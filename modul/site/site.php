@@ -1,14 +1,14 @@
 <?php
 function _auth() {//авторизация через сайт
 	if($code = @$_GET['code'])
-		_authLoginProcess($code);
+		_authLogin($code);
 
 	if(!$sid = @$_COOKIE['viewer_sid'])
-		_authLoginButton();
+		_authLogin();
 
 	$sql = "";
 }
-function _authLoginButton() {//отображение ссылки для входа через ВКонтакте
+function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 	$href = 'https://oauth.vk.com/authorize?'.
 					 'client_id=6046182'.
 					'&display=page'.
@@ -30,39 +30,20 @@ function _authLoginButton() {//отображение ссылки для входа через ВКонтакте
 
 		'<div class="center mt40">'.
 			'<div class="w1000 pad30 dib mt40">'.
-				'<button class="vk" onclick="location.href=\''.$href.'\'">Войти через VK</button>'.
+				'<button class="vk'.($code ? ' _busy' : '').'"'.($code ? '' : ' onclick="location.href=\''.$href.'\'"').'>Войти через VK</button>'.
 			'</div>'.
 		'</div>'.
 
+	($code ?
+		'<script>_authLogin("'.$code.'")</script>'
+	: '').
+	
 	'</body>'.
 	'</html>';
 
 	die($html);
 }
-function _authLoginProcess($code) {
-	$html =
-	'<!DOCTYPE html>'.
-	'<html lang="ru">'.
 
-	'<head>'.
-		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
-		'<title>Процесс авторизации</title>'.
-		_global_script().
-	'</head>'.
-
-	'<body>'.
-
-		'<div class="center mt40">'.
-			'<div class="w1000 pad30 dib mt40">'.
-				'Ожидайте, сейчас Вы будете перенаправлены в приложение...'.
-			'</div>'.
-		'</div>'.
-
-	'</body>'.
-	'</html>';
-
-	die($html);
-}
 
 
 

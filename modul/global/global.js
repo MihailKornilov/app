@@ -20,6 +20,9 @@ var _cookie = function(name, value) {
 			return;
 		_cookie('face', face);
 		location.reload();
+	},
+	_authLogin = function(code) {
+		alert(code);
 	};
 
 $(document)
