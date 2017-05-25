@@ -1,4 +1,9 @@
 <?php
+function _auth() {//авторизация через сайт
+}
+
+
+
 function _header() {
 	return
 		'<!DOCTYPE html>'.

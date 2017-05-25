@@ -1,4 +1,13 @@
-var _cookie = function(name, value) {
+var _post = function(send, func) {//отправка ajax-запроса методом POST
+		$.post(AJAX, send, function(res) {
+			if(res.success) {
+				if(func)
+					func(res);
+			} else
+				console.log(res.text);
+		}, 'json');
+	},
+	_cookie = function(name, value) {
 		if(value !== undefined) {
 			var exdate = new Date();
 			exdate.setDate(exdate.getDate() + 1);
@@ -22,7 +31,13 @@ var _cookie = function(name, value) {
 		location.reload();
 	},
 	_authLogin = function(code) {
-		alert(code);
+		var send = {
+			op:'login',
+			code:code
+		};
+		_post(send, function(res) {
+			location.href = 'https://nyandoma.ru/app';
+		});
 	};
 
 $(document)

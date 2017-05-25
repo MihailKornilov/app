@@ -3,10 +3,17 @@ function _auth() {//авторизация через сайт
 	if($code = @$_GET['code'])
 		_authLogin($code);
 
-	if(!$sid = @$_COOKIE['viewer_sid'])
+	if(!$sid = _txt(@$_COOKIE['viewer_sid']))
 		_authLogin();
 
-	$sql = "";
+	$sql = "SELECT *
+			FROM `_vkuser`
+			WHERE `viewer_sid`='".addslashes($sid)."'
+			LIMIT 1";
+	if(!$r = query_assoc($sql))
+		_authLogin();
+
+	
 }
 function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 	$href = 'https://oauth.vk.com/authorize?'.
