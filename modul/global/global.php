@@ -43,8 +43,8 @@ function _global_script() {//скрипты и стили
 //		'<script src="'.API_HTML.'/modul/global/global'.MIN.'.js?'.VERSION.'"></script>';
 	'<script src="js/jquery-3.2.1.slim.min.js"></script>'.
 
-	'<link rel="stylesheet" type="text/css" href="modul/global/global.css" />'.
-	'<script src="modul/global/global.js?1006"></script>';
+	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?1000" />'.
+	'<script src="modul/global/global.js?1007"></script>';
 }
 
 function _content() {//центральное содержание
