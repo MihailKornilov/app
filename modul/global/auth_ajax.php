@@ -23,18 +23,18 @@ switch(@$_POST['op']) {
 			jsonError('Пользователь не зарегистрирован');
 
 		$sql = "UPDATE `_vkuser`
-				SET `viewer_sid`='".$code."',
+				SET `code`='".$code."',
 					`last_seen`=CURRENT_TIMESTAMP
 				WHERE `id`=".$r['id'];
 		query($sql);
 		
-		setcookie('viewer_sid', $code, time() + 2592000, '/');
+		setcookie('code', $code, time() + 2592000, '/');
 		
 		jsonSuccess();
 		break;
 }
 
-if(!$sid = _txt(@$_COOKIE['viewer_sid']))
+if(!$sid = _txt(@$_COOKIE['code']))
 	jsonError('Пользователь не авторизирован');
 
 

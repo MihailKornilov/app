@@ -56,12 +56,12 @@ function _global_script() {//скрипты и стили
 	'<script src="modul/global/global.js?1015"></script>';
 }
 function _viewerConst() {//установка констант для пользователя
-	if(!$sid = _txt(@$_COOKIE['viewer_sid']))
+	if(!$code = _txt(@$_COOKIE['code']))
 		return false;
 
 	$sql = "SELECT *
 			FROM `_vkuser`
-			WHERE `viewer_sid`='".addslashes($sid)."'
+			WHERE `code`='".addslashes($code)."'
 			LIMIT 1";
 	if(!$r = query_assoc($sql))
 		return false;
@@ -72,10 +72,10 @@ function _viewerConst() {//установка констант для пользователя
 	//выход из приложения
 	if(isset($_GET['logout'])) {
 		$sql = "UPDATE `_vkuser`
-				SET `viewer_sid`=''
+				SET `code`=''
 				WHERE `id`=".$r['id'];
 		query($sql);
-		setcookie('viewer_sid', '', time() - 1, '/');
+		setcookie('code', '', time() - 1, '/');
 		header('Location:'.URL);
 	}
 	
@@ -97,9 +97,13 @@ function _content() {//центральное содержание
 		'<a href="https://vk.com/app4872135" target="blank">vk.com/app4872135</a>'.
 
 		'<br />'.
+		'<br />'.
 		'viewer_id='.VIEWER_ID.
 		'<br />'.
 		'app_id='.APP_ID.
+		'<br />'.
+		'<br />'.
+		'auth_key='.@$_GET['auth_key'].
 	'</div>';
 }
 
