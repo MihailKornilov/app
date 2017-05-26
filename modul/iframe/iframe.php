@@ -1,5 +1,5 @@
 <?php
-function _auth() {//авторизация через сайт
+function _auth() {//авторизация через iframe
 }
 
 

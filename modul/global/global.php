@@ -1,5 +1,7 @@
 <?php
 define('TIME', microtime(true));
+define('TODAY', strftime('%Y-%m-%d'));
+define('TODAY_UNIXTIME', strtotime(TODAY));
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 
 setlocale(LC_ALL, 'ru_RU.CP1251');
@@ -16,8 +18,10 @@ require_once GLOBAL_DIR.'/modul/global/regexp.php';
 
 define('FACE', _face());
 require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
-//define('SITE', FACE == 'site');
-//define('IFRAME', FACE == 'iframe');
+
+
+define('URL', API_HTML.'/index.php?'.TIME);
+define('URL_AJAX', API_HTML.'/ajax.php?'.TIME);
 
 
 
@@ -43,7 +47,7 @@ function _global_script() {//скрипты и стили
 //		'<script src="'.API_HTML.'/modul/global/global'.MIN.'.js?'.VERSION.'"></script>';
 
 	'<script>'.
-		'var AJAX="'.API_HTML.'/ajax.php"'.
+		'var AJAX="'.URL_AJAX.'"'.
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js"></script>'.
@@ -51,6 +55,33 @@ function _global_script() {//скрипты и стили
 	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?1001" />'.
 	'<script src="modul/global/global.js?1015"></script>';
 }
+function _viewerConst() {//установка констант для пользователя
+	if(!$sid = _txt(@$_COOKIE['viewer_sid']))
+		return false;
+
+	$sql = "SELECT *
+			FROM `_vkuser`
+			WHERE `viewer_sid`='".addslashes($sid)."'
+			LIMIT 1";
+	if(!$r = query_assoc($sql))
+		return false;
+
+	define('VIEWER_ID', $r['viewer_id']);
+	define('APP_ID', $r['app_id']);
+	
+	//выход из приложения
+	if(isset($_GET['logout'])) {
+		$sql = "UPDATE `_vkuser`
+				SET `viewer_sid`=''
+				WHERE `id`=".$r['id'];
+		query($sql);
+		setcookie('viewer_sid', '', time() - 1, '/');
+		header('Location:'.URL);
+	}
+	
+	return true;
+}
+
 
 function _content() {//центральное содержание
 	$sql = "SELECT COUNT(*) FROM `_vkuser`";
@@ -64,6 +95,11 @@ function _content() {//центральное содержание
 		'<a href="https://nyandoma.ru/app" target="blank">nyandoma.ru/app</a>'.
 		'<br />'.
 		'<a href="https://vk.com/app4872135" target="blank">vk.com/app4872135</a>'.
+
+		'<br />'.
+		'viewer_id='.VIEWER_ID.
+		'<br />'.
+		'app_id='.APP_ID.
 	'</div>';
 }
 

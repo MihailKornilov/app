@@ -2,18 +2,8 @@
 function _auth() {//авторизация через сайт
 	if($code = @$_GET['code'])
 		_authLogin($code);
-
-	if(!$sid = _txt(@$_COOKIE['viewer_sid']))
+	if(!_viewerConst())
 		_authLogin();
-
-	$sql = "SELECT *
-			FROM `_vkuser`
-			WHERE `viewer_sid`='".addslashes($sid)."'
-			LIMIT 1";
-	if(!$r = query_assoc($sql))
-		_authLogin();
-
-	
 }
 function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 	$href = 'https://oauth.vk.com/authorize?'.
@@ -68,15 +58,15 @@ function _header() {
 		'</head>'.
 
 		'<body>'.
-			_header_hat().
-
-
-		'<br />token='.@$_GET['access_token'];
+			_header_hat();
 }
 function _header_hat() {//верхняя строка приложения-сайта
 	return
 	'<div id="hat">'.
-		'<p>Фабрика мебели</p>'.
+		'<p>'.
+			'Фабрика мебели'.
+			'<a href="'.URL.'&logout" class="fr white mt5">Выход</a>'.
+		'</p>'.
 	'</div>';
 }
 function _footer() {
