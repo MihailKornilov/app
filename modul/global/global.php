@@ -4,6 +4,13 @@ define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 
+define('SA', true);
+if(SA) {
+	error_reporting(E_ALL);
+	ini_set('display_errors', true);
+	ini_set('display_startup_errors', true);
+}
+
 setlocale(LC_ALL, 'ru_RU.CP1251');
 setlocale(LC_NUMERIC, 'en_US');
 
@@ -21,8 +28,8 @@ require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
 require_once GLOBAL_DIR.'/modul/global/func_require.php';
 
 
-define('URL', API_HTML.'/index.php?'.TIME);
-define('URL_AJAX', API_HTML.'/ajax.php?'.TIME);
+define('URL', APP_HTML.'/index.php?'.TIME);
+define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
 
 
@@ -44,18 +51,20 @@ function _face() {//определение, как загружена страница: iframe или сайт
 }
 function _global_script() {//скрипты и стили
 	return
-		//стили Global
-//		'<link rel="stylesheet" type="text/css" href="'.API_HTML.'/modul/global/global'.MIN.'.css?'.VERSION.'" />'.
-//		'<script src="'.API_HTML.'/modul/global/global'.MIN.'.js?'.VERSION.'"></script>';
+	//ќтслеживание ошибок в скриптах
+	(SA ? '<script src="/.vkapp/.js/errors.js"></script>' : '').
 
 	'<script>'.
 		'var AJAX="'.URL_AJAX.'"'.
 	'</script>'.
 
-	'<script src="js/jquery-3.2.1.min.js"></script>'.
+	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?'.TIME.'" />'.
-	'<script src="modul/global/global.js?'.TIME.'"></script>';
+	'<script src="modul/global/global.js?'.TIME.'"></script>'.
+
+	'<link rel="stylesheet" type="text/css" href="modul/element/element.css?'.TIME.'" />'.
+	'<script src="modul/element/element.js?'.TIME.'"></script>';
 }
 function _viewerConst() {//установка констант дл€ пользовател€
 	if(!$code = _txt(@$_COOKIE['code']))

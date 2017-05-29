@@ -1,5 +1,6 @@
 var _post = function(send, func) {//отправка ajax-запроса методом POST
 		$.post(AJAX, send, function(res) {
+			console.log(res);
 			if(res.success) {
 				if(func)
 					func(res);
@@ -30,7 +31,7 @@ var _post = function(send, func) {//отправка ajax-запроса методом POST
 		_cookie('face', face);
 		location.reload();
 	},
-	_authLogin = function(code) {
+	_authLogin = function(code) {//авторизация пользователя по коду на сайте
 		var send = {
 			op:'login',
 			code:code
@@ -40,7 +41,30 @@ var _post = function(send, func) {//отправка ajax-запроса методом POST
 		});
 	};
 
+$.fn.keyEnter = function(func) {
+	$(this).keydown(function(e) {
+		if(e.keyCode == 13)
+			func();
+	});
+	return $(this);
+};
+
 $(document)
+	.ajaxError(function(event, request, settings) {
+//		_busy(0);
+		if(!request.responseText)
+			return;
+		var d = _dialog({
+			width:770,
+			top:10,
+			head:'Ошибка AJAX-запроса',
+			content:'<textarea style="width:730px;background-color:#fdd">' + request.responseText + '</textarea>',
+			butSubmit:'',
+			butCancel:'Закрыть'
+		});
+		d.content.find('textarea').autosize();
+	})
+
 	.ready(function() {
 		_faceTest();
 	});

@@ -7,7 +7,7 @@ function _auth() {//авторизация через сайт
 }
 function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 	$href = 'https://oauth.vk.com/authorize?'.
-					 'client_id=6046182'.
+					 'client_id='.AUTH_APP_ID.
 					'&display=page'.
 					'&redirect_uri=https://nyandoma.ru/app'.
 					'&scope=0'.

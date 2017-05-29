@@ -6,18 +6,22 @@ switch(@$_POST['op']) {
 		if(!$code = _txt($_POST['code']))
 			jsonError('Отсутствует код');
 
-		$url = 'https://oauth.vk.com/access_token?client_id=6046182&client_secret=s4gT1VC1JKQpkG0JiifY&redirect_uri=https://nyandoma.ru/app&code='.$code;
-		$res = file_get_contents($url);
+		$url = 'https://oauth.vk.com/access_token?'.
+					'client_id='.AUTH_APP_ID.
+				   '&client_secret='.AUTH_APP_SECRET.
+				   '&redirect_uri=https://nyandoma.ru/app'.
+				   '&code='.$code;
+		if(!$res = @file_get_contents($url))
+			jsonError('Неуспешная попытка получения токена');
+
 		$res = json_decode($res, true);
 
 		if(!$viewer_id = _num($res['user_id']))
-			jsonError('Неудачное получение токена');
+			jsonError('Ошибка при получении токена');
 
 		$sql = "SELECT *
 				FROM `_vkuser`
 				WHERE `viewer_id`=".$viewer_id."
-				  AND `worker`
-				ORDER BY `id`
 				LIMIT 1";
 		if(!$r = query_assoc($sql))
 			jsonError('Пользователь не зарегистрирован');
@@ -34,7 +38,7 @@ switch(@$_POST['op']) {
 		break;
 }
 
-if(!$sid = _txt(@$_COOKIE['code']))
+if(!$code = _txt(@$_COOKIE['code']))
 	jsonError('Пользователь не авторизирован');
 
 

@@ -129,7 +129,7 @@ function query_insert_id($tab, $resource_id=GLOBAL_MYSQL_CONNECT) {//id последне
 function _dbDump() {
 	define('INSERT_COUNT_MAX', 500); //записей в одном INSERT
 	define('DUMP_NAME', GLOBAL_MYSQL_DATABASE.'_'.strftime('%Y-%m-%d_%H-%M-%S').'.sql');//только название файла
-	define('DUMP_FILE', API_PATH.'/'.DUMP_NAME); //полный путь с названием
+	define('DUMP_FILE', APP_PATH.'/'.DUMP_NAME); //полный путь с названием
 	define('DUMP_FILE_ZIP', DUMP_FILE.'.zip');   //полный путь запакованного файла с названием
 	define('DUMP_NAME_ZIP', DUMP_NAME.'.zip');   //название запакованного файла
 
