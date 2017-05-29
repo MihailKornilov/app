@@ -18,10 +18,12 @@ require_once GLOBAL_DIR.'/modul/global/regexp.php';
 
 define('FACE', _face());
 require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
+require_once GLOBAL_DIR.'/modul/global/func_require.php';
 
 
 define('URL', API_HTML.'/index.php?'.TIME);
 define('URL_AJAX', API_HTML.'/ajax.php?'.TIME);
+
 
 
 
@@ -52,8 +54,8 @@ function _global_script() {//скрипты и стили
 
 	'<script src="js/jquery-3.2.1.min.js"></script>'.
 
-	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?1001" />'.
-	'<script src="modul/global/global.js?1015"></script>';
+	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?'.TIME.'" />'.
+	'<script src="modul/global/global.js?'.TIME.'"></script>';
 }
 function _viewerConst() {//установка констант для пользователя
 	if(!$code = _txt(@$_COOKIE['code']))
