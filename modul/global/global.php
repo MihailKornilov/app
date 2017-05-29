@@ -22,6 +22,7 @@ require_once GLOBAL_DIR.'/modul/global/mysql.php';
 _dbConnect('GLOBAL_');
 
 require_once GLOBAL_DIR.'/modul/global/regexp.php';
+require_once GLOBAL_DIR.'/modul/global/vkuser.php';
 
 define('FACE', _face());
 require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
@@ -31,6 +32,7 @@ require_once GLOBAL_DIR.'/modul/global/func_require.php';
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
+define('CACHE_PREFIX', 'CACHE_');
 
 
 
@@ -281,6 +283,43 @@ function translit($str) {
 	);
 	return strtr($str, $list);
 }
+
+
+
+
+
+function _vkapi($method, $param=array()) {//получение данных из api вконтакте
+	$param += array(
+		'v' => 5.64,
+		'lang' => 'ru'
+	);
+
+	$url = 'https://api.vk.com/method/'.$method.'?'.http_build_query($param);
+	$res = file_get_contents($url);
+	$res = json_decode($res, true);
+//	if(DEBUG)
+//		$res['url'] = $url;
+	return $res;
+}
+
+function _cache($key, $v='') {//кеширование данных
+	if(empty($key))
+		die('Отсутствует ключ для кеширования.');
+
+	$key = CACHE_PREFIX.$key;
+
+	//занесение данных в кеш
+	if($v) {
+		xcache_set($key, $v, 86400);
+		return true;
+	}
+
+	if(xcache_isset($key))
+		return false;
+
+	return xcache_get($key);
+}
+
 
 
 

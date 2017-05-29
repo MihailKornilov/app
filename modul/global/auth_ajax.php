@@ -19,19 +19,15 @@ switch(@$_POST['op']) {
 		if(!$viewer_id = _num($res['user_id']))
 			jsonError('Ошибка при получении токена');
 
-		$sql = "SELECT *
-				FROM `_vkuser`
-				WHERE `viewer_id`=".$viewer_id."
-				LIMIT 1";
-		if(!$r = query_assoc($sql))
-			jsonError('Пользователь не зарегистрирован');
+		if(!$u = _viewer($viewer_id))
+			jsonError('Ошибка получения данных пользователя');
 
-		$sql = "UPDATE `_vkuser`
+/*		$sql = "UPDATE `_vkuser`
 				SET `code`='".$code."',
 					`last_seen`=CURRENT_TIMESTAMP
-				WHERE `id`=".$r['id'];
+				WHERE `id`=".$u['id'];
 		query($sql);
-		
+*/
 		setcookie('code', $code, time() + 2592000, '/');
 		
 		jsonSuccess();
