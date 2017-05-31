@@ -1,12 +1,30 @@
 <?php
 function _auth() {//авторизация через сайт
-	if(!$code = _txt(@$_COOKIE['code']))
-		_authLogin();
 	if($code = @$_GET['code'])
 		_authLogin($code);
-//	if($code != _viewer())
+	if(!$code = _txt(@$_COOKIE['code']))
+		_authLogin();
+
+	$sql = "SELECT *
+			FROM `_vkuser_auth`
+			WHERE `code`='".addslashes($code)."'
+			LIMIT 1";
+	if(!$r = query_assoc($sql))
+		_authLogin();
+
+	if(isset($_GET['logout'])) {
+		$sql = "DELETE FROM `_vkuser_auth` WHERE `code`='".addslashes($code)."'";
+		query($sql);
+		_cache('viewer_'.$r['viewer_id'], 'clear');
+		header('Location:'.URL);
+		exit;
+	}
+
+	_viewer($r['viewer_id']);
 }
 function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
+	setcookie('code', '', time() - 1, '/');//сброс авторизации
+
 	$href = 'https://oauth.vk.com/authorize?'.
 					 'client_id='.AUTH_APP_ID.
 					'&display=page'.

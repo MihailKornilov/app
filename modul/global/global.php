@@ -282,6 +282,11 @@ function _cache($key, $v='') {//кеширование данных
 
 	$key = CACHE_PREFIX.$key;
 
+	if($v == 'clear') {
+		xcache_unset($key);
+		return true;
+	}
+
 	//занесение данных в кеш
 	if($v) {
 		xcache_set($key, $v, 86400);

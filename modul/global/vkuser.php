@@ -14,6 +14,8 @@ function _viewer($viewer_id, $i='') {//получение данных о пользовате из контакта
 		_cache('viewer_'.$viewer_id, $u);
 	}
 
+	_viewerDefine($viewer_id);
+
 	return $u;
 }
 function _viewerVkUpdate($viewer_id) {//Обновление пользователя из Контакта
@@ -85,26 +87,15 @@ function _viewerVkUpdate($viewer_id) {//Обновление пользователя из Контакта
 
 	return _viewer($viewer_id);
 }
-function _viewerDefine() {//установка констант для пользователя
-	$sql = "SELECT *
-			FROM `_vkuser`
-			WHERE `code`='".addslashes($code)."'
-			LIMIT 1";
-	if(!$r = query_assoc($sql))
-		return false;
+function _viewerDefine($viewer_id) {//установка констант для пользователя
+	if(defined('VIEWER_DEFINED'))
+		return;
 
-	define('VIEWER_ID', $r['viewer_id']);
-	define('APP_ID', $r['app_id']);
+	$app_id = 0;
 
-	//выход из приложения
-	if(isset($_GET['logout'])) {
-		$sql = "UPDATE `_vkuser`
-				SET `code`=''
-				WHERE `id`=".$r['id'];
-		query($sql);
-		setcookie('code', '', time() - 1, '/');
-		header('Location:'.URL);
-	}
+	define('VIEWER_ID', $viewer_id);
+	define('APP_ID', $app_id);
+	define('VIEWER_DEFINED', true);
 
-	return true;
+	return;
 }
