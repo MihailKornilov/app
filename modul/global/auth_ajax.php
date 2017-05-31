@@ -22,12 +22,41 @@ switch(@$_POST['op']) {
 		if(!$u = _viewer($viewer_id))
 			jsonError('Ошибка получения данных пользователя');
 
-/*		$sql = "UPDATE `_vkuser`
-				SET `code`='".$code."',
-					`last_seen`=CURRENT_TIMESTAMP
+		//отметка даты последнего посещения пользователя
+		$sql = "UPDATE `_vkuser`
+				SET `last_seen`=CURRENT_TIMESTAMP
 				WHERE `id`=".$u['id'];
 		query($sql);
-*/
+
+		//получение id приложения, в котором в последний раз был пользователь
+		$sql = "SELECT `app_id`
+				FROM `_vkuser_auth`
+				WHERE `viewer_id`=".$viewer_id."
+				ORDER BY `id` DESC
+				LIMIT 1";
+		if(!$app_id = _num(query_value($sql))) {
+			//если входов ещё не было, значит получение id приложения, при условии, если пользователь использует всего одно приложение, иначе 0
+			$sql = "SELECT `app_id`,1
+					FROM `_vkuser_app`
+					WHERE `viewer_id`=".$viewer_id."
+					  AND `worker`
+					ORDER BY `last_seen` DESC";
+			if($app = query_ass($sql))
+				if(count($app) == 1)
+					$app_id = _num(key($app));
+		}
+
+		$sql = "INSERT INTO `_vkuser_auth` (
+					`viewer_id`,
+					`app_id`,
+					`code`
+				) VALUES (
+					".$viewer_id.",
+					".$app_id.",
+					'".$code."'
+				)";
+		query($sql);
+
 		setcookie('code', $code, time() + 2592000, '/');
 		
 		jsonSuccess();

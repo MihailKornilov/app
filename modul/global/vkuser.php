@@ -52,7 +52,6 @@ function _viewerVkUpdate($viewer_id) {//Обновление пользователя из Контакта
 
 	$sql = "INSERT INTO `_vkuser` (
 				`id`,
-				`app_id`,
 				`viewer_id`,
 				`first_name`,
 				`last_name`,
@@ -64,7 +63,6 @@ function _viewerVkUpdate($viewer_id) {//Обновление пользователя из Контакта
 				`city_title`
 			) VALUES (
 				".$id.",
-				".APP_ID.",
 				".$viewer_id.",
 				'".addslashes($u['first_name'])."',
 				'".addslashes($u['last_name'])."',
@@ -86,4 +84,27 @@ function _viewerVkUpdate($viewer_id) {//Обновление пользователя из Контакта
 	query($sql);
 
 	return _viewer($viewer_id);
+}
+function _viewerDefine() {//установка констант для пользователя
+	$sql = "SELECT *
+			FROM `_vkuser`
+			WHERE `code`='".addslashes($code)."'
+			LIMIT 1";
+	if(!$r = query_assoc($sql))
+		return false;
+
+	define('VIEWER_ID', $r['viewer_id']);
+	define('APP_ID', $r['app_id']);
+
+	//выход из приложения
+	if(isset($_GET['logout'])) {
+		$sql = "UPDATE `_vkuser`
+				SET `code`=''
+				WHERE `id`=".$r['id'];
+		query($sql);
+		setcookie('code', '', time() - 1, '/');
+		header('Location:'.URL);
+	}
+
+	return true;
 }

@@ -68,32 +68,6 @@ function _global_script() {//скрипты и стили
 	'<link rel="stylesheet" type="text/css" href="modul/element/element.css?'.TIME.'" />'.
 	'<script src="modul/element/element.js?'.TIME.'"></script>';
 }
-function _viewerConst() {//установка констант для пользователя
-	if(!$code = _txt(@$_COOKIE['code']))
-		return false;
-
-	$sql = "SELECT *
-			FROM `_vkuser`
-			WHERE `code`='".addslashes($code)."'
-			LIMIT 1";
-	if(!$r = query_assoc($sql))
-		return false;
-
-	define('VIEWER_ID', $r['viewer_id']);
-	define('APP_ID', $r['app_id']);
-	
-	//выход из приложения
-	if(isset($_GET['logout'])) {
-		$sql = "UPDATE `_vkuser`
-				SET `code`=''
-				WHERE `id`=".$r['id'];
-		query($sql);
-		setcookie('code', '', time() - 1, '/');
-		header('Location:'.URL);
-	}
-	
-	return true;
-}
 
 
 function _content() {//центральное содержание

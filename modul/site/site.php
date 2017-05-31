@@ -1,9 +1,10 @@
 <?php
 function _auth() {//авторизация через сайт
+	if(!$code = _txt(@$_COOKIE['code']))
+		_authLogin();
 	if($code = @$_GET['code'])
 		_authLogin($code);
-	if(!_viewerConst())
-		_authLogin();
+//	if($code != _viewer())
 }
 function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 	$href = 'https://oauth.vk.com/authorize?'.
