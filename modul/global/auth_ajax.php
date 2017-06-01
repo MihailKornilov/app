@@ -46,14 +46,23 @@ switch(@$_POST['op']) {
 					$app_id = _num(key($app));
 		}
 
+		$ip = $_SERVER['REMOTE_ADDR'];
+		$browser = _txt($_SERVER['HTTP_USER_AGENT']);
+		$browser_md5 = md5($browser);
 		$sql = "INSERT INTO `_vkuser_auth` (
 					`viewer_id`,
 					`app_id`,
-					`code`
+					`code`,
+					`ip`,
+					`browser`,
+					`browser_md5`
 				) VALUES (
 					".$viewer_id.",
 					".$app_id.",
-					'".$code."'
+					'".$code."',
+					'".$ip."',
+					'".addslashes($browser)."',
+					'".$browser_md5."'
 				)";
 		query($sql);
 

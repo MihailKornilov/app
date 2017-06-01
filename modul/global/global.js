@@ -1,11 +1,12 @@
-var _post = function(send, func) {//отправка ajax-запроса методом POST
+var _post = function(send, func, funcErr) {//отправка ajax-запроса методом POST
 		$.post(AJAX, send, function(res) {
 			console.log(res);
 			if(res.success) {
 				if(func)
 					func(res);
 			} else
-				console.log(res.text);
+				if(funcErr)
+					funcErr(res);
 		}, 'json');
 	},
 	_cookie = function(name, value) {
@@ -33,12 +34,14 @@ var _post = function(send, func) {//отправка ajax-запроса методом POST
 	},
 	_authLogin = function(code) {//авторизация пользователя по коду на сайте
 		var send = {
-			op:'login',
-			code:code
-		};
-		_post(send, function(res) {
-			location.href = 'https://nyandoma.ru/app';
-		});
+				op:'login',
+				code:code
+			},
+			func = function() {
+				location.href = 'https://nyandoma.ru/app';
+			};
+
+		_post(send, func, func);
 	};
 
 $.fn.keyEnter = function(func) {

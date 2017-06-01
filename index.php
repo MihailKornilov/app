@@ -6,5 +6,6 @@ _auth();
 die(
 	_header().
 	_content().
+	_debug().
 	_footer()
 );

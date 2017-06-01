@@ -4,6 +4,10 @@ define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 
+define('VERSION', 0);
+define('DEBUG', true);
+define('MIN', DEBUG ? '' : '.min');
+
 define('SA', true);
 if(SA) {
 	error_reporting(E_ALL);
@@ -28,6 +32,7 @@ define('FACE', _face());
 require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
 require_once GLOBAL_DIR.'/modul/global/func_require.php';
 
+require_once GLOBAL_DIR.'/modul/debug/debug.php';
 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
@@ -54,7 +59,7 @@ function _face() {//определение, как загружена страница: iframe или сайт
 function _global_script() {//скрипты и стили
 	return
 	//Отслеживание ошибок в скриптах
-	(SA ? '<script src="/.vkapp/.js/errors.js"></script>' : '').
+	(SA ? '<script src="js/errors.js"></script>' : '').
 
 	'<script>'.
 		'var AJAX="'.URL_AJAX.'"'.
@@ -66,13 +71,15 @@ function _global_script() {//скрипты и стили
 	'<script src="modul/global/global.js?'.TIME.'"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/element/element.css?'.TIME.'" />'.
-	'<script src="modul/element/element.js?'.TIME.'"></script>';
+	'<script src="modul/element/element.js?'.TIME.'"></script>'.
+	
+	_debug('style');
 }
+
 
 
 function _content() {//центральное содержание
 	$sql = "SELECT COUNT(*) FROM `_vkuser`";
-
 	return
 	'<div id="_content">'.
 		FACE.
@@ -93,7 +100,6 @@ function _content() {//центральное содержание
 		'auth_key='.@$_GET['auth_key'].
 	'</div>';
 }
-
 
 
 
@@ -293,7 +299,7 @@ function _cache($key, $v='') {//кеширование данных
 		return true;
 	}
 
-	if(xcache_isset($key))
+	if(!xcache_isset($key))
 		return false;
 
 	return xcache_get($key);

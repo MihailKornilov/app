@@ -1,23 +1,22 @@
 <?php
 function _auth() {//авторизация через iframe
 	if($auth_key = @$_GET['auth_key']) {
-		$viewer_id = _num(@$_GET['viewer_id']);
 		$app_id = _num(@$_GET['api_id']);
-		$sql = "SELECT *
+		$viewer_id = _num(@$_GET['viewer_id']);
+//		if($auth_key != md5($app_id.'_'.$viewer_id.'_'._app('secret')))
+//			_appError('Ошибка авторизации.');
+
+/*		$sql = "SELECT *
 				FROM `_vkuser`
 				WHERE `app_id`=".$app_id."
 				  AND `viewer_id`=".$viewer_id;
 		if(!$r = query_assoc($sql))
 			_appError();
-
+*/
 	}
 		
 }
 function _appError($msg='Приложение не было загружено.') {//вывод сообщения об ошибке приложения и выход
-	if(!defined('VERSION')) {
-		define('VERSION', 141);
-		define('MIN', defined('DEBUG') ? '' : '.min');
-	}
 	$html =
 		'<!DOCTYPE html>'.
 		'<html lang="ru">'.

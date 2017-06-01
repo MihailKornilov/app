@@ -1,4 +1,10 @@
 <?php
+/*
+	1. Если есть GET code -> переход на страницу авторизации
+	2. Если нет code в Cookie -> переход на страницу авторизации
+	3.
+*/
+
 function _auth() {//авторизация через сайт
 	if($code = @$_GET['code'])
 		_authLogin($code);
@@ -33,7 +39,8 @@ function _authCache($code) {//получение данных авторизации из кеша и установка к
 			'app_id' => $r['app_id']
 		));
 	}
-	
+
+
 	define('VIEWER_ID', _num($r['viewer_id']));
 	define('APP_ID', _num($r['app_id']));
 
