@@ -15,36 +15,12 @@ function _auth() {//авторизаци€ через сайт
 		_authLogin();
 
 	if(isset($_GET['logout'])) {
-		$sql = "DELETE FROM `_vkuser_auth` WHERE `code`='".addslashes($code)."'";
-		query($sql);
-		_cache($code, 'clear');
-		_cache('viewer_'.VIEWER_ID, 'clear');
+		_authLogout($code, VIEWER_ID);
 		header('Location:'.URL);
 		exit;
 	}
 
 	_viewer();
-}
-function _authCache($code) {//получение данных авторизации из кеша и установка констант id пользовател€ и приложени€
-	if(!$r = _cache($code)) {
-		$sql = "SELECT *
-				FROM `_vkuser_auth`
-				WHERE `code`='".addslashes($code)."'
-				LIMIT 1";
-		if(!$r = query_assoc($sql))
-			return false;
-
-		_cache($code, array(
-			'viewer_id' => $r['viewer_id'],
-			'app_id' => $r['app_id']
-		));
-	}
-
-
-	define('VIEWER_ID', _num($r['viewer_id']));
-	define('APP_ID', _num($r['app_id']));
-
-	return true;
 }
 function _authLogin($code='') {//отображение ссылки дл€ входа через ¬ онтакте
 	setcookie('code', '', time() - 1, '/');//сброс авторизации

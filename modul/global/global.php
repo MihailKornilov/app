@@ -37,7 +37,7 @@ require_once GLOBAL_DIR.'/modul/debug/debug.php';
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
-define('CACHE_PREFIX', 'CACHE_');
+define('CACHE_PREFIX', md5(@$_COOKIE['code']));
 
 
 
@@ -76,6 +76,85 @@ function _global_script() {//скрипты и стили
 	_debug('style');
 }
 
+function _authSuccess($code, $viewer_id, $app_id) {//внесение записи об успешной авторизации
+	_authLogout($code, $viewer_id);
+
+	$ip = $_SERVER['REMOTE_ADDR'];
+	$browser = _txt($_SERVER['HTTP_USER_AGENT']);
+	$browser_md5 = md5($browser);
+	$sql = "INSERT INTO `_vkuser_auth` (
+				`viewer_id`,
+				`app_id`,
+				`code`,
+				`ip`,
+				`browser`,
+				`browser_md5`
+			) VALUES (
+				".$viewer_id.",
+				".$app_id.",
+				'".$code."',
+				'".$ip."',
+				'".addslashes($browser)."',
+				'".$browser_md5."'
+			)";
+	query($sql);
+
+	//отметка даты последнего посещени€ пользовател€
+	$sql = "UPDATE `_vkuser`
+			SET `last_seen`=CURRENT_TIMESTAMP
+			WHERE `id`=".$viewer_id;
+	query($sql);
+
+	setcookie('code', $code, time() + 2592000, '/');
+}
+function _authLogout($code, $viewer_id) {
+	$sql = "DELETE FROM `_vkuser_auth` WHERE `code`='".addslashes($code)."'";
+	query($sql);
+	_cache($code, 'clear');
+	_cache('viewer_'.$viewer_id, 'clear');
+}
+function _authCache($code) {//получение данных авторизации из кеша и установка констант id пользовател€ и приложени€
+	if(!$r = _cache($code)) {
+		$sql = "SELECT *
+				FROM `_vkuser_auth`
+				WHERE `code`='".addslashes($code)."'
+				LIMIT 1";
+		if(!$r = query_assoc($sql))
+			return false;
+
+		_cache($code, array(
+			'viewer_id' => $r['viewer_id'],
+			'app_id' => $r['app_id']
+		));
+	}
+
+	define('VIEWER_ID', _num($r['viewer_id']));
+	define('APP_ID', _num($r['app_id']));
+
+	return true;
+}
+
+function _app($i='all') {//ѕолучение данных о приложении
+	if(!$arr = _cache('app')) {
+		$sql = "SELECT *
+				FROM `_app`
+				WHERE `id`=".APP_ID;
+		if(!$arr = query_assoc($sql))
+			_appError('Ќевозможно прочитать данные приложени€ дл€ кеша.');
+
+		_cache('app', $arr);
+	}
+
+	if($i == 'all') {
+		_debugLoad('ѕолучены данные приложени€');
+		return $arr;
+	}
+
+	if(!isset($arr[$i]))
+		return _cacheErr('_app: неизвестный ключ', $i);
+
+	return $arr[$i];
+}
 
 
 function _content() {//центральное содержание
@@ -286,6 +365,12 @@ function _cache($key, $v='') {//кеширование данных
 	if(empty($key))
 		die('ќтсутствует ключ дл€ кешировани€.');
 
+	/*
+		code - произвольный код
+		viewer_ + id
+		app
+	*/
+
 	$key = CACHE_PREFIX.$key;
 
 	if($v == 'clear') {
@@ -303,6 +388,11 @@ function _cache($key, $v='') {//кеширование данных
 		return false;
 
 	return xcache_get($key);
+}
+function _cacheErr($txt='Ќеизвестное значение', $i='') {//
+	if($i != '')
+		$i = ': <b>'.$i.'</b>';
+	return '<span class="red">'.$txt.$i.'.</span>';
 }
 
 
