@@ -1,5 +1,5 @@
 <?php
-function _viewer($viewer_id, $i='') {//получение данных о пользовате из контакта
+function _viewer($viewer_id=VIEWER_ID, $i='') {//получение данных о пользовате из контакта
 	if(!_num($viewer_id))
 		return false;
 
@@ -14,7 +14,7 @@ function _viewer($viewer_id, $i='') {//получение данных о пользовате из контакта
 		_cache('viewer_'.$viewer_id, $u);
 	}
 
-	_viewerDefine($viewer_id);
+	_viewerDefine();
 
 	return $u;
 }
@@ -87,14 +87,10 @@ function _viewerVkUpdate($viewer_id) {//Обновление пользователя из Контакта
 
 	return _viewer($viewer_id);
 }
-function _viewerDefine($viewer_id) {//установка констант для пользователя
+function _viewerDefine() {//установка констант для пользователя
 	if(defined('VIEWER_DEFINED'))
 		return;
 
-	$app_id = 0;
-
-	define('VIEWER_ID', $viewer_id);
-	define('APP_ID', $app_id);
 	define('VIEWER_DEFINED', true);
 
 	return;
