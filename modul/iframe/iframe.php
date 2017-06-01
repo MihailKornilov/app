@@ -39,23 +39,20 @@ function _appError($msg='Приложение не было загружено.') {//вывод сообщения об о
 			'<body>'.
 				'<div id="frameBody">'.
 					'<iframe id="frameHidden" name="frameHidden"></iframe>'.
-					_noauth($msg).
+
+					'<div class="pad30 bg-gr1">'.
+						'<div class="bg-fff pad30 bor-e8">'.
+							'<div class="center grey mt40 mb40">'.
+								$msg.
+							'</div>'.
+						'</div>'.
+					'</div>'.
+
 				'</div>'.
 			'</body>'.
 		'</html>';
 	die($html);
 }
-function _noauth($msg='Не удалось выполнить вход в приложение.') {
-	return
-	'<div class="pad30 bg-gr1">'.
-		'<div class="bg-fff pad30 bor-e8">'.
-			'<div class="center grey mt40 mb40">'.
-				$msg.
-			'</div>'.
-		'</div>'.
-	'</div>';
-}
-
 
 
 function _header() {
