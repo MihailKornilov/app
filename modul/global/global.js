@@ -1,9 +1,13 @@
 var _post = function(send, func, funcErr) {//отправка ajax-запроса методом POST
 		$.post(AJAX, send, function(res) {
-			console.log(res);
 			if(res.success) {
-				if(func)
-					func(res);
+				if(!func)
+					return;
+				if(func == 'reload') {
+					location.reload();
+					return;
+				}
+				func(res);
 			} else
 				if(funcErr)
 					funcErr(res);
@@ -42,6 +46,14 @@ var _post = function(send, func, funcErr) {//отправка ajax-запроса методом POST
 			};
 
 		_post(send, func, func);
+	},
+	_appEnter = function(app_id) {//вход в приложение из списка приложений
+		var send = {
+			op:'app_enter',
+			app_id:app_id
+		};
+
+		_post(send, 'reload');
 	};
 
 $.fn.keyEnter = function(func) {

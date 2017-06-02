@@ -5,3 +5,9 @@ if(!function_exists('_auth')) {
 		die('no func: _auth');
 	}
 }
+if(!function_exists('_appSpisok')) {
+	function _appSpisok() {
+		return '';
+	}
+}
+

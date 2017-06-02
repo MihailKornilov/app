@@ -1,8 +1,8 @@
 <?php
 /*
-	1. Если есть GET code -> переход на страницу авторизации
-	2. Если нет code в Cookie -> переход на страницу авторизации
-	3.
+	Процесс авторизации:
+		1. Если есть GET code -> переход на страницу авторизации
+		2. Если нет code в Cookie -> переход на страницу авторизации
 */
 
 function _auth() {//авторизация через сайт
@@ -83,10 +83,36 @@ function _header_hat() {//верхняя строка приложения-сайта
 	return
 	'<div id="hat">'.
 		'<p>'.
-			'Фабрика мебели'.
+			(APP_ID ? _app('app_name') : 'Мои приложения').
 			'<a href="'.URL.'&logout" class="fr white mt5">Выход</a>'.
 		'</p>'.
 	'</div>';
 }
 
 
+
+function _appSpisok() {//список приложений, которые доступны пользователю
+	$sql = "SELECT `app`.*
+			FROM
+				`_app` `app`,
+				`_vkuser_app` `va`
+			WHERE `app`.`id`=`va`.`app_id`
+			  AND `viewer_id`=".VIEWER_ID."
+			  AND `worker`
+			ORDER BY `va`.`dtime_add`";
+	if(!$spisok = query_arr($sql))
+		return 'Приложений нет.';
+
+	$send = '<div class="">';
+	foreach($spisok as $r) {
+		$send .=
+			'<div class="pad10 bg-gr2 mar10 over2 curP" onclick="_appEnter('.$r['id'].')">'.
+				'<span class="grey">'.$r['id'].'</span> '.
+				$r['app_name'].
+				'<div class="fr grey">'.FullData($r['dtime_add']).'</div>'.
+			'</div>';
+	}
+	$send .= '</div>';
+
+	return $send;
+}

@@ -2,6 +2,10 @@
 require_once 'modul/global/global.php';
 require_once 'modul/global/auth_ajax.php';
 
+_auth();
+
+require_once 'modul/site/site_ajax.php';
+
 
 
 

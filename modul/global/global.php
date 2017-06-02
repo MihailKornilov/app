@@ -26,9 +26,12 @@ require_once GLOBAL_DIR.'/modul/global/mysql.php';
 _dbConnect('GLOBAL_');
 
 require_once GLOBAL_DIR.'/modul/global/regexp.php';
+require_once GLOBAL_DIR.'/modul/global/date.php';
 require_once GLOBAL_DIR.'/modul/global/vkuser.php';
 
 define('FACE', _face());
+define('SITE', FACE == 'site');
+define('IFRAME', FACE == 'iframe');
 require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
 require_once GLOBAL_DIR.'/modul/global/func_require.php';
 
@@ -37,7 +40,8 @@ require_once GLOBAL_DIR.'/modul/debug/debug.php';
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
-define('CACHE_PREFIX', md5(@$_COOKIE['code']));
+define('CODE', _txt(@$_COOKIE['code']));
+define('CACHE_PREFIX', md5(CODE));
 
 
 
@@ -158,25 +162,15 @@ function _app($i='all') {//Получение данных о приложении
 
 
 function _content() {//центральное содержание
-	$sql = "SELECT COUNT(*) FROM `_vkuser`";
 	return
 	'<div id="_content">'.
 		FACE.
 		'<br />'.
-		'количество пользователей: '.query_value($sql).
+		'<span class="grey">viewer_id:</span> '.VIEWER_ID.
 		'<br />'.
-		'<a href="https://nyandoma.ru/app" target="blank">nyandoma.ru/app</a>'.
+		'<span class="grey">app_id:</span> '.APP_ID.
 		'<br />'.
-		'<a href="https://vk.com/app4872135" target="blank">vk.com/app4872135</a>'.
-
-		'<br />'.
-		'<br />'.
-		'viewer_id='.VIEWER_ID.
-		'<br />'.
-		'app_id='.APP_ID.
-		'<br />'.
-		'<br />'.
-		'auth_key='.@$_GET['auth_key'].
+		_appSpisok().
 	'</div>';
 }
 function _footer() {
