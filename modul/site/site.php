@@ -88,9 +88,5 @@ function _header_hat() {//верхняя строка приложения-сайта
 		'</p>'.
 	'</div>';
 }
-function _footer() {
-	return
-	'</body></html>';
-}
 
 

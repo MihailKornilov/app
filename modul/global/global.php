@@ -179,6 +179,9 @@ function _content() {//центральное содержание
 		'auth_key='.@$_GET['auth_key'].
 	'</div>';
 }
+function _footer() {
+	return '</body></html>';
+}
 
 
 

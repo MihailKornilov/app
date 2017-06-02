@@ -69,7 +69,3 @@ function _header() {
 
 		'<body>';
 }
-function _footer() {
-	return
-	'</body></html>';
-}
