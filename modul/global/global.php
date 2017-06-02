@@ -81,7 +81,7 @@ function _global_script() {//скрипты и стили
 }
 
 function _authSuccess($code, $viewer_id, $app_id) {//внесение записи об успешной авторизации
-	_authLogout($code, $viewer_id);
+	_authLogout($code, $viewer_id);//предварительное очищение старой авторизации
 
 	$ip = $_SERVER['REMOTE_ADDR'];
 	$browser = _txt($_SERVER['HTTP_USER_AGENT']);
@@ -111,6 +111,15 @@ function _authSuccess($code, $viewer_id, $app_id) {//внесение записи об успешной
 
 	setcookie('code', $code, time() + 2592000, '/');
 }
+function _authLogoutApp() {//выход из приложения и попадание в список приложений
+	$sql = "UPDATE `_vkuser_auth`
+			SET `app_id`=0
+			WHERE `code`='".CODE."'";
+	query($sql);
+
+	_cache(CODE, 'clear');
+	_cache('viewer_'.VIEWER_ID, 'clear');
+}
 function _authLogout($code, $viewer_id) {
 	$sql = "DELETE FROM `_vkuser_auth` WHERE `code`='".addslashes($code)."'";
 	query($sql);
@@ -139,14 +148,14 @@ function _authCache($code) {//получение данных авторизации из кеша и установка к
 }
 
 function _app($i='all') {//Получение данных о приложении
-	if(!$arr = _cache('app')) {
+	if(!$arr = _cache('app'.APP_ID)) {
 		$sql = "SELECT *
 				FROM `_app`
 				WHERE `id`=".APP_ID;
 		if(!$arr = query_assoc($sql))
 			_appError('Невозможно прочитать данные приложения для кеша.');
 
-		_cache('app', $arr);
+		_cache('app'.APP_ID, $arr);
 	}
 
 	if($i == 'all') {
@@ -165,6 +174,8 @@ function _content() {//центральное содержание
 	return
 	'<div id="_content">'.
 		FACE.
+		'<br />'.
+		'<span class="grey">code:</span> '.CODE.
 		'<br />'.
 		'<span class="grey">viewer_id:</span> '.VIEWER_ID.
 		'<br />'.

@@ -15,7 +15,10 @@ function _auth() {//авторизация через сайт
 		_authLogin();
 
 	if(isset($_GET['logout'])) {
-		_authLogout($code, VIEWER_ID);
+		if(isset($_GET['app']))
+			_authLogoutApp();
+		else
+			_authLogout($code, VIEWER_ID);
 		header('Location:'.URL);
 		exit;
 	}
@@ -84,7 +87,7 @@ function _header_hat() {//верхняя строка приложения-сайта
 	'<div id="hat">'.
 		'<p>'.
 			(APP_ID ? _app('app_name') : 'Мои приложения').
-			'<a href="'.URL.'&logout" class="fr white mt5">Выход</a>'.
+			'<a href="'.URL.'&logout'.(APP_ID ? '&app' : '').'" class="fr white mt5">Выход</a>'.
 		'</p>'.
 	'</div>';
 }
@@ -92,6 +95,9 @@ function _header_hat() {//верхняя строка приложения-сайта
 
 
 function _appSpisok() {//список приложений, которые доступны пользователю
+	if(APP_ID)
+		return '';
+
 	$sql = "SELECT `app`.*
 			FROM
 				`_app` `app`,

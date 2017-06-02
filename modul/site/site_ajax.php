@@ -1,8 +1,10 @@
 <?php
+/* Запросы, которые выполняются только для сайта */
+
 
 if(SITE)
 switch(@$_POST['op']) {
-	case 'app_enter':
+	case 'app_enter'://вход в приложение из списка приложений
 		if(!$app_id = _num($_POST['app_id']))
 			jsonError('Некорректный ID приложения');
 
@@ -17,12 +19,13 @@ switch(@$_POST['op']) {
 		if(!$va['worker'])
 			jsonError('Нет доступа в приложение');
 
-		$sql = "UPDATE `app_auth`
+		$sql = "UPDATE `_vkuser_auth`
 				SET `app_id`=".$app_id."
 				WHERE `code`='".CODE."'";
 		query($sql);
 		
-		_cache($code, 'clear');
+		_cache(CODE, 'clear');
+		_cache('viewer_'.VIEWER_ID, 'clear');
 
 		jsonSuccess();
 		break;
