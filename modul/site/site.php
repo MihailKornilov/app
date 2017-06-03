@@ -77,7 +77,7 @@ function _header() {
 
 		'<head>'.
 			'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
-//			'<title>'.APP_NAME.'</title>'.
+			'<title>'.(APP_ID ? _app('app_name') : 'Мои приложения').'</title>'.
 			_global_script().
 //			_api_scripts().
 		'</head>'.
