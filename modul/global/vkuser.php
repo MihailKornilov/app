@@ -11,7 +11,11 @@ function _viewer($viewer_id=VIEWER_ID, $i='') {//получение данных о пользовате и
 		if(!$u = query_assoc($sql))
 			$u = _viewerVkUpdate($viewer_id);
 
-		$u['app_count'] = _viewerArrCount($viewer_id);
+		$u['app_count'] = _viewerAppCount($viewer_id);
+
+		$app = _viewerAppVar($viewer_id);
+		$u['worker'] = _bool(@$app['worker']);
+		$u['admin'] = _bool(@$app['admin']);
 		
 		_cache('viewer_'.$viewer_id, $u);
 	}
@@ -93,7 +97,8 @@ function _viewerDefine($u) {//установка констант для пользователя
 	if(defined('VIEWER_DEFINED'))
 		return;
 
-//	define('VIEWER_ADMIN', _bool($u['admin']));
+	define('VIEWER_WORKER', $u['worker']);
+	define('VIEWER_ADMIN', $u['admin']);
 	define('VIEWER_APP_ONE', $u['app_count'] == 1);
 	define('VIEWER_APP_COUNT', $u['app_count']);
 
@@ -101,10 +106,17 @@ function _viewerDefine($u) {//установка констант для пользователя
 
 	return;
 }
-function _viewerArrCount($viewer_id) {//получение количества приложений, в которых участвует пользователь
+function _viewerAppCount($viewer_id) {//получение количества приложений, в которых участвует пользователь
 	$sql = "SELECT COUNT(*)
 			FROM `_vkuser_app`
 			WHERE `viewer_id`=".$viewer_id."
 			  AND `worker`";
 	return _num(query_value($sql));
+}
+function _viewerAppVar($viewer_id, $app_id=APP_ID) {//получение настроек в приложении для пользователя
+	$sql = "SELECT *
+			FROM `_vkuser_app`
+			WHERE `viewer_id`=".$viewer_id."
+			  AND `app_id`=".$app_id;
+	return query_assoc($sql);
 }

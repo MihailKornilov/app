@@ -109,12 +109,26 @@ function _authSuccess($code, $viewer_id, $app_id) {//внесение записи об успешной
 			WHERE `id`=".$viewer_id;
 	query($sql);
 
-	//отметка даты последнего посещения приложения
+	//отметка даты последнего посещения приложения. Если пользователь впервые входит в приложение, то внесение приложения для него
 	if($app_id) {
-		$sql = "UPDATE `_vkuser_app`
-				SET `last_seen`=CURRENT_TIMESTAMP
+		$sql = "SELECT `id`
+		        FROM `_vkuser_app`
 				WHERE `app_id`=".$app_id."
 				  AND `viewer_id`=".$viewer_id;
+		$id = _num(query_value($sql));
+
+		$sql = "INSERT INTO `_vkuser_app` (
+					`id`,
+					`viewer_id`,
+					`app_id`,
+					`last_seen`
+				) VALUES (
+					".$id.",
+					".$viewer_id.",
+					".$app_id.",
+					CURRENT_TIMESTAMP
+				) ON DUPLICATE KEY UPDATE
+					`last_seen`=CURRENT_TIMESTAMP";
 		query($sql);
 	}
 

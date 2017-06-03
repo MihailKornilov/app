@@ -18,7 +18,7 @@ function _auth() {//авторизация через сайт
 		if(isset($_GET['app']))
 			_authLogoutApp();
 		else
-			_authLogout($code, VIEWER_ID);
+			_authLogout(CODE, VIEWER_ID);
 		header('Location:'.URL);
 		exit;
 	}

@@ -13,6 +13,10 @@ function _auth() {//авторизация через iframe
 			_appError('Авторизация не пройдена.');
 
 		_authSuccess($auth_key, $viewer_id, $app_id);
+		_viewer();
+
+		if(!VIEWER_WORKER)
+			_appError('Нет доступа в приложение.');
 
 		return;
 	}
@@ -21,6 +25,8 @@ function _auth() {//авторизация через iframe
 		_appError('Авторизация не пройдена.'.(SA ? ' Пустой code.' : ''));
 	if(!_authCache())
 		_appError('Авторизация не пройдена.'.(SA ? ' Не получены данные по code.' : ''));
+	if(!VIEWER_WORKER)
+		_appError('Нет доступа в приложение.');
 }
 function _appError($msg='Приложение не было загружено.') {//вывод сообщения об ошибке приложения и выход
 	$html =
