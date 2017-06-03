@@ -28,6 +28,7 @@ _dbConnect('GLOBAL_');
 require_once GLOBAL_DIR.'/modul/global/regexp.php';
 require_once GLOBAL_DIR.'/modul/global/date.php';
 require_once GLOBAL_DIR.'/modul/global/vkuser.php';
+require_once GLOBAL_DIR.'/modul/element/element.php';
 
 define('FACE', _face());
 define('SITE', FACE == 'site');
@@ -71,13 +72,14 @@ function _global_script() {//скрипты и стили
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
+	'<script src="js/jquery-ui.min.js?1"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?'.TIME.'" />'.
 	'<script src="modul/global/global.js?'.TIME.'"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/element/element.css?'.TIME.'" />'.
 	'<script src="modul/element/element.js?'.TIME.'"></script>'.
-	
+
 	_debug('style');
 }
 
@@ -213,6 +215,16 @@ function _content() {//центральное содержание
 		'<br />'.
 		'<span class="grey">app_id:</span> '.APP_ID.
 		'<br />'.
+		'<br />'.
+		(APP_ID ?
+			_button(array(
+				'name' => '—оздать страницу',
+				'click' => '_dialogEdit()',
+				'color' => 'green'
+			))
+		: '').
+			'<br />'.
+		'<br />'.
 		'<a href="'.URL.'">link</a>'.
 		'<br />'.
 		'VIEWER_WORKER='.VIEWER_WORKER.
@@ -289,6 +301,36 @@ function _daNet($v) {//$v: 1 -> да, 0 -> нет
 	return $v ? 'да' : 'нет';
 }
 
+function _ids($ids, $return_arr=0) {//проверка корректности списка id, составленные через зап€тую
+	$arr = array();
+	foreach(explode(',', $ids) as $i => $id) {
+		if(!preg_match(REGEXP_NUMERIC, $id))
+			return false;
+		$arr[$i] = _num($id);
+	}
+	return $return_arr ? $arr : implode(',', $arr);
+}
+function _idsGet($arr, $i='id') {//возвращение из массива списка id через зап€тую
+/*
+	key: сборка id по ключу
+*/
+	$ids = array();
+	foreach($arr as $id => $r) {
+		if($i == 'key') {
+			$ids[] = $id;
+			continue;
+		}
+		if(!empty($r[$i]))
+			$ids[] = $r[$i];
+	}
+	return empty($ids) ? 0 : implode(',', array_unique($ids));
+}
+function _idsAss($v) {//получение списка id вида: $v[25] = 1; - выбранный список
+	$send = array();
+	foreach(_ids($v, 1) as $id)
+		$send[$id] = 1;
+	return $send;
+}
 
 
 function win1251($txt) { return iconv('UTF-8', 'WINDOWS-1251//TRANSLIT', $txt); }

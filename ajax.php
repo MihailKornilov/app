@@ -5,6 +5,7 @@ require_once 'modul/global/auth_ajax.php';
 _auth();
 
 require_once 'modul/site/site_ajax.php';
+require_once 'modul/element/element_ajax.php';
 
 
 

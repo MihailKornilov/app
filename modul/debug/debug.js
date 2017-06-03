@@ -35,7 +35,7 @@ $(document)
 			return;
 		h3.html('');
 		p.addClass('_busy');
-		$.post(AJAX_MAIN, send, function(res) {
+		$.post(AJAX, send, function(res) {
 			p.removeClass('_busy');
 			if(res.success) {
 				h3.html(res.html);
@@ -45,7 +45,7 @@ $(document)
 		}, 'json');
 	})
 	.on('click', '#cookie_clear', function() {
-		$.post(AJAX_MAIN, {'op':'cookie_clear'}, function(res) {
+		$.post(AJAX, {'op':'cookie_clear'}, function(res) {
 			if(res.success) {
 				_msg('Cookie очищены');
 				document.location.reload();
@@ -53,7 +53,7 @@ $(document)
 		}, 'json');
 	})
 	.on('click', '#cache_clear', function() {
-		$.post(AJAX_MAIN, {'op':'cache_clear'}, function(res) {
+		$.post(AJAX, {'op':'cache_clear'}, function(res) {
 			if(res.success) {
 				_msg('Кэш очищен');
 				document.location.reload();
@@ -86,7 +86,7 @@ $(document)
 		$('#cookie_update').click(function() {
 			var t = $(this);
 			t.addClass('_busy');
-			$.post(AJAX_MAIN, {op:'debug_cookie'}, function(res) {
+			$.post(AJAX, {op:'debug_cookie'}, function(res) {
 				t.removeClass('_busy');
 				if(res.success)
 					$('#cookie_spisok').html(res.html);
