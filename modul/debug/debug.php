@@ -13,6 +13,7 @@ function _debug($i='') {
 			(empty($_GET['d1']) ? '' : '&pre_d1='.$_GET['d1']).
 			(empty($_GET['id']) ? '' : '&pre_id='.$_GET['id']);
 
+	$goFace = SITE ? 'iframe' : 'site';
 	$send =
 		'<div id="debug-footer">'.
 			(@$_GET['p'] != 9 ? '<a href="'.URL.'&p=9'.$pre.'">SA</a> :: ' : '').
@@ -21,8 +22,10 @@ function _debug($i='') {
 			'<a id="cache_clear">Очисить кэш ('.VERSION.')</a> :: '.
 			'sql <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).') :: '.
 			'php '.round(microtime(true) - TIME, 3).' :: '.
-			'js <em></em>'.
+			'js <em></em> :: '.
+   (LOCAL ? '<a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
 		'</div>';
+
 	if(DEBUG) {
 		$get = '';
 		ksort($_GET);

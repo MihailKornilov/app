@@ -8,6 +8,7 @@
 function _auth() {//авторизация через сайт
 	if($code = @$_GET['code'])
 		_authLogin($code);
+
 	if(!CODE)
 		_authLogin();
 
@@ -28,7 +29,9 @@ function _auth() {//авторизация через сайт
 function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 	setcookie('code', '', time() - 1, '/');//сброс авторизации
 
-	$href = 'https://oauth.vk.com/authorize?'.
+	$href = LOCAL ? URL.'&code='.md5(TIME)
+			:
+			'https://oauth.vk.com/authorize?'.
 					 'client_id='.AUTH_APP_ID.
 					'&display=page'.
 					'&redirect_uri=https://nyandoma.ru/app'.

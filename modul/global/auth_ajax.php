@@ -6,15 +6,21 @@ switch(@$_POST['op']) {
 		if(!$code = _txt($_POST['code']))
 			jsonError('Отсутствует код');
 
-		$url = 'https://oauth.vk.com/access_token?'.
-					'client_id='.AUTH_APP_ID.
-				   '&client_secret='.AUTH_APP_SECRET.
-				   '&redirect_uri=https://nyandoma.ru/app'.
-				   '&code='.$code;
-		if(!$res = @file_get_contents($url))
-			jsonError('Неуспешная попытка получения токена');
 
-		$res = json_decode($res, true);
+		if(!LOCAL) {
+			$url = 'https://oauth.vk.com/access_token?'.
+						'client_id='.AUTH_APP_ID.
+					   '&client_secret='.AUTH_APP_SECRET.
+					   '&redirect_uri=https://nyandoma.ru/app'.
+					   '&code='.$code;
+			if(!$res = @file_get_contents($url))
+				jsonError('Неуспешная попытка получения токена');
+
+			$res = json_decode($res, true);
+		} else
+			$res = array(
+				'user_id' => 982006
+			);
 
 		if(!$viewer_id = _num($res['user_id']))
 			jsonError('Ошибка при получении токена');

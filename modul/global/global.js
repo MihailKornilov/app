@@ -29,10 +29,16 @@ var _post = function(send, func, funcErr) {//отправка ajax-запроса методом POST
 		return '';
 	},
 	_faceTest = function() {//определение, как загружена страница: iframe или сайт
+		if(_cookie('local'))
+			return;
 		//если текущее значение не совпадает, то установка и перезагрузка страницы
 		var face = window == window.top ? 'site' : 'iframe';
 		if(_cookie('face') == face)
 			return;
+		_cookie('face', face);
+		location.reload();
+	},
+	_faceGo = function(face) {
 		_cookie('face', face);
 		location.reload();
 	},
@@ -42,7 +48,7 @@ var _post = function(send, func, funcErr) {//отправка ajax-запроса методом POST
 				code:code
 			},
 			func = function() {
-				location.href = 'https://nyandoma.ru/app';
+				location.href = URL;
 			};
 
 		_post(send, func, func);

@@ -66,7 +66,8 @@ function _global_script() {//скрипты и стили
 	(SA ? '<script src="js/errors.js"></script>' : '').
 
 	'<script>'.
-		'var AJAX="'.URL_AJAX.'"'.
+		'var URL="'.URL.'",'.
+			'AJAX="'.URL_AJAX.'";'.
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
@@ -133,6 +134,9 @@ function _authSuccess($code, $viewer_id, $app_id) {//внесение записи об успешной
 	}
 
 	setcookie('code', $code, time() + 2592000, '/');
+
+	if(LOCAL)
+		setcookie('local', 1, time() + 2592000, '/');
 }
 function _authLogoutApp() {//выход из приложения и попадание в список приложений
 	$sql = "UPDATE `_vkuser_auth`
