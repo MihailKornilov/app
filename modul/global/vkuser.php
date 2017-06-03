@@ -99,7 +99,7 @@ function _viewerDefine($u) {//установка констант для пользователя
 
 	define('VIEWER_WORKER', $u['worker']);
 	define('VIEWER_ADMIN', $u['admin']);
-	define('VIEWER_APP_ONE', $u['app_count'] == 1);
+	define('VIEWER_APP_ONE', $u['app_count'] < 2);
 	define('VIEWER_APP_COUNT', $u['app_count']);
 
 	define('VIEWER_DEFINED', true);
@@ -113,10 +113,13 @@ function _viewerAppCount($viewer_id) {//получение количества приложений, в котор
 			  AND `worker`";
 	return _num(query_value($sql));
 }
-function _viewerAppVar($viewer_id, $app_id=APP_ID) {//получение настроек в приложении для пользователя
+function _viewerAppVar($viewer_id) {//получение настроек в приложении для пользователя
+	if(!defined('APP_ID'))
+		return array();
+
 	$sql = "SELECT *
 			FROM `_vkuser_app`
 			WHERE `viewer_id`=".$viewer_id."
-			  AND `app_id`=".$app_id;
+			  AND `app_id`=".APP_ID;
 	return query_assoc($sql);
 }

@@ -170,6 +170,8 @@ function _authCache() {//получение данных авторизации из кеша и установка конста
 	define('VIEWER_ID', _num($r['viewer_id']));
 	define('APP_ID', _num($r['app_id']));
 
+	_viewer();
+
 	return true;
 }
 
@@ -206,6 +208,10 @@ function _content() {//центральное содержание
 		'<span class="grey">viewer_id:</span> '.VIEWER_ID.
 		'<br />'.
 		'<span class="grey">app_id:</span> '.APP_ID.
+		'<br />'.
+		'<a href="'.URL.'">link</a>'.
+		'<br />'.
+		'VIEWER_WORKER='.VIEWER_WORKER.
 		'<br />'.
 		_appSpisok().
 	'</div>';
