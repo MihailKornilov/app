@@ -17,9 +17,9 @@ function _auth() {//авторизация через iframe
 		return;
 	}
 
-	if(!$code = _txt(@$_COOKIE['code']))
+	if(!CODE)
 		_appError('Авторизация не пройдена.'.(SA ? ' Пустой code.' : ''));
-	if(!_authCache($code))
+	if(!_authCache())
 		_appError('Авторизация не пройдена.'.(SA ? ' Не получены данные по code.' : ''));
 }
 function _appError($msg='Приложение не было загружено.') {//вывод сообщения об ошибке приложения и выход

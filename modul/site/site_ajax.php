@@ -24,6 +24,12 @@ switch(@$_POST['op']) {
 				WHERE `code`='".CODE."'";
 		query($sql);
 		
+		//отметка даты последнего посещения приложения
+		$sql = "UPDATE `_vkuser_app`
+				SET `last_seen`=CURRENT_TIMESTAMP
+				WHERE `id`=".$va['id'];
+		query($sql);
+
 		_cache(CODE, 'clear');
 		_cache('viewer_'.VIEWER_ID, 'clear');
 

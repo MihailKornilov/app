@@ -8,10 +8,10 @@
 function _auth() {//авторизация через сайт
 	if($code = @$_GET['code'])
 		_authLogin($code);
-	if(!$code = _txt(@$_COOKIE['code']))
+	if(!CODE)
 		_authLogin();
 
-	if(!_authCache($code))
+	if(!_authCache())
 		_authLogin();
 
 	if(isset($_GET['logout'])) {
@@ -87,7 +87,7 @@ function _header_hat() {//верхняя строка приложения-сайта
 	'<div id="hat">'.
 		'<p>'.
 			(APP_ID ? _app('app_name') : 'Мои приложения').
-			'<a href="'.URL.'&logout'.(APP_ID ? '&app' : '').'" class="fr white mt5">Выход</a>'.
+			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt5">Выход</a>'.
 		'</p>'.
 	'</div>';
 }

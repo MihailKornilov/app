@@ -109,6 +109,15 @@ function _authSuccess($code, $viewer_id, $app_id) {//внесение записи об успешной
 			WHERE `id`=".$viewer_id;
 	query($sql);
 
+	//отметка даты последнего посещения приложения
+	if($app_id) {
+		$sql = "UPDATE `_vkuser_app`
+				SET `last_seen`=CURRENT_TIMESTAMP
+				WHERE `app_id`=".$app_id."
+				  AND `viewer_id`=".$viewer_id;
+		query($sql);
+	}
+
 	setcookie('code', $code, time() + 2592000, '/');
 }
 function _authLogoutApp() {//выход из приложения и попадание в список приложений
@@ -126,16 +135,19 @@ function _authLogout($code, $viewer_id) {
 	_cache($code, 'clear');
 	_cache('viewer_'.$viewer_id, 'clear');
 }
-function _authCache($code) {//получение данных авторизации из кеша и установка констант id пользователя и приложения
-	if(!$r = _cache($code)) {
+function _authCache() {//получение данных авторизации из кеша и установка констант id пользователя и приложения
+	if(!CODE)
+		return false;
+
+	if(!$r = _cache(CODE)) {
 		$sql = "SELECT *
 				FROM `_vkuser_auth`
-				WHERE `code`='".addslashes($code)."'
+				WHERE `code`='".addslashes(CODE)."'
 				LIMIT 1";
 		if(!$r = query_assoc($sql))
 			return false;
 
-		_cache($code, array(
+		_cache(CODE, array(
 			'viewer_id' => $r['viewer_id'],
 			'app_id' => $r['app_id']
 		));
