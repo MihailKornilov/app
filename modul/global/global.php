@@ -217,11 +217,19 @@ function _content() {//центральное содержание
 		'<br />'.
 		'<br />'.
 		(APP_ID ?
+		'<br />'.
+		'<br />'.
+		'<br />'.
+		'<br />'.
+		'<br />'.
+		'<br />'.
+		'<br />'.
 			_button(array(
 				'name' => 'Создать страницу',
 				'click' => '_dialogEdit()',
 				'color' => 'green'
-			))
+			)).
+			'<div class="icon icon-hint ml20 mt5"></div>'
 		: '').
 			'<br />'.
 		'<br />'.

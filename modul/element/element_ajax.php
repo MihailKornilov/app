@@ -3,7 +3,8 @@ switch(@$_POST['op']) {
 	case 'dialog_edit_load':
 		$dialog = array(
 			'button_submit' => 'Внести',
-			'button_cancel' => 'Отмена'
+			'button_cancel' => 'Отмена',
+			'width' => 500
 		);
 
 		if($dialog_id = _num($_POST['dialog_id'])) {
@@ -11,7 +12,10 @@ switch(@$_POST['op']) {
 					FROM `_dialog`
 					WHERE `app_id`=".APP_ID."
 					  AND `id`=".$dialog_id;
-			$dialog = query_assoc($sql);
+			if($ass = query_assoc($sql))
+				$dialog = $ass;
+			else
+				$dialog_id = 0;
 		}
 
 		$html =
@@ -43,6 +47,7 @@ switch(@$_POST['op']) {
 			'</div>'
 			;
 
+		$send['dialog_id'] = $dialog_id;
 		$send['width'] = $dialog_id ? _num($dialog['width']) : 500;
 		$send['head'] = utf8(@$dialog['head']);
 		$send['button_submit'] = utf8($dialog['button_submit']);

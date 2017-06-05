@@ -163,11 +163,9 @@ var VK_SCROLL = 0,
 //			_fbhs();
 		}
 		function dialogErr(msg) {
-			bottom._hint({
-				msg:'<span class="red">' + msg + '</span>',
-				top:-48,
-				left:w2 - 90,
-				indent:40,
+			butSubmit._hint({
+				msg:msg,
+				red:1,
 				show:1,
 				remove:1
 			});
@@ -264,7 +262,6 @@ var VK_SCROLL = 0,
 				padding:0,
 				head:'Диалог',
 				load:1,
-				butSubmit:(dialog_id ? 'Сохранить' : 'Создать') + ' диалоговое окно',
 				submit:submit
 			}),
 			send = {
@@ -277,9 +274,11 @@ var VK_SCROLL = 0,
 		dialog.load(send, loaded);
 
 		function loaded(res) {
+			dialog_id = res.dialog_id;
 			dialog.width(res.width);
 			dialog.editHead(res.head);
 			dialog.content.html(res.html);
+			dialog.butSubmit((dialog_id ? 'Сохранить' : 'Создать') + ' диалоговое окно');
 			DIALOG_ELEMENT = res.element;
 			_dialogScript(res.element);
 			sortable();
@@ -1041,6 +1040,10 @@ $.fn._radio = function(o, o1) {
 $.fn._hint = function(o) {
 	var t = $(this);
 
+	//счётчик подсказок. Для удаления именно той подсказки, которая была добавлена
+	if(!window.HINT_COUNT)
+		HINT_COUNT = 1;
+
 	o = $.extend({
 		msg:'Сообщение подсказки',
 		red:0,      //окрашивание текста в красный цвет
@@ -1059,7 +1062,8 @@ $.fn._hint = function(o) {
 		remove:0	 // удалить подсказку после показа
 	}, o);
 
-	var	top = o.top, // установка конечного положения подсказки после движения
+	var	HC = HINT_COUNT++,
+		top = o.top, // установка конечного положения подсказки после движения
 		left = o.left,
 		html =
 			hintCorrect() +
@@ -1067,7 +1071,7 @@ $.fn._hint = function(o) {
 				hintUgolTop() +
 				'<tr>' +
 					hintUgolLeft() +
-					'<td class="cont pad10' + (o.red ? ' red' : '') + '">' + o.msg +
+					'<td class="pad10' + (o.red ? ' red' : '') + '">' + o.msg +
 					hintUgolRight() +
 				hintUgolBottom() +
 			'</table>';
@@ -1088,43 +1092,42 @@ $.fn._hint = function(o) {
 			'<tr><td class="b005" colspan="3">' +
 		'</table>';
 
-	html = '<div class="_hint">' + html + '</div>';
+	html = '<div class="_hint hint' + HC + '">' + html + '</div>';
 
 //	t.prev().remove('._hint'); // удаление предыдущей такой же подсказки
 //	t.before(html); // вставка перед элементом
 
-	$('body')
-		.remove('._hint')
-		.append(html);
-
-	var hi = $('body').find('._hint:first'), //поле absolute для подсказки
+	var hi = $('body').append(html).find('.hint' + HC), //поле absolute для подсказки
 //		hi = t.prev(), //поле absolute для подсказки
 		hintTable = hi.find('._hint-tab1'), // сама подсказка
 		hintW = hintTable.width(),
 		hintH = hintTable.height(),
+		tW = t.width() + _num(t.css('padding-left').split('px')[0]) + _num(t.css('padding-right').split('px')[0]),//ширина объекта
+		tH = t.height() + _num(t.css('padding-top').split('px')[0]) + _num(t.css('padding-bottom').split('px')[0]),//высота объекта
 		diff = Math.round((hintW - 26) / (hintH - 24));
 
 	//корректировка ширины, если слишком длинный текст в одну строку
 	if(diff > 15) {
 		var x = hintW - 26,
-			y = hintH - 24;
-		hintW = Math.round(Math.sqrt(x * y)) + 26 + 70;
+			y = hintH - 24;//коэфициент отношения стороны экрана 16*9
+		hintW = Math.round(Math.sqrt(x * y) * 1.3) + 26;
 		hintTable.width(hintW);
 		hintH = hintTable.height();
 	}
 
 	hintUgolPos();
-	hintAutoPos();
+
+	hi.addClass('dn');
 
 	// отключение событий от предыдущей такой же подсказки
-	t.off(o.event + '.hint');
-	t.off('mouseleave.hint');
+//	t.off(o.event + '.hint');
+//	t.off('mouseleave.hint');
 
 	// установка событий
-	t.on(o.event + '.hint', hintShow);
-	t.on('mouseleave.hint', hintHide);
-	hintTable.on('mouseenter.hint', hintShow);
-	hintTable.on('mouseleave.hint', hintHide);
+	t.on(o.event + '.hint' + HC, hintShow);
+	t.on('mouseleave.hint' + HC, hintHide);
+	hintTable.on('mouseenter.hint' + HC, hintShow);
+	hintTable.on('mouseleave.hint' + HC, hintHide);
 
 
 
@@ -1210,8 +1213,26 @@ $.fn._hint = function(o) {
 	}
 	function hintAutoPos() {//автоматическое позиционирование подсказки
 		var offset = t.offset(),
-			x = offset.left - Math.round(hintW / 2) + 8,
-			y = offset.top - hintH - 21;
+			x, y;
+
+		switch(o.ugol) {
+			case 'top':
+				x = Math.round(offset.left - hintW / 2 + tW / 2) - 2;
+				y = offset.top + tH + 24;
+				break;
+			case 'bottom':
+				x = Math.round(offset.left - hintW / 2 + tW / 2) - 2;
+				y = offset.top - hintH - 21;
+				break;
+			case 'left':
+				x = offset.left + tW + 32;
+				y = Math.round(offset.top - hintH / 2 + tH / 2 );
+				break;
+			case 'right':
+				x = offset.left - hintW - 31;
+				y = Math.round(offset.top - hintH / 2 + tH / 2 );
+				break;
+		}
 
 		hi.css({
 			top:y + 'px',
@@ -1219,8 +1240,12 @@ $.fn._hint = function(o) {
 		});
 	}
 	function hintShow() {//всплытие подсказки
+		hi.removeClass('dn');
+		hintAutoPos();
+
 		if(o.correct)
 			$(document).off('keydown.hint');
+
 		switch(process) {
 			case 'wait_to_hidding':
 				clearTimeout(timer);
@@ -1289,10 +1314,11 @@ $.fn._hint = function(o) {
 			process = 'hidding';
 			hintTable.animate({opacity:0}, 200, function () {
 				process = 'hidden';
+				hi.addClass('dn');
 				if(o.remove) {
 					hi.remove();
-					t.off(o.event + '.hint');
-					t.off('mouseleave.hint');
+					t.off(o.event + '.hint' + HC);
+					t.off('mouseleave.hint' + HC);
 				}
 			});
 		}
@@ -1306,4 +1332,15 @@ $.fn._hint = function(o) {
 					'left: <span class="crt-left mr10">' + o.left + '</span>' +
 				'</div>';
 	}
+};
+$.fn._tooltip = function(msg, left, ugolSide) {
+	var t = $(this);
+
+	t.addClass('_tooltip');
+	t.append(
+		'<div class="ttdiv"' + (left ? ' style="left:' + left + 'px"' : '') + '>' +
+			'<div class="ttmsg">' + msg + '</div>' +
+			'<div class="ttug' + (ugolSide ? ' ' + ugolSide : '') + '"></div>' +
+		'</div>'
+	);
 };

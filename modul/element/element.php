@@ -10,6 +10,16 @@ function _button($v=array()) {//кнопка из контакта
 	'</button>';
 }
 
+function _tooltip($msg, $left=0, $ugolSide='', $x2=0) {
+	//x2: в две строки
+	$x2 = $x2 ? ' x2' : '';
+	return
+		' _tooltip">'.
+		'<div class="ttdiv'.$x2.'"'.($left ? ' style="left:'.$left.'px"' : '').'>'.
+			'<div class="ttmsg">'.$msg.'</div>'.
+			'<div class="ttug'.($ugolSide ? ' '.$ugolSide : '').'"></div>'.
+		'</div>';
+}
 
 
 

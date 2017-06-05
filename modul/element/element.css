@@ -148,7 +148,6 @@
 }
 ._hint-tab1{opacity:0}
 ._hint-tab3{border:#aebdcc solid 1px}
-._hint .cont{color:#000;text-align:left}
 ._hint .b012,
 ._hint .b005,
 ._hint .side012,
@@ -203,3 +202,39 @@
 	padding:3px;
 	border:#CC9 solid 1px;
 }
+
+
+
+
+
+
+
+
+
+
+/* Подсказка на тёмном фоне */
+._tooltip{position:relative}
+._tooltip .ttdiv{
+	position:absolute;
+	display:inline-block;
+	top:-29px;
+	opacity:.85;
+	z-index:10000;
+}
+._tooltip .ttdiv.x2{top:-43px}
+._tooltip:not(:hover) .ttdiv,._tooltip .ttdiv:hover{display:none}
+._tooltip .ttmsg{
+	font-size:12px;
+	color:#fff;
+	padding:5px 10px;
+	font-weight:bold;
+	border-radius:3px;
+	background-color:#222;
+	white-space:nowrap;
+}
+._tooltip .ttug{
+	background:center 0 no-repeat url("data:image/dif;base64,R0lGODlhJQAEAJEAAAAAAP///yIiIv///yH5BAEAAAMALAAAAAAlAAQAAAIQnI8py5IPo2qy2sOurm6fAgA7");
+	height:4px;
+}
+._tooltip .ttug.r{background-position:right 0}
+._tooltip .ttug.l{background-position:left 0}
