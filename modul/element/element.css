@@ -136,3 +136,70 @@
 
 
 
+
+
+
+
+/* ---=== ПОДСКАЗКИ ===--- */
+._hint{
+	position:absolute;
+	height:0;
+	z-index:999;
+}
+._hint-tab1{opacity:0}
+._hint-tab3{border:#aebdcc solid 1px}
+._hint .cont{color:#000;text-align:left}
+._hint .b012,
+._hint .b005,
+._hint .side012,
+._hint .side005{background-color:#000}
+._hint .b012,._hint .b005{height:1px}
+._hint .side012,._hint .side005{width:1px}
+._hint .b012,._hint .side012{opacity:0.12}
+._hint .b005,._hint .side005{opacity:0.05}
+/* параметры для всех уголков */
+._hint .ug{
+	display:inline-block;
+	position:absolute;
+	z-index:1000;
+}
+/* уголок сверху */
+._hint .ugt{
+	height:6px;
+	width:11px;
+	background:transparent no-repeat 0 0 url("data:image/gif;base64,R0lGODlhCwAGAKIAAAAAAP///669zPLy8ubm5v///wAAAAAAACH5BAEAAAUALAAAAAALAAYAAAMSWKqyzqG9IoKVq9qbt2+atwkJADs=");
+	top:-6px;
+}
+/* уголок снизу */
+._hint .ugb{
+	height:7px;
+	width:11px;
+	background:transparent no-repeat 0 0 url("data:image/gif;base64,R0lGODlhCwAIAKIEAPLy8q69zObm5v///////wAAAAAAAAAAACH5BAEAAAQALAAAAAALAAgAAAMaOLo80SyIByWYzZJLnQBEyHlgKE6fqV5lmAAAOw==");
+	top:-1px;
+}
+/* уголок слева */
+._hint .ugl{
+	height:11px;
+	width:7px;
+	background:transparent no-repeat 0 0 url("data:image/gif;base64,R0lGODlhBwALAKIAAAAAAP///669zPLy8ubm5v///wAAAAAAACH5BAEAAAUALAAAAAAHAAsAAAMWWFpDsk0EFcOsFltnu76cRYUQtzBOAgA7");
+	left:-7px;
+}
+/* уголок справа */
+._hint .ugr{
+	height:11px;
+	width:7px;
+	background:transparent no-repeat 0 0 url("data:image/gif;base64,R0lGODlhBwALAKIAAAAAAP///669zPLy8ubm5v///wAAAAAAACH5BAEAAAUALAAAAAAHAAsAAAMXKDTVFYq1ANek8dE6NiZetGWfxDmZkwAAOw==");
+	left:0;
+}
+/* корректировка положения */
+._hint-crt{
+	position:absolute;
+	top:-22px;
+	left:2px;
+	width:130px;
+	text-align:center;
+	color:#555;
+	background-color:#ffb;
+	padding:3px;
+	border:#CC9 solid 1px;
+}

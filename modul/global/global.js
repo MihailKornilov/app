@@ -207,8 +207,9 @@ var
 			});
 	},
 	_err = function(msg) {
-		dialog.bottom.vkHint({
-			msg:'<SPAN class="red">' + msg + '</SPAN>',
+		dialog.bottom._hint({
+			msg:msg,
+			red:1,
 			top:-48,
 			left:126,
 			indent:40,

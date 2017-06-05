@@ -163,7 +163,7 @@ var VK_SCROLL = 0,
 //			_fbhs();
 		}
 		function dialogErr(msg) {
-			bottom.vkHint({
+			bottom._hint({
 				msg:'<span class="red">' + msg + '</span>',
 				top:-48,
 				left:w2 - 90,
@@ -467,18 +467,19 @@ var VK_SCROLL = 0,
 				EL.hint_left = 55;
 			}
 
-			$(this).vkHint({
+			$(this)._hint({
 				msg:msg,
-				top:EL.hint_top,
-				left:EL.hint_left,
-				indent:50,
+//				top:EL.hint_top,
+//				left:EL.hint_left,
+//				ugol:'right',
+//				indent:'auto',
 				show:1,
-				correct:1,
-				correctCoordHide:1,
-				correctFunc:function(top, left) {
-					EL.hint_top = top;
-					EL.hint_left = left;
-				},
+//				correct:1,
+//				correctCoordHide:1,
+//				correctFunc:function(top, left) {
+//					EL.hint_top = top;
+//					EL.hint_left = left;
+//				},
 				delayHide:100,
 				remove:1
 			});
@@ -898,18 +899,19 @@ var VK_SCROLL = 0,
 
 $(document)
 	.on('mouseenter', '.dialog-hint', function() {
-		var msg = $(this).attr('val');
+		var t = $(this),
+			msg = t.attr('val');
 
 		if(!msg)
 			return;
 
 		var v = msg.split('###');
 
-		$(this).vkHint({
+		t._hint({
 			msg:v[0],
-			top:v[1] * 1,
-			left:v[2] * 1,
-			indent:50,
+//			top:v[1] * 1,
+//			left:v[2] * 1,
+//			indent:50,
 			show:1,
 			delayHide:100,
 			remove:1
@@ -1035,4 +1037,273 @@ $.fn._radio = function(o, o1) {
 
 	window[win] = t;
 	return t;
+};
+$.fn._hint = function(o) {
+	var t = $(this);
+
+	o = $.extend({
+		msg:'Сообщение подсказки',
+		red:0,      //окрашивание текста в красный цвет
+		width:0,
+		event:'mouseenter', // событие, при котором происходит всплытие подсказки
+		ugol:'bottom',
+		indent:'center',    //отступ уголка: top, bottom (для вертикали), left, right (для горизонтали). Либо число в пикселях слева либо сверху.
+		top:0,
+		left:0,
+		show:0,	     // выводить ли подсказку после загрузки страницы
+		delayShow:0, // задержка перед всплытием
+		delayHide:0, // задержка перед скрытием
+		correct:0,   // настройка top и left
+		correctCoordHide:0,// скрывать координаты при настройке top и left
+		correctFunc:function() {},// функция, выполняемая при настройки top и left
+		remove:0	 // удалить подсказку после показа
+	}, o);
+
+	var	top = o.top, // установка конечного положения подсказки после движения
+		left = o.left,
+		html =
+			hintCorrect() +
+			'<table class="_hint-tab3 bg-fff curD"' + (o.width ? ' style="width:' + o.width + 'px"' : '') + '>' +
+				hintUgolTop() +
+				'<tr>' +
+					hintUgolLeft() +
+					'<td class="cont pad10' + (o.red ? ' red' : '') + '">' + o.msg +
+					hintUgolRight() +
+				hintUgolBottom() +
+			'</table>';
+
+	html =
+		'<table>' +
+			'<tr><td class="side012">' +
+				'<td>' + html +
+				'<td class="side012">' +
+			'<tr><td class="b012" colspan="3">' +
+		'</table>';
+
+	html =
+		'<table class="_hint-tab1 prel">' +
+			'<tr><td class="side005">' +
+				'<td>' + html +
+				'<td class="side005">' +
+			'<tr><td class="b005" colspan="3">' +
+		'</table>';
+
+	html = '<div class="_hint">' + html + '</div>';
+
+//	t.prev().remove('._hint'); // удаление предыдущей такой же подсказки
+//	t.before(html); // вставка перед элементом
+
+	$('body')
+		.remove('._hint')
+		.append(html);
+
+	var hi = $('body').find('._hint:first'), //поле absolute для подсказки
+//		hi = t.prev(), //поле absolute для подсказки
+		hintTable = hi.find('._hint-tab1'), // сама подсказка
+		hintW = hintTable.width(),
+		hintH = hintTable.height(),
+		diff = Math.round((hintW - 26) / (hintH - 24));
+
+	//корректировка ширины, если слишком длинный текст в одну строку
+	if(diff > 15) {
+		var x = hintW - 26,
+			y = hintH - 24;
+		hintW = Math.round(Math.sqrt(x * y)) + 26 + 70;
+		hintTable.width(hintW);
+		hintH = hintTable.height();
+	}
+
+	hintUgolPos();
+	hintAutoPos();
+
+	// отключение событий от предыдущей такой же подсказки
+	t.off(o.event + '.hint');
+	t.off('mouseleave.hint');
+
+	// установка событий
+	t.on(o.event + '.hint', hintShow);
+	t.on('mouseleave.hint', hintHide);
+	hintTable.on('mouseenter.hint', hintShow);
+	hintTable.on('mouseleave.hint', hintHide);
+
+
+
+	// процессы всплытия подсказки:
+	// - wait_to_showind - ожидает показа (мышь была наведена)
+	// - showing - выплывает
+	// - show - показана
+	// - wait_to_hidding - ожидает скрытия (мышь была отведена)
+	// - hidding - скрывается
+	// - hidden - скрыта
+	var process = 'hidden',
+		timer = 0;
+
+	// автоматический показ подсказки, если нужно
+	if(o.show)
+		hintShow();
+
+	function hintUgolTop() {//рисование уголка сверху
+		if(o.ugol != 'top')
+			return '';
+
+		top = o.top - 15;
+
+		return '<tr><td class="prel"><div class="ug ugt"></div>';
+	}
+	function hintUgolBottom() {//рисование уголка снизу
+		if(o.ugol != 'bottom')
+			return '';
+
+		top = o.top + 15;
+
+		return '<tr><td class="prel"><div class="ug ugb"></div>';
+	}
+	function hintUgolLeft() {//рисование уголка слева
+		if(o.ugol != 'left')
+			return '';
+		
+		left = o.left - 25;
+
+		return '<td class="prel"><div class="ug ugl"></div>';
+	}
+	function hintUgolRight() {//рисование уголка справа
+		if(o.ugol != 'right')
+			return '';
+
+		left = o.left + 25;
+
+		return '<td class="prel"><div class="ug ugr"></div>';
+	}
+	function hintUgolPos() {//позиционирование уголка после вывода вставки подсказки
+		var pos = 10;
+		switch(o.ugol) {
+			case 'top':
+			case 'bottom':
+				switch(o.indent) {
+					case 'center': pos = Math.round(hintW / 2) - 8;	break;
+					case 'left': break;
+					case 'right': pos = hintW - 27; break;
+					default:
+						pos = _num(o.indent);
+						if(pos > hintW - 28)
+							pos = hintW - 28;
+				}
+				if(pos < 10)
+					pos = 10;
+				hintTable.find('.ug').css('left', pos + 'px');
+				break;
+			case 'left':
+			case 'right':
+				switch(o.indent) {
+					case 'center': pos = Math.round(hintH / 2) - 8;	break;
+					case 'top': break;
+					case 'bottom': pos = hintH - 27; break;
+					default:
+						pos = _num(o.indent);
+						if(pos > hintH - 25)
+							pos = hintH - 25;
+				}
+				if(pos < 10)
+					pos = 10;
+				hintTable.find('.ug').css('top', pos + 'px');
+		}
+	}
+	function hintAutoPos() {//автоматическое позиционирование подсказки
+		var offset = t.offset(),
+			x = offset.left - Math.round(hintW / 2) + 8,
+			y = offset.top - hintH - 21;
+
+		hi.css({
+			top:y + 'px',
+			left:x + 'px'
+		});
+	}
+	function hintShow() {//всплытие подсказки
+		if(o.correct)
+			$(document).off('keydown.hint');
+		switch(process) {
+			case 'wait_to_hidding':
+				clearTimeout(timer);
+				process = 'show';
+				break;
+			case 'hidding':
+				process = 'showing';
+				hintTable
+					.stop()
+					.animate({top:top, left:left, opacity:1}, 200, showed);
+				break;
+			case 'hidden':
+				if(o.delayShow) {
+					process = 'wait_to_showing';
+					timer = setTimeout(action, o.delayShow);
+				} else
+					action();
+				break;
+		}
+		// действие всплытия подсказки
+		function action() {
+			process = 'showing';
+			hintTable
+				.css({top:o.top, left:o.left})
+				.animate({top:top, left:left, opacity:1}, 200, showed);
+		}
+		// действие по завершению всплытия
+		function showed() {
+			process = 'show';
+			if(o.correct) {
+				$(document).on('keydown.hint', function(e) {
+					e.preventDefault();
+					switch(e.keyCode) {
+						case 38: o.top--; top--; break; // вверх
+						case 40: o.top++; top++; break; // вниз
+						case 37: o.left--; left--; break; // влево
+						case 39: o.left++; left++; break; // вправо
+					}
+					hintTable.css({top:top, left:left});
+					hintTable.find('.crt-top').html(o.top);
+					hintTable.find('.crt-left').html(o.left);
+					o.correctFunc(o.top, o.left);
+				});
+			}
+		}
+	}
+	function hintHide() {//скрытие подсказки
+		if(o.correct)
+			$(document).off('keydown.hint');
+		if(process == 'wait_to_showing') {
+			clearTimeout(timer);
+			process = 'hidden';
+		}
+		if(process == 'showing') {
+			hintTable.stop();
+			action();
+		}
+		if(process == 'show') {
+			if(o.delayHide) {
+				process = 'wait_to_hidding';
+				timer = setTimeout(action, o.delayHide);
+			} else
+				action();
+		}
+		function action() {
+			process = 'hidding';
+			hintTable.animate({opacity:0}, 200, function () {
+				process = 'hidden';
+				if(o.remove) {
+					hi.remove();
+					t.off(o.event + '.hint');
+					t.off('mouseleave.hint');
+				}
+			});
+		}
+	}
+	function hintCorrect() {//вставка информации о корректировке положения подсказки
+		if(!o.correct)
+			return '';
+
+		return '<div class="_hint-crt' + (o.correctCoordHide ? ' dn' : '') + '">' +
+					 'top: <span class="crt-top mr10">' + o.top + '</span> ' +
+					'left: <span class="crt-left mr10">' + o.left + '</span>' +
+				'</div>';
+	}
 };
