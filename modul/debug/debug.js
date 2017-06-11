@@ -1,3 +1,9 @@
+var debugHeight = function(s) {
+	return;
+	var h = $('#_debug').height();
+	FOTO_HEIGHT = s || h < FBH - 30 ? 0 : h + 30;
+	_fbhs();
+};
 
 $(document)
 	.on('click', '.debug_toggle', function() {
@@ -63,7 +69,7 @@ $(document)
 
 	.ready(function() {
 //		window.FBH = FB.height();
-//		debugHeight();
+		debugHeight();
 		$('#_debug h1').click(function() {
 			var t = $(this).parent(),
 				s = t.hasClass('show');

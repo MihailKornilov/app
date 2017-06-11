@@ -16,6 +16,31 @@
 
 
 
+/* Сообщение в центре экрана об успешном выполнении */
+#_msg{
+	padding:15px 20px;
+	position:absolute;
+	width:400px;
+	top:100px;
+	background-color:#333;
+	font:bold 12px Tahoma;
+	color:#FFF;
+	opacity:0.9;
+	border-radius:5px;
+	z-index:99999
+}
+#_msg a{color:#b1daff;font:bold 12px Tahoma}
+#_msg b{font-size:12px}
+
+
+
+
+
+
+
+
+
+
 /* ---=== ДИАЛОГОВОЕ ОКНО ===--- */
 ._dialog{
 	position:absolute;
@@ -49,7 +74,16 @@
 	border-radius:0 0 2px 2px;
 }
 
-
+/* линия для настройки ширины диалога */
+#dialog-w-change{
+	position:absolute;
+	cursor:e-resize;
+	background-color:#FFD9B2;
+	width:7px;
+	opacity:.5;
+}
+#dialog-w-change:hover{opacity:1}
+/* элементы диалога при редактировании */
 #dialog-base .element-edit,
 #dialog-base .element-del{
 	position:absolute;
@@ -58,12 +92,26 @@
 	border:#eee solid 1px;
 	border-radius:2px;
 	padding:0;
+	z-index:91;
 }
 #dialog-base .element-edit{right:25px;background-position:0 -79px}
 #dialog-base .element-del{right:3px;background-position:0 -19px}
-#dialog-base dd:not(:hover) .element-edit{display:none}
+#dialog-base dd:not(:hover) .element-edit,
 #dialog-base dd:not(:hover) .element-del{display:none}
-
+#dialog-base .element-edit:not(:hover),
+#dialog-base .element-del:not(:hover){opacity:.5}
+/* разделительная линия для label */
+#label-w-change{
+	position:absolute;
+	cursor:e-resize;
+	background-color:#FFD9B2;
+	width:5px;
+	top:15px;
+	z-index:101;
+	opacity:.5;
+}
+#label-w-change:hover{opacity:1}
+#dialog-base:not(:hover) #label-w-change{display:none}
 
 .element{
 	background:url(../../img/element.png?0) no-repeat 200px -10px;
@@ -130,6 +178,120 @@
 ._radio div.on{background-position:0 -100px}
 ._radio div.on:hover{background-position:0 -300px}
 ._radio div.l:not(.on){color:#888}
+
+
+
+
+
+
+
+
+
+
+/* ---=== ВЫПАДАЮЩИЙ СПИСОК ===--- */
+._select{background:#fff;display:inline-block;position:relative}
+._select .title0bg{
+	position:absolute;
+	top:7px;
+	left:8px;
+	white-space:nowrap;
+	overflow:hidden;
+	color:#888;
+}
+._select .seltab{
+	border:#d3d9de solid 1px;
+	border-radius:1px;
+	height:29px;
+	width:100%;
+}
+._select.disabled .seltab{border-color:#ccc;background-color:#f0f0f0}
+._select .selsel{vertical-align:top;padding-bottom:2px}
+._select .selinp{
+	position:relative;
+	border:none;
+	padding:4px 0 4px 5px;
+	margin:2px 2px 0;
+	background-color:transparent;
+}
+._select .selinp._busy{background-position:right center}
+._select.disabled .selinp{color:#777}
+._select .clear{float:right;margin:7px 3px 0 0}
+._select .selug{
+	width:16px;
+	border-left:#fff solid 1px;
+	background:transparent no-repeat center center url("data:image/gif;base64,R0lGODlhBwAEAIABAAAAAP///yH5BAEAAAEALAAAAAAHAAQAAAIIhA+BGWoNWSgAOw==");
+}
+._select.disabled .selug{
+	border-left:#f0f0f0 solid 1px;
+	background:transparent no-repeat center center url("data:image/gif;base64,R0lGODlhBwAEAJEAAAAAAP///3d3d////yH5BAEAAAMALAAAAAAHAAQAAAIIlC+DOWoN2SgAOw==");
+}
+._select .seladd{
+	width:17px;
+	border-left:#FFF solid 1px;
+	background:transparent no-repeat center center url("data:image/gif;base64,R0lGODlhCAAIAKIAAAAAAP///ytYeuHo7ff398zMzIiIiP///yH5BAEAAAcALAAAAAAIAAgAAAMOeGqmfuytNpm92EW5X08AOw==");
+	cursor:pointer;
+}
+._select.disabled .seladd{border-left:#f0f0f0 solid 1px;cursor:default}
+._select:not(.disabled):hover .selug,
+._select.rs .selug,
+._select:not(.disabled) .seladd:hover
+{border-left:#d2dbe0 solid 1px;background-color:#e1e8ed}
+._select:not(.rs) .selres{display:none}
+._select .selres{
+	background-color:#fff;
+	opacity:.95;
+	cursor:pointer;
+	position:absolute;
+	z-index:10;
+	overflow:auto;
+}
+._select .selres.h250{height:250px;border-bottom:#CCC solid 1px}
+._select .selres.h250 .last{border-bottom:0}
+._select .title0{color:#888}
+._select .selun{
+	padding:3px 5px 4px 10px;
+	border-left:#CCC solid 1px;
+	border-right:#CCC solid 1px
+}
+._select .selun.ov{
+	padding:2px 5px 3px 10px;
+	border:#2a5883 solid 1px;
+	background-color:#587da1;
+	color:#FFF;
+}
+._select .selun.title0.ov{color:#ddd}
+._select .selun span{display:block;margin-top:1px;font-size:12px;color:#888}
+._select .selun.ov span,
+._select .selun.ov .grey{color:#bbe}
+._select .selun em{background-color:#dee}
+._select .selun span em{font-size:12px}
+._select .selun.ov em{background-color:#358}
+._select .last{border-bottom:#CCC solid 1px}
+._select .last.ov{padding-bottom:4px;border:#2a5883 solid 1px;}
+._select .multi{
+	display:inline-block;
+	background-color:#DAE2E8;
+	margin:2px 0 0 2px;
+	padding:1px 2px 2px 3px ;
+}
+._select .multi:hover{background-color:#587DA1;color:#fff}
+._select .x{
+	display:inline-block;
+	width:11px;
+	height:11px;
+	background:transparent no-repeat 2px 4px url("data:image/gif;base64,R0lGODlhBwAHAKIAAAAAAP///6azz9ri6P///wAAAAAAAAAAACH5BAEAAAQALAAAAAAHAAcAAAMOSEK88gq+yeJq00lZVwIAOw==");
+	cursor:pointer;
+	margin-left:3px;
+}
+._select .nofind{
+	background-color:#EEE;
+	border-left:#CCC solid 1px;
+	border-right:#CCC solid 1px;
+	border-bottom:#CCC solid 1px;
+	padding:4px 6px;
+	cursor:default;
+}
+
 
 
 
@@ -238,3 +400,72 @@
 }
 ._tooltip .ttug.r{background-position:right 0}
 ._tooltip .ttug.l{background-position:left 0}
+
+
+
+
+
+
+
+
+
+
+/* Календарь */
+._calendar{
+	display:inline-block;
+	position:relative;
+}
+._calendar .calinp{
+	display:inline-block;
+	width:125px;
+	border:#d3d9de solid 1px;
+	border-radius:1px;
+	padding:6px 8px;
+	background:#FFF no-repeat 118px 5px url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAABGdBTUEAALGPC/xhBQAAAJVJREFUKBVjYEACkxfv+Y/ExWCiy7NMXrK3nYHhf1FujAs7TDW6IpB4bqwLI1x+yZ6fQE4vE0gjw38GNpgEUTRQPdCJxUwwjdMW7/MGmQ6isRmAIQ80gBGbE7FpxiYGdDb5gAWmFTlAYGK4aJhrKbJ5VDOu4MUhzjgZmE5hqQyHGuzCjAy/mEAJnAHIwK4ChyhQPUgfALxfM4cHDm26AAAAAElFTkSuQmCC");
+	cursor:pointer;
+}
+._calendar .calcal{
+	background-color:#FFF;
+	border:#597da3 solid 1px;
+	width:182px;
+	position:absolute;
+	top:33px;
+	z-index:1;
+}
+._calendar .calhead{
+	border-top:#4c7097 solid 1px;
+	border-bottom:#4c7097 solid 1px;
+	background-color:#597da3;
+	width:100%;
+	height:25px;
+}
+._calendar .calback,._calendar .calnext{
+	background-image:url("data:image/gif;base64,R0lGODlhBAAeAJEAAAAAAP///////wAAACH5BAEAAAIALAAAAAAEAB4AAAIUlHMYy7ppBIq02ouz3lNO5jXOERUAOw==");
+	background-repeat:no-repeat;
+	width:25px;
+	cursor:pointer;
+}
+._calendar .calback{background-position:10px 9px}
+._calendar .calnext{background-position:11px -14px}
+._calendar .calmon{color:#FFF;font-weight:bold;text-align:center;vertical-align:middle}
+._calendar .calweeks{background-color:#F1F1F1;border-bottom:#EEE solid 1px;width:100%}
+._calendar .calweeks td{color:#777;text-align:center;line-height:23px}
+._calendar .caldays{width:100%}
+._calendar .caldays td{line-height:23px;width:26px;text-align:center}
+._calendar .sel{cursor:pointer}
+._calendar .lost{color:#777}
+._calendar .sel:hover,._calendar .set{background-color:#e1e7ed}
+
+
+
+
+
+
+
+
+
+
+td.label{color:#777}
+td.label em{font-size:10px;color:#aaa;display:block}
+td.top,td.topi{vertical-align:top}
+td.topi{padding-top:7px}

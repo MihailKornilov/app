@@ -1,4 +1,4 @@
-var
+var FB,
 	REGEXP_NUMERIC =       /^\d+$/,
 	REGEXP_NUMERIC_MINUS = /^-?\d+$/,
 	REGEXP_DROB =          /^[\d]+(.[\d]+)?(,[\d]+)?$/,
@@ -90,7 +90,7 @@ var
 					table:$(this).attr('val'),
 					ids:arr.join()
 				};
-				$.post(AJAX, send, function() {}, 'json');
+				_post(send);
 			}
 		});
 	},
@@ -330,6 +330,75 @@ $.fn.keyEnter = function(func) {
 };
 
 $(document)
+	.ajaxSuccess(function(event, request, settings) {
+		_busy(0);
+		var req = request.responseJSON;
+
+		if(req.pin) {
+			location.reload();
+			return;
+		}
+
+		if(!$('#_debug').length)
+			return;
+
+		var html = '',
+			post =
+				'<div class="hd ' + (req.success ? 'res1' : '') + (req.error ? 'res0' : '') + '">' +
+					'<b>post</b>' +
+					'<a id="repeat">повтор</a>' +
+	 (req.success ? '<b id="res-success">success</b>' : '') +
+	   (req.error ? '<b id="res-error">error</b>' : '') +
+				'</div>',
+			link = '<div class="hd"><b>link</b></div><textarea>' + req.link + '</textarea>',
+			sql = '<div class="hd">sql <b>' + req.sql_count + '</b> (' + req.sql_time + ') :: php ' + req.php_time + '</div>';
+
+		for(var i in req) {
+			switch(i) {
+				case 'success': break;
+				case 'error': break;
+				case 'php_time': break;
+				case 'sql_count': break;
+				case 'sql_time': break;
+				case 'link': break;
+				case 'post':
+					for(var k in req.post)
+						post += '<p><b>' + k + '</b>: ' + req.post[k];
+					break;
+				case 'sql':
+					sql += '<ul>' + req[i] + '</ul>';
+					break;
+				default:
+					var len = req[i].length ? '<tt>' + req[i].length + '</tt>' : '';
+					html += '<div class="hd"><b>' + i + '</b>' + len + '<em>' + typeof req[i] + '</em></div>';
+					if(typeof req[i] == 'object') {
+						html += obj(req[i]);
+						break;
+					}
+					html += '<textarea>' + req[i] + '</textarea>';
+			}
+		}
+		$('#_debug .ajax').html(post + link + sql + html);
+		$('#_debug .ajax textarea').autosize();
+		$('#_debug #repeat').click(function() {
+			var t = $(this).parent();
+			if(t.hasClass('_busy'))
+				return;
+			t.addClass('_busy');
+			$.post(req.link, req.post, function() {}, 'json');
+		});
+//		window.FBH = FB.height();
+		debugHeight();
+		function obj(v) {
+			var send = '<table>',
+				i;
+			for(i in v)
+				send += '<tr><td class="val"><b>' + i + '</b>: ' +
+							'<td>' + (typeof v[i] == 'object' ? obj(v[i]) : v[i]);
+			send += '</table>';
+			return send;
+		}
+	})
 	.ajaxError(function(event, request, settings) {
 //		_busy(0);
 		if(!request.responseText)

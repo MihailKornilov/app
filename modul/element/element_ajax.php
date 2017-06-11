@@ -19,36 +19,26 @@ switch(@$_POST['op']) {
 		}
 
 		$html =
-			'<div class="pad10 line-b1">'.
+			'<div id="dialog-w-change"></div>'.
+			'<div class="pt10 mb10 ml10 mr10 prel">'.
 				'<dl id="dialog-base" class="_sort pad5" val="_dialog_element">'.
+					'<div id="label-w-change"></div>'.
 					_dialogElementSpisok($dialog_id, 'html_edit').
 				'</dl>'.
 			'</div>'.
 
-			'<div id="dialog-but" class="pad20 center bg-ffd">'.
-				'<button class="vk small green" onclick="_dialogEditElement()">Добавить элемент</button>'.
-  ($dialog_id ? '<button class="vk small ml5" onclick="_dialogEditWidth()">Изменить ширину окна</button>' : '').
-
+			'<div id="dialog-but" class="pad20 center bg-ffd line-t1">'.
+				'<button class="vk green" onclick="_dialogEditElement()">Добавить элемент</button>'.
 				'<table class="bs5 mt20">'.
 					'<tr><td class="label">Текст кнопки применения:<td><input type="text" id="button_submit" class="w230" maxlength="100" value="'.$dialog['button_submit'].'" />'.
 					'<tr><td class="label r">Текст кнопки отмены:<td><input type="text" id="button_cancel" class="w230" maxlength="100" value="'.$dialog['button_cancel'].'" />'.
 				'</table>'.
 
-			'</div>'.
-
-			'<div id="dialog-width" class="pad20 bg-ffd dn">'.
-				'<div class="ml20 fs14">Допустимые значения ширины: от <b>480</b> до <b>780</b> пикселей.</div>'.
-				'<table class="bs5 mt10">'.
-					'<tr><td class="label w100 r">Ширина окна:'.
-						'<td><input type="text" id="dialog-width-inp" class="w50 r" value="'._num(@$dialog['width']).'" /> px'.
-						'<td><button id="dialog-width-ok" class="vk small ml10 mr5">Применить</button>'.
-							'<button id="dialog-width-cancel" class="vk small grey">Отмена</button>'.
-				'</table>'.
-			'</div>'
-			;
+			'</div>';
 
 		$send['dialog_id'] = $dialog_id;
 		$send['width'] = $dialog_id ? _num($dialog['width']) : 500;
+		$send['label_width'] = $dialog_id ? _num($dialog['label_width']) : 125;
 		$send['head'] = utf8(@$dialog['head']);
 		$send['button_submit'] = utf8($dialog['button_submit']);
 		$send['button_cancel'] = utf8($dialog['button_cancel']);
@@ -92,6 +82,12 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID диалогового окна');
 		if(!$head = _txt($_POST['head']))
 			jsonError('Не указано название диалога');
+		if(!$width = _num($_POST['width']))
+			jsonError('Некорректное значение ширины диалога');
+		if($width < 480 || $width > 780)
+			jsonError('Установлена недопустимая ширина диалога');
+		if(!$label_width = _num($_POST['label_width']))
+			jsonError('Некорректное значение ширины label');
 		if(!$button_cancel = _txt($_POST['button_cancel']))
 			jsonError('Не указан текст кнопки отмены');
 
@@ -108,6 +104,8 @@ switch(@$_POST['op']) {
 
 		$sql = "UPDATE `_dialog`
 				SET `head`='".addslashes($head)."',
+					`width`=".$width.",
+					`label_width`=".$label_width.",
 					`button_submit`='".addslashes($button_submit)."',
 					`button_cancel`='".addslashes($button_cancel)."'
 				WHERE `id`=".$dialog_id;
@@ -117,29 +115,6 @@ switch(@$_POST['op']) {
 
 		$send['dialog_id'] = $dialog_id;
 		jsonSuccess($send);
-		break;
-	case 'dialog_width_set'://установка ширины диалога
-		if(!$dialog_id = _num($_POST['dialog_id']))
-			jsonError('Некорректный ID диалогового окна');
-		if(!$width = _num($_POST['width']))
-			jsonError('Указана некорректная ширина');
-
-		if($width < 480 || $width > 780)
-			jsonError('Указана недопустимая ширина');
-
-		$sql = "SELECT *
-				FROM `_dialog`
-				WHERE `app_id`=".APP_ID."
-				  AND `id`=".$dialog_id;
-		if(!$dialog = query_assoc($sql))
-			jsonError('Диалога не существует');
-
-		$sql = "UPDATE `_dialog`
-				SET `width`=".$width."
-				WHERE `id`=".$dialog_id;
-		query($sql);
-
-		jsonSuccess();
 		break;
 
 	case 'dialog_open_load'://получение данных для диалогового окна
@@ -229,8 +204,7 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 		$label_name = _txt($r['label_name']);
 		$require = _bool($r['require']);
 		$hint = _txt($r['hint']);
-		$hint_top = intval($r['hint_top']);
-		$hint_left = intval($r['hint_left']);
+		$width = _num($r['width']);
 		$param_txt_1 = _txt($r['param_txt_1']);
 
 		$sql = "INSERT INTO `_dialog_element` (
@@ -241,8 +215,7 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 					`label_name`,
 					`require`,
 					`hint`,
-					`hint_top`,
-					`hint_left`,
+					`width`,
 					`param_txt_1`,
 					`param_bool_1`,
 					`param_bool_2`,
@@ -256,8 +229,7 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 					'".addslashes($label_name)."',
 					".$require.",
 					'".addslashes($hint)."',
-					".$hint_top.",
-					".$hint_left.",
+					".$width.",
 					'".addslashes($param_txt_1)."',
 					"._bool($r['param_bool_1']).",
 					"._bool($r['param_bool_2']).",
@@ -268,8 +240,7 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 					`label_name`=VALUES(`label_name`),
 					`require`=VALUES(`require`),
 					`hint`=VALUES(`hint`),
-					`hint_top`=VALUES(`hint_top`),
-					`hint_left`=VALUES(`hint_left`),
+					`width`=VALUES(`width`),
 					`param_txt_1`=VALUES(`param_txt_1`),
 					`param_bool_1`=VALUES(`param_bool_1`),
 					`param_bool_2`=VALUES(`param_bool_2`)";
@@ -333,6 +304,11 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 	$html = '';
 	$edit = $i == 'html_edit';//редактирование + сортировка элементов
 
+	$sql = "SELECT `label_width`
+			FROM `_dialog`
+			WHERE `id`=".$dialog_id;
+	$label_width = _num(query_value($sql));
+
 	$sql = "SELECT *
 			FROM `_dialog_element`
 			WHERE `app_id`=".APP_ID."
@@ -347,6 +323,7 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 				$val = $data[$r['spisok_pole']];
 
 			$attr_id = 'elem'.$r['id'];
+			$width = $r['width'] ? _num($r['width']) : 250;
 			$inp = '<input type="hidden" id="'.$attr_id.'" value="'.$val.'" />';
 
 			$html .=
@@ -356,10 +333,10 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 						'<div class="element-edit icon icon-edit'._tooltip('Изменить', -29).'</div>'.
 						'<table class="bs5">'
 				: '').
-				'<tr><td class="label r w125'.($edit ? ' w125 pr5' : '').'">'.
+				'<tr><td class="label r'.($edit ? ' label-width pr5' : '').'" style="width:'.$label_width.'px">'.
 						($r['label_name'] ? $r['label_name'].':' : '').
 						($r['require'] ? '<div class="dib red fs15 mtm2">*</div>' : '').
-						($r['hint'] ? ' <div class="icon icon-hint dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'###'.$r['hint_top'].'###'.$r['hint_left'].'"></div>' : '').
+						($r['hint'] ? ' <div class="icon icon-hint dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'"></div>' : '').
 					'<td>';
 
 			switch($r['type_id']) {
@@ -367,10 +344,10 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 				case 2://select
 				default: break;
 				case 3://input
-					$inp = '<input type="text" id="'.$attr_id.'" placeholder="'.$r['param_txt_1'].'" value="'.$val.'" />';
+					$inp = '<input type="text" id="'.$attr_id.'" placeholder="'.$r['param_txt_1'].'" style="width:'.$width.'px" value="'.$val.'" />';
 					break;
 				case 4://textarea
-					$inp = '<textarea id="'.$attr_id.'" class="w250" placeholder="'.$r['param_txt_1'].'">'.$val.'</textarea>';
+					$inp = '<textarea id="'.$attr_id.'" placeholder="'.$r['param_txt_1'].'" style="width:'.$width.'px">'.$val.'</textarea>';
 					break;
 			}
 
@@ -382,8 +359,7 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 				'label_name' => utf8($r['label_name']),
 				'require' => _bool($r['require']),
 				'hint' => utf8(htmlspecialchars_decode(htmlspecialchars_decode($r['hint']))),
-				'hint_top' => intval($r['hint_top']),
-				'hint_left' => intval($r['hint_left']),
+				'width' => $width,
 				'param_txt_1' => utf8($r['param_txt_1']),
 				'param_bool_1' => _bool($r['param_bool_1']),
 				'param_bool_2' => _bool($r['param_bool_2']),

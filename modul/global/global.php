@@ -5,8 +5,8 @@ define('TODAY_UNIXTIME', strtotime(TODAY));
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 
 define('VERSION', 0);
-define('DEBUG', true);
-define('MIN', DEBUG ? '' : '.min');
+define('DEBUG', 0);
+define('MIN', DEBUG ? '' : '');//.min
 
 define('SA', true);
 if(SA) {
@@ -72,7 +72,8 @@ function _global_script() {//скрипты и стили
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
-	'<script src="js/jquery-ui.min.js?1"></script>'.
+	'<link rel="stylesheet" type="text/css" href="css/jquery-ui.css?'.TIME.'" />'.
+	'<script src="js/jquery-ui.min.js?3"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?'.TIME.'" />'.
 	'<script src="modul/global/global.js?'.TIME.'"></script>'.
@@ -220,13 +221,14 @@ function _content() {//центральное содержание
 		'<br />'.
 		'<br />'.
 		'<br />'.
+		'<textarea id="txt"></textarea>'.
 		'<br />'.
 		'<br />'.
 		'<br />'.
 		'<br />'.
 			_button(array(
 				'name' => 'Создать страницу',
-				'click' => '_dialogEdit()',
+				'click' => '_dialogOpen(1)',
 				'color' => 'green'
 			)).
 			'<div class="icon icon-hint ml20 mt5"></div>'
