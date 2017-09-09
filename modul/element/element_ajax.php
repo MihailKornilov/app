@@ -30,10 +30,20 @@ switch(@$_POST['op']) {
 			'<div id="dialog-but" class="pad20 center bg-ffd line-t1">'.
 				'<button class="vk green" onclick="_dialogEditElement()">Добавить элемент</button>'.
 				'<table class="bs5 mt20">'.
-					'<tr><td class="label">Текст кнопки применения:<td><input type="text" id="button_submit" class="w230" maxlength="100" value="'.$dialog['button_submit'].'" />'.
+					'<tr><td class="label w175 r">Текст кнопки применения:<td><input type="text" id="button_submit" class="w230" maxlength="100" value="'.$dialog['button_submit'].'" />'.
 					'<tr><td class="label r">Текст кнопки отмены:<td><input type="text" id="button_cancel" class="w230" maxlength="100" value="'.$dialog['button_cancel'].'" />'.
 				'</table>'.
 
+				'<table class="bs5 mt10'.(SA ? '' : ' dn').'">'.
+					'<tr><td class="label w175 r"><div class="red">SA: Таблица в базе:</div>'.
+						'<td><input type="text" id="base_table" class="w230" maxlength="30" value="'.$dialog['base_table'].'" />'.
+					'<tr><td class="label r"><div class="red">SA: App any:</div>'.
+						'<td>'._check(array(
+								'id' => 'app_any',
+								'block' => 1,
+								'value' => _bool($dialog['app_any'])
+							   )).
+				'</table>'.
 			'</div>';
 
 		$send['dialog_id'] = $dialog_id;
@@ -92,6 +102,7 @@ switch(@$_POST['op']) {
 			jsonError('Не указан текст кнопки отмены');
 
 		$button_submit = _txt($_POST['button_submit']);
+		$base_table = _txt($_POST['base_table']);
 
 		_dialogElementUpdate();
 
@@ -107,7 +118,8 @@ switch(@$_POST['op']) {
 					`width`=".$width.",
 					`label_width`=".$label_width.",
 					`button_submit`='".addslashes($button_submit)."',
-					`button_cancel`='".addslashes($button_cancel)."'
+					`button_cancel`='".addslashes($button_cancel)."',
+					`base_table`='".addslashes($base_table)."'
 				WHERE `id`=".$dialog_id;
 		query($sql);
 
@@ -118,7 +130,21 @@ switch(@$_POST['op']) {
 		break;
 
 	case 'dialog_open_load'://получение данных для диалогового окна
-		if(!$dialog_id = _num($_POST['dialog_id']))
+		$dialog_id = _num($_POST['dialog_id']);
+
+		$data = array();
+		if($unit_id = _num($_POST['unit_id'])) {
+			$sql = "SELECT *
+					FROM `_page`
+					WHERE `id`=".$unit_id;
+			if(!$data = query_assoc($sql))
+				jsonError('Записи не существует');
+			if($data['deleted'])
+				jsonError('Запись была удалена');
+			$dialog_id = _num($data['dialog_id']);
+		}
+		
+		if(!$dialog_id)
 			jsonError('Некорректный ID диалогового окна');
 
 		$sql = "SELECT *
@@ -128,15 +154,100 @@ switch(@$_POST['op']) {
 		if(!$dialog = query_assoc($sql))
 			jsonError('Диалога не существует');
 
-		$html = '<table class="bs10">'._dialogElementSpisok($dialog_id, 'html').'</table>';
+		$html = '<table class="bs10">'._dialogElementSpisok($dialog_id, 'html', $data).'</table>';
 
 		$send['width'] = _num($dialog['width']);
-		$send['head'] = utf8($dialog['head']);
-		$send['button_submit'] = utf8($dialog['button_submit']);
+		$send['head'] = utf8($unit_id ? 'Редактирование записи' : $dialog['head']);
+		$send['button_submit'] = utf8($unit_id ? 'Сохранить' : $dialog['button_submit']);
 		$send['button_cancel'] = utf8($dialog['button_cancel']);
 		$send['element'] = _dialogElementSpisok($dialog_id, 'arr');
 		$send['html'] = utf8($html);
 		jsonSuccess($send);
+		break;
+
+	case 'spisok_add'://внесение данных диалога в _spisok
+		if(!$dialog_id = _num($_POST['dialog_id']))
+			jsonError('Некорректный ID диалогового окна');
+
+		$page_id = _num($_POST['page_id']);
+		
+		_dialogSpisokUpdate($dialog_id, 0, $page_id);
+
+		jsonSuccess();
+		break;
+	case 'spisok_edit_load'://получение данных записи для диалога
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный идентификатор');
+
+		$sql = "SELECT *
+				FROM `_spisok`
+				WHERE `app_id`=".APP_ID."
+				  AND `id`=".$id;
+		if(!$r = query_assoc($sql))
+			jsonError('Записи не существует');
+
+		if($r['deleted'])
+			jsonError('Запись была удалена');
+
+		$sql = "SELECT *
+				FROM `_dialog`
+				WHERE `app_id`=".APP_ID."
+				  AND `id`=".$r['dialog_id'];
+		if(!$dialog = query_assoc($sql))
+			jsonError('Диалога не существует');
+
+		$html = '<table class="bs10">'._dialogElementSpisok($r['dialog_id'], 'html', $r).'</table>';
+
+		$send['width'] = _num($dialog['width']);
+		$send['element'] = _dialogElementSpisok($r['dialog_id'], 'arr');
+		$send['html'] = utf8($html);
+		jsonSuccess($send);
+		break;
+	case 'spisok_edit'://сохранение данных записи для диалога
+		if(!$id = _num($_POST['unit_id']))
+			jsonError('Некорректный идентификатор');
+
+		$sql = "SELECT *
+				FROM `_page`
+				WHERE `app_id`=".APP_ID."
+				  AND `id`=".$id;
+		if(!$r = query_assoc($sql))
+			jsonError('Записи не существует');
+
+		if($r['deleted'])
+			jsonError('Запись была удалена');
+
+		$sql = "SELECT *
+				FROM `_dialog`
+				WHERE `app_id`=".APP_ID."
+				  AND `id`=".$r['dialog_id'];
+		if(!$dialog = query_assoc($sql))
+			jsonError('Диалога не существует');
+
+		_dialogSpisokUpdate($r['dialog_id'], $id);
+
+		jsonSuccess();
+		break;
+	case 'spisok_del'://удаление записи из _spisok
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный идентификатор');
+
+		$sql = "SELECT *
+				FROM `_spisok`
+				WHERE `app_id`=".APP_ID."
+				  AND `id`=".$id;
+		if(!$r = query_assoc($sql))
+			jsonError('Записи не существует');
+
+		if($r['deleted'])
+			jsonError('Запись уже была удалена');
+
+		$sql = "UPDATE `_spisok`
+				SET `deleted`=1
+				WHERE `id`=".$id;
+		query($sql);
+
+		jsonSuccess();
 		break;
 }
 
@@ -174,10 +285,11 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 
 	$sort = 0;
 	foreach($arr as $r) {
+		$element_id = _num($r['id']);
 		$type_id = _num($r['type_id']);
+		$col_name = _txt($r['col_name']);
 
-		$spisok_pole = '';
-		if(!$element_id = _num(@$r['id'])) {
+		if(!$element_id && !$col_name) {
 			//формирование названия поля на основании типа элемента
 			$pole = array(
 				1 => 'bool',
@@ -188,15 +300,15 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 				6 => 'date'
 			);
 			$n = 1;
-			$sql = "SELECT `spisok_pole`,1
+			$sql = "SELECT `col_name`,1
 					FROM `_dialog_element`
 					WHERE `app_id`=".APP_ID."
 					  AND `dialog_id`=".$dialog_id."
-					  AND `spisok_pole` LIKE '".$pole[$type_id]."_%'";
+					  AND `col_name` LIKE '".$pole[$type_id]."_%'";
 			$ass = query_ass($sql);
 			for($n = 1; $n <= 5; $n++) {
-				$spisok_pole = $pole[$type_id].'_'.$n;
-				if(!isset($ass[$spisok_pole]))
+				$col_name = $pole[$type_id].'_'.$n;
+				if(!isset($ass[$col_name]))
 					break;
 			}
 		}
@@ -219,7 +331,7 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 					`param_txt_1`,
 					`param_bool_1`,
 					`param_bool_2`,
-					`spisok_pole`,
+					`col_name`,
 					`sort`
 				) VALUES (
 					".$element_id.",
@@ -233,7 +345,7 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 					'".addslashes($param_txt_1)."',
 					"._bool($r['param_bool_1']).",
 					"._bool($r['param_bool_2']).",
-					'".$spisok_pole."',
+					'".$col_name."',
 					".($sort++)."
 				)
 				ON DUPLICATE KEY UPDATE
@@ -243,7 +355,8 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 					`width`=VALUES(`width`),
 					`param_txt_1`=VALUES(`param_txt_1`),
 					`param_bool_1`=VALUES(`param_bool_1`),
-					`param_bool_2`=VALUES(`param_bool_2`)";
+					`param_bool_2`=VALUES(`param_bool_2`),
+					`col_name`=VALUES(`col_name`)";
 		query($sql);
 
 		if(!$element_id)
@@ -320,7 +433,7 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 
 			//установка значения при редактировании данных диалога
 			if(!empty($data))
-				$val = $data[$r['spisok_pole']];
+				$val = $data[$r['col_name']];
 
 			$attr_id = 'elem'.$r['id'];
 			$width = $r['width'] ? _num($r['width']) : 250;
@@ -364,6 +477,8 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 				'param_bool_1' => _bool($r['param_bool_1']),
 				'param_bool_2' => _bool($r['param_bool_2']),
 
+				'col_name' => $r['col_name'],
+
 				'attr_id' => '#'.$attr_id,
 
 				'v' => array()
@@ -396,7 +511,23 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 	return $html;
 }
 
-function _dialogSpisokUpdate($dialog_id, $spisok_id=0) {//внесение/редактирование записи списка
+function _dialogSpisokUpdate($dialog_id, $spisok_id=0, $page_id=0) {//внесение/редактирование записи списка
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `id`=".$dialog_id;
+	if(!$dialog = query_assoc($sql))
+		jsonError('Диалога не существует');
+
+	//установка таблицы для внесения данных
+	$baseTable = '_spisok';
+	if(!empty($dialog['base_table'])) {
+		$baseTable = $dialog['base_table'];
+		$sql = "SHOW TABLES LIKE '".$baseTable."'";
+		if(!mysql_num_rows(query($sql)))
+			jsonError('Таблицы не существует');
+	}
+
 	//проверка на корректность данных элементов диалога
 	$elem = $_POST['elem'];
 	if(!is_array($elem))
@@ -421,25 +552,26 @@ function _dialogSpisokUpdate($dialog_id, $spisok_id=0) {//внесение/редактировани
 		if($r['require'] && empty($v))
 			jsonError('Не заполнено поле <b>'.$r['label_name'].'</b>');
 
-		$elemUpdate[] = "`".$r['spisok_pole']."`='".addslashes($v)."'";
+		$elemUpdate[] = "`".$r['col_name']."`='".addslashes($v)."'";
 	}
 
-
 	if(!$spisok_id) {
-		$sql = "INSERT INTO `_spisok` (
+		$sql = "INSERT INTO `".$baseTable."` (
 					`app_id`,
 					`dialog_id`,
+					`page_id`,
 					`viewer_id_add`
 				) VALUES (
 					".APP_ID.",
 					".$dialog_id.",
+					".$page_id.",
 					".VIEWER_ID."
 				)";
 		query($sql);
-		$spisok_id = query_insert_id('_spisok');
+		$spisok_id = query_insert_id($baseTable);
 	}
 
-	$sql = "UPDATE `_spisok`
+	$sql = "UPDATE `".$baseTable."`
 			SET ".implode(',', $elemUpdate)."
 			WHERE `id`=".$spisok_id;
 	query($sql);

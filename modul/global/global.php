@@ -4,7 +4,6 @@ define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 
-define('VERSION', 0);
 define('DEBUG', 0);
 define('MIN', DEBUG ? '' : '');//.min
 
@@ -37,6 +36,11 @@ require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
 require_once GLOBAL_DIR.'/modul/global/func_require.php';
 
 require_once GLOBAL_DIR.'/modul/debug/debug.php';
+require_once GLOBAL_DIR.'/modul/sa/sa.php';
+
+define('VERSION', _num(@$_COOKIE['version']));
+define('PAS', _bool(@$_COOKIE['page_setup'])); //флаг включения управления страницей PAS: page_setup
+define('PAGE_ID', _num(@$_GET['p'])); //идентификатор страницы: для отображения ссылок управления страницей
 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
@@ -68,7 +72,8 @@ function _global_script() {//скрипты и стили
 
 	'<script>'.
 		'var URL="'.URL.'",'.
-			'AJAX="'.URL_AJAX.'";'.
+			'AJAX="'.URL_AJAX.'",'.
+			'PAGE_ID='.PAGE_ID.';'.
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
@@ -205,9 +210,43 @@ function _app($i='all') {//Получение данных о приложении
 }
 
 
-function _content() {//центральное содержание
+function _pageSetupMenu() {//строка меню управления страницей
+	if(!PAS)
+		return '';
+	if(!PAGE_ID)
+		return '';
 	return
-	'<div id="_content">'.
+	'<div id="pas">'.
+		'<p>'.
+			'<a onclick="_dialogOpen('._dialogValToId('page_setup_menu_add').')">Добавить меню</a>'.
+			' :: '.
+			'<a onclick="_dialogOpen('._dialogValToId('page_setup_head_add').')">Добавить заголовок</a>'.
+			' :: '.
+			'<a onclick="_dialogOpen('._dialogValToId('page_setup_find_add').')">Добавить поиск</a>'.
+			' :: '.
+			'<a onclick="_dialogOpen('._dialogValToId('page_setup_button_add').')">Добавить кнопку</a>'.
+		'</p>'.
+	'</div>';
+}
+
+
+function _content() {//центральное содержание
+	$page_id = _num(@$_GET['p']);
+
+	if(!APP_ID)
+		$content = _appSpisok();
+	else
+		if($page_id)
+			$content = _page_show($page_id);
+		else
+			$content = _contentEmpty();
+
+	return
+	'<div id="_content">'.$content.'</div>';
+}
+function _contentEmpty() {
+	return
+		'<div class="_empty mt20 mb20">Несуществующая страница</div>'.
 		FACE.
 		'<br />'.
 		'<span class="grey">code:</span> '.CODE.
@@ -235,16 +274,31 @@ function _content() {//центральное содержание
 		: '').
 			'<br />'.
 		'<br />'.
-		'<a href="'.URL.'">link</a>'.
+		'<a href="'.URL.'&p=1">page link</a>'.
 		'<br />'.
 		'VIEWER_WORKER='.VIEWER_WORKER.
-		'<br />'.
-		_appSpisok().
-	'</div>';
+		'<br />';
 }
 function _footer() {
 	return '</body></html>';
 }
+
+
+
+
+
+function _pageForm() {//формат страницы
+	return
+	'<div>'.
+		'<table class="tabLR">'.
+			'<tr><td class="left">'.
+				'<td class="right">'.
+		'</table>'.
+	'</div>';
+}
+
+
+
 
 
 

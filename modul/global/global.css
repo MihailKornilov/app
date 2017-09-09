@@ -57,6 +57,16 @@ table{border:0;border-spacing:0}
 
 
 
+.tabLR{width:100%}
+.tabLR .left{vertical-align:top}
+.tabLR .right{
+	vertical-align:top;
+	padding:8px 8px 20px 8px;
+	width:200px;
+	background:#f7f7f7;
+	border-left:#dae1e8 solid 1px;
+	height:450px;
+}
 
 
 
@@ -132,6 +142,18 @@ table{border:0;border-spacing:0}
 	margin:auto;
 	padding-top:8px;
 	font-size:22px;
+}
+
+
+/* Строка управления страницей page_setup */
+#pas{
+	background-color:#ffc;
+	border-bottom:#F2F2C2 solid 1px;
+}
+#pas p{
+	width:1000px;
+	margin:auto;
+	padding:10px;
 }
 
 /* Основное содержание сайта */

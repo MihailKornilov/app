@@ -292,7 +292,7 @@ var VK_SCROLL = 0,
 			}
 		};
 	},
-	_dialogEdit = function(dialog_id) {//создание диалогового окна
+	_dialogEdit = function(dialog_id) {//создание|редактирование диалогового окна
 		dialog_id = _num(dialog_id);
 		var dialog = _dialog({
 				edit:1,
@@ -395,6 +395,7 @@ var VK_SCROLL = 0,
 				label_width:LABEL_WIDTH,
 				button_submit:$('#button_submit').val(),
 				button_cancel:$('#button_cancel').val(),
+				base_table:$('#base_table').val(),
 				element:DIALOG_ELEMENT
 			};
 			dialog.post(send, function(res) {
@@ -419,7 +420,8 @@ var VK_SCROLL = 0,
 			param_txt_1:'',
 			param_bool_1:0,
 			param_bool_2:0,
-			v:[]
+			v:[],
+			col_name:''
 		}, EL);
 		var html =
 				'<div id="element-unit">' +
@@ -433,6 +435,8 @@ var VK_SCROLL = 0,
 				'<div id="element-sel" class="dn">' +
 					'<div class="fs16">Ёлемент <b id="element-name" class="fs16"></b></div>' +
 					'<table id="element-main" class="bs10 mt10">' +
+						'<tr><td class="label"><div class="red r">SA:  олонка в таблице:</div>' +
+							'<td><input type="text" id="col-name" class="w100" value="' + EL.col_name + '" />' +
 						'<tr><td class="label r b">Ќазвание пол€:' +
 							'<td><input type="text" id="label-name" class="w250" value="' + EL.label_name + '" />' +
 						'<tr id="tr-require" class="dn">' +
@@ -463,7 +467,7 @@ var VK_SCROLL = 0,
 				submit:submit
 			}),
 			TYPE_ID = EL.type_id,//выбранный элемент
-			RADIO_ASS = [];
+			EL_VAL_ASS = [];
 
 		$('#element-unit div').click(function() {
 			var t = $(this);
@@ -539,7 +543,7 @@ var VK_SCROLL = 0,
 					name = '¬ыпадающий список';
 					main =
 						'<tr><td class="label r">“екст по умолчанию:' +
-							'<td><input type="text" class="w250" id="param_txt_1" value="не выбрано" />';
+							'<td><input type="text" class="w250" id="param_txt_1" value="' + (EL.id ? EL.param_txt_1 : 'не выбрано') + '" />';
 					prev = '<input type="hidden" id="elem-attr-id" />';
 					break;
 				case 3:
@@ -601,13 +605,13 @@ var VK_SCROLL = 0,
 					elementRequire();
 					elementActionSel = function() {
 						$('#elem-attr-id')._select({
-							width:200,
+							width:198,
 							title0:$.trim($('#param_txt_1').val()),
-							spisok:[]
+							spisok:EL_VAL_ASS
 						});
 					};
 					$('#param_txt_1').keyup(elementActionSel);
-					elementActionSel();
+					elementVal(elementActionSel);
 					break;
 
 				case 3://text
@@ -634,70 +638,12 @@ var VK_SCROLL = 0,
 				case 5://radio
 					elementRequire();
 					$('#prev-label').addClass('topi');
-					var RADIO_N = 1,
-						radioValAdd = function(v) {
-							v = $.extend({
-								id:0,
-								uid:RADIO_N,
-								title:'им€ значени€ ' + RADIO_N
-							}, v);
-							$('#element-main').append(
-								'<tr><td class="label r">«начение ' + RADIO_N + ':' +
-									'<td><input type="text" class="w250" id="radio-val-' + v.uid + '" val="' + v.uid + '" value="' + v.title + '" />' +
-						 (RADIO_N > 1 ? '<div class="icon icon-del ml5 prel top5' + _tooltip('”далить значение', -55) + '</div>' : '')
-							);
-							$('#radio-val-' + v.uid).keyup(function() {
-								var t = $(this),
-									uid = _num(t.attr('val'));
-								for(var n = 0; n < RADIO_ASS.length; n++) {
-									var sp = RADIO_ASS[n];
-									if(sp.uid == uid) {
-										sp.title = t.val();
-										break;
-									}
-								}
-								radioPrint();
-							}).select();
-							$('#element-main .icon-del:last').click(function() {
-								var t = $(this),
-									uid = _num(t.prev().attr('val')),
-									p = _parent(t);
-								for(var n = 0; n < RADIO_ASS.length; n++) {
-									var sp = RADIO_ASS[n];
-									if(sp.uid == uid) {
-										RADIO_ASS.splice(n, 1);
-										break;
-									}
-								}
-								p.remove();
-								radioPrint();
-							});
-							RADIO_ASS.push({
-								id:v.id,
-								uid:v.uid,
-								title:v.title
-							});
-							RADIO_N++;
-							radioPrint();
-						},
-						radioPrint = function() {
-							$('#elem-attr-id')._radio({
-								light:1,
-								spisok:RADIO_ASS
-							});
-						};
-					//кнопка добавлени€ нового значени€ radio
-					$('#element-main').after(
-						'<div class="color-555 b center pad10 over1 curP">' +
-							'ƒобавить значение' +
-						'</div>'
-					).next().click(radioValAdd);
-
-					if(EL.id){
-						for(var n = 0; n < EL.v.length; n++)
-							radioValAdd(EL.v[n]);
-					} else
-						radioValAdd();
+					elementVal(function() {
+						$('#elem-attr-id')._radio({
+							light:1,
+							spisok:EL_VAL_ASS
+						});
+					}, 1);
 					break;
 				case 6://календарь
 					elementActionSel = function() {
@@ -716,19 +662,84 @@ var VK_SCROLL = 0,
 					break;
 			}
 		}
+		function elementVal(valPrintFunc, firstAdd) {//значени€, которые содержат элементы Radio, Select
+			var NUM = 1,
+				valAdd = function(v) {
+					v = $.extend({
+						id:0,
+						uid:NUM,
+						title:'им€ значени€ ' + NUM
+					}, v);
+					$('#element-main').append(
+						'<tr><td class="label r">«начение ' + NUM + ':' +
+							'<td><input type="text" class="w250" id="el-val-' + v.uid + '" val="' + v.uid + '" value="' + v.title + '" />' +
+								(NUM > 1 ? '<div class="icon icon-del ml5 prel top5' + _tooltip('”далить значение', -55) + '</div>' : '')
+					);
+					$('#el-val-' + v.uid).keyup(function() {
+						var t = $(this),
+							uid = _num(t.attr('val'));
+						for(var n = 0; n < EL_VAL_ASS.length; n++) {
+							var sp = EL_VAL_ASS[n];
+							if(sp.uid == uid) {
+								sp.title = t.val();
+								sp.content = t.val();
+								break;
+							}
+						}
+						valPrintFunc();
+					}).select();
+					$('#element-main .icon-del:last').click(function() {
+						var t = $(this),
+							uid = _num(t.prev().attr('val')),
+							p = _parent(t);
+						for(var n = 0; n < EL_VAL_ASS.length; n++) {
+							var sp = EL_VAL_ASS[n];
+							if(sp.uid == uid) {
+								EL_VAL_ASS.splice(n, 1);
+								break;
+							}
+						}
+						p.remove();
+						valPrintFunc();
+					});
+					EL_VAL_ASS.push({
+						id:v.id,
+						uid:v.uid,
+						title:v.title
+					});
+					NUM++;
+					valPrintFunc();
+				};
+			//кнопка добавлени€ нового значени€ radio
+			$('#element-main').after(
+				'<div class="color-555 b center pad10 over1 curP">' +
+					'ƒобавить значение' +
+				'</div>'
+			).next().click(valAdd);
+
+			if(EL.id) {
+				for(var n = 0; n < EL.v.length; n++)
+					valAdd(EL.v[n]);
+			} else
+				if(firstAdd)
+					valAdd();
+				else
+					valPrintFunc();
+		}
 		function elementActionSel() {}//действие, которое примен€етс€ к выбранному элементу в предварительном просмотре
 		function submit() {
 			var elem = {
 					id:EL.id,
 					type_id:TYPE_ID,
+					col_name:$.trim($('#col-name').val()),
 					label_name:$.trim($('#label-name').val()),
 					require:_bool($('#label-require').val()),
 					hint:$.trim($('#label-hint').val()),
-					width:250,
+					width:TYPE_ID == 2 ? 198 : 250,
 					param_txt_1:$.trim($('#param_txt_1').val()),
 					param_bool_1:_bool($('#param_bool_1').val()),
 					param_bool_2:_bool($('#param_bool_2').val()),
-					v:RADIO_ASS
+					v:EL_VAL_ASS
 				},
 				rand = EL.id || Math.round(Math.random() * 10000),//случайное число дл€ создани ID элемента
 				attr_id = 'elem' + rand,
@@ -802,7 +813,7 @@ var VK_SCROLL = 0,
 					break;
 				case 2://select
 					$('#' + attr_id)._select({
-						width:200,
+						width:198,
 						title0:elem.param_txt_1,
 						spisok:[]
 					});
@@ -819,7 +830,7 @@ var VK_SCROLL = 0,
 					$('#' + attr_id)
 						._radio({
 							light:1,
-							spisok:RADIO_ASS
+							spisok:EL_VAL_ASS
 						})
 						.parent().parent()
 						.find('.label').addClass('topi');
@@ -836,8 +847,9 @@ var VK_SCROLL = 0,
 			_dialogHeightCorrect();
 		}
 	},
-	_dialogOpen = function(dialog_id) {//создание диалогового окна
+	_dialogOpen = function(dialog_id, unit_id) {//создание диалогового окна
 		dialog_id = _num(dialog_id);
+		unit_id = _num(unit_id);
 		var dialog = _dialog({
 				dialog_id:dialog_id,
 				width:500,
@@ -848,7 +860,8 @@ var VK_SCROLL = 0,
 			}),
 			send = {
 				op:'dialog_open_load',
-				dialog_id:dialog_id
+				dialog_id:dialog_id,
+				unit_id:unit_id
 			};
 
 		dialog.load(send, loaded);
@@ -866,9 +879,11 @@ var VK_SCROLL = 0,
 		}
 		function submit(elem) {
 			send = {
-				op:'spisok_add',
+				op:'spisok_' + (unit_id ? 'edit' : 'add'),
+				unit_id:unit_id,
 				dialog_id:dialog_id,
-				elem:{}
+				elem:{},
+				page_id:PAGE_ID
 			};
 
 			for(var n = 0; n < elem.length; n++) {
@@ -891,9 +906,30 @@ var VK_SCROLL = 0,
 			}
 			if(ch.type_id == 2) {//select
 				$(ch.attr_id)._select({
+					width:ch.width,
 					title0:ch.param_txt_1,
-					spisok:[]
+					spisok:ch.v
 				});
+				if(isEdit) {
+					$(ch.attr_id)
+						._select('disabled')
+						.next().resizable({
+							minWidth:80,
+							maxWidth:350,
+							grid:10,
+							handles:'e',
+							stop:function(event, ui) {
+								var id = _num(ui.originalElement[0].id.split('elem')[1].split('_select')[0]);
+								for(var n = 0; n < DIALOG_ELEMENT.length; n++) {
+									var sp = DIALOG_ELEMENT[n];
+									if(sp.id == id) {
+										sp.width = ui.size.width;
+										break;
+									}
+								}
+							}
+						});
+				}
 				continue;
 			}
 			if(ch.type_id == 3) {//input
@@ -979,8 +1015,69 @@ $(document)
 			delayHide:100,
 			remove:1
 		});
-});
+})
+	.on('click', '.spisok-edit', function() {
+		var t = $(this),
+			id = t.attr('val');
 
+		_dialogOpen(0, id);
+	});
+/*	.on('click', '.spisok-edit', function() {
+		var t = $(this),
+			id = t.attr('val');
+
+		var dialog = _dialog({
+				width:500,
+				top:20,
+				head:'–едактирование записи',
+				load:1,
+				butSubmit:''
+			}),
+			send = {
+				op:'spisok_edit_load',
+				id:id
+			};
+
+		dialog.load(send, loaded);
+
+		function loaded(res) {
+			dialog.width(res.width);
+			dialog.content.html(res.html);
+			dialog.butSubmit('—охранить');
+			_dialogScript(res.element);
+			dialog.submit(function() {
+				submit(res.element);
+			});
+		}
+		function submit(elem) {
+			send = {
+				op:'spisok_edit',
+				id:id,
+				elem:{}
+			};
+
+			for(var n = 0; n < elem.length; n++) {
+				var sp = elem[n];
+				send.elem[sp.id] = $(sp.attr_id).val();
+			}
+
+			dialog.post(send, 'reload');
+		}
+	})
+	.on('click', '.spisok-del', function() {
+		var t = $(this),
+			id = t.attr('val');
+
+		_dialogDel({
+			id:id,
+			head:'записи',
+			op:'spisok_del',
+			func:function() {
+				_parent(t).remove();
+			}
+		});
+	});
+*/
 
 $.fn._check = function(o) {
 	var t = $(this),
@@ -1124,6 +1221,7 @@ $.fn._select = function(o) {
 				case 'inp': return s.inp();
 				case 'focus': s.focus(); break;
 				case 'first': s.first(); break;//установка первого элемента в списке
+				case 'disabled': s.disabled(); break;
 				case 'remove':
 					$('#' + id + '_select').remove();
 					window[id + '_select'] = null;
@@ -1581,6 +1679,11 @@ $.fn._select = function(o) {
 	};
 	t.focus = function() {//установка фокуса на input
 		inp.focus();
+	};
+	t.disabled = function() {//установка недоступности селекта
+		select.addClass('disabled');
+		res.remove();
+		inp.remove();
 	};
 	t.first = function() {//установка первого элемента в списке
 		if(!o.spisok.length)
@@ -2082,4 +2185,113 @@ $.fn._calendar = function(o) {
 		calmon.html(MONTH_DEF[o.mon] + ' ' + o.year);
 		daysPrint();
 	}
+};
+$.fn._search = function(o, v) {
+	var t = $(this),
+		id = t.attr('id');
+
+	switch(typeof o) {
+		case 'number':
+		case 'string':
+			if(o == 'val') {
+				if(v) {
+					window[id + '_search'].inp(v);
+					return;
+				}
+				return window[id + '_search'].inp();
+			}
+			if(o == 'process')
+				window[id + '_search'].process();
+			if(o == 'cancel')
+				window[id + '_search'].cancel();
+			if(o == 'clear')
+				window[id + '_search'].clear();
+			return t;
+	}
+	o = $.extend({
+		width:126,
+		focus:0,//сразу устанавливать фокус
+		txt:'', //текст-подсказка
+		func:function() {},
+		enter:0,//примен€ть введЄнный текст только после нажати€ ентер
+		v:''    //введЄнное значение
+	}, o);
+	var html =
+			'<div class="_search" style="width:' + o.width + 'px">' +
+				'<div class="img_del dn"></div>' +
+				'<div class="_busy dib fr mr5 dn"></div>' +
+				'<div class="hold">' + o.txt + '</div>' +
+				'<input type="text" style="width:' + (o.width - 77) + 'px" />' +
+			'</div>';
+	t.html(html);
+	var _s = t.find('._search'),
+		inp = t.find('input'),
+		busy = t.find('._busy'),
+		hold = t.find('.hold'),
+		del = t.find('.img_del');
+
+	if(o.focus) {
+		inp.focus();
+		holdFocus()
+	}
+
+	inp .focus(holdFocus)
+		.blur(holdBlur)
+		.keyup(function() {
+			var c = $(this).val().length > 0;
+			hold[(c ? 'add' : 'remove') + 'Class']('dn');
+			del[(c ? 'remove' : 'add') + 'Class']('dn');
+			if(!o.enter)
+				o.func(inp.val(), id);
+		});
+
+	if(o.enter)
+		inp.keydown(function(e) {
+			if(e.which == 13)
+				o.func($(this).val(), id);
+		});
+
+	t.clear = function() {
+		inp.val('');
+		del.addClass('dn');
+		hold.removeClass('dn');
+	};
+
+	del.click(function() {
+		t.clear();
+		o.func('', id);
+	});
+
+	_s.click(function() {
+		inp.focus();
+		holdFocus();
+	});
+
+	t.inp = function(v) {
+		if(!v)
+			return $.trim(inp.val());
+		inp.val(v);
+		del.removeClass('dn');
+		hold.addClass('dn');
+		return $(this);
+	};
+	t.process = function() {//показ процесса ожидани€ с правой стороны
+		busy.removeClass('dn');
+	};
+	t.cancel = function() {//скрытие процесса ожидани€ с правой стороны
+		busy.addClass('dn');
+	};
+	t.clear = function() {
+		inp.val('');
+		del.addClass('dn');
+		hold.removeClass('dn');
+	};
+	window[id + '_search'] = t;
+
+	t.inp(o.v);
+
+	return t;
+
+	function holdFocus() { hold.css('color', '#ccc'); }
+	function holdBlur() { hold.css('color', '#777'); }
 };

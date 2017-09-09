@@ -41,6 +41,102 @@
 
 
 
+/* ---=== СПИСОК В ТАБЛИЦЕ ===--- */
+._stab{
+	border-collapse:collapse;
+	border:#D3DBE1 solid 1px;
+	background:#fff;
+	width:100%;
+}
+._stab th{
+	background:#E3E9EE;
+	border:#D3DBE1 solid 1px;
+	color:rgb(81, 103, 122);
+	padding:8px;
+	font-size:14px;
+}
+._stab td{
+	border:#EFF2F5 solid 1px;
+	padding:6px 8px;
+}
+._stab td.topi{padding-top:13px}
+._stab .icon-del.out{
+	position:absolute;
+	right:-25px;
+}
+
+
+
+
+
+
+
+
+/* Заголовок 1 - на сером фоне */
+.hd1{
+	font-size:14px;
+	color:#333;
+	background:#FAFBFC;
+	border-bottom:#E7E8EC solid 1px;
+	padding:14px 17px;
+}
+.hd1 a,.hd1 b,.hd1 u{font-size:14px}
+.hd1 a.link{color:#777}
+
+
+/* Заголовок 2 - подчёркнутая линия */
+.hd2{
+	color:#31618C;
+	font-size:16px;
+	border-bottom:#DEE3EF solid 1px;
+	padding:2px 0;
+	margin:5px 0;
+}
+.hd2 .vk.small.fr{margin-top:-4px}
+.hd2 b{font-size:16px}
+
+
+
+
+
+/* Текст с информацией на жёлтом форе */
+._info{
+	background:#ffffe6;
+	border:#eea 1px solid;
+	border-radius:3px;
+	padding:8px 12px;
+	text-align:justify;
+	margin-bottom:10px;
+	line-height:1.4;
+}
+._info p{
+	margin:3px 0 7px;
+	line-height:1.4;
+}
+
+
+
+
+
+
+/* Сообщение пустого запроса */
+._empty{
+	font-size:14px;
+	color:#777;
+	background:#f9f9f9;
+	border:#ddd solid 1px;
+	border-radius:2px;
+	text-align:center;
+	padding:70px 20px;
+}
+
+
+
+
+
+
+
+
 /* ---=== ДИАЛОГОВОЕ ОКНО ===--- */
 ._dialog{
 	position:absolute;
@@ -188,6 +284,27 @@
 
 
 
+/* ---=== ПОИСК ===--- */
+._search{
+	border:#CCC solid 1px;
+	background:#fff no-repeat 6px 8px url("data:image/gif;base64,R0lGODlhCwALANUAAAAAAP////z8/ert8+ns8vj5+/f4+unt8+Xp7+Pn7ejr7+ru8+nt8tPb5Nrh6dng6Njf59fe5t/l7N3j6tjg6Nbe5tXd5dTc5N3k69vi6eXq7+Tp7uLn7OHm6/Hz9fr7/Pn6+/j5+s3X4NTd5dPc5NLb49Ha4tnh6Njg59be5d7l687Y4NXe5dTd5N3l6+7y9dLc49jh5+Dn7N/m693l6urv8v3///z9/f39/fv7+wAAAAAAAAAAAAAAAAAAAAAAACwAAAAACwALAAAGWsCA8DM4ORwZRU54Y1xasg6LdBCGGpaX0JOqCA0rmVCYMH1Fs3GAYw6AKK6a8MXyulWVCU3VuiwCCCgRGBgPJxAEHxsjMDEFIJAgAgESJS0aakI4AhIbNplCQQA7");
+	position:relative;
+}
+._search input{border:0;margin-left:22px;padding:7px 0 6px 0}
+._search ._busy{width:30px;height:27px}
+._search .img_del{float:right;margin:7px 5px 0 0}
+._search .hold{position:absolute;left:24px;top:6px;color:#777}
+
+
+
+
+
+
+
+
+
+
+
 /* ---=== ВЫПАДАЮЩИЙ СПИСОК ===--- */
 ._select{background:#fff;display:inline-block;position:relative}
 ._select .title0bg{
@@ -290,6 +407,11 @@
 	border-bottom:#CCC solid 1px;
 	padding:4px 6px;
 	cursor:default;
+}
+
+.ui-resizable._select .ui-resizable-e{
+	width:6px;
+	right:-8px;
 }
 
 

@@ -5,6 +5,7 @@ _auth();
 
 die(
 	_header().
+	_pageSetupMenu().
 	_content().
 	_debug().
 	_footer()
