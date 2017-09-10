@@ -662,6 +662,7 @@ var VK_SCROLL = 0,
 					break;
 			}
 		}
+
 		function elementVal(valPrintFunc, firstAdd) {//значения, которые содержат элементы Radio, Select
 			var NUM = 1,
 				valAdd = function(v) {
