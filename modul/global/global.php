@@ -236,9 +236,11 @@ function _content() {//центральное содержание
 	if(!APP_ID)
 		$content = _appSpisok();
 	else
-		if($page_id)
+		if($page_id) {
 			$content = _page_show($page_id);
-		else
+			if($page_id == 4)
+				$content .= _page_menu_spisok();
+		} else
 			$content = _contentEmpty();
 
 	return

@@ -360,7 +360,7 @@ var VK_SCROLL = 0,
 			$(document).off('click', '.element-edit');
 			$(document).on('click', '.element-edit', function() {
 				var p = $(this).parent(),
-					id = _num(p.attr('val')),
+					id = _num(p.attr('val'), 1),
 					sp = {};
 				for(var n = 0; n < DIALOG_ELEMENT.length; n++) {
 					sp = DIALOG_ELEMENT[n];
@@ -418,6 +418,7 @@ var VK_SCROLL = 0,
 			hint:'',
 			width:0,
 			param_txt_1:'',
+			param_txt_2:'',
 			param_bool_1:0,
 			param_bool_2:0,
 			v:[],
@@ -430,27 +431,30 @@ var VK_SCROLL = 0,
 					'<div val="2" class="over1 line-b element element-select">Выпадающий список</div>' +
 					'<div val="1" class="over1 line-b element">Галочка</div>' +
 					'<div val="5" class="over1 line-b element element-radio">Radio</div>' +
-					'<div val="6" class="over1 element element-calendar">Календарь</div>' +
+					'<div val="6" class="over1 line-b element element-calendar">Календарь</div>' +
+					'<div val="7" class="over1 element element-info">Информация</div>' +
 				'</div>' +
 				'<div id="element-sel" class="dn">' +
 					'<div class="fs16">Элемент <b id="element-name" class="fs16"></b></div>' +
 					'<table id="element-main" class="bs10 mt10">' +
 						'<tr><td class="label"><div class="red r">SA: Колонка в таблице:</div>' +
 							'<td><input type="text" id="col-name" class="w100" value="' + EL.col_name + '" />' +
-						'<tr><td class="label r b">Название поля:' +
+						'<tr id="tr-name">' +
+							'<td class="label r b">Название поля:' +
 							'<td><input type="text" id="label-name" class="w250" value="' + EL.label_name + '" />' +
 						'<tr id="tr-require" class="dn">' +
 							'<td>' +
 							'<td><input type="hidden" id="label-require" value="' + EL.require + '" />' +
-						'<tr><td class="label r topi">Текст подсказки:' +
+						'<tr id="tr-hint">' +
+							'<td class="label r topi">Текст подсказки:' +
 							'<td><textarea id="label-hint" class="w250">' + EL.hint + '</textarea>' +
 					'</table>' +
 
 					'<div class="line-b mt10"></div>' +
 
 					'<div class="fs15 color-555 mt30">Предварительный просмотр:</div>' +
-					'<div class="pad10 mt10 bor-f0 bg-ffe">' +
-						'<table class="bs10">' +
+					'<div id="prev-tab" class="pad10 mt10 bor-f0 bg-ffe">' +
+						'<table class="bs10 w100p">' +
 							'<tr><td id="prev-label" class="label r w150">' +
 								'<td id="prev-element">' +
 						'</table>' +
@@ -484,7 +488,10 @@ var VK_SCROLL = 0,
 			TYPE_ID = _num(t.attr('val'));
 			t.parent().slideUp(200, function() {
 				$('#element-sel').slideDown(200, function() {
-					$('#label-name').focus();
+					if(TYPE_ID == 7)
+						$('#param_txt_1').focus();
+					else
+						$('#label-name').focus();
 				});
 				dialog.butSubmit('Добавить элемент');
 			});
@@ -573,6 +580,13 @@ var VK_SCROLL = 0,
 							'<td><input type="hidden" id="param_bool_2" />';
 					prev = '<input type="hidden" id="elem-attr-id" />';
 					break;
+				case 7:
+					name = 'Информация';
+					main =
+						'<tr><td class="label r topi">Текст:' +
+							'<td><textarea id="param_txt_1" class="w250">' + EL.param_txt_1 + '</textarea>';
+					prev = '<div id="elem-attr-id" class="_info"></div>';
+					break;
 			}
 			$('#element-main').append(main);
 			$('#prev-element').html(prev);
@@ -602,19 +616,58 @@ var VK_SCROLL = 0,
 					break;
 
 				case 2://select
+					if(!EL.id)
+						EL.width = 228;
 					elementRequire();
 					elementActionSel = function() {
 						$('#elem-attr-id')._select({
-							width:198,
+							width:228,
 							title0:$.trim($('#param_txt_1').val()),
 							spisok:EL_VAL_ASS
 						});
 					};
 					$('#param_txt_1').keyup(elementActionSel);
-					elementVal(elementActionSel);
+
+					var em = $('#element-main');
+					em.after(
+						'<div class="center pad10">' +
+							'<button class="vk small green">Добавить произвольные значения</button> ' +
+							'<button class="vk small">Прикрепить список</button>' +
+						'</div>'
+					);
+					var but1 = em.next().find('button:first'),
+						but2 = em.next().find('button:last');
+					but1.click(function() {
+						em.next().remove();
+						elementVal(elementActionSel);
+					});
+					but2.click(function() {
+						em.next().remove();
+						em.append(
+							'<tr><td class="label r">Список:' +
+								'<td><input type="hidden" id="param_txt_2" value="' + EL.param_txt_2 + '" />'
+						);
+						$('#param_txt_2')._select({
+							width:198,
+							title0:'Список не указан',
+							spisok:[
+								{uid:1,title:'Страницы'}
+							]
+						});
+					});
+
+					if(_num(EL.param_txt_2)) {
+						but2.trigger('click');
+						elementActionSel();
+					} else
+						if(EL.v.length)
+							but1.trigger('click');
+
 					break;
 
 				case 3://text
+					if(!EL.id)
+						EL.width = 250;
 					elementRequire();
 					elementActionSel = function() {
 						var txt = $.trim($('#param_txt_1').val());
@@ -625,6 +678,8 @@ var VK_SCROLL = 0,
 					break;
 
 				case 4://textarea
+					if(!EL.id)
+						EL.width = 250;
 					elementRequire();
 					$('#prev-label').addClass('topi');
 					elementActionSel = function() {
@@ -660,9 +715,21 @@ var VK_SCROLL = 0,
 					});
 					elementActionSel();
 					break;
+				case 7://info
+					$('#tr-name,#tr-hint').addClass('dn');
+					$('#prev-label').remove();
+					$('#prev-tab').removeClass('pad10 bor-f0 bg-ffe');
+					elementActionSel = function(v) {
+						var txt = _br($.trim($('#param_txt_1').val()), 1);
+						$('#elem-attr-id').html(txt);
+					};
+					elementActionSel();
+					$('#param_txt_1')
+						.autosize()
+						.keyup(elementActionSel);
+					break;
 			}
 		}
-
 		function elementVal(valPrintFunc, firstAdd) {//значения, которые содержат элементы Radio, Select
 			var NUM = 1,
 				valAdd = function(v) {
@@ -674,7 +741,8 @@ var VK_SCROLL = 0,
 					$('#element-main').append(
 						'<tr><td class="label r">Значение ' + NUM + ':' +
 							'<td><input type="text" class="w250" id="el-val-' + v.uid + '" val="' + v.uid + '" value="' + v.title + '" />' +
-								(NUM > 1 ? '<div class="icon icon-del ml5 prel top5' + _tooltip('Удалить значение', -55) + '</div>' : '')
+								//(NUM > 1 ? '<div class="icon icon-del ml5 prel top5' + _tooltip('Удалить значение', -55) + '</div>' : '')
+								'<div class="icon icon-del ml5 prel top5' + _tooltip('Удалить значение', -55) + '</div>'
 					);
 					$('#el-val-' + v.uid).keyup(function() {
 						var t = $(this),
@@ -721,6 +789,8 @@ var VK_SCROLL = 0,
 			if(EL.id) {
 				for(var n = 0; n < EL.v.length; n++)
 					valAdd(EL.v[n]);
+				if(!EL.v.length)
+					valPrintFunc();
 			} else
 				if(firstAdd)
 					valAdd();
@@ -729,32 +799,33 @@ var VK_SCROLL = 0,
 		}
 		function elementActionSel() {}//действие, которое применяется к выбранному элементу в предварительном просмотре
 		function submit() {
-			var elem = {
-					id:EL.id,
+			var rand = EL.id || Math.round(Math.random() * 10000),//случайное число для создани ID элемента
+				attr_id = 'elem' + rand,
+				elem = {
+					id:EL.id || rand * -1,
 					type_id:TYPE_ID,
 					col_name:$.trim($('#col-name').val()),
 					label_name:$.trim($('#label-name').val()),
 					require:_bool($('#label-require').val()),
 					hint:$.trim($('#label-hint').val()),
-					width:TYPE_ID == 2 ? 198 : 250,
+					width:EL.width,
 					param_txt_1:$.trim($('#param_txt_1').val()),
+					param_txt_2:$.trim($('#param_txt_2').val()),
 					param_bool_1:_bool($('#param_bool_1').val()),
 					param_bool_2:_bool($('#param_bool_2').val()),
 					v:EL_VAL_ASS
 				},
-				rand = EL.id || Math.round(Math.random() * 10000),//случайное число для создани ID элемента
-				attr_id = 'elem' + rand,
 				DD =
-					'<dd class="over1 curM prel" val="' + (EL.id || 0) + '">' +
+					'<dd class="over1 curM prel" val="' + elem.id + '">' +
 						'<div class="element-del icon icon-del' + _tooltip('Удалить элемент', -53) + '</div>' +
 						'<div class="element-edit icon icon-edit' + _tooltip('Изменить', -29) + '</div>' +
-						'<table class="bs5">' +
-							'<tr><td class="label label-width r pr5" style="width:' + LABEL_WIDTH + 'px">' +
+						'<table class="bs5 w100p">' +
+							'<tr><td class="label label-width r pr5" ' + (TYPE_ID == 7 ? 'colspan="2"' : 'style="width:' + LABEL_WIDTH + 'px"') + '>' +
 									elem.label_name +
 									(elem.label_name ? ':' : '') +
 									(elem.require ? '<div class="dib red fs15 mtm2">*</div>' : '') +
 									(elem.hint ? ' <div class="icon icon-hint dialog-hint" val="' + _br(elem.hint, 1) + '"></div>' : '') +
-								'<td>',
+				(TYPE_ID != 7 ? '<td>' : ''),
 				inp = '<input type="hidden" id="' + attr_id + '" />';
 
 			//формирование содержания
@@ -778,6 +849,14 @@ var VK_SCROLL = 0,
 					break;
 				case 6://календарь
 					break;
+				case 7://info
+					if(!elem.param_txt_1) {
+						dialog.err('Напишите текст информации');
+						$('#param_txt_1').focus();
+						return;
+					}
+					inp = '<div class="_info">' + _br(elem.param_txt_1, 1) + '</div>';
+					break;
 			}
 
 			//вставка содержания
@@ -785,7 +864,7 @@ var VK_SCROLL = 0,
 				var dd = $('#dialog-base DD');
 				for(var n = 0; n < dd.length; n++) {
 					var sp = dd.eq(n),
-						id = _num(sp.attr('val'));
+						id = _num(sp.attr('val'), 1);
 					if(EL.id == id) {
 						sp.after(DD + inp + '</dd></table>')
 						  .remove();
@@ -814,9 +893,10 @@ var VK_SCROLL = 0,
 					break;
 				case 2://select
 					$('#' + attr_id)._select({
-						width:198,
+						width:elem.width,
 						title0:elem.param_txt_1,
-						spisok:[]
+						spisok:[],
+						disabled:1
 					});
 					break;
 				case 3://text

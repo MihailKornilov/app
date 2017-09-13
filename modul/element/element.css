@@ -101,6 +101,7 @@
 
 /* Текст с информацией на жёлтом форе */
 ._info{
+	color:#000;
 	background:#ffffe6;
 	border:#eea 1px solid;
 	border-radius:3px;
@@ -210,7 +211,7 @@
 #dialog-base:not(:hover) #label-w-change{display:none}
 
 .element{
-	background:url(../../img/element.png?0) no-repeat 200px -10px;
+	background:url(../../img/element.png?3) no-repeat 200px -10px;
 	font-size:17px;
 	font-weight:bold;
 	height:30px;
@@ -223,6 +224,7 @@
 .element-textaera{background-position:200px -355px;height:50px}
 .element-radio{background-position:200px -500px;}
 .element-calendar{background-position:200px -620px;}
+.element-info{background-position:200px -740px;}
 
 
 

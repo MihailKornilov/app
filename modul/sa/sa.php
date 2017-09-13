@@ -35,7 +35,11 @@ function sa_page_spisok() {
 }
 
 
-function _page_show($page_id) {
+
+
+
+
+function _page_show($page_id) {//отображение содержани€ страницы
 	$send = '';
 
 	//заголовки
@@ -82,3 +86,33 @@ function _page_show($page_id) {
 	return
 	'<div class="">'.$send.'</div>';
 }
+
+function _page_menu_spisok() {//список меню
+	$sql = "SELECT *
+			FROM `_page_menu`
+			ORDER BY `id`";
+	$spisok = query_arr($sql);
+
+	$send =
+		'<table class="_stab">'.
+			'<tr><th class="w15">id'.
+				'<th>Ќазвание'.
+				'<th class="w35">';
+	foreach($spisok as $r) {
+		$send .=
+				'<tr><td class="r grey">'.$r['id'].
+					'<td>'.$r['name'].
+					'<td class="wsnw">'.
+						'<div onclick="_dialogOpen('._dialogValToId('page_menu_razdel').')" class="icon icon-avai'._tooltip('Ќастроить разделы меню', -147, 'r').'</div>'.
+						_iconEdit(array('onclick'=>'_dialogOpen('.$r['dialog_id'].','.$r['id'].')')).
+//						_iconEdit(array('class'=>'spisok-edit') + $r).
+						_iconDel();
+	}
+
+	$send .= '</table>';
+
+	return $send;
+}
+
+
+

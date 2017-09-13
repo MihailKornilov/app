@@ -16,7 +16,7 @@ function _debug($i='') {
 	$goFace = SITE ? 'iframe' : 'site';
 	$send =
 		'<div id="debug-footer"'.(SITE ? ' style="bottom:0;position:fixed;width:100%"' : '').'>'.
-			(@$_GET['p'] != 9 ? '<a href="'.URL.'&p=9'.$pre.'">SA</a> :: ' : '').
+			(@$_GET['p'] != 1 ? '<a href="'.URL.'&p=1'.$pre.'">SA</a> :: ' : '').
 			'<a class="debug_toggle'.(DEBUG ? ' on' : '').'">'.(DEBUG ? 'От' : 'В').'ключить Debug</a> :: '.
 			'<a id="cookie_clear">Очисить cookie</a> :: '.
 			'<a id="cache_clear">Очисить кэш ('.VERSION.')</a> :: '.
