@@ -55,11 +55,23 @@
 	padding:8px;
 	font-size:14px;
 }
+._stab.small th{
+	padding:3px;
+	font-size:13px;
+}
 ._stab td{
 	border:#EFF2F5 solid 1px;
 	padding:6px 8px;
 }
-._stab td.topi{padding-top:13px}
+._stab td.topi{vertical-align:top;padding-top:9px}
+._stab.small td{
+	padding:3px;
+	font-size:12px;
+}
+._stab td{
+	border:#EFF2F5 solid 1px;
+	padding:6px 8px;
+}
 ._stab .icon-del.out{
 	position:absolute;
 	right:-25px;
@@ -211,7 +223,7 @@
 #dialog-base:not(:hover) #label-w-change{display:none}
 
 .element{
-	background:url(../../img/element.png?3) no-repeat 200px -10px;
+	background:url(../../img/element.png?5) no-repeat 200px -10px;
 	font-size:17px;
 	font-weight:bold;
 	height:30px;
@@ -225,6 +237,7 @@
 .element-radio{background-position:200px -500px;}
 .element-calendar{background-position:200px -620px;}
 .element-info{background-position:200px -740px;}
+.element-connect{background-position:200px -860px;}
 
 
 
@@ -593,3 +606,76 @@ td.label{color:#777}
 td.label em{font-size:10px;color:#aaa;display:block}
 td.top,td.topi{vertical-align:top}
 td.topi{padding-top:7px}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Μενώ */
+/* type 1 */
+._menu1{border-bottom:#E7E8EC solid 1px;margin:5px 0 10px}
+._menu1 .link{
+	display:inline-block;
+	color:#777;
+	padding:14px 6px 10px;
+	margin:0 8px -1px;
+}
+._menu1 .sel{color:#000;border-bottom:#6387AC solid 2px}
+._menu1 .link:hover{text-decoration:none}
+._menu1 .link:not(.sel):hover{border-bottom:#CAD2DB solid 2px}
+
+/* type 2 */
+._menu2{margin:5px 0 10px}
+._menu2 .link{
+	display:inline-block;
+	color:#45688e;
+	margin:0 4px;
+	font-weight:bold;
+	padding:3px 8px 0;
+	border-radius:2px;
+	height:17px;
+}
+._menu2 .sel{background-color:#597da3;color:#fff}
+._menu2 .link:hover{text-decoration:none}
+._menu2 .link:not(.sel):hover{background-color:#e9edf1}
+
+/* type 3 */
+._menu3{margin:5px 0 10px}
+._menu3 .link{
+	display:block;
+	padding:10px;
+}
+._menu3 .link:hover{
+	text-decoration:none;
+	background-color:#e9edf1;
+}
+._menu3 .link .icon{float:left;margin:-1px 3px 0 0}
+
+
+/* type 3 */
+._menu4{
+	padding:15px;
+	background:#f7f7f7;
+	border-bottom:#dae1e8 solid 1px;
+	text-align:center;
+}
+._menu4 .link{
+	display:inline-block;
+	color:#45688e;
+	margin:0 4px;
+	font-weight:bold;
+	padding:5px 12px;
+	border-radius:2px;
+}
+._menu4 .sel{background-color:#597da3;color:#fff}
+._menu4 .link:hover{text-decoration:none}
+._menu4 .link:not(.sel):hover{background-color:#e9edf1}
+
+

@@ -22,6 +22,7 @@ define('LOCAL', DOMAIN != 'nyandoma.ru');
 
 require_once GLOBAL_DIR.'/syncro.php';
 require_once GLOBAL_DIR.'/modul/global/mysql.php';
+require_once GLOBAL_DIR.'/modul/db/db.php';
 _dbConnect('GLOBAL_');
 
 require_once GLOBAL_DIR.'/modul/global/regexp.php';
@@ -88,6 +89,37 @@ function _global_script() {//скрипты и стили
 
 	_debug('style');
 }
+
+function _globalTable($v='name', $id=0) {//список таблиц для связок между ними
+	$table = array(
+//		0 => '_app',
+//		_dialog
+//		_dialog_element
+//		_dialog_element_v
+		1 => '_page',
+//		2 => '_page_button',
+//		3 => '_page_head',
+//		4 => '_page_link',
+		5 => '_page_menu'
+//		_page_menu_razdel
+//		_page_search
+//		_vkuser
+//		_vkuser_app
+//		_vkuser_auth
+	);
+
+	$name = array(
+		1 => 'Страницы',
+		5 => 'Меню'
+	);
+	
+	if($v == 'name')
+		return $id ? $name[$id] : $name;
+	
+	return $id ? $table[$id] : $table;
+}
+
+
 
 function _authSuccess($code, $viewer_id, $app_id) {//внесение записи об успешной авторизации
 	_authLogout($code, $viewer_id);//предварительное очищение старой авторизации
@@ -210,6 +242,21 @@ function _app($i='all') {//Получение данных о приложении
 }
 
 
+function _page() {//отображение страницы
+	if(!$page_id = _num(@$_GET['p']))
+		return _contentEmpty();
+
+	$sql = "SELECT *
+			FROM `_page`
+			WHERE `id`=".$page_id;
+	if(!$page = query_assoc($sql))
+		return _contentEmpty();
+
+	if($page['func'] && function_exists($page['func']))
+		return _page_show($page_id).$page['func']();
+
+	return _page_show($page_id);
+}
 function _pageSetupMenu() {//строка меню управления страницей
 	if(!PAS)
 		return '';
@@ -225,70 +272,11 @@ function _pageSetupMenu() {//строка меню управления страницей
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_find_add').')">Добавить поиск</a>'.
 			' :: '.
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_button_add').')">Добавить кнопку</a>'.
+			' :: '.
+			'<a onclick="_dialogOpen('._dialogValToId('page_setup_link_add').')">Добавить ссылку</a>'.
 		'</p>'.
 	'</div>';
 }
-
-
-function _content() {//центральное содержание
-	$page_id = _num(@$_GET['p']);
-
-	if(!APP_ID)
-		$content = _appSpisok();
-	else
-		if($page_id) {
-			$content = _page_show($page_id);
-			if($page_id == 4)
-				$content .= _page_menu_spisok();
-		} else
-			$content = _contentEmpty();
-
-	return
-	'<div id="_content">'.$content.'</div>';
-}
-function _contentEmpty() {
-	return
-		'<div class="_empty mt20 mb20">Несуществующая страница</div>'.
-		FACE.
-		'<br />'.
-		'<span class="grey">code:</span> '.CODE.
-		'<br />'.
-		'<span class="grey">viewer_id:</span> '.VIEWER_ID.
-		'<br />'.
-		'<span class="grey">app_id:</span> '.APP_ID.
-		'<br />'.
-		'<br />'.
-		(APP_ID ?
-		'<br />'.
-		'<br />'.
-		'<br />'.
-		'<textarea id="txt"></textarea>'.
-		'<br />'.
-		'<br />'.
-		'<br />'.
-		'<br />'.
-			_button(array(
-				'name' => 'Создать страницу',
-				'click' => '_dialogOpen(1)',
-				'color' => 'green'
-			)).
-			'<div class="icon icon-hint ml20 mt5"></div>'
-		: '').
-			'<br />'.
-		'<br />'.
-		'<a href="'.URL.'&p=1">page link</a>'.
-		'<br />'.
-		'VIEWER_WORKER='.VIEWER_WORKER.
-		'<br />';
-}
-function _footer() {
-	return '</body></html>';
-}
-
-
-
-
-
 function _pageForm() {//формат страницы
 	return
 	'<div>'.
@@ -298,6 +286,20 @@ function _pageForm() {//формат страницы
 		'</table>'.
 	'</div>';
 }
+
+function _content() {//центральное содержание
+	return '<div id="_content">'.(APP_ID ? _page() : _appSpisok()).'</div>';
+}
+function _contentEmpty() {
+	return '<div class="_empty mt20 mb20">Несуществующая страница</div>';
+}
+function _footer() {
+	return '</body></html>';
+}
+
+
+
+
 
 
 
@@ -494,6 +496,99 @@ function translit($str) {
 	);
 	return strtr($str, $list);
 }
+
+
+
+
+
+function _arr($arr, $i=false) {//Последовательный массив
+	$send = array();
+	foreach($arr as $r) {
+		$v = $i === false ? $r : $r[$i];
+		$send[] = preg_match(REGEXP_CENA, $v) ? _cena($v) : utf8(htmlspecialchars_decode($v));
+	}
+	return $send;
+}
+function _sel($arr) {
+	$send = array();
+	foreach($arr as $uid => $title) {
+		$send[] = array(
+			'uid' => $uid,
+			'title' => utf8(trim($title))
+		);
+	}
+	return $send;
+}
+function _selJson($arr) {
+	$send = array();
+	foreach($arr as $uid => $title) {
+		$content = '';
+		if(is_array($title)) {
+			$r = $title;
+			$title = $r['title'];
+			$content = isset($r['content']) ? $r['content'] : '';
+		}
+		$send[] = '{'.
+			'uid:'.$uid.','.
+			'title:"'.addslashes($title).'"'.
+			($content ? ',content:"'.addslashes($content).'"' : '').
+		'}';
+	}
+	return '['.implode(',',$send).']';
+}
+function _selJsonSub($arr, $uidName='id', $titleName='name') {//ассоциативный массив для _select 2-го уровня
+	/*
+		В виде:
+		{1:[{uid:3,title:'Название 3'},{uid:5,title:'Название 5'}],
+		 2:[{uid:3,title:'Название 3'},{uid:5,title:'Название 5'}]
+		}
+
+	*/
+	$send = array();
+	foreach($arr as $id => $sub) {
+		if(!isset($send[$id]))
+			$send[$id] = array();
+		foreach($sub as $r)
+			$send[$id][] = '{'.
+				'uid:'.$r[$uidName].','.
+				'title:"'.addslashes($r[$titleName]).'"'.
+			'}';
+	}
+
+	$json = array();
+	foreach($send as $id => $r)
+		$json[] = $id.':['.implode(',', $r).']';
+
+	return '{'.implode(',',$json).'}';
+}
+function _selArray($arr) {//список для _select при отправке через ajax
+	$send = array();
+	foreach($arr as $uid => $title) {
+		$send[] = array(
+			'uid' => $uid,
+			'title' => utf8(addslashes(htmlspecialchars_decode(trim($title))))
+		);
+	}
+	return $send;
+}
+function _assJson($arr) {//Ассоциативный массив
+	$send = array();
+	foreach($arr as $id => $v)
+		$send[] =
+			(preg_match(REGEXP_NUMERIC, $id) ? $id : '"'.$id.'"').
+			':'.
+			(preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.$v.'"');
+	return '{'.implode(',', $send).'}';
+}
+function _arrJson($arr, $i=false) {//Последовательный массив
+	$send = array();
+	foreach($arr as $r) {
+		$v = $i === false ? $r : $r[$i];
+		$send[] = preg_match(REGEXP_CENA, $v) ? $v : '"'.addslashes(htmlspecialchars_decode($v)).'"';
+	}
+	return '['.implode(',', $send).']';
+}
+
 
 
 

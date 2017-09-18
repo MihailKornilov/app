@@ -1,13 +1,4 @@
 <?php
-function sa_page() {//страницы приложения
-	return
-	'<div class="mar10">'.
-		'<div class="hd2">Страницы приложения'.
-			'<button class="vk small green fr" onclick="_dialogOpen(1)">Добавить страницу</button>'.
-		'</div>'.
-		'<div id="spisok">'.sa_page_spisok().'</div>'.
-	'</div>';
-}
 function sa_page_spisok() {
 	$sql = "SELECT *
 			FROM `_page`
@@ -18,14 +9,16 @@ function sa_page_spisok() {
 		'<table class="_stab">'.
 			'<tr><th class="w15">id'.
 				'<th>Название'.
+				'<th class="w200">Функция'.
 				'<th class="w35">';
 	foreach($spisok as $r) {
 		$send .=
 				'<tr><td class="r grey">'.$r['id'].
 					'<td><a href="'.URL.'&p='.$r['id'].'">'.$r['name'].'</a>'.
+					'<td>'.$r['func'].
 					'<td class="wsnw">'
-//						._iconEdit(array('onclick'=>'_dialogOpen(1,'.$r['id'].')'))
-						._iconEdit(array('class'=>'spisok-edit') + $r)
+						._iconEdit(array('onclick'=>'_dialogOpen(1,'.$r['id'].')'))
+//						._iconEdit(array('class'=>'spisok-edit') + $r)
 						._iconDel();
 	}
 
@@ -83,29 +76,65 @@ function _page_show($page_id) {//отображение содержания страницы
 			'</div>';
 	}
 
+	//ссылки
+	$sql = "SELECT *
+			FROM `_page_link`
+			WHERE `app_id`=".APP_ID."
+			  AND `page_id`=".$page_id."
+			ORDER BY `id`";
+	foreach(query_arr($sql) as $r) {
+		$send .= '<a href="'.URL.'&p='.$r['link_id'].'" class="db ml20">'.
+					$r['name'].
+				 '</a>';
+	}
+
 	return
 	'<div class="">'.$send.'</div>';
 }
 
 function _page_menu_spisok() {//список меню
-	$sql = "SELECT *
+	$sql = "SELECT
+				*,
+				'' `razdel`
 			FROM `_page_menu`
 			ORDER BY `id`";
 	$spisok = query_arr($sql);
 
+	$sql = "SELECT
+				*,
+				'' `razdel`
+			FROM `_page_menu_razdel`
+			ORDER BY `sort`";
+	$razdel = query_arr($sql);
+	foreach($razdel as $r) {
+		$spisok[$r['menu_id']]['razdel'][] = $r;
+	}
+
 	$send =
 		'<table class="_stab">'.
 			'<tr><th class="w15">id'.
-				'<th>Название'.
+				'<th class="w200">Название'.
+				'<th>Разделы'.
 				'<th class="w35">';
 	foreach($spisok as $r) {
+		$razdel = '';
+		if($r['razdel']) {
+			foreach($r['razdel'] as $rz) {
+				$razdel .=
+					'<div>'.
+						'<a onclick="_dialogOpen('._dialogValToId('page_menu_razdel').','.$rz['id'].')">'.
+							$rz['name'].
+						'<a>'.
+					'</div>';
+			}
+		}
 		$send .=
-				'<tr><td class="r grey">'.$r['id'].
-					'<td>'.$r['name'].
+				'<tr><td class="r grey topi">'.$r['id'].
+					'<td class="b topi">'.$r['name'].
+					'<td>'.$razdel.
 					'<td class="wsnw">'.
-						'<div onclick="_dialogOpen('._dialogValToId('page_menu_razdel').')" class="icon icon-avai'._tooltip('Настроить разделы меню', -147, 'r').'</div>'.
+						'<div onclick="_dialogOpen('._dialogValToId('page_menu_razdel').')" val="'.$r['id'].'" class="icon icon-avai'._tooltip('Добавить раздел', -94, 'r').'</div>'.
 						_iconEdit(array('onclick'=>'_dialogOpen('.$r['dialog_id'].','.$r['id'].')')).
-//						_iconEdit(array('class'=>'spisok-edit') + $r).
 						_iconDel();
 	}
 

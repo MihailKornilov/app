@@ -102,12 +102,24 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 	$sql = "INSERT INTO `_dialog` (
 				`app_id`,
 				`val`,
-				`head`,
-				`button_cancel`
+
+				`head_insert`,
+				`button_insert_submit`,
+				`button_insert_cancel`,
+
+				`head_edit`,
+				`button_edit_submit`,
+				`button_edit_cancel`
 			) VALUES (
 				".APP_ID.",
 				'".$val."',
-				'".$val."',
+
+				'".$val." - внесение',
+				'Внести',
+				'Отмена',
+
+				'".$val." - сохранение',
+				'Сохранить',
 				'Отмена'
 			)";
 	query($sql);

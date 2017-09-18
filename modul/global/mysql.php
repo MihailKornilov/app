@@ -49,6 +49,13 @@ function query_ass($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Ассоциативный мас
 		$send[$r[0]] = preg_match(REGEXP_NUMERIC, $r[1]) ? intval($r[1]) : $r[1];
 	return $send;
 }
+function query_array($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//последовательный массив без ключей
+	$send = array();
+	$q = query($sql, $resource_id);
+	while($r = mysql_fetch_assoc($q))
+		$send[] = $r;
+	return $send;
+}
 function query_arr($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Массив, где ключами является id
 	$send = array();
 	$q = query($sql, $resource_id);
