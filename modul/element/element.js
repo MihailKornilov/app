@@ -982,7 +982,7 @@ var VK_SCROLL = 0,
 			_dialogHeightCorrect();
 		}
 	},
-	_dialogOpen = function(dialog_id, unit_id) {//создание диалогового окна
+	_dialogOpen = function(dialog_id, unit_id, unit_id_dub) {//создание диалогового окна
 		dialog_id = _num(dialog_id);
 		unit_id = _num(unit_id);
 		var dialog = _dialog({
@@ -996,7 +996,8 @@ var VK_SCROLL = 0,
 			send = {
 				op:'dialog_open_load',
 				dialog_id:dialog_id,
-				unit_id:unit_id
+				unit_id:unit_id,
+				unit_id_dub:unit_id_dub
 			};
 
 		dialog.load(send, loaded);

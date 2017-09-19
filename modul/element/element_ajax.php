@@ -201,7 +201,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
-	case 'dialog_table_col_load':
+	case 'dialog_table_col_load'://получение списка колонок конкретной таблицы
 		if(!$table_id = _num($_POST['table_id']))
 			jsonError('Ќекорректный ID таблицы');
 
@@ -236,6 +236,13 @@ switch(@$_POST['op']) {
 				jsonError('«аписи не существует');
 			if($data['deleted'])
 				jsonError('«апись была удалена');
+		}
+
+		//8:св€зка
+		if($unit_id_dub = _num(@$_POST['unit_id_dub'])) {
+			foreach($dialog['element'] as $r)
+				if($r['type_id'] == 8)
+					$data[$r['col_name']] = $unit_id_dub;
 		}
 
 		$html = '<table class="bs10 w100p">'._dialogElementSpisok($dialog_id, 'html', $data).'</table>';
@@ -332,6 +339,11 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 			WHERE `app_id`=".APP_ID."
 			  AND `id`=".$dialog_id;
 	$r = query_assoc($sql);
+
+	$sql = "SELECT *
+			FROM `_dialog_element`
+			WHERE `dialog_id`=".$dialog_id;
+	$r['element'] = query_arr($sql);
 
 /* пока отменено
 	//конкретна€ колонка, используема€ в таблице
@@ -601,7 +613,7 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 							WHERE `id`=1";
 					$colVal = query_value($sql);
 
-					$inp = '<b>'.$colVal.'</b>';
+					$inp .= '<b>'.$colVal.'</b>';
 					break;
 			}
 
@@ -737,7 +749,7 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 		$sql = "DESCRIBE `".$baseTable."`";
 		$desc = query_array($sql);
 		foreach($desc as $r)
-			if($r['Field'] = 'page_id') {
+			if($r['Field'] == 'page_id') {
 				$sql = "UPDATE `".$baseTable."`
 						SET `page_id`=".$page_id."
 						WHERE `id`=".$unit_id;

@@ -133,7 +133,7 @@ function _page_menu_spisok() {//список меню
 					'<td class="b topi">'.$r['name'].
 					'<td>'.$razdel.
 					'<td class="wsnw">'.
-						'<div onclick="_dialogOpen('._dialogValToId('page_menu_razdel').')" val="'.$r['id'].'" class="icon icon-avai'._tooltip('Добавить раздел', -94, 'r').'</div>'.
+						'<div onclick="_dialogOpen('._dialogValToId('page_menu_razdel').',0,'.$r['id'].')" class="icon icon-avai'._tooltip('Добавить раздел', -94, 'r').'</div>'.
 						_iconEdit(array('onclick'=>'_dialogOpen('.$r['dialog_id'].','.$r['id'].')')).
 						_iconDel();
 	}
