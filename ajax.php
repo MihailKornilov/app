@@ -25,9 +25,9 @@ function jsonError($values=null) {
 		$send += $values;
 	else
 		$send['text'] = utf8($values);
-	die(json_encode($send));// + jsonDebugParam()
+	die(json_encode($send + jsonDebugParam()));
 }
 function jsonSuccess($send=array()) {
 	$send['success'] = 1;
-	die(json_encode($send));// + jsonDebugParam()
+	die(json_encode($send + jsonDebugParam()));
 }

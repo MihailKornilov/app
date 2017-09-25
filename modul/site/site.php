@@ -53,11 +53,12 @@ function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 		'<div class="center mt40">'.
 			'<div class="w1000 pad30 dib mt40">'.
 				'<button class="vk'.($code ? ' _busy' : '').'"'.($code ? '' : ' onclick="location.href=\''.$href.'\'"').'>Войти через VK</button>'.
+				_localDopUserAuth($code).
 			'</div>'.
 		'</div>'.
 
 	($code ?
-		'<script>_authLogin("'.$code.'")</script>'
+		'<script>_authLogin("'.$code.'",'._num(@$_GET['user_id']).')</script>'
 	: '').
 	
 	'</body>'.
@@ -65,7 +66,20 @@ function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 
 	die($html);
 }
+function _localDopUserAuth($code) {//кнопки входа разных пользователей для тестирования todo НА УДАЛЕНИЕ
+	if(!LOCAL)
+		return '';
 
+	$busy = $code ? ' _busy' : '';
+
+	return
+		'<br />'.
+		'<br />'.
+		'<button class="vk'.$busy.'"'.($code ? '' : ' onclick="location.href=\''.URL.'&code='.md5(TIME.'1382858').'&user_id=1382858\'"').'>Войти как <b>Сергей Шерстянников</b>: id=1382858</button>'.
+		'<br />'.
+		'<br />'.
+		'<button class="vk'.$busy.'"'.($code ? '' : ' onclick="location.href=\''.URL.'&code='.md5(TIME.'5809794').'&user_id=5809794\'"').'>Войти как <b>Максим Ильин</b>: id=5809794</button>';
+}
 
 
 
@@ -86,11 +100,16 @@ function _header() {
 			_header_hat();
 }
 function _header_hat() {//верхняя строка приложения-сайта
+	
 	return
 	'<div id="hat">'.
 		'<p>'.
 			(APP_ID ? _app('app_name') : 'Мои приложения').
-			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt5">Выход</a>'.
+			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt5">'.
+				'<span class="dib mr20 pale">'.VIEWER_APP_NAME.'</span>'.
+				'Выход'.
+	(PAGE_ID && !SA ? '<a id="page_setup" class="fr mt5 mr20'.(PAS ? ' color-aea' : '').'">Page setup</a>' : '').//todo временная ссылка
+			'</a>'.
 		'</p>'.
 	'</div>';
 }

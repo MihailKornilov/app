@@ -20,12 +20,13 @@ function _debug($i='') {
 			'<a class="debug_toggle'.(DEBUG ? ' on' : '').'">'.(DEBUG ? 'От' : 'В').'ключить Debug</a> :: '.
 			'<a id="cookie_clear">Очисить cookie</a> :: '.
 			'<a id="cache_clear">Очисить кэш ('.VERSION.')</a> :: '.
- (PAGE_ID ? '<a id="page_setup" class="'.(PAS ? 'on b' : '').'">Управление страницей</a> :: ' : '').
+ (PAGE_ID ? '<a id="page_setup" class="'.(PAS ? 'on b' : '').'">Page Setup</a> :: ' : '').
 			'sql <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).') :: '.
 			'php '.round(microtime(true) - TIME, 3).' :: '.
 			'js <em></em> :: '.
    (LOCAL ? '<a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
-		'</div>';
+		'</div>'.
+		'<script src="modul/debug/debug.js?'.TIME.'"></script>';
 
 	if(DEBUG) {
 		$get = '';
@@ -35,7 +36,6 @@ function _debug($i='') {
 		$get .= '<textarea>http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'].'</textarea>';
 
 		$send .=
-		'<script src="modul/debug/debug.js?'.TIME.'"></script>'.
 		'<div id="_debug"'.(empty($_COOKIE['debug_show']) ? '' : ' class="show"').'>'.
 			'<h1>+</h1>'.
 			'<h2><div class="dmenu">'.

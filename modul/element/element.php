@@ -73,19 +73,51 @@ function _search($v=array()) {//элемент ПОИСК
 	$v = array(
 		'id' => @$v['id'],
 		'width' => _num(@$v['width']) ? _num($v['width']) : 300,
-		'txt' => @$v['txt']		
+		'txt' => @$v['txt'],
+		'grey' => _num(@$v['grey'])
 	);
 	return
-	'<div class="_search" style="width:'.$v['width'].'px">'.
-		'<div class="img_del dn"></div>'.
-		'<div class="_busy dib fr mr5 dn"></div>'.
-		'<div class="hold">'.$v['txt'].'</div>'.
-		'<input type="text" style="width:'.($v['width'] - 77).'px" />'.
-	'</div>';
+	($v['grey'] ? '<div class="pad10 bg-gr3 line-b">' : '').
+		'<div class="_search" style="width:'.$v['width'].'px">'.
+				'<div class="img_del dn"></div>'.
+				'<div class="_busy dib fr mr5 dn"></div>'.
+				'<div class="hold">'.$v['txt'].'</div>'.
+				'<input type="text" style="width:'.($v['width'] - 77).'px" />'.
+		'</div>'.
+	($v['grey'] ? '</div>' : '');
 }
 
 
 
+function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id` IN(0,".APP_ID.")
+			  AND `sa` IN (0,".SA.")
+			  AND `id`=".$dialog_id;
+	if(!$r = query_assoc($sql))
+		return array();
+
+	$sql = "SELECT *
+			FROM `_dialog_element`
+			WHERE `dialog_id`=".$dialog_id;
+	$r['element'] = query_arr($sql);
+
+	$sql = "SELECT `id`,`v`
+			FROM `_dialog_element_v`
+			WHERE `dialog_id`=".$dialog_id;
+	$r['v_ass'] = query_ass($sql);
+
+/* пока отменено
+	//конкретная колонка, используемая в таблице
+	//берётся из `base_table`
+	//например: _page:razdel
+	$ex = explode(':', $r['base_table']);
+	$r['col'] = @$ex[1];
+	$r['base_table'] = $ex[0];
+*/
+	return $r;
+}
 function _dialogValToId($val='') {//получение id диалога на основании имени val
 	//если такого имени нет, то внесение диалога в базу
 

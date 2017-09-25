@@ -8,7 +8,7 @@ var debugHeight = function(s) {
 $(document)
 	.on('click', '.debug_toggle', function() {
 		_cookie('debug', _cookie('debug') == 1 ? 0 : 1);
-		_msg('Debug включен.');
+		_msg();
 		location.reload();
 	})
 	.on('click', '#_debug .sql-un', function() {

@@ -17,10 +17,13 @@ switch(@$_POST['op']) {
 				jsonError('Неуспешная попытка получения токена');
 
 			$res = json_decode($res, true);
-		} else
+		} else {
+			//todo локальная версия
+			$user_id = _num($_POST['user_id']);
 			$res = array(
-				'user_id' => 982006
+				'user_id' => $user_id ? $user_id : 982006
 			);
+		}
 
 		if(!$viewer_id = _num($res['user_id']))
 			jsonError('Ошибка при получении токена');

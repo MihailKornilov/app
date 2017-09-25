@@ -101,6 +101,7 @@ function _viewerDefine($u) {//установка констант для пользователя
 	define('VIEWER_ADMIN', $u['admin']);
 	define('VIEWER_APP_ONE', $u['app_count'] < 2);
 	define('VIEWER_APP_COUNT', $u['app_count']);
+	define('VIEWER_APP_NAME', $u['first_name'].' '.$u['last_name']);//Имя Фамилия
 
 	define('VIEWER_DEFINED', true);
 

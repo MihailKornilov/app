@@ -52,10 +52,11 @@ var FB,
 		_cookie('face', face);
 		location.reload();
 	},
-	_authLogin = function(code) {//авторизация пользователя по коду на сайте
+	_authLogin = function(code, user_id) {//авторизация пользователя по коду на сайте
 		var send = {
 				op:'login',
-				code:code
+				code:code,
+				user_id:user_id//TODO для локальной версии, на удаление
 			},
 			func = function() {
 				location.href = URL;
@@ -91,6 +92,26 @@ var FB,
 					ids:arr.join()
 				};
 				_post(send);
+			}
+		});
+	},
+	sortPageElem = function() {
+		$('.pas_sort').sortable({
+			axis:'y',
+			update:function () {
+				var dds = $(this).find('.pas'),
+					arr = [];
+				for(var n = 0; n < dds.length; n++) {
+					var v = _num(dds.eq(n).attr('val'));
+					if(v)
+						arr.push(v);
+				}
+				var send = {
+					op:'sort',
+					table:'_page_element',
+					ids:arr.join()
+				};
+				_post(send, 'reload');
 			}
 		});
 	},

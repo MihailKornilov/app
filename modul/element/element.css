@@ -619,6 +619,39 @@ td.topi{padding-top:7px}
 
 
 /* Меню */
+/* type 0: Главное меню */
+._menu0{
+	border-bottom:#31618C solid 1px;
+	padding:15px 5px 0 5px;
+}
+._menu0 .link{
+	display:inline-block;
+	margin-left:5px;
+	padding:8px 14px 6px;
+	color:#31618C;
+	border-radius:5px 5px 0 0;
+}
+._menu0 .link:hover{text-decoration:none}
+._menu0 .link:not(.sel):hover{background-color:#DEE3EF}
+._menu0 .link.sel{color:#FFF;background-color:#31618C}
+
+/*
+#_menu a.main{
+	padding-left:16px;
+	padding-right:16px;
+	background-image:url(data:image/gif;base64,R0lGODlhEgAoAJEAAAAAAP///zFhjP///yH5BAEAAAMALAAAAAASACgAAAItlI+py+MPo5y0VoYztrx7qoXiR5bmiabqyrbuCw/BTNf2jefxm/d+v3P9hsQCADs=);
+	background-repeat:no-repeat;
+	background-position:9px 10px;
+}
+#_menu a.main.sel{background-position:9px -18px}
+#_menu a.back{
+	float:right;
+	position:relative;
+	top:9px;
+	right:10px;
+}
+#_menu._busy{background-position:right center}
+*/
 /* type 1 */
 ._menu1{border-bottom:#E7E8EC solid 1px;margin:5px 0 10px}
 ._menu1 .link{

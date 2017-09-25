@@ -132,6 +132,13 @@ function query_insert_id($tab, $resource_id=GLOBAL_MYSQL_CONNECT) {//id последне
 	$sql = "SELECT `id` FROM `".$tab."` ORDER BY `id` DESC LIMIT 1";
 	return query_value($sql, $resource_id);
 }
+function _maxSql($table, $pole='sort', $app=0) {
+	$sql = "SELECT IFNULL(MAX(`".$pole."`)+1,1)
+			FROM `".$table."`
+			WHERE `id`".
+			($app ? " AND `app_id`=".APP_ID : '');
+	return query_value($sql);
+}
 
 function _dbDump() {
 	define('INSERT_COUNT_MAX', 500); //записей в одном INSERT

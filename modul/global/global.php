@@ -4,10 +4,14 @@ define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 
-define('DEBUG', 0);
+define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '');//.min
 
-define('SA', true);
+define('CODE', _txt(@$_COOKIE['code']));
+define('CACHE_PREFIX', md5(CODE));
+
+_sa();
+
 if(SA) {
 	error_reporting(E_ALL);
 	ini_set('display_errors', true);
@@ -46,12 +50,23 @@ define('PAGE_ID', _num(@$_GET['p'])); //идентификатор страницы: для отображения 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
-define('CODE', _txt(@$_COOKIE['code']));
-define('CACHE_PREFIX', md5(CODE));
 
 
 
+function _sa() {//установка флага суперадминистратора
+	//Флаг устанавливается только после входа пользователя в приложения и применяется после первого обновления страницы.
 
+
+	//Список пользователей - SA
+	$SA[982006] = true;//Михаил Корнилов
+
+	if(!CODE || !$r = _cache(CODE)) {
+		define('SA', 0);
+		return;
+	}
+
+	define('SA', isset($SA[$r['viewer_id']]) ? 1 : 0);
+}
 function _face() {//определение, как загружена страница: iframe или сайт
 	switch(@$_COOKIE['face']) {
 		case 'site': return 'site';
@@ -97,12 +112,8 @@ function _globalTable($v='name', $id=0) {//список таблиц для связок между ними
 //		_dialog_element
 //		_dialog_element_v
 		1 => '_page',
-//		2 => '_page_button',
-//		3 => '_page_head',
-//		4 => '_page_link',
 		5 => '_page_menu'
 //		_page_menu_razdel
-//		_page_search
 //		_vkuser
 //		_vkuser_app
 //		_vkuser_auth
@@ -243,28 +254,38 @@ function _app($i='all') {//Получение данных о приложении
 
 
 function _page() {//отображение страницы
-	if(!$page_id = _num(@$_GET['p']))
+	if(!PAGE_ID)
 		return _contentEmpty();
 
 	$sql = "SELECT *
 			FROM `_page`
-			WHERE `id`=".$page_id;
+			WHERE `app_id` IN (0,".APP_ID.")
+			  AND `id`=".PAGE_ID;
 	if(!$page = query_assoc($sql))
 		return _contentEmpty();
 
 	if($page['func'] && function_exists($page['func']))
-		return _page_show($page_id).$page['func']();
+		return _page_show(PAGE_ID).$page['func']();
 
-	return _page_show($page_id);
+	return _page_show(PAGE_ID);
 }
 function _pageSetupMenu() {//строка меню управления страницей
 	if(!PAS)
 		return '';
 	if(!PAGE_ID)
 		return '';
+
+	$sql = "SELECT *
+			FROM `_page`
+			WHERE `app_id` IN (0,".APP_ID.")
+			  AND `id`=".PAGE_ID;
+	if(!$page = query_assoc($sql))
+		return '';
+
 	return
 	'<div id="pas">'.
 		'<p>'.
+			'<span class="dib w150 fs15">'.$page['name'].':</span>'.
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_menu_add').')">Добавить меню</a>'.
 			' :: '.
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_head_add').')">Добавить заголовок</a>'.
@@ -274,6 +295,8 @@ function _pageSetupMenu() {//строка меню управления страницей
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_button_add').')">Добавить кнопку</a>'.
 			' :: '.
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_link_add').')">Добавить ссылку</a>'.
+			' :: '.
+			'<a onclick="_dialogOpen('._dialogValToId('page_setup_spisok_add').')">Добавить список</a>'.
 		'</p>'.
 	'</div>';
 }
