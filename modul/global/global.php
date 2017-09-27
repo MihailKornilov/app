@@ -260,6 +260,7 @@ function _page() {//отображение страницы
 	$sql = "SELECT *
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_ID.")
+			  AND `sa` IN (0,".SA.")
 			  AND `id`=".PAGE_ID;
 	if(!$page = query_assoc($sql))
 		return _contentEmpty();
@@ -278,14 +279,20 @@ function _pageSetupMenu() {//строка меню управления страницей
 	$sql = "SELECT *
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_ID.")
+			  AND `sa` IN (0,".SA.")
 			  AND `id`=".PAGE_ID;
 	if(!$page = query_assoc($sql))
 		return '';
 
 	return
 	'<div id="pas">'.
-		'<p>'.
-			'<span class="dib w150 fs15">'.$page['name'].':</span>'.
+		'<div class="p pad5">'.
+			'<div class="dib fs15">'.$page['name'].':</div>'.
+			'<div onclick="_dialogOpen('.$page['dialog_id'].','.PAGE_ID.')" class="icon icon-edit mbm5 ml20'._tooltip('Редактировать текущую страницу', -102).'</div>'.
+		'</div>'.
+		'<div class="p pad5">'.
+			'<a onclick="_dialogOpen('._dialogValToId('page_setup_page_add').')" class="b">Новая страница</a>'.
+			' :: '.
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_menu_add').')">Добавить меню</a>'.
 			' :: '.
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_head_add').')">Добавить заголовок</a>'.
@@ -297,7 +304,7 @@ function _pageSetupMenu() {//строка меню управления страницей
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_link_add').')">Добавить ссылку</a>'.
 			' :: '.
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_spisok_add').')">Добавить список</a>'.
-		'</p>'.
+		'</div>'.
 	'</div>';
 }
 function _pageForm() {//формат страницы

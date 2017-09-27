@@ -1179,6 +1179,7 @@ $(document)
 			msg:msg,
 			ugol:'right',
 			show:1,
+			delayShow:500,
 			delayHide:100,
 			remove:1,
 			func:function(hi) {
@@ -1210,14 +1211,14 @@ $(document)
 				});
 			}
 		});
-})
-	.on('click', '.spisok-edit', function() {
+});
+/*	.on('click', '.spisok-edit', function() {
 		var t = $(this),
 			id = t.attr('val');
 
 		_dialogOpen(0, id);
 	});
-/*	.on('click', '.spisok-edit', function() {
+	.on('click', '.spisok-edit', function() {
 		var t = $(this),
 			id = t.attr('val');
 

@@ -150,11 +150,7 @@ table{border:0;border-spacing:0}
 	background-color:#ffc;
 	border-bottom:#F2F2C2 solid 1px;
 }
-#pas p{
-	width:1000px;
-	margin:auto;
-	padding:10px;
-}
+#pas .p{width:1000px;margin:auto}
 
 /* Основное содержание сайта */
 #_content{
@@ -324,6 +320,7 @@ button.vk.edit:hover{background-color:#D59553}
 .mt40{margin-top:40px}
 .mb1{margin-bottom:1px}
 .mb5{margin-bottom:5px}
+.mbm5{margin-bottom:-5px}
 .mb10{margin-bottom:10px}
 .mb20{margin-bottom:20px}
 .mb30{margin-bottom:30px}
@@ -375,6 +372,7 @@ button.vk.edit:hover{background-color:#D59553}
 .bg-fcc{background-color:#fcc}  /* красный - ошибка */
 .bg-dfd{background-color:#dfd}  /* зелёный */
 .bg-ddf{background-color:#ddf}  /* синий */
+.bg-ccd{background-color:#cce}  /* фиолетовый */
 
 
 .db{display:block}

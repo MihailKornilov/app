@@ -396,6 +396,8 @@ $(document)
 						html += obj(req[i]);
 						break;
 					}
+					if(typeof req[i] == 'string')
+						req[i] = req[i].replace(/<\/textarea>/g,'</ textarea>');
 					html += '<textarea>' + req[i] + '</textarea>';
 			}
 		}

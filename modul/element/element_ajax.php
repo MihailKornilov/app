@@ -248,9 +248,12 @@ switch(@$_POST['op']) {
 		if($unit_id = _num($_POST['unit_id'])) {
 			$sql = "SELECT *
 					FROM `".$dialog['base_table']."`
-					WHERE `id`=".$unit_id;
+					WHERE `app_id` IN (0,".APP_ID.")
+					  AND `id`=".$unit_id;
 			if(!$data = query_assoc($sql))
 				jsonError('«аписи не существует');
+			if(@$data['sa'] && !SA)
+				jsonError('Ќет доступа');
 			if($data['deleted'])
 				jsonError('«апись была удалена');
 		}
@@ -564,8 +567,12 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 			$val = '';
 
 			//установка значени€ при редактировании данных диалога
-			if(!empty($data))
-				$val = @$data[$r['col_name']];
+			if(!empty($data)) {
+				if($r['col_name'] == 'app_any_spisok') {
+					$val = $data['app_id'] ? 0 : 1;
+				} else
+					$val = @$data[$r['col_name']];
+			}
 
 			$attr_id = 'elem'.$r['id'];
 			$width = $r['width'] ? _num($r['width']) : 250;
@@ -703,7 +710,7 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 	if($unit_id) {
 		$sql = "SELECT *
 				FROM `".BASE_TABLE."`
-				WHERE `app_id`=".APP_ID."
+				WHERE `app_id` IN (0,".APP_ID.")
 				  AND `id`=".$unit_id;
 		if(!$r = query_assoc($sql))
 			jsonError('«аписи не существует');
@@ -745,6 +752,12 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 		//если это выпадающий список, выбирающий св€зку и вносит в список элементов
 		if($r['type_id'] == 2 && $dialog['base_table'] == '_page_element' && $r['param_num_1'])
 			$elemUpdate[] = "`table_id`=".$r['param_num_1'];
+
+		//служебна€ переменна€ app_any_spisok. ≈сли равна 1, то устанавливает app_id=0 (все приложени€), либо = id приложени€
+		if($r['col_name'] == 'app_any_spisok') {
+			$elemUpdate[] = "`app_id`=".($v ? 0 : APP_ID);
+			continue;
+		}
 
 		$upd = "`".$r['col_name']."`=";
 		switch($r['type_id']) {
@@ -794,8 +807,7 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 	}
 
 	$sql = "UPDATE `".BASE_TABLE."`
-			SET `app_id`=".($dialog['app_any'] ? 0 : APP_ID).",
-				".implode(',', $elemUpdate)."
+			SET ".implode(',', $elemUpdate)."
 			WHERE `id`=".$unit_id;
 	query($sql);
 

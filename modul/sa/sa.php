@@ -2,6 +2,7 @@
 function sa_page_spisok() {
 	$sql = "SELECT *
 			FROM `_page`
+			WHERE `app_id` IN (0,".APP_ID.")
 			ORDER BY `sort`";
 	$spisok = query_arr($sql);
 
@@ -9,16 +10,19 @@ function sa_page_spisok() {
 		'<table class="_stab">'.
 			'<tr><th class="w15">id'.
 				'<th>Название'.
+				'<th class="w70">App any'.
+				'<th class="w70">SA only'.
 				'<th class="w200">Функция'.
 				'<th class="w35">';
 	foreach($spisok as $r) {
 		$send .=
 				'<tr><td class="r grey">'.$r['id'].
 					'<td><a href="'.URL.'&p='.$r['id'].'">'.$r['name'].'</a>'.
+					'<td class="'.($r['app_id'] ? '' : 'bg-dfd').'">'.
+					'<td class="'.($r['sa'] ? 'bg-ccd' : '').'">'.
 					'<td>'.$r['func'].
 					'<td class="wsnw">'
-						._iconEdit(array('onclick'=>'_dialogOpen(1,'.$r['id'].')'))
-//						._iconEdit(array('class'=>'spisok-edit') + $r)
+						._iconEdit(array('onclick'=>'_dialogOpen('.$r['dialog_id'].','.$r['id'].')'))
 						._iconDel();
 	}
 
