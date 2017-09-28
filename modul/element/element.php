@@ -156,9 +156,24 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 			)";
 	query($sql);
 
-	return query_insert_id('_dialog');
+	$dialog_id = query_insert_id('_dialog');
+	
+	$sql = "UPDATE `_dialog`
+			SET `spisok_name`='Список ".$dialog_id."'
+			WHERE `id`=".$dialog_id;
+	query($sql);
+	
+	return $dialog_id;
 }
-
+function _dialogSpisokOn() {//получение массива диалогов, которые могут быть списками: spisok_on=1
+	$sql = "SELECT `id`,`spisok_name`
+			FROM `_dialog`
+			WHERE `app_id` IN (0,".APP_ID.")
+			  AND `sa` IN (0,".SA.")
+			  AND `spisok_on`
+			ORDER BY `id`";
+	return query_selArray($sql);
+}
 
 
 

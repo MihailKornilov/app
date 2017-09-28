@@ -105,31 +105,6 @@ function _global_script() {//скрипты и стили
 	_debug('style');
 }
 
-function _globalTable($v='name', $id=0) {//список таблиц для связок между ними
-	$table = array(
-//		0 => '_app',
-//		_dialog
-//		_dialog_element
-//		_dialog_element_v
-		1 => '_page',
-		5 => '_page_menu'
-//		_page_menu_razdel
-//		_vkuser
-//		_vkuser_app
-//		_vkuser_auth
-	);
-
-	$name = array(
-		1 => 'Страницы',
-		5 => 'Меню'
-	);
-	
-	if($v == 'name')
-		return $id ? $name[$id] : $name;
-	
-	return $id ? $table[$id] : $table;
-}
-
 
 
 function _authSuccess($code, $viewer_id, $app_id) {//внесение записи об успешной авторизации
@@ -291,7 +266,7 @@ function _pageSetupMenu() {//строка меню управления страницей
 			'<div onclick="_dialogOpen('.$page['dialog_id'].','.PAGE_ID.')" class="icon icon-edit mbm5 ml20'._tooltip('Редактировать текущую страницу', -102).'</div>'.
 		'</div>'.
 		'<div class="p pad5">'.
-			'<a onclick="_dialogOpen('._dialogValToId('page_setup_page_add').')" class="b">Новая страница</a>'.
+			'<input type="hidden" id="page-setup-page" />'.
 			' :: '.
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_menu_add').')">Добавить меню</a>'.
 			' :: '.
@@ -305,7 +280,8 @@ function _pageSetupMenu() {//строка меню управления страницей
 			' :: '.
 			'<a onclick="_dialogOpen('._dialogValToId('page_setup_spisok_add').')">Добавить список</a>'.
 		'</div>'.
-	'</div>';
+	'</div>'.
+	'<script>_pas()</script>';
 }
 function _pageForm() {//формат страницы
 	return

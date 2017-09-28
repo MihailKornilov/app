@@ -712,3 +712,52 @@ td.topi{padding-top:7px}
 ._menu4 .link:not(.sel):hover{background-color:#e9edf1}
 
 
+
+
+
+
+
+
+
+/* Выпадающее меню по ссылке */
+._dropdown{position:relative;display:inline-block}
+._dropdown .ddhead{white-space:nowrap}
+._dropdown span{color:#777}
+._dropdown .ddlist{
+	display:none;
+	position:absolute;
+	top:-3px;
+	left:-7px;
+	border-left:#EEE solid 1px;
+	border-right:#EEE solid 1px;
+	border-bottom:#EEE solid 1px;
+	background-color:#FFF;
+	cursor:pointer;
+	z-index:1;
+}
+._dropdown .ddsel{
+	padding:2px 18px 3px 5px;
+	background:#EEF2F6 url("data:image/gif;base64,R0lGODlhEQAEAKIAAAAAAP///11xhXOLo+7y9v///wAAAAAAACH5BAEAAAUALAAAAAARAAQAAAMOWKrSLivGQam8quI9dgIAOw==") no-repeat right 7px;
+	color:#2C587D;
+	border-top:#96AABE solid 1px;
+	border-left:#96AABE solid 1px;
+	border-right:#96AABE solid 1px;
+	white-space:nowrap;
+}
+._dropdown .ddu{
+	display:block;
+	text-decoration:none;
+	padding:3px 5px 4px 5px;
+	border-left:#96AABE solid 1px;
+	border-right:#96AABE solid 1px;
+	white-space:nowrap;
+}
+._dropdown .last{border-bottom:#96AABE solid 1px;padding-bottom:3px}
+._dropdown .ddu:hover,._dropdown .seld{
+	background-color:#6D8FB3;
+	color:#FFF;
+	padding:2px 5px 3px 5px;
+	border:#476D96 solid 1px;
+}
+._dropdown .ddu:not(:hover) tt{color:red}
+

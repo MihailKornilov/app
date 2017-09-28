@@ -15,6 +15,10 @@ switch(@$_POST['op']) {
 			'button_edit_cancel' => 'Отмена',
 
 			'base_table' => '_spisok',
+
+			'spisok_on' => 0,
+			'spisok_name' => '',
+
 			'menu_edit_last' => 1
 		);
 
@@ -64,6 +68,16 @@ switch(@$_POST['op']) {
 						'<tr><td class="label r">Текст кнопки <b>отмены</b>:<td><input type="text" id="button_edit_cancel" class="w150" maxlength="100" value="'.$dialog['button_edit_cancel'].'" />'.
 					'</table>'.
 				'</div>'.
+				'<div class="bg-gr2 line-t1 pad10">'.
+					'<div class="hd2">Служебное</div>'.
+					'<table class="bs10">'.
+						'<tr><td class="label w175 r">Может быть списком:'.
+							'<td><input type="hidden" id="spisok_on" value="'.$dialog['spisok_on'].'" />'.
+						'<tr id="tr_spisok_name" class="'.($dialog['spisok_on'] ? '' : 'dn').'">'.
+							'<td class="label r">Имя списка:'.
+							'<td><input type="text" id="spisok_name" class="w200" maxlength="100" value="'.$dialog['spisok_name'].'" />'.
+					'</table>'.
+				'</div>'.
 			'</div>'.
 
 			//Элементы
@@ -109,8 +123,9 @@ switch(@$_POST['op']) {
 		$send['button_edit_cancel'] = utf8($dialog['button_edit_cancel']);
 		$send['menu'] = _selArray($menu);
 		$send['element'] = _dialogElementSpisok($dialog_id, 'arr');
-		$send['table'] = _selArray(_globalTable());
+		$send['spisokOn'] = _dialogSpisokOn();
 		$send['html'] = utf8($html);
+		$send['sa'] = SA;
 		jsonSuccess($send);
 		break;
 	case 'dialog_add'://создание нового диалогового окна
@@ -182,7 +197,7 @@ switch(@$_POST['op']) {
 
 		if(!$width = _num($_POST['width']))
 			jsonError('Некорректное значение ширины диалога');
-		if($width < 480 || $width > 780)
+		if($width < 480 || $width > 900)
 			jsonError('Установлена недопустимая ширина диалога');
 		if(!$label_width = _num($_POST['label_width']))
 			jsonError('Некорректное значение ширины label');
@@ -190,6 +205,11 @@ switch(@$_POST['op']) {
 		$base_table = _txt($_POST['base_table']);
 		$menu_edit_last = _num($_POST['menu_edit_last']);
 		$sa = _bool($_POST['sa']);
+
+		$spisok_on = _bool($_POST['spisok_on']);
+		$spisok_name = _txt($_POST['spisok_name']);
+		if($spisok_on && !$spisok_name)
+			jsonError('Укажите имя списка страницы');
 
 		_dialogElementUpdate();
 
@@ -207,6 +227,8 @@ switch(@$_POST['op']) {
 					`button_edit_submit`='".addslashes($button_edit_submit)."',
 					`button_edit_cancel`='".addslashes($button_edit_cancel)."',
 					`base_table`='".addslashes($base_table)."',
+					`spisok_on`=".$spisok_on.",
+					`spisok_name`='".addslashes($spisok_name)."',
 					`menu_edit_last`=".$menu_edit_last."
 				WHERE `id`=".$dialog_id;
 		query($sql);
@@ -218,19 +240,19 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
-	case 'dialog_table_col_load'://получение списка колонок конкретной таблицы
-		if(!$table_id = _num($_POST['table_id']))
-			jsonError('Некорректный ID таблицы');
+	case 'dialog_spisok_on_col_load'://получение списка колонок конкретного списка
+		if(!$dialog_id = _num($_POST['dialog_id']))
+			jsonError('Некорректный ID диалога');
 
-		$tab = _globalTable();
-		if(!isset($tab[$table_id]))
-			jsonError('Таблицы не существует');
+		if(!$dialog = _dialogQuery($dialog_id))
+			jsonError('Диалога не существует');
 
 		$sql = "SELECT
 					`id`,
 					`label_name`
 				FROM `_dialog_element`
-				WHERE `dialog_id`=".$table_id."
+				WHERE `dialog_id`=".$dialog_id."
+				  AND LENGTH(`label_name`)
 				ORDER BY `sort`";
 		$send['spisok'] = query_selArray($sql);
 
@@ -607,8 +629,6 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 					$inp = '<div id="'.$attr_id.'" class="_info">'._br(htmlspecialchars_decode($r['param_txt_1'])).'</div>';
 					break;
 				case 8://connect
-//					$baseTable = _globalTable('table', $r['param_num_1']);
-
 					//получение названия таблицы для связки из диалога
 					$sql = "SELECT `base_table`
 							FROM `_dialog`
@@ -676,6 +696,9 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 			//получение значений конкретного объекта
 			if($r['type_id'] == 2 && $r['param_num_1'])
 				$arr[$n]['v'] = _dialogSpisokList($r['param_num_1'], $r['param_num_2']);
+			//массив объектов, которые могут быть списками
+			if($r['type_id'] == 2 && $r['param_bool_1'])
+				$arr[$n]['v'] = _dialogSpisokOn();
 		}
 	}
 
@@ -685,15 +708,17 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 	return $html;
 }
 
-function _dialogSpisokList($table_id, $element_id) {//массив списков (пока только для select)
-	//получение названия колонки для связки
+function _dialogSpisokList($dialog_id, $element_id) {//массив списков (пока только для select)
+	$dialog = _dialogQuery($dialog_id);
+
 	$sql = "SELECT `col_name`
 			FROM `_dialog_element`
 			WHERE `id`=".$element_id;
-	$colName = query_value($sql);
+	if(!$colName = query_value($sql))
+		$colName = 'id';
 
 	$sql = "SELECT `id`,`".$colName."`
-			FROM `"._globalTable('tab', $table_id)."`
+			FROM `".$dialog['base_table']."`
 			ORDER BY `id`";
 	return query_selArray($sql);
 }

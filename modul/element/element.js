@@ -301,7 +301,8 @@ var VK_SCROLL = 0,
 
 		window.LABEL_WIDTH = 125;
 		window.DIALOG_ELEMENT = [];
-		window.GLOBAL_TABLE = [];
+		window.GLOBAL_SPISOK_ON = [];
+		window.SA = 0;
 
 		dialog.load(send, loaded);
 
@@ -312,10 +313,17 @@ var VK_SCROLL = 0,
 			dialog.butSubmit((dialog_id ? 'Сохранить' : 'Создать') + ' диалоговое окно');
 
 			DIALOG_ELEMENT = res.element;
-			GLOBAL_TABLE = res.table;
-			console.log(res);
+			GLOBAL_SPISOK_ON = res.spisokOn;
+			SA = res.sa;
 
 			_dialogScript(res.element, 1);
+
+			$('#spisok_on')._check({
+				func:function(v) {
+					$('#tr_spisok_name')[(v ? 'remove' : 'add') + 'Class']('dn');
+				}
+			});
+
 			$('#app_any')._check();
 			$('#sa')._check();
 			sortable();
@@ -403,6 +411,8 @@ var VK_SCROLL = 0,
 				button_edit_cancel:$('#button_edit_cancel').val(),
 				base_table:$('#base_table').val(),
 				element:DIALOG_ELEMENT,
+				spisok_on:$('#spisok_on').val(),
+				spisok_name:$('#spisok_name').val(),
 				menu_edit_last:$('#dialog-menu').val()
 			};
 			dialog.post(send, function(res) {
@@ -447,7 +457,8 @@ var VK_SCROLL = 0,
 				'<div id="element-sel" class="dn">' +
 					'<div class="fs16">Элемент <b id="element-name" class="fs16"></b></div>' +
 					'<table id="element-main" class="bs10 mt10">' +
-						'<tr><td class="label"><div class="red r">SA: Колонка в таблице:</div>' +
+						'<tr class="' + (SA ? '' : 'dn') + '">' +
+							'<td class="label"><div class="red r">SA: Колонка в таблице:</div>' +
 							'<td><input type="text" id="col-name" class="w100" value="' + EL.col_name + '" />' +
 						'<tr id="tr-name">' +
 							'<td class="label r b">Название поля:' +
@@ -599,7 +610,7 @@ var VK_SCROLL = 0,
 					break;
 				case 8:
 					name = 'Связка';
-					main = elementObjectSelect(EL, 1);
+					main = elementObjectSelect(EL, 'Привязка элемента к объекту');
 					prev = '<div class="grey i">Текстовый результат</div>';
 					break;
 			}
@@ -646,28 +657,45 @@ var VK_SCROLL = 0,
 					var em = $('#element-main');
 					em.after(
 						'<div class="center pad10">' +
-							'<button class="vk small green">Добавить произвольные значения</button> ' +
-							'<button class="vk small">Прикрепить список</button>' +
+							'<button class="vk small green">Произвольные значения</button> ' +
+							'<button class="vk small">Все списки</button> ' +
+							'<button class="vk small">Выбрать из списков</button>' +
 						'</div>'
 					);
 					var but1 = em.next().find('button:first'),
-						but2 = em.next().find('button:last');
+						but2 = em.next().find('button:eq(1)'),
+						but3 = em.next().find('button:last');
 					but1.click(function() {
 						em.next().remove();
 						elementVal(elementActionSel);
 					});
 					but2.click(function() {
+						em.next().addClass('dn');
+						$('#element-main').append(
+							'<tr><td class="label r">Содержание:' +
+								'<td class="i b">все объекты списков' +
+									'<input type="hidden" id="param_bool_1" value="1" />' +
+									'<div class="icon icon-del fr mbm2' + _tooltip('Отменить выбор', -52) + '</div>'
+						).find('.icon-del').click(function() {
+							$(this).parent().parent().remove();
+							em.next().removeClass('dn');
+						});
+					});
+					but3.click(function() {
 						em.next().remove();
-						em.append(elementObjectSelect(EL, 1));
+						em.append(elementObjectSelect(EL, 'Выбор из доступных объектов списков'));
 						elementObjectSelect(EL);
 					});
 
-					if(_num(EL.param_num_1)) {
+					if(_num(EL.param_bool_1)) {
 						but2.trigger('click');
-						elementActionSel();
 					} else
-						if(EL.v.length)
-							but1.trigger('click');
+						if(_num(EL.param_num_1)) {
+							but3.trigger('click');
+							elementActionSel();
+						} else
+							if(EL.v.length)
+								but1.trigger('click');
 
 					break;
 
@@ -810,10 +838,10 @@ var VK_SCROLL = 0,
 		function elementObjectSelect(EL, html) {//выбор объекта для связки при помощи _select
 			/*
 				EL - данные элемента
-				html - возвращать в виде html, либо применять скрипт
+				html - возвращать в виде html, либо применять скрипт. Содержит заголовок
 			*/
 			if(html)
-				return  '<tr><td colspan="2"><div class="hd2">Привязка элемента к объекту</div>' +
+				return  '<tr><td colspan="2"><div class="hd2">' + html + ':</div>' +
 						'<tr><td class="label r topi">Объект:' +
 							'<td><input type="hidden" id="param_num_1" value="' + EL.param_num_1 + '" />' +
 						'<tr><td class="label r topi">Имя колонки:' +
@@ -830,8 +858,8 @@ var VK_SCROLL = 0,
 
 				$('#param_num_2')._select(0);
 				var send = {
-					op:'dialog_table_col_load',
-					table_id:v
+					op:'dialog_spisok_on_col_load',
+					dialog_id:v
 				};
 				$('#param_num_2')._select('load', send, function() {
 					$('#param_num_2')._select('title0', 'не выбрано')
@@ -840,7 +868,7 @@ var VK_SCROLL = 0,
 			$('#param_num_1')._select({
 				width:220,
 				title0:'не выбран',
-				spisok:GLOBAL_TABLE,
+				spisok:GLOBAL_SPISOK_ON,
 				func:menuColSet
 			});
 			$('#param_num_2')._select({
@@ -1211,10 +1239,10 @@ $(document)
 				});
 			}
 		});
-});
+})
 /*	.on('click', '.spisok-edit', function() {
 		var t = $(this),
-			id = t.attr('val');
+			id = t.attr('val')
 
 		_dialogOpen(0, id);
 	});
@@ -1272,8 +1300,10 @@ $(document)
 				_parent(t).remove();
 			}
 		});
-	});
+	})
 */
+	
+	;
 
 $.fn._check = function(o) {
 	var t = $(this),
@@ -1425,7 +1455,7 @@ $.fn._select = function(o, o1, o2) {
 				case 'cancel': s.cancel(); break;
 				case 'clear': s.clear(); break;//очищение inp, установка val=0
 				case 'empty': s.empty(); break;//удаление списка, установка val=0
-				case 'title0':
+				case 'title0'://установка или получение title0
 					if(o1) {
 						s.title0(o1);
 						return s;
@@ -1901,6 +1931,7 @@ $.fn._select = function(o, o1, o2) {
 	t.title0 = function(v) {//Получение|установка нулевого значения
 		if(v) {
 			title0bg.html(v);
+			select.find('.title0').html(v);
 			return;
 		}
 		return title0bg.html();
@@ -2618,4 +2649,129 @@ $.fn._menu = function(o) {//меню
 
 	window[win] = tMain;
 	return tMain;
+};
+$.fn._dropdown = function(o) {//выпадающий список в виде ссылки
+	var t = $(this),
+		id = t.attr('id');
+
+	if(typeof o == 'number' || typeof o == 'string') {
+		switch(o) {
+			case 'remove':t.next().remove('._dropdown'); break;
+			default: window[id + '_dropdown'].value(o);
+		}
+		return t;
+	}
+
+	o = $.extend({
+		head:'',    // если указано, то ставится в название ссылки, а список из spisok
+		headgrey:0,
+		disabled:0,
+		title0:'',
+		spisok:[],
+		func:function() {},
+		nosel:0 // не вставлять название при выборе значения
+	}, o);
+	var n,
+		val = t.val() * 1 || 0,
+		ass = assCreate(),
+		head = o.head || o.title0,
+		len = o.spisok.length,
+		spisok = o.title0 && !o.disabled ? '<a class="ddu grey' + (!len ? ' last' : '') + (!val ? ' seld' : '') + '" val="0">' + o.title0 + '</a>' : '',
+		delay = 0;
+	t.val(val);
+	for(n = 0; n < len; n++) {
+		var sp = o.spisok[n];
+		spisok += '<a class="ddu' + (n == len - 1 ? ' last' : '') + (val == sp.uid ? ' seld' : '') + '" val="' + sp.uid + '">' + sp.title + '</a>';
+		if(val == sp.uid)
+			head = sp.title;
+	}
+	t.next().remove('._dropdown');
+	t.after(
+		'<div class="_dropdown' + (o.disabled ? ' disabled' : '') + '" id="' + id + '_dropdown">' +
+			(o.disabled ?
+				'<span>' + head + '</span>'
+				:
+				'<a class="ddhead' + (!val && (o.headgrey || o.title0) ? ' grey' : '') + '">' + head + '</a>'
+			) +
+			'<div class="ddlist">' +
+				'<div class="ddsel">' + head + '</div>' +
+				spisok +
+			'</div>' +
+		'</div>');
+
+	if(!o.disabled) {
+		var dropdown = t.next(),
+			aHead = dropdown.find('.ddhead'),
+			list = dropdown.find('.ddlist'),
+			ddsel = list.find('.ddsel'),
+			ddu = list.find('.ddu');
+		aHead.mouseover(function(e) {
+			e.stopPropagation();
+			delayClear();
+			list.show();
+		});
+		ddsel.click(function(e) {
+			e.stopPropagation();
+			delayClear();
+			list.hide();
+		});
+		ddu.click(function(e) {
+			e.stopPropagation();
+			var th = $(this),
+				v = parseInt(th.attr('val'));
+			setVal(v);
+			if(!o.nosel)
+				th.addClass('seld');
+			list.hide();
+			o.func(v, id);
+		})
+		   .mouseenter(function() {
+				ddu.removeClass('seld');
+		   });
+		list.on({
+			mouseleave:function () {
+				delay = setTimeout(function() {
+					list.fadeOut(200);
+				}, 500);
+			},
+			mouseenter:delayClear
+		});
+	}
+
+	function assCreate() {//Создание ассоциативного массива
+		var arr = o.title0 ? {0:o.title0} : {};
+		for (var n = 0; n < o.spisok.length; n++) {
+			var sp = o.spisok[n];
+			arr[sp.uid] = sp.title;
+		}
+		return arr;
+	}
+	function setVal(v) {
+		delayClear();
+		if(!o.nosel) {
+			t.val(v);
+			aHead.html(ass[v])[(o.title0 && !v ? 'add' : 'remove') + 'Class']('grey');
+			ddsel.html(ass[v]);
+		}
+	}
+	function delayClear() {
+		if(delay) {
+			clearTimeout(delay);
+			delay = 0;
+		}
+	}
+
+	t.value = function(v) {
+		setVal(v);
+		list.find('.seld').removeClass('seld');
+		for(n = 0; n < ddu.length; n++) {
+			var eq = ddu.eq(n);
+			if(eq.attr('val') == v) {
+				eq.addClass('seld');
+				break;
+			}
+		}
+	};
+	window[id + '_dropdown'] = t;
+	return t;
 };

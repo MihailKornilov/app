@@ -3,6 +3,7 @@ function sa_page_spisok() {
 	$sql = "SELECT *
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_ID.")
+			  AND `dialog_id`=1
 			ORDER BY `sort`";
 	$spisok = query_arr($sql);
 

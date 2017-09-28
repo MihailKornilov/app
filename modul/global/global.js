@@ -340,6 +340,23 @@ var FB,
 			return true;
 
 		m.addClass('_busy');
+	},
+
+	_pas = function() {
+		$('#page-setup-page')._dropdown({
+			head:'Страница',
+			nosel:1,
+			spisok:[
+				{uid:1,title:'<b>Новая страница</b>'},
+				{uid:2,title:'Список страниц'}
+			],
+			func:function(v) {
+				if(v == 1)
+					_dialogOpen(20);
+				if(v == 2)
+					location.href = URL + '&p=2';
+			}
+		});
 	};
 
 $.fn.keyEnter = function(func) {
