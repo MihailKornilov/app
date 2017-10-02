@@ -354,7 +354,7 @@ var FB,
 				if(v == 1)
 					_dialogOpen(20);
 				if(v == 2)
-					location.href = URL + '&p=2';
+					location.href = URL + '&p=12';
 			}
 		});
 	};
@@ -365,6 +365,19 @@ $.fn.keyEnter = function(func) {
 			func();
 	});
 	return $(this);
+};
+$.fn._flash = function() {//вспышка и затухание элемента в списке
+	var t = $(this);
+
+	t.css('position', 'relative')
+	 .append('<div id="unit-flash"></div>')
+	 .find('div:last')
+	 .animate({opacity:.5}, 100)
+	 .animate({opacity:0}, 600, function() {
+		$(this).remove();
+	 });
+
+	return t;
 };
 
 $(document)

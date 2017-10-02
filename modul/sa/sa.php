@@ -90,13 +90,70 @@ function _page_show($page_id) {//отображение содержания страницы
 							'</div>';
 						break;
 					case 14://_spisok
-						$dialog = _dialogQuery($r['dialog_id']);
+						$dialog = _dialogQuery(14);
+						$dv = $dialog['v_ass'];
+
+						$spTypeId = $r['num_1'];    //внешний вид списка: [181] => Таблица [182] => Шаблон
+						$spLimit = $dv[$r['num_2']];//лимит
+
+						//диалог, через который вносятся данные списка
+						$dialog_id = $r['num_3'];
+						$spDialog = _dialogQuery($dialog_id);
+						$spElement = $spDialog['component']; //элементы списка
+						$spTable = $spDialog['base_table'];
+//						$sa =
+//						print_r($spDialog);
+
+						//получение данных списка
 						$sql = "SELECT *
-								FROM `_spisok`
-								WHERE `app_id`=".APP_ID."
-								  AND `dialog_id`=13
+								FROM `".$spTable."`
+								WHERE `app_id` IN (0,".APP_ID.")
+								  AND `dialog_id`=".$dialog_id."
 								ORDER BY `dtime_add` DESC
-								LIMIT ".$dialog['v_ass'][$r['num_2']];
+								LIMIT ".$spLimit;
+						$spisok = query_arr($sql);
+
+						$html = '';
+
+						//выбор внешнего вида
+						switch($spTypeId) {
+							case 181://Таблица
+								$html = '<table class="_stab">'.
+											'<tr>'.
+												'<th class="w15">id';//ID
+								foreach($spElement as $el) {
+									if($el['type_id'] == 7)
+										continue;
+									$html .= '<th>'.$el['label_name'];
+								}
+								$html .= '<th class="w15">';//настройки
+								foreach($spisok as $sp) {
+									$html .= '<tr><td class="r grey">'.$sp['id'];
+									foreach($spElement as $el) {
+										if($el['type_id'] == 7)
+											continue;
+										if($el['col_name'] == 'app_any_spisok')
+											$v = '';
+										else
+											$v = $sp[$el['col_name']];
+										$html .= '<td>'.$v;
+									}
+									$html .= '<td class="wsnw">'
+												._iconEdit(array('onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')'));
+												//._iconDel();
+								}
+
+								$html .= '</table>';
+								break;
+							case 182://Шаблон
+								foreach($spElement as $el) {
+									$html .= '<div>'.$el['label_name'].'</div>';
+								}
+								break;
+							default:
+								$html = 'Неизвестный внешний вид списка: '.$spTypeId;
+						}
+/*
 						$html = '';
 						if($spisok = query_arr($sql)) {
 							foreach($spisok as $sp) {
@@ -107,6 +164,8 @@ function _page_show($page_id) {//отображение содержания страницы
 							}
 						}else
 							$html = '<div class="_empty">'.$r['txt_1'].'</div>';
+*/
+
 						$send .=
 							'<div class="'.$r['cls']._pasClass($r).'"'._pasId($id).'>'.
 								$html.

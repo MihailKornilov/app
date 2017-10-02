@@ -30,7 +30,7 @@ switch(@$_POST['op']) {
 
 		$menu = array(
 			1 => 'Заголовок, кнопки',
-			2 => 'Элементы',
+			2 => 'Компоненты',
 //  		3 => 'Функции',
 //			4 => 'Отображение полей',
 			9 => '<b class="red">SA</b>'
@@ -80,16 +80,16 @@ switch(@$_POST['op']) {
 				'</div>'.
 			'</div>'.
 
-			//Элементы
+			//Компоненты
 			'<div class="dialog-menu-2">'.
 				'<div class="pt10 mb10 ml10 mr10 prel">'.
-					'<dl id="dialog-base" class="_sort pad5" val="_dialog_element">'.
+					'<dl id="dialog-base" class="_sort pad5" val="_dialog_component">'.
 						'<div id="label-w-change"></div>'.
-						_dialogElementSpisok($dialog_id, 'html_edit').
+						_dialogComponentSpisok($dialog_id, 'html_edit').
 					'</dl>'.
 				'</div>'.
 				'<div class="pad20 center bg-ffd line-t1">'.
-					'<button class="vk green" onclick="_dialogEditElement()">Добавить элемент</button>'.
+					'<button class="vk green" onclick="_dialogComponentEdit()">Новый компонент</button>'.
 				'</div>'.
 			'</div>'.
 
@@ -122,7 +122,8 @@ switch(@$_POST['op']) {
 		$send['button_edit_submit'] = utf8($dialog['button_edit_submit']);
 		$send['button_edit_cancel'] = utf8($dialog['button_edit_cancel']);
 		$send['menu'] = _selArray($menu);
-		$send['element'] = _dialogElementSpisok($dialog_id, 'arr');
+		$send['element'] = _dialogEl();
+		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr');
 		$send['spisokOn'] = _dialogSpisokOn();
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
@@ -146,7 +147,7 @@ switch(@$_POST['op']) {
 		$menu_edit_last = _num($_POST['menu_edit_last']);
 		$sa = _bool($_POST['sa']);
 
-		_dialogElementUpdate();
+		_dialogComponentUpdate();
 
 		$sql = "INSERT INTO `_dialog` (
 					`sa`,
@@ -172,7 +173,7 @@ switch(@$_POST['op']) {
 		$dialog_id = query_insert_id('_dialog');
 
 		_dialogAppAnyUpdate($dialog_id);
-		_dialogElementUpdate($dialog_id);
+		_dialogComponentUpdate($dialog_id);
 
 		$send['dialog_id'] = $dialog_id;
 		jsonSuccess($send);
@@ -211,7 +212,7 @@ switch(@$_POST['op']) {
 		if($spisok_on && !$spisok_name)
 			jsonError('Укажите имя списка страницы');
 
-		_dialogElementUpdate();
+		_dialogComponentUpdate();
 
 		if(!_dialogQuery($dialog_id))
 			jsonError('Диалога не существует');
@@ -234,13 +235,13 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		_dialogAppAnyUpdate($dialog_id);
-		_dialogElementUpdate($dialog_id);
+		_dialogComponentUpdate($dialog_id);
 
 		$send['dialog_id'] = $dialog_id;
 		jsonSuccess($send);
 		break;
 
-	case 'dialog_spisok_on_col_load'://получение списка колонок конкретного списка
+	case 'dialog_spisok_on_col_load'://получение названий колонок конкретного списка из компонентов диалога
 		if(!$dialog_id = _num($_POST['dialog_id']))
 			jsonError('Некорректный ID диалога');
 
@@ -250,7 +251,7 @@ switch(@$_POST['op']) {
 		$sql = "SELECT
 					`id`,
 					`label_name`
-				FROM `_dialog_element`
+				FROM `_dialog_component`
 				WHERE `dialog_id`=".$dialog_id."
 				  AND LENGTH(`label_name`)
 				ORDER BY `sort`";
@@ -265,6 +266,8 @@ switch(@$_POST['op']) {
 
 		if(!$dialog = _dialogQuery($dialog_id))
 			jsonError('Диалога не существует');
+
+		$page_id = _num($_POST['page_id']);
 
 		$data = array();
 		if($unit_id = _num($_POST['unit_id'])) {
@@ -282,13 +285,14 @@ switch(@$_POST['op']) {
 
 		//8:связка
 		if($unit_id_dub = _num(@$_POST['unit_id_dub'])) {
-			foreach($dialog['element'] as $r)
+			foreach($dialog['component'] as $r)
 				if($r['type_id'] == 8)
 					$data[$r['col_name']] = $unit_id_dub;
 		}
 
-		$html = '<table class="bs10 w100p">'._dialogElementSpisok($dialog_id, 'html', $data).'</table>';
+		$html = '<div class="mt5 mb5">'._dialogComponentSpisok($dialog_id, 'html', $data, $page_id).'</div>';
 
+		$send['iconEdit'] = SA || $dialog['app_id'] == APP_ID ? 'show' : 'hide';//права для редактирования диалога
 		$send['width'] = _num($dialog['width']);
 		$send['head_insert'] = utf8($dialog['head_insert']);
 		$send['button_insert_submit'] = utf8($dialog['button_insert_submit']);
@@ -296,12 +300,12 @@ switch(@$_POST['op']) {
 		$send['head_edit'] = utf8($dialog['head_edit']);
 		$send['button_edit_submit'] = utf8($dialog['button_edit_submit']);
 		$send['button_edit_cancel'] = utf8($dialog['button_edit_cancel']);
-		$send['element'] = _dialogElementSpisok($dialog_id, 'arr');
+		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr');
 		$send['html'] = utf8($html);
 		jsonSuccess($send);
 		break;
 
-	case 'element_class_set'://применение новых стилей к элементу
+	case 'page_element_class_set'://применение новых стилей к элементу страницы
 		if(!$element_id = _num($_POST['element_id']))
 			jsonError('Некорректный ID элемента');
 
@@ -326,6 +330,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+/*
 	case 'spisok_edit_load'://получение данных записи для диалога
 		if(!$id = _num($_POST['id']))
 			jsonError('Некорректный идентификатор');
@@ -343,13 +348,14 @@ switch(@$_POST['op']) {
 		if(!$dialog = _dialogQuery($r['dialog_id']))
 			jsonError('Диалога не существует');
 
-		$html = '<table class="bs10">'._dialogElementSpisok($r['dialog_id'], 'html', $r).'</table>';
+		$html = '<table class="bs10">'._dialogComponentSpisok($r['dialog_id'], 'html', $r).'</table>';
 
 		$send['width'] = _num($dialog['width']);
-		$send['element'] = _dialogElementSpisok($r['dialog_id'], 'arr');
+		$send['component'] = _dialogComponentSpisok($r['dialog_id'], 'arr');
 		$send['html'] = utf8($html);
 		jsonSuccess($send);
 		break;
+*/
 	case 'spisok_edit'://сохранение данных записи для диалога
 		if(!$dialog_id = _num($_POST['dialog_id']))
 			jsonError('Некорректный ID диалогового окна');
@@ -385,6 +391,128 @@ switch(@$_POST['op']) {
 }
 
 
+function _dialogEl() {//данные всех элементов, используемых в диалоге
+	define('EL_LABEL_W', 'w150');//ширина для всех label
+	$sort = array(3,4,2,1,5,6,7,8);
+	$name = array(
+		1 => 'Галочка',
+		2 => 'Выпадающий список',
+		3 => 'Однострочный текст',
+		4 => 'Многострочный текст',
+		5 => 'Radio',
+		6 => 'Календарь',
+		7 => 'Информация',
+		8 => 'Связка'
+	);
+	$css = array(
+		1 => '',
+		2 => 'element-select',
+		3 => 'element-input',
+		4 => 'element-textaera',
+		5 => 'element-radio',
+		6 => 'element-calendar',
+		7 => 'element-info',
+		8 => 'element-connect'
+	);
+	$html = array(
+		1 => /*
+				param_txt_1 - текст для галочки
+            */
+			_dialogElHtmlContent().
+			'<table class="bs5">'.
+				'<tr><td class="label r '.EL_LABEL_W.'">Текст для галочки:'.
+					'<td><input type="text" class="w250" id="param_txt_1" />'.
+			'</table>'.
+			_dialogElHtmlPrev(),
+
+		2 => /*
+				param_bool_1 - использовать или нет нулевое значение
+                param_txt_1  - текст нулевого значения
+                param_bool_2 - использование всех списков при выборе
+				param_num_1  - id списка по dialog_id
+		        param_num_2  - id колонки по component_id
+			*/
+			_dialogElHtmlContent(1).
+			'<div class="hd2 ml20 mr20">Содержание выпадающего списка:</div>'.
+			'<table class="bs5 mt5">'.
+				'<tr><td class="label r '.EL_LABEL_W.'">Нулевое значение:'.
+					'<td><input type="hidden" id="param_bool_1" value="1" />'.
+						'<input type="text" class="w230 ml5" id="param_txt_1" value="не выбрано" />'.
+			'</table>'.
+			'<div id="elem-select-but" class="center pad10">'.
+				'<button class="vk small green">Произвольные значения</button> '.
+				'<button class="vk small">Все списки</button> '.
+				'<button class="vk small">Выбрать из списков</button>'.
+			'</div>'.
+			_dialogElHtmlPrev(),
+
+		3 => '',
+		4 => '',
+		5 => '',
+		6 => '',
+		7 => '',
+		8 => ''
+	);
+	
+
+	$send = array();
+	foreach($sort as $id) {
+		$send[$id] = array(
+			'name' => utf8($name[$id]),
+			'css' => $css[$id],
+			'html' => utf8(
+						_dialogElHtmlHead($name[$id]).
+						_dialogElHtmlSA().
+						$html[$id]
+					)
+		);
+	}
+	return $send;
+}
+function _dialogElHtmlHead($name) {//заголовок элемента
+	return '<div class="fs16 bg-gr1 pad20 line-b mb10">Компонент <b class="fs16">'.$name.'</b></div>';
+}
+function _dialogElHtmlSA() {//поле SA
+	if(!SA)
+		return '';
+	return
+	'<table class="bs5">'.
+		'<tr><td class="'.EL_LABEL_W.' red r">SA: col_name:'.
+			'<td><input type="text" id="col_name" class="w100" />'.
+	'</table>';
+}
+function _dialogElHtmlContent($req=0) {//основное содержимое
+	return
+	'<table class="bs5">'.
+		'<tr><td class="'.EL_LABEL_W.' label r b">Название поля:'.
+			'<td><input type="text" id="label_name" class="w250" />'.
+		'</table>'.
+
+($req ? //отображение галочки "Требуется обязательное заполнение"
+	'<table class="bs5">'.
+		'<tr><td class="'.EL_LABEL_W.'">'.
+			'<td><input type="hidden" id="label-require" />'.
+	'</table>'
+: '').
+
+	'<table class="bs5">'.
+		'<tr><td class="'.EL_LABEL_W.' label r topi">Текст подсказки:'.
+			'<td><textarea id="label-hint" class="w250"></textarea>'.
+	'</table>';
+}
+function _dialogElHtmlPrev($inp='<input type="hidden" id="elem-attr-id" />') {//предварительный просмотр
+	return
+	'<div id="prev-tab" class="mt20 pad20 pt10 bor-f0 bg-ffe">'.
+		'<div class="hd2">Предварительный просмотр:</div>'.
+		'<table class="bs5 w100p mt10">'.
+			'<tr><td id="label-prev" class="label r '.EL_LABEL_W.'">'.
+				'<td>'.$inp.
+		'</table>'.
+	'</div>';
+}
+
+
+
 function _dialogAppAnyUpdate($dialog_id) {//обновление значения диалога для возможности видимости во всех приложениях
 	$app_any = _num($_POST['app_any']);
 
@@ -393,11 +521,11 @@ function _dialogAppAnyUpdate($dialog_id) {//обновление значения диалога для возм
 			WHERE `id`=".$dialog_id;
 	query($sql);
 }
-function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диалога
-	if(!$arr = @$_POST['element'])
-		jsonError('Отсутствуют элементы диалога');
+function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диалога
+	if(!$arr = @$_POST['component'])
+		jsonError('Отсутствуют компоненты диалога');
 	if(!is_array($arr))
-		jsonError('Некорректный массив элементов диалога');
+		jsonError('Некорректный массив компонентов диалога');
 
 	foreach($arr as $r) {
 		if(!$type_id = _num($r['type_id']))
@@ -410,25 +538,25 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 	if(!$dialog_id)
 		return;
 
-	//удаление удалённых элементов
-	$sql = "DELETE FROM `_dialog_element`
+	//удаление удалённых компонентов
+	$sql = "DELETE FROM `_dialog_component`
 			WHERE `dialog_id`=".$dialog_id."
 			  AND `id` NOT IN ("._idsGet($arr).")";
 	query($sql);
 
-	//удаление значений удалённых элементов
-	$sql = "DELETE FROM `_dialog_element_v`
+	//удаление значений удалённых компонентов
+	$sql = "DELETE FROM `_dialog_component_v`
 			WHERE `dialog_id`=".$dialog_id."
-			  AND `element_id` NOT IN ("._idsGet($arr).")";
+			  AND `component_id` NOT IN ("._idsGet($arr).")";
 	query($sql);
 
 	$sort = 0;
 	foreach($arr as $r) {
-		$element_id = _num($r['id']);
+		$component_id = _num($r['id']);
 		$type_id = _num($r['type_id']);
 		$col_name = _txt($r['col_name']);
 
-		if(!$element_id && !$col_name) {
+		if(!$component_id && !$col_name) {
 			//формирование названия поля на основании типа элемента
 			$pole = array(
 				1 => 'bool',
@@ -442,7 +570,7 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 			);
 			$n = 1;
 			$sql = "SELECT `col_name`,1
-					FROM `_dialog_element`
+					FROM `_dialog_component`
 					WHERE `dialog_id`=".$dialog_id."
 					  AND `col_name` LIKE '".$pole[$type_id]."_%'";
 			$ass = query_ass($sql);
@@ -460,7 +588,7 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 		$param_txt_1 = _txt($r['param_txt_1']);
 		$param_txt_2 = _txt($r['param_txt_2']);
 
-		$sql = "INSERT INTO `_dialog_element` (
+		$sql = "INSERT INTO `_dialog_component` (
 					`id`,
 					`dialog_id`,
 					`type_id`,
@@ -477,7 +605,7 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 					`col_name`,
 					`sort`
 				) VALUES (
-					".$element_id.",
+					".$component_id.",
 					".$dialog_id.",
 					".$type_id.",
 					'".addslashes($label_name)."',
@@ -507,21 +635,21 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 					`col_name`=VALUES(`col_name`)";
 		query($sql);
 
-		if(!$element_id)
-			$element_id = query_insert_id('_dialog_element');
+		if(!$component_id)
+			$component_id = query_insert_id('_dialog_component');
 
 		//удаление всех элементов, если были
 		if(empty($r['v'])) {
-			$sql = "DELETE FROM `_dialog_element_v`
-					WHERE `element_id`=".$element_id;
+			$sql = "DELETE FROM `_dialog_component_v`
+					WHERE `component_id`=".$component_id;
 			query($sql);
 			continue;
 		}
 
 		//удаление удалённых значений элемента
 		if($ids = _idsGet($r['v'])) {
-			$sql = "DELETE FROM `_dialog_element_v`
-					WHERE `element_id`=".$element_id."
+			$sql = "DELETE FROM `_dialog_component_v`
+					WHERE `component_id`=".$component_id."
 					  AND `id` NOT IN (".$ids.")";
 			query($sql);
 		}
@@ -529,16 +657,16 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 		//внесение дополнительных значений элемента
 		$sort_v = 0;
 		foreach($r['v'] as $v) {
-			$sql = "INSERT INTO `_dialog_element_v` (
+			$sql = "INSERT INTO `_dialog_component_v` (
 						`id`,
 						`dialog_id`,
-						`element_id`,
+						`component_id`,
 						`v`,
 						`sort`
 					) VALUES (
 						"._num(@$v['id']).",
 						".$dialog_id.",
-						".$element_id.",
+						".$component_id.",
 						'".addslashes(_txt($v['title']))."',
 						".($sort_v++)."
 					)
@@ -548,14 +676,14 @@ function _dialogElementUpdate($dialog_id=0) {//проверка/внесение элементов диало
 		}
 	}
 }
-function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов диалога в формате массива и html
+function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//список значений диалога в формате массива и html
 /*
 	Форматы возврата данных:
 		arr
 		html
 		html_edit
 
-	Элементы и их характеристики - порядок отображения колонки в таблице, например: txt_1, num_2
+	Компоненты и их характеристики - порядок отображения колонки в таблице, например: txt_1, num_2
 		1. check:    bool
 		2. select:   num
 		3. input:    txt
@@ -568,7 +696,7 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 
 	$arr = array();
 	$html = '';
-	$edit = $i == 'html_edit';//редактирование + сортировка элементов
+	$edit = $i == 'html_edit';//редактирование + сортировка значений
 
 	$sql = "SELECT `label_width`
 			FROM `_dialog`
@@ -576,7 +704,7 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 	$label_width = _num(query_value($sql));
 
 	$sql = "SELECT *
-			FROM `_dialog_element`
+			FROM `_dialog_component`
 			WHERE `dialog_id`=".$dialog_id."
 			ORDER BY `sort`";
 	if($spisok = query_arr($sql)) {
@@ -596,24 +724,11 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 					$val = @$data[$r['col_name']];
 			}
 
+			$val = _dialogComponent_autoSelectPage($val, $r, $page_id);
+
 			$attr_id = 'elem'.$r['id'];
 			$width = $r['width'] ? _num($r['width']) : 250;
 			$inp = '<input type="hidden" id="'.$attr_id.'" value="'.$val.'" />';
-
-			$html .=
-				($edit ?
-					'<dd class="over1 curM prel" val="'.$r['id'].'">'.
-						'<div class="element-del icon icon-del'._tooltip('Удалить элемент', -53).'</div>'.
-						'<div class="element-edit icon icon-edit'._tooltip('Изменить', -29).'</div>'.
-						'<table class="bs5 w100p">'
-				: '').
-				'<tr><td class="label r'.($edit ? ' label-width pr5' : '').'" '.($type_id == 7 ? 'colspan="2"' : 'style="width:'.$label_width.'px"').'>'.
-						($r['label_name'] ? $r['label_name'].':' : '').
-						($r['require'] ? '<div class="dib red fs15 mtm2">*</div>' : '').
-						($r['hint'] ? ' <div class="icon icon-hint dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'"></div>' : '').
-				($type_id != 7 ?//если информация, то показ на всю шишину
-					'<td>'
-				: '');
 
 			switch($type_id) {
 				case 1://check
@@ -637,7 +752,7 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 
 					//получение названия колонки для связки
 					$sql = "SELECT `col_name`
-							FROM `_dialog_element`
+							FROM `_dialog_component`
 							WHERE `id`=".$r['param_num_2'];
 					$colName = query_value($sql);
 
@@ -651,7 +766,22 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 					break;
 			}
 
-			$html .= $inp.($edit ? '</table></dd>' : '');
+			$html .=
+				($edit ?
+					'<dd class="over1 curM prel" val="'.$r['id'].'">'.
+						'<div class="component-del icon icon-del'._tooltip('Удалить компонент', -59).'</div>'.
+						'<div class="component-edit icon icon-edit'._tooltip('Настроить', -32).'</div>'
+				: '').
+						'<table class="bs5 w100p">'.
+							'<tr><td class="label r'.($edit ? ' label-width pr5' : '').'" '.($type_id == 7 ? 'colspan="2"' : 'style="width:'.$label_width.'px"').'>'.
+									($r['label_name'] ? $r['label_name'].':' : '').
+									($r['require'] ? '<div class="dib red fs15 mtm2">*</div>' : '').
+									($r['hint'] ? ' <div class="icon icon-hint dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'"></div>' : '').
+				//если информация, то показ на всю ширину
+			   ($type_id != 7 ? '<td>' : '').
+									$inp.
+						'</table>'.
+		   ($edit ? '</dd>' : '');
 
 			$arr[] = array(
 				'id' => _num($r['id']),
@@ -676,13 +806,13 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 		}
 
 		$sql = "SELECT *
-				FROM `_dialog_element_v`
-				WHERE `element_id` IN ("._idsGet($spisok).")
+				FROM `_dialog_component_v`
+				WHERE `component_id` IN ("._idsGet($spisok).")
 				ORDER BY `sort`";
 		$element_v = array();
 		if($spisok = query_arr($sql)) {
 			foreach($spisok as $r) {
-				$element_v[$r['element_id']][] = array(
+				$element_v[$r['component_id']][] = array(
 					'id' => _num($r['id']),
 					'uid' => _num($r['id']),
 					'title' => utf8($r['v'])
@@ -697,7 +827,7 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 			if($r['type_id'] == 2 && $r['param_num_1'])
 				$arr[$n]['v'] = _dialogSpisokList($r['param_num_1'], $r['param_num_2']);
 			//массив объектов, которые могут быть списками
-			if($r['type_id'] == 2 && $r['param_bool_1'])
+			if($r['type_id'] == 2 && $r['param_bool_2'])
 				$arr[$n]['v'] = _dialogSpisokOn();
 		}
 	}
@@ -707,13 +837,41 @@ function _dialogElementSpisok($dialog_id, $i, $data=array()) {//список элементов
 
 	return $html;
 }
+function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страницы по умолчанию, если список добавляется на страницу, кнопка этого списка на данной странице
+	//выбранное значени не меняется
+	if($val)
+		return $val;
 
-function _dialogSpisokList($dialog_id, $element_id) {//массив списков (пока только для select)
+	//нет страницы - нет выбора
+	if(!$page_id)
+		return '';
+
+	if($r['type_id'] != 2 || !$r['param_bool_1'])
+		return '';
+
+	//элементы-кнопки: dialog_id=2
+	$sql = "SELECT CONCAT('\'button',id,'\'')
+			FROM `_page_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=2
+			  AND `page_id`=".$page_id;
+	if(!$but = query_ids($sql))
+		return '';
+
+	$sql = "SELECT `id`
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `val` IN (".$but.")
+			LIMIT 1";
+	return query_value($sql);
+}
+
+function _dialogSpisokList($dialog_id, $component_id) {//массив списков (пока только для select)
 	$dialog = _dialogQuery($dialog_id);
 
 	$sql = "SELECT `col_name`
-			FROM `_dialog_element`
-			WHERE `id`=".$element_id;
+			FROM `_dialog_component`
+			WHERE `id`=".$component_id;
 	if(!$colName = query_value($sql))
 		$colName = 'id';
 
@@ -744,23 +902,22 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 			jsonError('Запись была удалена');
 	}
 
-	//удаление элемента
+	//удаление элемента со страницы
 	if($dialog_id == 6)
-		return _dialogElementDel($unit_id);
+		return _pageElementDel($unit_id);
 
-	//проверка на корректность данных элементов диалога
-	$elem = $_POST['elem'];
+	//проверка на корректность данных компонентах диалога
+	if(!$elem = @$_POST['elem'])
+		jsonError('Нет данных для внесения');
 	if(!is_array($elem))
 		jsonError('Некорректный формат данных');
-	if(empty($elem))
-		jsonError('Нет данных для внесения');
 	foreach($elem as $id => $v)
 		if(!_num($id))
 			jsonError('Некорректный идентификатор поля');
 
-	//получение информации об элементах и составление списка для внесения в таблицу
+	//получение информации об компонентах диалога и составление списка для внесения в таблицу
 	$sql = "SELECT *
-			FROM `_dialog_element`
+			FROM `_dialog_component`
 			WHERE `dialog_id`=".$dialog_id;
 	$de = query_arr($sql);
 
@@ -838,7 +995,7 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 
 	return $unit_id;
 }
-function _dialogElementDel($unit_id) {//удаление элемента
+function _pageElementDel($unit_id) {//удаление элемента страницы
 	$sql = "DELETE FROM `_page_element`
 			WHERE `id`=".$unit_id;
 	query($sql);

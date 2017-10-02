@@ -99,12 +99,13 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		return array();
 
 	$sql = "SELECT *
-			FROM `_dialog_element`
-			WHERE `dialog_id`=".$dialog_id;
-	$r['element'] = query_arr($sql);
+			FROM `_dialog_component`
+			WHERE `dialog_id`=".$dialog_id."
+			ORDER BY `sort`";
+	$r['component'] = query_arr($sql);
 
 	$sql = "SELECT `id`,`v`
-			FROM `_dialog_element_v`
+			FROM `_dialog_component_v`
 			WHERE `dialog_id`=".$dialog_id;
 	$r['v_ass'] = query_ass($sql);
 
@@ -168,8 +169,8 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 function _dialogSpisokOn() {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$sql = "SELECT `id`,`spisok_name`
 			FROM `_dialog`
-			WHERE `app_id` IN (0,".APP_ID.")
-			  AND `sa` IN (0,".SA.")
+			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
+			  AND `sa` IN (0".(SA ? ",1" : '').")
 			  AND `spisok_on`
 			ORDER BY `id`";
 	return query_selArray($sql);

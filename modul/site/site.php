@@ -100,7 +100,6 @@ function _header() {
 			_header_hat();
 }
 function _header_hat() {//верхняя строка приложения-сайта
-	
 	return
 	'<div id="hat">'.
 		'<p>'.

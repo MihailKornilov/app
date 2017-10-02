@@ -259,6 +259,12 @@ function _pageSetupMenu() {//строка меню управления страницей
 	if(!$page = query_assoc($sql))
 		return '';
 
+	if($page['sa'] && !SA)
+		return '';
+
+	if(!$page['app_id'] && !SA)
+		return '';
+
 	return
 	'<div id="pas">'.
 		'<div class="p pad5">'.
