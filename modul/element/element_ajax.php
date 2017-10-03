@@ -123,121 +123,21 @@ switch(@$_POST['op']) {
 		$send['button_edit_cancel'] = utf8($dialog['button_edit_cancel']);
 		$send['menu'] = _selArray($menu);
 		$send['element'] = _dialogEl();
-		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr');
+		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr_edit');
 		$send['spisokOn'] = _dialogSpisokOn();
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
 		jsonSuccess($send);
 		break;
 	case 'dialog_add'://создание нового диалогового окна
-		if(!$head_insert = _txt($_POST['head_insert']))
-			jsonError('Не указано название диалога для новой записи');
-		if(!$button_insert_submit = _txt($_POST['button_insert_submit']))
-			jsonError('Не указан текст кнопки внесения');
-		if(!$button_insert_cancel = _txt($_POST['button_insert_cancel']))
-			jsonError('Не указан текст кнопки отмены для новой записи');
-
-		if(!$head_edit = _txt($_POST['head_edit']))
-			jsonError('Не указано название диалога редактирования');
-		if(!$button_edit_submit = _txt($_POST['button_edit_submit']))
-			jsonError('Не указан текст кнопки сохранения');
-		if(!$button_edit_cancel = _txt($_POST['button_edit_cancel']))
-			jsonError('Не указан текст кнопки отмены редактирования');
-
-		$menu_edit_last = _num($_POST['menu_edit_last']);
-		$sa = _bool($_POST['sa']);
-
-		_dialogComponentUpdate();
-
-		$sql = "INSERT INTO `_dialog` (
-					`sa`,
-					`head_insert`,
-					`button_insert_submit`,
-					`button_insert_cancel`,
-					`head_edit`,
-					`button_edit_submit`,
-					`button_edit_cancel`,
-					`menu_edit_last`
-				) VALUES (
-					".$sa.",
-					'".addslashes($head_insert)."',
-					'".addslashes($button_insert_submit)."',
-					'".addslashes($button_insert_cancel)."',
-					'".addslashes($head_edit)."',
-					'".addslashes($button_edit_submit)."',
-					'".addslashes($button_edit_cancel)."',
-					".$menu_edit_last."
-				)";
-		query($sql);
-
-		$dialog_id = query_insert_id('_dialog');
-
-		_dialogAppAnyUpdate($dialog_id);
-		_dialogComponentUpdate($dialog_id);
-
-		$send['dialog_id'] = $dialog_id;
+		$send['dialog_id'] = _dialogUpdate(0);
 		jsonSuccess($send);
 		break;
 	case 'dialog_edit'://сохранение диалогового окна
 		if(!$dialog_id = _num($_POST['dialog_id']))
 			jsonError('Некорректный ID диалогового окна');
 
-		if(!$head_insert = _txt($_POST['head_insert']))
-			jsonError('Не указано название диалога для новой записи');
-		if(!$button_insert_submit = _txt($_POST['button_insert_submit']))
-			jsonError('Не указан текст кнопки внесения');
-		if(!$button_insert_cancel = _txt($_POST['button_insert_cancel']))
-			jsonError('Не указан текст кнопки отмены для новой записи');
-
-		if(!$head_edit = _txt($_POST['head_edit']))
-			jsonError('Не указано название диалога редактирования');
-		if(!$button_edit_submit = _txt($_POST['button_edit_submit']))
-			jsonError('Не указан текст кнопки сохранения');
-		if(!$button_edit_cancel = _txt($_POST['button_edit_cancel']))
-			jsonError('Не указан текст кнопки отмены редактирования');
-
-		if(!$width = _num($_POST['width']))
-			jsonError('Некорректное значение ширины диалога');
-		if($width < 480 || $width > 900)
-			jsonError('Установлена недопустимая ширина диалога');
-		if(!$label_width = _num($_POST['label_width']))
-			jsonError('Некорректное значение ширины label');
-
-		$base_table = _txt($_POST['base_table']);
-		$menu_edit_last = _num($_POST['menu_edit_last']);
-		$sa = _bool($_POST['sa']);
-
-		$spisok_on = _bool($_POST['spisok_on']);
-		$spisok_name = _txt($_POST['spisok_name']);
-		if($spisok_on && !$spisok_name)
-			jsonError('Укажите имя списка страницы');
-
-		_dialogComponentUpdate();
-
-		if(!_dialogQuery($dialog_id))
-			jsonError('Диалога не существует');
-
-		$sql = "UPDATE `_dialog`
-				SET `sa`=".$sa.",
-					`width`=".$width.",
-					`label_width`=".$label_width.",
-					`head_insert`='".addslashes($head_insert)."',
-					`button_insert_submit`='".addslashes($button_insert_submit)."',
-					`button_insert_cancel`='".addslashes($button_insert_cancel)."',
-					`head_edit`='".addslashes($head_edit)."',
-					`button_edit_submit`='".addslashes($button_edit_submit)."',
-					`button_edit_cancel`='".addslashes($button_edit_cancel)."',
-					`base_table`='".addslashes($base_table)."',
-					`spisok_on`=".$spisok_on.",
-					`spisok_name`='".addslashes($spisok_name)."',
-					`menu_edit_last`=".$menu_edit_last."
-				WHERE `id`=".$dialog_id;
-		query($sql);
-
-		_dialogAppAnyUpdate($dialog_id);
-		_dialogComponentUpdate($dialog_id);
-
-		$send['dialog_id'] = $dialog_id;
+		$send['dialog_id'] = _dialogUpdate($dialog_id);
 		jsonSuccess($send);
 		break;
 
@@ -390,6 +290,80 @@ switch(@$_POST['op']) {
 		break;
 }
 
+function _dialogUpdate($dialog_id) {//обновление диалога
+	if(!$head_insert = _txt($_POST['head_insert']))
+		jsonError('Не указано название диалога для новой записи');
+	if(!$button_insert_submit = _txt($_POST['button_insert_submit']))
+		jsonError('Не указан текст кнопки внесения');
+	if(!$button_insert_cancel = _txt($_POST['button_insert_cancel']))
+		jsonError('Не указан текст кнопки отмены для новой записи');
+
+	if(!$head_edit = _txt($_POST['head_edit']))
+		jsonError('Не указано название диалога редактирования');
+	if(!$button_edit_submit = _txt($_POST['button_edit_submit']))
+		jsonError('Не указан текст кнопки сохранения');
+	if(!$button_edit_cancel = _txt($_POST['button_edit_cancel']))
+		jsonError('Не указан текст кнопки отмены редактирования');
+
+	if(!$width = _num($_POST['width']))
+		jsonError('Некорректное значение ширины диалога');
+	if($width < 480 || $width > 900)
+		jsonError('Установлена недопустимая ширина диалога');
+	if(!$label_width = _num($_POST['label_width']))
+		jsonError('Некорректное значение ширины label');
+
+	$base_table = _txt($_POST['base_table']);
+	$menu_edit_last = _num($_POST['menu_edit_last']);
+	$sa = _bool($_POST['sa']);
+
+	$spisok_on = _bool($_POST['spisok_on']);
+	$spisok_name = _txt($_POST['spisok_name']);
+	if($spisok_on && !$spisok_name)
+		jsonError('Укажите имя списка страницы');
+
+	$app_any = _num($_POST['app_any']);
+
+	_dialogComponentUpdate();
+
+	if(!$dialog_id) {
+		$sql = "INSERT INTO `_dialog` (
+					`app_id`
+				) VALUES (
+					".APP_ID."
+				)";
+		query($sql);
+		$dialog_id = query_insert_id('_dialog');
+	}
+
+	if(!_dialogQuery($dialog_id))
+		jsonError('Диалога не существует');
+
+	$sql = "UPDATE `_dialog`
+			SET `app_id`=".($app_any ? 0 : APP_ID).",
+				`sa`=".$sa.",
+				`width`=".$width.",
+				`label_width`=".$label_width.",
+
+				`head_insert`='".addslashes($head_insert)."',
+				`button_insert_submit`='".addslashes($button_insert_submit)."',
+				`button_insert_cancel`='".addslashes($button_insert_cancel)."',
+
+				`head_edit`='".addslashes($head_edit)."',
+				`button_edit_submit`='".addslashes($button_edit_submit)."',
+				`button_edit_cancel`='".addslashes($button_edit_cancel)."',
+
+				`base_table`='".addslashes($base_table)."',
+				`spisok_on`=".$spisok_on.",
+				`spisok_name`='".addslashes($spisok_name)."',
+				`menu_edit_last`=".$menu_edit_last."
+			WHERE `id`=".$dialog_id;
+	query($sql);
+
+	_dialogComponentUpdate($dialog_id);
+
+	return $dialog_id;
+}
+
 
 function _dialogEl() {//данные всех элементов, используемых в диалоге
 	define('EL_LABEL_W', 'w150');//ширина для всех label
@@ -415,7 +389,7 @@ function _dialogEl() {//данные всех элементов, используемых в диалоге
 		8 => 'element-connect'
 	);
 	$html = array(
-		1 => /*
+		1 => /* *** галочка ***
 				param_txt_1 - текст для галочки
             */
 			_dialogElHtmlContent().
@@ -425,7 +399,7 @@ function _dialogEl() {//данные всех элементов, используемых в диалоге
 			'</table>'.
 			_dialogElHtmlPrev(),
 
-		2 => /*
+		2 => /* *** выпадающий список ***
 				param_bool_1 - использовать или нет нулевое значение
                 param_txt_1  - текст нулевого значения
                 param_bool_2 - использование всех списков при выборе
@@ -446,9 +420,33 @@ function _dialogEl() {//данные всех элементов, используемых в диалоге
 			'</div>'.
 			_dialogElHtmlPrev(),
 
-		3 => '',
-		4 => '',
-		5 => '',
+		3 => /* *** Однострочный текст ***
+				param_txt_1 - текст для placeholder
+             */
+			_dialogElHtmlContent(1).
+			'<table class="bs5 mt5">'.
+				'<tr><td class="label r '.EL_LABEL_W.'">Подсказка в поле:'.
+					'<td><input type="text" class="w300" id="param_txt_1" />'.
+			'</table>'.
+			_dialogElHtmlPrev('<input type="text" id="elem-attr-id" class="w250" />'),
+
+		4 => /* *** Многострочный текст ***
+				param_txt_1 - текст для placeholder
+             */
+			_dialogElHtmlContent(1).
+			'<table class="bs5 mt5">'.
+				'<tr><td class="label r '.EL_LABEL_W.'">Подсказка в поле:'.
+					'<td><input type="text" class="w300" id="param_txt_1" />'.
+			'</table>'.
+			_dialogElHtmlPrev('<textarea id="elem-attr-id" class="w250"></textarea>'),
+
+		5 => /* *** Радио ***
+				param_txt_1 - текст для placeholder
+             */
+			_dialogElHtmlContent(1).
+			'<div class="hd2 ml20 mr20" id="radio-cont">Содержание:</div>'.
+			_dialogElHtmlPrev(),
+
 		6 => '',
 		7 => '',
 		8 => ''
@@ -496,8 +494,8 @@ function _dialogElHtmlContent($req=0) {//основное содержимое
 : '').
 
 	'<table class="bs5">'.
-		'<tr><td class="'.EL_LABEL_W.' label r topi">Текст подсказки:'.
-			'<td><textarea id="label-hint" class="w250"></textarea>'.
+		'<tr><td class="'.EL_LABEL_W.' label r topi">Текст выплывающей<br />подсказки:'.
+			'<td><textarea id="label-hint" class="w300"></textarea>'.
 	'</table>';
 }
 function _dialogElHtmlPrev($inp='<input type="hidden" id="elem-attr-id" />') {//предварительный просмотр
@@ -513,14 +511,6 @@ function _dialogElHtmlPrev($inp='<input type="hidden" id="elem-attr-id" />') {//
 
 
 
-function _dialogAppAnyUpdate($dialog_id) {//обновление значения диалога для возможности видимости во всех приложениях
-	$app_any = _num($_POST['app_any']);
-
-	$sql = "UPDATE `_dialog`
-			SET `app_id`=".($app_any ? 0 : APP_ID)."
-			WHERE `id`=".$dialog_id;
-	query($sql);
-}
 function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диалога
 	if(!$arr = @$_POST['component'])
 		jsonError('Отсутствуют компоненты диалога');
@@ -529,9 +519,42 @@ function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диа
 
 	foreach($arr as $r) {
 		if(!$type_id = _num($r['type_id']))
-			jsonError('Некорректный тип элемента');
-		if($type_id == 5 && empty($r['v']))
-			jsonError('Отсутствуют значения элемента Radio');
+			jsonError('Некорректный тип компонента');
+
+		$component_id = _num($r['id']);
+
+		//проверка на ошибки всех видов компонентов диалога
+		switch($type_id) {
+			case 1://check
+				if(!_txt($r['label_name']) && !_txt($r['param_txt_1']))
+					jsonError('Укажите название поля,<br />либо текст для галочки');
+				break;
+			case 2://select
+				if($dialog_id)
+					if(_num($r['param_bool_2']) || _num($r['param_num_1'])) {
+						$sql = "DELETE FROM `_dialog_component_v`
+								WHERE `component_id`=".$component_id;
+						query($sql);
+						$r['v'] = array();
+					}
+				break;
+			case 3://text
+				break;
+			case 4://textarea
+				break;
+			case 5://radio
+				if(empty($r['v']))
+					jsonError('Отсутствуют значения элемента Radio');
+				break;
+			case 6://календарь
+				break;
+			case 7://info
+				break;
+			case 8://connect
+				break;
+			default:
+				jsonError('Несуществующий тип компонента');
+		}
 	}
 
 	//первый запуск - тестирование
@@ -662,16 +685,19 @@ function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диа
 						`dialog_id`,
 						`component_id`,
 						`v`,
+						`def`,
 						`sort`
 					) VALUES (
 						"._num(@$v['id']).",
 						".$dialog_id.",
 						".$component_id.",
 						'".addslashes(_txt($v['title']))."',
+						"._bool($v['def']).",
 						".($sort_v++)."
 					)
 					ON DUPLICATE KEY UPDATE
-						`v`=VALUES(`v`)";
+						`v`=VALUES(`v`),
+						`def`=VALUES(`def`)";
 			query($sql);
 		}
 	}
@@ -696,7 +722,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 
 	$arr = array();
 	$html = '';
-	$edit = $i == 'html_edit';//редактирование + сортировка значений
+	$edit = $i == 'html_edit' || $i == 'arr_edit';//редактирование + сортировка значений
 
 	$sql = "SELECT `label_width`
 			FROM `_dialog`
@@ -725,6 +751,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 			}
 
 			$val = _dialogComponent_autoSelectPage($val, $r, $page_id);
+			$val = _dialogComponent_defSet($val, $r, $data);
 
 			$attr_id = 'elem'.$r['id'];
 			$width = $r['width'] ? _num($r['width']) : 250;
@@ -815,7 +842,8 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 				$element_v[$r['component_id']][] = array(
 					'id' => _num($r['id']),
 					'uid' => _num($r['id']),
-					'title' => utf8($r['v'])
+					'title' => utf8($r['v']),
+					'def' => _bool($r['def'])
 				);
 			}
 		}
@@ -827,7 +855,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 			if($r['type_id'] == 2 && $r['param_num_1'])
 				$arr[$n]['v'] = _dialogSpisokList($r['param_num_1'], $r['param_num_2']);
 			//массив объектов, которые могут быть списками
-			if($r['type_id'] == 2 && $r['param_bool_2'])
+			if($r['type_id'] == 2 && $r['param_bool_2'] && !$edit)
 				$arr[$n]['v'] = _dialogSpisokOn();
 		}
 	}
@@ -835,10 +863,13 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 	if($i == 'arr')
 		return $arr;
 
+	if($i == 'arr_edit')
+		return $arr;
+
 	return $html;
 }
 function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страницы по умолчанию, если список добавляется на страницу, кнопка этого списка на данной странице
-	//выбранное значени не меняется
+	//выбранное значениe не меняется
 	if($val)
 		return $val;
 
@@ -863,6 +894,31 @@ function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страни
 			WHERE `app_id`=".APP_ID."
 			  AND `val` IN (".$but.")
 			LIMIT 1";
+	return query_value($sql);
+}
+function _dialogComponent_defSet($val, $r, $data) {//установка значения по умолчанию в select
+	//выбранное значениe не меняется
+	if($val)
+		return $val;
+
+	//если редактирование диалога, то не устанавливается
+	if(!empty($data))
+		return $val;
+
+	//все элементы списка - умолчания нет
+	if($r['type_id'] != 2 && !$r['param_bool_2'])
+		return $val;
+
+	//выбор конкретного элемента - умолчания нет
+	if($r['type_id'] != 2 && !$r['param_num_1'])
+		return $val;
+
+	$sql = "SELECT *
+			FROM `_dialog_component_v`
+			WHERE `component_id`=".$r['id']."
+			  AND `def`
+			LIMIT 1";
+
 	return query_value($sql);
 }
 

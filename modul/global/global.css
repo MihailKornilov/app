@@ -14,7 +14,8 @@ input,textarea{
 	border-radius:1px;
 	outline:none;
 }
-input[type="text"]:disabled{color:#ccc;background:#f5f5f5}
+input[type="text"]:disabled,
+textarea:disabled{color:#ccc;background:#f5f5f5}
 input::-webkit-input-placeholder{color:#bbb}
 input::-moz-placeholder{color:#999}
 input.oplata{font:bold 13px Tahoma;width:60px;padding:4px}

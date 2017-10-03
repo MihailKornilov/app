@@ -101,8 +101,6 @@ function _page_show($page_id) {//отображение содержания страницы
 						$spDialog = _dialogQuery($dialog_id);
 						$spElement = $spDialog['component']; //элементы списка
 						$spTable = $spDialog['base_table'];
-//						$sa =
-//						print_r($spDialog);
 
 						//получение данных списка
 						$sql = "SELECT *

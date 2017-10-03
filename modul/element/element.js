@@ -520,24 +520,6 @@ var VK_SCROLL = 0,
 		}
 		function elementHtml() {//вставка основных данных в таблицу для конкретного элемента
 			switch(TYPE_ID) {
-				case 3:
-					name = 'Однострочный текст';
-					main =
-						'<tr><td class="label r">Комментарий:' +
-							'<td><input type="text" class="w250" id="param_txt_1" value="' + CMP.param_txt_1 + '" />';
-					prev = '<input type="text" id="elem-attr-id" class="w250" />';
-					break;
-				case 4:
-					name = 'Многострочный текст';
-					main =
-						'<tr><td class="label r">Комментарий:' +
-							'<td><input type="text" class="w250" id="param_txt_1" value="' + CMP.param_txt_1 + '" />';
-					prev = '<textarea id="elem-attr-id" class="w250"></textarea>';
-					break;
-				case 5:
-					name = 'Радио';
-					prev = '<input type="hidden" id="elem-attr-id" />';
-					break;
 				case 6:
 					name = 'Календарь';
 					main =
@@ -628,6 +610,10 @@ var VK_SCROLL = 0,
 							elPrevAction();
 						}
 					});
+					if(CMP.id)
+						$('#param_bool_1')
+							._check(CMP.param_bool_1)
+							._check('func');
 					$('#param_txt_1').keyup(elPrevAction);
 
 					var em = $('#elem-select-but'),
@@ -641,10 +627,15 @@ var VK_SCROLL = 0,
 						});
 					};
 					but1.click(function() {
+						$('#param_bool_1')._check('enable');
 						em.addClass('dn');
 						elementVal(elPrevAction, em);
 					});
 					but2.click(function() {
+						$('#param_bool_1')
+							._check(1)
+							._check('func')
+							._check('disable');
 						CMP.v = [];
 						em.addClass('dn');
 						em.after(
@@ -661,6 +652,10 @@ var VK_SCROLL = 0,
 					});
 					but3.click(function() {
 						CMP.v = [];
+						$('#param_bool_1')
+							._check(1)
+							._check('func')
+							._check('disable');
 						em.addClass('dn');
 						em.after(elementObjectSelect(CMP, 'Выбор элемента конкретного объекта-списка.' +
 														  '<br />' +
@@ -670,12 +665,12 @@ var VK_SCROLL = 0,
 						elementObjectSelect(CMP);
 					});
 
-					if(_num(CMP.param_bool_2)) {
+					if(_num(CMP.param_bool_2))//все списки
 						but2.trigger('click');
-					} else if(_num(CMP.param_num_1)) {
+					else if(_num(CMP.param_num_1)) {//выбор элемента списка
 						but3.trigger('click');
 						elPrevAction();
-					} else if(CMP.v.length)
+					} else if(CMP.v.length)//произвольные значения
 						but1.trigger('click');
 					break;
 				}
@@ -710,7 +705,7 @@ var VK_SCROLL = 0,
 							light:1,
 							spisok:EL_VAL_ASS
 						});
-					}, 1);
+					}, $('#radio-cont'));
 					break;
 				}
 				case 6: /* календарь */ {
@@ -956,12 +951,17 @@ var VK_SCROLL = 0,
 					}
 					break;
 				case 2://select
+					if(elem.param_bool_1 && !elem.param_txt_1) {
+						dialog.err('Не указан текст нулевого значения');
+						$('#param_txt_1').focus();
+						return;
+					}
 					break;
 				case 3://text
-					inp = '<input type="text" id="' + attr_id + '" class="w250" placeholder="' + elem.param_txt_1 +'" />';
+					inp = '<input type="text" id="' + attr_id + '" style="width:' + elem.width + 'px" placeholder="' + elem.param_txt_1 +'" />';
 					break;
 				case 4://textarea
-					inp = '<textarea id="' + attr_id + '" class="w250" placeholder="' + elem.param_txt_1 + '"></textarea>';
+					inp = '<textarea id="' + attr_id + '" style="width:' + elem.width + 'px" placeholder="' + elem.param_txt_1 + '"></textarea>';
 					break;
 				case 5://radio
 					break;
@@ -1024,14 +1024,6 @@ var VK_SCROLL = 0,
 
 /*			//применение скриптов
 			switch(TYPE_ID) {
-				case 3://text
-					break;
-				case 4://textarea
-					$('#' + attr_id)
-						.autosize()
-						.parent().parent()
-						.find('.label').addClass('topi');
-					break;
 				case 5://radio
 					$('#' + attr_id)
 						._radio({
@@ -1110,55 +1102,6 @@ var VK_SCROLL = 0,
 			_dialogComponentScript(ch, isEdit);
 			continue;
 
-			if(ch.type_id == 3) {//input
-				if(isEdit)
-					$(ch.attr_id)
-						.attr('readonly', true)
-						.resizable({
-							minWidth:50,
-							maxWidth:350,
-							grid:10,
-							handles:'e',
-							stop:function(event, ui) {
-								var id = _num(ui.originalElement[0].id.split('elem')[1]);
-								for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-									var sp = DIALOG_COMPONENT[n];
-									if(sp.id == id) {
-										sp.width = ui.size.width - 18;
-										break;
-									}
-								}
-							}
-						});
-				continue;
-			}
-			if(ch.type_id == 4) {//textarea
-				$(ch.attr_id)
-					.parent().parent()
-					.find('.label').addClass('topi');
-				if(isEdit)
-					$(ch.attr_id)
-						.attr('readonly', true)
-						.resizable({
-							minWidth:50,
-							maxWidth:350,
-							grid:10,
-							handles:'e',
-							stop:function(event, ui) {
-								var id = _num(ui.originalElement[0].id.split('elem')[1]);
-								for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-									var sp = DIALOG_COMPONENT[n];
-									if(sp.id == id) {
-										sp.width = ui.size.width - 18;
-										break;
-									}
-								}
-							}
-						});
-				else
-					$(ch.attr_id).autosize();
-				continue;
-			}
 			if(ch.type_id == 5) {//radio
 				$(ch.attr_id)
 					._radio({
@@ -1191,7 +1134,7 @@ var VK_SCROLL = 0,
 			case 2: /* select */ {
 				$(ch.attr_id)._select({
 					width:ch.width,
-					title0:ch.param_txt_1,
+					title0:ch.param_bool_1 ? ch.param_txt_1 : '',
 					spisok:ch.v
 				});
 				if(isEdit) {
@@ -1216,10 +1159,53 @@ var VK_SCROLL = 0,
 				}
 				break;
 			}
-			case 3: /* */ {
+			case 3: /* input */ {
+				if(isEdit)
+					$(ch.attr_id)
+						.attr('disabled', true)
+						.resizable({
+							minWidth:50,
+							maxWidth:350,
+							grid:10,
+							handles:'e',
+							stop:function(event, ui) {
+								var id = _num(ui.originalElement[0].id.split('elem')[1]);
+								for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
+									var sp = DIALOG_COMPONENT[n];
+									if(sp.id == id) {
+										sp.width = ui.size.width - 18;
+										break;
+									}
+								}
+							}
+						});
 				break;
 			}
-			case 4: /* */ {
+			case 4: /* textarea */ {
+				$(ch.attr_id)
+					.parent().parent()
+					.find('.label').addClass('topi');
+				if(isEdit)
+					$(ch.attr_id)
+						.attr('disabled', true)
+						.resizable({
+							minWidth:50,
+							maxWidth:350,
+							grid:10,
+							handles:'e',
+							stop:function(event, ui) {
+								var id = _num(ui.originalElement[0].id.split('elem')[1]);
+								for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
+									var sp = DIALOG_COMPONENT[n];
+									if(sp.id == id) {
+										sp.width = ui.size.width - 18;
+										break;
+									}
+								}
+							}
+						});
+				else
+					$(ch.attr_id).autosize();
 				break;
 			}
 			case 5: /* */ {
@@ -1325,6 +1311,16 @@ $.fn._check = function(o) {
 			s = window[win];
 			s.value(o ? 1 : 0);
 			return t;
+		case 'string':
+			s = window[win];
+			if(o == 'disable')
+				s.dis();
+			if(o == 'enable')
+				s.enab();
+			if(o == 'func')
+				s.funcGo();
+			return t;
+			break;
 	}
 
 	t.next().remove('._check');
@@ -1352,29 +1348,20 @@ $.fn._check = function(o) {
 	t.val(val).after(html);
 	var CHECK = $('#' + win);
 
-	if(!o.disabled) {
-		if(o.tooltip)
-			CHECK._tooltip(o.tooltip);
-		CHECK.click(function() {
-			var v = $(this).hasClass('on') ? 0 : 1;
-			setVal(v);
-			o.func(v, attr_id);
-		});
-	}
 
-/*
-	_click(o.func);
+	CHECK.click(function() {
+		var tt = $(this);
 
-	function _click(func) {
-		if($('#' + win).hasClass('disabled'))
+		if(tt.hasClass('disabled'))
 			return;
-		$(document).on('click', '#' + win, function() {
-			func(parseInt(t.val()), attr_id);
-		});
-	}
 
-*/
+		var v = tt.hasClass('on') ? 0 : 1;
+		setVal(v);
+		o.func(v, attr_id);
+	});
 
+	if(o.tooltip)
+		CHECK._tooltip(o.tooltip);
 
 	function setVal(v) {
 		CHECK[(v ? 'add' : 'remove') + 'Class']('on');
@@ -1382,6 +1369,15 @@ $.fn._check = function(o) {
 	}
 
 	t.value = setVal;
+	t.funcGo = function() {//применение фукнции
+		o.func(_num(t.val()), attr_id);
+	};
+	t.dis = function() {//перевод галочки в неактивное состояние
+		CHECK.addClass('disabled');
+	};
+	t.enab = function() {//перевод галочки в активное состояние
+		CHECK.removeClass('disabled');
+	};
 	window[win] = t;
 	return t;
 };
