@@ -1069,99 +1069,154 @@ var VK_SCROLL = 0,
 			type_id:0
 		}, CMP);
 
-		var func = $.extend({
-			action_id:0,
-			cond_id:0,
-			ids:0
-		}, COMPONENT_FUNC[CMP.id] ? COMPONENT_FUNC[CMP.id][0] : {});
-
-		var TYPE_ID = CMP.type_id,//выбранный элемент
-			html =
-				'<div class="hd1">Компонент <b class="fs15">...</b></div>' +
-				'<div class="hd2 ml20 mr20">Функция 1:</div>' +
-				'<table class="bs5 mt10">' +
-					'<tr><td class="label r w125">Действие:' +
-						'<td><input type="hidden" id="elem-func-act" value="' + func.action_id + '" />' +
-					'<tr><td class="label r topi">Условие:' +
-						'<td><input type="hidden" id="elem-func-cond" value="' + func.cond_id + '" />' +
-					'<tr><td class="label r">Компоненты:' +
-						'<td><input type="hidden" id="elem-func-ids" value="' + func.ids + '" />' +
-				'</table>',
-			dialog = _dialog({
+		var dialog = _dialog({
 				width:500,
 				top:30,
 				padding:0,
 				color:'orange',
 				head:'Функции компонента диалога',
-				content:html,
+				content:
+					'<div class="hd1">Компонент <b class="fs15">...</b></div>' +
+					'<div id="cmp-func-add" class="center over1 mar20 pad10 curP b">Новая функция</div>',
 				butSubmit:'Сохранить',
 				submit:submit
-			});
+			}),
+			FC = COMPONENT_FUNC[CMP.id],
+			NUM = 1,
+			COND_SHOW = {//показывать или нет условие на основании действия
+				0:0,
+				1:1,
+				2:1,
+				3:0,
+				4:0
+			};
 
-		$('#elem-func-act')._select({
-			width:250,
-			title0:'не выбрано',
-			spisok:[
-				{uid:1,title:'Скрыть'},
-				{uid:2,title:'Показать'},
-				{uid:3,title:'Скрыть=0 / Показать=1',
-					content:'Скрыть=0 / Показать=1' +
-							'<div class="grey fs12">Скрывать при нулевом значении</div>' +
-							'<div class="grey fs12">Показывать при ненулевом</div>'
-				},
-				{uid:4,title:'Скрыть=1 / Показать=0',
-					content:'Скрыть=1 / Показать=0' +
-							'<div class="grey fs12">Скрывать при ненулевом значении</div>' +
-							'<div class="grey fs12">Показывать при нулевом</div>'
-				}
-			]
-		});
+		cmpFuncHtml();
+		$('#cmp-func-add').click(cmpFuncUnit);
 
-		$('#elem-func-cond')._radio({
-			title0:'без условий',
-			light:1,
-			spisok:[
-				{uid:1,title:'при нулевом значении'},
-				{uid:2,title:'при ненулевом значении'}
-			]
-		});
+		function cmpFuncHtml() {//вывод списка функций компонента
+			if(!FC)
+				return '';
 
-		var spisok = [];
-		for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-			var sp = DIALOG_COMPONENT[n];
-			if(sp.id == CMP.id)
-				continue;
-			spisok.push({
-				uid:sp.id,
-				title:sp.label_name
-			});
+			var html = '';
+			for(var n = 0; n < FC.length; n++) {
+				var sp = FC[n];
+				html += cmpFuncUnit(sp);
+			}
+			return html;
 		}
+		function cmpFuncUnit(v) {//формирование одной фукнции
+			v = $.extend({
+				action_id:0,
+				cond_id:0,
+				ids:0
+			}, v);
+			var html =
+				'<div class="cmp-func bor-e8 bg-gr2 mar20 pad10 pt1" val="' + NUM + '">' +
+					'<div class="hd2">' +
+						'Функция ' + NUM + ':' +
+						'<div class="icon icon-del fr" id="cmp-func-del' + NUM + '"></div>' +
+					'</div>' +
+					'<table class="bs5 mt10 w100p" id="act-tab' + NUM + '">' +
+						'<tr><td class="label r w100">Действие:' +
+							'<td><input type="hidden" id="cmp-func-act' + NUM + '" value="' + v.action_id + '" />' +
+					'</table>' +
+					'<table class="bs5' + (COND_SHOW[v.action_id] ? '' : ' dn') + '" id="cond-tab' + NUM + '">' +
+						'<tr><td class="label r w100 topi">Условие:' +
+							'<td><input type="hidden" id="cmp-func-cond' + NUM + '" value="' + v.cond_id + '" />' +
+					'</table>' +
+					'<table class="bs5 w100p" id="cmp-tab' + NUM + '">' +
+						'<tr><td class="label r w100 topi">Компоненты:' +
+							'<td><input type="hidden" id="cmp-func-ids' + NUM + '" value="' + v.ids + '" />' +
+					'</table>' +
+				'</div>';
+			$('#cmp-func-add').before(html);
 
-		$('#elem-func-ids')._select({
-			width:300,
-			title0:'не выбраны',
-			multiselect:1,
-			spisok:spisok
-		});
+			$('#cmp-func-del' + NUM)
+				._tooltip('Удалить функцию ' + NUM)
+				.click(function() {
+					$(this).parent().parent().remove();
+				});
 
+			$('#cmp-func-act' + NUM)._select({
+				width:250,
+				title0:'не выбрано',
+				spisok:[
+					{uid:1,title:'Скрыть'},
+					{uid:2,title:'Показать'},
+					{uid:3,title:'Скрыть=0 / Показать=1',
+						content:'Скрыть=0 / Показать=1' +
+								'<div class="grey fs12">Скрывать при нулевом значении</div>' +
+								'<div class="grey fs12">Показывать при ненулевом</div>'
+					},
+					{uid:4,title:'Скрыть=1 / Показать=0',
+						content:'Скрыть=1 / Показать=0' +
+								'<div class="grey fs12">Скрывать при ненулевом значении</div>' +
+								'<div class="grey fs12">Показывать при нулевом</div>'
+					}
+				],
+				func:function(v, attr_id) {
+					var num = attr_id.split('act')[1];
+					$('#cond-tab' + num)._dn(COND_SHOW[v]);
+				}
+			});
+
+			$('#cmp-func-cond' + NUM)._radio({
+				title0:'без условий',
+				light:1,
+				spisok:[
+					{uid:1,title:'при нулевом значении'},
+					{uid:2,title:'при ненулевом значении'}
+				]
+			});
+
+			var spisok = [];
+			for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
+				var sp = DIALOG_COMPONENT[n];
+				if(sp.id == CMP.id)
+					continue;
+				spisok.push({
+					uid:sp.id,
+					title:sp.label_name
+				});
+			}
+
+			$('#cmp-func-ids' + NUM)._select({
+				width:300,
+				title0:'не выбраны',
+				multiselect:1,
+				spisok:spisok
+			});
+
+			NUM++;
+		}
 		function submit() {
 			var arr = [],
-				func = {
-					action_id:_num($('#elem-func-act').val()),
-					cond_id:$('#elem-func-cond').val(),
-					ids:$('#elem-func-ids').val()
-				};
+				func = $('.cmp-func');
 
-			if(!func.action_id) {
-				dialog.err('Не выбрано действие');
-				return;
-			}
-			if(func.ids == 0) {
-				dialog.err('Не выбраны компоненты');
-				return;
+			for(var n = 0; n < func.length; n++) {
+				var sp = func.eq(n),
+					num = sp.attr('val'),
+					f = {
+						action_id:_num($('#cmp-func-act' + num).val()),
+						cond_id:$('#cmp-func-cond' + num).val(),
+						ids:$('#cmp-func-ids' + num).val()
+					};
+
+				if(!f.action_id) {
+					$('#act-tab' + num)._flash({color:'red'});
+					dialog.err('Не выбрано действие в функции ' + num);
+					return;
+				}
+				if(f.ids == 0) {
+					$('#cmp-tab' + num)._flash({color:'red'});
+					dialog.err('Не выбраны компоненты в функции ' + num);
+					return;
+				}
+
+				arr.push(f);
 			}
 
-			arr.push(func);
 			COMPONENT_FUNC[CMP.id] = arr;
 			dialog.close();
 		}
@@ -2505,6 +2560,8 @@ $.fn._tooltip = function(msg, left, ugolSide) {
 		left = Math.ceil(ttdiv.width() / 2) - 8;
 		ttdiv.css('left', '-' + left + 'px');
 	}
+
+	return t;
 };
 $.fn._calendar = function(o) {
 	var t = $(this),

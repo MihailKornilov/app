@@ -367,20 +367,30 @@ $.fn.keyEnter = function(func) {
 	return $(this);
 };
 $.fn._flash = function(o) {//вспышка и затухание элемента в списке
-	var t = $(this);
+	var t = $(this),
+		w = t.width(),
+		h = t.height(),
+		mt = t.css('margin-top');
 
 	o = $.extend({
 		color:'orange'
 	}, o);
-	
-	t.css('position', 'relative')
-	 .append('<div id="unit-flash" class="' + o.color + '"></div>')
-	 .find('div:last')
+
+	t.before('<div id="unit-flash" class="' + o.color + '"><div></div></div>')
+	 .prev().find('div')
+	 .width(w)
+	 .height(h)
+	 .css('top', mt)
 	 .animate({opacity:.7}, 100)
 	 .animate({opacity:0}, 600, function() {
-		$(this).remove();
+		$(this).parent().remove();
 	 });
 
+	return t;
+};
+$.fn._dn = function(v) {//скрытие/показ элемента
+	var t = $(this);
+	t[(v ? 'remove' : 'add') + 'Class']('dn');
 	return t;
 };
 

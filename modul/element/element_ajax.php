@@ -911,8 +911,8 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 				($edit ?
 					'<dd class="over1 curM prel" val="'.$r['id'].'">'.
 						'<div class="component-del icon icon-del'._tooltip('Удалить компонент', -59).'</div>'.
-						'<div class="component-edit icon icon-edit'._tooltip('Настроить', -32).'</div>'.
-						'<div class="component-func icon icon-zp'._tooltip('Применить функцию', -63).'</div>'
+						'<div class="component-edit icon icon-edit'._tooltip('Настроить компонент', -66).'</div>'.
+						'<div class="component-func icon icon-zp'._tooltip('Настроить функции', -61).'</div>'
 				: '').
 						'<div id="delem'.$r['id'].'">'.
 							'<table class="bs5 w100p">'.

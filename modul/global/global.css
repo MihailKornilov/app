@@ -246,19 +246,17 @@ button.vk.edit:hover{background-color:#D59553}
 
 /* вспышка и затухание элемента в списке */
 #unit-flash{
+	position:relative;
+	display:block;
+	height:0;
+}
+#unit-flash div{
 	position:absolute;
-	width:100%;
-	height:100%;
-	top:0;
 	left:0;
 	background:#FFD782;
 	opacity:0;
 }
-#unit-flash.red{background:#fcc}
-
-
-
-
+#unit-flash.red div{background:#fcc}
 
 
 
