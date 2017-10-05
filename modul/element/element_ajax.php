@@ -124,6 +124,7 @@ switch(@$_POST['op']) {
 		$send['menu'] = _selArray($menu);
 		$send['element'] = _dialogEl();
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr_edit');
+		$send['func'] = _dialogFuncSpisok($dialog_id);
 		$send['spisokOn'] = _dialogSpisokOn();
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
@@ -201,6 +202,7 @@ switch(@$_POST['op']) {
 		$send['button_edit_submit'] = utf8($dialog['button_edit_submit']);
 		$send['button_edit_cancel'] = utf8($dialog['button_edit_cancel']);
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr');
+		$send['func'] = _dialogFuncSpisok($dialog_id);
 		$send['html'] = utf8($html);
 		jsonSuccess($send);
 		break;
@@ -360,14 +362,68 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	query($sql);
 
 	_dialogComponentUpdate($dialog_id);
+	_dialogFuncUpdate($dialog_id);
 
 	return $dialog_id;
 }
+function _dialogFuncUpdate($dialog_id) {//обновление функций компонентов диалога
+	$sql = "DELETE FROM `_dialog_component_func`
+			WHERE `dialog_id`=".$dialog_id;
+	query($sql);
 
+	if(!$func = @$_POST['func'])
+		return;
+
+	$insert = array();
+	foreach($func as $component_id => $arr)
+		foreach($arr as $k => $r) {
+			$insert[] = "(
+				".$dialog_id.",
+				".$component_id.",
+				".$r['action_id'].",
+				".$r['cond_id'].",
+				'".addslashes($r['ids'])."'
+			)";
+		}
+
+	$sql = "INSERT INTO `_dialog_component_func` (
+				`dialog_id`,
+				`component_id`,
+				`action_id`,
+				`cond_id`,
+				`component_ids`
+			) VALUES ".implode(',', $insert);
+	query($sql);
+}
+function _dialogFuncSpisok($dialog_id) {//получение данных фукнциий компонентов диалога
+	if(!$dialog_id)
+		return array();
+
+	$sql = "SELECT *
+			FROM `_dialog_component_func`
+			WHERE `dialog_id`=".$dialog_id."
+			ORDER BY `component_id`,`id`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$func = array();
+	foreach($arr as $r) {
+		if(!isset($func[$r['component_id']]))
+			$func[$r['component_id']] = array();
+
+		$func[$r['component_id']][] = array(
+			'action_id' => _num($r['action_id']),
+			'cond_id' => _num($r['cond_id']),
+			'ids' => $r['component_ids']
+		);
+	}
+
+	return $func;
+}
 
 function _dialogEl() {//данные всех элементов, используемых в диалоге
-	define('EL_LABEL_W', 'w150');//ширина для всех label
-	$sort = array(3,4,2,1,5,6,7,8);
+	define('EL_LABEL_W', 'w175');//ширина для всех label
+	$sort = array(9,3,4,2,1,5,6,7,8);
 	$name = array(
 		1 => 'Галочка',
 		2 => 'Выпадающий список',
@@ -376,7 +432,8 @@ function _dialogEl() {//данные всех элементов, используемых в диалоге
 		5 => 'Radio',
 		6 => 'Календарь',
 		7 => 'Информация',
-		8 => 'Связка'
+		8 => 'Связка',
+		9 => 'Заголовок'
 	);
 	$css = array(
 		1 => '',
@@ -386,7 +443,8 @@ function _dialogEl() {//данные всех элементов, используемых в диалоге
 		5 => 'element-radio',
 		6 => 'element-calendar',
 		7 => 'element-info',
-		8 => 'element-connect'
+		8 => 'element-connect',
+		9 => 'element-head'
 	);
 	$html = array(
 		1 => /* *** галочка ***
@@ -447,9 +505,53 @@ function _dialogEl() {//данные всех элементов, используемых в диалоге
 			'<div class="hd2 ml20 mr20" id="radio-cont">Содержание:</div>'.
 			_dialogElHtmlPrev(),
 
-		6 => '',
-		7 => '',
-		8 => ''
+		6 => /* *** Календарь ***
+				param_bool_1 - возможность выбирать прошедшие дни
+                param_bool_2 - показывать ссылку "завтра"
+             */
+			_dialogElHtmlContent(1).
+			'<table class="bs5 mt5">'.
+				'<tr><td class="label r '.EL_LABEL_W.'">Выбор прошедших дней:'.
+					'<td><input type="hidden" id="param_bool_1" />'.
+				'<tr><td class="label r">Ссылка <u>завтра</u>:'.
+					'<td><input type="hidden" id="param_bool_2" />'.
+			'</table>'.
+			_dialogElHtmlPrev(),
+
+		7 => /* *** Информация ***
+				param_txt_1 - текст информации
+             */
+			'<table class="bs5 mt5">'.
+				'<tr><td class="label r topi '.EL_LABEL_W.'">Текст:'.
+					'<td><textarea id="param_txt_1" class="w300"></textarea>'.
+			'</table>'.
+			'<div id="prev-tab" class="mt20 pad20 pt10">'.
+				'<div class="hd2">Предварительный просмотр:</div>'.
+				'<div id="elem-attr-id" class="_info mt10"></div>'.
+			'</div>',
+
+		8 => /* *** Связка ***
+ 				param_num_1  - id списка по dialog_id
+		        param_num_2  - id колонки по component_id
+            */
+			_dialogElHtmlContent().
+			'<div id="connect-head"></div>'.
+			_dialogElHtmlPrev('<div class="grey i">Текстовый результат</div>'),
+
+		9 => /* *** Заголовок ***
+ 				param_num_1  - вид заголовка
+ 				param_txt_1  - текст заголовка
+            */
+			'<table class="bs5 mt5">'.
+				'<tr><td class="label r '.EL_LABEL_W.'">Вид:'.
+					'<td><input type="hidden" id="param_num_1" value="2" />'.
+				'<tr><td class="label r">Текст:'.
+					'<td><input type="text" class="w300" id="param_txt_1" />'.
+			'</table>'.
+			'<div class="b ml20 mt20 mb5">Предосмотр:</div>'.
+			'<div id="prev-tab" class="pad20 pt10 bor-f0">'.
+				'<div id="elem-attr-id" class="mt10 hd2"></div>'.
+			'</div>',
 	);
 	
 
@@ -552,6 +654,8 @@ function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диа
 				break;
 			case 8://connect
 				break;
+			case 9://head
+				break;
 			default:
 				jsonError('Несуществующий тип компонента');
 		}
@@ -589,7 +693,8 @@ function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диа
 				5 => 'num',
 				6 => 'date',
 				7 => 'txt',
-				8 => 'num'
+				8 => 'num',
+				9 => 'txt'
 			);
 			$n = 1;
 			$sql = "SELECT `col_name`,1
@@ -736,6 +841,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 	if($spisok = query_arr($sql)) {
 		foreach($spisok as $r) {
 			$type_id = _num($r['type_id']);
+			$type_7 = $type_id == 7 || $type_id == 9;
 			
 //			if($type_id == 7)
 //				continue;
@@ -751,7 +857,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 			}
 
 			$val = _dialogComponent_autoSelectPage($val, $r, $page_id);
-			$val = _dialogComponent_defSet($val, $r, $data);
+			$val = _dialogComponent_defSet($val, $r, $i != 'html' || isset($data['id']));
 
 			$attr_id = 'elem'.$r['id'];
 			$width = $r['width'] ? _num($r['width']) : 250;
@@ -771,6 +877,11 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 					$inp = '<div id="'.$attr_id.'" class="_info">'._br(htmlspecialchars_decode($r['param_txt_1'])).'</div>';
 					break;
 				case 8://connect
+					if($i != 'html')
+						break;
+					if(!_num($val))
+						break;
+
 					//получение названия таблицы для связки из диалога
 					$sql = "SELECT `base_table`
 							FROM `_dialog`
@@ -786,10 +897,13 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 					//получение значения колонки
 					$sql = "SELECT `".$colName."`
 							FROM `".$baseTable."`
-							WHERE `id`=1";
+							WHERE `id`=".$val;
 					$colVal = query_value($sql);
 
 					$inp .= '<b>'.$colVal.'</b>';
+					break;
+				case 9://head
+					$inp = '<div class="hd'.$r['param_num_1'].'">'.$r['param_txt_1'].'</div>';
 					break;
 			}
 
@@ -797,17 +911,20 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 				($edit ?
 					'<dd class="over1 curM prel" val="'.$r['id'].'">'.
 						'<div class="component-del icon icon-del'._tooltip('Удалить компонент', -59).'</div>'.
-						'<div class="component-edit icon icon-edit'._tooltip('Настроить', -32).'</div>'
+						'<div class="component-edit icon icon-edit'._tooltip('Настроить', -32).'</div>'.
+						'<div class="component-func icon icon-zp'._tooltip('Применить функцию', -63).'</div>'
 				: '').
-						'<table class="bs5 w100p">'.
-							'<tr><td class="label r'.($edit ? ' label-width pr5' : '').'" '.($type_id == 7 ? 'colspan="2"' : 'style="width:'.$label_width.'px"').'>'.
-									($r['label_name'] ? $r['label_name'].':' : '').
-									($r['require'] ? '<div class="dib red fs15 mtm2">*</div>' : '').
-									($r['hint'] ? ' <div class="icon icon-hint dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'"></div>' : '').
-				//если информация, то показ на всю ширину
-			   ($type_id != 7 ? '<td>' : '').
-									$inp.
-						'</table>'.
+						'<div id="delem'.$r['id'].'">'.
+							'<table class="bs5 w100p">'.
+								'<tr><td class="label '.($type_7 ? '' : 'r').($edit ? ' label-width pr5' : '').'" '.($type_7 ? 'colspan="2"' : 'style="width:'.$label_width.'px"').'>'.
+										($r['label_name'] ? $r['label_name'].':' : '').
+										($r['require'] ? '<div class="dib red fs15 mtm2">*</div>' : '').
+										($r['hint'] ? ' <div class="icon icon-hint dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'"></div>' : '').
+					//если информация, то показ на всю ширину
+				   (!$type_7 ? '<td>' : '').
+										$inp.
+							'</table>'.
+						'</div>'.
 		   ($edit ? '</dd>' : '');
 
 			$arr[] = array(
@@ -852,7 +969,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 			if(isset($element_v[$r['id']]))
 				$arr[$n]['v'] = $element_v[$r['id']];
 			//получение значений конкретного объекта
-			if($r['type_id'] == 2 && $r['param_num_1'])
+			if($r['type_id'] == 2 && $r['param_num_1'] && !$edit)
 				$arr[$n]['v'] = _dialogSpisokList($r['param_num_1'], $r['param_num_2']);
 			//массив объектов, которые могут быть списками
 			if($r['type_id'] == 2 && $r['param_bool_2'] && !$edit)
@@ -877,10 +994,13 @@ function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страни
 	if(!$page_id)
 		return '';
 
-	if($r['type_id'] != 2 || !$r['param_bool_1'])
+	$spisokOther = $r['type_id'] == 2 && $r['param_num_1'];
+
+	//выбор конкретного элемента - умолчания нет
+	if(!$spisokOther)
 		return '';
 
-	//элементы-кнопки: dialog_id=2
+	//определение, есть ли на странице элементы-кнопки: dialog_id=2
 	$sql = "SELECT CONCAT('\'button',id,'\'')
 			FROM `_page_element`
 			WHERE `app_id`=".APP_ID."
@@ -896,21 +1016,26 @@ function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страни
 			LIMIT 1";
 	return query_value($sql);
 }
-function _dialogComponent_defSet($val, $r, $data) {//установка значения по умолчанию в select
+function _dialogComponent_defSet($val, $r, $isEdit) {//установка значения по умолчанию в select
 	//выбранное значениe не меняется
 	if($val)
 		return $val;
 
 	//если редактирование диалога, то не устанавливается
-	if(!empty($data))
+	if($isEdit)
 		return $val;
 
+
 	//все элементы списка - умолчания нет
-	if($r['type_id'] != 2 && !$r['param_bool_2'])
+	if($r['type_id'] == 2 && $r['param_bool_2'])
 		return $val;
 
 	//выбор конкретного элемента - умолчания нет
-	if($r['type_id'] != 2 && !$r['param_num_1'])
+	if($r['type_id'] == 2 && $r['param_num_1'])
+		return $val;
+
+	//либо select, либо radio
+	if($r['type_id'] != 2 && $r['type_id'] != 5)
 		return $val;
 
 	$sql = "SELECT *
@@ -974,7 +1099,8 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 	//получение информации об компонентах диалога и составление списка для внесения в таблицу
 	$sql = "SELECT *
 			FROM `_dialog_component`
-			WHERE `dialog_id`=".$dialog_id;
+			WHERE `dialog_id`=".$dialog_id."
+			ORDER BY `sort`";
 	$de = query_arr($sql);
 
 	$elemUpdate = array();
@@ -985,7 +1111,10 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 		$v = _txt($elem[$id]);
 
 		if($r['require'] && empty($v))
-			jsonError('Не заполнено поле <b>'.$r['label_name'].'</b>');
+			jsonError(array(
+				'delem_id' => $id,
+				'text' => utf8('Не заполнено поле <b>'.$r['label_name'].'</b>')
+			));
 
 		//если это выпадающий список, выбирающий связку и вносит в список элементов
 		if($r['type_id'] == 2 && $dialog['base_table'] == '_page_element' && $r['param_num_1'])
@@ -1005,6 +1134,15 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 				$upd .= _num($v);
 				break;
 			default://остальные текстовые значения
+				if(preg_match('/^num_/', $r['col_name'])) {//если текстовое значение должно быть только числом
+					if($v && !preg_match(REGEXP_NUMERIC, $v))
+						jsonError(array(
+							'delem_id' => $id,
+							'text' => utf8('Некорректно заполнено поле <b>'.$r['label_name'].'</b>')
+						));
+					$upd .= _num($v);
+					break;
+				}
 				$upd .= "'".addslashes($v)."'";
 		}
 		$elemUpdate[] = $upd;

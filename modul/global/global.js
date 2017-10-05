@@ -366,13 +366,17 @@ $.fn.keyEnter = function(func) {
 	});
 	return $(this);
 };
-$.fn._flash = function() {//вспышка и затухание элемента в списке
+$.fn._flash = function(o) {//вспышка и затухание элемента в списке
 	var t = $(this);
 
+	o = $.extend({
+		color:'orange'
+	}, o);
+	
 	t.css('position', 'relative')
-	 .append('<div id="unit-flash"></div>')
+	 .append('<div id="unit-flash" class="' + o.color + '"></div>')
 	 .find('div:last')
-	 .animate({opacity:.5}, 100)
+	 .animate({opacity:.7}, 100)
 	 .animate({opacity:0}, 600, function() {
 		$(this).remove();
 	 });
