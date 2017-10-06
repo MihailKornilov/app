@@ -123,6 +123,7 @@ switch(@$_POST['op']) {
 		$send['button_edit_cancel'] = utf8($dialog['button_edit_cancel']);
 		$send['menu'] = _selArray($menu);
 		$send['element'] = _dialogEl();
+		$send['cmp_name'] = _dialogEl(0, 'name');
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr_edit');
 		$send['func'] = _dialogFuncSpisok($dialog_id);
 		$send['spisokOn'] = _dialogSpisokOn();
@@ -421,9 +422,11 @@ function _dialogFuncSpisok($dialog_id) {//получение данных фукнциий компонентов 
 	return $func;
 }
 
-function _dialogEl() {//данные всех элементов, используемых в диалоге
-	define('EL_LABEL_W', 'w175');//ширина для всех label
+function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в диалоге
+	if(!defined('EL_LABEL_W'))
+		define('EL_LABEL_W', 'w175');//ширина для всех label
 	$sort = array(9,3,4,2,1,5,6,7,8);
+
 	$name = array(
 		1 => 'Галочка',
 		2 => 'Выпадающий список',
@@ -445,6 +448,18 @@ function _dialogEl() {//данные всех элементов, используемых в диалоге
 		7 => 'element-info',
 		8 => 'element-connect',
 		9 => 'element-head'
+	);
+	//может ли компонент иметь функцию
+	$func = array(
+		1 => 1,
+		2 => 1,
+		3 => 1,
+		4 => 1,
+		5 => 1,
+		6 => 1,
+		7 => 0,
+		8 => 0,
+		9 => 0
 	);
 	$html = array(
 		1 => /* *** галочка ***
@@ -553,7 +568,18 @@ function _dialogEl() {//данные всех элементов, используемых в диалоге
 				'<div id="elem-attr-id" class="mt10 hd2"></div>'.
 			'</div>',
 	);
-	
+
+	//получение возможности настройки функции для компонента
+	if($i == 'func')
+		return $func[$type_id];
+
+	//подготовка и отправка имён компонентов через AJAX
+	if($i == 'name') {
+		foreach($name as $id => $r)
+			 $name[$id] = utf8($r);
+		return $name;
+	}
+
 
 	$send = array();
 	foreach($sort as $id) {
@@ -834,6 +860,8 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 			WHERE `id`=".$dialog_id;
 	$label_width = _num(query_value($sql));
 
+	$func = _dialogFuncSpisok($dialog_id);
+
 	$sql = "SELECT *
 			FROM `_dialog_component`
 			WHERE `dialog_id`=".$dialog_id."
@@ -912,7 +940,9 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 					'<dd class="over1 curM prel" val="'.$r['id'].'">'.
 						'<div class="component-del icon icon-del'._tooltip('Удалить компонент', -59).'</div>'.
 						'<div class="component-edit icon icon-edit'._tooltip('Настроить компонент', -66).'</div>'.
-						'<div class="component-func icon icon-zp'._tooltip('Настроить функции', -61).'</div>'
+					(_dialogEl($type_id, 'func') ?
+						'<div class="component-func'.(empty($func[$r['id']]) ? '' : ' on').' icon icon-zp'._tooltip('Настроить функции', -61).'</div>'
+					: '')
 				: '').
 						'<div id="delem'.$r['id'].'">'.
 							'<table class="bs5 w100p">'.

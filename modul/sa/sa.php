@@ -56,12 +56,23 @@ function _page_show($page_id) {//отображение содержания страницы
 			default:
 				switch($r['dialog_id']) {
 					case 2://button
+						$color = array(
+							0 => '',        //Синий - по умолчанию
+							321 => '',      //Синий
+							322 => 'green', //Зелёный
+							323 => 'red',   //Красный
+							324 => 'grey',  //Серый
+							325 => 'cancel',//Прозрачный
+							326 => 'pink',  //Розовый
+							327 => 'orange' //Оранжевый
+						);
 						$send .=
 							'<div class="pad5 '.$r['cls']._pasClass($r).'"'._pasId($id).'>'.
 								_button(array(
 									'name' => $r['txt_1'],
 									'click' => '_dialogOpen('._dialogValToId('button'.$id).')',
-									'color' => 'green'
+									'color' => $color[$r['num_1']],
+									'small' => $r['num_2']
 								)).
 							'</div>';
 					break;

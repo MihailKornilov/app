@@ -208,10 +208,10 @@
 #dialog-base .component-func{right:48px;background-position:0 -39px}
 #dialog-base .component-edit{right:25px;background-position:0 -79px}
 #dialog-base .component-del{right:3px;background-position:0 -19px}
-#dialog-base dd:not(:hover) .component-func,
+#dialog-base dd:not(:hover) .component-func:not(.on),
 #dialog-base dd:not(:hover) .component-edit,
 #dialog-base dd:not(:hover) .component-del{display:none}
-#dialog-base .component-func:not(:hover),
+#dialog-base .component-func:not(:hover):not(.on),
 #dialog-base .component-edit:not(:hover),
 #dialog-base .component-del:not(:hover){opacity:.5}
 /* разделительная линия для label */

@@ -3,9 +3,10 @@ function _button($v=array()) {//кнопка из контакта
 	$name = empty($v['name']) ? 'Кнопка' : $v['name'];
 	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
 	$color = empty($v['color']) ? '' : ' '.$v['color'];
+	$small = empty($v['small']) ? '' : ' small';
 
 	return
-	'<button class="vk'.$color.'"'.$click.'>'.
+	'<button class="vk'.$color.$small.'"'.$click.'>'.
 		$name.
 	'</button>';
 }

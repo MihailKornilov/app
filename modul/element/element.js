@@ -317,6 +317,7 @@ var VK_SCROLL = 0,
 			dialog.content.html(res.html);
 			dialog.butSubmit((dialog_id ? 'Сохранить' : 'Создать') + ' диалоговое окно');
 
+			window.CMP_NAME = res.cmp_name;
 			window.DIALOG_ELEMENT = res.element;
 			window.DIALOG_COMPONENT = res.component;
 			window.COMPONENT_FUNC = res.func;
@@ -1064,11 +1065,6 @@ var VK_SCROLL = 0,
 		}
 	},
 	_dialogComponentEditFunc = function(CMP) {//настройка функций компонента
-		CMP = $.extend({
-			id:0,
-			type_id:0
-		}, CMP);
-
 		var dialog = _dialog({
 				width:500,
 				top:30,
@@ -1076,7 +1072,7 @@ var VK_SCROLL = 0,
 				color:'orange',
 				head:'Функции компонента диалога',
 				content:
-					'<div class="hd1">Компонент <b class="fs15">...</b></div>' +
+					'<div class="hd1">Компонент <b class="fs15">' + CMP_NAME[CMP.type_id] + '</b> <u>' + CMP.label_name + '</u></div>' +
 					'<div id="cmp-func-add" class="center over1 mar20 pad10 curP b">Новая функция</div>',
 				butSubmit:'Сохранить',
 				submit:submit
@@ -1172,12 +1168,15 @@ var VK_SCROLL = 0,
 
 			var spisok = [];
 			for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-				var sp = DIALOG_COMPONENT[n];
+				var sp = DIALOG_COMPONENT[n],
+					name = sp.label_name;
 				if(sp.id == CMP.id)
 					continue;
+				if(sp.type_id == 9)
+					name = sp.param_txt_1;
 				spisok.push({
 					uid:sp.id,
-					title:sp.label_name
+					title:CMP_NAME[sp.type_id] + (name ? ': ' + name : '')
 				});
 			}
 
@@ -2303,7 +2302,6 @@ $.fn._hint = function(o) {
 
 	html = '<div class="_hint hint' + HC + '">' + html + '</div>';
 
-//	t.prev().remove('._hint'); // удаление предыдущей такой же подсказки
 //	t.before(html); // вставка перед элементом
 
 	var hi = $('body').append(html).find('.hint' + HC), //поле absolute для подсказки
@@ -2314,6 +2312,8 @@ $.fn._hint = function(o) {
 		tW = t.width() + _num(t.css('padding-left').split('px')[0]) + _num(t.css('padding-right').split('px')[0]),//ширина объекта
 		tH = t.height() + _num(t.css('padding-top').split('px')[0]) + _num(t.css('padding-bottom').split('px')[0]),//высота объекта
 		diff = Math.round((hintW - 26) / (hintH - 24));
+
+	hi.prev().remove('._hint'); // удаление предыдущей такой же подсказки
 
 	o.func(hi);
 
@@ -2343,7 +2343,7 @@ $.fn._hint = function(o) {
 
 
 	// процессы всплытия подсказки:
-	// - wait_to_showind - ожидает показа (мышь была наведена)
+	// - wait_to_showing - ожидает показа (мышь была наведена)
 	// - showing - выплывает
 	// - show - показана
 	// - wait_to_hidding - ожидает скрытия (мышь была отведена)
