@@ -56,17 +56,18 @@ function _iconDel($v=array()) {//иконка удаления записи в таблице
 function _check($v=array()) {//элемент ГАЛОЧКА
 	$v = array(
 		'id' => @$v['id'],
-		'txt' => @$v['txt'],
+		'title' => @$v['title'],
 		'value' => _bool(@$v['value']),
 		'on' => _bool(@$v['value']) ? ' on' : '',
 		'light' => _bool(@$v['light']) ? ' l' : '',
 		'disabled' => _bool(@$v['disabled']) ? ' disabled' : '',
 		'block' => _bool(@$v['block']) ? ' block' : ''
 	);
+	$title = $v['title'] ? ' title' : '';
 	return
-	'<div class="_check '.$v['on'].$v['block'].$v['disabled'].$v['light'].($v['txt'] ? '' : ' e').'" id="'.$v['id'].'_check">'.
-		'<input type="hidden" id="'.$v['id'].'" value="'.$v['value'].'" />'.
-		$v['txt'].
+	'<input type="hidden" id="'.$v['id'].'" value="'.$v['value'].'" />'.
+	'<div class="_check '.$v['on'].$v['block'].$v['disabled'].$v['light'].$title.'" id="'.$v['id'].'_check">'.
+		$v['title'].
 	'</div>';
 }
 
@@ -80,7 +81,7 @@ function _search($v=array()) {//элемент ПОИСК
 	return
 	($v['grey'] ? '<div class="pad10 bg-gr3 line-b">' : '').
 		'<div class="_search" style="width:'.$v['width'].'px">'.
-				'<div class="img_del dn"></div>'.
+				'<div class="icon icon-del fr dn"></div>'.
 				'<div class="_busy dib fr mr5 dn"></div>'.
 				'<div class="hold">'.$v['txt'].'</div>'.
 				'<input type="text" style="width:'.($v['width'] - 77).'px" />'.

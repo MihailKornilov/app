@@ -1084,7 +1084,8 @@ var VK_SCROLL = 0,
 				1:1,
 				2:1,
 				3:0,
-				4:0
+				4:0,
+				5:0
 			};
 
 		cmpFuncHtml();
@@ -1121,7 +1122,7 @@ var VK_SCROLL = 0,
 						'<tr><td class="label r w100 topi">Условие:' +
 							'<td><input type="hidden" id="cmp-func-cond' + NUM + '" value="' + v.cond_id + '" />' +
 					'</table>' +
-					'<table class="bs5 w100p" id="cmp-tab' + NUM + '">' +
+					'<table class="bs5 w100p' + (v.action_id == 5 ? ' dn' : '') + '" id="cmp-tab' + NUM + '">' +
 						'<tr><td class="label r w100 topi">Компоненты:' +
 							'<td><input type="hidden" id="cmp-func-ids' + NUM + '" value="' + v.ids + '" />' +
 					'</table>' +
@@ -1149,11 +1150,13 @@ var VK_SCROLL = 0,
 						content:'Скрыть=1 / Показать=0' +
 								'<div class="grey fs12">Скрывать при ненулевом значении</div>' +
 								'<div class="grey fs12">Показывать при нулевом</div>'
-					}
+					},
+					{uid:5,title:'Вывести колонки списка'}
 				],
 				func:function(v, attr_id) {
 					var num = attr_id.split('act')[1];
 					$('#cond-tab' + num)._dn(COND_SHOW[v]);
+					$('#cmp-tab' + num)._dn(v != 5);
 				}
 			});
 
@@ -1207,7 +1210,7 @@ var VK_SCROLL = 0,
 					dialog.err('Не выбрано действие в функции ' + num);
 					return;
 				}
-				if(f.ids == 0) {
+				if(f.action_id != 5 && f.ids == 0) {
 					$('#cmp-tab' + num)._flash({color:'red'});
 					dialog.err('Не выбраны компоненты в функции ' + num);
 					return;
@@ -1431,6 +1434,31 @@ var VK_SCROLL = 0,
 
 				ids = func.ids.split(',');
 
+			if(func.action_id == 5) {//вывод элементов списка
+				var delem = $('#delem' + component_id);
+				delem.find('.spisok-col').remove();
+
+				if(!v)
+					continue;
+
+				delem.append('<div class="spisok-col _busy">&nbsp;</div>');
+				var spc = delem.find('.spisok-col'),
+					send = {
+						op:'spisok_col_get',
+						component_id:component_id,
+						dialog_id:v
+					};
+				_post(send, function(res) {
+					spc.html(res.html).removeClass('_busy');
+				}, function(res) {
+					spc.html(res.text)
+						.removeClass('_busy')
+						.addClass('center red');
+				});
+
+				continue;
+			}
+
 			if(ifNo && v)
 				return;
 
@@ -1449,6 +1477,18 @@ var VK_SCROLL = 0,
 	};
 
 $(document)
+	.on('click', '._check', function() {//установка/снятие галочки, если была выведена через PHP
+		var t = $(this);
+		if(t.hasClass('noon'))//если галочка выведена через JS, а не через PHP, то действия нет
+			return;
+
+		var p = t.prev(),
+			v = _num(p.val()) ? 0 : 1;
+
+		p.val(v);
+		t[(v ? 'add' : 'remove') + 'Class']('on');
+	})
+
 	.on('mouseenter', '.dialog-hint', function() {//отображение подсказки при наведении на вопрос в диалоге
 		var t = $(this),
 			msg = t.attr('val');
@@ -1465,16 +1505,9 @@ $(document)
 })
 	.on('mouseenter', '.pas', function() {//вывод подсказки для редактирования или удаления элемента страницы
 		var t = $(this),
-			cls = t.attr('class').split(' '),
-			dialog_id = 0,
-			element_id = 0;
-
-		for(var v in cls)
-			if(/^pas_[\d]+_[\d]+$/.test(cls[v])) {
-				var sp = cls[v].split('_');
-				dialog_id = sp[1];
-				element_id = sp[2];
-			}
+			pe = t.attr('id').split('_'),
+			dialog_id = pe[1],
+			element_id = pe[2];
 
 		var msg =
 			'<div class="pt5 pl10 pr10">' +
@@ -1525,54 +1558,30 @@ $(document)
 $.fn._check = function(o) {
 	var t = $(this),
 		attr_id = t.attr('id'),
-		win = attr_id + '_check',
-		s;
+		div_id = attr_id + '_check',
+		win = attr_id + '_check_win',
+		S = window[win];
 
 	if(!attr_id)
 		return;
 
 	switch(typeof o) {
 		case 'number':
-			s = window[win];
-			s.value(o ? 1 : 0);
+			S.value(o ? 1 : 0);
 			return t;
 		case 'string':
-			s = window[win];
 			if(o == 'disable')
-				s.dis();
+				S.dis();
 			if(o == 'enable')
-				s.enab();
+				S.enab();
 			if(o == 'func')
-				s.funcGo();
+				S.funcGo();
 			return t;
-			break;
 	}
 
-	t.next().remove('._check');
+	checkPrint();
 
-	o = $.extend({
-		title:'',
-		disabled:0,
-		light:0,
-		block:0,
-		tooltip:'',
-		func:function() {}
-	}, o);
-
-	var val = t.val() == 1 ? 1 : 0,
-		on = val ? ' on' : '',
-		title = o.title ? ' title' : '',
-		light = o.light ? ' light' : '',
-		block = o.block ? ' block' : '',
-		dis = o.disabled ? ' disabled' : '',
-		html =
-			'<div id="' + win + '" class="_check' + on + title + light + block + dis + '">' +
-				(o.title ? o.title : '&nbsp;') +
-			'</div>';
-
-	t.val(val).after(html);
-	var CHECK = $('#' + win);
-
+	var CHECK = $('#' + div_id);
 
 	CHECK.click(function() {
 		if(CHECK.hasClass('disabled'))
@@ -1586,6 +1595,39 @@ $.fn._check = function(o) {
 	if(o.tooltip)
 		CHECK._tooltip(o.tooltip);
 
+	function checkPrint() {//вывод галочки
+		var nx = t.next();
+		if(nx.hasClass('_check'))   //если галочка была выведена через PHP - только применение функций
+			o = $.extend({
+				title:nx.html(),
+				disabled:nx.hasClass('disabled'),
+				light:nx.hasClass('light'),
+				block:nx.hasClass('block')
+			}, o);
+
+		t.next().remove('._check');
+		o = $.extend({
+			title:'',
+			disabled:0,
+			light:0,
+			block:0,
+			tooltip:'',
+			func:function() {}
+		}, o);
+
+		var val = t.val() == 1 ? 1 : 0,
+			on = val ? ' on' : '',
+			title = o.title ? ' title' : '',
+			light = o.light ? ' light' : '',
+			block = o.block ? ' block' : '',
+			dis = o.disabled ? ' disabled' : '',
+			html =
+				'<div id="' + div_id + '" class="_check noon' + on + title + light + block + dis + '">' +
+					(o.title ? o.title : '&nbsp;') +
+				'</div>';
+
+		t.val(val).after(html);
+	}
 	function setVal(v) {
 		CHECK[(v ? 'add' : 'remove') + 'Class']('on');
 		t.val(v);
@@ -2748,29 +2790,46 @@ $.fn._calendar = function(o) {
 		daysPrint();
 	}
 };
-$.fn._search = function(o, v) {
+$.fn._search = function(o, v) {//поисковая строка
+	/*
+		Оборачивается input:text
+		attr_id не обязателен
+	*/
 	var t = $(this),
-		id = t.attr('id');
+		attr_id = t.attr('id');
+
+	if(!attr_id) {
+		attr_id = 'sr' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
+	}
+
+	var win = attr_id + '_search',
+		S = window[win];
 
 	switch(typeof o) {
 		case 'number':
 		case 'string':
 			if(o == 'val') {
 				if(v) {
-					window[id + '_search'].inp(v);
+					S.inp(v);
 					return;
 				}
-				return window[id + '_search'].inp();
+				return S.inp();
 			}
 			if(o == 'process')
-				window[id + '_search'].process();
+				S.process();
 			if(o == 'cancel')
-				window[id + '_search'].cancel();
+				S.cancel();
 			if(o == 'clear')
-				window[id + '_search'].clear();
+				S.clear();
 			return t;
 	}
+
+	if(S)
+		return;
+
 	o = $.extend({
+		ex:0,
 		width:126,
 		focus:0,//сразу устанавливать фокус
 		txt:'', //текст-подсказка
@@ -2778,19 +2837,29 @@ $.fn._search = function(o, v) {
 		enter:0,//применять введённый текст только после нажатия ентер
 		v:''    //введённое значение
 	}, o);
-	var html =
-			'<div class="_search" style="width:' + o.width + 'px">' +
-				'<div class="img_del dn"></div>' +
-				'<div class="_busy dib fr mr5 dn"></div>' +
-				'<div class="hold">' + o.txt + '</div>' +
-				'<input type="text" style="width:' + (o.width - 77) + 'px" />' +
-			'</div>';
-	t.html(html);
-	var _s = t.find('._search'),
-		inp = t.find('input'),
-		busy = t.find('._busy'),
-		hold = t.find('.hold'),
-		del = t.find('.img_del');
+
+	//проверка такой же поисковой строки, которая была выведена через PHP. Если уже есть, то применение функций.
+	var p = t.parent();
+	if(p.hasClass('_search')) {
+		o.ex = 1;    //флаг существующей поисковой строки
+		o.width = p.width();
+	}
+
+	if(!o.ex) {
+		t.width(o.width - 77);
+		t.wrap('<div class="_search" style="width:' + o.width + 'px">');
+		t.before(
+			'<div class="icon icon-del fr dn"></div>' +
+			'<div class="_busy dib fr mr5 dn"></div>' +
+			'<div class="hold">' + o.txt + '</div>'
+		);
+	}
+
+	var _s = t.parent(),
+		inp = t,
+		busy = _s.find('._busy'),
+		hold = _s.find('.hold'),
+		del = _s.find('.icon-del');
 
 	if(o.focus) {
 		inp.focus();
@@ -2799,18 +2868,15 @@ $.fn._search = function(o, v) {
 
 	inp .focus(holdFocus)
 		.blur(holdBlur)
-		.keyup(function() {
-			var c = $(this).val().length > 0;
-			hold[(c ? 'add' : 'remove') + 'Class']('dn');
-			del[(c ? 'remove' : 'add') + 'Class']('dn');
-			if(!o.enter)
-				o.func(inp.val(), id);
-		});
-
-	if(o.enter)
-		inp.keydown(function(e) {
-			if(e.which == 13)
-				o.func($(this).val(), id);
+		.keydown(function(e) {
+			setTimeout(function() {
+				var v = inp.val();
+				hold._dn(!v);
+				del._dn(v);
+				if(o.enter && e.which != 13)
+					return;
+				o.func(v, attr_id);
+			}, 0);
 		});
 
 	t.clear = function() {
@@ -2821,7 +2887,7 @@ $.fn._search = function(o, v) {
 
 	del.click(function() {
 		t.clear();
-		o.func('', id);
+		o.func('', attr_id);
 	});
 
 	_s.click(function() {
@@ -2848,7 +2914,7 @@ $.fn._search = function(o, v) {
 		del.addClass('dn');
 		hold.removeClass('dn');
 	};
-	window[id + '_search'] = t;
+	window[win] = t;
 
 	t.inp(o.v);
 

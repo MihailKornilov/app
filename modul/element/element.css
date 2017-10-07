@@ -321,9 +321,9 @@
 	position:relative;
 }
 ._search input{border:0;margin-left:22px;padding:7px 0 6px 0}
+._search .icon-del{margin:6px 4px 0 0}
 ._search ._busy{width:30px;height:27px}
-._search .img_del{float:right;margin:7px 5px 0 0}
-._search .hold{position:absolute;left:24px;top:6px;color:#777}
+._search .hold{position:absolute;left:24px;top:7px;color:#777}
 
 
 

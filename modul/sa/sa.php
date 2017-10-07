@@ -49,7 +49,7 @@ function _page_show($page_id) {//отображение содержания страницы
 		switch($r['table_id']) {
 			case 5://menu
 				$send .=
-					'<div class="'.$r['cls']._pasClass($r).'"'._pasId($id).'>'.
+					'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
 						_pageElementMenu($r['unit_id']).
 					'</div>';
 				break;
@@ -67,7 +67,7 @@ function _page_show($page_id) {//отображение содержания страницы
 							327 => 'orange' //Оранжевый
 						);
 						$send .=
-							'<div class="pad5 '.$r['cls']._pasClass($r).'"'._pasId($id).'>'.
+							'<div class="pad5 '.$r['cls']._pasClass().'"'._pasId($r).'>'.
 								_button(array(
 									'name' => $r['txt_1'],
 									'click' => '_dialogOpen('._dialogValToId('button'.$id).')',
@@ -78,13 +78,13 @@ function _page_show($page_id) {//отображение содержания страницы
 					break;
 					case 4://head
 						$send .=
-							'<div class="'.$r['cls']._pasClass($r).'"'._pasId($id).'>'.
+							'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
 								'<div class="hd2">'.$r['txt_1'].'</div>'.
 							'</div>';
 						break;
 					case 7://search
 						$send .=
-							'<div class="'.$r['cls']._pasClass($r).'"'._pasId($id).'>'.
+							'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
 								_search(array(
 											'txt' => $r['txt_1'],
 											'grey' => $r['num_1'],
@@ -94,90 +94,16 @@ function _page_show($page_id) {//отображение содержания страницы
 						break;
 					case 9://link
 						$send .=
-							'<div class="'.$r['cls']._pasClass($r).'"'._pasId($id).'>'.
+							'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
 								'<a href="'.URL.'&p='.$r['num_1'].'">'.
 										$r['txt_1'].
 								 '</a>'.
 							'</div>';
 						break;
 					case 14://_spisok
-						$dialog = _dialogQuery(14);
-						$dv = $dialog['v_ass'];
-
-						$spTypeId = $r['num_1'];    //внешний вид списка: [181] => Таблица [182] => Шаблон
-						$spLimit = $dv[$r['num_2']];//лимит
-
-						//диалог, через который вносятся данные списка
-						$dialog_id = $r['num_3'];
-						$spDialog = _dialogQuery($dialog_id);
-						$spElement = $spDialog['component']; //элементы списка
-						$spTable = $spDialog['base_table'];
-
-						//получение данных списка
-						$sql = "SELECT *
-								FROM `".$spTable."`
-								WHERE `app_id` IN (0,".APP_ID.")
-								  AND `dialog_id`=".$dialog_id."
-								ORDER BY `dtime_add` DESC
-								LIMIT ".$spLimit;
-						$spisok = query_arr($sql);
-
-						$html = '';
-
-						//выбор внешнего вида
-						switch($spTypeId) {
-							case 181://Таблица
-								$html = '<table class="_stab">'.
-											'<tr>'.
-												'<th class="w15">id';//ID
-								foreach($spElement as $el) {
-									if($el['type_id'] == 7)
-										continue;
-									$html .= '<th>'.$el['label_name'];
-								}
-								$html .= '<th class="w15">';//настройки
-								foreach($spisok as $sp) {
-									$html .= '<tr><td class="r grey">'.$sp['id'];
-									foreach($spElement as $el) {
-										if($el['type_id'] == 7)
-											continue;
-										if($el['col_name'] == 'app_any_spisok')
-											$v = '';
-										else
-											$v = $sp[$el['col_name']];
-										$html .= '<td>'.$v;
-									}
-									$html .= '<td class="wsnw">'
-												._iconEdit(array('onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')'));
-												//._iconDel();
-								}
-
-								$html .= '</table>';
-								break;
-							case 182://Шаблон
-								foreach($spElement as $el) {
-									$html .= '<div>'.$el['label_name'].'</div>';
-								}
-								break;
-							default:
-								$html = 'Неизвестный внешний вид списка: '.$spTypeId;
-						}
-/*
-						$html = '';
-						if($spisok = query_arr($sql)) {
-							foreach($spisok as $sp) {
-								$html .=
-									'<div class="pad5">'.
-										'<a>'.$sp['txt_1'].'</a>, '.$sp['txt_2'].
-									'</div>';
-							}
-						}else
-							$html = '<div class="_empty">'.$r['txt_1'].'</div>';
-*/
-
 						$send .=
-							'<div class="'.$r['cls']._pasClass($r).'"'._pasId($id).'>'.
-								$html.
+							'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
+								_pageSpisok($r).
 							'</div>';
 						break;
 				}
@@ -185,19 +111,20 @@ function _page_show($page_id) {//отображение содержания страницы
 	}
 
 
-	return '<div class="pas_sort">'.$send.'</div>';
+	return
+	'<div class="pas_sort">'.
+		$send.
+	'</div>'.
+	'<script>_pageShow()</script>';
 }
-function _pasClass($r) {//стили для редактирования элемента при условии включенного флага PAS
+function _pasClass() {//стили для редактирования элемента при условии включенного флага PAS
 	if(!PAS)
-		return '';
+		return ' pe';
 
-	return ' over3 pas pas_'.$r['dialog_id'].'_'.$r['id'];
+	return ' over3 pas pe';
 }
-function _pasId($id) {//id элемента страницы для сотрировки
-	if(!PAS)
-		return '';
-
-	return ' val="'.$id.'"';
+function _pasId($r) {//id элемента страницы для сотрировки
+	return ' id="pe_'.$r['dialog_id'].'_'.$r['id'].'"'.(PAS ? ' val="'.$r['id'].'"' : '');
 }
 function _pageElementMenu($id) {//элемент страницы: Меню
 	$sql = "SELECT *
@@ -226,6 +153,89 @@ function _pageElementMenu($id) {//элемент страницы: Меню
 
 	return '<div class="_menu0">'.$razdel.'</div>';
 }
+
+
+
+
+function _pageSpisok($pe, $val='') {//список, выводимый на странице
+	$comp_id = 60;
+
+	$dialog = _dialogQuery(14);
+	$dv = $dialog['v_ass'];
+
+	$spTypeId = $pe['num_1'];    //внешний вид списка: [181] => Таблица [182] => Шаблон
+	$spLimit = $dv[$pe['num_2']];//лимит
+
+	//диалог, через который вносятся данные списка
+	$dialog_id = $pe['num_3'];
+	$spDialog = _dialogQuery($dialog_id);
+	$spElement = $spDialog['component']; //элементы списка
+	$spTable = $spDialog['base_table'];
+
+	$cond = strlen($val) ? " AND `".$spElement[$comp_id]['col_name']."` LIKE '%".$val."%'" : '';
+
+	//получение данных списка
+	$sql = "SELECT *
+			FROM `".$spTable."`
+			WHERE `app_id` IN (0,".APP_ID.")
+			  AND `dialog_id`=".$dialog_id."
+			  ".$cond."
+			ORDER BY `dtime_add` DESC
+			LIMIT ".$spLimit;
+	$spisok = query_arr($sql);
+
+	$html = '';
+
+	//выбор внешнего вида
+	switch($spTypeId) {
+		case 181://Таблица
+			if(!$spisok) {
+				$html = '<div class="_empty">'.$pe['txt_1'].'</div>';
+				break;
+			}
+			$html = '<table class="_stab">'.
+						'<tr>'.
+							'<th class="w15">id';//ID
+			foreach($spElement as $el) {
+				if($el['type_id'] == 7)
+					continue;
+				$html .= '<th>'.$el['label_name'];
+			}
+			$html .= '<th class="w15">';//настройки
+			foreach($spisok as $sp) {
+				$html .= '<tr><td class="r grey">'.$sp['id'];
+				foreach($spElement as $el) {
+					if($el['type_id'] == 7)
+						continue;
+					if($el['col_name'] == 'app_any_spisok')
+						$v = '';
+					else {
+						$v = $sp[$el['col_name']];
+						if(strlen($val) && $el['col_name'] == $spElement[$comp_id]['col_name'])
+							$v = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $v, 1);
+					}
+					$html .= '<td>'.$v;
+				}
+				$html .= '<td class="wsnw">'
+							._iconEdit(array('onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')'));
+							//._iconDel();
+			}
+
+			$html .= '</table>';
+			break;
+		case 182://Шаблон
+			foreach($spElement as $el) {
+				$html .= '<div>'.$el['label_name'].'</div>';
+			}
+			break;
+		default:
+			$html = 'Неизвестный внешний вид списка: '.$spTypeId;
+	}
+
+	return $html;
+}
+
+
 
 
 function _page_menu_spisok() {//список меню

@@ -313,6 +313,12 @@ function _footer() {
 
 
 
+function _regFilter($v) {//проверка регул€рного выражени€ на недопустимые символы
+	$reg = '/(\[)/'; // скобка [
+	if(preg_match($reg, $v))
+		return '';
+	return '/('.$v.')/iu';
+}
 
 
 

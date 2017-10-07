@@ -125,7 +125,7 @@ switch(@$_POST['op']) {
 		$send['element'] = _dialogEl();
 		$send['cmp_name'] = _dialogEl(0, 'name');
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr_edit');
-		$send['func'] = _dialogFuncSpisok($dialog_id);
+		$send['func'] = (object)_dialogFuncSpisok($dialog_id);
 		$send['spisokOn'] = _dialogSpisokOn();
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
@@ -290,6 +290,98 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		jsonSuccess();
+		break;
+	case 'spisok_get'://обновление списка по условиям
+		if(!$element_id = _num($_POST['element_id']))
+			jsonError('Некорректный ID элемента станицы');
+
+		$v = _txt($_POST['v']);
+		
+		//получение данных элемента поиска
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `app_id` IN(0,".APP_ID.")
+				  AND `id`=".$element_id;
+		if(!$pe = query_assoc($sql))
+			jsonError('Элемента id'.$element_id.' не существует');
+
+		//id диалога списка, на который происходит воздействие
+		if(!$spisok_id = _num($pe['num_3']))
+			jsonError('Нет воздействия на список');
+
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `app_id` IN(0,".APP_ID.")
+				  AND `dialog_id`=14
+				  AND `page_id`=".$pe['page_id']."
+				  AND `num_3`=".$spisok_id."
+				LIMIT 1";
+		if(!$peSpisok = query_assoc($sql))
+			jsonError('Нет нужного списка на странице');
+
+//		$dialog = _dialogQuery($spisok_id);
+
+		$send['attr_id'] = '#pe_'.$peSpisok['dialog_id'].'_'.$peSpisok['id'];
+		$send['spisok'] = utf8(_pageSpisok($peSpisok, $v));
+
+		jsonSuccess($send);
+		break;
+	case 'spisok_col_get'://получение колонок списка
+		if(!$component_id = _num($_POST['component_id']))
+			jsonError('Некорректный ID компонента диалога');
+
+		$sql = "SELECT *
+				FROM `_dialog_component`
+				WHERE `id`=".$component_id;
+		if(!$cmp = query_assoc($sql))
+			jsonError('Компонента не существует');
+
+		//проверка: компонент должен быть выпадающим списком и одновременно содержать списки
+		if($cmp['type_id'] != 2 || !$cmp['param_bool_2'])
+			jsonError('Компонент не является массивом списков');
+		if(!$cmpDialog = _dialogQuery($cmp['dialog_id']))
+			jsonError('Диалога, в котором содержится компонент, не существует');
+
+		if(!$dialog_id = _num($_POST['dialog_id']))
+			jsonError('Некорректный ID диалога');
+		if(!$dialog = _dialogQuery($dialog_id))
+			jsonError('Диалога не существует');
+		if(!$dialog['spisok_on'])
+			jsonError('Диалог не является списком');
+		if(empty($dialog['component']))
+			jsonError('В данном списке колонок нет');
+
+		$col = '';
+		foreach($dialog['component'] as $id => $r) {
+			if($r['type_id'] == 1)
+				continue;
+			if($r['type_id'] == 5)
+				continue;
+			if($r['type_id'] == 6)
+				continue;
+			if($r['type_id'] == 7)
+				continue;
+			if($r['type_id'] == 8)
+				continue;
+			if($r['type_id'] == 9)
+				continue;
+			$col .=
+				'<div class="mb5">'.
+					_check(array(
+						'id' => 'col'.$id,
+						'title' => $r['label_name'].' <span class="grey i">'._dialogEl($r['type_id'], 'name').'</span>'
+					)).
+				'</div>';
+		}
+
+		$send['html'] = utf8(
+			'<table class="bs5 w100p">'.
+				'<tr><td class="label r top" style="width:'.$cmpDialog['label_width'].'px">Колонки:'.
+					'<td>'.$col.
+			'</table>'
+		);
+
+		jsonSuccess($send);
 		break;
 }
 
@@ -575,6 +667,8 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
 
 	//подготовка и отправка имён компонентов через AJAX
 	if($i == 'name') {
+		if($type_id)
+			return $name[$type_id];
 		foreach($name as $id => $r)
 			 $name[$id] = utf8($r);
 		return $name;
@@ -1136,6 +1230,8 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 	$elemUpdate = array();
 	foreach($de as $id => $r) {
 		if($r['type_id'] == 7)//info
+			continue;
+		if($r['type_id'] == 9)//head
 			continue;
 
 		$v = _txt($elem[$id]);

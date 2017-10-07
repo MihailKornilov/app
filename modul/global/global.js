@@ -341,6 +341,10 @@ var FB,
 
 		m.addClass('_busy');
 	},
+	_forEq = function(arr, func) {//перечисление последовательного массива
+		for(var n = 0; n < arr.length; n++)
+			func(arr.eq(n));
+	},
 
 	_pas = function() {
 		$('#page-setup-page')._dropdown({
@@ -356,6 +360,23 @@ var FB,
 				if(v == 2)
 					location.href = URL + '&p=12';
 			}
+		});
+	},
+	_pageShow = function() {//выполнение после вывода страницы
+		//применение функций к _search
+		_forEq($('._search'), function(sp) {
+			sp.find('input')._search({
+				func:function(v) {
+					var send = {
+						op:'spisok_get',
+						element_id:_parent(sp, '.pe').attr('id').split('_')[2],
+						v:v
+					};
+					_post(send, function(res) {
+						$(res.attr_id).html(res.spisok);
+					});
+				}
+			});
 		});
 	};
 
