@@ -322,7 +322,11 @@ function _regFilter($v) {//проверка регулярного выражения на недопустимые символ
 
 
 
-
+function _dn($v) {//показ/скрытие блока на основании условия
+	if(empty($v))
+		return ' dn';
+	return '';
+}
 
 function _num($v) {
 	if(empty($v) || is_array($v) || !preg_match(REGEXP_NUMERIC, $v))

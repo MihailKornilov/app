@@ -1260,33 +1260,55 @@ var VK_SCROLL = 0,
 				submit(res.component);
 			});
 		}
-		function submit(elem) {
+		function submit(cmp) {
 			send = {
 				op:'spisok_' + (unit_id ? 'edit' : 'add'),
 				unit_id:unit_id,
 				dialog_id:dialog_id,
 				elem:{},
+				func:{},//значения функций, если требуется сохранять. Конкретно пока для действия 5
 				page_id:PAGE_ID
 			};
 
-			for(var n = 0; n < elem.length; n++) {
-				var sp = elem[n];
-				send.elem[sp.id] = $(sp.attr_id).val();
-			}
+			_forN(cmp, function(sp) {
+				if(!sp.func_flag)
+					return;
 
-			dialog.post(send, 'reload');
+				send.elem[sp.id] = $(sp.attr_id).val();
+
+				//сохранение значений функций
+				funcVal(sp.id, send.func, COMPONENT_FUNC);
+			});
+
+			dialog.post(send);
+		}
+		function funcVal(id, sf, func) {//получение значений функций
+			if(!func[id])
+				return;
+
+			var v = []; //переменная для сбора значений
+			_forN(func[id], function(sp) {
+				if(sp.action_id != 5)
+					return;
+
+				_forEq($('#delem' + id).find('.spisok-col ._check').prev(), function(i) {
+					if(_num(i.val()))
+						v.push(_num(i.attr('id').split('col')[1]));
+				});
+			});
+			sf[id] = v.join(',');
 		}
 	},
 	_dialogScript = function(component, isEdit) {//применение скриптов после загрузки данных диалога
+
 		//рисование компонентов
 		for(var n = 0; n < component.length; n++)
 			_dialogComponentScript(component[n], isEdit);
 
 		//применение функций, привязанных к компонентам
-		for(n = 0; n < component.length; n++) {
-			var ch = component[n];
+		_forN(component, function(ch) {
 			_dialogComponentFunc(ch.id, _num($(ch.attr_id).val()), isEdit, 1);
-		}
+		})
 	},
 	_dialogComponentScript = function(ch, isEdit) {//применение скриптов для конкретного компонента диалога
 		switch(ch.type_id) {
@@ -1445,6 +1467,7 @@ var VK_SCROLL = 0,
 				var spc = delem.find('.spisok-col'),
 					send = {
 						op:'spisok_col_get',
+						page_id:PAGE_ID,
 						component_id:component_id,
 						dialog_id:v
 					};
@@ -2832,7 +2855,7 @@ $.fn._search = function(o, v) {//поисковая строка
 		ex:0,
 		width:126,
 		focus:0,//сразу устанавливать фокус
-		txt:'', //текст-подсказка
+		hold:'', //текст-подсказка placeholder
 		func:function() {},
 		enter:0,//применять введённый текст только после нажатия ентер
 		v:''    //введённое значение
@@ -2851,7 +2874,7 @@ $.fn._search = function(o, v) {//поисковая строка
 		t.before(
 			'<div class="icon icon-del fr dn"></div>' +
 			'<div class="_busy dib fr mr5 dn"></div>' +
-			'<div class="hold">' + o.txt + '</div>'
+			'<div class="hold">' + o.hold + '</div>'
 		);
 	}
 

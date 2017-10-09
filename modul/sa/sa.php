@@ -86,9 +86,10 @@ function _page_show($page_id) {//отображение содержания страницы
 						$send .=
 							'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
 								_search(array(
-											'txt' => $r['txt_1'],
+											'hold' => $r['txt_1'],
 											'grey' => $r['num_1'],
-											'width' => $r['num_2']
+											'width' => $r['num_2'],
+											'v' => $r['v']
 										)).
 							'</div>';
 						break;
@@ -157,8 +158,8 @@ function _pageElementMenu($id) {//элемент страницы: Меню
 
 
 
-function _pageSpisok($pe, $val='') {//список, выводимый на странице
-	$comp_id = 60;
+function _pageSpisok($pe) {//список, выводимый на странице
+	$page_id = $pe['page_id'];
 
 	$dialog = _dialogQuery(14);
 	$dv = $dialog['v_ass'];
@@ -172,14 +173,12 @@ function _pageSpisok($pe, $val='') {//список, выводимый на странице
 	$spElement = $spDialog['component']; //элементы списка
 	$spTable = $spDialog['base_table'];
 
-	$cond = strlen($val) ? " AND `".$spElement[$comp_id]['col_name']."` LIKE '%".$val."%'" : '';
-
 	//получение данных списка
 	$sql = "SELECT *
 			FROM `".$spTable."`
 			WHERE `app_id` IN (0,".APP_ID.")
 			  AND `dialog_id`=".$dialog_id."
-			  ".$cond."
+			  "._pageSpisokFilterSearch($page_id, $spDialog)."
 			ORDER BY `dtime_add` DESC
 			LIMIT ".$spLimit;
 	$spisok = query_arr($sql);
@@ -211,8 +210,8 @@ function _pageSpisok($pe, $val='') {//список, выводимый на странице
 						$v = '';
 					else {
 						$v = $sp[$el['col_name']];
-						if(strlen($val) && $el['col_name'] == $spElement[$comp_id]['col_name'])
-							$v = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $v, 1);
+//						if(strlen($val) && $el['col_name'] == $spElement[$comp_id]['col_name'])
+//							$v = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $v, 1);
 					}
 					$html .= '<td>'.$v;
 				}
@@ -234,7 +233,24 @@ function _pageSpisok($pe, $val='') {//список, выводимый на странице
 
 	return $html;
 }
+function _pageSpisokFilterSearch($page_id, $spDialog) {//получение значений фильтра-поиска для списка
+//	print_r($spDialog);
+//	$spisok_id = $spDialog['num_3'];
 
+	//получение элемента поиска, содержащегося на странице, где находится список воздействующий на этот список
+	$sql = "SELECT *
+			FROM `_page_element`
+			WHERE `app_id` IN(0,".APP_ID.")
+			  AND `page_id`=".$page_id."
+			  AND `dialog_id`=7
+			  AND `num_3`=".$spDialog['id'];
+	if(!$pe = query_assoc($sql))
+		return '';
+//echo $sql;
+
+//	$cond = strlen($val) ? " AND `".$spElement[$comp_id]['col_name']."` LIKE '%".$val."%'" : '';
+	return '';
+}
 
 
 

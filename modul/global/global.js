@@ -341,9 +341,13 @@ var FB,
 
 		m.addClass('_busy');
 	},
-	_forEq = function(arr, func) {//перечисление последовательного массива
+	_forEq = function(arr, func) {//перечисление последовательного массива jquery $(...)
 		for(var n = 0; n < arr.length; n++)
 			func(arr.eq(n));
+	},
+	_forN = function(arr, func) {//перечисление последовательного массива js
+		for(var n = 0; n < arr.length; n++)
+			func(arr[n]);
 	},
 
 	_pas = function() {

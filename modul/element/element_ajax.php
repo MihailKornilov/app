@@ -305,10 +305,17 @@ switch(@$_POST['op']) {
 		if(!$pe = query_assoc($sql))
 			jsonError('Элемента id'.$element_id.' не существует');
 
-		//id диалога списка, на который происходит воздействие
+		//сохранение строки поиска
+		$sql = "UPDATE `_page_element`
+				SET `v`='".addslashes($v)."'
+				WHERE `id`=".$element_id;
+		query($sql);
+
+		//id диалога списка, на который происходит воздействие через поиск
 		if(!$spisok_id = _num($pe['num_3']))
 			jsonError('Нет воздействия на список');
 
+		//расположение списка на странице, на которой расположен поиск
 		$sql = "SELECT *
 				FROM `_page_element`
 				WHERE `app_id` IN(0,".APP_ID.")
@@ -319,16 +326,16 @@ switch(@$_POST['op']) {
 		if(!$peSpisok = query_assoc($sql))
 			jsonError('Нет нужного списка на странице');
 
-//		$dialog = _dialogQuery($spisok_id);
-
 		$send['attr_id'] = '#pe_'.$peSpisok['dialog_id'].'_'.$peSpisok['id'];
-		$send['spisok'] = utf8(_pageSpisok($peSpisok, $v));
+		$send['spisok'] = utf8(_pageSpisok($peSpisok));
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_col_get'://получение колонок списка
+	case 'spisok_col_get'://получение колонок списка (для функции Действие 5)
 		if(!$component_id = _num($_POST['component_id']))
 			jsonError('Некорректный ID компонента диалога');
+		if(!$page_id = _num($_POST['page_id']))
+			jsonError('Некорректный ID страницы');
 
 		$sql = "SELECT *
 				FROM `_dialog_component`
@@ -351,6 +358,13 @@ switch(@$_POST['op']) {
 		if(empty($dialog['component']))
 			jsonError('В данном списке колонок нет');
 
+		//получение значения функции Действие 5
+		$sql = "SELECT `txt_3`
+				FROM `_page_element`
+				WHERE `page_id`=".$page_id."
+				  AND `dialog_id`=7";
+		$ids = _idsAss(query_value($sql));
+
 		$col = '';
 		foreach($dialog['component'] as $id => $r) {
 			if($r['type_id'] == 1)
@@ -369,7 +383,8 @@ switch(@$_POST['op']) {
 				'<div class="mb5">'.
 					_check(array(
 						'id' => 'col'.$id,
-						'title' => $r['label_name'].' <span class="grey i">'._dialogEl($r['type_id'], 'name').'</span>'
+						'title' => $r['label_name'].' <span class="grey i">'._dialogEl($r['type_id'], 'name').'</span>',
+						'value' => @$ids[$id]
 					)).
 				'</div>';
 		}
@@ -541,7 +556,7 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
 		8 => 'element-connect',
 		9 => 'element-head'
 	);
-	//может ли компонент иметь функцию
+	//может ли компонент содержать функцию (а также может ли участвовать в передаче данных)
 	$func = array(
 		1 => 1,
 		2 => 1,
@@ -1053,7 +1068,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 
 			$arr[] = array(
 				'id' => _num($r['id']),
-				'type_id' => _num($type_id),
+				'type_id' => $type_id,
 				'label_name' => utf8($r['label_name']),
 				'require' => _bool($r['require']),
 				'hint' => utf8(htmlspecialchars_decode(htmlspecialchars_decode($r['hint']))),
@@ -1064,6 +1079,8 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 				'param_txt_2' => utf8($r['param_txt_2']),
 				'param_bool_1' => _bool($r['param_bool_1']),
 				'param_bool_2' => _bool($r['param_bool_2']),
+
+				'func_flag' => _dialogEl($type_id, 'func'), //может ли содержать функцию
 
 				'col_name' => $r['col_name'],
 
@@ -1229,9 +1246,7 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 
 	$elemUpdate = array();
 	foreach($de as $id => $r) {
-		if($r['type_id'] == 7)//info
-			continue;
-		if($r['type_id'] == 9)//head
+		if(!_dialogEl($r['type_id'], 'func'))
 			continue;
 
 		$v = _txt($elem[$id]);
@@ -1272,6 +1287,8 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 				$upd .= "'".addslashes($v)."'";
 		}
 		$elemUpdate[] = $upd;
+
+		_dialogSpisokFuncValUpdate($r['id']);
 	}
 
 	if(!$unit_id) {
@@ -1314,6 +1331,26 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 	query($sql);
 
 	return $unit_id;
+}
+function _dialogSpisokFuncValUpdate($cmp_id) {//обновление значений функций компонентов (пока конкретно Действие 5)
+	if(!isset($_POST['func'][$cmp_id]))
+		return;
+
+	$v = $_POST['func'][$cmp_id];
+
+	$sql = "SELECT COUNT(`id`)
+			FROM `_dialog_component_func`
+			WHERE `action_id`=5
+			  AND `component_id`=".$cmp_id;
+	if(!query_value($sql))
+		return;
+/*
+	$sql = "UPDATE `_page_element`
+			SET `txt_3`='".addslashes($v)."'
+			WHERE `action_id`=5
+			  AND `component_id`=".$cmp_id;
+	query($sql);
+*/
 }
 function _pageElementDel($unit_id) {//удаление элемента страницы
 	$sql = "DELETE FROM `_page_element`
