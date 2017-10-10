@@ -178,7 +178,7 @@ function _pageSpisok($pe) {//список, выводимый на странице
 			FROM `".$spTable."`
 			WHERE `app_id` IN (0,".APP_ID.")
 			  AND `dialog_id`=".$dialog_id."
-			  "._pageSpisokFilterSearch($page_id, $spDialog)."
+			  "._pageSpisokFilterSearch($pe, $spDialog)."
 			ORDER BY `dtime_add` DESC
 			LIMIT ".$spLimit;
 	$spisok = query_arr($sql);
@@ -233,23 +233,26 @@ function _pageSpisok($pe) {//список, выводимый на странице
 
 	return $html;
 }
-function _pageSpisokFilterSearch($page_id, $spDialog) {//получение значений фильтра-поиска для списка
-//	print_r($spDialog);
-//	$spisok_id = $spDialog['num_3'];
+function _pageSpisokFilterSearch($pe, $spDialog) {//получение значений фильтра-поиска для списка
+	//если поиск не производится ни по каким колонкам, то выход
+	if(!$colIds = _ids($pe['txt_3'], 1))
+		return '';
 
-	//получение элемента поиска, содержащегося на странице, где находится список воздействующий на этот список
+	//получение значения элемента поиска, содержащегося на странице, где находится список воздействующий на этот список
 	$sql = "SELECT *
 			FROM `_page_element`
 			WHERE `app_id` IN(0,".APP_ID.")
-			  AND `page_id`=".$page_id."
+			  AND `page_id`=".$pe['page_id']."
 			  AND `dialog_id`=7
-			  AND `num_3`=".$spDialog['id'];
-	if(!$pe = query_assoc($sql))
+			  AND `num_3`=".$pe['id'];
+	if(!$search = query_assoc($sql))
 		return '';
-//echo $sql;
 
-//	$cond = strlen($val) ? " AND `".$spElement[$comp_id]['col_name']."` LIKE '%".$val."%'" : '';
-	return '';
+	$arr = array();
+	foreach($colIds as $cmp_id)
+		$arr[] = "`".$spDialog['component'][$cmp_id]['col_name']."` LIKE '%".addslashes($search['v'])."%'";
+
+	return " AND (".implode($arr, ' OR ').")";
 }
 
 
@@ -304,6 +307,17 @@ function _page_menu_spisok() {//список меню
 
 	return $send;
 }
+
+
+function _page_div() {//todo тест
+	return
+	'<div class="bg-ffc">123</div>';
+}
+
+
+
+
+
 
 
 

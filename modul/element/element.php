@@ -178,6 +178,32 @@ function _dialogSpisokOn() {//получение массива диалогов, которые могут быть спи
 			ORDER BY `id`";
 	return query_selArray($sql);
 }
+function _dialogSpisokOnPage($page_id) {//получение массива элементов страницы, которые являются списками 
+	if(!$page_id)
+		return array();
+	
+	$sql = "SELECT `id`,`num_3`
+			FROM `_page_element`
+			WHERE `app_id` IN (".APP_ID.",0)
+			  AND `page_id`=".$page_id."
+			  AND `dialog_id`=14
+			  AND `num_3`";
+	if(!$res = query_arr($sql))
+		return array();
+
+	$sql = "SELECT `id`,`spisok_name`
+			FROM `_dialog`
+			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
+			  AND `sa` IN (0".(SA ? ",1" : '').")
+			  AND `id` IN ("._idsGet($res, 'num_3').")
+			ORDER BY `id`";
+	$ass = query_ass($sql);
+
+	foreach($res as $id => $r)
+		$res[$id] = $ass[$r['num_3']];
+
+	return _selArray($res);
+}
 
 
 

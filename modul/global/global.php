@@ -417,8 +417,13 @@ function _idsGet($arr, $i='id') {//возвращение из массива списка id через запяту
 }
 function _idsAss($v) {//получение списка id вида: $v[25] = 1; - выбранный список
 	$send = array();
+
+	if(empty($v))
+		return $send;
+
 	foreach(_ids($v, 1) as $id)
 		$send[$id] = 1;
+
 	return $send;
 }
 

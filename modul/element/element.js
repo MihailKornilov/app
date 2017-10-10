@@ -464,6 +464,7 @@ var VK_SCROLL = 0,
 			param_txt_2:'',
 			param_bool_1:0,
 			param_bool_2:0,
+			param_bool_3:0,
 			v:[]
 		}, CMP);
 
@@ -572,6 +573,7 @@ var VK_SCROLL = 0,
 						param_bool_1 - использовать или нет нулевое значение
 		                param_txt_1  - текст нулевого значения
 		                param_bool_2 - использование всех списков при выборе
+                        param_bool_3 - выбор списков только с текущей страницы
 		                param_num_1  - id списка по dialog_id
 		                param_num_2  - id колонки по component_id
 		            */
@@ -636,9 +638,15 @@ var VK_SCROLL = 0,
 									'<td class="i b w150">все объекты списков' +
 										'<input type="hidden" id="param_bool_2" value="1" />' +
 									'<td><div class="icon icon-del mbm5' + _tooltip('Отменить выбор', -52) + '</div>' +
+								'<tr><td>' +
+									'<td colspan="2"><input type="hidden" id="param_bool_3" value="' + CMP.param_bool_3 + '" />' +
 							'</table>'
 						);
 						em.selCancel();
+						$('#param_bool_3')._check({
+							light:1,
+							title:'отображать списки только с текущей страницы'
+						});
 					});
 					but3.click(function() {
 						CMP.v = [];
@@ -648,10 +656,10 @@ var VK_SCROLL = 0,
 							._check('disable');
 						em.addClass('dn');
 						em.after(elObjSelect(CMP, 'Выбор элемента конкретного объекта-списка.' +
-														  '<br />' +
-														  'Для настройки выберите объект, затем колонку, ' +
-														  'по которой будет производиться отображение содержания.',
-													1)
+												  '<br />' +
+												  'Для настройки выберите объект, затем колонку, ' +
+												  'по которой будет производиться отображение содержания.',
+											1)
 								);
 						em.selCancel();
 						elObjSelect(CMP);
@@ -966,6 +974,7 @@ var VK_SCROLL = 0,
 					param_txt_2:$.trim($('#param_txt_2').val()),
 					param_bool_1:_bool($('#param_bool_1').val()),
 					param_bool_2:_bool($('#param_bool_2').val()),
+					param_bool_3:_bool($('#param_bool_3').val()),
 					v:EL_VAL_ASS
 				},
 				TYPE_7 = TYPE_ID == 7 || TYPE_ID == 9,
@@ -1280,7 +1289,7 @@ var VK_SCROLL = 0,
 				funcVal(sp.id, send.func, COMPONENT_FUNC);
 			});
 
-			dialog.post(send);
+			dialog.post(send, 'reload');
 		}
 		function funcVal(id, sf, func) {//получение значений функций
 			if(!func[id])
@@ -1469,7 +1478,7 @@ var VK_SCROLL = 0,
 						op:'spisok_col_get',
 						page_id:PAGE_ID,
 						component_id:component_id,
-						dialog_id:v
+						vid:v //либо dialog_id, либо pe_id, если стоит условие - список только с текущей страницы
 					};
 				_post(send, function(res) {
 					spc.html(res.html).removeClass('_busy');
