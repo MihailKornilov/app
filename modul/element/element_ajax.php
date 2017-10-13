@@ -1279,8 +1279,8 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 			));
 
 		//если это выпадающий список, выбирающий связку и вносит в список элементов
-		if($r['type_id'] == 2 && $dialog['base_table'] == '_page_element' && $r['param_num_1'])
-			$elemUpdate[] = "`table_id`=".$r['param_num_1'];
+//		if($r['type_id'] == 2 && $dialog['base_table'] == '_page_element' && $r['param_num_1'])
+//			$elemUpdate[] = "`num_id`=".$r['param_num_1'];
 
 		//служебная переменная app_any_spisok. Если равна 1, то устанавливает app_id=0 (все приложения), либо = id приложения
 		if($r['col_name'] == 'app_any_spisok') {

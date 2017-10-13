@@ -95,26 +95,6 @@ var FB,
 			}
 		});
 	},
-	sortPageElem = function() {
-		$('.pas_sort').sortable({
-			axis:'y',
-			update:function () {
-				var dds = $(this).find('.pas'),
-					arr = [];
-				for(var n = 0; n < dds.length; n++) {
-					var v = _num(dds.eq(n).attr('val'));
-					if(v)
-						arr.push(v);
-				}
-				var send = {
-					op:'sort',
-					table:'_page_element',
-					ids:arr.join()
-				};
-				_post(send, 'reload');
-			}
-		});
-	},
 	_toSpisok = function(s) {
 		var a=[];
 		for(k in s)
@@ -413,9 +393,9 @@ $.fn._flash = function(o) {//вспышка и затухание элемента в списке
 
 	return t;
 };
-$.fn._dn = function(v) {//скрытие/показ элемента
+$.fn._dn = function(v, cls) {//скрытие/показ элемента
 	var t = $(this);
-	t[(v ? 'remove' : 'add') + 'Class']('dn');
+	t[(v ? 'remove' : 'add') + 'Class'](cls || 'dn');
 	return t;
 };
 

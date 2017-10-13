@@ -268,6 +268,16 @@ function _pageSetupMenu() {//строка меню управления страницей
 	return
 	'<div id="pas">'.
 		'<div class="p pad5">'.
+
+			'<div class="fr mtm3">'.
+				'<div class="pad5 fl dn">'.
+					'<div id="pas-sort" class="pl icon icon-sort'._tooltip('Сортировать блоки', -59).'</div>'.
+					'<br />'.
+					'<div id="pas-div" class="pl icon icon-avai'._tooltip('Разделить блок пополам', -76).'</div>'.
+				'</div>'.
+				'<div class="icon-page-tmp"></div>'.
+			'</div>'.
+
 			'<div class="dib fs15">'.$page['name'].':</div>'.
 			'<div onclick="_dialogOpen('.$page['dialog_id'].','.PAGE_ID.')" class="icon icon-edit mbm5 ml20'._tooltip('Редактировать текущую страницу', -102).'</div>'.
 		'</div>'.

@@ -1506,6 +1506,44 @@ var VK_SCROLL = 0,
 			for(var i in ids)
 				$('#delem' + ids[i])[act](speed);
 		}
+	},
+
+	_pageElSort = function(v) {//включение/выключение сотрировки блоков на странице
+		$('#pas-sort')._dn(v, 'pl');
+
+		var curm = $('.pas:first').hasClass('curM');
+		if(!v && !curm)
+			return;
+
+		$('.pas')[(!v ? 'remove' : 'add') + 'Class']('curM');
+		$('.pas_sort').sortable(!v ? 'destroy' : {
+			axis:'y',
+			start:function(event, ui) {
+				ui.item.find('.pas-block').addClass('mv');
+				ui.item.css('z-index', 2000);
+			},
+			stop:function(event, ui) {
+				ui.item.find('.pas-block').removeClass('mv');
+				ui.item.css('z-index', 'auto');
+			},
+			update:function () {
+				var dds = $(this).find('.pas'),
+					arr = [];
+				_forEq(dds, function(sp) {
+					var v = _num(sp.attr('val'));
+					if(v)
+						arr.push(v);
+				});
+				var send = {
+					op:'sort',
+					table:'_page_element',
+					ids:arr.join()
+				};
+				_post(send, function() {
+					_msg('<div class="b center">Порядок сохранён</div>');
+				});
+			}
+		});
 	};
 
 $(document)
@@ -1547,7 +1585,6 @@ $(document)
 			'<div onclick="_dialogOpen(6,' + element_id + ')" class="icon icon-off' + _tooltip('Удалить', -25) + '</div>' +
 			'<br />' +
 			'<div class="icon icon-move' + _tooltip('Изменить позицию', -58) + '</div>' +
-			'<div class="icon icon-sort' + _tooltip('Сортировка', -36) + '</div>' +
 			'</div>';
 
 		t._hint({
@@ -1579,12 +1616,28 @@ $(document)
 						_msg('Стили применены');
 					});
 				});
-				hi.find('.icon-sort').click(function() {
-					$('.pas').addClass('curM');
-					sortPageElem();
-				});
 			}
 		});
+	})
+
+	.on('click', '.icon-page-tmp', function() {//установка/снятие галочки, если была выведена через PHP
+		var t = $(this),
+			v = t.hasClass('on');
+
+		t._dn(v, 'on');
+		t.prev()[!v ? 'show' : 'hide'](200);
+
+		//подсветка всех блоков страницы
+		$('.pas-block')._dn(!v);
+
+		_pageElSort();
+	})
+	.on('click', '#pas-sort', function() {//включение/выключение сотрировки блоков на странице
+		var t = $(this),
+			v = t.hasClass('pl');
+
+		_pageElSort(v);
+		_msg('Сортировка блоков в' + (!v ? 'ы' : '') + 'ключена');
 	});
 
 $.fn._check = function(o) {

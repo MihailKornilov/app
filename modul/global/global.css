@@ -2,6 +2,7 @@
 	margin:0;
 	font:13px normal;
 	font-family: -apple-system, BlinkMacSystemFont, Roboto, Open Sans, Helvetica Neue, sans-serif;
+/*	box-sizing:border-box;  */
 }
 body{background:#fff}
 a{color:#2B587A;text-decoration:none;outline:none;cursor:pointer}
@@ -122,6 +123,17 @@ table{border:0;border-spacing:0}
 
 
 
+.icon-page-tmp{
+	display:inline-block;
+	cursor:pointer;
+	width:48px;
+	height:48px;
+	background:url(../../img/page_tmp.png?1) no-repeat;
+	opacity:.4;
+}
+.icon-page-tmp:hover,
+.icon-page-tmp.on{background-position:0 -50px}
+.icon-page-tmp.on{opacity:1}
 
 
 
@@ -150,6 +162,26 @@ table{border:0;border-spacing:0}
 	border-bottom:#F2F2C2 solid 1px;
 }
 #pas .p{width:1000px;margin:auto}
+
+/* вспомогательный блок настройки элементов страницы */
+.pas-block{
+	position:absolute;
+	top:0;
+	right:-1px;
+	bottom:-1px;
+	left:0;
+	border:#BA5E00 solid 1px;
+	background-color:#FFECD8;
+	opacity:.6;
+	z-index:1000;
+}
+.pas-block:hover {
+	border:#AC5700 solid 1px;
+	background-color:#FFD1A2;
+	opacity:.4;
+}
+.pas-block.mv{opacity:1}
+
 
 /* Основное содержание сайта */
 #_content{
@@ -325,6 +357,7 @@ button.vk.orange:hover{background-color:#D59553}
 .mt1{margin-top:1px}
 .mtm1{margin-top:-1px}
 .mtm2{margin-top:-2px}
+.mtm3{margin-top:-3px}
 .mt3{margin-top:3px}
 .mt5{margin-top:5px}
 .mt10{margin-top:10px}

@@ -46,99 +46,94 @@ function _page_show($page_id) {//отображение содержания страницы
 			WHERE `page_id`=".$page_id."
 			ORDER BY `sort`";
 	foreach(query_arr($sql) as $id => $r) {
-		switch($r['table_id']) {
-			case 5://menu
-				$send .=
-					'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
-						_pageElementMenu($r['unit_id']).
-					'</div>';
+		switch($r['dialog_id']) {
+			case 2://button
+				$color = array(
+					0 => '',        //Синий - по умолчанию
+					321 => '',      //Синий
+					322 => 'green', //Зелёный
+					323 => 'red',   //Красный
+					324 => 'grey',  //Серый
+					325 => 'cancel',//Прозрачный
+					326 => 'pink',  //Розовый
+					327 => 'orange' //Оранжевый
+				);
+				$r['cls'] .= ' pad5 ';
+				$send .= _pageEl($r, _button(array(
+							'name' => $r['txt_1'],
+							'click' => '_dialogOpen('._dialogValToId('button'.$id).')',
+							'color' => $color[$r['num_1']],
+							'small' => $r['num_2']
+						)));
 				break;
-			default:
-				switch($r['dialog_id']) {
-					case 2://button
-						$color = array(
-							0 => '',        //Синий - по умолчанию
-							321 => '',      //Синий
-							322 => 'green', //Зелёный
-							323 => 'red',   //Красный
-							324 => 'grey',  //Серый
-							325 => 'cancel',//Прозрачный
-							326 => 'pink',  //Розовый
-							327 => 'orange' //Оранжевый
-						);
-						$send .=
-							'<div class="pad5 '.$r['cls']._pasClass().'"'._pasId($r).'>'.
-								_button(array(
-									'name' => $r['txt_1'],
-									'click' => '_dialogOpen('._dialogValToId('button'.$id).')',
-									'color' => $color[$r['num_1']],
-									'small' => $r['num_2']
-								)).
-							'</div>';
-					break;
-					case 4://head
-						$send .=
-							'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
-								'<div class="hd2">'.$r['txt_1'].'</div>'.
-							'</div>';
-						break;
-					case 7://search
-						$send .=
-							'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
-								_search(array(
-											'hold' => $r['txt_1'],
-											'grey' => $r['num_1'],
-											'width' => $r['num_2'],
-											'v' => $r['v']
-										)).
-							'</div>';
-						break;
-					case 9://link
-						$send .=
-							'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
-								'<a href="'.URL.'&p='.$r['num_1'].'">'.
+			case 3://menu
+				$send .= _pageEl($r, _pageElementMenu($r['num_1']));
+				break;
+			case 4://head
+				$send .= _pageEl($r, '<div class="hd2">'.$r['txt_1'].'</div>');
+				break;
+			case 7://search
+				$send .= _pageEl($r, _search(array(
+							'hold' => $r['txt_1'],
+							'grey' => $r['num_1'],
+							'width' => $r['num_2'],
+							'v' => $r['v']
+						)));
+				break;
+			case 9://link
+				$send .= _pageEl($r, '<a href="'.URL.'&p='.$r['num_1'].'">'.
 										$r['txt_1'].
-								 '</a>'.
-							'</div>';
-						break;
-					case 14://_spisok
-						$send .=
-							'<div class="'.$r['cls']._pasClass().'"'._pasId($r).'>'.
-								_pageSpisok($r).
-							'</div>';
-						break;
-				}
+						             '</a>'
+								);
+				break;
+			case 14://_spisok
+				$send .= _pageEl($r, _pageSpisok($r));
+				break;
 		}
 	}
 
 
 	return
-	'<div class="pas_sort">'.
+	'<div class="pas_sort prel">'.
 		$send.
+
+		'<div class="pe pas prel" id="pe_2_120" val="120">'.
+			'<table class="w100p">'.
+				'<tr><td class="prel top w300">'.
+						'<div class="pas-block dn"></div>'.
+						'<button class="vk green">Кнопка</button>'.
+					'<td class="prel top">'.
+						'<div class="pas-block dn"></div>'.
+						'123'.
+			'</table>'.
+		'</div>'.
+
 	'</div>'.
 	'<script>_pageShow()</script>';
 }
-function _pasClass() {//стили для редактирования элемента при условии включенного флага PAS
-	if(!PAS)
-		return ' pe';
+function _pageEl($r, $cont) {//вывод элемента станицы с учётом настройки
+	$attr_id = ' id="pe_'.$r['dialog_id'].'_'.$r['id'].'"';
+	$valId = PAS ? ' val="'.$r['id'].'"' : '';
+	$cls = PAS ? 'pas prel' : '';
+	return
+	'<div class="pe '.$r['cls'].$cls.'"'.$attr_id.$valId.'>'.
+		(PAS ? '<div class="pas-block dn"></div>' : '').
+		$cont.
+	'</div>';
 
-	return ' over3 pas pe';
 }
-function _pasId($r) {//id элемента страницы для сотрировки
-	return ' id="pe_'.$r['dialog_id'].'_'.$r['id'].'"'.(PAS ? ' val="'.$r['id'].'"' : '');
-}
-function _pageElementMenu($id) {//элемент страницы: Меню
+function _pageElementMenu($menu_id) {//элемент страницы: Меню
 	$sql = "SELECT *
 			FROM `_page_menu`
 			WHERE `app_id`=".APP_ID."
-			  AND `id`=".$id;
+			  AND `id`=".$menu_id;
 	if(!$menu = query_assoc($sql))
 		return 'Несуществующее меню.';
 
 	$sql = "SELECT *
 			FROM `_page_menu_razdel`
 			WHERE `app_id`=".APP_ID."
-			  AND `menu_id`=".$id;
+			  AND `menu_id`=".$menu_id;
 	if(!$spisok = query_arr($sql))
 		return 'Не разделов меню.';
 
@@ -311,7 +306,31 @@ function _page_menu_spisok() {//список меню
 
 function _page_div() {//todo тест
 	return
-	'<div class="bg-ffc">123</div>';
+	'<style>'.
+		'.t-block{background-color:#aee;border:transparent solid 1px;position:absolute;left:0;right:0;top:0;bottom:0;opacity:.5}'.
+		'.t-block:hover{background-color:#aff;border:#f00 solid 1px}'.
+		'.bg-gr3:not(:hover) .t-block{display:none}'.
+	'</style>'.
+	'<div class="bg-dfd">'.
+		'<div class="bg-gr3 w200 dib curP prel" style="height:100%">'.
+			'<div class="t-block"></div>'.
+			'1<br />'.
+			'1<br />'.
+			'1<br />'.
+			'1<br />'.
+			'<a>2354</a><br />'.
+			'1<br />'.
+			'1<br />'.
+			'1<br />'.
+			'1<br />'.
+			'1<br />'.
+			'1<br />'.
+			'1<br />'.
+			'1<br />'.
+		'</div>'.
+		'<div class="bg-ddf w400 dib" style="height:inherit">124<br />456</div>'.
+//		'<div class="bg-eee fl w500">124</div>'.
+	'</div>';
 }
 
 
