@@ -1508,15 +1508,15 @@ var VK_SCROLL = 0,
 		}
 	},
 
-	_pageElSort = function(v) {//включение/выключение сотрировки блоков на странице
+	_pageBlockSort = function(v) {//включение/выключение сотрировки блоков на странице
 		$('#pas-sort')._dn(v, 'pl');
 
-		var curm = $('.pas:first').hasClass('curM');
+		var curm = $('.pas-block:first').hasClass('curM');
 		if(!v && !curm)
 			return;
 
-		$('.pas')[(!v ? 'remove' : 'add') + 'Class']('curM');
-		$('.pas_sort').sortable(!v ? 'destroy' : {
+		$('.pas-block')._dn(!v, 'curM');
+		$('.pbsort0').sortable(!v ? 'destroy' : {
 			axis:'y',
 			start:function(event, ui) {
 				ui.item.find('.pas-block').addClass('mv');
@@ -1527,7 +1527,7 @@ var VK_SCROLL = 0,
 				ui.item.css('z-index', 'auto');
 			},
 			update:function () {
-				var dds = $(this).find('.pas'),
+				var dds = $(this).find('.pb'),
 					arr = [];
 				_forEq(dds, function(sp) {
 					var v = _num(sp.attr('val'));
@@ -1536,13 +1536,46 @@ var VK_SCROLL = 0,
 				});
 				var send = {
 					op:'sort',
-					table:'_page_element',
+					table:'_page_block',
 					ids:arr.join()
 				};
 				_post(send, function() {
 					_msg('<div class="b center">Порядок сохранён</div>');
 				});
 			}
+		});
+	},
+	_pageBlockResize = function() {//применение изменения размеров блоков
+		if(!$('.icon-page-tmp').hasClass('on'))
+			return;
+
+		_forEq($('.pas-block.resize'), function(eq) {
+			var wNext = eq.parent().next().find('.pas-block').width() - 29,
+				max = eq.width() + wNext;
+			eq.resizable({
+				minWidth:20,
+				maxWidth:max,
+				grid:10,
+				handles:'e',
+				start:function(event, ui) {
+					var el = $(ui.originalElement[0]);
+					el.css('z-index', 11)
+						.addClass('mv')
+						.find('.pas-icon')._dn();
+				},
+				stop:function(event, ui) {
+					var el = $(ui.originalElement[0]),
+						send = {
+							op:'page_block_resize',
+							block_id:el.attr('val'),
+							w:ui.size.width + 1
+						};
+					_post(send, function(res) {
+						$('#_content').html(res.html);
+						_pageBlockResize();
+					});
+				}
+			});
 		});
 	};
 
@@ -1576,15 +1609,15 @@ $(document)
 	.on('mouseenter', '.pas', function() {//вывод подсказки для редактирования или удаления элемента страницы
 		var t = $(this),
 			pe = t.attr('id').split('_'),
-			dialog_id = pe[1],
-			element_id = pe[2];
+			element_id = pe[1],
+			dialog_id = pe[2];
 
 		var msg =
 			'<div class="pt5 pl10 pr10">' +
-			'<div onclick="_dialogOpen(' + dialog_id + ',' + element_id + ')" class="icon icon-edit' + _tooltip('Редактировать элемент', -70) + '</div>' +
-			'<div onclick="_dialogOpen(6,' + element_id + ')" class="icon icon-off' + _tooltip('Удалить', -25) + '</div>' +
-			'<br />' +
-			'<div class="icon icon-move' + _tooltip('Изменить позицию', -58) + '</div>' +
+				'<div onclick="_dialogOpen(' + dialog_id + ',' + element_id + ')" class="icon icon-edit' + _tooltip('Редактировать элемент', -70) + '</div>' +
+				'<div onclick="_dialogOpen(6,' + element_id + ')" class="icon icon-off' + _tooltip('Удалить', -25) + '</div>' +
+				'<br />' +
+				'<div class="icon icon-move' + _tooltip('Изменить позицию', -58) + '</div>' +
 			'</div>';
 
 		t._hint({
@@ -1620,24 +1653,93 @@ $(document)
 		});
 	})
 
-	.on('click', '.icon-page-tmp', function() {//установка/снятие галочки, если была выведена через PHP
+	.on('click', '.icon-page-tmp', function() {//включение/выключение управления блоками
 		var t = $(this),
-			v = t.hasClass('on');
+			v = !t.hasClass('on');
 
-		t._dn(v, 'on');
-		t.prev()[!v ? 'show' : 'hide'](200);
+		t._dn(!v, 'on');
+		t.prev()[v ? 'show' : 'hide'](200);
 
 		//подсветка всех блоков страницы
-		$('.pas-block')._dn(!v);
+		$('.pas-block')._dn(v);
 
-		_pageElSort();
+		$('#page-block-add')[v ? 'slideDown' : 'slideUp'](200);
+		_pageBlockSort();
+		_pageBlockResize();
 	})
-	.on('click', '#pas-sort', function() {//включение/выключение сотрировки блоков на странице
+	.on('click', '#page-block-add', function() {//добавление нового блока
+		var t = $(this);
+
+		if(t.hasClass('_busy'))
+			return;
+
+		t.addClass('_busy');
+
+		var send = {
+			op:'page_block_add',
+			page_id:PAGE_ID
+		};
+		_post(
+			send,
+			function(res) {
+				t.removeClass('_busy');
+				$('.pbsort0').append(res.html);
+				$('#pb_' + res.id)._flash();
+			},
+			function() {
+				t.removeClass('_busy');
+			}
+		);
+	})
+	.on('click', '#pas-sort', function() {//включение/выключение сортировки блоков на странице
 		var t = $(this),
 			v = t.hasClass('pl');
 
-		_pageElSort(v);
+		_pageBlockSort(v);
 		_msg('Сортировка блоков в' + (!v ? 'ы' : '') + 'ключена');
+	})
+	.on('click', '#pas-div', function() {//включение/выключение деления блока пололам
+		var t = $(this),
+			v = t.hasClass('pl');
+
+		_pageBlockSort();
+
+		$('#pas-div')._dn(v, 'pl');
+		$('.pas-block')._dn(!v, 'curP');
+
+		$(document).off('click', '.pas-block');
+
+		if(!v)
+			return;
+
+		_msg('<div class="b center">Выберите блок, который нужно разделить</div>');
+		$(document).on('click', '.pas-block', function() {
+			var t = $(this),
+				id = _num(t.attr('val')),
+				send = {
+					op:'page_block_div',
+					block_id:id
+				};
+			_post(send, function(res) {
+				$('#_content').html(res.html);
+				_pageBlockResize();
+			});
+		});
+	})
+	.on('click', '.pas-block .icon-del-red', function() {//удаление блока
+		var t = $(this),
+			p = _parent(t, '.pas-block'),
+			id = p.attr('val'),
+			send = {
+				op:'page_block_del',
+				id:id
+			};
+		_post(send, function(res) {
+			p.parent().fadeOut(200, function() {
+				$('#_content').html(res.html);
+				_pageBlockResize();
+			})
+		});
 	});
 
 $.fn._check = function(o) {

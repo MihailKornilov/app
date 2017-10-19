@@ -35,93 +35,231 @@ function sa_page_spisok() {
 
 
 
+function _page_show($page_id, $blockShow=0) {
+	_pageBlockTest($page_id);
 
+	//получение списка блоков
+	$sql = "SELECT *
+			FROM `_page_block`
+			WHERE `page_id`=".$page_id."
+			ORDER BY `parent_id`,`sort`";
+	$arr = query_arr($sql);
+	$block = array();
+	$elem = array();
+	foreach($arr as $id => $r) {
+		$elem[$id] = array();
+		$r['sub'] = array();
+		if(!$r['parent_id']) {
+			$block[$id] = $r;
+			continue;
+		}
+		$block[$r['parent_id']]['sub'][] = $r;
+	}
 
-function _page_show($page_id) {//отображение содержания страницы
-	$send = '';
-
-	//элементы страницы
+	//расстановка элементов в блоки
 	$sql = "SELECT *
 			FROM `_page_element`
 			WHERE `page_id`=".$page_id."
 			ORDER BY `sort`";
-	foreach(query_arr($sql) as $id => $r) {
-		switch($r['dialog_id']) {
-			case 2://button
-				$color = array(
-					0 => '',        //Синий - по умолчанию
-					321 => '',      //Синий
-					322 => 'green', //Зелёный
-					323 => 'red',   //Красный
-					324 => 'grey',  //Серый
-					325 => 'cancel',//Прозрачный
-					326 => 'pink',  //Розовый
-					327 => 'orange' //Оранжевый
-				);
-				$r['cls'] .= ' pad5 ';
-				$send .= _pageEl($r, _button(array(
-							'name' => $r['txt_1'],
-							'click' => '_dialogOpen('._dialogValToId('button'.$id).')',
-							'color' => $color[$r['num_1']],
-							'small' => $r['num_2']
-						)));
-				break;
-			case 3://menu
-				$send .= _pageEl($r, _pageElementMenu($r['num_1']));
-				break;
-			case 4://head
-				$send .= _pageEl($r, '<div class="hd2">'.$r['txt_1'].'</div>');
-				break;
-			case 7://search
-				$send .= _pageEl($r, _search(array(
-							'hold' => $r['txt_1'],
-							'grey' => $r['num_1'],
-							'width' => $r['num_2'],
-							'v' => $r['v']
-						)));
-				break;
-			case 9://link
-				$send .= _pageEl($r, '<a href="'.URL.'&p='.$r['num_1'].'">'.
-										$r['txt_1'].
-						             '</a>'
-								);
-				break;
-			case 14://_spisok
-				$send .= _pageEl($r, _pageSpisok($r));
-				break;
+	$arr = query_arr($sql);
+	foreach($arr as $r)
+		$elem[$r['block_id']][] = $r;
+
+	$send = '';
+	foreach($block as $block_id => $r) {
+		$cls = PAS ? ' pb prel' : '';
+		$val = PAS ? ' val="'.$r['id'].'"' : '';
+		$mh = $elem[$block_id] ? '': ' h50';//минимальная высота, если блок пустой
+
+		if(!$r['sub']) {
+			$send .=
+				'<div id="pb_'.$r['id'].'" class="'.$cls.$mh.'"'.$val.'>'.
+					_pagePasBlock($r, $blockShow).
+					_pageElSpisok($elem[$block_id]).
+				'</div>';
+			continue;
 		}
+
+		$send .= '<div id="pb_'.$r['id'].'" class="pb"'.$val.'>'.
+					'<table class="w100p'.$mh.'"><tr>';
+		$cSub = count($r['sub']) - 1;
+		foreach($r['sub'] as $n => $sub) {
+			$w = $sub['w'] ? ' style="width:'.$sub['w'].'px"' : '';
+			$send .= '<td class="prel"'.$w.'>'.
+						_pagePasBlock($sub, $blockShow, $n != $cSub).
+						_pageElSpisok($elem[$sub['id']]);
+		}
+		$send .=	'</table>'.
+				'</div>';
+	}
+
+	return
+//	_pr($block).
+	'<div class="pbsort0 prel">'.
+		$send.
+	'</div>'.
+
+(PAS ?
+	'<div id="page-block-add" class="center mt1 pad15 bg-gr1 bor-f0 over1 curP'._dn($blockShow).'">'.
+		'<tt class="fs15 color-555">Добавить новый блок</tt>'.
+	'</div>'
+: '').
+
+	'<script>_pageShow()</script>';
+}
+function _pageBlockTest($page_id) {//проверка страницы на наличие хотя бы одного блока
+	//если блоков нет, то внесение одного и применение к нему всех элементов на странице
+
+	$sql = "SELECT `id`
+			FROM `_page_block`
+			WHERE `page_id`=".$page_id."
+			LIMIT 1";
+	if($block_id = query_value($sql))
+		return;
+
+	$sql = "INSERT INTO `_page_block` (
+				`app_id`,
+				`page_id`,
+				`viewer_id_add`
+			) VALUES (
+				".APP_ID.",
+				".$page_id.",
+				".VIEWER_ID."
+			)";
+	query($sql);
+
+	$block_id = query_insert_id('_page_block');
+
+	$sql = "UPDATE `_page_element`
+			SET `block_id`=".$block_id."
+			WHERE `page_id`=".$page_id;
+	query($sql);
+}
+/*
+function _page_show($page_id) {//отображение содержания страницы
+	$send = '';
+
+	//фасовка элементов страницы на группы
+	$sql = "SELECT
+				*
+			FROM `_page_element`
+			WHERE `page_id`=".$page_id."
+			ORDER BY `parent_id`,`sort`";
+	$arr = query_arr($sql);
+
+	foreach($arr as $id => $r)
+		if($r['parent_id']) {
+			if(!isset($arr[$r['parent_id']]['sub_ids']))
+				$arr[$r['parent_id']]['sub_ids'] = array();
+			$arr[$r['parent_id']]['sub_ids'][] = $id;
+		}
+
+	foreach($arr as $r) {
+		$cls = PAS ? ' class="prel"' : '';
+		$val = PAS ? ' val="'.$r['id'].'"' : '';
+
+		if(empty($r['sub_ids'])) {
+			if($r['parent_id'])
+				continue;
+			$send .=
+				'<div id="pe_'.$r['id'].'"'.$cls.$val.'>'.
+					_pagePasBlock($r).
+					_pageUnit($r).
+				'</div>';
+			continue;
+		}
+
+		$send .= '<div id="pe_'.$r['id'].'">'.
+					'<table class="w100p"><tr>';
+		foreach($r['sub_ids'] as $sub_id) {
+			$send .= '<td class="prel">'.
+						_pagePasBlock($arr[$sub_id]).
+						_pageUnit($arr[$sub_id]);
+		}
+		$send .= '</table></div>';
 	}
 
 
 	return
 	'<div class="pas_sort prel">'.
 		$send.
-
-		'<div class="pe pas prel" id="pe_2_120" val="120">'.
-			'<table class="w100p">'.
-				'<tr><td class="prel top w300">'.
-						'<div class="pas-block dn"></div>'.
-						'<button class="vk green">Кнопка</button>'.
-					'<td class="prel top">'.
-						'<div class="pas-block dn"></div>'.
-						'123'.
-			'</table>'.
-		'</div>'.
-
 	'</div>'.
 	'<script>_pageShow()</script>';
 }
-function _pageEl($r, $cont) {//вывод элемента станицы с учётом настройки
-	$attr_id = ' id="pe_'.$r['dialog_id'].'_'.$r['id'].'"';
-	$valId = PAS ? ' val="'.$r['id'].'"' : '';
-	$cls = PAS ? 'pas prel' : '';
+*/
+function _pageElSpisok($elem) {//список элементов формате html для конкретного блока
+	if(!$elem)
+		return '';
+
+	$send = '';
+	foreach($elem as $r) {
+		$send .= '<div>'._pageUnit($r).'</div>';
+	}
+
+	return $send;
+}
+function _pageUnit($unit) {//формирование элемента страницы
+	switch($unit['dialog_id']) {
+		case 2://button
+			$color = array(
+				0 => '',        //Синий - по умолчанию
+				321 => '',      //Синий
+				322 => 'green', //Зелёный
+				323 => 'red',   //Красный
+				324 => 'grey',  //Серый
+				325 => 'cancel',//Прозрачный
+				326 => 'pink',  //Розовый
+				327 => 'orange' //Оранжевый
+			);
+			return _button(array(
+						'name' => $unit['txt_1'],
+						'click' => '_dialogOpen('._dialogValToId('button'.$unit['id']).')',
+						'color' => $color[$unit['num_1']],
+						'small' => $unit['num_2']
+					));
+		case 3://menu
+			return _pageElementMenu($unit['num_1']);
+		case 4://head
+			return '<div class="hd2">'.$unit['txt_1'].'</div>';
+		case 7://search
+			return _search(array(
+						'hold' => $unit['txt_1'],
+						'grey' => $unit['num_1'],
+						'width' => $unit['num_2'],
+						'v' => $unit['v']
+					));
+		case 9://link
+			return '<a href="'.URL.'&p='.$unit['num_1'].'">'.
+						$unit['txt_1'].
+				   '</a>';
+		case 14://_spisok
+			return _pageSpisok($unit);
+	}
+	return 'неизвестный элемент='.$unit['dialog_id'];
+}
+function _pagePasBlock($r, $show=0, $resize=0) {//подсветка блоков при редактировании
+	if(!PAS)
+		return '';
+
+	$block_id = $r['id'];
+	$dn = $show ? '' : ' dn';
+	$resize = $resize ? ' resize' : '';
+
 	return
-	'<div class="pe '.$r['cls'].$cls.'"'.$attr_id.$valId.'>'.
-		(PAS ? '<div class="pas-block dn"></div>' : '').
-		$cont.
+	'<div class="pas-block'.$resize.$dn.'" val="'.$block_id.'">'.
+		'<div class="fl">'.
+			$block_id.
+			'<span class="fs11 grey"> w'.$r['w'].'</span>'.
+			'<span class="fs11 color-acc"> '.$r['sort'].'</span>'.
+		'</div>'.
+		'<div class="pas-icon'.($resize ? ' mr5' : '').'">'.
+			'<div class="icon icon-del-red fr mt1'._tooltip('Удалить блок', -42).'</div>'.
+		'</div>'.
 	'</div>';
 
 }
+
+
 function _pageElementMenu($menu_id) {//элемент страницы: Меню
 	$sql = "SELECT *
 			FROM `_page_menu`

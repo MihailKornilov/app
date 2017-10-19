@@ -270,10 +270,9 @@ function _pageSetupMenu() {//строка меню управления страницей
 		'<div class="p pad5">'.
 
 			'<div class="fr mtm3">'.
-				'<div class="pad5 fl dn">'.
+				'<div class="pad5 w35 wsnw mr5 fl dn">'.
 					'<div id="pas-sort" class="pl icon icon-sort'._tooltip('Сортировать блоки', -59).'</div>'.
-					'<br />'.
-					'<div id="pas-div" class="pl icon icon-avai'._tooltip('Разделить блок пополам', -76).'</div>'.
+					'<div id="pas-div" class="pl icon icon-div'._tooltip('Разделить блок пополам', -76).'</div>'.
 				'</div>'.
 				'<div class="icon-page-tmp"></div>'.
 			'</div>'.
@@ -536,6 +535,36 @@ function translit($str) {
 
 
 
+function _pr($arr) {//аналог функции print_r
+	if(empty($arr))
+		return _prMsg('массив пуст');
+
+	if(!is_array($arr))
+		return _prMsg('не является массивом');
+
+	return
+	'<div class="dib pad5 bor-e8">'.
+		_prFor($arr).
+	'</div>';
+}
+function _prMsg($msg) {
+	return '<div class="dib grey i pad5 bor-e8">'.$msg.'</div>';
+}
+function _prFor($arr, $sub=0) {//перебор массива
+	$send = '';
+	foreach($arr as $id => $r) {
+		$send .=
+			'<div class="'.($sub ? 'ml20' : '').(is_array($r) ? '' : ' mtm2').'">'.
+				'<span class="'.($sub ? 'fs11 color-acc' : 'fs12 black').(is_array($r) ? ' b u curP' : '').'"'.(is_array($r) ? ' onclick="$(this).next().slideToggle(300)"' : '').'>'.
+					$id.':'.
+				'</span> '.
+				'<span class="grey fs11">'.
+					(is_array($r) ? _prFor($r, 1) : $r).
+				'</span>'.
+			'</div>';
+	}
+	return $send;
+}
 
 
 function _arr($arr, $i=false) {//Последовательный массив

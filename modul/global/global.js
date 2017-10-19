@@ -347,13 +347,14 @@ var FB,
 		});
 	},
 	_pageShow = function() {//выполнение после вывода страницы
+
 		//применение функций к _search
 		_forEq($('._search'), function(sp) {
 			sp.find('input')._search({
 				func:function(v) {
 					var send = {
 						op:'spisok_get',
-						element_id:_parent(sp, '.pe').attr('id').split('_')[2],
+						element_id:_parent(sp, '.pe').attr('id').split('_')[1],
 						v:v
 					};
 					_post(send, function(res) {
@@ -378,7 +379,7 @@ $.fn._flash = function(o) {//вспышка и затухание элемента в списке
 		mt = t.css('margin-top');
 
 	o = $.extend({
-		color:'orange'
+		color:'orange' //orange, red
 	}, o);
 
 	t.before('<div id="unit-flash" class="' + o.color + '"><div></div></div>')

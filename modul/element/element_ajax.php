@@ -222,6 +222,216 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+	case 'page_block_add'://добавление блока на страницу
+		if(!$page_id = _num($_POST['page_id']))
+			jsonError('Некорректный ID страницы');
+
+		$sql = "INSERT INTO `_page_block` (
+					`app_id`,
+					`page_id`,
+					`sort`,
+					`viewer_id_add`
+				) VALUES (
+					".APP_ID.",
+					".$page_id.",
+					"._maxSql('_page_block').",
+					".VIEWER_ID."
+				)";
+		query($sql);
+
+		$block_id = query_insert_id('_page_block');
+
+		$block = array(
+			'id' => $block_id,
+			'w' => 0,
+			'sort' => 0
+		);
+
+		$send['id'] = $block_id;
+		$send['html'] = utf8(
+			'<div id="pb_'.$block_id.'" class="pb prel h50" val="'.$block_id.'">'.
+				_pagePasBlock($block, 1).
+			'</div>'
+		);
+
+		jsonSuccess($send);
+		break;
+	case 'page_block_div'://деление блока на две части
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный ID блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `app_id` IN (0,".APP_ID.")
+				  AND `id`=".$block_id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$block_id.' не существует');
+
+
+		//если блок является основным, то он становится дочерним, а над ним вносится блок, который будет родителем над текущим и над новым
+		if(!$parent_id = _num($block['parent_id'])) {
+			$sql = "INSERT INTO `_page_block` (
+						`app_id`,
+						`page_id`,
+						`sort`,
+						`viewer_id_add`
+					) VALUES (
+						".APP_ID.",
+						".$block['page_id'].",
+						".$block['sort'].",
+						".VIEWER_ID."
+					)";
+			query($sql);
+
+			$parent_id = query_insert_id('_page_block');
+
+			$sql = "UPDATE `_page_block`
+					SET `parent_id`=".$parent_id.",
+						`w`=1000
+					WHERE `id`=".$block_id;
+			query($sql);
+
+			$block['w'] = 1000;
+		}
+
+		//изменение значений сортировки, чтобы не повторялись
+		$sql = "UPDATE `_page_block`
+				SET `sort`=`sort`+1
+				WHERE `parent_id`=".$parent_id."
+				  AND `sort`>".$block['sort'];
+		query($sql);
+
+		//внесение нового дочернего блока
+		$sql = "INSERT INTO `_page_block` (
+					`app_id`,
+					`page_id`,
+					`parent_id`,
+					`w`,
+					`sort`,
+					`viewer_id_add`
+				) VALUES (
+					".APP_ID.",
+					".$block['page_id'].",
+					".$parent_id.",
+					100,
+					".($block['sort'] + 1).",
+					".VIEWER_ID."
+				)";
+		query($sql);
+
+		//определение блока, из которого нужно вычесть размер 100px
+		if($block['w'] < 200) {
+			$sql = "SELECT `id`
+					FROM `_page_block`
+					WHERE `parent_id`=".$parent_id."
+					ORDER BY `w` DESC
+					LIMIT 1";
+			$block_id = query_value($sql);
+		}
+
+		//убавление размера разделяемого блока
+		$sql = "UPDATE `_page_block`
+				SET `w`=`w`-100
+				WHERE `id`=".$block_id;
+		query($sql);
+
+		$send['html'] = utf8(_page_show($block['page_id'], 1));
+
+		jsonSuccess($send);
+		break;
+	case 'page_block_resize'://изменение размера блока
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный ID блока');
+		if(!$w = _num($_POST['w']))
+			jsonError('Некорректная длина блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `app_id` IN (0,".APP_ID.")
+				  AND `id`=".$block_id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$block_id.' не существует');
+
+		//установка новой длины блока
+		$sql = "UPDATE `_page_block`
+				SET `w`=".$w."
+				WHERE `id`=".$block_id;
+		query($sql);
+
+		//изменение длины следующего блока на уменьшенную разницу
+		$sql = "UPDATE `_page_block`
+				SET `w`=`w`+(".($block['w'] - $w).")
+				WHERE `parent_id`=".$block['parent_id']."
+				  AND `sort`>".$block['sort']."
+				ORDER BY `sort`
+				LIMIT 1";
+		query($sql);
+
+		$send['html'] = utf8(_page_show($block['page_id'], 1));
+		
+		jsonSuccess($send);
+		break;
+	case 'page_block_del'://удаление блока
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный ID блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `app_id` IN (0,".APP_ID.")
+				  AND `id`=".$id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$id.' не существует');
+
+		//если блок является дочерним
+		if($block['parent_id']) {
+			//подсчёт количества дочерних блоков, в котором состоит удаляемый блок
+			$sql = "SELECT COUNT(*)
+					FROM `_page_block`
+					WHERE `parent_id`=".$block['parent_id'];
+			$parentCount = query_value($sql);
+
+			//если блок останется один, то установка его основным на странице
+			if($parentCount < 3) {
+				//получение данных блока-родителя
+				$sql = "SELECT *
+						FROM `_page_block`
+						WHERE `id`=".$id;
+				$blockParent = query_assoc($sql);
+
+				//удаление блока-родителя
+				$sql = "DELETE FROM `_page_block` WHERE `id`=".$block['parent_id'];
+				query($sql);
+
+				//оставшийся блок помещается на основной странице
+				$sql = "UPDATE `_page_block`
+						SET `parent_id`=0,
+							`w`=0,
+							`sort`=".$blockParent['sort']."
+						WHERE `parent_id`=".$block['parent_id'];
+				query($sql);
+			} else {
+				//увеличение длины первого блока в строке на длину удалённого блока
+				$sql = "UPDATE `_page_block`
+						SET `w`=`w`+".$block['w']."
+						WHERE `parent_id`=".$block['parent_id']."
+						  AND `id`!=".$id."
+						ORDER BY `sort`
+						LIMIT 1";
+				query($sql);
+			}
+		}
+
+		//удаление блока
+		$sql = "DELETE FROM `_page_block` WHERE `id`=".$id;
+		query($sql);
+
+		$send['html'] = utf8(_page_show($block['page_id'], 1));
+
+		jsonSuccess($send);
+		break;
 
 	case 'spisok_add'://внесение данных диалога в _spisok
 		if(!$dialog_id = _num($_POST['dialog_id']))
@@ -300,7 +510,7 @@ switch(@$_POST['op']) {
 		//получение данных элемента поиска
 		$sql = "SELECT *
 				FROM `_page_element`
-				WHERE `app_id` IN(0,".APP_ID.")
+				WHERE `app_id` IN (0,".APP_ID.")
 				  AND `id`=".$element_id;
 		if(!$pe = query_assoc($sql))
 			jsonError('Элемента id'.$element_id.' не существует');
@@ -318,7 +528,7 @@ switch(@$_POST['op']) {
 		//расположение списка на странице, на которой расположен поиск
 		$sql = "SELECT *
 				FROM `_page_element`
-				WHERE `app_id` IN(0,".APP_ID.")
+				WHERE `app_id` IN (0,".APP_ID.")
 				  AND `dialog_id`=14
 				  AND `page_id`=".$pe['page_id']."
 				  AND `id`=".$pe_id."
@@ -326,7 +536,7 @@ switch(@$_POST['op']) {
 		if(!$peSpisok = query_assoc($sql))
 			jsonError('Нет нужного списка на странице');
 
-		$send['attr_id'] = '#pe_'.$peSpisok['dialog_id'].'_'.$peSpisok['id'];
+		$send['attr_id'] = '#pe_'.$peSpisok['id'];
 		$send['spisok'] = utf8(_pageSpisok($peSpisok));
 
 		jsonSuccess($send);
@@ -1154,6 +1364,9 @@ function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страни
 
 	//нет страницы - нет выбора
 	if(!$page_id)
+		return '';
+
+	if($r['dialog_id'] == 3)//меню
 		return '';
 
 	$spisokOther = $r['type_id'] == 2 && $r['param_num_1'];
