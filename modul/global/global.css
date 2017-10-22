@@ -76,7 +76,7 @@ table{border:0;border-spacing:0}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:url(../../img/icon_vk.png?42) no-repeat;
+	background:url(../../img/icon_vk.png?46) no-repeat;
 	width:18px;
 	height:18px;
 	padding:0 1px;
@@ -98,7 +98,7 @@ table{border:0;border-spacing:0}
 .icon-worker{background-position:0 -180px}
 .icon-setup{background-position:0 -200px}
 .icon-setup-big{background-position:0 -220px}
-.icon-sort{background-position:0 -240px}
+.icon-sort{background-position:0 -240px}/* стрелки верх-вниз */
 .icon-add{background-position:0 -260px}
 .icon-ok{background-position:0 -280px}
 .icon-sub{background-position:0 -300px}
@@ -107,7 +107,7 @@ table{border:0;border-spacing:0}
 .icon-join{background-position:0 -380px}
 /*.icon-off{background-position:0 -400px} мусорный контейнер*/
 .icon-order{background-position:0 -420px}
-.icon-move{background-position:0 -440px}
+.icon-move{background-position:0 -440px}/* стрелки лево-право */
 .icon-avai{background-position:0 -460px}
 .icon-off{background-position:0 -480px}
 .icon-stat{background-position:0 -500px}
@@ -173,11 +173,26 @@ table{border:0;border-spacing:0}
 	left:0;
 	border:#b61 solid 1px;
 	background-color:#FFDCB9;
-	opacity:.6;
+	opacity:.7;
 	z-index:10;
 }
 .pas-block:hover{opacity:.9}
+.pas-block.empty{
+	background:transparent repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAAsTAAALEwEAmpwYAAAABGdBTUEAALGeYUxB9wAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAANklEQVR42mL4f2np/////zPgwhAGLkWXlqJy0CURJqArQlKM1VhMNxBlAl434PEFAAAA//8DAB4qxdGX1So4AAAAAElFTkSuQmCC");
+}
 .pas-block.mv{opacity:1}
+.pas-icon{
+	position:absolute;
+	white-space:nowrap;
+	padding:5px 2px 0 5px;
+	height:22px;
+	right:-1px;
+	top:-1px;
+	text-align:right;
+	border:#b61 solid 1px;
+	background-color:#fff;
+}
+.pas-block.resize .pas-icon{right:6px}
 .pas-block:not(:hover) .pas-icon{display:none}
 .pas-block .ui-resizable-e{right:0;width:6px}
 .pas-block:hover .ui-resizable-e{background-color:#FFBA75}
@@ -344,6 +359,7 @@ button.vk.orange:hover{background-color:#D59553}
 .mar20{margin:20px}
 .mar0-5{margin:0 5px}
 .mar020{margin:0 20px}
+.mr3{margin-right:3px}
 .mr5{margin-right:5px}
 .mr10{margin-right:10px}
 .mr20{margin-right:20px}

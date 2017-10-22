@@ -70,6 +70,7 @@ function _page_show($page_id, $blockShow=0) {
 		$cls = PAS ? ' pb prel' : '';
 		$val = PAS ? ' val="'.$r['id'].'"' : '';
 		$mh = $elem[$block_id] ? '': ' h50';//минимальная высота, если блок пустой
+		$r['elem_count'] = count($elem[$block_id]);
 
 		if(!$r['sub']) {
 			$send .=
@@ -84,6 +85,7 @@ function _page_show($page_id, $blockShow=0) {
 					'<table class="w100p'.$mh.'"><tr>';
 		$cSub = count($r['sub']) - 1;
 		foreach($r['sub'] as $n => $sub) {
+			$sub['elem_count'] = count($elem[$sub['id']]);
 			$w = $sub['w'] ? ' style="width:'.$sub['w'].'px"' : '';
 			$send .= '<td class="prel"'.$w.'>'.
 						_pagePasBlock($sub, $blockShow, $n != $cSub).
@@ -244,16 +246,21 @@ function _pagePasBlock($r, $show=0, $resize=0) {//подсветка блоков при редактиро
 	$block_id = $r['id'];
 	$dn = $show ? '' : ' dn';
 	$resize = $resize ? ' resize' : '';
+	$empty = $r['elem_count'] ? '' : ' empty';
+
 
 	return
-	'<div class="pas-block'.$resize.$dn.'" val="'.$block_id.'">'.
+	'<div class="pas-block'.$empty.$resize.$dn.'" val="'.$block_id.'">'.
 		'<div class="fl">'.
 			$block_id.
 			'<span class="fs11 grey"> w'.$r['w'].'</span>'.
 			'<span class="fs11 color-acc"> '.$r['sort'].'</span>'.
 		'</div>'.
-		'<div class="pas-icon'.($resize ? ' mr5' : '').'">'.
-			'<div class="icon icon-del-red fr mt1'._tooltip('Удалить блок', -42).'</div>'.
+		'<div class="pas-icon">'.
+			'<div class="icon icon-add mr3'._tooltip('Добавить элемент', -57).'</div>'.
+	($r['parent_id'] ? '<div class="icon icon-move mr3 center'._tooltip('Изменить порядок<br />по горизонтали', -56, '', 1).'</div>' : '').
+			'<div class="icon icon-div mr3'._tooltip('Разделить блок пополам', -76).'</div>'.
+			'<div class="icon icon-del-red'._tooltip('Удалить блок', -42).'</div>'.
 		'</div>'.
 	'</div>';
 

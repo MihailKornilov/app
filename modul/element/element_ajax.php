@@ -244,6 +244,7 @@ switch(@$_POST['op']) {
 		$block = array(
 			'id' => $block_id,
 			'w' => 0,
+			'elem_count' => 0,
 			'sort' => 0
 		);
 

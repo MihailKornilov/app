@@ -1698,32 +1698,17 @@ $(document)
 		_pageBlockSort(v);
 		_msg('Сортировка блоков в' + (!v ? 'ы' : '') + 'ключена');
 	})
-	.on('click', '#pas-div', function() {//включение/выключение деления блока пололам
+	.on('click', '.pas-block .icon-div', function() {//деление блока пололам
 		var t = $(this),
-			v = t.hasClass('pl');
-
-		_pageBlockSort();
-
-		$('#pas-div')._dn(v, 'pl');
-		$('.pas-block')._dn(!v, 'curP');
-
-		$(document).off('click', '.pas-block');
-
-		if(!v)
-			return;
-
-		_msg('<div class="b center">Выберите блок, который нужно разделить</div>');
-		$(document).on('click', '.pas-block', function() {
-			var t = $(this),
-				id = _num(t.attr('val')),
-				send = {
-					op:'page_block_div',
-					block_id:id
-				};
-			_post(send, function(res) {
-				$('#_content').html(res.html);
-				_pageBlockResize();
-			});
+			p = _parent(t, '.pas-block'),
+			id = p.attr('val'),
+			send = {
+				op:'page_block_div',
+				block_id:id
+			};
+		_post(send, function(res) {
+			$('#_content').html(res.html);
+			_pageBlockResize();
 		});
 	})
 	.on('click', '.pas-block .icon-del-red', function() {//удаление блока

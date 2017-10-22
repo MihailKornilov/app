@@ -272,7 +272,6 @@ function _pageSetupMenu() {//строка меню управлени€ страницей
 			'<div class="fr mtm3">'.
 				'<div class="pad5 w35 wsnw mr5 fl dn">'.
 					'<div id="pas-sort" class="pl icon icon-sort'._tooltip('—ортировать блоки', -59).'</div>'.
-					'<div id="pas-div" class="pl icon icon-div'._tooltip('–азделить блок пополам', -76).'</div>'.
 				'</div>'.
 				'<div class="icon-page-tmp"></div>'.
 			'</div>'.
