@@ -74,22 +74,22 @@ function _page_show($page_id, $blockShow=0) {
 
 		if(!$r['sub']) {
 			$send .=
-				'<div id="pb_'.$r['id'].'" class="'.$cls.$mh.'"'.$val.'>'.
+				'<div id="pb_'.$r['id'].'"'._pageBlockStyle($r).' class="elem-sort bspb '.$r['bg'].' '.$cls.$mh.'"'.$val.'>'.
 					_pagePasBlock($r, $blockShow).
-					_pageElSpisok($elem[$block_id]).
+					_pageElemSpisok($elem[$block_id]).
 				'</div>';
 			continue;
 		}
 
 		$send .= '<div id="pb_'.$r['id'].'" class="pb"'.$val.'>'.
-					'<table class="w100p'.$mh.'"><tr>';
+					'<table class="w100p prel'.$mh.'">'.
+						'<tr>';
 		$cSub = count($r['sub']) - 1;
 		foreach($r['sub'] as $n => $sub) {
 			$sub['elem_count'] = count($elem[$sub['id']]);
-			$w = $sub['w'] ? ' style="width:'.$sub['w'].'px"' : '';
-			$send .= '<td class="prel"'.$w.'>'.
+			$send .= '<td class="elem-sort bspb '.$sub['bg'].' prel top"'._pageBlockStyle($sub).'>'.
 						_pagePasBlock($sub, $blockShow, $n != $cSub).
-						_pageElSpisok($elem[$sub['id']]);
+						_pageElemSpisok($elem[$sub['id']]);
 		}
 		$send .=	'</table>'.
 				'</div>';
@@ -137,70 +137,57 @@ function _pageBlockTest($page_id) {//проверка страницы на наличие хотя бы одного
 			WHERE `page_id`=".$page_id;
 	query($sql);
 }
-/*
-function _page_show($page_id) {//отображение содержания страницы
-	$send = '';
+function _pageBlockStyle($r) {
+	$send = array();
 
-	//фасовка элементов страницы на группы
-	$sql = "SELECT
-				*
-			FROM `_page_element`
-			WHERE `page_id`=".$page_id."
-			ORDER BY `parent_id`,`sort`";
-	$arr = query_arr($sql);
-
-	foreach($arr as $id => $r)
-		if($r['parent_id']) {
-			if(!isset($arr[$r['parent_id']]['sub_ids']))
-				$arr[$r['parent_id']]['sub_ids'] = array();
-			$arr[$r['parent_id']]['sub_ids'][] = $id;
+	$ex = explode(' ', $r['pad']);
+	foreach($ex as $px)
+		if($px) {
+			$send[] = 'padding:'.
+				$ex[0].($ex[0] ? 'px' : '').' '.
+				$ex[1].($ex[1] ? 'px' : '').' '.
+				$ex[2].($ex[2] ? 'px' : '').' '.
+				$ex[3].($ex[3] ? 'px' : '');
+			break;
 		}
 
-	foreach($arr as $r) {
-		$cls = PAS ? ' class="prel"' : '';
-		$val = PAS ? ' val="'.$r['id'].'"' : '';
+	if($r['w'])
+		$send[] = 'width:'.$r['w'].'px';
 
-		if(empty($r['sub_ids'])) {
-			if($r['parent_id'])
-				continue;
-			$send .=
-				'<div id="pe_'.$r['id'].'"'.$cls.$val.'>'.
-					_pagePasBlock($r).
-					_pageUnit($r).
-				'</div>';
-			continue;
-		}
+	if(!$send)
+		return '';
 
-		$send .= '<div id="pe_'.$r['id'].'">'.
-					'<table class="w100p"><tr>';
-		foreach($r['sub_ids'] as $sub_id) {
-			$send .= '<td class="prel">'.
-						_pagePasBlock($arr[$sub_id]).
-						_pageUnit($arr[$sub_id]);
-		}
-		$send .= '</table></div>';
-	}
-
-
-	return
-	'<div class="pas_sort prel">'.
-		$send.
-	'</div>'.
-	'<script>_pageShow()</script>';
+	return ' style="'.implode(';', $send).'"';
 }
-*/
-function _pageElSpisok($elem) {//список элементов формате html для конкретного блока
+function _pageElemSpisok($elem) {//список элементов формате html для конкретного блока
 	if(!$elem)
 		return '';
 
 	$send = '';
 	foreach($elem as $r) {
-		$send .= '<div>'._pageUnit($r).'</div>';
+		$send .=
+		'<div class="pe prel" id="pe_'.$r['id'].'">'.
+			_pagePasElem($r).
+			_pageElemUnit($r).
+		'</div>';
 	}
 
 	return $send;
 }
-function _pageUnit($unit) {//формирование элемента страницы
+function _pagePasElem($r) {
+	if(!PAS)
+		return '';
+
+	return
+	'<div class="pas-elem" val="'.$r['id'].'">'.
+		'<div class="elem-icon">'.
+			'<div class="icon icon-sort curM mr3'._tooltip('Изменить порядок<br />внутри блока', -57, '', 1).'</div>'.
+			'<div onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')" class="icon icon-edit mr3'._tooltip('Настроить элемент', -58).'</div>'.
+			'<div onclick="_dialogOpen(6,'.$r['id'].')" class="icon icon-del-red'._tooltip('Удалить элемент', -53).'</div>'.
+		'</div>'.
+	'</div>';
+}
+function _pageElemUnit($unit) {//формирование элемента страницы
 	switch($unit['dialog_id']) {
 		case 2://button
 			$color = array(
@@ -226,7 +213,6 @@ function _pageUnit($unit) {//формирование элемента страницы
 		case 7://search
 			return _search(array(
 						'hold' => $unit['txt_1'],
-						'grey' => $unit['num_1'],
 						'width' => $unit['num_2'],
 						'v' => $unit['v']
 					));
@@ -258,12 +244,12 @@ function _pagePasBlock($r, $show=0, $resize=0) {//подсветка блоков при редактиро
 		'</div>'.
 		'<div class="pas-icon">'.
 			'<div class="icon icon-add mr3'._tooltip('Добавить элемент', -57).'</div>'.
-	($r['parent_id'] ? '<div class="icon icon-move mr3 center'._tooltip('Изменить порядок<br />по горизонтали', -56, '', 1).'</div>' : '').
+			'<div class="icon icon-setup mr3'._tooltip('Стили блока', -39).'</div>'.
+	($r['parent_id'] ? '<div class="icon icon-move mr3 curM center'._tooltip('Изменить порядок<br />по горизонтали', -56, '', 1).'</div>' : '').
 			'<div class="icon icon-div mr3'._tooltip('Разделить блок пополам', -76).'</div>'.
 			'<div class="icon icon-del-red'._tooltip('Удалить блок', -42).'</div>'.
 		'</div>'.
 	'</div>';
-
 }
 
 

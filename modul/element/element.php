@@ -76,18 +76,15 @@ function _search($v=array()) {//ıëåìåíò ÏÎÈÑÊ
 		'id' => @$v['id'],
 		'width' => _num(@$v['width']) ? _num($v['width']) : 300,
 		'hold' => @$v['hold'],
-		'grey' => _num(@$v['grey']),
 		'v' => @$v['v']
 	);
 	return
-	($v['grey'] ? '<div class="pad10 bg-gr3 line-b">' : '').
-		'<div class="_search" style="width:'.$v['width'].'px">'.
-				'<div class="icon icon-del fr'._dn($v['v']).'"></div>'.
-				'<div class="_busy dib fr mr5 dn"></div>'.
-				'<div class="hold'._dn(!$v['v']).'">'.$v['hold'].'</div>'.
-				'<input type="text" style="width:'.($v['width'] - 77).'px" value="'.$v['v'].'" />'.
-		'</div>'.
-	($v['grey'] ? '</div>' : '');
+	'<div class="_search" style="width:'.$v['width'].'px">'.
+		'<div class="icon icon-del fr'._dn($v['v']).'"></div>'.
+		'<div class="_busy dib fr mr5 dn"></div>'.
+		'<div class="hold'._dn(!$v['v']).'">'.$v['hold'].'</div>'.
+		'<input type="text" style="width:'.($v['width'] - 77).'px" value="'.$v['v'].'" />'.
+	'</div>';
 }
 
 

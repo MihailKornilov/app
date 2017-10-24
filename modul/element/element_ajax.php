@@ -181,7 +181,7 @@ switch(@$_POST['op']) {
 				jsonError('Записи не существует');
 			if(@$data['sa'] && !SA)
 				jsonError('Нет доступа');
-			if($data['deleted'])
+			if(@$data['deleted'])
 				jsonError('Запись была удалена');
 		}
 
@@ -208,20 +208,6 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
-	case 'page_element_class_set'://применение новых стилей к элементу страницы
-		if(!$element_id = _num($_POST['element_id']))
-			jsonError('Некорректный ID элемента');
-
-		$cls = _txt($_POST['cls']);
-
-		$sql = "UPDATE `_page_element`
-				SET `cls`='".addslashes($cls)."'
-				WHERE `app_id`=".APP_ID."
-				  AND `id`=".$element_id;
-		query($sql);
-
-		jsonSuccess();
-		break;
 	case 'page_block_add'://добавление блока на страницу
 		if(!$page_id = _num($_POST['page_id']))
 			jsonError('Некорректный ID страницы');
@@ -243,6 +229,7 @@ switch(@$_POST['op']) {
 
 		$block = array(
 			'id' => $block_id,
+			'parent_id' => 0,
 			'w' => 0,
 			'elem_count' => 0,
 			'sort' => 0
@@ -374,6 +361,98 @@ switch(@$_POST['op']) {
 		
 		jsonSuccess($send);
 		break;
+	case 'page_block_style_load'://получение стилей блока для диалога
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный ID блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `app_id` IN (0,".APP_ID.")
+				  AND `id`=".$id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$id.' не существует');
+
+		$ex = explode(' ', $block['pad']);
+		$pad =
+		'<div class="pas-block-pad mt10 center">'.
+
+			'<div class="fs15 color-555 mb5">сверху</div>'.
+			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15'.($ex[0] ? '' : ' pale').'">'.$ex[0].'</div>'.
+			'<button class="vk small cancel mt1 plus">»</button>'.
+
+			'<table class="w100p ml10 mt30 mb30">'.
+				'<tr><td class="w200">'.
+						'<div class="dib fs15 color-555 mr5">слева</div>'.
+						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15'.($ex[3] ? '' : ' pale').'">'.$ex[3].'</div>'.
+						'<button class="vk small cancel mt1 plus">»</button>'.
+					'<td>'.
+						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15'.($ex[1] ? '' : ' pale').'">'.$ex[1].'</div>'.
+						'<button class="vk small cancel mt1 plus">»</button>'.
+						'<div class="dib fs15 color-555 ml5">справа</div>'.
+			'</table>'.
+
+			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15'.($ex[2] ? '' : ' pale').'">'.$ex[2].'</div>'.
+			'<button class="vk small cancel mt1 plus">»</button>'.
+			'<div class="fs15 color-555 mt3">снизу</div>'.
+
+		'</div>';
+
+
+		$send['html'] = utf8(
+			'<div class="ml10 mr10">'.
+				'<div class="hd2">Внутренние отступы:</div>'.
+				$pad.
+				'<div class="hd2 mt20">Цвет заливки:</div>'.
+				'<div class="pas-block-bg mt10">'.
+					'<div class="'.($block['bg'] == 'bg-fff' ? 'sel' : '').' dib h50 w50 bor-e8 curP" val="bg-fff"></div>'.
+					'<div class="'.($block['bg'] == 'bg-gr3' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-gr3" val="bg-gr3"></div>'.
+					'<div class="'.($block['bg'] == 'bg-gr2' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-gr2" val="bg-gr2"></div>'.
+					'<div class="'.($block['bg'] == 'bg-ffe' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-ffe" val="bg-ffe"></div>'.
+				'</div>'.
+
+				'<div class="hd2 mt20">Линии:</div>'.
+			'</div>'
+		);
+
+		jsonSuccess($send);
+		break;
+	case 'page_block_style_save'://применение стилей блока
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный ID блока');
+
+		$bg = _txt($_POST['bg']);
+
+		$ex = explode(' ', $_POST['pad']);
+		$pad =  _num($ex[0]).' './/сверху
+				_num($ex[2]).' './/справа
+				_num($ex[3]).' './/снизу
+				_num($ex[1]);    //слева
+
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `app_id` IN (0,".APP_ID.")
+				  AND `id`=".$id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$id.' не существует');
+
+		//изменение стилей
+		$sql = "UPDATE `_page_block`
+				SET `bg`='".addslashes($bg)."',
+				    `pad`='".$pad."'
+				WHERE `id`=".$id;
+		query($sql);
+
+		$send['html'] = utf8(_page_show($block['page_id'], 1));
+
+		jsonSuccess($send);
+		break;
 	case 'page_block_del'://удаление блока
 		if(!$id = _num($_POST['id']))
 			jsonError('Некорректный ID блока');
@@ -429,9 +508,34 @@ switch(@$_POST['op']) {
 		$sql = "DELETE FROM `_page_block` WHERE `id`=".$id;
 		query($sql);
 
+		//удаление элементов в блоке
+		$sql = "DELETE FROM `_page_element` WHERE `block_id`=".$id;
+		query($sql);
+
 		$send['html'] = utf8(_page_show($block['page_id'], 1));
 
 		jsonSuccess($send);
+		break;
+
+	case 'page_elem_del'://применение новых стилей к элементу страницы
+		if(!$element_id = _num($_POST['id']))
+			jsonError('Некорректный ID элемента');
+
+		//получение данных элемента
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `app_id` IN (0,".APP_ID.")
+				  AND `id`=".$element_id;
+		if(!$elem = query_assoc($sql))
+			jsonError('Блока id'.$id.' не существует');
+
+		//удаление элемента
+		$sql = "DELETE FROM `_page_element` WHERE `id`=".$element_id;
+		query($sql);
+
+		$send['html'] = utf8(_page_show($elem['page_id'], 1));
+
+		jsonSuccess();
 		break;
 
 	case 'spisok_add'://внесение данных диалога в _spisok
@@ -439,8 +543,9 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID диалогового окна');
 
 		$page_id = _num($_POST['page_id']);
-		
-		_dialogSpisokUpdate($dialog_id, 0, $page_id);
+		$block_id = _num($_POST['block_id']);
+
+		_dialogSpisokUpdate($dialog_id, 0, $page_id, $block_id);
 
 		jsonSuccess();
 		break;
@@ -1437,7 +1542,7 @@ function _dialogSpisokList($dialog_id, $component_id) {//массив списков (пока то
 			ORDER BY `id`";
 	return query_selArray($sql);
 }
-function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/редактирование записи списка
+function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0, $block_id=0) {//внесение/редактирование записи списка
 	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('Диалога не существует');
 
@@ -1455,7 +1560,7 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 		if(!$r = query_assoc($sql))
 			jsonError('Записи не существует');
 
-		if($r['deleted'])
+		if(@$r['deleted'])
 			jsonError('Запись была удалена');
 	}
 
@@ -1547,6 +1652,13 @@ function _dialogSpisokUpdate($dialog_id, $unit_id=0, $page_id=0) {//внесение/ред
 			if($r['Field'] == 'page_id') {
 				$sql = "UPDATE `".BASE_TABLE."`
 						SET `page_id`=".$page_id."
+						WHERE `id`=".$unit_id;
+				query($sql);
+				continue;
+			}
+			if($r['Field'] == 'block_id') {
+				$sql = "UPDATE `".BASE_TABLE."`
+						SET `block_id`=".$block_id."
 						WHERE `id`=".$unit_id;
 				query($sql);
 				continue;

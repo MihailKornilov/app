@@ -1276,7 +1276,8 @@ var VK_SCROLL = 0,
 				dialog_id:dialog_id,
 				elem:{},
 				func:{},//значения функций, если требуется сохранять. Конкретно пока для действия 5
-				page_id:PAGE_ID
+				page_id:PAGE_ID,
+				block_id:window.BLOCK_ID || 0
 			};
 
 			_forN(cmp, function(sp) {
@@ -1508,6 +1509,110 @@ var VK_SCROLL = 0,
 		}
 	},
 
+	_pageBlockElAdd = function() {//добавление нового элемента в блок
+		var t = $(this),
+			p = _parent(t, '.pas-block'),
+			html =
+				'<div class="center pad20">' +
+					'<p><button class="vk" val="3">Меню</button>' +
+					'<p class="mt10"><button class="vk" val="4">Заголовок</button>' +
+					'<p class="mt10"><button class="vk" val="7">Поиск</button>' +
+					'<p class="mt10"><button class="vk green" val="2">Кнопка</button>' +
+					'<p class="mt10"><button class="vk" val="9">Ссылка</button>' +
+					'<p class="mt10"><button class="vk" val="14">Список</button>' +
+				'</div>',
+			dialog = _dialog({
+				width:450,
+				top:20,
+				head:'Добавление нового элемента в блок страницы',
+				content:html,
+				butSubmit:'',
+				butCancel:'Закрыть'
+			});
+
+		dialog.content.find('button').click(function() {
+			var v = $(this).attr('val');
+			window.BLOCK_ID = p.attr('val');
+			dialog.close();
+			_dialogOpen(v);
+		});
+	},
+	_pageBlockStyle = function() {//настройка стилей блока
+		var t = $(this),
+			p = _parent(t, '.pas-block'),
+			dialog = _dialog({
+				width:450,
+				top:30,
+				padding:0,
+				head:'Параметры стилей блока',
+				load:1,
+				submit:submit
+			}),
+			send = {
+				op:'page_block_style_load',
+				id:p.attr('val')
+			},
+			BG_DIV,
+			PAD;
+
+		dialog.load(send, loaded);
+
+		function loaded() {
+			dialog.butSubmit('Сохранить');
+
+			BG_DIV = dialog.content.find('.pas-block-bg');
+			BG_DIV.find('div').click(function() {
+				var div = $(this),
+					pp = div.parent();
+				pp.find('div').removeClass('sel');
+				div.addClass('sel');
+			});
+
+			PAD = dialog.content.find('.pas-block-pad');
+			PAD.find('.minus').click(function() {
+				var but = $(this),
+					vd = but.next(),
+					v = _num(vd.html());
+				v -= 5;
+				if(v <= 0) {
+					v = 0;
+					vd.addClass('pale');
+				}
+				vd.html(v);
+			});
+			PAD.find('.plus').click(function() {
+				var but = $(this),
+					vd = but.prev(),
+					v = _num(vd.html());
+				v += 5;
+				vd.removeClass('pale');
+				if(v > 50) {
+					v = 50;
+				}
+				vd.html(v);
+			});
+
+		}
+		function submit() {
+			var arr = [];
+			_forEq(PAD.find('.bor-e8'), function(eq) {
+				arr.push(_num(eq.html()));
+			});
+			var send = {
+				op:'page_block_style_save',
+				id:p.attr('val'),
+				bg:BG_DIV.find('.sel').attr('val'),
+				pad:arr.join(' ')
+			};
+			_post(send, function(res) {
+				dialog.close();
+				_msg();
+				$('#_content').html(res.html);
+				_pageBlockResize();
+				$('.icon-page-tmp').trigger('click');
+			});
+		}
+	},
 	_pageBlockSort = function(v) {//включение/выключение сотрировки блоков на странице
 		$('#pas-sort')._dn(v, 'pl');
 
@@ -1550,6 +1655,7 @@ var VK_SCROLL = 0,
 			return;
 
 		_forEq($('.pas-block.resize'), function(eq) {
+//			var wNext = eq.parent().next().find('.pas-block').css('width').split('px')[0] - 29,
 			var wNext = eq.parent().next().find('.pas-block').width() - 29,
 				max = eq.width() + wNext;
 			eq.resizable({
@@ -1606,52 +1712,6 @@ $(document)
 			remove:1
 		});
 })
-	.on('mouseenter', '.pas', function() {//вывод подсказки для редактирования или удаления элемента страницы
-		var t = $(this),
-			pe = t.attr('id').split('_'),
-			element_id = pe[1],
-			dialog_id = pe[2];
-
-		var msg =
-			'<div class="pt5 pl10 pr10">' +
-				'<div onclick="_dialogOpen(' + dialog_id + ',' + element_id + ')" class="icon icon-edit' + _tooltip('Редактировать элемент', -70) + '</div>' +
-				'<div onclick="_dialogOpen(6,' + element_id + ')" class="icon icon-off' + _tooltip('Удалить', -25) + '</div>' +
-				'<br />' +
-				'<div class="icon icon-move' + _tooltip('Изменить позицию', -58) + '</div>' +
-			'</div>';
-
-		t._hint({
-			msg:msg,
-			ugol:'right',
-			show:1,
-			delayShow:500,
-			delayHide:100,
-			remove:1,
-			func:function(hi) {
-				hi.find('.icon-move').click(function() {
-					var cls = '';
-					if(t.hasClass('center')) {
-						t.removeClass('center');
-						t.addClass('r');
-						cls = 'r';
-					} else if(t.hasClass('r')) {
-						t.removeClass('r');
-					} else {
-						t.addClass('center');
-						cls = 'center';
-					}
-					var send = {
-						op:'page_element_class_set',
-						element_id:element_id,
-						cls:cls
-					};
-					_post(send, function() {
-						_msg('Стили применены');
-					});
-				});
-			}
-		});
-	})
 
 	.on('click', '.icon-page-tmp', function() {//включение/выключение управления блоками
 		var t = $(this),
@@ -1698,6 +1758,8 @@ $(document)
 		_pageBlockSort(v);
 		_msg('Сортировка блоков в' + (!v ? 'ы' : '') + 'ключена');
 	})
+	.on('click', '.pas-block .icon-add', _pageBlockElAdd)
+	.on('click', '.pas-block .icon-setup', _pageBlockStyle)
 	.on('click', '.pas-block .icon-div', function() {//деление блока пололам
 		var t = $(this),
 			p = _parent(t, '.pas-block'),
@@ -1709,6 +1771,42 @@ $(document)
 		_post(send, function(res) {
 			$('#_content').html(res.html);
 			_pageBlockResize();
+		});
+	})
+	.on('mouseenter', '.pas-block .icon-move', function() {//сортировка подблоков
+		var t = $(this),
+			p = _parent(t, '.pas-block'),
+			TR = _parent(p),
+			h = p.height();
+
+		TR.height(h).sortable({
+			axis:'x',
+			handle:'.icon-move',
+			start:function(event, ui) {
+				ui.item.find('.pas-block').addClass('mv');
+				ui.item.css('z-index', 2000);
+			},
+			stop:function(event, ui) {
+				ui.item.find('.pas-block').removeClass('mv');
+				ui.item.css('z-index', 'auto');
+			},
+			update:function () {
+				var dds = $(this).find('.pas-block'),
+					arr = [];
+				_forEq(dds, function(sp) {
+					var v = _num(sp.attr('val'));
+					if(v)
+						arr.push(v);
+				});
+				var send = {
+					op:'sort',
+					table:'_page_block',
+					ids:arr.join()
+				};
+				_post(send, function() {
+					_msg('<div class="b center">Порядок сохранён</div>');
+				});
+			}
 		});
 	})
 	.on('click', '.pas-block .icon-del-red', function() {//удаление блока
@@ -1724,6 +1822,42 @@ $(document)
 				$('#_content').html(res.html);
 				_pageBlockResize();
 			})
+		});
+	})
+
+	.on('mouseenter', '.pas-elem .icon-sort', function() {
+		var t = $(this),
+			ES = _parent(t, '.elem-sort');
+
+		if(ES.hasClass('ui-sortable'))
+			return;
+
+		ES.sortable({
+			axis:'y',
+			handle:'.icon-sort',
+			start:function(event, ui) {
+				ES.find('.pas-elem').addClass('mv');
+			},
+			stop:function(event, ui) {
+				ES.find('.pas-elem').removeClass('mv');
+			},
+			update:function () {
+				var dds = ES.find('.pas-elem'),
+					arr = [];
+				_forEq(dds, function(sp) {
+					var v = _num(sp.attr('val'));
+					if(v)
+						arr.push(v);
+				});
+				var send = {
+					op:'sort',
+					table:'_page_element',
+					ids:arr.join()
+				};
+				_post(send, function() {
+					_msg('<div class="b center">Порядок сохранён</div>');
+				});
+			}
 		});
 	});
 

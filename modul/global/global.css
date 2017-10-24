@@ -96,8 +96,8 @@ table{border:0;border-spacing:0}
 .icon-rub{background-position:0 -140px}
 .icon-print{background-position:0 -160px}
 .icon-worker{background-position:0 -180px}
-.icon-setup{background-position:0 -200px}
-.icon-setup-big{background-position:0 -220px}
+.icon-setup{background-position:0 -200px}/* маленькая шестерёнка */
+.icon-setup-big{background-position:0 -220px}/* большая шестерёнка */
 .icon-sort{background-position:0 -240px}/* стрелки верх-вниз */
 .icon-add{background-position:0 -260px}
 .icon-ok{background-position:0 -280px}
@@ -164,7 +164,7 @@ table{border:0;border-spacing:0}
 }
 #pas .p{width:1000px;margin:auto}
 
-/* вспомогательный блок настройки элементов страницы */
+/* вспомогательный блок настройки блоков страницы */
 .pas-block{
 	position:absolute;
 	top:0;
@@ -178,9 +178,9 @@ table{border:0;border-spacing:0}
 }
 .pas-block:hover{opacity:.9}
 .pas-block.empty{
-	background:transparent repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAAsTAAALEwEAmpwYAAAABGdBTUEAALGeYUxB9wAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAANklEQVR42mL4f2np/////zPgwhAGLkWXlqJy0CURJqArQlKM1VhMNxBlAl434PEFAAAA//8DAB4qxdGX1So4AAAAAElFTkSuQmCC");
+	background:#fff repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAAsTAAALEwEAmpwYAAAABGdBTUEAALGeYUxB9wAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAANklEQVR42mL4f2np/////zPgwhAGLkWXlqJy0CURJqArQlKM1VhMNxBlAl434PEFAAAA//8DAB4qxdGX1So4AAAAAElFTkSuQmCC");
 }
-.pas-block.mv{opacity:1}
+.pas-block.mv{opacity:1;cursor:move}
 .pas-icon{
 	position:absolute;
 	white-space:nowrap;
@@ -196,6 +196,38 @@ table{border:0;border-spacing:0}
 .pas-block:not(:hover) .pas-icon{display:none}
 .pas-block .ui-resizable-e{right:0;width:6px}
 .pas-block:hover .ui-resizable-e{background-color:#FFBA75}
+.pas-block.mv .pas-icon{display:none}
+/* цвета блока в настройках */
+.pas-block-bg div:not(.sel):hover{border:#aaa solid 1px;}
+.pas-block-bg .sel{border:#777 solid 1px;}
+
+
+/* вспомогательный блок для настройки элементов */
+.pas-elem{
+	position:absolute;
+	top:0;
+	right:-1px;
+	bottom:-1px;
+	left:0;
+	border:#595 solid 1px;
+	background-color:#dfd;
+	opacity:.85;
+	z-index:9;
+}
+.pe:not(:hover) .pas-elem:not(.mv){display:none}
+.elem-icon{
+	position:absolute;
+	right:-1px;
+	top:-1px;
+	padding:5px 2px 0 5px;
+	border:#595 solid 1px;
+	background-color:#fff;
+}
+.pas-elem.mv{display:block;cursor:move}
+.pas-elem.mv .elem-icon{display:none}
+
+
+
 
 /* Основное содержание сайта */
 #_content{
@@ -444,6 +476,7 @@ button.vk.orange:hover{background-color:#D59553}
 .vh{visibility:hidden}
 .wsnw{white-space:nowrap}
 .wspl{white-space:pre-line}
+.bspb{box-sizing:padding-box;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;}
 .prel{position:relative}
 .top5{top:5px}
 .pabs{position:absolute}

@@ -281,18 +281,6 @@ function _pageSetupMenu() {//строка меню управления страницей
 		'</div>'.
 		'<div class="p pad5">'.
 			'<input type="hidden" id="page-setup-page" />'.
-			' :: '.
-			'<a onclick="_dialogOpen('._dialogValToId('page_setup_menu_add').')">Добавить меню</a>'.
-			' :: '.
-			'<a onclick="_dialogOpen('._dialogValToId('page_setup_head_add').')">Добавить заголовок</a>'.
-			' :: '.
-			'<a onclick="_dialogOpen('._dialogValToId('page_setup_find_add').')">Добавить поиск</a>'.
-			' :: '.
-			'<a onclick="_dialogOpen('._dialogValToId('page_setup_button_add').')">Добавить кнопку</a>'.
-			' :: '.
-			'<a onclick="_dialogOpen('._dialogValToId('page_setup_link_add').')">Добавить ссылку</a>'.
-			' :: '.
-			'<a onclick="_dialogOpen('._dialogValToId('page_setup_spisok_add').')">Добавить список</a>'.
 		'</div>'.
 	'</div>'.
 	'<script>_pas()</script>';
