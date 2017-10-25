@@ -203,7 +203,7 @@ table{border:0;border-spacing:0}
 
 
 /* вспомогательный блок для настройки элементов */
-.pas-elem{
+.elem-pas{
 	position:absolute;
 	top:0;
 	right:-1px;
@@ -214,7 +214,7 @@ table{border:0;border-spacing:0}
 	opacity:.85;
 	z-index:9;
 }
-.pe:not(:hover) .pas-elem:not(.mv){display:none}
+.pe:not(:hover) .elem-pas:not(.mv){display:none}
 .elem-icon{
 	position:absolute;
 	right:-1px;
@@ -223,8 +223,8 @@ table{border:0;border-spacing:0}
 	border:#595 solid 1px;
 	background-color:#fff;
 }
-.pas-elem.mv{display:block;cursor:move}
-.pas-elem.mv .elem-icon{display:none}
+.elem-pas.mv{display:block;cursor:move}
+.elem-pas.mv .elem-icon{display:none}
 
 
 

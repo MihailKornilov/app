@@ -1,4 +1,23 @@
 <?php
+/*
+	---=== Элементы, размещаемые на странице ===---
+
+	*** Меню *** dialog_id=5 (страница настройки: 4)
+		txt_1 - Название меню
+		num_1 - положение (горизонтальное, вертикальное)
+		num_2 - тип меню
+
+	*** Заголовок *** dialog_id=4
+
+	*** Поиск *** dialog_id=7
+
+	*** Кнопка *** dialog_id=2
+
+	*** Ссыдка *** dialog_id=9
+
+	*** Список *** dialog_id=14
+
+*/
 function _button($v=array()) {//кнопка из контакта
 	$name = empty($v['name']) ? 'Кнопка' : $v['name'];
 	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
@@ -59,7 +78,7 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 		'title' => @$v['title'],
 		'value' => _bool(@$v['value']),
 		'on' => _bool(@$v['value']) ? ' on' : '',
-		'light' => _bool(@$v['light']) ? ' l' : '',
+		'light' => _bool(@$v['light']) ? ' light' : '',
 		'disabled' => _bool(@$v['disabled']) ? ' disabled' : '',
 		'block' => _bool(@$v['block']) ? ' block' : ''
 	);
@@ -172,6 +191,13 @@ function _dialogSpisokOn() {//получение массива диалогов, которые могут быть спи
 			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
 			  AND `sa` IN (0".(SA ? ",1" : '').")
 			  AND `spisok_on`
+			ORDER BY `id`";
+	return query_selArray($sql);
+}
+function _dialogPageList() {//получение массива страниц приложения
+	$sql = "SELECT `id`,`name`
+			FROM `_page`
+			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
 			ORDER BY `id`";
 	return query_selArray($sql);
 }

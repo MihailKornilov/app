@@ -100,6 +100,7 @@ function _page_show($page_id, $blockShow=0) {
 	'<div class="pbsort0 prel">'.
 		$send.
 	'</div>'.
+	_pageSpisokUnit().
 
 (PAS ?
 	'<div id="page-block-add" class="center mt1 pad15 bg-gr1 bor-f0 over1 curP'._dn($blockShow).'">'.
@@ -140,6 +141,7 @@ function _pageBlockTest($page_id) {//проверка страницы на наличие хот€ бы одного
 function _pageBlockStyle($r) {
 	$send = array();
 
+	//отступы
 	$ex = explode(' ', $r['pad']);
 	foreach($ex as $px)
 		if($px) {
@@ -150,6 +152,19 @@ function _pageBlockStyle($r) {
 				$ex[3].($ex[3] ? 'px' : '');
 			break;
 		}
+
+	//границы
+	$ex = explode(' ', $r['bor']);
+	foreach($ex as $i => $b) {
+		if(!$b)
+			continue;
+		switch($i) {
+			case 0: $send[] = 'border-top:#DEE3EF solid 1px'; break;
+			case 1: $send[] = 'border-right:#DEE3EF solid 1px'; break;
+			case 2: $send[] = 'border-bottom:#DEE3EF solid 1px'; break;
+			case 3: $send[] = 'border-left:#DEE3EF solid 1px'; break;
+		}
+	}
 
 	if($r['w'])
 		$send[] = 'width:'.$r['w'].'px';
@@ -167,19 +182,19 @@ function _pageElemSpisok($elem) {//список элементов формате html дл€ конкретного
 	foreach($elem as $r) {
 		$send .=
 		'<div class="pe prel" id="pe_'.$r['id'].'">'.
-			_pagePasElem($r).
+			_pageElemPas($r).
 			_pageElemUnit($r).
 		'</div>';
 	}
 
 	return $send;
 }
-function _pagePasElem($r) {
+function _pageElemPas($r) {
 	if(!PAS)
 		return '';
 
 	return
-	'<div class="pas-elem" val="'.$r['id'].'">'.
+	'<div class="elem-pas" val="'.$r['id'].'">'.
 		'<div class="elem-icon">'.
 			'<div class="icon icon-sort curM mr3'._tooltip('»зменить пор€док<br />внутри блока', -57, '', 1).'</div>'.
 			'<div onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')" class="icon icon-edit mr3'._tooltip('Ќастроить элемент', -58).'</div>'.
@@ -220,6 +235,8 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 			return '<a href="'.URL.'&p='.$unit['num_1'].'">'.
 						$unit['txt_1'].
 				   '</a>';
+		case 10://произвольный текст
+			return $unit['txt_1'];
 		case 14://_spisok
 			return _pageSpisok($unit);
 	}
@@ -381,6 +398,19 @@ function _pageSpisokFilterSearch($pe, $spDialog) {//получение значений фильтра-п
 	return " AND (".implode($arr, ' OR ').")";
 }
 
+function _pageSpisokUnit() {
+	if(!$unit_id = _num(@$_GET['id']))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `app_id` IN (0,".APP_ID.")
+			  AND `id`=".$unit_id;
+	if(!$unit = query_assoc($sql))
+		return 'записи не существует';
+
+	return _pr($unit);
+}
 
 
 function _page_menu_spisok() {//список меню

@@ -343,6 +343,20 @@ var VK_SCROLL = 0,
 				spisok:res.menu,
 				func:_dialogHeightCorrect
 			});
+			$('#action_id')._select({
+				width:250,
+				title0:'нет',
+				spisok:res.action,
+				func:function(v) {
+					$('.td-action-page')._dn(v == 2);
+					$('#action_page_id')._select(0);
+				}
+			});
+			$('#action_page_id')._select({
+				width:250,
+				title0:'не выбрана',
+				spisok:res.page_list
+			});
 
 			_dialogHeightCorrect();
 
@@ -436,6 +450,8 @@ var VK_SCROLL = 0,
 				func:COMPONENT_FUNC,
 				spisok_on:$('#spisok_on').val(),
 				spisok_name:$('#spisok_name').val(),
+				action_id:$('#action_id').val(),
+				action_page_id:$('#action_page_id').val(),
 				menu_edit_last:$('#dialog-menu').val()
 			};
 			dialog.post(send, function(res) {
@@ -458,13 +474,13 @@ var VK_SCROLL = 0,
 			require:0,      //флаг "требовать обязательное заполнение"
 			hint:'',        //текст подсказки
 			width:0,        //длина элемента (для input, textarea, select)
-			param_num_1:0,
-			param_num_2:0,
-			param_txt_1:'',
-			param_txt_2:'',
-			param_bool_1:0,
-			param_bool_2:0,
-			param_bool_3:0,
+			num_1:0,
+			num_2:0,
+			num_3:0,
+			num_4:0,
+			num_5:0,
+			txt_1:'',
+			txt_2:'',
 			v:[]
 		}, CMP);
 
@@ -529,7 +545,7 @@ var VK_SCROLL = 0,
 			$('#label_name').val(CMP.label_name);
 			$('#label-require').val(CMP.require);
 			$('#label-hint').val(CMP.hint);
-			$('#param_txt_1').val(CMP.param_txt_1);
+			$('#txt_1').val(CMP.txt_1);
 
 			elScript();
 			dialog.butSubmit('Сохранить изменения');
@@ -561,74 +577,69 @@ var VK_SCROLL = 0,
 				case 1: /* check */ {
 					elPrevAction = function() {
 						$('#elem-attr-id')._check({
-							title:$.trim($('#param_txt_1').val()),
+							title:$.trim($('#txt_1').val()),
 							light:1
 						});
 					};
-					$('#param_txt_1').keyup(elPrevAction);
+					$('#txt_1').keyup(elPrevAction);
 					break;
 				}
 				case 2: /* select */ {
-					/*
-						param_bool_1 - использовать или нет нулевое значение
-		                param_txt_1  - текст нулевого значения
-		                param_bool_2 - использование всех списков при выборе
-                        param_bool_3 - выбор списков только с текущей страницы
-		                param_num_1  - id списка по dialog_id
-		                param_num_2  - id колонки по component_id
-		            */
 					CMP.width = CMP.width || 228;
 					elPrevAction = function() {
 						$('#elem-attr-id')
 							._select({
 								width:228,
-								title0:_num($('#param_bool_1').val()) ? $.trim($('#param_txt_1').val()) : '',
+								title0:_num($('#num_3').val()) ? $.trim($('#txt_1').val()) : '',
 								spisok:EL_VAL_ASS
 							})
 							._select(0);
 
-						for(var n = 0; n < EL_VAL_ASS.length; n++) {
-							var sp = EL_VAL_ASS[n];
+						_forN(EL_VAL_ASS, function(sp) {
 							if(sp.def) {
 								$('#elem-attr-id')._select(sp.uid);
-								break;
+								return;
 							}
-						}
+						});
 					};
-					$('#param_bool_1')._check({
+					$('#num_3')._check({
 						tooltip:'Использовать нулевое значение',
 						func:function(v) {
-							$('#param_txt_1').attr('disabled', !v);
+							$('#txt_1').attr('disabled', !v);
 							elPrevAction();
 						}
 					});
 					if(CMP.id)
-						$('#param_bool_1')
-							._check(CMP.param_bool_1)
+						$('#num_3')
+							._check(CMP.num_3)
 							._check('func');
-					$('#param_txt_1').keyup(elPrevAction);
+					$('#txt_1').keyup(elPrevAction);
 
 					var em = $('#elem-select-but'),
 						but1 = em.find('button:first'),//произвольные значения
-						but2 = em.find('button:eq(1)'),//все объекты-списки
-						but3 = em.find('button:last'); //выбор элемента объекта
+						but2 = em.find('button:eq(1)'),//все списки
+						but3 = em.find('button:eq(2)'),//выбор элемента объекта
+						but4 = em.find('button:eq(3)');//Списки объектов страницы
 					$.fn.selCancel = function() {//отмена выбора
 						em.next().find('.icon-del').click(function() {
 							em.next().remove();
 							em.removeClass('dn');
+							$('#num_4').val(0);
 						});
 					};
 					but1.click(function() {
-						$('#param_bool_1')._check('enable');
+						$('#num_3')._check('enable');
+						$('#num_4').val(1);
 						em.addClass('dn');
 						elVal(elPrevAction, em);
 					});
 					but2.click(function() {
-						$('#param_bool_1')
+						CMP.v = [];
+						$('#num_3')
 							._check(1)
 							._check('func')
 							._check('disable');
-						CMP.v = [];
+						$('#num_4').val(2);
 						em.addClass('dn');
 						em.after(
 							'<table class="bs5 w100p">' +
@@ -636,24 +647,24 @@ var VK_SCROLL = 0,
 									'<div class="_info w400 dib">Будут выбираться объекты, которые являются списками.</div>' +
 								'<tr><td class="label r w150">Содержание:' +
 									'<td class="i b w150">все объекты списков' +
-										'<input type="hidden" id="param_bool_2" value="1" />' +
 									'<td><div class="icon icon-del mbm5' + _tooltip('Отменить выбор', -52) + '</div>' +
 								'<tr><td>' +
-									'<td colspan="2"><input type="hidden" id="param_bool_3" value="' + CMP.param_bool_3 + '" />' +
+									'<td colspan="2"><input type="hidden" id="num_5" value="' + CMP.num_5 + '" />' +
 							'</table>'
 						);
 						em.selCancel();
-						$('#param_bool_3')._check({
+						$('#num_5')._check({
 							light:1,
 							title:'отображать списки только с текущей страницы'
 						});
 					});
 					but3.click(function() {
 						CMP.v = [];
-						$('#param_bool_1')
+						$('#num_3')
 							._check(1)
 							._check('func')
 							._check('disable');
+						$('#num_4').val(3);
 						em.addClass('dn');
 						em.after(elObjSelect(CMP, 'Выбор элемента конкретного объекта-списка.' +
 												  '<br />' +
@@ -664,10 +675,29 @@ var VK_SCROLL = 0,
 						em.selCancel();
 						elObjSelect(CMP);
 					});
+					but4.click(function() {
+						CMP.v = [];
+						$('#num_3')
+							._check(1)
+							._check('func')
+							._check('disable');
+						$('#num_4').val(4);
+						em.addClass('dn');
+						em.after(
+							'<table class="bs5 w100p">' +
+								'<tr><td colspan="3" class="center">' +
+									'<div class="_info w400 dib">Выбор из списков, объекты которых размещаются на странице.</div>' +
+								'<tr><td class="label r w150">Содержание:' +
+									'<td class="i b w200">списки объектов страницы' +
+									'<td><div class="icon icon-del mbm5' + _tooltip('Отменить выбор', -52) + '</div>' +
+							'</table>'
+						);
+						em.selCancel();
+					});
 
-					if(_num(CMP.param_bool_2))//все списки
+					if(_num(CMP.num_4))//все списки
 						but2.trigger('click');
-					else if(_num(CMP.param_num_1)) {//выбор элемента списка
+					else if(_num(CMP.num_1)) {//выбор элемента списка
 						but3.trigger('click');
 						elPrevAction();
 					} else if(CMP.v.length)//произвольные значения
@@ -678,10 +708,10 @@ var VK_SCROLL = 0,
 					if(!CMP.id)
 						CMP.width = 250;
 					elPrevAction = function() {
-						var txt = $.trim($('#param_txt_1').val());
+						var txt = $.trim($('#txt_1').val());
 						$('#elem-attr-id').attr('placeholder', txt);
 					};
-					$('#param_txt_1').keyup(elPrevAction);
+					$('#txt_1').keyup(elPrevAction);
 					elPrevAction();
 					break;
 				}
@@ -690,10 +720,10 @@ var VK_SCROLL = 0,
 						CMP.width = 250;
 					$('#label-prev').addClass('topi');
 					elPrevAction = function() {
-						var txt = $.trim($('#param_txt_1').val());
+						var txt = $.trim($('#txt_1').val());
 						$('#elem-attr-id').attr('placeholder', txt);
 					};
-					$('#param_txt_1').keyup(elPrevAction);
+					$('#txt_1').keyup(elPrevAction);
 					elPrevAction();
 					$('#elem-attr-id').autosize();
 					break;
@@ -705,13 +735,12 @@ var VK_SCROLL = 0,
 							light:1,
 							spisok:EL_VAL_ASS
 						});
-						for(var n = 0; n < EL_VAL_ASS.length; n++) {
-							var sp = EL_VAL_ASS[n];
+						_forN(EL_VAL_ASS, function(sp) {
 							if(sp.def) {
 								$('#elem-attr-id')._radio(sp.uid);
-								break;
+								return;
 							}
-						}
+						});
 					};
 					elVal(elPrevAction, $('#radio-cont'), 1);
 					break;
@@ -719,29 +748,29 @@ var VK_SCROLL = 0,
 				case 6: /* календарь */ {
 					elPrevAction = function() {
 						$('#elem-attr-id')._calendar({
-							lost:_bool($('#param_bool_1').val()),
-							tomorrow:_bool($('#param_bool_2').val())
+							lost:_num($('#num_3').val()),
+							tomorrow:_num($('#num_4').val())
 						});
 					};
-					$('#param_bool_1')._check({
+					$('#num_3')._check({
 						func:elPrevAction
 					});
-					$('#param_bool_2')._check({
+					$('#num_4')._check({
 						func:elPrevAction
 					});
 					if(CMP.id) {
-						$('#param_bool_1')._check(CMP.param_bool_1);
-						$('#param_bool_2')._check(CMP.param_bool_2);
+						$('#num_3')._check(CMP.num_3);
+						$('#num_4')._check(CMP.num_4);
 					}
 
 					break;
 				}
 				case 7: /* info */ {
 					elPrevAction = function(v) {
-						var txt = _br($.trim($('#param_txt_1').val()), 1);
+						var txt = _br($.trim($('#txt_1').val()), 1);
 						$('#elem-attr-id').html(txt);
 					};
-					$('#param_txt_1')
+					$('#txt_1')
 						.autosize()
 						.keyup(elPrevAction);
 					break;
@@ -754,18 +783,18 @@ var VK_SCROLL = 0,
 				}
 				case 9: /* Заголовок */ {
 					if(CMP.id)
-						$('#param_num_1').val(CMP.param_num_1);
+						$('#num_1').val(CMP.num_1);
 
 					elPrevAction = function() {
-						var v = _num($('#param_num_1').val()),
-							txt = _br($.trim($('#param_txt_1').val()), 1);
+						var v = _num($('#num_1').val()),
+							txt = _br($.trim($('#txt_1').val()), 1);
 
 						$('#elem-attr-id')
 							.html(txt)
 							.removeClass('hd1 hd2 hd3')
 							.addClass('hd' + v);
 					};
-					$('#param_num_1')._select({
+					$('#num_1')._select({
 						width:250,
 						spisok:[
 							{uid:1,title:'На сером фоне'},
@@ -773,7 +802,7 @@ var VK_SCROLL = 0,
 						],
 						func:elPrevAction
 					});
-					$('#param_txt_1').keyup(elPrevAction);
+					$('#txt_1').keyup(elPrevAction);
 					break;
 				}
 			}
@@ -849,14 +878,12 @@ var VK_SCROLL = 0,
 					$('#el-val-' + v.uid).keyup(function() {
 						var t = $(this),
 							uid = _num(t.attr('val'));
-						for(var n = 0; n < EL_VAL_ASS.length; n++) {
-							var sp = EL_VAL_ASS[n];
-							if(sp.uid == uid) {
-								sp.title = t.val();
-								sp.content = t.val();
-								break;
-							}
-						}
+						_forN(EL_VAL_ASS, function(sp) {
+							if(sp.uid != uid)
+								return;
+							sp.title = t.val();
+							sp.content = t.val();
+						});
 						func();
 					}).select();
 
@@ -867,11 +894,11 @@ var VK_SCROLL = 0,
 						var t = $(this),
 							uid = _num(t.attr('val')),
 							p = _parent(t, 'DD');
-						for(var n = 0; n < EL_VAL_ASS.length; n++)
-							if(EL_VAL_ASS[n].uid == uid) {
-								EL_VAL_ASS.splice(n, 1);
-								break;
-							}
+						_forN(EL_VAL_ASS, function(sp, n) {
+							if(sp.uid != uid)
+								return;
+							EL_VAL_ASS.splice(n, 1);
+						});
 						p.remove();
 						func();
 						if(!EL_VAL_ASS.length) {
@@ -916,44 +943,44 @@ var VK_SCROLL = 0,
 							'<tr><td colspan="3" class="center">' +
 								'<div class="_info w400 dib">' + html + '</div>' +
 							'<tr><td class="label r topi w175">Объект:' +
-								'<td class="w230"><input type="hidden" id="param_num_1" value="' + CMP.param_num_1 + '" />' +
+								'<td class="w230"><input type="hidden" id="num_1" value="' + CMP.num_1 + '" />' +
 								'<td>' +
 							 (del ? '<div class="icon icon-del mbm5' + _tooltip('Отменить выбор', -52) + '</div>' : '') +
 							'<tr><td class="label r topi">Имя колонки:' +
 								'<td colspan="2">' +
-									'<input type="hidden" id="param_num_2" value="' + CMP.param_num_2 + '" />' +
+									'<input type="hidden" id="num_2" value="' + CMP.num_2 + '" />' +
 						'</table>';
 
 			//применение скриптов
 			var menuColSet = function(v) {
 				if(!v) {
-					$('#param_num_2')
+					$('#num_2')
 						._select('title0', 'сначала выберите объект')
 						._select('empty');
 					return;
 				}
 
-				$('#param_num_2')._select(0);
+				$('#num_2')._select(0);
 				var send = {
 					op:'dialog_spisok_on_col_load',
 					dialog_id:v
 				};
-				$('#param_num_2')._select('load', send, function() {
-					$('#param_num_2')._select('title0', 'не выбрано')
+				$('#num_2')._select('load', send, function() {
+					$('#num_2')._select('title0', 'не выбрано')
 				});
 			};
-			$('#param_num_1')._select({
+			$('#num_1')._select({
 				width:220,
 				title0:'не выбран',
 				spisok:SPISOK_ON,
 				func:menuColSet
 			});
-			$('#param_num_2')._select({
+			$('#num_2')._select({
 				width:220,
 				title0:'сначала выберите объект'
 			});
-			menuColSet(CMP.param_num_1);
-			$('#param_num_2')._select(CMP.param_num_2);
+			menuColSet(CMP.num_1);
+			$('#num_2')._select(CMP.num_2);
 
 		}
 		function submit() {
@@ -967,14 +994,15 @@ var VK_SCROLL = 0,
 					label_name:$.trim($('#label_name').val()),
 					require:_bool($('#label-require').val()),
 					hint:$.trim($('#label-hint').val()),
-					param_num_1:_num($('#param_num_1').val()),
-					param_num_2:_num($('#param_num_2').val()),
 					width:CMP.width,
-					param_txt_1:$.trim($('#param_txt_1').val()),
-					param_txt_2:$.trim($('#param_txt_2').val()),
-					param_bool_1:_bool($('#param_bool_1').val()),
-					param_bool_2:_bool($('#param_bool_2').val()),
-					param_bool_3:_bool($('#param_bool_3').val()),
+					txt_1:$.trim($('#txt_1').val()),
+					txt_2:$.trim($('#txt_2').val()),
+					txt_3:$.trim($('#txt_3').val()),
+					num_1:_num($('#num_1').val()),
+					num_2:_num($('#num_2').val()),
+					num_3:_num($('#num_3').val()),
+					num_4:_num($('#num_4').val()),
+					num_5:_num($('#num_5').val()),
 					v:EL_VAL_ASS
 				},
 				TYPE_7 = TYPE_ID == 7 || TYPE_ID == 9,
@@ -983,47 +1011,47 @@ var VK_SCROLL = 0,
 			//формирование содержания и проверка на ошибки
 			switch(TYPE_ID) {
 				case 1://check
-					if(!elem.label_name && !elem.param_txt_1) {
+					if(!elem.label_name && !elem.txt_1) {
 						dialog.err('Укажите название поля,<br />либо текст для галочки');
 						$('#label_name').focus();
 						return;
 					}
 					break;
 				case 2://select
-					if(elem.param_bool_1 && !elem.param_txt_1) {
+					if(elem.num_3 && !elem.txt_1) {
 						dialog.err('Не указан текст нулевого значения');
-						$('#param_txt_1').focus();
+						$('#txt_1').focus();
 						return;
 					}
 					break;
 				case 3://text
-					inp = '<input type="text" id="' + attr_id + '" style="width:' + elem.width + 'px" placeholder="' + elem.param_txt_1 +'" />';
+					inp = '<input type="text" id="' + attr_id + '" style="width:' + elem.width + 'px" placeholder="' + elem.txt_1 +'" />';
 					break;
 				case 4://textarea
-					inp = '<textarea id="' + attr_id + '" style="width:' + elem.width + 'px" placeholder="' + elem.param_txt_1 + '"></textarea>';
+					inp = '<textarea id="' + attr_id + '" style="width:' + elem.width + 'px" placeholder="' + elem.txt_1 + '"></textarea>';
 					break;
 				case 5://radio
 					break;
 				case 6://календарь
 					break;
 				case 7://info
-					if(!elem.param_txt_1) {
+					if(!elem.txt_1) {
 						dialog.err('Напишите текст информации');
-						$('#param_txt_1').focus();
+						$('#txt_1').focus();
 						return;
 					}
-					inp = '<div class="_info">' + _br(elem.param_txt_1, 1) + '</div>';
+					inp = '<div class="_info">' + _br(elem.txt_1, 1) + '</div>';
 					break;
 				case 8://connect
 					inp = '<div class="grey i">Текстовый результат</div>';
 					break;
 				case 9://Заголовок
-					if(!elem.param_txt_1) {
+					if(!elem.txt_1) {
 						dialog.err('Напишите текст заголовка');
-						$('#param_txt_1').focus();
+						$('#txt_1').focus();
 						return;
 					}
-					inp = '<div class="hd' + elem.param_num_1 + '">' + elem.param_txt_1 + '</div>';
+					inp = '<div class="hd' + elem.num_1 + '">' + elem.txt_1 + '</div>';
 					break;
 			}
 
@@ -1039,7 +1067,9 @@ var VK_SCROLL = 0,
 				(!TYPE_7 ? '<td>' : '') +
 								inp +
 						'</table>' +
-					'</dd>';
+					'</dd>',
+				DD_ED;//новый или изменённый элемент (для _flash)
+
 
 
 			//вставка содержания
@@ -1049,7 +1079,7 @@ var VK_SCROLL = 0,
 					var sp = dd.eq(n),
 						id = _num(sp.attr('val'), 1);
 					if(CMP.id == id) {
-						sp.after(DD).next()._flash();
+						DD_ED = sp.after(DD).next();
 						sp.remove();
 						break;
 					}
@@ -1062,14 +1092,13 @@ var VK_SCROLL = 0,
 					}
 				}
 			} else {
-				$('#dialog-base')
-					.append(DD)
-					.find('dd:last')._flash();
+				DD_ED = $('#dialog-base').append(DD).find('dd:last');
 				DIALOG_COMPONENT.push(elem);
 			}
 
 			_dialogComponentScript(elem, 1);
 			dialog.close();
+			DD_ED._flash();
 			_dialogHeightCorrect();
 		}
 	},
@@ -1185,7 +1214,7 @@ var VK_SCROLL = 0,
 				if(sp.id == CMP.id)
 					continue;
 				if(sp.type_id == 9)
-					name = sp.param_txt_1;
+					name = sp.txt_1;
 				spisok.push({
 					uid:sp.id,
 					title:CMP_NAME[sp.type_id] + (name ? ': ' + name : '')
@@ -1290,7 +1319,12 @@ var VK_SCROLL = 0,
 				funcVal(sp.id, send.func, COMPONENT_FUNC);
 			});
 
-			dialog.post(send, 'reload');
+			dialog.post(send, function(res) {
+				switch(res.action_id) {
+					case 1: location.reload(); break;
+					case 2: location.href = URL + '&p=' + res.page_id + '&id=' + res.unit_id; break;
+				}
+			});
 		}
 		function funcVal(id, sf, func) {//получение значений функций
 			if(!func[id])
@@ -1324,7 +1358,7 @@ var VK_SCROLL = 0,
 		switch(ch.type_id) {
 			case 1: /* check */ {
 				$(ch.attr_id)._check({
-					title:ch.param_txt_1,
+					title:ch.txt_1,
 					light:1,
 					disabled:isEdit
 				});
@@ -1333,7 +1367,7 @@ var VK_SCROLL = 0,
 			case 2: /* select */ {
 				$(ch.attr_id)._select({
 					width:ch.width,
-					title0:ch.param_bool_1 ? ch.param_txt_1 : '',
+					title0:ch.num_3 ? ch.txt_1 : '',
 					spisok:ch.v,
 					func:function(v) {
 						_dialogComponentFunc(ch.id, v, isEdit);
@@ -1424,8 +1458,8 @@ var VK_SCROLL = 0,
 			}
 			case 6: /* Календарь */ {
 				$(ch.attr_id)._calendar({
-					lost:ch.param_bool_1,
-					tomorrow:ch.param_bool_2
+					lost:ch.num_3,
+					tomorrow:ch.num_4
 				});
 				break;
 			}
@@ -1517,6 +1551,8 @@ var VK_SCROLL = 0,
 					'<p><button class="vk" val="3">Меню</button>' +
 					'<p class="mt10"><button class="vk" val="4">Заголовок</button>' +
 					'<p class="mt10"><button class="vk" val="7">Поиск</button>' +
+					'<p class="mt10"><button class="vk grey" val="10">Произвольный текст</button>' +
+					'<p class="mt10"><button class="vk" val="11">Данные объекта</button>' +
 					'<p class="mt10"><button class="vk green" val="2">Кнопка</button>' +
 					'<p class="mt10"><button class="vk" val="9">Ссылка</button>' +
 					'<p class="mt10"><button class="vk" val="14">Список</button>' +
@@ -1594,15 +1630,24 @@ var VK_SCROLL = 0,
 
 		}
 		function submit() {
-			var arr = [];
+			var arr = [],
+				bor = [];
+
 			_forEq(PAD.find('.bor-e8'), function(eq) {
 				arr.push(_num(eq.html()));
 			});
+
+			bor.push($('#bor0').val());
+			bor.push($('#bor1').val());
+			bor.push($('#bor2').val());
+			bor.push($('#bor3').val());
+
 			var send = {
 				op:'page_block_style_save',
 				id:p.attr('val'),
 				bg:BG_DIV.find('.sel').attr('val'),
-				pad:arr.join(' ')
+				pad:arr.join(' '),
+				bor:bor.join(' ')
 			};
 			_post(send, function(res) {
 				dialog.close();
@@ -1655,7 +1700,6 @@ var VK_SCROLL = 0,
 			return;
 
 		_forEq($('.pas-block.resize'), function(eq) {
-//			var wNext = eq.parent().next().find('.pas-block').css('width').split('px')[0] - 29,
 			var wNext = eq.parent().next().find('.pas-block').width() - 29,
 				max = eq.width() + wNext;
 			eq.resizable({
@@ -1825,7 +1869,7 @@ $(document)
 		});
 	})
 
-	.on('mouseenter', '.pas-elem .icon-sort', function() {
+	.on('mouseenter', '.elem-pas .icon-sort', function() {
 		var t = $(this),
 			ES = _parent(t, '.elem-sort');
 
@@ -1836,13 +1880,13 @@ $(document)
 			axis:'y',
 			handle:'.icon-sort',
 			start:function(event, ui) {
-				ES.find('.pas-elem').addClass('mv');
+				ES.find('.elem-pas').addClass('mv');
 			},
 			stop:function(event, ui) {
-				ES.find('.pas-elem').removeClass('mv');
+				ES.find('.elem-pas').removeClass('mv');
 			},
 			update:function () {
-				var dds = ES.find('.pas-elem'),
+				var dds = ES.find('.elem-pas'),
 					arr = [];
 				_forEq(dds, function(sp) {
 					var v = _num(sp.attr('val'));

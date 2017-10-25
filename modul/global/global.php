@@ -229,8 +229,18 @@ function _app($i='all') {//Получение данных о приложении
 
 
 function _page() {//отображение страницы
-	if(!PAGE_ID)
-		return _contentEmpty();
+	if(!PAGE_ID) {
+		$sql = "SELECT *
+				FROM `_page`
+				WHERE `app_id` IN (0,".APP_ID.")
+				  AND `sa` IN (0,".SA.")
+				  AND `def`
+				LIMIT 1";
+		if(!$page = query_assoc($sql))
+			return _contentEmpty();
+
+		header('Location:'.URL.'&p='.$page['id']);
+	}
 
 	$sql = "SELECT *
 			FROM `_page`

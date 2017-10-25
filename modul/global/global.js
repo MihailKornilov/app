@@ -327,7 +327,7 @@ var FB,
 	},
 	_forN = function(arr, func) {//перечисление последовательного массива js
 		for(var n = 0; n < arr.length; n++)
-			func(arr[n]);
+			func(arr[n], n);
 	},
 
 	_pas = function() {
