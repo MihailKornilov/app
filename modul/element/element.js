@@ -619,7 +619,7 @@ var VK_SCROLL = 0,
 						but1 = em.find('button:first'),//произвольные значения
 						but2 = em.find('button:eq(1)'),//все списки
 						but3 = em.find('button:eq(2)'),//выбор элемента объекта
-						but4 = em.find('button:eq(3)');//Списки объектов страницы
+						but4 = em.find('button:eq(3)');//списки объектов страницы
 					$.fn.selCancel = function() {//отмена выбора
 						em.next().find('.icon-del').click(function() {
 							em.next().remove();
@@ -695,13 +695,12 @@ var VK_SCROLL = 0,
 						em.selCancel();
 					});
 
-					if(_num(CMP.num_4))//все списки
-						but2.trigger('click');
-					else if(_num(CMP.num_1)) {//выбор элемента списка
-						but3.trigger('click');
-						elPrevAction();
-					} else if(CMP.v.length)//произвольные значения
-						but1.trigger('click');
+					switch(CMP.num_4) {
+						case 1: but1.trigger('click'); break;
+						case 2: but2.trigger('click'); break;
+						case 3: but3.trigger('click'); elPrevAction(); break;
+						case 4: but4.trigger('click');
+					}
 					break;
 				}
 				case 3: /* text */ {
@@ -729,7 +728,7 @@ var VK_SCROLL = 0,
 					break;
 				}
 				case 5: /* radio */ {
-					$('#label-prev').addClass('topi');
+					$('#label-prev').addClass('top');
 					elPrevAction = function() {
 						$('#elem-attr-id')._radio({
 							light:1,
@@ -1118,12 +1117,14 @@ var VK_SCROLL = 0,
 			FC = COMPONENT_FUNC[CMP.id],
 			NUM = 1,
 			COND_SHOW = {//показывать или нет условие на основании действия
-				0:0,
+				1:1,
+				2:1
+			},
+			CMP_SHOW = {//показывать или нет компоненты на основании действия
 				1:1,
 				2:1,
-				3:0,
-				4:0,
-				5:0
+				3:1,
+				4:1
 			};
 
 		cmpFuncHtml();
@@ -1189,12 +1190,19 @@ var VK_SCROLL = 0,
 								'<div class="grey fs12">Скрывать при ненулевом значении</div>' +
 								'<div class="grey fs12">Показывать при нулевом</div>'
 					},
-					{uid:5,title:'Вывести колонки списка'}
+					{uid:5,title:'Выбор нескольких колонок списка',
+						content:'Выбор нескольких колонок списка' +
+								'<div class="grey fs12">Отобразятся все колонки в виде галочек, можно выбирать несколько или все.</div>'
+					},
+					{uid:6,title:'Выбор одной из колонок списка',
+						content:'Выбор одной из колонок списка' +
+								'<div class="grey fs12">Отобразятся все колонки в виде Radio, можно выбрать только одну.</div>'
+					}
 				],
 				func:function(v, attr_id) {
 					var num = attr_id.split('act')[1];
 					$('#cond-tab' + num)._dn(COND_SHOW[v]);
-					$('#cmp-tab' + num)._dn(v != 5);
+					$('#cmp-tab' + num)._dn(CMP_SHOW[v]);
 				}
 			});
 
@@ -1231,12 +1239,10 @@ var VK_SCROLL = 0,
 			NUM++;
 		}
 		function submit() {
-			var arr = [],
-				func = $('.cmp-func');
+			var arr = [];
 
-			for(var n = 0; n < func.length; n++) {
-				var sp = func.eq(n),
-					num = sp.attr('val'),
+			if(!_forEq($('.cmp-func'), function(sp) {
+				var	num = sp.attr('val'),
 					f = {
 						action_id:_num($('#cmp-func-act' + num).val()),
 						cond_id:$('#cmp-func-cond' + num).val(),
@@ -1246,16 +1252,17 @@ var VK_SCROLL = 0,
 				if(!f.action_id) {
 					$('#act-tab' + num)._flash({color:'red'});
 					dialog.err('Не выбрано действие в функции ' + num);
-					return;
+					return false;
 				}
-				if(f.action_id != 5 && f.ids == 0) {
+				if(CMP_SHOW[f.action_id] && f.ids == 0) {
 					$('#cmp-tab' + num)._flash({color:'red'});
 					dialog.err('Не выбраны компоненты в функции ' + num);
-					return;
+					return false;
 				}
 
 				arr.push(f);
-			}
+			}))
+				return;
 
 			COMPONENT_FUNC[CMP.id] = arr;
 			dialog.close();
@@ -1293,6 +1300,7 @@ var VK_SCROLL = 0,
 			dialog.butSubmit(res['button_' + (unit_id ? 'edit' : 'insert') + '_submit']);
 			dialog.butCancel(unit_id ? res.button_edit_cancel : res.button_insert_cancel);
 			window.COMPONENT_FUNC = res.func;
+			window.DATA = res.data;
 			_dialogScript(res.component);
 			dialog.submit(function() {
 				submit(res.component);
@@ -1304,7 +1312,7 @@ var VK_SCROLL = 0,
 				unit_id:unit_id,
 				dialog_id:dialog_id,
 				elem:{},
-				func:{},//значения функций, если требуется сохранять. Конкретно пока для действия 5
+				func:{},//значения функций, если требуется сохранять. Конкретно пока для действия 5,6
 				page_id:PAGE_ID,
 				block_id:window.BLOCK_ID || 0
 			};
@@ -1332,13 +1340,13 @@ var VK_SCROLL = 0,
 
 			var v = []; //переменная для сбора значений
 			_forN(func[id], function(sp) {
-				if(sp.action_id != 5)
-					return;
-
-				_forEq($('#delem' + id).find('.spisok-col ._check').prev(), function(i) {
-					if(_num(i.val()))
-						v.push(_num(i.attr('id').split('col')[1]));
-				});
+				if(sp.action_id == 5)
+					_forEq($('#delem' + id).find('.spisok-col ._check').prev(), function(i) {
+						if(_num(i.val()))
+							v.push(_num(i.attr('id').split('col')[1]));
+					});
+				if(sp.action_id == 6)
+					v.push(_num($('#delem' + id).find('.spisok-col ._radio .on').attr('val')));
 			});
 			sf[id] = v.join(',');
 		}
@@ -1451,7 +1459,7 @@ var VK_SCROLL = 0,
 						spisok:ch.v
 					})
 					.parent().parent()
-					.find('.label').addClass('topi');
+					.find('.label').addClass('top');
 				if(isEdit)
 					$(ch.attr_id)._radio('disable');
 				break;
@@ -1500,7 +1508,7 @@ var VK_SCROLL = 0,
 
 				ids = func.ids.split(',');
 
-			if(func.action_id == 5) {//вывод элементов списка
+			if(func.action_id == 5 || func.action_id == 6) {//вывод элементов списка
 				var delem = $('#delem' + component_id);
 				delem.find('.spisok-col').remove();
 
@@ -1517,6 +1525,9 @@ var VK_SCROLL = 0,
 					};
 				_post(send, function(res) {
 					spc.html(res.html).removeClass('_busy');
+					if(func.action_id == 6) {
+						spc.find('input')._radio()._radio(_num(DATA.num_3));
+					}
 				}, function(res) {
 					spc.html(res.text)
 						.removeClass('_busy')
@@ -1741,6 +1752,19 @@ $(document)
 		p.val(v);
 		t[(v ? 'add' : 'remove') + 'Class']('on');
 	})
+	.on('click', '._radio div', function() {//выбор значения radio, если был выведен через PHP
+		var t = $(this),
+			p = t.parent();
+		if(!p.hasClass('php'))//если элемент был выведен через JS, а не через PHP, то действия нет
+			return;
+		if(p.hasClass('disabled'))
+			return;
+		var v = _num(t.attr('val'));
+
+		p.prev().val(v);
+		p.find('.on').removeClass('on');
+		t.addClass('on');
+	})
 
 	.on('mouseenter', '.dialog-hint', function() {//отображение подсказки при наведении на вопрос в диалоге
 		var t = $(this),
@@ -1947,7 +1971,7 @@ $.fn._check = function(o) {
 
 	function checkPrint() {//вывод галочки
 		var nx = t.next();
-		if(nx.hasClass('_check'))   //если галочка была выведена через PHP - только применение функций
+		if(nx.hasClass('_check'))   //если галочка была выведена через PHP - обновление и применение функций
 			o = $.extend({
 				title:nx.html(),
 				disabled:nx.hasClass('disabled'),
@@ -1996,15 +2020,18 @@ $.fn._check = function(o) {
 	window[win] = t;
 	return t;
 };
-$.fn._radio = function(o, o1) {
+$.fn._radio = function(o) {
 	var t = $(this),
 		n,
 		attr_id = t.attr('id'),
-		win = attr_id + '_radio',
 		s;
 
-	if(!attr_id)
-		return;
+	if(!attr_id) {
+		attr_id = 'radio' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
+	}
+
+	var win = attr_id + '_radio';
 
 	switch(typeof o) {
 		case 'number':
@@ -2020,10 +2047,15 @@ $.fn._radio = function(o, o1) {
 			if(o == 'func')
 				s.funcGo();
 			return t;
-			break;
 	}
 
-	t.next().remove('._radio');
+	var cnt = t.next();
+	if(cnt.hasClass('_radio'))
+		if(cnt.hasClass('php')) {
+			cnt.removeClass('php')
+			   .attr('id', win);
+		} else
+			cnt.remove();
 
 	o = $.extend({
 		title0:'',
@@ -2031,21 +2063,12 @@ $.fn._radio = function(o, o1) {
 		disabled:0,
 		light:0,
 		block:1,
-		top:7,      //отступ сверху всего блока
 		interval:7, //интервал между значениями
 		func:function() {}
 	}, o);
 
-	var val = _num(t.val(), 1),
-		block = o.block ? ' block' : '',
-		light = o.light ? ' light' : '',
-		dis = o.disabled ? ' disabled' : '',
-		html =
-			'<div class="_radio' + block + dis + light + '" id="' + win + '" style="margin-top:' + o.top + 'px">' +
-				_print(_copySel(o.spisok)) +
-			'</div>';
+	_print();
 
-	t.after(html);
 	var RADIO = $('#' + win),
 		RDIV = RADIO.find('div');
 
@@ -2060,18 +2083,29 @@ $.fn._radio = function(o, o1) {
 		o.func(v, attr_id);
 	});
 
-	function _print(spisok) {
-		var list = '';
+	function _print() {
+		if(t.next().hasClass('_radio'))
+			return;
+		var spisok = _copySel(o.spisok),
+			val = _num(t.val(), 1),
+			block = o.block ? ' block' : '',
+			light = o.light ? ' light' : '',
+			dis = o.disabled ? ' disabled' : '',
+			html = '<div class="_radio' + block + dis + light + '" id="' + win + '">';
+
 		if(o.title0)
 			spisok.unshift({uid:0,title:o.title0});
-		for(n = 0; n < spisok.length; n++) {
-			var sp = spisok[n],
-				on = val == sp.uid ? 'on' : '';
-			list += '<div class="' + on + '" val="' + sp.uid + '" style="margin-bottom:' + o.interval + 'px">' +
+
+		_forN(spisok, function(sp) {
+			var on = val == sp.uid ? 'on' : '';
+			html += '<div class="' + on + '" val="' + sp.uid + '" style="margin-bottom:' + o.interval + 'px">' +
 						sp.title +
 					'</div>';
-		}
-		return list;
+		});
+
+		html += '</div>';
+
+		t.after(html);
 	}
 
 	function setVal(v) {

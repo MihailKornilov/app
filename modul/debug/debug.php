@@ -120,7 +120,7 @@ function jsonDebugParam() {//возвращение дополнительных параметров json, если вк
 	global $sqlQuery, $sqlTime;
 	$d = debug_backtrace();
 	return array(
-		'post' => $_POST,
+		'post' => _pr($_POST),
 		'link' => 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'],
 		'php_time' => round(microtime(true) - TIME, 3),
 		'sql_count' => count($sqlQuery),

@@ -237,6 +237,19 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 				   '</a>';
 		case 10://произвольный текст
 			return $unit['txt_1'];
+		case 11://имя колонки или значение из диалога
+			/*
+				num_1 - dialog_id списка
+				num_2 - тип содержания колонки:
+							331: название
+							332: значение
+				num_3 - id компонента диалога
+				$_GET['id'] - id списка при выводе
+			*/
+			if(!$id = _num(@$_GET['id']))
+				return 'объект отсутствует';
+
+			return $unit['num_3'];
 		case 14://_spisok
 			return _pageSpisok($unit);
 	}

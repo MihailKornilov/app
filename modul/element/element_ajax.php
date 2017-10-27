@@ -230,6 +230,7 @@ switch(@$_POST['op']) {
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr', array(), $page_id);
 		$send['func'] = _dialogFuncSpisok($dialog_id);
 		$send['html'] = utf8($html);
+		$send['data'] = $data;
 		jsonSuccess($send);
 		break;
 
@@ -722,8 +723,8 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_col_get'://получение колонок списка (для функции Действие 5)
-		if(!$component_id = _num($_POST['component_id']))
+	case 'spisok_col_get'://получение колонок списка (для функции Действие 5 и 6)
+		if(!$cmp_id = _num($_POST['component_id']))
 			jsonError('Некорректный ID компонента диалога');
 		if(!$page_id = _num($_POST['page_id']))
 			jsonError('Некорректный ID страницы');
@@ -732,7 +733,7 @@ switch(@$_POST['op']) {
 
 		$sql = "SELECT *
 				FROM `_dialog_component`
-				WHERE `id`=".$component_id;
+				WHERE `id`=".$cmp_id;
 		if(!$cmp = query_assoc($sql))
 			jsonError('Компонента не существует');
 
@@ -741,6 +742,12 @@ switch(@$_POST['op']) {
 			jsonError('Компонент не является массивом списков');
 		if(!$cmpDialog = _dialogQuery($cmp['dialog_id']))
 			jsonError('Диалога, в котором содержится компонент, не существует');
+
+		$cmpFuncAss = $cmpDialog['component'][$cmp_id]['func_action_ass'];
+		$f5 = !empty($cmpFuncAss[5]);
+		$f6 = !empty($cmpFuncAss[6]);
+		if(!$f5 && !$f6)
+			jsonError('Отсутствует функция получения колонок');
 
 		//получение dialog_id списка
 		$dialog_id = $vid;  //если не установлена галочка "только с текущей страницы", то это и есть тот самый dialog_id
@@ -766,32 +773,49 @@ switch(@$_POST['op']) {
 			jsonError('В данном списке колонок нет');
 
 		$col = '';
+		$radioAss = array();
 		foreach($dialog['component'] as $id => $r) {
-			if($r['type_id'] == 1)
-				continue;
-			if($r['type_id'] == 5)
-				continue;
-			if($r['type_id'] == 6)
-				continue;
 			if($r['type_id'] == 7)
 				continue;
 			if($r['type_id'] == 8)
 				continue;
 			if($r['type_id'] == 9)
 				continue;
+
+			$title = $r['label_name'].' <span class="grey i">'._dialogEl($r['type_id'], 'name').'</span>';
+			
+			if($f6) {
+				$radioAss[$id] = $title;
+				continue;
+			}
+
+			if($r['type_id'] == 1)
+				continue;
+			if($r['type_id'] == 5)
+				continue;
+			if($r['type_id'] == 6)
+				continue;
 			$col .=
 				'<div class="mb5">'.
 					_check(array(
 						'id' => 'col'.$id,
-						'title' => $r['label_name'].' <span class="grey i">'._dialogEl($r['type_id'], 'name').'</span>',
+						'title' => $title,
 						'value' => @$colIds[$id]
 					)).
 				'</div>';
 		}
 
+		if($f6)
+			$col = _radio(array(
+				'spisok' => $radioAss,
+				'light' => 1,
+				'interval' => 5
+			));
+
+		
 		$send['html'] = utf8(
 			'<table class="bs5 w100p">'.
-				'<tr><td class="label r top" style="width:'.$cmpDialog['label_width'].'px">Колонки:'.
+				'<tr><td class="label r top" style="width:'.$cmpDialog['label_width'].'px">Колонк'.($f6 ? 'а' : 'и').':'.
 					'<td>'.$col.
 			'</table>'
 		);
@@ -988,17 +1012,13 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
 		2 => /* *** выпадающий список ***
 				num_3 - использовать или нет нулевое значение
                 txt_1  - текст нулевого значения
-
-                num_4 - использование всех списков при выборе
-                num_5 - выбор списков только с текущей страницы
-
-				num_4:  1 - произвольные значения
+				num_4:  0 - данных нет
+						1 - произвольные значения
 						2 - использование всех списков при выборе
 							num_5 - выбор списков только с текущей страницы
 						3 - выбор элемента списка (для связок)
-						4 - выбор из списков, объекты которых размещаются текущей на странице
- 
-				num_1  - id списка по dialog_id
+						4 - список объектов, которые поступают на страницу через GET
+ 				num_1  - id списка по dialog_id
 		        num_2  - id колонки по component_id
 			*/
 			_dialogElHtmlContent(1).
@@ -1138,7 +1158,7 @@ function _dialogElHtmlContent($req=0) {//основное содержимое
 	'<table class="bs5">'.
 		'<tr><td class="'.EL_LABEL_W.' label r b">Название поля:'.
 			'<td><input type="text" id="label_name" class="w250" />'.
-		'</table>'.
+	'</table>'.
 
 ($req ? //отображение галочки "Требуется обязательное заполнение"
 	'<table class="bs5">'.
@@ -1532,20 +1552,18 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 			if(isset($element_v[$r['id']]))
 				$arr[$n]['v'] = $element_v[$r['id']];
 
-			if($r['type_id'] == 2 && !$edit) {
-				if($r['num_1']) {//получение значений конкретного объекта
-					$arr[$n]['v'] = _dialogSpisokList($r['num_1'], $r['num_2']);
-					continue;
+			if($r['type_id'] == 2 && !$edit)
+				switch($r['num_4']) {
+					case 2://все списки или с конкретной страницы
+						$arr[$n]['v'] = $r['num_5'] ? _dialogSpisokOnPage($page_id) : _dialogSpisokOn();
+						break;
+					case 3://получение значений конкретного объекта
+						$arr[$n]['v'] = _dialogSpisokList($r['num_1'], $r['num_2']);
+						break;
+					case 4://список объектов, которые поступают на страницу через GET
+						$arr[$n]['v'] = _dialogSpisokGetPage($page_id);
+						break;
 				}
-				if($r['num_5']) {//массив объектов-списков на конкретной странице
-					$arr[$n]['v'] = _dialogSpisokOnPage($page_id);
-					continue;
-				}
-				if($r['num_4']) {//массив объектов-списков
-					$arr[$n]['v'] = _dialogSpisokOn();
-					continue;
-				}
-			}
 		}
 	}
 
@@ -1681,15 +1699,8 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 		if(!_num($id))
 			jsonError('Некорректный идентификатор поля');
 
-	//получение информации об компонентах диалога и составление списка для внесения в таблицу
-	$sql = "SELECT *
-			FROM `_dialog_component`
-			WHERE `dialog_id`=".$dialog_id."
-			ORDER BY `sort`";
-	$de = query_arr($sql);
-
 	$elemUpdate = array();
-	foreach($de as $id => $r) {
+	foreach($dialog['component'] as $id => $r) {
 		if(!_dialogEl($r['type_id'], 'func'))
 			continue;
 
@@ -1732,7 +1743,7 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 		}
 		$elemUpdate[] = $upd;
 
-		_dialogSpisokFuncValUpdate($dialog, $r, $unit_id);
+		_dialogSpisokFuncValUpdate($dialog, $id, $unit_id);
 	}
 
 	if(!$unit_id) {
@@ -1784,45 +1795,51 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 
 	return $send;
 }
-function _dialogSpisokFuncValUpdate($dialog, $cmp, $unit_id) {//обновление значений функций компонентов (пока конкретно Действие 5)
+function _dialogSpisokFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление значений функций компонентов (пока конкретно Действие 5)
 	if(!$unit_id)
 		return;
-
-	$cmp_id = _num($cmp['id']);
-
 	if(!isset($_POST['func'][$cmp_id]))
 		return;
 
+	$cmp = $dialog['component'][$cmp_id];
 	$v = $_POST['func'][$cmp_id];
 
 	//проверка наличия функции у компонента
-	$sql = "SELECT COUNT(`id`)
-			FROM `_dialog_component_func`
-			WHERE `action_id`=5
-			  AND `component_id`=".$cmp_id;
-	if(!query_value($sql))
+	$f5 = !empty($cmp['func_action_ass'][5]);
+	$f6 = !empty($cmp['func_action_ass'][6]);
+	if(!$f5 && !$f6)
 		return;
 
 	//если компонент не содержит список
 	if(!$cmp['num_4'])
 		return;
 
-	//если список не со страницы
-	if(!$cmp['num_5'])
+	if($f5) {
+		//если список не со страницы
+		if(!$cmp['num_5'])
+			return;
+
+		//получение id элемента страницы, у которой будет изменяться значение
+		$sql = "SELECT `num_3`
+				FROM `".BASE_TABLE."`
+				WHERE `id`=".$unit_id;
+		if(!$pe_id = query_value($sql))
+			return;
+
+		$sql = "UPDATE `".BASE_TABLE."`
+				SET `txt_3`='".addslashes($v)."'
+				WHERE `id`=".$pe_id;
+		query($sql);
 		return;
+	}
 
-	//получение id элемента страницы, у которой будет изменяться значение
-	$sql = "SELECT `num_3`
-			FROM `".$dialog['base_table']."`
-			WHERE `id`=".$unit_id;
-	if(!$pe_id = query_value($sql))
+	if($f6) {
+		$sql = "UPDATE `".BASE_TABLE."`
+				SET `num_3`='".addslashes($v)."'
+				WHERE `id`=".$unit_id;
+		query($sql);
 		return;
-
-	$sql = "UPDATE `".$dialog['base_table']."`
-			SET `txt_3`='".addslashes($v)."'
-			WHERE `id`=".$pe_id;
-	query($sql);
-
+	}
 }
 
 

@@ -322,8 +322,12 @@ var FB,
 		m.addClass('_busy');
 	},
 	_forEq = function(arr, func) {//перечисление последовательного массива jquery $(...)
+
+		//перебор будет осуществляться до тех пор, пока не будет встречено значение false в функции
 		for(var n = 0; n < arr.length; n++)
-			func(arr.eq(n));
+			if(func(arr.eq(n)) === false)
+				return false;
+		return true;
 	},
 	_forN = function(arr, func) {//перечисление последовательного массива js
 		for(var n = 0; n < arr.length; n++)
@@ -401,7 +405,7 @@ $.fn._dn = function(v, cls) {//скрытие/показ элемента
 };
 
 $(document)
-	.ajaxSuccess(function(event, request, settings) {
+	.ajaxSuccess(function(event, request) {
 		_busy(0);
 		var req = request.responseJSON;
 
@@ -420,7 +424,8 @@ $(document)
 					'<a id="repeat">повтор</a>' +
 	 (req.success ? '<b id="res-success">success</b>' : '') +
 	   (req.error ? '<b id="res-error">error</b>' : '') +
-				'</div>',
+				'</div>' +
+				req.post,
 			link = '<div class="hd"><b>link</b></div><textarea>' + req.link + '</textarea>',
 			sql = '<div class="hd">sql <b>' + req.sql_count + '</b> (' + req.sql_time + ') :: php ' + req.php_time + '</div>';
 
@@ -432,10 +437,7 @@ $(document)
 				case 'sql_count': break;
 				case 'sql_time': break;
 				case 'link': break;
-				case 'post':
-					for(var k in req.post)
-						post += '<p><b>' + k + '</b>: ' + req.post[k];
-					break;
+				case 'post': break;
 				case 'sql':
 					sql += '<ul>' + req[i] + '</ul>';
 					break;
@@ -472,7 +474,7 @@ $(document)
 			return send;
 		}
 	})
-	.ajaxError(function(event, request, settings) {
+	.ajaxError(function(event, request) {
 //		_busy(0);
 		if(!request.responseText)
 			return;

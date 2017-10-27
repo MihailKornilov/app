@@ -89,6 +89,36 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 		$v['title'].
 	'</div>';
 }
+function _radio($v=array()) {//элемент RADIO
+	$attr_id = @$v['attr_id'] ? ' id="'.$v['attr_id'].'_radio"' : '';
+	$title0 = @$v['title0'];
+	$spisok = @$v['spisok'] ? $v['spisok'] : array();
+	$value = _num(@$v['value']);
+	$dis = _num(@$v['disabled']) ? ' disabled' : '';
+	$light = _num(@$v['light']) ? ' light' : '';
+	$block = _bool(@$v['block']) ? ' block' : '';
+	$interval = _num(@$v['interval']) ? _num(@$v['interval']) : 7;
+
+	$html = '';
+	if($title0)
+		$html = _radioUnit(0, $title0, $interval, $value == 0);
+	if(is_array($spisok))
+		foreach($spisok as $id => $title)
+			$html .= _radioUnit($id, $title, $interval, $value == $id);
+
+	return
+	'<input type="hidden" id="" value="'.$value.'" />'.
+	'<div class="_radio php'.$block.$dis.$light.'"'.$attr_id.'>'.
+		$html.
+	'</div>';
+}
+function _radioUnit($id, $title, $interval, $on) {
+	$on = $on ? ' class="on"' : '';
+	return
+	'<div'.$on.' val="'.$id.'" style="margin-bottom:'.$interval.'px">'.
+		$title.
+	'</div>';
+}
 
 function _search($v=array()) {//элемент ПОИСК
 	$v = array(
@@ -114,29 +144,40 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 			WHERE `app_id` IN(0,".APP_ID.")
 			  AND `sa` IN (0,".SA.")
 			  AND `id`=".$dialog_id;
-	if(!$r = query_assoc($sql))
+	if(!$dialog = query_assoc($sql))
 		return array();
 
 	$sql = "SELECT *
 			FROM `_dialog_component`
 			WHERE `dialog_id`=".$dialog_id."
 			ORDER BY `sort`";
-	$r['component'] = query_arr($sql);
+	$cmp = query_arr($sql);
+	foreach($cmp as $id => $r) {
+		$cmp[$id]['v_ass'] = array();
+		$cmp[$id]['func'] = array();
+		$cmp[$id]['func_action_ass'] = array();//ассоциативный массив действий для конкретного компонента
+	}
 
 	$sql = "SELECT `id`,`v`
 			FROM `_dialog_component_v`
 			WHERE `dialog_id`=".$dialog_id;
-	$r['v_ass'] = query_ass($sql);
+	$dialog['v_ass'] = query_ass($sql);
 
-/* пока отменено
-	//конкретная колонка, используемая в таблице
-	//берётся из `base_table`
-	//например: _page:razdel
-	$ex = explode(':', $r['base_table']);
-	$r['col'] = @$ex[1];
-	$r['base_table'] = $ex[0];
-*/
-	return $r;
+	$sql = "SELECT *
+			FROM `_dialog_component_func`
+			WHERE `component_id` IN ("._idsGet($cmp).")
+			ORDER BY `sort`";
+	foreach(query_arr($sql) as $r) {
+		$cmp[$r['component_id']]['func'][] = array(
+			'action_id' => $r['action_id'],
+			'cond_id' => $r['cond_id'],
+			'component_ids' => $r['component_ids']
+		);
+		$cmp[$r['component_id']]['func_action_ass'][$r['action_id']] = 1;
+	}
+
+	$dialog['component'] = $cmp;
+	return $dialog;
 }
 function _dialogValToId($val='') {//получение id диалога на основании имени val
 	//если такого имени нет, то внесение диалога в базу
@@ -226,6 +267,21 @@ function _dialogSpisokOnPage($page_id) {//получение массива элементов страницы, 
 		$res[$id] = $ass[$r['num_3']];
 
 	return _selArray($res);
+}
+function _dialogSpisokGetPage($page_id) {//список объектов, которые поступают на страницу через GET
+	if(!$page_id)
+		return array();
+
+	//определение, есть ли данные, поступающие на эту страницу
+	$sql = "SELECT `id`,`spisok_name`
+			FROM `_dialog`
+			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
+			  AND `action_id`=2
+			  AND `action_page_id`=".$page_id;
+	if(!$send = query_ass($sql))
+		return array();
+
+	return _selArray($send);
 }
 
 
