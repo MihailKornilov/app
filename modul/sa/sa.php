@@ -77,7 +77,7 @@ function _page_show($page_id, $blockShow=0) {
 		if(!$r['sub']) {
 			$send .=
 				'<div id="pb_'.$r['id'].'"'._pageBlockStyle($r).' class="elem-sort bspb '.$r['bg'].' '.$cls.$mh.'"'.$val.'>'.
-					_pagePasBlock($r, $blockShow).
+					_pageBlockPas($r, $blockShow).
 					_pageElemSpisok($elem[$block_id]).
 				'</div>';
 			continue;
@@ -90,7 +90,7 @@ function _page_show($page_id, $blockShow=0) {
 		foreach($r['sub'] as $n => $sub) {
 			$sub['elem_count'] = count($elem[$sub['id']]);
 			$send .= '<td class="elem-sort bspb '.$sub['bg'].' prel top"'._pageBlockStyle($sub).'>'.
-						_pagePasBlock($sub, $blockShow, $n != $cSub).
+						_pageBlockPas($sub, $blockShow, $n != $cSub).
 						_pageElemSpisok($elem[$sub['id']]);
 		}
 		$send .=	'</table>'.
@@ -139,7 +139,7 @@ function _pageBlockTest($page_id) {//проверка страницы на наличие хотя бы одного
 			WHERE `page_id`=".$page_id;
 	query($sql);
 }
-function _pageBlockStyle($r) {
+function _pageBlockStyle($r) {//стили css для блока
 	$send = array();
 
 	//отступы
@@ -175,6 +175,32 @@ function _pageBlockStyle($r) {
 
 	return ' style="'.implode(';', $send).'"';
 }
+function _pageBlockPas($r, $show=0, $resize=0) {//подсветка блоков при редактировании
+	if(!PAS)
+		return '';
+
+	$block_id = $r['id'];
+	$dn = $show ? '' : ' dn';
+	$resize = $resize ? ' resize' : '';
+	$empty = $r['elem_count'] ? '' : ' empty';
+
+
+	return
+	'<div class="pas-block'.$empty.$resize.$dn.'" val="'.$block_id.'">'.
+		'<div class="fl">'.
+			$block_id.
+			'<span class="fs11 grey"> w'.$r['w'].'</span>'.
+			'<span class="fs11 color-acc"> '.$r['sort'].'</span>'.
+		'</div>'.
+		'<div class="pas-icon">'.
+			'<div class="icon icon-add mr3'._tooltip('Добавить элемент', -57).'</div>'.
+			'<div class="icon icon-setup mr3'._tooltip('Стили блока', -39).'</div>'.
+	($r['parent_id'] ? '<div class="icon icon-move mr3 curM center'._tooltip('Изменить порядок<br />по горизонтали', -56, '', 1).'</div>' : '').
+			'<div class="icon icon-div mr3'._tooltip('Разделить блок пополам', -76).'</div>'.
+			'<div class="icon icon-del-red'._tooltip('Удалить блок', -42).'</div>'.
+		'</div>'.
+	'</div>';
+}
 function _pageElemSpisok($elem) {//список элементов формате html для конкретного блока
 	if(!$elem)
 		return '';
@@ -182,7 +208,7 @@ function _pageElemSpisok($elem) {//список элементов формате html для конкретного
 	$send = '';
 	foreach($elem as $r) {
 		$send .=
-		'<div class="pe prel" id="pe_'.$r['id'].'">'.
+		'<div class="pe prel '.$r['color'].' '.$r['font'].' '.$r['size'].'" id="pe_'.$r['id'].'"'._pageElemStyle($r).'>'.
 			_pageElemPas($r).
 			_pageElemUnit($r).
 		'</div>';
@@ -198,6 +224,7 @@ function _pageElemPas($r) {
 	'<div class="elem-pas" val="'.$r['id'].'">'.
 		'<div class="elem-icon">'.
 			'<div class="icon icon-sort curM mr3'._tooltip('Изменить порядок<br />внутри блока', -57, '', 1).'</div>'.
+			'<div class="icon icon-setup mr3'._tooltip('Стили элемента', -50).'</div>'.
 			'<div onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')" class="icon icon-edit mr3'._tooltip('Настроить элемент', -58).'</div>'.
 			'<div onclick="_dialogOpen(6,'.$r['id'].')" class="icon icon-del-red'._tooltip('Удалить элемент', -53).'</div>'.
 		'</div>'.
@@ -247,42 +274,61 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 				num_3 - id компонента диалога
 				$_GET['id'] - id списка при выводе
 			*/
-			if(!$id = _num(@$_GET['id']))
-				return 'объект отсутствует';
+			if(!$spisok_id = _num(@$_GET['id']))
+				return 'некорректный id объекта';
 
-			return $unit['num_3'];
+			if(!$unit['num_3'])
+				return 'нулевое значение компонента';
+
+			$sql = "SELECT *
+					FROM `_spisok`
+					WHERE `app_id` IN (0,".APP_ID.")
+					  AND `id`=".$spisok_id;
+			if(!$sp = query_assoc($sql))
+				return 'объекта не существует';
+
+			$dialog = _dialogQuery($unit['num_1']);
+			$cmp = $dialog['component'][$unit['num_3']];
+
+			if($unit['num_2'] == 331)
+				return $cmp['label_name'];
+
+			if($unit['num_2'] == 332)
+				return $sp[$cmp['col_name']];
+
+			return 'spisok_id='.$spisok_id.' '.$unit['num_3']._pr($cmp);
 		case 14://_spisok
 			return _pageSpisok($unit);
 	}
 	return 'неизвестный элемент='.$unit['dialog_id'];
 }
-function _pagePasBlock($r, $show=0, $resize=0) {//подсветка блоков при редактировании
-	if(!PAS)
+function _pageElemStyle($r) {//стили css для элемента
+	$send = array();
+
+	//отступы
+	$ex = explode(' ', $r['mar']);
+	foreach($ex as $px)
+		if($px) {
+			$send[] = 'margin:'.
+				$ex[0].($ex[0] ? 'px' : '').' '.
+				$ex[1].($ex[1] ? 'px' : '').' '.
+				$ex[2].($ex[2] ? 'px' : '').' '.
+				$ex[3].($ex[3] ? 'px' : '');
+			break;
+		}
+
+	if(!$send)
 		return '';
 
-	$block_id = $r['id'];
-	$dn = $show ? '' : ' dn';
-	$resize = $resize ? ' resize' : '';
-	$empty = $r['elem_count'] ? '' : ' empty';
-
-
-	return
-	'<div class="pas-block'.$empty.$resize.$dn.'" val="'.$block_id.'">'.
-		'<div class="fl">'.
-			$block_id.
-			'<span class="fs11 grey"> w'.$r['w'].'</span>'.
-			'<span class="fs11 color-acc"> '.$r['sort'].'</span>'.
-		'</div>'.
-		'<div class="pas-icon">'.
-			'<div class="icon icon-add mr3'._tooltip('Добавить элемент', -57).'</div>'.
-			'<div class="icon icon-setup mr3'._tooltip('Стили блока', -39).'</div>'.
-	($r['parent_id'] ? '<div class="icon icon-move mr3 curM center'._tooltip('Изменить порядок<br />по горизонтали', -56, '', 1).'</div>' : '').
-			'<div class="icon icon-div mr3'._tooltip('Разделить блок пополам', -76).'</div>'.
-			'<div class="icon icon-del-red'._tooltip('Удалить блок', -42).'</div>'.
-		'</div>'.
-	'</div>';
+	return ' style="'.implode(';', $send).'"';
 }
-
+function _pageElemFontAllow($dialog_id) {//отображение в настройках стилей для конкретных элементов страницы
+	$elem = array(
+		10 => 1,
+		11 => 1
+	);
+	return isset($elem[$dialog_id]);
+}
 
 function _pageElementMenu($menu_id) {//элемент страницы: Меню
 	$sql = "SELECT *

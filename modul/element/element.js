@@ -284,8 +284,6 @@ var VK_SCROLL = 0,
 		};
 	},
 
-
-
 	_dialogEdit = function(dialog_id) {//создание|редактирование диалогового окна
 		dialog_id = _num(dialog_id);
 		var dialog = _dialog({
@@ -1269,8 +1267,6 @@ var VK_SCROLL = 0,
 		}
 	},
 
-
-
 	_dialogOpen = function(dialog_id, unit_id, unit_id_dub) {//открытие диалогового окна
 		dialog_id = _num(dialog_id);
 		unit_id = _num(unit_id);
@@ -1621,10 +1617,10 @@ var VK_SCROLL = 0,
 					vd = but.next(),
 					v = _num(vd.html());
 				v -= 5;
-				if(v <= 0) {
+				if(v <= 0)
 					v = 0;
-					vd.addClass('pale');
-				}
+				vd._dn(v, 'pale');
+				vd._dn(!v, 'bg-dfd');
 				vd.html(v);
 			});
 			PAD.find('.plus').click(function() {
@@ -1632,13 +1628,12 @@ var VK_SCROLL = 0,
 					vd = but.prev(),
 					v = _num(vd.html());
 				v += 5;
-				vd.removeClass('pale');
-				if(v > 50) {
+				if(v > 50)
 					v = 50;
-				}
+				vd.removeClass('pale');
+				vd.addClass('bg-dfd');
 				vd.html(v);
 			});
-
 		}
 		function submit() {
 			var arr = [],
@@ -1660,13 +1655,15 @@ var VK_SCROLL = 0,
 				pad:arr.join(' '),
 				bor:bor.join(' ')
 			};
-			_post(send, function(res) {
+			dialog.post(send, 'reload');
+/*			_post(send, function(res) {
 				dialog.close();
 				_msg();
 				$('#_content').html(res.html);
 				_pageBlockResize();
 				$('.icon-page-tmp').trigger('click');
 			});
+*/
 		}
 	},
 	_pageBlockSort = function(v) {//включение/выключение сотрировки блоков на странице
@@ -1738,6 +1735,99 @@ var VK_SCROLL = 0,
 				}
 			});
 		});
+	},
+
+	_pageElemStyle = function() {//настройка стилей элемента
+		var t = $(this),
+			p = _parent(t, '.elem-pas'),
+			dialog = _dialog({
+				width:500,
+				top:30,
+				padding:0,
+				head:'Параметры стилей элемента',
+				load:1,
+				butSubmit:'',
+				submit:submit
+			}),
+			send = {
+				op:'page_elem_style_load',
+				id:p.attr('val')
+			},
+			MAR,
+			COLOR,
+			FONT,
+			SIZE;
+
+		dialog.load(send, loaded);
+
+		function loaded() {
+			dialog.butSubmit('Применить');
+
+			MAR = dialog.content.find('.elem-pas-mar');
+			MAR.find('.minus').click(function() {
+				var but = $(this),
+					vd = but.next(),
+					v = _num(vd.html());
+				v -= 5;
+				if(v <= 0)
+					v = 0;
+				vd._dn(v, 'pale');
+				vd._dn(!v, 'bg-dfd');
+				vd.html(v);
+			});
+			MAR.find('.plus').click(function() {
+				var but = $(this),
+					vd = but.prev(),
+					v = _num(vd.html());
+				v += 5;
+				if(v > 50)
+					v = 50;
+				vd.removeClass('pale');
+				vd.addClass('bg-dfd');
+				vd.html(v);
+			});
+
+			COLOR = dialog.content.find('.elem-pas-color');
+			COLOR.find('td').click(function() {
+				COLOR.find('.bg-dfd').removeClass('bg-dfd');
+				$(this).addClass('bg-dfd');
+			});
+
+			FONT = dialog.content.find('.elem-pas-font');
+			FONT.find('td').click(function() {
+				var td = $(this),
+					v = td.hasClass('bg-dfd');
+				td._dn(v, 'bg-dfd');
+			});
+
+			SIZE = dialog.content.find('.elem-pas-size');
+			SIZE.find('td').click(function() {
+				SIZE.find('.bg-dfd').removeClass('bg-dfd');
+				$(this).addClass('bg-dfd');
+			});
+		}
+		function submit() {
+			var mar = [],
+				font = [];
+
+			_forEq(MAR.find('.bor-e8'), function(eq) {
+				mar.push(_num(eq.html()));
+			});
+
+			_forEq(FONT.find('.bg-dfd'), function(eq) {
+				font.push(eq.attr('val'));
+			});
+
+			var send = {
+				op:'page_elem_style_save',
+				id:p.attr('val'),
+				mar:mar.join(' '),
+				color:COLOR.find('.bg-dfd').attr('val'),
+				font:font.join(' '),
+				size:SIZE.find('.bg-dfd').attr('val')
+			};
+			dialog.post(send, 'reload');
+		}
 	};
 
 $(document)
@@ -1828,7 +1918,7 @@ $(document)
 	})
 	.on('click', '.pas-block .icon-add', _pageBlockElAdd)
 	.on('click', '.pas-block .icon-setup', _pageBlockStyle)
-	.on('click', '.pas-block .icon-div', function() {//деление блока пололам
+	.on('click', '.pas-block .icon-div', function() {//деление блока пополам
 		var t = $(this),
 			p = _parent(t, '.pas-block'),
 			id = p.attr('val'),
@@ -1893,6 +1983,7 @@ $(document)
 		});
 	})
 
+	.on('click', '.elem-pas .icon-setup', _pageElemStyle)
 	.on('mouseenter', '.elem-pas .icon-sort', function() {
 		var t = $(this),
 			ES = _parent(t, '.elem-sort');

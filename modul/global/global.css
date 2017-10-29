@@ -345,6 +345,7 @@ button.vk.orange:hover{background-color:#D59553}
 .w50{width:50px}
 .h20{height:20px}
 .h25{height:25px}
+.h35{height:35px}
 .h50{height:50px}
 .mh150{min-height:150px}
 .w70{width:70px}
@@ -446,7 +447,8 @@ button.vk.orange:hover{background-color:#D59553}
 .color-vin{color:#c88}/* бордовый */
 .color-del{color:#a66}/* удалено: тёмно-бордовый */
 .color-acc{color:#07a}/* голубой - начисление */
-.color-pay{color:#090}/* зелёны - платёж */
+.blue{color:#2B587A}  /* синий - как ссылка */
+.color-pay{color:#090}/* зелёный - платёж */
 .color-ref{color:#800}/* красный - возврат */
 .color-sal{color:#770}/* салатовый - расчётный счёт */
 

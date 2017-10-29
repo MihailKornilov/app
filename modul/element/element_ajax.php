@@ -165,6 +165,7 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID диалогового окна');
 
 		$send['dialog_id'] = _dialogUpdate($dialog_id);
+
 		jsonSuccess($send);
 		break;
 
@@ -264,7 +265,7 @@ switch(@$_POST['op']) {
 		$send['id'] = $block_id;
 		$send['html'] = utf8(
 			'<div id="pb_'.$block_id.'" class="pb prel h50" val="'.$block_id.'">'.
-				_pagePasBlock($block, 1).
+				_pageBlockPas($block, 1).
 			'</div>'
 		);
 
@@ -406,24 +407,24 @@ switch(@$_POST['op']) {
 
 			'<div class="fs15 color-555 mb5">сверху</div>'.
 			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15'.($ex[0] ? '' : ' pale').'">'.$ex[0].'</div>'.
+			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[0] ? 'bg-dfd' : 'pale').'">'.$ex[0].'</div>'.
 			'<button class="vk small cancel mt1 plus">»</button>'.
 
 			'<table class="w100p ml10 mt30 mb30">'.
 				'<tr><td class="w200">'.
 						'<div class="dib fs15 color-555 mr5">слева</div>'.
 						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15'.($ex[3] ? '' : ' pale').'">'.$ex[3].'</div>'.
+						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[3] ? 'bg-dfd' : 'pale').'">'.$ex[3].'</div>'.
 						'<button class="vk small cancel mt1 plus">»</button>'.
 					'<td>'.
 						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15'.($ex[1] ? '' : ' pale').'">'.$ex[1].'</div>'.
+						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[1] ? 'bg-dfd' : 'pale').'">'.$ex[1].'</div>'.
 						'<button class="vk small cancel mt1 plus">»</button>'.
 						'<div class="dib fs15 color-555 ml5">справа</div>'.
 			'</table>'.
 
 			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15'.($ex[2] ? '' : ' pale').'">'.$ex[2].'</div>'.
+			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[2] ? 'bg-dfd' : 'pale').'">'.$ex[2].'</div>'.
 			'<button class="vk small cancel mt1 plus">»</button>'.
 			'<div class="fs15 color-555 mt3">снизу</div>'.
 
@@ -523,9 +524,9 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$id;
 		query($sql);
 
-		$send['html'] = utf8(_page_show($block['page_id'], 1));
+//		$send['html'] = utf8(_page_show($block['page_id'], 1));
 
-		jsonSuccess($send);
+		jsonSuccess();
 		break;
 	case 'page_block_del'://удаление блока
 		if(!$id = _num($_POST['id']))
@@ -591,6 +592,170 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
+	case 'page_elem_style_load'://получение стилей элемента для диалога
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный ID элемента');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `app_id` IN (0,".APP_ID.")
+				  AND `id`=".$id;
+		if(!$elem = query_assoc($sql))
+			jsonError('Блока id'.$id.' не существует');
+
+		//отступы
+		$ex = explode(' ', $elem['mar']);
+		$mar =
+		'<div class="elem-pas-mar mt10 mb20 center">'.
+
+			'<div class="fs15 color-555 mb5">сверху</div>'.
+			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[0] ? 'bg-dfd' : 'pale').'">'.$ex[0].'</div>'.
+			'<button class="vk small cancel mt1 plus">»</button>'.
+
+			'<table class="w100p ml20 mt30 mb30">'.
+				'<tr><td class="w200">'.
+						'<div class="dib fs15 color-555 mr5">слева</div>'.
+						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[3] ? 'bg-dfd' : 'pale').'">'.$ex[3].'</div>'.
+						'<button class="vk small cancel mt1 plus">»</button>'.
+					'<td>'.
+						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[1] ? 'bg-dfd' : 'pale').'">'.$ex[1].'</div>'.
+						'<button class="vk small cancel mt1 plus">»</button>'.
+						'<div class="dib fs15 color-555 ml5">справа</div>'.
+			'</table>'.
+
+			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[2] ? 'bg-dfd' : 'pale').'">'.$ex[2].'</div>'.
+			'<button class="vk small cancel mt1 plus">»</button>'.
+			'<div class="fs15 color-555 mt3">снизу</div>'.
+
+		'</div>';
+
+		//цвет
+		$color = array(
+			'' => '',
+			'color-555' => '',
+			'grey' => '',
+			'pale' => '',
+			'color-ccc' => '',
+			'blue' => '',
+			'color-acc' => '',
+			'color-sal' => '',
+			'color-pay' => '',
+			'color-aea' => '',
+			'color-ref' => '',
+			'red' => '',
+			'color-del' => '',
+			'color-vin' => ''
+		);
+		$color[$elem['color']] = ' bg-dfd';
+
+		//выделение
+		$font = array(
+			'b' => '',
+			'i' => '',
+			'u' => ''
+		);
+		foreach(explode(' ', $elem['font']) as $r)
+			if($r)
+				$font[$r] = ' bg-dfd';
+
+		//размер текста
+		$size = '';
+		for($n = 10; $n <= 18; $n++) {
+			if(!$elem['size'])
+				$elem['size'] = 'fs13';
+			$sel = $elem['size'] == 'fs'.$n ? ' bg-dfd' : '';
+			$size .= '<td class="fs'.$n.$sel.' center h50 w50 bor-e8 curP over1" val="fs'.$n.'">'.$n.'px';
+		}
+
+		$send['html'] = utf8(
+			'<div class="ml10 mr10">'.
+				'<div class="hd2">Внешние отступы элемента:</div>'.
+				$mar.
+
+			(_pageElemFontAllow($elem['dialog_id']) ?
+				'<div class="hd2">Цвет текста:</div>'.
+				'<table class="elem-pas-color ml10 mt10 collaps">'.
+					'<tr class="h35">'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color[''].'" val="">чёрный'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-555'].' color-555" val="color-555">тёмно-серый'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['grey'].' grey" val="grey">серый'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['pale'].' pale" val="pale">бледный'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-ccc'].' color-ccc" val="color-ccc">совсем бледный'.
+				'</table>'.
+				'<table class="elem-pas-color ml10 mt3 collaps">'.
+					'<tr class="h35">'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['blue'].' blue" val="blue">синий'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-acc'].' color-acc" val="color-acc">голубой'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-sal'].' color-sal" val="color-sal">салатовый'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-pay'].' color-pay" val="color-pay">зелёный'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-aea'].' color-aea" val="color-aea">ярко-зелёный'.
+				'</table>'.
+				'<table class="elem-pas-color ml10 mt3 mb20 collaps">'.
+					'<tr class="h35">'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-ref'].' color-ref" val="color-ref">тёмно-красный'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['red'].' red" val="red">красный'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-del'].' color-del" val="color-del">тёмно-бордовый'.
+						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-vin'].' color-vin" val="color-vin">бордовый'.
+				'</table>'.
+
+				'<div class="hd2">Выделение:</div>'.
+				'<table class="elem-pas-font ml10 mt10 mb20 collaps">'.
+					'<tr><td class="fs16 center h50 w50 bor-e8 curP'.$font['b'].' b" val="b">B'.
+						'<td class="fs16 center h50 w50 bor-e8 curP'.$font['i'].' i" val="i">I'.
+						'<td class="fs16 center h50 w50 bor-e8 curP'.$font['u'].' u" val="u">U'.
+				'</table>'.
+
+				'<div class="hd2">Размер текста:</div>'.
+				'<table class="elem-pas-size ml10 mt10 mb20 collaps"><tr>'.$size.'</table>'
+			: '').
+
+			'</div>'
+		);
+
+		jsonSuccess($send);
+		break;
+	case 'page_elem_style_save'://применение стилей элемента
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный ID элемента');
+
+		//отступы
+		$ex = explode(' ', $_POST['mar']);
+		$mar =  _num($ex[0]).' './/сверху
+				_num($ex[2]).' './/справа
+				_num($ex[3]).' './/снизу
+				_num($ex[1]);    //слева
+
+		$color = _txt(@$_POST['color']);
+		$font = _txt(@$_POST['font']);
+
+		$size = _txt(@$_POST['size']);
+		if($size == 'fs13')
+			$size = '';
+
+		//получение данных элемента
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `app_id` IN (0,".APP_ID.")
+				  AND `id`=".$id;
+		if(!$elem = query_assoc($sql))
+			jsonError('Элемента id'.$id.' не существует');
+
+		//изменение стилей
+		$sql = "UPDATE `_page_element`
+				SET `mar`='".$mar."',
+					`color`='".$color."',
+					`font`='".$font."',
+					`size`='".$size."'
+				WHERE `id`=".$id;
+		query($sql);
+
+		jsonSuccess();
+		break;
 	case 'page_elem_del'://применение новых стилей к элементу страницы
 		if(!$element_id = _num($_POST['id']))
 			jsonError('Некорректный ID элемента');
@@ -901,6 +1066,8 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 
 	_dialogComponentUpdate($dialog_id);
 	_dialogFuncUpdate($dialog_id);
+
+	_cacheNew('clear', '_dialogQuery'.$dialog_id);
 
 	return $dialog_id;
 }
@@ -1742,8 +1909,6 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 				$upd .= "'".addslashes($v)."'";
 		}
 		$elemUpdate[] = $upd;
-
-		_dialogSpisokFuncValUpdate($dialog, $id, $unit_id);
 	}
 
 	if(!$unit_id) {
@@ -1792,6 +1957,10 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 			SET ".implode(',', $elemUpdate)."
 			WHERE `id`=".$unit_id;
 	query($sql);
+
+	//обновление функций компонентов
+	foreach($dialog['component'] as $id => $r)
+		_dialogSpisokFuncValUpdate($dialog, $id, $unit_id);
 
 	return $send;
 }
