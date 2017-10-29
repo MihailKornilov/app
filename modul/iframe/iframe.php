@@ -9,7 +9,7 @@ function _auth() {//авторизация через iframe
 			_appError('Ошибка авторизации.'.(SA ? ' Отсутствует ID пользователя.' : ''));
 		define('VIEWER_ID', $viewer_id);
 
-		if($auth_key != md5(APP_ID.'_'.$viewer_id.'_'._app('secret')))
+		if($auth_key != md5(APP_ID.'_'.$viewer_id.'_'._app(APP_ID, 'secret')))
 			_appError('Авторизация не пройдена.');
 
 		_authSuccess($auth_key, $viewer_id, $app_id);

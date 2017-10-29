@@ -36,6 +36,8 @@ function sa_page_spisok() {
 
 
 function _page_show($page_id, $blockShow=0) {
+//	$dialog = _dialogQuery(2);
+	
 	_pageBlockTest($page_id);
 
 	//получение списка блоков
@@ -96,7 +98,6 @@ function _page_show($page_id, $blockShow=0) {
 	}
 
 	return
-//	_pr($block).
 	'<div class="pbsort0 prel">'.
 		$send.
 	'</div>'.

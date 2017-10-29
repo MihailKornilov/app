@@ -91,7 +91,7 @@ function _header() {
 
 		'<head>'.
 			'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
-			'<title>'.(APP_ID ? _app('app_name') : 'Мои приложения').'</title>'.
+			'<title>'.(APP_ID ? _app(APP_ID, 'app_name') : 'Мои приложения').'</title>'.
 			_global_script().
 //			_api_scripts().
 		'</head>'.
@@ -103,7 +103,7 @@ function _header_hat() {//верхняя строка приложения-сайта
 	return
 	'<div id="hat">'.
 		'<p>'.
-			(APP_ID ? _app('app_name') : 'Мои приложения').
+			(APP_ID ? _app(APP_ID, 'app_name') : 'Мои приложения').
 			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt5">'.
 				'<span class="dib mr20 pale">'.VIEWER_APP_NAME.'</span>'.
 				'Выход'.

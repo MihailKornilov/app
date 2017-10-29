@@ -139,6 +139,9 @@ function _search($v=array()) {//элемент ПОИСК
 
 
 function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
+	if($dialog = _cacheNew())
+		return $dialog;
+
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id` IN(0,".APP_ID.")
@@ -177,7 +180,8 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	}
 
 	$dialog['component'] = $cmp;
-	return $dialog;
+
+	return _cacheNew($dialog);
 }
 function _dialogValToId($val='') {//получение id диалога на основании имени val
 	//если такого имени нет, то внесение диалога в базу
@@ -185,12 +189,15 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 	if(!$val = _txt($val))
 		return 0;
 
+	if($dialog_id = _cacheNew())
+		return $dialog_id;
+
 	$sql = "SELECT `id`
 			FROM `_dialog`
 			WHERE `val`='".$val."'
 			LIMIT 1";
 	if($dialog_id = query_value($sql))
-		return $dialog_id;
+		return _cacheNew($dialog_id);
 
 	$sql = "INSERT INTO `_dialog` (
 				`app_id`,
@@ -224,7 +231,7 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 			WHERE `id`=".$dialog_id;
 	query($sql);
 	
-	return $dialog_id;
+	return _cacheNew($dialog_id);
 }
 function _dialogSpisokOn() {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$sql = "SELECT `id`,`spisok_name`

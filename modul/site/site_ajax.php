@@ -31,7 +31,7 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		_cache(CODE, 'clear');
-		_cache('viewer_'.VIEWER_ID, 'clear');
+		_cacheNew('clear', '_viewer'.VIEWER_ID);
 
 		jsonSuccess();
 		break;

@@ -8,7 +8,6 @@ define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '');//.min
 
 define('CODE', _txt(@$_COOKIE['code']));
-define('CACHE_PREFIX', md5(CODE));
 
 _sa();
 
@@ -55,7 +54,6 @@ define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
 function _sa() {//установка флага суперадминистратора
 	//Флаг устанавливается только после входа пользователя в приложения и применяется после первого обновления страницы.
-
 
 	//Список пользователей - SA
 	$SA[982006] = true;//Михаил Корнилов
@@ -170,14 +168,15 @@ function _authLogoutApp() {//выход из приложения и попадание в список приложений
 			WHERE `code`='".CODE."'";
 	query($sql);
 
+//	_cacheNew('clear', '_authCache');
 	_cache(CODE, 'clear');
-	_cache('viewer_'.VIEWER_ID, 'clear');
+	_cacheNew('clear', '_viewer'.VIEWER_ID);
 }
-function _authLogout($code, $viewer_id) {
+function _authLogout($code, $viewer_id) {//выход из списка приложений
 	$sql = "DELETE FROM `_vkuser_auth` WHERE `code`='".addslashes($code)."'";
 	query($sql);
 	_cache($code, 'clear');
-	_cache('viewer_'.$viewer_id, 'clear');
+	_cacheNew('clear', '_viewer'.$viewer_id);
 }
 function _authCache() {//получение данных авторизации из кеша и установка констант id пользователя и приложения
 	if(!CODE)
@@ -205,15 +204,15 @@ function _authCache() {//получение данных авторизации из кеша и установка конста
 	return true;
 }
 
-function _app($i='all') {//Получение данных о приложении
-	if(!$arr = _cache('app'.APP_ID)) {
+function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
+	if(!$arr = _cacheNew()) {
 		$sql = "SELECT *
 				FROM `_app`
-				WHERE `id`=".APP_ID;
+				WHERE `id`=".$app_id;
 		if(!$arr = query_assoc($sql))
 			_appError('Невозможно прочитать данные приложения для кеша.');
 
-		_cache('app'.APP_ID, $arr);
+		_cacheNew($arr);
 	}
 
 	if($i == 'all') {
@@ -681,7 +680,7 @@ function _cache($key, $v='') {//кеширование данных
 		app
 	*/
 
-	$key = CACHE_PREFIX.$key;
+	$key = md5(CODE).$key;
 
 	if($v == 'clear') {
 		xcache_unset($key);
@@ -697,6 +696,42 @@ function _cache($key, $v='') {//кеширование данных
 	if(!xcache_isset($key))
 		return false;
 
+	return xcache_get($key);
+}
+function _cacheNew($data='', $key='') {//кеширование данных
+	/*
+		$data - данные, сохраняемые в кеш. Если значение пустое, то попытка получить данные
+		$key  - автоматически получается из второго элемента массива debug_backtrace
+				имя вызываемого файла + значение первого аргумента (если есть)
+	*/
+
+	
+	if(!$key) {
+		$DBT = debug_backtrace(0, 2);
+		$DBT = $DBT[1];
+//		echo _pr($DBT);
+		$ARG = empty($DBT['args'][0]) ? '' : $DBT['args'][0];
+		$key = $DBT['function'].$ARG;
+	}
+
+	$key = md5(CODE).$key;
+	if($data == 'clear') {
+		xcache_unset($key);
+//		echo $key.' clear<br />';
+		return true;
+	}
+
+	//занесение данных в кеш
+	if($data) {
+		xcache_set($key, $data, 86400);
+//		echo $key.' set<br />';
+		return $data;
+	}
+
+	if(!xcache_isset($key))
+		return false;
+
+//	echo $key.' GET<br />';
 	return xcache_get($key);
 }
 function _cacheErr($txt='Неизвестное значение', $i='') {//
