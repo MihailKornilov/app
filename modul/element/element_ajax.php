@@ -235,6 +235,35 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
+	case 'page_sort'://сортировка страниц
+		$arr = $_POST['arr'];
+		if(!is_array($arr))
+			jsonError('Не является массивом');
+
+		$update = array();
+		foreach($arr as $n => $r) {
+			if(!$id = _num($r['id']))
+				continue;
+			$parent_id = _num($r['parent_id']);
+			$update[] = "(".$id.",".$parent_id.",".$n.")";
+		}
+
+		if(empty($update))
+			jsonError('Нет данных для обновления');
+
+		$sql = "INSERT INTO `_page` (
+					`id`,
+					`parent_id`,
+					`sort`
+				) VALUES ".implode(',', $update)."
+				ON DUPLICATE KEY UPDATE
+					`parent_id`=VALUES(`parent_id`),
+					`sort`=VALUES(`sort`)";
+		query($sql);
+
+		jsonSuccess();
+		break;
+
 	case 'page_block_add'://добавление блока на страницу
 		if(!$page_id = _num($_POST['page_id']))
 			jsonError('Некорректный ID страницы');
@@ -475,6 +504,7 @@ switch(@$_POST['op']) {
 				'<div class="hd2 mt20">Цвет заливки:</div>'.
 				'<div class="pas-block-bg mt10">'.
 					'<div class="'.($block['bg'] == 'bg-fff' ? 'sel' : '').' dib h50 w50 bor-e8 curP" val="bg-fff"></div>'.
+					'<div class="'.($block['bg'] == 'bg-gr1' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-gr3" val="bg-gr1"></div>'.
 					'<div class="'.($block['bg'] == 'bg-gr3' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-gr3" val="bg-gr3"></div>'.
 					'<div class="'.($block['bg'] == 'bg-gr2' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-gr2" val="bg-gr2"></div>'.
 					'<div class="'.($block['bg'] == 'bg-ffe' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-ffe" val="bg-ffe"></div>'.

@@ -93,6 +93,7 @@ function _global_script() {//скрипты и стили
 	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui.css?'.TIME.'" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
+	'<script src="js/jquery.mjs.nestedSortable.js?6"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?'.TIME.'" />'.
 	'<script src="modul/global/global.js?'.TIME.'"></script>'.
@@ -249,10 +250,52 @@ function _page() {//отображение страницы
 	if(!$page = query_assoc($sql))
 		return _contentEmpty();
 
-	if($page['func'] && function_exists($page['func']))
-		return _page_show(PAGE_ID).$page['func']();
-
 	return _page_show(PAGE_ID);
+}
+function _pageSetupAppPage() {//управление страницами приложения
+	$sql = "SELECT *
+			FROM `_page`
+			WHERE `app_id`=".APP_ID."
+			  AND !`sa`
+			ORDER BY `sort`";
+	$arr = query_arr($sql);
+
+	$sort = array();
+	foreach($arr as $id => $r)
+		if($r['parent_id']) {
+			if(empty($sort[$r['parent_id']]))
+				$sort[$r['parent_id']] = array();
+			$sort[$r['parent_id']][] = $r;
+			unset($arr[$id]);
+		}
+
+	return
+	'<style>'.
+		'.placeholder{outline:1px dashed #4183C4;margin-top:1px}'.
+		'ol{list-style-type:none;max-width:700px;padding-left:40px}'.
+	'</style>'.
+	'<ol id="page-sort">'._pageSetupAppPageSpisok($arr, $sort).'</ol>'.
+	'<script>_pageSetupAppPage()</script>';
+}
+function _pageSetupAppPageSpisok($arr, $sort) {
+	if(empty($arr))
+		return '';
+
+	$send = '';
+	foreach($arr as $r) {
+		$send .= '<li class="mt1" id="item_'.$r['id'].'">'.
+			'<div class="curM">'.
+				'<table class="_stab  bor-e8 bg-fff over1">'.
+					'<tr><td><a href="'.URL.'&p='.$r['id'].'">'.$r['name'].'</a>'.
+						'<td class="w35">'.
+							'<div class="icon icon-edit" onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')"></div>'.
+				'</table>'.
+			'</div>';
+		if(!empty($sort[$r['id']]))
+			$send .= '<ol>'._pageSetupAppPageSpisok($sort[$r['id']], $sort).'</ol>';
+	}
+
+	return $send;
 }
 function _pageSetupMenu() {//строка меню управления страницей
 	if(!PAS)

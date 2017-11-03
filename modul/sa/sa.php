@@ -13,7 +13,6 @@ function sa_page_spisok() {
 				'<th>Название'.
 				'<th class="w70">App any'.
 				'<th class="w70">SA only'.
-				'<th class="w200">Функция'.
 				'<th class="w35">';
 	foreach($spisok as $r) {
 		$send .=
@@ -21,7 +20,6 @@ function sa_page_spisok() {
 					'<td><a href="'.URL.'&p='.$r['id'].'">'.$r['name'].'</a>'.
 					'<td class="'.($r['app_id'] ? '' : 'bg-dfd').'">'.
 					'<td class="'.($r['sa'] ? 'bg-ccd' : '').'">'.
-					'<td>'.$r['func'].
 					'<td class="wsnw">'
 						._iconEdit(array('onclick'=>'_dialogOpen('.$r['dialog_id'].','.$r['id'].')'))
 						._iconDel();
@@ -297,6 +295,12 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 				return $sp[$cmp['col_name']];
 
 			return 'spisok_id='.$spisok_id.' '.$unit['num_3']._pr($cmp);
+		case 12://из функции напрямую
+			if(!$unit['txt_1'])
+				return 'пустое значение фукнции';
+			if(!function_exists($unit['txt_1']))
+				return 'фукнции не существует';
+			return $unit['txt_1']();
 		case 14://_spisok
 			return _pageSpisok($unit);
 	}
@@ -526,32 +530,7 @@ function _page_menu_spisok() {//список меню
 
 
 function _page_div() {//todo тест
-	return
-	'<style>'.
-		'.t-block{background-color:#aee;border:transparent solid 1px;position:absolute;left:0;right:0;top:0;bottom:0;opacity:.5}'.
-		'.t-block:hover{background-color:#aff;border:#f00 solid 1px}'.
-		'.bg-gr3:not(:hover) .t-block{display:none}'.
-	'</style>'.
-	'<div class="bg-dfd">'.
-		'<div class="bg-gr3 w200 dib curP prel" style="height:100%">'.
-			'<div class="t-block"></div>'.
-			'1<br />'.
-			'1<br />'.
-			'1<br />'.
-			'1<br />'.
-			'<a>2354</a><br />'.
-			'1<br />'.
-			'1<br />'.
-			'1<br />'.
-			'1<br />'.
-			'1<br />'.
-			'1<br />'.
-			'1<br />'.
-			'1<br />'.
-		'</div>'.
-		'<div class="bg-ddf w400 dib" style="height:inherit">124<br />456</div>'.
-//		'<div class="bg-eee fl w500">124</div>'.
-	'</div>';
+	return 'test';
 }
 
 

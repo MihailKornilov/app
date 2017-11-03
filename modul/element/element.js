@@ -1563,6 +1563,7 @@ var VK_SCROLL = 0,
 					'<p class="mt10"><button class="vk green" val="2">Кнопка</button>' +
 					'<p class="mt10"><button class="vk" val="9">Ссылка</button>' +
 					'<p class="mt10"><button class="vk" val="14">Список</button>' +
+					'<p class="mt10"><button class="vk red" val="12">SA: из функции</button>' +
 				'</div>',
 			dialog = _dialog({
 				width:450,
@@ -1737,6 +1738,36 @@ var VK_SCROLL = 0,
 		});
 	},
 
+	_pageSetupAppPage = function() {
+		$('#page-sort').nestedSortable({
+			forcePlaceholderSize: true,//сохранять размер места, откуда был взят элемент
+			placeholder:'placeholder',//класс, применяемый для подсветки места, откуда взялся элемент 
+			handle:'div',
+//			helper:	'clone',
+			listType:'ol',
+			items:'li',
+//			tolerance:'pointer',
+			toleranceElement:'> div',
+			isTree:true,
+			maxLevels:3,
+//			startCollapsed: false,
+			tabSize:30,//расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
+//			expandOnHover:700,
+//			opacity:1,
+			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+
+			update:function() {
+				var send = {
+					op:'page_sort',
+					arr:$('#page-sort').nestedSortable('toArray')
+				};
+				_post(send);
+			},
+
+			expandedClass:'pb10',//раскрытый список
+			errorClass:'bg-err' //ошибка, если попытка переместить элемент на недоступный уровень
+		});
+	},
 	_pageElemStyle = function() {//настройка стилей элемента
 		var t = $(this),
 			p = _parent(t, '.elem-pas'),
