@@ -1846,6 +1846,7 @@ function _dialogSpisokList($dialog_id, $component_id) {//массив списков (пока то
 	if(!$colName = query_value($sql))
 		$colName = 'id';
 
+	//отображение списка страниц определённым образом
 	if($dialog['base_table'] == '_page')
 		return _dialogPageList();
 

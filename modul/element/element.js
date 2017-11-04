@@ -1759,7 +1759,7 @@ var VK_SCROLL = 0,
 			update:function() {
 				var send = {
 					op:'page_sort',
-					arr:$('#page-sort').nestedSortable('toArray')
+					arr:$(this).nestedSortable('toArray')
 				};
 				_post(send);
 			},

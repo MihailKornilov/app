@@ -93,7 +93,7 @@ function _global_script() {//скрипты и стили
 	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui.css?'.TIME.'" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
-	'<script src="js/jquery.mjs.nestedSortable.js?6"></script>'.
+	'<script src="js/jquery.mjs.nestedSortable.js?'.TIME.'"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?'.TIME.'" />'.
 	'<script src="modul/global/global.js?'.TIME.'"></script>'.
@@ -222,7 +222,7 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 	}
 
 	if(!isset($arr[$i]))
-		return _cacheErr('_app: неизвестный ключ', $i);
+		return _pr($arr)._cacheErr('_app: неизвестный ключ', $i);
 
 	return $arr[$i];
 }
@@ -230,16 +230,17 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 
 function _page() {//отображение страницы
 	if(!PAGE_ID) {
-		$sql = "SELECT *
+		$sql = "SELECT `id`
 				FROM `_page`
 				WHERE `app_id` IN (0,".APP_ID.")
 				  AND `sa` IN (0,".SA.")
 				  AND `def`
 				LIMIT 1";
-		if(!$page = query_assoc($sql))
-			return _contentEmpty();
+		if(!$page_id = query_value($sql))
+			$page_id = 12;
+//			return _contentEmpty();
 
-		header('Location:'.URL.'&p='.$page['id']);
+		header('Location:'.URL.'&p='.$page_id);
 	}
 
 	$sql = "SELECT *
@@ -286,7 +287,7 @@ function _pageSetupAppPageSpisok($arr, $sort) {
 		$send .= '<li class="mt1" id="item_'.$r['id'].'">'.
 			'<div class="curM">'.
 				'<table class="_stab  bor-e8 bg-fff over1">'.
-					'<tr><td><a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
+					'<tr><td>'.$r['id'].'. <a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
 						'<td class="w35">'.
 							'<div class="icon icon-edit" onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')"></div>'.
 				'</table>'.
@@ -750,7 +751,7 @@ function _cacheNew($data='', $key='') {//кеширование данных
 
 	
 	if(!$key) {
-		$DBT = debug_backtrace(0, 2);
+		$DBT = debug_backtrace(0);
 		$DBT = $DBT[1];
 //		echo _pr($DBT);
 		$ARG = empty($DBT['args'][0]) ? '' : $DBT['args'][0];

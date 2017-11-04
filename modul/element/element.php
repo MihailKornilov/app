@@ -193,6 +193,8 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 	if(!$val = _txt($val))
 		return 0;
 
+//	_cacheNew('clear', '_dialogValToIdbutton172');
+
 	if($dialog_id = _cacheNew())
 		return $dialog_id;
 
