@@ -262,7 +262,7 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 						$unit['txt_1'].
 				   '</a>';
 		case 10://произвольный текст
-			return $unit['txt_1'];
+			return _br($unit['txt_1']);
 		case 11://имя колонки или значение из диалога
 			/*
 				num_1 - dialog_id списка

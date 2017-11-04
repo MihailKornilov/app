@@ -259,7 +259,12 @@ function _pageSetupAppPage() {//управление страницами приложения
 			WHERE `app_id`=".APP_ID."
 			  AND !`sa`
 			ORDER BY `sort`";
-	$arr = query_arr($sql);
+	if(!$arr = query_arr($sql))
+		return
+		'<div class="_empty">'.
+			'Ещё не создано ни одной страницы.'.
+			'<div class="mt10 fs15 black">Создайте первую!</div>'.
+		'</div>';
 
 	$sort = array();
 	foreach($arr as $id => $r)
@@ -287,7 +292,7 @@ function _pageSetupAppPageSpisok($arr, $sort) {
 		$send .= '<li class="mt1" id="item_'.$r['id'].'">'.
 			'<div class="curM">'.
 				'<table class="_stab  bor-e8 bg-fff over1">'.
-					'<tr><td>'.$r['id'].'. <a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
+					'<tr><td><a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
 						'<td class="w35">'.
 							'<div class="icon icon-edit" onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')"></div>'.
 				'</table>'.
@@ -329,23 +334,15 @@ function _pageSetupMenu() {//строка меню управления страницей
 				'<div class="icon-page-tmp"></div>'.
 			'</div>'.
 
-			'<div class="dib fs15">'.$page['name'].':</div>'.
-			'<div onclick="_dialogOpen('.$page['dialog_id'].','.PAGE_ID.')" class="icon icon-edit mbm5 ml20'._tooltip('Редактировать текущую страницу', -102).'</div>'.
+			'<div class="dib fs16 b">'.$page['name'].'</div>'.
+//			'<div onclick="_dialogOpen('.$page['dialog_id'].','.PAGE_ID.')" class="icon icon-edit mbm5 ml20'._tooltip('Редактировать текущую страницу', -102).'</div>'.
 		'</div>'.
 		'<div class="p pad5">'.
-			'<input type="hidden" id="page-setup-page" />'.
+			(PAGE_ID !=12 ? '<a href="'.URL.'&p=12">Мои страницы</a>' : '&nbsp;').
+//			'<input type="hidden" id="page-setup-page" />'.
 		'</div>'.
-	'</div>'.
-	'<script>_pas()</script>';
-}
-function _pageForm() {//формат страницы
-	return
-	'<div>'.
-		'<table class="tabLR">'.
-			'<tr><td class="left">'.
-				'<td class="right">'.
-		'</table>'.
 	'</div>';
+//	'<script>_pas()</script>';
 }
 
 function _content() {//центральное содержание

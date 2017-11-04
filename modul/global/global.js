@@ -334,6 +334,7 @@ var FB,
 			func(arr[n], n);
 	},
 
+/*
 	_pas = function() {
 		$('#page-setup-page')._dropdown({
 			head:'Страница',
@@ -350,6 +351,7 @@ var FB,
 			}
 		});
 	},
+*/
 	_pageShow = function() {//выполнение после вывода страницы
 
 		//применение функций к _search
