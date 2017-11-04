@@ -1846,8 +1846,12 @@ function _dialogSpisokList($dialog_id, $component_id) {//массив списков (пока то
 	if(!$colName = query_value($sql))
 		$colName = 'id';
 
+	if($dialog['base_table'] == '_page')
+		return _dialogPageList();
+
 	$sql = "SELECT `id`,`".$colName."`
 			FROM `".$dialog['base_table']."`
+			WHERE `app_id`=".APP_ID."
 			ORDER BY `id`";
 	return query_selArray($sql);
 }

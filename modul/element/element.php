@@ -246,12 +246,42 @@ function _dialogSpisokOn() {//получение массива диалогов, которые могут быть спи
 			ORDER BY `id`";
 	return query_selArray($sql);
 }
-function _dialogPageList() {//получение массива страниц приложения
-	$sql = "SELECT `id`,`name`
+function _dialogPageList() {//получение массива страниц приложения для select
+	$sql = "SELECT *
 			FROM `_page`
-			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
-			ORDER BY `id`";
-	return query_selArray($sql);
+			WHERE `app_id`=".APP_ID."
+			  AND !`sa`
+			ORDER BY `sort`";
+	$arr = query_arr($sql);
+
+	$sort = array();
+	foreach($arr as $id => $r)
+		if($r['parent_id']) {
+			if(empty($sort[$r['parent_id']]))
+				$sort[$r['parent_id']] = array();
+			$sort[$r['parent_id']][] = $r;
+			unset($arr[$id]);
+		}
+
+	return _dialogPageListSpisok($arr, $sort);
+}
+function _dialogPageListSpisok($arr, $sort, $level=0) {
+	if(empty($arr))
+		return '';
+
+	$send = array();
+	foreach($arr as $r) {
+		$send[] = array(
+			'uid' => _num($r['id']),
+			'title' => utf8(addslashes(htmlspecialchars_decode(trim($r['name'])))),
+			'content' => '<div class="'.($level ? 'ml'.($level*10) : 'b').'">'.utf8(addslashes(htmlspecialchars_decode(trim($r['name'])))).'</div>'
+		);
+		if(!empty($sort[$r['id']]))
+			foreach(_dialogPageListSpisok($sort[$r['id']], $sort, $level+1) as $sub)
+				$send[] = $sub;
+	}
+
+	return $send;
 }
 function _dialogSpisokOnPage($page_id) {//получение массива элементов страницы, которые являются списками 
 	if(!$page_id)

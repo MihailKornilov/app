@@ -248,7 +248,7 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 						'small' => $unit['num_2']
 					));
 		case 3://menu
-			return _pageElementMenu($unit['num_1']);
+			return _pageElemMenu($unit);
 		case 4://head
 			return '<div class="hd2">'.$unit['txt_1'].'</div>';
 		case 7://search
@@ -334,32 +334,36 @@ function _pageElemFontAllow($dialog_id) {//отображение в настройках стилей для к
 	return isset($elem[$dialog_id]);
 }
 
-function _pageElementMenu($menu_id) {//элемент страницы: Меню
+function _pageElemMenu($unit) {//элемент страницы: Меню
 	$sql = "SELECT *
-			FROM `_page_menu`
+			FROM `_page`
 			WHERE `app_id`=".APP_ID."
-			  AND `id`=".$menu_id;
-	if(!$menu = query_assoc($sql))
-		return 'Несуществующее меню.';
-
-	$sql = "SELECT *
-			FROM `_page_menu_razdel`
-			WHERE `app_id`=".APP_ID."
-			  AND `menu_id`=".$menu_id;
-	if(!$spisok = query_arr($sql))
-		return 'Не разделов меню.';
+			  AND `parent_id`=".$unit['num_1']."
+			  AND !`sa`
+			ORDER BY `sort`";
+	if(!$menu = query_arr($sql))
+		return 'Разделов нет.';
 
 	$razdel = '';
-	foreach($spisok as $r) {
-		$sel = PAGE_ID == $r['uid'] ? ' sel' : '';
-		$href = $r['uid'] ? ' href="'.URL.'&p='.$r['uid'].'"' : '';
+	foreach($menu as $r) {
+		$sel = PAGE_ID == $r['id'] ? ' sel' : '';
 		$razdel .=
-			'<a class="link'.$sel.'"'.$href.'>'.
+			'<a class="link'.$sel.'" href="'.URL.'&p='.$r['id'].'">'.
 				$r['name'].
 			'</a>';
 	}
 
-	return '<div class="_menu0">'.$razdel.'</div>';
+	//Внешний вид меню
+	$type = array(
+		0 => 0,
+		335 => 0, //Основной - горизонтальное меню
+		336 => 1, //С подчёркиванием (гориз.)
+		337 => 2, //Дополнительное на белом фоне (гориз.)
+		339 => 3, //Дополнительное на сером фоне (гориз.)
+		338 => 4  //Доп. - вертикальное
+	);
+
+	return '<div class="_menu'.$type[$unit['num_2']].'">'.$razdel.'</div>';
 }
 
 
@@ -471,62 +475,11 @@ function _pageSpisokUnit() {
 			WHERE `app_id` IN (0,".APP_ID.")
 			  AND `id`=".$unit_id;
 	if(!$unit = query_assoc($sql))
-		return 'записи не существует';
+		return '<div class="fs10 pale">записи не существует</div>';
 
 	return _pr($unit);
 }
 
-
-function _page_menu_spisok() {//список меню
-	$sql = "SELECT
-				*,
-				'' `razdel`
-			FROM `_page_menu`
-			ORDER BY `id`";
-	$spisok = query_arr($sql);
-
-	$sql = "SELECT
-				*,
-				'' `razdel`
-			FROM `_page_menu_razdel`
-			ORDER BY `sort`";
-	$razdel = query_arr($sql);
-	foreach($razdel as $r) {
-		$spisok[$r['menu_id']]['razdel'][] = $r;
-	}
-
-	$send =
-		'<table class="_stab">'.
-			'<tr><th class="w15">id'.
-				'<th class="w200">Название'.
-				'<th>Разделы'.
-				'<th class="w35">';
-	foreach($spisok as $r) {
-		$razdel = '';
-		if($r['razdel']) {
-			foreach($r['razdel'] as $rz) {
-				$razdel .=
-					'<div>'.
-						'<a onclick="_dialogOpen('._dialogValToId('page_menu_razdel').','.$rz['id'].')">'.
-							$rz['name'].
-						'<a>'.
-					'</div>';
-			}
-		}
-		$send .=
-				'<tr><td class="r grey topi">'.$r['id'].
-					'<td class="b topi">'.$r['name'].
-					'<td>'.$razdel.
-					'<td class="wsnw">'.
-						'<div onclick="_dialogOpen('._dialogValToId('page_menu_razdel').',0,'.$r['id'].')" class="icon icon-avai'._tooltip('Добавить раздел', -94, 'r').'</div>'.
-						_iconEdit(array('onclick'=>'_dialogOpen('.$r['dialog_id'].','.$r['id'].')')).
-						_iconDel();
-	}
-
-	$send .= '</table>';
-
-	return $send;
-}
 
 
 function _page_div() {//todo тест

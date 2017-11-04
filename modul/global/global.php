@@ -286,7 +286,7 @@ function _pageSetupAppPageSpisok($arr, $sort) {
 		$send .= '<li class="mt1" id="item_'.$r['id'].'">'.
 			'<div class="curM">'.
 				'<table class="_stab  bor-e8 bg-fff over1">'.
-					'<tr><td><a href="'.URL.'&p='.$r['id'].'">'.$r['name'].'</a>'.
+					'<tr><td><a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
 						'<td class="w35">'.
 							'<div class="icon icon-edit" onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')"></div>'.
 				'</table>'.
