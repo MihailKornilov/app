@@ -87,6 +87,7 @@ function _global_script() {//скрипты и стили
 	'<script>'.
 		'var URL="'.URL.'",'.
 			'AJAX="'.URL_AJAX.'",'.
+			'SA='.SA.','.
 			'PAGE_ID='.PAGE_ID.';'.
 	'</script>'.
 

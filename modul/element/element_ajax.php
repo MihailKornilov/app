@@ -1041,7 +1041,9 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	if(!$label_width = _num($_POST['label_width']))
 		jsonError('Некорректное значение ширины label');
 
-	$base_table = _txt($_POST['base_table']);
+	if(!$base_table = _txt($_POST['base_table']))
+		$base_table = '_spisok';
+
 	$menu_edit_last = _num($_POST['menu_edit_last']);
 	$sa = _bool($_POST['sa']);
 
@@ -1816,6 +1818,16 @@ function _dialogComponent_defSet($val, $r, $isEdit) {//установка значения по умо
 		return $val;
 
 
+	if(!$val) {
+		$sql = "SELECT *
+				FROM `_dialog_component_v`
+				WHERE `component_id`=".$r['id']."
+				  AND `def`
+				LIMIT 1";
+		if($def = query_value($sql))
+			$val = $def;
+	}
+
 	//все элементы списка - умолчания нет
 	if($r['type_id'] == 2 && $r['num_4'])
 		return $val;
@@ -1828,13 +1840,7 @@ function _dialogComponent_defSet($val, $r, $isEdit) {//установка значения по умо
 	if($r['type_id'] != 2 && $r['type_id'] != 5)
 		return $val;
 
-	$sql = "SELECT *
-			FROM `_dialog_component_v`
-			WHERE `component_id`=".$r['id']."
-			  AND `def`
-			LIMIT 1";
-
-	return query_value($sql);
+	return $val;
 }
 
 function _dialogSpisokList($dialog_id, $component_id) {//массив списков (пока только для select)
