@@ -107,8 +107,8 @@ function _header_hat() {//верхняя строка приложения-сайта
 			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt5">'.
 				'<span class="dib mr20 pale">'.VIEWER_APP_NAME.'</span>'.
 				'Выход'.
-				_header_pas().
 			'</a>'.
+			_header_pas().
 		'</p>'.
 	'</div>';
 }
@@ -125,7 +125,7 @@ function _header_pas() {//отображение ссылки настройки страницы
 	if(!$page['app_id'] && !SA)
 		return '';
 
-	return '<a id="page_setup" class="fr mt5 mr20'.(PAS ? ' color-aea' : '').'">Page setup</a>';
+	return '<button id="page_setup" class="vk small fr mt3 mr40 '.(PAS ? 'green' : 'grey').'">Page setup</button>';
 }
 
 
