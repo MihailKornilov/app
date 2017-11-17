@@ -248,9 +248,15 @@ function _page($id='all') {//получение данных страницы
 			if(isset($page[$page_id]))
 				return $page_id;
 
-		foreach($page as $p)
-			if($p['def'])
-				return $p['id'];
+		foreach($page as $p) {
+			if(!$p['def'])
+				continue;
+
+			if(!SA && $p['sa'])
+				continue;
+
+			return $p['id'];
+		}
 
 		//иначе на список страниц
 		return 12;
