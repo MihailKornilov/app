@@ -100,9 +100,9 @@ table{border:0;border-spacing:0}
 .icon-setup-big{background-position:0 -220px}/* большая шестерёнка */
 .icon-sort{background-position:0 -240px}/* стрелки верх-вниз */
 .icon-add{background-position:0 -260px}
-.icon-ok{background-position:0 -280px}
+.icon-ok{background-position:0 -280px}/* галочка */
 .icon-sub{background-position:0 -300px}
-.icon-dot{background-position:0 -340px}
+.icon-dot{background-position:0 -340px}/* три жирных точки - настройки */
 .icon-link{background-position:0 -360px}
 .icon-join{background-position:0 -380px}
 /*.icon-off{background-position:0 -400px} мусорный контейнер*/

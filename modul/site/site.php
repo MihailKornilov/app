@@ -107,7 +107,7 @@ function _header_hat() {//верхняя строка приложения-сайта
 			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt5">'.
 				'<span class="dib mr20 pale">'.VIEWER_APP_NAME.'</span>'.
 				'Выход'.
-	(PAGE_ID && !SA ? '<a id="page_setup" class="fr mt5 mr20'.(PAS ? ' color-aea' : '').'">Page setup</a>' : '').//todo временная ссылка
+				'<a id="page_setup" class="fr mt5 mr20'.(PAS ? ' color-aea' : '').'">Page setup</a>'.
 			'</a>'.
 		'</p>'.
 	'</div>';

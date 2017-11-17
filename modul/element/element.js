@@ -396,7 +396,7 @@ var VK_SCROLL = 0,
 					if(sp.id == id)
 						break;
 				}
-				_dialogComponentEditFunc(sp);
+				_dialogCmpEditFunc(sp);
 			});
 		}
 		function elementFuncEdit() {//функция редактирование компонента
@@ -410,7 +410,7 @@ var VK_SCROLL = 0,
 					if(sp.id == id)
 						break;
 				}
-				_dialogComponentEdit(sp);
+				_dialogCmpEdit(sp);
 			});
 		}
 		function elementFuncDel() {//фукнция удаления компонента
@@ -463,7 +463,7 @@ var VK_SCROLL = 0,
 		h = $('#dialog-base').height();
 		$('#label-w-change').height(h);
 	},
-	_dialogComponentEdit = function(CMP) {//добавление|редактирование компонента диалога
+	_dialogCmpEdit = function(CMP) {//добавление|редактирование компонента диалога
 		CMP = $.extend({
 			id:0,
 			type_id:0,
@@ -1093,13 +1093,13 @@ var VK_SCROLL = 0,
 				DIALOG_COMPONENT.push(elem);
 			}
 
-			_dialogComponentScript(elem, 1);
+			_dialogCmpScript(elem, 1);
 			dialog.close();
 			DD_ED._flash();
 			_dialogHeightCorrect();
 		}
 	},
-	_dialogComponentEditFunc = function(CMP) {//настройка функций компонента
+	_dialogCmpEditFunc = function(CMP) {//настройка функций компонента
 		var dialog = _dialog({
 				width:500,
 				top:30,
@@ -1133,10 +1133,9 @@ var VK_SCROLL = 0,
 				return '';
 
 			var html = '';
-			for(var n = 0; n < FC.length; n++) {
-				var sp = FC[n];
+			_forN(FC, function(sp) {
 				html += cmpFuncUnit(sp);
-			}
+			});
 			return html;
 		}
 		function cmpFuncUnit(v) {//формирование одной фукнции
@@ -1155,11 +1154,11 @@ var VK_SCROLL = 0,
 						'<tr><td class="label r w100">Действие:' +
 							'<td><input type="hidden" id="cmp-func-act' + NUM + '" value="' + v.action_id + '" />' +
 					'</table>' +
-					'<table class="bs5' + (COND_SHOW[v.action_id] ? '' : ' dn') + '" id="cond-tab' + NUM + '">' +
+					'<table class="bs5' + _dn(COND_SHOW[v.action_id]) + '" id="cond-tab' + NUM + '">' +
 						'<tr><td class="label r w100 topi">Условие:' +
 							'<td><input type="hidden" id="cmp-func-cond' + NUM + '" value="' + v.cond_id + '" />' +
 					'</table>' +
-					'<table class="bs5 w100p' + (v.action_id == 5 ? ' dn' : '') + '" id="cmp-tab' + NUM + '">' +
+					'<table class="bs5 w100p' + _dn(CMP_SHOW[v.action_id]) + '" id="cmp-tab' + NUM + '">' +
 						'<tr><td class="label r w100 topi">Компоненты:' +
 							'<td><input type="hidden" id="cmp-func-ids' + NUM + '" value="' + v.ids + '" />' +
 					'</table>' +
@@ -1195,6 +1194,10 @@ var VK_SCROLL = 0,
 					{uid:6,title:'Выбор одной из колонок списка',
 						content:'Выбор одной из колонок списка' +
 								'<div class="grey fs12">Отобразятся все колонки в виде Radio, можно выбрать только одну.</div>'
+					},
+					{uid:7,title:'Составление таблицы списка',
+						content:'Составление таблицы списка' +
+								'<div class="grey fs12">Возможность настраивать таблицу из списка.</div>'
 					}
 				],
 				func:function(v, attr_id) {
@@ -1214,18 +1217,17 @@ var VK_SCROLL = 0,
 			});
 
 			var spisok = [];
-			for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-				var sp = DIALOG_COMPONENT[n],
-					name = sp.label_name;
+			_forN(DIALOG_COMPONENT, function(sp) {
+				var name = sp.label_name;
 				if(sp.id == CMP.id)
-					continue;
+					return;
 				if(sp.type_id == 9)
 					name = sp.txt_1;
 				spisok.push({
 					uid:sp.id,
 					title:CMP_NAME[sp.type_id] + (name ? ': ' + name : '')
 				});
-			}
+			});
 
 			$('#cmp-func-ids' + NUM)._select({
 				width:300,
@@ -1297,6 +1299,7 @@ var VK_SCROLL = 0,
 			dialog.butCancel(unit_id ? res.button_edit_cancel : res.button_insert_cancel);
 			window.COMPONENT_FUNC = res.func;
 			window.DATA = res.data;
+			window.UNIT_ID = unit_id;
 			_dialogScript(res.component);
 			dialog.submit(function() {
 				submit(res.component);
@@ -1324,6 +1327,7 @@ var VK_SCROLL = 0,
 			});
 
 			dialog.post(send, function(res) {
+//				return;
 				switch(res.action_id) {
 					case 1: location.reload(); break;
 					case 2: location.href = URL + '&p=' + res.page_id + '&id=' + res.unit_id; break;
@@ -1336,13 +1340,24 @@ var VK_SCROLL = 0,
 
 			var v = []; //переменная для сбора значений
 			_forN(func[id], function(sp) {
+				var delem = $('#delem' + id);
 				if(sp.action_id == 5)
-					_forEq($('#delem' + id).find('.spisok-col ._check').prev(), function(i) {
+					_forEq(delem.find('.spisok-col ._check').prev(), function(i) {
 						if(_num(i.val()))
 							v.push(_num(i.attr('id').split('col')[1]));
 					});
 				if(sp.action_id == 6)
-					v.push(_num($('#delem' + id).find('.spisok-col ._radio .on').attr('val')));
+					v.push(_num(delem.find('.spisok-col ._radio .on').attr('val')));
+				if(sp.action_id == 7) {
+					v.push(_num($('#colNameShow').val()));
+					_forEq(delem.find('dd'), function(eq) {
+						var col_id = _num(eq.find('input:first').val(), 1),
+							tr = eq.find('.tr').val();
+						if(!col_id)
+							return;
+						v.push(col_id + '&' + tr);
+					});
+				}
 			});
 			sf[id] = v.join(',');
 		}
@@ -1350,15 +1365,16 @@ var VK_SCROLL = 0,
 	_dialogScript = function(component, isEdit) {//применение скриптов после загрузки данных диалога
 
 		//рисование компонентов
-		for(var n = 0; n < component.length; n++)
-			_dialogComponentScript(component[n], isEdit);
+		_forN(component, function(ch) {
+			_dialogCmpScript(ch, isEdit);
+		});
 
 		//применение функций, привязанных к компонентам
 		_forN(component, function(ch) {
-			_dialogComponentFunc(ch.id, _num($(ch.attr_id).val()), isEdit, 1);
+			_dialogCmpFunc(ch.id, _num($(ch.attr_id).val()), isEdit, 1);
 		})
 	},
-	_dialogComponentScript = function(ch, isEdit) {//применение скриптов для конкретного компонента диалога
+	_dialogCmpScript = function(ch, isEdit) {//применение скриптов для конкретного компонента диалога
 		switch(ch.type_id) {
 			case 1: /* check */ {
 				$(ch.attr_id)._check({
@@ -1374,7 +1390,7 @@ var VK_SCROLL = 0,
 					title0:ch.num_3 ? ch.txt_1 : '',
 					spisok:ch.v,
 					func:function(v) {
-						_dialogComponentFunc(ch.id, v, isEdit);
+						_dialogCmpFunc(ch.id, v, isEdit);
 					}
 				});
 				if(isEdit) {
@@ -1478,11 +1494,11 @@ var VK_SCROLL = 0,
 			}
 		}
 	},
-	_dialogComponentFunc = function(component_id, v, isEdit, first) {//функция, исполняемая в компонентах диалога
+	_dialogCmpFunc = function(cmp_id, v, isEdit, first) {//функция, исполняемая в компонентах диалога
 		if(isEdit)
 			return;
 
-		var farr = COMPONENT_FUNC[component_id];
+		var farr = COMPONENT_FUNC[cmp_id];
 		if(!farr)
 			return;
 
@@ -1505,7 +1521,7 @@ var VK_SCROLL = 0,
 				ids = func.ids.split(',');
 
 			if(func.action_id == 5 || func.action_id == 6) {//вывод элементов списка
-				var delem = $('#delem' + component_id);
+				var delem = $('#delem' + cmp_id);
 				delem.find('.spisok-col').remove();
 
 				if(!v)
@@ -1516,7 +1532,7 @@ var VK_SCROLL = 0,
 					send = {
 						op:'spisok_col_get',
 						page_id:PAGE_ID,
-						component_id:component_id,
+						component_id:cmp_id,
 						vid:v //либо dialog_id, либо pe_id, если стоит условие - список только с текущей страницы
 					};
 				_post(send, function(res) {
@@ -1533,6 +1549,8 @@ var VK_SCROLL = 0,
 				continue;
 			}
 
+			_dialogCmpFuncElemList(cmp_id, func, v);
+
 			if(ifNo && v)
 				return;
 
@@ -1547,6 +1565,86 @@ var VK_SCROLL = 0,
 
 			for(var i in ids)
 				$('#delem' + ids[i])[act](speed);
+		}
+	},
+	_dialogCmpFuncElemList = function(cmp_id, o, v) {//настройка столбцов списка
+		if(o.action_id != 7)
+			return;
+
+		var delem = $('#delem' + cmp_id);
+		delem.find('#elem-list').remove();
+		
+		if(!v)
+			return;
+
+		delem.append('<div id="elem-list" class="_busy">&nbsp;</div>');
+		var spc = delem.find('#elem-list'),
+			send = {
+				op:'spisok_elem_list',
+				elem_id:UNIT_ID,
+				component_id:cmp_id,
+				spisok_id:v
+			},
+			RES,
+			DL,
+			NUM = 0;
+		_post(send, listShow, function(res) {
+			spc.html(res.text)
+				.removeClass('_busy')
+				.addClass('center red');
+		});
+
+		function listShow(res) {
+			spc.removeClass('_busy');
+
+			if(res.after)
+				return spc.html(res.after);
+
+			spc.html(res.html);
+
+			RES = res;
+			DL = spc.find('dl');
+
+			_forN(res.arr, itemAdd);
+			_forEq(DL.find('input'), colSel);
+
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-sort'
+			});
+
+			spc.find('.item-add').click(itemAdd);
+		}
+		function itemAdd(sp) {
+			sp = $.extend({
+				id:0,
+				tr:''
+			}, sp);
+			DL.append(
+				'<dd class="over1">' +
+					'<table class="bs5">' +
+						'<tr>' +
+							'<td class="topi w15">' +
+								'<div class="icon icon-sort pl curM"></div>' +
+							'<td><input type="hidden" id="elem-col' + NUM + '" value="' + sp.id + '" />' +
+							'<td class="top"><input type="text" class="tr w175" placeholder="имя колонки" value="' + sp.tr + '" />' +
+							'<td class="topi">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить колонку', -51) + '</div>' +
+					'</table>'
+			);
+
+			colSel($('#elem-col' + NUM));
+			DL.find('.icon-del').click(function() {
+				_parent($(this),'DD').remove();
+			});
+
+			NUM++;
+		}
+		function colSel(sp) {
+			sp._select({
+				title0:'колонка не выбрана',
+				spisok:RES.label_name_select
+			});
 		}
 	},
 

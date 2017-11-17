@@ -375,8 +375,14 @@ function _dn($v) {//показ/скрытие блока на основании условия
 	return '';
 }
 
-function _num($v) {
-	if(empty($v) || is_array($v) || !preg_match(REGEXP_NUMERIC, $v))
+function _num($v, $minus=0) {
+	if(empty($v) || is_array($v))
+		return 0;
+
+	if($minus && !preg_match(REGEXP_INTEGER, $v))
+		return 0;
+
+	if(!$minus && !preg_match(REGEXP_NUMERIC, $v))
 		return 0;
 
 	return intval($v);

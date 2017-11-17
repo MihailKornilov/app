@@ -1,34 +1,4 @@
 <?php
-function sa_page_spisok() {
-	$sql = "SELECT *
-			FROM `_page`
-			WHERE `app_id` IN (0,".APP_ID.")
-			  AND `dialog_id`=1
-			ORDER BY `sort`";
-	$spisok = query_arr($sql);
-
-	$send =
-		'<table class="_stab">'.
-			'<tr><th class="w15">id'.
-				'<th>Ќазвание'.
-				'<th class="w70">App any'.
-				'<th class="w70">SA only'.
-				'<th class="w35">';
-	foreach($spisok as $r) {
-		$send .=
-				'<tr><td class="r grey">'.$r['id'].
-					'<td><a href="'.URL.'&p='.$r['id'].'">'.$r['name'].'</a>'.
-					'<td class="'.($r['app_id'] ? '' : 'bg-dfd').'">'.
-					'<td class="'.($r['sa'] ? 'bg-ccd' : '').'">'.
-					'<td class="wsnw">'
-						._iconEdit(array('onclick'=>'_dialogOpen('.$r['dialog_id'].','.$r['id'].')'))
-						._iconDel();
-	}
-
-	$send .= '</table>';
-
-	return $send;
-}
 
 
 
@@ -301,8 +271,7 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 			if(!function_exists($unit['txt_1']))
 				return 'фукнции не существует';
 			return $unit['txt_1']();
-		case 14://_spisok
-			return _pageSpisok($unit);
+		case 14: return _pageSpisok($unit); //_spisok
 	}
 	return 'неизвестный элемент='.$unit['dialog_id'];
 }
@@ -370,18 +339,28 @@ function _pageElemMenu($unit) {//элемент страницы: ћеню
 
 
 function _pageSpisok($pe) {//список, выводимый на странице
+	/*  dialog_id = 14
+		txt_1 - сообщение пустого запроса
+		txt_5 - текстовый массив настроенных колонок
+			-1: num пор€дковый номер
+			-2: dtime_add
+			-3: иконки управлени€
+		num_1 - внешний вид списка: [181] => “аблица [182] => Ўаблон
+		num_2 - лимит, длина списка, показываемого за один раз
+		num_3 - id диалога, через который внос€тс€ данные списка
+		num_5 - галочка "ѕоказывать имена колонок"
+	*/
 	$page_id = $pe['page_id'];
 
 	$dialog = _dialogQuery(14);
 	$dv = $dialog['v_ass'];
 
-	$spTypeId = $pe['num_1'];    //внешний вид списка: [181] => “аблица [182] => Ўаблон
 	$spLimit = $dv[$pe['num_2']];//лимит
 
 	//диалог, через который внос€тс€ данные списка
 	$dialog_id = $pe['num_3'];
 	$spDialog = _dialogQuery($dialog_id);
-	$spElement = $spDialog['component']; //элементы списка
+	$CMP = $spDialog['component']; //элементы списка
 	$spTable = $spDialog['base_table'];
 
 	//получение данных списка
@@ -397,49 +376,71 @@ function _pageSpisok($pe) {//список, выводимый на странице
 	$html = '';
 
 	//выбор внешнего вида
-	switch($spTypeId) {
+	switch($pe['num_1']) {
 		case 181://“аблица
 			if(!$spisok) {
-				$html = '<div class="_empty">'.$pe['txt_1'].'</div>';
+				$html = '<div class="_empty">'._br($pe['txt_1']).'</div>';
 				break;
 			}
-			$html = '<table class="_stab">'.
-						'<tr>'.
-							'<th class="w15">id';//ID
-			foreach($spElement as $el) {
-				if($el['type_id'] == 7)
-					continue;
-				$html .= '<th>'.$el['label_name'];
-			}
-			$html .= '<th class="w15">';//настройки
-			foreach($spisok as $sp) {
-				$html .= '<tr><td class="r grey">'.$sp['id'];
-				foreach($spElement as $el) {
-					if($el['type_id'] == 7)
-						continue;
-					if($el['col_name'] == 'app_any_spisok')
-						$v = '';
-					else {
-						$v = $sp[$el['col_name']];
-//						if(strlen($val) && $el['col_name'] == $spElement[$comp_id]['col_name'])
-//							$v = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $v, 1);
-					}
-					$html .= '<td>'.$v;
+			$html = '<table class="_stab">';
+
+			$colArr = explode(',', $pe['txt_5']);
+			//отображение названий колонок
+			if($pe['num_5']) {
+				$html .= '<tr>';
+				foreach($colArr as $col) {
+					$ex = explode('&', $col);
+					$html .= '<th>'.$ex[1];
 				}
-				$html .= '<td class="wsnw">'
-							._iconEdit(array('onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')'));
+			}
+
+			foreach($spisok as $sp) {
+				$html .= '<tr>';
+				foreach($colArr as $col) {
+					$ex = explode('&', $col);
+
+					//num  todo пока id
+					switch($ex[0]) {
+						case -1:
+							$html .= '<td class="grey r">'.$sp['id'];
+							break;
+						case -2:
+							$html .= '<td class="r grey fs12">'.FullData($sp['dtime_add'], 0, 1);
+							break;
+						case -3://иконки управлени€
+							$html .= '<td class="wsnw">'.
+										_iconEdit(array('onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')'));
 							//._iconDel();
+							break;
+						default:
+							$el = $CMP[$ex[0]];
+							if($el['col_name'] == 'app_any_spisok')
+								$v = $sp['app_id'] ? 0 : 1;
+							else
+								$v = $sp[$el['col_name']];
+
+							$cls = array();
+							if($el['type_id'] == 1) {
+								$cls[] = 'center';
+								$v = $v ? '<div class="icon icon-ok curD"></div>' : '';
+							}
+							$html .= '<td class="'.implode(' ', $cls).'">'.$v;
+					}
+
+//						if(strlen($val) && $el['col_name'] == $CMP[$comp_id]['col_name'])
+//							$v = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $v, 1);
+				}
 			}
 
 			$html .= '</table>';
 			break;
 		case 182://Ўаблон
-			foreach($spElement as $el) {
+			foreach($CMP as $el) {
 				$html .= '<div>'.$el['label_name'].'</div>';
 			}
 			break;
 		default:
-			$html = 'Ќеизвестный внешний вид списка: '.$spTypeId;
+			$html = 'Ќеизвестный внешний вид списка: '.$pe['num_1'];
 	}
 
 	return $html;
@@ -460,8 +461,14 @@ function _pageSpisokFilterSearch($pe, $spDialog) {//получение значений фильтра-п
 		return '';
 
 	$arr = array();
-	foreach($colIds as $cmp_id)
+	foreach($colIds as $cmp_id) {
+		if(empty($spDialog['component'][$cmp_id]))
+			continue;
 		$arr[] = "`".$spDialog['component'][$cmp_id]['col_name']."` LIKE '%".addslashes($search['v'])."%'";
+	}
+
+	if(empty($arr))
+		return '';
 
 	return " AND (".implode($arr, ' OR ').")";
 }

@@ -98,7 +98,7 @@ switch(@$_POST['op']) {
 					'</dl>'.
 				'</div>'.
 				'<div class="pad20 center bg-ffd line-t1">'.
-					'<button class="vk green" onclick="_dialogComponentEdit()">Новый компонент</button>'.
+					'<button class="vk green" onclick="_dialogCmpEdit()">Новый компонент</button>'.
 				'</div>'.
 			'</div>'.
 
@@ -1017,6 +1017,97 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'spisok_elem_list'://настройка колонок списка (для функции Действие 7)
+		if(!$cmp_id = _num($_POST['component_id']))
+			jsonError('Некорректный ID компонента диалога');
+		if(!$elem_id = _num($_POST['elem_id'])) {
+			$send['after'] = utf8('<div class="center fs14 i grey">Настройка колонок будет доступна<br />после добавления списка на страницу.</div>');
+			jsonSuccess($send);
+		}
+		if(!$spisok_id = _num($_POST['spisok_id']))
+			jsonError('Некорректный ID списка');
+		if(!$dialog = _dialogQuery($spisok_id))
+			jsonError('Диалога для создания списка не существует');
+
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `id`=".$elem_id;
+		if(!$elem = query_assoc($sql))
+			jsonError('Элемента не существует');
+
+		$labelName = array();
+		$labelName[] = array(
+			'uid' => -1,
+			'title' => utf8('Порядковый номер'),
+			'content' => utf8('<div class="color-pay">Порядковый номер</div>')
+		);
+
+		$arrDef = array();//массив колонок по умолчанию, если настройка списка производится впервые
+		$html =
+			'<div class="hd2">Содержание списка:</div>'.
+			'<div class="mar10">'.
+				'<div class="ml30 mb10">'.
+					_check(array(
+						'id' => 'colNameShow',
+						'title' => 'Показывать имена колонок',
+						'light' => 1,
+						'value' => $elem['num_5']
+					)).
+				'</div>'.
+				'<dl></dl>'.
+				'<div class="item-add center pad15 fs15 color-555 over1 curP">Добавить колонку</div>'.
+			'</div>';
+
+		$html182 = ''.
+			'<div class="hd2">Настройка шаблона элемента списка:</div>';
+
+		foreach($dialog['component'] as $r) {
+			if(!_dialogEl($r['type_id'], 'func'))
+				continue;
+
+			$labelName[] = array(
+				'uid' => $r['id'],
+				'title' => utf8($r['label_name'] ? $r['label_name'] : $r['type_name']),
+				'content' => utf8($r['label_html'])
+			);
+
+			if(!$r['label_name'])
+				continue;
+
+			$arrDef[] = array(
+				'id' => $r['id'],
+				'tr' => utf8($r['label_name'])
+			);
+		}
+
+		$labelName[] = array(
+			'uid' => -2,
+			'title' => utf8('Дата внесения'),
+			'content' => utf8('<div class="color-pay">Дата внесения</div>')
+		);
+		$labelName[] = array(
+			'uid' => -3,
+			'title' => utf8('Иконки управления'),
+			'content' => utf8('<div class="color-pay">Иконки управления</div>')
+		);
+
+		//массив настроенных колонок
+		$arr = array();
+		if(!empty($elem['txt_5']))
+			foreach(explode(',', $elem['txt_5']) as $col) {
+				$ex = explode('&', $col);
+				$arr[] = array(
+					'id' => $ex[0],
+					'tr' => utf8($ex[1])
+				);
+			}
+
+		$send['label_name_select'] = $labelName;//названия колонок для select
+		$send['arr'] = empty($elem['txt_5']) || $spisok_id != $elem['num_3'] ? $arrDef : $arr;//колонки, которые были настроены
+		$send['html'] = utf8($elem['num_1'] == 181 ? $html : $html182);
+
+		jsonSuccess($send);
+		break;
 }
 
 function _dialogUpdate($dialog_id) {//обновление диалога
@@ -1157,232 +1248,6 @@ function _dialogFuncSpisok($dialog_id) {//получение данных фукнциий компонентов 
 
 	return $func;
 }
-
-function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в диалоге
-	if(!defined('EL_LABEL_W'))
-		define('EL_LABEL_W', 'w175');//первоначальная ширина для всех label
-	$sort = array(9,3,4,2,1,5,6,7,8);
-
-	$name = array(
-		1 => 'Галочка',
-		2 => 'Выпадающий список',
-		3 => 'Однострочный текст',
-		4 => 'Многострочный текст',
-		5 => 'Radio',
-		6 => 'Календарь',
-		7 => 'Информация',
-		8 => 'Связка',
-		9 => 'Заголовок'
-	);
-	$css = array(
-		1 => '',
-		2 => 'element-select',
-		3 => 'element-input',
-		4 => 'element-textaera',
-		5 => 'element-radio',
-		6 => 'element-calendar',
-		7 => 'element-info',
-		8 => 'element-connect',
-		9 => 'element-head'
-	);
-	//может ли компонент содержать функцию (а также может ли участвовать в передаче данных)
-	$func = array(
-		1 => 1,
-		2 => 1,
-		3 => 1,
-		4 => 1,
-		5 => 1,
-		6 => 1,
-		7 => 0,
-		8 => 0,
-		9 => 0
-	);
-	$html = array(
-		1 => /* *** галочка ***
-				txt_1 - текст для галочки
-            */
-			_dialogElHtmlContent().
-			'<table class="bs5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Текст для галочки:'.
-					'<td><input type="text" class="w250" id="txt_1" />'.
-			'</table>'.
-			_dialogElHtmlPrev(),
-
-		2 => /* *** выпадающий список ***
-				num_3 - использовать или нет нулевое значение
-                txt_1  - текст нулевого значения
-				num_4:  0 - данных нет
-						1 - произвольные значения
-						2 - использование всех списков при выборе
-							num_5 - выбор списков только с текущей страницы
-						3 - выбор элемента списка (для связок)
-						4 - список объектов, которые поступают на страницу через GET
- 				num_1  - id списка по dialog_id
-		        num_2  - id колонки по component_id
-			*/
-			_dialogElHtmlContent(1).
-			'<div class="hd2 ml20 mr20">Содержание выпадающего списка:</div>'.
-			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Нулевое значение:'.
-					'<td><input type="hidden" id="num_3" value="1" />'.
-						'<input type="text" class="w230 ml5" id="txt_1" value="не выбрано" />'.
-			'</table>'.
-			'<input type="hidden" id="num_4" />'.
-			'<div id="elem-select-but" class="center pad10">'.
-				'<p><button class="vk small green">Произвольные значения</button>'.
-				'<p class="mt5"><button class="vk small">Все списки</button> '.
-				'<button class="vk small">Выбрать из списков</button>'.
-				'<p class="mt5"><button class="vk small">Списки объектов страницы</button>'.
-			'</div>'.
-			_dialogElHtmlPrev(),
-
-		3 => /* *** Однострочный текст ***
-				txt_1 - текст для placeholder
-             */
-			_dialogElHtmlContent(1).
-			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Подсказка в поле:'.
-					'<td><input type="text" class="w300" id="txt_1" />'.
-			'</table>'.
-			_dialogElHtmlPrev('<input type="text" id="elem-attr-id" class="w250" />'),
-
-		4 => /* *** Многострочный текст ***
-				txt_1 - текст для placeholder
-             */
-			_dialogElHtmlContent(1).
-			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Подсказка в поле:'.
-					'<td><input type="text" class="w300" id="txt_1" />'.
-			'</table>'.
-			_dialogElHtmlPrev('<textarea id="elem-attr-id" class="w250"></textarea>'),
-
-		5 => /* *** Радио ***
-				txt_1 - текст для placeholder
-             */
-			_dialogElHtmlContent(1).
-			'<div class="hd2 ml20 mr20" id="radio-cont">Содержание:</div>'.
-			_dialogElHtmlPrev(),
-
-		6 => /* *** Календарь ***
-				num_3 - возможность выбирать прошедшие дни
-                num_4 - показывать ссылку "завтра"
-             */
-			_dialogElHtmlContent(1).
-			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Выбор прошедших дней:'.
-					'<td><input type="hidden" id="num_3" />'.
-				'<tr><td class="label r">Ссылка <u>завтра</u>:'.
-					'<td><input type="hidden" id="num_4" />'.
-			'</table>'.
-			_dialogElHtmlPrev(),
-
-		7 => /* *** Информация ***
-				txt_1 - текст информации
-             */
-			'<table class="bs5 mt5">'.
-				'<tr><td class="label r topi '.EL_LABEL_W.'">Текст:'.
-					'<td><textarea id="txt_1" class="w300"></textarea>'.
-			'</table>'.
-			'<div id="prev-tab" class="mt20 pad20 pt10">'.
-				'<div class="hd2">Предварительный просмотр:</div>'.
-				'<div id="elem-attr-id" class="_info mt10"></div>'.
-			'</div>',
-
-		8 => /* *** Связка ***
- 				num_1  - id списка по dialog_id
-		        num_2  - id колонки по component_id
-            */
-			_dialogElHtmlContent().
-			'<div id="connect-head"></div>'.
-			_dialogElHtmlPrev('<div class="grey i">Текстовый результат</div>'),
-
-		9 => /* *** Заголовок ***
- 				num_1  - вид заголовка
- 				txt_1  - текст заголовка
-            */
-			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Вид:'.
-					'<td><input type="hidden" id="num_1" value="2" />'.
-				'<tr><td class="label r">Текст:'.
-					'<td><input type="text" class="w300" id="txt_1" />'.
-			'</table>'.
-			'<div class="b ml20 mt20 mb5">Предосмотр:</div>'.
-			'<div id="prev-tab" class="pad20 pt10 bor-f0">'.
-				'<div id="elem-attr-id" class="mt10 hd2"></div>'.
-			'</div>',
-	);
-
-	//получение возможности настройки функции для компонента
-	if($i == 'func')
-		return $func[$type_id];
-
-	//подготовка и отправка имён компонентов через AJAX
-	if($i == 'name') {
-		if($type_id)
-			return $name[$type_id];
-		foreach($name as $id => $r)
-			 $name[$id] = utf8($r);
-		return $name;
-	}
-
-
-	$send = array();
-	foreach($sort as $id) {
-		$send[$id] = array(
-			'name' => utf8($name[$id]),
-			'css' => $css[$id],
-			'html' => utf8(
-						_dialogElHtmlHead($name[$id]).
-						_dialogElHtmlSA().
-						$html[$id]
-					)
-		);
-	}
-	return $send;
-}
-function _dialogElHtmlHead($name) {//заголовок элемента
-	return '<div class="fs16 bg-gr1 pad20 line-b mb10">Компонент <b class="fs16">'.$name.'</b></div>';
-}
-function _dialogElHtmlSA() {//поле SA
-	if(!SA)
-		return '';
-	return
-	'<table class="bs5">'.
-		'<tr><td class="'.EL_LABEL_W.' red r">SA: col_name:'.
-			'<td><input type="text" id="col_name" class="w100" />'.
-	'</table>';
-}
-function _dialogElHtmlContent($req=0) {//основное содержимое
-	return
-	'<table class="bs5">'.
-		'<tr><td class="'.EL_LABEL_W.' label r b">Название поля:'.
-			'<td><input type="text" id="label_name" class="w250" />'.
-	'</table>'.
-
-($req ? //отображение галочки "Требуется обязательное заполнение"
-	'<table class="bs5">'.
-		'<tr><td class="'.EL_LABEL_W.'">'.
-			'<td><input type="hidden" id="label-require" />'.
-	'</table>'
-: '').
-
-	'<table class="bs5">'.
-		'<tr><td class="'.EL_LABEL_W.' label r topi">Текст выплывающей<br />подсказки:'.
-			'<td><textarea id="label-hint" class="w300"></textarea>'.
-	'</table>';
-}
-function _dialogElHtmlPrev($inp='<input type="hidden" id="elem-attr-id" />') {//предварительный просмотр
-	return
-	'<div id="prev-tab" class="mt20 pad20 pt10 bor-f0 bg-ffe">'.
-		'<div class="hd2">Предварительный просмотр:</div>'.
-		'<table class="bs5 w100p mt10">'.
-			'<tr><td id="label-prev" class="label r '.EL_LABEL_W.'">'.
-				'<td>'.$inp.
-		'</table>'.
-	'</div>';
-}
-
-
 
 function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диалога
 	if(!$arr = @$_POST['component'])
@@ -1917,7 +1782,7 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 		if($r['require'] && empty($v))
 			jsonError(array(
 				'delem_id' => $id,
-				'text' => utf8('Не заполнено поле <b>'.$r['label_name'].'</b>')
+				'text' => utf8('Не заполнено поле<br><b>'.$r['label_name'].'</b>')
 			));
 
 		//если это выпадающий список, выбирающий связку и вносит в список элементов
@@ -2017,7 +1882,8 @@ function _dialogSpisokFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление зн
 	//проверка наличия функции у компонента
 	$f5 = !empty($cmp['func_action_ass'][5]);
 	$f6 = !empty($cmp['func_action_ass'][6]);
-	if(!$f5 && !$f6)
+	$f7 = !empty($cmp['func_action_ass'][7]);
+	if(!$f5 && !$f6 && !$f7)
 		return;
 
 	//если компонент не содержит список
@@ -2048,6 +1914,32 @@ function _dialogSpisokFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление зн
 				SET `num_3`='".addslashes($v)."'
 				WHERE `id`=".$unit_id;
 		query($sql);
+		return;
+	}
+
+	if($f7) {
+		$ex = explode(',', $v);
+		$num_5 = _num($ex[0]);
+
+		$txt_5 = array();
+		foreach($ex as $k => $r) {
+			if(!$k)
+				continue;
+
+			$rex = explode('&', $r);
+			if(!$id = _num($rex[0], 1))
+				continue;
+			$tr = _txt(@$rex[1]);
+
+			$txt_5[] = $id.'&'.$tr;
+		}
+
+		$sql = "UPDATE `".BASE_TABLE."`
+				SET `num_5`=".$num_5.",
+					`txt_5`='".implode(',', $txt_5)."'
+				WHERE `id`=".$unit_id;
+		query($sql);
+
 		return;
 	}
 }

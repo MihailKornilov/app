@@ -333,6 +333,9 @@ var FB,
 		for(var n = 0; n < arr.length; n++)
 			func(arr[n], n);
 	},
+	_dn = function(v) {//скрытие/показ элемента
+		return v ? '' : ' dn';
+	},
 
 /*
 	_pas = function() {
