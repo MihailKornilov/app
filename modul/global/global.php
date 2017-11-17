@@ -44,7 +44,6 @@ require_once GLOBAL_DIR.'/modul/sa/sa.php';
 
 define('VERSION', _num(@$_COOKIE['version']));
 define('PAS', _bool(@$_COOKIE['page_setup'])); //флаг включения управления страницей PAS: page_setup
-define('PAGE_ID', _num(@$_GET['p'])); //идентификатор страницы: для отображения ссылок управления страницей
 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
@@ -56,9 +55,9 @@ function _sa() {//установка флага суперадминистратора
 	//Флаг устанавливается только после входа пользователя в приложения и применяется после первого обновления страницы.
 
 	//Список пользователей - SA
-	$SA[982006] = true;//Михаил Корнилов
+//	$SA[982006] = true;//Михаил Корнилов
 
-	if(!CODE || !$r = _cache(CODE)) {
+	if(!CODE || !$r = _cacheOld(CODE)) {
 		define('SA', 0);
 		return;
 	}
@@ -88,7 +87,7 @@ function _global_script() {//скрипты и стили
 		'var URL="'.URL.'",'.
 			'AJAX="'.URL_AJAX.'",'.
 			'SA='.SA.','.
-			'PAGE_ID='.PAGE_ID.';'.
+			'PAGE_ID='._page('cur').';'.
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
@@ -170,21 +169,23 @@ function _authLogoutApp() {//выход из приложения и попадание в список приложений
 			WHERE `code`='".CODE."'";
 	query($sql);
 
-//	_cacheNew('clear', '_authCache');
-	_cache(CODE, 'clear');
-	_cacheNew('clear', '_viewer'.VIEWER_ID);
+//	_cache('clear', '_authCache');
+	_cacheOld(CODE, 'clear');
+	_cache('clear', '_pageCache');
+	_cache('clear', '_viewer'.VIEWER_ID);
 }
 function _authLogout($code, $viewer_id) {//выход из списка приложений
 	$sql = "DELETE FROM `_vkuser_auth` WHERE `code`='".addslashes($code)."'";
 	query($sql);
-	_cache($code, 'clear');
-	_cacheNew('clear', '_viewer'.$viewer_id);
+	_cacheOld($code, 'clear');
+	_cache('clear', '_pageCache');
+	_cache('clear', '_viewer'.$viewer_id);
 }
 function _authCache() {//получение данных авторизации из кеша и установка констант id пользователя и приложения
 	if(!CODE)
 		return false;
 
-	if(!$r = _cache(CODE)) {
+	if(!$r = _cacheOld(CODE)) {
 		$sql = "SELECT *
 				FROM `_vkuser_auth`
 				WHERE `code`='".addslashes(CODE)."'
@@ -192,7 +193,7 @@ function _authCache() {//получение данных авторизации из кеша и установка конста
 		if(!$r = query_assoc($sql))
 			return false;
 
-		_cache(CODE, array(
+		_cacheOld(CODE, array(
 			'viewer_id' => $r['viewer_id'],
 			'app_id' => $r['app_id']
 		));
@@ -207,14 +208,14 @@ function _authCache() {//получение данных авторизации из кеша и установка конста
 }
 
 function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
-	if(!$arr = _cacheNew()) {
+	if(!$arr = _cache()) {
 		$sql = "SELECT *
 				FROM `_app`
 				WHERE `id`=".$app_id;
 		if(!$arr = query_assoc($sql))
 			_appError('Невозможно прочитать данные приложения для кеша.');
 
-		_cacheNew($arr);
+		_cache($arr);
 	}
 
 	if($i == 'all') {
@@ -229,31 +230,50 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 }
 
 
-function _page() {//отображение страницы
-	if(!PAGE_ID) {
-		$sql = "SELECT `id`
-				FROM `_page`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `sa` IN (0,".SA.")
-				  AND `def`
-				LIMIT 1";
-		if(!$page_id = query_value($sql))
-			$page_id = 12;
-//			return _contentEmpty();
+function _page($id='all') {//получение данных страницы
+	if(!defined('APP_ID'))
+		return 0;
 
-		header('Location:'.URL.'&p='.$page_id);
+	if(!$id)
+		return 0;
+
+	$page = _pageCache();
+
+	if($id === 'all')
+		return $page;
+
+	//id страницы по умолчанию, либо из $_GET
+	if($id == 'cur') {
+		if($page_id = _num(@$_GET['p']))
+			if(isset($page[$page_id]))
+				return $page_id;
+
+		foreach($page as $p)
+			if($p['def'])
+				return $p['id'];
+
+		//иначе на список страниц
+		return 12;
 	}
+
+	if(_num($id)) {
+		if(!isset($page[$id]))
+			return false;
+		return $page[$id];
+	}
+	return false;
+}
+function _pageCache() {//получение массива страниц из кеша
+	if($arr = _cache())
+		return $arr;
 
 	$sql = "SELECT *
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_ID.")
-			  AND `sa` IN (0,".SA.")
-			  AND `id`=".PAGE_ID;
-	if(!$page = query_assoc($sql))
-		return _contentEmpty();
-
-	return _page_show(PAGE_ID);
+			ORDER BY `id`";
+	return _cache(query_arr($sql));
 }
+
 function _pageSetupAppPage() {//управление страницами приложения
 	$sql = "SELECT *
 			FROM `_page`
@@ -307,15 +327,10 @@ function _pageSetupAppPageSpisok($arr, $sort) {
 function _pageSetupMenu() {//строка меню управления страницей
 	if(!PAS)
 		return '';
-	if(!PAGE_ID)
+	if(!$page_id = _page('cur'))
 		return '';
 
-	$sql = "SELECT *
-			FROM `_page`
-			WHERE `app_id` IN (0,".APP_ID.")
-			  AND `sa` IN (0,".SA.")
-			  AND `id`=".PAGE_ID;
-	if(!$page = query_assoc($sql))
+	if(!$page = _page($page_id))
 		return '';
 
 	if($page['sa'] && !SA)
@@ -339,7 +354,7 @@ function _pageSetupMenu() {//строка меню управления страницей
 //			'<div onclick="_dialogOpen('.$page['dialog_id'].','.PAGE_ID.')" class="icon icon-edit mbm5 ml20'._tooltip('Редактировать текущую страницу', -102).'</div>'.
 		'</div>'.
 		'<div class="p pad5">'.
-			(PAGE_ID !=12 ? '<a href="'.URL.'&p=12">Мои страницы</a>' : '&nbsp;').
+			(_page('cur') !=12 ? '<a href="'.URL.'&p=12">Мои страницы</a>' : '&nbsp;').
 //			'<input type="hidden" id="page-setup-page" />'.
 		'</div>'.
 	'</div>';
@@ -347,10 +362,10 @@ function _pageSetupMenu() {//строка меню управления страницей
 }
 
 function _content() {//центральное содержание
-	return '<div id="_content">'.(APP_ID ? _page() : _appSpisok()).'</div>';
+	return '<div id="_content">'.(APP_ID ? _pageShow(_page('cur')) : _appSpisok()).'</div>';
 }
-function _contentEmpty() {
-	return '<div class="_empty mt20 mb20">Несуществующая страница</div>';
+function _contentMsg($msg='Несуществующая страница') {
+	return '<div class="_empty mt20 mb20">'.$msg.'</div>';
 }
 function _footer() {
 	return '</body></html>';
@@ -718,7 +733,7 @@ function _vkapi($method, $param=array()) {//получение данных из api вконтакте
 	return $res;
 }
 
-function _cache($key, $v='') {//кеширование данных
+function _cacheOld($key, $v='') {//кеширование данных
 	if(empty($key))
 		die('Отсутствует ключ для кеширования.');
 
@@ -746,7 +761,7 @@ function _cache($key, $v='') {//кеширование данных
 
 	return xcache_get($key);
 }
-function _cacheNew($data='', $key='') {//кеширование данных
+function _cache($data='', $key='') {//кеширование данных
 	/*
 		$data - данные, сохраняемые в кеш. Если значение пустое, то попытка получить данные
 		$key  - автоматически получается из второго элемента массива debug_backtrace

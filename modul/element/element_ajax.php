@@ -380,7 +380,7 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$block_id;
 		query($sql);
 
-		$send['html'] = utf8(_page_show($block['page_id'], 1));
+		$send['html'] = utf8(_pageShow($block['page_id'], 1));
 
 		jsonSuccess($send);
 		break;
@@ -413,7 +413,7 @@ switch(@$_POST['op']) {
 				LIMIT 1";
 		query($sql);
 
-		$send['html'] = utf8(_page_show($block['page_id'], 1));
+		$send['html'] = utf8(_pageShow($block['page_id'], 1));
 		
 		jsonSuccess($send);
 		break;
@@ -554,7 +554,7 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$id;
 		query($sql);
 
-//		$send['html'] = utf8(_page_show($block['page_id'], 1));
+//		$send['html'] = utf8(_pageShow($block['page_id'], 1));
 
 		jsonSuccess();
 		break;
@@ -617,7 +617,7 @@ switch(@$_POST['op']) {
 		$sql = "DELETE FROM `_page_element` WHERE `block_id`=".$id;
 		query($sql);
 
-		$send['html'] = utf8(_page_show($block['page_id'], 1));
+		$send['html'] = utf8(_pageShow($block['page_id'], 1));
 
 		jsonSuccess($send);
 		break;
@@ -802,7 +802,7 @@ switch(@$_POST['op']) {
 		$sql = "DELETE FROM `_page_element` WHERE `id`=".$element_id;
 		query($sql);
 
-		$send['html'] = utf8(_page_show($elem['page_id'], 1));
+		$send['html'] = utf8(_pageShow($elem['page_id'], 1));
 
 		jsonSuccess();
 		break;
@@ -1190,7 +1190,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	_dialogComponentUpdate($dialog_id);
 	_dialogFuncUpdate($dialog_id);
 
-	_cacheNew('clear', '_dialogQuery'.$dialog_id);
+	_cache('clear', '_dialogQuery'.$dialog_id);
 
 	return $dialog_id;
 }

@@ -107,12 +107,26 @@ function _header_hat() {//верхняя строка приложения-сайта
 			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt5">'.
 				'<span class="dib mr20 pale">'.VIEWER_APP_NAME.'</span>'.
 				'Выход'.
-				'<a id="page_setup" class="fr mt5 mr20'.(PAS ? ' color-aea' : '').'">Page setup</a>'.
+				_header_pas().
 			'</a>'.
 		'</p>'.
 	'</div>';
 }
+function _header_pas() {//отображение ссылки настройки страницы
+	if(!$page_id = _page('cur'))
+		return '';
 
+	if(!$page = _page($page_id))
+		return '';
+
+	if($page['sa'] && !SA)
+		return '';
+
+	if(!$page['app_id'] && !SA)
+		return '';
+
+	return '<a id="page_setup" class="fr mt5 mr20'.(PAS ? ' color-aea' : '').'">Page setup</a>';
+}
 
 
 function _appSpisok() {//список приложений, которые доступны пользователю
@@ -189,7 +203,7 @@ function _appCreate() {//автоматическое создание приложения, если пользователь в
 			  AND `viewer_id`=".VIEWER_ID;
 	query($sql);
 
-	_cache(CODE, 'clear');
+	_cacheOld(CODE, 'clear');
 	header('Location:'.URL);
 
 	return '<div class="_empty mt20">Приложений нет.</div>';

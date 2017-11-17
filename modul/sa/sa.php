@@ -3,9 +3,14 @@
 
 
 
-function _page_show($page_id, $blockShow=0) {
-//	$dialog = _dialogQuery(2);
-	
+function _pageShow($page_id, $blockShow=0) {
+	if(!$page = _page($page_id))
+		return _contentMsg();
+
+	if(!SA && $page['sa'])
+		return _contentMsg();
+
+
 	_pageBlockTest($page_id);
 
 	//получение списка блоков
@@ -147,6 +152,18 @@ function _pageBlockPas($r, $show=0, $resize=0) {//подсветка блоков при редактиро
 	if(!PAS)
 		return '';
 
+	if(!$page_id = _page('cur'))
+		return '';
+
+	if(!$page = _page($page_id))
+		return '';
+
+	if($page['sa'] && !SA)
+		return '';
+
+	if(!$page['app_id'] && !SA)
+		return '';
+
 	$block_id = $r['id'];
 	$dn = $show ? '' : ' dn';
 	$resize = $resize ? ' resize' : '';
@@ -186,6 +203,18 @@ function _pageElemSpisok($elem) {//список элементов формате html для конкретного
 }
 function _pageElemPas($r) {
 	if(!PAS)
+		return '';
+
+	if(!$page_id = _page('cur'))
+		return '';
+
+	if(!$page = _page($page_id))
+		return '';
+
+	if($page['sa'] && !SA)
+		return '';
+
+	if(!$page['app_id'] && !SA)
 		return '';
 
 	return
@@ -315,7 +344,7 @@ function _pageElemMenu($unit) {//элемент страницы: Меню
 
 	$razdel = '';
 	foreach($menu as $r) {
-		$sel = PAGE_ID == $r['id'] ? ' sel' : '';
+		$sel = _page('cur') == $r['id'] ? ' sel' : '';
 		$razdel .=
 			'<a class="link'.$sel.'" href="'.URL.'&p='.$r['id'].'">'.
 				$r['name'].

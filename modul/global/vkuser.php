@@ -3,7 +3,7 @@ function _viewer($viewer_id=VIEWER_ID, $i='') {//получение данных о пользовате и
 	if(!_num($viewer_id))
 		return false;
 
-	if(!$u = _cacheNew()) {
+	if(!$u = _cache()) {
 		$sql = "SELECT *
 				FROM `_vkuser`
 				WHERE `viewer_id`=".$viewer_id."
@@ -17,7 +17,7 @@ function _viewer($viewer_id=VIEWER_ID, $i='') {//получение данных о пользовате и
 		$u['worker'] = _bool(@$app['worker']);
 		$u['admin'] = _bool(@$app['admin']);
 		
-		_cacheNew($u);
+		_cache($u);
 	}
 
 	_viewerDefine($u);

@@ -143,7 +143,7 @@ function _search($v=array()) {//элемент ПОИСК
 
 
 function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
-	if($dialog = _cacheNew())
+	if($dialog = _cache())
 		return $dialog;
 
 	$sql = "SELECT *
@@ -193,7 +193,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	$dialog['component'] = $cmp;
 
-	return _cacheNew($dialog);
+	return _cache($dialog);
 }
 function _dialogValToId($val='') {//получение id диалога на основании имени val
 	//если такого имени нет, то внесение диалога в базу
@@ -201,9 +201,9 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 	if(!$val = _txt($val))
 		return 0;
 
-//	_cacheNew('clear', '_dialogValToIdbutton172');
+//	_cache('clear', '_dialogValToIdbutton172');
 
-	if($dialog_id = _cacheNew())
+	if($dialog_id = _cache())
 		return $dialog_id;
 
 	$sql = "SELECT `id`
@@ -211,7 +211,7 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 			WHERE `val`='".$val."'
 			LIMIT 1";
 	if($dialog_id = query_value($sql))
-		return _cacheNew($dialog_id);
+		return _cache($dialog_id);
 
 	$sql = "INSERT INTO `_dialog` (
 				`app_id`,
@@ -245,7 +245,7 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 			WHERE `id`=".$dialog_id;
 	query($sql);
 	
-	return _cacheNew($dialog_id);
+	return _cache($dialog_id);
 }
 function _dialogSpisokOn() {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$sql = "SELECT `id`,`spisok_name`
