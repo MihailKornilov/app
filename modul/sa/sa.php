@@ -428,16 +428,16 @@ function _pageSpisok($pe) {//список, выводимый на странице
 				foreach($colArr as $col) {
 					$ex = explode('&', $col);
 
-					//num  todo пока id
+
 					switch($ex[0]) {
-						case -1:
-							$html .= '<td class="grey r">'.$sp['id'];
+						case -1://num  todo пока id
+							$html .= '<td class="w15 grey r">'.$sp['id'];
 							break;
-						case -2:
-							$html .= '<td class="r grey fs12">'.FullData($sp['dtime_add'], 0, 1);
+						case -2://дата
+							$html .= '<td class="w50 wsnw r grey fs12">'.FullData($sp['dtime_add'], 0, 1);
 							break;
 						case -3://иконки управления
-							$html .= '<td class="wsnw">'.
+							$html .= '<td class="w15 wsnw">'.
 										_iconEdit(array('onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')'));
 							//._iconDel();
 							break;
