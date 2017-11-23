@@ -635,9 +635,9 @@ switch(@$_POST['op']) {
 			jsonError('Блока id'.$id.' не существует');
 
 		//отступы
-		$ex = explode(' ', $elem['mar']);
+		$ex = explode(' ', $elem['pad']);
 		$mar =
-		'<div class="elem-pas-mar mt10 mb20 center">'.
+		'<div class="elem-pas-mar mt10 center">'.
 
 			'<div class="fs15 color-555 mb5">сверху</div>'.
 			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
@@ -663,6 +663,13 @@ switch(@$_POST['op']) {
 			'<div class="fs15 color-555 mt3">снизу</div>'.
 
 		'</div>';
+
+		$type = array(
+			'' => '',
+			'dib' => '',
+			'fix' => '',
+		);
+		$type[$elem['type']] = ' bg-dfd';
 
 		//цвет
 		$color = array(
@@ -703,46 +710,15 @@ switch(@$_POST['op']) {
 		}
 
 		$send['html'] = utf8(
-			'<div class="ml10 mr10">'.
-				'<div class="hd2">Внешние отступы элемента:</div>'.
-				$mar.
+			'<div class="ml10 mr10 mb20">'.
 
-			(_pageElemFontAllow($elem['dialog_id']) ?
-				'<div class="hd2">Цвет текста:</div>'.
-				'<table class="elem-pas-color ml10 mt10 collaps">'.
-					'<tr class="h35">'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color[''].'" val="">чёрный'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-555'].' color-555" val="color-555">тёмно-серый'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['grey'].' grey" val="grey">серый'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['pale'].' pale" val="pale">бледный'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-ccc'].' color-ccc" val="color-ccc">совсем бледный'.
+				'<div class="hd2 mt20">Вид элемента:</div>'.
+				'<table class="elem-pas-type ml10 mt10 collaps">'.
+					'<tr class="curP center">'.
+						'<td class="fs14 bor-e8 pad10'.$type[''].'" val="">Занимает<br>всю длину'.
+						'<td class="fs14 bor-e8 pad10'.$type['dib'].'" val="dib">Ограничен<br>длиной текста'.
+						'<td class="fs14 bor-e8 pad10'.$type['fix'].'" val="fix">Конкретный размер'.
 				'</table>'.
-				'<table class="elem-pas-color ml10 mt3 collaps">'.
-					'<tr class="h35">'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['blue'].' blue" val="blue">синий'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-acc'].' color-acc" val="color-acc">голубой'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-sal'].' color-sal" val="color-sal">салатовый'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-pay'].' color-pay" val="color-pay">зелёный'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-aea'].' color-aea" val="color-aea">ярко-зелёный'.
-				'</table>'.
-				'<table class="elem-pas-color ml10 mt3 mb20 collaps">'.
-					'<tr class="h35">'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-ref'].' color-ref" val="color-ref">тёмно-красный'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['red'].' red" val="red">красный'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-del'].' color-del" val="color-del">тёмно-бордовый'.
-						'<td class="b center pl10 pr10 bor-e8 curP'.$color['color-vin'].' color-vin" val="color-vin">бордовый'.
-				'</table>'.
-
-				'<div class="hd2">Выделение:</div>'.
-				'<table class="elem-pas-font ml10 mt10 mb20 collaps">'.
-					'<tr><td class="fs16 center h50 w50 bor-e8 curP'.$font['b'].' b" val="b">B'.
-						'<td class="fs16 center h50 w50 bor-e8 curP'.$font['i'].' i" val="i">I'.
-						'<td class="fs16 center h50 w50 bor-e8 curP'.$font['u'].' u" val="u">U'.
-				'</table>'.
-
-				'<div class="hd2">Размер текста:</div>'.
-				'<table class="elem-pas-size ml10 mt10 mb20 collaps"><tr>'.$size.'</table>'
-			: '').
 
 			'</div>'
 		);
@@ -754,18 +730,13 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID элемента');
 
 		//отступы
-		$ex = explode(' ', $_POST['mar']);
-		$mar =  _num($ex[0]).' './/сверху
-				_num($ex[2]).' './/справа
-				_num($ex[3]).' './/снизу
-				_num($ex[1]);    //слева
-
+		$pad = _txt(@$_POST['pad']);
+		$type = _txt(@$_POST['type']);
 		$color = _txt(@$_POST['color']);
 		$font = _txt(@$_POST['font']);
 
-		$size = _txt(@$_POST['size']);
-		if($size == 'fs13')
-			$size = '';
+		$size = _num(@$_POST['size']);
+		$size = $size == 13 ? '' : 'fs'.$size;
 
 		//получение данных элемента
 		$sql = "SELECT *
@@ -777,7 +748,8 @@ switch(@$_POST['op']) {
 
 		//изменение стилей
 		$sql = "UPDATE `_page_element`
-				SET `mar`='".$mar."',
+				SET `pad`='".$pad."',
+					`type`='".$type."',
 					`color`='".$color."',
 					`font`='".$font."',
 					`size`='".$size."'

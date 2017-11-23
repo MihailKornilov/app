@@ -325,7 +325,7 @@ var FB,
 
 		//перебор будет осуществляться до тех пор, пока не будет встречено значение false в функции
 		for(var n = 0; n < arr.length; n++)
-			if(func(arr.eq(n)) === false)
+			if(func(arr.eq(n), n) === false)
 				return false;
 		return true;
 	},

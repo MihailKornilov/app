@@ -36,8 +36,8 @@ function _pageShow($page_id, $blockShow=0) {
 			FROM `_page_element`
 			WHERE `page_id`=".$page_id."
 			ORDER BY `sort`";
-	$arr = query_arr($sql);
-	foreach($arr as $r)
+	$elem_arr = query_arr($sql);
+	foreach($elem_arr as $r)
 		$elem[$r['block_id']][] = $r;
 
 	$send = '';
@@ -79,8 +79,13 @@ function _pageShow($page_id, $blockShow=0) {
 (PAS ?
 	'<div id="page-block-add" class="center mt1 pad15 bg-gr1 bor-f0 over1 curP'._dn($blockShow).'">'.
 		'<tt class="fs15 color-555">Добавить новый блок</tt>'.
-	'</div>'
+	'</div>'.
+	'<script>'.
+		'var ELEM_ARR={'._pageElemArr($elem_arr).'},'.
+			'ELEM_COLOR={'._pageElemColor().'};'.
+	'</script>'
 : '').
+//	_pr($elem_arr).
 
 	'<script>_pageShow()</script>';
 }
@@ -193,13 +198,53 @@ function _pageElemSpisok($elem) {//список элементов формате html для конкретного
 	$send = '';
 	foreach($elem as $r) {
 		$send .=
-		'<div class="pe prel '.$r['color'].' '.$r['font'].' '.$r['size'].'" id="pe_'.$r['id'].'"'._pageElemStyle($r).'>'.
+		'<div class="pe prel '.$r['type'].' '.$r['color'].' '.$r['font'].' '.$r['size'].'" id="pe_'.$r['id'].'"'._pageElemStyle($r).'>'.
 			_pageElemPas($r).
 			_pageElemUnit($r).
 		'</div>';
 	}
 
 	return $send;
+}
+function _pageElemArr($elem) {//массив настроек элементов в формате JS
+	if(empty($elem))
+		return '';
+
+	$send = array();
+	foreach($elem as $r) {
+		$size = 13;
+		if($r['size']) {
+			$ex = explode('fs', $r['size']);
+			$size = _num($ex[1]);
+		}
+		$send[] = $r['id'].':{'.
+			'dialog_id:'.$r['dialog_id'].','.
+			'fontAllow:'._pageElemFontAllow($r['dialog_id']).','.
+			'type:"'.$r['type'].'",'.
+			'color:"'.$r['color'].'",'.
+			'font:"'.$r['font'].'",'.
+			'size:'.$size.','.
+			'pad:"'.$r['pad'].'"'.
+		'}';
+	}
+	return implode(',', $send);
+}
+function _pageElemColor() {//массив цветов для текста в формате JS, доступных элементам
+	return
+		'"":["#000","Чёрный"],'.
+		'"color-555":["#555","Тёмно-серый"],'.
+		'"grey":["#888","Серый"],'.
+		'"pale":["#aaa","Бледный"],'.
+		'"color-ccc":["#ccc","Совсем бледный"],'.
+		'"blue":["#2B587A","Тёмно-синий"],'.
+		'"color-acc":["#07a","Синий"],'.
+		'"color-sal":["#770","Салатовый"],'.
+		'"color-pay":["#090","Зелёный"],'.
+		'"color-aea":["#aea","Ярко-зелёный"],'.
+		'"color-ref":["#800","Тёмно-красный"],'.
+		'"red":["#e22","Красный"],'.
+		'"color-del":["#a66","Тёмно-бордовый"],'.
+		'"color-vin":["#c88","Бордовый"]';
 }
 function _pageElemPas($r) {
 	if(!PAS)
@@ -220,10 +265,7 @@ function _pageElemPas($r) {
 	return
 	'<div class="elem-pas" val="'.$r['id'].'">'.
 		'<div class="elem-icon">'.
-			'<div class="icon icon-sort curM mr3'._tooltip('Изменить порядок<br />внутри блока', -57, '', 1).'</div>'.
 			'<div class="icon icon-setup mr3'._tooltip('Стили элемента', -50).'</div>'.
-			'<div onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')" class="icon icon-edit mr3'._tooltip('Настроить элемент', -58).'</div>'.
-			'<div onclick="_dialogOpen(6,'.$r['id'].')" class="icon icon-del-red'._tooltip('Удалить элемент', -53).'</div>'.
 		'</div>'.
 	'</div>';
 }
@@ -308,16 +350,18 @@ function _pageElemStyle($r) {//стили css для элемента
 	$send = array();
 
 	//отступы
-	$ex = explode(' ', $r['mar']);
+	$ex = explode(' ', $r['pad']);
 	foreach($ex as $px)
 		if($px) {
-			$send[] = 'margin:'.
+			$send[] = 'padding:'.
 				$ex[0].($ex[0] ? 'px' : '').' '.
 				$ex[1].($ex[1] ? 'px' : '').' '.
 				$ex[2].($ex[2] ? 'px' : '').' '.
 				$ex[3].($ex[3] ? 'px' : '');
 			break;
 		}
+
+//	$send[] = 'box-sizing:padding-box';
 
 	if(!$send)
 		return '';
@@ -329,7 +373,7 @@ function _pageElemFontAllow($dialog_id) {//отображение в настройках стилей для к
 		10 => 1,
 		11 => 1
 	);
-	return isset($elem[$dialog_id]);
+	return _num(@$elem[$dialog_id]);
 }
 
 function _pageElemMenu($unit) {//элемент страницы: Меню

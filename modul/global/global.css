@@ -157,6 +157,10 @@ table{border:0;border-spacing:0}
 }
 
 
+
+.pe._busy{color:transparent}
+.pe._busy *:not(.elem-pas){visibility:hidden}
+
 /* Строка управления страницей page_setup */
 #pas{
 	background-color:#ffc;
@@ -171,7 +175,7 @@ table{border:0;border-spacing:0}
 	right:-1px;
 	bottom:-1px;
 	left:0;
-	border:#b61 solid 1px;
+	border:#b61 dashed 1px;
 	background-color:#FFDCB9;
 	opacity:.7;
 	z-index:10;
@@ -209,12 +213,16 @@ table{border:0;border-spacing:0}
 	right:-1px;
 	bottom:-1px;
 	left:0;
-	border:#595 solid 1px;
+	border:#272 dashed 1px;
 	background-color:#dfd;
-	opacity:.85;
+	opacity:.5;
 	z-index:9;
+	cursor:move;
 }
-.pe:not(:hover) .elem-pas:not(.mv){display:none}
+.elem-pas:hover{
+	background-color:#dfd;
+	opacity:.9;
+}
 .elem-icon{
 	position:absolute;
 	right:-1px;
@@ -223,6 +231,7 @@ table{border:0;border-spacing:0}
 	border:#595 solid 1px;
 	background-color:#fff;
 }
+.elem-pas:not(:hover) .elem-icon{display:none}
 .elem-pas.mv{display:block;cursor:move}
 .elem-pas.mv .elem-icon{display:none}
 
@@ -262,7 +271,7 @@ table{border:0;border-spacing:0}
 
 /* Кнопка ВКонтакте */
 button.vk{
-	padding: 7px 16px 8px;
+	padding:7px 16px 8px;
 	zoom: 1;
 	cursor: pointer;
 	white-space: nowrap;
@@ -284,6 +293,10 @@ button.vk{
 	-ms-transition: background-color 100ms ease-in-out;
 	-o-transition: background-color 100ms ease-in-out;
 	transition: background-color 100ms ease-in-out;
+}
+button.vk.short{/* короткий вариант: для кнопок переключения */
+	padding-left:8px;
+	padding-right:8px;
 }
 button.vk:not(._busy):hover{background:#6d8cb0} /* 678EB4 */
 button.vk.fw{width:100%}
