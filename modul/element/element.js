@@ -1879,13 +1879,14 @@ var VK_SCROLL = 0,
 
 		t._hint({
 			msg:_pageElemSetupIcon(elem_id, EL) +
+				_pageElemSetupPlace(elem_id, EL) +
 				_pageElemSetupPad(elem_id, EL) +
 		(EL.fontAllow ?
 				'<table class="w100p">' +
 					'<tr><td>' + _pageElemSetupFont(elem_id, EL) +
+						'<td>' + _pageElemSetupColor(elem_id, EL) +
 						'<td class="r">' + _pageElemSetupSize(elem_id, EL) +
-				'</table>' +
-				_pageElemSetupColor(elem_id, EL)
+				'</table>'
 		: ''),
 			ugol:'right',
 			show:1,
@@ -1970,31 +1971,77 @@ var VK_SCROLL = 0,
 			'<button class="vk small cancel mt1 plus">»</button>' +
 		'</div>';
 	},
+	_pageElemSetupPlace = function(elem_id, EL) {//стили элемента: тип блока, позиция элемента
+		$(document)
+			.off('click', '#elem-type div')
+			.on('click', '#elem-type div', function() {
+				var unit = $(this),
+					v = unit.attr('val');
+
+				unit.parent().find('.on').removeClass('on');
+				unit.addClass('on');
+
+				$('#elem-pos')._dn(v != 'dib');
+
+				$('#pe_' + elem_id)
+					.removeClass('dib fix')
+					.addClass(v);
+
+				EL.type = v;
+				EL.save = 1;
+			})
+			.off('click', '#elem-pos div')
+			.on('click', '#elem-pos div', function() {
+				var unit = $(this),
+					v = unit.attr('val');
+
+				unit.parent().find('.on').removeClass('on');
+				unit.addClass('on');
+
+				$('#pe_' + elem_id)
+					.removeClass('r center')
+					.addClass(v);
+
+				EL.pos = v;
+				EL.save = 1;
+			});
+		return '<table class="mb5 w100p">' +
+			'<tr><td id="elem-type">' +
+					'<div val="" class="icon-wiki iw18 mr3' + (!EL.type ? ' on' : '') + _tooltip('Максимальная длина', -61) + '</div>' +
+					'<div val="dib" class="icon-wiki iw19 mr3' + (EL.type == 'dib' ? ' on' : '') + _tooltip('Обтекание', -29) + '</div>' +
+					'<div val="fix" class="icon-wiki iw20' + (EL.type == 'fix' ? ' on' : '') + _tooltip('Фиксированный размер', -71) + '</div>' +
+
+				'<td id="elem-pos" class="r' + (EL.type == 'dib' ? ' dn' : '') + '">' +
+					'<div val="" class="icon-wiki iw3 mr3' + (!EL.pos ? ' on' : '') + _tooltip('Прижать влево', -43) + '</div>' +
+					'<div val="center" class="icon-wiki iw4 mr3' + (EL.pos == 'center' ? ' on' : '') + _tooltip('По центру', -28) + '</div>' +
+					'<div val="r" class="icon-wiki iw5' + (EL.pos == 'r' ? ' on' : '') + _tooltip('Прижать вправо', -47) + '</div>' +
+
+		'</table>';
+	},
 	_pageElemSetupFont = function(elem_id, EL) {//стили элемента: жирность, наклон, подчёркивание
 		var font = {
-			b:' grey',
-			i:' grey',
-			u:' grey'
+			b:'',
+			i:'',
+			u:''
 		};
 		_forN(EL.font.split(' '), function(v) {
 			if(!v)
 				return;
-			font[v] = ' bg-dfd';
+			font[v] = ' on';
 		});
 
 		$(document)
-			.off('click', '.elem-pas-font td')
-			.on('click', '.elem-pas-font td', function() {
+			.off('click', '#elem-font div')
+			.on('click', '#elem-font div', function() {
 				var td = $(this),
-					cls = td.hasClass('bg-dfd'),
+					cls = td.hasClass('on'),
 					v = td.attr('val'),
 					font = [];
-				td._dn(cls, 'bg-dfd');
-				td._dn(!cls, 'grey');
+				td._dn(cls, 'on');
 
 				$('#pe_' + elem_id)._dn(cls, v);
 
-				_forEq($('.elem-pas-font .bg-dfd'), function(eq) {
+				_forEq($('#elem-font .on'), function(eq) {
 					font.push(eq.attr('val'));
 				});
 				EL.font = font.join(' ');
@@ -2002,12 +2049,11 @@ var VK_SCROLL = 0,
 			});
 
 
-		return '<table class="elem-pas-font collaps">' +
-			'<tr class="center curP">' +
-				'<td class="w15 pad5 bor-e8 over1 b' + font.b + '" val="b">B' +
-				'<td class="w15 pad5 bor-e8 over1 i' + font.i + '" val="i">I' +
-				'<td class="w15 pad5 bor-e8 over1 u' + font.u + '" val="u">U' +
-		'</table>';
+		return '<div id="elem-font" class="dib">' +
+				'<div class="icon-wiki mr3' + font.b + '" val="b"></div>' +
+				'<div class="icon-wiki iw1 mr3' + font.i + '" val="i"></div>' +
+				'<div class="icon-wiki iw2 mr5' + font.u + '" val="u"></div>' +
+		'</div>';
 	},
 	_pageElemSetupSize = function(elem_id, EL) {//стили элемента: размер текста
 		$(document)
@@ -2038,7 +2084,7 @@ var VK_SCROLL = 0,
 
 		return '<div id="elem-size" class="dib' + _tooltip('Размер текста', -6) +
 			'<button class="vk short cancel mr3">«</button>' +
-			'<div class="dib center bor-e8 fs14 b pt5 pb5 mr3 w35">' + EL.size + '</div>' +
+			'<div class="dib center bor-e8 fs16 b pt3 pb3 mr3 w35">' + EL.size + '</div>' +
 			'<button class="vk short cancel plus">»</button>' +
 		'</div>';
 	},
@@ -2062,6 +2108,8 @@ var VK_SCROLL = 0,
 					.removeClass(EL.color)
 					.addClass(v);
 
+				$('#elem-color').css('background-color', ELEM_COLOR[v][0]);
+
 				EL.color = v;
 				EL.save = 1;
 			});
@@ -2073,11 +2121,13 @@ var VK_SCROLL = 0,
 				sel = i == EL.color ? '#fff' : 'transparent';
 			if(!n || n == 7)
 				td += '<tr>';
-			td += '<td class="bor-e8 pad5 center" style="background-color:' + bg + ';color:' + sel + '" val="' + i + '">&#10004;';
+			td += '<td class="pad5 center" style="background-color:' + bg + ';color:' + sel + '" val="' + i + '">&#10004;';
 			n++;
 		}
 
-		return '<table id="elem-color" class="w100p mt10 collaps curP">' + td + '</table>';
+		return '<div id="elem-color" class="bor-e8 prel mtm2"  style="background-color:' + ELEM_COLOR[EL.color][0] + '">' +
+			 '<table class="w200 bg-eee curP pabs">' + td + '</table>' +
+			'</div>';
 	},
 	_pageElemSort = function(t) {//сортировка элементов
 		var ES = _parent(t, '.elem-sort');
@@ -2123,63 +2173,6 @@ var VK_SCROLL = 0,
 				_post(send);
 			}
 		});
-	},
-	_pageElemStyle = function() {//настройка стилей элемента
-		var t = $(this),
-			p = _parent(t, '.elem-pas'),
-			dialog = _dialog({
-				width:500,
-				top:30,
-				padding:0,
-				head:'Параметры стилей элемента',
-				load:1,
-				butSubmit:'',
-				submit:submit
-			}),
-			send = {
-				op:'page_elem_style_load',
-				id:p.attr('val')
-			},
-			COLOR,
-			FONT,
-			SIZE;
-
-		dialog.load(send, loaded);
-
-		function loaded() {
-			dialog.butSubmit('Применить');
-
-			COLOR = dialog.content.find('.elem-pas-color');
-			COLOR.find('td').click(function() {
-				COLOR.find('.bg-dfd').removeClass('bg-dfd');
-				$(this).addClass('bg-dfd');
-			});
-
-			SIZE = dialog.content.find('.elem-pas-size');
-			SIZE.find('td').click(function() {
-				SIZE.find('.bg-dfd').removeClass('bg-dfd');
-				$(this).addClass('bg-dfd');
-			});
-		}
-		function submit() {
-			var mar = [],
-				font = [];
-
-			_forEq(FONT.find('.bg-dfd'), function(eq) {
-				font.push(eq.attr('val'));
-			});
-
-			var send = {
-				op:'page_elem_style_save',
-				id:p.attr('val'),
-				mar:mar.join(' '),
-				type:TYPE.find('.bg-dfd').attr('val'),
-				color:COLOR.find('.bg-dfd').attr('val'),
-				font:font.join(' '),
-				size:SIZE.find('.bg-dfd').attr('val')
-			};
-			dialog.post(send, 'reload');
-		}
 	};
 
 $(document)
@@ -2335,7 +2328,6 @@ $(document)
 		});
 	})
 
-	.on('click', '.elem-pas .icon-setup', _pageElemStyle)
 	.on('mouseenter', '.elem-pas', _pageElemSetup);
 
 $.fn._check = function(o) {

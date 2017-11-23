@@ -622,109 +622,6 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
-	case 'page_elem_style_load'://получение стилей элемента для диалога
-		if(!$id = _num($_POST['id']))
-			jsonError('Некорректный ID элемента');
-
-		//получение данных блока
-		$sql = "SELECT *
-				FROM `_page_element`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$id;
-		if(!$elem = query_assoc($sql))
-			jsonError('Блока id'.$id.' не существует');
-
-		//отступы
-		$ex = explode(' ', $elem['pad']);
-		$mar =
-		'<div class="elem-pas-mar mt10 center">'.
-
-			'<div class="fs15 color-555 mb5">сверху</div>'.
-			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[0] ? 'bg-dfd' : 'pale').'">'.$ex[0].'</div>'.
-			'<button class="vk small cancel mt1 plus">»</button>'.
-
-			'<table class="w100p ml20 mt30 mb30">'.
-				'<tr><td class="w200">'.
-						'<div class="dib fs15 color-555 mr5">слева</div>'.
-						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[3] ? 'bg-dfd' : 'pale').'">'.$ex[3].'</div>'.
-						'<button class="vk small cancel mt1 plus">»</button>'.
-					'<td>'.
-						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[1] ? 'bg-dfd' : 'pale').'">'.$ex[1].'</div>'.
-						'<button class="vk small cancel mt1 plus">»</button>'.
-						'<div class="dib fs15 color-555 ml5">справа</div>'.
-			'</table>'.
-
-			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[2] ? 'bg-dfd' : 'pale').'">'.$ex[2].'</div>'.
-			'<button class="vk small cancel mt1 plus">»</button>'.
-			'<div class="fs15 color-555 mt3">снизу</div>'.
-
-		'</div>';
-
-		$type = array(
-			'' => '',
-			'dib' => '',
-			'fix' => '',
-		);
-		$type[$elem['type']] = ' bg-dfd';
-
-		//цвет
-		$color = array(
-			'' => '',
-			'color-555' => '',
-			'grey' => '',
-			'pale' => '',
-			'color-ccc' => '',
-			'blue' => '',
-			'color-acc' => '',
-			'color-sal' => '',
-			'color-pay' => '',
-			'color-aea' => '',
-			'color-ref' => '',
-			'red' => '',
-			'color-del' => '',
-			'color-vin' => ''
-		);
-		$color[$elem['color']] = ' bg-dfd';
-
-		//выделение
-		$font = array(
-			'b' => '',
-			'i' => '',
-			'u' => ''
-		);
-		foreach(explode(' ', $elem['font']) as $r)
-			if($r)
-				$font[$r] = ' bg-dfd';
-
-		//размер текста
-		$size = '';
-		for($n = 10; $n <= 18; $n++) {
-			if(!$elem['size'])
-				$elem['size'] = 'fs13';
-			$sel = $elem['size'] == 'fs'.$n ? ' bg-dfd' : '';
-			$size .= '<td class="fs'.$n.$sel.' center h50 w50 bor-e8 curP over1" val="fs'.$n.'">'.$n.'px';
-		}
-
-		$send['html'] = utf8(
-			'<div class="ml10 mr10 mb20">'.
-
-				'<div class="hd2 mt20">Вид элемента:</div>'.
-				'<table class="elem-pas-type ml10 mt10 collaps">'.
-					'<tr class="curP center">'.
-						'<td class="fs14 bor-e8 pad10'.$type[''].'" val="">Занимает<br>всю длину'.
-						'<td class="fs14 bor-e8 pad10'.$type['dib'].'" val="dib">Ограничен<br>длиной текста'.
-						'<td class="fs14 bor-e8 pad10'.$type['fix'].'" val="fix">Конкретный размер'.
-				'</table>'.
-
-			'</div>'
-		);
-
-		jsonSuccess($send);
-		break;
 	case 'page_elem_style_save'://применение стилей элемента
 		if(!$id = _num($_POST['id']))
 			jsonError('Некорректный ID элемента');
@@ -732,6 +629,7 @@ switch(@$_POST['op']) {
 		//отступы
 		$pad = _txt(@$_POST['pad']);
 		$type = _txt(@$_POST['type']);
+		$pos = _txt(@$_POST['pos']);
 		$color = _txt(@$_POST['color']);
 		$font = _txt(@$_POST['font']);
 
@@ -750,6 +648,7 @@ switch(@$_POST['op']) {
 		$sql = "UPDATE `_page_element`
 				SET `pad`='".$pad."',
 					`type`='".$type."',
+					`pos`='".$pos."',
 					`color`='".$color."',
 					`font`='".$font."',
 					`size`='".$size."'

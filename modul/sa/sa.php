@@ -198,7 +198,7 @@ function _pageElemSpisok($elem) {//список элементов формате html для конкретного
 	$send = '';
 	foreach($elem as $r) {
 		$send .=
-		'<div class="pe prel '.$r['type'].' '.$r['color'].' '.$r['font'].' '.$r['size'].'" id="pe_'.$r['id'].'"'._pageElemStyle($r).'>'.
+		'<div class="pe prel '.$r['type'].' '.$r['pos'].' '.$r['color'].' '.$r['font'].' '.$r['size'].'" id="pe_'.$r['id'].'"'._pageElemStyle($r).'>'.
 			_pageElemPas($r).
 			_pageElemUnit($r).
 		'</div>';
@@ -221,6 +221,7 @@ function _pageElemArr($elem) {//массив настроек элементов в формате JS
 			'dialog_id:'.$r['dialog_id'].','.
 			'fontAllow:'._pageElemFontAllow($r['dialog_id']).','.
 			'type:"'.$r['type'].'",'.
+			'pos:"'.$r['pos'].'",'.
 			'color:"'.$r['color'].'",'.
 			'font:"'.$r['font'].'",'.
 			'size:'.$size.','.
@@ -262,12 +263,7 @@ function _pageElemPas($r) {
 	if(!$page['app_id'] && !SA)
 		return '';
 
-	return
-	'<div class="elem-pas" val="'.$r['id'].'">'.
-		'<div class="elem-icon">'.
-			'<div class="icon icon-setup mr3'._tooltip('Стили элемента', -50).'</div>'.
-		'</div>'.
-	'</div>';
+	return '<div class="elem-pas" val="'.$r['id'].'"></div>';
 }
 function _pageElemUnit($unit) {//формирование элемента страницы
 	switch($unit['dialog_id']) {

@@ -123,19 +123,43 @@ table{border:0;border-spacing:0}
 
 
 
-
+/* иконка включения управления блоками */
 .icon-page-tmp{
 	display:inline-block;
 	cursor:pointer;
 	width:48px;
 	height:48px;
-	background:url(../../img/page_tmp.png?1) no-repeat;
+	background:url(../../img/page_tmp.png?3) no-repeat;
 	opacity:.4;
 }
 .icon-page-tmp:hover,
 .icon-page-tmp.on{background-position:0 -50px}
 .icon-page-tmp.on{opacity:1}
 
+
+
+
+/* иконки редактирования текста */
+.icon-wiki{
+	display:inline-block;
+	cursor:pointer;
+	width:24px;
+	height:24px;
+	background:0 0 url(../../img/wiki_icons.png?4) no-repeat;
+	opacity:.6;
+	border-radius:1px;
+}
+.icon-wiki:hover{opacity:1}
+.icon-wiki.on{opacity:1;background-color:#E4EAF0}
+.iw1{background-position:0 -24px}/* I */
+.iw2{background-position:0 -48px}/* U */
+.iw3{background-position:0 -72px}/* left */
+.iw4{background-position:0 -96px}/* center */
+.iw5{background-position:0 -120px}/* right */
+
+.iw18{background-position:0 -432px}/*  */
+.iw19{background-position:0 -456px}/*  */
+.iw20{background-position:0 -480px}/*  */
 
 
 
@@ -223,19 +247,19 @@ table{border:0;border-spacing:0}
 	background-color:#dfd;
 	opacity:.9;
 }
-.elem-icon{
-	position:absolute;
-	right:-1px;
-	top:-1px;
-	padding:5px 2px 0 5px;
-	border:#595 solid 1px;
-	background-color:#fff;
+
+
+
+/* настройка цвета элемента */
+#elem-color{width:22px;height:22px}
+#elem-color .pabs{
+	top:-58px;
+	left:-88px;
+	border-spacing:1px;
+	box-shadow: 0 -3px 12px rgba(0,0,0,0.7);
+	z-index:100;
 }
-.elem-pas:not(:hover) .elem-icon{display:none}
-.elem-pas.mv{display:block;cursor:move}
-.elem-pas.mv .elem-icon{display:none}
-
-
+#elem-color:not(:hover) .pabs{display:none}
 
 
 /* Основное содержание сайта */
@@ -294,14 +318,12 @@ button.vk{
 	-o-transition: background-color 100ms ease-in-out;
 	transition: background-color 100ms ease-in-out;
 }
-button.vk.short{/* короткий вариант: для кнопок переключения */
-	padding-left:8px;
-	padding-right:8px;
-}
 button.vk:not(._busy):hover{background:#6d8cb0} /* 678EB4 */
 button.vk.fw{width:100%}
-button.vk:active{padding-top:8px;padding-bottom:7px}
+button.vk:active{padding:8px 16px 7px}
 button.vk._busy{color:transparent}
+button.vk.short{padding:6px 8px 7px}/* короткий вариант: для кнопок переключения */
+button.vk.short:active{padding:7px 8px 6px}
 button.vk.small{padding:4px 10px 3px;font-size:12px}
 button.vk.small:active{padding-top:5px;padding-bottom:2px}
 button.vk.cancel{background:transparent;color:#33567F}
@@ -354,6 +376,7 @@ button.vk.orange:hover{background-color:#D59553}
 
 /* Короткие стили */
 .w15{width:15px}
+.w25{width:25px}
 .w35{width:35px}
 .w50{width:50px}
 .h20{height:20px}
@@ -385,6 +408,8 @@ button.vk.orange:hover{background-color:#D59553}
 .pad20{padding:20px}
 .pad30{padding:30px}
 .pt1{padding-top:1px}
+.pt2{padding-top:2px}
+.pt3{padding-top:3px}
 .pt5{padding-top:5px}
 .pt10{padding-top:10px}
 .pt15{padding-top:15px}
@@ -394,6 +419,7 @@ button.vk.orange:hover{background-color:#D59553}
 .pr5{padding-right:5px}
 .pr10{padding-right:10px}
 .pr20{padding-right:20px}
+.pb3{padding-bottom:3px}
 .pb10{padding-bottom:10px}
 .pb20{padding-bottom:20px}
 .pl5{padding-left:5px}
