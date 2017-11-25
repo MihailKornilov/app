@@ -218,6 +218,7 @@ function _pageElemArr($elem) {//массив настроек элементов в формате JS
 			$size = _num($ex[1]);
 		}
 		$send[] = $r['id'].':{'.
+			'id:'.$r['id'].','.
 			'dialog_id:'.$r['dialog_id'].','.
 			'fontAllow:'._pageElemFontAllow($r['dialog_id']).','.
 			'type:"'.$r['type'].'",'.
@@ -410,13 +411,16 @@ function _pageElemMenu($unit) {//элемент страницы: ћеню
 function _pageSpisok($pe) {//список, выводимый на странице
 	/*  dialog_id = 14
 		txt_1 - сообщение пустого запроса
+		txt_2[child] - дл€ [182]: произвольное содержание
 		txt_5 - текстовый массив настроенных колонок
 			-1: num пор€дковый номер
 			-2: dtime_add
 			-3: иконки управлени€
+			-4: произвольный текст
 		num_1 - внешний вид списка: [181] => “аблица [182] => Ўаблон
 		num_2 - лимит, длина списка, показываемого за один раз
 		num_3 - id диалога, через который внос€тс€ данные списка
+		num_4[child] - id колонки. ≈сли отрицательное - см.txt_5
 		num_5 - галочка "ѕоказывать имена колонок"
 	*/
 	$page_id = $pe['page_id'];
@@ -437,80 +441,119 @@ function _pageSpisok($pe) {//список, выводимый на странице
 			FROM `".$spTable."`
 			WHERE `app_id` IN (0,".APP_ID.")
 			  AND `dialog_id`=".$dialog_id."
+			  AND !`deleted`
 			  "._pageSpisokFilterSearch($pe, $spDialog)."
 			ORDER BY `dtime_add` DESC
 			LIMIT ".$spLimit;
 	$spisok = query_arr($sql);
 
-	$html = '';
+	$html = '<div class="_empty">'._br($pe['txt_1']).'</div>';
 
 	//выбор внешнего вида
-	switch($pe['num_1']) {
-		case 181://“аблица
-			if(!$spisok) {
-				$html = '<div class="_empty">'._br($pe['txt_1']).'</div>';
-				break;
-			}
-			$html = '<table class="_stab">';
+	if($spisok)
+		switch($pe['num_1']) {
+			case 181://“аблица
+				$html = '<table class="_stab">';
 
-			$colArr = explode(',', $pe['txt_5']);
-			//отображение названий колонок
-			if($pe['num_5']) {
-				$html .= '<tr>';
-				foreach($colArr as $col) {
-					$ex = explode('&', $col);
-					$html .= '<th>'.$ex[1];
-				}
-			}
-
-			foreach($spisok as $sp) {
-				$html .= '<tr>';
-				foreach($colArr as $col) {
-					$ex = explode('&', $col);
-
-
-					switch($ex[0]) {
-						case -1://num  todo пока id
-							$html .= '<td class="w15 grey r">'.$sp['id'];
-							break;
-						case -2://дата
-							$html .= '<td class="w50 wsnw r grey fs12">'.FullData($sp['dtime_add'], 0, 1);
-							break;
-						case -3://иконки управлени€
-							$html .= '<td class="w15 wsnw">'.
-										_iconEdit(array('onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')'));
-							//._iconDel();
-							break;
-						default:
-							$el = $CMP[$ex[0]];
-							if($el['col_name'] == 'app_any_spisok')
-								$v = $sp['app_id'] ? 0 : 1;
-							else
-								$v = $sp[$el['col_name']];
-
-							$cls = array();
-							if($el['type_id'] == 1) {
-								$cls[] = 'center';
-								$v = $v ? '<div class="icon icon-ok curD"></div>' : '';
-							}
-							$html .= '<td class="'.implode(' ', $cls).'">'.$v;
+				$colArr = explode(',', $pe['txt_5']);
+				//отображение названий колонок
+				if($pe['num_5']) {
+					$html .= '<tr>';
+					foreach($colArr as $col) {
+						$ex = explode('&', $col);
+						$html .= '<th>'.$ex[1];
 					}
-
-//						if(strlen($val) && $el['col_name'] == $CMP[$comp_id]['col_name'])
-//							$v = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $v, 1);
 				}
-			}
 
-			$html .= '</table>';
-			break;
-		case 182://Ўаблон
-			foreach($CMP as $el) {
-				$html .= '<div>'.$el['label_name'].'</div>';
-			}
-			break;
-		default:
-			$html = 'Ќеизвестный внешний вид списка: '.$pe['num_1'];
-	}
+				foreach($spisok as $sp) {
+					$html .= '<tr>';
+					foreach($colArr as $col) {
+						$ex = explode('&', $col);
+						switch($ex[0]) {
+							case -1://num
+								$html .= '<td class="w15 grey r">'.$sp['num'];
+								break;
+							case -2://дата
+								$html .= '<td class="w50 wsnw r grey fs12">'.FullData($sp['dtime_add'], 0, 1);
+								break;
+							case -3://иконки управлени€
+								$html .= '<td class="w15 wsnw">'.
+											_iconEdit(array('onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')'));
+								//._iconDel();
+								break;
+							default:
+								$el = $CMP[$ex[0]];
+								if($el['col_name'] == 'app_any_spisok')
+									$v = $sp['app_id'] ? 0 : 1;
+								else
+									$v = $sp[$el['col_name']];
+
+								$cls = array();
+								if($el['type_id'] == 1) {
+									$cls[] = 'center';
+									$v = $v ? '<div class="icon icon-ok curD"></div>' : '';
+								}
+								$html .= '<td class="'.implode(' ', $cls).'">'.$v;
+						}
+
+	//						if(strlen($val) && $el['col_name'] == $CMP[$comp_id]['col_name'])
+	//							$v = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $v, 1);
+					}
+				}
+
+				$html .= '</table>';
+				break;
+			case 182://Ўаблон
+				//получение элементов шаблона
+				$sql = "SELECT *
+						FROM `_page_element`
+						WHERE `app_id` IN(0,".APP_ID.")
+						  AND `parent_id`=".$pe['id']."
+						ORDER BY `sort`";
+				if(!$tmp = query_arr($sql)) {
+					$html = '<div class="_empty"><span class="fs15 red">Ўаблон единицы списка не настроен.</span></div>';
+					break;
+				}
+
+				$html = '';
+				foreach($spisok as $sp) {
+					$html .= '<div>';
+					foreach($tmp as $r) {
+						$txt = '';
+						switch($r['num_4']) {
+							case -1://пор€дковый номер
+								$txt = $sp['num'];
+								break;
+							case -2://дата внесени€
+								$txt = FullData($sp['dtime_add'], 0, 1);
+								break;
+							case -4://произвольный текст
+								$txt = _br($r['txt_2']);
+								break;
+							default:
+								if($r['num_4'] <= 0)
+									continue;
+								switch($r['txt_2']) {
+									case 1://им€ колонки
+										$txt = $CMP[$r['num_4']]['label_name'];
+										break;
+									case 2://значение колонки
+										$txt = $sp[$CMP[$r['num_4']]['col_name']];
+										break;
+									default: continue;
+								}
+						}
+						$html .=
+						'<div class="'.$r['type'].' '.$r['pos'].' '.$r['color'].' '.$r['font'].' '.$r['size'].'"'._pageElemStyle($r).'>'.
+							$txt.
+						'</div>';
+					}
+					$html .= '</div>';
+				}
+				break;
+			default:
+				$html = 'Ќеизвестный внешний вид списка: '.$pe['num_1'];
+		}
 
 	return $html;
 }

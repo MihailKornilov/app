@@ -906,6 +906,8 @@ switch(@$_POST['op']) {
 		if(!$elem = query_assoc($sql))
 			jsonError('Элемента не существует');
 
+		$CMP = $dialog['component'];
+
 		$labelName = array();
 		$labelName[] = array(
 			'uid' => -1,
@@ -914,25 +916,109 @@ switch(@$_POST['op']) {
 		);
 
 		$arrDef = array();//массив колонок по умолчанию, если настройка списка производится впервые
-		$html =
-			'<div class="hd2">Содержание списка:</div>'.
-			'<div class="mar10">'.
-				'<div class="ml30 mb10">'.
-					_check(array(
-						'id' => 'colNameShow',
-						'title' => 'Показывать имена колонок',
-						'light' => 1,
-						'value' => $elem['num_5']
-					)).
-				'</div>'.
-				'<dl></dl>'.
-				'<div class="item-add center pad15 fs15 color-555 over1 curP">Добавить колонку</div>'.
-			'</div>';
+		$arr182 = array();//массив элементов для шаблона
 
-		$html182 = ''.
-			'<div class="hd2">Настройка шаблона элемента списка:</div>';
+		switch($elem['num_1']) {
+			default:
+			case 181://таблица
+				$html =
+					'<div class="hd2">Содержание списка:</div>'.
+					'<div class="mar10">'.
+						'<div class="ml30 mb10">'.
+							_check(array(
+								'id' => 'colNameShow',
+								'title' => 'Показывать имена колонок',
+								'light' => 1,
+								'value' => $elem['num_5']
+							)).
+						'</div>'.
+						'<dl></dl>'.
+						'<div class="item-add center pad15 fs15 color-555 over1 curP">Добавить колонку</div>'.
+					'</div>';
+				break;
+			case 182://шаблон
+				$tmpHtml = '';
+				//получение элементов шаблона
+				$sql = "SELECT *
+						FROM `_page_element`
+						WHERE `app_id` IN(0,".APP_ID.")
+						  AND `parent_id`=".$elem_id."
+						ORDER BY `sort`";
+				if($tmp = query_arr($sql))
+					foreach($tmp as $id => $r) {
+						$txt = '';
+						$txt_2 = '';
+						switch($r['num_4']) {
+							case -1://порядковый номер
+								$txt = '123';
+								break;
+							case -2://дата внесения
+								$txt = '21 мар 2017';
+								break;
+							case -4://произвольный текст
+								$txt = _br($r['txt_2']);
+								$txt_2 = $r['txt_2'];
+								break;
+							default:
+								if($r['num_4'] <= 0)
+									continue;
+								$txt_2 = $r['txt_2'];
+								switch($r['txt_2']) {
+									case 1://имя колонки
+										$txt = $CMP[$r['num_4']]['label_name'];
+										break;
+									case 2://значение колонки
+										$txt = 'Значение "'.$CMP[$r['num_4']]['label_name'].'"';
+										break;
+									default: continue;
+								}
+						}
 
-		foreach($dialog['component'] as $r) {
+						$size = 13;
+						if($r['size']) {
+							$ex = explode('fs', $r['size']);
+							$size = _num($ex[1]);
+						}
+						$arr182[] = array(
+							'id' => _num($id),
+							'tmp' => 1,
+							'txt_2' => utf8($txt_2),
+							'num_4' => _num($r['num_4'], 1),
+							'fontAllow' => 1,
+							'type' => $r['type'],
+							'pos' => $r['pos'],
+							'color' => $r['color'],
+							'font' => $r['font'],
+							'size' => $size,
+							'pad' => $r['pad'],
+						);
+						$tmpHtml .=
+							'<div id="pe_'.$id.'" class="pe prel '.$r['type'].' '.$r['pos'].' '.$r['color'].' '.$r['font'].' '.$r['size'].'"'._pageElemStyle($r).' val="'.$id.'">'.
+								'<div class="elem-pas" val="'.$id.'"></div>'.
+								$txt.
+							'</div>';
+					}
+
+				$html =
+					'<div class="hd2">Настройка шаблона единицы списка:</div>'.
+					'<table class="mt10">'.
+						'<tr><td class="top">'.
+								'<input type="hidden" id="elem_type" />'.
+							'<td class="top pl10 dn">'.
+								'<input type="hidden" id="col_type" />'.
+							'<td class="top dn">'.
+								'<textarea id="tmp_elem_txt_2" class="min w250 ml10"></textarea>'.
+							'<td class="top dn">'.
+								'<button id="elem-add" class="vk green ml10">Добавить элемент</button>'.
+					'</table>'.
+					'<div id="tmp-elem-list" class="elem-sort mh50 mt10 bor-f0 bg-ffe">'.$tmpHtml.'</div>';
+				break;
+		}
+
+
+
+
+		foreach($CMP as $r) {
 			if(!_dialogEl($r['type_id'], 'func'))
 				continue;
 
@@ -951,16 +1037,23 @@ switch(@$_POST['op']) {
 			);
 		}
 
+		if($elem['num_1'] == 182)
+			$labelName[] = array(
+				'uid' => -4,
+				'title' => utf8('Произвольный текст'),
+				'content' => utf8('<div class="color-pay b">Произвольный текст</div>')
+			);
 		$labelName[] = array(
 			'uid' => -2,
 			'title' => utf8('Дата внесения'),
 			'content' => utf8('<div class="color-pay">Дата внесения</div>')
 		);
-		$labelName[] = array(
-			'uid' => -3,
-			'title' => utf8('Иконки управления'),
-			'content' => utf8('<div class="color-pay">Иконки управления</div>')
-		);
+		if($elem['num_1'] == 181)
+			$labelName[] = array(
+				'uid' => -3,
+				'title' => utf8('Иконки управления'),
+				'content' => utf8('<div class="color-pay">Иконки управления</div>')
+			);
 
 		//массив настроенных колонок
 		$arr = array();
@@ -975,7 +1068,9 @@ switch(@$_POST['op']) {
 
 		$send['label_name_select'] = $labelName;//названия колонок для select
 		$send['arr'] = empty($elem['txt_5']) || $spisok_id != $elem['num_3'] ? $arrDef : $arr;//колонки, которые были настроены
-		$send['html'] = utf8($elem['num_1'] == 181 ? $html : $html182);
+		$send['arr182'] = $arr182;
+		$send['spisok_type'] = _num($elem['num_1']);
+		$send['html'] = utf8($html);
 
 		jsonSuccess($send);
 		break;
@@ -1703,10 +1798,22 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 		$unit_id = query_insert_id(BASE_TABLE);
 		$send['unit_id'] = $unit_id;
 
-		//обновление page_id, если есть
+		//обновление некоторых колонок
 		$sql = "DESCRIBE `".BASE_TABLE."`";
 		$desc = query_array($sql);
 		foreach($desc as $r) {
+			if($r['Field'] == 'num') {//установка порядкового номера
+				$sql = "SELECT IFNULL(MAX(`num`),0)+1
+						FROM `".BASE_TABLE."`
+						WHERE `app_id`=".APP_ID."
+						  AND `dialog_id`=".$dialog_id;
+				$num = query_value($sql);
+				$sql = "UPDATE `".BASE_TABLE."`
+						SET `num`=".$num."
+						WHERE `id`=".$unit_id;
+				query($sql);
+				continue;
+			}
 			if($r['Field'] == 'page_id') {
 				$sql = "UPDATE `".BASE_TABLE."`
 						SET `page_id`=".$page_id."
@@ -1789,32 +1896,92 @@ function _dialogSpisokFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление зн
 	}
 
 	if($f7) {
-		$ex = explode(',', $v);
-		$num_5 = _num($ex[0]);
+		switch(is_array($v)) {
+			default://[181] таблица
+				$ex = explode(',', $v);
+				$num_5 = _num($ex[0]);
 
-		$txt_5 = array();
-		foreach($ex as $k => $r) {
-			if(!$k)
-				continue;
+				$txt_5 = array();
+				foreach($ex as $k => $r) {
+					if(!$k)
+						continue;
 
-			$rex = explode('&', $r);
-			if(!$id = _num($rex[0], 1))
-				continue;
-			$tr = _txt(@$rex[1]);
+					$rex = explode('&', $r);
+					if(!$id = _num($rex[0], 1))
+						continue;
+					$tr = _txt(@$rex[1]);
 
-			$txt_5[] = $id.'&'.$tr;
+					$txt_5[] = $id.'&'.$tr;
+				}
+
+				$sql = "UPDATE `".BASE_TABLE."`
+						SET `num_5`=".$num_5.",
+							`txt_5`='".implode(',', $txt_5)."'
+						WHERE `id`=".$unit_id;
+				query($sql);
+
+				return;
+			case 1://[182] шаблон
+				$insert = array();
+				$sort = 0;
+				$idsEdit = '0';//id элементов, которые редактировались, не для удаления
+				foreach($v as $r) {
+					$insert[] = "(
+						".$r['id'].",
+						".APP_ID.",
+						".$unit_id.",
+						'".$r['type']."',
+						'".$r['pos']."',
+						'".$r['color']."',
+						'".$r['font']."',
+						'fs".$r['size']."',
+						'".$r['pad']."',
+						'".addslashes(_txt($r['txt_2']))."',
+						".$r['num_4'].",
+						".$sort++."
+					)";
+					if($r['id'])
+						$idsEdit .= ','.$r['id'];
+				}
+
+				$sql = "DELETE FROM `".BASE_TABLE."`
+						WHERE `parent_id`=".$unit_id."
+						  AND `id` NOT IN (".$idsEdit.")";
+				query($sql);
+
+				if(empty($insert))
+					return;
+
+				$sql = "INSERT INTO `".BASE_TABLE."` (
+							`id`,
+							`app_id`,
+							`parent_id`,
+							`type`,
+							`pos`,
+							`color`,
+							`font`,
+							`size`,
+							`pad`,
+							`txt_2`,
+							`num_4`,
+							`sort`
+						) VALUES ".implode(',', $insert)."
+						ON DUPLICATE KEY UPDATE
+							`type`=VALUES(`type`),
+							`pos`=VALUES(`pos`),
+							`color`=VALUES(`color`),
+							`font`=VALUES(`font`),
+							`size`=VALUES(`size`),
+							`pad`=VALUES(`pad`),
+							`txt_2`=VALUES(`txt_2`),
+							`num_4`=VALUES(`num_4`),
+							`sort`=VALUES(`sort`)
+						";
+				query($sql);
+				break;
 		}
-
-		$sql = "UPDATE `".BASE_TABLE."`
-				SET `num_5`=".$num_5.",
-					`txt_5`='".implode(',', $txt_5)."'
-				WHERE `id`=".$unit_id;
-		query($sql);
-
-		return;
 	}
 }
-
 
 
 

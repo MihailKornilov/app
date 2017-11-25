@@ -1338,7 +1338,8 @@ var VK_SCROLL = 0,
 			if(!func[id])
 				return;
 
-			var v = []; //переменная для сбора значений
+			var v = [], //переменная для сбора значений
+				join = 1;//производить ли объединение элементов после сбора
 			_forN(func[id], function(sp) {
 				var delem = $('#delem' + id);
 				if(sp.action_id == 5)
@@ -1349,17 +1350,26 @@ var VK_SCROLL = 0,
 				if(sp.action_id == 6)
 					v.push(_num(delem.find('.spisok-col ._radio .on').attr('val')));
 				if(sp.action_id == 7) {
-					v.push(_num($('#colNameShow').val()));
-					_forEq(delem.find('dd'), function(eq) {
-						var col_id = _num(eq.find('input:first').val(), 1),
-							tr = eq.find('.tr').val();
-						if(!col_id)
-							return;
-						v.push(col_id + '&' + tr);
-					});
+					if($('#colNameShow').length) {//181 таблица
+						v.push(_num($('#colNameShow').val()));
+						_forEq(delem.find('dd'), function(eq) {
+							var col_id = _num(eq.find('input:first').val(), 1),
+								tr = eq.find('.tr').val();
+							if(!col_id)
+								return;
+							v.push(col_id + '&' + tr);
+						});
+					}
+					if($('#tmp-elem-list').length) {//182 шаблон
+						_forEq($('#tmp-elem-list .pe'), function(eq) {
+							var k = _num(eq.attr('val'));
+							v.push(ELEM_ARR[k]);
+						});
+						join = 0;
+					}
 				}
 			});
-			sf[id] = v.join(',');
+			sf[id] = join ? v.join(',') : v;
 		}
 	},
 	_dialogScript = function(component, isEdit) {//применение скриптов после загрузки данных диалога
@@ -1597,23 +1607,124 @@ var VK_SCROLL = 0,
 		function listShow(res) {
 			spc.removeClass('_busy');
 
+			//настройка колонок будет доступна позже
 			if(res.after)
 				return spc.html(res.after);
 
 			spc.html(res.html);
 
 			RES = res;
-			DL = spc.find('dl');
 
-			_forN(res.arr, itemAdd);
-			_forEq(DL.find('input'), colSel);
+			switch(res.spisok_type) {
+				default:
+				case 181:/* таблица */ {
+					DL = spc.find('dl');
 
-			DL.sortable({
-				axis:'y',
-				handle:'.icon-sort'
-			});
+					_forN(res.arr, itemAdd);
+					_forEq(DL.find('input'), colSel);
 
-			spc.find('.item-add').click(itemAdd);
+					DL.sortable({
+						axis:'y',
+						handle:'.icon-sort'
+					});
+
+					spc.find('.item-add').click(itemAdd);
+
+					break;
+				}
+				case 182:/* шаблон */ {
+					for(var n = 0; n < res.arr182.length; n++)
+						ELEM_ARR[res.arr182[n].id] = res.arr182[n];
+					console.log(ELEM_ARR);
+					var tmp = $('#tmp-elem-list'),
+						elemType = $('#elem_type'),
+						colType = $('#col_type'),
+						txt_2 = $('#tmp_elem_txt_2'),
+						N = 10000;
+					txt_2.autosize();
+					elemType._select({
+						block:1,
+						width:200,
+						title0:'колонка не выбрана',
+						spisok:res.label_name_select,
+						func:function(v) {
+							$('#elem-add').parent()._dn(v);
+
+							colType
+								._select('clear')
+								.parent()._dn(v > 0);
+
+							txt_2
+								.val('')
+								.parent()._dn(v == -4);
+							if(v == -4)
+								txt_2.focus();
+						}
+					});
+					colType._select({
+						block:1,
+						width:200,
+						title0:'выберите тип содержания',
+						spisok:[
+							{uid:1,title:'имя колонки'},
+							{uid:2,title:'значение колонки'}
+						]
+					});
+					$('#elem-add').click(function() {
+						var txt = '',
+							txt2 = '',
+							num_4 = _num(elemType.val(), 1);
+						switch(num_4) {
+							case -1://порядковый номер
+								txt = 123;
+								break;
+							case -2://дата
+								txt = '21 мар 2017';
+								break;
+							case -4://произвольный текст
+								txt2 = $.trim(txt_2.val());
+								txt = _br(txt2, 1);
+								if(!txt) {
+									txt_2.focus().parent()._flash({color:'red'});
+									return;
+								}
+								break;
+							default:
+								if(num_4 <= 0)
+									return;
+								txt2 = _num(colType.val());
+								switch(txt2)  {
+									case 1:
+										txt = elemType._select('title');
+										break;
+									case 2:
+										txt = 'Значение "' + elemType._select('title') + '"';
+										break;
+									default: return;
+								}
+
+
+						}
+						ELEM_ARR[N] = {
+							tmp:1,
+							txt_2:txt2,
+							num_4:num_4,
+							fontAllow:1
+						};
+						tmp.append(
+							'<div id="pe_' + N + '" class="pe prel" val="' + N + '">' +
+								'<div class="elem-pas" val="' + N + '"></div>' +
+								txt +
+							'</div>'
+						);
+						_pageElemExtend(N);
+						N++;
+
+						elemType._select('clear');
+					});
+					break;
+				}
+			}
 		}
 		function itemAdd(sp) {
 			sp = $.extend({
@@ -1869,7 +1980,7 @@ var VK_SCROLL = 0,
 	_pageElemSetup = function() {//настройка стилей элементов в выплывающем окне. Также сортировка
 		var t = $(this),
 			elem_id = _num(t.attr('val')),
-			EL = ELEM_ARR[elem_id],
+			EL = _pageElemExtend(elem_id),
 			PE = $('#pe_' + elem_id);
 
 		if(PE.hasClass('_busy'))
@@ -1893,6 +2004,8 @@ var VK_SCROLL = 0,
 			remove:1,
 			delayHide:300,
 			funcHide:function() {
+				if(EL.tmp)
+					return;
 				if(!EL.save)
 					return;
 
@@ -1905,7 +2018,24 @@ var VK_SCROLL = 0,
 			}
 		});
 
-		_pageElemSort(t);
+		_pageElemSort(t, !EL.tmp);
+	},
+	_pageElemExtend = function(elem_id) {//заполнение всех отсутствующих значений элемента по умолчанию
+		ELEM_ARR[elem_id] = $.extend({
+			id:0,
+			tmp:0,   //элемент настраивается для единицы списка
+			txt_2:'',//произвольное значение (для элемента списка)
+			num_4:0, //id колонки
+			dialog_id:0,
+			fontAllow:0,
+			type:'',
+			pos:'',
+			color:'',
+			font:'',
+			size:13,
+			pad:'0 0 0 0'
+		}, ELEM_ARR[elem_id]);
+		return ELEM_ARR[elem_id];
 	},
 	_pageElemSetupIcon = function(elem_id, EL) {//стили элемента: иконки редактировани и удаления
 		return '<div class="r">' +
@@ -2129,7 +2259,7 @@ var VK_SCROLL = 0,
 			 '<table class="w200 bg-eee curP pabs">' + td + '</table>' +
 			'</div>';
 	},
-	_pageElemSort = function(t) {//сортировка элементов
+	_pageElemSort = function(t, save) {//сортировка элементов
 		var ES = _parent(t, '.elem-sort');
 
 		if(ES.hasClass('ui-sortable'))
@@ -2158,6 +2288,9 @@ var VK_SCROLL = 0,
 					.css('border','1px dashed #aaa');
 			},
 			update:function() {
+				if(!save)
+					return;
+
 				var dds = ES.find('.elem-pas'),
 					arr = [];
 				_forEq(dds, function(sp) {
