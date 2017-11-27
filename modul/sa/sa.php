@@ -499,9 +499,17 @@ function _pageSpisok($pe) {//список, выводимый на странице
 									$v = $v ? '<div class="icon icon-ok curD"></div>' : '';
 								}
 								if(@$ex[3]) {//ссылка
-									$link = '&';
+									//по умолчанию текущая страница
+									$link = '&p='.$page_id;
+
+									//если таблица является страницей, то ссылка перехода на страницу
 									if($spTable == '_page')
 										$link = '&p='.$sp['id'];
+
+									//если указана страница перехода после создания элемента списка
+									if($spDialog['action_id'] == 2)
+										$link = '&p='.$spDialog['action_page_id'].'&id='.$sp['id'];
+
 									$v = '<a href="'.URL.$link.'">'.$v.'</a>';
 								}
 								$html .= '<td class="'.implode(' ', $cls).'">'.$v;
