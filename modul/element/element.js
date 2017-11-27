@@ -1352,6 +1352,7 @@ var VK_SCROLL = 0,
 				if(sp.action_id == 7) {
 					if($('#colNameShow').length) {//181 таблица
 						v.push(_num($('#colNameShow').val()));
+						v.push(_num($('#rowLight').val()));
 						_forEq(delem.find('dd'), function(eq) {
 							var col_id = _num(eq.find('input:first').val(), 1),
 								tr = eq.find('.tr').val(),

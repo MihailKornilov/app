@@ -427,6 +427,7 @@ function _pageSpisok($pe) {//список, выводимый на странице
 		num_3 - id диалога, через который вносятся данные списка
 		num_4[child] - id колонки. Если отрицательное - см.txt_5
 		num_5 - галочка "Показывать имена колонок"
+		num_6 - галочка "Подсвечивать строки при наведении"
 	*/
 	$page_id = $pe['page_id'];
 
@@ -441,12 +442,16 @@ function _pageSpisok($pe) {//список, выводимый на странице
 	$CMP = $spDialog['component']; //элементы списка
 	$spTable = $spDialog['base_table'];
 
+	$cond = "!`deleted`";
+	if(isset($spDialog['field']['app_id']))
+		$cond .= " AND `app_id` IN (0,".APP_ID.")";
+	if(isset($spDialog['field']['dialog_id']))
+		$cond .= " AND `dialog_id`=".$dialog_id;
+
 	//получение данных списка
 	$sql = "SELECT *
 			FROM `".$spTable."`
-			WHERE `app_id` IN (0,".APP_ID.")
-			  AND `dialog_id`=".$dialog_id."
-			  AND !`deleted`
+			WHERE ".$cond."
 			  "._pageSpisokFilterSearch($pe, $spDialog)."
 			ORDER BY `dtime_add` DESC
 			LIMIT ".$spLimit;
@@ -476,7 +481,7 @@ function _pageSpisok($pe) {//список, выводимый на странице
 				}
 
 				foreach($spisok as $sp) {
-					$html .= '<tr>';
+					$html .= '<tr'.($pe['num_6'] ? ' class="over1"' : '').'>';
 					foreach($colArr as $col) {
 						$ex = explode('&', $col);
 						switch($ex[0]) {
@@ -484,7 +489,9 @@ function _pageSpisok($pe) {//список, выводимый на странице
 								$html .= '<td class="w15 grey r">'.$sp['num'];
 								break;
 							case -2://дата
-								$html .= '<td class="w50 wsnw r grey fs12">'.FullData($sp['dtime_add'], 0, 1);
+								$u = _viewer($sp['viewer_id_add']);
+								$msg = 'Вн'.($u['sex'] == 2 ? 'ёс ' : 'есла ').$u['first_name'].' '.$u['last_name'];
+								$html .= '<td class="w50 wsnw r grey fs12 curD'._tooltip($msg, -40).FullData($sp['dtime_add'], 0, 1);
 								break;
 							case -3://иконки управления
 								$html .= '<td class="w15 wsnw">'.

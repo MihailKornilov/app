@@ -195,14 +195,19 @@ switch(@$_POST['op']) {
 		if(!$dialog = _dialogQuery($dialog_id))
 			jsonError('Диалога не существует');
 
+		if($dialog['sa'] && !SA)
+			jsonError('Нет доступа');
+
 		$page_id = _num($_POST['page_id']);
 
 		$data = array();
 		if($unit_id = _num($_POST['unit_id'])) {
+			$cond = "`id`=".$unit_id;
+			if(isset($dialog['field']['app_id']))
+				$cond .= " AND `app_id` IN (0,".APP_ID.")";
 			$sql = "SELECT *
 					FROM `".$dialog['base_table']."`
-					WHERE `app_id` IN (0,".APP_ID.")
-					  AND `id`=".$unit_id;
+					WHERE ".$cond;
 			if(!$data = query_assoc($sql))
 				jsonError('Записи не существует');
 			if(@$data['sa'] && !SA)
@@ -933,6 +938,14 @@ switch(@$_POST['op']) {
 								'light' => 1,
 								'value' => $elem['num_5']
 							)).
+							'<span class="ml20">'.
+								_check(array(
+									'id' => 'rowLight',
+									'title' => 'Подсвечивать строки при наведении',
+									'light' => 1,
+									'value' => $elem['num_6']
+								)).
+							'</span>'.
 						'</div>'.
 						'<dl></dl>'.
 						'<div class="item-add center pad15 fs15 color-555 over1 curP">Добавить колонку</div>'.
@@ -1016,9 +1029,6 @@ switch(@$_POST['op']) {
 					'<div id="tmp-elem-list" class="elem-sort mh50 mt10 bor-f0 bg-ffe">'.$tmpHtml.'</div>';
 				break;
 		}
-
-
-
 
 		foreach($CMP as $r) {
 			if(!_dialogEl($r['type_id'], 'func'))
@@ -1703,6 +1713,8 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 		jsonError('Некорректный ID диалогового окна');
 	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('Диалога не существует');
+	if($dialog['sa'] && !SA)
+		jsonError('Нет доступа');
 
 	$send = array(
 		'unit_id' => $unit_id,
@@ -1716,10 +1728,10 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 		jsonError('Таблицы не существует');
 
 	if($unit_id) {
-		$sql = "SELECT *
-				FROM `".BASE_TABLE."`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$unit_id;
+		$cond = "`id`=".$unit_id;
+		if(isset($dialog['field']['app_id']))
+			$cond .= " AND `app_id` IN (0,".APP_ID.")";
+		$sql = "SELECT * FROM `".BASE_TABLE."` WHERE ".$cond;
 		if(!$r = query_assoc($sql))
 			jsonError('Записи не существует');
 
@@ -1908,10 +1920,13 @@ function _dialogSpisokFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление зн
 			default://[181] таблица
 				$ex = explode(',', $v);
 				$num_5 = _num($ex[0]);
+				$num_6 = _num($ex[1]);
 
 				$txt_5 = array();
 				foreach($ex as $k => $r) {
 					if(!$k)
+						continue;
+					if($k == 1)
 						continue;
 
 					$rex = explode('&', $r);
@@ -1926,6 +1941,7 @@ function _dialogSpisokFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление зн
 
 				$sql = "UPDATE `".BASE_TABLE."`
 						SET `num_5`=".$num_5.",
+							`num_6`=".$num_6.",
 							`txt_5`='".implode(',', $txt_5)."'
 						WHERE `id`=".$unit_id;
 				query($sql);

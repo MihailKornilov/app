@@ -171,12 +171,10 @@ function _appCreate() {//автоматическое создание приложения, если пользователь в
 
 	$sql = "INSERT INTO `_app` (
 				`id`,
-				`title`,
 				`app_name`,
 				`viewer_id_add`
 			) VALUES (
 				".$app_id.",
-				'app".$app_id."',
 				'Приложение ".$app_id."',
 				".VIEWER_ID."
 			)";
