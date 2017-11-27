@@ -933,19 +933,25 @@ switch(@$_POST['op']) {
 					'<div class="mar10">'.
 						'<div class="ml30 mb10">'.
 							_check(array(
+								'id' => 'rowSmall',
+								'title' => 'Узкие строки',
+								'light' => 1,
+								'value' => $elem['num_7']
+							)).
+							_check(array(
 								'id' => 'colNameShow',
 								'title' => 'Показывать имена колонок',
 								'light' => 1,
-								'value' => $elem['num_5']
+								'value' => $elem['num_5'],
+								'class' => 'ml30'
 							)).
-							'<span class="ml20">'.
-								_check(array(
-									'id' => 'rowLight',
-									'title' => 'Подсвечивать строки при наведении',
-									'light' => 1,
-									'value' => $elem['num_6']
-								)).
-							'</span>'.
+							_check(array(
+								'id' => 'rowLight',
+								'title' => 'Подсвечивать строки при наведении',
+								'light' => 1,
+								'value' => $elem['num_6'],
+								'class' => 'ml30'
+							)).
 						'</div>'.
 						'<dl></dl>'.
 						'<div class="item-add center pad15 fs15 color-555 over1 curP">Добавить колонку</div>'.
@@ -1921,12 +1927,11 @@ function _dialogSpisokFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление зн
 				$ex = explode(',', $v);
 				$num_5 = _num($ex[0]);
 				$num_6 = _num($ex[1]);
+				$num_7 = _num($ex[2]);
 
 				$txt_5 = array();
 				foreach($ex as $k => $r) {
-					if(!$k)
-						continue;
-					if($k == 1)
+					if($k < 3)
 						continue;
 
 					$rex = explode('&', $r);
@@ -1942,6 +1947,7 @@ function _dialogSpisokFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление зн
 				$sql = "UPDATE `".BASE_TABLE."`
 						SET `num_5`=".$num_5.",
 							`num_6`=".$num_6.",
+							`num_7`=".$num_7.",
 							`txt_5`='".implode(',', $txt_5)."'
 						WHERE `id`=".$unit_id;
 				query($sql);

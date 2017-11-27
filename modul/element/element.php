@@ -84,12 +84,13 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 		'on' => _bool(@$v['value']) ? ' on' : '',
 		'light' => _bool(@$v['light']) ? ' light' : '',
 		'disabled' => _bool(@$v['disabled']) ? ' disabled' : '',
+		'class' => !empty($v['class']) ? ' '.$v['class'] : '',      //дополнительный класс
 		'block' => _bool(@$v['block']) ? ' block' : ''
 	);
 	$title = $v['title'] ? ' title' : '';
 	return
 	'<input type="hidden" id="'.$v['id'].'" value="'.$v['value'].'" />'.
-	'<div class="_check '.$v['on'].$v['block'].$v['disabled'].$v['light'].$title.'" id="'.$v['id'].'_check">'.
+	'<div class="_check '.$v['on'].$v['block'].$v['class'].$v['disabled'].$v['light'].$title.'" id="'.$v['id'].'_check">'.
 		$v['title'].
 	'</div>';
 }

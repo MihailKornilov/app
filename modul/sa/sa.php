@@ -428,6 +428,7 @@ function _pageSpisok($pe) {//список, выводимый на странице
 		num_4[child] - id колонки. Если отрицательное - см.txt_5
 		num_5 - галочка "Показывать имена колонок"
 		num_6 - галочка "Подсвечивать строки при наведении"
+		num_7 - галочка "Узкие строки"
 	*/
 	$page_id = $pe['page_id'];
 
@@ -447,6 +448,13 @@ function _pageSpisok($pe) {//список, выводимый на странице
 		$cond .= " AND `app_id` IN (0,".APP_ID.")";
 	if(isset($spDialog['field']['dialog_id']))
 		$cond .= " AND `dialog_id`=".$dialog_id;
+
+	//получение общего количество строк
+	$sql = "SELECT COUNT(*)
+			FROM `".$spTable."`
+			WHERE ".$cond."
+			  "._pageSpisokFilterSearch($pe, $spDialog);
+	$all = query_value($sql);
 
 	//получение данных списка
 	$sql = "SELECT *
@@ -468,7 +476,7 @@ function _pageSpisok($pe) {//список, выводимый на странице
 	if($spisok)
 		switch($pe['num_1']) {
 			case 181://Таблица
-				$html = '<table class="_stab">';
+				$html = '<table class="_stab'._dn(!$pe['num_7'], 'small').'">';
 
 				$colArr = explode(',', $pe['txt_5']);
 				//отображение названий колонок
@@ -494,8 +502,11 @@ function _pageSpisok($pe) {//список, выводимый на странице
 								$html .= '<td class="w50 wsnw r grey fs12 curD'._tooltip($msg, -40).FullData($sp['dtime_add'], 0, 1);
 								break;
 							case -3://иконки управления
-								$html .= '<td class="w15 wsnw">'.
-											_iconEdit(array('onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')'));
+								$html .= '<td class="pad0 w15 wsnw">'.
+												_iconEdit(array(
+													'onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')',
+													'class' => 'ml5 mr5'
+												));
 								//._iconDel();
 								break;
 							default:
@@ -522,7 +533,7 @@ function _pageSpisok($pe) {//список, выводимый на странице
 									if($spDialog['action_id'] == 2)
 										$link = '&p='.$spDialog['action_page_id'].'&id='.$sp['id'];
 
-									$v = '<a href="'.URL.$link.'">'.$v.'</a>';
+									$v = '<a href="'.URL.$link.'"'._dn(!$pe['num_7'], 'class="fs12"').'>'.$v.'</a>';
 								}
 								$html .= '<td class="'.implode(' ', $cls).'">'.$v;
 						}
@@ -531,6 +542,14 @@ function _pageSpisok($pe) {//список, выводимый на странице
 	//							$v = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $v, 1);
 					}
 				}
+
+				if($all > count($spisok)) {
+					$html .=
+						'<tr class="over1">'.
+							'<td colspan="20">'.
+								'<tt class="db center curP fs14 blue pad8">Показать ещё '.$spLimit.' записей</tt>';
+				}
+
 
 				$html .= '</table>';
 				break;

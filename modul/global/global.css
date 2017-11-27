@@ -57,19 +57,6 @@ table{border:0;border-spacing:0}
 
 
 
-.tabLR{width:100%}
-.tabLR .left{vertical-align:top}
-.tabLR .right{
-	vertical-align:top;
-	padding:8px 8px 20px 8px;
-	width:200px;
-	background:#f7f7f7;
-	border-left:#dae1e8 solid 1px;
-	height:450px;
-}
-
-
-
 
 
 
@@ -90,7 +77,7 @@ table{border:0;border-spacing:0}
 .icon-del-white{background-position:0 -320px}
 .icon-zp{background-position:0 -40px}
 .icon-vk{background-position:0 -60px}
-.icon-edit{background-position:0 -80px}
+.icon-edit{background-position:0 -78px}
 .icon-edit-white{background-position:0 -520px}
 .icon-out{background-position:0 -100px}
 .icon-rub{background-position:0 -140px}
@@ -551,6 +538,7 @@ button.vk.orange:hover{background-color:#D59553}
 .over2:hover{background-color:#FFFFF0}/* бледно-жёлтый */
 .over3:hover,.over3:hover textarea{background-color:#ffc} /* жёлтый */
 .over4:hover{background-color:#F9F9F9}/* светло-серый */
+.over5:hover{background-color:#E8ECF0}/* серо-синий */
 
 /* Линии */
 .line-b{border-bottom:#DEE3EF solid 1px}

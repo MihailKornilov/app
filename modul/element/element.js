@@ -1353,6 +1353,7 @@ var VK_SCROLL = 0,
 					if($('#colNameShow').length) {//181 таблица
 						v.push(_num($('#colNameShow').val()));
 						v.push(_num($('#rowLight').val()));
+						v.push(_num($('#rowSmall').val()));
 						_forEq(delem.find('dd'), function(eq) {
 							var col_id = _num(eq.find('input:first').val(), 1),
 								tr = eq.find('.tr').val(),
@@ -1995,6 +1996,13 @@ var VK_SCROLL = 0,
 		});
 	},
 	_pageElemSetup = function() {//настройка стилей элементов в выплывающем окне. Также сортировка
+		if(!window.ELEM_ARR)//страница ещё не загрузилась
+			return;
+
+		//если происходит процесс перетаскивания элемента
+		if($('.ui-state-high').length)
+			return;
+
 		var t = $(this),
 			elem_id = _num(t.attr('val')),
 			EL = _pageElemExtend(elem_id),
