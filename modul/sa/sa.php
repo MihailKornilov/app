@@ -374,18 +374,23 @@ function _pageElemFontAllow($dialog_id) {//отображение в настройках стилей для к
 }
 
 function _pageElemMenu($unit) {//элемент страницы: Меню
-	$sql = "SELECT *
-			FROM `_page`
-			WHERE `app_id`=".APP_ID."
-			  AND `parent_id`=".$unit['num_1']."
-			  AND !`sa`
-			ORDER BY `sort`";
-	if(!$menu = query_arr($sql))
+	$menu = array();
+	foreach(_page() as $id => $r) {
+		if(!$r['app_id'])
+			continue;
+		if($r['sa'])
+			continue;
+		if($unit['num_1'] != $r['parent_id'])
+			continue;
+		$menu[$id] = $r;
+	}
+
+	if(!$menu)
 		return 'Разделов нет.';
 
 	$razdel = '';
 	foreach($menu as $r) {
-		$sel = _page('cur') == $r['id'] ? ' sel' : '';
+		$sel = _page('is_cur_parent', $r['id']) ? ' sel' : '';
 		$razdel .=
 			'<a class="link'.$sel.'" href="'.URL.'&p='.$r['id'].'">'.
 				$r['name'].
@@ -402,7 +407,7 @@ function _pageElemMenu($unit) {//элемент страницы: Меню
 		338 => 4  //Доп. - вертикальное
 	);
 
-	return '<div class="_menu'.$type[$unit['num_2']].'">'.$razdel.'</div>';
+	return '<div class="_menu'.$type[$unit['num_2']].'">'.$razdel.'</div>';//._pr(_page());
 }
 
 

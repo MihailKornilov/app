@@ -230,20 +230,20 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 }
 
 
-function _page($id='all') {//получение данных страницы
+function _page($i='all', $id=0) {//получение данных страницы
 	if(!defined('APP_ID'))
 		return 0;
 
-	if(!$id)
+	if(!$i)
 		return 0;
 
 	$page = _pageCache();
 
-	if($id === 'all')
+	if($i === 'all')
 		return $page;
 
 	//id страницы по умолчанию, либо из $_GET
-	if($id == 'cur') {
+	if($i == 'cur') {
 		if($page_id = _num(@$_GET['p']))
 			if(isset($page[$page_id]))
 				return $page_id;
@@ -262,10 +262,35 @@ function _page($id='all') {//получение данных страницы
 		return 12;
 	}
 
-	if(_num($id)) {
-		if(!isset($page[$id]))
+	//является ли страница родительской относительно текущей
+	if($i == 'is_cur_parent') {
+		if(!$page_id = _num($id))
 			return false;
-		return $page[$id];
+		$cur = _page('cur');
+
+		//проверяемая страница совпадает с текущей
+		if($page_id == $cur)
+			return true;
+
+		//текущая страница сама является главной
+		if(!$cur_parent = _num($page[$cur]['parent_id']))
+			return false;
+
+		//проверяемая страница является родителем текущей
+		if($page_id == $cur_parent)
+			return true;
+
+		//проверяемая страница является про-родителем текущей
+		if($page_id == $page[$cur_parent]['parent_id'])
+			return true;
+
+		return false;
+	}
+
+	if($page_id = _num($i)) {
+		if(!isset($page[$page_id]))
+			return false;
+		return $page[$page_id];
 	}
 	return false;
 }
@@ -276,17 +301,21 @@ function _pageCache() {//получение массива страниц из кеша
 	$sql = "SELECT *
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_ID.")
-			ORDER BY `id`";
+			ORDER BY `sort`";
 	return _cache(query_arr($sql));
 }
 
 function _pageSetupAppPage() {//управление страницами приложения
-	$sql = "SELECT *
-			FROM `_page`
-			WHERE `app_id`=".APP_ID."
-			  AND !`sa`
-			ORDER BY `sort`";
-	if(!$arr = query_arr($sql))
+	$arr = array();
+	foreach(_page() as $id => $r) {
+		if(!$r['app_id'])
+			continue;
+		if($r['sa'])
+			continue;
+		$arr[$id] = $r;
+	}
+
+	if(empty($arr))
 		return
 		'<div class="_empty">'.
 			'Ещё не создано ни одной страницы.'.
@@ -319,7 +348,9 @@ function _pageSetupAppPageSpisok($arr, $sort) {
 		$send .= '<li class="mt1" id="item_'.$r['id'].'">'.
 			'<div class="curM">'.
 				'<table class="_stab  bor-e8 bg-fff over1">'.
-					'<tr><td><a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
+					'<tr><td>'.
+							'<a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
+								($r['def'] ? '<div class="icon icon-ok ml10 mbm5 curD'._tooltip('Страница по умолчанию', -76).'</div>' : '').
 						'<td class="w35">'.
 							'<div class="icon icon-edit" onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')"></div>'.
 				'</table>'.

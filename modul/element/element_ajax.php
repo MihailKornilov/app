@@ -261,6 +261,8 @@ switch(@$_POST['op']) {
 					`sort`=VALUES(`sort`)";
 		query($sql);
 
+		_cache('clear', '_pageCache');
+
 		jsonSuccess();
 		break;
 
@@ -1848,6 +1850,9 @@ function _dialogSpisokUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/ре
 	//обновление функций компонентов
 	foreach($dialog['component'] as $id => $r)
 		_dialogSpisokFuncValUpdate($dialog, $id, $unit_id);
+
+	if(BASE_TABLE == '_page')
+		_cache('clear', '_pageCache');
 
 	return $send;
 }
