@@ -1025,7 +1025,8 @@ switch(@$_POST['op']) {
 			$labelName[] = array(
 				'uid' => $r['id'],
 				'title' => utf8($r['label_name'] ? $r['label_name'] : $r['type_name']),
-				'content' => utf8($r['label_html'])
+				'content' => utf8($r['label_html']),
+				'link_on' => 1
 			);
 
 			if(!$r['label_name'])
@@ -1062,7 +1063,9 @@ switch(@$_POST['op']) {
 				$ex = explode('&', $col);
 				$arr[] = array(
 					'id' => $ex[0],
-					'tr' => utf8($ex[1])
+					'tr' => utf8($ex[1]),
+					'link_on' => _num(@$ex[2]),
+					'link' => _num(@$ex[3])
 				);
 			}
 
@@ -1910,8 +1913,10 @@ function _dialogSpisokFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление зн
 					if(!$id = _num($rex[0], 1))
 						continue;
 					$tr = _txt(@$rex[1]);
+					$link_on = _num(@$rex[2]);
+					$link = _num(@$rex[3]);
 
-					$txt_5[] = $id.'&'.$tr;
+					$txt_5[] = $id.'&'.$tr.'&'.$link_on.'&'.$link;
 				}
 
 				$sql = "UPDATE `".BASE_TABLE."`

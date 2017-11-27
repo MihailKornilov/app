@@ -1354,10 +1354,12 @@ var VK_SCROLL = 0,
 						v.push(_num($('#colNameShow').val()));
 						_forEq(delem.find('dd'), function(eq) {
 							var col_id = _num(eq.find('input:first').val(), 1),
-								tr = eq.find('.tr').val();
+								tr = eq.find('.tr').val(),
+								link_on = eq.find('.td-link-on').hasClass('dn') ? 0 : 1,
+								link = _num(eq.find('.elem-link').val());
 							if(!col_id)
 								return;
-							v.push(col_id + '&' + tr);
+							v.push(col_id + '&' + tr + '&' + link_on + '&' + link);
 						});
 					}
 					if($('#tmp-elem-list').length) {//182 шаблон
@@ -1621,7 +1623,6 @@ var VK_SCROLL = 0,
 					DL = spc.find('dl');
 
 					_forN(res.arr, itemAdd);
-					_forEq(DL.find('input'), colSel);
 
 					DL.sortable({
 						axis:'y',
@@ -1729,24 +1730,36 @@ var VK_SCROLL = 0,
 		function itemAdd(sp) {
 			sp = $.extend({
 				id:0,
-				tr:''
+				tr:'',
+				link_on:0,
+				link:0
 			}, sp);
 			DL.append(
 				'<dd class="over1">' +
-					'<table class="bs5">' +
+					'<table class="bs5 w100p">' +
 						'<tr>' +
 							'<td class="topi w15">' +
 								'<div class="icon icon-sort pl curM"></div>' +
-							'<td><input type="hidden" id="elem-col' + NUM + '" value="' + sp.id + '" />' +
-							'<td class="top"><input type="text" class="tr w175" placeholder="имя колонки" value="' + sp.tr + '" />' +
-							'<td class="topi">' +
+							'<td class="w175">' +
+								'<input type="hidden" id="elem-col' + NUM + '" value="' + sp.id + '" />' +
+							'<td class="w175 top">' +
+								'<input type="text" class="tr w175 b" placeholder="имя колонки" value="' + sp.tr + '" />' +
+							'<td class="td-link-on">' +
+								'<input type="hidden" class="elem-link" id="elem-link' + NUM + '" value="' + sp.link + '" />' +
+							'<td class="topi r">' +
 								'<div class="icon icon-del pl' + _tooltip('Удалить колонку', -51) + '</div>' +
 					'</table>'
 			);
 
+			var DD = DL.find('dd:last');
+
 			colSel($('#elem-col' + NUM));
-			DL.find('.icon-del').click(function() {
-				_parent($(this),'DD').remove();
+			$('#elem-link' + NUM)._check({
+					tooltip:'Является ссылкой'
+				});
+			DD.find('.td-link-on')._dn(sp.link_on);
+			DD.find('.icon-del').click(function() {
+				DD.remove();
 			});
 
 			NUM++;
@@ -1754,7 +1767,10 @@ var VK_SCROLL = 0,
 		function colSel(sp) {
 			sp._select({
 				title0:'колонка не выбрана',
-				spisok:RES.label_name_select
+				spisok:RES.label_name_select,
+				func:function(v, id, item) {
+					_parent($('#' + id)).find('.td-link-on')._dn(item.link_on);
+				}
 			});
 		}
 	},
@@ -3037,7 +3053,7 @@ $.fn._select = function(o, o1, o2) {
 	}
 	function unitSel(t) {
 		var v = parseInt(t.attr('val')),
-			item;
+			item = {};
 		if(o.multiselect) {
 			if(!o.title0 && !v || v > 0)
 				inp.before('<div class="multi">' + ass[v] + '<span class="x" val="' + v + '"></span></div>');

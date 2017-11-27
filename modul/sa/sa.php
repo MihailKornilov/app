@@ -449,6 +449,11 @@ function _pageSpisok($pe) {//список, выводимый на странице
 
 	$html = '<div class="_empty">'._br($pe['txt_1']).'</div>';
 
+	foreach($spisok as $id => $sp)
+		if(empty($sp['num']))
+			$spisok[$id]['num'] = $sp['id'];
+
+
 	//выбор внешнего вида
 	if($spisok)
 		switch($pe['num_1']) {
@@ -489,9 +494,15 @@ function _pageSpisok($pe) {//список, выводимый на странице
 									$v = $sp[$el['col_name']];
 
 								$cls = array();
-								if($el['type_id'] == 1) {
+								if($el['type_id'] == 1) {//галочка
 									$cls[] = 'center';
 									$v = $v ? '<div class="icon icon-ok curD"></div>' : '';
+								}
+								if(@$ex[3]) {//ссылка
+									$link = '&';
+									if($spTable == '_page')
+										$link = '&p='.$sp['id'];
+									$v = '<a href="'.URL.$link.'">'.$v.'</a>';
 								}
 								$html .= '<td class="'.implode(' ', $cls).'">'.$v;
 						}
