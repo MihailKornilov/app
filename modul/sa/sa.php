@@ -83,7 +83,7 @@ function _pageShow($page_id, $blockShow=0) {
 			'ELEM_COLOR={'._pageElemColor().'};'.
 	'</script>'
 : '').
-//	_pr($elem_arr).
+	_pr($page).
 
 	'<script>_pageShow()</script>';
 }

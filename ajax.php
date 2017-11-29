@@ -2,6 +2,9 @@
 require_once 'modul/global/global.php';
 require_once 'modul/global/auth_ajax.php';
 
+_face();
+_sa();
+_dbConnect('GLOBAL_');
 _auth();
 
 require_once 'modul/global/global_ajax.php';

@@ -22,8 +22,8 @@ function _debug($i='') {
 			'<a id="cache_clear">Очисить кэш ('.VERSION.')</a> :: '.
 			'sql <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).') :: '.
 			'php '.round(microtime(true) - TIME, 3).' :: '.
-			'js <em></em> :: '.
-   (LOCAL ? '<a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
+			'js <em></em>'.
+   (LOCAL ? ' :: <a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
 		'</div>'.
 		'<script src="modul/debug/debug.js?'.TIME.'"></script>';
 

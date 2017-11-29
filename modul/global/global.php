@@ -1,53 +1,38 @@
 <?php
 define('TIME', microtime(true));
+
+setlocale(LC_ALL, 'ru_RU.CP1251');
+setlocale(LC_NUMERIC, 'en_US');
+
+define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
+define('DOMAIN', $_SERVER['SERVER_NAME']);
+define('LOCAL', DOMAIN != 'nyandoma.ru');
+
+require_once GLOBAL_DIR.'/syncro.php';
+require_once GLOBAL_DIR.'/modul/global/regexp.php';
+require_once GLOBAL_DIR.'/modul/global/mysql.php';
+require_once GLOBAL_DIR.'/modul/global/date.php';
+require_once GLOBAL_DIR.'/modul/debug/debug.php';
+require_once GLOBAL_DIR.'/modul/db/db.php';
+require_once GLOBAL_DIR.'/modul/global/vkuser.php';
+require_once GLOBAL_DIR.'/modul/element/element.php';
+require_once GLOBAL_DIR.'/modul/spisok/spisok.php';
+require_once GLOBAL_DIR.'/modul/sa/sa.php';
+
 define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
-define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 
 define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '');//.min
 
 define('CODE', _txt(@$_COOKIE['code']));
 
-_sa();
-
-if(SA) {
-	error_reporting(E_ALL);
-	ini_set('display_errors', true);
-	ini_set('display_startup_errors', true);
-}
-
-setlocale(LC_ALL, 'ru_RU.CP1251');
-setlocale(LC_NUMERIC, 'en_US');
-
-define('DOMAIN', $_SERVER['SERVER_NAME']);
-define('LOCAL', DOMAIN != 'nyandoma.ru');
-
-require_once GLOBAL_DIR.'/syncro.php';
-require_once GLOBAL_DIR.'/modul/global/mysql.php';
-require_once GLOBAL_DIR.'/modul/db/db.php';
-_dbConnect('GLOBAL_');
-
-require_once GLOBAL_DIR.'/modul/global/regexp.php';
-require_once GLOBAL_DIR.'/modul/global/date.php';
-require_once GLOBAL_DIR.'/modul/global/vkuser.php';
-require_once GLOBAL_DIR.'/modul/element/element.php';
-require_once GLOBAL_DIR.'/modul/spisok/spisok.php';
-
-define('FACE', _face());
-define('SITE', FACE == 'site');
-define('IFRAME', FACE == 'iframe');
-require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
-require_once GLOBAL_DIR.'/modul/global/func_require.php';
-
-require_once GLOBAL_DIR.'/modul/debug/debug.php';
-require_once GLOBAL_DIR.'/modul/sa/sa.php';
-
 define('VERSION', _num(@$_COOKIE['version']));
 define('PAS', _bool(@$_COOKIE['page_setup'])); //флаг включени€ управлени€ страницей PAS: page_setup
 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
+
 
 
 
@@ -64,20 +49,31 @@ function _sa() {//установка флага суперадминистратора
 	}
 
 	define('SA', isset($SA[$r['viewer_id']]) ? 1 : 0);
+
+	if(SA) {
+		error_reporting(E_ALL);
+		ini_set('display_errors', true);
+		ini_set('display_startup_errors', true);
+	}
 }
 function _face() {//определение, как загружена страница: iframe или сайт
+	$face = 'site';
 	switch(@$_COOKIE['face']) {
-		case 'site': return 'site';
-		case 'iframe': return 'iframe';
+		case 'site': $face = 'site'; break;
+		case 'iframe': $face = 'iframe'; break;
 	}
 
-	if(!empty($_GET['referrer'])) {
-		setcookie('face', 'iframe', time() + 2592000, '/');
-		return 'iframe';
-	}
+	if(!empty($_GET['referrer']))
+		$face = 'iframe';
 
-	setcookie('face', 'site', time() + 2592000, '/');
-	return 'site';
+	setcookie('face', $face, time() + 2592000, '/');
+
+	define('FACE', $face);
+	define('SITE', FACE == 'site');
+	define('IFRAME', FACE == 'iframe');
+
+	require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
+	require_once GLOBAL_DIR.'/modul/global/func_require.php';
 }
 function _global_script() {//скрипты и стили
 	return
@@ -247,9 +243,11 @@ function _page($i='all', $id=0) {//получение данных страницы
 
 	//id страницы по умолчанию, либо из $_GET
 	if($i == 'cur') {
-		if($page_id = _num(@$_GET['p']))
-			if(isset($page[$page_id]))
-				return $page_id;
+		if($page_id = _num(@$_GET['p'])) {
+			if(!isset($page[$page_id]))
+				return 0;
+			return $page_id;
+		}
 
 		foreach($page as $p) {
 			if(!$p['def'])
@@ -404,7 +402,11 @@ function _pageSetupMenu() {//строка меню управлени€ страницей
 function _content() {//центральное содержание
 	return '<div id="_content">'.(APP_ID ? _pageShow(_page('cur')) : _appSpisok()).'</div>';
 }
-function _contentMsg($msg='Ќесуществующа€ страница') {
+function _contentMsg($msg='') {
+	if(!$msg) {
+		$_GET['p'] = 0;
+		$msg = 'Ќесуществующа€ страница<br><br><a href="'.URL.'&p='._page('cur').'">ѕерейти на страницу по умолчанию</a>';
+	}
 	return '<div class="_empty mt20 mb20">'.$msg.'</div>';
 }
 function _footer() {
@@ -443,6 +445,7 @@ function _dn($v, $cls='dn') {//показ/скрытие блока на основании услови€
 }
 
 function _num($v, $minus=0) {
+//	echo _pr(debug_backtrace(0));
 	if(empty($v) || is_array($v))
 		return 0;
 
