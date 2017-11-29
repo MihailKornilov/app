@@ -3,7 +3,6 @@ require_once 'modul/global/global.php';
 
 _face();
 _sa();
-_dbConnect('GLOBAL_');
 _auth();
 
 die(

@@ -54,7 +54,7 @@ $(document)
 		$.post(AJAX, {'op':'cookie_clear'}, function(res) {
 			if(res.success) {
 				_msg('Cookie очищены');
-				document.location.reload();
+				location.reload();
 			}
 		}, 'json');
 	})

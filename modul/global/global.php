@@ -200,6 +200,7 @@ function _authCache() {//получение данных авторизации из кеша и установка конста
 
 	define('VIEWER_ID', _num($r['viewer_id']));
 	define('APP_ID', _num($r['app_id']));
+//	define('APP_ID', _num($r['app_id']));
 
 	_viewer();
 

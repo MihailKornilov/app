@@ -6,7 +6,6 @@ switch(@$_POST['op']) {
 		if(!$code = _txt($_POST['code']))
 			jsonError('Отсутствует код');
 
-
 		if(!LOCAL) {
 			$url = 'https://oauth.vk.com/access_token?'.
 						'client_id='.AUTH_APP_ID.

@@ -1,4 +1,6 @@
 <?php
+_dbConnect('GLOBAL_');
+
 function _dbConnect($prefix='') {
 	global $sqlQuery;
 	$sqlQuery = array();
