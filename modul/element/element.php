@@ -144,8 +144,8 @@ function _search($v=array()) {//элемент ПОИСК
 
 
 function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
-//	if($dialog = _cache())
-//		return $dialog;
+	if($dialog = _cache())
+		return $dialog;
 
 	$sql = "SELECT *
 			FROM `_dialog`

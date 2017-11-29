@@ -362,7 +362,7 @@ var FB,
 			sp.find('input')._search({
 				func:function(v) {
 					var send = {
-						op:'spisok_get',
+						op:'spisok_search',
 						element_id:_parent(sp, '.pe').attr('id').split('_')[1],
 						v:v
 					};

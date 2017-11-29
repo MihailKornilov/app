@@ -32,6 +32,7 @@ require_once GLOBAL_DIR.'/modul/global/regexp.php';
 require_once GLOBAL_DIR.'/modul/global/date.php';
 require_once GLOBAL_DIR.'/modul/global/vkuser.php';
 require_once GLOBAL_DIR.'/modul/element/element.php';
+require_once GLOBAL_DIR.'/modul/spisok/spisok.php';
 
 define('FACE', _face());
 define('SITE', FACE == 'site');
@@ -100,6 +101,8 @@ function _global_script() {//скрипты и стили
 
 	'<link rel="stylesheet" type="text/css" href="modul/element/element.css?'.TIME.'" />'.
 	'<script src="modul/element/element.js?'.TIME.'"></script>'.
+
+	'<script src="modul/spisok/spisok.js?'.TIME.'"></script>'.
 
 	_debug('style');
 }
@@ -420,7 +423,19 @@ function _regFilter($v) {//проверка регулярного выражения на недопустимые символ
 }
 
 
-
+function _end($count, $o1, $o2, $o5=false) {
+	if($o5 === false) $o5 = $o2;
+	if($count / 10 % 10 == 1)
+		return $o5;
+	else
+		switch($count % 10) {
+			case 1: return $o1;
+			case 2: return $o2;
+			case 3: return $o2;
+			case 4: return $o2;
+		}
+	return $o5;
+}
 function _dn($v, $cls='dn') {//показ/скрытие блока на основании условия
 	if(empty($v))
 		return ' '.$cls;
