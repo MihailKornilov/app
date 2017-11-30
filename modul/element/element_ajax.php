@@ -276,12 +276,10 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID страницы');
 
 		$sql = "INSERT INTO `_page_block` (
-					`app_id`,
 					`page_id`,
 					`sort`,
 					`viewer_id_add`
 				) VALUES (
-					".APP_ID.",
 					".$page_id.",
 					"._maxSql('_page_block').",
 					".VIEWER_ID."
@@ -314,8 +312,7 @@ switch(@$_POST['op']) {
 		//получение данных блока
 		$sql = "SELECT *
 				FROM `_page_block`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$block_id;
+				WHERE `id`=".$block_id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$block_id.' не существует');
 
@@ -323,12 +320,10 @@ switch(@$_POST['op']) {
 		//если блок является основным, то он становится дочерним, а над ним вносится блок, который будет родителем над текущим и над новым
 		if(!$parent_id = _num($block['parent_id'])) {
 			$sql = "INSERT INTO `_page_block` (
-						`app_id`,
 						`page_id`,
 						`sort`,
 						`viewer_id_add`
 					) VALUES (
-						".APP_ID.",
 						".$block['page_id'].",
 						".$block['sort'].",
 						".VIEWER_ID."
@@ -355,14 +350,12 @@ switch(@$_POST['op']) {
 
 		//внесение нового дочернего блока
 		$sql = "INSERT INTO `_page_block` (
-					`app_id`,
 					`page_id`,
 					`parent_id`,
 					`w`,
 					`sort`,
 					`viewer_id_add`
 				) VALUES (
-					".APP_ID.",
 					".$block['page_id'].",
 					".$parent_id.",
 					100,
@@ -400,8 +393,7 @@ switch(@$_POST['op']) {
 		//получение данных блока
 		$sql = "SELECT *
 				FROM `_page_block`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$block_id;
+				WHERE `id`=".$block_id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$block_id.' не существует');
 
@@ -431,8 +423,7 @@ switch(@$_POST['op']) {
 		//получение данных блока
 		$sql = "SELECT *
 				FROM `_page_block`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$id;
+				WHERE `id`=".$id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$id.' не существует');
 
@@ -548,8 +539,7 @@ switch(@$_POST['op']) {
 		//получение данных блока
 		$sql = "SELECT *
 				FROM `_page_block`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$id;
+				WHERE `id`=".$id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$id.' не существует');
 
@@ -572,8 +562,7 @@ switch(@$_POST['op']) {
 		//получение данных блока
 		$sql = "SELECT *
 				FROM `_page_block`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$id;
+				WHERE `id`=".$id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$id.' не существует');
 
@@ -646,8 +635,7 @@ switch(@$_POST['op']) {
 		//получение данных элемента
 		$sql = "SELECT *
 				FROM `_page_element`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$id;
+				WHERE `id`=".$id;
 		if(!$elem = query_assoc($sql))
 			jsonError('Элемента id'.$id.' не существует');
 
@@ -664,17 +652,16 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'page_elem_del'://применение новых стилей к элементу страницы
+	case 'page_elem_del'://удаление элемента со страницы
 		if(!$element_id = _num($_POST['id']))
 			jsonError('Некорректный ID элемента');
 
 		//получение данных элемента
 		$sql = "SELECT *
 				FROM `_page_element`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$element_id;
+				WHERE `id`=".$element_id;
 		if(!$elem = query_assoc($sql))
-			jsonError('Блока id'.$id.' не существует');
+			jsonError('Блока id'.$element_id.' не существует');
 
 		//удаление элемента
 		$sql = "DELETE FROM `_page_element` WHERE `id`=".$element_id;
@@ -1236,8 +1223,7 @@ function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страни
 	//определение, есть ли на странице элементы-кнопки: dialog_id=2
 	$sql = "SELECT CONCAT('\'button',id,'\'')
 			FROM `_page_element`
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=2
+			WHERE `dialog_id`=2
 			  AND `page_id`=".$page_id;
 	if(!$but = query_ids($sql))
 		return '';

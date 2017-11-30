@@ -80,8 +80,7 @@ switch(@$_POST['op']) {
 		//получение данных элемента поиска
 		$sql = "SELECT *
 				FROM `_page_element`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$pe_id;
+				WHERE `id`=".$pe_id;
 		if(!$pe = query_assoc($sql))
 			jsonError('Элемента id'.$pe_id.' не существует');
 
@@ -101,8 +100,7 @@ switch(@$_POST['op']) {
 		//получение данных элемента поиска
 		$sql = "SELECT *
 				FROM `_page_element`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `id`=".$element_id;
+				WHERE `id`=".$element_id;
 		if(!$pe = query_assoc($sql))
 			jsonError('Элемента id'.$element_id.' не существует');
 
@@ -119,8 +117,7 @@ switch(@$_POST['op']) {
 		//расположение списка на странице, на которой расположен поиск
 		$sql = "SELECT *
 				FROM `_page_element`
-				WHERE `app_id` IN (0,".APP_ID.")
-				  AND `dialog_id`=14
+				WHERE `dialog_id`=14
 				  AND `page_id`=".$pe['page_id']."
 				  AND `id`=".$pe_id."
 				LIMIT 1";
@@ -298,8 +295,7 @@ switch(@$_POST['op']) {
 				//получение элементов шаблона
 				$sql = "SELECT *
 						FROM `_page_element`
-						WHERE `app_id` IN(0,".APP_ID.")
-						  AND `parent_id`=".$elem_id."
+						WHERE `parent_id`=".$elem_id."
 						ORDER BY `sort`";
 				if($tmp = query_arr($sql))
 					foreach($tmp as $id => $r) {
@@ -547,11 +543,9 @@ function _spisokUnitUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/реда
 
 	if(!$unit_id) {
 		$sql = "INSERT INTO `".BASE_TABLE."` (
-					`app_id`,
 					`dialog_id`,
 					`viewer_id_add`
 				) VALUES (
-					".APP_ID.",
 					".$dialog_id.",
 					".VIEWER_ID."
 				)";
@@ -564,6 +558,13 @@ function _spisokUnitUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/реда
 		$sql = "DESCRIBE `".BASE_TABLE."`";
 		$desc = query_array($sql);
 		foreach($desc as $r) {
+			if($r['Field'] == 'app_id') {
+				$sql = "UPDATE `".BASE_TABLE."`
+						SET `app_id`=".APP_ID."
+						WHERE `id`=".$unit_id;
+				query($sql);
+				continue;
+			}
 			if($r['Field'] == 'num') {//установка порядкового номера
 				$sql = "SELECT IFNULL(MAX(`num`),0)+1
 						FROM `".BASE_TABLE."`

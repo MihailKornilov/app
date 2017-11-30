@@ -98,11 +98,9 @@ function _pageBlockTest($page_id) {//проверка страницы на наличие хотя бы одного
 		return;
 
 	$sql = "INSERT INTO `_page_block` (
-				`app_id`,
 				`page_id`,
 				`viewer_id_add`
 			) VALUES (
-				".APP_ID.",
 				".$page_id.",
 				".VIEWER_ID."
 			)";

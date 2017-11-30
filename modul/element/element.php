@@ -307,8 +307,7 @@ function _dialogSpisokOnPage($page_id) {//получение массива элементов страницы, 
 	
 	$sql = "SELECT `id`,`num_3`
 			FROM `_page_element`
-			WHERE `app_id` IN (".APP_ID.",0)
-			  AND `page_id`=".$page_id."
+			WHERE `page_id`=".$page_id."
 			  AND `dialog_id`=14
 			  AND `num_3`";
 	if(!$res = query_arr($sql))

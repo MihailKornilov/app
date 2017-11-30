@@ -170,8 +170,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 				//получение элементов шаблона
 				$sql = "SELECT *
 						FROM `_page_element`
-						WHERE `app_id` IN(0,".APP_ID.")
-						  AND `parent_id`=".$pe['id']."
+						WHERE `parent_id`=".$pe['id']."
 						ORDER BY `sort`";
 				if(!$tmp = query_arr($sql)) {
 					$html = '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
@@ -238,8 +237,7 @@ function _spisokFilterSearch($pe, $spDialog) {//получение значений фильтра-поиск
 	//получение значения элемента поиска, содержащегося на странице, где находится список воздействующий на этот список
 	$sql = "SELECT *
 			FROM `_page_element`
-			WHERE `app_id` IN(0,".APP_ID.")
-			  AND `page_id`=".$pe['page_id']."
+			WHERE `page_id`=".$pe['page_id']."
 			  AND `dialog_id`=7
 			  AND `num_3`=".$pe['id'];
 	if(!$search = query_assoc($sql))
