@@ -5,6 +5,7 @@
 /*	box-sizing:border-box;  */
 }
 body{background:#fff}
+body.site{background:#fafbfd}
 a{color:#2B587A;text-decoration:none;outline:none;cursor:pointer}
 a:hover{text-decoration:underline}
 b{font-weight:bold}
@@ -172,7 +173,16 @@ table{border:0;border-spacing:0}
 /* Основное содержание сайта */
 #_content{
 	width:1000px;
-	margin:0 auto 20px;
+	margin:0 auto;
+	background-color:#fff;
+}
+#_content.site{
+	border-left:#EEEFF3 solid 1px;
+	border-right:#EEEFF3 solid 1px;
+	border-bottom:#E4E5E9 solid 1px;
+	border-radius:0 0 2px 2px;
+	margin-bottom:20px;
+	padding-top:1px;
 }
 
 

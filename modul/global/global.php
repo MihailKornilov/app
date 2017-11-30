@@ -240,7 +240,10 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 
 
 function _content() {//центральное содержание
-	return '<div id="_content">'.(APP_ID ? _pageShow(_page('cur')) : _appSpisok()).'</div>';
+	return
+	'<div id="_content"'.(SITE ? ' class="site"' : '').'>'.
+		(APP_ID ? _pageShow(_page('cur')) : _appSpisok()).
+	'</div>';
 }
 function _contentMsg($msg='') {
 	if(!$msg) {

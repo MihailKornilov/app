@@ -102,7 +102,7 @@ function _header() {
 //			_api_scripts().
 		'</head>'.
 
-		'<body>'.
+		'<body class="site">'.
 			_header_hat();
 }
 function _header_hat() {//верхняя строка приложения-сайта

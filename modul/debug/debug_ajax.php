@@ -3,22 +3,7 @@
 if(SA)
 switch(@$_POST['op']) {
 	case 'cache_clear':
-		jsonSuccess();
-
-		_globalCacheClear();
-		_globalJsValues();
-		_appJsValues();
-
-		//обновление глобальных значений
-		$sql = "UPDATE `_setup_global`
-				SET `value`=`value`+1
-				WHERE !`app_id`";
-		query($sql);
-
-		//обновление значений js всех приложений по отдельности
-		$sql = "UPDATE `_app` SET `js_values`=`js_values`+1";
-		query($sql);
-
+		_cache('clear', '_pageCache');//страницы
 		jsonSuccess();
 		break;
 	case 'cookie_clear':
