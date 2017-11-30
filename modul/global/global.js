@@ -52,11 +52,10 @@ var FB,
 		_cookie('face', face);
 		location.reload();
 	},
-	_authLogin = function(code, user_id) {//авторизация пользователя по коду на сайте
+	_authLogin = function(code) {//авторизация пользователя по коду на сайте
 		var send = {
 				op:'login',
-				code:code,
-				user_id:user_id//TODO для локальной версии, на удаление
+				code:code
 			},
 			func = function() {
 				location.href = URL;

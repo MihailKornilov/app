@@ -160,11 +160,19 @@ table{border:0;border-spacing:0}
 	background-color:#697F99;
 	color:#fff;
 }
+#hat.show{background-color:#D47E02}/* просмотр от имени другого пользовател€ */
 #hat p{
 	width:1000px;
 	margin:auto;
 	padding-top:8px;
 	font-size:22px;
+}
+
+
+/* ќсновное содержание сайта */
+#_content{
+	width:1000px;
+	margin:0 auto 20px;
 }
 
 
@@ -249,11 +257,6 @@ table{border:0;border-spacing:0}
 #elem-color:not(:hover) .pabs{display:none}
 
 
-/* ќсновное содержание сайта */
-#_content{
-	width:1000px;
-	margin:auto;
-}
 
 
 

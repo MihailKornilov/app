@@ -4,6 +4,8 @@ if(!SA)
 
 switch(@$_POST['op']) {
 	case 'cache_clear':
+		jsonSuccess();
+
 		_globalCacheClear();
 		_globalJsValues();
 		_appJsValues();

@@ -665,8 +665,8 @@ function _spisokUnitFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление знач
 			default://[181] таблица
 				$ex = explode(',', $v);
 				$num_5 = _num($ex[0]);
-				$num_6 = _num($ex[1]);
-				$num_7 = _num($ex[2]);
+				$num_6 = _num(@$ex[1]);
+				$num_7 = _num(@$ex[2]);
 
 				$txt_5 = array();
 				foreach($ex as $k => $r) {

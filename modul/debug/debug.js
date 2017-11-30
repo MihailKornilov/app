@@ -62,7 +62,7 @@ $(document)
 		$.post(AJAX, {'op':'cache_clear'}, function(res) {
 			if(res.success) {
 				_msg('Кэш очищен');
-				document.location.reload();
+				location.reload();
 			}
 		}, 'json');
 	})

@@ -1,8 +1,10 @@
 <?php
 require_once 'modul/global/global.php';
 
+//echo CODE ? CODE : 'no code';
+
 _face();
-_sa();
+_saSet();
 _auth();
 
 die(

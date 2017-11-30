@@ -24,6 +24,27 @@ function _auth() {//авторизация через сайт
 		exit;
 	}
 
+	//SA: вход от имени другого пользователя
+	if(SA && $viewer_id = _num(@$_GET['viewer_id'])) {
+		$sql = "SELECT COUNT(*)
+				FROM `_vkuser`
+				WHERE `viewer_id`=".$viewer_id;
+		if(query_value($sql)) {
+			$sql = "UPDATE `_vkuser_auth`
+					SET `viewer_id_show`=".$viewer_id.",
+						`app_id`=0
+					WHERE `code`='".CODE."'";
+			query($sql);
+
+			_cache('clear', '_viewerCache'.VIEWER_ID);
+			_cache('clear', '_viewer'.$viewer_id);
+			_cache('clear', '_authCache');
+
+			header('Location:'.URL);
+			exit;
+		}
+	}
+
 	_viewer();
 }
 function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
@@ -53,32 +74,17 @@ function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 		'<div class="center mt40">'.
 			'<div class="w1000 pad30 dib mt40">'.
 				'<button class="vk'.($code ? ' _busy' : '').'"'.($code ? '' : ' onclick="location.href=\''.$href.'\'"').'>Войти через VK</button>'.
-				_localDopUserAuth($code).
 			'</div>'.
 		'</div>'.
 
 	($code ?
-		'<script>_authLogin("'.$code.'",'._num(@$_GET['user_id']).')</script>'
+		'<script>_authLogin("'.$code.'")</script>'
 	: '').
 	
 	'</body>'.
 	'</html>';
 
 	die($html);
-}
-function _localDopUserAuth($code) {//кнопки входа разных пользователей для тестирования todo НА УДАЛЕНИЕ
-	if(!LOCAL)
-		return '';
-
-	$busy = $code ? ' _busy' : '';
-
-	return
-		'<br />'.
-		'<br />'.
-		'<button class="vk'.$busy.'"'.($code ? '' : ' onclick="location.href=\''.URL.'&code='.md5(TIME.'1382858').'&user_id=1382858\'"').'>Войти как <b>Сергей Шерстянников</b>: id=1382858</button>'.
-		'<br />'.
-		'<br />'.
-		'<button class="vk'.$busy.'"'.($code ? '' : ' onclick="location.href=\''.URL.'&code='.md5(TIME.'5809794').'&user_id=5809794\'"').'>Войти как <b>Максим Ильин</b>: id=5809794</button>';
 }
 
 
@@ -101,11 +107,11 @@ function _header() {
 }
 function _header_hat() {//верхняя строка приложения-сайта
 	return
-	'<div id="hat">'.
+	'<div id="hat"'.(VIEWER_ID_SHOWER ? 'class="show"' : '').'>'.
 		'<p>'.
 			(APP_ID ? _app(APP_ID, 'app_name') : 'Мои приложения').
 			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt5">'.
-				'<span class="dib mr20 pale">'.VIEWER_APP_NAME.'</span>'.
+				'<span class="dib mr20 pale">'.VIEWER_NAME.'</span>'.
 				'Выход'.
 			'</a>'.
 			_header_pas().
@@ -113,6 +119,9 @@ function _header_hat() {//верхняя строка приложения-сайта
 	'</div>';
 }
 function _header_pas() {//отображение ссылки настройки страницы
+	if(!APP_ID)
+		return '';
+
 	if(!$page_id = _page('cur'))
 		return '';
 
@@ -201,7 +210,7 @@ function _appCreate() {//автоматическое создание приложения, если пользователь в
 			  AND `viewer_id`=".VIEWER_ID;
 	query($sql);
 
-	_cacheOld(CODE, 'clear');
+	_cache('clear', '_authCache');
 	header('Location:'.URL);
 
 	return '<div class="_empty mt20">Приложений нет.</div>';

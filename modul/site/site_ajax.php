@@ -30,9 +30,9 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$va['id'];
 		query($sql);
 
-		_cacheOld(CODE, 'clear');
+		_cache('clear', '_authCache');
 		_cache('clear', '_pageCache');
-		_cache('clear', '_viewer'.VIEWER_ID);
+		_cache('clear', '_viewerCache'.VIEWER_ID);
 
 		jsonSuccess();
 		break;

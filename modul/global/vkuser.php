@@ -3,26 +3,30 @@ function _viewer($viewer_id=VIEWER_ID, $i='') {//получение данных о пользовате и
 	if(!_num($viewer_id))
 		return false;
 
-	if(!$u = _cache()) {
-		$sql = "SELECT *
-				FROM `_vkuser`
-				WHERE `viewer_id`=".$viewer_id."
-				LIMIT 1";
-		if(!$u = query_assoc($sql))
-			$u = _viewerVkUpdate($viewer_id);
-
-		$u['app_count'] = _viewerAppCount($viewer_id);
-
-		$app = _viewerAppVar($viewer_id);
-		$u['worker'] = _bool(@$app['worker']);
-		$u['admin'] = _bool(@$app['admin']);
-		
-		_cache($u);
-	}
+	$u = _viewerCache($viewer_id);
 
 	_viewerDefine($u);
 
 	return $u;
+}
+function _viewerCache($viewer_id) {
+	if($u = _cache())
+		return $u;
+
+	$sql = "SELECT *
+			FROM `_vkuser`
+			WHERE `viewer_id`=".$viewer_id."
+			LIMIT 1";
+	if(!$u = query_assoc($sql))
+		$u = _viewerVkUpdate($viewer_id);
+
+	$u['app_count'] = _viewerAppCount($viewer_id);
+
+	$app = _viewerAppVar($viewer_id);
+	$u['worker'] = _bool(@$app['worker']);
+	$u['admin'] = _bool(@$app['admin']);
+
+	return _cache($u);
 }
 function _viewerVkUpdate($viewer_id) {//Обновление пользователя из Контакта
 	if(LOCAL)
@@ -101,7 +105,7 @@ function _viewerDefine($u) {//установка констант для пользователя
 	define('VIEWER_ADMIN', $u['admin']);
 	define('VIEWER_APP_ONE', $u['app_count'] < 2);
 	define('VIEWER_APP_COUNT', $u['app_count']);
-	define('VIEWER_APP_NAME', $u['first_name'].' '.$u['last_name']);//Имя Фамилия
+	define('VIEWER_NAME', $u['first_name'].' '.$u['last_name']);//Имя Фамилия
 
 	define('VIEWER_DEFINED', true);
 

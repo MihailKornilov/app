@@ -37,18 +37,20 @@ define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
 
 
-function _sa() {//установка флага суперадминистратора
-	//Флаг устанавливается только после входа пользователя в приложения и применяется после первого обновления страницы.
-
+function _sa($viewer_id) {//проверка пользователя на доступ SA
 	//Список пользователей - SA
 	$SA[982006] = true;//Михаил Корнилов
 
-	if(!CODE || !$r = _cacheOld(CODE)) {
+	return isset($SA[_num($viewer_id)]) ? 1 : 0;
+}
+function _saSet() {//установка флага суперадминистратора
+	if(!_authCache()) {
 		define('SA', 0);
 		return;
 	}
 
-	define('SA', isset($SA[$r['viewer_id']]) ? 1 : 0);
+//	define('SA', _sa(VIEWER_ID_SHOWER ? VIEWER_ID_SHOWER : VIEWER_ID));
+	define('SA', _sa(VIEWER_ID));
 
 	if(SA) {
 		error_reporting(E_ALL);
@@ -56,6 +58,7 @@ function _sa() {//установка флага суперадминистратора
 		ini_set('display_startup_errors', true);
 	}
 }
+
 function _face() {//определение, как загружена страница: iframe или сайт
 	$face = 'site';
 	switch(@$_COOKIE['face']) {
@@ -168,23 +171,27 @@ function _authLogoutApp() {//выход из приложения и попадание в список приложений
 			WHERE `code`='".CODE."'";
 	query($sql);
 
-//	_cache('clear', '_authCache');
-	_cacheOld(CODE, 'clear');
+	_cache('clear', '_authCache');
 	_cache('clear', '_pageCache');
-	_cache('clear', '_viewer'.VIEWER_ID);
+	_cache('clear', '_viewerCache'.VIEWER_ID);
 }
 function _authLogout($code, $viewer_id) {//выход из списка приложений
 	$sql = "DELETE FROM `_vkuser_auth` WHERE `code`='".addslashes($code)."'";
 	query($sql);
-	_cacheOld($code, 'clear');
+
+	_cache('clear', '_authCache');
 	_cache('clear', '_pageCache');
 	_cache('clear', '_viewer'.$viewer_id);
+
+	setcookie('code', '', time() - 1, '/');
 }
 function _authCache() {//получение данных авторизации из кеша и установка констант id пользователя и приложения
 	if(!CODE)
 		return false;
+	if(defined('VIEWER_ID'))
+		return true;
 
-	if(!$r = _cacheOld(CODE)) {
+	if(!$r = _cache()) {
 		$sql = "SELECT *
 				FROM `_vkuser_auth`
 				WHERE `code`='".addslashes(CODE)."'
@@ -192,15 +199,17 @@ function _authCache() {//получение данных авторизации из кеша и установка конста
 		if(!$r = query_assoc($sql))
 			return false;
 
-		_cacheOld(CODE, array(
+		_cache(array(
 			'viewer_id' => $r['viewer_id'],
-			'app_id' => $r['app_id']
+			'app_id' => $r['app_id'],
+			'viewer_id_show' => $r['viewer_id_show']
 		));
 	}
 
-	define('VIEWER_ID', _num($r['viewer_id']));
+	//флаг устанавливается, если SA просматривает от имени другого пользователя
+	define('VIEWER_ID_SHOWER', $r['viewer_id_show'] && _sa($r['viewer_id']) ? _num($r['viewer_id']) : 0);//id пользователя, который смотрит
+	define('VIEWER_ID', _num($r['viewer_id'.(VIEWER_ID_SHOWER ? '_show' : '')]));
 	define('APP_ID', _num($r['app_id']));
-//	define('APP_ID', _num($r['app_id']));
 
 	_viewer();
 
@@ -789,34 +798,6 @@ function _vkapi($method, $param=array()) {//получение данных из api вконтакте
 	return $res;
 }
 
-function _cacheOld($key, $v='') {//кеширование данных
-	if(empty($key))
-		die('Отсутствует ключ для кеширования.');
-
-	/*
-		code - произвольный код
-		viewer_ + id
-		app
-	*/
-
-	$key = md5(CODE).$key;
-
-	if($v == 'clear') {
-		xcache_unset($key);
-		return true;
-	}
-
-	//занесение данных в кеш
-	if($v) {
-		xcache_set($key, $v, 86400);
-		return true;
-	}
-
-	if(!xcache_isset($key))
-		return false;
-
-	return xcache_get($key);
-}
 function _cache($data='', $key='') {//кеширование данных
 	/*
 		$data - данные, сохраняемые в кеш. Если значение пустое, то попытка получить данные
@@ -828,9 +809,11 @@ function _cache($data='', $key='') {//кеширование данных
 	if(!$key) {
 		$DBT = debug_backtrace(0);
 		$DBT = $DBT[1];
-//		echo _pr($DBT);
 		$ARG = empty($DBT['args'][0]) ? '' : $DBT['args'][0];
 		$key = $DBT['function'].$ARG;
+
+//		if($DBT['function'] == '_viewerCache')
+//			echo $key;
 	}
 
 	$key = md5(CODE).$key;

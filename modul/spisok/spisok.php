@@ -32,16 +32,19 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 	//диалог, через который вносятся данные списка
 	$dialog_id = $pe['num_3'];
 	$spDialog = _dialogQuery($dialog_id);
+
 	$CMP = $spDialog['component']; //элементы списка
 	$spTable = $spDialog['base_table'];
 
-	$cond = "!`deleted`";
+	$cond = "`id`";
+	if(isset($spDialog['field']['deleted']))
+		$cond = "!`deleted`";
 	if(isset($spDialog['field']['app_id']))
 		$cond .= " AND `app_id` IN (0,".APP_ID.")";
 	if(isset($spDialog['field']['dialog_id']))
 		$cond .= " AND `dialog_id`=".$dialog_id;
 
-	//получение общего количество строк
+	//получение общего количества строк
 	$sql = "SELECT COUNT(*)
 			FROM `".$spTable."`
 			WHERE ".$cond."
@@ -70,9 +73,14 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 	if($spisok)
 		switch($pe['num_1']) {
 			case 181://Таблица
-				$html = !$next ? '<table class="_stab'._dn(!$pe['num_7'], 'small').'">' : '';
+				if(empty($pe['txt_5'])) {
+					$html = '<div class="_empty"><span class="fs15 red">Таблица не настроена.</span></div>';
+					break;
+				}
 
 				$colArr = explode(',', $pe['txt_5']);
+
+				$html = !$next ? '<table class="_stab'._dn(!$pe['num_7'], 'small').'">' : '';
 				//отображение названий колонок
 				if($pe['num_5'] && !$next) {
 					$html .= '<tr>';
@@ -91,9 +99,13 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 								$html .= '<td class="w15 grey r">'.$sp['num'];
 								break;
 							case -2://дата
-								$u = _viewer($sp['viewer_id_add']);
-								$msg = 'Вн'.($u['sex'] == 2 ? 'ёс ' : 'есла ').$u['first_name'].' '.$u['last_name'];
-								$html .= '<td class="w50 wsnw r grey fs12 curD'._tooltip($msg, -40).FullData($sp['dtime_add'], 0, 1);
+								$tooltip = '">';
+								if(isset($sp['viewer_id_add'])) {
+									$u = _viewer($sp['viewer_id_add']);
+									$msg = 'Вн'.($u['sex'] == 2 ? 'ёс ' : 'есла ').$u['first_name'].' '.$u['last_name'];
+									$tooltip = _tooltip($msg, -40);
+								}
+								$html .= '<td class="w50 wsnw r grey fs12 curD'.$tooltip.FullData($sp['dtime_add'], 0, 1);
 								break;
 							case -3://иконки управления
 								$html .= '<td class="pad0 w15 wsnw">'.
@@ -122,6 +134,10 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 									//если таблица является страницей, то ссылка перехода на страницу
 									if($spTable == '_page')
 										$link = '&p='.$sp['id'];
+
+									//если список пользователей, то переход на страницу приложений пользователя от его имени todo временно
+									if($spTable == '_vkuser')
+										$link = '&viewer_id='.$sp['viewer_id'];
 
 									//если указана страница перехода после создания элемента списка
 									if($spDialog['action_id'] == 2)

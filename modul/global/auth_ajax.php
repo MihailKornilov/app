@@ -18,9 +18,8 @@ switch(@$_POST['op']) {
 			$res = json_decode($res, true);
 		} else {
 			//todo локальная версия
-			$user_id = _num($_POST['user_id']);
 			$res = array(
-				'user_id' => $user_id ? $user_id : 982006
+				'user_id' => 982006
 			);
 		}
 

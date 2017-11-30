@@ -3,14 +3,14 @@ require_once 'modul/global/global.php';
 require_once 'modul/global/auth_ajax.php';
 
 _face();
-_sa();
+_saSet();
 _auth();
 
-require_once 'modul/debug/debug_ajax.php';
 require_once 'modul/global/global_ajax.php';
 require_once 'modul/site/site_ajax.php';
 require_once 'modul/element/element_ajax.php';
 require_once 'modul/spisok/spisok_ajax.php';
+require_once 'modul/debug/debug_ajax.php';
 
 
 
