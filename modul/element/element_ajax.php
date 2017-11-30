@@ -303,6 +303,8 @@ switch(@$_POST['op']) {
 			'</div>'
 		);
 
+		_cache('clear', '_pageCache');
+
 		jsonSuccess($send);
 		break;
 	case 'page_block_div'://деление блока на две части
@@ -615,6 +617,8 @@ switch(@$_POST['op']) {
 
 		$send['html'] = utf8(_pageShow($block['page_id'], 1));
 
+		_cache('clear', '_pageCache');
+
 		jsonSuccess($send);
 		break;
 
@@ -668,6 +672,8 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		$send['html'] = utf8(_pageShow($elem['page_id'], 1));
+
+		_cache('clear', '_pageCache');
 
 		jsonSuccess();
 		break;

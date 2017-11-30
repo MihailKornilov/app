@@ -1,4 +1,210 @@
 <?php
+function _page($i='all', $id=0) {//получение данных страницы
+	if(!defined('APP_ID'))
+		return 0;
+
+	if(!$i)
+		return 0;
+
+	$page = _pageCache();
+
+	if($i === 'all')
+		return $page;
+
+	//id страницы по умолчанию, либо из $_GET
+	if($i == 'cur') {
+		if($page_id = _num(@$_GET['p'])) {
+			if(!isset($page[$page_id]))
+				return 0;
+			return $page_id;
+		}
+
+		foreach($page as $p) {
+			if(!$p['def'])
+				continue;
+
+			if(!SA && $p['sa'])
+				continue;
+
+			return $p['id'];
+		}
+
+		//иначе на список страниц
+		return 12;
+	}
+
+	//является ли страница родительской относительно текущей
+	if($i == 'is_cur_parent') {
+		if(!$page_id = _num($id))
+			return false;
+		$cur = _page('cur');
+
+		//проверяемая страница совпадает с текущей
+		if($page_id == $cur)
+			return true;
+
+		//текущая страница сама является главной
+		if(!$cur_parent = _num($page[$cur]['parent_id']))
+			return false;
+
+		//проверяемая страница является родителем текущей
+		if($page_id == $cur_parent)
+			return true;
+
+		//проверяемая страница является про-родителем текущей
+		if($page_id == $page[$cur_parent]['parent_id'])
+			return true;
+
+		return false;
+	}
+
+	if($page_id = _num($i)) {
+		if(!isset($page[$page_id]))
+			return false;
+		return $page[$page_id];
+	}
+	return false;
+}
+function _pageCache() {//получение массива страниц из кеша
+	if($arr = _cache())
+		return $arr;
+
+	$sql = "SELECT
+				*,
+				0 `block_count`,
+				0 `elem_count`,
+				1 `del_access`
+			FROM `_page`
+			WHERE `app_id` IN (0,".APP_ID.")
+			ORDER BY `sort`";
+	if(!$page = query_arr($sql))
+		return array();
+
+	//получение количества блоков по каждой странице
+	$sql = "SELECT
+				`page_id`,
+				COUNT(*) `c`
+			FROM `_page_block`
+			WHERE `page_id` IN ("._idsGet($page).")
+			GROUP BY `page_id`";
+	$block = query_ass($sql);
+
+	//получение количества элементов по каждой странице
+	$sql = "SELECT
+				`page_id`,
+				COUNT(*) `c`
+			FROM `_page_element`
+			WHERE `page_id` IN ("._idsGet($page).")
+			GROUP BY `page_id`";
+	$elem = query_ass($sql);
+
+	foreach($page as $id => $r) {
+		$block_count = _num(@$block[$id]);
+		$elem_count = _num(@$elem[$id]);
+		$page[$id]['block_count'] = $block_count;
+		$page[$id]['elem_count'] = $elem_count;
+		$page[$id]['del_access'] = $block_count || $elem_count ? 0 : 1;
+	}
+
+	return _cache($page);
+}
+
+function _pageSetupAppPage() {//управление страницами приложения
+	$arr = array();
+	foreach(_page() as $id => $r) {
+		if(!$r['app_id'])
+			continue;
+		if($r['sa'])
+			continue;
+		$arr[$id] = $r;
+	}
+
+	if(empty($arr))
+		return
+		'<div class="_empty">'.
+			'Ещё не создано ни одной страницы.'.
+			'<div class="mt10 fs15 black">Создайте первую!</div>'.
+		'</div>';
+
+	$sort = array();
+	foreach($arr as $id => $r)
+		if($r['parent_id']) {
+			if(empty($sort[$r['parent_id']]))
+				$sort[$r['parent_id']] = array();
+			$sort[$r['parent_id']][] = $r;
+			unset($arr[$id]);
+		}
+
+	return
+	'<style>'.
+		'.placeholder{outline:1px dashed #4183C4;margin-top:1px}'.
+		'ol{list-style-type:none;max-width:700px;padding-left:40px}'.
+	'</style>'.
+	'<ol id="page-sort">'._pageSetupAppPageSpisok($arr, $sort).'</ol>'.
+	'<script>_pageSetupAppPage()</script>';
+}
+function _pageSetupAppPageSpisok($arr, $sort) {
+	if(empty($arr))
+		return '';
+
+	$send = '';
+	foreach($arr as $r) {
+		$send .= '<li class="mt1" id="item_'.$r['id'].'">'.
+			'<div class="curM">'.
+				'<table class="_stab  bor-e8 bg-fff over1">'.
+					'<tr><td>'.
+							'<a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
+								($r['def'] ? '<div class="icon icon-ok ml10 mbm5 curD'._tooltip('Страница по умолчанию', -76).'</div>' : '').
+						'<td class="w50 wsnw">'.
+							'<div onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')" class="icon icon-edit'._tooltip('Изменить название', -58).'</div>'.
+	   (!$r['del_access'] ? '<div class="icon icon-off'._tooltip('Очистить', -29).'</div>' : '').
+		($r['del_access'] ? '<div onclick="_dialogOpen(6,'.$r['id'].')" class="icon icon-del-red'._tooltip('Страница пустая, удалить', -79).'</div>' : '').
+				'</table>'.
+			'</div>';
+		if(!empty($sort[$r['id']]))
+			$send .= '<ol>'._pageSetupAppPageSpisok($sort[$r['id']], $sort).'</ol>';
+	}
+
+	return $send;
+}
+function _pageSetupMenu() {//строка меню управления страницей
+	if(!PAS)
+		return '';
+	if(!$page_id = _page('cur'))
+		return '';
+
+	if(!$page = _page($page_id))
+		return '';
+
+	if($page['sa'] && !SA)
+		return '';
+
+	if(!$page['app_id'] && !SA)
+		return '';
+
+	return
+	'<div id="pas">'.
+		'<div class="p pad5">'.
+
+			'<div class="fr mtm3">'.
+				'<div class="pad5 w35 wsnw mr5 fl dn">'.
+					'<div id="pas-sort" class="pl icon icon-sort'._tooltip('Сортировать блоки', -59).'</div>'.
+				'</div>'.
+				'<div class="icon-page-tmp"></div>'.
+			'</div>'.
+
+			'<div class="dib fs16 b">'.
+				$page['name'].
+			'</div>'.
+//			'<div onclick="_dialogOpen('.$page['dialog_id'].','.PAGE_ID.')" class="icon icon-edit mbm5 ml20'._tooltip('Редактировать текущую страницу', -102).'</div>'.
+		'</div>'.
+		'<div class="p pad5">'.
+			(_page('cur') !=12 ? '<a href="'.URL.'&p=12"><< к списку страниц</a>' : '&nbsp;').
+//			'<input type="hidden" id="page-setup-page" />'.
+		'</div>'.
+	'</div>';
+//	'<script>_pas()</script>';
+}
 
 
 function _pageShow($page_id, $blockShow=0) {
@@ -8,15 +214,16 @@ function _pageShow($page_id, $blockShow=0) {
 	if(!SA && $page['sa'])
 		return _contentMsg();
 
-
-	_pageBlockTest($page_id);
-
 	//получение списка блоков
 	$sql = "SELECT *
 			FROM `_page_block`
 			WHERE `page_id`=".$page_id."
 			ORDER BY `parent_id`,`sort`";
 	$arr = query_arr($sql);
+
+	if(empty($arr) && !PAS)
+		return '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>';
+
 	$block = array();
 	$elem = array();
 	foreach($arr as $id => $r) {
@@ -86,32 +293,6 @@ function _pageShow($page_id, $blockShow=0) {
 //	_pr($page).
 
 	'<script>_pageShow()</script>';
-}
-function _pageBlockTest($page_id) {//проверка страницы на наличие хотя бы одного блока
-	//если блоков нет, то внесение одного и применение к нему всех элементов на странице
-
-	$sql = "SELECT `id`
-			FROM `_page_block`
-			WHERE `page_id`=".$page_id."
-			LIMIT 1";
-	if($block_id = query_value($sql))
-		return;
-
-	$sql = "INSERT INTO `_page_block` (
-				`page_id`,
-				`viewer_id_add`
-			) VALUES (
-				".$page_id.",
-				".VIEWER_ID."
-			)";
-	query($sql);
-
-	$block_id = query_insert_id('_page_block');
-
-	$sql = "UPDATE `_page_element`
-			SET `block_id`=".$block_id."
-			WHERE `page_id`=".$page_id;
-	query($sql);
 }
 function _pageBlockStyle($r) {//стили css для блока
 	$send = array();
