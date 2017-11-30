@@ -3,6 +3,7 @@
 if(SA)
 switch(@$_POST['op']) {
 	case 'cache_clear':
+		_cache('clear', '_viewerCache'.VIEWER_ID);//текущий пользователь
 		_cache('clear', '_pageCache');//страницы
 		jsonSuccess();
 		break;
