@@ -1191,7 +1191,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 						$arr[$n]['v'] = $r['num_5'] ? _dialogSpisokOnPage($page_id) : _dialogSpisokOn();
 						break;
 					case 3://получение значений конкретного объекта
-						$arr[$n]['v'] = _dialogSpisokList($r['num_1'], $r['num_2']);
+						$arr[$n]['v'] = _spisokList($r['num_1'], $r['num_2']);
 						break;
 					case 4://список объектов, которые поступают на страницу через GET
 						$arr[$n]['v'] = _dialogSpisokGetPage($page_id);

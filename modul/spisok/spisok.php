@@ -256,4 +256,23 @@ function _spisokFilterSearch($pe, $spDialog) {//получение значений фильтра-поиск
 	return " AND (".implode($arr, ' OR ').")";
 }
 
+function _spisokList($dialog_id, $component_id) {//массив списков (пока только для select)
+	$dialog = _dialogQuery($dialog_id);
+
+	$sql = "SELECT `col_name`
+			FROM `_dialog_component`
+			WHERE `id`=".$component_id;
+	if(!$colName = query_value($sql))
+		$colName = 'id';
+
+	//отображение списка страниц определённым образом
+	if($dialog['base_table'] == '_page')
+		return _dialogPageList();
+
+	$sql = "SELECT `id`,`".$colName."`
+			FROM `".$dialog['base_table']."`
+			WHERE `app_id`=".APP_ID."
+			ORDER BY `id`";
+	return query_selArray($sql);
+}
 

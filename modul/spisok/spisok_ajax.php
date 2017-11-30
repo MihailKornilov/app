@@ -430,25 +430,6 @@ switch(@$_POST['op']) {
 }
 
 
-function _dialogSpisokList($dialog_id, $component_id) {//массив списков (пока только для select)
-	$dialog = _dialogQuery($dialog_id);
-
-	$sql = "SELECT `col_name`
-			FROM `_dialog_component`
-			WHERE `id`=".$component_id;
-	if(!$colName = query_value($sql))
-		$colName = 'id';
-
-	//отображение списка страниц определённым образом
-	if($dialog['base_table'] == '_page')
-		return _dialogPageList();
-
-	$sql = "SELECT `id`,`".$colName."`
-			FROM `".$dialog['base_table']."`
-			WHERE `app_id`=".APP_ID."
-			ORDER BY `id`";
-	return query_selArray($sql);
-}
 function _spisokUnitUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/редактирование записи списка
 	if(!$dialog_id = _num($_POST['dialog_id']))
 		jsonError('Некорректный ID диалогового окна');
