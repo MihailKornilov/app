@@ -101,6 +101,8 @@ function _global_script() {//скрипты и стили
 	'<link rel="stylesheet" type="text/css" href="modul/element/element.css?'.TIME.'" />'.
 	'<script src="modul/element/element.js?'.TIME.'"></script>'.
 
+	'<script src="modul/page/page.js?'.TIME.'"></script>'.
+
 	'<script src="modul/spisok/spisok.js?'.TIME.'"></script>'.
 
 	_debug('style');

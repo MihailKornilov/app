@@ -137,7 +137,7 @@ function _search($v=array()) {//элемент ПОИСК
 		'<div class="icon icon-del fr'._dn($v['v']).'"></div>'.
 		'<div class="_busy dib fr mr5 dn"></div>'.
 		'<div class="hold'._dn(!$v['v']).'">'.$v['hold'].'</div>'.
-		'<input type="text" style="width:'.($v['width'] - 77).'px" value="'.$v['v'].'" />'.
+		'<input type="text" style="width:'.($v['width'] - 87).'px" value="'.$v['v'].'" />'.
 	'</div>';
 }
 

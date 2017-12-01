@@ -334,43 +334,6 @@ var FB,
 	},
 	_dn = function(v) {//скрытие/показ элемента
 		return v ? '' : ' dn';
-	},
-
-/*
-	_pas = function() {
-		$('#page-setup-page')._dropdown({
-			head:'Страница',
-			nosel:1,
-			spisok:[
-				{uid:1,title:'<b>Новая страница</b>'},
-				{uid:2,title:'Список страниц'}
-			],
-			func:function(v) {
-				if(v == 1)
-					_dialogOpen(20);
-				if(v == 2)
-					location.href = URL + '&p=12';
-			}
-		});
-	},
-*/
-	_pageShow = function() {//выполнение после вывода страницы
-
-		//применение функций к _search
-		_forEq($('._search'), function(sp) {
-			sp.find('input')._search({
-				func:function(v) {
-					var send = {
-						op:'spisok_search',
-						element_id:_parent(sp, '.pe').attr('id').split('_')[1],
-						v:v
-					};
-					_post(send, function(res) {
-						$(res.attr_id).html(res.spisok);
-					});
-				}
-			});
-		});
 	};
 
 $.fn.keyEnter = function(func) {

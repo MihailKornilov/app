@@ -3767,6 +3767,8 @@ $.fn._search = function(o, v) {//поисковая строка
 			}
 			if(o == 'process')
 				S.process();
+			if(o == 'is_process')
+				return S.isProcess();
 			if(o == 'cancel')
 				S.cancel();
 			if(o == 'clear')
@@ -3795,10 +3797,10 @@ $.fn._search = function(o, v) {//поисковая строка
 	}
 
 	if(!o.ex) {
-		t.width(o.width - 77);
+		t.width(o.width - 87);
 		t.wrap('<div class="_search" style="width:' + o.width + 'px">');
 		t.before(
-			'<div class="icon icon-del fr dn"></div>' +
+			'<div class="icon icon-del fr dn "></div>' +
 			'<div class="_busy dib fr mr5 dn"></div>' +
 			'<div class="hold">' + o.hold + '</div>'
 		);
@@ -3854,6 +3856,9 @@ $.fn._search = function(o, v) {//поисковая строка
 	};
 	t.process = function() {//показ процесса ожидания с правой стороны
 		busy.removeClass('dn');
+	};
+	t.isProcess = function() {//определение, в процессе ли поиск
+		return !busy.hasClass('dn');
 	};
 	t.cancel = function() {//скрытие процесса ожидания с правой стороны
 		busy.addClass('dn');
