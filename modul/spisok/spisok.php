@@ -35,6 +35,25 @@ function _spisokCountAll($pe) {//получение общего количества строк списка
 
 	return $all;
 }
+function _spisokElemCount($r) {//формирование элемента с содержанием количества списка для вывода на страницу
+	if(!$pe_id = $r['num_1'])
+		return 'Список не указан.';
+
+	$sql = "SELECT *
+			FROM `_page_element`
+			WHERE `id`=".$pe_id;
+	if(!$pe = query_assoc($sql))
+		return 'Элемента, содержащего список, не существует.';
+
+	//если результат нулевой, выводится сообщение из элемента, который размещает список
+	if(!$all = _spisokCountAll($pe))
+		return $pe['txt_1'];
+
+	return
+		$r['txt_1'].' '.
+		$all.' '.
+		_end($all, $r['txt_2'], $r['txt_3'], $r['txt_4']);
+}
 function _spisokShow($pe, $next=0) {//список, выводимый на странице
 	/*
 	$pe:
@@ -61,7 +80,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 	$dialog = _dialogQuery(14);
 	$dv = $dialog['v_ass'];
 
-	define('SPISOK_LIMIT', $dv[$pe['num_2']]);//лимит
+	$limit = $dv[$pe['num_2']];//лимит
 
 	//диалог, через который вносятся данные списка
 	$dialog_id = $pe['num_3'];
@@ -78,7 +97,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 			FROM `".$spTable."`
 			WHERE "._spisokCond($pe)."
 			ORDER BY `dtime_add` DESC
-			LIMIT ".(SPISOK_LIMIT * $next).",".SPISOK_LIMIT;
+			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
 
@@ -172,10 +191,10 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 					}
 				}
 
-				if(SPISOK_LIMIT * ($next + 1) < $all) {
-					$count_next = $all - SPISOK_LIMIT * ($next + 1);
-					if($count_next > SPISOK_LIMIT)
-						$count_next = SPISOK_LIMIT;
+				if($limit * ($next + 1) < $all) {
+					$count_next = $all - $limit * ($next + 1);
+					if($count_next > $limit)
+						$count_next = $limit;
 					$html .=
 						'<tr class="over1" onclick="_spisokNext($(this),'.$pe['id'].','.($next + 1).')">'.
 							'<td colspan="20">'.
@@ -243,10 +262,10 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 					$html .= '</div>';
 				}
 
-				if(SPISOK_LIMIT * ($next + 1) < $all) {
-					$count_next = $all - SPISOK_LIMIT * ($next + 1);
-					if($count_next > SPISOK_LIMIT)
-						$count_next = SPISOK_LIMIT;
+				if($limit * ($next + 1) < $all) {
+					$count_next = $all - $limit * ($next + 1);
+					if($count_next > $limit)
+						$count_next = $limit;
 					$html .=
 						'<div class="mt5 over1" onclick="_spisokNext($(this),'.$pe['id'].','.($next + 1).')">'.
 							'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.

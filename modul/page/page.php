@@ -517,24 +517,7 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 				return 'фукнции не существует';
 			return $unit['txt_1']();
 		case 14: return _spisokShow($unit); //_spisok
-		case 15://количество строк списка
-			if(!$pe_id = $unit['num_1'])
-				return '—писок не указан.';
-
-			$sql = "SELECT *
-					FROM `_page_element`
-					WHERE `id`=".$pe_id;
-			if(!$pe = query_assoc($sql))
-				return 'Ёлемента, содержащего список, не существует.';
-
-			//если результат нулевой, выводитс€ сообщение из элемента, который размещает список
-			if(!$all = _spisokCountAll($pe))
-				return $pe['txt_1'];
-
-			return
-				$unit['txt_1'].' '.
-				$all.' '.
-				_end($all, $unit['txt_2'], $unit['txt_3'], $unit['txt_4']);
+		case 15:return _spisokElemCount($unit);//количество строк списка
 	}
 	return 'неизвестный элемент='.$unit['dialog_id'];
 }

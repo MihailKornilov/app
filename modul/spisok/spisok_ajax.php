@@ -124,8 +124,20 @@ switch(@$_POST['op']) {
 		if(!$peSpisok = query_assoc($sql))
 			jsonError('Нет нужного списка на странице');
 
-		$send['attr_id'] = '#pe_'.$peSpisok['id'];
-		$send['spisok'] = utf8(_spisokShow($peSpisok));
+		//элемент количества списка на странице, на которой расположен поиск
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `dialog_id`=15
+				  AND `page_id`=".$pe['page_id']."
+				  AND `num_1`=".$pe_id."
+				LIMIT 1";
+		if($peCount = query_assoc($sql)) {
+			$send['count_attr'] = '#pe_'.$peCount['id'];
+			$send['count_html'] = utf8(_spisokElemCount($peCount));
+		}
+
+		$send['spisok_attr'] = '#pe_'.$peSpisok['id'];
+		$send['spisok_html'] = utf8(_spisokShow($peSpisok));
 
 		jsonSuccess($send);
 		break;

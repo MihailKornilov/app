@@ -149,7 +149,7 @@ switch(@$_POST['op']) {
 		$send['element'] = _dialogEl();
 		$send['cmp_name'] = _dialogEl(0, 'name');
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr_edit');
-		$send['func'] = (object)_dialogFuncSpisok($dialog_id);
+		$send['func'] = (object)$dialog['func'];
 		$send['spisokOn'] = _dialogSpisokOn();
 		$send['page_list'] = _dialogPageList();
 		$send['html'] = utf8($html);
@@ -234,7 +234,7 @@ switch(@$_POST['op']) {
 		$send['button_edit_submit'] = utf8($dialog['button_edit_submit']);
 		$send['button_edit_cancel'] = utf8($dialog['button_edit_cancel']);
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr', array(), $page_id);
-		$send['func'] = _dialogFuncSpisok($dialog_id);
+		$send['func'] = $dialog['func'];
 		$send['html'] = utf8($html);
 		$send['data'] = $data;
 		jsonSuccess($send);
@@ -792,31 +792,6 @@ function _dialogFuncUpdate($dialog_id) {//обновление функций компонентов диалога
 			) VALUES ".implode(',', $insert);
 	query($sql);
 }
-function _dialogFuncSpisok($dialog_id) {//получение данных фукнциий компонентов диалога
-	if(!$dialog_id)
-		return array();
-
-	$sql = "SELECT *
-			FROM `_dialog_component_func`
-			WHERE `dialog_id`=".$dialog_id."
-			ORDER BY `component_id`,`id`";
-	if(!$arr = query_arr($sql))
-		return array();
-
-	$func = array();
-	foreach($arr as $r) {
-		if(!isset($func[$r['component_id']]))
-			$func[$r['component_id']] = array();
-
-		$func[$r['component_id']][] = array(
-			'action_id' => _num($r['action_id']),
-			'cond_id' => _num($r['cond_id']),
-			'ids' => $r['component_ids']
-		);
-	}
-
-	return $func;
-}
 
 function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диалога
 	if(!$arr = @$_POST['component'])
@@ -1040,19 +1015,10 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 	$html = '';
 	$edit = $i == 'html_edit' || $i == 'arr_edit';//редактирование + сортировка значений
 
-	$sql = "SELECT `label_width`
-			FROM `_dialog`
-			WHERE `id`=".$dialog_id;
-	$label_width = _num(query_value($sql));
+	$dialog = _dialogQuery($dialog_id);
 
-	$func = _dialogFuncSpisok($dialog_id);
-
-	$sql = "SELECT *
-			FROM `_dialog_component`
-			WHERE `dialog_id`=".$dialog_id."
-			ORDER BY `sort`";
-	if($spisok = query_arr($sql)) {
-		foreach($spisok as $r) {
+	if($cmp = $dialog['component']) {
+		foreach($cmp as $r) {
 			$type_id = _num($r['type_id']);
 			$type_7 = $type_id == 7 || $type_id == 9;//info & head
 			
@@ -1123,12 +1089,12 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 						'<div class="component-del icon icon-del'._tooltip('Удалить компонент', -59).'</div>'.
 						'<div class="component-edit icon icon-edit'._tooltip('Настроить компонент', -66).'</div>'.
 					(_dialogEl($type_id, 'func') ?
-						'<div class="component-func'.(empty($func[$r['id']]) ? '' : ' on').' icon icon-zp'._tooltip('Настроить функции', -61).'</div>'
+						'<div class="component-func'.($r['func'] ? ' on' : '').' icon icon-zp'._tooltip('Настроить функции', -61).'</div>'
 					: '')
 				: '').
 						'<div id="delem'.$r['id'].'">'.
 							'<table class="bs5 w100p">'.
-								'<tr><td class="label '.($type_7 ? '' : 'r').($edit ? ' label-width pr5' : '').'" '.($type_7 ? 'colspan="2"' : 'style="width:'.$label_width.'px"').'>'.
+								'<tr><td class="label '.($type_7 ? '' : 'r').($edit ? ' label-width pr5' : '').'" '.($type_7 ? 'colspan="2"' : 'style="width:'.$dialog['label_width'].'px"').'>'.
 										($r['label_name'] ? $r['label_name'].':' : '').
 										($r['require'] ? '<div class="dib red fs15 mtm2">*</div>' : '').
 										($r['hint'] ? ' <div class="icon icon-hint dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'"></div>' : '').
@@ -1167,7 +1133,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 
 		$sql = "SELECT *
 				FROM `_dialog_component_v`
-				WHERE `component_id` IN ("._idsGet($spisok).")
+				WHERE `component_id` IN ("._idsGet($cmp).")
 				ORDER BY `sort`";
 		$element_v = array();
 		if($spisok = query_arr($sql)) {

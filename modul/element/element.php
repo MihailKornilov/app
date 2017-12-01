@@ -182,17 +182,28 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	$sql = "SELECT *
 			FROM `_dialog_component_func`
 			WHERE `component_id` IN ("._idsGet($cmp).")
-			ORDER BY `sort`";
+			ORDER BY `component_id`,`id`";
+	$func = array();
 	foreach(query_arr($sql) as $r) {
 		$cmp[$r['component_id']]['func'][] = array(
-			'action_id' => $r['action_id'],
-			'cond_id' => $r['cond_id'],
+			'action_id' => _num($r['action_id']),
+			'cond_id' => _num($r['cond_id']),
 			'component_ids' => $r['component_ids']
 		);
 		$cmp[$r['component_id']]['func_action_ass'][$r['action_id']] = 1;
+
+		if(!isset($func[$r['component_id']]))
+			$func[$r['component_id']] = array();
+
+		$func[$r['component_id']][] = array(
+			'action_id' => _num($r['action_id']),
+			'cond_id' => _num($r['cond_id']),
+			'ids' => $r['component_ids']
+		);
 	}
 
 	$dialog['component'] = $cmp;
+	$dialog['func'] = $func;
 
 	//получение списка колонок, присутствующих в таблице
 	$col = array();

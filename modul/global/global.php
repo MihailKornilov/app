@@ -93,7 +93,7 @@ function _global_script() {//скрипты и стили
 	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui.css?'.TIME.'" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
-	'<script src="js/jquery.mjs.nestedSortable.js?'.TIME.'"></script>'.
+	'<script src="js/jquery.mjs.nestedSortable.js?1"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?'.TIME.'" />'.
 	'<script src="modul/global/global.js?'.TIME.'"></script>'.

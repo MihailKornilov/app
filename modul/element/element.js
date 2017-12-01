@@ -1323,7 +1323,7 @@ var VK_SCROLL = 0,
 				send.elem[sp.id] = $(sp.attr_id).val();
 
 				//сохранение значений функций
-				funcVal(sp.id, send.func, COMPONENT_FUNC);
+				funcVal(sp.id, send.func);
 			});
 
 			dialog.post(send, function(res) {
@@ -1334,12 +1334,14 @@ var VK_SCROLL = 0,
 				}
 			});
 		}
-		function funcVal(id, sf, func) {//получение значений функций
+		function funcVal(id, sf) {//получение значений функций
+			var func = COMPONENT_FUNC,
+				v = [], //переменная для сбора значений
+				join = 1;//производить ли объединение элементов после сбора
+
 			if(!func[id])
 				return;
 
-			var v = [], //переменная для сбора значений
-				join = 1;//производить ли объединение элементов после сбора
 			_forN(func[id], function(sp) {
 				var delem = $('#delem' + id);
 				if(sp.action_id == 5)

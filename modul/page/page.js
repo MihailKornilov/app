@@ -17,7 +17,8 @@ var _pageShow = function() {//выполнение после вывода страницы
 					obj._search('process');
 					_post(send, function(res) {
 						obj._search('cancel');
-						$(res.attr_id).html(res.spisok);
+						$(res.spisok_attr).html(res.spisok_html);
+						$(res.count_attr).html(res.count_html);
 					});
 				}
 			});

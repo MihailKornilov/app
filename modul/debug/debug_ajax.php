@@ -2,9 +2,18 @@
 
 if(SA)
 switch(@$_POST['op']) {
-	case 'cache_clear':
+	case 'cache_clear'://очистка xCache
 		_cache('clear', '_viewerCache'.VIEWER_ID);//текущий пользователь
 		_cache('clear', '_pageCache');//страницы
+
+		//диалоговые окна
+		$sql = "SELECT `id`
+				FROM `_dialog`
+				WHERE `app_id` IN(0,".APP_ID.")";
+		$arr = query_arr($sql);
+		foreach($arr as $r)
+			_cache('clear', '_dialogQuery'.$r['id']);
+
 		jsonSuccess();
 		break;
 	case 'cookie_clear':
