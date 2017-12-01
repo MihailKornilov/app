@@ -1789,7 +1789,8 @@ var VK_SCROLL = 0,
 					'<p class="mt10"><button class="vk" val="11">Данные объекта</button>' +
 					'<p class="mt10"><button class="vk green" val="2">Кнопка</button>' +
 					'<p class="mt10"><button class="vk" val="9">Ссылка</button>' +
-					'<p class="mt10"><button class="vk" val="14">Список</button>' +
+					'<p class="mt10"><button class="vk" val="15">Список: количество строк</button>' +
+					'<p class="mt10"><button class="vk" val="14">Список: содержание</button>' +
 			  (SA ? '<p class="mt10"><button class="vk red" val="12">SA: из функции</button>' : '') +
 				'</div>',
 			dialog = _dialog({

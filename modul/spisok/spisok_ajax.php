@@ -681,7 +681,6 @@ function _spisokUnitFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление знач
 				foreach($v as $r) {
 					$insert[] = "(
 						".$r['id'].",
-						".APP_ID.",
 						".$unit_id.",
 						'".$r['type']."',
 						'".$r['pos']."',
@@ -697,7 +696,7 @@ function _spisokUnitFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление знач
 						$idsEdit .= ','.$r['id'];
 				}
 
-				$sql = "DELETE FROM `".BASE_TABLE."`
+				$sql = "DELETE FROM `_page_element`
 						WHERE `parent_id`=".$unit_id."
 						  AND `id` NOT IN (".$idsEdit.")";
 				query($sql);
@@ -705,9 +704,8 @@ function _spisokUnitFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление знач
 				if(empty($insert))
 					return;
 
-				$sql = "INSERT INTO `".BASE_TABLE."` (
+				$sql = "INSERT INTO `_page_element`  (
 							`id`,
-							`app_id`,
 							`parent_id`,
 							`type`,
 							`pos`,

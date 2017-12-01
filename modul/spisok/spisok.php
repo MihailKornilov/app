@@ -1,6 +1,40 @@
 <?php
 
+function _spisokCond($pe) {//формирование строки с условиями поиска
+	//диалог, через который вносятся данные списка
+	$dialog = _dialogQuery($pe['num_3']);
+	$field = $dialog['field'];
 
+	$cond = "`id`";
+	if(isset($field['deleted']))
+		$cond = "!`deleted`";
+	if(isset($field['app_id']))
+		$cond .= " AND `app_id` IN (0,".APP_ID.")";
+	if(isset($field['dialog_id']))
+		$cond .= " AND `dialog_id`=".$pe['num_3'];
+
+	$cond .= _spisokFilterSearch($pe);
+
+	return $cond;
+}
+function _spisokCountAll($pe) {//получение общего количества строк списка
+	$key = 'SPISOK_COUNT_ALL'.$pe['id'];
+
+	if(defined($key))
+		return constant($key);
+
+	//диалог, через который вносятся данные списка
+	$dialog = _dialogQuery($pe['num_3']);
+
+	$sql = "SELECT COUNT(*)
+			FROM `".$dialog['base_table']."`
+			WHERE "._spisokCond($pe);
+	$all = _num(query_value($sql));
+
+	define($key, $all);
+
+	return $all;
+}
 function _spisokShow($pe, $next=0) {//список, выводимый на странице
 	/*
 	$pe:
@@ -36,26 +70,13 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 	$CMP = $spDialog['component']; //элементы списка
 	$spTable = $spDialog['base_table'];
 
-	$cond = "`id`";
-	if(isset($spDialog['field']['deleted']))
-		$cond = "!`deleted`";
-	if(isset($spDialog['field']['app_id']))
-		$cond .= " AND `app_id` IN (0,".APP_ID.")";
-	if(isset($spDialog['field']['dialog_id']))
-		$cond .= " AND `dialog_id`=".$dialog_id;
 
-	//получение общего количества строк
-	$sql = "SELECT COUNT(*)
-			FROM `".$spTable."`
-			WHERE ".$cond."
-			  "._spisokFilterSearch($pe, $spDialog);
-	$all = query_value($sql);
+	$all = _spisokCountAll($pe);
 
 	//получение данных списка
 	$sql = "SELECT *
 			FROM `".$spTable."`
-			WHERE ".$cond."
-			  "._spisokFilterSearch($pe, $spDialog)."
+			WHERE "._spisokCond($pe)."
 			ORDER BY `dtime_add` DESC
 			LIMIT ".(SPISOK_LIMIT * $next).",".SPISOK_LIMIT;
 	$spisok = query_arr($sql);
@@ -148,8 +169,6 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 								$html .= '<td class="'.implode(' ', $cls).'">'.$v;
 						}
 
-	//						if(strlen($val) && $el['col_name'] == $CMP[$comp_id]['col_name'])
-	//							$v = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $v, 1);
 					}
 				}
 
@@ -201,6 +220,17 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 										break;
 									case 2://значение колонки
 										$txt = $sp[$CMP[$r['num_4']]['col_name']];
+										if($val = _spisokFilterSearchVal($pe)) {
+											//ассоциативный массив колонок, по которым производится поиск
+											$colIds = _idsAss($pe['txt_3']);
+											//если по данной колонке поиск разрешён, то выделение цветом найденные символы
+											if(isset($colIds[$r['num_4']])) {
+												$val = utf8($val);
+												$txt = utf8($txt);
+												$txt = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $txt, 1);
+												$txt = win1251($txt);
+											}
+										}
 										break;
 									default: continue;
 								}
@@ -218,7 +248,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 					if($count_next > SPISOK_LIMIT)
 						$count_next = SPISOK_LIMIT;
 					$html .=
-						'<div class="over1" onclick="_spisokNext($(this),'.$pe['id'].','.($next + 1).')">'.
+						'<div class="mt5 over1" onclick="_spisokNext($(this),'.$pe['id'].','.($next + 1).')">'.
 							'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
 						'</div>';
 				}
@@ -229,25 +259,41 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 
 	return $html;
 }
-function _spisokFilterSearch($pe, $spDialog) {//получение значений фильтра-поиска для списка
-	//если поиск не производится ни по каким колонкам, то выход
-	if(!$colIds = _ids($pe['txt_3'], 1))
-		return '';
+function _spisokFilterSearchVal($pe) {//получение введённого значения в строку поиска, воздействующий на этот список
+	$key = 'ELEM_SEARCH_VAL'.$pe['id'];
 
-	//получение значения элемента поиска, содержащегося на странице, где находится список воздействующий на этот список
+	if(defined($key))
+		return constant($key);
+
 	$sql = "SELECT *
 			FROM `_page_element`
 			WHERE `page_id`=".$pe['page_id']."
 			  AND `dialog_id`=7
 			  AND `num_3`=".$pe['id'];
-	if(!$search = query_assoc($sql))
+	$el = query_assoc($sql);
+
+	define($key, $el['v']);
+
+	return $el['v'];
+}
+function _spisokFilterSearch($pe) {//получение значений фильтра-поиска для списка
+	//если поиск не производится ни по каким колонкам, то выход
+	if(!$colIds = _ids($pe['txt_3'], 1))
 		return '';
+
+	if(!$val = _spisokFilterSearchVal($pe))
+		return '';
+
+
+	//диалог, через который вносятся данные списка
+	$dialog = _dialogQuery($pe['num_3']);
+	$cmp = $dialog['component'];
 
 	$arr = array();
 	foreach($colIds as $cmp_id) {
-		if(empty($spDialog['component'][$cmp_id]))
+		if(empty($cmp[$cmp_id]))
 			continue;
-		$arr[] = "`".$spDialog['component'][$cmp_id]['col_name']."` LIKE '%".addslashes($search['v'])."%'";
+		$arr[] = "`".$cmp[$cmp_id]['col_name']."` LIKE '%".addslashes($val)."%'";
 	}
 
 	if(empty($arr))
