@@ -439,6 +439,19 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+
+	case 'spisok_select_get'://получение списка для селекта
+		if(!$dialog_id = _num($_POST['dialog_id']))
+			jsonError('Некорректный ID диалога');
+		if(!$cmp_id = _num($_POST['cmp_id']))
+			jsonError('Некорректный ID компонента диалога');
+
+		$v = _txt($_POST['v']);
+
+		$send['spisok'] = _spisokList($dialog_id, $cmp_id, $v);
+
+		jsonSuccess($send);
+		break;
 }
 
 

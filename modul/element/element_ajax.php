@@ -233,7 +233,7 @@ switch(@$_POST['op']) {
 		$send['head_edit'] = utf8($dialog['head_edit']);
 		$send['button_edit_submit'] = utf8($dialog['button_edit_submit']);
 		$send['button_edit_cancel'] = utf8($dialog['button_edit_cancel']);
-		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr', array(), $page_id);
+		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr', $data, $page_id);
 		$send['func'] = $dialog['func'];
 		$send['html'] = utf8($html);
 		$send['data'] = $data;
@@ -1124,6 +1124,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 				'func_flag' => _dialogEl($type_id, 'func'), //может ли содержать функцию
 
 				'col_name' => $r['col_name'],
+				'val' => $val,//выбранное значение
 
 				'attr_id' => '#'.$attr_id,
 
@@ -1156,8 +1157,8 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 					case 2://все списки или с конкретной страницы
 						$arr[$n]['v'] = $r['num_5'] ? _dialogSpisokOnPage($page_id) : _dialogSpisokOn();
 						break;
-					case 3://получение значений конкретного объекта
-						$arr[$n]['v'] = _spisokList($r['num_1'], $r['num_2']);
+					case 3://получение списка по значениям конкретного объекта
+						$arr[$n]['v'] = _spisokList($r['num_1'], $r['num_2'], '', $r['val']);
 						break;
 					case 4://список объектов, которые поступают на страницу через GET
 						$arr[$n]['v'] = _dialogSpisokGetPage($page_id);

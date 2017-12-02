@@ -1401,14 +1401,30 @@ var VK_SCROLL = 0,
 				break;
 			}
 			case 2: /* select */ {
+				funcKeyup = ch.num_4 != 3 ? undefined : function(v, t) {
+					if(t.isProcess())
+						return;
+					t.process();
+					var send = {
+						op:'spisok_select_get',
+						dialog_id:ch.num_1,
+						cmp_id:ch.num_2,
+						v:v
+					};
+					_post(send, function(res) {
+									t.spisok(res.spisok);
+								},
+								function() { t.cancel() })
+				};
 				$(ch.attr_id)._select({
 					width:ch.width,
 					title0:ch.num_3 ? ch.txt_1 : '',
-					write:ch.num_4 == 3,
+					write_save:ch.num_4 == 3,
 					spisok:ch.v,
 					func:function(v) {
 						_dialogCmpFunc(ch.id, v, isEdit);
-					}//,					funcKeyup:function() {					}
+					},
+					funcKeyup:funcKeyup
 				});
 				if(isEdit) {
 					$(ch.attr_id)
@@ -2715,6 +2731,7 @@ $.fn._select = function(o, o1, o2) {
 			s = window[id + '_select'];
 			switch(o) {
 				case 'process': s.process(); break;
+				case 'is_process': return s.isProcess();
 				case 'load'://загрузка нового списка
 					s.process();
 					_post(o1, function(res) {
@@ -2785,16 +2802,16 @@ $.fn._select = function(o, o1, o2) {
 		funcKeyup:funcKeyup	// функция, выполняемая при вводе в INPUT в селекте. Нужна для вывода списка из вне, например, Ajax-запроса, либо из vk api.
 	}, o);
 
-	o.clear = o.write && !o.multiselect;
-
 	if(o.multiselect || o.write_save)
 		o.write = true;
+
+	o.clear = o.write && !o.multiselect;
 
 	var inpWidth = o.width - 17 - 5 - 4;
 	if(o.funcAdd)
 		inpWidth -= 18;
 	if(o.clear) {
-		inpWidth -= 18;
+		inpWidth -= 24;
 		val = _num(val);
 	}
 	var html =
@@ -2812,7 +2829,7 @@ $.fn._select = function(o, o1, o2) {
 							   'style="width:' + inpWidth + 'px' +
 									(o.write && !o.disabled? '' : ';cursor:default') + '"' +
 									(o.write && !o.disabled? '' : ' readonly') + ' />' +
-					(o.clear ? '<div' + (val ? '' : ' style="display:none"') + ' class="clear' + _tooltip('Очистить', -51, 'r') + '</div>' : '') +
+					(o.clear ? '<div class="icon icon-del mt5 fr' + _dn(val) + _tooltip('Очистить', -49, 'r') + '</div>' : '') +
 	   (o.funcAdd ? '<td class="seladd">' : '') +
 					'<td class="selug">' +
 			'</table>' +
@@ -2823,7 +2840,7 @@ $.fn._select = function(o, o1, o2) {
 
 	var select = t.next(),
 		inp = select.find('.selinp'),
-		inpClear = select.find('.clear'),
+		inpClear = select.find('.icon-del'),
 		sel = select.find('.selsel'),
 		res = select.find('.selres'),
 		resH, //Высота списка до обрезания
@@ -2897,10 +2914,10 @@ $.fn._select = function(o, o1, o2) {
 				if(keys[e.keyCode])
 					return;
 				title0bg[inp.val() || multiCount ? 'hide' : 'show']();
-				inpClear[inp.val() ? 'show' : 'hide']();
+				inpClear._dn(inp.val());
 				if(keyVal != inp.val()) {
 					keyVal = inp.val();
-					o.funcKeyup(keyVal);
+					o.funcKeyup(keyVal, t);
 					t.val(0);
 					val = 0;
 				}
@@ -2911,7 +2928,9 @@ $.fn._select = function(o, o1, o2) {
 			setVal(0);
 			inp.val('');
 			title0bg.show();
+			inpClear._dn(0);
 			o.func(0, id);
+			o.funcKeyup('', t);
 		});
 	}
 
@@ -3058,7 +3077,7 @@ $.fn._select = function(o, o1, o2) {
 		}
 		val = v;
 		t.val(v);
-		inpClear[v ? 'show' : 'hide']();
+		inpClear,_dn(v);
 		if(v || !v && !o.write_save) {
 			inp.val(ass[v] ? ass[v].replace(/&quot;/g,'"') : '');
 			title0bg[v == 0 ? 'show' : 'hide']();
@@ -3153,7 +3172,7 @@ $.fn._select = function(o, o1, o2) {
 			if(o.write && !val) {
 				if(inp.val() && !o.write_save) {
 					inp.val('');
-					o.funcKeyup('');
+					o.funcKeyup('', t);
 				}
 				setVal(0);
 				o.func(0, id);
@@ -3168,6 +3187,9 @@ $.fn._select = function(o, o1, o2) {
 	t.value = setVal;
 	t.process = function() {//Показ ожидания загрузки в selinp
 		inp.addClass('_busy');
+	};
+	t.isProcess = function() {//проверка наличия ожидания загрузки в selinp
+		return inp.hasClass('_busy');
 	};
 	t.cancel = function() {//Отмена ожидания загрузки в selinp
 		inp.removeClass('_busy');

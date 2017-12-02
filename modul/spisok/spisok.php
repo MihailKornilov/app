@@ -54,6 +54,35 @@ function _spisokElemCount($r) {//формирование элемента с содержанием количества 
 		$all.' '.
 		_end($all, $r['txt_2'], $r['txt_3'], $r['txt_4']);
 }
+function _spisokInc($dialog, $spisok) {//вложенные списки
+	$send = array();
+
+	//поиск компонента диалога с вложенным списком
+	foreach($dialog['component'] as $cmp_id => $cmp) {
+		//если не селект
+		if($cmp['type_id'] != 2)
+			continue;
+
+		//если не является вложенным списком
+		if($cmp['num_4'] != 3)
+			continue;
+
+		//выборка будет производиться только по нужным строкам списка
+		if(!$ids = _idsGet($spisok, $cmp['col_name']))
+			continue;
+
+		//получение данных из вложенного списка
+		$incDialog = _dialogQuery($cmp['num_1']);
+		$sql = "SELECT *
+				FROM `".$incDialog['base_table']."`
+				WHERE `app_id`=".APP_ID."
+				  AND `dialog_id`=".$cmp['num_1']."
+				  AND `id` IN (".$ids.")";
+		$send[$cmp['num_1']] = query_arr($sql);
+	}
+
+	return $send;
+}
 function _spisokShow($pe, $next=0) {//список, выводимый на странице
 	/*
 	$pe:
@@ -100,7 +129,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
-
+	$inc = _spisokInc($spDialog, $spisok);
 
 	$html = '<div class="_empty">'._br($pe['txt_1']).'</div>';
 
@@ -163,11 +192,13 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 									$v = $sp[$el['col_name']];
 
 								$cls = array();
-								if($el['type_id'] == 1) {//галочка
+								//галочка
+								if($el['type_id'] == 1) {
 									$cls[] = 'center';
 									$v = $v ? '<div class="icon icon-ok curD"></div>' : '';
 								}
-								if(@$ex[3]) {//ссылка
+								//ссылка
+								if(@$ex[3]) {
 									//по умолчанию текущая страница
 									$link = '&p='.$page_id;
 
@@ -184,6 +215,19 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 										$link = '&p='.$spDialog['action_page_id'].'&id='.$sp['id'];
 
 									$v = '<a href="'.URL.$link.'"'._dn(!$pe['num_7'], 'class="fs12"').'>'.$v.'</a>';
+								}
+								//элемент другого списка
+								if($el['type_id'] == 2)
+									if($el['num_4'] == 3) {
+										$incDialog = _dialogQuery($el['num_1']);
+										$col_name = $incDialog['component'][$el['num_2']]['col_name'];
+
+										$unit_id = $v;
+										$v = $inc[$el['num_1']][$v][$col_name];
+
+										if($incDialog['action_id'] == 2)
+											$v = '<a href="'.URL.'&p='.$incDialog['action_page_id'].'&id='.$unit_id.'">'.$v.'</a>';
+
 								}
 								$html .= '<td class="'.implode(' ', $cls).'">'.$v;
 						}
@@ -321,24 +365,28 @@ function _spisokFilterSearch($pe) {//получение значений фильтра-поиска для списк
 	return " AND (".implode($arr, ' OR ').")";
 }
 
-function _spisokList($dialog_id, $component_id) {//массив списков (пока только для select)
+function _spisokList($dialog_id, $component_id, $v='', $unit_id=0) {//массив списков (пока только для select)
 	$dialog = _dialogQuery($dialog_id);
 
-	$sql = "SELECT `col_name`
-			FROM `_dialog_component`
-			WHERE `id`=".$component_id;
-	if(!$colName = query_value($sql))
+	if(!$colName = $dialog['component'][$component_id]['col_name'])
 		$colName = 'id';
 
 	//отображение списка страниц определённым образом
 	if($dialog['base_table'] == '_page')
 		return _dialogPageList();
 
+	$cond = "`app_id`=".APP_ID."
+		 AND `dialog_id`=".$dialog_id;
+	if($v)
+		$cond .= " AND `".$colName."` LIKE '%".addslashes($v)."%'";
+	if($unit_id)
+		$cond .= " AND `id`<=".$unit_id;
+
 	$sql = "SELECT `id`,`".$colName."`
 			FROM `".$dialog['base_table']."`
-			WHERE `app_id`=".APP_ID."
-			ORDER BY `id`
-			LIMIT 10";
+			WHERE ".$cond."
+			ORDER BY `id` DESC
+			LIMIT 50";
 	return query_selArray($sql);
 }
 

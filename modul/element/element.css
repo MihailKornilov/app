@@ -351,9 +351,8 @@
 	margin:2px 2px 0;
 	background-color:transparent;
 }
-._select .selinp._busy{background-position:right center}
+._select .selinp._busy{background-position:right center;color:#000}
 ._select.disabled .selinp{color:#777}
-._select .clear{float:right;margin:7px 3px 0 0}
 ._select .selug{
 	width:16px;
 	border-left:#fff solid 1px;
