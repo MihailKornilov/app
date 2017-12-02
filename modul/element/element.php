@@ -27,9 +27,10 @@ function _button($v=array()) {//кнопка из контакта
 	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
 	$color = empty($v['color']) ? '' : ' '.$v['color'];
 	$small = empty($v['small']) ? '' : ' small';
+	$cls = empty($v['class']) ? '' : ' '.$v['class'];
 
 	return
-	'<button class="vk'.$color.$small.'"'.$click.'>'.
+	'<button class="vk'.$color.$small.$cls.'"'.$click.'>'.
 		$name.
 	'</button>';
 }
@@ -405,7 +406,7 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
 
 		2 => /* *** выпадающий список ***
 				num_3 - использовать или нет нулевое значение
-                txt_1  - текст нулевого значения
+                txt_1 - текст нулевого значения
 				num_4:  0 - данных нет
 						1 - произвольные значения
 						2 - использование всех списков при выборе

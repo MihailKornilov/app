@@ -1404,10 +1404,11 @@ var VK_SCROLL = 0,
 				$(ch.attr_id)._select({
 					width:ch.width,
 					title0:ch.num_3 ? ch.txt_1 : '',
+					write:ch.num_4 == 3,
 					spisok:ch.v,
 					func:function(v) {
 						_dialogCmpFunc(ch.id, v, isEdit);
-					}
+					}//,					funcKeyup:function() {					}
 				});
 				if(isEdit) {
 					$(ch.attr_id)

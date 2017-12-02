@@ -279,7 +279,7 @@ function _pageShow($page_id, $blockShow=0) {
 	'<div class="pbsort0 prel">'.
 		$send.
 	'</div>'.
-	_pageSpisokUnit().
+//	_pageSpisokUnit().
 
 (PAS ?
 	'<div id="page-block-add" class="center mt1 pad15 bg-gr1 bor-f0 over1 curP'._dn($blockShow).'">'.
@@ -446,6 +446,12 @@ function _pageElemPas($r) {
 function _pageElemUnit($unit) {//формирование элемента страницы
 	switch($unit['dialog_id']) {
 		case 2://button
+			/*
+				txt_1 - текст кнопки
+				num_1 - цвет
+				num_2 - маленькая кнопка
+				num_3 - максимальная ширина
+			*/
 			$color = array(
 				0 => '',        //Синий - по умолчанию
 				321 => '',      //Синий
@@ -460,7 +466,8 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 						'name' => $unit['txt_1'],
 						'click' => '_dialogOpen('._dialogValToId('button'.$unit['id']).')',
 						'color' => $color[$unit['num_1']],
-						'small' => $unit['num_2']
+						'small' => $unit['num_2'],
+						'class' => $unit['num_3'] ? 'w100p' : ''
 					));
 		case 3://menu
 			return _pageElemMenu($unit);
@@ -516,8 +523,8 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 			if(!function_exists($unit['txt_1']))
 				return 'фукнции не существует';
 			return $unit['txt_1']();
-		case 14: return _spisokShow($unit); //_spisok
-		case 15:return _spisokElemCount($unit);//количество строк списка
+		case 14: return _spisokShow($unit); //содержание списка
+		case 15: return _spisokElemCount($unit);//текст с количеством строк списка
 	}
 	return 'неизвестный элемент='.$unit['dialog_id'];
 }
@@ -595,7 +602,7 @@ function _pageElemMenu($unit) {//элемент страницы: Меню
 
 
 
-function _pageSpisokUnit() {
+function _pageSpisokUnit() {//todo для тестов
 	if(!$unit_id = _num(@$_GET['id']))
 		return '';
 

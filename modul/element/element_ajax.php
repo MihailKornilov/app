@@ -1032,7 +1032,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 					$val = @$data[$r['col_name']];
 			}
 
-			$val = _dialogComponent_autoSelectPage($val, $r, $page_id);
+//			$val = _dialogComponent_autoSelectPage($val, $r, $page_id);
 			$val = _dialogComponent_defSet($val, $r, $i != 'html' || isset($data['id']));
 
 			$attr_id = 'elem'.$r['id'];
@@ -1174,7 +1174,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 
 	return $html;
 }
-function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страницы по умолчанию, если список добавляется на страницу, кнопка этого списка на данной странице
+function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страницы по умолчанию, если список добавляется на страницу, кнопка этого списка на данной странице todo пока отменено
 	//выбранное значениe не меняется
 	if($val)
 		return $val;

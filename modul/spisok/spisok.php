@@ -337,7 +337,8 @@ function _spisokList($dialog_id, $component_id) {//массив списков (пока только д
 	$sql = "SELECT `id`,`".$colName."`
 			FROM `".$dialog['base_table']."`
 			WHERE `app_id`=".APP_ID."
-			ORDER BY `id`";
+			ORDER BY `id`
+			LIMIT 10";
 	return query_selArray($sql);
 }
 
