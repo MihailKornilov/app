@@ -264,7 +264,8 @@ switch(@$_POST['op']) {
 		$labelName[] = array(
 			'uid' => -1,
 			'title' => utf8('Порядковый номер'),
-			'content' => utf8('<div class="color-pay">Порядковый номер</div>')
+			'content' => utf8('<div class="color-pay">Порядковый номер</div>'),
+			'link_on' => 1
 		);
 
 		$arrDef = array();//массив колонок по умолчанию, если настройка списка производится впервые

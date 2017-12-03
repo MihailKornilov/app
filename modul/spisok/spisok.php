@@ -104,8 +104,6 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 
 	$next: очередной блок списка, ограниченная $pe['num_2']
 	*/
-	$page_id = $pe['page_id'];
-
 	$dialog = _dialogQuery(14);
 	$dv = $dialog['v_ass'];
 
@@ -165,7 +163,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 						$ex = explode('&', $col);
 						switch($ex[0]) {
 							case -1://num
-								$html .= '<td class="w15 grey r">'.$sp['num'];
+								$html .= '<td class="w15 grey r">'._spisokColLink($sp['num'], $pe, $sp, $col);
 								break;
 							case -2://дата
 								$tooltip = '">';
@@ -197,25 +195,6 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 									$cls[] = 'center';
 									$v = $v ? '<div class="icon icon-ok curD"></div>' : '';
 								}
-								//ссылка
-								if(@$ex[3]) {
-									//по умолчанию текущая страница
-									$link = '&p='.$page_id;
-
-									//если таблица является страницей, то ссылка перехода на страницу
-									if($spTable == '_page')
-										$link = '&p='.$sp['id'];
-
-									//если список пользователей, то переход на страницу приложений пользователя от его имени todo временно
-									if($spTable == '_vkuser')
-										$link = '&viewer_id='.$sp['viewer_id'];
-
-									//если указана страница перехода после создания элемента списка
-									if($spDialog['action_id'] == 2)
-										$link = '&p='.$spDialog['action_page_id'].'&id='.$sp['id'];
-
-									$v = '<a href="'.URL.$link.'"'._dn(!$pe['num_7'], 'class="fs12"').'>'.$v.'</a>';
-								}
 								//элемент другого списка
 								if($el['type_id'] == 2)
 									if($el['num_4'] == 3) {
@@ -229,9 +208,10 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 											$v = '<a href="'.URL.'&p='.$incDialog['action_page_id'].'&id='.$unit_id.'">'.$v.'</a>';
 
 								}
-								$html .= '<td class="'.implode(' ', $cls).'">'.$v;
+								$v = _spisokColSearchBg($v, $pe, $el['id']);
+								$html .= '<td class="'.implode(' ', $cls).'">'.
+											_spisokColLink($v, $pe, $sp, $col);
 						}
-
 					}
 				}
 
@@ -283,17 +263,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 										break;
 									case 2://значение колонки
 										$txt = $sp[$CMP[$r['num_4']]['col_name']];
-										if($val = _spisokFilterSearchVal($pe)) {
-											//ассоциативный массив колонок, по которым производится поиск
-											$colIds = _idsAss($pe['txt_3']);
-											//если по данной колонке поиск разрешён, то выделение цветом найденные символы
-											if(isset($colIds[$r['num_4']])) {
-												$val = utf8($val);
-												$txt = utf8($txt);
-												$txt = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $txt, 1);
-												$txt = win1251($txt);
-											}
-										}
+										$txt = _spisokColSearchBg($txt, $pe, $r['num_4']);
 										break;
 									default: continue;
 								}
@@ -322,6 +292,50 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 
 	return $html;
 }
+function _spisokColLink($txt, $pe, $sp, $col) {//обёртка значения колонки в ссылку, если нужно
+	$ex = explode('&', $col);
+
+	if(!@$ex[3])
+		return $txt;
+
+	//диалог, через который вносятся данные списка
+	$dialog = _dialogQuery($pe['num_3']);
+
+	//по умолчанию текущая страница
+	$link = '&p='.$pe['page_id'];
+
+	//если таблица является страницей, то ссылка перехода на страницу
+	if($dialog['base_table'] == '_page')
+		$link = '&p='.$sp['id'];
+
+	//если список пользователей, то переход на страницу приложений пользователя от его имени todo временно
+	if($dialog['base_table'] == '_vkuser')
+		$link = '&viewer_id='.$sp['viewer_id'];
+
+	//если указана страница перехода после создания элемента списка
+	if($dialog['action_id'] == 2)
+		$link = '&p='.$dialog['action_page_id'].'&id='.$sp['id'];
+
+	return '<a href="'.URL.$link.'"'._dn(!$pe['num_7'], 'class="fs12"').'>'.$txt.'</a>';
+}
+function _spisokColSearchBg($txt, $pe, $cmp_id) {//подсветка значения колонки при текстовом (быстром) поиске
+	$val = _spisokFilterSearchVal($pe);
+	if(!strlen($val))
+		return $txt;
+
+	//ассоциативный массив колонок, по которым производится поиск
+	$colIds = _idsAss($pe['txt_3']);
+	//если по данной колонке поиск разрешён, то выделение цветом найденные символы
+	if(!isset($colIds[$cmp_id]))
+		return $txt;
+
+	$val = utf8($val);
+	$txt = utf8($txt);
+	$txt = preg_replace(_regFilter($val), '<em class="fndd'._dn(!$pe['num_7'], 'fs12').'">\\1</em>', $txt, 1);
+	$txt = win1251($txt);
+
+	return $txt;
+}
 function _spisokFilterSearchVal($pe) {//получение введённого значения в строку поиска, воздействующий на этот список
 	$key = 'ELEM_SEARCH_VAL'.$pe['id'];
 
@@ -344,7 +358,8 @@ function _spisokFilterSearch($pe) {//получение значений фильтра-поиска для списк
 	if(!$colIds = _ids($pe['txt_3'], 1))
 		return '';
 
-	if(!$val = _spisokFilterSearchVal($pe))
+	$val = _spisokFilterSearchVal($pe);
+	if(!strlen($val))
 		return '';
 
 
