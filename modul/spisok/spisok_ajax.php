@@ -351,18 +351,16 @@ switch(@$_POST['op']) {
 							'txt_2' => utf8($txt_2),
 							'num_4' => _num($r['num_4'], 1),
 							'fontAllow' => 1,
-							'type' => $r['type'],
+							'display' => $r['display'],
 							'pos' => $r['pos'],
+							'w' => _num($r['w']),
 							'color' => $r['color'],
 							'font' => $r['font'],
 							'size' => $size,
 							'pad' => $r['pad'],
 						);
-						$tmpHtml .=
-							'<div id="pe_'.$id.'" class="pe prel '.$r['type'].' '.$r['pos'].' '.$r['color'].' '.$r['font'].' '.$r['size'].'"'._pageElemStyle($r).' val="'.$id.'">'.
-								'<div class="elem-pas" val="'.$id.'"></div>'.
-								$txt.
-							'</div>';
+						$pas = '<div class="elem-pas" val="'.$id.'"></div>';
+						$tmpHtml .= _pageElem($r, $txt, $pas);
 					}
 
 				$html =
@@ -708,8 +706,9 @@ function _spisokUnitFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление знач
 					$insert[] = "(
 						".$r['id'].",
 						".$unit_id.",
-						'".$r['type']."',
+						'".$r['display']."',
 						'".$r['pos']."',
+						".$r['w'].",
 						'".$r['color']."',
 						'".$r['font']."',
 						'fs".$r['size']."',
@@ -733,8 +732,9 @@ function _spisokUnitFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление знач
 				$sql = "INSERT INTO `_page_element`  (
 							`id`,
 							`parent_id`,
-							`type`,
+							`display`,
 							`pos`,
+							`w`,
 							`color`,
 							`font`,
 							`size`,
@@ -746,6 +746,7 @@ function _spisokUnitFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление знач
 						ON DUPLICATE KEY UPDATE
 							`type`=VALUES(`type`),
 							`pos`=VALUES(`pos`),
+							`w`=VALUES(`w`),
 							`color`=VALUES(`color`),
 							`font`=VALUES(`font`),
 							`size`=VALUES(`size`),

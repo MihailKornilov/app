@@ -107,7 +107,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 	$dialog = _dialogQuery(14);
 	$dv = $dialog['v_ass'];
 
-	$limit = $dv[$pe['num_2']];//лимит
+	$limit = PAS ? 3 : $dv[$pe['num_2']];//лимит
 
 	//диалог, через который вносятся данные списка
 	$dialog_id = $pe['num_3'];
@@ -268,10 +268,8 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 									default: continue;
 								}
 						}
-						$html .=
-						'<div class="'.$r['type'].' '.$r['pos'].' '.$r['color'].' '.$r['font'].' '.$r['size'].'"'._pageElemStyle($r).'>'.
-							$txt.
-						'</div>';
+						$r['tmp'] = 1;
+						$html .= _pageElem($r, $txt);
 					}
 					$html .= '</div>';
 				}

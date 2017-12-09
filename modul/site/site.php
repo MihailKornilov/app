@@ -134,7 +134,7 @@ function _header_pas() {//отображение ссылки настройки страницы
 	if(!$page['app_id'] && !SA)
 		return '';
 
-	return '<button id="page_setup" class="vk small fr mt3 mr40 '.(PAS ? 'green' : 'grey').'">Page setup</button>';
+	return '<button id="page_setup" class="vk small fr mt3 mr40 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
 }
 
 

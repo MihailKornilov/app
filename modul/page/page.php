@@ -187,9 +187,6 @@ function _pageSetupMenu() {//строка меню управления страницей
 		'<div class="p pad5">'.
 
 			'<div class="fr mtm3">'.
-				'<div class="pad5 w35 wsnw mr5 fl dn">'.
-					'<div id="pas-sort" class="pl icon icon-sort'._tooltip('Сортировать блоки', -59).'</div>'.
-				'</div>'.
 				'<div class="icon-page-tmp"></div>'.
 			'</div>'.
 
@@ -206,13 +203,8 @@ function _pageSetupMenu() {//строка меню управления страницей
 //	'<script>_pas()</script>';
 }
 
-
+/*
 function _pageShow($page_id, $blockShow=0) {
-	if(!$page = _page($page_id))
-		return _contentMsg();
-
-	if(!SA && $page['sa'])
-		return _contentMsg();
 
 	//получение списка блоков
 	$sql = "SELECT *
@@ -294,10 +286,110 @@ function _pageShow($page_id, $blockShow=0) {
 
 	'<script>_pageShow()</script>';
 }
-function _pageBlockStyle($r) {//стили css для блока
+*/
+
+function _pageShow($page_id) {
+	if(!$page = _page($page_id))
+		return _contentMsg();
+
+	if(!SA && $page['sa'])
+		return _contentMsg();
+
+	return _blockTabGet($page_id);
+}
+function _blockTabGet($page_id, $div_id=0) {
+	$sql = "SELECT
+				*,
+				'' `elem`
+			FROM `_block`
+			WHERE `page_id`=".$page_id."
+			ORDER BY `y`,`x`";
+	if(!$arr = query_arr($sql))
+		return '';
+
+/*	//расстановка элементов в блоки
+	$sql = "SELECT *
+			FROM `_page_element`
+			WHERE `page_id`=".$page_id."
+			ORDER BY `sort`";
+	foreach(query_arr($sql) as $r)
+		$arr[$r['block_id']]['elem'] = $r;
+*/
+
+	//составление структуры блоков по строкам
+	$block = array();
+	foreach($arr as $r) {
+		$block[$r['y']][] = $r;
+	}
+
+
+	$send = '';
+	$BT = PAS ? ' bor-t-dash' : '';
+	$BR = PAS ? ' bor-r-dash' : '';
+	$br1px = PAS ? 1 : 0;
+	foreach($block as $y => $str) {
+		$r = $str[0];
+
+		$cls = PAS ? 'block-unit ' : 'bl ';
+		$cls .= $r['bg'];
+		$cls .= PAS && !$div_id ? 'over3 ' : '';
+		if($r['id'] == $div_id)
+			$cls = 'block-unit-div ';
+
+		$bt = $y ? $BT : '';
+		$h = 'min-height:'.$r['height'].'px';
+
+		if(count($str) == 1 && !$r['x'] && $r['w'] == 50) {
+			$send .= '<div id="bl_'.$r['id'].'" class="'.$cls.$bt.'" style="'._blockStyle($r).$h.'" val="'.$r['id'].'">'.
+//						_pageElemUnit($r['elem']).
+						_blockUnitGrid($div_id, $r).
+					 '</div>';
+			continue;
+		}
+
+		$send .=
+			'<table style="table-layout:fixed;width:1000px;'.$h.'">'.
+				'<tr>';
+		//пустота в начале
+		if($r['x'])
+			$send .= '<td class="'.$bt.$BR.'" style="width:'.($r['x'] * 20 - $br1px).'px">';
+		foreach($str as $n => $r) {
+			if($r['id'] == $div_id)
+				$cls = 'block-unit-div ';
+			$next = @$str[$n + 1];
+			$xEnd = !(50 - $r['x'] - $r['w']);
+			$send .= '<td id="bl_'.$r['id'].'"'.
+						' class="top '.$cls.$bt.(!$xEnd ? $BR : '').'"'.
+						' style="'._blockStyle($r).'width:'.($r['width'] - $br1px).'px"'.
+						' val="'.$r['id'].'">'.
+//	    					_pageElemUnit($r['elem']);
+							_blockUnitGrid($div_id, $r);
+
+			//пустота в середине
+			if($next)
+				if($next['x'] > $r['x'] + $r['w']) {
+					$w = $next['x'] - $r['x'] - $r['w'];
+					$send .= '<td class="'.$bt.$BR.'" style="width:'.($w * 20 - $br1px).'px">';
+				}
+
+			//пустота в конце
+			if(!$next && $r['x'] + $r['w'] < 50)
+				$send .= '<td  class="'.$bt.'" style="width:'.((50 - $r['x'] - $r['w']) * 20).'px">';
+		}
+		$send .= '</table>';
+	}
+
+	$send .=
+	'<script>'.
+		'var BLOCK_ARR={'._blockArr($arr).'};'.
+	'</script>';
+
+	return $send;
+}
+function _blockStyle($r) {//стили css для блока
 	$send = array();
 
-	//отступы
+/*	//отступы
 	$ex = explode(' ', $r['pad']);
 	foreach($ex as $px)
 		if($px) {
@@ -308,7 +400,7 @@ function _pageBlockStyle($r) {//стили css для блока
 				$ex[3].($ex[3] ? 'px' : '');
 			break;
 		}
-
+*/
 	//границы
 	$ex = explode(' ', $r['bor']);
 	foreach($ex as $i => $b) {
@@ -322,14 +414,106 @@ function _pageBlockStyle($r) {//стили css для блока
 		}
 	}
 
-	if($r['w'])
-		$send[] = 'width:'.$r['w'].'px';
-
 	if(!$send)
 		return '';
 
-	return ' style="'.implode(';', $send).'"';
+	return implode(';', $send).';';
 }
+function _blockArr($arr) {//массив настроек блоков в формате JS
+	if(empty($arr))
+		return '';
+
+	$send = array();
+	foreach($arr as $r) {
+		$send[] = $r['id'].':{'.
+			'id:'.$r['id'].','.
+			'bg:"'.$r['bg'].'",'.
+			'bor:"'.$r['bor'].'"'.
+		'}';
+	}
+	return implode(',', $send);
+}
+function _blockEditGet($page_id) {
+	$sql = "SELECT
+				*,
+				'' `elem`
+			FROM `_block`
+			WHERE `page_id`=".$page_id."
+			ORDER BY `y`,`x`";
+	if(!$arr = query_arr($sql))
+		return '';
+/*
+	//расстановка элементов в блоки
+	$sql = "SELECT *
+			FROM `_page_element`
+			WHERE `page_id`=".$page_id."
+			ORDER BY `sort`";
+	foreach(query_arr($sql) as $r)
+		$arr[$r['block_id']]['elem'] = $r;
+*/
+	$send = '';
+	foreach($arr as $r) {
+		$send .=
+	    '<div id="pb_'.$r['id'].'" class="grid-stack-item" data-gs-x="'.$r['x'].'" data-gs-y="'.$r['y'].'" data-gs-width="'.$r['w'].'" data-gs-height="'.$r['h'].'">'.
+			'<div class="grid-stack-item-content">'._pageElemUnit($r['elem']).'</div>'.
+			'<div class="grid-stack-item-del">x</div>'.
+	    '</div>';
+	}
+
+	return $send;
+}
+function _blockUnitGrid($block_id, $block) {//деление блока на части
+	if(!$block_id)
+		return '';
+	if($block_id != $block['id'])
+		return '';
+
+	return
+		'<div id="grid-child" class="prel"></div>'.
+		'<div class="pad5 bor-e8 fs14 center color-555 curP over1 mt1" id="grid-child-add">Добавить блок</div> '.
+		'<div class="pad5 center">'.
+			'<button class="vk small" id="grid-child-save">Сохранить</button>'.
+			'<button class="vk small cancel ml5" id="grid-child-cancel">Отмена</button>'.
+		'</div>';
+
+
+	$sql = "SELECT
+				*,
+				'' `elem`
+			FROM `_block`
+			WHERE `page_id`=".$page_id."
+			ORDER BY `y`,`x`";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$send = '';
+	foreach($arr as $r) {
+		$send .=
+	    '<div id="pb_'.$r['id'].'" class="grid-child-item" data-gs-x="'.$r['x'].'" data-gs-y="'.$r['y'].'" data-gs-width="'.$r['w'].'" data-gs-height="'.$r['h'].'">'.
+			'<div class="grid-stack-item-content">'._pageElemUnit($r['elem']).'</div>'.
+			'<div class="grid-stack-item-del">x</div>'.
+	    '</div>';
+	}
+
+	return $send;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function _pageBlockPas($r, $show=0, $resize=0) {//подсветка блоков при редактировании
 	if(!PAS)
 		return '';
@@ -374,14 +558,34 @@ function _pageElemSpisok($elem) {//список элементов формате html для конкретного
 
 	$send = '';
 	foreach($elem as $r) {
-		$send .=
-		'<div class="pe prel '.$r['type'].' '.$r['pos'].' '.$r['color'].' '.$r['font'].' '.$r['size'].'" id="pe_'.$r['id'].'"'._pageElemStyle($r).'>'.
-			_pageElemPas($r).
-			_pageElemUnit($r).
-		'</div>';
+		$txt = _pageElemUnit($r);
+		$pas = _pageElemPas($r);
+		$send .= _pageElem($r, $txt, $pas);
 	}
 
 	return $send;
+}
+function _pageElem($r, $txt, $pas='') {//формирование div элемента
+	$tmp = !empty($r['tmp']);//элемент списка шаблона
+
+	$cls = array();
+	$cls[] = $tmp ? '' : 'pe prel';
+	$cls[] = $r['display'];
+	$cls[] = $r['pos'];
+	$cls[] = $r['color'];
+	$cls[] = $r['font'];
+	$cls[] = $r['size'];
+	$cls = array_diff($cls, array(''));
+	$cls = implode(' ', $cls);
+
+	$attr_id = $tmp ? '' : ' id="pe_'.$r['id'].'"';
+
+	return
+	'<div class="'.$cls.'"'.$attr_id._pageElemStyle($r).'>'.
+		$pas.
+		$txt.
+	'</div>';
+
 }
 function _pageElemArr($elem) {//массив настроек элементов в формате JS
 	if(empty($elem))
@@ -398,8 +602,9 @@ function _pageElemArr($elem) {//массив настроек элементов в формате JS
 			'id:'.$r['id'].','.
 			'dialog_id:'.$r['dialog_id'].','.
 			'fontAllow:'._pageElemFontAllow($r['dialog_id']).','.
-			'type:"'.$r['type'].'",'.
+			'display:"'.$r['display'].'",'.
 			'pos:"'.$r['pos'].'",'.
+			'w:'.$r['w'].','.
 			'color:"'.$r['color'].'",'.
 			'font:"'.$r['font'].'",'.
 			'size:'.$size.','.
@@ -444,6 +649,8 @@ function _pageElemPas($r) {
 	return '<div class="elem-pas" val="'.$r['id'].'"></div>';
 }
 function _pageElemUnit($unit) {//формирование элемента страницы
+	if(!$unit)
+		return '';
 	switch($unit['dialog_id']) {
 		case 2://button
 			/*
@@ -543,6 +750,8 @@ function _pageElemStyle($r) {//стили css для элемента
 			break;
 		}
 
+	if($r['w'])
+		$send[] = 'width:'.$r['w'].'px';
 //	$send[] = 'box-sizing:padding-box';
 
 	if(!$send)
@@ -621,7 +830,37 @@ function _pageSpisokUnit() {//todo для тестов
 function _page_div() {//todo тест
 	return 'test';
 }
+function gridStackStyleGen() {//генерирование стилей для gridstack
+	$step = 50;    //шаг сетки по горизонтали
+	$send = '';
+	$w = round(100 / $step, 10);//ширина шага в процентах
+	$next = $w;
+	for($n = 1; $n <= $step; $n++) {
+		$send .=
+			".grid-stack-item[data-gs-width='".$n."'] {width:".$next."%}<br>".
+			".grid-stack-item[data-gs-x='".$n."']     {left:".$next."%}<br>".
+			".grid-stack-item[data-gs-min-width='".$n."'] {min-width:".$next."%}<br>".
+			".grid-stack-item[data-gs-max-width='".$n."'] {max-width:".$next."%}<br>".
+			"<br>";
+		$next = round($next + $w, 10);
+	}
 
+	return $send;
+}
+function gridStackStylePx() {//генерирование стилей для grid-child
+	$step = 100;    //шаг сетки по горизонтали
+	$send = '';
+	for($n = 1; $n <= $step; $n++) {
+		$send .=
+			".grid-child-item[data-gs-width='".$n."']{width:".($n*10)."px}<br>".
+			".grid-child-item[data-gs-x='".$n."']{left:".($n*10)."px}<br>".
+			".grid-child-item[data-gs-min-width='".$n."']{min-width:".($n*10)."px}<br>".
+			".grid-child-item[data-gs-max-width='".$n."']{max-width:".($n*10)."px}<br>".
+			"<br>";
+	}
+
+	return $send;
+}
 
 
 

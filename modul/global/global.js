@@ -332,8 +332,10 @@ var FB,
 		for(var n = 0; n < arr.length; n++)
 			func(arr[n], n);
 	},
-	_dn = function(v) {//скрытие/показ элемента
-		return v ? '' : ' dn';
+	_dn = function(v, cls) {//скрытие/показ элемента
+		cls = cls || 'dn';
+		v = cls == 'dn' ? v : !v;
+		return v ? '' : ' ' + cls;
 	};
 
 $.fn.keyEnter = function(func) {

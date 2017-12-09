@@ -187,52 +187,29 @@ table{border:0;border-spacing:0}
 
 
 
+.bl{overflow-x:hidden}
+
 .pe._busy{color:transparent}
 .pe._busy *:not(.elem-pas){visibility:hidden}
 
 /* Строка управления страницей page_setup */
 #pas{
-	background-color:#ffc;
+	background-color: #ffaf64;
 	border-bottom:#F2F2C2 solid 1px;
 }
 #pas .p{width:1000px;margin:auto}
 
-/* вспомогательный блок настройки блоков страницы */
-.pas-block{
-	position:absolute;
-	top:0;
-	right:-1px;
-	bottom:-1px;
-	left:0;
-	border:#b61 dashed 1px;
-	background-color:#FFDCB9;
-	opacity:.7;
-	z-index:10;
+/* отдельный блок в редактировании */
+.block-unit:not(.block-unit-div){
+	background:transparent repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAACXBIWXMAAAsTAAALEwEAmpwYAAAABGdBTUEAALGeYUxB9wAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAAYklEQVR42oSRwREAIQgD0399NEEV8XHnGYGDhw9ndokG0I10A91Acjx4YSahGuBGfNM1acMqufFJ0ImaVMCVgPQngbMQkwJ8hBv+L6JM2M9oE0J13b2Hh5bYbvnawwSLtAYA9Vy3mN0z328AAAAASUVORK5CYII=");
+	overflow-x:hidden;
 }
-.pas-block:hover{opacity:.9}
-.pas-block.empty{
-	background:#fff repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAACXBIWXMAAAsTAAALEwEAmpwYAAAABGdBTUEAALGeYUxB9wAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAANklEQVR42mL4f2np/////zPgwhAGLkWXlqJy0CURJqArQlKM1VhMNxBlAl434PEFAAAA//8DAB4qxdGX1So4AAAAAElFTkSuQmCC");
-}
-.pas-block.mv{opacity:1;cursor:move}
-.pas-icon{
-	position:absolute;
-	white-space:nowrap;
-	padding:5px 2px 0 5px;
-	height:22px;
-	right:-1px;
-	top:-1px;
-	text-align:right;
-	border:#b61 solid 1px;
-	background-color:#fff;
-}
-.pas-block.resize .pas-icon{right:6px}
-.pas-block:not(:hover) .pas-icon{display:none}
-.pas-block .ui-resizable-e{right:0;width:6px}
-.pas-block:hover .ui-resizable-e{background-color:#FFBA75}
-.pas-block.mv .pas-icon{display:none}
+
+
+
 /* цвета блока в настройках */
-.pas-block-bg div:not(.sel):hover{border:#aaa solid 1px;}
-.pas-block-bg .sel{border:#777 solid 1px;}
+#block-set-bg div:not(.sel):hover{border:#aaa solid 1px;}
+#block-set-bg .sel{border:#777 solid 1px;}
 
 
 /* вспомогательный блок для настройки элементов */
@@ -425,6 +402,7 @@ button.vk.orange:hover{background-color:#D59553}
 .pb20{padding-bottom:20px}
 .pl5{padding-left:5px}
 .pl10{padding-left:10px}
+.pl15{padding-left:15px}
 .pl20{padding-left:20px}
 
 .mar8{margin:8px}
@@ -435,6 +413,7 @@ button.vk.orange:hover{background-color:#D59553}
 .mr3{margin-right:3px}
 .mr5{margin-right:5px}
 .mr10{margin-right:10px}
+.mr15{margin-right:15px}
 .mr20{margin-right:20px}
 .mr30{margin-right:30px}
 .mr40{margin-right:40px}
@@ -473,6 +452,9 @@ button.vk.orange:hover{background-color:#D59553}
 .bor1{border:#E2E7EC solid 1px}
 .bor-e8{border:#e8e8e8 solid 1px}
 .bor-f0{border:#f0f0f0 solid 1px}
+/* для настройки блоков */
+.bor-t-dash{border-top:#ccc dashed 1px}
+.bor-r-dash{border-right:#ccc dashed 1px}
 
 .b{font-weight:bold}
 .i{font-style:italic}
@@ -563,3 +545,10 @@ button.vk.orange:hover{background-color:#D59553}
 .fndd{background:#ffc;border-bottom:1px solid #FE2}
 
 
+
+
+
+.aaa::after{
+	content:'123';
+	display:block;
+}

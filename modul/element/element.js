@@ -1369,6 +1369,7 @@ var VK_SCROLL = 0,
 					if($('#tmp-elem-list').length) {//182 шаблон
 						_forEq($('#tmp-elem-list .pe'), function(eq) {
 							var k = _num(eq.attr('val'));
+							ELEM_ARR[k].pe = '';
 							v.push(ELEM_ARR[k]);
 						});
 						join = 0;
@@ -1657,7 +1658,6 @@ var VK_SCROLL = 0,
 				case 182:/* шаблон */ {
 					for(var n = 0; n < res.arr182.length; n++)
 						ELEM_ARR[res.arr182[n].id] = res.arr182[n];
-					console.log(ELEM_ARR);
 					var tmp = $('#tmp-elem-list'),
 						elemType = $('#elem_type'),
 						colType = $('#col_type'),
@@ -1796,10 +1796,105 @@ var VK_SCROLL = 0,
 		}
 	},
 
-	_pageBlockElAdd = function() {//добавление нового элемента в блок
+	_blockUnitSetup = function() {//настройка стилей блока
+
+		//если производится деление блока на части, настройка стилей не выводится
+		if($('.block-unit-div').length)
+			return;
+
 		var t = $(this),
-			p = _parent(t, '.pas-block'),
-			html =
+			block_id = _num(t.attr('val')),
+			BL = BLOCK_ARR[block_id],
+			obj = $('#bl_' + BL.id);
+
+		t._hint({
+			msg:_blockUnitBg(BL) +
+				_blockUnitBor(BL) +
+				'<div class="mt20 center">' +
+					'<button class="vk small green" onclick="_blockUnitElAdd(' + block_id + ')">Вставить элемент</button>' +
+					'<button id="block-grid-button" class="vk small orange mt5" onclick="_blockUnitGrid(' + block_id + ')">Поделить блок на части</button>' +
+				'</div>',
+			ugol:'right',
+			width:190,
+			show:1,
+			remove:1,
+			delayHide:300,
+			func:function() {
+				$('#block-unit-bor0')._check({
+					title:'сверху',
+					func:function(v) {
+						obj.css('border-top', v ? '#DEE3EF solid 1px' : '');
+						BL.save = 1;
+					}
+				});
+				$('#block-unit-bor1')._check({
+					title:'справа',
+					func:function(v) {
+						obj.css('border-right', v ? '#DEE3EF solid 1px' : '');
+						BL.save = 1;
+					}
+				});
+				$('#block-unit-bor2')._check({
+					title:'снизу',
+					func:function(v) {
+						obj.css('border-bottom', v ? '#DEE3EF solid 1px' : '');
+						BL.save = 1;
+					}
+				});
+				$('#block-unit-bor3')._check({
+					title:'слева',
+					func:function(v) {
+						obj.css('border-left', v ? '#DEE3EF solid 1px' : '');
+						BL.save = 1;
+					}
+				});
+			},
+			funcHide:function() {
+				_blockUnitSave(BL, obj);
+			}
+		});
+	},
+	_blockUnitBg = function(BL) {//заливка блока
+		$(document)
+			.off('click', '#block-set-bg div')
+			.on('click', '#block-set-bg div', function() {
+				var unit = $(this),
+					v = unit.attr('val');
+
+				unit.parent().find('.sel').removeClass('sel');
+				unit.addClass('sel');
+
+				$('#bl_' + BL.id)
+					.removeClass('bg-fff bg-gr1 bg-gr2 bg-gr3 bg-ffe')
+					.addClass(v);
+
+				BL.bg = v;
+				BL.save = 1;
+			});
+
+		return '<div class="color-555 fs14">Цвет заливки:</div>' +
+			'<div id="block-set-bg" class="mt5">' +
+				'<div class="' + (BL.bg == 'bg-fff' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP" val="bg-fff"></div>' +
+				'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr3" val="bg-gr1"></div>' +
+				'<div class="' + (BL.bg == 'bg-gr3' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr3" val="bg-gr3"></div>' +
+				'<div class="' + (BL.bg == 'bg-gr2' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr2" val="bg-gr2"></div>' +
+				'<div class="' + (BL.bg == 'bg-ffe' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-ffe" val="bg-ffe"></div>' +
+			'</div>';
+	},
+	_blockUnitBor = function(BL) {//границы блока
+		var bor = BL.bor.split(' ');
+		return '<div class="color-555 fs14 mt10">Границы:</div>' +
+			'<div class="mt5 ml40 pl15"><input type="hidden" id="block-unit-bor0" value="' + bor[0] + '"></div>' +
+			'<table class="bs15">' +
+				'<tr>' +
+					'<td><input type="hidden" id="block-unit-bor3" value="' + bor[3] + '">' +
+					'<td class="pl5"><input type="hidden" id="block-unit-bor1" value="' + bor[1] + '">' +
+			'</table>' +
+			'<div class="ml40 pl15"><input type="hidden" id="block-unit-bor2" value="' + bor[2] + '"></div>';
+	},
+	_blockUnitElAdd = function(block_id) {//добавление нового элемента в блок
+		$('._hint').remove();
+		var html =
 				'<div class="center pad20">' +
 					'<p><button class="vk" val="3">Меню</button>' +
 					'<p class="mt10"><button class="vk" val="4">Заголовок</button>' +
@@ -1823,533 +1918,112 @@ var VK_SCROLL = 0,
 
 		dialog.content.find('button').click(function() {
 			var v = $(this).attr('val');
-			window.BLOCK_ID = p.attr('val');
+			window.BLOCK_ID = block_id;
 			dialog.close();
 			_dialogOpen(v);
 		});
 	},
-	_pageBlockStyle = function() {//настройка стилей блока
-		var t = $(this),
-			p = _parent(t, '.pas-block'),
-			dialog = _dialog({
-				width:450,
-				top:30,
-				padding:0,
-				head:'Параметры стилей блока',
-				load:1,
-				submit:submit
-			}),
-			send = {
-				op:'page_block_style_load',
-				id:p.attr('val')
+	_blockUnitGrid = function(block_id) {
+		var send = {
+				op:'block_unit_gird',
+				id:block_id
 			},
-			BG_DIV,
-			PAD;
+			but = $('#block-grid-button');
 
-		dialog.load(send, loaded);
+		but.addClass('_busy');
 
-		function loaded() {
-			dialog.butSubmit('Сохранить');
-
-			BG_DIV = dialog.content.find('.pas-block-bg');
-			BG_DIV.find('div').click(function() {
-				var div = $(this),
-					pp = div.parent();
-				pp.find('div').removeClass('sel');
-				div.addClass('sel');
-			});
-
-			PAD = dialog.content.find('.pas-block-pad');
-			PAD.find('.minus').click(function() {
-				var but = $(this),
-					vd = but.next(),
-					v = _num(vd.html());
-				v -= 5;
-				if(v <= 0)
-					v = 0;
-				vd._dn(v, 'pale');
-				vd._dn(!v, 'bg-dfd');
-				vd.html(v);
-			});
-			PAD.find('.plus').click(function() {
-				var but = $(this),
-					vd = but.prev(),
-					v = _num(vd.html());
-				v += 5;
-				if(v > 50)
-					v = 50;
-				vd.removeClass('pale');
-				vd.addClass('bg-dfd');
-				vd.html(v);
-			});
-		}
-		function submit() {
-			var arr = [],
-				bor = [];
-
-			_forEq(PAD.find('.bor-e8'), function(eq) {
-				arr.push(_num(eq.html()));
-			});
-
-			bor.push($('#bor0').val());
-			bor.push($('#bor1').val());
-			bor.push($('#bor2').val());
-			bor.push($('#bor3').val());
-
-			var send = {
-				op:'page_block_style_save',
-				id:p.attr('val'),
-				bg:BG_DIV.find('.sel').attr('val'),
-				pad:arr.join(' '),
-				bor:bor.join(' ')
-			};
-			dialog.post(send, 'reload');
-/*			_post(send, function(res) {
-				dialog.close();
-				_msg();
-				$('#_content').html(res.html);
-				_pageBlockResize();
-				$('.icon-page-tmp').trigger('click');
-			});
-*/
-		}
-	},
-	_pageBlockSort = function(v) {//включение/выключение сотрировки блоков на странице
-		$('#pas-sort')._dn(v, 'pl');
-
-		var curm = $('.pas-block:first').hasClass('curM');
-		if(!v && !curm)
-			return;
-
-		$('.pas-block')._dn(!v, 'curM');
-		$('.pbsort0').sortable(!v ? 'destroy' : {
-			axis:'y',
-			start:function(event, ui) {
-				ui.item.find('.pas-block').addClass('mv');
-				ui.item.css('z-index', 2000);
-			},
-			stop:function(event, ui) {
-				ui.item.find('.pas-block').removeClass('mv');
-				ui.item.css('z-index', 'auto');
-			},
-			update:function () {
-				var dds = $(this).find('.pb'),
-					arr = [];
-				_forEq(dds, function(sp) {
-					var v = _num(sp.attr('val'));
-					if(v)
-						arr.push(v);
-				});
-				var send = {
-					op:'sort',
-					table:'_page_block',
-					ids:arr.join()
-				};
-				_post(send, function() {
-					_msg('<div class="b center">Порядок сохранён</div>');
-				});
-			}
-		});
-	},
-	_pageBlockResize = function() {//применение изменения размеров блоков
-		if(!$('.icon-page-tmp').hasClass('on'))
-			return;
-
-		_forEq($('.pas-block.resize'), function(eq) {
-			var wNext = eq.parent().next().find('.pas-block').width() - 29,
-				max = eq.width() + wNext;
-			eq.resizable({
-				minWidth:20,
-				maxWidth:max,
-				grid:10,
-				handles:'e',
-				start:function(event, ui) {
-					var el = $(ui.originalElement[0]);
-					el.css('z-index', 11)
-						.addClass('mv')
-						.find('.pas-icon')._dn();
-				},
-				stop:function(event, ui) {
-					var el = $(ui.originalElement[0]),
-						send = {
-							op:'page_block_resize',
-							block_id:el.attr('val'),
-							w:ui.size.width + 1
-						};
-					_post(send, function(res) {
-						$('#_content').html(res.html);
-						_pageBlockResize();
-					});
-				}
-			});
-		});
-	},
-
-	_pageSetupAppPage = function() {//сортировка страниц приложения с учётом уровней
-		$('#page-sort').nestedSortable({
-			forcePlaceholderSize: true,//сохранять размер места, откуда был взят элемент
-			placeholder:'placeholder',//класс, применяемый для подсветки места, откуда взялся элемент 
-			handle:'div',
-//			helper:	'clone',
-			listType:'ol',
-			items:'li',
-//			tolerance:'pointer',
-			toleranceElement:'> div',
-			isTree:true,
-			maxLevels:3,
-//			startCollapsed: false,
-			tabSize:30,//расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
-//			expandOnHover:700,
-//			opacity:1,
-			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
-
-			update:function() {
-				var send = {
-					op:'page_sort',
-					arr:$(this).nestedSortable('toArray')
-				};
-				_post(send);
-			},
-
-			expandedClass:'pb10',//раскрытый список
-			errorClass:'bg-err' //ошибка, если попытка переместить элемент на недоступный уровень
-		});
-	},
-	_pageElemSetup = function() {//настройка стилей элементов в выплывающем окне. Также сортировка
-		if(!window.ELEM_ARR)//страница ещё не загрузилась
-			return;
-
-		//если происходит процесс перетаскивания элемента
-		if($('.ui-state-high').length)
-			return;
-
-		var t = $(this),
-			elem_id = _num(t.attr('val')),
-			EL = _pageElemExtend(elem_id),
-			PE = $('#pe_' + elem_id);
-
-		if(PE.hasClass('_busy'))
-			return;
-
-		EL.save = 0;//флаг сохранения настроек
-
-		t._hint({
-			msg:_pageElemSetupIcon(elem_id, EL) +
-				_pageElemSetupPlace(elem_id, EL) +
-				_pageElemSetupPad(elem_id, EL) +
-		(EL.fontAllow ?
-				'<table class="w100p">' +
-					'<tr><td>' + _pageElemSetupFont(elem_id, EL) +
-						'<td>' + _pageElemSetupColor(elem_id, EL) +
-						'<td class="r">' + _pageElemSetupSize(elem_id, EL) +
-				'</table>'
-		: ''),
-			ugol:'right',
-			show:1,
-			remove:1,
-			delayHide:300,
-			funcHide:function() {
-				if(EL.tmp)
-					return;
-				if(!EL.save)
-					return;
-
-				EL.op = 'page_elem_style_save';
-				EL.id = elem_id;
-				PE.addClass('_busy');
-				_post(EL, function() {
-					PE.removeClass('_busy');
-				});
-			}
-		});
-
-		_pageElemSort(t, !EL.tmp);
-	},
-	_pageElemExtend = function(elem_id) {//заполнение всех отсутствующих значений элемента по умолчанию
-		ELEM_ARR[elem_id] = $.extend({
-			id:0,
-			tmp:0,   //элемент настраивается для единицы списка
-			txt_2:'',//произвольное значение (для элемента списка)
-			num_4:0, //id колонки
-			dialog_id:0,
-			fontAllow:0,
-			type:'',
-			pos:'',
-			color:'',
-			font:'',
-			size:13,
-			pad:'0 0 0 0'
-		}, ELEM_ARR[elem_id]);
-		return ELEM_ARR[elem_id];
-	},
-	_pageElemSetupIcon = function(elem_id, EL) {//стили элемента: иконки редактировани и удаления
-		return '<div class="r">' +
-			'<div onclick="_dialogOpen(' + EL.dialog_id + ',' + elem_id + ')" class="icon icon-edit mr3' + _tooltip('Настроить элемент', -57) + '</div>' +
-			'<div onclick="_dialogOpen(6,' + elem_id + ')" class="icon icon-del-red' + _tooltip('Удалить элемент', -52) + '</div>' +
-		'</div>';
-	},
-	_pageElemSetupPad = function(elem_id, EL) {//стили элемента: отступы
-		var pad = EL.pad.split(' ');
-
-		$(document)
-			.off('click', '.spb button')
-			.on('click', '.spb button', function() {
-				var but = $(this),
-					znak = but.hasClass('plus') ? 1 : -1,
-					vd = but[znak > 0 ? 'prev' : 'next'](),
-					v = _num(vd.html());
-				v += 5 * znak;
-
-				if(znak > 0 && v > 50)
-					v = 50;
-
-				if(znak < 0 && v <= 0)
-					v = 0;
-
-				vd._dn(v, 'pale');
-				vd._dn(v, 'bg-fff');
-				vd._dn(!v, 'bg-dfd');
-				vd.html(v);
-				
-				var spb = $('.spb'),
-					top = _num(spb.eq(0).find('div').html()),
-					right = _num(spb.eq(2).find('div').html()),
-					bottom = _num(spb.eq(3).find('div').html()),
-					left = _num(spb.eq(1).find('div').html());
-
-				$('#pe_' + elem_id).css({
-					padding:top + (top ? 'px' : '') + ' ' +
-							right + (right ? 'px' : '') + ' ' +
-							bottom + (bottom ? 'px' : '') + ' ' +
-							left + (left ? 'px' : '')
-				});
-
-				EL.pad = top + ' ' + right + ' ' + bottom + ' ' + left;
-				EL.save = 1;
-			});
-
-		return '<div class="bor-e8 bg-gr1 mb10">' +
-			'<div class="mt5 ml10 fs14 center color-555">Внутренние отступы</div>' +
-			'<div class="center mt10">' + _setupPadBut(pad[0]) + '</div>' +
-			'<table class="bs10">' +
-				'<tr><td>' + _setupPadBut(pad[3]) +
-					'<td>' + _setupPadBut(pad[1]) +
-			'</table>' +
-			'<div class="center mb10">' + _setupPadBut(pad[2]) + '</div>' +
-		'</div>';
-	},
-	_setupPadBut = function(px) {//html отступы для одной стороны
-		px = _num(px);
-		return '<div class="spb">' +
-			'<button class="vk small cancel mt1 mr3">«</button>' +
-			'<div class="dib center bor-e8 fs14 b pad2-7 mr3 w15 ' + (px ? 'bg-dfd' : 'pale bg-fff') + '">' + px + '</div>' +
-			'<button class="vk small cancel mt1 plus">»</button>' +
-		'</div>';
-	},
-	_pageElemSetupPlace = function(elem_id, EL) {//стили элемента: тип блока, позиция элемента
-		$(document)
-			.off('click', '#elem-type div')
-			.on('click', '#elem-type div', function() {
-				var unit = $(this),
-					v = unit.attr('val');
-
-				unit.parent().find('.on').removeClass('on');
-				unit.addClass('on');
-
-				$('#elem-pos')._dn(v != 'dib');
-
-				$('#pe_' + elem_id)
-					.removeClass('dib fix')
-					.addClass(v);
-
-				EL.type = v;
-				EL.save = 1;
-			})
-			.off('click', '#elem-pos div')
-			.on('click', '#elem-pos div', function() {
-				var unit = $(this),
-					v = unit.attr('val');
-
-				unit.parent().find('.on').removeClass('on');
-				unit.addClass('on');
-
-				$('#pe_' + elem_id)
-					.removeClass('r center')
-					.addClass(v);
-
-				EL.pos = v;
-				EL.save = 1;
-			});
-		return '<table class="mb5 w100p">' +
-			'<tr><td id="elem-type">' +
-					'<div val="" class="icon-wiki iw18 mr3' + (!EL.type ? ' on' : '') + _tooltip('Максимальная длина', -61) + '</div>' +
-					'<div val="dib" class="icon-wiki iw19 mr3' + (EL.type == 'dib' ? ' on' : '') + _tooltip('Обтекание', -29) + '</div>' +
-					'<div val="fix" class="icon-wiki iw20' + (EL.type == 'fix' ? ' on' : '') + _tooltip('Фиксированный размер', -71) + '</div>' +
-
-				'<td id="elem-pos" class="r' + (EL.type == 'dib' ? ' dn' : '') + '">' +
-					'<div val="" class="icon-wiki iw3 mr3' + (!EL.pos ? ' on' : '') + _tooltip('Прижать влево', -43) + '</div>' +
-					'<div val="center" class="icon-wiki iw4 mr3' + (EL.pos == 'center' ? ' on' : '') + _tooltip('По центру', -28) + '</div>' +
-					'<div val="r" class="icon-wiki iw5' + (EL.pos == 'r' ? ' on' : '') + _tooltip('Прижать вправо', -47) + '</div>' +
-
-		'</table>';
-	},
-	_pageElemSetupFont = function(elem_id, EL) {//стили элемента: жирность, наклон, подчёркивание
-		var font = {
-			b:'',
-			i:'',
-			u:''
-		};
-		_forN(EL.font.split(' '), function(v) {
-			if(!v)
-				return;
-			font[v] = ' on';
-		});
-
-		$(document)
-			.off('click', '#elem-font div')
-			.on('click', '#elem-font div', function() {
-				var td = $(this),
-					cls = td.hasClass('on'),
-					v = td.attr('val'),
-					font = [];
-				td._dn(cls, 'on');
-
-				$('#pe_' + elem_id)._dn(cls, v);
-
-				_forEq($('#elem-font .on'), function(eq) {
-					font.push(eq.attr('val'));
-				});
-				EL.font = font.join(' ');
-				EL.save = 1;
-			});
-
-
-		return '<div id="elem-font" class="dib">' +
-				'<div class="icon-wiki mr3' + font.b + '" val="b"></div>' +
-				'<div class="icon-wiki iw1 mr3' + font.i + '" val="i"></div>' +
-				'<div class="icon-wiki iw2 mr5' + font.u + '" val="u"></div>' +
-		'</div>';
-	},
-	_pageElemSetupSize = function(elem_id, EL) {//стили элемента: размер текста
-		$(document)
-			.off('click', '#elem-size button')
-			.on('click', '#elem-size button', function() {
-				var but = $(this),
-					znak = but.hasClass('plus') ? 1 : -1,
-					vd = but[znak > 0 ? 'prev' : 'next'](),
-					v = _num(vd.html());
-
-				v += znak;
-
-				if(znak > 0 && v > 18)
-					v = 18;
-
-				if(znak < 0 && v <= 10)
-					v = 10;
-
-				vd.html(v);
-
-				$('#pe_' + elem_id)
-					.removeClass('fs' + EL.size)
-					.addClass('fs' + v);
-
-				EL.size = v;
-				EL.save = 1;
-			});
-
-		return '<div id="elem-size" class="dib' + _tooltip('Размер текста', -6) +
-			'<button class="vk short cancel mr3">«</button>' +
-			'<div class="dib center bor-e8 fs16 b pt3 pb3 mr3 w35">' + EL.size + '</div>' +
-			'<button class="vk short cancel plus">»</button>' +
-		'</div>';
-	},
-	_pageElemSetupColor = function(elem_id, EL) {//стили элемента: цвет текста
-		$(document)
-			.off('mouseenter', '#elem-color td')
-			.on('mouseenter', '#elem-color td', function() {
-				var td = $(this),
-					v = td.attr('val');
-				td._tooltip(ELEM_COLOR[v][1]);
-			})
-			.off('click', '#elem-color td')
-			.on('click', '#elem-color td', function() {
-				var td = $(this),
-					v = td.attr('val');
-
-				$('#elem-color td').css('color', 'transparent');
-				td.css('color', '#fff');
-
-				$('#pe_' + elem_id)
-					.removeClass(EL.color)
-					.addClass(v);
-
-				$('#elem-color').css('background-color', ELEM_COLOR[v][0]);
-
-				EL.color = v;
-				EL.save = 1;
-			});
-
-		var td = '',
-			n = 0;
-		for(var i in ELEM_COLOR) {
-			var bg = ELEM_COLOR[i][0],
-				sel = i == EL.color ? '#fff' : 'transparent';
-			if(!n || n == 7)
-				td += '<tr>';
-			td += '<td class="pad5 center" style="background-color:' + bg + ';color:' + sel + '" val="' + i + '">&#10004;';
-			n++;
-		}
-
-		return '<div id="elem-color" class="bor-e8 prel mtm2"  style="background-color:' + ELEM_COLOR[EL.color][0] + '">' +
-			 '<table class="w200 bg-eee curP pabs">' + td + '</table>' +
-			'</div>';
-	},
-	_pageElemSort = function(t, save) {//сортировка элементов
-		var ES = _parent(t, '.elem-sort');
-
-		if(ES.hasClass('ui-sortable'))
-			return;
-
-		ES.sortable({
-			placeholder:'ui-state-high',
-			start:function(event, ui) {
+		_post(send, function(res) {
 				$('._hint').remove();
-				var i = ui.item[0],
-					h = i.clientHeight - 2,
-					w = i.clientWidth - 2;
-				if(ui.item.hasClass('dib')) {
-					var pt = _num(ui.item.css('padding-top').split('px')[0]) - 1,
-						fs = ui.item.css('font-size');
-					$('.ui-state-high')
-						.addClass('dib')
-						.html('&nbsp;')
-						.css('font-size', fs)
-						.css('padding-top', pt + 'px');
-					h -= pt;
-				}
-				$('.ui-state-high')
-					.height(h)
-					.width(w)
-					.css('border','1px dashed #aaa');
-			},
-			update:function() {
-				if(!save)
-					return;
+				$('#_content').html(res.html);
 
-				var dds = ES.find('.elem-pas'),
-					arr = [];
-				_forEq(dds, function(sp) {
-					var v = _num(sp.attr('val'));
-					if(v)
-						arr.push(v);
+				$('#grid-child').gridstack({
+					itemClass:'grid-child-item',
+					animate:true,       //плавная пристыковка после отпускания при растягивании
+					verticalMargin:1,   //отступ сверху
+					cellHeight:10,      //минимальная высота блока
+					float:false,        //если true - блок можно расположить в любом месте, иначе блок всегда тянется к верху
+					width:res.block.w * 2
 				});
-				var send = {
-					op:'sort',
-					table:'_page_element',
-					ids:arr.join()
-				};
-				_post(send);
-			}
+
+				var grid = $('#grid-child').data('gridstack'),
+					num = 1;
+				//добавление нового блока
+				$('#grid-child-add').click(function() {
+					grid.addWidget($('<div id="gn' + num++ + '">' +
+						'<div class="grid-stack-item-content"></div>' +
+						'<div class="grid-stack-item-del">x</div>' +
+						'</div>'),
+						0, 0, 50, 2, true);
+				});
+
+				$('#grid-child')
+					.on('gsresizestop', function(event, elem) {
+						var h = _num($(elem).attr('data-gs-height')),
+							y = $(elem).attr('data-gs-y'),
+							attr_id = $(elem).attr('id');
+						_forEq($('.grid-child-item'), function(eq) {
+							if(eq.attr('data-gs-y') != y)
+								return;
+							if(eq.attr('id') == attr_id)
+								return;
+							grid.resize(eq, null, h);
+						});
+					})
+					.on('dragstop', function(event) {
+						var elem = $(event.target),
+							h = _num(elem.attr('data-gs-height')),
+							h_new = 0,
+							y = -1,
+							attr_id = elem.attr('id');
+						_forEq($('.grid-child-item'), function(eq) {
+							if(!eq.attr('id')) {
+								y = eq.attr('data-gs-y');
+								return false;
+							}
+						});
+						if(y < 0)
+							return;
+						_forEq($('.grid-child-item'), function(eq) {
+							if(!eq.attr('id'))
+								return;
+							if(attr_id == eq.attr('id'))
+								return;
+							if(y != eq.attr('data-gs-y'))
+								return;
+							if(h == eq.attr('data-gs-height'))
+								return;
+							h_new = _num(eq.attr('data-gs-height'));
+						});
+						if(!h_new)
+							return;
+						grid.resize(elem, null, h_new);
+					});
+
+				$(document)
+					.off('click', '.grid-stack-item-del')
+					.on('click', '.grid-stack-item-del', function() {
+						var t = $(this),
+							p = t.parent();
+						grid.removeWidget(p);
+					});
+			}, function() {
+				but.removeClass('_busy');
+			});
+	},
+	_blockUnitSave = function(BL, obj) {
+		if(!BL.save)
+			return;
+
+		BL.bor = $('#block-unit-bor0').val() + ' ' +
+				 $('#block-unit-bor1').val() + ' ' +
+				 $('#block-unit-bor2').val() + ' ' +
+				 $('#block-unit-bor3').val();
+
+		BL.op = 'block_unit_style_save';
+		obj.addClass('_busy');
+		_post(BL, function() {
+			obj.removeClass('_busy');
+			BL.save = 0;
 		});
 	};
 
@@ -2396,117 +2070,133 @@ $(document)
 
 	.on('click', '.icon-page-tmp', function() {//включение/выключение управления блоками
 		var t = $(this),
-			v = !t.hasClass('on');
+			v = !t.hasClass('on'),
+			send = {
+				op:'block_edit_' + (v ? 'on' : 'off'),
+				page_id:PAGE_ID
+			};
 
 		t._dn(!v, 'on');
-		t.prev()[v ? 'show' : 'hide'](200);
 
-		//подсветка всех блоков страницы
-		$('.pas-block')._dn(v);
-
-		$('#page-block-add')[v ? 'slideDown' : 'slideUp'](200);
-		_pageBlockSort();
-		_pageBlockResize();
-	})
-	.on('click', '#page-block-add', function() {//добавление нового блока
-		var t = $(this);
-
-		if(t.hasClass('_busy'))
-			return;
-
-		t.addClass('_busy');
-
-		var send = {
-			op:'page_block_add',
-			page_id:PAGE_ID
-		};
-		_post(
-			send,
-			function(res) {
-				t.removeClass('_busy');
-				$('.pbsort0').append(res.html);
-				$('#pb_' + res.id)._flash();
-			},
-			function() {
-				t.removeClass('_busy');
-			}
-		);
-	})
-	.on('click', '#pas-sort', function() {//включение/выключение сортировки блоков на странице
-		var t = $(this),
-			v = t.hasClass('pl');
-
-		_pageBlockSort(v);
-		_msg('Сортировка блоков в' + (!v ? 'ы' : '') + 'ключена');
-	})
-	.on('click', '.pas-block .icon-add', _pageBlockElAdd)
-	.on('click', '.pas-block .icon-setup', _pageBlockStyle)
-	.on('click', '.pas-block .icon-div', function() {//деление блока пополам
-		var t = $(this),
-			p = _parent(t, '.pas-block'),
-			id = p.attr('val'),
-			send = {
-				op:'page_block_div',
-				block_id:id
-			};
 		_post(send, function(res) {
 			$('#_content').html(res.html);
-			_pageBlockResize();
-		});
-	})
-	.on('mouseenter', '.pas-block .icon-move', function() {//сортировка подблоков
-		var t = $(this),
-			p = _parent(t, '.pas-block'),
-			TR = _parent(p),
-			h = p.height();
 
-		TR.height(h).sortable({
-			axis:'x',
-			handle:'.icon-move',
-			start:function(event, ui) {
-				ui.item.find('.pas-block').addClass('mv');
-				ui.item.css('z-index', 2000);
-			},
-			stop:function(event, ui) {
-				ui.item.find('.pas-block').removeClass('mv');
-				ui.item.css('z-index', 'auto');
-			},
-			update:function () {
-				var dds = $(this).find('.pas-block'),
+			if(!v)
+				return;
+
+			$('.grid-stack').gridstack({
+				animate:true,       //плавная пристыковка после отпускания при растягивании
+				verticalMargin:1,   //отступ сверху
+				cellHeight:20,      //минимальная высота блока
+				float:false,        //если true - блок можно расположить в любом месте, иначе блок всегда тянется к верху
+				width:50
+			});
+
+			var grid = $('.grid-stack').data('gridstack'),
+				num = 1;
+			//добавление нового блока
+			$('#grid-add').click(function() {
+				grid.addWidget($('<div id="gn' + num++ + '">' +
+					'<div class="grid-stack-item-content"></div>' +
+					'<div class="grid-stack-item-del">x</div>' +
+					'</div>'),
+					0, 0, 50, 2, true);
+			});
+
+			//сохранение данных
+			$('#grid-save').click(function() {
+				var t = $(this),
 					arr = [];
-				_forEq(dds, function(sp) {
-					var v = _num(sp.attr('val'));
-					if(v)
-						arr.push(v);
+				_forEq($('.grid-stack-item'), function(eq) {
+					arr.push(
+						(eq.attr('id') ? _num(eq.attr('id').split('_')[1]) : 0) + ',' +
+						eq.attr('data-gs-x') + ',' +
+						eq.attr('data-gs-y') + ',' +
+						eq.attr('data-gs-width') + ',' +
+						eq.attr('data-gs-height')
+					);
 				});
-				var send = {
-					op:'sort',
-					table:'_page_block',
-					ids:arr.join()
-				};
-				_post(send, function() {
-					_msg('<div class="b center">Порядок сохранён</div>');
-				});
-			}
-		});
-	})
-	.on('click', '.pas-block .icon-del-red', function() {//удаление блока
-		var t = $(this),
-			p = _parent(t, '.pas-block'),
-			id = p.attr('val'),
-			send = {
-				op:'page_block_del',
-				id:id
-			};
-		_post(send, function(res) {
-			p.parent().fadeOut(200, function() {
-				$('#_content').html(res.html);
-				_pageBlockResize();
-			})
-		});
-	})
 
-	.on('mouseenter', '.elem-pas', _pageElemSetup);
+				t.addClass('_busy');
+				var send = {
+					op:'block_edit_save',
+					page_id:PAGE_ID,
+					arr:arr
+				};
+				_post(send, function(res) {
+					$('#_content').html(res.html);
+					$('.icon-page-tmp').removeClass('on');
+				}, function() {
+					t.removeClass('_busy');
+				});
+			});
+			$('#grid-cancel').click(function() {//отмена редактирования
+				$('.icon-page-tmp').trigger('click');
+			});
+
+			$('.grid-stack')
+				.on('gsresizestop', function(event, elem) {
+					var h = _num($(elem).attr('data-gs-height')),
+						y = $(elem).attr('data-gs-y'),
+						attr_id = $(elem).attr('id');
+					_forEq($('.grid-stack-item'), function(eq) {
+						if(eq.attr('data-gs-y') != y)
+							return;
+						if(eq.attr('id') == attr_id)
+							return;
+
+						grid.resize(eq, null, h);
+					});
+				})
+				.on('dragstop', function(event) {
+					var elem = $(event.target),
+						h = _num(elem.attr('data-gs-height')),
+						h_new = 0,
+						y = -1,
+						attr_id = elem.attr('id');
+					_forEq($('.grid-stack-item'), function(eq) {
+						if(!eq.attr('id')) {
+							y = eq.attr('data-gs-y');
+							return false;
+						}
+					});
+					if(y < 0)
+						return;
+					_forEq($('.grid-stack-item'), function(eq) {
+						if(!eq.attr('id'))
+							return;
+						if(attr_id == eq.attr('id'))
+							return;
+						if(y != eq.attr('data-gs-y'))
+							return;
+						if(h == eq.attr('data-gs-height'))
+							return;
+						h_new = _num(eq.attr('data-gs-height'));
+					});
+					if(!h_new)
+						return;
+					grid.resize(elem, null, h_new);
+				});
+
+			$(document)
+				.off('click', '.grid-stack-item-del')
+				.on('click', '.grid-stack-item-del', function() {
+					var t = $(this),
+						p = t.parent();
+					grid.removeWidget(p);
+				});
+		});
+
+	})
+	.on('mouseenter', '.block-unit', _blockUnitSetup);
+
+
+
+
+//	.on('click', '.pas-block .icon-add', _pageBlockElAdd)
+//	.on('click', '.pas-block .icon-setup', _pageBlockStyle)
+
+//	.on('mouseenter', '.elem-pas', _pageElemSetup);
 
 $.fn._check = function(o) {
 	var t = $(this),
@@ -2562,7 +2252,7 @@ $.fn._check = function(o) {
 		o = $.extend({
 			title:'',
 			disabled:0,
-			light:0,
+			light:1,
 			block:0,
 			tooltip:'',
 			func:function() {}
@@ -4114,3 +3804,479 @@ $.fn._dropdown = function(o) {//выпадающий список в виде ссылки
 	window[id + '_dropdown'] = t;
 	return t;
 };
+
+
+
+
+/*
+
+	_pageSetupAppPage = function() {//сортировка страниц приложения с учётом уровней
+		$('#page-sort').nestedSortable({
+			forcePlaceholderSize: true,//сохранять размер места, откуда был взят элемент
+			placeholder:'placeholder',//класс, применяемый для подсветки места, откуда взялся элемент
+			handle:'div',
+//			helper:	'clone',
+			listType:'ol',
+			items:'li',
+//			tolerance:'pointer',
+			toleranceElement:'> div',
+			isTree:true,
+			maxLevels:3,
+//			startCollapsed: false,
+			tabSize:30,//расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
+//			expandOnHover:700,
+//			opacity:1,
+			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+
+			update:function() {
+				var send = {
+					op:'page_sort',
+					arr:$(this).nestedSortable('toArray')
+				};
+				_post(send);
+			},
+
+			expandedClass:'pb10',//раскрытый список
+			errorClass:'bg-err' //ошибка, если попытка переместить элемент на недоступный уровень
+		});
+	},
+	_pageElemSetup = function() {//настройка стилей элементов в выплывающем окне. Также сортировка
+		if(!window.ELEM_ARR)//страница ещё не загрузилась
+			return;
+
+		//если происходит процесс перетаскивания элемента
+		if($('.ui-state-high').length)
+			return;
+
+		//если происходит процесс изменения размера элемента
+		if($('.ui-resizable-resizing').length)
+			return;
+
+		var t = $(this),
+			elem_id = _num(t.attr('val')),
+			EL = _pageElemExtend(elem_id);
+
+		EL.pe = $('#pe_' + elem_id);
+
+		if(EL.pe.hasClass('_busy'))
+			return;
+
+		EL.save = 0;//флаг сохранения настроек
+
+		t._hint({
+			msg:_pageElemSetupIcon(elem_id, EL) +
+				_pageElemSetupPlace(elem_id, EL) +
+				_pageElemSetupPad(elem_id, EL) +
+			(EL.fontAllow ?
+				'<table class="w100p">' +
+					'<tr><td>' + _pageElemSetupFont(elem_id, EL) +
+						'<td>' + _pageElemSetupColor(elem_id, EL) +
+						'<td class="r">' + _pageElemSetupSize(elem_id, EL) +
+				'</table>'
+			: ''),
+			ugol:'right',
+			show:1,
+			remove:1,
+			delayHide:300,
+			funcHide:function() {
+				_pageElemSave(EL);
+			}
+		});
+
+		_pageElemResize(EL, EL.w);
+
+		_pageElemSort(t, !EL.tmp);
+	},
+	_pageElemExtend = function(elem_id) {//заполнение всех отсутствующих значений элемента по умолчанию
+		ELEM_ARR[elem_id] = $.extend({
+			id:0,
+			tmp:0,   //элемент настраивается для единицы списка
+			txt_2:'',//произвольное значение (для элемента списка)
+			num_4:0, //id колонки
+			dialog_id:0,
+			fontAllow:0,
+			display:'',
+			w:0,
+			pos:'',
+			color:'',
+			font:'',
+			size:13,
+			pad:'0 0 0 0'
+		}, ELEM_ARR[elem_id]);
+		return ELEM_ARR[elem_id];
+	},
+	_pageElemSave = function(EL) {
+		if(EL.tmp)
+			return;
+		if(!EL.save)
+			return;
+
+		var pe = EL.pe;
+		EL.pe = '';
+		EL.op = 'page_elem_style_save';
+		pe.addClass('_busy');
+		_post(EL, function() {
+			pe.removeClass('_busy');
+			EL.pe = pe;
+		});
+	},
+	_pageElemSetupIcon = function(elem_id, EL) {//стили элемента: иконки редактировани и удаления
+		return '<div class="r">' +
+			'<div onclick="_dialogOpen(' + EL.dialog_id + ',' + elem_id + ')" class="icon icon-edit mr3' + _tooltip('Настроить элемент', -57) + '</div>' +
+			'<div onclick="_dialogOpen(6,' + elem_id + ')" class="icon icon-del-red' + _tooltip('Удалить элемент', -52) + '</div>' +
+		'</div>';
+	},
+	_pageElemSetupPad = function(elem_id, EL) {//стили элемента: отступы
+		var pad = EL.pad.split(' ');
+
+		$(document)
+			.off('click', '.spb button')
+			.on('click', '.spb button', function() {
+				var but = $(this),
+					znak = but.hasClass('plus') ? 1 : -1,
+					vd = but[znak > 0 ? 'prev' : 'next'](),
+					v = _num(vd.html());
+				v += 5 * znak;
+
+				if(znak > 0 && v > 50)
+					v = 50;
+
+				if(znak < 0 && v <= 0)
+					v = 0;
+
+				vd._dn(v, 'pale');
+				vd._dn(v, 'bg-fff');
+				vd._dn(!v, 'bg-dfd');
+				vd.html(v);
+
+				var spb = $('.spb'),
+					top = _num(spb.eq(0).find('div').html()),
+					right = _num(spb.eq(2).find('div').html()),
+					bottom = _num(spb.eq(3).find('div').html()),
+					left = _num(spb.eq(1).find('div').html());
+
+				EL.pe.css({
+					padding:top + (top ? 'px' : '') + ' ' +
+							right + (right ? 'px' : '') + ' ' +
+							bottom + (bottom ? 'px' : '') + ' ' +
+							left + (left ? 'px' : '')
+				});
+
+				EL.pad = top + ' ' + right + ' ' + bottom + ' ' + left;
+				EL.save = 1;
+			});
+
+		return '<div class="bor-e8 bg-gr1 mb10">' +
+			'<div class="mt5 ml10 fs14 center color-555">Внутренние отступы</div>' +
+			'<div class="center mt10">' + _setupPadBut(pad[0]) + '</div>' +
+			'<table class="bs10">' +
+				'<tr><td>' + _setupPadBut(pad[3]) +
+					'<td>' + _setupPadBut(pad[1]) +
+			'</table>' +
+			'<div class="center mb10">' + _setupPadBut(pad[2]) + '</div>' +
+		'</div>';
+	},
+	_setupPadBut = function(px) {//html отступы для одной стороны
+		px = _num(px);
+		return '<div class="spb">' +
+			'<button class="vk small cancel mt1 mr3">«</button>' +
+			'<div class="dib center bor-e8 fs14 b pad2-7 mr3 w15 ' + (px ? 'bg-dfd' : 'pale bg-fff') + '">' + px + '</div>' +
+			'<button class="vk small cancel mt1 plus">»</button>' +
+		'</div>';
+	},
+	_pageElemSetupPlace = function(elem_id, EL) {//стили элемента: тип блока, позиция элемента
+		$(document)
+			.off('click', '#elem-display div')
+			.on('click', '#elem-display div', function() {
+				var unit = $(this),
+					v = unit.attr('val');
+
+				EL.display = v;
+
+				unit.parent().find('.on').removeClass('on');
+				unit.addClass('on');
+
+				$('#elem-pos')._dn(!v);
+
+				EL.pe._dn(!v, 'dib');
+				EL.save = 1;
+			})
+			.off('click', '#elem-fix')
+			.on('click', '#elem-fix', function() {
+				var unit = $(this),
+					v = !unit.hasClass('on');
+
+				unit._dn(!v, 'on');
+
+				$('#elem-w')._dn(v);
+
+				_pageElemResize(EL, v);
+				$('#elem-w span').html(EL.w + 'px');
+
+				EL.save = 1;
+			})
+			.off('click', '#elem-bl')
+			.on('click', '#elem-bl', function() {
+				var unit = $(this),
+					v = !unit.hasClass('on');
+
+				unit._dn(!v, 'on');
+				EL.pe._dn(!v, 'br').before('<br>');
+
+			})
+			.off('click', '#elem-pos div')
+			.on('click', '#elem-pos div', function() {
+				var unit = $(this),
+					v = unit.attr('val');
+
+				unit.parent().find('.on').removeClass('on');
+				unit.addClass('on');
+
+				EL.pe
+					.removeClass('r center')
+					.addClass(v);
+
+				EL.pos = v;
+				EL.save = 1;
+			});
+		return '<table class="mb5 w100p">' +
+			'<tr><td id="elem-display" class="w35 wsnw">' +
+					'<div val="" class="icon-wiki iw18 mr3' + _dn(!EL.display, 'on') + _tooltip('Максимальная длина', -61) + '</div>' +
+					'<div val="dib" class="icon-wiki iw19 mr15' + _dn(EL.display, 'on') + _tooltip('Обтекание', -29) + '</div>' +
+
+				'<td class="w15">' +
+					'<div id="elem-fix" class="icon-wiki iw20 mr3' + _dn(EL.w, 'on') + _tooltip('Фиксированный размер', -71) + '</div>' +
+
+				'<td id="elem-w" class="w15' + _dn(EL.w) + _tooltip('Текущий размер', -46) +
+					'<span class="fs11 color-555">' + EL.w + 'px</span>' +
+
+				'<td>' +
+					'<div id="elem-bl" class="icon-wiki iw8 mr3' + _tooltip('Прижимание справа', -71) + '</div>' +
+		'</table>' +
+
+		'<table class="mb5 w100p">' +
+			'<tr><td id="elem-pos" class="r' + _dn(!EL.display || EL.w) + '">' +
+					'<div val="" class="icon-wiki iw3 mr3' + (!EL.pos ? ' on' : '') + _tooltip('Прижать влево', -43) + '</div>' +
+					'<div val="center" class="icon-wiki iw4 mr3' + (EL.pos == 'center' ? ' on' : '') + _tooltip('По центру', -28) + '</div>' +
+					'<div val="r" class="icon-wiki iw5' + (EL.pos == 'r' ? ' on' : '') + _tooltip('Прижать вправо', -47) + '</div>' +
+		'</table>';
+	},
+	_pageElemSetupFont = function(elem_id, EL) {//стили элемента: жирность, наклон, подчёркивание
+		var font = {
+			b:'',
+			i:'',
+			u:''
+		};
+		_forN(EL.font.split(' '), function(v) {
+			if(!v)
+				return;
+			font[v] = ' on';
+		});
+
+		$(document)
+			.off('click', '#elem-font div')
+			.on('click', '#elem-font div', function() {
+				var td = $(this),
+					cls = td.hasClass('on'),
+					v = td.attr('val'),
+					font = [];
+				td._dn(cls, 'on');
+
+				EL.pe._dn(cls, v);
+
+				_forEq($('#elem-font .on'), function(eq) {
+					font.push(eq.attr('val'));
+				});
+				EL.font = font.join(' ');
+				EL.save = 1;
+			});
+
+
+		return '<div id="elem-font" class="dib">' +
+				'<div class="icon-wiki mr3' + font.b + '" val="b"></div>' +
+				'<div class="icon-wiki iw1 mr3' + font.i + '" val="i"></div>' +
+				'<div class="icon-wiki iw2 mr5' + font.u + '" val="u"></div>' +
+		'</div>';
+	},
+	_pageElemSetupSize = function(elem_id, EL) {//стили элемента: размер текста
+		$(document)
+			.off('click', '#elem-size button')
+			.on('click', '#elem-size button', function() {
+				var but = $(this),
+					znak = but.hasClass('plus') ? 1 : -1,
+					vd = but[znak > 0 ? 'prev' : 'next'](),
+					v = _num(vd.html());
+
+				v += znak;
+
+				if(znak > 0 && v > 18)
+					v = 18;
+
+				if(znak < 0 && v <= 10)
+					v = 10;
+
+				vd.html(v);
+
+				EL.pe
+					.removeClass('fs' + EL.size)
+					.addClass('fs' + v);
+
+				EL.size = v;
+				EL.save = 1;
+			});
+
+		return '<div id="elem-size" class="dib' + _tooltip('Размер текста', -6) +
+			'<button class="vk short cancel mr3">«</button>' +
+			'<div class="dib center bor-e8 fs16 b pt3 pb3 mr3 w35">' + EL.size + '</div>' +
+			'<button class="vk short cancel plus">»</button>' +
+		'</div>';
+	},
+	_pageElemSetupColor = function(elem_id, EL) {//стили элемента: цвет текста
+		$(document)
+			.off('mouseenter', '#elem-color td')
+			.on('mouseenter', '#elem-color td', function() {
+				var td = $(this),
+					v = td.attr('val');
+				td._tooltip(ELEM_COLOR[v][1]);
+			})
+			.off('click', '#elem-color td')
+			.on('click', '#elem-color td', function() {
+				var td = $(this),
+					v = td.attr('val');
+
+				$('#elem-color td').css('color', 'transparent');
+				td.css('color', '#fff');
+
+				EL.pe
+					.removeClass(EL.color)
+					.addClass(v);
+
+				$('#elem-color').css('background-color', ELEM_COLOR[v][0]);
+
+				EL.color = v;
+				EL.save = 1;
+			});
+
+		var td = '',
+			n = 0;
+		for(var i in ELEM_COLOR) {
+			var bg = ELEM_COLOR[i][0],
+				sel = i == EL.color ? '#fff' : 'transparent';
+			if(!n || n == 7)
+				td += '<tr>';
+			td += '<td class="pad5 center" style="background-color:' + bg + ';color:' + sel + '" val="' + i + '">&#10004;';
+			n++;
+		}
+
+		return '<div id="elem-color" class="bor-e8 prel mtm2"  style="background-color:' + ELEM_COLOR[EL.color][0] + '">' +
+			 '<table class="w200 bg-eee curP pabs">' + td + '</table>' +
+			'</div>';
+	},
+	_pageElemSort = function(t, save) {//сортировка элементов
+		var ES = _parent(t, '.elem-sort');
+
+		if(ES.hasClass('ui-sortable'))
+			return;
+
+		ES.sortable({
+			placeholder:'ui-state-high',
+			start:function(event, ui) {
+				$('._hint').remove();
+				var i = ui.item[0],
+					h = i.clientHeight - 2,
+					w = i.clientWidth - 2;
+				//alert()
+				ui.item.prev().remove('br');
+				if(ui.item.hasClass('dib')) {
+					var pt = _num(ui.item.css('padding-top').split('px')[0]) - 1,
+						fs = ui.item.css('font-size');
+					$('.ui-state-high')
+						.addClass('dib')
+						.html('&nbsp;')
+						.css('font-size', fs)
+						.css('padding-top', pt + 'px');
+					h -= pt;
+				}
+				$('.ui-state-high')
+					.height(h)
+					.width(w)
+					.css('border','1px dashed #aaa');
+			},
+			stop:function(event, ui) {
+				if(ui.item.hasClass('br'))
+					ui.item.before('<br>');
+			},
+			update:function() {
+				if(!save)
+					return;
+
+				var dds = ES.find('.elem-pas'),
+					arr = [];
+				_forEq(dds, function(sp) {
+					var v = _num(sp.attr('val'));
+					if(v)
+						arr.push(v);
+				});
+				var send = {
+					op:'sort',
+					table:'_page_element',
+					ids:arr.join()
+				};
+				_post(send);
+			}
+		});
+	},
+	_pageElemResize = function(EL, on) {//включение/выключение изменения размера элемента
+		var uiRes = EL.pe.hasClass('ui-resizable'),
+			w,
+			max;
+
+		if(on) {
+			if(uiRes)
+				return;
+
+			//опдереление максимальной длины, на которую может растягиваться элемент
+			EL.pe.removeClass('dib');
+			EL.pe.css('width', 'auto');
+			max = Math.round(EL.pe.width());
+
+			//установка начального размера по обтеканию
+			EL.pe.addClass('dib');
+			w = Math.round(EL.pe.width() / 10 + 1) * 10;
+			if(w > 1000)
+				w = 1000;
+
+			if(!EL.w) {
+				EL.w = w;
+				EL.save = 1;
+			}
+
+			EL.pe.css('width', EL.w + 'px');
+			EL.pe._dn(!EL.display, 'dib');
+
+			EL.pe.resizable({
+				minWidth:20,
+				maxWidth:max,
+				grid:10,
+				handles:'e',
+				start:function(event, ui) {
+					$('._hint').remove();
+				},
+				stop:function(event, ui) {
+					EL.w = ui.size.width;
+					ELEM_ARR[EL.id].w = EL.w;
+					EL.save = 1;
+					_pageElemSave(EL);
+				}
+			});
+			return;
+		}
+
+		if(uiRes) {
+			EL.pe.resizable('destroy');
+			EL.pe.css('width', 'auto');
+		}
+
+		EL.w = 0;
+	}
+*/

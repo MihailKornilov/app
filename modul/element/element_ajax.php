@@ -271,265 +271,103 @@ switch(@$_POST['op']) {
 		jsonSuccess();
 		break;
 
-	case 'page_block_add'://добавление блока на страницу
-		if(!$page_id = _num($_POST['page_id']))
+	case 'block_edit_on'://включение управления блоками
+		if(!$page_id = $_POST['page_id'])
 			jsonError('Некорректный ID страницы');
 
-		$sql = "INSERT INTO `_page_block` (
-					`page_id`,
-					`sort`,
-					`viewer_id_add`
-				) VALUES (
-					".$page_id.",
-					"._maxSql('_page_block').",
-					".VIEWER_ID."
-				)";
-		query($sql);
+		$html =
+		'<div class="grid-stack">'._blockEditGet($page_id).'</div>'.
+		'<div class="pad10 bor-e8 fs15 center color-555 curP over1 mt1" id="grid-add">Добавить блок</div> '.
 
-		$block_id = query_insert_id('_page_block');
+		'<div class="mar10 center">'.
+			'<button class="vk" id="grid-save">Сохранить порядок</button>'.
+			'<button class="vk cancel ml10" id="grid-cancel">Отмена</button>'.
+		'</div>';
 
-		$block = array(
-			'id' => $block_id,
-			'parent_id' => 0,
-			'w' => 0,
-			'elem_count' => 0,
-			'sort' => 0
-		);
-
-		$send['id'] = $block_id;
-		$send['html'] = utf8(
-			'<div id="pb_'.$block_id.'" class="pb prel h50" val="'.$block_id.'">'.
-				_pageBlockPas($block, 1).
-			'</div>'
-		);
-
-		_cache('clear', '_pageCache');
+		$send['html'] = utf8($html);
 
 		jsonSuccess($send);
 		break;
-	case 'page_block_div'://деление блока на две части
-		if(!$block_id = _num($_POST['block_id']))
-			jsonError('Некорректный ID блока');
+	case 'block_edit_off'://выключение управления блоками
+		if(!$page_id = $_POST['page_id'])
+			jsonError('Некорректный ID страницы');
 
-		//получение данных блока
-		$sql = "SELECT *
-				FROM `_page_block`
-				WHERE `id`=".$block_id;
-		if(!$block = query_assoc($sql))
-			jsonError('Блока id'.$block_id.' не существует');
+		$send['html'] = utf8(_blockTabGet($page_id));
 
+		jsonSuccess($send);
+		break;
+	case 'block_edit_save':
+		if(!$page_id = $_POST['page_id'])
+			jsonError('Некорректный ID страницы');
+		if(!$arr = @$_POST['arr'])
+			jsonError('Нет данных для сохранения блоков');
 
-		//если блок является основным, то он становится дочерним, а над ним вносится блок, который будет родителем над текущим и над новым
-		if(!$parent_id = _num($block['parent_id'])) {
-			$sql = "INSERT INTO `_page_block` (
-						`page_id`,
-						`sort`,
-						`viewer_id_add`
-					) VALUES (
-						".$block['page_id'].",
-						".$block['sort'].",
-						".VIEWER_ID."
-					)";
-			query($sql);
-
-			$parent_id = query_insert_id('_page_block');
-
-			$sql = "UPDATE `_page_block`
-					SET `parent_id`=".$parent_id.",
-						`w`=1000
-					WHERE `id`=".$block_id;
-			query($sql);
-
-			$block['w'] = 1000;
+		$insert = array();
+		$ids = array(0);
+		foreach($arr as $r) {
+			$ex = explode(',', $r);
+			$id = _num($ex[0]);
+			$x = _num($ex[1]);
+			$y = _num($ex[2]);
+			if(!$w = _num($ex[3]))
+				continue;
+			if(!$h = _num($ex[4]))
+				continue;
+			$width = $w * 20;
+			$height = $h * 20;
+			$insert[] = "(".
+				$id.",".
+				$page_id.",".
+				$x.",".
+				$y.",".
+				$w.",".
+				$h.",".
+				$width.",".
+				$height.",".
+				VIEWER_ID.
+			")";
+			if($id)
+				$ids[] = $id;
 		}
 
-		//изменение значений сортировки, чтобы не повторялись
-		$sql = "UPDATE `_page_block`
-				SET `sort`=`sort`+1
-				WHERE `parent_id`=".$parent_id."
-				  AND `sort`>".$block['sort'];
+		//удаление удалённых блоков
+		$sql = "DELETE FROM `_block`
+				WHERE `page_id`=".$page_id."
+				  AND `id` NOT IN (".implode(',', $ids).")";
 		query($sql);
 
-		//внесение нового дочернего блока
-		$sql = "INSERT INTO `_page_block` (
+		if(empty($insert))
+			jsonError('Некорректные данные для сохранения блоков');
+
+		$sql = "INSERT INTO `_block` (
+					`id`,
 					`page_id`,
-					`parent_id`,
+					`x`,
+					`y`,
 					`w`,
-					`sort`,
+					`h`,
+					`width`,
+					`height`,
 					`viewer_id_add`
-				) VALUES (
-					".$block['page_id'].",
-					".$parent_id.",
-					100,
-					".($block['sort'] + 1).",
-					".VIEWER_ID."
-				)";
+				) VALUES ".implode(',', $insert)."
+				ON DUPLICATE KEY UPDATE
+					`x`=VALUES(`x`),
+					`y`=VALUES(`y`),
+					`w`=VALUES(`w`),
+					`h`=VALUES(`h`),
+					`width`=VALUES(`width`),
+					`height`=VALUES(`height`)";
 		query($sql);
 
-		//определение блока, из которого нужно вычесть размер 100px
-		if($block['w'] < 200) {
-			$sql = "SELECT `id`
-					FROM `_page_block`
-					WHERE `parent_id`=".$parent_id."
-					ORDER BY `w` DESC
-					LIMIT 1";
-			$block_id = query_value($sql);
-		}
-
-		//убавление размера разделяемого блока
-		$sql = "UPDATE `_page_block`
-				SET `w`=`w`-100
-				WHERE `id`=".$block_id;
-		query($sql);
-
-		$send['html'] = utf8(_pageShow($block['page_id'], 1));
+		$send['html'] = utf8(_blockTabGet($page_id));
 
 		jsonSuccess($send);
 		break;
-	case 'page_block_resize'://изменение размера блока
-		if(!$block_id = _num($_POST['block_id']))
-			jsonError('Некорректный ID блока');
-		if(!$w = _num($_POST['w']))
-			jsonError('Некорректная длина блока');
-
-		//получение данных блока
-		$sql = "SELECT *
-				FROM `_page_block`
-				WHERE `id`=".$block_id;
-		if(!$block = query_assoc($sql))
-			jsonError('Блока id'.$block_id.' не существует');
-
-		//установка новой длины блока
-		$sql = "UPDATE `_page_block`
-				SET `w`=".$w."
-				WHERE `id`=".$block_id;
-		query($sql);
-
-		//изменение длины следующего блока на уменьшенную разницу
-		$sql = "UPDATE `_page_block`
-				SET `w`=`w`+(".($block['w'] - $w).")
-				WHERE `parent_id`=".$block['parent_id']."
-				  AND `sort`>".$block['sort']."
-				ORDER BY `sort`
-				LIMIT 1";
-		query($sql);
-
-		$send['html'] = utf8(_pageShow($block['page_id'], 1));
-		
-		jsonSuccess($send);
-		break;
-	case 'page_block_style_load'://получение стилей блока для диалога
-		if(!$id = _num($_POST['id']))
-			jsonError('Некорректный ID блока');
-
-		//получение данных блока
-		$sql = "SELECT *
-				FROM `_page_block`
-				WHERE `id`=".$id;
-		if(!$block = query_assoc($sql))
-			jsonError('Блока id'.$id.' не существует');
-
-		//отступы
-		$ex = explode(' ', $block['pad']);
-		$pad =
-		'<div class="pas-block-pad mt10 center">'.
-
-			'<div class="fs15 color-555 mb5">сверху</div>'.
-			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[0] ? 'bg-dfd' : 'pale').'">'.$ex[0].'</div>'.
-			'<button class="vk small cancel mt1 plus">»</button>'.
-
-			'<table class="w100p ml10 mt30 mb30">'.
-				'<tr><td class="w200">'.
-						'<div class="dib fs15 color-555 mr5">слева</div>'.
-						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[3] ? 'bg-dfd' : 'pale').'">'.$ex[3].'</div>'.
-						'<button class="vk small cancel mt1 plus">»</button>'.
-					'<td>'.
-						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[1] ? 'bg-dfd' : 'pale').'">'.$ex[1].'</div>'.
-						'<button class="vk small cancel mt1 plus">»</button>'.
-						'<div class="dib fs15 color-555 ml5">справа</div>'.
-			'</table>'.
-
-			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
-			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[2] ? 'bg-dfd' : 'pale').'">'.$ex[2].'</div>'.
-			'<button class="vk small cancel mt1 plus">»</button>'.
-			'<div class="fs15 color-555 mt3">снизу</div>'.
-
-		'</div>';
-
-		//границы блока
-		$ex = explode(' ', $block['bor']);
-		$bor =
-		'<div class="mar20 w250 center">'.
-			_check(array(
-				'id' => 'bor0',
-				'title' => 'сверху',
-				'value' => $ex[0],
-				'light' => 1
-			)).
-
-			'<table class="w100p ml10 mt20 mb20">'.
-				'<tr><td class="w100">'.
-						_check(array(
-							'id' => 'bor3',
-							'title' => 'слева',
-							'value' => $ex[3],
-							'light' => 1
-						)).
-					'<td>'.
-						_check(array(
-							'id' => 'bor1',
-							'title' => 'справа',
-							'value' => $ex[1],
-							'light' => 1
-						)).
-			'</table>'.
-
-			_check(array(
-				'id' => 'bor2',
-				'title' => 'снизу',
-				'value' => $ex[2],
-				'light' => 1
-			)).
-		'</div>';
-
-
-		$send['html'] = utf8(
-			'<div class="ml10 mr10">'.
-				'<div class="hd2">Внутренние отступы:</div>'.
-				$pad.
-
-				'<div class="hd2 mt20">Цвет заливки:</div>'.
-				'<div class="pas-block-bg mt10">'.
-					'<div class="'.($block['bg'] == 'bg-fff' ? 'sel' : '').' dib h50 w50 bor-e8 curP" val="bg-fff"></div>'.
-					'<div class="'.($block['bg'] == 'bg-gr1' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-gr3" val="bg-gr1"></div>'.
-					'<div class="'.($block['bg'] == 'bg-gr3' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-gr3" val="bg-gr3"></div>'.
-					'<div class="'.($block['bg'] == 'bg-gr2' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-gr2" val="bg-gr2"></div>'.
-					'<div class="'.($block['bg'] == 'bg-ffe' ? 'sel' : '').' dib h50 w50 bor-e8 curP ml10 bg-ffe" val="bg-ffe"></div>'.
-				'</div>'.
-
-				'<div class="hd2 mt20">Границы:</div>'.
-				$bor.
-			'</div>'
-		);
-
-		jsonSuccess($send);
-		break;
-	case 'page_block_style_save'://применение стилей блока
+	case 'block_unit_style_save'://применение стилей блока
 		if(!$id = _num($_POST['id']))
 			jsonError('Некорректный ID блока');
 
 		$bg = _txt($_POST['bg']);
-
-		//отступы
-		$ex = explode(' ', $_POST['pad']);
-		$pad =  _num($ex[0]).' './/сверху
-				_num($ex[2]).' './/справа
-				_num($ex[3]).' './/снизу
-				_num($ex[1]);    //слева
-
 		//границы
 		$ex = explode(' ', $_POST['bor']);
 		$bor =  _num($ex[0]).' './/сверху
@@ -537,90 +375,39 @@ switch(@$_POST['op']) {
 				_num($ex[2]).' './/снизу
 				_num($ex[3]);    //слева
 
-
 		//получение данных блока
 		$sql = "SELECT *
-				FROM `_page_block`
+				FROM `_block`
 				WHERE `id`=".$id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$id.' не существует');
 
 		//изменение стилей
-		$sql = "UPDATE `_page_block`
-				SET `bg`='".addslashes($bg)."',
-				    `pad`='".$pad."',
-				    `bor`='".$bor."'
+		$sql = "UPDATE `_block`
+				SET `bg`='".$bg."',
+					`bor`='".$bor."'
 				WHERE `id`=".$id;
 		query($sql);
 
-//		$send['html'] = utf8(_pageShow($block['page_id'], 1));
-
 		jsonSuccess();
 		break;
-	case 'page_block_del'://удаление блока
+	case 'block_unit_gird'://деление блока на части
 		if(!$id = _num($_POST['id']))
 			jsonError('Некорректный ID блока');
 
 		//получение данных блока
 		$sql = "SELECT *
-				FROM `_page_block`
+				FROM `_block`
 				WHERE `id`=".$id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$id.' не существует');
 
-		//если блок является дочерним
-		if($block['parent_id']) {
-			//подсчёт количества дочерних блоков, в котором состоит удаляемый блок
-			$sql = "SELECT COUNT(*)
-					FROM `_page_block`
-					WHERE `parent_id`=".$block['parent_id'];
-			$parentCount = query_value($sql);
-
-			//если блок останется один, то установка его основным на странице
-			if($parentCount < 3) {
-				//получение данных блока-родителя
-				$sql = "SELECT *
-						FROM `_page_block`
-						WHERE `id`=".$id;
-				$blockParent = query_assoc($sql);
-
-				//удаление блока-родителя
-				$sql = "DELETE FROM `_page_block` WHERE `id`=".$block['parent_id'];
-				query($sql);
-
-				//оставшийся блок помещается на основной странице
-				$sql = "UPDATE `_page_block`
-						SET `parent_id`=0,
-							`w`=0,
-							`sort`=".$blockParent['sort']."
-						WHERE `parent_id`=".$block['parent_id'];
-				query($sql);
-			} else {
-				//увеличение длины первого блока в строке на длину удалённого блока
-				$sql = "UPDATE `_page_block`
-						SET `w`=`w`+".$block['w']."
-						WHERE `parent_id`=".$block['parent_id']."
-						  AND `id`!=".$id."
-						ORDER BY `sort`
-						LIMIT 1";
-				query($sql);
-			}
-		}
-
-		//удаление блока
-		$sql = "DELETE FROM `_page_block` WHERE `id`=".$id;
-		query($sql);
-
-		//удаление элементов в блоке
-		$sql = "DELETE FROM `_page_element` WHERE `block_id`=".$id;
-		query($sql);
-
-		$send['html'] = utf8(_pageShow($block['page_id'], 1));
-
-		_cache('clear', '_pageCache');
+		$send['html'] = utf8(_blockTabGet($block['page_id'], $id));
+		$send['block'] = $block;
 
 		jsonSuccess($send);
 		break;
+
 
 	case 'page_elem_style_save'://применение стилей элемента
 		if(!$id = _num($_POST['id']))
@@ -628,13 +415,15 @@ switch(@$_POST['op']) {
 
 		//отступы
 		$pad = _txt(@$_POST['pad']);
-		$type = _txt(@$_POST['type']);
+		$display = _txt(@$_POST['display']);
 		$pos = _txt(@$_POST['pos']);
 		$color = _txt(@$_POST['color']);
 		$font = _txt(@$_POST['font']);
 
 		$size = _num(@$_POST['size']);
 		$size = $size == 13 ? '' : 'fs'.$size;
+
+		$w = _num(@$_POST['w']);
 
 		//получение данных элемента
 		$sql = "SELECT *
@@ -646,8 +435,9 @@ switch(@$_POST['op']) {
 		//изменение стилей
 		$sql = "UPDATE `_page_element`
 				SET `pad`='".$pad."',
-					`type`='".$type."',
+					`display`='".$display."',
 					`pos`='".$pos."',
+					`w`=".$w.",
 					`color`='".$color."',
 					`font`='".$font."',
 					`size`='".$size."'
@@ -1256,6 +1046,344 @@ function _dialogComponent_defSet($val, $r, $isEdit) {//установка значения по умо
 
 
 
+/*
+	case 'page_block_add'://добавление блока на страницу
+		if(!$page_id = _num($_POST['page_id']))
+			jsonError('Некорректный ID страницы');
+
+		$sql = "INSERT INTO `_page_block` (
+					`page_id`,
+					`sort`,
+					`viewer_id_add`
+				) VALUES (
+					".$page_id.",
+					"._maxSql('_page_block').",
+					".VIEWER_ID."
+				)";
+		query($sql);
+
+		$block_id = query_insert_id('_page_block');
+
+		$block = array(
+			'id' => $block_id,
+			'parent_id' => 0,
+			'w' => 0,
+			'elem_count' => 0,
+			'sort' => 0
+		);
+
+		$send['id'] = $block_id;
+		$send['html'] = utf8(
+			'<div id="pb_'.$block_id.'" class="pb prel h50" val="'.$block_id.'">'.
+				_pageBlockPas($block, 1).
+			'</div>'
+		);
+
+		_cache('clear', '_pageCache');
+
+		jsonSuccess($send);
+		break;
+	case 'page_block_div'://деление блока на две части
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный ID блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `id`=".$block_id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$block_id.' не существует');
+
+
+		//если блок является основным, то он становится дочерним, а над ним вносится блок, который будет родителем над текущим и над новым
+		if(!$parent_id = _num($block['parent_id'])) {
+			$sql = "INSERT INTO `_page_block` (
+						`page_id`,
+						`sort`,
+						`viewer_id_add`
+					) VALUES (
+						".$block['page_id'].",
+						".$block['sort'].",
+						".VIEWER_ID."
+					)";
+			query($sql);
+
+			$parent_id = query_insert_id('_page_block');
+
+			$sql = "UPDATE `_page_block`
+					SET `parent_id`=".$parent_id.",
+						`w`=1000
+					WHERE `id`=".$block_id;
+			query($sql);
+
+			$block['w'] = 1000;
+		}
+
+		//изменение значений сортировки, чтобы не повторялись
+		$sql = "UPDATE `_page_block`
+				SET `sort`=`sort`+1
+				WHERE `parent_id`=".$parent_id."
+				  AND `sort`>".$block['sort'];
+		query($sql);
+
+		//внесение нового дочернего блока
+		$sql = "INSERT INTO `_page_block` (
+					`page_id`,
+					`parent_id`,
+					`w`,
+					`sort`,
+					`viewer_id_add`
+				) VALUES (
+					".$block['page_id'].",
+					".$parent_id.",
+					100,
+					".($block['sort'] + 1).",
+					".VIEWER_ID."
+				)";
+		query($sql);
+
+		//определение блока, из которого нужно вычесть размер 100px
+		if($block['w'] < 200) {
+			$sql = "SELECT `id`
+					FROM `_page_block`
+					WHERE `parent_id`=".$parent_id."
+					ORDER BY `w` DESC
+					LIMIT 1";
+			$block_id = query_value($sql);
+		}
+
+		//убавление размера разделяемого блока
+		$sql = "UPDATE `_page_block`
+				SET `w`=`w`-100
+				WHERE `id`=".$block_id;
+		query($sql);
+
+		$send['html'] = utf8(_pageShow($block['page_id'], 1));
+
+		jsonSuccess($send);
+		break;
+	case 'page_block_resize'://изменение размера блока
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный ID блока');
+		if(!$w = _num($_POST['w']))
+			jsonError('Некорректная длина блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `id`=".$block_id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$block_id.' не существует');
+
+		//установка новой длины блока
+		$sql = "UPDATE `_page_block`
+				SET `w`=".$w."
+				WHERE `id`=".$block_id;
+		query($sql);
+
+		//изменение длины следующего блока на уменьшенную разницу
+		$sql = "UPDATE `_page_block`
+				SET `w`=`w`+(".($block['w'] - $w).")
+				WHERE `parent_id`=".$block['parent_id']."
+				  AND `sort`>".$block['sort']."
+				ORDER BY `sort`
+				LIMIT 1";
+		query($sql);
+
+		$send['html'] = utf8(_pageShow($block['page_id'], 1));
+
+		jsonSuccess($send);
+		break;
+	case 'page_block_style_load'://получение стилей блока для диалога
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный ID блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `id`=".$id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$id.' не существует');
+
+		//отступы
+		$ex = explode(' ', $block['pad']);
+		$pad =
+		'<div class="pas-block-pad mt10 center">'.
+
+			'<div class="fs15 color-555 mb5">сверху</div>'.
+			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[0] ? 'bg-dfd' : 'pale').'">'.$ex[0].'</div>'.
+			'<button class="vk small cancel mt1 plus">»</button>'.
+
+			'<table class="w100p ml10 mt30 mb30">'.
+				'<tr><td class="w200">'.
+						'<div class="dib fs15 color-555 mr5">слева</div>'.
+						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[3] ? 'bg-dfd' : 'pale').'">'.$ex[3].'</div>'.
+						'<button class="vk small cancel mt1 plus">»</button>'.
+					'<td>'.
+						'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+						'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[1] ? 'bg-dfd' : 'pale').'">'.$ex[1].'</div>'.
+						'<button class="vk small cancel mt1 plus">»</button>'.
+						'<div class="dib fs15 color-555 ml5">справа</div>'.
+			'</table>'.
+
+			'<button class="vk small cancel mt1 mr3 minus">«</button>'.
+			'<div class="dib bor-e8 fs14 b pad2-7 mr3 w15 '.($ex[2] ? 'bg-dfd' : 'pale').'">'.$ex[2].'</div>'.
+			'<button class="vk small cancel mt1 plus">»</button>'.
+			'<div class="fs15 color-555 mt3">снизу</div>'.
+
+		'</div>';
+
+		//границы блока
+		$ex = explode(' ', $block['bor']);
+		$bor =
+		'<div class="mar20 w250 center">'.
+			_check(array(
+				'id' => 'bor0',
+				'title' => 'сверху',
+				'value' => $ex[0],
+				'light' => 1
+			)).
+
+			'<table class="w100p ml10 mt20 mb20">'.
+				'<tr><td class="w100">'.
+						_check(array(
+							'id' => 'bor3',
+							'title' => 'слева',
+							'value' => $ex[3],
+							'light' => 1
+						)).
+					'<td>'.
+						_check(array(
+							'id' => 'bor1',
+							'title' => 'справа',
+							'value' => $ex[1],
+							'light' => 1
+						)).
+			'</table>'.
+
+			_check(array(
+				'id' => 'bor2',
+				'title' => 'снизу',
+				'value' => $ex[2],
+				'light' => 1
+			)).
+		'</div>';
+
+
+		$send['html'] = utf8(
+			'<div class="ml10 mr10">'.
+				'<div class="hd2">Внутренние отступы:</div>'.
+				$pad.
+
+
+				'<div class="hd2 mt20">Границы:</div>'.
+				$bor.
+			'</div>'
+		);
+
+		jsonSuccess($send);
+		break;
+	case 'page_block_style_save'://применение стилей блока
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный ID блока');
+
+		$bg = _txt($_POST['bg']);
+
+		//отступы
+		$ex = explode(' ', $_POST['pad']);
+		$pad =  _num($ex[0]).' './/сверху
+				_num($ex[2]).' './/справа
+				_num($ex[3]).' './/снизу
+				_num($ex[1]);    //слева
+
+
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `id`=".$id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$id.' не существует');
+
+		//изменение стилей
+		$sql = "UPDATE `_page_block`
+				SET `bg`='".addslashes($bg)."',
+				    `pad`='".$pad."',
+				    `bor`='".$bor."'
+				WHERE `id`=".$id;
+		query($sql);
+
+//		$send['html'] = utf8(_pageShow($block['page_id'], 1));
+
+		jsonSuccess();
+		break;
+	case 'page_block_del'://удаление блока
+		if(!$id = _num($_POST['id']))
+			jsonError('Некорректный ID блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_page_block`
+				WHERE `id`=".$id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$id.' не существует');
+
+		//если блок является дочерним
+		if($block['parent_id']) {
+			//подсчёт количества дочерних блоков, в котором состоит удаляемый блок
+			$sql = "SELECT COUNT(*)
+					FROM `_page_block`
+					WHERE `parent_id`=".$block['parent_id'];
+			$parentCount = query_value($sql);
+
+			//если блок останется один, то установка его основным на странице
+			if($parentCount < 3) {
+				//получение данных блока-родителя
+				$sql = "SELECT *
+						FROM `_page_block`
+						WHERE `id`=".$id;
+				$blockParent = query_assoc($sql);
+
+				//удаление блока-родителя
+				$sql = "DELETE FROM `_page_block` WHERE `id`=".$block['parent_id'];
+				query($sql);
+
+				//оставшийся блок помещается на основной странице
+				$sql = "UPDATE `_page_block`
+						SET `parent_id`=0,
+							`w`=0,
+							`sort`=".$blockParent['sort']."
+						WHERE `parent_id`=".$block['parent_id'];
+				query($sql);
+			} else {
+				//увеличение длины первого блока в строке на длину удалённого блока
+				$sql = "UPDATE `_page_block`
+						SET `w`=`w`+".$block['w']."
+						WHERE `parent_id`=".$block['parent_id']."
+						  AND `id`!=".$id."
+						ORDER BY `sort`
+						LIMIT 1";
+				query($sql);
+			}
+		}
+
+		//удаление блока
+		$sql = "DELETE FROM `_page_block` WHERE `id`=".$id;
+		query($sql);
+
+		//удаление элементов в блоке
+		$sql = "DELETE FROM `_page_element` WHERE `block_id`=".$id;
+		query($sql);
+
+		$send['html'] = utf8(_pageShow($block['page_id'], 1));
+
+		_cache('clear', '_pageCache');
+
+		jsonSuccess($send);
+		break;
+*/
 
 
 
