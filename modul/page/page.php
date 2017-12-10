@@ -430,15 +430,13 @@ function _blockLevelChange() {//кнопки для изменения уровня редактирования блоко
 			continue;
 
 		$level = 2;
-		if($max < $level)
-			$max = $level;
 
-		while($parent_id) {
+		while($parent_id)
 			if($parent_id = $arr[$parent_id]['parent_id'])
 				$level++;
-			if($max < $level)
-				$max = $level;
-		}
+
+		if($max < $level)
+			$max = $level;
 	}
 
 
