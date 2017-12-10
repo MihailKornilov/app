@@ -33,6 +33,8 @@ define('PAS', _bool(@$_COOKIE['page_setup'])); //флаг включения управления стран
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
+//уровень редактируемых блоков
+define('BLOCK_LEVEL', empty($_COOKIE['block_level']) ? 1 : _num($_COOKIE['block_level']));
 
 
 
@@ -97,7 +99,6 @@ function _global_script() {//скрипты и стили
 
 		'<script src="js/lodash.min.js"></script>'.
 		'<link rel="stylesheet" href="css/gridstack.css?'.TIME.'" />'.
-		'<link rel="stylesheet" href="css/grid-child.css?'.TIME.'" />'.
 		'<script src="js/gridstack.js?'.TIME.'"></script>'.
 		'<script src="js/gridstack.jQueryUI.js"></script>'.
 

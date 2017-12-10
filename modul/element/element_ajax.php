@@ -275,16 +275,14 @@ switch(@$_POST['op']) {
 		if(!$page_id = $_POST['page_id'])
 			jsonError('Некорректный ID страницы');
 
-		$html =
-		'<div class="grid-stack">'._blockEditGet($page_id).'</div>'.
-		'<div class="pad10 bor-e8 fs15 center color-555 curP over1 mt1" id="grid-add">Добавить блок</div> '.
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `page_id`=".$page_id."
+				  AND !`parent_id`
+				ORDER BY `y`,`x`";
+		$arr = query_arr($sql);
 
-		'<div class="mar10 center">'.
-			'<button class="vk" id="grid-save">Сохранить порядок</button>'.
-			'<button class="vk cancel ml10" id="grid-cancel">Отмена</button>'.
-		'</div>';
-
-		$send['html'] = utf8($html);
+		$send['html'] = utf8(_blockGrid($arr));
 
 		jsonSuccess($send);
 		break;
@@ -292,74 +290,90 @@ switch(@$_POST['op']) {
 		if(!$page_id = $_POST['page_id'])
 			jsonError('Некорректный ID страницы');
 
-		$send['html'] = utf8(_blockTabGet($page_id));
+		$send['html'] = utf8(_blockTab($page_id));
 
 		jsonSuccess($send);
 		break;
-	case 'block_edit_save':
-		if(!$page_id = $_POST['page_id'])
+	case 'block_grid_save':
+		if(!$page_id = _num($_POST['page_id']))
 			jsonError('Некорректный ID страницы');
-		if(!$arr = @$_POST['arr'])
-			jsonError('Нет данных для сохранения блоков');
 
-		$insert = array();
+
+		//проверка наличия родительского блока
+		if($parent_id = _num(@$_POST['parent_id'])) {
+			$sql = "SELECT *
+					FROM `_block`
+					WHERE `id`=".$parent_id;
+			if(!$parent = query_ass($sql))
+				jsonError('Родительского блока не существует');
+		}
+
 		$ids = array(0);
-		foreach($arr as $r) {
-			$ex = explode(',', $r);
-			$id = _num($ex[0]);
-			$x = _num($ex[1]);
-			$y = _num($ex[2]);
-			if(!$w = _num($ex[3]))
-				continue;
-			if(!$h = _num($ex[4]))
-				continue;
-			$width = $w * 20;
-			$height = $h * 20;
-			$insert[] = "(".
-				$id.",".
-				$page_id.",".
-				$x.",".
-				$y.",".
-				$w.",".
-				$h.",".
-				$width.",".
-				$height.",".
-				VIEWER_ID.
-			")";
-			if($id)
-				$ids[] = $id;
+		$insert = array();
+
+		if($arr = @$_POST['arr']) {
+			$mn = 10;//множитель
+
+			foreach($arr as $r) {
+				$ex = explode(',', $r);
+				$id = _num($ex[0]);
+				$x = _num($ex[1]);
+				$y = _num($ex[2]);
+				if(!$w = _num($ex[3]))
+					continue;
+				if(!$h = _num($ex[4]))
+					continue;
+				$width = $w * $mn;
+				$height = $h * $mn;
+				$insert[] = "(".
+					$id.",".
+					$page_id.",".
+					$parent_id.",".
+					$x.",".
+					$y.",".
+					$w.",".
+					$h.",".
+					$width.",".
+					$height.",".
+					VIEWER_ID.
+				")";
+				if($id)
+					$ids[] = $id;
+			}
 		}
 
 		//удаление удалённых блоков
 		$sql = "DELETE FROM `_block`
 				WHERE `page_id`=".$page_id."
+				  AND `parent_id`=".$parent_id."
 				  AND `id` NOT IN (".implode(',', $ids).")";
 		query($sql);
 
-		if(empty($insert))
-			jsonError('Некорректные данные для сохранения блоков');
+		if(!empty($insert)) {
+			$sql = "INSERT INTO `_block` (
+						`id`,
+						`page_id`,
+						`parent_id`,
+						`x`,
+						`y`,
+						`w`,
+						`h`,
+						`width`,
+						`height`,
+						`viewer_id_add`
+					) VALUES ".implode(',', $insert)."
+					ON DUPLICATE KEY UPDATE
+						`x`=VALUES(`x`),
+						`y`=VALUES(`y`),
+						`w`=VALUES(`w`),
+						`h`=VALUES(`h`),
+						`width`=VALUES(`width`),
+						`height`=VALUES(`height`)";
+			query($sql);
+		}
 
-		$sql = "INSERT INTO `_block` (
-					`id`,
-					`page_id`,
-					`x`,
-					`y`,
-					`w`,
-					`h`,
-					`width`,
-					`height`,
-					`viewer_id_add`
-				) VALUES ".implode(',', $insert)."
-				ON DUPLICATE KEY UPDATE
-					`x`=VALUES(`x`),
-					`y`=VALUES(`y`),
-					`w`=VALUES(`w`),
-					`h`=VALUES(`h`),
-					`width`=VALUES(`width`),
-					`height`=VALUES(`height`)";
-		query($sql);
 
-		$send['html'] = utf8(_blockTabGet($page_id));
+		$send['html'] = utf8(_blockTab($page_id));
 
 		jsonSuccess($send);
 		break;
@@ -402,8 +416,9 @@ switch(@$_POST['op']) {
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$id.' не существует');
 
-		$send['html'] = utf8(_blockTabGet($block['page_id'], $id));
+		$send['html'] = utf8(_blockTab($block['page_id'], $id));
 		$send['block'] = $block;
+		$send['w'] = $block['w'];
 
 		jsonSuccess($send);
 		break;

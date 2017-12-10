@@ -200,11 +200,19 @@ table{border:0;border-spacing:0}
 #pas .p{width:1000px;margin:auto}
 
 /* отдельный блок в редактировании */
-.block-unit:not(.block-unit-div){
+.block-unit{
 	background:transparent repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAACXBIWXMAAAsTAAALEwEAmpwYAAAABGdBTUEAALGeYUxB9wAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAAAYklEQVR42oSRwREAIQgD0399NEEV8XHnGYGDhw9ndokG0I10A91Acjx4YSahGuBGfNM1acMqufFJ0ImaVMCVgPQngbMQkwJ8hBv+L6JM2M9oE0J13b2Hh5bYbvnawwSLtAYA9Vy3mN0z328AAAAASUVORK5CYII=");
-	overflow-x:hidden;
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	z-index:1;
 }
-
+.block-unit:not(.grid):hover{
+	background-color:#ffe;
+	opacity:.6;
+}
 
 
 /* цвета блока в настройках */

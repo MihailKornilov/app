@@ -1797,9 +1797,11 @@ var VK_SCROLL = 0,
 	},
 
 	_blockUnitSetup = function() {//настройка стилей блока
+		if(!window.BLOCK_ARR)//страница ещё не догрузилась
+			return;
 
-		//если производится деление блока на части, настройка стилей не выводится
-		if($('.block-unit-div').length)
+		//если производится процесс деления блока на части, настройка стилей не выводится
+		if($('.block-unit-grid').length)
 			return;
 
 		var t = $(this),
@@ -1808,12 +1810,11 @@ var VK_SCROLL = 0,
 			obj = $('#bl_' + BL.id);
 
 		t._hint({
-			msg:_blockUnitBg(BL) +
+			msg:'<div class="hd2 mb10">Настройки блока</div>' +
+				_blockUnitBg(BL) +
 				_blockUnitBor(BL) +
-				'<div class="mt20 center">' +
-					'<button class="vk small green" onclick="_blockUnitElAdd(' + block_id + ')">Вставить элемент</button>' +
-					'<button id="block-grid-button" class="vk small orange mt5" onclick="_blockUnitGrid(' + block_id + ')">Поделить блок на части</button>' +
-				'</div>',
+				_blockUnitBut(BL) +
+				_blockUnitElem(BL),
 			ugol:'right',
 			width:190,
 			show:1,
@@ -1892,6 +1893,20 @@ var VK_SCROLL = 0,
 			'</table>' +
 			'<div class="ml40 pl15"><input type="hidden" id="block-unit-bor2" value="' + bor[2] + '"></div>';
 	},
+	_blockUnitBut = function(BL) {//кнопки
+		if(BL.elem)
+			return '';
+		return '<div class="mt20 center">' +
+					'<button id="block-grid-button" class="vk small orange mb5" onclick="_blockUnitGrid(' + BL.id + ')">Настроить подблоки</button>' +
+	   (!BL.child ? '<button class="vk small green" onclick="_blockUnitElAdd(' + BL.id + ')">Вставить элемент</button>' : '') +
+				'</div>';
+	},
+	_blockUnitElem = function(BL) {//настройки элемента
+		if(!BL.elem)
+			return '';
+
+		return '<div class="hd2 mt20">Настройки элемента</div>';
+	},
 	_blockUnitElAdd = function(block_id) {//добавление нового элемента в блок
 		$('._hint').remove();
 		var html =
@@ -1935,77 +1950,10 @@ var VK_SCROLL = 0,
 		_post(send, function(res) {
 				$('._hint').remove();
 				$('#_content').html(res.html);
-
-				$('#grid-child').gridstack({
-					itemClass:'grid-child-item',
-					animate:true,       //плавная пристыковка после отпускания при растягивании
-					verticalMargin:1,   //отступ сверху
-					cellHeight:10,      //минимальная высота блока
-					float:false,        //если true - блок можно расположить в любом месте, иначе блок всегда тянется к верху
-					width:res.block.w * 2
+				$('#grid-stack')._grid({
+					width:res.w,
+					parent_id:block_id,
 				});
-
-				var grid = $('#grid-child').data('gridstack'),
-					num = 1;
-				//добавление нового блока
-				$('#grid-child-add').click(function() {
-					grid.addWidget($('<div id="gn' + num++ + '">' +
-						'<div class="grid-stack-item-content"></div>' +
-						'<div class="grid-stack-item-del">x</div>' +
-						'</div>'),
-						0, 0, 50, 2, true);
-				});
-
-				$('#grid-child')
-					.on('gsresizestop', function(event, elem) {
-						var h = _num($(elem).attr('data-gs-height')),
-							y = $(elem).attr('data-gs-y'),
-							attr_id = $(elem).attr('id');
-						_forEq($('.grid-child-item'), function(eq) {
-							if(eq.attr('data-gs-y') != y)
-								return;
-							if(eq.attr('id') == attr_id)
-								return;
-							grid.resize(eq, null, h);
-						});
-					})
-					.on('dragstop', function(event) {
-						var elem = $(event.target),
-							h = _num(elem.attr('data-gs-height')),
-							h_new = 0,
-							y = -1,
-							attr_id = elem.attr('id');
-						_forEq($('.grid-child-item'), function(eq) {
-							if(!eq.attr('id')) {
-								y = eq.attr('data-gs-y');
-								return false;
-							}
-						});
-						if(y < 0)
-							return;
-						_forEq($('.grid-child-item'), function(eq) {
-							if(!eq.attr('id'))
-								return;
-							if(attr_id == eq.attr('id'))
-								return;
-							if(y != eq.attr('data-gs-y'))
-								return;
-							if(h == eq.attr('data-gs-height'))
-								return;
-							h_new = _num(eq.attr('data-gs-height'));
-						});
-						if(!h_new)
-							return;
-						grid.resize(elem, null, h_new);
-					});
-
-				$(document)
-					.off('click', '.grid-stack-item-del')
-					.on('click', '.grid-stack-item-del', function() {
-						var t = $(this),
-							p = t.parent();
-						grid.removeWidget(p);
-					});
 			}, function() {
 				but.removeClass('_busy');
 			});
@@ -2080,111 +2028,26 @@ $(document)
 
 		_post(send, function(res) {
 			$('#_content').html(res.html);
+			if(v)
+				$('#grid-stack')._grid();
+		});
 
-			if(!v)
-				return;
+	})
+	.on('click', '.block-level-change', function() {//изменения уровня редактирования блоков
+		var t = $(this),
+			v = _num(t.html()),
+			send = {
+				op:'block_edit_off',
+				page_id:PAGE_ID
+			};
 
-			$('.grid-stack').gridstack({
-				animate:true,       //плавная пристыковка после отпускания при растягивании
-				verticalMargin:1,   //отступ сверху
-				cellHeight:20,      //минимальная высота блока
-				float:false,        //если true - блок можно расположить в любом месте, иначе блок всегда тянется к верху
-				width:50
-			});
+		t.parent().find('.vk').addClass('cancel');
+		t.removeClass('cancel');
 
-			var grid = $('.grid-stack').data('gridstack'),
-				num = 1;
-			//добавление нового блока
-			$('#grid-add').click(function() {
-				grid.addWidget($('<div id="gn' + num++ + '">' +
-					'<div class="grid-stack-item-content"></div>' +
-					'<div class="grid-stack-item-del">x</div>' +
-					'</div>'),
-					0, 0, 50, 2, true);
-			});
+		_cookie('block_level', v);
 
-			//сохранение данных
-			$('#grid-save').click(function() {
-				var t = $(this),
-					arr = [];
-				_forEq($('.grid-stack-item'), function(eq) {
-					arr.push(
-						(eq.attr('id') ? _num(eq.attr('id').split('_')[1]) : 0) + ',' +
-						eq.attr('data-gs-x') + ',' +
-						eq.attr('data-gs-y') + ',' +
-						eq.attr('data-gs-width') + ',' +
-						eq.attr('data-gs-height')
-					);
-				});
-
-				t.addClass('_busy');
-				var send = {
-					op:'block_edit_save',
-					page_id:PAGE_ID,
-					arr:arr
-				};
-				_post(send, function(res) {
-					$('#_content').html(res.html);
-					$('.icon-page-tmp').removeClass('on');
-				}, function() {
-					t.removeClass('_busy');
-				});
-			});
-			$('#grid-cancel').click(function() {//отмена редактирования
-				$('.icon-page-tmp').trigger('click');
-			});
-
-			$('.grid-stack')
-				.on('gsresizestop', function(event, elem) {
-					var h = _num($(elem).attr('data-gs-height')),
-						y = $(elem).attr('data-gs-y'),
-						attr_id = $(elem).attr('id');
-					_forEq($('.grid-stack-item'), function(eq) {
-						if(eq.attr('data-gs-y') != y)
-							return;
-						if(eq.attr('id') == attr_id)
-							return;
-
-						grid.resize(eq, null, h);
-					});
-				})
-				.on('dragstop', function(event) {
-					var elem = $(event.target),
-						h = _num(elem.attr('data-gs-height')),
-						h_new = 0,
-						y = -1,
-						attr_id = elem.attr('id');
-					_forEq($('.grid-stack-item'), function(eq) {
-						if(!eq.attr('id')) {
-							y = eq.attr('data-gs-y');
-							return false;
-						}
-					});
-					if(y < 0)
-						return;
-					_forEq($('.grid-stack-item'), function(eq) {
-						if(!eq.attr('id'))
-							return;
-						if(attr_id == eq.attr('id'))
-							return;
-						if(y != eq.attr('data-gs-y'))
-							return;
-						if(h == eq.attr('data-gs-height'))
-							return;
-						h_new = _num(eq.attr('data-gs-height'));
-					});
-					if(!h_new)
-						return;
-					grid.resize(elem, null, h_new);
-				});
-
-			$(document)
-				.off('click', '.grid-stack-item-del')
-				.on('click', '.grid-stack-item-del', function() {
-					var t = $(this),
-						p = t.parent();
-					grid.removeWidget(p);
-				});
+		_post(send, function(res) {
+			$('#_content').html(res.html);
 		});
 
 	})
@@ -3804,7 +3667,118 @@ $.fn._dropdown = function(o) {//выпадающий список в виде ссылки
 	window[id + '_dropdown'] = t;
 	return t;
 };
+$.fn._grid = function(o) {
+	var t = $(this);
 
+	o = $.extend({
+		width:100,//количество элементов минимальной длины может поместиться в ширину
+		parent_id:0
+	}, o);
+
+	t.gridstack({
+		itemClass:'grid-item',
+		handle:'.grid-content',  //область, за которую можно перетаскивать
+		animate:true,           //плавная пристыковка после отпускания при растягивании
+		verticalMargin:1,       //отступ сверху
+		cellHeight:10,          //минимальная высота блока
+		float:false,            //если true - блок можно расположить в любом месте, иначе блок всегда тянется к верху
+		width:o.width
+	});
+
+	var grid = t.data('gridstack'),
+		num = 1;
+	//добавление нового блока
+	$('#grid-add').click(function() {
+		grid.addWidget($('<div id="gn' + num++ + '">' +
+			'<div class="grid-content"></div>' +
+			'<div class="grid-del">x</div>' +
+			'</div>'),
+			0, 0, o.width, 3, true);
+	});
+
+	//сохранение данных
+	$('#grid-save').click(function() {
+		var t = $(this),
+			arr = [];
+		_forEq($('.grid-item'), function(eq) {
+			arr.push(
+				(eq.attr('id') ? _num(eq.attr('id').split('_')[1]) : 0) + ',' +
+				eq.attr('data-gs-x') + ',' +
+				eq.attr('data-gs-y') + ',' +
+				eq.attr('data-gs-width') + ',' +
+				eq.attr('data-gs-height')
+			);
+		});
+
+		t.addClass('_busy');
+		var send = {
+			op:'block_grid_save',
+			page_id:PAGE_ID,
+			parent_id:o.parent_id,
+			arr:arr
+		};
+		_post(send, function(res) {
+			$('.icon-page-tmp').removeClass('on');
+			$('#_content').html(res.html);
+		}, function() {
+			t.removeClass('_busy');
+		});
+	});
+	$('#grid-cancel').click(function() {//отмена редактирования
+		$('.icon-page-tmp').addClass('on').trigger('click');
+	});
+
+	t.on('gsresizestop', function(event, elem) {
+			var h = _num($(elem).attr('data-gs-height')),
+				y = $(elem).attr('data-gs-y'),
+				attr_id = $(elem).attr('id');
+			_forEq($('.grid-item'), function(eq) {
+				if(eq.attr('data-gs-y') != y)
+					return;
+				if(eq.attr('id') == attr_id)
+					return;
+				grid.resize(eq, null, h);
+			});
+		})
+	 .on('dragstop', function(event) {
+			var elem = $(event.target),
+				h = _num(elem.attr('data-gs-height')),
+				h_new = 0,
+				y = -1,
+				attr_id = elem.attr('id');
+			_forEq($('.grid-item'), function(eq) {
+				if(!eq.attr('id')) {
+					y = eq.attr('data-gs-y');
+					return false;
+				}
+			});
+			if(y < 0)
+				return;
+			_forEq($('.grid-item'), function(eq) {
+				if(!eq.attr('id'))
+					return;
+				if(attr_id == eq.attr('id'))
+					return;
+				if(y != eq.attr('data-gs-y'))
+					return;
+				if(h == eq.attr('data-gs-height'))
+					return;
+				h_new = _num(eq.attr('data-gs-height'));
+			});
+			if(!h_new)
+				return;
+			grid.resize(elem, null, h_new);
+		});
+
+	$(document)
+		.off('click', '.grid-del')
+		.on('click', '.grid-del', function() {
+			var t = $(this),
+				p = t.parent();
+			grid.removeWidget(p);
+		});
+
+};
 
 
 
