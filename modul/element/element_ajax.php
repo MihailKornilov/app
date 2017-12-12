@@ -294,7 +294,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'block_grid_save':
+	case 'block_grid_save'://сохранение данных блоков после редактирования
 		if(!$page_id = _num($_POST['page_id']))
 			jsonError('Некорректный ID страницы');
 
@@ -303,12 +303,13 @@ switch(@$_POST['op']) {
 		if($parent_id = _num(@$_POST['parent_id'])) {
 			$sql = "SELECT *
 					FROM `_block`
-					WHERE `id`=".$parent_id;
+					WHERE `page_id`=".$page_id."
+					  AND `id`=".$parent_id;
 			if(!$parent = query_ass($sql))
 				jsonError('Родительского блока не существует');
 		}
 
-		$ids = array(0);
+		$idsNotDel = array(0);
 		$insert = array();
 
 		if($arr = @$_POST['arr']) {
@@ -338,18 +339,51 @@ switch(@$_POST['op']) {
 					VIEWER_ID.
 				")";
 				if($id)
-					$ids[] = $id;
+					$idsNotDel[$id] = $id;
 			}
 		}
+
 
 		//удаление удалённых блоков
 		$sql = "DELETE FROM `_block`
 				WHERE `page_id`=".$page_id."
 				  AND `parent_id`=".$parent_id."
-				  AND `id` NOT IN (".implode(',', $ids).")";
+				  AND `id` NOT IN (".implode(',', $idsNotDel).")";
 		query($sql);
 
-		if(!empty($insert)) {
+		//удаление удалённых блоков и их потомков
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `page_id`=".$page_id."
+				ORDER BY `parent_id`,`y`,`x`";
+		if($arr = query_arr($sql)) {
+			$idsForDel = array();
+			foreach($arr as $id => $r) {
+				if(!$parent_id = $r['parent_id'])
+					continue;
+				$ids[$id] = $id;
+				$DEL_FLAG = true;
+				while(true) {
+					if(!$p = @$arr[$parent_id])
+						break;
+					$ids[$p['id']] = $p['id'];
+					if(!$parent_id = $p['parent_id']) {
+						$DEL_FLAG = false;
+						break;
+					}
+
+				}
+				if($DEL_FLAG)
+					$idsForDel += $ids;
+			}
+
+			if($idsForDel) {
+				$sql = "DELETE FROM `_block` WHERE `id` IN (".implode(',', $idsForDel).")";
+				query($sql);
+			}
+		}
+
+		if($insert) {
 			$sql = "INSERT INTO `_block` (
 						`id`,
 						`page_id`,
@@ -373,6 +407,7 @@ switch(@$_POST['op']) {
 		}
 
 
+		$send['level'] = _blockLevelChange($page_id);
 		$send['html'] = utf8(_blockTab($page_id));
 
 		jsonSuccess($send);
@@ -1047,9 +1082,6 @@ function _dialogComponent_defSet($val, $r, $isEdit) {//установка значения по умо
 
 	return $val;
 }
-
-
-
 
 
 

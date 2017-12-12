@@ -1860,23 +1860,25 @@ var VK_SCROLL = 0,
 			.off('click', '#block-set-bg div')
 			.on('click', '#block-set-bg div', function() {
 				var unit = $(this),
-					v = unit.attr('val');
+					bg = unit.attr('val'),
+					sel = unit.hasClass('sel');
 
 				unit.parent().find('.sel').removeClass('sel');
-				unit.addClass('sel');
+				$('#bl_' + BL.id).removeClass('bg-fff bg-gr1 bg-gr2 bg-gr3 bg-ffe');
 
-				$('#bl_' + BL.id)
-					.removeClass('bg-fff bg-gr1 bg-gr2 bg-gr3 bg-ffe')
-					.addClass(v);
+				if(!sel) {
+					unit.addClass('sel');
+					$('#bl_' + BL.id).addClass(bg);
+				}
 
-				BL.bg = v;
+				BL.bg = sel ? '' : bg;
 				BL.save = 1;
 			});
 
 		return '<div class="color-555 fs14">Цвет заливки:</div>' +
 			'<div id="block-set-bg" class="mt5">' +
-				'<div class="' + (BL.bg == 'bg-fff' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP" val="bg-fff"></div>' +
-				'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr3" val="bg-gr1"></div>' +
+				'<div class="' + (BL.bg == 'bg-fff' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP     bg-fff" val="bg-fff"></div>' +
+//				'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr1" val="bg-gr1"></div>' +
 				'<div class="' + (BL.bg == 'bg-gr3' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr3" val="bg-gr3"></div>' +
 				'<div class="' + (BL.bg == 'bg-gr2' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr2" val="bg-gr2"></div>' +
 				'<div class="' + (BL.bg == 'bg-ffe' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-ffe" val="bg-ffe"></div>' +
@@ -3719,6 +3721,7 @@ $.fn._grid = function(o) {
 		};
 		_post(send, function(res) {
 			$('.icon-page-tmp').removeClass('on');
+			$('#block-level').after(res.level).remove();
 			$('#_content').html(res.html);
 		}, function() {
 			t.removeClass('_busy');

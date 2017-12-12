@@ -983,8 +983,8 @@
 
         if (!this.opts.verticalMargin || this.opts.cellHeightUnit === this.opts.verticalMarginUnit) {
             getHeight = function(nbRows, nbMargins) {
-                return (self.opts.cellHeight * nbRows + self.opts.verticalMargin * nbMargins) +
-                    self.opts.cellHeightUnit;
+               return (self.opts.cellHeight * nbRows + self.opts.verticalMargin * nbMargins) +
+                       self.opts.cellHeightUnit;//px
             };
         } else {
             getHeight = function(nbRows, nbMargins) {
@@ -1001,7 +1001,7 @@
             Utils.insertCSSRule(this._styles, prefix, 'min-height: ' + getHeight(1, 0) + ';', 0);
         }
 
-        if (maxHeight > this._styles._max) {
+       if (maxHeight > this._styles._max) {
             for (var i = this._styles._max; i < maxHeight; ++i) {
                 Utils.insertCSSRule(this._styles,
                     prefix + '[data-gs-height="' + (i + 1) + '"]',
