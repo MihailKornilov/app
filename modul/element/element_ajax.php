@@ -416,6 +416,7 @@ switch(@$_POST['op']) {
 		if(!$id = _num($_POST['id']))
 			jsonError('Некорректный ID блока');
 
+		$pos = _txt($_POST['pos']);
 		$bg = _txt($_POST['bg']);
 		//границы
 		$ex = explode(' ', $_POST['bor']);
@@ -433,10 +434,31 @@ switch(@$_POST['op']) {
 
 		//изменение стилей
 		$sql = "UPDATE `_block`
-				SET `bg`='".$bg."',
+				SET `pos`='".$pos."',
+					`bg`='".$bg."',
 					`bor`='".$bor."'
 				WHERE `id`=".$id;
 		query($sql);
+
+		//сохранение стилей элемента в блоке
+		if($elem_id = _num($_POST['elem_id'])) {
+			$sql = "SELECT *
+					FROM `_page_element`
+					WHERE `id`=".$elem_id;
+			if($elem = query_ass($sql)) {
+				$font = _txt($_POST['font']);
+				$color = _txt($_POST['color']);
+				$size = _num($_POST['size']);
+				if($size == 13)
+					$size = 0;
+				$sql = "UPDATE `_page_element`
+						SET `font`='".$font."',
+							`color`='".$color."',
+							`size`=".$size."
+						WHERE `id`=".$elem_id;
+				query($sql);
+			}
+		}
 
 		jsonSuccess();
 		break;

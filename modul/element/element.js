@@ -1814,9 +1814,9 @@ var VK_SCROLL = 0,
 				_blockUnitBg(BL) +
 				_blockUnitBor(BL) +
 				_blockUnitBut(BL) +
-				_blockUnitElem(BL),
+				_elemUnit(BL),
 			ugol:'right',
-			width:190,
+			width:230,
 			show:1,
 			remove:1,
 			delayHide:300,
@@ -1875,14 +1875,16 @@ var VK_SCROLL = 0,
 				BL.save = 1;
 			});
 
-		return '<div class="color-555 fs14">Цвет заливки:</div>' +
-			'<div id="block-set-bg" class="mt5">' +
-				'<div class="' + (BL.bg == 'bg-fff' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP     bg-fff" val="bg-fff"></div>' +
-//				'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr1" val="bg-gr1"></div>' +
-				'<div class="' + (BL.bg == 'bg-gr3' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr3" val="bg-gr3"></div>' +
-				'<div class="' + (BL.bg == 'bg-gr2' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr2" val="bg-gr2"></div>' +
-				'<div class="' + (BL.bg == 'bg-ffe' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-ffe" val="bg-ffe"></div>' +
-			'</div>';
+		return '<table>' +
+			'<tr><td class="color-555 fs14 pr5">Заливка:' +
+				'<td><div id="block-set-bg">' +
+						'<div class="' + (BL.bg == 'bg-fff' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP     bg-fff" val="bg-fff"></div>' +
+		//				'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr1" val="bg-gr1"></div>' +
+						'<div class="' + (BL.bg == 'bg-gr3' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr3" val="bg-gr3"></div>' +
+						'<div class="' + (BL.bg == 'bg-gr2' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr2" val="bg-gr2"></div>' +
+						'<div class="' + (BL.bg == 'bg-ffe' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-ffe" val="bg-ffe"></div>' +
+					'</div>' +
+			'</table>';
 	},
 	_blockUnitBor = function(BL) {//границы блока
 		var bor = BL.bor.split(' ');
@@ -1896,18 +1898,13 @@ var VK_SCROLL = 0,
 			'<div class="ml40 pl15"><input type="hidden" id="block-unit-bor2" value="' + bor[2] + '"></div>';
 	},
 	_blockUnitBut = function(BL) {//кнопки
-		if(BL.elem)
+		if(BL.elem_id)
 			return '';
+
 		return '<div class="mt20 center">' +
 					'<button id="block-grid-button" class="vk small orange mb5" onclick="_blockUnitGrid(' + BL.id + ')">Настроить подблоки</button>' +
 	   (!BL.child ? '<button class="vk small green" onclick="_blockUnitElAdd(' + BL.id + ')">Вставить элемент</button>' : '') +
 				'</div>';
-	},
-	_blockUnitElem = function(BL) {//настройки элемента
-		if(!BL.elem)
-			return '';
-
-		return '<div class="hd2 mt20">Настройки элемента</div>';
 	},
 	_blockUnitElAdd = function(block_id) {//добавление нового элемента в блок
 		$('._hint').remove();
@@ -1974,6 +1971,202 @@ var VK_SCROLL = 0,
 		_post(BL, function() {
 			obj.removeClass('_busy');
 			BL.save = 0;
+		});
+	},
+
+	_elemUnit = function(EL) {//настройки элемента в выплывающем окне
+		if(!EL.elem_id)
+			return '';
+
+		return  '<div class="hd2 mt20">' +
+					'Настройки элемента' +
+					'<div class="fr">' +
+						'<div onclick="_dialogOpen(' + EL.dialog_id + ',' + EL.elem_id + ')" class="icon icon-edit mr3' + _tooltip('Редактировать данные', -69) + '</div>' +
+						'<div onclick="_dialogOpen(6,' + EL.elem_id + ')" class="icon icon-del-red' + _tooltip('Удалить элемент', -52) + '</div>' +
+					'</div>' +
+				'</div>' +
+				_elemUnitPlace(EL) +
+
+				'<table class="w100p">' +
+					'<tr><td>' + _elemUnitFont(EL) +
+						'<td>' + _elemUnitColor(EL) +
+						'<td class="r">' + _elemUnitSize(EL) +
+				'</table>' +
+				'';
+	},
+	_elemUnitPlace = function(EL) {//стили элемента: тип блока, позиция элемента
+		$(document)
+			.off('click', '#elem-pos div')
+			.on('click', '#elem-pos div', function() {
+				var unit = $(this),
+					v = unit.attr('val'),
+					bl = $('#bl_' + EL.id);
+
+				_parent(unit, 'TABLE').find('.on').removeClass('on');
+				unit.addClass('on');
+
+				bl.removeClass('top r center bottom');
+				if(v)
+					bl.addClass(v);
+
+				EL.pos = v;
+				EL.save = 1;
+			});
+		return '<table id="elem-pos" class="mb5 w100p">' +
+			'<tr><td class="r">' +
+					'<div val="top" class="icon-wiki iw6 mr3' + _dn(EL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
+					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(EL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
+					'<div val="top r" class="icon-wiki iw8' + _dn(EL.pos == 'top r','on') + _tooltip('Вверх-вправо', -40) + '</div>' +
+			'<tr><td class="r">' +
+					'<div val="" class="icon-wiki iw3 mr3' + _dn(!EL.pos,'on') + _tooltip('Влево', -15) + '</div>' +
+					'<div val="center" class="icon-wiki iw4 mr3' + _dn(EL.pos == 'center','on') + _tooltip('По центру', -28) + '</div>' +
+					'<div val="r" class="icon-wiki iw5' + _dn(EL.pos == 'r','on') + _tooltip('Вправо', -20) + '</div>' +
+			'<tr><td class="r">' +
+					'<div val="bottom" class="icon-wiki iw9 mr3' + _dn(EL.pos == 'bottom','on') + _tooltip('Вниз-влево', -33) + '</div>' +
+					'<div val="bottom center" class="icon-wiki iw10 mr3' + _dn(EL.pos == 'bottom center','on') + _tooltip('Вниз-центр', -32) + '</div>' +
+					'<div val="bottom r" class="icon-wiki iw11' + _dn(EL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -36) + '</div>' +
+		'</table>';
+	},
+	_elemUnitFont = function(EL) {//стили элемента: жирность, наклон, подчёркивание
+		var font = {
+			b:'',
+			i:'',
+			u:''
+		};
+		_forN(EL.font.split(' '), function(v) {
+			if(!v)
+				return;
+			font[v] = ' on';
+		});
+
+		$(document)
+			.off('click', '#elem-font div')
+			.on('click', '#elem-font div', function() {
+				var td = $(this),
+					cls = td.hasClass('on'),
+					v = td.attr('val'),
+					font = [];
+				td._dn(cls, 'on');
+
+				$('#pe_' + EL.elem_id)._dn(cls, v);
+
+				_forEq($('#elem-font .on'), function(eq) {
+					font.push(eq.attr('val'));
+				});
+				EL.font = font.join(' ');
+				EL.save = 1;
+			});
+
+
+		return '<div id="elem-font" class="dib">' +
+				'<div class="icon-wiki mr3' + font.b + '" val="b"></div>' +
+				'<div class="icon-wiki iw1 mr3' + font.i + '" val="i"></div>' +
+				'<div class="icon-wiki iw2 mr5' + font.u + '" val="u"></div>' +
+		'</div>';
+	},
+	_elemUnitSize = function(EL) {//стили элемента: размер текста
+		$(document)
+			.off('click', '#elem-size button')
+			.on('click', '#elem-size button', function() {
+				var but = $(this),
+					znak = but.hasClass('plus') ? 1 : -1,
+					vd = but[znak > 0 ? 'prev' : 'next'](),
+					v = _num(vd.html());
+
+				v += znak;
+
+				if(znak > 0 && v > 18)
+					v = 18;
+
+				if(znak < 0 && v <= 10)
+					v = 10;
+
+				vd.html(v);
+
+				EL.pe
+					.removeClass('fs' + EL.size)
+					.addClass('fs' + v);
+
+				EL.size = v;
+				EL.save = 1;
+			});
+
+		return '<div id="elem-size" class="dib' + _tooltip('Размер текста', -6) +
+			'<button class="vk short cancel mr3">«</button>' +
+			'<div class="dib center bor-e8 fs16 b pt3 pb3 mr3 w35">' + EL.size + '</div>' +
+			'<button class="vk short cancel plus">»</button>' +
+		'</div>';
+	},
+	_elemUnitColor = function(EL) {//стили элемента: цвет текста
+		$(document)
+			.off('mouseenter', '#elem-color td')
+			.on('mouseenter', '#elem-color td', function() {
+				var td = $(this),
+					v = td.attr('val');
+				td._tooltip(ELEM_COLOR[v][1]);
+			})
+			.off('click', '#elem-color td')
+			.on('click', '#elem-color td', function() {
+				var td = $(this),
+					v = td.attr('val');
+
+				$('#elem-color td').css('color', 'transparent');
+				td.css('color', '#fff');
+
+				EL.pe
+					.removeClass(EL.color)
+					.addClass(v);
+
+				$('#elem-color').css('background-color', ELEM_COLOR[v][0]);
+
+				EL.color = v;
+				EL.save = 1;
+			});
+
+		var td = '',
+			n = 0;
+		for(var i in ELEM_COLOR) {
+			var bg = ELEM_COLOR[i][0],
+				sel = i == EL.color ? '#fff' : 'transparent';
+			if(!n || n == 7)
+				td += '<tr>';
+			td += '<td class="pad5 center" style="background-color:' + bg + ';color:' + sel + '" val="' + i + '">&#10004;';
+			n++;
+		}
+
+		return '<div id="elem-color" class="bor-e8 prel mtm2"  style="background-color:' + ELEM_COLOR[EL.color][0] + '">' +
+			 '<table class="w200 bg-eee curP pabs">' + td + '</table>' +
+			'</div>';
+	},
+
+	_pageSetupAppPage = function() {//сортировка страниц приложения с учётом уровней
+		$('#page-sort').nestedSortable({
+			forcePlaceholderSize: true,//сохранять размер места, откуда был взят элемент
+			placeholder:'placeholder',//класс, применяемый для подсветки места, откуда взялся элемент
+			handle:'div',
+//			helper:	'clone',
+			listType:'ol',
+			items:'li',
+//			tolerance:'pointer',
+			toleranceElement:'> div',
+			isTree:true,
+			maxLevels:3,
+//			startCollapsed: false,
+			tabSize:30,//расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
+//			expandOnHover:700,
+//			opacity:1,
+			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+
+			update:function() {
+				var send = {
+					op:'page_sort',
+					arr:$(this).nestedSortable('toArray')
+				};
+				_post(send);
+			},
+
+			expandedClass:'pb10',//раскрытый список
+			errorClass:'bg-err' //ошибка, если попытка переместить элемент на недоступный уровень
 		});
 	};
 
@@ -3787,36 +3980,7 @@ $.fn._grid = function(o) {
 
 /*
 
-	_pageSetupAppPage = function() {//сортировка страниц приложения с учётом уровней
-		$('#page-sort').nestedSortable({
-			forcePlaceholderSize: true,//сохранять размер места, откуда был взят элемент
-			placeholder:'placeholder',//класс, применяемый для подсветки места, откуда взялся элемент
-			handle:'div',
-//			helper:	'clone',
-			listType:'ol',
-			items:'li',
-//			tolerance:'pointer',
-			toleranceElement:'> div',
-			isTree:true,
-			maxLevels:3,
-//			startCollapsed: false,
-			tabSize:30,//расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
-//			expandOnHover:700,
-//			opacity:1,
-			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
 
-			update:function() {
-				var send = {
-					op:'page_sort',
-					arr:$(this).nestedSortable('toArray')
-				};
-				_post(send);
-			},
-
-			expandedClass:'pb10',//раскрытый список
-			errorClass:'bg-err' //ошибка, если попытка переместить элемент на недоступный уровень
-		});
-	},
 	_pageElemSetup = function() {//настройка стилей элементов в выплывающем окне. Также сортировка
 		if(!window.ELEM_ARR)//страница ещё не загрузилась
 			return;
@@ -3841,15 +4005,8 @@ $.fn._grid = function(o) {
 		EL.save = 0;//флаг сохранения настроек
 
 		t._hint({
-			msg:_pageElemSetupIcon(elem_id, EL) +
-				_pageElemSetupPlace(elem_id, EL) +
 				_pageElemSetupPad(elem_id, EL) +
 			(EL.fontAllow ?
-				'<table class="w100p">' +
-					'<tr><td>' + _pageElemSetupFont(elem_id, EL) +
-						'<td>' + _pageElemSetupColor(elem_id, EL) +
-						'<td class="r">' + _pageElemSetupSize(elem_id, EL) +
-				'</table>'
 			: ''),
 			ugol:'right',
 			show:1,
@@ -3862,7 +4019,6 @@ $.fn._grid = function(o) {
 
 		_pageElemResize(EL, EL.w);
 
-		_pageElemSort(t, !EL.tmp);
 	},
 	_pageElemExtend = function(elem_id) {//заполнение всех отсутствующих значений элемента по умолчанию
 		ELEM_ARR[elem_id] = $.extend({
@@ -3881,27 +4037,6 @@ $.fn._grid = function(o) {
 			pad:'0 0 0 0'
 		}, ELEM_ARR[elem_id]);
 		return ELEM_ARR[elem_id];
-	},
-	_pageElemSave = function(EL) {
-		if(EL.tmp)
-			return;
-		if(!EL.save)
-			return;
-
-		var pe = EL.pe;
-		EL.pe = '';
-		EL.op = 'page_elem_style_save';
-		pe.addClass('_busy');
-		_post(EL, function() {
-			pe.removeClass('_busy');
-			EL.pe = pe;
-		});
-	},
-	_pageElemSetupIcon = function(elem_id, EL) {//стили элемента: иконки редактировани и удаления
-		return '<div class="r">' +
-			'<div onclick="_dialogOpen(' + EL.dialog_id + ',' + elem_id + ')" class="icon icon-edit mr3' + _tooltip('Настроить элемент', -57) + '</div>' +
-			'<div onclick="_dialogOpen(6,' + elem_id + ')" class="icon icon-del-red' + _tooltip('Удалить элемент', -52) + '</div>' +
-		'</div>';
 	},
 	_pageElemSetupPad = function(elem_id, EL) {//стили элемента: отступы
 		var pad = EL.pad.split(' ');
@@ -3961,299 +4096,5 @@ $.fn._grid = function(o) {
 			'<button class="vk small cancel mt1 plus">»</button>' +
 		'</div>';
 	},
-	_pageElemSetupPlace = function(elem_id, EL) {//стили элемента: тип блока, позиция элемента
-		$(document)
-			.off('click', '#elem-display div')
-			.on('click', '#elem-display div', function() {
-				var unit = $(this),
-					v = unit.attr('val');
 
-				EL.display = v;
-
-				unit.parent().find('.on').removeClass('on');
-				unit.addClass('on');
-
-				$('#elem-pos')._dn(!v);
-
-				EL.pe._dn(!v, 'dib');
-				EL.save = 1;
-			})
-			.off('click', '#elem-fix')
-			.on('click', '#elem-fix', function() {
-				var unit = $(this),
-					v = !unit.hasClass('on');
-
-				unit._dn(!v, 'on');
-
-				$('#elem-w')._dn(v);
-
-				_pageElemResize(EL, v);
-				$('#elem-w span').html(EL.w + 'px');
-
-				EL.save = 1;
-			})
-			.off('click', '#elem-bl')
-			.on('click', '#elem-bl', function() {
-				var unit = $(this),
-					v = !unit.hasClass('on');
-
-				unit._dn(!v, 'on');
-				EL.pe._dn(!v, 'br').before('<br>');
-
-			})
-			.off('click', '#elem-pos div')
-			.on('click', '#elem-pos div', function() {
-				var unit = $(this),
-					v = unit.attr('val');
-
-				unit.parent().find('.on').removeClass('on');
-				unit.addClass('on');
-
-				EL.pe
-					.removeClass('r center')
-					.addClass(v);
-
-				EL.pos = v;
-				EL.save = 1;
-			});
-		return '<table class="mb5 w100p">' +
-			'<tr><td id="elem-display" class="w35 wsnw">' +
-					'<div val="" class="icon-wiki iw18 mr3' + _dn(!EL.display, 'on') + _tooltip('Максимальная длина', -61) + '</div>' +
-					'<div val="dib" class="icon-wiki iw19 mr15' + _dn(EL.display, 'on') + _tooltip('Обтекание', -29) + '</div>' +
-
-				'<td class="w15">' +
-					'<div id="elem-fix" class="icon-wiki iw20 mr3' + _dn(EL.w, 'on') + _tooltip('Фиксированный размер', -71) + '</div>' +
-
-				'<td id="elem-w" class="w15' + _dn(EL.w) + _tooltip('Текущий размер', -46) +
-					'<span class="fs11 color-555">' + EL.w + 'px</span>' +
-
-				'<td>' +
-					'<div id="elem-bl" class="icon-wiki iw8 mr3' + _tooltip('Прижимание справа', -71) + '</div>' +
-		'</table>' +
-
-		'<table class="mb5 w100p">' +
-			'<tr><td id="elem-pos" class="r' + _dn(!EL.display || EL.w) + '">' +
-					'<div val="" class="icon-wiki iw3 mr3' + (!EL.pos ? ' on' : '') + _tooltip('Прижать влево', -43) + '</div>' +
-					'<div val="center" class="icon-wiki iw4 mr3' + (EL.pos == 'center' ? ' on' : '') + _tooltip('По центру', -28) + '</div>' +
-					'<div val="r" class="icon-wiki iw5' + (EL.pos == 'r' ? ' on' : '') + _tooltip('Прижать вправо', -47) + '</div>' +
-		'</table>';
-	},
-	_pageElemSetupFont = function(elem_id, EL) {//стили элемента: жирность, наклон, подчёркивание
-		var font = {
-			b:'',
-			i:'',
-			u:''
-		};
-		_forN(EL.font.split(' '), function(v) {
-			if(!v)
-				return;
-			font[v] = ' on';
-		});
-
-		$(document)
-			.off('click', '#elem-font div')
-			.on('click', '#elem-font div', function() {
-				var td = $(this),
-					cls = td.hasClass('on'),
-					v = td.attr('val'),
-					font = [];
-				td._dn(cls, 'on');
-
-				EL.pe._dn(cls, v);
-
-				_forEq($('#elem-font .on'), function(eq) {
-					font.push(eq.attr('val'));
-				});
-				EL.font = font.join(' ');
-				EL.save = 1;
-			});
-
-
-		return '<div id="elem-font" class="dib">' +
-				'<div class="icon-wiki mr3' + font.b + '" val="b"></div>' +
-				'<div class="icon-wiki iw1 mr3' + font.i + '" val="i"></div>' +
-				'<div class="icon-wiki iw2 mr5' + font.u + '" val="u"></div>' +
-		'</div>';
-	},
-	_pageElemSetupSize = function(elem_id, EL) {//стили элемента: размер текста
-		$(document)
-			.off('click', '#elem-size button')
-			.on('click', '#elem-size button', function() {
-				var but = $(this),
-					znak = but.hasClass('plus') ? 1 : -1,
-					vd = but[znak > 0 ? 'prev' : 'next'](),
-					v = _num(vd.html());
-
-				v += znak;
-
-				if(znak > 0 && v > 18)
-					v = 18;
-
-				if(znak < 0 && v <= 10)
-					v = 10;
-
-				vd.html(v);
-
-				EL.pe
-					.removeClass('fs' + EL.size)
-					.addClass('fs' + v);
-
-				EL.size = v;
-				EL.save = 1;
-			});
-
-		return '<div id="elem-size" class="dib' + _tooltip('Размер текста', -6) +
-			'<button class="vk short cancel mr3">«</button>' +
-			'<div class="dib center bor-e8 fs16 b pt3 pb3 mr3 w35">' + EL.size + '</div>' +
-			'<button class="vk short cancel plus">»</button>' +
-		'</div>';
-	},
-	_pageElemSetupColor = function(elem_id, EL) {//стили элемента: цвет текста
-		$(document)
-			.off('mouseenter', '#elem-color td')
-			.on('mouseenter', '#elem-color td', function() {
-				var td = $(this),
-					v = td.attr('val');
-				td._tooltip(ELEM_COLOR[v][1]);
-			})
-			.off('click', '#elem-color td')
-			.on('click', '#elem-color td', function() {
-				var td = $(this),
-					v = td.attr('val');
-
-				$('#elem-color td').css('color', 'transparent');
-				td.css('color', '#fff');
-
-				EL.pe
-					.removeClass(EL.color)
-					.addClass(v);
-
-				$('#elem-color').css('background-color', ELEM_COLOR[v][0]);
-
-				EL.color = v;
-				EL.save = 1;
-			});
-
-		var td = '',
-			n = 0;
-		for(var i in ELEM_COLOR) {
-			var bg = ELEM_COLOR[i][0],
-				sel = i == EL.color ? '#fff' : 'transparent';
-			if(!n || n == 7)
-				td += '<tr>';
-			td += '<td class="pad5 center" style="background-color:' + bg + ';color:' + sel + '" val="' + i + '">&#10004;';
-			n++;
-		}
-
-		return '<div id="elem-color" class="bor-e8 prel mtm2"  style="background-color:' + ELEM_COLOR[EL.color][0] + '">' +
-			 '<table class="w200 bg-eee curP pabs">' + td + '</table>' +
-			'</div>';
-	},
-	_pageElemSort = function(t, save) {//сортировка элементов
-		var ES = _parent(t, '.elem-sort');
-
-		if(ES.hasClass('ui-sortable'))
-			return;
-
-		ES.sortable({
-			placeholder:'ui-state-high',
-			start:function(event, ui) {
-				$('._hint').remove();
-				var i = ui.item[0],
-					h = i.clientHeight - 2,
-					w = i.clientWidth - 2;
-				//alert()
-				ui.item.prev().remove('br');
-				if(ui.item.hasClass('dib')) {
-					var pt = _num(ui.item.css('padding-top').split('px')[0]) - 1,
-						fs = ui.item.css('font-size');
-					$('.ui-state-high')
-						.addClass('dib')
-						.html('&nbsp;')
-						.css('font-size', fs)
-						.css('padding-top', pt + 'px');
-					h -= pt;
-				}
-				$('.ui-state-high')
-					.height(h)
-					.width(w)
-					.css('border','1px dashed #aaa');
-			},
-			stop:function(event, ui) {
-				if(ui.item.hasClass('br'))
-					ui.item.before('<br>');
-			},
-			update:function() {
-				if(!save)
-					return;
-
-				var dds = ES.find('.elem-pas'),
-					arr = [];
-				_forEq(dds, function(sp) {
-					var v = _num(sp.attr('val'));
-					if(v)
-						arr.push(v);
-				});
-				var send = {
-					op:'sort',
-					table:'_page_element',
-					ids:arr.join()
-				};
-				_post(send);
-			}
-		});
-	},
-	_pageElemResize = function(EL, on) {//включение/выключение изменения размера элемента
-		var uiRes = EL.pe.hasClass('ui-resizable'),
-			w,
-			max;
-
-		if(on) {
-			if(uiRes)
-				return;
-
-			//опдереление максимальной длины, на которую может растягиваться элемент
-			EL.pe.removeClass('dib');
-			EL.pe.css('width', 'auto');
-			max = Math.round(EL.pe.width());
-
-			//установка начального размера по обтеканию
-			EL.pe.addClass('dib');
-			w = Math.round(EL.pe.width() / 10 + 1) * 10;
-			if(w > 1000)
-				w = 1000;
-
-			if(!EL.w) {
-				EL.w = w;
-				EL.save = 1;
-			}
-
-			EL.pe.css('width', EL.w + 'px');
-			EL.pe._dn(!EL.display, 'dib');
-
-			EL.pe.resizable({
-				minWidth:20,
-				maxWidth:max,
-				grid:10,
-				handles:'e',
-				start:function(event, ui) {
-					$('._hint').remove();
-				},
-				stop:function(event, ui) {
-					EL.w = ui.size.width;
-					ELEM_ARR[EL.id].w = EL.w;
-					EL.save = 1;
-					_pageElemSave(EL);
-				}
-			});
-			return;
-		}
-
-		if(uiRes) {
-			EL.pe.resizable('destroy');
-			EL.pe.css('width', 'auto');
-		}
-
-		EL.w = 0;
-	}
 */

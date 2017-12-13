@@ -133,7 +133,7 @@ table{border:0;border-spacing:0}
 	cursor:pointer;
 	width:24px;
 	height:24px;
-	background:0 0 url(../../img/wiki_icons.png?4) no-repeat;
+	background:0 0 url(../../img/wiki_icons.png?5) no-repeat;
 	opacity:.6;
 	border-radius:1px;
 }
@@ -143,7 +143,13 @@ table{border:0;border-spacing:0}
 .iw2{background-position:0 -48px}/* U */
 .iw3{background-position:0 -72px}/* left */
 .iw4{background-position:0 -96px}/* center */
-.iw5{background-position:0 -120px}/* right */
+.iw5{background-position:0 -120px}/* вправо */
+.iw6{background-position:0 -144px}/* Вверх-влево */
+.iw7{background-position:0 -168px}/* Вверх-центр */
+.iw8{background-position:0 -192px}/* Вверх-вправо */
+.iw9{background-position:0 -216px}/* Вниз-влево */
+.iw10{background-position:0 -240px}/* Вниз-центр */
+.iw11{background-position:0 -264px}/* Вниз-вправо */
 
 .iw18{background-position:0 -432px}/*  */
 .iw19{background-position:0 -456px}/*  */
@@ -186,11 +192,17 @@ table{border:0;border-spacing:0}
 }
 
 
+/* блоки из таблиц */
+.bl-tab{
+	width:100%;
+	table-layout:fixed;
+}
+.bl-td{
+	position:relative;
+	overflow-x:hidden;
+}
 
-.bl{overflow-x:hidden}
 
-.pe._busy{color:transparent}
-.pe._busy *:not(.elem-pas){visibility:hidden}
 
 /* Строка управления страницей page_setup */
 #pas{
@@ -214,7 +226,6 @@ table{border:0;border-spacing:0}
 .block-unit.level2{background:transparent repeat url("data:image/gif;base64,R0lGODlhDwAPAJEAAAAAAP///8Hduv///yH5BAEAAAMALAAAAAAPAA8AAAIanI+py+0tYIqKzsuszWPL14WO9h2ecYomVAAAOw==")}
 .block-unit.level3{background:transparent repeat url("data:image/gif;base64,R0lGODlhDQANAJEAAAAAAP///8Hduv///yH5BAEAAAMALAAAAAANAA0AAAIUnI+py+0jVkTzVGpbvPJtnSncKBUAOw==")}
 .block-unit.level4{background:transparent repeat url("data:image/gif;base64,R0lGODlhCwALAJEAAAAAAP///8Hduv///yH5BAEAAAMALAAAAAALAAsAAAIRnI+py32SIJKDztpsxIrqXwAAOw==")}
-
 .block-unit:not(.grid):hover{
 	background-color:#f8fff8;
 	opacity:.9;
@@ -523,6 +534,8 @@ button.vk.orange:hover{background-color:#D59553}
 .top5{top:5px}
 .pabs{position:absolute}
 
+td.top{vertical-align:top}
+td.bottom{vertical-align:bottom}
 .center{text-align:center}
 .r{text-align:right}
 .fr{float:right}
@@ -560,10 +573,3 @@ button.vk.orange:hover{background-color:#D59553}
 .fndd{background:#ffc;border-bottom:1px solid #FE2}
 
 
-
-
-
-.aaa::after{
-	content:'123';
-	display:block;
-}

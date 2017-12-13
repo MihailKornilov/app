@@ -275,16 +275,6 @@ function _pageShow($page_id, $blockShow=0) {
 	'</div>'.
 //	_pageSpisokUnit().
 
-(PAS ?
-	'<div id="page-block-add" class="center mt1 pad15 bg-gr1 bor-f0 over1 curP'._dn($blockShow).'">'.
-		'<tt class="fs15 color-555">Добавить новый блок</tt>'.
-	'</div>'.
-	'<script>'.
-		'var ELEM_ARR={'._pageElemArr($elem_arr).'},'.
-			'ELEM_COLOR={'._pageElemColor().'};'.
-	'</script>'
-: '').
-//	_pr(_page()).
 
 	'<script>_pageShow()</script>';
 }
@@ -330,7 +320,8 @@ function _blockTab($page_id, $grid_id=0) {
 
 	return _blockLevel($block, 100).
 			'<script>'.
-				'var BLOCK_ARR={'._blockArr($arr, $child).'};'.
+				'var BLOCK_ARR={'._blockArr($arr, $child).'},'.
+					'ELEM_COLOR={'._elemColor().'};'.
 			'</script>';
 }
 function _blockChildArr($child, $parent_id=0) {//расстановка дочерних блоков
@@ -365,31 +356,17 @@ function _blockLevel($arr, $wMax, $hMax=0, $level=1) {//формирование блоков по у
 	$BB = PAS ? ' bor-b-dash' : '';
 	$br1px = PAS ? 1 : 0;
 
-	$CLS = 'bl prel ';
 
 	foreach($block as $y => $str) {
 		$r = $str[0];
 
-		$cls = $CLS.($r['id'] == GRID_ID ? ' block-unit-grid ' : '');
-
 		$bt = $y ? $BT : '';
-		$h = 'min-height:'.$r['height'].'px';
 
 		$hSum += $r['h'];
-		$bb = $y == $yEnd && $hMax > $hSum ? ' '.$BB : '';
-
-		if(count($str) == 1 && !$r['x'] && $r['w'] == $wMax) {
-			$send .= '<div id="bl_'.$r['id'].'" class="'.$r['bg'].' '.$cls.$bt.$bb.'" style="'._blockStyle($r).$h.'" val="'.$r['id'].'">'.
-						_blockSetka($r, $level).
-						_blockChildHtml($r, $level + 1).
-						_pageElemUnit($r['elem']).
-					 '</div>';
-			continue;
-		}
-
+		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
 		$send .=
-			'<table style="table-layout:fixed;width:'.($wMax * $MN).'px;'.$h.'">'.
+			'<table class="bl-tab" style="min-height:'.$r['height'].'px">'.
 				'<tr>';
 		//пустота в начале
 		if($r['x'])
@@ -397,18 +374,26 @@ function _blockLevel($arr, $wMax, $hMax=0, $level=1) {//формирование блоков по у
 		foreach($str as $n => $r) {
 			$next = @$str[$n + 1];
 
-			$bor = explode(' ', $r['bor']);
-			$borPx = $bor[3] + (PAS ? 0 : $bor[1]);
-
-			$cls = $CLS.($r['id'] == GRID_ID ? ' block-unit-grid ' : '');
 			$xEnd = !($wMax - $r['x'] - $r['w']);
+
+			$cls = array('bl-td');
+			$cls[] = $r['bg'];
+			$cls[] = trim($bt);
+			$cls[] = trim($bb);
+			$cls[] = !$xEnd ? trim($BR) : '';
+			$cls[] = $r['id'] == GRID_ID ? 'block-unit-grid' : '';
+			$cls[] = $r['pos'];
+			$cls = array_diff($cls, array(''));
+			$cls = implode(' ', $cls);
+
 			$send .= '<td id="bl_'.$r['id'].'"'.
-						' class="top '.$r['bg'].' '.$cls.$bt.$bb.(!$xEnd ? $BR : '').'"'.
-						' style="'._blockStyle($r).'width:'.($r['width'] - $br1px - $borPx).'px"'.
-						' val="'.$r['id'].'">'.
+						' class="'.$cls.'"'.
+						' style="'._blockStyle($r, $br1px).'"'.
+				 (PAS ? ' val="'.$r['id'].'"' : '').
+					 '>'.
 							_blockSetka($r, $level).
 							_blockChildHtml($r, $level + 1).
-	    					_pageElemUnit($r['elem']).
+	    					_elemDiv($r['elem']).
 					'';
 
 			//пустота в середине
@@ -469,12 +454,12 @@ function _blockSetka($r, $level) {//отображение сетки для настраиваемого блока
 
 	return '<div class="block-unit level'.BLOCK_LEVEL.' '.(GRID_ID ? ' grid' : '').'" val="'.$r['id'].'"></div>';
 }
-function _blockStyle($r) {//стили css для блока
+function _blockStyle($r, $br1px) {//стили css для блока
 	$send = array();
 
 	//границы
-	$ex = explode(' ', $r['bor']);
-	foreach($ex as $i => $b) {
+	$bor = explode(' ', $r['bor']);
+	foreach($bor as $i => $b) {
 		if(!$b)
 			continue;
 		switch($i) {
@@ -485,10 +470,10 @@ function _blockStyle($r) {//стили css для блока
 		}
 	}
 
-	if(!$send)
-		return '';
+	$borPx = $bor[3] + (PAS ? 0 : $bor[1]);
+	$send[] = 'width:'.($r['width'] - $br1px - $borPx).'px';
 
-	return implode(';', $send).';';
+	return implode(';', $send);
 }
 function _blockArr($arr, $child) {//массив настроек блоков в формате JS
 	if(empty($arr))
@@ -496,12 +481,25 @@ function _blockArr($arr, $child) {//массив настроек блоков в формате JS
 
 	$send = array();
 	foreach($arr as $id => $r) {
+		$el = $r['elem'];
 		$send[] = $id.':{'.
 			'id:'.$id.','.
+			'pos:"'.$r['pos'].'",'.
 			'bg:"'.$r['bg'].'",'.
 			'bor:"'.$r['bor'].'",'.
-			'elem:'.(empty($r['elem']) ? 0 : 1).','.
-			'child:'.(empty($child[$id]) ? 0 : 1).
+			'child:'.(!empty($child[$id]) ? 1 : 0).
+
+		($el ?
+			','.
+			'elem_id:'._num($el['id']).','.
+			'dialog_id:'._num($el['dialog_id']).','.
+			'fontAllow:'._elemFontAllow($el['dialog_id']).','.
+			'color:"'.$el['color'].'",'.
+			'font:"'.$el['font'].'",'.
+			'size:'._num($el['size']).','.
+			'mar:"'.$el['mar'].'"'
+		: '').
+
 		'}';
 	}
 	return implode(',', $send);
@@ -532,159 +530,53 @@ function _blockChildHtml($block, $level) {//деление блока на части
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function _pageBlockPas($r, $show=0, $resize=0) {//подсветка блоков при редактировании
-	if(!PAS)
+function _elemDiv($el) {//формирование div элемента
+	if(!$el)
 		return '';
 
-	if(!$page_id = _page('cur'))
-		return '';
-
-	if(!$page = _page($page_id))
-		return '';
-
-	if($page['sa'] && !SA)
-		return '';
-
-	if(!$page['app_id'] && !SA)
-		return '';
-
-	$block_id = $r['id'];
-	$dn = $show ? '' : ' dn';
-	$resize = $resize ? ' resize' : '';
-	$empty = $r['elem_count'] ? '' : ' empty';
-
-
-	return
-	'<div class="pas-block'.$empty.$resize.$dn.'" val="'.$block_id.'">'.
-		'<div class="fl">'.
-			$block_id.
-			'<span class="fs11 grey"> w'.$r['w'].'</span>'.
-			'<span class="fs11 color-acc"> '.$r['sort'].'</span>'.
-		'</div>'.
-		'<div class="pas-icon">'.
-			'<div class="icon icon-add mr3'._tooltip('Добавить элемент', -57).'</div>'.
-			'<div class="icon icon-setup mr3'._tooltip('Стили блока', -39).'</div>'.
-	($r['parent_id'] ? '<div class="icon icon-move mr3 curM center'._tooltip('Изменить порядок<br />по горизонтали', -56, '', 1).'</div>' : '').
-			'<div class="icon icon-div mr3'._tooltip('Разделить блок пополам', -76).'</div>'.
-			'<div class="icon icon-del-red'._tooltip('Удалить блок', -42).'</div>'.
-		'</div>'.
-	'</div>';
-}
-function _pageElemSpisok($elem) {//список элементов формате html для конкретного блока
-	if(!$elem)
-		return '';
-
-	$send = '';
-	foreach($elem as $r) {
-		$txt = _pageElemUnit($r);
-		$pas = _pageElemPas($r);
-		$send .= _pageElem($r, $txt, $pas);
-	}
-
-	return $send;
-}
-function _pageElem($r, $txt, $pas='') {//формирование div элемента
-	$tmp = !empty($r['tmp']);//элемент списка шаблона
+	$tmp = !empty($el['tmp']);//элемент списка шаблона
+	$attr_id = $tmp ? '' : ' id="pe_'.$el['id'].'"';
 
 	$cls = array();
-	$cls[] = $tmp ? '' : 'pe prel';
-	$cls[] = $r['display'];
-	$cls[] = $r['pos'];
-	$cls[] = $r['color'];
-	$cls[] = $r['font'];
-	$cls[] = $r['size'];
+//	$cls[] = $tmp ? '' : 'pe prel';
+	$cls[] = $el['color'];
+	$cls[] = $el['font'];
+	$cls[] = $el['size'] ? 'fs'.$el['size'] : '';
 	$cls = array_diff($cls, array(''));
 	$cls = implode(' ', $cls);
+	$cls = ' class="'.$cls.'"';
 
-	$attr_id = $tmp ? '' : ' id="pe_'.$r['id'].'"';
 
 	return
-	'<div class="'.$cls.'"'.$attr_id._pageElemStyle($r).'>'.
-		$pas.
-		$txt.
+	'<div'.$attr_id.$cls._elemStyle($el).'>'.
+		_elemUnit($el).
 	'</div>';
 
 }
-function _pageElemArr($elem) {//массив настроек элементов в формате JS
-	if(empty($elem))
-		return '';
-
+function _elemStyle($r) {//стили css для элемента
 	$send = array();
-	foreach($elem as $r) {
-		$size = 13;
-		if($r['size']) {
-			$ex = explode('fs', $r['size']);
-			$size = _num($ex[1]);
+
+	//отступы
+	$ex = explode(' ', $r['mar']);
+	foreach($ex as $px)
+		if($px) {
+			$send[] = 'margin:'.
+				$ex[0].($ex[0] ? 'px' : '').' '.
+				$ex[1].($ex[1] ? 'px' : '').' '.
+				$ex[2].($ex[2] ? 'px' : '').' '.
+				$ex[3].($ex[3] ? 'px' : '');
+			break;
 		}
-		$send[] = $r['id'].':{'.
-			'id:'.$r['id'].','.
-			'dialog_id:'.$r['dialog_id'].','.
-			'fontAllow:'._pageElemFontAllow($r['dialog_id']).','.
-			'display:"'.$r['display'].'",'.
-			'pos:"'.$r['pos'].'",'.
-			'w:'.$r['w'].','.
-			'color:"'.$r['color'].'",'.
-			'font:"'.$r['font'].'",'.
-			'size:'.$size.','.
-			'pad:"'.$r['pad'].'"'.
-		'}';
-	}
-	return implode(',', $send);
+
+	if(!$send)
+		return '';
+
+	return ' style="'.implode(';', $send).'"';
 }
-function _pageElemColor() {//массив цветов для текста в формате JS, доступных элементам
-	return
-		'"":["#000","Чёрный"],'.
-		'"color-555":["#555","Тёмно-серый"],'.
-		'"grey":["#888","Серый"],'.
-		'"pale":["#aaa","Бледный"],'.
-		'"color-ccc":["#ccc","Совсем бледный"],'.
-		'"blue":["#2B587A","Тёмно-синий"],'.
-		'"color-acc":["#07a","Синий"],'.
-		'"color-sal":["#770","Салатовый"],'.
-		'"color-pay":["#090","Зелёный"],'.
-		'"color-aea":["#aea","Ярко-зелёный"],'.
-		'"color-ref":["#800","Тёмно-красный"],'.
-		'"red":["#e22","Красный"],'.
-		'"color-del":["#a66","Тёмно-бордовый"],'.
-		'"color-vin":["#c88","Бордовый"]';
-}
-function _pageElemPas($r) {
-	if(!PAS)
+function _elemUnit($el) {//формирование элемента страницы
+	if(!$el)
 		return '';
-
-	if(!$page_id = _page('cur'))
-		return '';
-
-	if(!$page = _page($page_id))
-		return '';
-
-	if($page['sa'] && !SA)
-		return '';
-
-	if(!$page['app_id'] && !SA)
-		return '';
-
-	return '<div class="elem-pas" val="'.$r['id'].'"></div>';
-}
-function _pageElemUnit($unit) {//формирование элемента страницы
-	if(!$unit)
-		return '';
-	switch($unit['dialog_id']) {
+	switch($el['dialog_id']) {
 		case 2://button
 			/*
 				txt_1 - текст кнопки
@@ -703,28 +595,28 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 				327 => 'orange' //Оранжевый
 			);
 			return _button(array(
-						'name' => $unit['txt_1'],
-						'click' => '_dialogOpen('._dialogValToId('button'.$unit['id']).')',
-						'color' => $color[$unit['num_1']],
-						'small' => $unit['num_2'],
-						'class' => $unit['num_3'] ? 'w100p' : ''
+						'name' => $el['txt_1'],
+						'click' => '_dialogOpen('._dialogValToId('button'.$el['id']).')',
+						'color' => $color[$el['num_1']],
+						'small' => $el['num_2'],
+						'class' => $el['num_3'] ? 'w100p' : ''
 					));
 		case 3://menu
-			return _pageElemMenu($unit);
+			return _pageElemMenu($el);
 		case 4://head
-			return '<div class="hd2">'.$unit['txt_1'].'</div>';
+			return '<div class="hd2">'.$el['txt_1'].'</div>';
 		case 7://search
 			return _search(array(
-						'hold' => $unit['txt_1'],
-						'width' => $unit['num_2'],
-						'v' => $unit['v']
+						'hold' => $el['txt_1'],
+						'width' => $el['num_2'],
+						'v' => $el['v']
 					));
 		case 9://link
-			return '<a href="'.URL.'&p='.$unit['num_1'].'">'.
-						$unit['txt_1'].
+			return '<a href="'.URL.'&p='.$el['num_1'].'">'.
+						$el['txt_1'].
 				   '</a>';
 		case 10://произвольный текст
-			return _br($unit['txt_1']);
+			return _br($el['txt_1']);
 		case 11://имя колонки или значение из диалога
 			/*
 				num_1 - dialog_id списка
@@ -737,7 +629,7 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 			if(!$spisok_id = _num(@$_GET['id']))
 				return 'некорректный id объекта';
 
-			if(!$unit['num_3'])
+			if(!$el['num_3'])
 				return 'нулевое значение компонента';
 
 			$sql = "SELECT *
@@ -747,58 +639,51 @@ function _pageElemUnit($unit) {//формирование элемента страницы
 			if(!$sp = query_assoc($sql))
 				return 'объекта не существует';
 
-			$dialog = _dialogQuery($unit['num_1']);
-			$cmp = $dialog['component'][$unit['num_3']];
+			$dialog = _dialogQuery($el['num_1']);
+			$cmp = $dialog['component'][$el['num_3']];
 
-			if($unit['num_2'] == 331)
+			if($el['num_2'] == 331)
 				return $cmp['label_name'];
 
-			if($unit['num_2'] == 332)
+			if($el['num_2'] == 332)
 				return $sp[$cmp['col_name']];
 
-			return 'spisok_id='.$spisok_id.' '.$unit['num_3']._pr($cmp);
+			return 'spisok_id='.$spisok_id.' '.$el['num_3']._pr($cmp);
 		case 12://из функции напрямую
-			if(!$unit['txt_1'])
+			if(!$el['txt_1'])
 				return 'пустое значение фукнции';
-			if(!function_exists($unit['txt_1']))
+			if(!function_exists($el['txt_1']))
 				return 'фукнции не существует';
-			return $unit['txt_1']();
-		case 14: return _spisokShow($unit); //содержание списка
-		case 15: return _spisokElemCount($unit);//текст с количеством строк списка
+			return $el['txt_1']();
+		case 14: return _spisokShow($el); //содержание списка
+		case 15: return _spisokElemCount($el);//текст с количеством строк списка
 	}
-	return 'неизвестный элемент='.$unit['dialog_id'];
+	return 'неизвестный элемент='.$el['dialog_id'];
 }
-function _pageElemStyle($r) {//стили css для элемента
-	$send = array();
-
-	//отступы
-	$ex = explode(' ', $r['pad']);
-	foreach($ex as $px)
-		if($px) {
-			$send[] = 'padding:'.
-				$ex[0].($ex[0] ? 'px' : '').' '.
-				$ex[1].($ex[1] ? 'px' : '').' '.
-				$ex[2].($ex[2] ? 'px' : '').' '.
-				$ex[3].($ex[3] ? 'px' : '');
-			break;
-		}
-
-	if($r['w'])
-		$send[] = 'width:'.$r['w'].'px';
-//	$send[] = 'box-sizing:padding-box';
-
-	if(!$send)
-		return '';
-
-	return ' style="'.implode(';', $send).'"';
-}
-function _pageElemFontAllow($dialog_id) {//отображение в настройках стилей для конкретных элементов страницы
+function _elemFontAllow($dialog_id) {//отображение в настройках стилей для конкретных элементов страницы
 	$elem = array(
 		10 => 1,
 		11 => 1,
 		15 => 1
 	);
 	return _num(@$elem[$dialog_id]);
+}
+function _elemColor() {//массив цветов для текста в формате JS, доступных элементам
+	return
+		'"":["#000","Чёрный"],'.
+		'"color-555":["#555","Тёмно-серый"],'.
+		'"grey":["#888","Серый"],'.
+		'"pale":["#aaa","Бледный"],'.
+		'"color-ccc":["#ccc","Совсем бледный"],'.
+		'"blue":["#2B587A","Тёмно-синий"],'.
+		'"color-acc":["#07a","Синий"],'.
+		'"color-sal":["#770","Салатовый"],'.
+		'"color-pay":["#090","Зелёный"],'.
+		'"color-aea":["#aea","Ярко-зелёный"],'.
+		'"color-ref":["#800","Тёмно-красный"],'.
+		'"red":["#e22","Красный"],'.
+		'"color-del":["#a66","Тёмно-бордовый"],'.
+		'"color-vin":["#c88","Бордовый"]';
 }
 
 function _pageElemMenu($unit) {//элемент страницы: Меню
@@ -857,9 +742,6 @@ function _pageSpisokUnit() {//todo для тестов
 
 	return _pr($unit);
 }
-
-
-
 function _page_div() {//todo тест
 	return 'test';
 }
