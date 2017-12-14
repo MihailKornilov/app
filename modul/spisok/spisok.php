@@ -340,16 +340,16 @@ function _spisokFilterSearchVal($pe) {//получение введённого значения в строку п
 	if(defined($key))
 		return constant($key);
 
-	$sql = "SELECT *
+	$sql = "SELECT `v`
 			FROM `_page_element`
 			WHERE `page_id`=".$pe['page_id']."
 			  AND `dialog_id`=7
 			  AND `num_3`=".$pe['id'];
-	$el = query_assoc($sql);
+	$v = query_value($sql);
 
-	define($key, $el['v']);
+	define($key, $v);
 
-	return $el['v'];
+	return $v;
 }
 function _spisokFilterSearch($pe) {//получение значений фильтра-поиска для списка
 	//если поиск не производится ни по каким колонкам, то выход

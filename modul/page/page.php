@@ -205,80 +205,6 @@ function _pageSetupMenu() {//строка меню управления страницей
 //	'<script>_pas()</script>';
 }
 
-/*
-function _pageShow($page_id, $blockShow=0) {
-
-	//получение списка блоков
-	$sql = "SELECT *
-			FROM `_page_block`
-			WHERE `page_id`=".$page_id."
-			ORDER BY `parent_id`,`sort`";
-	$arr = query_arr($sql);
-
-	if(empty($arr) && !PAS)
-		return '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>';
-
-	$block = array();
-	$elem = array();
-	foreach($arr as $id => $r) {
-		$elem[$id] = array();
-		$r['sub'] = array();
-		if(!$r['parent_id']) {
-			$block[$id] = $r;
-			continue;
-		}
-		$block[$r['parent_id']]['sub'][] = $r;
-	}
-
-	//расстановка элементов в блоки
-	$sql = "SELECT *
-			FROM `_page_element`
-			WHERE `page_id`=".$page_id."
-			ORDER BY `sort`";
-	$elem_arr = query_arr($sql);
-	foreach($elem_arr as $r)
-		$elem[$r['block_id']][] = $r;
-
-	$send = '';
-	foreach($block as $block_id => $r) {
-		$cls = PAS ? ' pb prel' : '';
-		$val = PAS ? ' val="'.$r['id'].'"' : '';
-		$mh = $elem[$block_id] ? '': ' h50';//минимальная высота, если блок пустой
-		$r['elem_count'] = count($elem[$block_id]);
-
-		if(!$r['sub']) {
-			$send .=
-				'<div id="pb_'.$r['id'].'"'._pageBlockStyle($r).' class="elem-sort bspb '.$r['bg'].' '.$cls.$mh.'"'.$val.'>'.
-					_pageBlockPas($r, $blockShow).
-					_pageElemSpisok($elem[$block_id]).
-				'</div>';
-			continue;
-		}
-
-		$send .= '<div id="pb_'.$r['id'].'" class="pb"'.$val.'>'.
-					'<table class="w100p prel'.$mh.'">'.
-						'<tr>';
-		$cSub = count($r['sub']) - 1;
-		foreach($r['sub'] as $n => $sub) {
-			$sub['elem_count'] = count($elem[$sub['id']]);
-			$send .= '<td class="elem-sort bspb '.$sub['bg'].' prel top"'._pageBlockStyle($sub).'>'.
-						_pageBlockPas($sub, $blockShow, $n != $cSub).
-						_pageElemSpisok($elem[$sub['id']]);
-		}
-		$send .=	'</table>'.
-				'</div>';
-	}
-
-	return
-	'<div class="pbsort0 prel">'.
-		$send.
-	'</div>'.
-//	_pageSpisokUnit().
-
-
-	'<script>_pageShow()</script>';
-}
-*/
 
 function _pageShow($page_id) {
 	if(!$page = _page($page_id))
@@ -287,7 +213,9 @@ function _pageShow($page_id) {
 	if(!SA && $page['sa'])
 		return _contentMsg();
 
-	return _blockTab($page_id);
+	return
+	_blockTab($page_id).
+	(!PAS ? '<script>_pageShow()</script>' : '');
 }
 function _blockTab($page_id, $grid_id=0) {
 	define('GRID_ID', $grid_id);
@@ -299,7 +227,7 @@ function _blockTab($page_id, $grid_id=0) {
 			WHERE `page_id`=".$page_id."
 			ORDER BY `parent_id`,`y`,`x`";
 	if(!$arr = query_arr($sql))
-		return '';
+		return PAS ? '' : '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>';
 
 	//расстановка элементов в блоки
 	$sql = "SELECT *
@@ -318,7 +246,7 @@ function _blockTab($page_id, $grid_id=0) {
 
 	$block = _blockChildArr($child);
 
-	return _blockLevel($block, 100).
+	return _blockLevel($block, 1000).
 			'<script>'.
 				'var BLOCK_ARR={'._blockArr($arr, $child).'},'.
 					'ELEM_COLOR={'._elemColor().'};'.
@@ -333,11 +261,12 @@ function _blockChildArr($child, $parent_id=0) {//расстановка дочерних блоков
 
 	return $send;
 }
-function _blockLevel($arr, $wMax, $hMax=0, $level=1) {//формирование блоков по уровням
+function _blockLevel($arr, $WM, $hMax=0, $level=1) {//формирование блоков по уровням
 	if(empty($arr))
 		return '';
 
 	$MN = 10;//множитель
+	$wMax = round($WM / $MN);
 
 	//подстановка нижней линии, если блоки не доходят до низу
 	$yEnd = 0;
@@ -358,6 +287,7 @@ function _blockLevel($arr, $wMax, $hMax=0, $level=1) {//формирование блоков по у
 
 
 	foreach($block as $y => $str) {
+		$widthMax = $WM;
 		$r = $str[0];
 
 		$bt = $y ? $BT : '';
@@ -366,17 +296,25 @@ function _blockLevel($arr, $wMax, $hMax=0, $level=1) {//формирование блоков по у
 		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
 		$send .=
-			'<table class="bl-tab" style="min-height:'.$r['height'].'px">'.
+			'<table class="bl-tab" style="height:'.$r['height'].'px">'.
 				'<tr>';
 		//пустота в начале
-		if($r['x'])
-			$send .= '<td class="'.$BR.$bt.$bb.'" style="width:'.($r['x'] * $MN - $br1px).'px">';
+		if($r['x']) {
+			$width = $r['x'] * $MN - $br1px;
+			$send .= '<td class="'.$BR.$bt.$bb.'" style="width:'.$width.'px">';
+			$widthMax -= $width;
+		}
+
 		foreach($str as $n => $r) {
 			$next = @$str[$n + 1];
+
+			if($r['width'] > $widthMax)
+				$r['width'] = $widthMax;
 
 			$xEnd = !($wMax - $r['x'] - $r['w']);
 
 			$cls = array('bl-td');
+			$cls[] = PAS ? 'prel' : '';
 			$cls[] = $r['bg'];
 			$cls[] = trim($bt);
 			$cls[] = trim($bb);
@@ -386,26 +324,34 @@ function _blockLevel($arr, $wMax, $hMax=0, $level=1) {//формирование блоков по у
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
+			$bor = explode(' ', $r['bor']);
+			$borPx = $bor[3] + (PAS ? 0 : $bor[1]);
+			$width = $r['width'] - $br1px - $borPx;
+
 			$send .= '<td id="bl_'.$r['id'].'"'.
 						' class="'.$cls.'"'.
-						' style="'._blockStyle($r, $br1px).'"'.
+						' style="'._blockStyle($r, $width).'"'.
 				 (PAS ? ' val="'.$r['id'].'"' : '').
-					 '>'.
+					 '>'.//$widthMax.':'.$width.
 							_blockSetka($r, $level).
-							_blockChildHtml($r, $level + 1).
+							_blockChildHtml($r, $level + 1, $width).
 	    					_elemDiv($r['elem']).
 					'';
+
+			$widthMax -= $r['width'];
 
 			//пустота в середине
 			if($next)
 				if($next['x'] > $r['x'] + $r['w']) {
 					$w = $next['x'] - $r['x'] - $r['w'];
-					$send .= '<td class="'.$BR.$bt.$bb.'" style="width:'.($w * $MN - $br1px).'px">';
+					$width = $w * $MN - $br1px;
+					$send .= '<td class="'.$BR.$bt.$bb.'" style="width:'.$width.'px">';
+					$widthMax -= $width;
 				}
 
 			//пустота в конце
-			if(!$next && $r['x'] + $r['w'] < $wMax)
-				$send .= '<td class="'.$bt.$bb.'" style="width:'.(($wMax - $r['x'] - $r['w']) * $MN).'px">';
+			if(!$next && $widthMax)
+				$send .= '<td class="'.$bt.$bb.'" style="width:'.$widthMax.'px">';
 		}
 		$send .= '</table>';
 	}
@@ -454,7 +400,7 @@ function _blockSetka($r, $level) {//отображение сетки для настраиваемого блока
 
 	return '<div class="block-unit level'.BLOCK_LEVEL.' '.(GRID_ID ? ' grid' : '').'" val="'.$r['id'].'"></div>';
 }
-function _blockStyle($r, $br1px) {//стили css для блока
+function _blockStyle($r, $width) {//стили css для блока
 	$send = array();
 
 	//границы
@@ -470,8 +416,7 @@ function _blockStyle($r, $br1px) {//стили css для блока
 		}
 	}
 
-	$borPx = $bor[3] + (PAS ? 0 : $bor[1]);
-	$send[] = 'width:'.($r['width'] - $br1px - $borPx).'px';
+	$send[] = 'width:'.$width.'px';
 
 	return implode(';', $send);
 }
@@ -481,26 +426,27 @@ function _blockArr($arr, $child) {//массив настроек блоков в формате JS
 
 	$send = array();
 	foreach($arr as $id => $r) {
-		$el = $r['elem'];
-		$send[] = $id.':{'.
-			'id:'.$id.','.
-			'pos:"'.$r['pos'].'",'.
-			'bg:"'.$r['bg'].'",'.
-			'bor:"'.$r['bor'].'",'.
-			'child:'.(!empty($child[$id]) ? 1 : 0).
+		$v = array();
+		$v[] = 'id:'.$id;
+		$v[] = 'pos:"'.$r['pos'].'"';
+		$v[] = 'bg:"'.$r['bg'].'"';
+		$v[] = 'bor:"'.$r['bor'].'"';
+		$v[] = 'child:'.(!empty($child[$id]) ? 1 : 0);
 
-		($el ?
-			','.
-			'elem_id:'._num($el['id']).','.
-			'dialog_id:'._num($el['dialog_id']).','.
-			'fontAllow:'._elemFontAllow($el['dialog_id']).','.
-			'color:"'.$el['color'].'",'.
-			'font:"'.$el['font'].'",'.
-			'size:'._num($el['size']).','.
-			'mar:"'.$el['mar'].'"'
-		: '').
+		if($el = $r['elem']) {
+			if(!$size = _num($el['size']))
+				$size = 13;
+			$v[] = 'elem_id:'._num($el['id']);
+			$v[] = 'dialog_id:'._num($el['dialog_id']);
+			$v[] = 'fontAllow:'._elemFontAllow($el['dialog_id']);
+			$v[] = 'color:"'.$el['color'].'"';
+			$v[] = 'font:"'.$el['font'].'"';
+			$v[] = 'size:'.$size;
+			$v[] = 'mar:"'.$el['mar'].'"';
 
-		'}';
+		}
+
+		$send[] = $id.':{'.implode(',', $v).'}';
 	}
 	return implode(',', $send);
 }
@@ -522,9 +468,9 @@ function _blockGrid($arr) {//режим деления страницы на блоки
 			'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
 		'</div>';
 }
-function _blockChildHtml($block, $level) {//деление блока на части
+function _blockChildHtml($block, $level, $width) {//деление блока на части
 	if(GRID_ID != $block['id'])
-		return _blockLevel($block['child'], $block['w'], $block['h'], $level);
+		return _blockLevel($block['child'], $width, $block['h'], $level);
 
 	return _blockGrid($block['child']);
 }

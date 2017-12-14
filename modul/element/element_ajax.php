@@ -441,18 +441,20 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		//сохранение стилей элемента в блоке
-		if($elem_id = _num($_POST['elem_id'])) {
+		if($elem_id = _num(@$_POST['elem_id'])) {
 			$sql = "SELECT *
 					FROM `_page_element`
 					WHERE `id`=".$elem_id;
 			if($elem = query_ass($sql)) {
+				$mar = _txt($_POST['mar']);
 				$font = _txt($_POST['font']);
 				$color = _txt($_POST['color']);
 				$size = _num($_POST['size']);
 				if($size == 13)
 					$size = 0;
 				$sql = "UPDATE `_page_element`
-						SET `font`='".$font."',
+						SET `mar`='".$mar."',
+							`font`='".$font."',
 							`color`='".$color."',
 							`size`=".$size."
 						WHERE `id`=".$elem_id;
@@ -478,66 +480,6 @@ switch(@$_POST['op']) {
 		$send['w'] = $block['w'];
 
 		jsonSuccess($send);
-		break;
-
-
-	case 'page_elem_style_save'://применение стилей элемента
-		if(!$id = _num($_POST['id']))
-			jsonError('Некорректный ID элемента');
-
-		//отступы
-		$pad = _txt(@$_POST['pad']);
-		$display = _txt(@$_POST['display']);
-		$pos = _txt(@$_POST['pos']);
-		$color = _txt(@$_POST['color']);
-		$font = _txt(@$_POST['font']);
-
-		$size = _num(@$_POST['size']);
-		$size = $size == 13 ? '' : 'fs'.$size;
-
-		$w = _num(@$_POST['w']);
-
-		//получение данных элемента
-		$sql = "SELECT *
-				FROM `_page_element`
-				WHERE `id`=".$id;
-		if(!$elem = query_assoc($sql))
-			jsonError('Элемента id'.$id.' не существует');
-
-		//изменение стилей
-		$sql = "UPDATE `_page_element`
-				SET `pad`='".$pad."',
-					`display`='".$display."',
-					`pos`='".$pos."',
-					`w`=".$w.",
-					`color`='".$color."',
-					`font`='".$font."',
-					`size`='".$size."'
-				WHERE `id`=".$id;
-		query($sql);
-
-		jsonSuccess();
-		break;
-	case 'page_elem_del'://удаление элемента со страницы
-		if(!$element_id = _num($_POST['id']))
-			jsonError('Некорректный ID элемента');
-
-		//получение данных элемента
-		$sql = "SELECT *
-				FROM `_page_element`
-				WHERE `id`=".$element_id;
-		if(!$elem = query_assoc($sql))
-			jsonError('Блока id'.$element_id.' не существует');
-
-		//удаление элемента
-		$sql = "DELETE FROM `_page_element` WHERE `id`=".$element_id;
-		query($sql);
-
-		$send['html'] = utf8(_pageShow($elem['page_id'], 1));
-
-		_cache('clear', '_pageCache');
-
-		jsonSuccess();
 		break;
 }
 

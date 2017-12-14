@@ -1822,33 +1822,76 @@ var VK_SCROLL = 0,
 			delayHide:300,
 			func:function() {
 				$('#block-unit-bor0')._check({
-					title:'сверху',
+					tooltip:'сверху',
 					func:function(v) {
 						obj.css('border-top', v ? '#DEE3EF solid 1px' : '');
 						BL.save = 1;
 					}
 				});
 				$('#block-unit-bor1')._check({
-					title:'справа',
+					tooltip:'справа',
 					func:function(v) {
 						obj.css('border-right', v ? '#DEE3EF solid 1px' : '');
 						BL.save = 1;
 					}
 				});
 				$('#block-unit-bor2')._check({
-					title:'снизу',
+					tooltip:'снизу',
 					func:function(v) {
 						obj.css('border-bottom', v ? '#DEE3EF solid 1px' : '');
 						BL.save = 1;
 					}
 				});
 				$('#block-unit-bor3')._check({
-					title:'слева',
+					tooltip:'слева',
 					func:function(v) {
 						obj.css('border-left', v ? '#DEE3EF solid 1px' : '');
 						BL.save = 1;
 					}
 				});
+				if(BL.elem_id) {
+					var tMar = {
+						0:'сверху',
+						1:'справа',
+						2:'снизу',
+						3:'слева'
+					};
+					for(var n = 0; n < 4; n++)
+						$('#el-mar' + n)._count({
+							step:5,
+							max:50,
+							tooltip:'Отступ ' + tMar[n],
+							func:function(v, id) {
+								var pos = _num(id.split('el-mar')[1]),
+									top =    pos == 0 ? v : _num($('#el-mar0').val()),
+									right =  pos == 1 ? v : _num($('#el-mar1').val()),
+									bottom = pos == 2 ? v : _num($('#el-mar2').val()),
+									left =   pos == 3 ? v : _num($('#el-mar3').val());
+								$('#pe_' + BL.elem_id)
+									.css({margin:
+										top + (top ? 'px' : '') + ' ' +
+										right + (right ? 'px' : '') + ' ' +
+										bottom + (bottom ? 'px' : '') + ' ' +
+										left + (left ? 'px' : '')
+									});
+
+								BL.mar = top + ' ' + right + ' ' + bottom + ' ' + left;
+								BL.save = 1;
+							}
+						});
+					$('#elem-size')._count({
+						min:10,
+						max:18,
+						func:function(v) {
+							$('#pe_' + BL.elem_id)
+								.removeClass('fs' + BL.size)
+								.addClass('fs' + v);
+							BL.size = v;
+							BL.save = 1;
+						}
+					});
+
+				}
 			},
 			funcHide:function() {
 				_blockUnitSave(BL, obj);
@@ -1888,14 +1931,17 @@ var VK_SCROLL = 0,
 	},
 	_blockUnitBor = function(BL) {//границы блока
 		var bor = BL.bor.split(' ');
-		return '<div class="color-555 fs14 mt10">Границы:</div>' +
-			'<div class="mt5 ml40 pl15"><input type="hidden" id="block-unit-bor0" value="' + bor[0] + '"></div>' +
-			'<table class="bs15">' +
-				'<tr>' +
-					'<td><input type="hidden" id="block-unit-bor3" value="' + bor[3] + '">' +
-					'<td class="pl5"><input type="hidden" id="block-unit-bor1" value="' + bor[1] + '">' +
-			'</table>' +
-			'<div class="ml40 pl15"><input type="hidden" id="block-unit-bor2" value="' + bor[2] + '"></div>';
+		return '<table class="mt10">' +
+				'<tr><td class="color-555 fs14 pr5">Границы:' +
+				'<td>' +
+					'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor0" value="' + bor[0] + '"></div>' +
+					'<table class="bs5">' +
+						'<tr>' +
+							'<td><input type="hidden" id="block-unit-bor3" value="' + bor[3] + '">' +
+							'<td class="pl20"><input type="hidden" id="block-unit-bor1" value="' + bor[1] + '">' +
+					'</table>' +
+					'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor2" value="' + bor[2] + '"></div>' +
+			'</table>';
 	},
 	_blockUnitBut = function(BL) {//кнопки
 		if(BL.elem_id)
@@ -1985,14 +2031,34 @@ var VK_SCROLL = 0,
 						'<div onclick="_dialogOpen(6,' + EL.elem_id + ')" class="icon icon-del-red' + _tooltip('Удалить элемент', -52) + '</div>' +
 					'</div>' +
 				'</div>' +
-				_elemUnitPlace(EL) +
 
-				'<table class="w100p">' +
+				'<table class="w100p mt5">' +
+					'<tr><td>' + _elemUnitMar(EL) +
+						'<td>' + _elemUnitPlace(EL) +
+				'</table>' +
+
+			(EL.fontAllow ?
+				'<table class="w100p mt10">' +
 					'<tr><td>' + _elemUnitFont(EL) +
 						'<td>' + _elemUnitColor(EL) +
-						'<td class="r">' + _elemUnitSize(EL) +
+						'<td class="r w75">' +
+							'<input id="elem-size" class="w15" value="' + EL.size + '" />' +
+				'</table>'
+			: '');
+	},
+	_elemUnitMar = function(EL) {
+		var mar = EL.mar.split(' ');
+		return  '<div class="ml30 pl3">' +
+					'<input type="hidden" id="el-mar0" value="' + mar[0] + '" />' +
+				'</div>' +
+				'<table class="mt5">' +
+					'<tr>' +
+						'<td class=""><input type="hidden" id="el-mar3" value="' + mar[3] + '" />' +
+						'<td class="pl10"><input type="hidden" id="el-mar1" value="' + mar[1] + '" />' +
 				'</table>' +
-				'';
+				'<div class="mt5 ml30 pl3">' +
+					'<input type="hidden" id="el-mar2" value="' + mar[2] + '" />' +
+				'</div>';
 	},
 	_elemUnitPlace = function(EL) {//стили элемента: тип блока, позиция элемента
 		$(document)
@@ -2012,7 +2078,8 @@ var VK_SCROLL = 0,
 				EL.pos = v;
 				EL.save = 1;
 			});
-		return '<table id="elem-pos" class="mb5 w100p">' +
+		return '<div class="color-555 fs14 ml20">Позиция:</div>' +
+		'<table id="elem-pos" class="mb5 w100p">' +
 			'<tr><td class="r">' +
 					'<div val="top" class="icon-wiki iw6 mr3' + _dn(EL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
 					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(EL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
@@ -2064,39 +2131,6 @@ var VK_SCROLL = 0,
 				'<div class="icon-wiki iw2 mr5' + font.u + '" val="u"></div>' +
 		'</div>';
 	},
-	_elemUnitSize = function(EL) {//стили элемента: размер текста
-		$(document)
-			.off('click', '#elem-size button')
-			.on('click', '#elem-size button', function() {
-				var but = $(this),
-					znak = but.hasClass('plus') ? 1 : -1,
-					vd = but[znak > 0 ? 'prev' : 'next'](),
-					v = _num(vd.html());
-
-				v += znak;
-
-				if(znak > 0 && v > 18)
-					v = 18;
-
-				if(znak < 0 && v <= 10)
-					v = 10;
-
-				vd.html(v);
-
-				EL.pe
-					.removeClass('fs' + EL.size)
-					.addClass('fs' + v);
-
-				EL.size = v;
-				EL.save = 1;
-			});
-
-		return '<div id="elem-size" class="dib' + _tooltip('Размер текста', -6) +
-			'<button class="vk short cancel mr3">«</button>' +
-			'<div class="dib center bor-e8 fs16 b pt3 pb3 mr3 w35">' + EL.size + '</div>' +
-			'<button class="vk short cancel plus">»</button>' +
-		'</div>';
-	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста
 		$(document)
 			.off('mouseenter', '#elem-color td')
@@ -2113,7 +2147,7 @@ var VK_SCROLL = 0,
 				$('#elem-color td').css('color', 'transparent');
 				td.css('color', '#fff');
 
-				EL.pe
+				$('#pe_' + EL.elem_id)
 					.removeClass(EL.color)
 					.addClass(v);
 
@@ -2247,14 +2281,6 @@ $(document)
 
 	})
 	.on('mouseenter', '.block-unit', _blockUnitSetup);
-
-
-
-
-//	.on('click', '.pas-block .icon-add', _pageBlockElAdd)
-//	.on('click', '.pas-block .icon-setup', _pageBlockStyle)
-
-//	.on('mouseenter', '.elem-pas', _pageElemSetup);
 
 $.fn._check = function(o) {
 	var t = $(this),
@@ -2459,6 +2485,79 @@ $.fn._radio = function(o) {
 	t.enab = function() {//перевод галочки в активное состояние
 		RADIO.removeClass('disabled');
 	};
+	window[win] = t;
+	return t;
+};
+$.fn._count = function(o) {//input с количеством
+	var t = $(this),
+		n,
+		attr_id = t.attr('id'),
+		s;
+
+	if(!attr_id) {
+		attr_id = 'radio' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
+	}
+
+	var win = attr_id + '_count';
+
+	o = $.extend({
+		width:50,
+		bold:0,
+		min:false,  //минимальное значение
+		max:false,  //максимальное значение
+		minus:0,    //может уходить в минус
+		step:1,     //шаг
+		tooltip:'',
+		func:function() {}
+	}, o);
+
+	if(o.min < 0)
+		o.minus = 1;
+
+	var val = _num(t.val());
+	valCorrect();
+	t.val(val)
+	 .width(o.width - 31)
+	 .attr('type', 'text')
+	 .attr('readonly', true);
+
+	if(o.bold)
+		t.addClass('b');
+
+	t.wrap('<div class="_count" id="' + win + '">');
+
+	var el = $('#' + win);
+	el._dn(val, 'nol');
+	el.append(
+		'<div class="but"></div>' +
+		'<div class="but but-b"></div>'
+	);
+
+	if(o.tooltip)
+		el._tooltip(o.tooltip);
+
+	el.find('.but').click(function() {
+		var znak = $(this).hasClass('but-b') ? -1 : 1;
+		val += o.step * znak;
+
+		valCorrect();
+
+		el._dn(val, 'nol');
+		t.val(val);
+		o.func(val, attr_id);
+	});
+	function valCorrect() {
+		if(!o.minus && val < 0)
+			val = 0;
+
+		if(o.max !== false && val > o.max)
+			val = o.max;
+
+		if(o.min !== false && val < o.min)
+			val = o.min;
+	}
+
 	window[win] = t;
 	return t;
 };
@@ -3978,123 +4077,3 @@ $.fn._grid = function(o) {
 
 
 
-/*
-
-
-	_pageElemSetup = function() {//настройка стилей элементов в выплывающем окне. Также сортировка
-		if(!window.ELEM_ARR)//страница ещё не загрузилась
-			return;
-
-		//если происходит процесс перетаскивания элемента
-		if($('.ui-state-high').length)
-			return;
-
-		//если происходит процесс изменения размера элемента
-		if($('.ui-resizable-resizing').length)
-			return;
-
-		var t = $(this),
-			elem_id = _num(t.attr('val')),
-			EL = _pageElemExtend(elem_id);
-
-		EL.pe = $('#pe_' + elem_id);
-
-		if(EL.pe.hasClass('_busy'))
-			return;
-
-		EL.save = 0;//флаг сохранения настроек
-
-		t._hint({
-				_pageElemSetupPad(elem_id, EL) +
-			(EL.fontAllow ?
-			: ''),
-			ugol:'right',
-			show:1,
-			remove:1,
-			delayHide:300,
-			funcHide:function() {
-				_pageElemSave(EL);
-			}
-		});
-
-		_pageElemResize(EL, EL.w);
-
-	},
-	_pageElemExtend = function(elem_id) {//заполнение всех отсутствующих значений элемента по умолчанию
-		ELEM_ARR[elem_id] = $.extend({
-			id:0,
-			tmp:0,   //элемент настраивается для единицы списка
-			txt_2:'',//произвольное значение (для элемента списка)
-			num_4:0, //id колонки
-			dialog_id:0,
-			fontAllow:0,
-			display:'',
-			w:0,
-			pos:'',
-			color:'',
-			font:'',
-			size:13,
-			pad:'0 0 0 0'
-		}, ELEM_ARR[elem_id]);
-		return ELEM_ARR[elem_id];
-	},
-	_pageElemSetupPad = function(elem_id, EL) {//стили элемента: отступы
-		var pad = EL.pad.split(' ');
-
-		$(document)
-			.off('click', '.spb button')
-			.on('click', '.spb button', function() {
-				var but = $(this),
-					znak = but.hasClass('plus') ? 1 : -1,
-					vd = but[znak > 0 ? 'prev' : 'next'](),
-					v = _num(vd.html());
-				v += 5 * znak;
-
-				if(znak > 0 && v > 50)
-					v = 50;
-
-				if(znak < 0 && v <= 0)
-					v = 0;
-
-				vd._dn(v, 'pale');
-				vd._dn(v, 'bg-fff');
-				vd._dn(!v, 'bg-dfd');
-				vd.html(v);
-
-				var spb = $('.spb'),
-					top = _num(spb.eq(0).find('div').html()),
-					right = _num(spb.eq(2).find('div').html()),
-					bottom = _num(spb.eq(3).find('div').html()),
-					left = _num(spb.eq(1).find('div').html());
-
-				EL.pe.css({
-					padding:top + (top ? 'px' : '') + ' ' +
-							right + (right ? 'px' : '') + ' ' +
-							bottom + (bottom ? 'px' : '') + ' ' +
-							left + (left ? 'px' : '')
-				});
-
-				EL.pad = top + ' ' + right + ' ' + bottom + ' ' + left;
-				EL.save = 1;
-			});
-
-		return '<div class="bor-e8 bg-gr1 mb10">' +
-			'<div class="mt5 ml10 fs14 center color-555">Внутренние отступы</div>' +
-			'<div class="center mt10">' + _setupPadBut(pad[0]) + '</div>' +
-			'<table class="bs10">' +
-				'<tr><td>' + _setupPadBut(pad[3]) +
-					'<td>' + _setupPadBut(pad[1]) +
-			'</table>' +
-			'<div class="center mb10">' + _setupPadBut(pad[2]) + '</div>' +
-		'</div>';
-	},
-	_setupPadBut = function(px) {//html отступы для одной стороны
-		px = _num(px);
-		return '<div class="spb">' +
-			'<button class="vk small cancel mt1 mr3">«</button>' +
-			'<div class="dib center bor-e8 fs14 b pad2-7 mr3 w15 ' + (px ? 'bg-dfd' : 'pale bg-fff') + '">' + px + '</div>' +
-			'<button class="vk small cancel mt1 plus">»</button>' +
-		'</div>';
-	},
-
-*/

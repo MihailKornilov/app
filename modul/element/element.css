@@ -767,3 +767,42 @@ td.topi{padding-top:7px}
 }
 ._dropdown .ddu:not(:hover) tt{color:red}
 
+
+
+
+
+
+
+
+
+
+
+/* Переключатель количество */
+._count{
+	display:inline-block;
+	position:relative;
+}
+._count input{
+	text-align:right;
+	padding-left:3px;
+	padding-right:26px;
+	border-radius:2px;
+}
+
+._count .but{
+	position:absolute;
+	right:1px;
+	top:1px;
+	width:20px;
+	height:13px;
+	background:4px 3px  no-repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAASCAYAAABvqT8MAAAACXBIWXMAAAsTAAALEwEAmpwYAAAABGdBTUEAALGeYUxB9wAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAUggAARVYAAA6lwAAF2/XWh+QAAABSklEQVR42oySMU/CQBTH/3+0JLRNQDqLq1+gC1ujQ4dKGGTw65mYmJAYUjqQqNzmUr6Ao+wgJFAT0DwXj1xPML6p7/r73Xvv7ggrJpOJ8/o2vwXoBp53E8ftwvxPMxkoVVvNtymASwAgqQLXS0ypsg8m8UxyKCLRrFhno9GLWxJs2DtxruqnjWuCqS1xH9yNog8AyPK8upwu+gLp6PYqh2AASMJwU281emYliAhEBAOlajgQWZ5XNbcTRAR/hZZKgpbstYFSNf1d2bcbWboeHPv+1y4REWR5XtW5eebmXLrKv2YwW+Ldw+NYRCKCab3V6CVhuLHh9ft2KIILAE+VwPUSkkogneV00Tfbs2G/6XSo+54V68ys9LlaHdlwN4o+aA67k8ghIK4N/3repvSzNPabTmI+l9I9xHG7CFwvIZgSuD8/a8b2iX0PACPaEH0gvTS1AAAAAElFTkSuQmCC");
+	border-left:1px solid #E5ECF1;
+	cursor:pointer;
+}
+._count .but:hover{background-color:#F2F6F9}
+._count .but-b{
+	top:14px;
+	background-position:4px -8px;
+	border-top:1px solid #E5ECF1;
+}
+._count.nol input{color:#999}

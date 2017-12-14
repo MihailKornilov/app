@@ -4,12 +4,12 @@ var _pageShow = function() {//выполнение после вывода страницы
 		_forEq($('._search'), function(sp) {
 			sp.find('input')._search({
 				func:function(v, attr_id) {
-					var send = {
-						op:'spisok_search',
-						element_id:_parent(sp, '.pe').attr('id').split('_')[1],
-						v:v
-					},
-						obj = $('#' + attr_id);
+					var obj = $('#' + attr_id),
+						send = {
+							op:'spisok_search',
+							element_id:sp.parent().attr('id').split('_')[1],
+							v:v
+						};
 
 					if(obj._search('is_process'))
 						return;
