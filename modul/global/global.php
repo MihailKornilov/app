@@ -260,7 +260,7 @@ function _contentMsg($msg='') {
 		$_GET['p'] = 0;
 		$msg = 'Несуществующая страница<br><br><a href="'.URL.'&p='._page('cur').'">Перейти на страницу по умолчанию</a>';
 	}
-	return '<div class="_empty mt20 mb20">'.$msg.'</div>';
+	return '<div class="_empty mar20">'.$msg.'</div>';
 }
 function _footer() {
 	return '</body></html>';

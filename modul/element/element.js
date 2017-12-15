@@ -1816,7 +1816,7 @@ var VK_SCROLL = 0,
 				_blockUnitBut(BL) +
 				_elemUnit(BL),
 			ugol:'right',
-			width:230,
+			width:242,
 			show:1,
 			remove:1,
 			delayHide:300,
@@ -1922,7 +1922,7 @@ var VK_SCROLL = 0,
 			'<tr><td class="color-555 fs14 pr5">Заливка:' +
 				'<td><div id="block-set-bg">' +
 						'<div class="' + (BL.bg == 'bg-fff' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP     bg-fff" val="bg-fff"></div>' +
-		//				'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr1" val="bg-gr1"></div>' +
+						'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr1" val="bg-gr1"></div>' +
 						'<div class="' + (BL.bg == 'bg-gr3' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr3" val="bg-gr3"></div>' +
 						'<div class="' + (BL.bg == 'bg-gr2' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr2" val="bg-gr2"></div>' +
 						'<div class="' + (BL.bg == 'bg-ffe' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-ffe" val="bg-ffe"></div>' +
