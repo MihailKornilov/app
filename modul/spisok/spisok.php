@@ -135,7 +135,6 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 		if(empty($sp['num']))
 			$spisok[$id]['num'] = $sp['id'];
 
-
 	//выбор внешнего вида
 	if($spisok)
 		switch($pe['num_1']) {
@@ -228,62 +227,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 
 				$html .= !$next ? '</table>' : '';
 				break;
-			case 182://Ўаблон
-				//получение элементов шаблона
-				$sql = "SELECT *
-						FROM `_page_element`
-						WHERE `parent_id`=".$pe['id']."
-						ORDER BY `sort`";
-				if(!$tmp = query_arr($sql)) {
-					$html = '<div class="_empty"><span class="fs15 red">Ўаблон единицы списка не настроен.</span></div>';
-					break;
-				}
-
-				$html = '';
-				foreach($spisok as $sp) {
-					$html .= '<div>';
-					foreach($tmp as $r) {
-						$txt = '';
-						switch($r['num_4']) {
-							case -1://пор€дковый номер
-								$txt = $sp['num'];
-								break;
-							case -2://дата внесени€
-								$txt = FullData($sp['dtime_add'], 0, 1);
-								break;
-							case -4://произвольный текст
-								$txt = _br($r['txt_2']);
-								break;
-							default:
-								if($r['num_4'] <= 0)
-									continue;
-								switch($r['txt_2']) {
-									case 1://им€ колонки
-										$txt = $CMP[$r['num_4']]['label_name'];
-										break;
-									case 2://значение колонки
-										$txt = $sp[$CMP[$r['num_4']]['col_name']];
-										$txt = _spisokColSearchBg($txt, $pe, $r['num_4']);
-										break;
-									default: continue;
-								}
-						}
-						$r['tmp'] = 1;
-						$html .= _pageElem($r, $txt);
-					}
-					$html .= '</div>';
-				}
-
-				if($limit * ($next + 1) < $all) {
-					$count_next = $all - $limit * ($next + 1);
-					if($count_next > $limit)
-						$count_next = $limit;
-					$html .=
-						'<div class="mt5 over1" onclick="_spisokNext($(this),'.$pe['id'].','.($next + 1).')">'.
-							'<tt class="db center curP fs14 blue pad10">ѕоказать ещЄ '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
-						'</div>';
-				}
-				break;
+			case 182: $html = _spisokUnit182_template($pe, $spisok, $all, $limit, $next);	break;
 			default:
 				$html = 'Ќеизвестный внешний вид списка: '.$pe['num_1'];
 		}
@@ -402,4 +346,127 @@ function _spisokList($dialog_id, $component_id, $v='', $unit_id=0) {//массив спи
 			LIMIT 50";
 	return query_selArray($sql);
 }
+
+function _spisokUnitSetup($block_id, $width, $grid_id=0) {//данные дл€ настройки единицы списка
+	$sql = "SELECT
+				*,
+				'' `elem`
+			FROM `_block`
+			WHERE `is_spisok`=".$block_id."
+			ORDER BY `y`,`x`";
+	if(!$arr = query_arr($sql))
+		return '<div class="_empty min">'.
+				'Ўаблон пуст.'.
+				'<div class="mt10 pale">Ќачните с настройки блоков.</div>'.
+			   '</div>';
+
+	//расстановка элементов в блоки
+	$sql = "SELECT *
+			FROM `_page_element`
+			WHERE `block_id` IN ("._idsGet($arr).")";
+	foreach(query_arr($sql) as $r) {
+		unset($arr[$r['block_id']]['elem']);
+		$r['block'] = $arr[$r['block_id']];
+		$arr[$r['block_id']]['elem'] = $r;
+	}
+
+	foreach($arr as $id => $r)
+		$arr[$id]['child'] = array();
+
+	$child = array();
+	foreach($arr as $id => $r)
+		$child[$r['parent_id']][$id] = $r;
+
+	$block = _blockChildArr($child, $block_id);
+
+	define('GRID_ID', $grid_id);
+
+	return _blockLevel($block, $width);
+}
+function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирование списка из шаблона
+	//получение блоков шаблона
+	$sql = "SELECT
+				*,
+				'' `elem`				
+			FROM `_block`
+			WHERE `is_spisok`=".$pe['block_id']."
+			ORDER BY `y`,`x`";
+	if(!$arr = query_arr($sql))
+		return '<div class="_empty"><span class="fs15 red">Ўаблон единицы списка не настроен.</span></div>';
+
+	//расстановка элементов в блоки
+	$sql = "SELECT *
+			FROM `_page_element`
+			WHERE `block_id` IN ("._idsGet($arr).")";
+	foreach(query_arr($sql) as $r) {
+		unset($arr[$r['block_id']]['elem']);
+		$r['block'] = $arr[$r['block_id']];
+		$arr[$r['block_id']]['elem'] = $r;
+	}
+
+	foreach($arr as $id => $r)
+		$arr[$id]['child'] = array();
+
+	$child = array();
+	foreach($arr as $id => $r)
+		$child[$r['parent_id']][$id] = $r;
+
+	$block = _blockChildArr($child, $pe['block_id']);
+
+	$send = _blockLevel($block, $pe['block']['width']);
+/*
+	$html = '';
+	foreach($spisok as $sp) {
+		$html .= '<div>';
+		foreach($block as $r) {
+			$txt = '';
+			switch($r['num_4']) {
+				case -1://пор€дковый номер
+					$txt = $sp['num'];
+					break;
+				case -2://дата внесени€
+					$txt = FullData($sp['dtime_add'], 0, 1);
+					break;
+				case -4://произвольный текст
+					$txt = _br($r['txt_2']);
+					break;
+				default:
+					if($r['num_4'] <= 0)
+						continue;
+					switch($r['txt_2']) {
+						case 1://им€ колонки
+							$txt = $CMP[$r['num_4']]['label_name'];
+							break;
+						case 2://значение колонки
+							$txt = $sp[$CMP[$r['num_4']]['col_name']];
+							$txt = _spisokColSearchBg($txt, $pe, $r['num_4']);
+							break;
+						default: continue;
+					}
+			}
+			$r['tmp'] = 1;
+			$html .= '';
+		}
+		$html .= '</div>';
+	}
+*/
+
+	if($limit * ($next + 1) < $all) {
+		$count_next = $all - $limit * ($next + 1);
+		if($count_next > $limit)
+			$count_next = $limit;
+		$send .=
+			'<div class="mt5 over1" onclick="_spisokNext($(this),'.$pe['id'].','.($next + 1).')">'.
+				'<tt class="db center curP fs14 blue pad10">ѕоказать ещЄ '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
+			'</div>';
+	}
+
+	return $send;
+}
+
+
+
+
+
+
 

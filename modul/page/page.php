@@ -84,7 +84,7 @@ function _pageCache() {//получение массива страниц из кеша
 	$sql = "SELECT
 				`page_id`,
 				COUNT(*) `c`
-			FROM `_page_block`
+			FROM `_block`
 			WHERE `page_id` IN ("._idsGet($page).")
 			GROUP BY `page_id`";
 	$block = query_ass($sql);
@@ -199,10 +199,8 @@ function _pageSetupMenu() {//строка меню управления страницей
 		'<div class="p pad5">'.
 			(_page('cur') !=12 ? '<a href="'.URL.'&p=12"><< к списку страниц</a>' : '&nbsp;').
 			_blockLevelChange(_page('cur')).
-//			'<input type="hidden" id="page-setup-page" />'.
 		'</div>'.
 	'</div>';
-//	'<script>_pas()</script>';
 }
 
 
@@ -232,23 +230,28 @@ function _blockTab($page_id, $grid_id=0) {
 	//расстановка элементов в блоки
 	$sql = "SELECT *
 			FROM `_page_element`
-			WHERE `block_id` IN ("._idsGet($arr).")
-			ORDER BY `sort`";
-	foreach(query_arr($sql) as $r)
+			WHERE `block_id` IN ("._idsGet($arr).")";
+	foreach(query_arr($sql) as $r) {
+		unset($arr[$r['block_id']]['elem']);
+		$r['block'] = $arr[$r['block_id']];
 		$arr[$r['block_id']]['elem'] = $r;
+	}
 
 	foreach($arr as $id => $r)
 		$arr[$id]['child'] = array();
 
 	$child = array();
-	foreach($arr as $id => $r)
+	foreach($arr as $id => $r) {
+		if($r['is_spisok'])
+			continue;
 		$child[$r['parent_id']][$id] = $r;
+	}
 
 	$block = _blockChildArr($child);
 
 	return _blockLevel($block, 1000).
 			'<script>'.
-				'var BLOCK_ARR={'._blockArr($arr, $child).'},'.
+				'var BLOCK_ARR={'._blockArr($arr).'},'.
 					'ELEM_COLOR={'._elemColor().'};'.
 			'</script>';
 }
@@ -264,6 +267,9 @@ function _blockChildArr($child, $parent_id=0) {//расстановка дочерних блоков
 function _blockLevel($arr, $WM, $hMax=0, $level=1) {//формирование блоков по уровням
 	if(empty($arr))
 		return '';
+
+	if(!defined('GRID_ID'))
+		define('GRID_ID', 0);
 
 	$MN = 10;//множитель
 	$wMax = round($WM / $MN);
@@ -332,8 +338,8 @@ function _blockLevel($arr, $WM, $hMax=0, $level=1) {//формирование блоков по уро
 						' class="'.$cls.'"'.
 						' style="'._blockStyle($r, $width).'"'.
 				 (PAS ? ' val="'.$r['id'].'"' : '').
-					 '>'.//$widthMax.':'.$width.
-							_blockSetka($r, $level).
+					 '>'.
+							_blockSetka($r, $level, $r['is_spisok']).
 							_blockChildHtml($r, $level + 1, $width).
 	    					_elemDiv($r['elem']).
 					'';
@@ -361,7 +367,8 @@ function _blockLevel($arr, $WM, $hMax=0, $level=1) {//формирование блоков по уро
 function _blockLevelChange($page_id) {//кнопки для изменения уровня редактирования блоков
 	$sql = "SELECT *
 			FROM `_block`
-			WHERE `page_id`=".$page_id;
+			WHERE `page_id`=".$page_id."
+			  AND !`is_spisok`";
 	if(!$arr = query_arr($sql))
 		return '';
 
@@ -384,21 +391,30 @@ function _blockLevelChange($page_id) {//кнопки для изменения уровня редактирован
 
 	$send = '';
 	for($n = 1; $n <= $max; $n++) {
-		$sel = BLOCK_LEVEL == $n ? '' : ' cancel';
+		$sel = _blockLevelDefine() == $n ? '' : ' cancel';
 		$send .= '<button class="block-level-change vk small ml5'.$sel.'">'.$n.'</button>';
 	}
 
 	return '<div id="block-level" class="dib ml20">'.$send.'</div>';
 }
-function _blockSetka($r, $level) {//отображение сетки для настраиваемого блока
+function _blockLevelDefine($is_spisok=0) {//уровень редактируемых блоков
+	if($is_spisok)
+		return empty($_COOKIE['block_level_spisok']) ? 1 : _num($_COOKIE['block_level_spisok']);
+
+	return empty($_COOKIE['block_level']) ? 1 : _num($_COOKIE['block_level']);
+}
+function _blockSetka($r, $level, $is_spisok) {//отображение сетки для настраиваемого блока
+	$bld = _blockLevelDefine($is_spisok);
 	if(!PAS)
 		return '';
 	if(GRID_ID == $r['id'])
 		return '';
-	if(BLOCK_LEVEL != $level)
+	if($bld != $level)
 		return '';
 
-	return '<div class="block-unit level'.BLOCK_LEVEL.' '.(GRID_ID ? ' grid' : '').'" val="'.$r['id'].'"></div>';
+	$bld += $is_spisok ? 2 : 0;
+
+	return '<div class="block-unit level'.$bld.' '.(GRID_ID ? ' grid' : '').'" val="'.$r['id'].'"></div>';
 }
 function _blockStyle($r, $width) {//стили css для блока
 	$send = array();
@@ -420,9 +436,13 @@ function _blockStyle($r, $width) {//стили css для блока
 
 	return implode(';', $send);
 }
-function _blockArr($arr, $child) {//массив настроек блоков в формате JS
+function _blockArr($arr) {//массив настроек блоков в формате JS
 	if(empty($arr))
 		return '';
+
+	$child = array();
+	foreach($arr as $id => $r)
+		$child[$r['parent_id']][$id] = $r;
 
 	$send = array();
 	foreach($arr as $id => $r) {
@@ -431,6 +451,7 @@ function _blockArr($arr, $child) {//массив настроек блоков в формате JS
 		$v[] = 'pos:"'.$r['pos'].'"';
 		$v[] = 'bg:"'.$r['bg'].'"';
 		$v[] = 'bor:"'.$r['bor'].'"';
+		$v[] = 'is_spisok:'._num($r['is_spisok']);
 		$v[] = 'child:'.(!empty($child[$id]) ? 1 : 0);
 
 		if($el = $r['elem']) {
@@ -444,6 +465,9 @@ function _blockArr($arr, $child) {//массив настроек блоков в формате JS
 			$v[] = 'size:'.$size;
 			$v[] = 'mar:"'.$el['mar'].'"';
 
+			$v[] = 'num_1:'._num($el['num_1'], true);
+			$v[] = 'num_2:'._num($el['num_2']);
+			$v[] = 'txt_2:"'._br($el['txt_2']).'"';
 		}
 
 		$send[] = $id.':{'.implode(',', $v).'}';
@@ -462,7 +486,7 @@ function _blockGrid($arr) {//режим деления страницы на блоки
 
 	return
 		'<div id="grid-stack" class="prel">'.$spisok.'</div>'.
-		'<div id="grid-add" class="pad5 bg-fff bor-e8 fs14 center color-555 curP over1 mt1">Добавить блок</div> '.
+		'<div id="grid-add" class="pad5 bg-gr2 bor-e8 fs14 center color-555 curP over5 mt1">Добавить блок</div> '.
 		'<div class="pad5 center">'.
 			'<button class="vk small orange" id="grid-save">Сохранить</button>'.
 			'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
@@ -484,13 +508,12 @@ function _elemDiv($el) {//формирование div элемента
 	$attr_id = $tmp ? '' : ' id="pe_'.$el['id'].'"';
 
 	$cls = array();
-//	$cls[] = $tmp ? '' : 'pe prel';
 	$cls[] = $el['color'];
 	$cls[] = $el['font'];
 	$cls[] = $el['size'] ? 'fs'.$el['size'] : '';
 	$cls = array_diff($cls, array(''));
 	$cls = implode(' ', $cls);
-	$cls = ' class="'.$cls.'"';
+	$cls = $cls ? ' class="'.$cls.'"' : '';
 
 
 	return
@@ -604,10 +627,28 @@ function _elemUnit($el) {//формирование элемента страницы
 		case 14: return _spisokShow($el); //содержание списка
 		case 15: return _spisokElemCount($el);//текст с количеством строк списка
 	}
-	return 'неизвестный элемент='.$el['dialog_id'];
+	//элементы списка шаблона (для настройки)
+	if($el['block']['is_spisok'])
+		switch($el['num_1']) {
+			case -1: return '{NUM}';//порядковый номер
+			case -2: return FullData(curTime(), 0, 1);//дата внесения
+			case -4: return _br($el['txt_2']);//произвольный текст
+			default:
+				if(!$dialog = _dialogQuery($el['num_3']))
+					return 'неизвестный id диалога списка: '.$el['num_3'];
+				$cmp = $dialog['component'];
+				$label_name = $cmp[$el['num_1']]['label_name'];
+				switch($el['num_2']) {
+					case 1: return $label_name;//название колонки
+					case 2: return 'Значение "'.$label_name.'"';//значение колонки
+					default: return 'неизвестный тип содержания колонки';
+				}
+		}
+	return'неизвестный элемент='.$el['dialog_id'];
 }
 function _elemFontAllow($dialog_id) {//отображение в настройках стилей для конкретных элементов страницы
 	$elem = array(
+		0 => 1,
 		10 => 1,
 		11 => 1,
 		15 => 1
@@ -668,6 +709,15 @@ function _pageElemMenu($unit) {//элемент страницы: Меню
 
 	return '<div class="_menu'.$type[$unit['num_2']].'">'.$razdel.'</div>';//._pr(_page());
 }
+
+
+
+
+
+
+
+
+
 
 
 

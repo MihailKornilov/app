@@ -33,8 +33,6 @@ define('PAS', _bool(@$_COOKIE['page_setup'])); //флаг включения управления стран
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
-//уровень редактируемых блоков
-define('BLOCK_LEVEL', empty($_COOKIE['block_level']) ? 1 : _num($_COOKIE['block_level']));
 
 
 
@@ -298,7 +296,6 @@ function _dn($v, $cls='dn') {//показ/скрытие блока на основании условия
 }
 
 function _num($v, $minus=0) {
-//	echo _pr(debug_backtrace(0));
 	if(empty($v) || is_array($v))
 		return 0;
 

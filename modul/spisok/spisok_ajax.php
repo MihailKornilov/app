@@ -87,7 +87,13 @@ switch(@$_POST['op']) {
 		if($pe['dialog_id'] != 14)
 			jsonError('Элемент не является списком');
 
-		$send['spisok_type'] = _num($pe['num_1']);
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$pe['block_id'];
+		if(!$pe['block'] = query_assoc($sql))
+			jsonError('Отсутствует блок списка');
+
+		$send['type'] = _num($pe['num_1']);
 		$send['spisok'] = utf8(_spisokShow($pe, $next));
 		jsonSuccess($send);
 		break;
@@ -258,6 +264,12 @@ switch(@$_POST['op']) {
 		if(!$elem = query_assoc($sql))
 			jsonError('Элемента не существует');
 
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$elem['block_id'];
+		if(!$block = query_assoc($sql))
+			jsonError('Блока не существует');
+
 		$CMP = $dialog['component'];
 
 		$labelName = array();
@@ -269,7 +281,6 @@ switch(@$_POST['op']) {
 		);
 
 		$arrDef = array();//массив колонок по умолчанию, если настройка списка производится впервые
-		$arr182 = array();//массив элементов для шаблона
 
 		switch($elem['num_1']) {
 			default:
@@ -304,78 +315,11 @@ switch(@$_POST['op']) {
 					'</div>';
 				break;
 			case 182://шаблон
-				$tmpHtml = '';
-				//получение элементов шаблона
-				$sql = "SELECT *
-						FROM `_page_element`
-						WHERE `parent_id`=".$elem_id."
-						ORDER BY `sort`";
-				if($tmp = query_arr($sql))
-					foreach($tmp as $id => $r) {
-						$txt = '';
-						$txt_2 = '';
-						switch($r['num_4']) {
-							case -1://порядковый номер
-								$txt = '123';
-								break;
-							case -2://дата внесения
-								$txt = '21 мар 2017';
-								break;
-							case -4://произвольный текст
-								$txt = _br($r['txt_2']);
-								$txt_2 = $r['txt_2'];
-								break;
-							default:
-								if($r['num_4'] <= 0)
-									continue;
-								$txt_2 = $r['txt_2'];
-								switch($r['txt_2']) {
-									case 1://имя колонки
-										$txt = $CMP[$r['num_4']]['label_name'];
-										break;
-									case 2://значение колонки
-										$txt = 'Значение "'.$CMP[$r['num_4']]['label_name'].'"';
-										break;
-									default: continue;
-								}
-						}
-
-						$size = 13;
-						if($r['size']) {
-							$ex = explode('fs', $r['size']);
-							$size = _num($ex[1]);
-						}
-						$arr182[] = array(
-							'id' => _num($id),
-							'tmp' => 1,
-							'txt_2' => utf8($txt_2),
-							'num_4' => _num($r['num_4'], 1),
-							'fontAllow' => 1,
-							'display' => $r['display'],
-							'pos' => $r['pos'],
-							'w' => _num($r['w']),
-							'color' => $r['color'],
-							'font' => $r['font'],
-							'size' => $size,
-							'pad' => $r['pad'],
-						);
-						$pas = '<div class="elem-pas" val="'.$id.'"></div>';
-						$tmpHtml .= _pageElem($r, $txt, $pas);
-					}
-
+				setcookie('block_level_spisok', 1, time() + 2592000, '/');
 				$html =
-					'<div class="hd2">Настройка шаблона единицы списка:</div>'.
-					'<table class="mt10">'.
-						'<tr><td class="top">'.
-								'<input type="hidden" id="elem_type" />'.
-							'<td class="top pl10 dn">'.
-								'<input type="hidden" id="col_type" />'.
-							'<td class="top dn">'.
-								'<textarea id="tmp_elem_txt_2" class="min w250 ml10"></textarea>'.
-							'<td class="top dn">'.
-								'<button id="elem-add" class="vk green ml10">Добавить элемент</button>'.
-					'</table>'.
-					'<div id="tmp-elem-list" class="elem-sort mh50 mt10 bor-f0 bg-ffe">'.$tmpHtml.'</div>';
+					'<div class="hd2 mt20">Настройка шаблона единицы списка:</div>'.
+					'<button id="but-spisok-tmp-grid" class="vk small grey mt10" onclick="_spisokTmpBlock($(this),'.$block['id'].')" val="Отключить настройку блоков">Включить настройку блоков</button>'.
+					'<div id="tmp-elem-list" class="mt10" style="width:'.$block['width'].'px">'._spisokUnitSetup($block['id'], $block['width']).'</div>';
 				break;
 		}
 
@@ -417,7 +361,7 @@ switch(@$_POST['op']) {
 				'content' => utf8('<div class="color-pay">Иконки управления</div>')
 			);
 
-		//массив настроенных колонок
+		//массив настроенных колонок (для 181)
 		$arr = array();
 		if(!empty($elem['txt_5']))
 			foreach(explode(',', $elem['txt_5']) as $col) {
@@ -432,11 +376,121 @@ switch(@$_POST['op']) {
 
 		$send['label_name_select'] = $labelName;//названия колонок для select
 		$send['arr'] = empty($elem['txt_5']) || $spisok_id != $elem['num_3'] ? $arrDef : $arr;//колонки, которые были настроены
-		$send['arr182'] = $arr182;
 		$send['spisok_type'] = _num($elem['num_1']);
 		$send['html'] = utf8($html);
 
 		jsonSuccess($send);
+		break;
+	case 'spisok_tmp_block_on'://получение блоков единицы списка для настройки (grid)
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный ID блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$block_id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$block_id.' не существует');
+
+		//получение списка подблоков
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `parent_id`=".$block_id."
+				ORDER BY `y`,`x`";
+		$arr = query_arr($sql);
+
+		$send['html'] = utf8(_blockGrid($arr));
+		$send['w'] = $block['w'];
+
+		jsonSuccess($send);
+		break;
+	case 'spisok_tmp_block_off':
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный ID блока');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$block_id;
+		if(!$bl = query_assoc($sql))
+			jsonError('Блока id'.$block_id.' не существует');
+
+		$send['html'] = utf8(_spisokUnitSetup($block_id, $bl['width']));
+
+		jsonSuccess($send);
+		break;
+	case 'spisok_tmp_elem_to_block'://вставка элемента в блок единицы списка
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный ID блока');
+		if(!$num_1 = _num($_POST['num_1'], true))
+			jsonError('Колонка не выбрана');
+
+		if($elem_id = _num($_POST['elem_id'])) {
+			$sql = "SELECT *
+					FROM `_page_element`
+					WHERE `id`=".$elem_id;
+			if(!query_assoc($sql))
+				jsonError('Редактируемого элемента id'.$elem_id.' не существует');
+		}
+
+		$num_2 = _num($_POST['num_2']);
+		$txt_2 = $num_1 == -4 ? _txt($_POST['txt_2']) : '';
+
+		if($num_1 > 0 && !$num_2)
+			jsonError('Не выбран тип содержания');
+
+		//получение данных блока
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `is_spisok`
+				  AND `id`=".$block_id;
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$block_id.' не существует');
+
+		//проверка наличия элемента в блоке
+		if(!$elem_id) {
+			$sql = "SELECT COUNT(`id`)
+					FROM `_page_element`
+					WHERE `block_id`=".$block_id;
+			if(query_value($sql))
+				jsonError('В данном блоке уже присутствует элемент');
+		}
+
+		//получение элемента, в котором находятся данные списка
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `block_id`=".$block['is_spisok'];
+		if(!$elSpisok = query_assoc($sql))
+			jsonError('Списка не существует');
+
+		//диалог, через который вносятся единицы списка
+		$dialog_id = $elSpisok['num_3'];
+
+		$sql = "INSERT INTO `_page_element` (
+					`id`,
+					`page_id`,
+					`block_id`,
+					`num_1`,
+					`num_2`,
+					`num_3`,
+					`txt_2`,
+					`viewer_id_add`
+				) VALUES (
+					".$elem_id.",
+					".$block['page_id'].",
+					".$block_id.",
+					".$num_1.",
+					".$num_2.",
+					".$dialog_id.",
+					'".addslashes($txt_2)."',
+					".VIEWER_ID."
+				) ON DUPLICATE KEY UPDATE
+					`num_1`=VALUES(`num_1`),
+					`num_2`=VALUES(`num_2`),
+					`txt_2`=VALUES(`txt_2`)";
+		query($sql);
+
+		jsonSuccess();
 		break;
 
 	case 'spisok_select_get'://получение списка для селекта
@@ -699,63 +753,7 @@ function _spisokUnitFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление знач
 
 				return;
 			case 1://[182] шаблон
-				$insert = array();
-				$sort = 0;
-				$idsEdit = '0';//id элементов, которые редактировались, не для удаления
-				foreach($v as $r) {
-					$insert[] = "(
-						".$r['id'].",
-						".$unit_id.",
-						'".$r['display']."',
-						'".$r['pos']."',
-						".$r['w'].",
-						'".$r['color']."',
-						'".$r['font']."',
-						'fs".$r['size']."',
-						'".$r['pad']."',
-						'".addslashes(_txt($r['txt_2']))."',
-						".$r['num_4'].",
-						".$sort++."
-					)";
-					if($r['id'])
-						$idsEdit .= ','.$r['id'];
-				}
 
-				$sql = "DELETE FROM `_page_element`
-						WHERE `parent_id`=".$unit_id."
-						  AND `id` NOT IN (".$idsEdit.")";
-				query($sql);
-
-				if(empty($insert))
-					return;
-
-				$sql = "INSERT INTO `_page_element`  (
-							`id`,
-							`parent_id`,
-							`display`,
-							`pos`,
-							`w`,
-							`color`,
-							`font`,
-							`size`,
-							`pad`,
-							`txt_2`,
-							`num_4`,
-							`sort`
-						) VALUES ".implode(',', $insert)."
-						ON DUPLICATE KEY UPDATE
-							`type`=VALUES(`type`),
-							`pos`=VALUES(`pos`),
-							`w`=VALUES(`w`),
-							`color`=VALUES(`color`),
-							`font`=VALUES(`font`),
-							`size`=VALUES(`size`),
-							`pad`=VALUES(`pad`),
-							`txt_2`=VALUES(`txt_2`),
-							`num_4`=VALUES(`num_4`),
-							`sort`=VALUES(`sort`)
-						";
-				query($sql);
 				break;
 		}
 	}

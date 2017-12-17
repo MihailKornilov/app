@@ -1366,6 +1366,7 @@ var VK_SCROLL = 0,
 							v.push(col_id + '&' + tr + '&' + link_on + '&' + link);
 						});
 					}
+/*
 					if($('#tmp-elem-list').length) {//182 шаблон
 						_forEq($('#tmp-elem-list .pe'), function(eq) {
 							var k = _num(eq.attr('val'));
@@ -1374,6 +1375,7 @@ var VK_SCROLL = 0,
 						});
 						join = 0;
 					}
+*/
 				}
 			});
 			sf[id] = join ? v.join(',') : v;
@@ -1619,9 +1621,9 @@ var VK_SCROLL = 0,
 				component_id:cmp_id,
 				spisok_id:v
 			},
-			RES,
 			DL,
 			NUM = 0;
+		window.RES = [];
 		_post(send, listShow, function(res) {
 			spc.html(res.text)
 				.removeClass('_busy')
@@ -1656,94 +1658,7 @@ var VK_SCROLL = 0,
 					break;
 				}
 				case 182:/* шаблон */ {
-					for(var n = 0; n < res.arr182.length; n++)
-						ELEM_ARR[res.arr182[n].id] = res.arr182[n];
-					var tmp = $('#tmp-elem-list'),
-						elemType = $('#elem_type'),
-						colType = $('#col_type'),
-						txt_2 = $('#tmp_elem_txt_2'),
-						N = 10000;
-					txt_2.autosize();
-					elemType._select({
-						block:1,
-						width:200,
-						title0:'колонка не выбрана',
-						spisok:res.label_name_select,
-						func:function(v) {
-							$('#elem-add').parent()._dn(v);
-
-							colType
-								._select('clear')
-								.parent()._dn(v > 0);
-
-							txt_2
-								.val('')
-								.parent()._dn(v == -4);
-							if(v == -4)
-								txt_2.focus();
-						}
-					});
-					colType._select({
-						block:1,
-						width:200,
-						title0:'выберите тип содержания',
-						spisok:[
-							{uid:1,title:'имя колонки'},
-							{uid:2,title:'значение колонки'}
-						]
-					});
-					$('#elem-add').click(function() {
-						var txt = '',
-							txt2 = '',
-							num_4 = _num(elemType.val(), 1);
-						switch(num_4) {
-							case -1://порядковый номер
-								txt = 123;
-								break;
-							case -2://дата
-								txt = '21 мар 2017';
-								break;
-							case -4://произвольный текст
-								txt2 = $.trim(txt_2.val());
-								txt = _br(txt2, 1);
-								if(!txt) {
-									txt_2.focus().parent()._flash({color:'red'});
-									return;
-								}
-								break;
-							default:
-								if(num_4 <= 0)
-									return;
-								txt2 = _num(colType.val());
-								switch(txt2)  {
-									case 1:
-										txt = elemType._select('title');
-										break;
-									case 2:
-										txt = 'Значение "' + elemType._select('title') + '"';
-										break;
-									default: return;
-								}
-
-
-						}
-						ELEM_ARR[N] = {
-							tmp:1,
-							txt_2:txt2,
-							num_4:num_4,
-							fontAllow:1
-						};
-						tmp.append(
-							'<div id="pe_' + N + '" class="pe prel" val="' + N + '">' +
-								'<div class="elem-pas" val="' + N + '"></div>' +
-								txt +
-							'</div>'
-						);
-						_pageElemExtend(N);
-						N++;
-
-						elemType._select('clear');
-					});
+					//настройка через фукнцию _blockSpisokUnitElAdd
 					break;
 				}
 			}
@@ -1849,7 +1764,20 @@ var VK_SCROLL = 0,
 						BL.save = 1;
 					}
 				});
+				$('#but-elem-add').click(function() {
+					_blockUnitElAdd(BL);
+				});
 				if(BL.elem_id) {
+					$('#elem-edit').click(function() {
+						$('._hint').remove();
+						if(BL.is_spisok)
+							return _blockSpisokUnitElAdd(BL);
+						_dialogOpen(BL.dialog_id, BL.elem_id);
+					});
+					$('#elem-del').click(function() {
+						$('._hint').remove();
+						_dialogOpen(6, BL.elem_id);
+					});
 					var tMar = {
 						0:'сверху',
 						1:'справа',
@@ -1948,12 +1876,16 @@ var VK_SCROLL = 0,
 			return '';
 
 		return '<div class="mt20 center">' +
-					'<button id="block-grid-button" class="vk small orange mb5" onclick="_blockUnitGrid(' + BL.id + ')">Настроить подблоки</button>' +
-	   (!BL.child ? '<button class="vk small green" onclick="_blockUnitElAdd(' + BL.id + ')">Вставить элемент</button>' : '') +
+					'<button id="but-block-grid" class="vk small orange mb5" onclick="_blockUnitGrid(' + BL.id + ')">Настроить подблоки</button>' +
+	   (!BL.child ? '<button id="but-elem-add" class="vk small green">Вставить элемент</button>' : '') +
 				'</div>';
 	},
-	_blockUnitElAdd = function(block_id) {//добавление нового элемента в блок
+	_blockUnitElAdd = function(BL) {//добавление нового элемента в блок
 		$('._hint').remove();
+
+		if(BL.is_spisok)
+			return _blockSpisokUnitElAdd(BL);
+
 		var html =
 				'<div class="center pad20">' +
 					'<p><button class="vk" val="3">Меню</button>' +
@@ -1978,7 +1910,7 @@ var VK_SCROLL = 0,
 
 		dialog.content.find('button').click(function() {
 			var v = $(this).attr('val');
-			window.BLOCK_ID = block_id;
+			window.BLOCK_ID = BL.id;
 			dialog.close();
 			_dialogOpen(v);
 		});
@@ -1988,17 +1920,30 @@ var VK_SCROLL = 0,
 				op:'block_unit_gird',
 				id:block_id
 			},
-			but = $('#block-grid-button');
+			but = $('#but-block-grid');
 
 		but.addClass('_busy');
 
 		_post(send, function(res) {
 				$('._hint').remove();
-				$('#_content').html(res.html);
-				$('#grid-stack')._grid({
+				$(res.block.is_spisok ? '#tmp-elem-list' : '#_content').html(res.html);
+				var obj = {
 					width:res.w,
 					parent_id:block_id,
-				});
+					is_spisok:res.block.is_spisok
+				};
+				if(res.block.is_spisok) {
+					obj.funcAfterSave = function(res) {
+						$('#tmp-elem-list').html(res.html);
+					};
+					obj.funcCancel = function() {
+						$('#but-spisok-tmp-grid')
+							.removeClass('grey')
+							.addClass('orange')
+							.trigger('click');
+					};
+				}
+				$('#grid-stack')._grid(obj);
 			}, function() {
 				but.removeClass('_busy');
 			});
@@ -2027,8 +1972,8 @@ var VK_SCROLL = 0,
 		return  '<div class="hd2 mt20">' +
 					'Настройки элемента' +
 					'<div class="fr">' +
-						'<div onclick="_dialogOpen(' + EL.dialog_id + ',' + EL.elem_id + ')" class="icon icon-edit mr3' + _tooltip('Редактировать данные', -69) + '</div>' +
-						'<div onclick="_dialogOpen(6,' + EL.elem_id + ')" class="icon icon-del-red' + _tooltip('Удалить элемент', -52) + '</div>' +
+						'<div id="elem-edit" class="icon icon-edit mr3' + _tooltip('Редактировать данные', -69) + '</div>' +
+						'<div id="elem-del" class="icon icon-del-red' + _tooltip('Удалить элемент', -52) + '</div>' +
 					'</div>' +
 				'</div>' +
 
@@ -3965,8 +3910,11 @@ $.fn._grid = function(o) {
 	var t = $(this);
 
 	o = $.extend({
-		width:100,//количество элементов минимальной длины может поместиться в ширину
-		parent_id:0
+		width:100,  //количество элементов минимальной ширины может поместиться по всей длине
+		parent_id:0,//родительский блок
+		is_spisok:0,//если блоки являются единицей списка
+		funcAfterSave:afterSave,//действие после сохранения
+		funcCancel:cancel       //действие для кнопки Отмена
 	}, o);
 
 	t.gridstack({
@@ -4009,19 +3957,14 @@ $.fn._grid = function(o) {
 			op:'block_grid_save',
 			page_id:PAGE_ID,
 			parent_id:o.parent_id,
+			is_spisok:o.is_spisok,
 			arr:arr
 		};
-		_post(send, function(res) {
-			$('.icon-page-tmp').removeClass('on');
-			$('#block-level').after(res.level).remove();
-			$('#_content').html(res.html);
-		}, function() {
+		_post(send, o.funcAfterSave, function() {
 			t.removeClass('_busy');
 		});
 	});
-	$('#grid-cancel').click(function() {//отмена редактирования
-		$('.icon-page-tmp').addClass('on').trigger('click');
-	});
+	$('#grid-cancel').click(o.funcCancel);
 
 	t.on('gsresizestop', function(event, elem) {
 			var h = _num($(elem).attr('data-gs-height')),
@@ -4073,6 +4016,16 @@ $.fn._grid = function(o) {
 			grid.removeWidget(p);
 		});
 
+	//сохранение блоков
+	function afterSave(res) {
+		$('.icon-page-tmp').removeClass('on');
+		$('#block-level').after(res.level).remove();
+		$('#_content').html(res.html);
+	}
+	//отмена редактирования
+	function cancel() {
+		$('.icon-page-tmp').addClass('on').trigger('click');
+	}
 };
 
 
