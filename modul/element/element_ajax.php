@@ -422,6 +422,7 @@ switch(@$_POST['op']) {
 
 		$send['level'] = _blockLevelChange($page_id);
 		$send['html'] = utf8($html);
+		$send['block_arr'] = _blockArr($page_id);
 
 		jsonSuccess($send);
 		break;
@@ -496,6 +497,7 @@ switch(@$_POST['op']) {
 							);
 		$send['block'] = $block;
 		$send['w'] = $block['w'];
+		$send['block_arr'] = _blockArr($block['page_id']);
 
 		jsonSuccess($send);
 		break;

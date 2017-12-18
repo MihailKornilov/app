@@ -124,7 +124,7 @@ var VK_SCROLL = 0,
 						o.content +
 					'</div>' +
 				'</div>' +
-				'<div class="bottom">' +
+				'<div class="btm">' +
 					'<button class="vk submit mr10 ' + o.color + (o.butSubmit ? '' : ' dn') + '">' + o.butSubmit + '</button>' +
 					'<button class="vk cancel' + (o.butCancel ? '' : ' dn') + '">' + o.butCancel + '</button>' +
 				'</div>' +
@@ -137,7 +137,7 @@ var VK_SCROLL = 0,
 		var dialog = $('body').append(html).find('._dialog:last'),
 			iconEdit = dialog.find('.head .edit'),
 			content = dialog.find('.content'),
-			bottom = dialog.find('.bottom'),
+			bottom = dialog.find('.btm'),
 			butSubmit = bottom.find('.submit'),
 			butCancel = bottom.find('.cancel'),
 			submitFunc = function() {
@@ -1269,7 +1269,7 @@ var VK_SCROLL = 0,
 		}
 	},
 
-	_dialogOpen = function(dialog_id, unit_id, unit_id_dub) {//открытие диалогового окна
+	_dialogOpen = function(dialog_id, unit_id, unit_id_dub, funcAfterPost) {//открытие диалогового окна
 		dialog_id = _num(dialog_id);
 		unit_id = _num(unit_id);
 		var dialog = _dialog({
@@ -1327,7 +1327,10 @@ var VK_SCROLL = 0,
 			});
 
 			dialog.post(send, function(res) {
-//				return;
+				if(funcAfterPost) {
+					funcAfterPost(res);
+					return;
+				}
 				switch(res.action_id) {
 					case 1: location.reload(); break;
 					case 2: location.href = URL + '&p=' + res.page_id + '&id=' + res.unit_id; break;
@@ -1776,7 +1779,13 @@ var VK_SCROLL = 0,
 					});
 					$('#elem-del').click(function() {
 						$('._hint').remove();
-						_dialogOpen(6, BL.elem_id);
+						var func = !BL.is_spisok ? false : function() {
+							$('#but-spisok-tmp-grid')
+								.removeClass('grey')
+								.addClass('orange')
+								.trigger('click');
+						};
+						_dialogOpen(6, BL.elem_id, 0, func);
 					});
 					var tMar = {
 						0:'сверху',
@@ -1935,6 +1944,7 @@ var VK_SCROLL = 0,
 				if(res.block.is_spisok) {
 					obj.funcAfterSave = function(res) {
 						$('#tmp-elem-list').html(res.html);
+						BLOCK_ARR = res.block_arr;
 					};
 					obj.funcCancel = function() {
 						$('#but-spisok-tmp-grid')

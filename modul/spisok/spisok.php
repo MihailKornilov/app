@@ -348,30 +348,14 @@ function _spisokList($dialog_id, $component_id, $v='', $unit_id=0) {//массив спи
 }
 
 function _spisokUnitSetup($block_id, $width, $grid_id=0) {//данные для настройки единицы списка
-	$sql = "SELECT
-				*,
-				'' `elem`
-			FROM `_block`
-			WHERE `is_spisok`=".$block_id."
-			ORDER BY `y`,`x`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = _pageBlockArr(0, $block_id))
 		return '<div class="_empty min">'.
-				'Шаблон пуст.'.
-				'<div class="mt10 pale">Начните с настройки блоков.</div>'.
+					'Шаблон пуст.'.
+					'<div class="mt10 pale">Начните с настройки блоков.</div>'.
 			   '</div>';
 
-	//расстановка элементов в блоки
-	$sql = "SELECT *
-			FROM `_page_element`
-			WHERE `block_id` IN ("._idsGet($arr).")";
-	foreach(query_arr($sql) as $r) {
-		unset($arr[$r['block_id']]['elem']);
-		$r['block'] = $arr[$r['block_id']];
-		$arr[$r['block_id']]['elem'] = $r;
-	}
 
-	foreach($arr as $id => $r)
-		$arr[$id]['child'] = array();
+
 
 	$child = array();
 	foreach($arr as $id => $r)
@@ -390,33 +374,8 @@ function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирова
 	if(PAS)
 		return '<div class="_empty">Список <b class="fs14">'.$dialog['spisok_name'].'</b></div>';
 
-	//получение блоков шаблона
-	$sql = "SELECT
-				*,
-				'' `elem`				
-			FROM `_block`
-			WHERE `is_spisok`=".$pe['block_id']."
-			ORDER BY `y`,`x`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = _pageBlockArr(0, $pe['block_id']))
 		return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
-
-	//расстановка элементов в блоки
-	$sql = "SELECT *
-			FROM `_page_element`
-			WHERE `block_id` IN ("._idsGet($arr).")";
-	if(!$elem = query_arr($sql))
-		return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
-
-	foreach($elem as $r) {
-		unset($arr[$r['block_id']]['elem']);
-		$r['block'] = $arr[$r['block_id']];
-		$r['real_txt'] = '';
-		$arr[$r['block_id']]['elem'] = $r;
-	}
-
-	foreach($arr as $id => $r)
-		$arr[$id]['child'] = array();
-
 
 	$send = '';
 	foreach($spisok as $sp) {

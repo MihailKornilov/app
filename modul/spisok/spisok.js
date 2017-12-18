@@ -34,14 +34,17 @@ var _spisokNext = function(t, pe_id, next) {
 		_post(send, function(res) {
 			butOn(on);
 			$('#tmp-elem-list').html(res.html);
-			if(!on)
+			if(!on) {
+				BLOCK_ARR = res.block_arr;
 				return;
+			}
 			$('#grid-stack')._grid({
 				width:res.w,
 				parent_id:block_id,
 				is_spisok:block_id,
 				funcAfterSave:function(res) {
 					$('#tmp-elem-list').html(res.html);
+					BLOCK_ARR = res.block_arr;
 					butOn(0);
 				},
 				funcCancel:function() {
@@ -135,8 +138,9 @@ var _spisokNext = function(t, pe_id, next) {
 					num_2:$('#col_type').val(),
 					txt_2:$('#tmp_elem_txt_2').val()
 				};
-				dialog.post(send, function() {
-
+				dialog.post(send, function(res) {
+					$('#tmp-elem-list').html(res.html);
+					BLOCK_ARR = res.block_arr;
 				});
 			}
 

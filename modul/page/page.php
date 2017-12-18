@@ -215,17 +215,20 @@ function _pageShow($page_id) {
 	_blockTab($page_id).
 	(!PAS ? '<script>_pageShow()</script>' : '');
 }
-function _blockTab($page_id, $grid_id=0) {
-	define('GRID_ID', $grid_id);
+function _pageBlockArr($page_id, $is_spisok=0) {//получение структуры блоков с элементами для конкретной страницы
+	$cond = "`page_id`=".$page_id;
+	//выбор блоков для единицы списка
+	if($is_spisok)
+		$cond = "`is_spisok`=".$is_spisok;
 
 	$sql = "SELECT
 				*,
 				'' `elem`
 			FROM `_block`
-			WHERE `page_id`=".$page_id."
+			WHERE ".$cond."
 			ORDER BY `parent_id`,`y`,`x`";
 	if(!$arr = query_arr($sql))
-		return PAS ? '' : '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>';
+		return array();
 
 	//расстановка элементов в блоки
 	$sql = "SELECT *
@@ -240,6 +243,14 @@ function _blockTab($page_id, $grid_id=0) {
 	foreach($arr as $id => $r)
 		$arr[$id]['child'] = array();
 
+	return $arr;
+}
+function _blockTab($page_id, $grid_id=0) {
+	define('GRID_ID', $grid_id);
+
+	if(!$arr = _pageBlockArr($page_id))
+		return PAS ? '' : '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>';
+
 	$child = array();
 	foreach($arr as $id => $r) {
 		if($r['is_spisok'])
@@ -249,11 +260,12 @@ function _blockTab($page_id, $grid_id=0) {
 
 	$block = _blockChildArr($child);
 
-	return _blockLevel($block, 1000).
-			'<script>'.
-				'var BLOCK_ARR={'._blockArr($arr).'},'.
-					'ELEM_COLOR={'._elemColor().'};'.
-			'</script>';
+	return
+	_blockLevel($block, 1000).
+	'<script>'.
+		'var BLOCK_ARR={'._blockJS($page_id).'},'.
+			'ELEM_COLOR={'._elemColor().'};'.
+	'</script>';
 }
 function _blockChildArr($child, $parent_id=0) {//расстановка дочерних блоков
 	if(!$send = @$child[$parent_id])
@@ -436,8 +448,8 @@ function _blockStyle($r, $width) {//стили css для блока
 
 	return implode(';', $send);
 }
-function _blockArr($arr) {//массив настроек блоков в формате JS
-	if(empty($arr))
+function _blockJS($page_id) {//массив настроек блоков в формате JS
+	if(!$arr = _pageBlockArr($page_id))
 		return '';
 
 	$child = array();
@@ -473,6 +485,45 @@ function _blockArr($arr) {//массив настроек блоков в формате JS
 		$send[] = $id.':{'.implode(',', $v).'}';
 	}
 	return implode(',', $send);
+}
+function _blockArr($page_id) {//массив настроек блоков в формате для отправки через JSON для BLOCK_ARR
+	if(!$arr = _pageBlockArr($page_id))
+		return '';
+
+	$child = array();
+	foreach($arr as $id => $r)
+		$child[$r['parent_id']][$id] = $r;
+
+	$send = array();
+	foreach($arr as $id => $r) {
+		$v = array(
+			'id' => _num($id),
+			'pos' => $r['pos'],
+			'bg' => $r['bg'],
+			'bor' => $r['bor'],
+			'is_spisok' => _num($r['is_spisok']),
+			'child' => !empty($child[$id]) ? 1 : 0
+		);
+
+		if($el = $r['elem']) {
+			if(!$size = _num($el['size']))
+				$size = 13;
+			$v['elem_id'] = _num($el['id']);
+			$v['dialog_id'] = _num($el['dialog_id']);
+			$v['fontAllow'] = _elemFontAllow($el['dialog_id']);
+			$v['color'] = $el['color'];
+			$v['font'] = $el['font'];
+			$v['size'] = $size;
+			$v['mar'] = $el['mar'];
+
+			$v['num_1'] = _num($el['num_1'], true);
+			$v['num_2'] = _num($el['num_2']);
+			$v['txt_2'] = utf8(_br($el['txt_2']));
+		}
+
+		$send[_num($id)] = $v;
+	}
+	return $send;
 }
 function _blockGrid($arr) {//режим деления страницы на блоки
 	$spisok = '';

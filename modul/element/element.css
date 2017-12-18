@@ -169,7 +169,7 @@
 ._dialog .content{border-bottom:#EBEDF0 solid 1px}
 ._dialog .ms{padding:80px 0}
 ._dialog .load._busy .ms{visibility:hidden}
-._dialog .bottom {
+._dialog .btm {
 	background:#F8F9FA;
 	padding:10px;
 	text-align:center;

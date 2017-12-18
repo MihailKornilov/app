@@ -316,10 +316,15 @@ switch(@$_POST['op']) {
 				break;
 			case 182://шаблон
 				setcookie('block_level_spisok', 1, time() + 2592000, '/');
+
+				//корректировка ширины с учётом отступов
+				$ex = explode(' ', $elem['mar']);
+				$width = $block['width'] - $ex[1] - $ex[3];
+
 				$html =
 					'<div class="hd2 mt20">Настройка шаблона единицы списка:</div>'.
 					'<button id="but-spisok-tmp-grid" class="vk small grey mt10" onclick="_spisokTmpBlock($(this),'.$block['id'].')" val="Отключить настройку блоков">Включить настройку блоков</button>'.
-					'<div id="tmp-elem-list" class="mt10" style="width:'.$block['width'].'px">'._spisokUnitSetup($block['id'], $block['width']).'</div>';
+					'<div id="tmp-elem-list" class="mt10" style="width:'.$width.'px">'._spisokUnitSetup($block['id'], $width).'</div>';
 				break;
 		}
 
@@ -392,6 +397,17 @@ switch(@$_POST['op']) {
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$block_id.' не существует');
 
+		//получение элемента, который содержит список (для корректировки ширины с отступами)
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `block_id`=".$block_id."
+				LIMIT 1";
+		if(!$elem = query_assoc($sql))
+			jsonError('Элемента в блоке не существует');
+
+		$ex = explode(' ', $elem['mar']);
+		$w = $block['w'] - ceil(($ex[1] + $ex[3]) / 10);
+
 		//получение списка подблоков
 		$sql = "SELECT *
 				FROM `_block`
@@ -400,7 +416,7 @@ switch(@$_POST['op']) {
 		$arr = query_arr($sql);
 
 		$send['html'] = utf8(_blockGrid($arr));
-		$send['w'] = $block['w'];
+		$send['w'] = $w;
 
 		jsonSuccess($send);
 		break;
@@ -416,6 +432,7 @@ switch(@$_POST['op']) {
 			jsonError('Блока id'.$block_id.' не существует');
 
 		$send['html'] = utf8(_spisokUnitSetup($block_id, $bl['width']));
+		$send['block_arr'] = _blockArr($bl['page_id']);
 
 		jsonSuccess($send);
 		break;
@@ -446,6 +463,13 @@ switch(@$_POST['op']) {
 				  AND `id`=".$block_id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$block_id.' не существует');
+
+		//проверка наличия в блоке других блоков
+		$sql = "SELECT COUNT(`id`)
+				FROM `_block`
+				WHERE `parent_id`=".$block_id;
+		if(query_value($sql))
+			jsonError('Данный блок поделён на части,<br>вставка элемента невозможна');
 
 		//проверка наличия элемента в блоке
 		if(!$elem_id) {
@@ -490,7 +514,16 @@ switch(@$_POST['op']) {
 					`txt_2`=VALUES(`txt_2`)";
 		query($sql);
 
-		jsonSuccess();
+		//получение данных самого главного блока списка
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$block['is_spisok'];
+		$iss = query_assoc($sql);
+
+		$send['html'] = utf8(_spisokUnitSetup($iss['id'], $iss['width']));
+		$send['block_arr'] = _blockArr($block['page_id']);
+
+		jsonSuccess($send);
 		break;
 
 	case 'spisok_select_get'://получение списка для селекта
