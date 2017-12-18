@@ -130,6 +130,13 @@ switch(@$_POST['op']) {
 		if(!$peSpisok = query_assoc($sql))
 			jsonError('Нет нужного списка на странице');
 
+		//получение данных блока, в котором расположен элемент-список
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$peSpisok['block_id'];
+		if(!$peSpisok['block'] = query_assoc($sql))
+			jsonError('Блока не существует');
+
 		//элемент количества списка на странице, на которой расположен поиск
 		$sql = "SELECT *
 				FROM `_page_element`
