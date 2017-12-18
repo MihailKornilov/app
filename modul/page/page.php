@@ -628,7 +628,9 @@ function _elemUnit($el) {//формирование элемента страницы
 		case 15: return _spisokElemCount($el);//текст с количеством строк списка
 	}
 	//элементы списка шаблона (для настройки)
-	if($el['block']['is_spisok'])
+	if($el['block']['is_spisok']) {
+		if(isset($el['real_txt']))
+			return $el['real_txt'];
 		switch($el['num_1']) {
 			case -1: return '{NUM}';//порядковый номер
 			case -2: return FullData(curTime(), 0, 1);//дата внесения
@@ -644,6 +646,7 @@ function _elemUnit($el) {//формирование элемента страницы
 					default: return 'неизвестный тип содержания колонки';
 				}
 		}
+	}
 	return'неизвестный элемент='.$el['dialog_id'];
 }
 function _elemFontAllow($dialog_id) {//отображение в настройках стилей для конкретных элементов страницы

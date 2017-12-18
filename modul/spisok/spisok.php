@@ -384,6 +384,12 @@ function _spisokUnitSetup($block_id, $width, $grid_id=0) {//данные для настройки
 	return _blockLevel($block, $width);
 }
 function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирование списка из шаблона
+	$dialog = _dialogQuery($pe['num_3']);
+	$cmp = $dialog['component'];
+
+	if(PAS)
+		return '<div class="_empty">Список <b class="fs14">'.$dialog['spisok_name'].'</b></div>';
+
 	//получение блоков шаблона
 	$sql = "SELECT
 				*,
@@ -398,58 +404,43 @@ function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирова
 	$sql = "SELECT *
 			FROM `_page_element`
 			WHERE `block_id` IN ("._idsGet($arr).")";
-	foreach(query_arr($sql) as $r) {
+	if(!$elem = query_arr($sql))
+		return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
+
+	foreach($elem as $r) {
 		unset($arr[$r['block_id']]['elem']);
 		$r['block'] = $arr[$r['block_id']];
+		$r['real_txt'] = '';
 		$arr[$r['block_id']]['elem'] = $r;
 	}
 
 	foreach($arr as $id => $r)
 		$arr[$id]['child'] = array();
 
-	$child = array();
-	foreach($arr as $id => $r)
-		$child[$r['parent_id']][$id] = $r;
 
-	$block = _blockChildArr($child, $pe['block_id']);
-
-	$send = _blockLevel($block, $pe['block']['width']);
-/*
-	$html = '';
+	$send = '';
 	foreach($spisok as $sp) {
-		$html .= '<div>';
-		foreach($block as $r) {
-			$txt = '';
-			switch($r['num_4']) {
-				case -1://порядковый номер
-					$txt = $sp['num'];
-					break;
-				case -2://дата внесения
-					$txt = FullData($sp['dtime_add'], 0, 1);
-					break;
-				case -4://произвольный текст
-					$txt = _br($r['txt_2']);
-					break;
-				default:
-					if($r['num_4'] <= 0)
-						continue;
-					switch($r['txt_2']) {
-						case 1://имя колонки
-							$txt = $CMP[$r['num_4']]['label_name'];
-							break;
-						case 2://значение колонки
-							$txt = $sp[$CMP[$r['num_4']]['col_name']];
-							$txt = _spisokColSearchBg($txt, $pe, $r['num_4']);
-							break;
-						default: continue;
-					}
+		$child = array();
+		foreach($arr as $id => $r) {
+			if($el = $r['elem']) {//если элемент есть в блоке
+				$txt = '';
+				switch($el['num_1']) {
+					case -1: $txt = $sp['num']; break;//порядковый номер
+					case -2: $txt = FullData($sp['dtime_add'], 0, 1); break; //дата внесения
+					case -4: $txt = _br($el['txt_2']); break;//произвольный текст
+					default:
+						switch($el['num_2']) {
+							case 1: $txt = $cmp[$el['num_1']]['label_name']; break;//название колонки
+							case 2: $txt = $sp[$cmp[$el['num_1']]['col_name']]; break;//значение колонки
+						}				}
+				$r['elem']['real_txt'] = $txt;
 			}
-			$r['tmp'] = 1;
-			$html .= '';
+			$child[$r['parent_id']][$id] = $r;
 		}
-		$html .= '</div>';
+
+		$block = _blockChildArr($child, $pe['block_id']);
+		$send .= _blockLevel($block, $pe['block']['width']);
 	}
-*/
 
 	if($limit * ($next + 1) < $all) {
 		$count_next = $all - $limit * ($next + 1);
