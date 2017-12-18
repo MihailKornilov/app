@@ -479,6 +479,7 @@ function _blockJS($page_id) {//массив настроек блоков в формате JS
 
 			$v[] = 'num_1:'._num($el['num_1'], true);
 			$v[] = 'num_2:'._num($el['num_2']);
+			$v[] = 'num_7:'._num($el['num_7']);
 			$v[] = 'txt_2:"'._br($el['txt_2']).'"';
 		}
 
@@ -518,6 +519,7 @@ function _blockArr($page_id) {//массив настроек блоков в формате для отправки че
 
 			$v['num_1'] = _num($el['num_1'], true);
 			$v['num_2'] = _num($el['num_2']);
+			$v['num_7'] = _num($el['num_7']);
 			$v['txt_2'] = utf8(_br($el['txt_2']));
 		}
 

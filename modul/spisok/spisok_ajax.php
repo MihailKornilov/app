@@ -470,6 +470,7 @@ switch(@$_POST['op']) {
 		}
 
 		$num_2 = _num($_POST['num_2']);
+		$num_7 = _num($_POST['num_7']);
 		$txt_2 = $num_1 == -4 ? _txt($_POST['txt_2']) : '';
 
 		if($num_1 > 0 && !$num_2)
@@ -516,6 +517,7 @@ switch(@$_POST['op']) {
 					`num_1`,
 					`num_2`,
 					`num_3`,
+					`num_7`,
 					`txt_2`,
 					`viewer_id_add`
 				) VALUES (
@@ -525,11 +527,13 @@ switch(@$_POST['op']) {
 					".$num_1.",
 					".$num_2.",
 					".$dialog_id.",
+					".$num_7.",
 					'".addslashes($txt_2)."',
 					".VIEWER_ID."
 				) ON DUPLICATE KEY UPDATE
 					`num_1`=VALUES(`num_1`),
 					`num_2`=VALUES(`num_2`),
+					`num_7`=VALUES(`num_7`),
 					`txt_2`=VALUES(`txt_2`)";
 		query($sql);
 

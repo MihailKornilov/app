@@ -162,7 +162,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 						$ex = explode('&', $col);
 						switch($ex[0]) {
 							case -1://num
-								$html .= '<td class="w15 grey r">'._spisokColLink($sp['num'], $pe, $sp, $col);
+								$html .= '<td class="w15 grey r">'._spisokColLink($sp['num'], $pe, $sp, @$ex[3]);
 								break;
 							case -2://дата
 								$tooltip = '">';
@@ -209,7 +209,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 								}
 								$v = _spisokColSearchBg($v, $pe, $el['id']);
 								$html .= '<td class="'.implode(' ', $cls).'">'.
-											_spisokColLink($v, $pe, $sp, $col);
+											_spisokColLink($v, $pe, $sp, @$ex[3]);
 						}
 					}
 				}
@@ -234,10 +234,8 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 
 	return $html;
 }
-function _spisokColLink($txt, $pe, $sp, $col) {//обёртка значения колонки в ссылку, если нужно
-	$ex = explode('&', $col);
-
-	if(!@$ex[3])
+function _spisokColLink($txt, $pe, $sp, $allow) {//обёртка значения колонки в ссылку, если нужно
+	if(!$allow)
 		return $txt;
 
 	//диалог, через который вносятся данные списка
@@ -258,7 +256,7 @@ function _spisokColLink($txt, $pe, $sp, $col) {//обёртка значения колонки в ссыл
 	if($dialog['action_id'] == 2)
 		$link = '&p='.$dialog['action_page_id'].'&id='.$sp['id'];
 
-	return '<a href="'.URL.$link.'"'._dn(!$pe['num_7'], 'class="fs12"').'>'.$txt.'</a>';
+	return '<a href="'.URL.$link.'" class="inhr">'.$txt.'</a>';
 }
 function _spisokColSearchBg($txt, $pe, $cmp_id) {//подсветка значения колонки при текстовом (быстром) поиске
 	$val = _spisokFilterSearchVal($pe);
@@ -430,6 +428,7 @@ function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирова
 							case 2://значение колонки
 								$txt = $sp[$cmp[$el['num_1']]['col_name']];
 								$txt = _spisokColSearchBg($txt, $pe, $el['num_1']);
+								$txt = _spisokColLink($txt, $pe, $sp, $el['num_7']);
 								break;
 						}				}
 				$r['elem']['real_txt'] = $txt;

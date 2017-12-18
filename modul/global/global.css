@@ -561,5 +561,12 @@ td.bottom{vertical-align:bottom}
 	font-style:inherit;
 	text-decoration:inherit;
 }
-
+/* Принимает все стили родителя */
+.inhr{
+	color:inherit;
+	font-size:inherit;
+	font-weight:inherit;
+	font-style:inherit;
+	text-decoration:inherit;
+}
 
