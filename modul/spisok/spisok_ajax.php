@@ -330,7 +330,8 @@ switch(@$_POST['op']) {
 
 				$html =
 					'<div class="hd2 mt20">Настройка шаблона единицы списка:</div>'.
-					'<button id="but-spisok-tmp-grid" class="vk small grey mt10" onclick="_spisokTmpBlock($(this),'.$block['id'].')" val="Отключить настройку блоков">Включить настройку блоков</button>'.
+					'<button id="but-spisok-tmp-grid" class="vk small grey mt10 w200" onclick="_spisokTmpBlock($(this),'.$block['id'].')" val="Отключить настройку блоков">Включить настройку блоков</button>'.
+					'<div id="spisok-unit-block-level" class="dib ml20 mt10" val="'.$block['id'].'">'._spisokUnitBlockLevelChange($block['id']).'</div>'.
 					'<div id="tmp-elem-list" class="mt10" style="width:'.$width.'px">'._spisokUnitSetup($block['id'], $width).'</div>';
 				break;
 		}

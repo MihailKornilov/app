@@ -1727,6 +1727,10 @@ var VK_SCROLL = 0,
 			BL = BLOCK_ARR[block_id],
 			obj = $('#bl_' + BL.id);
 
+		//идёт процес сохранения
+		if(BL.save)
+			return;
+
 		t._hint({
 			msg:'<div class="hd2 mb10">Настройки блока</div>' +
 				_blockUnitBg(BL) +
@@ -1779,12 +1783,7 @@ var VK_SCROLL = 0,
 					});
 					$('#elem-del').click(function() {
 						$('._hint').remove();
-						var func = !BL.is_spisok ? false : function() {
-							$('#but-spisok-tmp-grid')
-								.removeClass('grey')
-								.addClass('orange')
-								.trigger('click');
-						};
+						var func = !BL.is_spisok ? false : _blockUnitGridOff;
 						_dialogOpen(6, BL.elem_id, 0, func);
 					});
 					var tMar = {
@@ -1943,20 +1942,28 @@ var VK_SCROLL = 0,
 				};
 				if(res.block.is_spisok) {
 					obj.funcAfterSave = function(res) {
+						$('#spisok-unit-block-level').html(res.level);
 						$('#tmp-elem-list').html(res.html);
 						BLOCK_ARR = res.block_arr;
 					};
-					obj.funcCancel = function() {
-						$('#but-spisok-tmp-grid')
-							.removeClass('grey')
-							.addClass('orange')
-							.trigger('click');
-					};
+					obj.funcCancel = _blockUnitGridOff;
 				}
 				$('#grid-stack')._grid(obj);
 			}, function() {
 				but.removeClass('_busy');
 			});
+	},
+	_blockUnitGridOff = function() {//отключение управления блоками, также обновление списка блоков
+		var but = $('#but-spisok-tmp-grid');
+		if(but.hasClass('grey')) {
+			var html = but.html(),
+				val = but.attr('val');
+			but.html(val);
+			but.attr('val', html);
+			but.removeClass('grey')
+			   .addClass('orange');
+		}
+		but.trigger('click');
 	},
 	_blockUnitSave = function(BL, obj) {
 		if(!BL.save)
@@ -2234,6 +2241,17 @@ $(document)
 			$('#_content').html(res.html);
 		});
 
+	})
+	.on('click', '.spisok-unit-block-level-change', function() {//изменения уровня редактирования блоков единицы списка
+		var t = $(this),
+			v = _num(t.html());
+
+		t.parent().find('.vk').addClass('cancel');
+		t.removeClass('cancel');
+
+		_cookie('block_level_spisok', v);
+
+		_blockUnitGridOff();
 	})
 	.on('mouseenter', '.block-unit', _blockUnitSetup);
 

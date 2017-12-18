@@ -427,11 +427,14 @@ switch(@$_POST['op']) {
 			$ex = explode(' ', $elem['mar']);
 			$width = floor(($iss['width'] - $ex[1] - $ex[3]) / 10) * 10;
 
+			$level = _spisokUnitBlockLevelChange($is_spisok);
 			$html = _spisokUnitSetup($is_spisok, $width);
-		} else
+		} else {
+			$level = _blockLevelChange($page_id);
 			$html = _blockTab($page_id);
+		}
 
-		$send['level'] = _blockLevelChange($page_id);
+		$send['level'] = $level;
 		$send['html'] = utf8($html);
 		$send['block_arr'] = _blockArr($page_id);
 

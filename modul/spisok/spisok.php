@@ -367,6 +367,43 @@ function _spisokUnitSetup($block_id, $width, $grid_id=0) {//данные для настройки
 
 	return _blockLevel($block, $width);
 }
+function _spisokUnitBlockLevelChange($is_spisok) {//кнопки для изменения уровня редактирования блоков единицы списка
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `is_spisok`=".$is_spisok;
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$max = 1;
+
+	foreach($arr as $r) {
+		$parent_id = $r['parent_id'];
+		if($parent_id == $is_spisok)
+			continue;
+
+		$level = 2;
+
+		while(true) {
+			$parent_id = $arr[$parent_id]['parent_id'];
+			if($parent_id == $is_spisok)
+				break;
+			$level++;
+		}
+
+		if($max < $level)
+			$max = $level;
+	}
+
+
+	$send = '';
+	for($n = 1; $n <= $max; $n++) {
+		$sel = _blockLevelDefine($is_spisok) == $n ? '' : ' cancel';
+		$send .= '<button class="spisok-unit-block-level-change vk small ml5'.$sel.'">'.$n.'</button>';
+	}
+
+	return $send;
+}
+
 function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирование списка из шаблона
 	$dialog = _dialogQuery($pe['num_3']);
 	$cmp = $dialog['component'];

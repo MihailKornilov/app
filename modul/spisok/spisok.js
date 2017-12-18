@@ -19,7 +19,7 @@ var _spisokNext = function(t, pe_id, next) {
 			 .removeClass('_busy');
 		});
 	},
-	_spisokTmpBlock = function(t, block_id) {//включкние/отключение настройки блоков единицы списка
+	_spisokTmpBlock = function(t, block_id) {//включение/отключение настройки блоков единицы списка
 		var on = t.hasClass('grey'),
 			send = {
 				op:'spisok_tmp_block_' + (on ? 'on' : 'off'),
@@ -43,6 +43,7 @@ var _spisokNext = function(t, pe_id, next) {
 				parent_id:block_id,
 				is_spisok:block_id,
 				funcAfterSave:function(res) {
+					$('#spisok-unit-block-level').html(res.level);
 					$('#tmp-elem-list').html(res.html);
 					BLOCK_ARR = res.block_arr;
 					butOn(0);
