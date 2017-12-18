@@ -552,6 +552,14 @@ td.bottom{vertical-align:bottom}
 .line-r{border-right:#DEE3EF solid 1px}
 
 /* Подсветка найденной подстроки */
-.fndd{background:#ffc;border-bottom:1px solid #FE2}
+.fndd{
+	background:#ffc;
+	border-bottom:1px solid #FE2;
+	color:inherit;
+	font-size:inherit;
+	font-weight:inherit;
+	font-style:inherit;
+	text-decoration:inherit;
+}
 
 

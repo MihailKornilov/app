@@ -273,7 +273,7 @@ function _spisokColSearchBg($txt, $pe, $cmp_id) {//подсветка значения колонки пр
 
 	$val = utf8($val);
 	$txt = utf8($txt);
-	$txt = preg_replace(_regFilter($val), '<em class="fndd'._dn(!$pe['num_7'], 'fs12').'">\\1</em>', $txt, 1);
+	$txt = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $txt, 1);
 	$txt = win1251($txt);
 
 	return $txt;
@@ -427,7 +427,10 @@ function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирова
 					default:
 						switch($el['num_2']) {
 							case 1: $txt = $cmp[$el['num_1']]['label_name']; break;//название колонки
-							case 2: $txt = $sp[$cmp[$el['num_1']]['col_name']]; break;//значение колонки
+							case 2://значение колонки
+								$txt = $sp[$cmp[$el['num_1']]['col_name']];
+								$txt = _spisokColSearchBg($txt, $pe, $el['num_1']);
+								break;
 						}				}
 				$r['elem']['real_txt'] = $txt;
 			}
