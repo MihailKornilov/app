@@ -326,7 +326,7 @@ switch(@$_POST['op']) {
 
 				//корректировка ширины с учётом отступов
 				$ex = explode(' ', $elem['mar']);
-				$width = $block['width'] - $ex[1] - $ex[3];
+				$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
 
 				$html =
 					'<div class="hd2 mt20">Настройка шаблона единицы списка:</div>'.
@@ -435,11 +435,22 @@ switch(@$_POST['op']) {
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `id`=".$block_id;
-		if(!$bl = query_assoc($sql))
+		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$block_id.' не существует');
 
-		$send['html'] = utf8(_spisokUnitSetup($block_id, $bl['width']));
-		$send['block_arr'] = _blockArr($bl['page_id']);
+		//получение элемента, который содержит список (для корректировки ширины с отступами)
+		$sql = "SELECT *
+				FROM `_page_element`
+				WHERE `block_id`=".$block_id."
+				LIMIT 1";
+		if(!$elem = query_assoc($sql))
+			jsonError('Элемента в блоке не существует');
+
+		$ex = explode(' ', $elem['mar']);
+		$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
+
+		$send['html'] = utf8(_spisokUnitSetup($block_id, $width));
+		$send['block_arr'] = _blockArr($block['page_id']);
 
 		jsonSuccess($send);
 		break;

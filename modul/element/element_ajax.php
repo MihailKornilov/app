@@ -415,8 +415,19 @@ switch(@$_POST['op']) {
 			$sql = "SELECT *
 					FROM `_block`
 					WHERE `id`=".$is_spisok;
-			$block = query_assoc($sql);
-			$html = _spisokUnitSetup($is_spisok, $block['width']);
+			$iss = query_assoc($sql);
+
+			//получение элемента, который содержит список (для корректировки ширины с отступами)
+			$sql = "SELECT *
+					FROM `_page_element`
+					WHERE `block_id`=".$iss['id']."
+					LIMIT 1";
+			$elem = query_assoc($sql);
+
+			$ex = explode(' ', $elem['mar']);
+			$width = floor(($iss['width'] - $ex[1] - $ex[3]) / 10) * 10;
+
+			$html = _spisokUnitSetup($is_spisok, $width);
 		} else
 			$html = _blockTab($page_id);
 
@@ -489,12 +500,30 @@ switch(@$_POST['op']) {
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$id.' не существует');
 
-		$block['is_spisok'] = _num($block['is_spisok']);
-		$send['html'] = utf8($block['is_spisok'] ?
-									_spisokUnitSetup($block['is_spisok'], $block['width'], $id)
-									:
-									_blockTab($block['page_id'], $id)
-							);
+		if($block['is_spisok'] = _num($block['is_spisok'])) {//деление происходит для элемента списка
+			//получение данных главного блока списка
+			$sql = "SELECT *
+					FROM `_block`
+					WHERE `id`=".$block['is_spisok'];
+			if(!$iss = query_assoc($sql))
+				jsonError('Главного блока списка id'.$block['is_spisok'].' не существует');
+
+			//получение элемента, который содержит список (для корректировки ширины с отступами)
+			$sql = "SELECT *
+					FROM `_page_element`
+					WHERE `block_id`=".$iss['id']."
+					LIMIT 1";
+			if(!$elem = query_assoc($sql))
+				jsonError('Элемента в блоке не существует');
+
+			$ex = explode(' ', $elem['mar']);
+			$width = floor(($iss['width'] - $ex[1] - $ex[3]) / 10) * 10;
+
+			$html = _spisokUnitSetup($iss['id'], $width, $id);
+		} else
+			$html = _blockTab($block['page_id'], $id);
+
+		$send['html'] = utf8($html);
 		$send['block'] = $block;
 		$send['w'] = $block['w'];
 		$send['block_arr'] = _blockArr($block['page_id']);
