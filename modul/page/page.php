@@ -795,7 +795,44 @@ function _pageSpisokUnit() {//todo дл€ тестов
 	return _pr($unit);
 }
 function _page_div() {//todo тест
-	return 'test';
+	return
+	'<div class="mar20 bor-e8">'.
+		'ѕередний текст '.
+		'<div class="icon icon-edit"></div>'.
+		'<div class="icon icon-del"></div>'.
+		'<div class="icon icon-del-red"></div>'.
+		'<div class="icon icon-add"></div>'.
+		'<div class="icon icon-ok"></div>'.
+		'<div class="icon icon-set"></div>'.
+		'<div class="icon icon-set-b"></div>'.
+		'<div class="icon icon-off"></div>'.
+		'<div class="icon icon-offf"></div>'.
+		'<div class="icon icon-doc-add"></div>'.
+		'<div class="icon icon-order"></div>'.
+		'<div class="icon icon-client"></div>'.
+		'<div class="icon icon-worker"></div>'.
+		'<div class="icon icon-vk"></div>'.
+		'<div class="icon icon-rub"></div>'.
+		'<div class="icon icon-usd"></div>'.
+		'<div class="icon icon-stat"></div>'.
+		'<div class="icon icon-print"></div>'.
+		'<div class="icon icon-out"></div>'.
+		'<div class="icon icon-chain"></div>'.
+		'<div class="icon icon-set-dot"></div>'.
+		'<div class="icon icon-move"></div>'.
+		'<div class="icon icon-move-x"></div>'.
+		'<div class="icon icon-move-y"></div>'.
+		'<div class="icon icon-sub"></div>'.
+		'<div class="icon icon-join"></div>'.
+		'<div class="icon icon-info"></div>'.
+		'<div class="icon icon-hint"></div>'.
+		' ѕопутный текст'.
+	'</div>'.
+
+	'<div class="mar20 bg-ccd">'.
+		'<div class="icon icon-edit wh"></div>'.
+		'<div class="icon icon-del wh"></div>'.
+	'</div>';
 }
 function gridStackStyleGen() {//генерирование стилей дл€ gridstack
 	$step = 50;    //шаг сетки по горизонтали

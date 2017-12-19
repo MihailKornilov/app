@@ -942,18 +942,20 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 			$html .=
 				($edit ?
 					'<dd class="over1 curM prel" val="'.$r['id'].'">'.
-						'<div class="component-del icon icon-del'._tooltip('Удалить компонент', -59).'</div>'.
-						'<div class="component-edit icon icon-edit'._tooltip('Настроить компонент', -66).'</div>'.
-					(_dialogEl($type_id, 'func') ?
-						'<div class="component-func'.($r['func'] ? ' on' : '').' icon icon-zp'._tooltip('Настроить функции', -61).'</div>'
-					: '')
+						'<div class="cmp-set">'.
+						(_dialogEl($type_id, 'func') ?
+							'<div class="icon icon-usd mr3'._dn($r['func'], 'on')._tooltip('Настроить функции', -61).'</div>'
+						: '').
+							'<div class="icon icon-edit mr3'._tooltip('Настроить компонент', -66).'</div>'.
+							'<div class="icon icon-del-red'._tooltip('Удалить компонент', -59).'</div>'.
+						'</div>'
 				: '').
 						'<div id="delem'.$r['id'].'">'.
 							'<table class="bs5 w100p">'.
 								'<tr><td class="label '.($type_7 ? '' : 'r').($edit ? ' label-width pr5' : '').'" '.($type_7 ? 'colspan="2"' : 'style="width:'.$dialog['label_width'].'px"').'>'.
 										($r['label_name'] ? $r['label_name'].':' : '').
 										($r['require'] ? '<div class="dib red fs15 mtm2">*</div>' : '').
-										($r['hint'] ? ' <div class="icon icon-hint dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'"></div>' : '').
+										($r['hint'] ? ' <div class="icon icon-info pl dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'"></div>' : '').
 					//если информация, то показ на всю ширину
 				   (!$type_7 ? '<td>' : '').
 										$inp.

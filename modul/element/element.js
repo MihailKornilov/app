@@ -113,8 +113,8 @@ var VK_SCROLL = 0,
 		var html =
 			'<div class="_dialog"' + (o.id ? ' id="' + o.id + '_dialog"' : '') + '>' +
 				'<div class="head ' + o.color + '">' +
-					'<div class="close fr curP"><a class="icon icon-del-white"></a></div>' +
-		            '<div class="edit fr curP dn"><a class="icon icon-edit-white"></a></div>' +
+					'<div class="close fr curP"><a class="icon icon-del wh"></a></div>' +
+		            '<div class="edit fr curP dn"><a class="icon icon-edit wh"></a></div>' +
 				'<div class="fs14 white">' + o.head + '</div>' +
 
 				'</div>' +
@@ -386,46 +386,44 @@ var VK_SCROLL = 0,
 				});
 		}
 		function elementFuncFunc() {//открытие окна настройки функции компонента
-			$(document).off('click', '.component-func');
-			$(document).on('click', '.component-func', function() {
-				var p = $(this).parent(),
+			$(document).off('click', '.cmp-set .icon-usd');
+			$(document).on('click', '.cmp-set .icon-usd', function() {
+				var p = _parent($(this), 'DD'),
 					id = _num(p.attr('val'), 1),
-					sp = {};
-				for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-					sp = DIALOG_COMPONENT[n];
+					cmp = {};
+				_forN(DIALOG_COMPONENT, function(sp, n) {
+					cmp = DIALOG_COMPONENT[n];
 					if(sp.id == id)
-						break;
-				}
-				_dialogCmpEditFunc(sp);
+						return false;
+				});
+				_dialogCmpEditFunc(cmp);
 			});
 		}
 		function elementFuncEdit() {//функция редактирование компонента
-			$(document).off('click', '.component-edit');
-			$(document).on('click', '.component-edit', function() {
-				var p = $(this).parent(),
+			$(document).off('click', '.cmp-set .icon-edit');
+			$(document).on('click', '.cmp-set .icon-edit', function() {
+				var p = _parent($(this), 'DD'),
 					id = _num(p.attr('val'), 1),
-					sp = {};
-				for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-					sp = DIALOG_COMPONENT[n];
+					cmp = {};
+				_forN(DIALOG_COMPONENT, function(sp, n) {
+					cmp = DIALOG_COMPONENT[n];
 					if(sp.id == id)
-						break;
-				}
-				_dialogCmpEdit(sp);
+						return false;
+				});
+				_dialogCmpEdit(cmp);
 			});
 		}
 		function elementFuncDel() {//фукнция удаления компонента
-			$(document).off('click', '.component-del');
-			$(document).on('click', '.component-del', function() {
-				var p = $(this).parent(),
+			$(document).off('click', '.cmp-set .icon-del-red');
+			$(document).on('click', '.cmp-set .icon-del-red', function() {
+				var p = _parent($(this), 'DD'),
 					id = _num(p.attr('val'));
 				p.remove();
-				for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-					var sp = DIALOG_COMPONENT[n];
-					if(sp.id == id) {
-						DIALOG_COMPONENT.splice(n, 1);
-						break;
-					}
-				}
+				_forN(DIALOG_COMPONENT, function(sp, n) {
+					if(sp.id != id)
+						return;
+					DIALOG_COMPONENT.splice(n, 1);
+				});
 				_dialogHeightCorrect();
 			});
 		}
@@ -556,7 +554,7 @@ var VK_SCROLL = 0,
 					txt =
 						(txt ? txt + ':' : '') +
 						(require ? '<div class="dib red fs15 mtm2">*</div>' : '') +
-						(hint ? ' <div class="icon icon-hint dialog-hint-edit"></div>' : '');
+						(hint ? ' <div class="icon icon-info pl dialog-hint-edit"></div>' : '');
 					$('#label-prev').html(txt);
 				},
 				elPrevAction = function() {};//действие, которое применяется к выбранному элементу в предварительном просмотре
@@ -1054,13 +1052,15 @@ var VK_SCROLL = 0,
 
 			var DD =
 					'<dd class="over1 curM prel" val="' + elem.id + '">' +
-						'<div class="component-del icon icon-del' + _tooltip('Удалить компонент', -59) + '</div>' +
-						'<div class="component-edit icon icon-edit' + _tooltip('Настроить', -32) + '</div>' +
+						'<div class="cmp-set">' +
+							'<div class="icon icon-edit mr3' + _tooltip('Настроить компонент', -66) + '</div>' +
+							'<div class="icon icon-del-red' + _tooltip('Удалить компонент', -59) + '</div>' +
+						'</div>' +
 						'<table class="bs5 w100p">' +
 							'<tr><td class="label label-width ' + (TYPE_7 ? '' : 'r') +' pr5" ' + (TYPE_7 ? 'colspan="2"' : 'style="width:' + LABEL_WIDTH + 'px"') + '>' +
 									(elem.label_name ? elem.label_name + ':' : '') +
 									(elem.require ? '<div class="dib red fs15 mtm2">*</div>' : '') +
-									(elem.hint ? ' <div class="icon icon-hint dialog-hint" val="' + _br(elem.hint, 1) + '"></div>' : '') +
+									(elem.hint ? ' <div class="icon icon-info pl dialog-hint" val="' + _br(elem.hint, 1) + '"></div>' : '') +
 				(!TYPE_7 ? '<td>' : '') +
 								inp +
 						'</table>' +
@@ -1146,7 +1146,7 @@ var VK_SCROLL = 0,
 			}, v);
 			var html =
 				'<div class="cmp-func bor-e8 bg-gr2 mar20 pad10 pt1" val="' + NUM + '">' +
-					'<div class="hd2">' +
+					'<div class="hd2 mt5">' +
 						'Функция ' + NUM + ':' +
 						'<div class="icon icon-del fr" id="cmp-func-del' + NUM + '"></div>' +
 					'</div>' +
@@ -1653,7 +1653,7 @@ var VK_SCROLL = 0,
 
 					DL.sortable({
 						axis:'y',
-						handle:'.icon-sort'
+						handle:'.icon-move-y'
 					});
 
 					spc.find('.item-add').click(itemAdd);
@@ -1678,7 +1678,7 @@ var VK_SCROLL = 0,
 					'<table class="bs5 w100p">' +
 						'<tr>' +
 							'<td class="topi w15">' +
-								'<div class="icon icon-sort pl curM"></div>' +
+								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w175">' +
 								'<input type="hidden" id="elem-col' + NUM + '" value="' + sp.id + '" />' +
 							'<td class="w175 top">' +
@@ -3226,7 +3226,7 @@ $.fn._hint = function(o) {
 			case 'top':
 			case 'bottom':
 				switch(o.indent) {
-					case 'center': pos = Math.round(hintW / 2) - 8;	break;
+					case 'center': pos = Math.round(hintW / 2) - 6;	break;
 					case 'left': break;
 					case 'right': pos = hintW - 27; break;
 					default:

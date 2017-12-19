@@ -186,26 +186,19 @@
 }
 #dialog-w-change:hover{opacity:1}
 /* компоненты диалога при редактировании */
-#dialog-base .component-func,
-#dialog-base .component-edit,
-#dialog-base .component-del{
+#dialog-base .cmp-set{
 	position:absolute;
-	top:3px;
+	top:0;
+	right:0;
+	z-index:91;
+	display:inline-block;
+	padding:1px 1px 2px 2px;
 	background-color:#fff;
 	border:#eee solid 1px;
 	border-radius:2px;
-	padding:0;
-	z-index:91;
 }
-#dialog-base .component-func{right:48px;background-position:0 -39px}
-#dialog-base .component-edit{right:25px;background-position:0 -79px}
-#dialog-base .component-del{right:3px;background-position:0 -19px}
-#dialog-base dd:not(:hover) .component-func:not(.on),
-#dialog-base dd:not(:hover) .component-edit,
-#dialog-base dd:not(:hover) .component-del{display:none}
-#dialog-base .component-func:not(:hover):not(.on),
-#dialog-base .component-edit:not(:hover),
-#dialog-base .component-del:not(:hover){opacity:.5}
+#dialog-base dd:not(:hover) .cmp-set{display:none}
+#dialog-base .cmp-set:not(:hover){opacity:.6}
 /* разделительная линия для label */
 #label-w-change{
 	position:absolute;

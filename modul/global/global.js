@@ -330,7 +330,9 @@ var FB,
 	},
 	_forN = function(arr, func) {//перечисление последовательного массива js
 		for(var n = 0; n < arr.length; n++)
-			func(arr[n], n);
+			if(func(arr[n], n) === false)
+				return false;
+		return true;
 	},
 	_dn = function(v, cls) {//скрытие/показ элемента
 		cls = cls || 'dn';

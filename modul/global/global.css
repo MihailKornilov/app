@@ -64,48 +64,61 @@ table{border:0;border-spacing:0}
 /* »конки */
 .icon{
 	display:inline-block;
-	background:url(../../img/icon_vk.png?46) no-repeat;
+	background:0 0 no-repeat url(../../img/icon18.png?5);
 	width:18px;
 	height:18px;
-	padding:0 1px;
 	cursor:pointer;
+	margin-bottom:-3px;
 }
-.icon.pl:not(:hover){opacity:.5}/* бледна€ иконка */
-.icon-empty{background-position:0 -5000px}
-.icon-client{background-position:0 0}
-.icon-del{background-position:0 -20px}
-.icon-del-red{background-position:0 -120px}
-.icon-del-white{background-position:0 -320px}
-.icon-zp{background-position:0 -40px}
-.icon-vk{background-position:0 -60px}
-.icon-edit{background-position:0 -78px}
-.icon-edit-white{background-position:0 -520px}
-.icon-out{background-position:0 -100px}
-.icon-rub{background-position:0 -140px}
-.icon-print{background-position:0 -160px}
-.icon-worker{background-position:0 -180px}
-.icon-setup{background-position:0 -200px}/* маленька€ шестерЄнка */
-.icon-setup-big{background-position:0 -220px}/* больша€ шестерЄнка */
-.icon-sort{background-position:0 -240px}/* стрелки верх-вниз */
-.icon-add{background-position:0 -260px}
-.icon-ok{background-position:0 -280px}/* галочка */
-.icon-sub{background-position:0 -300px}
-.icon-dot{background-position:0 -340px}/* три жирных точки - настройки */
-.icon-link{background-position:0 -360px}
-.icon-join{background-position:0 -380px}
-/*.icon-off{background-position:0 -400px} мусорный контейнер*/
-.icon-order{background-position:0 -420px}
-.icon-move{background-position:0 -440px}/* стрелки лево-право */
-.icon-avai{background-position:0 -460px}
-.icon-off{background-position:0 -480px}
-.icon-stat{background-position:0 -500px}
-.icon-div{background-position:0 -540px}/* деление блока на две части */
+.icon.pl:not(:hover){opacity:.5}     /* pale: бледна€ иконка */
+.icon.wh{background-position-y:-20px}/* white: бела€ иконка */
+.icon-empty{background-position:-9999px -9999px}/* пуста€ иконка */
+.icon-edit   {background-position-x:0}    /* редактирование */
+.icon-del    {background-position-x:-20px}/* удаление */
+.icon-del-red{background-position-x:-40px}/* удаление красна€ */
+.icon-add    {background-position-x:-60px}/* плюсик-добавление */
+.icon-ok     {background-position-x:-80px}/* галочка */
+.icon-set    {background-position-x:-100px}/* настройки: маленька€ шестерЄнка */
+.icon-set-b  {background-position-x:-120px}/* настройки: больша€ шестерЄнка */
+.icon-off    {background-position-x:-140px}/* мусорный корзина */
+.icon-offf   {background-position-x:-160px}/* мусорный контейнер */
+.icon-doc-add{background-position-x:-180px}/* новый документ */
+.icon-order  {background-position-x:-200px}/* тележка из маркета */
+.icon-client {background-position-x:-220px}/* бюст человечка */
+.icon-worker {background-position-x:-240px}/* сотрудник - бюст человечка в галстуке*/
+.icon-vk     {background-position-x:-260px}/* иконка VK */
+.icon-rub    {background-position-x:-280px}/* значЄк рубл€ в кружке */
+.icon-usd    {background-position-x:-300px}/* значЄк $ в кружке */
+.icon-stat   {background-position-x:-320px}/* статистика: три столбика */
+.icon-print  {background-position-x:-340px}/* принтер */
+.icon-out    {background-position-x:-360px}/* внешн€€ ссылка: стрелка наружу */
+.icon-chain  {background-position-x:-380px}/* св€зка: звень€ цепи */
+.icon-set-dot{background-position-x:-400px}/* настройки: три жирных точки */
+.icon-move   {background-position-x:-420px}/* перемещение: стрелки четыре стороны */
+.icon-move-x {background-position-x:-440px}/* перемещение: стрелки лево-право */
+.icon-move-y {background-position-x:-460px}/* перемещение: стрелки верх-вниз icon-sort */
+.icon-sub    {background-position-x:-480px}/* подкатегори€: углова€ стрелка вниз-вправо */
+.icon-join   {background-position-x:-500px}/* объединение: стрелки друг на друга сверху-снизу */
+.icon-info   {background-position-x:-520px}/* информаци€: "i" в кружке */
 .icon-hint{
-	background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAAXNSR0IArs4c6QAAAitJREFUOBGdVDFoU1EUvfe9/5UPKRXBQRelglCczOAmDloqTSPo4NzZmq9JC652kkJIYmi1Y+cOijZFRQeLm2DAwerUUReVSgO1Sf+73vPTX76/RdA35L77zjn3P+47N0yZVa4tBeznrpLQRWIeEnJHmMwGiawT06r0Os/qlRtbaRmnk+mHrcsustN61hbpvTSH+eMmHf85QF8H3bacZfZHFcsbG1WrN8dfJ9q9IpX5lQmO+Hpk3d3G5PinhJCNd+ZbwzYys2LlcW2ysAjc4Ac3QAG305n4WwFwgYMHPnQ4434PBp44E5XTBcrN1gWF72lfzjPJF3FUr98uLECEhRsZZ+vS27xm4iZqD/4ogOayWdYiw0JSFaEtNvwofLB8qV+ifyPdt6E3eAVm9yIBEXt+cFJE3pO4SqNUmHHM93FuiM8hJgvNh97DM5IfrSUA4lyp+FlD/NVSc+mYFQk17xqWV8CThdeTLg8Z+ADPmADpeGv26QmPcu+E6LSL3GgtLH5I49BB78FI8IGC39IE7L3AXmGmU454rFEuvsni0Al5G9oTWYeRsoQ4j7afk5OZ7vfO24PwWKd67RWt7jpxH8/YYES7GR4aDM7sA/Ug1qneYBY0z+Pds0QR1xXhX8ZSlMV2+XnoY9vDebJjQjhRh+tHVpDN1aBHjZdbZM81MUOx7bHBLAA46EbpIrFTlQd+MoR7Awji1NzKiIiZ0m07NqDv1v5pipOv/c//yW90GxY+MmYg4gAAAABJRU5ErkJggg==") no-repeat 0 0;
-	margin-bottom:-6px;
-	opacity:.5;
+	background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAAXNSR0IArs4c6QAAAitJREFUOBGdVDFoU1EUvfe9/5UPKRXBQRelglCczOAmDloqTSPo4NzZmq9JC652kkJIYmi1Y+cOijZFRQeLm2DAwerUUReVSgO1Sf+73vPTX76/RdA35L77zjn3P+47N0yZVa4tBeznrpLQRWIeEnJHmMwGiawT06r0Os/qlRtbaRmnk+mHrcsustN61hbpvTSH+eMmHf85QF8H3bacZfZHFcsbG1WrN8dfJ9q9IpX5lQmO+Hpk3d3G5PinhJCNd+ZbwzYys2LlcW2ysAjc4Ac3QAG305n4WwFwgYMHPnQ4434PBp44E5XTBcrN1gWF72lfzjPJF3FUr98uLECEhRsZZ+vS27xm4iZqD/4ogOayWdYiw0JSFaEtNvwofLB8qV+ifyPdt6E3eAVm9yIBEXt+cFJE3pO4SqNUmHHM93FuiM8hJgvNh97DM5IfrSUA4lyp+FlD/NVSc+mYFQk17xqWV8CThdeTLg8Z+ADPmADpeGv26QmPcu+E6LSL3GgtLH5I49BB78FI8IGC39IE7L3AXmGmU454rFEuvsni0Al5G9oTWYeRsoQ4j7afk5OZ7vfO24PwWKd67RWt7jpxH8/YYES7GR4aDM7sA/Ug1qneYBY0z+Pds0QR1xXhX8ZSlMV2+XnoY9vDebJjQjhRh+tHVpDN1aBHjZdbZM81MUOx7bHBLAA46EbpIrFTlQd+MoR7Awji1NzKiIiZ0m07NqDv1v5pipOv/c//yW90GxY+MmYg4gAAAABJRU5ErkJggg==");
+	background-position-y:1px;
+	cursor:default;
 }
-.icon-hint:hover{opacity:1}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
