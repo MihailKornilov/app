@@ -58,11 +58,22 @@ function _page($i='all', $id=0) {//получение данных страницы
 		return false;
 	}
 
+	//данные конкретной страницы
 	if($page_id = _num($i)) {
 		if(!isset($page[$page_id]))
 			return false;
 		return $page[$page_id];
 	}
+
+	//значение текущей страницы
+	if($page_id = _page('cur')) {
+		if(!isset($page[$page_id]))
+			return false;
+		if(!isset($page[$page_id][$i]))
+			return false;
+		return $page[$page_id][$i];
+	}
+
 	return false;
 }
 function _pageCache() {//получение массива страниц из кеша
@@ -109,6 +120,17 @@ function _pageCache() {//получение массива страниц из кеша
 	return _cache($page);
 }
 
+function _pageSetupDefine() {//установка флага включения управления страницей PAS: page_setup
+	$pas = 0;
+
+	if($page_id = _page('cur'))//страница существует
+		if($page = _page($page_id))//данные страницы получены
+			if(!($page['sa'] && !SA))
+				if(!(!$page['app_id'] && !SA))
+					$pas = _bool(@$_COOKIE['page_setup']);
+
+	define('PAS', $pas);
+}
 function _pageSetupAppPage() {//управление страницами приложения
 	$arr = array();
 	foreach(_page() as $id => $r) {
@@ -170,17 +192,6 @@ function _pageSetupAppPageSpisok($arr, $sort) {
 function _pageSetupMenu() {//строка меню управления страницей
 	if(!PAS)
 		return '';
-	if(!$page_id = _page('cur'))
-		return '';
-
-	if(!$page = _page($page_id))
-		return '';
-
-	if($page['sa'] && !SA)
-		return '';
-
-	if(!$page['app_id'] && !SA)
-		return '';
 
 	return
 	'<div id="pas">'.
@@ -190,7 +201,7 @@ function _pageSetupMenu() {//строка меню управления страницей
 			'</div>'.
 
 			'<div class="dib fs16 b">'.
-				$page['name'].
+				_page('name').
 			'</div>'.
 
 
@@ -416,11 +427,13 @@ function _blockLevelDefine($is_spisok=0) {//уровень редактируемых блоков
 	return empty($_COOKIE['block_level']) ? 1 : _num($_COOKIE['block_level']);
 }
 function _blockSetka($r, $level, $is_spisok) {//отображение сетки для настраиваемого блока
-	$bld = _blockLevelDefine($is_spisok);
 	if(!PAS)
 		return '';
 	if(GRID_ID == $r['id'])
 		return '';
+
+	$bld = _blockLevelDefine($is_spisok);
+
 	if($bld != $level)
 		return '';
 

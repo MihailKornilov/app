@@ -5,6 +5,7 @@ require_once 'modul/global/auth_ajax.php';
 _face();
 _saSet();
 _auth();
+_pageSetupDefine();
 
 require_once 'modul/global/global_ajax.php';
 require_once 'modul/site/site_ajax.php';

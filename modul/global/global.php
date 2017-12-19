@@ -28,7 +28,6 @@ define('MIN', DEBUG ? '' : '');//.min
 define('CODE', _txt(@$_COOKIE['code']));
 
 define('VERSION', _num(@$_COOKIE['version']));
-define('PAS', _bool(@$_COOKIE['page_setup'])); //флаг включения управления страницей PAS: page_setup
 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
