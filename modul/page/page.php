@@ -214,7 +214,6 @@ function _pageSetupMenu() {//строка меню управления страницей
 	'</div>';
 }
 
-
 function _pageShow($page_id) {
 	if(!$page = _page($page_id))
 		return _contentMsg();
@@ -540,6 +539,12 @@ function _blockArr($page_id) {//массив настроек блоков в формате для отправки че
 	}
 	return $send;
 }
+function _blockChildHtml($block, $level, $width) {//деление блока на части
+	if(GRID_ID != $block['id'])
+		return _blockLevel($block['child'], $width, $block['h'], $level);
+
+	return _blockGrid($block['child']);
+}
 function _blockGrid($arr) {//режим деления страницы на блоки
 	$spisok = '';
 	foreach($arr as $r) {
@@ -557,12 +562,6 @@ function _blockGrid($arr) {//режим деления страницы на блоки
 			'<button class="vk small orange" id="grid-save">Сохранить</button>'.
 			'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
 		'</div>';
-}
-function _blockChildHtml($block, $level, $width) {//деление блока на части
-	if(GRID_ID != $block['id'])
-		return _blockLevel($block['child'], $width, $block['h'], $level);
-
-	return _blockGrid($block['child']);
 }
 
 

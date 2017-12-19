@@ -94,11 +94,12 @@ function _global_script() {//скрипты и стили
 	'<script src="js/jquery-ui.min.js?3"></script>'.
 	'<script src="js/jquery.mjs.nestedSortable.js?1"></script>'.
 
+	(PAS ?
 		'<script src="js/lodash.min.js"></script>'.
 		'<link rel="stylesheet" href="css/gridstack.css?'.TIME.'" />'.
 		'<script src="js/gridstack.js?'.TIME.'"></script>'.
-		'<script src="js/gridstack.jQueryUI.js"></script>'.
-
+		'<script src="js/gridstack.jQueryUI.js"></script>'
+	: '').
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?'.TIME.'" />'.
 	'<script src="modul/global/global.js?'.TIME.'"></script>'.
