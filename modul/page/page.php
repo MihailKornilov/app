@@ -808,7 +808,7 @@ function _pageSpisokUnit() {//todo для тестов
 }
 function _page_div() {//todo тест
 	return
-	'<div class="mar20 bor-e8">'.
+	'<div class="mar20 bor-e8 w200 pad20" id="for-hint">'.
 		'Передний текст '.
 		'<div class="icon icon-edit"></div>'.
 		'<div class="icon icon-del"></div>'.
@@ -841,6 +841,9 @@ function _page_div() {//todo тест
 		' Попутный текст'.
 	'</div>'.
 
+	'<button class="vk mar20" id="bbb">Кнопка для сохранения</button>'.
+
+	'<div id="aaa">0</div>'.
 	'<div class="mar20 bg-ccd">'.
 		'<div class="icon icon-edit wh"></div>'.
 		'<div class="icon icon-del wh"></div>'.

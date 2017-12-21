@@ -206,17 +206,6 @@ var FB,
 					func();
 			});
 	},
-	_err = function(msg) {
-		dialog.bottom._hint({
-			msg:msg,
-			red:1,
-			top:-48,
-			left:126,
-			indent:40,
-			show:1,
-			remove:1
-		});
-	},
 	_wait = function(v) {//ќжидание выполнени€ действи€
 		$('#_wait').remove();
 		if(v === false) {

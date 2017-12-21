@@ -439,70 +439,40 @@
 
 
 
-/* ---=== ПОДСКАЗКИ ===--- */
+
+
+/* ---=== ПОДСКАЗКИ ===--- 2017-12-20 */
 ._hint{
 	position:absolute;
-	height:0;
+	left:-9999px;
+	top:-9999px;
+	box-sizing:border-box;
+	background-color:#fff;
+	border:#D1DCE8 solid 1px;
+	border-radius:4px;
+	box-shadow:0 0 7px rgba(196,207,218,.5);
 	z-index:999;
 }
-._hint-tab1{opacity:0}
-._hint-tab3{border:#aebdcc solid 1px}
-._hint .b012,
-._hint .b005,
-._hint .side012,
-._hint .side005{background-color:#000}
-._hint .b012,._hint .b005{height:1px}
-._hint .side012,._hint .side005{width:1px}
-._hint .b012,._hint .side012{opacity:0.12}
-._hint .b005,._hint .side005{opacity:0.05}
 /* параметры для всех уголков */
 ._hint .ug{
-	display:inline-block;
 	position:absolute;
+	box-sizing:border-box;
 	z-index:1000;
 }
+._hint .ug div{background:transparent no-repeat 0 0 url(data:image/gif;base64,R0lGODlhIgALAKIAABkZGf///8fW5f///////////xkZGRkZGSH5BAEAAAUALAAAAAAiAAsAAANCWKqyHDBG0ZytDz8JW9COECxid3GVeY5FOa3f8pJRy6m0JlXud88kC6rHshiPit0GgmwKcTamcwrdTKkg2tWZDSUAADs=)}
 /* уголок сверху */
-._hint .ugt{
-	height:6px;
-	width:11px;
-	background:transparent no-repeat 0 0 url("data:image/gif;base64,R0lGODlhCwAGAKIAAAAAAP///669zPLy8ubm5v///wAAAAAAACH5BAEAAAUALAAAAAALAAYAAAMSWKqyzqG9IoKVq9qbt2+atwkJADs=");
-	top:-6px;
-}
+._hint .ugt{width:100%;height:6px;top:-6px;left:0}
+._hint .ugt div{width:11px;height:6px}
 /* уголок снизу */
-._hint .ugb{
-	height:7px;
-	width:11px;
-	background:transparent no-repeat 0 0 url("data:image/gif;base64,R0lGODlhCwAIAKIEAPLy8q69zObm5v///////wAAAAAAAAAAACH5BAEAAAQALAAAAAALAAgAAAMaOLo80SyIByWYzZJLnQBEyHlgKE6fqV5lmAAAOw==");
-	top:-1px;
-}
-/* уголок слева */
-._hint .ugl{
-	height:11px;
-	width:7px;
-	background:transparent no-repeat 0 0 url("data:image/gif;base64,R0lGODlhBwALAKIAAAAAAP///669zPLy8ubm5v///wAAAAAAACH5BAEAAAUALAAAAAAHAAsAAAMWWFpDsk0EFcOsFltnu76cRYUQtzBOAgA7");
-	left:-7px;
-}
+._hint .ugb{width:100%;height:6px;bottom:-6px;left:0}
+._hint .ugb div{width:11px;height:6px;background-position:-11px 0}
 /* уголок справа */
-._hint .ugr{
-	height:11px;
-	width:7px;
-	background:transparent no-repeat 0 0 url("data:image/gif;base64,R0lGODlhBwALAKIAAAAAAP///669zPLy8ubm5v///wAAAAAAACH5BAEAAAUALAAAAAAHAAsAAAMXKDTVFYq1ANek8dE6NiZetGWfxDmZkwAAOw==");
-	left:0;
-}
-/* корректировка положения */
-._hint-crt{
-	position:absolute;
-	top:-22px;
-	left:2px;
-	width:130px;
-	text-align:center;
-	color:#555;
-	background-color:#ffb;
-	padding:3px;
-	border:#CC9 solid 1px;
-}
-
-
+._hint .ugr{width:6px;height:100%;top:0;right:-6px}
+._hint .ugr div{width:6px;height:11px;background-position:-22px 0}
+/* уголок слева */
+._hint .ugl{width:6px;height:100%;top:0;left:-6px}
+._hint .ugl div{width:6px;height:11px;background-position:-28px 0}
+._hint .hi-msg{overflow-x:hidden}
 
 
 

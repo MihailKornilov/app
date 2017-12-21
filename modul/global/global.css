@@ -213,6 +213,7 @@ table{border:0;border-spacing:0}
 .bl-td{
 	/* overflow-x:hidden; */
 }
+.bl-td._busy *{visibility:hidden}
 
 
 
@@ -242,7 +243,6 @@ table{border:0;border-spacing:0}
 	background-color:#f8fff8;
 	opacity:.9;
 }
-
 
 /* цвета блока в настройках */
 #block-set-bg div:not(.sel):hover{border:#aaa solid 1px;}
@@ -425,6 +425,7 @@ button.vk.orange:hover{background-color:#D59553}
 .pl15{padding-left:15px}
 .pl20{padding-left:20px}
 
+.mar5{margin:5px}
 .mar8{margin:8px}
 .mar10{margin:10px}
 .mar20{margin:20px}
