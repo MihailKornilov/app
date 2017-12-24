@@ -2050,15 +2050,15 @@ var VK_SCROLL = 0,
 			'<tr><td>' +
 					'<div val="top" class="icon-wiki iw6 mr3' + _dn(EL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
 					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(EL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
-					'<div val="top r" class="icon-wiki iw8' + _dn(EL.pos == 'top r','on') + _tooltip('Вверх-вправо', -40) + '</div>' +
+					'<div val="top r" class="icon-wiki iw8' + _dn(EL.pos == 'top r','on') + _tooltip('Вверх-вправо', -73, 'r') + '</div>' +
 			'<tr><td>' +
 					'<div val="" class="icon-wiki iw3 mr3' + _dn(!EL.pos,'on') + _tooltip('Влево', -15) + '</div>' +
 					'<div val="center" class="icon-wiki iw4 mr3' + _dn(EL.pos == 'center','on') + _tooltip('По центру', -28) + '</div>' +
-					'<div val="r" class="icon-wiki iw5' + _dn(EL.pos == 'r','on') + _tooltip('Вправо', -20) + '</div>' +
+					'<div val="r" class="icon-wiki iw5' + _dn(EL.pos == 'r','on') + _tooltip('Вправо', -34, 'r') + '</div>' +
 			'<tr><td>' +
 					'<div val="bottom" class="icon-wiki iw9 mr3' + _dn(EL.pos == 'bottom','on') + _tooltip('Вниз-влево', -33) + '</div>' +
 					'<div val="bottom center" class="icon-wiki iw10 mr3' + _dn(EL.pos == 'bottom center','on') + _tooltip('Вниз-центр', -32) + '</div>' +
-					'<div val="bottom r" class="icon-wiki iw11' + _dn(EL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -36) + '</div>' +
+					'<div val="bottom r" class="icon-wiki iw11' + _dn(EL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -65, 'r') + '</div>' +
 		'</table>';
 	},
 	_elemUnitFont = function(EL) {//стили элемента: жирность, наклон, подчёркивание
@@ -2514,7 +2514,7 @@ $.fn._count = function(o) {//input с количеством
 	);
 
 	if(o.tooltip)
-		el._tooltip(o.tooltip);
+		el._tooltip(o.tooltip, -15);
 
 	el.find('.but').click(function() {
 		var znak = $(this).hasClass('but-b') ? -1 : 1;
@@ -3195,6 +3195,7 @@ $.fn._hint = function(o) {//выплывающие подсказки
 	// автоматический показ подсказки, если нужно
 	if(o.show) {
 		t.addClass('hnt' + HN);
+		t.addClass('hint-show');
 		t.on('mousemove.hint' + HN, hintShow);
 	}
 
@@ -3409,6 +3410,8 @@ $.fn._hint = function(o) {//выплывающие подсказки
 			case 'wait_to_showing':
 				process = 'hidden';
 				clearTimeout(timer);
+				if(o.show)
+					hidding();
 				break;
 			case 'showing':
 				HINT.stop();
@@ -3434,7 +3437,8 @@ $.fn._hint = function(o) {//выплывающие подсказки
 					HINT.remove();
 					t.off(o.event + '.hint' + HN);
 					t.off('mouseleave.hint' + HN);
-					t.removeClass('hnt' + HN)
+					t.removeClass('hnt' + HN);
+					t.removeClass('hint-show');
 				}
 			});
 		}
