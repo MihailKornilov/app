@@ -124,20 +124,6 @@ table{border:0;border-spacing:0}
 
 
 
-/* иконка включения управления блоками */
-.icon-page-tmp{
-	display:inline-block;
-	cursor:pointer;
-	width:48px;
-	height:48px;
-	background:url(../../img/page_tmp.png?3) no-repeat;
-	opacity:.4;
-}
-.icon-page-tmp:hover,
-.icon-page-tmp.on{background-position:0 -50px}
-.icon-page-tmp.on{opacity:1}
-
-
 
 
 /* иконки редактирования текста */
@@ -181,13 +167,6 @@ table{border:0;border-spacing:0}
 	color:#fff;
 }
 #hat.show{background-color:#D47E02}/* просмотр от имени другого пользователя */
-#hat p{
-	width:1000px;
-	margin:auto;
-	padding-top:8px;
-	font-size:22px;
-}
-
 
 /* Основное содержание сайта */
 #_content{
@@ -222,7 +201,6 @@ table{border:0;border-spacing:0}
 	background-color: #ffaf64;
 	border-bottom:#C3864C solid 1px;
 }
-#pas .p{width:1000px;margin:auto}
 
 /* отдельный блок в редактировании */
 .block-unit{
@@ -425,6 +403,7 @@ button.vk._busy{color:transparent}
 .pl15{padding-left:15px}
 .pl20{padding-left:20px}
 
+.mara{margin:auto}
 .mar5{margin:5px}
 .mar8{margin:8px}
 .mar10{margin:10px}
@@ -450,6 +429,7 @@ button.vk._busy{color:transparent}
 .mtm3{margin-top:-3px}
 .mt3{margin-top:3px}
 .mt5{margin-top:5px}
+.mt8{margin-top:8px}
 .mt10{margin-top:10px}
 .mt15{margin-top:15px}
 .mt20{margin-top:20px}
@@ -506,13 +486,11 @@ button.vk._busy{color:transparent}
 .bg-gr2{background-color:#F2F6F9}/* бледно-серо-синий */
 .bg-gr3{background-color:#F7F7F7}/* стандарт светло-серый */
 .bg-add{background-color:#e0ffe0}
-.bg-fee,.bg-del{background-color:#fee}
+.bg-fee{background-color:#fee}
 .bg-ffe{background-color:#ffe}
 .bg-ffd{background-color:#ffd}
 .edtd,/* отредактировано. При наведении класс удаляется */
-.bg-ffc,
-.bg-ch{background-color:#ffc}   /* жёлтый - данные изменены */
-.bg-err,
+.bg-ffc{background-color:#ffc}   /* жёлтый - данные изменены */
 .bg-fcc{background-color:#fcc}  /* красный - ошибка */
 .bg-dfd{background-color:#dfd}  /* зелёный */
 .bg-ddf{background-color:#ddf}  /* синий */
@@ -545,6 +523,7 @@ td.bottom{vertical-align:bottom}
 .fs16{font-size:16px}
 .fs17{font-size:17px}
 .fs18{font-size:18px}
+.fs22{font-size:22px}
 
 /* Курсоры */
 .curM{cursor:move}

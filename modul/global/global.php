@@ -16,6 +16,7 @@ require_once GLOBAL_DIR.'/modul/debug/debug.php';
 require_once GLOBAL_DIR.'/modul/db/db.php';
 require_once GLOBAL_DIR.'/modul/global/vkuser.php';
 require_once GLOBAL_DIR.'/modul/page/page.php';
+require_once GLOBAL_DIR.'/modul/block/block.php';
 require_once GLOBAL_DIR.'/modul/element/element.php';
 require_once GLOBAL_DIR.'/modul/spisok/spisok.php';
 
@@ -249,7 +250,7 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 
 function _content() {//центральное содержание
 	return
-	'<div id="_content"'.(SITE ? ' class="site"' : '').'>'.
+	'<div id="_content" class="block-content-page'.(SITE ? ' site' : '').'">'.
 		(APP_ID ? _pageShow(_page('cur')) : _appSpisok()).
 	'</div>';
 }

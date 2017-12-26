@@ -345,21 +345,12 @@ function _spisokList($dialog_id, $component_id, $v='', $unit_id=0) {//массив спи
 	return query_selArray($sql);
 }
 
-function _spisokUnitSetup($block_id, $width, $grid_id=0) {//данные для настройки единицы списка
-	if(!$arr = _pageBlockArr(0, $block_id))
+function _spisokUnitSetup($spisok_id, $width, $grid_id=0) {//данные для настройки единицы списка
+	if(!$block = _blockArr('spisok', $spisok_id))
 		return '<div class="_empty min">'.
 					'Шаблон пуст.'.
 					'<div class="mt10 pale">Начните с настройки блоков.</div>'.
 			   '</div>';
-
-
-
-
-	$child = array();
-	foreach($arr as $id => $r)
-		$child[$r['parent_id']][$id] = $r;
-
-	$block = _blockChildArr($child, $block_id);
 
 	define('GRID_ID', $grid_id);
 
@@ -409,7 +400,7 @@ function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирова
 	if(PAS)
 		return '<div class="_empty">Список <b class="fs14">'.$dialog['spisok_name'].'</b></div>';
 
-	if(!$arr = _pageBlockArr(0, $pe['block_id']))
+	if(!$arr = _blockArr('spisok', $pe['block_id']))
 		return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
 
 	$send = '';
@@ -436,7 +427,7 @@ function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирова
 			$child[$r['parent_id']][$id] = $r;
 		}
 
-		$block = _blockChildArr($child, $pe['block_id']);
+		$block = _blockArrChild($child, $pe['block_id']);
 		$send .= _blockLevel($block, $pe['block']['width']);
 	}
 

@@ -1,0 +1,355 @@
+<?php
+function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры блоков с элементами для конкретной страницы
+	/*
+		$return:
+			block - иерархия блоков
+			arr - последовательность блоков (для формата JS)
+	*/
+	$sql = "SELECT
+				*,
+				'' `elem`
+			FROM `_block`
+			WHERE `obj_name`='".$obj_name."'
+			  AND `obj_id`=".$obj_id."
+			ORDER BY `parent_id`,`y`,`x`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	//расстановка элементов в блоки
+	$sql = "SELECT *
+			FROM `_page_element`
+			WHERE `block_id` IN ("._idsGet($arr).")";
+	foreach(query_arr($sql) as $r) {
+		unset($arr[$r['block_id']]['elem']);
+		$r['block'] = $arr[$r['block_id']];
+		$arr[$r['block_id']]['elem'] = $r;
+	}
+
+	foreach($arr as $id => $r) {
+		$arr[$id]['child'] = array();
+		$arr[$id]['child_count'] = 0;
+	}
+
+	$child = array();
+	foreach($arr as $id => $r)
+		$child[$r['parent_id']][$id] = $r;
+
+	$block = _blockArrChild($child);
+
+	if($return == 'block')
+		return $block;
+
+	foreach($arr as $id => $r) {
+		if(!$r['parent_id'])
+			continue;
+		$arr[$r['parent_id']]['child_count'] = count($child[$r['parent_id']]);
+	}
+
+	return $arr;
+}
+function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
+	if(!$send = @$child[$parent_id])
+		return array();
+
+	foreach($send as $id => $r)
+		$send[$id]['child'] = _blockArrChild($child, $id);
+
+	return $send;
+}
+function _blockObjName($name) {//доступные варианты объектов для блоков
+	$arr = array(
+		'page' => 1,
+		'spisok' => 1,
+		'dialog' => 1
+	);
+
+	if(!isset($arr[$name]))
+		return 0;
+
+	return $name;
+}
+function _blockTab($obj_name, $obj_id, $grid_id=0) {
+	define('GRID_ID', $grid_id);
+
+	if(!$block = _blockArr($obj_name, $obj_id))
+		return PAS ? '' : '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>';
+
+	return
+	_blockLevel($block, 1000).
+	'<script>'.
+		'var BLOCK_ARR={'._blockJS($obj_name, $obj_id).'},'.
+			'ELEM_COLOR={'._elemColor().'};'.
+	'</script>';
+}
+function _blockLevel($arr, $WM, $hMax=0, $level=1) {//формирование блоков по уровням
+	if(empty($arr))
+		return '';
+
+	if(!defined('GRID_ID'))
+		define('GRID_ID', 0);
+
+	$MN = 10;//множитель
+	$wMax = round($WM / $MN);
+
+	//подстановка нижней линии, если блоки не доходят до низу
+	$yEnd = 0;
+	$hSum = 0;
+
+	//составление структуры блоков по строкам
+	$block = array();
+	foreach($arr as $r) {
+		$block[$r['y']][] = $r;
+		$yEnd = $r['y'];
+	}
+
+	$send = '';
+	$BT = PAS ? ' bor-t-dash' : '';
+	$BR = PAS ? ' bor-r-dash' : '';
+	$BB = PAS ? ' bor-b-dash' : '';
+	$br1px = PAS ? 1 : 0;
+
+
+	foreach($block as $y => $str) {
+		$widthMax = $WM;
+		$r = $str[0];
+
+		$bt = $y ? $BT : '';
+
+		$hSum += $r['h'];
+		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
+
+		$send .=
+			'<table class="bl-tab" style="height:'.$r['height'].'px">'.
+				'<tr>';
+		//пустота в начале
+		if($r['x']) {
+			$width = $r['x'] * $MN - $br1px;
+			$send .= '<td class="'.$BR.$bt.$bb.'" style="width:'.$width.'px">';
+			$widthMax -= $width;
+		}
+
+		foreach($str as $n => $r) {
+			$next = @$str[$n + 1];
+
+			if($r['width'] > $widthMax)
+				$r['width'] = $widthMax;
+
+			$xEnd = !($wMax - $r['x'] - $r['w']);
+
+			$cls = array('bl-td');
+			$cls[] = PAS ? 'prel' : '';
+			$cls[] = $r['bg'];
+			$cls[] = trim($bt);
+			$cls[] = trim($bb);
+			$cls[] = !$xEnd ? trim($BR) : '';
+			$cls[] = $r['id'] == GRID_ID ? 'block-unit-grid' : '';
+			$cls[] = $r['pos'];
+			$cls = array_diff($cls, array(''));
+			$cls = implode(' ', $cls);
+
+			$bor = explode(' ', $r['bor']);
+			$borPx = $bor[3] + (PAS ? 0 : $bor[1]);
+			$width = $r['width'] - $br1px - $borPx;
+
+			$send .= '<td id="bl_'.$r['id'].'"'.
+						' class="'.$cls.'"'.
+						' style="'._blockStyle($r, $width).'"'.
+				 (PAS ? ' val="'.$r['id'].'"' : '').
+					 '>'.
+							_blockSetka($r, $level, $r['obj_name']).
+							_blockChildHtml($r, $level + 1, $width).
+	    					_elemDiv($r['elem']).
+					'';
+
+			$widthMax -= $r['width'];
+
+			//пустота в середине
+			if($next)
+				if($next['x'] > $r['x'] + $r['w']) {
+					$w = $next['x'] - $r['x'] - $r['w'];
+					$width = $w * $MN - $br1px;
+					$send .= '<td class="'.$BR.$bt.$bb.'" style="width:'.$width.'px">';
+					$widthMax -= $width;
+				}
+
+			//пустота в конце
+			if(!$next && $widthMax)
+				$send .= '<td class="'.$bt.$bb.'" style="width:'.$widthMax.'px">';
+		}
+		$send .= '</table>';
+	}
+
+	return $send;
+}
+function _blockLevelChange($obj_name, $obj_id) {//кнопки для изменения уровня редактирования блоков
+	$max = 1;
+
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='".$obj_name."'
+			  AND `obj_id`=".$obj_id;
+	$arr = query_arr($sql);
+
+	foreach($arr as $r) {
+		if(!$parent_id = $r['parent_id'])
+			continue;
+
+		$level = 2;
+
+		while($parent_id)
+			if($parent_id = $arr[$parent_id]['parent_id'])
+				$level++;
+
+		if($max < $level)
+			$max = $level;
+	}
+
+
+	$send = '';
+	for($n = 1; $n <= $max; $n++) {
+		$sel = _blockLevelDefine($obj_name) == $n ? 'orange' : 'cancel';
+		$send .= '<button class="block-level-change vk small ml5 '.$sel.'">'.$n.'</button>';
+	}
+
+	return
+	'<div id="block-level-'.$obj_name.'" class="dib">'.
+		'<button class="vk small grey block-grid-on" val="'.$obj_name.':'.$obj_id.'">Управление блоками</button>'.
+		$send.
+	'</div>';
+}
+function _blockLevelDefine($obj_name) {//уровень редактируемых блоков
+	$key = 'block_level_'.$obj_name;
+	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
+}
+function _blockSetka($r, $level, $obj_name) {//отображение сетки для настраиваемого блока
+	if(!PAS)
+		return '';
+	if(GRID_ID == $r['id'])
+		return '';
+
+	$bld = _blockLevelDefine($obj_name);
+
+	if($bld != $level)
+		return '';
+
+	$bld += $obj_name == 'page' ? 0 : 2;
+
+	return '<div class="block-unit level'.$bld.' '.(GRID_ID ? ' grid' : '').'" val="'.$r['id'].'"></div>';
+}
+function _blockStyle($r, $width) {//стили css для блока
+	$send = array();
+
+	//границы
+	$bor = explode(' ', $r['bor']);
+	foreach($bor as $i => $b) {
+		if(!$b)
+			continue;
+		switch($i) {
+			case 0: $send[] = 'border-top:#DEE3EF solid 1px'; break;
+			case 1: $send[] = 'border-right:#DEE3EF solid 1px'; break;
+			case 2: $send[] = 'border-bottom:#DEE3EF solid 1px'; break;
+			case 3: $send[] = 'border-left:#DEE3EF solid 1px'; break;
+		}
+	}
+
+	$send[] = 'width:'.$width.'px';
+
+	return implode(';', $send);
+}
+function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
+	if(!$arr = _blockArr($obj_name, $obj_id, 'arr'))
+		return '';
+
+	$send = array();
+	foreach($arr as $id => $r) {
+		$v = array();
+		$v[] = 'id:'.$id;
+		$v[] = 'pos:"'.$r['pos'].'"';
+		$v[] = 'bg:"'.$r['bg'].'"';
+		$v[] = 'bor:"'.$r['bor'].'"';
+		$v[] = 'obj_name:"'.$r['obj_name'].'"';
+		$v[] = 'obj_id:'.$r['obj_id'];
+		$v[] = 'child:'.$r['child_count'];
+
+		if($el = $r['elem']) {
+			if(!$size = _num($el['size']))
+				$size = 13;
+			$v[] = 'elem_id:'._num($el['id']);
+			$v[] = 'dialog_id:'._num($el['dialog_id']);
+			$v[] = 'fontAllow:'._elemFontAllow($el['dialog_id']);
+			$v[] = 'color:"'.$el['color'].'"';
+			$v[] = 'font:"'.$el['font'].'"';
+			$v[] = 'size:'.$size;
+			$v[] = 'mar:"'.$el['mar'].'"';
+
+			$v[] = 'num_1:'._num($el['num_1'], true);
+			$v[] = 'num_2:'._num($el['num_2']);
+			$v[] = 'num_7:'._num($el['num_7']);
+			$v[] = 'txt_2:"'._br($el['txt_2']).'"';
+		}
+
+		$send[] = $id.':{'.implode(',', $v).'}';
+	}
+	return implode(',', $send);
+}
+function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для отправки через JSON для BLOCK_ARR
+	if(!$arr = _blockArr($obj_name, $obj_id, 'arr'))
+		return array();
+
+	$send = array();
+	foreach($arr as $id => $r) {
+		$v = array(
+			'id' => _num($id),
+			'pos' => $r['pos'],
+			'bg' => $r['bg'],
+			'bor' => $r['bor'],
+			'obj_name' => $r['obj_name'],
+			'obj_id' => _num($r['obj_id']),
+			'child' => _num($r['child_count'])
+		);
+
+		if($el = $r['elem']) {
+			if(!$size = _num($el['size']))
+				$size = 13;
+			$v['elem_id'] = _num($el['id']);
+			$v['dialog_id'] = _num($el['dialog_id']);
+			$v['fontAllow'] = _elemFontAllow($el['dialog_id']);
+			$v['color'] = $el['color'];
+			$v['font'] = $el['font'];
+			$v['size'] = $size;
+			$v['mar'] = $el['mar'];
+
+			$v['num_1'] = _num($el['num_1'], true);
+			$v['num_2'] = _num($el['num_2']);
+			$v['num_7'] = _num($el['num_7']);
+			$v['txt_2'] = utf8(_br($el['txt_2']));
+		}
+
+		$send[_num($id)] = $v;
+	}
+	return $send;
+}
+function _blockChildHtml($block, $level, $width) {//деление блока на части
+	if(GRID_ID != $block['id'])
+		return _blockLevel($block['child'], $width, $block['h'], $level);
+
+	return _blockGrid($block['child']);
+}
+function _blockGrid($arr) {//режим деления страницы на блоки
+	$spisok = '';
+	foreach($arr as $r) {
+		$spisok .=
+		    '<div id="pb_'.$r['id'].'" class="grid-item" data-gs-x="'.$r['x'].'" data-gs-y="'.$r['y'].'" data-gs-width="'.$r['w'].'" data-gs-height="'.$r['h'].'">'.
+				'<div class="grid-content"></div>'.
+				'<div class="grid-del">x</div>'.
+		    '</div>';
+	}
+
+	return
+		'<div id="grid-stack" class="prel">'.$spisok.'</div>'.
+		'<div id="grid-add" class="pad5 bg-gr2 bor-e8 fs14 center color-555 curP over5 mt1">Добавить блок</div> '.
+		'<div class="pad5 center">'.
+			'<button class="vk small orange" id="grid-save">Сохранить</button>'.
+			'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
+		'</div>';
+}

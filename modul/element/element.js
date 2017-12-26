@@ -367,8 +367,12 @@ var VK_SCROLL = 0,
 					axis:'x',
 					grid:[10,0],
 					drag:function(event, ui) {
-						DIALOG_WIDTH = ui.position.left - 8;
-						dialog.width(DIALOG_WIDTH);
+						var w = ui.position.left - 8;
+						if(w < 480 || w > 980)
+							return false;
+						DIALOG_WIDTH = w;
+						dialog.width(w);
+						$('#dialog-width').html(w);
 					}
 				});
 
@@ -385,6 +389,11 @@ var VK_SCROLL = 0,
 						$('.label-width').width(LABEL_WIDTH);
 					}
 				});
+
+			//включение/отключение управления блоками
+			$('#dialog-cmp-block').click(function() {
+				_dialogCmpBlock();
+			});
 		}
 		function elementFuncFunc() {//открытие окна настройки функции компонента
 			$(document).off('click', '.cmp-set .icon-usd');
@@ -1271,6 +1280,54 @@ var VK_SCROLL = 0,
 		}
 	},
 
+	_dialogCmpBlock = function(t, block_id) {//включение/отключение настройки блоков для диалога
+		var on = t.hasClass('grey'),
+			send = {
+				op:'spisok_tmp_block_' + (on ? 'on' : 'off'),
+				block_id:block_id
+			};
+
+		if(t.hasClass('_busy'))
+			return;
+
+		t.addClass('_busy');
+
+		_post(send, function(res) {
+			butOn(on);
+			$('#tmp-elem-list').html(res.html);
+			if(!on) {
+				BLOCK_ARR = res.block_arr;
+				return;
+			}
+			$('#grid-stack')._grid({
+				width:res.w,
+				parent_id:block_id,
+				is_spisok:block_id,
+				funcAfterSave:function(res) {
+					$('#spisok-unit-block-level').html(res.level);
+					$('#tmp-elem-list').html(res.html);
+					BLOCK_ARR = res.block_arr;
+					butOn(0);
+				},
+				funcCancel:function() {
+					t.trigger('click');
+				}
+			});
+		}, function() {
+			t.removeClass('_busy');
+		});
+
+		function butOn(v) {
+			t.removeClass('_busy');
+			var val = t.attr('val'),
+				html = t.html();
+			t._dn(v, 'grey');
+			t._dn(!v, 'orange');
+			t.html(val);
+			t.attr('val', html);
+		}
+	},
+
 	_dialogOpen = function(dialog_id, unit_id, unit_id_dub, funcAfterPost) {//открытие диалогового окна
 		dialog_id = _num(dialog_id);
 		unit_id = _num(unit_id);
@@ -1937,12 +1994,14 @@ var VK_SCROLL = 0,
 
 		_post(send, function(res) {
 				$('._hint').remove();
-				$(res.block.is_spisok ? '#tmp-elem-list' : '#_content').html(res.html);
-				var obj = {
+				$('.block-content-' + res.block.obj_name).html(res.html);
+				$('#grid-stack')._grid({
 					width:res.w,
 					parent_id:block_id,
-					is_spisok:res.block.is_spisok
-				};
+					obj_name:res.block.obj_name,
+					obj_id:res.block.obj_id
+				});
+/*
 				if(res.block.is_spisok) {
 					obj.funcAfterSave = function(res) {
 						$('#spisok-unit-block-level').html(res.level);
@@ -1951,7 +2010,7 @@ var VK_SCROLL = 0,
 					};
 					obj.funcCancel = _blockUnitGridOff;
 				}
-				$('#grid-stack')._grid(obj);
+*/
 			}, function() {
 				but.removeClass('_busy');
 			});
@@ -2167,7 +2226,7 @@ var VK_SCROLL = 0,
 			},
 
 			expandedClass:'pb10',//раскрытый список
-			errorClass:'bg-err' //ошибка, если попытка переместить элемент на недоступный уровень
+			errorClass:'bg-fcc' //ошибка, если попытка переместить элемент на недоступный уровень
 		});
 	};
 
@@ -2213,18 +2272,24 @@ $(document)
 		});
 	})
 
-	.on('click', '.icon-page-tmp', function() {//включение/выключение управления блоками
+	.on('click', '.block-grid-on', function() {//включение/выключение управления блоками
 		var t = $(this),
-			v = !t.hasClass('on'),
+			p = t.parent(),
+			v = t.hasClass('grey'),
+			obj_name = t.attr('val').split(':')[0],
+			obj_id = t.attr('val').split(':')[1],
 			send = {
 				op:'block_edit_' + (v ? 'on' : 'off'),
-				page_id:PAGE_ID
+				obj_name:obj_name,
+				obj_id:obj_id
 			};
 
-		t._dn(!v, 'on');
+		t._dn(v, 'grey');
+		t._dn(!v, 'orange');
+		p.find('.block-level-change')._dn(!v);
 
 		_post(send, function(res) {
-			$('#_content').html(res.html);
+			$('.block-content-' + obj_name).html(res.html);
 			if(v)
 				$('#grid-stack')._grid();
 		});
@@ -2233,20 +2298,19 @@ $(document)
 	.on('click', '.block-level-change', function() {//изменения уровня редактирования блоков
 		var t = $(this),
 			v = _num(t.html()),
-			send = {
-				op:'block_edit_off',
-				page_id:PAGE_ID
-			};
+			p = t.parent(),
+			but = p.find('.block-grid-on'),
+			obj_name = but.attr('val').split(':')[0];
 
-		t.parent().find('.vk').addClass('cancel');
-		t.removeClass('cancel');
+		p.find('.block-level-change')
+			.removeClass('orange')
+			.addClass('cancel');
 
-		_cookie('block_level', v);
+		t.removeClass('cancel').addClass('orange');
 
-		_post(send, function(res) {
-			$('#_content').html(res.html);
-		});
+		_cookie('block_level_' + obj_name, v);
 
+		but.removeClass('grey').trigger('click');
 	})
 	.on('click', '.spisok-unit-block-level-change', function() {//изменения уровня редактирования блоков единицы списка
 		var t = $(this),
@@ -4009,7 +4073,8 @@ $.fn._grid = function(o) {
 	o = $.extend({
 		width:100,  //количество элементов минимальной ширины может поместиться по всей длине
 		parent_id:0,//родительский блок
-		is_spisok:0,//если блоки являются единицей списка
+		obj_name:'page',//имя объекта, где располагаются блоки
+		obj_id:PAGE_ID, //id объекта
 		funcAfterSave:afterSave,//действие после сохранения
 		funcCancel:cancel       //действие для кнопки Отмена
 	}, o);
@@ -4052,9 +4117,9 @@ $.fn._grid = function(o) {
 		t.addClass('_busy');
 		var send = {
 			op:'block_grid_save',
-			page_id:PAGE_ID,
 			parent_id:o.parent_id,
-			is_spisok:o.is_spisok,
+			obj_name:o.obj_name,
+			obj_id:o.obj_id,
 			arr:arr
 		};
 		_post(send, o.funcAfterSave, function() {
@@ -4115,13 +4180,15 @@ $.fn._grid = function(o) {
 
 	//сохранение блоков
 	function afterSave(res) {
-		$('.icon-page-tmp').removeClass('on');
-		$('#block-level').after(res.level).remove();
-		$('#_content').html(res.html);
+		$('#block-level-' + o.obj_name).after(res.level).remove();
+		$('.block-content-' + o.obj_name).html(res.html);
 	}
 	//отмена редактирования
 	function cancel() {
-		$('.icon-page-tmp').addClass('on').trigger('click');
+		$('#block-level-' + o.obj_name)
+			.find('.block-grid-on')
+			.removeClass('grey')
+			.trigger('click');
 	}
 };
 

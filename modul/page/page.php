@@ -93,11 +93,12 @@ function _pageCache() {//получение массива страниц из кеша
 
 	//получение количества блоков по каждой странице
 	$sql = "SELECT
-				`page_id`,
+				`obj_id`,
 				COUNT(*) `c`
 			FROM `_block`
-			WHERE `page_id` IN ("._idsGet($page).")
-			GROUP BY `page_id`";
+			WHERE `obj_name`='page'
+			  AND `obj_id` IN ("._idsGet($page).")
+			GROUP BY `obj_id`";
 	$block = query_ass($sql);
 
 	//получение количества элементов по каждой странице
@@ -195,21 +196,12 @@ function _pageSetupMenu() {//строка меню управления страницей
 
 	return
 	'<div id="pas">'.
-		'<div class="p pad5">'.
-			'<div class="fr mtm3">'.
-				'<div class="icon-page-tmp"></div>'.
-			'</div>'.
-
-			'<div class="dib fs16 b">'.
-				_page('name').
-			'</div>'.
-
-
+		'<div class="w1000 mara pad5">'.
+			'<div class="dib fs16 b">'._page('name').	'</div>'.
 //			'<div onclick="_dialogOpen('.$page['dialog_id'].','.PAGE_ID.')" class="icon icon-edit mbm5 ml20'._tooltip('Редактировать текущую страницу', -102).'</div>'.
 		'</div>'.
-		'<div class="p pad5">'.
-			(_page('cur') !=12 ? '<a href="'.URL.'&p=12"><< к списку страниц</a>' : '&nbsp;').
-			_blockLevelChange(_page('cur')).
+		'<div class="w1000 mara pad5">'.
+			_blockLevelChange('page', _page('cur')).
 		'</div>'.
 	'</div>';
 }
@@ -222,348 +214,9 @@ function _pageShow($page_id) {
 		return _contentMsg();
 
 	return
-	_blockTab($page_id).
+	_blockTab('page', $page_id).
 	(!PAS ? '<script>_pageShow()</script>' : '');
 }
-function _pageBlockArr($page_id, $is_spisok=0) {//получение структуры блоков с элементами для конкретной страницы
-	$cond = "`page_id`=".$page_id;
-	//выбор блоков для единицы списка
-	if($is_spisok)
-		$cond = "`is_spisok`=".$is_spisok;
-
-	$sql = "SELECT
-				*,
-				'' `elem`
-			FROM `_block`
-			WHERE ".$cond."
-			ORDER BY `parent_id`,`y`,`x`";
-	if(!$arr = query_arr($sql))
-		return array();
-
-	//расстановка элементов в блоки
-	$sql = "SELECT *
-			FROM `_page_element`
-			WHERE `block_id` IN ("._idsGet($arr).")";
-	foreach(query_arr($sql) as $r) {
-		unset($arr[$r['block_id']]['elem']);
-		$r['block'] = $arr[$r['block_id']];
-		$arr[$r['block_id']]['elem'] = $r;
-	}
-
-	foreach($arr as $id => $r)
-		$arr[$id]['child'] = array();
-
-	return $arr;
-}
-function _blockTab($page_id, $grid_id=0) {
-	define('GRID_ID', $grid_id);
-
-	if(!$arr = _pageBlockArr($page_id))
-		return PAS ? '' : '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>';
-
-	$child = array();
-	foreach($arr as $id => $r) {
-		if($r['is_spisok'])
-			continue;
-		$child[$r['parent_id']][$id] = $r;
-	}
-
-	$block = _blockChildArr($child);
-
-	return
-	_blockLevel($block, 1000).
-	'<script>'.
-		'var BLOCK_ARR={'._blockJS($page_id).'},'.
-			'ELEM_COLOR={'._elemColor().'};'.
-	'</script>';
-}
-function _blockChildArr($child, $parent_id=0) {//расстановка дочерних блоков
-	if(!$send = @$child[$parent_id])
-		return array();
-
-	foreach($send as $id => $r)
-		$send[$id]['child'] = _blockChildArr($child, $id);
-
-	return $send;
-}
-function _blockLevel($arr, $WM, $hMax=0, $level=1) {//формирование блоков по уровням
-	if(empty($arr))
-		return '';
-
-	if(!defined('GRID_ID'))
-		define('GRID_ID', 0);
-
-	$MN = 10;//множитель
-	$wMax = round($WM / $MN);
-
-	//подстановка нижней линии, если блоки не доходят до низу
-	$yEnd = 0;
-	$hSum = 0;
-
-	//составление структуры блоков по строкам
-	$block = array();
-	foreach($arr as $r) {
-		$block[$r['y']][] = $r;
-		$yEnd = $r['y'];
-	}
-
-	$send = '';
-	$BT = PAS ? ' bor-t-dash' : '';
-	$BR = PAS ? ' bor-r-dash' : '';
-	$BB = PAS ? ' bor-b-dash' : '';
-	$br1px = PAS ? 1 : 0;
-
-
-	foreach($block as $y => $str) {
-		$widthMax = $WM;
-		$r = $str[0];
-
-		$bt = $y ? $BT : '';
-
-		$hSum += $r['h'];
-		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
-
-		$send .=
-			'<table class="bl-tab" style="height:'.$r['height'].'px">'.
-				'<tr>';
-		//пустота в начале
-		if($r['x']) {
-			$width = $r['x'] * $MN - $br1px;
-			$send .= '<td class="'.$BR.$bt.$bb.'" style="width:'.$width.'px">';
-			$widthMax -= $width;
-		}
-
-		foreach($str as $n => $r) {
-			$next = @$str[$n + 1];
-
-			if($r['width'] > $widthMax)
-				$r['width'] = $widthMax;
-
-			$xEnd = !($wMax - $r['x'] - $r['w']);
-
-			$cls = array('bl-td');
-			$cls[] = PAS ? 'prel' : '';
-			$cls[] = $r['bg'];
-			$cls[] = trim($bt);
-			$cls[] = trim($bb);
-			$cls[] = !$xEnd ? trim($BR) : '';
-			$cls[] = $r['id'] == GRID_ID ? 'block-unit-grid' : '';
-			$cls[] = $r['pos'];
-			$cls = array_diff($cls, array(''));
-			$cls = implode(' ', $cls);
-
-			$bor = explode(' ', $r['bor']);
-			$borPx = $bor[3] + (PAS ? 0 : $bor[1]);
-			$width = $r['width'] - $br1px - $borPx;
-
-			$send .= '<td id="bl_'.$r['id'].'"'.
-						' class="'.$cls.'"'.
-						' style="'._blockStyle($r, $width).'"'.
-				 (PAS ? ' val="'.$r['id'].'"' : '').
-					 '>'.
-							_blockSetka($r, $level, $r['is_spisok']).
-							_blockChildHtml($r, $level + 1, $width).
-	    					_elemDiv($r['elem']).
-					'';
-
-			$widthMax -= $r['width'];
-
-			//пустота в середине
-			if($next)
-				if($next['x'] > $r['x'] + $r['w']) {
-					$w = $next['x'] - $r['x'] - $r['w'];
-					$width = $w * $MN - $br1px;
-					$send .= '<td class="'.$BR.$bt.$bb.'" style="width:'.$width.'px">';
-					$widthMax -= $width;
-				}
-
-			//пустота в конце
-			if(!$next && $widthMax)
-				$send .= '<td class="'.$bt.$bb.'" style="width:'.$widthMax.'px">';
-		}
-		$send .= '</table>';
-	}
-
-	return $send;
-}
-function _blockLevelChange($page_id) {//кнопки для изменения уровня редактирования блоков
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `page_id`=".$page_id."
-			  AND !`is_spisok`";
-	if(!$arr = query_arr($sql))
-		return '';
-
-	$max = 1;
-
-	foreach($arr as $r) {
-		if(!$parent_id = $r['parent_id'])
-			continue;
-
-		$level = 2;
-
-		while($parent_id)
-			if($parent_id = $arr[$parent_id]['parent_id'])
-				$level++;
-
-		if($max < $level)
-			$max = $level;
-	}
-
-
-	$send = '';
-	for($n = 1; $n <= $max; $n++) {
-		$sel = _blockLevelDefine() == $n ? '' : ' cancel';
-		$send .= '<button class="block-level-change vk small ml5'.$sel.'">'.$n.'</button>';
-	}
-
-	return '<div id="block-level" class="dib ml20">'.$send.'</div>';
-}
-function _blockLevelDefine($is_spisok=0) {//уровень редактируемых блоков
-	if($is_spisok)
-		return empty($_COOKIE['block_level_spisok']) ? 1 : _num($_COOKIE['block_level_spisok']);
-
-	return empty($_COOKIE['block_level']) ? 1 : _num($_COOKIE['block_level']);
-}
-function _blockSetka($r, $level, $is_spisok) {//отображение сетки для настраиваемого блока
-	if(!PAS)
-		return '';
-	if(GRID_ID == $r['id'])
-		return '';
-
-	$bld = _blockLevelDefine($is_spisok);
-
-	if($bld != $level)
-		return '';
-
-	$bld += $is_spisok ? 2 : 0;
-
-	return '<div class="block-unit level'.$bld.' '.(GRID_ID ? ' grid' : '').'" val="'.$r['id'].'"></div>';
-}
-function _blockStyle($r, $width) {//стили css для блока
-	$send = array();
-
-	//границы
-	$bor = explode(' ', $r['bor']);
-	foreach($bor as $i => $b) {
-		if(!$b)
-			continue;
-		switch($i) {
-			case 0: $send[] = 'border-top:#DEE3EF solid 1px'; break;
-			case 1: $send[] = 'border-right:#DEE3EF solid 1px'; break;
-			case 2: $send[] = 'border-bottom:#DEE3EF solid 1px'; break;
-			case 3: $send[] = 'border-left:#DEE3EF solid 1px'; break;
-		}
-	}
-
-	$send[] = 'width:'.$width.'px';
-
-	return implode(';', $send);
-}
-function _blockJS($page_id) {//массив настроек блоков в формате JS
-	if(!$arr = _pageBlockArr($page_id))
-		return '';
-
-	$child = array();
-	foreach($arr as $id => $r)
-		$child[$r['parent_id']][$id] = $r;
-
-	$send = array();
-	foreach($arr as $id => $r) {
-		$v = array();
-		$v[] = 'id:'.$id;
-		$v[] = 'pos:"'.$r['pos'].'"';
-		$v[] = 'bg:"'.$r['bg'].'"';
-		$v[] = 'bor:"'.$r['bor'].'"';
-		$v[] = 'is_spisok:'._num($r['is_spisok']);
-		$v[] = 'child:'.(!empty($child[$id]) ? 1 : 0);
-
-		if($el = $r['elem']) {
-			if(!$size = _num($el['size']))
-				$size = 13;
-			$v[] = 'elem_id:'._num($el['id']);
-			$v[] = 'dialog_id:'._num($el['dialog_id']);
-			$v[] = 'fontAllow:'._elemFontAllow($el['dialog_id']);
-			$v[] = 'color:"'.$el['color'].'"';
-			$v[] = 'font:"'.$el['font'].'"';
-			$v[] = 'size:'.$size;
-			$v[] = 'mar:"'.$el['mar'].'"';
-
-			$v[] = 'num_1:'._num($el['num_1'], true);
-			$v[] = 'num_2:'._num($el['num_2']);
-			$v[] = 'num_7:'._num($el['num_7']);
-			$v[] = 'txt_2:"'._br($el['txt_2']).'"';
-		}
-
-		$send[] = $id.':{'.implode(',', $v).'}';
-	}
-	return implode(',', $send);
-}
-function _blockArr($page_id) {//массив настроек блоков в формате для отправки через JSON для BLOCK_ARR
-	if(!$arr = _pageBlockArr($page_id))
-		return '';
-
-	$child = array();
-	foreach($arr as $id => $r)
-		$child[$r['parent_id']][$id] = $r;
-
-	$send = array();
-	foreach($arr as $id => $r) {
-		$v = array(
-			'id' => _num($id),
-			'pos' => $r['pos'],
-			'bg' => $r['bg'],
-			'bor' => $r['bor'],
-			'is_spisok' => _num($r['is_spisok']),
-			'child' => !empty($child[$id]) ? 1 : 0
-		);
-
-		if($el = $r['elem']) {
-			if(!$size = _num($el['size']))
-				$size = 13;
-			$v['elem_id'] = _num($el['id']);
-			$v['dialog_id'] = _num($el['dialog_id']);
-			$v['fontAllow'] = _elemFontAllow($el['dialog_id']);
-			$v['color'] = $el['color'];
-			$v['font'] = $el['font'];
-			$v['size'] = $size;
-			$v['mar'] = $el['mar'];
-
-			$v['num_1'] = _num($el['num_1'], true);
-			$v['num_2'] = _num($el['num_2']);
-			$v['num_7'] = _num($el['num_7']);
-			$v['txt_2'] = utf8(_br($el['txt_2']));
-		}
-
-		$send[_num($id)] = $v;
-	}
-	return $send;
-}
-function _blockChildHtml($block, $level, $width) {//деление блока на части
-	if(GRID_ID != $block['id'])
-		return _blockLevel($block['child'], $width, $block['h'], $level);
-
-	return _blockGrid($block['child']);
-}
-function _blockGrid($arr) {//режим деления страницы на блоки
-	$spisok = '';
-	foreach($arr as $r) {
-		$spisok .=
-		    '<div id="pb_'.$r['id'].'" class="grid-item" data-gs-x="'.$r['x'].'" data-gs-y="'.$r['y'].'" data-gs-width="'.$r['w'].'" data-gs-height="'.$r['h'].'">'.
-				'<div class="grid-content"></div>'.
-				'<div class="grid-del">x</div>'.
-		    '</div>';
-	}
-
-	return
-		'<div id="grid-stack" class="prel">'.$spisok.'</div>'.
-		'<div id="grid-add" class="pad5 bg-gr2 bor-e8 fs14 center color-555 curP over5 mt1">Добавить блок</div> '.
-		'<div class="pad5 center">'.
-			'<button class="vk small orange" id="grid-save">Сохранить</button>'.
-			'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
-		'</div>';
-}
-
 
 function _elemDiv($el) {//формирование div элемента
 	if(!$el)
@@ -692,8 +345,9 @@ function _elemUnit($el) {//формирование элемента страницы
 		case 14: return _spisokShow($el); //содержание списка
 		case 15: return _spisokElemCount($el);//текст с количеством строк списка
 	}
+
 	//элементы списка шаблона (для настройки)
-	if($el['block']['is_spisok']) {
+	if($el['block']['obj_name'] == 'spisok') {
 		if(isset($el['real_txt']))
 			return $el['real_txt'];
 		switch($el['num_1']) {

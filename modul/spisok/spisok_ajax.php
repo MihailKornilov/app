@@ -330,9 +330,11 @@ switch(@$_POST['op']) {
 
 				$html =
 					'<div class="hd2 mt20">Настройка шаблона единицы списка:</div>'.
-					'<button id="but-spisok-tmp-grid" class="vk small grey mt10 w200" onclick="_spisokTmpBlock($(this),'.$block['id'].')" val="Отключить настройку блоков">Включить настройку блоков</button>'.
-					'<div id="spisok-unit-block-level" class="dib ml20 mt10" val="'.$block['id'].'">'._spisokUnitBlockLevelChange($block['id']).'</div>'.
-					'<div id="tmp-elem-list" class="mt10" style="width:'.$width.'px">'._spisokUnitSetup($block['id'], $width).'</div>';
+					'<div class="bg-gr2 pad10 line-b">'._blockLevelChange('spisok', $spisok_id).'</div>'.
+					'<div class="block-content-spisok mt10" style="width:'.$width.'px">'._spisokUnitSetup($spisok_id, $width).'</div>';
+//					'<button id="but-spisok-tmp-grid" class="vk small grey mt10 w200" onclick="_spisokTmpBlock($(this),'.$block['id'].')" val="Отключить настройку блоков">Включить настройку блоков</button>'.
+//					'<div id="spisok-unit-block-level" class="dib ml20 mt10" val="'.$block['id'].'">'._spisokUnitBlockLevelChange($block['id']).'</div>'.
+//					'<div id="tmp-elem-list" class="mt10" style="width:'.$width.'px">'._spisokUnitSetup($block['id'], $width).'</div>';
 				break;
 		}
 
@@ -451,7 +453,7 @@ switch(@$_POST['op']) {
 		$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
 
 		$send['html'] = utf8(_spisokUnitSetup($block_id, $width));
-		$send['block_arr'] = _blockArr($block['page_id']);
+		$send['block_arr'] = _blockJsArr($block['page_id']);
 
 		jsonSuccess($send);
 		break;
@@ -544,7 +546,7 @@ switch(@$_POST['op']) {
 		$iss = query_assoc($sql);
 
 		$send['html'] = utf8(_spisokUnitSetup($iss['id'], $iss['width']));
-		$send['block_arr'] = _blockArr($block['page_id']);
+		$send['block_arr'] = _blockJsArr($block['page_id']);
 
 		jsonSuccess($send);
 		break;

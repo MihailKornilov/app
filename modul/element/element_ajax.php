@@ -32,8 +32,9 @@ switch(@$_POST['op']) {
 				$dialog_id = 0;
 
 		$menu = array(
-			1 => 'Заголовок, кнопки',
+			1 => 'Заголовок',
 			2 => 'Компоненты',
+			4 => 'CMP new',
   		    3 => 'Действие',
 //  		4 => 'Функции',
 //			5 => 'Отображение полей',
@@ -102,6 +103,17 @@ switch(@$_POST['op']) {
 				'</div>'.
 			'</div>'.
 
+			//Компоненты - новое
+			'<div class="dialog-menu-4">'.
+				'<div class="pad10 line-b bg-ffc">'.
+					'<button class="vk small grey" id="dialog-cmp-block">Включить настройку блоков</button>'.
+				'</div>'.
+				'<div class="_empty min mar10">'.
+					'Компонентов нет.'.
+					'<div class="mt10 pale">Начните с настройки блоков.</div>'.
+			   '</div>'.
+			'</div>'.
+
 			//Действие
 			'<div class="dialog-menu-3">'.
 				'<div class="_info mar20">'.
@@ -122,14 +134,14 @@ switch(@$_POST['op']) {
 			//SA
 	  (SA ? '<div class="dialog-menu-9 pt20 pb20">'.
 				'<table class="bs10">'.
-					'<tr><td class="label w175 r"><div class="red">ID диалога:</div>'.
-						'<td>'.$dialog['id'].
-					'<tr><td class="label r"><div class="red">Таблица в базе:</div>'.
+					'<tr><td class="red w175 r">ID:<td class="b">'.$dialog['id'].
+					'<tr><td class="red r">Ширина:<td id="dialog-width">'.$dialog['width'].
+					'<tr><td class="red r">Таблица в базе:'.
 						'<td><input type="text" id="base_table" class="w230" maxlength="30" value="'.$dialog['base_table'].'" />'.
 					//доступность диалога. На основании app_id. По умолчанию 0 - недоступен всем.
-					'<tr><td class="label r"><div class="red">App any:</div>'.
+					'<tr><td class="red r">App any:'.
 						'<td><input type="hidden" id="app_any" value="'.($dialog['id'] ? ($dialog['app_id'] ? 0 : 1) : 0).'" />'.
-					'<tr><td class="label r"><div class="red">SA only:</div>'.
+					'<tr><td class="red r">SA only:'.
 						'<td><input type="hidden" id="sa" value="'.$dialog['sa'].'" />'.
 				'</table>'.
 			'</div>'
@@ -272,12 +284,15 @@ switch(@$_POST['op']) {
 		break;
 
 	case 'block_edit_on'://включение управления блоками
-		if(!$page_id = $_POST['page_id'])
-			jsonError('Некорректный ID страницы');
+		if(!$obj_name = _blockObjName($_POST['obj_name']))
+			jsonError('Несуществующее имя объекта');
+		if(!$obj_id = _num($_POST['obj_id']))
+			jsonError('Некорректный ID объекта');
 
 		$sql = "SELECT *
 				FROM `_block`
-				WHERE `page_id`=".$page_id."
+				WHERE `obj_name`='".$obj_name."'
+				  AND `obj_id`=".$obj_id."
 				  AND !`parent_id`
 				ORDER BY `y`,`x`";
 		$arr = query_arr($sql);
@@ -287,29 +302,32 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 	case 'block_edit_off'://выключение управления блоками
-		if(!$page_id = $_POST['page_id'])
-			jsonError('Некорректный ID страницы');
+		if(!$obj_name = _blockObjName($_POST['obj_name']))
+			jsonError('Несуществующее имя объекта');
+		if(!$obj_id = _num($_POST['obj_id']))
+			jsonError('Некорректный ID объекта');
 
-		$send['html'] = utf8(_blockTab($page_id));
+		$send['html'] = utf8(_blockTab($obj_name, $obj_id));
 
 		jsonSuccess($send);
 		break;
 	case 'block_grid_save'://сохранение данных блоков после редактирования
-		if(!$page_id = _num($_POST['page_id']))
-			jsonError('Некорректный ID страницы');
+		if(!$obj_name = _blockObjName($_POST['obj_name']))
+			jsonError('Несуществующее имя объекта');
+		if(!$obj_id = _num($_POST['obj_id']))
+			jsonError('Некорректный ID объекта');
 
 		//проверка наличия родительского блока
 		$parent = array();
 		if($parent_id = _num(@$_POST['parent_id'])) {
 			$sql = "SELECT *
 					FROM `_block`
-					WHERE `page_id`=".$page_id."
+					WHERE `obj_name`='".$obj_name."'
+					  AND `obj_id`=".$obj_id."
 					  AND `id`=".$parent_id;
 			if(!$parent = query_ass($sql))
 				jsonError('Родительского блока не существует');
 		}
-
-		$is_spisok = _num(@$_POST['is_spisok']);
 
 		$idsNotDel = array(0);
 		$insert = array();
@@ -330,9 +348,9 @@ switch(@$_POST['op']) {
 				$height = $h * $mn;
 				$insert[] = "(".
 					$id.",".
-					$page_id.",".
 					$parent_id.",".
-					$is_spisok.",".
+					"'".$obj_name."',".
+					$obj_id.",".
 					$x.",".
 					$y.",".
 					$w.",".
@@ -348,22 +366,23 @@ switch(@$_POST['op']) {
 
 		//удаление удалённых блоков
 		$sql = "DELETE FROM `_block`
-				WHERE `page_id`=".$page_id."
+				WHERE `obj_name`='".$obj_name."'
+				  AND `obj_id`=".$obj_id."
 				  AND `parent_id`=".$parent_id."
-				  AND `is_spisok`=".$is_spisok."
 				  AND `id` NOT IN (".implode(',', $idsNotDel).")";
 		query($sql);
 
-		//удаление удалённых блоков и их потомков
+		//удаление потомков удалённых блоков
 		$sql = "SELECT *
 				FROM `_block`
-				WHERE `page_id`=".$page_id."
-				ORDER BY `parent_id`,`y`,`x`";
+				WHERE `obj_name`='".$obj_name."'
+				  AND `obj_id`=".$obj_id;
 		if($arr = query_arr($sql)) {
 			$idsForDel = array();
 			foreach($arr as $id => $r) {
 				if(!$parent_id = $r['parent_id'])
 					continue;
+				$ids = array();
 				$ids[$id] = $id;
 				$DEL_FLAG = true;
 				while(true) {
@@ -374,7 +393,6 @@ switch(@$_POST['op']) {
 						$DEL_FLAG = false;
 						break;
 					}
-
 				}
 				if($DEL_FLAG)
 					$idsForDel += $ids;
@@ -389,9 +407,9 @@ switch(@$_POST['op']) {
 		if($insert) {
 			$sql = "INSERT INTO `_block` (
 						`id`,
-						`page_id`,
 						`parent_id`,
-						`is_spisok`,
+						`obj_name`,
+						`obj_id`,
 						`x`,
 						`y`,
 						`w`,
@@ -410,8 +428,8 @@ switch(@$_POST['op']) {
 			query($sql);
 		}
 
-
-		if($is_spisok) {
+/*
+		if(false) {//$obj_name == 'spisok'
 			$sql = "SELECT *
 					FROM `_block`
 					WHERE `id`=".$is_spisok;
@@ -429,14 +447,11 @@ switch(@$_POST['op']) {
 
 			$level = _spisokUnitBlockLevelChange($is_spisok);
 			$html = _spisokUnitSetup($is_spisok, $width);
-		} else {
-			$level = _blockLevelChange($page_id);
-			$html = _blockTab($page_id);
 		}
-
-		$send['level'] = $level;
-		$send['html'] = utf8($html);
-		$send['block_arr'] = _blockArr($page_id);
+*/
+		$send['level'] = utf8(_blockLevelChange($obj_name, $obj_id));
+		$send['html'] = utf8(_blockTab($obj_name, $obj_id));
+		$send['block_arr'] = _blockJsArr($obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;
@@ -502,8 +517,8 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$id.' не существует');
-
-		if($block['is_spisok'] = _num($block['is_spisok'])) {//деление происходит для элемента списка
+/*
+		if($block['obj_name'] = 'spisok') {//деление происходит для элемента списка
 			//получение данных главного блока списка
 			$sql = "SELECT *
 					FROM `_block`
@@ -523,13 +538,12 @@ switch(@$_POST['op']) {
 			$width = floor(($iss['width'] - $ex[1] - $ex[3]) / 10) * 10;
 
 			$html = _spisokUnitSetup($iss['id'], $width, $id);
-		} else
-			$html = _blockTab($block['page_id'], $id);
-
-		$send['html'] = utf8($html);
+		}
+*/
+		$send['html'] = utf8(_blockTab($block['obj_name'], $block['obj_id'], $id));
 		$send['block'] = $block;
 		$send['w'] = $block['w'];
-		$send['block_arr'] = _blockArr($block['page_id']);
+		$send['block_arr'] = _blockJsArr($block['obj_name'], $block['obj_id']);
 
 		jsonSuccess($send);
 		break;
@@ -552,7 +566,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 
 	if(!$width = _num($_POST['width']))
 		jsonError('Некорректное значение ширины диалога');
-	if($width < 480 || $width > 900)
+	if($width < 480 || $width > 980)
 		jsonError('Установлена недопустимая ширина диалога');
 	if(!$label_width = _num($_POST['label_width']))
 		jsonError('Некорректное значение ширины label');

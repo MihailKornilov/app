@@ -107,15 +107,20 @@ function _header() {
 }
 function _header_hat() {//верхняя строка приложения-сайта
 	return
-	'<div id="hat"'.(VIEWER_ID_SHOWER ? 'class="show"' : '').'>'.
-		'<p>'.
-			(APP_ID ? _app(APP_ID, 'app_name') : 'Мои приложения').
-			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt5">'.
+	'<div id="hat"'.(VIEWER_ID_SHOWER ? ' class="show"' : '').'>'.
+		'<div class="w1000 mara pt3">'.
+			'<div class="dib mt5 fs22">'.(APP_ID ? _app(APP_ID, 'app_name') : 'Мои приложения').'</div>'.
+
+			'<a href="'.URL.'&logout'.(APP_ID && !VIEWER_APP_ONE ? '&app' : '').'" class="fr white mt10">'.
 				'<span class="dib mr20 pale">'.VIEWER_NAME.'</span>'.
 				'Выход'.
 			'</a>'.
-			_header_pas().
-		'</p>'.
+
+			'<div class="fr w200 mt8">'.
+				(_page('cur') !=12 ? '<button class="vk small" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>' : '').
+				_header_pas().
+			'</div>'.
+		'</div>'.
 	'</div>';
 }
 function _header_pas() {//отображение ссылки настройки страницы
@@ -134,7 +139,7 @@ function _header_pas() {//отображение ссылки настройки страницы
 	if(!$page['app_id'] && !SA)
 		return '';
 
-	return '<button id="page_setup" class="vk small fr mt3 mr40 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
+	return '<button id="page_setup" class="vk small fr mr30 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
 }
 
 
