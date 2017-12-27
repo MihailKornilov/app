@@ -185,22 +185,14 @@ table{border:0;border-spacing:0}
 
 
 /* блоки из таблиц */
-.bl-tab{
-	width:100%;
-	table-layout:fixed;
-}
-.bl-td{
-	/* overflow-x:hidden; */
-}
+.bl-tab{width:100%;table-layout:fixed}
+.bl-td{/*overflow-x:hidden*/}
 .bl-td._busy *{visibility:hidden}
 
 
 
 /* —трока управлени€ страницей page_setup */
-#pas{
-	background-color: #ffaf64;
-	border-bottom:#C3864C solid 1px;
-}
+#pas{background-color: #ffaf64;border-bottom:#C3864C solid 1px}
 
 /* отдельный блок в редактировании */
 .block-unit{

@@ -198,7 +198,6 @@ function _pageSetupMenu() {//строка меню управления страницей
 	'<div id="pas">'.
 		'<div class="w1000 mara pad5">'.
 			'<div class="dib fs16 b">'._page('name').	'</div>'.
-//			'<div onclick="_dialogOpen('.$page['dialog_id'].','.PAGE_ID.')" class="icon icon-edit mbm5 ml20'._tooltip('Редактировать текущую страницу', -102).'</div>'.
 		'</div>'.
 		'<div class="w1000 mara pad5">'.
 			_blockLevelChange('page', _page('cur')).
@@ -215,14 +214,11 @@ function _pageShow($page_id) {
 
 	return
 	_blockHtml('page', $page_id).
-	(PAS ?
-		'<script>'.
-			'var BLOCK_ARR={'._blockJS('page', $page_id).'},'.
-				'ELEM_COLOR={'._elemColor().'};'.
-		'</script>'
-		:
-		'<script>_pageShow()</script>'
-	);
+	'<script>'.
+		'var BLOCK_ARR={'._blockJS('page', $page_id).'},'.
+			'ELEM_COLOR={'._elemColor().'};'.
+	'</script>'.
+	(!PAS ? '<script>_pageShow()</script>' : '');
 }
 function _elemDiv($el) {//формирование div элемента
 	if(!$el)
@@ -308,8 +304,7 @@ function _elemUnit($el) {//формирование элемента страницы
 			return '<a href="'.URL.'&p='.$el['num_1'].'">'.
 						$el['txt_1'].
 				   '</a>';
-		case 10://произвольный текст
-			return _br($el['txt_1']);
+		case 10: return _br($el['txt_1']);//произвольный текст
 		case 11://имя колонки или значение из диалога
 			/*
 				num_1 - dialog_id списка
