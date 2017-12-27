@@ -214,10 +214,16 @@ function _pageShow($page_id) {
 		return _contentMsg();
 
 	return
-	_blockTab('page', $page_id).
-	(!PAS ? '<script>_pageShow()</script>' : '');
+	_blockHtml('page', $page_id).
+	(PAS ?
+		'<script>'.
+			'var BLOCK_ARR={'._blockJS('page', $page_id).'},'.
+				'ELEM_COLOR={'._elemColor().'};'.
+		'</script>'
+		:
+		'<script>_pageShow()</script>'
+	);
 }
-
 function _elemDiv($el) {//формирование div элемента
 	if(!$el)
 		return '';

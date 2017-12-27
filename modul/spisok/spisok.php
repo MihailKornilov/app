@@ -345,54 +345,6 @@ function _spisokList($dialog_id, $component_id, $v='', $unit_id=0) {//массив спи
 	return query_selArray($sql);
 }
 
-function _spisokUnitSetup($spisok_id, $width, $grid_id=0) {//данные для настройки единицы списка
-	if(!$block = _blockArr('spisok', $spisok_id))
-		return '<div class="_empty min">'.
-					'Шаблон пуст.'.
-					'<div class="mt10 pale">Начните с настройки блоков.</div>'.
-			   '</div>';
-
-	define('GRID_ID', $grid_id);
-
-	return _blockLevel($block, $width);
-}
-function _spisokUnitBlockLevelChange($is_spisok) {//кнопки для изменения уровня редактирования блоков единицы списка
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `is_spisok`=".$is_spisok;
-	if(!$arr = query_arr($sql))
-		return '';
-
-	$max = 1;
-
-	foreach($arr as $r) {
-		$parent_id = $r['parent_id'];
-		if($parent_id == $is_spisok)
-			continue;
-
-		$level = 2;
-
-		while(true) {
-			$parent_id = $arr[$parent_id]['parent_id'];
-			if($parent_id == $is_spisok)
-				break;
-			$level++;
-		}
-
-		if($max < $level)
-			$max = $level;
-	}
-
-
-	$send = '';
-	for($n = 1; $n <= $max; $n++) {
-		$sel = _blockLevelDefine($is_spisok) == $n ? '' : ' cancel';
-		$send .= '<button class="spisok-unit-block-level-change vk small ml5'.$sel.'">'.$n.'</button>';
-	}
-
-	return $send;
-}
-
 function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирование списка из шаблона
 	$dialog = _dialogQuery($pe['num_3']);
 	$cmp = $dialog['component'];
@@ -400,7 +352,7 @@ function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирова
 	if(PAS)
 		return '<div class="_empty">Список <b class="fs14">'.$dialog['spisok_name'].'</b></div>';
 
-	if(!$arr = _blockArr('spisok', $pe['block_id']))
+	if(!$arr = _blockArr('spisok', $pe['block_id'], 'arr'))
 		return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
 
 	$send = '';
@@ -427,7 +379,7 @@ function _spisokUnit182_template($pe, $spisok, $all, $limit, $next) {//формирова
 			$child[$r['parent_id']][$id] = $r;
 		}
 
-		$block = _blockArrChild($child, $pe['block_id']);
+		$block = _blockArrChild($child);
 		$send .= _blockLevel($block, $pe['block']['width']);
 	}
 

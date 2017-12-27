@@ -389,11 +389,6 @@ var VK_SCROLL = 0,
 						$('.label-width').width(LABEL_WIDTH);
 					}
 				});
-
-			//включение/отключение управления блоками
-			$('#dialog-cmp-block').click(function() {
-				_dialogCmpBlock();
-			});
 		}
 		function elementFuncFunc() {//открытие окна настройки функции компонента
 			$(document).off('click', '.cmp-set .icon-usd');
@@ -1280,54 +1275,6 @@ var VK_SCROLL = 0,
 		}
 	},
 
-	_dialogCmpBlock = function(t, block_id) {//включение/отключение настройки блоков для диалога
-		var on = t.hasClass('grey'),
-			send = {
-				op:'spisok_tmp_block_' + (on ? 'on' : 'off'),
-				block_id:block_id
-			};
-
-		if(t.hasClass('_busy'))
-			return;
-
-		t.addClass('_busy');
-
-		_post(send, function(res) {
-			butOn(on);
-			$('#tmp-elem-list').html(res.html);
-			if(!on) {
-				BLOCK_ARR = res.block_arr;
-				return;
-			}
-			$('#grid-stack')._grid({
-				width:res.w,
-				parent_id:block_id,
-				is_spisok:block_id,
-				funcAfterSave:function(res) {
-					$('#spisok-unit-block-level').html(res.level);
-					$('#tmp-elem-list').html(res.html);
-					BLOCK_ARR = res.block_arr;
-					butOn(0);
-				},
-				funcCancel:function() {
-					t.trigger('click');
-				}
-			});
-		}, function() {
-			t.removeClass('_busy');
-		});
-
-		function butOn(v) {
-			t.removeClass('_busy');
-			var val = t.attr('val'),
-				html = t.html();
-			t._dn(v, 'grey');
-			t._dn(!v, 'orange');
-			t.html(val);
-			t.attr('val', html);
-		}
-	},
-
 	_dialogOpen = function(dialog_id, unit_id, unit_id_dub, funcAfterPost) {//открытие диалогового окна
 		dialog_id = _num(dialog_id);
 		unit_id = _num(unit_id);
@@ -1720,6 +1667,8 @@ var VK_SCROLL = 0,
 					break;
 				}
 				case 182:/* шаблон */ {
+					for(var k in res.block_arr)
+						BLOCK_ARR[k] = res.block_arr[k];
 					//настройка через фукнцию _blockSpisokUnitElAdd
 					break;
 				}
@@ -1837,13 +1786,15 @@ var VK_SCROLL = 0,
 				if(BL.elem_id) {
 					$('#elem-edit').click(function() {
 						$('._hint').remove();
-						if(BL.is_spisok)
+						if(BL.obj_name == 'spisok')
 							return _blockSpisokUnitElAdd(BL);
 						_dialogOpen(BL.dialog_id, BL.elem_id);
 					});
 					$('#elem-del').click(function() {
 						$('._hint').remove();
-						var func = !BL.is_spisok ? false : _blockUnitGridOff;
+						var func = BL.obj_name != 'spisok' ? false : function() {
+							$('#block-level-spisok').find('.block-grid-on').removeClass('grey').trigger('click');
+						};
 						_dialogOpen(6, BL.elem_id, 0, func);
 					});
 					var tMar = {
@@ -1951,7 +1902,7 @@ var VK_SCROLL = 0,
 	_blockUnitElAdd = function(BL) {//добавление нового элемента в блок
 		$('._hint').remove();
 
-		if(BL.is_spisok)
+		if(BL.obj_name == 'spisok')
 			return _blockSpisokUnitElAdd(BL);
 
 		var html =
@@ -1996,36 +1947,14 @@ var VK_SCROLL = 0,
 				$('._hint').remove();
 				$('.block-content-' + res.block.obj_name).html(res.html);
 				$('#grid-stack')._grid({
-					width:res.w,
+					width:res.block.width,
 					parent_id:block_id,
 					obj_name:res.block.obj_name,
 					obj_id:res.block.obj_id
 				});
-/*
-				if(res.block.is_spisok) {
-					obj.funcAfterSave = function(res) {
-						$('#spisok-unit-block-level').html(res.level);
-						$('#tmp-elem-list').html(res.html);
-						BLOCK_ARR = res.block_arr;
-					};
-					obj.funcCancel = _blockUnitGridOff;
-				}
-*/
 			}, function() {
 				but.removeClass('_busy');
 			});
-	},
-	_blockUnitGridOff = function() {//отключение управления блоками, также обновление списка блоков
-		var but = $('#but-spisok-tmp-grid');
-		if(but.hasClass('grey')) {
-			var html = but.html(),
-				val = but.attr('val');
-			but.html(val);
-			but.attr('val', html);
-			but.removeClass('grey')
-			   .addClass('orange');
-		}
-		but.trigger('click');
 	},
 	_blockUnitSave = function(BL, obj) {
 		if(!BL.save)
@@ -2276,12 +2205,12 @@ $(document)
 		var t = $(this),
 			p = t.parent(),
 			v = t.hasClass('grey'),
-			obj_name = t.attr('val').split(':')[0],
-			obj_id = t.attr('val').split(':')[1],
+			spl = t.attr('val').split(':'),
 			send = {
-				op:'block_edit_' + (v ? 'on' : 'off'),
-				obj_name:obj_name,
-				obj_id:obj_id
+				op:'block_grid_' + (v ? 'on' : 'off'),
+				obj_name:spl[0],
+				obj_id:spl[1],
+				width:spl[2]
 			};
 
 		t._dn(v, 'grey');
@@ -2289,9 +2218,13 @@ $(document)
 		p.find('.block-level-change')._dn(!v);
 
 		_post(send, function(res) {
-			$('.block-content-' + obj_name).html(res.html);
+			$('.block-content-' + spl[0]).html(res.html);
 			if(v)
-				$('#grid-stack')._grid();
+				$('#grid-stack')._grid({
+					obj_name:spl[0],
+					obj_id:spl[1],
+					width:spl[2]
+				});
 		});
 
 	})
@@ -2311,17 +2244,6 @@ $(document)
 		_cookie('block_level_' + obj_name, v);
 
 		but.removeClass('grey').trigger('click');
-	})
-	.on('click', '.spisok-unit-block-level-change', function() {//изменения уровня редактирования блоков единицы списка
-		var t = $(this),
-			v = _num(t.html());
-
-		t.parent().find('.vk').addClass('cancel');
-		t.removeClass('cancel');
-
-		_cookie('block_level_spisok', v);
-
-		_blockUnitGridOff();
 	})
 	.on('mouseenter', '.block-unit', _blockUnitSetup);
 
@@ -4071,12 +3993,10 @@ $.fn._grid = function(o) {
 	var t = $(this);
 
 	o = $.extend({
-		width:100,  //количество элементов минимальной ширины может поместиться по всей длине
+		width:1000,
 		parent_id:0,//родительский блок
 		obj_name:'page',//имя объекта, где располагаются блоки
-		obj_id:PAGE_ID, //id объекта
-		funcAfterSave:afterSave,//действие после сохранения
-		funcCancel:cancel       //действие для кнопки Отмена
+		obj_id:PAGE_ID  //id объекта
 	}, o);
 
 	t.gridstack({
@@ -4086,7 +4006,7 @@ $.fn._grid = function(o) {
 		verticalMargin:1,       //отступ сверху
 		cellHeight:10,          //минимальная высота блока
 		float:false,            //если true - блок можно расположить в любом месте, иначе блок всегда тянется к верху
-		width:o.width
+		width:o.width / 10      //количество элементов минимальной ширины может поместиться по всей длине
 	});
 
 	var grid = t.data('gridstack'),
@@ -4120,13 +4040,14 @@ $.fn._grid = function(o) {
 			parent_id:o.parent_id,
 			obj_name:o.obj_name,
 			obj_id:o.obj_id,
+			width:o.width,
 			arr:arr
 		};
-		_post(send, o.funcAfterSave, function() {
+		_post(send, afterSave, function() {
 			t.removeClass('_busy');
 		});
 	});
-	$('#grid-cancel').click(o.funcCancel);
+	$('#grid-cancel').click(cancel);
 
 	t.on('gsresizestop', function(event, elem) {
 			var h = _num($(elem).attr('data-gs-height')),
@@ -4182,6 +4103,8 @@ $.fn._grid = function(o) {
 	function afterSave(res) {
 		$('#block-level-' + o.obj_name).after(res.level).remove();
 		$('.block-content-' + o.obj_name).html(res.html);
+		for(var k in res.block_arr)
+			BLOCK_ARR[k] = res.block_arr[k];
 	}
 	//отмена редактирования
 	function cancel() {

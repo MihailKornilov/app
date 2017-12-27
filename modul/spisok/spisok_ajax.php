@@ -330,11 +330,10 @@ switch(@$_POST['op']) {
 
 				$html =
 					'<div class="hd2 mt20">Настройка шаблона единицы списка:</div>'.
-					'<div class="bg-gr2 pad10 line-b">'._blockLevelChange('spisok', $spisok_id).'</div>'.
-					'<div class="block-content-spisok mt10" style="width:'.$width.'px">'._spisokUnitSetup($spisok_id, $width).'</div>';
-//					'<button id="but-spisok-tmp-grid" class="vk small grey mt10 w200" onclick="_spisokTmpBlock($(this),'.$block['id'].')" val="Отключить настройку блоков">Включить настройку блоков</button>'.
-//					'<div id="spisok-unit-block-level" class="dib ml20 mt10" val="'.$block['id'].'">'._spisokUnitBlockLevelChange($block['id']).'</div>'.
-//					'<div id="tmp-elem-list" class="mt10" style="width:'.$width.'px">'._spisokUnitSetup($block['id'], $width).'</div>';
+					'<div class="bg-ffc pad10 line-b">'._blockLevelChange('spisok', $block['id'], $width).'</div>'.
+					'<div class="block-content-spisok mt10" style="width:'.$width.'px">'._blockHtml('spisok', $block['id'], $width).'</div>';
+
+				$send['block_arr'] = _blockJsArr('spisok', $block['id']);
 				break;
 		}
 
@@ -396,67 +395,6 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_tmp_block_on'://получение блоков единицы списка для настройки (grid)
-		if(!$block_id = _num($_POST['block_id']))
-			jsonError('Некорректный ID блока');
-
-		//получение данных блока
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$block_id;
-		if(!$block = query_assoc($sql))
-			jsonError('Блока id'.$block_id.' не существует');
-
-		//получение элемента, который содержит список (для корректировки ширины с отступами)
-		$sql = "SELECT *
-				FROM `_page_element`
-				WHERE `block_id`=".$block_id."
-				LIMIT 1";
-		if(!$elem = query_assoc($sql))
-			jsonError('Элемента в блоке не существует');
-
-		$ex = explode(' ', $elem['mar']);
-		$w = $block['w'] - ceil(($ex[1] + $ex[3]) / 10);
-
-		//получение списка подблоков
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `parent_id`=".$block_id."
-				ORDER BY `y`,`x`";
-		$arr = query_arr($sql);
-
-		$send['html'] = utf8(_blockGrid($arr));
-		$send['w'] = $w;
-
-		jsonSuccess($send);
-		break;
-	case 'spisok_tmp_block_off':
-		if(!$block_id = _num($_POST['block_id']))
-			jsonError('Некорректный ID блока');
-
-		//получение данных блока
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$block_id;
-		if(!$block = query_assoc($sql))
-			jsonError('Блока id'.$block_id.' не существует');
-
-		//получение элемента, который содержит список (для корректировки ширины с отступами)
-		$sql = "SELECT *
-				FROM `_page_element`
-				WHERE `block_id`=".$block_id."
-				LIMIT 1";
-		if(!$elem = query_assoc($sql))
-			jsonError('Элемента в блоке не существует');
-
-		$ex = explode(' ', $elem['mar']);
-		$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
-
-		$send['html'] = utf8(_spisokUnitSetup($block_id, $width));
-		$send['block_arr'] = _blockJsArr($block['page_id']);
-
-		jsonSuccess($send);
-		break;
 	case 'spisok_tmp_elem_to_block'://вставка элемента в блок единицы списка
 		if(!$block_id = _num($_POST['block_id']))
 			jsonError('Некорректный ID блока');
@@ -481,8 +419,7 @@ switch(@$_POST['op']) {
 		//получение данных блока
 		$sql = "SELECT *
 				FROM `_block`
-				WHERE `is_spisok`
-				  AND `id`=".$block_id;
+				WHERE `id`=".$block_id;
 		if(!$block = query_assoc($sql))
 			jsonError('Блока id'.$block_id.' не существует');
 
@@ -505,7 +442,7 @@ switch(@$_POST['op']) {
 		//получение элемента, в котором находятся данные списка
 		$sql = "SELECT *
 				FROM `_page_element`
-				WHERE `block_id`=".$block['is_spisok'];
+				WHERE `block_id`=".$block['obj_id'];
 		if(!$elSpisok = query_assoc($sql))
 			jsonError('Списка не существует');
 
@@ -524,7 +461,7 @@ switch(@$_POST['op']) {
 					`viewer_id_add`
 				) VALUES (
 					".$elem_id.",
-					".$block['page_id'].",
+					".$elSpisok['page_id'].",
 					".$block_id.",
 					".$num_1.",
 					".$num_2.",
@@ -542,11 +479,15 @@ switch(@$_POST['op']) {
 		//получение данных самого главного блока списка
 		$sql = "SELECT *
 				FROM `_block`
-				WHERE `id`=".$block['is_spisok'];
+				WHERE `id`=".$block['obj_id'];
 		$iss = query_assoc($sql);
 
-		$send['html'] = utf8(_spisokUnitSetup($iss['id'], $iss['width']));
-		$send['block_arr'] = _blockJsArr($block['page_id']);
+		//корректировка ширины с учётом отступов
+		$ex = explode(' ', $elSpisok['mar']);
+		$width = floor(($iss['width'] - $ex[1] - $ex[3]) / 10) * 10;
+
+		$send['html'] = utf8(_blockHtml('spisok', $iss['id'], $width));
+		$send['block_arr'] = _blockJsArr('spisok', $iss['id']);
 
 		jsonSuccess($send);
 		break;

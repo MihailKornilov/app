@@ -19,54 +19,6 @@ var _spisokNext = function(t, pe_id, next) {
 			 .removeClass('_busy');
 		});
 	},
-	_spisokTmpBlock = function(t, block_id) {//включение/отключение настройки блоков единицы списка
-		var on = t.hasClass('grey'),
-			send = {
-				op:'spisok_tmp_block_' + (on ? 'on' : 'off'),
-				block_id:block_id
-			};
-
-		if(t.hasClass('_busy'))
-			return;
-
-		t.addClass('_busy');
-
-		_post(send, function(res) {
-			butOn(on);
-			$('#tmp-elem-list').html(res.html);
-			if(!on) {
-				BLOCK_ARR = res.block_arr;
-				return;
-			}
-			$('#grid-stack')._grid({
-				width:res.w,
-				parent_id:block_id,
-				is_spisok:block_id,
-				funcAfterSave:function(res) {
-					$('#spisok-unit-block-level').html(res.level);
-					$('#tmp-elem-list').html(res.html);
-					BLOCK_ARR = res.block_arr;
-					butOn(0);
-				},
-				funcCancel:function() {
-					t.trigger('click');
-				}
-			});
-		}, function() {
-			t.removeClass('_busy');
-		});
-
-		function butOn(v) {
-			t.removeClass('_busy');
-			var val = t.attr('val'),
-				html = t.html();
-			t._dn(v, 'grey');
-			t._dn(!v, 'orange');
-			t.html(val);
-			t.attr('val', html);
-		}
-
-	},
 	_blockSpisokUnitElAdd = function(BL) {//вставка элемента в блок в единицу списка
 		/*
 			num_1 - колонка списка
@@ -151,8 +103,9 @@ var _spisokNext = function(t, pe_id, next) {
 					txt_2:$('#tmp_elem_txt_2').val()
 				};
 				dialog.post(send, function(res) {
-					$('#tmp-elem-list').html(res.html);
-					BLOCK_ARR = res.block_arr;
+					$('.block-content-spisok').html(res.html);
+					for(var k in res.block_arr)
+						BLOCK_ARR[k] = res.block_arr[k];
 				});
 			}
 
