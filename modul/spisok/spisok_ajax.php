@@ -79,7 +79,7 @@ switch(@$_POST['op']) {
 
 		//получение данных элемента поиска
 		$sql = "SELECT *
-				FROM `_page_element`
+				FROM `_element`
 				WHERE `id`=".$pe_id;
 		if(!$pe = query_assoc($sql))
 			jsonError('Элемента id'.$pe_id.' не существует');
@@ -105,13 +105,13 @@ switch(@$_POST['op']) {
 
 		//получение данных элемента поиска
 		$sql = "SELECT *
-				FROM `_page_element`
+				FROM `_element`
 				WHERE `id`=".$element_id;
 		if(!$pe = query_assoc($sql))
 			jsonError('Элемента id'.$element_id.' не существует');
 
 		//сохранение строки поиска
-		$sql = "UPDATE `_page_element`
+		$sql = "UPDATE `_element`
 				SET `v`='".addslashes($v)."'
 				WHERE `id`=".$element_id;
 		query($sql);
@@ -122,7 +122,7 @@ switch(@$_POST['op']) {
 
 		//расположение списка на странице, на которой расположен поиск
 		$sql = "SELECT *
-				FROM `_page_element`
+				FROM `_element`
 				WHERE `dialog_id`=14
 				  AND `page_id`=".$pe['page_id']."
 				  AND `id`=".$pe_id."
@@ -139,7 +139,7 @@ switch(@$_POST['op']) {
 
 		//элемент количества списка на странице, на которой расположен поиск
 		$sql = "SELECT *
-				FROM `_page_element`
+				FROM `_element`
 				WHERE `dialog_id`=15
 				  AND `page_id`=".$pe['page_id']."
 				  AND `num_1`=".$pe_id."
@@ -185,7 +185,7 @@ switch(@$_POST['op']) {
 		$colIds = array();
 		if($cmp['num_5']) {//получение dialog_id из элемента страницы
 			$sql = "SELECT *
-					FROM `_page_element`
+					FROM `_element`
 					WHERE `page_id`=".$page_id."
 					  AND `id`=".$vid;
 			if(!$pe = query_assoc($sql))
@@ -266,7 +266,7 @@ switch(@$_POST['op']) {
 			jsonError('Диалога для создания списка не существует');
 
 		$sql = "SELECT *
-				FROM `_page_element`
+				FROM `_element`
 				WHERE `id`=".$elem_id;
 		if(!$elem = query_assoc($sql))
 			jsonError('Элемента не существует');
@@ -403,7 +403,7 @@ switch(@$_POST['op']) {
 
 		if($elem_id = _num($_POST['elem_id'])) {
 			$sql = "SELECT *
-					FROM `_page_element`
+					FROM `_element`
 					WHERE `id`=".$elem_id;
 			if(!query_assoc($sql))
 				jsonError('Редактируемого элемента id'.$elem_id.' не существует');
@@ -433,7 +433,7 @@ switch(@$_POST['op']) {
 		//проверка наличия элемента в блоке
 		if(!$elem_id) {
 			$sql = "SELECT COUNT(`id`)
-					FROM `_page_element`
+					FROM `_element`
 					WHERE `block_id`=".$block_id;
 			if(query_value($sql))
 				jsonError('В данном блоке уже присутствует элемент');
@@ -441,7 +441,7 @@ switch(@$_POST['op']) {
 
 		//получение элемента, в котором находятся данные списка
 		$sql = "SELECT *
-				FROM `_page_element`
+				FROM `_element`
 				WHERE `block_id`=".$block['obj_id'];
 		if(!$elSpisok = query_assoc($sql))
 			jsonError('Списка не существует');
@@ -449,7 +449,7 @@ switch(@$_POST['op']) {
 		//диалог, через который вносятся единицы списка
 		$dialog_id = $elSpisok['num_3'];
 
-		$sql = "INSERT INTO `_page_element` (
+		$sql = "INSERT INTO `_element` (
 					`id`,
 					`page_id`,
 					`block_id`,
@@ -540,7 +540,7 @@ function _spisokUnitUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/реда
 
 	//удаление элемента со страницы
 	if($dialog_id == 6) {
-		$sql = "DELETE FROM `_page_element` WHERE `id`=".$unit_id;
+		$sql = "DELETE FROM `_element` WHERE `id`=".$unit_id;
 		query($sql);
 		return $send;
 	}
@@ -568,7 +568,7 @@ function _spisokUnitUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/реда
 			));
 
 		//если это выпадающий список, выбирающий связку и вносит в список элементов
-//		if($r['type_id'] == 2 && $dialog['base_table'] == '_page_element' && $r['num_1'])
+//		if($r['type_id'] == 2 && $dialog['base_table'] == '_element' && $r['num_1'])
 //			$elemUpdate[] = "`num_id`=".$r['num_1'];
 
 		//служебная переменная app_any_spisok. Если равна 1, то устанавливает app_id=0 (все приложения), либо = id приложения

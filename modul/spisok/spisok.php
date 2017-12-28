@@ -40,7 +40,7 @@ function _spisokElemCount($r) {//формирование элемента с содержанием количества 
 		return '—писок не указан.';
 
 	$sql = "SELECT *
-			FROM `_page_element`
+			FROM `_element`
 			WHERE `id`=".$pe_id;
 	if(!$pe = query_assoc($sql))
 		return 'Ёлемента, содержащего список, не существует.';
@@ -283,7 +283,7 @@ function _spisokFilterSearchVal($pe) {//получение введЄнного значени€ в строку п
 		return constant($key);
 
 	$sql = "SELECT `v`
-			FROM `_page_element`
+			FROM `_element`
 			WHERE `page_id`=".$pe['page_id']."
 			  AND `dialog_id`=7
 			  AND `num_3`=".$pe['id'];

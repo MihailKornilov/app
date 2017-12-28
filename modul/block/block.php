@@ -17,7 +17,7 @@ function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры б
 
 	//расстановка элементов в блоки
 	$sql = "SELECT *
-			FROM `_page_element`
+			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($arr).")";
 	foreach(query_arr($sql) as $r) {
 		unset($arr[$r['block_id']]['elem']);

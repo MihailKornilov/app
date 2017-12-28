@@ -62,7 +62,7 @@ switch(@$_POST['op']) {
 						jsonError('Ѕлока дл€ элемента-списка не существует');
 
 					$sql = "SELECT *
-							FROM `_page_element`
+							FROM `_element`
 							WHERE `block_id`=".$obj_id;
 					if(!$elem = query_assoc($sql))
 						jsonError('Ёлемента-списка не существует');
@@ -212,7 +212,7 @@ switch(@$_POST['op']) {
 		//сохранение стилей элемента в блоке
 		if($elem_id = _num(@$_POST['elem_id'])) {
 			$sql = "SELECT *
-					FROM `_page_element`
+					FROM `_element`
 					WHERE `id`=".$elem_id;
 			if($elem = query_ass($sql)) {
 				$mar = _txt($_POST['mar']);
@@ -221,7 +221,7 @@ switch(@$_POST['op']) {
 				$size = _num($_POST['size']);
 				if($size == 13)
 					$size = 0;
-				$sql = "UPDATE `_page_element`
+				$sql = "UPDATE `_element`
 						SET `mar`='".$mar."',
 							`font`='".$font."',
 							`color`='".$color."',
@@ -256,7 +256,7 @@ switch(@$_POST['op']) {
 
 			//получение элемента, который содержит список (дл€ корректировки ширины с отступами)
 			$sql = "SELECT *
-					FROM `_page_element`
+					FROM `_element`
 					WHERE `block_id`=".$iss['id']."
 					LIMIT 1";
 			if(!$elem = query_assoc($sql))

@@ -105,7 +105,7 @@ function _pageCache() {//получение массива страниц из кеша
 	$sql = "SELECT
 				`page_id`,
 				COUNT(*) `c`
-			FROM `_page_element`
+			FROM `_element`
 			WHERE `page_id` IN ("._idsGet($page).")
 			GROUP BY `page_id`";
 	$elem = query_ass($sql);

@@ -805,7 +805,7 @@ function _dialogComponent_autoSelectPage($val, $r, $page_id) {//установка страни
 
 	//определение, есть ли на странице элементы-кнопки: dialog_id=2
 	$sql = "SELECT CONCAT('\'button',id,'\'')
-			FROM `_page_element`
+			FROM `_element`
 			WHERE `dialog_id`=2
 			  AND `page_id`=".$page_id;
 	if(!$but = query_ids($sql))

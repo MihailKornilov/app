@@ -318,7 +318,7 @@ function _dialogSpisokOnPage($page_id) {//получение массива элементов страницы, 
 		return array();
 	
 	$sql = "SELECT `id`,`num_3`
-			FROM `_page_element`
+			FROM `_element`
 			WHERE `page_id`=".$page_id."
 			  AND `dialog_id`=14
 			  AND `num_3`";
