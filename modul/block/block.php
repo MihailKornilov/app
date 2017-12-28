@@ -216,8 +216,9 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для измене
 				$max = $level;
 		}
 
-		$selected = $max;
-		if(_blockLevelDefine($obj_name) < $max) {
+		//обновление текущего уровня настройки блоков, если у предыдущего объекта было больше уровней
+		$selected = _blockLevelDefine($obj_name);
+		if($selected > $max) {
 			_blockLevelDefine($obj_name, 1);
 			$selected = 1;
 		}
@@ -238,7 +239,8 @@ function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
 	$key = 'block_level_'.$obj_name;
 	if($v) {
 		$_COOKIE[$key] = $v;
-		setcookie('block_level_'.$obj_name, $v, time() + 2592000, '/');
+		setcookie($key, $v, time() + 2592000, '/');
+		return $v;
 	}
 	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
 }
