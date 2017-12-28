@@ -86,12 +86,12 @@ var VK_SCROLL = 0,
 			padding:10, //отступ для content
 			dialog_id:0,//ID диалога, загруженного из базы
 			color:'',   //цвет диалога - заголовка и кнопки
-			id:'',      //идентификатор диалога: для определения открытого такого же, чтобы предварительно закрывать его
+			attr_id:'',      //идентификатор диалога: для определения открытого такого же, чтобы предварительно закрывать его
 			head:'head: Название заголовка',
 			load:0,     // Показ процесса ожидания загрузки в центре диалога
 			content:'content: содержимое центрального поля',
 			submit:function() {},
-			cancel:function() {},
+			cancel:dialogClose,
 			butSubmit:'Внести',
 			butCancel:'Отмена'
 		}, o);
@@ -99,8 +99,8 @@ var VK_SCROLL = 0,
 		var frameNum = $('._dialog').length;
 
 		//закрытие диалога с тем же идентификатором
-		if(o.id && $('#' + o.id + '_dialog').length) {
-			$('#' + o.id + '_dialog').remove();
+		if(o.attr_id && $('#' + o.attr_id + '_dialog').length) {
+			$('#' + o.attr_id + '_dialog').remove();
 			_backfon(false);
 			if(!frameNum)
 				DIALOG_MAXHEIGHT = 0;
@@ -114,7 +114,7 @@ var VK_SCROLL = 0,
 				'</div>';
 
 		var html =
-			'<div class="_dialog"' + (o.id ? ' id="' + o.id + '_dialog"' : '') + '>' +
+			'<div class="_dialog"' + (o.attr_id ? ' id="' + o.attr_id + '_dialog"' : '') + '>' +
 				'<div class="head ' + o.color + '">' +
 					'<div class="close fr curP"><a class="icon icon-del wh pl"></a></div>' +
 		            '<div class="edit fr curP dn"><a class="icon icon-edit wh pl"></a></div>' +
@@ -150,9 +150,11 @@ var VK_SCROLL = 0,
 			w2 = Math.round(o.width / 2); // ширина/2. Для определения положения по центру
 		dialog.find('.close').click(dialogClose);
 		butSubmit.click(submitFunc);
-		butCancel.click(function(e) {
-			e.stopPropagation();
-			dialogClose();
+		butCancel.click(function() {
+//			e.stopPropagation();
+//			dialogClose();
+			if(butCancel.hasClass('_busy'))
+				return;
 			o.cancel();
 		});
 
@@ -167,9 +169,29 @@ var VK_SCROLL = 0,
 			left:$(document).width() / 2 - w2 + 'px',
 			'z-index':ZINDEX + 5
 		});
-		iconEdit.click(function() {
-			dialogClose();
-			_dialogEdit(o.dialog_id);
+		iconEdit.click(function() {//нажатие на иконку редактирования
+			if(!o.dialog_id)
+				return;
+
+			var icon = iconEdit.find('.icon'),
+				send = {
+					op:'dialog_edit_load',
+					dialog_id:o.dialog_id
+				};
+
+			if(icon.hasClass('spin'))
+				return;
+
+			iconEdit.removeClass('curP');
+			icon.addClass('spin');
+
+			_post(send, function(res) {
+				dialogClose();
+				_dialogEdit(res);
+			}, function(res) {
+				iconEdit.addClass('curP');
+				icon.removeClass('spin');
+			});
 		});
 
 /*
@@ -191,7 +213,7 @@ var VK_SCROLL = 0,
 		function dialogClose() {
 			dialog.remove();
 			_backfon(false);
-			if(frameNum == 0)
+			if(!frameNum)
 				DIALOG_MAXHEIGHT = 0;
 //			_fbhs();
 		}
@@ -200,8 +222,7 @@ var VK_SCROLL = 0,
 				msg:msg,
 				color:'red',
 				pad:10,
-				show:1,
-				remove:1
+				show:1
 			});
 		}
 		function loadError(msg) {//ошибка загрузки данных для диалога
@@ -215,10 +236,16 @@ var VK_SCROLL = 0,
 			process:function() {
 				butSubmit.addClass('_busy');
 			},
+			processCancel:function() {
+				butCancel.addClass('_busy');
+			},
 			abort:function(msg) {
 				butSubmit.removeClass('_busy');
 				if(msg)
 					dialogErr(msg);
+			},
+			abortCancel:function() {
+				butCancel.removeClass('_busy');
 			},
 			bottom:(function() {
 				return bottom;
@@ -289,114 +316,112 @@ var VK_SCROLL = 0,
 		};
 	},
 
-	_dialogEdit = function(dialog_id) {//создание|редактирование диалогового окна
-		dialog_id = _num(dialog_id);
+	_dialogEdit = function(res) {//создание|редактирование диалогового окна
 		var dialog = _dialog({
-				dialog_id:dialog_id,
+				dialog_id:res.dialog_id,
 				color:'orange',
-				width:500,
+				width:res.width,
 				top:20,
 				padding:0,
 				head:'Настройка диалогового окна',
-				load:1,
+				content:res.html,
+				butSubmit:'Сохранить диалоговое окно',
 				submit:submit,
 				cancel:function() {
-					_dialogOpen(dialog_id);
+					var send = {
+						op:'dialog_open_load',
+						id:res.dialog_id
+					};
+					dialog.processCancel();
+					_post(send, function(res) {
+						dialog.close();
+						_dialogOpen(res);
+					}, function() {
+						dialog.abortCancel();
+					});
 				}
 			}),
-			send = {
-				op:'dialog_edit_load',
-				dialog_id:dialog_id
-			},
 			DIALOG_WIDTH;
 
 		window.LABEL_WIDTH = 125;
 
-		dialog.load(send, loaded);
+		window.CMP_NAME = res.cmp_name;
+		window.DIALOG_ELEMENT = res.element;
+		window.DIALOG_COMPONENT = res.component;
+		window.COMPONENT_FUNC = res.func;
+		window.SPISOK_ON = res.spisokOn;
 
-		function loaded(res) {
-			dialog_id = res.dialog_id;
-			dialog.width(res.width);
-			dialog.content.html(res.html);
-			dialog.butSubmit((dialog_id ? 'Сохранить' : 'Создать') + ' диалоговое окно');
+		for(var k in res.block_arr)
+			BLOCK_ARR[k] = res.block_arr[k];
 
-			window.CMP_NAME = res.cmp_name;
-			window.DIALOG_ELEMENT = res.element;
-			window.DIALOG_COMPONENT = res.component;
-			window.COMPONENT_FUNC = res.func;
-			window.SPISOK_ON = res.spisokOn;
+		_dialogScript(res.component, 1);
 
-			for(var k in res.block_arr)
-				BLOCK_ARR[k] = res.block_arr[k];
+		$('#spisok_on')._check({
+			func:function(v) {
+				$('#tr_spisok_name')[(v ? 'remove' : 'add') + 'Class']('dn');
+			}
+		});
 
-			_dialogScript(res.component, 1);
+		$('#app_any')._check();
+		$('#sa')._check();
+		sortable();
+		elementFuncFunc();
+		elementFuncEdit();
+		elementFuncDel();
 
-			$('#spisok_on')._check({
-				func:function(v) {
-					$('#tr_spisok_name')[(v ? 'remove' : 'add') + 'Class']('dn');
+		$('#dialog-menu')._menu({
+			type:4,
+			spisok:res.menu,
+			func:_dialogHeightCorrect
+		});
+		$('#action_id')._select({
+			width:250,
+			title0:'нет',
+			spisok:res.action,
+			func:function(v) {
+				$('.td-action-page')._dn(v == 2);
+				$('#action_page_id')._select(0);
+			}
+		});
+		$('#action_page_id')._select({
+			width:250,
+			title0:'не выбрана',
+			spisok:res.page_list
+		});
+
+		_dialogHeightCorrect();
+
+		//установка линии для настройки ширины диалога
+		DIALOG_WIDTH = res.width;
+		$('#dialog-w-change')
+			.css('left', (DIALOG_WIDTH + 8) + 'px')
+			.draggable({
+				axis:'x',
+				grid:[10,0],
+				drag:function(event, ui) {
+					var w = ui.position.left - 8;
+					if(w < 480 || w > 980)
+						return false;
+					DIALOG_WIDTH = w;
+					dialog.width(w);
+					$('#dialog-width').html(w);
 				}
 			});
 
-			$('#app_any')._check();
-			$('#sa')._check();
-			sortable();
-			elementFuncFunc();
-			elementFuncEdit();
-			elementFuncDel();
-
-			$('#dialog-menu')._menu({
-				type:4,
-				spisok:res.menu,
-				func:_dialogHeightCorrect
-			});
-			$('#action_id')._select({
-				width:250,
-				title0:'нет',
-				spisok:res.action,
-				func:function(v) {
-					$('.td-action-page')._dn(v == 2);
-					$('#action_page_id')._select(0);
+		//установка линии для настройки ширины полей с названиями
+		LABEL_WIDTH = res.label_width;
+		$('#label-w-change')
+			.css('left', (LABEL_WIDTH + 12) + 'px')
+			.draggable({
+				axis:'x',
+				grid:[10,0],
+				containment:'parent',
+				drag:function(event, ui) {
+					LABEL_WIDTH = ui.position.left - 12;
+					$('.label-width').width(LABEL_WIDTH);
 				}
 			});
-			$('#action_page_id')._select({
-				width:250,
-				title0:'не выбрана',
-				spisok:res.page_list
-			});
 
-			_dialogHeightCorrect();
-
-			//установка линии для настройки ширины диалога
-			DIALOG_WIDTH = res.width;
-			$('#dialog-w-change')
-				.css('left', (DIALOG_WIDTH + 8) + 'px')
-				.draggable({
-					axis:'x',
-					grid:[10,0],
-					drag:function(event, ui) {
-						var w = ui.position.left - 8;
-						if(w < 480 || w > 980)
-							return false;
-						DIALOG_WIDTH = w;
-						dialog.width(w);
-						$('#dialog-width').html(w);
-					}
-				});
-
-			//установка линии для настройки ширины полей с названиями
-			LABEL_WIDTH = res.label_width;
-			$('#label-w-change')
-				.css('left', (LABEL_WIDTH + 12) + 'px')
-				.draggable({
-					axis:'x',
-					grid:[10,0],
-					containment:'parent',
-					drag:function(event, ui) {
-						LABEL_WIDTH = ui.position.left - 12;
-						$('.label-width').width(LABEL_WIDTH);
-					}
-				});
-		}
 		function elementFuncFunc() {//открытие окна настройки функции компонента
 			$(document).off('click', '.cmp-set .icon-usd');
 			$(document).on('click', '.cmp-set .icon-usd', function() {
@@ -1282,6 +1307,7 @@ var VK_SCROLL = 0,
 		}
 	},
 
+/*
 	_dialogOpen = function(dialog_id, unit_id, unit_id_dub, funcAfterPost) {//открытие диалогового окна
 		dialog_id = _num(dialog_id);
 		unit_id = _num(unit_id);
@@ -1320,6 +1346,96 @@ var VK_SCROLL = 0,
 		}
 		function submit(cmp) {
 			send = {
+				op:'spisok_' + (unit_id ? 'edit' : 'add'),
+				unit_id:unit_id,
+				dialog_id:dialog_id,
+				elem:{},
+				func:{},//значения функций, если требуется сохранять. Конкретно пока для действия 5,6
+				page_id:PAGE_ID,
+				block_id:window.BLOCK_ID || 0
+			};
+
+			_forN(cmp, function(sp) {
+				if(!sp.func_flag)
+					return;
+
+				send.elem[sp.id] = $(sp.attr_id).val();
+
+				//сохранение значений функций
+				funcVal(sp.id, send.func);
+			});
+
+			dialog.post(send, function(res) {
+				if(funcAfterPost)
+					return funcAfterPost(res);
+
+				switch(res.action_id) {
+					case 1: location.reload(); break;
+					case 2: location.href = URL + '&p=' + res.page_id + '&id=' + res.unit_id; break;
+				}
+			});
+		}
+		function funcVal(id, sf) {//получение значений функций
+			var func = COMPONENT_FUNC,
+				v = [], //переменная для сбора значений
+				join = 1;//производить ли объединение элементов после сбора
+
+			if(!func[id])
+				return;
+
+			_forN(func[id], function(sp) {
+				var delem = $('#delem' + id);
+				if(sp.action_id == 5)
+					_forEq(delem.find('.spisok-col ._check').prev(), function(i) {
+						if(_num(i.val()))
+							v.push(_num(i.attr('id').split('col')[1]));
+					});
+				if(sp.action_id == 6)
+					v.push(_num(delem.find('.spisok-col ._radio .on').attr('val')));
+				if(sp.action_id == 7) {
+					if($('#colNameShow').length) {//181 таблица
+						v.push(_num($('#colNameShow').val()));
+						v.push(_num($('#rowLight').val()));
+						v.push(_num($('#rowSmall').val()));
+						_forEq(delem.find('dd'), function(eq) {
+							var col_id = _num(eq.find('input:first').val(), 1),
+								tr = eq.find('.tr').val(),
+								link_on = eq.find('.td-link-on').hasClass('dn') ? 0 : 1,
+								link = _num(eq.find('.elem-link').val());
+							if(!col_id)
+								return;
+							v.push(col_id + '&' + tr + '&' + link_on + '&' + link);
+						});
+					}
+				}
+			});
+			sf[id] = join ? v.join(',') : v;
+		}
+	},
+*/
+	_dialogOpen = function(res) {//открытие диалогового окна
+		var dialog = _dialog({
+			dialog_id:res.dialog_id,
+			width:res.width,
+			top:20,
+			padding:0,
+			head:res.head_insert,
+			content:res.html,
+			butSubmit:res.button_insert_submit,
+			butCancel:res.button_insert_cancel,
+			submit:function() {
+				submit(res.component);
+			}
+		});
+
+		dialog.iconEdit(res.iconEdit);
+		window.COMPONENT_FUNC = res.func;
+		window.DATA = res.data;
+		window.UNIT_ID = 0;//unit_id;
+		_dialogScript(res.component);
+
+		function submit(cmp) {
+			var send = {
 				op:'spisok_' + (unit_id ? 'edit' : 'add'),
 				unit_id:unit_id,
 				dialog_id:dialog_id,
@@ -1783,6 +1899,35 @@ $(document)
 		p.prev().val(v);
 		p.find('.on').removeClass('on');
 		t.addClass('on');
+	})
+
+	.on('click', '.elem-button,.dialog-button', function() {//нажатие на кнопку
+		var t = $(this),
+			v = _num(t.attr('val')),
+			send = {
+				op:'elem_button_load',
+				id:v
+			};
+
+		if(t.hasClass('dialog-button'))
+			send.op = 'dialog_open_load';
+
+		if(t.hasClass('_busy'))
+			return;
+
+		t.addClass('_busy');
+		_post(send, function(res) {
+			t.removeClass('_busy');
+			_dialogOpen(res);
+		}, function(res) {
+			t.removeClass('_busy');
+			t._hint({
+				msg:res.text,
+				color:'red',
+				pad:10,
+				show:1
+			});
+		});
 	})
 
 	.on('mouseenter', '.dialog-hint', function() {//отображение подсказки при наведении на вопрос в диалоге
@@ -2646,7 +2791,7 @@ $.fn._hint = function(o) {//выплывающие подсказки
 						//mouse - относительно положения мыши при первом касании объекта
 	                    //число в пикселях слева либо сверху.
 
-		show:0,	     //сразу показывать подсказку
+		show:0,	     //сразу показывать подсказку. После показа удаляется.
 
 		event:'mouseenter', // событие, при котором происходит всплытие подсказки
 		speed:200,//скорость появления, скрытия

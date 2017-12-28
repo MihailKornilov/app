@@ -64,13 +64,13 @@ table{border:0;border-spacing:0}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:0 0 no-repeat url(../../img/icon18.png?5);
+	background:0 0 no-repeat url(../../img/icon18.png?10);
 	width:18px;
 	height:18px;
 	cursor:pointer;
 	margin-bottom:-3px;
 }
-.icon.pl:not(:hover){opacity:.5}     /* pale: бледная иконка */
+.icon.pl:not(.spin):not(:hover){opacity:.5}     /* pale: бледная иконка */
 .icon.wh{background-position-y:-20px}/* white: белая иконка */
 .icon-empty{background-position:-9999px -9999px}/* пустая иконка */
 .icon-edit   {background-position-x:0}    /* редактирование */
@@ -105,7 +105,19 @@ table{border:0;border-spacing:0}
 	background-position-y:1px;
 	cursor:default;
 }
-
+/* ожидание процесса загрузки для любой иконки */
+.icon.spin{
+	height:16px;
+	margin-top:1px;
+	background-position:-1000px -1px;
+	cursor:default;
+    animation: spin 700ms infinite linear;
+    -webkit-animation: spin 700ms infinite linear;
+    -moz-animation: spin 700ms infinite linear;
+}
+@-webkit-keyframes spin{to{-webkit-transform:rotate(360deg)}}
+@-moz-keyframes spin{to{-moz-transform: rotate(360deg)}}
+@keyframes spin{to{transform: rotate(360deg)}}
 
 
 

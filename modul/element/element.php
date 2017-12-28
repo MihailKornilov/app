@@ -24,13 +24,14 @@
 */
 function _button($v=array()) {//кнопка из контакта
 	$name = empty($v['name']) ? 'Кнопка' : $v['name'];
-	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
-	$color = empty($v['color']) ? '' : ' '.$v['color'];
 	$small = empty($v['small']) ? '' : ' small';
+	$color = empty($v['color']) ? '' : ' '.$v['color'];
 	$cls = empty($v['class']) ? '' : ' '.$v['class'];
+	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
+	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
 
 	return
-	'<button class="vk'.$color.$small.$cls.'"'.$click.'>'.
+	'<button class="vk'.$color.$small.$cls.'"'.$click.$val.'>'.
 		$name.
 	'</button>';
 }

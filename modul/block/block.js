@@ -186,7 +186,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'<p><button class="vk" val="3">Меню</button>' +
 					'<p class="mt10"><button class="vk" val="4">Заголовок</button>' +
 					'<p class="mt10"><button class="vk" val="7">Поиск</button>' +
-					'<p class="mt10"><button class="vk grey" val="10">Произвольный текст</button>' +
+					'<p class="mt10"><button class="vk grey dialog-button" val="10">Произвольный текст</button>' +
 					'<p class="mt10"><button class="vk" val="11">Данные объекта</button>' +
 					'<p class="mt10"><button class="vk green" val="2">Кнопка</button>' +
 					'<p class="mt10"><button class="vk" val="9">Ссылка</button>' +
@@ -207,7 +207,6 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 			var v = $(this).attr('val');
 			window.BLOCK_ID = BL.id;
 			dialog.close();
-			_dialogOpen(v);
 		});
 	},
 	_blockUnitGrid = function(block_id) {

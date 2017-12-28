@@ -214,6 +214,7 @@ function _pageShow($page_id) {
 
 	return
 	_blockHtml('page', $page_id).
+//	_page_div().
 	'<script>'.
 		'var BLOCK_ARR={'._blockJS('page', $page_id).'},'.
 			'ELEM_COLOR={'._elemColor().'};'.
@@ -272,6 +273,7 @@ function _elemUnit($el) {//формирование элемента страницы
 				num_1 - цвет
 				num_2 - маленькая кнопка
 				num_3 - максимальная ширина
+				num_4 - dialog_id, который назначен на эту кнопку
 			*/
 			$color = array(
 				0 => '',        //Синий - по умолчанию
@@ -285,10 +287,11 @@ function _elemUnit($el) {//формирование элемента страницы
 			);
 			return _button(array(
 						'name' => $el['txt_1'],
-						'click' => '_dialogOpen('._dialogValToId('button'.$el['id']).')',
+//						'click' => '_dialogOpen('._dialogValToId('button'.$el['id']).')',
 						'color' => $color[$el['num_1']],
 						'small' => $el['num_2'],
-						'class' => $el['num_3'] ? 'w100p' : ''
+						'class' => 'elem-button'.($el['num_3'] ? ' w100p' : ''),
+						'val' => $el['id']
 					));
 		case 3: return _pageElemMenu($el); //menu
 		case 4: return '<div class="hd2">'.$el['txt_1'].'</div>'; //head
@@ -469,6 +472,7 @@ function _page_div() {//todo тест
 	'<div class="mar20 bor-e8 w200 pad20" id="for-hint">'.
 		'Передний текст '.
 		'<div class="icon icon-edit"></div>'.
+		'<div class="icon spin pl wh"></div>'.
 		'<div class="icon icon-del"></div>'.
 		'<div class="icon icon-del-red"></div>'.
 		'<div class="icon icon-add"></div>'.

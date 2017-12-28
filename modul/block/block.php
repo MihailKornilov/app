@@ -63,7 +63,7 @@ function _blockObj($name, $i='name') {//доступные варианты объектов для блоков
 		'dialog' => '<div class="pad10">'.
 						'<div class="_empty min">'.
 							'Пустое содержание диалога.'.
-							'<div class="mt10 pale">Начните с управления блоками.</div>'.
+	   (_num(@BLOCK_EDIT) ? '<div class="mt10 pale">Начните с управления блоками.</div>' : '').
 						'</div>'.
 					'</div>'
 	);
