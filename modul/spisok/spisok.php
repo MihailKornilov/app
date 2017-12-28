@@ -175,12 +175,10 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 								break;
 							case -3://иконки управления
 								$html .= '<td class="pad0 w15 wsnw">'.
-												_iconEdit(array(
-										//			'onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')',
-													'class' => 'dialog-icon ml5 mr5',
-													'val' => $dialog_id
-												));
-								//._iconDel();
+											_iconEdit(array(
+												'class' => 'dialog-open ml5 mr5',
+												'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id']
+											));
 								break;
 							default:
 								$el = $CMP[$ex[0]];

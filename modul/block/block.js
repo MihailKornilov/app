@@ -190,7 +190,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'<p><button class="vk" val="3">Меню</button>' +
 					'<p class="mt10"><button class="vk" val="4">Заголовок</button>' +
 					'<p class="mt10"><button class="vk" val="7">Поиск</button>' +
-					'<p class="mt10"><button class="vk grey dialog-button" val="10">Произвольный текст</button>' +
+					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:10">Произвольный текст</button>' +
 					'<p class="mt10"><button class="vk" val="11">Данные объекта</button>' +
 					'<p class="mt10"><button class="vk green" val="2">Кнопка</button>' +
 					'<p class="mt10"><button class="vk" val="9">Ссылка</button>' +
@@ -260,7 +260,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				'<div class="hd2 ">' +
 					'Настройки элемента' +
 					'<div class="fr">' +
-						'<div val="' + EL.dialog_id + '" class="icon icon-edit dialog-icon mr3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +//id="elem-edit"
+						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + '" class="icon icon-edit dialog-open mr3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
 						'<div id="elem-del" class="icon icon-del-red' + _tooltip('Удалить элемент', -95, 'r') + '</div>' +
 					'</div>' +
 				'</div>' +

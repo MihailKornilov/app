@@ -89,16 +89,20 @@ var VK_SCROLL = 0,
 			width:380,
 			mb:0,       //margin-bottom: отступ снизу от диалога (дл€ календар€ или выпадающих списков)
 			padding:10, //отступ дл€ content
+
 			dialog_id:0,//ID диалога, загруженного из базы
+			unit_id:0,  //ID единицы списка, который вноситс€ при помощи данного диалога
+
 			color:'',   //цвет диалога - заголовка и кнопки
 			attr_id:'', //идентификатор диалога: дл€ определени€ открытого такого же, чтобы предварительно закрывать его
 			head:'head: Ќазвание заголовка',
 			load:0,     // ѕоказ процесса ожидани€ загрузки в центре диалога
 			content:'<div class="pad30 pale">content: содержимое центрального пол€</div>',
-			submit:function() {},
-			cancel:dialogClose,
+
 			butSubmit:'¬нести',
-			butCancel:'ќтмена'
+			butCancel:'ќтмена',
+			submit:function() {},
+			cancel:dialogClose
 		}, o);
 
 		var frameNum = $('._dialog').length;
@@ -192,6 +196,7 @@ var VK_SCROLL = 0,
 
 			_post(send, function(res) {
 				dialogClose();
+				res.unit_id = o.unit_id;
 				_dialogEdit(res);
 			}, function(res) {
 				iconEdit.addClass('curP');
@@ -335,7 +340,8 @@ var VK_SCROLL = 0,
 				cancel:function() {
 					var send = {
 						op:'dialog_open_load',
-						id:res.dialog_id
+						dialog_id:res.dialog_id,
+						unit_id:res.unit_id
 					};
 					dialog.processCancel();
 					_post(send, function(res) {
@@ -470,9 +476,10 @@ var VK_SCROLL = 0,
 			});
 		}
 		function submit() {
-			send = {
-				op:'dialog_' + (dialog_id ? 'edit' : 'add'),
-				dialog_id:dialog_id,
+			var send = {
+				op:'dialog_' + (res.dialog_id ? 'edit' : 'add'),
+				dialog_id:res.dialog_id,
+				unit_id:res.unit_id,
 				app_any:$('#app_any').val(),
 				sa:$('#sa').val(),
 				width:DIALOG_WIDTH,
@@ -1421,23 +1428,24 @@ var VK_SCROLL = 0,
 	_dialogOpen = function(res) {//открытие диалогового окна
 		var dialog = _dialog({
 			dialog_id:res.dialog_id,
+			unit_id:res.unit_id,
 			width:res.width,
 			top:20,
 			padding:0,
-			head:res.head_insert,
+			head:res.head,
 			content:res.html,
-			butSubmit:res.button_insert_submit,
-			butCancel:res.button_insert_cancel,
+			butSubmit:res.button_submit,
+			butCancel:res.button_cancel,
 			submit:function() {
 				submit(res.component);
 			}
 		});
 
 		dialog.iconEdit(res.iconEdit);
-		window.COMPONENT_FUNC = res.func;
-		window.DATA = res.data;
-		window.UNIT_ID = 0;//unit_id;
-		_dialogScript(res.component);
+//		window.COMPONENT_FUNC = res.func;
+//		window.DATA = res.data;
+//		window.UNIT_ID = 0;//unit_id;
+//		_dialogScript(res.component);
 
 		function submit(cmp) {
 			var send = {
@@ -1906,21 +1914,24 @@ $(document)
 		t.addClass('on');
 	})
 
-	.on('click', '.elem-button,.dialog-button,.dialog-icon', function() {//нажатие на кнопку, иконку дл€ открыти€ диалога
+	.on('click', '.dialog-open', function() {//нажатие на кнопку, иконку дл€ открыти€ диалога
 		var t = $(this),
-			v = _num(t.attr('val')),
+			val = t.attr('val'),
 			send = {
-				op:'elem_button_load',
-				id:v
+				op:'dialog_open_load',
+				dialog_id:0,    //id диалогового окна
+				unit_id:0       //id единицы списка
 			},
-			icon = t.hasClass('dialog-icon'),
-			busy = icon ? 'spin' : '_busy';
-
-		if(t.hasClass('dialog-button') || icon)
-			send.op = 'dialog_open_load';
+			busy = t.hasClass('icon') ? 'spin' : '_busy';
 
 		if(t.hasClass(busy))
 			return;
+
+		_forN(val.split(','), function(sp) {
+			var spl = sp.split(':'),
+				k = spl[0];
+			send[k] = _num(spl[1]);
+		});
 
 		t.addClass(busy);
 		_post(send, function(res) {

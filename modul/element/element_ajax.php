@@ -184,12 +184,55 @@ switch(@$_POST['op']) {
 		break;
 
 	case 'dialog_open_load'://получение данных диалога
-		if(!$dialog_id = _num($_POST['id']))
+		if(!$dialog_id = _num($_POST['dialog_id']))
 			jsonError('Некорректный ID диалога');
+		if(!$dialog = _dialogQuery($dialog_id))
+			jsonError('Диалога не существует');
 
-		$send = _dialogOpenLoad($dialog_id);
-		if(!is_array($send))
-			jsonError($send);
+	//	$page_id = _num($_POST['page_id']);
+
+		$data = array();
+		if($unit_id = _num($_POST['unit_id'])) {
+			$cond = "`id`=".$unit_id;
+			if(isset($dialog['field']['app_id']))
+				$cond .= " AND `app_id` IN (0,".APP_ID.")";
+			$sql = "SELECT *
+					FROM `".$dialog['base_table']."`
+					WHERE ".$cond;
+			if(!$data = query_assoc($sql))
+				jsonError('Записи не существует');
+			if(@$data['sa'] && !SA)
+				jsonError('Нет доступа');
+			if(@$data['deleted'])
+				jsonError('Запись была удалена');
+			foreach($data as $i => $v)
+				$data[$i] = utf8($v);
+		}
+
+	/*
+		//8:связка
+		if($unit_id_dub = _num(@$_POST['unit_id_dub'])) {
+			foreach($dialog['component'] as $r)
+				if($r['type_id'] == 8)
+					$data[$r['col_name']] = $unit_id_dub;
+		}
+	*/
+
+	//	$html = '<div class="mt5 mb5">'._dialogComponentSpisok($dialog_id, 'html', $data, $page_id).'</div>';
+
+		$send['dialog_id'] = $dialog_id;
+		$send['unit_id'] = $unit_id;
+
+		$send['iconEdit'] = SA || $dialog['app_id'] == APP_ID ? 'show' : 'hide';//права для редактирования диалога
+		$send['width'] = _num($dialog['width']);
+		$send['head'] = utf8($dialog[!$unit_id ? 'head_insert' : 'head_edit']);
+		$send['button_submit'] = utf8($dialog[!$unit_id ? 'button_insert_submit' : 'button_edit_submit']);
+		$send['button_cancel'] = utf8($dialog[!$unit_id ? 'button_insert_cancel' : 'button_edit_cancel']);
+//		$send['component'] = array();//_dialogComponentSpisok($dialog_id, 'arr', $data, $page_id);
+//		$send['func'] = $dialog['func'];
+//		$send['html'] = utf8($html);
+		$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width']));
+		$send['data'] = $data;
 
 		jsonSuccess($send);
 		break;
@@ -209,27 +252,6 @@ switch(@$_POST['op']) {
 				  AND LENGTH(`label_name`)
 				ORDER BY `sort`";
 		$send['spisok'] = query_selArray($sql);
-
-		jsonSuccess($send);
-		break;
-
-	case 'elem_button_load'://получение функции элемента-кнопки
-		if(!$id = _num($_POST['id']))
-			jsonError('Некорректный ID элемента');
-
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=2
-				  AND `id`=".$id;
-		if(!$but = query_assoc($sql))
-			jsonError('Элемента-кнопки не существует');
-
-		if(!$dialog_id = $but['num_4'])
-			jsonError('Кнопка не назначена');
-
-		$send = _dialogOpenLoad($dialog_id);
-		if(!is_array($send))
-			jsonError($send);
 
 		jsonSuccess($send);
 		break;
@@ -266,58 +288,6 @@ switch(@$_POST['op']) {
 		break;
 }
 
-function _dialogOpenLoad($dialog_id) {
-	if(!$dialog = _dialogQuery($dialog_id))
-		return 'Диалога не существует';
-
-//	$page_id = _num($_POST['page_id']);
-
-	$data = array();
-/*
-	if($unit_id = _num($_POST['unit_id'])) {
-		$cond = "`id`=".$unit_id;
-		if(isset($dialog['field']['app_id']))
-			$cond .= " AND `app_id` IN (0,".APP_ID.")";
-		$sql = "SELECT *
-				FROM `".$dialog['base_table']."`
-				WHERE ".$cond;
-		if(!$data = query_assoc($sql))
-			jsonError('Записи не существует');
-		if(@$data['sa'] && !SA)
-			jsonError('Нет доступа');
-		if(@$data['deleted'])
-			jsonError('Запись была удалена');
-	}
-*/
-
-/*
-	//8:связка
-	if($unit_id_dub = _num(@$_POST['unit_id_dub'])) {
-		foreach($dialog['component'] as $r)
-			if($r['type_id'] == 8)
-				$data[$r['col_name']] = $unit_id_dub;
-	}
-*/
-
-//	$html = '<div class="mt5 mb5">'._dialogComponentSpisok($dialog_id, 'html', $data, $page_id).'</div>';
-
-	$send['dialog_id'] = _num($dialog_id);
-	$send['iconEdit'] = SA || $dialog['app_id'] == APP_ID ? 'show' : 'hide';//права для редактирования диалога
-	$send['width'] = _num($dialog['width']);
-	$send['head_insert'] = utf8($dialog['head_insert']);
-	$send['button_insert_submit'] = utf8($dialog['button_insert_submit']);
-	$send['button_insert_cancel'] = utf8($dialog['button_insert_cancel']);
-	$send['head_edit'] = utf8($dialog['head_edit']);
-	$send['button_edit_submit'] = utf8($dialog['button_edit_submit']);
-	$send['button_edit_cancel'] = utf8($dialog['button_edit_cancel']);
-	$send['component'] = array();//_dialogComponentSpisok($dialog_id, 'arr', $data, $page_id);
-	$send['func'] = $dialog['func'];
-//		$send['html'] = utf8($html);
-	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width']));
-	$send['data'] = $data;
-
-	return $send;
-}
 function _dialogUpdate($dialog_id) {//обновление диалога
 	if(!$head_insert = _txt($_POST['head_insert']))
 		jsonError('Не указано название диалога для новой записи');

@@ -287,11 +287,10 @@ function _elemUnit($el) {//формирование элемента страницы
 			);
 			return _button(array(
 						'name' => $el['txt_1'],
-//						'click' => '_dialogOpen('._dialogValToId('button'.$el['id']).')',
 						'color' => $color[$el['num_1']],
 						'small' => $el['num_2'],
-						'class' => 'elem-button'.($el['num_3'] ? ' w100p' : ''),
-						'val' => $el['id']
+						'class' => 'dialog-open'.($el['num_3'] ? ' w100p' : ''),
+						'val' => 'dialog_id:'.$el['num_4']
 					));
 		case 3: return _pageElemMenu($el); //menu
 		case 4: return '<div class="hd2">'.$el['txt_1'].'</div>'; //head
