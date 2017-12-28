@@ -279,7 +279,7 @@ var VK_SCROLL = 0,
 				dialog.find('.head input').width(v - 80);
 			},
 			iconEdit:function(v) {//показ/скрытие иконки редактированния диалога
-				if(v == 'hide' || !(frameNum - 1)) {
+				if(v == 'hide' || !(frameNum - 1)) {//редактировать нельзя окно более первого уровня
 					iconEdit.addClass('dn');
 					return;
 				}
@@ -301,7 +301,6 @@ var VK_SCROLL = 0,
 				load:1,
 				submit:submit,
 				cancel:function() {
-					_cookie('page_setup', 0);//отключение управления блоками
 					_dialogOpen(dialog_id);
 				}
 			}),
@@ -312,8 +311,6 @@ var VK_SCROLL = 0,
 			DIALOG_WIDTH;
 
 		window.LABEL_WIDTH = 125;
-
-		_cookie('page_setup', 1);//включение управления блоками
 
 		dialog.load(send, loaded);
 
@@ -466,7 +463,6 @@ var VK_SCROLL = 0,
 				menu_edit_last:$('#dialog-menu').val()
 			};
 			dialog.post(send, function(res) {
-				_cookie('page_setup', 0);//отключение управления блоками
 				_dialogOpen(res.dialog_id);
 			});
 		}
@@ -1344,10 +1340,9 @@ var VK_SCROLL = 0,
 			});
 
 			dialog.post(send, function(res) {
-				if(funcAfterPost) {
-					funcAfterPost(res);
-					return;
-				}
+				if(funcAfterPost)
+					return funcAfterPost(res);
+
 				switch(res.action_id) {
 					case 1: location.reload(); break;
 					case 2: location.href = URL + '&p=' + res.page_id + '&id=' + res.unit_id; break;
@@ -2741,6 +2736,8 @@ $.fn._hint = function(o) {//выплывающие подсказки
 	if(o.show) {
 		t.addClass('hnt' + HN);
 		t.addClass('hint-show');
+		if(o.objPos != 'mouse')
+			hintShow();
 		t.on('mousemove.hint' + HN, hintShow);
 	}
 

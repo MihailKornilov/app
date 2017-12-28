@@ -26,6 +26,8 @@ switch(@$_POST['op']) {
 		if(!$width = _num($_POST['width']))
 			jsonError('Некорректная ширина');
 
+		define('BLOCK_EDIT', 1);
+
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
 
 		jsonSuccess($send);
@@ -69,7 +71,10 @@ switch(@$_POST['op']) {
 					$ex = explode(' ', $elem['mar']);
 					$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
 					break;
-				case 'dialog': break;
+				case 'dialog':
+					$dialog = _dialogQuery($obj_id);
+					$width = $dialog['width'];
+					break;
 			}
 		}
 
@@ -167,6 +172,8 @@ switch(@$_POST['op']) {
 						`height`=VALUES(`height`)";
 			query($sql);
 		}
+
+		define('BLOCK_EDIT', 1);
 
 		$send['level'] = utf8(_blockLevelChange($obj_name, $obj_id, $width));
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));

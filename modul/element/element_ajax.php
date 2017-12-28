@@ -53,6 +53,8 @@ switch(@$_POST['op']) {
 				$dialog['menu_edit_last'] = 2;
 		}
 
+		define('BLOCK_EDIT', 1);
+
 		$html =
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
 

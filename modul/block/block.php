@@ -87,6 +87,19 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1) {//формирование б
 	if(empty($arr))
 		return '';
 
+	//условия для настройки блоков конкретного объекта
+	if(!defined('BLOCK_EDIT')) {
+		$id = key($arr);
+		switch($arr[$id]['obj_name']) {
+			default:
+			case 'page': $v = PAS; break;
+			case 'spisok': $v = 0; break;
+			case 'dialog': $v = 0; break;
+		}
+		define('BLOCK_EDIT', $v);
+	}
+
+
 	$MN = 10;//множитель
 	$wMax = round($WM / $MN);
 
@@ -102,10 +115,10 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1) {//формирование б
 	}
 
 	$send = '';
-	$BT = PAS ? ' bor-t-dash' : '';
-	$BR = PAS ? ' bor-r-dash' : '';
-	$BB = PAS ? ' bor-b-dash' : '';
-	$br1px = PAS ? 1 : 0;
+	$BT = BLOCK_EDIT ? ' bor-t-dash' : '';
+	$BR = BLOCK_EDIT ? ' bor-r-dash' : '';
+	$BB = BLOCK_EDIT ? ' bor-b-dash' : '';
+	$br1px = BLOCK_EDIT ? 1 : 0;
 
 
 	foreach($block as $y => $str) {
@@ -136,7 +149,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1) {//формирование б
 			$xEnd = !($wMax - $r['x'] - $r['w']);
 
 			$cls = array('bl-td');
-			$cls[] = PAS ? 'prel' : '';
+			$cls[] = BLOCK_EDIT ? 'prel' : '';
 			$cls[] = $r['bg'];
 			$cls[] = trim($bt);
 			$cls[] = trim($bb);
@@ -147,13 +160,13 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1) {//формирование б
 			$cls = implode(' ', $cls);
 
 			$bor = explode(' ', $r['bor']);
-			$borPx = $bor[3] + (PAS ? 0 : $bor[1]);
+			$borPx = $bor[3] + (BLOCK_EDIT ? 0 : $bor[1]);
 			$width = $r['width'] - $br1px - $borPx;
 
 			$send .= '<td id="bl_'.$r['id'].'"'.
 						' class="'.$cls.'"'.
 						' style="'._blockStyle($r, $width).'"'.
-				 (PAS ? ' val="'.$r['id'].'"' : '').
+				 (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
 					 '>'.
 							_blockSetka($r, $level, $r['obj_name'], $grid_id).
 							_blockChildHtml($r, $level + 1, $width, $grid_id).
@@ -203,8 +216,14 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для измене
 				$max = $level;
 		}
 
+		$selected = $max;
+		if(_blockLevelDefine($obj_name) < $max) {
+			_blockLevelDefine($obj_name, 1);
+			$selected = 1;
+		}
+
 		for($n = 1; $n <= $max; $n++) {
-			$sel = _blockLevelDefine($obj_name) == $n ? 'orange' : 'cancel';
+			$sel = $selected == $n ? 'orange' : 'cancel';
 			$send .= '<button class="block-level-change vk small ml5 '.$sel.'">'.$n.'</button>';
 		}
 	}
@@ -215,12 +234,16 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для измене
 		$send.
 	'</div>';
 }
-function _blockLevelDefine($obj_name) {//уровень редактируемых блоков
+function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
 	$key = 'block_level_'.$obj_name;
+	if($v) {
+		$_COOKIE[$key] = $v;
+		setcookie('block_level_'.$obj_name, $v, time() + 2592000, '/');
+	}
 	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
 }
 function _blockSetka($r, $level, $obj_name, $grid_id) {//отображение сетки для настраиваемого блока
-	if(!PAS)
+	if(!BLOCK_EDIT)
 		return '';
 	if($r['id'] == $grid_id)
 		return '';

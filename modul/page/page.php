@@ -290,10 +290,13 @@ function _elemUnit($el) {//формирование элемента страницы
 						'small' => $el['num_2'],
 						'class' => $el['num_3'] ? 'w100p' : ''
 					));
-		case 3://menu
-			return _pageElemMenu($el);
-		case 4://head
-			return '<div class="hd2">'.$el['txt_1'].'</div>';
+		case 3: return _pageElemMenu($el); //menu
+		case 4: return '<div class="hd2">'.$el['txt_1'].'</div>'; //head
+		case 5://textarea
+			/*
+				num_1 - ширина
+			*/
+			return '<textarea style="width:'.$el['num_1'].'px"></textarea>';
 		case 7://search
 			return _search(array(
 						'hold' => $el['txt_1'],
