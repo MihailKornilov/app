@@ -1,6 +1,6 @@
 /* ¬се элементы визуального отображени€, используемые в приложении */
 var VK_SCROLL = 0,
-	ZINDEX = 0,
+	ZINDEX = 1000,
 	BC = 0,
 
 	MONTH_DEF = {
@@ -70,11 +70,16 @@ var VK_SCROLL = 0,
 		function del() {
 			BC--;
 			ZINDEX -= 10;
+			if($('._dialog').length)
+				ZINDEX = $('._dialog:last').css('z-index') - 5;
+
 			var backfon = body.find('._backfon');
 			if(!BC)
 				backfon.remove();
-			else
+			else {
 				backfon.css({'z-index':ZINDEX});
+				ZINDEX += 10;
+			}
 		}
 	},
 
@@ -86,10 +91,10 @@ var VK_SCROLL = 0,
 			padding:10, //отступ дл€ content
 			dialog_id:0,//ID диалога, загруженного из базы
 			color:'',   //цвет диалога - заголовка и кнопки
-			attr_id:'',      //идентификатор диалога: дл€ определени€ открытого такого же, чтобы предварительно закрывать его
+			attr_id:'', //идентификатор диалога: дл€ определени€ открытого такого же, чтобы предварительно закрывать его
 			head:'head: Ќазвание заголовка',
 			load:0,     // ѕоказ процесса ожидани€ загрузки в центре диалога
-			content:'content: содержимое центрального пол€',
+			content:'<div class="pad30 pale">content: содержимое центрального пол€</div>',
 			submit:function() {},
 			cancel:dialogClose,
 			butSubmit:'¬нести',
@@ -1901,26 +1906,28 @@ $(document)
 		t.addClass('on');
 	})
 
-	.on('click', '.elem-button,.dialog-button', function() {//нажатие на кнопку
+	.on('click', '.elem-button,.dialog-button,.dialog-icon', function() {//нажатие на кнопку, иконку дл€ открыти€ диалога
 		var t = $(this),
 			v = _num(t.attr('val')),
 			send = {
 				op:'elem_button_load',
 				id:v
-			};
+			},
+			icon = t.hasClass('dialog-icon'),
+			busy = icon ? 'spin' : '_busy';
 
-		if(t.hasClass('dialog-button'))
+		if(t.hasClass('dialog-button') || icon)
 			send.op = 'dialog_open_load';
 
-		if(t.hasClass('_busy'))
+		if(t.hasClass(busy))
 			return;
 
-		t.addClass('_busy');
+		t.addClass(busy);
 		_post(send, function(res) {
-			t.removeClass('_busy');
+			t.removeClass(busy);
 			_dialogOpen(res);
 		}, function(res) {
-			t.removeClass('_busy');
+			t.removeClass(busy);
 			t._hint({
 				msg:res.text,
 				color:'red',
@@ -2832,6 +2839,9 @@ $.fn._hint = function(o) {//выплывающие подсказки
 		MSG = HINT.find('.hi-msg'),
 		UG = HINT.find('.ug');
 
+	ZINDEX += 10;
+	HINT.css('z-index', ZINDEX);
+
 	//автоматический подбор ширины, если строка слишком длинна€
 	if(!o.width) {
 		var msgW = Math.ceil(MSG.width()),
@@ -3126,6 +3136,7 @@ $.fn._hint = function(o) {//выплывающие подсказки
 					t.off('mouseleave.hint' + HN);
 					t.removeClass('hnt' + HN);
 					t.removeClass('hint-show');
+					ZINDEX -= 10;
 				}
 			});
 		}

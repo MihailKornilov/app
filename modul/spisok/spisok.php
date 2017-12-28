@@ -176,8 +176,9 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 							case -3://иконки управлени€
 								$html .= '<td class="pad0 w15 wsnw">'.
 												_iconEdit(array(
-													'onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')',
-													'class' => 'ml5 mr5'
+										//			'onclick'=>'_dialogOpen('.$dialog_id.','.$sp['id'].')',
+													'class' => 'dialog-icon ml5 mr5',
+													'val' => $dialog_id
 												));
 								//._iconDel();
 								break;
@@ -228,8 +229,7 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 				$html .= !$next ? '</table>' : '';
 				break;
 			case 182: $html = _spisokUnit182_template($pe, $spisok, $all, $limit, $next);	break;
-			default:
-				$html = 'Ќеизвестный внешний вид списка: '.$pe['num_1'];
+			default:  $html = 'Ќеизвестный внешний вид списка: '.$pe['num_1'];
 		}
 
 	return $html;

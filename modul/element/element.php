@@ -1,27 +1,4 @@
 <?php
-/*
-	---=== Элементы, размещаемые на странице ===---
-
-	5:  *** Меню *** (страница настройки: 4)
-			txt_1 - Название меню
-			num_1 - положение (горизонтальное, вертикальное)
-			num_2 - тип меню
-
-	4:  *** Заголовок ***
-
-	7:  *** Поиск ***
-
-	2:  *** Кнопка ***
-
-	9:  *** Ссылка ***
-
-	14: *** Список ***
-
-	10: *** Произвольный список ***
-
-	11: *** Данные объекта ***
-
-*/
 function _button($v=array()) {//кнопка из контакта
 	$name = empty($v['name']) ? 'Кнопка' : $v['name'];
 	$small = empty($v['small']) ? '' : ' small';
@@ -48,16 +25,17 @@ function _tooltip($msg, $left=0, $ugolSide='', $x2=0) {
 }
 
 function _iconEdit($v=array()) {//иконка редактирования записи в таблице
+	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
+	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
+	$cls = empty($v['class']) ? '' : ' '.$v['class'];
+
 	$v = array(
-		'id' => _num(@$v['id']) ? ' val="'.$v['id'].'"' : '',       //id записи
-		'class' => !empty($v['class']) ? ' '.$v['class'] : '',      //дополнительный класс
-		'onclick' => !empty($v['onclick']) ? ' onclick="'.$v['onclick'].'"' : '', //скрипт по нажатию
 		'tt_name' => !empty($v['tt_name']) ? $v['tt_name'] : 'Изменить',
 		'tt_left' => !empty($v['tt_left']) ? $v['tt_left'] : -48,
 		'tt_side' => !empty($v['tt_side']) ? $v['tt_side'] : 'r'
 	);
 
-	return '<div'.$v['id'].$v['onclick'].' class="icon icon-edit'.$v['class']._tooltip($v['tt_name'], $v['tt_left'], $v['tt_side']).'</div>';
+	return '<div'.$click.$val.' class="icon icon-edit'.$cls._tooltip($v['tt_name'], $v['tt_left'], $v['tt_side']).'</div>';
 }
 function _iconDel($v=array()) {//иконка удаления записи в таблице
 	if(!empty($v['nodel']))

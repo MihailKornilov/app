@@ -60,12 +60,16 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					_blockUnitElAdd(BL);
 				});
 				if(BL.elem_id) {
+/*
 					$('#elem-edit').click(function() {
+						$(this).addClass('spin');
+						return;
 						$('._hint').remove();
 						if(BL.obj_name == 'spisok')
 							return _blockSpisokUnitElAdd(BL);
 						_dialogOpen(BL.dialog_id, BL.elem_id);
 					});
+*/
 					$('#elem-del').click(function() {
 						$('._hint').remove();
 						var func = BL.obj_name != 'spisok' ? false : function() {
@@ -256,7 +260,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				'<div class="hd2 ">' +
 					'Настройки элемента' +
 					'<div class="fr">' +
-						'<div id="elem-edit" class="icon icon-edit mr3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
+						'<div val="' + EL.dialog_id + '" class="icon icon-edit dialog-icon mr3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +//id="elem-edit"
 						'<div id="elem-del" class="icon icon-del-red' + _tooltip('Удалить элемент', -95, 'r') + '</div>' +
 					'</div>' +
 				'</div>' +

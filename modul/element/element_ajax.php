@@ -116,11 +116,11 @@ switch(@$_POST['op']) {
 			'</div>'.
 
 			//Действие
-			'<div class="dialog-menu-3">'.
+			'<div class="dialog-menu-3 pb20">'.
 				'<div class="_info mar20">'.
 					'Дальнейшее действие, которое происходит после внесения или сохранения записи.'.
 				'</div>'.
-				'<table class="bs10 mb20">'.
+				'<table class="bs10">'.
 					'<tr><td class="label r w100">Действие:'.
 						'<td><input type="hidden" id="action_id" value="'.$dialog['action_id'].'" />'.
 					'<tr class="td-action-page'._dn($dialog['action_id'] == 2).'">'.
