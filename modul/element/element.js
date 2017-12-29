@@ -2855,8 +2855,7 @@ $.fn._hint = function(o) {//выплывающие подсказки
 		MSG = HINT.find('.hi-msg'),
 		UG = HINT.find('.ug');
 
-	ZINDEX += 10;
-	HINT.css('z-index', ZINDEX);
+	HINT.css('z-index', ZINDEX + 100);
 
 	//автоматический подбор ширины, если строка слишком длинная
 	if(!o.width) {

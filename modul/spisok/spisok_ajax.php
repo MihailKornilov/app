@@ -11,9 +11,9 @@ switch(@$_POST['op']) {
 		break;
 	case 'spisok_edit'://сохранение данных записи для диалога
 		if(!$unit_id = _num($_POST['unit_id']))
-			jsonError('Некорректный идентификатор');
+			jsonError('Некорректный id единицы списка');
 
-		$v = _spisokUnitUpdate($unit_id);
+		$v = _spisokUnitUpdate();
 
 		$send['unit_id'] = $v['unit_id'];
 		$send['action_id'] = _num($v['dialog']['action_id']);
