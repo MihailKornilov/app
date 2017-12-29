@@ -221,7 +221,7 @@ function _pageShow($page_id) {
 	'</script>'.
 	(!PAS ? '<script>_pageShow()</script>' : '');
 }
-function _elemDiv($el) {//формирование div элемента
+function _elemDiv($el, $unit=array()) {//формирование div элемента
 	if(!$el)
 		return '';
 
@@ -239,7 +239,7 @@ function _elemDiv($el) {//формирование div элемента
 
 	return
 	'<div'.$attr_id.$cls._elemStyle($el).'>'.
-		_elemUnit($el).
+		_elemUnit($el, $unit).
 	'</div>';
 
 }
@@ -263,9 +263,13 @@ function _elemStyle($r) {//стили css для элемента
 
 	return ' style="'.implode(';', $send).'"';
 }
-function _elemUnit($el) {//формирование элемента страницы
+function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	if(!$el)
 		return '';
+
+	//значение из списка
+	$v = $unit && $el['col'] ? $unit[$el['col']]: '';
+
 	switch($el['dialog_id']) {
 		case 2://button
 			/*
@@ -298,7 +302,7 @@ function _elemUnit($el) {//формирование элемента страницы
 			/*
 				num_1 - ширина
 			*/
-			return '<textarea style="width:'.$el['num_1'].'px"></textarea>';
+			return '<textarea style="width:'.$el['num_1'].'px">'.$v.'</textarea>';
 		case 7://search
 			return _search(array(
 						'hold' => $el['txt_1'],

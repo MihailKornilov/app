@@ -77,13 +77,13 @@ function _blockObj($name, $i='name') {//доступные варианты объектов для блоков
 
 	return $name;
 }
-function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0) {//вывод на экран всей структуры блоков
+function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) {//вывод на экран всей структуры блоков
 	if(!$block = _blockArr($obj_name, $obj_id))
 		return _blockObj($obj_name, 'empty');
 
-	return _blockLevel($block, $width, $grid_id);
+	return _blockLevel($block, $width, $grid_id, 0,1, $unit);
 }
-function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1) {//формирование блоков по уровням
+function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {//формирование блоков по уровням
 	if(empty($arr))
 		return '';
 
@@ -170,7 +170,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1) {//формирование б
 					 '>'.
 							_blockSetka($r, $level, $r['obj_name'], $grid_id).
 							_blockChildHtml($r, $level + 1, $width, $grid_id).
-	    					_elemDiv($r['elem']).
+	    					_elemDiv($r['elem'], $unit).
 					'';
 
 			$widthMax -= $r['width'];

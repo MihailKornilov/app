@@ -205,8 +205,8 @@ switch(@$_POST['op']) {
 				jsonError('Нет доступа');
 			if(@$data['deleted'])
 				jsonError('Запись была удалена');
-			foreach($data as $i => $v)
-				$data[$i] = utf8($v);
+//			foreach($data as $i => $v)
+//				$data[$i] = utf8($v);
 		}
 
 	/*
@@ -231,7 +231,7 @@ switch(@$_POST['op']) {
 //		$send['component'] = array();//_dialogComponentSpisok($dialog_id, 'arr', $data, $page_id);
 //		$send['func'] = $dialog['func'];
 //		$send['html'] = utf8($html);
-		$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width']));
+		$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $data));
 		$send['data'] = $data;
 
 		jsonSuccess($send);
