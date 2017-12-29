@@ -327,9 +327,8 @@ function _dialogOpenLoad($dialog_id) {
 	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('ƒиалога не существует');
 
-	//	$page_id = _num($_POST['page_id']);
-
-	$data = array();
+	//получение данных единицы списка
+	$unit = array();
 	if($unit_id = _num($_POST['unit_id'])) {
 		$cond = "`id`=" . $unit_id;
 		if(isset($dialog['field']['app_id']))
@@ -337,38 +336,26 @@ function _dialogOpenLoad($dialog_id) {
 		$sql = "SELECT *
 					FROM `" . $dialog['base_table'] . "`
 					WHERE " . $cond;
-		if(!$data = query_assoc($sql))
+		if(!$unit = query_assoc($sql))
 			jsonError('«аписи не существует');
-		if(@$data['sa'] && !SA)
+		if(@$unit['sa'] && !SA)
 			jsonError('Ќет доступа');
-		if(@$data['deleted'])
+		if(@$unit['deleted'])
 			jsonError('«апись была удалена');
 	}
 
-	/*
-		//8:св€зка
-		if($unit_id_dub = _num(@$_POST['unit_id_dub'])) {
-			foreach($dialog['component'] as $r)
-				if($r['type_id'] == 8)
-					$data[$r['col_name']] = $unit_id_dub;
-		}
-	*/
-
-	//	$html = '<div class="mt5 mb5">'._dialogComponentSpisok($dialog_id, 'html', $data, $page_id).'</div>';
-
 	$send['dialog_id'] = $dialog_id;
 	$send['unit_id'] = $unit_id;
+	$send['block_id'] = _num($_POST['block_id']);
 
-	$send['iconEdit'] = SA || $dialog['app_id'] == APP_ID ? 'show' : 'hide';//права дл€ редактировани€ диалога
+	$send['edit_access'] = SA || $dialog['app_id'] == APP_ID ? 1 : 0;//права дл€ редактировани€ диалога
 	$send['width'] = _num($dialog['width']);
 	$send['head'] = utf8($dialog[!$unit_id ? 'head_insert' : 'head_edit']);
 	$send['button_submit'] = utf8($dialog[!$unit_id ? 'button_insert_submit' : 'button_edit_submit']);
 	$send['button_cancel'] = utf8($dialog[!$unit_id ? 'button_insert_cancel' : 'button_edit_cancel']);
-//		$send['component'] = array();//_dialogComponentSpisok($dialog_id, 'arr', $data, $page_id);
-//		$send['func'] = $dialog['func'];
-//		$send['html'] = utf8($html);
-	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $data));
-	$send['data'] = $data;
+	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
+	$send['cmp'] = $dialog['cmp'];
+	$send['unit'] = $unit;
 
 	return $send;
 }

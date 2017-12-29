@@ -190,8 +190,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'<p><button class="vk" val="3">Меню</button>' +
 					'<p class="mt10"><button class="vk" val="4">Заголовок</button>' +
 					'<p class="mt10"><button class="vk" val="7">Поиск</button>' +
-					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:5">Элемент: textarea</button>' +
-					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:10">Произвольный текст</button>' +
+					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:5,block_id:' + BL.id + '">Элемент: textarea</button>' +
+					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:10,block_id:' + BL.id + '">Произвольный текст</button>' +
 					'<p class="mt10"><button class="vk" val="11">Данные объекта</button>' +
 					'<p class="mt10"><button class="vk green" val="2">Кнопка</button>' +
 					'<p class="mt10"><button class="vk" val="9">Ссылка</button>' +

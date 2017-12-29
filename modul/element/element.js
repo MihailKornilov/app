@@ -90,8 +90,11 @@ var VK_SCROLL = 0,
 			mb:0,       //margin-bottom: отступ снизу от диалога (для календаря или выпадающих списков)
 			padding:10, //отступ для content
 
-			dialog_id:0,//ID диалога, загруженного из базы
-			unit_id:0,  //ID единицы списка, который вносится при помощи данного диалога
+			dialog_id:0,//id диалога, загруженного из базы
+			unit_id:0,  //id единицы списка, который вносится при помощи данного диалога (только для передачи при редактировании диалога)
+			block_id:0, //id блока, в который вставляется элемент (только для передачи при редактировании диалога)
+
+			edit_access:0,//показ иконки редактирования диалога
 
 			color:'',   //цвет диалога - заголовка и кнопки
 			attr_id:'', //идентификатор диалога: для определения открытого такого же, чтобы предварительно закрывать его
@@ -106,6 +109,10 @@ var VK_SCROLL = 0,
 		}, o);
 
 		var frameNum = $('._dialog').length;
+
+		//запрет редактирования диалогового окна, которое открыто поверх другого
+		if(frameNum)
+			o.edit_access = 0;
 
 		//закрытие диалога с тем же идентификатором
 		if(o.attr_id && $('#' + o.attr_id + '_dialog').length) {
@@ -126,7 +133,7 @@ var VK_SCROLL = 0,
 			'<div class="_dialog"' + (o.attr_id ? ' id="' + o.attr_id + '_dialog"' : '') + '>' +
 				'<div class="head ' + o.color + '">' +
 					'<div class="close fr curP"><a class="icon icon-del wh pl"></a></div>' +
-		            '<div class="edit fr curP dn"><a class="icon icon-edit wh pl"></a></div>' +
+		            '<div class="edit fr curP' + _dn(o.edit_access) + '"><a class="icon icon-edit wh pl"></a></div>' +
 					'<div class="fs14 white">' + o.head + '</div>' +
 				'</div>' +
 //				'<div>' +
@@ -197,8 +204,9 @@ var VK_SCROLL = 0,
 			_post(send, function(res) {
 				dialogClose();
 				res.unit_id = o.unit_id;
+				res.block_id = o.block_id;
 				_dialogEdit(res);
-			}, function(res) {
+			}, function() {
 				iconEdit.addClass('curP');
 				icon.removeClass('spin');
 			});
@@ -314,34 +322,27 @@ var VK_SCROLL = 0,
 					left:$(document).width() / 2 - w2 + 'px'
 				});
 				dialog.find('.head input').width(v - 80);
-			},
-			iconEdit:function(v) {//показ/скрытие иконки редактированния диалога
-				if(v == 'hide' || !(frameNum - 1)) {//редактировать нельзя окно более первого уровня
-					iconEdit.addClass('dn');
-					return;
-				}
-				if(v == 'show')
-					iconEdit.removeClass('dn');
 			}
 		};
 	},
 
-	_dialogEdit = function(res) {//создание|редактирование диалогового окна
+	_dialogEdit = function(o) {//создание|редактирование диалогового окна
 		var dialog = _dialog({
-				dialog_id:res.dialog_id,
+				dialog_id:o.dialog_id,
 				color:'orange',
-				width:res.width,
+				width:o.width,
 				top:20,
 				padding:0,
 				head:'Настройка диалогового окна',
-				content:res.html,
+				content:o.html,
 				butSubmit:'Сохранить диалоговое окно',
 				submit:submit,
 				cancel:function() {
 					var send = {
 						op:'dialog_open_load',
-						dialog_id:res.dialog_id,
-						unit_id:res.unit_id
+						dialog_id:o.dialog_id,
+						unit_id:o.unit_id,
+						block_id:o.block_id
 					};
 					dialog.processCancel();
 					_post(send, function(res) {
@@ -352,18 +353,18 @@ var VK_SCROLL = 0,
 					});
 				}
 			}),
-			DIALOG_WIDTH = res.width;
+			DIALOG_WIDTH = o.width;
 
-		window.CMP_NAME = res.cmp_name;
-		window.DIALOG_ELEMENT = res.element;
-		window.DIALOG_COMPONENT = res.component;
-		window.COMPONENT_FUNC = res.func;
-		window.SPISOK_ON = res.spisokOn;
+		window.CMP_NAME = o.cmp_name;
+		window.DIALOG_ELEMENT = o.element;
+		window.DIALOG_COMPONENT = o.component;
+		window.COMPONENT_FUNC = o.func;
+		window.SPISOK_ON = o.spisokOn;
 
-		for(var k in res.block_arr)
-			BLOCK_ARR[k] = res.block_arr[k];
+		for(var k in o.block_arr)
+			BLOCK_ARR[k] = o.block_arr[k];
 
-		_dialogScript(res.component, 1);
+		_dialogScript(o.component, 1);
 
 		$('#spisok_on')._check({
 			func:function(v) {
@@ -380,13 +381,13 @@ var VK_SCROLL = 0,
 
 		$('#dialog-menu')._menu({
 			type:4,
-			spisok:res.menu,
+			spisok:o.menu,
 			func:_dialogHeightCorrect
 		});
 		$('#action_id')._select({
 			width:250,
 			title0:'нет',
-			spisok:res.action,
+			spisok:o.action,
 			func:function(v) {
 				$('.td-action-page')._dn(v == 2);
 				$('#action_page_id')._select(0);
@@ -395,7 +396,7 @@ var VK_SCROLL = 0,
 		$('#action_page_id')._select({
 			width:250,
 			title0:'не выбрана',
-			spisok:res.page_list
+			spisok:o.page_list
 		});
 
 		_dialogHeightCorrect();
@@ -460,10 +461,11 @@ var VK_SCROLL = 0,
 		}
 		function submit() {
 			var send = {
-				op:'dialog_edit',// + (res.dialog_id ? 'edit' : 'add'),
+				op:'dialog_edit',// + (o.dialog_id ? 'edit' : 'add'),
 
-				dialog_id:res.dialog_id,
-				unit_id:res.unit_id,
+				dialog_id:o.dialog_id,
+				unit_id:o.unit_id,
+				block_id:o.block_id,
 
 				width:DIALOG_WIDTH,
 
@@ -1409,39 +1411,56 @@ var VK_SCROLL = 0,
 		}
 	},
 */
-	_dialogOpen = function(res) {//открытие диалогового окна
+	_dialogOpen = function(o) {//открытие диалогового окна
 		var dialog = _dialog({
-			dialog_id:res.dialog_id,
-			unit_id:res.unit_id,
-			width:res.width,
+			dialog_id:o.dialog_id,
+			unit_id:o.unit_id,    //для передачи значений, если будет требоваться редактирование диалога
+			block_id:o.block_id,  //также для передачи
+
 			top:20,
+			width:o.width,
 			padding:0,
-			head:res.head,
-			content:res.html,
-			butSubmit:res.button_submit,
-			butCancel:res.button_cancel,
-			submit:function() {
-				submit(res.component);
-			}
+			edit_access:o.edit_access,
+
+			head:o.head,
+			content:o.html,
+			butSubmit:o.button_submit,
+			butCancel:o.button_cancel,
+			submit:submit
 		});
 
-		dialog.iconEdit(res.iconEdit);
+
+		//применение функций к компонентам
+		for(var k in o.cmp) {
+			var sp = o.cmp[k];
+			switch(sp.dialog_id) {
+				case 5://textarea
+					$(sp.attr_id).autosize();
+					break;
+			}
+		}
+
 //		window.COMPONENT_FUNC = res.func;
 //		window.DATA = res.data;
 //		window.UNIT_ID = 0;//unit_id;
 //		_dialogScript(res.component);
 
-		function submit(cmp) {
+		function submit() {
 			var send = {
-				op:'spisok_' + (unit_id ? 'edit' : 'add'),
-				unit_id:unit_id,
-				dialog_id:dialog_id,
-				elem:{},
-				func:{},//значения функций, если требуется сохранять. Конкретно пока для действия 5,6
+				op:'spisok_' + (o.unit_id ? 'edit' : 'add'),
 				page_id:PAGE_ID,
-				block_id:window.BLOCK_ID || 0
+				dialog_id:o.dialog_id,
+				unit_id:o.unit_id,
+				block_id:o.block_id,
+				cmp:{}
 			};
 
+			//получение значений компонентов
+			_forIn(o.cmp, function(sp, id) {
+				send.cmp[id] = $(sp.attr_id).val();
+			});
+
+/*
 			_forN(cmp, function(sp) {
 				if(!sp.func_flag)
 					return;
@@ -1451,10 +1470,11 @@ var VK_SCROLL = 0,
 				//сохранение значений функций
 				funcVal(sp.id, send.func);
 			});
-
+*/
 			dialog.post(send, function(res) {
-				if(funcAfterPost)
-					return funcAfterPost(res);
+				return;
+//				if(funcAfterPost)
+//					return funcAfterPost(res);
 
 				switch(res.action_id) {
 					case 1: location.reload(); break;
@@ -1904,7 +1924,8 @@ $(document)
 			send = {
 				op:'dialog_open_load',
 				dialog_id:0,    //id диалогового окна
-				unit_id:0       //id единицы списка
+				unit_id:0,      //id единицы списка
+				block_id:0      //id блока, если элемент вставляется в блок
 			},
 			busy = t.hasClass('icon') ? 'spin' : '_busy';
 

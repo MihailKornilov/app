@@ -135,23 +135,45 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	if(!$dialog = query_assoc($sql))
 		return array();
 
+	//получение компонентов диалога, ответственных за внесение единицы списка
+	$cmp = array();
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='dialog'
+			  AND `obj_id`=".$dialog_id;
+	if($block_ids = query_ids($sql)) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `block_id` IN (".$block_ids.")
+				  AND LENGTH(`col`)";
+		foreach(query_arr($sql) as $r) {
+			$id = _num($r['id']);
+			$cmp[$id] = array(
+				'dialog_id' => _num($r['dialog_id']),
+				'col' => $r['col'],
+				'attr_id' => '#cmp_'.$id
+			);
+		}
+	}
+
+
 	$sql = "SELECT *
 			FROM `_dialog_component`
 			WHERE `dialog_id`=".$dialog_id."
 			ORDER BY `sort`";
-	$cmp = query_arr($sql);
-	foreach($cmp as $id => $r) {
-		$cmp[$id]['type_name'] = _dialogEl($r['type_id'], 'name');
-		$cmp[$id]['label_html'] = $r['label_name'] ?
+	$component = query_arr($sql);
+	foreach($component as $id => $r) {
+		$component[$id]['type_name'] = _dialogEl($r['type_id'], 'name');
+		$component[$id]['label_html'] = $r['label_name'] ?
 										$r['label_name']
 										:
 										'<span class="grey i b">'.
-											$cmp[$id]['type_name'].
+											$component[$id]['type_name'].
 										($r['type_id'] == 1 ? ': <i>'.$r['txt_1'].'</i>' : '').
 										'</span>';
-		$cmp[$id]['v_ass'] = array();
-		$cmp[$id]['func'] = array();
-		$cmp[$id]['func_action_ass'] = array();//ассоциативный массив действий для конкретного компонента
+		$component[$id]['v_ass'] = array();
+		$component[$id]['func'] = array();
+		$component[$id]['func_action_ass'] = array();//ассоциативный массив действий для конкретного компонента
 	}
 
 	$sql = "SELECT `id`,`v`
@@ -161,16 +183,16 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	$sql = "SELECT *
 			FROM `_dialog_component_func`
-			WHERE `component_id` IN ("._idsGet($cmp).")
+			WHERE `component_id` IN ("._idsGet($component).")
 			ORDER BY `component_id`,`id`";
 	$func = array();
 	foreach(query_arr($sql) as $r) {
-		$cmp[$r['component_id']]['func'][] = array(
+		$component[$r['component_id']]['func'][] = array(
 			'action_id' => _num($r['action_id']),
 			'cond_id' => _num($r['cond_id']),
 			'component_ids' => $r['component_ids']
 		);
-		$cmp[$r['component_id']]['func_action_ass'][$r['action_id']] = 1;
+		$component[$r['component_id']]['func_action_ass'][$r['action_id']] = 1;
 
 		if(!isset($func[$r['component_id']]))
 			$func[$r['component_id']] = array();
@@ -182,18 +204,20 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		);
 	}
 
-	$dialog['component'] = $cmp;
-	$dialog['func'] = $func;
-
 	//получение списка колонок, присутствующих в таблице
 	$col = array();
 	$sql = "DESCRIBE `".$dialog['base_table']."`";
 	foreach(query_array($sql) as $r)
 		$col[$r['Field']] = 1;
+
+	$dialog['cmp'] = $cmp;
+	$dialog['component'] = $component;
+	$dialog['func'] = $func;
 	$dialog['field'] = $col;
 
 	return _cache($dialog);
 }
+/*
 function _dialogValToId($val='') {//получение id диалога на основании имени val
 	//если такого имени нет, то внесение диалога в базу
 
@@ -246,6 +270,7 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 	
 	return _cache($dialog_id);
 }
+*/
 function _dialogSpisokOn() {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$sql = "SELECT `id`,`spisok_name`
 			FROM `_dialog`

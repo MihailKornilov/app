@@ -309,7 +309,7 @@ var FB,
 
 		m.addClass('_busy');
 	},
-	_forEq = function(arr, func) {//перечисление последовательного массива jquery $(...)
+	_forEq = function(arr, func) {//перечисление последовательного массива jQuery $(...)
 
 		//перебор будет осуществляться до тех пор, пока не будет встречено значение false в функции
 		for(var n = 0; n < arr.length; n++)
@@ -319,6 +319,12 @@ var FB,
 	},
 	_forN = function(arr, func) {//перечисление последовательного массива js
 		for(var n = 0; n < arr.length; n++)
+			if(func(arr[n], n) === false)
+				return false;
+		return true;
+	},
+	_forIn = function(arr, func) {//перечисление ассоциативного массива или объекта
+		for(var n in arr)
 			if(func(arr[n], n) === false)
 				return false;
 		return true;
@@ -402,7 +408,7 @@ $(document)
 					sql += '<ul>' + req[i] + '</ul>';
 					break;
 				default:
-					var len = req[i].length ? '<tt>' + req[i].length + '</tt>' : '';
+					var len = req[i] && req[i].length ? '<tt>' + req[i].length + '</tt>' : '';
 					html += '<div class="hd"><b>' + i + '</b>' + len + '<em>' + typeof req[i] + '</em></div>';
 					if(typeof req[i] == 'object') {
 						html += obj(req[i]);

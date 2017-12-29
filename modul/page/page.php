@@ -271,6 +271,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	$v = $unit && $el['col'] ? $unit[$el['col']]: '';
 
 	switch($el['dialog_id']) {
+		//---=== ЭЛЕМЕНТЫ ДЛЯ ВНЕСЕНИЯ ДАННЫХ ===---
+		case 5://textarea
+			/*
+				num_1 - ширина
+			*/
+			return
+			'<textarea id="cmp_'.$el['id'].'" style="width:'.$el['num_1'].'px">'.
+				$v.
+			'</textarea>';
+
+
 		case 2://button
 			/*
 				txt_1 - текст кнопки
@@ -298,11 +309,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					));
 		case 3: return _pageElemMenu($el); //menu
 		case 4: return '<div class="hd2">'.$el['txt_1'].'</div>'; //head
-		case 5://textarea
-			/*
-				num_1 - ширина
-			*/
-			return '<textarea style="width:'.$el['num_1'].'px">'.$v.'</textarea>';
 		case 7://search
 			return _search(array(
 						'hold' => $el['txt_1'],
