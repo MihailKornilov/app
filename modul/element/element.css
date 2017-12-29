@@ -199,18 +199,6 @@
 }
 #dialog-base dd:not(:hover) .cmp-set{display:none}
 #dialog-base .cmp-set:not(:hover){opacity:.6}
-/* разделительная линия для label */
-#label-w-change{
-	position:absolute;
-	cursor:e-resize;
-	background-color:#FFD9B2;
-	width:5px;
-	top:15px;
-	z-index:101;
-	opacity:.5;
-}
-#label-w-change:hover{opacity:1}
-#dialog-base:not(:hover) #label-w-change{display:none}
 
 .element{
 	background:url(../../img/element.png?5) no-repeat 200px -10px;

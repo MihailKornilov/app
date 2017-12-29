@@ -246,7 +246,7 @@ switch(@$_POST['op']) {
 		
 		$send['html'] = utf8(
 			'<table class="bs5 w100p">'.
-				'<tr><td class="label r top" style="width:'.$cmpDialog['label_width'].'px">Колонк'.($f6 ? 'а' : 'и').':'.
+				'<tr><td class="label r top" style="width:125px">Колонк'.($f6 ? 'а' : 'и').':'.
 					'<td>'.$col.
 			'</table>'
 		);

@@ -352,9 +352,7 @@ var VK_SCROLL = 0,
 					});
 				}
 			}),
-			DIALOG_WIDTH;
-
-		window.LABEL_WIDTH = 125;
+			DIALOG_WIDTH = res.width;
 
 		window.CMP_NAME = res.cmp_name;
 		window.DIALOG_ELEMENT = res.element;
@@ -403,7 +401,6 @@ var VK_SCROLL = 0,
 		_dialogHeightCorrect();
 
 		//установка линии для настройки ширины диалога
-		DIALOG_WIDTH = res.width;
 		$('#dialog-w-change')
 			.css('left', (DIALOG_WIDTH + 8) + 'px')
 			.draggable({
@@ -416,20 +413,6 @@ var VK_SCROLL = 0,
 					DIALOG_WIDTH = w;
 					dialog.width(w);
 					$('#dialog-width').html(w);
-				}
-			});
-
-		//установка линии для настройки ширины полей с названиями
-		LABEL_WIDTH = res.label_width;
-		$('#label-w-change')
-			.css('left', (LABEL_WIDTH + 12) + 'px')
-			.draggable({
-				axis:'x',
-				grid:[10,0],
-				containment:'parent',
-				drag:function(event, ui) {
-					LABEL_WIDTH = ui.position.left - 12;
-					$('.label-width').width(LABEL_WIDTH);
 				}
 			});
 
@@ -477,38 +460,39 @@ var VK_SCROLL = 0,
 		}
 		function submit() {
 			var send = {
-				op:'dialog_' + (res.dialog_id ? 'edit' : 'add'),
+				op:'dialog_edit',// + (res.dialog_id ? 'edit' : 'add'),
+
 				dialog_id:res.dialog_id,
 				unit_id:res.unit_id,
-				app_any:$('#app_any').val(),
-				sa:$('#sa').val(),
+
 				width:DIALOG_WIDTH,
-				label_width:LABEL_WIDTH,
+
 				head_insert:$('#head_insert').val(),
 				button_insert_submit:$('#button_insert_submit').val(),
 				button_insert_cancel:$('#button_insert_cancel').val(),
 				head_edit:$('#head_edit').val(),
 				button_edit_submit:$('#button_edit_submit').val(),
 				button_edit_cancel:$('#button_edit_cancel').val(),
-				base_table:$('#base_table').val(),
-				component:DIALOG_COMPONENT,
-				func:COMPONENT_FUNC,
+
+//				component:DIALOG_COMPONENT,
+//				func:COMPONENT_FUNC,
 				spisok_on:$('#spisok_on').val(),
 				spisok_name:$('#spisok_name').val(),
 				action_id:$('#action_id').val(),
 				action_page_id:$('#action_page_id').val(),
+
+				base_table:$('#base_table').val(),
+				app_any:$('#app_any').val(),
+				sa:$('#sa').val(),
+
 				menu_edit_last:$('#dialog-menu').val()
 			};
-			dialog.post(send, function(res) {
-				_dialogOpen(res.dialog_id);
-			});
+			dialog.post(send, _dialogOpen);
 		}
 	},
 	_dialogHeightCorrect = function() {//установка высоты линий для настройки ширины диалога и ширины полей с названиями
 		var h = $('#dialog-w-change').parent().height();
 		$('#dialog-w-change').height(h);
-		h = $('#dialog-base').height();
-		$('#label-w-change').height(h);
 	},
 	_dialogCmpEdit = function(CMP) {//добавление|редактирование компонента диалога
 		CMP = $.extend({
@@ -1107,7 +1091,7 @@ var VK_SCROLL = 0,
 							'<div class="icon icon-del-red' + _tooltip('Удалить компонент', -59) + '</div>' +
 						'</div>' +
 						'<table class="bs5 w100p">' +
-							'<tr><td class="label label-width ' + (TYPE_7 ? '' : 'r') +' pr5" ' + (TYPE_7 ? 'colspan="2"' : 'style="width:' + LABEL_WIDTH + 'px"') + '>' +
+							'<tr><td class="label label-width ' + (TYPE_7 ? '' : 'r') +' pr5" ' + (TYPE_7 ? 'colspan="2"' : 'style="width:125px"') + '>' +
 									(elem.label_name ? elem.label_name + ':' : '') +
 									(elem.require ? '<div class="dib red fs15 mtm2">*</div>' : '') +
 									(elem.hint ? ' <div class="icon icon-info pl dialog-hint" val="' + _br(elem.hint, 1) + '"></div>' : '') +
