@@ -188,9 +188,10 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 		var html =
 				'<div class="center pad20">' +
 					'<p class="mt10"><button class="vk dialog-open" val="dialog_id:1,block_id:' + BL.id + '">Ёлемент: галочка</button>' +
+					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:8,block_id:' + BL.id + '">Ёлемент: input:text</button>' +
+					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:5,block_id:' + BL.id + '">Ёлемент: textarea</button>' +
 					'<p class="mt10">---' +
 
-					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:5,block_id:' + BL.id + '">Ёлемент: textarea</button>' +
 					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:10,block_id:' + BL.id + '">ѕроизвольный текст</button>' +
 
 					'<p class="mt10"><button class="vk" val="3">ћеню</button>' +

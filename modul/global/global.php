@@ -321,7 +321,7 @@ function _num($v, $minus=0) {
 function _bool($v) {//проверка на булево число
 	if(empty($v) || is_array($v) || !preg_match(REGEXP_BOOL, $v))
 		return 0;
-	return intval($v);
+	return 1;
 }
 function _cena($v, $minus=0, $kop=0, $del='.') {//проверка на цену.
 	/*

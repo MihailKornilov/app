@@ -273,19 +273,31 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		2 - EL: кнопка
 		3 - EL: меню
 		4 - ??? заголовок
-		5 - CMP: textarea
+		5 - CMP: textarea (многострочное текстовое поле)
 		6 - ??? удаление элемента
 		7 - EL: поле поиска
-		8 -
+		8 - CMP: input:text (однострочное текстовое поле)
 */
 
 	//значение из списка
 	$v = $unit && $el['col'] ? $unit[$el['col']]: '';
-	$attr_id = ' id="cmp_'.$el['id'].'"';
+	$attr_id = 'cmp_'.$el['id'];
 
 	switch($el['dialog_id']) {
 		//---=== КОМПОНЕНТ ДЛЯ ВНЕСЕНИЯ ДАННЫХ ===---
-		case 5://textarea
+		//галочка
+		case 1:
+			/*
+				txt_1 - текст для галочки
+			*/
+
+			return _check(array(
+				'attr_id' => $attr_id,
+				'light' => 1,
+				'value' => _num($v)
+			));
+		//textarea (многострочное текстовое поле)
+		case 5:
 			/*
 				num_1 - ширина
 				txt_1 - текст для placeholder
@@ -293,9 +305,20 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$width = $el['num_1'] ? ' style="width:'.$el['num_1'].'px"' : '';
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			return
-			'<textarea'.$attr_id.$width.$placeholder.'>'.
+			'<textarea id="'.$attr_id.'"'.$width.$placeholder.'>'.
 				$v.
 			'</textarea>';
+		//input:text (однострочное текстовое поле)
+		case 8:
+			/*
+				num_1 - ширина
+				txt_1 - текст для placeholder
+			*/
+			$width = $el['num_1'] ? ' style="width:'.$el['num_1'].'px"' : '';
+			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+			return '<input type="text" id="'.$attr_id.'"'.$width.$placeholder.' value="'.$v.'" />';
+
+
 
 
 		case 2://button

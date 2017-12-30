@@ -57,21 +57,24 @@ function _iconDel($v=array()) {//иконка удаления записи в таблице
 
 
 function _check($v=array()) {//элемент ГАЛОЧКА
-	$v = array(
-		'id' => @$v['id'],
-		'title' => @$v['title'],
-		'value' => _bool(@$v['value']),
-		'on' => _bool(@$v['value']) ? ' on' : '',
-		'light' => _bool(@$v['light']) ? ' light' : '',
-		'disabled' => _bool(@$v['disabled']) ? ' disabled' : '',
-		'class' => !empty($v['class']) ? ' '.$v['class'] : '',      //дополнительный класс
-		'block' => _bool(@$v['block']) ? ' block' : ''
-	);
-	$title = $v['title'] ? ' title' : '';
+	$attr_id = empty($v['attr_id']) ? 'check'.rand(1, 10000) : $v['attr_id'];
+
+	$cls = '_check ';
+	$cls .= empty($v['block']) ? '' : ' block';      //display:block, иначе inline-block
+	$cls .= empty($v['disabled']) ? '' : ' disabled';//неактивное состояние
+	$cls .= empty($v['light']) ? '' : ' light';      //если галочка не стоит, текст бледный
+	$cls .= empty($v['class']) ? '' : ' '.$v['class'];//дополнительные классы
+
+	$val = _bool(@$v['value']);
+	$cls .= $val ? ' on' : '';      //галочка поставлена или нет
+
+	$title = empty($v['title']) ? '' : $v['title'];
+	$cls .= $title ? ' title' : ''; //отступ от галочки, если есть текст
+
 	return
-	'<input type="hidden" id="'.$v['id'].'" value="'.$v['value'].'" />'.
-	'<div class="_check '.$v['on'].$v['block'].$v['class'].$v['disabled'].$v['light'].$title.'" id="'.$v['id'].'_check">'.
-		$v['title'].
+	'<input type="hidden" id="'.$attr_id.'" value="'.$val.'" />'.
+	'<div class="'.$cls.'" id="'.$attr_id.'_check">'.
+		$title.
 	'</div>';
 }
 function _radio($v=array()) {//элемент RADIO

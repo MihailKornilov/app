@@ -247,14 +247,14 @@ switch(@$_POST['op']) {
 
 function _dialogUpdate($dialog_id) {//обновление диалога
 	if(!$head_insert = _txt($_POST['head_insert']))
-		jsonError('Не указано название диалога для новой записи');
+		jsonError('Не указан заголовок для внесения записи');
 	if(!$button_insert_submit = _txt($_POST['button_insert_submit']))
 		jsonError('Не указан текст кнопки внесения');
 	if(!$button_insert_cancel = _txt($_POST['button_insert_cancel']))
 		jsonError('Не указан текст кнопки отмены для новой записи');
 
 	if(!$head_edit = _txt($_POST['head_edit']))
-		jsonError('Не указано название диалога редактирования');
+		jsonError('Не указан заголовок редактирования');
 	if(!$button_edit_submit = _txt($_POST['button_edit_submit']))
 		jsonError('Не указан текст кнопки сохранения');
 	if(!$button_edit_cancel = _txt($_POST['button_edit_cancel']))
