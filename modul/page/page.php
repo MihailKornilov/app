@@ -284,7 +284,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	$attr_id = 'cmp_'.$el['id'];
 
 	switch($el['dialog_id']) {
-		//---=== КОМПОНЕНТ ДЛЯ ВНЕСЕНИЯ ДАННЫХ ===---
+		//---=== КОМПОНЕНТ ДЛЯ ВНЕСЕНИЯ ДАННЫХ ===--- (используется $unit)
 		//галочка
 		case 1:
 			/*
@@ -320,7 +320,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 
 
-
+		//---=== ЭЛЕМЕНТЫ ДЛЯ ОТОБРАЖЕНИЯ ===---
 		case 2://button
 			/*
 				txt_1 - текст кнопки
@@ -485,7 +485,7 @@ function _pageElemMenu($unit) {//элемент страницы: Меню
 		338 => 4  //Доп. - вертикальное
 	);
 
-	return '<div class="_menu'.$type[$unit['num_2']].'">'.$razdel.'</div>';//._pr(_page());
+	return '<div class="_menu'.$type[$unit['num_2']].'">'.$razdel.'</div>';
 }
 
 

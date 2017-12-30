@@ -169,7 +169,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 				 (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
 					 '>'.
 							_blockSetka($r, $level, $r['obj_name'], $grid_id).
-							_blockChildHtml($r, $level + 1, $width, $grid_id).
+							_blockChildHtml($r, $level + 1, $width, $grid_id, $unit).
 	    					_elemDiv($r['elem'], $unit).
 					'';
 
@@ -352,9 +352,9 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 	}
 	return $send;
 }
-function _blockChildHtml($block, $level, $width, $grid_id) {//деление блока на части
+function _blockChildHtml($block, $level, $width, $grid_id, $unit) {//деление блока на части
 	if($block['id'] != $grid_id)
-		return _blockLevel($block['child'], $width, $grid_id, $block['h'], $level);
+		return _blockLevel($block['child'], $width, $grid_id, $block['h'], $level, $unit);
 
 	return _blockGrid($block['child']);
 }

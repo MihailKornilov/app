@@ -331,12 +331,12 @@ function _dialogOpenLoad($dialog_id) {
 	//получение данных единицы списка
 	$unit = array();
 	if($unit_id = _num($_POST['unit_id'])) {
-		$cond = "`id`=" . $unit_id;
+		$cond = "`id`=".$unit_id;
 		if(isset($dialog['field']['app_id']))
-			$cond .= " AND `app_id` IN (0," . APP_ID . ")";
+			$cond .= " AND `app_id` IN (0,".APP_ID.")";
 		$sql = "SELECT *
-					FROM `" . $dialog['base_table'] . "`
-					WHERE " . $cond;
+				FROM `".$dialog['base_table']."`
+				WHERE ".$cond;
 		if(!$unit = query_assoc($sql))
 			jsonError('Записи не существует');
 		if(@$unit['sa'] && !SA)
@@ -356,6 +356,9 @@ function _dialogOpenLoad($dialog_id) {
 	$send['button_cancel'] = utf8($dialog[!$unit_id ? 'button_insert_cancel' : 'button_edit_cancel']);
 	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
 	$send['cmp'] = $dialog['cmp'];
+
+	foreach($unit as $id => $r)
+		$unit[$id] = utf8($r);
 	$send['unit'] = $unit;
 
 	return $send;

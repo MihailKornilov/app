@@ -252,7 +252,7 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 	}
 
 	if(!isset($arr[$i]))
-		return _pr($arr)._cacheErr('_app: неизвестный ключ', $i);
+		return _cacheErr('_app: неизвестный ключ', $i);
 
 	return $arr[$i];
 }
