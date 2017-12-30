@@ -2855,7 +2855,7 @@ $.fn._hint = function(o) {//выплывающие подсказки
 		MSG = HINT.find('.hi-msg'),
 		UG = HINT.find('.ug');
 
-	HINT.css('z-index', ZINDEX + 100);
+	HINT.css('z-index', ZINDEX + 6);
 
 	//автоматический подбор ширины, если строка слишком длинная
 	if(!o.width) {
@@ -3151,7 +3151,6 @@ $.fn._hint = function(o) {//выплывающие подсказки
 					t.off('mouseleave.hint' + HN);
 					t.removeClass('hnt' + HN);
 					t.removeClass('hint-show');
-					ZINDEX -= 10;
 				}
 			});
 		}
