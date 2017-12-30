@@ -351,13 +351,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if($el['num_2'] == 332)
 				return $sp[$cmp['col_name']];
 
-			return 'spisok_id='.$spisok_id.' '.$el['num_3']._pr($cmp);
+			return 'spisok_id='.$spisok_id.' '.$el['num_3'];
 		case 12://из функции напрямую
 			if(!$el['txt_1'])
 				return 'пустое значение фукнции';
 			if(!function_exists($el['txt_1']))
 				return 'фукнции не существует';
 			return $el['txt_1']();
+
 		case 14: return _spisokShow($el); //содержание списка
 		case 15: return _spisokElemCount($el);//текст с количеством строк списка
 	}

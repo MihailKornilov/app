@@ -31,7 +31,6 @@ define('CODE', _txt(@$_COOKIE['code']));
 define('VERSION', _num(@$_COOKIE['version']));
 
 define('URL', APP_HTML.'/index.php?'.TIME);
-define('URL_AJAX', APP_HTML.'/ajax.php?'.TIME);
 
 
 
@@ -78,6 +77,15 @@ function _face() {//определение, как загружена страница: iframe или сайт
 	require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
 	require_once GLOBAL_DIR.'/modul/global/func_require.php';
 }
+function _ajax_url() {//глобальная ссылка для отправки запросов ajax
+		$get = '';
+		foreach($_GET as $i => $v) {
+			if(!$v)
+				continue;
+			$get .= '&'.$i.'='.$v;
+		}
+	return APP_HTML.'/ajax.php?'.TIME.$get;
+}
 function _global_script() {//скрипты и стили
 	return
 	//Отслеживание ошибок в скриптах
@@ -85,7 +93,7 @@ function _global_script() {//скрипты и стили
 
 	'<script>'.
 		'var URL="'.URL.'",'.
-			'AJAX="'.URL_AJAX.'",'.
+			'AJAX="'._ajax_url().'",'.
 			'SA='.SA.','.
 			'PAGE_ID='._page('cur').';'.
 	'</script>'.
