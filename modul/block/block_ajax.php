@@ -27,8 +27,8 @@ switch(@$_POST['op']) {
 			jsonError('Некорректная ширина');
 
 		define('BLOCK_EDIT', 1);
-
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
+		$send['block_arr'] = _blockJsArr($obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;
@@ -271,6 +271,7 @@ switch(@$_POST['op']) {
 			$width = $dialog['width'];
 		}
 
+		define('BLOCK_EDIT', 1);
 		$send['html'] = utf8(_blockHtml($block['obj_name'], $block['obj_id'], $width, $id));
 		$send['block'] = $block;
 		$send['block_arr'] = _blockJsArr($block['obj_name'], $block['obj_id']);

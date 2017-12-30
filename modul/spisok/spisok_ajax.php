@@ -1,23 +1,14 @@
 <?php
 switch(@$_POST['op']) {
 	case 'spisok_add'://внесение единицы списка из диалога
-		$v = _spisokUnitUpdate();
-
-		$send['unit_id'] = $v['unit_id'];
-		$send['action_id'] = _num($v['dialog']['action_id']);
-		$send['page_id'] = _num($v['dialog']['action_page_id']);
-
+		$send = _spisokUnitUpdate();
 		jsonSuccess($send);
 		break;
 	case 'spisok_edit'://сохранение данных записи для диалога
 		if(!$unit_id = _num($_POST['unit_id']))
 			jsonError('Некорректный id единицы списка');
 
-		$v = _spisokUnitUpdate();
-
-		$send['unit_id'] = $v['unit_id'];
-		$send['action_id'] = _num($v['dialog']['action_id']);
-		$send['page_id'] = _num($v['dialog']['action_page_id']);
+		$send = _spisokUnitUpdate();
 
 		jsonSuccess($send);
 		break;
@@ -489,11 +480,6 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 	$unit_id = _num($_POST['unit_id']);
 	$block_id = _num($_POST['block_id']);
 
-	$send = array(
-		'unit_id' => $unit_id,
-		'dialog' => $dialog
-	);
-
 	//проверка наличия таблицы для внесения данных
 	$sql = "SHOW TABLES LIKE '".$dialog['base_table']."'";
 	if(!mysql_num_rows(query($sql)))
@@ -532,6 +518,22 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 	}
 
 	if(!$unit_id) {
+		//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
+		if($dialog['base_table'] == '_element' && $block_id) {
+			$sql = "SELECT *
+					FROM `_block`
+					WHERE `id`=".$block_id;
+			if(!$block = query_assoc($sql))
+				jsonError('Блока не сущетвует');
+
+			$sql = "SELECT COUNT(*)
+					FROM `_element`
+					WHERE `block_id`=".$block_id;
+			if(query_value($sql))
+				jsonError('В блоке уже есть элемент');
+		}
+
+
 		$sql = "INSERT INTO `".$dialog['base_table']."` (
 					`dialog_id`,
 					`viewer_id_add`
@@ -542,7 +544,6 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 		query($sql);
 
 		$unit_id = query_insert_id($dialog['base_table']);
-		$send['unit_id'] = $unit_id;
 
 		//обновление некоторых колонок
 		$sql = "DESCRIBE `".$dialog['base_table']."`";
@@ -598,7 +599,28 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
 
-	return $send;
+	//получение имени объекта, если действие производилось для блока
+	$block_obj_name = '';
+	if($dialog['base_table'] == '_element') {
+		$sql = "SELECT `block_id`
+				FROM `_element`
+				WHERE `id`=".$unit_id;
+		$block_id = _num(query_value($sql));
+
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$block_id;
+		$block = query_assoc($sql);
+
+		$block_obj_name = $block['obj_name'];
+	}
+
+	return array(
+		'unit_id' => $unit_id,
+		'action_id' => _num($dialog['action_id']),
+		'action_page_id' => _num($dialog['action_page_id']),
+		'block_obj_name' => $block_obj_name
+	);
 }
 
 /*

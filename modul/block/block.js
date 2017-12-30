@@ -425,6 +425,8 @@ $(document)
 
 		_post(send, function(res) {
 			$('.block-content-' + spl[0]).html(res.html);
+			for(var k in res.block_arr)
+				BLOCK_ARR[k] = res.block_arr[k];
 			if(v)
 				$('#grid-stack')._grid({
 					obj_name:spl[0],
@@ -432,7 +434,6 @@ $(document)
 					width:spl[2]
 				});
 		});
-
 	})
 	.on('click', '.block-level-change', function() {//изменения уровня редактирования блоков
 		var t = $(this),

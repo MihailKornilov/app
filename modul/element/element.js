@@ -385,8 +385,8 @@ var VK_SCROLL = 0,
 			func:_dialogHeightCorrect
 		});
 		$('#action_id')._select({
-			width:250,
-			title0:'нет',
+			width:260,
+			title0:'действия нет, закрыть окно',
 			spisok:o.action,
 			func:function(v) {
 				$('.td-action-page')._dn(v == 2);
@@ -1472,13 +1472,15 @@ var VK_SCROLL = 0,
 			});
 */
 			dialog.post(send, function(res) {
-				return;
-//				if(funcAfterPost)
-//					return funcAfterPost(res);
-
 				switch(res.action_id) {
 					case 1: location.reload(); break;
-					case 2: location.href = URL + '&p=' + res.page_id + '&id=' + res.unit_id; break;
+					case 2: location.href = URL + '&p=' + res.action_page_id + '&id=' + res.unit_id; break;
+					case 3://обновление содержимого блоков
+						$('#block-level-' + res.block_obj_name)
+							.find('.block-grid-on')
+							.removeClass('grey')
+							.trigger('click');
+						break;
 				}
 			});
 		}
