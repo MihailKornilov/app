@@ -159,12 +159,12 @@ switch(@$_POST['op']) {
 		$send['menu'] = _selArray($menu);
 		$send['block_arr'] = _blockJsArr('dialog', $dialog_id);
 		$send['action'] = _selArray($action);
-		$send['element'] = _dialogEl();
-		$send['cmp_name'] = _dialogEl(0, 'name');
+//		$send['element'] = _dialogEl();
+//		$send['cmp_name'] = _dialogEl(0, 'name');
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr_edit');
-		$send['func'] = (object)$dialog['func'];
-		$send['spisokOn'] = _dialogSpisokOn();
-		$send['page_list'] = _dialogPageList();
+//		$send['func'] = (object)$dialog['func'];
+//		$send['spisokOn'] = _dialogSpisokOn();
+//		$send['page_list'] = _dialogPageList();
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
 		jsonSuccess($send);

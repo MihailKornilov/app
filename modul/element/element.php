@@ -364,7 +364,7 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
 	$sort = array(9,3,4,2,1,5,6,7,8);
 
 	$name = array(
-		1 => 'Галочка',
+		1 => 'Галочка', //стало dialog_id=8
 		2 => 'Выпадающий список',
 		3 => 'Однострочный текст',
 		4 => 'Многострочный текст',
@@ -445,16 +445,6 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
 					'<td><input type="text" class="w300" id="txt_1" />'.
 			'</table>'.
 			_dialogElHtmlPrev('<input type="text" id="elem-attr-id" class="w250" />'),
-
-		4 => /* *** Многострочный текст ***
-				txt_1 - текст для placeholder
-             */
-			_dialogElHtmlContent(1).
-			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Подсказка в поле:'.
-					'<td><input type="text" class="w300" id="txt_1" />'.
-			'</table>'.
-			_dialogElHtmlPrev('<textarea id="elem-attr-id" class="w250"></textarea>'),
 
 		5 => /* *** Радио ***
 				txt_1 - текст для placeholder

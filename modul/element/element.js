@@ -1623,33 +1623,6 @@ var VK_SCROLL = 0,
 						});
 				break;
 			}
-			case 4: /* textarea */ {
-				$(ch.attr_id)
-					.parent().parent()
-					.find('.label').addClass('topi');
-				if(isEdit)
-					$(ch.attr_id)
-						.attr('disabled', true)
-						.resizable({
-							minWidth:50,
-							maxWidth:350,
-							grid:10,
-							handles:'e',
-							stop:function(event, ui) {
-								var id = _num(ui.originalElement[0].id.split('elem')[1]);
-								for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-									var sp = DIALOG_COMPONENT[n];
-									if(sp.id == id) {
-										sp.width = ui.size.width - 18;
-										break;
-									}
-								}
-							}
-						});
-				else
-					$(ch.attr_id).autosize();
-				break;
-			}
 			case 5: /* radio */ {
 				$(ch.attr_id)
 					._radio({

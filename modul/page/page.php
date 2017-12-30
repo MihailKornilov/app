@@ -267,17 +267,33 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	if(!$el)
 		return '';
 
+/*
+	Диалоговые окна по порядку:
+		1 - CMP: галочка
+		2 - EL: кнопка
+		3 - EL: меню
+		4 - ??? заголовок
+		5 - CMP: textarea
+		6 - ??? удаление элемента
+		7 - EL: поле поиска
+		8 -
+*/
+
 	//значение из списка
 	$v = $unit && $el['col'] ? $unit[$el['col']]: '';
+	$attr_id = ' id="cmp_'.$el['id'].'"';
 
 	switch($el['dialog_id']) {
-		//---=== ЭЛЕМЕНТЫ ДЛЯ ВНЕСЕНИЯ ДАННЫХ ===---
+		//---=== КОМПОНЕНТ ДЛЯ ВНЕСЕНИЯ ДАННЫХ ===---
 		case 5://textarea
 			/*
 				num_1 - ширина
+				txt_1 - текст для placeholder
 			*/
+			$width = $el['num_1'] ? ' style="width:'.$el['num_1'].'px"' : '';
+			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			return
-			'<textarea id="cmp_'.$el['id'].'" style="width:'.$el['num_1'].'px">'.
+			'<textarea'.$attr_id.$width.$placeholder.'>'.
 				$v.
 			'</textarea>';
 
