@@ -237,7 +237,7 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для измене
 				FROM `_element`
 				WHERE `block_id` IN ("._idsGet($arr).")";
 		foreach(query_arr($sql) as $r)
-			if(_elemWidthChange($r)) {
+			if(_elemWidth($r['dialog_id'])) {
 				$html .= '<button class="vk small grey ml30 elem-width-change">Настройка ширины элементов</button>';
 				break;
 			}
@@ -317,7 +317,8 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 			$v[] = 'elem_id:'._num($el['id']);
 			$v[] = 'dialog_id:'._num($el['dialog_id']);
 			$v[] = 'fontAllow:'._elemFontAllow($el['dialog_id']);
-			$v[] = 'widthChange:'._elemWidthChange($el);
+			$v[] = 'width:'._num($el['width']);
+			$v[] = 'width_change:'._elemWidth($el['dialog_id']);
 			$v[] = 'color:"'.$el['color'].'"';
 			$v[] = 'font:"'.$el['font'].'"';
 			$v[] = 'size:'.$size;
@@ -355,7 +356,9 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 			$v['elem_id'] = _num($el['id']);
 			$v['dialog_id'] = _num($el['dialog_id']);
 			$v['fontAllow'] = _elemFontAllow($el['dialog_id']);
-			$v['widthChange'] = _elemWidthChange($el);
+			$v['width'] = _num($el['width']);
+			$v['width_change'] = _elemWidth($el['dialog_id']);
+			$v['width_min'] = _elemWidth($el['dialog_id'], 'min');
 			$v['color'] = $el['color'];
 			$v['font'] = $el['font'];
 			$v['size'] = $size;

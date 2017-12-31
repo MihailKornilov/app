@@ -1,10 +1,13 @@
-/*! jQuery UI - v1.12.1 - 2017-06-08
+/*! jQuery UI - v1.12.1 - 2017-12-31
 * http://jqueryui.com
-* Includes: core.css, resizable.css, sortable.css
+* Includes: draggable.css, core.css, resizable.css, sortable.css
 * Copyright jQuery Foundation and other contributors; Licensed MIT */
 
+.ui-draggable-handle {
+	-ms-touch-action: none;
+	touch-action: none;
+}
 /* Layout helpers
-ui-resizable-handle ui-resizable-e
 ----------------------------------*/
 .ui-helper-hidden {
 	display: none;
@@ -120,13 +123,11 @@ ui-resizable-handle ui-resizable-e
 }
 .ui-resizable-e {
 	cursor: e-resize;
-	width: 8px;
-	right: -2px;
-	top:0;
-	height:100%;
+	width: 7px;
+	right: -5px;
+	top: 0;
+	height: 100%;
 }
-.ui-resizable:hover .ui-resizable-e{background-color:#FFD9B2}
-.ui-wrapper:hover .ui-resizable-e{background-color:#FFD9B2}
 .ui-resizable-w {
 	cursor: w-resize;
 	width: 7px;

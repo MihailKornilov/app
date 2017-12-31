@@ -476,11 +476,11 @@ $(document)
 			$('.block-content-' + spl[0]).html(res.html);
 			_forIn(res.block_arr, function(sp, k) {
 				BLOCK_ARR[k] = sp;
-				if(!on || !sp.widthChange)
+				if(!on || !sp.width_change)
 					return;
 				$('#cmp_' + sp.elem_id).css('width', '100%');
-				$('#pe_' + sp.elem_id).addClass('dib').resizable({
-					minWidth:30,
+				$('#pe_' + sp.elem_id).css('width', sp.width ? sp.width + 'px' : '100%').resizable({
+					minWidth:sp.width_min,
 					maxWidth:1000,
 					grid:10,
 					handles:'e',

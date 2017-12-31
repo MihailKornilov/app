@@ -1,33 +1,44 @@
 *{	padding:0;
 	margin:0;
 	font:13px normal;
-	font-family: -apple-system, BlinkMacSystemFont, Roboto, Open Sans, Helvetica Neue, sans-serif;
+	font-family:-apple-system, BlinkMacSystemFont, Roboto, Open Sans, Helvetica Neue, sans-serif;
 /*	box-sizing:border-box;  */
 }
 body{background:#fff}
 body.site{background:#f8fafc}
-a{color:#2B587A;text-decoration:none;outline:none;cursor:pointer}
+a{	color:#2B587A;
+	text-decoration:none;
+	outline:none;
+	cursor:pointer;
+}
 a:hover{text-decoration:underline}
 b{font-weight:bold}
 i{font-style:italic}
+
 input,textarea{
+	box-sizing:border-box;
 	border:1px solid #d3d9de;
 	padding:6px 8px;
-	border-radius:1px;
+	border-radius:2px;
 	outline:none;
+	width:150px;
 }
-input[type="text"]:disabled,
-textarea:disabled{color:#ccc;background:#f5f5f5}
 input::-webkit-input-placeholder{color:#bbb}
 input::-moz-placeholder{color:#999}
-input.oplata{font:bold 13px Tahoma;width:60px;padding:4px}
-input.money{font:bold 14px Tahoma;width:100px}
 input.err{background:#fff2f2}
-textarea{resize:none;height:30px}
+
+textarea{resize:none;height:44px}
 textarea::-webkit-input-placeholder{color:#bbb}
 textarea::-moz-placeholder{color:#999}
-textarea.min{height:15px}
+textarea.min{height:29px}
 textarea.err{background:#fff2f2}
+input[type="text"]:disabled,
+textarea:disabled{
+	color:#ccc;
+	background:#f5f5f5;
+	border:1px solid #ddd;
+}
+
 img{border:none}
 table{border:0;border-spacing:0}
 
@@ -199,6 +210,12 @@ table{border:0;border-spacing:0}
 /* блоки из таблиц */
 .bl-tab{width:100%;table-layout:fixed}
 .bl-td{/*overflow-x:hidden*/}
+.bl-td .ui-resizable-e{
+	background-color:#ffaf64;
+	width:10px;
+	right:0;
+}
+.bl-td:not(:hover) .ui-resizable-e{opacity:.4}
 .bl-td._busy *{visibility:hidden}
 
 

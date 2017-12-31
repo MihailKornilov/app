@@ -260,7 +260,7 @@ function _elemStyle($el) {//стили css для элемента
 
 	//когда включена настройка ширины элементов,
 	//те элементы, которые могут настраиваться, остаются, остальные скрываются
-	if(ELEM_WIDTH_CHANGE && !_elemWidthChange($el))
+	if(ELEM_WIDTH_CHANGE && !_elemWidth($el['dialog_id']))
 		$send[] = 'visibility:hidden';
 
 	if(!$send)
@@ -268,17 +268,40 @@ function _elemStyle($el) {//стили css для элемента
 
 	return ' style="'.implode(';', $send).'"';
 }
-function _elemWidthChange($el) {//определение элементов, у которых может настраиваться ширина
-	switch($el['dialog_id']) {
-		case 2://кнопка
-			if($el['num_3'])//установлена максимальная ширина
-				return 0;
-		case 5:
-		case 7:
-		case 8: return 1;
-	}
+function _elemWidth($dialog_id, $i='access') {//получение информации о ширине элементов
+	/*
+		   def: ширина по умолчанию (для внесения нового элемента)
+		   min: минимальная ширина, которую можно установить элементу
+		access: определение элементов, у которых может настраиваться ширина
+	*/
 
-	return 0;
+	if($i == 'def')
+		switch($dialog_id) {
+			case 5: return 150;//textarea
+			case 7: return 150;//search
+			case 8: return 150;//input:text
+			default: return 0;
+		}
+
+	if($i == 'min')
+		switch($dialog_id) {
+			case 2: return 30;//button
+			case 5: return 30;//textarea
+			case 7: return 50;//search
+			case 8: return 30;//input:text
+			default: return 0;
+		}
+
+	//$i == 'access'
+	switch($dialog_id) {
+		case 2://кнопка
+//			if($el['num_3'])//установлена максимальная ширина
+//				return 0;
+		case 5://textarea
+		case 7://search
+		case 8: return 1;//input:text
+		default: return 0;
+	}
 }
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 /*
@@ -298,6 +321,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	$attr_id = 'cmp_'.$el['id'];
 	$disabled = ELEM_WIDTH_CHANGE ? ' disabled' : '';
 
+	switch($el['width']) {
+		case 0: $width = ' style="width:100%"'; break;
+//		case -1: $width = ' style="width:100%"'; break;
+		default: $width = ' style="width:'.$el['width'].'px"';
+	}
+
 	switch($el['dialog_id']) {
 		//---=== КОМПОНЕНТ ДЛЯ ВНЕСЕНИЯ ДАННЫХ ===--- (используется $unit)
 		//галочка
@@ -312,27 +341,29 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'title' => $el['txt_1'],
 				'value' => _num($v)
 			));
+
 		//textarea (многострочное текстовое поле)
 		case 5:
 			/*
-				num_1 - ширина
 				txt_1 - текст для placeholder
 			*/
-			$width = $el['num_1'] ? ' style="width:'.$el['num_1'].'px"' : '';
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			return
 			'<textarea id="'.$attr_id.'"'.$width.$placeholder.$disabled.'>'.
 				$v.
 			'</textarea>';
+
 		//input:text (однострочное текстовое поле)
 		case 8:
 			/*
-				num_1 - ширина
 				txt_1 - текст для placeholder
 			*/
-			$width = $el['num_1'] ? ' style="width:'.$el['num_1'].'px"' : '';
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			return '<input type="text" id="'.$attr_id.'"'.$width.$placeholder.$disabled.' value="'.$v.'" />';
+
+
+
+
 
 
 
@@ -536,7 +567,7 @@ function _pageSpisokUnit() {//todo для тестов
 }
 function _page_div() {//todo тест
 	return
-	'<div class="mar20 bor-e8 w200 pad20" id="for-hint">'.
+	'<div class="mar20 bor-e8 pad20" id="for-hint">'.
 		'Передний текст '.
 		'<div class="icon icon-edit"></div>'.
 		'<div class="icon spin pl wh"></div>'.
@@ -572,7 +603,12 @@ function _page_div() {//todo тест
 
 	'<button class="vk mar20" id="bbb">Кнопка для сохранения</button>'.
 
-	'<div id="aaa">0</div>'.
+	'<br>'.
+	'<br>'.
+	'<br>'.
+	'<input type="text" />'.
+	'<br>'.
+	'<textarea class="mt5 w200"></textarea>'.
 	'<div class="mar20 bg-ccd">'.
 		'<div class="icon icon-edit wh"></div>'.
 		'<div class="icon icon-del wh"></div>'.

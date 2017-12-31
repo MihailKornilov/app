@@ -585,6 +585,13 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 				query($sql);
 				continue;
 			}
+			if($r['Field'] == 'width' && $dialog['base_table'] == '_element') {
+				$sql = "UPDATE `".$dialog['base_table']."`
+						SET `width`="._elemWidth($dialog_id, 'def')."
+						WHERE `id`=".$unit_id;
+				query($sql);
+				continue;
+			}
 			if($r['Field'] == 'sort') {
 				$sql = "UPDATE `".$dialog['base_table']."`
 						SET `sort`="._maxSql($dialog['base_table'])."

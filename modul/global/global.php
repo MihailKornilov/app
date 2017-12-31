@@ -98,9 +98,10 @@ function _global_script() {//скрипты и стили
 			'PAGE_ID='._page('cur').';'.
 	'</script>'.
 
-	'<script src="js/jquery-3.2.1.min.js?1"></script>'.
-	'<link rel="stylesheet" type="text/css" href="css/jquery-ui.css?'.TIME.'" />'.
+	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
+	'<link rel="stylesheet" type="text/css" href="css/jquery-ui.css?3" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
+	'<script src="js/autosize.js?3"></script>'.
 	'<script src="js/jquery.mjs.nestedSortable.js?1"></script>'.
 
 //	(@PAS ?

@@ -2182,7 +2182,7 @@ $.fn._count = function(o) {//input с количеством
 	var val = _num(t.val());
 	valCorrect();
 	t.val(val)
-	 .width(o.width - 31)
+	 .width(o.width - 18)
 	 .attr('type', 'text')
 	 .attr('readonly', true);
 
