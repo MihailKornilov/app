@@ -416,7 +416,7 @@ $(document)
 		var t = $(this),
 			p = t.parent(),
 			v = t.hasClass('grey'),
-			spl = t.attr('val').split(':'),
+			spl = p.attr('val').split(':'),
 			send = {
 				op:'block_grid_' + (v ? 'on' : 'off'),
 				obj_name:spl[0],
@@ -424,20 +424,60 @@ $(document)
 				width:spl[2]
 			};
 
-		t._dn(v, 'grey');
-		t._dn(!v, 'orange');
-		p.find('.block-level-change')._dn(!v);
+		if(t._busy())
+			return;
 
 		_post(send, function(res) {
+			t._busy(0);
+
+			t._dn(v, 'grey');
+			t._dn(!v, 'orange');
+			p.find('.block-level-change')._dn(!v);
+			p.find('.elem-width-change')._dn(!v);
+
 			$('.block-content-' + spl[0]).html(res.html);
 			for(var k in res.block_arr)
 				BLOCK_ARR[k] = res.block_arr[k];
+
 			if(v)
 				$('#grid-stack')._grid({
 					obj_name:spl[0],
 					obj_id:spl[1],
 					width:spl[2]
 				});
+		}, function() {
+			t._busy(0);
+		});
+	})
+	.on('click', '.elem-width-change', function() {//включение/выключение изменения ширины элементов
+		var t = $(this),
+			p = t.parent(),
+			on = t.hasClass('grey') ? 1 : 0,
+			spl = p.attr('val').split(':'),
+			send = {
+				op:'block_elem_width_change',
+				obj_name:spl[0],
+				obj_id:spl[1],
+				width:spl[2],
+				on:on
+			};
+
+		if(t._busy())
+			return;
+
+		_post(send, function(res) {
+			t._busy(0);
+
+			t._dn(on, 'grey');
+			t._dn(!on, 'orange');
+			p.find('.block-grid-on').css('visibility', on ? 'hidden' : 'visible');
+			p.find('.block-level-change').css('visibility', on ? 'hidden' : 'visible');
+
+			$('.block-content-' + spl[0]).html(res.html);
+			for(var k in res.block_arr)
+				BLOCK_ARR[k] = res.block_arr[k];
+		}, function() {
+			t._busy(0);
 		});
 	})
 	.on('click', '.block-level-change', function() {//изменения уровня редактирования блоков
@@ -445,7 +485,7 @@ $(document)
 			v = _num(t.html()),
 			p = t.parent(),
 			but = p.find('.block-grid-on'),
-			obj_name = but.attr('val').split(':')[0];
+			obj_name = p.attr('val').split(':')[0];
 
 		p.find('.block-level-change')
 			.removeClass('orange')

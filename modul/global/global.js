@@ -369,6 +369,21 @@ $.fn._dn = function(v, cls) {//скрытие/показ элемента
 	t[(v ? 'remove' : 'add') + 'Class'](cls || 'dn');
 	return t;
 };
+$.fn._busy = function(v) {//проверка/установка/снятие процесса ожидания для элемента - класс _busy
+	var t = $(this);
+
+	if(v === undefined) {
+		v = t.hasClass('_busy');
+		//если процесса не было, то установка
+		if(!v)
+			t.addClass('_busy');
+		return v;
+	}
+
+	t[(v ? 'add' : 'remove') + 'Class']('_busy');
+
+	return t;
+};
 
 $(document)
 	.ajaxSuccess(function(event, request) {

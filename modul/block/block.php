@@ -87,6 +87,10 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	if(empty($arr))
 		return '';
 
+	//условие изменения ширины элемента
+	if(!defined('ELEM_WIDTH_CHANGE'))
+		define('ELEM_WIDTH_CHANGE', 0);
+
 	//условия для настройки блоков конкретного объекта
 	if(!defined('BLOCK_EDIT')) {
 		$id = key($arr);
@@ -98,7 +102,6 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		}
 		define('BLOCK_EDIT', $v);
 	}
-
 
 	$MN = 10;//множитель
 	$wMax = round($WM / $MN);
@@ -195,13 +198,14 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 }
 function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для изменения уровня редактирования блоков
 	$max = 1;
-	$send = '';
+	$html = '';
 
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `obj_name`='".$obj_name."'
 			  AND `obj_id`=".$obj_id;
 	if($arr = query_arr($sql)) {
+		//определение количества уровней блоков
 		foreach($arr as $r) {
 			if(!$parent_id = $r['parent_id'])
 				continue;
@@ -225,14 +229,24 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для измене
 
 		for($n = 1; $n <= $max; $n++) {
 			$sel = $selected == $n ? 'orange' : 'cancel';
-			$send .= '<button class="block-level-change vk small ml5 '.$sel.'">'.$n.'</button>';
+			$html .= '<button class="block-level-change vk small ml5 '.$sel.'">'.$n.'</button>';
 		}
+
+		//опделеление, есть ли элементы, у которых можно изменять ширину, чтобы выводить кнопку настройки
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `block_id` IN ("._idsGet($arr).")";
+		foreach(query_arr($sql) as $r)
+			if(_elemWidthChange($r)) {
+				$html .= '<button class="vk small grey ml30 elem-width-change">Настройка ширины элементов</button>';
+				break;
+			}
 	}
 
 	return
-	'<div id="block-level-'.$obj_name.'" class="dib">'.
-		'<button class="vk small grey block-grid-on" val="'.$obj_name.':'.$obj_id.':'.$width.'">Управление блоками</button>'.
-		$send.
+	'<div id="block-level-'.$obj_name.'" class="dib" val="'.$obj_name.':'.$obj_id.':'.$width.'">'.
+		'<button class="vk small grey block-grid-on">Управление блоками</button>'.
+		$html.
 	'</div>';
 }
 function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
@@ -246,6 +260,9 @@ function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
 }
 function _blockSetka($r, $level, $obj_name, $grid_id) {//отображение сетки для настраиваемого блока
 	if(!BLOCK_EDIT)
+		return '';
+	//включенное изменение ширины элемента отключает настройку блоков
+	if(ELEM_WIDTH_CHANGE)
 		return '';
 	if($r['id'] == $grid_id)
 		return '';

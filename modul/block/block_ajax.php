@@ -32,6 +32,23 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'block_elem_width_change'://включение/выключение изменения ширины элементов
+		if(!$obj_name = _blockObj($_POST['obj_name']))
+			jsonError('Несуществующее имя объекта');
+		if(!$obj_id = _num($_POST['obj_id']))
+			jsonError('Некорректный ID объекта');
+		if(!$width = _num($_POST['width']))
+			jsonError('Некорректная ширина');
+
+		$on = _num($_POST['on']);
+
+		define('ELEM_WIDTH_CHANGE', $on);
+
+		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
+		$send['block_arr'] = _blockJsArr($obj_name, $obj_id);
+
+		jsonSuccess($send);
+		break;
 	case 'block_grid_save'://сохранение данных блоков после редактирования
 		if(!$obj_name = _blockObj($_POST['obj_name']))
 			jsonError('Несуществующее имя объекта');

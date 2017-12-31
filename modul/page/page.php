@@ -243,11 +243,11 @@ function _elemDiv($el, $unit=array()) {//формирование div элемента
 	'</div>';
 
 }
-function _elemStyle($r) {//стили css для элемента
+function _elemStyle($el) {//стили css для элемента
 	$send = array();
 
 	//отступы
-	$ex = explode(' ', $r['mar']);
+	$ex = explode(' ', $el['mar']);
 	foreach($ex as $px)
 		if($px) {
 			$send[] = 'margin:'.
@@ -258,15 +258,29 @@ function _elemStyle($r) {//стили css для элемента
 			break;
 		}
 
+	//когда включена настройка ширины элементов,
+	//те элементы, которые могут настраиваться, остаются, остальные скрываются
+	if(ELEM_WIDTH_CHANGE && !_elemWidthChange($el))
+		$send[] = 'visibility:hidden';
+
 	if(!$send)
 		return '';
 
 	return ' style="'.implode(';', $send).'"';
 }
-function _elemUnit($el, $unit=array()) {//формирование элемента страницы
-	if(!$el)
-		return '';
+function _elemWidthChange($el) {//определение элементов, у которых может настраиваться ширина
+	switch($el['dialog_id']) {
+		case 2://кнопка
+			if($el['num_3'])//установлена максимальная ширина
+				return false;
+		case 5:
+		case 7:
+		case 8: return true;
+	}
 
+	return false;
+}
+function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 /*
 	Диалоговые окна по порядку:
 		1 - CMP: галочка
@@ -294,6 +308,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			return _check(array(
 				'attr_id' => $attr_id,
 				'light' => 1,
+				'title' => $el['txt_1'],
 				'value' => _num($v)
 			));
 		//textarea (многострочное текстовое поле)

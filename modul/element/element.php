@@ -153,6 +153,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 			$id = _num($r['id']);
 			$cmp[$id] = array(
 				'dialog_id' => _num($r['dialog_id']),
+				'require' => _num($r['require']),
 				'col' => $r['col'],
 				'attr_id' => '#cmp_'.$id
 			);

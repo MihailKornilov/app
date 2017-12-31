@@ -1476,7 +1476,9 @@ var VK_SCROLL = 0,
 					case 1: location.reload(); break;
 					case 2: location.href = URL + '&p=' + res.action_page_id + '&id=' + res.unit_id; break;
 					case 3://обновление содержимого блоков
-						$('#block-level-' + res.block_obj_name)
+						var bln = '#block-level-' + res.block_obj_name;
+						$(bln).after(res.level).remove();
+						$(bln)
 							.find('.block-grid-on')
 							.removeClass('grey')
 							.trigger('click');

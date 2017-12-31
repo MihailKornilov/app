@@ -514,6 +514,9 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 
 		$v = _txt($cmp[$cmp_id]);
 
+		if($dialog['cmp'][$cmp_id]['require'] && !$v)
+			jsonError('Требуется обязательно заполнить<br>поля, помеченные звёздочкой');
+
 		$cmpUpdate[] = "`".$col."`='".addslashes($v)."'";
 	}
 
@@ -599,9 +602,18 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
 
+
+	$send = array(
+		'unit_id' => $unit_id,
+		'action_id' => _num($dialog['action_id']),
+		'action_page_id' => _num($dialog['action_page_id']),
+		'block_obj_name' => '',
+		'level' => ''
+	);
+
+
 	//получение имени объекта, если действие производилось для блока
-	$block_obj_name = '';
-	if($dialog['base_table'] == '_element') {
+	if($dialog['action_id'] == 3 && $dialog['base_table'] == '_element') {
 		$sql = "SELECT `block_id`
 				FROM `_element`
 				WHERE `id`=".$unit_id;
@@ -612,15 +624,25 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 				WHERE `id`=".$block_id;
 		$block = query_assoc($sql);
 
-		$block_obj_name = $block['obj_name'];
+		$send['block_obj_name'] = $block['obj_name'];
+
+		switch($block['obj_name']) {
+			default:
+			case 'page': $width = 1000; break;
+			case 'spisok':
+				jsonError('Получение ширины для списка не доделано...');
+				$width = 0;
+				break;
+			case 'dialog':
+				$dlg = _dialogQuery($block['obj_id']);
+				$width = $dlg['width'];
+				break;
+		}
+		$send['level'] = utf8(_blockLevelChange($block['obj_name'], $block['obj_id'], $width));
 	}
 
-	return array(
-		'unit_id' => $unit_id,
-		'action_id' => _num($dialog['action_id']),
-		'action_page_id' => _num($dialog['action_page_id']),
-		'block_obj_name' => $block_obj_name
-	);
+
+	return $send;
 }
 
 /*
