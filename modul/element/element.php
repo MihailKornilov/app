@@ -1,5 +1,6 @@
 <?php
 function _button($v=array()) {//кнопка из контакта
+	$attr_id = empty($v['attr_id']) ? '' : ' id="'.$v['attr_id'].'"';
 	$name = empty($v['name']) ? 'Кнопка' : $v['name'];
 	$small = empty($v['small']) ? '' : ' small';
 	$color = empty($v['color']) ? '' : ' '.$v['color'];
@@ -8,7 +9,7 @@ function _button($v=array()) {//кнопка из контакта
 	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
 
 	return
-	'<button class="vk'.$color.$small.$cls.'"'.$click.$val.'>'.
+	'<button class="vk'.$color.$small.$cls.'"'.$attr_id.$click.$val.'>'.
 		$name.
 	'</button>';
 }
@@ -109,6 +110,7 @@ function _radioUnit($id, $title, $interval, $on) {
 }
 
 function _search($v=array()) {//элемент ПОИСК
+	$attr_id = empty($v['attr_id']) ? '' : ' id="'.$v['attr_id'].'"';
 	$v = array(
 		'id' => @$v['id'],
 		'width' => _num(@$v['width']) ? _num($v['width']) : 300,
@@ -116,7 +118,7 @@ function _search($v=array()) {//элемент ПОИСК
 		'v' => @$v['v']
 	);
 	return
-	'<div class="_search" style="width:'.$v['width'].'px">'.
+	'<div class="_search" style="width:'.$v['width'].'px"'.$attr_id.'>'.
 		'<div class="icon icon-del fr'._dn($v['v']).'"></div>'.
 		'<div class="_busy dib fr mr5 dn"></div>'.
 		'<div class="hold'._dn(!$v['v']).'">'.$v['hold'].'</div>'.

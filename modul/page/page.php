@@ -296,6 +296,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	//значение из списка
 	$v = $unit && $el['col'] ? $unit[$el['col']]: '';
 	$attr_id = 'cmp_'.$el['id'];
+	$disabled = ELEM_WIDTH_CHANGE ? ' disabled' : '';
 
 	switch($el['dialog_id']) {
 		//---=== КОМПОНЕНТ ДЛЯ ВНЕСЕНИЯ ДАННЫХ ===--- (используется $unit)
@@ -320,7 +321,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$width = $el['num_1'] ? ' style="width:'.$el['num_1'].'px"' : '';
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			return
-			'<textarea id="'.$attr_id.'"'.$width.$placeholder.'>'.
+			'<textarea id="'.$attr_id.'"'.$width.$placeholder.$disabled.'>'.
 				$v.
 			'</textarea>';
 		//input:text (однострочное текстовое поле)
@@ -331,7 +332,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			$width = $el['num_1'] ? ' style="width:'.$el['num_1'].'px"' : '';
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			return '<input type="text" id="'.$attr_id.'"'.$width.$placeholder.' value="'.$v.'" />';
+			return '<input type="text" id="'.$attr_id.'"'.$width.$placeholder.$disabled.' value="'.$v.'" />';
 
 
 
@@ -355,6 +356,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				327 => 'orange' //Оранжевый
 			);
 			return _button(array(
+						'attr_id' => $attr_id,
 						'name' => $el['txt_1'],
 						'color' => $color[$el['num_1']],
 						'small' => $el['num_2'],
@@ -365,6 +367,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 4: return '<div class="hd2">'.$el['txt_1'].'</div>'; //head
 		case 7://search
 			return _search(array(
+						'attr_id' => $attr_id,
 						'hold' => $el['txt_1'],
 						'width' => $el['num_2'],
 						'v' => $el['v']
