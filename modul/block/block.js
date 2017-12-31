@@ -479,16 +479,89 @@ $(document)
 				if(!on || !sp.width_change)
 					return;
 				$('#cmp_' + sp.elem_id).css('width', '100%');
-				$('#pe_' + sp.elem_id).css('width', sp.width ? sp.width + 'px' : '100%').resizable({
-					minWidth:sp.width_min,
-					maxWidth:1000,
-					grid:10,
-					handles:'e',
-					stop:function(event, ui) {}
-				});
+				$('#pe_' + sp.elem_id)
+					.css('width', sp.width ? sp.width + 'px' : 'auto')
+					.resizable({
+						minWidth:sp.width_min,
+						maxWidth:sp.width_max,
+						grid:10,
+						handles:'e',
+						start:function() {
+							$('._hint').remove();
+						},
+						stop:function(event, ui) {
+							var el = ui.originalElement,
+								p = el.parent(),
+								send = {
+									op:'block_elem_width_save',
+									elem_id:sp.elem_id,
+									width:ui.size.width
+								};
+							p._busy();
+							_post(send,
+								function() {
+									p._busy(0);
+									BLOCK_ARR[k].width = ui.size.width;
+								},
+								function() { p._busy(0); }
+							);
+						}
+					});
 			});
 		}, function() {
 			t._busy(0);
+		});
+	})
+	.on('mouseenter', '.bl-td .ui-resizable-e', function() {//подсказка с возможностью установить ширину 100% для элемента
+		var t = $(this),
+			div = t.parent(),
+			block = div.parent(),
+			block_id = _num(block.attr('id').split('_')[1]),
+			BL = BLOCK_ARR[block_id],
+			val = BL.width ? 0 : 1,
+			save = 0,
+			save_v;
+
+		if(div.hasClass('ui-resizable-resizing'))
+			return;
+
+		t._hint({
+			msg:'<input type="hidden" id="elem-width-max" value="' + val + '" />' +
+				'<div class="mt10 fs12 i color-555">' +
+					'При установке галочки <b class="i">размер элемента</b> ' +
+					'будет автоматически подстраиваться под <b class="i">размер блока</b>, в котором он находится.' +
+				'</div>',
+			width:280,
+			pad:10,
+			delayShow:700,
+			show:1,
+			func:function() {
+				$('#elem-width-max')._check({
+					title:'максимальная ширина',
+					func:function(v) {
+						save = 1;
+						save_v = v ? 0 : BL.width_max - 10;
+						BL.width = save_v;
+						div.width(v ? 'auto' : BL.width_max - 10);
+					}
+				});
+			},
+			funcBeforeHide:function() {
+				if(!save)
+					return false;
+
+				var elem_id = _num(div.attr('id').split('_')[1]),
+					send = {
+						op:'block_elem_width_save',
+						elem_id:elem_id,
+						width:save_v
+					};
+				block._busy();
+				_post(send,
+					function() { block._busy(0); },
+					function() { block._busy(0); }
+				);
+			}
 		});
 	})
 	.on('click', '.block-level-change', function() {//изменения уровня редактирования блоков

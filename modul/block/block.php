@@ -312,16 +312,12 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 		$v[] = 'child:'.$r['child_count'];
 
 		if($el = $r['elem']) {
-			if(!$size = _num($el['size']))
-				$size = 13;
 			$v[] = 'elem_id:'._num($el['id']);
 			$v[] = 'dialog_id:'._num($el['dialog_id']);
 			$v[] = 'fontAllow:'._elemFontAllow($el['dialog_id']);
-			$v[] = 'width:'._num($el['width']);
-			$v[] = 'width_change:'._elemWidth($el['dialog_id']);
 			$v[] = 'color:"'.$el['color'].'"';
 			$v[] = 'font:"'.$el['font'].'"';
-			$v[] = 'size:'.$size;
+			$v[] = 'size:'.($el['size'] ? _num($el['size']) : 13);
 			$v[] = 'mar:"'.$el['mar'].'"';
 
 			$v[] = 'num_1:'._num($el['num_1'], true);
@@ -351,17 +347,21 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 		);
 
 		if($el = $r['elem']) {
-			if(!$size = _num($el['size']))
-				$size = 13;
+			//определение максимальной ширины, на которую может растягиваться элемент
+			$ex = explode(' ', $el['mar']);
+			$width_max = $el['block']['width'] - $ex[1] - $ex[3];
+			$width_max = floor($width_max / 10) * 10;
+
 			$v['elem_id'] = _num($el['id']);
 			$v['dialog_id'] = _num($el['dialog_id']);
 			$v['fontAllow'] = _elemFontAllow($el['dialog_id']);
 			$v['width'] = _num($el['width']);
 			$v['width_change'] = _elemWidth($el['dialog_id']);
 			$v['width_min'] = _elemWidth($el['dialog_id'], 'min');
+			$v['width_max'] = $width_max;
 			$v['color'] = $el['color'];
 			$v['font'] = $el['font'];
-			$v['size'] = $size;
+			$v['size'] = $el['size'] ? _num($el['size']) : 13;
 			$v['mar'] = $el['mar'];
 
 			$v['num_1'] = _num($el['num_1'], true);

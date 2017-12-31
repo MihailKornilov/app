@@ -50,6 +50,29 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'block_elem_width_save'://включение/выключение изменения ширины элементов
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента');
+
+		$width = _num($_POST['width']);
+
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id`=".$elem_id;
+		if(!$elem = query_assoc($sql))
+			jsonError('Элемента не существует');
+
+		if(!_elemWidth($elem['dialog_id']))
+			jsonError('У этого элемента не может настраиваться ширина');
+
+		$sql = "UPDATE `_element`
+				SET `width`=".$width."
+				WHERE `id`=".$elem_id;
+		query($sql);
+
+		jsonSuccess();
+		break;
+
 	case 'block_grid_save'://сохранение данных блоков после редактирования
 		if(!$obj_name = _blockObj($_POST['obj_name']))
 			jsonError('Несуществующее имя объекта');
