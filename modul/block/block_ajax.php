@@ -72,7 +72,6 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-
 	case 'block_grid_save'://сохранение данных блоков после редактирования
 		if(!$obj_name = _blockObj($_POST['obj_name']))
 			jsonError('Несуществующее имя объекта');
@@ -226,6 +225,7 @@ switch(@$_POST['op']) {
 		if(!$id = _num($_POST['id']))
 			jsonError('Некорректный ID блока');
 
+		$sa = _num($_POST['sa']);
 		$pos = _txt($_POST['pos']);
 		$bg = _txt($_POST['bg']);
 		//границы
@@ -244,7 +244,8 @@ switch(@$_POST['op']) {
 
 		//изменение стилей
 		$sql = "UPDATE `_block`
-				SET `pos`='".$pos."',
+				SET `sa`='".$sa."',
+					`pos`='".$pos."',
 					`bg`='".$bg."',
 					`bor`='".$bor."'
 				WHERE `id`=".$id;

@@ -22,6 +22,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					_blockUnitBor(BL) +
 					_blockUnitBut(BL) +
 				'</div>' +
+				_blockUnitSa(BL) +
 				_elemUnit(BL),
 			width:240,
 			objPos:'mouse',
@@ -53,6 +54,13 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					tooltip:'слева',
 					func:function(v) {
 						obj.css('border-left', v ? '#DEE3EF solid 1px' : '');
+						BL.save = 1;
+					}
+				});
+				$('#block-sa-view')._check({
+					title:'блок виден только для SA',
+					func:function(v) {
+						BL.sa = v;
 						BL.save = 1;
 					}
 				});
@@ -170,6 +178,14 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor2" value="' + bor[2] + '"></div>' +
 			'</table>';
 	},
+	_blockUnitSa = function(BL) {//настройка блока для SA
+		if(!SA)
+			return '';
+
+		return '<div class="bg-ffc pad10 line-b line-t">' +
+					'<input type="hidden" id="block-sa-view" value="' + BL.sa + '" />' +
+				'</div>';
+	},
 	_blockUnitBut = function(BL) {//кнопки
 		if(BL.elem_id)
 			return '';
@@ -193,12 +209,13 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'<p class="mt10">---' +
 
 					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:10,block_id:' + BL.id + '">Произвольный текст</button>' +
+					'<p class="mt10"><button class="vk green dialog-open" val="dialog_id:2,block_id:' + BL.id + '">Кнопка</button>' +
+					'<p class="mt10">---' +
 
 					'<p class="mt10"><button class="vk" val="3">Меню</button>' +
 					'<p class="mt10"><button class="vk" val="4">Заголовок</button>' +
 					'<p class="mt10"><button class="vk" val="7">Поиск</button>' +
 					'<p class="mt10"><button class="vk" val="11">Данные объекта</button>' +
-					'<p class="mt10"><button class="vk green" val="2">Кнопка</button>' +
 					'<p class="mt10"><button class="vk" val="9">Ссылка</button>' +
 					'<p class="mt10"><button class="vk" val="15">Список: количество строк</button>' +
 					'<p class="mt10"><button class="vk" val="14">Список: содержание</button>' +

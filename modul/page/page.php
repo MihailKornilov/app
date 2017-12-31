@@ -87,6 +87,7 @@ function _pageCache() {//получение массива страниц из кеша
 				1 `del_access`
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_ID.")
+			  AND `sa` IN (0,".SA.")
 			ORDER BY `sort`";
 	if(!$page = query_arr($sql))
 		return array();
@@ -106,7 +107,7 @@ function _pageCache() {//получение массива страниц из кеша
 				`page_id`,
 				COUNT(*) `c`
 			FROM `_element`
-			WHERE `page_id` IN ("._idsGet($page).")
+			WHERE `block_id` IN ("._idsGet($block).")
 			GROUP BY `page_id`";
 	$elem = query_ass($sql);
 

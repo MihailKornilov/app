@@ -515,7 +515,7 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 		$v = _txt($cmp[$cmp_id]);
 
 		if($dialog['cmp'][$cmp_id]['require'] && !$v)
-			jsonError('Требуется обязательно заполнить<br>поля, помеченные звёздочкой');
+			jsonError('Требуется обязательно заполнить<br>поля, отмеченные звёздочкой');
 
 		$cmpUpdate[] = "`".$col."`='".addslashes($v)."'";
 	}

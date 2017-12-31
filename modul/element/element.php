@@ -145,22 +145,24 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `obj_name`='dialog'
-			  AND `obj_id`=".$dialog_id;
-	if($block_ids = query_ids($sql)) {
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `block_id` IN (".$block_ids.")
-				  AND LENGTH(`col`)";
-		foreach(query_arr($sql) as $r) {
-			$id = _num($r['id']);
-			$cmp[$id] = array(
-				'dialog_id' => _num($r['dialog_id']),
-				'require' => _num($r['require']),
-				'col' => $r['col'],
-				'attr_id' => '#cmp_'.$id
-			);
+			  AND `obj_id`=".$dialog_id."
+			  AND `sa` IN (0,".SA.")";
+	if($block = query_arr($sql))
+		if($block = _blockChildClear($block)) {
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `block_id` IN ("._idsGet($block).")
+					  AND LENGTH(`col`)";
+			foreach(query_arr($sql) as $r) {
+				$id = _num($r['id']);
+				$cmp[$id] = array(
+					'dialog_id' => _num($r['dialog_id']),
+					'require' => _num($r['require']),
+					'col' => $r['col'],
+					'attr_id' => '#cmp_'.$id
+				);
+			}
 		}
-	}
 
 
 	$sql = "SELECT *

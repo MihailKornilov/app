@@ -564,9 +564,10 @@ td.bottom{vertical-align:bottom}
 .over5:hover{background-color:#E8ECF0}/* серо-синий */
 
 /* Ћинии */
-.line-b{border-bottom:#DEE3EF solid 1px}
-.line-b1{border-bottom:#EFF2F5 solid 1px}/* светла€ нижн€€ лини€ */
+.line-t{border-top:#DEE3EF solid 1px}    /* насыщенна€ верхн€€ лини€ */
+.line-b{border-bottom:#DEE3EF solid 1px} /* насыщенна€ нижн€€ лини€ */
 .line-t1{border-top:#EFF2F5 solid 1px}   /* светла€ верхн€€ лини€ */
+.line-b1{border-bottom:#EFF2F5 solid 1px}/* светла€ нижн€€ лини€ */
 .line-r{border-right:#DEE3EF solid 1px}
 
 /* ѕодсветка найденной подстроки */

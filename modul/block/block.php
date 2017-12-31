@@ -1,4 +1,29 @@
 <?php
+function _blockChildClear($arr) {//изъятие дочерних блоков, если отсутствует родитель
+	$idsForDel = array();
+	foreach($arr as $id => $r) {
+		if(!$parent_id = $r['parent_id'])
+			continue;
+		$ids = array();
+		$ids[$id] = $id;
+		$DEL_FLAG = true;
+		while(true) {
+			if(!$p = @$arr[$parent_id])
+				break;
+			$ids[$p['id']] = $p['id'];
+			if(!$parent_id = $p['parent_id']) {
+				$DEL_FLAG = false;
+				break;
+			}
+		}
+		if($DEL_FLAG)
+			$idsForDel += $ids;
+	}
+	foreach($idsForDel as $id)
+		unset($arr[$id]);
+
+	return $arr;
+}
 function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры блоков с элементами для конкретной страницы
 	/*
 		$return:
@@ -11,9 +36,12 @@ function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры б
 			FROM `_block`
 			WHERE `obj_name`='".$obj_name."'
 			  AND `obj_id`=".$obj_id."
+			  AND `sa` IN (0,".SA.")
 			ORDER BY `parent_id`,`y`,`x`";
 	if(!$arr = query_arr($sql))
 		return array();
+
+	$arr = _blockChildClear($arr);
 
 	//расстановка элементов в блоки
 	$sql = "SELECT *
@@ -304,6 +332,7 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 	foreach($arr as $id => $r) {
 		$v = array();
 		$v[] = 'id:'.$id;
+		$v[] = 'sa:"'.$r['sa'].'"';
 		$v[] = 'pos:"'.$r['pos'].'"';
 		$v[] = 'bg:"'.$r['bg'].'"';
 		$v[] = 'bor:"'.$r['bor'].'"';
@@ -338,6 +367,7 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 	foreach($arr as $id => $r) {
 		$v = array(
 			'id' => _num($id),
+			'sa' => _num($r['sa']),
 			'pos' => $r['pos'],
 			'bg' => $r['bg'],
 			'bor' => $r['bor'],
