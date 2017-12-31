@@ -272,13 +272,13 @@ function _elemWidthChange($el) {//определение элементов, у которых может настраи
 	switch($el['dialog_id']) {
 		case 2://кнопка
 			if($el['num_3'])//установлена максимальная ширина
-				return false;
+				return 0;
 		case 5:
 		case 7:
-		case 8: return true;
+		case 8: return 1;
 	}
 
-	return false;
+	return 0;
 }
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 /*

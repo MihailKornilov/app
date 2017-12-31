@@ -43,6 +43,9 @@ switch(@$_POST['op']) {
 		$on = _num($_POST['on']);
 
 		define('ELEM_WIDTH_CHANGE', $on);
+		define('BLOCK_EDIT', !$on);
+
+
 
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
 		$send['block_arr'] = _blockJsArr($obj_name, $obj_id);

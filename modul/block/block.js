@@ -474,8 +474,18 @@ $(document)
 			p.find('.block-level-change').css('visibility', on ? 'hidden' : 'visible');
 
 			$('.block-content-' + spl[0]).html(res.html);
-			for(var k in res.block_arr)
-				BLOCK_ARR[k] = res.block_arr[k];
+			_forIn(res.block_arr, function(sp, k) {
+				BLOCK_ARR[k] = sp;
+				if(!sp.widthChange)
+					return;
+				$('#cmp_' + sp.elem_id).resizable({
+					minWidth:50,
+					maxWidth:350,
+					grid:10,
+					handles:'e',
+					stop:function(event, ui) {}
+				});
+			});
 		}, function() {
 			t._busy(0);
 		});
