@@ -27,7 +27,11 @@ input::-webkit-input-placeholder{color:#bbb}
 input::-moz-placeholder{color:#999}
 input.err{background:#fff2f2}
 
-textarea{resize:none;height:44px}
+textarea{
+	resize:none;
+	height:46px;
+	vertical-align:top;/* исключение непонятного отступа снизу */
+}
 textarea::-webkit-input-placeholder{color:#bbb}
 textarea::-moz-placeholder{color:#999}
 textarea.min{height:29px}

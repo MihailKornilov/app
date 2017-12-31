@@ -606,9 +606,9 @@ function _page_div() {//todo тест
 	'<br>'.
 	'<br>'.
 	'<br>'.
-	'<input type="text" />'.
-	'<br>'.
-	'<textarea class="mt5 w200"></textarea>'.
+	'<div class="bg-ffc"><textarea class="w200"></textarea></div>'.
+	'<div><input type="text" /></div>'.
+
 	'<div class="mar20 bg-ccd">'.
 		'<div class="icon icon-edit wh"></div>'.
 		'<div class="icon icon-del wh"></div>'.
