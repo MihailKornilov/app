@@ -1414,8 +1414,8 @@ var VK_SCROLL = 0,
 	_dialogOpen = function(o) {//открытие диалогового окна
 		var dialog = _dialog({
 			dialog_id:o.dialog_id,
-			unit_id:o.unit_id,    //для передачи значений, если будет требоваться редактирование диалога
-			block_id:o.block_id,  //также для передачи
+			block_id:o.block_id,  //для передачи значений, если будет требоваться редактирование диалога
+			unit_id:o.unit_id,    //также для передачи
 
 			top:20,
 			width:o.width,
@@ -1429,6 +1429,9 @@ var VK_SCROLL = 0,
 			submit:submit
 		});
 
+		//если удаление единицы списка, то кнопка красная
+		if(o.to_del)
+			dialog.bottom.find('.submit').addClass('red');
 
 		//применение функций к компонентам
 		for(var k in o.cmp) {
@@ -1447,13 +1450,19 @@ var VK_SCROLL = 0,
 
 		function submit() {
 			var send = {
-				op:'spisok_' + (o.unit_id ? 'edit' : 'add'),
+				op:'spisok_add',
 				page_id:PAGE_ID,
 				dialog_id:o.dialog_id,
-				unit_id:o.unit_id,
 				block_id:o.block_id,
+				unit_id:o.unit_id,
 				cmp:{}
 			};
+
+			if(o.unit_id) {
+				send.op = 'spisok_edit';
+				if(o.to_del)
+					send.op = 'spisok_del';
+			}
 
 			//получение значений компонентов
 			_forIn(o.cmp, function(sp, id) {

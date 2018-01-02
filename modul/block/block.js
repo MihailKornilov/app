@@ -77,7 +77,6 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 							return _blockSpisokUnitElAdd(BL);
 						_dialogOpen(BL.dialog_id, BL.elem_id);
 					});
-*/
 					$('#elem-del').click(function() {
 						$('._hint').remove();
 						var func = BL.obj_name != 'spisok' ? false : function() {
@@ -85,6 +84,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						};
 						_dialogOpen(6, BL.elem_id, 0, func);
 					});
+*/
+
 					var tMar = {
 						0:'сверху',
 						1:'справа',
@@ -202,24 +203,44 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 			return _blockSpisokUnitElAdd(BL);
 
 		var html =
-				'<div class="center pad20">' +
-					'<p class="mt10"><button class="vk dialog-open" val="dialog_id:1,block_id:' + BL.id + '">Элемент: галочка</button>' +
-					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:8,block_id:' + BL.id + '">Элемент: input:text</button>' +
-					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:5,block_id:' + BL.id + '">Элемент: textarea</button>' +
-					'<p class="mt10">---' +
+				'<div class="center">' +
+					'<p class="mt10 fs17">Компоненты для внесения данных:' +
+					'<p class="mt10">' +
+						'<button class="vk grey dialog-open" val="dialog_id:8,block_id:' + BL.id + '">Однострочное поле</button>' +
+						'<button class="vk grey dialog-open ml10" val="dialog_id:5,block_id:' + BL.id + '">Многострочное поле</button>' +
+					'<p class="mt10">' +
+						'<button class="vk dialog-open" val="dialog_id:1,block_id:' + BL.id + '">Галочка</button>' +
+						'<button class="vk dialog-open ml10" val="dialog_id:16,block_id:' + BL.id + '">Radio</button>' +
+						'<button class="vk dialog-open ml10" val="dialog_id:17,block_id:' + BL.id + '">Select</button>' +
+						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Календарь</button>' +
 
-					'<p class="mt10"><button class="vk grey dialog-open" val="dialog_id:10,block_id:' + BL.id + '">Произвольный текст</button>' +
-					'<p class="mt10"><button class="vk green dialog-open" val="dialog_id:2,block_id:' + BL.id + '">Кнопка</button>' +
-					'<p class="mt10">---' +
+					'<p class="mt30 fs17">Вспомогательные компоненты:' +
+					'<p class="mt10">' +
+						'<button class="vk orange dialog-open" val="dialog_id:19,block_id:' + BL.id + '">Содержание для некоторых компонентов</button>' +
 
-					'<p class="mt10"><button class="vk" val="3">Меню</button>' +
-					'<p class="mt10"><button class="vk" val="4">Заголовок</button>' +
-					'<p class="mt10"><button class="vk" val="7">Поиск</button>' +
-					'<p class="mt10"><button class="vk" val="11">Данные объекта</button>' +
-					'<p class="mt10"><button class="vk" val="9">Ссылка</button>' +
-					'<p class="mt10"><button class="vk" val="15">Список: количество строк</button>' +
-					'<p class="mt10"><button class="vk" val="14">Список: содержание</button>' +
-			  (SA ? '<p class="mt10"><button class="vk red" val="12">SA: из функции</button>' : '') +
+					'<p class="mt30 fs17">Элементы для наполнения содержания:' +
+					'<p class="mt10">' +
+						'<button val="dialog_id:3,block_id:' + BL.id + '" class="vk dialog-open">Меню</button>' +
+						'<button val="dialog_id:10,block_id:' + BL.id + '" class="vk grey dialog-open ml10">Произвольный текст</button>' +
+						'<button val="dialog_id:2,block_id:' + BL.id + '" class="vk green dialog-open ml10">Кнопка</button>' +
+					'<p class="mt10">' +
+						'<button val="dialog_id:4,block_id:' + BL.id + '" class="vk dialog-open">Заголовок</button>' +
+						'<button val="dialog_id:21,block_id:' + BL.id + '" class="vk dialog-open ml10">Информация</button>' +
+						'<button val="dialog_id:9,block_id:' + BL.id + '" class="vk dialog-open ml10">Ссылка</button>' +
+						'<button val="dialog_id:7,block_id:' + BL.id + '" class="vk dialog-open ml10">Поиск</button>' +
+
+					'<p class="mt30 fs17">Элементы для списков:' +
+					'<p class="mt10">' +
+						'<button val="dialog_id:15,block_id:' + BL.id + '" class="vk dialog-open">Количество строк</button>' +
+						'<button val="dialog_id:14,block_id:' + BL.id + '" class="vk dialog-open ml10">Содержание</button>' +
+						'<button val="dialog_id:22,block_id:' + BL.id + '" class="vk dialog-open orange ml10">Связка</button>' +
+					'<p class="mt10">' +
+						'<button val="dialog_id:11,block_id:' + BL.id + '" class="vk dialog-open">Данные единицы списка</button>' +
+
+			  (SA ? '<p class="mt30">' +
+						'<button val="dialog_id:12,block_id:' + BL.id + '" class="vk dialog-open red">SA: функция</button>'
+			  : '') +
+
 				'</div>',
 			dialog = _dialog({
 				width:450,
@@ -281,8 +302,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				'<div class="hd2 ">' +
 					'Настройки элемента' +
 					'<div class="fr">' +
-						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + '" class="icon icon-edit dialog-open mr3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
-						'<div id="elem-del" class="icon icon-del-red' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
+						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + '" class="icon icon-edit mr3 dialog-open' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
+						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + ',to_del:1" class="icon icon-del-red dialog-open' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 					'</div>' +
 				'</div>' +
 

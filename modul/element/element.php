@@ -46,13 +46,11 @@ function _iconDel($v=array()) {//иконка удаления записи в таблице
 	if(empty($v['del']) && !empty($v['dtime_add']) && TODAY != substr($v['dtime_add'], 0, 10))
 		return '';
 
-	$v = array(
-		'id' => _num(@$v['id']) ? 'val="'.$v['id'].'" ' : '',//id записи
-		'class' => !empty($v['class']) ? ' '.$v['class'] : '',//дополнительный класс
-		'onclick' => !empty($v['onclick']) ? ' onclick="'.$v['onclick'].'"' : '' //скрипт по нажатию
-	);
+	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
+	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
+	$cls = empty($v['class']) ? '' : ' '.$v['class'];
 
-	return '<div '.$v['id'].$v['onclick'].' class="icon icon-del'.$v['class']._tooltip('Удалить', -42, 'r').'</div>';
+	return '<div'.$click.$val.' class="icon icon-del'.$cls._tooltip('Удалить', -42, 'r').'</div>';
 }
 
 
@@ -379,6 +377,7 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
 		5 => 'Radio',
 		6 => 'Календарь',
 		7 => 'Информация',
+
 		8 => 'Связка',
 		9 => 'Заголовок'
 	);

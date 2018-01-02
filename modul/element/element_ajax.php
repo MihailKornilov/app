@@ -361,6 +361,21 @@ function _dialogOpenLoad($dialog_id) {
 		$unit[$id] = utf8($r);
 	$send['unit'] = $unit;
 
+	//если производится удаление единицы списка
+	if($send['to_del'] = _num(@$_POST['to_del'])) {
+		if(!$unit_id)
+			jsonError('Отсутствует единица списка для удаления');
+
+		$html =
+			'<div class="pad20">'.
+				'<div class="_info b">Подтвердите удаление записи.</div>'.
+			'</div>';
+
+		$send['head'] = utf8('Удаление записи');
+		$send['html'] = utf8($html);
+		$send['button_submit'] = utf8('Удалить');
+	}
+
 	return $send;
 }
 

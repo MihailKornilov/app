@@ -4,7 +4,7 @@ switch(@$_POST['op']) {
 		$send = _spisokUnitUpdate();
 		jsonSuccess($send);
 		break;
-	case 'spisok_edit'://сохранение данных записи дл€ диалога
+	case 'spisok_edit'://сохранение данных единицы списка дл€ диалога
 		if(!$unit_id = _num($_POST['unit_id']))
 			jsonError('Ќекорректный id единицы списка');
 
@@ -12,23 +12,20 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_del'://удаление записи из _spisok
-		if(!$id = _num($_POST['id']))
-			jsonError('Ќекорректный идентификатор');
+	case 'spisok_del'://удаление единицы списка
+		if(!$unit_id = _num($_POST['unit_id']))
+			jsonError('Ќекорректный id единицы списка');
 
-		$sql = "SELECT *
-				FROM `_spisok`
-				WHERE `app_id`=".APP_ID."
-				  AND `id`=".$id;
-		if(!$r = query_assoc($sql))
-			jsonError('«аписи не существует');
+		$dialog = _spisokUnitDialog($unit_id);
 
-		if($r['deleted'])
-			jsonError('«апись уже была удалена');
-
-		$sql = "UPDATE `_spisok`
-				SET `deleted`=1
-				WHERE `id`=".$id;
+		if(isset($dialog['field']['deleted']))
+			$sql = "UPDATE `".$dialog['base_table']."`
+					SET `deleted`=1,
+						`viewer_id_del`=".VIEWER_ID.",
+						`dtime_del`=CURRENT_TIMESTAMP
+					WHERE `id`=".$unit_id;
+		else
+			$sql = "DELETE FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
 		query($sql);
 
 		jsonSuccess();
@@ -468,17 +465,13 @@ switch(@$_POST['op']) {
 		break;
 }
 
-function _spisokUnitUpdate() {//внесение/редактирование единицы списка
+function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличи€ единицы списка
 	if(!$dialog_id = _num($_POST['dialog_id']))
 		jsonError('Ќекорректный ID диалогового окна');
 	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('ƒиалога не существует');
 	if($dialog['sa'] && !SA)
 		jsonError('Ќет доступа');
-
-	$page_id = _num($_POST['page_id']);
-	$unit_id = _num($_POST['unit_id']);
-	$block_id = _num($_POST['block_id']);
 
 	//проверка наличи€ таблицы дл€ внесени€ данных
 	$sql = "SHOW TABLES LIKE '".$dialog['base_table']."'";
@@ -496,6 +489,15 @@ function _spisokUnitUpdate() {//внесение/редактирование единицы списка
 		if(@$r['deleted'])
 			jsonError('«апись была удалена');
 	}
+
+	return $dialog;
+}
+function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
+	$dialog = _spisokUnitDialog($unit_id);
+	$dialog_id = $dialog['id'];
+
+	$page_id = _num($_POST['page_id']);
+	$block_id = _num($_POST['block_id']);
 
 	//данные компонентов диалога
 	if(!$cmp = @$_POST['cmp'])

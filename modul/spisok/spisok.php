@@ -176,8 +176,12 @@ function _spisokShow($pe, $next=0) {//список, выводимый на странице
 							case -3://иконки управления
 								$html .= '<td class="pad0 w15 wsnw">'.
 											_iconEdit(array(
-												'class' => 'dialog-open ml5 mr5',
+												'class' => 'dialog-open ml3',
 												'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id']
+											)).
+											_iconDel(array(
+												'class' => 'dialog-open mr3',
+												'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id'].',to_del:1'
 											));
 								break;
 							default:
