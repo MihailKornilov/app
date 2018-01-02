@@ -59,16 +59,16 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 	$attr_id = empty($v['attr_id']) ? 'check'.rand(1, 10000) : $v['attr_id'];
 
 	$cls = '_check ';
-	$cls .= empty($v['block']) ? '' : ' block';      //display:block, иначе inline-block
+	$cls .= empty($v['block']) ?    '' : ' block';      //display:block, иначе inline-block
 	$cls .= empty($v['disabled']) ? '' : ' disabled';//неактивное состояние
-	$cls .= empty($v['light']) ? '' : ' light';      //если галочка не стоит, текст бледный
-	$cls .= empty($v['class']) ? '' : ' '.$v['class'];//дополнительные классы
+	$cls .= empty($v['light']) ?    '' : ' light';      //если галочка не стоит, текст бледный
+	$cls .= empty($v['class']) ?    '' : ' '.$v['class'];//дополнительные классы
 
 	$val = _bool(@$v['value']);
 	$cls .= $val ? ' on' : '';      //галочка поставлена или нет
 
-	$title = empty($v['title']) ? '' : $v['title'];
-	$cls .= $title ? ' title' : ''; //отступ от галочки, если есть текст
+	$title = empty($v['title']) ? '&nbsp;' : $v['title'];
+	$cls .= empty($v['title']) ? '' : ' title'; //отступ от галочки, если есть текст
 
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$val.'" />'.
@@ -77,32 +77,43 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 	'</div>';
 }
 function _radio($v=array()) {//элемент RADIO
-	$attr_id = @$v['attr_id'] ? ' id="'.$v['attr_id'].'_radio"' : '';
+	$attr_id = empty($v['attr_id']) ? 'radio'.rand(1, 10000) : $v['attr_id'];
 	$title0 = @$v['title0'];
-	$spisok = @$v['spisok'] ? $v['spisok'] : array();
+	$spisok = @$v['spisok'] ? $v['spisok'] : array();//содержание в виде id => title
 	$value = _num(@$v['value']);
 	$dis = _num(@$v['disabled']) ? ' disabled' : '';
 	$light = _num(@$v['light']) ? ' light' : '';
 	$block = _bool(@$v['block']) ? ' block' : '';
 	$interval = _num(@$v['interval']) ? _num(@$v['interval']) : 7;
 
-	$html = '';
-	if($title0)
-		$html = _radioUnit(0, $title0, $interval, $value == 0);
-	if(is_array($spisok))
-		foreach($spisok as $id => $title)
-			$html .= _radioUnit($id, $title, $interval, $value == $id);
+	//если список пуст и только нулевое значение, отступ снизу не делается
+	$int = empty($spisok) ? 0 : $interval;
+	$html = _radioUnit(0, $title0, $int, $value == 0);
+
+	if(is_array($spisok) && !empty($spisok)) {
+		end($spisok);
+		$idEnd = key($spisok);
+		foreach($spisok as $id => $title) {
+			//отступ снизу после последнего значения не делается
+			$int = $idEnd == $id ? 0 : $interval;
+			$html .= _radioUnit($id, $title, $int, $value == $id);
+		}
+	}
 
 	return
-	'<input type="hidden" id="" value="'.$value.'" />'.
-	'<div class="_radio php'.$block.$dis.$light.'"'.$attr_id.'>'.
+	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
+	'<div id="'.$attr_id.'_radio" class="_radio php'.$block.$dis.$light.'">'.
 		$html.
 	'</div>';
 }
 function _radioUnit($id, $title, $interval, $on) {
+	if(empty($title))
+		return '';
+
 	$on = $on ? ' class="on"' : '';
+	$interval = $interval ? ' style="margin-bottom:'.$interval.'px"' : '';
 	return
-	'<div'.$on.' val="'.$id.'" style="margin-bottom:'.$interval.'px">'.
+	'<div'.$on.' val="'.$id.'"'.$interval.'>'.
 		$title.
 	'</div>';
 }

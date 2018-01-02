@@ -1276,7 +1276,7 @@ var VK_SCROLL = 0,
 					$(sp.attr_id).autosize();
 					return;
 				case 19://наполнение для некоторых компонентов
-					_dialogCmpValue(sp);
+					_dialogCmpValue(sp, o.unit[sp.col]);
 					return;
 			}
 		});
@@ -1326,7 +1326,7 @@ var VK_SCROLL = 0,
 			});
 */
 			dialog.post(send, function(res) {
-				return;
+//				return;
 				switch(res.action_id) {
 					case 1: location.reload(); break;
 					case 2: location.href = URL + '&p=' + res.action_page_id + '&id=' + res.unit_id; break;
@@ -1388,11 +1388,11 @@ var VK_SCROLL = 0,
 			sf[id] = join ? v.join(',') : v;
 		}
 	},
-	_dialogCmpValue = function(o, i) {//наполнение для некоторых компонентов
+	_dialogCmpValue = function(o, val) {//наполнение для некоторых компонентов
 		var el = $(o.attr_pe);
 
 		//получение данных для сохранения
-		if(i == 'get') {
+		if(val == 'get') {
 			var send = [];
 			_forEq(el.find('dd'), function(sp) {
 				send.push({
@@ -1411,6 +1411,9 @@ var VK_SCROLL = 0,
 			NUM = 1;
 
 		BUT_ADD.click(valueAdd);
+
+		for(var i in val)
+			valueAdd(val[i])
 
 		function valueAdd(v) {
 				v = $.extend({

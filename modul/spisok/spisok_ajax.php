@@ -619,7 +619,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	foreach($postCmp as $cmp_id => $val) {
 		$cmp = @$dialog['cmp'][$cmp_id];
 		if($cmp['dialog_id'] == 19) {//наполнение для некоторых компонентов: radio, select, dropdown
-			_dialogCmpValue($val, 'save', $dialog_id, $cmp_id);
+			_dialogCmpValue($val, 'save', $dialog_id, $unit_id);
 			continue;
 		}
 	}

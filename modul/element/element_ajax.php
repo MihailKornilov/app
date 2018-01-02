@@ -359,6 +359,30 @@ function _dialogOpenLoad($dialog_id) {
 
 	foreach($unit as $id => $r)
 		$unit[$id] = utf8($r);
+
+	//вставка наполнения для некоторых компонентов
+	foreach($dialog['cmp'] as $cmp)
+		switch($cmp['dialog_id']) {
+			case 19:
+				if(!$col = $cmp['col'])
+					break;
+				$unit[$col] = array();
+				if($unit_id) {
+					$sql = "SELECT *
+							FROM `_element_value`
+							WHERE `dialog_id`=".$dialog_id."
+							  AND `element_id`=".$unit_id."
+							ORDER BY `sort`";
+					foreach(query_arr($sql) as $id => $r)
+						$unit[$col][] = array(
+							'id' => _num($id),
+							'title' => utf8($r['title']),
+							'def' => _num($r['def'])
+						);
+				}
+		}
+
+
 	$send['unit'] = $unit;
 
 	//если производится удаление единицы списка

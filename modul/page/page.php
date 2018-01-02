@@ -362,6 +362,32 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			return '<input type="text" id="'.$attr_id.'"'.$width.$placeholder.$disabled.' value="'.$v.'" />';
 
+		//Radio
+		case 16:
+			/*
+				txt_1 - текст нулевого значени€
+				v - наполнение из таблицы _element_value через dialog:19
+			*/
+			$value = _num($v);
+			$spisok = array();
+			$sql = "SELECT *
+					FROM `_element_value`
+					WHERE `dialog_id`=".$el['dialog_id']."
+					  AND `element_id`=".$el['id']."
+					ORDER BY `sort`";
+			foreach(query_arr($sql) as $id => $r) {
+				$spisok[$id] = $r['title'];
+				if(!$value && $r['def'])
+					$value = $r['id'];
+			}
+			return _radio(array(
+				'attr_id' => $attr_id,
+				'light' => 1,
+				'interval' => 5,
+				'value' => $value,
+				'title0' => $el['txt_1'],
+				'spisok' => $spisok
+			));
 
 
 
@@ -369,12 +395,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 
 		//---=== ЁЋ≈ћ≈Ќ“џ ƒЋя ќ“ќЅ–ј∆≈Ќ»я ===---
-		case 2://button
+		//button
+		case 2:
 			/*
 				txt_1 - текст кнопки
 				num_1 - цвет
 				num_2 - маленька€ кнопка
-				num_3 - максимальна€ ширина
 				num_4 - dialog_id, который назначен на эту кнопку
 			*/
 			$color = array(
@@ -448,7 +474,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return 'фукнции не существует';
 			return $el['txt_1']();
 
-		case 14: return _spisokShow($el); //содержание списка
+		case 14: return _spisokShow($el);     //содержание списка
 		case 15: return _spisokElemCount($el);//текст с количеством строк списка
 
 		//наполнение дл€ некоторых компонентов: radio, select, dropdown

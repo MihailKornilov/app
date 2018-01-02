@@ -151,7 +151,6 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	$BB = BLOCK_EDIT ? ' bor-b-dash' : '';
 	$br1px = BLOCK_EDIT ? 1 : 0;
 
-
 	foreach($block as $y => $str) {
 		$widthMax = $WM;
 		$r = $str[0];
