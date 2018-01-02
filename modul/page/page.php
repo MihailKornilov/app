@@ -450,6 +450,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		case 14: return _spisokShow($el); //содержание списка
 		case 15: return _spisokElemCount($el);//текст с количеством строк списка
+
+		//наполнение для некоторых компонентов: radio, select, dropdown
+		case 19: return '<div class="_empty min">Наполнение компонента</div>'; //все действия через JS
 	}
 
 	//элементы списка шаблона (для настройки)

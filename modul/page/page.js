@@ -7,7 +7,7 @@ var _pageShow = function() {//выполнение после вывода страницы
 					var obj = $('#' + attr_id),
 						send = {
 							op:'spisok_search',
-							element_id:sp.parent().attr('id').split('_')[1],
+							elem_id:sp.parent().attr('id').split('_')[1],
 							v:v
 						};
 

@@ -8,7 +8,7 @@ switch(@$_POST['op']) {
 		if(!$unit_id = _num($_POST['unit_id']))
 			jsonError('Некорректный id единицы списка');
 
-		$send = _spisokUnitUpdate();
+		$send = _spisokUnitUpdate($unit_id);
 
 		jsonSuccess($send);
 		break;
@@ -57,7 +57,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 	case 'spisok_search'://получение обновлённого списка по условиям
-		if(!$element_id = _num($_POST['element_id']))
+		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Некорректный ID элемента станицы');
 
 		$v = _txt($_POST['v']);
@@ -65,14 +65,14 @@ switch(@$_POST['op']) {
 		//получение данных элемента поиска
 		$sql = "SELECT *
 				FROM `_element`
-				WHERE `id`=".$element_id;
+				WHERE `id`=".$elem_id;
 		if(!$pe = query_assoc($sql))
-			jsonError('Элемента id'.$element_id.' не существует');
+			jsonError('Элемента id'.$elem_id.' не существует');
 
 		//сохранение строки поиска
 		$sql = "UPDATE `_element`
 				SET `v`='".addslashes($v)."'
-				WHERE `id`=".$element_id;
+				WHERE `id`=".$elem_id;
 		query($sql);
 
 		//id диалога списка, на который происходит воздействие через поиск
@@ -500,23 +500,30 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$block_id = _num($_POST['block_id']);
 
 	//данные компонентов диалога
-	if(!$cmp = @$_POST['cmp'])
+	if(!$postCmp = @$_POST['cmp'])
 		jsonError('Нет данных для внесения');
-	if(!is_array($cmp))
-		jsonError('Компоненты диалога не являтся массивом');
+	if(!is_array($postCmp))
+		jsonError('Компоненты диалога не являются массивом');
 
 	$cmpUpdate = array();
-	foreach($cmp as $cmp_id => $val) {
+	foreach($postCmp as $cmp_id => $val) {
 		if(!$cmp_id = _num($cmp_id))
 			jsonError('Некорректный id компонента диалога');
-		if(!$col = @$dialog['cmp'][$cmp_id]['col'])
+		if(!$cmp = @$dialog['cmp'][$cmp_id])
+			jsonError('Отсутствует компонент id'.$cmp_id.' в диалоге');
+		if(!$col = @$cmp['col'])
 			jsonError('Отсутствует имя колонки списка');
 		if(!isset($dialog['field'][$col]))
 			jsonError('В списке нет колонки с именем "'.$col.'"');
 
-		$v = _txt($cmp[$cmp_id]);
+		if($cmp['dialog_id'] == 19) {//наполнение для некоторых компонентов: radio, select, dropdown
+			_dialogCmpValue($val, 'test');
+			continue;
+		}
 
-		if($dialog['cmp'][$cmp_id]['require'] && !$v)
+		$v = _txt($val);
+
+		if($cmp['require'] && !$v)
 			jsonError('Требуется обязательно заполнить<br>поля, отмеченные звёздочкой');
 
 		$cmpUpdate[] = "`".$col."`='".addslashes($v)."'";
@@ -608,8 +615,20 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			WHERE `id`=".$unit_id;
 	query($sql);
 
+	//обновление значений компонентов
+	foreach($postCmp as $cmp_id => $val) {
+		$cmp = @$dialog['cmp'][$cmp_id];
+		if($cmp['dialog_id'] == 19) {//наполнение для некоторых компонентов: radio, select, dropdown
+			_dialogCmpValue($val, 'save', $dialog_id, $cmp_id);
+			continue;
+		}
+	}
+
+
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
+	if($dialog['base_table'] == '_element')
+		_cache('clear', '_dialogQuery'.$dialog_id);
 
 
 	$send = array(
@@ -649,7 +668,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		}
 		$send['level'] = utf8(_blockLevelChange($block['obj_name'], $block['obj_id'], $width));
 	}
-
 
 	return $send;
 }

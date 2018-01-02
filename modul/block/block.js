@@ -27,6 +27,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 			width:240,
 			objPos:'mouse',
 			show:1,
+			delayShow:500,
 			delayHide:300,
 			func:function() {
 				$('#block-unit-bor0')._check({

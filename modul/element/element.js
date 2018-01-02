@@ -361,23 +361,20 @@ var VK_SCROLL = 0,
 		window.COMPONENT_FUNC = o.func;
 		window.SPISOK_ON = o.spisokOn;
 
-		for(var k in o.block_arr)
-			BLOCK_ARR[k] = o.block_arr[k];
+		_forIn(o.block_arr, function(sp, k) {
+			BLOCK_ARR[k] = sp;
+		});
 
 		_dialogScript(o.component, 1);
 
 		$('#spisok_on')._check({
 			func:function(v) {
-				$('#tr_spisok_name')[(v ? 'remove' : 'add') + 'Class']('dn');
+				$('#tr_spisok_name')._dn(v);
 			}
 		});
 
 		$('#app_any')._check();
 		$('#sa')._check();
-		sortable();
-		elementFuncFunc();
-		elementFuncEdit();
-		elementFuncDel();
 
 		$('#dialog-menu')._menu({
 			type:4,
@@ -417,48 +414,6 @@ var VK_SCROLL = 0,
 				}
 			});
 
-		function elementFuncFunc() {//открытие окна настройки функции компонента
-			$(document).off('click', '.cmp-set .icon-usd');
-			$(document).on('click', '.cmp-set .icon-usd', function() {
-				var p = _parent($(this), 'DD'),
-					id = _num(p.attr('val'), 1),
-					cmp = {};
-				_forN(DIALOG_COMPONENT, function(sp, n) {
-					cmp = DIALOG_COMPONENT[n];
-					if(sp.id == id)
-						return false;
-				});
-				_dialogCmpEditFunc(cmp);
-			});
-		}
-		function elementFuncEdit() {//функция редактирование компонента
-			$(document).off('click', '.cmp-set .icon-edit');
-			$(document).on('click', '.cmp-set .icon-edit', function() {
-				var p = _parent($(this), 'DD'),
-					id = _num(p.attr('val'), 1),
-					cmp = {};
-				_forN(DIALOG_COMPONENT, function(sp, n) {
-					cmp = DIALOG_COMPONENT[n];
-					if(sp.id == id)
-						return false;
-				});
-				_dialogCmpEdit(cmp);
-			});
-		}
-		function elementFuncDel() {//фукнция удаления компонента
-			$(document).off('click', '.cmp-set .icon-del-red');
-			$(document).on('click', '.cmp-set .icon-del-red', function() {
-				var p = _parent($(this), 'DD'),
-					id = _num(p.attr('val'));
-				p.remove();
-				_forN(DIALOG_COMPONENT, function(sp, n) {
-					if(sp.id != id)
-						return;
-					DIALOG_COMPONENT.splice(n, 1);
-				});
-				_dialogHeightCorrect();
-			});
-		}
 		function submit() {
 			var send = {
 				op:'dialog_edit',// + (o.dialog_id ? 'edit' : 'add'),
@@ -492,6 +447,10 @@ var VK_SCROLL = 0,
 			dialog.post(send, _dialogOpen);
 		}
 	},
+
+
+
+
 	_dialogHeightCorrect = function() {//установка высоты линий для настройки ширины диалога и ширины полей с названиями
 		var h = $('#dialog-w-change').parent().height();
 		$('#dialog-w-change').height(h);
@@ -840,129 +799,6 @@ var VK_SCROLL = 0,
 
 			labelPrevUpdate();
 			elPrevAction();
-		}
-		function elVal(func, obj, lastNoDel) {//значения, которые содержат элементы Radio, Select
-			var DL = obj.after('<dl class="mt10"></dl>').next(),
-				NUM = 1,
-				valAdd = function(v) {
-					v = $.extend({
-						id:0,
-						uid:NUM,
-						title:'имя значения ' + NUM,
-						def:0
-					}, v);
-
-					DL.append(
-						'<dd class="curM over1 ml20 mr20" val="' + v.id + '">' +
-							'<table class="bs5 w100p">' +
-								'<tr><td class="label r w150">Значение ' + NUM + ':' +
-									'<td><input type="text" class="w230 mr5" id="el-val-' + v.uid + '" val="' + v.uid + '" value="' + v.title + '" />' +
-										'<input type="hidden" id="el-def-' + v.uid + '" val="' + v.uid + '" value="' + v.def + '" />' +
-										'<div val="' + v.uid + '" class="icon icon-del ml20 prel top5' + _tooltip('Удалить значение', -55) + '</div>' +
-							'</table>' +
-						'</dd>'
-					);
-
-					DL.sortable({
-						axis:'y',
-						update:function () {
-							var dd = DL.find('dd');
-							EL_VAL_ASS = [];
-							for(var n =0; n < dd.length; n++) {
-								var eq = dd.eq(n);
-								EL_VAL_ASS.push({
-									id:_num(eq.attr('val')),
-									uid:_num(eq.find('.icon-del').attr('val')),
-									title:eq.find('input[type="text"]').val(),
-									def:_num(eq.find('input[type="hidden"]').val())
-								});
-							}
-							func();
-						}
-					});
-
-					$('#el-def-' + v.uid)._check({
-						tooltip:'использовать по умолчанию',
-						func:function(v, attr_id) {
-							var uid = _num($('#' + attr_id).attr('val'));
-							for(var n = 0; n < EL_VAL_ASS.length; n++) {
-								var sp = EL_VAL_ASS[n];
-								sp.def = sp.uid == uid ? v : 0;
-							}
-
-							func();
-
-							if(!v)
-								return;
-
-							//снятие галочек с остальных значений
-							var DEF = DL.find('input[type="hidden"]');
-							for(var n = 0; n < DEF.length; n++) {
-								var sp = DEF.eq(n);
-								if(sp.attr('id') == attr_id)
-									continue;
-								sp._check(0);
-							}
-						}
-					});
-
-					$('#el-val-' + v.uid).keyup(function() {
-						var t = $(this),
-							uid = _num(t.attr('val'));
-						_forN(EL_VAL_ASS, function(sp) {
-							if(sp.uid != uid)
-								return;
-							sp.title = t.val();
-							sp.content = t.val();
-						});
-						func();
-					}).select();
-
-					DL.find('.icon-del:last').click(function() {
-						if(lastNoDel && EL_VAL_ASS.length < 2)
-							return;
-
-						var t = $(this),
-							uid = _num(t.attr('val')),
-							p = _parent(t, 'DD');
-						_forN(EL_VAL_ASS, function(sp, n) {
-							if(sp.uid != uid)
-								return;
-							EL_VAL_ASS.splice(n, 1);
-						});
-						p.remove();
-						func();
-						if(!EL_VAL_ASS.length) {
-							DL.next().remove();
-							DL.prev().removeClass('dn');
-							DL.remove();
-							CMP.v = [];
-						}
-					});
-					EL_VAL_ASS.push({
-						id:v.id,
-						uid:v.uid,
-						title:v.title,
-						def:v.def
-					});
-					NUM++;
-					func();
-				};
-
-			//кнопка добавления нового значения
-			DL.after(
-				'<div class="center mt5">' +
-					'<button class="vk cancel">Добавить значение</button>' +
-				'</div>'
-			).next().find('button').click(valAdd);
-
-			if(CMP.id) {
-				for(var n = 0; n < CMP.v.length; n++)
-					valAdd(CMP.v[n]);
-				if(!CMP.v.length)
-					valAdd();
-			} else
-				valAdd();
 		}
 		function elObjSelect(CMP, html, del) {//выбор объекта для связки при помощи _select
 			/*
@@ -1434,14 +1270,16 @@ var VK_SCROLL = 0,
 			dialog.bottom.find('.submit').addClass('red');
 
 		//применение функций к компонентам
-		for(var k in o.cmp) {
-			var sp = o.cmp[k];
+		_forIn(o.cmp, function(sp) {
 			switch(sp.dialog_id) {
 				case 5://textarea
 					$(sp.attr_id).autosize();
-					break;
+					return;
+				case 19://наполнение для некоторых компонентов
+					_dialogCmpValue(sp);
+					return;
 			}
-		}
+		});
 
 //		window.COMPONENT_FUNC = res.func;
 //		window.DATA = res.data;
@@ -1464,8 +1302,15 @@ var VK_SCROLL = 0,
 					send.op = 'spisok_del';
 			}
 
+
+
 			//получение значений компонентов
 			_forIn(o.cmp, function(sp, id) {
+				switch(sp.dialog_id) {
+					case 19://наполнение для некоторых компонентов
+						send.cmp[id] = _dialogCmpValue(sp, 'get');
+						return;
+				}
 				send.cmp[id] = $(sp.attr_id).val();
 			});
 
@@ -1481,6 +1326,7 @@ var VK_SCROLL = 0,
 			});
 */
 			dialog.post(send, function(res) {
+				return;
 				switch(res.action_id) {
 					case 1: location.reload(); break;
 					case 2: location.href = URL + '&p=' + res.action_page_id + '&id=' + res.unit_id; break;
@@ -1542,6 +1388,78 @@ var VK_SCROLL = 0,
 			sf[id] = join ? v.join(',') : v;
 		}
 	},
+	_dialogCmpValue = function(o, i) {//наполнение для некоторых компонентов
+		var el = $(o.attr_pe);
+
+		//получение данных для сохранения
+		if(i == 'get') {
+			var send = [];
+			_forEq(el.find('dd'), function(sp) {
+				send.push({
+					id:_num(sp.attr('val')),
+					title:sp.find('.title').val(),
+					def:_num(sp.find('.def').val())
+				});
+			});
+			return send;
+		}
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			DL = el.html(html).find('dl'),
+			BUT_ADD = el.find('div:last'),
+			NUM = 1;
+
+		BUT_ADD.click(valueAdd);
+
+		function valueAdd(v) {
+				v = $.extend({
+					id:0,
+					uid:NUM,
+					title:'имя значения ' + NUM,
+					def:0
+				}, v);
+
+				DL.append(
+					'<dd class="over1" val="' + v.id + '">' +
+						'<table class="bs5 w100p">' +
+							'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
+								'<td class="w90 grey r">Значение ' + NUM + ':' +
+								'<td><input type="text" class="title w100p" id="el-val-' + v.uid + '" value="' + v.title + '" />' +
+								'<td class="w15">' +
+									'<input type="hidden" class="def" id="el-def-' + v.uid + '" value="' + v.def + '" />' +
+								'<td class="w35 r">' +
+									'<div val="' + v.uid + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>' +
+						'</table>' +
+					'</dd>'
+				);
+
+				DL.sortable({axis:'y',handle:'.icon-move-y'});
+
+				$('#el-def-' + v.uid)._check({
+					tooltip:'По умолчанию',
+					func:function(v, attr_id) {
+						if(!v)
+							return;
+						//снятие галочек с остальных значений
+						_forEq(DL.find('.def'), function(sp) {
+							if(sp.attr('id') == attr_id)
+								return;
+							sp._check(0);
+						});
+					}
+				});
+
+				DL.find('.icon-del:last').click(function() {
+					var t = $(this),
+						p = _parent(t, 'DD');
+					p.remove();
+				});
+				NUM++;
+			}
+	},
+
+
 	_dialogScript = function(component, isEdit) {//применение скриптов после загрузки данных диалога
 
 		//рисование компонентов

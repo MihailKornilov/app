@@ -154,10 +154,12 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 			foreach(query_arr($sql) as $r) {
 				$id = _num($r['id']);
 				$cmp[$id] = array(
+					'id' => _num($r['id']),
 					'dialog_id' => _num($r['dialog_id']),
 					'require' => _num($r['require']),
 					'col' => $r['col'],
-					'attr_id' => '#cmp_'.$id
+					'attr_id' => '#cmp_'.$id,
+					'attr_pe' => '#pe_'.$id
 				);
 			}
 		}
@@ -362,6 +364,60 @@ function _dialogSpisokGetPage($page_id) {//список объектов, которые поступают на
 		return array();
 
 	return _selArray($send);
+}
+
+function _dialogCmpValue($val, $i='test', $dialog_id=0, $cmp_id=0) {//проверка на корректность заполнения значений для некоторых компонентов
+	if(empty($val))
+		return;
+	if(!is_array($val))
+		jsonError('Значения компонента не являются массивом');
+
+	$update = array();
+	$idsNoDel = '0';
+	$sort = 0;
+	foreach($val as $r) {
+		if(!$title = _txt($r['title']))
+			jsonError('Не заполнено одно из значений');
+		if($id = _num($r['id']))
+			$idsNoDel .= ','.$id;
+		$update[] = "(
+			".$id.",
+			".$dialog_id.",
+			".$cmp_id.",
+			'".addslashes($title)."',
+			"._num($r['def']).",
+			".$sort++."
+		)";
+	}
+
+	if($i == 'test')
+		return;
+
+	//$i == 'save': процесс сохранения
+
+	//удаление удалённых значений
+	$sql = "DELETE FROM `_element_value`
+			WHERE `element_id`=".$cmp_id."
+			  AND `id` NOT IN (".$idsNoDel.")";
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	$sql = "INSERT INTO `_element_value` (
+				`id`,
+				`dialog_id`,
+				`element_id`,
+				`title`,
+				`def`,
+				`sort`
+			)
+			VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`title`=VALUES(`title`),
+				`def`=VALUES(`def`),
+				`sort`=VALUES(`sort`)";
+	query($sql);
 }
 
 function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в диалоге
