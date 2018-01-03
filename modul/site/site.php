@@ -117,13 +117,22 @@ function _header_hat() {//верхн€€ строка приложени€-сайта
 			'</a>'.
 
 			'<div class="fr w200 mt8">'.
-				(_page('cur') !=12 ? '<button class="vk small" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>' : '').
-				_header_pas().
+				_header_but_page().
+				_header_but_pas().
 			'</div>'.
 		'</div>'.
 	'</div>';
 }
-function _header_pas() {//отображение ссылки настройки страницы
+function _header_but_page() {//отображение кнопки списка страниц
+	if(!APP_ID)
+		return '';
+
+	if(_page('cur') != 12)
+		return '';
+
+	return '<button class="vk small" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>';
+}
+function _header_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)
 		return '';
 

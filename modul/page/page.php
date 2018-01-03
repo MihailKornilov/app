@@ -167,7 +167,7 @@ function _pageSetupAppPage() {//управление страницами приложения
 	'<ol id="page-sort">'._pageSetupAppPageSpisok($arr, $sort).'</ol>'.
 	'<script>_pageSetupAppPage()</script>';
 }
-function _pageSetupAppPageSpisok($arr, $sort) {
+function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
 	if(empty($arr))
 		return '';
 
@@ -192,6 +192,8 @@ function _pageSetupAppPageSpisok($arr, $sort) {
 	return $send;
 }
 function _pageSetupMenu() {//строка меню управления страницей
+	if(!APP_ID)
+		return '';
 	if(!PAS)
 		return '';
 
@@ -220,7 +222,7 @@ function _pageShow($page_id) {
 		'var BLOCK_ARR={'._blockJS('page', $page_id).'},'.
 			'ELEM_COLOR={'._elemColor().'};'.
 	'</script>'.
-	(!PAS ? '<script>_pageShow()</script>' : '');
+	'<script>_pageShow('.PAS.')</script>';
 }
 function _elemDiv($el, $unit=array()) {//формирование div элемента
 	if(!$el)
@@ -278,18 +280,20 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 
 	if($i == 'def')
 		switch($dialog_id) {
-			case 5: return 150;//textarea
-			case 7: return 150;//search
-			case 8: return 150;//input:text
+			case 5:  return 150;//textarea
+			case 7:  return 150;//search
+			case 8:  return 150;//input:text
+			case 17: return 150;//select
 			default: return 0;
 		}
 
 	if($i == 'min')
 		switch($dialog_id) {
-			case 2: return 30;//button
-			case 5: return 30;//textarea
-			case 7: return 50;//search
-			case 8: return 30;//input:text
+			case 2:  return 30;//button
+			case 5:  return 30;//textarea
+			case 7:  return 50;//search
+			case 8:  return 30;//input:text
+			case 17: return 50;//select
 			default: return 0;
 		}
 
@@ -300,7 +304,8 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 //				return 0;
 		case 5://textarea
 		case 7://search
-		case 8: return 1;//input:text
+		case 8://input:text
+		case 17: return 1;//select
 		default: return 0;
 	}
 }
@@ -389,6 +394,33 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'spisok' => $spisok
 			));
 
+		//Select
+		case 17:
+			/*
+                txt_1 - текст нулевого значения
+				v - наполнение из таблицы _element_value через dialog:19
+			*/
+			if(!$value = _num($v)) {
+				$block = $el['block'];
+				if($block['obj_name'] == 'dialog') {
+					$dialog = _dialogQuery($block['obj_id']);
+					$value = $dialog['cmp'][$el['id']]['elv_def'];
+				} else {
+					$sql = "SELECT *
+							FROM `_element_value`
+							WHERE `dialog_id`=".$el['dialog_id']."
+							  AND `element_id`=".$el['id']."
+							ORDER BY `sort`";
+					foreach(query_arr($sql) as $id => $r) {
+						if(!$value && $r['def'])
+							$value = $r['id'];
+					}
+				}
+			}
+			return '<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />';
+
+		//наполнение для некоторых компонентов: radio, select, dropdown
+		case 19: return '<div class="_empty min">Наполнение компонента</div>'; //все действия через JS
 
 
 
@@ -404,14 +436,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_4 - dialog_id, который назначен на эту кнопку
 			*/
 			$color = array(
-				0 => '',        //Синий - по умолчанию
-				321 => '',      //Синий
-				322 => 'green', //Зелёный
-				323 => 'red',   //Красный
-				324 => 'grey',  //Серый
-				325 => 'cancel',//Прозрачный
-				326 => 'pink',  //Розовый
-				327 => 'orange' //Оранжевый
+				0 => '',      //Синий - по умолчанию
+				1 => '',      //Синий
+				2 => 'green', //Зелёный
+				3 => 'red',   //Красный
+				4 => 'grey',  //Серый
+				5 => 'cancel',//Прозрачный
+				6 => 'pink',  //Розовый
+				7 => 'orange' //Оранжевый
 			);
 			return _button(array(
 						'attr_id' => $attr_id,
@@ -421,6 +453,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'class' => 'dialog-open'.($el['num_3'] ? ' w100p' : ''),
 						'val' => 'dialog_id:'.$el['num_4']
 					));
+
+
 		case 3: return _pageElemMenu($el); //menu
 		case 4: return '<div class="hd2">'.$el['txt_1'].'</div>'; //head
 		case 7://search
@@ -476,9 +510,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		case 14: return _spisokShow($el);     //содержание списка
 		case 15: return _spisokElemCount($el);//текст с количеством строк списка
-
-		//наполнение для некоторых компонентов: radio, select, dropdown
-		case 19: return '<div class="_empty min">Наполнение компонента</div>'; //все действия через JS
 	}
 
 	//элементы списка шаблона (для настройки)

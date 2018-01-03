@@ -662,6 +662,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 				$width = 0;
 				break;
 			case 'dialog':
+				_cache('clear', '_dialogQuery'.$block['obj_id']);
 				$dlg = _dialogQuery($block['obj_id']);
 				$width = $dlg['width'];
 				break;

@@ -475,6 +475,7 @@ $(document)
 			p.find('.elem-width-change')._dn(!v);
 
 			$('.block-content-' + spl[0]).html(res.html);
+			_elemActivate(res.block_arr, {}, 1);
 			for(var k in res.block_arr)
 				BLOCK_ARR[k] = res.block_arr[k];
 
@@ -513,6 +514,7 @@ $(document)
 			p.find('.block-level-change').css('visibility', on ? 'hidden' : 'visible');
 
 			$('.block-content-' + spl[0]).html(res.html);
+			_elemActivate(res.block_arr, {}, 1);
 			_forIn(res.block_arr, function(sp, k) {
 				BLOCK_ARR[k] = sp;
 				if(!on || !sp.width_change)
@@ -736,6 +738,7 @@ $.fn._grid = function(o) {
 	function afterSave(res) {
 		$('#block-level-' + o.obj_name).after(res.level).remove();
 		$('.block-content-' + o.obj_name).html(res.html);
+		_elemActivate(res.block_arr, {}, 1);
 		for(var k in res.block_arr)
 			BLOCK_ARR[k] = res.block_arr[k];
 	}

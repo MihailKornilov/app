@@ -308,30 +308,15 @@
 
 
 /* ---=== ¬€œ¿ƒ¿ﬁŸ»… —œ»—Œ  ===--- */
-._select{background:#fff;display:inline-block;position:relative}
-._select .title0bg{
-	position:absolute;
-	top:7px;
-	left:8px;
-	white-space:nowrap;
-	overflow:hidden;
-	color:#888;
-}
+._select{background:#fff;position:relative}
 ._select .seltab{
 	border:#d3d9de solid 1px;
-	border-radius:1px;
+	border-radius:2px;
 	height:29px;
 	width:100%;
 }
 ._select.disabled .seltab{border-color:#ccc;background-color:#f0f0f0}
-._select .selsel{vertical-align:top;padding-bottom:2px}
-._select .selinp{
-	position:relative;
-	border:none;
-	padding:4px 0 4px 5px;
-	margin:2px 2px 0;
-	background-color:transparent;
-}
+._select .selinp{border:none;width:100%}
 ._select .selinp._busy{background-position:right center;color:#000}
 ._select.disabled .selinp{color:#777}
 ._select .selug{
@@ -411,10 +396,6 @@
 	cursor:default;
 }
 
-.ui-resizable._select .ui-resizable-e{
-	width:6px;
-	right:-8px;
-}
 
 
 

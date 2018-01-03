@@ -355,6 +355,8 @@ var VK_SCROLL = 0,
 			}),
 			DIALOG_WIDTH = o.width;
 
+		_elemActivate(o.cmp, {}, 1);
+
 		window.CMP_NAME = o.cmp_name;
 		window.DIALOG_ELEMENT = o.element;
 		window.DIALOG_COMPONENT = o.component;
@@ -1268,18 +1270,8 @@ var VK_SCROLL = 0,
 		//если удаление единицы списка, то кнопка красная
 		if(o.to_del)
 			dialog.bottom.find('.submit').addClass('red');
-
-		//применение функций к компонентам
-		_forIn(o.cmp, function(sp) {
-			switch(sp.dialog_id) {
-				case 5://textarea
-					$(sp.attr_id).autosize();
-					return;
-				case 19://наполнение для некоторых компонентов
-					_dialogCmpValue(sp, o.unit[sp.col]);
-					return;
-			}
-		});
+		else
+			_elemActivate(o.cmp, o.unit);
 
 //		window.COMPONENT_FUNC = res.func;
 //		window.DATA = res.data;
@@ -1462,6 +1454,30 @@ var VK_SCROLL = 0,
 			}
 	},
 
+	_elemActivate = function(elem, unit, is_edit) {//применение функций (активирование) к элементам
+		_forIn(elem, function(sp) {
+			switch(sp.dialog_id) {
+				case 5://textarea
+					$(sp.attr_id).autosize();
+					return;
+				case 17://select
+					$(sp.attr_id)._select({
+						disabled:is_edit,
+			//			write:1,
+						block:1,
+						width:sp.width,
+						title0:sp.txt_1,
+						spisok:sp.elv_spisok
+					});
+					return;
+				case 19://наполнение для некоторых компонентов
+					if(is_edit)
+						return;
+					_dialogCmpValue(sp, unit[sp.col]);
+					return;
+			}
+		});
+	},
 
 	_dialogScript = function(component, isEdit) {//применение скриптов после загрузки данных диалога
 
@@ -2167,6 +2183,7 @@ $.fn._select = function(o, o1, o2) {
 
 	switch(typeof o) {
 		default:
+		case 'undefined': break;
 		case 'number':
 		case 'string':
 			s = window[id + '_select'];
@@ -2211,26 +2228,26 @@ $.fn._select = function(o, o1, o2) {
 					}
 			}
 			return t;
-		case 'object':
-			//если это первый вход, то пропуск
-			if(o.width || o.func)
+		case 'object': break;
+/*			//если это первый вход, то пропуск
+			s = window[id + '_select'];
+			if(!s)
 				break;
 
 			//вставка списка после загрузки
 			if('length' in o) {
-				s = window[id + '_select'];
 				s.spisok(o);
 				return t;
 			}
 			if(!('spisok' in o))
 				return t;
+*/
 	}
 
 	o = $.extend({
 		width:180,			// ширина
 		disabled:0,
-		block:false,       	// расположение селекта
-		bottom:0,           // отступ снизу
+		block:0,       	    // расположение селекта
 		title0:'',			// поле с нулевым значением
 		spisok:[],			// результаты в формате json
 		limit:0,
@@ -2255,21 +2272,20 @@ $.fn._select = function(o, o1, o2) {
 		inpWidth -= 24;
 		val = _num(val);
 	}
-	var html =
-		'<div class="_select' + (o.disabled ? ' disabled' : '') + '" ' +
-			 'id="' + id + '_select" ' +
-			 'style="width:' + o.width + 'px' +
-				(o.block ? ';display:block' : '') +
-				(o.bottom ? ';margin-bottom:' + o.bottom + 'px' : '') +
-		'">' +
-			'<div class="title0bg" style="width:' + inpWidth + 'px">' + o.title0 + '</div>' +
+	var dis = o.disabled ? ' disabled' : '',
+		dib = o.block ? '' : ' dib',
+		html =
+		'<div class="_select' + dis + dib + '" id="' + id + '_select" style="width:' + o.width + 'px">' +
+//			'<div class="title0bg" style="width:' + inpWidth + 'px">' + o.title0 + '</div>' +
 			'<table class="seltab">' +
 				'<tr><td class="selsel">' +
-						'<input type="text" ' +
-							   'class="selinp" ' +
-							   'style="width:' + inpWidth + 'px' +
-									(o.write && !o.disabled? '' : ';cursor:default') + '"' +
-									(o.write && !o.disabled? '' : ' readonly') + ' />' +
+						'<input type="text"' +
+							  ' class="selinp"' +
+							  ' placeholder="' + o.title0 + '"' +
+							//  ' style="width:' + inpWidth + 'px' +
+							//		(o.write && !o.disabled? '' : ';cursor:default') + '"' +
+									(o.write && !o.disabled? '' : ' readonly') +
+						' />' +
 					(o.clear ? '<div class="icon icon-del mt5 fr' + _dn(val) + _tooltip('Очистить', -49, 'r') + '</div>' : '') +
 	   (o.funcAdd ? '<td class="seladd">' : '') +
 					'<td class="selug">' +
@@ -2278,7 +2294,7 @@ $.fn._select = function(o, o1, o2) {
 		'</div>';
 	t.next().remove('._select');
 	t.after(html);
-
+//return t;
 	var select = t.next(),
 		inp = select.find('.selinp'),
 		inpClear = select.find('.icon-del'),

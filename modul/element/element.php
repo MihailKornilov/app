@@ -151,6 +151,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	//получение компонентов диалога, ответственных за внесение единицы списка
 	$cmp = array();
+	$cmpUtf8 = array();
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `obj_name`='dialog'
@@ -160,18 +161,56 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		if($block = _blockChildClear($block)) {
 			$sql = "SELECT *
 					FROM `_element`
-					WHERE `block_id` IN ("._idsGet($block).")
-					  AND LENGTH(`col`)";
-			foreach(query_arr($sql) as $r) {
-				$id = _num($r['id']);
-				$cmp[$id] = array(
-					'id' => _num($r['id']),
-					'dialog_id' => _num($r['dialog_id']),
-					'require' => _num($r['require']),
-					'col' => $r['col'],
-					'attr_id' => '#cmp_'.$id,
-					'attr_pe' => '#pe_'.$id
-				);
+					WHERE `block_id` IN ("._idsGet($block).")";
+			if($elem = query_arr($sql)) {
+				foreach($elem as $r) {
+					$id = _num($r['id']);
+					$cmp[$id] = array(
+						'id' => _num($r['id']),
+						'dialog_id' => _num($r['dialog_id']),
+
+						'width' => _num($r['width']),
+						'require' => _num($r['require']),
+						'col' => $r['col'],
+
+						'num_1' => _num($r['num_1']),
+						'txt_1' => $r['txt_1'],
+
+						'elv_ass' => array(),   //ассоциативные значения из таблицы _element_value
+						'elv_spisok' => array(),//значения из таблицы _element_value в виде списка {uid:1,title:'значение'}
+						'elv_def' => 0,  //значение по умолчанию
+
+						'attr_id' => '#cmp_'.$id,
+						'attr_pe' => '#pe_'.$id
+					);
+				}
+
+				$sql = "SELECT *
+						FROM `_element_value`
+						WHERE `element_id` IN("._idsGet($elem).")
+						ORDER BY `element_id`,`sort`";
+				foreach(query_arr($sql) as $r) {
+					$id = _num($r['id']);
+					$cmp_id = _num($r['element_id']);
+					$cmp[$cmp_id]['elv_ass'][$id] = $r['title'];
+					$cmp[$cmp_id]['elv_spisok'][] = array(
+						'uid' => $id,
+						'title' => $r['title']
+					);
+					if($r['def'])
+						$cmp[$r['element_id']]['elv_def'] = $id;
+				}
+
+				//формирование компонентов для отправки через AJAX
+				$cmpUtf8 = $cmp;
+				foreach($cmp as $r) {
+					$id = _num($r['id']);
+					$cmpUtf8[$id]['txt_1'] = utf8($r['txt_1']);
+					foreach($r['elv_ass'] as $ass_id => $val)
+						$cmpUtf8[$id]['elv_ass'][$ass_id] = utf8($val);
+					foreach($r['elv_spisok'] as $sp_id => $v)
+						$cmpUtf8[$id]['elv_spisok'][$sp_id]['title'] = utf8($v['title']);
+				}
 			}
 		}
 
@@ -230,6 +269,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		$col[$r['Field']] = 1;
 
 	$dialog['cmp'] = $cmp;
+	$dialog['cmp_utf8'] = $cmpUtf8;
 	$dialog['component'] = $component;
 	$dialog['func'] = $func;
 	$dialog['field'] = $col;

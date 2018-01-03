@@ -149,7 +149,7 @@ switch(@$_POST['op']) {
 	  : '');
 
 		$send['dialog_id'] = $dialog_id;
-		$send['width'] = $dialog_id ? _num($dialog['width']) : 500;
+		$send['width'] = _num($dialog['width']);
 		$send['head_insert'] = utf8($dialog['head_insert']);
 		$send['button_insert_submit'] = utf8($dialog['button_insert_submit']);
 		$send['button_insert_cancel'] = utf8($dialog['button_insert_cancel']);
@@ -159,9 +159,8 @@ switch(@$_POST['op']) {
 		$send['menu'] = _selArray($menu);
 		$send['block_arr'] = _blockJsArr('dialog', $dialog_id);
 		$send['action'] = _selArray($action);
-//		$send['element'] = _dialogEl();
-//		$send['cmp_name'] = _dialogEl(0, 'name');
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr_edit');
+		$send['cmp'] = $dialog['cmp_utf8'];
 //		$send['func'] = (object)$dialog['func'];
 //		$send['spisokOn'] = _dialogSpisokOn();
 //		$send['page_list'] = _dialogPageList();
@@ -355,7 +354,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['button_submit'] = utf8($dialog[!$unit_id ? 'button_insert_submit' : 'button_edit_submit']);
 	$send['button_cancel'] = utf8($dialog[!$unit_id ? 'button_insert_cancel' : 'button_edit_cancel']);
 	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
-	$send['cmp'] = $dialog['cmp'];
+	$send['cmp'] = $dialog['cmp_utf8'];
 
 	foreach($unit as $id => $r)
 		$unit[$id] = utf8($r);

@@ -43,14 +43,40 @@ function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры б
 
 	$arr = _blockChildClear($arr);
 
-	//расстановка элементов в блоки
+	//получение элементов
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($arr).")";
-	foreach(query_arr($sql) as $r) {
-		unset($arr[$r['block_id']]['elem']);
-		$r['block'] = $arr[$r['block_id']];
-		$arr[$r['block_id']]['elem'] = $r;
+	if($elem = query_arr($sql)) {
+		foreach($elem as $id => $r) {
+			$elem[$id]['elv_ass'] = array();
+			$elem[$id]['elv_spisok'] = array();
+			$elem[$id]['elv_def'] = 0;
+		}
+
+		//значения элементов-списков
+		$sql = "SELECT *
+				FROM `_element_value`
+				WHERE `element_id` IN("._idsGet($elem).")
+				ORDER BY `element_id`,`sort`";
+		foreach(query_arr($sql) as $r) {
+			$id = _num($r['id']);
+			$elem_id = _num($r['element_id']);
+			$elem[$elem_id]['elv_ass'][$id] = $r['title'];
+			$elem[$elem_id]['elv_spisok'][] = array(
+				'uid' => $id,
+				'title' => $r['title']
+			);
+			if($r['def'])
+				$elem[$elem_id]['elv_def'] = $id;
+		}
+
+		//расстановка элементов в блоки
+		foreach($elem as $r) {
+			unset($arr[$r['block_id']]['elem']);
+			$r['block'] = $arr[$r['block_id']];
+			$arr[$r['block_id']]['elem'] = $r;
+		}
 	}
 
 	foreach($arr as $id => $r) {
@@ -67,6 +93,7 @@ function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры б
 	if($return == 'block')
 		return $block;
 
+	//количество дочерних блоков для каждого блока
 	foreach($arr as $id => $r) {
 		if(!$r['parent_id'])
 			continue;
@@ -342,16 +369,25 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 		if($el = $r['elem']) {
 			$v[] = 'elem_id:'._num($el['id']);
 			$v[] = 'dialog_id:'._num($el['dialog_id']);
+
 			$v[] = 'fontAllow:'._elemFontAllow($el['dialog_id']);
+			$v[] = 'width:'.$el['width'];
 			$v[] = 'color:"'.$el['color'].'"';
 			$v[] = 'font:"'.$el['font'].'"';
 			$v[] = 'size:'.($el['size'] ? _num($el['size']) : 13);
 			$v[] = 'mar:"'.$el['mar'].'"';
 
+			$v[] = 'attr_id:"#cmp_'.$el['id'].'"';
+			$v[] = 'attr_pe:"#pe_'.$el['id'].'"';
+
 			$v[] = 'num_1:'._num($el['num_1'], true);
 			$v[] = 'num_2:'._num($el['num_2']);
 			$v[] = 'num_7:'._num($el['num_7']);
+			$v[] = 'txt_1:"'._br($el['txt_1']).'"';
 			$v[] = 'txt_2:"'._br($el['txt_2']).'"';
+
+			$v[] = 'elv_spisok:'._selJson($el['elv_ass']);
+			$v[] = 'elv_def:'.$el['elv_def'];
 		}
 
 		$send[] = $id.':{'.implode(',', $v).'}';
@@ -384,19 +420,28 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 			$v['elem_id'] = _num($el['id']);
 			$v['dialog_id'] = _num($el['dialog_id']);
 			$v['fontAllow'] = _elemFontAllow($el['dialog_id']);
+
 			$v['width'] = _num($el['width']);
 			$v['width_change'] = _elemWidth($el['dialog_id']);
 			$v['width_min'] = _elemWidth($el['dialog_id'], 'min');
 			$v['width_max'] = $width_max;
+
 			$v['color'] = $el['color'];
 			$v['font'] = $el['font'];
 			$v['size'] = $el['size'] ? _num($el['size']) : 13;
 			$v['mar'] = $el['mar'];
 
+			$v['attr_id'] = '#cmp_'.$el['id'];
+			$v['attr_pe'] = '#pe_'.$el['id'];
+
 			$v['num_1'] = _num($el['num_1'], true);
 			$v['num_2'] = _num($el['num_2']);
 			$v['num_7'] = _num($el['num_7']);
+			$v['txt_1'] = utf8(_br($el['txt_1']));
 			$v['txt_2'] = utf8(_br($el['txt_2']));
+
+			$v['elv_spisok'] = _selArray($el['elv_ass']);
+			$v['elv_def'] = $el['elv_def'];
 		}
 
 		$send[_num($id)] = $v;

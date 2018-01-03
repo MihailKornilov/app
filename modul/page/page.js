@@ -1,4 +1,9 @@
-var _pageShow = function() {//выполнение после вывода страницы
+var _pageShow = function(pas) {//активаци€ элементов после вывода страницы
+		_elemActivate(BLOCK_ARR, {}, pas);
+
+		//если включено управление страницей, активаци€ прекращаетс€ дл€ некоторых элементов
+		if(pas)
+			return;
 
 		//применение функций к _search
 		_forEq($('._search'), function(sp) {
@@ -23,4 +28,5 @@ var _pageShow = function() {//выполнение после вывода страницы
 				}
 			});
 		});
+
 	};
