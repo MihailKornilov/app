@@ -25,7 +25,7 @@ input,textarea{
 }
 input::-webkit-input-placeholder{color:#bbb}
 input::-moz-placeholder{color:#999}
-input.err{background:#fff2f2}
+input.err{background-color:#fff2f2}
 
 textarea{
 	resize:none;
@@ -35,11 +35,11 @@ textarea{
 textarea::-webkit-input-placeholder{color:#bbb}
 textarea::-moz-placeholder{color:#999}
 textarea.min{height:29px}
-textarea.err{background:#fff2f2}
+textarea.err{background-color:#fff2f2}
 input[type="text"]:disabled,
 textarea:disabled{
 	color:#ccc;
-	background:#f5f5f5;
+	background-color:#f5f5f5;
 	border:1px solid #ddd;
 }
 
@@ -294,15 +294,14 @@ table{border:0;border-spacing:0}
 
 /* Кнопка ВКонтакте */
 button.vk{
-	padding:7px 16px 8px;
-	zoom: 1;
-	cursor: pointer;
-	white-space: nowrap;
-	outline: none;
-	overflow: visible;
-	line-height: 13px;
+	padding:7px 16px;
+	zoom:1;
+	cursor:pointer;
+	white-space:nowrap;
+	outline:none;
+	overflow:visible;
 	background-color:#6383a8;/* 6287AE - новый контакт */
-	color: #fff;
+	color:#fff;
 	border:0;
 	vertical-align: top;
 	-webkit-border-radius: 2px;
@@ -318,23 +317,23 @@ button.vk{
 	transition: background-color 100ms ease-in-out;
 }
 button.vk:not(._busy):hover{background-color:#6d8cb0} /* 678EB4 */
-button.vk.fw{width:100%}
-button.vk:active{padding:8px 16px 7px}
+button.vk:active{padding:8px 16px 6px}
 button.vk.short{padding:6px 8px 7px}/* короткий вариант: для кнопок переключения */
 button.vk.short:active{padding:7px 8px 6px}
 button.vk.small{padding:4px 10px 3px;font-size:12px}
-button.vk.small:active{padding-top:5px;padding-bottom:2px}
+button.vk.small:active{padding:5px 10px 2px}
+/* цвета */
 button.vk.cancel{background-color:transparent;color:#33567F}
 button.vk.cancel:hover{background-color:#E5EBF1}
-button.vk.red{background-color:#b55}
-button.vk.red:hover{background-color:#c66}
-button.vk.grey{background-color: #888}
-button.vk.grey:hover{background-color:#999}
-button.vk.pink{background-color: #c6c}
-button.vk.pink:hover{background-color:#d7d}
-button.vk.green{background-color: #00AB50}
-button.vk.green:hover{background-color:#00BB57}
-button.vk.orange{background-color: #CC8E4F}
+button.vk.red         {background-color:#b55}
+button.vk.red:hover   {background-color:#c66}
+button.vk.grey        {background-color:#888}
+button.vk.grey:hover  {background-color:#999}
+button.vk.pink        {background-color:#c6c}
+button.vk.pink:hover  {background-color:#d7d}
+button.vk.green       {background-color:#00AB50}
+button.vk.green:hover {background-color:#00BB57}
+button.vk.orange      {background-color:#CC8E4F}
 button.vk.orange:hover{background-color:#D59553}
 button.vk._busy{color:transparent}
 

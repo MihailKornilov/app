@@ -519,8 +519,14 @@ $(document)
 				BLOCK_ARR[k] = sp;
 				if(!on || !sp.width_change)
 					return;
-				$('#cmp_' + sp.elem_id).css('width', '100%');
-				$('#pe_' + sp.elem_id)
+
+				//аффикс к атрибуту элемента, если нужно
+				var el_name = '';
+				if(sp.dialog_id == 17)
+					el_name = '_select'
+
+				$(sp.attr_id + el_name).css('width', '100%');
+				$(sp.attr_pe)
 					.css('width', sp.width ? sp.width + 'px' : 'auto')
 					.resizable({
 						minWidth:sp.width_min,
@@ -568,11 +574,14 @@ $(document)
 
 		t._hint({
 			msg:'<input type="hidden" id="elem-width-max" value="' + val + '" />' +
-				'<div class="mt10 fs12 i color-555">' +
-					'При установке галочки <b class="i">размер элемента</b> ' +
-					'будет автоматически подстраиваться под <b class="i">размер блока</b>, в котором он находится.' +
+				'<div class="mt5 ml20 fs11 i pale">' +
+					'<b class="i fs11">Размер элемента</b> будет ' +
+					'<br>' +
+					'подстраиваться под <b class="i fs11">размер блока</b>,' +
+					'<br>' +
+					'в котором он находится.' +
 				'</div>',
-			width:280,
+			width:240,
 			pad:10,
 			delayShow:700,
 			show:1,

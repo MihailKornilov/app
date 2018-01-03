@@ -308,7 +308,48 @@
 
 
 /* ---=== ¬€œ¿ƒ¿ﬁŸ»… —œ»—Œ  ===--- */
-._select{background:#fff;position:relative}
+._select{
+	position:relative;
+	box-sizing:border-box;
+	background-color:#fff;
+	border:#d3d9de solid 1px;
+	border-radius:2px;
+	vertical-align:top;
+}
+._select.disabled{background-color:#f5f5f5;border:1px solid #ddd}
+._select .select-inp{
+	width:100%;
+	border:none;
+	padding:6px 0 6px 8px;
+}
+._select .select-inp._busy{background-position:right center}
+._select.disabled .select-inp{background-color:#f5f5f5;color:#ccc}
+._select .arrow{
+	width:25px;
+	background:transparent no-repeat center center url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAHCAYAAADebrddAAAAZUlEQVQY02P4//8/IwMRAKxu49YdNzZu2TkNlyaQ+IatO2cA1V0FKt5Zv2HLjv9ADbPQNYD4QPG5IPkNW3ZWgwWBGprRNSArBMo3oFiHpoEZp0IsGm7hVYikoQGIv2zctqsWXQ4AGPZvtpjg4t8AAAAASUVORK5CYII=");
+}
+._select:not(.disabled) .arrow{cursor:pointer}
+._select:not(.rs) .select-res{display:none}
+._select .select-res{
+	position:absolute;
+	left:-1px;
+	width:100%;
+	border:#d3d9de solid 1px;
+	border-radius:0 0 2px 2px;
+	box-shadow:0 1px 3px rgba(0,0,0,.1);
+	background-color:#fff;
+	cursor:pointer;
+	z-index:10;
+}
+._select .select-unit{padding:7px 8px}
+._select .select-unit.title0{color:#999}
+._select .select-unit.ov{background-color:#EBF3FA}
+._select .empty{
+	background-color:#eee;
+	padding:7px 8px;
+	cursor:default;
+}
+/*
 ._select .seltab{
 	border:#d3d9de solid 1px;
 	border-radius:2px;
@@ -395,7 +436,8 @@
 	padding:4px 6px;
 	cursor:default;
 }
-
+*/
+/* ·˚ÎÓ 90 ÒÚÓÍ */
 
 
 

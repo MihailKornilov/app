@@ -667,8 +667,23 @@ function _page_div() {//todo тест
 	'<br>'.
 	'<br>'.
 	'<br>'.
-	'<div class="bg-ffc"><textarea class="w200"></textarea></div>'.
-	'<div><input type="text" /></div>'.
+	'<div class="bg-fcc w200">'.
+		'<input type="hidden" class="aaa" />'.
+	'</div>'.
+
+	'<div class="bg-ddf w500 mt10">'.
+		'<div class="_select dib bg-ffc w200 prel">'.
+			'<table class="w100p">'.
+				'<tr><td>456'.
+			'</table>'.
+		'</div>'.
+		'<div class="_select  bg-ffc w200 prel">'.
+			'<table>'.
+				'<tr><td>456'.
+			'</table>'.
+		'</div>'.
+	'</div>'.
+//	'<div><input type="text" /></div>'.
 
 	'<div class="mar20 bg-ccd">'.
 		'<div class="icon icon-edit wh"></div>'.

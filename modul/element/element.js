@@ -1464,7 +1464,7 @@ var VK_SCROLL = 0,
 					$(sp.attr_id)._select({
 						disabled:is_edit,
 			//			write:1,
-						block:1,
+			//			block:1,
 						width:sp.width,
 						title0:sp.txt_1,
 						spisok:sp.elv_spisok
@@ -2171,7 +2171,192 @@ $.fn._count = function(o) {//input с количеством
 	window[win] = t;
 	return t;
 };
-$.fn._select = function(o, o1, o2) {
+$.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
+	var t = $(this),
+		attr_id = t.attr('id');
+
+	if(!attr_id) {
+		attr_id = 'select' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
+	}
+
+	var win = attr_id + '_select';
+
+	o = $.extend({
+		width:150,			// ширина. Если 0 = 100%
+		disabled:0,
+		block:0,       	    // расположение селекта
+		title0:'',			// поле с нулевым значением
+		spisok:[],			// результаты в формате json
+//		limit:0,
+		write:0,            // возможность вводить значения
+		write_save:0,       // сохранять текст, если даже не выбран элемент
+		msg_empty:'Список пуст',
+		multiselect:0,      // возможность выбирать несколько значений. Идентификаторы перечисляются через запятую
+		func:function() {},	// функция, выполняемая при выборе элемента
+//		funcAdd:null,		// функция добавления нового значения. Если не пустая, то выводится плюсик. Функция передаёт список всех элементов, чтобы можно было добавить новый
+//		funcKeyup:funcKeyup	// функция, выполняемая при вводе в INPUT в селекте. Нужна для вывода списка из вне, например, Ajax-запроса, либо из vk api.
+		end:0//удалить
+	}, o);
+
+	var dis = o.disabled ? ' disabled' : '',
+		dib = o.block ? '' : ' dib',
+		width = 'width:' + (o.width ? o.width + 'px' : '100%'),
+		html =
+		'<div class="_select' + dis + dib + '" id="' + win + '" style="' + width + '">' +
+			'<table class="w100p">' +
+				'<tr><td><input type="text" class="select-inp" placeholder="' + o.title0 + '" readonly />' +
+//					'<td class="w15 clear"><div class="icon icon-del pl' + _tooltip('Очистить', -29) + '</div>' +
+//			(!dis ? '<td class="w25 r"><div class="icon icon-add pl"></div>' : '') +
+					'<td class="arrow">' +
+			'</table>' +
+			'<div class="select-res"></div>' +
+		'</div>';
+	t.next().remove('._select');
+	t.after(html);
+
+	var SEL = t.next(),
+		INP = SEL.find('.select-inp'),
+		RES = SEL.find('.select-res'),
+		MASS_ASS = {},//ассоциативный массив в виде {1:'text'}
+		MASS_SEL = [],//массив в виде [{id:1,title:'text1'},{id:2,title:'text2'}]
+		MASS_SEL_SAVE = [],//дублирование MASS_SEL
+
+		end;//удалить
+
+	massCreate();
+	spisokPrint();
+
+
+	SEL.click(function(e) {
+		if(dis)
+			return;
+
+		var rs = SEL.hasClass('rs'),
+			tagret = $(e.target);
+
+		if(tagret.hasClass('select-unit'))
+			return unitClick(tagret);
+		if(rs && o.write && tagret.hasClass('select-inp'))
+			return;
+		if(tagret.hasClass('icon-add'))
+			return;
+		if(tagret.hasClass('icon-del'))
+			return;
+		if(tagret.hasClass('empty'))
+			return;
+
+		SEL._dn(rs, 'rs');
+	});
+	RES.find('.select-unit').mouseenter(function() {
+		RES.find('.ov').removeClass('ov');
+		$(this).addClass('ov');
+	});
+
+	$(document)
+		.off('click._select')
+		.on('click._select', function(e) {
+			var target = $(e.target),
+				cur,
+				attr = '';
+
+			if(target.hasClass('_select'))
+				cur = target;
+			else
+				cur = _parent(target, '._select')
+
+			if(cur.hasClass('_select'))
+				attr = ':not(#' + cur.attr('id') + ')';
+
+			$('._select' + attr).removeClass('rs');
+		});
+
+	function massCreate() {//создание массива для корректного вывода списка
+		var unit;
+
+		if(o.title0)
+			MASS_ASS[0] = '';
+
+		//исходный список является ассоциативным объектом
+		if(!o.spisok.length) {
+			_forIn(o.spisok, function(sp, id) {
+				id = _num(id);
+				if(!id)
+					return;
+				MASS_ASS[id] = sp;
+				unit = {
+					id:id,
+					title:sp,
+					content:sp
+				};
+				MASS_SEL.push(unit);
+				MASS_SEL_SAVE.push(unit);
+			});
+			return;
+		}
+
+		//исходный список является последовательным массивом
+		_forN(o.spisok, function(sp, n) {
+			var id,
+				title,
+				content;
+
+			//проверка на одномерный последовательный массив
+			if(typeof sp == 'number' || typeof sp == 'string') {
+				id = n + 1;
+				title = sp;
+				content = sp;
+			} else {
+				id = sp.uid;
+				if(id === undefined)
+					id = sp.id;
+				if(id === undefined)
+					return;
+				id = _num(id);
+				if(!id)
+					return;
+				title = sp.title;
+				if(title === undefined)
+					return;
+				content = sp.content;
+				if(content === undefined)
+					content = title;
+			}
+
+			MASS_ASS[id] = title;
+			unit = {
+				id:id,
+				title:title,
+				content:content
+			};
+			MASS_SEL.push(unit);
+			MASS_SEL_SAVE.push(unit);
+		});
+	}
+	function unitClick(unit) {//нажатие на элемент списка
+		var v = _num(unit.attr('val'));
+		t.val(v);
+		INP.val(MASS_ASS[v]);
+		SEL.removeClass('rs');
+	}
+	function spisokPrint() {//вставка списка в select
+		if(!MASS_SEL.length) {
+			RES.html('<div class="empty">' + o.msg_empty + '</div>');
+			return;
+		}
+
+		var html = '';
+		if(o.title0)
+			html += '<div class="select-unit title0" val="0">' + o.title0 + '</div>';
+
+		_forN(MASS_SEL, function(sp) {
+			html += '<div class="select-unit" val="' + sp.id + '">' + sp.content + '</div>';
+		});
+		RES.html(html);
+	}
+
+};
+$.fn._select1 = function(o, o1, o2) {
 	var t = $(this),
 		n,
 		s,

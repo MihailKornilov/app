@@ -127,7 +127,7 @@ function _header_but_page() {//отображение кнопки списка страниц
 	if(!APP_ID)
 		return '';
 
-	if(_page('cur') != 12)
+	if(_page('cur') == 12)
 		return '';
 
 	return '<button class="vk small" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>';
