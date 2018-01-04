@@ -1412,7 +1412,8 @@ var VK_SCROLL = 0,
 					id:0,
 					uid:NUM,
 					title:'имя значения ' + NUM,
-					def:0
+					def:0,
+					use:0
 				}, v);
 
 				DL.append(
@@ -1423,8 +1424,11 @@ var VK_SCROLL = 0,
 								'<td><input type="text" class="title w100p" id="el-val-' + v.uid + '" value="' + v.title + '" />' +
 								'<td class="w15">' +
 									'<input type="hidden" class="def" id="el-def-' + v.uid + '" value="' + v.def + '" />' +
-								'<td class="w35 r">' +
-									'<div val="' + v.uid + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>' +
+								'<td class="w50 r">' +
+						   (v.use ? '<div class="dib fs11 color-ccc mr3 curD' + _tooltip('Использование', -53) + v.use + '</div>'
+									:
+									'<div val="' + v.uid + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
+						   )+
 						'</table>' +
 					'</dd>'
 				);

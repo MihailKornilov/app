@@ -373,11 +373,33 @@ function _dialogOpenLoad($dialog_id) {
 							  AND `element_id`=".$unit_id."
 							ORDER BY `sort`";
 					foreach(query_arr($sql) as $id => $r)
-						$unit[$col][] = array(
+						$unit[$col][_num($id)] = array(
 							'id' => _num($id),
 							'title' => utf8($r['title']),
-							'def' => _num($r['def'])
+							'def' => _num($r['def']),
+							'use' => 0  //количество использования значений, чтобы нельзя было удалять
 						);
+
+					//объект, в котором находится блок с элементом
+					$sql = "SELECT *
+							FROM `_block`
+							WHERE `id`=".$unit['block_id'];
+					if(!$block = query_assoc($sql))
+						break;
+
+					//пока только для диалогов
+					if($block['obj_name'] != 'dialog')
+						break;
+
+					//получение количества использования значений
+					$sql = "SELECT
+								`".$unit['col']."` `id`,
+								COUNT(*) `use`
+							FROM `_element`
+							WHERE `dialog_id`=".$block['obj_id']."
+							GROUP BY `".$unit['col']."`";
+					foreach(query_ass($sql) as $id => $use)
+						$unit[$col][$id]['use'] = $use;
 				}
 		}
 
