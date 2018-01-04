@@ -352,7 +352,7 @@ function _blockStyle($r, $width) {//стили css для блока
 }
 function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 	if(!$arr = _blockArr($obj_name, $obj_id, 'arr'))
-		return '';
+		return '{}';
 
 	$send = array();
 	foreach($arr as $id => $r) {
@@ -393,7 +393,7 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 
 		$send[] = $id.':{'.implode(',', $v).'}';
 	}
-	return implode(',', $send);
+	return '{'.implode(',', $send).'}';
 }
 function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для отправки через JSON для BLOCK_ARR
 	if(!$arr = _blockArr($obj_name, $obj_id, 'arr'))

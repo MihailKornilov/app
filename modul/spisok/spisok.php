@@ -328,10 +328,6 @@ function _spisokList($dialog_id, $component_id, $v='', $unit_id=0) {//массив спи
 	if(!$colName = $dialog['component'][$component_id]['col_name'])
 		$colName = 'id';
 
-	//отображение списка страниц определённым образом
-	if($dialog['base_table'] == '_page')
-		return _dialogPageList();
-
 	$cond = "`app_id`=".APP_ID."
 		 AND `dialog_id`=".$dialog_id;
 	if($v)

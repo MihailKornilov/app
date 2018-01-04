@@ -212,8 +212,10 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'<p class="mt10">' +
 						'<button class="vk dialog-open" val="dialog_id:1,block_id:' + BL.id + '">Галочка</button>' +
 						'<button class="vk dialog-open ml10" val="dialog_id:16,block_id:' + BL.id + '">Radio</button>' +
-						'<button class="vk dialog-open ml10" val="dialog_id:17,block_id:' + BL.id + '">Select</button>' +
 						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Календарь</button>' +
+					'<p class="mt10">' +
+						'<button class="vk dialog-open" val="dialog_id:17,block_id:' + BL.id + '">Select - произвольные значения</button>' +
+						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Select - список страниц</button>' +
 
 					'<p class="mt30 fs17">Вспомогательные компоненты:' +
 					'<p class="mt10">' +

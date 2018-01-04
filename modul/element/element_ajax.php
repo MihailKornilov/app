@@ -141,9 +141,15 @@ switch(@$_POST['op']) {
 						'<td><input type="text" id="base_table" class="w230" maxlength="30" value="'.$dialog['base_table'].'" />'.
 					//доступность диалога. На основании app_id. По умолчанию 0 - недоступен всем.
 					'<tr><td class="red r">App any:'.
-						'<td><input type="hidden" id="app_any" value="'.($dialog['id'] ? ($dialog['app_id'] ? 0 : 1) : 0).'" />'.
+						'<td>'._check(array(
+									'attr_id' => 'app_any',
+									'value' => $dialog['id'] ? ($dialog['app_id'] ? 0 : 1) : 0
+							   )).
 					'<tr><td class="red r">SA only:'.
-						'<td><input type="hidden" id="sa" value="'.$dialog['sa'].'" />'.
+						'<td>'._check(array(
+									'attr_id' => 'sa',
+									'value' => $dialog['sa']
+							   )).
 				'</table>'.
 			'</div>'
 	  : '');
@@ -163,7 +169,6 @@ switch(@$_POST['op']) {
 		$send['cmp'] = $dialog['cmp_utf8'];
 //		$send['func'] = (object)$dialog['func'];
 //		$send['spisokOn'] = _dialogSpisokOn();
-//		$send['page_list'] = _dialogPageList();
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
 		jsonSuccess($send);
@@ -402,7 +407,6 @@ function _dialogOpenLoad($dialog_id) {
 						$unit[$col][$id]['use'] = $use;
 				}
 		}
-
 
 	$send['unit'] = $unit;
 

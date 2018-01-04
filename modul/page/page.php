@@ -1,81 +1,4 @@
 <?php
-function _page($i='all', $id=0) {//получение данных страницы
-	if(!defined('APP_ID'))
-		return 0;
-
-	if(!$i)
-		return 0;
-
-	$page = _pageCache();
-
-	if($i === 'all')
-		return $page;
-
-	//id страницы по умолчанию, либо из $_GET
-	if($i == 'cur') {
-		if($page_id = _num(@$_GET['p'])) {
-			if(!isset($page[$page_id]))
-				return 0;
-			return $page_id;
-		}
-
-		foreach($page as $p) {
-			if(!$p['def'])
-				continue;
-
-			if(!SA && $p['sa'])
-				continue;
-
-			return $p['id'];
-		}
-
-		//иначе на список страниц
-		return 12;
-	}
-
-	//является ли страница родительской относительно текущей
-	if($i == 'is_cur_parent') {
-		if(!$page_id = _num($id))
-			return false;
-		$cur = _page('cur');
-
-		//проверяемая страница совпадает с текущей
-		if($page_id == $cur)
-			return true;
-
-		//текущая страница сама является главной
-		if(!$cur_parent = _num($page[$cur]['parent_id']))
-			return false;
-
-		//проверяемая страница является родителем текущей
-		if($page_id == $cur_parent)
-			return true;
-
-		//проверяемая страница является про-родителем текущей
-		if($page_id == $page[$cur_parent]['parent_id'])
-			return true;
-
-		return false;
-	}
-
-	//данные конкретной страницы
-	if($page_id = _num($i)) {
-		if(!isset($page[$page_id]))
-			return false;
-		return $page[$page_id];
-	}
-
-	//значение текущей страницы
-	if($page_id = _page('cur')) {
-		if(!isset($page[$page_id]))
-			return false;
-		if(!isset($page[$page_id][$i]))
-			return false;
-		return $page[$page_id][$i];
-	}
-
-	return false;
-}
 function _pageCache() {//получение массива страниц из кеша
 	if($arr = _cache())
 		return $arr;
@@ -120,6 +43,126 @@ function _pageCache() {//получение массива страниц из кеша
 	}
 
 	return _cache($page);
+}
+function _page($i='all', $i1=0) {//получение данных страницы
+	if(!defined('APP_ID'))
+		return 0;
+
+	if(!$i)
+		return 0;
+
+	$page = _pageCache();
+
+	if($i === 'all')
+		return $page;
+
+	//id страницы по умолчанию, либо из $_GET
+	if($i == 'cur') {
+		if($page_id = _num(@$_GET['p'])) {
+			if(!isset($page[$page_id]))
+				return 0;
+			return $page_id;
+		}
+
+		foreach($page as $p) {
+			if(!$p['def'])
+				continue;
+
+			if(!SA && $p['sa'])
+				continue;
+
+			return $p['id'];
+		}
+
+		//иначе на список страниц
+		return 12;
+	}
+
+	//является ли страница родительской относительно текущей
+	if($i == 'is_cur_parent') {
+		if(!$page_id = _num($i1))
+			return false;
+		$cur = _page('cur');
+
+		//проверяемая страница совпадает с текущей
+		if($page_id == $cur)
+			return true;
+
+		//текущая страница сама является главной
+		if(!$cur_parent = _num($page[$cur]['parent_id']))
+			return false;
+
+		//проверяемая страница является родителем текущей
+		if($page_id == $cur_parent)
+			return true;
+
+		//проверяемая страница является про-родителем текущей
+		if($page_id == $page[$cur_parent]['parent_id'])
+			return true;
+
+		return false;
+	}
+
+	//список страниц для select
+	if($i == 'for_select') {
+		$child = array();
+		foreach($page as $id => $r) {
+			if(!$r['parent_id'])
+				continue;
+
+			if(empty($child[$r['parent_id']]))
+				$child[$r['parent_id']] = array();
+
+			$child[$r['parent_id']][] = $r;
+			unset($page[$id]);
+		}
+		$send = _pageChildArr($page, $child);
+
+		if($i1 == 'js')
+			return json_encode($send);
+
+		return $send;
+	}
+
+	//данные конкретной страницы
+	if($page_id = _num($i)) {
+		if(!isset($page[$page_id]))
+			return false;
+		return $page[$page_id];
+	}
+
+	//значение текущей страницы
+	if($page_id = _page('cur')) {
+		if(!isset($page[$page_id]))
+			return false;
+		if(!isset($page[$page_id][$i]))
+			return false;
+		return $page[$page_id][$i];
+	}
+
+	return false;
+}
+function _pageChildArr($arr, $child, $level=0) {//перечисление иерархии страниц
+	if(empty($arr))
+		return '';
+
+	$send = array();
+	foreach($arr as $r) {
+		if($r['sa'])
+			continue;
+		if(!$r['app_id'])
+			continue;
+		$send[] = array(
+			'id' => _num($r['id']),
+			'title' => utf8(addslashes(htmlspecialchars_decode(trim($r['name'])))),
+			'content' => '<div class="fs'.(14-$level).' '.($level ? 'ml'.($level*20) : 'b').'">'.utf8(addslashes(htmlspecialchars_decode(trim($r['name'])))).'</div>'
+		);
+		if(!empty($child[$r['id']]))
+			foreach(_pageChildArr($child[$r['id']], $child, $level+1) as $sub)
+				$send[] = $sub;
+	}
+
+	return $send;
 }
 
 function _pageSetupDefine() {//установка флага включения управления страницей PAS: page_setup
@@ -219,7 +262,8 @@ function _pageShow($page_id) {
 	_blockHtml('page', $page_id).
 //	_page_div().
 	'<script>'.
-		'var BLOCK_ARR={'._blockJS('page', $page_id).'},'.
+		'var PAGE_LIST='._page('for_select', 'js').','.
+			'BLOCK_ARR='._blockJS('page', $page_id).','.
 			'ELEM_COLOR={'._elemColor().'};'.
 	'</script>'.
 	'<script>_pageShow('.PAS.')</script>';
@@ -359,6 +403,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				$v.
 			'</textarea>';
 
+		//Select - выбор страницы
+		case 6:
+			/*
+                txt_1 - текст, когда страница не выбрана
+
+			*/
+			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+
 		//input:text (однострочное текстовое поле)
 		case 8:
 			/*
@@ -394,7 +446,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'spisok' => $spisok
 			));
 
-		//Select
+		//Select - произвольные значения
 		case 17:
 			/*
                 txt_1 - текст нулевого значения
@@ -669,6 +721,8 @@ function _page_div() {//todo тест
 		'<div class="icon icon-hint"></div>'.
 		' Попутный текст'.
 	'</div>'.
+
+	_page('for_select', 'js').
 
 	'<button class="vk mar20" id="bbb">Кнопка для сохранения</button>'.
 

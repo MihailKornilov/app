@@ -374,16 +374,13 @@ var VK_SCROLL = 0,
 			}
 		});
 
-		$('#app_any')._check();
-		$('#sa')._check();
-
 		$('#dialog-menu')._menu({
 			type:4,
 			spisok:o.menu,
 			func:_dialogHeightCorrect
 		});
 		$('#action_id')._select({
-			width:260,
+			width:300,
 			title0:'действия нет, закрыть окно',
 			spisok:o.action,
 			func:function(v) {
@@ -392,9 +389,9 @@ var VK_SCROLL = 0,
 			}
 		});
 		$('#action_page_id')._select({
-			width:250,
+			width:300,
 			title0:'не выбрана',
-			spisok:o.page_list
+			spisok:PAGE_LIST
 		});
 
 		_dialogHeightCorrect();
@@ -448,8 +445,6 @@ var VK_SCROLL = 0,
 			dialog.post(send, _dialogOpen);
 		}
 	},
-
-
 
 
 	_dialogHeightCorrect = function() {//установка высоты линий для настройки ширины диалога и ширины полей с названиями
@@ -1402,7 +1397,16 @@ var VK_SCROLL = 0,
 			switch(sp.dialog_id) {
 				//textarea
 				case 5:	$(sp.attr_id).autosize(); return;
-				//select
+				//select - выбор страницы
+				case 6:
+					$(sp.attr_id)._select({
+						disabled:is_edit,
+						width:sp.width,
+						title0:sp.txt_1,
+						spisok:PAGE_LIST
+					});
+					return;
+				//select - произвольные значения
 				case 17:
 					$(sp.attr_id)._select({
 						disabled:is_edit,
@@ -2175,8 +2179,16 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		var rs = SEL.hasClass('rs'),
 			tagret = $(e.target);
 
-		if(tagret.hasClass('select-unit'))
+		if(tagret.hasClass('select-unit')) {
 			valueSet(tagret.attr('val'));
+			o.func(VALUE);
+		} else {
+			var p = _parent(tagret, '.select-unit');
+			if(p.hasClass('select-unit')) {
+				valueSet(p.attr('val'));
+				o.func(VALUE);
+			}
+		}
 
 		if(rs && o.write && tagret.hasClass('select-inp'))
 			return;
@@ -2303,10 +2315,16 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		VALUE = v;
 		t.val(v);
 		INP.val(MASS_ASS[v]);
+
 	}
 	function action() {//выполнение действия в существующем селекте
 		if(s === undefined)
 			return t;
+
+		if(typeof o == 'number') {
+			s.value(o);
+			return s;
+		}
 
 		switch(o) {
 			case 'disable': s.disable(); break;
@@ -2315,6 +2333,7 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		return s;
 	}
 
+	t.value = valueSet;
 	t.disable = function() {//делание неактивным
 		SEL.addClass('disabled')
 		   .removeClass('rs');
