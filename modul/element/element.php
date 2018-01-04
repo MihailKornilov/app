@@ -170,8 +170,9 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'dialog_id' => _num($r['dialog_id']),
 
 						'width' => _num($r['width']),
-						'require' => _num($r['require']),
 						'col' => $r['col'],
+						'req' => _num($r['req']),
+						'focus' => _num($r['focus']),
 
 						'num_1' => _num($r['num_1']),
 						'txt_1' => $r['txt_1'],
@@ -666,7 +667,7 @@ function _dialogElHtmlContent($req=0) {//основное содержимое
 ($req ? //отображение галочки "Требуется обязательное заполнение"
 	'<table class="bs5">'.
 		'<tr><td class="'.EL_LABEL_W.'">'.
-			'<td><input type="hidden" id="label-require" />'.
+			'<td><input type="hidden" id="label-req" />'.
 	'</table>'
 : '').
 

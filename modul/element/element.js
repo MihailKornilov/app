@@ -325,7 +325,6 @@ var VK_SCROLL = 0,
 			}
 		};
 	},
-
 	_dialogEdit = function(o) {//создание|редактирование диалогового окна
 		var dialog = _dialog({
 				dialog_id:o.dialog_id,
@@ -463,7 +462,7 @@ var VK_SCROLL = 0,
 			type_id:0,
 			col_name:'',    //имя колонки (для SA)
 			label_name:'',  //название поля
-			require:0,      //флаг "требовать обязательное заполнение"
+			req:0,      //флаг "требовать обязательное заполнение"
 			hint:'',        //текст подсказки
 			width:0,        //длина элемента (для input, textarea, select)
 			num_1:0,
@@ -536,7 +535,7 @@ var VK_SCROLL = 0,
 			dialog.content.html(DIALOG_ELEMENT[TYPE_ID].html);
 			$('#col_name').val(CMP.col_name);
 			$('#label_name').val(CMP.label_name);
-			$('#label-require').val(CMP.require);
+			$('#label-req').val(CMP.req);
 			$('#label-hint').val(CMP.hint);
 			$('#txt_1').val(CMP.txt_1);
 
@@ -546,11 +545,11 @@ var VK_SCROLL = 0,
 		function elScript() {//применение скриптов для конкретного элемента
 			var labelPrevUpdate = function() {//обновление предварительного просмотра label
 					var txt = $.trim($('#label_name').val()),
-						require = _bool($('#label-require').val()),
+						req = _bool($('#label-req').val()),
 						hint = $.trim($('#label-hint').val());
 					txt =
 						(txt ? txt + ':' : '') +
-						(require ? '<div class="dib red fs15 mtm2">*</div>' : '') +
+						(req ? '<div class="dib red fs15 mtm2">*</div>' : '') +
 						(hint ? ' <div class="icon icon-info pl dialog-hint-edit"></div>' : '');
 					$('#label-prev').html(txt);
 				},
@@ -558,7 +557,7 @@ var VK_SCROLL = 0,
 
 			$('#label_name').keyup(labelPrevUpdate).focus();
 
-			$('#label-require')._check({
+			$('#label-req')._check({
 				title:'требовать обязательное заполнение',
 				light:1,
 				func:labelPrevUpdate
@@ -861,7 +860,7 @@ var VK_SCROLL = 0,
 					type_id:TYPE_ID,
 					col_name:$.trim($('#col_name').val()),
 					label_name:$.trim($('#label_name').val()),
-					require:_bool($('#label-require').val()),
+					req:_bool($('#label-req').val()),
 					hint:$.trim($('#label-hint').val()),
 					width:CMP.width,
 					txt_1:$.trim($('#txt_1').val()),
@@ -933,7 +932,7 @@ var VK_SCROLL = 0,
 						'<table class="bs5 w100p">' +
 							'<tr><td class="label label-width ' + (TYPE_7 ? '' : 'r') +' pr5" ' + (TYPE_7 ? 'colspan="2"' : 'style="width:125px"') + '>' +
 									(elem.label_name ? elem.label_name + ':' : '') +
-									(elem.require ? '<div class="dib red fs15 mtm2">*</div>' : '') +
+									(elem.req ? '<div class="dib red fs15 mtm2">*</div>' : '') +
 									(elem.hint ? ' <div class="icon icon-info pl dialog-hint" val="' + _br(elem.hint, 1) + '"></div>' : '') +
 				(!TYPE_7 ? '<td>' : '') +
 								inp +
@@ -1289,8 +1288,6 @@ var VK_SCROLL = 0,
 					send.op = 'spisok_del';
 			}
 
-
-
 			//получение значений компонентов
 			_forIn(o.cmp, function(sp, id) {
 				switch(sp.dialog_id) {
@@ -1301,17 +1298,6 @@ var VK_SCROLL = 0,
 				send.cmp[id] = $(sp.attr_id).val();
 			});
 
-/*
-			_forN(cmp, function(sp) {
-				if(!sp.func_flag)
-					return;
-
-				send.elem[sp.id] = $(sp.attr_id).val();
-
-				//сохранение значений функций
-				funcVal(sp.id, send.func);
-			});
-*/
 			dialog.post(send, function(res) {
 //				return;
 				switch(res.action_id) {
@@ -1408,12 +1394,16 @@ var VK_SCROLL = 0,
 	},
 
 	_elemActivate = function(elem, unit, is_edit) {//применение функций (активирование) к элементам
+		var attr_focus = false;//элемент, на который будет поставлен фокус
+
 		_forIn(elem, function(sp) {
+			if(sp.focus)
+				attr_focus = sp.attr_id;
 			switch(sp.dialog_id) {
-				case 5://textarea
-					$(sp.attr_id).autosize();
-					return;
-				case 17://select
+				//textarea
+				case 5:	$(sp.attr_id).autosize(); return;
+				//select
+				case 17:
 					$(sp.attr_id)._select({
 						disabled:is_edit,
 			//			write:1,
@@ -1423,13 +1413,17 @@ var VK_SCROLL = 0,
 						spisok:sp.elv_spisok
 					});
 					return;
-				case 19://наполнение для некоторых компонентов
+				//наполнение для некоторых компонентов
+				case 19:
 					if(is_edit)
 						return;
 					_dialogCmpValue(sp, unit[sp.col]);
 					return;
 			}
 		});
+
+		if(attr_focus)
+			$(attr_focus).focus();
 	},
 
 	_dialogScript = function(component, isEdit) {//применение скриптов после загрузки данных диалога

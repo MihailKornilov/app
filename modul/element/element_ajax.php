@@ -564,7 +564,7 @@ function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диа
 		}
 
 		$label_name = _txt($r['label_name']);
-		$require = _bool($r['require']);
+		$req = _bool($r['req']);
 		$hint = _txt($r['hint']);
 		$width = _num($r['width']);
 
@@ -573,7 +573,7 @@ function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диа
 					`dialog_id`,
 					`type_id`,
 					`label_name`,
-					`require`,
+					`req`,
 					`hint`,
 					`width`,
 					`txt_1`,
@@ -591,7 +591,7 @@ function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диа
 					".$dialog_id.",
 					".$type_id.",
 					'".addslashes($label_name)."',
-					".$require.",
+					".$req.",
 					'".addslashes($hint)."',
 					".$width.",
 					'".addslashes(_txt($r['txt_1']))."',
@@ -607,7 +607,7 @@ function _dialogComponentUpdate($dialog_id=0) {//проверка/внесение элементов диа
 				)
 				ON DUPLICATE KEY UPDATE
 					`label_name`=VALUES(`label_name`),
-					`require`=VALUES(`require`),
+					`req`=VALUES(`req`),
 					`hint`=VALUES(`hint`),
 					`width`=VALUES(`width`),
 					`txt_1`=VALUES(`txt_1`),
@@ -772,7 +772,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 							'<table class="bs5 w100p">'.
 								'<tr><td class="label '.($type_7 ? '' : 'r').($edit ? ' label-width pr5' : '').'" '.($type_7 ? 'colspan="2"' : 'style="width:125px"').'>'.
 										($r['label_name'] ? $r['label_name'].':' : '').
-										($r['require'] ? '<div class="dib red fs15 mtm2">*</div>' : '').
+										($r['req'] ? '<div class="dib red fs15 mtm2">*</div>' : '').
 										($r['hint'] ? ' <div class="icon icon-info pl dialog-hint" val="'.addslashes(_br(htmlspecialchars_decode($r['hint']))).'"></div>' : '').
 					//если информация, то показ на всю ширину
 				   (!$type_7 ? '<td>' : '').
@@ -785,7 +785,7 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 				'id' => _num($r['id']),
 				'type_id' => $type_id,
 				'label_name' => utf8($r['label_name']),
-				'require' => _bool($r['require']),
+				'req' => _bool($r['req']),
 				'hint' => utf8(htmlspecialchars_decode(htmlspecialchars_decode($r['hint']))),
 				'width' => $width,
 				'txt_1' => utf8($r['txt_1']),

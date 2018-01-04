@@ -506,6 +506,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		jsonError('Компоненты диалога не являются массивом');
 
 	$cmpUpdate = array();
+	$focusUpdate = false;//если в таблице присутствует колонка `focus`, то предварительное снятие флага фокуса с других элементов объекта (для таблицы _element)
 	foreach($postCmp as $cmp_id => $val) {
 		if(!$cmp_id = _num($cmp_id))
 			jsonError('Некорректный id компонента диалога');
@@ -523,8 +524,11 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 		$v = _txt($val);
 
-		if($cmp['require'] && !$v)
+		if($cmp['req'] && !$v)
 			jsonError('Требуется обязательно заполнить<br>поля, отмеченные звёздочкой');
+
+		if($col == 'focus' && $v)
+			$focusUpdate = true;
 
 		$cmpUpdate[] = "`".$col."`='".addslashes($v)."'";
 	}
@@ -595,7 +599,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 				continue;
 			}
 			if($r['Field'] == 'width' && $dialog['base_table'] == '_element') {
-				$sql = "UPDATE `".$dialog['base_table']."`
+				$sql = "UPDATE `_element`
 						SET `width`="._elemWidth($dialog_id, 'def')."
 						WHERE `id`=".$unit_id;
 				query($sql);
@@ -607,6 +611,30 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 						WHERE `id`=".$unit_id;
 				query($sql);
 			}
+		}
+	}
+
+	//снятие флага фокуса со всех элементов объекта
+	if($focusUpdate && $dialog['base_table'] == '_element') {
+		$sql = "SELECT `block_id`
+				FROM `_element`
+				WHERE `id`=".$unit_id;
+		$block_id = _num(query_value($sql));
+
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$block_id;
+		$block = query_assoc($sql);
+
+		$sql = "SELECT `id`
+				FROM `_block`
+				WHERE `obj_name`='".$block['obj_name']."'
+				  AND `obj_id`=".$block['obj_id'];
+		if($block_ids = query_ids($sql)) {
+			$sql = "UPDATE `_element`
+					SET `focus`=0
+					WHERE `block_id` IN (".$block_ids.")";
+			query($sql);
 		}
 	}
 
@@ -727,7 +755,7 @@ function _spisokUnitUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/реда
 
 		$v = _txt($elem[$id]);
 
-		if($r['require'] && empty($v))
+		if($r['req'] && empty($v))
 			jsonError(array(
 				'delem_id' => $id,
 				'text' => utf8('Не заполнено поле<br><b>'.$r['label_name'].'</b>')
