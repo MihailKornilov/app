@@ -510,6 +510,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		case 14: return _spisokShow($el);     //содержание списка
 		case 15: return _spisokElemCount($el);//текст с количеством строк списка
+
+		//информационный блок
+		case 21:
+			/*
+                txt_1 - содержание
+			*/
+			return '<div class="_info">'._br($el['txt_1']).'</div>';
 	}
 
 	//элементы списка шаблона (для настройки)

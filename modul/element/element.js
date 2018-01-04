@@ -2177,7 +2177,8 @@ $.fn._count = function(o) {//input с количеством
 };
 $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 	var t = $(this),
-		attr_id = t.attr('id');
+		attr_id = t.attr('id'),
+		VALUE = t.val();
 
 	if(!attr_id) {
 		attr_id = 'select' + Math.round(Math.random() * 100000);
@@ -2230,6 +2231,7 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 
 	massCreate();
 	spisokPrint();
+	valueSet(VALUE);
 
 
 	SEL.click(function(e) {
@@ -2240,7 +2242,8 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			tagret = $(e.target);
 
 		if(tagret.hasClass('select-unit'))
-			return unitClick(tagret);
+			valueSet(tagret.attr('val'));
+
 		if(rs && o.write && tagret.hasClass('select-inp'))
 			return;
 		if(tagret.hasClass('icon-add'))
@@ -2251,6 +2254,15 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			return;
 
 		SEL._dn(rs, 'rs');
+
+		if(!rs)
+			_forEq(RES.find('.select-unit'), function(sp) {
+				if(VALUE == sp.attr('val')) {
+					RES.find('.select-unit').removeClass('ov');
+					sp.addClass('ov');
+					return false;
+				}
+			});
 	});
 	RES.find('.select-unit').mouseenter(function() {
 		RES.find('.ov').removeClass('ov');
@@ -2337,12 +2349,6 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			MASS_SEL_SAVE.push(unit);
 		});
 	}
-	function unitClick(unit) {//нажатие на элемент списка
-		var v = _num(unit.attr('val'));
-		t.val(v);
-		INP.val(MASS_ASS[v]);
-		SEL.removeClass('rs');
-	}
 	function spisokPrint() {//вставка списка в select
 		if(!MASS_SEL.length) {
 			RES.html('<div class="empty">' + o.msg_empty + '</div>');
@@ -2357,6 +2363,12 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			html += '<div class="select-unit" val="' + sp.id + '">' + sp.content + '</div>';
 		});
 		RES.html(html);
+	}
+	function valueSet(v) {
+		v = _num(v);
+		VALUE = v;
+		t.val(v);
+		INP.val(MASS_ASS[v]);
 	}
 
 };
