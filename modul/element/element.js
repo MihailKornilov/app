@@ -1273,11 +1273,6 @@ var VK_SCROLL = 0,
 		else
 			_elemActivate(o.cmp, o.unit);
 
-//		window.COMPONENT_FUNC = res.func;
-//		window.DATA = res.data;
-//		window.UNIT_ID = 0;//unit_id;
-//		_dialogScript(res.component);
-
 		function submit() {
 			var send = {
 				op:'spisok_add',
@@ -1332,52 +1327,6 @@ var VK_SCROLL = 0,
 						break;
 				}
 			});
-		}
-		function funcVal(id, sf) {//получение значений функций
-			var func = COMPONENT_FUNC,
-				v = [], //переменная для сбора значений
-				join = 1;//производить ли объединение элементов после сбора
-
-			if(!func[id])
-				return;
-
-			_forN(func[id], function(sp) {
-				var delem = $('#delem' + id);
-				if(sp.action_id == 5)
-					_forEq(delem.find('.spisok-col ._check').prev(), function(i) {
-						if(_num(i.val()))
-							v.push(_num(i.attr('id').split('col')[1]));
-					});
-				if(sp.action_id == 6)
-					v.push(_num(delem.find('.spisok-col ._radio .on').attr('val')));
-				if(sp.action_id == 7) {
-					if($('#colNameShow').length) {//181 таблица
-						v.push(_num($('#colNameShow').val()));
-						v.push(_num($('#rowLight').val()));
-						v.push(_num($('#rowSmall').val()));
-						_forEq(delem.find('dd'), function(eq) {
-							var col_id = _num(eq.find('input:first').val(), 1),
-								tr = eq.find('.tr').val(),
-								link_on = eq.find('.td-link-on').hasClass('dn') ? 0 : 1,
-								link = _num(eq.find('.elem-link').val());
-							if(!col_id)
-								return;
-							v.push(col_id + '&' + tr + '&' + link_on + '&' + link);
-						});
-					}
-/*
-					if($('#tmp-elem-list').length) {//182 шаблон
-						_forEq($('#tmp-elem-list .pe'), function(eq) {
-							var k = _num(eq.attr('val'));
-							ELEM_ARR[k].pe = '';
-							v.push(ELEM_ARR[k]);
-						});
-						join = 0;
-					}
-*/
-				}
-			});
-			sf[id] = join ? v.join(',') : v;
 		}
 	},
 	_dialogCmpValue = function(o, val) {//наполнение для некоторых компонентов
@@ -1492,7 +1441,7 @@ var VK_SCROLL = 0,
 
 		//применение функций, привязанных к компонентам
 		_forN(component, function(ch) {
-			_dialogCmpFunc(ch.id, _num($(ch.attr_id).val()), isEdit, 1);
+//			_dialogCmpFunc(ch.id, _num($(ch.attr_id).val()), isEdit, 1);
 		})
 	},
 	_dialogCmpScript = function(ch, isEdit) {//применение скриптов для конкретного компонента диалога
@@ -1532,24 +1481,7 @@ var VK_SCROLL = 0,
 					funcKeyup:funcKeyup
 				});
 				if(isEdit) {
-					$(ch.attr_id)
-						._select('disabled')
-						.next().resizable({
-							minWidth:80,
-							maxWidth:350,
-							grid:10,
-							handles:'e',
-							stop:function(event, ui) {
-								var id = _num(ui.originalElement[0].id.split('elem')[1].split('_select')[0]);
-								for(var n = 0; n < DIALOG_COMPONENT.length; n++) {
-									var sp = DIALOG_COMPONENT[n];
-									if(sp.id == id) {
-										sp.width = ui.size.width;
-										break;
-									}
-								}
-							}
-						});
+					$(ch.attr_id)._select('disable');
 				}
 				break;
 			}
@@ -2185,7 +2117,16 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		t.attr('id', attr_id);
 	}
 
-	var win = attr_id + '_select';
+	var win = attr_id + '_select',
+		s = window[win];
+	console.log(s);
+	switch(typeof o) {
+		default:
+		case 'undefined': break;
+		case 'object': break;
+		case 'number':
+		case 'string': return action();
+	}
 
 	o = $.extend({
 		width:150,			// ширина. Если 0 = 100%
@@ -2232,7 +2173,6 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 	massCreate();
 	spisokPrint();
 	valueSet(VALUE);
-
 
 	SEL.click(function(e) {
 		if(dis)
@@ -2364,13 +2304,31 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		});
 		RES.html(html);
 	}
-	function valueSet(v) {
+	function valueSet(v) {//установка значения
 		v = _num(v);
 		VALUE = v;
 		t.val(v);
 		INP.val(MASS_ASS[v]);
 	}
+	function action() {//выполнение действия в существующем селекте
+		if(s === undefined)
+			return t;
 
+		switch(o) {
+			case 'disable': s.disable(); break;
+		}
+
+		return s;
+	}
+
+	t.disable = function() {//делание неактивным
+		SEL.addClass('disabled')
+		   .removeClass('rs');
+		dis = true;
+	};
+
+	window[win] = t;
+	return t;
 };
 $.fn._select1 = function(o, o1, o2) {
 	var t = $(this),
@@ -2385,6 +2343,7 @@ $.fn._select1 = function(o, o1, o2) {
 	switch(typeof o) {
 		default:
 		case 'undefined': break;
+		case 'object': break;
 		case 'number':
 		case 'string':
 			s = window[id + '_select'];
@@ -2429,7 +2388,6 @@ $.fn._select1 = function(o, o1, o2) {
 					}
 			}
 			return t;
-		case 'object': break;
 /*			//если это первый вход, то пропуск
 			s = window[id + '_select'];
 			if(!s)
