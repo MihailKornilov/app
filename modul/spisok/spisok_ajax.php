@@ -513,7 +513,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		if(!$cmp = @$dialog['cmp'][$cmp_id])
 			jsonError('Отсутствует компонент id'.$cmp_id.' в диалоге');
 		if(!$col = @$cmp['col'])
-			jsonError('Отсутствует имя колонки списка');
+			jsonError('Отсутствует имя колонки в компоненте id'.$cmp_id);
 		if(!isset($dialog['field'][$col]))
 			jsonError('В списке нет колонки с именем "'.$col.'"');
 

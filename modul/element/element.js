@@ -1422,7 +1422,7 @@ var VK_SCROLL = 0,
 			}
 		});
 
-		if(attr_focus)
+		if(!is_edit && attr_focus)
 			$(attr_focus).focus();
 	},
 

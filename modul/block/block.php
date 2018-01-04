@@ -372,6 +372,7 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 
 			$v[] = 'fontAllow:'._elemFontAllow($el['dialog_id']);
 			$v[] = 'width:'.$el['width'];
+			$v[] = 'focus:'.$el['focus'];
 			$v[] = 'color:"'.$el['color'].'"';
 			$v[] = 'font:"'.$el['font'].'"';
 			$v[] = 'size:'.($el['size'] ? _num($el['size']) : 13);
@@ -425,6 +426,8 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 			$v['width_change'] = _elemWidth($el['dialog_id']);
 			$v['width_min'] = _elemWidth($el['dialog_id'], 'min');
 			$v['width_max'] = $width_max;
+
+			$v['focus'] = _num($el['focus']);
 
 			$v['color'] = $el['color'];
 			$v['font'] = $el['font'];
