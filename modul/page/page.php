@@ -447,8 +447,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			);
 			return _button(array(
 						'attr_id' => $attr_id,
-						'name' => $el['txt_1'],
+						'name' => _br($el['txt_1']),
 						'color' => $color[$el['num_1']],
+						'width' => $el['width'],
 						'small' => $el['num_2'],
 						'class' => 'dialog-open'.($el['num_3'] ? ' w100p' : ''),
 						'val' => 'dialog_id:'.$el['num_4']

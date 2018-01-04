@@ -8,8 +8,15 @@ function _button($v=array()) {//кнопка из контакта
 	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
 	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
 
+	$width = '';
+	if(isset($v['width']))
+		switch($v['width']) {
+			case 0: $width = ' style="width:100%"'; break;
+			default: $width = ' style="width:'._num($v['width']).'px"';
+		}
+
 	return
-	'<button class="vk'.$color.$small.$cls.'"'.$attr_id.$click.$val.'>'.
+	'<button class="vk'.$color.$small.$cls.'"'.$attr_id.$width.$click.$val.'>'.
 		$name.
 	'</button>';
 }
