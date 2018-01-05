@@ -433,6 +433,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 6:
 			/*
                 txt_1 - текст, когда страница не выбрана
+				функция _page('for_select', 'js')
 			*/
 			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
 
@@ -499,6 +500,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//наполнение для некоторых компонентов: radio, select, dropdown
 		case 19: return '<div class="_empty min">Наполнение компонента</div>'; //все действия через JS
 
+		//Select - выбор списка
+		case 24:
+			/*
+                txt_1 - текст, когда список не выбран
+				функция
+			*/
+			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
 
 
 
@@ -623,10 +631,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return 'фукнции не существует';
 			return $el['txt_1']();
 
-		//Содержание единицы списка
+		//Содержание единицы списка - шаблон
 		case 14:
 			/*
-                num_1 - внешний вид
+                num_1 -
 				num_2 - длина (количество строк, выводимых за один раз)
 			*/
 			return _spisokShow($el);
@@ -647,6 +655,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 txt_1 - содержание
 			*/
 			return '<div class="_info">'._br($el['txt_1']).'</div>';
+
+		//Содержание единицы списка - таблица
+		case 23:
+			return 'Содержание единицы списка - таблица';
 	}
 
 	//элементы списка шаблона (для настройки)

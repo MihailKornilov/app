@@ -342,7 +342,7 @@ function _dialogSpisokOn() {//получение массива диалогов, которые могут быть спи
 	$sql = "SELECT `id`,`spisok_name`
 			FROM `_dialog`
 			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
-			  AND `sa` IN (0".(SA ? ",1" : '').")
+			  AND `sa` IN (0,".SA.")
 			  AND `spisok_on`
 			ORDER BY `id`";
 	return query_selArray($sql);

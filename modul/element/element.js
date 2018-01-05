@@ -356,11 +356,9 @@ var VK_SCROLL = 0,
 
 		_elemActivate(o.cmp, {}, 1);
 
-		window.CMP_NAME = o.cmp_name;
 		window.DIALOG_ELEMENT = o.element;
 		window.DIALOG_COMPONENT = o.component;
 		window.COMPONENT_FUNC = o.func;
-		window.SPISOK_ON = o.spisokOn;
 
 		_forIn(o.block_arr, function(sp, k) {
 			BLOCK_ARR[k] = sp;

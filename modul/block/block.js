@@ -9,7 +9,14 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 		var t = $(this),
 			block_id = _num(t.attr('val')),
 			BL = BLOCK_ARR[block_id],
-			obj = $('#bl_' + BL.id);
+			obj = $('#bl_' + BL.id),
+			borSave = function() {//нажатие на галочку для установки/снятия бордюра
+				BL.bor = $('#block-unit-bor0').val() + ' ' +
+						 $('#block-unit-bor1').val() + ' ' +
+						 $('#block-unit-bor2').val() + ' ' +
+						 $('#block-unit-bor3').val();
+				BL.save = 1;
+			};
 
 		//идёт процес сохранения
 		if(BL.save || obj.hasClass('_busy'))
@@ -34,28 +41,28 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					tooltip:'сверху',
 					func:function(v) {
 						obj.css('border-top', v ? '#DEE3EF solid 1px' : '');
-						BL.save = 1;
+						borSave();
 					}
 				});
 				$('#block-unit-bor1')._check({
 					tooltip:'справа',
 					func:function(v) {
 						obj.css('border-right', v ? '#DEE3EF solid 1px' : '');
-						BL.save = 1;
+						borSave();
 					}
 				});
 				$('#block-unit-bor2')._check({
 					tooltip:'снизу',
 					func:function(v) {
 						obj.css('border-bottom', v ? '#DEE3EF solid 1px' : '');
-						BL.save = 1;
+						borSave();
 					}
 				});
 				$('#block-unit-bor3')._check({
 					tooltip:'слева',
 					func:function(v) {
 						obj.css('border-left', v ? '#DEE3EF solid 1px' : '');
-						BL.save = 1;
+						borSave();
 					}
 				});
 				$('#block-sa-view')._check({
@@ -69,24 +76,6 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					_blockUnitElAdd(BL);
 				});
 				if(BL.elem_id) {
-/*
-					$('#elem-edit').click(function() {
-						$(this).addClass('spin');
-						return;
-						$('._hint').remove();
-						if(BL.obj_name == 'spisok')
-							return _blockSpisokUnitElAdd(BL);
-						_dialogOpen(BL.dialog_id, BL.elem_id);
-					});
-					$('#elem-del').click(function() {
-						$('._hint').remove();
-						var func = BL.obj_name != 'spisok' ? false : function() {
-							$('#block-level-spisok').find('.block-grid-on').removeClass('grey').trigger('click');
-						};
-						_dialogOpen(6, BL.elem_id, 0, func);
-					});
-*/
-
 					var tMar = {
 						0:'сверху',
 						1:'справа',
@@ -134,6 +123,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				_blockUnitSave(BL, obj);
 			}
 		});
+
 	},
 	_blockUnitBg = function(BL) {//заливка блока
 		$(document)
@@ -215,7 +205,9 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Календарь</button>' +
 					'<p class="mt10">' +
 						'<button class="vk dialog-open" val="dialog_id:17,block_id:' + BL.id + '">Select - произвольные значения</button>' +
-						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Select - список страниц</button>' +
+						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Select - страницы</button>' +
+					'<p class="mt10">' +
+						'<button class="vk dialog-open ml10" val="dialog_id:24,block_id:' + BL.id + '">Select - списки</button>' +
 
 					'<p class="mt30 fs17">Вспомогательные компоненты:' +
 					'<p class="mt10">' +
@@ -233,9 +225,11 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 
 					'<p class="mt30 fs17">Элементы для списков:' +
 					'<p class="mt10">' +
-						'<button val="dialog_id:15,block_id:' + BL.id + '" class="vk dialog-open">Количество строк</button>' +
-						'<button val="dialog_id:14,block_id:' + BL.id + '" class="vk dialog-open ml10">Содержание</button>' +
-						'<button val="dialog_id:7,block_id:' + BL.id + '" class="vk dialog-open ml10">Поиск</button>' +
+						'<button val="dialog_id:7,block_id:' + BL.id + '" class="vk dialog-open">Поиск</button>' +
+						'<button val="dialog_id:15,block_id:' + BL.id + '" class="vk dialog-open ml10">Количество строк</button>' +
+					'<p class="mt10">' +
+						'<button val="dialog_id:14,block_id:' + BL.id + '" class="vk dialog-open">Содержание - шаблон</button>' +
+						'<button val="dialog_id:23,block_id:' + BL.id + '" class="vk dialog-open ml10">Содержание - таблица</button>' +
 					'<p class="mt10">' +
 						'<button val="dialog_id:11,block_id:' + BL.id + '" class="vk dialog-open">Данные единицы списка</button>' +
 						'<button val="dialog_id:22,block_id:' + BL.id + '" class="vk dialog-open orange ml10">Связка</button>' +
@@ -283,11 +277,6 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 	_blockUnitSave = function(BL, obj) {
 		if(!BL.save)
 			return;
-
-		BL.bor = $('#block-unit-bor0').val() + ' ' +
-				 $('#block-unit-bor1').val() + ' ' +
-				 $('#block-unit-bor2').val() + ' ' +
-				 $('#block-unit-bor3').val();
 
 		BL.op = 'block_unit_style_save';
 		obj.addClass('_busy');
