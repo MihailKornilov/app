@@ -352,6 +352,7 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 			case 7:  return 150;//search
 			case 8:  return 150;//input:text
 			case 17: return 150;//select - произвольные значения
+			case 24: return 150;//select - выбор списка
 			default: return 0;
 		}
 
@@ -363,19 +364,19 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 			case 7:  return 50;//search
 			case 8:  return 30;//input:text
 			case 17: return 50;//select - произвольные значения
+			case 24: return 70;//select - выбор списка
 			default: return 0;
 		}
 
 	//$i == 'access'
 	switch($dialog_id) {
-		case 2://кнопка
-//			if($el['num_3'])//установлена максимальная ширина
-//				return 0;
-		case 5://textarea
-		case 6://select - выбор страницы
-		case 7://search
-		case 8://input:text
-		case 17: return 1;//select - произвольные значения
+		case 2: //кнопка
+		case 5: //textarea
+		case 6: //select - выбор страницы
+		case 7: //search
+		case 8: //input:text
+		case 17: //select - произвольные значения
+		case 24: return 1;//select - выбор списка
 		default: return 0;
 	}
 }
@@ -504,7 +505,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 24:
 			/*
                 txt_1 - текст, когда список не выбран
-				функция
+				функция _dialogSpisokOn()
 			*/
 			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
 
@@ -539,7 +540,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'class' => 'dialog-open'.($el['num_3'] ? ' w100p' : ''),
 						'val' => 'dialog_id:'.$el['num_4']
 					));
-
 
 		//Меню страниц
 		case 3:
@@ -634,8 +634,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Содержание единицы списка - шаблон
 		case 14:
 			/*
-                num_1 -
+                num_1 - id диалога, который вносит данные списка
 				num_2 - длина (количество строк, выводимых за один раз)
+				txt_1 - сообщение пустого запроса
 			*/
 			return _spisokShow($el);
 

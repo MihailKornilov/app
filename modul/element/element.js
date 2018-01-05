@@ -1265,6 +1265,8 @@ var VK_SCROLL = 0,
 		else
 			_elemActivate(o.cmp, o.unit);
 
+		window.SPISOK_ON = o.spisok_on;
+
 		function submit() {
 			var send = {
 				op:'spisok_add',
@@ -1420,6 +1422,15 @@ var VK_SCROLL = 0,
 					if(is_edit)
 						return;
 					_dialogCmpValue(sp, unit[sp.col]);
+					return;
+				//select - выбор списка
+				case 24:
+					$(sp.attr_id)._select({
+						disabled:is_edit,
+						width:sp.width,
+						title0:sp.txt_1,
+						spisok:SPISOK_ON
+					});
 					return;
 			}
 		});

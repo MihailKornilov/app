@@ -514,7 +514,7 @@ $(document)
 
 				//аффикс к атрибуту элемента, если нужно
 				var el_name = '';
-				if(sp.dialog_id == 17 || sp.dialog_id == 6)
+				if(sp.dialog_id == 17 || sp.dialog_id == 6 || sp.dialog_id == 24)
 					el_name = '_select';
 
 				$(sp.attr_id + el_name).css('width', '100%');

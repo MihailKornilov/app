@@ -339,11 +339,16 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 }
 */
 function _dialogSpisokOn() {//получение массива диалогов, которые могут быть списками: spisok_on=1
-	$sql = "SELECT `id`,`spisok_name`
+	$cond = "`spisok_on`";
+	$cond .= " AND `app_id`=".APP_ID;
+//	$cond .= " AND !`app_id`";
+	$cond .= " AND !`sa`";
+
+	$sql = "SELECT
+				`id`,
+				`spisok_name`
 			FROM `_dialog`
-			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
-			  AND `sa` IN (0,".SA.")
-			  AND `spisok_on`
+			WHERE ".$cond."
 			ORDER BY `id`";
 	return query_selArray($sql);
 }
