@@ -116,12 +116,24 @@ function _header_hat() {//верхняя строка приложения-сайта
 				'Выход'.
 			'</a>'.
 
-			'<div class="fr w200 mt8">'.
+			'<div class="fr w300 mt8 r mr20">'.
+				_header_but_sa().
 				_header_but_page().
 				_header_but_pas().
 			'</div>'.
 		'</div>'.
 	'</div>';
+}
+function _header_but_sa() {//отображение кнопки списка страниц
+	if(!SA)
+		return '';
+	if(!APP_ID)
+		return '';
+
+	if(_page('cur') == 1)
+		return '';
+
+	return '<button class="vk small red" onclick="location.href=\''.URL.'&p=1\'">SA</button>';
 }
 function _header_but_page() {//отображение кнопки списка страниц
 	if(!APP_ID)
@@ -130,7 +142,7 @@ function _header_but_page() {//отображение кнопки списка страниц
 	if(_page('cur') == 12)
 		return '';
 
-	return '<button class="vk small" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>';
+	return '<button class="vk small ml10" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>';
 }
 function _header_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)
@@ -148,7 +160,7 @@ function _header_but_pas() {//отображение кнопки настройки страницы
 	if(!$page['app_id'] && !SA)
 		return '';
 
-	return '<button id="page_setup" class="vk small fr mr30 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
+	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
 }
 
 

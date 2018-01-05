@@ -8,15 +8,9 @@ function _debug($i='') {
 
 	global $sqlQuery, $sqlTime;
 
-	$pre = '&pre_p='.@$_GET['p'].
-			(empty($_GET['d']) ? '' : '&pre_d='.$_GET['d']).
-			(empty($_GET['d1']) ? '' : '&pre_d1='.$_GET['d1']).
-			(empty($_GET['id']) ? '' : '&pre_id='.$_GET['id']);
-
 	$goFace = SITE ? 'iframe' : 'site';
 	$send =
 		'<div id="debug-footer"'.(SITE ? ' style="bottom:0;position:fixed;width:100%"' : '').'>'.
-			(@$_GET['p'] != 1 ? '<a href="'.URL.'&p=1'.$pre.'">SA</a> :: ' : '').
 			'<a class="debug_toggle'.(DEBUG ? ' on' : '').'">'.(DEBUG ? 'От' : 'В').'ключить Debug</a> :: '.
 			'<a id="cookie_clear">Очисить cookie</a> :: '.
 			'<a id="cache_clear">Очисить кэш ('.VERSION.')</a> :: '.
