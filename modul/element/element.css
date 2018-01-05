@@ -633,8 +633,9 @@ td.topi{padding-top:7px}
 ._menu2 .link{
 	display:inline-block;
 	color:#45688e;
+	font-weight:bold;
 	margin:0 5px;
-	padding:3px 10px;
+	padding:4px 8px;
 	border-radius:2px;
 }
 ._menu2 .sel{background-color:#597da3;color:#fff}

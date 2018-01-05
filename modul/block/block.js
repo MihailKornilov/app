@@ -223,8 +223,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 
 					'<p class="mt30 fs17">Элементы для наполнения содержания:' +
 					'<p class="mt10">' +
-						'<button val="dialog_id:3,block_id:' + BL.id + '" class="vk dialog-open">Меню</button>' +
-						'<button val="dialog_id:10,block_id:' + BL.id + '" class="vk grey dialog-open ml10">Произвольный текст</button>' +
+						'<button val="dialog_id:3,block_id:' + BL.id + '" class="vk dialog-open">Меню страниц</button>' +
+						'<button val="dialog_id:10,block_id:' + BL.id + '" class="vk grey dialog-open ml10">Текст</button>' +
 						'<button val="dialog_id:2,block_id:' + BL.id + '" class="vk green dialog-open ml10">Кнопка</button>' +
 					'<p class="mt10">' +
 						'<button val="dialog_id:4,block_id:' + BL.id + '" class="vk dialog-open">Заголовок</button>' +
