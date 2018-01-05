@@ -176,7 +176,8 @@ function _pageSaForSelect($arr, $child) {//страницы SA для select
 			continue;
 		$send[] = array(
 			'id' => _num($r['id']),
-			'title' => utf8(addslashes(htmlspecialchars_decode(trim($r['name']))))
+			'title' => utf8(addslashes(htmlspecialchars_decode(trim($r['name'])))),
+			'content' => '<div class="color-ref">'.utf8(addslashes(htmlspecialchars_decode(trim($r['name'])))).'</div>'
 		);
 		if(!empty($child[$r['id']]))
 			foreach(_pageSaForSelect($child[$r['id']], $child) as $sub)
@@ -565,8 +566,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 txt_1 - текст ссылки
 				num_1 - id страницы
 			*/
+			if(!$txt = $el['txt_1'])
+				$txt = _page('name', $el['num_1']);
 			return '<a class="inhr" href="'.URL.'&p='.$el['num_1'].'">'.
-						$el['txt_1'].
+						$txt.
 				   '</a>';
 
 		//произвольный текст
@@ -621,9 +624,18 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			return $el['txt_1']();
 
 		case 14: return _spisokShow($el);     //содержание списка
-		case 15: return _spisokElemCount($el);//текст с количеством строк списка
 
-		//информационный блок
+		//Количество строк списка
+		case 15:
+			/*
+                num_1 - id элемента, содержащего список, количество строк которого нужно выводить
+				txt_1 "1" txt_2 - показана "1" запись
+				txt_3 "2" txt_4 - показано "2" записи
+				txt_5 "5" txt_6 - показано "5" записей
+			*/
+			return _spisokElemCount($el);
+
+		//Информационный блок
 		case 21:
 			/*
                 txt_1 - содержание
@@ -656,6 +668,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 function _elemFontAllow($dialog_id) {//отображение в настройках стилей для конкретных элементов страницы
 	$elem = array(
 		0 => 1,
+		9 => 1,
 		10 => 1,
 		11 => 1,
 		15 => 1

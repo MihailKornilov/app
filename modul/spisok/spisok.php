@@ -50,9 +50,11 @@ function _spisokElemCount($r) {//формирование элемента с содержанием количества 
 		return $pe['txt_1'];
 
 	return
-		$r['txt_1'].' '.
-		$all.' '.
-		_end($all, $r['txt_2'], $r['txt_3'], $r['txt_4']);
+	_end($all, $r['txt_1'], $r['txt_3'], $r['txt_5']).
+	' '.
+	$all.
+	' '.
+	_end($all, $r['txt_2'], $r['txt_4'], $r['txt_6']);
 }
 function _spisokInc($dialog, $spisok) {//вложенные списки
 	$send = array();

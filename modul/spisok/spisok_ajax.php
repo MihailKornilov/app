@@ -517,7 +517,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			jsonError('ќтсутствует им€ колонки в компоненте id'.$cmp_id);
 		if(!isset($dialog['field'][$col]))
 			jsonError('¬ списке нет колонки с именем "'.$col.'"');
-
 		if($cmp['dialog_id'] == 19) {//наполнение дл€ некоторых компонентов: radio, select, dropdown
 			_dialogCmpValue($val, 'test');
 			continue;
