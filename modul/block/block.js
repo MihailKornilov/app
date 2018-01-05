@@ -229,16 +229,16 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'<p class="mt10">' +
 						'<button val="dialog_id:4,block_id:' + BL.id + '" class="vk dialog-open">Заголовок</button>' +
 						'<button val="dialog_id:21,block_id:' + BL.id + '" class="vk dialog-open ml10">Информация</button>' +
-						'<button val="dialog_id:9,block_id:' + BL.id + '" class="vk dialog-open ml10">Ссылка</button>' +
-						'<button val="dialog_id:7,block_id:' + BL.id + '" class="vk dialog-open ml10">Поиск</button>' +
+						'<button val="dialog_id:9,block_id:' + BL.id + '" class="vk dialog-open ml10">Ссылка на страницу</button>' +
 
 					'<p class="mt30 fs17">Элементы для списков:' +
 					'<p class="mt10">' +
 						'<button val="dialog_id:15,block_id:' + BL.id + '" class="vk dialog-open">Количество строк</button>' +
 						'<button val="dialog_id:14,block_id:' + BL.id + '" class="vk dialog-open ml10">Содержание</button>' +
-						'<button val="dialog_id:22,block_id:' + BL.id + '" class="vk dialog-open orange ml10">Связка</button>' +
+						'<button val="dialog_id:7,block_id:' + BL.id + '" class="vk dialog-open ml10">Поиск</button>' +
 					'<p class="mt10">' +
 						'<button val="dialog_id:11,block_id:' + BL.id + '" class="vk dialog-open">Данные единицы списка</button>' +
+						'<button val="dialog_id:22,block_id:' + BL.id + '" class="vk dialog-open orange ml10">Связка</button>' +
 
 			  (SA ? '<p class="mt30">' +
 						'<button val="dialog_id:12,block_id:' + BL.id + '" class="vk dialog-open red">SA: функция</button>'

@@ -91,16 +91,11 @@
 	color:#31618C;
 	font-size:16px;
 	border-bottom:#DEE3EF solid 1px;
-/*
-	padding-top:12px;
-	padding:2px 0 ;
-	margin-top:10px;
-	margin-bottom:5px;
-*/
 }
+/*
 .hd2 .vk.small.fr{margin-top:-4px}
 .hd2 b{font-size:16px}
-
+*/
 
 
 
@@ -346,6 +341,15 @@
 ._select .select-unit{padding:7px 8px;text-align:left}
 ._select .select-unit.title0{color:#999}
 ._select .select-unit.ov{background-color:#EBF3FA}
+._select .select-unit.info{
+	padding:4px 8px;
+	background-color:#f7f7f7;
+	border-top:#f1f1f1 solid 1px;
+	border-bottom:#f1f1f1 solid 1px;
+	color:#555;
+	font-weight:bold;
+	cursor:default;
+}
 ._select .empty{
 	background-color:#eee;
 	padding:7px 8px;

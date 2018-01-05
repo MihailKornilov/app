@@ -117,6 +117,14 @@ function _page($i='all', $i1=0) {//получение данных страницы
 			unset($page[$id]);
 		}
 		$send = _pageChildArr($page, $child);
+		if(SA) {
+			$send[] = array(
+				'title' => utf8('Страницы SA'),
+				'info' => 1
+			);
+			foreach(_pageSaForSelect($page, $child) as $r)
+				$send[] = $r;
+		}
 
 		if($i1 == 'js')
 			return json_encode($send);
@@ -142,10 +150,7 @@ function _page($i='all', $i1=0) {//получение данных страницы
 
 	return false;
 }
-function _pageChildArr($arr, $child, $level=0) {//перечисление иерархии страниц
-	if(empty($arr))
-		return '';
-
+function _pageChildArr($arr, $child, $level=0) {//перечисление иерархии страниц для select
 	$send = array();
 	foreach($arr as $r) {
 		if($r['sa'])
@@ -163,6 +168,23 @@ function _pageChildArr($arr, $child, $level=0) {//перечисление иерархии страниц
 	}
 
 	return $send;
+}
+function _pageSaForSelect($arr, $child) {//страницы SA для select
+	$send = array();
+	foreach($arr as $r) {
+		if(!$r['sa'])
+			continue;
+		$send[] = array(
+			'id' => _num($r['id']),
+			'title' => utf8(addslashes(htmlspecialchars_decode(trim($r['name']))))
+		);
+		if(!empty($child[$r['id']]))
+			foreach(_pageSaForSelect($child[$r['id']], $child) as $sub)
+				$send[] = $sub;
+	}
+
+	return $send;
+
 }
 
 function _pageSetupDefine() {//установка флага включения управления страницей PAS: page_setup
@@ -222,7 +244,7 @@ function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
 					'<tr><td>'.
 							'<a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
 								($r['def'] ? '<div class="icon icon-ok fr curD'._tooltip('Страница по умолчанию', -76).'</div>' : '').
-						'<td class="w50 wsnw">'.
+						'<td class="w35 wsnw">'.
 							'<div val="dialog_id:20,unit_id:'.$r['id'].'" class="icon icon-edit dialog-open'._tooltip('Изменить название', -58).'</div>'.
 	   (!$r['del_access'] ? '<div class="icon icon-off'._tooltip('Очистить', -29).'</div>' : '').
 		($r['del_access'] ? '<div onclick="_dialogOpen(6,'.$r['id'].')" class="icon icon-del-red'._tooltip('Страница пустая, удалить', -79).'</div>' : '').
@@ -410,7 +432,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 6:
 			/*
                 txt_1 - текст, когда страница не выбрана
-
 			*/
 			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
 
@@ -522,7 +543,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						19 - Боковое вертикальное меню
 			*/
 			return _pageElemMenu($el);
-		case 4: return '<div class="hd2">'.$el['txt_1'].'</div>'; //head
+
+		//Заголовок
+		case 4:
+			/*
+                txt_1 - текст заголовка
+			*/
+			return '<div class="hd2">'.$el['txt_1'].'</div>';
+
 		case 7://search
 			return _search(array(
 						'attr_id' => $attr_id,
@@ -530,11 +558,24 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'width' => $el['num_2'],
 						'v' => $el['v']
 					));
-		case 9://link
-			return '<a href="'.URL.'&p='.$el['num_1'].'">'.
+
+		//Ссылка на страницу
+		case 9:
+			/*
+                txt_1 - текст ссылки
+				num_1 - id страницы
+			*/
+			return '<a class="inhr" href="'.URL.'&p='.$el['num_1'].'">'.
 						$el['txt_1'].
 				   '</a>';
-		case 10: return _br($el['txt_1']);//произвольный текст
+
+		//произвольный текст
+		case 10:
+			/*
+                txt_1 - текст
+			*/
+			return _br($el['txt_1']);
+
 		case 11://имя колонки или значение из диалога
 			/*
 				num_1 - dialog_id списка
@@ -567,7 +608,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return $sp[$cmp['col_name']];
 
 			return 'spisok_id='.$spisok_id.' '.$el['num_3'];
-		case 12://из функции напрямую
+
+		//Функция PHP
+		case 12:
+			/*
+                txt_1 - имя функции
+			*/
 			if(!$el['txt_1'])
 				return 'пустое значение фукнции';
 			if(!function_exists($el['txt_1']))
@@ -734,7 +780,7 @@ function _page_div() {//todo тест
 		' Попутный текст'.
 	'</div>'.
 
-	_page('for_select', 'js').
+	_pr(_page('all', 'js')).
 
 	'<button class="vk mar20" id="bbb">Кнопка для сохранения</button>'.
 

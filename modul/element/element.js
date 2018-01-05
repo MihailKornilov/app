@@ -2179,6 +2179,8 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		var rs = SEL.hasClass('rs'),
 			tagret = $(e.target);
 
+		if(tagret.hasClass('select-unit info'))
+			return;
 		if(tagret.hasClass('select-unit')) {
 			valueSet(tagret.attr('val'));
 			o.func(VALUE);
@@ -2205,14 +2207,19 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			_forEq(RES.find('.select-unit'), function(sp) {
 				if(VALUE == sp.attr('val')) {
 					RES.find('.select-unit').removeClass('ov');
+					if(sp.hasClass('info'))
+						return false;
 					sp.addClass('ov');
 					return false;
 				}
 			});
 	});
 	RES.find('.select-unit').mouseenter(function() {
+		var sp = $(this);
 		RES.find('.ov').removeClass('ov');
-		$(this).addClass('ov');
+		if(sp.hasClass('info'))
+			return;
+		sp.addClass('ov');
 	});
 
 	$(document)
@@ -2272,9 +2279,11 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 				id = sp.uid;
 				if(id === undefined)
 					id = sp.id;
+				if(sp.info)
+					id = -1;
 				if(id === undefined)
 					return;
-				id = _num(id);
+				id = _num(id, 1);
 				if(!id)
 					return;
 				title = sp.title;
@@ -2289,7 +2298,8 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			unit = {
 				id:id,
 				title:title,
-				content:content
+				content:content,
+				info:_num(sp.info)//флаг информационного значения. Значение нельзя выбрать.
 			};
 			MASS_SEL.push(unit);
 			MASS_SEL_SAVE.push(unit);
@@ -2306,7 +2316,9 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			html += '<div class="select-unit title0" val="0">' + o.title0 + '</div>';
 
 		_forN(MASS_SEL, function(sp) {
-			html += '<div class="select-unit" val="' + sp.id + '">' + sp.content + '</div>';
+			var info = sp.info ? ' info' : '',
+				val = info ? '' : ' val="' + sp.id + '"';
+			html += '<div class="select-unit' + info + '"' + val + '>' + sp.content + '</div>';
 		});
 		RES.html(html);
 	}
