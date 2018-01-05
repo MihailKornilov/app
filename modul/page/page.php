@@ -325,9 +325,10 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 	if($i == 'def')
 		switch($dialog_id) {
 			case 5:  return 150;//textarea
+			case 6:  return 150;//select - выбор страницы
 			case 7:  return 150;//search
 			case 8:  return 150;//input:text
-			case 17: return 150;//select
+			case 17: return 150;//select - произвольные значения
 			default: return 0;
 		}
 
@@ -335,9 +336,10 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 		switch($dialog_id) {
 			case 2:  return 30;//button
 			case 5:  return 30;//textarea
+			case 6:  return 50;//select - выбор страницы
 			case 7:  return 50;//search
 			case 8:  return 30;//input:text
-			case 17: return 50;//select
+			case 17: return 50;//select - произвольные значения
 			default: return 0;
 		}
 
@@ -347,9 +349,10 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 //			if($el['num_3'])//установлена максимальная ширина
 //				return 0;
 		case 5://textarea
+		case 6://select - выбор страницы
 		case 7://search
 		case 8://input:text
-		case 17: return 1;//select
+		case 17: return 1;//select - произвольные значения
 		default: return 0;
 	}
 }
@@ -508,7 +511,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					));
 
 
-		case 3: return _pageElemMenu($el); //menu
+		//Меню страниц
+		case 3:
+			/*
+				num_1 - раздел (страница-родитель). В меню будут дочерние страницы
+				num_2 - внешний вид:
+						16 - Основной вид - горизонтальное меню
+						17 - С подчёркиванием (гориз.)
+						18 - Синие маленькие кнопки (гориз.)
+						19 - Боковое вертикальное меню
+			*/
+			return _pageElemMenu($el);
 		case 4: return '<div class="hd2">'.$el['txt_1'].'</div>'; //head
 		case 7://search
 			return _search(array(
@@ -648,11 +661,10 @@ function _pageElemMenu($unit) {//элемент страницы: Меню
 	//Внешний вид меню
 	$type = array(
 		0 => 0,
-		335 => 0, //Основной - горизонтальное меню
-		336 => 1, //С подчёркиванием (гориз.)
-		337 => 2, //Дополнительное на белом фоне (гориз.)
-		339 => 3, //Дополнительное на сером фоне (гориз.)
-		338 => 4  //Доп. - вертикальное
+		16 => 0,
+		17 => 1,
+		18 => 2,
+		19 => 3
 	);
 
 	return '<div class="_menu'.$type[$unit['num_2']].'">'.$razdel.'</div>';

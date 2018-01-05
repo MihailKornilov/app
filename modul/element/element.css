@@ -343,7 +343,7 @@
 	cursor:pointer;
 	z-index:10;
 }
-._select .select-unit{padding:7px 8px}
+._select .select-unit{padding:7px 8px;text-align:left}
 ._select .select-unit.title0{color:#999}
 ._select .select-unit.ov{background-color:#EBF3FA}
 ._select .empty{

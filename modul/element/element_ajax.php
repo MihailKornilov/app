@@ -384,7 +384,7 @@ function _dialogOpenLoad($dialog_id) {
 							'def' => _num($r['def']),
 							'use' => 0  //количество использования значений, чтобы нельзя было удалять
 						);
-
+break;
 					//объект, в котором находится блок с элементом
 					$sql = "SELECT *
 							FROM `_block`
