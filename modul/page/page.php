@@ -221,9 +221,9 @@ function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
 				'<table class="_stab  bor-e8 bg-fff over1">'.
 					'<tr><td>'.
 							'<a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
-								($r['def'] ? '<div class="icon icon-ok ml10 mbm5 curD'._tooltip('Страница по умолчанию', -76).'</div>' : '').
+								($r['def'] ? '<div class="icon icon-ok fr curD'._tooltip('Страница по умолчанию', -76).'</div>' : '').
 						'<td class="w50 wsnw">'.
-							'<div onclick="_dialogOpen('.$r['dialog_id'].','.$r['id'].')" class="icon icon-edit'._tooltip('Изменить название', -58).'</div>'.
+							'<div val="dialog_id:20,unit_id:'.$r['id'].'" class="icon icon-edit dialog-open'._tooltip('Изменить название', -58).'</div>'.
 	   (!$r['del_access'] ? '<div class="icon icon-off'._tooltip('Очистить', -29).'</div>' : '').
 		($r['del_access'] ? '<div onclick="_dialogOpen(6,'.$r['id'].')" class="icon icon-del-red'._tooltip('Страница пустая, удалить', -79).'</div>' : '').
 				'</table>'.
@@ -634,7 +634,7 @@ function _elemColor() {//массив цветов для текста в формате JS, доступных элемен
 		'"color-vin":["#c88","Бордовый"]';
 }
 
-function _pageElemMenu($unit) {//элемент страницы: Меню
+function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 	$menu = array();
 	foreach(_page() as $id => $r) {
 		if(!$r['app_id'])

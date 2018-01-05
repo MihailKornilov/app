@@ -506,7 +506,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		jsonError('Компоненты диалога не являются массивом');
 
 	$cmpUpdate = array();
-	$focusUpdate = false;//если в таблице присутствует колонка `focus`, то предварительное снятие флага фокуса с других элементов объекта (для таблицы _element)
+	$elementFocusClear = false;//если в таблице присутствует колонка `focus`, то предварительное снятие флага фокуса с других элементов объекта (для таблицы _element)
+	$pageDefClear = false; //для таблицы _page: очистка `def`, если устанавливается новая страница по умолчанию
 	foreach($postCmp as $cmp_id => $val) {
 		if(!$cmp_id = _num($cmp_id))
 			jsonError('Некорректный id компонента диалога');
@@ -527,8 +528,11 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		if($cmp['req'] && !$v)
 			jsonError('Требуется обязательно заполнить<br>поля, отмеченные звёздочкой');
 
-		if($col == 'focus' && $v)
-			$focusUpdate = true;
+		if($dialog['base_table'] == '_element' && $col == 'focus' && $v)
+			$elementFocusClear = true;
+
+		if($dialog['base_table'] == '_page' && $col == 'def' && $v)
+			$pageDefClear = true;
 
 		$cmpUpdate[] = "`".$col."`='".addslashes($v)."'";
 	}
@@ -615,7 +619,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	}
 
 	//снятие флага фокуса со всех элементов объекта
-	if($focusUpdate && $dialog['base_table'] == '_element') {
+	if($elementFocusClear) {
 		$sql = "SELECT `block_id`
 				FROM `_element`
 				WHERE `id`=".$unit_id;
@@ -636,6 +640,15 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 					WHERE `block_id` IN (".$block_ids.")";
 			query($sql);
 		}
+	}
+
+	//снятие флага 'страница по умолчанию' со всех страниц приложения
+	if($pageDefClear) {
+		$sql = "UPDATE `_page`
+				SET `def`=0
+				WHERE `app_id`=".APP_ID."
+				  AND !`sa`";
+		query($sql);
 	}
 
 	$sql = "UPDATE `".$dialog['base_table']."`
