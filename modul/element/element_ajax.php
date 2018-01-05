@@ -387,6 +387,13 @@ function _dialogOpenLoad($dialog_id) {
 							'use' => 0  //количество использования значений, чтобы нельзя было удалять
 						);
 
+					//если нет значений
+					if(empty($unit[$col]))
+						break;
+
+					if(empty($unit['col']))
+						break;
+
 					//объект, в котором находится блок с элементом
 					$sql = "SELECT *
 							FROM `_block`
@@ -406,7 +413,8 @@ function _dialogOpenLoad($dialog_id) {
 							WHERE `dialog_id`=".$block['obj_id']."
 							GROUP BY `".$unit['col']."`";
 					foreach(query_ass($sql) as $id => $use)
-						$unit[$col][$id]['use'] = $use;
+						if(isset($unit[$col][$id]))
+							$unit[$col][$id]['use'] = $use;
 				}
 		}
 
