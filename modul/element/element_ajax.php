@@ -59,7 +59,9 @@ switch(@$_POST['op']) {
 		$html =
 			'<div id="dialog-w-change"></div>'.//права€ вертикальна€ лини€ дл€ изменени€ ширины диалога
 
-			'<input type="hidden" id="dialog-menu" value="'.$dialog['menu_edit_last'].'" />'.
+			'<div class="pad10 center bg-gr3 line-b">'.
+				'<input type="hidden" id="dialog-menu" value="'.$dialog['menu_edit_last'].'" />'.
+			'</div>'.
 
 			//«аголовок и кнопки
 			'<div class="dialog-menu-1">'.
@@ -384,7 +386,7 @@ function _dialogOpenLoad($dialog_id) {
 							'def' => _num($r['def']),
 							'use' => 0  //количество использовани€ значений, чтобы нельз€ было удал€ть
 						);
-break;
+
 					//объект, в котором находитс€ блок с элементом
 					$sql = "SELECT *
 							FROM `_block`

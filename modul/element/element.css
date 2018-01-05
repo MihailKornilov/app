@@ -601,7 +601,7 @@ td.topi{padding-top:7px}
 
 
 /* Меню */
-/* type 0: Главное меню */
+/* type 0: Основной вид - горизонтальное меню */
 ._menu0{
 	border-bottom:#31618C solid 1px;
 	padding:15px 5px 0 5px;
@@ -617,81 +617,37 @@ td.topi{padding-top:7px}
 ._menu0 .link:not(.sel):hover{background-color:#DEE3EF}
 ._menu0 .link.sel{color:#FFF;background-color:#31618C}
 
-/*
-#_menu a.main{
-	padding-left:16px;
-	padding-right:16px;
-	background-image:url(data:image/gif;base64,R0lGODlhEgAoAJEAAAAAAP///zFhjP///yH5BAEAAAMALAAAAAASACgAAAItlI+py+MPo5y0VoYztrx7qoXiR5bmiabqyrbuCw/BTNf2jefxm/d+v3P9hsQCADs=);
-	background-repeat:no-repeat;
-	background-position:9px 10px;
-}
-#_menu a.main.sel{background-position:9px -18px}
-#_menu a.back{
-	float:right;
-	position:relative;
-	top:9px;
-	right:10px;
-}
-#_menu._busy{background-position:right center}
-*/
-/* type 1 */
-._menu1{border-bottom:#E7E8EC solid 1px;margin:5px 0 10px}
+/* type 1: С подчёркиванием (гориз.) */
+._menu1{border-bottom:#E7E8EC solid 1px}
 ._menu1 .link{
 	display:inline-block;
 	color:#777;
-	padding:14px 6px 10px;
+	padding:10px 6px 7px;
 	margin:0 8px -1px;
 }
 ._menu1 .sel{color:#000;border-bottom:#6387AC solid 2px}
 ._menu1 .link:hover{text-decoration:none}
 ._menu1 .link:not(.sel):hover{border-bottom:#CAD2DB solid 2px}
 
-/* type 2 */
-._menu2{margin:5px 0 10px}
+/* type 2: Синие маленькие кнопки (гориз.) */
 ._menu2 .link{
 	display:inline-block;
 	color:#45688e;
-	margin:0 4px;
-	font-weight:bold;
-	padding:3px 8px 0;
+	margin:0 5px;
+	padding:3px 10px;
 	border-radius:2px;
-	height:17px;
 }
 ._menu2 .sel{background-color:#597da3;color:#fff}
 ._menu2 .link:hover{text-decoration:none}
 ._menu2 .link:not(.sel):hover{background-color:#e9edf1}
 
-/* type 3 */
-._menu3{margin:5px 0 10px}
-._menu3 .link{
-	display:block;
-	padding:10px;
-}
-._menu3 .link:hover{
-	text-decoration:none;
-	background-color:#e9edf1;
-}
-._menu3 .link .icon{float:left;margin:-1px 3px 0 0}
+/* type 3: Боковое вертикальное меню */
+._menu3 .link{display:block;padding:10px 12px}
+._menu3 .link.sel{background-color:#6b8eb5;color:#fff}
+._menu3 .link:hover{text-decoration:none}
+._menu3 .link:not(.sel):hover{background-color:#e9edf1}
+/*._menu3 .link .icon{float:left;margin:-1px 3px 0 0}*/
 
-
-/* type 4 */
-._menu4{
-	padding:10px;
-	background:#f7f7f7;
-	border-bottom:#dae1e8 solid 1px;
-	text-align:center;
-}
-._menu4 .link{
-	display:inline-block;
-	color:#45688e;
-	margin:0 4px;
-	font-weight:bold;
-	padding:5px 12px;
-	border-radius:2px;
-}
-._menu4 .sel{background-color:#597da3;color:#fff}
-._menu4 .link:hover{text-decoration:none}
-._menu4 .link:not(.sel):hover{background-color:#e9edf1}
 
 
 

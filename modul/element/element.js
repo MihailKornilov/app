@@ -375,7 +375,7 @@ var VK_SCROLL = 0,
 		});
 
 		$('#dialog-menu')._menu({
-			type:4,
+			type:2,
 			spisok:o.menu,
 			func:_dialogHeightCorrect
 		});
