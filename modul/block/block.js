@@ -518,6 +518,7 @@ $(document)
 			$('.block-content-' + spl[0]).html(res.html);
 			_elemActivate(res.block_arr, {}, 1);
 			_forIn(res.block_arr, function(sp, k) {
+				$('._hint').remove();
 				BLOCK_ARR[k] = sp;
 				if(!on || !sp.width_change)
 					return;

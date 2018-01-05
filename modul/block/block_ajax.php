@@ -118,6 +118,19 @@ switch(@$_POST['op']) {
 			}
 		}
 
+		//получение id элементов, содержащихся в блоках (для последующего их удаления в удалённых блоках)
+		$elemIdsPrev = 0;
+		$sql = "SELECT `id`
+				FROM `_block`
+				WHERE `obj_name`='".$obj_name."'
+				  AND `obj_id`=".$obj_id;
+		if($block_ids = query_ids($sql)) {
+			$sql = "SELECT `id`
+					FROM `_element`
+					WHERE `block_id` IN (".$block_ids.")";
+			$elemIdsPrev = query_ids($sql);
+		}
+
 		$idsNotDel = array(0);
 		$insert = array();
 
@@ -188,6 +201,25 @@ switch(@$_POST['op']) {
 				query($sql);
 			}
 		}
+
+
+		//удаление элементов в удалённых блоках
+		$elemIdsNotDel = 0;
+		$sql = "SELECT `id`
+				FROM `_block`
+				WHERE `obj_name`='".$obj_name."'
+				  AND `obj_id`=".$obj_id;
+		if($block_ids = query_ids($sql)) {
+			$sql = "SELECT `id`
+					FROM `_element`
+					WHERE `block_id` IN (".$block_ids.")";
+			$elemIdsNotDel = query_ids($sql);
+		}
+		$sql = "DELETE FROM `_element`
+				WHERE `id` IN (".$elemIdsPrev.")
+				  AND `id` NOT IN (".$elemIdsNotDel.")";
+		query($sql);
+
 
 		if($insert) {
 			$sql = "INSERT INTO `_block` (
