@@ -326,6 +326,8 @@ var VK_SCROLL = 0,
 		};
 	},
 	_dialogEdit = function(o) {//создание|редактирование диалогового окна
+		window.SPISOK_ON = o.spisok_on;
+
 		var dialog = _dialog({
 				dialog_id:o.dialog_id,
 				color:'orange',
@@ -1242,6 +1244,8 @@ var VK_SCROLL = 0,
 	},
 */
 	_dialogOpen = function(o) {//открытие диалогового окна
+		window.SPISOK_ON = o.spisok_on;
+
 		var dialog = _dialog({
 			dialog_id:o.dialog_id,
 			block_id:o.block_id,  //для передачи значений, если будет требоваться редактирование диалога
@@ -1264,8 +1268,6 @@ var VK_SCROLL = 0,
 			dialog.bottom.find('.submit').addClass('red');
 		else
 			_elemActivate(o.cmp, o.unit);
-
-		window.SPISOK_ON = o.spisok_on;
 
 		function submit() {
 			var send = {
@@ -1405,6 +1407,15 @@ var VK_SCROLL = 0,
 						title0:sp.txt_1,
 						spisok:PAGE_LIST
 					});
+					return;
+				//настройка шаблона единицы списка
+				case 25:
+					if(is_edit)
+						return;
+					$('#block-level-spisok')
+						.find('.block-grid-on')
+						.removeClass('grey')
+						.trigger('click');
 					return;
 				//select - произвольные значения
 				case 17:

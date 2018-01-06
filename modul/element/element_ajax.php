@@ -169,6 +169,7 @@ switch(@$_POST['op']) {
 		$send['action'] = _selArray($action);
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr_edit');
 		$send['cmp'] = $dialog['cmp_utf8'];
+		$send['spisok_on'] = _dialogSpisokOn();
 //		$send['func'] = (object)$dialog['func'];
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;

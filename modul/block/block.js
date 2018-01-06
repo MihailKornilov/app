@@ -212,6 +212,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'<p class="mt30 fs17">Вспомогательные компоненты:' +
 					'<p class="mt10">' +
 						'<button class="vk orange dialog-open" val="dialog_id:19,block_id:' + BL.id + '">Содержание для некоторых компонентов</button>' +
+					'<p class="mt10">' +
+						'<button class="vk orange dialog-open" val="dialog_id:25,block_id:' + BL.id + '">Настройка содержания шаблона списка</button>' +
 
 					'<p class="mt30 fs17">Элементы для наполнения содержания:' +
 					'<p class="mt10">' +

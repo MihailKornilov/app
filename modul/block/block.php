@@ -114,7 +114,15 @@ function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
 function _blockObj($name, $i='name') {//доступные варианты объектов для блоков
 	$empty = array(
 		'page' => '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>',
-		'spisok' => '<div class="_empty min">Шаблон пуст.<div class="mt10 pale">Начните с настройки блоков.</div></div>',
+
+		'spisok' =>
+			'<div class="bg-ffe pad10">'.
+				'<div class="_empty min">'.
+					'Шаблон пуст.'.
+					'<div class="mt10 pale">Начните с настройки блоков.</div>'.
+				'</div>'.
+			'</div>',
+
 		'dialog' => '<div class="pad10">'.
 						'<div class="_empty min">'.
 							'Пустое содержание диалога.'.

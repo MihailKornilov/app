@@ -498,7 +498,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			}
 			return '<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />';
 
-		//наполнение для некоторых компонентов: radio, select, dropdown
+		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: наполнение для некоторых компонентов: radio, select, dropdown
 		case 19: return '<div class="_empty min">Наполнение компонента</div>'; //все действия через JS
 
 		//Select - выбор списка
@@ -634,10 +634,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Содержание единицы списка - шаблон
 		case 14:
 			/*
-                num_1 - id диалога, который вносит данные списка
+                num_1 - id диалога, который вносит данные списка (шаблон которого будет настраиваться)
 				num_2 - длина (количество строк, выводимых за один раз)
 				txt_1 - сообщение пустого запроса
+				num_3 - настройка шаблона: dialig_id=25
 			*/
+			return '<div class="_empty min">Список.</div>';
 			return _spisokShow($el);
 
 		//Количество строк списка
@@ -660,6 +662,45 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Содержание единицы списка - таблица
 		case 23:
 			return 'Содержание единицы списка - таблица';
+
+		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ШАБЛОНА единицы списка
+		case 25:
+			/*
+				имя объекта: spisok
+				 id объекта: block_id, в котором размещается список
+			*/
+			if(empty($unit))
+				return
+				'<div class="bg-ffe pad10">'.
+					'<div class="_empty min">'.
+						'Настройка шаблона будет доступна после вставки списка в блок.'.
+					'</div>'.
+				'</div>';
+
+			//определение ширины шаблона
+			$sql = "SELECT *
+					FROM `_block`
+					WHERE `id`=".$unit['block_id'];
+			if(!$block = query_assoc($sql))
+				return 'Блока, в котором находится список, не существует.';
+
+			setcookie('block_level_spisok', 1, time() + 2592000, '/');
+
+			//корректировка ширины с учётом отступов
+			$ex = explode(' ', $unit['mar']);
+			$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
+			$line_r = $width < 980 ? ' line-r' : '';
+
+			$dialog = _dialogQuery($unit['num_1']);
+
+			return
+				'<div class="bg-ffc pad10 line-b">'.
+					'<button class="vk small green dialog-open fr" val="dialog_id:'.$unit['num_1'].'">'.
+						'Кнопка-подсказка списка <b>'.$dialog['spisok_name'].'</b>'.
+					'</button>'.
+					_blockLevelChange('spisok', $unit['block_id'], $width).
+				'</div>'.
+				'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'._blockHtml('spisok', $unit['block_id'], $width).'</div>';
 	}
 
 	//элементы списка шаблона (для настройки)
