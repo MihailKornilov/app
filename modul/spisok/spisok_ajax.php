@@ -682,14 +682,14 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	//получение имени объекта, если действие производилось дл€ блока
 	if($dialog['action_id'] == 3 && $dialog['base_table'] == '_element') {
-		$sql = "SELECT `block_id`
+		$sql = "SELECT *
 				FROM `_element`
 				WHERE `id`=".$unit_id;
-		$block_id = _num(query_value($sql));
+		$elem = query_assoc($sql);
 
 		$sql = "SELECT *
 				FROM `_block`
-				WHERE `id`=".$block_id;
+				WHERE `id`=".$elem['block_id'];
 		$block = query_assoc($sql);
 
 		$send['block_obj_name'] = $block['obj_name'];
@@ -698,8 +698,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			default:
 			case 'page': $width = 1000; break;
 			case 'spisok':
-				jsonError('ѕолучение ширины дл€ списка не доделано...');
-				$width = 0;
+				//корректировка ширины с учЄтом отступов
+				$ex = explode(' ', $elem['mar']);
+				$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
 				break;
 			case 'dialog':
 				_cache('clear', '_dialogQuery'.$block['obj_id']);

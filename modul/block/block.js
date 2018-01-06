@@ -190,8 +190,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 	_blockUnitElAdd = function(BL) {//добавление нового элемента в блок
 		$('._hint').remove();
 
-		if(BL.obj_name == 'spisok')
-			return _blockSpisokUnitElAdd(BL);
+//		if(BL.obj_name == 'spisok')
+//			return _blockSpisokUnitElAdd(BL);
 
 		var html =
 				'<div class="center">' +
@@ -214,6 +214,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						'<button class="vk orange dialog-open" val="dialog_id:19,block_id:' + BL.id + '">Содержание для некоторых компонентов</button>' +
 					'<p class="mt10">' +
 						'<button class="vk orange dialog-open" val="dialog_id:25,block_id:' + BL.id + '">Настройка содержания шаблона списка</button>' +
+					'<p class="mt10">' +
+						'<button class="vk orange dialog-open" val="dialog_id:26,block_id:' + BL.id + '">Содержание диалога для выбора значения</button>' +
 
 					'<p class="mt30 fs17">Элементы для наполнения содержания:' +
 					'<p class="mt10">' +
