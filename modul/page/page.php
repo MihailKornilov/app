@@ -392,9 +392,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		7 - EL: поле поиска
 		8 - CMP: input:text (однострочное текстовое поле)
 */
+	$unitExist = isset($unit['id']);
 
 	//значение из списка
-	$v = $unit && $el['col'] ? $unit[$el['col']]: '';
+	$v = $unitExist && $el['col'] ? $unit[$el['col']]: '';
 	$attr_id = 'cmp_'.$el['id'];
 	$disabled = ELEM_WIDTH_CHANGE ? ' disabled' : '';
 
@@ -587,8 +588,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return _br($el['txt_1']);
 
-		case 11://имя колонки или значение из диалога
-			/*
+		//Выбор значения для шаблона (выводится окно для выбора)
+		case 11:
+
+			return 'dialog 11 в процессе';
+
+
+			/* ...старая версия...
 				num_1 - dialog_id списка
 				num_2 - тип содержания колонки:
 							331: название
@@ -596,6 +602,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_3 - id компонента диалога
 				$_GET['id'] - id списка при выводе
 			*/
+
+
 			if(!$spisok_id = _num(@$_GET['id']))
 				return 'некорректный id объекта';
 
@@ -669,7 +677,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				имя объекта: spisok
 				 id объекта: block_id, в котором размещается список
 			*/
-			if(empty($unit))
+			if(!$unitExist)
 				return
 				'<div class="bg-ffe pad10">'.
 					'<div class="_empty min">'.
@@ -701,6 +709,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					_blockLevelChange('spisok', $unit['block_id'], $width).
 				'</div>'.
 				'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'._blockHtml('spisok', $unit['block_id'], $width).'</div>';
+
+		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
+		case 26:
+			return _pr($unit);
 	}
 
 	//элементы списка шаблона (для настройки)

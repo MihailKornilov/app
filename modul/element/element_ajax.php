@@ -355,6 +355,11 @@ function _dialogOpenLoad($dialog_id) {
 	$send['unit_id'] = $unit_id;
 	$send['block_id'] = _num($_POST['block_id']);
 
+	//исходные данные, полученные для открытия диалога
+	$unit['source'] = array(
+		'block_id' => $send['block_id']//для какого блока был запрос
+	);
+
 	$send['edit_access'] = SA || $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
 	$send['width'] = _num($dialog['width']);
 	$send['head'] = utf8($dialog[!$unit_id ? 'head_insert' : 'head_edit']);
