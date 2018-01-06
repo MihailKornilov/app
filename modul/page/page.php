@@ -393,6 +393,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		8 - CMP: input:text (однострочное текстовое поле)
 */
 	$unitExist = isset($unit['id']);
+	if(!$US = @$unit['source'])
+		$US = array();
 
 	//значение из списка
 	$v = $unitExist && $el['col'] ? $unit[$el['col']]: '';
@@ -415,7 +417,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			return _check(array(
 				'attr_id' => $attr_id,
-				'light' => 1,
 				'title' => $el['txt_1'],
 				'value' => _num($v)
 			));
@@ -704,7 +705,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			return
 				'<div class="bg-ffc pad10 line-b">'.
 					'<button class="vk small green dialog-open fr" val="dialog_id:'.$unit['num_1'].'">'.
-						' нопка-подсказка списка <b>'.$dialog['spisok_name'].'</b>'.
+						' нопка-подсказка списка <b>'.@$dialog['spisok_name'].'</b>'.
 					'</button>'.
 					_blockLevelChange('spisok', $unit['block_id'], $width).
 				'</div>'.
@@ -712,7 +713,34 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —одержание диалога дл€ выбора значени€
 		case 26:
-			return _pr($unit);
+			if(empty($US['block_id']))
+				return '<div class="_empty min mar10">ќтсутствует исходный блок</div>';
+
+			$sql = "SELECT *
+					FROM `_block`
+					WHERE `id`=".$US['block_id'];
+			if(!$blockSource = query_assoc($sql))
+				return '<div class="_empty min mar10">»сходного блока id'.$US['block_id'].' не существует.</div>';
+
+			if($blockSource['obj_name'] != 'spisok')
+				return '<div class="_empty min mar10">»сходный блок не €вл€етс€ частью шаблона дл€ списка.</div>';
+
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `block_id`=".$blockSource['obj_id']."
+					  AND `dialog_id`=14";
+			if(!$elem = query_assoc($sql))
+				return '<div class="_empty min mar10">Ёлемента, который размещает список, не существует.</div>';
+
+			if(!$dialog = _dialogQuery($elem['num_1']))
+				return '<div class="_empty min mar10">ƒиалога, который вносит данные списка.</div>';
+
+			$line_r = $dialog['width'] < 980 ? ' line-r' : '';
+
+			return
+			'<div class="'.$line_r.'" style="width:'.$dialog['width'].'px">'.
+				_blockHtml('dialog', $elem['num_1'], $dialog['width']).
+			'</div>';
 	}
 
 	//элементы списка шаблона (дл€ настройки)

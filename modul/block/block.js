@@ -244,7 +244,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 
 				'</div>',
 			dialog = _dialog({
-				width:450,
+				width:500,
 				top:20,
 				head:'Вставка элемента в блок',
 				content:html,

@@ -212,7 +212,7 @@ table{border:0;border-spacing:0}
 
 
 /* блоки из таблиц */
-.bl-tab{width:100%;table-layout:fixed}
+.bl-tab{table-layout:fixed}/* каким образом вычисл€етс€ ширина €чеек, чтобы €чейки не сдвигали друг друга */
 .bl-td{/*overflow-x:hidden*/}
 .bl-td .ui-resizable-e{
 	background-color:#ffaf64;

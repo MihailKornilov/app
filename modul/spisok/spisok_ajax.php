@@ -258,20 +258,17 @@ switch(@$_POST['op']) {
 							_check(array(
 								'id' => 'rowSmall',
 								'title' => 'Узкие строки',
-								'light' => 1,
 								'value' => $elem['num_7']
 							)).
 							_check(array(
 								'id' => 'colNameShow',
 								'title' => 'Показывать имена колонок',
-								'light' => 1,
 								'value' => $elem['num_5'],
 								'class' => 'ml30'
 							)).
 							_check(array(
 								'id' => 'rowLight',
 								'title' => 'Подсвечивать строки при наведении',
-								'light' => 1,
 								'value' => $elem['num_6'],
 								'class' => 'ml30'
 							)).

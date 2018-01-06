@@ -86,7 +86,7 @@ var VK_SCROLL = 0,
 	_dialog = function(o) {//диалоговое окно
 		o = $.extend({
 			top:100,
-			width:380,
+			width:0,    //ширина диалога. Если 0 = автоматически
 			mb:0,       //margin-bottom: отступ снизу от диалога (для календаря или выпадающих списков)
 			padding:10, //отступ для content
 
@@ -155,6 +155,7 @@ var VK_SCROLL = 0,
 		var dialog = $('body').append(html).find('._dialog:last'),
 			iconEdit = dialog.find('.head .edit'),
 			content = dialog.find('.content'),
+			width = o.width || Math.round(content.width()),
 			bottom = dialog.find('.btm'),
 			butSubmit = bottom.find('.submit'),
 			butCancel = bottom.find('.cancel'),
@@ -163,7 +164,7 @@ var VK_SCROLL = 0,
 					return;
 				o.submit();
 			},
-			w2 = Math.round(o.width / 2); // ширина/2. Для определения положения по центру
+			w2 = Math.round(width / 2); // ширина/2. Для определения положения по центру
 		dialog.find('.close').click(dialogClose);
 		butSubmit.click(submitFunc);
 		butCancel.click(function() {
@@ -180,7 +181,7 @@ var VK_SCROLL = 0,
 		_backfon();
 
 		dialog.css({
-			width:o.width + 'px',
+			width:width + 'px',
 			top:$(window).scrollTop() + VK_SCROLL + o.top + 'px',
 			left:$(document).width() / 2 - w2 + 'px',
 			'z-index':ZINDEX + 5
@@ -379,6 +380,11 @@ var VK_SCROLL = 0,
 			spisok:o.menu,
 			func:_dialogHeightCorrect
 		});
+
+		$('#width_auto')._check({
+			title:'автоматическая ширина'
+		});
+
 		$('#action_id')._select({
 			width:300,
 			title0:'действия нет, закрыть окно',
@@ -403,6 +409,7 @@ var VK_SCROLL = 0,
 				axis:'x',
 				grid:[10,0],
 				drag:function(event, ui) {
+					$('#width_auto')._check(0);
 					var w = ui.position.left - 8;
 					if(w < 480 || w > 980)
 						return false;
@@ -414,13 +421,14 @@ var VK_SCROLL = 0,
 
 		function submit() {
 			var send = {
-				op:'dialog_edit',// + (o.dialog_id ? 'edit' : 'add'),
+				op:'dialog_save',// + (o.dialog_id ? 'edit' : 'add'),
 
 				dialog_id:o.dialog_id,
 				unit_id:o.unit_id,
 				block_id:o.block_id,
 
 				width:DIALOG_WIDTH,
+				width_auto:_num($('#width_auto').val()),
 
 				head_insert:$('#head_insert').val(),
 				button_insert_submit:$('#button_insert_submit').val(),

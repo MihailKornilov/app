@@ -66,9 +66,9 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 	$attr_id = empty($v['attr_id']) ? 'check'.rand(1, 10000) : $v['attr_id'];
 
 	$cls = '_check ';
-	$cls .= empty($v['block']) ?    '' : ' block';      //display:block, иначе inline-block
-	$cls .= empty($v['disabled']) ? '' : ' disabled';//неактивное состояние
-	$cls .= empty($v['light']) ?    '' : ' light';      //если галочка не стоит, текст бледный
+	$cls .= empty($v['block']) ?    '' : ' block';       //display:block, иначе inline-block
+	$cls .= empty($v['disabled']) ? '' : ' disabled';    //неактивное состояние
+	$cls .= isset($v['light']) && empty($v['light']) ?    '' : ' light';       //если галочка не стоит, текст бледный
 	$cls .= empty($v['class']) ?    '' : ' '.$v['class'];//дополнительные классы
 
 	$val = _bool(@$v['value']);

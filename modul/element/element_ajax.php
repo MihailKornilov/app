@@ -5,6 +5,7 @@ switch(@$_POST['op']) {
 			'id' => 0,
 			'sa' => 0,
 			'width' => 500,
+			'width_auto' => 0,
 
 			'head_insert' => 'Внесение новой записи',
 			'button_insert_submit' => 'Внести',
@@ -138,7 +139,9 @@ switch(@$_POST['op']) {
 	  (SA ? '<div class="dialog-menu-9 pt20 pb20">'.
 				'<table class="bs10">'.
 					'<tr><td class="red w175 r">ID:<td class="b">'.$dialog['id'].
-					'<tr><td class="red r">Ширина:<td id="dialog-width">'.$dialog['width'].
+					'<tr><td class="red r">Ширина:'.
+		                '<td><div id="dialog-width" class="dib w50">'.$dialog['width'].'</div>'.
+		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
 					'<tr><td class="red r">Таблица в базе:'.
 						'<td><input type="text" id="base_table" class="w230" maxlength="30" value="'.$dialog['base_table'].'" />'.
 					//доступность диалога. На основании app_id. По умолчанию 0 - недоступен всем.
@@ -180,7 +183,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 */
-	case 'dialog_edit'://сохранение диалогового окна
+	case 'dialog_save'://сохранение диалогового окна
 		if(!$dialog_id = _num($_POST['dialog_id']))
 			jsonError('Некорректный ID диалогового окна');
 
@@ -282,6 +285,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	if($spisok_on && !$spisok_name)
 		jsonError('Укажите имя списка страницы');
 
+	$width_auto = _num($_POST['width_auto']);
 	$app_any = _num($_POST['app_any']);
 	$action_id = _num($_POST['action_id']);
 	$action_page_id = _num($_POST['action_page_id']);
@@ -303,6 +307,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
 				`sa`=".$sa.",
 				`width`=".$width.",
+				`width_auto`=".$width_auto.",
 
 				`head_insert`='".addslashes($head_insert)."',
 				`button_insert_submit`='".addslashes($button_insert_submit)."',
@@ -361,7 +366,7 @@ function _dialogOpenLoad($dialog_id) {
 	);
 
 	$send['edit_access'] = SA || $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
-	$send['width'] = _num($dialog['width']);
+	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 	$send['head'] = utf8($dialog[!$unit_id ? 'head_insert' : 'head_edit']);
 	$send['button_submit'] = utf8($dialog[!$unit_id ? 'button_insert_submit' : 'button_edit_submit']);
 	$send['button_cancel'] = utf8($dialog[!$unit_id ? 'button_insert_cancel' : 'button_edit_cancel']);
