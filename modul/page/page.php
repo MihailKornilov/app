@@ -700,13 +700,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
 			$line_r = $width < 980 ? ' line-r' : '';
 
-			$dialog = _dialogQuery($unit['num_1']);
-
 			return
 				'<div class="bg-ffc pad10 line-b">'.
-					'<button class="vk small green dialog-open fr" val="dialog_id:'.$unit['num_1'].'">'.
-						'Кнопка-подсказка списка <b>'.@$dialog['spisok_name'].'</b>'.
-					'</button>'.
 					_blockLevelChange('spisok', $unit['block_id'], $width).
 				'</div>'.
 				'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'._blockHtml('spisok', $unit['block_id'], $width).'</div>';

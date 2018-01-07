@@ -184,7 +184,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	$BT = BLOCK_EDIT ? ' bor-t-dash' : '';
 	$BR = BLOCK_EDIT ? ' bor-r-dash' : '';
 	$BB = BLOCK_EDIT ? ' bor-b-dash' : '';
-	$br1px = BLOCK_EDIT ? 1 : 0;
+	$br1px = BLOCK_EDIT ? 1 : 0;//показ красной разделительной линии справа
 
 	foreach($block as $y => $str) {
 		$widthMax = $WM;
@@ -226,7 +226,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 
 			$bor = explode(' ', $r['bor']);
 			$borPx = $bor[3] + (BLOCK_EDIT ? 0 : $bor[1]);
-			$width = $r['width'] - $br1px - $borPx;
+			$width = $r['width'] - ($xEnd ? 0 : $br1px) - $borPx;
 
 			$send .= '<td id="bl_'.$r['id'].'"'.
 						' class="'.$cls.'"'.
@@ -354,10 +354,7 @@ function _blockStyle($r, $width) {//стили css для блока
 		}
 	}
 
-	if($r['width_auto'])
-		$send[] = 'min-width:'.$width.'px';
-	else
-		$send[] = 'width:'.$width.'px';
+	$send[] = ($r['width_auto'] ? 'min-' : '').'width:'.$width.'px';
 
 	return implode(';', $send);
 }
