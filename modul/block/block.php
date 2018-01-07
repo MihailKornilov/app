@@ -196,7 +196,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
 		$send .=
-			'<table class="bl-tab" style="width:'.$WM.'px;height:'.$r['height'].'px">'.
+			'<table class="bl-tab" style="height:'.$r['height'].'px">'.//width:'.$WM.'px;
 				'<tr>';
 		//пустота в начале
 		if($r['x']) {
@@ -354,7 +354,10 @@ function _blockStyle($r, $width) {//стили css для блока
 		}
 	}
 
-	$send[] = 'width:'.$width.'px';
+	if($r['width_auto'])
+		$send[] = 'min-width:'.$width.'px';
+	else
+		$send[] = 'width:'.$width.'px';
 
 	return implode(';', $send);
 }
@@ -367,6 +370,7 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 		$v = array();
 		$v[] = 'id:'.$id;
 		$v[] = 'sa:"'.$r['sa'].'"';
+		$v[] = 'width_auto:"'.$r['width_auto'].'"';
 		$v[] = 'pos:"'.$r['pos'].'"';
 		$v[] = 'bg:"'.$r['bg'].'"';
 		$v[] = 'bor:"'.$r['bor'].'"';
@@ -412,6 +416,7 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 		$v = array(
 			'id' => _num($id),
 			'sa' => _num($r['sa']),
+			'width_auto' => _num($r['width_auto']),
 			'pos' => $r['pos'],
 			'bg' => $r['bg'],
 			'bor' => $r['bor'],

@@ -29,7 +29,6 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					_blockUnitBor(BL) +
 					_blockUnitBut(BL) +
 				'</div>' +
-				_blockUnitSa(BL) +
 				_elemUnit(BL),
 			width:240,
 			objPos:'mouse',
@@ -65,8 +64,15 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						borSave();
 					}
 				});
+				$('#block-width-auto')._check({
+					title:'<div class="fs12">width auto</div>',
+					func:function(v) {
+						BL.width_auto = v;
+						BL.save = 1;
+					}
+				});
 				$('#block-sa-view')._check({
-					title:'блок виден только для SA',
+					title:'<div class="fs12">SA only</div>',
 					func:function(v) {
 						BL.sa = v;
 						BL.save = 1;
@@ -159,24 +165,27 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 	_blockUnitBor = function(BL) {//границы блока
 		var bor = BL.bor.split(' ');
 		return '<table class="mt10">' +
-				'<tr><td class="color-555 fs14 pr5">Границы:' +
-				'<td>' +
-					'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor0" value="' + bor[0] + '"></div>' +
-					'<table class="bs5">' +
-						'<tr>' +
-							'<td><input type="hidden" id="block-unit-bor3" value="' + bor[3] + '">' +
-							'<td class="pl20"><input type="hidden" id="block-unit-bor1" value="' + bor[1] + '">' +
-					'</table>' +
-					'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor2" value="' + bor[2] + '"></div>' +
-			'</table>';
+				'<tr><td class="color-555 fs14">Границы:' +
+					'<td class="pr3">' +
+						'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor0" value="' + bor[0] + '"></div>' +
+						'<table class="bs5">' +
+							'<tr>' +
+								'<td><input type="hidden" id="block-unit-bor3" value="' + bor[3] + '">' +
+								'<td class="pl20"><input type="hidden" id="block-unit-bor1" value="' + bor[1] + '">' +
+						'</table>' +
+						'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor2" value="' + bor[2] + '"></div>' +
+					_blockUnitSa(BL) +
+				'</table>';
 	},
 	_blockUnitSa = function(BL) {//настройка блока для SA
 		if(!SA)
 			return '';
 
-		return '<div class="bg-ffc pad10 line-b line-t">' +
-					'<input type="hidden" id="block-sa-view" value="' + BL.sa + '" />' +
-				'</div>';
+		return '<td class="bg-ffc bor-f0 pl5 pr3">' +
+			'<input type="hidden" id="block-width-auto" value="' + BL.width_auto + '" />' +
+			'<div class="mt8">' +
+				'<input type="hidden" id="block-sa-view" value="' + BL.sa + '" />' +
+			'</div>';
 	},
 	_blockUnitBut = function(BL) {//кнопки
 		if(BL.elem_id)

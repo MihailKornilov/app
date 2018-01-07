@@ -258,6 +258,7 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID блока');
 
 		$sa = _num($_POST['sa']);
+		$width_auto = _num($_POST['width_auto']);
 		$pos = _txt($_POST['pos']);
 		$bg = _txt($_POST['bg']);
 		//границы
@@ -277,6 +278,7 @@ switch(@$_POST['op']) {
 		//изменение стилей
 		$sql = "UPDATE `_block`
 				SET `sa`='".$sa."',
+					`width_auto`='".$width_auto."',
 					`pos`='".$pos."',
 					`bg`='".$bg."',
 					`bor`='".$bor."'
