@@ -247,6 +247,33 @@ table{border:0;border-spacing:0}
 	opacity:.9;
 }
 
+/* подсветка блока при выборе элемента для вставки в шаблон */
+.block-elem-choose{
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	border:#5ce dashed 1px;
+	background:transparent repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAAARnQU1BAACxnmFMQfcAAAAgY0hSTQAAeiUAAICDAAD5/wAAgOgAAFIIAAEVWAAAOpcAABdv11ofkAAAAI5JREFUeNqkk8ENgDAMA70TezAGO3UOtkCshMIHJGQaTOpH1cZp1eQUIyIQEZi3Y7nPV7w/92zxu1tsdEnFa5Z/VcA/Kp07YnFy4m6FfyvLmJcZqbjMSDFHlZG6X2akmI/OYcq8zEjpqDKSDF3vsm57t+dly7vcEVzvpgxHvftZoTGHTY7N6FzC8W4vfw4AEN6KxmfW57wAAAAASUVORK5CYII=");
+	opacity:.3;
+	z-index:1;
+}
+.block-elem-choose:not(.process):hover{
+	opacity:1;
+	border-color:#0ad;
+	cursor:pointer;
+}
+.block-elem-choose._busy{
+	background-color:#C1EDFF;
+	opacity:.8;
+}
+.block-elem-choose.sel:not(:hover){
+	border-color:#00607D;
+	background-color:#bef;
+	opacity:.5;
+}
+
 /* цвета блока в настройках */
 #block-set-bg div:not(.sel):hover{border:#aaa solid 1px;}
 #block-set-bg .sel{border:#777 solid 1px;}

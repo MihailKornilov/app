@@ -351,6 +351,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+/*
 	case 'spisok_tmp_elem_to_block'://вставка элемента в блок единицы списка
 		if(!$block_id = _num($_POST['block_id']))
 			jsonError('Некорректный ID блока');
@@ -444,6 +445,68 @@ switch(@$_POST['op']) {
 
 		$send['html'] = utf8(_blockHtml('spisok', $iss['id'], $width));
 		$send['block_arr'] = _blockJsArr('spisok', $iss['id']);
+
+		jsonSuccess($send);
+		break;
+*/
+	case 'spisok_tmp_elem_to_block'://вставка элемента в блок единицы списка
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный ID исходного блока');
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента');
+
+		//получение данных исходного блока
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$block_id;
+		if(!$blockSource = query_assoc($sql))
+			jsonError('Блока id'.$block_id.' не существует');
+
+		if($blockSource['obj_name'] != 'spisok')
+			jsonError('Исходный блок не является блоком списка');
+
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id`=".$elem_id;
+		if(!$elem = query_assoc($sql))
+			jsonError('Элемента id'.$elem_id.' не существует');
+
+		//получение данных блока из диалога, в котором находится элемент
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$elem['block_id'];
+		if(!$block = query_assoc($sql))
+			jsonError('Блока id'.$elem['block_id'].' не существует');
+
+		if($block['obj_name'] != 'dialog')
+			jsonError('Блок элемента не является блоком диалога');
+
+		//получение id элемента шаблона, если ранее был в исходном блоке
+		$sql = "SELECT `id`
+				FROM `_element`
+				WHERE `block_id`=".$block_id."
+				  AND `dialog_id`=11";
+		$id = _num(query_value($sql));
+
+		$sql = "INSERT INTO `_element` (
+					`id`,
+					`block_id`,
+					`dialog_id`,
+					`num_1`,
+					`viewer_id_add`
+				) VALUES (
+					".$id.",
+					".$block_id.",
+					11,
+					".$elem_id.",
+					".VIEWER_ID."
+				) ON DUPLICATE KEY UPDATE
+					`num_1`=VALUES(`num_1`)";
+		query($sql);
+
+
+		$send['elem'] = $elem;
+		$send['block'] = $block;
 
 		jsonSuccess($send);
 		break;

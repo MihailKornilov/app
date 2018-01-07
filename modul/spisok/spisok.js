@@ -94,7 +94,7 @@ var _spisokNext = function(t, pe_id, next) {
 			});
 			function submit() {
 				var send = {
-					op:'spisok_tmp_elem_to_block',
+					op:'spisok_tmp_elem_to_block_',
 					elem_id:el.elem_id,
 					block_id:BL.id,
 					num_1:$('#elem_type').val(),

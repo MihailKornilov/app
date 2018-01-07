@@ -214,7 +214,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$xEnd = !($wMax - $r['x'] - $r['w']);
 
 			$cls = array('bl-td');
-			$cls[] = BLOCK_EDIT ? 'prel' : '';
+			//$cls[] = BLOCK_EDIT ? 'prel' : '';
+			$cls[] = 'prel';
 			$cls[] = $r['bg'];
 			$cls[] = trim($bt);
 			$cls[] = trim($bb);
@@ -233,7 +234,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 						' style="'._blockStyle($r, $width).'"'.
 				 (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
 					 '>'.
-							_blockSetka($r, $level, $r['obj_name'], $grid_id).
+							_blockSetka($r, $level, $grid_id).
+							_blockElemChoose($r, $unit).
 							_blockChildHtml($r, $level + 1, $width, $grid_id, $unit).
 	    					_elemDiv($r['elem'], $unit).
 					'';
@@ -320,7 +322,7 @@ function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
 	}
 	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
 }
-function _blockSetka($r, $level, $obj_name, $grid_id) {//отображение сетки для настраиваемого блока
+function _blockSetka($r, $level, $grid_id) {//отображение сетки для настраиваемого блока
 	if(!BLOCK_EDIT)
 		return '';
 	//включенное изменение ширины элемента отключает настройку блоков
@@ -329,14 +331,29 @@ function _blockSetka($r, $level, $obj_name, $grid_id) {//отображение сетки для н
 	if($r['id'] == $grid_id)
 		return '';
 
-	$bld = _blockLevelDefine($obj_name);
+	$bld = _blockLevelDefine($r['obj_name']);
 
 	if($bld != $level)
 		return '';
 
-	$bld += $obj_name == 'page' ? 0 : 2;
+	$bld += $r['obj_name'] == 'page' ? 0 : 2;
 
 	return '<div class="block-unit level'.$bld.' '.($grid_id ? ' grid' : '').'" val="'.$r['id'].'"></div>';
+}
+function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
+	//условие выбора элемента для настройки шаблона
+	if(!defined('ELEM_CHOOSE'))
+//		define('ELEM_CHOOSE', 0);
+//	if(!ELEM_CHOOSE)
+		return '';
+	if(empty($r['elem']))//блок не подсвечивается, если в нём нет элемента
+		return '';
+	if($r['obj_name'] != 'dialog')//выбор элементов можно производить только у диалогов (пока)
+		return '';
+
+	$sel = $unit['elem_id_choosed'] == $r['elem']['id'] ? ' sel' : '';
+
+	return '<div class="block-elem-choose'.$sel.'" val="'.$r['elem']['id'].'"></div>';
 }
 function _blockStyle($r, $width) {//стили css для блока
 	$send = array();

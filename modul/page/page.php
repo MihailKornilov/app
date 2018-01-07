@@ -591,8 +591,21 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//Выбор значения для шаблона (выводится окно для выбора)
 		case 11:
+			/*
+				num_1 - id вставленного элемента из диалога, который вносит данные списка
+			*/
 
-			return 'dialog 11 в процессе';
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id`=".$el['num_1'];
+			if(!$elem = query_assoc($sql))
+				return 'элемент отсутствует</div>';
+
+			switch($elem['dialog_id']) {
+				case 10: return $elem['txt_1'];
+			}
+
+			return 'значение не доделано';
 
 
 			/* ...старая версия...
@@ -602,7 +615,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							332: значение
 				num_3 - id компонента диалога
 				$_GET['id'] - id списка при выводе
-			*/
 
 
 			if(!$spisok_id = _num(@$_GET['id']))
@@ -628,6 +640,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return $sp[$cmp['col_name']];
 
 			return 'spisok_id='.$spisok_id.' '.$el['num_3'];
+			*/
 
 		//Функция PHP
 		case 12:
@@ -646,9 +659,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 num_1 - id диалога, который вносит данные списка (шаблон которого будет настраиваться)
 				num_2 - длина (количество строк, выводимых за один раз)
 				txt_1 - сообщение пустого запроса
-				num_3 - настройка шаблона: dialig_id=25
+
+				настройка шаблона через вспомогательный элемент: dialig_id=25
 			*/
-			return '<div class="_empty min">Список.</div>';
 			return _spisokShow($el);
 
 		//Количество строк списка
@@ -670,6 +683,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//Содержание единицы списка - таблица
 		case 23:
+			/*
+				в процессе...
+			*/
 			return 'Содержание единицы списка - таблица';
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ШАБЛОНА единицы списка
@@ -708,8 +724,18 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
 		case 26:
+			if($unitExist) {
+				//получение исходного блока, если элемент был вставлен ранее
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `id`=".$unit['id'];
+				if(!$elemSource = query_assoc($sql))
+					return '<div class="_empty min mar10">Отсутствует исходный элемент.</div>';
+
+				$US['block_id'] = $elemSource['block_id'];
+			}
 			if(empty($US['block_id']))
-				return '<div class="_empty min mar10">Отсутствует исходный блок</div>';
+				return '<div class="_empty min mar10">Отсутствует исходный блок.</div>';
 
 			$sql = "SELECT *
 					FROM `_block`
@@ -718,7 +744,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return '<div class="_empty min mar10">Исходного блока id'.$US['block_id'].' не существует.</div>';
 
 			if($blockSource['obj_name'] != 'spisok')
-				return '<div class="_empty min mar10">Исходный блок не является частью шаблона для списка.</div>';
+				return '<div class="_empty min mar10">Исходный блок не является блоком шаблона для списка.</div>';
 
 			$sql = "SELECT *
 					FROM `_element`
@@ -731,10 +757,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return '<div class="_empty min mar10">Диалога, который вносит данные списка.</div>';
 
 			$line_r = $dialog['width'] < 980 ? ' line-r' : '';
+			define('ELEM_CHOOSE', 1);
+
+			//вместо данных будет отправлено id выбранного элемента
+			$send = array(
+				'elem_id_choosed' => $unitExist ? $unit['num_1'] : 0
+			);
 
 			return
+			'<input type="hidden" id="block-id-source" value="'.$US['block_id'].'" />'.
 			'<div class="'.$line_r.'" style="width:'.$dialog['width'].'px">'.
-				_blockHtml('dialog', $elem['num_1'], $dialog['width']).
+				_blockHtml('dialog', $elem['num_1'], $dialog['width'], 0, $send).
 			'</div>';
 	}
 

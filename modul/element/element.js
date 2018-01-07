@@ -1274,8 +1274,10 @@ var VK_SCROLL = 0,
 		//если удаление единицы списка, то кнопка красная
 		if(o.to_del)
 			dialog.bottom.find('.submit').addClass('red');
-		else
+		else {
+			window.DIALOG_OPEN = dialog;
 			_elemActivate(o.cmp, o.unit);
+		}
 
 		function submit() {
 			var send = {
@@ -1449,6 +1451,46 @@ var VK_SCROLL = 0,
 						width:sp.width,
 						title0:sp.txt_1,
 						spisok:SPISOK_ON
+					});
+					return;
+				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
+				case 26:
+					if(is_edit)
+						return;
+					if(!DIALOG_OPEN)
+						return;
+					var bec = DIALOG_OPEN.content.find('.block-elem-choose');
+					bec.click(function(){
+						var t = $(this),
+							send = {
+								op:'spisok_tmp_elem_to_block',
+								block_id:$('#block-id-source').val(),
+								elem_id:_num(t.attr('val'))
+							};
+
+						if(t.hasClass('process'))
+							return;
+
+						bec.addClass('process');
+						t.addClass('_busy');
+						_post(send, function() {
+							DIALOG_OPEN.close();
+							$('#block-level-spisok')
+								.find('.block-grid-on')
+								.removeClass('grey')
+								.trigger('click');
+						}, function(res) {
+							bec.removeClass('process');
+							t.removeClass('_busy');
+							t._hint({
+								msg:res.text,
+								width:150,
+								pad:10,
+								color:'red',
+								side:'left',
+								show:1
+							});
+						});
 					});
 					return;
 			}

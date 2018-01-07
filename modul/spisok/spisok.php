@@ -86,6 +86,8 @@ function _spisokInc($dialog, $spisok) {//вложенные списки
 	return $send;
 }
 function _spisokShow($pe, $next=0) {//список, выводимый на странице
+	return _pr($pe);
+
 	/*
 	$pe:
 		dialog_id = 14
