@@ -159,6 +159,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	//получение компонентов диалога, ответственных за внесение единицы списка
 	$cmp = array();
 	$cmpUtf8 = array();
+	$v_ass = array();//ассоциативный список значений всех компонентов (для быстрого выбора)
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `obj_name`='dialog'
@@ -207,6 +208,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 					);
 					if($r['def'])
 						$cmp[$r['element_id']]['elv_def'] = $id;
+					$v_ass[$id] = $r['title'];
 				}
 
 				//формирование компонентов для отправки через AJAX
@@ -242,10 +244,6 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		$component[$id]['func_action_ass'] = array();//ассоциативный массив действий для конкретного компонента
 	}
 
-	$sql = "SELECT `id`,`v`
-			FROM `_dialog_component_v`
-			WHERE `dialog_id`=".$dialog_id;
-	$dialog['v_ass'] = query_ass($sql);
 
 	$sql = "SELECT *
 			FROM `_dialog_component_func`
@@ -278,6 +276,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	$dialog['cmp'] = $cmp;
 	$dialog['cmp_utf8'] = $cmpUtf8;
+	$dialog['v_ass'] = $v_ass;
 	$dialog['component'] = $component;
 	$dialog['func'] = $func;
 	$dialog['field'] = $col;
