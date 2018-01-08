@@ -63,7 +63,7 @@ function _iconDel($v=array()) {//иконка удаления записи в таблице
 
 
 function _check($v=array()) {//элемент ГАЛОЧКА
-	$attr_id = empty($v['attr_id']) ? 'check'.rand(1, 10000) : $v['attr_id'];
+	$attr_id = empty($v['attr_id']) ? 'check'.rand(1, 100000) : $v['attr_id'];
 
 	$cls = '_check ';
 	$cls .= empty($v['block']) ?    '' : ' block';       //display:block, иначе inline-block
@@ -84,7 +84,7 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 	'</div>';
 }
 function _radio($v=array()) {//элемент RADIO
-	$attr_id = empty($v['attr_id']) ? 'radio'.rand(1, 10000) : $v['attr_id'];
+	$attr_id = empty($v['attr_id']) ? 'radio'.rand(1, 100000) : $v['attr_id'];
 	$title0 = @$v['title0'];
 	$spisok = @$v['spisok'] ? $v['spisok'] : array();//содержание в виде id => title
 	$value = _num(@$v['value']);
@@ -126,7 +126,7 @@ function _radioUnit($id, $title, $interval, $on) {
 }
 
 function _search($v=array()) {//элемент ПОИСК
-	$attr_id = empty($v['attr_id']) ? '' : ' id="'.$v['attr_id'].'"';
+	$attr_id = empty($v['attr_id']) ? 'search'.rand(1, 100000) : $v['attr_id'];
 
 	$width = '150px';
 	if(isset($v['width']))
@@ -134,20 +134,19 @@ function _search($v=array()) {//элемент ПОИСК
 			$width = '100%';
 		else
 			$width .= 'px';
-
 	$width = ' style="width:'.$width.'"';
 
 	$placeholder = empty($v['placeholder']) ? '' : ' placeholder="'.trim($v['placeholder']).'"';
 	$v = trim(@$v['v']);
 
 	return
-	'<div class="_search"'.$width.$attr_id.'>'.
+	'<div class="_search"'.$width.' id="'.$attr_id.'_search">'.
 		'<table class="w100p">'.
 			'<tr><td class="w15 pl5">'.
 					'<div class="icon icon-search curD"></div>'.
-				'<td><input type="text"'.$placeholder.' value="'.$v.'" />'.
-				'<td class="w25 center'._dn($v).'">'.
-					'<div class="icon icon-del pl'._tooltip('Очистить', -49, 'r').'</div>'.
+				'<td><input type="text" id="'.$attr_id.'"'.$placeholder.' value="'.$v.'" />'.
+				'<td class="w25 center">'.
+					'<div class="icon icon-del pl'._dn($v).'"></div>'.
 		'</table>'.
 	'</div>';
 }

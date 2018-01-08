@@ -579,6 +579,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//Поиск
 		case 7:
+//			return '<input type="text" id="'.$attr_id.'" value="" />';
 			return _search(array(
 						'attr_id' => $attr_id,
 						'placeholder' => $el['txt_1'],

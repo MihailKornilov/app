@@ -532,6 +532,8 @@ $(document)
 				var el_name = '';
 				if(sp.dialog_id == 17 || sp.dialog_id == 6 || sp.dialog_id == 24 || sp.dialog_id == 27)
 					el_name = '_select';
+				if(sp.dialog_id == 7)
+					el_name = '_search';
 
 				$(sp.attr_id + el_name).css('width', '100%');
 				$(sp.attr_pe)

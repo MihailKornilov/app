@@ -422,7 +422,7 @@ var VK_SCROLL = 0,
 
 		function submit() {
 			var send = {
-				op:'dialog_save',// + (o.dialog_id ? 'edit' : 'add'),
+				op:'dialog_save',
 
 				page_id:PAGE_ID,
 				dialog_id:o.dialog_id,
@@ -439,8 +439,6 @@ var VK_SCROLL = 0,
 				button_edit_submit:$('#button_edit_submit').val(),
 				button_edit_cancel:$('#button_edit_cancel').val(),
 
-//				component:DIALOG_COMPONENT,
-//				func:COMPONENT_FUNC,
 				spisok_on:$('#spisok_on').val(),
 				spisok_name:$('#spisok_name').val(),
 				action_id:$('#action_id').val(),
@@ -1421,6 +1419,28 @@ var VK_SCROLL = 0,
 						spisok:PAGE_LIST
 					});
 					return;
+				//search
+				case 7:
+					$(sp.attr_id)._search({
+						func:function(v, attr_id) {
+							var send = {
+								op:'spisok_search',
+								elem_id:sp.elem_id,
+								v:v
+							};
+
+							if($(sp.attr_id)._search('is_process'))
+								return;
+
+							$(sp.attr_id)._search('process');
+							_post(send, function(res) {
+								$(sp.attr_id)._search('cancel');
+								$(res.spisok_attr).html(res.spisok_html);
+								$(res.count_attr).html(res.count_html);
+							});
+						}
+					});
+					return;
 				//настройка шаблона единицы списка
 				case 25:
 					if(is_edit)
@@ -1434,8 +1454,6 @@ var VK_SCROLL = 0,
 				case 17:
 					$(sp.attr_id)._select({
 						disabled:is_edit,
-			//			write:1,
-			//			block:1,
 						width:sp.width,
 						title0:sp.txt_1,
 						spisok:sp.elv_spisok
@@ -3536,10 +3554,11 @@ $.fn._search = function(o, v) {//поисковая строка
 		attr_id не обязателен
 	*/
 	var t = $(this),
-		attr_id = t.attr('id');
+		attr_id = t.attr('id'),
+		VALUE = $.trim(t.val());
 
 	if(!attr_id) {
-		attr_id = 'sr' + Math.round(Math.random() * 100000);
+		attr_id = 'search' + Math.round(Math.random() * 100000);
 		t.attr('id', attr_id);
 	}
 
@@ -3549,10 +3568,12 @@ $.fn._search = function(o, v) {//поисковая строка
 	switch(typeof o) {
 		case 'number':
 		case 'string':
+			if(!S)
+				break;
 			if(o == 'val') {
 				if(v) {
 					S.inp(v);
-					return;
+					return S;
 				}
 				return S.inp();
 			}
@@ -3564,109 +3585,86 @@ $.fn._search = function(o, v) {//поисковая строка
 				S.cancel();
 			if(o == 'clear')
 				S.clear();
-			return t;
+			return S;
 	}
 
-	if(S)
-		return;
+	if(S && S.inp)
+		return S;
 
 	o = $.extend({
-		ex:0,
-		width:126,
-		focus:0,//сразу устанавливать фокус
-		hold:'', //текст-подсказка placeholder
-		func:function() {},
-		enter:0,//применять введённый текст только после нажатия ентер
-		v:''    //введённое значение
+		width:150,      //ширина. Если 0 = 100%
+		placeholder:'', //текст-подсказка
+		focus:0,        //сразу устанавливать фокус
+		enter:0,        //применять введённый текст только после нажатия ентер
+		func:function() {}
 	}, o);
 
-	//проверка такой же поисковой строки, которая была выведена через PHP. Если уже есть, то применение функций.
-	var p = t.parent();
-	if(p.hasClass('_search')) {
-		o.ex = 1;    //флаг существующей поисковой строки
-		o.width = p.width();
+	if(!_parent(t, '._search').hasClass('_search')) {
+		var width = ' style="width:' + (o.width ? o.width + 'px' : '100%') + '"',
+			placeholder = o.placeholder ? ' placeholder="' + o.placeholder + '"' : '',
+			html = '<div class="_search" id="' + attr_id + '_search"' + width + '>' +
+				'<table class="w100p">' +
+					'<tr><td class="w15 pl5">' +
+							'<div class="icon icon-search curD"></div>' +
+						'<td><input type="text" id="' + attr_id + '"' + placeholder + ' value="' + VALUE + '" />' +
+						'<td class="w25 center">' +
+							'<div class="icon icon-del pl' + _dn(VALUE) + '"></div>' +
+				'</table>' +
+			'</div>';
+
+		t.after(html).remove();
 	}
 
-	if(!o.ex) {
-		t.width(o.width - 87);
-		t.wrap('<div class="_search" style="width:' + o.width + 'px">');
-		t.before(
-			'<div class="icon icon-del fr dn "></div>' +
-			'<div class="_busy dib fr mr5 dn"></div>' +
-			'<div class="hold">' + o.hold + '</div>'
-		);
-	}
+	var SEARCH = $('#' + win),
+		INP = $('#' + attr_id),
+		DEL = SEARCH.find('.icon-del');
 
-	var _s = t.parent(),
-		inp = t,
-		busy = _s.find('._busy'),
-		hold = _s.find('.hold'),
-		del = _s.find('.icon-del');
+	t = INP;
 
-	if(o.focus) {
-		inp.focus();
-		holdFocus()
-	}
+	if(o.focus)
+		t.focus();
 
-	inp .focus(holdFocus)
-		.blur(holdBlur)
-		.keydown(function(e) {
-			setTimeout(function() {
-				var v = inp.val();
-				hold._dn(!v);
-				del._dn(v);
-				if(o.enter && e.which != 13)
-					return;
-				o.func(v, attr_id);
-			}, 0);
-		});
-
-	t.clear = function() {
-		inp.val('');
-		del.addClass('dn');
-		hold.removeClass('dn');
-	};
-
-	del.click(function() {
+	INP.keydown(function(e) {
+		setTimeout(function() {
+			VALUE = $.trim(INP.val());
+			DEL._dn(VALUE);
+			if(o.enter && e.which != 13)
+				return;
+			o.func(VALUE, attr_id);
+		}, 0);
+	});
+	DEL.click(function() {
+		if(DEL.hasClass('spin'))
+			return;
 		t.clear();
 		o.func('', attr_id);
-	});
-
-	_s.click(function() {
-		inp.focus();
-		holdFocus();
+		t.focus();
 	});
 
 	t.inp = function(v) {
 		if(!v)
-			return $.trim(inp.val());
-		inp.val(v);
-		del.removeClass('dn');
-		hold.addClass('dn');
-		return $(this);
+			return VALUE;
+		VALUE = $.trim(v);
+		INP.val(VALUE);
+		DEL.removeClass('dn spin');
 	};
-	t.process = function() {//показ процесса ожидания с правой стороны
-		busy.removeClass('dn');
+	t.clear = function() {//очищение содержимого
+		INP.val('');
+		DEL.addClass('dn');
+	};
+	t.process = function() {//показ процесса ожидания
+		DEL.addClass('spin');
 	};
 	t.isProcess = function() {//определение, в процессе ли поиск
-		return !busy.hasClass('dn');
+		return DEL.hasClass('spin');
 	};
-	t.cancel = function() {//скрытие процесса ожидания с правой стороны
-		busy.addClass('dn');
+	t.cancel = function() {//отмена процесса ожидания
+		DEL.removeClass('spin');
 	};
-	t.clear = function() {
-		inp.val('');
-		del.addClass('dn');
-		hold.removeClass('dn');
-	};
+
 	window[win] = t;
 
-	t.inp(o.v);
-
 	return t;
-
-	function holdFocus() { hold.css('color', '#ccc'); }
-	function holdBlur() { hold.css('color', '#777'); }
 };
 $.fn._menu = function(o) {//меню
 	var tMain = $(this),
