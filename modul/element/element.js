@@ -1422,7 +1422,7 @@ var VK_SCROLL = 0,
 				//search
 				case 7:
 					$(sp.attr_id)._search({
-						func:function(v, attr_id) {
+						func:function(v) {
 							var send = {
 								op:'spisok_search',
 								elem_id:sp.elem_id,

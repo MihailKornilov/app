@@ -579,7 +579,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//ѕоиск
 		case 7:
-//			return '<input type="text" id="'.$attr_id.'" value="" />';
+			/*
+                txt_1 - текст поиска
+				num_1 - id элемента, содержащего список, по которому происходит поиск
+			*/
 			return _search(array(
 						'attr_id' => $attr_id,
 						'placeholder' => $el['txt_1'],

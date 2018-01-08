@@ -76,14 +76,13 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		//id диалога списка, на который происходит воздействие через поиск
-		if(!$pe_id = _num($pe['num_3']))
+		if(!$pe_id = _num($pe['num_1']))
 			jsonError('Нет воздействия на список');
 
 		//расположение списка на странице, на которой расположен поиск
 		$sql = "SELECT *
 				FROM `_element`
-				WHERE `dialog_id`=14
-				  AND `page_id`=".$pe['page_id']."
+				WHERE `dialog_id` IN (14,23)
 				  AND `id`=".$pe_id."
 				LIMIT 1";
 		if(!$peSpisok = query_assoc($sql))
