@@ -595,6 +595,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_1 - id вставленного элемента из диалога, который вносит данные списка
 			*/
 
+			if(isset($el['txt_real']))
+				return $el['txt_real'];
+
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `id`=".$el['num_1'];
@@ -602,6 +605,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return 'элемент отсутствует</div>';
 
 			switch($elem['dialog_id']) {
+				case 8: return 'текстовое значение';
 				case 10: return $elem['txt_1'];
 			}
 
@@ -662,6 +666,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 				настройка шаблона через вспомогательный элемент: dialig_id=25
 			*/
+			if(PAS) {
+				$dialog = _dialogQuery($el['num_1']);
+				return '<div class="_empty">Список <b class="fs14">'.$dialog['spisok_name'].'</b></div>';
+			}
+
 			return _spisokShow($el);
 
 		//Количество строк списка
@@ -710,6 +719,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return 'Блока, в котором находится список, не существует.';
 
 			setcookie('block_level_spisok', 1, time() + 2592000, '/');
+			$_COOKIE['block_level_spisok'] = 1;
 
 			//корректировка ширины с учётом отступов
 			$ex = explode(' ', $unit['mar']);
@@ -756,7 +766,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$dialog = _dialogQuery($elem['num_1']))
 				return '<div class="_empty min mar10">Диалога, который вносит данные списка.</div>';
 
-			$line_r = $dialog['width'] < 980 ? ' line-r' : '';
 			define('ELEM_CHOOSE', 1);
 
 			//вместо данных будет отправлено id выбранного элемента
@@ -765,12 +774,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			);
 
 			return
+			'<div class="hd2 ml10 mr10">Диалоговое окно <b class="fs16">'.$dialog['spisok_name'].'</b>:</div>'.
 			'<input type="hidden" id="block-id-source" value="'.$US['block_id'].'" />'.
-			'<div class="'.$line_r.'" style="width:'.$dialog['width'].'px">'.
-				_blockHtml('dialog', $elem['num_1'], $dialog['width'], 0, $send).
-			'</div>';
+			_blockHtml('dialog', $elem['num_1'], $dialog['width'], 0, $send);
 	}
-
+/*
 	//элементы списка шаблона (для настройки)
 	if($el['block']['obj_name'] == 'spisok') {
 		if(isset($el['real_txt']))
@@ -791,6 +799,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				}
 		}
 	}
+*/
 	return'неизвестный элемент='.$el['dialog_id'];
 }
 function _elemFontAllow($dialog_id) {//отображение в настройках стилей для конкретных элементов страницы
