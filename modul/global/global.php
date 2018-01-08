@@ -611,7 +611,7 @@ function _selArray($arr) {//список для _select при отправке через ajax
 	$send = array();
 	foreach($arr as $uid => $title) {
 		$send[] = array(
-			'uid' => $uid,
+			'uid' => _num($uid),
 			'title' => utf8(addslashes(htmlspecialchars_decode(trim($title))))
 		);
 	}

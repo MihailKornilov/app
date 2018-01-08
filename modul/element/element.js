@@ -1253,6 +1253,7 @@ var VK_SCROLL = 0,
 */
 	_dialogOpen = function(o) {//открытие диалогового окна
 		window.SPISOK_ON = o.spisok_on;
+		window.SPISOK_ON_PAGE = o.spisok_on_page;
 
 		var dialog = _dialog({
 			dialog_id:o.dialog_id,
@@ -1444,7 +1445,7 @@ var VK_SCROLL = 0,
 						return;
 					_dialogCmpValue(sp, unit[sp.col]);
 					return;
-				//select - выбор списка
+				//select - выбор списка (все списки приложения)
 				case 24:
 					$(sp.attr_id)._select({
 						disabled:is_edit,
@@ -1460,46 +1461,21 @@ var VK_SCROLL = 0,
 					if(!DIALOG_OPEN)
 						return;
 					var bec = DIALOG_OPEN.content.find('.block-elem-choose');
-					bec.click(function(){
+					bec.click(function() {
 						var t = $(this),
 							elem_id = _num(t.attr('val'));
-
 						bec.removeClass('sel');
 						t.addClass('sel');
-
 						$(sp.attr_id).val(elem_id);
-
-						return;
-
-							send = {
-								op:'spisok_tmp_elem_to_block',
-								block_id:$('#block-id-source').val(),
-								elem_id:_num(t.attr('val'))
-							};
-
-						if(t.hasClass('process'))
-							return;
-
-						bec.addClass('process');
-						t.addClass('_busy');
-						_post(send, function() {
-							DIALOG_OPEN.close();
-							$('#block-level-spisok')
-								.find('.block-grid-on')
-								.removeClass('grey')
-								.trigger('click');
-						}, function(res) {
-							bec.removeClass('process');
-							t.removeClass('_busy');
-							t._hint({
-								msg:res.text,
-								width:150,
-								pad:10,
-								color:'red',
-								side:'left',
-								show:1
-							});
-						});
+					});
+					return;
+				//select - выбор списка, размещённого на текущей странице
+				case 27:
+					$(sp.attr_id)._select({
+						disabled:is_edit,
+						width:sp.width,
+						title0:sp.txt_1,
+						spisok:SPISOK_ON_PAGE
 					});
 					return;
 			}
@@ -1859,6 +1835,7 @@ $(document)
 			val = t.attr('val'),
 			send = {
 				op:'dialog_open_load',
+				page_id:PAGE_ID,//id текущей страницы
 				dialog_id:0,    //id диалогового окна
 				unit_id:0,      //id единицы списка
 				block_id:0      //id блока, если элемент вставляется в блок

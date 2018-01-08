@@ -503,11 +503,22 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: наполнение дл€ некоторых компонентов: radio, select, dropdown
 		case 19: return '<div class="_empty min">Ќаполнение компонента</div>'; //все действи€ через JS
 
-		//Select - выбор списка
+		//Select - выбор списка, которые есть в приложении
 		case 24:
 			/*
                 txt_1 - текст, когда список не выбран
 				функци€ _dialogSpisokOn()
+			*/
+			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+
+		//Select - выбор списка из размещЄнных текущей странице
+		case 27:
+			/*
+				списки размещаютс€ диалогами 14(шаблон) и 23(таблица)
+				идентификаторами результата €вл€ютс€ id элементов (а не диалогов)
+
+                txt_1 - текст, когда список не выбран
+				функци€ _dialogSpisokOnPage()
 			*/
 			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
 
@@ -611,40 +622,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			}
 
 			return 'значение не доделано';
-
-			/* ...стара€ верси€...
-				num_1 - dialog_id списка
-				num_2 - тип содержани€ колонки:
-							331: название
-							332: значение
-				num_3 - id компонента диалога
-				$_GET['id'] - id списка при выводе
-
-
-			if(!$spisok_id = _num(@$_GET['id']))
-				return 'некорректный id объекта';
-
-			if(!$el['num_3'])
-				return 'нулевое значение компонента';
-
-			$sql = "SELECT *
-					FROM `_spisok`
-					WHERE `app_id` IN (0,".APP_ID.")
-					  AND `id`=".$spisok_id;
-			if(!$sp = query_assoc($sql))
-				return 'объекта не существует';
-
-			$dialog = _dialogQuery($el['num_1']);
-			$cmp = $dialog['component'][$el['num_3']];
-
-			if($el['num_2'] == 331)
-				return $cmp['label_name'];
-
-			if($el['num_2'] == 332)
-				return $sp[$cmp['col_name']];
-
-			return 'spisok_id='.$spisok_id.' '.$el['num_3'];
-			*/
 
 		//‘ункци€ PHP
 		case 12:

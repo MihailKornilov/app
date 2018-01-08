@@ -356,6 +356,7 @@ function _dialogOpenLoad($dialog_id) {
 			jsonError('Запись была удалена');
 	}
 
+	$page_id = _num($_POST['page_id']);
 	$send['dialog_id'] = $dialog_id;
 	$send['unit_id'] = $unit_id;
 	$send['block_id'] = _num($_POST['block_id']);
@@ -373,6 +374,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
 	$send['cmp'] = $dialog['cmp_utf8'];
 	$send['spisok_on'] = _dialogSpisokOn();
+	$send['spisok_on_page'] = _dialogSpisokOnPage($page_id);
 
 	foreach($unit as $id => $r)
 		$unit[$id] = utf8($r);

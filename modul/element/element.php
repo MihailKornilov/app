@@ -351,30 +351,27 @@ function _dialogSpisokOn() {//получение массива диалогов, которые могут быть спи
 			ORDER BY `id`";
 	return query_selArray($sql);
 }
-function _dialogSpisokOnPage($page_id) {//получение массива элементов страницы, которые являются списками
+function _dialogSpisokOnPage($page_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1 и которые размещены на текущей странице
 	if(!$page_id)
 		return array();
+
+	//списки размещаются при помощи диалогов 14 и 23
+	//идентификаторами результата являются id элементов (а не диалогов)
 	
-	$sql = "SELECT `id`,`num_3`
+	$sql = "SELECT *
 			FROM `_element`
 			WHERE `page_id`=".$page_id."
-			  AND `dialog_id`=14
-			  AND `num_3`";
-	if(!$res = query_arr($sql))
+			  AND `dialog_id` IN (14,23)";
+	if(!$arr = query_arr($sql))
 		return array();
 
-	$sql = "SELECT `id`,`spisok_name`
-			FROM `_dialog`
-			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
-			  AND `sa` IN (0".(SA ? ",1" : '').")
-			  AND `id` IN ("._idsGet($res, 'num_3').")
-			ORDER BY `id`";
-	$ass = query_ass($sql);
+	$send = array();
+	foreach($arr as $r) {
+		$dialog = _dialogQuery($r['num_1']);
+		$send[$r['id']] = $dialog['spisok_name'].' #'.$r['id'];
+	}
 
-	foreach($res as $id => $r)
-		$res[$id] = $ass[$r['num_3']];
-
-	return _selArray($res);
+	return _selArray($send);
 }
 function _dialogSpisokGetPage($page_id) {//список объектов, которые поступают на страницу через GET
 	if(!$page_id)

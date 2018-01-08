@@ -216,7 +216,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						'<button class="vk dialog-open" val="dialog_id:17,block_id:' + BL.id + '">Select - произвольные значения</button>' +
 						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Select - страницы</button>' +
 					'<p class="mt10">' +
-						'<button class="vk dialog-open ml10" val="dialog_id:24,block_id:' + BL.id + '">Select - списки</button>' +
+						'<button class="vk dialog-open ml10" val="dialog_id:24,block_id:' + BL.id + '">Select - списки приложения</button>' +
+						'<button class="vk dialog-open ml10" val="dialog_id:27,block_id:' + BL.id + '">Select - списки на текущей странице</button>' +
 
 					'<p class="mt30 fs17">Вспомогательные компоненты:' +
 					'<p class="mt10">' +
@@ -483,12 +484,14 @@ $(document)
 			for(var k in res.block_arr)
 				BLOCK_ARR[k] = res.block_arr[k];
 
-			if(v)
+			if(v) {
+				$('._hint').remove();
 				$('#grid-stack')._grid({
 					obj_name:spl[0],
 					obj_id:spl[1],
 					width:spl[2]
 				});
+			}
 		}, function() {
 			t._busy(0);
 		});
