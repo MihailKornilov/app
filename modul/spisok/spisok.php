@@ -282,12 +282,13 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 									default://значение колонки
 										if($col = $tmp['col'])
 											$txt = $sp[$col];
-/*									case 2:
-										$txt = $sp[$CMP[$el['num_1']]['col_name']];
-										$txt = _spisokColSearchBg($txt, $el, $el['num_1']);
-										$txt = _spisokColLink($txt, $el, $sp, $el['num_7']);
-										break;
-*/								}				}
+//										$txt = _spisokColSearchBg($txt, $el, $el['num_1']);
+								}
+						}
+						//обЄртка в ссылку
+						if($tmpElem['num_2'])
+							$txt = _spisokColLink($txt, $ELEM, $sp);
+
 						$r['elem']['txt_real'] = $txt;
 					}
 					$child[$r['parent_id']][$id] = $r;
@@ -302,7 +303,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				if($count_next > $limit)
 					$count_next = $limit;
 				$send .=
-					'<div class="mt5 over1" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
+					'<div class="over5" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
 						'<tt class="db center curP fs14 blue pad10">ѕоказать ещЄ '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
 					'</div>';
 			}
@@ -312,12 +313,9 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 	return 'Ќеизвестный внешний вид списка: '.$ELEM['num_1'];
 }
-function _spisokColLink($txt, $pe, $sp, $allow) {//обЄртка значени€ колонки в ссылку, если нужно
-	if(!$allow)
-		return $txt;
-
+function _spisokColLink($txt, $pe, $sp) {//обЄртка значени€ колонки в ссылку
 	//диалог, через который внос€тс€ данные списка
-	$dialog = _dialogQuery($pe['num_3']);
+	$dialog = _dialogQuery($pe['num_1']);
 
 	//по умолчанию текуща€ страница
 	$link = '&p='.$pe['page_id'];
