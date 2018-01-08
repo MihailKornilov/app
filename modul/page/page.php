@@ -592,7 +592,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Выбор значения для шаблона (выводится окно для выбора)
 		case 11:
 			/*
-				num_1 - id вставленного элемента из диалога, который вносит данные списка
+				num_1 - id элемента, выбранного из диалога, который вносит данные списка (через dialog_id=26)
+				num_2 - является ссылкой
 			*/
 
 			if(isset($el['txt_real']))
@@ -610,7 +611,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			}
 
 			return 'значение не доделано';
-
 
 			/* ...старая версия...
 				num_1 - dialog_id списка
@@ -768,15 +768,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			define('ELEM_CHOOSE', 1);
 
-			//вместо данных будет отправлено id выбранного элемента
-			$send = array(
-				'elem_id_choosed' => $unitExist ? $unit['num_1'] : 0
-			);
-
 			return
 			'<div class="hd2 ml10 mr10">Диалоговое окно <b class="fs16">'.$dialog['spisok_name'].'</b>:</div>'.
-			'<input type="hidden" id="block-id-source" value="'.$US['block_id'].'" />'.
-			_blockHtml('dialog', $elem['num_1'], $dialog['width'], 0, $send);
+//			'<input type="hidden" id="block-id-source" value="'.$US['block_id'].'" />'.
+			_blockHtml('dialog', $elem['num_1'], $dialog['width'], 0, $unit);
 	}
 /*
 	//элементы списка шаблона (для настройки)

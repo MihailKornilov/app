@@ -1462,6 +1462,15 @@ var VK_SCROLL = 0,
 					var bec = DIALOG_OPEN.content.find('.block-elem-choose');
 					bec.click(function(){
 						var t = $(this),
+							elem_id = _num(t.attr('val'));
+
+						bec.removeClass('sel');
+						t.addClass('sel');
+
+
+
+						return;
+
 							send = {
 								op:'spisok_tmp_elem_to_block',
 								block_id:$('#block-id-source').val(),

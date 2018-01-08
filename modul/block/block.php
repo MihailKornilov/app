@@ -351,7 +351,7 @@ function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 	if($r['obj_name'] != 'dialog')//выбор элементов можно производить только у диалогов (пока)
 		return '';
 
-	$sel = $unit['elem_id_choosed'] == $r['elem']['id'] ? ' sel' : '';
+	$sel = $unit['num_1'] == $r['elem']['id'] ? ' sel' : '';
 
 	return '<div class="block-elem-choose'.$sel.'" val="'.$r['elem']['id'].'"></div>';
 }
