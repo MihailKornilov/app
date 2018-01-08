@@ -3599,6 +3599,7 @@ $.fn._search = function(o, v) {//поисковая строка
 		func:function() {}
 	}, o);
 
+	//вывод поиска, если не был вставлен через PHP. Иначе только применение функций
 	if(!_parent(t, '._search').hasClass('_search')) {
 		var width = ' style="width:' + (o.width ? o.width + 'px' : '100%') + '"',
 			placeholder = o.placeholder ? ' placeholder="' + o.placeholder + '"' : '',

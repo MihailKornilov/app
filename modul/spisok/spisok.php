@@ -362,7 +362,7 @@ function _spisokFilterSearchVal($pe) {//получение введённого значения в строку п
 			FROM `_element`
 			WHERE `page_id`=".$pe['page_id']."
 			  AND `dialog_id`=7
-			  AND `num_3`=".$pe['id'];
+			  AND `num_1`=".$pe['id'];
 	$v = query_value($sql);
 
 	define($key, $v);
@@ -370,6 +370,7 @@ function _spisokFilterSearchVal($pe) {//получение введённого значения в строку п
 	return $v;
 }
 function _spisokFilterSearch($pe) {//получение значений фильтра-поиска для списка
+	return " AND `txt_1` LIKE '%".addslashes(_spisokFilterSearchVal($pe))."%'";
 	//если поиск не производится ни по каким колонкам, то выход
 	if(!$colIds = _ids($pe['txt_3'], 1))
 		return '';
@@ -377,7 +378,6 @@ function _spisokFilterSearch($pe) {//получение значений фильтра-поиска для списк
 	$val = _spisokFilterSearchVal($pe);
 	if(!strlen($val))
 		return '';
-
 
 	//диалог, через который вносятся данные списка
 	$dialog = _dialogQuery($pe['num_1']);
