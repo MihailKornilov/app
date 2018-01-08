@@ -127,18 +127,28 @@ function _radioUnit($id, $title, $interval, $on) {
 
 function _search($v=array()) {//ýëåìåíò ÏÎÈÑÊ
 	$attr_id = empty($v['attr_id']) ? '' : ' id="'.$v['attr_id'].'"';
-	$v = array(
-		'id' => @$v['id'],
-		'width' => _num(@$v['width']) ? _num($v['width']) : 300,
-		'hold' => @$v['hold'],
-		'v' => @$v['v']
-	);
+
+	$width = '150px';
+	if(isset($v['width']))
+		if(!$width = _num($v['width']))
+			$width = '100%';
+		else
+			$width .= 'px';
+
+	$width = ' style="width:'.$width.'"';
+
+	$placeholder = empty($v['placeholder']) ? '' : ' placeholder="'.trim($v['placeholder']).'"';
+	$v = trim(@$v['v']);
+
 	return
-	'<div class="_search" style="width:'.$v['width'].'px"'.$attr_id.'>'.
-		'<div class="icon icon-del fr'._dn($v['v']).'"></div>'.
-		'<div class="_busy dib fr mr5 dn"></div>'.
-		'<div class="hold'._dn(!$v['v']).'">'.$v['hold'].'</div>'.
-		'<input type="text" style="width:'.($v['width'] - 87).'px" value="'.$v['v'].'" />'.
+	'<div class="_search"'.$width.$attr_id.'>'.
+		'<table class="w100p">'.
+			'<tr><td class="w15 pl5">'.
+					'<div class="icon icon-search curD"></div>'.
+				'<td><input type="text"'.$placeholder.' value="'.$v.'" />'.
+				'<td class="w25 center'._dn($v).'">'.
+					'<div class="icon icon-del pl'._tooltip('Î÷èñòèòü', -49, 'r').'</div>'.
+		'</table>'.
 	'</div>';
 }
 

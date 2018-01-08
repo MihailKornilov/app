@@ -362,7 +362,7 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 			case 2:  return 30;//button
 			case 5:  return 30;//textarea
 			case 6:  return 50;//select - выбор страницы
-			case 7:  return 50;//search
+			case 7:  return 70;//search
 			case 8:  return 30;//input:text
 			case 17: return 50;//select - произвольные значения
 			case 24: return 70;//select - выбор списка
@@ -577,11 +577,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return '<div class="hd2">'.$el['txt_1'].'</div>';
 
-		case 7://search
+		//Поиск
+		case 7:
 			return _search(array(
 						'attr_id' => $attr_id,
-						'hold' => $el['txt_1'],
-						'width' => $el['num_2'],
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
 						'v' => $el['v']
 					));
 
@@ -905,6 +906,7 @@ function _page_div() {//todo тест
 		'<div class="icon icon-sub"></div>'.
 		'<div class="icon icon-join"></div>'.
 		'<div class="icon icon-info"></div>'.
+		'<div class="icon icon-search"></div>'.
 		'<div class="icon icon-hint"></div>'.
 		' Попутный текст'.
 	'</div>'.
