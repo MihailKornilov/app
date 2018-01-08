@@ -353,6 +353,7 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 			case 8:  return 150;//input:text
 			case 17: return 150;//select - произвольные значения
 			case 24: return 150;//select - выбор списка
+			case 27: return 150;//select - выбор списка, размещённого на текущей странице
 			default: return 0;
 		}
 
@@ -365,18 +366,21 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 			case 8:  return 30;//input:text
 			case 17: return 50;//select - произвольные значения
 			case 24: return 70;//select - выбор списка
+			case 27: return 70;//select - выбор списка, размещённого на текущей странице
 			default: return 0;
 		}
 
 	//$i == 'access'
 	switch($dialog_id) {
-		case 2: //кнопка
-		case 5: //textarea
-		case 6: //select - выбор страницы
-		case 7: //search
-		case 8: //input:text
+		case 2:  //кнопка
+		case 5:  //textarea
+		case 6:  //select - выбор страницы
+		case 7:  //search
+		case 8:  //input:text
 		case 17: //select - произвольные значения
-		case 24: return 1;//select - выбор списка
+		case 24: //select - выбор списка
+		case 27: //select - выбор списка, размещённого на текущей странице
+		case 0: return 1;
 		default: return 0;
 	}
 }

@@ -36,18 +36,18 @@ function _spisokCountAll($pe) {//получение общего количества строк списка
 	return $all;
 }
 function _spisokElemCount($r) {//формирование элемента с содержанием количества списка для вывода на страницу
-	if(!$pe_id = $r['num_1'])
+	if(!$elem_id = $r['num_1'])
 		return 'Список не указан.';
 
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `id`=".$pe_id;
-	if(!$pe = query_assoc($sql))
+			WHERE `id`=".$elem_id;
+	if(!$elem = query_assoc($sql))
 		return 'Элемента, содержащего список, не существует.';
 
 	//если результат нулевой, выводится сообщение из элемента, который размещает список
-	if(!$all = _spisokCountAll($pe))
-		return $pe['txt_1'];
+	if(!$all = _spisokCountAll($elem))
+		return $elem['txt_1'];
 
 	return
 	_end($all, $r['txt_1'], $r['txt_3'], $r['txt_5']).

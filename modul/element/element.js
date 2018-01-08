@@ -342,6 +342,7 @@ var VK_SCROLL = 0,
 				cancel:function() {
 					var send = {
 						op:'dialog_open_load',
+						page_id:PAGE_ID,
 						dialog_id:o.dialog_id,
 						unit_id:o.unit_id,
 						block_id:o.block_id
@@ -423,6 +424,7 @@ var VK_SCROLL = 0,
 			var send = {
 				op:'dialog_save',// + (o.dialog_id ? 'edit' : 'add'),
 
+				page_id:PAGE_ID,
 				dialog_id:o.dialog_id,
 				unit_id:o.unit_id,
 				block_id:o.block_id,
