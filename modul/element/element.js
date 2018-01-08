@@ -1467,7 +1467,7 @@ var VK_SCROLL = 0,
 						bec.removeClass('sel');
 						t.addClass('sel');
 
-
+						$(sp.attr_id).val(elem_id);
 
 						return;
 

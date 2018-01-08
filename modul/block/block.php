@@ -342,16 +342,14 @@ function _blockSetka($r, $level, $grid_id) {//отображение сетки для настраиваемо
 }
 function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 	//условие выбора элемента для настройки шаблона
-	if(!defined('ELEM_CHOOSE'))
-//		define('ELEM_CHOOSE', 0);
-//	if(!ELEM_CHOOSE)
+	if(empty($unit['choose']))
 		return '';
 	if(empty($r['elem']))//блок не подсвечивается, если в нём нет элемента
 		return '';
 	if($r['obj_name'] != 'dialog')//выбор элементов можно производить только у диалогов (пока)
 		return '';
 
-	$sel = $unit['num_1'] == $r['elem']['id'] ? ' sel' : '';
+	$sel = $unit['choose_elem_id'] == $r['elem']['id'] ? ' sel' : '';
 
 	return '<div class="block-elem-choose'.$sel.'" val="'.$r['elem']['id'].'"></div>';
 }

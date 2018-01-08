@@ -766,12 +766,15 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$dialog = _dialogQuery($elem['num_1']))
 				return '<div class="_empty min mar10">Диалога, который вносит данные списка.</div>';
 
-			define('ELEM_CHOOSE', 1);
+			$send = array(
+				'choose' => 1,
+				'choose_elem_id' => _num($v)
+			);
 
 			return
 			'<div class="hd2 ml10 mr10">Диалоговое окно <b class="fs16">'.$dialog['spisok_name'].'</b>:</div>'.
-//			'<input type="hidden" id="block-id-source" value="'.$US['block_id'].'" />'.
-			_blockHtml('dialog', $elem['num_1'], $dialog['width'], 0, $unit);
+			'<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />'.
+			_blockHtml('dialog', $elem['num_1'], $dialog['width'], 0, $send);
 	}
 /*
 	//элементы списка шаблона (для настройки)

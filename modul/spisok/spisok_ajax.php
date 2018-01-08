@@ -351,165 +351,6 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-/*
-	case 'spisok_tmp_elem_to_block'://вставка элемента в блок единицы списка
-		if(!$block_id = _num($_POST['block_id']))
-			jsonError('Некорректный ID блока');
-		if(!$num_1 = _num($_POST['num_1'], true))
-			jsonError('Колонка не выбрана');
-
-		if($elem_id = _num($_POST['elem_id'])) {
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id`=".$elem_id;
-			if(!query_assoc($sql))
-				jsonError('Редактируемого элемента id'.$elem_id.' не существует');
-		}
-
-		$num_2 = _num($_POST['num_2']);
-		$num_7 = _num($_POST['num_7']);
-		$txt_2 = $num_1 == -4 ? _txt($_POST['txt_2']) : '';
-
-		if($num_1 > 0 && !$num_2)
-			jsonError('Не выбран тип содержания');
-
-		//получение данных блока
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$block_id;
-		if(!$block = query_assoc($sql))
-			jsonError('Блока id'.$block_id.' не существует');
-
-		//проверка наличия в блоке других блоков
-		$sql = "SELECT COUNT(`id`)
-				FROM `_block`
-				WHERE `parent_id`=".$block_id;
-		if(query_value($sql))
-			jsonError('Данный блок поделён на части,<br>вставка элемента невозможна');
-
-		//проверка наличия элемента в блоке
-		if(!$elem_id) {
-			$sql = "SELECT COUNT(`id`)
-					FROM `_element`
-					WHERE `block_id`=".$block_id;
-			if(query_value($sql))
-				jsonError('В данном блоке уже присутствует элемент');
-		}
-
-		//получение элемента, в котором находятся данные списка
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `block_id`=".$block['obj_id'];
-		if(!$elSpisok = query_assoc($sql))
-			jsonError('Списка не существует');
-
-		//диалог, через который вносятся единицы списка
-		$dialog_id = $elSpisok['num_3'];
-
-		$sql = "INSERT INTO `_element` (
-					`id`,
-					`page_id`,
-					`block_id`,
-					`num_1`,
-					`num_2`,
-					`num_3`,
-					`num_7`,
-					`txt_2`,
-					`viewer_id_add`
-				) VALUES (
-					".$elem_id.",
-					".$elSpisok['page_id'].",
-					".$block_id.",
-					".$num_1.",
-					".$num_2.",
-					".$dialog_id.",
-					".$num_7.",
-					'".addslashes($txt_2)."',
-					".VIEWER_ID."
-				) ON DUPLICATE KEY UPDATE
-					`num_1`=VALUES(`num_1`),
-					`num_2`=VALUES(`num_2`),
-					`num_7`=VALUES(`num_7`),
-					`txt_2`=VALUES(`txt_2`)";
-		query($sql);
-
-		//получение данных самого главного блока списка
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$block['obj_id'];
-		$iss = query_assoc($sql);
-
-		//корректировка ширины с учётом отступов
-		$ex = explode(' ', $elSpisok['mar']);
-		$width = floor(($iss['width'] - $ex[1] - $ex[3]) / 10) * 10;
-
-		$send['html'] = utf8(_blockHtml('spisok', $iss['id'], $width));
-		$send['block_arr'] = _blockJsArr('spisok', $iss['id']);
-
-		jsonSuccess($send);
-		break;
-*/
-	case 'spisok_tmp_elem_to_block'://вставка элемента в блок единицы списка
-		if(!$block_id = _num($_POST['block_id']))
-			jsonError('Некорректный ID исходного блока');
-		if(!$elem_id = _num($_POST['elem_id']))
-			jsonError('Некорректный ID элемента');
-
-		//получение данных исходного блока
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$block_id;
-		if(!$blockSource = query_assoc($sql))
-			jsonError('Блока id'.$block_id.' не существует');
-
-		if($blockSource['obj_name'] != 'spisok')
-			jsonError('Исходный блок не является блоком списка');
-
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id`=".$elem_id;
-		if(!$elem = query_assoc($sql))
-			jsonError('Элемента id'.$elem_id.' не существует');
-
-		//получение данных блока из диалога, в котором находится элемент
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$elem['block_id'];
-		if(!$block = query_assoc($sql))
-			jsonError('Блока id'.$elem['block_id'].' не существует');
-
-		if($block['obj_name'] != 'dialog')
-			jsonError('Блок элемента не является блоком диалога');
-
-		//получение id элемента шаблона, если ранее был в исходном блоке
-		$sql = "SELECT `id`
-				FROM `_element`
-				WHERE `block_id`=".$block_id."
-				  AND `dialog_id`=11";
-		$id = _num(query_value($sql));
-
-		$sql = "INSERT INTO `_element` (
-					`id`,
-					`block_id`,
-					`dialog_id`,
-					`num_1`,
-					`viewer_id_add`
-				) VALUES (
-					".$id.",
-					".$block_id.",
-					11,
-					".$elem_id.",
-					".VIEWER_ID."
-				) ON DUPLICATE KEY UPDATE
-					`num_1`=VALUES(`num_1`)";
-		query($sql);
-
-
-		$send['elem'] = $elem;
-		$send['block'] = $block;
-
-		jsonSuccess($send);
-		break;
 
 	case 'spisok_select_get'://получение списка для селекта
 		if(!$dialog_id = _num($_POST['dialog_id']))
@@ -758,9 +599,19 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			default:
 			case 'page': $width = 1000; break;
 			case 'spisok':
+				$sql = "SELECT *
+						FROM `_block`
+						WHERE `id`=".$block['obj_id'];
+				$bl = query_assoc($sql);
+
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `block_id`=".$bl['id'];
+				$el = query_assoc($sql);
+
 				//корректировка ширины с учётом отступов
-				$ex = explode(' ', $elem['mar']);
-				$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
+				$ex = explode(' ', $el['mar']);
+				$width = floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
 				break;
 			case 'dialog':
 				_cache('clear', '_dialogQuery'.$block['obj_id']);
