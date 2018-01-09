@@ -354,6 +354,7 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 			case 17: return 150;//select - произвольные значения
 			case 24: return 150;//select - выбор списка
 			case 27: return 150;//select - выбор списка, размещённого на текущей странице
+			case 29: return 150;//select - выбор единицы из другого списка (для связки)
 			default: return 0;
 		}
 
@@ -367,6 +368,7 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 			case 17: return 50;//select - произвольные значения
 			case 24: return 70;//select - выбор списка
 			case 27: return 70;//select - выбор списка, размещённого на текущей странице
+			case 29: return 70;//select - выбор единицы из другого списка (для связки)
 			default: return 0;
 		}
 
@@ -380,6 +382,7 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 		case 17: //select - произвольные значения
 		case 24: //select - выбор списка
 		case 27: //select - выбор списка, размещённого на текущей странице
+		case 29: //select - выбор единицы из другого списка (для связки)
 		case 0: return 1;
 		default: return 0;
 	}
@@ -523,6 +526,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
                 txt_1 - текст, когда список не выбран
 				функция _dialogSpisokOnPage()
+			*/
+			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+
+		//Select - выбор единицы из другого списка
+		case 29:
+			/*
+				Для связки одного списка с другим
+				Список нельзя связывать самого с собой
+
+                num_1 - id диалога, через который вносятся данные выбираемого списка
+                txt_1 - текст, когда единица не выбрана
 			*/
 			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
 

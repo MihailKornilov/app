@@ -1519,6 +1519,14 @@ var VK_SCROLL = 0,
 						$(sp.attr_id).val(ids.join(','));
 					});
 					return;
+				//select - выбор единицы из другого списка (для связки)
+				case 29:
+					$(sp.attr_id)._select({
+						disabled:is_edit,
+						width:sp.width,
+						title0:sp.txt_1
+					});
+					return;
 			}
 		});
 
