@@ -377,7 +377,7 @@ function _dialogSpisokOnPage($page_id) {//получение массива диалогов, которые мо
 	$send = array();
 	foreach($arr as $r) {
 		$dialog = _dialogQuery($r['num_1']);
-		$send[$r['id']] = $dialog['spisok_name'].' #'.$r['id'];
+		$send[$r['id']] = $dialog['spisok_name'].' (в блоке '.$r['id'].')';
 	}
 
 	return _selArray($send);

@@ -1437,6 +1437,8 @@ var VK_SCROLL = 0,
 								$(sp.attr_id)._search('cancel');
 								$(res.spisok_attr).html(res.spisok_html);
 								$(res.count_attr).html(res.count_html);
+							}, function(res) {
+								$(sp.attr_id)._search('cancel');
 							});
 						}
 					});

@@ -747,20 +747,56 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					WHERE `block_id`=".$blockSource['obj_id']."
 					  AND `dialog_id`=14";
 			if(!$elem = query_assoc($sql))
-				return '<div class="_empty min mar10">Ёлемента, который размещает список, не существует.</div>';
+				return '<div class="_empty min mar10">Ёлемента не существует, который размещает список.</div>';
 
 			if(!$dialog = _dialogQuery($elem['num_1']))
-				return '<div class="_empty min mar10">ƒиалога, который вносит данные списка.</div>';
+				return '<div class="_empty min mar10">ƒиалога не существует, который вносит данные списка.</div>';
 
 			$send = array(
 				'choose' => 1,
-				'choose_elem_id' => _num($v)
+				'choose_sel' => _num($v)
 			);
 
 			return
 			'<div class="hd2 ml10 mr10">ƒиалоговое окно <b class="fs16">'.$dialog['spisok_name'].'</b>:</div>'.
 			'<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />'.
 			_blockHtml('dialog', $elem['num_1'], $dialog['width'], 0, $send);
+
+		//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —одержание диалога дл€ указани€ значений, по которым будет производитьс€ поиск
+		case 28:
+			if(!$unitExist || !$unit['num_1'])
+				return '<div class="_empty min mar10">'.
+							'¬ыбор полей, по которым производитс€ поиск,'.
+							'<br>'.
+							'будет доступен после выбора списка'.
+							'<br>'.
+							'и вставки элемента поиска в блок.'.
+						'</div>';
+
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id`=".$unit['num_1'];
+			if(!$elemSource = query_assoc($sql))
+				return '<div class="_empty min mar10">ќтсутствует элемент, который содержит список.</div>';
+
+			if(!$dialog_id = $elemSource['num_1'])
+				return '<div class="_empty min mar10">Ќужный список ещЄ не был вставлен в блок.</div>';
+
+			if(!$dialog = _dialogQuery($dialog_id))
+				return '<div class="_empty min mar10">ƒиалога не существует, который вносит данные списка.</div>';
+
+
+			$send = array(
+				'choose' => 1,                      //флаг подсветки элементов
+				'choose_search' => 1,               //флаг выбора полей поиска
+				'choose_access' => _idsAss('5,8'),  //пол€, которые можно подсвечивать
+				'choose_sel' => _num($v)            //id выбранных элементов
+			);
+
+			return
+			'<div class="hd1">ƒиалоговое окно <b class="fs16">'.$dialog['spisok_name'].'</b>:</div>'.
+			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
 	}
 /*
 	//элементы списка шаблона (дл€ настройки)
