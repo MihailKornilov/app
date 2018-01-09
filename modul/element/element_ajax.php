@@ -172,8 +172,6 @@ switch(@$_POST['op']) {
 		$send['action'] = _selArray($action);
 		$send['component'] = _dialogComponentSpisok($dialog_id, 'arr_edit');
 		$send['cmp'] = $dialog['cmp_utf8'];
-		$send['spisok_on'] = _dialogSpisokOn();
-//		$send['func'] = (object)$dialog['func'];
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
 		jsonSuccess($send);
@@ -373,7 +371,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['button_cancel'] = utf8($dialog[!$unit_id ? 'button_insert_cancel' : 'button_edit_cancel']);
 	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
 	$send['cmp'] = $dialog['cmp_utf8'];
-	$send['spisok_on'] = _dialogSpisokOn();
+	$send['spisok_on'] = _dialogSpisokOn($dialog_id, $send['block_id'], $unit_id);
 	$send['spisok_on_page'] = _dialogSpisokOnPage($page_id);
 
 	foreach($unit as $id => $r)

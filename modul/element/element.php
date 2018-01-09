@@ -346,7 +346,7 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 	return _cache($dialog_id);
 }
 */
-function _dialogSpisokOn() {//получение массива диалогов, которые могут быть списками: spisok_on=1
+function _dialogSpisokOn($dialog_id, $block_id, $unit_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$cond = "`spisok_on`";
 	$cond .= " AND `app_id`=".APP_ID;
 //	$cond .= " AND !`app_id`";

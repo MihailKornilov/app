@@ -327,7 +327,7 @@ var VK_SCROLL = 0,
 		};
 	},
 	_dialogEdit = function(o) {//создание|редактирование диалогового окна
-		window.SPISOK_ON = o.spisok_on;
+		window.SPISOK_ON = [];
 
 		var dialog = _dialog({
 				dialog_id:o.dialog_id,
