@@ -1,22 +1,5 @@
 <?php
 
-function _spisokCond($pe) {//формирование строки с условиями поиска
-	//диалог, через который вносятся данные списка
-	$dialog = _dialogQuery($pe['num_1']);
-	$field = $dialog['field'];
-
-	$cond = "`id`";
-	if(isset($field['deleted']))
-		$cond = "!`deleted`";
-	if(isset($field['app_id']))
-		$cond .= " AND `app_id` IN (0,".APP_ID.")";
-	if(isset($field['dialog_id']))
-		$cond .= " AND `dialog_id`=".$pe['num_1'];
-
-	$cond .= _spisokFilterSearch($pe);
-
-	return $cond;
-}
 function _spisokCountAll($pe) {//получение общего количества строк списка
 	$key = 'SPISOK_COUNT_ALL'.$pe['id'];
 
@@ -335,7 +318,7 @@ function _spisokColLink($txt, $pe, $sp) {//обёртка значения колонки в ссылку
 	return '<a href="'.URL.$link.'" class="inhr">'.$txt.'</a>';
 }
 function _spisokColSearchBg($txt, $pe, $cmp_id) {//подсветка значения колонки при текстовом (быстром) поиске
-	$val = _spisokFilterSearchVal($pe);
+	$val = _spisokCondSearchVal($pe);
 	if(!strlen($val))
 		return $txt;
 
@@ -352,7 +335,52 @@ function _spisokColSearchBg($txt, $pe, $cmp_id) {//подсветка значения колонки пр
 
 	return $txt;
 }
-function _spisokFilterSearchVal($pe) {//получение введённого значения в строку поиска, воздействующий на этот список
+
+function _spisokCond($el) {//формирование строки с условиями поиска
+	//$el - элемент, который размещает список. 14 или 23.
+	//диалог, через который вносятся данные списка
+	$dialog = _dialogQuery($el['num_1']);
+	$field = $dialog['field'];
+
+	$cond = "`id`";
+	if(isset($field['deleted']))
+		$cond = "!`deleted`";
+	if(isset($field['app_id']))
+		$cond .= " AND `app_id` IN (0,".APP_ID.")";
+	if(isset($field['dialog_id']))
+		$cond .= " AND `dialog_id`=".$el['num_1'];
+
+	$cond .= _spisokCondSearch($el);
+
+	return $cond;
+}
+function _spisokCondSearch($pe) {//получение значений фильтра-поиска для списка
+	return " AND `txt_1` LIKE '%".addslashes(_spisokCondSearchVal($pe))."%'";
+	//если поиск не производится ни по каким колонкам, то выход
+	if(!$colIds = _ids($pe['txt_3'], 1))
+		return '';
+
+	$val = _spisokCondSearchVal($pe);
+	if(!strlen($val))
+		return '';
+
+	//диалог, через который вносятся данные списка
+	$dialog = _dialogQuery($pe['num_1']);
+	$cmp = $dialog['cmp'];
+
+	$arr = array();
+	foreach($colIds as $cmp_id) {
+		if(empty($cmp[$cmp_id]))
+			continue;
+		$arr[] = "`".$cmp[$cmp_id]['col_name']."` LIKE '%".addslashes($val)."%'";
+	}
+
+	if(!$arr)
+		return '';
+
+	return " AND (".implode($arr, ' OR ').")";
+}
+function _spisokCondSearchVal($pe) {//получение введённого значения в строку поиска, воздействующий на этот список
 	$key = 'ELEM_SEARCH_VAL'.$pe['id'];
 
 	if(defined($key))
@@ -368,32 +396,6 @@ function _spisokFilterSearchVal($pe) {//получение введённого значения в строку п
 	define($key, $v);
 
 	return $v;
-}
-function _spisokFilterSearch($pe) {//получение значений фильтра-поиска для списка
-	return " AND `txt_1` LIKE '%".addslashes(_spisokFilterSearchVal($pe))."%'";
-	//если поиск не производится ни по каким колонкам, то выход
-	if(!$colIds = _ids($pe['txt_3'], 1))
-		return '';
-
-	$val = _spisokFilterSearchVal($pe);
-	if(!strlen($val))
-		return '';
-
-	//диалог, через который вносятся данные списка
-	$dialog = _dialogQuery($pe['num_1']);
-	$cmp = $dialog['cmp'];
-
-	$arr = array();
-	foreach($colIds as $cmp_id) {
-		if(empty($cmp[$cmp_id]))
-			continue;
-		$arr[] = "`".$cmp[$cmp_id]['col_name']."` LIKE '%".addslashes($val)."%'";
-	}
-
-	if(empty($arr))
-		return '';
-
-	return " AND (".implode($arr, ' OR ').")";
 }
 
 function _spisokList($dialog_id, $component_id, $v='', $unit_id=0) {//массив списков (пока только для select)

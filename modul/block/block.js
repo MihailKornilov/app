@@ -226,6 +226,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						'<button class="vk orange dialog-open" val="dialog_id:25,block_id:' + BL.id + '">Ќастройка содержани€ шаблона списка</button>' +
 					'<p class="mt10">' +
 						'<button class="vk orange dialog-open" val="dialog_id:26,block_id:' + BL.id + '">—одержание диалога дл€ выбора значени€</button>' +
+					'<p class="mt10">' +
+						'<button class="vk orange dialog-open" val="dialog_id:28,block_id:' + BL.id + '">¬ыбор элементов из содержани€ диалога,<br>по которым нужно производить поиск</button>' +
 
 					'<p class="mt30 fs17">Ёлементы дл€ наполнени€ содержани€:' +
 					'<p class="mt10">' +
@@ -641,7 +643,28 @@ $(document)
 
 		but.removeClass('grey').trigger('click');
 	})
-	.on('mouseenter', '.block-unit', _blockUnitSetup);
+	.on('mouseenter', '.block-unit', _blockUnitSetup)
+	.on('click', '.block-unit', function() {//нажатие на блок дл€ настройки
+		if(!window.BLOCK_ARR)//страница ещЄ не догрузилась
+			return;
+
+		//если производитс€ процесс делени€ блока на части, действие не производитс€
+		if($('.block-unit-grid').length)
+			return;
+
+		var t = $(this),
+			block_id = _num(t.attr('val')),
+			BL = BLOCK_ARR[block_id];
+
+		//если есть подблоки, действие не производитс€
+		if(BL.child)
+			return;
+
+		if(BL.elem_id)
+			return $('.dialog-open.icon-edit').trigger('click');
+
+		_blockUnitElAdd(BL);
+	});
 
 $.fn._grid = function(o) {
 	var t = $(this);

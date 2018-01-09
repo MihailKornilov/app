@@ -2193,7 +2193,7 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 
 	var win = attr_id + '_select',
 		s = window[win];
-	console.log(s);
+
 	switch(typeof o) {
 		default:
 		case 'undefined': break;
