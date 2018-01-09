@@ -346,11 +346,31 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 	return _cache($dialog_id);
 }
 */
-function _dialogSpisokOn($dialog_id, $block_id, $unit_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
+function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$cond = "`spisok_on`";
 	$cond .= " AND `app_id`=".APP_ID;
 //	$cond .= " AND !`app_id`";
 	$cond .= " AND !`sa`";
+
+
+	//получение id диалога, который является списком, чтобы было нельзя его выбирать в самом себе (для связок)
+	$dialog = _dialogQuery($dialog_id);
+	if($dialog['base_table'] == '_element') {
+		//если редактирование - получение id блока из элемента
+		if($elem_id) {
+			$sql = "SELECT `block_id`
+					FROM `_element`
+					WHERE `id`=".$elem_id;
+			$block_id = query_value($sql);
+		}
+		//если вставка элемента в блок
+		$sql = "SELECT `obj_id`
+				FROM `_block`
+				WHERE `obj_name`='dialog'
+				  AND `id`=".$block_id;
+		if($dialog_id_skip = query_value($sql))
+			$cond .= " AND `id`!=".$dialog_id_skip;
+	}
 
 	$sql = "SELECT
 				`id`,

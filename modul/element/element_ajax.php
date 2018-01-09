@@ -855,9 +855,6 @@ function _dialogComponentSpisok($dialog_id, $i, $data=array(), $page_id=0) {//сп
 
 			if($r['type_id'] == 2 && !$edit)
 				switch($r['num_4']) {
-					case 2://все списки или с конкретной страницы
-						$arr[$n]['v'] = $r['num_5'] ? _dialogSpisokOnPage($page_id) : _dialogSpisokOn();
-						break;
 					case 3://получение списка по значениям конкретного объекта
 						$arr[$n]['v'] = _spisokList($r['num_1'], $r['num_2'], '', $r['val']);
 						break;
