@@ -1500,6 +1500,25 @@ var VK_SCROLL = 0,
 						spisok:SPISOK_ON_PAGE
 					});
 					return;
+				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для указания значений, по которым будет производиться поиск
+				case 28:
+					if(is_edit)
+						return;
+					if(!DIALOG_OPEN)
+						return;
+					var bec = DIALOG_OPEN.content.find('.block-elem-choose');
+					bec.click(function() {
+						var t = $(this),
+							sel = t.hasClass('sel'),
+							ids = [];
+						t._dn(sel, 'sel');
+						_forEq(bec, function(sp) {
+							if(sp.hasClass('sel'))
+								ids.push(_num(sp.attr('val')));
+						});
+						$(sp.attr_id).val(ids.join(','));
+					});
+					return;
 			}
 		});
 

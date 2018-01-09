@@ -353,8 +353,12 @@ function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 
 	if(!empty($unit['choose_search'])) {//выбор полей для поиска
 		//подсвечивать можно только разрешённые поля
-		if(!isset($unit['choose_access']))
+		if(!isset($unit['choose_access'][$r['elem']['dialog_id']]))
 			return '';
+		if(!$r['elem']['col'])
+			return '';
+		if(isset($unit['choose_sel'][$r['elem']['id']]))
+			$sel = ' sel';
 	} elseif($unit['choose_sel'] == $r['elem']['id'])
 		$sel = ' sel';
 

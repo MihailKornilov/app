@@ -265,7 +265,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 									default://значение колонки
 										if($col = $tmp['col'])
 											$txt = $sp[$col];
-//										$txt = _spisokColSearchBg($txt, $el, $el['num_1']);
+										$txt = _spisokColSearchBg($txt, $ELEM, $tmpElem['num_1']);
 								}
 						}
 						//обёртка в ссылку
@@ -317,13 +317,21 @@ function _spisokColLink($txt, $pe, $sp) {//обёртка значения колонки в ссылку
 
 	return '<a href="'.URL.$link.'" class="inhr">'.$txt.'</a>';
 }
-function _spisokColSearchBg($txt, $pe, $cmp_id) {//подсветка значения колонки при текстовом (быстром) поиске
-	$val = _spisokCondSearchVal($pe);
+function _spisokColSearchBg($txt, $el, $cmp_id) {//подсветка значения колонки при текстовом (быстром) поиске
+	$val = _spisokCondSearchVal($el);
 	if(!strlen($val))
 		return $txt;
 
+	//элемент поиска, который ищет по данному списку
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=7
+			  AND `num_1`=".$el['id'];
+	if(!$elemSearch = query_assoc($sql))
+		return $txt;
+
 	//ассоциативный массив колонок, по которым производится поиск
-	$colIds = _idsAss($pe['txt_3']);
+	$colIds = _idsAss($elemSearch['txt_2']);
 	//если по данной колонке поиск разрешён, то выделение цветом найденные символы
 	if(!isset($colIds[$cmp_id]))
 		return $txt;
@@ -354,10 +362,17 @@ function _spisokCond($el) {//формирование строки с условиями поиска
 
 	return $cond;
 }
-function _spisokCondSearch($pe) {//получение значений фильтра-поиска для списка
-	return " AND `txt_1` LIKE '%".addslashes(_spisokCondSearchVal($pe))."%'";
+function _spisokCondSearch($pe) {//значения фильтра-поиска для списка
+	//элемент поиска, который ищет по данному списку
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=7
+			  AND `num_1`=".$pe['id'];
+	if(!$elemSearch = query_assoc($sql))
+		return '';
+
 	//если поиск не производится ни по каким колонкам, то выход
-	if(!$colIds = _ids($pe['txt_3'], 1))
+	if(!$colIds = _ids($elemSearch['txt_2'], 1))
 		return '';
 
 	$val = _spisokCondSearchVal($pe);
@@ -372,7 +387,7 @@ function _spisokCondSearch($pe) {//получение значений фильтра-поиска для списка
 	foreach($colIds as $cmp_id) {
 		if(empty($cmp[$cmp_id]))
 			continue;
-		$arr[] = "`".$cmp[$cmp_id]['col_name']."` LIKE '%".addslashes($val)."%'";
+		$arr[] = "`".$cmp[$cmp_id]['col']."` LIKE '%".addslashes($val)."%'";
 	}
 
 	if(!$arr)
