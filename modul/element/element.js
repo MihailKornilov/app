@@ -2408,7 +2408,8 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			return;
 		}
 
-		var html = '';
+		var html = '',
+			h;
 		if(o.title0)
 			html += '<div class="select-unit title0" val="0">' + o.title0 + '</div>';
 
@@ -2418,6 +2419,8 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			html += '<div class="select-unit' + info + '"' + val + '>' + sp.content + '</div>';
 		});
 		RES.html(html);
+		h = RES.height();
+		RES._dn(h < 250, 'h250');
 	}
 	function valueSet(v) {//установка значения
 		v = _num(v);
