@@ -206,8 +206,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				'<div class="center">' +
 					'<p class="mt10 fs17">Компоненты для внесения данных:' +
 					'<p class="mt10">' +
-						'<button class="vk grey dialog-open" val="dialog_id:8,block_id:' + BL.id + '">Однострочное поле</button>' +
-						'<button class="vk grey dialog-open ml10" val="dialog_id:5,block_id:' + BL.id + '">Многострочное поле</button>' +
+						'<button val="dialog_id:8,block_id:' + BL.id + '" class="vk grey dialog-open">Однострочное поле</button>' +
+						'<button val="dialog_id:5,block_id:' + BL.id + '" class="vk grey dialog-open ml10">Многострочное поле</button>' +
 					'<p class="mt10">' +
 						'<button class="vk dialog-open" val="dialog_id:1,block_id:' + BL.id + '">Галочка</button>' +
 						'<button class="vk dialog-open ml10" val="dialog_id:16,block_id:' + BL.id + '">Radio</button>' +
@@ -216,7 +216,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						'<button class="vk dialog-open" val="dialog_id:17,block_id:' + BL.id + '">Select - произвольные значения</button>' +
 						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Select - страницы</button>' +
 					'<p class="mt10">' +
-						'<button class="vk dialog-open" val="dialog_id:24,block_id:' + BL.id + '">Select - списки приложения</button>' +
+						'<button val="dialog_id:24,block_id:' + BL.id + '" class="vk dialog-open">Select - списки приложения</button>' +
 						'<button class="vk dialog-open ml10" val="dialog_id:27,block_id:' + BL.id + '">Select - списки на текущей странице</button>' +
 					'<p class="mt10">' +
 						'<button class="vk dialog-open" val="dialog_id:29,block_id:' + BL.id + '">Select - выбор единицы из другого списка (связка)</button>' +

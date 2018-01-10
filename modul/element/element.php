@@ -195,7 +195,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'txt_1' => $r['txt_1'],
 
 						'elv_ass' => array(),   //ассоциативные значения из таблицы _element_value
-						'elv_spisok' => array(),//значения из таблицы _element_value в виде списка {uid:1,title:'значение'}
+						'elv_spisok' => array(),//значения в виде списка {id:1,title:'значение'} (из таблицы _element_value, либо связанные списки)
 						'elv_def' => 0,  //значение по умолчанию
 
 						'attr_id' => '#cmp_'.$id,

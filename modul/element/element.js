@@ -327,8 +327,6 @@ var VK_SCROLL = 0,
 		};
 	},
 	_dialogEdit = function(o) {//создание|редактирование диалогового окна
-		window.SPISOK_ON = [];
-
 		var dialog = _dialog({
 				dialog_id:o.dialog_id,
 				color:'orange',
@@ -360,15 +358,9 @@ var VK_SCROLL = 0,
 
 		_elemActivate(o.cmp, {}, 1);
 
-		window.DIALOG_ELEMENT = o.element;
-		window.DIALOG_COMPONENT = o.component;
-		window.COMPONENT_FUNC = o.func;
-
 		_forIn(o.block_arr, function(sp, k) {
 			BLOCK_ARR[k] = sp;
 		});
-
-		_dialogScript(o.component, 1);
 
 		$('#spisok_on')._check({
 			func:function(v) {
@@ -830,20 +822,11 @@ var VK_SCROLL = 0,
 						._select('empty');
 					return;
 				}
-
-				$('#num_2')._select(0);
-				var send = {
-					op:'dialog_spisok_on_col_load',
-					dialog_id:v
-				};
-				$('#num_2')._select('load', send, function() {
-					$('#num_2')._select('title0', 'не выбрано')
-				});
 			};
 			$('#num_1')._select({
 				width:220,
 				title0:'не выбран',
-				spisok:SPISOK_ON,
+				spisok:[],
 				func:menuColSet
 			});
 			$('#num_2')._select({
@@ -1177,7 +1160,6 @@ var VK_SCROLL = 0,
 			window.COMPONENT_FUNC = res.func;
 			window.DATA = res.data;
 			window.UNIT_ID = unit_id;
-			_dialogScript(res.component);
 			dialog.submit(function() {
 				submit(res.component);
 			});
@@ -1252,9 +1234,6 @@ var VK_SCROLL = 0,
 	},
 */
 	_dialogOpen = function(o) {//открытие диалогового окна
-		window.SPISOK_ON = o.spisok_on;
-		window.SPISOK_ON_PAGE = o.spisok_on_page;
-
 		var dialog = _dialog({
 			dialog_id:o.dialog_id,
 			block_id:o.block_id,  //для передачи значений, если будет требоваться редактирование диалога
@@ -1291,7 +1270,7 @@ var VK_SCROLL = 0,
 			};
 
 			if(o.unit_id) {
-				send.op = 'spisok_edit';
+				send.op = 'spisok_save';
 				if(o.to_del)
 					send.op = 'spisok_del';
 			}
@@ -1473,7 +1452,7 @@ var VK_SCROLL = 0,
 						disabled:is_edit,
 						width:sp.width,
 						title0:sp.txt_1,
-						spisok:SPISOK_ON
+						spisok:sp.elv_spisok
 					});
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
@@ -1497,7 +1476,7 @@ var VK_SCROLL = 0,
 						disabled:is_edit,
 						width:sp.width,
 						title0:sp.txt_1,
-						spisok:SPISOK_ON_PAGE
+						spisok:sp.elv_spisok
 					});
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для указания значений, по которым будет производиться поиск
@@ -1524,7 +1503,25 @@ var VK_SCROLL = 0,
 					$(sp.attr_id)._select({
 						disabled:is_edit,
 						width:sp.width,
-						title0:sp.txt_1
+						title0:sp.txt_1,
+						write:1,
+						msg_empty:'Не найдено',
+						spisok:sp.elv_spisok,
+						funcWrite:function(v, t) {
+							if(t.isProcess())
+								return;
+							var send = {
+								op:'spisok_connect_29',
+								cmp_id:sp.id,
+								v:v
+							};
+							t.process();
+							_post(send, function(res) {
+								t.spisok(res.spisok);
+							}, function() {
+								t.cancel();
+							});
+						}
 					});
 					return;
 			}
@@ -1534,18 +1531,6 @@ var VK_SCROLL = 0,
 			$(attr_focus).focus();
 	},
 
-	_dialogScript = function(component, isEdit) {//применение скриптов после загрузки данных диалога
-
-		//рисование компонентов
-		_forN(component, function(ch) {
-			_dialogCmpScript(ch, isEdit);
-		});
-
-		//применение функций, привязанных к компонентам
-		_forN(component, function(ch) {
-//			_dialogCmpFunc(ch.id, _num($(ch.attr_id).val()), isEdit, 1);
-		})
-	},
 	_dialogCmpScript = function(ch, isEdit) {//применение скриптов для конкретного компонента диалога
 		switch(ch.type_id) {
 			case 1: /* check */ {
@@ -1557,21 +1542,6 @@ var VK_SCROLL = 0,
 				break;
 			}
 			case 2: /* select */ {
-				funcKeyup = ch.num_4 != 3 ? undefined : function(v, t) {
-					if(t.isProcess())
-						return;
-					t.process();
-					var send = {
-						op:'spisok_select_get',
-						dialog_id:ch.num_1,
-						cmp_id:ch.num_2,
-						v:v
-					};
-					_post(send, function(res) {
-									t.spisok(res.spisok);
-								},
-								function() { t.cancel() })
-				};
 				$(ch.attr_id)._select({
 					width:ch.width,
 					title0:ch.num_3 ? ch.txt_1 : '',
@@ -1579,8 +1549,7 @@ var VK_SCROLL = 0,
 					spisok:ch.v,
 					func:function(v) {
 						_dialogCmpFunc(ch.id, v, isEdit);
-					},
-					funcKeyup:funcKeyup
+					}
 				});
 				if(isEdit) {
 					$(ch.attr_id)._select('disable');
@@ -1671,25 +1640,6 @@ var VK_SCROLL = 0,
 
 				if(!v)
 					continue;
-
-				delem.append('<div class="spisok-col _busy">&nbsp;</div>');
-				var spc = delem.find('.spisok-col'),
-					send = {
-						op:'spisok_col_get',
-						page_id:PAGE_ID,
-						component_id:cmp_id,
-						vid:v //либо dialog_id, либо pe_id, если стоит условие - список только с текущей страницы
-					};
-				_post(send, function(res) {
-					spc.html(res.html).removeClass('_busy');
-					if(func.action_id == 6) {
-						spc.find('input')._radio()._radio(_num(DATA.num_3));
-					}
-				}, function(res) {
-					spc.html(res.text)
-						.removeClass('_busy')
-						.addClass('center red');
-				});
 
 				continue;
 			}
@@ -2237,25 +2187,24 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		block:0,       	    // расположение селекта
 		title0:'',			// поле с нулевым значением
 		spisok:[],			// результаты в формате json
-//		limit:0,
 		write:0,            // возможность вводить значения
 		write_save:0,       // сохранять текст, если даже не выбран элемент
 		msg_empty:'Список пуст',
 		multiselect:0,      // возможность выбирать несколько значений. Идентификаторы перечисляются через запятую
 		func:function() {},	// функция, выполняемая при выборе элемента
-//		funcAdd:null,		// функция добавления нового значения. Если не пустая, то выводится плюсик. Функция передаёт список всех элементов, чтобы можно было добавить новый
-//		funcKeyup:funcKeyup	// функция, выполняемая при вводе в INPUT в селекте. Нужна для вывода списка из вне, например, Ajax-запроса, либо из vk api.
-		end:0//удалить
+		funcWrite:function() {}	// функция, выполняемая при вводе в INPUT в селекте. Нужна для вывода списка из вне, например, Ajax-запроса, либо из vk api.
 	}, o);
 
 	var dis = o.disabled ? ' disabled' : '',
 		dib = o.block ? '' : ' dib',
 		width = 'width:' + (o.width ? o.width + 'px' : '100%'),
+		readonly = o.write ? '' : ' readonly',
+		placeholder = o.title0 ? ' placeholder="' + o.title0 + '"' : '',
 		html =
 		'<div class="_select' + dis + dib + '" id="' + win + '" style="' + width + '">' +
 			'<table class="w100p">' +
-				'<tr><td><input type="text" class="select-inp" placeholder="' + o.title0 + '" readonly />' +
-//					'<td class="w15 clear"><div class="icon icon-del pl' + _tooltip('Очистить', -29) + '</div>' +
+				'<tr><td><input type="text" class="select-inp"' + placeholder + readonly + ' />' +
+					'<td class="w15"><div class="icon icon-del pl dn"></div>' +
 //			(!dis ? '<td class="w25 r"><div class="icon icon-add pl"></div>' : '') +
 					'<td class="arrow">' +
 			'</table>' +
@@ -2267,16 +2216,24 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 	var SEL = t.next(),
 		INP = SEL.find('.select-inp'),
 		RES = SEL.find('.select-res'),
-		MASS_ASS = {},//ассоциативный массив в виде {1:'text'}
-		MASS_SEL = [],//массив в виде [{id:1,title:'text1'},{id:2,title:'text2'}]
-		MASS_SEL_SAVE = [],//дублирование MASS_SEL
-
-		end;//удалить
+		ICON_DEL = SEL.find('.icon-del'),
+		MASS_ASS,//ассоциативный массив в виде {1:'text'}
+		MASS_SEL,//массив в виде [{id:1,title:'text1'},{id:2,title:'text2'}]
+		MASS_SEL_SAVE;//дублирование MASS_SEL
 
 	massCreate();
 	spisokPrint();
 	valueSet(VALUE);
 
+	INP.keydown(function(e) {
+		setTimeout(function() {
+			VALUE = 0;
+			t.val(0);
+			var v = INP.val();
+			ICON_DEL._dn(v);
+			o.funcWrite(v, t);
+		}, 0);
+	});
 	SEL.click(function(e) {
 		if(dis)
 			return;
@@ -2319,12 +2276,9 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 				}
 			});
 	});
-	RES.find('.select-unit').mouseenter(function() {
-		var sp = $(this);
-		RES.find('.ov').removeClass('ov');
-		if(sp.hasClass('info'))
-			return;
-		sp.addClass('ov');
+	ICON_DEL.click(function() {
+		valueSet(0);
+		o.funcWrite('', t);
 	});
 
 	$(document)
@@ -2347,6 +2301,10 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 
 	function massCreate() {//создание массива для корректного вывода списка
 		var unit;
+
+		MASS_ASS = {};
+		MASS_SEL = [];
+		MASS_SEL_SAVE = [];
 
 		if(o.title0)
 			MASS_ASS[0] = '';
@@ -2379,7 +2337,6 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 			if(typeof sp == 'number' || typeof sp == 'string') {
 				id = n + 1;
 				title = sp;
-				content = sp;
 			} else {
 				id = sp.uid;
 				if(id === undefined)
@@ -2395,11 +2352,12 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 				if(title === undefined)
 					return;
 				content = sp.content;
-				if(content === undefined)
-					content = title;
 			}
 
-			MASS_ASS[id] = title;
+			MASS_ASS[id] = title || ' ';
+			title = title || '&nbsp;';
+			if(!content)
+				content = title;
 			unit = {
 				id:id,
 				title:title,
@@ -2411,6 +2369,7 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		});
 	}
 	function spisokPrint() {//вставка списка в select
+		RES.removeClass('h250');
 		if(!MASS_SEL.length) {
 			RES.html('<div class="empty">' + o.msg_empty + '</div>');
 			return;
@@ -2418,7 +2377,7 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 
 		var html = '',
 			h;
-		if(o.title0)
+		if(o.title0 && !o.write)
 			html += '<div class="select-unit title0" val="0">' + o.title0 + '</div>';
 
 		_forN(MASS_SEL, function(sp) {
@@ -2426,16 +2385,25 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 				val = info ? '' : ' val="' + sp.id + '"';
 			html += '<div class="select-unit' + info + '"' + val + '>' + sp.content + '</div>';
 		});
+
 		RES.html(html);
 		h = RES.height();
 		RES._dn(h < 250, 'h250');
+
+		RES.find('.select-unit').mouseenter(function() {
+			var sp = $(this);
+			RES.find('.ov').removeClass('ov');
+			if(sp.hasClass('info'))
+				return;
+			sp.addClass('ov');
+		});
 	}
 	function valueSet(v) {//установка значения
 		v = _num(v);
 		VALUE = v;
 		t.val(v);
 		INP.val(MASS_ASS[v]);
-
+		ICON_DEL._dn(v && o.write)
 	}
 	function action() {//выполнение действия в существующем селекте
 		if(s === undefined)
@@ -2457,7 +2425,23 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 	t.disable = function() {//делание неактивным
 		SEL.addClass('disabled')
 		   .removeClass('rs');
+		INP.attr('readonly', true);
 		dis = true;
+	};
+	t.process = function() {//показ процесса ожидания
+		ICON_DEL.addClass('spin');
+	};
+	t.isProcess = function() {//получение флага процесса ожидания
+		return ICON_DEL.hasClass('spin');
+	};
+	t.cancel = function() {//отмена процесса ожидания
+		ICON_DEL.removeClass('spin');
+	};
+	t.spisok = function(spisok) {//вставка нового списка
+		t.cancel();
+		o.spisok = spisok;
+		massCreate();
+		spisokPrint();
 	};
 
 	window[win] = t;

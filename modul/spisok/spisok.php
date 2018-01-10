@@ -1,5 +1,4 @@
 <?php
-
 function _spisokCountAll($pe) {//получение общего количества строк списка
 	$key = 'SPISOK_COUNT_ALL'.$pe['id'];
 
@@ -413,27 +412,52 @@ function _spisokCondSearchVal($pe) {//получение введённого значения в строку пои
 	return $v;
 }
 
-function _spisokList($dialog_id, $component_id, $v='', $unit_id=0) {//массив списков (пока только для select)
-	$dialog = _dialogQuery($dialog_id);
+function _spisokConnect($cmp_id, $v='') {//получение данных списка для связки (dialog_id:29)
+	if(!$cmp_id)
+		return array();
 
-	if(!$colName = $dialog['component'][$component_id]['col_name'])
-		$colName = 'id';
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id`=".$cmp_id;
+	if(!$cmp = query_assoc($sql))
+		return array();
 
-	$cond = "`app_id`=".APP_ID."
-		 AND `dialog_id`=".$dialog_id;
+	if(!$cmp['num_1'])
+		return array();
+
+	if(!$dialog = _dialogQuery($cmp['num_1']))
+		return array();
+
+
+	$cond = "`dialog_id`=".$cmp['num_1'];
 	if($v)
-		$cond .= " AND `".$colName."` LIKE '%".addslashes($v)."%'";
-	if($unit_id)
-		$cond .= " AND `id`<=".$unit_id;
-
-	$sql = "SELECT `id`,`".$colName."`
-			FROM `".$dialog['base_table']."`
+		$cond .= " AND (`txt_1` LIKE '%".$v."%' OR `txt_2` LIKE '%".$v."%')";
+	$sql = "SELECT *
+			FROM `_spisok`
 			WHERE ".$cond."
 			ORDER BY `id` DESC
 			LIMIT 50";
-	return query_selArray($sql);
-}
+	if(!$arr = query_arr($sql))
+		return array();
 
+	$send = array();
+	foreach($arr as $r) {
+		$u = array(
+			'id' => _num($r['id']),
+			'title' => utf8($r['txt_1']),
+			'content' => utf8($r['txt_1'])
+		);
+		if($r['txt_2'])
+			$u['content'] = utf8($r['txt_1'].'<div class="fs11 grey">'.$r['txt_2'].'</div>');
+
+		if($v)
+			$u['content'] = preg_replace(_regFilter(utf8($v)), '<em class="fndd">\\1</em>', $u['content'], 1);
+
+		$send[] = $u;
+	}
+
+	return $send;
+}
 
 
 

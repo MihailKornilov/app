@@ -4,7 +4,7 @@ switch(@$_POST['op']) {
 		$send = _spisokUnitUpdate();
 		jsonSuccess($send);
 		break;
-	case 'spisok_edit'://сохранение данных единицы списка для диалога
+	case 'spisok_save'://сохранение данных единицы списка для диалога
 		if(!$unit_id = _num($_POST['unit_id']))
 			jsonError('Некорректный id единицы списка');
 
@@ -112,6 +112,16 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'spisok_connect_29':
+		if(!$cmp_id = _num($_POST['cmp_id']))
+			jsonError('Некорректный ID компонента диалога');
+
+		$v = _txt($_POST['v']);
+
+		$send['spisok'] = _spisokConnect($cmp_id, $v);
+		jsonSuccess($send);
+		break;
+/*
 	case 'spisok_col_get'://получение колонок списка (для функции Действие 5 и 6)
 		if(!$cmp_id = _num($_POST['component_id']))
 			jsonError('Некорректный ID компонента диалога');
@@ -350,19 +360,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-
-	case 'spisok_select_get'://получение списка для селекта
-		if(!$dialog_id = _num($_POST['dialog_id']))
-			jsonError('Некорректный ID диалога');
-		if(!$cmp_id = _num($_POST['cmp_id']))
-			jsonError('Некорректный ID компонента диалога');
-
-		$v = _txt($_POST['v']);
-
-		$send['spisok'] = _spisokList($dialog_id, $cmp_id, $v);
-
-		jsonSuccess($send);
-		break;
+*/
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка
