@@ -450,7 +450,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 				jsonError('В блоке уже есть элемент');
 		}
 
-
 		$sql = "INSERT INTO `".$dialog['base_table']."` (
 					`dialog_id`,
 					`viewer_id_add`
@@ -562,15 +561,20 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		}
 	}
 
-
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
 	if($dialog['base_table'] == '_element')
 		_cache('clear', '_dialogQuery'.$dialog_id);
 
 
+	//получение данных единицы списка
+	$sql = "SELECT *
+			FROM `".$dialog['base_table']."`
+			WHERE `id`=".$unit_id;
+	$unit = query_assoc_utf8($sql);
+
 	$send = array(
-		'unit_id' => $unit_id,
+		'unit' => $unit,
 		'action_id' => _num($dialog['action_id']),
 		'action_page_id' => _num($dialog['action_page_id']),
 		'block_obj_name' => '',

@@ -44,6 +44,19 @@ function query_assoc($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
 		return array();
 	return $r;
 }
+function query_assoc_utf8($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
+	$q = query($sql, $resource_id);
+	if(!$res = mysql_fetch_assoc($q))
+		return array();
+
+	$send = array();
+	foreach($res as $key => $v) {
+		$v = preg_match(REGEXP_NUMERIC, $v) ? intval($v) : utf8($v);
+		$send[$key] = $v;
+	}
+
+	return $send;
+}
 function query_ass($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Ассоциативный массив
 	$send = array();
 	$q = query($sql, $resource_id);

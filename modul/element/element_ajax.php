@@ -296,7 +296,7 @@ function _dialogOpenLoad($dialog_id) {
 
 	//получение данных единицы списка
 	$unit = array();
-	if($unit_id = _num($_POST['unit_id'])) {
+	if($unit_id = _num(@$_POST['unit_id'])) {
 		$cond = "`id`=".$unit_id;
 		if(isset($dialog['field']['app_id']))
 			$cond .= " AND `app_id` IN (0,".APP_ID.")";
@@ -314,7 +314,7 @@ function _dialogOpenLoad($dialog_id) {
 	$page_id = _num($_POST['page_id']);
 	$send['dialog_id'] = $dialog_id;
 	$send['unit_id'] = $unit_id;
-	$send['block_id'] = _num($_POST['block_id']);
+	$send['block_id'] = _num(@$_POST['block_id']);
 
 	//исходные данные, полученные для открытия диалога
 	$unit['source'] = array(

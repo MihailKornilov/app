@@ -1287,9 +1287,14 @@ var VK_SCROLL = 0,
 
 			dialog.post(send, function(res) {
 //				return;
+
+				//если присутствует функция, выполняется она
+				if(o.func)
+					return o.func(res);
+
 				switch(res.action_id) {
 					case 1: location.reload(); break;
-					case 2: location.href = URL + '&p=' + res.action_page_id + '&id=' + res.unit_id; break;
+					case 2: location.href = URL + '&p=' + res.action_page_id + '&id=' + res.unit.id; break;
 					case 3://обновление содержимого блоков
 						var bln = '#block-level-' + res.block_obj_name;
 						$(bln).after(res.level).remove();
@@ -1520,6 +1525,29 @@ var VK_SCROLL = 0,
 								t.spisok(res.spisok);
 							}, function() {
 								t.cancel();
+							});
+						},
+						funcAdd:function(t) {
+							if(t.iconAddIsProcess())
+								return;
+							var send = {
+								op:'dialog_open_load',
+								page_id:PAGE_ID,
+								dialog_id:sp.num_1
+							};
+							t.iconAddProcess();
+							_post(send, function(res) {
+								t.iconAddCancel();
+								res.func = function(ia) {
+									t.unitUnshift({
+										id:ia.unit.id,
+										title:ia.unit.txt_1
+									});
+									t.value(ia.unit.id);
+								};
+								_dialogOpen(res);
+							}, function() {
+								t.iconAddCancel();
 							});
 						}
 					});
@@ -2192,7 +2220,8 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		msg_empty:'Список пуст',
 		multiselect:0,      // возможность выбирать несколько значений. Идентификаторы перечисляются через запятую
 		func:function() {},	// функция, выполняемая при выборе элемента
-		funcWrite:function() {}	// функция, выполняемая при вводе в INPUT в селекте. Нужна для вывода списка из вне, например, Ajax-запроса, либо из vk api.
+		funcWrite:function() {},// функция, выполняемая при вводе в INPUT в селекте. Нужна для вывода списка из вне, например, Ajax-запроса, либо из vk api.
+		funcAdd:null	    // добавления новой единицы. Если указана, показывает плюсик.
 	}, o);
 
 	var dis = o.disabled ? ' disabled' : '',
@@ -2200,12 +2229,13 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		width = 'width:' + (o.width ? o.width + 'px' : '100%'),
 		readonly = o.write ? '' : ' readonly',
 		placeholder = o.title0 ? ' placeholder="' + o.title0 + '"' : '',
+		iconAddFlag = o.funcAdd && !dis,
 		html =
 		'<div class="_select' + dis + dib + '" id="' + win + '" style="' + width + '">' +
 			'<table class="w100p">' +
 				'<tr><td><input type="text" class="select-inp"' + placeholder + readonly + ' />' +
 					'<td class="w15"><div class="icon icon-del pl dn"></div>' +
-//			(!dis ? '<td class="w25 r"><div class="icon icon-add pl"></div>' : '') +
+					'<td class="w25 r' + _dn(iconAddFlag) + '"><div class="icon icon-add pl"></div>'+
 					'<td class="arrow">' +
 			'</table>' +
 			'<div class="select-res"></div>' +
@@ -2217,6 +2247,7 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		INP = SEL.find('.select-inp'),
 		RES = SEL.find('.select-res'),
 		ICON_DEL = SEL.find('.icon-del'),
+		ICON_ADD = SEL.find('.icon-add'),
 		MASS_ASS,//ассоциативный массив в виде {1:'text'}
 		MASS_SEL,//массив в виде [{id:1,title:'text1'},{id:2,title:'text2'}]
 		MASS_SEL_SAVE;//дублирование MASS_SEL
@@ -2280,6 +2311,10 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		valueSet(0);
 		o.funcWrite('', t);
 	});
+	if(iconAddFlag)
+		SEL.find('.icon-add').click(function() {
+			o.funcAdd(t);
+		});
 
 	$(document)
 		.off('click._select')
@@ -2426,8 +2461,10 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		SEL.addClass('disabled')
 		   .removeClass('rs');
 		INP.attr('readonly', true);
+		SEL.find('.td-add')._dn();
 		dis = true;
 	};
+
 	t.process = function() {//показ процесса ожидания
 		ICON_DEL.addClass('spin');
 	};
@@ -2437,9 +2474,25 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 	t.cancel = function() {//отмена процесса ожидания
 		ICON_DEL.removeClass('spin');
 	};
+
+	t.iconAddProcess = function() {//показ процесса ожидания
+		ICON_ADD.addClass('spin');
+	};
+	t.iconAddIsProcess = function() {//получение флага процесса ожидания
+		return ICON_ADD.hasClass('spin');
+	};
+	t.iconAddCancel = function() {//отмена процесса ожидания
+		ICON_ADD.removeClass('spin');
+	};
+
 	t.spisok = function(spisok) {//вставка нового списка
 		t.cancel();
 		o.spisok = spisok;
+		massCreate();
+		spisokPrint();
+	};
+	t.unitUnshift = function(unit) {//вставка единицы в начало существующего списка
+		o.spisok.unshift(unit);
 		massCreate();
 		spisokPrint();
 	};
