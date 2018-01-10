@@ -136,7 +136,8 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	switch($ELEM['dialog_id']) {
 		//таблица
 		case 23://Таблица
-			if(empty($ELEM['txt_5']))
+
+//			if(empty($ELEM['txt_5']))
 				return '<div class="_empty"><span class="fs15 red">Таблица не настроена.</span></div>';
 
 			$colArr = explode(',', $ELEM['txt_5']);

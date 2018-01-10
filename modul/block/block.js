@@ -225,7 +225,9 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'<p class="mt10">' +
 						'<button class="vk orange dialog-open" val="dialog_id:19,block_id:' + BL.id + '">Содержание для некоторых компонентов</button>' +
 					'<p class="mt10">' +
-						'<button class="vk orange dialog-open" val="dialog_id:25,block_id:' + BL.id + '">Настройка содержания шаблона списка</button>' +
+						'<button class="vk orange dialog-open" val="dialog_id:25,block_id:' + BL.id + '">Настройка содержания списка-шаблона</button>' +
+					'<p class="mt10">' +
+						'<button class="vk orange dialog-open" val="dialog_id:30,block_id:' + BL.id + '">Настройка содержания списка-таблицы</button>' +
 					'<p class="mt10">' +
 						'<button class="vk orange dialog-open" val="dialog_id:26,block_id:' + BL.id + '">Содержание диалога для выбора значения</button>' +
 					'<p class="mt10">' +
