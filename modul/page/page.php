@@ -172,12 +172,12 @@ function _pageChildArr($arr, $child, $level=0) {//перечисление иерархии страниц 
 function _pageSaForSelect($arr, $child) {//страницы SA дл€ select
 	$send = array();
 	foreach($arr as $r) {
-		if(!$r['sa'])
+		if(!$r['sa'] && $r['app_id'])
 			continue;
 		$send[] = array(
 			'id' => _num($r['id']),
 			'title' => utf8(addslashes(htmlspecialchars_decode(trim($r['name'])))),
-			'content' => '<div class="color-ref">'.utf8(addslashes(htmlspecialchars_decode(trim($r['name'])))).'</div>'
+			'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">'.utf8(addslashes(htmlspecialchars_decode(trim($r['name'])))).'</div>'
 		);
 		if(!empty($child[$r['id']]))
 			foreach(_pageSaForSelect($child[$r['id']], $child) as $sub)
@@ -388,17 +388,6 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 	}
 }
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
-/*
-	ƒиалоговые окна по пор€дку:
-		1 - CMP: галочка
-		2 - EL: кнопка
-		3 - EL: меню
-		4 - ??? заголовок
-		5 - CMP: textarea (многострочное текстовое поле)
-		6 - ??? удаление элемента
-		7 - EL: поле поиска
-		8 - CMP: input:text (однострочное текстовое поле)
-*/
 	$unitExist = isset($unit['id']);
 	if(!$US = @$unit['source'])
 		$US = array();
@@ -611,8 +600,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 txt_1 - текст ссылки
 				num_1 - id страницы
 			*/
-			if(!$txt = $el['txt_1'])
-				$txt = _page('name', $el['num_1']);
+			if(!$txt = $el['txt_1']) {
+				$page = _page($el['num_1']);
+				$txt = $page['name'];
+			}
 			return '<a class="inhr" href="'.URL.'&p='.$el['num_1'].'">'.
 						$txt.
 				   '</a>';

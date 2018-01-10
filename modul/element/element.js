@@ -2234,7 +2234,7 @@ $.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
 		'<div class="_select' + dis + dib + '" id="' + win + '" style="' + width + '">' +
 			'<table class="w100p">' +
 				'<tr><td><input type="text" class="select-inp"' + placeholder + readonly + ' />' +
-					'<td class="w15"><div class="icon icon-del pl dn"></div>' +
+					'<td class="w15' + _dn(o.write) + '"><div class="icon icon-del pl dn"></div>' +
 					'<td class="w25 r' + _dn(iconAddFlag) + '"><div class="icon icon-add pl"></div>'+
 					'<td class="arrow">' +
 			'</table>' +

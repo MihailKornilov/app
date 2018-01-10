@@ -348,9 +348,7 @@ function _dialogValToId($val='') {//получение id диалога на основании имени val
 */
 function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$cond = "`spisok_on`";
-	$cond .= " AND `app_id`=".APP_ID;
-//	$cond .= " AND !`app_id`";
-	$cond .= " AND !`sa`";
+	$cond .= " AND `app_id` IN (0,".APP_ID.")";
 
 
 	//получение id диалога, который является списком, чтобы было нельзя его выбирать в самом себе (для связок)
@@ -372,13 +370,43 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 			$cond .= " AND `id`!=".$dialog_id_skip;
 	}
 
-	$sql = "SELECT
-				`id`,
-				`spisok_name`
+	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE ".$cond."
 			ORDER BY `id`";
-	return query_selArray($sql);
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$send = array();
+	$saArr = array();
+	foreach($arr as $r) {
+		if($r['sa'] || !$r['app_id']) {
+			$saArr[] = $r;
+			continue;
+		}
+		$send[] = array(
+			'id' => _num($r['id']),
+			'title' => utf8($r['spisok_name'])
+		);
+	}
+
+
+	//списки, доступные только SA
+	if(SA) {
+		$send[] = array(
+			'info' => 1,
+			'title' => utf8('SA-списки:')
+		);
+		foreach($saArr as $r)
+			$send[] = array(
+				'id' => _num($r['id']),
+				'title' => utf8($r['spisok_name']),
+				'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">'.utf8($r['spisok_name']).'</div>'
+			);
+	}
+
+
+	return $send;
 }
 function _dialogSpisokOnPage($page_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1 и которые размещены на текущей странице
 	if(!$page_id)
