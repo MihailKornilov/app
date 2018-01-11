@@ -1308,7 +1308,7 @@ var VK_SCROLL = 0,
 		}
 	},
 	_dialogCmpValue = function(o, val) {//наполнение для некоторых компонентов. dialog_id=19
-		var el = $(o.attr_pe);
+		var el = $(o.attr_el);
 
 		//получение данных для сохранения
 		if(val == 'get') {
@@ -1335,119 +1335,173 @@ var VK_SCROLL = 0,
 			valueAdd(val[i])
 
 		function valueAdd(v) {
-				v = $.extend({
-					id:0,
-					uid:NUM,
-					title:'имя значения ' + NUM,
-					def:0,
-					use:0
-				}, v);
+			v = $.extend({
+				id:0,
+				uid:NUM,
+				title:'имя значения ' + NUM,
+				def:0,
+				use:0
+			}, v);
 
-				DL.append(
-					'<dd class="over1" val="' + v.id + '">' +
-						'<table class="bs5 w100p">' +
-							'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
-								'<td class="w90 grey r">Значение ' + NUM + ':' +
-								'<td><input type="text" class="title w100p" value="' + v.title + '" />' +
-								'<td class="w15">' +
-									'<input type="hidden" class="def" id="el-def-' + v.uid + '" value="' + v.def + '" />' +
-								'<td class="w50 r">' +
-						   (v.use ? '<div class="dib fs11 color-ccc mr3 curD' + _tooltip('Использование', -53) + v.use + '</div>'
-									:
-									'<div val="' + v.uid + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
-						   )+
-						'</table>' +
-					'</dd>'
-				);
+			DL.append(
+				'<dd class="over1" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w90 grey r">Значение ' + NUM + ':' +
+							'<td><input type="text" class="title w100p" value="' + v.title + '" />' +
+							'<td class="w15">' +
+								'<input type="hidden" class="def" id="el-def-' + v.uid + '" value="' + v.def + '" />' +
+							'<td class="w50 r">' +
+					   (v.use ? '<div class="dib fs11 color-ccc mr3 curD' + _tooltip('Использование', -53) + v.use + '</div>'
+								:
+								'<div val="' + v.uid + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
+					   )+
+					'</table>' +
+				'</dd>'
+			);
 
-				DL.sortable({axis:'y',handle:'.icon-move-y'});
+			DL.sortable({axis:'y',handle:'.icon-move-y'});
 
-				$('#el-def-' + v.uid)._check({
-					tooltip:'По умолчанию',
-					func:function(v, attr_id) {
-						if(!v)
+			$('#el-def-' + v.uid)._check({
+				tooltip:'По умолчанию',
+				func:function(v, attr_id) {
+					if(!v)
+						return;
+					//снятие галочек с остальных значений
+					_forEq(DL.find('.def'), function(sp) {
+						if(sp.attr('id') == attr_id)
 							return;
-						//снятие галочек с остальных значений
-						_forEq(DL.find('.def'), function(sp) {
-							if(sp.attr('id') == attr_id)
-								return;
-							sp._check(0);
-						});
-					}
-				});
+						sp._check(0);
+					});
+				}
+			});
 
-				DL.find('.icon-del:last').click(function() {
-					var t = $(this),
-						p = _parent(t, 'DD');
-					p.remove();
-				});
-				NUM++;
-			}
+			DL.find('.icon-del:last').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+			});
+			NUM++;
+		}
 	},
-	_dialogSpisokTable = function(o, val) {//наполнение для некоторых компонентов. dialog_id=19
-		var el = $(o.attr_pe);
+	_dialogSpisokTable = function(o, unit) {//Настройка ТАБЛИЧНОГО содержания списка. dialog_id=30
+		if(!unit.block_id)
+			return;
+		var el = $(o.attr_el),
+			cmp = $(o.attr_cmp);
 
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
-			DL = el.html(html).find('dl'),
+			DL = el.append(html).find('dl'),
 			BUT_ADD = el.find('div:last'),
 			NUM = 1;
 
 		BUT_ADD.click(valueAdd);
 
-		for(var i in val)
-			valueAdd(val[i])
+//		for(var i in val)
+//			valueAdd(val[i])
 
 		function valueAdd(v) {
-				v = $.extend({
-					id:0,
-					num:NUM,
-					width:150,
-					title:''
-				}, v);
+			v = $.extend({
+				id:0,       //id элемента
+				num:NUM,
+				width:150,  //ширина колонки
+				title:''    //тип значения
+			}, v);
 
-				DL.append(
-					'<dd class="over1" val="' + v.id + '">' +
-						'<table class="bs5 w100p">' +
-							'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
-								'<td class="w80 grey r">Колонка ' + NUM + ':' +
-								'<td>' +
-									'<div class="col-div" style="width:' + v.width + 'px">' +
-										'<input type="text" class="col-inp w100p curP over2" readonly placeholder="значение не выбрано" value="' + v.title + '" />' +
-									'</div>' +
-								'<td class="w50 r">' +
-									'<div val="' + v.num + '" class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
-						'</table>' +
-					'</dd>'
-				);
+			DL.append(
+				'<dd class="over1">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w80 grey r">Колонка ' + NUM + ':' +
+							'<td>' +
+								'<div style="width:' + v.width + 'px">' +
+									'<input type="text"' +
+										  ' class="col-inp w100p curP over2"' +
+										  ' readonly' +
+										  ' placeholder="значение не выбрано"' +
+										  ' value="' + v.title + '"' +
+										  ' val="' + v.id + '"' +
+									' />' +
+								'</div>' +
+							'<td class="w50 r">' +
+								'<div val="' + v.num + '" class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
 
-				DL.find('.col-div:last')
-					.resizable({
-						minWidth:50,
-						maxWidth:300,
-						grid:10,
-						handles:'e'
-					});
-				DL.find('.col-inp:last').click(function() {
-					var send = {
+			var INP = DL.find('.col-inp:last');
+			valueResize(INP);
+			INP.click(function() {
+				var t = $(this),
+					unit_id = _num(t.attr('val')),
+					send = {
 						op:'dialog_open_load',
 						page_id:PAGE_ID,
-						dialog_id:11
+						dialog_id:31,
+						block_id:unit.block_id,
+						unit_id:unit_id
 					};
-					_post(send, function(res) {
-						_dialogOpen(res);
-					}, function() {});
+				if(t.hasClass('hold'))
+					return;
+				t.addClass('hold _busy');
+				_post(send, function(res) {
+					t.removeClass('hold _busy');
+					res.block_id = 0;
+					res.func = function(ia) {
+						valuePaste(t, ia.unit);
+					};
+					_dialogOpen(res);
+				}, function() {
+					t.removeClass('hold _busy');
 				});
+			});
 
-
-				DL.sortable({axis:'y',handle:'.icon-move-y'});
-				DL.find('.icon-del:last').click(function() {
-					var t = $(this),
-						p = _parent(t, 'DD');
-					p.remove();
-				});
-				NUM++;
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-move-y',
+				stop:cmpUpdate
+			});
+			DL.find('.icon-del:last').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+				cmpUpdate();
+			});
+			NUM++;
+		}
+		function valueResize(inp) {//включение изменения ширины, если есть значение
+			if(!_num(inp.attr('val')))
+				return;
+			if(inp.parent().hasClass('ui-resizable'))
+				return;
+			inp.parent().resizable({
+				minWidth:50,
+				maxWidth:300,
+				grid:10,
+				handles:'e'
+			});
+		}
+		function valuePaste(inp, unit) {//оформление элемента после вставки
+			var unit_id = _num(inp.attr('val'));
+			if(!unit_id) {
+				inp.attr('val', unit.id);
+				cmpUpdate();
 			}
+			inp.val(unit.num_1);
+			valueResize(inp);
+//			t.addClass('hold _busy');
+		}
+		function cmpUpdate() {//обновление значения компонента
+			var val = [];
+			_forEq(el.find('dd'), function(sp) {
+				var id = _num(sp.find('.col-inp').attr('val'));
+				if(!id)
+					return;
+				val.push(id);
+			});
+			cmp.val(val);
+		}
 	},
 
 	_elemActivate = function(elem, unit, is_edit) {//применение функций (активирование) к элементам
@@ -1621,7 +1675,7 @@ var VK_SCROLL = 0,
 				case 30:
 					if(is_edit)
 						return;
-					_dialogSpisokTable(sp, unit[sp.col]);
+					_dialogSpisokTable(sp, unit);
 					return;
 			}
 		});

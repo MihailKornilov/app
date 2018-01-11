@@ -26,6 +26,10 @@ input,textarea{
 input::-webkit-input-placeholder{color:#bbb}
 input::-moz-placeholder{color:#999}
 input.err{background-color:#fff2f2}
+/* скрытие текста и подсказки для прогресса */
+input.hold{color:transparent}
+input.hold::-webkit-input-placeholder{color:transparent}
+input.hold::-moz-placeholder{color:transparent}
 
 textarea{
 	resize:none;

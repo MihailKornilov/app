@@ -690,6 +690,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				txt_1 - сообщение пустого запроса
 				num_3 - узкие строки таблицы
 				num_4 - подсвечивать строку при наведении мыши
+				txt_2 - ids элементов через запятую. Сами элементы хранятся в таблице _element
 
 				настройка шаблона через вспомогательный элемент: dialig_id=30
 			*/
@@ -737,32 +738,43 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
 		case 26:
-			if($unitExist) {
-				//получение исходного блока, если элемент был вставлен ранее
+			/*
+				num_1 - требуется наличие блока, в который будет вставляться значение.
+						Блок обязательно должен быть из диалога: obj_name=dialog.
+			*/
+
+			$block_id_spisok = _num(@$US['block_id']);
+
+			if($el['num_1']) {
+				if($unitExist) {
+					//получение исходного блока, если элемент был вставлен ранее
+					$sql = "SELECT *
+							FROM `_element`
+							WHERE `id`=".$unit['id'];
+					if(!$elemSource = query_assoc($sql))
+						return '<div class="_empty min mar10">Отсутствует исходный элемент.</div>';
+
+					$US['block_id'] = $elemSource['block_id'];
+				}
+				if(empty($US['block_id']))
+					return '<div class="_empty min mar10">Отсутствует исходный блок.</div>';
+
 				$sql = "SELECT *
-						FROM `_element`
-						WHERE `id`=".$unit['id'];
-				if(!$elemSource = query_assoc($sql))
-					return '<div class="_empty min mar10">Отсутствует исходный элемент.</div>';
+						FROM `_block`
+						WHERE `id`=".$US['block_id'];
+				if(!$blockSource = query_assoc($sql))
+					return '<div class="_empty min mar10">Исходного блока id'.$US['block_id'].' не существует.</div>';
 
-				$US['block_id'] = $elemSource['block_id'];
+				if($blockSource['obj_name'] != 'spisok')
+					return '<div class="_empty min mar10">Исходный блок не является блоком шаблона для списка.</div>';
+
+				$block_id_spisok = $blockSource['obj_id'];
 			}
-			if(empty($US['block_id']))
-				return '<div class="_empty min mar10">Отсутствует исходный блок.</div>';
-
-			$sql = "SELECT *
-					FROM `_block`
-					WHERE `id`=".$US['block_id'];
-			if(!$blockSource = query_assoc($sql))
-				return '<div class="_empty min mar10">Исходного блока id'.$US['block_id'].' не существует.</div>';
-
-			if($blockSource['obj_name'] != 'spisok')
-				return '<div class="_empty min mar10">Исходный блок не является блоком шаблона для списка.</div>';
 
 			$sql = "SELECT *
 					FROM `_element`
-					WHERE `block_id`=".$blockSource['obj_id']."
-					  AND `dialog_id`=14";
+					WHERE `block_id`=".$block_id_spisok."
+					  AND `dialog_id` IN (14,23)";
 			if(!$elem = query_assoc($sql))
 				return '<div class="_empty min mar10">Элемента не существует, который размещает список.</div>';
 
@@ -824,8 +836,15 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$unitExist)
 				return '<div class="_empty min">Настройка таблицы будет доступна после вставки списка в блок.</div>';
 
-			 //все действия через JS
-			return '<div class="_empty min">Подключение настройки таблицы...</div>';
+			//все действия через JS
+			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
+
+		//Выбор значения для ТАБЛИЦЫ (выводится окно для выбора)
+		case 31:
+			/*
+				num_1 - id элемента, выбранного из диалога, который вносит данные списка (через dialog_id=26)
+			*/
+			return '31';
 	}
 /*
 	//элементы списка шаблона (для настройки)

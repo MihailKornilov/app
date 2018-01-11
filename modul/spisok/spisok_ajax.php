@@ -396,6 +396,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	$page_id = _num($_POST['page_id']);
 	$block_id = _num($_POST['block_id']);
+	//игнорировать вставку в блок
+	if($block_ignore = _num(@$_POST['block_ignore']))
+		$block_id = 0;
 
 	//данные компонентов диалога
 	if(!$postCmp = @$_POST['cmp'])
@@ -491,7 +494,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 				query($sql);
 				continue;
 			}
-			if($r['Field'] == 'block_id') {
+			if($r['Field'] == 'block_id' && $block_id) {
 				$sql = "UPDATE `".$dialog['base_table']."`
 						SET `block_id`=".$block_id."
 						WHERE `id`=".$unit_id;

@@ -199,7 +199,9 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'elv_def' => 0,  //значение по умолчанию
 
 						'attr_id' => '#cmp_'.$id,
-						'attr_pe' => '#pe_'.$id
+						'attr_cmp' => '#cmp_'.$id,
+						'attr_pe' => '#pe_'.$id,
+						'attr_el' => '#pe_'.$id
 					);
 				}
 

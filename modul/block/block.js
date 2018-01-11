@@ -249,9 +249,11 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						'<button val="dialog_id:15,block_id:' + BL.id + '" class="vk dialog-open ml10">Количество строк</button>' +
 					'<p class="mt10">' +
 						'<button val="dialog_id:14,block_id:' + BL.id + '" class="vk dialog-open">Содержание - шаблон</button>' +
-						'<button val="dialog_id:23,block_id:' + BL.id + '" class="vk dialog-open ml10">Содержание - таблица</button>' +
+						'<button val="dialog_id:11,block_id:' + BL.id + '" class="vk dialog-open cancel ml10">Выбор значения для шаблона</button>' +
 					'<p class="mt10">' +
-						'<button val="dialog_id:11,block_id:' + BL.id + '" class="vk dialog-open">Данные единицы списка</button>' +
+						'<button val="dialog_id:23,block_id:' + BL.id + '" class="vk dialog-open">Содержание - таблица</button>' +
+						'<button val="dialog_id:31,block_id:' + BL.id + '" class="vk dialog-open cancel ml10">Выбор значения для таблицы</button>' +
+					'<p class="mt10">' +
 						'<button val="dialog_id:22,block_id:' + BL.id + '" class="vk dialog-open orange ml10">Связка</button>' +
 
 			  (SA ? '<p class="mt30">' +
