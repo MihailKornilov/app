@@ -543,6 +543,7 @@ $(document)
 
 				$(sp.attr_id + el_name).css('width', '100%');
 				$(sp.attr_pe)
+					.addClass('ewc')
 					.css('width', sp.width ? sp.width + 'px' : 'auto')
 					.resizable({
 						minWidth:sp.width_min,
@@ -575,7 +576,7 @@ $(document)
 			t._busy(0);
 		});
 	})
-	.on('mouseenter', '.bl-td .ui-resizable-e', function() {//подсказка с возможностью установить ширину 100% для элемента
+	.on('mouseenter', '.ewc .ui-resizable-e', function() {//подсказка с возможностью установить ширину 100% для элемента
 		var t = $(this),
 			div = t.parent(),
 			block = div.parent(),

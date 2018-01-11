@@ -1307,7 +1307,7 @@ var VK_SCROLL = 0,
 			});
 		}
 	},
-	_dialogCmpValue = function(o, val) {//наполнение для некоторых компонентов
+	_dialogCmpValue = function(o, val) {//наполнение для некоторых компонентов. dialog_id=19
 		var el = $(o.attr_pe);
 
 		//получение данных для сохранения
@@ -1348,7 +1348,7 @@ var VK_SCROLL = 0,
 						'<table class="bs5 w100p">' +
 							'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
 								'<td class="w90 grey r">Значение ' + NUM + ':' +
-								'<td><input type="text" class="title w100p" id="el-val-' + v.uid + '" value="' + v.title + '" />' +
+								'<td><input type="text" class="title w100p" value="' + v.title + '" />' +
 								'<td class="w15">' +
 									'<input type="hidden" class="def" id="el-def-' + v.uid + '" value="' + v.def + '" />' +
 								'<td class="w50 r">' +
@@ -1376,6 +1376,71 @@ var VK_SCROLL = 0,
 					}
 				});
 
+				DL.find('.icon-del:last').click(function() {
+					var t = $(this),
+						p = _parent(t, 'DD');
+					p.remove();
+				});
+				NUM++;
+			}
+	},
+	_dialogSpisokTable = function(o, val) {//наполнение для некоторых компонентов. dialog_id=19
+		var el = $(o.attr_pe);
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
+			DL = el.html(html).find('dl'),
+			BUT_ADD = el.find('div:last'),
+			NUM = 1;
+
+		BUT_ADD.click(valueAdd);
+
+		for(var i in val)
+			valueAdd(val[i])
+
+		function valueAdd(v) {
+				v = $.extend({
+					id:0,
+					num:NUM,
+					width:150,
+					title:''
+				}, v);
+
+				DL.append(
+					'<dd class="over1" val="' + v.id + '">' +
+						'<table class="bs5 w100p">' +
+							'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
+								'<td class="w80 grey r">Колонка ' + NUM + ':' +
+								'<td>' +
+									'<div class="col-div" style="width:' + v.width + 'px">' +
+										'<input type="text" class="col-inp w100p curP over2" readonly placeholder="значение не выбрано" value="' + v.title + '" />' +
+									'</div>' +
+								'<td class="w50 r">' +
+									'<div val="' + v.num + '" class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
+						'</table>' +
+					'</dd>'
+				);
+
+				DL.find('.col-div:last')
+					.resizable({
+						minWidth:50,
+						maxWidth:300,
+						grid:10,
+						handles:'e'
+					});
+				DL.find('.col-inp:last').click(function() {
+					var send = {
+						op:'dialog_open_load',
+						page_id:PAGE_ID,
+						dialog_id:11
+					};
+					_post(send, function(res) {
+						_dialogOpen(res);
+					}, function() {});
+				});
+
+
+				DL.sortable({axis:'y',handle:'.icon-move-y'});
 				DL.find('.icon-del:last').click(function() {
 					var t = $(this),
 						p = _parent(t, 'DD');
@@ -1551,6 +1616,12 @@ var VK_SCROLL = 0,
 							});
 						}
 					});
+					return;
+				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ТАБЛИЧНОГО содержания списка
+				case 30:
+					if(is_edit)
+						return;
+					_dialogSpisokTable(sp, unit[sp.col]);
 					return;
 			}
 		});
