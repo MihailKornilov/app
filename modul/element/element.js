@@ -1266,7 +1266,8 @@ var VK_SCROLL = 0,
 				dialog_id:o.dialog_id,
 				block_id:o.block_id,
 				unit_id:o.unit_id,
-				cmp:{}
+				cmp:{},
+				cmpv:{}
 			};
 
 			if(o.unit_id) {
@@ -1281,16 +1282,18 @@ var VK_SCROLL = 0,
 					case 19://наполнение для некоторых компонентов
 						send.cmp[id] = _dialogCmpValue(sp, 'get');
 						return;
+					case 30://Настройка ТАБЛИЧНОГО содержания списка
+						send.cmpv[id] = _dialogSpisokTable(sp, 'get');
+						break;
 				}
 				send.cmp[id] = $(sp.attr_id).val();
 			});
 
 			dialog.post(send, function(res) {
-//				return;
-
 				//если присутствует функция, выполняется она
 				if(o.func)
 					return o.func(res);
+//				return;
 
 				switch(res.action_id) {
 					case 1: location.reload(); break;
@@ -1385,10 +1388,27 @@ var VK_SCROLL = 0,
 		}
 	},
 	_dialogSpisokTable = function(o, unit) {//Настройка ТАБЛИЧНОГО содержания списка. dialog_id=30
-		if(!unit.block_id)
-			return;
 		var el = $(o.attr_el),
 			cmp = $(o.attr_cmp);
+
+		//получение данных для сохранения
+		if(unit == 'get') {
+			var send = [];
+			_forEq(el.find('dd'), function(sp) {
+				var inp = sp.find('input'),
+					id = _num(inp.attr('val'));
+				if(!id)
+					return;
+				send.push({
+					id:id,
+					width:_num(inp.parent().width())
+				});
+			});
+			return send;
+		}
+
+		if(!unit.block_id)
+			return;
 
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
@@ -1398,8 +1418,8 @@ var VK_SCROLL = 0,
 
 		BUT_ADD.click(valueAdd);
 
-//		for(var i in val)
-//			valueAdd(val[i])
+		for(var i in o.elv_spisok)
+			valueAdd(o.elv_spisok[i])
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -1414,10 +1434,9 @@ var VK_SCROLL = 0,
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w80 grey r">Колонка ' + NUM + ':' +
-							'<td>' +
-								'<div style="width:' + v.width + 'px">' +
+							'<td><div style="width:' + v.width + 'px">' +
 									'<input type="text"' +
-										  ' class="col-inp w100p curP over2"' +
+										  ' class="w100p curP over2"' +
 										  ' readonly' +
 										  ' placeholder="значение не выбрано"' +
 										  ' value="' + v.title + '"' +
@@ -1430,7 +1449,7 @@ var VK_SCROLL = 0,
 				'</dd>'
 			);
 
-			var INP = DL.find('.col-inp:last');
+			var INP = DL.find('input:last');
 			valueResize(INP);
 			INP.click(function() {
 				var t = $(this),
@@ -1439,15 +1458,15 @@ var VK_SCROLL = 0,
 						op:'dialog_open_load',
 						page_id:PAGE_ID,
 						dialog_id:31,
-						block_id:unit.block_id,
-						unit_id:unit_id
+						block_id:unit.block_id,//блок, в котором размещена таблица
+						unit_id:unit_id        //id выбранного элемента (при редактировании)
 					};
 				if(t.hasClass('hold'))
 					return;
 				t.addClass('hold _busy');
 				_post(send, function(res) {
 					t.removeClass('hold _busy');
-					res.block_id = 0;
+					res.block_id = _num('-' + unit.id, 1);
 					res.func = function(ia) {
 						valuePaste(t, ia.unit);
 					};
@@ -1495,7 +1514,7 @@ var VK_SCROLL = 0,
 		function cmpUpdate() {//обновление значения компонента
 			var val = [];
 			_forEq(el.find('dd'), function(sp) {
-				var id = _num(sp.find('.col-inp').attr('val'));
+				var id = _num(sp.find('input').attr('val'));
 				if(!id)
 					return;
 				val.push(id);

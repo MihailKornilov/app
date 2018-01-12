@@ -11,7 +11,7 @@ var _spisokNext = function(t, pe_id, next) {
 			next:next
 		};
 		_post(send, function(res) {
-			var obj = res.type == 181 ? _parent(t, 'TABLE') : $('#pe_' + pe_id);
+			var obj = res.is_table ? _parent(t, 'TABLE') : $('#pe_' + pe_id);
 			obj.append(res.spisok);
 			t.remove();
 		},function() {

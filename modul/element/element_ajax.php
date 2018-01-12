@@ -343,7 +343,35 @@ function _dialogOpenLoad($dialog_id) {
 			case 29:
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _spisokConnect($cmp_id);
 				break;
+			//настройка ТАБЛИЧНОГО содержания списка
+			case 30:
+				if(!$unit_id)
+					break;
+				if(!$col = $cmp['col'])
+					break;
+				if(!$ids = $unit[$col])
+					break;
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `id` IN (".$ids.")
+						ORDER BY `sort`";
+				if(!$arr = query_arr($sql))
+					break;
 
+				$sql = "SELECT `id`,`dialog_id`
+						FROM `_element`
+						WHERE `id` IN ("._idsGet($arr, 'num_1').")";
+				$elem = query_ass($sql);
+
+				$spisok = array();
+				foreach($arr as $r)
+					$spisok[] = array(
+						'id' => _num($r['id']),
+						'width' => _num($r['width']),
+						'title' => utf8(_elemName($elem[$r['num_1']]))
+					);
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
+				break;
 	}
 
 	$send['cmp'] = $dialog['cmp_utf8'];

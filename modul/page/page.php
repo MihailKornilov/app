@@ -387,6 +387,17 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 		default: return 0;
 	}
 }
+function _elemName($dialog_id) {//название элемента по dialog_id
+	switch($dialog_id) {
+		case 1: return 'галочка';
+		case 5: return 'многострочное поле';
+		case 8: return 'однострочное поле';
+		case 10: return 'текст';
+		case 16: return 'радио';
+		case 17: return 'выпадающе поле';
+	}
+	return 'элемент '.$dialog_id;
+}
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	$unitExist = isset($unit['id']);
 	if(!$US = @$unit['source'])

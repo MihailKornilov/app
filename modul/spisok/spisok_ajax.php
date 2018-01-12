@@ -43,7 +43,7 @@ switch(@$_POST['op']) {
 		if(!$pe = query_assoc($sql))
 			jsonError('Элемента id'.$pe_id.' не существует');
 
-		if($pe['dialog_id'] != 14)
+		if($pe['dialog_id'] != 14 && $pe['dialog_id'] != 23)
 			jsonError('Элемент не является списком');
 
 		$sql = "SELECT *
@@ -52,7 +52,7 @@ switch(@$_POST['op']) {
 		if(!$pe['block'] = query_assoc($sql))
 			jsonError('Отсутствует блок списка');
 
-		$send['type'] = _num($pe['num_1']);
+		$send['is_table'] = $pe['dialog_id'] == 23;
 		$send['spisok'] = utf8(_spisokShow($pe, $next));
 		jsonSuccess($send);
 		break;
@@ -395,10 +395,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$dialog_id = $dialog['id'];
 
 	$page_id = _num($_POST['page_id']);
-	$block_id = _num($_POST['block_id']);
-	//игнорировать вставку в блок
-	if($block_ignore = _num(@$_POST['block_ignore']))
-		$block_id = 0;
+	$block_id = _num($_POST['block_id'], 1);
 
 	//данные компонентов диалога
 	if(!$postCmp = @$_POST['cmp'])
@@ -417,7 +414,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		if(!$col = @$cmp['col'])
 			jsonError('Отсутствует имя колонки в компоненте id'.$cmp_id);
 		if(!isset($dialog['field'][$col]))
-			jsonError('В списке нет колонки с именем "'.$col.'"');
+			jsonError('В таблице <b>'.$dialog['base_table'].'</b> нет колонки с именем "'.$col.'"');
 		if($cmp['dialog_id'] == 19) {//наполнение для некоторых компонентов: radio, select, dropdown
 			_dialogCmpValue($val, 'test');
 			continue;
@@ -439,7 +436,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	if(!$unit_id) {
 		//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
-		if($dialog['base_table'] == '_element' && $block_id) {
+		if($dialog['base_table'] == '_element' && $block_id > 0) {
 			$sql = "SELECT *
 					FROM `_block`
 					WHERE `id`=".$block_id;
@@ -494,8 +491,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 				query($sql);
 				continue;
 			}
-			if($r['Field'] == 'block_id' && $block_id) {
-				$sql = "UPDATE `".$dialog['base_table']."`
+			if($r['Field'] == 'block_id' && $block_id && $dialog['base_table'] == '_element') {
+				$sql = "UPDATE `_element`
 						SET `block_id`=".$block_id."
 						WHERE `id`=".$unit_id;
 				query($sql);
@@ -564,17 +561,27 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		}
 	}
 
-	if($dialog['base_table'] == '_page')
-		_cache('clear', '_pageCache');
-	if($dialog['base_table'] == '_element')
-		_cache('clear', '_dialogQuery'.$dialog_id);
-
-
 	//получение данных единицы списка
 	$sql = "SELECT *
 			FROM `".$dialog['base_table']."`
 			WHERE `id`=".$unit_id;
 	$unit = query_assoc_utf8($sql);
+
+	if($cmpv = @$_POST['cmpv'])
+		foreach($dialog['cmp'] as $cmp_id => $cmp) {
+			if(!isset($cmpv[$cmp_id]))
+				continue;
+			switch($cmp['dialog_id']) {
+				//Настройка ТАБЛИЧНОГО содержания списка
+				case 30: _spisokTableValueSave($cmp, $cmpv[$cmp_id], $unit); break;
+			}
+		}
+
+
+	if($dialog['base_table'] == '_page')
+		_cache('clear', '_pageCache');
+	if($dialog['base_table'] == '_element')
+		_cache('clear', '_dialogQuery'.$dialog_id);
 
 	$send = array(
 		'unit' => $unit,
@@ -627,6 +634,36 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	}
 
 	return $send;
+}
+function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания списка (30)
+	$cmp,//компонент из диалога, отвечающий за настройку таблицы
+	$val,//значения, полученные для сохранения
+	$unit//элемент, размещающий таблицу, для которой происходит настройка
+) {
+	if(empty($cmp['col']))
+		return;
+
+	//поле, хранящее список id элементов-значений
+	$col = $cmp['col'];
+	$ids = $unit[$col] ? $unit[$col] : 0;
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			  AND `id` NOT IN (".$ids.")";
+	query($sql);
+
+	if(empty($val))
+		return;
+
+	$sort = 0;
+	foreach($val as $r) {
+		$sql = "UPDATE `_element`
+				SET `width`=".$r['width'].",
+					`sort`=".$sort++."
+				WHERE `id`=".$r['id'];
+		query($sql);
+	}
 }
 
 /*
@@ -795,88 +832,3 @@ function _spisokUnitUpdate($unit_id=0, $page_id=0, $block_id=0) {//внесение/реда
 	return $send;
 }
 */
-function _spisokUnitFuncValUpdate($dialog, $cmp_id, $unit_id) {//обновление значений функций компонентов (пока конкретно Действие 5)
-	if(!$unit_id)
-		return;
-	if(!isset($_POST['func'][$cmp_id]))
-		return;
-
-	$cmp = $dialog['component'][$cmp_id];
-	$v = $_POST['func'][$cmp_id];
-
-	//проверка наличия функции у компонента
-	$f5 = !empty($cmp['func_action_ass'][5]);
-	$f6 = !empty($cmp['func_action_ass'][6]);
-	$f7 = !empty($cmp['func_action_ass'][7]);
-	if(!$f5 && !$f6 && !$f7)
-		return;
-
-	//если компонент не содержит список
-	if(!$cmp['num_4'])
-		return;
-
-	if($f5) {
-		//если список не со страницы
-		if(!$cmp['num_5'])
-			return;
-
-		//получение id элемента страницы, у которой будет изменяться значение
-		$sql = "SELECT `num_3`
-				FROM `".$dialog['base_table']."`
-				WHERE `id`=".$unit_id;
-		if(!$pe_id = query_value($sql))
-			return;
-
-		$sql = "UPDATE `".$dialog['base_table']."`
-				SET `txt_3`='".addslashes($v)."'
-				WHERE `id`=".$pe_id;
-		query($sql);
-		return;
-	}
-
-	if($f6) {
-		$sql = "UPDATE `".$dialog['base_table']."`
-				SET `num_3`='".addslashes($v)."'
-				WHERE `id`=".$unit_id;
-		query($sql);
-		return;
-	}
-
-	if($f7) {
-		switch(is_array($v)) {
-			default://[181] таблица
-				$ex = explode(',', $v);
-				$num_5 = _num($ex[0]);
-				$num_6 = _num(@$ex[1]);
-				$num_7 = _num(@$ex[2]);
-
-				$txt_5 = array();
-				foreach($ex as $k => $r) {
-					if($k < 3)
-						continue;
-
-					$rex = explode('&', $r);
-					if(!$id = _num($rex[0], 1))
-						continue;
-					$tr = _txt(@$rex[1]);
-					$link_on = _num(@$rex[2]);
-					$link = _num(@$rex[3]);
-
-					$txt_5[] = $id.'&'.$tr.'&'.$link_on.'&'.$link;
-				}
-
-				$sql = "UPDATE `".$dialog['base_table']."`
-						SET `num_5`=".$num_5.",
-							`num_6`=".$num_6.",
-							`num_7`=".$num_7.",
-							`txt_5`='".implode(',', $txt_5)."'
-						WHERE `id`=".$unit_id;
-				query($sql);
-
-				return;
-			case 1://[182] шаблон
-
-				break;
-		}
-	}
-}

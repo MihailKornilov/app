@@ -72,33 +72,28 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	$ELEM:
 		dialog_id = 14: ШАБЛОН
             num_1 - id диалога, который вносит данные списка (шаблон которого будет настраиваться)
-			num_2 - длина (количество строк, выводимых за один раз)
+			num_2 - длина (лимит, количество строк, выводимых за один раз)
 			txt_1 - сообщение пустого запроса
 
 
+		dialog_id = 23: таблица
+            num_1 - id диалога, который вносит данные списка (шаблон которого будет настраиваться)
+			num_2 - длина (лимит, количество строк, выводимых за один раз)
+			txt_1 - сообщение пустого запроса
+			num_3 - узкие строки таблицы
+			num_4 - подсвечивать строку при наведении мыши
+			txt_2 - ids элементов через запятую. Сами элементы хранятся в таблице _element
 
 
 
 
 		--- старое ---
-		txt_2[child] - для [182]: произвольное содержание
 		txt_5 - текстовый массив настроенных колонок
 			-1: num порядковый номер
 			-2: dtime_add
 			-3: иконки управления
 			-4: произвольный текст
-		num_1 - внешний вид списка: [181] => Таблица [182] => Шаблон
-		num_2 - лимит, количество строк списка, показываемого за один раз
-		num_3 - id диалога, через который вносятся данные списка
-		num_4[child] - id колонки. Если отрицательное - см.txt_5
 		num_5 - галочка "Показывать имена колонок"
-		num_6 - галочка "Подсвечивать строки при наведении"
-		num_7 - галочка "Узкие строки"
-
-		$next: очередной блок списка, ограниченная $ELEM['num_2']
-
-		dialog_id = 23: таблица
-
 	*/
 	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
 		return 'Несуществующий диалог id'.$ELEM['dialog_id'];
@@ -136,14 +131,30 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	switch($ELEM['dialog_id']) {
 		//таблица
 		case 23://Таблица
-
-//			if(empty($ELEM['txt_5']))
+			if(empty($ELEM['txt_2']))
 				return '<div class="_empty"><span class="fs15 red">Таблица не настроена.</span></div>';
+			if(!$ELEM['num_1'])
+				return '<div class="_empty"><span class="fs15 red">Не указан список для вывода данных.</span></div>';
+			if(!$tabDialog = _dialogQuery($ELEM['num_1']))
+				return '<div class="_empty"><span class="fs15 red">Списка <b>'.$ELEM['num_1'].'</b> не существует.</span></div>';
 
-			$colArr = explode(',', $ELEM['txt_5']);
+			//получение настроек колонок таблицы
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id` IN (".$ELEM['txt_2'].")
+					  AND `block_id`=-".$ELEM['id']."
+					ORDER BY `sort`";
+			$tabCol = query_arr($sql);
 
-			$html = !$next ? '<table class="_stab'._dn(!$ELEM['num_7'], 'small').'">' : '';
-			//отображение названий колонок
+			//получение используемых значений списка
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id` IN ("._idsGet($tabCol, 'num_1').")";
+			$tabElemUse = query_arr($sql);
+
+			$html = !$next ? '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">' : '';
+
+/*			//отображение названий колонок
 			if($ELEM['num_5'] && !$next) {
 				$html .= '<tr>';
 				foreach($colArr as $col) {
@@ -151,12 +162,12 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$html .= '<th>'.$ex[1];
 				}
 			}
-
+*/
 			foreach($spisok as $sp) {
-				$html .= '<tr'.($ELEM['num_6'] ? ' class="over1"' : '').'>';
-				foreach($colArr as $col) {
-					$ex = explode('&', $col);
-					switch($ex[0]) {
+				$html .= '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
+				foreach($tabCol as $col) {
+					$elemUse = $tabElemUse[$col['num_1']];
+					switch($col) {
 						case -1://num
 							$html .= '<td class="w15 grey r">'._spisokColLink($sp['num'], $ELEM, $sp, @$ex[3]);
 							break;
@@ -181,12 +192,13 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 										));
 							break;
 						default:
-							$el = $CMP[$ex[0]];
-							if($el['col_name'] == 'app_any_spisok')
-								$v = $sp['app_id'] ? 0 : 1;
-							else
-								$v = $sp[$el['col_name']];
+							$el = $CMP[$elemUse['id']];
+//							if($el['col_name'] == 'app_any_spisok')
+//								$v = $sp['app_id'] ? 0 : 1;
+//							else
 
+							$v = $el['col'] ? $sp[$el['col']] : '';
+/*
 							$cls = array();
 							//галочка
 							if($el['type_id'] == 1) {
@@ -207,8 +219,10 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 							}
 							$v = _spisokColSearchBg($v, $el, $el['id']);
-							$html .= '<td class="'.implode(' ', $cls).'">'.
-										_spisokColLink($v, $el, $sp, @$ex[3]);
+*/
+
+							$html .= '<td class="" style="width:'.$col['width'].'px">'.$v;
+//										_spisokColLink($v, $el, $sp, @$ex[3]);
 					}
 				}
 			}
@@ -218,7 +232,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				if($count_next > $limit)
 					$count_next = $limit;
 				$html .=
-					'<tr class="over1" onclick="_spisokNext($(this),'.$el['id'].','.($next + 1).')">'.
+					'<tr class="over5" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
 						'<td colspan="20">'.
 							'<tt class="db center curP fs14 blue pad8">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>';
 			}
