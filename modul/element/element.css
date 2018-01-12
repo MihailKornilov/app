@@ -52,19 +52,20 @@
 ._stab th{
 	background:#E3E9EE;
 	border:#D3DBE1 solid 1px;
-	color:rgb(81, 103, 122);
+	color:#51677A;/* rgb(81,103,122) */
 	padding:8px;
 	font-size:14px;
+	box-sizing:border-box;
 }
 ._stab.small th{padding:3px;font-size:13px}
-._stab td{padding:8px;border:#EFF2F5 solid 1px}
+._stab td{
+	padding:8px;
+	border:#EFF2F5 solid 1px;
+	box-sizing:border-box;
+}
 ._stab td.topi{vertical-align:top;padding-top:9px}
 ._stab.small td{padding:4px 5px 3px;font-size:12px}
 ._stab td.pad0{padding:0}/* для иконок */
-._stab .icon-del.out{
-	position:absolute;
-	right:-25px;
-}
 
 
 

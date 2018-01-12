@@ -1399,6 +1399,7 @@ var VK_SCROLL = 0,
 					return;
 				send[sp.id] = {
 					width:_num($(sp.attr_el).parent().width()),
+					tr:$(sp.attr_tr).val(),
 					font:sp.font,
 					color:sp.color,
 					pos:sp.pos
@@ -1407,8 +1408,17 @@ var VK_SCROLL = 0,
 			return send;
 		}
 
+		window.TABLE30 = [];
+
 		if(!unit.block_id)
 			return;
+
+		$('#cmp_531')._check({
+			func:function(v) {
+				unit.num_5 = v;
+				DL.find('.div-inp-tr')['slide' + (v ? 'Down' : 'Up')]();
+			}
+		});
 
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
@@ -1418,7 +1428,6 @@ var VK_SCROLL = 0,
 
 		BUT_ADD.click(valueAdd);
 
-		window.TABLE30 = [];
 		for(var i in o.elv_spisok)
 			valueAdd(o.elv_spisok[i])
 
@@ -1428,7 +1437,9 @@ var VK_SCROLL = 0,
 				num:NUM,
 				attr_el:'#inp_' + NUM,
 				attr_bl:'#inp_' + NUM,
+				attr_tr:'#tr_' + NUM,
 				width:150,  //ширина колонки
+				tr:'',      //имя колонки
 				title:'',   //тип значения
 				font:'',
 				color:'',
@@ -1436,27 +1447,35 @@ var VK_SCROLL = 0,
 			}, v);
 
 			DL.append(
-				'<dd class="over1">' +
+				'<dd class="over3">' +
 					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w80 grey r">Колонка ' + NUM + ':' +
+						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w80 grey r topi">Колонка ' + NUM + ':' +
 							'<td><div style="width:' + v.width + 'px">' +
+									'<div class="div-inp-tr' + _dn(unit.num_5) + '">' +
+										'<input type="text"' +
+											  ' id="tr_' + NUM + '"' +
+											  ' class="inp-tr bg-gr2 w100p center fs14 blue mb1"' +
+											  ' placeholder="имя колонки"' +
+											  ' value="' + v.tr + '"' +
+										' />' +
+									'</div>' +
 									'<input type="text"' +
 										  ' id="inp_' + NUM + '"' +
-										  ' class="w100p curP over2 ' + v.font + ' ' + v.color + ' ' + v.pos + '"' +
+										  ' class="inp w100p curP ' + v.font + ' ' + v.color + ' ' + v.pos + '"' +
 										  ' readonly' +
 										  ' placeholder="значение не выбрано"' +
 										  ' value="' + v.title + '"' +
 										  ' val="' + v.id + '"' +
 									' />' +
 								'</div>' +
-							'<td class="w50 r">' +
+							'<td class="w50 r top pt5">' +
 								'<div val="' + v.num + '" class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
 					'</table>' +
 				'</dd>'
 			);
 
-			var INP = DL.find('input:last');
+			var INP = $(v.attr_el);
 			valueResize(INP);
 			INP.click(function() {
 				var t = $(this),
@@ -1542,7 +1561,7 @@ var VK_SCROLL = 0,
 		function cmpUpdate() {//обновление значения компонента
 			var val = [];
 			_forEq(el.find('dd'), function(sp) {
-				var id = _num(sp.find('input').attr('val'));
+				var id = _num(sp.find('.inp').attr('val'));
 				if(!id)
 					return;
 				val.push(id);

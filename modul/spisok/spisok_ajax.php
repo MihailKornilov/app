@@ -662,6 +662,7 @@ function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания спис
 		$r = $val[$id];
 		$sql = "UPDATE `_element`
 				SET `width`=".$r['width'].",
+					`txt_1`='".addslashes(_txt($r['tr']))."',
 					`font`='".$r['font']."',
 					`color`='".$r['color']."',
 					`txt_6`='".$r['pos']."',

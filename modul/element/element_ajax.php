@@ -368,6 +368,7 @@ function _dialogOpenLoad($dialog_id) {
 					$spisok[] = array(
 						'id' => _num($r['id']),
 						'width' => _num($r['width']),
+						'tr' => utf8($r['txt_1']),
 						'title' => utf8(_elemName($elem[$r['num_1']])),
 						'font' => $r['font'],
 						'color' => $r['color'],
@@ -379,8 +380,10 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send['cmp'] = $dialog['cmp_utf8'];
 
-	foreach($unit as $id => $r)
-		$unit[$id] = utf8($r);
+	foreach($unit as $id => $r) {
+		$r = !is_array($r) && preg_match(REGEXP_NUMERIC, $r) ? intval($r) : utf8($r);
+		$unit[$id] = $r;
+	}
 
 	//вставка наполнения для некоторых компонентов
 	foreach($dialog['cmp'] as $cmp)

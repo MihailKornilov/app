@@ -556,7 +556,7 @@ button.vk._busy{color:transparent}
 .vh{visibility:hidden}
 .wsnw{white-space:nowrap}
 .wspl{white-space:pre-line}
-.bspb{box-sizing:padding-box;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;}
+.bspb{box-sizing:border-box;-webkit-box-sizing:border-box;-moz-box-sizing:border-box}
 .prel{position:relative}
 .top5{top:5px}
 .pabs{position:absolute}
