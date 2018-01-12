@@ -197,7 +197,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 //								$v = $sp['app_id'] ? 0 : 1;
 //							else
 
-							$v = $el['col'] ? $sp[$el['col']] : '';
+							$txt = $el['col'] ? $sp[$el['col']] : '';
 /*
 							$cls = array();
 							//галочка
@@ -220,8 +220,9 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							}
 							$v = _spisokColSearchBg($v, $el, $el['id']);
 */
+							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 
-							$html .= '<td class="" style="width:'.$col['width'].'px">'.$v;
+							$html .= '<td class="" style="width:'.$col['width'].'px">'.$txt;
 //										_spisokColLink($v, $el, $sp, @$ex[3]);
 					}
 				}
