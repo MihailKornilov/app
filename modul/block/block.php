@@ -392,6 +392,7 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 	foreach($arr as $id => $r) {
 		$v = array();
 		$v[] = 'id:'.$id;
+		$v[] = 'attr_bl:"#bl_'.$id.'"';
 		$v[] = 'sa:"'.$r['sa'].'"';
 		$v[] = 'width_auto:"'.$r['width_auto'].'"';
 		$v[] = 'pos:"'.$r['pos'].'"';
@@ -414,7 +415,9 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 			$v[] = 'mar:"'.$el['mar'].'"';
 
 			$v[] = 'attr_id:"#cmp_'.$el['id'].'"';
+			$v[] = 'attr_cmp:"#cmp_'.$el['id'].'"';
 			$v[] = 'attr_pe:"#pe_'.$el['id'].'"';
+			$v[] = 'attr_el:"#pe_'.$el['id'].'"';
 
 			$v[] = 'num_1:'._num($el['num_1'], true);
 			$v[] = 'num_2:'._num($el['num_2']);
@@ -438,6 +441,7 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 	foreach($arr as $id => $r) {
 		$v = array(
 			'id' => _num($id),
+			'attr_bl' => '#bl_'.$id,
 			'sa' => _num($r['sa']),
 			'width_auto' => _num($r['width_auto']),
 			'pos' => $r['pos'],
@@ -471,7 +475,9 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 			$v['mar'] = $el['mar'];
 
 			$v['attr_id'] = '#cmp_'.$el['id'];
+			$v['attr_cmp'] = '#cmp_'.$el['id'];
 			$v['attr_pe'] = '#pe_'.$el['id'];
+			$v['attr_el'] = '#pe_'.$el['id'];
 
 			$v['num_1'] = _num($el['num_1'], true);
 			$v['num_2'] = _num($el['num_2']);

@@ -1286,7 +1286,7 @@ var VK_SCROLL = 0,
 						send.cmpv[id] = _dialogSpisokTable(sp, 'get');
 						break;
 				}
-				send.cmp[id] = $(sp.attr_id).val();
+				send.cmp[id] = $(sp.attr_cmp).val();
 			});
 
 			dialog.post(send, function(res) {
@@ -1393,16 +1393,16 @@ var VK_SCROLL = 0,
 
 		//получение данных для сохранения
 		if(unit == 'get') {
-			var send = [];
-			_forEq(el.find('dd'), function(sp) {
-				var inp = sp.find('input'),
-					id = _num(inp.attr('val'));
-				if(!id)
+			var send = {};
+			_forN(TABLE30, function(sp) {
+				if(!sp.id)
 					return;
-				send.push({
-					id:id,
-					width:_num(inp.parent().width())
-				});
+				send[sp.id] = {
+					width:_num($(sp.attr_el).parent().width()),
+					font:sp.font,
+					color:sp.color,
+					pos:sp.pos
+				};
 			});
 			return send;
 		}
@@ -1418,6 +1418,7 @@ var VK_SCROLL = 0,
 
 		BUT_ADD.click(valueAdd);
 
+		window.TABLE30 = [];
 		for(var i in o.elv_spisok)
 			valueAdd(o.elv_spisok[i])
 
@@ -1425,8 +1426,13 @@ var VK_SCROLL = 0,
 			v = $.extend({
 				id:0,       //id элемента
 				num:NUM,
+				attr_el:'#inp_' + NUM,
+				attr_bl:'#inp_' + NUM,
 				width:150,  //ширина колонки
-				title:''    //тип значения
+				title:'',   //тип значения
+				font:'',
+				color:'',
+				pos:''
 			}, v);
 
 			DL.append(
@@ -1436,7 +1442,8 @@ var VK_SCROLL = 0,
 							'<td class="w80 grey r">Колонка ' + NUM + ':' +
 							'<td><div style="width:' + v.width + 'px">' +
 									'<input type="text"' +
-										  ' class="w100p curP over2"' +
+										  ' id="inp_' + NUM + '"' +
+										  ' class="w100p curP over2 ' + v.font + ' ' + v.color + ' ' + v.pos + '"' +
 										  ' readonly' +
 										  ' placeholder="значение не выбрано"' +
 										  ' value="' + v.title + '"' +
@@ -1469,10 +1476,30 @@ var VK_SCROLL = 0,
 					res.block_id = _num('-' + unit.id, 1);
 					res.func = function(ia) {
 						valuePaste(t, ia.unit);
+						v.id = ia.unit.id;
 					};
 					_dialogOpen(res);
 				}, function() {
 					t.removeClass('hold _busy');
+				});
+			});
+			INP.mouseenter(function() {
+				if(INP.hasClass('_busy'))
+					return;
+				if(!INP.parent().hasClass('ui-resizable'))
+					return;
+				if(INP.parent().hasClass('ui-resizable-resizing'))
+					return;
+				INP._hint({
+					msg:'<table class="bs5">' +
+							'<tr><td class="pt3">' + _elemUnitFont(v) +
+								'<td class="pt3">' + _elemUnitColor(v) +
+								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
+						'</table>',
+					side:'right',
+					show:1,
+					delayShow:700,
+					delayHide:300
 				});
 			});
 
@@ -1486,8 +1513,10 @@ var VK_SCROLL = 0,
 					p = _parent(t, 'DD');
 				p.remove();
 				cmpUpdate();
+				v.id = 0;
 			});
 			NUM++;
+			TABLE30.push(v);
 		}
 		function valueResize(inp) {//включение изменения ширины, если есть значение
 			if(!_num(inp.attr('val')))
@@ -1509,7 +1538,6 @@ var VK_SCROLL = 0,
 			}
 			inp.val(unit.num_1);
 			valueResize(inp);
-//			t.addClass('hold _busy');
 		}
 		function cmpUpdate() {//обновление значения компонента
 			var val = [];

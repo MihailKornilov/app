@@ -653,15 +653,20 @@ function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания спис
 			  AND `id` NOT IN (".$ids.")";
 	query($sql);
 
-	if(empty($val))
+
+	if(!$ids)
 		return;
 
 	$sort = 0;
-	foreach($val as $r) {
+	foreach(_ids($ids, 1) as $id) {
+		$r = $val[$id];
 		$sql = "UPDATE `_element`
 				SET `width`=".$r['width'].",
+					`font`='".$r['font']."',
+					`color`='".$r['color']."',
+					`txt_6`='".$r['pos']."',
 					`sort`=".$sort++."
-				WHERE `id`=".$r['id'];
+				WHERE `id`=".$id;
 		query($sql);
 	}
 }

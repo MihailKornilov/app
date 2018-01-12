@@ -241,7 +241,7 @@ function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложени€
 	foreach($arr as $r) {
 		$send .= '<li class="mt1" id="item_'.$r['id'].'">'.
 			'<div class="curM">'.
-				'<table class="_stab  bor-e8 bg-fff over1">'.
+				'<table class="_stab w100p bor-e8 bg-fff over1">'.
 					'<tr><td>'.
 							'<a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
 								($r['def'] ? '<div class="icon icon-ok fr curD'._tooltip('—траница по умолчанию', -76).'</div>' : '').

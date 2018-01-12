@@ -165,9 +165,8 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 */
 			foreach($spisok as $sp) {
 				$html .= '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
-				foreach($tabCol as $col) {
-					$elemUse = $tabElemUse[$col['num_1']];
-					switch($col) {
+				foreach($tabCol as $td) {
+					switch($td['num_1']) {
 						case -1://num
 							$html .= '<td class="w15 grey r">'._spisokColLink($sp['num'], $ELEM, $sp, @$ex[3]);
 							break;
@@ -192,6 +191,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 										));
 							break;
 						default:
+							$elemUse = $tabElemUse[$td['num_1']];
 							$el = $CMP[$elemUse['id']];
 //							if($el['col_name'] == 'app_any_spisok')
 //								$v = $sp['app_id'] ? 0 : 1;
@@ -199,12 +199,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 							$txt = $el['col'] ? $sp[$el['col']] : '';
 /*
-							$cls = array();
-							//галочка
-							if($el['type_id'] == 1) {
-								$cls[] = 'center';
-								$v = $v ? '<div class="icon icon-ok curD"></div>' : '';
-							}
 							//элемент другого списка
 							if($el['type_id'] == 2)
 								if($el['num_4'] == 3) {
@@ -218,11 +212,18 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 										$v = '<a href="'.URL.'&p='.$incDialog['action_page_id'].'&id='.$unit_id.'">'.$v.'</a>';
 
 							}
-							$v = _spisokColSearchBg($v, $el, $el['id']);
 */
+							$cls = array();
+							$cls[] = $td['font'];
+							$cls[] = $td['color'];
+							$cls[] = $td['txt_6'];//pos - позиция
+							$cls = array_diff($cls, array(''));
+							$cls = implode(' ', $cls);
+							$cls = $cls ? ' class="'.$cls.'"' : '';
+
 							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 
-							$html .= '<td class="" style="width:'.$col['width'].'px">'.$txt;
+							$html .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
 //										_spisokColLink($v, $el, $sp, @$ex[3]);
 					}
 				}
