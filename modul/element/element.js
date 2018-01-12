@@ -1388,6 +1388,9 @@ var VK_SCROLL = 0,
 		}
 	},
 	_dialogSpisokTable = function(o, unit) {//Настройка ТАБЛИЧНОГО содержания списка. dialog_id=30
+		if(!unit.block_id)
+			return {};
+
 		var el = $(o.attr_el),
 			cmp = $(o.attr_cmp);
 
@@ -1408,26 +1411,21 @@ var VK_SCROLL = 0,
 			return send;
 		}
 
-		window.TABLE30 = [];
-
-		if(!unit.block_id)
-			return;
-
-		$('#cmp_531')._check({
-			func:function(v) {
-				unit.num_5 = v;
-				DL.find('.div-inp-tr')['slide' + (v ? 'Down' : 'Up')]();
-			}
-		});
-
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
 			DL = el.append(html).find('dl'),
 			BUT_ADD = el.find('div:last'),
 			NUM = 1;
 
+		$('#cmp_531')._check({//показ-скрытие настройки заголовков
+			func:function(v) {
+				unit.num_5 = v;
+				DL.find('.div-inp-tr')['slide' + (v ? 'Down' : 'Up')]();
+			}
+		});
 		BUT_ADD.click(valueAdd);
 
+		window.TABLE30 = [];
 		for(var i in o.elv_spisok)
 			valueAdd(o.elv_spisok[i])
 
