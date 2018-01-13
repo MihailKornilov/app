@@ -8,8 +8,26 @@ var FB,
 	REGEXP_MS =            /^[\d]+(.[\d]{1,3})?(,[\d]{1,3})?$/,
 	REGEXP_DATE =          /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
 
-	_post = function(send, func, funcErr) {//отправка ajax-запроса методом POST
+	_post = function(send, func) {//отправка ajax-запроса методом POST
+		var v = $.extend({
+			busy_obj:null,  //объект, к которому применяется процесс ожидания
+			busy_cls:'_busy'//класс, показвыающий процесс ожидания
+		}, send);
+
+		if(v.busy_obj) {
+			if($(v.busy_obj).hasClass(v.busy_cls))
+				return;
+			$(v.busy_obj).addClass(v.busy_cls);
+		}
+
+		delete send.busy_obj;
+		delete send.busy_cls;
+
 		$.post(AJAX, send, function(res) {
+	//		return;
+			if(v.busy_obj)
+				$(v.busy_obj).removeClass(v.busy_cls);
+
 			if(res.success) {
 				if(!func)
 					return;
@@ -18,9 +36,16 @@ var FB,
 					return;
 				}
 				func(res);
-			} else
-				if(funcErr)
-					funcErr(res);
+				return;
+			}
+
+			if(v.busy_obj)
+				$(v.busy_obj)._hint({
+					msg:res.text,
+					color:'red',
+					pad:10,
+					show:1
+				});
 		}, 'json');
 	},
 	_cookie = function(name, value) {
@@ -54,14 +79,12 @@ var FB,
 	},
 	_authLogin = function(code) {//авторизация пользователя по коду на сайте
 		var send = {
-				op:'login',
-				code:code
-			},
-			func = function() {
-				location.href = URL;
-			};
-
-		_post(send, func, func);
+			op:'login',
+			code:code
+		};
+		_post(send, function() {
+			location.href = URL;
+		});
 	},
 	_appEnter = function(app_id) {//вход в приложение из списка приложений
 		var send = {

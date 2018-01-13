@@ -27,7 +27,6 @@ input::-webkit-input-placeholder{color:#bbb}
 input::-moz-placeholder{color:#999}
 input.err{background-color:#fff2f2}
 /* скрытие текста и подсказки дл€ прогресса */
-input.hold{color:transparent}
 input.hold::-webkit-input-placeholder{color:transparent}
 input.hold::-moz-placeholder{color:transparent}
 
@@ -298,7 +297,8 @@ table{border:0;border-spacing:0}
 
 
 
-._busy{
+._busy,
+input.hold{
 	background-image:url("data:image/gif;base64,R0lGODlhIAAIAKECAEVojoSctMHN2QAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFCgADACwAAAAAIAAIAAACFZyPqcvtD6KMr445LcRUN9554kiSBQAh+QQFCgADACwCAAIAEgAEAAACD4xvM8DNiJRz8Mj5ari4AAAh+QQFCgADACwCAAIAHAAEAAACGJRvM8HNCqKMCCnn4JT1XPwMG9cJH6iNBQAh+QQFCgADACwMAAIAEgAEAAACD5RvM8HNiJRz8Mj5qri4AAAh+QQFCgADACwWAAIACAAEAAACBZSPqYsFACH5BAUUAAMALAAAAAAgAAgAAAIOnI+py+0Po5y02ouzPgUAOw==");
 	background-repeat:no-repeat;
 	background-position:center center;
@@ -589,7 +589,7 @@ td.bottom{vertical-align:bottom}
 .over2:hover{background-color:#FFFFF0}/* бледно-жЄлтый */
 .over3:hover,.over3:hover textarea{background-color:#ffc} /* жЄлтый */
 .over4:hover{background-color:#F9F9F9}/* светло-серый */
-.over5:hover{background-color:#E8ECF0}/* серо-синий */
+.over5:not(._busy):hover{background-color:#E8ECF0}/* серо-синий */
 
 /* Ћинии */
 .line-t{border-top:#DEE3EF solid 1px}    /* насыщенна€ верхн€€ лини€ */

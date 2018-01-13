@@ -367,6 +367,7 @@ function _dialogOpenLoad($dialog_id) {
 				foreach($arr as $r)
 					$spisok[] = array(
 						'id' => _num($r['id']),
+						'dialog_id' => _num($r['dialog_id']),
 						'width' => _num($r['width']),
 						'tr' => utf8($r['txt_1']),
 						'title' => utf8(_elemName($elem[$r['num_1']])),

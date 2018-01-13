@@ -79,7 +79,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					}
 				});
 				$('#but-elem-add').click(function() {
-					_blockUnitElAdd(BL);
+					_elemChoose(BL.id);
 				});
 				if(BL.elem_id) {
 					var tMar = {
@@ -129,7 +129,6 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				_blockUnitSave(BL, obj);
 			}
 		});
-
 	},
 	_blockUnitBg = function(BL) {//заливка блока
 		$(document)
@@ -196,114 +195,30 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 	   (!BL.child ? '<button id="but-elem-add" class="vk small green">Вставить элемент</button>' : '') +
 				'</div>';
 	},
-	_blockUnitElAdd = function(BL) {//добавление нового элемента в блок
-		$('._hint').remove();
-
-//		if(BL.obj_name == 'spisok')
-//			return _blockSpisokUnitElAdd(BL);
-
-		var html =
-				'<div class="center">' +
-					'<p class="mt10 fs17">Компоненты для внесения данных:' +
-					'<p class="mt10">' +
-						'<button val="dialog_id:8,block_id:' + BL.id + '" class="vk grey dialog-open">Однострочное поле</button>' +
-						'<button val="dialog_id:5,block_id:' + BL.id + '" class="vk grey dialog-open ml10">Многострочное поле</button>' +
-					'<p class="mt10">' +
-						'<button class="vk dialog-open" val="dialog_id:1,block_id:' + BL.id + '">Галочка</button>' +
-						'<button class="vk dialog-open ml10" val="dialog_id:16,block_id:' + BL.id + '">Radio</button>' +
-						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Календарь</button>' +
-					'<p class="mt10">' +
-						'<button class="vk dialog-open" val="dialog_id:17,block_id:' + BL.id + '">Select - произвольные значения</button>' +
-						'<button class="vk dialog-open ml10" val="dialog_id:6,block_id:' + BL.id + '">Select - страницы</button>' +
-					'<p class="mt10">' +
-						'<button val="dialog_id:24,block_id:' + BL.id + '" class="vk dialog-open">Select - списки приложения</button>' +
-						'<button class="vk dialog-open ml10" val="dialog_id:27,block_id:' + BL.id + '">Select - списки на текущей странице</button>' +
-					'<p class="mt10">' +
-						'<button class="vk dialog-open" val="dialog_id:29,block_id:' + BL.id + '">Select - выбор единицы из другого списка (связка)</button>' +
-
-					'<p class="mt30 fs17">Вспомогательные компоненты:' +
-					'<p class="mt10">' +
-						'<button class="vk orange dialog-open" val="dialog_id:19,block_id:' + BL.id + '">Содержание для некоторых компонентов</button>' +
-					'<p class="mt10">' +
-						'<button class="vk orange dialog-open" val="dialog_id:25,block_id:' + BL.id + '">Настройка содержания списка-шаблона</button>' +
-					'<p class="mt10">' +
-						'<button class="vk orange dialog-open" val="dialog_id:30,block_id:' + BL.id + '">Настройка содержания списка-таблицы</button>' +
-					'<p class="mt10">' +
-						'<button class="vk orange dialog-open" val="dialog_id:26,block_id:' + BL.id + '">Содержание диалога для выбора значения</button>' +
-					'<p class="mt10">' +
-						'<button class="vk orange dialog-open" val="dialog_id:28,block_id:' + BL.id + '">Выбор элементов из содержания диалога,<br>по которым нужно производить поиск</button>' +
-
-					'<p class="mt30 fs17">Элементы для наполнения содержания:' +
-					'<p class="mt10">' +
-						'<button val="dialog_id:3,block_id:' + BL.id + '" class="vk dialog-open">Меню страниц</button>' +
-						'<button val="dialog_id:10,block_id:' + BL.id + '" class="vk grey dialog-open ml10">Текст</button>' +
-						'<button val="dialog_id:2,block_id:' + BL.id + '" class="vk green dialog-open ml10">Кнопка</button>' +
-					'<p class="mt10">' +
-						'<button val="dialog_id:4,block_id:' + BL.id + '" class="vk dialog-open">Заголовок</button>' +
-						'<button val="dialog_id:21,block_id:' + BL.id + '" class="vk dialog-open ml10">Информация</button>' +
-						'<button val="dialog_id:9,block_id:' + BL.id + '" class="vk dialog-open ml10">Ссылка на страницу</button>' +
-
-					'<p class="mt30 fs17">Элементы для списков:' +
-					'<p class="mt10">' +
-						'<button val="dialog_id:7,block_id:' + BL.id + '" class="vk dialog-open">Поиск</button>' +
-						'<button val="dialog_id:15,block_id:' + BL.id + '" class="vk dialog-open ml10">Количество строк</button>' +
-					'<p class="mt10">' +
-						'<button val="dialog_id:14,block_id:' + BL.id + '" class="vk dialog-open">Содержание - шаблон</button>' +
-						'<button val="dialog_id:11,block_id:' + BL.id + '" class="vk dialog-open cancel ml10">Выбор значения для шаблона</button>' +
-					'<p class="mt10">' +
-						'<button val="dialog_id:23,block_id:' + BL.id + '" class="vk dialog-open">Содержание - таблица</button>' +
-						'<button val="dialog_id:31,block_id:' + BL.id + '" class="vk dialog-open cancel ml10">Выбор значения для таблицы</button>' +
-					'<p class="mt10">' +
-						'<button val="dialog_id:22,block_id:' + BL.id + '" class="vk dialog-open orange ml10">Связка</button>' +
-
-			  (SA ? '<p class="mt30">' +
-						'<button val="dialog_id:12,block_id:' + BL.id + '" class="vk dialog-open red">SA: функция</button>'
-			  : '') +
-
-				'</div>',
-			dialog = _dialog({
-				width:500,
-				top:20,
-				head:'Вставка элемента в блок',
-				content:html,
-				butSubmit:'',
-				butCancel:'Закрыть'
-			});
-
-		dialog.content.find('button').click(function() {
-			dialog.close();
-		});
-	},
 	_blockUnitGrid = function(block_id) {
 		var send = {
-				op:'block_unit_gird',
-				id:block_id
-			},
-			but = $('#but-block-grid');
-
-		but.addClass('_busy');
-
+			op:'block_unit_gird',
+			id:block_id,
+			busy_obj:$('#but-block-grid')
+		};
 		_post(send, function(res) {
-				$('._hint').remove();
-				$('.block-content-' + res.block.obj_name).html(res.html);
-				$('#grid-stack')._grid({
-					width:res.block.width,
-					parent_id:block_id,
-					obj_name:res.block.obj_name,
-					obj_id:res.block.obj_id
-				});
-			}, function() {
-				but.removeClass('_busy');
+			$('._hint').remove();
+			$('.block-content-' + res.block.obj_name).html(res.html);
+			$('#grid-stack')._grid({
+				width:res.block.width,
+				parent_id:block_id,
+				obj_name:res.block.obj_name,
+				obj_id:res.block.obj_id
 			});
+		});
 	},
 	_blockUnitSave = function(BL, obj) {
 		if(!BL.save)
 			return;
 
 		BL.op = 'block_unit_style_save';
-		obj.addClass('_busy');
+		BL.busy_obj = obj;
 		_post(BL, function() {
-			obj.removeClass('_busy');
 			BL.save = 0;
 		});
 	},
@@ -472,15 +387,10 @@ $(document)
 				op:'block_grid_' + (v ? 'on' : 'off'),
 				obj_name:spl[0],
 				obj_id:spl[1],
-				width:spl[2]
+				width:spl[2],
+				busy_obj:t
 			};
-
-		if(t._busy())
-			return;
-
 		_post(send, function(res) {
-			t._busy(0);
-
 			t._dn(v, 'grey');
 			t._dn(!v, 'orange');
 			p.find('.block-level-change')._dn(!v);
@@ -499,8 +409,6 @@ $(document)
 					width:spl[2]
 				});
 			}
-		}, function() {
-			t._busy(0);
 		});
 	})
 	.on('click', '.elem-width-change', function() {//включение/выключение изменения ширины элементов
@@ -513,15 +421,11 @@ $(document)
 				obj_name:spl[0],
 				obj_id:spl[1],
 				width:spl[2],
-				on:on
+				on:on,
+				busy_obj:t
 			};
 
-		if(t._busy())
-			return;
-
 		_post(send, function(res) {
-			t._busy(0);
-
 			t._dn(on, 'grey');
 			t._dn(!on, 'orange');
 			p.find('.block-grid-on').css('visibility', on ? 'hidden' : 'visible');
@@ -560,21 +464,15 @@ $(document)
 								send = {
 									op:'block_elem_width_save',
 									elem_id:sp.elem_id,
-									width:ui.size.width
+									width:ui.size.width,
+									busy_obj:p
 								};
-							p._busy();
-							_post(send,
-								function() {
-									p._busy(0);
-									BLOCK_ARR[k].width = ui.size.width;
-								},
-								function() { p._busy(0); }
-							);
+							_post(send,	function() {
+								BLOCK_ARR[k].width = ui.size.width;
+							});
 						}
 					});
 			});
-		}, function() {
-			t._busy(0);
 		});
 	})
 	.on('mouseenter', '.ewc .ui-resizable-e', function() {//подсказка с возможностью установить ширину 100% для элемента
@@ -622,13 +520,10 @@ $(document)
 					send = {
 						op:'block_elem_width_save',
 						elem_id:elem_id,
-						width:save_v
+						width:save_v,
+						busy_obj:block
 					};
-				block._busy();
-				_post(send,
-					function() { block._busy(0); },
-					function() { block._busy(0); }
-				);
+				_post(send);
 			}
 		});
 	})
@@ -669,7 +564,7 @@ $(document)
 		if(BL.elem_id)
 			return $('#elem-hint-' + BL.elem_id + ' .icon-edit').trigger('click');
 
-		_blockUnitElAdd(BL);
+		_elemChoose(BL.id);
 	});
 
 $.fn._grid = function(o) {
@@ -717,18 +612,16 @@ $.fn._grid = function(o) {
 			);
 		});
 
-		t.addClass('_busy');
 		var send = {
 			op:'block_grid_save',
 			parent_id:o.parent_id,
 			obj_name:o.obj_name,
 			obj_id:o.obj_id,
 			width:o.width,
-			arr:arr
+			arr:arr,
+			busy_obj:t
 		};
-		_post(send, afterSave, function() {
-			t.removeClass('_busy');
-		});
+		_post(send, afterSave);
 	});
 	$('#grid-cancel').click(cancel);
 
