@@ -364,17 +364,18 @@ function _dialogOpenLoad($dialog_id) {
 				$elem = query_ass($sql);
 
 				$spisok = array();
-				foreach($arr as $r)
+				foreach($arr as $r) {
 					$spisok[] = array(
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
 						'width' => _num($r['width']),
 						'tr' => utf8($r['txt_1']),
-						'title' => utf8(_elemName($elem[$r['num_1']])),
+						'title' => utf8(_elemName($r['dialog_id'] == 31 ? $elem[$r['num_1']] : $r['dialog_id'])),
 						'font' => $r['font'],
 						'color' => $r['color'],
 						'pos' => $r['txt_6']
 					);
+				}
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
 				break;
 	}

@@ -477,17 +477,18 @@ var VK_SCROLL = 0,
 			}
 
 			//получение значений компонентов
-			_forIn(o.cmp, function(sp, id) {
-				switch(sp.dialog_id) {
-					case 19://наполнение для некоторых компонентов
-						send.cmp[id] = _dialogCmpValue(sp, 'get');
-						return;
-					case 30://Настройка ТАБЛИЧНОГО содержания списка
-						send.cmpv[id] = _dialogSpisokTable(sp, 'get');
-						break;
-				}
-				send.cmp[id] = $(sp.attr_cmp).val();
-			});
+			if(!o.to_del)
+				_forIn(o.cmp, function(sp, id) {
+					switch(sp.dialog_id) {
+						case 19://наполнение для некоторых компонентов
+							send.cmp[id] = _dialogCmpValue(sp, 'get');
+							return;
+						case 30://Настройка ТАБЛИЧНОГО содержания списка
+							send.cmpv[id] = _dialogSpisokTable(sp, 'get');
+							break;
+					}
+					send.cmp[id] = $(sp.attr_cmp).val();
+				});
 
 			dialog.post(send, function(res) {
 				//если присутствует функция, выполняется она
@@ -603,6 +604,8 @@ var VK_SCROLL = 0,
 			return send;
 		}
 
+		window.TABLE30 = [];
+
 		if(!unit.block_id)
 			return {};
 
@@ -622,7 +625,6 @@ var VK_SCROLL = 0,
 		});
 		BUT_ADD.click(valueAdd);
 
-		window.TABLE30 = [];
 		for(var i in o.elv_spisok)
 			valueAdd(o.elv_spisok[i])
 
@@ -737,7 +739,7 @@ var VK_SCROLL = 0,
 				return;
 			$(v.attr_el).parent().resizable({
 				minWidth:50,
-				maxWidth:300,
+				maxWidth:400,
 				grid:10,
 				handles:'e',
 				stop:function(e, ui) {
@@ -959,6 +961,7 @@ var VK_SCROLL = 0,
 
 		dialog.content.find('button').click(function() {
 			v.busy_obj = $(this);
+			v.busy_cls = '_busy';
 			v.dialog_id = v.busy_obj.attr('val');
 			var func = v.func_open;
 			v.func_open = function(res) {
@@ -1035,6 +1038,8 @@ var VK_SCROLL = 0,
 				'<button val="11" class="vk cancel ml10">Выбор значения для шаблона</button>' +
 			'<p class="mt10">' +
 				'<button val="23" class="vk">Содержание - таблица</button>' +
+				'<button val="31" class="vk cancel ml10">Значение из диалога</button>' +
+				'<button val="32" class="vk cancel ml10">Значение: порядковый номер</button>' +
 			'<p class="mt10">' +
 				'<button val="22" class="vk orange ml10">Связка</button>' +
 
@@ -1045,10 +1050,10 @@ var VK_SCROLL = 0,
 		'</div>';
 	},
 	_elemChooseTable = function() {
-		return '<div class="center">' +
-			'<p class="mt10 fs17">Варианты выбора для ячейки таблицы:' +
-				'<button val="31" class="vk cancel mt5">Выбор значения для таблицы</button>' +
-		'</div>';
+		return '<div class="hd2 mt10">Варианты выбора для ячейки таблицы:</div>' +
+			'<button val="31" class="vk cancel mt5">Значение из диалога</button>' +
+			'<button val="32" class="vk cancel mt5">Значение: порядковый номер</button>' +
+		'';
 	},
 
 	_pageSetupAppPage = function() {//сортировка страниц приложения с учётом уровней

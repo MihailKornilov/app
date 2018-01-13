@@ -389,12 +389,13 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 }
 function _elemName($dialog_id) {//название элемента по dialog_id
 	switch($dialog_id) {
-		case 1: return 'галочка';
-		case 5: return 'многострочное поле';
-		case 8: return 'однострочное поле';
+		case 1:  return 'галочка';
+		case 5:  return 'многострочное поле';
+		case 8:  return 'однострочное поле';
 		case 10: return 'текст';
 		case 16: return 'радио';
 		case 17: return 'выпадающе поле';
+		case 32: return 'номер';
 	}
 	return 'элемент '.$dialog_id;
 }
@@ -857,6 +858,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_1 - id элемента, выбранного из диалога, который вносит данные списка (через dialog_id=26)
 			*/
 			return '31';
+
+		//«начение списка: пор€дковый номер
+		case 32: return 'ѕор€дковый номер используетс€ только в списках';
 	}
 /*
 	//элементы списка шаблона (дл€ настройки)

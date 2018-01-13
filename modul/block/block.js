@@ -79,7 +79,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					}
 				});
 				$('#but-elem-add').click(function() {
-					_elemChoose(BL.id);
+					_elemChoose({block_id:BL.id});
 				});
 				if(BL.elem_id) {
 					var tMar = {
@@ -564,7 +564,7 @@ $(document)
 		if(BL.elem_id)
 			return $('#elem-hint-' + BL.elem_id + ' .icon-edit').trigger('click');
 
-		_elemChoose(BL.id);
+		_elemChoose({block_id:block_id});
 	});
 
 $.fn._grid = function(o) {

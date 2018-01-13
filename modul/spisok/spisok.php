@@ -169,9 +169,10 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			foreach($spisok as $sp) {
 				$html .= '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
 				foreach($tabCol as $td) {
-					switch($td['num_1']) {
-						case -1://num
-							$html .= '<td class="w15 grey r">'._spisokColLink($sp['num'], $ELEM, $sp, @$ex[3]);
+					$txt = '';
+					switch($td['dialog_id']) {
+						case 32://порядковый номер - num
+							$txt = $sp['num'];
 							break;
 						case -2://дата
 							$tooltip = '">';
@@ -193,15 +194,16 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 											'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id'].',to_del:1'
 										));
 							break;
-						default:
+						case 31://из диалога
 							$elemUse = $tabElemUse[$td['num_1']];
 							$el = $CMP[$elemUse['id']];
+
+							$txt = $el['col'] ? $sp[$el['col']] : '';
+							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
+/*
 //							if($el['col_name'] == 'app_any_spisok')
 //								$v = $sp['app_id'] ? 0 : 1;
 //							else
-
-							$txt = $el['col'] ? $sp[$el['col']] : '';
-/*
 							//элемент другого списка
 							if($el['type_id'] == 2)
 								if($el['num_4'] == 3) {
@@ -216,19 +218,16 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 							}
 */
-							$cls = array();
-							$cls[] = $td['font'];
-							$cls[] = $td['color'];
-							$cls[] = $td['txt_6'];//pos - позиция
-							$cls = array_diff($cls, array(''));
-							$cls = implode(' ', $cls);
-							$cls = $cls ? ' class="'.$cls.'"' : '';
-
-							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
-
-							$html .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
-//										_spisokColLink($v, $el, $sp, @$ex[3]);
+						break;
 					}
+					$cls = array();
+					$cls[] = $td['font'];
+					$cls[] = $td['color'];
+					$cls[] = $td['txt_6'];//pos - позиция
+					$cls = array_diff($cls, array(''));
+					$cls = implode(' ', $cls);
+					$cls = $cls ? ' class="'.$cls.'"' : '';
+					$html .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
 				}
 			}
 
