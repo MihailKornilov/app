@@ -1040,6 +1040,7 @@ var VK_SCROLL = 0,
 				'<button val="23" class="vk">Содержание - таблица</button>' +
 				'<button val="31" class="vk cancel ml10">Значение из диалога</button>' +
 				'<button val="32" class="vk cancel ml10">Значение: порядковый номер</button>' +
+				'<button val="33" class="vk cancel ml10">Значение: Дата</button>' +
 			'<p class="mt10">' +
 				'<button val="22" class="vk orange ml10">Связка</button>' +
 
@@ -1052,7 +1053,8 @@ var VK_SCROLL = 0,
 	_elemChooseTable = function() {
 		return '<div class="hd2 mt10">Варианты выбора для ячейки таблицы:</div>' +
 			'<button val="31" class="vk cancel mt5">Значение из диалога</button>' +
-			'<button val="32" class="vk cancel mt5">Значение: порядковый номер</button>' +
+			'<button val="32" class="vk cancel mt5">Значение: Порядковый номер</button>' +
+			'<button val="33" class="vk cancel mt5">Значение: Дата</button>' +
 		'';
 	},
 

@@ -38,7 +38,7 @@ function _spisokElemCount($r) {//формирование элемента с содержанием количества 
 	' '.
 	_end($all, $r['txt_2'], $r['txt_4'], $r['txt_6']);
 }
-function _spisokInc($dialog, $spisok) {//вложенные списки
+function _spisokInclude($spisok, $dialog) {//вложенные списки
 	$send = array();
 
 	//поиск компонента диалога с вложенным списком
@@ -91,14 +91,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			color
 			txt_6 - pos (позиция)
 			sort
-
-
-		--- старое ---
-		txt_5 - текстовый массив настроенных колонок
-			-1: num порядковый номер
-			-2: dtime_add
-			-3: иконки управления
-			-4: произвольный текст
 	*/
 	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
 		return 'Несуществующий диалог id'.$ELEM['dialog_id'];
@@ -126,7 +118,8 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	if(!$spisok = query_arr($sql))
 		return '<div class="_empty">'._br($ELEM['txt_1']).'</div>';
 
-	//	$inc = _spisokInc($spDialog, $spisok);
+	//вставка значений из вложенных списков
+//	$spisok = _spisokInclude($spisok, $spDialog);
 
 	foreach($spisok as $id => $sp)
 		if(empty($sp['num']))
@@ -171,17 +164,18 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				foreach($tabCol as $td) {
 					$txt = '';
 					switch($td['dialog_id']) {
-						case 32://порядковый номер - num
-							$txt = $sp['num'];
-							break;
-						case -2://дата
-							$tooltip = '">';
+						//порядковый номер - num
+						case 32: $txt = $sp['num'];	break;
+						case 33://дата
+/*							$tooltip = '">';
 							if(isset($sp['viewer_id_add'])) {
 								$u = _viewer($sp['viewer_id_add']);
 								$msg = 'Вн'.($u['sex'] == 2 ? 'ёс ' : 'есла ').$u['first_name'].' '.$u['last_name'];
 								$tooltip = _tooltip($msg, -40);
 							}
-							$html .= '<td class="w50 wsnw r grey fs12 curD'.$tooltip.FullData($sp['dtime_add'], 0, 1);
+*/
+							$cut = $td['num_1'] == 36;
+							$txt = FullData($sp['dtime_add'], $td['num_2'], $cut);
 							break;
 						case -3://иконки управления
 							$html .= '<td class="pad0 w15 wsnw">'.

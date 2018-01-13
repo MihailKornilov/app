@@ -396,6 +396,7 @@ function _elemName($dialog_id) {//название элемента по dialog_id
 		case 16: return 'радио';
 		case 17: return 'выпадающе поле';
 		case 32: return 'номер';
+		case 33: return 'дата';
 	}
 	return 'элемент '.$dialog_id;
 }
@@ -861,29 +862,25 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//Значение списка: порядковый номер
 		case 32: return 'Порядковый номер используется только в списках';
+
+		//Значение списка: дата
+		case 33:
+			/*
+				num_1 - формат:
+					35: 5 августа 2017
+					36: 5 авг 2017
+					37: 05/08/2017
+				num_2 - не показывать текущий год
+				num_3 - имена у ближайших дней:
+					позавчера
+					вчера
+					сегодня
+					завтра
+					послезавтра
+			*/
+			return 'Дата используется только в списках';
 	}
-/*
-	//элементы списка шаблона (для настройки)
-	if($el['block']['obj_name'] == 'spisok') {
-		if(isset($el['real_txt']))
-			return $el['real_txt'];
-		switch($el['num_1']) {
-			case -1: return '{NUM}';//порядковый номер
-			case -2: return FullData(curTime(), 0, 1);//дата внесения
-			case -4: return _br($el['txt_2']);//произвольный текст
-			default:
-				if(!$dialog = _dialogQuery($el['num_3']))
-					return 'неизвестный id диалога списка: '.$el['num_3'];
-				$cmp = $dialog['component'];
-				$label_name = $cmp[$el['num_1']]['label_name'];
-				switch($el['num_2']) {
-					case 1: return $label_name;//название колонки
-					case 2: return 'Значение "'.$label_name.'"';//значение колонки
-					default: return 'неизвестный тип содержания колонки';
-				}
-		}
-	}
-*/
+
 	return'неизвестный элемент='.$el['dialog_id'];
 }
 function _elemFontAllow($dialog_id) {//отображение в настройках стилей для конкретных элементов страницы
