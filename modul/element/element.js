@@ -593,7 +593,7 @@ var VK_SCROLL = 0,
 				if(!sp.id)
 					return;
 				send[sp.id] = {
-					width:_num($(sp.attr_el).parent().width()),
+					width:sp.width,
 					tr:$(sp.attr_tr).val(),
 					font:sp.font,
 					color:sp.color,
@@ -602,6 +602,7 @@ var VK_SCROLL = 0,
 			});
 			return send;
 		}
+
 		if(!unit.block_id)
 			return {};
 
@@ -671,7 +672,7 @@ var VK_SCROLL = 0,
 			);
 
 			var INP = $(v.attr_el);
-			valueResize(INP);
+			valueResize(v);
 			INP.click(function() {
 				_elemChoose({
 					type:'table',
@@ -691,7 +692,7 @@ var VK_SCROLL = 0,
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
 						INP.val(ia.unit.num_1);
-						valueResize(INP);
+						valueResize(v);
 					}
 				});
 			});
@@ -714,7 +715,6 @@ var VK_SCROLL = 0,
 					delayHide:300
 				});
 			});
-
 			DL.sortable({
 				axis:'y',
 				handle:'.icon-move-y',
@@ -730,16 +730,19 @@ var VK_SCROLL = 0,
 			NUM++;
 			TABLE30.push(v);
 		}
-		function valueResize(inp) {//включение изменения ширины, если есть значение
-			if(!_num(inp.attr('val')))
+		function valueResize(v) {//включение изменения ширины, если есть значение
+			if(!v.id)
 				return;
-			if(inp.parent().hasClass('ui-resizable'))
+			if($(v.attr_el).parent().hasClass('ui-resizable'))
 				return;
-			inp.parent().resizable({
+			$(v.attr_el).parent().resizable({
 				minWidth:50,
 				maxWidth:300,
 				grid:10,
-				handles:'e'
+				handles:'e',
+				stop:function(e, ui) {
+					v.width = ui.size.width;
+				}
 			});
 		}
 		function cmpUpdate() {//обновление значения компонента
