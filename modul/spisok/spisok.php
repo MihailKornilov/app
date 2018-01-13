@@ -38,21 +38,18 @@ function _spisokElemCount($r) {//формирование элемента с содержанием количества 
 	' '.
 	_end($all, $r['txt_2'], $r['txt_4'], $r['txt_6']);
 }
-function _spisokInclude($spisok, $dialog) {//вложенные списки
-	$send = array();
-
-	//поиск компонента диалога с вложенным списком
-	foreach($dialog['cmp'] as $cmp_id => $cmp) {
-		//если не селект
-		if($cmp['type_id'] != 2)
+function _spisokInclude($spisok, $CMP) {//вложенные списки
+	foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
+		//должен является вложенным списком
+		if($cmp['dialog_id'] != 29)
 			continue;
 
-		//если не является вложенным списком
-		if($cmp['num_4'] != 3)
+		//должно быть присвоено имя колонки
+		if(!$col = $cmp['col'])
 			continue;
 
 		//выборка будет производиться только по нужным строкам списка
-		if(!$ids = _idsGet($spisok, $cmp['col_name']))
+		if(!$ids = _idsGet($spisok, $col))
 			continue;
 
 		//получение данных из вложенного списка
@@ -62,10 +59,15 @@ function _spisokInclude($spisok, $dialog) {//вложенные списки
 				WHERE `app_id`=".APP_ID."
 				  AND `dialog_id`=".$cmp['num_1']."
 				  AND `id` IN (".$ids.")";
-		$send[$cmp['num_1']] = query_arr($sql);
+		$arr = query_arr($sql);
+		//идентификаторы будут заменены на массив с данными единицы списка
+		foreach($spisok as $id => $r) {
+			$connect_id = $r[$col];
+			$spisok[$id][$col] = $arr[$connect_id];
+		}
 	}
 
-	return $send;
+	return $spisok;
 }
 function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	/*
@@ -119,7 +121,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 		return '<div class="_empty">'._br($ELEM['txt_1']).'</div>';
 
 	//вставка значений из вложенных списков
-//	$spisok = _spisokInclude($spisok, $spDialog);
+	$spisok = _spisokInclude($spisok, $CMP);
 
 	foreach($spisok as $id => $sp)
 		if(empty($sp['num']))
@@ -164,16 +166,8 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				foreach($tabCol as $td) {
 					$txt = '';
 					switch($td['dialog_id']) {
-						//порядковый номер - num
-						case 32: $txt = $sp['num'];	break;
+						case 32: $txt = $sp['num'];	break;//порядковый номер - num
 						case 33://дата
-/*							$tooltip = '">';
-							if(isset($sp['viewer_id_add'])) {
-								$u = _viewer($sp['viewer_id_add']);
-								$msg = 'Вн'.($u['sex'] == 2 ? 'ёс ' : 'есла ').$u['first_name'].' '.$u['last_name'];
-								$tooltip = _tooltip($msg, -40);
-							}
-*/
 							$cut = $td['num_1'] == 36;
 							$txt = FullData($sp['dtime_add'], $td['num_2'], $cut);
 							break;
@@ -192,26 +186,22 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							$elemUse = $tabElemUse[$td['num_1']];
 							$el = $CMP[$elemUse['id']];
 
-							$txt = $el['col'] ? $sp[$el['col']] : '';
-							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
-/*
-//							if($el['col_name'] == 'app_any_spisok')
-//								$v = $sp['app_id'] ? 0 : 1;
-//							else
-							//элемент другого списка
-							if($el['type_id'] == 2)
-								if($el['num_4'] == 3) {
-									$incDialog = _dialogQuery($el['num_1']);
-									$col_name = $incDialog['component'][$el['num_2']]['col_name'];
+							//элементу не присвоена колонка
+							if(!$col = $el['col'])
+								break;
 
-									$unit_id = $v;
-									$v = $inc[$el['num_1']][$v][$col_name];
+							//в списке не существует такой колонки
+							if(!isset($sp[$col]))
+								break;
 
-									if($incDialog['action_id'] == 2)
-										$v = '<a href="'.URL.'&p='.$incDialog['action_page_id'].'&id='.$unit_id.'">'.$v.'</a>';
-
+							//значение из другого списка
+							if($el['dialog_id'] == 29) {
+								$txt = $sp[$col]['txt_1'];
+								break;
 							}
-*/
+
+							$txt = $sp[$col];
+							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 						break;
 					}
 					$cls = array();
