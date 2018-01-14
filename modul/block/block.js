@@ -232,7 +232,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					'Настройки элемента' +
 					'<div class="fr">' +
 						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + '" class="icon icon-edit mr3 dialog-open' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
-						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + ',to_del:1" class="icon icon-del-red dialog-open' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
+						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + ',del:1" class="icon icon-del-red dialog-open' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 					'</div>' +
 				'</div>' +
 

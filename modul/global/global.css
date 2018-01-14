@@ -562,6 +562,7 @@ button.vk._busy{color:transparent}
 .pabs{position:absolute}
 
 td.top{vertical-align:top}
+td.topi{vertical-align:top;padding-top:7px}
 td.bottom{vertical-align:bottom}
 .center{text-align:center}
 .r{text-align:right}

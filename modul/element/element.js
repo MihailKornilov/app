@@ -345,35 +345,35 @@ var VK_SCROLL = 0,
 			BLOCK_ARR[k] = sp;
 		});
 
-		$('#spisok_on')._check({
-			func:function(v) {
-				$('#tr_spisok_name')._dn(v);
-			}
-		});
-
 		$('#dialog-menu')._menu({
 			type:2,
 			spisok:o.menu,
 			func:_dialogHeightCorrect
 		});
-
+		$('#spisok_on')._check({
+			func:function(v) {
+				$('#tr_spisok_name')._dn(v);
+			}
+		});
 		$('#width_auto')._check({
 			title:'автоматическая ширина'
 		});
 
-		$('#action_id')._select({
-			width:300,
-			title0:'действия нет, закрыть окно',
-			spisok:o.action,
-			func:function(v) {
-				$('.td-action-page')._dn(v == 2);
-				$('#action_page_id')._select(0);
-			}
-		});
-		$('#action_page_id')._select({
-			width:300,
-			title0:'не выбрана',
-			spisok:PAGE_LIST
+		_forN(['insert', 'edit', 'del'], function(act) {
+			$('#' + act + '_action_id')._select({
+				width:300,
+				title0:'действия нет, закрыть окно',
+				spisok:o.action,
+				func:function(v) {
+					$('.td-' + act + '-action-page')._dn(v == 2);
+					$('#' + act + '_action_page_id')._select(0);
+				}
+			});
+			$('#' + act + '_action_page_id')._select({
+				width:300,
+				title0:'не выбрана',
+				spisok:PAGE_LIST
+			});
 		});
 
 		$('#element_width')._count({width:60,step:10});
@@ -413,17 +413,23 @@ var VK_SCROLL = 0,
 				insert_head:$('#insert_head').val(),
 				insert_button_submit:$('#insert_button_submit').val(),
 				insert_button_cancel:$('#insert_button_cancel').val(),
+				insert_action_id:$('#insert_action_id').val(),
+				insert_action_page_id:$('#insert_action_page_id').val(),
+
 				edit_head:$('#edit_head').val(),
 				edit_button_submit:$('#edit_button_submit').val(),
 				edit_button_cancel:$('#edit_button_cancel').val(),
+				edit_action_id:$('#edit_action_id').val(),
+				edit_action_page_id:$('#edit_action_page_id').val(),
+
 				del_head:$('#del_head').val(),
 				del_button_submit:$('#del_button_submit').val(),
 				del_button_cancel:$('#del_button_cancel').val(),
+				del_action_id:$('#del_action_id').val(),
+				del_action_page_id:$('#del_action_page_id').val(),
 
 				spisok_on:$('#spisok_on').val(),
 				spisok_name:$('#spisok_name').val(),
-				action_id:$('#action_id').val(),
-				action_page_id:$('#action_page_id').val(),
 
 				base_table:$('#base_table').val(),
 				app_any:$('#app_any').val(),
@@ -463,7 +469,7 @@ var VK_SCROLL = 0,
 		});
 
 		//если удаление единицы списка, то кнопка красная
-		if(o.to_del)
+		if(o.act == 'del')
 			dialog.bottom.find('.submit').addClass('red');
 		else {
 			window.DIALOG_OPEN = dialog;
@@ -483,12 +489,12 @@ var VK_SCROLL = 0,
 
 			if(o.unit_id) {
 				send.op = 'spisok_save';
-				if(o.to_del)
+				if(o.act == 'del')
 					send.op = 'spisok_del';
 			}
 
 			//получение значений компонентов
-			if(!o.to_del)
+			if(o.act != 'del')
 				_forIn(o.cmp, function(sp, id) {
 					switch(sp.dialog_id) {
 						case 19://наполнение для некоторых компонентов
@@ -505,6 +511,8 @@ var VK_SCROLL = 0,
 				//если присутствует функция, выполняется она
 				if(o.func)
 					return o.func(res);
+
+//return;
 
 				switch(res.action_id) {
 					case 1: location.reload(); break;
@@ -1444,7 +1452,7 @@ $.fn._count = function(o) {//input с количеством
 	window[win] = t;
 	return t;
 };
-$.fn._select = function(o, o1, o2) {//выпадающий список от 03.01.2018
+$.fn._select = function(o) {//выпадающий список от 03.01.2018
 	var t = $(this),
 		attr_id = t.attr('id'),
 		VALUE = t.val();

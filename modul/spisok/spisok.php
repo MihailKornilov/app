@@ -179,7 +179,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 										)).
 										_iconDel(array(
 											'class' => 'dialog-open mr3',
-											'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id'].',to_del:1'
+											'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id'].',del:1'
 										));
 							break;
 						case 31://из диалога
@@ -314,8 +314,8 @@ function _spisokColLink($txt, $pe, $sp) {//обёртка значения колонки в ссылку
 		$link = '&viewer_id='.$sp['viewer_id'];
 
 	//если указана страница перехода после создания элемента списка
-	if($dialog['action_id'] == 2)
-		$link = '&p='.$dialog['action_page_id'].'&id='.$sp['id'];
+	if($dialog['insert_action_id'] == 2)
+		$link = '&p='.$dialog['insert_action_page_id'].'&id='.$sp['id'];
 
 	return '<a href="'.URL.$link.'" class="inhr">'.$txt.'</a>';
 }

@@ -18,6 +18,10 @@ switch(@$_POST['op']) {
 
 		$dialog = _spisokUnitDialog($unit_id);
 
+		$send['action_id'] = _num($dialog['del_action_id']);
+		$send['action_page_id'] = _num($dialog['del_action_page_id']);
+		$send = _spisokAction3($send, $dialog, $unit_id);
+
 		if(isset($dialog['field']['deleted']))
 			$sql = "UPDATE `".$dialog['base_table']."`
 					SET `deleted`=1,
@@ -28,7 +32,7 @@ switch(@$_POST['op']) {
 			$sql = "DELETE FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
 		query($sql);
 
-		jsonSuccess();
+		jsonSuccess($send);
 		break;
 	case 'spisok_next'://догрузка списка
 		if(!$pe_id = _num($_POST['pe_id']))
@@ -121,246 +125,6 @@ switch(@$_POST['op']) {
 		$send['spisok'] = _spisokConnect($cmp_id, $v);
 		jsonSuccess($send);
 		break;
-/*
-	case 'spisok_col_get'://получение колонок списка (для функции Действие 5 и 6)
-		if(!$cmp_id = _num($_POST['component_id']))
-			jsonError('Некорректный ID компонента диалога');
-		if(!$page_id = _num($_POST['page_id']))
-			jsonError('Некорректный ID страницы');
-		if(!$vid = _num($_POST['vid']))
-			jsonError('Некорректное значение для поиска списка');
-
-		$sql = "SELECT *
-				FROM `_dialog_component`
-				WHERE `id`=".$cmp_id;
-		if(!$cmp = query_assoc($sql))
-			jsonError('Компонента не существует');
-
-		//проверка: компонент должен быть выпадающим списком и одновременно содержать списки
-		if($cmp['type_id'] != 2 || !$cmp['num_4'])
-			jsonError('Компонент не является массивом списков');
-		if(!$cmpDialog = _dialogQuery($cmp['dialog_id']))
-			jsonError('Диалога, в котором содержится компонент, не существует');
-
-		$cmpFuncAss = $cmpDialog['component'][$cmp_id]['func_action_ass'];
-		$f5 = !empty($cmpFuncAss[5]);
-		$f6 = !empty($cmpFuncAss[6]);
-		if(!$f5 && !$f6)
-			jsonError('Отсутствует функция получения колонок');
-
-		//получение dialog_id списка
-		$dialog_id = $vid;  //если не установлена галочка "только с текущей страницы", то это и есть тот самый dialog_id
-		$colIds = array();
-		if($cmp['num_5']) {//получение dialog_id из элемента страницы
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `page_id`=".$page_id."
-					  AND `id`=".$vid;
-			if(!$pe = query_assoc($sql))
-				jsonError('Элемента на странице не существует');
-			if(!$dialog_id = _num($pe['num_3']))
-				jsonError('Нет размещённого списка на странице');
-
-			$colIds = _idsAss($pe['txt_3']);  //получение значения функции Действие 5
-		}
-
-		if(!$dialog = _dialogQuery($dialog_id))
-			jsonError('Диалога не существует');
-		if(!$dialog['spisok_on'])
-			jsonError('Диалог не является списком');
-		if(empty($dialog['component']))
-			jsonError('В данном списке колонок нет');
-
-		$col = '';
-		$radioAss = array();
-		foreach($dialog['component'] as $id => $r) {
-			if($r['type_id'] == 7)
-				continue;
-			if($r['type_id'] == 8)
-				continue;
-			if($r['type_id'] == 9)
-				continue;
-
-			$title = $r['label_name'].' <span class="grey i">'._dialogEl($r['type_id'], 'name').'</span>';
-			
-			if($f6) {
-				$radioAss[$id] = $title;
-				continue;
-			}
-
-			if($r['type_id'] == 1)
-				continue;
-			if($r['type_id'] == 5)
-				continue;
-			if($r['type_id'] == 6)
-				continue;
-			$col .=
-				'<div class="mb5">'.
-					_check(array(
-						'id' => 'col'.$id,
-						'title' => $title,
-						'value' => @$colIds[$id]
-					)).
-				'</div>';
-		}
-
-		if($f6)
-			$col = _radio(array(
-				'spisok' => $radioAss,
-				'light' => 1,
-				'interval' => 5
-			));
-
-		
-		$send['html'] = utf8(
-			'<table class="bs5 w100p">'.
-				'<tr><td class="label r top" style="width:125px">Колонк'.($f6 ? 'а' : 'и').':'.
-					'<td>'.$col.
-			'</table>'
-		);
-
-		jsonSuccess($send);
-		break;
-	case 'spisok_elem_list'://настройка колонок списка (для функции Действие 7)
-		if(!$cmp_id = _num($_POST['component_id']))
-			jsonError('Некорректный ID компонента диалога');
-		if(!$elem_id = _num($_POST['elem_id'])) {
-			$send['after'] = utf8('<div class="center fs14 i grey">Настройка колонок будет доступна<br />после добавления списка на страницу.</div>');
-			jsonSuccess($send);
-		}
-		if(!$spisok_id = _num($_POST['spisok_id']))
-			jsonError('Некорректный ID списка');
-		if(!$dialog = _dialogQuery($spisok_id))
-			jsonError('Диалога для создания списка не существует');
-
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id`=".$elem_id;
-		if(!$elem = query_assoc($sql))
-			jsonError('Элемента не существует');
-
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$elem['block_id'];
-		if(!$block = query_assoc($sql))
-			jsonError('Блока не существует');
-
-		$CMP = $dialog['component'];
-
-		$labelName = array();
-		$labelName[] = array(
-			'uid' => -1,
-			'title' => utf8('Порядковый номер'),
-			'content' => utf8('<div class="color-pay">Порядковый номер</div>'),
-			'link_on' => 1
-		);
-
-		$arrDef = array();//массив колонок по умолчанию, если настройка списка производится впервые
-
-		switch($elem['num_1']) {
-			default:
-			case 181://таблица
-				$html =
-					'<div class="hd2">Содержание списка:</div>'.
-					'<div class="mar10">'.
-						'<div class="ml30 mb10">'.
-							_check(array(
-								'id' => 'rowSmall',
-								'title' => 'Узкие строки',
-								'value' => $elem['num_7']
-							)).
-							_check(array(
-								'id' => 'colNameShow',
-								'title' => 'Показывать имена колонок',
-								'value' => $elem['num_5'],
-								'class' => 'ml30'
-							)).
-							_check(array(
-								'id' => 'rowLight',
-								'title' => 'Подсвечивать строки при наведении',
-								'value' => $elem['num_6'],
-								'class' => 'ml30'
-							)).
-						'</div>'.
-						'<dl></dl>'.
-						'<div class="item-add center pad15 fs15 color-555 over1 curP">Добавить колонку</div>'.
-					'</div>';
-				break;
-			case 182://шаблон
-				setcookie('block_level_spisok', 1, time() + 2592000, '/');
-
-				//корректировка ширины с учётом отступов
-				$ex = explode(' ', $elem['mar']);
-				$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
-
-				$html =
-					'<div class="hd2 mt20">Настройка шаблона единицы списка:</div>'.
-					'<div class="bg-ffc pad10 line-b">'._blockLevelChange('spisok', $block['id'], $width).'</div>'.
-					'<div class="block-content-spisok mt10" style="width:'.$width.'px">'._blockHtml('spisok', $block['id'], $width).'</div>';
-
-				$send['block_arr'] = _blockJsArr('spisok', $block['id']);
-				break;
-		}
-
-		foreach($CMP as $r) {
-			if(!_dialogEl($r['type_id'], 'func'))
-				continue;
-
-			$labelName[] = array(
-				'uid' => $r['id'],
-				'title' => utf8($r['label_name'] ? $r['label_name'] : $r['type_name']),
-				'content' => utf8($r['label_html']),
-				'link_on' => 1
-			);
-
-			if(!$r['label_name'])
-				continue;
-
-			$arrDef[] = array(
-				'id' => $r['id'],
-				'tr' => utf8($r['label_name'])
-			);
-		}
-
-		if($elem['num_1'] == 182)
-			$labelName[] = array(
-				'uid' => -4,
-				'title' => utf8('Произвольный текст'),
-				'content' => utf8('<div class="color-pay b">Произвольный текст</div>')
-			);
-		$labelName[] = array(
-			'uid' => -2,
-			'title' => utf8('Дата внесения'),
-			'content' => utf8('<div class="color-pay">Дата внесения</div>')
-		);
-		if($elem['num_1'] == 181)
-			$labelName[] = array(
-				'uid' => -3,
-				'title' => utf8('Иконки управления'),
-				'content' => utf8('<div class="color-pay">Иконки управления</div>')
-			);
-
-		//массив настроенных колонок (для 181)
-		$arr = array();
-		if(!empty($elem['txt_5']))
-			foreach(explode(',', $elem['txt_5']) as $col) {
-				$ex = explode('&', $col);
-				$arr[] = array(
-					'id' => $ex[0],
-					'tr' => utf8($ex[1]),
-					'link_on' => _num(@$ex[2]),
-					'link' => _num(@$ex[3])
-				);
-			}
-
-		$send['label_name_select'] = $labelName;//названия колонок для select
-		$send['arr'] = empty($elem['txt_5']) || $spisok_id != $elem['num_3'] ? $arrDef : $arr;//колонки, которые были настроены
-		$send['spisok_type'] = _num($elem['num_1']);
-		$send['html'] = utf8($html);
-
-		jsonSuccess($send);
-		break;
-*/
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка
@@ -393,6 +157,8 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$dialog = _spisokUnitDialog($unit_id);
 	$dialog_id = $dialog['id'];
+
+	$act = $unit_id ? 'edit' : 'insert';
 
 	$page_id = _num($_POST['page_id']);
 	$block_id = _num($_POST['block_id'], 1);
@@ -585,53 +351,57 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	$send = array(
 		'unit' => $unit,
-		'action_id' => _num($dialog['action_id']),
-		'action_page_id' => _num($dialog['action_page_id']),
-		'block_obj_name' => '',
-		'level' => ''
+		'action_id' => _num($dialog[$act.'_action_id']),
+		'action_page_id' => _num($dialog[$act.'_action_page_id'])
 	);
 
+	$send = _spisokAction3($send, $dialog, $unit_id);
 
-	//получение имени объекта, если действие производилось для блока
-	if($dialog['action_id'] == 3 && $dialog['base_table'] == '_element') {
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id`=".$unit_id;
-		$elem = query_assoc($sql);
+	return $send;
+}
+function _spisokAction3($send, $dialog, $unit_id) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
+	if($send['action_id'] != 3)
+		return $send;
+	if($dialog['base_table'] != '_element')
+		return $send;
 
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$elem['block_id'];
-		$block = query_assoc($sql);
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id`=".$unit_id;
+	$elem = query_assoc($sql);
 
-		$send['block_obj_name'] = $block['obj_name'];
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `id`=".$elem['block_id'];
+	$block = query_assoc($sql);
 
-		switch($block['obj_name']) {
-			default:
-			case 'page': $width = 1000; break;
-			case 'spisok':
-				$sql = "SELECT *
-						FROM `_block`
-						WHERE `id`=".$block['obj_id'];
-				$bl = query_assoc($sql);
+	$send['block_obj_name'] = $block['obj_name'];
 
-				$sql = "SELECT *
-						FROM `_element`
-						WHERE `block_id`=".$bl['id'];
-				$el = query_assoc($sql);
+	switch($block['obj_name']) {
+		default:
+		case 'page': $width = 1000; break;
+		case 'spisok':
+			$sql = "SELECT *
+					FROM `_block`
+					WHERE `id`=".$block['obj_id'];
+			$bl = query_assoc($sql);
 
-				//корректировка ширины с учётом отступов
-				$ex = explode(' ', $el['mar']);
-				$width = floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
-				break;
-			case 'dialog':
-				_cache('clear', '_dialogQuery'.$block['obj_id']);
-				$dlg = _dialogQuery($block['obj_id']);
-				$width = $dlg['width'];
-				break;
-		}
-		$send['level'] = utf8(_blockLevelChange($block['obj_name'], $block['obj_id'], $width));
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `block_id`=".$bl['id'];
+			$el = query_assoc($sql);
+
+			//корректировка ширины с учётом отступов
+			$ex = explode(' ', $el['mar']);
+			$width = floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
+			break;
+		case 'dialog':
+			_cache('clear', '_dialogQuery'.$block['obj_id']);
+			$dlg = _dialogQuery($block['obj_id']);
+			$width = $dlg['width'];
+			break;
 	}
+	$send['level'] = utf8(_blockLevelChange($block['obj_name'], $block['obj_id'], $width));
 
 	return $send;
 }

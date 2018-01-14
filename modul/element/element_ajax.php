@@ -20,8 +20,8 @@ switch(@$_POST['op']) {
 			'spisok_on' => 0,
 			'spisok_name' => '',
 
-			'action_id' => 1,
-			'action_page_id' => 0,
+			'insert_action_id' => 1,
+			'insert_action_page_id' => 0,
 
 			'menu_edit_last' => 1
 		);
@@ -34,10 +34,8 @@ switch(@$_POST['op']) {
 
 		$menu = array(
 			1 => 'Заголовок',
+			2 => 'Содержание',
 	  		4 => 'Служебное',
-			2 => 'Компоненты',
-  		    3 => 'Действие',
-//			5 => 'Отображение полей',
 			9 => '<b class="red">SA</b>'
 		);
 
@@ -66,51 +64,55 @@ switch(@$_POST['op']) {
 			'<div class="dialog-menu-1'._dn($dialog['menu_edit_last'] == 1).'">'.
 				'<div class="pad10 bg-dfd">'.
 					'<div class="hd2 mt5">Внесение новой записи</div>'.
-					'<table class="bs10 w100p">'.
-						'<tr><td class="label w175 r">Заголовок:'.
+					'<table class="bs5 w100p">'.
+						'<tr><td class="grey w175 r">Заголовок:'.
 							'<td><input type="text" id="insert_head" class="w100p" maxlength="200" placeholder="название диалогового окна - новая запись" value="'.$dialog['insert_head'].'" />'.
-						'<tr><td class="label r">Текст кнопки <b>внесения</b>:'.
+						'<tr><td class="grey r">Текст кнопки <b>внесения</b>:'.
 							'<td><input type="text" id="insert_button_submit" class="w200" maxlength="100" value="'.$dialog['insert_button_submit'].'" />'.
-						'<tr><td class="label r">Текст кнопки <b>отмены</b>:'.
+						'<tr><td class="grey r">Текст кнопки <b>отмены</b>:'.
 							'<td><input type="text" id="insert_button_cancel" class="w200" maxlength="100" value="'.$dialog['insert_button_cancel'].'" />'.
+						'<tr><td class="blue r">Дальнейшее действие:'.
+							'<td><input type="hidden" id="insert_action_id" value="'.$dialog['insert_action_id'].'" />'.
+						'<tr class="td-insert-action-page'._dn($dialog['insert_action_id'] == 2).'">'.
+							'<td class="grey r">Страница:'.
+							'<td><input type="hidden" id="insert_action_page_id" value="'.$dialog['insert_action_page_id'].'" />'.
 					'</table>'.
 				'</div>'.
 				'<div class="bg-ffd line-t1 pad10">'.
 					'<div class="hd2 mt5">Редактирование записи</div>'.
 					'<table class="bs10 w100p">'.
-						'<tr><td class="label w175 r">Заголовок:'.
+						'<tr><td class="grey w175 r">Заголовок:'.
 							'<td><input type="text" id="edit_head" class="w100p" maxlength="200" placeholder="название диалогового окна - редактирование" value="'.$dialog['edit_head'].'" />'.
-						'<tr><td class="label r">Текст кнопки <b>сохранения</b>:'.
+						'<tr><td class="grey r">Текст кнопки <b>сохранения</b>:'.
 							'<td><input type="text" id="edit_button_submit" class="w200" maxlength="100" value="'.$dialog['edit_button_submit'].'" />'.
-						'<tr><td class="label r">Текст кнопки <b>отмены</b>:'.
+						'<tr><td class="grey r">Текст кнопки <b>отмены</b>:'.
 							'<td><input type="text" id="edit_button_cancel" class="w200" maxlength="100" value="'.$dialog['edit_button_cancel'].'" />'.
+						'<tr><td class="blue r">Дальнейшее действие:'.
+							'<td><input type="hidden" id="edit_action_id" value="'.$dialog['edit_action_id'].'" />'.
+						'<tr class="td-edit-action-page'._dn($dialog['edit_action_id'] == 2).'">'.
+							'<td class="grey r">Страница:'.
+							'<td><input type="hidden" id="edit_action_page_id" value="'.$dialog['edit_action_page_id'].'" />'.
 					'</table>'.
 				'</div>'.
 				'<div class="bg-fee line-t1 pad10">'.
 					'<div class="hd2 mt5">Удаление записи</div>'.
 					'<table class="bs10 w100p">'.
-						'<tr><td class="label w175 r">Заголовок:'.
+						'<tr><td class="grey w175 r">Заголовок:'.
 							'<td><input type="text" id="del_head" class="w100p" maxlength="200" placeholder="название диалогового окна - удаление" value="'.$dialog['del_head'].'" />'.
-						'<tr><td class="label r">Текст кнопки <b>удаления</b>:'.
+						'<tr><td class="grey r">Текст кнопки <b>удаления</b>:'.
 							'<td><input type="text" id="del_button_submit" class="w200" maxlength="100" value="'.$dialog['del_button_submit'].'" />'.
-						'<tr><td class="label r">Текст кнопки <b>отмены</b>:'.
+						'<tr><td class="grey r">Текст кнопки <b>отмены</b>:'.
 							'<td><input type="text" id="del_button_cancel" class="w200" maxlength="100" value="'.$dialog['del_button_cancel'].'" />'.
+						'<tr><td class="blue r">Дальнейшее действие:'.
+							'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
+						'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
+							'<td class="grey r">Страница:'.
+							'<td><input type="hidden" id="del_action_page_id" value="'.$dialog['del_action_page_id'].'" />'.
 					'</table>'.
 				'</div>'.
 			'</div>'.
 
-			//Служебное
-			'<div class="dialog-menu-4 pad20'._dn($dialog['menu_edit_last'] == 4).'">'.
-				'<table class="bs10">'.
-					'<tr><td class="label w150 r">Может быть списком:'.
-						'<td><input type="hidden" id="spisok_on" value="'.$dialog['spisok_on'].'" />'.
-					'<tr id="tr_spisok_name" class="'.($dialog['spisok_on'] ? '' : 'dn').'">'.
-						'<td class="label r">Имя списка:'.
-						'<td><input type="text" id="spisok_name" class="w200" maxlength="100" value="'.$dialog['spisok_name'].'" />'.
-				'</table>'.
-			'</div>'.
-
-			//Компоненты
+			//Содержание
 			'<div class="dialog-menu-2'._dn($dialog['menu_edit_last'] == 2).'">'.
 				'<div class="pad10 line-b bg-ffc">'.
 					_blockLevelChange('dialog', $dialog_id, $dialog['width']).
@@ -120,17 +122,14 @@ switch(@$_POST['op']) {
 				'</div>'.
 			'</div>'.
 
-			//Действие
-			'<div class="dialog-menu-3 pb20'._dn($dialog['menu_edit_last'] == 3).'">'.
-				'<div class="_info mar20">'.
-					'Дальнейшее действие, которое происходит после внесения или сохранения записи.'.
-				'</div>'.
+			//Служебное
+			'<div class="dialog-menu-4 bg-gr2 pad20'._dn($dialog['menu_edit_last'] == 4).'">'.
 				'<table class="bs10">'.
-					'<tr><td class="label r w100">Действие:'.
-						'<td><input type="hidden" id="action_id" value="'.$dialog['action_id'].'" />'.
-					'<tr class="td-action-page'._dn($dialog['action_id'] == 2).'">'.
-						'<td class="label r">Страница:'.
-						'<td><input type="hidden" id="action_page_id" value="'.$dialog['action_page_id'].'" />'.
+					'<tr><td class="grey w150 r">Может быть списком:'.
+						'<td><input type="hidden" id="spisok_on" value="'.$dialog['spisok_on'].'" />'.
+					'<tr id="tr_spisok_name" class="'.($dialog['spisok_on'] ? '' : 'dn').'">'.
+						'<td class="grey r">Имя списка:'.
+						'<td><input type="text" id="spisok_name" class="w200" maxlength="100" value="'.$dialog['spisok_name'].'" />'.
 				'</table>'.
 			'</div>'.
 
@@ -176,12 +175,6 @@ switch(@$_POST['op']) {
 
 		$send['dialog_id'] = $dialog_id;
 		$send['width'] = _num($dialog['width']);
-		$send['insert_head'] = utf8($dialog['insert_head']);
-		$send['insert_button_submit'] = utf8($dialog['insert_button_submit']);
-		$send['insert_button_cancel'] = utf8($dialog['insert_button_cancel']);
-		$send['edit_head'] = utf8($dialog['edit_head']);
-		$send['edit_button_submit'] = utf8($dialog['edit_button_submit']);
-		$send['edit_button_cancel'] = utf8($dialog['edit_button_cancel']);
 		$send['menu'] = _selArray($menu);
 		$send['block_arr'] = _blockJsArr('dialog', $dialog_id);
 		$send['action'] = _selArray($action);
@@ -248,6 +241,8 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 		jsonError('Не указан текст кнопки внесения');
 	if(!$insert_button_cancel = _txt($_POST['insert_button_cancel']))
 		jsonError('Не указан текст кнопки отмены для новой записи');
+	$insert_action_id = _num($_POST['insert_action_id']);
+	$insert_action_page_id = _num($_POST['insert_action_page_id']);
 
 	if(!$edit_head = _txt($_POST['edit_head']))
 		jsonError('Не указан заголовок редактирования');
@@ -255,6 +250,8 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 		jsonError('Не указан текст кнопки сохранения');
 	if(!$edit_button_cancel = _txt($_POST['edit_button_cancel']))
 		jsonError('Не указан текст кнопки отмены редактирования');
+	$edit_action_id = _num($_POST['edit_action_id']);
+	$edit_action_page_id = _num($_POST['edit_action_page_id']);
 
 	if(!$del_head = _txt($_POST['del_head']))
 		jsonError('Не указан заголовок удаления');
@@ -262,6 +259,8 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 		jsonError('Не указан текст кнопки удаления');
 	if(!$del_button_cancel = _txt($_POST['del_button_cancel']))
 		jsonError('Не указан текст кнопки отмены удаления');
+	$del_action_id = _num($_POST['del_action_id']);
+	$del_action_page_id = _num($_POST['del_action_page_id']);
 
 	if(!$width = _num($_POST['width']))
 		jsonError('Некорректное значение ширины диалога');
@@ -281,8 +280,6 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 
 	$width_auto = _num($_POST['width_auto']);
 	$app_any = _num($_POST['app_any']);
-	$action_id = _num($_POST['action_id']);
-	$action_page_id = _num($_POST['action_page_id']);
 
 	$element_name = _txt($_POST['element_name']);
 	$element_width = _num($_POST['element_width']);
@@ -313,21 +310,25 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`insert_head`='".addslashes($insert_head)."',
 				`insert_button_submit`='".addslashes($insert_button_submit)."',
 				`insert_button_cancel`='".addslashes($insert_button_cancel)."',
+				`insert_action_id`=".$insert_action_id.",
+				`insert_action_page_id`=".$insert_action_page_id.",
 
 				`edit_head`='".addslashes($edit_head)."',
 				`edit_button_submit`='".addslashes($edit_button_submit)."',
 				`edit_button_cancel`='".addslashes($edit_button_cancel)."',
+				`edit_action_id`=".$edit_action_id.",
+				`edit_action_page_id`=".$edit_action_page_id.",
 
 				`del_head`='".addslashes($del_head)."',
 				`del_button_submit`='".addslashes($del_button_submit)."',
 				`del_button_cancel`='".addslashes($del_button_cancel)."',
+				`del_action_id`=".$del_action_id.",
+				`del_action_page_id`=".$del_action_page_id.",
 
 				`base_table`='".addslashes($base_table)."',
 				`spisok_on`=".$spisok_on.",
 				`spisok_name`='".addslashes($spisok_name)."',
 
-				`action_id`=".$action_id.",
-				`action_page_id`=".$action_page_id.",
 
 				`element_name`='".addslashes($element_name)."',
 				`element_width`=".$element_width.",
@@ -364,9 +365,15 @@ function _dialogOpenLoad($dialog_id) {
 	}
 
 	$page_id = _num($_POST['page_id']);
+
+	$act = $unit_id ? 'edit' : 'insert';
+	if(_num(@$_POST['del']))
+		$act = 'del';
+
 	$send['dialog_id'] = $dialog_id;
 	$send['unit_id'] = $unit_id;
 	$send['block_id'] = _num(@$_POST['block_id']);
+	$send['act'] = $act;
 
 	//исходные данные, полученные для открытия диалога
 	$unit['source'] = array(
@@ -375,9 +382,9 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send['edit_access'] = SA || $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
-	$send['head'] = utf8($dialog[!$unit_id ? 'insert_head' : 'edit_head']);
-	$send['button_submit'] = utf8($dialog[!$unit_id ? 'insert_button_submit' : 'edit_button_submit']);
-	$send['button_cancel'] = utf8($dialog[!$unit_id ? 'insert_button_cancel' : 'edit_button_cancel']);
+	$send['head'] = utf8($dialog[$act.'_head']);
+	$send['button_submit'] = utf8($dialog[$act.'_button_submit']);
+	$send['button_cancel'] = utf8($dialog[$act.'_button_cancel']);
 	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
 
 	//заполнение значениями некоторых компонентов
@@ -495,7 +502,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['unit'] = $unit;
 
 	//если производится удаление единицы списка
-	if($send['to_del'] = _num(@$_POST['to_del'])) {
+	if($act == 'del') {
 		if(!$unit_id)
 			jsonError('Отсутствует единица списка для удаления');
 
@@ -504,9 +511,8 @@ function _dialogOpenLoad($dialog_id) {
 				'<div class="_info b">Подтвердите удаление записи.</div>'.
 			'</div>';
 
-		$send['head'] = utf8('Удаление записи');
+		$send['width'] = 480;
 		$send['html'] = utf8($html);
-		$send['button_submit'] = utf8('Удалить');
 	}
 
 	return $send;

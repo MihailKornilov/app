@@ -235,50 +235,6 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 			}
 		}
 
-
-	$sql = "SELECT *
-			FROM `_dialog_component`
-			WHERE `dialog_id`=".$dialog_id."
-			ORDER BY `sort`";
-	$component = query_arr($sql);
-	foreach($component as $id => $r) {
-		$component[$id]['type_name'] = _dialogEl($r['type_id'], 'name');
-		$component[$id]['label_html'] = $r['label_name'] ?
-										$r['label_name']
-										:
-										'<span class="grey i b">'.
-											$component[$id]['type_name'].
-										($r['type_id'] == 1 ? ': <i>'.$r['txt_1'].'</i>' : '').
-										'</span>';
-		$component[$id]['v_ass'] = array();
-		$component[$id]['func'] = array();
-		$component[$id]['func_action_ass'] = array();//ассоциативный массив действий для конкретного компонента
-	}
-
-
-	$sql = "SELECT *
-			FROM `_dialog_component_func`
-			WHERE `component_id` IN ("._idsGet($component).")
-			ORDER BY `component_id`,`id`";
-	$func = array();
-	foreach(query_arr($sql) as $r) {
-		$component[$r['component_id']]['func'][] = array(
-			'action_id' => _num($r['action_id']),
-			'cond_id' => _num($r['cond_id']),
-			'component_ids' => $r['component_ids']
-		);
-		$component[$r['component_id']]['func_action_ass'][$r['action_id']] = 1;
-
-		if(!isset($func[$r['component_id']]))
-			$func[$r['component_id']] = array();
-
-		$func[$r['component_id']][] = array(
-			'action_id' => _num($r['action_id']),
-			'cond_id' => _num($r['cond_id']),
-			'ids' => $r['component_ids']
-		);
-	}
-
 	//получение списка колонок, присутствующих в таблице
 	$col = array();
 	$sql = "DESCRIBE `".$dialog['base_table']."`";
@@ -288,8 +244,6 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	$dialog['cmp'] = $cmp;
 	$dialog['cmp_utf8'] = $cmpUtf8;
 	$dialog['v_ass'] = $v_ass;
-	$dialog['component'] = $component;
-	$dialog['func'] = $func;
 	$dialog['field'] = $col;
 
 	return _cache($dialog);
@@ -297,7 +251,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 function _dialogParam($dialog_id, $param) {//получение конкретного параметра диалога
 	$dialog = _dialogQuery($dialog_id);
 	if(!isset($dialog[$param]))
-		return 'Неизвестный параметр диалога '.$param;
+		return 'Неизвестный параметр диалога: '.$param;
 	return $dialog[$param];
 }
 function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
@@ -392,8 +346,8 @@ function _dialogSpisokGetPage($page_id) {//список объектов, которые поступают на
 	$sql = "SELECT `id`,`spisok_name`
 			FROM `_dialog`
 			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
-			  AND `action_id`=2
-			  AND `action_page_id`=".$page_id;
+			  AND `insert_action_id`=2
+			  AND `insert_action_page_id`=".$page_id;
 	if(!$send = query_ass($sql))
 		return array();
 
@@ -500,7 +454,7 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
             */
 			_dialogElHtmlContent().
 			'<table class="bs5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Текст для галочки:'.
+				'<tr><td class="grey r '.EL_LABEL_W.'">Текст для галочки:'.
 					'<td><input type="text" class="w250" id="txt_1" />'.
 			'</table>'.
 			_dialogElHtmlPrev(),
@@ -520,7 +474,7 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
 			_dialogElHtmlContent(1).
 			'<div class="hd2 ml20 mr20">Содержание выпадающего списка:</div>'.
 			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Нулевое значение:'.
+				'<tr><td class="grey r '.EL_LABEL_W.'">Нулевое значение:'.
 					'<td><input type="hidden" id="num_3" value="1" />'.
 						'<input type="text" class="w230 ml5" id="txt_1" value="не выбрано" />'.
 			'</table>'.
@@ -538,7 +492,7 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
              */
 			_dialogElHtmlContent(1).
 			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Подсказка в поле:'.
+				'<tr><td class="grey r '.EL_LABEL_W.'">Подсказка в поле:'.
 					'<td><input type="text" class="w300" id="txt_1" />'.
 			'</table>'.
 			_dialogElHtmlPrev('<input type="text" id="elem-attr-id" class="w250" />'),
@@ -556,9 +510,9 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
              */
 			_dialogElHtmlContent(1).
 			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Выбор прошедших дней:'.
+				'<tr><td class="grey r '.EL_LABEL_W.'">Выбор прошедших дней:'.
 					'<td><input type="hidden" id="num_3" />'.
-				'<tr><td class="label r">Ссылка <u>завтра</u>:'.
+				'<tr><td class="grey r">Ссылка <u>завтра</u>:'.
 					'<td><input type="hidden" id="num_4" />'.
 			'</table>'.
 			_dialogElHtmlPrev(),
@@ -567,7 +521,7 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
 				txt_1 - текст информации
              */
 			'<table class="bs5 mt5">'.
-				'<tr><td class="label r topi '.EL_LABEL_W.'">Текст:'.
+				'<tr><td class="grey r topi '.EL_LABEL_W.'">Текст:'.
 					'<td><textarea id="txt_1" class="w300"></textarea>'.
 			'</table>'.
 			'<div id="prev-tab" class="mt20 pad20 pt10">'.
@@ -588,9 +542,9 @@ function _dialogEl($type_id=0, $i='') {//данные всех элементов, используемых в д
  				txt_1  - текст заголовка
             */
 			'<table class="bs5 mt5">'.
-				'<tr><td class="label r '.EL_LABEL_W.'">Вид:'.
+				'<tr><td class="grey r '.EL_LABEL_W.'">Вид:'.
 					'<td><input type="hidden" id="num_1" value="2" />'.
-				'<tr><td class="label r">Текст:'.
+				'<tr><td class="grey r">Текст:'.
 					'<td><input type="text" class="w300" id="txt_1" />'.
 			'</table>'.
 			'<div class="b ml20 mt20 mb5">Предосмотр:</div>'.
@@ -663,7 +617,7 @@ function _dialogElHtmlPrev($inp='<input type="hidden" id="elem-attr-id" />') {//
 	'<div id="prev-tab" class="mt20 pad20 pt10 bor-f0 bg-ffe">'.
 		'<div class="hd2">Предварительный просмотр:</div>'.
 		'<table class="bs5 w100p mt10">'.
-			'<tr><td id="label-prev" class="label r '.EL_LABEL_W.'">'.
+			'<tr><td id="label-prev" class="grey r '.EL_LABEL_W.'">'.
 				'<td>'.$inp.
 		'</table>'.
 	'</div>';
