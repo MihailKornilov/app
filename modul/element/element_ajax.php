@@ -149,6 +149,11 @@ switch(@$_POST['op']) {
 						'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
 					'<tr><td class="red r">ћинимальна€ ширина:'.
 						'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
+					'<tr><td class="red r">Ќастраивать стили:'.
+						'<td>'._check(array(
+									'attr_id' => 'element_style_access',
+									'value' => $dialog['element_style_access']
+							   )).
 				'</table>'.
 			'</div>'
 	  : '');
@@ -259,6 +264,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_name = _txt($_POST['element_name']);
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
+	$element_style_access = _num($_POST['element_style_access']);
 
 	if(!$dialog_id) {
 		$sql = "INSERT INTO `_dialog` (
@@ -298,6 +304,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_name`='".addslashes($element_name)."',
 				`element_width`=".$element_width.",
 				`element_width_min`=".$element_width_min.",
+				`element_style_access`=".$element_style_access.",
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;

@@ -337,54 +337,22 @@ function _elemStyle($el) {//стили css для элемента
 
 	return ' style="'.implode(';', $send).'"';
 }
-function _elemWidth($dialog_id, $i='access') {//получение информации о ширине элементов
-	/*
-		   def: ширина по умолчанию (для внесения нового элемента)
-		   min: минимальная ширина, которую можно установить элементу
-		access: определение элементов, у которых может настраиваться ширина
-	*/
-
-	if($i == 'def')
-		switch($dialog_id) {
-			case 5:  return 150;//textarea
-			case 6:  return 150;//select - выбор страницы
-			case 7:  return 150;//search
-			case 8:  return 150;//input:text
-			case 17: return 150;//select - произвольные значения
-			case 24: return 150;//select - выбор списка
-			case 27: return 150;//select - выбор списка, размещённого на текущей странице
-			case 29: return 150;//select - выбор единицы из другого списка (для связки)
-			default: return 0;
-		}
-
-	if($i == 'min')
-		switch($dialog_id) {
-			case 2:  return 30;//button
-			case 5:  return 30;//textarea
-			case 6:  return 50;//select - выбор страницы
-			case 7:  return 70;//search
-			case 8:  return 30;//input:text
-			case 17: return 50;//select - произвольные значения
-			case 24: return 70;//select - выбор списка
-			case 27: return 70;//select - выбор списка, размещённого на текущей странице
-			case 29: return 70;//select - выбор единицы из другого списка (для связки)
-			default: return 0;
-		}
-
-	//$i == 'access'
-	switch($dialog_id) {
-		case 2:  //кнопка
-		case 5:  //textarea
-		case 6:  //select - выбор страницы
-		case 7:  //search
-		case 8:  //input:text
-		case 17: //select - произвольные значения
-		case 24: //select - выбор списка
-		case 27: //select - выбор списка, размещённого на текущей странице
-		case 29: //select - выбор единицы из другого списка (для связки)
-		case 0: return 1;
-		default: return 0;
-	}
+function _elemColor() {//массив цветов для текста в формате JS, доступных элементам
+	return
+		'"":["#000","Чёрный"],'.
+		'"color-555":["#555","Тёмно-серый"],'.
+		'"grey":["#888","Серый"],'.
+		'"pale":["#aaa","Бледный"],'.
+		'"color-ccc":["#ccc","Совсем бледный"],'.
+		'"blue":["#2B587A","Тёмно-синий"],'.
+		'"color-acc":["#07a","Синий"],'.
+		'"color-sal":["#770","Салатовый"],'.
+		'"color-pay":["#090","Зелёный"],'.
+		'"color-aea":["#aea","Ярко-зелёный"],'.
+		'"color-ref":["#800","Тёмно-красный"],'.
+		'"red":["#e22","Красный"],'.
+		'"color-del":["#a66","Тёмно-бордовый"],'.
+		'"color-vin":["#c88","Бордовый"]';
 }
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	$unitExist = isset($unit['id']);
@@ -868,33 +836,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	}
 
 	return'неизвестный элемент='.$el['dialog_id'];
-}
-function _elemFontAllow($dialog_id) {//отображение в настройках стилей для конкретных элементов страницы
-	$elem = array(
-		0 => 1,
-		9 => 1,
-		10 => 1,
-		11 => 1,
-		15 => 1
-	);
-	return _num(@$elem[$dialog_id]);
-}
-function _elemColor() {//массив цветов для текста в формате JS, доступных элементам
-	return
-		'"":["#000","Чёрный"],'.
-		'"color-555":["#555","Тёмно-серый"],'.
-		'"grey":["#888","Серый"],'.
-		'"pale":["#aaa","Бледный"],'.
-		'"color-ccc":["#ccc","Совсем бледный"],'.
-		'"blue":["#2B587A","Тёмно-синий"],'.
-		'"color-acc":["#07a","Синий"],'.
-		'"color-sal":["#770","Салатовый"],'.
-		'"color-pay":["#090","Зелёный"],'.
-		'"color-aea":["#aea","Ярко-зелёный"],'.
-		'"color-ref":["#800","Тёмно-красный"],'.
-		'"red":["#e22","Красный"],'.
-		'"color-del":["#a66","Тёмно-бордовый"],'.
-		'"color-vin":["#c88","Бордовый"]';
 }
 
 function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц

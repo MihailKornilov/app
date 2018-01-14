@@ -241,7 +241,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						'<td>' + _elemUnitPlace(EL) +
 				'</table>' +
 
-			(EL.fontAllow ?
+			(EL.style_access ?
 				'<table class="w100p mt10">' +
 					'<tr><td>' + _elemUnitFont(EL) +
 						'<td>' + _elemUnitColor(EL) +
@@ -436,7 +436,7 @@ $(document)
 			_forIn(res.block_arr, function(sp, k) {
 				$('._hint').remove();
 				BLOCK_ARR[k] = sp;
-				if(!on || !sp.width_change)
+				if(!on || !sp.width_min)
 					return;
 
 				//аффикс к атрибуту элемента, если нужно

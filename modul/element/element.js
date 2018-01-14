@@ -429,6 +429,7 @@ var VK_SCROLL = 0,
 				element_name:$('#element_name').val(),
 				element_width:$('#element_width').val(),
 				element_width_min:$('#element_width_min').val(),
+				element_style_access:$('#element_style_access').val(),
 
 				menu_edit_last:$('#dialog-menu').val()
 			};
