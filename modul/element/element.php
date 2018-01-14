@@ -294,60 +294,6 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	return _cache($dialog);
 }
-/*
-function _dialogValToId($val='') {//получение id диалога на основании имени val
-	//если такого имени нет, то внесение диалога в базу
-
-	if(!$val = _txt($val))
-		return 0;
-
-//	_cache('clear', '_dialogValToIdbutton172');
-
-	if($dialog_id = _cache())
-		return $dialog_id;
-
-	$sql = "SELECT `id`
-			FROM `_dialog`
-			WHERE `val`='".$val."'
-			LIMIT 1";
-	if($dialog_id = query_value($sql))
-		return _cache($dialog_id);
-
-	$sql = "INSERT INTO `_dialog` (
-				`app_id`,
-				`val`,
-
-				`head_insert`,
-				`button_insert_submit`,
-				`button_insert_cancel`,
-
-				`head_edit`,
-				`button_edit_submit`,
-				`button_edit_cancel`
-			) VALUES (
-				".APP_ID.",
-				'".$val."',
-
-				'".$val." - внесение',
-				'Внести',
-				'Отмена',
-
-				'".$val." - сохранение',
-				'Сохранить',
-				'Отмена'
-			)";
-	query($sql);
-
-	$dialog_id = query_insert_id('_dialog');
-	
-	$sql = "UPDATE `_dialog`
-			SET `spisok_name`='Список ".$dialog_id."'
-			WHERE `id`=".$dialog_id;
-	query($sql);
-	
-	return _cache($dialog_id);
-}
-*/
 function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$cond = "`spisok_on`";
 	$cond .= " AND `app_id` IN (0,".APP_ID.")";

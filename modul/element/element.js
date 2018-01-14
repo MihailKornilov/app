@@ -376,6 +376,9 @@ var VK_SCROLL = 0,
 			spisok:PAGE_LIST
 		});
 
+		$('#element_width')._count({width:60,step:10});
+		$('#element_width_min')._count({width:60,step:10});
+
 		_dialogHeightCorrect();
 
 		//установка линии дл€ настройки ширины диалога
@@ -422,6 +425,10 @@ var VK_SCROLL = 0,
 				base_table:$('#base_table').val(),
 				app_any:$('#app_any').val(),
 				sa:$('#sa').val(),
+
+				element_name:$('#element_name').val(),
+				element_width:$('#element_width').val(),
+				element_width_min:$('#element_width_min').val(),
 
 				menu_edit_last:$('#dialog-menu').val()
 			};

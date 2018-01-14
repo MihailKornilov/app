@@ -119,7 +119,8 @@ switch(@$_POST['op']) {
 			'</div>'.
 
 			//SA
-	  (SA ? '<div class="dialog-menu-9 pt20 pb20'._dn($dialog['menu_edit_last'] == 9).'">'.
+	  (SA ? '<div class="dialog-menu-9 pad20'._dn($dialog['menu_edit_last'] == 9).'">'.
+		        '<div class="hd2">Информация о диалоговом окне:</div>'.
 				'<table class="bs10">'.
 					'<tr><td class="red w175 r">ID:<td class="b">'.$dialog['id'].
 					'<tr><td class="red r">Ширина:'.
@@ -128,16 +129,26 @@ switch(@$_POST['op']) {
 					'<tr><td class="red r">Таблица в базе:'.
 						'<td><input type="text" id="base_table" class="w230" maxlength="30" value="'.$dialog['base_table'].'" />'.
 					//доступность диалога. На основании app_id. По умолчанию 0 - недоступен всем.
-					'<tr><td class="red r">App any:'.
+					'<tr><td class="red r">Доступ всем приложениям:'.
 						'<td>'._check(array(
 									'attr_id' => 'app_any',
 									'value' => $dialog['id'] ? ($dialog['app_id'] ? 0 : 1) : 0
 							   )).
-					'<tr><td class="red r">SA only:'.
+					'<tr><td class="red r">Доступ только SA:'.
 						'<td>'._check(array(
 									'attr_id' => 'sa',
 									'value' => $dialog['sa']
 							   )).
+				'</table>'.
+
+		        '<div class="hd2 mt20">Настройки как элемента:</div>'.
+				'<table class="bs10">'.
+					'<tr><td class="red w175 r">Имя элемента:'.
+		                '<td><input type="text" id="element_name" class="w230" maxlength="100" value="'.$dialog['element_name'].'" />'.
+					'<tr><td class="red r">Начальная ширина:'.
+						'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
+					'<tr><td class="red r">Минимальная ширина:'.
+						'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
 				'</table>'.
 			'</div>'
 	  : '');
@@ -245,6 +256,10 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$action_id = _num($_POST['action_id']);
 	$action_page_id = _num($_POST['action_page_id']);
 
+	$element_name = _txt($_POST['element_name']);
+	$element_width = _num($_POST['element_width']);
+	$element_width_min = _num($_POST['element_width_min']);
+
 	if(!$dialog_id) {
 		$sql = "INSERT INTO `_dialog` (
 					`app_id`
@@ -253,6 +268,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				)";
 		query($sql);
 		$dialog_id = query_insert_id('_dialog');
+		$element_name = 'элемент '.$dialog_id;
 	}
 
 	if(!_dialogQuery($dialog_id))
@@ -278,6 +294,10 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 
 				`action_id`=".$action_id.",
 				`action_page_id`=".$action_page_id.",
+
+				`element_name`='".addslashes($element_name)."',
+				`element_width`=".$element_width.",
+				`element_width_min`=".$element_width_min.",
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;
@@ -365,12 +385,13 @@ function _dialogOpenLoad($dialog_id) {
 
 				$spisok = array();
 				foreach($arr as $r) {
+					$elDialog = _dialogQuery($r['dialog_id'] == 31 ? $elem[$r['num_1']] : $r['dialog_id']);
 					$spisok[] = array(
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
 						'width' => _num($r['width']),
 						'tr' => utf8($r['txt_1']),
-						'title' => utf8(_elemName($r['dialog_id'] == 31 ? $elem[$r['num_1']] : $r['dialog_id'])),
+						'title' => utf8($elDialog['element_name']),
 						'font' => $r['font'],
 						'color' => $r['color'],
 						'pos' => $r['txt_6']

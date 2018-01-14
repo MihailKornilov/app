@@ -306,7 +306,6 @@ function _elemDiv($el, $unit=array()) {//формирование div элемента
 	$cls = implode(' ', $cls);
 	$cls = $cls ? ' class="'.$cls.'"' : '';
 
-
 	return
 	'<div'.$attr_id.$cls._elemStyle($el).'>'.
 		_elemUnit($el, $unit).
@@ -386,19 +385,6 @@ function _elemWidth($dialog_id, $i='access') {//получение информации о ширине эл
 		case 0: return 1;
 		default: return 0;
 	}
-}
-function _elemName($dialog_id) {//название элемента по dialog_id
-	switch($dialog_id) {
-		case 1:  return 'галочка';
-		case 5:  return 'многострочное поле';
-		case 8:  return 'однострочное поле';
-		case 10: return 'текст';
-		case 16: return 'радио';
-		case 17: return 'выпадающе поле';
-		case 32: return 'номер';
-		case 33: return 'дата';
-	}
-	return 'элемент '.$dialog_id;
 }
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	$unitExist = isset($unit['id']);
@@ -962,19 +948,6 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 
 
-function _pageSpisokUnit() {//todo для тестов
-	if(!$unit_id = _num(@$_GET['id']))
-		return '';
-
-	$sql = "SELECT *
-			FROM `_spisok`
-			WHERE `app_id` IN (0,".APP_ID.")
-			  AND `id`=".$unit_id;
-	if(!$unit = query_assoc($sql))
-		return '<div class="fs10 pale">записи не существует</div>';
-
-	return _pr($unit);
-}
 function _page_div() {//todo тест
 	return
 	'<div class="mar20 bor-e8 pad20" id="for-hint">'.
