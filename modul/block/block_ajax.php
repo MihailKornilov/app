@@ -50,7 +50,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'block_elem_width_save'://включение/выключение изменения ширины элементов
+	case 'block_elem_width_save'://сохранение ширины элемента
 		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Некорректный ID элемента');
 
@@ -62,7 +62,7 @@ switch(@$_POST['op']) {
 		if(!$elem = query_assoc($sql))
 			jsonError('Элемента не существует');
 
-		if(!_elemWidth($elem['dialog_id']))
+		if(!_dialogParam($elem['dialog_id'], 'element_width'))
 			jsonError('У этого элемента не может настраиваться ширина');
 
 		$sql = "UPDATE `_element`

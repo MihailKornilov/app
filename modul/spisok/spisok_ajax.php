@@ -500,7 +500,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			}
 			if($r['Field'] == 'width' && $dialog['base_table'] == '_element') {
 				$sql = "UPDATE `_element`
-						SET `width`="._elemWidth($dialog_id, 'def')."
+						SET `width`=".$dialog['element_width']."
 						WHERE `id`=".$unit_id;
 				query($sql);
 				continue;

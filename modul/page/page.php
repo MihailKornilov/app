@@ -329,7 +329,7 @@ function _elemStyle($el) {//стили css для элемента
 
 	//когда включена настройка ширины элементов,
 	//те элементы, которые могут настраиваться, остаются, остальные скрываются
-	if(ELEM_WIDTH_CHANGE && !_elemWidth($el['dialog_id']))
+	if(ELEM_WIDTH_CHANGE && !_dialogParam($el['dialog_id'], 'element_width'))
 		$send[] = 'visibility:hidden';
 
 	if(!$send)

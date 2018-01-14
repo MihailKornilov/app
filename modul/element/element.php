@@ -294,6 +294,12 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	return _cache($dialog);
 }
+function _dialogParam($dialog_id, $param) {//получение конкретного параметра диалога
+	$dialog = _dialogQuery($dialog_id);
+	if(!isset($dialog[$param]))
+		return 'Неизвестный параметр диалога '.$param;
+	return $dialog[$param];
+}
 function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$cond = "`spisok_on`";
 	$cond .= " AND `app_id` IN (0,".APP_ID.")";
