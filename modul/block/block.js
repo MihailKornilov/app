@@ -30,7 +30,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					_blockUnitBut(BL) +
 				'</div>' +
 				_elemUnit(BL),
-			width:240,
+			width:238,
 			objPos:'mouse',
 			show:1,
 			delayShow:500,
@@ -65,7 +65,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					}
 				});
 				$('#block-width-auto')._check({
-					title:'<div class="fs12">width auto</div>',
+					title:'<div class="fs11">width auto</div>',
 					func:function(v) {
 						BL.width_auto = v;
 						BL.save = 1;
@@ -154,10 +154,10 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 			'<tr><td class="color-555 fs14 pr5">Заливка:' +
 				'<td><div id="block-set-bg">' +
 						'<div class="' + (BL.bg == 'bg-fff' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP     bg-fff" val="bg-fff"></div>' +
-						'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr1" val="bg-gr1"></div>' +
-						'<div class="' + (BL.bg == 'bg-gr3' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr3" val="bg-gr3"></div>' +
-						'<div class="' + (BL.bg == 'bg-gr2' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-gr2" val="bg-gr2"></div>' +
-						'<div class="' + (BL.bg == 'bg-ffe' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml5 bg-ffe" val="bg-ffe"></div>' +
+						'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-gr1" val="bg-gr1"></div>' +
+						'<div class="' + (BL.bg == 'bg-gr3' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-gr3" val="bg-gr3"></div>' +
+						'<div class="' + (BL.bg == 'bg-gr2' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-gr2" val="bg-gr2"></div>' +
+						'<div class="' + (BL.bg == 'bg-ffe' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-ffe" val="bg-ffe"></div>' +
 					'</div>' +
 			'</table>';
 	},
