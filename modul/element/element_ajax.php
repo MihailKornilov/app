@@ -235,6 +235,9 @@ switch(@$_POST['op']) {
 }
 
 function _dialogUpdate($dialog_id) {//обновление диалога
+	if(!_dialogQuery($dialog_id))
+		jsonError('Диалога не существует');
+
 	if(!$insert_head = _txt($_POST['insert_head']))
 		jsonError('Не указан заголовок для внесения записи');
 	if(!$insert_button_submit = _txt($_POST['insert_button_submit']))
@@ -285,21 +288,6 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
 	$element_style_access = _num($_POST['element_style_access']);
-
-	if(!$dialog_id) {
-		$sql = "INSERT INTO `_dialog` (
-					`app_id`
-				) VALUES (
-					".APP_ID."
-				)";
-		query($sql);
-		$dialog_id = query_insert_id('_dialog');
-		if(!$element_name)
-			$element_name = 'элемент '.$dialog_id;
-	}
-
-	if(!_dialogQuery($dialog_id))
-		jsonError('Диалога не существует');
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",

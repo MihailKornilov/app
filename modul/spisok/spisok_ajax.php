@@ -227,6 +227,14 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 		$unit_id = query_insert_id($dialog['base_table']);
 
+		//если вносится кнопка, то применение к ней диалогового окна
+		if($dialog_id == 2) {
+			$sql = "UPDATE `_element`
+					SET `num_4`="._dialogNew()."
+					WHERE `id`=".$unit_id;
+			query($sql);
+		}
+
 		//обновление некоторых колонок
 		$sql = "DESCRIBE `".$dialog['base_table']."`";
 		$desc = query_array($sql);

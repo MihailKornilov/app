@@ -152,7 +152,20 @@ function _search($v=array()) {//элемент ПОИСК
 }
 
 
+function _dialogNew() {//создание нового диалогового окна в базе
+	$sql = "INSERT INTO `_dialog` (`app_id`) VALUES (".APP_ID.")";
+	query($sql);
 
+	$dialog_id = query_insert_id('_dialog');
+
+	$sql = "UPDATE `_dialog`
+			SET `element_name`='элемент ".$dialog_id."',
+				`spisok_name`='Список ".$dialog_id."'
+			WHERE `id`=".$dialog_id;
+	query($sql);
+
+	return $dialog_id;
+}
 function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	if($dialog = _cache())
 		return $dialog;
