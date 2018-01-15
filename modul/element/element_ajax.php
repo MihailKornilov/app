@@ -80,7 +80,7 @@ switch(@$_POST['op']) {
 				'</div>'.
 				'<div class="bg-ffd line-t1 pad10">'.
 					'<div class="hd2 mt5">Редактирование записи</div>'.
-					'<table class="bs10 w100p">'.
+					'<table class="bs5 w100p">'.
 						'<tr><td class="grey w175 r">Заголовок:'.
 							'<td><input type="text" id="edit_head" class="w100p" maxlength="200" placeholder="название диалогового окна - редактирование" value="'.$dialog['edit_head'].'" />'.
 						'<tr><td class="grey r">Текст кнопки <b>сохранения</b>:'.
@@ -96,7 +96,7 @@ switch(@$_POST['op']) {
 				'</div>'.
 				'<div class="bg-fee line-t1 pad10">'.
 					'<div class="hd2 mt5">Удаление записи</div>'.
-					'<table class="bs10 w100p">'.
+					'<table class="bs5 w100p">'.
 						'<tr><td class="grey w175 r">Заголовок:'.
 							'<td><input type="text" id="del_head" class="w100p" maxlength="200" placeholder="название диалогового окна - удаление" value="'.$dialog['del_head'].'" />'.
 						'<tr><td class="grey r">Текст кнопки <b>удаления</b>:'.

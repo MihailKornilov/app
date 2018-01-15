@@ -361,7 +361,7 @@ var VK_SCROLL = 0,
 
 		_forN(['insert', 'edit', 'del'], function(act) {
 			$('#' + act + '_action_id')._select({
-				width:300,
+				width:270,
 				title0:'действия нет, закрыть окно',
 				spisok:o.action,
 				func:function(v) {

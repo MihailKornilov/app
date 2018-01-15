@@ -321,6 +321,7 @@
 	border:none;
 	padding:6px 0 6px 8px;
 }
+._select .select-inp[readonly]{cursor:pointer}
 ._select .select-inp::-webkit-input-placeholder{color:#999}
 ._select .select-inp::-moz-placeholder{color:#444}
 ._select .select-inp._busy{background-position:right center}
