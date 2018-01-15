@@ -283,7 +283,7 @@ function _pageShow($page_id) {
 
 	return
 	_blockHtml('page', $page_id).
-//	_page_div().
+	_page_div().
 	'<script>'.
 		'var PAGE_LIST='._page('for_select', 'js').','.
 			'BLOCK_ARR='._blockJS('page', $page_id).','.
@@ -407,8 +407,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 8:
 			/*
 				txt_1 - текст для placeholder
+				txt_2 - текст по умолчанию
 			*/
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+			$v = empty($v) ? $el['txt_2'] : $v;
 			return '<input type="text" id="'.$attr_id.'"'.$width.$placeholder.$disabled.' value="'.$v.'" />';
 
 		//Radio
@@ -493,6 +495,16 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
                 num_1 - id диалога, через который вносятся данные выбираемого списка
                 txt_1 - текст, когда единица не выбрана
+			*/
+			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+
+		//Count - количество
+		case 35:
+			/*
+                num_1 - минимальное значение
+                num_2 - максимальное значение
+                num_3 - шаг
+                num_4 - может быть отрицательным (галочка)
 			*/
 			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
 
@@ -926,14 +938,12 @@ function _page_div() {//todo тест
 		' Попутный текст'.
 	'</div>'.
 
-	_pr(_page('all', 'js')).
-
 	'<button class="vk mar20" id="bbb">Кнопка для сохранения</button>'.
 
 	'<br>'.
 	'<br>'.
 	'<br>'.
-	'<div class="bg-fcc w200">'.
+	'<div class="w200">'.
 		'<input type="hidden" class="aaa" />'.
 	'</div>'.
 

@@ -956,6 +956,17 @@ var VK_SCROLL = 0,
 						return;
 					_dialogSpisokTable(sp, unit);
 					return;
+				//count - количество
+				case 35:
+					console.log(sp)
+					$(sp.attr_id)._count({
+						width:sp.width,
+						min:sp.num_1,
+						max:sp.num_2,
+						step:sp.num_3,
+						minus:sp.num_4
+					});
+					return;
 			}
 		});
 
@@ -1042,20 +1053,21 @@ var VK_SCROLL = 0,
 		return '<div class="center">' +
 			'<p class="mt10 fs17"> омпоненты дл€ внесени€ данных:' +
 			'<p class="mt10">' +
-				'<button val="8" class="vk grey">ќднострочное поле</button>' +
-				'<button val="5" class="vk grey ml10">ћногострочное поле</button>' +
+				'<button val="8" class="vk grey" data-hint="">ќднострочное поле</button>' +
+				'<button val="5" class="vk grey ml10" data-hint="">ћногострочное поле</button>' +
 			'<p class="mt10">' +
-				'<button val="1" class="vk">√алочка</button>' +
-				'<button val="16" class="vk ml10">Radio</button>' +
-				'<button val="-6" class="vk ml10"> алендарь</button>' +
+				'<button val="1" class="vk" data-hint="√алочка">1</button>' +
+				'<button val="16" class="vk ml5" data-hint="Radio">16</button>' +
+				'<button val="-6" class="vk ml5" data-hint=" алендарь">-</button>' +
+				'<button val="35" class="vk ml5" data-hint=" оличество">35</button>' +
 			'<p class="mt10">' +
-				'<button val="17" class="vk">Select - произвольные значени€</button>' +
-				'<button val="6" class="vk ml10">Select - страницы</button>' +
+				'<button val="17" class="vk" data-hint="">Select - произвольные значени€</button>' +
+				'<button val="6" class="vk ml10" data-hint="">Select - страницы</button>' +
 			'<p class="mt10">' +
-				'<button val="24" class="vk">Select - списки приложени€</button>' +
-				'<button val="27" class="vk ml10">Select - списки на текущей странице</button>' +
+				'<button val="24" class="vk" data-hint="">Select - списки приложени€</button>' +
+				'<button val="27" class="vk ml10" data-hint="">Select - списки на текущей странице</button>' +
 			'<p class="mt10">' +
-				'<button val="29" class="vk">Select - выбор единицы из другого списка (св€зка)</button>' +
+				'<button val="29" class="vk" data-hint="Select - выбор единицы из другого списка (св€зка)">29</button>' +
 
 			'<p class="mt30 fs17">¬спомогательные компоненты:' +
 			'<p class="mt10">' +
@@ -1415,20 +1427,21 @@ $.fn._count = function(o) {//input с количеством
 		s;
 
 	if(!attr_id) {
-		attr_id = 'radio' + Math.round(Math.random() * 100000);
+		attr_id = 'count' + Math.round(Math.random() * 100000);
 		t.attr('id', attr_id);
 	}
 
 	var win = attr_id + '_count';
 
 	o = $.extend({
-		width:50,
+		width:50,   //если 0 = 100%
 		bold:0,
 		min:false,  //минимальное значение
 		max:false,  //максимальное значение
 		minus:0,    //может уходить в минус
 		step:1,     //шаг
 		tooltip:'',
+		disabled:0,
 		func:function() {}
 	}, o);
 
@@ -1438,14 +1451,15 @@ $.fn._count = function(o) {//input с количеством
 	var val = _num(t.val());
 	valCorrect();
 	t.val(val)
-	 .width(o.width - 18)
 	 .attr('type', 'text')
 	 .attr('readonly', true);
 
 	if(o.bold)
 		t.addClass('b');
 
-	t.wrap('<div class="_count" id="' + win + '">');
+	var width = 'width:' + (o.width ? o.width + 'px' : '100%'),
+		dis = o.disabled ? ' disabled' : '';
+	t.wrap('<div class="_count' + dis + '" id="' + win + '" style="' + width + '">');
 
 	var el = $('#' + win);
 	el._dn(val, 'nol');
@@ -1458,6 +1472,8 @@ $.fn._count = function(o) {//input с количеством
 		el._tooltip(o.tooltip, -15);
 
 	el.find('.but').click(function() {
+		if(dis)
+			return;
 		var znak = $(this).hasClass('but-b') ? -1 : 1;
 		val += o.step * znak;
 

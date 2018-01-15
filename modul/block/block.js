@@ -122,7 +122,6 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 							BL.save = 1;
 						}
 					});
-
 				}
 			},
 			funcBeforeHide:function() {
@@ -445,6 +444,8 @@ $(document)
 					el_name = '_select';
 				if(sp.dialog_id == 7)
 					el_name = '_search';
+				if(sp.dialog_id == 35)
+					el_name = '_count';
 
 				$(sp.attr_id + el_name).css('width', '100%');
 				$(sp.attr_pe)

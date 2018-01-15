@@ -421,6 +421,8 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 
 			$v[] = 'num_1:'._num($el['num_1'], true);
 			$v[] = 'num_2:'._num($el['num_2']);
+			$v[] = 'num_3:'._num($el['num_3']);
+			$v[] = 'num_4:'._num($el['num_4']);
 			$v[] = 'num_7:'._num($el['num_7']);
 			$v[] = 'txt_1:"'._br($el['txt_1']).'"';
 			$v[] = 'txt_2:"'._br($el['txt_2']).'"';
@@ -480,6 +482,8 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 
 			$v['num_1'] = _num($el['num_1'], true);
 			$v['num_2'] = _num($el['num_2']);
+			$v['num_3'] = _num($el['num_3']);
+			$v['num_4'] = _num($el['num_4']);
 			$v['num_7'] = _num($el['num_7']);
 			$v['txt_1'] = utf8(_br($el['txt_1']));
 			$v['txt_2'] = utf8(_br($el['txt_2']));

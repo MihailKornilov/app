@@ -719,17 +719,14 @@
 
 
 /* Переключатель количество */
-._count{
-	display:inline-block;
-	position:relative;
-}
+._count{display:inline-block;position:relative}
 ._count input{
+	width:100%;
 	text-align:right;
 	padding-left:3px;
 	padding-right:26px;
-	border-radius:2px;
+	cursor:default;
 }
-
 ._count .but{
 	position:absolute;
 	right:1px;
@@ -740,10 +737,27 @@
 	border-left:1px solid #E5ECF1;
 	cursor:pointer;
 }
-._count .but:hover{background-color:#F2F6F9}
+._count:not(.disabled) .but:hover{background-color:#F2F6F9}
 ._count .but-b{
 	top:14px;
 	background-position:4px -8px;
 	border-top:1px solid #E5ECF1;
 }
 ._count.nol input{color:#999}
+._count.disabled *{cursor:default}
+._count.disabled input{
+	color:#ccc;
+	background-color:#f5f5f5;
+	border:1px solid #ddd;
+}
+._count.disabled .but{opacity:.5}
+
+
+
+
+
+
+
+
+
+
