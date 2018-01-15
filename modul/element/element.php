@@ -205,7 +205,13 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'focus' => _num($r['focus']),
 
 						'num_1' => _num($r['num_1']),
+						'num_2' => _num($r['num_2']),
+						'num_3' => _num($r['num_3']),
+						'num_4' => _num($r['num_4']),
 						'txt_1' => $r['txt_1'],
+						'txt_2' => $r['txt_2'],
+						'txt_3' => $r['txt_3'],
+						'txt_4' => $r['txt_4'],
 
 						'elv_ass' => array(),   //ассоциативные значения из таблицы _element_value
 						'elv_spisok' => array(),//значения в виде списка {id:1,title:'значение'} (из таблицы _element_value, либо связанные списки)

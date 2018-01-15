@@ -283,7 +283,7 @@ function _pageShow($page_id) {
 
 	return
 	_blockHtml('page', $page_id).
-	_page_div().
+//	_page_div().
 	'<script>'.
 		'var PAGE_LIST='._page('for_select', 'js').','.
 			'BLOCK_ARR='._blockJS('page', $page_id).','.
@@ -408,6 +408,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			/*
 				txt_1 - текст для placeholder
 				txt_2 - текст по умолчанию
+				num_1 - формат:
+					38 - любой текст
+					39 - цифры и числа
+				num_2 - количество знаков после запятой
+				num_3 - разрешать отрицательные значения
+				num_4 - разрешать вносить 0
 			*/
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$v = empty($v) ? $el['txt_2'] : $v;

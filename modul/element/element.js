@@ -958,8 +958,8 @@ var VK_SCROLL = 0,
 					return;
 				//count - количество
 				case 35:
-					console.log(sp)
 					$(sp.attr_id)._count({
+						disabled:is_edit,
 						width:sp.width,
 						min:sp.num_1,
 						max:sp.num_2,
