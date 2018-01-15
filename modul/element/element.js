@@ -978,17 +978,30 @@ var VK_SCROLL = 0,
 				butCancel:'Закрыть'
 			});
 
-		dialog.content.find('button').click(function() {
-			v.busy_obj = $(this);
-			v.busy_cls = '_busy';
-			v.dialog_id = v.busy_obj.attr('val');
-			var func = v.func_open;
-			v.func_open = function(res) {
-				func(res);
-				dialog.close();
-			};
-			dialogGet();
-		});
+		dialog.content.find('button')
+			.click(function() {
+				v.busy_obj = $(this);
+				v.busy_cls = '_busy';
+				v.dialog_id = v.busy_obj.attr('val');
+				var func = v.func_open;
+				v.func_open = function(res) {
+					func(res);
+					dialog.close();
+				};
+				$('._hint').remove();
+				dialogGet();
+			})
+			.mouseenter(function() {
+				var t = $(this),
+					msg = t.attr('data-hint');
+				if(!msg)
+					return;
+				t._hint({
+					msg:'<div class="blue">' + msg + '</div>',
+					pad:10,
+					show:1
+				});
+			});
 
 		function dialogGet() {
 			var send = {
@@ -1028,15 +1041,11 @@ var VK_SCROLL = 0,
 
 			'<p class="mt30 fs17">Вспомогательные компоненты:' +
 			'<p class="mt10">' +
-				'<button val="19" class="vk orange">Содержание для некоторых компонентов</button>' +
-			'<p class="mt10">' +
-				'<button val="25" class="vk orange">Настройка содержания списка-шаблона</button>' +
-			'<p class="mt10">' +
-				'<button val="30" class="vk orange">Настройка содержания списка-таблицы</button>' +
-			'<p class="mt10">' +
-				'<button val="26" class="vk orange">Содержание диалога для выбора значения</button>' +
-			'<p class="mt10">' +
-				'<button val="28" class="vk orange">Выбор элементов из содержания диалога,<br>по которым нужно производить поиск</button>' +
+				'<button val="19" class="vk orange" data-hint="Содержание для некоторых компонентов">19</button>' +
+				'<button val="25" class="vk orange ml5" data-hint="Настройка содержания списка-шаблона">25</button>' +
+				'<button val="30" class="vk orange ml5" data-hint="Настройка содержания списка-таблицы">30</button>' +
+				'<button val="26" class="vk orange ml5" data-hint="Содержание диалога для выбора значения">26</button>' +
+				'<button val="28" class="vk orange ml5" data-hint="Выбор элементов из содержания диалога,<br>по которым нужно производить поиск">28</button>' +
 
 			'<p class="mt30 fs17">Элементы для наполнения содержания:' +
 			'<p class="mt10">' +
@@ -1054,12 +1063,13 @@ var VK_SCROLL = 0,
 				'<button val="15" class="vk ml10">Количество строк</button>' +
 			'<p class="mt10">' +
 				'<button val="14" class="vk">Содержание - шаблон</button>' +
-				'<button val="11" class="vk cancel ml10">Выбор значения для шаблона</button>' +
+				'<button val="11" class="vk cancel ml10" data-hint="">Выбор значения для шаблона</button>' +
 			'<p class="mt10">' +
 				'<button val="23" class="vk">Содержание - таблица</button>' +
-				'<button val="31" class="vk cancel ml10">Значение из диалога</button>' +
-				'<button val="32" class="vk cancel ml10">Значение: порядковый номер</button>' +
-				'<button val="33" class="vk cancel ml10">Значение: Дата</button>' +
+				'<button val="31" class="vk cancel ml5" data-hint="Значение из диалога">31</button>' +
+				'<button val="32" class="vk cancel ml5" data-hint="Значение: Порядковый номер">32</button>' +
+				'<button val="33" class="vk cancel ml5" data-hint="Значение: Дата">33</button>' +
+				'<button val="34" class="vk cancel ml5" data-hint="Значение: Иконки управления">34</button>' +
 			'<p class="mt10">' +
 				'<button val="22" class="vk orange ml10">Связка</button>' +
 

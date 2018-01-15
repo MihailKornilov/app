@@ -23,14 +23,14 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 			return;
 
 		t._hint({
-			msg:'<div class="pad10">' +
+			msg:'<div class="pad5">' +
 					'<div class="hd2 mb10">Настройки блока</div>' +
 					_blockUnitBg(BL) +
 					_blockUnitBor(BL) +
 					_blockUnitBut(BL) +
 				'</div>' +
 				_elemUnit(BL),
-			width:238,
+			width:228,
 			objPos:'mouse',
 			show:1,
 			delayShow:500,
