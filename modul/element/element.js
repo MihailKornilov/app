@@ -622,7 +622,8 @@ var VK_SCROLL = 0,
 					tr:$(sp.attr_tr).val(),
 					font:sp.font,
 					color:sp.color,
-					pos:sp.pos
+					pos:sp.pos,
+					link:sp.link
 				};
 			});
 			return send;
@@ -661,11 +662,12 @@ var VK_SCROLL = 0,
 				attr_bl:'#inp_' + NUM,
 				attr_tr:'#tr_' + NUM,
 				width:150,  //ширина колонки
-				tr:'',      //имя колонки
+				tr:'',      //имя колонки txt_1
 				title:'',   //тип значения
 				font:'',
 				color:'',
-				pos:''
+				pos:'',     //txt_6
+				link:0      //колонка является ссылкой
 			}, v);
 
 			DL.append(
@@ -734,11 +736,22 @@ var VK_SCROLL = 0,
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
 								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
-						'</table>',
+							'<tr><td colspan="3" class="pl5">' +
+									'<input type="hidden" id="tab-sp-link" value="' + v.link + '" />' +
+						'</table>' +
+						'',
 					side:'right',
 					show:1,
 					delayShow:700,
-					delayHide:300
+					delayHide:300,
+					func:function() {
+						$('#tab-sp-link')._check({
+							title:'обернуть в ссылку',
+							func:function(vv) {
+								v.link = vv;
+							}
+						});
+					}
 				});
 			});
 			DL.sortable({

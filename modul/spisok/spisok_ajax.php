@@ -423,7 +423,6 @@ function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания спис
 			  AND `id` NOT IN (".$ids.")";
 	query($sql);
 
-
 	if(!$ids)
 		return;
 
@@ -431,11 +430,12 @@ function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания спис
 	foreach(_ids($ids, 1) as $id) {
 		$r = $val[$id];
 		$sql = "UPDATE `_element`
-				SET `width`=".$r['width'].",
+				SET `width`="._num($r['width']).",
 					`txt_1`='".addslashes(_txt($r['tr']))."',
 					`font`='".$r['font']."',
 					`color`='".$r['color']."',
 					`txt_6`='".$r['pos']."',
+					`num_2`="._num($r['link']).",
 					`sort`=".$sort++."
 				WHERE `id`=".$id;
 		query($sql);

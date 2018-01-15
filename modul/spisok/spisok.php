@@ -87,11 +87,13 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			txt_2 - ids элементов через запятую. Сами элементы хранятся в таблице _element
 		Значения вставляются диалогом 31.
 		Параметры значений:
+			num_1 - id элемента-значения из диалога
 			txt_1 - имя заголовка TR
 			width - ширина колонки
 			font
 			color
 			txt_6 - pos (позиция)
+			num_2 - является ссылкой
 			sort
 	*/
 	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
@@ -167,7 +169,10 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$txt = '';
 					$cls = array();
 					switch($td['dialog_id']) {
-						case 32: $txt = $sp['num'];	break;//порядковый номер - num
+						case 32://порядковый номер - num
+							$txt = $sp['num'];
+							$txt = _spisokColLink($txt, $sp, $td['num_2']);
+							break;
 						case 33://дата
 							$cut = $td['num_1'] == 36;
 							$txt = FullData($sp['dtime_add'], $td['num_2'], $cut);
@@ -198,11 +203,13 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							//значение из другого списка
 							if($el['dialog_id'] == 29) {
 								$txt = $sp[$col]['txt_1'];
+								$txt = _spisokColLink($txt, $sp[$col], $td['num_2']);
 								break;
 							}
 
 							$txt = $sp[$col];
 							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
+							$txt = _spisokColLink($txt, $sp, $td['num_2']);
 						break;
 					}
 					$cls[] = $td['font'];
@@ -271,8 +278,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 								}
 						}
 						//обёртка в ссылку
-						if($tmpElem['num_2'])
-							$txt = _spisokColLink($txt, $ELEM, $sp);
+						$txt = _spisokColLink($txt, $sp, $tmpElem['num_2']);
 
 						$r['elem']['txt_real'] = $txt;
 					}
@@ -298,12 +304,15 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 	return 'Неизвестный внешний вид списка: '.$ELEM['num_1'];
 }
-function _spisokColLink($txt, $pe, $sp) {//обёртка значения колонки в ссылку
+function _spisokColLink($txt, $sp, $to_link) {//обёртка значения колонки в ссылку
+	if(!$to_link)//если оборачивать не нужно
+		return $txt;
+
 	//диалог, через который вносятся данные списка
-	$dialog = _dialogQuery($pe['num_1']);
+	$dialog = _dialogQuery($sp['dialog_id']);
 
 	//по умолчанию текущая страница
-	$link = '&p='.$pe['page_id'];
+	$link = '&p='._page('cur');
 
 	//если таблица является страницей, то ссылка перехода на страницу
 	if($dialog['base_table'] == '_page')

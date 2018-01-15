@@ -433,7 +433,8 @@ function _dialogOpenLoad($dialog_id) {
 						'title' => utf8($elDialog['element_name']),
 						'font' => $r['font'],
 						'color' => $r['color'],
-						'pos' => $r['txt_6']
+						'pos' => $r['txt_6'],
+						'link' => _num($r['num_2']),
 					);
 				}
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
