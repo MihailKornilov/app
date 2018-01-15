@@ -165,22 +165,23 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				$html .= '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
 				foreach($tabCol as $td) {
 					$txt = '';
+					$cls = array();
 					switch($td['dialog_id']) {
 						case 32: $txt = $sp['num'];	break;//порядковый номер - num
 						case 33://дата
 							$cut = $td['num_1'] == 36;
 							$txt = FullData($sp['dtime_add'], $td['num_2'], $cut);
 							break;
-						case -3://иконки управления
-							$html .= '<td class="pad0 w15 wsnw">'.
-										_iconEdit(array(
-											'class' => 'dialog-open ml3',
-											'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id']
-										)).
-										_iconDel(array(
-											'class' => 'dialog-open mr3',
-											'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id'].',del:1'
-										));
+						case 34://иконки управления
+							$txt = _iconEdit(array(
+										'class' => 'dialog-open pl',
+										'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id']
+									)).
+									_iconDel(array(
+										'class' => 'dialog-open pl',
+										'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id'].',del:1'
+									));
+							$cls[] = 'pad0';
 							break;
 						case 31://из диалога
 							$elemUse = $tabElemUse[$td['num_1']];
@@ -204,7 +205,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 						break;
 					}
-					$cls = array();
 					$cls[] = $td['font'];
 					$cls[] = $td['color'];
 					$cls[] = $td['txt_6'];//pos - позиция

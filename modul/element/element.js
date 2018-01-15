@@ -370,7 +370,7 @@ var VK_SCROLL = 0,
 				}
 			});
 			$('#' + act + '_action_page_id')._select({
-				width:300,
+				width:270,
 				title0:'не выбрана',
 				spisok:PAGE_LIST
 			});
@@ -516,7 +516,12 @@ var VK_SCROLL = 0,
 
 				switch(res.action_id) {
 					case 1: location.reload(); break;
-					case 2: location.href = URL + '&p=' + res.action_page_id + '&id=' + res.unit.id; break;
+					case 2:
+						var url = URL + '&p=' + res.action_page_id;
+						if(res.unit)
+							url += '&id=' + res.unit.id;
+						location.href = url;
+						break;
 					case 3://обновление содержимого блоков
 						var bln = '#block-level-' + res.block_obj_name;
 						$(bln).after(res.level).remove();
@@ -757,7 +762,7 @@ var VK_SCROLL = 0,
 			if($(v.attr_el).parent().hasClass('ui-resizable'))
 				return;
 			$(v.attr_el).parent().resizable({
-				minWidth:50,
+				minWidth:40,
 				maxWidth:400,
 				grid:10,
 				handles:'e',
@@ -1084,6 +1089,7 @@ var VK_SCROLL = 0,
 			'<button val="31" class="vk cancel mt5">Значение из диалога</button>' +
 			'<button val="32" class="vk cancel mt5">Значение: Порядковый номер</button>' +
 			'<button val="33" class="vk cancel mt5">Значение: Дата</button>' +
+			'<button val="34" class="vk cancel mt5">Значение: Иконки управления</button>' +
 		'';
 	},
 
