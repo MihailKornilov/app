@@ -359,7 +359,7 @@ function _dialogOpenLoad($dialog_id) {
 		if(@$unit['deleted'])
 			jsonError('Запись была удалена');
 
-		if(isset($dialog['field']['block_id']))
+		if(!$block_id && isset($dialog['field']['block_id']))
 			$block_id = _num($unit['block_id']);
 	}
 
