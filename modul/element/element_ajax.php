@@ -1,36 +1,10 @@
 <?php
 switch(@$_POST['op']) {
 	case 'dialog_edit_load':
-		$dialog = array(
-			'id' => 0,
-			'sa' => 0,
-			'width' => 500,
-			'width_auto' => 0,
-
-			'insert_head' => 'Внесение новой записи',
-			'insert_button_submit' => 'Внести',
-			'insert_button_cancel' => 'Отмена',
-
-			'edit_head' => 'Сохранение записи',
-			'edit_button_submit' => 'Сохранить',
-			'edit_button_cancel' => 'Отмена',
-
-			'base_table' => '_spisok',
-
-			'spisok_on' => 0,
-			'spisok_name' => '',
-
-			'insert_action_id' => 1,
-			'insert_action_page_id' => 0,
-
-			'menu_edit_last' => 1
-		);
-
-		if($dialog_id = _num($_POST['dialog_id']))
-			if($ass = _dialogQuery($dialog_id))
-				$dialog = $ass;
-			else
-				$dialog_id = 0;
+		if(!$dialog_id = _num($_POST['dialog_id']))
+			jsonError('Некорректный ID диалогового окна');
+		if(!$dialog = _dialogQuery($dialog_id))
+			jsonError('Диалога не существует');
 
 		$menu = array(
 			1 => 'Заголовок',
@@ -38,7 +12,6 @@ switch(@$_POST['op']) {
 	  		4 => 'Служебное',
 			9 => '<b class="red">SA</b>'
 		);
-
 		$action = array(
 			3 => 'Обновить содержимое блоков',
 			1 => 'Обновить страницу',
@@ -52,6 +25,19 @@ switch(@$_POST['op']) {
 			$dialog['menu_edit_last'] = 1;
 
 		define('BLOCK_EDIT', 1);
+
+		//получение списка таблиц базы и определение выбранной (SA)
+		$sql = "SHOW TABLES";
+		$arr = query_array($sql);
+		$tables = array();
+		$tab_id = 0;
+		$n = 1;
+		foreach($arr as $ass)
+			foreach($ass as $base => $tab) {
+				if($dialog['base_table'] == $tab)
+					$tab_id = $n;
+				$tables[$n++] = $tab;
+			}
 
 		$html =
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
@@ -142,7 +128,7 @@ switch(@$_POST['op']) {
 		                '<td><div id="dialog-width" class="dib w50">'.$dialog['width'].'</div>'.
 		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
 					'<tr><td class="red r">Таблица в базе:'.
-						'<td><input type="text" id="base_table" class="w230" maxlength="30" value="'.$dialog['base_table'].'" />'.
+						'<td><input type="hidden" id="base_table" value="'.$tab_id.'" />'.
 					//доступность диалога. На основании app_id. По умолчанию 0 - недоступен всем.
 					'<tr><td class="red r">Доступ всем приложениям:'.
 						'<td>'._check(array(
@@ -181,6 +167,8 @@ switch(@$_POST['op']) {
 		$send['cmp'] = $dialog['cmp_utf8'];
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
+		$send['tables'] = SA ? $tables : array();
+
 		jsonSuccess($send);
 		break;
 	case 'dialog_save'://сохранение диалогового окна

@@ -376,6 +376,11 @@ var VK_SCROLL = 0,
 			});
 		});
 
+		$('#base_table')._select({
+			width:230,
+			write:1,
+			spisok:o.tables
+		});
 		$('#element_width')._count({width:60,step:10});
 		$('#element_width_min')._count({width:60,step:10});
 
@@ -431,7 +436,7 @@ var VK_SCROLL = 0,
 				spisok_on:$('#spisok_on').val(),
 				spisok_name:$('#spisok_name').val(),
 
-				base_table:$('#base_table').val(),
+				base_table:$('#base_table')._select('inp'),
 				app_any:$('#app_any').val(),
 				sa:$('#sa').val(),
 
@@ -1495,8 +1500,12 @@ $.fn._count = function(o) {//input с количеством
 	return t;
 };
 $.fn._select = function(o) {//выпадающий список от 03.01.2018
-	var t = $(this),
-		attr_id = t.attr('id'),
+	var t = $(this);
+
+	if(!t.length)
+		return;
+
+	var attr_id = t.attr('id'),
 		VALUE = t.val();
 
 	if(!attr_id) {
@@ -1757,6 +1766,7 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 
 		switch(o) {
 			case 'disable': s.disable(); break;
+			case 'inp': return s.inp();
 		}
 
 		return s;
@@ -1765,6 +1775,9 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 	t.value = valueSet;
 	t.icon_del = ICON_DEL;
 	t.icon_add = ICON_ADD;
+	t.inp = function() {//получение введённого значения
+		return INP.val();
+	};
 	t.disable = function() {//делание неактивным
 		SEL.addClass('disabled')
 		   .removeClass('rs');
