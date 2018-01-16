@@ -445,6 +445,14 @@ function _dialogOpenLoad($dialog_id) {
 				if(!$colDialog = _dialogQuery($block['obj_id']))
 					break;
 
+				//получение используемых колонок
+				$colUse = array();
+				foreach($colDialog['cmp'] as $r) {
+					if(!$col = $r['col'])
+						continue;
+					$colUse[$col] = 1;
+				}
+
 				$field = array();
 				$n = 1;
 				foreach($colDialog['field'] as $col => $k)
@@ -470,10 +478,15 @@ function _dialogOpenLoad($dialog_id) {
 						case 'dtime_del':
 						case '': break;
 						default:
-							$field[] = array(
+							$u = array(
 								'id' => $n++,
 								'title' => $col
 							);
+							if(isset($colUse[$col])) {
+								$color = $unit_id && $unit['col'] == $col ? 'color-pay' : 'red';
+								$u['content'] = '<div class="'.$color.' b">'.$col.'</div>';
+							}
+							$field[] = $u;
 					}
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $field;
 				break;
