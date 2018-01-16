@@ -122,41 +122,50 @@ switch(@$_POST['op']) {
 			'</div>'.
 
 			//SA
-	  (SA ? '<div class="dialog-menu-9 pad20'._dn($dialog['menu_edit_last'] == 9).'">'.
-		        '<div class="hd2">Информация о диалоговом окне:</div>'.
+	  (SA ? '<div class="dialog-menu-9 pt20 pb20'._dn($dialog['menu_edit_last'] == 9).'">'.
+		        '<div class="hd2 ml20 mr20">Настройки диалогового окна:</div>'.
 				'<table class="bs10">'.
-					'<tr><td class="red w175 r">ID:<td class="b">'.$dialog['id'].
+					'<tr><td class="red w150 r">ID:<td class="b">'.$dialog['id'].
 					'<tr><td class="red r">Ширина:'.
 		                '<td><div id="dialog-width" class="dib w50">'.$dialog['width'].'</div>'.
 		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
 					'<tr><td class="red r">Таблица в базе:'.
 						'<td><input type="hidden" id="base_table" value="'.$tab_id.'" />'.
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'cmp_no_req',
+									'title' => 'компоненты в содержании не требуются',
+									'value' => $dialog['cmp_no_req']
+							   )).
 					//доступность диалога. На основании app_id.
 		            //0 - доступен только конкретному приложению
 		            //1 - всем приложениям
-					'<tr><td class="red r">Доступ всем приложениям:'.
+					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'app_any',
+									'title' => 'доступно всем приложениям',
 									'value' => $dialog['id'] ? ($dialog['app_id'] ? 0 : 1) : 0
 							   )).
-					'<tr><td class="red r">Доступ только SA:'.
+					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'sa',
+									'title' => 'доступно только SA',
 									'value' => $dialog['sa']
 							   )).
 				'</table>'.
 
-		        '<div class="hd2 mt20">Настройки как элемента:</div>'.
+		        '<div class="hd2 mt20 ml20 mr20">Настройки как элемента:</div>'.
 				'<table class="bs10">'.
-					'<tr><td class="red w175 r">Имя элемента:'.
+					'<tr><td class="red w150 r">Имя элемента:'.
 		                '<td><input type="text" id="element_name" class="w230" maxlength="100" value="'.$dialog['element_name'].'" />'.
 					'<tr><td class="red r">Начальная ширина:'.
 						'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
 					'<tr><td class="red r">Минимальная ширина:'.
 						'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
-					'<tr><td class="red r">Настраивать стили:'.
+					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_style_access',
+									'title' => 'настраивать стили',
 									'value' => $dialog['element_style_access']
 							   )).
 				'</table>'.
@@ -277,6 +286,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 		jsonError('Укажите имя списка страницы');
 
 	$width_auto = _num($_POST['width_auto']);
+	$cmp_no_req = _num($_POST['cmp_no_req']);
 	$app_any = _num($_POST['app_any']);
 
 	$element_name = _txt($_POST['element_name']);
@@ -289,6 +299,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`sa`=".$sa.",
 				`width`=".$width.",
 				`width_auto`=".$width_auto.",
+				`cmp_no_req`=".$cmp_no_req.",
 
 				`insert_head`='".addslashes($insert_head)."',
 				`insert_button_submit`='".addslashes($insert_button_submit)."',
@@ -513,7 +524,7 @@ function _dialogOpenLoad($dialog_id) {
 							  AND `element_id`=".$unit_id."
 							ORDER BY `sort`";
 					foreach(query_arr($sql) as $id => $r)
-						$unit[$col][_num($id)] = array(
+						$unit[$col][] = array(
 							'id' => _num($id),
 							'title' => utf8($r['title']),
 							'def' => _num($r['def']),
@@ -548,8 +559,11 @@ function _dialogOpenLoad($dialog_id) {
 							WHERE `dialog_id`=".$block['obj_id']."
 							GROUP BY `".$unit['col']."`";
 					foreach(query_ass($sql) as $id => $use)
-						if(isset($unit[$col][$id]))
-							$unit[$col][$id]['use'] = $use;
+						foreach($unit[$col] as $n => $r)
+							if($id == $r['id']) {
+								$unit[$col][$n]['use'] = $use;
+								break;
+							}
 				}
 		}
 

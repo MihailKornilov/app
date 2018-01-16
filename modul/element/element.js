@@ -413,7 +413,8 @@ var VK_SCROLL = 0,
 				block_id:o.block_id,
 
 				width:DIALOG_WIDTH,
-				width_auto:_num($('#width_auto').val()),
+				width_auto:$('#width_auto').val(),
+				cmp_no_req:$('#cmp_no_req').val(),
 
 				insert_head:$('#insert_head').val(),
 				insert_button_submit:$('#insert_button_submit').val(),
