@@ -981,6 +981,7 @@ var VK_SCROLL = 0,
 						disabled:is_edit,
 						width:sp.width,
 						title0:'не выбрано',
+						msg_empty:'колонок нет',
 						spisok:sp.elv_spisok
 					});
 					_forN(sp.elv_spisok, function(u) {

@@ -538,11 +538,13 @@ function _dialogOpenLoad($dialog_id) {
 					if($block['obj_name'] != 'dialog')
 						break;
 
+					$dlg = _dialogQuery($block['obj_id']);
+
 					//получение количества использования значений
 					$sql = "SELECT
 								`".$unit['col']."` `id`,
 								COUNT(*) `use`
-							FROM `_element`
+							FROM `".$dlg['base_table']."`
 							WHERE `dialog_id`=".$block['obj_id']."
 							GROUP BY `".$unit['col']."`";
 					foreach(query_ass($sql) as $id => $use)
