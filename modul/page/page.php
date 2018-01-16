@@ -514,6 +514,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
 
+		//SA: Select - выбор колонки таблицы
+		case 37:
+			/*
+                num_1 - показывать имя таблицы перед выбором
+			*/
+			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+
 
 
 
@@ -623,7 +630,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			return 'значение не доделано';
 
-		//Функция PHP
+		//SA: Функция PHP
 		case 12:
 			/*
                 txt_1 - имя функции

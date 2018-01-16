@@ -972,6 +972,15 @@ var VK_SCROLL = 0,
 						minus:sp.num_4
 					});
 					return;
+				//SA: Select - выбор имени колонки
+				case 37:
+					$(sp.attr_id)._select({
+						disabled:is_edit,
+						width:sp.width,
+						title0:'не выбрано',
+						spisok:sp.elv_spisok
+					});
+					return;
 			}
 		});
 
@@ -1106,8 +1115,9 @@ var VK_SCROLL = 0,
 			'<p class="mt10">' +
 				'<button val="22" class="vk orange ml10">—в€зка</button>' +
 
-	  (SA ? '<p class="mt30">' +
-				'<button val="12" class="vk red">SA: PHP-функци€</button>'
+	  (SA ? '<div class="hd2 mt20 mb5">Ёлементы дл€ SA</div>' +
+				'<button val="12" class="vk red">PHP-функци€</button>' +
+				'<button val="37" class="vk red ml5">Select - выбор имени колонки</button>'
 	  : '') +
 
 		'</div>';

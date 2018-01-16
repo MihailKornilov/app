@@ -330,6 +330,8 @@ function _dialogOpenLoad($dialog_id) {
 	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('Диалога не существует');
 
+	$block_id = _num(@$_POST['block_id']);
+
 	//получение данных единицы списка
 	$unit = array();
 	if($unit_id = _num(@$_POST['unit_id'])) {
@@ -345,6 +347,9 @@ function _dialogOpenLoad($dialog_id) {
 			jsonError('Нет доступа');
 		if(@$unit['deleted'])
 			jsonError('Запись была удалена');
+
+		if(isset($dialog['field']['block_id']))
+			$block_id = _num($unit['block_id']);
 	}
 
 	$page_id = _num($_POST['page_id']);
@@ -355,7 +360,7 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send['dialog_id'] = $dialog_id;
 	$send['unit_id'] = $unit_id;
-	$send['block_id'] = _num(@$_POST['block_id']);
+	$send['block_id'] = $block_id;
 	$send['act'] = $act;
 
 	//исходные данные, полученные для открытия диалога
@@ -424,6 +429,42 @@ function _dialogOpenLoad($dialog_id) {
 					);
 				}
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
+				break;
+			//SA: select - выбор имени колонки
+			case 37:
+				$sql = "SELECT *
+						FROM `_block`
+						WHERE `id`=".$block_id;
+				if(!$block = query_assoc($sql))
+					break;
+
+				//выбор имени колонки может производиться, только если элемент размещается в диалоге
+				if($block['obj_name'] != '_dialog')
+					break;
+
+				if(!$colDialog = _dialogQuery($dialog_id))
+					break;
+
+				$field = array();
+				foreach($colDialog['field'] as $col => $k)
+					switch($col) {
+						case 'id':
+						case 'page_id':
+						case 'block_id':
+						case 'element_id':
+						case 'dialog_id':
+						case 'width':
+						case 'color':
+						case 'font':
+						case 'size':
+						case 'mar':
+						case 'sort':
+						case 'viewer_id_add':
+						case 'dtime_add':
+						case '': break;
+						default: $field[] = $col;
+					}
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $field;
 				break;
 	}
 
