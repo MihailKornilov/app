@@ -272,6 +272,9 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 
 	if(!$base_table = _txt($_POST['base_table']))
 		$base_table = '_spisok';
+	$sql = "SHOW TABLES LIKE '".$base_table."'";
+	if(!query_array($sql))
+		jsonError('Указана несуществующая таблица');
 
 	$menu_edit_last = _num($_POST['menu_edit_last']);
 	$sa = _bool($_POST['sa']);

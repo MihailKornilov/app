@@ -193,12 +193,19 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 					FROM `_element`
 					WHERE `block_id` IN ("._idsGet($block).")";
 			if($elem = query_arr($sql)) {
+				//получение разрешения настройки стилей для выбранных элементов
+				$sql = "SELECT `id`,`element_style_access`
+						FROM `_dialog`
+						WHERE `id` IN ("._idsGet($elem, 'dialog_id').")";
+				$styleAccess = query_ass($sql);
+
 				foreach($elem as $r) {
 					$id = _num($r['id']);
 					$cmp[$id] = array(
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
 
+						'style_access' => _num($styleAccess[$r['dialog_id']]),
 						'width' => _num($r['width']),
 						'col' => $r['col'],
 						'req' => _num($r['req']),
@@ -271,7 +278,13 @@ function _dialogParam($dialog_id, $param) {//получение конкретного параметра диа
 	$dialog = _dialogQuery($dialog_id);
 	if(!isset($dialog[$param]))
 		return 'Неизвестный параметр диалога: '.$param;
-	return $dialog[$param];
+
+	$send = $dialog[$param];
+
+	if(!is_array($send) && preg_match(REGEXP_NUMERIC, $send))
+		return _num($send);
+
+	return $send;
 }
 function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$cond = "`spisok_on`";

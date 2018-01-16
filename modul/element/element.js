@@ -1050,13 +1050,11 @@ var VK_SCROLL = 0,
 		}
 	},
 	_elemChooseAll = function() {//все варианты элементов
-		return '<div class="center">' +
-			'<p class="mt10 fs17">Компоненты для внесения данных:' +
-			'<p class="mt10">' +
-				'<button val="8" class="vk grey" data-hint="">Однострочное поле</button>' +
-				'<button val="5" class="vk grey ml10" data-hint="">Многострочное поле</button>' +
-			'<p class="mt10">' +
-				'<button val="1" class="vk" data-hint="Галочка">1</button>' +
+		return '<div class="center mt5">' +
+			'<div class="hd2 mb5">Компоненты для внесения данных</div>' +
+				'<button val="8"  class="vk grey" data-hint="Однострочное поле">8</button>' +
+				'<button val="5"  class="vk grey ml5" data-hint="Многострочное поле">5</button>' +
+				'<button val="1"  class="vk ml5" data-hint="Галочка">1</button>' +
 				'<button val="16" class="vk ml5" data-hint="Radio">16</button>' +
 				'<button val="-6" class="vk ml5" data-hint="Календарь">-</button>' +
 				'<button val="35" class="vk ml5" data-hint="Количество">35</button>' +
@@ -1069,26 +1067,25 @@ var VK_SCROLL = 0,
 			'<p class="mt10">' +
 				'<button val="29" class="vk" data-hint="Select - выбор единицы из другого списка (связка)">29</button>' +
 
-			'<p class="mt30 fs17">Вспомогательные компоненты:' +
-			'<p class="mt10">' +
+			'<div class="hd2 mt20 mb5">Вспомогательные компоненты</div>' +
 				'<button val="19" class="vk orange" data-hint="Содержание для некоторых компонентов">19</button>' +
 				'<button val="25" class="vk orange ml5" data-hint="Настройка содержания списка-шаблона">25</button>' +
 				'<button val="30" class="vk orange ml5" data-hint="Настройка содержания списка-таблицы">30</button>' +
 				'<button val="26" class="vk orange ml5" data-hint="Содержание диалога для выбора значения">26</button>' +
 				'<button val="28" class="vk orange ml5" data-hint="Выбор элементов из содержания диалога,<br>по которым нужно производить поиск">28</button>' +
 
-			'<p class="mt30 fs17">Элементы для наполнения содержания:' +
-			'<p class="mt10">' +
-				'<button val="3" class="vk">Меню страниц</button>' +
-				'<button val="10" class="vk grey ml10">Текст</button>' +
-				'<button val="2" class="vk green ml10">Кнопка</button>' +
-			'<p class="mt10">' +
-				'<button val="4" class="vk">Заголовок</button>' +
-				'<button val="21" class="vk ml10">Информация</button>' +
-				'<button val="9" class="vk ml10">Ссылка на страницу</button>' +
+			'<div class="hd2 mt20 mb5">Функции</div>' +
+				'<button val="36" class="vk" data-hint="Функция: скрытие-показ">36</button>' +
 
-			'<p class="mt30 fs17">Элементы для списков:' +
-			'<p class="mt10">' +
+			'<div class="hd2 mt20 mb5">Элементы для наполнения содержания</div>' +
+				'<button val="3"  class="vk" data-hint="Меню страниц">3</button>' +
+				'<button val="10" class="vk grey ml5" data-hint="Произвольный текст">10</button>' +
+				'<button val="2"  class="vk green ml5" data-hint="Кнопка">2</button>' +
+				'<button val="4"  class="vk ml5" data-hint="Заголовок">4</button>' +
+				'<button val="21" class="vk ml5" data-hint="Информация">21</button>' +
+				'<button val="9"  class="vk ml5" data-hint="Ссылка на страницу">9</button>' +
+
+			'<div class="hd2 mt20 mb5">Элементы для списков</div>' +
 				'<button val="7" class="vk">Поиск</button>' +
 				'<button val="15" class="vk ml10">Количество строк</button>' +
 			'<p class="mt10">' +
@@ -1104,7 +1101,7 @@ var VK_SCROLL = 0,
 				'<button val="22" class="vk orange ml10">Связка</button>' +
 
 	  (SA ? '<p class="mt30">' +
-				'<button val="12" class="vk red">SA: функция</button>'
+				'<button val="12" class="vk red">SA: PHP-функция</button>'
 	  : '') +
 
 		'</div>';
