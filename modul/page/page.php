@@ -519,7 +519,20 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			/*
                 num_1 - показывать имя таблицы перед выбором
 			*/
-			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+			if($el['num_1'] && !empty($US)) {
+				$sql = "SELECT *
+						FROM `_block`
+						WHERE `id`=".$US['block_id'];
+				if($block = query_assoc($sql))
+					if($block['obj_name'] == 'dialog') //выбор имени колонки может производиться, только если элемент размещается в диалоге
+						return
+							'<table>'.
+								'<tr><td class="pr3 b color-555">'._dialogParam($block['obj_id'], 'base_table').'.'.
+									'<td><input type="hidden" id="'.$attr_id.'" />'.
+							'</table>';
+			}
+
+			return '<input type="hidden" id="'.$attr_id.'" />';
 
 
 

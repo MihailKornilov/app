@@ -508,6 +508,9 @@ var VK_SCROLL = 0,
 						case 30://Настройка ТАБЛИЧНОГО содержания списка
 							send.cmpv[id] = _dialogSpisokTable(sp, 'get');
 							break;
+						case 37://SA: Select - выбор имени колонки
+							send.cmp[id] = $(sp.attr_cmp)._select('inp');
+							return;
 					}
 					send.cmp[id] = $(sp.attr_cmp).val();
 				});
@@ -806,13 +809,13 @@ var VK_SCROLL = 0,
 
 		_forIn(elem, function(sp) {
 			if(sp.focus)
-				attr_focus = sp.attr_id;
+				attr_focus = sp.attr_cmp;
 			switch(sp.dialog_id) {
 				//textarea
-				case 5:	$(sp.attr_id).autosize(); return;
+				case 5:	$(sp.attr_cmp).autosize(); return;
 				//select - выбор страницы
 				case 6:
-					$(sp.attr_id)._select({
+					$(sp.attr_cmp)._select({
 						disabled:is_edit,
 						width:sp.width,
 						title0:sp.txt_1,
@@ -821,7 +824,7 @@ var VK_SCROLL = 0,
 					return;
 				//search
 				case 7:
-					$(sp.attr_id)._search({
+					$(sp.attr_cmp)._search({
 						func:function(v, obj) {
 							var send = {
 								op:'spisok_search',
@@ -848,7 +851,7 @@ var VK_SCROLL = 0,
 					return;
 				//select - произвольные значения
 				case 17:
-					$(sp.attr_id)._select({
+					$(sp.attr_cmp)._select({
 						disabled:is_edit,
 						width:sp.width,
 						title0:sp.txt_1,
@@ -863,7 +866,7 @@ var VK_SCROLL = 0,
 					return;
 				//select - выбор списка (все списки приложения)
 				case 24:
-					$(sp.attr_id)._select({
+					$(sp.attr_cmp)._select({
 						disabled:is_edit,
 						width:sp.width,
 						title0:sp.txt_1,
@@ -882,12 +885,12 @@ var VK_SCROLL = 0,
 							elem_id = _num(t.attr('val'));
 						bec.removeClass('sel');
 						t.addClass('sel');
-						$(sp.attr_id).val(elem_id);
+						$(sp.attr_cmp).val(elem_id);
 					});
 					return;
 				//select - выбор списка, размещённого на текущей странице
 				case 27:
-					$(sp.attr_id)._select({
+					$(sp.attr_cmp)._select({
 						disabled:is_edit,
 						width:sp.width,
 						title0:sp.txt_1,
@@ -910,12 +913,12 @@ var VK_SCROLL = 0,
 							if(sp.hasClass('sel'))
 								ids.push(_num(sp.attr('val')));
 						});
-						$(sp.attr_id).val(ids.join(','));
+						$(sp.attr_cmp).val(ids.join(','));
 					});
 					return;
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
-					$(sp.attr_id)._select({
+					$(sp.attr_cmp)._select({
 						disabled:is_edit,
 						width:sp.width,
 						title0:sp.txt_1,
@@ -963,7 +966,7 @@ var VK_SCROLL = 0,
 					return;
 				//count - количество
 				case 35:
-					$(sp.attr_id)._count({
+					$(sp.attr_cmp)._count({
 						disabled:is_edit,
 						width:sp.width,
 						min:sp.num_1,
@@ -974,11 +977,17 @@ var VK_SCROLL = 0,
 					return;
 				//SA: Select - выбор имени колонки
 				case 37:
-					$(sp.attr_id)._select({
+					$(sp.attr_cmp)._select({
 						disabled:is_edit,
 						width:sp.width,
 						title0:'не выбрано',
 						spisok:sp.elv_spisok
+					});
+					_forN(sp.elv_spisok, function(u) {
+						if(u.title == unit.col) {
+							$(sp.attr_cmp)._select(u.id);
+							return false;
+						}
 					});
 					return;
 			}

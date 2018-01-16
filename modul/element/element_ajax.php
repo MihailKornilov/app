@@ -359,13 +359,13 @@ function _dialogOpenLoad($dialog_id) {
 		$act = 'del';
 
 	$send['dialog_id'] = $dialog_id;
-	$send['unit_id'] = $unit_id;
 	$send['block_id'] = $block_id;
+	$send['unit_id'] = $unit_id;
 	$send['act'] = $act;
 
 	//исходные данные, полученные для открытия диалога
 	$unit['source'] = array(
-		'block_id' => $send['block_id']//для какого блока был запрос
+		'block_id' => $block_id//для какого блока был запрос
 	);
 
 	$send['edit_access'] = SA || $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
@@ -439,16 +439,20 @@ function _dialogOpenLoad($dialog_id) {
 					break;
 
 				//выбор имени колонки может производиться, только если элемент размещается в диалоге
-				if($block['obj_name'] != '_dialog')
+				if($block['obj_name'] != 'dialog')
 					break;
 
-				if(!$colDialog = _dialogQuery($dialog_id))
+				if(!$colDialog = _dialogQuery($block['obj_id']))
 					break;
 
 				$field = array();
+				$n = 1;
 				foreach($colDialog['field'] as $col => $k)
 					switch($col) {
 						case 'id':
+						case 'id_old':
+						case 'num':
+						case 'app_id':
 						case 'page_id':
 						case 'block_id':
 						case 'element_id':
@@ -459,10 +463,17 @@ function _dialogOpenLoad($dialog_id) {
 						case 'size':
 						case 'mar':
 						case 'sort':
+						case 'deleted':
 						case 'viewer_id_add':
+						case 'viewer_id_del':
 						case 'dtime_add':
+						case 'dtime_del':
 						case '': break;
-						default: $field[] = $col;
+						default:
+							$field[] = array(
+								'id' => $n++,
+								'title' => $col
+							);
 					}
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $field;
 				break;
