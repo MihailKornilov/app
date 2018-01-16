@@ -424,7 +424,7 @@ function _spisokCondSearchVal($pe) {//получение введённого значения в строку пои
 	return $v;
 }
 
-function _spisokConnect($cmp_id, $v='') {//получение данных списка для связки (dialog_id:29)
+function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)
 		return array();
 
@@ -451,6 +451,16 @@ function _spisokConnect($cmp_id, $v='') {//получение данных списка для связки (d
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
 		return array();
+
+	//добавление единицы списка, которая была выбрана ранее
+	if($sel_id && empty($arr[$sel_id])) {
+		$sql = "SELECT *
+				FROM `_spisok`
+				WHERE `dialog_id`=".$cmp['num_1']."
+				  AND `id`=".$sel_id;
+		if($unit = query_assoc($sql))
+			$arr[$sel_id] = $unit;
+	}
 
 	$send = array();
 	foreach($arr as $r) {

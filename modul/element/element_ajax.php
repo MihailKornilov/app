@@ -388,7 +388,10 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//select - выбор единицы из другого списка (дл€ св€зки)
 			case 29:
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _spisokConnect($cmp_id);
+				$sel_id = 0;//выбранное значение
+				if($unit_id)
+					$sel_id = $unit[$cmp['col']];
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _spisokConnect($cmp_id, $v='', $sel_id);
 				break;
 			//настройка “јЅЋ»„Ќќ√ќ содержани€ списка
 			case 30:
