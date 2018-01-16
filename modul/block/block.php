@@ -416,7 +416,6 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 
 			$v[] = 'attr_id:"#cmp_'.$el['id'].'"';
 			$v[] = 'attr_cmp:"#cmp_'.$el['id'].'"';
-			$v[] = 'attr_pe:"#pe_'.$el['id'].'"';
 			$v[] = 'attr_el:"#pe_'.$el['id'].'"';
 
 			$v[] = 'num_1:'._num($el['num_1'], true);
@@ -477,7 +476,6 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 
 			$v['attr_id'] = '#cmp_'.$el['id'];
 			$v['attr_cmp'] = '#cmp_'.$el['id'];
-			$v['attr_pe'] = '#pe_'.$el['id'];
 			$v['attr_el'] = '#pe_'.$el['id'];
 
 			$v['num_1'] = _num($el['num_1'], true);

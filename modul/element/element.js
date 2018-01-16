@@ -998,7 +998,8 @@ var VK_SCROLL = 0,
 
 		var html;
 		switch(v.type) {
-			case 'table': html = _elemChooseTable(); break;
+			case 'table':  html = _elemChooseTable(); break;
+			case 'func_1': html = _elemChooseFunc1(); break;
 			default:html = _elemChooseAll();
 		}
 
@@ -1080,7 +1081,7 @@ var VK_SCROLL = 0,
 				'<button val="28" class="vk orange ml5" data-hint="Выбор элементов из содержания диалога,<br>по которым нужно производить поиск">28</button>' +
 
 			'<div class="hd2 mt20 mb5">Функции</div>' +
-				'<button val="36" class="vk" data-hint="Функция: скрытие-показ">36</button>' +
+				'<button val="36" class="vk" data-hint="Функция для галочки: скрытие-показ блоков">36</button>' +
 
 			'<div class="hd2 mt20 mb5">Элементы для наполнения содержания</div>' +
 				'<button val="3"  class="vk" data-hint="Меню страниц">3</button>' +
@@ -1117,6 +1118,11 @@ var VK_SCROLL = 0,
 			'<button val="32" class="vk cancel mt5">Значение: Порядковый номер</button>' +
 			'<button val="33" class="vk cancel mt5">Значение: Дата</button>' +
 			'<button val="34" class="vk cancel mt5">Значение: Иконки управления</button>' +
+		'';
+	},
+	_elemChooseFunc1 = function() {
+		return '<div class="hd2 mt5 mb5">Функции для галочки:</div>' +
+				'<button val="36" class="vk">Скрытие-показ блоков</button>' +
 		'';
 	},
 

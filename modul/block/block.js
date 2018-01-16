@@ -81,6 +81,12 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				$('#but-elem-add').click(function() {
 					_elemChoose({block_id:BL.id});
 				});
+				$('#elem-func').click(function() {
+					switch(BL.dialog_id) {
+						case 1:_elemChoose({unit_id:BL.elem_id,type:'func_1'}); break;
+					}
+				});
+
 				if(BL.elem_id) {
 					var tMar = {
 						0:'сверху',
@@ -230,7 +236,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				'<div class="fs14 blue line-b">' +
 					'Настройки элемента' +
 					'<div class="fr mtm3">' +
-						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + '" class="icon icon-usd mr3 pl dialog-open' + _tooltip('Функции', -28) + '</div>' +
+						'<div id="elem-func" class="icon icon-usd mr3 pl' + _tooltip('Функции', -28) + '</div>' +
 						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + '" class="icon icon-edit mr3 dialog-open' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
 						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + ',del:1" class="icon icon-del-red dialog-open' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 					'</div>' +
@@ -449,7 +455,7 @@ $(document)
 					el_name = '_count';
 
 				$(sp.attr_id + el_name).css('width', '100%');
-				$(sp.attr_pe)
+				$(sp.attr_el)
 					.addClass('ewc')
 					.css('width', sp.width ? sp.width + 'px' : 'auto')
 					.resizable({

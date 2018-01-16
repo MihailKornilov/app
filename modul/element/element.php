@@ -226,7 +226,6 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 						'attr_id' => '#cmp_'.$id,
 						'attr_cmp' => '#cmp_'.$id,
-						'attr_pe' => '#pe_'.$id,
 						'attr_el' => '#pe_'.$id
 					);
 				}
@@ -253,6 +252,9 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 				foreach($cmp as $r) {
 					$id = _num($r['id']);
 					$cmpUtf8[$id]['txt_1'] = utf8($r['txt_1']);
+					$cmpUtf8[$id]['txt_2'] = utf8($r['txt_2']);
+					$cmpUtf8[$id]['txt_3'] = utf8($r['txt_3']);
+					$cmpUtf8[$id]['txt_4'] = utf8($r['txt_4']);
 					foreach($r['elv_ass'] as $ass_id => $val)
 						$cmpUtf8[$id]['elv_ass'][$ass_id] = utf8($val);
 					foreach($r['elv_spisok'] as $sp_id => $v)

@@ -27,17 +27,19 @@ switch(@$_POST['op']) {
 		define('BLOCK_EDIT', 1);
 
 		//получение списка таблиц базы и определение выбранной (SA)
-		$sql = "SHOW TABLES";
-		$arr = query_array($sql);
-		$tables = array();
 		$tab_id = 0;
-		$n = 1;
-		foreach($arr as $ass)
-			foreach($ass as $base => $tab) {
-				if($dialog['base_table'] == $tab)
-					$tab_id = $n;
-				$tables[$n++] = $tab;
-			}
+		$tables = array();
+		if(SA) {
+			$sql = "SHOW TABLES";
+			$arr = query_array($sql);
+			$n = 1;
+			foreach($arr as $ass)
+				foreach($ass as $base => $tab) {
+					if($dialog['base_table'] == $tab)
+						$tab_id = $n;
+					$tables[$n++] = $tab;
+				}
+		}
 
 		$html =
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
@@ -129,7 +131,9 @@ switch(@$_POST['op']) {
 		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
 					'<tr><td class="red r">Таблица в базе:'.
 						'<td><input type="hidden" id="base_table" value="'.$tab_id.'" />'.
-					//доступность диалога. На основании app_id. По умолчанию 0 - недоступен всем.
+					//доступность диалога. На основании app_id.
+		            //0 - доступен только конкретному приложению
+		            //1 - всем приложениям
 					'<tr><td class="red r">Доступ всем приложениям:'.
 						'<td>'._check(array(
 									'attr_id' => 'app_any',
@@ -167,7 +171,7 @@ switch(@$_POST['op']) {
 		$send['cmp'] = $dialog['cmp_utf8'];
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
-		$send['tables'] = SA ? $tables : array();
+		$send['tables'] = $tables;
 
 		jsonSuccess($send);
 		break;
