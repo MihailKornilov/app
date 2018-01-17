@@ -318,8 +318,8 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 			query($sql);
 			continue;
 		}
-		if($r['Field'] == 'block_id' && $block_id && $dialog['base_table'] == '_element') {
-			$sql = "UPDATE `_element`
+		if($r['Field'] == 'block_id' && $block_id) {
+			$sql = "UPDATE `".$dialog['base_table']."`
 					SET `block_id`=".$block_id."
 					WHERE `id`=".$unit_id;
 			query($sql);

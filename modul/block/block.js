@@ -83,7 +83,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				});
 				$('#elem-func').click(function() {
 					switch(BL.dialog_id) {
-						case 1:_elemChoose({unit_id:BL.elem_id,type:'func_1'}); break;
+						case 1:_elemChoose({block_id:BL.id,type:'func_1'}); break;
 					}
 				});
 

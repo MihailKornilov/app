@@ -189,6 +189,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 			  AND `sa` IN (0,".SA.")";
 	if($block = query_arr($sql))
 		if($block = _blockChildClear($block)) {
+			$BLM = array();//ассоциативный массив блок[элемент]
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `block_id` IN ("._idsGet($block).")";
@@ -201,6 +202,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 				foreach($elem as $r) {
 					$id = _num($r['id']);
+					$BLM[$r['block_id']] = $id;
 					$cmp[$id] = array(
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
@@ -222,11 +224,13 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 						'elv_ass' => array(),   //ассоциативные значения из таблицы _element_value
 						'elv_spisok' => array(),//значения в виде списка {id:1,title:'значение'} (из таблицы _element_value, либо связанные списки)
-						'elv_def' => 0,  //значение по умолчанию
+						'elv_def' => 0,         //значение по умолчанию
 
 						'attr_id' => '#cmp_'.$id,
 						'attr_cmp' => '#cmp_'.$id,
-						'attr_el' => '#pe_'.$id
+						'attr_el' => '#pe_'.$id,
+
+						'func' => array()
 					);
 				}
 
@@ -246,6 +250,20 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						$cmp[$r['element_id']]['elv_def'] = $id;
 					$v_ass[$id] = $r['title'];
 				}
+
+				$sql = "SELECT *
+						FROM `_element_func`
+						WHERE `block_id` IN ("._idsGet($block).")
+						ORDER BY `sort`";
+				foreach(query_arr($sql) as $r) {
+					$elem_id = $BLM[$r['block_id']];
+					$cmp[$elem_id]['func'][] = array(
+						'dialog_id' => _num($r['dialog_id']),
+						'action_id' => _num($r['action_id']),
+						'target' => $r['target']
+					);
+				}
+
 
 				//формирование компонентов для отправки через AJAX
 				$cmpUtf8 = $cmp;

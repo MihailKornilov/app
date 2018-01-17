@@ -460,7 +460,7 @@ var VK_SCROLL = 0,
 		var dialog = _dialog({
 			dialog_id:o.dialog_id,
 			block_id:o.block_id,  //дл€ передачи значений, если будет требоватьс€ редактирование диалога
-			unit_id:o.unit_id,    //также дл€ передачи
+			unit_id:o.unit_id,    //id также дл€ передачи
 
 			top:20,
 			width:o.width,
@@ -600,12 +600,12 @@ var VK_SCROLL = 0,
 
 			$('#el-def-' + v.uid)._check({
 				tooltip:'ѕо умолчанию',
-				func:function(v, attr_id) {
+				func:function(v, ch) {
 					if(!v)
 						return;
 					//сн€тие галочек с остальных значений
 					_forEq(DL.find('.def'), function(sp) {
-						if(sp.attr('id') == attr_id)
+						if(sp.attr('id') == ch.attr('id'))
 							return;
 						sp._check(0);
 					});
@@ -805,31 +805,38 @@ var VK_SCROLL = 0,
 		}
 	},
 
-	_elemActivate = function(elem, unit, is_edit) {//применение функций (активирование) к элементам
+	_elemActivate = function(elem, unit, is_edit) {//активирование элементов
 		var attr_focus = false;//элемент, на который будет поставлен фокус
 
-		_forIn(elem, function(sp) {
-			if(sp.focus)
-				attr_focus = sp.attr_cmp;
-			switch(sp.dialog_id) {
+		_forIn(elem, function(el) {
+			if(el.focus)
+				attr_focus = el.attr_cmp;
+			switch(el.dialog_id) {
+				case 1://галочка
+					$(el.attr_cmp)._check({
+						func:function(v, o) {
+							_elemFunc(el, v, o);
+						}
+					});
+					return;
 				//textarea
-				case 5:	$(sp.attr_cmp).autosize(); return;
+				case 5:	$(el.attr_cmp).autosize(); return;
 				//select - выбор страницы
 				case 6:
-					$(sp.attr_cmp)._select({
+					$(el.attr_cmp)._select({
 						disabled:is_edit,
-						width:sp.width,
-						title0:sp.txt_1,
+						width:el.width,
+						title0:el.txt_1,
 						spisok:PAGE_LIST
 					});
 					return;
 				//search
 				case 7:
-					$(sp.attr_cmp)._search({
+					$(el.attr_cmp)._search({
 						func:function(v, obj) {
 							var send = {
 								op:'spisok_search',
-								elem_id:sp.elem_id,
+								elem_id:el.elem_id,
 								v:v,
 								busy_obj:obj.icon_del,
 								busy_cls:'spin'
@@ -852,26 +859,26 @@ var VK_SCROLL = 0,
 					return;
 				//select - произвольные значени€
 				case 17:
-					$(sp.attr_cmp)._select({
+					$(el.attr_cmp)._select({
 						disabled:is_edit,
-						width:sp.width,
-						title0:sp.txt_1,
-						spisok:sp.elv_spisok
+						width:el.width,
+						title0:el.txt_1,
+						spisok:el.elv_spisok
 					});
 					return;
 				//наполнение дл€ некоторых компонентов
 				case 19:
 					if(is_edit)
 						return;
-					_dialogCmpValue(sp, unit[sp.col]);
+					_dialogCmpValue(el, unit[el.col]);
 					return;
 				//select - выбор списка (все списки приложени€)
 				case 24:
-					$(sp.attr_cmp)._select({
+					$(el.attr_cmp)._select({
 						disabled:is_edit,
-						width:sp.width,
-						title0:sp.txt_1,
-						spisok:sp.elv_spisok
+						width:el.width,
+						title0:el.txt_1,
+						spisok:el.elv_spisok
 					});
 					return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —одержание диалога дл€ выбора значени€
@@ -886,16 +893,16 @@ var VK_SCROLL = 0,
 							elem_id = _num(t.attr('val'));
 						bec.removeClass('sel');
 						t.addClass('sel');
-						$(sp.attr_cmp).val(elem_id);
+						$(el.attr_cmp).val(elem_id);
 					});
 					return;
 				//select - выбор списка, размещЄнного на текущей странице
 				case 27:
-					$(sp.attr_cmp)._select({
+					$(el.attr_cmp)._select({
 						disabled:is_edit,
-						width:sp.width,
-						title0:sp.txt_1,
-						spisok:sp.elv_spisok
+						width:el.width,
+						title0:el.txt_1,
+						spisok:el.elv_spisok
 					});
 					return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —одержание диалога дл€ указани€ значений, по которым будет производитьс€ поиск
@@ -910,26 +917,26 @@ var VK_SCROLL = 0,
 							sel = t.hasClass('sel'),
 							ids = [];
 						t._dn(sel, 'sel');
-						_forEq(bec, function(sp) {
-							if(sp.hasClass('sel'))
-								ids.push(_num(sp.attr('val')));
+						_forEq(bec, function(el) {
+							if(el.hasClass('sel'))
+								ids.push(_num(el.attr('val')));
 						});
-						$(sp.attr_cmp).val(ids.join(','));
+						$(el.attr_cmp).val(ids.join(','));
 					});
 					return;
 				//select - выбор единицы из другого списка (дл€ св€зки)
 				case 29:
-					$(sp.attr_cmp)._select({
+					var o = {
 						disabled:is_edit,
-						width:sp.width,
-						title0:sp.txt_1,
-						write:1,
+						width:el.width,
+						title0:el.txt_1,
+						write:el.num_1 && el.num_3,
 						msg_empty:'Ќе найдено',
-						spisok:sp.elv_spisok,
+						spisok:el.elv_spisok,
 						funcWrite:function(v, t) {
 							var send = {
 								op:'spisok_connect_29',
-								cmp_id:sp.id,
+								cmp_id:el.id,
 								v:v,
 								busy_obj:t.icon_del,
 								busy_cls:'spin'
@@ -937,12 +944,16 @@ var VK_SCROLL = 0,
 							_post(send, function(res) {
 								t.spisok(res.spisok);
 							});
-						},
-						funcAdd:function(t) {
+						}
+					};
+					if(!el.num_1)
+						o.msg_empty = '—писок пока не прив€зан';
+					if(el.num_1 && el.num_2)
+						o.funcAdd = function(t) {
 							var send = {
 								op:'dialog_open_load',
 								page_id:PAGE_ID,
-								dialog_id:sp.num_1,
+								dialog_id:el.num_1,
 								busy_obj:t.icon_add,
 								busy_cls:'spin'
 							};
@@ -956,38 +967,38 @@ var VK_SCROLL = 0,
 								};
 								_dialogOpen(res);
 							});
-						}
-					});
+						};
+					$(el.attr_cmp)._select(o);
 					return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: Ќастройка “јЅЋ»„Ќќ√ќ содержани€ списка
 				case 30:
 					if(is_edit)
 						return;
-					_dialogSpisokTable(sp, unit);
+					_dialogSpisokTable(el, unit);
 					return;
 				//count - количество
 				case 35:
-					$(sp.attr_cmp)._count({
+					$(el.attr_cmp)._count({
 						disabled:is_edit,
-						width:sp.width,
-						min:sp.num_1,
-						max:sp.num_2,
-						step:sp.num_3,
-						minus:sp.num_4
+						width:el.width,
+						min:el.num_1,
+						max:el.num_2,
+						step:el.num_3,
+						minus:el.num_4
 					});
 					return;
 				//SA: Select - выбор имени колонки
 				case 37:
-					$(sp.attr_cmp)._select({
+					$(el.attr_cmp)._select({
 						disabled:is_edit,
-						width:sp.width,
+						width:el.width,
 						title0:'не выбрано',
 						msg_empty:'колонок нет',
-						spisok:sp.elv_spisok
+						spisok:el.elv_spisok
 					});
-					_forN(sp.elv_spisok, function(u) {
+					_forN(el.elv_spisok, function(u) {
 						if(u.title == unit.col) {
-							$(sp.attr_cmp)._select(u.id);
+							$(el.attr_cmp)._select(u.id);
 							return false;
 						}
 					});
@@ -998,13 +1009,29 @@ var VK_SCROLL = 0,
 		if(!is_edit && attr_focus)
 			$(attr_focus).focus();
 	},
+	_elemFunc = function(el, v, o) {//применение функций, прив€занных к элементам
+		_forN(el.func, function(sp) {
+			switch(sp.dialog_id) {
+				case 36://√алочка[1]: скрытие/показ блоков
+					if(el.dialog_id != 1)
+						return;
+					var target = _parent($('#bl_554'), '.bl-tab');// + sp.target);
+//					target.css('visibility', v ? 'visible' : 'hidden');
+//					target._dn(!v);
+					if(!target.parent().hasClass('up'))
+						target.wrap('<div class="up">');
+					target.parent().slideToggle();
+					break;
+			}
+		});
+	},
 
 	_elemChoose = function(v) {//¬џЅќ– элемента дл€ вставки
 		v = $.extend({
 			type:'all',
 			dialog_id:0,//диалог, который вносит элемент
-			block_id:0, //блок (или элемент-группировка), в который вставл€етс€ элемент
-			unit_id:0,  //id элемента дл€ редактировани€
+			block_id:0, //блок (или отрицательный id элемента - группировка), в который вставл€етс€ элемент
+			unit_id:0,  //id единицы списка (элемент или функци€)
 
 			busy_obj:null,
 			busy_cls:'_busy',
@@ -1092,6 +1119,7 @@ var VK_SCROLL = 0,
 				'<button val="27" class="vk ml10" data-hint="">Select - списки на текущей странице</button>' +
 			'<p class="mt10">' +
 				'<button val="29" class="vk" data-hint="Select - выбор единицы из другого списка (св€зка)">29</button>' +
+				'<button val="38" class="vk ml5" data-hint="Select - выбор диалогового окна">38</button>' +
 
 			'<div class="hd2 mt20 mb5">¬спомогательные компоненты</div>' +
 				'<button val="19" class="vk orange" data-hint="—одержание дл€ некоторых компонентов">19</button>' +
@@ -1244,14 +1272,20 @@ $(document)
 	});
 
 $.fn._check = function(o) {
-	var t = $(this),
-		attr_id = t.attr('id'),
-		div_id = attr_id + '_check',
+	var t = $(this);
+
+	if(!t.length)
+		return;
+
+	var attr_id = t.attr('id');
+	if(!attr_id) {
+		attr_id = 'check' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
+	}
+
+	var div_id = attr_id + '_check',
 		win = attr_id + '_check_win',
 		S = window[win];
-
-	if(!attr_id)
-		return;
 
 	switch(typeof o) {
 		case 'number':
@@ -1277,7 +1311,7 @@ $.fn._check = function(o) {
 
 		var v = CHECK.hasClass('on') ? 0 : 1;
 		setVal(v);
-		o.func(v, attr_id);
+		o.func(v, t);
 	});
 
 	if(o.tooltip)
@@ -1323,7 +1357,7 @@ $.fn._check = function(o) {
 
 	t.value = setVal;
 	t.funcGo = function() {//применение фукнции
-		o.func(_num(t.val()), attr_id);
+		o.func(_num(t.val()), t);
 	};
 	t.dis = function() {//перевод галочки в неактивное состо€ние
 		CHECK.addClass('disabled');
