@@ -536,6 +536,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			return '<input type="hidden" id="'.$attr_id.'" />';
 
+		//SA: Select - выбор диалогового окна
+		case 38:
+			/*
+                txt_1 - нулевое значение
+			*/
+			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+
 
 
 

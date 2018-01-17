@@ -1003,6 +1003,16 @@ var VK_SCROLL = 0,
 						}
 					});
 					return;
+				//SA: Select - выбор диалогового окна
+				case 38:
+					$(el.attr_cmp)._select({
+						disabled:is_edit,
+						width:el.width,
+						title0:el.txt_1,
+						msg_empty:'диалоги ещё не были созданы',
+						spisok:el.elv_spisok
+					});
+					return;
 			}
 		});
 
@@ -1112,14 +1122,13 @@ var VK_SCROLL = 0,
 				'<button val="-6" class="vk ml5" data-hint="Календарь">-</button>' +
 				'<button val="35" class="vk ml5" data-hint="Количество">35</button>' +
 			'<p class="mt10">' +
-				'<button val="17" class="vk" data-hint="">Select - произвольные значения</button>' +
-				'<button val="6" class="vk ml10" data-hint="">Select - страницы</button>' +
-			'<p class="mt10">' +
-				'<button val="24" class="vk" data-hint="">Select - списки приложения</button>' +
-				'<button val="27" class="vk ml10" data-hint="">Select - списки на текущей странице</button>' +
+				'<button val="17" class="vk" data-hint="Select - произвольные значения">17</button>' +
+				'<button val="6"  class="vk ml5" data-hint="Select - страницы">6</button>' +
+				'<button val="24" class="vk ml5" data-hint="Select - списки приложения">24</button>' +
+				'<button val="27" class="vk ml5" data-hint="Select - списки на текущей странице">27</button>' +
 			'<p class="mt10">' +
 				'<button val="29" class="vk" data-hint="Select - выбор единицы из другого списка (связка)">29</button>' +
-				'<button val="38" class="vk ml5" data-hint="Select - выбор диалогового окна">38</button>' +
+				'<button val="38" class="vk red ml5" data-hint="Select - выбор диалогового окна">38</button>' +
 
 			'<div class="hd2 mt20 mb5">Вспомогательные компоненты</div>' +
 				'<button val="19" class="vk orange" data-hint="Содержание для некоторых компонентов">19</button>' +

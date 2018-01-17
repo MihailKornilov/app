@@ -447,7 +447,7 @@ $(document)
 
 				//аффикс к атрибуту элемента, если нужно
 				var el_name = '';
-				if(sp.dialog_id == 17 || sp.dialog_id == 6 || sp.dialog_id == 24 || sp.dialog_id == 27 || sp.dialog_id == 29)
+				if(sp.dialog_id == 17 || sp.dialog_id == 6 || sp.dialog_id == 24 || sp.dialog_id == 27 || sp.dialog_id == 29 || sp.dialog_id == 37 || sp.dialog_id == 38)
 					el_name = '_select';
 				if(sp.dialog_id == 7)
 					el_name = '_search';
