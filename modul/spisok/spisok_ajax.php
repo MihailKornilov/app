@@ -280,14 +280,6 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 
 	$unit_id = query_insert_id($dialog['base_table']);
 
-	//если вносится кнопка, то применение к ней диалогового окна
-	if($dialog['id'] == 2) {
-		$sql = "UPDATE `_element`
-				SET `num_4`="._dialogNew()."
-				WHERE `id`=".$unit_id;
-		query($sql);
-	}
-
 	//обновление некоторых колонок
 	$sql = "DESCRIBE `".$dialog['base_table']."`";
 	$desc = query_array($sql);

@@ -195,7 +195,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 	case 'dialog_open_load'://получение данных диалога
-		if(!$dialog_id = _num($_POST['dialog_id']))
+		if(!$dialog_id = _dialogTest())
 			jsonError('Некорректный ID диалога');
 
 		$send = _dialogOpenLoad($dialog_id);
@@ -500,6 +500,37 @@ function _dialogOpenLoad($dialog_id) {
 							$field[] = $u;
 					}
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $field;
+				break;
+			//SA: Select - выбор диалогового окна
+			case 38:
+				$sql = "SELECT *
+						FROM `_dialog`
+						WHERE `app_id` IN (".APP_ID.(SA ? ',0' : '').")
+						  AND `sa` IN(0".(SA ? ',1' : '').")
+						ORDER BY `app_id` DESC,`id`";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$spisok = array();
+				$saFlag = 0;
+				foreach($arr as $r) {
+					if(!$saFlag && !$r['app_id']) {//вставка графы для SA
+						$spisok[] = array(
+							'info' => 1,
+							'title' => utf8('SA-диалоги:')
+						);
+						$saFlag = 1;
+					}
+					$u = array(
+						'id' => _num($r['id']),
+						'title' => utf8($r['insert_head'])
+					);
+					if(!$r['app_id'])
+						$u['content'] = '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'"><b>'.$r['id'].'</b>. '.utf8($r['insert_head']).'</div>';
+					$spisok[] = $u;
+				}
+
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
 				break;
 	}
 

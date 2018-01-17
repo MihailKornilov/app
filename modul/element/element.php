@@ -152,16 +152,46 @@ function _search($v=array()) {//элемент ПОИСК
 }
 
 
-function _dialogNew() {//создание нового диалогового окна в базе
+function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
+	//если dialog_id получен - отправка его
+	if($dialog_id = _num(@$_POST['dialog_id']))
+		return $dialog_id;
+	if(!$block_id = _num(@$_POST['block_id']))
+		return false;
+
+	//получение элемента-кнопки для присвоения нового диалога
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `block_id`=".$block_id."
+			  AND `dialog_id`=2
+			LIMIT 1";
+	if(!$elem = query_assoc($sql))
+		return false;
+
+	//новый диалог кнопке уже был присвоен
+	if($elem['num_4'])
+		return $elem['num_4'];
+
 	$sql = "INSERT INTO `_dialog` (`app_id`) VALUES (".APP_ID.")";
 	query($sql);
+
+	$sql = "SELECT IFNULL(MAX(`num`),0)+1
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID;
+	$num = query_value($sql);
 
 	$dialog_id = query_insert_id('_dialog');
 
 	$sql = "UPDATE `_dialog`
-			SET `element_name`='элемент ".$dialog_id."',
-				`spisok_name`='Список ".$dialog_id."'
+			SET `num`=".$num.",
+				`element_name`='элемент ".$dialog_id."',
+				`spisok_name`='Список ".$num."'
 			WHERE `id`=".$dialog_id;
+	query($sql);
+
+	$sql = "UPDATE `_element`
+			SET `num_4`=".$dialog_id."
+			WHERE `id`=".$elem['id'];
 	query($sql);
 
 	return $dialog_id;
