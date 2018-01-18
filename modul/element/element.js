@@ -1517,12 +1517,18 @@ $.fn._count = function(o) {//input с количеством
 	 .attr('type', 'text')
 	 .attr('readonly', true);
 
-	if(o.bold)
-		t.addClass('b');
-
 	var width = 'width:' + (o.width ? o.width + 'px' : '100%'),
 		dis = o.disabled ? ' disabled' : '';
-	t.wrap('<div class="_count' + dis + '" id="' + win + '" style="' + width + '">');
+
+	if(t.parent().hasClass('_count')) {
+		t.parent()
+			._dn(dis == '', 'disabled')
+			.attr('id', win)
+			.width(o.width || '100%')
+			.find('.but').remove();
+	} else {
+		t.wrap('<div class="_count' + dis + '" id="' + win + '" style="' + width + '">');
+	}
 
 	var el = $('#' + win);
 	el._dn(val, 'nol');
@@ -1530,6 +1536,9 @@ $.fn._count = function(o) {//input с количеством
 		'<div class="but"></div>' +
 		'<div class="but but-b"></div>'
 	);
+
+	if(o.bold)
+		t.addClass('b');
 
 	if(o.tooltip)
 		el._tooltip(o.tooltip, -15);

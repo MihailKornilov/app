@@ -362,7 +362,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	//значение из списка
 	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']]: '';
 	$attr_id = 'cmp_'.$el['id'];
-	$disabled = ELEM_WIDTH_CHANGE || !empty($unit['choose']) ? ' disabled' : '';
+	$disabled = BLOCK_EDIT || ELEM_WIDTH_CHANGE || !empty($unit['choose']) ? ' disabled' : '';
 
 	switch($el['width']) {
 		case 0: $width = ' style="width:100%"'; break;
@@ -381,6 +381,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			return _check(array(
 				'attr_id' => $attr_id,
 				'title' => $el['txt_1'],
+				'disabled' => $disabled,
 				'value' => _num($v)
 			));
 
@@ -470,7 +471,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					}
 				}
 			}
-			return '<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />';
+			return _select(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => $value
+				   ));
 
 		//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: наполнение дл€ некоторых компонентов: radio, select, dropdown
 		case 19: return '<div class="_empty min">Ќаполнение компонента</div>'; //все действи€ через JS
@@ -481,7 +487,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 txt_1 - текст, когда список не выбран
 				функци€ _dialogSpisokOn()
 			*/
-			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+			return _select(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _num($v)
+				   ));
 
 		//Select - выбор списка из размещЄнных текущей странице
 		case 27:
@@ -492,7 +503,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 txt_1 - текст, когда список не выбран
 				функци€ _dialogSpisokOnPage()
 			*/
-			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+			return _select(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _num($v)
+				   ));
 
 		//Select - выбор единицы из другого списка
 		case 29:
@@ -505,7 +521,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_2 - возможность добавлени€ новых значений
 				num_3 - поиск значений вручную
 			*/
-			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+			return _select(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _num($v)
+				   ));
 
 		//Count - количество
 		case 35:
@@ -515,7 +536,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 num_3 - шаг
                 num_4 - может быть отрицательным (галочка)
 			*/
-			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+			return _count(array(
+						'attr_id' => $attr_id,
+						'width' => $el['width'],
+						'value' => _num($v)
+				   ));
 
 		//SA: Select - выбор колонки таблицы
 		case 37:
@@ -523,26 +548,34 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 num_1 - показывать им€ таблицы перед выбором
 			*/
 			if($el['num_1'] && !empty($US)) {
-				$sql = "SELECT *
-						FROM `_block`
-						WHERE `id`=".$US['block_id'];
-				if($block = query_assoc($sql))
+				if($block = _blockQuery($US['block_id']))
 					if($block['obj_name'] == 'dialog') //выбор имени колонки может производитьс€, только если элемент размещаетс€ в диалоге
 						return
 							'<table>'.
 								'<tr><td class="pr3 b color-555">'._dialogParam($block['obj_id'], 'base_table').'.'.
-									'<td><input type="hidden" id="'.$attr_id.'" />'.
+									'<td>'._select(array(
+												'attr_id' => $attr_id,
+												'width' => $el['width']
+										   )).
 							'</table>';
 			}
 
-			return '<input type="hidden" id="'.$attr_id.'" />';
+			return _select(array(
+						'attr_id' => $attr_id,
+						'width' => $el['width']
+				   ));
 
 		//SA: Select - выбор диалогового окна
 		case 38:
 			/*
                 txt_1 - нулевое значение
 			*/
-			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+			return _select(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _num($v)
+				   ));
 
 
 
@@ -606,7 +639,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'attr_id' => $attr_id,
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'v' => $el['v']
+						'v' => $el['v'],
+						'disabled' => $disabled
 					));
 
 		//—сылка на страницу

@@ -122,6 +122,48 @@ function _radioUnit($id, $title, $interval, $on) {
 		$title.
 	'</div>';
 }
+function _select($v=array()) {//выпадающее поле
+	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
+
+	$width = '150px';
+	if(isset($v['width']))
+		if(!$width = _num($v['width']))
+			$width = '100%';
+		else
+			$width .= 'px';
+	$width = ' style="width:'.$width.'"';
+
+	$placeholder = empty($v['placeholder']) ? '' : ' placeholder="'.trim($v['placeholder']).'"';
+	$value = _num(@$v['value']);
+
+	return
+	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
+	'<div class="_select disabled dib" id="'.$attr_id.'_select"'.$width.'">'.
+		'<table class="w100p">'.
+			'<tr><td><input type="text" class="select-inp"'.$placeholder.' readonly />'.
+				'<td class="arrow">'.
+		'</table>'.
+	'</div>';
+}
+function _count($v=array()) {//поле количество
+	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
+
+	$width = '50px';
+	if(isset($v['width']))
+		if(!$width = _num($v['width']))
+			$width = '100%';
+		else
+			$width .= 'px';
+	$width = ' style="width:'.$width.'"';
+
+	$value = _num(@$v['value']);
+	return
+	'<div class="_count disabled" id="'.$attr_id.'_count"'.$width.'>'.
+		'<input type="text" readonly id="'.$attr_id.'" value="'.$value.'" />'.
+		'<div class="but"></div>'.
+		'<div class="but but-b"></div>'.
+	'</div>';
+}
 function _search($v=array()) {//элемент ПОИСК
 	$attr_id = empty($v['attr_id']) ? 'search'.rand(1, 100000) : $v['attr_id'];
 
@@ -133,15 +175,17 @@ function _search($v=array()) {//элемент ПОИСК
 			$width .= 'px';
 	$width = ' style="width:'.$width.'"';
 
+	$dis = empty($v['disabled']) ? '' : ' disabled';
+	$readonly = $dis ? ' readonly' : '';
 	$placeholder = empty($v['placeholder']) ? '' : ' placeholder="'.trim($v['placeholder']).'"';
 	$v = trim(@$v['v']);
 
 	return
-	'<div class="_search"'.$width.' id="'.$attr_id.'_search">'.
+	'<div class="_search'.$dis.'"'.$width.' id="'.$attr_id.'_search">'.
 		'<table class="w100p">'.
 			'<tr><td class="w15 pl5">'.
 					'<div class="icon icon-search curD"></div>'.
-				'<td><input type="text" id="'.$attr_id.'"'.$placeholder.' value="'.$v.'" />'.
+				'<td><input type="text" id="'.$attr_id.'"'.$placeholder.$readonly.' value="'.$v.'" />'.
 				'<td class="w25 center">'.
 					'<div class="icon icon-del pl'._dn($v).'"></div>'.
 		'</table>'.

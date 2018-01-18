@@ -243,6 +243,10 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 		if($cmp['req'] && !$v)
 			jsonError('Требуется обязательно заполнить<br>поля, отмеченные звёздочкой');
 
+		$ex = explode('_', $col);
+		if($ex[0] == 'num')
+			$v = _num($v);
+
 		$send[$cmp_id] = $v;
 	}
 
