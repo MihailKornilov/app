@@ -789,8 +789,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
 		case 26:
 			/*
-				num_1 - вставка значения производится в блок (блок обязательно должен быть из диалога: obj_name=dialog),
-						иначе только отправляются данные (значение таблицы)
 				num_2 - Что выбирать:
 							46: любые элементы
 							47: элементы, которые вносят данные
@@ -810,9 +808,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if($BL['obj_name'] == 'spisok')
 				$BL = _blockQuery($BL['obj_id']);
 
-
 			if(!$EL = $BL['elem'])
 				return _emptyMin('Содержание диалога будет доступно после вставки элемента в блок.');
+
+			if($el['num_2'] == 49 && $BL['obj_name'] != 'dialog')
+				return _emptyMin('Выбор блоков доступен только для диалогов.');
 
 			//поиск id диалога, который следует выводить
 			$dialog_id = 0;
@@ -830,6 +830,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					break;
 			}
 
+			if($el['num_2'] == 49)
+				$dialog_id = $BL['obj_id'];
+
 			if(!$dialog_id)
 				return _emptyMin('Не найдено ID диалога, который вносит данные списка.');
 
@@ -840,7 +843,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			//поля, которые можно подсвечивать
 			$choose_access = array();
 			switch($el['num_2']) {
-				case 46: $choose_access = array('all'=>1); break; //любые элементы
+				case 46://любые элементы
+					$choose_access = array('all'=>1);
+					break;
 				case 47: //элементы, которые вносят данные
 						$sql = "SELECT `id`,1
 								FROM `_dialog`
@@ -855,14 +860,16 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 								  AND `element_search_access`";
 						$choose_access = query_ass($sql);
 					break;
-				case 49: break;
+				case 49: //блоки
+					$choose_access = array('block'=>1);
+					break;
 			}
 
 
 			$send = array(
 				'choose' => 1,
 				'choose_access' => $choose_access,
-				'choose_sel' => _idsAss($v)            //ids ранее выбранных элементов
+				'choose_sel' => _idsAss($v)            //ids ранее выбранных элементов или блоков
 			);
 
 			return

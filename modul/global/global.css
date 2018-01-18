@@ -251,7 +251,27 @@ table{border:0;border-spacing:0}
 	opacity:.9;
 }
 
-/* подсветка блока при выборе элемента для вставки в шаблон */
+/* подсветка блока при выборе блока */
+.block-choose{
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	border:#ea2 dashed 1px;
+	background:transparent repeat url(../../img/block-choose.png?2);
+	opacity:.45;
+	cursor:pointer;
+	z-index:1;
+}
+.block-choose:not(.sel):hover{opacity:1;border-color:#d90}
+.block-choose.sel{
+	border-color:#d60;
+	background-color:#ec6;
+	opacity:.5;
+}
+
+/* подсветка блока при выборе элемента */
 .block-elem-choose{
 	position:absolute;
 	top:0;
@@ -260,15 +280,15 @@ table{border:0;border-spacing:0}
 	left:0;
 	border:#5ce dashed 1px;
 	background:transparent repeat url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAABNmlDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjarY6xSsNQFEDPi6LiUCsEcXB4kygotupgxqQtRRCs1SHJ1qShSmkSXl7VfoSjWwcXd7/AyVFwUPwC/0Bx6uAQIYODCJ7p3MPlcsGo2HWnYZRhEGvVbjrS9Xw5+8QMUwDQCbPUbrUOAOIkjvjB5ysC4HnTrjsN/sZ8mCoNTIDtbpSFICpA/0KnGsQYMIN+qkHcAaY6addAPAClXu4vQCnI/Q0oKdfzQXwAZs/1fDDmADPIfQUwdXSpAWpJOlJnvVMtq5ZlSbubBJE8HmU6GmRyPw4TlSaqo6MukP8HwGK+2G46cq1qWXvr/DOu58vc3o8QgFh6LFpBOFTn3yqMnd/n4sZ4GQ5vYXpStN0ruNmAheuirVahvAX34y/Axk/96FpPYgAAAARnQU1BAACxnmFMQfcAAAAgY0hSTQAAeiUAAICDAAD5/wAAgOgAAFIIAAEVWAAAOpcAABdv11ofkAAAAI5JREFUeNqkk8ENgDAMA70TezAGO3UOtkCshMIHJGQaTOpH1cZp1eQUIyIQEZi3Y7nPV7w/92zxu1tsdEnFa5Z/VcA/Kp07YnFy4m6FfyvLmJcZqbjMSDFHlZG6X2akmI/OYcq8zEjpqDKSDF3vsm57t+dly7vcEVzvpgxHvftZoTGHTY7N6FzC8W4vfw4AEN6KxmfW57wAAAAASUVORK5CYII=");
-	opacity:.3;
+	opacity:.45;
 	cursor:pointer;
 	z-index:1;
 }
 .block-elem-choose:not(.sel):hover{opacity:1;border-color:#0ad}
 .block-elem-choose.sel{
 	border-color:#00607D;
-	background-color:#bef;
-	opacity:.5;
+	background-color:#6ce;
+	opacity:.35;
 }
 
 /* цвета блока в настройках */

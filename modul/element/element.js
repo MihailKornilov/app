@@ -889,7 +889,7 @@ var VK_SCROLL = 0,
 						return;
 					if(!DIALOG_OPEN)
 						return;
-					var bec = DIALOG_OPEN.content.find('.block-elem-choose');
+					var bec = DIALOG_OPEN.content.find('.choose');
 					bec.click(function() {
 						var t = $(this),
 							ids = [];
@@ -1017,12 +1017,13 @@ var VK_SCROLL = 0,
 				case 36://Галочка[1]: скрытие/показ блоков
 					if(el.dialog_id != 1)
 						return;
-					var target = _parent($('#bl_554'), '.bl-tab');// + sp.target);
-//					target.css('visibility', v ? 'visible' : 'hidden');
-//					target._dn(!v);
-					if(!target.parent().hasClass('up'))
-						target.wrap('<div class="up">');
-					target.parent().slideToggle();
+					var arr = [];
+					_forN(sp.target.split(','), function(bl_id) {
+					//	arr.push('#bl_' + bl_id);
+						_parent($('#bl_' + bl_id), '.bl-div').slideToggle();
+					});
+					//$(arr.join(',')).css('visibility', v ? 'visible' : 'hidden');
+//					$(arr.join(',')).animate({opacity:v}, 200);
 					break;
 			}
 		});

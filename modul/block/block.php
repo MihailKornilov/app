@@ -106,8 +106,10 @@ function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
 	if(!$send = @$child[$parent_id])
 		return array();
 
-	foreach($send as $id => $r)
+	foreach($send as $id => $r) {
 		$send[$id]['child'] = _blockArrChild($child, $id);
+		$send[$id]['child_count'] = count($send[$id]['child']);
+	}
 
 	return $send;
 }
@@ -196,7 +198,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
 		$send .=
-			'<table class="bl-tab" style="height:'.$r['height'].'px">'.//width:'.$WM.'px;
+			'<div class="bl-div y'.$y.'">'.
+			'<table class="bl-tab" style="height:'.$r['height'].'px">'.
 				'<tr>';
 		//пустота в начале
 		if($r['x']) {
@@ -235,6 +238,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 				 (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
 					 '>'.
 							_blockSetka($r, $level, $grid_id).
+							_blockChoose($r, $unit).
 							_blockElemChoose($r, $unit).
 							_blockChildHtml($r, $level + 1, $width, $grid_id, $unit).
 	    					_elemDiv($r['elem'], $unit).
@@ -255,7 +259,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			if(!$next && $widthMax)
 				$send .= '<td class="'.$bt.$bb.'" style="width:'.$widthMax.'px">';
 		}
-		$send .= '</table>';
+		$send .= '</table>'.
+				 '</div>';
 	}
 
 	return $send;
@@ -340,8 +345,25 @@ function _blockSetka($r, $level, $grid_id) {//отображение сетки для настраиваемо
 
 	return '<div class="block-unit level'.$bld.' '.($grid_id ? ' grid' : '').'" val="'.$r['id'].'"></div>';
 }
+function _blockChoose($r, $unit) {//подсветка блоков для выбора (к функциям)
+	if(empty($unit['choose']))
+		return '';
+	//выбирать можно только корневые блоки
+	if($r['parent_id'])
+		return '';
+	if(!$ca = $unit['choose_access'])
+		return '';
+	if(!@$ca['block'])
+		return '';
+
+	//отметка выбранных полей
+	$block_id = $r['id'];
+	$sel = isset($unit['choose_sel'][$block_id]) ? ' sel' : '';
+
+	return '<div class="choose block-choose'.$sel.'" val="'.$block_id.'"></div>';
+}
 function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
-	//условие выбора элемента для настройки шаблона
+	//условие выбора
 	if(empty($unit['choose']))
 		return '';
 	if(empty($r['elem']))//блок не подсвечивается, если в нём нет элемента
@@ -355,6 +377,9 @@ function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 	if(!$ca = $unit['choose_access'])
 		return '';
 
+	if(@$ca['block'])
+		return '';
+
 	if(!@$ca['all'] && !isset($ca[$dialog_id]))
 		return '';
 
@@ -362,7 +387,7 @@ function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 	$elem_id = $r['elem']['id'];
 	$sel = isset($unit['choose_sel'][$elem_id]) ? ' sel' : '';
 
-	return '<div class="block-elem-choose'.$sel.'" val="'.$r['elem']['id'].'"></div>';
+	return '<div class="choose block-elem-choose'.$sel.'" val="'.$elem_id.'"></div>';
 }
 function _blockStyle($r, $width) {//стили css для блока
 	$send = array();
