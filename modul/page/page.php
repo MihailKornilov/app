@@ -362,7 +362,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	//значение из списка
 	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']]: '';
 	$attr_id = 'cmp_'.$el['id'];
-	$disabled = ELEM_WIDTH_CHANGE ? ' disabled' : '';
+	$disabled = ELEM_WIDTH_CHANGE || !empty($unit['choose']) ? ' disabled' : '';
 
 	switch($el['width']) {
 		case 0: $width = ' style="width:100%"'; break;
@@ -443,7 +443,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'interval' => 5,
 				'value' => $value,
 				'title0' => $el['txt_1'],
-				'spisok' => $spisok
+				'spisok' => $spisok,
+				'disabled' => $disabled
 			));
 
 		//Select - произвольные значения

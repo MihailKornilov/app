@@ -86,7 +86,7 @@ function _radio($v=array()) {//элемент RADIO
 	$title0 = @$v['title0'];
 	$spisok = @$v['spisok'] ? $v['spisok'] : array();//содержание в виде id => title
 	$value = _num(@$v['value']);
-	$dis = _num(@$v['disabled']) ? ' disabled' : '';
+	$dis = empty($v['disabled']) ? '' : ' disabled';
 	$light = _num(@$v['light']) ? ' light' : '';
 	$block = _bool(@$v['block']) ? ' block' : '';
 	$interval = _num(@$v['interval']) ? _num(@$v['interval']) : 7;

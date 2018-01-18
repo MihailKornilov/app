@@ -892,10 +892,19 @@ var VK_SCROLL = 0,
 					var bec = DIALOG_OPEN.content.find('.block-elem-choose');
 					bec.click(function() {
 						var t = $(this),
-							elem_id = _num(t.attr('val'));
-						bec.removeClass('sel');
-						t.addClass('sel');
-						$(el.attr_cmp).val(elem_id);
+							ids = [];
+						if(el.num_3) {
+							var sel = t.hasClass('sel');
+							t._dn(sel, 'sel');
+						} else {
+							bec.removeClass('sel');
+							t.addClass('sel');
+						}
+						_forEq(bec, function(el) {
+							if(el.hasClass('sel'))
+								ids.push(_num(el.attr('val')));
+						});
+						$(el.attr_cmp).val(ids.join(','));
 					});
 					return;
 				//select - выбор списка, размещённого на текущей странице
@@ -907,29 +916,6 @@ var VK_SCROLL = 0,
 						spisok:el.elv_spisok
 					});
 					return;
-
-/*
-				//УДАЛЕНИЕ - ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для указания значений, по которым будет производиться поиск
-				case 28:
-					if(is_edit)
-						return;
-					if(!DIALOG_OPEN)
-						return;
-					var bec = DIALOG_OPEN.content.find('.block-elem-choose');
-					bec.click(function() {
-						var t = $(this),
-							sel = t.hasClass('sel'),
-							ids = [];
-						t._dn(sel, 'sel');
-						_forEq(bec, function(el) {
-							if(el.hasClass('sel'))
-								ids.push(_num(el.attr('val')));
-						});
-						$(el.attr_cmp).val(ids.join(','));
-					});
-					return;
-*/
-
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
 					var o = {
@@ -1145,6 +1131,7 @@ var VK_SCROLL = 0,
 			'<div class="hd2 mt20 mb5">Функции</div>' +
 				'<button val="36" class="vk" data-hint="Функция для галочки: скрытие-показ блоков">36</button>' +
 				'<button val="28" class="vk ml5" data-hint="">28 - свободно</button>' +
+				'<button val="22" class="vk ml5">22 - свободно</button>' +
 
 			'<div class="hd2 mt20 mb5">Элементы для наполнения содержания</div>' +
 				'<button val="3"  class="vk" data-hint="Меню страниц">3</button>' +
@@ -1166,8 +1153,6 @@ var VK_SCROLL = 0,
 				'<button val="32" class="vk cancel ml5" data-hint="Значение: Порядковый номер">32</button>' +
 				'<button val="33" class="vk cancel ml5" data-hint="Значение: Дата">33</button>' +
 				'<button val="34" class="vk cancel ml5" data-hint="Значение: Иконки управления">34</button>' +
-			'<p class="mt10">' +
-				'<button val="22" class="vk orange ml10">Связка</button>' +
 
 	  (SA ? '<div class="hd2 mt20 mb5">Элементы для SA</div>' +
 				'<button val="12" class="vk red">PHP-функция</button>' +
