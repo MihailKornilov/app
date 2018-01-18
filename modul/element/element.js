@@ -905,7 +905,9 @@ var VK_SCROLL = 0,
 						spisok:el.elv_spisok
 					});
 					return;
-				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для указания значений, по которым будет производиться поиск
+
+/*
+				//УДАЛЕНИЕ - ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для указания значений, по которым будет производиться поиск
 				case 28:
 					if(is_edit)
 						return;
@@ -924,6 +926,8 @@ var VK_SCROLL = 0,
 						$(el.attr_cmp).val(ids.join(','));
 					});
 					return;
+*/
+
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
 					var o = {
@@ -1135,10 +1139,10 @@ var VK_SCROLL = 0,
 				'<button val="25" class="vk orange ml5" data-hint="Настройка содержания списка-шаблона">25</button>' +
 				'<button val="30" class="vk orange ml5" data-hint="Настройка содержания списка-таблицы">30</button>' +
 				'<button val="26" class="vk orange ml5" data-hint="Содержание диалога для выбора значения">26</button>' +
-				'<button val="28" class="vk orange ml5" data-hint="Выбор элементов из содержания диалога,<br>по которым нужно производить поиск">28</button>' +
 
 			'<div class="hd2 mt20 mb5">Функции</div>' +
 				'<button val="36" class="vk" data-hint="Функция для галочки: скрытие-показ блоков">36</button>' +
+				'<button val="28" class="vk ml5" data-hint="">28 - свободно</button>' +
 
 			'<div class="hd2 mt20 mb5">Элементы для наполнения содержания</div>' +
 				'<button val="3"  class="vk" data-hint="Меню страниц">3</button>' +

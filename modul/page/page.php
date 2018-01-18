@@ -355,12 +355,12 @@ function _elemColor() {//массив цветов дл€ текста в формате JS, доступных элемен
 		'"color-vin":["#c88","Ѕордовый"]';
 }
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
-	$unitExist = isset($unit['id']);
+	$UNIT_ISSET = isset($unit['id']);
 	if(!$US = @$unit['source'])
 		$US = array();
 
 	//значение из списка
-	$v = $unitExist && $el['col'] ? $unit[$el['col']]: '';
+	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']]: '';
 	$attr_id = 'cmp_'.$el['id'];
 	$disabled = ELEM_WIDTH_CHANGE ? ' disabled' : '';
 
@@ -371,7 +371,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	}
 
 	switch($el['dialog_id']) {
-		//---===  ќћѕќЌ≈Ќ“ ƒЋя ¬Ќ≈—≈Ќ»я ƒјЌЌџ’ ===--- (используетс€ $unit)
+		//---===  ќћѕќЌ≈Ќ“џ ƒЋя ¬Ќ≈—≈Ќ»я ƒјЌЌџ’ ===--- (используетс€ $unit)
 		//галочка
 		case 1:
 			/*
@@ -722,7 +722,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				им€ объекта: spisok
 				 id объекта: block_id, в котором размещаетс€ список
 			*/
-			if(!$unitExist)
+			if(!$UNIT_ISSET)
 				return
 				'<div class="bg-ffe pad10">'.
 					'<div class="_empty min">'.
@@ -754,14 +754,40 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —одержание диалога дл€ выбора значени€
 		case 26:
 			/*
-				num_1 - требуетс€ наличие блока, в который будет вставл€тьс€ значение.
-						Ѕлок об€зательно должен быть из диалога: obj_name=dialog.
+				num_1 - вставка значени€ производитс€ в блок (блок об€зательно должен быть из диалога: obj_name=dialog),
+						иначе только отправл€ютс€ данные (значение таблицы)
+				num_2 - „то выбирать:
+							любые элементы
+							элементы, отвечающие за внесение данных
+							блоки
+				num_3 - выбор нескольких значений
 			*/
+
+			if(!$bs_id = _num(@$US['block_id']))
+				return _emptyMin('ќтсутствует ID исходного блока.');
+
+			$BL = _blockQuery($bs_id);
+			if(!$EL = $BL['elem'])
+				return _emptyMin('—одержание диалога будет доступно после вставки элемента в блок.');
+
+			//поиск id диалога, который следует выводить
+			$dialog_id = 0;
+			switch($EL['dialog_id']) {
+				case 7://поиск
+					if(!$EL['num_1'])
+						return _emptyMin('—одержание диалога будет доступно после выбора списка,<br>по которому будет производитьс€ поиск.');
+					$sp = _elemQuery($EL['num_1']);
+					$dialog_id = $sp['num_1'];
+					break;
+			}
+/*
+return _pr($el)._pr($BL);
+
 
 			$block_id_spisok = _num(@$US['block_id']);
 
 			if($el['num_1']) {
-				if($unitExist) {
+				if($UNIT_ISSET) {
 					//получение исходного блока, если элемент был вставлен ранее
 					$sql = "SELECT *
 							FROM `_element`
@@ -792,9 +818,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					  AND `dialog_id` IN (14,23)";
 			if(!$elem = query_assoc($sql))
 				return '<div class="_empty min mar10">Ёлемента не существует, который размещает список.</div>';
+*/
+			if(!$dialog_id)
+				return _emptyMin('Ќе найдено ID диалога, который вносит данные списка.');
 
-			if(!$dialog = _dialogQuery($elem['num_1']))
-				return '<div class="_empty min mar10">ƒиалога не существует, который вносит данные списка.</div>';
+			if(!$dialog = _dialogQuery($dialog_id))
+				return _emptyMin('ƒиалога не существует, который вносит данные списка.');
 
 			$send = array(
 				'choose' => 1,
@@ -802,13 +831,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			);
 
 			return
-			'<div class="hd2 ml10 mr10">ƒиалоговое окно <b class="fs16">'.$dialog['spisok_name'].'</b>:</div>'.
+			'<div class="fs14 pad10 pl15 bg-gr2 line-b">ƒиалоговое окно <b class="fs14">'.$dialog['spisok_name'].'</b>:</div>'.
 			'<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />'.
-			_blockHtml('dialog', $elem['num_1'], $dialog['width'], 0, $send);
+			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
 
-		//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —одержание диалога дл€ указани€ значений, по которым будет производитьс€ поиск
+		//”ƒјЋ≈Ќ»≈ - ¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —одержание диалога дл€ указани€ значений, по которым будет производитьс€ поиск
 		case 28:
-			if(!$unitExist || !$unit['num_1'])
+/*
+			if(!$UNIT_ISSET || !$unit['num_1'])
 				return '<div class="_empty min mar10">'.
 							'¬ыбор полей, по которым производитс€ поиск,'.
 							'<br>'.
@@ -841,6 +871,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			'<div class="hd1">ƒиалоговое окно <b class="fs16">'.$dialog['spisok_name'].'</b>:</div>'.
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
+*/
+		return 28;
 
 		//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: Ќастройка “јЅЋ»„Ќќ√ќ содержани€ списка
 		case 30:
@@ -848,7 +880,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				им€ объекта: spisok
 				 id объекта: block_id, в котором размещаетс€ список
 			*/
-			if(!$unitExist)
+			if(!$UNIT_ISSET)
 				return '<div class="_empty min">Ќастройка таблицы будет доступна после вставки списка в блок.</div>';
 
 			//все действи€ через JS
