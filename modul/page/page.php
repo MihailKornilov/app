@@ -757,9 +757,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_1 - вставка значения производится в блок (блок обязательно должен быть из диалога: obj_name=dialog),
 						иначе только отправляются данные (значение таблицы)
 				num_2 - Что выбирать:
-							любые элементы
-							элементы, отвечающие за внесение данных
-							блоки
+							46: любые элементы
+							47: элементы, которые вносят данные
+							48: элементы, по которым можно производить поиск
+							49: блоки
 				num_3 - выбор нескольких значений
 			*/
 
@@ -767,6 +768,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return _emptyMin('Отсутствует ID исходного блока.');
 
 			$BL = _blockQuery($bs_id);
+
+//			return _pr($BL);
+
+			//вставка значения в единицу списка
+			if($BL['obj_name'] == 'spisok')
+				$BL = _blockQuery($BL['obj_id']);
+
+
 			if(!$EL = $BL['elem'])
 				return _emptyMin('Содержание диалога будет доступно после вставки элемента в блок.');
 
@@ -779,55 +788,46 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					$sp = _elemQuery($EL['num_1']);
 					$dialog_id = $sp['num_1'];
 					break;
-			}
-/*
-return _pr($el)._pr($BL);
-
-
-			$block_id_spisok = _num(@$US['block_id']);
-
-			if($el['num_1']) {
-				if($UNIT_ISSET) {
-					//получение исходного блока, если элемент был вставлен ранее
-					$sql = "SELECT *
-							FROM `_element`
-							WHERE `id`=".$unit['id'];
-					if(!$elemSource = query_assoc($sql))
-						return '<div class="_empty min mar10">Отсутствует исходный элемент.</div>';
-
-					$US['block_id'] = $elemSource['block_id'];
-				}
-				if(empty($US['block_id']))
-					return '<div class="_empty min mar10">Отсутствует исходный блок.</div>';
-
-				$sql = "SELECT *
-						FROM `_block`
-						WHERE `id`=".$US['block_id'];
-				if(!$blockSource = query_assoc($sql))
-					return '<div class="_empty min mar10">Исходного блока id'.$US['block_id'].' не существует.</div>';
-
-				if($blockSource['obj_name'] != 'spisok')
-					return '<div class="_empty min mar10">Исходный блок не является блоком шаблона для списка.</div>';
-
-				$block_id_spisok = $blockSource['obj_id'];
+				case 14://список-ШАБЛОН
+				case 23://список-ТАБЛИЦА
+					if(!$dialog_id = $EL['num_1'])
+						return _emptyMin('Содержание диалога будет доступно после выбора списка.');
+					break;
 			}
 
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `block_id`=".$block_id_spisok."
-					  AND `dialog_id` IN (14,23)";
-			if(!$elem = query_assoc($sql))
-				return '<div class="_empty min mar10">Элемента не существует, который размещает список.</div>';
-*/
 			if(!$dialog_id)
 				return _emptyMin('Не найдено ID диалога, который вносит данные списка.');
 
 			if(!$dialog = _dialogQuery($dialog_id))
 				return _emptyMin('Диалога не существует, который вносит данные списка.');
 
+
+			//поля, которые можно подсвечивать
+			$choose_access = array();
+			switch($el['num_2']) {
+				case 46: $choose_access = array('all'=>1); break; //любые элементы
+				case 47: //элементы, которые вносят данные
+						$sql = "SELECT `id`,1
+								FROM `_dialog`
+								WHERE !`app_id`
+								  AND `element_is_insert`";
+						$choose_access = query_ass($sql);
+					break;
+				case 48: //элементы, по которым можно производить поиск
+						$sql = "SELECT `id`,1
+								FROM `_dialog`
+								WHERE !`app_id`
+								  AND `element_search_access`";
+						$choose_access = query_ass($sql);
+					break;
+				case 49: break;
+			}
+
+
 			$send = array(
 				'choose' => 1,
-				'choose_sel' => _num($v)
+				'choose_access' => $choose_access,
+				'choose_sel' => _idsAss($v)            //ids ранее выбранных элементов
 			);
 
 			return
@@ -835,44 +835,8 @@ return _pr($el)._pr($BL);
 			'<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />'.
 			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
 
-		//УДАЛЕНИЕ - ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для указания значений, по которым будет производиться поиск
-		case 28:
-/*
-			if(!$UNIT_ISSET || !$unit['num_1'])
-				return '<div class="_empty min mar10">'.
-							'Выбор полей, по которым производится поиск,'.
-							'<br>'.
-							'будет доступен после выбора списка'.
-							'<br>'.
-							'и вставки элемента поиска в блок.'.
-						'</div>';
-
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id`=".$unit['num_1'];
-			if(!$elemSource = query_assoc($sql))
-				return '<div class="_empty min mar10">Отсутствует элемент, который содержит список.</div>';
-
-			if(!$dialog_id = $elemSource['num_1'])
-				return '<div class="_empty min mar10">Нужный список ещё не был вставлен в блок.</div>';
-
-			if(!$dialog = _dialogQuery($dialog_id))
-				return '<div class="_empty min mar10">Диалога не существует, который вносит данные списка.</div>';
-
-
-			$send = array(
-				'choose' => 1,                      //флаг подсветки элементов
-				'choose_search' => 1,               //флаг выбора полей поиска
-				'choose_access' => _idsAss('5,8'),  //поля, которые можно подсвечивать
-				'choose_sel' => _idsAss($v)            //id выбранных элементов
-			);
-
-			return
-			'<div class="hd1">Диалоговое окно <b class="fs16">'.$dialog['spisok_name'].'</b>:</div>'.
-			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
-*/
-		return 28;
+		//28
+		case 28: return 28;
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ТАБЛИЧНОГО содержания списка
 		case 30:

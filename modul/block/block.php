@@ -349,18 +349,18 @@ function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 	if($r['obj_name'] != 'dialog')//выбор элементов можно производить только у диалогов (пока)
 		return '';
 
-	$sel = '';
+	$dialog_id = $r['elem']['dialog_id'];
 
-	if(!empty($unit['choose_search'])) {//выбор полей для поиска
-		//подсвечивать можно только разрешённые поля
-		if(!isset($unit['choose_access'][$r['elem']['dialog_id']]))
-			return '';
-		if(!$r['elem']['col'])
-			return '';
-		if(isset($unit['choose_sel'][$r['elem']['id']]))
-			$sel = ' sel';
-	} elseif($unit['choose_sel'] == $r['elem']['id'])
-		$sel = ' sel';
+	//подсветка полей, которые разрешено выбирать
+	if(!$ca = $unit['choose_access'])
+		return '';
+
+	if(!@$ca['all'] && !isset($ca[$dialog_id]))
+		return '';
+
+	//отметка выбранных полей
+	$elem_id = $r['elem']['id'];
+	$sel = isset($unit['choose_sel'][$elem_id]) ? ' sel' : '';
 
 	return '<div class="block-elem-choose'.$sel.'" val="'.$r['elem']['id'].'"></div>';
 }

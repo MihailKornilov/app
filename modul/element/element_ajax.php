@@ -164,8 +164,20 @@ switch(@$_POST['op']) {
 						'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
 					'<tr><td>'.
 						'<td>'._check(array(
+									'attr_id' => 'element_is_insert',
+									'title' => 'элемент вносит данные',
+									'value' => $dialog['element_is_insert']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_search_access',
+									'title' => 'разрешать поиск по этому элементу',
+									'value' => $dialog['element_search_access']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
 									'attr_id' => 'element_style_access',
-									'title' => 'настраивать стили',
+									'title' => 'разрешать настраивать стили',
 									'value' => $dialog['element_style_access']
 							   )).
 				'</table>'.
@@ -292,6 +304,8 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_name = _txt($_POST['element_name']);
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
+	$element_search_access = _num($_POST['element_search_access']);
+	$element_is_insert = _num($_POST['element_is_insert']);
 	$element_style_access = _num($_POST['element_style_access']);
 
 	$sql = "UPDATE `_dialog`
@@ -327,6 +341,8 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_name`='".addslashes($element_name)."',
 				`element_width`=".$element_width.",
 				`element_width_min`=".$element_width_min.",
+				`element_search_access`=".$element_search_access.",
+				`element_is_insert`=".$element_is_insert.",
 				`element_style_access`=".$element_style_access.",
 
 				`menu_edit_last`=".$menu_edit_last."
