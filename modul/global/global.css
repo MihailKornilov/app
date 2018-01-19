@@ -112,9 +112,9 @@ table{border:0;border-spacing:0}
 .icon-out    {background-position-x:-360px}/* внешняя ссылка: стрелка наружу */
 .icon-chain  {background-position-x:-380px}/* связка: звенья цепи */
 .icon-set-dot{background-position-x:-400px}/* настройки: три жирных точки */
-.icon-move   {background-position-x:-420px}/* перемещение: стрелки четыре стороны */
-.icon-move-x {background-position-x:-440px}/* перемещение: стрелки лево-право */
-.icon-move-y {background-position-x:-460px}/* перемещение: стрелки верх-вниз icon-sort */
+.icon-move   {background-position-x:-420px;cursor:move}/* перемещение: стрелки четыре стороны */
+.icon-move-x {background-position-x:-440px;cursor:move}/* перемещение: стрелки лево-право */
+.icon-move-y {background-position-x:-460px;cursor:move}/* перемещение: стрелки верх-вниз icon-sort */
 .icon-sub    {background-position-x:-480px}/* подкатегория: угловая стрелка вниз-вправо */
 .icon-join   {background-position-x:-500px}/* объединение: стрелки друг на друга сверху-снизу */
 .icon-info   {background-position-x:-520px}/* информация: "i" в кружке */
@@ -558,7 +558,6 @@ button.vk._busy{color:transparent}
 .bg-gr1{background-color:#FaFaFa}/* светло-серый */
 .bg-gr2{background-color:#F2F6F9}/* бледно-серо-синий */
 .bg-gr3{background-color:#F7F7F7}/* стандарт светло-серый */
-.bg-add{background-color:#e0ffe0}
 .bg-fee{background-color:#fee}/* бледно-красный */
 .bg-ffe{background-color:#ffe}
 .bg-ffd{background-color:#ffd}

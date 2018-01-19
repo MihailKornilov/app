@@ -273,9 +273,6 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 			jsonError('В блоке уже есть элемент');
 	}
 
-	$sql = "DELETE FROM `_element_func`";
-	query($sql);
-
 	$sql = "INSERT INTO `".$dialog['base_table']."` (
 				`dialog_id`,
 				`viewer_id_add`

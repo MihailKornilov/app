@@ -1188,9 +1188,10 @@ var VK_SCROLL = 0,
 				'<button val="26" class="vk orange ml5" data-hint="Содержание диалога для выбора значения">26</button>' +
 
 			'<div class="hd2 mt20 mb5">Функции</div>' +
-				'<button val="36" class="vk" data-hint="Функция для галочки: скрытие-показ блоков">36</button>' +
-				'<button val="28" class="vk ml5" data-hint="">28 - свободно</button>' +
-				'<button val="22" class="vk ml5">22 - свободно</button>' +
+				'<button val="28" class="vk" data-hint="Действия для галочки">28</button>' +
+				'<button val="36" class="vk cancel ml5" data-hint="Действие для галочки: скрытие-показ блоков">36</button>' +
+			'<p class="mt5">' +
+				'<button val="22" class="vk orange" data-hint="Список действий у элементов">22</button>' +
 
 			'<div class="hd2 mt20 mb5">Элементы для наполнения содержания</div>' +
 				'<button val="3"  class="vk" data-hint="Меню страниц">3</button>' +
@@ -1226,11 +1227,6 @@ var VK_SCROLL = 0,
 			'<button val="32" class="vk cancel mt5">Значение: Порядковый номер</button>' +
 			'<button val="33" class="vk cancel mt5">Значение: Дата</button>' +
 			'<button val="34" class="vk cancel mt5">Значение: Иконки управления</button>' +
-		'';
-	},
-	_elemChooseFunc1 = function() {
-		return '<div class="hd2 mt5 mb5">Функции для галочки:</div>' +
-				'<button val="36" class="vk">Скрытие-показ блоков</button>' +
 		'';
 	},
 

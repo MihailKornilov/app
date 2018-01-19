@@ -254,8 +254,8 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 
 	if(!$insert_head = _txt($_POST['insert_head']))
 		jsonError('Не указан заголовок для внесения записи');
-	if(!$insert_button_submit = _txt($_POST['insert_button_submit']))
-		jsonError('Не указан текст кнопки внесения');
+	$insert_button_submit = _txt($_POST['insert_button_submit']);
+//		jsonError('Не указан текст кнопки внесения');
 	if(!$insert_button_cancel = _txt($_POST['insert_button_cancel']))
 		jsonError('Не указан текст кнопки отмены для новой записи');
 	$insert_action_id = _num($_POST['insert_action_id']);

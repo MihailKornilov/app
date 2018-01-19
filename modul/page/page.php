@@ -599,14 +599,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				6 => 'pink',  //Розовый
 				7 => 'orange' //Оранжевый
 			);
+
+			//вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
+			$block = _num(@$US['block_id']) ? ',block_id:'.$US['block_id'] : '';
 			return _button(array(
 						'attr_id' => $attr_id,
 						'name' => _br($el['txt_1']),
 						'color' => $color[$el['num_1']],
 						'width' => $el['width'],
 						'small' => $el['num_2'],
-						'class' => 'dialog-open'.($el['num_3'] ? ' w100p' : ''),
-						'val' => 'block_id:'.$el['block_id'].',dialog_id:'.$el['num_4']
+						'class' => 'dialog-open',
+						'val' => 'dialog_id:'.$el['num_4'].$block
 					));
 
 		//Меню страниц
@@ -731,6 +734,51 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return '<div class="_info">'._br($el['txt_1']).'</div>';
 
+		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Список действий, привязанных к элементу
+		case 22:
+			if(!$bs_id = _num(@$US['block_id']))
+				return _emptyMin('Отсутствует ID исходного блока.');
+
+			$BL = _blockQuery($bs_id);
+
+			if($BL['obj_name'] != 'dialog')
+				return _emptyMin('Действия можно назначать<br>только компонентам в диалоговых окнах.');
+
+			$sql = "SELECT *
+					FROM `_element_func`
+					WHERE `block_id`=".$bs_id."
+					ORDER BY `sort`";
+			if(!$arr = query_arr($sql))
+				return _emptyMin('Действий не назначено.');
+
+			$spisok = '';
+			foreach($arr as $r) {
+				$c = count(_ids($r['target'], 1));
+				$spisok .=
+					'<table class="bs5 ml10 bor1 bg-gr2 over2 mb5 curD">'.
+						'<tr>'.
+							'<td class="w35 top">'.
+								'<div class="icon icon-move-y pl"></div>'.
+							'<td class="w230">'.
+								'<div class="fs15">Показ-скрытие блоков</div>'.
+								'<div class="fs12 ml20 mt3">1 - показать, 0 - скрыть</div>'.
+								'<div class="fs12 ml20 pale">эффекта нет</div>'.
+							'<td class="w100 b color-ref top center pt3">'.
+								$c.' блок'._end($c, '', 'а', 'ов').
+							'<td class="w50 r top">'.
+								'<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
+								_iconDel(array(
+									'class' => 'pl ml5 dialog-open',
+									'val' => 'dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',del:1'
+								)).
+					'</table>';
+			}
+
+			return
+				'<div class="pad10">'.
+					$spisok.
+				'</div>';
+
 		//Содержание единицы списка - таблица
 		case 23:
 			/*
@@ -809,7 +857,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				$BL = _blockQuery($BL['obj_id']);
 
 			if(!$EL = $BL['elem'])
-				return _emptyMin('Содержание диалога будет доступно после вставки элемента в блок.');
+				return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента в блок.');
 
 			if($el['num_2'] == 49 && $BL['obj_name'] != 'dialog')
 				return _emptyMin('Выбор блоков доступен только для диалогов.');
