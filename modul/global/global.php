@@ -406,7 +406,9 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1; - выбранный список
 	if(empty($v))
 		return $send;
 
-	foreach(_ids($v, 1) as $id)
+	$arr = is_array($v) ? $v : _ids($v, 1);
+
+	foreach($arr as $id)
 		$send[$id] = 1;
 
 	return $send;

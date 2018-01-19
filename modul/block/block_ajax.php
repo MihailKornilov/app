@@ -373,7 +373,8 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерн
 	//предварительное обнуление количества дочерних блоков
 	$sql = "UPDATE `_block`
 			SET `child_count`=0,
-				`xx`=1
+				`xx`=1,
+				`xx_ids`=''
 			WHERE `id` IN ("._idsGet($arr).")";
 	query($sql);
 
@@ -411,17 +412,22 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерн
 			$c = count($y);
 			if($c < 2)
 				continue;
-			foreach($y as $block_id)
-				$xxUpdate[] = '('.$block_id.','.$c.')';
+			foreach($y as $block_id) {
+				$xx_ids = _idsAss($y);
+				unset($xx_ids[$block_id]);
+				$xxUpdate[] = "(".$block_id.",".$c.",'"._idsGet($xx_ids, 'key')."')";
+			}
 		}
 
 	if($xxUpdate) {
 		$sql = "INSERT INTO `_block` (
 					`id`,
-					`xx`
+					`xx`,
+					`xx_ids`
 				) VALUES ".implode(',', $xxUpdate)."
 				ON DUPLICATE KEY UPDATE
-					`xx`=VALUES(`xx`)";
+					`xx`=VALUES(`xx`),
+					`xx_ids`=VALUES(`xx_ids`)";
 		query($sql);
 	}
 }

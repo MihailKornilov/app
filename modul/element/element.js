@@ -481,6 +481,9 @@ var VK_SCROLL = 0,
 			dialog.bottom.find('.submit').addClass('red');
 		else {
 			window.DIALOG_OPEN = dialog;
+			_forIn(o.block_arr, function(sp, k) {
+				BLOCK_ARR[k] = sp;
+			});
 			_elemActivate(o.cmp, o.unit);
 		}
 
@@ -1020,7 +1023,8 @@ var VK_SCROLL = 0,
 					var arr = [];
 					_forN(sp.target.split(','), function(bl_id) {
 					//	arr.push('#bl_' + bl_id);
-						_parent($('#bl_' + bl_id), '.bl-div').slideToggle();
+						console.log(BLOCK_ARR[bl_id]);
+//						_parent($('#bl_' + bl_id), '.bl-div').slideToggle();
 					});
 					//$(arr.join(',')).css('visibility', v ? 'visible' : 'hidden');
 //					$(arr.join(',')).animate({opacity:v}, 200);

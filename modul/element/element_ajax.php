@@ -211,6 +211,7 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID диалога');
 
 		$send = _dialogOpenLoad($dialog_id);
+		$send['block_arr'] = _blockJsArr('dialog', $dialog_id);
 
 		jsonSuccess($send);
 		break;

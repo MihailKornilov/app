@@ -415,6 +415,7 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 		$v[] = 'obj_name:"'.$r['obj_name'].'"';
 		$v[] = 'obj_id:'.$r['obj_id'];
 		$v[] = 'child:'.$r['child_count'];
+		$v[] = 'xx:'.$r['xx'];
 
 		if($el = $r['elem']) {
 			$v[] = 'elem_id:'._num($el['id']);
@@ -464,7 +465,8 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 			'bor' => $r['bor'],
 			'obj_name' => $r['obj_name'],
 			'obj_id' => _num($r['obj_id']),
-			'child' => _num($r['child_count'])
+			'child' => _num($r['child_count']),
+			'xx' => _num($r['xx'])
 		);
 
 		if($el = $r['elem']) {
