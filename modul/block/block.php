@@ -187,7 +187,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
 		$send .=
-			'<div class="bl-div y'.$y.'">'.
+			'<div class="bl-div">'.
 			'<table class="bl-tab" style="height:'.$r['height'].'px">'.
 				'<tr>';
 		//пустота в начале

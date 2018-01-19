@@ -247,7 +247,6 @@ switch(@$_POST['op']) {
 
 		_blockChildCountSet($obj_name, $obj_id);
 
-
 		define('BLOCK_EDIT', 1);
 
 		$send['level'] = utf8(_blockLevelChange($obj_name, $obj_id, $width));
@@ -373,7 +372,8 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерн
 
 	//предварительное обнуление количества дочерних блоков
 	$sql = "UPDATE `_block`
-			SET `child_count`=0
+			SET `child_count`=0,
+				`xx`=1
 			WHERE `id` IN ("._idsGet($arr).")";
 	query($sql);
 
@@ -381,23 +381,49 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерн
 	foreach($arr as $id => $r)
 		$child[$r['parent_id']][$id] = $r;
 
-	$update = array();
+	$countUpdate = array();
 	foreach($arr as $id => $r) {
 		if(!$r['parent_id'])
 			continue;
-		$update[] = '('.$r['parent_id'].','.count($child[$r['parent_id']]).')';
+		$countUpdate[] = '('.$r['parent_id'].','.count($child[$r['parent_id']]).')';
 	}
 
-	if(!$update)
-		return;
+	if($countUpdate) {
+		$sql = "INSERT INTO `_block` (
+					`id`,
+					`child_count`
+				) VALUES ".implode(',', $countUpdate)."
+				ON DUPLICATE KEY UPDATE
+					`child_count`=VALUES(`child_count`)";
+		query($sql);
+	}
 
-	$sql = "INSERT INTO `_block` (
-				`id`,
-				`child_count`
-			) VALUES ".implode(',', $update)."
-			ON DUPLICATE KEY UPDATE
-				`child_count`=VALUES(`child_count`)";
-	query($sql);
+	//подсчёт количества рядом стоящих Х-блоков в каждой Y-строке
+	$stroka = array();
+	foreach($child as $block_id => $bl)
+		foreach($bl as $r) {
+			$stroka[$block_id][$r['y']][] = $r['id'];
+		}
+
+	$xxUpdate = array();
+	foreach($stroka as $str)
+		foreach($str as $y) {
+			$c = count($y);
+			if($c < 2)
+				continue;
+			foreach($y as $block_id)
+				$xxUpdate[] = '('.$block_id.','.$c.')';
+		}
+
+	if($xxUpdate) {
+		$sql = "INSERT INTO `_block` (
+					`id`,
+					`xx`
+				) VALUES ".implode(',', $xxUpdate)."
+				ON DUPLICATE KEY UPDATE
+					`xx`=VALUES(`xx`)";
+		query($sql);
+	}
 }
 function _blockChildCountAllUpdate() {//обновление количества дочерних блоков у всех объектов (разовая функция)
 	$sql = " SELECT DISTINCT `obj_name` FROM `_block`";
