@@ -245,6 +245,9 @@ switch(@$_POST['op']) {
 			query($sql);
 		}
 
+		_blockChildCountSet($obj_name, $obj_id);
+
+
 		define('BLOCK_EDIT', 1);
 
 		$send['level'] = utf8(_blockLevelChange($obj_name, $obj_id, $width));
@@ -358,3 +361,52 @@ switch(@$_POST['op']) {
 
 
 
+
+function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерних блоков
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='".$obj_name."'
+			  AND `obj_id`=".$obj_id."
+			ORDER BY `parent_id`,`y`,`x`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	//предварительное обнуление количества дочерних блоков
+	$sql = "UPDATE `_block`
+			SET `child_count`=0
+			WHERE `id` IN ("._idsGet($arr).")";
+	query($sql);
+
+	$child = array();
+	foreach($arr as $id => $r)
+		$child[$r['parent_id']][$id] = $r;
+
+	$update = array();
+	foreach($arr as $id => $r) {
+		if(!$r['parent_id'])
+			continue;
+		$update[] = '('.$r['parent_id'].','.count($child[$r['parent_id']]).')';
+	}
+
+	if(!$update)
+		return;
+
+	$sql = "INSERT INTO `_block` (
+				`id`,
+				`child_count`
+			) VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`child_count`=VALUES(`child_count`)";
+	query($sql);
+}
+function _blockChildCountAllUpdate() {//обновление количества дочерних блоков у всех объектов (разовая функция)
+	$sql = " SELECT DISTINCT `obj_name` FROM `_block`";
+	foreach(query_array($sql) as $arr)
+		foreach($arr as $name) {
+			$sql = "SELECT DISTINCT `obj_id`
+					FROM `_block`
+					WHERE `obj_name`='".$name."'";
+			foreach(_ids(query_ids($sql), 1) as $id)
+				_blockChildCountSet($name, $id);
+		}
+}

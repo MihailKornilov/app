@@ -79,10 +79,8 @@ function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры б
 		}
 	}
 
-	foreach($arr as $id => $r) {
+	foreach($arr as $id => $r)
 		$arr[$id]['child'] = array();
-		$arr[$id]['child_count'] = 0;
-	}
 
 	$child = array();
 	foreach($arr as $id => $r)
@@ -93,23 +91,14 @@ function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры б
 	if($return == 'block')
 		return $block;
 
-	//количество дочерних блоков для каждого блока
-	foreach($arr as $id => $r) {
-		if(!$r['parent_id'])
-			continue;
-		$arr[$r['parent_id']]['child_count'] = count($child[$r['parent_id']]);
-	}
-
 	return $arr;
 }
 function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
 	if(!$send = @$child[$parent_id])
 		return array();
 
-	foreach($send as $id => $r) {
+	foreach($send as $id => $r)
 		$send[$id]['child'] = _blockArrChild($child, $id);
-		$send[$id]['child_count'] = count($send[$id]['child']);
-	}
 
 	return $send;
 }
