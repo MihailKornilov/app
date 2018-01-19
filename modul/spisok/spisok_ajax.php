@@ -22,15 +22,23 @@ switch(@$_POST['op']) {
 		$send['action_page_id'] = _num($dialog['del_action_page_id']);
 		$send = _spisokAction3($send, $dialog, $unit_id);
 
-		if(isset($dialog['field']['deleted']))
+		if(isset($dialog['field']['deleted'])) {
 			$sql = "UPDATE `".$dialog['base_table']."`
 					SET `deleted`=1,
 						`viewer_id_del`=".VIEWER_ID.",
 						`dtime_del`=CURRENT_TIMESTAMP
 					WHERE `id`=".$unit_id;
-		else
+			query($sql);
+		} else {
 			$sql = "DELETE FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
-		query($sql);
+			query($sql);
+
+			//удаление значений элемента
+			if($dialog['base_table'] == '_element') {
+				$sql = "DELETE FROM `_element_value` WHERE `element_id`=".$unit_id;
+				query($sql);
+			}
+		}
 
 		jsonSuccess($send);
 		break;

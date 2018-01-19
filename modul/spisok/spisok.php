@@ -99,9 +99,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
 		return 'Несуществующий диалог id'.$ELEM['dialog_id'];
 
-	$dv = $dialog['v_ass'];
-
-	$limit = PAS ? 3 : $dv[$ELEM['num_2']];//лимит
+	$limit = PAS ? 3 : $ELEM['num_2'];//лимит
 
 	//диалог, через который вносятся данные списка
 	$dialog_id = $ELEM['num_1'];
