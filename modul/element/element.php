@@ -358,7 +358,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 					$cmp[$elem_id]['func'][] = array(
 						'dialog_id' => _num($r['dialog_id']),
 						'action_id' => _num($r['action_id']),
-						'target' => $r['target']
+						'target' => _idsAss($r['target'])
 					);
 				}
 

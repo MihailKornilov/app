@@ -466,7 +466,8 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 			'obj_name' => $r['obj_name'],
 			'obj_id' => _num($r['obj_id']),
 			'child' => _num($r['child_count']),
-			'xx' => _num($r['xx'])
+			'xx' => _num($r['xx']),
+			'xx_ids' => _idsAss($r['xx_ids'])
 		);
 
 		if($el = $r['elem']) {

@@ -1020,14 +1020,68 @@ var VK_SCROLL = 0,
 				case 36://Галочка[1]: скрытие/показ блоков
 					if(el.dialog_id != 1)
 						return;
-					var arr = [];
-					_forN(sp.target.split(','), function(bl_id) {
-					//	arr.push('#bl_' + bl_id);
-						console.log(BLOCK_ARR[bl_id]);
-//						_parent($('#bl_' + bl_id), '.bl-div').slideToggle();
+
+					var TRG = _copyObj(sp.target),
+						arr = [];
+					_forIn(TRG, function(n, block_id) {
+						if(!n)
+							return;
+						var BL = BLOCK_ARR[block_id];
+						if(BL.xx == 1) {//если блок в ряду один, фукнция применится ко всей таблице
+							arr.push({
+								obj:_parent($(BL.attr_bl), '.bl-div'),
+								slide:1
+							});
+							return;
+						}
+
+						//проверка, поставлена та же функция на остальные блоки в том же ряду
+						var all = 1;
+						_forIn(BL.xx_ids, function(i, id) {
+							if(!TRG[id]) {//выход, если не на всех
+								all = 0;
+								return false;
+							}
+						});
+
+						if(all) {
+							_forIn(BL.xx_ids, function(i, id) {
+								TRG[id] = 0;//блоки в том же ряду отмечаются, чтобы к ним функция не применялась
+							});
+							//
+							arr.push({
+								obj:_parent($(BL.attr_bl), '.bl-div'),
+								slide:1
+							});
+							return;
+						}
+
+						//функция будет применена к конкретному блоку
+						arr.push({
+							obj:$(BL.attr_bl),
+							slide:0
+						});
 					});
-					//$(arr.join(',')).css('visibility', v ? 'visible' : 'hidden');
-//					$(arr.join(',')).animate({opacity:v}, 200);
+
+					_forN(arr, function(oo) {
+						if(!oo.obj.length)
+							return;
+
+						oo.obj.css('visibility', v ? 'visible' : 'hidden');
+						return;
+
+						oo.obj._dn(v);
+						return;
+
+						oo.obj.animate({opacity:v}, 200);
+						return;
+
+						if(oo.slide) {
+							oo.obj['slide' + (v ? 'Down' : 'Up')]();
+							return;
+						}
+						oo.obj.css('visibility', v ? 'visible' : 'hidden');
+					});
 					break;
 			}
 		});

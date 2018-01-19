@@ -256,6 +256,13 @@ var FB,
 		}
 		return send;
 	},
+	_copyObj = function(arr) {//копирование ассоциативного массива
+		var send = {};
+		_forIn(arr, function(v, i) {
+			send[i] = v;
+		});
+		return send;
+	},
 	_dialogDel = function(o) {//вывод диалога удаления
 		o = $.extend({
 			id:0,               //id, который нужно удалить
