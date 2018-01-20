@@ -449,19 +449,14 @@ function _dialogOpenLoad($dialog_id) {
 						'use' => 0  //количество использования значений, чтобы нельзя было удалять
 					);
 
-/*
-				//если нет значений
-				if(empty($unit[$col]))
-					break;
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
 
+				//если элемент пока не применяется
 				if(empty($unit['col']))
 					break;
 
 				//объект, в котором находится блок с элементом
-				$sql = "SELECT *
-						FROM `_block`
-						WHERE `id`=".$unit['block_id'];
-				if(!$block = query_assoc($sql))
+				if(!$block = _blockQuery($unit['block_id']))
 					break;
 
 				//пока только для диалогов
@@ -477,14 +472,13 @@ function _dialogOpenLoad($dialog_id) {
 						FROM `".$dlg['base_table']."`
 						WHERE `dialog_id`=".$block['obj_id']."
 						GROUP BY `".$unit['col']."`";
-				foreach(query_ass($sql) as $id => $use)
-					foreach($unit[$col] as $n => $r)
-						if($id == $r['id']) {
-							$unit[$col][$n]['use'] = $use;
-							break;
-						}
-				break;
-*/
+				if($ass = query_ass($sql))
+					foreach($spisok as $n => $r) {
+						if(empty($ass[$r['id']]))
+							continue;
+						$spisok[$n]['use'] = $ass[$r['id']];
+					}
+
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
 				break;
 			//select - выбор списка (все списки приложения)
