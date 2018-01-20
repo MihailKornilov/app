@@ -426,23 +426,18 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				txt_1 - текст нулевого значения
 				значения из _element через dialog_id:19
 			*/
-			$value = _num($v);
-			$spisok = array();
-			$sql = "SELECT *
+			$sql = "SELECT `id`,`txt_1`
 					FROM `_element`
 					WHERE `dialog_id`=19
 					  AND `block_id`=-".$el['id']."
 					ORDER BY `sort`";
-			foreach(query_arr($sql) as $id => $r) {
-				$spisok[$id] = $r['txt_1'];
-				if(!$value && $r['def'])
-					$value = $r['id'];
-			}
+			$spisok = query_ass($sql);
+
 			return _radio(array(
 				'attr_id' => $attr_id,
 				'light' => 1,
 				'interval' => 5,
-				'value' => $value,
+				'value' => _num($v) ? _num($v) : $el['def'],
 				'title0' => $el['txt_1'],
 				'spisok' => $spisok,
 				'disabled' => $disabled
@@ -454,24 +449,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 txt_1 - текст нулевого значения
 				значения из _element через dialog_id:19
 			*/
-
-			//получение значения по умолчанию, если отсутствует выбор ранее
-			if(!$value = _num($v)) {
-				$sql = "SELECT *
-						FROM `_element`
-						WHERE `dialog_id`=19
-						  AND `block_id`=-".$el['id']."
-						ORDER BY `sort`";
-				foreach(query_arr($sql) as $id => $r) {
-					if(!$value && $r['def'])
-						$value = $r['id'];
-				}
-			}
 			return _select(array(
 						'attr_id' => $attr_id,
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'value' => $value
+						'value' => _num($v) ? _num($v) : $el['def']
 				   ));
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: наполнение для некоторых компонентов: radio, select, dropdown

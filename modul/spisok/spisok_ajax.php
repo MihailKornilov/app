@@ -482,6 +482,12 @@ function _elementCmp19($cmp, $val, $unit) {//наполнение для некоторых компоненто
 			  AND `id` NOT IN (".$idsNoDel.")";
 	query($sql);
 
+	//сброс значения по умолчанию
+	$sql = "UPDATE `_element`
+			SET `def`=0
+			WHERE `id`=".$unit['id'];
+	query($sql);
+
 	if(empty($update))
 		return;
 
@@ -500,6 +506,19 @@ function _elementCmp19($cmp, $val, $unit) {//наполнение для некоторых компоненто
 				`txt_2`=VALUES(`txt_2`),
 				`def`=VALUES(`def`),
 				`sort`=VALUES(`sort`)";
+	query($sql);
+
+	//установка нового значения по умолчанию
+	$sql = "SELECT `id` FROM `_element`
+			WHERE `dialog_id`=19
+			  AND `block_id`=-".$unit['id']."
+			  AND `def`
+			LIMIT 1";
+	$def = _num(query_value($sql));
+
+	$sql = "UPDATE `_element`
+			SET `def`=".$def."
+			WHERE `id`=".$unit['id'];
 	query($sql);
 }
 function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания списка (30)
