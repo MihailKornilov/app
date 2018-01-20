@@ -526,7 +526,7 @@ var VK_SCROLL = 0,
 				if(o.func)
 					return o.func(res);
 
-return;
+//return;
 
 				switch(res.action_id) {
 					case 1: location.reload(); break;
@@ -558,7 +558,7 @@ return;
 				send.push({
 					id:_num(sp.attr('val')),
 					title:sp.find('.title').val(),
-					content:'',
+					content:sp.find('textarea').val(),
 					def:_num(sp.find('.def').val())
 				});
 			});
@@ -588,12 +588,14 @@ return;
 			DL.append(
 				'<dd class="over1" val="' + v.id + '">' +
 					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center"><div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w90 grey r">Значение ' + NUM + ':' +
-							'<td><input type="text" class="title w100p" value="' + v.title + '" />' +
-							'<td class="w15">' +
+						'<tr><td class="w25 center top pt5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w90 grey r topi">Значение ' + NUM + ':' +
+							'<td><input type="text" class="title w100p b" value="' + v.title + '" />' +
+								'<textarea class="w100p min mtm1' + _dn(o.num_1) + '" placeholder="описание значения">' + v.content + '</textarea>' +
+							'<td class="w15 topi">' +
 								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
-							'<td class="w50 r">' +
+							'<td class="w50 r top pt5">' +
 					   (v.use ? '<div class="dib fs11 color-ccc mr3 curD' + _tooltip('Использование', -53) + v.use + '</div>'
 								:
 								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
@@ -603,7 +605,9 @@ return;
 			);
 
 			DL.sortable({axis:'y',handle:'.icon-move-y'});
-			$('#el-def-' + NUM)._check({
+			var DD = DL.find('dd:last');
+			DD.find('textarea').autosize();
+			DD.find('.def')._check({
 				tooltip:'По умолчанию',
 				func:function(v, ch) {
 					if(!v)
@@ -616,7 +620,7 @@ return;
 					});
 				}
 			});
-			DL.find('.icon-del:last').click(function() {
+			DD.find('.icon-del').click(function() {
 				var t = $(this),
 					p = _parent(t, 'DD');
 				p.remove();

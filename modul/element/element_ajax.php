@@ -421,7 +421,7 @@ function _dialogOpenLoad($dialog_id) {
 					$spisok[] = array(
 						'id' => _num($id),
 						'title' => utf8($r['txt_1']),
-						'content' => utf8($r['txt_2'])
+						'content' => utf8($r['txt_1'].'<div class="fs11 grey">'._br($r['txt_2']).'</div>')
 					);
 
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;

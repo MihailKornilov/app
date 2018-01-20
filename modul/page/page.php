@@ -462,10 +462,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				Все действия через JS.
 				Данные хранятся в _element. В block_id пишется отрицательный id главного элемента.
 
-				txt_1 - title
-				txt_2 - content
-				def
-				sort
+				num_1 - использовать Описания значений
+
+				Значения:
+					id
+					txt_1 - title
+					txt_2 - content
+					def
+					sort
 			*/
 
 			return '<div class="_empty min">Наполнение компонента</div>';
