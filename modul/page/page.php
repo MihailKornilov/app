@@ -843,8 +843,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			$BL = _blockQuery($bs_id);
 
-//			return _pr($BL);
-
 			//вставка значения в единицу списка
 			if($BL['obj_name'] == 'spisok')
 				$BL = _blockQuery($BL['obj_id']);
