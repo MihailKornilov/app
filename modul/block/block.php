@@ -53,7 +53,7 @@ function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры б
 			$elem[$id]['elv_spisok'] = array();
 			$elem[$id]['elv_def'] = 0;
 		}
-
+/*
 		//значения элементов-списков
 		$sql = "SELECT *
 				FROM `_element_value`
@@ -70,7 +70,7 @@ function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры б
 			if($r['def'])
 				$elem[$elem_id]['elv_def'] = $id;
 		}
-
+*/
 		//расстановка элементов в блоки
 		foreach($elem as $r) {
 			unset($arr[$r['block_id']]['elem']);

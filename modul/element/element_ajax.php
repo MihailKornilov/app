@@ -406,6 +406,87 @@ function _dialogOpenLoad($dialog_id) {
 	//заполнение значениями некоторых компонентов
 	foreach($dialog['cmp_utf8'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
+			//произвольные значения
+			case 17://select - произвольные значения
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `dialog_id`=19
+						  AND `block_id`=-".$cmp_id."
+						ORDER BY `sort`";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$spisok = array();
+				foreach($arr as $id => $r)
+					$spisok[] = array(
+						'id' => _num($id),
+						'title' => utf8($r['txt_1']),
+						'content' => utf8($r['txt_2'])
+					);
+
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
+				break;
+			//вспомогательный элемент: значения для select, radio, dropdown
+			case 19:
+				if(!$unit_id)
+					break;
+
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `dialog_id`=19
+						  AND `block_id`=-".$unit_id."
+						ORDER BY `sort`";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$spisok = array();
+				foreach($arr as $id => $r)
+					$spisok[] = array(
+						'id' => _num($id),
+						'title' => utf8($r['txt_1']),
+						'content' => utf8($r['txt_2']),
+						'def' => _num($r['def']),
+						'use' => 0  //количество использования значений, чтобы нельзя было удалять
+					);
+
+/*
+				//если нет значений
+				if(empty($unit[$col]))
+					break;
+
+				if(empty($unit['col']))
+					break;
+
+				//объект, в котором находится блок с элементом
+				$sql = "SELECT *
+						FROM `_block`
+						WHERE `id`=".$unit['block_id'];
+				if(!$block = query_assoc($sql))
+					break;
+
+				//пока только для диалогов
+				if($block['obj_name'] != 'dialog')
+					break;
+
+				$dlg = _dialogQuery($block['obj_id']);
+
+				//получение количества использования значений
+				$sql = "SELECT
+							`".$unit['col']."` `id`,
+							COUNT(*) `use`
+						FROM `".$dlg['base_table']."`
+						WHERE `dialog_id`=".$block['obj_id']."
+						GROUP BY `".$unit['col']."`";
+				foreach(query_ass($sql) as $id => $use)
+					foreach($unit[$col] as $n => $r)
+						if($id == $r['id']) {
+							$unit[$col][$n]['use'] = $use;
+							break;
+						}
+				break;
+*/
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
+				break;
 			//select - выбор списка (все списки приложения)
 			case 24:
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _dialogSpisokOn($dialog_id, $send['block_id'], $unit_id);
@@ -557,63 +638,6 @@ function _dialogOpenLoad($dialog_id) {
 		$r = !is_array($r) && preg_match(REGEXP_NUMERIC, $r) ? intval($r) : utf8($r);
 		$unit[$id] = $r;
 	}
-
-	//вставка наполнения для некоторых компонентов
-	foreach($dialog['cmp'] as $cmp)
-		switch($cmp['dialog_id']) {
-			case 19:
-				if(!$col = $cmp['col'])
-					break;
-				$unit[$col] = array();
-				if($unit_id) {
-					$sql = "SELECT *
-							FROM `_element_value`
-							WHERE `dialog_id`=".$dialog_id."
-							  AND `element_id`=".$unit_id."
-							ORDER BY `sort`";
-					foreach(query_arr($sql) as $id => $r)
-						$unit[$col][] = array(
-							'id' => _num($id),
-							'title' => utf8($r['title']),
-							'def' => _num($r['def']),
-							'use' => 0  //количество использования значений, чтобы нельзя было удалять
-						);
-
-					//если нет значений
-					if(empty($unit[$col]))
-						break;
-
-					if(empty($unit['col']))
-						break;
-
-					//объект, в котором находится блок с элементом
-					$sql = "SELECT *
-							FROM `_block`
-							WHERE `id`=".$unit['block_id'];
-					if(!$block = query_assoc($sql))
-						break;
-
-					//пока только для диалогов
-					if($block['obj_name'] != 'dialog')
-						break;
-
-					$dlg = _dialogQuery($block['obj_id']);
-
-					//получение количества использования значений
-					$sql = "SELECT
-								`".$unit['col']."` `id`,
-								COUNT(*) `use`
-							FROM `".$dlg['base_table']."`
-							WHERE `dialog_id`=".$block['obj_id']."
-							GROUP BY `".$unit['col']."`";
-					foreach(query_ass($sql) as $id => $use)
-						foreach($unit[$col] as $n => $r)
-							if($id == $r['id']) {
-								$unit[$col][$n]['use'] = $use;
-								break;
-							}
-				}
-		}
 
 	$send['unit'] = $unit;
 

@@ -320,8 +320,8 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'txt_3' => $r['txt_3'],
 						'txt_4' => $r['txt_4'],
 
-						'elv_ass' => array(),   //ассоциативные значени€ из таблицы _element_value
-						'elv_spisok' => array(),//значени€ в виде списка {id:1,title:'значение'} (из таблицы _element_value, либо св€занные списки)
+						'elv_ass' => array(),   //ассоциативные значени€
+						'elv_spisok' => array(),//значени€ в виде списка {id:1,title:'значение'}
 						'elv_def' => 0,         //значение по умолчанию
 
 						'attr_id' => '#cmp_'.$id,
@@ -331,7 +331,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'func' => array()
 					);
 				}
-
+/*
 				$sql = "SELECT *
 						FROM `_element_value`
 						WHERE `element_id` IN("._idsGet($elem).")
@@ -348,7 +348,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						$cmp[$r['element_id']]['elv_def'] = $id;
 					$v_ass[$id] = $r['title'];
 				}
-
+*/
 				$sql = "SELECT *
 						FROM `_element_func`
 						WHERE `block_id` IN ("._idsGet($block).")
@@ -362,7 +362,6 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'target' => _idsAss($r['target'])
 					);
 				}
-
 
 				//формирование компонентов дл€ отправки через AJAX
 				$cmpUtf8 = $cmp;
@@ -505,57 +504,4 @@ function _dialogSpisokGetPage($page_id) {//список объектов, которые поступают на
 	return _selArray($send);
 }
 
-function _dialogCmpValue($val, $i='test', $dialog_id=0, $cmp_id=0) {//проверка на корректность заполнени€ значений дл€ некоторых компонентов
-	if(empty($val))
-		return;
-	if(!is_array($val))
-		jsonError('«начени€ компонента не €вл€ютс€ массивом');
-
-	$update = array();
-	$idsNoDel = '0';
-	$sort = 0;
-	foreach($val as $r) {
-		if(!$title = _txt($r['title']))
-			jsonError('Ќе заполнено одно из значений');
-		if($id = _num($r['id']))
-			$idsNoDel .= ','.$id;
-		$update[] = "(
-			".$id.",
-			".$dialog_id.",
-			".$cmp_id.",
-			'".addslashes($title)."',
-			"._num($r['def']).",
-			".$sort++."
-		)";
-	}
-
-	if($i == 'test')
-		return;
-
-	//$i == 'save': процесс сохранени€
-
-	//удаление удалЄнных значений
-	$sql = "DELETE FROM `_element_value`
-			WHERE `element_id`=".$cmp_id."
-			  AND `id` NOT IN (".$idsNoDel.")";
-	query($sql);
-
-	if(empty($update))
-		return;
-
-	$sql = "INSERT INTO `_element_value` (
-				`id`,
-				`dialog_id`,
-				`element_id`,
-				`title`,
-				`def`,
-				`sort`
-			)
-			VALUES ".implode(',', $update)."
-			ON DUPLICATE KEY UPDATE
-				`title`=VALUES(`title`),
-				`def`=VALUES(`def`),
-				`sort`=VALUES(`sort`)";
-	query($sql);
-}
 

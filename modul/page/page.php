@@ -424,17 +424,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 16:
 			/*
 				txt_1 - текст нулевого значения
-				v - наполнение из таблицы _element_value через dialog:19
+				значения из _element через dialog_id:19
 			*/
 			$value = _num($v);
 			$spisok = array();
 			$sql = "SELECT *
-					FROM `_element_value`
-					WHERE `dialog_id`=".$el['dialog_id']."
-					  AND `element_id`=".$el['id']."
+					FROM `_element`
+					WHERE `dialog_id`=19
+					  AND `block_id`=-".$el['id']."
 					ORDER BY `sort`";
 			foreach(query_arr($sql) as $id => $r) {
-				$spisok[$id] = $r['title'];
+				$spisok[$id] = $r['txt_1'];
 				if(!$value && $r['def'])
 					$value = $r['id'];
 			}
@@ -452,23 +452,19 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 17:
 			/*
                 txt_1 - текст нулевого значения
-				v - наполнение из таблицы _element_value через dialog:19
+				значения из _element через dialog_id:19
 			*/
+
+			//получение значения по умолчанию, если отсутствует выбор ранее
 			if(!$value = _num($v)) {
-				$block = $el['block'];
-				if($block['obj_name'] == 'dialog') {
-					$dialog = _dialogQuery($block['obj_id']);
-					$value = $dialog['cmp'][$el['id']]['elv_def'];
-				} else {
-					$sql = "SELECT *
-							FROM `_element_value`
-							WHERE `dialog_id`=".$el['dialog_id']."
-							  AND `element_id`=".$el['id']."
-							ORDER BY `sort`";
-					foreach(query_arr($sql) as $id => $r) {
-						if(!$value && $r['def'])
-							$value = $r['id'];
-					}
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `dialog_id`=19
+						  AND `block_id`=-".$el['id']."
+						ORDER BY `sort`";
+				foreach(query_arr($sql) as $id => $r) {
+					if(!$value && $r['def'])
+						$value = $r['id'];
 				}
 			}
 			return _select(array(
@@ -479,7 +475,18 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				   ));
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: наполнение для некоторых компонентов: radio, select, dropdown
-		case 19: return '<div class="_empty min">Наполнение компонента</div>'; //все действия через JS
+		case 19:
+			/*
+				Все действия через JS.
+				Данные хранятся в _element. В block_id пишется отрицательный id главного элемента.
+
+				txt_1 - title
+				txt_2 - content
+				def
+				sort
+			*/
+
+			return '<div class="_empty min">Наполнение компонента</div>';
 
 		//Select - выбор списка, которые есть в приложении
 		case 24:

@@ -509,7 +509,7 @@ var VK_SCROLL = 0,
 				_forIn(o.cmp, function(sp, id) {
 					switch(sp.dialog_id) {
 						case 19://наполнение для некоторых компонентов
-							send.cmp[id] = _dialogCmpValue(sp, 'get');
+							send.cmpv[id] = _dialogCmpValue(sp, 1);
 							return;
 						case 30://Настройка ТАБЛИЧНОГО содержания списка
 							send.cmpv[id] = _dialogSpisokTable(sp, 'get');
@@ -526,7 +526,7 @@ var VK_SCROLL = 0,
 				if(o.func)
 					return o.func(res);
 
-//return;
+return;
 
 				switch(res.action_id) {
 					case 1: location.reload(); break;
@@ -548,16 +548,17 @@ var VK_SCROLL = 0,
 			});
 		}
 	},
-	_dialogCmpValue = function(o, val) {//наполнение для некоторых компонентов. dialog_id=19
+	_dialogCmpValue = function(o, get) {//наполнение для некоторых компонентов. dialog_id=19
 		var el = $(o.attr_el);
 
 		//получение данных для сохранения
-		if(val == 'get') {
+		if(get) {
 			var send = [];
 			_forEq(el.find('dd'), function(sp) {
 				send.push({
 					id:_num(sp.attr('val')),
 					title:sp.find('.title').val(),
+					content:'',
 					def:_num(sp.find('.def').val())
 				});
 			});
@@ -572,14 +573,14 @@ var VK_SCROLL = 0,
 
 		BUT_ADD.click(valueAdd);
 
-		for(var i in val)
-			valueAdd(val[i])
+		for(var i in o.elv_spisok)
+			valueAdd(o.elv_spisok[i])
 
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,
-				uid:NUM,
 				title:'имя значения ' + NUM,
+				content:'',
 				def:0,
 				use:0
 			}, v);
@@ -591,19 +592,18 @@ var VK_SCROLL = 0,
 							'<td class="w90 grey r">Значение ' + NUM + ':' +
 							'<td><input type="text" class="title w100p" value="' + v.title + '" />' +
 							'<td class="w15">' +
-								'<input type="hidden" class="def" id="el-def-' + v.uid + '" value="' + v.def + '" />' +
+								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
 							'<td class="w50 r">' +
 					   (v.use ? '<div class="dib fs11 color-ccc mr3 curD' + _tooltip('Использование', -53) + v.use + '</div>'
 								:
-								'<div val="' + v.uid + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
-					   )+
+								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
+					   ) +
 					'</table>' +
 				'</dd>'
 			);
 
 			DL.sortable({axis:'y',handle:'.icon-move-y'});
-
-			$('#el-def-' + v.uid)._check({
+			$('#el-def-' + NUM)._check({
 				tooltip:'По умолчанию',
 				func:function(v, ch) {
 					if(!v)
@@ -616,7 +616,6 @@ var VK_SCROLL = 0,
 					});
 				}
 			});
-
 			DL.find('.icon-del:last').click(function() {
 				var t = $(this),
 					p = _parent(t, 'DD');
@@ -671,7 +670,6 @@ var VK_SCROLL = 0,
 			v = $.extend({
 				id:0,       //id элемента
 				dialog_id:0,//id диалога, через который был вставлен этот элемент
-				num:NUM,
 				attr_el:'#inp_' + NUM,
 				attr_bl:'#inp_' + NUM,
 				attr_tr:'#tr_' + NUM,
@@ -708,7 +706,7 @@ var VK_SCROLL = 0,
 									' />' +
 								'</div>' +
 							'<td class="w50 r top pt5">' +
-								'<div val="' + v.num + '" class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
+								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -875,7 +873,7 @@ var VK_SCROLL = 0,
 				case 19:
 					if(is_edit)
 						return;
-					_dialogCmpValue(el, unit[el.col]);
+					_dialogCmpValue(el);
 					return;
 				//select - выбор списка (все списки приложения)
 				case 24:

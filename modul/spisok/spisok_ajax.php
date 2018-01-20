@@ -32,12 +32,6 @@ switch(@$_POST['op']) {
 		} else {
 			$sql = "DELETE FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
 			query($sql);
-
-			//удаление значений элемента
-			if($dialog['base_table'] == '_element') {
-				$sql = "DELETE FROM `_element_value` WHERE `element_id`=".$unit_id;
-				query($sql);
-			}
 		}
 
 		jsonSuccess($send);
@@ -181,16 +175,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	_spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id);
 
-	//обновление значений компонентов
-	if(!empty($_POST['cmp']))
-		foreach($_POST['cmp'] as $cmp_id => $val) {
-			$cmp = @$dialog['cmp'][$cmp_id];
-			if($cmp['dialog_id'] == 19) {//наполнение для некоторых компонентов: radio, select, dropdown
-				_dialogCmpValue($val, 'save', $dialog_id, $unit_id);
-				continue;
-			}
-		}
-
 	//получение обновлённых данных единицы списка
 	$sql = "SELECT *
 			FROM `".$dialog['base_table']."`
@@ -202,6 +186,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			if(!isset($cmpv[$cmp_id]))
 				continue;
 			switch($cmp['dialog_id']) {
+				//наполнение для некоторых компонентов: radio, select, dropdown
+				case 19: _elementCmp19($cmp, $cmpv[$cmp_id], $unit); break;
 				//Настройка ТАБЛИЧНОГО содержания списка
 				case 30: _spisokTableValueSave($cmp, $cmpv[$cmp_id], $unit); break;
 			}
@@ -241,10 +227,6 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 			jsonError('Отсутствует имя колонки в компоненте id'.$cmp_id);
 		if(!isset($dialog['field'][$col]))
 			jsonError('В таблице <b>'.$dialog['base_table'].'</b> нет колонки с именем "'.$col.'"');
-		if($cmp['dialog_id'] == 19) {//наполнение для некоторых компонентов: radio, select, dropdown
-			_dialogCmpValue($val, 'test');
-			continue;
-		}
 
 		$v = _txt($val);
 
@@ -465,6 +447,60 @@ function _spisokAction3($send, $dialog, $unit_id) {//добавление значений для отп
 	$send['level'] = utf8(_blockLevelChange($block['obj_name'], $block['obj_id'], $width));
 
 	return $send;
+}
+function _elementCmp19($cmp, $val, $unit) {//наполнение для некоторых компонентов: radio, select, dropdown
+	if(empty($val))
+		return;
+	if(!is_array($val))
+		return;
+	if(empty($cmp['col']))
+		return;
+
+	$update = array();
+	$idsNoDel = '0';
+	$sort = 0;
+	foreach($val as $r) {
+		if(!$title = _txt($r['title']))
+			continue;
+		if($id = _num($r['id']))
+			$idsNoDel .= ','.$id;
+		$content = _txt($r['content']);
+		$update[] = "(
+			".$id.",
+			19,
+			-".$unit['id'].",
+			'".addslashes($title)."',
+			'".addslashes($content)."',
+			"._num($r['def']).",
+			".$sort++."
+		)";
+	}
+
+	//удаление удалённых значений
+	$sql = "DELETE FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			  AND `id` NOT IN (".$idsNoDel.")";
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	$sql = "INSERT INTO `_element` (
+				`id`,
+				`dialog_id`,
+				`block_id`,
+				`txt_1`,
+				`txt_2`,
+				`def`,
+				`sort`
+			)
+			VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`txt_1`=VALUES(`txt_1`),
+				`txt_2`=VALUES(`txt_2`),
+				`def`=VALUES(`def`),
+				`sort`=VALUES(`sort`)";
+	query($sql);
 }
 function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания списка (30)
 	$cmp,//компонент из диалога, отвечающий за настройку таблицы
