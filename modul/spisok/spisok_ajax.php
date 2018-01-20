@@ -181,16 +181,13 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			WHERE `id`=".$unit_id;
 	$unit = query_assoc_utf8($sql);
 
-	if($cmpv = @$_POST['cmpv'])
-		foreach($dialog['cmp'] as $cmp_id => $cmp) {
-			if(!isset($cmpv[$cmp_id]))
-				continue;
-			switch($cmp['dialog_id']) {
-				//наполнение для некоторых компонентов: radio, select, dropdown
-				case 19: _elementCmp19($cmp, $cmpv[$cmp_id], $unit); break;
-				//Настройка ТАБЛИЧНОГО содержания списка
-				case 30: _spisokTableValueSave($cmp, $cmpv[$cmp_id], $unit); break;
-			}
+	$cmpv = @$_POST['cmpv'];
+	foreach($dialog['cmp'] as $cmp_id => $cmp)
+		switch($cmp['dialog_id']) {
+			//наполнение для некоторых компонентов: radio, select, dropdown
+			case 19: _elementCmp19($cmpv[$cmp_id], $unit); break;
+			//Настройка ТАБЛИЧНОГО содержания списка
+			case 30: _spisokTableValueSave($cmp, $cmpv[$cmp_id], $unit); break;
 		}
 
 	if($dialog['base_table'] == '_page')
@@ -448,32 +445,31 @@ function _spisokAction3($send, $dialog, $unit_id) {//добавление значений для отп
 
 	return $send;
 }
-function _elementCmp19($cmp, $val, $unit) {//наполнение для некоторых компонентов: radio, select, dropdown
-	if(empty($val))
-		return;
-	if(!is_array($val))
-		return;
-	if(empty($cmp['col']))
-		return;
-
+function _elementCmp19($val, $unit) {//наполнение для некоторых компонентов: radio, select, dropdown
 	$update = array();
 	$idsNoDel = '0';
-	$sort = 0;
-	foreach($val as $r) {
-		if(!$title = _txt($r['title']))
-			continue;
-		if($id = _num($r['id']))
-			$idsNoDel .= ','.$id;
-		$content = _txt($r['content']);
-		$update[] = "(
-			".$id.",
-			19,
-			-".$unit['id'].",
-			'".addslashes($title)."',
-			'".addslashes($content)."',
-			"._num($r['def']).",
-			".$sort++."
-		)";
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		$sort = 0;
+		foreach($val as $r) {
+			if(!$title = _txt($r['title']))
+				continue;
+			if($id = _num($r['id']))
+				$idsNoDel .= ','.$id;
+			$content = _txt($r['content']);
+			$update[] = "(
+				".$id.",
+				19,
+				-".$unit['id'].",
+				'".addslashes($title)."',
+				'".addslashes($content)."',
+				"._num($r['def']).",
+				".$sort++."
+			)";
+		}
 	}
 
 	//удаление удалённых значений
