@@ -34,6 +34,8 @@ switch(@$_POST['op']) {
 			query($sql);
 		}
 
+		$send = _spisokAction4($send);
+
 		jsonSuccess($send);
 		break;
 	case 'spisok_next'://догрузка списка
@@ -202,6 +204,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	);
 
 	$send = _spisokAction3($send, $dialog, $unit_id);
+	$send = _spisokAction4($send);
 
 	return $send;
 }
@@ -442,6 +445,17 @@ function _spisokAction3($send, $dialog, $unit_id) {//добавление значений для отп
 			break;
 	}
 	$send['level'] = utf8(_blockLevelChange($block['obj_name'], $block['obj_id'], $width));
+
+	return $send;
+}
+function _spisokAction4($send) {//действие 4 - обновление исходного диалога
+	if($send['action_id'] != 4)
+		return $send;
+	if(!$dialog_id = _num(@$_POST['dialog_source']))
+		return $send;
+
+	$_POST['unit_id'] = 0;
+	$send['dialog_source'] = _dialogOpenLoad($dialog_id);
 
 	return $send;
 }

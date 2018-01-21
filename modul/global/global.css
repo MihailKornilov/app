@@ -264,11 +264,17 @@ table{border:0;border-spacing:0}
 	cursor:pointer;
 	z-index:1;
 }
-.block-choose:not(.sel):hover{opacity:1;border-color:#d90}
+.block-choose:not(.sel):not(.deny):hover{opacity:1;border-color:#d90}
 .block-choose.sel{
 	border-color:#d60;
 	background-color:#ec6;
 	opacity:.5;
+}
+.block-choose.deny{
+	cursor:default;
+	border-color:#999;
+	background-color:#ccc;
+	opacity:.7;
 }
 
 /* подсветка блока при выборе элемента */

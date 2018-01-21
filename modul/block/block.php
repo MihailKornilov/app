@@ -348,8 +348,9 @@ function _blockChoose($r, $unit) {//подсветка блоков для выбора (к функциям)
 	//отметка выбранных полей
 	$block_id = $r['id'];
 	$sel = isset($unit['choose_sel'][$block_id]) ? ' sel' : '';
+	$deny = isset($unit['choose_deny'][$block_id]) ? ' deny' : '';
 
-	return '<div class="choose block-choose'.$sel.'" val="'.$block_id.'"></div>';
+	return '<div class="choose block-choose'.$sel.$deny.'" val="'.$block_id.'"></div>';
 }
 function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 	//условие выбора

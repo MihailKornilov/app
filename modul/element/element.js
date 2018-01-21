@@ -2,6 +2,7 @@
 var VK_SCROLL = 0,
 	ZINDEX = 1000,
 	BC = 0,
+	DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 
 	MONTH_DEF = {
 		1:'январь',
@@ -163,6 +164,8 @@ var VK_SCROLL = 0,
 				if(butSubmit.hasClass('_busy'))
 					return;
 				o.submit();
+				if(o.dialog_id)
+					delete DIALOG[o.dialog_id];
 			},
 			w2 = Math.round(width / 2); // ширина/2. ƒл€ определени€ положени€ по центру
 		dialog.find('.close').click(dialogClose);
@@ -223,6 +226,8 @@ var VK_SCROLL = 0,
 		function dialogClose() {
 			dialog.remove();
 			_backfon(false);
+			if(o.dialog_id)
+				delete DIALOG[o.dialog_id];
 			if(!frameNum)
 				DIALOG_MAXHEIGHT = 0;
 //			_fbhs();
@@ -241,7 +246,7 @@ var VK_SCROLL = 0,
 				dialog.find('.load tt').append('<br /><br /><b>' + msg + '</b>');
 		}
 
-		return {
+		var DLG = {
 			close:dialogClose,
 			process:function() {
 				butSubmit.addClass('_busy');
@@ -310,6 +315,11 @@ var VK_SCROLL = 0,
 				dialog.find('.head input').width(v - 80);
 			}
 		};
+
+		if(o.dialog_id)
+			DIALOG[o.dialog_id] = DLG;
+
+		return DLG;
 	},
 	_dialogEdit = function(o) {//создание|редактирование диалогового окна
 		var dialog = _dialog({
@@ -494,6 +504,7 @@ var VK_SCROLL = 0,
 				dialog_id:o.dialog_id,
 				block_id:o.block_id,
 				unit_id:o.unit_id,
+				dialog_source:o.dialog_source,//id исходного диалогового окна
 				cmp:{},
 				cmpv:{}
 			};
@@ -543,6 +554,17 @@ var VK_SCROLL = 0,
 							.find('.block-grid-on')
 							.removeClass('grey')
 							.trigger('click');
+						break;
+					case 4://обновление исходного диалога
+						var id = _num(o.dialog_source);
+						if(!id)
+							break;
+						if(!DIALOG[id])
+							break;
+						DIALOG[id].close();
+						if(!res.dialog_source)
+							break;
+						_dialogOpen(res.dialog_source);
 						break;
 				}
 			});
@@ -879,6 +901,12 @@ var VK_SCROLL = 0,
 						return;
 					_dialogCmpValue(el);
 					return;
+				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —писок действий, прив€занных к элементу
+				case 22:
+					if(is_edit)
+						return;
+					$(el.attr_el).find('DL')._sort({table:'_element_func'});
+					return;
 				//select - выбор списка (все списки приложени€)
 				case 24:
 					$(el.attr_cmp)._select({
@@ -898,6 +926,8 @@ var VK_SCROLL = 0,
 					bec.click(function() {
 						var t = $(this),
 							ids = [];
+						if(t.hasClass('deny'))
+							return;
 						if(el.num_3) {
 							var sel = t.hasClass('sel');
 							t._dn(sel, 'sel');
@@ -1298,6 +1328,8 @@ $(document)
 				dialog_id:0,    //id диалогового окна
 				block_id:0,     //id блока, если элемент вставл€етс€ в блок
 				unit_id:0,      //id единицы списка, если редактируетс€
+
+				dialog_source:0,//id исходного диалогового окна
 
 				busy_obj:t,
 				busy_cls:t.hasClass('icon') ? 'spin' : '_busy'

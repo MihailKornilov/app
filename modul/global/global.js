@@ -94,29 +94,6 @@ var FB,
 
 		_post(send, 'reload');
 	},
-
-	sortable = function() {
-		$('._sort').sortable({
-			axis:'y',
-			update:function () {
-				if($(this).hasClass('no'))
-					return true;
-				var dds = $(this).find('dd'),
-					arr = [];
-				for(var n = 0; n < dds.length; n++) {
-					var v = _num(dds.eq(n).attr('val'));
-					if(v)
-						arr.push(v);
-				}
-				var send = {
-					op:'sort',
-					table:$(this).attr('val'),
-					ids:arr.join()
-				};
-				_post(send);
-			}
-		});
-	},
 	_toSpisok = function(s) {
 		var a=[];
 		for(k in s)
@@ -413,6 +390,40 @@ $.fn._busy = function(v) {//проверка/установка/снятие процесса ожидания для элем
 	t[(v ? 'add' : 'remove') + 'Class']('_busy');
 
 	return t;
+};
+$.fn._sort = function(o) {//сортировка
+	var t = $(this);
+
+	o = $.extend({
+		y:'y',
+		handle:'.icon-move-y',
+		table:''
+	}, o);
+
+	t.sortable({
+		axis:'y',
+		update:function() {
+			if(!o.table)
+				return;
+			var dds = $(this).find('dd'),
+				arr = [];
+			for(var n = 0; n < dds.length; n++) {
+				var v = _num(dds.eq(n).attr('val'));
+				if(v)
+					arr.push(v);
+			}
+			var send = {
+				op:'sort',
+				table:o.table,
+				ids:arr.join()
+			};
+			t.addClass('prel');
+			t.append('<div class="pabs _busy" style="top:0;bottom:0;left:0;right:0;opacity:.8;background-color:#fff"></div>');
+			_post(send, function() {
+				t.find('.pabs').remove();
+			});
+		}
+	});
 };
 
 $(document)

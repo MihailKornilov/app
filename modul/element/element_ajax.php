@@ -15,11 +15,14 @@ switch(@$_POST['op']) {
 		$action = array(
 			3 => 'Обновить содержимое блоков',
 			1 => 'Обновить страницу',
-			2 => 'Перейти на страницу'
+			2 => 'Перейти на страницу',
+			4 => 'Обновить исходный диалог'
 		);
 
-		if(!SA)
+		if(!SA) {
 			unset($menu[9]);
+			unset($action[4]);
+		}
 
 		if(!isset($menu[$dialog['menu_edit_last']]))
 			$dialog['menu_edit_last'] = 1;
@@ -211,7 +214,6 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID диалога');
 
 		$send = _dialogOpenLoad($dialog_id);
-		$send['block_arr'] = _blockJsArr('dialog', $dialog_id);
 
 		jsonSuccess($send);
 		break;
@@ -389,6 +391,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['dialog_id'] = $dialog_id;
 	$send['block_id'] = $block_id;
 	$send['unit_id'] = $unit_id;
+	$send['dialog_source'] = _num(@$_POST['dialog_source']);
 	$send['act'] = $act;
 
 	//исходные данные, полученные для открытия диалога
@@ -648,6 +651,8 @@ function _dialogOpenLoad($dialog_id) {
 		$send['width'] = 480;
 		$send['html'] = utf8($html);
 	}
+
+	$send['block_arr'] = _blockJsArr('dialog', $dialog_id);
 
 	return $send;
 }

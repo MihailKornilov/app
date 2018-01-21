@@ -595,6 +595,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			//вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
 			$block = _num(@$US['block_id']) ? ',block_id:'.$US['block_id'] : '';
+			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
+			$dialog_source = $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
 			return _button(array(
 						'attr_id' => $attr_id,
 						'name' => _br($el['txt_1']),
@@ -602,7 +604,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'width' => $el['width'],
 						'small' => $el['num_2'],
 						'class' => 'dialog-open',
-						'val' => 'dialog_id:'.$el['num_4'].$block
+						'val' => 'dialog_id:'.$el['num_4'].$block.$dialog_source
 					));
 
 		//Меню страниц
@@ -748,6 +750,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			foreach($arr as $r) {
 				$c = count(_ids($r['target'], 1));
 				$spisok .=
+					'<dd val="'.$r['id'].'">'.
 					'<table class="bs5 ml10 bor1 bg-gr2 over2 mb5 curD">'.
 						'<tr>'.
 							'<td class="w35 top">'.
@@ -759,18 +762,16 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							'<td class="w100 b color-ref top center pt3">'.
 								$c.' блок'._end($c, '', 'а', 'ов').
 							'<td class="w50 r top">'.
-								'<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
+								'<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',dialog_source:'.$el['block']['obj_id'].'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
 								_iconDel(array(
 									'class' => 'pl ml5 dialog-open',
-									'val' => 'dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',del:1'
+									'val' => 'dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',del:1,dialog_source:'.$el['block']['obj_id']
 								)).
-					'</table>';
+					'</table>'.
+					'</dd>';
 			}
 
-			return
-				'<div class="pad10">'.
-					$spisok.
-				'</div>';
+			return '<dl class="mar10">'.$spisok.'</dl>';
 
 		//Содержание единицы списка - таблица
 		case 23:
@@ -904,16 +905,32 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					break;
 			}
 
+			//выделение уже выбранных полей, чтобы нельзя было их выбрать (для функций)
+			$choose_deny = array();
+			$dialogCur = _dialogQuery($el['block']['obj_id']);
+			if($dialogCur['base_table'] == '_element_func') {
+				$id = $UNIT_ISSET ? _num($unit['id']) : 0;
+				$sql = "SELECT *
+						FROM `_element_func`
+						WHERE `block_id`=".$bs_id."
+						  AND `id`!=".$id;
+				if($arr = query_arr($sql))
+					foreach($arr as $r)
+						foreach(_ids($r['target'], 1) as $t)
+							$choose_deny[$t] = 1;
+			}
+
 
 			$send = array(
 				'choose' => 1,
 				'choose_access' => $choose_access,
-				'choose_sel' => _idsAss($v)            //ids ранее выбранных элементов или блоков
+				'choose_sel' => _idsAss($v),       //ids ранее выбранных элементов или блоков
+				'choose_deny' => $choose_deny      //ids элементов или блоков, которые выбирать нельзя (если они были выбраны другой фукцией того же элемента)
 			);
 
 			return
 			'<div class="fs14 pad10 pl15 bg-gr2 line-b">Диалоговое окно <b class="fs14">'.$dialog['spisok_name'].'</b>:</div>'.
-			'<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />'.
+			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
 
 		//28
