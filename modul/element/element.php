@@ -503,5 +503,36 @@ function _dialogSpisokGetPage($page_id) {//список объектов, которые поступают на
 
 	return _selArray($send);
 }
+function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка через AJAX
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id` IN (".APP_ID.(SA ? ',0' : '').")
+			  AND `sa` IN(0".(SA ? ',1' : '').")
+			ORDER BY `app_id` DESC,`id`";
+	if(!$arr = query_arr($sql))
+		return array();
 
+	$spisok = array();
+	$saFlag = $sa_only;
+	foreach($arr as $r) {
+		if(!$saFlag && !$r['app_id']) {//вставка графы для SA
+			$spisok[] = array(
+				'info' => 1,
+				'title' => utf8('SA-диалоги:')
+			);
+			$saFlag = 1;
+		}
+		if($sa_only && $r['app_id'])
+			continue;
+		$u = array(
+			'id' => _num($r['id']),
+			'title' => utf8($r['insert_head'])
+		);
+		if(!$r['app_id'])
+			$u['content'] = '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'"><b>'.$r['id'].'</b>. '.utf8($r['insert_head']).'</div>';
+		$spisok[] = $u;
+	}
+
+	return $spisok;
+}
 

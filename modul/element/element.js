@@ -349,11 +349,13 @@ var VK_SCROLL = 0,
 			}),
 			DIALOG_WIDTH = o.width;
 
-		_elemActivate(o.cmp, {}, 1);
-
 		_forIn(o.block_arr, function(sp, k) {
 			BLOCK_ARR[k] = sp;
 		});
+
+		_elemActivate(o.cmp, {}, 1);
+
+		console.log(o.block_arr);
 
 		$('#dialog-menu')._menu({
 			type:2,
@@ -393,6 +395,11 @@ var VK_SCROLL = 0,
 		});
 		$('#element_width')._count({width:60,step:10});
 		$('#element_width_min')._count({width:60,step:10});
+		$('#element_dialog_func')._select({
+			width:280,
+			title0:'не указан',
+			spisok:o.dialog_spisok
+		});
 
 		_dialogHeightCorrect();
 
@@ -457,6 +464,7 @@ var VK_SCROLL = 0,
 				element_search_access:$('#element_search_access').val(),
 				element_is_insert:$('#element_is_insert').val(),
 				element_style_access:$('#element_style_access').val(),
+				element_dialog_func:$('#element_dialog_func').val(),
 
 				menu_edit_last:$('#dialog-menu').val()
 			};
@@ -842,9 +850,10 @@ var VK_SCROLL = 0,
 				attr_focus = el.attr_cmp;
 			switch(el.dialog_id) {
 				case 1://галочка
+					_elemFunc(el, 0, is_edit, 1);
 					$(el.attr_cmp)._check({
 						func:function(v, o) {
-							_elemFunc(el, v, o);
+							_elemFunc(el, v, is_edit);
 						}
 					});
 					return;
@@ -1046,7 +1055,9 @@ var VK_SCROLL = 0,
 		if(!is_edit && attr_focus)
 			$(attr_focus).focus();
 	},
-	_elemFunc = function(el, v, o) {//применение функций, привязанных к элементам
+	_elemFunc = function(el, v, is_edit, is_open) {//применение функций, привязанных к элементам
+		if(is_edit)
+			return;
 		_forN(el.func, function(sp) {
 			switch(sp.dialog_id) {
 				case 36://Галочка[1]: скрытие/показ блоков
@@ -1080,7 +1091,6 @@ var VK_SCROLL = 0,
 							_forIn(BL.xx_ids, function(i, id) {
 								TRG[id] = 0;//блоки в том же ряду отмечаются, чтобы к ним функция не применялась
 							});
-							//
 							arr.push({
 								obj:_parent($(BL.attr_bl), '.bl-div'),
 								slide:1
@@ -1099,20 +1109,32 @@ var VK_SCROLL = 0,
 						if(!oo.obj.length)
 							return;
 
-						oo.obj.css('visibility', v ? 'visible' : 'hidden');
-						return;
-
-						oo.obj._dn(v);
-						return;
-
-						oo.obj.animate({opacity:v}, 200);
-						return;
-
-						if(oo.slide) {
-							oo.obj['slide' + (v ? 'Down' : 'Up')]();
-							return;
+						switch(sp.effect_id) {
+							case 44://изчезновение/появление
+								if(is_open) {
+									oo.obj._dn(v, 'vh');
+									oo.obj.css({opacity:v});
+									break;
+								}
+								oo.obj._dn(1, 'vh');
+								oo.obj.animate({opacity:v}, 300, function() {
+									oo.obj._dn(v, 'vh');
+								});
+								break;
+							case 45://сворачивание/разворачивание
+								if(!oo.slide) {
+									oo.obj._dn(v, 'vh');
+									break;
+								}
+								if(is_open) {
+									oo.obj._dn(v);
+									break;
+								}
+								oo.obj['slide' + (v ? 'Down' : 'Up')]();
+								break;
+							default:
+								oo.obj._dn(v, oo.slide ? '' : 'vh');
 						}
-						oo.obj.css('visibility', v ? 'visible' : 'hidden');
 					});
 					break;
 			}
@@ -1769,6 +1791,8 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 			return;
 
 		SEL._dn(rs, 'rs');
+		var h = RES.height();
+		RES._dn(h < 250, 'h250');
 
 		if(!rs)
 			_forEq(RES.find('.select-unit'), function(sp) {
@@ -1884,8 +1908,7 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 			return;
 		}
 
-		var html = '',
-			h;
+		var html = '';
 		if(o.title0 && !o.write)
 			html += '<div class="select-unit title0" val="0">' + o.title0 + '</div>';
 
@@ -1896,7 +1919,8 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		});
 
 		RES.html(html);
-		h = RES.height();
+
+		var h = RES.height();
 		RES._dn(h < 250, 'h250');
 
 		RES.find('.select-unit').mouseenter(function() {

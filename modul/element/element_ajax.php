@@ -183,6 +183,8 @@ switch(@$_POST['op']) {
 									'title' => 'разрешать настраивать стили',
 									'value' => $dialog['element_style_access']
 							   )).
+					'<tr><td class="red r">Диалог для функций:'.
+						'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
 				'</table>'.
 			'</div>'
 	  : '');
@@ -196,6 +198,7 @@ switch(@$_POST['op']) {
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
 		$send['tables'] = $tables;
+		$send['dialog_spisok'] = SA ? _dialogSelArray(true) : array() ;
 
 		jsonSuccess($send);
 		break;
@@ -310,6 +313,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_search_access = _num($_POST['element_search_access']);
 	$element_is_insert = _num($_POST['element_is_insert']);
 	$element_style_access = _num($_POST['element_style_access']);
+	$element_dialog_func = _num($_POST['element_dialog_func']);
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
@@ -347,6 +351,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_search_access`=".$element_search_access.",
 				`element_is_insert`=".$element_is_insert.",
 				`element_style_access`=".$element_style_access.",
+				`element_dialog_func`=".$element_dialog_func.",
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;
@@ -598,34 +603,7 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//SA: Select - выбор диалогового окна
 			case 38:
-				$sql = "SELECT *
-						FROM `_dialog`
-						WHERE `app_id` IN (".APP_ID.(SA ? ',0' : '').")
-						  AND `sa` IN(0".(SA ? ',1' : '').")
-						ORDER BY `app_id` DESC,`id`";
-				if(!$arr = query_arr($sql))
-					break;
-
-				$spisok = array();
-				$saFlag = 0;
-				foreach($arr as $r) {
-					if(!$saFlag && !$r['app_id']) {//вставка графы для SA
-						$spisok[] = array(
-							'info' => 1,
-							'title' => utf8('SA-диалоги:')
-						);
-						$saFlag = 1;
-					}
-					$u = array(
-						'id' => _num($r['id']),
-						'title' => utf8($r['insert_head'])
-					);
-					if(!$r['app_id'])
-						$u['content'] = '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'"><b>'.$r['id'].'</b>. '.utf8($r['insert_head']).'</div>';
-					$spisok[] = $u;
-				}
-
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _dialogSelArray();
 				break;
 	}
 

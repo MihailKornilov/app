@@ -48,11 +48,20 @@ function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры б
 			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($arr).")";
 	if($elem = query_arr($sql)) {
+		//наличие функций в элементах
+		$sql = "SELECT `block_id`,1
+				FROM `_element_func`
+				WHERE `block_id` IN("._idsGet($elem, 'block_id').")
+				GROUP BY `block_id`";
+		$isFunc = query_ass($sql);
+
 		foreach($elem as $id => $r) {
 			$elem[$id]['elv_ass'] = array();
 			$elem[$id]['elv_spisok'] = array();
 			$elem[$id]['elv_def'] = 0;
+			$elem[$id]['is_func'] = _num(@$isFunc[$r['block_id']]);
 		}
+
 /*
 		//значения элементов-списков
 		$sql = "SELECT *
@@ -444,6 +453,8 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 
 			$v[] = 'elv_spisok:'._selJson($el['elv_ass']);
 			$v[] = 'elv_def:'.$el['elv_def'];
+			$v[] = 'dialog_func:'._dialogParam($el['dialog_id'], 'element_dialog_func');
+			$v[] = 'is_func:'.$el['is_func'];
 		}
 
 		$send[] = $id.':{'.implode(',', $v).'}';
@@ -506,6 +517,8 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 
 			$v['elv_spisok'] = _selArray($el['elv_ass']);
 			$v['elv_def'] = $el['elv_def'];
+			$v['dialog_func'] = _dialogParam($el['dialog_id'], 'element_dialog_func');
+			$v['is_func'] = $el['is_func'];
 		}
 
 		$send[_num($id)] = $v;
