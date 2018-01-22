@@ -1081,8 +1081,8 @@ var VK_SCROLL = 0,
 				//показ/скрытие блоков
 				case 36://Галочка[1]:
 				case 40://Выпадающее поле[17]:
-					var is_show = 0,//скрывать или показывать блоки. По умолчанию скрывать.
-						effect_id = is_open ? 0  : sp.effect_id;
+					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
+
 					//ДЕЙСТВИЕ
 					switch(sp.action_id) {
 						//скрыть
@@ -1101,12 +1101,20 @@ var VK_SCROLL = 0,
 						//значение не выбрано
 						case 703:
 						case 730:
+							if(v && sp.action_reverse) {
+								is_show = is_show ? 0 : 1;
+								break;
+							}
 							if(v)
 								return;
 							break;
 						//значение выбрано
 						case 704:
 						case 731:
+							if(!v && sp.action_reverse) {
+								is_show = is_show ? 0 : 1;
+								break;
+							}
 							if(!v)
 								return;
 							break;
@@ -1118,32 +1126,42 @@ var VK_SCROLL = 0,
 						default: return;
 					}
 
+					//ПРОЦЕСС
 					_forN(_elemFuncBlockObj(sp), function(oo) {
 						if(!oo.obj.length)
 							return;
 
-						switch(effect_id) {
+						switch(sp.effect_id) {
 							//изчезновение/появление
 							case 44:
 							case 715:
+								if(is_open) {
+									oo.obj._dn(is_show, 'vh');
+									oo.obj.css({opacity:is_show});
+									return;
+								}
 								oo.obj._dn(1, 'vh');
 								oo.obj.animate({opacity:is_show}, 300, function() {
 									oo.obj._dn(is_show, 'vh');
 								});
-								break;
+								return;
 							//сворачивание/разворачивание
 							case 45:
 							case 716:
 								if(!oo.slide) {
 									oo.obj._dn(is_show, 'vh');
-									break;
+									return;
+								}
+								if(is_open) {
+									oo.obj[is_show ? 'show' : 'hide']();
+									return;
 								}
 								oo.obj['slide' + (is_show ? 'Down' : 'Up')](300);
-								break;
+								return;
 							default:
 								if(!oo.slide) {
 									oo.obj._dn(is_show, 'vh');
-									break;
+									return;
 								}
 								oo.obj[is_show ? 'show' : 'hide']();
 						}
