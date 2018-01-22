@@ -1087,20 +1087,26 @@ var VK_SCROLL = 0,
 					switch(sp.action_id) {
 						//скрыть
 						case 709:
+						case 726:
 						default: break;
 						//показать
-						case 710: is_show = 1; break;
+						case 710:
+						case 727:
+							is_show = 1;
+							break;
 					}
 
 					//УСЛОВИЕ
 					switch(sp.cond_id) {
 						//значение не выбрано
 						case 703:
+						case 730:
 							if(v)
 								return;
 							break;
 						//значение выбрано
 						case 704:
+						case 731:
 							if(!v)
 								return;
 							break;
