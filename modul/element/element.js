@@ -1132,7 +1132,7 @@ var VK_SCROLL = 0,
 									oo.obj._dn(is_show, 'vh');
 									break;
 								}
-								oo.obj['slide' + (is_show ? 'Down' : 'Up')]();
+								oo.obj['slide' + (is_show ? 'Down' : 'Up')](300);
 								break;
 							default:
 								if(!oo.slide) {
