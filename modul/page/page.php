@@ -361,8 +361,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 	//значение из списка
 	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']]: '';
-	$attr_id = 'cmp_'.$el['id'];
-	$disabled = BLOCK_EDIT || ELEM_WIDTH_CHANGE || !empty($unit['choose']) ? ' disabled' : '';
+	$is_edit = BLOCK_EDIT || ELEM_WIDTH_CHANGE || !empty($unit['choose']);
+	$attr_id = 'cmp_'.$el['id'].($is_edit ? '_edit' : '');
+	$disabled = $is_edit ? ' disabled' : '';
 
 	switch($el['width']) {
 		case 0: $width = ' style="width:100%"'; break;
@@ -935,6 +936,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			//выделение уже выбранных полей, чтобы нельзя было их выбрать (для функций)
 			$choose_deny = array();
+/*
 			$dialogCur = _dialogQuery($el['block']['obj_id']);
 			if($dialogCur['base_table'] == '_element_func') {
 				$id = $UNIT_ISSET ? _num($unit['id']) : 0;
@@ -947,7 +949,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						foreach(_ids($r['target'], 1) as $t)
 							$choose_deny[$t] = 1;
 			}
-
+*/
 
 			$send = array(
 				'choose' => 1,
@@ -960,9 +962,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			'<div class="fs14 pad10 pl15 bg-gr2 line-b">Диалоговое окно <b class="fs14">'.$dialog['spisok_name'].'</b>:</div>'.
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
-
-		//Список действий для галочки
-		case 28: return 28;
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ТАБЛИЧНОГО содержания списка
 		case 30:
@@ -1003,7 +1002,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return 'Дата используется только в списках';
 
-		//Назначение действия для галочки: скрытие/показ блоков
+
+
+
+		//---=== ДЕЙСТВИЯ К ЭЛЕМЕНТАМ (ФУНКЦИИ) ===---
+		//Список действий для Галочки [1]
+		case 28: return 28;
+
+		//Назначение действия для Галочки [1]: скрытие/показ блоков
 		case 36:
 			/*
 				таблица _element_func
@@ -1014,6 +1020,29 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					target - id блоков, на которые воздействует галочка
 			*/
 			return 36;
+
+		//Список действий для Выпадающего поля [17]
+		case 39: return 39;
+
+		//Назначение действия для Выпадающего поля [17]: скрытие/показ блоков
+		case 40:
+			/*
+				таблица _element_func
+					action_id - действие для блоков
+						709 - скрыть
+						710 - показать
+					cond_id - условие действия
+						703 - значение не выбрано
+						704 - значение выбрано
+						705 - конкретное значение
+					action_reverse - применять обратное действие (для выбрано/не выбрано)
+					value_specific - конкртетное значение (при условии 705)
+					effect_id - эффекты
+						715 - изчезновение/появление
+						716 - сворачивание/разворачивание
+					target - id блоков, на которые воздействует галочка
+			*/
+			return 40;
 	}
 
 	return'неизвестный элемент='.$el['dialog_id'];

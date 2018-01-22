@@ -324,7 +324,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 						'elv_ass' => array(),   //ассоциативные значения
 						'elv_spisok' => array(),//значения в виде списка {id:1,title:'значение'}
-						'elv_def' => 0,         //значение по умолчанию
+						'def' => _num($r['def']),//значение по умолчанию
 
 						'attr_id' => '#cmp_'.$id,
 						'attr_cmp' => '#cmp_'.$id,
@@ -333,24 +333,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'func' => array()
 					);
 				}
-/*
-				$sql = "SELECT *
-						FROM `_element_value`
-						WHERE `element_id` IN("._idsGet($elem).")
-						ORDER BY `element_id`,`sort`";
-				foreach(query_arr($sql) as $r) {
-					$id = _num($r['id']);
-					$cmp_id = _num($r['element_id']);
-					$cmp[$cmp_id]['elv_ass'][$id] = $r['title'];
-					$cmp[$cmp_id]['elv_spisok'][] = array(
-						'uid' => $id,
-						'title' => $r['title']
-					);
-					if($r['def'])
-						$cmp[$r['element_id']]['elv_def'] = $id;
-					$v_ass[$id] = $r['title'];
-				}
-*/
+
 				$sql = "SELECT *
 						FROM `_element_func`
 						WHERE `block_id` IN ("._idsGet($block).")
@@ -360,6 +343,9 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 					$cmp[$elem_id]['func'][] = array(
 						'dialog_id' => _num($r['dialog_id']),
 						'action_id' => _num($r['action_id']),
+						'cond_id' => _num($r['cond_id']),
+						'action_reverse' => _num($r['action_reverse']),
+						'value_specific' => _num($r['value_specific']),
 						'effect_id' => _num($r['effect_id']),
 						'target' => _idsAss($r['target'])
 					);

@@ -899,11 +899,15 @@ var VK_SCROLL = 0,
 					return;
 				//select - произвольные значения
 				case 17:
+					_elemFunc(el, _num(unit[el.col] || el.def), is_edit, 1);
 					$(el.attr_cmp)._select({
 						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.elv_spisok
+						spisok:el.elv_spisok,
+						func:function(v) {
+							_elemFunc(el, v, is_edit);
+						}
 					});
 					return;
 				//наполнение для некоторых компонентов
@@ -1067,89 +1071,132 @@ var VK_SCROLL = 0,
 			$(attr_focus).focus();
 	},
 	_elemFunc = function(el, v, is_edit, is_open) {//применение функций, привязанных к элементам
+		/*
+			is_open - окно открылось, эффектов нет, только применение функций
+		*/
 		if(is_edit)
 			return;
 		_forN(el.func, function(sp) {
 			switch(sp.dialog_id) {
-				case 36://Галочка[1]: скрытие/показ блоков
-					if(el.dialog_id != 1)
-						return;
+				//показ/скрытие блоков
+				case 36://Галочка[1]:
+				case 40://Выпадающее поле[17]:
+					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
+					//ДЕЙСТВИЕ
+					switch(sp.action_id) {
+						//скрыть
+						case 709:
+						default: break;
+						//показать
+						case 710: is_show = 1; break;
+					}
 
-					var TRG = _copyObj(sp.target),
-						arr = [];
-					_forIn(TRG, function(n, block_id) {
-						if(!n)
-							return;
-						var BL = BLOCK_ARR[block_id];
-						if(BL.xx == 1) {//если блок в ряду один, фукнция применится ко всей таблице
-							arr.push({
-								obj:_parent($(BL.attr_bl), '.bl-div'),
-								slide:1
-							});
-							return;
-						}
+					//УСЛОВИЕ
+					switch(sp.cond_id) {
+						//значение не выбрано
+						case 703:
+							if(v)
+								return;
+							break;
+						//значение выбрано
+						case 704:
+							if(!v)
+								return;
+							break;
+						//конкретное значение
+						case 705:
+							if(v != sp.value_specific)
+								return;
+							break;
+						default: return;
+					}
 
-						//проверка, поставлена та же функция на остальные блоки в том же ряду
-						var all = 1;
-						_forIn(BL.xx_ids, function(i, id) {
-							if(!TRG[id]) {//выход, если не на всех
-								all = 0;
-								return false;
-							}
-						});
-
-						if(all) {
-							_forIn(BL.xx_ids, function(i, id) {
-								TRG[id] = 0;//блоки в том же ряду отмечаются, чтобы к ним функция не применялась
-							});
-							arr.push({
-								obj:_parent($(BL.attr_bl), '.bl-div'),
-								slide:1
-							});
-							return;
-						}
-
-						//функция будет применена к конкретному блоку
-						arr.push({
-							obj:$(BL.attr_bl),
-							slide:0
-						});
-					});
-
-					_forN(arr, function(oo) {
+					_forN(_elemFuncBlockObj(sp), function(oo) {
 						if(!oo.obj.length)
 							return;
 
 						switch(sp.effect_id) {
-							case 44://изчезновение/появление
+							//изчезновение/появление
+							case 44:
+							case 715:
 								if(is_open) {
-									oo.obj._dn(v, 'vh');
-									oo.obj.css({opacity:v});
+									oo.obj._dn(is_show, 'vh');
+									oo.obj.css({opacity:is_show});
 									break;
 								}
 								oo.obj._dn(1, 'vh');
-								oo.obj.animate({opacity:v}, 300, function() {
-									oo.obj._dn(v, 'vh');
+								oo.obj.animate({opacity:is_show}, 300, function() {
+									oo.obj._dn(is_show, 'vh');
 								});
 								break;
-							case 45://сворачивание/разворачивание
+							//сворачивание/разворачивание
+							case 45:
+							case 716:
 								if(!oo.slide) {
-									oo.obj._dn(v, 'vh');
+									oo.obj._dn(is_show, 'vh');
 									break;
 								}
 								if(is_open) {
-									oo.obj._dn(v);
+									oo.obj._dn(is_show);
 									break;
 								}
-								oo.obj['slide' + (v ? 'Down' : 'Up')]();
+								oo.obj['slide' + (is_show ? 'Down' : 'Up')]();
 								break;
 							default:
-								oo.obj._dn(v, oo.slide ? '' : 'vh');
+								if(!oo.slide) {
+									oo.obj._dn(is_show, 'vh');
+									break;
+								}
+								oo.obj[is_show ? 'show' : 'hide']();
 						}
 					});
 					break;
 			}
 		});
+	},
+	_elemFuncBlockObj = function(sp) {//получение $(obj) блоков
+		var TRG = _copyObj(sp.target),
+			arr = [];
+		_forIn(TRG, function(n, block_id) {
+			if(!n)
+				return;
+			var BL = BLOCK_ARR[block_id];
+			if(BL.xx == 1) {//если блок в ряду один, фукнция применится ко всей таблице
+				arr.push({
+					obj:_parent($(BL.attr_bl), '.bl-div'),
+					slide:1
+				});
+				return;
+			}
+
+			//проверка, поставлена та же функция на остальные блоки в том же ряду
+			var all = 1;
+			_forIn(BL.xx_ids, function(i, id) {
+				if(!TRG[id]) {//выход, если не на всех
+					all = 0;
+					return false;
+				}
+			});
+
+			if(all) {
+				_forIn(BL.xx_ids, function(i, id) {
+					TRG[id] = 0;//блоки в том же ряду отмечаются, чтобы к ним функция не применялась
+				});
+				arr.push({
+					obj:_parent($(BL.attr_bl), '.bl-div'),
+					slide:1
+				});
+				return;
+			}
+
+			//функция будет применена к конкретному блоку
+			arr.push({
+				obj:$(BL.attr_bl),
+				slide:0
+			});
+		});
+
+		return arr;
 	},
 
 	_elemChoose = function(v) {//ВЫБОР элемента для вставки
