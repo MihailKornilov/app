@@ -1081,7 +1081,8 @@ var VK_SCROLL = 0,
 				//показ/скрытие блоков
 				case 36://Галочка[1]:
 				case 40://Выпадающее поле[17]:
-					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
+					var is_show = 0,//скрывать или показывать блоки. По умолчанию скрывать.
+						effect_id = is_open ? 0  : sp.effect_id;
 					//ДЕЙСТВИЕ
 					switch(sp.action_id) {
 						//скрыть
@@ -1115,15 +1116,10 @@ var VK_SCROLL = 0,
 						if(!oo.obj.length)
 							return;
 
-						switch(sp.effect_id) {
+						switch(effect_id) {
 							//изчезновение/появление
 							case 44:
 							case 715:
-								if(is_open) {
-									oo.obj._dn(is_show, 'vh');
-									oo.obj.css({opacity:is_show});
-									break;
-								}
 								oo.obj._dn(1, 'vh');
 								oo.obj.animate({opacity:is_show}, 300, function() {
 									oo.obj._dn(is_show, 'vh');
@@ -1134,10 +1130,6 @@ var VK_SCROLL = 0,
 							case 716:
 								if(!oo.slide) {
 									oo.obj._dn(is_show, 'vh');
-									break;
-								}
-								if(is_open) {
-									oo.obj._dn(is_show);
 									break;
 								}
 								oo.obj['slide' + (is_show ? 'Down' : 'Up')]();
