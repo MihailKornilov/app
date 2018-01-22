@@ -416,23 +416,7 @@ function _dialogOpenLoad($dialog_id) {
 		switch($cmp['dialog_id']) {
 			//произвольные значения
 			case 17://select - произвольные значения
-				$sql = "SELECT *
-						FROM `_element`
-						WHERE `dialog_id`=19
-						  AND `block_id`=-".$cmp_id."
-						ORDER BY `sort`";
-				if(!$arr = query_arr($sql))
-					break;
-
-				$spisok = array();
-				foreach($arr as $id => $r)
-					$spisok[] = array(
-						'id' => _num($id),
-						'title' => utf8($r['txt_1']),
-						'content' => utf8($r['txt_1'].'<div class="fs11 grey">'._br($r['txt_2']).'</div>')
-					);
-
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _elemValue($cmp_id);
 				break;
 			//вспомогательный элемент: значения для select, radio, dropdown
 			case 19:
@@ -605,6 +589,29 @@ function _dialogOpenLoad($dialog_id) {
 			case 38:
 				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _dialogSelArray();
 				break;
+			//SA: Select - дублирование
+			case 41:
+				//Отсутствует ID исходного блока.
+				if(!$block_id)
+					break;
+
+				$BL = _blockQuery($block_id);
+
+				//Исходный блок не является блоком из диалога
+				if($BL['obj_name'] != 'dialog')
+					break;
+
+				//Отсутствует исходный элемент
+				if(!$EL = $BL['elem'])
+					break;
+
+				//Исходный элемент не является выпадающим полем
+				if($EL['dialog_id'] != 17)
+					break;
+
+				$dialog['cmp_utf8'][$cmp_id]['txt_1'] = utf8($EL['txt_1']);
+				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _elemValue($EL['id']);
+				break;
 	}
 
 	$send['cmp'] = $dialog['cmp_utf8'];
@@ -634,7 +641,25 @@ function _dialogOpenLoad($dialog_id) {
 
 	return $send;
 }
+function _elemValue($elem_id) {//дополнительне значения к элементу (select, radio)
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=19
+			  AND `block_id`=-".$elem_id."
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return array();
 
+	$spisok = array();
+	foreach($arr as $id => $r)
+		$spisok[] = array(
+			'id' => _num($id),
+			'title' => utf8($r['txt_1']),
+			'content' => utf8($r['txt_1'].'<div class="fs11 grey">'._br($r['txt_2']).'</div>')
+		);
+
+	return $spisok;
+}
 
 
 

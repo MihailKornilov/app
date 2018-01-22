@@ -32,6 +32,11 @@ switch(@$_POST['op']) {
 		} else {
 			$sql = "DELETE FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
 			query($sql);
+
+			if($dialog['base_table'] == '_element') {//удаление значений у элементов
+				$sql = "DELETE FROM `_element` WHERE `block_id`=-".$unit_id;
+				query($sql);
+			}
 		}
 
 		$send = _spisokAction4($send);

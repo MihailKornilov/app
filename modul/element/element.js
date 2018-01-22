@@ -655,6 +655,8 @@ var VK_SCROLL = 0,
 					p = _parent(t, 'DD');
 				p.remove();
 			});
+			if(!v.id)
+				DD.find('.title').select();
 			NUM++;
 		}
 	},
@@ -1049,6 +1051,15 @@ var VK_SCROLL = 0,
 						spisok:el.elv_spisok
 					});
 					return;
+				//SA: Select - дублирование
+				case 41:
+					$(el.attr_cmp)._select({
+						disabled:is_edit,
+						width:el.width,
+						title0:el.txt_1,
+						spisok:el.elv_spisok
+					});
+					return;
 			}
 		});
 
@@ -1227,13 +1238,14 @@ var VK_SCROLL = 0,
 				'<button val="-6" class="vk ml5" data-hint=" алендарь">-</button>' +
 				'<button val="35" class="vk ml5" data-hint=" оличество">35</button>' +
 			'<p class="mt10">' +
-				'<button val="17" class="vk" data-hint="Select - произвольные значени€">17</button>' +
+				'<div class="dib fs15 mt5">Select:</div>' +
+				'<button val="17" class="vk ml5" data-hint="Select - произвольные значени€">17</button>' +
 				'<button val="6"  class="vk ml5" data-hint="Select - страницы">6</button>' +
 				'<button val="24" class="vk ml5" data-hint="Select - списки приложени€">24</button>' +
 				'<button val="27" class="vk ml5" data-hint="Select - списки на текущей странице">27</button>' +
-			'<p class="mt10">' +
-				'<button val="29" class="vk" data-hint="Select - выбор единицы из другого списка (св€зка)">29</button>' +
+				'<button val="29" class="vk ml5" data-hint="Select - выбор единицы из другого списка (св€зка)">29</button>' +
 				'<button val="38" class="vk red ml5" data-hint="Select - выбор диалогового окна">38</button>' +
+				'<button val="41" class="vk red ml5" data-hint="Select - значени€ из существующего селекта">41</button>' +
 
 			'<div class="hd2 mt20 mb5">¬спомогательные компоненты</div>' +
 				'<button val="19" class="vk orange" data-hint="—одержание дл€ некоторых компонентов">19</button>' +
@@ -1244,6 +1256,9 @@ var VK_SCROLL = 0,
 			'<div class="hd2 mt20 mb5">‘ункции</div>' +
 				'<button val="28" class="vk" data-hint="ƒействи€ дл€ галочки">28</button>' +
 				'<button val="36" class="vk cancel ml5" data-hint="ƒействие дл€ галочки: скрытие-показ блоков">36</button>' +
+			'<p class="mt5">' +
+				'<button val="39" class="vk" data-hint="ƒействи€ дл€ выпадающего пол€">39</button>' +
+				'<button val="40" class="vk cancel ml5" data-hint="ƒействие дл€ выпадающего пол€: скрытие-показ блоков">40</button>' +
 			'<p class="mt5">' +
 				'<button val="22" class="vk orange" data-hint="—писок действий у элементов">22</button>' +
 

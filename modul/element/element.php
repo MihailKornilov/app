@@ -93,7 +93,7 @@ function _radio($v=array()) {//элемент RADIO
 
 	//если список пуст и только нулевое значение, отступ снизу не делается
 	$int = empty($spisok) ? 0 : $interval;
-	$html = _radioUnit(0, $title0, $int, $value == 0);
+	$html = _radioUnit(0, $block, $title0, $int, $value == 0);
 
 	if(is_array($spisok) && !empty($spisok)) {
 		end($spisok);
@@ -101,7 +101,7 @@ function _radio($v=array()) {//элемент RADIO
 		foreach($spisok as $id => $title) {
 			//отступ снизу после последнего значения не делается
 			$int = $idEnd == $id ? 0 : $interval;
-			$html .= _radioUnit($id, $title, $int, $value == $id);
+			$html .= _radioUnit($id, $block, $title, $int, $value == $id);
 		}
 	}
 
@@ -111,12 +111,14 @@ function _radio($v=array()) {//элемент RADIO
 		$html.
 	'</div>';
 }
-function _radioUnit($id, $title, $interval, $on) {
+function _radioUnit($id, $block, $title, $interval, $on) {
 	if(empty($title))
 		return '';
 
 	$on = $on ? ' class="on"' : '';
-	$interval = $interval ? ' style="margin-bottom:'.$interval.'px"' : '';
+	$ms = $block ? 'bottom' : 'right';
+	$interval = $block ? $interval : 12;
+	$interval = $interval ? ' style="margin-'.$ms.':'.$interval.'px"' : '';
 	return
 	'<div'.$on.' val="'.$id.'"'.$interval.'>'.
 		$title.

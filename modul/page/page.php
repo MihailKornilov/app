@@ -424,6 +424,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 16:
 			/*
 				txt_1 - текст нулевого значения
+				num_1 - горизонтальное положение
 				значения из _element через dialog_id:19
 			*/
 			$sql = "SELECT `id`,`txt_1`
@@ -436,6 +437,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			return _radio(array(
 				'attr_id' => $attr_id,
 				'light' => 1,
+				'block' => !$el['num_1'],
 				'interval' => 5,
 				'value' => _num($v) ? _num($v) : $el['def'],
 				'title0' => $el['txt_1'],
@@ -568,6 +570,32 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
 						'value' => _num($v)
+				   ));
+
+		//SA: Select - значения из существующего селекта
+		case 41:
+			/*
+
+			*/
+
+			if(!$bs_id = _num(@$US['block_id']))
+				return '<div class="red">Отсутствует ID исходного блока.</div>';
+
+			$BL = _blockQuery($bs_id);
+			if($BL['obj_name'] != 'dialog')
+				return '<div class="red">Исходный блок не является блоком из диалога.</div>';
+
+			if(!$EL = $BL['elem'])
+				return '<div class="red">Отсутствует исходный элемент.</div>';
+
+			if($EL['dialog_id'] != 17)
+				return '<div class="red">Исходный элемент не является выпадающим полем.</div>';
+
+			return _select(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $EL['txt_1'],
+						'width' => $el['width'],
+						'value' => _num($v) ? _num($v) : $EL['def']
 				   ));
 
 
@@ -933,7 +961,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
 
-		//28
+		//Список действий для галочки
 		case 28: return 28;
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ТАБЛИЧНОГО содержания списка
@@ -975,7 +1003,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return 'Дата используется только в списках';
 
-		//Действие для галочки: скрытие/показ блоков
+		//Назначение действия для галочки: скрытие/показ блоков
 		case 36:
 			/*
 				таблица _element_func
