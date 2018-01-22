@@ -1120,8 +1120,13 @@ var VK_SCROLL = 0,
 							break;
 						//конкретное значение
 						case 705:
-							if(v != sp.value_specific)
+							if(v != sp.value_specific) {
+								if(sp.action_reverse) {
+									is_show = is_show ? 0 : 1;
+									break;
+								}
 								return;
+							}
 							break;
 						default: return;
 					}
