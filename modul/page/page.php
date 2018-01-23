@@ -775,20 +775,53 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$arr = query_arr($sql))
 				return _emptyMin('Действий не назначено.');
 
+			//Названия действий
+			$sql = "SELECT `id`,`txt_1`
+					FROM `_element`
+					WHERE `id` IN ("._idsGet($arr, 'action_id').")";
+			$act = query_ass($sql);
+
+			//Названия условий
+			$sql = "SELECT `id`,`txt_1`
+					FROM `_element`
+					WHERE `id` IN ("._idsGet($arr, 'cond_id').")";
+			$cond = query_ass($sql);
+
+			//Конкретные значения
+			$sql = "SELECT `id`,`txt_1`
+					FROM `_element`
+					WHERE `id` IN ("._idsGet($arr, 'value_specific').")";
+			$vs = query_ass($sql);
+
+			//Названия эффектов
+			$sql = "SELECT `id`,`txt_1`
+					FROM `_element`
+					WHERE `id` IN ("._idsGet($arr, 'effect_id').")";
+			$effect = query_ass($sql);
+			$effect[0] = 'нет';
+
 			$spisok = '';
 			foreach($arr as $r) {
 				$c = count(_ids($r['target'], 1));
 				$spisok .=
 					'<dd val="'.$r['id'].'">'.
-					'<table class="bs5 ml10 bor1 bg-gr2 over2 mb5 curD">'.
+					'<table class="bs5 bor1 bg-gr2 over2 mb5 curD">'.
 						'<tr>'.
-							'<td class="w35 top">'.
+							'<td class="w25 top">'.
 								'<div class="icon icon-move-y pl"></div>'.
-							'<td class="w230">'.
-								'<div class="fs15">Показ-скрытие блоков</div>'.
-								'<div class="fs12 ml20 mt3">1 - показать, 0 - скрыть</div>'.
-								'<div class="fs12 ml20 pale">эффекта нет</div>'.
-							'<td class="w100 b color-ref top center pt3">'.
+							'<td class="w300">'.
+								'<div class="fs15">'._dialogParam($el['dialog_id'], 'spisok_name').'</div>'.
+								'<table class="bs3">'.
+									'<tr><td class="fs12 grey top pt1">Действие:'.
+										'<td class="fs12">'.
+											'<b class="fs12">'.$act[$r['action_id']].'</b>, если '.
+				   (!$r['value_specific'] ? '<b class="fs12">'.$cond[$r['cond_id']].'</b>' : '').
+					($r['value_specific'] ? 'выбрано: <b>'.$vs[$r['value_specific']].'</b>' : '').
+					($r['action_reverse'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
+									'<tr><td class="fs12 grey r">Эффект:'.
+										'<td class="fs12 '.($r['effect_id'] ? 'color-pay' : 'pale').'">'.$effect[$r['effect_id']].
+								'</table>'.
+							'<td class="w70 b color-ref top center pt3">'.
 								$c.' блок'._end($c, '', 'а', 'ов').
 							'<td class="w50 r top">'.
 								'<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',dialog_source:'.$el['block']['obj_id'].'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
