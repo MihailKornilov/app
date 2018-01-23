@@ -183,12 +183,18 @@ switch(@$_POST['op']) {
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_style_access',
-									'title' => 'разрешать настраивать стили',
+									'title' => 'разрешать настройку стилей',
 									'value' => $dialog['element_style_access']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_hint_access',
+									'title' => 'разрешать прикрепление подсказки',
+									'value' => $dialog['element_hint_access']
 							   )).
 					'<tr><td class="red r">Диалог для функций:'.
 						'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
-					'<tr><td class="red r">CMP-Аффикс:'.
+					'<tr><td class="red r">CMP-аффикс:'.
 						'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
 				'</table>'.
 			'</div>'
@@ -318,6 +324,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_search_access = _num($_POST['element_search_access']);
 	$element_is_insert = _num($_POST['element_is_insert']);
 	$element_style_access = _num($_POST['element_style_access']);
+	$element_hint_access = _num($_POST['element_hint_access']);
 	$element_dialog_func = _num($_POST['element_dialog_func']);
 	$element_afics = _txt($_POST['element_afics']);
 
@@ -357,6 +364,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_search_access`=".$element_search_access.",
 				`element_is_insert`=".$element_is_insert.",
 				`element_style_access`=".$element_style_access.",
+				`element_hint_access`=".$element_hint_access.",
 				`element_dialog_func`=".$element_dialog_func.",
 				`element_afics`='".addslashes($element_afics)."',
 

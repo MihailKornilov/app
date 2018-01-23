@@ -460,6 +460,7 @@ var VK_SCROLL = 0,
 				element_search_access:$('#element_search_access').val(),
 				element_is_insert:$('#element_is_insert').val(),
 				element_style_access:$('#element_style_access').val(),
+				element_hint_access:$('#element_hint_access').val(),
 				element_dialog_func:$('#element_dialog_func').val(),
 				element_afics:$('#element_afics').val(),
 
@@ -1419,12 +1420,14 @@ $(document)
 		var t = $(this);
 		if(t.hasClass('noon'))//если галочка выведена через JS, а не через PHP, то действия нет
 			return;
+		if(t.hasClass('disabled'))
+			return;
 
 		var p = t.prev(),
 			v = _num(p.val()) ? 0 : 1;
 
 		p.val(v);
-		t[(v ? 'add' : 'remove') + 'Class']('on');
+		t._dn(!v, 'on');
 	})
 	.on('click', '._radio div', function() {//выбор значения radio, если был выведен через PHP
 		var t = $(this),

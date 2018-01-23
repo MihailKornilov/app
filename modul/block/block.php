@@ -413,6 +413,7 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 			$v[] = 'dialog_id:'._num($el['dialog_id']);
 
 			$v[] = 'style_access:'._dialogParam($el['dialog_id'], 'element_style_access');
+			$v[] = 'hint_access:'._dialogParam($el['dialog_id'], 'element_hint_access');
 			$v[] = 'width:'.$el['width'];
 			$v[] = 'focus:'.$el['focus'];
 			$v[] = 'color:"'.$el['color'].'"';
@@ -473,6 +474,7 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 			$v['elem_id'] = _num($el['id']);
 			$v['dialog_id'] = _num($el['dialog_id']);
 			$v['style_access'] = _dialogParam($el['dialog_id'], 'element_style_access');
+			$v['hint_access'] = _dialogParam($el['dialog_id'], 'element_hint_access');
 
 			$v['width'] = _num($el['width']);
 			$v['width_min'] = _dialogParam($el['dialog_id'], 'element_width_min');
