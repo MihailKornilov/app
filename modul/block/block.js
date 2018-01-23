@@ -436,26 +436,14 @@ $(document)
 			$('._hint').remove();
 			t._dn(on, 'grey');
 			t._dn(!on, 'orange');
-			p.find('.block-grid-on').css('visibility', on ? 'hidden' : 'visible');
-			p.find('.block-level-change').css('visibility', on ? 'hidden' : 'visible');
-
+			p.find('.block-grid-on')._dn(!on, 'vh');
+			p.find('.block-level-change')._dn(!on, 'vh');
 			$('.block-content-' + spl[0]).html(res.html);
-//			_elemActivate(res.block_arr, {}, 1);
 			_forIn(res.block_arr, function(sp, k) {
 				BLOCK_ARR[k] = sp;
 				if(!on || !sp.width_min)
 					return;
-
-				//аффикс к атрибуту элемента, если нужно
-				var el_name = '';
-				if(sp.dialog_id == 17 || sp.dialog_id == 6 || sp.dialog_id == 24 || sp.dialog_id == 27 || sp.dialog_id == 29 || sp.dialog_id == 37 || sp.dialog_id == 38)
-					el_name = '_select';
-				if(sp.dialog_id == 7)
-					el_name = '_search';
-				if(sp.dialog_id == 35)
-					el_name = '_count';
-
-				$(sp.attr_cmp + '_edit' + el_name).css('width', '100%');
+				$(sp.attr_cmp + '_edit' + sp.afics).css('width', '100%');
 				$(sp.attr_el)
 					.addClass('ewc')
 					.css('width', sp.width ? sp.width + 'px' : 'auto')
