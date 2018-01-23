@@ -1064,6 +1064,27 @@ var VK_SCROLL = 0,
 						spisok:el.elv_spisok
 					});
 					return;
+				//Иконка вопрос: Выплывающая подсказка
+				case 42:
+					if(is_edit)
+						return;
+					var side = {
+						0:'auto',
+						741:'top',
+						742:'bottom',
+						743:'left',
+						744:'right'
+					};
+
+					$(el.attr_cmp).mouseenter(function() {
+						$(el.attr_cmp)._hint({
+							msg:_br(el.txt_1, 1),
+							pad:10,
+							side:side[el.num_1],
+							show:1
+						});
+					});
+					return;
 			}
 		});
 
@@ -1337,6 +1358,7 @@ var VK_SCROLL = 0,
 				'<button val="4"  class="vk ml5" data-hint="Заголовок">4</button>' +
 				'<button val="21" class="vk ml5" data-hint="Информация">21</button>' +
 				'<button val="9"  class="vk ml5" data-hint="Ссылка на страницу">9</button>' +
+				'<button val="42" class="vk ml5" data-hint="Иконка с вопросом: Выплывающая подсказка">42</button>' +
 
 			'<div class="hd2 mt20 mb5">Элементы для списков</div>' +
 				'<button val="7" class="vk">Поиск</button>' +

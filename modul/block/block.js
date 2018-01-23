@@ -433,15 +433,15 @@ $(document)
 			};
 
 		_post(send, function(res) {
+			$('._hint').remove();
 			t._dn(on, 'grey');
 			t._dn(!on, 'orange');
 			p.find('.block-grid-on').css('visibility', on ? 'hidden' : 'visible');
 			p.find('.block-level-change').css('visibility', on ? 'hidden' : 'visible');
 
 			$('.block-content-' + spl[0]).html(res.html);
-			_elemActivate(res.block_arr, {}, 1);
+//			_elemActivate(res.block_arr, {}, 1);
 			_forIn(res.block_arr, function(sp, k) {
-				$('._hint').remove();
 				BLOCK_ARR[k] = sp;
 				if(!on || !sp.width_min)
 					return;
@@ -455,7 +455,7 @@ $(document)
 				if(sp.dialog_id == 35)
 					el_name = '_count';
 
-				$(sp.attr_id + el_name).css('width', '100%');
+				$(sp.attr_cmp + '_edit' + el_name).css('width', '100%');
 				$(sp.attr_el)
 					.addClass('ewc')
 					.css('width', sp.width ? sp.width + 'px' : 'auto')
