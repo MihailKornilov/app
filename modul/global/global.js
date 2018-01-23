@@ -355,8 +355,8 @@ $.fn._flash = function(o) {//вспышка и затухание элемента в списке
 	if(!t.length)
 		return t;
 
-	var w = _num(t.css('width').split('px')[0]),
-		h = _num(t.css('height').split('px')[0]),
+	var w = t.css('width'),
+		h = t.css('height'),
 		mt = t.css('margin-top');
 
 	o = $.extend({
@@ -365,8 +365,8 @@ $.fn._flash = function(o) {//вспышка и затухание элемента в списке
 
 	t.before('<div id="unit-flash" class="' + o.color + '"><div></div></div>')
 	 .prev().find('div')
-	 .width(w)
-	 .height(h)
+	 .css('width', w)
+	 .css('height', h)
 	 .css('top', mt)
 	 .animate({opacity:.7}, 100)
 	 .animate({opacity:0}, 600, function() {
