@@ -421,8 +421,9 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 			$v[] = 'mar:"'.$el['mar'].'"';
 
 			$v[] = 'attr_id:"#cmp_'.$el['id'].'"';
-			$v[] = 'attr_cmp:"#cmp_'.$el['id'].'"';
 			$v[] = 'attr_el:"#pe_'.$el['id'].'"';
+			$v[] = 'attr_cmp:"#cmp_'.$el['id'].'"';
+			$v[] = 'afics:"'._dialogParam($el['dialog_id'], 'element_afics').'"';
 
 			$v[] = 'num_1:'._num($el['num_1'], true);
 			$v[] = 'num_2:'._num($el['num_2']);
@@ -487,6 +488,7 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 			$v['attr_id'] = '#cmp_'.$el['id'];
 			$v['attr_cmp'] = '#cmp_'.$el['id'];
 			$v['attr_el'] = '#pe_'.$el['id'];
+			$v['afics'] = _dialogParam($el['dialog_id'], 'element_afics');
 
 			$v['num_1'] = _num($el['num_1'], true);
 			$v['num_2'] = _num($el['num_2']);

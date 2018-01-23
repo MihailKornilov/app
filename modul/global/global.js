@@ -350,9 +350,13 @@ $.fn.keyEnter = function(func) {
 	return $(this);
 };
 $.fn._flash = function(o) {//вспышка и затухание элемента в списке
-	var t = $(this),
-		w = t.width(),
-		h = t.height(),
+	var t = $(this);
+
+	if(!t.length)
+		return t;
+
+	var w = _num(t.css('width').split('px')[0]),
+		h = _num(t.css('height').split('px')[0]),
 		mt = t.css('margin-top');
 
 	o = $.extend({

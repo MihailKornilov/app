@@ -235,8 +235,13 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 
 		$v = _txt($val);
 
-		if($cmp['req'] && !$v)
-			jsonError('Требуется обязательно заполнить<br>поля, отмеченные звёздочкой');
+		if($cmp['req'] && !$v) {
+			$send = array(
+				'attr_cmp' => $cmp['attr_cmp']._dialogParam($cmp['dialog_id'], 'element_afics'),
+				'text' => utf8('Необходимо заполнить поле')
+			);
+			jsonError($send);
+		}
 
 		$ex = explode('_', $col);
 		if($ex[0] == 'num')

@@ -298,8 +298,9 @@ var VK_SCROLL = 0,
 					} else {
 						butSubmit.removeClass('_busy');
 						dialogErr(res.text);
-						if(res.delem_id)
-							$('#delem' + res.delem_id)._flash({color:'red'});
+						$(res.attr_cmp)
+							._flash({color:'red'})
+							.focus();
 					}
 				}, 'json');
 			},
@@ -361,11 +362,6 @@ var VK_SCROLL = 0,
 			type:2,
 			spisok:o.menu,
 			func:_dialogHeightCorrect
-		});
-		$('#spisok_on')._check({
-			func:function(v) {
-				$('#tr_spisok_name')._dn(v);
-			}
 		});
 		$('#width_auto')._check({
 			title:'автоматическая ширина'
@@ -465,6 +461,7 @@ var VK_SCROLL = 0,
 				element_is_insert:$('#element_is_insert').val(),
 				element_style_access:$('#element_style_access').val(),
 				element_dialog_func:$('#element_dialog_func').val(),
+				element_afics:$('#element_afics').val(),
 
 				menu_edit_last:$('#dialog-menu').val()
 			};

@@ -326,6 +326,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'elv_spisok' => array(),//значения в виде списка {id:1,title:'значение'}
 						'def' => _num($r['def']),//значение по умолчанию
 
+						'attr_bl' => '#bl_'.$r['block_id'],
 						'attr_id' => '#cmp_'.$id,
 						'attr_cmp' => '#cmp_'.$id,
 						'attr_el' => '#pe_'.$id,

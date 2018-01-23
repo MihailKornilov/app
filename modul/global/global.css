@@ -404,6 +404,7 @@ button.vk._busy{color:transparent}
 	position:relative;
 	display:block;
 	height:0;
+	z-index:3000;
 }
 #unit-flash div{
 	position:absolute;

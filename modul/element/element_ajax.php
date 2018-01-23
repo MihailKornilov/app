@@ -116,11 +116,14 @@ switch(@$_POST['op']) {
 			//Служебное
 			'<div class="dialog-menu-4 bg-gr2 pad20'._dn($dialog['menu_edit_last'] == 4).'">'.
 				'<table class="bs10">'.
-					'<tr><td class="grey w150 r">Может быть списком:'.
-						'<td><input type="hidden" id="spisok_on" value="'.$dialog['spisok_on'].'" />'.
-					'<tr id="tr_spisok_name" class="'.($dialog['spisok_on'] ? '' : 'dn').'">'.
-						'<td class="grey r">Имя списка:'.
-						'<td><input type="text" id="spisok_name" class="w200" maxlength="100" value="'.$dialog['spisok_name'].'" />'.
+					'<tr><td class="grey r">Имя диалогового окна:'.
+						'<td><input type="text" id="spisok_name" class="w250" maxlength="100" value="'.$dialog['spisok_name'].'" />'.
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'spisok_on',
+									'title' => 'диалог вносит данные для списка',
+									'value' => $dialog['spisok_on']
+							   )).
 				'</table>'.
 			'</div>'.
 
@@ -185,6 +188,8 @@ switch(@$_POST['op']) {
 							   )).
 					'<tr><td class="red r">Диалог для функций:'.
 						'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
+					'<tr><td class="red r">CMP-Аффикс:'.
+						'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
 				'</table>'.
 			'</div>'
 	  : '');
@@ -314,6 +319,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_is_insert = _num($_POST['element_is_insert']);
 	$element_style_access = _num($_POST['element_style_access']);
 	$element_dialog_func = _num($_POST['element_dialog_func']);
+	$element_afics = _txt($_POST['element_afics']);
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
@@ -352,6 +358,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_is_insert`=".$element_is_insert.",
 				`element_style_access`=".$element_style_access.",
 				`element_dialog_func`=".$element_dialog_func.",
+				`element_afics`='".addslashes($element_afics)."',
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;
