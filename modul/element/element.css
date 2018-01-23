@@ -266,6 +266,7 @@
 ._radio div.on{background-position:0 -100px}
 ._radio div.on:hover{background-position:0 -300px}
 ._radio.light:not(.disabled) div:not(.on){color:#999}
+._radio div.title0{color:#999}
 ._radio.disabled div{
 	background-position:0 -400px;
 	color:#999;

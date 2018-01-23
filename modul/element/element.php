@@ -115,12 +115,13 @@ function _radioUnit($id, $block, $title, $interval, $on) {
 	if(empty($title))
 		return '';
 
-	$on = $on ? ' class="on"' : '';
+	$title0 = !$id ? 'title0' : '';
+	$on = $on ? ' on' : '';
 	$ms = $block ? 'bottom' : 'right';
 	$interval = $block ? $interval : 12;
 	$interval = $interval ? ' style="margin-'.$ms.':'.$interval.'px"' : '';
 	return
-	'<div'.$on.' val="'.$id.'"'.$interval.'>'.
+	'<div class="'.$title0.$on.'" val="'.$id.'"'.$interval.'>'.
 		$title.
 	'</div>';
 }
