@@ -312,6 +312,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'width' => _num($r['width']),
 						'col' => $r['col'],
 						'req' => _num($r['req']),
+						'req_msg' => $r['req_msg'],
 						'focus' => _num($r['focus']),
 
 						'num_1' => _num($r['num_1']),
@@ -357,6 +358,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 				$cmpUtf8 = $cmp;
 				foreach($cmp as $r) {
 					$id = _num($r['id']);
+					$cmpUtf8[$id]['req_msg'] = utf8($r['req_msg']);
 					$cmpUtf8[$id]['txt_1'] = utf8($r['txt_1']);
 					$cmpUtf8[$id]['txt_2'] = utf8($r['txt_2']);
 					$cmpUtf8[$id]['txt_3'] = utf8($r['txt_3']);

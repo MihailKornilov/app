@@ -849,9 +849,9 @@ var VK_SCROLL = 0,
 				attr_focus = el.attr_cmp;
 			switch(el.dialog_id) {
 				case 1://галочка
-					_elemFunc(el, 0, is_edit, 1);
+					_elemFunc(el, _num(unit[el.col] || 0), is_edit, 1);
 					$(el.attr_cmp)._check({
-						func:function(v, o) {
+						func:function(v) {
 							_elemFunc(el, v, is_edit);
 						}
 					});
@@ -1116,9 +1116,8 @@ var VK_SCROLL = 0,
 
 					//УСЛОВИЕ
 					switch(sp.cond_id) {
-						//значение не выбрано
-						case 703:
-						case 730:
+						case 703://значение не выбрано
+						case 730://галочка снята
 							if(v && sp.action_reverse) {
 								is_show = is_show ? 0 : 1;
 								break;
@@ -1126,9 +1125,8 @@ var VK_SCROLL = 0,
 							if(v)
 								return;
 							break;
-						//значение выбрано
-						case 704:
-						case 731:
+						case 704://значение выбрано
+						case 731://галочка установлена
 							if(!v && sp.action_reverse) {
 								is_show = is_show ? 0 : 1;
 								break;
@@ -1136,8 +1134,7 @@ var VK_SCROLL = 0,
 							if(!v)
 								return;
 							break;
-						//конкретное значение
-						case 705:
+						case 705://конкретное значение
 							if(v != sp.value_specific) {
 								if(sp.action_reverse) {
 									is_show = is_show ? 0 : 1;
