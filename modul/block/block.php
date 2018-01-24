@@ -414,6 +414,17 @@ function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
 
 			$v[] = 'style_access:'._dialogParam($el['dialog_id'], 'element_style_access');
 			$v[] = 'hint_access:'._dialogParam($el['dialog_id'], 'element_hint_access');
+
+			$v[] = 'hint_on:'.$el['hint_on'];
+			if($el['hint_on']) {
+				$v[] = 'hint_msg:"'._br($el['hint_msg']).'"';
+				$v[] = 'hint_side:'.$el['hint_side'];
+				$v[] = 'hint_obj_pos_h:'.$el['hint_obj_pos_h'];
+				$v[] = 'hint_obj_pos_v:'.$el['hint_obj_pos_v'];
+				$v[] = 'hint_delay_show:'.$el['hint_delay_show'];
+				$v[] = 'hint_delay_hide:'.$el['hint_delay_hide'];
+			}
+
 			$v[] = 'width:'.$el['width'];
 			$v[] = 'focus:'.$el['focus'];
 			$v[] = 'color:"'.$el['color'].'"';
@@ -475,6 +486,16 @@ function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате для
 			$v['dialog_id'] = _num($el['dialog_id']);
 			$v['style_access'] = _dialogParam($el['dialog_id'], 'element_style_access');
 			$v['hint_access'] = _dialogParam($el['dialog_id'], 'element_hint_access');
+
+			$v['hint_on'] = _num($el['hint_on']);
+			if($v['hint_on']) {
+				$v['hint_msg'] = utf8(_br($el['hint_msg']));
+				$v['hint_side'] = _num($el['hint_side']);
+				$v['hint_obj_pos_h'] = _num($el['hint_obj_pos_h']);
+				$v['hint_obj_pos_v'] = _num($el['hint_obj_pos_v']);
+				$v['hint_delay_show'] = _num($el['hint_delay_show']);
+				$v['hint_delay_hide'] = _num($el['hint_delay_hide']);
+			}
 
 			$v['width'] = _num($el['width']);
 			$v['width_min'] = _dialogParam($el['dialog_id'], 'element_width_min');

@@ -333,6 +333,14 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 						'attr_cmp' => '#cmp_'.$id,
 						'attr_el' => '#pe_'.$id,
 
+						'hint_on' => _num($r['hint_on']),
+						'hint_msg' => _br($r['hint_msg']),
+						'hint_side' => _num($r['hint_side']),
+						'hint_obj_pos_h' => _num($r['hint_obj_pos_h']),
+						'hint_obj_pos_v' => _num($r['hint_obj_pos_v']),
+						'hint_delay_show' => _num($r['hint_delay_show']),
+						'hint_delay_hide' => _num($r['hint_delay_hide']),
+
 						'func' => array()
 					);
 				}
@@ -363,6 +371,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 					$cmpUtf8[$id]['txt_2'] = utf8($r['txt_2']);
 					$cmpUtf8[$id]['txt_3'] = utf8($r['txt_3']);
 					$cmpUtf8[$id]['txt_4'] = utf8($r['txt_4']);
+					$cmpUtf8[$id]['hint_msg'] = utf8($r['hint_msg']);
 					foreach($r['elv_ass'] as $ass_id => $val)
 						$cmpUtf8[$id]['elv_ass'][$ass_id] = utf8($val);
 					foreach($r['elv_spisok'] as $sp_id => $v)

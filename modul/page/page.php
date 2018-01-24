@@ -299,6 +299,7 @@ function _elemDiv($el, $unit=array()) {//формирование div элемента
 	$attr_id = $tmp ? '' : ' id="pe_'.$el['id'].'"';
 
 	$cls = array();
+//	$cls[] = 'dib';
 	$cls[] = $el['color'];
 	$cls[] = $el['font'];
 	$cls[] = $el['size'] ? 'fs'.$el['size'] : '';

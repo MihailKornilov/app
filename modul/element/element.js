@@ -848,6 +848,45 @@ var VK_SCROLL = 0,
 		_forIn(elem, function(el) {
 			if(el.focus)
 				attr_focus = el.attr_cmp;
+
+			if(!is_edit && el.hint_on) {
+				var side = {
+						0:'auto',
+						755:'top',
+						756:'bottom',
+						757:'left',
+						758:'right'
+					},
+					sideObj = {
+						755:'h',
+						756:'h',
+						757:'v',
+						758:'v'
+					},
+					objPos = {
+						767:'center',
+						768:'left',
+						769:'right',
+
+						772:'center',
+						773:'top',
+						774:'bottom'
+					};
+				$(el.attr_el).mouseenter(function() {
+					var oo = {
+						msg:el.hint_msg,
+						pad:10,
+						side:side[el.hint_side],
+						show:1,
+						delayShow:el.hint_delay_show,
+						delayHide:el.hint_delay_hide
+					};
+					if(el.hint_side)
+						oo.objPos = objPos[el['hint_obj_pos_' + sideObj[el.hint_side]]];
+					$(el.attr_el)._hint(oo);
+				});
+			}
+
 			switch(el.dialog_id) {
 				case 1://галочка
 					_elemFunc(el, _num(unit[el.col] || 0), is_edit, 1);
@@ -1336,6 +1375,7 @@ var VK_SCROLL = 0,
 				'<button val="25" class="vk orange ml5" data-hint="Настройка содержания списка-шаблона">25</button>' +
 				'<button val="30" class="vk orange ml5" data-hint="Настройка содержания списка-таблицы">30</button>' +
 				'<button val="26" class="vk orange ml5" data-hint="Содержание диалога для выбора значения">26</button>' +
+				'<button val="43" class="vk ml5 pink" data-hint="Прикрепление подсказки к элементу">43</button>' +
 
 			'<div class="hd2 mt20 mb5">Функции</div>' +
 				'<button val="28" class="vk" data-hint="Действия для галочки">28</button>' +

@@ -237,8 +237,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				'<div class="fs15 blue line-b">' +
 					'Элемент' +
 					'<div class="fr mtm3">' +
-						'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + EL.id + '" class="icon icon-usd dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настройка действий', -62) + '</div>' +
-						'<div val="dialog_id:0,unit_id:' + EL.elem_id + '" class="icon icon-hint dialog-open ml3 curP pl' + _dn(EL.hint_access) + _tooltip('Прикрепить подсказку', -69) + '</div>' +
+						'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + EL.id + '" class="icon icon-usd dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
+						'<div val="dialog_id:43,unit_id:' + EL.elem_id + '" class="icon icon-hint dialog-open ml3 curP' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
 						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
 						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 					'</div>' +
