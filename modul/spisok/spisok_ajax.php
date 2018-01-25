@@ -112,7 +112,6 @@ switch(@$_POST['op']) {
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `dialog_id`=15
-				  AND `page_id`=".$pe['page_id']."
 				  AND `num_1`=".$pe_id."
 				LIMIT 1";
 		if($peCount = query_assoc($sql)) {

@@ -25,21 +25,9 @@ function _pageCache() {//получение массива страниц из кеша
 			GROUP BY `obj_id`";
 	$block = query_ass($sql);
 
-	//получение количества элементов по каждой странице
-	$sql = "SELECT
-				`page_id`,
-				COUNT(*) `c`
-			FROM `_element`
-			WHERE `block_id` IN ("._idsGet($block).")
-			GROUP BY `page_id`";
-	$elem = query_ass($sql);
-
 	foreach($page as $id => $r) {
 		$block_count = _num(@$block[$id]);
-		$elem_count = _num(@$elem[$id]);
-		$page[$id]['block_count'] = $block_count;
-		$page[$id]['elem_count'] = $elem_count;
-		$page[$id]['del_access'] = $block_count || $elem_count ? 0 : 1;
+		$page[$id]['del_access'] = $block_count ? 0 : 1;
 	}
 
 	return _cache($page);
@@ -294,7 +282,7 @@ function _pageShow($page_id) {
 				FROM `".$dialog['base_table']."`
 				WHERE `app_id`=".APP_ID."
 				  AND `id`=".$id;
-		if(!$unit = query_ass($sql))
+		if(!$unit = query_assoc($sql))
 			return _contentMsg('Единицы списка id'.$id.' не существует.');
 
 		if(isset($dialog['field']['deleted']) && $unit['deleted'])
@@ -302,7 +290,6 @@ function _pageShow($page_id) {
 	}
 
 	return
-//	(_block('page', $page_id, 'block_js')).
 	_blockHtml('page', $page_id, 1000, 0, $unit).
 //	_page_div().
 	'<script>'.
