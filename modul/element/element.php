@@ -199,7 +199,14 @@ function _elemQuery($elem_id) {//запрос одного элемента
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id`=".$elem_id;
-	return query_assoc($sql);
+	$elem = query_assoc($sql);
+
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `id`=".$elem['block_id'];
+	$elem['block'] = query_assoc($sql);
+
+	return $elem;
 }
 function _blockQuery($block_id) {//запрос одного блока
 	if(empty($block_id))
@@ -279,116 +286,16 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	if(!$dialog = query_assoc($sql))
 		return array();
 
-	//получение компонентов диалога, ответственных за внесение единицы списка
-	$cmp = array();
-	$cmpUtf8 = array();
-	$v_ass = array();//ассоциативный список значений всех компонентов (для быстрого выбора)
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `obj_name`='dialog'
-			  AND `obj_id`=".$dialog_id."
-			  AND `sa` IN (0,".SA.")";
-	if($block = query_arr($sql))
-		if($block = _blockChildClear($block)) {
-			$BLM = array();//ассоциативный массив блок[элемент]
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `block_id` IN ("._idsGet($block).")";
-			if($elem = query_arr($sql)) {
-				//получение разрешения настройки стилей для выбранных элементов
-				$sql = "SELECT `id`,`element_style_access`
-						FROM `_dialog`
-						WHERE `id` IN ("._idsGet($elem, 'dialog_id').")";
-				$styleAccess = query_ass($sql);
-
-				foreach($elem as $r) {
-					$id = _num($r['id']);
-					$BLM[$r['block_id']] = $id;
-					$cmp[$id] = array(
-						'id' => _num($r['id']),
-						'dialog_id' => _num($r['dialog_id']),
-
-						'style_access' => _num($styleAccess[$r['dialog_id']]),
-						'width' => _num($r['width']),
-						'col' => $r['col'],
-						'req' => _num($r['req']),
-						'req_msg' => $r['req_msg'],
-						'focus' => _num($r['focus']),
-
-						'num_1' => _num($r['num_1']),
-						'num_2' => _num($r['num_2']),
-						'num_3' => _num($r['num_3']),
-						'num_4' => _num($r['num_4']),
-						'txt_1' => $r['txt_1'],
-						'txt_2' => $r['txt_2'],
-						'txt_3' => $r['txt_3'],
-						'txt_4' => $r['txt_4'],
-
-						'elv_ass' => array(),   //ассоциативные значения
-						'elv_spisok' => array(),//значения в виде списка {id:1,title:'значение'}
-						'def' => _num($r['def']),//значение по умолчанию
-
-						'attr_bl' => '#bl_'.$r['block_id'],
-						'attr_id' => '#cmp_'.$id,
-						'attr_cmp' => '#cmp_'.$id,
-						'attr_el' => '#pe_'.$id,
-
-						'hint_on' => _num($r['hint_on']),
-						'hint_msg' => _br($r['hint_msg']),
-						'hint_side' => _num($r['hint_side']),
-						'hint_obj_pos_h' => _num($r['hint_obj_pos_h']),
-						'hint_obj_pos_v' => _num($r['hint_obj_pos_v']),
-						'hint_delay_show' => _num($r['hint_delay_show']),
-						'hint_delay_hide' => _num($r['hint_delay_hide']),
-
-						'func' => array()
-					);
-				}
-
-				$sql = "SELECT *
-						FROM `_element_func`
-						WHERE `block_id` IN ("._idsGet($block).")
-						ORDER BY `sort`";
-				foreach(query_arr($sql) as $r) {
-					$elem_id = $BLM[$r['block_id']];
-					$cmp[$elem_id]['func'][] = array(
-						'dialog_id' => _num($r['dialog_id']),
-						'action_id' => _num($r['action_id']),
-						'cond_id' => _num($r['cond_id']),
-						'action_reverse' => _num($r['action_reverse']),
-						'value_specific' => _num($r['value_specific']),
-						'effect_id' => _num($r['effect_id']),
-						'target' => _idsAss($r['target'])
-					);
-				}
-
-				//формирование компонентов для отправки через AJAX
-				$cmpUtf8 = $cmp;
-				foreach($cmp as $r) {
-					$id = _num($r['id']);
-					$cmpUtf8[$id]['req_msg'] = utf8($r['req_msg']);
-					$cmpUtf8[$id]['txt_1'] = utf8($r['txt_1']);
-					$cmpUtf8[$id]['txt_2'] = utf8($r['txt_2']);
-					$cmpUtf8[$id]['txt_3'] = utf8($r['txt_3']);
-					$cmpUtf8[$id]['txt_4'] = utf8($r['txt_4']);
-					$cmpUtf8[$id]['hint_msg'] = utf8($r['hint_msg']);
-					foreach($r['elv_ass'] as $ass_id => $val)
-						$cmpUtf8[$id]['elv_ass'][$ass_id] = utf8($val);
-					foreach($r['elv_spisok'] as $sp_id => $v)
-						$cmpUtf8[$id]['elv_spisok'][$sp_id]['title'] = utf8($v['title']);
-				}
-			}
-		}
-
 	//получение списка колонок, присутствующих в таблице
 	$col = array();
 	$sql = "DESCRIBE `".$dialog['base_table']."`";
 	foreach(query_array($sql) as $r)
 		$col[$r['Field']] = 1;
 
-	$dialog['cmp'] = $cmp;
-	$dialog['cmp_utf8'] = $cmpUtf8;
-	$dialog['v_ass'] = $v_ass;
+	_cache('clear', 'dialog_'.$dialog_id);
+	$dialog['blk'] = _block('dialog', $dialog_id, 'block_arr');
+	$dialog['cmp'] = _block('dialog', $dialog_id, 'elem_arr');
+	$dialog['cmp_utf8'] = _block('dialog', $dialog_id, 'elem_utf8');
 	$dialog['field'] = $col;
 
 	return _cache($dialog);
@@ -484,7 +391,7 @@ function _dialogSpisokOnPage($page_id) {//получение массива диалогов, которые мо
 	$send = array();
 	foreach($arr as $r) {
 		$dialog = _dialogQuery($r['num_1']);
-		$send[$r['id']] = $dialog['spisok_name'].' (в блоке '.$r['id'].')';
+		$send[$r['id']] = $dialog['spisok_name'].' (в блоке '.$r['block_id'].')';
 	}
 
 	return _selArray($send);

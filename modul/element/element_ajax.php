@@ -203,8 +203,8 @@ switch(@$_POST['op']) {
 		$send['dialog_id'] = $dialog_id;
 		$send['width'] = _num($dialog['width']);
 		$send['menu'] = _selArray($menu);
-		$send['block_arr'] = _blockJsArr('dialog', $dialog_id);
 		$send['action'] = _selArray($action);
+		$send['blk'] = $dialog['blk'];
 		$send['cmp'] = $dialog['cmp_utf8'];
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
@@ -425,13 +425,12 @@ function _dialogOpenLoad($dialog_id) {
 	$send['button_submit'] = utf8($dialog[$act.'_button_submit']);
 	$send['button_cancel'] = utf8($dialog[$act.'_button_cancel']);
 	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
-
 	//заполнение значениями некоторых компонентов
 	foreach($dialog['cmp_utf8'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
 			//произвольные значения
 			case 17://select - произвольные значения
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _elemValue($cmp_id);
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _elemValue($cmp_id);
 				break;
 			//вспомогательный элемент: значения для select, radio, dropdown
 			case 19:
@@ -456,7 +455,7 @@ function _dialogOpenLoad($dialog_id) {
 						'use' => 0  //количество использования значений, чтобы нельзя было удалять
 					);
 
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
 
 				//если элемент пока не применяется
 				if(empty($unit['col']))
@@ -486,22 +485,22 @@ function _dialogOpenLoad($dialog_id) {
 						$spisok[$n]['use'] = $ass[$r['id']];
 					}
 
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
 				break;
 			//select - выбор списка (все списки приложения)
 			case 24:
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _dialogSpisokOn($dialog_id, $send['block_id'], $unit_id);
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _dialogSpisokOn($dialog_id, $send['block_id'], $unit_id);
 				break;
 			//select - выбор списка, размещённого на текущей странице
 			case 27:
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _dialogSpisokOnPage($page_id);
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _dialogSpisokOnPage($page_id);
 				break;
 			//select - выбор единицы из другого списка (для связки)
 			case 29:
 				$sel_id = 0;//выбранное значение
 				if($unit_id)
 					$sel_id = $unit[$cmp['col']];
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _spisokConnect($cmp_id, $v='', $sel_id);
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _spisokConnect($cmp_id, $v='', $sel_id);
 				break;
 			//настройка ТАБЛИЧНОГО содержания списка
 			case 30:
@@ -538,14 +537,11 @@ function _dialogOpenLoad($dialog_id) {
 						'link' => _num($r['num_2']),
 					);
 				}
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $spisok;
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
 				break;
 			//SA: select - выбор имени колонки
 			case 37:
-				$sql = "SELECT *
-						FROM `_block`
-						WHERE `id`=".$block_id;
-				if(!$block = query_assoc($sql))
+				if(!$block = _blockQuery($block_id))
 					break;
 
 				//выбор имени колонки может производиться, только если элемент размещается в диалоге
@@ -598,11 +594,12 @@ function _dialogOpenLoad($dialog_id) {
 							}
 							$field[] = $u;
 					}
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = $field;
+
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $field;
 				break;
 			//SA: Select - выбор диалогового окна
 			case 38:
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _dialogSelArray();
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _dialogSelArray();
 				break;
 			//SA: Select - дублирование
 			case 41:
@@ -625,10 +622,11 @@ function _dialogOpenLoad($dialog_id) {
 					break;
 
 				$dialog['cmp_utf8'][$cmp_id]['txt_1'] = utf8($EL['txt_1']);
-				$dialog['cmp_utf8'][$cmp_id]['elv_spisok'] = _elemValue($EL['id']);
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 				break;
-	}
+		}
 
+	$send['blk'] = $dialog['blk'];
 	$send['cmp'] = $dialog['cmp_utf8'];
 
 	foreach($unit as $id => $r) {
@@ -651,8 +649,6 @@ function _dialogOpenLoad($dialog_id) {
 		$send['width'] = 480;
 		$send['html'] = utf8($html);
 	}
-
-	$send['block_arr'] = _blockJsArr('dialog', $dialog_id);
 
 	return $send;
 }

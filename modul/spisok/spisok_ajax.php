@@ -44,7 +44,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 	case 'spisok_next'://догрузка списка
-		if(!$pe_id = _num($_POST['pe_id']))
+		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Некорректный ID элемента станицы');
 		if(!$next = _num($_POST['next']))
 			jsonError('Некорректное значение очередного блока');
@@ -52,9 +52,9 @@ switch(@$_POST['op']) {
 		//получение данных элемента поиска
 		$sql = "SELECT *
 				FROM `_element`
-				WHERE `id`=".$pe_id;
+				WHERE `id`=".$elem_id;
 		if(!$pe = query_assoc($sql))
-			jsonError('Элемента id'.$pe_id.' не существует');
+			jsonError('Элемента id'.$elem_id.' не существует');
 
 		if($pe['dialog_id'] != 14 && $pe['dialog_id'] != 23)
 			jsonError('Элемент не является списком');
@@ -116,11 +116,11 @@ switch(@$_POST['op']) {
 				  AND `num_1`=".$pe_id."
 				LIMIT 1";
 		if($peCount = query_assoc($sql)) {
-			$send['count_attr'] = '#pe_'.$peCount['id'];
+			$send['count_attr'] = '#el_'.$peCount['id'];
 			$send['count_html'] = utf8(_spisokElemCount($peCount));
 		}
 
-		$send['spisok_attr'] = '#pe_'.$peSpisok['id'];
+		$send['spisok_attr'] = '#el_'.$peSpisok['id'];
 		$send['spisok_html'] = utf8(_spisokShow($peSpisok));
 
 		jsonSuccess($send);
@@ -238,7 +238,7 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 		if($cmp['req'] && !$v)
 			jsonError(array(
 				'attr_cmp' => $cmp['attr_cmp']._dialogParam($cmp['dialog_id'], 'element_afics'),
-				'text' => utf8($cmp['req_msg'] ? $cmp['req_msg'] : 'Необходимо заполнить поле')
+				'text' => utf8($cmp['req_msg'] ? $cmp['req_msg'] : 'Необходимо заполнить поле,<br>либо выбрать значение')
 			));
 
 		$ex = explode('_', $col);

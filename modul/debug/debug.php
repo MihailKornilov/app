@@ -24,36 +24,58 @@ function _debug($i='') {
 	if(DEBUG) {
 		$get = '';
 		ksort($_GET);
-		foreach($_GET as $i => $v)
-			$get .= '<b>'.$i.'</b>='.$v.'<br />';
+		foreach($_GET as $k => $v)
+			$get .= '<b>'.$k.'</b>='.$v.'<br />';
 		$get .= '<textarea>http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'].'</textarea>';
 
 		$send .=
-		'<div id="_debug"'.(empty($_COOKIE['debug_show']) ? '' : ' class="show"').'>'.
+		'<div id="_debug" class="'._dn(empty($_COOKIE['debug_show']), 'show').'">'.
 			'<h1>+</h1>'.
 			'<h2><div class="dmenu">'.
-					'<a'.(@$_COOKIE['debug_pg'] == 'process' ? ' class="sel"' : '').' val="process">load process</a>'.
-					'<a'.(empty($_COOKIE['debug_pg']) || $_COOKIE['debug_pg'] == 'sql' ? ' class="sel"' : '').' val="sql">sql <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).')</a>'.
-					'<a'.(@$_COOKIE['debug_pg'] == 'cookie' ? ' class="sel"' : '').' val="cookie">cookie <b>'._debug_cookie_count().'</b></a>'.
-					'<a'.(@$_COOKIE['debug_pg'] == 'get' ? ' class="sel"' : '').' val="get">$_GET</a>'.
-					'<a'.(@$_COOKIE['debug_pg'] == 'ajax' ? ' class="sel"' : '').' val="ajax">ajax</a>'.
-					(defined('ARRAY_PRE') ? '<a'.(@$_COOKIE['debug_pg'] == 'pre' ? ' class="sel"' : '').' val="pre">pre</a>' : '').
+					'<a>cache</a>'.
+					'<a>sql</a>'.// <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).')
+					'<a>cookie</a>'.
+					'<a>get</a>'.
+					'<a>ajax</a>'.
 				'</div>'.
-				'<div class="pg process'.(@$_COOKIE['debug_pg'] == 'process' ? '' : ' dn').'">'._debugLoad('show').'</div>'.
-				'<ul class="pg sql'.(empty($_COOKIE['debug_pg']) || $_COOKIE['debug_pg'] == 'sql' ? '' : ' dn').'">'.implode('', $sqlQuery).'</ul>'.
-				'<div class="pg cookie'.(@$_COOKIE['debug_pg'] == 'cookie' ? '' : ' dn').'">'.
-					'<a id="cookie_update">ќбновить</a>'.
-					'<div id="cookie_spisok">'._debug_cookie().'</div>'.
+				'<div class="pg cache dn">'._debugCache().'</div>'.
+				'<ul class="pg sql dn">'.implode('', $sqlQuery).'</ul>'.
+				'<div class="pg cookie dn">'.
+					'<a onclick="debugCookieUpdate($(this))">ќбновить</a>'.
+					'<div class="mt10">'._debug_cookie().'</div>'.
 				'</div>'.
-				'<div class="pg get'.(@$_COOKIE['debug_pg'] == 'get' ? '' : ' dn').'">'.$get.'</div>'.
-				'<div class="pg ajax'.(@$_COOKIE['debug_pg'] == 'ajax' ? '' : ' dn').'">&nbsp;</div>'.
-				(defined('ARRAY_PRE') ? '<div class="pg pre'.(@$_COOKIE['debug_pg'] == 'pre' ? '' : ' dn').'">'.ARRAY_PRE.'</div>' : '').
+				'<div class="pg get dn">'.$get.'</div>'.
+				'<div class="pg ajax dn">&nbsp;</div>'.
 			'</h2>'.
 		'</div>';
 	}
 	return $send;
 }
 
+function _debugCache() {//результат использовани€ кеша
+	global $CACHE_ARR;
+
+	$send = '<table class="mar10 bg-fff collaps">'.
+			'<tr>'.
+				'<td class="bor-f0">'.
+				'<td class="bor-f0 pad5 center b">act'.
+				'<td class="bor-f0 pad5 center b">key'.
+				'<td class="bor-f0 pad5 center b">'.
+				'<td class="bor-f0 pad5 center b">func';
+	foreach($CACHE_ARR as $n => $r) {
+		$dbtCount = count($r['dbt']);
+		$send .= '<tr>'.
+			'<td class="grey r bor-f0 pad5">'.($n + 1).
+			'<td class="bor-f0 pad5'._dn($r['act'] != 'set', 'bg-fcc').'">'.$r['act'].
+			'<td class="bor-f0 pad5">'.$r['key'].
+			'<td class="bor-f0 pad5 center">'.$dbtCount.
+			'<td class="bor-f0 pad5">'.$r['dbt'][$dbtCount - 1]['function'];
+	}
+
+	$send .= '</table>';
+
+	return $send;
+}
 function _debug_cookie_count() {
 	$count = 0;
 	if(!empty($_COOKIE))
@@ -63,6 +85,7 @@ function _debug_cookie_count() {
 	return $count ? $count : '';
 }
 function _debug_cookie() {
+//	<b>'._debug_cookie_count().'</b>
 	$cookie = '';
 	if(!empty($_COOKIE))
 		foreach($_COOKIE as $key => $val)
@@ -71,40 +94,6 @@ function _debug_cookie() {
 	return $cookie;
 }
 
-function _debugLoad($i='show') {//сохранение процесса загрузки приложени€, затем вывод
-	if(!@DEBUG)
-		return '';
-
-	global $debugLoadNum, $debugLoadText;
-
-	if($i == 'show')
-		return '<div class="mar10">'.$debugLoadText.'</div>';
-	
-	$debugLoadText .= ++$debugLoadNum.'. '.$i.'.<br />';
-}
-
-function _pre($v) {// вывод в debug разобранного массива
-	if(empty($v))
-		return '';
-
-	if(defined('ARRAY_PRE'))
-		return '';
-
-	$pre = '';
-	foreach($v as $k => $r)
-		$pre .= '<div class="un"><b>'.$k.':</b>'._pre_arr($r).'</div>';
-	define('ARRAY_PRE', $pre);
-	return $pre;
-}
-function _pre_arr($v) {// проверка, €вл€етс€ ли переменна€ массивом. ≈сли да, то обработка массива.
-	if(is_array($v)) {
-		$send = '';
-		foreach($v as $k => $r)
-			$send .= '<div class="el"><b>'.$k.':</b>'._pre_arr($r).'</div>';
-		return $send;
-	}
-	return $v;
-}
 
 function jsonDebugParam() {//возвращение дополнительных параметров json, если включен debug
 	if(!@DEBUG)

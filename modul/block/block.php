@@ -24,65 +24,6 @@ function _blockChildClear($arr) {//изъ€тие дочерних блоков, если отсутствует род
 
 	return $arr;
 }
-function _blockArr($obj_name, $obj_id, $return='block') {//получение структуры блоков с элементами дл€ конкретной страницы
-	/*
-		$return:
-			block - иерархи€ блоков
-			arr - последовательность блоков (дл€ формата JS)
-	*/
-	$sql = "SELECT
-				*,
-				'' `elem`
-			FROM `_block`
-			WHERE `obj_name`='".$obj_name."'
-			  AND `obj_id`=".$obj_id."
-			  AND `sa` IN (0,".SA.")
-			ORDER BY `parent_id`,`y`,`x`";
-	if(!$arr = query_arr($sql))
-		return array();
-
-	$arr = _blockChildClear($arr);
-
-	//получение элементов
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `block_id` IN ("._idsGet($arr).")";
-	if($elem = query_arr($sql)) {
-		//наличие функций в элементах
-		$sql = "SELECT `block_id`,1
-				FROM `_element_func`
-				WHERE `block_id` IN("._idsGet($elem, 'block_id').")
-				GROUP BY `block_id`";
-		$isFunc = query_ass($sql);
-
-		foreach($elem as $id => $r) {
-			$elem[$id]['elv_ass'] = array();
-			$elem[$id]['elv_spisok'] = array();
-			$elem[$id]['is_func'] = _num(@$isFunc[$r['block_id']]);
-		}
-
-		//расстановка элементов в блоки
-		foreach($elem as $r) {
-			unset($arr[$r['block_id']]['elem']);
-			$r['block'] = $arr[$r['block_id']];
-			$arr[$r['block_id']]['elem'] = $r;
-		}
-	}
-
-	foreach($arr as $id => $r)
-		$arr[$id]['child'] = array();
-
-	$child = array();
-	foreach($arr as $id => $r)
-		$child[$r['parent_id']][$id] = $r;
-
-	$block = _blockArrChild($child);
-
-	if($return == 'block')
-		return $block;
-
-	return $arr;
-}
 function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
 	if(!$send = @$child[$parent_id])
 		return array();
@@ -122,8 +63,27 @@ function _blockObj($name, $i='name') {//доступные варианты объектов дл€ блоков
 	return $name;
 }
 function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) {//вывод на экран всей структуры блоков
-	if(!$block = _blockArr($obj_name, $obj_id))
+	if(!$blk = _block($obj_name, $obj_id, 'block_arr'))
 		return _blockObj($obj_name, 'empty');
+
+	$elm = _block($obj_name, $obj_id, 'elem_arr');
+
+	//расстановка элементов в блоки
+	foreach($blk as $id => $r) {
+		$arr[$id]['child'] = array();
+		$blk[$id]['elem'] = array();
+		if($r['elem_id']) {
+			$el = $elm[$r['elem_id']];
+			$el['block'] = $blk[$id];//а также предварительно прикрепление данных блока к элементу
+			$blk[$id]['elem'] = $el;
+		}
+	}
+
+	$child = array();
+	foreach($blk as $id => $r)
+		$child[$r['parent_id']][$id] = $r;
+
+	$block = _blockArrChild($child);
 
 	return _blockLevel($block, $width, $grid_id, 0,1, $unit);
 }
@@ -389,148 +349,6 @@ function _blockStyle($r, $width) {//стили css дл€ блока
 
 	return implode(';', $send);
 }
-function _blockJS($obj_name, $obj_id) {//массив настроек блоков в формате JS
-	if(!$arr = _blockArr($obj_name, $obj_id, 'arr'))
-		return '{}';
-
-	$send = array();
-	foreach($arr as $id => $r) {
-		$v = array();
-		$v[] = 'id:'.$id;
-		$v[] = 'attr_bl:"#bl_'.$id.'"';
-		$v[] = 'sa:"'.$r['sa'].'"';
-		$v[] = 'width_auto:"'.$r['width_auto'].'"';
-		$v[] = 'pos:"'.$r['pos'].'"';
-		$v[] = 'bg:"'.$r['bg'].'"';
-		$v[] = 'bor:"'.$r['bor'].'"';
-		$v[] = 'obj_name:"'.$r['obj_name'].'"';
-		$v[] = 'obj_id:'.$r['obj_id'];
-		$v[] = 'child:'.$r['child_count'];
-		$v[] = 'xx:'.$r['xx'];
-
-		if($el = $r['elem']) {
-			$v[] = 'elem_id:'._num($el['id']);
-			$v[] = 'dialog_id:'._num($el['dialog_id']);
-
-			$v[] = 'style_access:'._dialogParam($el['dialog_id'], 'element_style_access');
-			$v[] = 'hint_access:'._dialogParam($el['dialog_id'], 'element_hint_access');
-
-			$v[] = 'hint_on:'.$el['hint_on'];
-			if($el['hint_on']) {
-				$v[] = 'hint_msg:"'._br($el['hint_msg']).'"';
-				$v[] = 'hint_side:'.$el['hint_side'];
-				$v[] = 'hint_obj_pos_h:'.$el['hint_obj_pos_h'];
-				$v[] = 'hint_obj_pos_v:'.$el['hint_obj_pos_v'];
-				$v[] = 'hint_delay_show:'.$el['hint_delay_show'];
-				$v[] = 'hint_delay_hide:'.$el['hint_delay_hide'];
-			}
-
-			$v[] = 'width:'.$el['width'];
-			$v[] = 'focus:'.$el['focus'];
-			$v[] = 'color:"'.$el['color'].'"';
-			$v[] = 'font:"'.$el['font'].'"';
-			$v[] = 'size:'.($el['size'] ? _num($el['size']) : 13);
-			$v[] = 'mar:"'.$el['mar'].'"';
-
-			$v[] = 'attr_id:"#cmp_'.$el['id'].'"';
-			$v[] = 'attr_el:"#pe_'.$el['id'].'"';
-			$v[] = 'attr_cmp:"#cmp_'.$el['id'].'"';
-			$v[] = 'afics:"'._dialogParam($el['dialog_id'], 'element_afics').'"';
-
-			$v[] = 'num_1:'._num($el['num_1'], true);
-			$v[] = 'num_2:'._num($el['num_2']);
-			$v[] = 'num_3:'._num($el['num_3']);
-			$v[] = 'num_4:'._num($el['num_4']);
-			$v[] = 'num_7:'._num($el['num_7']);
-			$v[] = 'txt_1:"'._br($el['txt_1']).'"';
-			$v[] = 'txt_2:"'._br($el['txt_2']).'"';
-
-			$v[] = 'elv_spisok:'._selJson($el['elv_ass']);
-			$v[] = 'def:'.$el['def'];
-			$v[] = 'dialog_func:'._dialogParam($el['dialog_id'], 'element_dialog_func');
-			$v[] = 'is_func:'.$el['is_func'];
-		}
-
-		$send[] = $id.':{'.implode(',', $v).'}';
-	}
-	return '{'.implode(',', $send).'}';
-}
-function _blockJsArr($obj_name, $obj_id) {//массив настроек блоков в формате дл€ отправки через JSON дл€ BLOCK_ARR
-	if(!$arr = _blockArr($obj_name, $obj_id, 'arr'))
-		return array();
-
-	$send = array();
-	foreach($arr as $id => $r) {
-		$v = array(
-			'id' => _num($id),
-			'attr_bl' => '#bl_'.$id,
-			'sa' => _num($r['sa']),
-			'width_auto' => _num($r['width_auto']),
-			'pos' => $r['pos'],
-			'bg' => $r['bg'],
-			'bor' => $r['bor'],
-			'obj_name' => $r['obj_name'],
-			'obj_id' => _num($r['obj_id']),
-			'child' => _num($r['child_count']),
-			'xx' => _num($r['xx']),
-			'xx_ids' => _idsAss($r['xx_ids'])
-		);
-
-		if($el = $r['elem']) {
-			//определение максимальной ширины, на которую может раст€гиватьс€ элемент
-			$ex = explode(' ', $el['mar']);
-			$width_max = $el['block']['width'] - $ex[1] - $ex[3];
-			$width_max = floor($width_max / 10) * 10;
-
-			$v['elem_id'] = _num($el['id']);
-			$v['dialog_id'] = _num($el['dialog_id']);
-			$v['style_access'] = _dialogParam($el['dialog_id'], 'element_style_access');
-			$v['hint_access'] = _dialogParam($el['dialog_id'], 'element_hint_access');
-
-			$v['hint_on'] = _num($el['hint_on']);
-			if($v['hint_on']) {
-				$v['hint_msg'] = utf8(_br($el['hint_msg']));
-				$v['hint_side'] = _num($el['hint_side']);
-				$v['hint_obj_pos_h'] = _num($el['hint_obj_pos_h']);
-				$v['hint_obj_pos_v'] = _num($el['hint_obj_pos_v']);
-				$v['hint_delay_show'] = _num($el['hint_delay_show']);
-				$v['hint_delay_hide'] = _num($el['hint_delay_hide']);
-			}
-
-			$v['width'] = _num($el['width']);
-			$v['width_min'] = _dialogParam($el['dialog_id'], 'element_width_min');
-			$v['width_max'] = $width_max;
-
-			$v['focus'] = _num($el['focus']);
-
-			$v['color'] = $el['color'];
-			$v['font'] = $el['font'];
-			$v['size'] = $el['size'] ? _num($el['size']) : 13;
-			$v['mar'] = $el['mar'];
-
-			$v['attr_id'] = '#cmp_'.$el['id'];
-			$v['attr_cmp'] = '#cmp_'.$el['id'];
-			$v['attr_el'] = '#pe_'.$el['id'];
-			$v['afics'] = _dialogParam($el['dialog_id'], 'element_afics');
-
-			$v['num_1'] = _num($el['num_1'], true);
-			$v['num_2'] = _num($el['num_2']);
-			$v['num_3'] = _num($el['num_3']);
-			$v['num_4'] = _num($el['num_4']);
-			$v['num_7'] = _num($el['num_7']);
-			$v['txt_1'] = utf8(_br($el['txt_1']));
-			$v['txt_2'] = utf8(_br($el['txt_2']));
-
-			$v['elv_spisok'] = _selArray($el['elv_ass']);
-			$v['def'] = $el['def'];
-			$v['dialog_func'] = _dialogParam($el['dialog_id'], 'element_dialog_func');
-			$v['is_func'] = $el['is_func'];
-		}
-
-		$send[_num($id)] = $v;
-	}
-	return $send;
-}
 function _blockChildHtml($block, $level, $width, $grid_id, $unit) {//деление блока на части
 	if($block['id'] != $grid_id)
 		return _blockLevel($block['child'], $width, $grid_id, $block['h'], $level, $unit);
@@ -555,3 +373,188 @@ function _blockGrid($arr) {//режим делени€ на подблоки
 			'<button class="vk small cancel ml5" id="grid-cancel">ќтмена</button>'.
 		'</div>';
 }
+
+function _blockCache($obj_name, $obj_id) {
+	$cacheKey = $obj_name.'_'.$obj_id;
+	if($send = _cache('', $cacheKey))
+		return $send;
+
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='".$obj_name."'
+			  AND `obj_id`=".$obj_id."
+			  AND `sa` IN (0,".SA.")
+			ORDER BY `parent_id`,`y`,`x`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	if(!$arr = _blockChildClear($arr))
+		return array();
+
+	$block = array();
+	foreach($arr as $bl) {
+		$id = _num($bl['id']);
+		unset($bl['viewer_id_add']);
+		unset($bl['dtime_add']);
+		foreach($bl as $key => $v)
+			if(preg_match(REGEXP_NUMERIC, $v))
+				$bl[$key] = _num($v);
+		$bl['elem_id'] = 0;
+		$bl['attr_bl'] = '#bl_'.$id;
+		$block[$id] = $bl;
+	}
+
+	//получение элементов
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `block_id` IN ("._idsGet($block).")";
+	$arr = query_arr($sql);
+
+	//наличие функций в элементах
+	$sql = "SELECT `block_id`,1
+			FROM `_element_func`
+			WHERE `block_id` IN("._idsGet($arr, 'block_id').")
+			GROUP BY `block_id`";
+	$isFunc = query_ass($sql);
+
+	//данные настроек из диалога
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `id` IN ("._idsGet($arr, 'dialog_id').")";
+	$dialog = query_arr($sql);
+
+	$elem = array();
+	foreach($arr as $el) {
+		$id = _num($el['id']);
+		$dlg = $dialog[$el['dialog_id']];
+		$block[$el['block_id']]['elem_id'] = $id;
+		unset($el['sort']);
+		unset($el['viewer_id_add']);
+		unset($el['dtime_add']);
+		unset($el['page_id']);
+
+		if(!$el['hint_on']) {
+			unset($el['hint_msg']);
+			unset($el['hint_side']);
+			unset($el['hint_obj_pos_h']);
+			unset($el['hint_obj_pos_v']);
+			unset($el['hint_delay_show']);
+			unset($el['hint_delay_hide']);
+		}
+
+		foreach($el as $key => $v)
+			if(preg_match(REGEXP_INTEGER, $v))
+				$el[$key] = _num($v, 1);
+
+		$el['attr_el'] = '#el_'.$id;
+		$el['attr_cmp'] = '#cmp_'.$id;
+		$el['size'] = $el['size'] ? _num($el['size']) : 13;
+		$el['is_func'] = _num(@$isFunc[$el['block_id']]);
+		$el['style_access'] = _num($dlg['element_style_access']);
+		$el['hint_access'] = _num($dlg['element_hint_access']);
+		$el['dialog_func'] = _num($dlg['element_dialog_func']);
+		$el['afics'] = $dlg['element_afics'];
+
+		if($el['width_min'] = _num($dlg['element_width_min'])) {
+			//определение максимальной ширины, на которую может раст€гиватьс€ элемент
+			$ex = explode(' ', $el['mar']);
+			$width_max = $block[$el['block_id']]['width'] - $ex[1] - $ex[3];
+			$el['width_max'] = floor($width_max / 10) * 10;
+		}
+
+		$el['func'] = array();
+		$el['vvv'] = array();//значени€ дл€ некоторых компонентов
+
+		$elem[$id] = $el;
+	}
+
+	$sql = "SELECT *
+			FROM `_element_func`
+			WHERE `block_id` IN ("._idsGet($block).")
+			ORDER BY `sort`";
+	foreach(query_arr($sql) as $r) {
+		$elem_id = $block[$r['block_id']]['elem_id'];
+		$elem[$elem_id]['func'][] = array(
+			'dialog_id' => _num($r['dialog_id']),
+			'action_id' => _num($r['action_id']),
+			'cond_id' => _num($r['cond_id']),
+			'action_reverse' => _num($r['action_reverse']),
+			'value_specific' => _num($r['value_specific']),
+			'effect_id' => _num($r['effect_id']),
+			'target' => _idsAss($r['target'])
+		);
+	}
+
+	return _cache(array(
+		'block' => $block,
+		'elem' => $elem
+	), $cacheKey);
+}
+function _block($obj_name, $obj_id, $i='all') {
+	$mass = _blockCache($obj_name, $obj_id);
+
+	$BLK = $mass['block'];
+	$ELM = $mass['elem'];
+
+	if($i == 'block_js') {//массив блоков в формате JS
+		if(empty($BLK))
+			return '{}';
+		$send = array();
+		foreach($BLK as $id => $bl) {
+			$u = array();
+			foreach($bl as $k => $v) {
+				if($k == 'xx_ids')
+					continue;
+				if(!preg_match(REGEXP_NUMERIC, $v))
+					$v = '"'.addslashes($v).'"';
+				$u[] = $k.':'.$v;
+			}
+
+			$send[] = $id.':{'.implode(',', $u).'}';
+		}
+		return '{'.implode(',', $send).'}';
+	}
+
+	if($i == 'elem_js') {//массив элементов в формате JS
+		if(empty($ELM))
+			return '{}';
+		$send = array();
+		foreach($ELM as $id => $bl) {
+			$u = array();
+			foreach($bl as $k => $v) {
+				if($k == 'focus' && !$v)
+					continue;
+				if(is_array($v))
+					continue;
+				if(!preg_match(REGEXP_NUMERIC, $v))
+					$v = '"'.addslashes($v).'"';
+				$u[] = $k.':'.$v;
+			}
+
+			$send[] = $id.':{'.implode(',', $u).'}';
+		}
+		return '{'.implode(',', $send).'}';
+	}
+
+	if($i == 'block_arr') {
+		foreach($BLK as $id => $bl)
+			$BLK[$id]['xx_ids'] = _idsAss($bl['xx_ids']);
+		return $BLK;
+	}
+
+	if($i == 'elem_arr')
+		return $ELM;
+
+	if($i == 'elem_utf8') {
+		foreach($ELM as $id => $el)
+			foreach($el as $k => $v)
+				if(!is_array($v))
+					if(!preg_match(REGEXP_NUMERIC, $v))
+						$ELM[$id][$k] = utf8($v);
+		return $ELM;
+	}
+
+	return $mass;
+}
+
+

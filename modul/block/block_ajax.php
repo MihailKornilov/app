@@ -28,7 +28,8 @@ switch(@$_POST['op']) {
 
 		define('BLOCK_EDIT', 1);
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
-		$send['block_arr'] = _blockJsArr($obj_name, $obj_id);
+		$send['blk'] = _block($obj_name, $obj_id, 'block_arr');
+		$send['elm'] = _block($obj_name, $obj_id, 'elem_utf8');
 
 		jsonSuccess($send);
 		break;
@@ -46,7 +47,7 @@ switch(@$_POST['op']) {
 		define('BLOCK_EDIT', 1);
 
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
-		$send['block_arr'] = _blockJsArr($obj_name, $obj_id);
+		$send['elm'] = _block($obj_name, $obj_id, 'elem_utf8');
 
 		jsonSuccess($send);
 		break;
@@ -56,10 +57,7 @@ switch(@$_POST['op']) {
 
 		$width = _num($_POST['width']);
 
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id`=".$elem_id;
-		if(!$elem = query_assoc($sql))
+		if(!$elem = _elemQuery($elem_id))
 			jsonError('Ёлемента не существует');
 
 		if(!_dialogParam($elem['dialog_id'], 'element_width'))
@@ -69,6 +67,8 @@ switch(@$_POST['op']) {
 				SET `width`=".$width."
 				WHERE `id`=".$elem_id;
 		query($sql);
+
+		_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 
 		jsonSuccess();
 		break;
@@ -249,14 +249,16 @@ switch(@$_POST['op']) {
 
 		define('BLOCK_EDIT', 1);
 
+		_cache('clear', $obj_name.'_'.$obj_id);
 		$send['level'] = utf8(_blockLevelChange($obj_name, $obj_id, $width));
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
-		$send['block_arr'] = _blockJsArr($obj_name, $obj_id);
+		$send['blk'] = _block($obj_name, $obj_id, 'block_arr');
+		$send['elm'] = _block($obj_name, $obj_id, 'elem_utf8');
 
 		jsonSuccess($send);
 		break;
 	case 'block_unit_style_save'://применение стилей блока
-		if(!$id = _num($_POST['id']))
+		if(!$block_id = _num($_POST['id']))
 			jsonError('Ќекорректный ID блока');
 
 		$sa = _num($_POST['sa']);
@@ -271,11 +273,8 @@ switch(@$_POST['op']) {
 				_num($ex[3]);    //слева
 
 		//получение данных блока
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$id;
-		if(!$block = query_assoc($sql))
-			jsonError('Ѕлока id'.$id.' не существует');
+		if(!$block = _blockQuery($block_id))
+			jsonError('Ѕлока id'.$block_id.' не существует');
 
 		//изменение стилей
 		$sql = "UPDATE `_block`
@@ -284,19 +283,17 @@ switch(@$_POST['op']) {
 					`pos`='".$pos."',
 					`bg`='".$bg."',
 					`bor`='".$bor."'
-				WHERE `id`=".$id;
+				WHERE `id`=".$block_id;
 		query($sql);
 
 		//сохранение стилей элемента в блоке
-		if($elem_id = _num(@$_POST['elem_id'])) {
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id`=".$elem_id;
-			if($elem = query_ass($sql)) {
-				$mar = _txt($_POST['mar']);
-				$font = _txt($_POST['font']);
-				$color = _txt($_POST['color']);
-				$size = _num($_POST['size']);
+		if($elem_id = _num($_POST['elem_id']))
+			if(_elemQuery($elem_id)) {
+				$EL = $_POST['elem'];
+				$mar = _txt($EL['mar']);
+				$font = _txt($EL['font']);
+				$color = _txt($EL['color']);
+				$size = _num($EL['size']);
 				if($size == 13)
 					$size = 0;
 				$sql = "UPDATE `_element`
@@ -307,11 +304,12 @@ switch(@$_POST['op']) {
 						WHERE `id`=".$elem_id;
 				query($sql);
 			}
-		}
+
+		_cache('clear', $block['obj_name'].'_'.$block['obj_id']);
 
 		jsonSuccess();
 		break;
-	case 'block_unit_gird'://деление блока на части
+	case 'block_unit_gird'://включение делени€ блока на подблоки
 		if(!$id = _num($_POST['id']))
 			jsonError('Ќекорректный ID блока');
 
@@ -323,6 +321,10 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$id;
 		if(!$block = query_assoc($sql))
 			jsonError('Ѕлока id'.$id.' не существует');
+
+		foreach($block as $key => $v)
+			if(preg_match(REGEXP_INTEGER, $v))
+				$block[$key] = _num($v, 1);
 
 		if($block['obj_name'] == 'spisok') {//деление происходит дл€ элемента списка
 			//получение данных главного блока списка
@@ -344,15 +346,12 @@ switch(@$_POST['op']) {
 			$width = floor(($iss['width'] - $ex[1] - $ex[3]) / 10) * 10;
 		}
 
-		if($block['obj_name'] == 'dialog') {//деление происходит дл€ диалогового окна
-			$dialog = _dialogQuery($block['obj_id']);
-			$width = $dialog['width'];
-		}
+		if($block['obj_name'] == 'dialog')//деление происходит дл€ диалогового окна
+			$width = _dialogParam($block['obj_id'], 'width');
 
 		define('BLOCK_EDIT', 1);
-		$send['html'] = utf8(_blockHtml($block['obj_name'], $block['obj_id'], $width, $id));
 		$send['block'] = $block;
-		$send['block_arr'] = _blockJsArr($block['obj_name'], $block['obj_id']);
+		$send['html'] = utf8(_blockHtml($block['obj_name'], $block['obj_id'], $width, $id));
 
 		jsonSuccess($send);
 		break;

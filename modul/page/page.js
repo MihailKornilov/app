@@ -1,3 +1,3 @@
-var _pageShow = function(pas) {//активация элементов после вывода страницы
-		_elemActivate(BLOCK_ARR, {}, pas);
+var _pageAct = function(pas) {//активация элементов после вывода страницы
+		_elemActivate(ELM, {}, pas);
 	};

@@ -488,8 +488,6 @@ $(document)
 			t.addClass('_busy');
 			$.post(req.link, req.post, function() {}, 'json');
 		});
-//		window.FBH = FB.height();
-		debugHeight();
 		function obj(v) {
 			var send = '<table>',
 				i;

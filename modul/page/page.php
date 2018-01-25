@@ -64,15 +64,16 @@ function _page($i='all', $i1=0) {//получение данных страницы
 			return $page_id;
 		}
 
-		foreach($page as $p) {
-			if(!$p['def'])
-				continue;
+		//сначала поиск страницы приложения
+		foreach($page as $p)
+			if(!$p['sa'] && $p['def'])
+				return $p['id'];
 
-			if(!SA && $p['sa'])
-				continue;
-
-			return $p['id'];
-		}
+		//затем страницы SA
+		if(SA)
+			foreach($page as $p)
+				if($p['sa'] && $p['def'])
+					return $p['id'];
 
 		//иначе на список страниц
 		return 12;
@@ -281,22 +282,43 @@ function _pageShow($page_id) {
 	if(!SA && $page['sa'])
 		return _contentMsg();
 
+	$unit = array();
+	if($page['spisok_id']) {
+		if(!$id = _num($_GET['id']))
+			return _contentMsg('Некорректный идентификатор единицы списка.');
+
+		if(!$dialog = _dialogQuery($page['spisok_id']))
+			return _contentMsg('Отсутствует диалог, который вносит данные.');
+
+		$sql = "SELECT *
+				FROM `".$dialog['base_table']."`
+				WHERE `app_id`=".APP_ID."
+				  AND `id`=".$id;
+		if(!$unit = query_ass($sql))
+			return _contentMsg('Единицы списка id'.$id.' не существует.');
+
+		if(isset($dialog['field']['deleted']) && $unit['deleted'])
+			return _contentMsg('Единица списка id'.$id.' была удалена.');
+	}
+
 	return
-	_blockHtml('page', $page_id).
+//	(_block('page', $page_id, 'block_js')).
+	_blockHtml('page', $page_id, 1000, 0, $unit).
 //	_page_div().
 	'<script>'.
-		'var PAGE_LIST='._page('for_select', 'js').','.
-			'BLOCK_ARR='._blockJS('page', $page_id).','.
+		'var BLK='._block('page', $page_id, 'block_js').','.
+			'ELM='._block('page', $page_id, 'elem_js').','.
+			'PAGE_LIST='._page('for_select', 'js').','.
 			'ELEM_COLOR={'._elemColor().'};'.
 	'</script>'.
-	'<script>_pageShow('.PAS.')</script>';
+	'<script>_pageAct('.PAS.')</script>';
 }
 function _elemDiv($el, $unit=array()) {//формирование div элемента
 	if(!$el)
 		return '';
 
-	$tmp = !empty($el['tmp']);//элемент списка шаблона
-	$attr_id = $tmp ? '' : ' id="pe_'.$el['id'].'"';
+	//если элемент списка шаблона, attr_id не ставится
+	$attr_id = empty($el['tmp']) ? ' id="el_'.$el['id'].'"' : '';
 
 	$cls = array();
 //	$cls[] = 'dib';
@@ -304,8 +326,7 @@ function _elemDiv($el, $unit=array()) {//формирование div элемента
 	$cls[] = $el['font'];
 	$cls[] = $el['size'] ? 'fs'.$el['size'] : '';
 	$cls = array_diff($cls, array(''));
-	$cls = implode(' ', $cls);
-	$cls = $cls ? ' class="'.$cls.'"' : '';
+	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
 	return
 	'<div'.$attr_id.$cls._elemStyle($el).'>'.
@@ -706,7 +727,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					FROM `_element`
 					WHERE `id`=".$el['num_1'];
 			if(!$elem = query_assoc($sql))
-				return 'элемент отсутствует</div>';
+				return 'элемент отсутствует';
 
 			switch($elem['dialog_id']) {
 				case 8: return 'текстовое значение';
@@ -894,6 +915,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
 		case 26:
 			/*
+				Используется в диалогах: 7,11,31,36,40
+
 				num_2 - Что выбирать:
 							40: любые элементы
 							41: элементы, которые вносят данные
@@ -905,7 +928,20 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$bs_id = _num(@$US['block_id']))
 				return _emptyMin('Отсутствует ID исходного блока.');
 
-			$BL = _blockQuery($bs_id);
+			if(!$BL = _blockQuery($bs_id))
+				return _emptyMin('Исходный блок id'.$bs_id.' отсутствует.');
+
+			switch($BL['obj_name']) {
+				case 'page':
+
+					break;
+				case 'dialog': break;
+				case 'spisok': break;
+				default:
+					return _emptyMin('Исходный блок из неизвестного объекта.');
+			}
+
+//return _pr($BL);
 
 			//вставка значения в единицу списка
 			if($BL['obj_name'] == 'spisok')
@@ -916,6 +952,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			if($el['num_2'] == 43 && $BL['obj_name'] != 'dialog')
 				return _emptyMin('Выбор блоков доступен только для диалогов.');
+
 
 			//поиск id диалога, который следует выводить
 			$dialog_id = 0;

@@ -5,6 +5,7 @@ switch(@$_POST['op']) {
 	case 'cache_clear'://очистка xCache
 		_cache('clear', '_viewerCache'.VIEWER_ID);//текущий пользователь
 		_cache('clear', '_pageCache');//страницы
+		_cache('clear', 'page_67');
 
 		//диалоговые окна
 		$sql = "SELECT `id`

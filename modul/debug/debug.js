@@ -1,9 +1,12 @@
-var debugHeight = function(s) {
-	return;
-	var h = $('#_debug').height();
-	FOTO_HEIGHT = s || h < FBH - 30 ? 0 : h + 30;
-	_fbhs();
-};
+var debugCookieUpdate = function(t) {//обновление COOKIE
+		var send = {
+			op:'debug_cookie',
+			busy_obj:t
+		};
+		_post(send, function(res) {
+			t.next().html(res.html);
+		});
+	};
 
 $(document)
 	.on('click', '.debug_toggle', function() {
@@ -24,8 +27,7 @@ $(document)
 				  '<div class="exp"></div>';
 		t.parent()
 		 .html(txt)
-		 .find('textarea').select().autosize({callback:function() { debugHeight(); }});
-		debugHeight();
+		 .find('textarea').select().autosize();
 	})
 	.on('click', '#_debug .sql-hd a', function() {
 		var t = $(this),
@@ -68,35 +70,30 @@ $(document)
 	})
 
 	.ready(function() {
-//		window.FBH = FB.height();
-		debugHeight();
+		if(!_cookie('debug_pg'))
+			_cookie('debug_pg', 'sql');
+
+		$('.pg.' + _cookie('debug_pg'))._dn(1);
+		_forEq($('#_debug .dmenu a'), function(sp) {
+			if(sp.html() == _cookie('debug_pg'))
+				sp.addClass('sel');
+		});
+
 		$('#_debug h1').click(function() {
 			var t = $(this).parent(),
 				s = t.hasClass('show');
 			t[(s ? 'remove' : 'add') + 'Class']('show');
 			$(this).html(s ? '+' : 'Ч');
 			_cookie('debug_show', s ? 0 : 1);
-			debugHeight(s);
 		});
 		$('#_debug .dmenu a').click(function() {
 			var t = $(this),
-				sel = t.attr('val');
+				sel = t.html();
+			$('.pg')._dn();
+			$('.pg.' + sel)._dn(1);
 			t.parent().find('.sel').removeClass('sel');
 			t.addClass('sel');
-			t.parent().parent()
-				.find('.pg').addClass('dn').end()
-				.find('.' + sel).removeClass('dn');
 			_cookie('debug_pg', sel);
-			debugHeight();
-		});
-		$('#cookie_update').click(function() {
-			var t = $(this);
-			t.addClass('_busy');
-			$.post(AJAX, {op:'debug_cookie'}, function(res) {
-				t.removeClass('_busy');
-				if(res.success)
-					$('#cookie_spisok').html(res.html);
-			}, 'json');
 		});
 
 		if($('#admin').length)

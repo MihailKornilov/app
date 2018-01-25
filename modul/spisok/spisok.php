@@ -236,20 +236,18 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 		//шаблон
 		case 14:
-			if(!$arr = _blockArr('spisok', $ELEM['block_id'], 'arr'))
+			if(!$BLK = _block('spisok', $ELEM['block_id'], 'block_arr'))
 				return '<div class="_empty"><span class="fs15 red">Ўаблон единицы списка не настроен.</span></div>';
 
-			//получение ids элементов, которые расставлены по шаблону
-			$ids = 0;
-			foreach($arr as $r)
-				if($r['elem'])
-					$ids .= ','.$r['elem']['num_1'];
+			//получение элементов, расставленных наход€щихс€ в блоках
+			$ELM = _block('spisok', $ELEM['block_id'], 'elem_arr');
 
 			//получение самих элементов, расставленных по шаблону
+			$ids = _idsGet($ELM, 'num_1');
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `id` IN (".$ids.")";
-			$tmpElemArr = $ids ? query_arr($sql) : array();
+			$ELM_TMP = $ids ? query_arr($sql) : array();
 
 			//ширина единицы списка с учЄтом отступов
 			$ex = explode(' ', $ELEM['mar']);
@@ -258,27 +256,32 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			$send = '';
 			foreach($spisok as $sp) {
 				$child = array();
-				foreach($arr as $id => $r) {
-					if($tmpElem = $r['elem']) {//если элемент есть в блоке
+				foreach($BLK as $id => $r) {
+					$r['elem'] = array();
+					if($elem_id = $r['elem_id']) {//если элемент есть в блоке
 						$txt = '';
-						switch($tmpElem['num_1']) {
+						$el = $ELM[$elem_id];
+						switch($el['num_1']) {
 							case -1: $txt = $sp['num']; break;//пор€дковый номер
 							case -2: $txt = FullData($sp['dtime_add'], 0, 1); break; //дата внесени€
-							case -4: $txt = _br($tmpElem['txt_2']); break;//произвольный текст
+							case -4: $txt = _br($el['txt_2']); break;//произвольный текст
 							default:
-								$tmp = $tmpElemArr[$tmpElem['num_1']];
+								$tmp = $ELM_TMP[$el['num_1']];
 								switch($tmp['dialog_id']) {
 									case 10: $txt = $tmp['txt_1']; break;//произвольный текст
 									default://значение колонки
 										if($col = $tmp['col'])
 											$txt = $sp[$col];
-										$txt = _spisokColSearchBg($txt, $ELEM, $tmpElem['num_1']);
+										$txt = _spisokColSearchBg($txt, $ELEM, $el['num_1']);
 								}
 						}
 						//обЄртка в ссылку
-						$txt = _spisokColLink($txt, $sp, $tmpElem['num_2']);
+						$txt = _spisokColLink($txt, $sp, $el['num_2']);
 
-						$r['elem']['txt_real'] = $txt;
+						$el['tmp'] = 1;
+						$el['block'] = $r;
+						$el['txt_real'] = $txt;
+						$r['elem'] = $el;
 					}
 					$child[$r['parent_id']][$id] = $r;
 				}
@@ -412,8 +415,7 @@ function _spisokCondSearchVal($pe) {//получение введЄнного значени€ в строку пои
 
 	$sql = "SELECT `v`
 			FROM `_element`
-			WHERE `page_id`=".$pe['page_id']."
-			  AND `dialog_id`=7
+			WHERE `dialog_id`=7
 			  AND `num_1`=".$pe['id'];
 	$v = query_value($sql);
 

@@ -350,13 +350,9 @@ var VK_SCROLL = 0,
 			}),
 			DIALOG_WIDTH = o.width;
 
-		_forIn(o.block_arr, function(sp, k) {
-			BLOCK_ARR[k] = sp;
-		});
-
+		_blockUpd(o.blk);
+		_elemUpd(o.cmp);
 		_elemActivate(o.cmp, {}, 1);
-
-		console.log(o.block_arr);
 
 		$('#dialog-menu')._menu({
 			type:2,
@@ -497,9 +493,8 @@ var VK_SCROLL = 0,
 			dialog.bottom.find('.submit').addClass('red');
 		else {
 			window.DIALOG_OPEN = dialog;
-			_forIn(o.block_arr, function(sp, k) {
-				BLOCK_ARR[k] = sp;
-			});
+			_blockUpd(o.blk);
+			_elemUpd(o.cmp);
 			_elemActivate(o.cmp, o.unit);
 		}
 
@@ -601,8 +596,8 @@ var VK_SCROLL = 0,
 
 		BUT_ADD.click(valueAdd);
 
-		for(var i in o.elv_spisok)
-			valueAdd(o.elv_spisok[i])
+		for(var i in o.vvv)
+			valueAdd(o.vvv[i])
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -697,8 +692,8 @@ var VK_SCROLL = 0,
 		});
 		BUT_ADD.click(valueAdd);
 
-		for(var i in o.elv_spisok)
-			valueAdd(o.elv_spisok[i])
+		for(var i in o.vvv)
+			valueAdd(o.vvv[i])
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -913,7 +908,7 @@ var VK_SCROLL = 0,
 						func:function(v, obj) {
 							var send = {
 								op:'spisok_search',
-								elem_id:el.elem_id,
+								elem_id:el.id,
 								v:v,
 								busy_obj:obj.icon_del,
 								busy_cls:'spin'
@@ -941,7 +936,7 @@ var VK_SCROLL = 0,
 						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.elv_spisok,
+						spisok:el.vvv,
 						func:function(v) {
 							_elemFunc(el, v, is_edit);
 						}
@@ -965,7 +960,7 @@ var VK_SCROLL = 0,
 						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.elv_spisok
+						spisok:el.vvv
 					});
 					return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —одержание диалога дл€ выбора значени€
@@ -1000,7 +995,7 @@ var VK_SCROLL = 0,
 						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.elv_spisok
+						spisok:el.vvv
 					});
 					return;
 				//select - выбор единицы из другого списка (дл€ св€зки)
@@ -1011,7 +1006,7 @@ var VK_SCROLL = 0,
 						title0:el.txt_1,
 						write:el.num_1 && el.num_3,
 						msg_empty:'Ќе найдено',
-						spisok:el.elv_spisok,
+						spisok:el.vvv,
 						funcWrite:function(v, t) {
 							var send = {
 								op:'spisok_connect_29',
@@ -1073,9 +1068,9 @@ var VK_SCROLL = 0,
 						width:el.width,
 						title0:'не выбрано',
 						msg_empty:'колонок нет',
-						spisok:el.elv_spisok
+						spisok:el.vvv
 					});
-					_forN(el.elv_spisok, function(u) {
+					_forN(el.vvv, function(u) {
 						if(u.title == unit.col) {
 							$(el.attr_cmp)._select(u.id);
 							return false;
@@ -1089,7 +1084,7 @@ var VK_SCROLL = 0,
 						width:el.width,
 						title0:el.txt_1,
 						msg_empty:'диалоги ещЄ не были созданы',
-						spisok:el.elv_spisok
+						spisok:el.vvv
 					});
 					return;
 				//SA: Select - дублирование
@@ -1098,7 +1093,7 @@ var VK_SCROLL = 0,
 						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.elv_spisok
+						spisok:el.vvv
 					});
 					return;
 				//»конка вопрос: ¬ыплывающа€ подсказка
@@ -1134,6 +1129,7 @@ var VK_SCROLL = 0,
 		*/
 		if(is_edit)
 			return;
+
 		_forN(el.func, function(sp) {
 			switch(sp.dialog_id) {
 				//показ/скрытие блоков
@@ -1236,7 +1232,7 @@ var VK_SCROLL = 0,
 		_forIn(TRG, function(n, block_id) {
 			if(!n)
 				return;
-			var BL = BLOCK_ARR[block_id];
+			var BL = BLK[block_id];
 			if(BL.xx == 1) {//если блок в р€ду один, фукнци€ применитс€ ко всей таблице
 				arr.push({
 					obj:_parent($(BL.attr_bl), '.bl-div'),

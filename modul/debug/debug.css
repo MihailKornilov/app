@@ -55,7 +55,6 @@
 #_debug .exp td,#_debug .exp th{border:#ccc solid 1px;padding:2px 4px}
 #_debug .exp th{font-weight:bold}
 #_debug .cookie{margin:10px}
-#_debug #cookie_update{display:inline-block;margin-bottom:5px}
 #_debug .get{margin:10px}
 #_debug .get textarea{width:586px;height:100px;margin-top:10px}
 #_debug .ajax{margin:10px}
@@ -76,10 +75,6 @@
 #_debug .ajax table{border-spacing:1px;border:#ddd solid 1px;margin-bottom:5px}
 #_debug .ajax .val{text-align:right;vertical-align:top}
 #_debug .ajax textarea{width:586px;height:1px}
-#_debug .pre{margin:10px}
-#_debug .pre .un{margin-bottom:5px}
-#_debug .pre .el{margin-left:20px}
-#_debug .pre b{margin-right:7px}
 
 #debug-footer{
 	text-align:center;

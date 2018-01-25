@@ -1,5 +1,9 @@
-var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
-		if(!window.BLOCK_ARR)//страница ещё не догрузилась
+var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей блоки
+		for(var k in blk)
+			BLK[k] = blk[k];
+	},
+	_blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
+		if(!window.BLK)//страница ещё не догрузилась
 			return;
 
 		//если производится процесс деления блока на части, настройка стилей не выводится
@@ -8,8 +12,8 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 
 		var t = $(this),
 			block_id = _num(t.attr('val')),
-			BL = BLOCK_ARR[block_id],
-			obj = $('#bl_' + BL.id),
+			BL = BLK[block_id],
+			obj = $(BL.attr_bl),
 			borSave = function() {//нажатие на галочку для установки/снятия бордюра
 				BL.bor = $('#block-unit-bor0').val() + ' ' +
 						 $('#block-unit-bor1').val() + ' ' +
@@ -89,12 +93,13 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 				});
 
 				if(BL.elem_id) {
-					var tMar = {
-						0:'сверху',
-						1:'справа',
-						2:'снизу',
-						3:'слева'
-					};
+					var EL = ELM[BL.elem_id],
+						tMar = {
+							0:'сверху',
+							1:'справа',
+							2:'снизу',
+							3:'слева'
+						};
 					for(var n = 0; n < 4; n++)
 						$('#el-mar' + n)._count({
 							step:5,
@@ -106,7 +111,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 									right =  pos == 1 ? v : _num($('#el-mar1').val()),
 									bottom = pos == 2 ? v : _num($('#el-mar2').val()),
 									left =   pos == 3 ? v : _num($('#el-mar3').val());
-								$('#pe_' + BL.elem_id)
+								$(EL.attr_el)
 									.css({margin:
 										top + (top ? 'px' : '') + ' ' +
 										right + (right ? 'px' : '') + ' ' +
@@ -114,7 +119,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 										left + (left ? 'px' : '')
 									});
 
-								BL.mar = top + ' ' + right + ' ' + bottom + ' ' + left;
+								EL.mar = top + ' ' + right + ' ' + bottom + ' ' + left;
 								BL.save = 1;
 							}
 						});
@@ -122,10 +127,10 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 						min:10,
 						max:18,
 						func:function(v) {
-							$('#pe_' + BL.elem_id)
-								.removeClass('fs' + BL.size)
+							$(EL.attr_el)
+								.removeClass('fs' + EL.size)
 								.addClass('fs' + v);
-							BL.size = v;
+							EL.size = v;
 							BL.save = 1;
 						}
 					});
@@ -145,11 +150,11 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 					sel = unit.hasClass('sel');
 
 				unit.parent().find('.sel').removeClass('sel');
-				$('#bl_' + BL.id).removeClass('bg-fff bg-gr1 bg-gr2 bg-gr3 bg-ffe');
+				$(BL.attr_bl).removeClass('bg-fff bg-gr1 bg-gr2 bg-gr3 bg-ffe');
 
 				if(!sel) {
 					unit.addClass('sel');
-					$('#bl_' + BL.id).addClass(bg);
+					$(BL.attr_bl).addClass(bg);
 				}
 
 				BL.bg = sel ? '' : bg;
@@ -198,7 +203,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 
 		return '<div class="mt20 center">' +
 					'<button id="but-block-grid" class="vk small orange mb5" onclick="_blockUnitGrid(' + BL.id + ')">Настроить подблоки</button>' +
-	   (!BL.child ? '<button id="but-elem-add" class="vk small green">Вставить элемент</button>' : '') +
+ (!BL.child_count ? '<button id="but-elem-add" class="vk small green">Вставить элемент</button>' : '') +
 				'</div>';
 	},
 	_blockUnitGrid = function(block_id) {
@@ -210,6 +215,7 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 		_post(send, function(res) {
 			$('._hint').remove();
 			$('.block-content-' + res.block.obj_name).html(res.html);
+			console.log(res.block);
 			$('#grid-stack')._grid({
 				width:res.block.width,
 				parent_id:block_id,
@@ -223,24 +229,31 @@ var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 			return;
 
 		BL.op = 'block_unit_style_save';
+		BL.elem = ELM[BL.elem_id];
 		BL.busy_obj = obj;
 		_post(BL, function() {
 			BL.save = 0;
 		});
 	},
 
-	_elemUnit = function(EL) {//настройки элемента в выплывающем окне
-		if(!EL.elem_id)
+	_elemUpd = function(elm) {//обновление глобальной переменной, содержащей
+		for(var k in elm)
+			ELM[k] = elm[k];
+	},
+	_elemUnit = function(BL) {//настройки элемента в выплывающем окне
+		if(!BL.elem_id)
 			return '';
 
-		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.elem_id + '">' +
+		var EL = ELM[BL.elem_id];
+
+		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.id + '">' +
 				'<div class="fs15 blue line-b">' +
 					'Элемент' +
 					'<div class="fr mtm3">' +
 						'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + EL.id + '" class="icon icon-usd dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
-						'<div val="dialog_id:43,unit_id:' + EL.elem_id + '" class="icon icon-hint dialog-open ml3 curP' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
-						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
-						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.elem_id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
+						'<div val="dialog_id:43,unit_id:' + EL.id + '" class="icon icon-hint dialog-open ml3 curP' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
+						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
+						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 					'</div>' +
 				'</div>' +
 
@@ -405,10 +418,11 @@ $(document)
 			p.find('.elem-width-change')._dn(!v);
 
 			$('.block-content-' + spl[0]).html(res.html);
-			_elemActivate(res.block_arr, {}, 1);
-			for(var k in res.block_arr)
-				BLOCK_ARR[k] = res.block_arr[k];
 
+			if(!v) {
+				_elemActivate(res.elm, {}, 1);
+				_blockUpd(res.blk);
+			}
 			if(v) {
 				$('._hint').remove();
 				$('#grid-stack')._grid({
@@ -440,8 +454,7 @@ $(document)
 			p.find('.block-grid-on')._dn(!on, 'vh');
 			p.find('.block-level-change')._dn(!on, 'vh');
 			$('.block-content-' + spl[0]).html(res.html);
-			_forIn(res.block_arr, function(sp, k) {
-				BLOCK_ARR[k] = sp;
+			_forIn(res.elm, function(sp, k) {
 				if(!on || !sp.width_min)
 					return;
 				$(sp.attr_cmp + '_edit' + sp.afics).css('width', '100%');
@@ -461,12 +474,12 @@ $(document)
 								p = el.parent(),
 								send = {
 									op:'block_elem_width_save',
-									elem_id:sp.elem_id,
+									elem_id:k,
 									width:ui.size.width,
 									busy_obj:p
 								};
 							_post(send,	function() {
-								BLOCK_ARR[k].width = ui.size.width;
+								ELM[k].width = ui.size.width;
 							});
 						}
 					});
@@ -478,8 +491,9 @@ $(document)
 			div = t.parent(),
 			block = div.parent(),
 			block_id = _num(block.attr('id').split('_')[1]),
-			BL = BLOCK_ARR[block_id],
-			val = BL.width ? 0 : 1,
+			BL = BLK[block_id],
+			EL = ELM[BL.elem_id],
+			val = EL.width ? 0 : 1,
 			save = 0,
 			save_v;
 
@@ -504,9 +518,9 @@ $(document)
 					title:'максимальная ширина',
 					func:function(v) {
 						save = 1;
-						save_v = v ? 0 : BL.width_max - 10;
-						BL.width = save_v;
-						div.width(v ? 'auto' : BL.width_max - 10);
+						save_v = v ? 0 : EL.width_max - 10;
+						EL.width = save_v;
+						div.width(v ? 'auto' : EL.width_max - 10);
 					}
 				});
 			},
@@ -514,10 +528,9 @@ $(document)
 				if(!save)
 					return false;
 
-				var elem_id = _num(div.attr('id').split('_')[1]),
-					send = {
+				var send = {
 						op:'block_elem_width_save',
-						elem_id:elem_id,
+						elem_id:BL.elem_id,
 						width:save_v,
 						busy_obj:block
 					};
@@ -544,7 +557,7 @@ $(document)
 	})
 	.on('mouseenter', '.block-unit', _blockUnitSetup)
 	.on('click', '.block-unit', function() {//нажатие на блок для настройки
-		if(!window.BLOCK_ARR)//страница ещё не догрузилась
+		if(!window.BLK)//страница ещё не догрузилась
 			return;
 
 		//если производится процесс деления блока на части, действие не производится
@@ -553,10 +566,10 @@ $(document)
 
 		var t = $(this),
 			block_id = _num(t.attr('val')),
-			BL = BLOCK_ARR[block_id];
+			BL = BLK[block_id];
 
 		//если есть подблоки, действие не производится
-		if(BL.child)
+		if(BL.child_count)
 			return;
 
 		if(BL.elem_id)
@@ -619,9 +632,19 @@ $.fn._grid = function(o) {
 			arr:arr,
 			busy_obj:t
 		};
-		_post(send, afterSave);
+		_post(send, function(res) {
+			$('#block-level-' + o.obj_name).after(res.level).remove();
+			$('.block-content-' + o.obj_name).html(res.html);
+			_elemActivate(res.elm, {}, 1);
+			_blockUpd(res.blk);
+		});
 	});
-	$('#grid-cancel').click(cancel);
+	$('#grid-cancel').click(function() {
+		$('#block-level-' + o.obj_name)
+			.find('.block-grid-on')
+			.removeClass('grey')
+			.trigger('click');
+	});
 
 	t.on('gsresizestop', function(event, elem) {
 			var h = _num($(elem).attr('data-gs-height')),
@@ -672,21 +695,5 @@ $.fn._grid = function(o) {
 				p = t.parent();
 			grid.removeWidget(p);
 		});
-
-	//сохранение блоков
-	function afterSave(res) {
-		$('#block-level-' + o.obj_name).after(res.level).remove();
-		$('.block-content-' + o.obj_name).html(res.html);
-		_elemActivate(res.block_arr, {}, 1);
-		for(var k in res.block_arr)
-			BLOCK_ARR[k] = res.block_arr[k];
-	}
-	//отмена редактирования
-	function cancel() {
-		$('#block-level-' + o.obj_name)
-			.find('.block-grid-on')
-			.removeClass('grey')
-			.trigger('click');
-	}
 };
 

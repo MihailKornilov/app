@@ -33,6 +33,9 @@ define('VERSION', _num(@$_COOKIE['version']));
 define('URL', APP_HTML.'/index.php?'.TIME);
 
 
+//глобальные переменные
+$CACHE_ARR = array();
+
 
 
 
@@ -247,10 +250,8 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 		_cache($arr);
 	}
 
-	if($i == 'all') {
-		_debugLoad('Получены данные приложения');
+	if($i == 'all')
 		return $arr;
-	}
 
 	if(!isset($arr[$i]))
 		return _cacheErr('_app: неизвестный ключ', $i);
@@ -584,31 +585,6 @@ function _selJson($arr) {
 	}
 	return '['.implode(',',$send).']';
 }
-function _selJsonSub($arr, $uidName='id', $titleName='name') {//ассоциативный массив для _select 2-го уровня
-	/*
-		В виде:
-		{1:[{uid:3,title:'Название 3'},{uid:5,title:'Название 5'}],
-		 2:[{uid:3,title:'Название 3'},{uid:5,title:'Название 5'}]
-		}
-
-	*/
-	$send = array();
-	foreach($arr as $id => $sub) {
-		if(!isset($send[$id]))
-			$send[$id] = array();
-		foreach($sub as $r)
-			$send[$id][] = '{'.
-				'uid:'.$r[$uidName].','.
-				'title:"'.addslashes($r[$titleName]).'"'.
-			'}';
-	}
-
-	$json = array();
-	foreach($send as $id => $r)
-		$json[] = $id.':['.implode(',', $r).']';
-
-	return '{'.implode(',',$json).'}';
-}
 function _selArray($arr) {//список для _select при отправке через ajax
 	$send = array();
 	foreach($arr as $uid => $title) {
@@ -662,6 +638,7 @@ function _cache($data='', $key='') {//кеширование данных
 		$key  - автоматически получается из второго элемента массива debug_backtrace
 				имя вызываемого файла + значение первого аргумента (если есть)
 	*/
+	global $CACHE_ARR;
 
 	
 	if(!$key) {
@@ -669,30 +646,45 @@ function _cache($data='', $key='') {//кеширование данных
 		$DBT = $DBT[1];
 		$ARG = empty($DBT['args'][0]) ? '' : $DBT['args'][0];
 		$key = $DBT['function'].$ARG;
-
-//		if($DBT['function'] == '_viewerCache')
-//			echo $key;
 	}
 
-	$key = md5(CODE).$key;
+	$cKey = md5(CODE).$key;
 	if($data == 'clear') {
-		xcache_unset($key);
-//		echo $key.' clear<br />';
+		xcache_unset($cKey);
+		$CACHE_ARR[] = array(
+			'act' => 'clear',
+			'key' => $key,
+			'dbt' => debug_backtrace(0)
+		);
 		return true;
 	}
 
 	//занесение данных в кеш
 	if($data) {
-		xcache_set($key, $data, 86400);
-//		echo $key.' set<br />';
+		xcache_set($cKey, $data, 86400);
+		$CACHE_ARR[] = array(
+			'act' => 'set',
+			'key' => $key,
+			'dbt' => debug_backtrace(0)
+		);
 		return $data;
 	}
 
-	if(!xcache_isset($key))
+	if(!xcache_isset($cKey)) {
+		$CACHE_ARR[] = array(
+			'act' => 'empty',
+			'key' => $key,
+			'dbt' => debug_backtrace(0)
+		);
 		return false;
+	}
 
-//	echo $key.' GET<br />';
-	return xcache_get($key);
+	$CACHE_ARR[] = array(
+		'act' => 'get',
+		'key' => $key,
+		'dbt' => debug_backtrace(0)
+	);
+	return xcache_get($cKey);
 }
 function _cacheErr($txt='Неизвестное значение', $i='') {//
 	if($i != '')
