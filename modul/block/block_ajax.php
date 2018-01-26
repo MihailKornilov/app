@@ -27,7 +27,7 @@ switch(@$_POST['op']) {
 			jsonError('Некорректная ширина');
 
 		define('BLOCK_EDIT', 1);
-		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
+		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name)));
 		$send['blk'] = _block($obj_name, $obj_id, 'block_arr');
 		$send['elm'] = _block($obj_name, $obj_id, 'elem_utf8');
 
@@ -46,7 +46,7 @@ switch(@$_POST['op']) {
 		define('ELEM_WIDTH_CHANGE', $on);
 		define('BLOCK_EDIT', 1);
 
-		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
+		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name)));
 		$send['elm'] = _block($obj_name, $obj_id, 'elem_utf8');
 
 		jsonSuccess($send);
@@ -251,7 +251,7 @@ switch(@$_POST['op']) {
 
 		_cache('clear', $obj_name.'_'.$obj_id);
 		$send['level'] = utf8(_blockLevelChange($obj_name, $obj_id, $width));
-		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width));
+		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width,0, _pageSpisokUnit($obj_id, $obj_name)));
 		$send['blk'] = _block($obj_name, $obj_id, 'block_arr');
 		$send['elm'] = _block($obj_name, $obj_id, 'elem_utf8');
 
@@ -296,11 +296,13 @@ switch(@$_POST['op']) {
 				$size = _num($EL['size']);
 				if($size == 13)
 					$size = 0;
+				$url = _num($EL['url']);
 				$sql = "UPDATE `_element`
 						SET `mar`='".$mar."',
 							`font`='".$font."',
 							`color`='".$color."',
-							`size`=".$size."
+							`size`=".$size.",
+							`url`=".$url."
 						WHERE `id`=".$elem_id;
 				query($sql);
 			}
@@ -356,8 +358,6 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 }
-
-
 
 
 function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерних блоков

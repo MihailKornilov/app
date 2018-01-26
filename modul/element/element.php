@@ -374,27 +374,31 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 
 	return $send;
 }
-function _dialogSpisokOnPage($page_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1 и которые размещены на текущей странице
-	if(!$page_id)
+function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
+/*
+	 получены будут списки, размещЄные в текущем объекте
+	$block_id - исходный блок, по которому определ€етс€ объект
+
+*/
+
+	if(!$block = _blockQuery($block_id))
 		return array();
 
 	//списки размещаютс€ при помощи диалогов 14 и 23
 	//идентификаторами результата €вл€ютс€ id элементов (а не диалогов)
-	
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `page_id`=".$page_id."
-			  AND `dialog_id` IN (14,23)";
-	if(!$arr = query_arr($sql))
+
+	if(!$elm = _block($block['obj_name'], $block['obj_id'], 'elem_arr'))
 		return array();
 
 	$send = array();
-	foreach($arr as $r) {
+	foreach($elm as $elem_id => $r) {
+		if($r['dialog_id'] != 14 && $r['dialog_id'] != 23)
+			continue;
 		$dialog = _dialogQuery($r['num_1']);
-		$send[$r['id']] = $dialog['spisok_name'].' (в блоке '.$r['block_id'].')';
+		$send[$elem_id] = utf8($dialog['spisok_name'].' (в '.$block['obj_name'].'-блоке '.$r['block_id'].')');
 	}
 
-	return _selArray($send);
+	return $send;
 }
 function _dialogSpisokGetPage($page_id) {//список объектов, которые поступают на страницу через GET
 	if(!$page_id)

@@ -44,14 +44,18 @@ function _page($i='all', $i1=0) {//получение данных страницы
 	if($i === 'all')
 		return $page;
 
-	//id страницы по умолчанию, либо из $_GET
+	//id текущей страницы
 	if($i == 'cur') {
 		if($page_id = _num(@$_GET['p'])) {
 			if(!isset($page[$page_id]))
 				return 0;
 			return $page_id;
 		}
+		$i = 'def';
+	}
 
+	//id страницы по умолчанию
+	if($i == 'def') {
 		//сначала поиск страницы приложения
 		foreach($page as $p)
 			if(!$p['sa'] && $p['def'])
@@ -270,27 +274,8 @@ function _pageShow($page_id) {
 	if(!SA && $page['sa'])
 		return _contentMsg();
 
-	$unit = array();
-	if($page['spisok_id']) {
-		if(!$id = _num($_GET['id']))
-			return _contentMsg('Некорректный идентификатор единицы списка.');
-
-		if(!$dialog = _dialogQuery($page['spisok_id']))
-			return _contentMsg('Отсутствует диалог, который вносит данные.');
-
-		$sql = "SELECT *
-				FROM `".$dialog['base_table']."`
-				WHERE `app_id`=".APP_ID."
-				  AND `id`=".$id;
-		if(!$unit = query_assoc($sql))
-			return _contentMsg('Единицы списка id'.$id.' не существует.');
-
-		if(isset($dialog['field']['deleted']) && $unit['deleted'])
-			return _contentMsg('Единица списка id'.$id.' была удалена.');
-	}
-
 	return
-	_blockHtml('page', $page_id, 1000, 0, $unit).
+	_blockHtml('page', $page_id, 1000, 0, _pageSpisokUnit($page_id)).
 //	_page_div().
 	'<script>'.
 		'var BLK='._block('page', $page_id, 'block_js').','.
@@ -299,6 +284,33 @@ function _pageShow($page_id) {
 			'ELEM_COLOR={'._elemColor().'};'.
 	'</script>'.
 	'<script>_pageAct('.PAS.')</script>';
+}
+function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, которая размещается на странице. Получение по $_GET['id']
+	if($obj_name != 'page')
+		return array();
+
+	$page = _page($page_id);
+	if(!$dialog_id = $page['spisok_id'])
+		return array();
+
+	$pageDef = '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на страницу по умолчанию</a>';
+	if(!$id = _num(@$_GET['id']))
+		return _contentMsg('Некорректный идентификатор единицы списка.'.$pageDef);
+
+	if(!$dialog = _dialogQuery($dialog_id))
+		return _contentMsg('Отсутствует диалог, который вносит данные.'.$pageDef);
+
+	$sql = "SELECT *
+			FROM `".$dialog['base_table']."`
+			WHERE `app_id`=".APP_ID."
+			  AND `id`=".$id;
+	if(!$unit = query_assoc($sql))
+		return _contentMsg('Единицы списка id'.$id.' не существует.'.$pageDef);
+
+	if(isset($dialog['field']['deleted']) && $unit['deleted'])
+		return _contentMsg('Единица списка id'.$id.' была удалена.'.$pageDef);
+
+	return $unit;
 }
 function _elemDiv($el, $unit=array()) {//формирование div элемента
 	if(!$el)
@@ -717,7 +729,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return 'элемент отсутствует';
 
 			switch($elem['dialog_id']) {
-				case 8: return 'текстовое значение';
+				case 8: return $UNIT_ISSET ? $unit[$elem['col']] : 'текстовое значение';
 				case 10: return $elem['txt_1'];
 			}
 
@@ -911,61 +923,66 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							43: блоки
 				num_3 - выбор нескольких значений
 			*/
+			if($el['block']['obj_name'] != 'dialog')
+				return _emptyMin('Элемент может располагаться только в блоке Диалога');
 
-			if(!$bs_id = _num(@$US['block_id']))
+			if(!$bls_id = _num(@$US['block_id']))
 				return _emptyMin('Отсутствует ID исходного блока.');
 
-			if(!$BL = _blockQuery($bs_id))
-				return _emptyMin('Исходный блок id'.$bs_id.' отсутствует.');
+			if(!$BLS = _blockQuery($bls_id))
+				return _emptyMin('Исходный блок id'.$bls_id.' отсутствует.');
 
-			switch($BL['obj_name']) {
-				case 'page':
-
-					break;
-				case 'dialog': break;
-				case 'spisok': break;
-				default:
-					return _emptyMin('Исходный блок из неизвестного объекта.');
-			}
-
-//return _pr($BL);
-
-			//вставка значения в единицу списка
-			if($BL['obj_name'] == 'spisok')
-				$BL = _blockQuery($BL['obj_id']);
-
-			if(!$EL = $BL['elem'])
-				return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента в блок.');
-
-			if($el['num_2'] == 43 && $BL['obj_name'] != 'dialog')
+			if($el['num_2'] == 43 && $BLS['obj_name'] != 'dialog')
 				return _emptyMin('Выбор блоков доступен только для диалогов.');
 
-
-			//поиск id диалога, который следует выводить
 			$dialog_id = 0;
-			switch($EL['dialog_id']) {
+			//id диалога, в котором располагается выбор
+			switch($el['block']['obj_id']) {
 				case 7://поиск
+					if(!$EL = $BLS['elem'])
+						return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента поиска в блок.');
 					if(!$EL['num_1'])
 						return _emptyMin('Содержание диалога будет доступно после выбора списка,<br>по которому будет производиться поиск.');
 					$sp = _elemQuery($EL['num_1']);
 					$dialog_id = $sp['num_1'];
 					break;
-				case 14://список-ШАБЛОН
-				case 23://список-ТАБЛИЦА
-					if(!$dialog_id = $EL['num_1'])
-						return _emptyMin('Содержание диалога будет доступно после выбора списка.');
+				case 11://вставка значения...
+					if($BLS['obj_name'] == 'spisok') {//...в блок шаблона [14]
+						$bl = _blockQuery($BLS['obj_id']);
+						if(!$bl['elem'])
+							return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента в блок.');
+						if(!$dialog_id = $bl['elem']['num_1'])
+							return _emptyMin('Содержание диалога будет доступно после выбора списка.');
+						break;
+					}
+					if($BLS['obj_name'] == 'page') {
+						if(!$page = _page($BLS['obj_id']))
+							return _emptyMin('Данные страницы '.$BLS['obj_id'].' не получены.');
+						if(!$dialog_id = $page['spisok_id'])
+							return _emptyMin('Страница не принимает значения единицы списка');
+					}
+					if($BLS['obj_name'] == 'dialog') {
+						return _emptyMin('Вставка значения в блок диалога пока не доделана.');
+					}
 					break;
+				case 31://вставка значения в таблицу [23]
+					$dialog_id = $BLS['elem']['num_1'];
+					break;
+				case 36://показ-скрытие блоков для галочки
+				case 40://показ-скрытие блоков для выпадающего поля
+				default:
+					if($el['num_2'] == 43) {
+						$dialog_id = $BLS['obj_id'];
+						break;
+					}
+					return _emptyMin('Ненастроенный диалог '.$el['block']['obj_id']);
 			}
-
-			if($el['num_2'] == 43)
-				$dialog_id = $BL['obj_id'];
 
 			if(!$dialog_id)
 				return _emptyMin('Не найдено ID диалога, который вносит данные списка.');
 
 			if(!$dialog = _dialogQuery($dialog_id))
 				return _emptyMin('Диалога не существует, который вносит данные списка.');
-
 
 			//поля, которые можно подсвечивать
 			$choose_access = array();
@@ -1016,6 +1033,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'choose_deny' => $choose_deny      //ids элементов или блоков, которые выбирать нельзя (если они были выбраны другой фукцией того же элемента)
 			);
 
+			//выбирается только одно значение
+			if(!$el['num_3'])
+				$v = _num($v);
+
 			return
 			'<div class="fs14 pad10 pl15 bg-gr2 line-b">Диалоговое окно <b class="fs14">'.$dialog['spisok_name'].'</b>:</div>'.
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
@@ -1041,7 +1062,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			return '31';
 
 		//Значение списка: порядковый номер
-		case 32: return 'Порядковый номер используется только в списках';
+		case 32: return _spisokUnitNum($unit);
 
 		//Значение списка: дата
 		case 33:
@@ -1058,7 +1079,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					завтра
 					послезавтра
 			*/
-			return 'Дата используется только в списках';
+			return _spisokUnitData($unit, $el);
 
 		//Иконка вопрос: Выплывающая подсказка
 		case 42:
@@ -1180,6 +1201,7 @@ function _page_div() {//todo тест
 	'<div class="mar20 bor-e8 pad20" id="for-hint">'.
 		'Передний текст '.
 		'<div class="icon icon-edit"></div>'.
+		'<div class="icon icon-hint"></div>'.
 		'<div class="icon spin pl wh"></div>'.
 		'<div class="icon icon-del"></div>'.
 		'<div class="icon icon-del-red"></div>'.
@@ -1208,7 +1230,6 @@ function _page_div() {//todo тест
 		'<div class="icon icon-join"></div>'.
 		'<div class="icon icon-info"></div>'.
 		'<div class="icon icon-search"></div>'.
-		'<div class="icon icon-hint"></div>'.
 		' Попутный текст'.
 	'</div>'.
 

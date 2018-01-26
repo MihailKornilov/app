@@ -456,6 +456,7 @@ var VK_SCROLL = 0,
 				element_search_access:$('#element_search_access').val(),
 				element_is_insert:$('#element_is_insert').val(),
 				element_style_access:$('#element_style_access').val(),
+				element_url_access:$('#element_url_access').val(),
 				element_hint_access:$('#element_hint_access').val(),
 				element_dialog_func:$('#element_dialog_func').val(),
 				element_afics:$('#element_afics').val(),
@@ -967,7 +968,7 @@ var VK_SCROLL = 0,
 				case 26:
 					if(is_edit)
 						return;
-					if(!DIALOG_OPEN)
+					if(!window.DIALOG_OPEN)
 						return;
 					var bec = DIALOG_OPEN.content.find('.choose');
 					bec.click(function() {

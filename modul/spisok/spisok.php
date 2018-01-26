@@ -123,10 +123,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok, $CMP);
 
-	foreach($spisok as $id => $sp)
-		if(empty($sp['num']))
-			$spisok[$id]['num'] = $sp['id'];
-
 	//выбор внешнего вида
 	switch($ELEM['dialog_id']) {
 		//таблица
@@ -168,12 +164,11 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$cls = array();
 					switch($td['dialog_id']) {
 						case 32://порядковый номер - num
-							$txt = $sp['num'];
+							$txt = _spisokUnitNum($sp);
 							$txt = _spisokColLink($txt, $sp, $td['num_2']);
 							break;
 						case 33://дата
-							$cut = $td['num_1'] == 36;
-							$txt = FullData($sp['dtime_add'], $td['num_2'], $cut);
+							$txt = _spisokUnitData($sp, $td);
 							break;
 						case 34://иконки управления
 							$txt = _iconEdit(array(
@@ -257,14 +252,14 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			foreach($spisok as $sp) {
 				$child = array();
 				foreach($BLK as $id => $r) {
+/*
 					$r['elem'] = array();
 					if($elem_id = $r['elem_id']) {//если элемент есть в блоке
 						$txt = '';
 						$el = $ELM[$elem_id];
 						switch($el['num_1']) {
-							case -1: $txt = $sp['num']; break;//порядковый номер
-							case -2: $txt = FullData($sp['dtime_add'], 0, 1); break; //дата внесения
-							case -4: $txt = _br($el['txt_2']); break;//произвольный текст
+							case -1: $txt = _spisokUnitNum($sp); break;//порядковый номер
+							case -2: $txt = _spisokUnitData($sp, $el); break; //дата внесения
 							default:
 								$tmp = $ELM_TMP[$el['num_1']];
 								switch($tmp['dialog_id']) {
@@ -283,11 +278,13 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 						$el['txt_real'] = $txt;
 						$r['elem'] = $el;
 					}
+*/
+					$r['elem'] = $r['elem_id'] ? $ELM[$r['elem_id']] : array();
 					$child[$r['parent_id']][$id] = $r;
 				}
 
 				$block = _blockArrChild($child);
-				$send .= _blockLevel($block, $width);
+				$send .= _blockLevel($block, $width, 0, 0, 1, $sp);
 			}
 
 			if($limit * ($next + 1) < $all) {
@@ -305,6 +302,23 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 	return 'Неизвестный внешний вид списка: '.$ELEM['num_1'];
 }
+
+function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
+	if(empty($u))
+		return 'порядковый номер';
+	if(empty($u['num']))
+		return $u['id'];
+	return $u['num'];
+}
+function _spisokUnitData($u, $el) {//дата и время - значение единицы списка
+	if(empty($u))
+		return 'дата и время';
+
+	$cut = $el['num_1'] == 36;
+
+	return 'data';
+}
+
 function _spisokColLink($txt, $sp, $to_link) {//обёртка значения колонки в ссылку
 	if(!$to_link)//если оборачивать не нужно
 		return $txt;

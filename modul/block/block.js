@@ -259,7 +259,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 
 				'<table class="w100p mt5">' +
 					'<tr><td>' + _elemUnitMar(EL) +
-						'<td>' + _elemUnitPlace(EL) +
+						'<td>' + _elemUnitPlace(BL) +
 				'</table>' +
 
 			(EL.style_access ?
@@ -286,19 +286,19 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 					'<input type="hidden" id="el-mar2" value="' + mar[2] + '" />' +
 				'</div>';
 	},
-	_elemUnitPlace = function(EL) {//стили элемента: тип блока, позиция элемента
+	_elemUnitPlace = function(BL) {//позиция элемента
 		return  '<table id="elem-pos">' +
 			'<tr><td class="fs14 color-555 pb3 center">Позиция' +
-			'<tr><td><div val="top" class="icon-wiki iw6 mr3' + _dn(EL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
-					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(EL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
-					'<div val="top r" class="icon-wiki iw8' + _dn(EL.pos == 'top r','on') + _tooltip('Вверх-вправо', -73, 'r') + '</div>' +
-			'<tr><td>' + _elemUnitPlaceMiddle(EL) +
-			'<tr><td><div val="bottom" class="icon-wiki iw9 mr3' + _dn(EL.pos == 'bottom','on') + _tooltip('Вниз-влево', -33) + '</div>' +
-					'<div val="bottom center" class="icon-wiki iw10 mr3' + _dn(EL.pos == 'bottom center','on') + _tooltip('Вниз-центр', -32) + '</div>' +
-					'<div val="bottom r" class="icon-wiki iw11' + _dn(EL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -65, 'r') + '</div>' +
+			'<tr><td><div val="top" class="icon-wiki iw6 mr3' + _dn(BL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
+					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(BL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
+					'<div val="top r" class="icon-wiki iw8' + _dn(BL.pos == 'top r','on') + _tooltip('Вверх-вправо', -73, 'r') + '</div>' +
+			'<tr><td>' + _elemUnitPlaceMiddle(BL) +
+			'<tr><td><div val="bottom" class="icon-wiki iw9 mr3' + _dn(BL.pos == 'bottom','on') + _tooltip('Вниз-влево', -33) + '</div>' +
+					'<div val="bottom center" class="icon-wiki iw10 mr3' + _dn(BL.pos == 'bottom center','on') + _tooltip('Вниз-центр', -32) + '</div>' +
+					'<div val="bottom r" class="icon-wiki iw11' + _dn(BL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -65, 'r') + '</div>' +
 		'</table>';
 	},
-	_elemUnitPlaceMiddle = function(EL) {//центральная часть позиции
+	_elemUnitPlaceMiddle = function(BL) {//центральная часть позиции
 		$(document)
 			.off('click', '#elem-pos div')
 			.on('click', '#elem-pos div', function() {
@@ -308,16 +308,16 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				_parent(unit, 'TABLE').find('.on').removeClass('on');
 				unit.addClass('on');
 
-				$(EL.attr_bl).removeClass('top r center bottom');
+				$(BL.attr_bl).removeClass('top r center bottom');
 				if(v)
-					$(EL.attr_bl).addClass(v);
+					$(BL.attr_bl).addClass(v);
 
-				EL.pos = v;
-				EL.save = 1;
+				BL.pos = v;
+				BL.save = 1;
 			});
-		return  '<div val="" class="icon-wiki iw3 mr3' + _dn(!EL.pos,'on') + _tooltip('Влево', -15) + '</div>' +
-				'<div val="center" class="icon-wiki iw4 mr3' + _dn(EL.pos == 'center','on') + _tooltip('По центру', -28) + '</div>' +
-				'<div val="r" class="icon-wiki iw5' + _dn(EL.pos == 'r','on') + _tooltip('Вправо', -34, 'r') + '</div>';
+		return  '<div val="" class="icon-wiki iw3 mr3' + _dn(!BL.pos,'on') + _tooltip('Влево', -15) + '</div>' +
+				'<div val="center" class="icon-wiki iw4 mr3' + _dn(BL.pos == 'center','on') + _tooltip('По центру', -28) + '</div>' +
+				'<div val="r" class="icon-wiki iw5' + _dn(BL.pos == 'r','on') + _tooltip('Вправо', -34, 'r') + '</div>';
 	},
 	_elemUnitFont = function(EL) {//стили элемента: жирность, наклон, подчёркивание
 		var font = {
@@ -346,15 +346,24 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 					font.push(eq.attr('val'));
 				});
 				EL.font = font.join(' ');
-				EL.save = 1;
+				BLK[EL.block_id].save = 1;
+			})
+			.off('click', '.elem-url')
+			.on('click', '.elem-url', function() {
+				var t = $(this),
+					v = t.hasClass('on') ? 0 : 1;
+				t._dn(!v, 'on');
+				EL.url = v;
+				BLK[EL.block_id].save = 1;
 			});
-
-
 		return '<div id="elem-font" class="dib">' +
-				'<div class="icon-wiki mr3' + font.b + '" val="b"></div>' +
-				'<div class="icon-wiki iw1 mr3' + font.i + '" val="i"></div>' +
-				'<div class="icon-wiki iw2 mr5' + font.u + '" val="u"></div>' +
-		'</div>';
+			'<div val="b" class="icon-wiki ml3' + font.b + _tooltip('Жирный', -23) + '</div>' +
+			'<div val="i" class="icon-wiki iw1 ml3' + font.i + _tooltip('Наклонный', -31) + '</div>' +
+			'<div val="u" class="icon-wiki iw2 ml3' + font.u + _tooltip('Подчёкнутый', -39) + '</div>' +
+		'</div>' +
+		(EL.url_access ?
+			'<div class="elem-url icon-wiki iw12 ml3' + _dn(EL.url, 'on') + _tooltip('Ссылка', -20) + '</div>'
+		: '');
 	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста
 		$(document)
@@ -379,7 +388,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				$('#elem-color').css('background-color', ELEM_COLOR[v][0]);
 
 				EL.color = v;
-				EL.save = 1;
+				BLK[EL.block_id].save = 1;
 			});
 
 		var td = '',
@@ -422,6 +431,7 @@ $(document)
 			if(!v) {
 				_elemActivate(res.elm, {}, 1);
 				_blockUpd(res.blk);
+				_elemUpd(res.elm);
 			}
 			if(v) {
 				$('._hint').remove();

@@ -82,7 +82,7 @@ table{border:0;border-spacing:0}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:0 0 no-repeat url(../../img/icon18.png?12);
+	background:0 0 no-repeat url(../../img/icon18.png?14);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -119,11 +119,7 @@ table{border:0;border-spacing:0}
 .icon-join   {background-position-x:-500px}/* объединение: стрелки друг на друга сверху-снизу */
 .icon-info   {background-position-x:-520px}/* информация: "i" в кружке */
 .icon-search {background-position-x:-540px}/* поиск: лупа */
-.icon-hint{
-	background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAAXNSR0IArs4c6QAAAitJREFUOBGdVDFoU1EUvfe9/5UPKRXBQRelglCczOAmDloqTSPo4NzZmq9JC652kkJIYmi1Y+cOijZFRQeLm2DAwerUUReVSgO1Sf+73vPTX76/RdA35L77zjn3P+47N0yZVa4tBeznrpLQRWIeEnJHmMwGiawT06r0Os/qlRtbaRmnk+mHrcsustN61hbpvTSH+eMmHf85QF8H3bacZfZHFcsbG1WrN8dfJ9q9IpX5lQmO+Hpk3d3G5PinhJCNd+ZbwzYys2LlcW2ysAjc4Ac3QAG305n4WwFwgYMHPnQ4434PBp44E5XTBcrN1gWF72lfzjPJF3FUr98uLECEhRsZZ+vS27xm4iZqD/4ogOayWdYiw0JSFaEtNvwofLB8qV+ifyPdt6E3eAVm9yIBEXt+cFJE3pO4SqNUmHHM93FuiM8hJgvNh97DM5IfrSUA4lyp+FlD/NVSc+mYFQk17xqWV8CThdeTLg8Z+ADPmADpeGv26QmPcu+E6LSL3GgtLH5I49BB78FI8IGC39IE7L3AXmGmU454rFEuvsni0Al5G9oTWYeRsoQ4j7afk5OZ7vfO24PwWKd67RWt7jpxH8/YYES7GR4aDM7sA/Ug1qneYBY0z+Pds0QR1xXhX8ZSlMV2+XnoY9vDebJjQjhRh+tHVpDN1aBHjZdbZM81MUOx7bHBLAA46EbpIrFTlQd+MoR7Awji1NzKiIiZ0m07NqDv1v5pipOv/c//yW90GxY+MmYg4gAAAABJRU5ErkJggg==");
-	background-position-y:1px;
-	cursor:default;
-}
+.icon-hint{background-position-x:-560px;cursor:default}/* подсказка: знак вопроса */
 /* ожидание процесса загрузки для любой иконки */
 .icon.spin{
 	height:16px;
@@ -163,7 +159,7 @@ table{border:0;border-spacing:0}
 	cursor:pointer;
 	width:24px;
 	height:24px;
-	background:0 0 url(../../img/wiki_icons.png?5) no-repeat;
+	background:0 0 url(../../img/wiki_icons.png?7) no-repeat;
 	opacity:.6;
 	border-radius:1px;
 }
@@ -180,6 +176,7 @@ table{border:0;border-spacing:0}
 .iw9{background-position:0 -216px}/* Вниз-влево */
 .iw10{background-position:0 -240px}/* Вниз-центр */
 .iw11{background-position:0 -264px}/* Вниз-вправо */
+.iw12{background-position:0 -286px}/* url */
 
 .iw18{background-position:0 -432px}/*  */
 .iw19{background-position:0 -456px}/*  */

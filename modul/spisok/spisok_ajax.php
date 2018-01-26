@@ -30,13 +30,23 @@ switch(@$_POST['op']) {
 					WHERE `id`=".$unit_id;
 			query($sql);
 		} else {
+			$elem = array();
+			if($dialog['base_table'] == '_element') {//если это элемент
+				$elem = _elemQuery($unit_id);
+				//удаление значений
+				$sql = "DELETE FROM `_element` WHERE `block_id`=-".$unit_id;
+				query($sql);
+				//удаление функций
+				$sql = "DELETE FROM `_element_func` WHERE `block_id`=".$elem['block_id'];
+				query($sql);
+			}
+
 			$sql = "DELETE FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
 			query($sql);
 
-			if($dialog['base_table'] == '_element') {//удаление значений у элементов
-				$sql = "DELETE FROM `_element` WHERE `block_id`=-".$unit_id;
-				query($sql);
-			}
+			//обновление кеша объекта, если это элемент
+			if($elem)
+				_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 		}
 
 		$send = _spisokAction4($send);
@@ -48,25 +58,16 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID элемента станицы');
 		if(!$next = _num($_POST['next']))
 			jsonError('Некорректное значение очередного блока');
-
 		//получение данных элемента поиска
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id`=".$elem_id;
-		if(!$pe = query_assoc($sql))
+		if(!$el = _elemQuery($elem_id))
 			jsonError('Элемента id'.$elem_id.' не существует');
-
-		if($pe['dialog_id'] != 14 && $pe['dialog_id'] != 23)
+		if($el['dialog_id'] != 14 && $el['dialog_id'] != 23)
 			jsonError('Элемент не является списком');
-
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$pe['block_id'];
-		if(!$pe['block'] = query_assoc($sql))
+		if(!$el['block'])
 			jsonError('Отсутствует блок списка');
 
-		$send['is_table'] = $pe['dialog_id'] == 23;
-		$send['spisok'] = utf8(_spisokShow($pe, $next));
+		$send['is_table'] = $el['dialog_id'] == 23;
+		$send['spisok'] = utf8(_spisokShow($el, $next));
 		jsonSuccess($send);
 		break;
 	case 'spisok_search'://получение обновлённого списка по условиям
@@ -164,7 +165,6 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 }
 function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$dialog = _spisokUnitDialog($unit_id);
-	$dialog_id = $dialog['id'];
 
 	$act = $unit_id ? 'edit' : 'insert';
 
@@ -198,8 +198,12 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
-	if($dialog['base_table'] == '_element')
-		_cache('clear', '_dialogQuery'.$dialog_id);
+	if($dialog['base_table'] == '_element') {
+		$elem = _elemQuery($unit_id);
+		_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
+	}
+
+
 
 	$send = array(
 		'unit' => $unit,
@@ -257,16 +261,9 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 
 	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
 	if($dialog['base_table'] == '_element' && $block_id > 0) {
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$block_id;
-		if(!$block = query_assoc($sql))
+		if(!$block = _blockQuery($block_id))
 			jsonError('Блока не сущетвует');
-
-		$sql = "SELECT COUNT(*)
-				FROM `_element`
-				WHERE `block_id`=".$block_id;
-		if(query_value($sql))
+		if($block['elem'])
 			jsonError('В блоке уже есть элемент');
 	}
 

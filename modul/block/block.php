@@ -451,6 +451,7 @@ function _blockCache($obj_name, $obj_id) {
 		$el['size'] = $el['size'] ? _num($el['size']) : 13;
 		$el['is_func'] = _num(@$isFunc[$el['block_id']]);
 		$el['style_access'] = _num($dlg['element_style_access']);
+		$el['url_access'] = _num($dlg['element_url_access']);
 		$el['hint_access'] = _num($dlg['element_hint_access']);
 		$el['dialog_func'] = _num($dlg['element_dialog_func']);
 		$el['afics'] = $dlg['element_afics'];
@@ -506,7 +507,7 @@ function _block($obj_name, $obj_id, $i='all') {
 				if($k == 'xx_ids')
 					continue;
 				if(!preg_match(REGEXP_NUMERIC, $v))
-					$v = '"'.addslashes($v).'"';
+					$v = '"'.addslashes(_br($v)).'"';
 				$u[] = $k.':'.$v;
 			}
 
@@ -527,7 +528,7 @@ function _block($obj_name, $obj_id, $i='all') {
 				if(is_array($v))
 					continue;
 				if(!preg_match(REGEXP_NUMERIC, $v))
-					$v = '"'.addslashes($v).'"';
+					$v = '"'.addslashes(_br($v)).'"';
 				$u[] = $k.':'.$v;
 			}
 

@@ -188,6 +188,12 @@ switch(@$_POST['op']) {
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
+									'attr_id' => 'element_url_access',
+									'title' => 'разрешать делать ссылкой',
+									'value' => $dialog['element_url_access']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
 									'attr_id' => 'element_hint_access',
 									'title' => 'разрешать прикрепление подсказки',
 									'value' => $dialog['element_hint_access']
@@ -324,6 +330,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_search_access = _num($_POST['element_search_access']);
 	$element_is_insert = _num($_POST['element_is_insert']);
 	$element_style_access = _num($_POST['element_style_access']);
+	$element_url_access = _num($_POST['element_url_access']);
 	$element_hint_access = _num($_POST['element_hint_access']);
 	$element_dialog_func = _num($_POST['element_dialog_func']);
 	$element_afics = _txt($_POST['element_afics']);
@@ -364,6 +371,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_search_access`=".$element_search_access.",
 				`element_is_insert`=".$element_is_insert.",
 				`element_style_access`=".$element_style_access.",
+				`element_url_access`=".$element_url_access.",
 				`element_hint_access`=".$element_hint_access.",
 				`element_dialog_func`=".$element_dialog_func.",
 				`element_afics`='".addslashes($element_afics)."',
@@ -493,7 +501,7 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//select - выбор списка, размещённого на текущей странице
 			case 27:
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _dialogSpisokOnPage($page_id);
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _dialogSpisokOnPage($block_id);
 				break;
 			//select - выбор единицы из другого списка (для связки)
 			case 29:
