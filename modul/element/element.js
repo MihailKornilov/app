@@ -1393,21 +1393,20 @@ var VK_SCROLL = 0,
 				'<button val="42" class="vk ml5" data-hint="Иконка с вопросом: Выплывающая подсказка">42</button>' +
 
 			'<div class="hd2 mt20 mb5">Элементы для списков</div>' +
-				'<button val="7" class="vk">Поиск</button>' +
-				'<button val="15" class="vk ml10">Количество строк</button>' +
+				'<button val="7" class="vk">7 - search</button>' +
+				'<button val="15" class="vk ml5" data-hint="Количество строк">15</button>' +
+				'<button val="14" class="vk ml5">14 - Шаблон</button>' +
+				'<button val="23" class="vk ml5">23 - Таблица</button>' +
 			'<p class="mt10">' +
-				'<button val="14" class="vk">Содержание - шаблон</button>' +
-				'<button val="11" class="vk cancel ml10" data-hint="">Выбор значения для шаблона</button>' +
-			'<p class="mt10">' +
-				'<button val="23" class="vk">Содержание - таблица</button>' +
-				'<button val="31" class="vk cancel ml5" data-hint="Значение из диалога">31</button>' +
+				'<button val="11" class="vk cancel" data-hint="Значение: из единицы списка">11</button>' +
 				'<button val="32" class="vk cancel ml5" data-hint="Значение: Порядковый номер">32</button>' +
 				'<button val="33" class="vk cancel ml5" data-hint="Значение: Дата">33</button>' +
 				'<button val="34" class="vk cancel ml5" data-hint="Значение: Иконки управления">34</button>' +
 
 	  (SA ? '<div class="hd2 mt20 mb5">Элементы для SA</div>' +
-				'<button val="12" class="vk red">PHP-функция</button>' +
-				'<button val="37" class="vk red ml5">Select - выбор имени колонки</button>'
+				'<button val="12" class="vk red" data-hint="PHP-функция">12</button>' +
+				'<button val="37" class="vk red ml5" data-hint="Select - выбор имени колонки">37</button>' +
+				'<button val="31" class="vk ml5" data-hint="">31 - свободно</button>'
 	  : '') +
 
 		'</div>';
