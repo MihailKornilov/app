@@ -666,7 +666,7 @@ var VK_SCROLL = 0,
 					font:sp.font,
 					color:sp.color,
 					pos:sp.pos,
-					link:sp.link
+					url:sp.url
 				};
 			});
 			return send;
@@ -708,8 +708,9 @@ var VK_SCROLL = 0,
 				title:'',   //тип значения
 				font:'',
 				color:'',
-				pos:'',     //txt_6
-				link:0      //колонка является ссылкой
+				pos:'',      //txt_6
+				url_access:1,//колонке разрешено быть ссылкой
+				url:0        //колонка является ссылкой
 			}, v);
 
 			DL.append(
@@ -778,22 +779,12 @@ var VK_SCROLL = 0,
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
 								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
-							'<tr><td colspan="3" class="pl5">' +
-									'<input type="hidden" id="tab-sp-link" value="' + v.link + '" />' +
 						'</table>' +
 						'',
 					side:'right',
 					show:1,
 					delayShow:700,
-					delayHide:300,
-					func:function() {
-						$('#tab-sp-link')._check({
-							title:'обернуть в ссылку',
-							func:function(vv) {
-								v.link = vv;
-							}
-						});
-					}
+					delayHide:300
 				});
 			});
 			DL.sortable({
@@ -921,15 +912,6 @@ var VK_SCROLL = 0,
 						}
 					});
 					return;
-				//настройка шаблона единицы списка
-				case 25:
-					if(is_edit)
-						return;
-					$('#block-level-spisok')
-						.find('.block-grid-on')
-						.removeClass('grey')
-						.trigger('click');
-					return;
 				//select - произвольные значения
 				case 17:
 					_elemFunc(el, _num(unit[el.col] || el.def), is_edit, 1);
@@ -963,6 +945,15 @@ var VK_SCROLL = 0,
 						title0:el.txt_1,
 						spisok:el.vvv
 					});
+					return;
+				//настройка шаблона единицы списка
+				case 25:
+					if(is_edit)
+						return;
+					$('#block-level-spisok')
+						.find('.block-grid-on')
+						.removeClass('grey')
+						.trigger('click');
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
 				case 26:
@@ -1413,7 +1404,7 @@ var VK_SCROLL = 0,
 	},
 	_elemChooseTable = function() {
 		return '<div class="hd2 mt10">Варианты выбора для ячейки таблицы:</div>' +
-			'<button val="31" class="vk cancel mt5">Значение из диалога</button>' +
+			'<button val="11" class="vk cancel mt5">Значение из диалога</button>' +
 			'<button val="32" class="vk cancel mt5">Значение: Порядковый номер</button>' +
 			'<button val="33" class="vk cancel mt5">Значение: Дата</button>' +
 			'<button val="34" class="vk cancel mt5">Значение: Иконки управления</button>' +

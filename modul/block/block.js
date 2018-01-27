@@ -346,6 +346,10 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 					font.push(eq.attr('val'));
 				});
 				EL.font = font.join(' ');
+
+				if(EL.attr_tr)//настройка для таблицы, без блоков
+					return;
+
 				BLK[EL.block_id].save = 1;
 			})
 			.off('click', '.elem-url')
@@ -354,6 +358,10 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 					v = t.hasClass('on') ? 0 : 1;
 				t._dn(!v, 'on');
 				EL.url = v;
+
+				if(EL.attr_tr)//настройка для таблицы, без блоков
+					return;
+
 				BLK[EL.block_id].save = 1;
 			});
 		return '<div id="elem-font" class="dib">' +
@@ -388,6 +396,10 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				$('#elem-color').css('background-color', ELEM_COLOR[v][0]);
 
 				EL.color = v;
+
+				if(EL.attr_tr)//настройка для таблицы, без блоков
+					return;
+
 				BLK[EL.block_id].save = 1;
 			});
 

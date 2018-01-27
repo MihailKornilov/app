@@ -542,7 +542,7 @@ function _dialogOpenLoad($dialog_id) {
 						'font' => $r['font'],
 						'color' => $r['color'],
 						'pos' => $r['txt_6'],
-						'link' => _num($r['num_2']),
+						'url' => _num($r['url']),
 					);
 				}
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;

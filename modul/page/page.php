@@ -125,6 +125,18 @@ function _page($i='all', $i1=0) {//получение данных страницы
 		return $send;
 	}
 
+	//получение страницы, которая принимает значения списка
+	//  $i1 - id диалога, который вносит данные этого списка
+	if($i == 'spisok_id') {
+		if(!$dialog_id = _num($i1))
+			return 0;
+		foreach($page as $id => $r) {
+			if($r['spisok_id'] == $dialog_id)
+				return $id;
+		}
+		return 0;
+	}
+
 	//данные конкретной страницы
 	if($page_id = _num($i)) {
 		if(!isset($page[$page_id]))
@@ -729,7 +741,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return 'элемент отсутствует';
 
 			switch($elem['dialog_id']) {
-				case 8: return $UNIT_ISSET ? $unit[$elem['col']] : 'текстовое значение';
+				//однострочное поле
+				case 8:
+					if(!$UNIT_ISSET)
+						return 'текстовое значение';
+					$txt = $unit[$elem['col']];
+					$txt = _spisokUnitUrl($txt, $unit, $el['url']);
+					return $txt;
+				//произвольный текст
 				case 10: return $elem['txt_1'];
 			}
 
@@ -914,7 +933,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
 		case 26:
 			/*
-				Используется в диалогах: 7,11,31,36,40
+				Используется в диалогах: 7,11,36,40
 
 				num_2 - Что выбирать:
 							40: любые элементы
@@ -956,6 +975,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						break;
 					}
 					if($BLS['obj_name'] == 'page') {
+						if($BLS['elem'] && $BLS['elem']['dialog_id'] == 23) {//...в таблицу [23]
+							$dialog_id = $BLS['elem']['num_1'];
+							break;
+						}
 						if(!$page = _page($BLS['obj_id']))
 							return _emptyMin('Данные страницы '.$BLS['obj_id'].' не получены.');
 						if(!$dialog_id = $page['spisok_id'])
@@ -964,9 +987,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					if($BLS['obj_name'] == 'dialog') {
 						return _emptyMin('Вставка значения в блок диалога пока не доделана.');
 					}
-					break;
-				case 31://вставка значения в таблицу [23]
-					$dialog_id = _num(@$BLS['elem']['num_1']);
 					break;
 				case 36://показ-скрытие блоков для галочки
 				case 40://показ-скрытие блоков для выпадающего поля

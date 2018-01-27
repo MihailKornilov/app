@@ -165,7 +165,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					switch($td['dialog_id']) {
 						case 32://порядковый номер - num
 							$txt = _spisokUnitNum($sp);
-							$txt = _spisokColLink($txt, $sp, $td['num_2']);
+							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
 							break;
 						case 33://дата
 							$txt = _spisokUnitData($sp, $td);
@@ -181,7 +181,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 									));
 							$cls[] = 'pad0';
 							break;
-						case 31://из диалога
+						case 11://из диалога
 							$elemUse = $tabElemUse[$td['num_1']];
 							$el = $CMP[$elemUse['id']];
 
@@ -196,13 +196,13 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							//значение из другого списка
 							if($el['dialog_id'] == 29) {
 								$txt = $sp[$col]['txt_1'];
-								$txt = _spisokColLink($txt, $sp[$col], $td['num_2']);
+								$txt = _spisokUnitUrl($txt, $sp[$col], $td['url']);
 								break;
 							}
 
 							$txt = $sp[$col];
 							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
-							$txt = _spisokColLink($txt, $sp, $td['num_2']);
+							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
 						break;
 					}
 					$cls[] = $td['font'];
@@ -224,7 +224,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 						'<td colspan="20">'.
 							'<tt class="db center curP fs14 blue pad8">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>';
 			}
-
 
 			$html .= !$next ? '</table>' : '';
 			return $html;
@@ -258,8 +257,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 						$txt = '';
 						$el = $ELM[$elem_id];
 						switch($el['num_1']) {
-							case -1: $txt = _spisokUnitNum($sp); break;//порядковый номер
-							case -2: $txt = _spisokUnitData($sp, $el); break; //дата внесения
 							default:
 								$tmp = $ELM_TMP[$el['num_1']];
 								switch($tmp['dialog_id']) {
@@ -270,8 +267,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 										$txt = _spisokColSearchBg($txt, $ELEM, $el['num_1']);
 								}
 						}
-						//обёртка в ссылку
-						$txt = _spisokColLink($txt, $sp, $el['num_2']);
 
 						$el['tmp'] = 1;
 						$el['block'] = $r;
@@ -319,8 +314,8 @@ function _spisokUnitData($u, $el) {//дата и время - значение единицы списка
 	return 'data';
 }
 
-function _spisokColLink($txt, $sp, $to_link) {//обёртка значения колонки в ссылку
-	if(!$to_link)//если оборачивать не нужно
+function _spisokUnitUrl($txt, $sp, $is_url) {//обёртка значения колонки в ссылку
+	if(!$is_url)//если оборачивать не нужно
 		return $txt;
 
 	//диалог, через который вносятся данные списка
@@ -337,9 +332,9 @@ function _spisokColLink($txt, $sp, $to_link) {//обёртка значения колонки в ссылк
 	if($dialog['base_table'] == '_vkuser')
 		$link = '&viewer_id='.$sp['viewer_id'];
 
-	//если указана страница перехода после создания элемента списка
-	if($dialog['insert_action_id'] == 2)
-		$link = '&p='.$dialog['insert_action_page_id'].'&id='.$sp['id'];
+	//если есть страница, которая принимает значения списка
+	if($page_id = _page('spisok_id', $dialog['id']))
+		$link = '&p='.$page_id.'&id='.$sp['id'];
 
 	return '<a href="'.URL.$link.'" class="inhr">'.$txt.'</a>';
 }

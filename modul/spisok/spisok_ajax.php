@@ -200,10 +200,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		_cache('clear', '_pageCache');
 	if($dialog['base_table'] == '_element') {
 		$elem = _elemQuery($unit_id);
-		_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
+		if($elem['block'])
+			_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 	}
-
-
 
 	$send = array(
 		'unit' => $unit,
@@ -211,7 +210,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		'action_page_id' => _num($dialog[$act.'_action_page_id'])
 	);
 
-	$send = _spisokAction3($send, $dialog, $unit_id);
+	$send = _spisokAction3($send, $dialog, $unit_id, $block_id);
 	$send = _spisokAction4($send);
 
 	return $send;
@@ -406,10 +405,12 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 			WHERE `id`=".$unit_id;
 	query($sql);
 }
-function _spisokAction3($send, $dialog, $unit_id) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
+function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
 	if($send['action_id'] != 3)
 		return $send;
 	if($dialog['base_table'] != '_element')
+		return $send;
+	if($block_id < 0)//была вставка доп-значения для элемета
 		return $send;
 
 	$sql = "SELECT *
@@ -565,7 +566,7 @@ function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания спис
 					`font`='".$r['font']."',
 					`color`='".$r['color']."',
 					`txt_6`='".$r['pos']."',
-					`num_2`="._num($r['link']).",
+					`url`="._num($r['url']).",
 					`sort`=".$sort++."
 				WHERE `id`=".$id;
 		query($sql);

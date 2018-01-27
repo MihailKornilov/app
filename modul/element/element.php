@@ -198,7 +198,7 @@ function _search($v=array()) {//элемент ПОИСК
 function _elemQuery($elem_id) {//запрос одного элемента
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `id`=".$elem_id;
+			WHERE `id`=".abs($elem_id);
 	$elem = query_assoc($sql);
 
 	$sql = "SELECT *
