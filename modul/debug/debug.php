@@ -4,7 +4,7 @@ function _debug($i='') {
 		return '';
 
 	if($i == 'style')
-		return '<link rel="stylesheet" type="text/css" href="modul/debug/debug'.MIN.'.css?'.TIME.'" />';
+		return '<link rel="stylesheet" type="text/css" href="modul/debug/debug'.MIN.'.css?'.VERSION.'" />';
 
 	global $sqlQuery, $sqlTime;
 
@@ -19,7 +19,7 @@ function _debug($i='') {
 			'js <em></em>'.
    (LOCAL ? ' :: <a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
 		'</div>'.
-		'<script src="modul/debug/debug.js?'.TIME.'"></script>';
+		'<script src="modul/debug/debug'.MIN.'.js?'.VERSION.'"></script>';
 
 	if(DEBUG) {
 		$get = '';

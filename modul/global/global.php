@@ -24,7 +24,7 @@ define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
 
 define('DEBUG', @$_COOKIE['debug']);
-define('MIN', DEBUG ? '' : '');//.min
+define('MIN', DEBUG ? '' : '.min');
 
 define('CODE', _txt(@$_COOKIE['code']));
 
@@ -107,24 +107,22 @@ function _global_script() {//скрипты и стили
 	'<script src="js/autosize.js?3"></script>'.
 	'<script src="js/jquery.mjs.nestedSortable.js?1"></script>'.
 
-//	(@PAS ?
-		'<script src="js/lodash.min.js"></script>'.
-		'<link rel="stylesheet" href="css/gridstack.css?'.TIME.'" />'.
-		'<script src="js/gridstack.js?'.TIME.'"></script>'.
-		'<script src="js/gridstack.jQueryUI.js"></script>'.
-//	: '').
+	'<script src="js/lodash.min.js"></script>'.
+	'<link rel="stylesheet" href="css/gridstack.css" />'.
+	'<script src="js/gridstack.js?"></script>'.
+	'<script src="js/gridstack.jQueryUI.js"></script>'.
 
-	'<link rel="stylesheet" type="text/css" href="modul/global/global.css?'.TIME.'" />'.
-	'<script src="modul/global/global.js?'.TIME.'"></script>'.
+	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
+	'<script src="modul/global/global'.MIN.'.js?'.VERSION.'"></script>'.
 
-	'<link rel="stylesheet" type="text/css" href="modul/element/element.css?'.TIME.'" />'.
-	'<script src="modul/element/element.js?'.TIME.'"></script>'.
+	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.VERSION.'" />'.
+	'<script src="modul/element/element'.MIN.'.js?'.VERSION.'"></script>'.
 
-	'<script src="modul/page/page.js?'.TIME.'"></script>'.
+	'<script src="modul/page/page'.MIN.'.js?'.VERSION.'"></script>'.
 
-	'<script src="modul/block/block.js?'.TIME.'"></script>'.
+	'<script src="modul/block/block'.MIN.'.js?'.VERSION.'"></script>'.
 
-	'<script src="modul/spisok/spisok.js?'.TIME.'"></script>'.
+	'<script src="modul/spisok/spisok'.MIN.'.js?'.VERSION.'"></script>'.
 
 	_debug('style');
 }
