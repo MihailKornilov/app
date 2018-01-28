@@ -231,7 +231,10 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 		if(!$cmp = @$dialog['cmp'][$cmp_id])
 			jsonError('Отсутствует компонент id'.$cmp_id.' в диалоге');
 		if(!$col = @$cmp['col'])
-			jsonError('Отсутствует имя колонки в компоненте id'.$cmp_id);
+			jsonError(array(
+				'attr_cmp' => $cmp['attr_cmp']._dialogParam($cmp['dialog_id'], 'element_afics'),
+				'text' => utf8('Отсутствует имя колонки в компоненте id'.$cmp_id)
+			));
 		if(!isset($dialog['field'][$col]))
 			jsonError('В таблице <b>'.$dialog['base_table'].'</b> нет колонки с именем "'.$col.'"');
 

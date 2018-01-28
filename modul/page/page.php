@@ -818,7 +818,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$bs_id = _num(@$US['block_id']))
 				return _emptyMin('Отсутствует ID исходного блока.');
 
-			$BL = _blockQuery($bs_id);
+			if(!$BL = _blockQuery($bs_id))
+				return _emptyMin('Исходного блока id'.$bs_id.' не существует.');
 
 			if($BL['obj_name'] != 'dialog')
 				return _emptyMin('Действия можно назначать<br>только компонентам в диалоговых окнах.');
