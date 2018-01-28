@@ -102,15 +102,15 @@ function _global_script() {//скрипты и стили
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
-	'<link rel="stylesheet" type="text/css" href="css/jquery-ui.css?3" />'.
+	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
 	'<script src="js/autosize.js?3"></script>'.
-	'<script src="js/jquery.mjs.nestedSortable.js?1"></script>'.
+	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?1"></script>'.
 
 	'<script src="js/lodash.min.js"></script>'.
-	'<link rel="stylesheet" href="css/gridstack.css" />'.
-	'<script src="js/gridstack.js?"></script>'.
-	'<script src="js/gridstack.jQueryUI.js"></script>'.
+	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css" />'.
+	'<script src="js/gridstack'.MIN.'.js?"></script>'.
+	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
 	'<script src="modul/global/global'.MIN.'.js?'.VERSION.'"></script>'.

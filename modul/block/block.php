@@ -388,10 +388,16 @@ function _blockCache($obj_name, $obj_id) {
 			  AND `sa` IN (0,".SA.")
 			ORDER BY `parent_id`,`y`,`x`";
 	if(!$arr = query_arr($sql))
-		return array();
+		return _cache(array(
+			'block' => array(),
+			'elem' => array()
+		), $cacheKey);
 
 	if(!$arr = _blockChildClear($arr))
-		return array();
+		return _cache(array(
+			'block' => array(),
+			'elem' => array()
+		), $cacheKey);
 
 	$block = array();
 	foreach($arr as $bl) {
@@ -495,7 +501,7 @@ function _blockCache($obj_name, $obj_id) {
 }
 function _block($obj_name, $obj_id, $i='all') {
 	$mass = _blockCache($obj_name, $obj_id);
-
+//print_r(debug_backtrace(0));
 	$BLK = $mass['block'];
 	$ELM = $mass['elem'];
 

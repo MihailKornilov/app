@@ -410,8 +410,6 @@ function _dialogOpenLoad($dialog_id) {
 			$block_id = _num($unit['block_id']);
 	}
 
-	$page_id = _num($_POST['page_id']);
-
 	$act = $unit_id ? 'edit' : 'insert';
 	if(_num(@$_POST['del']))
 		$act = 'del';

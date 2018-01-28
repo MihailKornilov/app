@@ -659,6 +659,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$block = _num(@$US['block_id']) ? ',block_id:'.$US['block_id'] : '';
 			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
 			$dialog_source = $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
+
+			//если новая кнопка, будет создаваться новый диалог для неё
+			if(!$el['num_4'])
+				$block = ',block_id:'.$el['block_id'];
+
 			return _button(array(
 						'attr_id' => $attr_id,
 						'name' => _br($el['txt_1']),
