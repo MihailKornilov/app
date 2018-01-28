@@ -750,8 +750,18 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					return $txt;
 				//произвольный текст
 				case 10: return $elem['txt_1'];
+				case 29:
+					if(!$connect_id = $unit[$elem['col']])
+						return '';
+					$dialog = _dialogQuery($unit['dialog_id']);
+					$sql = "SELECT *
+							FROM `".$dialog['base_table']."`
+							WHERE `id`=".$connect_id;
+					$sp = query_assoc($sql);
+					$txt = $sp['txt_1'];
+					$txt = _spisokUnitUrl($txt, $sp, $el['url']);
+					return $txt;
 			}
-
 			return 'значение не доделано';
 
 		//SA: Функция PHP

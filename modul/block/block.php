@@ -65,6 +65,8 @@ function _blockObj($name, $i='name') {//доступные варианты объектов для блоков
 function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) {//вывод на экран всей структуры блоков
 	if(!$blk = _block($obj_name, $obj_id, 'block_arr'))
 		return _blockObj($obj_name, 'empty');
+	if(!is_array($unit))
+		return $unit;
 
 	$elm = _block($obj_name, $obj_id, 'elem_arr');
 

@@ -353,7 +353,7 @@ switch(@$_POST['op']) {
 
 		define('BLOCK_EDIT', 1);
 		$send['block'] = $block;
-		$send['html'] = utf8(_blockHtml($block['obj_name'], $block['obj_id'], $width, $id));
+		$send['html'] = utf8(_blockHtml($block['obj_name'], $block['obj_id'], $width, $id, _pageSpisokUnit($block['obj_id'], $block['obj_name'])));
 
 		jsonSuccess($send);
 		break;
