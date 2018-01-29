@@ -547,6 +547,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
                 num_1 - id диалога, через который внос€тс€ данные выбираемого списка
                 txt_1 - текст, когда единица не выбрана
+                txt_2 - два id элемента, составл€ющие содержание Select
 				num_2 - возможность добавлени€ новых значений
 				num_3 - поиск значений вручную
 			*/
@@ -556,6 +557,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'width' => $el['width'],
 						'value' => _num($v)
 				   ));
+
+		//¬ыбор значений дл€ содержани€ Select
+		case 31:
+			/*
+				num_1 - id элемента, размещающее Select, дл€ которого выбираютс€ значени€
+			*/
+			return
+//				_pr($el).
+				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+				'<input type="text" class="sv w125 curP over1" placeholder="основное" val="0" readonly'.$disabled.' value="" />'.
+				'<input type="text" class="sv w150 curP over1 ml5" placeholder="дополнительное" val="1" readonly'.$disabled.' value="" />';
 
 		//Count - количество
 		case 35:
@@ -1001,8 +1013,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							return _emptyMin('—траница не принимает значени€ единицы списка');
 					}
 					if($BLS['obj_name'] == 'dialog') {
+						if($US['dialog_source']) {
+							$dialog_id = $US['dialog_source'];
+							break;
+						}
 						return _emptyMin('¬ставка значени€ в блок диалога пока не доделана.');
 					}
+					break;
+				case 31://выбор значени€ дл€ ¬ыпадающего пол€
+					if($BLS['obj_name'] != 'dialog')
+						return _emptyMin('¬ыбор значени€ только дл€ диалогов');
+					$dialog_id = $BLS['obj_id'];
 					break;
 				case 36://показ-скрытие блоков дл€ галочки
 				case 40://показ-скрытие блоков дл€ выпадающего пол€
@@ -1089,9 +1110,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			//все действи€ через JS
 			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
-
-		//--- —¬ќЅќƒЌќ ---
-		case 31: return '31';
 
 		//«начение списка: пор€дковый номер
 		case 32: return _spisokUnitNum($unit);

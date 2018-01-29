@@ -414,17 +414,16 @@ function _dialogOpenLoad($dialog_id) {
 	if(_num(@$_POST['del']))
 		$act = 'del';
 
+	$send['page_id'] = _num(@$_POST['page_id']);;
 	$send['dialog_id'] = $dialog_id;
 	$send['block_id'] = $block_id;
 	$send['unit_id'] = $unit_id;
 	$send['dialog_source'] = _num(@$_POST['dialog_source']);
-	$send['act'] = $act;
 
 	//исходные данные, полученные для открытия диалога
-	$unit['source'] = array(
-		'block_id' => $block_id//для какого блока был запрос
-	);
+	$unit['source'] = $send;
 
+	$send['act'] = $act;
 	$send['edit_access'] = SA || $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 	$send['head'] = utf8($dialog[$act.'_head']);

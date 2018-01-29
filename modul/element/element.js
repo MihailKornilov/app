@@ -939,11 +939,15 @@ var VK_SCROLL = 0,
 					return;
 				//select - выбор списка (все списки приложения)
 				case 24:
+					_elemFunc(el, _num(unit[el.col] || el.def), is_edit, 1);
 					$(el.attr_cmp)._select({
 						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.vvv
+						spisok:el.vvv,
+						func:function(v) {
+							_elemFunc(el, v, is_edit);
+						}
 					});
 					return;
 				//настройка шаблона единицы списка
@@ -1041,6 +1045,35 @@ var VK_SCROLL = 0,
 					if(is_edit)
 						return;
 					_dialogSpisokTable(el, unit);
+					return;
+				//Выбор значений для содержания Select
+				case 31:
+					if(is_edit)
+						return;
+					var sv = $(el.attr_el).find('.sv'),
+						ex = $(el.attr_cmp).val().split(','),
+						v = [_num(ex[0]),_num(ex[1])];
+					$(el.attr_cmp).val(v.join(','));
+					sv.click(function() {
+						var t = $(this),
+							n = _num(t.attr('val')),
+							attr_cmp = ELM[el.num_1].attr_cmp;
+						_elemChoose({
+							dialog_id:11,
+							block_id:el.block_id,
+							dialog_source:$(attr_cmp).val(),
+							unit_id:v[n],
+							busy_obj:t,
+							busy_cls:'hold',
+							func_open:function(res) {
+								res.block_id = el.id * -1;
+							},
+							func_save:function(ia) {
+								v[n] = ia.unit.id;
+								$(el.attr_cmp).val(v.join(','));
+							}
+						});
+					});
 					return;
 				//count - количество
 				case 35:
@@ -1267,6 +1300,7 @@ var VK_SCROLL = 0,
 		v = $.extend({
 			type:'all',
 			dialog_id:0,//диалог, который вносит элемент
+			dialog_source:0,//исходный диалог, либо настраиваемый
 			block_id:0, //блок (или отрицательный id элемента - группировка), в который вставляется элемент
 			unit_id:0,  //id единицы списка (элемент или функция)
 
@@ -1327,6 +1361,7 @@ var VK_SCROLL = 0,
 				op:'dialog_open_load',
 				page_id:PAGE_ID,
 				dialog_id:v.dialog_id,
+				dialog_source:v.dialog_source,
 				block_id:v.block_id,
 				unit_id:v.unit_id,
 				busy_obj:v.busy_obj,
@@ -1355,8 +1390,11 @@ var VK_SCROLL = 0,
 				'<button val="24" class="vk ml5" data-hint="Select - списки приложения">24</button>' +
 				'<button val="27" class="vk ml5" data-hint="Select - списки на текущей странице">27</button>' +
 				'<button val="29" class="vk ml5" data-hint="Select - выбор единицы из другого списка (связка)">29</button>' +
+			'<p class="mt10">' +
+				'<button val="31" class="vk orange" data-hint="Значения для содержания Select">31</button>' +
 				'<button val="38" class="vk red ml5" data-hint="Select - выбор диалогового окна">38</button>' +
 				'<button val="41" class="vk red ml5" data-hint="Select - значения из существующего селекта">41</button>' +
+				'<button val="37" class="vk red ml5" data-hint="Select - выбор имени колонки">37</button>' +
 
 			'<div class="hd2 mt20 mb5">Вспомогательные компоненты</div>' +
 				'<button val="19" class="vk orange" data-hint="Содержание для некоторых компонентов">19</button>' +
@@ -1394,12 +1432,8 @@ var VK_SCROLL = 0,
 				'<button val="33" class="vk cancel ml5" data-hint="Значение: Дата">33</button>' +
 				'<button val="34" class="vk cancel ml5" data-hint="Значение: Иконки управления">34</button>' +
 
-	  (SA ? '<div class="hd2 mt20 mb5">Элементы для SA</div>' +
+	        '<div class="hd2 mt20 mb5">Элементы для SA</div>' +
 				'<button val="12" class="vk red" data-hint="PHP-функция">12</button>' +
-				'<button val="37" class="vk red ml5" data-hint="Select - выбор имени колонки">37</button>' +
-				'<button val="31" class="vk ml5" data-hint="">31 - свободно</button>'
-	  : '') +
-
 		'</div>';
 	},
 	_elemChooseTable = function() {
