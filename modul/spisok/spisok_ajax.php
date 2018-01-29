@@ -191,9 +191,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
 			//наполнение для некоторых компонентов: radio, select, dropdown
-			case 19: _elementCmp19($cmpv[$cmp_id], $unit); break;
+			case 19: _cmpV19($cmpv[$cmp_id], $unit); break;
 			//Настройка ТАБЛИЧНОГО содержания списка
-			case 30: _spisokTableValueSave($cmp, $cmpv[$cmp_id], $unit); break;
+			case 30: _cmpV30($cmp, $cmpv[$cmp_id], $unit); break;
+			case 49: _cmpV49($cmp, $cmpv[$cmp_id], $unit); break;
 		}
 
 	if($dialog['base_table'] == '_page')
@@ -413,7 +414,7 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление зна
 		return $send;
 	if($dialog['base_table'] != '_element')
 		return $send;
-	if($block_id < 0)//была вставка доп-значения для элемета
+	if($block_id <= 0)//была вставка доп-значения для элемета
 		return $send;
 
 	$sql = "SELECT *
@@ -467,7 +468,7 @@ function _spisokAction4($send) {//действие 4 - обновление исходного диалога
 
 	return $send;
 }
-function _elementCmp19($val, $unit) {//наполнение для некоторых компонентов: radio, select, dropdown
+function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, select, dropdown
 	$update = array();
 	$idsNoDel = '0';
 
@@ -539,11 +540,12 @@ function _elementCmp19($val, $unit) {//наполнение для некоторых компонентов: rad
 			WHERE `id`=".$unit['id'];
 	query($sql);
 }
-function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания списка (30)
-	$cmp,//компонент из диалога, отвечающий за настройку таблицы
-	$val,//значения, полученные для сохранения
-	$unit//элемент, размещающий таблицу, для которой происходит настройка
-) {
+function _cmpV30($cmp, $val, $unit) {//сохранение настройки ТАБЛИЧНОГО содержания списка (30)
+	/*
+		$cmp  - компонент из диалога, отвечающий за настройку таблицы
+		$val  - значения, полученные для сохранения
+		$unit -элемент, размещающий таблицу, для которой происходит настройка
+	*/
 	if(empty($cmp['col']))
 		return;
 
@@ -570,6 +572,40 @@ function _spisokTableValueSave(//сохранение настройки ТАБЛИЧНОГО содержания спис
 					`color`='".$r['color']."',
 					`txt_6`='".$r['pos']."',
 					`url`="._num($r['url']).",
+					`sort`=".$sort++."
+				WHERE `id`=".$id;
+		query($sql);
+	}
+}
+function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
+	/*
+		$cmp  - компонент из диалога, отвечающий за настройку таблицы
+		$val  - значения, полученные для сохранения
+		$unit -элемент, размещающий таблицу, для которой происходит настройка
+	*/
+	if(empty($cmp['col']))
+		return;
+
+	//поле, хранящее список id элементов-значений
+	$col = $cmp['col'];
+	$ids = $unit[$col] ? $unit[$col] : 0;
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `viewer_id_add`=".VIEWER_ID."
+			  AND `block_id` IN (0,-".$unit['id'].")
+			  AND `id` NOT IN (".$ids.")";
+	query($sql);
+
+	if(!$ids)
+		return;
+
+	$sort = 0;
+	foreach(_ids($ids, 1) as $id) {
+		$r = $val[$id];
+		$sql = "UPDATE `_element`
+				SET `block_id`=-".$unit['id'].",
+					`num_1`=".$r['num_1'].",
 					`sort`=".$sort++."
 				WHERE `id`=".$id;
 		query($sql);

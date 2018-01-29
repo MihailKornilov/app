@@ -168,7 +168,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
 							break;
 						case 33://дата
-							$txt = _spisokUnitData($sp, $td);
+							$txt = _spisokUnitData($sp['dtime_add'], $td);
 							break;
 						case 34://иконки управления
 							$txt = _iconEdit(array(
@@ -305,15 +305,13 @@ function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
 		return $u['id'];
 	return $u['num'];
 }
-function _spisokUnitData($u, $el) {//дата и время - значение единицы списка [33]
-	if(empty($u))
+function _spisokUnitData($dtime, $el) {//дата и время - значение единицы списка [33]
+	if(empty($dtime))
 		return 'дата и время';
-	if(!isset($u['dtime_add']))
-		return 'дата отсутствует';
-	if(!preg_match(REGEXP_DATE, $u['dtime_add']))
+	if(!preg_match(REGEXP_DATE, $dtime))
 		return 'некорректный формат даты';
 
-	$ex = explode(' ', $u['dtime_add']);
+	$ex = explode(' ', $dtime);
 	$d = explode('-', $ex[0]);
 
 	//время

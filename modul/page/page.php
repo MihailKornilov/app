@@ -1130,7 +1130,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					завтра
 				num_4 - показывать время в формате 12:45
 			*/
-			return _spisokUnitData($unit, $el);
+			return _spisokUnitData($unit['dtime_add'], $el);
 
 		//Иконка вопрос: Выплывающая подсказка
 		case 42:
@@ -1191,6 +1191,42 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					target - id блоков, на которые воздействует галочка
 			*/
 			return 40;
+
+		//Сборный текст
+		case 44:
+			/*
+				txt_1 - ids элементов, наполняющих содержание
+			*/
+
+			if(!$el['txt_1'])
+				return '';
+
+			$txt = '';
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id` IN (".$el['txt_1'].")
+					ORDER BY `sort`";
+			foreach(query_arr($sql) as $r) {
+				switch($r['dialog_id']) {
+					case 10: $txt .= $r['txt_1']; break;
+					case 32: $txt .= _spisokUnitNum($unit); break;
+					case 33: $txt .= _spisokUnitData($unit['dtime_add'], $r); break;
+				}
+				$txt .= $r['num_1'] ? ' ' : ''; //добавление пробела справа, если нужно
+			}
+
+			return $txt;
+
+		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка содержания сборного текста
+		case 49:
+			/*
+				Все действия через JS.
+				cmp_id получает ids используемых элементов в определённом порядке
+			*/
+			if($is_edit)
+				return '<div class="_empty min">Содержание сборного текста</div>';
+
+			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
 	}
 
 	return'неизвестный элемент='.$el['dialog_id'];

@@ -629,6 +629,31 @@ function _dialogOpenLoad($dialog_id) {
 				$dialog['cmp_utf8'][$cmp_id]['txt_1'] = utf8($EL['txt_1']);
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 				break;
+			//Настройка содержания Сборного текста
+			case 49:
+				if(!$unit_id)
+					break;
+				if(!$col = $cmp['col'])
+					break;
+				if(!$ids = $unit[$col])
+					break;
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `id` IN (".$ids.")
+						ORDER BY `sort`";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$spisok = array();
+				foreach($arr as $r) {
+					$spisok[] = array(
+						'id' => _num($r['id']),
+						'dialog_id' => _num($r['dialog_id']),
+						'num_1' => _num($r['num_1'])
+					);
+				}
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				break;
 		}
 
 	$send['blk'] = $dialog['blk'];

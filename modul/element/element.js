@@ -522,14 +522,17 @@ var VK_SCROLL = 0,
 				_forIn(o.cmp, function(sp, id) {
 					switch(sp.dialog_id) {
 						case 19://наполнение для некоторых компонентов
-							send.cmpv[id] = _dialogCmpValue(sp, 1);
+							send.cmpv[id] = _dialogCmpV19(sp, 1);
 							return;
 						case 30://Настройка ТАБЛИЧНОГО содержания списка
-							send.cmpv[id] = _dialogSpisokTable(sp, 'get');
+							send.cmpv[id] = _dialogCmpV30(sp, 'get');
 							break;
 						case 37://SA: Select - выбор имени колонки
 							send.cmp[id] = $(sp.attr_cmp)._select('inp');
 							return;
+						case 49://Настройка содержания Сборного текста
+							send.cmpv[id] = _dialogCmpV49(sp, 'get');
+							break;
 					}
 					send.cmp[id] = $(sp.attr_cmp).val();
 				});
@@ -572,7 +575,7 @@ var VK_SCROLL = 0,
 			});
 		}
 	},
-	_dialogCmpValue = function(o, get) {//наполнение для некоторых компонентов. dialog_id=19
+	_dialogCmpV19 = function(o, get) {//наполнение для некоторых компонентов. dialog_id=19
 		var el = $(o.attr_el);
 
 		//получение данных для сохранения
@@ -654,7 +657,7 @@ var VK_SCROLL = 0,
 			NUM++;
 		}
 	},
-	_dialogSpisokTable = function(o, unit) {//Настройка ТАБЛИЧНОГО содержания списка. dialog_id=30
+	_dialogCmpV30 = function(o, unit) {//Настройка ТАБЛИЧНОГО содержания списка. dialog_id=30
 		if(unit == 'get') {//получение данных для сохранения
 			var send = {};
 			_forN(TABLE30, function(sp) {
@@ -828,6 +831,109 @@ var VK_SCROLL = 0,
 			cmp.val(val);
 		}
 	},
+	_dialogCmpV49 = function(o, unit) {//Настройка содержания Сборного текста
+		var el = $(o.attr_el);
+
+		//получение данных для сохранения
+		if(unit == 'get') {
+			var send = {};
+			_forEq(el.find('dd'), function(sp) {
+				var id = _num(sp.attr('val'));
+				if(!id)
+					return;
+				send[id] = {
+					num_1:sp.find('.spc').val()
+				};
+			});
+			return send;
+		}
+
+		var cmp = $(o.attr_cmp),
+			html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить элемент</div>',
+			DL = el.append(html).find('dl'),
+			BUT_ADD = el.find('div:last'),
+			NUM = 1;
+
+		BUT_ADD.click(valueAdd);
+
+		for(var i in o.vvv)
+			valueAdd(o.vvv[i])
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,       //id элемента
+				dialog_id:0,
+				num_1:1     //пробел справа
+			}, v);
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td><input type="text"' +
+									  ' class="inp w100p curP"' +
+									  ' readonly' +
+									  ' placeholder="элемент не выбран"' +
+									  ' value=""' +
+								' />' +
+							'<td class="w25">' +
+								'<input type="hidden" class="spc" value="' + v.num_1 + '" />' +
+							'<td class="w50 r">' +
+								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить элемент', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				INP = DD.find('.inp');
+			INP.click(function() {
+				_elemChoose({
+					dialog_id:v.dialog_id,
+					unit_id:v.id,           //id выбранного элемента (при редактировании)
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_open:function(res) {
+						res.block_id = _num('-' + unit.id, 1);
+					},
+					func_save:function(ia) {
+						if(!v.id) {
+							DD.attr('val', ia.unit.id);
+							cmpUpdate();
+						}
+						v.id = ia.unit.id;
+						v.dialog_id = ia.unit.dialog_id;
+						INP.val(ia.unit.num_1);
+					}
+				});
+			});
+			DD.find('.spc')._check({tooltip:'Пробел справа'});
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-move-y',
+				stop:cmpUpdate
+			});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+				cmpUpdate();
+				v.id = 0;
+			});
+			NUM++;
+		}
+		function cmpUpdate() {//обновление значения компонента
+			var val = [];
+			_forEq(el.find('dd'), function(sp) {
+				var id = _num(sp.attr('val'));
+				if(!id)
+					return;
+				val.push(id);
+			});
+			cmp.val(val);
+		}
+	},
 
 	_elemActivate = function(elem, unit, is_edit) {//активирование элементов
 		var attr_focus = false;//элемент, на который будет поставлен фокус
@@ -929,7 +1035,7 @@ var VK_SCROLL = 0,
 				case 19:
 					if(is_edit)
 						return;
-					_dialogCmpValue(el);
+					_dialogCmpV19(el);
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Список действий, привязанных к элементу
 				case 22:
@@ -1044,7 +1150,7 @@ var VK_SCROLL = 0,
 				case 30:
 					if(is_edit)
 						return;
-					_dialogSpisokTable(el, unit);
+					_dialogCmpV30(el, unit);
 					return;
 				//Выбор значений для содержания Select
 				case 31:
@@ -1142,6 +1248,12 @@ var VK_SCROLL = 0,
 							show:1
 						});
 					});
+					return;
+				//наполнение для некоторых компонентов
+				case 49:
+					if(is_edit)
+						return;
+					_dialogCmpV49(el, unit);
 					return;
 			}
 		});
@@ -1402,7 +1514,8 @@ var VK_SCROLL = 0,
 				'<button val="25" class="vk orange ml5" data-hint="Настройка содержания списка-шаблона">25</button>' +
 				'<button val="30" class="vk orange ml5" data-hint="Настройка содержания списка-таблицы">30</button>' +
 				'<button val="26" class="vk orange ml5" data-hint="Содержание диалога для выбора значения">26</button>' +
-				'<button val="43" class="vk ml5 pink" data-hint="Прикрепление подсказки к элементу">43</button>' +
+				'<button val="43" class="vk pink ml5" data-hint="Прикрепление подсказки к элементу">43</button>' +
+				'<button val="49" class="vk orange ml5" data-hint="Настройка содержания Сборного текста">49</button>' +
 
 			'<div class="hd2 mt20 mb5">Функции</div>' +
 				'<button val="28" class="vk" data-hint="Действия для галочки">28</button>' +
@@ -1416,6 +1529,7 @@ var VK_SCROLL = 0,
 			'<div class="hd2 mt20 mb5">Элементы для наполнения содержания</div>' +
 				'<button val="3"  class="vk" data-hint="Меню страниц">3</button>' +
 				'<button val="10" class="vk grey ml5" data-hint="Произвольный текст">10</button>' +
+				'<button val="44" class="vk grey ml5" data-hint="Сборный текст">44</button>' +
 				'<button val="2"  class="vk green ml5" data-hint="Кнопка">2</button>' +
 				'<button val="4"  class="vk ml5" data-hint="Заголовок">4</button>' +
 				'<button val="21" class="vk ml5" data-hint="Информация">21</button>' +
