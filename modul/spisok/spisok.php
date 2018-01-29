@@ -305,13 +305,43 @@ function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
 		return $u['id'];
 	return $u['num'];
 }
-function _spisokUnitData($u, $el) {//дата и время - значение единицы списка
+function _spisokUnitData($u, $el) {//дата и время - значение единицы списка [33]
 	if(empty($u))
 		return 'дата и время';
+	if(!isset($u['dtime_add']))
+		return 'дата отсутствует';
+	if(!preg_match(REGEXP_DATE, $u['dtime_add']))
+		return 'некорректный формат даты';
 
-	$cut = $el['num_1'] == 36;
+	$ex = explode(' ', $u['dtime_add']);
+	$d = explode('-', $ex[0]);
 
-	return 'data';
+	//время
+	$hh = '';
+	if($el['num_4'] && !empty($ex[1])) {
+		$h = explode(':', $ex[1]);
+		$hh .= ' '.$h[0].':'.$h[1];
+	}
+
+	if($el['num_1'] == 31)
+		return $d[2].'/'.$d[1].'/'.$d[0].$hh;
+
+	$hh = $hh ? ' в'.$hh : '';
+
+	if($el['num_3']) {
+		$dCount = floor((strtotime($ex[0]) - TODAY_UNIXTIME) / 3600 / 24);
+		switch($dCount) {
+			case -1: return 'вчера'.$hh;
+			case 0: return 'сегодня'.$hh;
+			case 1: return 'завтра'.$hh;
+		}
+	}
+
+	return
+		_num($d[2]).                                                     //день
+		' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //месяц
+		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
+		$hh;                                                             //время
 }
 
 function _spisokUnitUrl($txt, $sp, $is_url) {//обёртка значения колонки в ссылку
@@ -449,10 +479,37 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 	if(!$dialog = _dialogQuery($cmp['num_1']))
 		return array();
 
+	//получение имён колонок для отображения содержания Select
+	$ex = explode(',', $cmp['txt_2']);
+	$col0 = _num($ex[0]);
+	$col1 = _num(@$ex[1]);
+	if($cmp['txt_2']) {
+		$sql = "SELECT `id`,`num_1`
+				FROM `_element`
+				WHERE `id` IN ("._ids($cmp['txt_2']).")";
+		if($ass = query_ass($sql)) {
+			$sql = "SELECT `id`,`col`
+					FROM `_element`
+					WHERE `id` IN (".implode(',', $ass).")";
+			if($cols = query_ass($sql)) {
+				$col0 = $cols[$ass[$col0]];
+				$col1 = @$cols[$ass[$col1]];
+			}
+		}
+	}
+	//проверка наличия колонок в таблице
+	$col0 = isset($dialog['field'][$col0]) ? $col0 : '';
+	$col1 = isset($dialog['field'][$col1]) ? $col1 : '';
 
 	$cond = "`dialog_id`=".$cmp['num_1'];
-	if($v)
-		$cond .= " AND (`txt_1` LIKE '%".$v."%' OR `txt_2` LIKE '%".$v."%')";
+	if($v) {
+		$cols = array();
+		if($col0)
+			$cols[] = "`".$col0."` LIKE '%".$v."%'";
+		if($col1)
+			$cols[] = "`".$col1."` LIKE '%".$v."%'";
+		$cond .= $cols ? " AND (".implode(' OR ', $cols).")" : " AND !`id`";
+	}
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE ".$cond."
@@ -475,12 +532,11 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 	foreach($arr as $r) {
 		$u = array(
 			'id' => _num($r['id']),
-			'title' => utf8($r['txt_1']),
-			'content' => utf8($r['txt_1'])
+			'title' => utf8($col0 ? $r[$col0] : 'значение не настроено'),
+			'content' => utf8($col0 ? $r[$col0] : '<div class="red">значение не настроено</div>')
 		);
-		if($r['txt_2'])
-			$u['content'] = utf8($r['txt_1'].'<div class="fs11 grey">'.$r['txt_2'].'</div>');
-
+		if($col1 && $r[$col1])
+			$u['content'] = utf8($r[$col0].'<div class="fs11 grey">'.$r[$col1].'</div>');
 		if($v)
 			$u['content'] = preg_replace(_regFilter(utf8($v)), '<em class="fndd">\\1</em>', $u['content'], 1);
 

@@ -22,6 +22,9 @@ require_once GLOBAL_DIR.'/modul/spisok/spisok.php';
 
 define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
+define('YEAR_CUR', strftime('%Y'));
+
+
 
 define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '.min');
@@ -379,7 +382,7 @@ function _ids($ids, $return_arr=0) {//проверка корректности списка id, составлен
 	$arr = array();
 	foreach(explode(',', $ids) as $i => $id) {
 		if(!preg_match(REGEXP_NUMERIC, $id))
-			return false;
+			return 0;
 		$arr[$i] = _num($id);
 	}
 	return $return_arr ? $arr : implode(',', $arr);

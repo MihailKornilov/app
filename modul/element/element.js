@@ -1070,6 +1070,7 @@ var VK_SCROLL = 0,
 							},
 							func_save:function(ia) {
 								v[n] = ia.unit.id;
+								t.val('выбрано');
 								$(el.attr_cmp).val(v.join(','));
 							}
 						});

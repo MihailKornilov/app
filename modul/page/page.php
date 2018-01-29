@@ -563,11 +563,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			/*
 				num_1 - id элемента, размещающее Select, для которого выбираются значения
 			*/
+			$ex = explode(',', $v);
+			$v0 = _num(@$ex[0]) ? 'выбрано' : '';
+			$v1 = _num(@$ex[1]) ? 'выбрано' : '';
 			return
-//				_pr($el).
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				'<input type="text" class="sv w125 curP over1" placeholder="основное" val="0" readonly'.$disabled.' value="" />'.
-				'<input type="text" class="sv w150 curP over1 ml5" placeholder="дополнительное" val="1" readonly'.$disabled.' value="" />';
+				'<input type="text" class="sv w125 curP over1 color-pay" placeholder="основное" val="0" readonly'.$disabled.' value="'.$v0.'" />'.
+				'<input type="text" class="sv w150 curP over1 color-pay ml5" placeholder="дополнительное" val="1" readonly'.$disabled.' value="'.$v1.'" />';
 
 		//Count - количество
 		case 35:
@@ -1118,16 +1120,15 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 33:
 			/*
 				num_1 - формат:
-					35: 5 августа 2017
-					36: 5 авг 2017
-					37: 05/08/2017
+					29: 5 августа 2017
+					30: 5 авг 2017
+					31: 05/08/2017
 				num_2 - не показывать текущий год
 				num_3 - имена у ближайших дней:
-					позавчера
 					вчера
 					сегодня
 					завтра
-					послезавтра
+				num_4 - показывать время в формате 12:45
 			*/
 			return _spisokUnitData($unit, $el);
 
