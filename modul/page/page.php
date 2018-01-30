@@ -49,6 +49,8 @@ function _page($i='all', $i1=0) {//получение данных страницы
 		if($page_id = _num(@$_GET['p'])) {
 			if(!isset($page[$page_id]))
 				return 0;
+			if($page[$page_id]['common_id'])
+				return $page[$page_id]['common_id'];
 			return $page_id;
 		}
 		$i = 'def';
@@ -436,7 +438,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 txt_1 - текст, когда страница не выбрана
 				функция _page('for_select', 'js')
 			*/
-			return '<input type="hidden" id="'.$attr_id.'" value="'._num($v).'" />';
+			return _select(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _num($v)
+				   ));
 
 		//input:text (однострочное текстовое поле)
 		case 8:
@@ -1251,7 +1258,7 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 	foreach($menu as $r) {
 		$sel = _page('is_cur_parent', $r['id']) ? ' sel' : '';
 		$razdel .=
-			'<a class="link'.$sel.'" href="'.URL.'&p='.$r['id'].'">'.
+			'<a class="link'.$sel.'" href="'.URL.'&p='.($r['common_id'] ? $r['common_id'] : $r['id']).'">'.
 				$r['name'].
 			'</a>';
 	}

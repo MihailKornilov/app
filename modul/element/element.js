@@ -982,22 +982,28 @@ var VK_SCROLL = 0,
 
 			switch(el.dialog_id) {
 				case 1://галочка
-					_elemFunc(el, _num(unit[el.col] || 0), is_edit, 1);
-					$(el.attr_cmp)._check({
-						func:function(v) {
-							_elemFunc(el, v, is_edit);
-						}
-					});
+					if(el.func.length) {
+						_elemFunc(el, _num(unit[el.col] || 0), is_edit, 1);
+						$(el.attr_cmp)._check({
+							func:function(v) {
+								_elemFunc(el, v, is_edit);
+							}
+						});
+					}
 					return;
 				//textarea
 				case 5:	$(el.attr_cmp).autosize(); return;
 				//select - выбор страницы
 				case 6:
+					_elemFunc(el, _num(unit[el.col]), is_edit, 1);
 					$(el.attr_cmp)._select({
 						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
-						spisok:PAGE_LIST
+						spisok:PAGE_LIST,
+						func:function(v) {
+							_elemFunc(el, v, is_edit);
+						}
 					});
 					return;
 				//search
@@ -1557,6 +1563,7 @@ var VK_SCROLL = 0,
 			'<button val="32" class="vk cancel mt5">Значение: Порядковый номер</button>' +
 			'<button val="33" class="vk cancel mt5">Значение: Дата</button>' +
 			'<button val="34" class="vk cancel mt5">Значение: Иконки управления</button>' +
+//			'<button val="44" class="vk grey ml5">Сборный текст</button>' +
 		'';
 	},
 

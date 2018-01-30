@@ -20,7 +20,7 @@ switch(@$_POST['op']) {
 
 		$send['action_id'] = _num($dialog['del_action_id']);
 		$send['action_page_id'] = _num($dialog['del_action_page_id']);
-		$send = _spisokAction3($send, $dialog, $unit_id);
+		$send = _spisokAction3($send, $dialog, $unit_id, 1);
 
 		if(isset($dialog['field']['deleted'])) {
 			$sql = "UPDATE `".$dialog['base_table']."`
@@ -417,25 +417,17 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление зна
 	if($block_id <= 0)//была вставка доп-значения для элемета
 		return $send;
 
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id`=".$unit_id;
-	$elem = query_assoc($sql);
+	$elem = _elemQuery($unit_id);
 
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `id`=".$elem['block_id'];
-	$block = query_assoc($sql);
+	$send['block_obj_name'] = $elem['block']['obj_name'];
 
-	$send['block_obj_name'] = $block['obj_name'];
-
-	switch($block['obj_name']) {
+	switch($elem['block']['obj_name']) {
 		default:
 		case 'page': $width = 1000; break;
 		case 'spisok':
 			$sql = "SELECT *
 					FROM `_block`
-					WHERE `id`=".$block['obj_id'];
+					WHERE `id`=".$elem['block']['obj_id'];
 			$bl = query_assoc($sql);
 
 			$sql = "SELECT *
@@ -448,12 +440,12 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление зна
 			$width = floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
 			break;
 		case 'dialog':
-			_cache('clear', '_dialogQuery'.$block['obj_id']);
-			$dlg = _dialogQuery($block['obj_id']);
+			_cache('clear', '_dialogQuery'.$elem['block']['obj_id']);
+			$dlg = _dialogQuery($elem['block']['obj_id']);
 			$width = $dlg['width'];
 			break;
 	}
-	$send['level'] = utf8(_blockLevelChange($block['obj_name'], $block['obj_id'], $width));
+	$send['level'] = utf8(_blockLevelChange($elem['block']['obj_name'], $elem['block']['obj_id'], $width));
 
 	return $send;
 }
