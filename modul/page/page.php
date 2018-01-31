@@ -799,7 +799,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return 'пустое значение фукнции';
 			if(!function_exists($el['txt_1']))
 				return 'фукнции не существует';
-			return $el['txt_1']();
+			return $el['txt_1']($unit);
 
 		//Содержание единицы списка - шаблон
 		case 14:

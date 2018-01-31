@@ -195,37 +195,6 @@ function _search($v=array()) {//элемент ПОИСК
 	'</div>';
 }
 
-function _elemQuery($elem_id) {//запрос одного элемента
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id`=".abs($elem_id);
-	$elem = query_assoc($sql);
-
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `id`=".$elem['block_id'];
-	$elem['block'] = query_assoc($sql);
-
-	return $elem;
-}
-function _blockQuery($block_id) {//запрос одного блока
-	if(empty($block_id))
-		return array();
-
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `id`=".$block_id;
-	if(!$block = query_assoc($sql))
-		return array();
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `block_id`=".$block_id;
-	$block['elem'] = query_assoc($sql);
-
-	return $block;
-}
-
 function _emptyMin($msg) {
 	return '<div class="_empty min mar10">'.$msg.'</div>';
 }
@@ -446,5 +415,64 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 	}
 
 	return $spisok;
+}
+
+function _elemQuery($elem_id) {//запрос одного элемента
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id`=".abs($elem_id);
+	$elem = query_assoc($sql);
+
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `id`=".$elem['block_id'];
+	$elem['block'] = query_assoc($sql);
+
+	return $elem;
+}
+function _blockQuery($block_id) {//запрос одного блока
+	if(empty($block_id))
+		return array();
+
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `id`=".$block_id;
+	if(!$block = query_assoc($sql))
+		return array();
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `block_id`=".$block_id;
+	$block['elem'] = query_assoc($sql);
+
+	return $block;
+}
+
+function _elementChoose($unit) {
+	if(empty($unit['source']))
+		return _emptyMin('Функция _elementChoose');
+	if(!$block_id = _num($unit['source']['block_id']))
+		return _emptyMin('Отсутствует id исходного блока.');
+	if(!$BL = _blockQuery($block_id))
+		return _emptyMin('Исходного блока id'.$block_id.' не существует.');
+
+	$spisok = '';
+	$sql = "SELECT *
+			FROM `_dialog_group`
+			ORDER BY `sort`";
+	foreach(query_arr($sql) as $r) {
+		$spisok .=
+			'<table class="w100p bs5 h50 mb5 curP over1">'.
+				'<tr>'.
+	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
+					'<td class="fs14 '.($r['sa'] ? 'red' : 'blue').'">'.$r['name'].
+			'</table>';
+	}
+
+	return
+		'<table>'.
+			'<tr><td class="w150">'.$spisok.
+				'<td>'.
+		'</table>';
 }
 

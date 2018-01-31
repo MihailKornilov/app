@@ -1555,6 +1555,7 @@ var VK_SCROLL = 0,
 
 	        '<div class="hd2 mt20 mb5">Элементы для SA</div>' +
 				'<button val="12" class="vk red" data-hint="PHP-функция">12</button>' +
+				'<button val="50" class="vk cancel" data-hint="Выбор диалога">50</button>' +
 		'</div>';
 	},
 	_elemChooseTable = function() {
@@ -1563,6 +1564,7 @@ var VK_SCROLL = 0,
 			'<button val="32" class="vk cancel mt5">Значение: Порядковый номер</button>' +
 			'<button val="33" class="vk cancel mt5">Значение: Дата</button>' +
 			'<button val="34" class="vk cancel mt5">Значение: Иконки управления</button>' +
+			'<button val="50" class="vk cancel" data-hint="Выбор диалога">50</button>' +
 //			'<button val="44" class="vk grey ml5">Сборный текст</button>' +
 		'';
 	},

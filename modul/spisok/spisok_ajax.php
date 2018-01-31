@@ -270,13 +270,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 			jsonError('¬ блоке уже есть элемент');
 	}
 
-	$sql = "INSERT INTO `".$dialog['base_table']."` (
-				`dialog_id`,
-				`viewer_id_add`
-			) VALUES (
-				".$dialog['id'].",
-				".VIEWER_ID."
-			)";
+	$sql = "INSERT INTO `".$dialog['base_table']."` (`id`) VALUES (0)";
 	query($sql);
 
 	$unit_id = query_insert_id($dialog['base_table']);
@@ -288,6 +282,13 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 		if($r['Field'] == 'app_id') {
 			$sql = "UPDATE `".$dialog['base_table']."`
 					SET `app_id`=".APP_ID."
+					WHERE `id`=".$unit_id;
+			query($sql);
+			continue;
+		}
+		if($r['Field'] == 'dialog_id') {
+			$sql = "UPDATE `".$dialog['base_table']."`
+					SET `dialog_id`=".$dialog['id']."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;
@@ -330,6 +331,14 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 					SET `sort`="._maxSql($dialog['base_table'])."
 					WHERE `id`=".$unit_id;
 			query($sql);
+			continue;
+		}
+		if($r['Field'] == 'viewer_id_add') {
+			$sql = "UPDATE `".$dialog['base_table']."`
+					SET `viewer_id_add`=".VIEWER_ID."
+					WHERE `id`=".$unit_id;
+			query($sql);
+			continue;
 		}
 	}
 

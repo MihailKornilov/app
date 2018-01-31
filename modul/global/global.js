@@ -240,39 +240,6 @@ var FB,
 		});
 		return send;
 	},
-	_dialogDel = function(o) {//вывод диалога удаления
-		o = $.extend({
-			id:0,               //id, который нужно удалить
-			head:'записи',      //заголовок диалога
-			info:'',            //дополнительная информация об удалении
-			op:'_del',          //переменная switch, по которой будет производиться удаление
-			func:function() {}  //функция, выполняемая после успешного удаления
-		}, o);
-		var html = (o.info ? '<div class="_info">'+ o.info + '</div>' : '') +
-				'<center class="red">Подтвердите удаление<br /><b>' + o.head + '</b>.</center>',
-			dialog = _dialog({
-				head:'Удаление ' + o.head,
-				padding:30,
-				content:html,
-				butSubmit:'Удалить',
-				submit:submit
-			});
-		function submit() {
-			var send = {
-				op:o.op,
-				id:o.id
-			};
-			dialog.process();
-			$.post(AJAX, send, function(res) {
-				if(res.success) {
-					dialog.close();
-					_msg('Удалено');
-					o.func(res);
-				} else
-					dialog.abort(res.text);
-			}, 'json');
-		}
-	},
 	_tooltip = function(msg, left, ugolSide) {
 		return ' _tooltip">' +
 		'<div class="ttdiv"' + (left ? ' style="left:' + left + 'px"' : '') + '>' +
@@ -499,7 +466,6 @@ $(document)
 		}
 	})
 	.ajaxError(function(event, request) {
-//		_busy(0);
 		if(!request.responseText)
 			return;
 		var d = _dialog({

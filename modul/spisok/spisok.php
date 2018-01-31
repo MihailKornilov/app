@@ -115,7 +115,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	$sql = "SELECT *
 			FROM `".$spTable."`
 			WHERE "._spisokCond($ELEM)."
-			ORDER BY `dtime_add` DESC
+			ORDER BY `id` DESC
 			LIMIT ".($limit * $next).",".$limit;
 	if(!$spisok = query_arr($sql))
 		return '<div class="_empty">'._br($ELEM['txt_1']).'</div>';
@@ -200,7 +200,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 								break;
 							}
 
-							$txt = $sp[$col];
+							$txt = _br($sp[$col]);
 							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
 						break;
