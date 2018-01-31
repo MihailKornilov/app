@@ -385,6 +385,11 @@ var VK_SCROLL = 0,
 			write:1,
 			spisok:o.tables
 		});
+		$('#element_group_id')._select({
+			title0:'нет',
+			width:230,
+			spisok:o.group
+		});
 		$('#element_width')._count({width:60,step:10});
 		$('#element_width_min')._count({width:60,step:10});
 		$('#element_dialog_func')._select({
@@ -450,6 +455,7 @@ var VK_SCROLL = 0,
 				app_any:$('#app_any').val(),
 				sa:$('#sa').val(),
 
+				element_group_id:$('#element_group_id').val(),
 				element_name:$('#element_name').val(),
 				element_width:$('#element_width').val(),
 				element_width_min:$('#element_width_min').val(),
@@ -1415,6 +1421,18 @@ var VK_SCROLL = 0,
 		return arr;
 	},
 
+	_elementChooseAct = function() {
+		$('.el-group-head').click(function() {
+			var t = $(this),
+				id = t.attr('val');
+			$('.el-group-head').removeClass('sel');
+			t.addClass('sel');
+
+			$('#elem-group .cnt')._dn(0);
+			$('#cnt_' + id)._dn(1);
+		});
+	},
+
 	_elemChoose = function(v) {//ВЫБОР элемента для вставки
 		v = $.extend({
 			type:'all',
@@ -1514,7 +1532,7 @@ var VK_SCROLL = 0,
 				'<button val="38" class="vk red ml5" data-hint="Select - выбор диалогового окна">38</button>' +
 				'<button val="41" class="vk red ml5" data-hint="Select - значения из существующего селекта">41</button>' +
 				'<button val="37" class="vk red ml5" data-hint="Select - выбор имени колонки">37</button>' +
-
+/*
 			'<div class="hd2 mt20 mb5">Вспомогательные компоненты</div>' +
 				'<button val="19" class="vk orange" data-hint="Содержание для некоторых компонентов">19</button>' +
 				'<button val="25" class="vk orange ml5" data-hint="Настройка содержания списка-шаблона">25</button>' +
@@ -1522,7 +1540,7 @@ var VK_SCROLL = 0,
 				'<button val="26" class="vk orange ml5" data-hint="Содержание диалога для выбора значения">26</button>' +
 				'<button val="43" class="vk pink ml5" data-hint="Прикрепление подсказки к элементу">43</button>' +
 				'<button val="49" class="vk orange ml5" data-hint="Настройка содержания Сборного текста">49</button>' +
-
+*/
 			'<div class="hd2 mt20 mb5">Функции</div>' +
 				'<button val="28" class="vk" data-hint="Действия для галочки">28</button>' +
 				'<button val="36" class="vk cancel ml5" data-hint="Действие для галочки: скрытие-показ блоков">36</button>' +
@@ -1531,7 +1549,7 @@ var VK_SCROLL = 0,
 				'<button val="40" class="vk cancel ml5" data-hint="Действие для выпадающего поля: скрытие-показ блоков">40</button>' +
 			'<p class="mt5">' +
 				'<button val="22" class="vk orange" data-hint="Список действий у элементов">22</button>' +
-
+/*
 			'<div class="hd2 mt20 mb5">Элементы для наполнения содержания</div>' +
 				'<button val="3"  class="vk" data-hint="Меню страниц">3</button>' +
 				'<button val="10" class="vk grey ml5" data-hint="Произвольный текст">10</button>' +
@@ -1541,7 +1559,7 @@ var VK_SCROLL = 0,
 				'<button val="21" class="vk ml5" data-hint="Информация">21</button>' +
 				'<button val="9"  class="vk ml5" data-hint="Ссылка на страницу">9</button>' +
 				'<button val="42" class="vk ml5" data-hint="Иконка с вопросом: Выплывающая подсказка">42</button>' +
-
+*/
 			'<div class="hd2 mt20 mb5">Элементы для списков</div>' +
 				'<button val="7" class="vk">7 - search</button>' +
 				'<button val="15" class="vk ml5" data-hint="Количество строк">15</button>' +

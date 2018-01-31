@@ -371,8 +371,8 @@ function _txt($v, $utf8=0) {
 	$v = htmlspecialchars(trim($v));
 	return $utf8 ? $v : win1251($v);
 }
-function _br($v) {//вставка br в текст при нахождении enter
-	return str_replace("\n", '<br />', $v);
+function _br($v, $replace='<br />') {//вставка br в текст при нахождении enter
+	return str_replace("\n", $replace, $v);
 }
 function _daNet($v) {//$v: 1 -> да, 0 -> нет
 	return $v ? 'да' : 'нет';

@@ -456,23 +456,44 @@ function _elementChoose($unit) {
 	if(!$BL = _blockQuery($block_id))
 		return _emptyMin('Исходного блока id'.$block_id.' не существует.');
 
-	$spisok = '';
+	$head = '';
+	$content = '';
 	$sql = "SELECT *
 			FROM `_dialog_group`
 			ORDER BY `sort`";
-	foreach(query_arr($sql) as $r) {
-		$spisok .=
-			'<table class="w100p bs5 h50 mb5 curP over1">'.
+	$group = query_arr($sql);
+
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `element_group_id`
+			ORDER BY `id`";
+	$elem = query_arr($sql);
+
+	$c = count($group);
+	foreach($group as $id => $r) {
+		$sel = _dn($id != 1, 'sel');
+		$first = _dn($id != 1, 'first');
+		$last = _dn(--$c, 'last');
+		$head .=
+			'<table class="el-group-head w100p bs5 curP over1'.$sel.$first.$last.'" val="'.$id.'">'.
 				'<tr>'.
 	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
 					'<td class="fs14 '.($r['sa'] ? 'red' : 'blue').'">'.$r['name'].
 			'</table>';
+
+		$content .= '<div id="cnt_'.$id.'" class="cnt'._dn($id == 1).'">'.
+						'<b>'.$r['name'].'</b>';
+		foreach($elem as $el)
+			if($el['element_group_id'] == $id)
+				$content .= '<div class="curP over3 pad5">'.$el['element_name'].'</div>';
+		$content .=	'</div>';
 	}
 
 	return
-		'<table>'.
-			'<tr><td class="w150">'.$spisok.
-				'<td>'.
-		'</table>';
+		'<table id="elem-group" class="w100p">'.
+			'<tr><td class="w150">'.$head.
+				'<td id="elem-group-content" class="top bg-gr2 pad10">'.$content.
+		'</table>'.
+		'<script>_elementChooseAct()</script>';
 }
 

@@ -137,6 +137,29 @@
 
 
 
+/* Меню групп элементов */
+.el-group-head{height:60px}
+.el-group-head:not(.sel){border-right:#CEDDE8 solid 1px}
+.el-group-head:not(.first){border-top:#fff solid 1px}
+.el-group-head:not(.last){border-bottom:#fff solid 1px}
+.el-group-head:not(.sel) *{opacity:.85}
+.el-group-head.sel:not(.first){border-top:#C6D7E4 solid 1px}
+.el-group-head.sel:not(.last){border-bottom:#C6D7E4 solid 1px}
+.el-group-head.sel{
+	background-color:#EBF3F9;
+}
+#elem-group-content{
+	background-color:#EBF3F9;
+}
+
+
+
+
+
+
+
+
+
 
 
 /* ---=== ДИАЛОГОВОЕ ОКНО ===--- */
@@ -179,40 +202,6 @@
 	opacity:.5;
 }
 #dialog-w-change:hover{opacity:1}
-/* компоненты диалога при редактировании */
-#dialog-base .cmp-set{
-	position:absolute;
-	top:0;
-	right:0;
-	z-index:91;
-	display:inline-block;
-	padding:1px 1px 2px 2px;
-	background-color:#fff;
-	border:#eee solid 1px;
-	border-radius:2px;
-}
-#dialog-base dd:not(:hover) .cmp-set{display:none}
-#dialog-base .cmp-set:not(:hover){opacity:.6}
-
-.element{
-	background:url(../../img/element.png?5) no-repeat 200px -10px;
-	font-size:17px;
-	font-weight:bold;
-	height:30px;
-	padding:20px;
-	cursor:pointer;
-	color:#555;
-}
-.element-select{background-position:200px -110px;}
-.element-input{background-position:200px -225px;}
-.element-textaera{background-position:200px -355px;height:50px}
-.element-radio{background-position:200px -500px;}
-.element-calendar{background-position:200px -620px;}
-.element-info{background-position:200px -740px;}
-.element-connect{background-position:200px -860px;}
-.element-head{background-position:200px -980px;}
-
-
 
 
 

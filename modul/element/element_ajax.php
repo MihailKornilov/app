@@ -29,10 +29,11 @@ switch(@$_POST['op']) {
 
 		define('BLOCK_EDIT', 1);
 
-		//получение списка таблиц базы и определение выбранной (SA)
 		$tab_id = 0;
 		$tables = array();
+		$group = array();
 		if(SA) {
+			//получение списка таблиц базы и определение выбранной
 			$sql = "SHOW TABLES";
 			$arr = query_array($sql);
 			$n = 1;
@@ -42,6 +43,18 @@ switch(@$_POST['op']) {
 						$tab_id = $n;
 					$tables[$n++] = $tab;
 				}
+
+			//группы элементов
+			$sql = "SELECT *
+					FROM `_dialog_group`
+					ORDER BY `sort`";
+			foreach(query_arr($sql) as $r) {
+				$group[] = array(
+					'id' => _num($r['id']),
+					'title' => utf8(_br($r['name'], ' ')),
+					'content' => '<div class="'._dn(!$r['sa'], 'red').'">'.utf8(_br($r['name'])).'</div>'
+				);
+			}
 		}
 
 		$html =
@@ -162,8 +175,10 @@ switch(@$_POST['op']) {
 
 		        '<div class="hd2 mt20 ml20 mr20">Настройки как элемента:</div>'.
 				'<table class="bs10">'.
-					'<tr><td class="red w150 r">Имя элемента:'.
-		                '<td><input type="text" id="element_name" class="w230" maxlength="100" value="'.$dialog['element_name'].'" />'.
+					'<tr><td class="red w150 r">Группа:'.
+		                '<td><input type="hidden" id="element_group_id" value="'.$dialog['element_group_id'].'" />'.
+					'<tr><td class="red r">Имя элемента:'.
+		                '<td><input type="text" id="element_name" class="w230 b" maxlength="100" value="'.$dialog['element_name'].'" />'.
 					'<tr><td class="red r">Начальная ширина:'.
 						'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
 					'<tr><td class="red r">Минимальная ширина:'.
@@ -215,6 +230,7 @@ switch(@$_POST['op']) {
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
 		$send['tables'] = $tables;
+		$send['group'] = $group;
 		$send['dialog_spisok'] = SA ? _dialogSelArray(true) : array() ;
 
 		jsonSuccess($send);
@@ -324,6 +340,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$cmp_no_req = _num($_POST['cmp_no_req']);
 	$app_any = _num($_POST['app_any']);
 
+	$element_group_id = _num($_POST['element_group_id']);
 	$element_name = _txt($_POST['element_name']);
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
@@ -365,6 +382,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`spisok_name`='".addslashes($spisok_name)."',
 
 
+				`element_group_id`=".$element_group_id.",
 				`element_name`='".addslashes($element_name)."',
 				`element_width`=".$element_width.",
 				`element_width_min`=".$element_width_min.",
