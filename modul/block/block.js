@@ -82,15 +82,6 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 						BL.save = 1;
 					}
 				});
-				$('#but-elem-add').click(function() {
-					_elemChoose({block_id:BL.id});
-				});
-				$('#elem-func').click(function() {
-					switch(BL.dialog_id) {
-						case 1:
-						default: _elemChoose({block_id:BL.id,type:'func_1'}); break;
-					}
-				});
 
 				if(BL.elem_id) {
 					var EL = ELM[BL.elem_id],
@@ -202,15 +193,15 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 			return '';
 
 		return '<div class="mt20 center">' +
-					'<button id="but-block-grid" class="vk small orange mb5" onclick="_blockUnitGrid(' + BL.id + ')">Настроить подблоки</button>' +
- (!BL.child_count ? '<button id="but-elem-add" class="vk small green">Вставить элемент</button>' : '') +
+					'<button class="vk small orange mb5" onclick="_blockUnitGrid($(this),' + BL.id + ')">Настроить подблоки</button>' +
+ (!BL.child_count ? '<button class="dialog-open vk small green" id="elem-hint-add" val="dialog_id:50,block_id:' + BL.id + '">Вставить элемент</button>' : '') +
 				'</div>';
 	},
-	_blockUnitGrid = function(block_id) {
+	_blockUnitGrid = function(obj, block_id) {
 		var send = {
 			op:'block_unit_gird',
 			id:block_id,
-			busy_obj:$('#but-block-grid')
+			busy_obj:obj
 		};
 		_post(send, function(res) {
 			$('._hint').remove();
@@ -597,7 +588,7 @@ $(document)
 		if(BL.elem_id)
 			return $('#elem-hint-' + BL.elem_id + ' .icon-edit').trigger('click');
 
-		_elemChoose({block_id:block_id});
+		$('#elem-hint-add').trigger('click');
 	});
 
 $.fn._grid = function(o) {

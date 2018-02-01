@@ -171,14 +171,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							$txt = _spisokUnitData($sp['dtime_add'], $td);
 							break;
 						case 34://иконки управления
-							$txt = _iconEdit(array(
-										'class' => 'dialog-open pl',
-										'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id']
-									)).
-									_iconDel(array(
-										'class' => 'dialog-open pl',
-										'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$sp['id'].',del:1'
-									));
+							$txt = _spisokUnitIconEdit($sp);
 							$cls[] = 'pad0';
 							break;
 						case 11://из диалога
@@ -340,6 +333,17 @@ function _spisokUnitData($dtime, $el) {//дата и время - значение единицы списка 
 		' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //месяц
 		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
 		$hh;                                                             //время
+}
+function _spisokUnitIconEdit($sp) {//дата и время - значение единицы списка [33]
+	return
+		_iconEdit(array(
+			'class' => 'dialog-open pl',
+			'val' => 'dialog_id:'.$sp['dialog_id'].',unit_id:'.$sp['id']
+		)).
+		_iconDel(array(
+			'class' => 'dialog-open pl',
+			'val' => 'dialog_id:'.$sp['dialog_id'].',unit_id:'.$sp['id'].',del:1'
+		));
 }
 
 function _spisokUnitUrl($txt, $sp, $is_url) {//обёртка значения колонки в ссылку

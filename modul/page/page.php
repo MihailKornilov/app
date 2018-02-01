@@ -1139,6 +1139,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return _spisokUnitData($unit['dtime_add'], $el);
 
+		//Значение списка: иконки управления
+		case 34: return _spisokUnitIconEdit($unit);
+
 		//Иконка вопрос: Выплывающая подсказка
 		case 42:
 			/*

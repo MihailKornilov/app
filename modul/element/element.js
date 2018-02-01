@@ -1421,7 +1421,7 @@ var VK_SCROLL = 0,
 		return arr;
 	},
 
-	_elementChooseAct = function() {
+	_elemGroup = function() {
 		$('.el-group-head').click(function() {
 			var t = $(this),
 				id = t.attr('val');
@@ -1432,7 +1432,6 @@ var VK_SCROLL = 0,
 			$('#cnt_' + id)._dn(1);
 		});
 	},
-
 	_elemChoose = function(v) {//ВЫБОР элемента для вставки
 		v = $.extend({
 			type:'all',
@@ -1453,8 +1452,6 @@ var VK_SCROLL = 0,
 
 		var html;
 		switch(v.type) {
-			case 'table':  html = _elemChooseTable(); break;
-			case 'func_1': html = _elemChooseFunc1(); break;
 			default:html = _elemChooseAll();
 		}
 
@@ -1510,81 +1507,6 @@ var VK_SCROLL = 0,
 				_dialogOpen(res);
 			});
 		}
-	},
-	_elemChooseAll = function() {//все варианты элементов
-		return '<div class="center mt5">' +
-			'<div class="hd2 mb5">Компоненты для внесения данных</div>' +
-				'<button val="8"  class="vk grey" data-hint="Однострочное поле">8</button>' +
-				'<button val="5"  class="vk grey ml5" data-hint="Многострочное поле">5</button>' +
-				'<button val="1"  class="vk ml5" data-hint="Галочка">1</button>' +
-				'<button val="16" class="vk ml5" data-hint="Radio">16</button>' +
-				'<button val="-6" class="vk ml5" data-hint="Календарь">-</button>' +
-				'<button val="35" class="vk ml5" data-hint="Количество">35</button>' +
-			'<p class="mt10">' +
-				'<div class="dib fs15 mt5">Select:</div>' +
-				'<button val="17" class="vk ml5" data-hint="Select - произвольные значения">17</button>' +
-				'<button val="6"  class="vk ml5" data-hint="Select - страницы">6</button>' +
-				'<button val="24" class="vk ml5" data-hint="Select - списки приложения">24</button>' +
-				'<button val="27" class="vk ml5" data-hint="Select - списки на текущей странице">27</button>' +
-				'<button val="29" class="vk ml5" data-hint="Select - выбор единицы из другого списка (связка)">29</button>' +
-			'<p class="mt10">' +
-				'<button val="31" class="vk orange" data-hint="Значения для содержания Select">31</button>' +
-				'<button val="38" class="vk red ml5" data-hint="Select - выбор диалогового окна">38</button>' +
-				'<button val="41" class="vk red ml5" data-hint="Select - значения из существующего селекта">41</button>' +
-				'<button val="37" class="vk red ml5" data-hint="Select - выбор имени колонки">37</button>' +
-/*
-			'<div class="hd2 mt20 mb5">Вспомогательные компоненты</div>' +
-				'<button val="19" class="vk orange" data-hint="Содержание для некоторых компонентов">19</button>' +
-				'<button val="25" class="vk orange ml5" data-hint="Настройка содержания списка-шаблона">25</button>' +
-				'<button val="30" class="vk orange ml5" data-hint="Настройка содержания списка-таблицы">30</button>' +
-				'<button val="26" class="vk orange ml5" data-hint="Содержание диалога для выбора значения">26</button>' +
-				'<button val="43" class="vk pink ml5" data-hint="Прикрепление подсказки к элементу">43</button>' +
-				'<button val="49" class="vk orange ml5" data-hint="Настройка содержания Сборного текста">49</button>' +
-*/
-			'<div class="hd2 mt20 mb5">Функции</div>' +
-				'<button val="28" class="vk" data-hint="Действия для галочки">28</button>' +
-				'<button val="36" class="vk cancel ml5" data-hint="Действие для галочки: скрытие-показ блоков">36</button>' +
-			'<p class="mt5">' +
-				'<button val="39" class="vk" data-hint="Действия для выпадающего поля">39</button>' +
-				'<button val="40" class="vk cancel ml5" data-hint="Действие для выпадающего поля: скрытие-показ блоков">40</button>' +
-			'<p class="mt5">' +
-				'<button val="22" class="vk orange" data-hint="Список действий у элементов">22</button>' +
-/*
-			'<div class="hd2 mt20 mb5">Элементы для наполнения содержания</div>' +
-				'<button val="3"  class="vk" data-hint="Меню страниц">3</button>' +
-				'<button val="10" class="vk grey ml5" data-hint="Произвольный текст">10</button>' +
-				'<button val="44" class="vk grey ml5" data-hint="Сборный текст">44</button>' +
-				'<button val="2"  class="vk green ml5" data-hint="Кнопка">2</button>' +
-				'<button val="4"  class="vk ml5" data-hint="Заголовок">4</button>' +
-				'<button val="21" class="vk ml5" data-hint="Информация">21</button>' +
-				'<button val="9"  class="vk ml5" data-hint="Ссылка на страницу">9</button>' +
-				'<button val="42" class="vk ml5" data-hint="Иконка с вопросом: Выплывающая подсказка">42</button>' +
-*/
-			'<div class="hd2 mt20 mb5">Элементы для списков</div>' +
-				'<button val="7" class="vk">7 - search</button>' +
-				'<button val="15" class="vk ml5" data-hint="Количество строк">15</button>' +
-				'<button val="14" class="vk ml5">14 - Шаблон</button>' +
-				'<button val="23" class="vk ml5">23 - Таблица</button>' +
-			'<p class="mt10">' +
-				'<button val="11" class="vk cancel" data-hint="Значение: из единицы списка">11</button>' +
-				'<button val="32" class="vk cancel ml5" data-hint="Значение: Порядковый номер">32</button>' +
-				'<button val="33" class="vk cancel ml5" data-hint="Значение: Дата">33</button>' +
-				'<button val="34" class="vk cancel ml5" data-hint="Значение: Иконки управления">34</button>' +
-
-	        '<div class="hd2 mt20 mb5">Элементы для SA</div>' +
-				'<button val="12" class="vk red" data-hint="PHP-функция">12</button>' +
-				'<button val="50" class="vk cancel" data-hint="Выбор диалога">50</button>' +
-		'</div>';
-	},
-	_elemChooseTable = function() {
-		return '<div class="hd2 mt10">Варианты выбора для ячейки таблицы:</div>' +
-			'<button val="11" class="vk cancel mt5">Значение из диалога</button>' +
-			'<button val="32" class="vk cancel mt5">Значение: Порядковый номер</button>' +
-			'<button val="33" class="vk cancel mt5">Значение: Дата</button>' +
-			'<button val="34" class="vk cancel mt5">Значение: Иконки управления</button>' +
-			'<button val="50" class="vk cancel" data-hint="Выбор диалога">50</button>' +
-//			'<button val="44" class="vk grey ml5">Сборный текст</button>' +
-		'';
 	},
 
 	_pageSetupAppPage = function() {//сортировка страниц приложения с учётом уровней

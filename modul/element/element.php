@@ -478,22 +478,29 @@ function _elementChoose($unit) {
 			'<table class="el-group-head w100p bs5 curP over1'.$sel.$first.$last.'" val="'.$id.'">'.
 				'<tr>'.
 	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
-					'<td class="fs14 '.($r['sa'] ? 'red' : 'blue').'">'.$r['name'].
+					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'.$r['name'].
 			'</table>';
 
-		$content .= '<div id="cnt_'.$id.'" class="cnt'._dn($id == 1).'">'.
-						'<b>'.$r['name'].'</b>';
+		$content .= '<div id="cnt_'.$id.'" class="cnt'._dn($id == 1).'">';
+		$n = 1;
 		foreach($elem as $el)
-			if($el['element_group_id'] == $id)
-				$content .= '<div class="curP over3 pad5">'.$el['element_name'].'</div>';
+			if($el['element_group_id'] == $id) {
+				$content .=
+					'<div class="dialog-open '.($el['sa'] ? 'red' : 'color-555').'" val="dialog_id:'.$el['id'].',block_id:'.$block_id.'">'.
+						'<div class="dib w25 fs12 r">'.$n++.'.</div> '.
+						'<b>'.$el['element_name'].'</b>'.
+						'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
+					'</div>';
+			}
 		$content .=	'</div>';
 	}
 
 	return
 		'<table id="elem-group" class="w100p">'.
-			'<tr><td class="w150">'.$head.
-				'<td id="elem-group-content" class="top bg-gr2 pad10">'.$content.
+			'<tr><td class="w150 top">'.$head.
+				'<td id="elem-group-content" class="top">'.
+					'<div class="cnt-div">'.$content.'<div>'.
 		'</table>'.
-		'<script>_elementChooseAct()</script>';
+		'<script>_elemGroup()</script>';
 }
 
