@@ -163,7 +163,7 @@
 	padding:10px;
 }
 .elem-img{
-	background:no-repeat 0 200px url(../../img/elem.png?23);
+	background:no-repeat 0 200px url(../../img/elem.png?24);
 	height:0;
 	margin-left:29px;
 }
@@ -177,6 +177,7 @@
 .eli8{background-position-y:-100px;height:30px}/* однострочное поле */
 .eli9{background-position-y:-800px;height:20px}/* ссылка на страницу */
 .eli10{background-position-y:-900px;height:30px}/* текст */
+.eli14{background-position-y:-2500px;height:95px}/* список - ШАБЛОН */
 .eli15{background-position-y:-2200px;height:15px}/* количество строк списка */
 .eli16{background-position-y:-300px;height:50px}/* радио */
 .eli17{background-position-y:-1400px;height:30px}/* select - проивольные значения */
@@ -187,6 +188,7 @@
 .eli29{background-position-y:-1800px;height:100px}/* select - связка с другим списком */
 .eli32{background-position-y:-2400px;height:15px}/* список - порядковый номер */
 .eli33{background-position-y:-2300px;height:15px}/* список - дата и время */
+.eli34{background-position-y:-2600px;height:15px}/* список - иконки редактирования */
 .eli35{background-position-y:-1300px;height:30px}/* список - количество строк */
 .eli37{background-position-y:-1920px;height:30px}/* select - выбор колонки */
 .eli38{background-position-y:-2000px;height:30px}/* select - выбор диалога */
