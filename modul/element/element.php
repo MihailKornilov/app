@@ -460,13 +460,15 @@ function _elementChoose($unit) {
 	$content = '';
 	$sql = "SELECT *
 			FROM `_dialog_group`
+			WHERE `sa` IN (0,".SA.")
 			ORDER BY `sort`";
 	$group = query_arr($sql);
 
 	$sql = "SELECT *
 			FROM `_dialog`
-			WHERE `element_group_id`
-			ORDER BY `id`";
+			WHERE `element_group_id` IN ("._idsGet($group).")
+			  AND `sa` IN (0,".SA.")
+			ORDER BY `sort`,`id`";
 	$elem = query_arr($sql);
 
 	$c = count($group);
@@ -481,18 +483,21 @@ function _elementChoose($unit) {
 					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'.$r['name'].
 			'</table>';
 
-		$content .= '<div id="cnt_'.$id.'" class="cnt'._dn($id == 1).'">';
+		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == 1).'">';
 		$n = 1;
 		foreach($elem as $el)
 			if($el['element_group_id'] == $id) {
 				$content .=
+					'<dd val="'.$el['id'].'">'.
 					'<div class="dialog-open '.($el['sa'] ? 'red' : 'color-555').'" val="dialog_id:'.$el['id'].',block_id:'.$block_id.'">'.
+				  (SA ? '<div class="icon icon-move-y fr pl"></div><div class="icon icon-edit fr pl mr3"></div>' : '').
 						'<div class="dib w25 fs12 r">'.$n++.'.</div> '.
 						'<b>'.$el['element_name'].'</b>'.
 						'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
-					'</div>';
+					'</div>'.
+					'</dd>';
 			}
-		$content .=	'</div>';
+		$content .=	'</dl>';
 	}
 
 	return

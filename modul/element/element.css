@@ -148,12 +148,14 @@
 .el-group-head.sel{background-color:#EBF0F3}
 #elem-group .dialog-open{
 	font-size:12px;
-	padding:10px 12px 10px 0;
+	padding:10px 10px 10px 0;
 	cursor:pointer;
 	border-bottom:#CEDDE8 solid 1px;
 }
 #elem-group .dialog-open b{font:bold 12px Verdana}
-#elem-group .dialog-open:hover{background-color:#feb;color:#333}
+#elem-group .dialog-open:hover{background-color:#feb}
+#elem-group .dialog-open:not(.red):hover{color:#333}
+#elem-group .dialog-open:not(:hover) .icon{display:none}
 #elem-group-content{background-color:#EBF0F3}
 #elem-group-content .cnt-div{
 	height:450px;

@@ -1431,6 +1431,22 @@ var VK_SCROLL = 0,
 			$('#elem-group .cnt')._dn(0);
 			$('#cnt_' + id)._dn(1);
 		});
+		if(!SA)
+			return;
+		$('#elem-group .icon-edit').click(function(e) {//редактирование диалога
+			e.stopPropagation();
+			var t = $(this),
+				send = {
+					op:'dialog_edit_load',
+					dialog_id:t.parent().parent().attr('val'),
+					busy_obj:t,
+					busy_cls:'spin'
+				};
+			_post(send, _dialogEdit);
+		});
+		_forEq($('#elem-group .cnt'), function(sp) {
+			sp._sort({table:'_dialog'});
+		});
 	},
 	_elemChoose = function(v) {//ВЫБОР элемента для вставки
 		v = $.extend({
