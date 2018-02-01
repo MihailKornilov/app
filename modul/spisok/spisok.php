@@ -171,7 +171,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							$txt = _spisokUnitData($sp['dtime_add'], $td);
 							break;
 						case 34://иконки управления
-							$txt = _spisokUnitIconEdit($sp);
+							$txt = _spisokUnitIconEdit($dialog_id, $sp['id']);
 							$cls[] = 'pad0';
 							break;
 						case 11://из диалога
@@ -334,15 +334,15 @@ function _spisokUnitData($dtime, $el) {//дата и время - значение единицы списка 
 		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
 		$hh;                                                             //время
 }
-function _spisokUnitIconEdit($sp) {//дата и время - значение единицы списка [33]
+function _spisokUnitIconEdit($dialog_id, $unit_id) {//иконки управления - значение единицы списка [34]
 	return
 		_iconEdit(array(
 			'class' => 'dialog-open pl',
-			'val' => 'dialog_id:'.$sp['dialog_id'].',unit_id:'.$sp['id']
+			'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$unit_id
 		)).
 		_iconDel(array(
 			'class' => 'dialog-open pl',
-			'val' => 'dialog_id:'.$sp['dialog_id'].',unit_id:'.$sp['id'].',del:1'
+			'val' => 'dialog_id:'.$dialog_id.',unit_id:'.$unit_id.',del:1'
 		));
 }
 
