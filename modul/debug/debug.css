@@ -77,10 +77,11 @@
 #_debug .ajax textarea{width:586px;height:1px}
 
 #debug-footer{
-	text-align:center;
 	background:#F7F7F7;
 	border-top:#DDD solid 1px;
-	padding:2px 0 3px 0;
+	padding:2px 0 3px 8px;
+	margin-left:-15px;
 }
+body.scrl #debug-footer{padding-left:0}
 #debug-footer a{color:#888;font-size:11px}
 #debug-footer .on{color:#0b0}

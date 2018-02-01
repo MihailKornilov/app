@@ -103,6 +103,7 @@ function _header() {
 		'</head>'.
 
 		'<body class="site">'.
+			'<iframe id="frame0" name="frame0"></iframe>'.
 			_header_hat();
 }
 function _header_hat() {//верхняя строка приложения-сайта
