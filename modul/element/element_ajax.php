@@ -32,6 +32,7 @@ switch(@$_POST['op']) {
 		$tab_id = 0;
 		$tables = array();
 		$group = array();
+		$menu_sa = array();
 		if(SA) {
 			//получение списка таблиц базы и определение выбранной
 			$sql = "SHOW TABLES";
@@ -55,6 +56,11 @@ switch(@$_POST['op']) {
 					'content' => '<div class="'._dn(!$r['sa'], 'red').'">'.utf8(_br($r['name'])).'</div>'
 				);
 			}
+
+			$menu_sa = array(
+				1 => 'Диалог',
+				2 => 'Элемент'
+			);
 		}
 
 		$html =
@@ -141,10 +147,13 @@ switch(@$_POST['op']) {
 			'</div>'.
 
 			//SA
-	  (SA ? '<div class="dialog-menu-9 pt20 pb20'._dn($dialog['menu_edit_last'] == 9).'">'.
-		        '<div class="hd2 ml20 mr20">Настройки диалогового окна:</div>'.
-				'<table class="bs10">'.
-					'<tr><td class="red w150 r">ID:<td class="b">'.$dialog['id'].
+	  (SA ? '<div class="dialog-menu-9 pb20'._dn($dialog['menu_edit_last'] == 9).'">'.
+				'<div class="mt5 mb10 ml20 mr20">'.
+		            '<input type="hidden" id="menu_sa" value="1" />'.
+				'</div>'.
+
+				'<table class="menu_sa-1 bs10">'.
+					'<tr><td class="red w125 r">ID:<td class="b">'.$dialog['id'].
 					'<tr><td class="red r">Ширина:'.
 		                '<td><div id="dialog-width" class="dib w50">'.$dialog['width'].'</div>'.
 		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
@@ -173,28 +182,27 @@ switch(@$_POST['op']) {
 							   )).
 				'</table>'.
 
-		        '<div class="hd2 mt20 ml20 mr20">Настройки как элемента:</div>'.
-				'<table class="bs10">'.
-					'<tr><td class="red w150 r">Группа:'.
-		                '<td><input type="hidden" id="element_group_id" value="'.$dialog['element_group_id'].'" />'.
-					'<tr><td class="red r">Имя элемента:'.
+				'<table class="menu_sa-2 bs5">'.
+					'<tr><td class="red w150 r">Имя элемента:'.
 		                '<td><input type="text" id="element_name" class="w230 b" maxlength="100" value="'.$dialog['element_name'].'" />'.
+					'<tr><td class="red r">Группа:'.
+		                '<td><input type="hidden" id="element_group_id" value="'.$dialog['element_group_id'].'" />'.
 					'<tr><td class="red r">Начальная ширина:'.
 						'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
 					'<tr><td class="red r">Минимальная ширина:'.
 						'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_is_insert',
-									'title' => 'элемент вносит данные',
-									'value' => $dialog['element_is_insert']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
+					'<tr><td class="red r">CMP-аффикс:'.
+						'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
+					'<tr><td class="red r">Диалог для функций:'.
+						'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
+
+					'<tr><td class="red r pt20">Разрешения:'.
+						'<td class="pt20">'.
+		                        _check(array(
 									'attr_id' => 'element_search_access',
-									'title' => 'разрешать поиск по этому элементу',
+									'title' => 'разрешать быстрый поиск по элементу',
 									'value' => $dialog['element_search_access']
-							   )).
+								)).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_style_access',
@@ -213,10 +221,32 @@ switch(@$_POST['op']) {
 									'title' => 'разрешать прикрепление подсказки',
 									'value' => $dialog['element_hint_access']
 							   )).
-					'<tr><td class="red r">Диалог для функций:'.
-						'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
-					'<tr><td class="red r">CMP-аффикс:'.
-						'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
+
+					'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге для вставки в блок:</div>'.
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_is_insert',
+									'title' => 'элемент вносит данные',
+									'value' => $dialog['element_is_insert']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_page_paste',
+									'title' => 'вставка в блок страницы',
+									'value' => $dialog['element_page_paste']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_dialog_paste',
+									'title' => 'вставка в блок диалога',
+									'value' => $dialog['element_dialog_paste']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_spisok_paste',
+									'title' => 'вставка в блок шаблона списка',
+									'value' => $dialog['element_spisok_paste']
+							   )).
 				'</table>'.
 			'</div>'
 	  : '');
@@ -224,6 +254,7 @@ switch(@$_POST['op']) {
 		$send['dialog_id'] = $dialog_id;
 		$send['width'] = _num($dialog['width']);
 		$send['menu'] = _selArray($menu);
+		$send['menu_sa'] = _selArray($menu_sa);
 		$send['action'] = _selArray($action);
 		$send['blk'] = $dialog['blk'];
 		$send['cmp'] = $dialog['cmp_utf8'];
@@ -351,6 +382,9 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_hint_access = _num($_POST['element_hint_access']);
 	$element_dialog_func = _num($_POST['element_dialog_func']);
 	$element_afics = _txt($_POST['element_afics']);
+	$element_page_paste = _num($_POST['element_page_paste']);
+	$element_dialog_paste = _num($_POST['element_dialog_paste']);
+	$element_spisok_paste = _num($_POST['element_spisok_paste']);
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
@@ -393,6 +427,9 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_hint_access`=".$element_hint_access.",
 				`element_dialog_func`=".$element_dialog_func.",
 				`element_afics`='".addslashes($element_afics)."',
+				`element_page_paste`=".$element_page_paste.",
+				`element_dialog_paste`=".$element_dialog_paste.",
+				`element_spisok_paste`=".$element_spisok_paste.",
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;

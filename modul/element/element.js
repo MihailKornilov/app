@@ -359,6 +359,10 @@ var VK_SCROLL = 0,
 			spisok:o.menu,
 			func:_dialogHeightCorrect
 		});
+		$('#menu_sa')._menu({
+			type:1,
+			spisok:o.menu_sa
+		});
 		$('#width_auto')._check({
 			title:'автоматическая ширина'
 		});
@@ -466,6 +470,10 @@ var VK_SCROLL = 0,
 				element_hint_access:$('#element_hint_access').val(),
 				element_dialog_func:$('#element_dialog_func').val(),
 				element_afics:$('#element_afics').val(),
+
+				element_page_paste:$('#element_page_paste').val(),
+				element_dialog_paste:$('#element_dialog_paste').val(),
+				element_spisok_paste:$('#element_spisok_paste').val(),
 
 				menu_edit_last:$('#dialog-menu').val()
 			};

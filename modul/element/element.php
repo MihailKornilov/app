@@ -456,28 +456,60 @@ function _elementChoose($unit) {
 	if(!$BL = _blockQuery($block_id))
 		return _emptyMin('Исходного блока id'.$block_id.' не существует.');
 
+
+	/*
+		page
+			требуется наличие списка на странице
+			требуется наличие
+		dialog
+		spisok
+
+	*/
+
+
+
+
+
+
+
 	$head = '';
 	$content = '';
 	$sql = "SELECT *
 			FROM `_dialog_group`
 			WHERE `sa` IN (0,".SA.")
 			ORDER BY `sort`";
-	$group = query_arr($sql);
+	if(!$group = query_arr($sql))
+		return _emptyMin('Отсутствуют группы элементов.');
+
+	foreach($group as $id => $r)
+		$group[$id]['elem'] = array();
 
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `element_group_id` IN ("._idsGet($group).")
 			  AND `sa` IN (0,".SA.")
 			ORDER BY `sort`,`id`";
-	$elem = query_arr($sql);
+	if(!$elem = query_arr($sql))
+		return _emptyMin('Нет элементов для отображения.');
 
-	$c = count($group);
+	//расстановка элементов в группы с учётом правил отображения
+	foreach($elem as $id => $r) {
+//		if($BL['obj_name'] == 'page' && !$r['element_page_paste'])
+//			continue;
+		if($BL['obj_name'] == 'dialog' && !$r['element_dialog_paste'])
+			continue;
+		if($BL['obj_name'] == 'spisok' && !$r['element_spisok_paste'])
+			continue;
+		$group[$r['element_group_id']]['elem'][] = $r;
+	}
+
 	foreach($group as $id => $r) {
+		if(empty($r['elem']))
+			continue;
 		$sel = _dn($id != 1, 'sel');
 		$first = _dn($id != 1, 'first');
-		$last = _dn(--$c, 'last');
 		$head .=
-			'<table class="el-group-head w100p bs5 curP over1'.$sel.$first.$last.'" val="'.$id.'">'.
+			'<table class="el-group-head'.$first.$sel.'" val="'.$id.'">'.
 				'<tr>'.
 	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
 					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'.$r['name'].
@@ -485,8 +517,7 @@ function _elementChoose($unit) {
 
 		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == 1).'">';
 		$n = 1;
-		foreach($elem as $el)
-			if($el['element_group_id'] == $id) {
+		foreach($r['elem'] as $el)
 				$content .=
 					'<dd val="'.$el['id'].'">'.
 					'<div class="dialog-open '.($el['sa'] ? 'red' : 'color-555').'" val="dialog_id:'.$el['id'].',block_id:'.$block_id.'">'.
@@ -496,13 +527,14 @@ function _elementChoose($unit) {
 						'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
 					'</div>'.
 					'</dd>';
-			}
 		$content .=	'</dl>';
 	}
 
 	return
 		'<table id="elem-group" class="w100p">'.
-			'<tr><td class="w150 top">'.$head.
+			'<tr><td class="w150 top prel">'.
+					'<div id="head-back"></div>'.
+					$head.
 				'<td id="elem-group-content" class="top">'.
 					'<div class="cnt-div">'.$content.'<div>'.
 		'</table>'.
