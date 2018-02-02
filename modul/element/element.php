@@ -456,21 +456,9 @@ function _elementChoose($unit) {
 	if(!$BL = _blockQuery($block_id))
 		return _emptyMin('Исходного блока id'.$block_id.' не существует.');
 
-
-	/*
-		page
-			требуется наличие списка на странице
-			требуется наличие
-		dialog
-		spisok
-
-	*/
-
-
-
-
-
-
+	define('BLOCK_PAGE', $BL['obj_name'] == 'page');
+	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
+	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
 
 	$head = '';
 	$content = '';
@@ -494,13 +482,16 @@ function _elementChoose($unit) {
 
 	//расстановка элементов в группы с учётом правил отображения
 	foreach($elem as $id => $r) {
-//		if($BL['obj_name'] == 'page' && !$r['element_page_paste'])
-//			continue;
-		if($BL['obj_name'] == 'dialog' && !$r['element_dialog_paste'])
-			continue;
-		if($BL['obj_name'] == 'spisok' && !$r['element_spisok_paste'])
-			continue;
-		$group[$r['element_group_id']]['elem'][] = $r;
+		$show = false;
+		if(BLOCK_PAGE && $r['element_page_paste'])
+			$show = true;
+		if(BLOCK_DIALOG && $r['element_dialog_paste'])
+			$show = true;
+		if(BLOCK_SPISOK && $r['element_spisok_paste'])
+			$show = true;
+
+		if($show)
+			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 
 	foreach($group as $id => $r) {

@@ -247,6 +247,12 @@ switch(@$_POST['op']) {
 									'title' => 'вставка в блок шаблона списка',
 									'value' => $dialog['element_spisok_paste']
 							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_is_spisok_unit',
+									'title' => 'является значением списка',
+									'value' => $dialog['element_is_spisok_unit']
+							   )).
 				'</table>'.
 			'</div>'
 	  : '');
@@ -385,6 +391,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_page_paste = _num($_POST['element_page_paste']);
 	$element_dialog_paste = _num($_POST['element_dialog_paste']);
 	$element_spisok_paste = _num($_POST['element_spisok_paste']);
+	$element_is_spisok_unit = _num($_POST['element_is_spisok_unit']);
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
@@ -430,6 +437,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_page_paste`=".$element_page_paste.",
 				`element_dialog_paste`=".$element_dialog_paste.",
 				`element_spisok_paste`=".$element_spisok_paste.",
+				`element_is_spisok_unit`=".$element_is_spisok_unit.",
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;
