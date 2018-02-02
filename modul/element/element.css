@@ -161,15 +161,15 @@
 	border-right:#CEDDE8 solid 1px;
 	z-index:1;
 }
-#elem-group .dialog-open{
+#elem-group .elem-unit{
 	font-size:12px;
 	padding:10px 10px 10px 0;
 	cursor:pointer;
 }
-#elem-group .dialog-open b{font:bold 12px Verdana}
-#elem-group .dialog-open:hover{background-color:#feb}
-#elem-group .dialog-open:not(.red):hover{color:#333}
-#elem-group .dialog-open:not(:hover) .icon:not(.spin){display:none}
+#elem-group .elem-unit b{font:bold 12px Verdana}
+#elem-group .elem-unit:hover{background-color:#feb}
+#elem-group .elem-unit:not(.red):hover{color:#333}
+#elem-group .elem-unit:not(:hover) .icon:not(.spin){display:none}
 #elem-group-content{background-color:#EBF0F3}
 #elem-group-content .cnt-div{
 	height:450px;

@@ -982,8 +982,15 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if($el['block']['obj_name'] != 'dialog')
 				return _emptyMin('Элемент может располагаться только в блоке Диалога');
 
-			if(!$bls_id = _num(@$US['block_id']))
+			if(!$bls_id = _num(@$US['block_id'], 1))
 				return _emptyMin('Отсутствует ID исходного блока.');
+
+			//блок является элементом
+			if($bls_id < 0) {
+				if(!$EL = _elemQuery(abs($bls_id)))
+					return _emptyMin('Исходного элемента id'.$bls_id.' не существует.');
+				$bls_id = $EL['block_id'];//обновление исходного блока
+			}
 
 			if(!$BLS = _blockQuery($bls_id))
 				return _emptyMin('Исходный блок id'.$bls_id.' отсутствует.');
@@ -1137,10 +1144,16 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					завтра
 				num_4 - показывать время в формате 12:45
 			*/
+			if(!$UNIT_ISSET)
+				return 'дата';
 			return _spisokUnitData($unit['dtime_add'], $el);
 
 		//Значение списка: иконки управления
-		case 34: return _spisokUnitIconEdit($unit['dialog_id'], $unit['id']);
+		case 34:
+			if(!$UNIT_ISSET)
+				return 'edit';
+
+			return _spisokUnitIconEdit($unit['dialog_id'], $unit['id']);
 
 		//Иконка вопрос: Выплывающая подсказка
 		case 42:

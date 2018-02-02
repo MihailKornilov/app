@@ -238,7 +238,12 @@ table{border:0;border-spacing:0}
 
 
 /* Строка управления страницей page_setup */
-#pas{background-color: #ffaf64;border-bottom:#C3864C solid 1px}
+#pas{
+	background-color: #ffaf64;
+	border-bottom:#C3864C solid 1px;
+	margin-left:-15px;
+	padding-left:15px;
+}
 
 /* отдельный блок в редактировании */
 .block-unit{

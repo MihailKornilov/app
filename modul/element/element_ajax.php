@@ -451,7 +451,7 @@ function _dialogOpenLoad($dialog_id) {
 	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('Диалога не существует');
 
-	$block_id = _num(@$_POST['block_id']);
+	$block_id = _num(@$_POST['block_id'], 1);
 
 	//получение данных единицы списка
 	$unit = array();

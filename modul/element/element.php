@@ -451,14 +451,32 @@ function _blockQuery($block_id) {//запрос одного блока
 function _elementChoose($unit) {
 	if(empty($unit['source']))
 		return _emptyMin('Функция _elementChoose');
-	if(!$block_id = _num($unit['source']['block_id']))
+	if(!$block_id = _num($unit['source']['block_id'], 1))
 		return _emptyMin('Отсутствует id исходного блока.');
-	if(!$BL = _blockQuery($block_id))
+	if($block_id > 0 && !$BL = _blockQuery($block_id))
 		return _emptyMin('Исходного блока id'.$block_id.' не существует.');
 
-	define('BLOCK_PAGE', $BL['obj_name'] == 'page');
-	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
-	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
+	$spisok_exist = false;
+
+	if($block_id < 0) {
+		if(!$EL = _elemQuery(abs($block_id)))
+			return _emptyMin('Исходного элемента id'.$block_id.' не существует.');
+		if($EL['dialog_id'] == 23)
+			$spisok_exist = true;
+		$block_id = $EL['block_id'];
+	}
+
+
+	define('BLOCK_PAGE',   @$BL['obj_name'] == 'page');
+	define('BLOCK_DIALOG', @$BL['obj_name'] == 'dialog');
+	define('BLOCK_SPISOK', @$BL['obj_name'] == 'spisok');
+
+	//определение, принимает ли страница значения списка
+	if(BLOCK_PAGE) {
+		$page = _page($BL['obj_id']);
+		$spisok_exist = $page['spisok_id'];
+	}
+	define('SPISOK_EXIST', BLOCK_SPISOK || $spisok_exist);
 
 	$head = '';
 	$content = '';
@@ -489,16 +507,27 @@ function _elementChoose($unit) {
 			$show = true;
 		if(BLOCK_SPISOK && $r['element_spisok_paste'])
 			$show = true;
+		if($r['element_is_spisok_unit'] && !SPISOK_EXIST)
+			$show = false;
+		if(SPISOK_EXIST && $r['element_is_spisok_unit'])
+			$show = true;
 
 		if($show)
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 
-	foreach($group as $id => $r) {
+	foreach($group as $id => $r)
 		if(empty($r['elem']))
-			continue;
-		$sel = _dn($id != 1, 'sel');
-		$first = _dn($id != 1, 'first');
+			unset($group[$id]);
+
+	if(empty($group))
+		return _emptyMin('Нет элементов для отображения.');
+
+	reset($group);
+	$firstId = key($group);
+	foreach($group as $id => $r) {
+		$sel = _dn($id != $firstId, 'sel');
+		$first = _dn($id != $firstId, 'first');
 		$head .=
 			'<table class="el-group-head'.$first.$sel.'" val="'.$id.'">'.
 				'<tr>'.
@@ -506,12 +535,12 @@ function _elementChoose($unit) {
 					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'.$r['name'].
 			'</table>';
 
-		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == 1).'">';
+		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == $firstId).'">';
 		$n = 1;
 		foreach($r['elem'] as $el)
 				$content .=
 					'<dd val="'.$el['id'].'">'.
-					'<div class="dialog-open '.($el['sa'] ? 'red' : 'color-555').'" val="dialog_id:'.$el['id'].',block_id:'.$block_id.'">'.
+					'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
 				  (SA ? '<div class="icon icon-move-y fr pl"></div><div class="icon icon-edit fr pl mr3"></div>' : '').
 						'<div class="dib w25 fs12 r">'.$n++.'.</div> '.
 						'<b>'.$el['element_name'].'</b>'.
@@ -522,13 +551,18 @@ function _elementChoose($unit) {
 	}
 
 	return
+/*
+		'<div>BLOCK_PAGE = '.BLOCK_PAGE.'</div>'.
+		'<div>BLOCK_DIALOG = '.BLOCK_DIALOG.'</div>'.
+		'<div>BLOCK_SPISOK = '.BLOCK_SPISOK.'</div>'.
+		'<div>SPISOK_EXIST = '.SPISOK_EXIST.'</div>'.
+*/
 		'<table id="elem-group" class="w100p">'.
 			'<tr><td class="w150 top prel">'.
 					'<div id="head-back"></div>'.
 					$head.
 				'<td id="elem-group-content" class="top">'.
 					'<div class="cnt-div">'.$content.'<div>'.
-		'</table>'.
-		'<script>_elemGroup()</script>';
+		'</table>';
 }
 
