@@ -206,7 +206,6 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		_post(send, function(res) {
 			$('._hint').remove();
 			$('.block-content-' + res.block.obj_name).html(res.html);
-			console.log(res.block);
 			$('#grid-stack')._grid({
 				width:res.block.width,
 				parent_id:block_id,

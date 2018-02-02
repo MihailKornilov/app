@@ -832,14 +832,11 @@ var VK_SCROLL = 0,
 							attr_cmp = ELM[el.num_1].attr_cmp;
 						_dialogLoad({
 							dialog_id:11,
-							block_id:el.block_id,
+							block_id:el.id * -1,
 							dialog_source:$(attr_cmp).val(),
 							unit_id:v[n],
 							busy_obj:t,
 							busy_cls:'hold',
-							func_open:function(res) {
-								res.block_id = el.id * -1;
-							},
 							func_save:function(ia) {
 								v[n] = ia.unit.id;
 								t.val('выбрано');
@@ -1211,7 +1208,7 @@ var VK_SCROLL = 0,
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,       //id элемента
-				dialog_id:0,
+				dialog_id:50,
 				num_1:1     //пробел справа
 			}, v);
 
@@ -1239,12 +1236,10 @@ var VK_SCROLL = 0,
 			INP.click(function() {
 				_dialogLoad({
 					dialog_id:v.dialog_id,
+					block_id:unit.source.block_id,
 					unit_id:v.id,           //id выбранного элемента (при редактировании)
 					busy_obj:INP,
 					busy_cls:'hold',
-					func_open:function(res) {
-						res.block_id = _num('-' + unit.id, 1);
-					},
 					func_save:function(ia) {
 						if(!v.id) {
 							DD.attr('val', ia.unit.id);
@@ -1464,7 +1459,6 @@ var VK_SCROLL = 0,
 		});
 	},
 	_dialogLoad = function(o) {//загрузка диалога
-		console.log(o);
 		var send = {
 			op:'dialog_open_load',
 			page_id:PAGE_ID,
@@ -1481,7 +1475,11 @@ var VK_SCROLL = 0,
 		};
 
 		_post(send, function(res) {
-			res.d50close = o.d50close;
+			if(res.dialog_id == 44) {
+				if(o.d50close)
+					o.d50close();
+			} else
+				res.d50close = o.d50close;
 			//функция, выполняемая после успешной вставки элемента
 			res.func = o.func_save;
 			var dialog = _dialogOpen(res);

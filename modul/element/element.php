@@ -463,7 +463,6 @@ function _elementChoose($unit) {
 			return _emptyMin('Исходного элемента id'.$block_id.' не существует.');
 		if($EL['dialog_id'] == 23)
 			$spisok_exist = true;
-		$block_id = $EL['block_id'];
 	}
 
 
