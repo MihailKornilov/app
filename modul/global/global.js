@@ -309,7 +309,7 @@ var FB,
 		return v ? '' : ' ' + cls;
 	};
 
-$.fn.keyEnter = function(func) {
+$.fn._enter = function(func) {
 	$(this).keydown(function(e) {
 		if(e.keyCode == 13)
 			func();
@@ -468,6 +468,13 @@ $(document)
 	.ajaxError(function(event, request) {
 		if(!request.responseText)
 			return;
+
+//		<!DOCTYPE html>
+		if(request.responseText[0] == '<') {
+			location.reload();
+			return;
+		}
+
 		var d = _dialog({
 			width:770,
 			top:10,

@@ -179,7 +179,7 @@ var VK_SCROLL = 0,
 		});
 
 		//для всех input при нажатии enter применяется submit
-		content.find('input').keyEnter(submitFunc);
+		content.find('input')._enter(submitFunc);
 
 		_backfon();
 
@@ -538,7 +538,7 @@ var VK_SCROLL = 0,
 				_forIn(o.cmp, function(sp, id) {
 					switch(sp.dialog_id) {
 						case 19://наполнение для некоторых компонентов
-							send.cmpv[id] = _dialogCmpV19(sp, 1);
+							send.cmpv[id] = _cmpV19(sp, 1);
 							return;
 						case 30://Настройка ТАБЛИЧНОГО содержания списка
 							send.cmpv[id] = _cmpV30(sp, 'get');
@@ -547,7 +547,7 @@ var VK_SCROLL = 0,
 							send.cmp[id] = $(sp.attr_cmp)._select('inp');
 							return;
 						case 49://Настройка содержания Сборного текста
-							send.cmpv[id] = _dialogCmpV49(sp, 'get');
+							send.cmpv[id] = _cmpV49(sp, 'get');
 							break;
 					}
 					send.cmp[id] = $(sp.attr_cmp).val();
@@ -701,7 +701,7 @@ var VK_SCROLL = 0,
 				case 19:
 					if(is_edit)
 						return;
-					_dialogCmpV19(el);
+					_cmpV19(el);
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Список действий, привязанных к элементу
 				case 22:
@@ -916,7 +916,7 @@ var VK_SCROLL = 0,
 				case 49:
 					if(is_edit)
 						return;
-					_dialogCmpV49(el, unit);
+					_cmpV49(el, unit);
 					return;
 			}
 		});
@@ -924,7 +924,7 @@ var VK_SCROLL = 0,
 		if(!is_edit && attr_focus)
 			$(attr_focus).focus();
 	},
-	_dialogCmpV19 = function(o, get) {//наполнение для некоторых компонентов. dialog_id=19
+	_cmpV19 = function(o, get) {//наполнение для некоторых компонентов. dialog_id=19
 		var el = $(o.attr_el);
 
 		//получение данных для сохранения
@@ -1176,7 +1176,7 @@ var VK_SCROLL = 0,
 			cmp.val(val);
 		}
 	},
-	_dialogCmpV49 = function(o, unit) {//Настройка содержания Сборного текста
+	_cmpV49 = function(o, unit) {//Настройка содержания Сборного текста
 		var el = $(o.attr_el);
 
 		//получение данных для сохранения
