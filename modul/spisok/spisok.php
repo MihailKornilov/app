@@ -1,16 +1,16 @@
 <?php
-function _spisokCountAll($pe) {//получение общего количества строк списка
-	$key = 'SPISOK_COUNT_ALL'.$pe['id'];
+function _spisokCountAll($el) {//получение общего количества строк списка
+	$key = 'SPISOK_COUNT_ALL'.$el['id'];
 
 	if(defined($key))
 		return constant($key);
 
 	//диалог, через который вносятся данные списка
-	$dialog = _dialogQuery($pe['num_1']);
+	$dialog = _dialogQuery($el['num_1']);
 
 	$sql = "SELECT COUNT(*)
 			FROM `".$dialog['base_table']."`
-			WHERE "._spisokCond($pe);
+			WHERE "._spisokCond($el);
 	$all = _num(query_value($sql));
 
 	define($key, $all);
@@ -20,11 +20,7 @@ function _spisokCountAll($pe) {//получение общего количества строк списка
 function _spisokElemCount($r) {//формирование элемента с содержанием количества списка для вывода на страницу
 	if(!$elem_id = $r['num_1'])
 		return 'Список не указан.';
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id`=".$elem_id;
-	if(!$elem = query_assoc($sql))
+	if(!$elem = _elemQuery($elem_id))
 		return 'Элемента, содержащего список, не существует.';
 
 	//если результат нулевой, выводится сообщение из элемента, который размещает список
@@ -412,6 +408,7 @@ function _spisokCond($el) {//формирование строки с условиями поиска
 		$cond .= " AND `dialog_id`=".$el['num_1'];
 
 	$cond .= _spisokCondSearch($el);
+	$cond .= _spisokCond52($el);
 
 	return $cond;
 }
@@ -464,6 +461,45 @@ function _spisokCondSearchVal($pe) {//получение введённого значения в строку пои
 
 	return $v;
 }
+function _spisokCond52($el) {//связка со другим списком
+	//поиск элемента, который содержит условие связки именно для этого списка
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `dialog_id`=52
+			  AND `num_1`=".$el['id']."
+			LIMIT 1";
+	if(!query_value($sql))
+		return '';
+
+	//проверка, чтобы список был размещён именно на странице
+	if($el['block']['obj_name'] != 'page')
+		return ' AND !`id`';
+
+	//страница, на которой размещён список
+	if(!$page = _page($el['block']['obj_id']))
+		return ' AND !`id`';
+
+	//id диалога, единица списка которого размещается на странице
+	if(!$spisok_id = $page['spisok_id'])
+		return ' AND !`id`';
+
+	$cmp = false;
+	foreach(_dialogParam($el['num_1'], 'cmp') as $r) {
+		if($r['dialog_id'] != 29)
+			continue;
+		if($r['num_1'] != $spisok_id)
+			continue;
+		$cmp = $r;
+	}
+
+	if(!$cmp)
+		return ' AND !`id`';
+
+	if(!$unit_id = _num(@$_GET['id']))
+		return ' AND !`id`';
+
+	return " AND `".$cmp['col']."`=".$unit_id;
+}
 
 function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)
@@ -515,6 +551,7 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE ".$cond."
+			  AND !`deleted`
 			ORDER BY `id` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))

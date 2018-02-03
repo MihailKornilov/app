@@ -39,6 +39,9 @@ switch(@$_POST['op']) {
 				//удаление функций
 				$sql = "DELETE FROM `_element_func` WHERE `block_id`=".$elem['block_id'];
 				query($sql);
+				//установка позиции в блоке по умолчанию
+				$sql = "UPDATE `_block` SET `pos`='top' WHERE `id`=".$elem['block_id'];
+				query($sql);
 			}
 
 			$sql = "DELETE FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
