@@ -369,20 +369,52 @@ function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые м
 
 	return $send;
 }
-function _dialogSpisokGetPage($page_id) {//список объектов, которые поступают на страницу через GET
-	if(!$page_id)
+function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списков, которые привязаны к текущему (исходному) диалогу
+/*
+	$block_id - исходный блок, по которому определяется объект
+	Привязка происходит через элемент [29], по нему будет производиться происк
+	Идентификаторами результата являются id диалогов
+*/
+
+	//получение исходного блока, если редактирование значения
+	if($elem_id) {
+		if(!$EL = _elemQuery($elem_id))
+			return array();
+		$block_id = $EL['block_id'];
+	}
+
+	if(!$BL = _blockQuery($block_id))
 		return array();
 
-	//определение, есть ли данные, поступающие на эту страницу
-	$sql = "SELECT `id`,`spisok_name`
-			FROM `_dialog`
-			WHERE `app_id` IN (".APP_ID.(SA ? ",0" : '').")
-			  AND `insert_action_id`=2
-			  AND `insert_action_page_id`=".$page_id;
-	if(!$send = query_ass($sql))
+	if($BL['obj_name'] != 'dialog')
 		return array();
 
-	return _selArray($send);
+	$dialog_id = $BL['obj_id'];
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=29
+			  AND `num_1`=".$dialog_id."
+			ORDER BY `id`";
+	if(!$elem = query_arr($sql))
+		return array();
+
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='dialog' 
+			  AND `id` IN ("._idsGet($elem, 'block_id').")
+			ORDER BY `obj_id`";
+	if(!$block = query_arr($sql))
+		return array();
+
+	$send = array();
+	foreach($block as $r) {
+		$obj_id = _num($r['obj_id']);
+		$dialog = _dialogQuery($obj_id);
+		$send[$obj_id] = utf8($dialog['spisok_name']);
+	}
+
+	return $send;
 }
 function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка через AJAX
 	$sql = "SELECT *
@@ -511,7 +543,7 @@ function _elementChoose($unit) {
 		if(SPISOK_EXIST && $r['element_is_spisok_unit'])
 			$show = true;
 
-//		if($show)
+		if($show)
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 

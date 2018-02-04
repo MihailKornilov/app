@@ -568,11 +568,10 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//select - выбор списка (все списки приложения)
 			case 24:
-				$vvv = array();
 				switch($cmp['num_1']) {
 					case 960: $vvv = _dialogSpisokOnPage($block_id); break;
-					case 961: break;
-					default: $vvv = _dialogSpisokOn($dialog_id, $send['block_id'], $unit_id); break;
+					case 961: $vvv = _dialogSpisokOnConnect($block_id, $unit_id); break;
+					default:  $vvv = _dialogSpisokOn($dialog_id, $block_id, $unit_id); break;
 				}
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $vvv;
 				break;

@@ -758,15 +758,6 @@ var VK_SCROLL = 0,
 						$(el.attr_cmp).val(ids.join(','));
 					});
 					return;
-				//select - выбор списка, размещённого на текущей странице
-				case 27:
-					$(el.attr_cmp)._select({
-						disabled:is_edit,
-						width:el.width,
-						title0:el.txt_1,
-						spisok:el.vvv
-					});
-					return;
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
 					var o = {

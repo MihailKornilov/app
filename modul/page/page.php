@@ -536,22 +536,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'value' => _num($v)
 				   ));
 
-		//Select - выбор списка из размещённых текущей странице
-		case 27:
-			/*
-
-
-
-                txt_1 - текст, когда список не выбран
-
-			*/
-			return _select(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'value' => _num($v)
-				   ));
-
 		//Select - выбор единицы из другого списка
 		case 29:
 			/*
