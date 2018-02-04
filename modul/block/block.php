@@ -119,9 +119,14 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	//составление структуры блоков по строкам
 	$block = array();
 	foreach($arr as $r) {
+		if(!BLOCK_EDIT && $r['elem_id'] && $r['elem']['hidden'])
+			continue;
 		$block[$r['y']][] = $r;
 		$yEnd = $r['y'];
 	}
+
+	if(empty($block))
+		return '';
 
 	$send = '';
 	$BT = BLOCK_EDIT ? ' bor-t-dash' : '';
@@ -463,6 +468,7 @@ function _blockCache($obj_name, $obj_id) {
 		$el['hint_access'] = _num($dlg['element_hint_access']);
 		$el['dialog_func'] = _num($dlg['element_dialog_func']);
 		$el['afics'] = $dlg['element_afics'];
+		$el['hidden'] = _num($dlg['element_hidden']);
 
 		if($el['width_min'] = _num($dlg['element_width_min'])) {
 			//определение максимальной ширины, на которую может растягиваться элемент
@@ -501,7 +507,7 @@ function _blockCache($obj_name, $obj_id) {
 }
 function _block($obj_name, $obj_id, $i='all') {
 	$mass = _blockCache($obj_name, $obj_id);
-//print_r(debug_backtrace(0));
+
 	$BLK = $mass['block'];
 	$ELM = $mass['elem'];
 

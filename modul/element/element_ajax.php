@@ -222,7 +222,15 @@ switch(@$_POST['op']) {
 									'value' => $dialog['element_hint_access']
 							   )).
 
-					'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге для вставки в блок:</div>'.
+					'<tr><td class="red r pt20">Дополнительно:'.
+						'<td class="pt20">'.
+		                        _check(array(
+									'attr_id' => 'element_hidden',
+									'title' => 'скрытый элемент',
+									'value' => $dialog['element_hidden']
+								)).
+
+					'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_is_insert',
@@ -392,6 +400,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_dialog_paste = _num($_POST['element_dialog_paste']);
 	$element_spisok_paste = _num($_POST['element_spisok_paste']);
 	$element_is_spisok_unit = _num($_POST['element_is_spisok_unit']);
+	$element_hidden = _num($_POST['element_hidden']);
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
@@ -438,6 +447,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_dialog_paste`=".$element_dialog_paste.",
 				`element_spisok_paste`=".$element_spisok_paste.",
 				`element_is_spisok_unit`=".$element_is_spisok_unit.",
+				`element_hidden`=".$element_hidden.",
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;
