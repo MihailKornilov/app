@@ -511,7 +511,7 @@ function _elementChoose($unit) {
 		if(SPISOK_EXIST && $r['element_is_spisok_unit'])
 			$show = true;
 
-		if($show)
+//		if($show)
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 

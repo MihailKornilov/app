@@ -503,6 +503,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['button_submit'] = utf8($dialog[$act.'_button_submit']);
 	$send['button_cancel'] = utf8($dialog[$act.'_button_cancel']);
 	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
+
 	//заполнение значениями некоторых компонентов
 	foreach($dialog['cmp_utf8'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
@@ -567,11 +568,13 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//select - выбор списка (все списки приложения)
 			case 24:
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _dialogSpisokOn($dialog_id, $send['block_id'], $unit_id);
-				break;
-			//select - выбор списка, размещённого на текущей странице
-			case 27:
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _dialogSpisokOnPage($block_id);
+				$vvv = array();
+				switch($cmp['num_1']) {
+					case 960: $vvv = _dialogSpisokOnPage($block_id); break;
+					case 961: break;
+					default: $vvv = _dialogSpisokOn($dialog_id, $send['block_id'], $unit_id); break;
+				}
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $vvv;
 				break;
 			//select - выбор единицы из другого списка (для связки)
 			case 29:
