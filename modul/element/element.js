@@ -1627,7 +1627,7 @@ $.fn._check = function(o) {
 		var nx = t.next();
 		if(nx.hasClass('_check'))   //если галочка была выведена через PHP - обновление и применение функций
 			o = $.extend({
-				title:nx.html(),
+				title:nx.html() == '&nbsp;' ? '' : nx.html(),
 				disabled:nx.hasClass('disabled'),
 				light:nx.hasClass('light'),
 				block:nx.hasClass('block')
