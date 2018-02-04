@@ -777,8 +777,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					$txt = $sp['txt_1'];
 					$txt = _spisokUnitUrl($txt, $sp, $el['url']);
 					return $txt;
+				//количество связанного списка
+				case 54: return _num($unit[$elem['col']]);
 			}
-			return 'значение не доделано';
+			return 'значение '.$elem['dialog_id'].' ещё не сделано';
 
 		//SA: Функция PHP
 		case 12:
