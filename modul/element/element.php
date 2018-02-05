@@ -450,10 +450,12 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 }
 
 function _elemQuery($elem_id) {//запрос одного элемента
+//	print_r(debug_backtrace(0));
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id`=".abs($elem_id);
-	$elem = query_assoc($sql);
+	if(!$elem = query_assoc($sql))
+		return array();
 
 	$sql = "SELECT *
 			FROM `_block`
