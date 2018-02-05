@@ -570,7 +570,6 @@
 	position:absolute;
 	display:inline-block;
 	top:-29px;
-	opacity:.85;
 	z-index:998;
 }
 ._tooltip .ttdiv.x2{top:-45px}

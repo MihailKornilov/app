@@ -1039,7 +1039,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							$dialog_id = $US['dialog_source'];
 							break;
 						}
-						return _emptyMin('Вставка значения в блок диалога пока не доделана.');
+						$dialog_id = $BLS['obj_id'];
+						break;
 					}
 					break;
 				case 31://выбор значения для Выпадающего поля
@@ -1173,6 +1174,16 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return '<div class="icon icon-hint pl" id="'.$attr_id.'"></div>';
 
+		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка суммы значений единицы списка (для [27])
+		case 56:
+			/*
+				Все действия через JS.
+				cmp_id получает ids используемых элементов в определённом порядке
+			*/
+			if($is_edit)
+				return '<div class="_empty min">Настройка суммы значений единицы списка</div>';
+
+			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
 
 
 
@@ -1278,6 +1289,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			/*
 			*/
 			return 'порядок';
+
+
 
 
 		//---=== СВЯЗКИ ===---

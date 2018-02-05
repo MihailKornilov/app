@@ -550,6 +550,9 @@ var VK_SCROLL = 0,
 						case 49://Настройка содержания Сборного текста
 							send.cmpv[id] = _cmpV49(sp, 'get');
 							break;
+						case 56://Настройка суммы значений единицы списка
+							send.cmpv[id] = _cmpV56(sp, 'get');
+							break;
 					}
 					send.cmp[id] = $(sp.attr_cmp).val();
 				});
@@ -910,11 +913,17 @@ var VK_SCROLL = 0,
 						});
 					});
 					return;
-				//наполнение для некоторых компонентов
+				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Наполнение для некоторых компонентов
 				case 49:
 					if(is_edit)
 						return;
 					_cmpV49(el, unit);
+					return;
+				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка суммы значений единицы списка (для [27])
+				case 56:
+					if(is_edit)
+						return;
+					_cmpV56(el, unit);
 					return;
 			}
 		});
@@ -1263,6 +1272,111 @@ var VK_SCROLL = 0,
 				v.id = 0;
 			});
 			NUM++;
+		}
+		function cmpUpdate() {//обновление значения компонента
+			var val = [];
+			_forEq(el.find('dd'), function(sp) {
+				var id = _num(sp.attr('val'));
+				if(!id)
+					return;
+				val.push(id);
+			});
+			cmp.val(val);
+		}
+	},
+	_cmpV56 = function(o, unit) {//Настройка суммы значений единицы списка
+		var el = $(o.attr_el);
+
+		//получение данных для сохранения
+		if(unit == 'get') {
+			var send = {};
+			_forEq(el.find('dd'), function(sp) {
+				var id = _num(sp.attr('val'));
+				if(!id)
+					return;
+				send[id] = {
+					num_1:sp.find('button').hasClass('green') ? 0 : 1
+				};
+			});
+			return send;
+		}
+
+		var cmp = $(o.attr_cmp),
+			html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			DL = el.append(html).find('dl'),
+			BUT_ADD = el.find('div:last');
+
+		BUT_ADD.click(valueAdd);
+
+		for(var i in o.vvv)
+			valueAdd(o.vvv[i])
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,       //id элемента
+				num_1:0     //минусовое значение
+			}, v);
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w50 pl5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w25 r">' +
+								'<button class="vk short green w35">+</button>' +
+							'<td><input type="text"' +
+									  ' class="inp w100p curP"' +
+									  ' readonly' +
+									  ' placeholder="значение не выбрано"' +
+								' />' +
+							'<td class="w50 r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить значение', -54) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				INP = DD.find('.inp');
+			INP.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					block_id:unit.source.block_id,
+					unit_id:v.id,           //id выбранного элемента (при редактировании)
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_save:function(ia) {
+						if(!v.id) {
+							DD.attr('val', ia.unit.id);
+							cmpUpdate();
+						}
+						v.id = ia.unit.id;
+						INP.val(ia.unit.num_1);
+					}
+				});
+			});
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-move-y',
+				stop:cmpUpdate
+			});
+			DD.find('button')
+				._tooltip('Прибавление', -33)
+				.click(function() {
+					var t = $(this),
+						plus = t.hasClass('green');
+					t.html(plus ? '—' : '+');
+					t._dn(plus, 'green');
+					t._dn(!plus, 'red');
+					t._tooltip(plus ? 'Вычитание' : 'Прибавление', plus ? -26 : -33);
+				});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+				cmpUpdate();
+				v.id = 0;
+			});
 		}
 		function cmpUpdate() {//обновление значения компонента
 			var val = [];
@@ -3106,9 +3220,7 @@ $.fn._hint = function(o) {//выплывающие подсказки
 $.fn._tooltip = function(msg, left, ugolSide) {
 	var t = $(this);
 
-	if(t.hasClass('_tooltip'))
-		return t;
-
+	t.find('.ttdiv').remove();
 	t.addClass('_tooltip');
 	t.append(
 		'<div class="ttdiv"' + (left ? ' style="left:' + left + 'px"' : '') + '>' +
