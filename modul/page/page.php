@@ -559,14 +559,19 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 31:
 			/*
 				num_1 - id элемента, размещающее Select, для которого выбираются значения
+				txt_1 - имя первого значения
+				num_2 - использовать ли второе значение
+				txt_2 - имя второго значения
 			*/
 			$ex = explode(',', $v);
 			$v0 = _num(@$ex[0]) ? 'выбрано' : '';
 			$v1 = _num(@$ex[1]) ? 'выбрано' : '';
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				'<input type="text" class="sv w125 curP over1 color-pay" placeholder="основное" val="0" readonly'.$disabled.' value="'.$v0.'" />'.
-				'<input type="text" class="sv w150 curP over1 color-pay ml5" placeholder="дополнительное" val="1" readonly'.$disabled.' value="'.$v1.'" />';
+				'<input type="text" id="'.$attr_id.'_sv" class="sv w125 curP over1 color-pay" placeholder="'.$el['txt_1'].'" val="0" readonly'.$disabled.' value="'.$v0.'" />'.
+			($el['num_2'] ?
+				'<input type="text" class="sv w150 curP over1 color-pay ml5" placeholder="'.$el['txt_2'].'" val="1" readonly'.$disabled.' value="'.$v1.'" />'
+			: '');
 
 		//Count - количество
 		case 35:
@@ -1275,6 +1280,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			/*
 				txt_1 - имя значения (для отображения в блоке при выборе как значение)
 				num_1 - привязанный список
+			*/
+			return $el['txt_1'];
+
+		//сумма значений привязанного списка
+		case 55:
+			/*
+				для хранения сумм используется колонка sum_1, sum_2, ...
+
+				txt_1 - имя значения (для отображения в блоке при выборе как значение)
+				num_1 - привязанный список
+				num_2 - id элемента значения (колонки) привязанного списка
 			*/
 			return $el['txt_1'];
 

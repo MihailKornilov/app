@@ -814,10 +814,16 @@ var VK_SCROLL = 0,
 				case 31:
 					if(is_edit)
 						return;
+
 					var sv = $(el.attr_el).find('.sv'),
 						ex = $(el.attr_cmp).val().split(','),
-						v = [_num(ex[0]),_num(ex[1])];
+						v = [];
+
+					v.push(_num(ex[0]));
+					if(el.num_2 && _num(ex[1]))
+						v.push(_num(ex[1]));
 					$(el.attr_cmp).val(v.join(','));
+
 					sv.click(function() {
 						var t = $(this),
 							n = _num(t.attr('val')),
