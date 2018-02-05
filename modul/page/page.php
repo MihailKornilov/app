@@ -787,6 +787,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					if(!$UNIT_ISSET)
 						return $elem['txt_1'];
 					return _num($unit[$elem['col']]);
+				//сумма связанного списка
+				case 55:
+					if(!$UNIT_ISSET)
+						return $elem['txt_1'];
+					return $unit[$elem['col']];
 			}
 			return 'значение '.$elem['dialog_id'].' ещё не сделано';
 

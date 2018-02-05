@@ -469,8 +469,7 @@ $(document)
 		if(!request.responseText)
 			return;
 
-//		<!DOCTYPE html>
-		if(request.responseText[0] == '<') {
+		if(request.responseText.substr(0, 15) == '<!DOCTYPE html>') {
 			location.reload();
 			return;
 		}

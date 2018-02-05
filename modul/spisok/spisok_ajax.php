@@ -203,6 +203,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		}
 
 	_spisokUnitUpd54($unit);
+	_spisokUnitUpd55($unit);
 
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
@@ -655,6 +656,80 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка
 	$sql = "SELECT
 				`".$cmp['col']."`,
 				COUNT(`id`)
+			FROM `".$DConn['base_table']."`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND `".$cmp['col']."`
+			  AND !`deleted`
+			GROUP BY `".$cmp['col']."`";
+	if(!$ass = query_ass($sql))//выход, если нечего обновлять
+		return;
+
+	$n = 1000;
+	$upd = array();
+	$cAss = count($ass);
+	foreach($ass as $id => $c) {
+		$upd[] = "(".$id.",".$c.")";
+		if(!--$cAss || !--$n) {
+			$sql = "INSERT INTO `".$DSrc['base_table']."`
+						(`id`,`".$unit['col']."`)
+						VALUES ".implode(',', $upd)."
+					ON DUPLICATE KEY UPDATE
+						`".$unit['col']."`=VALUES(`".$unit['col']."`)";
+			query($sql);
+			$n = 1000;
+			$upd = array();
+		}
+	}
+}
+function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
+	if(!isset($unit['dialog_id']))
+		return;
+	if($unit['dialog_id'] != 55)
+		return;
+	if(!$dialog_id = _num($unit['num_1']))//id диалога, в котором размещается привязка (сумма этих значений будет считаться)
+		return;
+	if(!$DConn = _dialogQuery($dialog_id))
+		return;
+
+	//блок, в котором размещается "сумма"
+	if(!$block_id = _num($unit['block_id']))
+		return;
+	if(!$BL = _blockQuery($block_id))
+		return;
+	if($BL['obj_name'] != 'dialog')
+		return;
+	if(!$DSrc = _dialogQuery($BL['obj_id']))//диалог, к которому привязан список (данные этого списка будут обновляться)
+		return;
+
+	//получение элемента, который размещает привязанный список (для получения имени колонки)
+	$cmp = array();
+	foreach($DConn['cmp'] as $r)
+		if($r['dialog_id'] == 29 && $r['num_1'] == $BL['obj_id']) {
+			$cmp = $r;
+			break;
+		}
+
+	//предварительное обнуление значений перед обновлением
+	$sql = "UPDATE `".$DSrc['base_table']."`
+			SET `".$unit['col']."`=0
+			WHERE `dialog_id`=".$BL['obj_id'];
+	query($sql);
+
+	//получение элемента, который указывает на элемент, сумму значения которого нужно будет считать
+	if(!$elem_id = _num($unit['num_2']))
+		return;
+	if(!$elForSum = _elemQuery($elem_id))
+		return;
+	if(!$elForSum_id = _num($elForSum['num_1']))
+		return;
+	if(!$cmpSum = @$DConn['cmp_utf8'][$elForSum_id])
+		return;
+	if(!$sum_col = $cmpSum['col'])
+		return;
+
+	$sql = "SELECT
+				`".$cmp['col']."`,
+				SUM(`".$sum_col."`)
 			FROM `".$DConn['base_table']."`
 			WHERE `dialog_id`=".$dialog_id."
 			  AND `".$cmp['col']."`
