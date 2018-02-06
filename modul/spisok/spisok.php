@@ -207,9 +207,11 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				if($count_next > $limit)
 					$count_next = $limit;
 				$html .=
-					'<tr class="over5" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
+					'<tr class="over5 curP center blue" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
 						'<td colspan="20">'.
-							'<tt class="db center curP fs14 blue pad8">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>';
+							'<tt class="db '.($ELEM['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
+								'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
+							'</tt>';
 			}
 
 			$html .= !$next ? '</table>' : '';
