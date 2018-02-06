@@ -201,6 +201,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			//Настройка ТАБЛИЧНОГО содержания списка
 			case 30: _cmpV30($cmp, $cmpv[$cmp_id], $unit); break;
 			case 49: _cmpV49($cmp, $cmpv[$cmp_id], $unit); break;
+			//Настройка суммы значений единицы списка
+			case 56: _cmpV56($cmp, $cmpv[$cmp_id], $unit); break;
 			//количество значений связанного списка
 			case 54: /* сделать пересчёт значения */ break;
 		}
@@ -641,6 +643,46 @@ function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
 	$sql = "DELETE FROM `_element`
 			WHERE `viewer_id_add`=".VIEWER_ID."
 			  AND `block_id` IN (0,-111)";
+	query($sql);
+}
+function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
+	/*
+		$cmp  - компонент из диалога, отвечающий за настройку таблицы
+		$val  - значения, полученные для сохранения
+		$unit -элемент, размещающий таблицу, для которой происходит настройка
+	*/
+	if(empty($cmp['col']))
+		return;
+
+	//поле, хранящее список id элементов-значений
+	$col = $cmp['col'];
+	$ids = $unit[$col] ? $unit[$col] : 0;
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `viewer_id_add`=".VIEWER_ID."
+			  AND `block_id` IN (0,-".$unit['id'].")
+			  AND `id` NOT IN (".$ids.")";
+	query($sql);
+
+	if(!$ids)
+		return;
+
+	$sort = 0;
+	foreach(_ids($ids, 1) as $id) {
+		$r = $val[$id];
+		$sql = "UPDATE `_element`
+				SET `block_id`=-".$unit['id'].",
+					`num_8`=".$r['minus'].",
+					`sort`=".$sort++."
+				WHERE `id`=".$id;
+		query($sql);
+	}
+
+	//очистка неиспользованных элементов
+	$sql = "DELETE FROM `_element`
+			WHERE `viewer_id_add`=".VIEWER_ID."
+			  AND `block_id` IN (0,-113)";
 	query($sql);
 }
 function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка

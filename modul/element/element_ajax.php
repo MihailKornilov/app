@@ -716,7 +716,7 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//Настройка содержания Сборного текста
 			case 49:
-				if($unit_id < 0)
+				if($unit_id <= 0)
 					break;
 				if(!$col = $cmp['col'])
 					break;
@@ -736,6 +736,32 @@ function _dialogOpenLoad($dialog_id) {
 						'dialog_id' => _num($r['dialog_id']),
 						'title' => utf8(_elemUnit($r)),
 						'spc' => _num($r['num_8']) //пробел справа
+					);
+				}
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				break;
+			////Настройка суммы значений единицы списка
+			case 56:
+				if($unit_id <= 0)
+					break;
+				if(!$col = $cmp['col'])
+					break;
+				if(!$ids = $unit[$col])
+					break;
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `id` IN (".$ids.")
+						ORDER BY `sort`";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$spisok = array();
+				foreach($arr as $r) {
+					$spisok[] = array(
+						'id' => _num($r['id']),
+						'dialog_id' => _num($r['dialog_id']),
+						'minus' => _num($r['num_8']), //вычитание=1, сложение=0
+						'title' => utf8(_elemUnit($r))
 					);
 				}
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;

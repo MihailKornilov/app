@@ -1296,7 +1296,7 @@ var VK_SCROLL = 0,
 				if(!id)
 					return;
 				send[id] = {
-					num_1:sp.find('button').hasClass('green') ? 0 : 1
+					minus:sp.find('button').hasClass('green') ? 0 : 1
 				};
 			});
 			return send;
@@ -1316,7 +1316,8 @@ var VK_SCROLL = 0,
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,       //id элемента
-				num_1:0     //минусовое значение
+				minus:0,    //минусовое значение
+				title:''
 			}, v);
 
 			DL.append(
@@ -1325,11 +1326,12 @@ var VK_SCROLL = 0,
 						'<tr><td class="w50 pl5">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w25 r">' +
-								'<button class="vk short green w35">+</button>' +
+								'<button class="vk short ' + (v.minus ? 'red' : 'green') + ' w35">' + (v.minus ? 'Ч' : '+') + '</button>' +
 							'<td><input type="text"' +
 									  ' class="inp w100p curP"' +
 									  ' readonly' +
 									  ' placeholder="значение не выбрано"' +
+									  ' value="' + v.title + '"' +
 								' />' +
 							'<td class="w50 r">' +
 								'<div class="icon icon-del pl' + _tooltip('”далить значение', -54) + '</div>' +
@@ -1343,16 +1345,14 @@ var VK_SCROLL = 0,
 				_dialogLoad({
 					dialog_id:11,
 					block_id:unit.source.block_id,
-					unit_id:v.id,           //id выбранного элемента (при редактировании)
+					unit_id:v.id || -113,      //id выбранного элемента (при редактировании)
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
-						if(!v.id) {
-							DD.attr('val', ia.unit.id);
-							cmpUpdate();
-						}
+						DD.attr('val', ia.unit.id);
+						cmpUpdate();
 						v.id = ia.unit.id;
-						INP.val(ia.unit.num_1);
+						INP.val(ia.unit.title);
 					}
 				});
 			});
