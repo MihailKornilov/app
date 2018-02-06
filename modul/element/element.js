@@ -474,6 +474,7 @@ var VK_SCROLL = 0,
 				element_dialog_paste:$('#element_dialog_paste').val(),
 				element_spisok_paste:$('#element_spisok_paste').val(),
 				element_is_spisok_unit:$('#element_is_spisok_unit').val(),
+				element_44_access:$('#element_44_access').val(),
 				element_hidden:$('#element_hidden').val(),
 
 				menu_edit_last:$('#dialog-menu').val()
@@ -1183,7 +1184,7 @@ var VK_SCROLL = 0,
 			cmp.val(val);
 		}
 	},
-	_cmpV49 = function(o, unit) {//Настройка содержания Сборного текста
+	_cmpV49 = function(o, unit) {//Настройка содержания Сборного текста [44]
 		var el = $(o.attr_el);
 
 		//получение данных для сохранения

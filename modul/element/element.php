@@ -507,7 +507,7 @@ function _elementChoose($unit) {
 		$page = _page($BL['obj_id']);
 		$spisok_exist = $page['spisok_id'];
 	}
-	define('SPISOK_EXIST', BLOCK_SPISOK || $spisok_exist);
+	define('IS_SPISOK_UNIT', BLOCK_SPISOK || $spisok_exist);
 
 	$head = '';
 	$content = '';
@@ -538,9 +538,9 @@ function _elementChoose($unit) {
 			$show = true;
 		if(BLOCK_SPISOK && $r['element_spisok_paste'])
 			$show = true;
-		if($r['element_is_spisok_unit'] && !SPISOK_EXIST)
+		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
 			$show = false;
-		if(SPISOK_EXIST && $r['element_is_spisok_unit'])
+		if(IS_SPISOK_UNIT && $r['element_is_spisok_unit'])
 			$show = true;
 
 		if($show)
@@ -582,18 +582,20 @@ function _elementChoose($unit) {
 	}
 
 	return
-/*
-		'<div>BLOCK_PAGE = '.BLOCK_PAGE.'</div>'.
-		'<div>BLOCK_DIALOG = '.BLOCK_DIALOG.'</div>'.
-		'<div>BLOCK_SPISOK = '.BLOCK_SPISOK.'</div>'.
-		'<div>SPISOK_EXIST = '.SPISOK_EXIST.'</div>'.
-*/
 		'<table id="elem-group" class="w100p">'.
 			'<tr><td class="w150 top prel">'.
 					'<div id="head-back"></div>'.
 					$head.
 				'<td id="elem-group-content" class="top">'.
 					'<div class="cnt-div">'.$content.'<div>'.
-		'</table>';
+		'</table>'.
+	(DEBUG ?
+		'<div class="line-t pad10 bg-ffe">'.
+			'<div class="'.(BLOCK_PAGE ? 'color-pay b' : 'pale').'">BLOCK_PAGE</div>'.
+			'<div class="'.(BLOCK_DIALOG ? 'color-pay b' : 'pale').'">BLOCK_DIALOG</div>'.
+			'<div class="'.(BLOCK_SPISOK ? 'color-pay b' : 'pale').'">BLOCK_SPISOK</div>'.
+			'<div class="'.(IS_SPISOK_UNIT ? 'color-pay b' : 'pale').'">IS_SPISOK_UNIT</div>'.
+		'</div>'
+	: '');
 }
 

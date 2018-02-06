@@ -261,6 +261,12 @@ switch(@$_POST['op']) {
 									'title' => 'является значением списка',
 									'value' => $dialog['element_is_spisok_unit']
 							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_44_access',
+									'title' => 'вставка в сборный текст',
+									'value' => $dialog['element_44_access']
+							   )).
 				'</table>'.
 			'</div>'
 	  : '');
@@ -400,6 +406,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_dialog_paste = _num($_POST['element_dialog_paste']);
 	$element_spisok_paste = _num($_POST['element_spisok_paste']);
 	$element_is_spisok_unit = _num($_POST['element_is_spisok_unit']);
+	$element_44_access = _num($_POST['element_44_access']);
 	$element_hidden = _num($_POST['element_hidden']);
 
 	$sql = "UPDATE `_dialog`
@@ -431,7 +438,6 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`spisok_on`=".$spisok_on.",
 				`spisok_name`='".addslashes($spisok_name)."',
 
-
 				`element_group_id`=".$element_group_id.",
 				`element_name`='".addslashes($element_name)."',
 				`element_width`=".$element_width.",
@@ -447,6 +453,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_dialog_paste`=".$element_dialog_paste.",
 				`element_spisok_paste`=".$element_spisok_paste.",
 				`element_is_spisok_unit`=".$element_is_spisok_unit.",
+				`element_44_access`=".$element_44_access.",
 				`element_hidden`=".$element_hidden.",
 
 				`menu_edit_last`=".$menu_edit_last."
