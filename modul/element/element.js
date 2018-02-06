@@ -475,6 +475,7 @@ var VK_SCROLL = 0,
 				element_spisok_paste:$('#element_spisok_paste').val(),
 				element_is_spisok_unit:$('#element_is_spisok_unit').val(),
 				element_44_access:$('#element_44_access').val(),
+				element_td_paste:$('#element_td_paste').val(),
 				element_hidden:$('#element_hidden').val(),
 
 				menu_edit_last:$('#dialog-menu').val()
@@ -1065,7 +1066,7 @@ var VK_SCROLL = 0,
 				attr_tr:'#tr_' + NUM,
 				width:150,  //ширина колонки
 				tr:'',      //имя колонки txt_1
-				title:'',   //тип значения
+				title:'',   //имя значения
 				font:'',
 				color:'',
 				pos:'',      //txt_6
@@ -1107,18 +1108,16 @@ var VK_SCROLL = 0,
 			INP.click(function() {
 				_dialogLoad({
 					dialog_id:v.dialog_id,
-					block_id:unit.id * -1,  //блок, в котором размещена таблица
-					unit_id:v.id,           //id выбранного элемента (при редактировании)
+					block_id:unit.source.block_id,  //блок, в котором размещена таблица
+					unit_id:v.id || -112,           //id выбранного элемента (при редактировании)
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
-						if(!v.id) {
-							INP.attr('val', ia.unit.id);
-							cmpUpdate();
-						}
+						INP.attr('val', ia.unit.id);
+						cmpUpdate();
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
-						INP.val(ia.unit.num_1);
+						INP.val(ia.unit.title);
 						valueResize(v);
 					}
 				});
@@ -1217,7 +1216,7 @@ var VK_SCROLL = 0,
 			v = $.extend({
 				id:0,       //id элемента
 				dialog_id:50,
-				txt:'',
+				title:'',
 				spc:1     //пробел справа
 			}, v);
 
@@ -1230,7 +1229,7 @@ var VK_SCROLL = 0,
 									  ' class="inp w100p curP"' +
 									  ' readonly' +
 									  ' placeholder="элемент не выбран"' +
-									  ' value="' + v.txt + '"' +
+									  ' value="' + v.title + '"' +
 								' />' +
 							'<td class="w25">' +
 								'<input type="hidden" class="spc" value="' + v.spc + '" />' +
@@ -1250,13 +1249,11 @@ var VK_SCROLL = 0,
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
-						if(!v.id) {
-							DD.attr('val', ia.unit.id);
-							cmpUpdate();
-						}
+						DD.attr('val', ia.unit.id);
+						cmpUpdate();
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
-						INP.val(ia.unit_txt);
+						INP.val(ia.unit.title);
 					}
 				});
 			});

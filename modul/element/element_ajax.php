@@ -225,18 +225,24 @@ switch(@$_POST['op']) {
 					'<tr><td class="red r pt20">Дополнительно:'.
 						'<td class="pt20">'.
 		                        _check(array(
-									'attr_id' => 'element_hidden',
-									'title' => 'скрытый элемент',
-									'value' => $dialog['element_hidden']
-								)).
-
-					'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
-					'<tr><td>'.
-						'<td>'._check(array(
 									'attr_id' => 'element_is_insert',
 									'title' => 'элемент вносит данные',
 									'value' => $dialog['element_is_insert']
+								)).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_is_spisok_unit',
+									'title' => 'является значением списка',
+									'value' => $dialog['element_is_spisok_unit']
 							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_hidden',
+									'title' => 'скрытый элемент',
+									'value' => $dialog['element_hidden']
+							   )).
+
+					'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_page_paste',
@@ -257,15 +263,15 @@ switch(@$_POST['op']) {
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
-									'attr_id' => 'element_is_spisok_unit',
-									'title' => 'является значением списка',
-									'value' => $dialog['element_is_spisok_unit']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
 									'attr_id' => 'element_44_access',
 									'title' => 'вставка в сборный текст',
 									'value' => $dialog['element_44_access']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_td_paste',
+									'title' => 'вставка в ячейку таблицы',
+									'value' => $dialog['element_td_paste']
 							   )).
 				'</table>'.
 			'</div>'
@@ -407,6 +413,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_spisok_paste = _num($_POST['element_spisok_paste']);
 	$element_is_spisok_unit = _num($_POST['element_is_spisok_unit']);
 	$element_44_access = _num($_POST['element_44_access']);
+	$element_td_paste = _num($_POST['element_td_paste']);
 	$element_hidden = _num($_POST['element_hidden']);
 
 	$sql = "UPDATE `_dialog`
@@ -454,6 +461,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_spisok_paste`=".$element_spisok_paste.",
 				`element_is_spisok_unit`=".$element_is_spisok_unit.",
 				`element_44_access`=".$element_44_access.",
+				`element_td_paste`=".$element_td_paste.",
 				`element_hidden`=".$element_hidden.",
 
 				`menu_edit_last`=".$menu_edit_last."
@@ -605,20 +613,14 @@ function _dialogOpenLoad($dialog_id) {
 				if(!$arr = query_arr($sql))
 					break;
 
-				$sql = "SELECT `id`,`dialog_id`
-						FROM `_element`
-						WHERE `id` IN ("._idsGet($arr, 'num_1').")";
-				$elem = query_ass($sql);
-
 				$spisok = array();
 				foreach($arr as $r) {
-					$elDialog = _dialogQuery($r['dialog_id'] == 31 ? $elem[$r['num_1']] : $r['dialog_id']);
 					$spisok[] = array(
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
 						'width' => _num($r['width']),
 						'tr' => utf8($r['txt_1']),
-						'title' => utf8($elDialog['element_name']),
+						'title' => utf8(_elemUnit($r)),
 						'font' => $r['font'],
 						'color' => $r['color'],
 						'pos' => $r['txt_6'],
@@ -732,7 +734,7 @@ function _dialogOpenLoad($dialog_id) {
 					$spisok[] = array(
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
-						'txt' => utf8(_elemUnit($r)),
+						'title' => utf8(_elemUnit($r)),
 						'spc' => _num($r['num_8']) //пробел справа
 					);
 				}

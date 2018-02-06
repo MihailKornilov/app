@@ -486,23 +486,17 @@ function _elementChoose($unit) {
 		return _emptyMin('Функция _elementChoose');
 	if(!$block_id = _num($unit['source']['block_id'], 1))
 		return _emptyMin('Отсутствует id исходного блока.');
-	if($block_id > 0 && !$BL = _blockQuery($block_id))
+	if(!$BL = _blockQuery($block_id))
 		return _emptyMin('Исходного блока id'.$block_id.' не существует.');
 
-	$spisok_exist = false;
-
-	if($block_id < 0) {
-		if(!$EL = _elemQuery(abs($block_id)))
-			return _emptyMin('Исходного элемента id'.$block_id.' не существует.');
-		if($EL['dialog_id'] == 23)
-			$spisok_exist = true;
-	}
-
-	define('BLOCK_PAGE',   @$BL['obj_name'] == 'page');
-	define('BLOCK_DIALOG', @$BL['obj_name'] == 'dialog');
-	define('BLOCK_SPISOK', @$BL['obj_name'] == 'spisok');
+	define('BLOCK_PAGE',   $BL['obj_name'] == 'page');
+	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
+	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
+	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//сборный текст
+	define('TD_ACCESS', $unit['source']['unit_id'] == -112); //ячейка таблицы
 
 	//определение, принимает ли страница значения списка
+	$spisok_exist = false;
 	if(BLOCK_PAGE) {
 		$page = _page($BL['obj_id']);
 		$spisok_exist = $page['spisok_id'];
@@ -531,7 +525,13 @@ function _elementChoose($unit) {
 
 	//расстановка элементов в группы с учётом правил отображения
 	foreach($elem as $id => $r) {
+		if(_44_ACCESS && !$r['element_44_access'])
+			continue;
+//		if(IS_SPISOK_UNIT && !$r['element_is_spisok_unit'])
+//			continue;
+
 		$show = false;
+
 		if(BLOCK_PAGE && $r['element_page_paste'])
 			$show = true;
 		if(BLOCK_DIALOG && $r['element_dialog_paste'])
@@ -540,19 +540,32 @@ function _elementChoose($unit) {
 			$show = true;
 		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
 			$show = false;
-		if(IS_SPISOK_UNIT && $r['element_is_spisok_unit'])
-			$show = true;
 
-		if($show)
+//		if($show)
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
+
+	$debug =
+		(DEBUG ?
+			'<div class="line-t pad10 bg-ffe">'.
+				'<div class="'.(BLOCK_PAGE ? 'color-pay b' : 'pale').'">BLOCK_PAGE</div>'.
+				'<div class="'.(BLOCK_DIALOG ? 'color-pay b' : 'pale').'">BLOCK_DIALOG</div>'.
+				'<div class="'.(BLOCK_SPISOK ? 'color-pay b' : 'pale').'">BLOCK_SPISOK</div>'.
+				'<div class="'.($spisok_exist ? 'color-pay b' : 'pale').'">$spisok_exist</div>'.
+				'<div class="'.(IS_SPISOK_UNIT ? 'color-pay b' : 'pale').'">IS_SPISOK_UNIT</div>'.
+				'<div class="'.(_44_ACCESS ? 'color-pay b' : 'pale').'">_44_ACCESS</div>'.
+				'<div class="'.(TD_ACCESS ? 'color-pay b' : 'pale').'">TD_ACCESS</div>'.
+				_pr($unit).
+//				_pr($BL).
+			'</div>'
+		: '');
 
 	foreach($group as $id => $r)
 		if(empty($r['elem']))
 			unset($group[$id]);
 
 	if(empty($group))
-		return _emptyMin('Нет элементов для отображения.');
+		return _emptyMin('Нет элементов для отображения.').$debug;
 
 	reset($group);
 	$firstId = key($group);
@@ -589,13 +602,6 @@ function _elementChoose($unit) {
 				'<td id="elem-group-content" class="top">'.
 					'<div class="cnt-div">'.$content.'<div>'.
 		'</table>'.
-	(DEBUG ?
-		'<div class="line-t pad10 bg-ffe">'.
-			'<div class="'.(BLOCK_PAGE ? 'color-pay b' : 'pale').'">BLOCK_PAGE</div>'.
-			'<div class="'.(BLOCK_DIALOG ? 'color-pay b' : 'pale').'">BLOCK_DIALOG</div>'.
-			'<div class="'.(BLOCK_SPISOK ? 'color-pay b' : 'pale').'">BLOCK_SPISOK</div>'.
-			'<div class="'.(IS_SPISOK_UNIT ? 'color-pay b' : 'pale').'">IS_SPISOK_UNIT</div>'.
-		'</div>'
-	: '');
+		$debug;
 }
 

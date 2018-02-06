@@ -772,6 +772,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				//произвольный текст
 				case 10: return $elem['txt_1'];
 				case 29:
+					if(!$UNIT_ISSET)
+						return 'связка';
 					if(!$connect_id = $unit[$elem['col']])
 						return '';
 					$dialog = _dialogQuery($unit['dialog_id']);

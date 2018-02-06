@@ -191,6 +191,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			FROM `".$dialog['base_table']."`
 			WHERE `id`=".$unit_id;
 	$unit = query_assoc($sql);
+	$unit['title'] = IS_ELEM ? _elemUnit($unit) : '';
 
 	$cmpv = @$_POST['cmpv'];
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
@@ -217,12 +218,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	$send = array(
 		'unit' => utf8($unit),
-		'unit_txt' => IS_ELEM ? utf8(_elemUnit($unit)) : '',
 		'action_id' => _num($dialog[$act.'_action_id']),
 		'action_page_id' => _num($dialog[$act.'_action_page_id'])
 	);
-
-
 
 	$send = _spisokAction3($send, $dialog, $unit_id, $block_id);
 	$send = _spisokAction4($send);
