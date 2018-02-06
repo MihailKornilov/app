@@ -207,6 +207,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			case 54: /* сделать пересчёт значения */ break;
 		}
 
+	_spisokUnitUpd27($unit);
 	_spisokUnitUpd54($unit);
 	_spisokUnitUpd55($unit);
 
@@ -683,6 +684,59 @@ function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
 	$sql = "DELETE FROM `_element`
 			WHERE `viewer_id_add`=".VIEWER_ID."
 			  AND `block_id` IN (0,-113)";
+	query($sql);
+}
+function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
+	if(!isset($unit['dialog_id']))
+		return;
+	if($unit['dialog_id'] != 27)
+		return;
+	//блок, в котором размещается "баланс"
+	if(!$block_id = _num($unit['block_id']))
+		return;
+	if(!$BL = _blockQuery($block_id))
+		return;
+	if($BL['obj_name'] != 'dialog')
+		return;
+	//диалог, в котором размещаются значения (данные этого списка будут обновляться)
+	if(!$DSrc = _dialogQuery($BL['obj_id']))
+		return;
+
+	//предварительное обнуление значений перед обновлением
+	$sql = "UPDATE `".$DSrc['base_table']."`
+			SET `".$unit['col']."`=0
+			WHERE `dialog_id`=".$BL['obj_id'];
+	query($sql);
+
+	if(!$ids = _ids($unit['txt_2']))
+		return;
+
+	//получение данных значений для подсчёта
+	$sql = "SELECT `num_1`,`num_8`
+			FROM `_element`
+			WHERE `id` IN (".$ids.")";
+	if(!$elData = query_ass($sql))
+		return;
+
+	//получение самих значений для подсчёта
+	$sql = "SELECT `id`,`col`
+			FROM `_element`
+			WHERE LENGTH(`col`)
+			  AND `id` IN ("._idsGet($elData, 'key').")";
+	if(!$elCol = query_ass($sql))
+		return;
+
+
+	$upd = '';
+	foreach($elCol as $id => $col) {
+		$znak = $elData[$id] ? '-' : '+';
+		$upd .= $znak.'`'.$col.'`';
+	}
+
+	//процесс обновления
+	$sql = "UPDATE `".$DSrc['base_table']."`
+			SET `".$unit['col']."`=".$upd."
+			WHERE `dialog_id`=".$BL['obj_id'];
 	query($sql);
 }
 function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка

@@ -784,6 +784,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					$txt = $sp['txt_1'];
 					$txt = _spisokUnitUrl($txt, $sp, $el['url']);
 					return $txt;
+				//сумма значений единицы списка
+				case 27:
+					if(!$UNIT_ISSET)
+						return $elem['txt_1'];
+					return $unit[$elem['col']];
 				//количество связанного списка
 				case 54:
 					if(!$UNIT_ISSET)
