@@ -1194,7 +1194,7 @@ var VK_SCROLL = 0,
 				if(!id)
 					return;
 				send[id] = {
-					num_1:sp.find('.spc').val()
+					spc:sp.find('.spc').val()
 				};
 			});
 			return send;
@@ -1216,7 +1216,8 @@ var VK_SCROLL = 0,
 			v = $.extend({
 				id:0,       //id элемента
 				dialog_id:50,
-				num_1:1     //пробел справа
+				txt:'',
+				spc:1     //пробел справа
 			}, v);
 
 			DL.append(
@@ -1228,10 +1229,10 @@ var VK_SCROLL = 0,
 									  ' class="inp w100p curP"' +
 									  ' readonly' +
 									  ' placeholder="элемент не выбран"' +
-									  ' value=""' +
+									  ' value="' + v.txt + '"' +
 								' />' +
 							'<td class="w25">' +
-								'<input type="hidden" class="spc" value="' + v.num_1 + '" />' +
+								'<input type="hidden" class="spc" value="' + v.spc + '" />' +
 							'<td class="w50 r">' +
 								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить элемент', -52) + '</div>' +
 					'</table>' +
@@ -1244,7 +1245,7 @@ var VK_SCROLL = 0,
 				_dialogLoad({
 					dialog_id:v.dialog_id,
 					block_id:unit.source.block_id,
-					unit_id:v.id,           //id выбранного элемента (при редактировании)
+					unit_id:v.id || -111,           //id выбранного элемента (при редактировании)
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
@@ -1254,7 +1255,7 @@ var VK_SCROLL = 0,
 						}
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
-						INP.val(ia.unit.num_1);
+						INP.val(ia.unit_txt);
 					}
 				});
 			});
@@ -1578,7 +1579,7 @@ var VK_SCROLL = 0,
 			dialog_id:_num(o.dialog_id),        //диалог, который вносит элемент
 			dialog_source:_num(o.dialog_source),//исходный диалог, либо настраиваемый
 			block_id:_num(o.block_id, 1),       //блок (или отрицательный id: элемент-группировка), в который вставляется элемент
-			unit_id:_num(o.unit_id),            //id единицы списка (элемент или функция)
+			unit_id:_num(o.unit_id, 1),         //id единицы списка (элемент или функция)
 
 			del:_num(o.del),                    //удаление элемента
 

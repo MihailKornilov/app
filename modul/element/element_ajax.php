@@ -465,7 +465,8 @@ function _dialogOpenLoad($dialog_id) {
 
 	//получение данных единицы списка
 	$unit = array();
-	if($unit_id = _num(@$_POST['unit_id'])) {
+	$unit_id = _num(@$_POST['unit_id'], 1);
+	if($unit_id > 0) {
 		$cond = "`id`=".$unit_id;
 		if(isset($dialog['field']['app_id']))
 			$cond .= " AND `app_id` IN (0,".APP_ID.")";
@@ -483,7 +484,7 @@ function _dialogOpenLoad($dialog_id) {
 			$block_id = _num($unit['block_id']);
 	}
 
-	$act = $unit_id ? 'edit' : 'insert';
+	$act = $unit_id > 0 ? 'edit' : 'insert';
 	if(_num(@$_POST['del']))
 		$act = 'del';
 
@@ -724,7 +725,8 @@ function _dialogOpenLoad($dialog_id) {
 					$spisok[] = array(
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
-						'num_1' => _num($r['num_1'])
+						'txt' => utf8(_elemUnit($r)),
+						'spc' => _num($r['num_8']) //пробел справа
 					);
 				}
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;

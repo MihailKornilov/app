@@ -5,7 +5,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 	case 'spisok_save'://сохранение данных единицы списка для диалога
-		if(!$unit_id = _num($_POST['unit_id']))
+		if(!$unit_id = _num($_POST['unit_id'], 1))
 			jsonError('Некорректный id единицы списка');
 
 		$send = _spisokUnitUpdate($unit_id);
@@ -153,7 +153,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 		jsonError('Таблицы не существует');
 
 	//получение данных единицы списка, если редактируется
-	if($unit_id) {
+	if($unit_id > 0) {
 		$cond = "`id`=".$unit_id;
 		if(isset($dialog['field']['app_id']))
 			$cond .= " AND `app_id` IN (0,".APP_ID.")";
@@ -168,6 +168,8 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 }
 function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$dialog = _spisokUnitDialog($unit_id);
+
+	define('IS_ELEM', $dialog['base_table'] == '_element');
 
 	$act = $unit_id ? 'edit' : 'insert';
 
@@ -188,7 +190,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$sql = "SELECT *
 			FROM `".$dialog['base_table']."`
 			WHERE `id`=".$unit_id;
-	$unit = query_assoc_utf8($sql);
+	$unit = query_assoc($sql);
 
 	$cmpv = @$_POST['cmpv'];
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
@@ -207,17 +209,20 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
-	if($dialog['base_table'] == '_element') {
+	if(IS_ELEM) {
 		$elem = _elemQuery($unit_id);
 		if($elem['block'])
 			_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 	}
 
 	$send = array(
-		'unit' => $unit,
+		'unit' => utf8($unit),
+		'unit_txt' => IS_ELEM ? utf8(_elemUnit($unit)) : '',
 		'action_id' => _num($dialog[$act.'_action_id']),
 		'action_page_id' => _num($dialog[$act.'_action_page_id'])
 	);
+
+
 
 	$send = _spisokAction3($send, $dialog, $unit_id, $block_id);
 	$send = _spisokAction4($send);
@@ -265,13 +270,13 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 	return $send;
 }
 function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой единицы списка, если отсутствует
-	if($unit_id)
+	if($unit_id > 0)
 		return $unit_id;
 
 	$page_id = _num($_POST['page_id']);
 
 	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
-	if($dialog['base_table'] == '_element' && $block_id > 0) {
+	if(IS_ELEM && $block_id > 0 && !$unit_id) {
 		if(!$block = _blockQuery($block_id))
 			jsonError('Блока не сущетвует');
 		if($block['elem'])
@@ -280,6 +285,10 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 
 	$sql = "INSERT INTO `".$dialog['base_table']."` (`id`) VALUES (0)";
 	query($sql);
+
+	//подмена id блока отрицательным значением для группировки
+	if($unit_id < 0)
+		$block_id = $unit_id;
 
 	$unit_id = query_insert_id($dialog['base_table']);
 
@@ -327,7 +336,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 			query($sql);
 			continue;
 		}
-		if($r['Field'] == 'width' && $dialog['base_table'] == '_element') {
+		if($r['Field'] == 'width' && IS_ELEM && $dialog['element_width']) {
 			$sql = "UPDATE `_element`
 					SET `width`=".$dialog['element_width']."
 					WHERE `id`=".$unit_id;
@@ -435,6 +444,9 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление зна
 		return $send;
 
 	$elem = _elemQuery($unit_id);
+
+	if($elem['block_id'] < 0)
+		return $send;
 
 	$send['block_obj_name'] = $elem['block']['obj_name'];
 
@@ -614,11 +626,17 @@ function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
 		$r = $val[$id];
 		$sql = "UPDATE `_element`
 				SET `block_id`=-".$unit['id'].",
-					`num_1`=".$r['num_1'].",
+					`num_8`=".$r['spc'].",
 					`sort`=".$sort++."
 				WHERE `id`=".$id;
 		query($sql);
 	}
+
+	//очистка неиспользованных элементов
+	$sql = "DELETE FROM `_element`
+			WHERE `viewer_id_add`=".VIEWER_ID."
+			  AND `block_id` IN (0,-111)";
+	query($sql);
 }
 function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка
 	if(!isset($unit['dialog_id']))

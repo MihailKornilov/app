@@ -450,7 +450,6 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 }
 
 function _elemQuery($elem_id) {//запрос одного элемента
-//	print_r(debug_backtrace(0));
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id`=".abs($elem_id);
@@ -498,7 +497,6 @@ function _elementChoose($unit) {
 		if($EL['dialog_id'] == 23)
 			$spisok_exist = true;
 	}
-
 
 	define('BLOCK_PAGE',   @$BL['obj_name'] == 'page');
 	define('BLOCK_DIALOG', @$BL['obj_name'] == 'dialog');

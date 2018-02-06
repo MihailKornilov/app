@@ -396,7 +396,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 	//значение из списка
 	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']]: '';
-	$is_edit = BLOCK_EDIT || ELEM_WIDTH_CHANGE || !empty($unit['choose']);
+	$is_edit = @BLOCK_EDIT || ELEM_WIDTH_CHANGE || !empty($unit['choose']);
 	$attr_id = 'cmp_'.$el['id'].($is_edit ? '_edit' : '');
 	$disabled = $is_edit ? ' disabled' : '';
 
@@ -1151,9 +1151,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					завтра
 				num_4 - показывать время в формате 12:45
 			*/
-			if(!$UNIT_ISSET)
-				return 'дата';
-			return _spisokUnitData($unit['dtime_add'], $el);
+
+			return _spisokUnitData($unit, $el);
 
 		//Значение списка: иконки управления
 		case 34:
@@ -1247,12 +1246,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					WHERE `id` IN (".$el['txt_1'].")
 					ORDER BY `sort`";
 			foreach(query_arr($sql) as $r) {
-				switch($r['dialog_id']) {
-					case 10: $txt .= $r['txt_1']; break;
-					case 32: $txt .= _spisokUnitNum($unit); break;
-					case 33: $txt .= _spisokUnitData($unit['dtime_add'], $r); break;
-				}
-				$txt .= $r['num_1'] ? ' ' : ''; //добавление пробела справа, если нужно
+				$txt .= _elemUnit($r, $unit);
+				$txt .= $r['num_8'] ? ' ' : ''; //добавление пробела справа, если нужно
 			}
 
 			return $txt;

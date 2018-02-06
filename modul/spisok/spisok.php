@@ -55,10 +55,14 @@ function _spisokInclude($spisok, $CMP) {//вложенные списки
 				WHERE `app_id`=".APP_ID."
 				  AND `dialog_id`=".$cmp['num_1']."
 				  AND `id` IN (".$ids.")";
-		$arr = query_arr($sql);
+		if(!$arr = query_arr($sql))
+			continue;
+
 		//идентификаторы будут заменены на массив с данными единицы списка
 		foreach($spisok as $id => $r) {
 			$connect_id = $r[$col];
+			if(empty($arr[$connect_id]))
+				continue;
 			$spisok[$id][$col] = $arr[$connect_id];
 		}
 	}
@@ -164,7 +168,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
 							break;
 						case 33://дата
-							$txt = _spisokUnitData($sp['dtime_add'], $td);
+							$txt = _spisokUnitData($sp, $td);
 							break;
 						case 34://иконки управления
 							$txt = _spisokUnitIconEdit($dialog_id, $sp['id']);
@@ -294,9 +298,12 @@ function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
 		return $u['id'];
 	return $u['num'];
 }
-function _spisokUnitData($dtime, $el) {//дата и время - значение единицы списка [33]
-	if(empty($dtime))
+function _spisokUnitData($unit, $el) {//дата и время - значение единицы списка [33]
+	if(empty($unit) || empty($unit['dtime_add']))
 		return 'дата и время';
+
+	$dtime = $unit['dtime_add'];
+
 	if(!preg_match(REGEXP_DATE, $dtime))
 		return 'некорректный формат даты';
 
