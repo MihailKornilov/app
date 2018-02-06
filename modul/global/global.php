@@ -421,7 +421,7 @@ function win1251($txt) { return iconv('UTF-8', 'WINDOWS-1251//TRANSLIT', $txt); 
 function utf8($val) {
 	if(is_array($val)) {
 		foreach($val as $k => $v)
-			$val[$k] = utf8($v);
+			$val[$k] = preg_match(REGEXP_INTEGER, $v) ? _num($v, 1) : utf8($v);
 		return $val;
 	}
 	return iconv('WINDOWS-1251', 'UTF-8', $val);

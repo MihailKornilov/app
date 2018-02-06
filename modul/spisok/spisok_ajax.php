@@ -563,7 +563,7 @@ function _cmpV30($cmp, $val, $unit) {//сохранение настройки ТАБЛИЧНОГО содержани
 	/*
 		$cmp  - компонент из диалога, отвечающий за настройку таблицы
 		$val  - значения, полученные для сохранения
-		$unit -элемент, размещающий таблицу, для которой происходит настройка
+		$unit - элемент, размещающий таблицу, для которой происходит настройка
 	*/
 	if(empty($cmp['col']))
 		return;
@@ -585,16 +585,23 @@ function _cmpV30($cmp, $val, $unit) {//сохранение настройки ТАБЛИЧНОГО содержани
 	foreach(_ids($ids, 1) as $id) {
 		$r = $val[$id];
 		$sql = "UPDATE `_element`
-				SET `width`="._num($r['width']).",
-					`txt_1`='".addslashes(_txt($r['tr']))."',
+				SET `block_id`=-".$unit['id'].",
+					`width`="._num($r['width']).",
+					`txt_7`='".addslashes(_txt($r['tr']))."',
 					`font`='".$r['font']."',
 					`color`='".$r['color']."',
-					`txt_6`='".$r['pos']."',
+					`txt_8`='".$r['pos']."',
 					`url`="._num($r['url']).",
 					`sort`=".$sort++."
 				WHERE `id`=".$id;
 		query($sql);
 	}
+
+	//очистка неиспользованных элементов
+	$sql = "DELETE FROM `_element`
+			WHERE `viewer_id_add`=".VIEWER_ID."
+			  AND `block_id` IN (0,-112)";
+	query($sql);
 }
 function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
 	/*

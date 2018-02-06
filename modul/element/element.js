@@ -1052,7 +1052,9 @@ var VK_SCROLL = 0,
 				DL.find('.div-inp-tr')['slide' + (v ? 'Down' : 'Up')]();
 			}
 		});
-		BUT_ADD.click(valueAdd);
+		BUT_ADD.click(function() {
+			valueAdd();
+		});
 
 		for(var i in o.vvv)
 			valueAdd(o.vvv[i])
@@ -1065,17 +1067,17 @@ var VK_SCROLL = 0,
 				attr_bl:'#inp_' + NUM,
 				attr_tr:'#tr_' + NUM,
 				width:150,  //ширина колонки
-				tr:'',      //имя колонки txt_1
+				tr:'',      //имя колонки txt_7
 				title:'',   //имя значения
 				font:'',
 				color:'',
-				pos:'',      //txt_6
+				pos:'',      //txt_8
 				url_access:1,//колонке разрешено быть ссылкой
 				url:0        //колонка является ссылкой
 			}, v);
 
 			DL.append(
-				'<dd class="over3">' +
+				'<dd class="over3" val="' + v.id + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w80 grey r topi">Колонка ' + NUM + ':' +
@@ -1094,7 +1096,6 @@ var VK_SCROLL = 0,
 										  ' readonly' +
 										  ' placeholder="значение не выбрано"' +
 										  ' value="' + v.title + '"' +
-										  ' val="' + v.id + '"' +
 									' />' +
 								'</div>' +
 							'<td class="w50 r top pt5">' +
@@ -1103,7 +1104,8 @@ var VK_SCROLL = 0,
 				'</dd>'
 			);
 
-			var INP = $(v.attr_el);
+			var INP = $(v.attr_el),
+				DD = DL.find('dd:last');
 			valueResize(v);
 			INP.click(function() {
 				_dialogLoad({
@@ -1113,7 +1115,7 @@ var VK_SCROLL = 0,
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
-						INP.attr('val', ia.unit.id);
+						DD.attr('val', ia.unit.id);
 						cmpUpdate();
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
@@ -1175,7 +1177,7 @@ var VK_SCROLL = 0,
 		function cmpUpdate() {//обновление значения компонента
 			var val = [];
 			_forEq(el.find('dd'), function(sp) {
-				var id = _num(sp.find('.inp').attr('val'));
+				var id = _num(sp.attr('val'));
 				if(!id)
 					return;
 				val.push(id);
@@ -1229,7 +1231,7 @@ var VK_SCROLL = 0,
 									  ' class="inp w100p curP"' +
 									  ' readonly' +
 									  ' placeholder="элемент не выбран"' +
-									  ' value="' + v.title + '"' +
+									  ' value="' + _br(v.title) + '"' +
 								' />' +
 							'<td class="w25">' +
 								'<input type="hidden" class="spc" value="' + v.spc + '" />' +
@@ -1253,7 +1255,7 @@ var VK_SCROLL = 0,
 						cmpUpdate();
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
-						INP.val(ia.unit.title);
+						INP.val(_br(ia.unit.title));
 					}
 				});
 			});

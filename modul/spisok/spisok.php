@@ -154,7 +154,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			if(!$next && $ELEM['num_5']) {
 				$html .= '<tr>';
 				foreach($tabCol as $tr)
-					$html .= '<th>'.$tr['txt_1'];
+					$html .= '<th>'.$tr['txt_7'];
 			}
 
 			foreach($spisok as $sp) {
@@ -163,17 +163,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$txt = '';
 					$cls = array();
 					switch($td['dialog_id']) {
-						case 32://порядковый номер - num
-							$txt = _spisokUnitNum($sp);
-							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
-							break;
-						case 33://дата
-							$txt = _spisokUnitData($sp, $td);
-							break;
-						case 34://иконки управления
-							$txt = _spisokUnitIconEdit($dialog_id, $sp['id']);
-							$cls[] = 'pad0';
-							break;
 						case 11://из диалога
 							$elemUse = $tabElemUse[$td['num_1']];
 							$el = $CMP[$elemUse['id']];
@@ -197,10 +186,15 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
 						break;
+						case 34: $cls[] = 'pad0'; //иконки управления
+						default:
+							$txt = _elemUnit($td, $sp);
+							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
+							break;
 					}
 					$cls[] = $td['font'];
 					$cls[] = $td['color'];
-					$cls[] = $td['txt_6'];//pos - позиция
+					$cls[] = $td['txt_8'];//pos - позиция
 					$cls = array_diff($cls, array(''));
 					$cls = implode(' ', $cls);
 					$cls = $cls ? ' class="'.$cls.'"' : '';

@@ -619,11 +619,11 @@ function _dialogOpenLoad($dialog_id) {
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
 						'width' => _num($r['width']),
-						'tr' => utf8($r['txt_1']),
+						'tr' => utf8($r['txt_7']),
 						'title' => utf8(_elemUnit($r)),
 						'font' => $r['font'],
 						'color' => $r['color'],
-						'pos' => $r['txt_6'],
+						'pos' => $r['txt_8'],
 						'url' => _num($r['url']),
 					);
 				}
@@ -716,7 +716,7 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//Настройка содержания Сборного текста
 			case 49:
-				if(!$unit_id)
+				if($unit_id < 0)
 					break;
 				if(!$col = $cmp['col'])
 					break;

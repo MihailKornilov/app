@@ -493,7 +493,7 @@ function _elementChoose($unit) {
 	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
 	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
 	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//сборный текст
-	define('TD_ACCESS', $unit['source']['unit_id'] == -112); //€чейка таблицы
+	define('TD_PASTE', $unit['source']['unit_id'] == -112); //€чейка таблицы
 
 	//определение, принимает ли страница значени€ списка
 	$spisok_exist = false;
@@ -501,7 +501,7 @@ function _elementChoose($unit) {
 		$page = _page($BL['obj_id']);
 		$spisok_exist = $page['spisok_id'];
 	}
-	define('IS_SPISOK_UNIT', BLOCK_SPISOK || $spisok_exist);
+	define('IS_SPISOK_UNIT', BLOCK_SPISOK || TD_PASTE || $spisok_exist);
 
 	$head = '';
 	$content = '';
@@ -527,6 +527,8 @@ function _elementChoose($unit) {
 	foreach($elem as $id => $r) {
 		if(_44_ACCESS && !$r['element_44_access'])
 			continue;
+		if(TD_PASTE && !$r['element_td_paste'])
+			continue;
 //		if(IS_SPISOK_UNIT && !$r['element_is_spisok_unit'])
 //			continue;
 
@@ -541,7 +543,7 @@ function _elementChoose($unit) {
 		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
 			$show = false;
 
-//		if($show)
+		if($show)
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 
@@ -554,7 +556,7 @@ function _elementChoose($unit) {
 				'<div class="'.($spisok_exist ? 'color-pay b' : 'pale').'">$spisok_exist</div>'.
 				'<div class="'.(IS_SPISOK_UNIT ? 'color-pay b' : 'pale').'">IS_SPISOK_UNIT</div>'.
 				'<div class="'.(_44_ACCESS ? 'color-pay b' : 'pale').'">_44_ACCESS</div>'.
-				'<div class="'.(TD_ACCESS ? 'color-pay b' : 'pale').'">TD_ACCESS</div>'.
+				'<div class="'.(TD_PASTE ? 'color-pay b' : 'pale').'">TD_PASTE</div>'.
 				_pr($unit).
 //				_pr($BL).
 			'</div>'
