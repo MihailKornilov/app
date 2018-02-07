@@ -43,53 +43,12 @@ var VK_SCROLL = 0,
 		7:'вс'
 	},
 
-	_backfon = function(add) {//Задний фон при открытии поверхностных окон
-		if(add === undefined)
-			add = true;
-		var body = $('body'),
-			h = $(document).height();
-		if(add) {
-			ZINDEX += 10;
-			if(!BC) {
-				body.find('._backfon').remove().end()
-					.append('<div class="_backfon"></div>');
-			}
-			var backfon = body.find('._backfon');
-			backfon.css({
-				'z-index':ZINDEX,
-				height:h
-			});
-			if(typeof add == 'object')
-				backfon.click(function() {
-					del();
-					add.remove();
-				});
-			BC++;
-		} else
-			del();
-
-		function del() {
-			BC--;
-			ZINDEX -= 10;
-			if($('._dialog').length)
-				ZINDEX = $('._dialog:last').css('z-index') - 5;
-
-			var backfon = body.find('._backfon');
-			if(!BC)
-				backfon.remove();
-			else {
-				backfon.css({'z-index':ZINDEX});
-				ZINDEX += 10;
-			}
-		}
-	},
-
 	_dialog = function(o) {//диалоговое окно
 		o = $.extend({
 			top:100,
 			width:0,    //ширина диалога. Если 0 = автоматически
 			mb:0,       //margin-bottom: отступ снизу от диалога (для календаря или выпадающих списков)
-			padding:10, //отступ для content
+			pad:0,      //отступ для content
 
 			dialog_id:0,//id диалога, загруженного из базы
 			unit_id:0,  //id единицы списка, который вносится при помощи данного диалога (только для передачи при редактировании диалога)
@@ -98,9 +57,7 @@ var VK_SCROLL = 0,
 			edit_access:0,//показ иконки редактирования диалога
 
 			color:'',   //цвет диалога - заголовка и кнопки
-			attr_id:'', //идентификатор диалога: для определения открытого такого же, чтобы предварительно закрывать его
 			head:'head: Название заголовка',
-			load:0,     // Показ процесса ожидания загрузки в центре диалога
 			content:'<div class="pad30 pale">content: содержимое центрального поля</div>',
 
 			butSubmit:'Внести',
@@ -109,51 +66,26 @@ var VK_SCROLL = 0,
 			cancel:dialogClose
 		}, o);
 
-		var frameNum = $('._dialog').length;
-
-		//запрет редактирования диалогового окна, которое открыто поверх другого
-		if(frameNum)
-			o.edit_access = 0;
-
-		//закрытие диалога с тем же идентификатором
-		if(o.attr_id && $('#' + o.attr_id + '_dialog').length) {
-			$('#' + o.attr_id + '_dialog').remove();
-			_backfon(false);
-			if(!frameNum)
-				DIALOG_MAXHEIGHT = 0;
-//			_fbhs();
-		}
-
-		if(o.load)
-			o.content =
-				'<div class="load _busy">' +
-					'<tt class="red">В процессе загрузки произошла ошибка.</tt>' +
-				'</div>';
-
-		var html =
-			'<div class="_dialog"' + (o.attr_id ? ' id="' + o.attr_id + '_dialog"' : '') + '>' +
+		var DIALOG_NUM = $('._dialog').length,
+			html =
+			'<div class="_dialog-back"></div>' +
+			'<div class="_dialog">' +
 				'<div class="head ' + o.color + '">' +
 					'<div class="close fr curP"><a class="icon icon-del wh pl"></a></div>' +
-		            '<div class="edit fr curP' + _dn(o.edit_access) + '"><a class="icon icon-edit wh pl"></a></div>' +
+		            '<div class="edit fr curP' + _dn(!DIALOG_NUM && o.edit_access) + '"><a class="icon icon-edit wh pl"></a></div>' +
 					'<div class="fs14 white">' + o.head + '</div>' +
 				'</div>' +
-//				'<div>' +
-//					'<iframe class="dFrame" name="dFrame' + frameNum + '"></iframe>' +
-					'<div class="content bg-fff"' + (o.padding ? ' style="padding:' + o.padding + 'px"' : '') + '>' +
-						o.content +
-					'</div>' +
-//				'</div>' +
+				'<div class="content bg-fff"' + (o.pad ? ' style="padding:' + o.pad + 'px"' : '') + '>' +
+					o.content +
+				'</div>' +
 				'<div class="btm">' +
 					'<button class="vk submit mr10 ' + o.color + (o.butSubmit ? '' : ' dn') + '">' + o.butSubmit + '</button>' +
 					'<button class="vk cancel' + (o.butCancel ? '' : ' dn') + '">' + o.butCancel + '</button>' +
 				'</div>' +
-			'</div>';
+			'</div>',
 
-		// Если открывается первый диалог на странице, запоминается стартовая максимальная высота диалогов
-		if(!frameNum)
-			DIALOG_MAXHEIGHT = 0;
-
-		var dialog = $('body').append(html).find('._dialog:last'),
+			dialog = $('body').append(html).find('._dialog:last'),
+			DBACK = dialog.prev(),
 			iconEdit = dialog.find('.head .edit'),
 			content = dialog.find('.content'),
 			width = o.width || Math.round(content.width()),
@@ -168,7 +100,9 @@ var VK_SCROLL = 0,
 					delete DIALOG[o.dialog_id];
 			},
 			w2 = Math.round(width / 2); // ширина/2. Для определения положения по центру
+
 		dialog.find('.close').click(dialogClose);
+		content.find('input')._enter(submitFunc);//для всех input при нажатии enter применяется submit
 		butSubmit.click(submitFunc);
 		butCancel.click(function() {
 //			e.stopPropagation();
@@ -176,18 +110,6 @@ var VK_SCROLL = 0,
 			if(butCancel.hasClass('_busy'))
 				return;
 			o.cancel();
-		});
-
-		//для всех input при нажатии enter применяется submit
-		content.find('input')._enter(submitFunc);
-
-		_backfon();
-
-		dialog.css({
-			width:width + 'px',
-			top:$(window).scrollTop() + VK_SCROLL + o.top + 'px',
-			left:$(document).width() / 2 - w2 + 'px',
-			'z-index':ZINDEX + 5
 		});
 		iconEdit.click(function() {//нажатие на иконку редактирования
 			if(!o.dialog_id)
@@ -207,30 +129,26 @@ var VK_SCROLL = 0,
 			});
 		});
 
-/*
-		window['dFrame' + frameNum].onresize = function() {
-			var fr = $('.dFrame'),
-				max = 0;
-			for(var n = 0; n < fr.length; n++) {
-				var h = fr.eq(n).height();
-				if(h > max)
-					max = h;
-			}
-			var dh = max + VK_SCROLL + 180 + o.mb;
-			if(DIALOG_MAXHEIGHT != dh) {
-				DIALOG_MAXHEIGHT = dh;
-//				_fbhs();
-			}
-		};
-*/
+		$('._hint').remove();
+		DBACK.css({
+				'z-index':ZINDEX + 3,
+				height:$(document).height()
+			 })
+			 .click(dialogClose);
+		dialog.css({
+			width:width + 'px',
+			top:$(window).scrollTop() + VK_SCROLL + o.top + 'px',
+			left:$(document).width() / 2 - w2 + 'px',
+			'z-index':ZINDEX + 5
+		});
+		ZINDEX += 10;
+
 		function dialogClose() {
+			DBACK.remove();
 			dialog.remove();
-			_backfon(false);
+			ZINDEX -= 10;
 			if(o.dialog_id)
 				delete DIALOG[o.dialog_id];
-			if(!frameNum)
-				DIALOG_MAXHEIGHT = 0;
-//			_fbhs();
 		}
 		function dialogErr(msg) {
 			butSubmit._hint({
@@ -239,11 +157,6 @@ var VK_SCROLL = 0,
 				pad:10,
 				show:1
 			});
-		}
-		function loadError(msg) {//ошибка загрузки данных для диалога
-			dialog.find('.load').removeClass('_busy');
-			if(msg)
-				dialog.find('.load tt').append('<br /><br /><b>' + msg + '</b>');
 		}
 
 		var DLG = {
@@ -263,7 +176,6 @@ var VK_SCROLL = 0,
 				return content;
 			})(),
 			err:dialogErr,
-			loadError:loadError,
 			butSubmit:function(name) {//изменение текста кнопки применения
 				butSubmit[(name ? 'remove' : 'add') + 'Class']('dn');
 				butSubmit.html(name);
@@ -274,16 +186,6 @@ var VK_SCROLL = 0,
 			},
 			submit:function(func) {
 				o.submit = func;
-			},
-			load:function(send, func) {//загрузка контенка и вставка при получении в диалоговое окно. Если ошибка - вывод сообщения
-				$.post(AJAX, send, function(res) {
-					if(res.success) {
-						content.html(res.html);
-						if(typeof func == 'function')
-							func(res);
-					} else
-						loadError(res.text);
-				}, 'json');
 			},
 			post:function(send, success) {//отправка формы
 				butSubmit.addClass('_busy');
@@ -325,10 +227,9 @@ var VK_SCROLL = 0,
 	_dialogEdit = function(o) {//создание|редактирование диалогового окна
 		var dialog = _dialog({
 				dialog_id:o.dialog_id,
+				top:20,
 				color:'orange',
 				width:o.width,
-				top:20,
-				padding:0,
 				head:'Настройка диалогового окна',
 				content:o.html,
 				butSubmit:'Сохранить диалоговое окно',
@@ -352,7 +253,7 @@ var VK_SCROLL = 0,
 
 		_blockUpd(o.blk);
 		_elemUpd(o.cmp);
-		_elemActivate(o.cmp, {}, 1);
+//		_elemActivate(o.cmp, {}, 1);
 
 		$('#dialog-menu')._menu({
 			type:2,
@@ -496,7 +397,6 @@ var VK_SCROLL = 0,
 
 			top:20,
 			width:o.width,
-			padding:0,
 			edit_access:o.edit_access,
 
 			head:o.head,

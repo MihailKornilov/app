@@ -1200,6 +1200,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						1159 - С нижним подчёркиванием
 			*/
 
+			if(empty($el['vvv']))
+				return '';
+
 			$razdel = '';
 			foreach($el['vvv'] as $r)
 				$razdel .= '<a class="link'._dn($el['def'] != $r['id'], 'sel').'">'.$r['title'].'</a>';

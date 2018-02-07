@@ -256,16 +256,16 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		return array();
 
 	//получение списка колонок, присутствующих в таблице
-	$col = array();
+	$field = array();
 	$sql = "DESCRIBE `".$dialog['base_table']."`";
 	foreach(query_array($sql) as $r)
-		$col[$r['Field']] = 1;
+		$field[$r['Field']] = 1;
 
 	_cache('clear', 'dialog_'.$dialog_id);
 	$dialog['blk'] = _block('dialog', $dialog_id, 'block_arr');
 	$dialog['cmp'] = _block('dialog', $dialog_id, 'elem_arr');
 	$dialog['cmp_utf8'] = _block('dialog', $dialog_id, 'elem_utf8');
-	$dialog['field'] = $col;
+	$dialog['field'] = $field;
 
 	return _cache($dialog);
 }

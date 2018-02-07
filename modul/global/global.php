@@ -662,6 +662,14 @@ function _cache($data='', $key='') {//кеширование данных
 		$DBT = debug_backtrace(0);
 		$DBT = $DBT[1];
 		$ARG = empty($DBT['args'][0]) ? '' : $DBT['args'][0];
+		if(is_array($ARG)) {
+			$CACHE_ARR[] = array(
+				'act' => 'key_array!!!',
+				'key' => _pr($ARG),
+				'dbt' => debug_backtrace(0)
+			);
+			return false;
+		}
 		$key = $DBT['function'].$ARG;
 	}
 

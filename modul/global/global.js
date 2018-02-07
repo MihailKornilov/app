@@ -172,25 +172,6 @@ var FB,
 			return 0;
 		return v * 1;
 	},
-	_fbhs = function() {
-		var h;
-		if(FOTO_HEIGHT > 0) {
-			h = FOTO_HEIGHT;
-			FB.height(h);
-		} else {
-			if(DIALOG_MAXHEIGHT == 0)
-				FB.height('auto');
-			h = FB.height();
-			if(h < DIALOG_MAXHEIGHT) {
-				h = DIALOG_MAXHEIGHT;
-				FB.height(h);
-			}
-		}
-		if(FB_HEIGHT == h)
-			return;
-		FB_HEIGHT = h;
-		VK.callMethod('resizeWindow', 795, h);
-	},
 	_msg = function(txt, func) {//Сообщение о результате выполненных действий
 		if(!txt)
 			txt = 'Выполнено';
@@ -205,17 +186,6 @@ var FB,
 				if(typeof func == 'function')
 					func();
 			});
-	},
-	_wait = function(v) {//Ожидание выполнения действия
-		$('#_wait').remove();
-		if(v === false) {
-			_backfon(false);
-			return;
-		}
-		$('body').append('<div id="_wait" class="_busy"></div>');
-		_backfon($('#_wait'));
-		$('#_wait')
-			.css('top', $(this).scrollTop() + 200 + VK_SCROLL);
 	},
 	_br = function(v, back) {
 		if(back)
@@ -477,6 +447,7 @@ $(document)
 		var d = _dialog({
 			width:770,
 			top:10,
+			pad:10,
 			head:'Ошибка AJAX-запроса',
 			content:'<textarea style="width:730px;background-color:#fdd">' + request.responseText + '</textarea>',
 			butSubmit:'',
