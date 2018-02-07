@@ -674,7 +674,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			//вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
 			$block = _num(@$US['block_id']) ? ',block_id:'.$US['block_id'] : '';
 			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
-			$dialog_source = $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
+			$dialog_source = !empty($el['block']) && $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
 
 			//если новая кнопка, будет создаваться новый диалог для неё
 			if(!$el['num_4'])
