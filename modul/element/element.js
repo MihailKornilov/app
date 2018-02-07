@@ -932,9 +932,14 @@ var VK_SCROLL = 0,
 					return;
 				//Меню переключения блоков
 				case 57:
+					if(is_edit)
+						return;
 					$(el.attr_cmp)._menu({
 						type:2,
-						spisok:el.vvv
+						spisok:el.vvv,
+						func:function(id) {
+							alert(id)
+						}
 					});
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка пунктов меню переключения блоков (для [57])
@@ -3729,6 +3734,7 @@ $.fn._menu = function(o) {//меню
 
 		html += '</div>';
 
+		tMain.next().remove('._menu' + o.type);
 		tMain.after(html);
 	}
 	function _click() {
