@@ -289,6 +289,8 @@ function _pageShow($page_id) {
 		return _contentMsg();
 
 	return
+//	_block('page', $page_id, 'elem_js').
+//	_pr(_block('page', $page_id, 'elem_arr')).
 	_blockHtml('page', $page_id, 1000, 0, _pageSpisokUnit($page_id)).
 //	_page_div().
 	'<script>'.
@@ -470,8 +472,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			$sql = "SELECT `id`,`txt_1`
 					FROM `_element`
-					WHERE `dialog_id`=19
-					  AND `block_id`=-".$el['id']."
+					WHERE `block_id`=-".$el['id']."
 					ORDER BY `sort`";
 			$spisok = query_ass($sql);
 
@@ -1188,6 +1189,26 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			if($is_edit)
 				return '<div class="_empty min">Настройка суммы значений единицы списка</div>';
+
+			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
+
+		//Меню переключения блоков
+		case 57:
+			/*
+				num_1 - внешний вид меню:
+						1158 - Маленькие синие кнопки
+						1159 - С нижним подчёркиванием
+			*/
+			return '<input type="hidden" id="'.$attr_id.'" value="'.$el['def'].'" />';
+
+		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка пунктов меню переключения блоков (для [57])
+		case 58:
+			/*
+				Все действия через JS.
+				cmp_id получает ids используемых элементов в определённом порядке
+			*/
+			if($is_edit)
+				return '<div class="_empty min">Настройка пунктов меню переключения блоков</div>';
 
 			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
 

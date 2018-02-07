@@ -438,9 +438,9 @@ function _blockCache($obj_name, $obj_id) {
 
 	$elem = array();
 	foreach($arr as $el) {
-		$id = _num($el['id']);
+		$elem_id = _num($el['id']);
 		$dlg = $dialog[$el['dialog_id']];
-		$block[$el['block_id']]['elem_id'] = $id;
+		$block[$el['block_id']]['elem_id'] = $elem_id;
 		unset($el['sort']);
 		unset($el['viewer_id_add']);
 		unset($el['dtime_add']);
@@ -459,8 +459,8 @@ function _blockCache($obj_name, $obj_id) {
 			if(preg_match(REGEXP_INTEGER, $v))
 				$el[$key] = _num($v, 1);
 
-		$el['attr_el'] = '#el_'.$id;
-		$el['attr_cmp'] = '#cmp_'.$id;
+		$el['attr_el'] = '#el_'.$elem_id;
+		$el['attr_cmp'] = '#cmp_'.$elem_id;
 		$el['size'] = $el['size'] ? _num($el['size']) : 13;
 		$el['is_func'] = _num(@$isFunc[$el['block_id']]);
 		$el['style_access'] = _num($dlg['element_style_access']);
@@ -480,7 +480,28 @@ function _blockCache($obj_name, $obj_id) {
 		$el['func'] = array();
 		$el['vvv'] = array();//значения для некоторых компонентов
 
-		$elem[$id] = $el;
+		switch($el['dialog_id']) {
+			//Меню переключения блоков - список пунктов
+			case 57:
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `block_id`=-".$elem_id."
+						ORDER BY `sort`";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$spisok = array();
+				foreach($arr as $id => $r)
+					$spisok[] = array(
+						'id' => _num($id),
+						'title' => $r['txt_1']
+					);
+
+				$el['vvv'] = $spisok;
+				break;
+		}
+
+		$elem[$elem_id] = $el;
 	}
 
 	$sql = "SELECT *
@@ -539,8 +560,12 @@ function _block($obj_name, $obj_id, $i='all') {
 			foreach($bl as $k => $v) {
 				if($k == 'focus' && !$v)
 					continue;
-				if(is_array($v))
+				if(is_array($v)) {
+					if(empty($v))
+						continue;
+					$u[] = $k.':'._json($v);
 					continue;
+				}
 				if(!preg_match(REGEXP_NUMERIC, $v))
 					$v = '"'.addslashes(_br($v)).'"';
 				$u[] = $k.':'.$v;

@@ -205,6 +205,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			case 56: _cmpV56($cmp, $cmpv[$cmp_id], $unit); break;
 			//количество значений связанного списка
 			case 54: /* сделать пересчёт значения */ break;
+			//Настройка пунктов меню переключения блоков
+			case 58: _cmpV58($cmpv[$cmp_id], $unit); break;
 		}
 
 	_spisokUnitUpd27($unit);
@@ -507,7 +509,6 @@ function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, se
 			$content = _txt($r['content']);
 			$update[] = "(
 				".$id.",
-				19,
 				-".$unit['id'].",
 				'".addslashes($title)."',
 				'".addslashes($content)."',
@@ -534,7 +535,6 @@ function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, se
 
 	$sql = "INSERT INTO `_element` (
 				`id`,
-				`dialog_id`,
 				`block_id`,
 				`txt_1`,
 				`txt_2`,
@@ -551,8 +551,7 @@ function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, se
 
 	//установка нового значения по умолчанию
 	$sql = "SELECT `id` FROM `_element`
-			WHERE `dialog_id`=19
-			  AND `block_id`=-".$unit['id']."
+			WHERE `block_id`=-".$unit['id']."
 			  AND `def`
 			LIMIT 1";
 	$def = _num(query_value($sql));
@@ -684,6 +683,71 @@ function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
 	$sql = "DELETE FROM `_element`
 			WHERE `viewer_id_add`=".VIEWER_ID."
 			  AND `block_id` IN (0,-113)";
+	query($sql);
+}
+function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
+	$update = array();
+	$idsNoDel = '0';
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		$sort = 0;
+		foreach($val as $r) {
+			if(!$name = _txt($r['name']))
+				continue;
+			if($id = _num($r['id']))
+				$idsNoDel .= ','.$id;
+			$update[] = "(
+				".$id.",
+				-".$unit['id'].",
+				'".addslashes($name)."',
+				"._num($r['def']).",
+				".$sort++."
+			)";
+		}
+	}
+
+	//удаление удалённых значений
+	$sql = "DELETE FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			  AND `id` NOT IN (".$idsNoDel.")";
+	query($sql);
+
+	//сброс значения по умолчанию
+	$sql = "UPDATE `_element`
+			SET `def`=0
+			WHERE `id`=".$unit['id'];
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	$sql = "INSERT INTO `_element` (
+				`id`,
+				`block_id`,
+				`txt_1`,
+				`def`,
+				`sort`
+			)
+			VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`txt_1`=VALUES(`txt_1`),
+				`def`=VALUES(`def`),
+				`sort`=VALUES(`sort`)";
+	query($sql);
+
+	//установка нового значения по умолчанию
+	$sql = "SELECT `id` FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			  AND `def`
+			LIMIT 1";
+	$def = _num(query_value($sql));
+
+	$sql = "UPDATE `_element`
+			SET `def`=".$def."
+			WHERE `id`=".$unit['id'];
 	query($sql);
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)

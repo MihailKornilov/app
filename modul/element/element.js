@@ -555,6 +555,9 @@ var VK_SCROLL = 0,
 						case 56://Настройка суммы значений единицы списка
 							send.cmpv[id] = _cmpV56(sp, 'get');
 							break;
+						case 58://наполнение для некоторых компонентов
+							send.cmpv[id] = _cmpV58(sp, 1);
+							return;
 					}
 					send.cmp[id] = $(sp.attr_cmp).val();
 				});
@@ -926,6 +929,19 @@ var VK_SCROLL = 0,
 					if(is_edit)
 						return;
 					_cmpV56(el, unit);
+					return;
+				//Меню переключения блоков
+				case 57:
+					$(el.attr_cmp)._menu({
+						type:2,
+						spisok:el.vvv
+					});
+					return;
+				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка пунктов меню переключения блоков (для [57])
+				case 58:
+					if(is_edit)
+						return;
+					_cmpV58(el);
 					return;
 			}
 		});
@@ -1371,6 +1387,125 @@ var VK_SCROLL = 0,
 					t._dn(!plus, 'red');
 					t._tooltip(plus ? 'Вычитание' : 'Прибавление', plus ? -26 : -33);
 				});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+				cmpUpdate();
+				v.id = 0;
+			});
+		}
+		function cmpUpdate() {//обновление значения компонента
+			var val = [];
+			_forEq(el.find('dd'), function(sp) {
+				var id = _num(sp.attr('val'));
+				if(!id)
+					return;
+				val.push(id);
+			});
+			cmp.val(val);
+		}
+	},
+	_cmpV58 = function(o, get) {//Настройка пунктов меню переключения блоков
+		var el = $(o.attr_el);
+
+		//получение данных для сохранения
+		if(get) {
+			var send = [];
+			_forEq(el.find('dd'), function(sp) {
+				send.push({
+					id:sp.attr('val'),
+					name:sp.find('.pk-name').val(),
+					def:sp.find('.def').val()
+				});
+			});
+			return send;
+		}
+
+		var cmp = $(o.attr_cmp),
+			html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Новый пункт меню</div>',
+			DL = el.append(html).find('dl'),
+			BUT_ADD = el.find('div:last'),
+			NUM = 1;
+
+		BUT_ADD.click(valueAdd);
+
+		if(!o.vvv.length)
+			valueAdd();
+
+		for(var i in o.vvv)
+			valueAdd(o.vvv[i])
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,                  //id элемента
+				name:'Имя пункта ' + NUM++, //имя пункта меню
+				def:0
+			}, v);
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w35 pl5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w15">' +
+								'<input type="hidden" class="def" value="' + v.def + '" />' +
+							'<td><input type="text"' +
+									  ' class="pk-name w100p"' +
+									  ' placeholder="имя не указано"' +
+									  ' value="' + v.name + '"' +
+								' />' +
+							'<td class="w125">' +
+								'<input type="text"' +
+									  ' class="pk-block w100p curP over1"' +
+									  ' readonly' +
+									  ' placeholder="выбрать блоки"' +
+									  ' value=""' +
+								' />' +
+							'<td class="w35 r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить пункт', -44) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				NAME = DD.find('.pk-name'),
+				BLOCK = DD.find('.pk-block');
+			NAME.focus();
+			BLOCK.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					block_id:unit.source.block_id,
+					unit_id:v.id || -114,
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_save:function(ia) {
+						DD.attr('val', ia.unit.id);
+						cmpUpdate();
+						v.id = ia.unit.id;
+						INP.val(ia.unit.title);
+					}
+				});
+			});
+			DD.find('.def')._check({
+				tooltip:'По умолчанию',
+				func:function(v, ch) {
+					if(!v)
+						return;
+					//снятие галочек с остальных значений
+					_forEq(DL.find('.def'), function(sp) {
+						if(sp.attr('id') == ch.attr('id'))
+							return;
+						sp._check(0);
+					});
+				}
+			});
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-move-y',
+				stop:cmpUpdate
+			});
 			DD.find('.icon-del').click(function() {
 				var t = $(this),
 					p = _parent(t, 'DD');
@@ -3585,9 +3720,9 @@ $.fn._menu = function(o) {//меню
 
 		for(n = 0; n < o.spisok.length; n++) {
 			var sp = o.spisok[n],
-				sel = val == sp.uid ? ' sel' : '';
+				sel = val == sp.id ? ' sel' : '';
 			html +=
-				'<a class="link' + sel + '" val="' + sp.uid + '">' +
+				'<a class="link' + sel + '" val="' + sp.id + '">' +
 					sp.title +
 				'</a>';
 		}
@@ -3608,7 +3743,7 @@ $.fn._menu = function(o) {//меню
 	function _pageCange(v) {
 		for(n = 0; n < o.spisok.length; n++) {
 			var sp = o.spisok[n];
-			$('.' + attr_id + '-' + sp.uid)[(v == sp.uid ? 'remove' : 'add') + 'Class']('dn');
+			$('.' + attr_id + '-' + sp.id)[(v == sp.id ? 'remove' : 'add') + 'Class']('dn');
 		}
 	}
 

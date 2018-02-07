@@ -527,15 +527,14 @@ function _dialogOpenLoad($dialog_id) {
 			case 17://select - произвольные значения
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _elemValue($cmp_id);
 				break;
-			//вспомогательный элемент: значения для select, radio, dropdown
+			//значения для select, radio, dropdown
 			case 19:
 				if(!$unit_id)
 					break;
 
 				$sql = "SELECT *
 						FROM `_element`
-						WHERE `dialog_id`=19
-						  AND `block_id`=-".$unit_id."
+						WHERE `block_id`=-".$unit_id."
 						ORDER BY `sort`";
 				if(!$arr = query_arr($sql))
 					break;
@@ -740,7 +739,7 @@ function _dialogOpenLoad($dialog_id) {
 				}
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
 				break;
-			////Настройка суммы значений единицы списка
+			//Настройка суммы значений единицы списка
 			case 56:
 				if($unit_id <= 0)
 					break;
@@ -766,17 +765,33 @@ function _dialogOpenLoad($dialog_id) {
 				}
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
 				break;
+			//Настройка пунктов меню переключения блоков
+			case 58:
+				if(!$unit_id)
+					break;
+
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `block_id`=-".$unit_id."
+						ORDER BY `sort`";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$spisok = array();
+				foreach($arr as $id => $r)
+					$spisok[] = array(
+						'id' => _num($id),
+						'name' => utf8($r['txt_1']),
+						'def' => _num($r['def'])
+					);
+
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				break;
 		}
 
 	$send['blk'] = $dialog['blk'];
 	$send['cmp'] = $dialog['cmp_utf8'];
-
-	foreach($unit as $id => $r) {
-		$r = !is_array($r) && preg_match(REGEXP_NUMERIC, $r) ? intval($r) : utf8($r);
-		$unit[$id] = $r;
-	}
-
-	$send['unit'] = $unit;
+	$send['unit'] = utf8($unit);
 
 	//если производится удаление единицы списка
 	if($act == 'del') {
@@ -794,11 +809,10 @@ function _dialogOpenLoad($dialog_id) {
 
 	return $send;
 }
-function _elemValue($elem_id) {//дополнительне значения к элементу (select, radio)
+function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `dialog_id`=19
-			  AND `block_id`=-".$elem_id."
+			WHERE `block_id`=-".$elem_id."
 			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))
 		return array();

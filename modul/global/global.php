@@ -420,8 +420,11 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1; - выбранный список
 function win1251($txt) { return iconv('UTF-8', 'WINDOWS-1251//TRANSLIT', $txt); }
 function utf8($val) {
 	if(is_array($val)) {
-		foreach($val as $k => $v)
+		foreach($val as $k => $v) {
+			if(is_array($v))
+				continue;
 			$val[$k] = preg_match(REGEXP_INTEGER, $v) ? _num($v, 1) : utf8($v);
+		}
 		return $val;
 	}
 	return iconv('WINDOWS-1251', 'UTF-8', $val);
@@ -593,13 +596,14 @@ function _selArray($arr) {//список для _select при отправке через ajax
 	$send = array();
 	foreach($arr as $uid => $title) {
 		$send[] = array(
+			'id' => _num($uid),
 			'uid' => _num($uid),
 			'title' => utf8(addslashes(htmlspecialchars_decode(trim($title))))
 		);
 	}
 	return $send;
 }
-function _assJson($arr) {//Ассоциативный массив
+function _assJson($arr) {//Ассоциативный массив одного элемента
 	$send = array();
 	foreach($arr as $id => $v)
 		$send[] =
@@ -616,7 +620,16 @@ function _arrJson($arr, $i=false) {//Последовательный массив
 	}
 	return '['.implode(',', $send).']';
 }
-
+function _json($arr) {
+	$send = array();
+	foreach($arr as $unit) {
+		$sn = array();
+		foreach($unit as $k => $v)
+			$sn[] = $k.':'.(preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.addslashes($v).'"');
+		$send[] = '{'.implode(',', $sn).'}';
+	}
+	return '['.implode(',', $send).']';
+}
 
 
 
