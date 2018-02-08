@@ -778,12 +778,17 @@ function _dialogOpenLoad($dialog_id) {
 					break;
 
 				$spisok = array();
-				foreach($arr as $id => $r)
+				foreach($arr as $id => $r) {
+					$c = count(_ids($r['txt_2'], 1));
+					$blk_title = $r['txt_2'] ? $c.' блок'._end($c, '', 'а', 'ов') : '';
 					$spisok[] = array(
 						'id' => _num($id),
-						'name' => utf8($r['txt_1']),
+						'title' => utf8($r['txt_1']),
+						'blk' => $r['txt_2'],
+						'blk_title' => utf8($blk_title),
 						'def' => _num($r['def'])
 					);
+				}
 
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
 				break;

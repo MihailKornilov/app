@@ -259,9 +259,13 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для измене
 	}
 
 	return
-	'<div id="block-level-'.$obj_name.'" class="dib" val="'.$obj_name.':'.$obj_id.':'.$width.'">'.
+	'<div id="block-level-'.$obj_name.'" val="'.$obj_name.':'.$obj_id.':'.$width.'">'.
 		'<button class="vk small grey block-grid-on">Управление блоками</button>'.
 		$html.
+		'<div class="dn fr">'.
+			'<button class="vk small green mr5 block-choose-submit">Блоки выбраны</button>'.
+			'<button class="vk small cancel block-choose-cancel">Вернуться к диалогу</button>'.
+		'</div>'.
 	'</div>';
 }
 function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
@@ -494,7 +498,8 @@ function _blockCache($obj_name, $obj_id) {
 				foreach($arr as $id => $r)
 					$spisok[] = array(
 						'id' => _num($id),
-						'title' => $r['txt_1']
+						'title' => $r['txt_1'],
+						'blk' => $r['txt_2']
 					);
 
 				$el['vvv'] = $spisok;

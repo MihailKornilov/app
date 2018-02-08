@@ -357,6 +357,27 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'block_choose_page'://выбор блоков на странице
+		if(!$obj_name = _blockObj($_POST['obj_name']))
+			jsonError('Несуществующее имя объекта');
+		if(!$obj_id = _num($_POST['obj_id']))
+			jsonError('Некорректный ID объекта');
+		if(!$width = _num($_POST['width']))
+			jsonError('Некорректная ширина');
+
+		$sel = _idsAss($_POST['sel']);
+
+		$unit = _pageSpisokUnit($obj_id, $obj_name);
+		$unit += array(
+			'choose' => 1,
+			'choose_access' => array('block'=>1),
+			'choose_sel' => $sel       //ids ранее выбранных блоков
+		);
+
+		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width, 0, $unit));
+
+		jsonSuccess($send);
+		break;
 }
 
 

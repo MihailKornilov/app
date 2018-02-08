@@ -161,6 +161,14 @@ var VK_SCROLL = 0,
 
 		var DLG = {
 			close:dialogClose,
+			hide:function() {
+				DBACK.hide();
+				dialog.hide();
+			},
+			show:function() {
+				DBACK.show();
+				dialog.show();
+			},
 			process:function() {
 				butSubmit.addClass('_busy');
 			},
@@ -1320,7 +1328,8 @@ var VK_SCROLL = 0,
 			_forEq(el.find('dd'), function(sp) {
 				send.push({
 					id:sp.attr('val'),
-					name:sp.find('.pk-name').val(),
+					title:sp.find('.pk-title').val(),
+					blk:sp.find('.pk-block').attr('val'),
 					def:sp.find('.def').val()
 				});
 			});
@@ -1332,7 +1341,11 @@ var VK_SCROLL = 0,
 				   '<div class="fs15 color-555 pad10 center over1 curP">Новый пункт меню</div>',
 			DL = el.append(html).find('dl'),
 			BUT_ADD = el.find('div:last'),
-			NUM = 1;
+			NUM = 1,
+			BCS = $('.block-choose-submit');//кнопка сохранения выбора блоков
+
+		//отмена выбора блоков на странице
+		$('.block-choose-cancel').click(dlgShow);
 
 		BUT_ADD.click(valueAdd);
 
@@ -1345,7 +1358,9 @@ var VK_SCROLL = 0,
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,                  //id элемента
-				name:'Имя пункта ' + NUM++, //имя пункта меню
+				title:'Имя пункта ' + NUM++, //имя пункта меню
+				blk:'',
+				blk_title:'',
 				def:0
 			}, v);
 
@@ -1357,16 +1372,17 @@ var VK_SCROLL = 0,
 							'<td class="w15">' +
 								'<input type="hidden" class="def" value="' + v.def + '" />' +
 							'<td><input type="text"' +
-									  ' class="pk-name w100p"' +
+									  ' class="pk-title w100p"' +
 									  ' placeholder="имя не указано"' +
-									  ' value="' + v.name + '"' +
+									  ' value="' + v.title + '"' +
 								' />' +
 							'<td class="w125">' +
 								'<input type="text"' +
-									  ' class="pk-block w100p curP over1"' +
+									  ' class="pk-block w100p curP color-ref over1"' +
 									  ' readonly' +
 									  ' placeholder="выбрать блоки"' +
-									  ' value=""' +
+									  ' value="' + v.blk_title + '"' +
+									  ' val="' + v.blk + '"' +
 								' />' +
 							'<td class="w35 r">' +
 								'<div class="icon icon-del pl' + _tooltip('Удалить пункт', -44) + '</div>' +
@@ -1375,22 +1391,43 @@ var VK_SCROLL = 0,
 			);
 
 			var DD = DL.find('dd:last'),
-				NAME = DD.find('.pk-name'),
+				NAME = DD.find('.pk-title'),
 				BLOCK = DD.find('.pk-block');
 			NAME.focus();
 			BLOCK.click(function() {
-				_dialogLoad({
-					dialog_id:11,
-					block_id:unit.source.block_id,
-					unit_id:v.id || -114,
-					busy_obj:INP,
-					busy_cls:'hold',
-					func_save:function(ia) {
-						DD.attr('val', ia.unit.id);
-						cmpUpdate();
-						v.id = ia.unit.id;
-						INP.val(ia.unit.title);
-					}
+				var spl = BCS.parent().parent().attr('val').split(':'),
+					send = {
+						op:'block_choose_page',
+						obj_name:spl[0],
+						obj_id:spl[1],
+						width:spl[2],
+						sel:BLOCK.attr('val'),
+						busy_obj:BLOCK,
+						busy_cls:'hold'
+					};
+				_post(send, function(res) {
+					$('#_content').html(res.html);
+					$('.block-grid-on').hide();
+					$('.block-level-change').hide();
+					$('.elem-width-change').hide();
+					BCS.parent().show();
+					DIALOG_OPEN.hide();
+					var bec = $('#_content').find('.choose');
+					bec.click(function() {
+						var t = $(this),
+							sel = t.hasClass('sel');
+						t._dn(sel, 'sel');
+					});
+					BCS.click(function() {
+						var ids = [];
+						_forEq(bec, function(el) {
+							if(el.hasClass('sel'))
+								ids.push(_num(el.attr('val')));
+						});
+						BLOCK.attr('val', ids.join(','));
+						BLOCK.val(ids.length ? ids.length + ' блок' + _end(ids.length, ['', 'а', 'ов']) : '');
+						dlgShow();
+					});
 				});
 			});
 			DD.find('.def')._check({
@@ -1428,6 +1465,16 @@ var VK_SCROLL = 0,
 				val.push(id);
 			});
 			cmp.val(val);
+		}
+		function dlgShow() {
+			$('.block-grid-on')
+				.show()
+				.removeClass('grey')
+				.trigger('click');
+			$('.block-level-change').show();
+			$('.elem-width-change').show();
+			BCS.parent().hide();
+			DIALOG_OPEN.show();
 		}
 	},
 	_elemFunc = function(el, v, is_edit, is_open) {//применение функций, привязанных к элементам

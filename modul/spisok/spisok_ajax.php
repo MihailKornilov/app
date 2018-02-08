@@ -695,14 +695,16 @@ function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
 
 		$sort = 0;
 		foreach($val as $r) {
-			if(!$name = _txt($r['name']))
+			if(!$title = _txt($r['title']))
 				continue;
 			if($id = _num($r['id']))
 				$idsNoDel .= ','.$id;
+			$blk = _ids($r['blk']);
 			$update[] = "(
 				".$id.",
 				-".$unit['id'].",
-				'".addslashes($name)."',
+				'".addslashes($title)."',
+				'".$blk."',
 				"._num($r['def']).",
 				".$sort++."
 			)";
@@ -728,12 +730,14 @@ function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
 				`id`,
 				`block_id`,
 				`txt_1`,
+				`txt_2`,
 				`def`,
 				`sort`
 			)
 			VALUES ".implode(',', $update)."
 			ON DUPLICATE KEY UPDATE
 				`txt_1`=VALUES(`txt_1`),
+				`txt_2`=VALUES(`txt_2`),
 				`def`=VALUES(`def`),
 				`sort`=VALUES(`sort`)";
 	query($sql);
