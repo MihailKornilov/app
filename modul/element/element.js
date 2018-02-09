@@ -842,19 +842,23 @@ var VK_SCROLL = 0,
 				case 57:
 					if(is_edit)
 						return;
-					var toggle = function(id) {
+					var type = {
+							1158:2,
+							1159:1
+						},
+						toggle = function(id) {
 						_forN(el.vvv, function(sp) {
 							_forN(_elemFuncBlockObj(_idsAss(sp.blk)), function(oo) {
 								if(!oo.obj.length)
 									return;
 								oo.obj[sp.id == id ? 'show' : 'hide']();
-//								oo.obj[sp.id == id ? 'slideDown' : 'slideUp']();
+//								oo.obj[sp.id == id ? 'slideDown' : 'slideUp'](300);
 							});
 						});
 					};
 					toggle(el.def);
 					$(el.attr_cmp)._menu({
-						type:2,
+						type:type[el.num_1],
 						spisok:el.vvv,
 						func:toggle
 					});

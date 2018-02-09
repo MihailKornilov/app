@@ -1203,13 +1203,18 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(empty($el['vvv']))
 				return '';
 
+			$type = array(
+				1158 => 2,
+				1159 => 1
+			);
+
 			$razdel = '';
 			foreach($el['vvv'] as $r)
 				$razdel .= '<a class="link'._dn($el['def'] != $r['id'], 'sel').'">'.$r['title'].'</a>';
 
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$el['def'].'" />'.
-				'<div class="_menu2">'.$razdel.'</div>';
+				'<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка пунктов меню переключения блоков (для [57])
 		case 58:
