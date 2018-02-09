@@ -842,12 +842,21 @@ var VK_SCROLL = 0,
 				case 57:
 					if(is_edit)
 						return;
+					var toggle = function(id) {
+						_forN(el.vvv, function(sp) {
+							_forN(_elemFuncBlockObj(_idsAss(sp.blk)), function(oo) {
+								if(!oo.obj.length)
+									return;
+								oo.obj[sp.id == id ? 'show' : 'hide']();
+//								oo.obj[sp.id == id ? 'slideDown' : 'slideUp']();
+							});
+						});
+					};
+					toggle(el.def);
 					$(el.attr_cmp)._menu({
 						type:2,
 						spisok:el.vvv,
-						func:function(id) {
-							alert(id)
-						}
+						func:toggle
 					});
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка пунктов меню переключения блоков (для [57])
@@ -1537,7 +1546,7 @@ var VK_SCROLL = 0,
 					}
 
 					//ПРОЦЕСС
-					_forN(_elemFuncBlockObj(sp), function(oo) {
+					_forN(_elemFuncBlockObj(sp.target), function(oo) {
 						if(!oo.obj.length)
 							return;
 
@@ -1580,9 +1589,9 @@ var VK_SCROLL = 0,
 			}
 		});
 	},
-	_elemFuncBlockObj = function(sp) {//получение $(obj) блоков
-		var TRG = _copyObj(sp.target),
-			arr = [];
+	_elemFuncBlockObj = function(TRG) {//получение $(obj) блоков
+		console.log(TRG);
+		var arr = [];
 		_forIn(TRG, function(n, block_id) {
 			if(!n)
 				return;
@@ -3636,18 +3645,19 @@ $.fn._menu = function(o) {//меню
 		val = _num(tMain.val()),
 		win = attr_id + '_menu',
 		n,
-		s;
+		S;
 
 	if(!attr_id)
 		return;
+
+	S = window[win];
 
 	switch(typeof o){
 		case 'number':
 		case 'string':
 		case 'boolean':
-			s = window[win];
 			var v = _num(o);
-			s.value(v);
+			S.value(v);
 			return tMain;
 	}
 
@@ -3691,7 +3701,7 @@ $.fn._menu = function(o) {//меню
 		t.addClass('sel');
 		tMain.val(v);
 		_pageCange(v);
-		o.func(v, attr_id);
+		o.func(v, S);
 	}
 	function _pageCange(v) {
 		for(n = 0; n < o.spisok.length; n++) {

@@ -277,6 +277,25 @@ var FB,
 		cls = cls || 'dn';
 		v = cls == 'dn' ? v : !v;
 		return v ? '' : ' ' + cls;
+	},
+	_idsAss = function(ids) {
+		var send = {};
+
+		if(!ids)
+			return send;
+
+		if(typeof ids == 'number') {
+			send[ids] = 1;
+			return send;
+		}
+
+		_forN(ids.split(','), function(id) {
+			id = _num(id);
+			if(!id)
+				return;
+			send[id] = 1;
+		});
+		return send;
 	};
 
 $.fn._enter = function(func) {

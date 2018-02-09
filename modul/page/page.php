@@ -289,7 +289,7 @@ function _pageShow($page_id) {
 		return _contentMsg();
 
 	return
-//	_block('page', $page_id, 'elem_js').
+//	_block('page', $page_id, 'block_js').
 //	_pr(_block('page', $page_id, 'elem_arr')).
 	_blockHtml('page', $page_id, 1000, 0, _pageSpisokUnit($page_id)).
 //	_page_div().
