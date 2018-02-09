@@ -1215,12 +1215,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		case 58:
 			/*
 				Все действия через JS.
-				cmp_id получает ids используемых элементов в определённом порядке
 			*/
 			if($is_edit)
 				return '<div class="_empty min">Настройка пунктов меню переключения блоков</div>';
 
-			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
+			return '';
 
 
 

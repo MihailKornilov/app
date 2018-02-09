@@ -366,12 +366,14 @@ switch(@$_POST['op']) {
 			jsonError('Ќекорректна€ ширина');
 
 		$sel = _idsAss($_POST['sel']);
+		$deny = @$_POST['deny'];
 
 		$unit = _pageSpisokUnit($obj_id, $obj_name);
 		$unit += array(
 			'choose' => 1,
 			'choose_access' => array('block'=>1),
-			'choose_sel' => $sel       //ids ранее выбранных блоков
+			'choose_sel' => $sel,       //ids ранее выбранных блоков
+			'choose_deny' => empty($deny) ? array() : $deny
 		);
 
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width, 0, $unit));

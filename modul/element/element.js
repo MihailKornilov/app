@@ -1367,6 +1367,7 @@ var VK_SCROLL = 0,
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,                  //id элемента
+				num:NUM,
 				title:'Имя пункта ' + NUM++, //имя пункта меню
 				blk:'',
 				blk_title:'',
@@ -1374,7 +1375,7 @@ var VK_SCROLL = 0,
 			}, v);
 
 			DL.append(
-				'<dd class="over3" val="' + v.id + '">' +
+				'<dd class="over3" val="' + v.id + '" data-num="' + v.num + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w35 pl5">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
@@ -1404,6 +1405,16 @@ var VK_SCROLL = 0,
 				BLOCK = DD.find('.pk-block');
 			NAME.focus();
 			BLOCK.click(function() {
+				var deny = [];
+				_forEq(el.find('dd'), function(sp) {
+					var num = _num(sp.attr('data-num')),
+						blk = sp.find('.pk-block').attr('val');
+					if(num == v.num)
+						return;
+					if(!blk)
+						return;
+					deny.push(blk);
+				});
 				var spl = BCS.parent().parent().attr('val').split(':'),
 					send = {
 						op:'block_choose_page',
@@ -1411,6 +1422,7 @@ var VK_SCROLL = 0,
 						obj_id:spl[1],
 						width:spl[2],
 						sel:BLOCK.attr('val'),
+						deny:_idsAss(deny.join(',')),
 						busy_obj:BLOCK,
 						busy_cls:'hold'
 					};
@@ -1454,26 +1466,13 @@ var VK_SCROLL = 0,
 			});
 			DL.sortable({
 				axis:'y',
-				handle:'.icon-move-y',
-				stop:cmpUpdate
+				handle:'.icon-move-y'
 			});
 			DD.find('.icon-del').click(function() {
 				var t = $(this),
 					p = _parent(t, 'DD');
 				p.remove();
-				cmpUpdate();
-				v.id = 0;
 			});
-		}
-		function cmpUpdate() {//обновление значения компонента
-			var val = [];
-			_forEq(el.find('dd'), function(sp) {
-				var id = _num(sp.attr('val'));
-				if(!id)
-					return;
-				val.push(id);
-			});
-			cmp.val(val);
 		}
 		function dlgShow() {
 			$('.block-grid-on')
@@ -1589,13 +1588,15 @@ var VK_SCROLL = 0,
 			}
 		});
 	},
-	_elemFuncBlockObj = function(TRG) {//получение $(obj) блоков
-		console.log(TRG);
-		var arr = [];
+	_elemFuncBlockObj = function(blk_ass) {//получение $(obj) блоков
+		var arr = [],
+			TRG = _copyObj(blk_ass);
+
 		_forIn(TRG, function(n, block_id) {
 			if(!n)
 				return;
 			var BL = BLK[block_id];
+
 			if(BL.xx == 1) {//если блок в ряду один, фукнция применится ко всей таблице
 				arr.push({
 					obj:_parent($(BL.attr_bl), '.bl-div'),

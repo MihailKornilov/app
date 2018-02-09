@@ -381,7 +381,7 @@
 	box-shadow:0 1px 3px rgba(0,0,0,.1);
 	background-color:#fff;
 	cursor:pointer;
-	z-index:10;
+	z-index:100;
 }
 ._select .select-res.h250{height:250px;overflow-y:scroll}
 ._select .select-unit{padding:6px 8px;text-align:left}
