@@ -373,7 +373,7 @@ function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списк
 /*
 	$block_id - исходный блок, по которому определяется объект
 	Привязка происходит через элемент [29], по нему будет производиться происк
-	Идентификаторами результата являются id диалогов
+	Идентификаторами результата являются id элементов (а не диалогов)
 */
 
 	//получение исходного блока, если редактирование значения
@@ -407,11 +407,26 @@ function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списк
 	if(!$block = query_arr($sql))
 		return array();
 
+	//количество связок для каждого диалога (connect count)
+	$sql = "SELECT
+				`obj_id`,
+				COUNT(`id`)-1
+			FROM `_block`
+			WHERE `obj_name`='dialog' 
+			  AND `id` IN ("._idsGet($elem, 'block_id').")
+			GROUP BY `obj_id`";
+	$cc = query_ass($sql);
+
 	$send = array();
-	foreach($block as $r) {
-		$obj_id = _num($r['obj_id']);
+	foreach($elem as $elem_id => $r) {
+		$BL = $block[$r['block_id']];
+		$obj_id = _num($BL['obj_id']);
 		$dialog = _dialogQuery($obj_id);
-		$send[$obj_id] = utf8($dialog['spisok_name']);
+		$send[_num($elem_id)] =
+			utf8(
+				$dialog['spisok_name'].
+					($cc[$obj_id] ? ' (в блоке '.$r['block_id'].')' : '')
+			);
 	}
 
 	return $send;
@@ -543,7 +558,7 @@ function _elementChoose($unit) {
 		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
 			$show = false;
 
-		if($show)
+//		if($show)
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 

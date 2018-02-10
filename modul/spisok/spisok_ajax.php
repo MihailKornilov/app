@@ -812,11 +812,14 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка
 		return;
 	if($unit['dialog_id'] != 54)
 		return;
-	if(!$dialog_id = _num($unit['num_1']))//id диалога, в котором размещается привязка (количество этих значений будет считаться)
+	if(!$cmp_id = _num($unit['num_1']))//id компонента в диалоге, в котором размещается привязка (количество этих значений будет считаться)
+		return;
+	if(!$cmp = _elemQuery($cmp_id))
+		return;
+	if(!$dialog_id = $cmp['block']['obj_id'])//id диалога, в котором размещается привязка
 		return;
 	if(!$DConn = _dialogQuery($dialog_id))
 		return;
-
 	//блок, в котором размещается "количество"
 	if(!$block_id = _num($unit['block_id']))
 		return;
@@ -826,13 +829,6 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка
 		return;
 	if(!$DSrc = _dialogQuery($BL['obj_id']))//диалог, к которому привязан список (данные этого списка будут обновляться)
 		return;
-
-	$cmp = array();
-	foreach($DConn['cmp'] as $r)
-		if($r['dialog_id'] == 29 && $r['num_1'] == $BL['obj_id']) {
-			$cmp = $r;
-			break;
-		}
 
 	//предварительное обнуление значений перед обновлением
 	$sql = "UPDATE `".$DSrc['base_table']."`
@@ -873,33 +869,25 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 		return;
 	if($unit['dialog_id'] != 55)
 		return;
-	if(!$dialog_id = _num($unit['num_1']))//id диалога, в котором размещается привязка (сумма этих значений будет считаться)
+	if(!$cmp_id = _num($unit['num_1']))//id компонента в диалоге, в котором размещается привязка (сумма этих значений будет считаться)
+		return;
+	if(!$cmp = _elemQuery($cmp_id))
+		return;
+	if(!$dialog_id = $cmp['block']['obj_id'])//id диалога, в котором размещается привязка
 		return;
 	if(!$DConn = _dialogQuery($dialog_id))
 		return;
 
-	//блок, в котором размещается "сумма"
-	if(!$block_id = _num($unit['block_id']))
+	//диалог, к которому привязан список (данные этого списка будут обновляться)
+	if(!$DSrc_id = _num($cmp['num_1']))
 		return;
-	if(!$BL = _blockQuery($block_id))
+	if(!$DSrc = _dialogQuery($DSrc_id))
 		return;
-	if($BL['obj_name'] != 'dialog')
-		return;
-	if(!$DSrc = _dialogQuery($BL['obj_id']))//диалог, к которому привязан список (данные этого списка будут обновляться)
-		return;
-
-	//получение элемента, который размещает привязанный список (для получения имени колонки)
-	$cmp = array();
-	foreach($DConn['cmp'] as $r)
-		if($r['dialog_id'] == 29 && $r['num_1'] == $BL['obj_id']) {
-			$cmp = $r;
-			break;
-		}
 
 	//предварительное обнуление значений перед обновлением
 	$sql = "UPDATE `".$DSrc['base_table']."`
 			SET `".$unit['col']."`=0
-			WHERE `dialog_id`=".$BL['obj_id'];
+			WHERE `dialog_id`=".$DSrc_id;
 	query($sql);
 
 	//получение элемента, который указывает на элемент, сумму значения которого нужно будет считать

@@ -529,6 +529,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							  Идентификаторами результата являются id элементов (а не диалогов)
 							  Функция _dialogSpisokOnPage()
 						961 - привязанные к данному диалогу
+							  Идентификаторами результата являются id элементов (а не диалогов)
+							  Функция _dialogSpisokOnConnect()
 			*/
 			return _select(array(
 						'attr_id' => $attr_id,
@@ -1044,7 +1046,21 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					}
 					if($BLS['obj_name'] == 'dialog') {
 						if($US['dialog_source']) {
-							$dialog_id = $US['dialog_source'];
+							if(!$dialog_id = $US['dialog_source'])
+								break;
+							//отображение диалога происходит для элемента, который выбирает значения для списка
+							//требуется уточнение, где искать id диалога
+							if($BLS['elem']['dialog_id'] == 31) {
+								if(!$el31_id = _num($BLS['elem']['num_1']))
+									return _emptyMin('Отсутствует id элемента, размещающего select');
+								if(!$el31 = _elemQuery($el31_id))
+									return _emptyMin('Отсутствует элемент, размещающий select');
+								if($el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-связку [29]
+									if(!$ell = _elemQuery($dialog_id))
+										return _emptyMin('...');
+									$dialog_id = _num($ell['block']['obj_id']);
+								}
+							}
 							break;
 						}
 						$dialog_id = $BLS['obj_id'];

@@ -45,6 +45,7 @@ $CACHE_ARR = array();
 function _sa($viewer_id) {//проверка пользователя на доступ SA
 	//Список пользователей - SA
 	$SA[982006] = true;//Михаил Корнилов
+	$SA[20912036] = true;//Игорь
 
 	return isset($SA[_num($viewer_id)]) ? 1 : 0;
 }
