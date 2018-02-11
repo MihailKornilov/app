@@ -29,6 +29,7 @@ switch(@$_POST['op']) {
 						`dtime_del`=CURRENT_TIMESTAMP
 					WHERE `id`=".$unit_id;
 			query($sql);
+			_spisokUnitAfter($dialog, $unit_id);
 		} else {
 			$elem = array();
 			if($dialog['base_table'] == '_element') {//если это элемент
@@ -193,8 +194,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$unit = query_assoc($sql);
 	$unit['title'] = IS_ELEM ? _elemUnit($unit) : '';
 
-
-
 	$cmpv = @$_POST['cmpv'];
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
@@ -210,17 +209,13 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			case 54: /* сделать пересчёт значения */ break;
 			//Настройка пунктов меню переключения блоков
 			case 58: _cmpV58($cmpv[$cmp_id], $unit); break;
-
-			//---=== ДЕЙСТВИЯ ПОСЛЕ ВНЕСЕНИЯ ДАННЫХ ===---
-			case 29:
-				_spisokUnitCount29($cmp, $dialog, $unit); //пересчёт количеств привязаного списка
-				_spisokUnitSum29($cmp, $dialog, $unit);   //пересчёт cумм привязаного списка
-				break;
 		}
 
 	_spisokUnitUpd27($unit);
 	_spisokUnitUpd54($unit);
 	_spisokUnitUpd55($unit);
+
+	_spisokUnitAfter($dialog, $unit_id);
 
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
@@ -940,6 +935,65 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 	}
 }
 
+function _spisokUnitAfter($dialog, $unit_id) {//выполнение действий после обновления единицы списка
+	$sql = "SELECT *
+			FROM `".$dialog['base_table']."`
+			WHERE `id`=".$unit_id;
+	if(!$unit = query_assoc($sql))
+		return;
+
+	//получение компонентов диалога, которые отвечают за внесение данных
+	//будет проверка, есть ли какой-то компонент, который участвует в подсчёте баланса
+	$cmpInsertIds = array();
+	foreach($dialog['cmp'] as $cmp) {
+		if(!$cmp['col'])
+			continue;
+		if($cmp['dialog_id'] == 27)
+			continue;
+		if($cmp['dialog_id'] == 54)
+			continue;
+		if($cmp['dialog_id'] == 55)
+			continue;
+		$cmpInsertIds[] = $cmp['id'];
+	}
+
+
+	foreach($dialog['cmp'] as $cmp)
+		switch($cmp['dialog_id']) {
+			//обновление суммы, если какой-то элемент самого диалога участвует в подсчёте (для стартовых сумм)
+			case 27:
+				if(empty($cmpInsertIds))
+					break;
+				if(empty($cmp['txt_2']))
+					break;
+
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `num_1` IN (".implode(',', $cmpInsertIds).")
+						  AND `id` IN (".$cmp['txt_2'].")";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$send = array();
+				foreach($arr as $r) {
+					$el = $dialog['cmp'][$r['num_1']];
+					$send[] = array(
+						'id' => $el['id'],
+						'block_id' => $el['block_id'],
+						'connect_id' => $unit_id     //id единицы списка, баланс которой будет пересчитан
+					);
+				}
+
+				_spisokUnitBalans29($send);
+				break;
+			//привязанные списки
+			case 29:
+				_spisokUnitCount29($cmp, $dialog, $unit);        //пересчёт количеств привязаного списка [54]
+				$elUpd = _spisokUnitSum29($cmp, $dialog, $unit); //пересчёт cумм привязаного списка [55]
+				_spisokUnitBalans29($elUpd);                     //подсчёт балансов после обновления сумм [27]
+				break;
+		}
+}
 function _spisokUnitCount29($cmp, $dialog, $unit) {//пересчёт количеств привязаного списка
 	$sql = "SELECT *
 			FROM `_element`
@@ -956,6 +1010,7 @@ function _spisokUnitCount29($cmp, $dialog, $unit) {//пересчёт количеств привязан
 	$sql = "SELECT COUNT(*)
 			FROM `".$dialog['base_table']."`
 			WHERE `dialog_id`=".$dialog['id']."
+			  AND !`deleted`
 			  AND `".$col."`=".$connect_id;
 	$count = _num(query_value($sql));
 
@@ -976,16 +1031,17 @@ function _spisokUnitSum29($cmp, $dialog, $unit) {//пересчёт сумм привязаного спи
 			WHERE `dialog_id`=55
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
-		return;
+		return array();
 	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
-		return;
+		return array();
 	if(!$connect_id = _num($unit[$col]))//значение, id единицы привязанного списка.
-		return;
+		return array();
 
-	foreach($arr as $r) {
+	$send = array();//значения, которые были пересчитаны. По ним будет потом посчитан баланс, если потребуется.
+	foreach($arr as $elem_id => $r) {
 		if(!$colSumSet = $r['col'])
 			continue;
-		//поиск колонки, по которой будет произодиться подсчёт суммы
+		//поиск колонки, по которой будет производиться подсчёт суммы
 		if(!$el = _elemQuery($r['num_2']))
 			continue;
 		if($el['dialog_id'] != 11)//ссылка элемент с колонкой суммы указывался через [11]
@@ -999,9 +1055,10 @@ function _spisokUnitSum29($cmp, $dialog, $unit) {//пересчёт сумм привязаного спи
 		$dlg = _dialogQuery($bl['obj_id']);
 
 		//получение нового количества для обновления
-		$sql = "SELECT SUM(`".$colSumGet."`)
+		$sql = "SELECT IFNULL(SUM(`".$colSumGet."`),0)
 				FROM `".$dialog['base_table']."`
 				WHERE `dialog_id`=".$dialog['id']."
+				  AND !`deleted`
 				  AND `".$col."`=".$connect_id;
 		$sum = query_value($sql);
 
@@ -1009,5 +1066,78 @@ function _spisokUnitSum29($cmp, $dialog, $unit) {//пересчёт сумм привязаного спи
 				SET `".$colSumSet."`=".$sum."
 				WHERE `id`=".$connect_id;
 		query($sql);
+
+		$send[] = array(
+			'id' => $elem_id,
+			'block_id' => $r['block_id'],
+			'connect_id' => $connect_id     //id единицы списка, баланс которой будет пересчитан
+		);
+	}
+
+	return $send;
+}
+function _spisokUnitBalans29($elUpd) {
+	if(empty($elUpd))
+		return;
+
+	foreach($elUpd as $el) {
+		if(!$bl = _blockQuery($el['block_id']))
+			continue;
+		if($bl['obj_name'] != 'dialog')
+			continue;
+		if(!$dialog = _dialogQuery($bl['obj_id']))
+			continue;
+
+		foreach($dialog['cmp'] as $cmp) {
+			if($cmp['dialog_id'] != 27)
+				continue;
+			if(empty($cmp['col']))//имя колонки, являющаяся балансом
+				continue;
+			if(empty($cmp['txt_2']))//список id элементов, составляющих сумму
+				continue;
+
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id` IN (".$cmp['txt_2'].")";
+			if(!$arr = query_arr($sql))
+				continue;
+
+			$upd_flag = 0;//флаг обновления баланса. Будет установлен, если присутствует элемент, участвующий в обновлении.
+			foreach($arr as $r)
+				if($r['num_1'] == $el['id']) {
+					$upd_flag = 1;
+					break;
+				}
+			if(!$upd_flag)
+				continue;
+
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id` IN ("._idsGet($arr, 'num_1').")";
+			if(!$dlgElUpd = query_arr($sql))
+				continue;
+
+			$upd = '';
+			foreach($arr as $r) {
+				if(!$elUpd = $dlgElUpd[$r['num_1']])
+					continue;
+				if(!$col = $elUpd['col'])
+					continue;
+
+				$znak = $r['num_8'] ? '-' : '+';
+				$upd .= $znak."`".$col."`";
+			}
+
+			//процесс обновления
+			$sql = "UPDATE `".$dialog['base_table']."`
+					SET `".$cmp['col']."`=".$upd."
+					WHERE `id`=".$el['connect_id'];
+			query($sql);
+		}
 	}
 }
+
+
+
+
+

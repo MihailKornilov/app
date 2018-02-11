@@ -409,6 +409,7 @@ function _blockCache($obj_name, $obj_id) {
 		), $cacheKey);
 
 	$block = array();
+	$blockYStr = array();//выстраивание id блоков по порядку, чтобы потом по этому порядку выстроить элементы
 	foreach($arr as $bl) {
 		$id = _num($bl['id']);
 		unset($bl['viewer_id_add']);
@@ -419,29 +420,30 @@ function _blockCache($obj_name, $obj_id) {
 		$bl['elem_id'] = 0;
 		$bl['attr_bl'] = '#bl_'.$id;
 		$block[$id] = $bl;
+		$blockYStr[$bl['parent_id']][$bl['y']][] = $id;
 	}
 
 	//получение элементов
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($block).")";
-	$arr = query_arr($sql);
+	$elemArr = query_arr($sql);
 
 	//наличие функций в элементах
 	$sql = "SELECT `block_id`,1
 			FROM `_element_func`
-			WHERE `block_id` IN("._idsGet($arr, 'block_id').")
+			WHERE `block_id` IN("._idsGet($elemArr, 'block_id').")
 			GROUP BY `block_id`";
 	$isFunc = query_ass($sql);
 
 	//данные настроек из диалога
 	$sql = "SELECT *
 			FROM `_dialog`
-			WHERE `id` IN ("._idsGet($arr, 'dialog_id').")";
+			WHERE `id` IN ("._idsGet($elemArr, 'dialog_id').")";
 	$dialog = query_arr($sql);
 
-	$elem = array();
-	foreach($arr as $el) {
+	$elemPrev = array();//предварительная сборка элементов (без порядка по блокам)
+	foreach($elemArr as $el) {
 		$elem_id = _num($el['id']);
 		$dlg = $dialog[$el['dialog_id']];
 		$block[$el['block_id']]['elem_id'] = $elem_id;
@@ -506,7 +508,20 @@ function _blockCache($obj_name, $obj_id) {
 				break;
 		}
 
-		$elem[$elem_id] = $el;
+		$elemPrev[$elem_id] = $el;
+	}
+
+	//выстраивание элементов по порядку
+	$block_ids = array();
+	foreach($blockYStr as $parent)
+		foreach($parent as $y)
+			foreach($y as $block_id)
+				$block_ids[] = $block_id;
+	$elem = array();
+	foreach($block_ids as $block_id) {
+		if(!$elem_id = $block[$block_id]['elem_id'])
+			continue;
+		$elem[$elem_id] = $elemPrev[$elem_id];
 	}
 
 	$sql = "SELECT *
