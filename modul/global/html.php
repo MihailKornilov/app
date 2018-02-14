@@ -126,7 +126,7 @@ function _authLogin() {//отображение ссылки дл€ входа через ¬ онтакте
 
 		'<div class="center mt40">'.
 			'<div class="w1000 pad30 dib mt40">'.
-				'<button class="vk" onclick="_loginVk(this)">¬ойти через VK</button>'.
+				'<button class="vk" onclick="_authVk(this)">¬ойти через VK</button>'.
 				'<br>'.
 				'<br>'.
 				'<button class="vk" onclick="VK.Auth.getLoginStatus(function(res){console.log(res)})">getLoginStatus</button>'.
@@ -138,7 +138,6 @@ function _authLogin() {//отображение ссылки дл€ входа через ¬ онтакте
 
 	'<script src="https://vk.com/js/api/openapi.js?152"></script>'.
 	'<script>VK.init({apiId:'.AUTH_APP_ID.'})</script>'.
-//		'<script>_authLogin("'.$href.'")</script>'.
 
 	'</body>'.
 	'</html>';
@@ -152,30 +151,27 @@ function _authSuccess($code, $user_id, $app_id) {//внесение записи об успешной а
 
 	$ip = $_SERVER['REMOTE_ADDR'];
 	$browser = _txt($_SERVER['HTTP_USER_AGENT']);
-	$browser_md5 = md5($browser);
-	$sql = "INSERT INTO `_vkuser_auth` (
-				`viewer_id`,
+	$sql = "INSERT INTO `_user_auth` (
+				`user_id`,
 				`app_id`,
 				`code`,
 				`ip`,
-				`browser`,
-				`browser_md5`
+				`browser`
 			) VALUES (
 				".$user_id.",
 				".$app_id.",
 				'".$code."',
 				'".$ip."',
-				'".addslashes($browser)."',
-				'".$browser_md5."'
+				'".addslashes($browser)."'
 			)";
 	query($sql);
 
 	//отметка даты последнего посещени€ пользовател€
-	$sql = "UPDATE `_vkuser`
-			SET `last_seen`=CURRENT_TIMESTAMP
+	$sql = "UPDATE `_user`
+			SET `dtime_last`=CURRENT_TIMESTAMP
 			WHERE `id`=".$user_id;
 	query($sql);
-
+/*
 	//отметка даты последнего посещени€ приложени€. ≈сли пользователь впервые входит в приложение, то внесение приложени€ дл€ него
 	if($app_id) {
 		$sql = "SELECT `id`
@@ -198,14 +194,14 @@ function _authSuccess($code, $user_id, $app_id) {//внесение записи об успешной а
 					`last_seen`=CURRENT_TIMESTAMP";
 		query($sql);
 	}
-
+*/
 	setcookie('code', $code, time() + 2592000, '/');
 
 	if(LOCAL)
 		setcookie('local', 1, time() + 2592000, '/');
 }
 function _authLogoutApp() {//выход из приложени€ и попадание в список приложений
-	$sql = "UPDATE `_vkuser_auth`
+	$sql = "UPDATE `_user_auth`
 			SET `app_id`=0
 			WHERE `code`='".CODE."'";
 	query($sql);
@@ -215,12 +211,12 @@ function _authLogoutApp() {//выход из приложени€ и попадание в список приложений
 	_cache('clear', '_userCache'.USER_ID);
 }
 function _authLogout($code, $user_id) {//выход из списка приложений
-	$sql = "DELETE FROM `_vkuser_auth` WHERE `code`='".addslashes($code)."'";
+	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes($code)."'";
 	query($sql);
 
 	_cache('clear', '_authCache');
 	_cache('clear', '_pageCache');
-	_cache('clear', '_viewer'.$user_id);
+	_cache('clear', '_userCache'.$user_id);
 
 	setcookie('code', '', time() - 1, '/');
 }

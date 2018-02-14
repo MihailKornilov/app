@@ -2,6 +2,22 @@
 
 //условия, не требующие авторизации
 switch(@$_POST['op']) {
+	case 'auth_vk':
+		$session = @$_POST['session'];
+		$valid_keys = array('expire', 'mid', 'secret', 'sid');
+
+		$key = '';
+		foreach($valid_keys as $k)
+			$key .= $k.'='.@$session[$k];
+
+		$sig = md5($key.AUTH_APP_SECRET);
+		if($sig != $session['sig'])
+			jsonError('Неуспешная авторизация');
+
+		_authSuccess($sig, _num($session['mid']), 0);
+
+		jsonSuccess();
+		break;
 	case 'login'://процесс авторизации пользователя
 		if(!$code = _txt($_POST['code']))
 			jsonError('Отсутствует код');

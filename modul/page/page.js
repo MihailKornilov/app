@@ -12,27 +12,31 @@ var _faceTest = function() {//определение, как загружена страница: iframe или са
 		_cookie('face', face);
 		location.reload();
 	},
-	_authLogin = function(url) {//авторизация пользователя по коду на сайте
-		var send = {
-			op:'login',
-			code:code
-		};
-		_post(url, function(res) {
-			//location.href = URL;
-			console.log(res);
-		});
-	},
-	_loginVk = function(but) {
+	_authVk = function(but) {//авторазация через VK
 		but = $(but);
 		but.addClass('_busy');
 
-		VK.Auth.getLoginStatus(function(res){
-			console.log(res)
-		});
-		return;
+		VK.Auth.login(function(res) {//проверка статуса авторизации
+			console.log(res);
+			but.removeClass('_busy');
+			if(res.status != 'connected')
+				return;
 
-		VK.Auth.login(function(res) {
-			console.log(res)
+			//вход на сайт
+			var send = {
+				op:'auth_vk',
+				session:res.session
+			};
+			but.addClass('_busy');
+			_post(send, function(res) {
+				if(res.success) {
+					location.reload();
+					return;
+				}
+				but.removeClass('_busy');
+				//location.href = URL;
+				console.log(res);
+			});
 		});
 	},
 	_appEnter = function(app_id) {//вход в приложение из списка приложений
