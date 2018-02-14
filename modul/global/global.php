@@ -25,15 +25,10 @@ define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
 define('YEAR_CUR', strftime('%Y'));
 
-
-
+define('CODE', _txt(@$_COOKIE['code']));
 define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '.min');
-
-define('CODE', _txt(@$_COOKIE['code']));
-
 define('VERSION', _num(@$_COOKIE['version']));
-
 define('URL', APP_HTML.'/index.php?'.TIME);
 
 
@@ -429,7 +424,9 @@ function _cache($data='', $key='') {//кеширование данных
 	*/
 	global $CACHE_ARR;
 
-	
+//	if(!CODE)
+//		return false;
+
 	if(!$key) {
 		$DBT = debug_backtrace(0);
 		$DBT = $DBT[1];

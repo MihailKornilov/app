@@ -63,37 +63,6 @@ var FB,
 		}
 		return '';
 	},
-	_faceTest = function() {//определение, как загружена страница: iframe или сайт
-		if(_cookie('local'))
-			return;
-		//если текущее значение не совпадает, то установка и перезагрузка страницы
-		var face = window == window.top ? 'site' : 'iframe';
-		if(_cookie('face') == face)
-			return;
-		_cookie('face', face);
-		location.reload();
-	},
-	_faceGo = function(face) {
-		_cookie('face', face);
-		location.reload();
-	},
-	_authLogin = function(code) {//авторизация пользователя по коду на сайте
-		var send = {
-			op:'login',
-			code:code
-		};
-		_post(send, function() {
-			location.href = URL;
-		});
-	},
-	_appEnter = function(app_id) {//вход в приложение из списка приложений
-		var send = {
-			op:'app_enter',
-			app_id:app_id
-		};
-
-		_post(send, 'reload');
-	},
 	_toSpisok = function(s) {
 		var a=[];
 		for(k in s)
@@ -484,8 +453,4 @@ $(document)
 		_cookie('page_setup', _cookie('page_setup') == 1 ? 0 : 1);
 		_msg();
 		location.reload();
-	})
-
-	.ready(function() {
-		_faceTest();
 	});

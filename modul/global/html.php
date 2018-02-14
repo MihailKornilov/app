@@ -26,8 +26,8 @@ function _face() {//определение, как загружена страница: iframe или сайт
 
 /* ---=== АВТОРИЗАЦИЯ ===--- */
 function _auth() {//авторизация через сайт
-	if($code = @$_GET['code'])
-		_authLogin($code);
+//	if($code = @$_GET['code'])
+//		_authLogin($code);
 
 	if(!CODE)
 		_authLogin();
@@ -35,7 +35,7 @@ function _auth() {//авторизация через сайт
 	if(!_authCache())
 		_authLogin();
 
-	if(isset($_GET['logout'])) {
+/*	if(isset($_GET['logout'])) {
 		if(isset($_GET['app']))
 			_authLogoutApp();
 		else
@@ -64,9 +64,10 @@ function _auth() {//авторизация через сайт
 			exit;
 		}
 	}
+*/
 
-	if(!_user())
-		_authLogin();
+//	if(!_user())
+//		_authLogin();
 }
 function _authCache() {//получение данных авторизации из кеша и установка констант id пользователя и приложения
 	if(!CODE)
@@ -76,7 +77,7 @@ function _authCache() {//получение данных авторизации из кеша и установка конста
 
 	if(!$r = _cache()) {
 		$sql = "SELECT *
-				FROM `_vkuser_auth`
+				FROM `_user_auth`
 				WHERE `code`='".addslashes(CODE)."'
 				LIMIT 1";
 		if(!$r = query_assoc($sql))
@@ -84,22 +85,22 @@ function _authCache() {//получение данных авторизации из кеша и установка конста
 
 		_cache(array(
 			'user_id' => $r['user_id'],
-			'app_id' => $r['app_id'],
-			'viewer_id_show' => $r['viewer_id_show']
+			'app_id' => $r['app_id']
 		));
 	}
 
 	//флаг устанавливается, если SA просматривает от имени другого пользователя
-	define('VIEWER_ID_SHOWER', $r['viewer_id_show'] && _sa($r['user_id']) ? _num($r['user_id']) : 0);//id пользователя, который смотрит
-	define('USER_ID', _num($r['user_id'.(VIEWER_ID_SHOWER ? '_show' : '')]));
+//	define('VIEWER_ID_SHOWER', $r['viewer_id_show'] && _sa($r['user_id']) ? _num($r['user_id']) : 0);//id пользователя, который смотрит
+//	define('USER_ID', _num($r['user_id'.(VIEWER_ID_SHOWER ? '_show' : '')]));
+	define('USER_ID', _num($r['user_id']));
 	define('APP_ID', _num($r['app_id']));
 
-	if(!_user())
-		return false;
+//	if(!_user())
+//		return false;
 
 	return true;
 }
-function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
+function _authLogin() {//отображение ссылки для входа через ВКонтакте
 	setcookie('code', '', time() - 1, '/');//сброс авторизации
 
 	$href = LOCAL ? URL.'&code='.md5(TIME)
@@ -125,13 +126,19 @@ function _authLogin($code='') {//отображение ссылки для входа через ВКонтакте
 
 		'<div class="center mt40">'.
 			'<div class="w1000 pad30 dib mt40">'.
-				'<button class="vk'.($code ? ' _busy' : '').'"'.($code ? '' : ' onclick="location.href=\''.$href.'\'"').'>Войти через VK</button>'.
+				'<button class="vk" onclick="_loginVk(this)">Войти через VK</button>'.
+				'<br>'.
+				'<br>'.
+				'<button class="vk" onclick="VK.Auth.getLoginStatus(function(res){console.log(res)})">getLoginStatus</button>'.
+				'<br>'.
+				'<br>'.
+				'<button class="vk" onclick="VK.Auth.logout(function(res){console.log(res)})">logout</button>'.
 			'</div>'.
 		'</div>'.
 
-	($code ?
-		'<script>_authLogin("'.$code.'")</script>'
-	: '').
+	'<script src="https://vk.com/js/api/openapi.js?152"></script>'.
+	'<script>VK.init({apiId:'.AUTH_APP_ID.'})</script>'.
+//		'<script>_authLogin("'.$href.'")</script>'.
 
 	'</body>'.
 	'</html>';
@@ -517,12 +524,12 @@ function _global_script() {//скрипты и стили
 	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
-	'<script src="modul/global/global'.MIN.'.js?'.VERSION.'"></script>'.
+	'<script src="modul/global/global'.MIN.'.js?'.VERSION.TIME.'"></script>'.
 
 	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.VERSION.'" />'.
 	'<script src="modul/element/element'.MIN.'.js?'.VERSION.'"></script>'.
 
-	'<script src="modul/page/page'.MIN.'.js?'.VERSION.'"></script>'.
+	'<script src="modul/page/page'.MIN.'.js?'.VERSION.TIME.'"></script>'.
 
 	'<script src="modul/block/block'.MIN.'.js?'.VERSION.'"></script>'.
 
