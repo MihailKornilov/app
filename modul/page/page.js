@@ -30,11 +30,10 @@ var _faceTest = function() {//определение, как загружена страница: iframe или са
 			but.addClass('_busy');
 			_post(send, function(res) {
 				if(res.success) {
-					location.reload();
+					location.href = URL;
 					return;
 				}
 				but.removeClass('_busy');
-				//location.href = URL;
 				console.log(res);
 			});
 		});

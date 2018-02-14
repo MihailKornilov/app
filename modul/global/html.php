@@ -26,25 +26,15 @@ function _face() {//определение, как загружена страница: iframe или сайт
 
 /* ---=== АВТОРИЗАЦИЯ ===--- */
 function _auth() {//авторизация через сайт
-//	if($code = @$_GET['code'])
-//		_authLogin($code);
-
 	if(!CODE)
 		_authLogin();
 
 	if(!_authCache())
 		_authLogin();
 
-/*	if(isset($_GET['logout'])) {
-		if(isset($_GET['app']))
-			_authLogoutApp();
-		else
-			_authLogout(CODE, USER_ID);
-		header('Location:'.URL);
-		exit;
-	}
+	_authLogout();
 
-	//SA: вход от имени другого пользователя
+/*	//SA: вход от имени другого пользователя
 	if(SA && $user_id = _num(@$_GET['user_id'])) {
 		$sql = "SELECT COUNT(*)
 				FROM `_vkuser`
@@ -147,8 +137,6 @@ function _authLogin() {//отображение ссылки для входа через ВКонтакте
 
 
 function _authSuccess($code, $user_id, $app_id) {//внесение записи об успешной авторизации
-	_authLogout($code, $user_id);//предварительное очищение старой авторизации
-
 	$ip = $_SERVER['REMOTE_ADDR'];
 	$browser = _txt($_SERVER['HTTP_USER_AGENT']);
 	$sql = "INSERT INTO `_user_auth` (
@@ -200,23 +188,31 @@ function _authSuccess($code, $user_id, $app_id) {//внесение записи об успешной а
 	if(LOCAL)
 		setcookie('local', 1, time() + 2592000, '/');
 }
-function _authLogoutApp() {//выход из приложения и попадание в список приложений
-	$sql = "UPDATE `_user_auth`
-			SET `app_id`=0
-			WHERE `code`='".CODE."'";
-	query($sql);
+function _authLogout() {//выход из списка приложений
+	if(!isset($_GET['logout']))
+		return;
+	if(!CODE)
+		return;
+	if(!USER_ID)
+		return;
 
 	_cache('clear', '_authCache');
 	_cache('clear', '_pageCache');
 	_cache('clear', '_userCache'.USER_ID);
-}
-function _authLogout($code, $user_id) {//выход из списка приложений
-	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes($code)."'";
+
+	if(APP_ID) {
+		$sql = "UPDATE `_user_auth`
+				SET `app_id`=0
+				WHERE `code`='".CODE."'";
+		query($sql);
+		header('Location:'.URL);
+		exit;
+	}
+
+
+	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes(CODE)."'";
 	query($sql);
 
-	_cache('clear', '_authCache');
-	_cache('clear', '_pageCache');
-	_cache('clear', '_userCache'.$user_id);
 
 	setcookie('code', '', time() - 1, '/');
 }

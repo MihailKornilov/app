@@ -11,6 +11,7 @@ switch(@$_POST['op']) {
 			$key .= $k.'='.@$session[$k];
 
 		$sig = md5($key.AUTH_APP_SECRET);
+
 		if($sig != $session['sig'])
 			jsonError('Неуспешная авторизация');
 
