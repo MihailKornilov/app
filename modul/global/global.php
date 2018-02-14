@@ -14,7 +14,8 @@ require_once GLOBAL_DIR.'/modul/global/mysql.php';
 require_once GLOBAL_DIR.'/modul/global/date.php';
 require_once GLOBAL_DIR.'/modul/debug/debug.php';
 require_once GLOBAL_DIR.'/modul/db/db.php';
-require_once GLOBAL_DIR.'/modul/global/vkuser.php';
+require_once GLOBAL_DIR.'/modul/global/html.php';
+require_once GLOBAL_DIR.'/modul/global/user.php';
 require_once GLOBAL_DIR.'/modul/page/page.php';
 require_once GLOBAL_DIR.'/modul/block/block.php';
 require_once GLOBAL_DIR.'/modul/element/element.php';
@@ -42,205 +43,6 @@ $CACHE_ARR = array();
 
 
 
-function _sa($viewer_id) {//проверка пользовател€ на доступ SA
-	//—писок пользователей - SA
-	$SA[982006] = true;//ћихаил  орнилов
-	$SA[20912036] = true;//»горь
-
-	return isset($SA[_num($viewer_id)]) ? 1 : 0;
-}
-function _saSet() {//установка флага суперадминистратора
-	if(!_authCache()) {
-		define('SA', 0);
-		return;
-	}
-
-//	define('SA', _sa(VIEWER_ID_SHOWER ? VIEWER_ID_SHOWER : VIEWER_ID));
-	define('SA', _sa(VIEWER_ID));
-
-	if(SA) {
-		error_reporting(E_ALL);
-		ini_set('display_errors', true);
-		ini_set('display_startup_errors', true);
-	}
-}
-
-function _face() {//определение, как загружена страница: iframe или сайт
-	$face = 'site';
-	switch(@$_COOKIE['face']) {
-		case 'site': $face = 'site'; break;
-		case 'iframe': $face = 'iframe'; break;
-	}
-
-	if(!empty($_GET['referrer']))
-		$face = 'iframe';
-
-	setcookie('face', $face, time() + 2592000, '/');
-
-	define('FACE', $face);
-	define('SITE', FACE == 'site');
-	define('IFRAME', FACE == 'iframe');
-
-	require_once GLOBAL_DIR.'/modul/'.FACE.'/'.FACE.'.php';
-	require_once GLOBAL_DIR.'/modul/global/func_require.php';
-}
-function _ajax_url() {//глобальна€ ссылка дл€ отправки запросов ajax
-		$get = '';
-		foreach($_GET as $i => $v) {
-			if(!$v)
-				continue;
-			$get .= '&'.$i.'='.$v;
-		}
-	return APP_HTML.'/ajax.php?'.TIME.$get;
-}
-function _global_script() {//скрипты и стили
-	return
-	//ќтслеживание ошибок в скриптах
-	(SA ? '<script src="js/errors.js"></script>' : '').
-
-	'<script>'.
-		'var URL="'.URL.'",'.
-			'AJAX="'._ajax_url().'",'.
-			'SA='.SA.','.
-			'PAGE_ID='._page('cur').';'.
-	'</script>'.
-
-	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
-	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
-	'<script src="js/jquery-ui.min.js?3"></script>'.
-	'<script src="js/autosize.js?3"></script>'.
-	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?1"></script>'.
-
-	'<script src="js/lodash.min.js"></script>'.
-	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css" />'.
-	'<script src="js/gridstack'.MIN.'.js?"></script>'.
-	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'.
-
-	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
-	'<script src="modul/global/global'.MIN.'.js?'.VERSION.'"></script>'.
-
-	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.VERSION.'" />'.
-	'<script src="modul/element/element'.MIN.'.js?'.VERSION.'"></script>'.
-
-	'<script src="modul/page/page'.MIN.'.js?'.VERSION.'"></script>'.
-
-	'<script src="modul/block/block'.MIN.'.js?'.VERSION.'"></script>'.
-
-	'<script src="modul/spisok/spisok'.MIN.'.js?'.VERSION.'"></script>'.
-
-	_debug('style');
-}
-
-
-
-function _authSuccess($code, $viewer_id, $app_id) {//внесение записи об успешной авторизации
-	_authLogout($code, $viewer_id);//предварительное очищение старой авторизации
-
-	$ip = $_SERVER['REMOTE_ADDR'];
-	$browser = _txt($_SERVER['HTTP_USER_AGENT']);
-	$browser_md5 = md5($browser);
-	$sql = "INSERT INTO `_vkuser_auth` (
-				`viewer_id`,
-				`app_id`,
-				`code`,
-				`ip`,
-				`browser`,
-				`browser_md5`
-			) VALUES (
-				".$viewer_id.",
-				".$app_id.",
-				'".$code."',
-				'".$ip."',
-				'".addslashes($browser)."',
-				'".$browser_md5."'
-			)";
-	query($sql);
-
-	//отметка даты последнего посещени€ пользовател€
-	$sql = "UPDATE `_vkuser`
-			SET `last_seen`=CURRENT_TIMESTAMP
-			WHERE `id`=".$viewer_id;
-	query($sql);
-
-	//отметка даты последнего посещени€ приложени€. ≈сли пользователь впервые входит в приложение, то внесение приложени€ дл€ него
-	if($app_id) {
-		$sql = "SELECT `id`
-		        FROM `_vkuser_app`
-				WHERE `app_id`=".$app_id."
-				  AND `viewer_id`=".$viewer_id;
-		$id = _num(query_value($sql));
-
-		$sql = "INSERT INTO `_vkuser_app` (
-					`id`,
-					`viewer_id`,
-					`app_id`,
-					`last_seen`
-				) VALUES (
-					".$id.",
-					".$viewer_id.",
-					".$app_id.",
-					CURRENT_TIMESTAMP
-				) ON DUPLICATE KEY UPDATE
-					`last_seen`=CURRENT_TIMESTAMP";
-		query($sql);
-	}
-
-	setcookie('code', $code, time() + 2592000, '/');
-
-	if(LOCAL)
-		setcookie('local', 1, time() + 2592000, '/');
-}
-function _authLogoutApp() {//выход из приложени€ и попадание в список приложений
-	$sql = "UPDATE `_vkuser_auth`
-			SET `app_id`=0
-			WHERE `code`='".CODE."'";
-	query($sql);
-
-	_cache('clear', '_authCache');
-	_cache('clear', '_pageCache');
-	_cache('clear', '_viewerCache'.VIEWER_ID);
-}
-function _authLogout($code, $viewer_id) {//выход из списка приложений
-	$sql = "DELETE FROM `_vkuser_auth` WHERE `code`='".addslashes($code)."'";
-	query($sql);
-
-	_cache('clear', '_authCache');
-	_cache('clear', '_pageCache');
-	_cache('clear', '_viewer'.$viewer_id);
-
-	setcookie('code', '', time() - 1, '/');
-}
-function _authCache() {//получение данных авторизации из кеша и установка констант id пользовател€ и приложени€
-	if(!CODE)
-		return false;
-	if(defined('VIEWER_ID'))
-		return true;
-
-	if(!$r = _cache()) {
-		$sql = "SELECT *
-				FROM `_vkuser_auth`
-				WHERE `code`='".addslashes(CODE)."'
-				LIMIT 1";
-		if(!$r = query_assoc($sql))
-			return false;
-
-		_cache(array(
-			'viewer_id' => $r['viewer_id'],
-			'app_id' => $r['app_id'],
-			'viewer_id_show' => $r['viewer_id_show']
-		));
-	}
-
-	//флаг устанавливаетс€, если SA просматривает от имени другого пользовател€
-	define('VIEWER_ID_SHOWER', $r['viewer_id_show'] && _sa($r['viewer_id']) ? _num($r['viewer_id']) : 0);//id пользовател€, который смотрит
-	define('VIEWER_ID', _num($r['viewer_id'.(VIEWER_ID_SHOWER ? '_show' : '')]));
-	define('APP_ID', _num($r['app_id']));
-
-	_viewer();
-
-	return true;
-}
-
 function _app($app_id=APP_ID, $i='all') {//ѕолучение данных о приложении
 	if(!$arr = _cache()) {
 		$sql = "SELECT *
@@ -261,35 +63,12 @@ function _app($app_id=APP_ID, $i='all') {//ѕолучение данных о приложении
 	return $arr[$i];
 }
 
-
-function _content() {//центральное содержание
-	return
-	'<div id="_content" class="block-content-page'.(SITE ? ' site' : '').'">'.
-		(APP_ID ? _pageShow(_page('cur')) : _appSpisok()).
-	'</div>';
-}
-function _contentMsg($msg='') {
-	if(!$msg) {
-		$_GET['p'] = 0;
-		$msg = 'Ќесуществующа€ страница<br><br><a href="'.URL.'&p='._page('cur').'">ѕерейти на страницу по умолчанию</a>';
-	}
-	return '<div class="_empty mar20">'.$msg.'</div>';
-}
-function _footer() {
-	return '</body></html>';
-}
-
-
-
-
-
 function _regFilter($v) {//проверка регул€рного выражени€ на недопустимые символы
 	$reg = '/(\[)/'; // скобка [
 	if(preg_match($reg, $v))
 		return '';
 	return '/('.$v.')/iu';
 }
-
 
 function _end($count, $o1, $o2, $o5=false) {
 	if($o5 === false) $o5 = $o2;
@@ -417,7 +196,6 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1; - выбранный список
 	return $send;
 }
 
-
 function win1251($txt) { return iconv('UTF-8', 'WINDOWS-1251//TRANSLIT', $txt); }
 function utf8($val) {
 	if(is_array($val)) {
@@ -524,8 +302,6 @@ function translit($str) {
 	return strtr($str, $list);
 }
 
-
-
 function _pr($arr) {//аналог функции print_r
 	if(empty($arr))
 		return _prMsg('массив пуст');
@@ -556,7 +332,6 @@ function _prFor($arr, $sub=0) {//перебор массива
 	}
 	return $send;
 }
-
 
 function _arr($arr, $i=false) {//ѕоследовательный массив
 	$send = array();
@@ -631,10 +406,6 @@ function _json($arr) {
 	}
 	return '['.implode(',', $send).']';
 }
-
-
-
-
 
 function _vkapi($method, $param=array()) {//получение данных из api вконтакте
 	$param += array(

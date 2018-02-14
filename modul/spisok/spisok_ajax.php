@@ -25,7 +25,7 @@ switch(@$_POST['op']) {
 		if(isset($dialog['field']['deleted'])) {
 			$sql = "UPDATE `".$dialog['base_table']."`
 					SET `deleted`=1,
-						`viewer_id_del`=".VIEWER_ID.",
+						`viewer_id_del`=".USER_ID.",
 						`dtime_del`=CURRENT_TIMESTAMP
 					WHERE `id`=".$unit_id;
 			query($sql);
@@ -359,7 +359,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 		}
 		if($r['Field'] == 'viewer_id_add') {
 			$sql = "UPDATE `".$dialog['base_table']."`
-					SET `viewer_id_add`=".VIEWER_ID."
+					SET `viewer_id_add`=".USER_ID."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;
@@ -605,7 +605,7 @@ function _cmpV30($cmp, $val, $unit) {//сохранение настройки ТАБЛИЧНОГО содержани
 
 	//очистка неиспользованных элементов
 	$sql = "DELETE FROM `_element`
-			WHERE `viewer_id_add`=".VIEWER_ID."
+			WHERE `viewer_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-112)";
 	query($sql);
 }
@@ -624,7 +624,7 @@ function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
 
 	//удаление значений, которые были удалены при настройке
 	$sql = "DELETE FROM `_element`
-			WHERE `viewer_id_add`=".VIEWER_ID."
+			WHERE `viewer_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-".$unit['id'].")
 			  AND `id` NOT IN (".$ids.")";
 	query($sql);
@@ -645,7 +645,7 @@ function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
 
 	//очистка неиспользованных элементов
 	$sql = "DELETE FROM `_element`
-			WHERE `viewer_id_add`=".VIEWER_ID."
+			WHERE `viewer_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-111)";
 	query($sql);
 }
@@ -664,7 +664,7 @@ function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
 
 	//удаление значений, которые были удалены при настройке
 	$sql = "DELETE FROM `_element`
-			WHERE `viewer_id_add`=".VIEWER_ID."
+			WHERE `viewer_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-".$unit['id'].")
 			  AND `id` NOT IN (".$ids.")";
 	query($sql);
@@ -685,7 +685,7 @@ function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
 
 	//очистка неиспользованных элементов
 	$sql = "DELETE FROM `_element`
-			WHERE `viewer_id_add`=".VIEWER_ID."
+			WHERE `viewer_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-113)";
 	query($sql);
 }

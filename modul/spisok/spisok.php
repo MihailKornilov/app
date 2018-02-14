@@ -361,7 +361,7 @@ function _spisokUnitUrl($txt, $sp, $is_url) {//обёртка значения колонки в ссылку
 
 	//если список пользователей, то переход на страницу приложений пользователя от его имени todo временно
 	if($dialog['base_table'] == '_vkuser')
-		$link = '&viewer_id='.$sp['viewer_id'];
+		$link = '&viewer_id='.$sp['user_id'];
 
 	//если есть страница, которая принимает значения списка
 	if($page_id = _page('spisok_id', $dialog['id']))

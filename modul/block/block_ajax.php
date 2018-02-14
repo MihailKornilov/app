@@ -155,7 +155,7 @@ switch(@$_POST['op']) {
 					$h.",".
 					($w * 10).",".
 					($h * 10).",".
-					VIEWER_ID.
+					USER_ID.
 				")";
 				if($id)
 					$idsNotDel[$id] = $id;

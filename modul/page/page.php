@@ -195,7 +195,7 @@ function _pageSaForSelect($arr, $child) {//страницы SA для select
 
 }
 
-function _pageSetupDefine() {//установка флага включения управления страницей PAS: page_setup
+function _pasDefine() {//установка флага включения управления страницей PAS: page_setup
 	$pas = 0;
 
 	if($page_id = _page('cur'))//страница существует

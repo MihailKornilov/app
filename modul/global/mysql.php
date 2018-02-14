@@ -44,19 +44,6 @@ function query_assoc($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
 		return array();
 	return $r;
 }
-function query_assoc_utf8($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
-	$q = query($sql, $resource_id);
-	if(!$res = mysql_fetch_assoc($q))
-		return array();
-
-	$send = array();
-	foreach($res as $key => $v) {
-		$v = preg_match(REGEXP_NUMERIC, $v) ? intval($v) : utf8($v);
-		$send[$key] = $v;
-	}
-
-	return $send;
-}
 function query_ass($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Ассоциативный массив
 	$send = array();
 	$q = query($sql, $resource_id);
@@ -77,64 +64,6 @@ function query_arr($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Массив, где ключа
 	while($r = mysql_fetch_assoc($q))
 		$send[$r['id']] = $r;
 	return $send;
-}
-function query_selJson($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
-	$send = array();
-	$q = query($sql, $resource_id);
-	while($sp = mysql_fetch_row($q))
-		$send[] = '{'.
-			'uid:'.$sp[0].','.
-			'title:"'.addslashes(htmlspecialchars_decode(trim($sp[1]))).'"'.
-		'}';
-	return '['.implode(',',$send).']';
-}
-function query_workerSelJson($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//список сотрудников в формате json для _select
-	$send = array();
-	$q = query($sql, $resource_id);
-	while($r = mysql_fetch_array($q))
-		$send[] = '{'.
-			'uid:'.$r[0].','.
-			'title:"'._viewer($r[0], 'viewer_name').'"'.
-		'}';
-	return '['.implode(',',$send).']';
-}
-function query_selArray($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//список для _select при отправке через ajax
-	$send = array();
-	$q = query($sql, $resource_id);
-	while($sp = mysql_fetch_row($q))
-		$send[] = array(
-			'uid' => $sp[0],
-			'title' => utf8(htmlspecialchars_decode(trim($sp[1])))
-		);
-	return $send;
-}
-function query_selMultiArray($sql) {//ассоциативный список для _select при отправке через ajax в виде подкатегорий
-	/*
-		Ассоциация списков по ключу.
-		Пример запроса:
-			SELECT `id`,`name`,`org_id`
-		Ключ должен быть всегда третьим
-
-		{
-			1:[{uid:1,title:'name111'},{uid:2,title:'name22'}],
-			2:[{uid:5,title:'name33'}]
-		}
-	*/
-	$send = array();
-	$q = query($sql);
-	while($r = mysql_fetch_row($q))
-		$send[$r[2]][] = array(
-			'uid' => $r[0],
-			'title' => utf8(htmlspecialchars_decode(trim($r[1])))
-		);
-	return $send;
-}
-function query_assJson($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Ассоциативный массив js
-	$q = query($sql, $resource_id);
-	$send = array();
-	while($sp = mysql_fetch_row($q))
-		$send[] = $sp[0].':'.(preg_match(REGEXP_NUMERIC, $sp[1]) ? $sp[1] : '"'.$sp[1].'"');
-	return '{'.implode(',', $send).'}';
 }
 function query_ids($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Список идентификаторов
 	$q = query($sql, $resource_id);

@@ -23,22 +23,22 @@ switch(@$_POST['op']) {
 			);
 		}
 
-		if(!$viewer_id = _num($res['user_id']))
+		if(!$user_id = _num($res['user_id']))
 			jsonError('Ошибка при получении токена');
 
-		if(!$u = _viewer($viewer_id))
+		if(!$u = _user($user_id))
 			jsonError('Ошибка получения данных пользователя');
 
 		//получение id приложения, в котором в последний раз был пользователь
 		$sql = "SELECT `app_id`
 				FROM `_vkuser_app`
-				WHERE `viewer_id`=".$viewer_id."
+				WHERE `viewer_id`=".$user_id."
 				  AND `worker`
 				ORDER BY `last_seen` DESC
 				LIMIT 1";
 		$app_id = _num(query_value($sql));
 
-		_authSuccess($code, $viewer_id, $app_id);
+		_authSuccess($code, $user_id, $app_id);
 		
 		jsonSuccess();
 		break;
