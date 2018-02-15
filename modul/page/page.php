@@ -264,7 +264,7 @@ function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
 
 	return $send;
 }
-function _pageSetupMenu() {//строка меню управления страницей
+function _pasMenu() {//строка меню управления страницей
 	if(!APP_ID)
 		return '';
 	if(!PAS)

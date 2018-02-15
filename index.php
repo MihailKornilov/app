@@ -6,10 +6,4 @@ _saSet();
 _auth();
 _pasDefine();
 
-die(
-	_header().
-	_pageSetupMenu().
-	_content().
-	_debug().
-	_footer()
-);
+die(_html());

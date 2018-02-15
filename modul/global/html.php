@@ -19,7 +19,7 @@ function _face() {//определение, как загружена страница: iframe или сайт
 	setcookie('face', $face, time() + 2592000, '/');
 
 	define('FACE', $face);
-	define('SITE', FACE == 'site');
+	define('SITE', FACE == 'site' ? 'site' : '');
 	define('IFRAME', FACE == 'iframe');
 //	echo FACE;
 }
@@ -105,60 +105,29 @@ function _authCache() {//получение данных авторизации из кеша и установка конста
 		));
 	}
 
-	//флаг устанавливается, если SA просматривает от имени другого пользователя
-//	define('VIEWER_ID_SHOWER', $r['viewer_id_show'] && _sa($r['user_id']) ? _num($r['user_id']) : 0);//id пользователя, который смотрит
-//	define('USER_ID', _num($r['user_id'.(VIEWER_ID_SHOWER ? '_show' : '')]));
 	define('USER_ID', _num($r['user_id']));
 	define('APP_ID', _num($r['app_id']));
 
-//	if(!_user())
-//		return false;
+	if(!_user())
+		return false;
 
 	return true;
 }
 function _authLogin() {//отображение ссылки для входа через ВКонтакте
-	setcookie('code', '', time() - 1, '/');//сброс авторизации
+	if(CODE)
+		return '';
 
-	$href = LOCAL ? URL.'&code='.md5(TIME)
-			:
-			'https://oauth.vk.com/authorize?'.
-					 'client_id='.AUTH_APP_ID.
-					'&display=page'.
-					'&redirect_uri=https://nyandoma.ru/app'.
-					'&scope=0'.
-					'&response_type=code'.
-					'&v=5.64';
-	$html =
-	'<!DOCTYPE html>'.
-	'<html lang="ru">'.
+	//	setcookie('code', '', time() - 1, '/');//сброс авторизации
 
-	'<head>'.
-		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
-		'<title>Авторизация</title>'.
-		_global_script().
-	'</head>'.
-
-	'<body>'.
-
-		'<div class="center mt40">'.
-			'<div class="w1000 pad30 dib mt40">'.
-				'<button class="vk" onclick="_authVk(this)">Войти через VK</button>'.
-				'<br>'.
-				'<br>'.
-				'<button class="vk" onclick="VK.Auth.getLoginStatus(function(res){console.log(res)})">getLoginStatus</button>'.
-				'<br>'.
-				'<br>'.
-				'<button class="vk" onclick="VK.Auth.logout(function(res){console.log(res)})">logout</button>'.
-			'</div>'.
+	return
+	'<div class="center mt40">'.
+		'<div class="w1000 pad30 dib mt40">'.
+			'<button class="vk" onclick="_authVk(this)">Войти через VK</button>'.
 		'</div>'.
+	'</div>'.
 
 	'<script src="https://vk.com/js/api/openapi.js?152"></script>'.
-	'<script>VK.init({apiId:'.AUTH_APP_ID.'})</script>'.
-
-	'</body>'.
-	'</html>';
-
-	die($html);
+	'<script>VK.init({apiId:'.AUTH_APP_ID.'})</script>';
 }
 function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной авторизации
 	$ip = $_SERVER['REMOTE_ADDR'];
@@ -285,7 +254,7 @@ function _appError($msg='Приложение не было загружено.') {//вывод сообщения об о
 				'<script src="https://vk.com/js/api/xd_connection.js?2"></script>'.
 				'<script>VK.init(function() {},function() {},"5.60");</script>'.
 
-				_global_script().
+				_html_script().
 
 			'</head>'.
 			'<body>'.
@@ -307,101 +276,46 @@ function _appError($msg='Приложение не было загружено.') {//вывод сообщения об о
 }
 
 
-function i_header() {
-	return
-		'<!DOCTYPE html>'.
-		'<html lang="ru">'.
-
-		'<head>'.
-			'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
-//			'<title>'.APP_NAME.'</title>'.
-			_global_script().
-//			_api_scripts().
-		'</head>'.
-
-		'<body>';
-}
-
-
 
 
 
 /* ---=== СОДЕРЖАНИЕ ===--- */
-function _header() {
+function _html() {
 	return
-		'<!DOCTYPE html>'.
-		'<html lang="ru">'.
+	'<!DOCTYPE html>'.
+	'<html lang="ru">'.
 
-		'<head>'.
-			'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
-			'<title>'.(APP_ID ? _app(APP_ID, 'app_name') : 'Мои приложения').'</title>'.
-			_global_script().
+	'<head>'.
+		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
+		'<title>'._html_title().'</title>'.
+		_html_script().
 //			_api_scripts().
-		'</head>'.
+	'</head>'.
 
-		'<body class="site">'.
-			'<iframe id="frame0" name="frame0"></iframe>'.
-			_header_hat();
+	'<body class="'.FACE.'">'.
+		(IFRAME ? '<iframe id="frame0" name="frame0"></iframe>' : '').
+
+		_authLogin().
+
+		_html_hat().
+		_pasMenu().
+		_app_list().
+		_app_create().
+		_app_content().
+
+		_debug().
+
+	'</body></html>';
 }
-function _header_hat() {//верхняя строка приложения-сайта
-	return
-	'<div id="hat"'.(VIEWER_ID_SHOWER ? ' class="show"' : '').'>'.
-		'<div class="w1000 mara pt3">'.
-			'<div class="dib mt5 fs22">'.(APP_ID ? _app(APP_ID, 'app_name') : 'Мои приложения').'</div>'.
-
-			'<a href="'.URL.'&logout'.(APP_ID && !USER_APP_ONE ? '&app' : '').'" class="fr white mt10">'.
-				'<span class="dib mr20 pale">'.USER_NAME.'</span>'.
-				'Выход'.
-			'</a>'.
-
-			'<div class="fr w300 mt8 r mr20">'.
-				_header_but_sa().
-				_header_but_page().
-				_header_but_pas().
-			'</div>'.
-		'</div>'.
-	'</div>';
-}
-function _header_but_sa() {//отображение кнопки списка страниц
-	if(!SA)
-		return '';
+function _html_title() {
+	if(!CODE)
+		return 'Авторизация';
 	if(!APP_ID)
-		return '';
+		return 'Мои приложения';
 
-	if(_page('cur') == 1)
-		return '';
-
-	return '<button class="vk small red" onclick="location.href=\''.URL.'&p=1\'">SA</button>';
+	return _app(APP_ID, 'app_name');
 }
-function _header_but_page() {//отображение кнопки списка страниц
-	if(!APP_ID)
-		return '';
-
-	if(_page('cur') == 12)
-		return '';
-
-	return '<button class="vk small ml10" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>';
-}
-function _header_but_pas() {//отображение кнопки настройки страницы
-	if(!APP_ID)
-		return '';
-
-	if(!$page_id = _page('cur'))
-		return '';
-
-	if(!$page = _page($page_id))
-		return '';
-
-	if($page['sa'] && !SA)
-		return '';
-
-	if(!$page['app_id'] && !SA)
-		return '';
-
-	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
-}
-
-function _global_script() {//скрипты и стили
+function _html_script() {//скрипты и стили
 	//глобальная ссылка для отправки запросов ajax
 	$GET_ARR = '';
 	foreach($_GET as $i => $v)
@@ -444,21 +358,81 @@ function _global_script() {//скрипты и стили
 
 	_debug('style');
 }
+function _html_hat() {//верхняя строка приложения для сайта
+	if(!CODE)
+		return '';
+	if(!SITE)
+		return '';
 
-function _appSpisok() {//список приложений, которые доступны пользователю
+	return
+	'<div id="hat">'.
+		'<div class="w1000 mara pt3">'.
+			'<div class="dib mt5 fs22">'._html_title().'</div>'.
+
+			'<a href="'.URL.'&logout" class="fr white mt10">'.
+				'<span class="dib mr20 pale">'.USER_NAME.'</span>'.
+				'Выход'.
+			'</a>'.
+
+			'<div class="fr w300 mt8 r mr20">'.
+				_hat_but_sa().
+				_hat_but_page().
+				_hat_but_pas().
+			'</div>'.
+		'</div>'.
+	'</div>';
+}
+function _hat_but_sa() {//отображение кнопки списка страниц
+	if(!SA)
+		return '';
+	if(!APP_ID)
+		return '';
+
+	if(_page('cur') == 1)
+		return '';
+
+	return '<button class="vk small red" onclick="location.href=\''.URL.'&p=1\'">SA</button>';
+}
+function _hat_but_page() {//отображение кнопки списка страниц
+	if(!APP_ID)
+		return '';
+
+	if(_page('cur') == 12)
+		return '';
+
+	return '<button class="vk small ml10" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>';
+}
+function _hat_but_pas() {//отображение кнопки настройки страницы
+	if(!APP_ID)
+		return '';
+
+	if(!$page_id = _page('cur'))
+		return '';
+
+	if(!$page = _page($page_id))
+		return '';
+
+	if($page['sa'] && !SA)
+		return '';
+
+	if(!$page['app_id'] && !SA)
+		return '';
+
+	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
+}
+
+function _app_list() {//список приложений, которые доступны пользователю
+	if(!USER_ID)
+		return '';
 	if(APP_ID)
 		return '';
 
-	$sql = "SELECT `app`.*
-			FROM
-				`_app` `app`,
-				`_vkuser_app` `va`
-			WHERE `app`.`id`=`va`.`app_id`
-			  AND `viewer_id`=".USER_ID."
-			  AND `worker`
-			ORDER BY `va`.`dtime_add`";
+	$sql = "SELECT *
+			FROM `_user_app`
+			WHERE `user_id`=".USER_ID."
+			ORDER BY `dtime_add`";
 	if(!$spisok = query_arr($sql))
-		return _appCreate();
+		return '';
 
 	$send = '<div class="">';
 	foreach($spisok as $r) {
@@ -473,11 +447,17 @@ function _appSpisok() {//список приложений, которые доступны пользователю
 
 	return $send;
 }
-function _appCreate() {//автоматическое создание приложения, если пользователь впервые зашёл на сайт
+function _app_create() {//автоматическое создание приложения, если пользователь впервые зашёл на сайт
 	/*
 		Приложение создаётся только с сайта.
 		id начинается от 1001 и не может быть больше 2.000.000, так как реальные приложения VK идут от 2млн
 	*/
+
+	if(APP_ID)
+		return '';
+
+
+	return '';
 
 	$sql = "SELECT MAX(`id`)+1
 			FROM `_app`
@@ -522,23 +502,22 @@ function _appCreate() {//автоматическое создание приложения, если пользователь в
 
 	return '<div class="_empty mt20">Приложений нет.</div>';
 }
+function _app_content() {//центральное содержание
+	if(!APP_ID)
+		return '';
 
-
-function _content() {//центральное содержание
 	return
-	'<div id="_content" class="block-content-page'.(SITE ? ' site' : '').'">'.
-		(APP_ID ? _pageShow(_page('cur')) : _appSpisok()).
+	'<div id="_content" class="block-content-page '.SITE.'">'.
+		_pageShow(_page('cur')).
 	'</div>';
 }
+
 function _contentMsg($msg='') {
 	if(!$msg) {
 		$_GET['p'] = 0;
 		$msg = 'Несуществующая страница<br><br><a href="'.URL.'&p='._page('cur').'">Перейти на страницу по умолчанию</a>';
 	}
 	return '<div class="_empty mar20">'.$msg.'</div>';
-}
-function _footer() {
-	return '</body></html>';
 }
 
 
