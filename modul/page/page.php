@@ -33,9 +33,6 @@ function _pageCache() {//получение массива страниц из кеша
 	return _cache($page);
 }
 function _page($i='all', $i1=0) {//получение данных страницы
-	if(!APP_ID)
-		return 0;
-
 	if(!$i)
 		return 0;
 
@@ -58,6 +55,10 @@ function _page($i='all', $i1=0) {//получение данных страницы
 
 	//id страницы по умолчанию
 	if($i == 'def') {
+		//список приложений, если пользователь не вошёл в приложение
+		if(!APP_ID)
+			return 98;
+
 		//сначала поиск страницы приложения
 		foreach($page as $p)
 			if(!$p['sa'] && $p['def'])

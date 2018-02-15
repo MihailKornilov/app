@@ -564,7 +564,7 @@ function _elementChoose($unit) {
 		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
 			$show = false;
 
-//		if($show)
+		if($show)
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 

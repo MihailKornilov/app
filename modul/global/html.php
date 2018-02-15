@@ -10,7 +10,7 @@ function _face() {//определение, как загружена страница: iframe или сайт
 	setcookie('face', $face, time() + 2592000, '/');
 
 	define('FACE', $face);
-	define('SITE', FACE == 'site');
+	define('SITE', FACE == 'site' ? 'site' : '');
 	define('IFRAME', FACE == 'iframe');
 }
 
@@ -263,8 +263,6 @@ function _html() {
 
 		_html_hat().
 		_pasMenu().
-		_app_list().
-		_app_create().
 		_app_content().
 
 		_debug().
@@ -394,25 +392,24 @@ function _app_list() {//список приложений, которые доступны пользователю
 	if(!USER_ID)
 		return '';
 	if(APP_ID)
-		return '';
+		return 'Здесь будет размещён список приложений.';
 
 	$sql = "SELECT *
 			FROM `_user_app`
 			WHERE `user_id`=".USER_ID."
 			ORDER BY `dtime_add`";
 	if(!$spisok = query_arr($sql))
-		return '';
+		return 'Приложения не созданы.';
 
-	$send = '<div class="">';
+	$send = '';
 	foreach($spisok as $r) {
 		$send .=
-			'<div class="pad10 bg-gr2 mar10 over2 curP" onclick="_appEnter('.$r['id'].')">'.
+			'<div class="pad10 bg-gr2 mb10 over2 curP" onclick="_appEnter('.$r['id'].')">'.
 				'<span class="grey">'.$r['id'].'</span> '.
 				_app($r['app_id'], 'name').
 				'<div class="fr grey">'.FullData($r['dtime_add']).'</div>'.
 			'</div>';
 	}
-	$send .= '</div>';
 
 	return $send;
 }
@@ -474,7 +471,7 @@ function _app_create() {//автоматическое создание приложения, если пользователь 
 function _app_content() {//центральное содержание
 	if(!CODE)
 		return '';
-	if(!APP_ID)
+	if(!USER_ID)
 		return '';
 
 	return
