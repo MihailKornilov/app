@@ -45,12 +45,12 @@ function _userCache($user_id) {
 
 	return _cache($u);
 }
-function _userVkUpdate($user_id) {//Обновление пользователя из Контакта
+function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 	if(LOCAL)
-		_appError('Not load user from VK <b>'.$user_id.'</b> in LOCAL version.');
+		_appError('Not load user from VK <b>'.$vk_id.'</b> in LOCAL version.');
 
 	$res = _vkapi('users.get', array(
-		'user_ids' => $user_id,
+		'user_ids' => $vk_id,
 		'fields' => 'photo,'.
 					'sex,'.
 					'country,'.
@@ -58,59 +58,46 @@ function _userVkUpdate($user_id) {//Обновление пользователя из Контакта
 	));
 
 	if(empty($res['response']))
-		die('Do not get user from VK: '.$user_id);
+		die('Do not get user from VK: '.$vk_id);
 
 	$res = $res['response'][0];
 	$u = array(
-		'user_id' => $user_id,
+		'user_id' => $vk_id,
 		'first_name' => win1251($res['first_name']),
 		'last_name' => win1251($res['last_name']),
 		'sex' => $res['sex'],
-		'photo' => $res['photo'],
-		'country_id' => empty($res['country']) ? 0 : $res['country']['id'],
-		'country_title' => empty($res['country']) ? '' : win1251($res['country']['title']),
-		'city_id' => empty($res['city']) ? 0 : $res['city']['id'],
-		'city_title' => empty($res['city']) ? '' : win1251($res['city']['title'])
+		'photo' => $res['photo']
 	);
 
 	$sql = "SELECT `id`
-			FROM `_vkuser`
-			WHERE `viewer_id`=".$user_id."
+			FROM `_user`
+			WHERE `vk_id`=".$vk_id."
 			LIMIT 1";
-	$id = query_value($sql);
+	$user_id = _num(query_value($sql));
 
-	$sql = "INSERT INTO `_vkuser` (
+	$sql = "INSERT INTO `_user` (
 				`id`,
-				`viewer_id`,
-				`first_name`,
-				`last_name`,
-				`sex`,
-				`photo`,
-				`country_id`,
-				`country_title`,
-				`city_id`,
-				`city_title`
+				`vk_id`,
+				`f`,
+				`i`,
+				`pol`,
+				`ava`
 			) VALUES (
-				".$id.",
 				".$user_id.",
-				'".addslashes($u['first_name'])."',
+				".$vk_id.",
 				'".addslashes($u['last_name'])."',
+				'".addslashes($u['first_name'])."',
 				"._num($u['sex']).",
-				'".addslashes($u['photo'])."',
-				"._num($u['country_id']).",
-				'".addslashes($u['country_title'])."',
-				"._num($u['city_id']).",
-				'".addslashes($u['city_title'])."'
+				'".addslashes($u['photo'])."'
 			) ON DUPLICATE KEY UPDATE
-				`first_name`=VALUES(`first_name`),
-				`last_name`=VALUES(`last_name`),
-				`sex`=VALUES(`sex`),
-				`photo`=VALUES(`photo`),
-				`country_id`=VALUES(`country_id`),
-				`country_title`=VALUES(`country_title`),
-				`city_id`=VALUES(`city_id`),
-				`city_title`=VALUES(`city_title`)";
+				`f`=VALUES(`f`),
+				`i`=VALUES(`i`),
+				`pol`=VALUES(`pol`),
+				`ava`=VALUES(`ava`)";
 	query($sql);
 
-	return _user($user_id);
+	if(!$user_id)
+		$user_id = query_insert_id('_user');
+
+	return $user_id;
 }

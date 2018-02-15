@@ -24,6 +24,32 @@ function _face() {//определение, как загружена страница: iframe или сайт
 //	echo FACE;
 }
 
+function _sa($user_id) {//проверка пользователя на доступ SA
+	//Список пользователей - SA
+	$SA[982006] = true;  //Михаил Корнилов
+//	$SA[20912036] = true;//Игорь
+
+	return isset($SA[_num($user_id)]) ? 1 : 0;
+}
+function _saSet() {//установка флага суперадминистратора
+	define('SA', 1); return;
+
+
+	if(!_authCache()) {
+		define('SA', 0);
+		return;
+	}
+
+//	define('SA', _sa(VIEWER_ID_SHOWER ? VIEWER_ID_SHOWER : USER_ID));
+	define('SA', _sa(USER_ID));
+
+	if(SA) {
+		error_reporting(E_ALL);
+		ini_set('display_errors', true);
+		ini_set('display_startup_errors', true);
+	}
+}
+
 /* ---=== АВТОРИЗАЦИЯ ===--- */
 function _auth() {//авторизация через сайт
 	if(!CODE)
@@ -134,9 +160,7 @@ function _authLogin() {//отображение ссылки для входа через ВКонтакте
 
 	die($html);
 }
-
-
-function _authSuccess($code, $user_id, $app_id) {//внесение записи об успешной авторизации
+function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной авторизации
 	$ip = $_SERVER['REMOTE_ADDR'];
 	$browser = _txt($_SERVER['HTTP_USER_AGENT']);
 	$sql = "INSERT INTO `_user_auth` (
@@ -188,7 +212,7 @@ function _authSuccess($code, $user_id, $app_id) {//внесение записи об успешной а
 	if(LOCAL)
 		setcookie('local', 1, time() + 2592000, '/');
 }
-function _authLogout() {//выход из списка приложений
+function _authLogout() {//выход из приложения, если требуется
 	if(!isset($_GET['logout']))
 		return;
 	if(!CODE)
@@ -200,6 +224,7 @@ function _authLogout() {//выход из списка приложений
 	_cache('clear', '_pageCache');
 	_cache('clear', '_userCache'.USER_ID);
 
+	//выход только из приложения и попадание в список приложений
 	if(APP_ID) {
 		$sql = "UPDATE `_user_auth`
 				SET `app_id`=0
@@ -208,7 +233,6 @@ function _authLogout() {//выход из списка приложений
 		header('Location:'.URL);
 		exit;
 	}
-
 
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes(CODE)."'";
 	query($sql);
@@ -302,6 +326,7 @@ function i_header() {
 
 
 
+/* ---=== СОДЕРЖАНИЕ ===--- */
 function _header() {
 	return
 		'<!DOCTYPE html>'.
@@ -376,6 +401,49 @@ function _header_but_pas() {//отображение кнопки настройки страницы
 	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
 }
 
+function _global_script() {//скрипты и стили
+	//глобальная ссылка для отправки запросов ajax
+	$GET_ARR = '';
+	foreach($_GET as $i => $v)
+		if($v)
+			$GET_ARR .= '&'.$i.'='.$v;
+
+	return
+	//Отслеживание ошибок в скриптах
+	(SA ? '<script src="js/errors.js"></script>' : '').
+
+	'<script>'.
+		'var URL="'.URL.'",'.
+			'AJAX="'.APP_HTML.'/ajax.php?'.TIME.$GET_ARR.'",'.
+			'SA='.SA.','.
+			'PAGE_ID='._page('cur').';'.
+	'</script>'.
+
+	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
+	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
+	'<script src="js/jquery-ui.min.js?3"></script>'.
+	'<script src="js/autosize.js?3"></script>'.
+	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?1"></script>'.
+
+	'<script src="js/lodash.min.js"></script>'.
+	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css" />'.
+	'<script src="js/gridstack'.MIN.'.js?"></script>'.
+	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'.
+
+	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
+	'<script src="modul/global/global'.MIN.'.js?'.VERSION.TIME.'"></script>'.
+
+	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.VERSION.'" />'.
+	'<script src="modul/element/element'.MIN.'.js?'.VERSION.'"></script>'.
+
+	'<script src="modul/page/page'.MIN.'.js?'.VERSION.TIME.'"></script>'.
+
+	'<script src="modul/block/block'.MIN.'.js?'.VERSION.'"></script>'.
+
+	'<script src="modul/spisok/spisok'.MIN.'.js?'.VERSION.'"></script>'.
+
+	_debug('style');
+}
 
 function _appSpisok() {//список приложений, которые доступны пользователю
 	if(APP_ID)
@@ -454,84 +522,6 @@ function _appCreate() {//автоматическое создание приложения, если пользователь в
 
 	return '<div class="_empty mt20">Приложений нет.</div>';
 }
-
-
-
-
-
-
-
-function _sa($user_id) {//проверка пользователя на доступ SA
-	//Список пользователей - SA
-	$SA[982006] = true;  //Михаил Корнилов
-//	$SA[20912036] = true;//Игорь
-
-	return isset($SA[_num($user_id)]) ? 1 : 0;
-}
-function _saSet() {//установка флага суперадминистратора
-	define('SA', 0); return;
-
-
-	if(!_authCache()) {
-		define('SA', 0);
-		return;
-	}
-
-//	define('SA', _sa(VIEWER_ID_SHOWER ? VIEWER_ID_SHOWER : USER_ID));
-	define('SA', _sa(USER_ID));
-
-	if(SA) {
-		error_reporting(E_ALL);
-		ini_set('display_errors', true);
-		ini_set('display_startup_errors', true);
-	}
-}
-
-function _global_script() {//скрипты и стили
-	//глобальная ссылка для отправки запросов ajax
-	$GET_ARR = '';
-	foreach($_GET as $i => $v)
-		if($v)
-			$GET_ARR .= '&'.$i.'='.$v;
-
-	return
-	//Отслеживание ошибок в скриптах
-	(SA ? '<script src="js/errors.js"></script>' : '').
-
-	'<script>'.
-		'var URL="'.URL.'",'.
-			'AJAX="'.APP_HTML.'/ajax.php?'.TIME.$GET_ARR.'",'.
-			'SA='.SA.','.
-			'PAGE_ID='._page('cur').';'.
-	'</script>'.
-
-	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
-	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
-	'<script src="js/jquery-ui.min.js?3"></script>'.
-	'<script src="js/autosize.js?3"></script>'.
-	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?1"></script>'.
-
-	'<script src="js/lodash.min.js"></script>'.
-	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css" />'.
-	'<script src="js/gridstack'.MIN.'.js?"></script>'.
-	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'.
-
-	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
-	'<script src="modul/global/global'.MIN.'.js?'.VERSION.TIME.'"></script>'.
-
-	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.VERSION.'" />'.
-	'<script src="modul/element/element'.MIN.'.js?'.VERSION.'"></script>'.
-
-	'<script src="modul/page/page'.MIN.'.js?'.VERSION.TIME.'"></script>'.
-
-	'<script src="modul/block/block'.MIN.'.js?'.VERSION.'"></script>'.
-
-	'<script src="modul/spisok/spisok'.MIN.'.js?'.VERSION.'"></script>'.
-
-	_debug('style');
-}
-
-
 
 
 function _content() {//центральное содержание

@@ -1,8 +1,8 @@
 <?php
+/* Условия, не требующие авторизации */
 
-//условия, не требующие авторизации
 switch(@$_POST['op']) {
-	case 'auth_vk':
+	case 'auth_vk'://авторизация пользователя по VK
 		$session = @$_POST['session'];
 		$valid_keys = array('expire', 'mid', 'secret', 'sid');
 
@@ -15,7 +15,16 @@ switch(@$_POST['op']) {
 		if($sig != $session['sig'])
 			jsonError('Неуспешная авторизация');
 
-		_authSuccess($sig, _num($session['mid']), 0);
+		//проверка, есть ли пользователь в базе
+		$vkUser_id = _num($session['mid']);
+		$sql = "SELECT `id`
+				FROM `_user`
+				WHERE `vk_id`=".$vkUser_id."
+				LIMIT 1";
+		if(!$user_id = _num(query_value($sql)))
+			$user_id = _userVkUpdate($vkUser_id);//если нет - получение данных из VK
+
+		_authSuccess($sig, $user_id);
 
 		jsonSuccess();
 		break;
