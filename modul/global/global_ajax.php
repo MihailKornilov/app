@@ -28,7 +28,7 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$va['id'];
 		query($sql);
 
-		_cache('clear', '_authCache');
+		_cache('clear', '_auth');
 		_cache('clear', '_pageCache');
 		_cache('clear', '_userCache'.USER_ID);
 

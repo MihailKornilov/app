@@ -1,14 +1,5 @@
 <?php
-/*
-	Процесс авторизации:
-		1. Если есть $_GET['code'] -> переход на страницу авторизации
-		2. Если нет code в Cookie -> переход на страницу авторизации
-*/
-
-
-
 function _face() {//определение, как загружена страница: iframe или сайт
-//	print_r(debug_backtrace(0));
 	$face = 'site';
 
 	if(@$_COOKIE['face'] == 'iframe')
@@ -19,9 +10,8 @@ function _face() {//определение, как загружена страница: iframe или сайт
 	setcookie('face', $face, time() + 2592000, '/');
 
 	define('FACE', $face);
-	define('SITE', FACE == 'site' ? 'site' : '');
+	define('SITE', FACE == 'site');
 	define('IFRAME', FACE == 'iframe');
-//	echo FACE;
 }
 
 function _sa($user_id) {//проверка пользователя на доступ SA
@@ -52,15 +42,24 @@ function _saSet() {//установка флага суперадминистратора
 
 /* ---=== АВТОРИЗАЦИЯ ===--- */
 function _auth() {//авторизация через сайт
-	if(!CODE)
-		_authLogin();
-
-	if(!_authCache())
-		_authLogin();
-
 	_authLogout();
 
-/*	//SA: вход от имени другого пользователя
+	if(!$r = _cache()) {
+		$sql = "SELECT *
+				FROM `_user_auth`
+				WHERE `code`='".addslashes(CODE)."'
+				LIMIT 1";
+		if($r = query_assoc($sql))
+			_cache(array(
+				'user_id' => $r['user_id'],
+				'app_id' => $r['app_id']
+			));
+	}
+
+	define('USER_ID', _num(@$r['user_id']));
+	define('APP_ID', _num(@$r['app_id']));
+
+	/*	//SA: вход от имени другого пользователя
 	if(SA && $user_id = _num(@$_GET['user_id'])) {
 		$sql = "SELECT COUNT(*)
 				FROM `_vkuser`
@@ -73,51 +72,19 @@ function _auth() {//авторизация через сайт
 			query($sql);
 
 			_cache('clear', '_userCache'.USER_ID);
-			_cache('clear', '_viewer'.$user_id);
-			_cache('clear', '_authCache');
+			_cache('clear', '_auth');
 
 			header('Location:'.URL);
 			exit;
 		}
 	}
 */
-
-//	if(!_user())
-//		_authLogin();
 }
 function _authCache() {//получение данных авторизации из кеша и установка констант id пользователя и приложения
-	if(!CODE)
-		return false;
-	if(defined('USER_ID'))
-		return true;
-
-	if(!$r = _cache()) {
-		$sql = "SELECT *
-				FROM `_user_auth`
-				WHERE `code`='".addslashes(CODE)."'
-				LIMIT 1";
-		if(!$r = query_assoc($sql))
-			return false;
-
-		_cache(array(
-			'user_id' => $r['user_id'],
-			'app_id' => $r['app_id']
-		));
-	}
-
-	define('USER_ID', _num($r['user_id']));
-	define('APP_ID', _num($r['app_id']));
-
-	if(!_user())
-		return false;
-
-	return true;
 }
 function _authLogin() {//отображение ссылки для входа через ВКонтакте
 	if(CODE)
 		return '';
-
-	//	setcookie('code', '', time() - 1, '/');//сброс авторизации
 
 	return
 	'<div class="center mt40">'.
@@ -189,7 +156,7 @@ function _authLogout() {//выход из приложения, если требуется
 	if(!USER_ID)
 		return;
 
-	_cache('clear', '_authCache');
+	_cache('clear', '_auth');
 	_cache('clear', '_pageCache');
 	_cache('clear', '_userCache'.USER_ID);
 
@@ -289,10 +256,10 @@ function _html() {
 		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
 		'<title>'._html_title().'</title>'.
 		_html_script().
-//			_api_scripts().
+//		_api_scripts().
 	'</head>'.
 
-	'<body class="'.FACE.'">'.
+	'<body class="'.(CODE && FACE ? 'site' : '').'">'.
 		(IFRAME ? '<iframe id="frame0" name="frame0"></iframe>' : '').
 
 		_authLogin().
@@ -304,7 +271,6 @@ function _html() {
 		_app_content().
 
 		_debug().
-
 	'</body></html>';
 }
 function _html_title() {
@@ -497,12 +463,14 @@ function _app_create() {//автоматическое создание приложения, если пользователь 
 			  AND `viewer_id`=".USER_ID;
 	query($sql);
 
-	_cache('clear', '_authCache');
+	_cache('clear', '_auth');
 	header('Location:'.URL);
 
 	return '<div class="_empty mt20">Приложений нет.</div>';
 }
 function _app_content() {//центральное содержание
+	if(!CODE)
+		return '';
 	if(!APP_ID)
 		return '';
 

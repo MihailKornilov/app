@@ -424,8 +424,8 @@ function _cache($data='', $key='') {//кеширование данных
 	*/
 	global $CACHE_ARR;
 
-//	if(!CODE)
-//		return false;
+	if(!CODE)
+		return false;
 
 	if(!$key) {
 		$DBT = debug_backtrace(0);
