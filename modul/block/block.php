@@ -412,7 +412,7 @@ function _blockCache($obj_name, $obj_id) {
 	$blockYStr = array();//выстраивание id блоков по порядку, чтобы потом по этому порядку выстроить элементы
 	foreach($arr as $bl) {
 		$id = _num($bl['id']);
-		unset($bl['viewer_id_add']);
+		unset($bl['user_id_add']);
 		unset($bl['dtime_add']);
 		foreach($bl as $key => $v)
 			if(preg_match(REGEXP_NUMERIC, $v))
@@ -448,7 +448,7 @@ function _blockCache($obj_name, $obj_id) {
 		$dlg = $dialog[$el['dialog_id']];
 		$block[$el['block_id']]['elem_id'] = $elem_id;
 		unset($el['sort']);
-		unset($el['viewer_id_add']);
+		unset($el['user_id_add']);
 		unset($el['dtime_add']);
 		unset($el['page_id']);
 

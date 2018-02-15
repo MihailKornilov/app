@@ -219,7 +219,13 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 	if($elem['num_4'])
 		return $elem['num_4'];
 
-	$sql = "INSERT INTO `_dialog` (`app_id`) VALUES (".APP_ID.")";
+	$sql = "INSERT INTO `_dialog` (
+				`app_id`,
+				`user_id_add`
+			) VALUES (
+				".APP_ID.",
+				".USER_ID."
+			)";
 	query($sql);
 
 	$sql = "SELECT IFNULL(MAX(`num`),0)+1

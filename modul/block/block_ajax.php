@@ -233,7 +233,7 @@ switch(@$_POST['op']) {
 						`h`,
 						`width`,
 						`height`,
-						`viewer_id_add`
+						`user_id_add`
 					) VALUES ".implode(',', $insert)."
 					ON DUPLICATE KEY UPDATE
 						`x`=VALUES(`x`),

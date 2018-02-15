@@ -667,8 +667,8 @@ function _dialogOpenLoad($dialog_id) {
 						case 'mar':
 						case 'sort':
 						case 'deleted':
-						case 'viewer_id_add':
-						case 'viewer_id_del':
+						case 'user_id_add':
+						case 'user_id_del':
 						case 'dtime_add':
 						case 'dtime_del':
 						case '': break;
