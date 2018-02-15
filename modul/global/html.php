@@ -213,8 +213,9 @@ function _authLogout() {//выход из списка приложений
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes(CODE)."'";
 	query($sql);
 
-
 	setcookie('code', '', time() - 1, '/');
+	header('Location:'.URL);
+	exit;
 }
 
 
