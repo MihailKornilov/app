@@ -252,7 +252,6 @@ function _html() {
 		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
 		'<title>'._html_title().'</title>'.
 		_html_script().
-//		_api_scripts().
 	'</head>'.
 
 	'<body class="'.(CODE && FACE ? 'site' : '').'">'.
@@ -286,7 +285,7 @@ function _html_script() {//скрипты и стили
 
 	return
 	//Отслеживание ошибок в скриптах
-	(SA ? '<script src="js/errors.js"></script>' : '').
+(SA ? '<script src="js/errors.js"></script>' : '').
 
 	'<script>'.
 		'var URL="'.URL.'",'.
@@ -296,27 +295,34 @@ function _html_script() {//скрипты и стили
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
+	'<script src="js/autosize.js?3"></script>'.
+
+(CODE ?
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
-	'<script src="js/autosize.js?3"></script>'.
+
 	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?1"></script>'.
 
 	'<script src="js/lodash.min.js"></script>'.
 	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css" />'.
 	'<script src="js/gridstack'.MIN.'.js?"></script>'.
-	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'.
+	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'
+: '').
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
 	'<script src="modul/global/global'.MIN.'.js?'.VERSION.TIME.'"></script>'.
 
+	'<script src="modul/page/page'.MIN.'.js?'.VERSION.TIME.'"></script>'.
+
+(CODE ?
 	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.VERSION.'" />'.
 	'<script src="modul/element/element'.MIN.'.js?'.VERSION.'"></script>'.
 
-	'<script src="modul/page/page'.MIN.'.js?'.VERSION.TIME.'"></script>'.
 
 	'<script src="modul/block/block'.MIN.'.js?'.VERSION.'"></script>'.
 
-	'<script src="modul/spisok/spisok'.MIN.'.js?'.VERSION.'"></script>'.
+	'<script src="modul/spisok/spisok'.MIN.'.js?'.VERSION.'"></script>'
+: '').
 
 	_debug('style');
 }

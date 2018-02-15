@@ -17,7 +17,6 @@ var _faceTest = function() {//определение, как загружена страница: iframe или са
 		but.addClass('_busy');
 
 		VK.Auth.login(function(res) {//проверка статуса авторизации
-			console.log(res);
 			but.removeClass('_busy');
 			if(res.status != 'connected')
 				return;
@@ -34,7 +33,6 @@ var _faceTest = function() {//определение, как загружена страница: iframe или са
 					return;
 				}
 				but.removeClass('_busy');
-				console.log(res);
 			});
 		});
 	},
