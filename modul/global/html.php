@@ -25,7 +25,7 @@ function _saSet() {//установка флага суперадминистратора
 	define('SA', 1); return;
 
 
-	if(!_authCache()) {
+	if(!_authCache__()) {
 		define('SA', 0);
 		return;
 	}
@@ -42,8 +42,6 @@ function _saSet() {//установка флага суперадминистратора
 
 /* ---=== АВТОРИЗАЦИЯ ===--- */
 function _auth() {//авторизация через сайт
-	_authLogout();
-
 	if(!$r = _cache()) {
 		$sql = "SELECT *
 				FROM `_user_auth`
@@ -79,8 +77,6 @@ function _auth() {//авторизация через сайт
 		}
 	}
 */
-}
-function _authCache() {//получение данных авторизации из кеша и установка констант id пользователя и приложения
 }
 function _authLogin() {//отображение ссылки для входа через ВКонтакте
 	if(CODE)
@@ -205,7 +201,7 @@ function i_auth() {//авторизация через iframe
 
 	if(!CODE)
 		_appError('Авторизация не пройдена.'.(SA ? ' Пустой code.' : ''));
-	if(!_authCache())
+	if(!_authCache__())
 		_appError('Авторизация не пройдена.'.(SA ? ' Не получены данные по code.' : ''));
 	if(!USER_WORKER)
 		_appError('Нет доступа в приложение.');
