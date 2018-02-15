@@ -2,9 +2,9 @@
 require_once 'modul/global/global.php';
 
 _face();
-_saSet();
 _auth();
 _authLogout();
+_saDefine();
 _user();
 _pasDefine();
 

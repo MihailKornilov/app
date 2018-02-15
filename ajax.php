@@ -3,9 +3,11 @@ require_once 'modul/global/global.php';
 require_once 'modul/global/auth_ajax.php';
 
 _face();
-_saSet();
 _auth();
+_saDefine();
+_user();
 _pasDefine();
+
 
 require_once 'modul/global/global_ajax.php';
 require_once 'modul/block/block_ajax.php';

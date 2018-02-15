@@ -13,25 +13,12 @@ function _face() {//определение, как загружена страница: iframe или сайт
 	define('SITE', FACE == 'site' ? 'site' : '');
 	define('IFRAME', FACE == 'iframe');
 }
-
-function _sa($user_id) {//проверка пользователя на доступ SA
+function _saDefine() {//установка флага суперпользователя SA
 	//Список пользователей - SA
-	$SA[982006] = true;  //Михаил Корнилов
+	$SA[1] = true;  //Михаил Корнилов
 //	$SA[20912036] = true;//Игорь
 
-	return isset($SA[_num($user_id)]) ? 1 : 0;
-}
-function _saSet() {//установка флага суперадминистратора
-	define('SA', 1); return;
-
-
-	if(!_authCache__()) {
-		define('SA', 0);
-		return;
-	}
-
-//	define('SA', _sa(VIEWER_ID_SHOWER ? VIEWER_ID_SHOWER : USER_ID));
-	define('SA', _sa(USER_ID));
+	define('SA', isset($SA[USER_ID]) ? 1 : 0);
 
 	if(SA) {
 		error_reporting(E_ALL);
@@ -310,9 +297,9 @@ function _html_script() {//скрипты и стили
 : '').
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
-	'<script src="modul/global/global'.MIN.'.js?'.VERSION.TIME.'"></script>'.
+	'<script src="modul/global/global'.MIN.'.js?'.VERSION.'"></script>'.
 
-	'<script src="modul/page/page'.MIN.'.js?'.VERSION.TIME.'"></script>'.
+	'<script src="modul/page/page'.MIN.'.js?'.VERSION.'"></script>'.
 
 (CODE ?
 	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.VERSION.'" />'.
