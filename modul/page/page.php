@@ -650,6 +650,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'value' => _num($v) ? _num($v) : $EL['def']
 				   ));
 
+		//Календарь
+		case 51:
+			/*
+				num_1 - разрешать выбор прошедших дней
+				num_2 - показывать время
+			*/
+			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
 
 
 

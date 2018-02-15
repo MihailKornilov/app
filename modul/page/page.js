@@ -56,7 +56,9 @@ var _faceTest = function() {//определение, как загружена страница: iframe или са
 	},
 
 	_pageAct = function(pas) {//активация элементов после вывода страницы
-		_elemActivate(ELM, {}, pas);
+		if(pas)
+			return;
+		_elemActivate(ELM, {});
 	};
 
 	$(document).ready(_faceTest);

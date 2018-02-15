@@ -829,6 +829,10 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						return;
 					_cmpV49(el, unit);
 					return;
+				//Календарь
+				case 51:
+					$(el.attr_cmp)._calendar();
+					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка суммы значений единицы списка (для [27])
 				case 56:
 					if(is_edit)
@@ -3337,6 +3341,43 @@ $.fn._tooltip = function(msg, left, ugolSide) {
 	return t;
 };
 $.fn._calendar = function(o) {
+	var t = $(this);
+
+	if(!t.length)
+		return;
+
+	var attr_id = t.attr('id'),
+		VALUE = t.val();
+
+	if(!attr_id) {
+		attr_id = 'select' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
+	}
+
+	var win = attr_id + '_calendar',
+		S = window[win];
+
+	//удаление такого же календаря при повторном вызове
+	t.next().remove('._calendar');
+	t.after(
+		'<div class="_calendar">' +
+			'<div class="icon icon-calendar"></div>' +
+			'<input type="text" readonly value="24 сентября 2018" />' +
+			'<div class="cal-abs">' +
+				'<table class="cal-head">'+
+					'<tr><td class="cal-back">' +
+						'<td class="cal-mon"> Сентябрь 2018' +
+						'<td class="cal-next">' +
+				'</table>' +
+				'<table class="cal-week"><tr><td>Пн<td>Вт<td>Ср<td>Чт<td>Пт<td>Сб<td>Вс</table>' +
+				'<table class="cal-day">' +
+					'<tr><td>11<td>12<td>13<td>14<td>15<td>16<td>17' +
+				'</table>' +
+			'</div>' +
+		'</div>'
+	);
+};
+$.fn._calendar1 = function(o) {
 	var t = $(this),
 		id = t.attr('id'),
 		val = t.val(),
