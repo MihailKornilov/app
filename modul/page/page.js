@@ -36,6 +36,16 @@ var _faceTest = function() {//определение, как загружена страница: iframe или са
 			});
 		});
 	},
+	_authVkLocal = function(but) {//авторазация через VK - локальная версия
+		$(but).addClass('_busy');
+		_post({op:'auth_vk_local'}, function(res) {
+			if(res.success) {
+				location.href = URL;
+				return;
+			}
+			$(but).removeClass('_busy');
+		});
+	},
 	_appEnter = function(app_id) {//вход в приложение из списка приложений
 		var send = {
 			op:'app_enter',

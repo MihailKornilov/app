@@ -33,7 +33,7 @@ function _pageCache() {//получение массива страниц из кеша
 	return _cache($page);
 }
 function _page($i='all', $i1=0) {//получение данных страницы
-	if(!defined('APP_ID'))
+	if(!APP_ID)
 		return 0;
 
 	if(!$i)

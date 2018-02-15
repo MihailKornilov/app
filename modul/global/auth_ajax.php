@@ -28,44 +28,16 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'login'://процесс авторизации пользователя
-		if(!$code = _txt($_POST['code']))
-			jsonError('Отсутствует код');
-
-		if(!LOCAL) {
-			$url = 'https://oauth.vk.com/access_token?'.
-						'client_id='.AUTH_APP_ID.
-					   '&client_secret='.AUTH_APP_SECRET.
-					   '&redirect_uri=https://nyandoma.ru/app'.
-					   '&code='.$code;
-			if(!$res = @file_get_contents($url))
-				jsonError('Неуспешная попытка получения токена');
-
-			$res = json_decode($res, true);
-		} else {
-			//todo локальная версия
-			$res = array(
-				'user_id' => 982006
-			);
-		}
-
-		if(!$user_id = _num($res['user_id']))
-			jsonError('Ошибка при получении токена');
-
-		if(!$u = _user($user_id))
-			jsonError('Ошибка получения данных пользователя');
-
-		//получение id приложения, в котором в последний раз был пользователь
-		$sql = "SELECT `app_id`
-				FROM `_vkuser_app`
-				WHERE `viewer_id`=".$user_id."
-				  AND `worker`
-				ORDER BY `last_seen` DESC
+	case 'auth_vk_local'://авторизация пользователя по VK - локальная версия
+		$sql = "SELECT `id`
+				FROM `_user`
+				WHERE `vk_id`=982006
 				LIMIT 1";
-		$app_id = _num(query_value($sql));
+		if(!$user_id = _num(query_value($sql)))
+			jsonError('Пользователь не найден');
 
-		_authSuccess($code, $user_id, $app_id);
-		
+		_authSuccess('local'.$user_id, $user_id);
+
 		jsonSuccess();
 		break;
 }

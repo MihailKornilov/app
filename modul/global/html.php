@@ -57,7 +57,8 @@ function _auth() {//авторизация через сайт
 	define('USER_ID', _num(@$r['user_id']));
 	define('APP_ID', _num(@$r['app_id']));
 
-	/*	//SA: вход от имени другого пользователя
+/*
+	//SA: вход от имени другого пользователя
 	if(SA && $user_id = _num(@$_GET['user_id'])) {
 		$sql = "SELECT COUNT(*)
 				FROM `_vkuser`
@@ -85,12 +86,13 @@ function _authLogin() {//отображение ссылки для входа через ВКонтакте
 	return
 	'<div class="center mt40">'.
 		'<div class="w1000 pad30 dib mt40">'.
-			'<button class="vk" onclick="_authVk(this)">Войти через VK</button>'.
+			'<button class="vk" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Войти через VK</button>'.
 		'</div>'.
 	'</div>'.
-
+(!LOCAL ?
 	'<script src="https://vk.com/js/api/openapi.js?152"></script>'.
-	'<script>VK.init({apiId:'.AUTH_APP_ID.'})</script>';
+	'<script>VK.init({apiId:'.AUTH_APP_ID.'})</script>'
+: '');
 }
 function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной авторизации
 	$ip = $_SERVER['REMOTE_ADDR'];
@@ -274,7 +276,7 @@ function _html_title() {
 	if(!APP_ID)
 		return 'Мои приложения';
 
-	return _app(APP_ID, 'app_name');
+	return _app(APP_ID, 'name');
 }
 function _html_script() {//скрипты и стили
 	//глобальная ссылка для отправки запросов ajax
@@ -317,7 +319,6 @@ function _html_script() {//скрипты и стили
 (CODE ?
 	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.VERSION.'" />'.
 	'<script src="modul/element/element'.MIN.'.js?'.VERSION.'"></script>'.
-
 
 	'<script src="modul/block/block'.MIN.'.js?'.VERSION.'"></script>'.
 
@@ -407,7 +408,7 @@ function _app_list() {//список приложений, которые доступны пользователю
 		$send .=
 			'<div class="pad10 bg-gr2 mar10 over2 curP" onclick="_appEnter('.$r['id'].')">'.
 				'<span class="grey">'.$r['id'].'</span> '.
-				$r['app_name'].
+				_app($r['app_id'], 'name').
 				'<div class="fr grey">'.FullData($r['dtime_add']).'</div>'.
 			'</div>';
 	}
@@ -435,8 +436,8 @@ function _app_create() {//автоматическое создание приложения, если пользователь 
 
 	$sql = "INSERT INTO `_app` (
 				`id`,
-				`app_name`,
-				`viewer_id_add`
+				`name`,
+				`user_id_add`
 			) VALUES (
 				".$app_id.",
 				'Приложение ".$app_id."',

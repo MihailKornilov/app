@@ -8,7 +8,7 @@ function _user($user_id=USER_ID) {//получение данных о пользовате из контакта
 
 	if(!defined('USER_NAME')) {
 		define('USER_WORKER', $u['worker']);
-		define('USER_APP_ONE', $u['app_count'] < 2);
+//		define('USER_APP_ONE', $u['app_count'] < 2);
 		define('USER_NAME', $u['i'].' '.$u['f']);//Имя Фамилия
 	}
 

@@ -1,28 +1,3 @@
-/* Сообщение в центре экрана об успешном выполнении */
-#_msg{
-	padding:15px 20px;
-	position:absolute;
-	width:400px;
-	top:100px;
-	background-color:#333;
-	font:bold 12px Tahoma;
-	color:#FFF;
-	opacity:0.9;
-	border-radius:5px;
-	z-index:99999
-}
-#_msg a{color:#b1daff;font:bold 12px Tahoma}
-#_msg b{font-size:12px}
-
-
-
-
-
-
-
-
-
-
 /* ---=== СПИСОК В ТАБЛИЦЕ ===--- */
 ._stab{
 	border-collapse:collapse;

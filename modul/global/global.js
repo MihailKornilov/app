@@ -1,4 +1,6 @@
-var FB,
+var VK_SCROLL = 0,
+	ZINDEX = 1000,
+	FB,
 	REGEXP_NUMERIC =       /^\d+$/,
 	REGEXP_NUMERIC_MINUS = /^-?\d+$/,
 	REGEXP_DROB =          /^[\d]+(.[\d]+)?(,[\d]+)?$/,
