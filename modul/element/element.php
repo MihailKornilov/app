@@ -167,6 +167,19 @@ function _count($v=array()) {//поле количество
 		'<div class="but but-b"></div>'.
 	'</div>';
 }
+function _calendar($v=array()) {//поле Календарь
+	$attr_id = empty($v['attr_id']) ? 'calendar'.rand(1, 100000) : $v['attr_id'];
+
+	if(!$value = @$v['value'])
+		$value = strftime('%Y-%m-%d');
+
+	return
+	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
+	'<div class="_calendar disabled" id="'.$attr_id.'_calendar">'.
+		'<div class="icon icon-calendar"></div>'.
+		'<input type="text" class="cal-inp" readonly value="'.FullData($value).'" />'.
+	'</div>';
+}
 function _search($v=array()) {//элемент ПОИСК
 	$attr_id = empty($v['attr_id']) ? 'search'.rand(1, 100000) : $v['attr_id'];
 

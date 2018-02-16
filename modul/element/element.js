@@ -831,7 +831,10 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					return;
 				//Календарь
 				case 51:
-					$(el.attr_cmp)._calendar();
+					$(el.attr_cmp)._calendar({
+						lost:el.num_1,
+						time:el.num_2
+					});
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка суммы значений единицы списка (для [27])
 				case 56:
@@ -2014,9 +2017,8 @@ $.fn._radio = function(o) {
 };
 $.fn._count = function(o) {//input с количеством
 	var t = $(this),
-		n,
 		attr_id = t.attr('id'),
-		s;
+		S;
 
 	if(!attr_id) {
 		attr_id = 'count' + Math.round(Math.random() * 100000);
@@ -2032,6 +2034,8 @@ $.fn._count = function(o) {//input с количеством
 		max:false,  //максимальное значение
 		minus:0,    //может уходить в минус
 		step:1,     //шаг
+		again:0,    //если переключение доходит до крайнего значения, продолжение с начала
+		time:0,     //значение является временем (добавление нуля спереди, если меньше 10)
 		tooltip:'',
 		disabled:0,
 		func:function() {}
@@ -2041,8 +2045,8 @@ $.fn._count = function(o) {//input с количеством
 		o.minus = 1;
 
 	var val = _num(t.val());
-	valCorrect();
-	t.val(val)
+	val = valCorrect();
+	t.val((o.time && val < 10 ? '0' : '') + val)
 	 .attr('type', 'text')
 	 .attr('readonly', true);
 
@@ -2060,7 +2064,7 @@ $.fn._count = function(o) {//input с количеством
 	}
 
 	var el = $('#' + win);
-	el._dn(val, 'nol');
+	el._dn(val || o.time, 'nol');
 	el.append(
 		'<div class="but"></div>' +
 		'<div class="but but-b"></div>'
@@ -2077,22 +2081,28 @@ $.fn._count = function(o) {//input с количеством
 			return;
 		var znak = $(this).hasClass('but-b') ? -1 : 1;
 		val += o.step * znak;
-
-		valCorrect();
-
-		el._dn(val, 'nol');
-		t.val(val);
+		val = valCorrect();
+		el._dn(val || o.time, 'nol');
+		t.val((o.time && val < 10 ? '0' : '') + val);
 		o.func(val, attr_id);
 	});
 	function valCorrect() {
-		if(!o.minus && val < 0)
-			val = 0;
+		if(o.min !== false && val < o.min && o.again && o.max !== false)
+			return o.max;
 
-		if(o.max !== false && val > o.max)
-			val = o.max;
+		if(o.max !== false && val > o.max && o.again && o.min !== false)
+			return o.min;
+
+		if(!o.minus && val < 0)
+			return 0;
 
 		if(o.min !== false && val < o.min)
-			val = o.min;
+			return o.min;
+
+		if(o.max !== false && val > o.max)
+			return o.max;
+
+		return val;
 	}
 
 	window[win] = t;
@@ -2242,8 +2252,9 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 			if(target.hasClass('_select'))
 				cur = target;
 			else
-				cur = _parent(target, '._select')
+				cur = _parent(target, '._select');
 
+			//закрытие селектов, когда нажатие было в стороне
 			if(cur.hasClass('_select'))
 				attr = ':not(#' + cur.attr('id') + ')';
 
@@ -3350,75 +3361,65 @@ $.fn._calendar = function(o) {
 		VALUE = t.val();
 
 	if(!attr_id) {
-		attr_id = 'select' + Math.round(Math.random() * 100000);
+		attr_id = 'calendar' + Math.round(Math.random() * 100000);
 		t.attr('id', attr_id);
 	}
 
 	var win = attr_id + '_calendar',
 		S = window[win];
 
+	o = $.extend({
+		lost:1,                //если не 0, то можно выбрать прошедшие дни
+		time:0,                //показывать время
+		tomorrow:0,            //ссылка "завтра" для быстрой установки завтрашней даты
+		func:function () {}    //исполняемая функция при выборе дня
+	}, o);
+
+
 	//удаление такого же календаря при повторном вызове
 	t.next().remove('._calendar');
 	t.after(
-		'<div class="_calendar">' +
+		'<div class="_calendar" id="' + win + '">' +
 			'<div class="icon icon-calendar"></div>' +
-			'<input type="text" readonly value="24 сентября 2018" />' +
-			'<div class="cal-abs">' +
+			'<input type="text" class="cal-inp" readonly />' +
+
+		(o.time ?
+			'<div class="dib ml8">' +
+				'<input type="hidden" id="' + attr_id + '_hour"/>' +
+			'</div>' +
+			'<div class="dib b ml3 mr3">:</div>' +
+			'<input type="hidden" id="' + attr_id + '_min"/>'
+		: '') +
+
+			'<div class="cal-abs dn">' +
 				'<table class="cal-head">'+
 					'<tr><td class="cal-back">' +
-						'<td class="cal-mon"> Сентябрь 2018' +
+						'<td class="cal-mon">' +
 						'<td class="cal-next">' +
 				'</table>' +
 				'<table class="cal-week"><tr><td>Пн<td>Вт<td>Ср<td>Чт<td>Пт<td>Сб<td>Вс</table>' +
-				'<table class="cal-day">' +
-					'<tr><td>11<td>12<td>13<td>14<td>15<td>16<td>17' +
-				'</table>' +
+				'<table class="cal-day"></table>' +
 			'</div>' +
 		'</div>'
 	);
-};
-$.fn._calendar1 = function(o) {
-	var t = $(this),
-		id = t.attr('id'),
-		val = t.val(),
-		d = new Date();
 
-	o = $.extend({
-		year:d.getFullYear(),	// если год не указан, то текущий год
-		mon:d.getMonth() + 1,   // если месяц не указан, то текущий месяц
-		day:d.getDate(),		// то же с днём
-		lost:0,                 // если не 0, то можно выбрать прошедшие дни
-		func:function () {},    // исполняемая функция при выборе дня
-		place:'right',          // расположение календаря относительно выбора
-		tomorrow:0              // ссылка "завтра" для быстрой установки завтрашней даты
-	}, o);
-
-	// если input hidden содежит дату, применение её
-	if(REGEXP_DATE.test(val) && val != '0000-00-00') {
-		var r = val.split('-');
-		o.year = r[0];
-		o.mon = Math.abs(r[1]);
-		o.day = Math.abs(r[2]);
+	if(o.time) {
+		$('#' + attr_id + '_hour')._count({
+			min:0,
+			max:23,
+			again:1,
+			time:1
+		});
+		$('#' + attr_id + '_min')._count({
+			step:10,
+			min:0,
+			max:50,
+			again:1,
+			time:1
+		});
 	}
 
-	//удаление такого же календаря при повторном вызове
-	t.next().remove('._calendar');
-
-	t.after(
-		'<div class="_calendar" id="' + id + '_calendar">' +
-			'<div class="calinp">' + o.day + ' ' + MONTH_DAT[o.mon] + ' ' + o.year + '</div>' +
-			'<div class="calabs"></div>' +
-		'</div>'
-	);
-
-	var	curYear = o.year,//дата,
-		curMon = o.mon,  //установленная
-		curDay = o.day,  //в input hidden
-		inp = t.next().find('.calinp'),
-		calabs = inp.next(),//место для календаря
-		calmon,             //место для месяца и года
-		caldays;            //место для дней
-
+/*
 	if(o.tomorrow) {
 		inp
 			.after('<a class="dib ml10 grey">завтра</a>')
@@ -3429,62 +3430,95 @@ $.fn._calendar1 = function(o) {
 				daySel(tmr.getDate());
 			});
 	}
+*/
 
-	t.val(dataForm());
-	inp.click(calPrint);
+	var D = new Date(),
+		CUR_YEAR = D.getFullYear(), //текущий год
+		CUR_MON =  D.getMonth() + 1,//текущий месяц
+		CUR_DAY =  D.getDate(),     //текущий день
 
-	function calPrint(e) {
-		if(!calabs.html()) {
-			e.stopPropagation();
+		TAB_YEAR = CUR_YEAR,        //год, отображаемый в календаре
+		TAB_MON =  CUR_MON,         //месяц, отображаемый в календаре
 
-			// если были открыты другие календари, то закрываются, кроме текущего
-			var cals = $('.calabs');
-			for(var n = 0; n < cals.length; n++) {
-				var sp = cals.eq(n);
-				if(sp.parent().attr('id').split('_calendar')[0] == id)
-					continue;
-				sp.html('');
-			}
+		VAL_YEAR = CUR_YEAR,    //выбранный год
+		VAL_MON =  CUR_MON,     //выбранный месяц
+		VAL_DAY =  CUR_DAY,     //выбранный день
 
-			// закрытие текущего календаря при нажатии на любое место экрана
-			$(document).on('click.calendar' + id, function () {
-				calabs.html('');
-				$(document).off('click.calendar' + id);
-			});
+		CAL = t.next(),
+		INP = CAL.find('.cal-inp'),        //текстовое отображение выбранного дня
+		CAL_ABS = CAL.find('.cal-abs'), //содержание календаря
+		TD_MON = CAL.find('.cal-mon'),  //строка td с месяцем и годом
+		TAB_DAY = CAL.find('.cal-day'); //таблица с днями
 
-			o.year = curYear;
-			o.mon = curMon;
-			o.day = curDay;
+	valTest();
+	tdMonUpd();
+	dayPrint();
 
-			var html =
-				'<div class="calcal" style="left:' + (o.place == 'right' ? 0 : -64) + 'px">' +
-					'<table class="calhead">'+
-						'<tr><td class="calback">' +
-							'<td class="calmon">' + MONTH_DEF[curMon] + ' ' + curYear +
-							'<td class="calnext">' +
-					'</table>' +
-					'<table class="calweeks"><tr><td>Пн<td>Вт<td>Ср<td>Чт<td>Пт<td>Сб<td>Вс</table>' +
-					'<table class="caldays"></table>' +
-				'</div>';
-			calabs.html(html);
-			calabs.find('.calback').click(back);
-			calabs.find('.calnext').click(next);
-			calmon = calabs.find('.calmon');
-			caldays = calabs.find('.caldays');
-			daysPrint();
-		}
+	INP.click(function() {
+		if(CAL.hasClass('disabled'))
+			return;
+		var on = CAL_ABS.hasClass('dn');
+		TAB_YEAR = VAL_YEAR;
+		TAB_MON = VAL_MON;
+		tdMonUpd();
+		dayPrint();
+		CAL_ABS._dn(on);
+	});
+	CAL.find('.cal-back').click(monBack);
+	CAL.find('.cal-next').click(monNext);
+
+	$(document)
+		.off('click._calendar')
+		.on('click._calendar', function(e) {
+			var target = $(e.target),
+				cur,        //текущий календарь
+				attr = '';  //id текущего календаря
+
+			if(target.hasClass('_calendar'))
+				cur = target;
+			else
+				cur = _parent(target, '._calendar');
+
+			//закрытие календарей, когда нажатие было в стороне
+			//кроме текущего, если натажие было на нём
+			if(cur.hasClass('_calendar'))
+				attr = ':not(#' + cur.attr('id') + ')';
+
+			$('._calendar' + attr + ' .cal-abs')._dn();
+		});
+
+	function valTest() {//проверка текущего значения, установка, если некорректное
+		if(!VALUE.length)
+			return valUpd();
+		if(!REGEXP_DATE.test(VALUE))
+			return valUpd();
+
+		var ex = VALUE.split('-');
+		if(!_num(ex[0]) || !_num(ex[1]) || !_num(ex[2]))
+			return valUpd();
+
+		VAL_YEAR = _num(ex[0]);
+		VAL_MON =  _num(ex[1]);
+		VAL_DAY =  _num(ex[2]);
+		TAB_YEAR = VAL_YEAR;
+		TAB_MON = VAL_MON;
+		valUpd();
 	}
-	function daysPrint() {//вывод списка дней
+	function valUpd() {//обновление значения
+		VALUE = TAB_YEAR + '-' + (TAB_MON < 10 ? '0' : '') + TAB_MON + '-' + (VAL_DAY < 10 ? '0' : '') + VAL_DAY;
+		t.val(VALUE);
+		INP.val(VAL_DAY + ' ' + MONTH_DAT[VAL_MON] + ' ' + VAL_YEAR);
+	}
+	function tdMonUpd() {
+		TD_MON.html(MONTH_DEF[TAB_MON] + ' ' + TAB_YEAR);
+	}
+	function dayPrint() {//вывод списка дней
 		var n,
 			html = '<tr>',
-			year = d.getFullYear(),
-			mon = d.getMonth() + 1,
-			today = d.getDate(),
-			df = dayFirst(o.year, o.mon),
-			cur = year == o.year && mon == o.mon,// выделение текущего дня, если показан текущий год и месяц
-			lost = o.lost == 0, // затемнение прошедших дней
-			st = o.year == curYear && o.mon == curMon, // выделение выбранного дня
-			dc = dayCount(o.year, o.mon);
+			df = dayFirst(),
+			dc = dayCount(TAB_YEAR, TAB_MON),
+			cur = CUR_YEAR == TAB_YEAR && CUR_MON == TAB_MON,// выделение текущего дня, если показан текущий год и месяц
+			st =  VAL_YEAR == TAB_YEAR && VAL_MON == TAB_MON;// выделение выбранного дня, если показан год и месяц выбранного дня
 
 		//установка пустых ячеек
 		if(df > 1)
@@ -3493,74 +3527,60 @@ $.fn._calendar1 = function(o) {
 
 		for(n = 1; n <= dc; n++) {
 			var l = '';
-			if(o.year < year) l = ' lost';
-			else if(o.year == year && o.mon < mon) l = ' lost';
-			else if(o.year == year && o.mon == mon && n < today) l = ' lost';
-			html +=
-				'<td class="' + (!l || l && !lost ? ' sel' : '') +
-								(cur && n == today ? ' b' : '') +
-								(st && n == curDay ? ' set' : '') +
-								l + '"' +
-							(!l || l && !lost ? ' val="' + n + '"' : '') +
-					'>' + n;
-			df++;
-			if(df == 8 && n != dc) {
+			if(TAB_YEAR < CUR_YEAR) l = ' lost';
+			else if(TAB_YEAR == CUR_YEAR && TAB_MON < CUR_MON) l = ' lost';
+			else if(TAB_YEAR == CUR_YEAR && TAB_MON == CUR_MON && n < CUR_DAY) l = ' lost';
+			var b = cur && n == CUR_DAY ? ' b' : '',
+				set = st && n == VAL_DAY ? ' set' : '',
+				sel = !l || l && o.lost ? ' sel' : '';
+			html += '<td class="' + sel + set + b +	l + '">' + n;
+			if(++df > 7 && n != dc) {
 				html += "<tr>";
 				df = 1;
 			}
 		}
-		caldays
+		TAB_DAY
 			.html(html)
-			.find('.sel').click(function() {
-				daySel($(this).attr('val'));
-			})
+			.find('.sel').click(daySel)
 	}
-	function daySel(v) {
-		curYear = o.year;
-		curMon = o.mon;
-		curDay = v;
-		inp.html(curDay + ' ' + MONTH_DAT[curMon] + ' ' + curYear);
-		t.val(dataForm());
-		o.func(dataForm());
-	}
-	function dataForm() {//формирование даты в виде 2012-12-03
-		return curYear +
-			'-' + (curMon < 10 ? '0' : '') + curMon +
-			'-' + (curDay < 10 ? '0' : '') + curDay;
-	}
-	function dayFirst(year, mon) {//номер первой недели в месяце
-		var first = new Date(year, mon - 1, 1).getDay();
-		return first == 0 ? 7 : first;
+	function dayFirst() {//номер первой недели в месяце
+		var first = new Date(TAB_YEAR, TAB_MON - 1, 1).getDay();
+		return first || 7;
 	}
 	function dayCount(year, mon) {//количество дней в месяце
 		mon--;
-		if(mon == 0) {
+		if(!mon) {
 			mon = 12;
 			year--;
 		}
 		return 32 - new Date(year, mon, 32).getDate();
 	}
-	function back(e) {//пролистывание календаря назад
-		e.stopPropagation();
-		o.mon--;
-		if(o.mon == 0) {
-			o.mon = 12;
-			o.year--;
+	function daySel() {
+		VAL_YEAR = TAB_YEAR;
+		VAL_MON = TAB_MON;
+		VAL_DAY = _num($(this).html());
+		CAL_ABS._dn();
+		valUpd();
+		dayPrint();
+	}
+	function monBack() {//пролистывание календаря назад
+		if(!--TAB_MON) {
+			TAB_MON = 12;
+			TAB_YEAR--;
 		}
+		tdMonUpd();
+		dayPrint();
+	}
+	function monNext() {//пролистывание календаря вперёд
+		if(++TAB_MON > 12) {
+			TAB_MON = 1;
+			TAB_YEAR++;
+		}
+		tdMonUpd();
+		dayPrint();
+	}
 
-		calmon.html(MONTH_DEF[o.mon] + ' ' + o.year);
-		daysPrint();
-	}
-	function next(e) {//пролистывание календаря вперёд
-		e.stopPropagation();
-		o.mon++;
-		if(o.mon == 13) {
-			o.mon = 1;
-			o.year++;
-		}
-		calmon.html(MONTH_DEF[o.mon] + ' ' + o.year);
-		daysPrint();
-	}
+
 };
 $.fn._search = function(o, v) {//поисковая строка
 	/*

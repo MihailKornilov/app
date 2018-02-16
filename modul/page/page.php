@@ -656,7 +656,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_1 - разрешать выбор прошедших дней
 				num_2 - показывать время
 			*/
-			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
+			return _calendar(array(
+				'attr_id' => $attr_id,
+				'value' => $v
+			));
 
 
 
