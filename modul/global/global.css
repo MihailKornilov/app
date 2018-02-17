@@ -101,7 +101,7 @@ table{border:0;border-spacing:0}
 }
 .icon.pl:not(.spin):not(:hover){opacity:.5}/* pale: бледная иконка */
 .icon.wh{background-position-y:-20px}/* white: белая иконка */
-.icon-empty{background-position:-9999px -9999px}/* пустая иконка */
+.icon-empty{background-position:-9999px -9999px;cursor:default}/* пустая иконка */
 .icon-edit   {background-position-x:0}    /* редактирование */
 .icon-del    {background-position-x:-20px}/* удаление */
 .icon-del-red{background-position-x:-40px}/* удаление красная */

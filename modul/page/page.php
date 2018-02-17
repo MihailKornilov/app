@@ -27,7 +27,7 @@ function _pageCache() {//получение массива страниц из кеша
 
 	foreach($page as $id => $r) {
 		$block_count = _num(@$block[$id]);
-		$page[$id]['del_access'] = $block_count ? 0 : 1;
+		$page[$id]['del_access'] = $block_count || $r['common_id'] ? 0 : 1;
 	}
 
 	return _cache($page);
@@ -244,19 +244,21 @@ function _pageSetupAppPage() {//управление страницами приложения
 function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
 	if(empty($arr))
 		return '';
-
+//mjs-nestedSortable-branch
 	$send = '';
 	foreach($arr as $r) {
-		$send .= '<li class="mt1" id="item_'.$r['id'].'">'.
-			'<div class="curM">'.
-				'<table class="_stab w100p bor-e8 bg-fff over1">'.
+		$send .= '<li class="mt1'.(!$r['parent_id'] ? ' pb10' : '').'" id="item_'.$r['id'].'">'.
+			'<div>'.
+				'<table class="_stab w100p bor-e8 bg-fff">'.
 					'<tr><td>'.
 							'<a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
 								($r['def'] ? '<div class="icon icon-ok fr curD'._tooltip('Страница по умолчанию', -76).'</div>' : '').
 						'<td class="w35 wsnw">'.
-							'<div val="dialog_id:20,unit_id:'.$r['id'].'" class="icon icon-edit dialog-open'._tooltip('Изменить название', -58).'</div>'.
-	   (!$r['del_access'] ? '<div class="icon icon-off'._tooltip('Очистить', -29).'</div>' : '').
-		($r['del_access'] ? '<div onclick="_dialogOpen(6,'.$r['id'].')" class="icon icon-del-red'._tooltip('Страница пустая, удалить', -79).'</div>' : '').
+							'<div class="icon icon-move pl"></div>'.
+							'<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].'" class="icon icon-edit pl dialog-open'._tooltip('Изменить название', -58).'</div>'.
+		($r['del_access'] ? '<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',del:1" class="icon icon-del-red dialog-open'._tooltip('Страница пустая, удалить', -79).'</div>'
+						  : '<div class="icon icon-empty"></div>'
+		).
 				'</table>'.
 			'</div>';
 		if(!empty($sort[$r['id']]))

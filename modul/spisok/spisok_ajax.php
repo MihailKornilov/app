@@ -51,6 +51,11 @@ switch(@$_POST['op']) {
 			//обновление кеша объекта, если это элемент
 			if($elem)
 				_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
+
+			//обновление кеша объекта, если это страница
+			if($dialog['base_table'] == '_page')
+				_cache('clear', '_pageCache');
+
 		}
 
 		$send = _spisokAction4($send);
