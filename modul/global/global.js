@@ -191,15 +191,15 @@ var VK_SCROLL = 0,
 	_parent = function(t, tag) {//поиск нужного тега методом parent()
 		tag = tag || 'TR';
 		var max = 10,
-			e = 0,
 			cls = tag[0] == '.';
 		if(cls)
 			tag = tag.substr(1);
-		while(!e) {
+		while(!(cls ? t.hasClass(tag) : t[0].tagName == tag)) {
+			if(!t.length)
+				break;
 			t = t.parent();
-			e = cls ? t.hasClass(tag) : t[0].tagName == tag;
 			if(!--max)
-				e = 1;
+				break;
 		}
 		return t;
 	},

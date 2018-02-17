@@ -2245,14 +2245,8 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 	$(document)
 		.off('click._select')
 		.on('click._select', function(e) {
-			var target = $(e.target),
-				cur,
+			var cur = _parent($(e.target), '._select'),
 				attr = '';
-
-			if(target.hasClass('_select'))
-				cur = target;
-			else
-				cur = _parent(target, '._select');
 
 			//закрытие селектов, когда нажатие было в стороне
 			if(cur.hasClass('_select'))
@@ -3366,7 +3360,8 @@ $.fn._calendar = function(o) {
 	}
 
 	var win = attr_id + '_calendar',
-		S = window[win];
+		S = window[win],
+		n;
 
 	o = $.extend({
 		lost:1,                //если не 0, то можно выбрать прошедшие дни
@@ -3448,6 +3443,7 @@ $.fn._calendar = function(o) {
 		INP = CAL.find('.cal-inp'),        //текстовое отображение выбранного дня
 		CAL_ABS = CAL.find('.cal-abs'), //содержание календаря
 		TD_MON = CAL.find('.cal-mon'),  //строка td с месяцем и годом
+		TD_WEEK = CAL.find('.cal-week'),//таблица с названиями недель
 		TAB_DAY = CAL.find('.cal-day'); //таблица с днями
 
 	valTest();
@@ -3462,27 +3458,33 @@ $.fn._calendar = function(o) {
 		TAB_MON = VAL_MON;
 		tdMonUpd();
 		dayPrint();
+		TD_WEEK._dn(1);
+		TAB_DAY._dn(1, 'mon');
 		CAL_ABS._dn(on);
 	});
-	CAL.find('.cal-back').click(monBack);
-	CAL.find('.cal-next').click(monNext);
+	CAL.find('.cal-back').click(back);
+	CAL.find('.cal-next').click(next);
+	TD_MON.click(function() {
+		TD_WEEK._dn();
+		TAB_DAY._dn(0, 'mon');
+		TD_MON.html(TAB_YEAR);
+		monPrint();
+	});
+
 
 	$(document)
 		.off('click._calendar')
 		.on('click._calendar', function(e) {
-			var target = $(e.target),
-				cur,        //текущий календарь
+			var cur = $(e.target).closest('._calendar,.cal-tb'),//текущий календарь
 				attr = '';  //id текущего календаря
-
-			if(target.hasClass('_calendar'))
-				cur = target;
-			else
-				cur = _parent(target, '._calendar');
 
 			//закрытие календарей, когда нажатие было в стороне
 			//кроме текущего, если натажие было на нём
 			if(cur.hasClass('_calendar'))
 				attr = ':not(#' + cur.attr('id') + ')';
+
+			if(cur.hasClass('cal-tb'))
+				attr = ':not(#' + cur.attr('val') + ')';
 
 			$('._calendar' + attr + ' .cal-abs')._dn();
 		});
@@ -3513,8 +3515,7 @@ $.fn._calendar = function(o) {
 		TD_MON.html(MONTH_DEF[TAB_MON] + ' ' + TAB_YEAR);
 	}
 	function dayPrint() {//вывод списка дней
-		var n,
-			html = '<tr>',
+		var html = '<tr>',
 			df = dayFirst(),
 			dc = dayCount(TAB_YEAR, TAB_MON),
 			cur = CUR_YEAR == TAB_YEAR && CUR_MON == TAB_MON,// выделение текущего дня, если показан текущий год и месяц
@@ -3540,8 +3541,8 @@ $.fn._calendar = function(o) {
 			}
 		}
 		TAB_DAY
-			.html(html)
-			.find('.sel').click(daySel)
+			.html('<tbody class="cal-tb" val="' + win + '">' + html + '</tbody>')
+			.find('.sel').click(daySel);
 	}
 	function dayFirst() {//номер первой недели в месяце
 		var first = new Date(TAB_YEAR, TAB_MON - 1, 1).getDay();
@@ -3563,7 +3564,52 @@ $.fn._calendar = function(o) {
 		valUpd();
 		dayPrint();
 	}
-	function monBack() {//пролистывание календаря назад
+	function monPrint() {//отображение месяцев, когда пролистывание по году
+		var html = '',
+			cur = CUR_YEAR == TAB_YEAR,//выделение текущего месяца, если показан текущий год
+			st =  VAL_YEAR == TAB_YEAR,//выделение выбранного месяца, если показан год выбанного месяца
+			monn = {
+				1:'янв',
+				2:'фев',
+				3:'мар',
+				4:'апр',
+				5:'май',
+				6:'июн',
+				7:'июл',
+				8:'авг',
+				9:'сен',
+				10:'окт',
+				11:'ноя',
+				12:'дек'
+			},
+			tr = 3;
+
+		for(n = 1; n <= 12; n++) {
+			if(++tr > 3) {
+				html += '<tr>';
+				tr = 0;
+			}
+			var b = cur && n == CUR_MON ? ' b' : '',
+				set = st && n == VAL_MON ? ' set' : '';
+			html += '<td class="sel' + b + set + '" val="' + n + '">' + monn[n];
+		}
+		TAB_DAY
+			.html('<tbody class="cal-tb" val="' + win + '">' + html + '</tbody>')
+			.find('.sel').click(function() {
+				TAB_MON = _num($(this).attr('val'));
+				TAB_DAY._dn(1, 'mon');
+				TD_WEEK._dn(1);
+				tdMonUpd();
+				dayPrint();
+			});
+	}
+	function back() {//пролистывание календаря назад
+		if(TD_WEEK.hasClass('dn')) {
+			TAB_YEAR--;
+			TD_MON.html(TAB_YEAR);
+			monPrint();
+			return;
+		}
 		if(!--TAB_MON) {
 			TAB_MON = 12;
 			TAB_YEAR--;
@@ -3571,7 +3617,13 @@ $.fn._calendar = function(o) {
 		tdMonUpd();
 		dayPrint();
 	}
-	function monNext() {//пролистывание календаря вперёд
+	function next() {//пролистывание календаря вперёд
+		if(TD_WEEK.hasClass('dn')) {
+			TAB_YEAR++;
+			TD_MON.html(TAB_YEAR);
+			monPrint();
+			return;
+		}
 		if(++TAB_MON > 12) {
 			TAB_MON = 1;
 			TAB_YEAR++;

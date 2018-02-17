@@ -560,7 +560,7 @@
 
 /* Календарь */
 ._calendar{display:inline-block;position:relative}
-._calendar .icon{position:absolute;right:5px;top:4px}
+._calendar .icon{position:absolute;left:127px;top:4px}
 ._calendar .cal-inp{cursor:pointer;width:150px}
 ._calendar.disabled .cal-inp{
 	background-color:#f5f5f5;
@@ -574,6 +574,7 @@
 	top:33px;
 	width:212px;
 	box-shadow:0 1px 3px rgba(0,0,0,.1);
+	cursor:default;
 	z-index:90;
 }
 ._calendar .cal-head{
@@ -616,6 +617,7 @@
 	text-align:center;
 }
 ._calendar .cal-day td{height:27px;border:#fff solid 1px}
+._calendar .cal-day.mon td{height:40px;width:52.5px}
 ._calendar .cal-day td.sel{cursor:pointer}
 ._calendar .cal-day td.sel:not(.set):hover{background-color:#ECEFF4;border:#ECEFF4 solid 1px}
 ._calendar .cal-day td.set{border:#97AFCC solid 1px;background-color:#F1F5F9}
