@@ -663,6 +663,25 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'value' => $v
 			));
 
+		case 59:
+			/*
+				txt_1 - текст кнопки
+				num_4 - id диалогового окна
+				num_1 - id списка
+			*/
+
+			//если нова€ кнопка, будет создаватьс€ новый диалог дл€ неЄ
+			$block = !$el['num_4'] ? ',block_id:'.$el['block_id'] : '';
+
+			return _button(array(
+						'attr_id' => $attr_id,
+						'name' => $el['txt_1'],
+						'color' => 'grey',
+						'width' => $el['width'],
+						'small' => 1,
+						'class' => 'dialog-open',
+						'val' => 'dialog_id:'.$el['num_4'].$block
+					));
 
 
 		//---=== ЁЋ≈ћ≈Ќ“џ ƒЋя ќ“ќЅ–ј∆≈Ќ»я ===---
@@ -836,7 +855,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 				настройка шаблона через вспомогательный элемент: dialig_id=25
 			*/
-			if(PAS) {
+			if($is_edit) {
 				$dialog = _dialogQuery($el['num_1']);
 				return '<div class="_empty">—писок <b class="fs14">'.$dialog['spisok_name'].'</b></div>';
 			}

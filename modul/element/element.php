@@ -223,7 +223,7 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id`=".$block_id."
-			  AND `dialog_id`=2
+			  AND `dialog_id` IN (2,59)
 			LIMIT 1";
 	if(!$elem = query_assoc($sql))
 		return false;
@@ -259,6 +259,10 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 			SET `num_4`=".$dialog_id."
 			WHERE `id`=".$elem['id'];
 	query($sql);
+
+	//обновление кеша объекта, в котором находится блок с кнопкой
+	$bl = _blockQuery($block_id);
+	_cache('clear', $bl['obj_name'].'_'.$bl['obj_id']);
 
 	return $dialog_id;
 }

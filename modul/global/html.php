@@ -138,8 +138,6 @@ function _authLogout() {//выход из приложения, если требуется
 		return;
 	if(!CODE)
 		return;
-	if(!USER_ID)
-		return;
 
 	_cache('clear', '_auth');
 	_cache('clear', '_pageCache');

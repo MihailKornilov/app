@@ -99,7 +99,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			w2 = Math.round(width / 2); // ширина/2. Для определения положения по центру
 
 		dialog.find('.close').click(dialogClose);
-		content.find('input')._enter(submitFunc);//для всех input при нажатии enter применяется submit
+//		content.find('input')._enter(submitFunc);//для всех input при нажатии enter применяется submit
 		butSubmit.click(submitFunc);
 		butCancel.click(function() {
 //			e.stopPropagation();
