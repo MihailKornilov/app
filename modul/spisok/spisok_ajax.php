@@ -197,7 +197,16 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			FROM `".$dialog['base_table']."`
 			WHERE `id`=".$unit_id;
 	$unit = query_assoc($sql);
-	$unit['title'] = IS_ELEM ? _elemUnit($unit) : '';
+	$unit['title'] = '';
+	if(IS_ELEM)
+		if($bl = _blockQuery($unit['block_id'])) {
+			if($bl['obj_name'] == 'dialog') {
+				_cache('clear', '_dialogQuery'.$bl['obj_id']);
+				$dlg = _dialogQuery($bl['obj_id']);
+				$unit = $dlg['cmp'][$unit['id']];
+			}
+			$unit['title'] = _elemUnit($unit);
+		}
 
 	$cmpv = @$_POST['cmpv'];
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
@@ -245,8 +254,8 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 	$POST_CMP = @$_POST['cmp'];
 	if($dialog['cmp_no_req'] && empty($POST_CMP))
 		return array();
-	if(empty($POST_CMP))
-		jsonError('Нет данных для внесения');
+//	if(empty($POST_CMP))
+//		jsonError('Нет данных для внесения');
 	if(!is_array($POST_CMP))
 		jsonError('Компоненты диалога не являются массивом');
 
@@ -257,10 +266,12 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 		if(!$cmp = @$dialog['cmp'][$cmp_id])
 			jsonError('Отсутствует компонент id'.$cmp_id.' в диалоге');
 		if(!$col = @$cmp['col'])
-			jsonError(array(
+			continue;
+/*			jsonError(array(
 				'attr_cmp' => $cmp['attr_cmp']._dialogParam($cmp['dialog_id'], 'element_afics'),
 				'text' => utf8('Отсутствует имя колонки в компоненте id'.$cmp_id)
 			));
+*/
 		if(!isset($dialog['field'][$col]))
 			jsonError('В таблице <b>'.$dialog['base_table'].'</b> нет колонки с именем "'.$col.'"');
 
@@ -278,6 +289,9 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 
 		$send[$cmp_id] = $v;
 	}
+
+	if(!$send)
+		jsonError('Нет данных для внесения');
 
 	return $send;
 }
