@@ -873,6 +873,34 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						return;
 					_cmpV58(el);
 					return;
+				//Связка списка при помощи кнопки
+				case 59:
+					var but = $(el.attr_cmp + el.afics);
+					but.click(function() {
+						_dialogLoad({
+							block_id:el.block_id,
+							dialog_id:el.num_4,
+							busy_obj:$(this),
+							func_open:function(res, dlg) {
+								dlg.content.click(function(e) {
+									var un = $(e.target).parents('.sp-unit');
+									if(!un.length)
+										return;
+
+									var id = _num(un.attr('val'));
+									if(!id)
+										return;
+
+									$(el.attr_cmp).val(id);
+									dlg.close();
+									but._dn();
+									but.after('выбрано ' + id);
+								});
+							}
+						});
+					});
+
+					return;
 			}
 		});
 
@@ -1677,6 +1705,10 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 		});
 	},
 	_dialogLoad = function(o) {//загрузка диалога
+		/*
+			o.func_open - функция, выполняемая после открытия диалога
+			o.func_save - функция, выполняемая после успешного выполнения диалога (после нажатия кнопки submit)
+		*/
 		var send = {
 			op:'dialog_open_load',
 			page_id:PAGE_ID,
@@ -1708,6 +1740,8 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				};
 				_elemGroup(send);
 			}
+			if(o.func_open)
+				o.func_open(res, dialog);
 		});
 	},
 
@@ -3678,8 +3712,8 @@ $.fn._search = function(o, v) {//поисковая строка
 			return S;
 	}
 
-	if(S && S.inp)
-		return S;
+//	if(S && S.inp)
+//		return S;
 
 	o = $.extend({
 		width:150,      //ширина. Если 0 = 100%

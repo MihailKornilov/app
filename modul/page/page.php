@@ -663,6 +663,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'value' => $v
 			));
 
+		//—в€зка списка при помощи кнопки
 		case 59:
 			/*
 				txt_1 - текст кнопки
@@ -670,18 +671,28 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_1 - id списка
 			*/
 
-			//если нова€ кнопка, будет создаватьс€ новый диалог дл€ неЄ
-			$block = !$el['num_4'] ? ',block_id:'.$el['block_id'] : '';
-
-			return _button(array(
-						'attr_id' => $attr_id,
-						'name' => $el['txt_1'],
-						'color' => 'grey',
-						'width' => $el['width'],
-						'small' => 1,
-						'class' => 'dialog-open',
-						'val' => 'dialog_id:'.$el['num_4'].$block
-					));
+			$uHtml = '';
+			if($v = _num($v))
+				if($dialog_id = _num($el['num_1']))
+					if($dlg = _dialogQuery($dialog_id)) {
+						$sql = "SELECT *
+								FROM `".$dlg['base_table']."`
+								WHERE `id`=".$v;
+						if($un = query_assoc($sql)) {
+							$uHtml = _pr($un);
+						}
+					}
+			return
+			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+			_button(array(
+				'attr_id' => $attr_id.$el['afics'],
+				'name' => $el['txt_1'],
+				'color' => 'grey',
+				'width' => $el['width'],
+				'small' => 1,
+				'class' => _dn(!$v)
+			)).
+			'<div>'.$uHtml.'</div>';
 
 
 		//---=== ЁЋ≈ћ≈Ќ“џ ƒЋя ќ“ќЅ–ј∆≈Ќ»я ===---

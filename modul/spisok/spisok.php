@@ -268,7 +268,10 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				}
 
 				$block = _blockArrChild($child);
-				$send .= _blockLevel($block, $width, 0, 0, 1, $sp);
+				$send .=
+					'<div class="sp-unit" val="'.$sp['id'].'">'.
+						_blockLevel($block, $width, 0, 0, 1, $sp).
+					'</div>';
 			}
 
 			if($limit * ($next + 1) < $all) {
