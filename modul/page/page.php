@@ -679,7 +679,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 								FROM `".$dlg['base_table']."`
 								WHERE `id`=".$v;
 						if($un = query_assoc($sql)) {
-							$uHtml = _pr($un);
+							$uHtml = _blockHtml('spisok', $el['block_id'], 350, 0, $un);
 						}
 					}
 			return
@@ -692,7 +692,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'small' => 1,
 				'class' => _dn(!$v)
 			)).
-			'<div>'.$uHtml.'</div>';
+			'<div class="prel'._dn($v).'">'.
+				'<div class="icon icon-del-red pl fr'._tooltip('Отменить выбор', -53).'</div>'.
+				'<div>'.$uHtml.'</div>'.
+			'</div>';
 
 
 		//---=== ЭЛЕМЕНТЫ ДЛЯ ОТОБРАЖЕНИЯ ===---

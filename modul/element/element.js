@@ -875,7 +875,8 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					return;
 				//Связка списка при помощи кнопки
 				case 59:
-					var but = $(el.attr_cmp + el.afics);
+					var but = $(el.attr_cmp + el.afics),
+						div = but.next();
 					but.click(function() {
 						_dialogLoad({
 							block_id:el.block_id,
@@ -894,12 +895,17 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 									$(el.attr_cmp).val(id);
 									dlg.close();
 									but._dn();
-									but.after('выбрано ' + id);
+									div._dn(1);
 								});
 							}
 						});
 					});
-
+					//отмена выбора
+					div.find('.icon').click(function() {
+						but._dn(1);
+						div._dn();
+						$(el.attr_cmp).val(0);
+					});
 					return;
 			}
 		});
