@@ -1276,6 +1276,34 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			return '';
 
+		//Загрузка изображений
+		case 60:
+			if($is_edit)
+				return '<div class="_empty min">Загрузка изображений.</div>';
+
+			$html = '';
+			if($UNIT_ISSET) {
+				$sql = "SELECT *
+						FROM `_image`
+						WHERE `obj_name`='_spisok'
+						  AND `obj_id`=".$unit['id']."
+						ORDER BY `sort`";
+				if($spisok = query_arr($sql)) {
+					$sql = "SELECT `id`,`path` FROM `_image_server`";
+					$server = query_ass($sql);
+					foreach($spisok as $r) {
+						$html .=
+							'<dd class="dib mr3 curM bg-fff">'.
+								'<table class="w100 h100 center bor-f0 pad5">'.
+									'<tr><td>'.
+										'<img src="'.$server[$r['server_id']].$r['100_name'].'" style="width:'.$r['100_x'].'px;height:'.$r['100_y'].'px">'.
+								'</table>'.
+							'</dd>';
+					}
+				}
+			}
+			return '<dl id="'.$attr_id.'">'.$html.'</dl>';
+
 
 
 		//---=== ДЕЙСТВИЯ К ЭЛЕМЕНТАМ (ФУНКЦИИ) ===---

@@ -326,13 +326,14 @@ $.fn._sort = function(o) {//сортировка
 	var t = $(this);
 
 	o = $.extend({
-		y:'y',
+		axis:'y',
 		handle:'.icon-move-y',
 		table:''
 	}, o);
 
 	t.sortable({
-		axis:'y',
+		axis:o.axis,
+		handle:o.handle,
 		update:function() {
 			if(!o.table)
 				return;

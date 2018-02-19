@@ -919,6 +919,13 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						$(el.attr_cmp).val(0);
 					});
 					return;
+				//Загрузка изображений
+				case 60:
+					$(el.attr_cmp).sortable({
+//						axis:'xy',
+//						handle:'.curM'
+					});
+					return;
 			}
 		});
 
