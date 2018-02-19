@@ -876,12 +876,25 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				//—в€зка списка при помощи кнопки
 				case 59:
 					var but = $(el.attr_cmp + el.afics),
-						div = but.next();
+						div = but.next(),
+						unitSel = function(id) {//действие после выбора значени€
+							var send = {
+								op:'spisok_59_unit',
+								cmp_id:el.id,
+								unit_id:id,
+								busy_obj:but
+							};
+							_post(send, function(res) {
+								div.find('.un-html').html(res.html);
+								div._dn(1);
+								but._dn();
+							});
+						};
 					but.click(function() {
 						_dialogLoad({
 							block_id:el.block_id,
 							dialog_id:el.num_4,
-							busy_obj:$(this),
+							busy_obj:but,
 							func_open:function(res, dlg) {
 								dlg.content.click(function(e) {
 									var un = $(e.target).parents('.sp-unit');
@@ -894,8 +907,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 
 									$(el.attr_cmp).val(id);
 									dlg.close();
-									but._dn();
-									div._dn(1);
+									unitSel(id);
 								});
 							}
 						});

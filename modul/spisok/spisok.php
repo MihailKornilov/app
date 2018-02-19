@@ -590,7 +590,24 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 
 	return $send;
 }
+function _spisok59unit($cmp_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
+	if(!$unit_id)
+		return '';
+	if(!$el = _elemQuery($cmp_id))
+		return '';
+	if(!$dialog_id = _num($el['num_1']))
+		return '';
+	if(!$dlg = _dialogQuery($dialog_id))
+		return '';
 
+	$sql = "SELECT *
+			FROM `".$dlg['base_table']."`
+			WHERE `id`=".$unit_id;
+	if(!$un = query_assoc($sql))
+		return '';
+
+	return _blockHtml('spisok', $el['block_id'], 350, 0, $un);
+}
 
 
 

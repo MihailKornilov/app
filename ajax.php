@@ -19,7 +19,7 @@ require_once 'modul/debug/debug_ajax.php';
 
 
 
-jsonError('Условие [op] не найдено');
+jsonError('Условие [op: '.@$_POST['op'].'] не найдено');
 
 
 

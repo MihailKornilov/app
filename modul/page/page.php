@@ -671,17 +671,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_1 - id списка
 			*/
 
-			$uHtml = '';
-			if($v = _num($v))
-				if($dialog_id = _num($el['num_1']))
-					if($dlg = _dialogQuery($dialog_id)) {
-						$sql = "SELECT *
-								FROM `".$dlg['base_table']."`
-								WHERE `id`=".$v;
-						if($un = query_assoc($sql)) {
-							$uHtml = _blockHtml('spisok', $el['block_id'], 350, 0, $un);
-						}
-					}
+			$v = _num($v);
 			return
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			_button(array(
@@ -692,9 +682,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'small' => 1,
 				'class' => _dn(!$v)
 			)).
-			'<div class="prel'._dn($v).'">'.
+			'<div class="'._dn($v).'">'.
 				'<div class="icon icon-del-red pl fr'._tooltip('Отменить выбор', -53).'</div>'.
-				'<div>'.$uHtml.'</div>'.
+				'<div class="un-html">'._spisok59unit($el['id'], $v).'</div>'.
 			'</div>';
 
 

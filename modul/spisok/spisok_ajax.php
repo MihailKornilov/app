@@ -143,6 +143,15 @@ switch(@$_POST['op']) {
 		$send['spisok'] = _spisokConnect($cmp_id, $v);
 		jsonSuccess($send);
 		break;
+	case 'spisok_59_unit':
+		if(!$cmp_id = _num($_POST['cmp_id']))
+			jsonError('Некорректный ID компонента');
+		if(!$unit_id = _num($_POST['unit_id']))
+			jsonError('Некорректный ID выбранного элемента');
+
+		$send['html'] = utf8(_spisok59unit($cmp_id, $unit_id));
+		jsonSuccess($send);
+		break;
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка
