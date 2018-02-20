@@ -69,6 +69,32 @@ function _spisokInclude($spisok, $CMP) {//вложенные списки
 
 	return $spisok;
 }
+function _spisokImage($spisok, $CMP) {//вставка картинок
+	foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с изображениями
+		//должен является компонентом "загрузка изображений"
+		if($cmp['dialog_id'] != 60)
+			continue;
+
+		//должно быть присвоено имя колонки
+		if(!$col = $cmp['col'])
+			continue;
+
+		foreach($spisok as $id => $r)
+			$spisok[$id][$col] = 'no img';
+
+		$sql = "SELECT *
+				FROM `_image`
+				WHERE `obj_name`='_spisok'
+				  AND `obj_id` IN ("._idsGet($spisok).")
+				  AND !`sort`";
+		if($arr = query_arr($sql))
+			foreach($arr as$r) {
+				$spisok[$r['obj_id']][$col] = _imageHtml($r);
+			}
+	}
+
+	return $spisok;
+}
 function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	/*
 	$ELEM:
@@ -122,6 +148,8 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok, $CMP);
+	//вставка картинок
+	$spisok = _spisokImage($spisok, $CMP);
 
 	//выбор внешнего вида
 	switch($ELEM['dialog_id']) {

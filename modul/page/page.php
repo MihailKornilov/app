@@ -802,7 +802,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				//однострочное поле
 				case 8:
 					if(!$UNIT_ISSET)
-						return 'текстовое значение';
+						return 'text';
 					$txt = $unit[$elem['col']];
 					$txt = _spisokUnitUrl($txt, $unit, $el['url']);
 					return $txt;
@@ -835,6 +835,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				case 55:
 					if(!$UNIT_ISSET)
 						return $elem['txt_1'];
+					return $unit[$elem['col']];
+				//Изображение
+				case 60:
+					if(!$UNIT_ISSET)
+						return 'img';
 					return $unit[$elem['col']];
 			}
 			return 'значение '.$elem['dialog_id'].' ещё не сделано';
@@ -1279,7 +1284,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Загрузка изображений
 		case 60:
 			if($is_edit)
-				return '<div class="_empty min">Загрузка изображений.</div>';
+				return '<div class="_empty min">Изображения</div>';
 
 			$html = '';
 			if($UNIT_ISSET) {
@@ -1289,14 +1294,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						  AND `obj_id`=".$unit['id']."
 						ORDER BY `sort`";
 				if($spisok = query_arr($sql)) {
-					$sql = "SELECT `id`,`path` FROM `_image_server`";
-					$server = query_ass($sql);
 					foreach($spisok as $r) {
 						$html .=
 							'<dd class="dib mr3 curM bg-fff">'.
 								'<table class="w100 h100 center bor-f0 pad5">'.
 									'<tr><td>'.
-										'<img src="'.$server[$r['server_id']].$r['100_name'].'" style="width:'.$r['100_x'].'px;height:'.$r['100_y'].'px">'.
+										_imageHtml($r).
 								'</table>'.
 							'</dd>';
 					}
