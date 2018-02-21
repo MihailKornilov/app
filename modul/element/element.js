@@ -923,7 +923,15 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				case 60:
 					var AEL = $(el.attr_el),
 						load = AEL.find('._image-load'),
-						prc = AEL.find('._image-prc');
+						prc = AEL.find('._image-prc'),
+						loadErr = function(msg) {
+							load._hint({
+								msg:msg,
+								pad:10,
+								color:'red',
+								show:1
+							});
+						};
 
 					AEL.find('dl').sortable({
 						items:'.curM',
@@ -963,15 +971,20 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					        prc.html(itog + '%');
 					    	load.addClass('progress');
 					    });
-					    xhr.addEventListener('load', function(e) {
-					        console.log(e);
-					        console.log(this.responseText);
+					    xhr.addEventListener('load', function() {
+					  //  	console.log(xhr.responseText);
 					        load.removeClass('busy');
+					        var res = JSON.parse(xhr.responseText);
+							if(!res.success) {
+								loadErr(res.text);
+								return;
+							}
+
 					    });
 					    xhr.open('post', AJAX, true);
 
 					    var data = new FormData;
-					    data.append('file', file);
+					    data.append('f1', file);
 					    data.append('op', 'image_upload');
 					    data.append('obj_name', 'elem_' + el.id);
 					    data.append('obj_id', _num(unit.id));

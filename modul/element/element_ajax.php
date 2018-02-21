@@ -343,23 +343,20 @@ switch(@$_POST['op']) {
 		break;
 
 	case 'image_upload'://добавление изображения
-		$obj_name = _txt(@$_POST['obj_name']);
+		if(!$obj_name = _txt(@$_POST['obj_name']))
+			jsonError('Отсутствует имя объекта');
+
 		$obj_id = _num(@$_POST['obj_id']);
-
-
-		print_r($_POST);
-
-		exit;
-
-		if(!$unit_name)
-			jsonError();
 
 		$f = $_FILES['f1'];
 		$im = null;
 
 		//размер изображения не более 15 мб.
 		if($f['size'] > 15728640)
-			_imageCookie(4);
+			jsonError('Размер изображения не должен быть более 15 Мб');
+
+//		if(!is_dir(IMAGE_PATH))
+//			mkdir(IMAGE_PATH, 0777, true);
 
 		switch($f['type']) {
 			case 'image/jpeg': $im = @imagecreatefromjpeg($f['tmp_name']); break;
@@ -380,20 +377,18 @@ switch(@$_POST['op']) {
 
 
 		if(!$im)
-			_imageCookie(1);
+			jsonError('Загруженный файл не является изображением.<br>Выберите JPG, PNG, GIF или TIFF формат.');
 
 		$x = imagesx($im);
 		$y = imagesy($im);
 		if($x < 100 || $y < 100)
-			_imageCookie(2);
+			jsonError('Изображение слишком маленькое.<br>Используйте размер не менее 100х100 px.');
 
+jsonSuccess();
 		$fileName = time().'-'._imageNameCreate();
 
-		if(!is_dir(IMAGE_PATH))
-			mkdir(IMAGE_PATH, 0777, true);
-
-		$small = _imageImCreate($im, $x, $y, 80, 80, IMAGE_PATH.'/'.$fileName.'-s.jpg');
-		$big = _imageImCreate($im, $x, $y, 625, 625, IMAGE_PATH.'/'.$fileName.'-b.jpg');
+		$small = _imageImCreate($im, $x, $y, 100, 100, IMAGE_PATH.'/'.$fileName.'-100.jpg');
+		$big = _imageImCreate($im, $x, $y, 900, 900, IMAGE_PATH.'/'.$fileName.'-100.jpg');
 
 		$sql = "SELECT COUNT(`id`)
 				FROM `_image`
@@ -444,7 +439,7 @@ switch(@$_POST['op']) {
 			)";
 		query($sql);
 
-		_imageCookie(7);
+		jsonSuccess();
 		break;
 	case 'image_view':
 		if(!$id = _num($_POST['id']))

@@ -1336,7 +1336,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 									'<table class="tab-load">'.
 										'<tr><td class="icon-image ii1">'.//Выбрать из файлов
 												'<form>'.
-													'<input type="file" name="f1" />'.// accept="image/jpeg,image/png,image/gif,image/tiff"
+													'<input type="file" />'.// accept="image/jpeg,image/png,image/gif,image/tiff"
 												'</form>'.
 											'<td class="icon-image ii2">'.//Указать ссылку на изображение
 										'<tr><td class="icon-image ii3">'.//Фото с вебкамеры
@@ -1346,7 +1346,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'</table>'.
 					'</dd>'.
 				'</dl>'.
-				'<div id="aaa">000</div>'.
 			'</div>';
 
 
