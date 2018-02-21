@@ -682,7 +682,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						spisok:el.vvv,
 						funcWrite:function(v, t) {
 							var send = {
-								op:'spisok_connect_29',
+								op:'spisok_29_connect',
 								cmp_id:el.id,
 								v:v,
 								busy_obj:t.icon_del,
@@ -923,11 +923,32 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				case 60:
 					var AEL = $(el.attr_el),
 						load = AEL.find('._image-load'),
-						prc = AEL.find('._image-prc'); //div для отображения процентов
+						prc = AEL.find('._image-prc'), //div для отображения процентов
+						ids_upd = function() {//обновление id загруженных изображений
+							var ids = [];
+							_forEq(AEL.find('dd.curM'), function(sp) {
+								ids.push(sp.attr('val'));
+							});
+							$(el.attr_cmp).val(ids.join(','));
 
+							//установка действия для удаления изображения
+							AEL.find('.icon-del-red').off('click');
+							AEL.find('.icon-del-red').on('click', function(e) {
+								e.stopPropagation();
+								var dd = $(this).parent();
+								$(this).remove();
+								dd.animate({width:0}, 300, function() {
+									dd.remove();
+									ids_upd();
+								});
+							});
+						};
+
+					ids_upd();
 					AEL.find('dl').sortable({
 						items:'.curM',
-						placeholder:'ui-hold'
+						placeholder:'ui-hold',
+						update:ids_upd
 					});
 					AEL.find('.tab-load td').mouseenter(function() {
 						var t = $(this),
@@ -977,13 +998,14 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 								return;
 							}
 							load.parent().before(res.html);
+							ids_upd();
 					    });
 					    xhr.open('post', AJAX, true);
 
 					    var data = new FormData;
 					    data.append('f1', file);
 					    data.append('op', 'image_upload');
-					    data.append('obj_name', 'elem_' + el.id);
+					    data.append('obj_name', 'elem_' + el.id + '_' + USER_ID);
 					    data.append('obj_id', _num(unit.id));
 					    xhr.send(data);
 					});

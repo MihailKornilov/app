@@ -447,7 +447,8 @@ switch(@$_POST['op']) {
 		$img = query_assoc($sql);
 
 		$send['html'] =
-			'<dd class="dib mr3 curM">'.
+			'<dd class="dib mr3 curM" val="'.$img['id'].'">'.
+				'<div class="icon icon-del-red"></div>'.
 				'<table class="_image-unit">'.
 					'<tr><td>'.
 						_imageHtml($img).

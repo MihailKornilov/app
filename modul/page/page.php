@@ -849,8 +849,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 					$sql = "SELECT *
 							FROM `_image`
-							WHERE `obj_name`='_spisok'
+							WHERE `obj_name`='elem_".$elem['id']."'
 							  AND `obj_id`=".$unit['id']."
+							  AND !`deleted`
 							  AND !`sort`
 							LIMIT 1";
 					if(!$r = query_assoc($sql))
@@ -1298,10 +1299,20 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//Загрузка изображений
 		case 60:
+			/*
+				num_1 - максимальное количество изображений, которое разрешено загрузить
+			*/
 			if($is_edit)
 				return '<div class="_empty min">Изображения</div>';
 
 			$v = _num($v);
+
+			//отметка загруженных изображений как неиспользуемые, которые были не сохранены в предыдущий раз
+			$sql = "UPDATE `_image`
+					SET `obj_name`='elem_".$el['id']."',
+						`deleted`=1
+					WHERE `obj_name`='elem_".$el['id']."_".USER_ID."'";
+			query($sql);
 
 			$html = '';
 			if($unit_id = _num(@$unit['id'])) {
@@ -1309,11 +1320,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						FROM `_image`
 						WHERE `obj_name`='elem_".$el['id']."'
 						  AND `obj_id`=".$unit_id."
+						  AND !`deleted`
 						ORDER BY `sort`";
 				if($spisok = query_arr($sql)) {
 					foreach($spisok as $r) {
 						$html .=
-							'<dd class="dib mr3 curM">'.
+							'<dd class="mr3 curM" val="'.$r['id'].'">'.
+								'<div class="icon icon-del-red"></div>'.
 								'<table class="_image-unit">'.
 									'<tr><td>'.
 										_imageHtml($r).

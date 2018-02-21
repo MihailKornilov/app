@@ -277,6 +277,7 @@ function _html_script() {//скрипты и стили
 		'var URL="'.URL.'",'.
 			'AJAX="'.AJAX.$GET_ARR.'",'.
 			'SA='.SA.','.
+			'USER_ID='.USER_ID.','.
 			'PAGE_ID='._page('cur').';'.
 	'</script>'.
 

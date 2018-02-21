@@ -134,7 +134,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_connect_29':
+	case 'spisok_29_connect':
 		if(!$cmp_id = _num($_POST['cmp_id']))
 			jsonError('Некорректный ID компонента диалога');
 
@@ -232,6 +232,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			case 54: /* сделать пересчёт значения */ break;
 			//Настройка пунктов меню переключения блоков
 			case 58: _cmpV58($cmpv[$cmp_id], $unit); break;
+			//Применение загруженных изображений
+			case 60: _cmpV60($cmp, $unit); break;
 		}
 
 	_spisokUnitUpd27($unit);
@@ -785,6 +787,34 @@ function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
 			SET `def`=".$def."
 			WHERE `id`=".$unit['id'];
 	query($sql);
+}
+function _cmpV60($cmp, $unit) {//Применение загруженных изображений
+	//поле, хранящее список id изображений
+	if(!$col = $cmp['col'])
+		return;
+
+	//прикрепление изображений к единице списка
+	$sql = "UPDATE `_image`
+			SET `obj_name`='elem_".$cmp['id']."',
+				`obj_id`=".$unit['id']."
+			WHERE `obj_name`='elem_".$cmp['id']."_".USER_ID."'";
+	query($sql);
+
+	$sql = "UPDATE `_image`
+			SET `deleted`=1
+			WHERE `obj_name`='elem_".$cmp['id']."'
+			  AND `obj_id`=".$unit['id']."
+			  AND `id` NOT IN ("._ids($unit[$col]).")";
+	query($sql);
+
+	//обновление сортировки
+	$sort = 0;
+	foreach(_ids($unit[$col], 1) as $id) {
+		$sql = "UPDATE `_image`
+				SET `sort`=".$sort++."
+				WHERE `id`=".$id;
+		query($sql);
+	}
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
 	if(!isset($unit['dialog_id']))
