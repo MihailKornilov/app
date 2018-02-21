@@ -1334,12 +1334,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 									'<div class="icon-image spin"></div>'.
 									'<table class="tab-load">'.
 										'<tr><td class="icon-image ii1">'.//Выбрать из файлов
-												'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="image-frame">'.
-													'<input type="file" name="f1" class="inp-file" />'.// accept="image/jpeg,image/png,image/gif,image/tiff"
-													'<input type="hidden" name="op" value="image_upload" />'.
-													'<input type="hidden" name="obj_name" value="elem_'.$el['id'].'" />'.
-													'<input type="hidden" name="obj_id" value="'.$unit_id.'" />'.
-													'<input type="hidden" name="'.ini_get('session.upload_progress.name').'" value="'.$el['id'].'" />'.
+												'<form>'.
+													'<input type="file" name="f1" />'.// accept="image/jpeg,image/png,image/gif,image/tiff"
 												'</form>'.
 											'<td class="icon-image ii2">'.//Указать ссылку на изображение
 										'<tr><td class="icon-image ii3">'.//Фото с вебкамеры
@@ -1349,10 +1345,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'</table>'.
 					'</dd>'.
 				'</dl>'.
-				'<iframe name="image-frame"></iframe>'.
 				'<div id="aaa">000</div>'.
 			'</div>';
-
 
 
 		//---=== ДЕЙСТВИЯ К ЭЛЕМЕНТАМ (ФУНКЦИИ) ===---
@@ -1545,6 +1539,15 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 function _page_div() {//todo тест
 	return
+												'<form method="POST" action="'.AJAX.'" enctype="multipart/form-data">'.
+													'<input type="hidden" name="'.ini_get('session.upload_progress.name').'" value="123" />'.
+													'<input type="file" name="f1" />'.// accept="image/jpeg,image/png,image/gif,image/tiff"
+													'<input type="hidden" name="op" value="image_upload" />'.
+//													'<input type="hidden" name="obj_name" value="elem_'.$el['id'].'" />'.
+//													'<input type="hidden" name="obj_id" value="'.$unit_id.'" />'.
+				 '<input type="submit" />'.
+												'</form>'.
+
 	'<div class="mar20 bor-e8 pad20" id="for-hint">'.
 		'Передний текст '.
 		'<div class="icon icon-edit"></div>'.

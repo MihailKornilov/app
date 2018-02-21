@@ -347,11 +347,7 @@ switch(@$_POST['op']) {
 		$obj_id = _num(@$_POST['obj_id']);
 
 
-		echo CODE;
-
-//		print_r($_FILES);
-		var_dump($_SESSION);
-//		$_SESSION['aaa'] = 345;
+		print_r($_POST);
 
 		exit;
 
@@ -539,10 +535,6 @@ switch(@$_POST['op']) {
 		}
 
 		jsonSuccess();
-		break;
-	case 'image_check':
-		$send['html'] = _pr($_SESSION);
-		jsonSuccess($send);
 		break;
 }
 

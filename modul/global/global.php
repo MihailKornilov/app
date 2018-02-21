@@ -1,10 +1,6 @@
 <?php
 define('TIME', microtime(true));
 
-session_name('apppp');
-session_start();
-
-
 setlocale(LC_ALL, 'ru_RU.CP1251');
 setlocale(LC_NUMERIC, 'en_US');
 
@@ -36,6 +32,8 @@ define('VERSION', _num(@$_COOKIE['version']));
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);
 
+//session_name('apppp');
+//session_start();
 
 
 

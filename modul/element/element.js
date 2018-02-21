@@ -922,19 +922,8 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				//«агрузка изображений
 				case 60:
 					var AEL = $(el.attr_el),
-						load = AEL.find('._image-load'),
-						form = AEL.find('form'),
-						timer,
-						c = 11,
-						upload_start = function() {
-							var send = {
-								op:'image_check',
-								count:++c
-							};
-							_post(send, function(res) {
-								$('#aaa').html(res.html);
-							});
-						};
+						load = AEL.find('._image-load');
+
 					AEL.find('dl').sortable({
 						items:'.curM',
 						placeholder:'ui-hold'
@@ -955,10 +944,28 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 							delayShow:1000
 						});
 					});
-					AEL.find('.inp-file').change(function() {
+					AEL.find('form input').change(function() {
 						load.addClass('busy');
-						timer = setInterval(upload_start, 100);
-						form.submit();
+					    var file = this.files[0],
+					        xhr = new XMLHttpRequest();
+
+					    (xhr.upload || xhr).addEventListener('progress', function(e) {
+					        var done = e.position || e.loaded,
+					            total = e.totalSize || e.total;
+					        $('#aaa').html('xhr progress: ' + Math.round(done/total*100) + '%');
+					    });
+					    xhr.addEventListener('load', function(e) {
+					        $('#aaa').html('xhr upload complete' + e + this.responseText);
+					        load.removeClass('busy');
+					    });
+					    xhr.open('post', AJAX, true);
+
+					    var data = new FormData;
+					    data.append('file', file);
+					    data.append('op', 'image_upload');
+					    data.append('obj_name', 'elem_' + el.id);
+					    data.append('obj_id', _num(unit.id));
+					    xhr.send(data);
 					});
 					return;
 			}

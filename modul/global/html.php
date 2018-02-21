@@ -238,6 +238,7 @@ function _html() {
 	'<head>'.
 		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
 		'<title>'._html_title().'</title>'.
+		'<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">'.
 		_html_script().
 	'</head>'.
 
