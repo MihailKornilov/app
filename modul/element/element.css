@@ -819,7 +819,6 @@
 	z-index:21;
 }
 
-
 ._image{}
 ._image .ui-sortable-helper{
 	box-shadow:7px 7px 12px rgba(0,0,0,.2);
@@ -887,9 +886,20 @@
 ._image-load:not(.busy):hover ._image-add{width:0}
 ._image-load:not(.busy):hover{border-color:#B6CADE}
 ._image-load:not(.busy) .spin{display:none}
+._image-load.progress .spin{display:none}
 ._image-load.busy ._image-add{opacity:1;background-position:999px 999px}
-._image iframe{width:100%}
-
+._image-prc{
+	position:absolute;
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+	z-index:22;
+	font-size:22px;
+	color:#9dacbe;
+	padding-top:35px;
+}
+._image-load:not(.progress) ._image-prc{display:none}
 
 
 

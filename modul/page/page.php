@@ -1332,6 +1332,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							'<tr><td>'.
 									'<div class="_image-add icon-image"></div>'.
 									'<div class="icon-image spin"></div>'.
+									'<div class="_image-prc"></div>'.
 									'<table class="tab-load">'.
 										'<tr><td class="icon-image ii1">'.//Выбрать из файлов
 												'<form>'.

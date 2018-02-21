@@ -922,7 +922,8 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				//«агрузка изображений
 				case 60:
 					var AEL = $(el.attr_el),
-						load = AEL.find('._image-load');
+						load = AEL.find('._image-load'),
+						prc = AEL.find('._image-prc');
 
 					AEL.find('dl').sortable({
 						items:'.curM',
@@ -951,11 +952,20 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 
 					    (xhr.upload || xhr).addEventListener('progress', function(e) {
 					        var done = e.position || e.loaded,
-					            total = e.totalSize || e.total;
-					        $('#aaa').html('xhr progress: ' + Math.round(done/total*100) + '%');
+					            total = e.totalSize || e.total,
+					            itog = Math.round(done/total*100);
+
+					        if(itog == 100) {
+								load.removeClass('progress');
+								return;
+					        }
+
+					        prc.html(itog + '%');
+					    	load.addClass('progress');
 					    });
 					    xhr.addEventListener('load', function(e) {
-					        $('#aaa').html('xhr upload complete' + e + this.responseText);
+					        console.log(e);
+					        console.log(this.responseText);
 					        load.removeClass('busy');
 					    });
 					    xhr.open('post', AJAX, true);
