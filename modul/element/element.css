@@ -796,3 +796,112 @@
 
 
 
+
+/* Загрузка изображений */
+.icon-image{
+	background:transparent 22px 22px no-repeat url(../../img/icon-image.png);
+}
+.icon-image.ii1{background-position:-91px 9px}
+.icon-image.ii2{background-position:-141px 12px}
+.icon-image.ii3{background-position:-189px 7px}
+.icon-image.ii4{background-position:-239px 8px}
+.icon-image.spin{
+	position:absolute;
+	top:0;
+	bottom:0;
+	left:0;
+	width:98px;
+	background-position:-317px 32px;
+	opacity:1;
+    animation: spin 700ms infinite linear;
+    -webkit-animation: spin 700ms infinite linear;
+    -moz-animation: spin 700ms infinite linear;
+	z-index:21;
+}
+
+
+._image{}
+._image .ui-sortable-helper{
+	box-shadow:7px 7px 12px rgba(0,0,0,.2);
+}
+._image-unit{
+	border:#E2E9F2 solid 1px;
+	background-color:#fff;
+	text-align:center;
+	width:100px;
+	height:100px;
+	padding:5px;
+}
+._image .ui-hold{
+	border:#49C1FF dashed 1px;
+	background-color:#E4F6FF;
+	display:inline-block;
+	height:98px;
+	width:98px;
+	margin-right:3px;
+}
+._image-load{
+	border:#E2E9F2 solid 1px;
+	background-color:#F5FAFF;
+	text-align:center;
+	width:100px;
+	height:100px;
+	position:relative;
+}
+._image .tab-load{
+	width:100%;
+	height:100%;
+	border-spacing:3px;
+}
+._image .tab-load td{
+	width:50%;
+	height:44px;
+	cursor:pointer;
+}
+._image form{
+	width:44px;
+	background:#ffa;
+	overflow:hidden;
+	opacity:0;
+}
+._image form input{
+	height:44px;
+	font-size:8px;
+	cursor:pointer;
+}
+._image .tab-load td:not(:hover){opacity:.5}
+._image-add{
+	position:absolute;
+	top:0;
+	bottom:0;
+	left:0;
+	width:98px;
+	background-color:#F5FAFF;
+	opacity:.85;
+	z-index:20;
+	transition:width 130ms ease-in-out;
+	-o-transition:width 130ms ease-in-out;
+	-moz-transition:width 130ms ease-in-out;
+	-webkit-transition:width 130ms ease-in-out;
+}
+._image-load:not(.busy):hover ._image-add{width:0}
+._image-load:not(.busy):hover{border-color:#B6CADE}
+._image-load:not(.busy) .spin{display:none}
+._image-load.busy ._image-add{opacity:1;background-position:999px 999px}
+._image iframe{width:100%}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

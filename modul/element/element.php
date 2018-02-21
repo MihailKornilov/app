@@ -645,3 +645,30 @@ function _elementChoose($unit) {
 		$debug;
 }
 
+
+
+
+
+
+
+function _imageServerCache() {//кеширование серверов изображений
+	if($arr = _cache())
+		return $arr;
+
+	$sql = "SELECT `id`,`path` FROM `_image_server`";
+	return _cache(query_ass($sql));
+}
+function _imageServer($server_id) {//получение сервера (пути) для изображнения
+	if(empty($server_id))
+		return '';
+
+	$SRV = _imageServerCache();
+
+	if(empty($SRV[$server_id]))
+		return '';
+
+	return $SRV[$server_id];
+}
+function _imageHtml($r) {//получение картинки в html-формате
+	return '<img src="'._imageServer($r['server_id']).$r['100_name'].'" style="width:'.$r['100_x'].'px;height:'.$r['100_y'].'px">';
+}

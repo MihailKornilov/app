@@ -921,9 +921,44 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					return;
 				//Загрузка изображений
 				case 60:
-					$(el.attr_cmp).sortable({
-//						axis:'xy',
-//						handle:'.curM'
+					var AEL = $(el.attr_el),
+						load = AEL.find('._image-load'),
+						form = AEL.find('form'),
+						timer,
+						c = 11,
+						upload_start = function() {
+							var send = {
+								op:'image_check',
+								count:++c
+							};
+							_post(send, function(res) {
+								$('#aaa').html(res.html);
+							});
+						};
+					AEL.find('dl').sortable({
+						items:'.curM',
+						placeholder:'ui-hold'
+					});
+					AEL.find('.tab-load td').mouseenter(function() {
+						var t = $(this),
+							msg = 'Выбрать картинку из файлов';
+						if(t.hasClass('ii2'))
+							msg = 'Указать ссылку на изображение';
+						if(t.hasClass('ii3'))
+							msg = 'Сделать фото с вебкамеры';
+						if(t.hasClass('ii4'))
+							msg = 'Удалённых изображений нет';
+						t._hint({
+							msg:msg,
+							pad:10,
+							show:1,
+							delayShow:1000
+						});
+					});
+					AEL.find('.inp-file').change(function() {
+						load.addClass('busy');
+						timer = setInterval(upload_start, 100);
+						form.submit();
 					});
 					return;
 			}

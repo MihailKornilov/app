@@ -341,6 +341,209 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+
+	case 'image_upload'://добавление изображения
+		$obj_name = _txt(@$_POST['obj_name']);
+		$obj_id = _num(@$_POST['obj_id']);
+
+
+		echo CODE;
+
+//		print_r($_FILES);
+		var_dump($_SESSION);
+//		$_SESSION['aaa'] = 345;
+
+		exit;
+
+		if(!$unit_name)
+			jsonError();
+
+		$f = $_FILES['f1'];
+		$im = null;
+
+		//размер изображения не более 15 мб.
+		if($f['size'] > 15728640)
+			_imageCookie(4);
+
+		switch($f['type']) {
+			case 'image/jpeg': $im = @imagecreatefromjpeg($f['tmp_name']); break;
+			case 'image/png': $im = @imagecreatefrompng($f['tmp_name']); break;
+			case 'image/gif': $im = @imagecreatefromgif($f['tmp_name']); break;
+			case 'image/tiff':
+				$tmp = IMAGE_PATH.'/'.VIEWER_ID.'.jpg';
+				$image = NewMagickWand(); // magickwand.org
+				MagickReadImage($image, $f['tmp_name']);
+				MagickSetImageFormat($image, 'jpg');
+				MagickWriteImage($image, $tmp); //сохранение результата
+				ClearMagickWand($image); //удаление и выгрузка полученного изображения из памяти
+				DestroyMagickWand($image);
+				$im = @imagecreatefromjpeg($tmp);
+				unlink($tmp);
+				break;
+		}
+
+
+		if(!$im)
+			_imageCookie(1);
+
+		$x = imagesx($im);
+		$y = imagesy($im);
+		if($x < 100 || $y < 100)
+			_imageCookie(2);
+
+		$fileName = time().'-'._imageNameCreate();
+
+		if(!is_dir(IMAGE_PATH))
+			mkdir(IMAGE_PATH, 0777, true);
+
+		$small = _imageImCreate($im, $x, $y, 80, 80, IMAGE_PATH.'/'.$fileName.'-s.jpg');
+		$big = _imageImCreate($im, $x, $y, 625, 625, IMAGE_PATH.'/'.$fileName.'-b.jpg');
+
+		$sql = "SELECT COUNT(`id`)
+				FROM `_image`
+				WHERE !`deleted`
+				  AND `unit_name`='".$unit_name."'
+				  AND `unit_id`=".$unit_id."
+				LIMIT 1";
+		$sort = query_value($sql);
+
+		$sql = "INSERT INTO `_image` (
+					`app_id`,
+					`path`,
+
+					`small_name`,
+					`small_x`,
+					`small_y`,
+					`small_size`,
+
+					`big_name`,
+					`big_x`,
+					`big_y`,
+					`big_size`,
+
+					`unit_name`,
+					`unit_id`,
+
+					`sort`,
+					`viewer_id_add`
+				) VALUES (
+					".APP_ID.",
+					'".addslashes('//'.DOMAIN.IMAGE_HTML.'/')."',
+
+					'".$fileName."-s.jpg',
+					".$small['x'].",
+					".$small['y'].",
+					".$small['size'].",
+
+					'".$fileName."-b.jpg',
+					".$big['x'].",
+					".$big['y'].",
+					".$big['size'].",
+
+					'".$unit_name."',
+					".$unit_id.",
+
+					".$sort.",
+					".VIEWER_ID."
+			)";
+		query($sql);
+
+		_imageCookie(7);
+		break;
+	case 'image_view':
+		if(!$id = _num($_POST['id']))
+			jsonError();
+
+		$sql = "SELECT *
+				FROM `_image`
+				WHERE !`deleted`
+				  AND `id`=".$id;
+		if(!$im = query_assoc($sql))
+			jsonError();
+
+		$n = 0; //определение порядкового номера просматриваемого изображения
+		$send['img'] = array();
+		foreach(_imageArr($id) as $r) {
+			if($r['id'] == $im['id'])
+				$send['n'] = $n;
+			$send['img'][] = array(
+				'id' => $r['id'],
+				'link' => $r['path'].$r['big_name'],
+				'x' => $r['big_x'],
+				'y' => $r['big_y'],
+				'dtime' => utf8(FullData($r['dtime_add'], 1)),
+				'deleted' => 0
+			);
+			$n++;
+		}
+		jsonSuccess($send);
+		break;
+	case 'image_obj_get':
+		$unit_name = _txt(@$_POST['unit_name']);
+		$unit_id = _num(@$_POST['unit_id']);
+
+		if(!$unit_name)
+			jsonError();
+
+		//очищение списка картинок по требованию
+		if(_num(@$_POST['clear'])) {
+			$sql = "UPDATE `_image`
+					SET `deleted`=1
+					WHERE !`deleted`
+					  AND `unit_name`='".$unit_name."'
+					  AND `unit_id`=".$unit_id;
+			query($sql);
+		}
+
+		$sql = "SELECT *
+				FROM `_image`
+				WHERE !`deleted`
+				  AND `unit_name`='".$unit_name."'
+				  AND `unit_id`=".$unit_id."
+				ORDER BY `id`";
+		$arr = query_arr($sql);
+
+		$send['img'] = '';
+
+		foreach($arr as $r) {
+			$send['img'] .=
+			'<a class="_iview" val="'.$r['id'].'">'.
+				'<div class="div-del"></div>'.
+				'<div class="img_minidel'._tooltip(utf8('Удалить'), -29).'</div>'.
+				'<img src="'.$r['path'].$r['small_name'].'">'.
+			'</a>';
+		}
+
+		jsonSuccess($send);
+		break;
+	case 'image_del':
+		if(!$id = _num($_POST['id']))
+			jsonError();
+
+		if(!_imageQuery($id))
+			jsonError();
+
+		$sql = "UPDATE `_image`
+				SET `deleted`=1
+				WHERE `id`=".$id;
+		query($sql);
+
+		//обновление сортировки
+		$n = 0;
+		foreach(_imageArr($id, 1) as $r) {
+			if($r['deleted'])
+				continue;
+			$sql = "UPDATE `_image` SET `sort`=".$n." WHERE `id`=".$r['id'];
+			query($sql);
+			$n++;
+		}
+
+		jsonSuccess();
+		break;
+	case 'image_check':
+		$send['html'] = _pr($_SESSION);
+		jsonSuccess($send);
+		break;
 }
 
 function _dialogUpdate($dialog_id) {//обновление диалога

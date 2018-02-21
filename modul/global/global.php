@@ -1,6 +1,10 @@
 <?php
 define('TIME', microtime(true));
 
+session_name('apppp');
+session_start();
+
+
 setlocale(LC_ALL, 'ru_RU.CP1251');
 setlocale(LC_NUMERIC, 'en_US');
 
@@ -30,6 +34,9 @@ define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '.min');
 define('VERSION', _num(@$_COOKIE['version']));
 define('URL', APP_HTML.'/index.php?'.TIME);
+define('AJAX', APP_HTML.'/ajax.php?'.TIME);
+
+
 
 
 //глобальные переменные
@@ -416,28 +423,6 @@ function _vkapi($method, $param=array()) {//получение данных из api вконтакте
 	return $res;
 }
 
-
-function _imageServerCache() {//кеширование серверов изображений
-	if($arr = _cache())
-		return $arr;
-
-	$sql = "SELECT `id`,`path` FROM `_image_server`";
-	return _cache(query_ass($sql));
-}
-function _imageServer($server_id) {//получение сервера (пути) для изображнения
-	if(empty($server_id))
-		return '';
-
-	$SRV = _imageServerCache();
-
-	if(empty($SRV[$server_id]))
-		return '';
-
-	return $SRV[$server_id];
-}
-function _imageHtml($r) {//получение картинки в html-формате
-	return '<img src="'._imageServer($r['server_id']).$r['100_name'].'" style="width:'.$r['100_x'].'px;height:'.$r['100_y'].'px">';
-}
 
 function _cache($data='', $key='') {//кеширование данных
 	/*

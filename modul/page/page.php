@@ -840,7 +840,22 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				case 60:
 					if(!$UNIT_ISSET)
 						return 'img';
-					return $unit[$elem['col']];
+					if(!$col = $elem['col'])
+						return '';
+//					if(empty($unit[$elem['col']]))//id картинки хранится в колонке
+//						return '';
+//					if(!$img_id = _num($unit[$elem['col']]))//получение id картинки, либо вывод её, если уже сформирована
+//						return $unit[$elem['col']];
+
+					$sql = "SELECT *
+							FROM `_image`
+							WHERE `obj_name`='_spisok'
+							  AND `obj_id`=".$unit['id']."
+							  AND !`sort`
+							LIMIT 1";
+					if(!$r = query_assoc($sql))
+						return '';
+					return _imageHtml($r);
 			}
 			return 'значение '.$elem['dialog_id'].' ещё не сделано';
 
@@ -1286,18 +1301,20 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if($is_edit)
 				return '<div class="_empty min">Изображения</div>';
 
+			$v = _num($v);
+
 			$html = '';
-			if($UNIT_ISSET) {
+			if($unit_id = _num(@$unit['id'])) {
 				$sql = "SELECT *
 						FROM `_image`
 						WHERE `obj_name`='_spisok'
-						  AND `obj_id`=".$unit['id']."
+						  AND `obj_id`=".$unit_id."
 						ORDER BY `sort`";
 				if($spisok = query_arr($sql)) {
 					foreach($spisok as $r) {
 						$html .=
-							'<dd class="dib mr3 curM bg-fff">'.
-								'<table class="w100 h100 center bor-f0 pad5">'.
+							'<dd class="dib mr3 curM">'.
+								'<table class="_image-unit">'.
 									'<tr><td>'.
 										_imageHtml($r).
 								'</table>'.
@@ -1305,7 +1322,36 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					}
 				}
 			}
-			return '<dl id="'.$attr_id.'">'.$html.'</dl>';
+			return
+			'<div class="_image">'.
+				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+				'<dl>'.
+					$html.
+					'<dd class="dib">'.
+						'<table class="_image-load">'.
+							'<tr><td>'.
+									'<div class="_image-add icon-image"></div>'.
+									'<div class="icon-image spin"></div>'.
+									'<table class="tab-load">'.
+										'<tr><td class="icon-image ii1">'.//Выбрать из файлов
+												'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="image-frame">'.
+													'<input type="file" name="f1" class="inp-file" />'.// accept="image/jpeg,image/png,image/gif,image/tiff"
+													'<input type="hidden" name="op" value="image_upload" />'.
+													'<input type="hidden" name="obj_name" value="elem_'.$el['id'].'" />'.
+													'<input type="hidden" name="obj_id" value="'.$unit_id.'" />'.
+													'<input type="hidden" name="'.ini_get('session.upload_progress.name').'" value="'.$el['id'].'" />'.
+												'</form>'.
+											'<td class="icon-image ii2">'.//Указать ссылку на изображение
+										'<tr><td class="icon-image ii3">'.//Фото с вебкамеры
+											'<td class="icon-image ii4">'.//Достать из корзины
+									'</table>'.
+
+						'</table>'.
+					'</dd>'.
+				'</dl>'.
+				'<iframe name="image-frame"></iframe>'.
+				'<div id="aaa">000</div>'.
+			'</div>';
 
 
 

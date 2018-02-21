@@ -274,7 +274,7 @@ function _html_script() {//скрипты и стили
 
 	'<script>'.
 		'var URL="'.URL.'",'.
-			'AJAX="'.APP_HTML.'/ajax.php?'.TIME.$GET_ARR.'",'.
+			'AJAX="'.AJAX.$GET_ARR.'",'.
 			'SA='.SA.','.
 			'PAGE_ID='._page('cur').';'.
 	'</script>'.
