@@ -923,15 +923,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				case 60:
 					var AEL = $(el.attr_el),
 						load = AEL.find('._image-load'),
-						prc = AEL.find('._image-prc'),
-						loadErr = function(msg) {
-							load._hint({
-								msg:msg,
-								pad:10,
-								color:'red',
-								show:1
-							});
-						};
+						prc = AEL.find('._image-prc'); //div для отображения процентов
 
 					AEL.find('dl').sortable({
 						items:'.curM',
@@ -972,14 +964,19 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					    	load.addClass('progress');
 					    });
 					    xhr.addEventListener('load', function() {
-					  //  	console.log(xhr.responseText);
+					    	console.log(xhr.responseText);
 					        load.removeClass('busy');
 					        var res = JSON.parse(xhr.responseText);
 							if(!res.success) {
-								loadErr(res.text);
+								load._hint({
+									msg:res.text,
+									pad:10,
+									color:'red',
+									show:1
+								});
 								return;
 							}
-
+							load.parent().before(res.html);
 					    });
 					    xhr.open('post', AJAX, true);
 

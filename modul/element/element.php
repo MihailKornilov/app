@@ -658,17 +658,89 @@ function _imageServerCache() {//кеширование серверов изображений
 	$sql = "SELECT `id`,`path` FROM `_image_server`";
 	return _cache(query_ass($sql));
 }
-function _imageServer($server_id) {//получение сервера (пути) для изображнения
-	if(empty($server_id))
+function _imageServer($v) {//получение сервера (пути) для изображнения
+/*
+	если $v - число, получение имени пути
+	если $v - текст, это сам путь и получение id пути. Если нет, то создание
+*/
+	if(empty($v))
 		return '';
 
 	$SRV = _imageServerCache();
 
-	if(empty($SRV[$server_id]))
-		return '';
+	//получение id пути
+	if($server_id = _num($v)) {
+		if(empty($SRV[$server_id]))
+			return '';
 
-	return $SRV[$server_id];
+		return $SRV[$server_id];
+	}
+
+	foreach($SRV as $id => $path)
+		if($v == $path)
+			return $id;
+
+	//внесение в базу нового пути
+	$sql = "INSERT INTO `_image_server` (
+				`path`,
+				`user_id_add`
+			) VALUES (
+				'".addslashes($v)."',
+				".USER_ID."
+			)";
+	query($sql);
+
+	_cache('clear', '_imageServerCache');
+
+	return query_insert_id('_image_server');
 }
 function _imageHtml($r) {//получение картинки в html-формате
-	return '<img src="'._imageServer($r['server_id']).$r['100_name'].'" style="width:'.$r['100_x'].'px;height:'.$r['100_y'].'px">';
+	return '<img src="'._imageServer($r['server_id']).$r['80_name'].'" style="width:'.$r['80_x'].'px;height:'.$r['80_y'].'px">';
+}
+function _imageNameCreate() {//формирование имени файла из случайных символов
+	$arr = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','1','2','3','4','5','6','7','8','9','0');
+	$name = '';
+	for($i = 0; $i < 10; $i++)
+		$name .= $arr[rand(0,35)];
+	return $name;
+}
+function _imageImCreate($im, $x_cur, $y_cur, $x_new, $y_new, $name) {//сжатие изображения
+	$send = _imageResize($x_cur, $y_cur, $x_new, $y_new);
+
+	$im_new = imagecreatetruecolor($send['x'], $send['y']);
+	imagecopyresampled($im_new, $im, 0, 0, 0, 0, $send['x'], $send['y'], $x_cur, $y_cur);
+	imagejpeg($im_new, $name, 80);
+	imagedestroy($im_new);
+
+	$send['size'] = filesize($name);
+
+	return $send;
+}
+function _imageResize($x_cur, $y_cur, $x_new, $y_new) {//изменение размера изображения с сохранением пропорций
+	$x = $x_new;
+	$y = $y_new;
+	// если ширина больше или равна высоте
+	if ($x_cur >= $y_cur) {
+		if ($x > $x_cur) { $x = $x_cur; } // если новая ширина больше, чем исходная, то X остаётся исходным
+		$y = round($y_cur / $x_cur * $x);
+		if ($y > $y_new) { // если новая высота в итоге осталась меньше исходной, то подравнивание по Y
+			$y = $y_new;
+			$x = round($x_cur / $y_cur * $y);
+		}
+	}
+
+	// если высота больше ширины
+	if ($y_cur > $x_cur) {
+		if ($y > $y_cur) { $y = $y_cur; } // если новая высота больше, чем исходная, то Y остаётся исходным
+		$x = round($x_cur / $y_cur * $y);
+		if ($x > $x_new) { // если новая ширина в итоге осталась меньше исходной, то подравнивание по X
+			$x = $x_new;
+			$y = round($y_cur / $x_cur * $x);
+		}
+	}
+
+	return array(
+		'x' => $x,
+		'y' => $y
+	);
 }

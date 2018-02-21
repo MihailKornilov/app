@@ -1307,7 +1307,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if($unit_id = _num(@$unit['id'])) {
 				$sql = "SELECT *
 						FROM `_image`
-						WHERE `obj_name`='_spisok'
+						WHERE `obj_name`='elem_".$el['id']."'
 						  AND `obj_id`=".$unit_id."
 						ORDER BY `sort`";
 				if($spisok = query_arr($sql)) {
@@ -1336,7 +1336,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 									'<table class="tab-load">'.
 										'<tr><td class="icon-image ii1">'.//Выбрать из файлов
 												'<form>'.
-													'<input type="file" />'.// accept="image/jpeg,image/png,image/gif,image/tiff"
+													'<input type="file" accept="image/jpeg,image/png,image/gif,image/tiff" />'.
 												'</form>'.
 											'<td class="icon-image ii2">'.//Указать ссылку на изображение
 										'<tr><td class="icon-image ii3">'.//Фото с вебкамеры

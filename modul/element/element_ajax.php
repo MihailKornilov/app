@@ -345,25 +345,27 @@ switch(@$_POST['op']) {
 	case 'image_upload'://добавление изображения
 		if(!$obj_name = _txt(@$_POST['obj_name']))
 			jsonError('Отсутствует имя объекта');
-
-		$obj_id = _num(@$_POST['obj_id']);
-
-		$f = $_FILES['f1'];
-		$im = null;
-
-		//размер изображения не более 15 мб.
+		if(!$f = @$_FILES['f1'])
+			jsonError('Файл отсутствует');
 		if($f['size'] > 15728640)
 			jsonError('Размер изображения не должен быть более 15 Мб');
 
-//		if(!is_dir(IMAGE_PATH))
-//			mkdir(IMAGE_PATH, 0777, true);
+		$obj_id = _num(@$_POST['obj_id']);
+		$im = null;
+		$IMAGE_PATH = APP_PATH.'/.image/'.APP_ID;
+		$server_id = _imageServer('//'.DOMAIN.APP_HTML.'/.image/'.APP_ID.'/');
+
+		//создание директории, если отсутствует
+		if(!is_dir($IMAGE_PATH))
+			mkdir($IMAGE_PATH, 0777, true);
+
 
 		switch($f['type']) {
 			case 'image/jpeg': $im = @imagecreatefromjpeg($f['tmp_name']); break;
 			case 'image/png': $im = @imagecreatefrompng($f['tmp_name']); break;
 			case 'image/gif': $im = @imagecreatefromgif($f['tmp_name']); break;
 			case 'image/tiff':
-				$tmp = IMAGE_PATH.'/'.VIEWER_ID.'.jpg';
+				$tmp = $IMAGE_PATH.'/'.USER_ID.'.jpg';
 				$image = NewMagickWand(); // magickwand.org
 				MagickReadImage($image, $f['tmp_name']);
 				MagickSetImageFormat($image, 'jpg');
@@ -384,62 +386,75 @@ switch(@$_POST['op']) {
 		if($x < 100 || $y < 100)
 			jsonError('Изображение слишком маленькое.<br>Используйте размер не менее 100х100 px.');
 
-jsonSuccess();
 		$fileName = time().'-'._imageNameCreate();
+		$NAME_MAX = $fileName.'-900.jpg';
+		$NAME_80 = $fileName.'-80.jpg';
 
-		$small = _imageImCreate($im, $x, $y, 100, 100, IMAGE_PATH.'/'.$fileName.'-100.jpg');
-		$big = _imageImCreate($im, $x, $y, 900, 900, IMAGE_PATH.'/'.$fileName.'-100.jpg');
+		$max = _imageImCreate($im, $x, $y, 900, 900, $IMAGE_PATH.'/'.$NAME_MAX);
+		$_80 = _imageImCreate($im, $x, $y, 80, 80, $IMAGE_PATH.'/'.$NAME_80);
 
-		$sql = "SELECT COUNT(`id`)
+		$sql = "SELECT IFNULL(MAX(`sort`)+1,0)
 				FROM `_image`
 				WHERE !`deleted`
-				  AND `unit_name`='".$unit_name."'
-				  AND `unit_id`=".$unit_id."
-				LIMIT 1";
+				  AND `obj_name`='".$obj_name."'
+				  AND `obj_id`=".$obj_id;
 		$sort = query_value($sql);
 
 		$sql = "INSERT INTO `_image` (
-					`app_id`,
-					`path`,
+					`server_id`,
 
-					`small_name`,
-					`small_x`,
-					`small_y`,
-					`small_size`,
+					`max_name`,
+					`max_x`,
+					`max_y`,
+					`max_size`,
 
-					`big_name`,
-					`big_x`,
-					`big_y`,
-					`big_size`,
+					`80_name`,
+					`80_x`,
+					`80_y`,
+					`80_size`,
 
-					`unit_name`,
-					`unit_id`,
+					`obj_name`,
+					`obj_id`,
 
 					`sort`,
-					`viewer_id_add`
+					`user_id_add`
 				) VALUES (
-					".APP_ID.",
-					'".addslashes('//'.DOMAIN.IMAGE_HTML.'/')."',
+					".$server_id.",
 
-					'".$fileName."-s.jpg',
-					".$small['x'].",
-					".$small['y'].",
-					".$small['size'].",
+					'".$NAME_MAX."',
+					".$max['x'].",
+					".$max['y'].",
+					".$max['size'].",
 
-					'".$fileName."-b.jpg',
-					".$big['x'].",
-					".$big['y'].",
-					".$big['size'].",
+					'".$NAME_80."',
+					".$_80['x'].",
+					".$_80['y'].",
+					".$_80['size'].",
 
-					'".$unit_name."',
-					".$unit_id.",
+					'".$obj_name."',
+					".$obj_id.",
 
 					".$sort.",
-					".VIEWER_ID."
+					".USER_ID."
 			)";
 		query($sql);
 
-		jsonSuccess();
+		$image_id = query_insert_id('_image');
+
+		$sql = "SELECT *
+				FROM `_image`
+				WHERE `id`=".$image_id;
+		$img = query_assoc($sql);
+
+		$send['html'] =
+			'<dd class="dib mr3 curM">'.
+				'<table class="_image-unit">'.
+					'<tr><td>'.
+						_imageHtml($img).
+				'</table>'.
+			'</dd>';
+
+		jsonSuccess($send);
 		break;
 	case 'image_view':
 		if(!$id = _num($_POST['id']))
