@@ -944,6 +944,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 							});
 						};
 
+					//«агрузка изображени€ из файла
 					ids_upd();
 					AEL.find('dl').sortable({
 						items:'.curM',
@@ -1013,6 +1014,42 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					    data.append('obj_id', _num(unit.id));
 					    xhr.send(data);
 					});
+
+					//«агрузка изображени€ по ссылке
+					var linkDiv = AEL.find('._image-link'), //поле с ссылкой на изображение
+						linkInp = linkDiv.find('input'),
+						iconOk = linkDiv.find('.icon-ok'),
+						linkOkFunc = function() {
+							var send = {
+								op:'image_link',
+								obj_name:'elem_' + el.id + '_' + USER_ID,
+								obj_id:_num(unit.id),
+								url:$.trim(linkInp.val()),
+								busy_obj:iconOk,
+								busy_cls:'spin'
+							};
+							if(!send.url.length) {
+								linkInp.focus();
+								return;
+							}
+							_post(send, function(res) {
+								linkInp.val('');
+								load.parent().before(res.html);
+								ids_upd();
+								linkInp.focus();
+							});
+						};
+					AEL.find('.ii2').click(function() {
+						load.addClass('dis');
+						linkDiv.slideDown(200);
+						linkInp.val('').focus();
+					});
+					linkDiv.find('.icon-del').click(function() {
+						load.removeClass('dis');
+						linkDiv.slideUp(200);
+					});
+					linkInp._enter(linkOkFunc);
+					iconOk.click(linkOkFunc);
 					return;
 			}
 		});

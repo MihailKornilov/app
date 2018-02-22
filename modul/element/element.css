@@ -892,8 +892,8 @@
 	-moz-transition:width 130ms ease-in-out;
 	-webkit-transition:width 130ms ease-in-out;
 }
-._image-load:not(.busy):hover ._image-add{width:0}
-._image-load:not(.busy):hover{border-color:#B6CADE}
+._image-load:not(.busy):not(.dis):hover ._image-add{width:0}
+._image-load:not(.busy):not(.dis):hover{border-color:#B6CADE}
 ._image-load:not(.busy) .spin{display:none}
 ._image-load.progress .spin{display:none}
 ._image-load.busy ._image-add{opacity:1;background-position:999px 999px}
@@ -903,14 +903,26 @@
 	bottom:0;
 	left:0;
 	right:0;
-	z-index:22;
 	font-size:22px;
 	color:#9dacbe;
 	padding-top:35px;
+	z-index:22;
 }
 ._image-load:not(.progress) ._image-prc{display:none}
-
-
+/* блокировка добавления изображений */
+._image-load.dis{border-color:#eee}
+._image-dis{
+	position:absolute;
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+	z-index:23;
+	background-color:#fafafa;
+	opacity:.95;
+}
+._image-load:not(.dis) ._image-dis{display:none}
+._image-link{max-width:415px}
 
 
 

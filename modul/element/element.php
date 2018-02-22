@@ -744,3 +744,109 @@ function _imageResize($x_cur, $y_cur, $x_new, $y_new) {//изменение размера изобр
 		'y' => $y
 	);
 }
+
+function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
+	$im = null;
+	$IMAGE_PATH = APP_PATH.'/.image/'.APP_ID;
+	$server_id = _imageServer('//'.DOMAIN.APP_HTML.'/.image/'.APP_ID.'/');
+
+	//создание директории, если отсутствует
+	if(!is_dir($IMAGE_PATH))
+		mkdir($IMAGE_PATH, 0777, true);
+
+	switch($file_type) {
+		case 'image/jpeg': $im = @imagecreatefromjpeg($file_tmp_name); break;
+		case 'image/png': $im = @imagecreatefrompng($file_tmp_name); break;
+		case 'image/gif': $im = @imagecreatefromgif($file_tmp_name); break;
+		case 'image/tiff':
+			$tmp = $IMAGE_PATH.'/'.USER_ID.'.jpg';
+			$image = NewMagickWand(); // magickwand.org
+			MagickReadImage($image, $file_tmp_name);
+			MagickSetImageFormat($image, 'jpg');
+			MagickWriteImage($image, $tmp); //сохранение результата
+			ClearMagickWand($image); //удаление и выгрузка полученного изображения из памяти
+			DestroyMagickWand($image);
+			$im = @imagecreatefromjpeg($tmp);
+			unlink($tmp);
+			break;
+	}
+
+
+	if(!$im)
+		jsonError('Загруженный файл не является изображением.<br>Выберите JPG, PNG, GIF или TIFF формат.');
+
+	$x = imagesx($im);
+	$y = imagesy($im);
+	if($x < 100 || $y < 100)
+		jsonError('Изображение слишком маленькое.<br>Используйте размер не менее 100х100 px.');
+
+	$fileName = time().'-'._imageNameCreate();
+	$NAME_MAX = $fileName.'-900.jpg';
+	$NAME_80 = $fileName.'-80.jpg';
+
+	$max = _imageImCreate($im, $x, $y, 900, 900, $IMAGE_PATH.'/'.$NAME_MAX);
+	$_80 = _imageImCreate($im, $x, $y, 80, 80, $IMAGE_PATH.'/'.$NAME_80);
+
+	$sql = "SELECT IFNULL(MAX(`sort`)+1,0)
+			FROM `_image`
+			WHERE !`deleted`
+			  AND `obj_name`='".$obj_name."'
+			  AND `obj_id`=".$obj_id;
+	$sort = query_value($sql);
+
+	$sql = "INSERT INTO `_image` (
+				`server_id`,
+
+				`max_name`,
+				`max_x`,
+				`max_y`,
+				`max_size`,
+
+				`80_name`,
+				`80_x`,
+				`80_y`,
+				`80_size`,
+
+				`obj_name`,
+				`obj_id`,
+
+				`sort`,
+				`user_id_add`
+			) VALUES (
+				".$server_id.",
+
+				'".$NAME_MAX."',
+				".$max['x'].",
+				".$max['y'].",
+				".$max['size'].",
+
+				'".$NAME_80."',
+				".$_80['x'].",
+				".$_80['y'].",
+				".$_80['size'].",
+
+				'".$obj_name."',
+				".$obj_id.",
+
+				".$sort.",
+				".USER_ID."
+		)";
+	query($sql);
+
+	$image_id = query_insert_id('_image');
+
+	$sql = "SELECT *
+			FROM `_image`
+			WHERE `id`=".$image_id;
+	return query_assoc($sql);
+}
+function _imageDD($img) {//единица изображения для настройки
+	return
+	'<dd class="dib mr3 curM" val="'.$img['id'].'">'.
+		'<div class="icon icon-del-red'._tooltip('Переместить в корзину', -70).'</div>'.
+		'<table class="_image-unit">'.
+			'<tr><td>'.
+				_imageHtml($img).
+		'</table>'.
+	'</dd>';
+}

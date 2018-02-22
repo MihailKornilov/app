@@ -1323,16 +1323,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						  AND !`deleted`
 						ORDER BY `sort`";
 				if($spisok = query_arr($sql)) {
-					foreach($spisok as $r) {
-						$html .=
-							'<dd class="mr3 curM" val="'.$r['id'].'">'.
-								'<div class="icon icon-del-red'._tooltip('Переместить в корзину', -70).'</div>'.
-								'<table class="_image-unit">'.
-									'<tr><td>'.
-										_imageHtml($r).
-								'</table>'.
-							'</dd>';
-					}
+					foreach($spisok as $r)
+						$html .= _imageDD($r);
 				}
 			}
 			return
@@ -1346,6 +1338,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 									'<div class="_image-add icon-image"></div>'.
 									'<div class="icon-image spin"></div>'.
 									'<div class="_image-prc"></div>'.
+									'<div class="_image-dis"></div>'.
 									'<table class="tab-load">'.
 										'<tr><td class="icon-image ii1">'.//Выбрать из файлов
 												'<form>'.
@@ -1359,6 +1352,15 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'</table>'.
 					'</dd>'.
 				'</dl>'.
+				'<div class="_image-link dn mt5">'.
+					'<table class="w100p">'.
+						'<tr><td>'.
+								'<input type="text" class="w100p" placeholder="вставьте ссылку или скриншот и нажмите Enter" />'.
+							'<td class="w50 center">'.
+								'<div class="icon icon-ok"></div>'.
+								'<div class="icon icon-del pl ml5"></div>'.
+					'</table>'.
+				'</div>'.
 			'</div>';
 
 
@@ -1552,15 +1554,6 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 function _page_div() {//todo тест
 	return
-												'<form method="POST" action="'.AJAX.'" enctype="multipart/form-data">'.
-													'<input type="hidden" name="'.ini_get('session.upload_progress.name').'" value="123" />'.
-													'<input type="file" name="f1" />'.// accept="image/jpeg,image/png,image/gif,image/tiff"
-													'<input type="hidden" name="op" value="image_upload" />'.
-//													'<input type="hidden" name="obj_name" value="elem_'.$el['id'].'" />'.
-//													'<input type="hidden" name="obj_id" value="'.$unit_id.'" />'.
-				 '<input type="submit" />'.
-												'</form>'.
-
 	'<div class="mar20 bor-e8 pad20" id="for-hint">'.
 		'Передний текст '.
 		'<div class="icon icon-edit"></div>'.
