@@ -1326,7 +1326,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					foreach($spisok as $r) {
 						$html .=
 							'<dd class="mr3 curM" val="'.$r['id'].'">'.
-								'<div class="icon icon-del-red"></div>'.
+								'<div class="icon icon-del-red'._tooltip('Переместить в корзину', -70).'</div>'.
 								'<table class="_image-unit">'.
 									'<tr><td>'.
 										_imageHtml($r).

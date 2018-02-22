@@ -448,7 +448,7 @@ switch(@$_POST['op']) {
 
 		$send['html'] =
 			'<dd class="dib mr3 curM" val="'.$img['id'].'">'.
-				'<div class="icon icon-del-red"></div>'.
+				'<div class="icon icon-del-red'._tooltip('Переместить в корзину', -70).'</div>'.
 				'<table class="_image-unit">'.
 					'<tr><td>'.
 						_imageHtml($img).
