@@ -942,6 +942,47 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 									ids_upd();
 								});
 							});
+						},
+						xhr_upload = function(file) {//отправка выбранного файла или скрина на сервер
+						    var xhr = new XMLHttpRequest();
+
+						    (xhr.upload || xhr).addEventListener('progress', function(e) {
+						        var done = e.position || e.loaded,
+						            total = e.totalSize || e.total,
+						            itog = Math.round(done/total*100);
+
+						        if(itog == 100) {
+									load.removeClass('progress');
+									return;
+						        }
+
+						        prc.html(itog + '%');
+						        load.addClass('progress');
+						    });
+						    xhr.addEventListener('load', function() {
+						        console.log(xhr.responseText);
+						        load.removeClass('busy');
+						        var res = JSON.parse(xhr.responseText);
+								if(!res.success) {
+									load._hint({
+										msg:res.text,
+										pad:10,
+										color:'red',
+										show:1
+									});
+									return;
+								}
+								load.parent().before(res.html);
+								ids_upd();
+						    });
+						    xhr.open('post', AJAX, true);
+
+						    var data = new FormData;
+						    data.append('f1', file);
+						    data.append('op', 'image_upload');
+						    data.append('obj_name', 'elem_' + el.id + '_' + USER_ID);
+						    data.append('obj_id', _num(unit.id));
+						    xhr.send(data);
 						};
 
 					//Загрузка изображения из файла
@@ -973,46 +1014,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					});
 					AEL.find('form input').change(function() {
 						load.addClass('busy');
-					    var file = this.files[0],
-					        xhr = new XMLHttpRequest();
-
-					    (xhr.upload || xhr).addEventListener('progress', function(e) {
-					        var done = e.position || e.loaded,
-					            total = e.totalSize || e.total,
-					            itog = Math.round(done/total*100);
-
-					        if(itog == 100) {
-								load.removeClass('progress');
-								return;
-					        }
-
-					        prc.html(itog + '%');
-					    	load.addClass('progress');
-					    });
-					    xhr.addEventListener('load', function() {
-					    	console.log(xhr.responseText);
-					        load.removeClass('busy');
-					        var res = JSON.parse(xhr.responseText);
-							if(!res.success) {
-								load._hint({
-									msg:res.text,
-									pad:10,
-									color:'red',
-									show:1
-								});
-								return;
-							}
-							load.parent().before(res.html);
-							ids_upd();
-					    });
-					    xhr.open('post', AJAX, true);
-
-					    var data = new FormData;
-					    data.append('f1', file);
-					    data.append('op', 'image_upload');
-					    data.append('obj_name', 'elem_' + el.id + '_' + USER_ID);
-					    data.append('obj_id', _num(unit.id));
-					    xhr.send(data);
+						xhr_upload(this.files[0]);
 					});
 
 					//Загрузка изображения по ссылке
@@ -1050,6 +1052,28 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					});
 					linkInp._enter(linkOkFunc);
 					iconOk.click(linkOkFunc);
+
+					//загрузка скриншота
+					linkInp[0].addEventListener('paste', function(e) {
+						if(!e.clipboardData)
+							return;
+
+						var blob;
+						_forN(e.clipboardData.items, function(sp) {
+							if(sp.type.substr(0, 5) == 'image') {
+								blob = sp.getAsFile();
+								return false;
+							}
+						});
+
+						if(!blob)
+							return;
+
+						load.removeClass('dis');
+						load.addClass('busy');
+						linkDiv.slideUp(200);
+						xhr_upload(blob);
+					});
 					return;
 			}
 		});

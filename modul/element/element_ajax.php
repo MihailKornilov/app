@@ -366,9 +366,7 @@ switch(@$_POST['op']) {
 
 		$obj_id = _num(@$_POST['obj_id']);
 
-//		$url = 'http://www.winwalls.ru/pic/201305/800x600/winwalls.ru-45236.jpg';
 		$ch = curl_init($url);
-		// ”кажем настройки дл€ cURL
 		curl_setopt_array($ch, array(
 		    CURLOPT_TIMEOUT => 60,//максимальное врем€ работы cURL
 		    CURLOPT_FOLLOWLOCATION => 1,//следовать перенаправлени€м
