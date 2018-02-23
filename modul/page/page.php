@@ -1455,7 +1455,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			foreach($arr as $r) {
 				$html .=
 				'<div class="prel dib mr3">'.
-					'<div val="'.$r['id'].'" class="icon icon-recover'._tooltip('Восстановить', -40).'</div>'.
+					'<div val="'.$r['id'].'" class="icon icon-recover'._tooltip('Восстановить', -43).'</div>'.
 					'<table class="_image-unit">'.
 						'<tr><td>'.
 							_imageHtml($r).

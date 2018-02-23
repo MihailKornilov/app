@@ -1138,6 +1138,20 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 							busy_obj:load,
 							busy_cls:'busy',
 							func_open:function(res, dlg) {
+								dlg.content.find('.icon-recover').click(function() {
+									var t = $(this),
+										send = {
+											op:'image_recover',
+											id:t.attr('val'),
+											busy_obj:t,
+											busy_cls:'spin'
+										};
+									_post(send, function() {
+										t.parent().remove();
+										load.parent().before(res.html);
+										ids_upd();
+									});
+								});
 							}
 						});
 					});

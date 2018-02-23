@@ -832,6 +832,11 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	border-radius:2px;
 }
 ._image dd:not(:hover) .icon-off{display:none}
+._image div.prel:not(:hover) .icon-recover:not(.spin){display:none}
+._image .icon-recover.spin{
+	background-color:transparent;
+	box-shadow:0 0 0;
+}
 ._image .ui-sortable-helper .icon-off{display:none}
 ._image .ui-sortable-helper{box-shadow:7px 7px 12px rgba(0,0,0,.2)}
 ._image-unit{

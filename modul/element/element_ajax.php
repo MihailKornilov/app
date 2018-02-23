@@ -407,6 +407,22 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'image_recover':
+		if(!$image_id = _num($_POST['id']))
+			jsonError('Некорректный id изображения');
+
+		$sql = "SELECT *
+				FROM `_image`
+				WHERE `id`=".$image_id;
+		if(!$img = query_assoc($sql))
+			jsonError('Изображения не существует');
+
+		if(!$img['deleted'])
+			jsonError('Изображение не было удалено');
+
+		$send['html'] = utf8(_imageDD($img));
+		jsonSuccess($send);
+		break;
 	case 'image_view':
 		if(!$id = _num($_POST['id']))
 			jsonError();
