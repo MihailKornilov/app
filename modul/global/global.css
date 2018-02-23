@@ -48,7 +48,7 @@ textarea:disabled{
 	cursor:default;
 }
 
-img{border:none}
+img{border:none;vertical-align:top}
 table{border:0;border-spacing:0}
 
 

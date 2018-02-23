@@ -933,8 +933,23 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
-
-
+/* Просмотр изображений */
+#_image-main{
+	height:400px;
+	text-align:center;
+	vertical-align:middle;
+	cursor:pointer;
+}
+#_image-show .iu{
+	border:#E2E9F2 solid 1px;
+	background-color:#fff;
+	text-align:center;
+	width:90px;
+	height:90px;
+	cursor:pointer;
+}
+#_image-show .iu:hover{border-color:#B6CADE}
+#_image-show .iu.sel{border:#8893a4 solid 3px}
 
 
 

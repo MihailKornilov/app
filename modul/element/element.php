@@ -693,7 +693,12 @@ function _imageServer($v) {//получение сервера (пути) для изображнения
 	return query_insert_id('_image_server');
 }
 function _imageHtml($r) {//получение картинки в html-формате
-	return '<img src="'._imageServer($r['server_id']).$r['80_name'].'" style="width:'.$r['80_x'].'px;height:'.$r['80_y'].'px">';
+	return
+		'<img src="'._imageServer($r['server_id']).$r['80_name'].'"'.
+			' style="width:'.$r['80_x'].'px;height:'.$r['80_y'].'px"'.
+			' class="dialog-open curP"'.
+			' val="dialog_id:65,unit_id:'.$r['id'].'"'.
+		' />';
 }
 function _imageNameCreate() {//формирование имени файла из случайных символов
 	$arr = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','1','2','3','4','5','6','7','8','9','0');
@@ -849,8 +854,66 @@ function _imageDD($img) {//единица изображения для настройки
 	'</dd>';
 }
 
-function _imageShow() {//просмотр изображений (вставляется в блок через [12])
-	return 'изображения';
+function _imageShow($el, $unit) {//просмотр изображений (вставляется в блок через [12])
+	$image = 'Изображение отсутствует.';//основная картинка, на которую нажали. Выводится первой
+	$spisok = '';//html-список дополнительных изображений
+	$spisokJs = array();//js-список всех изображений
+	$spisokIds = array();//id картинок по порядку
+	if($image_id = _num(@$unit['id'])) {
+		$sql = "SELECT *
+				FROM `_image`
+				WHERE `id`=".$image_id;
+		if($im = query_assoc($sql)) {
+			$image = '<img src="'._imageServer($im['server_id']).$im['max_name'].'"'.
+						 ' width="'.$im['max_x'].'"'.
+						 ' height="'.$im['max_y'].'"'.
+						 ' />';
+
+			$sql = "SELECT *
+					FROM `_image`
+					WHERE `obj_name`='".$im['obj_name']."'
+					  AND `obj_id`=".$im['obj_id']."
+					  AND `deleted`=".$im['deleted']."
+					ORDER BY `".($im['deleted'] ? 'dtime_del' : 'sort')."`";
+			$arr = query_arr($sql);
+			if(count($arr) > 1) {
+				$spisok = '<div class="line-t pad10 center bg-gr2">';
+				foreach($arr as $r) {
+					$sel = $r['id'] == $image_id ? ' sel' : '';
+					$spisok .=
+					'<div class="dib ml3 mr3">'.
+						'<table class="iu'.$sel.'" val="'.$r['id'].'">'.
+							'<tr><td><img src="'._imageServer($r['server_id']).$r['80_name'].'"'.
+										' width="'.$r['80_x'].'"'.
+										' height="'.$r['80_y'].'"'.
+									' />'.
+						'</table>'.
+					'</div>';
+					$spisokJs[] = $r['id'].':{'.
+						'src:"'.addslashes(_imageServer($r['server_id']).$r['max_name']).'",'.
+						'x:'.$r['max_x'].','.
+						'y:'.$r['max_y'].','.
+					'}';
+					$spisokIds[] = $r['id'];
+				}
+				$spisok .= '</div>';
+			}
+
+		}
+	}
+
+	return
+	'<div id="_image-show">'.
+		'<table class="w100p">'.
+			'<tr><td id="_image-main" val="'.$image_id.'">'.
+					$image.
+		'</table>'.
+		$spisok.
+	'</div>'.
+	'<script>'.
+		'var IMG_ASS={'.implode(',', $spisokJs).'},'.
+			'IMG_IDS=['.implode(',', $spisokIds).'];'.
+	'</script>';
 }
 function _imageDeleted($el, $unit) {//удалённые изображения (вставляется в блок через [12])
 	if(!$unit_id = _num(@$unit['id']))

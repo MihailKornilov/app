@@ -407,7 +407,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'image_recover':
+	case 'image_recover'://восстановелние изображения из корзины
 		if(!$image_id = _num($_POST['id']))
 			jsonError('Некорректный id изображения');
 
@@ -422,96 +422,6 @@ switch(@$_POST['op']) {
 
 		$send['html'] = utf8(_imageDD($img));
 		jsonSuccess($send);
-		break;
-	case 'image_view':
-		if(!$id = _num($_POST['id']))
-			jsonError();
-
-		$sql = "SELECT *
-				FROM `_image`
-				WHERE !`deleted`
-				  AND `id`=".$id;
-		if(!$im = query_assoc($sql))
-			jsonError();
-
-		$n = 0; //определение порядкового номера просматриваемого изображения
-		$send['img'] = array();
-		foreach(_imageArr($id) as $r) {
-			if($r['id'] == $im['id'])
-				$send['n'] = $n;
-			$send['img'][] = array(
-				'id' => $r['id'],
-				'link' => $r['path'].$r['big_name'],
-				'x' => $r['big_x'],
-				'y' => $r['big_y'],
-				'dtime' => utf8(FullData($r['dtime_add'], 1)),
-				'deleted' => 0
-			);
-			$n++;
-		}
-		jsonSuccess($send);
-		break;
-	case 'image_obj_get':
-		$unit_name = _txt(@$_POST['unit_name']);
-		$unit_id = _num(@$_POST['unit_id']);
-
-		if(!$unit_name)
-			jsonError();
-
-		//очищение списка картинок по требованию
-		if(_num(@$_POST['clear'])) {
-			$sql = "UPDATE `_image`
-					SET `deleted`=1
-					WHERE !`deleted`
-					  AND `unit_name`='".$unit_name."'
-					  AND `unit_id`=".$unit_id;
-			query($sql);
-		}
-
-		$sql = "SELECT *
-				FROM `_image`
-				WHERE !`deleted`
-				  AND `unit_name`='".$unit_name."'
-				  AND `unit_id`=".$unit_id."
-				ORDER BY `id`";
-		$arr = query_arr($sql);
-
-		$send['img'] = '';
-
-		foreach($arr as $r) {
-			$send['img'] .=
-			'<a class="_iview" val="'.$r['id'].'">'.
-				'<div class="div-del"></div>'.
-				'<div class="img_minidel'._tooltip(utf8('Удалить'), -29).'</div>'.
-				'<img src="'.$r['path'].$r['small_name'].'">'.
-			'</a>';
-		}
-
-		jsonSuccess($send);
-		break;
-	case 'image_del':
-		if(!$id = _num($_POST['id']))
-			jsonError();
-
-		if(!_imageQuery($id))
-			jsonError();
-
-		$sql = "UPDATE `_image`
-				SET `deleted`=1
-				WHERE `id`=".$id;
-		query($sql);
-
-		//обновление сортировки
-		$n = 0;
-		foreach(_imageArr($id, 1) as $r) {
-			if($r['deleted'])
-				continue;
-			$sql = "UPDATE `_image` SET `sort`=".$n." WHERE `id`=".$r['id'];
-			query($sql);
-			$n++;
-		}
-
-		jsonSuccess();
 		break;
 }
 

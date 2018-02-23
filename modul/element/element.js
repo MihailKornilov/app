@@ -2039,6 +2039,44 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			expandedClass:'pb10',//раскрытый список
 			errorClass:'bg-fcc' //ошибка, если попытка переместить элемент на недоступный уровень
 		});
+	},
+	_imageShow = function() {//просмотр изображений. Подключается функцией [12]
+		var IMS = $('#_image-show'),
+			IU = IMS.find('.iu'),
+			IMAIN = $('#_image-main'),
+			imNext = function(next_id) {//установка следующего изображения
+				var im = IMG_ASS[next_id];
+				IU.removeClass('sel');
+				IMAIN.html('<img src="' + im.src + '" width="' + im.x + '" height="' + im.y + '" />');
+				IMAIN.attr('val', next_id);
+				_forEq(IU, function(sp) {
+					var id = _num(sp.attr('val'));
+					if(id == next_id) {
+						sp.addClass('sel');
+						return false;
+					}
+				});
+			};
+		IMAIN.click(function() {//нажатие на основное изображение
+			if(!IMG_IDS.length) {//если изображение всего одно, то закрытие диалога
+				DIALOG[65].close();
+				return;
+			}
+			var sel_id = _num(IMAIN.attr('val'));
+			_forN(IMG_IDS, function(id, n) {
+				if(id == sel_id) {
+					if(++n == IMG_IDS.length)
+						n = 0;
+					imNext(IMG_IDS[n]);
+					return false;
+				}
+			});
+		});
+		IU.click(function() {//нажатие на дополнительные изображения
+			var t = $(this),
+				id = _num(t.attr('val'));
+			imNext(id);
+		});
 	};
 
 $(document)
