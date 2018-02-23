@@ -960,7 +960,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 						        load.addClass('progress');
 						    });
 						    xhr.addEventListener('load', function() {
-						        console.log(xhr.responseText);
 						        load.removeClass('busy');
 						        var res = JSON.parse(xhr.responseText);
 								if(!res.success) {
@@ -1074,8 +1073,54 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 						linkDiv.slideUp(200);
 						xhr_upload(blob);
 					});
+
+					//изображение с ¬еб-камеры
+					var b64ToUint6 = function(nChr) {//convert base64 encoded character to 6-bit integer
+							return nChr > 64 && nChr < 91 ? nChr - 65
+								 : nChr > 96 && nChr < 123 ? nChr - 71
+								 : nChr > 47 && nChr < 58 ? nChr + 4
+								 : nChr === 43 ? 62 : nChr === 47 ? 63 : 0;
+						},
+						base64DecToArr = function(sBase64, nBlocksSize) {// convert base64 encoded string to Uintarray
+							var sB64Enc = sBase64.replace(/[^A-Za-z0-9\+\/]/g, ""),
+								nInLen = sB64Enc.length,
+								nOutLen = nBlocksSize ? Math.ceil((nInLen * 3 + 1 >> 2) / nBlocksSize) * nBlocksSize : nInLen * 3 + 1 >> 2,
+								taBytes = new Uint8Array(nOutLen);
+
+							for(var nMod3, nMod4, nUint24 = 0, nOutIdx = 0, nInIdx = 0; nInIdx < nInLen; nInIdx++) {
+								nMod4 = nInIdx & 3;
+								nUint24 |= b64ToUint6(sB64Enc.charCodeAt(nInIdx)) << 18 - 6 * nMod4;
+								if(nMod4 === 3 || nInLen - nInIdx === 1) {
+									for(nMod3 = 0; nMod3 < 3 && nOutIdx < nOutLen; nMod3++, nOutIdx++) {
+										taBytes[nOutIdx] = nUint24 >>> (16 >>> nMod3 & 24) & 255;
+									}
+									nUint24 = 0;
+								}
+							}
+							return taBytes;
+						};
+
+					AEL.find('.ii3').click(function() {
+						load.addClass('busy');
+						_dialogLoad({
+							dialog_id:61,
+							func_open:function(res, dlg) {
+								load.removeClass('busy');
+								var webcam = dlg.content.find('embed')[0];
+								dlg.submit(function() {
+									var foto = base64DecToArr(webcam._snap()),
+										blob = new Blob([foto], {type:'image/jpeg'});
+									xhr_upload(blob);
+									load.addClass('busy');
+									dlg.close();
+								});
+							}
+						});
+					});
 					return;
 			}
+
+
 		});
 
 		if(!is_edit && attr_focus)
