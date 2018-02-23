@@ -1323,10 +1323,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						  AND `obj_id`=".$unit_id."
 						  AND !`deleted`
 						ORDER BY `sort`";
-				if($spisok = query_arr($sql)) {
+				if($spisok = query_arr($sql))
 					foreach($spisok as $r)
 						$html .= _imageDD($r);
-				}
 
 				$sql = "SELECT COUNT(*)
 						FROM `_image`
@@ -1425,6 +1424,20 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							  ' wmode="opaque" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="'.$width.'" height="'.$height.'" name="webcam_movie_embed" align="middle" allowScriptAccess="always" allowFullScreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="'.$flashvars.'">'.
 						'</embed>'.
 			'</object>';
+
+		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Удалённые изображения (для [63])
+		case 64:
+			/*
+				Указывает блок, в котором будет расположены удалённые изображения.
+			*/
+			if($is_edit)
+				return '<div class="_empty min">Удалённые изображения.</div>';
+
+		return '<div class="_empty min">Удалённых изображений нет.</div>';
+
+
+
+
 
 		//---=== ДЕЙСТВИЯ К ЭЛЕМЕНТАМ (ФУНКЦИИ) ===---
 		//Список действий для Галочки [1]

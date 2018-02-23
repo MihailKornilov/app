@@ -1109,11 +1109,11 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						};
 
 					AEL.find('.ii3').click(function() {
-						load.addClass('busy');
 						_dialogLoad({
 							dialog_id:61,
+							busy_obj:load,
+							busy_cls:'busy',
 							func_open:function(res, dlg) {
-								load.removeClass('busy');
 								var webcam = dlg.content.find('embed')[0];
 								dlg.submit(function() {
 									var foto = base64DecToArr(webcam._snap()),
@@ -1122,6 +1122,22 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 									load.addClass('busy');
 									dlg.close();
 								});
+							}
+						});
+					});
+
+					//Удалённые изображения
+					AEL.find('.ii4').click(function() {
+						var t = $(this);
+						if(t.hasClass('empty'))
+							return;
+
+						_dialogLoad({
+							dialog_id:63,
+							unit_id:_num(unit.id),
+							busy_obj:load,
+							busy_cls:'busy',
+							func_open:function(res, dlg) {
 							}
 						});
 					});

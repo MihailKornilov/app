@@ -514,8 +514,8 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 
 	if(!$edit_head = _txt($_POST['edit_head']))
 		jsonError('Не указан заголовок редактирования');
-	if(!$edit_button_submit = _txt($_POST['edit_button_submit']))
-		jsonError('Не указан текст кнопки сохранения');
+	$edit_button_submit = _txt($_POST['edit_button_submit']);
+//		jsonError('Не указан текст кнопки сохранения');
 	if(!$edit_button_cancel = _txt($_POST['edit_button_cancel']))
 		jsonError('Не указан текст кнопки отмены редактирования');
 	$edit_action_id = _num($_POST['edit_action_id']);
