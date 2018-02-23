@@ -1315,6 +1315,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			query($sql);
 
 			$html = '';
+			$del_count = 0;
 			if($unit_id = _num(@$unit['id'])) {
 				$sql = "SELECT *
 						FROM `_image`
@@ -1326,6 +1327,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					foreach($spisok as $r)
 						$html .= _imageDD($r);
 				}
+
+				$sql = "SELECT COUNT(*)
+						FROM `_image`
+						WHERE `obj_name`='elem_".$el['id']."'
+						  AND `obj_id`=".$unit_id."
+						  AND `deleted`";
+				$del_count = query_value($sql);
 			}
 			return
 			'<div class="_image">'.
@@ -1344,9 +1352,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 												'<form>'.
 													'<input type="file" accept="image/jpeg,image/png,image/gif,image/tiff" />'.
 												'</form>'.
-											'<td class="icon-image ii2">'.//Указать ссылку на изображение
-										'<tr><td class="icon-image ii3">'.//Фото с вебкамеры
-											'<td class="icon-image ii4">'.//Достать из корзины
+											'<td class="icon-image ii2">'.      //Указать ссылку на изображение
+										'<tr><td class="icon-image ii3">'.      //Фото с вебкамеры
+											'<td class="icon-image ii4'._dn($del_count, 'empty').'" val="'.$del_count.'">'.//Достать из корзины
 									'</table>'.
 
 						'</table>'.
@@ -1362,13 +1370,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					'</table>'.
 				'</div>'.
 			'</div>';
-
-		//Получение изображения с Веб-камеры
-		case 61:
-			/*
-				Делает снимок с веб-камеры. Действия через JS.
-			*/
-			return '';
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Веб-камера (для [61])
 		case 62:
