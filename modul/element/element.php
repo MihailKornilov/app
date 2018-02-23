@@ -865,7 +865,7 @@ function _imageDeleted($el, $unit) {//удалённые изображения (вставляется в блок 
 			WHERE `obj_name`='elem_".abs($block_id)."'
 			  AND `obj_id`=".$unit_id."
 			  AND `deleted`
-			ORDER BY `sort`";
+			ORDER BY `dtime_del`";
 	if(!$arr = query_arr($sql))
 		return '<div class="_empty min">Удалённых изображений нет.</div>';
 
@@ -883,4 +883,81 @@ function _imageDeleted($el, $unit) {//удалённые изображения (вставляется в блок 
 
 	return '<div class="_image">'.$html.'</div>';
 }
+function _imageWebcam($el) {//Веб-камера (вставляется в блок через [12])
+	$width = $el['block']['width'];
+	$mar = explode(' ', $el['mar']);
+	$width = round($width - $mar[1] - $mar[3]);
+	$height = round($width * 0.75);
+
+	$flashvars =
+		'width='.$width.
+		'&height='.$height.
+		'&dest_width='.$width.
+		'&dest_height='.$height.
+		'&image_format=jpeg'.
+		'&jpeg_quality=100'.
+		'&enable_flash=true'.
+		'&force_flash=false'.
+		'&flip_horiz=false'.
+		'&fps=30'.
+		'&upload_name=webcam'.
+		'&constraints=null'.
+		'&swfURL=""'.
+		'&flashNotDetectedText=""'.
+		'&noInterfaceFoundText=""'.
+		'&unfreeze_snap=true'.
+		'&iosPlaceholderText=""'.
+		'&user_callback=null'.
+		'&user_canvas=null';
+
+	return
+	'<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"'.
+			' type="application/x-shockwave-flash"'.
+	        ' codebase="https://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0"'.
+	        ' width="'.$width.'"'.
+	        ' height="'.$height.'"'.
+	        ' align="middle">'.
+	            '<param name="wmode" value="opaque" />'.
+				'<param name="allowScriptAccess" value="always" />'.
+				'<param name="allowFullScreen" value="false" />'.
+				'<param name="movie" value="" />'.
+				'<param name="loop" value="false" />'.
+				'<param name="menu" value="false" />'.
+				'<param name="quality" value="best" />'.
+				'<param name="bgcolor" value="#ffffff" />'.
+				'<param name="flashvars" value="'.$flashvars.'" />'.
+				'<embed src="'.APP_HTML.'/modul/element/webcam.swf?2"'.
+					  ' wmode="opaque" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="'.$width.'" height="'.$height.'" name="webcam_movie_embed" align="middle" allowScriptAccess="always" allowFullScreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="'.$flashvars.'">'.
+				'</embed>'.
+	'</object>';
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
