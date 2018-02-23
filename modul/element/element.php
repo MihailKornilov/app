@@ -519,9 +519,7 @@ function _blockQuery($block_id) {//запрос одного блока
 	return $block;
 }
 
-function _elementChoose($unit) {
-	if(empty($unit['source']))
-		return _emptyMin('Функция _elementChoose');
+function _elementChoose($el, $unit) {//выбор элементна для вставки в блок
 	if(!$block_id = _num($unit['source']['block_id'], 1))
 		return _emptyMin('Отсутствует id исходного блока.');
 	if(!$BL = _blockQuery($block_id))
@@ -849,4 +847,8 @@ function _imageDD($img) {//единица изображения для настройки
 				_imageHtml($img).
 		'</table>'.
 	'</dd>';
+}
+
+function _imageShow() {//просмотр изображений (вставляется в блок через [12])
+	return 'изображения';
 }

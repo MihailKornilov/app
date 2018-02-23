@@ -598,6 +598,12 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						}
 					});
 					return;
+				//Функция
+				case 12:
+					if(!window[el.txt_1])
+						return;
+					window[el.txt_1](el, unit);
+					return;
 				//select - произвольные значения
 				case 17:
 					_elemFunc(el, _num(unit[el.col] || el.def), is_edit, 1);

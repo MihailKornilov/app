@@ -238,8 +238,7 @@ function _pageSetupAppPage() {//управление страницами приложения
 		'.placeholder{outline:1px dashed #4183C4;margin-top:1px}'.
 		'ol{list-style-type:none;max-width:700px;padding-left:40px}'.
 	'</style>'.
-	'<ol id="page-sort">'._pageSetupAppPageSpisok($arr, $sort).'</ol>'.
-	'<script>_pageSetupAppPage()</script>';
+	'<ol id="page-sort">'._pageSetupAppPageSpisok($arr, $sort).'</ol>';
 }
 function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
 	if(empty($arr))
@@ -863,13 +862,21 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//SA: Функция PHP
 		case 12:
 			/*
+				После размещения данных PHP-функции будет выполняться JS-функция с таким же именем, если существует.
+
                 txt_1 - имя функции
 			*/
+
 			if(!$el['txt_1'])
-				return 'пустое значение фукнции';
+				return '<div class="_empty min">Отсутствует имя функции.</div>';
 			if(!function_exists($el['txt_1']))
-				return 'фукнции не существует';
-			return $el['txt_1']($unit);
+				return '<div class="_empty min">Фукнции <u>'.$el['txt_1'].'</u> не существует.</div>';
+			if($is_edit)
+				return '<div class="_empty min">Функция '.$el['txt_1'].'</div>';
+
+			return
+				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+				$el['txt_1']($el, $unit);
 
 		//Содержание единицы списка - шаблон
 		case 14:
@@ -1454,7 +1461,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$html = '';
 			foreach($arr as $r) {
 				$html .=
-				'<div class="prel dib mr3">'.
+				'<div class="prel dib ml3 mr3">'.
 					'<div val="'.$r['id'].'" class="icon icon-recover'._tooltip('Восстановить', -43).'</div>'.
 					'<table class="_image-unit">'.
 						'<tr><td>'.
