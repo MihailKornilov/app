@@ -162,7 +162,7 @@ function _ids($ids, $return_arr=0) {//проверка корректности списка id, составлен
 	$arr = array();
 	foreach(explode(',', $ids) as $i => $id) {
 		if(!preg_match(REGEXP_NUMERIC, $id))
-			return 0;
+			return $return_arr ? array() : 0;
 		$arr[$i] = _num($id);
 	}
 	return $return_arr ? $arr : implode(',', $arr);

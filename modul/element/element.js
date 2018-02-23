@@ -1146,7 +1146,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 											busy_obj:t,
 											busy_cls:'spin'
 										};
-									_post(send, function() {
+									_post(send, function(res) {
 										t.parent().remove();
 										load.parent().before(res.html);
 										ids_upd();

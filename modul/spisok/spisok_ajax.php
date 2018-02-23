@@ -809,14 +809,14 @@ function _cmpV60($cmp, $unit) {//Применение загруженных изображений
 			  AND `id` NOT IN ("._ids($unit[$col]).")";
 	query($sql);
 
-	if(!$ids = _ids($unit[$col], 1))
-		return;
-
 	//обновление сортировки
 	$sort = 0;
 	foreach(_ids($unit[$col], 1) as $id) {
 		$sql = "UPDATE `_image`
-				SET `sort`=".$sort++."
+				SET `sort`=".$sort++.",
+					`deleted`=0,
+					`user_id_del`=0,
+					`dtime_del`='0000-00-00 00:00:00'
 				WHERE `id`=".$id;
 		query($sql);
 	}
