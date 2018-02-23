@@ -843,7 +843,7 @@ function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
 function _imageDD($img) {//единица изображения для настройки
 	return
 	'<dd class="dib mr3 curM" val="'.$img['id'].'">'.
-		'<div class="icon icon-del-red'._tooltip('Переместить в корзину', -70).'</div>'.
+		'<div class="icon icon-off'._tooltip('Переместить в корзину', -70).'</div>'.
 		'<table class="_image-unit">'.
 			'<tr><td>'.
 				_imageHtml($img).

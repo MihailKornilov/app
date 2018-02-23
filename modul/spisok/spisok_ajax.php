@@ -801,11 +801,16 @@ function _cmpV60($cmp, $unit) {//Применение загруженных изображений
 	query($sql);
 
 	$sql = "UPDATE `_image`
-			SET `deleted`=1
+			SET `deleted`=1,
+				`user_id_del`=".USER_ID.",
+				`dtime_del`=CURRENT_TIMESTAMP
 			WHERE `obj_name`='elem_".$cmp['id']."'
 			  AND `obj_id`=".$unit['id']."
 			  AND `id` NOT IN ("._ids($unit[$col]).")";
 	query($sql);
+
+	if(!$ids = _ids($unit[$col], 1))
+		return;
 
 	//обновление сортировки
 	$sort = 0;

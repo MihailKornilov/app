@@ -822,16 +822,16 @@
 td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 ._image dd{position:relative;display:inline-block}
-._image .icon-del-red{
+._image .icon-off{
 	position:absolute;
 	right:1px;
 	top:1px;
-	background-color:#fff5f5;
-	box-shadow:-1px 1px 6px rgba(100,0,0,.2);
-	border-radius:4px;
+	background-color:#f5f5ff;
+	box-shadow:-1px 1px 6px rgba(0,0,100,.2);
+	border-radius:2px;
 }
-._image dd:not(:hover) .icon-del-red{display:none}
-._image .ui-sortable-helper .icon-del-red{display:none}
+._image dd:not(:hover) .icon-off{display:none}
+._image .ui-sortable-helper .icon-off{display:none}
 ._image .ui-sortable-helper{box-shadow:7px 7px 12px rgba(0,0,0,.2)}
 ._image-unit{
 	border:#E2E9F2 solid 1px;

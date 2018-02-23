@@ -1310,7 +1310,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			//отметка загруженных изображений как неиспользуемые, которые были не сохранены в предыдущий раз
 			$sql = "UPDATE `_image`
 					SET `obj_name`='elem_".$el['id']."',
-						`deleted`=1
+						`deleted`=1,
+						`user_id_del`=".USER_ID.",
+						`dtime_del`=CURRENT_TIMESTAMP
 					WHERE `obj_name`='elem_".$el['id']."_".USER_ID."'";
 			query($sql);
 
@@ -1432,9 +1434,35 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			if($is_edit)
 				return '<div class="_empty min">”далЄнные изображени€.</div>';
+			if(!$UNIT_ISSET)
+				return '<div class="_empty min">ќтсутствует единица списка, к которой прикрепл€ютс€ изображени€.</div>';
+			if(!$block_id = _num($US['block_id'], 1))
+				return '<div class="_empty min">ќтсутствует id блока.</div>';
+			if($block_id > 0)
+				return '<div class="_empty min">Id блока не может быть положительным.</div>';
 
-		return '<div class="_empty min">”далЄнных изображений нет.</div>';
+			$obj_name = 'elem_'.abs($block_id);
+			$sql = "SELECT *
+					FROM `_image`
+					WHERE `obj_name`='".$obj_name."'
+					  AND `obj_id`=".$unit['id']."
+					  AND `deleted`
+					ORDER BY `sort`";
+			if(!$arr = query_arr($sql))
+				return '<div class="_empty min">”далЄнных изображений нет.</div>';
 
+			$html = '';
+			foreach($arr as $r) {
+				$html .=
+				'<dd class="dib mr3" val="'.$r['id'].'">'.
+					'<table class="_image-unit">'.
+						'<tr><td>'.
+							_imageHtml($r).
+					'</table>'.
+				'</dd>';
+			}
+
+			return $html;
 
 
 

@@ -932,8 +932,8 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 							$(el.attr_cmp).val(ids.join(','));
 
 							//установка действия для удаления изображения
-							AEL.find('.icon-del-red').off('click');
-							AEL.find('.icon-del-red').on('click', function(e) {
+							AEL.find('.icon-off').off('click');
+							AEL.find('.icon-off').on('click', function(e) {
 								e.stopPropagation();
 								var dd = $(this).parent();
 								$(this).remove();
@@ -1107,7 +1107,6 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 							}
 							return taBytes;
 						};
-
 					AEL.find('.ii3').click(function() {
 						_dialogLoad({
 							dialog_id:61,
@@ -1134,6 +1133,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 
 						_dialogLoad({
 							dialog_id:63,
+							block_id:el.id * -1,
 							unit_id:_num(unit.id),
 							busy_obj:load,
 							busy_cls:'busy',
