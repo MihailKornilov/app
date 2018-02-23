@@ -93,7 +93,7 @@ table{border:0;border-spacing:0}
 /* »конки */
 .icon{
 	display:inline-block;
-	background:0 0 no-repeat url(../../img/icon18.png?23);
+	background:0 0 no-repeat url(../../img/icon18.png?24);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -132,6 +132,7 @@ table{border:0;border-spacing:0}
 .icon-search {background-position-x:-540px}/* поиск: лупа */
 .icon-hint   {background-position-x:-560px;cursor:default}/* подсказка: знак вопроса */
 .icon-calendar{background-position-x:-580px}/* календарь */
+.icon-recover{background-position-x:-600px}/* восстановить: завЄрнута€ стрелка */
 /* ожидание процесса загрузки дл€ любой иконки */
 .icon.spin{
 	height:16px;

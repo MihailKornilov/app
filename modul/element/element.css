@@ -822,7 +822,8 @@
 td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 ._image dd{position:relative;display:inline-block}
-._image .icon-off{
+._image .icon-off,
+._image .icon-recover{
 	position:absolute;
 	right:1px;
 	top:1px;
