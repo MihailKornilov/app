@@ -852,3 +852,35 @@ function _imageDD($img) {//единица изображения для настройки
 function _imageShow() {//просмотр изображений (вставляется в блок через [12])
 	return 'изображения';
 }
+function _imageDeleted($el, $unit) {//удалённые изображения (вставляется в блок через [12])
+	if(!$unit_id = _num(@$unit['id']))
+		return '<div class="_empty min">Отсутствует единица списка, к которой прикрепляются изображения.</div>';
+	if(!$block_id = _num($unit['source']['block_id'], 1))
+		return '<div class="_empty min">Отсутствует id блока.</div>';
+	if($block_id > 0)
+		return '<div class="_empty min">Id блока не может быть положительным.</div>';
+
+	$sql = "SELECT *
+			FROM `_image`
+			WHERE `obj_name`='elem_".abs($block_id)."'
+			  AND `obj_id`=".$unit_id."
+			  AND `deleted`
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return '<div class="_empty min">Удалённых изображений нет.</div>';
+
+	$html = '';
+	foreach($arr as $r) {
+		$html .=
+		'<div class="prel dib ml3 mr3">'.
+			'<div val="'.$r['id'].'" class="icon icon-recover'._tooltip('Восстановить', -43).'</div>'.
+			'<table class="_image-unit">'.
+				'<tr><td>'.
+					_imageHtml($r).
+			'</table>'.
+		'</div>';
+	}
+
+	return '<div class="_image">'.$html.'</div>';
+}
+

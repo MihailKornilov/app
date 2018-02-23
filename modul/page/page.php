@@ -1434,44 +1434,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'</embed>'.
 			'</object>';
 
-		//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: ”далЄнные изображени€ (дл€ [63])
-		case 64:
-			/*
-				”казывает блок, в котором будет расположены удалЄнные изображени€.
-			*/
-			if($is_edit)
-				return '<div class="_empty min">”далЄнные изображени€.</div>';
-			if(!$UNIT_ISSET)
-				return '<div class="_empty min">ќтсутствует единица списка, к которой прикрепл€ютс€ изображени€.</div>';
-			if(!$block_id = _num($US['block_id'], 1))
-				return '<div class="_empty min">ќтсутствует id блока.</div>';
-			if($block_id > 0)
-				return '<div class="_empty min">Id блока не может быть положительным.</div>';
-
-			$obj_name = 'elem_'.abs($block_id);
-			$sql = "SELECT *
-					FROM `_image`
-					WHERE `obj_name`='".$obj_name."'
-					  AND `obj_id`=".$unit['id']."
-					  AND `deleted`
-					ORDER BY `sort`";
-			if(!$arr = query_arr($sql))
-				return '<div class="_empty min">”далЄнных изображений нет.</div>';
-
-			$html = '';
-			foreach($arr as $r) {
-				$html .=
-				'<div class="prel dib ml3 mr3">'.
-					'<div val="'.$r['id'].'" class="icon icon-recover'._tooltip('¬осстановить', -43).'</div>'.
-					'<table class="_image-unit">'.
-						'<tr><td>'.
-							_imageHtml($r).
-					'</table>'.
-				'</div>';
-			}
-
-			return '<div class="_image">'.$html.'</div>';
-
 
 
 
