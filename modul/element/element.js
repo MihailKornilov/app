@@ -2123,6 +2123,15 @@ $(document)
 
 		_dialogLoad(send);
 	})
+	.on('click', '.image-open', function() {//открытие изображения при нажатии на миниатюру
+		var t = $(this),
+			id = t.attr('val');
+		_dialogLoad({
+			dialog_id:65,
+			unit_id:id,
+			busy_obj:t.parent()
+		});
+	})
 
 	.on('mouseenter', '.dialog-hint', function() {//отображение подсказки при наведении на вопрос в диалоге
 		var t = $(this),

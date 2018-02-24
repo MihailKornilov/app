@@ -951,7 +951,8 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 #_image-show .iu:hover{border-color:#B6CADE}
 #_image-show .iu.sel{border:#8893a4 solid 3px}
 
-
+.image-open{cursor:pointer}
+._busy .image-open{opacity:.1}
 
 
 

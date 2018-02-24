@@ -854,7 +854,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							  AND !`sort`
 							LIMIT 1";
 					if(!$r = query_assoc($sql))
-						return '';
+						return _imageNo();
 					return _imageHtml($r);
 			}
 			return 'значение '.$elem['dialog_id'].' ещё не сделано';

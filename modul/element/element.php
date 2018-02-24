@@ -692,12 +692,15 @@ function _imageServer($v) {//получение сервера (пути) для изображнения
 
 	return query_insert_id('_image_server');
 }
+function _imageNo() {//картинка, если изображнеия нет
+	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="80" height= "80" />';
+}
 function _imageHtml($r) {//получение картинки в html-формате
 	return
 		'<img src="'._imageServer($r['server_id']).$r['80_name'].'"'.
-			' style="width:'.$r['80_x'].'px;height:'.$r['80_y'].'px"'.
-			' class="dialog-open curP"'.
-			' val="dialog_id:65,unit_id:'.$r['id'].'"'.
+			' width="'.$r['80_x'].'" height= "'.$r['80_y'].'"'.
+			' class="image-open"'.
+			' val="'.$r['id'].'"'.
 		' />';
 }
 function _imageNameCreate() {//формирование имени файла из случайных символов
