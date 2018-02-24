@@ -2565,9 +2565,9 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 			return;
 
 		SEL._dn(rs, 'rs');
-		var h = RES.height();
-		RES._dn(h < 250, 'h250');
+		RES._dn(RES.height() < 250, 'h250');
 
+		//выделение выбранного значения
 		if(!rs)
 			_forEq(RES.find('.select-unit'), function(sp) {
 				if(VALUE == sp.attr('val')) {
@@ -2575,6 +2575,10 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 					if(sp.hasClass('info'))
 						return false;
 					sp.addClass('ov');
+					//установка выбранного значения в области видимости
+					sp = sp[0];
+					var showTop = Math.round((250 - sp.offsetHeight) / 2);
+					RES[0].scrollTop = sp.offsetTop - showTop;
 					return false;
 				}
 			});
@@ -2591,7 +2595,7 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 	$(document)
 		.off('click._select')
 		.on('click._select', function(e) {
-			var cur = _parent($(e.target), '._select'),
+			var cur = $(e.target).parents('._select'),
 				attr = '';
 
 			//закрытие селектов, когда нажатие было в стороне
