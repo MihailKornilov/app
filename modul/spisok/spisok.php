@@ -1,4 +1,65 @@
 <?php
+function _spisokFilterCache() {//кеширование фильтров списка
+	if($send = _cache())
+		return $send;
+
+	$send = array(
+		'spisok' => array(),//все списки с фильтрами
+		'filter' => array() //ассоциативный список элемент-фильтр -> значение
+	);
+
+	$sql = "SELECT *
+			FROM `_user_spisok_filter`
+			WHERE `user_id`=".USER_ID;
+	if($arr = query_arr($sql)) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id` IN ("._idsGet($arr,'element_id_filter').")";
+		$elFilter = query_arr($sql);
+		foreach($arr as $r) {
+			$filter_id = $r['element_id_filter'];
+			$spisok_id = $r['element_id_spisok'];
+			$v = array(
+				'elem' => $elFilter[$filter_id],
+				'v' => $r['v']
+			);
+			$send['spisok'][$spisok_id][$filter_id] = $v;
+			$send['filter'][$filter_id] = $v;
+		}
+	}
+
+	return _cache($send);
+}
+function _spisokFilter($i='all', $elem_id=0) {//получение значений фильтров списка
+	if($i == 'cache_clear') {
+		_cache('clear', '_spisokFilterCache');
+		return true;
+	}
+
+	$F = _spisokFilterCache();
+
+	//значение конкретного элемента-фильтра
+	if($i == 'v') {
+		if(!$elem_id)
+			return '';
+		if(!isset($F['filter'][$elem_id]))
+			return '';
+		return $F['filter'][$elem_id]['v'];
+	}
+
+	//список элементов-фильтров для конкретного списка
+	if($i == 'spisok') {
+		if(!$elem_id)
+			return array();
+		if(!isset($F['spisok'][$elem_id]))
+			return array();
+		return $F['spisok'][$elem_id];
+	}
+
+
+	return $F;
+}
+
 function _spisokCountAll($el) {//получение общего количества строк списка
 	$key = 'SPISOK_COUNT_ALL'.$el['id'];
 
@@ -253,13 +314,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			//получение элементов, расставленных находящихся в блоках
 			$ELM = _block('spisok', $ELEM['block_id'], 'elem_arr');
 
-			//получение самих элементов, расставленных по шаблону
-			$ids = _idsGet($ELM, 'num_1');
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id` IN (".$ids.")";
-			$ELM_TMP = $ids ? query_arr($sql) : array();
-
 			//ширина единицы списка с учётом отступов
 			$ex = explode(' ', $ELEM['mar']);
 			$width = floor(($ELEM['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
@@ -401,27 +455,30 @@ function _spisokUnitUrl($txt, $sp, $is_url) {//обёртка значения колонки в ссылку
 	return '<a href="'.URL.$link.'" class="inhr">'.$txt.'</a>';
 }
 function _spisokColSearchBg($txt, $el, $cmp_id) {//подсветка значения колонки при текстовом (быстром) поиске
-	$val = _spisokCondSearchVal($el);
-	if(!strlen($val))
-		return $txt;
+	$search = false;
+	$v = '';
 
-	//элемент поиска, который ищет по данному списку
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `dialog_id`=7
-			  AND `num_1`=".$el['id'];
-	if(!$elemSearch = query_assoc($sql))
+	//поиск элемента-фильтра-поиска
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 7) {
+			$search = $r['elem'];
+			$v = $r['v'];
+		}
+
+	if(!$search)
+		return $txt;
+	if(!$v)
 		return $txt;
 
 	//ассоциативный массив колонок, по которым производится поиск
-	$colIds = _idsAss($elemSearch['txt_2']);
+	$colIds = _idsAss($search['txt_2']);
 	//если по данной колонке поиск разрешён, то выделение цветом найденные символы
 	if(!isset($colIds[$cmp_id]))
 		return $txt;
 
-	$val = utf8($val);
+	$v = utf8($v);
 	$txt = utf8($txt);
-	$txt = preg_replace(_regFilter($val), '<em class="fndd">\\1</em>', $txt, 1);
+	$txt = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $txt, 1);
 	$txt = win1251($txt);
 
 	return $txt;
@@ -446,54 +503,41 @@ function _spisokCond($el) {//формирование строки с условиями поиска
 
 	return $cond;
 }
-function _spisokCondSearch($pe) {//значения фильтра-поиска для списка
-	//элемент поиска, который ищет по данному списку
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `dialog_id`=7
-			  AND `num_1`=".$pe['id'];
-	if(!$elemSearch = query_assoc($sql))
+function _spisokCondSearch($el) {//значения фильтра-поиска для списка
+	$search = false;
+	$v = '';
+
+	//поиск элемента-фильтра-поиска
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 7) {
+			$search = $r['elem'];
+			$v = $r['v'];
+		}
+
+	if(!$search)
+		return '';
+	if(!$v)
 		return '';
 
 	//если поиск не производится ни по каким колонкам, то выход
-	if(!$colIds = _ids($elemSearch['txt_2'], 1))
-		return '';
-
-	$val = _spisokCondSearchVal($pe);
-	if(!strlen($val))
+	if(!$colIds = _ids($search['txt_2'], 1))
 		return '';
 
 	//диалог, через который вносятся данные списка
-	$dialog = _dialogQuery($pe['num_1']);
+	$dialog = _dialogQuery($el['num_1']);
 	$cmp = $dialog['cmp'];
 
 	$arr = array();
 	foreach($colIds as $cmp_id) {
 		if(empty($cmp[$cmp_id]))
 			continue;
-		$arr[] = "`".$cmp[$cmp_id]['col']."` LIKE '%".addslashes($val)."%'";
+		$arr[] = "`".$cmp[$cmp_id]['col']."` LIKE '%".addslashes($v)."%'";
 	}
 
 	if(!$arr)
 		return '';
 
 	return " AND (".implode($arr, ' OR ').")";
-}
-function _spisokCondSearchVal($pe) {//получение введённого значения в строку поиска, воздействующий на этот список
-	$key = 'ELEM_SEARCH_VAL'.$pe['id'];
-
-	if(defined($key))
-		return constant($key);
-
-	$sql = "SELECT `v`
-			FROM `_element`
-			WHERE `dialog_id`=7
-			  AND `num_1`=".$pe['id'];
-	$v = query_value($sql);
-
-	define($key, $v);
-
-	return $v;
 }
 function _spisokCond52($el) {//связка со другим списком
 	//поиск элемента, который содержит условие связки именно для этого списка

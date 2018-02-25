@@ -62,6 +62,65 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'spisok_filter_update'://обновление списка после применения фильтра
+		if(!$elem_spisok = _num($_POST['elem_spisok']))
+			jsonError('Некорректный ID элемента-списка');
+		if(!$elem_filter = _num($_POST['elem_filter']))
+			jsonError('Некорректный ID элемента-фильтра');
+
+		$v = _txt($_POST['v']);
+
+		//получение данных элемента списка
+		if(!$elSpisok = _elemQuery($elem_spisok))
+			jsonError('Элемента-списка id'.$elem_spisok.' не существует');
+		if($elSpisok['dialog_id'] != 14 && $elSpisok['dialog_id'] != 23)
+			jsonError('Элемент id'.$elem_spisok.' не является списком');
+
+		//получение данных элемента фильтра
+		if(!$elFilter = _elemQuery($elem_filter))
+			jsonError('Элемента-фильтра id'.$elem_filter.' не существует');
+
+		//получение id сохранённого фильтра для пользователя
+		$sql = "SELECT `id`
+				FROM `_user_spisok_filter`
+				WHERE `user_id`=".USER_ID."
+				  AND `element_id_spisok`=".$elem_spisok."
+				  AND `element_id_filter`=".$elem_filter;
+		$id = _num(query_value($sql));
+
+		$sql = "INSERT INTO `_user_spisok_filter` (
+					`id`,
+					`user_id`,
+					`element_id_spisok`,
+					`element_id_filter`,
+					`v`
+				) VALUES (
+					".$id.",
+					".USER_ID.",
+					".$elem_spisok.",
+					".$elem_filter.",
+					'".addslashes($v)."'
+				) ON DUPLICATE KEY UPDATE
+					`v`=VALUES(`v`)";
+		query($sql);
+
+		_spisokFilter('cache_clear');
+
+		//элемент количества, привязанный к списку
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=15
+				  AND `num_1`=".$elem_spisok."
+				LIMIT 1";
+		if($elCount = query_assoc($sql)) {
+			$send['count_attr'] = '#el_'.$elCount['id'];
+			$send['count_html'] = utf8(_spisokElemCount($elCount));
+		}
+
+		$send['spisok_attr'] = '#el_'.$elem_spisok;
+		$send['spisok_html'] = utf8(_spisokShow($elSpisok));
+		jsonSuccess($send);
+		break;
 	case 'spisok_next'://догрузка списка
 		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Некорректный ID элемента станицы');
@@ -77,61 +136,6 @@ switch(@$_POST['op']) {
 
 		$send['is_table'] = $el['dialog_id'] == 23;
 		$send['spisok'] = utf8(_spisokShow($el, $next));
-		jsonSuccess($send);
-		break;
-	case 'spisok_search'://получение обновлённого списка по условиям
-		if(!$elem_id = _num($_POST['elem_id']))
-			jsonError('Некорректный ID элемента станицы');
-
-		$v = _txt($_POST['v']);
-
-		//получение данных элемента поиска
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id`=".$elem_id;
-		if(!$pe = query_assoc($sql))
-			jsonError('Элемента id'.$elem_id.' не существует');
-
-		//сохранение строки поиска
-		$sql = "UPDATE `_element`
-				SET `v`='".addslashes($v)."'
-				WHERE `id`=".$elem_id;
-		query($sql);
-
-		//id диалога списка, на который происходит воздействие через поиск
-		if(!$pe_id = _num($pe['num_1']))
-			jsonError('Не указан список, по которому нужно производить поиск');
-
-		//расположение списка на странице, на которой расположен поиск
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id` IN (14,23)
-				  AND `id`=".$pe_id."
-				LIMIT 1";
-		if(!$peSpisok = query_assoc($sql))
-			jsonError('Нет нужного списка на странице');
-
-		//получение данных блока, в котором расположен элемент-список
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$peSpisok['block_id'];
-		if(!$peSpisok['block'] = query_assoc($sql))
-			jsonError('Блока не существует');
-
-		//элемент количества списка на странице, на которой расположен поиск
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=15
-				  AND `num_1`=".$pe_id."
-				LIMIT 1";
-		if($peCount = query_assoc($sql)) {
-			$send['count_attr'] = '#el_'.$peCount['id'];
-			$send['count_html'] = utf8(_spisokElemCount($peCount));
-		}
-
-		$send['spisok_attr'] = '#el_'.$peSpisok['id'];
-		$send['spisok_html'] = utf8(_spisokShow($peSpisok));
-
 		jsonSuccess($send);
 		break;
 	case 'spisok_29_connect':
@@ -221,6 +225,13 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
 			//---=== ДЕЙСТВИЯ ПРИ НАСТРОЙКИ ЭЛЕМЕНТОВ ===---
+			//конкретная функция
+			case 12:
+				$funcSave = $cmp['txt_1'].'Save';
+				if(!function_exists($funcSave))
+					break;
+				$funcSave($cmp, $cmpv[$cmp_id], $unit);
+				break;
 			//наполнение для некоторых компонентов: radio, select, dropdown
 			case 19: _cmpV19($cmpv[$cmp_id], $unit); break;
 			//Настройка ТАБЛИЧНОГО содержания списка
@@ -597,6 +608,7 @@ function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, se
 }
 function _cmpV30($cmp, $val, $unit) {//сохранение настройки ТАБЛИЧНОГО содержания списка (30)
 	/*
+		-112
 		$cmp  - компонент из диалога, отвечающий за настройку таблицы
 		$val  - значения, полученные для сохранения
 		$unit - элемент, размещающий таблицу, для которой происходит настройка
@@ -641,9 +653,10 @@ function _cmpV30($cmp, $val, $unit) {//сохранение настройки ТАБЛИЧНОГО содержани
 }
 function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
 	/*
+		-111
 		$cmp  - компонент из диалога, отвечающий за настройку таблицы
 		$val  - значения, полученные для сохранения
-		$unit -элемент, размещающий таблицу, для которой происходит настройка
+		$unit - элемент, размещающий таблицу, для которой происходит настройка
 	*/
 	if(empty($cmp['col']))
 		return;
@@ -681,9 +694,10 @@ function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
 }
 function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
 	/*
+		-113
 		$cmp  - компонент из диалога, отвечающий за настройку таблицы
 		$val  - значения, полученные для сохранения
-		$unit -элемент, размещающий таблицу, для которой происходит настройка
+		$unit - элемент, размещающий таблицу, для которой происходит настройка
 	*/
 	if(empty($cmp['col']))
 		return;
@@ -820,6 +834,64 @@ function _cmpV60($cmp, $unit) {//Применение загруженных изображений
 				WHERE `id`=".$id;
 		query($sql);
 	}
+}
+function _filterCheckSetupSave($cmp, $val, $unit) {//сохранение настройки фильтра для галочки. Подключаемая функция [12]
+	/*
+		-114
+		$cmp  - компонент из диалога, отвечающий за настройку таблицы
+		$val  - значения, полученные для сохранения
+		$unit - элемент, размещающий таблицу, для которой происходит настройка
+	*/
+
+	$update = array();
+	$idsNoDel = '0';
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		foreach($val as $id => $r) {
+			if($id = _num($id))
+				$idsNoDel .= ','.$id;
+			if(!$num_8 = _num($r['num_8']))
+				continue;
+			$txt_8 = $num_8 > 2 ? _txt($r['txt_8']) : '';
+			$update[] = "(
+				".$id.",
+				-".$unit['id'].",
+				".$num_8.",
+				'".addslashes($txt_8)."'
+			)";
+		}
+	}
+
+	//удаление удалённых значений
+	$sql = "DELETE FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			  AND `id` NOT IN (".$idsNoDel.")";
+	query($sql);
+
+	if(!empty($update)) {
+		$sql = "INSERT INTO `_element` (
+					`id`,
+					`block_id`,
+					`num_8`,
+					`txt_8`
+				)
+				VALUES ".implode(',', $update)."
+				ON DUPLICATE KEY UPDATE
+					`block_id`=VALUES(`block_id`),
+					`num_8`=VALUES(`num_8`),
+					`txt_8`=VALUES(`txt_8`)";
+		query($sql);
+	}
+
+
+	//очистка неиспользованных элементов
+	$sql = "DELETE FROM `_element`
+			WHERE `user_id_add`=".USER_ID."
+			  AND `block_id` IN (0,-114)";
+	query($sql);
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
 	if(!isset($unit['dialog_id']))

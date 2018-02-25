@@ -745,21 +745,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return '<div class="hd2">'.$el['txt_1'].'</div>';
 
-		//Поиск
-		case 7:
-			/*
-                txt_1 - текст поиска
-				num_1 - id элемента, содержащего список, по которому происходит поиск
-				txt_2 - по каким полям производить поиск (id элементов через запятую диалога списка)
-			*/
-			return _search(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'v' => $el['v'],
-						'disabled' => $disabled
-					));
-
 		//Ссылка на страницу
 		case 9:
 			/*
@@ -788,9 +773,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_2 - является ссылкой
 			*/
 
-			if(isset($el['txt_real']))
-				return $el['txt_real'];
-
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `id`=".$el['num_1'];
@@ -803,6 +785,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					if(!$UNIT_ISSET)
 						return 'text';
 					$txt = $unit[$elem['col']];
+//					$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 					$txt = _spisokUnitUrl($txt, $unit, $el['url']);
 					return $txt;
 				//произвольный текст
@@ -1097,7 +1080,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						break;
 					}
 					if($BLS['obj_name'] == 'page') {
-						if($BLS['elem'] && $BLS['elem']['dialog_id'] == 23) {//...в таблицу [23]
+						if($BLS['elem'] && ($BLS['elem']['dialog_id'] == 14 || $BLS['elem']['dialog_id'] == 23)) {//списки [14,23]
 							$dialog_id = $BLS['elem']['num_1'];
 							break;
 						}
@@ -1125,6 +1108,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							}
 							break;
 						}
+
 						$dialog_id = $BLS['obj_id'];
 						break;
 					}
@@ -1464,6 +1448,21 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 
 		//---=== ФИЛЬТРЫ ===---
+		//Быстрый поиск - фильтр
+		case 7:
+			/*
+                txt_1 - текст поиска
+				num_1 - id элемента, содержащего список, по которому происходит поиск
+				txt_2 - по каким полям производить поиск (id элементов через запятую диалога списка)
+			*/
+			return _search(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'v' => _spisokFilter('v', $el['id']),
+						'disabled' => $disabled
+					));
+
 		//отображение данных при условии связанного списка
 		case 52:
 			/*
@@ -1481,6 +1480,23 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			/*
 			*/
 			return 'порядок';
+
+		//Галочка - фильтр
+		case 62:
+			/*
+				txt_1 - текст для галочки
+				num_1 - условие применяется:
+						1439 - галочка установлена
+						1440 - галочка НЕ установлена
+				num_2 - id элемента, размещающего список
+			*/
+
+			return _check(array(
+				'attr_id' => $attr_id,
+				'title' => $el['txt_1'],
+				'disabled' => $disabled,
+				'value' => _num(_spisokFilter('v', $el['id']))
+			));
 
 
 

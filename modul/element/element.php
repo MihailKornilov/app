@@ -643,6 +643,9 @@ function _elementChoose($el, $unit) {//выбор элементна для вставки в блок
 		$debug;
 }
 
+function _filterCheckSetup() {//настройка условий фильтра для галочки (подключение через [12])
+	return '';
+}
 
 
 

@@ -605,6 +605,30 @@ function _dialogOpenLoad($dialog_id) {
 	//заполнение значениями некоторых компонентов
 	foreach($dialog['cmp_utf8'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
+			//подключаемая функция
+			case 12:
+				if(!$unit_id)
+					break;
+
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `block_id`=-".$unit_id."
+						ORDER BY `sort`";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$spisok = array();
+				foreach($arr as $id => $r) {
+					$spisok[] = array(
+						'id' => _num($id),
+						'title' => utf8('выбрано'),
+						'num_8' => _num($r['num_8']),
+						'txt_8' => utf8($r['txt_8'])
+					);
+				}
+
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				break;
 			//произвольные значения
 			case 17://select - произвольные значения
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _elemValue($cmp_id);
