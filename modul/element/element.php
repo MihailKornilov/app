@@ -207,6 +207,28 @@ function _search($v=array()) {//элемент ПОИСК
 		'</table>'.
 	'</div>';
 }
+function _color() {
+	return
+	'<div class="_color" style="background-color:#000">'.
+	'</div>';
+}
+function _colorJS() {//массив цветов для текста в формате JS, доступных элементам
+	return
+		'"":["#000","Чёрный"],'.
+		'"color-555":["#555","Тёмно-серый"],'.
+		'"grey":["#888","Серый"],'.
+		'"pale":["#aaa","Бледный"],'.
+		'"color-ccc":["#ccc","Совсем бледный"],'.
+		'"blue":["#2B587A","Тёмно-синий"],'.
+		'"color-acc":["#07a","Синий"],'.
+		'"color-sal":["#770","Салатовый"],'.
+		'"color-pay":["#090","Зелёный"],'.
+		'"color-aea":["#aea","Ярко-зелёный"],'.
+		'"red":["#e22","Красный"],'.
+		'"color-ref":["#800","Тёмно-красный"],'.
+		'"color-del":["#a66","Тёмно-бордовый"],'.
+		'"color-vin":["#c88","Бордовый"]';
+}
 
 function _emptyMin($msg) {
 	return '<div class="_empty min mar10">'.$msg.'</div>';

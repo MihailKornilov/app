@@ -240,8 +240,9 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				'<div class="fs15 blue line-b">' +
 					'Элемент' +
 					'<div class="fr mtm3">' +
-						'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
-						'<div val="dialog_id:43,unit_id:' + EL.id + '" class="icon icon-hint dialog-open ml3 curP' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
+						'<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>' +
+						'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
+						'<div val="dialog_id:43,unit_id:' + EL.id + '" class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
 						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
 						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 					'</div>' +
@@ -364,49 +365,20 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		: '');
 	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста
-		$(document)
-			.off('mouseenter', '#elem-color td')
-			.on('mouseenter', '#elem-color td', function() {
-				var td = $(this),
-					v = td.attr('val');
-				td._tooltip(ELEM_COLOR[v][1]);
-			})
-			.off('click', '#elem-color td')
-			.on('click', '#elem-color td', function() {
-				var td = $(this),
-					v = td.attr('val');
+		var func = function(v) {
+			$(EL.attr_el)
+				.removeClass(EL.color)
+				.addClass(v);
 
-				$('#elem-color td').css('color', 'transparent');
-				td.css('color', '#fff');
+			EL.color = v;
 
-				$(EL.attr_el)
-					.removeClass(EL.color)
-					.addClass(v);
+			if(EL.attr_tr)//настройка для таблицы, без блоков
+				return;
 
-				$('#elem-color').css('background-color', ELEM_COLOR[v][0]);
+			BLK[EL.block_id].save = 1;
+		};
 
-				EL.color = v;
-
-				if(EL.attr_tr)//настройка для таблицы, без блоков
-					return;
-
-				BLK[EL.block_id].save = 1;
-			});
-
-		var td = '',
-			n = 0;
-		for(var i in ELEM_COLOR) {
-			var bg = ELEM_COLOR[i][0],
-				sel = i == EL.color ? '#fff' : 'transparent';
-			if(!n || n == 7)
-				td += '<tr>';
-			td += '<td class="pad5 center" style="background-color:' + bg + ';color:' + sel + '" val="' + i + '">&#10004;';
-			n++;
-		}
-
-		return '<div id="elem-color" class="bor-e8 prel mtm2"  style="background-color:' + ELEM_COLOR[EL.color][0] + '">' +
-			 '<table class="w200 bg-eee curP pabs">' + td + '</table>' +
-			'</div>';
+		return _color(EL.color, func);
 	};
 
 $(document)

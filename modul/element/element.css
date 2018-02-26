@@ -934,8 +934,6 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 ._image-link{max-width:415px}
 
 
-
-
 /* Просмотр изображений */
 #_image-main{
 	height:400px;
@@ -956,6 +954,48 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 .image-open{cursor:pointer}
 ._busy .image-open{opacity:.1}
+
+
+
+
+
+
+
+
+/* настройка цвета элемента */
+._color{
+	display:inline-block;
+	position:relative;
+	width:22px;
+	height:22px;
+	vertical-align:top;
+	border:#e8e8e8 solid 1px;
+
+}
+._color .pabs{
+	top:-58px;
+	left:-88px;
+	border-spacing:1px;
+	box-shadow: 0 -3px 12px rgba(0,0,0,0.7);
+	z-index:100;
+}
+._color:not(:hover) .pabs{display:none}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

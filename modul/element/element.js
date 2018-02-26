@@ -40,6 +40,45 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 		7:'вс'
 	},
 
+	_color = function(v, func) {
+		$(document)
+			.off('mouseenter', '._color td')
+			.on('mouseenter', '._color td', function() {//показ цветов при наведении
+				var td = $(this),
+					v = td.attr('val');
+				td._tooltip(ELEM_COLOR[v][1]);
+			})
+			.off('click', '._color td')
+			.on('click', '._color td', function() {//установка цвета при выборе
+				var td = $(this),
+					v = td.attr('val'),
+					COL = td.parents('._color');
+
+				COL.find('td').css('color', 'transparent');
+				td.css('color', '#fff');
+				COL.css('background-color', ELEM_COLOR[v][0]);
+
+				if(func)
+					func(v);
+			});
+
+
+		var td = '',
+			n = 0;
+		_forIn(ELEM_COLOR, function(sp, i) {
+			var bg = sp[0],
+				sel = i == v ? '#fff' : 'transparent';
+			if(!n || n == 7)
+				td += '<tr>';
+			td += '<td class="pad5 center" style="background-color:' + bg + ';color:' + sel + '" val="' + i + '">&#10004;';
+			n++;
+		});
+
+		return '<div class="_color" style="background-color:' + ELEM_COLOR[v][0] + '">' +
+			       '<table class="w200 bg-eee curP pabs">' + td + '</table>' +
+			   '</div>';
+	},
+
 	_dialog = function(o) {//диалоговое окно
 		o = $.extend({
 			top:100,
@@ -1164,6 +1203,15 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 							_spisokUpdate(el.num_2, el.id, v);
 						}
 					});
+					return;
+				//Выбор цвета
+				case 66:
+					var func = function(v) {
+							$(el.attr_cmp).val(v);
+						},
+						html = _color($(el.attr_cmp).val(), func);
+					$(el.attr_cmp).next().remove('._color');
+					$(el.attr_cmp).after(html);
 					return;
 			}
 		});

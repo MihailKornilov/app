@@ -297,7 +297,7 @@ function _pageShow($page_id) {
 		'var BLK='._block('page', $page_id, 'block_js').','.
 			'ELM='._block('page', $page_id, 'elem_js').','.
 			'PAGE_LIST='._page('for_select', 'js').','.
-			'ELEM_COLOR={'._elemColor().'};'.
+			'ELEM_COLOR={'._colorJS().'};'.
 	'</script>'.
 	'<script>_pageAct('.PAS.')</script>';
 }
@@ -373,23 +373,6 @@ function _elemStyle($el) {//стили css для элемента
 		return '';
 
 	return ' style="'.implode(';', $send).'"';
-}
-function _elemColor() {//массив цветов для текста в формате JS, доступных элементам
-	return
-		'"":["#000","Чёрный"],'.
-		'"color-555":["#555","Тёмно-серый"],'.
-		'"grey":["#888","Серый"],'.
-		'"pale":["#aaa","Бледный"],'.
-		'"color-ccc":["#ccc","Совсем бледный"],'.
-		'"blue":["#2B587A","Тёмно-синий"],'.
-		'"color-acc":["#07a","Синий"],'.
-		'"color-sal":["#770","Салатовый"],'.
-		'"color-pay":["#090","Зелёный"],'.
-		'"color-aea":["#aea","Ярко-зелёный"],'.
-		'"red":["#e22","Красный"],'.
-		'"color-ref":["#800","Тёмно-красный"],'.
-		'"color-del":["#a66","Тёмно-бордовый"],'.
-		'"color-vin":["#c88","Бордовый"]';
 }
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	$UNIT_ISSET = isset($unit['id']);
@@ -1362,6 +1345,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					'</table>'.
 				'</div>'.
 			'</div>';
+
+		//Выбор цвета
+		case 66:
+			/*
+			*/
+			return
+				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+				_color();
 
 
 
