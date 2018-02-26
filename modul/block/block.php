@@ -178,7 +178,10 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$borPx = $bor[3] + (BLOCK_EDIT ? 0 : $bor[1]);
 			$width = $r['width'] - ($xEnd ? 0 : $br1px) - $borPx;
 
-			$send .= '<td id="bl_'.$r['id'].'"'.
+			//если блок списка шаблона, attr_id не ставится
+			$attr_id = $r['obj_name'] == 'spisok' ? '' : ' id="bl_'.$r['id'].'"';
+
+			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
 						' style="'._blockStyle($r, $width).'"'.
 				 (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').

@@ -345,7 +345,13 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 						$r['elem'] = $el;
 					}
 */
-					$r['elem'] = $r['elem_id'] ? $ELM[$r['elem_id']] : array();
+					if($r['elem_id']) {
+						$elem = $ELM[$r['elem_id']];
+						$elem['block'] = $r;
+						$r['elem'] = $elem;
+					} else
+						$r['elem'] = array();
+
 					$child[$r['parent_id']][$id] = $r;
 				}
 

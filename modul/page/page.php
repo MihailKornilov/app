@@ -335,7 +335,7 @@ function _elemDiv($el, $unit=array()) {//формирование div элемента
 	$txt = _elemUnit($el, $unit);
 
 	//если элемент списка шаблона, attr_id не ставится
-	$attr_id = empty($el['tmp']) ? ' id="el_'.$el['id'].'"' : '';
+	$attr_id = $el['block']['obj_name'] == 'spisok' ? '' : ' id="el_'.$el['id'].'"';
 
 	$cls = array();
 	$cls[] = _elemFormatColor($txt, $el, $el['color']);
@@ -347,7 +347,6 @@ function _elemDiv($el, $unit=array()) {//формирование div элемента
 	$txt = _elemFormat($txt, $el);
 
 	return '<div'.$attr_id.$cls._elemStyle($el).'>'.$txt.'</div>';
-
 }
 function _elemFormat($txt, $el) {//дополнительное форматирование для чисел
 	if(!preg_match(REGEXP_CENA_MINUS, $txt))
