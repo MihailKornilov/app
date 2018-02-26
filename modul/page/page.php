@@ -332,22 +332,57 @@ function _elemDiv($el, $unit=array()) {//формирование div элемента
 	if(!$el)
 		return '';
 
+	$txt = _elemUnit($el, $unit);
+
 	//если элемент списка шаблона, attr_id не ставится
 	$attr_id = empty($el['tmp']) ? ' id="el_'.$el['id'].'"' : '';
 
 	$cls = array();
-//	$cls[] = 'dib';
-	$cls[] = $el['color'];
+	$cls[] = _elemFormatColor($txt, $el, $el['color']);
 	$cls[] = $el['font'];
 	$cls[] = $el['size'] ? 'fs'.$el['size'] : '';
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
-	return
-	'<div'.$attr_id.$cls._elemStyle($el).'>'.
-		_elemUnit($el, $unit).
-	'</div>';
+	$txt = _elemFormat($txt, $el);
 
+	return '<div'.$attr_id.$cls._elemStyle($el).'>'.$txt.'</div>';
+
+}
+function _elemFormat($txt, $el) {//дополнительное форматирование для чисел
+	if(!preg_match(REGEXP_CENA_MINUS, $txt))
+		return $txt;
+
+	if($el['format_space'])
+		$txt = _sumSpace($txt, $el['format_fract_0_show'], $el['format_fract_char']);
+	else {
+		if(!$el['format_fract_0_show'])
+			$txt = round($txt, 2);
+		$txt = str_replace('.', $el['format_fract_char'], $txt);
+	}
+
+	return $txt;
+}
+function _elemFormatColor($txt, $el, $color) {//подмена цвета при дополнительном форматировании для чисел
+	if(!preg_match(REGEXP_CENA_MINUS, $txt))
+		return $color;
+
+	switch($el['format_color_cond']) {
+		case 1457:
+			if($txt == 0)
+				return $el['format_color'];
+			break;
+		case 1458:
+			if($txt < 0)
+				return $el['format_color'];
+			break;
+		case 1459:
+			if($txt > 0)
+				return $el['format_color'];
+			break;
+	}
+
+	return $color;
 }
 function _elemStyle($el) {//стили css для элемента
 	$send = array();
@@ -380,7 +415,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		$US = array();
 
 	//значение из списка
-	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']]: '';
+	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']] : '';
 	$is_edit = @BLOCK_EDIT || ELEM_WIDTH_CHANGE || !empty($unit['choose']);
 	$attr_id = 'cmp_'.$el['id'].($is_edit ? '_edit' : '');
 	$disabled = $is_edit ? ' disabled' : '';
@@ -770,7 +805,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					$txt = $unit[$elem['col']];
 //					$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 					$txt = _spisokUnitUrl($txt, $unit, $el['url']);
-					$txt = _spisokUnitFormat($txt, $el);
 					return $txt;
 				//произвольный текст
 				case 10: return $elem['txt_1'];
@@ -792,21 +826,18 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					if(!$UNIT_ISSET)
 						return $elem['txt_1'];
 					$txt = $unit[$elem['col']];
-					$txt = _spisokUnitFormat($txt, $el);
 					return $txt;
 				//количество связанного списка
 				case 54:
 					if(!$UNIT_ISSET)
 						return $elem['txt_1'];
 					$txt = $unit[$elem['col']];
-					$txt = _spisokUnitFormat($txt, $el);
 					return $txt;
 				//сумма связанного списка
 				case 55:
 					if(!$UNIT_ISSET)
 						return $elem['txt_1'];
 					$txt = $unit[$elem['col']];
-					$txt = _spisokUnitFormat($txt, $el);
 					return $txt;
 				//Изображение
 				case 60:

@@ -483,20 +483,6 @@ function _spisokColSearchBg($txt, $el, $cmp_id) {//подсветка значения колонки пр
 
 	return $txt;
 }
-function _spisokUnitFormat($txt, $el) {//дополнительное форматирование для чисел
-	if(!preg_match(REGEXP_CENA_MINUS, $txt))
-		return $txt;
-
-	if($el['format_space'])
-		$txt = _sumSpace($txt, $el['format_fraction_0_no_show'], $el['format_fraction']);
-	else {
-		if($el['format_fraction_0_no_show'])
-			$txt = round($txt, 2);
-		$txt = str_replace('.', $el['format_fraction'], $txt);
-	}
-
-	return $txt;
-}
 
 function _spisokCond($el) {//формирование строки с условиями поиска
 	//$el - элемент, который размещает список. 14 или 23.
