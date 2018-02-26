@@ -770,6 +770,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					$txt = $unit[$elem['col']];
 //					$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 					$txt = _spisokUnitUrl($txt, $unit, $el['url']);
+					$txt = _spisokUnitFormat($txt, $el);
 					return $txt;
 				//произвольный текст
 				case 10: return $elem['txt_1'];
@@ -1352,7 +1353,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				_color();
+				'<div class="_color" style="background-color:#000"></div>';
 
 
 

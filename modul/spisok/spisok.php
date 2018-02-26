@@ -483,6 +483,12 @@ function _spisokColSearchBg($txt, $el, $cmp_id) {//подсветка значения колонки пр
 
 	return $txt;
 }
+function _spisokUnitFormat($txt, $el) {//дополнительное форматирование для чисел
+	if(!preg_match(REGEXP_CENA_MINUS, $txt))
+		return $txt;
+
+	return 'fff';
+}
 
 function _spisokCond($el) {//формирование строки с условиями поиска
 	//$el - элемент, который размещает список. 14 или 23.

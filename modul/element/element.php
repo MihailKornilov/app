@@ -207,11 +207,6 @@ function _search($v=array()) {//элемент ПОИСК
 		'</table>'.
 	'</div>';
 }
-function _color() {
-	return
-	'<div class="_color" style="background-color:#000">'.
-	'</div>';
-}
 function _colorJS() {//массив цветов для текста в формате JS, доступных элементам
 	return
 		'"":["#000","Чёрный"],'.
