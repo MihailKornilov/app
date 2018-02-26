@@ -791,17 +791,23 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				case 27:
 					if(!$UNIT_ISSET)
 						return $elem['txt_1'];
-					return $unit[$elem['col']];
+					$txt = $unit[$elem['col']];
+					$txt = _spisokUnitFormat($txt, $el);
+					return $txt;
 				//количество связанного списка
 				case 54:
 					if(!$UNIT_ISSET)
 						return $elem['txt_1'];
-					return _num($unit[$elem['col']]);
+					$txt = $unit[$elem['col']];
+					$txt = _spisokUnitFormat($txt, $el);
+					return $txt;
 				//сумма связанного списка
 				case 55:
 					if(!$UNIT_ISSET)
 						return $elem['txt_1'];
-					return $unit[$elem['col']];
+					$txt = $unit[$elem['col']];
+					$txt = _spisokUnitFormat($txt, $el);
+					return $txt;
 				//Изображение
 				case 60:
 					if(!$UNIT_ISSET)

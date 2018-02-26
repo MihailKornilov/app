@@ -147,6 +147,25 @@ function _ms($v, $del='.') {//проверка на единицу измерени€ с дроб€ми 0.000
 
 	return $v;
 }
+function _sumSpace($sum, $oo=0, $znak=',') {//ѕриведение суммы к удобному виду с пробелами
+	$minus = $sum < 0 ? -1 : 1;
+	$sum *= $minus;
+	$send = '';
+	$floor = floor($sum);
+	$drob = round($sum - $floor, 2) * 100;
+	while($floor > 0) {
+		$del = $floor % 1000;
+		$floor = floor($floor / 1000);
+		if(!$del) $send = ' 000'.$send;
+		elseif($del < 10) $send = ($floor ? ' 00' : '').$del.$send;
+		elseif($del < 100) $send = ($floor ? ' 0' : '').$del.$send;
+		else $send = ' '.$del.$send;
+	}
+	$send = $send ? trim($send) : 0;
+	$send = $drob ? $send.$znak.($drob < 10 ? 0 : '').$drob : $send;
+	$send = $oo && !$drob ? $send.$znak.'00' : $send;
+	return ($minus < 0 ? '-' : '').$send;
+}
 function _txt($v, $utf8=0) {
 	$v = htmlspecialchars(trim($v));
 	return $utf8 ? $v : win1251($v);
