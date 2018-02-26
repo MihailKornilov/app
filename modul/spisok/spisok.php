@@ -500,6 +500,7 @@ function _spisokCond($el) {//формирование строки с условиями поиска
 
 	$cond .= _spisokCondSearch($el);
 	$cond .= _spisokCond52($el);
+	$cond .= _spisokCond62($el);
 
 	return $cond;
 }
@@ -512,6 +513,7 @@ function _spisokCondSearch($el) {//значения фильтра-поиска для списка
 		if($r['elem']['dialog_id'] == 7) {
 			$search = $r['elem'];
 			$v = $r['v'];
+			break;
 		}
 
 	if(!$search)
@@ -578,7 +580,73 @@ function _spisokCond52($el) {//связка со другим списком
 
 	return " AND `".$cmp['col']."`=".$unit_id;
 }
+function _spisokCond62($el) {//фильтр-галочка
+	$filter = false;
+	$v = 0;
 
+	//поиск элемента-фильтра-галочки
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 62) {
+			$filter = $r['elem'];
+			$v = $r['v'];
+			break;
+		}
+
+	if(!$filter)
+		return '';
+
+	//условие срабатывает, если 1439: установлена, 1440 - НЕ установлена
+	if($filter['num_1'] == 1439 && !$v)
+		return '';
+
+	//условия, формирующие фильтр
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `block_id`=-".$filter['id'];
+	if(!$cond = query_arr($sql))
+		return '';
+
+	//колонки, по которым будет производиться фильтр
+	$sql = "SELECT `id`,`col`
+			FROM `_element`
+			WHERE `id` IN ("._idsGet($cond, 'num_1').")";
+	if(!$elCol = query_ass($sql))
+		return '';
+
+	/*
+		 1: отсутствует
+		 2: присутствует
+		 3: равно
+		 4: не равно
+		 5: больше
+		 6: больше или равно
+		 7: меньше
+		 8: меньше или равно
+		 9: содержит
+		10: не содержит
+	*/
+
+	$send = '';
+	foreach($cond as $r) {
+		if(!$col = $elCol[$r['num_1']])
+			continue;
+		$val = addslashes($r['txt_8']);
+		switch($r['num_8']) {
+			case 1: $send.= " AND !`".$col."`"; break;
+			case 2: $send.= " AND `".$col."`"; break;
+			case 3: $send.= " AND `".$col."`='".$val."'"; break;
+			case 4: $send.= " AND `".$col."`!='".$val."'"; break;
+			case 5: $send.= " AND `".$col."`>'".$val."'"; break;
+			case 6: $send.= " AND `".$col."`>='".$val."'"; break;
+			case 7: $send.= " AND `".$col."`<'".$val."'"; break;
+			case 8: $send.= " AND `".$col."`<='".$val."'"; break;
+			case 9: $send.= " AND `".$col."` LIKE '%".$val."%'"; break;
+			case 10:$send.= " AND `".$col."` NOT LIKE '%".$val."%'"; break;
+		}
+	}
+
+	return $send;
+}
 function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)
 		return array();
