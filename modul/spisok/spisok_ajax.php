@@ -40,6 +40,9 @@ switch(@$_POST['op']) {
 				//удаление функций
 				$sql = "DELETE FROM `_element_func` WHERE `block_id`=".$elem['block_id'];
 				query($sql);
+				//удаление фильтров
+				$sql = "DELETE FROM `_user_spisok_filter` WHERE `element_id_filter`=".$unit_id;
+				query($sql);
 				//установка позиции в блоке по умолчанию
 				$sql = "UPDATE `_block` SET `pos`='top' WHERE `id`=".$elem['block_id'];
 				query($sql);

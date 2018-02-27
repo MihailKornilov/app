@@ -19,6 +19,8 @@ function _spisokFilterCache() {//кеширование фильтров списка
 		foreach($arr as $r) {
 			$filter_id = $r['element_id_filter'];
 			$spisok_id = $r['element_id_spisok'];
+			if(empty($elFilter[$filter_id]))
+				continue;
 			$v = array(
 				'elem' => $elFilter[$filter_id],
 				'v' => $r['v']
