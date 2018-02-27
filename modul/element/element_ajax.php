@@ -8,9 +8,10 @@ switch(@$_POST['op']) {
 
 		$menu = array(
 			1 => 'Заголовок',
-			2 => 'Содержание',
+			2 => 'История',
+			3 => 'Содержание',
 	  		4 => 'Служебное',
-			9 => '<b class="red">SA</b>'
+			9 => '<b class=red>SA</b>'
 		);
 		$action = array(
 			3 => 'Обновить содержимое блоков',
@@ -75,12 +76,11 @@ switch(@$_POST['op']) {
 				'<div class="pad10 bg-dfd">'.
 					'<div class="hd2 mt5">Внесение новой записи</div>'.
 					'<table class="bs5 w100p">'.
-						'<tr><td class="grey w175 r">Заголовок:'.
+						'<tr><td class="grey w150 r">Заголовок:'.
 							'<td><input type="text" id="insert_head" class="w100p" maxlength="200" placeholder="название диалогового окна - новая запись" value="'.$dialog['insert_head'].'" />'.
-						'<tr><td class="grey r">Текст кнопки <b>внесения</b>:'.
-							'<td><input type="text" id="insert_button_submit" class="w200" maxlength="100" value="'.$dialog['insert_button_submit'].'" />'.
-						'<tr><td class="grey r">Текст кнопки <b>отмены</b>:'.
-							'<td><input type="text" id="insert_button_cancel" class="w200" maxlength="100" value="'.$dialog['insert_button_cancel'].'" />'.
+						'<tr><td class="grey r">Текст кнопок:'.
+							'<td><input type="text" id="insert_button_submit" class="w150" maxlength="100" value="'.$dialog['insert_button_submit'].'" />'.
+								'<input type="text" id="insert_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['insert_button_cancel'].'" />'.
 						'<tr><td class="blue r">Дальнейшее действие:'.
 							'<td><input type="hidden" id="insert_action_id" value="'.$dialog['insert_action_id'].'" />'.
 						'<tr class="td-insert-action-page'._dn($dialog['insert_action_id'] == 2).'">'.
@@ -91,12 +91,11 @@ switch(@$_POST['op']) {
 				'<div class="bg-ffd line-t1 pad10">'.
 					'<div class="hd2 mt5">Редактирование записи</div>'.
 					'<table class="bs5 w100p">'.
-						'<tr><td class="grey w175 r">Заголовок:'.
+						'<tr><td class="grey w150 r">Заголовок:'.
 							'<td><input type="text" id="edit_head" class="w100p" maxlength="200" placeholder="название диалогового окна - редактирование" value="'.$dialog['edit_head'].'" />'.
-						'<tr><td class="grey r">Текст кнопки <b>сохранения</b>:'.
-							'<td><input type="text" id="edit_button_submit" class="w200" maxlength="100" value="'.$dialog['edit_button_submit'].'" />'.
-						'<tr><td class="grey r">Текст кнопки <b>отмены</b>:'.
-							'<td><input type="text" id="edit_button_cancel" class="w200" maxlength="100" value="'.$dialog['edit_button_cancel'].'" />'.
+						'<tr><td class="grey r">Текст кнопок:'.
+							'<td><input type="text" id="edit_button_submit" class="w150" maxlength="100" value="'.$dialog['edit_button_submit'].'" />'.
+								'<input type="text" id="edit_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['edit_button_cancel'].'" />'.
 						'<tr><td class="blue r">Дальнейшее действие:'.
 							'<td><input type="hidden" id="edit_action_id" value="'.$dialog['edit_action_id'].'" />'.
 						'<tr class="td-edit-action-page'._dn($dialog['edit_action_id'] == 2).'">'.
@@ -107,12 +106,11 @@ switch(@$_POST['op']) {
 				'<div class="bg-fee line-t1 pad10">'.
 					'<div class="hd2 mt5">Удаление записи</div>'.
 					'<table class="bs5 w100p">'.
-						'<tr><td class="grey w175 r">Заголовок:'.
+						'<tr><td class="grey w150 r">Заголовок:'.
 							'<td><input type="text" id="del_head" class="w100p" maxlength="200" placeholder="название диалогового окна - удаление" value="'.$dialog['del_head'].'" />'.
-						'<tr><td class="grey r">Текст кнопки <b>удаления</b>:'.
-							'<td><input type="text" id="del_button_submit" class="w200" maxlength="100" value="'.$dialog['del_button_submit'].'" />'.
-						'<tr><td class="grey r">Текст кнопки <b>отмены</b>:'.
-							'<td><input type="text" id="del_button_cancel" class="w200" maxlength="100" value="'.$dialog['del_button_cancel'].'" />'.
+						'<tr><td class="grey r">Текст кнопок:'.
+							'<td><input type="text" id="del_button_submit" class="w150" maxlength="100" value="'.$dialog['del_button_submit'].'" />'.
+								'<input type="text" id="del_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['del_button_cancel'].'" />'.
 						'<tr><td class="blue r">Дальнейшее действие:'.
 							'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
 						'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
@@ -122,8 +120,33 @@ switch(@$_POST['op']) {
 				'</div>'.
 			'</div>'.
 
-			//Содержание
+			//История действий
 			'<div class="dialog-menu-2'._dn($dialog['menu_edit_last'] == 2).'">'.
+				'<div class="pad10 pb20 bg-dfd">'.
+					'<div class="hd2 mt5">Внесение новой записи</div>'.
+					'<textarea class="mt5 w450 over1 curP history-insert"'.
+							 ' readonly'.
+							 ' placeholder="шаблон истории действий для внесения новой записи">'.
+					'</textarea>'.
+				'</div>'.
+				'<div class="pad10 pb20 bg-ffd line-t1">'.
+					'<div class="hd2 mt5">Редактирование записи</div>'.
+					'<textarea class="mt5 w450 over1 curP"'.
+							 ' readonly'.
+							 ' placeholder="шаблон истории действий для редактирования записи">'.
+					'</textarea>'.
+				'</div>'.
+				'<div class="pad10 pb20 bg-fee line-t1">'.
+					'<div class="hd2 mt5">Удаление записи</div>'.
+					'<textarea class="mt5 w450 over1 curP"'.
+							 ' readonly'.
+							 ' placeholder="шаблон истории действий для удаления записи">'.
+					'</textarea>'.
+				'</div>'.
+			'</div>'.
+
+			//Содержание
+			'<div class="dialog-menu-3'._dn($dialog['menu_edit_last'] == 3).'">'.
 				'<div class="pad10 line-b bg-ffc">'.
 					_blockLevelChange('dialog', $dialog_id, $dialog['width']).
 				'</div>'.

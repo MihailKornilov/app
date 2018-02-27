@@ -327,6 +327,14 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				title0:'не выбрана',
 				spisok:PAGE_LIST
 			});
+			$('.history-' + act).click(function() {
+				_dialogLoad({
+					dialog_id:67,
+					block_id:-115,
+					busy_obj:$(this),
+					busy_cls:'hold'
+				});
+			});
 		});
 
 		$('#base_table')._select({

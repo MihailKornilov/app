@@ -27,9 +27,6 @@ input,textarea{
 input::-webkit-input-placeholder{color:#bbb}
 input::-moz-placeholder{color:#999}
 input.err{background-color:#fff2f2}
-/* скрытие текста и подсказки для прогресса */
-input.hold::-webkit-input-placeholder{color:transparent}
-input.hold::-moz-placeholder{color:transparent}
 
 textarea{
 	resize:none;
@@ -352,12 +349,19 @@ table{border:0;border-spacing:0}
 
 
 ._busy,
-input.hold{
+input.hold,
+textarea.hold{
 	background-image:url("data:image/gif;base64,R0lGODlhIAAIAKECAEVojoSctMHN2QAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFCgADACwAAAAAIAAIAAACFZyPqcvtD6KMr445LcRUN9554kiSBQAh+QQFCgADACwCAAIAEgAEAAACD4xvM8DNiJRz8Mj5ari4AAAh+QQFCgADACwCAAIAHAAEAAACGJRvM8HNCqKMCCnn4JT1XPwMG9cJH6iNBQAh+QQFCgADACwMAAIAEgAEAAACD5RvM8HNiJRz8Mj5qri4AAAh+QQFCgADACwWAAIACAAEAAACBZSPqYsFACH5BAUUAAMALAAAAAAgAAgAAAIOnI+py+0Po5y02ouzPgUAOw==");
 	background-repeat:no-repeat;
 	background-position:center center;
 	color:transparent;
 }
+/* скрытие текста и подсказки для прогресса */
+input.hold::-webkit-input-placeholder{color:transparent}
+input.hold::-moz-placeholder{color:transparent}
+textarea.hold::-webkit-input-placeholder{color:transparent}
+textarea.hold::-moz-placeholder{color:transparent}
+
 ._busy tt{visibility:hidden}
 
 
