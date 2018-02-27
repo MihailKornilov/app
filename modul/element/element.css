@@ -363,7 +363,11 @@
 	z-index:100;
 }
 ._select .select-res.h250{height:250px;overflow-y:scroll}
-._select .select-unit{padding:6px 8px;text-align:left}
+._select .select-unit{
+	padding:6px 8px;
+	text-align:left;
+	overflow-x:hidden;
+}
 ._select .select-unit.title0{color:#999}
 ._select .select-unit.ov{background-color:#EBF3FA}
 ._select .select-unit .fndd{

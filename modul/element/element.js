@@ -330,7 +330,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			$('.history-' + act).click(function() {
 				_dialogLoad({
 					dialog_id:67,
-					block_id:-115,
+					dialog_source:o.dialog_id,
 					busy_obj:$(this),
 					busy_cls:'hold'
 				});
@@ -2240,6 +2240,111 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						._dn(v > 2)
 						.focus();
 				}
+			});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+			});
+		}
+	},
+	_historySetup = function(o, i) {//настройка шаблона истории действий (подключение через [12])
+		var el = $(o.attr_el);
+
+		//получение данных для сохранения
+		if(i == 'get') {
+			var send = {};
+			_forEq(el.find('dd'), function(sp) {
+				var id = _num(sp.find('.title').attr('val'));
+				if(!id)
+					return;
+				send[id] = {
+					num_8:sp.find('.cond_id').val(),
+					txt_8:sp.find('.cond_val').val()
+				};
+			});
+			return send;
+		}
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',
+			DL = el.append(html).find('dl'),
+			BUT_ADD = el.find('div:last');
+
+		BUT_ADD.click(valueAdd);
+
+		if(!o.vvv.length)
+			valueAdd();
+		else {
+			$('#cmp_1443')._select('disable');
+			_forIn(o.vvv, valueAdd);
+		}
+
+		DL.sortable({
+			axis:'y',
+			handle:'.icon-move-y'
+		});
+console.log(i);
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
+				title:'', //имя элемента
+				num_8:0,  //id условия из выпадающего списка [num_8]
+				txt_8:''  //значеие условия                  [txt_8]
+			}, v);
+
+			DL.append(
+				'<dd class="over3">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w35 center">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w200">' +
+								'<input type="text"' +
+									  ' class="cond_val w100p"' +
+									  ' placeholder="текст слева"' +
+									  ' value="' + v.txt_8 + '"' +
+								' />' +
+							'<td class="w150">' +
+								'<input type="text"' +
+									  ' readonly' +
+									  ' class="title w100p curP over4"' +
+									  ' placeholder="значение из диалога"' +
+									  ' value="' + v.title + '"' +
+									  ' val="' + v.id + '"' +
+								' />' +
+							'<td class="w150">' +
+								'<input type="text"' +
+									  ' class="cond_val w100p"' +
+									  ' placeholder="текст справа"' +
+									  ' value="' + v.txt_8 + '"' +
+								' />' +
+							'<td class="r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить сборку', -48) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				COND_ID = DD.find('.cond_id'),
+				TITLE = DD.find('.title');
+			TITLE.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					dialog_source:i.source.dialog_source,
+//					block_id:-116,
+//					unit_id:v.id || -114,           //id выбранного элемента (при редактировании)
+					busy_obj:$(this),
+					busy_cls:'hold',
+					func_save:function(res) {
+						COND_ID._select('enable');
+						$('#cmp_1443')._select('disable');
+						if(!v.id)
+							COND_ID._select(1);
+						v.id = res.unit.id;
+						TITLE.val(v.id);
+						TITLE.attr('val', v.id);
+					}
+				});
 			});
 			DD.find('.icon-del').click(function() {
 				var t = $(this),

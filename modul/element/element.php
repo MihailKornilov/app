@@ -663,6 +663,9 @@ function _elementChoose($el, $unit) {//выбор элементна для вставки в блок
 function _filterCheckSetup() {//настройка условий фильтра для галочки (подключение через [12])
 	return '';
 }
+function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])
+	return '';
+}
 
 
 

@@ -704,7 +704,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			'</div>';
 
 
-		//---=== ЭЛЕМЕНТЫ ДЛЯ ОТОБРАЖЕНИЯ ===---
+
+
+		//---=== ЭЛЕМЕНТЫ ОТОБРАЖЕНИЯ ===---
 		//button
 		case 2:
 			/*
@@ -1062,90 +1064,91 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if($el['block']['obj_name'] != 'dialog')
 				return _emptyMin('Элемент может располагаться только в блоке Диалога');
 
-			if(!$bls_id = _num(@$US['block_id'], 1))
-				return _emptyMin('Отсутствует ID исходного блока.');
+			$dialog_id = _num(@$US['dialog_source']);
 
-			//блок является элементом
-			if($bls_id < 0) {
-				if(!$EL = _elemQuery(abs($bls_id)))
-					return _emptyMin('Исходного элемента id'.$bls_id.' не существует.');
-				$bls_id = $EL['block_id'];//обновление исходного блока
-			}
+			//исходный блок
+			if($bls_id = _num(@$US['block_id'], 1)) {
+				//блок является элементом
+				if($bls_id < 0) {
+					if(!$EL = _elemQuery(abs($bls_id)))
+						return _emptyMin('Исходного элемента id'.$bls_id.' не существует.');
+					$bls_id = $EL['block_id'];//обновление исходного блока
+				}
 
-			if(!$BLS = _blockQuery($bls_id))
-				return _emptyMin('Исходный блок id'.$bls_id.' отсутствует.');
+				//$history = $el['dialog_id']
 
-			if($el['num_2'] == 43 && $BLS['obj_name'] != 'dialog')
-				return _emptyMin('Выбор блоков доступен только для диалогов.');
+				if(!$BLS = _blockQuery($bls_id))
+					return _emptyMin('Исходный блок id'.$bls_id.' отсутствует.');
 
-			$dialog_id = 0;
-			//id диалога, в котором располагается выбор
-			switch($el['block']['obj_id']) {
-				case 7://поиск
-					if(!$EL = $BLS['elem'])
-						return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента поиска в блок.');
-					if(!$EL['num_1'])
-						return _emptyMin('Содержание диалога будет доступно после выбора списка,<br>по которому будет производиться поиск.');
-					if(!$sp = _elemQuery($EL['num_1']))
-						return _emptyMin('Отсутствует элемент, размещающий список.');
-					$dialog_id = $sp['num_1'];
-					break;
-				case 11://вставка значения...
-					if($BLS['obj_name'] == 'spisok') {//...в блок шаблона [14]
-						$bl = _blockQuery($BLS['obj_id']);
-						if(!$bl['elem'])
-							return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента в блок.');
-						if(!$dialog_id = $bl['elem']['num_1'])
-							return _emptyMin('Содержание диалога будет доступно после выбора списка.');
+				if($el['num_2'] == 43 && $BLS['obj_name'] != 'dialog')
+					return _emptyMin('Выбор блоков доступен только для диалогов.');
+
+				//id диалога, в котором располагается выбор
+				switch($el['block']['obj_id']) {
+					case 7://поиск
+						if(!$EL = $BLS['elem'])
+							return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента поиска в блок.');
+						if(!$EL['num_1'])
+							return _emptyMin('Содержание диалога будет доступно после выбора списка,<br>по которому будет производиться поиск.');
+						if(!$sp = _elemQuery($EL['num_1']))
+							return _emptyMin('Отсутствует элемент, размещающий список.');
+						$dialog_id = $sp['num_1'];
 						break;
-					}
-					if($BLS['obj_name'] == 'page') {
-						if($BLS['elem'] && ($BLS['elem']['dialog_id'] == 14 || $BLS['elem']['dialog_id'] == 23)) {//списки [14,23]
-							$dialog_id = $BLS['elem']['num_1'];
+					case 11://вставка значения...
+						if($BLS['obj_name'] == 'spisok') {//...в блок шаблона [14]
+							$bl = _blockQuery($BLS['obj_id']);
+							if(!$bl['elem'])
+								return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента в блок.');
+							if(!$dialog_id = $bl['elem']['num_1'])
+								return _emptyMin('Содержание диалога будет доступно после выбора списка.');
 							break;
 						}
-						if(!$page = _page($BLS['obj_id']))
-							return _emptyMin('Данные страницы '.$BLS['obj_id'].' не получены.');
-						if(!$dialog_id = $page['spisok_id'])
-							return _emptyMin('Страница не принимает значения единицы списка');
-					}
-					if($BLS['obj_name'] == 'dialog') {
-						if($US['dialog_source']) {
-							if(!$dialog_id = $US['dialog_source'])
+						if($BLS['obj_name'] == 'page') {
+							if($BLS['elem'] && ($BLS['elem']['dialog_id'] == 14 || $BLS['elem']['dialog_id'] == 23)) {//списки [14,23]
+								$dialog_id = $BLS['elem']['num_1'];
 								break;
-							//отображение диалога происходит для элемента, который выбирает значения для списка
-							//требуется уточнение, где искать id диалога
-							if($BLS['elem']['dialog_id'] == 31) {
-								if(!$el31_id = _num($BLS['elem']['num_1']))
-									return _emptyMin('Отсутствует id элемента, размещающего select');
-								if(!$el31 = _elemQuery($el31_id))
-									return _emptyMin('Отсутствует элемент, размещающий select');
-								if($el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-связку [29]
-									if(!$ell = _elemQuery($dialog_id))
-										return _emptyMin('...');
-									$dialog_id = _num($ell['block']['obj_id']);
-								}
 							}
+							if(!$page = _page($BLS['obj_id']))
+								return _emptyMin('Данные страницы '.$BLS['obj_id'].' не получены.');
+							if(!$dialog_id = $page['spisok_id'])
+								return _emptyMin('Страница не принимает значения единицы списка');
+						}
+						if($BLS['obj_name'] == 'dialog') {
+							if($dialog_id = $US['dialog_source']) {
+								//отображение диалога происходит для элемента, который выбирает значения для списка
+								//требуется уточнение, где искать id диалога
+								if($BLS['elem']['dialog_id'] == 31) {
+									if(!$el31_id = _num($BLS['elem']['num_1']))
+										return _emptyMin('Отсутствует id элемента, размещающего select');
+									if(!$el31 = _elemQuery($el31_id))
+										return _emptyMin('Отсутствует элемент, размещающий select');
+									if($el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-связку [29]
+										if(!$ell = _elemQuery($dialog_id))
+											return _emptyMin('...');
+										$dialog_id = _num($ell['block']['obj_id']);
+									}
+								}
+								break;
+							}
+
+							$dialog_id = $BLS['obj_id'];
 							break;
 						}
-
+						break;
+					case 31://выбор значения для Выпадающего поля
+						if($BLS['obj_name'] != 'dialog')
+							return _emptyMin('Выбор значения только для диалогов');
 						$dialog_id = $BLS['obj_id'];
 						break;
-					}
-					break;
-				case 31://выбор значения для Выпадающего поля
-					if($BLS['obj_name'] != 'dialog')
-						return _emptyMin('Выбор значения только для диалогов');
-					$dialog_id = $BLS['obj_id'];
-					break;
-				case 36://показ-скрытие блоков для галочки
-				case 40://показ-скрытие блоков для выпадающего поля
-				default:
-					if($el['num_2'] == 43) {
-						$dialog_id = $BLS['obj_id'];
-						break;
-					}
-					return _emptyMin('Ненастроенный диалог '.$el['block']['obj_id']);
+					case 36://показ-скрытие блоков для галочки
+					case 40://показ-скрытие блоков для выпадающего поля
+					default:
+						if($el['num_2'] == 43) {
+							$dialog_id = $BLS['obj_id'];
+							break;
+						}
+						return _emptyMin('Ненастроенный диалог '.$el['block']['obj_id']);
+				}
 			}
 
 			if(!$dialog_id)
@@ -1530,7 +1533,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 
 		//---=== СВЯЗКИ ===---
-
 		//Настройка суммы значений единицы списка
 		case 27:
 			/*
