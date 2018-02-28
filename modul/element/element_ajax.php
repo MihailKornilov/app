@@ -24,7 +24,8 @@ switch(@$_POST['op']) {
 			unset($menu[9]);
 			unset($action[4]);
 		}
-
+		if(!isset($dialog['field']['deleted']))
+			unset($menu[2]);
 		if(!isset($menu[$dialog['menu_edit_last']]))
 			$dialog['menu_edit_last'] = 1;
 
@@ -124,23 +125,35 @@ switch(@$_POST['op']) {
 			'<div class="dialog-menu-2'._dn($dialog['menu_edit_last'] == 2).'">'.
 				'<div class="pad10 pb20 bg-dfd">'.
 					'<div class="hd2 mt5">Внесение новой записи</div>'.
-					'<textarea class="mt5 w450 over1 curP history-insert"'.
+					'<textarea class="mt5 w450 over1 curP"'.
+							 ' id="history_insert"'.
 							 ' readonly'.
-							 ' placeholder="шаблон истории действий для внесения новой записи">'.
+							 ' placeholder="шаблон истории действий для внесения новой записи"'.
+							 ' val="'.$dialog['history'][1]['elem_id'].'"'.
+					'>'.
+						$dialog['history'][1]['tmp'].
 					'</textarea>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-ffd line-t1">'.
 					'<div class="hd2 mt5">Редактирование записи</div>'.
 					'<textarea class="mt5 w450 over1 curP"'.
+							 ' id="history_edit"'.
 							 ' readonly'.
-							 ' placeholder="шаблон истории действий для редактирования записи">'.
+							 ' placeholder="шаблон истории действий для редактирования записи"'.
+							 ' val="'.$dialog['history'][2]['elem_id'].'"'.
+					'>'.
+						$dialog['history'][2]['tmp'].
 					'</textarea>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-fee line-t1">'.
 					'<div class="hd2 mt5">Удаление записи</div>'.
 					'<textarea class="mt5 w450 over1 curP"'.
+							 ' id="history_del"'.
 							 ' readonly'.
-							 ' placeholder="шаблон истории действий для удаления записи">'.
+							 ' placeholder="шаблон истории действий для удаления записи"'.
+							 ' val="'.$dialog['history'][3]['elem_id'].'"'.
+					'>'.
+						$dialog['history'][3]['tmp'].
 					'</textarea>'.
 				'</div>'.
 			'</div>'.
@@ -645,7 +658,9 @@ function _dialogOpenLoad($dialog_id) {
 					$spisok[] = array(
 						'id' => _num($id),
 						'title' => utf8('выбрано'),
+						'num_1' => _num($r['num_1']),
 						'num_8' => _num($r['num_8']),
+						'txt_7' => utf8($r['txt_7']),
 						'txt_8' => utf8($r['txt_8'])
 					);
 				}

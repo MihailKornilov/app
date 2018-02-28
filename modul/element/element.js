@@ -293,84 +293,98 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					});
 				}
 			}),
-			DIALOG_WIDTH = o.width;
+			DIALOG_WIDTH = o.width,
+			DLG = function(attr) {//получение элемента данного диалога по атрибуту (для устранения конфликта с другими диалогами)
+				return dialog.content.find(attr);
+			};
 
 		_blockUpd(o.blk);
 		_elemUpd(o.cmp);
 //		_elemActivate(o.cmp, {}, 1);
 
-		$('#dialog-menu')._menu({
+		DLG('#dialog-menu')._menu({
 			type:2,
 			spisok:o.menu,
-			func:_dialogHeightCorrect
+			func:function() {
+				_dialogHeightCorrect(DLG);
+			}
 		});
-		$('#menu_sa')._menu({
+		DLG('#menu_sa')._menu({
 			type:1,
 			spisok:o.menu_sa
 		});
-		$('#width_auto')._check({
+		DLG('#width_auto')._check({
 			title:'автоматическая ширина'
 		});
 
-		_forN(['insert', 'edit', 'del'], function(act) {
-			$('#' + act + '_action_id')._select({
+		_forN(['insert', 'edit', 'del'], function(act, n) {
+			DLG('#' + act + '_action_id')._select({
 				width:270,
 				title0:'действия нет, закрыть окно',
 				spisok:o.action,
 				func:function(v) {
-					$('.td-' + act + '-action-page')._dn(v == 2);
-					$('#' + act + '_action_page_id')._select(0);
+					DLG('.td-' + act + '-action-page')._dn(v == 2);
+					DLG('#' + act + '_action_page_id')._select(0);
 				}
 			});
-			$('#' + act + '_action_page_id')._select({
+			DLG('#' + act + '_action_page_id')._select({
 				width:270,
 				title0:'не выбрана',
 				spisok:PAGE_LIST
 			});
-			$('.history-' + act).click(function() {
+			DLG('#history_' + act).click(function() {
+				var t = $(this);
 				_dialogLoad({
 					dialog_id:67,
 					dialog_source:o.dialog_id,
+					unit_id:_num(t.attr('val')) || -117,
 					busy_obj:$(this),
-					busy_cls:'hold'
+					busy_cls:'hold',
+					func_open:function(res, dlg) {
+						dlg.content.find('#type_id').val(n + 1);
+					},
+					func_save:function(res) {
+						t.val(res.unit.title);
+						t._flash();
+					}
 				});
 			});
 		});
 
-		$('#base_table')._select({
+		DLG('#base_table')._select({
 			width:230,
 			write:1,
 			spisok:o.tables
 		});
-		$('#element_group_id')._select({
+		DLG('#element_group_id')._select({
 			title0:'нет',
 			width:230,
 			spisok:o.group
 		});
-		$('#element_width')._count({width:60,step:10});
-		$('#element_width_min')._count({width:60,step:10});
-		$('#element_dialog_func')._select({
+		DLG('#element_width')._count({width:60,step:10});
+		DLG('#element_width_min')._count({width:60,step:10});
+		DLG('#element_dialog_func')._select({
 			width:280,
 			title0:'не указан',
 			spisok:o.dialog_spisok
 		});
 
-		_dialogHeightCorrect();
+		_dialogHeightCorrect(DLG);
 
 		//установка линии для настройки ширины диалога
-		$('#dialog-w-change')
+		DLG('#dialog-w-change')
 			.css('left', (DIALOG_WIDTH + 8) + 'px')
 			.draggable({
 				axis:'x',
 				grid:[10,0],
 				drag:function(event, ui) {
-					$('#width_auto')._check(0);
+					DLG('#width_auto')._check(0);
 					var w = ui.position.left - 8;
 					if(w < 480 || w > 980)
 						return false;
 					DIALOG_WIDTH = w;
 					dialog.width(w);
-					$('#dialog-width').html(w);
+					DLG('#dialog-width').html(w);
 				}
 			});
 
@@ -384,61 +398,61 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				block_id:o.block_id,
 
 				width:DIALOG_WIDTH,
-				width_auto:$('#width_auto').val(),
-				cmp_no_req:$('#cmp_no_req').val(),
+				width_auto:DLG('#width_auto').val(),
+				cmp_no_req:DLG('#cmp_no_req').val(),
 
-				insert_head:$('#insert_head').val(),
-				insert_button_submit:$('#insert_button_submit').val(),
-				insert_button_cancel:$('#insert_button_cancel').val(),
-				insert_action_id:$('#insert_action_id').val(),
-				insert_action_page_id:$('#insert_action_page_id').val(),
+				insert_head:DLG('#insert_head').val(),
+				insert_button_submit:DLG('#insert_button_submit').val(),
+				insert_button_cancel:DLG('#insert_button_cancel').val(),
+				insert_action_id:DLG('#insert_action_id').val(),
+				insert_action_page_id:DLG('#insert_action_page_id').val(),
 
-				edit_head:$('#edit_head').val(),
-				edit_button_submit:$('#edit_button_submit').val(),
-				edit_button_cancel:$('#edit_button_cancel').val(),
-				edit_action_id:$('#edit_action_id').val(),
-				edit_action_page_id:$('#edit_action_page_id').val(),
+				edit_head:DLG('#edit_head').val(),
+				edit_button_submit:DLG('#edit_button_submit').val(),
+				edit_button_cancel:DLG('#edit_button_cancel').val(),
+				edit_action_id:DLG('#edit_action_id').val(),
+				edit_action_page_id:DLG('#edit_action_page_id').val(),
 
-				del_head:$('#del_head').val(),
-				del_button_submit:$('#del_button_submit').val(),
-				del_button_cancel:$('#del_button_cancel').val(),
-				del_action_id:$('#del_action_id').val(),
-				del_action_page_id:$('#del_action_page_id').val(),
+				del_head:DLG('#del_head').val(),
+				del_button_submit:DLG('#del_button_submit').val(),
+				del_button_cancel:DLG('#del_button_cancel').val(),
+				del_action_id:DLG('#del_action_id').val(),
+				del_action_page_id:DLG('#del_action_page_id').val(),
 
-				spisok_on:$('#spisok_on').val(),
-				spisok_name:$('#spisok_name').val(),
+				spisok_on:DLG('#spisok_on').val(),
+				spisok_name:DLG('#spisok_name').val(),
 
-				base_table:$('#base_table')._select('inp'),
-				app_any:$('#app_any').val(),
-				sa:$('#sa').val(),
+				base_table:DLG('#base_table')._select('inp'),
+				app_any:DLG('#app_any').val(),
+				sa:DLG('#sa').val(),
 
-				element_group_id:$('#element_group_id').val(),
-				element_name:$('#element_name').val(),
-				element_width:$('#element_width').val(),
-				element_width_min:$('#element_width_min').val(),
-				element_search_access:$('#element_search_access').val(),
-				element_is_insert:$('#element_is_insert').val(),
-				element_style_access:$('#element_style_access').val(),
-				element_url_access:$('#element_url_access').val(),
-				element_hint_access:$('#element_hint_access').val(),
-				element_dialog_func:$('#element_dialog_func').val(),
-				element_afics:$('#element_afics').val(),
-				element_page_paste:$('#element_page_paste').val(),
-				element_dialog_paste:$('#element_dialog_paste').val(),
-				element_spisok_paste:$('#element_spisok_paste').val(),
-				element_is_spisok_unit:$('#element_is_spisok_unit').val(),
-				element_44_access:$('#element_44_access').val(),
-				element_td_paste:$('#element_td_paste').val(),
-				element_hidden:$('#element_hidden').val(),
+				element_group_id:DLG('#element_group_id').val(),
+				element_name:DLG('#element_name').val(),
+				element_width:DLG('#element_width').val(),
+				element_width_min:DLG('#element_width_min').val(),
+				element_search_access:DLG('#element_search_access').val(),
+				element_is_insert:DLG('#element_is_insert').val(),
+				element_style_access:DLG('#element_style_access').val(),
+				element_url_access:DLG('#element_url_access').val(),
+				element_hint_access:DLG('#element_hint_access').val(),
+				element_dialog_func:DLG('#element_dialog_func').val(),
+				element_afics:DLG('#element_afics').val(),
+				element_page_paste:DLG('#element_page_paste').val(),
+				element_dialog_paste:DLG('#element_dialog_paste').val(),
+				element_spisok_paste:DLG('#element_spisok_paste').val(),
+				element_is_spisok_unit:DLG('#element_is_spisok_unit').val(),
+				element_44_access:DLG('#element_44_access').val(),
+				element_td_paste:DLG('#element_td_paste').val(),
+				element_hidden:DLG('#element_hidden').val(),
 
-				menu_edit_last:$('#dialog-menu').val()
+				menu_edit_last:DLG('#dialog-menu').val()
 			};
 			dialog.post(send, _dialogOpen);
 		}
 	},
-	_dialogHeightCorrect = function() {//установка высоты линий для настройки ширины диалога и ширины полей с названиями
-		var h = $('#dialog-w-change').parent().height();
-		$('#dialog-w-change').height(h);
+	_dialogHeightCorrect = function(DLG) {//установка высоты линий для настройки ширины диалога и ширины полей с названиями
+		var h = DLG('#dialog-w-change').parent().height();
+		DLG('#dialog-w-change').height(h);
 	},
 
 	_dialogOpen = function(o) {//открытие диалогового окна
@@ -2253,23 +2267,28 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 
 		//получение данных для сохранения
 		if(i == 'get') {
-			var send = {};
+			var send = [];
 			_forEq(el.find('dd'), function(sp) {
-				var id = _num(sp.find('.title').attr('val'));
-				if(!id)
-					return;
-				send[id] = {
-					num_8:sp.find('.cond_id').val(),
-					txt_8:sp.find('.cond_val').val()
-				};
+				send.push({
+					id:_num(sp.attr('val')),
+					num_1:sp.find('.title').attr('val'),
+					txt_7:sp.find('.txt_7').val(),
+					txt_8:sp.find('.txt_8').val()
+				});
 			});
-			return send;
+			return {
+				type_id:$(o.attr_cmp).next().val(),
+				dialog_id:$(o.attr_cmp).val(),
+				val:send
+			};
 		}
 
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',
 			DL = el.append(html).find('dl'),
 			BUT_ADD = el.find('div:last');
+
+		$(o.attr_cmp).val(i.source.dialog_source);
 
 		BUT_ADD.click(valueAdd);
 
@@ -2284,25 +2303,26 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			axis:'y',
 			handle:'.icon-move-y'
 		});
-console.log(i);
+
 		function valueAdd(v) {
 			v = $.extend({
-				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
-				title:'', //имя элемента
-				num_8:0,  //id условия из выпадающего списка [num_8]
-				txt_8:''  //значеие условия                  [txt_8]
+				id:0,     //id элемента-сборки
+				num_1:0,  //id элемента-значения
+				title:'', //имя элемента-значения
+				txt_7:'', //текст слева
+				txt_8:''  //текст справа
 			}, v);
 
 			DL.append(
-				'<dd class="over3">' +
+				'<dd class="over3" val="' + v.id + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w35 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w200">' +
 								'<input type="text"' +
-									  ' class="cond_val w100p"' +
+									  ' class="txt_7 w100p"' +
 									  ' placeholder="текст слева"' +
-									  ' value="' + v.txt_8 + '"' +
+									  ' value="' + v.txt_7 + '"' +
 								' />' +
 							'<td class="w150">' +
 								'<input type="text"' +
@@ -2310,11 +2330,11 @@ console.log(i);
 									  ' class="title w100p curP over4"' +
 									  ' placeholder="значение из диалога"' +
 									  ' value="' + v.title + '"' +
-									  ' val="' + v.id + '"' +
+									  ' val="' + v.num_1 + '"' +
 								' />' +
-							'<td class="w150">' +
+							'<td class="w200">' +
 								'<input type="text"' +
-									  ' class="cond_val w100p"' +
+									  ' class="txt_8 w100p"' +
 									  ' placeholder="текст справа"' +
 									  ' value="' + v.txt_8 + '"' +
 								' />' +
@@ -2325,24 +2345,20 @@ console.log(i);
 			);
 
 			var DD = DL.find('dd:last'),
-				COND_ID = DD.find('.cond_id'),
 				TITLE = DD.find('.title');
 			TITLE.click(function() {
 				_dialogLoad({
 					dialog_id:11,
 					dialog_source:i.source.dialog_source,
-//					block_id:-116,
-//					unit_id:v.id || -114,           //id выбранного элемента (при редактировании)
+					unit_id:v.id || -115,
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {
-						COND_ID._select('enable');
-						$('#cmp_1443')._select('disable');
-						if(!v.id)
-							COND_ID._select(1);
+						console.log(res);
 						v.id = res.unit.id;
+						DD.attr('val', v.id);
+						TITLE.attr('val', res.unit.num_1);
 						TITLE.val(v.id);
-						TITLE.attr('val', v.id);
 					}
 				});
 			});
@@ -2351,6 +2367,7 @@ console.log(i);
 					p = _parent(t, 'DD');
 				p.remove();
 			});
+			DD.find('.txt_7').focus();
 		}
 	};
 
@@ -4417,7 +4434,7 @@ $.fn._menu = function(o) {//меню
 	_init();
 	_pageCange(val);
 
-	var mainDiv = $('#' + attr_id + '_menu'),
+	var mainDiv = tMain.next(),
 		link = mainDiv.find('.link');
 
 	link.click(_click);
@@ -4449,10 +4466,9 @@ $.fn._menu = function(o) {//меню
 		o.func(v, S);
 	}
 	function _pageCange(v) {
-		for(n = 0; n < o.spisok.length; n++) {
-			var sp = o.spisok[n];
-			$('.' + attr_id + '-' + sp.id)[(v == sp.id ? 'remove' : 'add') + 'Class']('dn');
-		}
+		_forN(o.spisok, function(sp) {
+			$('.' + attr_id + '-' + sp.id)._dn(v == sp.id);
+		});
 	}
 
 

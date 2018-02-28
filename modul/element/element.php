@@ -295,7 +295,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	if(!$dialog = query_assoc($sql))
 		return array();
 
-	//получение списка колонок, присутствующих в таблице
+	//список колонок, присутствующих в таблице
 	$field = array();
 	$sql = "DESCRIBE `".$dialog['base_table']."`";
 	foreach(query_array($sql) as $r)
@@ -306,6 +306,31 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	$dialog['cmp'] = _block('dialog', $dialog_id, 'elem_arr');
 	$dialog['cmp_utf8'] = _block('dialog', $dialog_id, 'elem_utf8');
 	$dialog['field'] = $field;
+
+	//id заглавных элементов настройки шаблона истории действий
+	foreach(array(1,2,3) as $n) {
+		$sql = "SELECT `id`
+				FROM `_element`
+				WHERE `dialog_id`=67
+				  AND `num_1`=".$n."
+				  AND `num_2`=".$dialog_id."
+				LIMIT 1";
+		$elem_id = query_value($sql);
+		$dialog['history'][$n]['elem_id'] = $elem_id;
+
+		$tmp = '';
+		if($elem_id) {
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `block_id`=-".$elem_id."
+					ORDER BY `sort`";
+			foreach(query_arr($sql) as $r) {
+				$num_1 = $r['num_1'] ? '['.$r['num_1'].'] ' : '';
+				$tmp.= $r['txt_7'].' '.$num_1.$r['txt_8'].' ';
+			}
+		}
+		$dialog['history'][$n]['tmp'] = trim($tmp);
+	}
 
 	return _cache($dialog);
 }
@@ -536,6 +561,15 @@ function _blockQuery($block_id) {//запрос одного блока
 	return $block;
 }
 
+function _elemTitle($el) {//им€ элемента или его текст
+	if($el['dialog_id'] != 67)
+		return '';
+
+	_cache('clear', '_dialogQuery'.$el['num_2']);
+	$dlg = _dialogQuery($el['num_2']);
+	return $dlg['history'][$el['num_1']]['tmp'];
+}
+
 function _elementChoose($el, $unit) {//выбор элементна дл€ вставки в блок
 	if(!$block_id = _num($unit['source']['block_id'], 1))
 		return _emptyMin('ќтсутствует id исходного блока.');
@@ -664,7 +698,21 @@ function _filterCheckSetup() {//настройка условий фильтра дл€ галочки (подключен
 	return '';
 }
 function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])
-	return '';
+	/*
+		«аглавный элемент: -117
+			num_1 - действие (type_id):
+		              1 - запись внесена
+		              2 - запись изменена
+		              3 - запись удалена
+			num_2 - id диалога, по которому настраиваетс€ шаблон
+			txt_1 - список id дочерних элементов
+
+		ƒочерние элементы:
+			txt_7 - текст слева от значени€
+			num_8 - значение из диалога
+			txt_8 - текст справа от значени€
+	*/
+	return '<input type="hidden" id="type_id" />';
 }
 
 

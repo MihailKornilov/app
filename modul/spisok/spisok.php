@@ -762,3 +762,26 @@ function _spisok59unit($cmp_id, $unit_id) {//выбранное значение при связке списк
 
 
 
+
+
+
+function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действий
+	//история не вносится, если единица списка удаляется физически из базы
+	if(!isset($dialog['field']['deleted']))
+		return;
+
+	$sql = "INSERT INTO `_history` (
+				`type_id`,
+				`dialog_id`,
+				`unit_id`,
+				`user_id_add`
+			) VALUES (
+				".$type_id.",
+				".$dialog['id'].",
+				".$unit_id.",
+				".USER_ID."
+			)";
+	query($sql);
+}
+
+

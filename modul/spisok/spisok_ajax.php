@@ -29,6 +29,7 @@ switch(@$_POST['op']) {
 						`dtime_del`=CURRENT_TIMESTAMP
 					WHERE `id`=".$unit_id;
 			query($sql);
+			_historyInsert(3, $dialog, $unit_id);
 			_spisokUnitAfter($dialog, $unit_id);
 		} else {
 			$elem = array();
@@ -213,16 +214,13 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			FROM `".$dialog['base_table']."`
 			WHERE `id`=".$unit_id;
 	$unit = query_assoc($sql);
-	$unit['title'] = '';
 	if(IS_ELEM)
-		if($bl = _blockQuery($unit['block_id'])) {
+		if($bl = _blockQuery($unit['block_id']))
 			if($bl['obj_name'] == 'dialog') {
 				_cache('clear', '_dialogQuery'.$bl['obj_id']);
 				$dlg = _dialogQuery($bl['obj_id']);
 				$unit = $dlg['cmp'][$unit['id']];
 			}
-			$unit['title'] = _elemUnit($unit);
-		}
 
 	$cmpv = @$_POST['cmpv'];
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
@@ -258,11 +256,15 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
+
 	if(IS_ELEM) {
 		$elem = _elemQuery($unit_id);
 		if($elem['block'])
 			_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 	}
+
+	if(IS_ELEM)
+		$unit['title'] = _elemTitle($unit);
 
 	$send = array(
 		'unit' => utf8($unit),
@@ -409,6 +411,8 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 			continue;
 		}
 	}
+
+	_historyInsert(1, $dialog, $unit_id);
 
 	return $unit_id;
 }
@@ -894,6 +898,92 @@ function _filterCheckSetupSave($cmp, $val, $unit) {//сохранение настройки фильтр
 	$sql = "DELETE FROM `_element`
 			WHERE `user_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-114)";
+	query($sql);
+}
+function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона истории действий. Подключаемая функция [12]
+	/*
+		-115
+		$cmp  - компонент из диалога, отвечающий за настройку таблицы
+		$val  - значения, полученные для сохранения
+		$unit - элемент, размещающий таблицу, для которой происходит настройка
+	*/
+
+	$update = array();
+	$idsNoDel = '0';
+
+	if(!$dlg_id = $val['dialog_id'])
+		return;
+	if(!$type_id = $val['type_id'])
+		return;
+
+	$val = $val['val'];
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		$sort = 0;
+		foreach($val as $r) {
+			$num_1 = _num($r['num_1']);
+			$txt_7 = _txt($r['txt_7']);
+			$txt_8 = _txt($r['txt_8']);
+			if(!$num_1 && !$txt_7 && !$txt_8)
+				continue;
+			if($id = _num($r['id']))
+				$idsNoDel .= ','.$id;
+			$update[] = "(
+				".$id.",
+				-".$unit['id'].",
+				'".addslashes($txt_7)."',
+				'".addslashes($txt_8)."',
+				".$sort++.",
+				".USER_ID."
+			)";
+		}
+	}
+
+	//удаление удалённых значений
+	$sql = "DELETE FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			  AND `id` NOT IN (".$idsNoDel.")";
+	query($sql);
+
+	if(!empty($update)) {
+		$sql = "INSERT INTO `_element` (
+					`id`,
+					`block_id`,
+					`txt_7`,
+					`txt_8`,
+					`sort`,
+					`user_id_add`
+				)
+				VALUES ".implode(',', $update)."
+				ON DUPLICATE KEY UPDATE
+					`block_id`=VALUES(`block_id`),
+					`txt_7`=VALUES(`txt_7`),
+					`txt_8`=VALUES(`txt_8`),
+					`sort`=VALUES(`sort`)";
+		query($sql);
+	}
+
+	//очистка неиспользованных элементов
+	$sql = "DELETE FROM `_element`
+			WHERE `user_id_add`=".USER_ID."
+			  AND `block_id` IN (0,-115)";
+	query($sql);
+
+	//обновление значений главного элемента шаблона
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			ORDER BY `sort`";
+	$ids = query_ids($sql);
+
+	$sql = "UPDATE `_element`
+			SET `num_1`=".$type_id.",
+				`num_2`=".$dlg_id.",
+				`txt_1`='".($ids ? $ids : '')."'
+			WHERE `id`=".$unit['id'];
 	query($sql);
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
