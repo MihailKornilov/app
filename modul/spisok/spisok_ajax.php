@@ -264,7 +264,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	}
 
 	if(IS_ELEM)
-		$unit['title'] = _elemTitle($unit);
+		$unit['title'] = _elemTitle($unit_id);
 
 	$send = array(
 		'unit' => utf8($unit),

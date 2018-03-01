@@ -2359,6 +2359,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						DD.attr('val', v.id);
 						TITLE.attr('val', res.unit.num_1);
 						TITLE.val(v.id);
+						DD.find('.txt_8').focus();
 					}
 				});
 			});

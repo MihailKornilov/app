@@ -1394,6 +1394,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 				'<div class="_color" style="background-color:#000"></div>';
 
+		//Список истории действий
+		case 68:
+			if($is_edit)
+				return '<div class="_empty min">История действий.</div>';
+
+			return _historySpisok($el);
+
 
 
 

@@ -561,7 +561,9 @@ function _blockQuery($block_id) {//запрос одного блока
 	return $block;
 }
 
-function _elemTitle($el) {//имя элемента или его текст
+function _elemTitle($elem_id) {//имя элемента или его текст
+	if(!$el = _elemQuery($elem_id))
+		return '';
 	if($el['dialog_id'] != 67)
 		return '';
 
@@ -697,6 +699,7 @@ function _elementChoose($el, $unit) {//выбор элементна для вставки в блок
 function _filterCheckSetup() {//настройка условий фильтра для галочки (подключение через [12])
 	return '';
 }
+
 function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])
 	/*
 		Заглавный элемент: -117
@@ -714,7 +717,60 @@ function _historySetup($el, $unit) {//настройка шаблона истории действий (подклю
 	*/
 	return '<input type="hidden" id="type_id" />';
 }
+function _historySpisok($el) {//список истории действий [68]
+	$sql = "SELECT *
+			FROM `_history`
+			WHERE `app_id`=".APP_ID."
+			ORDER BY `dtime_add` DESC
+			LIMIT 50";
+	if(!$arr = query_arr($sql))
+		return '<div class="_empty min">Истории нет.</div>';
 
+	//распределение истории по дням
+	$spisok = array();
+	foreach($arr as $r) {
+		$day = substr($r['dtime_add'], 0, 10);
+		if(!isset($spisok[$day]))
+			$spisok[$day] = array();
+		$spisok[$day][] = $r;
+	}
+
+	$datFirst = key($spisok);
+	$send = '';
+	foreach($spisok as $day => $day_arr) {
+		$send .= '<div class="history-day'._dn($day == $datFirst, 'pt20').'">'.FullData($day, 1, 0, 1).'</div>';
+
+		$last = count($day_arr) - 1;
+		$user_id =  $day_arr[0]['user_id_add'];
+		$un = '';
+		foreach($day_arr as $n => $r) {
+			$un .= '<div class="history-un">'.
+						'<div class="history-o o'.$r['type_id'].'"></div>'.
+						'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
+						'Внесён новый клиент. '.
+					'</div>';
+
+			$is_user = $user_id != $r['user_id_add'];//изменился пользователь
+			$is_last = $n == $last;//последняя запись
+
+			if(!$is_user && !$is_last)
+				continue;
+
+			$send .=
+				'<table class="mt5">'.
+					'<tr><td class="top">'._user($r['user_id_add'], 'ava30').
+						'<td class="top">'.
+							'<div class="fs12 ml5 color-555">'._user($r['user_id_add'], 'name').'</div>'.
+							$un.
+				'</table>';
+
+			$user_id = $r['user_id_add'];
+			$un = '';
+		}
+	}
+
+	return $send;
+}
 
 
 

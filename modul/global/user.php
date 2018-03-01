@@ -1,5 +1,5 @@
 <?php
-function _user($user_id=USER_ID) {//получение данных о пользовате из контакта
+function _user($user_id=USER_ID, $i='') {//получение данных о пользовате из контакта
 	if(!_num($user_id))
 		return array();
 
@@ -11,6 +11,15 @@ function _user($user_id=USER_ID) {//получение данных о пользовате из контакта
 //		define('USER_APP_ONE', $u['app_count'] < 2);
 		define('USER_NAME', $u['i'].' '.$u['f']);//Имя Фамилия
 	}
+
+	if($i == 'name')
+		return $u['i'].' '.$u['f'];
+
+	if($i == 'ava')
+		return '<img src="'.$u['ava'].'" />';
+
+	if($i == 'ava30')
+		return '<img src="'.$u['ava'].'" width="30" />';
 
 	return $u;
 }
