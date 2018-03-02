@@ -318,18 +318,34 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		$elem_id = query_value($sql);
 		$dialog['history'][$n]['elem_id'] = $elem_id;
 
-		$tmp = '';
+		$tmp_txt = '';//текстовое содержание шаблона истории
+		$tmp_elm = array();//элементы, участвующие в шаблоне истории
 		if($elem_id) {
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `block_id`=-".$elem_id."
 					ORDER BY `sort`";
-			foreach(query_arr($sql) as $r) {
-				$num_1 = $r['num_1'] ? '['.$r['num_1'].'] ' : '';
-				$tmp.= $r['txt_7'].' '.$num_1.$r['txt_8'].' ';
+			if($elem = query_arr($sql)) {
+				$sql = "SELECT `id`,`col`
+						FROM `_element`
+						WHERE `id` IN ("._idsGet($elem, 'num_1').")";
+				$cols = query_ass($sql);
+				foreach($elem as $r) {
+					$num_1 = $r['num_1'] ? '[' . $r['num_1'] . ']' : '';
+					$tmp_txt .= $r['txt_7'].$num_1.$r['txt_8'];
+					switch($r['dialog_id']) {
+						case 11: $col = @$cols[$r['num_1']]; break;
+						case 32: $col = 'num'; break;
+						case 33: $col = 'dtime_add'; break;
+						default: $col = '';
+					}
+					$r['col'] = $col;
+					$tmp_elm[] = $r;
+				}
 			}
 		}
-		$dialog['history'][$n]['tmp'] = trim($tmp);
+		$dialog['history'][$n]['tmp'] = trim($tmp_txt);
+		$dialog['history'][$n]['tmp_elm'] = $tmp_elm;
 	}
 
 	return _cache($dialog);
@@ -572,17 +588,17 @@ function _elemTitle($elem_id) {//им€ элемента или его текст
 	return $dlg['history'][$el['num_1']]['tmp'];
 }
 
-function _elementChoose($el, $unit) {//выбор элементна дл€ вставки в блок
-	if(!$block_id = _num($unit['source']['block_id'], 1))
-		return _emptyMin('ќтсутствует id исходного блока.');
-	if(!$BL = _blockQuery($block_id))
-		return _emptyMin('»сходного блока id'.$block_id.' не существует.');
+function _elementChoose($el, $unit) {//выбор элемента дл€ вставки в блок
+	$BL['obj_name'] = $unit['source']['unit_id'] == -115 ? 'spisok' : '';
+	if($block_id = _num($unit['source']['block_id'], 1))
+		if(!$BL = _blockQuery($block_id))
+			return _emptyMin('»сходного блока id'.$block_id.' не существует.');
 
 	define('BLOCK_PAGE',   $BL['obj_name'] == 'page');
 	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
 	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
-	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//сборный текст
-	define('TD_PASTE', $unit['source']['unit_id'] == -112); //€чейка таблицы
+	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//сборный текст, шаблон истории действий
+	define('TD_PASTE', $unit['source']['unit_id'] == -112 || $unit['source']['unit_id'] == -115); //€чейка таблицы
 
 	//определение, принимает ли страница значени€ списка
 	$spisok_exist = false;
@@ -721,10 +737,16 @@ function _historySpisok($el) {//список истории действий [68]
 	$sql = "SELECT *
 			FROM `_history`
 			WHERE `app_id`=".APP_ID."
+			  AND `active`
 			ORDER BY `dtime_add` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
 		return '<div class="_empty min">»стории нет.</div>';
+
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `id` IN ("._idsGet($arr, 'unit_id').")";
+	$spUnit = query_arr($sql);
 
 	//распределение истории по дн€м
 	$spisok = array();
@@ -744,10 +766,25 @@ function _historySpisok($el) {//список истории действий [68]
 		$user_id =  $day_arr[0]['user_id_add'];
 		$un = '';
 		foreach($day_arr as $n => $r) {
+			$dlg = _dialogQuery($r['dialog_id']);
+			$msg = '';
+			$unit = $spUnit[$r['unit_id']];
+			foreach($dlg['history'][$r['type_id']]['tmp_elm'] as $el) {
+				$colVal = '';
+				if($col = $el['col']) {
+					if(!isset($unit[$col]))
+						continue;
+					if(!$colVal = $unit[$col])
+						continue;
+					if($col == 'dtime_add')
+						$colVal = _spisokUnitData($unit, $el);
+				}
+				$msg .= $el['txt_7'].$colVal.$el['txt_8'];
+			}
 			$un .= '<div class="history-un">'.
 						'<div class="history-o o'.$r['type_id'].'"></div>'.
 						'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
-						'¬несЄн новый клиент. '.
+						$msg.
 					'</div>';
 
 			$is_user = $user_id != $r['user_id_add'];//изменилс€ пользователь

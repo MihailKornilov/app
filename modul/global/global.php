@@ -166,8 +166,10 @@ function _sumSpace($sum, $oo=0, $znak=',') {//Приведение суммы к удобному виду с
 	$send = $oo && !$drob ? $send.$znak.'00' : $send;
 	return ($minus < 0 ? '-' : '').$send;
 }
-function _txt($v, $utf8=0) {
-	$v = htmlspecialchars(trim($v));
+function _txt($v, $utf8=0, $no_trim=0) {
+	$v = htmlspecialchars($v);
+	if(!$no_trim)
+		$v = trim($v);
 	return $utf8 ? $v : win1251($v);
 }
 function _br($v, $replace='<br />') {//вставка br в текст при нахождении enter

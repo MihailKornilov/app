@@ -658,6 +658,7 @@ function _dialogOpenLoad($dialog_id) {
 					$spisok[] = array(
 						'id' => _num($id),
 						'title' => utf8('выбрано'),
+						'dialog_id' => _num($r['dialog_id']),
 						'num_1' => _num($r['num_1']),
 						'num_8' => _num($r['num_8']),
 						'txt_7' => utf8($r['txt_7']),

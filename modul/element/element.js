@@ -2307,6 +2307,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,     //id элемента-сборки
+				dialog_id:50,  //id диалога, вносившего элемента-значения
 				num_1:0,  //id элемента-значения
 				title:'', //имя элемента-значения
 				txt_7:'', //текст слева
@@ -2347,10 +2348,12 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			var DD = DL.find('dd:last'),
 				TITLE = DD.find('.title');
 			TITLE.click(function() {
+				if(!v.dialog_id)
+					v.dialog_id = 50;
 				_dialogLoad({
-					dialog_id:11,
+					dialog_id:v.dialog_id,
 					dialog_source:i.source.dialog_source,
-					unit_id:v.id || -115,
+					unit_id:v.dialog_id != 50 ? v.id || -115 : -115,
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {

@@ -916,17 +916,13 @@ function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона ис
 	if(!$type_id = $val['type_id'])
 		return;
 
-	$val = $val['val'];
-
-	if(!empty($val)) {
-		if(!is_array($val))
-			return;
-
+	$val = @$val['val'];
+	if(!empty($val) && is_array($val)) {
 		$sort = 0;
 		foreach($val as $r) {
 			$num_1 = _num($r['num_1']);
-			$txt_7 = _txt($r['txt_7']);
-			$txt_8 = _txt($r['txt_8']);
+			$txt_7 = _txt($r['txt_7'], 0, 1);
+			$txt_8 = _txt($r['txt_8'], 0, 1);
 			if(!$num_1 && !$txt_7 && !$txt_8)
 				continue;
 			if($id = _num($r['id']))
@@ -984,6 +980,13 @@ function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона ис
 				`num_2`=".$dlg_id.",
 				`txt_1`='".($ids ? $ids : '')."'
 			WHERE `id`=".$unit['id'];
+	query($sql);
+
+	//обновление активности в истории
+	$sql = "UPDATE `_history`
+			SET `active`=".($ids ? 1 : 0)."
+			WHERE `type_id`=".$type_id."
+			  AND `dialog_id`=".$dlg_id;
 	query($sql);
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
