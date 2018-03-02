@@ -442,10 +442,14 @@ function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые м
 
 	$send = array();
 	foreach($elm as $elem_id => $r) {
-		if($r['dialog_id'] != 14 && $r['dialog_id'] != 23)
+		if($r['dialog_id'] != 14 && $r['dialog_id'] != 23 && $r['dialog_id'] != 68)
 			continue;
-		$dialog = _dialogQuery($r['num_1']);
-		$send[$elem_id] = utf8($dialog['spisok_name'].' (в '.$block['obj_name'].'-блоке '.$r['block_id'].')');
+
+		if($r['dialog_id'] == 68)
+			$spisokName = 'История действий';
+		else
+			$spisokName = _dialogParam($r['num_1'], 'spisok_name');
+		$send[$elem_id] = utf8($spisokName.' (в '.$block['obj_name'].'-блоке '.$r['block_id'].')');
 	}
 
 	return $send;
@@ -733,11 +737,36 @@ function _historySetup($el, $unit) {//настройка шаблона истории действий (подклю
 	*/
 	return '<input type="hidden" id="type_id" />';
 }
+function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действий
+	//история не вносится, если единица списка удаляется физически из базы
+	if(!isset($dialog['field']['deleted']))
+		return;
+
+	$active = empty($dialog['history'][$type_id]['tmp_elm']) ? 0 : 1;
+
+	$sql = "INSERT INTO `_history` (
+				`app_id`,
+				`type_id`,
+				`dialog_id`,
+				`unit_id`,
+				`active`,
+				`user_id_add`
+			) VALUES (
+				".APP_ID.",
+				".$type_id.",
+				".$dialog['id'].",
+				".$unit_id.",
+				".$active.",
+				".USER_ID."
+			)";
+	query($sql);
+}
 function _historySpisok($el) {//список истории действий [68]
 	$sql = "SELECT *
 			FROM `_history`
 			WHERE `app_id`=".APP_ID."
 			  AND `active`
+			  "._historyCond52($el)."
 			ORDER BY `dtime_add` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
@@ -807,6 +836,57 @@ function _historySpisok($el) {//список истории действий [68]
 	}
 
 	return $send;
+}
+function _historyCond52($el) {//отображение истории для конкретной единицы списка (связка)
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `dialog_id`=52
+			  AND `num_1`=".$el['id']."
+			LIMIT 1";
+	if(!query_value($sql))
+		return '';
+
+	//проверка, чтобы список был размещён именно на странице
+	if($el['block']['obj_name'] != 'page')
+		return ' AND !`id`';
+
+	//страница, на которой размещён список
+	if(!$page = _page($el['block']['obj_id']))
+		return ' AND !`id`';
+
+	//id диалога, единица списка которого размещается на странице
+	if(!$spisok_id = $page['spisok_id'])
+		return ' AND !`id`';
+
+	if(!$unit_id = _num(@$_GET['id']))
+		return ' AND !`id`';
+
+	$ids = 0;
+
+	//получение id единиц списка, которые были связаны с текущей единицей
+	$sql = "SELECT `block_id`,`col`
+			FROM `_element`
+			WHERE `dialog_id`=29
+			  AND `num_1`=".$spisok_id."
+			  AND LENGTH(`col`)";
+	if($cols = query_ass($sql)) {
+		$cond = array();
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `obj_name`='dialog'
+				  AND `id` IN ("._idsGet($cols, 'key').")";
+		foreach(query_arr($sql) as $r)
+			$cond[] = "`dialog_id`=".$r['obj_id']." AND `".$cols[$r['id']]."`=".$unit_id;
+
+		if(!empty($cond)) {
+			$sql = "SELECT `id`
+					FROM `_spisok`
+					WHERE ".implode(' OR ', $cond);
+			$ids = query_ids($sql);
+		}
+	}
+
+	return " AND `unit_id` IN (".$unit_id.",".$ids.")";
 }
 
 
