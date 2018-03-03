@@ -1774,6 +1774,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				BLOCK = DD.find('.pk-block');
 			NAME.focus();
 			BLOCK.click(function() {
+				_cookie('block_level_page', 1);
 				var deny = [];
 				_forEq(el.find('dd'), function(sp) {
 					var num = _num(sp.attr('data-num')),
