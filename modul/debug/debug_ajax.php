@@ -7,15 +7,20 @@ switch(@$_POST['op']) {
 		_cache('clear', '_userCache'.USER_ID);//текущий пользователь
 		_cache('clear', '_pageCache');        //страницы
 		_cache('clear', '_imageServerCache'); //серверы изображений
-//		_cache('clear', 'page_67');
 
 		//диалоговые окна
 		$sql = "SELECT `id`
 				FROM `_dialog`
 				WHERE `app_id` IN(0,".APP_ID.")";
-		$arr = query_arr($sql);
-		foreach($arr as $r)
+		foreach(query_arr($sql) as $r)
 			_cache('clear', '_dialogQuery'.$r['id']);
+
+		//страницы
+		$sql = "SELECT `id`
+				FROM `_page`
+				WHERE `app_id` IN(0,".APP_ID.")";
+		foreach(query_arr($sql) as $r)
+			_cache('clear', 'page_'.$r['id']);
 
 		jsonSuccess();
 		break;
