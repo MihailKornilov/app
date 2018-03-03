@@ -335,7 +335,7 @@ function _elemDiv($el, $unit=array()) {//формирование div элемента
 	$txt = _elemUnit($el, $unit);
 
 	//если элемент списка шаблона, attr_id не ставится
-	$attr_id = $el['block']['obj_name'] == 'spisok' ? '' : ' id="el_'.$el['id'].'"';
+	$attr_id = !BLOCK_EDIT && $el['block']['obj_name'] == 'spisok' ? '' : ' id="el_'.$el['id'].'"';
 
 	$cls = array();
 	$cls[] = _elemFormatColor($txt, $el, $el['color']);
@@ -812,13 +812,15 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				case 29:
 					if(!$UNIT_ISSET)
 						return 'связка';
-					if(!$connect_id = $unit[$elem['col']])
+					if(!$sp = $unit[$elem['col']])
 						return '';
-					$dialog = _dialogQuery($unit['dialog_id']);
-					$sql = "SELECT *
-							FROM `".$dialog['base_table']."`
-							WHERE `id`=".$connect_id;
-					$sp = query_assoc($sql);
+					if(!is_array($sp)) {
+						$dialog = _dialogQuery($unit['dialog_id']);
+						$sql = "SELECT *
+								FROM `".$dialog['base_table']."`
+								WHERE `id`=".$sp;
+						$sp = query_assoc($sql);
+					}
 					$txt = $sp['txt_1'];
 					$txt = _spisokUnitUrl($txt, $sp, $el['url']);
 					return $txt;
