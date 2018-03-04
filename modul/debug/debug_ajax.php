@@ -12,15 +12,49 @@ switch(@$_POST['op']) {
 		$sql = "SELECT `id`
 				FROM `_dialog`
 				WHERE `app_id` IN(0,".APP_ID.")";
-		foreach(query_arr($sql) as $r)
-			_cache('clear', '_dialogQuery'.$r['id']);
+		$dialog_ids = query_ids($sql);
+		foreach(_ids($dialog_ids, 1) as $id)
+			_cache('clear', '_dialogQuery'.$id);
+
+		//блоки, которые используются на в диалогах
+		$sql = "SELECT `id`
+				FROM `_block`
+				WHERE `obj_name`='dialog'
+				  AND `obj_id` IN (".$dialog_ids.")";
+		$block_ids = query_ids($sql);
+
+		//списки, которые расположены в диалогах
+		$sql = "SELECT `block_id`
+				FROM `_element`
+				WHERE `dialog_id`=14
+				  AND `block_id` IN (".$block_ids.")";
+		if($spisok_ids = query_ids($sql))
+			foreach(_ids($spisok_ids, 1) as $id)
+				_cache('clear', 'spisok_'.$id);
 
 		//страницы
 		$sql = "SELECT `id`
 				FROM `_page`
 				WHERE `app_id` IN(0,".APP_ID.")";
-		foreach(query_arr($sql) as $r)
-			_cache('clear', 'page_'.$r['id']);
+		$page_ids = query_ids($sql);
+		foreach(_ids($page_ids, 1) as $id)
+			_cache('clear', 'page_'.$id);
+
+		//блоки, которые используются на страницах
+		$sql = "SELECT `id`
+				FROM `_block`
+				WHERE `obj_name`='page'
+				  AND `obj_id` IN (".$page_ids.")";
+		$block_ids = query_ids($sql);
+
+		//списки, которые расположены на страницах
+		$sql = "SELECT `block_id`
+				FROM `_element`
+				WHERE `dialog_id`=14
+				  AND `block_id` IN (".$block_ids.")";
+		if($spisok_ids = query_ids($sql))
+			foreach(_ids($spisok_ids, 1) as $id)
+				_cache('clear', 'spisok_'.$id);
 
 		jsonSuccess();
 		break;

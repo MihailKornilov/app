@@ -60,14 +60,6 @@ $(document)
 			}
 		}, 'json');
 	})
-	.on('click', '#cache_clear', function() {
-		$.post(AJAX, {'op':'cache_clear'}, function(res) {
-			if(res.success) {
-				_msg('Кэш очищен');
-				location.reload();
-			}
-		}, 'json');
-	})
 
 	.ready(function() {
 		if(!_cookie('debug_pg'))
