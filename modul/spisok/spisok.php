@@ -254,7 +254,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$txt = '';
 					$cls = array();
 					switch($td['dialog_id']) {
-						case 11://из диалога
+						case 1111://из диалога
 							$elemUse = $tabElemUse[$td['txt_2']];
 							$el = $CMP[$elemUse['id']];
 
