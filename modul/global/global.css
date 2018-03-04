@@ -598,13 +598,14 @@ button.vk._busy{color:transparent}
 .bg-gr1{background-color:#FaFaFa}/* светло-серый */
 .bg-gr2{background-color:#F2F6F9}/* бледно-серо-синий */
 .bg-gr3{background-color:#F7F7F7}/* стандарт светло-серый */
-.bg-fee{background-color:#fee}/* бледно-красный */
+.bg-fee{background-color:#fee}   /* бледно-красный */
 .bg-ffe{background-color:#ffe}
 .bg-ffd{background-color:#ffd}
 .edtd,/* отредактировано. При наведении класс удаляется */
 .bg-ffc{background-color:#ffc}   /* жёлтый - данные изменены */
 .bg-fcc{background-color:#fcc}  /* красный - ошибка */
 .bg-dfd{background-color:#dfd}  /* зелёный */
+.bg-efe{background-color:#efe}  /* светло-зелёный */
 .bg-ddf{background-color:#ddf}  /* синий */
 .bg-ccd{background-color:#cce}  /* фиолетовый */
 

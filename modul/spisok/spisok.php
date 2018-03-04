@@ -251,9 +251,10 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			foreach($spisok as $sp) {
 				$html .= '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
 				foreach($tabCol as $td) {
-					$txt = '';
+//					$txt = '';
 					$cls = array();
 					switch($td['dialog_id']) {
+/*
 						case 1111://из диалога
 							$elemUse = $tabElemUse[$td['txt_2']];
 							$el = $CMP[$elemUse['id']];
@@ -277,6 +278,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
 						break;
+*/
 						case 34: $cls[] = 'pad0'; //иконки управления
 						default:
 							$txt = _elemUnit($td, $sp);
