@@ -845,7 +845,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 							busy_cls:'hold',
 							func_save:function(ia) {
 								v[n] = ia.unit.id;
-								t.val('выбрано');
+								t.val(ia.unit.title);
 								$(el.attr_cmp).val(v.join(','));
 							}
 						});

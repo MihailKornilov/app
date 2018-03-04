@@ -584,12 +584,24 @@ function _blockQuery($block_id) {//запрос одного блока
 function _elemTitle($elem_id) {//имя элемента или его текст
 	if(!$el = _elemQuery($elem_id))
 		return '';
-	if($el['dialog_id'] != 67)
-		return '';
 
-	_cache('clear', '_dialogQuery'.$el['num_2']);
-	$dlg = _dialogQuery($el['num_2']);
-	return $dlg['history'][$el['num_1']]['tmp'];
+	switch($el['dialog_id']) {
+		case 10: return $el['txt_1']; //произвольный текст
+		case 11: //значение диалога
+			$title = '';
+			foreach(_ids($el['txt_2'], 1) as $n => $id)
+				$title .= ($n ? ' » ' : '')._elemTitle($id);
+			return $title;
+		case 29: //связки
+		case 59: return _dialogParam($el['num_1'], 'spisok_name');
+		case 32: return 'номер';
+		case 33: return 'дата/время';
+		case 67://шаблон истории действий
+			_cache('clear', '_dialogQuery'.$el['num_2']);
+			$dlg = _dialogQuery($el['num_2']);
+			return $dlg['history'][$el['num_1']]['tmp'];
+	}
+	return $el['name'];
 }
 
 function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
@@ -806,7 +818,7 @@ function _historySpisok($el) {//список истории действий [68]
 					if(!$colVal = $unit[$col])
 						continue;
 					if($col == 'dtime_add')
-						$colVal = _spisokUnitData($unit, $el);
+						$colVal = _spisokUnitData($el, $unit);
 				}
 				$msg .= $el['txt_7'].$colVal.$el['txt_8'];
 			}

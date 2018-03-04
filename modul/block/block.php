@@ -583,6 +583,8 @@ function _block($obj_name, $obj_id, $i='all') {
 			foreach($bl as $k => $v) {
 				if($k == 'focus' && !$v)
 					continue;
+				if($k == 'func')
+					continue;
 				if(is_array($v)) {
 					if(empty($v))
 						continue;

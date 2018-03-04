@@ -382,16 +382,16 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	return 'Неизвестный внешний вид списка: '.$ELEM['num_1'];
 }
 
-function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
+function _spisokUnitNum($el, $u) {//порядковый номер - значение единицы списка
 	if(empty($u))
-		return 'порядковый номер';
+		return _elemTitle($el['id']);
 	if(empty($u['num']))
 		return $u['id'];
 	return $u['num'];
 }
-function _spisokUnitData($unit, $el) {//дата и время - значение единицы списка [33]
+function _spisokUnitData($el, $unit) {//дата и время - значение единицы списка [33]
 	if(empty($unit) || empty($unit['dtime_add']))
-		return 'дата и время';
+		return _elemTitle($el['id']);
 
 	$dtime = $unit['dtime_add'];
 

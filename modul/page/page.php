@@ -588,8 +588,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				txt_2 - имя второго значения
 			*/
 			$ex = explode(',', $v);
-			$v0 = _num(@$ex[0]) ? 'выбрано' : '';
-			$v1 = _num(@$ex[1]) ? 'выбрано' : '';
+			$v0 = _num(@$ex[0]) ? _elemTitle($ex[0]) : '';
+			$v1 = _num(@$ex[1]) ? _elemTitle($ex[1]) : '';
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 				'<input type="text" id="'.$attr_id.'_sv" class="sv w125 curP over1 color-pay" placeholder="'.$el['txt_1'].'" val="0" readonly'.$disabled.' value="'.$v0.'" />'.
@@ -796,6 +796,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						возможна иерархия элементов через запятую 256,1312,560
 			*/
 
+			if(!$UNIT_ISSET)
+				return _elemTitle($el['id']);
+
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `id` IN ("._ids($el['txt_2']).")";
@@ -804,33 +807,21 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			$send = '';
 
-			foreach(_ids($el['txt_2'], 1) as $n => $elem_id) {
+			foreach(_ids($el['txt_2'], 1) as $elem_id) {
 				$elem = $elemArr[$elem_id];
-				if(!$UNIT_ISSET && $n)
-					$send .= ' » ';
 				switch($elem['dialog_id']) {
 					//однострочное поле
 					case 8:
-						if(!$UNIT_ISSET) {
-							$send .= 'text';
-							break;
-						}
 						$txt = $unit[$elem['col']];
 	//					$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 						$txt = _spisokUnitUrl($txt, $unit, $el['url']);
 						$send .= $txt;
 						break;
 					//произвольный текст
-					case 10:
-						$send .= $elem['txt_1'];
-						break;
+					case 10: $send .= $elem['txt_1']; break;
+					//связки
 					case 29:
 					case 59:
-						$dlg = _dialogQuery($elem['num_1']);
-						if(!$UNIT_ISSET) {
-							$send .= $dlg['spisok_name'];
-							break;
-						}
 						if(!$sp = $unit[$elem['col']])
 							$send .= 'connect_no';
 						if(!is_array($sp)) {
@@ -845,37 +836,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						break;
 					//сумма значений единицы списка
 					case 27:
-						if(!$UNIT_ISSET) {
-							$send .= $elem['txt_1'];
-							break;
-						}
-						$txt = $unit[$elem['col']];
-						$send .= $txt;
-						break;
 					//количество связанного списка
 					case 54:
-						if(!$UNIT_ISSET) {
-							$send .= $elem['txt_1'];
-							break;
-						}
-						$txt = $unit[$elem['col']];
-						$send .= $txt;
-						break;
 					//сумма связанного списка
-					case 55:
-						if(!$UNIT_ISSET) {
-							$send .= $elem['txt_1'];
-							break;
-						}
-						$txt = $unit[$elem['col']];
-						$send .= $txt;
-						break;
+					case 55: $send .= $unit[$elem['col']]; break;
 					//Изображение
 					case 60:
-						if(!$UNIT_ISSET) {
-							$send .= 'img';
-							break;
-						}
 						if(!$col = $elem['col']) {
 							$send .= '';
 							break;
@@ -1264,7 +1230,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
 
 		//Значение списка: порядковый номер
-		case 32: return _spisokUnitNum($unit);
+		case 32: return _spisokUnitNum($el, $unit);
 
 		//Значение списка: дата
 		case 33:
@@ -1281,7 +1247,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_4 - показывать время в формате 12:45
 			*/
 
-			return _spisokUnitData($unit, $el);
+			return _spisokUnitData($el, $unit);
 
 		//Значение списка: иконки управления
 		case 34:
