@@ -349,12 +349,12 @@ function _elemDiv($el, $unit=array()) {//формирование div элемента
 	return '<div'.$attr_id.$cls._elemStyle($el).'>'.$txt.'</div>';
 }
 function _elemFormat($txt, $el) {//дополнительное форматирование для чисел
+	if($el['format_hide'] && empty($txt))
+		return '';
 	if(!preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
-
-	if($el['format_hide'])
-		if(empty($txt))
-			return '';
+	if($el['format_hide'] && !_cena($txt, 1))
+		return '';
 
 	if($el['format_space'])
 		$txt = _sumSpace($txt, $el['format_fract_0_show'], $el['format_fract_char']);

@@ -630,7 +630,7 @@ function _spisokCond62($el) {//фильтр-галочка
 	//колонки, по которым будет производиться фильтр
 	$sql = "SELECT `id`,`col`
 			FROM `_element`
-			WHERE `id` IN ("._idsGet($cond, 'num_1').")";
+			WHERE `id` IN ("._idsGet($cond, 'txt_2').")";
 	if(!$elCol = query_ass($sql))
 		return '';
 
@@ -649,7 +649,7 @@ function _spisokCond62($el) {//фильтр-галочка
 
 	$send = '';
 	foreach($cond as $r) {
-		if(!$col = $elCol[$r['num_1']])
+		if(!$col = $elCol[$r['txt_2']])
 			continue;
 		$val = addslashes($r['txt_8']);
 		switch($r['num_8']) {

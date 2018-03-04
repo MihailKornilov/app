@@ -1015,7 +1015,7 @@ function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (бал
 		return;
 
 	//получение данных значений для подсчёта
-	$sql = "SELECT `num_1`,`num_8`
+	$sql = "SELECT `txt_2`,`num_8`
 			FROM `_element`
 			WHERE `id` IN (".$ids.")";
 	if(!$elData = query_ass($sql))
@@ -1130,7 +1130,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 		return;
 	if(!$elForSum = _elemQuery($elem_id))
 		return;
-	if(!$elForSum_id = _num($elForSum['num_1']))
+	if(!$elForSum_id = _num($elForSum['txt_2']))
 		return;
 	if(!$cmpSum = @$DConn['cmp_utf8'][$elForSum_id])
 		return;
@@ -1256,7 +1256,7 @@ function _spisokUnitCount29($cmp, $dialog, $unit) {//пересчёт количеств привязан
 		query($sql);
 	}
 }
-function _spisokUnitSum29($cmp, $dialog, $unit) {//пересчёт сумм привязаного списка
+function _spisokUnitSum29($cmp, $dialog, $unit) {//пересчёт сумм привязаного списка после внесения/удаления данных
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=55
@@ -1277,7 +1277,7 @@ function _spisokUnitSum29($cmp, $dialog, $unit) {//пересчёт сумм привязаного спи
 			continue;
 		if($el['dialog_id'] != 11)//ссылка элемент с колонкой суммы указывался через [11]
 			continue;
-		if(!$el = _elemQuery($el['num_1']))
+		if(!$el = _elemQuery($el['txt_2']))
 			continue;
 		if(!$colSumGet = $el['col'])
 			continue;
@@ -1335,7 +1335,7 @@ function _spisokUnitBalans29($elUpd) {
 
 			$upd_flag = 0;//флаг обновления баланса. Будет установлен, если присутствует элемент, участвующий в обновлении.
 			foreach($arr as $r)
-				if($r['num_1'] == $el['id']) {
+				if($r['txt_2'] == $el['id']) {
 					$upd_flag = 1;
 					break;
 				}
@@ -1344,13 +1344,13 @@ function _spisokUnitBalans29($elUpd) {
 
 			$sql = "SELECT *
 					FROM `_element`
-					WHERE `id` IN ("._idsGet($arr, 'num_1').")";
+					WHERE `id` IN ("._idsGet($arr, 'txt_2').")";
 			if(!$dlgElUpd = query_arr($sql))
 				continue;
 
 			$upd = '';
 			foreach($arr as $r) {
-				if(!$elUpd = $dlgElUpd[$r['num_1']])
+				if(!$elUpd = $dlgElUpd[$r['txt_2']])
 					continue;
 				if(!$col = $elUpd['col'])
 					continue;
