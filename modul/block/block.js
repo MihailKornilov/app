@@ -133,6 +133,9 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		});
 	},
 	_blockUnitBg = function(BL) {//заливка блока
+		var BGS = 'bg-fff bg-gr1 bg-gr2 bg-gr3 bg-ffe bg-efe bg-fee',
+			div = '';
+
 		$(document)
 			.off('click', '#block-set-bg div')
 			.on('click', '#block-set-bg div', function() {
@@ -141,7 +144,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 					sel = unit.hasClass('sel');
 
 				unit.parent().find('.sel').removeClass('sel');
-				$(BL.attr_bl).removeClass('bg-fff bg-gr1 bg-gr2 bg-gr3 bg-ffe bg-efe bg-fee');
+				$(BL.attr_bl).removeClass(BGS);
 
 				if(!sel) {
 					unit.addClass('sel');
@@ -152,16 +155,14 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				BL.save = 1;
 			});
 
+		_forN(BGS.split(' '), function(sp, n) {
+			var sel = BL.bg == sp ? ' sel' : '',
+				ml3 = n ? ' ml3' : '';
+			div += '<div class="dib center h25 w25 bor-e8 curP fs17 grey ' + sp + ml3 + sel + '" val="' + sp + '">&#10004;</div>';
+		});
+
 		return '<div class="color-555 fs14 mt5">Заливка:</div>' +
-			'<div id="block-set-bg" class="mt3">' +
-				'<div class="' + (BL.bg == 'bg-fff' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP     bg-fff" val="bg-fff"></div>' +
-				'<div class="' + (BL.bg == 'bg-gr1' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-gr1" val="bg-gr1"></div>' +
-				'<div class="' + (BL.bg == 'bg-gr3' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-gr3" val="bg-gr3"></div>' +
-				'<div class="' + (BL.bg == 'bg-gr2' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-gr2" val="bg-gr2"></div>' +
-				'<div class="' + (BL.bg == 'bg-ffe' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-ffe" val="bg-ffe"></div>' +
-				'<div class="' + (BL.bg == 'bg-efe' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-efe" val="bg-efe"></div>' +
-				'<div class="' + (BL.bg == 'bg-fee' ? 'sel' : '') + ' dib h25 w25 bor-e8 curP ml3 bg-fee" val="bg-fee"></div>' +
-			'</div>';
+			   '<div id="block-set-bg" class="mt3">' + div + '</div>';
 	},
 	_blockUnitBor = function(BL) {//границы блока
 		var bor = BL.bor.split(' ');
