@@ -352,6 +352,10 @@ function _elemFormat($txt, $el) {//дополнительное форматирование для чисел
 	if(!preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
 
+	if($el['format_hide'])
+		if(empty($txt))
+			return '';
+
 	if($el['format_space'])
 		$txt = _sumSpace($txt, $el['format_fract_0_show'], $el['format_fract_char']);
 	else {
@@ -1432,6 +1436,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				return '<div class="_empty min">История действий.</div>';
 
 			return _historySpisok($el);
+
+		//Значение списка: имя пользователя
+		case 69: return _spisokUnitUser($el, $unit);
 
 
 

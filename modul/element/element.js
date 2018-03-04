@@ -197,6 +197,9 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 
 		var DLG = {
 			id:o.dialog_id,
+			D:function(attr) {//получение значений по аттрибутам конкретно из этого диалога
+				return content.find(attr);
+			},
 			close:dialogClose,
 			hide:function() {
 				DBACK.hide();
@@ -2035,17 +2038,18 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 		return arr;
 	},
 
-	_elemGroup = function(v) {//функция, которая выполняется после открытия окна выбора элемента
-		$('.el-group-head').click(function() {//переключение меню
+	_elemGroup = function(v, dlg) {//функция, которая выполняется после открытия окна выбора элемента
+		var D = dlg.D;
+		D('.el-group-head').click(function() {//переключение меню
 			var t = $(this),
 				id = t.attr('val');
-			$('.el-group-head').removeClass('sel');
+			D('.el-group-head').removeClass('sel');
 			t.addClass('sel');
 
-			$('#elem-group .cnt')._dn(0);
-			$('#cnt_' + id)._dn(1);
+			D('#elem-group .cnt')._dn(0);
+			D('#cnt_' + id)._dn(1);
 		});
-		$('.elem-unit').click(function() {//открытие диалога
+		D('.elem-unit').click(function() {//открытие диалога
 			var t = $(this);
 			v.dialog_id = t.attr('val');
 			_dialogLoad(v);
@@ -2053,7 +2057,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 
 		if(!SA)
 			return;
-		$('#elem-group .icon-edit').click(function(e) {//редактирование диалога
+		D('#elem-group .icon-edit').click(function(e) {//редактирование диалога
 			e.stopPropagation();
 			var t = $(this),
 				send = {
@@ -2064,7 +2068,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				};
 			_post(send, _dialogEdit);
 		});
-		_forEq($('#elem-group .cnt'), function(sp) {
+		_forEq(D('#elem-group .cnt'), function(sp) {
 			sp._sort({table:'_dialog'});
 		});
 	},
@@ -2102,7 +2106,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				send.d50close = function() {
 					dialog.close();
 				};
-				_elemGroup(send);
+				_elemGroup(send, dialog);
 			}
 			if(o.func_open)
 				o.func_open(res, dialog);

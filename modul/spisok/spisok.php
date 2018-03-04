@@ -428,6 +428,15 @@ function _spisokUnitData($unit, $el) {//дата и время - значение единицы списка [
 		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
 		$hh;                                                             //время
 }
+function _spisokUnitUser($el, $u) {//значение единицы списка - имя пользователя
+	if(empty($u))
+		return $el['name'];
+
+	if(empty($u['user_id_add']))
+		return 'no user';
+
+	return _user($u['user_id_add'], 'name');
+}
 function _spisokUnitIconEdit($dialog_id, $unit_id) {//иконки управления - значение единицы списка [34]
 	return
 		_iconEdit(array(
