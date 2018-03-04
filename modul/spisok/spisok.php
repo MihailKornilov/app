@@ -236,7 +236,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			//получение используемых значений списка
 			$sql = "SELECT *
 					FROM `_element`
-					WHERE `id` IN ("._idsGet($tabCol, 'num_1').")";
+					WHERE `id` IN ("._idsGet($tabCol, 'txt_2').")";
 			$tabElemUse = query_arr($sql);
 
 			$html = !$next ? '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">' : '';
@@ -255,7 +255,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$cls = array();
 					switch($td['dialog_id']) {
 						case 11://из диалога
-							$elemUse = $tabElemUse[$td['num_1']];
+							$elemUse = $tabElemUse[$td['txt_2']];
 							$el = $CMP[$elemUse['id']];
 
 							//элементу не присвоена колонка
@@ -678,7 +678,7 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 	$col0 = _num($ex[0]);
 	$col1 = _num(@$ex[1]);
 	if($cmp['txt_2']) {
-		$sql = "SELECT `id`,`num_1`
+		$sql = "SELECT `id`,`txt_2`
 				FROM `_element`
 				WHERE `id` IN ("._ids($cmp['txt_2']).")";
 		if($ass = query_ass($sql)) {

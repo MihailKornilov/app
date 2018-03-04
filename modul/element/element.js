@@ -196,6 +196,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 		}
 
 		var DLG = {
+			id:o.dialog_id,
 			close:dialogClose,
 			hide:function() {
 				DBACK.hide();
@@ -713,7 +714,12 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						return;
 					if(!window.DIALOG_OPEN)
 						return;
-					var bec = DIALOG_OPEN.content.find('.choose');
+					var DLG = DIALOG_OPEN,
+						D = function(attr) {
+							return DLG.content.find(attr);
+						},
+						bec = D('.choose'),
+						dlg_id =  _num(D('.dlg26').val());
 					bec.click(function() {
 						var t = $(this),
 							ids = [];
@@ -730,7 +736,31 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 							if(el.hasClass('sel'))
 								ids.push(_num(el.attr('val')));
 						});
-						$(el.attr_cmp).val(ids.join(','));
+						D(el.attr_cmp).val(ids.join(','));
+
+						if(el.num_3)
+							return;
+
+						//выбор подзначения из вложенного списка
+						var id = _num(D(el.attr_cmp).val()),
+							elm = window['ELM' + dlg_id][id];
+						if(elm.dialog_id != 29 && elm.dialog_id != 59)
+							return;
+
+						_dialogLoad({
+							dialog_id:11,
+							dialog_source:elm.num_1,
+							func_open:function(res, dlg) {
+								dlg.submit(function() {
+									var sel = dlg.content.find('.choose.sel').attr('val');
+									if(!sel)
+										return;
+									id = id + ',' + sel;
+									D(el.attr_cmp).val(id);
+									dlg.close();
+								});
+							}
+						});
 					});
 					return;
 				//select - выбор единицы из другого списка (для связки)

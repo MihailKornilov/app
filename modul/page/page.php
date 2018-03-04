@@ -788,83 +788,115 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Выбор значения для шаблона (выводится окно для выбора)
 		case 11:
 			/*
-				num_1 - id элемента, выбранного из диалога, который вносит данные списка (через dialog_id=26)
-				num_2 - является ссылкой
+				txt_2 - id элемента, выбранного из диалога, который вносит данные списка (через dialog_id=26)
+						возможна иерархия элементов через запятую 256,1312,560
 			*/
 
 			$sql = "SELECT *
 					FROM `_element`
-					WHERE `id`=".$el['num_1'];
-			if(!$elem = query_assoc($sql))
+					WHERE `id` IN ("._ids($el['txt_2']).")";
+			if(!$elemArr = query_arr($sql))
 				return 'элемент отсутствует';
 
-			switch($elem['dialog_id']) {
-				//однострочное поле
-				case 8:
-					if(!$UNIT_ISSET)
-						return 'text';
-					$txt = $unit[$elem['col']];
-//					$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
-					$txt = _spisokUnitUrl($txt, $unit, $el['url']);
-					return $txt;
-				//произвольный текст
-				case 10: return $elem['txt_1'];
-				case 29:
-					if(!$UNIT_ISSET)
-						return 'связка';
-					if(!$sp = $unit[$elem['col']])
-						return '';
-					if(!is_array($sp)) {
-						$dialog = _dialogQuery($unit['dialog_id']);
-						$sql = "SELECT *
-								FROM `".$dialog['base_table']."`
-								WHERE `id`=".$sp;
-						$sp = query_assoc($sql);
-					}
-					$txt = $sp['txt_1'];
-					$txt = _spisokUnitUrl($txt, $sp, $el['url']);
-					return $txt;
-				//сумма значений единицы списка
-				case 27:
-					if(!$UNIT_ISSET)
-						return $elem['txt_1'];
-					$txt = $unit[$elem['col']];
-					return $txt;
-				//количество связанного списка
-				case 54:
-					if(!$UNIT_ISSET)
-						return $elem['txt_1'];
-					$txt = $unit[$elem['col']];
-					return $txt;
-				//сумма связанного списка
-				case 55:
-					if(!$UNIT_ISSET)
-						return $elem['txt_1'];
-					$txt = $unit[$elem['col']];
-					return $txt;
-				//Изображение
-				case 60:
-					if(!$UNIT_ISSET)
-						return 'img';
-					if(!$col = $elem['col'])
-						return '';
-//					if(empty($unit[$elem['col']]))//id картинки хранится в колонке
-//						return '';
-//					if(!$img_id = _num($unit[$elem['col']]))//получение id картинки, либо вывод её, если уже сформирована
-//						return $unit[$elem['col']];
+			$send = '';
 
-					$sql = "SELECT *
-							FROM `_image`
-							WHERE `obj_name`='elem_".$elem['id']."'
-							  AND `obj_id`=".$unit['id']."
-							  AND !`deleted`
-							  AND !`sort`
-							LIMIT 1";
-					if(!$r = query_assoc($sql))
-						return _imageNo();
-					return _imageHtml($r);
+			foreach(_ids($el['txt_2'], 1) as $n => $elem_id) {
+				$elem = $elemArr[$elem_id];
+				if(!$UNIT_ISSET && $n)
+					$send .= ' » ';
+				switch($elem['dialog_id']) {
+					//однострочное поле
+					case 8:
+						if(!$UNIT_ISSET) {
+							$send .= 'text';
+							break;
+						}
+						$txt = $unit[$elem['col']];
+	//					$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
+						$txt = _spisokUnitUrl($txt, $unit, $el['url']);
+						$send .= $txt;
+						break;
+					//произвольный текст
+					case 10:
+						$send .= $elem['txt_1'];
+						break;
+					case 29:
+					case 59:
+						$dlg = _dialogQuery($elem['num_1']);
+						if(!$UNIT_ISSET) {
+							$send .= $dlg['spisok_name'];
+							break;
+						}
+						if(!$sp = $unit[$elem['col']])
+							$send .= 'connect_no';
+						if(!is_array($sp)) {
+							$dialog = _dialogQuery($unit['dialog_id']);
+							$sql = "SELECT *
+									FROM `".$dialog['base_table']."`
+									WHERE `id`=".$sp;
+							$unit = query_assoc($sql);
+							break;
+						}
+						$unit = $sp;
+						break;
+					//сумма значений единицы списка
+					case 27:
+						if(!$UNIT_ISSET) {
+							$send .= $elem['txt_1'];
+							break;
+						}
+						$txt = $unit[$elem['col']];
+						$send .= $txt;
+						break;
+					//количество связанного списка
+					case 54:
+						if(!$UNIT_ISSET) {
+							$send .= $elem['txt_1'];
+							break;
+						}
+						$txt = $unit[$elem['col']];
+						$send .= $txt;
+						break;
+					//сумма связанного списка
+					case 55:
+						if(!$UNIT_ISSET) {
+							$send .= $elem['txt_1'];
+							break;
+						}
+						$txt = $unit[$elem['col']];
+						$send .= $txt;
+						break;
+					//Изображение
+					case 60:
+						if(!$UNIT_ISSET) {
+							$send .= 'img';
+							break;
+						}
+						if(!$col = $elem['col']) {
+							$send .= '';
+							break;
+						}
+	//					if(empty($unit[$elem['col']]))//id картинки хранится в колонке
+	//						$send .= '';
+	//					if(!$img_id = _num($unit[$elem['col']]))//получение id картинки, либо вывод её, если уже сформирована
+	//						$send .= $unit[$elem['col']];
+
+						$sql = "SELECT *
+								FROM `_image`
+								WHERE `obj_name`='elem_".$elem['id']."'
+								  AND `obj_id`=".$unit['id']."
+								  AND !`deleted`
+								  AND !`sort`
+								LIMIT 1";
+						if(!$r = query_assoc($sql)) {
+							$send .= _imageNo();
+							break;
+						}
+						$send .= _imageHtml($r);
+						break;
+				}
 			}
-			return 'значение '.$elem['dialog_id'].' ещё не сделано';
+			return $send;
 
 		//SA: Функция PHP
 		case 12:
@@ -1208,14 +1240,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'choose_deny' => $choose_deny      //ids элементов или блоков, которые выбирать нельзя (если они были выбраны другой фукцией того же элемента)
 			);
 
-			//выбирается только одно значение
-			if(!$el['num_3'])
-				$v = _num($v);
-
 			return
 			'<div class="fs14 pad10 pl15 bg-gr2 line-b">Диалоговое окно <b class="fs14">'.$dialog['spisok_name'].'</b>:</div>'.
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
+			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send).
+			'<input type="hidden" class="dlg26" value="'.$dialog_id.'" />'.
+			'<script>ELM'.$dialog_id.'='._block('dialog', $dialog_id, 'elem_js').';</script>';
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ТАБЛИЧНОГО содержания списка
 		case 30:
