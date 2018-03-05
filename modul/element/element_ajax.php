@@ -937,6 +937,46 @@ function _dialogOpenLoad($dialog_id) {
 
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
 				break;
+			//÷вета дл€ фона
+			case 70:
+				$color = array(
+					'#fff',
+					'#ffffe4',
+					'#e4ffe4',
+					'#dff',
+					'#ffe8ff',
+
+					'#f9f9f9',
+					'#ffb',
+					'#cfc',
+					'#aff',
+					'#fcf',
+
+					'#f3f3f3',
+					'#fec',
+					'#F2F2B6',
+					'#D7EBFF',
+					'#ffe4e4',
+
+					'#ededed',
+					'#FFDA8F',
+					'#E3E3AA',
+					'#B2D9FF',
+					'#fcc'
+				);
+
+				$sel = '#fff';//выбранное значение
+				if($unit_id)
+					$sel = $unit[$cmp['col']];
+
+				$spisok = '';
+				for($n = 0; $n < count($color); $n++) {
+					$cls = $sel == $color[$n] ? ' class="sel"' : '';
+					$spisok .= '<div'.$cls.' style="background-color:'.$color[$n].'" val="'.$color[$n].'">'.
+									'&#10004;'.
+							   '</div>';
+				}
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = '<div class="_color-bg-choose">'.$spisok.'</div>';
 		}
 
 	$send['blk'] = $dialog['blk'];

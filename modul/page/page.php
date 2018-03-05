@@ -707,6 +707,21 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'<div class="un-html">'._spisok59unit($el['id'], $v).'</div>'.
 			'</div>';
 
+		//Выбор цвета текста
+		case 66:
+			/*
+			*/
+			return
+				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+				'<div class="_color" style="background-color:#000"></div>';
+
+		//Выбор цвета фона
+		case 70:
+			$v = empty($v) ? '#fff' : '';
+			return
+				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+				'<div class="_color-bg" style="background-color:'.$v.'"></div>';
+
 
 
 
@@ -1387,14 +1402,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					'</table>'.
 				'</div>'.
 			'</div>';
-
-		//Выбор цвета
-		case 66:
-			/*
-			*/
-			return
-				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				'<div class="_color" style="background-color:#000"></div>';
 
 		//Список истории действий
 		case 68:

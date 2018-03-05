@@ -1259,7 +1259,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						}
 					});
 					return;
-				//Выбор цвета
+				//Выбор цвета текста
 				case 66:
 					var func = function(v) {
 							$(el.attr_cmp).val(v);
@@ -1267,6 +1267,26 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						html = _color($(el.attr_cmp).val(), func);
 					$(el.attr_cmp).next().remove('._color');
 					$(el.attr_cmp).after(html);
+					return;
+				//Выбор цвета фона
+				case 70:
+					$(el.attr_cmp).next()._hint({
+						msg:el.vvv,
+						pad:3,
+						side:'right',
+						func:function(h) {
+							var div = h.find('._color-bg-choose div');
+							div.click(function() {
+								var t = $(this),
+									c = t.attr('val');
+								div.removeClass('sel');
+								t.addClass('sel');
+								$(el.attr_cmp)
+									.val(c)
+									.next().css('background-color', c);
+							});
+						}
+					});
 					return;
 			}
 		});
@@ -3702,11 +3722,11 @@ $.fn._hint = function(o) {//выплывающие подсказки
 	body.find('._hint').remove();
 	body.append(html);
 
-	o.func();
-
 	var HINT = $('#hint' + HN),
 		MSG = HINT.find('.hi-msg'),
 		UG = HINT.find('.ug');
+
+	o.func(MSG);
 
 	HINT.css('z-index', ZINDEX + 6);
 
