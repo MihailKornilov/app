@@ -2871,7 +2871,8 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		ICON_ADD = SEL.find('.icon-add'),
 		MASS_ASS,//ассоциативный массив в виде {1:'text'}
 		MASS_SEL,//массив в виде [{id:1,title:'text1'},{id:2,title:'text2'}]
-		MASS_SEL_SAVE;//дублирование MASS_SEL
+		MASS_SEL_SAVE,//дублирование MASS_SEL
+		BG_ASS;  //ассоциативный массив цветов фона
 
 	massCreate();
 	spisokPrint();
@@ -2962,6 +2963,7 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		MASS_ASS = {};
 		MASS_SEL = [];
 		MASS_SEL_SAVE = [];
+		BG_ASS = {};
 
 		if(o.title0)
 			MASS_ASS[0] = '';
@@ -3019,10 +3021,12 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 				id:id,
 				title:title,
 				content:content,
-				info:_num(sp.info)//флаг информационного значения. Значение нельзя выбрать.
+				info:_num(sp.info),//флаг информационного значения. Значение нельзя выбрать.
+				bg:sp.bg
 			};
 			MASS_SEL.push(unit);
 			MASS_SEL_SAVE.push(unit);
+			BG_ASS[id] = sp.bg;
 		});
 	}
 	function spisokPrint() {//вставка списка в select
@@ -3038,8 +3042,9 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 
 		_forN(MASS_SEL, function(sp) {
 			var info = sp.info ? ' info' : '',
-				val = info ? '' : ' val="' + sp.id + '"';
-			html += '<div class="select-unit' + info + '"' + val + '>' + sp.content + '</div>';
+				val = info ? '' : ' val="' + sp.id + '"',
+				bg = sp.bg ? ' style="background-color:' + sp.bg + '"' : '';
+			html += '<div class="select-unit' + info + '"' + bg + val + '>' + sp.content + '</div>';
 		});
 
 		RES.html(html);
@@ -3060,7 +3065,11 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		VALUE = v;
 		t.val(v);
 		INP.val(MASS_ASS[v]);
-		ICON_DEL._dn(v && o.write)
+		ICON_DEL._dn(v && o.write);
+		if(BG_ASS[v]) {
+			SEL.css('background-color', BG_ASS[v]);
+			INP.css('background-color', BG_ASS[v]);
+		}
 	}
 	function action() {//выполнение действия в существующем селекте
 		if(s === undefined)

@@ -161,7 +161,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 			div += '<div class="dib center w25 h25 bor-e8 curP fs17 grey ' + sp + ml3 + sel + '" val="' + sp + '">&#10004;</div>';
 		});
 
-		div += '<div val="bg71" class="prel dib center w25 bor-e8 curP grey ml3' + (BL.bg == 'bg71' ? ' sel' : '') + _tooltip('Окраска блока согласно<br>цвету фона единицы списка', -83, '', 1) +
+		div += '<div val="bg70" class="prel dib center w25 bor-e8 curP grey ml3' + (BL.bg == 'bg70' ? ' sel' : '') + _tooltip('Окраска блока согласно<br>цвету фона единицы списка', -83, '', 1) +
 					'<div class="pabs fs17 pl5">&#10004;</div>' +
 					'<table class="w100p">' +
 						'<tr><td class="bg-efe" style="width:24px;height:8px">' +

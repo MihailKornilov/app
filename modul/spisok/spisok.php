@@ -337,8 +337,18 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			$ex = explode(' ', $ELEM['mar']);
 			$width = floor(($ELEM['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
 
+			//если присутствует элемент-цвет фона, получение колонки для сохранения цвета, если потребуется окраска блока
+			$bg70Col = '';
+			foreach($CMP as $sp)
+				if($sp['dialog_id'] == 70) {
+					$bg70Col = $sp['col'];
+					break;
+				}
+
 			$send = '';
 			foreach($spisok as $sp) {
+				if($bg70Col)
+					$sp['bg70'] = $sp[$bg70Col];
 				$child = array();
 				foreach($BLK as $id => $r) {
 /*
@@ -687,15 +697,10 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 	if(!$cmp_id)
 		return array();
 
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id`=".$cmp_id;
-	if(!$cmp = query_assoc($sql))
+	if(!$cmp = _elemQuery($cmp_id))
 		return array();
-
 	if(!$cmp['num_1'])
 		return array();
-
 	if(!$dialog = _dialogQuery($cmp['num_1']))
 		return array();
 
@@ -730,11 +735,12 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 			$cols[] = "`".$col1."` LIKE '%".$v."%'";
 		$cond .= $cols ? " AND (".implode(' OR ', $cols).")" : " AND !`id`";
 	}
+
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE ".$cond."
 			  AND !`deleted`
-			ORDER BY `id` DESC
+			ORDER BY `sort`,`id` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
 		return array();
@@ -749,6 +755,13 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 			$arr[$sel_id] = $unit;
 	}
 
+	$bg70Col = '';
+	foreach($dialog['cmp'] as $sp)
+		if($sp['dialog_id'] == 70) {
+			$bg70Col = $sp['col'];
+			break;
+		}
+
 	$send = array();
 	foreach($arr as $r) {
 		$u = array(
@@ -760,6 +773,8 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 			$u['content'] = utf8($r[$col0].'<div class="fs11 grey">'.$r[$col1].'</div>');
 		if($v)
 			$u['content'] = preg_replace(_regFilter(utf8($v)), '<em class="fndd">\\1</em>', $u['content'], 1);
+		if($bg70Col)
+			$u['bg'] = $r[$bg70Col];
 
 		$send[] = $u;
 	}

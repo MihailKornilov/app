@@ -183,7 +183,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 
 			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
-						' style="'._blockStyle($r, $width).'"'.
+						' style="'._blockStyle($r, $width, $unit).'"'.
 				 (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
 					 '>'.
 							_blockSetka($r, $level, $grid_id).
@@ -343,7 +343,7 @@ function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 
 	return '<div class="choose block-elem-choose'.$sel.'" val="'.$elem_id.'"></div>';
 }
-function _blockStyle($r, $width) {//стили css для блока
+function _blockStyle($r, $width, $unit) {//стили css для блока
 	$send = array();
 
 	//границы
@@ -360,6 +360,11 @@ function _blockStyle($r, $width) {//стили css для блока
 	}
 
 	$send[] = ($r['width_auto'] ? 'min-' : '').'width:'.$width.'px';
+
+	//цвет фона из единицы списка
+	if($r['bg'] == 'bg70')
+		if(!empty($unit['bg70']))
+			$send[] = 'background-color:'.$unit['bg70'];
 
 	return implode(';', $send);
 }
