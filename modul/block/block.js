@@ -137,8 +137,8 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 			div = '';
 
 		$(document)
-			.off('click', '#block-set-bg div')
-			.on('click', '#block-set-bg div', function() {
+			.off('click', '#block-set-bg .curP')
+			.on('click', '#block-set-bg .curP', function() {
 				var unit = $(this),
 					bg = unit.attr('val'),
 					sel = unit.hasClass('sel');
@@ -158,8 +158,17 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		_forN(BGS.split(' '), function(sp, n) {
 			var sel = BL.bg == sp ? ' sel' : '',
 				ml3 = n ? ' ml3' : '';
-			div += '<div class="dib center h25 w25 bor-e8 curP fs17 grey ' + sp + ml3 + sel + '" val="' + sp + '">&#10004;</div>';
+			div += '<div class="dib center w25 h25 bor-e8 curP fs17 grey ' + sp + ml3 + sel + '" val="' + sp + '">&#10004;</div>';
 		});
+
+		div += '<div val="bg71" class="prel dib center w25 bor-e8 curP grey ml3' + (BL.bg == 'bg71' ? ' sel' : '') + _tooltip('Окраска блока согласно<br>цвету фона единицы списка', -83, '', 1) +
+					'<div class="pabs fs17 pl5">&#10004;</div>' +
+					'<table class="w100p">' +
+						'<tr><td class="bg-efe" style="width:24px;height:8px">' +
+						'<tr><td class="bg-ffe" style="width:24px;height:9px">' +
+						'<tr><td class="bg-fee" style="height:8px">' +
+					'</table>' +
+			   '</div>';
 
 		return '<div class="color-555 fs14 mt5">Заливка:</div>' +
 			   '<div id="block-set-bg" class="mt3">' + div + '</div>';

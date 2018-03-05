@@ -825,12 +825,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			foreach(_ids($el['txt_2'], 1) as $elem_id) {
 				$elem = $elemArr[$elem_id];
 				switch($elem['dialog_id']) {
+					//многострочное поле
+					case 5:
 					//однострочное поле
 					case 8:
 						$txt = $unit[$elem['col']];
 	//					$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 						$txt = _spisokUnitUrl($txt, $unit, $el['url']);
-						$send .= $txt;
+						$send .= _br($txt);
 						break;
 					//произвольный текст
 					case 10: $send .= $elem['txt_1']; break;

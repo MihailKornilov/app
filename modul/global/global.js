@@ -181,11 +181,14 @@ var VK_SCROLL = 0,
 		});
 		return send;
 	},
-	_tooltip = function(msg, left, ugolSide) {
+	_tooltip = function(msg, left, ugolSide, x2) {
+		left = left ? ' style="left:' + left + 'px"' : '';
+		x2 = x2 ? ' x2' : '';
+		ugolSide = ugolSide ? ' ' + ugolSide : '';
 		return ' _tooltip">' +
-		'<div class="ttdiv"' + (left ? ' style="left:' + left + 'px"' : '') + '>' +
+		'<div class="ttdiv' + x2 + '"' + left +'>' +
 			'<div class="ttmsg">' + msg + '</div>' +
-			'<div class="ttug' + (ugolSide ? ' ' + ugolSide : '') + '"></div>' +
+			'<div class="ttug' + ugolSide + '"></div>' +
 		'</div>';
 	},
 	_parent = function(t, tag) {//поиск нужного тега методом parent()

@@ -313,10 +313,10 @@ table{border:0;border-spacing:0}
 }
 
 /* цвета блока в настройках */
-#block-set-bg div:not(.sel):hover{border:#aaa solid 1px;}
-#block-set-bg div:not(.sel){color:transparent}
+#block-set-bg .curP{vertical-align:top}
+#block-set-bg .curP:not(.sel):hover{border:#aaa solid 1px;}
+#block-set-bg .curP:not(.sel){color:transparent}
 #block-set-bg .sel{border:#777 solid 1px;}
-
 
 
 
