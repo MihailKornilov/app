@@ -326,7 +326,8 @@ $.fn._sort = function(o) {//сортировка
 	var t = $(this);
 
 	o = $.extend({
-		axis:'y',
+		items:'dd',
+		axis:'',
 		handle:'.icon-move-y',
 		table:''
 	}, o);
@@ -337,7 +338,7 @@ $.fn._sort = function(o) {//сортировка
 		update:function() {
 			if(!o.table)
 				return;
-			var dds = $(this).find('dd'),
+			var dds = $(this).find(o.items),
 				arr = [];
 			for(var n = 0; n < dds.length; n++) {
 				var v = _num(dds.eq(n).attr('val'));

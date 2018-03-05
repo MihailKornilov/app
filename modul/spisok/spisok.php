@@ -62,6 +62,17 @@ function _spisokFilter($i='all', $elem_id=0) {//получение значений фильтров спис
 	return $F;
 }
 
+function _spisokIsSort($block_id) {//определение, нужно ли производить сортировку этого списка (поиск элемента 71)
+	if(!$spisok_el = _block('spisok', $block_id, 'elem_arr'))
+		return 0;
+
+	foreach($spisok_el as $elem)
+		if($elem['dialog_id'] == 71)
+			return 1;
+
+	return 0;
+}
+
 function _spisokCountAll($el) {//получение общего количества строк списка
 	$key = 'SPISOK_COUNT_ALL'.$el['id'];
 
@@ -200,11 +211,15 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 	$all = _spisokCountAll($ELEM);
 
+	$order = "`id` DESC";
+	if(_spisokIsSort($ELEM['block_id']))
+		$order = "`sort`";
+
 	//получение данных списка
 	$sql = "SELECT *
 			FROM `".$spTable."`
 			WHERE "._spisokCond($ELEM)."
-			ORDER BY `id` DESC
+			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
 	if(!$spisok = query_arr($sql))
 		return '<div class="_empty">'._br($ELEM['txt_1']).'</div>';

@@ -911,12 +911,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 				настройка шаблона через вспомогательный элемент: dialig_id=25
 			*/
-			if($is_edit) {
-				$dialog = _dialogQuery($el['num_1']);
-				return '<div class="_empty">Список <b class="fs14">'.$dialog['spisok_name'].'</b></div>';
-			}
+			if($is_edit)
+				return '<div class="_empty">Список <b class="fs14">'._dialogParam($el['num_1'],'spisok_name').'</b></div>';
 
-			return _spisokShow($el);
+			return
+				_spisokShow($el).
+				(_spisokIsSort($el['block_id']) ?
+					'<script>_spisokSort("'.$el['attr_el'].'")</script>'
+				: '');
 
 		//Количество строк списка
 		case 15:
@@ -1413,6 +1415,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Значение списка: имя пользователя
 		case 69: return _spisokUnitUser($el, $unit);
 
+		//Значение списка: иконка сортировки
+		case 71: return '<div class="icon icon-move pl"></div>';
 
 
 

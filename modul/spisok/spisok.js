@@ -24,4 +24,11 @@ var _spisokUpdate = function(elem_spisok, elem_filter, v) {
 			obj.append(res.spisok);
 			t.remove();
 		});
+	},
+	_spisokSort = function(attr_el) {
+		$(attr_el)._sort({
+			items:'.sp-unit',
+			handle:'.icon-move',
+			table:'_spisok'
+		});
 	};
