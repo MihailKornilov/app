@@ -717,7 +717,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//Выбор цвета фона
 		case 70:
-			$v = empty($v) ? '#fff' : '';
+			$v = empty($v) ? '#fff' : $v;
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 				'<div class="_color-bg" style="background-color:'.$v.'"></div>';

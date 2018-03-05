@@ -133,7 +133,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		});
 	},
 	_blockUnitBg = function(BL) {//заливка блока
-		var BGS = 'bg-fff bg-gr1 bg-gr2 bg-gr3 bg-ffe bg-efe bg-fee',
+		var BGS = 'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg-fee',
 			div = '';
 
 		$(document)
