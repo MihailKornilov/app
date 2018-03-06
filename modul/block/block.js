@@ -28,7 +28,14 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 
 		t._hint({
 			msg:'<div class="pad5">' +
-					'<div class="hd2">Ѕлок</div>' +
+					'<div class="fs16 blue line-b">' +
+						'Ѕлок' +
+					(BL.obj_name == 'spisok' ?
+						'<div class="fr mtm3">' +
+							'<div val="dialog_id:72,unit_id:' + BL.id + '" class="icon-wiki iw12 dialog-open' + _tooltip('Ќастроить ссылку', -53) + '</div>' +
+						'</div>'
+					: '') +
+					'</div>' +
 					_blockUnitBg(BL) +
 					_blockUnitBor(BL) +
 					_blockUnitBut(BL) +
@@ -284,7 +291,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		var EL = ELM[BL.elem_id];
 
 		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.id + '">' +
-				'<div class="fs15 blue line-b">' +
+				'<div class="fs16 blue line-b">' +
 					'Ёлемент' +
 					'<div class="fr mtm3">' +
 						'<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('”слови€ отображени€', -67) + '</div>' +
@@ -607,6 +614,29 @@ $(document)
 			return $('#elem-hint-' + BL.elem_id + ' .icon-edit').trigger('click');
 
 		$('#elem-hint-add').trigger('click');
+	})
+	.on('click', '.block-link', function(e) {//нажатие на блок дл€ перехода на страницу
+		e.stopPropagation();
+
+		var t = $(this),
+			cls = t.attr('class').split(' ');
+		_forN(cls, function(sp) {
+			if(sp.substr(0, 3) != 'pg-')
+				return;
+
+			var ex = sp.split('-'),
+				page_id = _num(ex[1]);
+			if(!page_id)
+				return false;
+
+			var unit = t.parents('.sp-unit'),
+				unit_id = _num(unit.attr('val'));
+			if(!unit_id)
+				return false;
+
+			location.href = URL + '&p=' + page_id + '&id=' + unit_id;
+			return false;
+		});
 	});
 
 $.fn._grid = function(o) {

@@ -171,6 +171,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$cls[] = !$xEnd ? trim($BR) : '';
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
+			$cls[] = $r['link'] ? 'curP block-link pg-'.$r['link'] : '';
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
