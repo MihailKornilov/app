@@ -337,7 +337,25 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			$ex = explode(' ', $ELEM['mar']);
 			$width = floor(($ELEM['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
 
-			//если присутствует элемент-цвет фона, получение колонки для сохранения цвета, если потребуется окраска блока
+			//если присутствует элемент-цвет фона, получение колонок для цвета, если потребуется окраска блока
+			foreach($BLK as $bl_id => $bl) {
+				$BLK[$bl_id]['bg_col'] = '';    //имя колонки, по которой будет выбираться цвет
+				$BLK[$bl_id]['bg_connect'] = '';//имя колонки, если это подключаемый список
+				if($bl['bg'] == 'bg70')
+					if($ids = _ids($bl['bg_ids'], 1))
+						foreach($ids as $id)
+							if($el = _elemQuery($id))
+								switch($el['dialog_id']) {
+									case 29:
+									case 59:
+										$BLK[$bl_id]['bg_connect'] = $el['col'];
+										break;
+									case 70:
+										$BLK[$bl_id]['bg_col'] = $el['col'];
+										break;
+								}
+			}
+
 			$bg70Col = '';
 			foreach($CMP as $sp)
 				if($sp['dialog_id'] == 70) {
@@ -347,8 +365,8 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 			$send = '';
 			foreach($spisok as $sp) {
-				if($bg70Col)
-					$sp['bg70'] = $sp[$bg70Col];
+//				if($bg70Col)
+//					$sp['bg70'] = $sp[$bg70Col];
 				$child = array();
 				foreach($BLK as $id => $r) {
 /*

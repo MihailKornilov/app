@@ -313,10 +313,13 @@ table{border:0;border-spacing:0}
 }
 
 /* цвета блока в настройках */
-#block-set-bg .curP{vertical-align:top}
-#block-set-bg .curP:not(.sel):hover{border:#aaa solid 1px;}
-#block-set-bg .curP:not(.sel){color:transparent}
+#block-set-bg div.curP{vertical-align:top}
+#block-set-bg div.curP:not(.sel):hover{border:#aaa solid 1px;}
+#block-set-bg div.curP:not(.sel){color:transparent}
 #block-set-bg .sel{border:#777 solid 1px;}
+#block-set-bg .galka{cursor:pointer}
+#block-set-bg .spin{left:3px;top:4px}
+#block-set-bg .bg70:not(.busy) .spin{display:none}
 
 
 

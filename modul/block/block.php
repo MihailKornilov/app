@@ -184,7 +184,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
 						' style="'._blockStyle($r, $width, $unit).'"'.
-				 (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
+		  (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
 					 '>'.
 							_blockSetka($r, $level, $grid_id).
 							_blockChoose($r, $unit).
@@ -363,8 +363,15 @@ function _blockStyle($r, $width, $unit) {//стили css для блока
 
 	//цвет фона из единицы списка
 	if($r['bg'] == 'bg70')
-		if(!empty($unit['bg70']))
-			$send[] = 'background-color:'.$unit['bg70'];
+		if(!empty($r['bg_col'])) {
+			$col = $r['bg_col'];
+			if(!empty($r['bg_connect']))
+				$bg = @$unit[$r['bg_connect']][$col];
+			else
+				$bg = @$unit[$col];
+			if($bg)
+				$send[] = 'background-color:'.$bg;
+		}
 
 	return implode(';', $send);
 }
@@ -416,6 +423,22 @@ function _blockCache($obj_name, $obj_id) {
 			'elem' => array()
 		), $cacheKey);
 
+	//Отображение варианта цвета для динамической окраски блоков
+	//Будет открываться диалог, который вносит данные списка, чтобы указать, откуда брать цвет для окраски
+	//Иконка показывается, если:
+	//      1. spisok-блоки. id диалога, который вносит значения списка
+	//      2. dialog-блоки. id этого диалога
+	$bg70 = 0;
+	if($obj_name == 'spisok')
+		if($bl = _blockQuery($obj_id))
+			if($el = $bl['elem'])
+				if($el['dialog_id'] == 14)
+					if($dlg_id = _num($el['num_1']))
+						$bg70 = $dlg_id;
+	if($obj_name == 'dialog')
+		$bg70 = $obj_id;
+
+
 	$block = array();
 	$blockYStr = array();//выстраивание id блоков по порядку, чтобы потом по этому порядку выстроить элементы
 	foreach($arr as $bl) {
@@ -427,6 +450,7 @@ function _blockCache($obj_name, $obj_id) {
 				$bl[$key] = _num($v);
 		$bl['elem_id'] = 0;
 		$bl['attr_bl'] = '#bl_'.$id;
+		$bl['bg70'] = $bg70;
 		$block[$id] = $bl;
 		$blockYStr[$bl['parent_id']][$bl['y']][] = $id;
 	}

@@ -137,14 +137,15 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 			div = '';
 
 		$(document)
-			.off('click', '#block-set-bg .curP')
-			.on('click', '#block-set-bg .curP', function() {
+			.off('click', '#block-set-bg div.curP')
+			.on('click', '#block-set-bg div.curP', function() {
 				var unit = $(this),
 					bg = unit.attr('val'),
 					sel = unit.hasClass('sel');
 
 				unit.parent().find('.sel').removeClass('sel');
 				$(BL.attr_bl).removeClass(BGS);
+				$('#block-set-bg .bg70 .galka')._dn();
 
 				if(!sel) {
 					unit.addClass('sel');
@@ -161,14 +162,50 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 			div += '<div class="dib center w25 h25 bor-e8 curP fs17 grey ' + sp + ml3 + sel + '" val="' + sp + '">&#10004;</div>';
 		});
 
-		div += '<div val="bg70" class="prel dib center w25 bor-e8 curP grey ml3' + (BL.bg == 'bg70' ? ' sel' : '') + _tooltip('ќкраска блока согласно<br>цвету фона единицы списка', -83, '', 1) +
-					'<div class="pabs fs17 pl5">&#10004;</div>' +
-					'<table class="w100p">' +
-						'<tr><td class="bg-efe" style="width:24px;height:8px">' +
-						'<tr><td class="bg-ffe" style="width:24px;height:9px">' +
-						'<tr><td class="bg-fee" style="height:8px">' +
-					'</table>' +
-			   '</div>';
+
+		if(BL.bg70) {
+			$(document)
+				.off('click', '#block-set-bg .bg70')
+				.on('click', '#block-set-bg .bg70', function() {
+					var t = $(this),
+						galka = t.find('.galka');
+
+					if(!galka.hasClass('dn')) {
+						galka._dn();
+						BL.bg = '';
+						BL.bg_ids = '';
+						BL.save = 1;
+						return;
+					}
+
+					_dialogLoad({
+						dialog_id:11,
+						dialog_source:BL.bg70,
+						unit_id:-118,
+						busy_obj:$(this),
+						busy_cls:'busy',
+						func_save:function(res) {
+							console.log(res);
+							BL.bg = 'bg70';
+							BL.bg_ids = res.unit.txt_2;
+							BL.save = 1;
+							$(BL.attr_bl).removeClass(BGS);
+							_blockUnitSave(BL, $(BL.attr_bl));
+						}
+					});
+				});
+			div += '<div class="bg70 prel dib center w25 bor-e8 grey ml3' +
+							_tooltip('ќкраска блока согласно<br>цвету фона единицы списка', -83, '', 1) +
+						'<div class="galka pabs fs17 pl5' + _dn(BL.bg == 'bg70') + '">&#10004;</div>' +
+						'<div class="pabs icon spin"></div>' +
+						'<table class="w100p curP">' +
+							'<tr><td class="bg-efe" style="width:24px;height:8px">' +
+							'<tr><td class="bg-ffe" style="width:24px;height:9px">' +
+							'<tr><td class="bg-fee" style="height:8px">' +
+						'</table>' +
+				   '</div>';
+		}
+
 
 		return '<div class="color-555 fs14 mt5">«аливка:</div>' +
 			   '<div id="block-set-bg" class="mt3">' + div + '</div>';
