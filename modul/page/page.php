@@ -829,6 +829,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					case 5:
 					//однострочное поле
 					case 8:
+						if(empty($unit))
+							return '';
 						$txt = $unit[$elem['col']];
 	//					$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 						$txt = _spisokUnitUrl($txt, $unit, $el['url']);
@@ -840,7 +842,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					case 29:
 					case 59:
 						if(!$sp = $unit[$elem['col']])
-							$send .= 'connect_no';
+							break;
 						if(!is_array($sp)) {
 							$dialog = _dialogQuery($unit['dialog_id']);
 							$sql = "SELECT *
@@ -863,6 +865,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							$send .= '';
 							break;
 						}
+						if(empty($unit)) {
+							$send .= _imageNo();
+							break;
+						}
+
 	//					if(empty($unit[$elem['col']]))//id картинки хранится в колонке
 	//						$send .= '';
 	//					if(!$img_id = _num($unit[$elem['col']]))//получение id картинки, либо вывод её, если уже сформирована
