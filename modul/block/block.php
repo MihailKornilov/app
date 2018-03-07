@@ -433,7 +433,7 @@ function _blockCache($obj_name, $obj_id) {
 	if($obj_name == 'spisok')
 		if($bl = _blockQuery($obj_id))
 			if($el = $bl['elem'])
-				if($el['dialog_id'] == 14)
+				if($el['dialog_id'] == 14 || $el['dialog_id'] == 59)
 					if($dlg_id = _num($el['num_1']))
 						$bg70 = $dlg_id;
 	if($obj_name == 'dialog')
@@ -632,8 +632,25 @@ function _block($obj_name, $obj_id, $i='all') {
 	}
 
 	if($i == 'block_arr') {
-		foreach($BLK as $id => $bl)
+		//если присутствует элемент-цвет фона, получение колонок для цвета, если потребуется окраска блока
+		foreach($BLK as $id => $bl) {
 			$BLK[$id]['xx_ids'] = _idsAss($bl['xx_ids']);
+			$BLK[$id]['bg_col'] = '';    //имя колонки, по которой будет выбираться цвет
+			$BLK[$id]['bg_connect'] = '';//имя колонки, если это подключаемый список
+			if($bl['bg'] == 'bg70')
+				if($ids = _ids($bl['bg_ids'], 1))
+					foreach($ids as $elem_id)
+						if($el = _elemQuery($elem_id))
+							switch($el['dialog_id']) {
+								case 29:
+								case 59:
+									$BLK[$id]['bg_connect'] = $el['col'];
+									break;
+								case 70:
+									$BLK[$id]['bg_col'] = $el['col'];
+									break;
+							}
+		}
 		return $BLK;
 	}
 

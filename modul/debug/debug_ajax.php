@@ -26,7 +26,7 @@ switch(@$_POST['op']) {
 		//списки, которые расположены в диалогах
 		$sql = "SELECT `block_id`
 				FROM `_element`
-				WHERE `dialog_id`=14
+				WHERE `dialog_id` IN (14,59)
 				  AND `block_id` IN (".$block_ids.")";
 		if($spisok_ids = query_ids($sql))
 			foreach(_ids($spisok_ids, 1) as $id)
