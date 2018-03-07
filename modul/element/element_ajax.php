@@ -740,7 +740,7 @@ function _dialogOpenLoad($dialog_id) {
 				$sel_id = 0;//выбранное значение
 				if($unit_id)
 					$sel_id = $unit[$cmp['col']];
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _spisokConnect($cmp_id, $v='', $sel_id);
+				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
 				break;
 			//настройка ТАБЛИЧНОГО содержания списка
 			case 30:

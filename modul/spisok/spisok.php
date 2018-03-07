@@ -711,7 +711,7 @@ function _spisokCond62($el) {//фильтр-галочка
 
 	return $send;
 }
-function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
+function _spisok29connect_($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)
 		return array();
 
@@ -795,6 +795,128 @@ function _spisokConnect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл
 			$u['bg'] = $r[$bg70Col];
 
 		$send[] = $u;
+	}
+
+	return $send;
+}
+function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
+	if(!$cmp_id)
+		return array();
+	if(!$cmp = _elemQuery($cmp_id))
+		return array();
+	if(!$cmp['num_1'])
+		return array();
+	if(!$dialog = _dialogQuery($cmp['num_1']))
+		return array();
+	if(!$elem_ids = _ids($cmp['txt_2']))//элементы, содержащие id элементов, настраивающих содержание select
+		return array();
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id` IN (".$elem_ids.")";
+	if(!$elem_arr = query_arr($sql))
+		return array();
+
+	$S = array();//данные с результатами для содержания select
+	foreach($elem_arr as $el)
+		$S[] = _spisok29connectGet($el, $v);
+
+	$cond = array();
+	foreach($S as $n => $r)
+		$cond[] = $r['cond'];
+	$cond = array_diff($cond, array(''));
+	$cond = $cond ? " AND (".implode(' OR ', $cond).")" : '';
+
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+		      AND `dialog_id`=".$cmp['num_1']."
+			  AND !`deleted`
+			  ".$cond."
+			ORDER BY `sort`,`id` DESC
+			LIMIT 50";
+	if(!$spisok = query_arr($sql))
+		return array();
+
+	foreach($S as $n => $r)
+		if($r['cnn']) {
+			$sql = "SELECT `id`,`".$r['col1']."`
+					FROM `_spisok`
+					WHERE `id` IN ("._idsGet($spisok, $r['col0']).")";
+			$S[$n]['cnnAss'] = query_ass($sql);
+		}
+
+	$send = array();
+	foreach($spisok as $r) {
+		$title = 'значение не настроено';
+		if($S[0]['col0']) {
+			$title = $r[$S[0]['col0']];
+			if($S[0]['cnn'])
+				$title = $title ? $S[0]['cnnAss'][$title] : '';
+		}
+
+		$content = '';
+		if(isset($S[1]) && $S[1]['col0']) {
+			$content = $r[$S[1]['col0']];
+			if($S[1]['cnn'])
+				$content = $content ? $S[1]['cnnAss'][$content] : '';
+		}
+		if($content)
+			$content = '<div class="fs11 grey">'.$content.'</div>';
+
+		$u = array(
+			'id' => _num($r['id']),
+			'title' => utf8($title),
+			'content' => utf8($title.$content)
+		);
+		if($v)
+			$u['content'] = preg_replace(_regFilter(utf8($v)), '<em class="fndd">\\1</em>', $u['content'], 1);
+
+		$send[] = $u;
+	}
+
+	return $send;
+}
+function _spisok29connectGet($el, $v) {
+	$send = array(
+		'col0' => '',       //имя колонки основого списка
+		'col1' => '',       //имя колонки привязанного списка
+		'cnn' => 0,         //был ли привязанный список
+		'cnnAss' => array(),//ассоциативный массив привязанного списка
+		'cond' => ''
+	);
+
+	$ids = $el['txt_2'];
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id` IN (".$ids.")";
+	if(!$arr = query_arr($sql))
+		return $send;
+
+	$ids = _ids($ids, 1);
+	$id0 = $ids[0];
+	$send['col0'] = $arr[$id0]['col'];
+	if(count($ids) == 1 && $v)
+		$send['cond'] = "`".$send['col0']."` LIKE '%".addslashes($v)."%'";
+	if(count($ids) == 2) {
+		$send['cnn'] = 1;
+		$id1 = $ids[1];
+		$dlg_id = _num($arr[$id0]['num_1']);
+		$send['col1'] = $arr[$id1]['col'];
+
+		if($v) {
+			$sql = "SELECT `id`,`".$send['col1']."`
+					FROM `_spisok`
+					WHERE `dialog_id`=".$dlg_id."
+					  AND `".$send['col1']."` LIKE '%".addslashes($v)."%'
+					LIMIT 1000";
+			if($cnnAss = query_ass($sql)) {
+				$send['cond'] = "`".$send['col0']."` IN ("._idsGet($cnnAss, 'key').")";
+				return $send;
+			}
+			$send['cond'] = "!`id`";
+		}
 	}
 
 	return $send;

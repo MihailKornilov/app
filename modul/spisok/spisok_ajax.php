@@ -148,7 +148,7 @@ switch(@$_POST['op']) {
 
 		$v = _txt($_POST['v']);
 
-		$send['spisok'] = _spisokConnect($cmp_id, $v);
+		$send['spisok'] = _spisok29connect($cmp_id, $v);
 		jsonSuccess($send);
 		break;
 	case 'spisok_59_unit':
