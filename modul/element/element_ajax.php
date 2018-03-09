@@ -61,7 +61,8 @@ switch(@$_POST['op']) {
 
 			$menu_sa = array(
 				1 => 'Диалог',
-				2 => 'Элемент'
+				2 => 'Элемент',
+				3 => 'Использование'
 			);
 		}
 
@@ -172,7 +173,9 @@ switch(@$_POST['op']) {
 			'<div class="dialog-menu-4 bg-gr2 pad20'._dn($dialog['menu_edit_last'] == 4).'">'.
 				'<table class="bs10">'.
 					'<tr><td class="grey r">Имя диалогового окна:'.
-						'<td><input type="text" id="spisok_name" class="w250" maxlength="100" value="'.$dialog['spisok_name'].'" />'.
+						'<td><input type="text" id="dialog_name" class="w250" maxlength="100" value="'.$dialog['name'].'" />'.
+					'<tr><td class="red r">Имя элемента:'.
+		                '<td><input type="text" id="element_name" class="w230 b" maxlength="100" value="'.$dialog['element_name'].'" />'.
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'spisok_on',
@@ -219,9 +222,7 @@ switch(@$_POST['op']) {
 				'</table>'.
 
 				'<table class="menu_sa-2 bs5">'.
-					'<tr><td class="red w150 r">Имя элемента:'.
-		                '<td><input type="text" id="element_name" class="w230 b" maxlength="100" value="'.$dialog['element_name'].'" />'.
-					'<tr><td class="red r">Группа:'.
+					'<tr><td class="red r w150">Группа элемента:'.
 		                '<td><input type="hidden" id="element_group_id" value="'.$dialog['element_group_id'].'" />'.
 					'<tr><td class="red r">Начальная ширина:'.
 						'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
@@ -310,6 +311,9 @@ switch(@$_POST['op']) {
 									'value' => $dialog['element_td_paste']
 							   )).
 				'</table>'.
+
+				_dialogEditLoadUse($dialog).
+
 			'</div>'
 	  : '');
 
@@ -461,6 +465,53 @@ switch(@$_POST['op']) {
 		break;
 }
 
+
+function _dialogEditLoadUse($dialog) {//использование как элемента в других диалогах
+
+	$use_dialog = '';
+	$use_page = '';
+	$sql = "SELECT `block_id`
+			FROM `_element`
+			WHERE `dialog_id`=".$dialog['id'];
+	if($block_ids = query_ids($sql)) {
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id` IN (".$block_ids.")
+				ORDER BY `obj_id`";
+		$arr = query_arr($sql);
+		foreach($arr as $r) {
+			switch($r['obj_name']) {
+				case 'dialog':
+					$use_dialog .=
+						'<div>'.
+							'<div class="dib w35 mr5">'.$r['obj_id'].':</div>'.
+							'<a class="dialog-open" val="dialog_id:'.$r['obj_id'].'">'._dialogParam($r['obj_id'], 'name').'</a>'.
+						'</div>';
+					break;
+				case 'page':
+					if(!$p = _page($r['obj_id']))
+						break;
+					$use_page .=
+						'<div>'.
+							'<div class="dib w35 mr5">'.$r['obj_id'].':</div>'.
+							'<a class="'._dn(!$p['sa'], 'color-ref').'" href="'.URL.'&p='.$r['obj_id'].'">'.$p['name'].'</a>'.
+						'</div>';
+					break;
+			}
+		}
+	}
+
+	return
+	'<table class="menu_sa-3 bs10">'.
+		'<tr><td class="w125 r color-pay top">В диалогах:'.
+			'<td>'.($use_dialog ? $use_dialog : '-').
+		'<tr><td class="r color-pay top">На страницах:'.
+			'<td>'.($use_page ? $use_page : '-').
+	'</table>';
+}
+
+
+
 function _dialogUpdate($dialog_id) {//обновление диалога
 	if(!_dialogQuery($dialog_id))
 		jsonError('Диалога не существует');
@@ -506,10 +557,10 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$menu_edit_last = _num($_POST['menu_edit_last']);
 	$sa = _bool($_POST['sa']);
 
+	$name = _txt($_POST['name']);
 	$spisok_on = _bool($_POST['spisok_on']);
-	$spisok_name = _txt($_POST['spisok_name']);
-	if($spisok_on && !$spisok_name)
-		jsonError('Укажите имя списка страницы');
+	if($spisok_on && !$name)
+		jsonError('Укажите имя диалогового окна');
 
 	$width_auto = _num($_POST['width_auto']);
 	$cmp_no_req = _num($_POST['cmp_no_req']);
@@ -537,6 +588,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
 				`sa`=".$sa.",
+				`name`='".addslashes($name)."',
 				`width`=".$width.",
 				`width_auto`=".$width_auto.",
 				`cmp_no_req`=".$cmp_no_req.",
@@ -561,7 +613,6 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 
 				`base_table`='".addslashes($base_table)."',
 				`spisok_on`=".$spisok_on.",
-				`spisok_name`='".addslashes($spisok_name)."',
 
 				`element_group_id`=".$element_group_id.",
 				`element_name`='".addslashes($element_name)."',

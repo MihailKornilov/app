@@ -268,7 +268,7 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 	$sql = "UPDATE `_dialog`
 			SET `num`=".$num.",
 				`element_name`='элемент ".$dialog_id."',
-				`spisok_name`='Список ".$num."'
+				`name`='Список ".$num."'
 			WHERE `id`=".$dialog_id;
 	query($sql);
 
@@ -402,7 +402,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 		}
 		$send[] = array(
 			'id' => _num($r['id']),
-			'title' => utf8($r['spisok_name'])
+			'title' => utf8($r['name'])
 		);
 	}
 
@@ -416,8 +416,8 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 		foreach($saArr as $r)
 			$send[] = array(
 				'id' => _num($r['id']),
-				'title' => utf8($r['spisok_name']),
-				'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">'.utf8($r['spisok_name']).'</div>'
+				'title' => utf8($r['name']),
+				'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">'.utf8($r['name']).'</div>'
 			);
 	}
 
@@ -448,7 +448,7 @@ function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые м
 		if($r['dialog_id'] == 68)
 			$spisokName = 'История действий';
 		else
-			$spisokName = _dialogParam($r['num_1'], 'spisok_name');
+			$spisokName = _dialogParam($r['num_1'], 'name');
 		$send[$elem_id] = utf8($spisokName.' (в '.$block['obj_name'].'-блоке '.$r['block_id'].')');
 	}
 
@@ -509,7 +509,7 @@ function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списк
 		$dialog = _dialogQuery($obj_id);
 		$send[_num($elem_id)] =
 			utf8(
-				$dialog['spisok_name'].
+				$dialog['name'].
 					($cc[$obj_id] ? ' (в блоке '.$r['block_id'].')' : '')
 			);
 	}
@@ -593,7 +593,7 @@ function _elemTitle($elem_id) {//имя элемента или его текст
 				$title .= ($n ? ' » ' : '')._elemTitle($id);
 			return $title;
 		case 29: //связки
-		case 59: return _dialogParam($el['num_1'], 'spisok_name');
+		case 59: return _dialogParam($el['num_1'], 'name');
 		case 32: return 'номер';
 		case 33: return 'дата/время';
 		case 67://шаблон истории действий

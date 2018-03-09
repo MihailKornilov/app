@@ -921,7 +921,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				настройка шаблона через вспомогательный элемент: dialig_id=25
 			*/
 			if($is_edit)
-				return '<div class="_empty">Список <b class="fs14">'._dialogParam($el['num_1'],'spisok_name').'</b></div>';
+				return '<div class="_empty">Список <b class="fs14">'._dialogParam($el['num_1'],'name').'</b></div>';
 
 			return
 				_spisokShow($el).
@@ -999,7 +999,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							'<td class="w25 top">'.
 								'<div class="icon icon-move-y pl"></div>'.
 							'<td class="w300">'.
-								'<div class="fs15">'._dialogParam($r['dialog_id'], 'spisok_name').'</div>'.
+								'<div class="fs15">'._dialogParam($r['dialog_id'], 'name').'</div>'.
 								'<table class="bs3">'.
 									'<tr><td class="fs12 grey top">Действие:'.
 										'<td class="fs12">'.
@@ -1039,7 +1039,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			*/
 			if(PAS) {
 				$dialog = _dialogQuery($el['num_1']);
-				return '<div class="_empty">Список-таблица <b class="fs14">'.$dialog['spisok_name'].'</b></div>';
+				return '<div class="_empty">Список-таблица <b class="fs14">'.$dialog['name'].'</b></div>';
 			}
 
 			return _spisokShow($el);
@@ -1237,7 +1237,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			);
 
 			return
-			'<div class="fs14 pad10 pl15 bg-gr2 line-b">Диалоговое окно <b class="fs14">'.$dialog['spisok_name'].'</b>:</div>'.
+			'<div class="fs14 pad10 pl15 bg-gr2 line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send).
 			'<input type="hidden" class="dlg26" value="'.$dialog_id.'" />'.

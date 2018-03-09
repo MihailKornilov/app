@@ -401,6 +401,8 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				unit_id:o.unit_id,
 				block_id:o.block_id,
 
+				name:DLG('#dialog_name').val(),
+
 				width:DIALOG_WIDTH,
 				width_auto:DLG('#width_auto').val(),
 				cmp_no_req:DLG('#cmp_no_req').val(),
@@ -424,7 +426,6 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				del_action_page_id:DLG('#del_action_page_id').val(),
 
 				spisok_on:DLG('#spisok_on').val(),
-				spisok_name:DLG('#spisok_name').val(),
 
 				base_table:DLG('#base_table')._select('inp'),
 				app_any:DLG('#app_any').val(),
