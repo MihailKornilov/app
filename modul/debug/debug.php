@@ -14,6 +14,7 @@ function _debug($i='') {
 			'<div class="w1000 mara center">'.
 				'<a class="debug_toggle'.(DEBUG ? ' on' : '').'">'.(DEBUG ? 'От' : 'В').'ключить Debug</a> :: '.
 				'<a id="cookie_clear">Очисить cookie</a> :: '.
+				'<a id="count_update">Обновить суммы</a> :: '.
 				'<a id="cache_clear">Очисить кэш ('.VERSION.')</a> :: '.
 				'sql <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).') :: '.
 				'php '.round(microtime(true) - TIME, 3).' :: '.

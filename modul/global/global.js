@@ -451,6 +451,15 @@ $(document)
 		d.content.find('textarea').autosize();
 	})
 
+	.on('click', '#count_update', function() {//обновление количеств и сумм
+		var send = {
+			op:'count_update',
+			busy_obj:$(this)
+		};
+		_post(send, function() {
+			_msg('Суммы обновлены.');
+		});
+	})
 	.on('click', '#cache_clear', function() {//очищение кеша
 		_post({'op':'cache_clear'}, 'reload');
 		_cookie('version', _num(_cookie('version')) + 1);

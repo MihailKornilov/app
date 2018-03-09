@@ -85,4 +85,5 @@
 }
 body.scrl #debug-footer{padding-left:0}
 #debug-footer a{color:#888;font-size:11px}
+#debug-footer a._busy{color:transparent}
 #debug-footer .on{color:#0b0}
