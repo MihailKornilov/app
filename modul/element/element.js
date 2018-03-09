@@ -3064,7 +3064,7 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		v = _num(v);
 		VALUE = v;
 		t.val(v);
-		INP.val(MASS_ASS[v]);
+		INP.val(MASS_ASS[v].replace(/&quot;/g,'"'));
 		ICON_DEL._dn(v && o.write);
 		if(BG_ASS[v]) {
 			SEL.css('background-color', BG_ASS[v]);
@@ -3493,7 +3493,6 @@ $.fn._select1 = function(o, o1, o2) {
 		}
 		val = v;
 		t.val(v);
-		inpClear,_dn(v);
 		if(v || !v && !o.write_save) {
 			inp.val(ass[v] ? ass[v].replace(/&quot;/g,'"') : '');
 			title0bg[v == 0 ? 'show' : 'hide']();

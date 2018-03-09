@@ -538,10 +538,10 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 			continue;
 		$u = array(
 			'id' => _num($r['id']),
-			'title' => utf8($r['insert_head'])
+			'title' => utf8($r['name'])
 		);
 		if(!$r['app_id'])
-			$u['content'] = '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'"><b>'.$r['id'].'</b>. '.utf8($r['insert_head']).'</div>';
+			$u['content'] = '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'"><b>'.$r['id'].'</b>. '.utf8($r['name']).'</div>';
 		$spisok[] = $u;
 	}
 
