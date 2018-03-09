@@ -1039,3 +1039,14 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
+
+/* выбор элемента из диалога или страницы */
+._selem .icon{
+	left:5px;
+	top:6px;
+	opacity:.7;
+}
+._selem input{
+	padding-left:27px;
+	background-color:transparent;
+}

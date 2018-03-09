@@ -90,7 +90,7 @@ table{border:0;border-spacing:0}
 /* »конки */
 .icon{
 	display:inline-block;
-	background:0 0 no-repeat url(../../img/icon18.png?25);
+	background:0 0 no-repeat url(../../img/icon18.png?26);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -131,6 +131,7 @@ table{border:0;border-spacing:0}
 .icon-calendar{background-position-x:-580px}/* календарь */
 .icon-recover{background-position-x:-600px}/* восстановить: завЄрнута€ стрелка */
 .icon-eye    {background-position-x:-620px}/* формат отображени€ текста: глаз */
+.icon-star   {background-position-x:-640px}/* звезда */
 /* ожидание процесса загрузки дл€ любой иконки */
 .icon.spin{
 	height:16px;

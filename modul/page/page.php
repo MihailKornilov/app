@@ -484,6 +484,18 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$v = empty($v) ? $el['txt_2'] : $v;
 			return '<input type="text" id="'.$attr_id.'"'.$width.$placeholder.$disabled.' value="'.$v.'" />';
 
+		//Выбор элемента из диалога или страницы
+		case 13:
+			/*
+			*/
+			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+			$v = empty($v) ? $el['txt_2'] : $v;
+			return
+				'<div class="_selem dib prel bg-fff over1" id="'.$attr_id.'_selem"'.$width.'>'.
+					'<div class="icon icon-star pabs"></div>'.
+					'<input type="text" id="'.$attr_id.'" readonly class="curP w100p"'.$placeholder.$disabled.' value="'.$v.'" />'.
+				'</div>';
+
 		//Radio
 		case 16:
 			/*

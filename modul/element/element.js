@@ -664,6 +664,10 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 						return;
 					window[el.txt_1](el, unit);
 					return;
+				//¬ыбор элемента из диалога или страницы
+				case 13:
+
+					return;
 				//select - произвольные значени€
 				case 17:
 					_elemFunc(el, _num(unit[el.col] || el.def), is_edit, 1);
