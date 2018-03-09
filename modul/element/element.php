@@ -267,8 +267,7 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 
 	$sql = "UPDATE `_dialog`
 			SET `num`=".$num.",
-				`element_name`='элемент ".$dialog_id."',
-				`name`='Список ".$num."'
+				`name`='Диалог ".$num."'
 			WHERE `id`=".$dialog_id;
 	query($sql);
 
@@ -710,7 +709,7 @@ function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 					'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
 				  (SA ? '<div class="icon icon-move-y fr pl"></div><div class="icon icon-edit fr pl mr3"></div>' : '').
 						'<div class="dib w25 fs12 r">'.$n++.'.</div> '.
-						'<b>'.$el['element_name'].'</b>'.
+						'<b>'.$el['name'].'</b>'.
 						'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
 					'</div>'.
 					'</dd>';

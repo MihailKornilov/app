@@ -432,7 +432,6 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				sa:DLG('#sa').val(),
 
 				element_group_id:DLG('#element_group_id').val(),
-				element_name:DLG('#element_name').val(),
 				element_width:DLG('#element_width').val(),
 				element_width_min:DLG('#element_width_min').val(),
 				element_search_access:DLG('#element_search_access').val(),

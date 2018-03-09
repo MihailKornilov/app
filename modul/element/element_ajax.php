@@ -174,8 +174,6 @@ switch(@$_POST['op']) {
 				'<table class="bs10">'.
 					'<tr><td class="grey r">Имя диалогового окна:'.
 						'<td><input type="text" id="dialog_name" class="w250" maxlength="100" value="'.$dialog['name'].'" />'.
-					'<tr><td class="red r">Имя элемента:'.
-		                '<td><input type="text" id="element_name" class="w230 b" maxlength="100" value="'.$dialog['element_name'].'" />'.
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'spisok_on',
@@ -567,7 +565,6 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$app_any = _num($_POST['app_any']);
 
 	$element_group_id = _num($_POST['element_group_id']);
-	$element_name = _txt($_POST['element_name']);
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
 	$element_search_access = _num($_POST['element_search_access']);
@@ -615,7 +612,6 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`spisok_on`=".$spisok_on.",
 
 				`element_group_id`=".$element_group_id.",
-				`element_name`='".addslashes($element_name)."',
 				`element_width`=".$element_width.",
 				`element_width_min`=".$element_width_min.",
 				`element_search_access`=".$element_search_access.",
