@@ -2284,7 +2284,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						if(!v.id)
 							COND_ID._select(1);
 						v.id = res.unit.id;
-						TITLE.val(v.id);
+						TITLE.val(res.unit.title);
 						TITLE.attr('val', v.id);
 					}
 				});
@@ -3064,7 +3064,7 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		v = _num(v);
 		VALUE = v;
 		t.val(v);
-		INP.val(MASS_ASS[v].replace(/&quot;/g,'"'));
+		INP.val(MASS_ASS[v] ? MASS_ASS[v].replace(/&quot;/g,'"') : '');
 		ICON_DEL._dn(v && o.write);
 		if(BG_ASS[v]) {
 			SEL.css('background-color', BG_ASS[v]);
