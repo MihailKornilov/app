@@ -458,6 +458,7 @@ $(document)
 		};
 		_post(send, function() {
 			_msg('Суммы обновлены.');
+			location.reload();
 		});
 	})
 	.on('click', '#cache_clear', function() {//очищение кеша
