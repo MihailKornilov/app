@@ -487,9 +487,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Выбор элемента из диалога или страницы
 		case 13:
 			/*
+				txt_1 - текст для placeholder
 			*/
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$v = empty($v) ? $el['txt_2'] : $v;
 			return
 				'<div class="_selem dib prel bg-fff over1" id="'.$attr_id.'_selem"'.$width.'>'.
 					'<div class="icon icon-star pabs"></div>'.
@@ -1704,7 +1704,7 @@ function _page_div() {//todo тест
 		'<input type="hidden" class="aaa" />'.
 	'</div>'.
 
-	'<div class="bg-ddf w500 mt10">'.
+	'<div class="w500 mt10">'.
 		'<div class="_select dib bg-ffc w200 prel">'.
 			'<table class="w100p">'.
 				'<tr><td>456'.
@@ -1718,7 +1718,7 @@ function _page_div() {//todo тест
 	'</div>'.
 //	'<div><input type="text" /></div>'.
 
-	'<div class="mar20 bg-ccd">'.
+	'<div class="mar20">'.
 		'<div class="icon icon-edit wh"></div>'.
 		'<div class="icon icon-del wh"></div>'.
 	'</div>';

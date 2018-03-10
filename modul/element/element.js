@@ -666,7 +666,16 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					return;
 				//¬ыбор элемента из диалога или страницы
 				case 13:
-
+					$(el.attr_cmp).parent().click(function() {
+						console.log(unit);
+						_dialogLoad({
+							dialog_id:11,
+							block_id:unit.source.block_id,
+							func_open:function() {
+								alert(123)
+							}
+						});
+					});
 					return;
 				//select - произвольные значени€
 				case 17:

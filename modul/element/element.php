@@ -547,6 +547,33 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 
 	return $spisok;
 }
+function _dialogElemChoose($el, $unit) {//выбор элемента (подключение через [12]). Используется в [74] для [13]
+
+	$dialog_id = 73;
+
+	if(!$dialog_id)
+		return _emptyMin('Не найдено ID диалога, который вносит данные списка.');
+
+	if(!$dialog = _dialogQuery($dialog_id))
+		return _emptyMin('Диалога не существует, который вносит данные списка.');
+
+	$sql = "SELECT `id`,1
+			FROM `_dialog`
+			WHERE !`app_id`
+			  AND `element_is_insert`";
+	$choose_access = query_ass($sql);
+
+	$send = array(
+		'choose' => 1,
+		'choose_access' => $choose_access,
+		'choose_sel' => array(),      //ids ранее выбранных элементов или блоков
+		'choose_deny' => array()      //ids элементов или блоков, которые выбирать нельзя (если они были выбраны другой фукцией того же элемента)
+	);
+
+	return
+	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
+	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
+}
 
 function _elemQuery($elem_id) {//запрос одного элемента
 	$sql = "SELECT *

@@ -608,12 +608,11 @@ button.vk._busy{color:transparent}
 .bg-ffe{background-color:#ffe}
 .bg-ffd{background-color:#ffd}
 .edtd,/* отредактировано. При наведении класс удаляется */
-.bg-ffc{background-color:#ffc}   /* жёлтый - данные изменены */
+.bg-ffc{background-color:#ffc}  /* жёлтый - данные изменены */
 .bg-fcc{background-color:#fcc}  /* красный - ошибка */
 .bg-dfd{background-color:#dfd}  /* зелёный */
 .bg-efe{background-color:#efe}  /* светло-зелёный */
-.bg-ddf{background-color:#ddf}  /* синий */
-.bg-ccd{background-color:#cce}  /* фиолетовый */
+.bg-orange{background-color:#ffaf64}/* оранжевый-насыщенный */
 
 
 .db{display:block}
