@@ -1041,11 +1041,12 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 /* выбор элемента из диалога или страницы */
-._selem .icon{
+._selem .icon-star{
 	left:5px;
 	top:6px;
 	opacity:.7;
 }
+._selem .icon-del{right:5px;top:5px}
 ._selem input{
 	padding-left:27px;
 	background-color:transparent;

@@ -548,14 +548,26 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 	return $spisok;
 }
 function _dialogElemChoose($el, $unit) {//выбор элемента (подключение через [12]). Используется в [74] для [13]
+	if(empty($unit['source']['block_id']))
+		return _emptyMin('Отсутствует исходный блок.');
 
-	$dialog_id = 73;
+	$block_id = _num($unit['source']['block_id']);
+
+	if(!$BL = _blockQuery($block_id))
+		return _emptyMin('Исходного блока id'.$block_id.' не существует.');
+
+	if($BL['obj_name'] != 'dialog')
+		return _emptyMin('Не диалог.');
+
+	$dialog_id = $BL['obj_id'];
 
 	if(!$dialog_id)
 		return _emptyMin('Не найдено ID диалога, который вносит данные списка.');
 
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin('Диалога не существует, который вносит данные списка.');
+
+//	$elemArr = _block('dialog', $dialog_id, 'elem_arr');
 
 	$sql = "SELECT `id`,1
 			FROM `_dialog`
@@ -570,9 +582,19 @@ function _dialogElemChoose($el, $unit) {//выбор элемента (подключение через [12]
 		'choose_deny' => array()      //ids элементов или блоков, которые выбирать нельзя (если они были выбраны другой фукцией того же элемента)
 	);
 
+	$elemJS = array();
+	foreach($dialog['cmp'] as $id => $r) {
+		if(empty($choose_access[$r['dialog_id']]))
+			continue;
+		$elemJS[] = $id.':"'.addslashes(_elemTitle($id)).'"';
+	}
+
+
+
 	return
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
-	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
+	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send).
+	'<script>ELM74={'.implode(',', $elemJS).'};</script>';
 }
 
 function _elemQuery($elem_id) {//запрос одного элемента

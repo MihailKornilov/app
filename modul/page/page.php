@@ -490,10 +490,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				txt_1 - текст дл€ placeholder
 			*/
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+			$v = _num($v);
 			return
+				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 				'<div class="_selem dib prel bg-fff over1" id="'.$attr_id.'_selem"'.$width.'>'.
 					'<div class="icon icon-star pabs"></div>'.
-					'<input type="text" id="'.$attr_id.'" readonly class="curP w100p"'.$placeholder.$disabled.' value="'.$v.'" />'.
+					'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+					'<input type="text" readonly class="curP w100p"'.$placeholder.$disabled.' value="'._elemTitle($v).'" />'.
 				'</div>';
 
 		//Radio
@@ -1004,6 +1007,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$spisok = '';
 			foreach($arr as $r) {
 				$c = count(_ids($r['target'], 1));
+				$targetName = 'блок'._end($c, '', 'а', 'ов');
+				$targetColor = 'color-ref';
+				if($r['dialog_id'] == 73) {
+					$targetName = 'элем.';
+					$targetColor = 'color-pay';
+				}
 				$spisok .=
 					'<dd val="'.$r['id'].'">'.
 					'<table class="bs5 bor1 bg-gr2 over2 mb5 curD">'.
@@ -1019,11 +1028,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				   (!$r['value_specific'] ? '<b class="fs12">'.$cond[$r['cond_id']].'</b>' : '').
 					($r['value_specific'] ? 'выбрано: <b>'.$vs[$r['value_specific']].'</b>' : '').
 					($r['action_reverse'] ? '<div class="fs11 color-555">(примен€етс€ обратное действие)</div>' : '').
-									'<tr><td class="fs12 grey r">Ёффект:'.
-										'<td class="fs12 '.($r['effect_id'] ? 'color-pay' : 'pale').'">'.$effect[$r['effect_id']].
+					 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Ёффект:<td class="fs12 color-pay">'.$effect[$r['effect_id']] : '').
 								'</table>'.
-							'<td class="w70 b color-ref top center pt3">'.
-								$c.' блок'._end($c, '', 'а', 'ов').
+							'<td class="w70 b '.$targetColor.' top center pt3">'.
+								$c.' '.$targetName.
 							'<td class="w50 r top">'.
 								'<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',dialog_source:'.$el['block']['obj_id'].'" class="icon icon-edit pl dialog-open'._tooltip('Ќастроить действие', -60).'</div>'.
 								_iconDel(array(

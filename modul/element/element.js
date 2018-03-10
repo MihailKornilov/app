@@ -666,15 +666,42 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					return;
 				//Выбор элемента из диалога или страницы
 				case 13:
-					$(el.attr_cmp).parent().click(function() {
+					var P = $(el.attr_cmp).next(),
+						inp = P.find('input'),
+						del = P.find('.icon-del'),
+						func_open = function(res, dlg) {
+							var bec = dlg.D('.choose');
+							_forEq(bec, function(sp) {
+								if(sp.attr('val') == $(el.attr_cmp).val()) {
+									sp.addClass('sel');
+									return false;
+								}
+							});
+							bec.click(function() {
+								var t = $(this),
+									id = t.attr('val');
+								$(el.attr_cmp).val(id);
+								inp.val(ELM74[id]);
+								del._dn(1);
+								dlg.close();
+								P._flash();
+							});
+						};
+					P.click(function() {//открытие окна для выбора
 						console.log(unit);
 						_dialogLoad({
-							dialog_id:11,
+							dialog_id:74,
 							block_id:unit.source.block_id,
-							func_open:function() {
-								alert(123)
-							}
+							busy_obj:inp,
+							busy_cls:'hold',
+							func_open:func_open
 						});
+					});
+					del.click(function(e) {
+						e.stopPropagation();
+						$(el.attr_cmp).val(0);
+						inp.val('');
+						del._dn();
 					});
 					return;
 				//select - произвольные значения
