@@ -49,6 +49,9 @@ switch(@$_POST['op']) {
 				query($sql);
 			}
 
+			$sql = "SELECT * FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
+			$unit = query_assoc($sql);
+
 			$sql = "DELETE FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
 			query($sql);
 
@@ -60,69 +63,13 @@ switch(@$_POST['op']) {
 			if($dialog['base_table'] == '_page')
 				_cache('clear', '_pageCache');
 
+			if($dialog['base_table'] == '_element_func')
+				if($BL = _blockQuery($unit['block_id']))
+					_cache('clear', $BL['obj_name'].'_'.$BL['obj_id']);
 		}
 
 		$send = _spisokAction4($send);
 
-		jsonSuccess($send);
-		break;
-	case 'spisok_filter_update_old'://обновление списка после применени€ фильтра
-		if(!$elem_spisok = _num($_POST['elem_spisok']))
-			jsonError('Ќекорректный ID элемента-списка');
-		if(!$elem_filter = _num($_POST['elem_filter']))
-			jsonError('Ќекорректный ID элемента-фильтра');
-
-		$v = _txt($_POST['v']);
-
-		//получение данных элемента списка
-		if(!$elSpisok = _elemQuery($elem_spisok))
-			jsonError('Ёлемента-списка id'.$elem_spisok.' не существует');
-		if($elSpisok['dialog_id'] != 14 && $elSpisok['dialog_id'] != 23)
-			jsonError('Ёлемент id'.$elem_spisok.' не €вл€етс€ списком');
-
-		//получение данных элемента фильтра
-		if(!$elFilter = _elemQuery($elem_filter))
-			jsonError('Ёлемента-фильтра id'.$elem_filter.' не существует');
-
-		//получение id сохранЄнного фильтра дл€ пользовател€
-		$sql = "SELECT `id`
-				FROM `_user_spisok_filter`
-				WHERE `user_id`=".USER_ID."
-				  AND `element_id_spisok`=".$elem_spisok."
-				  AND `element_id_filter`=".$elem_filter;
-		$id = _num(query_value($sql));
-
-		$sql = "INSERT INTO `_user_spisok_filter` (
-					`id`,
-					`user_id`,
-					`element_id_spisok`,
-					`element_id_filter`,
-					`v`
-				) VALUES (
-					".$id.",
-					".USER_ID.",
-					".$elem_spisok.",
-					".$elem_filter.",
-					'".addslashes(_txt($v))."'
-				) ON DUPLICATE KEY UPDATE
-					`v`=VALUES(`v`)";
-		query($sql);
-
-		_spisokFilter('cache_clear');
-
-		//элемент количества, прив€занный к списку
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=15
-				  AND `num_1`=".$elem_spisok."
-				LIMIT 1";
-		if($elCount = query_assoc($sql)) {
-			$send['count_attr'] = '#el_'.$elCount['id'];
-			$send['count_html'] = utf8(_spisokElemCount($elCount));
-		}
-
-		$send['spisok_attr'] = '#el_'.$elem_spisok;
-		$send['spisok_html'] = utf8(_spisokShow($elSpisok));
 		jsonSuccess($send);
 		break;
 	case 'spisok_filter_update'://обновление списка после применени€ фильтра
@@ -315,6 +262,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	if($dialog['base_table'] == '_page')
 		_cache('clear', '_pageCache');
+
+	if($dialog['base_table'] == '_element_func')
+		if($BL = _blockQuery($unit['block_id']))
+			_cache('clear', $BL['obj_name'].'_'.$BL['obj_id']);
 
 	if(IS_ELEM) {
 		$elem = _elemQuery($unit_id);
