@@ -429,7 +429,7 @@ function _json($arr) {//перевод массива в JS
 		if(is_array($v))
 			$v = _json($v);
 		else
-			$v = preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.addslashes($v).'"';
+			$v = preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.addslashes(_br($v)).'"';
 		if($is_ass)
 			$v = $k.':'.$v;
 		$send[] = $v;
