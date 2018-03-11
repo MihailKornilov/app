@@ -417,15 +417,27 @@ function _arrJson($arr, $i=false) {//Последовательный массив
 	}
 	return '['.implode(',', $send).']';
 }
-function _json($arr) {
+function _json($arr) {//перевод массива в JS
+	if(empty($arr))
+		return '[]';
+
+	//определение, ассоциативный массив или последовательный
+	$is_ass = range(0,count($arr) - 1) !== array_keys($arr);
+
 	$send = array();
-	foreach($arr as $unit) {
-		$sn = array();
-		foreach($unit as $k => $v)
-			$sn[] = $k.':'.(preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.addslashes($v).'"');
-		$send[] = '{'.implode(',', $sn).'}';
+	foreach($arr as $k => $v) {
+		if(is_array($v))
+			$v = _json($v);
+		else
+			$v = preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.addslashes($v).'"';
+		if($is_ass)
+			$v = $k.':'.$v;
+		$send[] = $v;
 	}
-	return '['.implode(',', $send).']';
+	return
+		($is_ass ? '{' : '[').
+		implode(',', $send).
+		($is_ass ? '}' : ']');
 }
 
 function _vkapi($method, $param=array()) {//получение данных из api вконтакте

@@ -304,7 +304,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 
 		_blockUpd(o.blk);
 		_elemUpd(o.cmp);
-//		_elemActivate(o.cmp, {}, 1);
 
 		DLG('#dialog-menu')._menu({
 			type:2,
@@ -579,14 +578,14 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 			});
 		}
 	},
-	_elemActivate = function(elem, unit, is_edit) {//активирование элементов
+	_elemActivate = function(elem, unit) {//активирование элементов
 		var attr_focus = false;//элемент, на который будет поставлен фокус
 
 		_forIn(elem, function(el) {
 			if(el.focus)
 				attr_focus = el.attr_cmp;
 
-			if(!is_edit && el.hint_on) {
+			if(el.hint_on) {
 				var side = {
 						0:'auto',
 						755:'top',
@@ -627,10 +626,10 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 			switch(el.dialog_id) {
 				case 1://галочка
 					if(el.func.length) {
-						_elemFunc(el, _num(unit[el.col] || 0), is_edit, 1);
+						_elemFunc(el, _num(unit[el.col] || 0), 1);
 						$(el.attr_cmp)._check({
 							func:function(v) {
-								_elemFunc(el, v, is_edit);
+								_elemFunc(el, v);
 							}
 						});
 					}
@@ -639,14 +638,13 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				case 5:	$(el.attr_cmp).autosize(); return;
 				//select - выбор страницы
 				case 6:
-					_elemFunc(el, _num(unit[el.col]), is_edit, 1);
+					_elemFunc(el, _num(unit[el.col]), 1);
 					$(el.attr_cmp)._select({
-						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
 						spisok:PAGE_LIST,
 						func:function(v) {
-							_elemFunc(el, v, is_edit);
+							_elemFunc(el, v);
 						}
 					});
 					return;
@@ -751,46 +749,36 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					return;
 				//select - произвольные значени€
 				case 17:
-					_elemFunc(el, _num(unit[el.col] || el.def), is_edit, 1);
+					_elemFunc(el, _num(unit[el.col] || el.def), 1);
 					$(el.attr_cmp)._select({
-						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
 						spisok:el.vvv,
 						func:function(v) {
-							_elemFunc(el, v, is_edit);
+							_elemFunc(el, v);
 						}
 					});
 					return;
 				//наполнение дл€ некоторых компонентов
-				case 19:
-					if(is_edit)
-						return;
-					_cmpV19(el);
-					return;
+				case 19: _cmpV19(el); return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —писок действий, прив€занных к элементу
 				case 22:
-					if(is_edit)
-						return;
 					$(el.attr_el).find('DL')._sort({table:'_element_func'});
 					return;
 				//select - выбор списка (все списки приложени€)
 				case 24:
-					_elemFunc(el, _num(unit[el.col] || el.def), is_edit, 1);
+					_elemFunc(el, _num(unit[el.col] || el.def), 1);
 					$(el.attr_cmp)._select({
-						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
 						spisok:el.vvv,
 						func:function(v) {
-							_elemFunc(el, v, is_edit);
+							_elemFunc(el, v);
 						}
 					});
 					return;
 				//настройка шаблона единицы списка
 				case 25:
-					if(is_edit)
-						return;
 					$('#block-level-spisok')
 						.find('.block-grid-on')
 						.removeClass('grey')
@@ -798,8 +786,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —одержание диалога дл€ выбора значени€
 				case 26:
-					if(is_edit)
-						return;
 					if(!window.DIALOG_OPEN)
 						return;
 					var DLG = DIALOG_OPEN,
@@ -854,7 +840,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				//select - выбор единицы из другого списка (дл€ св€зки)
 				case 29:
 					var o = {
-						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
 						write:el.num_1 && el.num_3,
@@ -898,16 +883,9 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					$(el.attr_cmp)._select(o);
 					return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: Ќастройка “јЅЋ»„Ќќ√ќ содержани€ списка
-				case 30:
-					if(is_edit)
-						return;
-					_cmpV30(el, unit);
-					return;
+				case 30: _cmpV30(el, unit); return;
 				//¬ыбор значений дл€ содержани€ Select
 				case 31:
-					if(is_edit)
-						return;
-
 					var sv = $(el.attr_el).find('.sv'),
 						ex = $(el.attr_cmp).val().split(','),
 						v = [];
@@ -939,7 +917,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				//count - количество
 				case 35:
 					$(el.attr_cmp)._count({
-						disabled:is_edit,
 						width:el.width,
 						min:el.num_1,
 						max:el.num_2,
@@ -950,7 +927,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				//SA: Select - выбор имени колонки
 				case 37:
 					$(el.attr_cmp)._select({
-						disabled:is_edit,
 						width:el.width,
 						title0:'не выбрано',
 						msg_empty:'колонок нет',
@@ -966,7 +942,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				//SA: Select - выбор диалогового окна
 				case 38:
 					$(el.attr_cmp)._select({
-						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
 						msg_empty:'диалоги ещЄ не были созданы',
@@ -976,7 +951,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				//SA: Select - дублирование
 				case 41:
 					$(el.attr_cmp)._select({
-						disabled:is_edit,
 						width:el.width,
 						title0:el.txt_1,
 						spisok:el.vvv
@@ -984,8 +958,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					return;
 				//»конка вопрос: ¬ыплывающа€ подсказка
 				case 42:
-					if(is_edit)
-						return;
 					var side = {
 						0:'auto',
 						741:'top',
@@ -993,7 +965,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 						743:'left',
 						744:'right'
 					};
-
 					$(el.attr_cmp).mouseenter(function() {
 						$(el.attr_cmp)._hint({
 							msg:_br(el.txt_1, 1),
@@ -1004,11 +975,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					});
 					return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: Ќаполнение дл€ некоторых компонентов
-				case 49:
-					if(is_edit)
-						return;
-					_cmpV49(el, unit);
-					return;
+				case 49: _cmpV49(el, unit); return;
 				// алендарь
 				case 51:
 					$(el.attr_cmp)._calendar({
@@ -1017,15 +984,9 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					});
 					return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: Ќастройка суммы значений единицы списка (дл€ [27])
-				case 56:
-					if(is_edit)
-						return;
-					_cmpV56(el, unit);
-					return;
+				case 56: _cmpV56(el, unit); return;
 				//ћеню переключени€ блоков
 				case 57:
-					if(is_edit)
-						return;
 					var type = {
 							1158:2,
 							1159:1
@@ -1048,11 +1009,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					});
 					return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: Ќастройка пунктов меню переключени€ блоков (дл€ [57])
-				case 58:
-					if(is_edit)
-						return;
-					_cmpV58(el);
-					return;
+				case 58: _cmpV58(el); return;
 				//—в€зка списка при помощи кнопки
 				case 59:
 					var but = $(el.attr_cmp + el.afics),
@@ -1340,6 +1297,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				case 62:
 					$(el.attr_cmp)._check({
 						func:function(v) {
+							_elemFunc(el, v);
 							_spisokUpdate(el.num_2, el.id, v);
 						}
 					});
@@ -1376,7 +1334,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 			}
 		});
 
-		if(!is_edit && attr_focus)
+		if(attr_focus)
 			$(attr_focus).focus();
 	},
 	_cmpV19 = function(o, get) {//наполнение дл€ некоторых компонентов. dialog_id=19
@@ -1993,11 +1951,12 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 			DIALOG_OPEN.show();
 		}
 	},
-	_elemFunc = function(el, v, is_edit, is_open) {//применение функций, прив€занных к элементам
+	_elemFunc = function(el, v, is_open) {//применение функций, прив€занных к элементам
 		/*
 			is_open - окно открылось, эффектов нет, только применение функций
 		*/
-		if(is_edit)
+
+		if(!el.func)
 			return;
 
 		_forN(el.func, function(sp) {
@@ -2093,6 +2052,18 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 						}
 					});
 					break;
+				//установка значени€
+				case 73://фильтр-галочка[62]
+					_forIn(sp.target, function(tar, elem_id) {
+						var EL = ELM[elem_id];
+						//свои способы действи€ по каждому элементу
+						switch(EL.dialog_id) {
+							case 1: //галочка
+							case 62://фильтр-галочка
+								$(EL.attr_cmp)._check(1);
+								break;
+						}
+					});
 			}
 		});
 	},

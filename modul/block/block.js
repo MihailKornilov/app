@@ -457,7 +457,6 @@ $(document)
 			$('.block-content-' + spl[0]).html(res.html);
 
 			if(!v) {
-//				_elemActivate(res.elm, {}, 1);
 				_blockUpd(res.blk);
 				_elemUpd(res.elm);
 			}
@@ -696,7 +695,6 @@ $.fn._grid = function(o) {
 		_post(send, function(res) {
 			$('#block-level-' + o.obj_name).after(res.level).remove();
 			$('.block-content-' + o.obj_name).html(res.html);
-//			_elemActivate(res.elm, {}, 1);
 			_blockUpd(res.blk);
 		});
 	});

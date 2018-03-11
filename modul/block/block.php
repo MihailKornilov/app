@@ -610,14 +610,18 @@ function _block($obj_name, $obj_id, $i='all') {
 	if($i == 'elem_js') {//массив элементов в формате JS
 		if(empty($ELM))
 			return '{}';
+		return _json($ELM);
+/*
 		$send = array();
 		foreach($ELM as $id => $bl) {
 			$u = array();
 			foreach($bl as $k => $v) {
 				if($k == 'focus' && !$v)
 					continue;
-				if($k == 'func')
+				if($k == 'func') {
+					$u[] = $k.':'._json($v);
 					continue;
+				}
 				if(is_array($v)) {
 					if(empty($v))
 						continue;
@@ -632,6 +636,7 @@ function _block($obj_name, $obj_id, $i='all') {
 			$send[] = $id.':{'.implode(',', $u).'}';
 		}
 		return '{'.implode(',', $send).'}';
+*/
 	}
 
 	if($i == 'block_arr') {

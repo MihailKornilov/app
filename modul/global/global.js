@@ -236,6 +236,8 @@ var VK_SCROLL = 0,
 		return true;
 	},
 	_forN = function(arr, func) {//перечисление последовательного массива js
+		if(!arr)
+			return false;
 		for(var n = 0; n < arr.length; n++)
 			if(func(arr[n], n) === false)
 				return false;
@@ -471,3 +473,4 @@ $(document)
 		_msg();
 		location.reload();
 	});
+

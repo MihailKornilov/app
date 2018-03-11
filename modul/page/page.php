@@ -988,8 +988,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$BL = _blockQuery($bs_id))
 				return _emptyMin('Исходного блока id'.$bs_id.' не существует.');
 
-			if($BL['obj_name'] != 'dialog')
-				return _emptyMin('Действия можно назначать<br>только компонентам в диалоговых окнах.');
+			if($BL['obj_name'] != 'page' && $BL['obj_name'] != 'dialog')
+				return _emptyMin('Действия можно назначать<br>только компонентам на страницах и диалоговых окнах.');
 
 			$sql = "SELECT *
 					FROM `_element_func`
