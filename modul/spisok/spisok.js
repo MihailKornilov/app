@@ -1,9 +1,8 @@
-var _spisokUpdate = function(elem_spisok, elem_filter, v) {
+var _spisokUpdate = function(elem_spisok) {
 		var send = {
 			op:'spisok_filter_update',
 			elem_spisok:elem_spisok,            //id элемента-списка
-			elem_filter:elem_filter,            //id элемента-фильтра
-			v:v,                                //значение фильтра
+			elem_v:FILTER[elem_spisok],         //значения фильтра по каждому элементу
 			busy_obj:$('#el_' + elem_spisok),   //id элемента, размещающего список
 			busy_cls:'spisok-busy'
 		};

@@ -297,9 +297,10 @@ function _pageShow($page_id) {
 		'var BLK='._block('page', $page_id, 'block_js').','.
 			'ELM='._block('page', $page_id, 'elem_js').','.
 			'PAGE_LIST='._page('for_select', 'js').','.
-			'ELEM_COLOR={'._colorJS().'};'.
-	'</script>'.
-	'<script>_pageAct('.PAS.')</script>';
+			'ELEM_COLOR='._colorJS().','.
+			'FILTER='._json(_spisokFilter('page_js')).';'.
+		'_pageAct('.PAS.');'.
+	'</script>';
 }
 function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, которая размещается на странице. Получение по $_GET['id']
 	if($obj_name != 'page')

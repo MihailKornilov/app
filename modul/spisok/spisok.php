@@ -58,6 +58,13 @@ function _spisokFilter($i='all', $elem_id=0) {//получение значений фильтров спис
 		return $F['spisok'][$elem_id];
 	}
 
+	if($i == 'page_js') {//значения фильтров в формате JS по каждому списку во всём приложении
+		$send = array();
+		foreach($F['spisok'] as $id => $arr)
+			foreach($arr as $elid => $el)
+				$send[$id][$elid] = $el['v'];
+		return $send;
+	}
 
 	return $F;
 }

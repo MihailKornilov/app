@@ -651,8 +651,9 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				//search
 				case 7:
 					$(el.attr_cmp)._search({
-						func:function(v, obj) {
-							_spisokUpdate(el.num_1, el.id, v);
+						func:function(v) {
+							FILTER[el.num_1][el.id] = v;
+							_spisokUpdate(el.num_1);
 						}
 					});
 					return;
@@ -1298,7 +1299,8 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					$(el.attr_cmp)._check({
 						func:function(v) {
 							_elemFunc(el, v);
-							_spisokUpdate(el.num_2, el.id, v);
+							FILTER[el.num_2][el.id] = v;
+							_spisokUpdate(el.num_2);
 						}
 					});
 					return;
@@ -2052,15 +2054,50 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						}
 					});
 					break;
-				//установка значения
+				//установка/снятие значений
 				case 73://фильтр-галочка[62]
+					var is_set = 0;//по умолчанию: сбросить значение
+
+					//ДЕЙСТВИЕ
+					switch(sp.action_id) {
+						//сбросить значение
+						case 1718:
+						default: break;
+						//установить значение
+						case 1719:
+							is_set = 1;
+							break;
+					}
+
+					//УСЛОВИЕ
+					switch(sp.cond_id) {
+						case 1715://галочка снята
+							if(v && sp.action_reverse) {
+								is_set = is_set ? 0 : 1;
+								break;
+							}
+							if(v)
+								return;
+							break;
+						case 1716://галочка установлена
+							if(!v && sp.action_reverse) {
+								is_set = is_set ? 0 : 1;
+								break;
+							}
+							if(!v)
+								return;
+							break;
+						default: return;
+					}
+
 					_forIn(sp.target, function(tar, elem_id) {
 						var EL = ELM[elem_id];
-						//свои способы действия по каждому элементу
+						//свои способы действия на каждый элемент
 						switch(EL.dialog_id) {
 							case 1: //галочка
 							case 62://фильтр-галочка
-								$(EL.attr_cmp)._check(1);
+								$(EL.attr_cmp)._check(is_set);
+								FILTER[el.num_2][EL.id] = is_set;
 								break;
 						}
 					});
