@@ -387,6 +387,26 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'elem_choose_page'://выбор элемента на странице
+		if(!$page_id = _num($_POST['page_id']))
+			jsonError('Некорректный ID страницы');
+		if(!$page = _page($page_id))
+			jsonError('Страницы не существует');
+		if(!SA && $page['sa'])
+			jsonError('Нет доступа');
+
+		$unit = _pageSpisokUnit($page_id);
+		$unit += array(
+			'choose' => 1,
+			'choose_access' => array('all'=>1),
+			'choose_sel' => array(),       //ids ранее выбранных блоков
+			'choose_deny' => array()
+		);
+
+		$send['html'] = utf8(_blockHtml('page', $page_id, 1000, 0, $unit));
+
+		jsonSuccess($send);
+		break;
 }
 
 

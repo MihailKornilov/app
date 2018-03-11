@@ -487,17 +487,36 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//¬ыбор элемента из диалога или страницы
 		case 13:
 			/*
+				ќтносительно исходного блока определ€етс€ страница или диалог, из которого будет выбиратьс€ элемент
+
 				txt_1 - текст дл€ placeholder
 			*/
+
+			$obj_name = '';
+			$obj_id = 0;
+
+			if(!empty($unit['source']['block_id'])) {
+				$block_id = _num($unit['source']['block_id']);
+				if($BL = _blockQuery($block_id)) {
+					if($BL['obj_name'] == 'page' || $BL['obj_name'] == 'dialog') {
+						$obj_name = $BL['obj_name'];
+						$obj_id = $BL['obj_id'];
+					}
+				}
+			}
+
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$v = _num($v);
+
 			return
-				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				'<div class="_selem dib prel bg-fff over1" id="'.$attr_id.'_selem"'.$width.'>'.
-					'<div class="icon icon-star pabs"></div>'.
-					'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-					'<input type="text" readonly class="curP w100p"'.$placeholder.$disabled.' value="'._elemTitle($v).'" />'.
-				'</div>';
+			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+			'<div class="_selem dib prel bg-fff over1" id="'.$attr_id.'_selem"'.$width.'>'.
+				'<input type="hidden" class="obj_name" value="'.$obj_name.'" />'.
+				'<input type="hidden" class="obj_id" value="'.$obj_id.'" />'.
+				'<div class="icon icon-star pabs"></div>'.
+				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+				'<input type="text" readonly class="inp curP w100p"'.$placeholder.$disabled.' value="'._elemTitle($v).'" />'.
+			'</div>';
 
 		//Radio
 		case 16:

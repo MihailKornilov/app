@@ -187,7 +187,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 						' style="'._blockStyle($r, $width, $unit).'"'.
 		  (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
 					 '>'.
-							_blockSetka($r, $level, $grid_id).
+							_blockSetka($r, $level, $grid_id, $unit).
 							_blockChoose($r, $unit).
 							_blockElemChoose($r, $unit).
 							_blockChildHtml($r, $level + 1, $width, $grid_id, $unit).
@@ -281,11 +281,13 @@ function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
 	}
 	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
 }
-function _blockSetka($r, $level, $grid_id) {//отображение сетки для настраиваемого блока
+function _blockSetka($r, $level, $grid_id, $unit) {//отображение сетки для настраиваемого блока
 	if(!BLOCK_EDIT)
 		return '';
 	//включенное изменение ширины элемента отключает настройку блоков
 	if(ELEM_WIDTH_CHANGE)
+		return '';
+	if(!empty($unit['choose']))
 		return '';
 	if($r['id'] == $grid_id)
 		return '';
@@ -323,8 +325,8 @@ function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 		return '';
 	if(empty($r['elem']))//блок не подсвечивается, если в нём нет элемента
 		return '';
-	if($r['obj_name'] != 'dialog')//выбор элементов можно производить только у диалогов (пока)
-		return '';
+//	if($r['obj_name'] != 'dialog')//выбор элементов можно производить только у диалогов (пока)
+//		return '';
 
 	$dialog_id = $r['elem']['dialog_id'];
 
@@ -508,6 +510,7 @@ function _blockCache($obj_name, $obj_id) {
 		$el['dialog_func'] = _num($dlg['element_dialog_func']);
 		$el['afics'] = $dlg['element_afics'];
 		$el['hidden'] = _num($dlg['element_hidden']);
+		$el['title'] = _elemTitle($el['id']);
 
 		if($el['width_min'] = _num($dlg['element_width_min'])) {
 			//определение максимальной ширины, на которую может растягиваться элемент

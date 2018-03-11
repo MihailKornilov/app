@@ -548,9 +548,10 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 	return $spisok;
 }
 function _dialogElemChoose($el, $unit) {//выбор элемента (подключение через [12]). Используется в [74] для [13]
-	if(empty($unit['source']['block_id']))
-		return _emptyMin('Отсутствует исходный блок.');
+	if(empty($unit['source']['dialog_source']))
+		return _emptyMin('Отсутствует исходный диалог.');
 
+/*
 	$block_id = _num($unit['source']['block_id']);
 
 	if(!$BL = _blockQuery($block_id))
@@ -560,14 +561,12 @@ function _dialogElemChoose($el, $unit) {//выбор элемента (подключение через [12]
 		return _emptyMin('Не диалог.');
 
 	$dialog_id = $BL['obj_id'];
+*/
 
-	if(!$dialog_id)
+	if(!$dialog_id = _num($unit['source']['dialog_source']))
 		return _emptyMin('Не найдено ID диалога, который вносит данные списка.');
-
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin('Диалога не существует, который вносит данные списка.');
-
-//	$elemArr = _block('dialog', $dialog_id, 'elem_arr');
 
 	$sql = "SELECT `id`,1
 			FROM `_dialog`
@@ -630,6 +629,8 @@ function _blockQuery($block_id) {//запрос одного блока
 }
 
 function _elemTitle($elem_id) {//имя элемента или его текст
+	if(!$elem_id = _num($elem_id))
+		return '';
 	if(!$el = _elemQuery($elem_id))
 		return '';
 
@@ -644,6 +645,7 @@ function _elemTitle($elem_id) {//имя элемента или его текст
 		case 59: return _dialogParam($el['num_1'], 'name');
 		case 32: return 'номер';
 		case 33: return 'дата/время';
+		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
 			_cache('clear', '_dialogQuery'.$el['num_2']);
 			$dlg = _dialogQuery($el['num_2']);
