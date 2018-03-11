@@ -1,4 +1,4 @@
-var _spisokUpdate = function(elem_spisok) {
+var _spisokUpdate = function(elem_spisok, func) {
 		var send = {
 			op:'spisok_filter_update',
 			elem_spisok:elem_spisok,            //id элемента-списка
@@ -9,6 +9,8 @@ var _spisokUpdate = function(elem_spisok) {
 		_post(send, function(res) {
 			$(res.count_attr).html(res.count_html);
 			$(res.spisok_attr).html(res.spisok_html);
+			if(func)
+				func(res);
 		});
 	},
 	_spisokNext = function(t, elem_id, next) {

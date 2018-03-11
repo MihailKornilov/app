@@ -650,10 +650,27 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					return;
 				//search
 				case 7:
+					var timer,
+						started = 0,
+						v_last;
 					$(el.attr_cmp)._search({
 						func:function(v) {
-							FILTER[el.num_1][el.id] = v;
-							_spisokUpdate(el.num_1);
+							if(started)
+								return;
+							if(timer)
+								clearInterval(timer);
+							if(v_last == v)
+								return;
+							timer = setInterval(function() {
+								started = 1;
+								v_last = v;
+								FILTER[el.num_1][el.id] = v;
+								_spisokUpdate(el.num_1, function() {
+									started = 0;
+									clearInterval(timer);
+									timer = 0;
+								});
+							}, 700);
 						}
 					});
 					return;
