@@ -664,6 +664,8 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 							timer = setInterval(function() {
 								started = 1;
 								v_last = v;
+								if(!FILTER[el.num_1])
+									FILTER[el.num_1] = {};
 								FILTER[el.num_1][el.id] = v;
 								_spisokUpdate(el.num_1, function() {
 									started = 0;
@@ -863,6 +865,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 						write:el.num_1 && el.num_3,
 						msg_empty:'Ќе найдено',
 						spisok:el.vvv,
+						disabled:el.num_5,
 						funcWrite:function(v, t) {
 							var send = {
 								op:'spisok_29_connect',
