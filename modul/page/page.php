@@ -606,15 +606,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
                 txt_2 - два id элемента, составляющие содержание Select
 				num_2 - возможность добавления новых значений
 				num_3 - поиск значений вручную
-				num_4 - устанавливать значение, которое принимает страница
-				num_5 - блокировать выбор
+				num_4 - блокировать выбор
 			*/
 
 			if(!$UNIT_ISSET)
-				if($page_id = _page('cur'))
-					if($page = _page($page_id))
-						if($page['spisok_id'] == $el['num_1'])
-							$v = _num(@$_GET['id']);
+				$v = _spisokCmpConnectIdGet($el);
 
 			return _select(array(
 						'attr_id' => $attr_id,

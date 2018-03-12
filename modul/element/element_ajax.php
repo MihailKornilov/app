@@ -784,14 +784,7 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//select - выбор единицы из другого списка (дл€ св€зки)
 			case 29:
-				$sel_id = 0;//выбранное значение
-				if($unit_id)
-					$sel_id = $unit[$cmp['col']];
-				else
-					if($page_id = _page('cur'))
-						if($page = _page($page_id))
-							if($page['spisok_id'] == $cmp['num_1'])
-								$sel_id = _num(@$_GET['id']);
+				$sel_id = $unit_id ? $unit[$cmp['col']] : _spisokCmpConnectIdGet($cmp);
 				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
 				break;
 			//настройка “јЅЋ»„Ќќ√ќ содержани€ списка

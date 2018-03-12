@@ -490,31 +490,16 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 		return;
 
 	$update = array();
-	$cmpConnect = array();//проверка чтобы второй вложенный список был установлен, если он является вложенным списком первого
 	foreach($POST_CMP as $cmp_id => $v) {
 		$cmp = $dialog['cmp'][$cmp_id];
-		if($cmp['dialog_id'] == 29 && $v)
-			$cmpConnect[] = $cmp;
 		$col = $cmp['col'];
 		$update[] = "`".$col."`='".addslashes($v)."'";
 	}
-
-
-
-//	print_r($cmpConnect);
-//	print_r($update);
 
 	$sql = "UPDATE `".$dialog['base_table']."`
 			SET ".implode(',', $update)."
 			WHERE `id`=".$unit_id;
 	query($sql);
-
-return;
-	foreach($cmpConnect as $r) {
-		$dlg = _dialogQuery($r['num_1']);
-
-	}
-
 }
 function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
 	if($send['action_id'] != 3)

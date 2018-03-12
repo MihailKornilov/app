@@ -865,7 +865,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 						write:el.num_1 && el.num_3,
 						msg_empty:'Ќе найдено',
 						spisok:el.vvv,
-						disabled:el.num_5,
+						blocked:el.num_4,
 						funcWrite:function(v, t) {
 							var send = {
 								op:'spisok_29_connect',
@@ -2945,7 +2945,8 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 
 	o = $.extend({
 		width:150,			// ширина. ≈сли 0 = 100%
-		disabled:0,
+		disabled:0,         // нельз€ выбирать, серые стили
+		blocked:0,          // заблокировано. Ќельз€ выбирать, но выгл€дит €рко
 		block:0,       	    // расположение селекта
 		title0:'',			// поле с нулевым значением
 		spisok:[],			// результаты в формате json
@@ -2959,13 +2960,14 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 	}, o);
 
 	var dis = o.disabled ? ' disabled' : '',
+		blocked = o.blocked ? ' blocked' : '',
 		dib = o.block ? '' : ' dib',
 		width = 'width:' + (o.width ? o.width + 'px' : '100%'),
 		readonly = o.write ? '' : ' readonly',
 		placeholder = o.title0 ? ' placeholder="' + o.title0 + '"' : '',
-		iconAddFlag = o.funcAdd && !dis,
+		iconAddFlag = o.funcAdd && !dis && !blocked,
 		html =
-		'<div class="_select' + dis + dib + '" id="' + win + '" style="' + width + '">' +
+		'<div class="_select' + dis + blocked + dib + '" id="' + win + '" style="' + width + '">' +
 			'<table class="w100p">' +
 				'<tr><td><input type="text" class="select-inp"' + placeholder + readonly + ' />' +
 					'<td class="w15' + _dn(o.write) + '"><div class="icon icon-del pl dn"></div>' +
@@ -2976,6 +2978,9 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		'</div>';
 	t.next().remove('._select');
 	t.after(html);
+
+	if(blocked)
+		dis = 1;
 
 	var SEL = t.next(),
 		INP = SEL.find('.select-inp'),

@@ -926,7 +926,34 @@ function _spisok59unit($cmp_id, $unit_id) {//выбранное значение при связке списк
 	return _blockHtml('spisok', $el['block_id'], 350, 0, $un);
 }
 
+function _spisokCmpConnectIdGet($el) {//получение id привязонного списка, если рядом стоит родительский список (для страницы, принимающей значения списка)
+	if($el['dialog_id'] != 29)//только для связок
+		return 0;
+	if(!$get_id = _num(@$_GET['id']))
+		return 0;
+	if(!$page_id = _page('cur'))
+		return 0;
+	if(!$page = _page($page_id))
+		return 0;
+	if(!$page['spisok_id'])//страница не принмает значения
+		return 0;
+	if($page['spisok_id'] == $el['num_1'])//если список является страницей, принимающей значение, возврат $_GET['id']
+		return $get_id;
 
+	if(!$dlg = _dialogQuery($page['spisok_id']))
+		return 0;
+
+	foreach($dlg['cmp'] as $cmp)
+		if($cmp['dialog_id'] == 29 && $cmp['num_1'] == $el['num_1']) {
+			$sql = "SELECT *
+					FROM `_spisok`
+					WHERE `id`=".$get_id;
+			if($unit = query_assoc($sql))
+				return $unit[$cmp['col']];
+		}
+
+	return 0;
+}
 
 
 
