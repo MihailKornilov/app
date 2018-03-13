@@ -1732,7 +1732,7 @@ function _page_div() {//todo тест
 	'<br>'.
 	'<br>'.
 	'<div class="w200">'.
-		'<input type="hidden" class="aaa" />'.
+		'<input type="hidden" id="aaa" value="1,2" />'.
 	'</div>'.
 
 	'<div class="w500 mt10">'.

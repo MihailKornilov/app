@@ -2525,7 +2525,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {
-						console.log(res);
 						v.id = res.unit.id;
 						DD.attr('val', v.id);
 						TITLE.attr('val', res.unit.num_1);
@@ -2611,6 +2610,8 @@ $(document)
 			delayShow:500,
 			delayHide:300
 		});
+	})
+	.ready(function() {
 	});
 
 $.fn._check = function(o) {
@@ -2953,9 +2954,9 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		write:0,            // возможность вводить значени€
 		write_save:0,       // сохран€ть текст, если даже не выбран элемент
 		msg_empty:'—писок пуст',
-		multiselect:0,      // возможность выбирать несколько значений. »дентификаторы перечисл€ютс€ через зап€тую
-		func:function() {},	// функци€, выполн€ема€ при выборе элемента
-		funcWrite:function() {},// функци€, выполн€ема€ при вводе в INPUT в селекте. Ќужна дл€ вывода списка из вне, например, Ajax-запроса, либо из vk api.
+		multi:0,            // возможность выбирать несколько значений. »дентификаторы перечисл€ютс€ через зап€тую
+		func:function() {},	// функци€, выполн€ема€ при выборе значени€
+		funcWrite:funcWrite,// функци€, выполн€ема€ при вводе в INPUT в селекте. Ќужна дл€ вывода списка из вне, например, Ajax-запроса, либо из vk api.
 		funcAdd:null	    // добавлени€ новой единицы. ≈сли указана, показывает плюсик.
 	}, o);
 
@@ -2969,8 +2970,11 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		html =
 		'<div class="_select' + dis + blocked + dib + '" id="' + win + '" style="' + width + '">' +
 			'<table class="w100p">' +
-				'<tr><td><input type="text" class="select-inp"' + placeholder + readonly + ' />' +
-					'<td class="w15' + _dn(o.write) + '"><div class="icon icon-del pl dn"></div>' +
+				'<tr><td>' +
+			 (o.multi ? '<dl>' : '') +
+							'<input type="text" class="select-inp w50' + _dn(!o.multi, 'w100p') + '"' + placeholder + readonly + ' />' +
+			 (o.multi ? '</dl>' : '') +
+					'<td class="w15' + _dn(o.write) + '"><div class="icon icon-del clear pl dn"></div>' +
 					'<td class="w25 r' + _dn(iconAddFlag) + '"><div class="icon icon-add pl"></div>'+
 					'<td class="arrow">' +
 			'</table>' +
@@ -2983,25 +2987,28 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 		dis = 1;
 
 	var SEL = t.next(),
+		DL = SEL.find('dl'),
+		DLW = o.multi ? Math.round(DL.width()) : 0,
 		INP = SEL.find('.select-inp'),
 		RES = SEL.find('.select-res'),
-		ICON_DEL = SEL.find('.icon-del'),
+		ICON_DEL = SEL.find('.clear'),
 		ICON_ADD = SEL.find('.icon-add'),
 		MASS_ASS,//ассоциативный массив в виде {1:'text'}
 		MASS_SEL,//массив в виде [{id:1,title:'text1'},{id:2,title:'text2'}]
 		MASS_SEL_SAVE,//дублирование MASS_SEL
+		TAG = /(<[\/]?[_a-zA-Z0-9=\"' ]*>)/i, // поиск всех тегов
 		BG_ASS;  //ассоциативный массив цветов фона
 
 	massCreate();
-	spisokPrint();
-	valueSet(VALUE);
+	o.multi ? multiPrint() : spisokPrint();
+	valueSet(o.multi ? '' : VALUE);
 
-	INP.keydown(function(e) {
+	INP.keydown(function() {
 		setTimeout(function() {
 			VALUE = 0;
 			t.val(0);
 			var v = INP.val();
-			ICON_DEL._dn(v);
+			ICON_DEL._dn(v && !o.multi);
 			o.funcWrite(v, t);
 		}, 0);
 	});
@@ -3062,9 +3069,12 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 			o.funcAdd(t);
 		});
 
+	if(o.multi)
+		DL.sortable({update:multiValueSet});
+
 	$(document)
 		.off('click._select')
-		.on('click._select', function(e) {
+		 .on('click._select', function(e) {
 			var cur = $(e.target).parents('._select'),
 				attr = '';
 
@@ -3099,7 +3109,7 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 					content:sp
 				};
 				MASS_SEL.push(unit);
-				MASS_SEL_SAVE.push(unit);
+				MASS_SEL_SAVE.push(_copyObj(unit));
 			});
 			return;
 		}
@@ -3143,7 +3153,7 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 				bg:sp.bg
 			};
 			MASS_SEL.push(unit);
-			MASS_SEL_SAVE.push(unit);
+			MASS_SEL_SAVE.push(_copyObj(unit));
 			BG_ASS[id] = sp.bg;
 		});
 	}
@@ -3154,11 +3164,14 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 			return;
 		}
 
-		var html = '';
-		if(o.title0 && !o.write)
+		var html = '',
+			is_sel = o.multi ? _idsAss(t.val()) : {}; //выбранные значени€ (нельз€ выбрать повторно при multi)
+		if(o.title0 && !o.write && !o.multi)
 			html += '<div class="select-unit title0" val="0">' + o.title0 + '</div>';
 
 		_forN(MASS_SEL, function(sp) {
+			if(is_sel[sp.id])
+				return;
 			var info = sp.info ? ' info' : '',
 				val = info ? '' : ' val="' + sp.id + '"',
 				bg = sp.bg ? ' style="background-color:' + sp.bg + '"' : '';
@@ -3178,7 +3191,33 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 			sp.addClass('ov');
 		});
 	}
+	function funcWrite() {//выделение символов при поиске
+		var v = $.trim(INP.val()),
+			find = [],
+			reg = new RegExp(v, 'i'); // дл€ замены найденного значени€
+		_forN(MASS_SEL_SAVE, function(sp) {
+			var un = _copyObj(sp),
+				arr = un.content.split(TAG); // разбивка на массив согласно тегам
+			_forN(arr, function(r, k) {
+				if(!r.length)    //если строка пуста€
+					return;
+				if(TAG.test(r))  //если это тег
+					return;
+				if(!reg.test(r)) //если нет совпадени€
+					return;
+
+				arr[k] = r.replace(reg, '<em class="fndd">$&</em>'); // производитс€ замена
+				un.content = arr.join('');
+				find.push(un);
+				return false; // и сразу выход из массива
+			});
+		});
+		MASS_SEL = find;
+		spisokPrint();
+	}
 	function valueSet(v) {//установка значени€
+		if(o.multi)
+			return multiValueSet(v);
 		v = _num(v);
 		VALUE = v;
 		t.val(v);
@@ -3188,6 +3227,49 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 			SEL.css('background-color', BG_ASS[v]);
 			INP.css('background-color', BG_ASS[v]);
 		}
+	}
+	function multiValueSet(v) {//обновление массива и ширины инпута после вставки значени€, если мульти-выбор
+		v = _num(v);
+		multiBefore(v);
+
+		var dd = DL.find('dd:last'),
+			w = DLW - 10,
+			vv = [];
+		if(dd.length) {
+			var ol = dd[0].offsetLeft,
+				ow = dd[0].offsetWidth,
+				inpW = DLW - ol - ow - 10;
+			w = inpW < 30 ? w : inpW;
+			_forEq(DL.find('dd'), function(sp) {
+				vv.push(sp.attr('val'));
+			});
+		}
+		INP.width(w);
+		INP.attr('placeholder', dd.length ? '' : o.title0);
+		t.val(vv.join(','));
+		spisokPrint();
+	}
+	function multiPrint() {//вывод выбранных значений при мульти-выборе
+		_forIn(_idsAss(t.val()), function(i, id) {
+			multiBefore(id);
+		});
+	}
+	function multiBefore(v) {//вставка значени€, если мульти-выбор
+		if(!v)
+			return;
+		if(!MASS_ASS[v])
+			return;
+		INP.before(
+			'<dd class="multi" val="' + v + '">' +
+				MASS_ASS[v] +
+				'<div class="icon icon-del pl"></div>' +
+			'</dd>'
+		);
+		INP.val('');
+		DL.find('.icon:last').click(function() {
+			$(this).parent().remove();
+			multiValueSet();
+		});
 	}
 	function action() {//выполнение действи€ в существующем селекте
 		if(s === undefined)

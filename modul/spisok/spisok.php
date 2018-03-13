@@ -687,94 +687,6 @@ function _spisokCond62($el) {//фильтр-галочка
 
 	return $send;
 }
-function _spisok29connect_($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
-	if(!$cmp_id)
-		return array();
-
-	if(!$cmp = _elemQuery($cmp_id))
-		return array();
-	if(!$cmp['num_1'])
-		return array();
-	if(!$dialog = _dialogQuery($cmp['num_1']))
-		return array();
-
-	//получение имён колонок для отображения содержания Select
-	$ex = explode(',', $cmp['txt_2']);
-	$col0 = _num($ex[0]);
-	$col1 = _num(@$ex[1]);
-	if($cmp['txt_2']) {
-		$sql = "SELECT `id`,`txt_2`
-				FROM `_element`
-				WHERE `id` IN ("._ids($cmp['txt_2']).")";
-		if($ass = query_ass($sql)) {
-			$sql = "SELECT `id`,`col`
-					FROM `_element`
-					WHERE `id` IN (".implode(',', $ass).")";
-			if($cols = query_ass($sql)) {
-				$col0 = $cols[$ass[$col0]];
-				$col1 = @$cols[$ass[$col1]];
-			}
-		}
-	}
-	//проверка наличия колонок в таблице
-	$col0 = isset($dialog['field'][$col0]) ? $col0 : '';
-	$col1 = isset($dialog['field'][$col1]) ? $col1 : '';
-
-	$cond = "`dialog_id`=".$cmp['num_1'];
-	if($v) {
-		$cols = array();
-		if($col0)
-			$cols[] = "`".$col0."` LIKE '%".$v."%'";
-		if($col1)
-			$cols[] = "`".$col1."` LIKE '%".$v."%'";
-		$cond .= $cols ? " AND (".implode(' OR ', $cols).")" : " AND !`id`";
-	}
-
-	$sql = "SELECT *
-			FROM `_spisok`
-			WHERE ".$cond."
-			  AND !`deleted`
-			ORDER BY `sort`,`id` DESC
-			LIMIT 50";
-	if(!$arr = query_arr($sql))
-		return array();
-
-	//добавление единицы списка, которая была выбрана ранее
-	if($sel_id && empty($arr[$sel_id])) {
-		$sql = "SELECT *
-				FROM `_spisok`
-				WHERE `dialog_id`=".$cmp['num_1']."
-				  AND `id`=".$sel_id;
-		if($unit = query_assoc($sql))
-			$arr[$sel_id] = $unit;
-	}
-
-	$bg70Col = '';
-	foreach($dialog['cmp'] as $sp)
-		if($sp['dialog_id'] == 70) {
-			$bg70Col = $sp['col'];
-			break;
-		}
-
-	$send = array();
-	foreach($arr as $r) {
-		$u = array(
-			'id' => _num($r['id']),
-			'title' => utf8($col0 ? $r[$col0] : 'значение не настроено'),
-			'content' => utf8($col0 ? $r[$col0] : '<div class="red">значение не настроено</div>')
-		);
-		if($col1 && $r[$col1])
-			$u['content'] = utf8($r[$col0].'<div class="fs11 grey">'.$r[$col1].'</div>');
-		if($v)
-			$u['content'] = preg_replace(_regFilter(utf8($v)), '<em class="fndd">\\1</em>', $u['content'], 1);
-		if($bg70Col)
-			$u['bg'] = $r[$bg70Col];
-
-		$send[] = $u;
-	}
-
-	return $send;
-}
 function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)
 		return array();
@@ -852,11 +764,14 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 
 		$u = array(
 			'id' => _num($r['id']),
-			'title' => utf8($title),
-			'content' => utf8($title.$content)
+			'title' => $title,
+			'content' => $title.$content
 		);
-		if($v)
-			$u['content'] = preg_replace(_regFilter(utf8($v)), '<em class="fndd">\\1</em>', $u['content'], 1);
+		if($v) {
+			$txt = utf8($u['content']);
+			$txt = preg_replace(_regFilter(utf8($v)), '<em class="fndd">\\1</em>', $txt, 1);
+			$u['content'] = win1251($txt);
+		}
 
 		$send[] = $u;
 	}
