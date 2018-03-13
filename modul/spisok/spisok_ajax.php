@@ -1143,7 +1143,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 		return;
 	if(!$elForSum_id = _num($elForSum['txt_2']))
 		return;
-	if(!$cmpSum = @$DConn['cmp_utf8'][$elForSum_id])
+	if(!$cmpSum = @$DConn['cmp'][$elForSum_id])
 		return;
 	if(!$sum_col = $cmpSum['col'])
 		return;

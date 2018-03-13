@@ -304,7 +304,6 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	_cache('clear', 'dialog_'.$dialog_id);
 	$dialog['blk'] = _block('dialog', $dialog_id, 'block_arr');
 	$dialog['cmp'] = _block('dialog', $dialog_id, 'elem_arr');
-	$dialog['cmp_utf8'] = _block('dialog', $dialog_id, 'elem_utf8');
 	$dialog['field'] = $field;
 
 	//id заглавных элементов настройки шаблона истории действий
@@ -428,7 +427,6 @@ function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые м
 /*
 	 получены будут списки, размещёные в текущем объекте
 	$block_id - исходный блок, по которому определяется объект
-
 */
 
 	if(!$block = _blockQuery($block_id))
@@ -629,6 +627,24 @@ function _blockQuery($block_id) {//запрос одного блока
 	return $block;
 }
 
+function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `block_id`=-".$elem_id."
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$spisok = array();
+	foreach($arr as $id => $r)
+		$spisok[] = array(
+			'id' => _num($id),
+			'title' => $r['txt_1'],
+			'content' => $r['txt_1'].'<div class="fs11 grey">'._br($r['txt_2']).'</div>'
+		);
+
+	return $spisok;
+}
 function _elemTitle($elem_id) {//имя элемента или его текст
 	if(!$elem_id = _num($elem_id))
 		return '';
@@ -715,7 +731,7 @@ function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
 			$show = false;
 
-		if($show)
+//		if($show)
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 

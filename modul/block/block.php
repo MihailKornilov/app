@@ -523,6 +523,10 @@ function _blockCache($obj_name, $obj_id) {
 		$el['vvv'] = array();//значения для некоторых компонентов
 
 		switch($el['dialog_id']) {
+			//произвольные значения
+			case 17://select - произвольные значения
+				$el['vvv'] = _elemValue($elem_id);
+				break;
 			//Меню переключения блоков - список пунктов
 			case 57:
 				$sql = "SELECT *

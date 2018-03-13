@@ -219,15 +219,18 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1; - выбранный список
 
 function win1251($txt) { return iconv('UTF-8', 'WINDOWS-1251//TRANSLIT', $txt); }
 function utf8($val) {
-	if(is_array($val)) {
-		foreach($val as $k => $v) {
-			if(is_array($v))
-				continue;
-			$val[$k] = preg_match(REGEXP_INTEGER, $v) ? _num($v, 1) : utf8($v);
+	if(!is_array($val))
+		return iconv('WINDOWS-1251', 'UTF-8', $val);
+
+	foreach($val as $k => $v) {
+		if(is_array($v)) {
+			$val[$k] = utf8($v);
+			continue;
 		}
-		return $val;
+		$val[$k] = preg_match(REGEXP_INTEGER, $v) ? _num($v, 1) : utf8($v);
 	}
-	return iconv('WINDOWS-1251', 'UTF-8', $val);
+
+	return $val;
 }
 function mb_ucfirst($txt) {//делание заклавной первую букву текста
 	mb_internal_encoding('UTF-8');

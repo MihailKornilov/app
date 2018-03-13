@@ -321,7 +321,7 @@ switch(@$_POST['op']) {
 		$send['menu_sa'] = _selArray($menu_sa);
 		$send['action'] = _selArray($action);
 		$send['blk'] = $dialog['blk'];
-		$send['cmp'] = $dialog['cmp_utf8'];
+		$send['cmp'] = utf8($dialog['cmp']);
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
 		$send['tables'] = $tables;
@@ -686,7 +686,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
 
 	//заполнение значениями некоторых компонентов
-	foreach($dialog['cmp_utf8'] as $cmp_id => $cmp)
+	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
 			//подключаемая функция
 			case 12:
@@ -713,11 +713,7 @@ function _dialogOpenLoad($dialog_id) {
 					);
 				}
 
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
-				break;
-			//произвольные значения
-			case 17://select - произвольные значения
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _elemValue($cmp_id);
+				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
 			//значения для select, radio, dropdown
 			case 19:
@@ -741,7 +737,7 @@ function _dialogOpenLoad($dialog_id) {
 						'use' => 0  //количество использования значений, чтобы нельзя было удалять
 					);
 
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 
 				//если элемент пока не применяется
 				if(empty($unit['col']))
@@ -771,7 +767,7 @@ function _dialogOpenLoad($dialog_id) {
 						$spisok[$n]['use'] = $ass[$r['id']];
 					}
 
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
 			//select - выбор списка (все списки приложения)
 			case 24:
@@ -780,12 +776,12 @@ function _dialogOpenLoad($dialog_id) {
 					case 961: $vvv = _dialogSpisokOnConnect($block_id, $unit_id); break;
 					default:  $vvv = _dialogSpisokOn($dialog_id, $block_id, $unit_id); break;
 				}
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $vvv;
+				$dialog['cmp'][$cmp_id]['vvv'] = $vvv;
 				break;
 			//select - выбор единицы из другого списка (для связки)
 			case 29:
 				$sel_id = $unit_id ? $unit[$cmp['col']] : _spisokCmpConnectIdGet($cmp);
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
+				$dialog['cmp'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
 				break;
 			//настройка ТАБЛИЧНОГО содержания списка
 			case 30:
@@ -816,7 +812,7 @@ function _dialogOpenLoad($dialog_id) {
 						'url' => _num($r['url']),
 					);
 				}
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
 			//SA: select - выбор имени колонки
 			case 37:
@@ -874,11 +870,11 @@ function _dialogOpenLoad($dialog_id) {
 							$field[] = $u;
 					}
 
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $field;
+				$dialog['cmp'][$cmp_id]['vvv'] = $field;
 				break;
 			//SA: Select - выбор диалогового окна
 			case 38:
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _dialogSelArray();
+				$dialog['cmp'][$cmp_id]['vvv'] = _dialogSelArray();
 				break;
 			//SA: Select - дублирование
 			case 41:
@@ -900,8 +896,8 @@ function _dialogOpenLoad($dialog_id) {
 				if($EL['dialog_id'] != 17)
 					break;
 
-				$dialog['cmp_utf8'][$cmp_id]['txt_1'] = utf8($EL['txt_1']);
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = _elemValue($EL['id']);
+				$dialog['cmp'][$cmp_id]['txt_1'] = utf8($EL['txt_1']);
+				$dialog['cmp'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 				break;
 			//Настройка содержания Сборного текста
 			case 49:
@@ -927,7 +923,7 @@ function _dialogOpenLoad($dialog_id) {
 						'spc' => _num($r['num_8']) //пробел справа
 					);
 				}
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
 			//Настройка суммы значений единицы списка
 			case 56:
@@ -953,7 +949,7 @@ function _dialogOpenLoad($dialog_id) {
 						'title' => utf8(_elemUnit($r))
 					);
 				}
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
 			//Настройка пунктов меню переключения блоков
 			case 58:
@@ -980,7 +976,7 @@ function _dialogOpenLoad($dialog_id) {
 					);
 				}
 
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = $spisok;
+				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
 			//Цвета для фона
 			case 70:
@@ -1021,11 +1017,11 @@ function _dialogOpenLoad($dialog_id) {
 									'&#10004;'.
 							   '</div>';
 				}
-				$dialog['cmp_utf8'][$cmp_id]['vvv'] = '<div class="_color-bg-choose">'.$spisok.'</div>';
+				$dialog['cmp'][$cmp_id]['vvv'] = '<div class="_color-bg-choose">'.$spisok.'</div>';
 		}
 
 	$send['blk'] = $dialog['blk'];
-	$send['cmp'] = $dialog['cmp_utf8'];
+	$send['cmp'] = utf8($dialog['cmp']);
 	$send['unit'] = utf8($unit);
 
 	//если производится удаление единицы списка
@@ -1043,24 +1039,6 @@ function _dialogOpenLoad($dialog_id) {
 	}
 
 	return $send;
-}
-function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `block_id`=-".$elem_id."
-			ORDER BY `sort`";
-	if(!$arr = query_arr($sql))
-		return array();
-
-	$spisok = array();
-	foreach($arr as $id => $r)
-		$spisok[] = array(
-			'id' => _num($id),
-			'title' => utf8($r['txt_1']),
-			'content' => utf8($r['txt_1'].'<div class="fs11 grey">'._br($r['txt_2']).'</div>')
-		);
-
-	return $spisok;
 }
 
 
