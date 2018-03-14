@@ -401,7 +401,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 		}
 		$send[] = array(
 			'id' => _num($r['id']),
-			'title' => utf8($r['name'])
+			'title' => $r['name']
 		);
 	}
 
@@ -410,13 +410,13 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 	if(SA) {
 		$send[] = array(
 			'info' => 1,
-			'title' => utf8('SA-списки:')
+			'title' => 'SA-списки:'
 		);
 		foreach($saArr as $r)
 			$send[] = array(
 				'id' => _num($r['id']),
-				'title' => utf8($r['name']),
-				'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">'.utf8($r['name']).'</div>'
+				'title' => $r['name'],
+				'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">'.$r['name'].'</div>'
 			);
 	}
 
@@ -447,7 +447,7 @@ function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые м
 			$spisokName = 'История действий';
 		else
 			$spisokName = _dialogParam($r['num_1'], 'name');
-		$send[$elem_id] = utf8($spisokName.' (в '.$block['obj_name'].'-блоке '.$r['block_id'].')');
+		$send[$elem_id] = $spisokName.' (в '.$block['obj_name'].'-блоке '.$r['block_id'].')';
 	}
 
 	return $send;
@@ -505,11 +505,7 @@ function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списк
 		$BL = $block[$r['block_id']];
 		$obj_id = _num($BL['obj_id']);
 		$dialog = _dialogQuery($obj_id);
-		$send[_num($elem_id)] =
-			utf8(
-				$dialog['name'].
-					($cc[$obj_id] ? ' (в блоке '.$r['block_id'].')' : '')
-			);
+		$send[_num($elem_id)] = $dialog['name'].($cc[$obj_id] ? ' (в блоке '.$r['block_id'].')' : '');
 	}
 
 	return $send;
@@ -529,7 +525,7 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 		if(!$saFlag && !$r['app_id']) {//вставка графы для SA
 			$spisok[] = array(
 				'info' => 1,
-				'title' => utf8('SA-диалоги:')
+				'title' => 'SA-диалоги:'
 			);
 			$saFlag = 1;
 		}
@@ -537,10 +533,10 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 			continue;
 		$u = array(
 			'id' => _num($r['id']),
-			'title' => utf8($r['name'])
+			'title' => $r['name']
 		);
 		if(!$r['app_id'])
-			$u['content'] = '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'"><b>'.$r['id'].'</b>. '.utf8($r['name']).'</div>';
+			$u['content'] = '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'"><b>'.$r['id'].'</b>. '.$r['name'].'</div>';
 		$spisok[] = $u;
 	}
 

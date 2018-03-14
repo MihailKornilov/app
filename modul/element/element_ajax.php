@@ -347,7 +347,7 @@ switch(@$_POST['op']) {
 		$send['tables'] = $tables;
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
-		$send['dialog_spisok'] = SA ? _dialogSelArray(true) : array() ;
+		$send['dialog_spisok'] = SA ? utf8(_dialogSelArray(true)) : array() ;
 
 		jsonSuccess($send);
 		break;
@@ -783,8 +783,8 @@ function _dialogOpenLoad($dialog_id) {
 				foreach($arr as $id => $r)
 					$spisok[] = array(
 						'id' => _num($id),
-						'title' => utf8($r['txt_1']),
-						'content' => utf8($r['txt_2']),
+						'title' => $r['txt_1'],
+						'content' => $r['txt_2'],
 						'def' => _num($r['def']),
 						'use' => 0  //количество использования значений, чтобы нельзя было удалять
 					);
@@ -802,14 +802,16 @@ function _dialogOpenLoad($dialog_id) {
 				//пока только для диалогов
 				if($block['obj_name'] != 'dialog')
 					break;
-
-				$dlg = _dialogQuery($block['obj_id']);
+				if(!$dlg = _dialogQuery($block['obj_id']))
+					break;
+				if($dlg['base_table'] != '_spisok')
+					break;
 
 				//получение количества использования значений
 				$sql = "SELECT
 							`".$unit['col']."` `id`,
 							COUNT(*) `use`
-						FROM `".$dlg['base_table']."`
+						FROM `_spisok`
 						WHERE `dialog_id`=".$block['obj_id']."
 						GROUP BY `".$unit['col']."`";
 				if($ass = query_ass($sql))
@@ -856,8 +858,8 @@ function _dialogOpenLoad($dialog_id) {
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
 						'width' => _num($r['width']),
-						'tr' => utf8($r['txt_7']),
-						'title' => utf8(_elemUnit($r)),
+						'tr' => $r['txt_7'],
+						'title' => _elemTitle($r['id']),
 						'font' => $r['font'],
 						'color' => $r['color'],
 						'pos' => $r['txt_8'],
