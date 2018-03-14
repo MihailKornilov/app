@@ -888,48 +888,77 @@ function _dialogOpenLoad($dialog_id) {
 					$colUse[$col] = 1;
 				}
 
+				//колонки, которые не должны выбираться
+				$fieldNo = array(
+					'id' => 1,
+					'id_old' => 1,
+					'num' => 1,
+					'app_id' => 1,
+					'user_id' => 1,
+					'page_id' => 1,
+					'block_id' => 1,
+					'element_id' => 1,
+					'dialog_id' => 1,
+					'width' => 1,
+					'color' => 1,
+					'font' => 1,
+					'size' => 1,
+					'mar' => 1,
+					'sort' => 1,
+					'deleted' => 1,
+					'user_id_add' => 1,
+					'user_id_del' => 1,
+					'dtime_add' => 1,
+					'dtime_del' => 1,
+					'dtime_last' => 1
+				);
+
 				$field = array();
 				$n = 1;
-				foreach($colDialog['field'] as $col => $k)
-					switch($col) {
-						case 'id':
-						case 'id_old':
-						case 'num':
-						case 'app_id':
-						case 'page_id':
-						case 'block_id':
-						case 'element_id':
-						case 'dialog_id':
-						case 'width':
-						case 'color':
-						case 'font':
-						case 'size':
-						case 'mar':
-						case 'sort':
-						case 'deleted':
-						case 'user_id_add':
-						case 'user_id_del':
-						case 'dtime_add':
-						case 'dtime_del':
-						case '': break;
-						default:
-							$u = array(
-								'id' => $n++,
-								'title' => $col
-							);
-							if(isset($colUse[$col])) {
-								$color = $unit_id && $unit['col'] == $col ? 'color-pay' : 'red';
-								$u['content'] = '<div class="'.$color.' b">'.$col.'</div>';
-							}
-							$field[] = $u;
-					}
+				foreach($colDialog['field'] as $col => $k) {
+					if(isset($fieldNo[$col]))
+						continue;
+
+					$color = '';
+					if(isset($colUse[$col]))
+						$color = $unit_id && $unit['col'] == $col ? 'b color-pay' : 'b red';
+					$u = array(
+						'id' => $n++,
+						'title' => $col,
+						'content' =>
+							'<div class="'.$color.'">'.
+								'<span class="pale">'.$colDialog['base_table'].'.</span>'.
+								$col.
+							'</div>'
+
+					);
+					$field[] = $u;
+				}
+
+				foreach($colDialog['field2'] as $col => $k) {
+					if(isset($fieldNo[$col]))
+						continue;
+
+					$color = '';
+					if(isset($colUse[$col]))
+						$color = $unit_id && $unit['col'] == $col ? 'b color-pay' : 'b red';
+					$u = array(
+						'id' => $n++,
+						'title' => $col,
+						'content' =>
+							'<div class="'.$color.'">'.
+								'<span class="pale">'.$colDialog['base_table_2'].'.</span>'.
+								$col.
+							'</div>'
+
+					);
+					$field[] = $u;
+				}
 
 				$dialog['cmp'][$cmp_id]['vvv'] = $field;
 				break;
 			//SA: Select - выбор диалогового окна
-			case 38:
-				$dialog['cmp'][$cmp_id]['vvv'] = _dialogSelArray();
-				break;
+			case 38: $dialog['cmp'][$cmp_id]['vvv'] = _dialogSelArray(); break;
 			//SA: Select - дублирование
 			case 41:
 				//Отсутствует ID исходного блока.

@@ -653,22 +653,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 		//SA: Select - выбор колонки таблицы
 		case 37:
-			/*
-                num_1 - показывать имя таблицы перед выбором
-			*/
-			if($el['num_1'] && !empty($US)) {
-				if($block = _blockQuery($US['block_id']))
-					if($block['obj_name'] == 'dialog') //выбор имени колонки может производиться, только если элемент размещается в диалоге
-						return
-							'<table>'.
-								'<tr><td class="pr3 b color-555">'._dialogParam($block['obj_id'], 'base_table').'.'.
-									'<td>'._select(array(
-												'attr_id' => $attr_id,
-												'width' => $el['width']
-										   )).
-							'</table>';
-			}
-
 			return _select(array(
 						'attr_id' => $attr_id,
 						'width' => $el['width']

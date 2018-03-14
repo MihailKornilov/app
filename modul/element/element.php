@@ -295,16 +295,25 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	if(!$dialog = query_assoc($sql))
 		return array();
 
-	//список колонок, присутствующих в таблице
+	//список колонок, присутствующих в таблице 1
 	$field = array();
 	$sql = "DESCRIBE `".$dialog['base_table']."`";
 	foreach(query_array($sql) as $r)
 		$field[$r['Field']] = 1;
+	$dialog['field'] = $field;
+
+	//список колонок, присутствующих в таблице 2
+	$field = array();
+	if($dialog['base_table_2']) {
+		$sql = "DESCRIBE `".$dialog['base_table_2']."`";
+		foreach(query_array($sql) as $r)
+			$field[$r['Field']] = 1;
+	}
+	$dialog['field2'] = $field;
 
 	_cache('clear', 'dialog_'.$dialog_id);
 	$dialog['blk'] = _block('dialog', $dialog_id, 'block_arr');
 	$dialog['cmp'] = _block('dialog', $dialog_id, 'elem_arr');
-	$dialog['field'] = $field;
 
 	//id заглавных элементов настройки шаблона истории действий
 	foreach(array(1,2,3) as $n) {
