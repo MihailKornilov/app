@@ -32,7 +32,10 @@ switch(@$_POST['op']) {
 		define('BLOCK_EDIT', 1);
 
 		$tab_id = 0;
+		$tab2_id = 0;
+		$tab2field_id = 0;   //id колонка для связки с первой таблицей
 		$tables = array();
+		$tablesFields = array();//колонки по каждой таблице
 		$group = array();
 		$menu_sa = array();
 		if(SA) {
@@ -44,8 +47,19 @@ switch(@$_POST['op']) {
 				foreach($ass as $base => $tab) {
 					if($dialog['base_table'] == $tab)
 						$tab_id = $n;
+					if($dialog['base_table_2'] == $tab)
+						$tab2_id = $n;
+					$tablesFields[$n] = _table2field($tab);
 					$tables[$n++] = $tab;
 				}
+
+			if($tab2_id) {
+				foreach(_table2field($tables[$tab2_id]) as $i => $field)
+					if($dialog['base_table_2_col'] == $field) {
+						$tab2field_id = $i;
+						break;
+					}
+			}
 
 			//группы элементов
 			$sql = "SELECT *
@@ -190,12 +204,18 @@ switch(@$_POST['op']) {
 				'</div>'.
 
 				'<table class="menu_sa-1 bs10">'.
-					'<tr><td class="red w125 r">ID:<td class="b">'.$dialog['id'].
+					'<tr><td class="red r w80">ID:<td class="b">'.$dialog['id'].
 					'<tr><td class="red r">Ширина:'.
 		                '<td><div id="dialog-width" class="dib w50">'.$dialog['width'].'</div>'.
 		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
-					'<tr><td class="red r">Таблица в базе:'.
-						'<td><input type="hidden" id="base_table" value="'.$tab_id.'" />'.
+					'<tr><td class="red r">Таблица 1:'.
+						'<td><input type="hidden" id="base_table"   value="'.$tab_id.'" />'.
+					'<tr><td class="red r">Таблица 2:'.
+						'<td><table>'.
+								'<tr><td><input type="hidden" id="base_table_2" value="'.$tab2_id.'" />'.
+									'<td class="pl5'._dn($tab2_id).'" id="td-bt2c">'.
+										'<input type="hidden" id="base_table_2_col" value="'.$tab2field_id.'" />'.
+		                    '</table>'.
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'cmp_no_req',
@@ -325,6 +345,7 @@ switch(@$_POST['op']) {
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
 		$send['tables'] = $tables;
+		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
 		$send['dialog_spisok'] = SA ? _dialogSelArray(true) : array() ;
 
@@ -464,6 +485,27 @@ switch(@$_POST['op']) {
 }
 
 
+function _table2field($tab) {//список колонок для таблицы 2
+	if(empty($tab))
+		return array();
+
+	$sql = "DESCRIBE `".$tab."`";
+	if(!$arr = query_array($sql))
+		return array();
+
+	$send = array();
+	$n = 1;
+	foreach($arr as $r) {
+		if($r['Field'] == 'id')
+			continue;
+		if(!preg_match('/^int+/', $r['Type']))//только INT
+			continue;
+		$send[$n++] = $r['Field'];
+	}
+
+	return $send;
+}
+
 function _dialogEditLoadUse($dialog) {//использование как элемента в других диалогах
 
 	$use_dialog = '';
@@ -507,9 +549,6 @@ function _dialogEditLoadUse($dialog) {//использование как элемента в других диал
 			'<td>'.($use_page ? $use_page : '-').
 	'</table>';
 }
-
-
-
 function _dialogUpdate($dialog_id) {//обновление диалога
 	if(!_dialogQuery($dialog_id))
 		jsonError('Диалога не существует');
@@ -550,7 +589,18 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 		$base_table = '_spisok';
 	$sql = "SHOW TABLES LIKE '".$base_table."'";
 	if(!query_array($sql))
-		jsonError('Указана несуществующая таблица');
+		jsonError('Указана несуществующая таблица 1');
+
+	$base_table_2_col = '';
+	if($base_table_2 = _txt($_POST['base_table_2'])) {
+		$sql = "SHOW TABLES LIKE '".$base_table_2."'";
+		if(!query_array($sql))
+			jsonError('Указана несуществующая таблица 2');
+		if($base_table == $base_table_2)
+			jsonError('Таблицы не могут совпадать');
+		if(!$base_table_2_col = _txt($_POST['base_table_2_col']))
+			jsonError('Не указана колонка для связки');
+	}
 
 	$menu_edit_last = _num($_POST['menu_edit_last']);
 	$sa = _bool($_POST['sa']);
@@ -609,6 +659,8 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`del_action_page_id`=".$del_action_page_id.",
 
 				`base_table`='".addslashes($base_table)."',
+				`base_table_2`='".addslashes($base_table_2)."',
+				`base_table_2_col`='".addslashes($base_table_2_col)."',
 				`spisok_on`=".$spisok_on.",
 
 				`element_group_id`=".$element_group_id.",

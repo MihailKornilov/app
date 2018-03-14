@@ -355,9 +355,25 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 		});
 
 		DLG('#base_table')._select({
-			width:230,
+			width:170,
 			write:1,
 			spisok:o.tables
+		});
+		DLG('#base_table_2')._select({
+			width:170,
+			title0:'не выбрана',
+			spisok:o.tables,
+			func:function(v) {
+				$('#td-bt2c')._dn(v);
+				DLG('#base_table_2_col')._select(0);
+				if(v)
+					DLG('#base_table_2_col')._select('spisok', o.tablesFields[v]);
+			}
+		});
+		DLG('#base_table_2_col')._select({
+			width:170,
+			title0:'колонка для связки',
+			spisok:o.tablesFields[DLG('#base_table_2').val()]
 		});
 		DLG('#element_group_id')._select({
 			title0:'нет',
@@ -427,6 +443,8 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				spisok_on:DLG('#spisok_on').val(),
 
 				base_table:DLG('#base_table')._select('inp'),
+				base_table_2:DLG('#base_table_2')._select('inp'),
+				base_table_2_col:DLG('#base_table_2_col')._select('inp'),
 				app_any:DLG('#app_any').val(),
 				sa:DLG('#sa').val(),
 
@@ -2919,7 +2937,7 @@ $.fn._count = function(o) {//input с количеством
 	window[win] = t;
 	return t;
 };
-$.fn._select = function(o) {//выпадающий список от 03.01.2018
+$.fn._select = function(o, o1) {//выпадающий список от 03.01.2018
 	var t = $(this);
 
 	if(!t.length)
@@ -3284,6 +3302,7 @@ $.fn._select = function(o) {//выпадающий список от 03.01.2018
 			case 'disable': s.disable(); break;
 			case 'enable': s.enable(); break;
 			case 'inp': return s.inp();
+			case 'spisok': s.spisok(o1); break;
 		}
 
 		return s;
