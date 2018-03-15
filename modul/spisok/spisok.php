@@ -89,8 +89,15 @@ function _spisokCountAll($el) {//получение общего количества строк списка
 	//диалог, через который вносятся данные списка
 	$dialog = _dialogQuery($el['num_1']);
 
+	$JOIN = '';
+	if($dialog['table_2']) {
+		$JOIN = "INNER JOIN `"._baseTable($dialog['table_2'])."` `t2`
+				 ON `t1`.`id`=`t2`.`".$dialog['table_2_field']."`";
+	}
+
 	$sql = "SELECT COUNT(*)
-			FROM `".$dialog['base_table']."`
+			FROM `"._baseTable($dialog['table_1'])."` `t1`
+			".$JOIN."
 			WHERE "._spisokCond($el);
 	$all = _num(query_value($sql));
 
@@ -132,7 +139,7 @@ function _spisokInclude($spisok, $CMP) {//вложенные списки
 		//получение данных из вложенного списка
 		$incDialog = _dialogQuery($cmp['num_1']);
 		$sql = "SELECT *
-				FROM `".$incDialog['base_table']."`
+				FROM `"._baseTable($incDialog['table_1'])."`
 				WHERE `app_id`=".APP_ID."
 				  AND `dialog_id`=".$cmp['num_1']."
 				  AND `id` IN (".$ids.")";
@@ -214,17 +221,25 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 	//элементы списка
 	$CMP = $spDialog['cmp'];
-	$spTable = $spDialog['base_table'];
+
+	$JOIN = '';
+	if($spDialog['table_2']) {
+		$JOIN = "INNER JOIN `"._baseTable($spDialog['table_2'])."` `t2`
+				 ON `t1`.`id`=`t2`.`".$spDialog['table_2_field']."`";
+	}
 
 	$all = _spisokCountAll($ELEM);
 
-	$order = "`id` DESC";
+	$order = "`t1`.`id` DESC";
 	if(_spisokIsSort($ELEM['block_id']))
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "SELECT *
-			FROM `".$spTable."`
+	$sql = "SELECT
+				`t1`.*
+				".($JOIN ? ",`t2`.*" : '')."
+			FROM `"._baseTable($spDialog['table_1'])."` `t1`
+			".$JOIN."
 			WHERE "._spisokCond($ELEM)."
 			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
@@ -482,12 +497,8 @@ function _spisokUnitUrl($txt, $sp, $is_url) {//обёртка значения колонки в ссылку
 	$link = '&p='._page('cur');
 
 	//если таблица является страницей, то ссылка перехода на страницу
-	if($dialog['base_table'] == '_page')
+	if(_baseTable($dialog['table_1']) == '_page')
 		$link = '&p='.$sp['id'];
-
-	//если список пользователей, то переход на страницу приложений пользователя от его имени todo временно
-	if($dialog['base_table'] == '_vkuser')
-		$link = '&viewer_id='.$sp['user_id'];
 
 	//если есть страница, которая принимает значения списка
 	if($page_id = _page('spisok_id', $dialog['id']))
@@ -531,13 +542,13 @@ function _spisokCond($el) {//формирование строки с условиями поиска
 	$dialog = _dialogQuery($el['num_1']);
 	$field = $dialog['field'];
 
-	$cond = "`id`";
+	$cond = "`t1`.`id`";
 	if(isset($field['deleted']))
-		$cond = "!`deleted`";
+		$cond = "!`t1`.`deleted`";
 	if(isset($field['app_id']))
-		$cond .= " AND `app_id` IN (0,".APP_ID.")";
+		$cond .= " AND `t1`.`app_id` IN (0,".APP_ID.")";
 	if(isset($field['dialog_id']))
-		$cond .= " AND `dialog_id`=".$el['num_1'];
+		$cond .= " AND `t1`.`dialog_id`=".$el['num_1'];
 
 	$cond .= _spisokCondSearch($el);
 	$cond .= _spisokCond52($el);
@@ -574,7 +585,7 @@ function _spisokCondSearch($el) {//значения фильтра-поиска для списка
 	foreach($colIds as $cmp_id) {
 		if(empty($cmp[$cmp_id]))
 			continue;
-		$arr[] = "`".$cmp[$cmp_id]['col']."` LIKE '%".addslashes($v)."%'";
+		$arr[] = "`t1`.`".$cmp[$cmp_id]['col']."` LIKE '%".addslashes($v)."%'";
 	}
 
 	if(!$arr)
@@ -594,15 +605,15 @@ function _spisokCond52($el) {//связка со другим списком
 
 	//проверка, чтобы список был размещён именно на странице
 	if($el['block']['obj_name'] != 'page')
-		return ' AND !`id`';
+		return ' AND !`t1`.`id`';
 
 	//страница, на которой размещён список
 	if(!$page = _page($el['block']['obj_id']))
-		return ' AND !`id`';
+		return ' AND !`t1`.`id`';
 
 	//id диалога, единица списка которого размещается на странице
 	if(!$spisok_id = $page['spisok_id'])
-		return ' AND !`id`';
+		return ' AND !`t1`.`id`';
 
 	$cmp = false;
 	foreach(_dialogParam($el['num_1'], 'cmp') as $r) {
@@ -614,12 +625,12 @@ function _spisokCond52($el) {//связка со другим списком
 	}
 
 	if(!$cmp)
-		return ' AND !`id`';
+		return ' AND !`t1`.`id`';
 
 	if(!$unit_id = _num(@$_GET['id']))
-		return ' AND !`id`';
+		return ' AND !`t1`.`id`';
 
-	return " AND `".$cmp['col']."`=".$unit_id;
+	return " AND `t1`.`".$cmp['col']."`=".$unit_id;
 }
 function _spisokCond62($el) {//фильтр-галочка
 	$send = '';
@@ -671,16 +682,16 @@ function _spisokCond62($el) {//фильтр-галочка
 				continue;
 			$val = addslashes($r['txt_8']);
 			switch($r['num_8']) {
-				case 1: $send.= " AND !`".$col."`"; break;
-				case 2: $send.= " AND `".$col."`"; break;
-				case 3: $send.= " AND `".$col."`='".$val."'"; break;
-				case 4: $send.= " AND `".$col."`!='".$val."'"; break;
-				case 5: $send.= " AND `".$col."`>'".$val."'"; break;
-				case 6: $send.= " AND `".$col."`>='".$val."'"; break;
-				case 7: $send.= " AND `".$col."`<'".$val."'"; break;
-				case 8: $send.= " AND `".$col."`<='".$val."'"; break;
-				case 9: $send.= " AND `".$col."` LIKE '%".$val."%'"; break;
-				case 10:$send.= " AND `".$col."` NOT LIKE '%".$val."%'"; break;
+				case 1: $send.= " AND !`t1`.`".$col."`"; break;
+				case 2: $send.= " AND `t1`.`".$col."`"; break;
+				case 3: $send.= " AND `t1`.`".$col."`='".$val."'"; break;
+				case 4: $send.= " AND `t1`.`".$col."`!='".$val."'"; break;
+				case 5: $send.= " AND `t1`.`".$col."`>'".$val."'"; break;
+				case 6: $send.= " AND `t1`.`".$col."`>='".$val."'"; break;
+				case 7: $send.= " AND `t1`.`".$col."`<'".$val."'"; break;
+				case 8: $send.= " AND `t1`.`".$col."`<='".$val."'"; break;
+				case 9: $send.= " AND `t1`.`".$col."` LIKE '%".$val."%'"; break;
+				case 10:$send.= " AND `t1`.`".$col."` NOT LIKE '%".$val."%'"; break;
 			}
 		}
 	}
@@ -833,7 +844,7 @@ function _spisok59unit($cmp_id, $unit_id) {//выбранное значение при связке списк
 		return '';
 
 	$sql = "SELECT *
-			FROM `".$dlg['base_table']."`
+			FROM `"._baseTable($dlg['table_1'])."`
 			WHERE `id`=".$unit_id;
 	if(!$un = query_assoc($sql))
 		return '';

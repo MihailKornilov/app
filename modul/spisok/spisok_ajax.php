@@ -23,7 +23,7 @@ switch(@$_POST['op']) {
 		$send = _spisokAction3($send, $dialog, $unit_id, 1);
 
 		if(isset($dialog['field']['deleted'])) {
-			$sql = "UPDATE `".$dialog['base_table']."`
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
 					SET `deleted`=1,
 						`user_id_del`=".USER_ID.",
 						`dtime_del`=CURRENT_TIMESTAMP
@@ -33,7 +33,7 @@ switch(@$_POST['op']) {
 			_spisokUnitAfter($dialog, $unit_id);
 		} else {
 			$elem = array();
-			if($dialog['base_table'] == '_element') {//если это элемент
+			if(_baseTable($dialog['table_1']) == '_element') {//если это элемент
 				$elem = _elemQuery($unit_id);
 				//удаление значений
 				$sql = "DELETE FROM `_element` WHERE `block_id`=-".$unit_id;
@@ -49,10 +49,10 @@ switch(@$_POST['op']) {
 				query($sql);
 			}
 
-			$sql = "SELECT * FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
+			$sql = "SELECT * FROM `"._baseTable($dialog['table_1'])."` WHERE `id`=".$unit_id;
 			$unit = query_assoc($sql);
 
-			$sql = "DELETE FROM `".$dialog['base_table']."` WHERE `id`=".$unit_id;
+			$sql = "DELETE FROM `"._baseTable($dialog['table_1'])."` WHERE `id`=".$unit_id;
 			query($sql);
 
 			//обновление кеша объекта, если это элемент
@@ -60,10 +60,10 @@ switch(@$_POST['op']) {
 				_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 
 			//обновление кеша объекта, если это страница
-			if($dialog['base_table'] == '_page')
+			if(_baseTable($dialog['table_1']) == '_page')
 				_cache('clear', '_pageCache');
 
-			if($dialog['base_table'] == '_element_func')
+			if(_baseTable($dialog['table_1']) == '_element_func')
 				if($BL = _blockQuery($unit['block_id']))
 					_cache('clear', $BL['obj_name'].'_'.$BL['obj_id']);
 		}
@@ -177,7 +177,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 		jsonError('Нет доступа');
 
 	//проверка наличия таблицы для внесения данных
-	$sql = "SHOW TABLES LIKE '".$dialog['base_table']."'";
+	$sql = "SHOW TABLES LIKE '"._baseTable($dialog['table_1'])."'";
 	if(!mysql_num_rows(query($sql)))
 		jsonError('Таблицы не существует');
 
@@ -186,7 +186,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 		$cond = "`id`=".$unit_id;
 		if(isset($dialog['field']['app_id']))
 			$cond .= " AND `app_id` IN (0,".APP_ID.")";
-		$sql = "SELECT * FROM `".$dialog['base_table']."` WHERE ".$cond;
+		$sql = "SELECT * FROM `"._baseTable($dialog['table_1'])."` WHERE ".$cond;
 		if(!$r = query_assoc($sql))
 			jsonError('Записи не существует');
 		if(@$r['deleted'])
@@ -198,7 +198,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$dialog = _spisokUnitDialog($unit_id);
 
-	define('IS_ELEM', $dialog['base_table'] == '_element');
+	define('IS_ELEM', _baseTable($dialog['table_1']) == '_element');
 
 	$act = $unit_id ? 'edit' : 'insert';
 
@@ -217,7 +217,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	//получение обновлённых данных единицы списка
 	$sql = "SELECT *
-			FROM `".$dialog['base_table']."`
+			FROM `"._baseTable($dialog['table_1'])."`
 			WHERE `id`=".$unit_id;
 	$unit = query_assoc($sql);
 	if(IS_ELEM)
@@ -260,10 +260,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	_spisokUnitAfter($dialog, $unit_id);
 
-	if($dialog['base_table'] == '_page')
+	if(_baseTable($dialog['table_1']) == '_page')
 		_cache('clear', '_pageCache');
 
-	if($dialog['base_table'] == '_element_func')
+	if(_baseTable($dialog['table_1']) == '_element_func')
 		if($BL = _blockQuery($unit['block_id']))
 			_cache('clear', $BL['obj_name'].'_'.$BL['obj_id']);
 
@@ -310,7 +310,7 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 			));
 */
 		if(!isset($dialog['field'][$col]))
-			jsonError('В таблице <b>'.$dialog['base_table'].'</b> нет колонки с именем "'.$col.'"');
+			jsonError('В таблице <b>'._baseTable($dialog['table_1']).'</b> нет колонки с именем "'.$col.'"');
 
 		$v = _txt($val);
 
@@ -346,28 +346,28 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 			jsonError('В блоке уже есть элемент');
 	}
 
-	$sql = "INSERT INTO `".$dialog['base_table']."` (`id`) VALUES (0)";
+	$sql = "INSERT INTO `"._baseTable($dialog['table_1'])."` (`id`) VALUES (0)";
 	query($sql);
 
 	//подмена id блока отрицательным значением для группировки
 	if($unit_id < 0)
 		$block_id = $unit_id;
 
-	$unit_id = query_insert_id($dialog['base_table']);
+	$unit_id = query_insert_id(_baseTable($dialog['table_1']));
 
 	//обновление некоторых колонок
-	$sql = "DESCRIBE `".$dialog['base_table']."`";
+	$sql = "DESCRIBE `"._baseTable($dialog['table_1'])."`";
 	$desc = query_array($sql);
 	foreach($desc as $r) {
 		if($r['Field'] == 'app_id') {
-			$sql = "UPDATE `".$dialog['base_table']."`
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
 					SET `app_id`=".APP_ID."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;
 		}
 		if($r['Field'] == 'dialog_id') {
-			$sql = "UPDATE `".$dialog['base_table']."`
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
 					SET `dialog_id`=".$dialog['id']."
 					WHERE `id`=".$unit_id;
 			query($sql);
@@ -375,25 +375,25 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 		}
 		if($r['Field'] == 'num') {//установка порядкового номера
 			$sql = "SELECT IFNULL(MAX(`num`),0)+1
-					FROM `".$dialog['base_table']."`
+					FROM `"._baseTable($dialog['table_1'])."`
 					WHERE `app_id`=".APP_ID."
 					  AND `dialog_id`=".$dialog['id'];
 			$num = query_value($sql);
-			$sql = "UPDATE `".$dialog['base_table']."`
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
 					SET `num`=".$num."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;
 		}
 		if($r['Field'] == 'page_id') {
-			$sql = "UPDATE `".$dialog['base_table']."`
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
 					SET `page_id`=".$page_id."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;
 		}
 		if($r['Field'] == 'block_id' && $block_id) {
-			$sql = "UPDATE `".$dialog['base_table']."`
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
 					SET `block_id`=".$block_id."
 					WHERE `id`=".$unit_id;
 			query($sql);
@@ -407,14 +407,14 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 			continue;
 		}
 		if($r['Field'] == 'sort') {
-			$sql = "UPDATE `".$dialog['base_table']."`
-					SET `sort`="._maxSql($dialog['base_table'])."
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
+					SET `sort`="._maxSql(_baseTable($dialog['table_1']))."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;
 		}
 		if($r['Field'] == 'user_id_add') {
-			$sql = "UPDATE `".$dialog['base_table']."`
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
 					SET `user_id_add`=".USER_ID."
 					WHERE `id`=".$unit_id;
 			query($sql);
@@ -427,7 +427,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 	return $unit_id;
 }
 function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//если в таблице присутствует колонка `focus`, то предварительное снятие флага фокуса с других элементов объекта (для таблицы _element)
-	if($dialog['base_table'] != '_element')
+	if(_baseTable($dialog['table_1']) != '_element')
 		return;
 	if(empty($POST_CMP))
 		return;
@@ -464,7 +464,7 @@ function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//если в таблице прис
 	}
 }
 function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: очистка `def`, если устанавливается новая страница по умолчанию
-	if($dialog['base_table'] != '_page')
+	if(_baseTable($dialog['table_1']) != '_page')
 		return;
 	if(empty($POST_CMP))
 		return;
@@ -496,7 +496,7 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 		$update[] = "`".$col."`='".addslashes($v)."'";
 	}
 
-	$sql = "UPDATE `".$dialog['base_table']."`
+	$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
 			SET ".implode(',', $update)."
 			WHERE `id`=".$unit_id;
 	query($sql);
@@ -504,7 +504,7 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
 	if($send['action_id'] != 3)
 		return $send;
-	if($dialog['base_table'] != '_element')
+	if(_baseTable($dialog['table_1']) != '_element')
 		return $send;
 	if($block_id <= 0)//была вставка доп-значения для элемета
 		return $send;
@@ -1017,7 +1017,7 @@ function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (бал
 		return;
 
 	//предварительное обнуление значений перед обновлением
-	$sql = "UPDATE `".$DSrc['base_table']."`
+	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."`
 			SET `".$unit['col']."`=0
 			WHERE `dialog_id`=".$BL['obj_id'];
 	query($sql);
@@ -1048,7 +1048,7 @@ function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (бал
 	}
 
 	//процесс обновления
-	$sql = "UPDATE `".$DSrc['base_table']."`
+	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."`
 			SET `".$unit['col']."`=".$upd."
 			WHERE `dialog_id`=".$BL['obj_id'];
 	query($sql);
@@ -1077,7 +1077,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка
 		return;
 
 	//предварительное обнуление значений перед обновлением
-	$sql = "UPDATE `".$DSrc['base_table']."`
+	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."`
 			SET `".$unit['col']."`=0
 			WHERE `dialog_id`=".$BL['obj_id'];
 	query($sql);
@@ -1085,7 +1085,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка
 	$sql = "SELECT
 				`".$cmp['col']."`,
 				COUNT(`id`)
-			FROM `".$DConn['base_table']."`
+			FROM `"._baseTable($DConn['table_1'])."`
 			WHERE `dialog_id`=".$dialog_id."
 			  AND `".$cmp['col']."`
 			  AND !`deleted`
@@ -1099,7 +1099,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка
 	foreach($ass as $id => $c) {
 		$upd[] = "(".$id.",".$c.")";
 		if(!--$cAss || !--$n) {
-			$sql = "INSERT INTO `".$DSrc['base_table']."`
+			$sql = "INSERT INTO `"._baseTable($DSrc['table_1'])."`
 						(`id`,`".$unit['col']."`)
 						VALUES ".implode(',', $upd)."
 					ON DUPLICATE KEY UPDATE
@@ -1131,7 +1131,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 		return;
 
 	//предварительное обнуление значений перед обновлением
-	$sql = "UPDATE `".$DSrc['base_table']."`
+	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."`
 			SET `".$unit['col']."`=0
 			WHERE `dialog_id`=".$DSrc_id;
 	query($sql);
@@ -1151,7 +1151,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 	$sql = "SELECT
 				`".$cmp['col']."`,
 				SUM(`".$sum_col."`)
-			FROM `".$DConn['base_table']."`
+			FROM `"._baseTable($DConn['table_1'])."`
 			WHERE `dialog_id`=".$dialog_id."
 			  AND `".$cmp['col']."`
 			  AND !`deleted`
@@ -1165,7 +1165,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 	foreach($ass as $id => $c) {
 		$upd[] = "(".$id.",".$c.")";
 		if(!--$cAss || !--$n) {
-			$sql = "INSERT INTO `".$DSrc['base_table']."`
+			$sql = "INSERT INTO `"._baseTable($DSrc['table_1'])."`
 						(`id`,`".$unit['col']."`)
 						VALUES ".implode(',', $upd)."
 					ON DUPLICATE KEY UPDATE
@@ -1179,7 +1179,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 
 function _spisokUnitAfter($dialog, $unit_id) {//выполнение действий после обновления единицы списка
 	$sql = "SELECT *
-			FROM `".$dialog['base_table']."`
+			FROM `"._baseTable($dialog['table_1'])."`
 			WHERE `id`=".$unit_id;
 	if(!$unit = query_assoc($sql))
 		return;
@@ -1250,7 +1250,7 @@ function _spisokUnitCount29($cmp, $dialog, $unit) {//пересчёт количеств привязан
 
 	//получение нового количества для обновления
 	$sql = "SELECT COUNT(*)
-			FROM `".$dialog['base_table']."`
+			FROM `"._baseTable($dialog['table_1'])."`
 			WHERE `dialog_id`=".$dialog['id']."
 			  AND !`deleted`
 			  AND `".$col."`=".$connect_id;
@@ -1261,7 +1261,7 @@ function _spisokUnitCount29($cmp, $dialog, $unit) {//пересчёт количеств привязан
 			continue;
 		$bl = _blockQuery($r['block_id']);
 		$dlg = _dialogQuery($bl['obj_id']);
-		$sql = "UPDATE `".$dlg['base_table']."`
+		$sql = "UPDATE `"._baseTable($dlg['table_1'])."`
 				SET `".$col."`=".$count."
 				WHERE `id`=".$connect_id;
 		query($sql);
@@ -1298,13 +1298,13 @@ function _spisokUnitSum29($cmp, $dialog, $unit) {//пересчёт сумм привязаного спи
 
 		//получение нового количества для обновления
 		$sql = "SELECT IFNULL(SUM(`".$colSumGet."`),0)
-				FROM `".$dialog['base_table']."`
+				FROM `"._baseTable($dialog['table_1'])."`
 				WHERE `dialog_id`=".$dialog['id']."
 				  AND !`deleted`
 				  AND `".$col."`=".$connect_id;
 		$sum = query_value($sql);
 
-		$sql = "UPDATE `".$dlg['base_table']."`
+		$sql = "UPDATE `"._baseTable($dlg['table_1'])."`
 				SET `".$colSumSet."`=".$sum."
 				WHERE `id`=".$connect_id;
 		query($sql);
@@ -1371,7 +1371,7 @@ function _spisokUnitBalans29($elUpd) {
 			}
 
 			//процесс обновления
-			$sql = "UPDATE `".$dialog['base_table']."`
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
 					SET `".$cmp['col']."`=".$upd."
 					WHERE `id`=".$el['connect_id'];
 			query($sql);

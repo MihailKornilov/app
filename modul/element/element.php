@@ -230,6 +230,35 @@ function _emptyMin($msg) {
 	return '<div class="_empty min mar10">'.$msg.'</div>';
 }
 
+function _baseTable($id=false) {//таблицы в базе с соответствующими идентификаторами
+	$tab = array(
+		 1 => '_app',
+		 2 => '_block',
+		 3 => '_dialog',
+		 4 => '_dialog_group',
+		 5 => '_element',
+		 6 => '_element_func',
+		 7 => '_history',
+		 8 => '_image',
+		 9 => '_image_server',
+		10 => '_page',
+		11 => '_spisok',
+		12 => '_user',
+		13 => '_user_app',
+		14 => '_user_auth',
+		15 => '_user_spisok_filter'
+	);
+
+	if($id === false)
+		return $tab;
+	if(!$id = _num($id))
+		return 0;
+	if(!isset($tab[$id]))
+		return 0;
+
+	return $tab[$id];
+}
+
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
 	//если dialog_id получен - отправка его
 	if($dialog_id = _num(@$_POST['dialog_id']))
@@ -297,15 +326,15 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	//список колонок, присутствующих в таблице 1
 	$field = array();
-	$sql = "DESCRIBE `".$dialog['base_table']."`";
+	$sql = "DESCRIBE `"._baseTable($dialog['table_1'])."`";
 	foreach(query_array($sql) as $r)
 		$field[$r['Field']] = 1;
 	$dialog['field'] = $field;
 
 	//список колонок, присутствующих в таблице 2
 	$field = array();
-	if($dialog['base_table_2']) {
-		$sql = "DESCRIBE `".$dialog['base_table_2']."`";
+	if($dialog['table_2']) {
+		$sql = "DESCRIBE `"._baseTable($dialog['table_2'])."`";
 		foreach(query_array($sql) as $r)
 			$field[$r['Field']] = 1;
 	}
@@ -377,7 +406,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 
 	//получение id диалога, который является списком, чтобы было нельзя его выбирать в самом себе (для связок)
 	$dialog = _dialogQuery($dialog_id);
-	if($dialog['base_table'] == '_element') {
+	if(_baseTable($dialog['table_1']) == '_element') {
 		//если редактирование - получение id блока из элемента
 		if($elem_id) {
 			$sql = "SELECT `block_id`

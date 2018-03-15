@@ -354,26 +354,25 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			});
 		});
 
-		DLG('#base_table')._select({
+		DLG('#table_1')._select({
 			width:170,
-			write:1,
 			spisok:o.tables
 		});
-		DLG('#base_table_2')._select({
+		DLG('#table_2')._select({
 			width:170,
 			title0:'не выбрана',
 			spisok:o.tables,
 			func:function(v) {
 				$('#td-bt2c')._dn(v);
-				DLG('#base_table_2_col')._select(0);
+				DLG('#table_2_field')._select(0);
 				if(v)
-					DLG('#base_table_2_col')._select('spisok', o.tablesFields[v]);
+					DLG('#table_2_field')._select('spisok', o.tablesFields[v]);
 			}
 		});
-		DLG('#base_table_2_col')._select({
+		DLG('#table_2_field')._select({
 			width:170,
 			title0:'колонка для связки',
-			spisok:o.tablesFields[DLG('#base_table_2').val()]
+			spisok:o.tablesFields[DLG('#table_2').val()]
 		});
 		DLG('#element_group_id')._select({
 			title0:'нет',
@@ -442,9 +441,9 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 
 				spisok_on:DLG('#spisok_on').val(),
 
-				base_table:DLG('#base_table')._select('inp'),
-				base_table_2:DLG('#base_table_2')._select('inp'),
-				base_table_2_col:DLG('#base_table_2_col')._select('inp'),
+				table_1:DLG('#table_1').val(),
+				table_2:DLG('#table_2').val(),
+				table_2_field:DLG('#table_2_field')._select('inp'),
 				app_any:DLG('#app_any').val(),
 				sa:DLG('#sa').val(),
 

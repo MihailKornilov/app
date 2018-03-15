@@ -31,35 +31,21 @@ switch(@$_POST['op']) {
 
 		define('BLOCK_EDIT', 1);
 
-		$tab_id = 0;
-		$tab2_id = 0;
 		$tab2field_id = 0;   //id колонка дл€ св€зки с первой таблицей
-		$tables = array();
 		$tablesFields = array();//колонки по каждой таблице
 		$group = array();
 		$menu_sa = array();
 		if(SA) {
-			//получение списка таблиц базы и определение выбранной
-			$sql = "SHOW TABLES";
-			$arr = query_array($sql);
-			$n = 1;
-			foreach($arr as $ass)
-				foreach($ass as $base => $tab) {
-					if($dialog['base_table'] == $tab)
-						$tab_id = $n;
-					if($dialog['base_table_2'] == $tab)
-						$tab2_id = $n;
-					$tablesFields[$n] = _table2field($tab);
-					$tables[$n++] = $tab;
-				}
+			//колонки дл€ всех таблиц
+			foreach(_baseTable() as $id => $tab)
+				$tablesFields[$id] = _table2field($tab);
 
-			if($tab2_id) {
-				foreach(_table2field($tables[$tab2_id]) as $i => $field)
-					if($dialog['base_table_2_col'] == $field) {
+			if($dialog['table_2'])
+				foreach(_table2field(_baseTable($dialog['table_2'])) as $i => $field)
+					if($dialog['table_2_field'] == $field) {
 						$tab2field_id = $i;
 						break;
 					}
-			}
 
 			//группы элементов
 			$sql = "SELECT *
@@ -209,12 +195,12 @@ switch(@$_POST['op']) {
 		                '<td><div id="dialog-width" class="dib w50">'.$dialog['width'].'</div>'.
 		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
 					'<tr><td class="red r">“аблица 1:'.
-						'<td><input type="hidden" id="base_table"   value="'.$tab_id.'" />'.
+						'<td><input type="hidden" id="table_1"   value="'.$dialog['table_1'].'" />'.
 					'<tr><td class="red r">“аблица 2:'.
 						'<td><table>'.
-								'<tr><td><input type="hidden" id="base_table_2" value="'.$tab2_id.'" />'.
-									'<td class="pl5'._dn($tab2_id).'" id="td-bt2c">'.
-										'<input type="hidden" id="base_table_2_col" value="'.$tab2field_id.'" />'.
+								'<tr><td><input type="hidden" id="table_2" value="'.$dialog['table_2'].'" />'.
+									'<td class="pl5'._dn($dialog['table_2']).'" id="td-bt2c">'.
+										'<input type="hidden" id="table_2_field" value="'.$tab2field_id.'" />'.
 		                    '</table>'.
 					'<tr><td>'.
 						'<td>'._check(array(
@@ -344,7 +330,7 @@ switch(@$_POST['op']) {
 		$send['cmp'] = utf8($dialog['cmp']);
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
-		$send['tables'] = $tables;
+		$send['tables'] = SA ? _baseTable() : array();
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
 		$send['dialog_spisok'] = SA ? utf8(_dialogSelArray(true)) : array() ;
@@ -585,20 +571,24 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	if($width < 480 || $width > 980)
 		jsonError('”становлена недопустима€ ширина диалога');
 
-	if(!$base_table = _txt($_POST['base_table']))
-		$base_table = '_spisok';
-	$sql = "SHOW TABLES LIKE '".$base_table."'";
-	if(!query_array($sql))
+	if(!$table_1 = _num($_POST['table_1']))
+		$table_1 = 11;
+	if(!$table = _baseTable($table_1))
 		jsonError('”казана несуществующа€ таблица 1');
+	$sql = "SHOW TABLES LIKE '".$table."'";
+	if(!query_array($sql))
+		jsonError('”казана несуществующа€ таблица 1: "'.$table.'"');
 
-	$base_table_2_col = '';
-	if($base_table_2 = _txt($_POST['base_table_2'])) {
-		$sql = "SHOW TABLES LIKE '".$base_table_2."'";
-		if(!query_array($sql))
+	$table_2_field = '';
+	if($table_2 = _num($_POST['table_2'])) {
+		if(!$table = _baseTable($table_2))
 			jsonError('”казана несуществующа€ таблица 2');
-		if($base_table == $base_table_2)
+		$sql = "SHOW TABLES LIKE '".$table."'";
+		if(!query_array($sql))
+			jsonError('”казана несуществующа€ таблица 2: "'.$table.'"');
+		if($table_1 == $table_2)
 			jsonError('“аблицы не могут совпадать');
-		if(!$base_table_2_col = _txt($_POST['base_table_2_col']))
+		if(!$table_2_field = _txt($_POST['table_2_field']))
 			jsonError('Ќе указана колонка дл€ св€зки');
 	}
 
@@ -658,9 +648,9 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`del_action_id`=".$del_action_id.",
 				`del_action_page_id`=".$del_action_page_id.",
 
-				`base_table`='".addslashes($base_table)."',
-				`base_table_2`='".addslashes($base_table_2)."',
-				`base_table_2_col`='".addslashes($base_table_2_col)."',
+				`table_1`=".$table_1.",
+				`table_2`=".$table_2.",
+				`table_2_field`='".addslashes($table_2_field)."',
 				`spisok_on`=".$spisok_on.",
 
 				`element_group_id`=".$element_group_id.",
@@ -703,7 +693,7 @@ function _dialogOpenLoad($dialog_id) {
 		if(isset($dialog['field']['app_id']))
 			$cond .= " AND `app_id` IN (0,".APP_ID.")";
 		$sql = "SELECT *
-				FROM `".$dialog['base_table']."`
+				FROM `"._baseTable($dialog['table_1'])."`
 				WHERE ".$cond;
 		if(!$unit = query_assoc($sql))
 			jsonError('«аписи не существует');
@@ -804,7 +794,7 @@ function _dialogOpenLoad($dialog_id) {
 					break;
 				if(!$dlg = _dialogQuery($block['obj_id']))
 					break;
-				if($dlg['base_table'] != '_spisok')
+				if(_baseTable($dlg['table_1']) != '_spisok')
 					break;
 
 				//получение количества использовани€ значений
@@ -927,7 +917,7 @@ function _dialogOpenLoad($dialog_id) {
 						'title' => $col,
 						'content' =>
 							'<div class="'.$color.'">'.
-								'<span class="pale">'.$colDialog['base_table'].'.</span>'.
+								'<span class="pale">'._baseTable($colDialog['table_1']).'.</span>'.
 								$col.
 							'</div>'
 
@@ -947,7 +937,7 @@ function _dialogOpenLoad($dialog_id) {
 						'title' => $col,
 						'content' =>
 							'<div class="'.$color.'">'.
-								'<span class="pale">'.$colDialog['base_table_2'].'.</span>'.
+								'<span class="pale">'._baseTable($colDialog['table_2']).'.</span>'.
 								$col.
 							'</div>'
 

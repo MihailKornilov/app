@@ -318,7 +318,7 @@ function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, к
 		return _contentMsg('ќтсутствует диалог, который вносит данные.'.$pageDef);
 
 	$sql = "SELECT *
-			FROM `".$dialog['base_table']."`
+			FROM `"._baseTable($dialog['table_1'])."`
 			WHERE `app_id`=".APP_ID."
 			  AND `id`=".$id;
 	if(!$unit = query_assoc($sql))
@@ -870,7 +870,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						if(!is_array($sp)) {
 							$dialog = _dialogQuery($unit['dialog_id']);
 							$sql = "SELECT *
-									FROM `".$dialog['base_table']."`
+									FROM `"._baseTable($dialog['table_1'])."`
 									WHERE `id`=".$sp;
 							$unit = query_assoc($sql);
 							break;
@@ -1245,7 +1245,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$choose_deny = array();
 /*
 			$dialogCur = _dialogQuery($el['block']['obj_id']);
-			if($dialogCur['base_table'] == '_element_func') {
+			if($dialogCur['base_tabl'] == '_element_func') {
 				$id = $UNIT_ISSET ? _num($unit['id']) : 0;
 				$sql = "SELECT *
 						FROM `_element_func`
