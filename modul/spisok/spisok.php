@@ -99,13 +99,6 @@ function _spisokCountAll($el) {//получение общего количества строк списка
 
 	return $all;
 }
-function _spisokJoin($dialog) {//подключение второго списка, если требуется
-	if(!$dialog['table_2'])
-		return '';
-
-	return "INNER JOIN `"._baseTable($dialog['table_2'])."` `t2`
-			ON `t1`.`id`=`t2`.`".$dialog['table_2_field']."`";
-}
 function _spisokJoinField($dialog) {//подключение колонок второго списка
 	if(!$dialog['table_2'])
 		return '';
@@ -120,6 +113,13 @@ function _spisokJoinField($dialog) {//подключение колонок второго списка
 	}
 
 	return $send;
+}
+function _spisokJoin($dialog) {//подключение второго списка, если требуется
+	if(!$dialog['table_2'])
+		return '';
+
+	return "INNER JOIN `"._baseTable($dialog['table_2'])."` `t2`
+			ON `t1`.`id`=`t2`.`".$dialog['table_2_field']."`";
 }
 
 function _spisokElemCount($r) {//формирование элемента с содержанием количества списка для вывода на страницу
@@ -316,19 +316,17 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							//значение из другого списка
 							if($el['dialog_id'] == 29) {
 								$txt = $sp[$col]['txt_1'];
-								$txt = _spisokUnitUrl($txt, $sp[$col], $td['url']);
 								break;
 							}
 
 							$txt = _br($sp[$col]);
 							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
-							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
 						break;
 */
 						case 34: $cls[] = 'pad0'; //иконки управления
 						default:
 							$txt = _elemUnit($td, $sp);
-							$txt = _spisokUnitUrl($txt, $sp, $td['url']);
+							$txt = _spisokUnitUrl($td, $sp, $txt);
 							break;
 					}
 					$cls[] = $td['font'];
@@ -428,6 +426,16 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	return 'Неизвестный внешний вид списка: '.$ELEM['num_1'];
 }
 
+function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
+	$cond = "`t1`.`id`=".$unit_id;
+	if(isset($dialog['field1']['app_id']) || isset($dialog['field2']['app_id']))
+		$cond .= " AND `app_id`=".APP_ID;
+	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
+			FROM `"._baseTable($dialog['table_1'])."` `t1`
+			"._spisokJoin($dialog)."
+			WHERE ".$cond;
+	return query_assoc($sql);
+}
 function _spisokUnitNum($el, $u) {//порядковый номер - значение единицы списка
 	if(empty($u))
 		return _elemTitle($el['id']);
@@ -523,25 +531,53 @@ function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение един
 		));
 }
 
-function _spisokUnitUrl($txt, $sp, $is_url) {//обёртка значения колонки в ссылку
-	if(!$is_url)//если оборачивать не нужно
+function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
+	if(!$el['url'])//если оборачивать не нужно
+		return $txt;
+	if(empty($unit['id']))//отсутствует единица списка
 		return $txt;
 
-	//диалог, через который вносятся данные списка
-	$dialog = _dialogQuery($sp['dialog_id']);
+	$dialog_id = 0;
 
-	//по умолчанию текущая страница
-	$link = '&p='._page('cur');
+	if($el['block_id'] < 0)
+		if($el = _elemQuery(abs($el['block_id'])))
+			if($el['dialog_id'] == 23)
+				$dialog_id = $el['num_1'];
 
-	//если таблица является страницей, то ссылка перехода на страницу
-	if(_baseTable($dialog['table_1']) == '_page')
-		$link = '&p='.$sp['id'];
+	if(!$dialog_id && empty($el['block']))//не переданы с элементом данные блока
+		return $txt;
 
-	//если есть страница, которая принимает значения списка
-	if($page_id = _page('spisok_id', $dialog['id']))
-		$link = '&p='.$page_id.'&id='.$sp['id'];
+	if(!$dialog_id)
+		switch($el['block']['obj_name']) {
+			case 'spisok':
+				$key = 'ELEM_LINK_'.$el['id'];
+				if(defined($key)) {
+					$dialog_id = constant($key);
+					break;
+				}
+				if(!$BL = _blockQuery($el['block']['obj_id']))//блока не существует
+					return $txt;
+				if(empty($BL['elem']))//нет элемента, размещающего список
+					return $txt;
 
-	return '<a href="'.URL.$link.'" class="inhr">'.$txt.'</a>';
+				$dialog_id = _num($BL['elem']['num_1']);
+				define($key, $dialog_id);
+				break;
+			case 'page':
+				if(!$page = _page($el['block']['obj_id']))
+					return $txt;
+				$dialog_id = $page['spisok_id'];
+				break;
+			default: return $txt;
+		}
+
+	if(!$dialog_id)
+		return $txt;
+
+	if(!$page_id = _page('spisok_id', $dialog_id))
+		return $txt;
+
+	return '<a href="'.URL.'&p='.$page_id.'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 }
 function _spisokColSearchBg($txt, $el, $cmp_id) {//подсветка значения колонки при текстовом (быстром) поиске
 	$search = false;

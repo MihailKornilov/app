@@ -748,12 +748,12 @@ function _dialogOpenLoad($dialog_id) {
 				foreach($arr as $id => $r) {
 					$spisok[] = array(
 						'id' => _num($id),
-						'title' => utf8(_elemTitle($id)),
+						'title' => _elemTitle($id),
 						'dialog_id' => _num($r['dialog_id']),
 						'num_1' => _num($r['num_1']),
 						'num_8' => _num($r['num_8']),
-						'txt_7' => utf8($r['txt_7']),
-						'txt_8' => utf8($r['txt_8'])
+						'txt_7' => $r['txt_7'],
+						'txt_8' => $r['txt_8']
 					);
 				}
 
@@ -971,7 +971,7 @@ function _dialogOpenLoad($dialog_id) {
 				if($EL['dialog_id'] != 17)
 					break;
 
-				$dialog['cmp'][$cmp_id]['txt_1'] = utf8($EL['txt_1']);
+				$dialog['cmp'][$cmp_id]['txt_1'] = $EL['txt_1'];
 				$dialog['cmp'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 				break;
 			//Настройка содержания Сборного текста
@@ -994,7 +994,7 @@ function _dialogOpenLoad($dialog_id) {
 					$spisok[] = array(
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
-						'title' => utf8(_elemUnit($r)),
+						'title' => _elemTitle($r['id']),
 						'spc' => _num($r['num_8']) //пробел справа
 					);
 				}
@@ -1021,7 +1021,7 @@ function _dialogOpenLoad($dialog_id) {
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
 						'minus' => _num($r['num_8']), //вычитание=1, сложение=0
-						'title' => utf8(_elemUnit($r))
+						'title' => _elemUnit($r)
 					);
 				}
 				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
@@ -1044,9 +1044,9 @@ function _dialogOpenLoad($dialog_id) {
 					$blk_title = $r['txt_2'] ? $c.' блок'._end($c, '', 'а', 'ов') : '';
 					$spisok[] = array(
 						'id' => _num($id),
-						'title' => utf8($r['txt_1']),
+						'title' => $r['txt_1'],
 						'blk' => $r['txt_2'],
-						'blk_title' => utf8($blk_title),
+						'blk_title' => $blk_title,
 						'def' => _num($r['def'])
 					);
 				}

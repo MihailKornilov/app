@@ -313,6 +313,9 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 	return $dialog_id;
 }
 function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
+	if(!$dialog_id = _num($dialog_id))
+		return array();
+
 	if($dialog = _cache())
 		return $dialog;
 

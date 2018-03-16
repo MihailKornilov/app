@@ -317,11 +317,7 @@ function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, к
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _contentMsg('Отсутствует диалог, который вносит данные.'.$pageDef);
 
-	$sql = "SELECT *
-			FROM `"._baseTable($dialog['table_1'])."`
-			WHERE `app_id`=".APP_ID."
-			  AND `id`=".$id;
-	if(!$unit = query_assoc($sql))
+	if(!$unit = _spisokUnitQuery($dialog, $id))
 		return _contentMsg('Единицы списка id'.$id.' не существует.'.$pageDef);
 
 	if(isset($dialog['field1']['deleted']) && $unit['deleted'])
@@ -856,8 +852,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						if(empty($unit))
 							return '';
 						$txt = $unit[$elem['col']];
-	//					$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
-						$txt = _spisokUnitUrl($txt, $unit, $el['url']);
+//						$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
+						$txt = _spisokUnitUrl($el, $unit, $txt);
 						$send .= _br($txt);
 						break;
 					//произвольный текст
@@ -1522,6 +1518,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				$txt .= _elemUnit($r, $unit);
 				$txt .= $r['num_8'] ? ' ' : ''; //добавление пробела справа, если нужно
 			}
+
+			$txt = _spisokUnitUrl($el, $unit, $txt);
 
 			return $txt;
 

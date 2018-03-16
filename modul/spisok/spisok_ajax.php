@@ -183,11 +183,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 
 	//получение данных единицы списка, если редактируется
 	if($unit_id > 0) {
-		$cond = "`id`=".$unit_id;
-		if(isset($dialog['field1']['app_id']))
-			$cond .= " AND `app_id` IN (0,".APP_ID.")";
-		$sql = "SELECT * FROM `"._baseTable($dialog['table_1'])."` WHERE ".$cond;
-		if(!$r = query_assoc($sql))
+		if(!$r = _spisokUnitQuery($dialog, $unit_id))
 			jsonError('Записи не существует');
 		if(@$r['deleted'])
 			jsonError('Запись была удалена');
