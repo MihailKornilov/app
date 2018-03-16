@@ -24,7 +24,7 @@ switch(@$_POST['op']) {
 			unset($menu[9]);
 			unset($action[4]);
 		}
-		if(!isset($dialog['field']['deleted']))
+		if(!isset($dialog['field1']['deleted']))
 			unset($menu[2]);
 		if(!isset($menu[$dialog['menu_edit_last']]))
 			$dialog['menu_edit_last'] = 1;
@@ -689,11 +689,13 @@ function _dialogOpenLoad($dialog_id) {
 	$unit = array();
 	$unit_id = _num(@$_POST['unit_id'], 1);
 	if($unit_id > 0) {
-		$cond = "`id`=".$unit_id;
-		if(isset($dialog['field']['app_id']))
+		$cond = "`t1`.`id`=".$unit_id;
+		if(isset($dialog['field1']['app_id']))
 			$cond .= " AND `app_id` IN (0,".APP_ID.")";
-		$sql = "SELECT *
-				FROM `"._baseTable($dialog['table_1'])."`
+
+		$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
+				FROM `"._baseTable($dialog['table_1'])."` `t1`
+				"._spisokJoin($dialog)."
 				WHERE ".$cond;
 		if(!$unit = query_assoc($sql))
 			jsonError('Записи не существует');
@@ -702,7 +704,7 @@ function _dialogOpenLoad($dialog_id) {
 		if(@$unit['deleted'])
 			jsonError('Запись была удалена');
 
-		if(!$block_id && isset($dialog['field']['block_id']))
+		if(!$block_id && isset($dialog['field1']['block_id']))
 			$block_id = _num($unit['block_id']);
 	}
 
@@ -905,7 +907,7 @@ function _dialogOpenLoad($dialog_id) {
 
 				$field = array();
 				$n = 1;
-				foreach($colDialog['field'] as $col => $k) {
+				foreach($colDialog['field1'] as $col => $k) {
 					if(isset($fieldNo[$col]))
 						continue;
 

@@ -324,7 +324,7 @@ function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, к
 	if(!$unit = query_assoc($sql))
 		return _contentMsg('Единицы списка id'.$id.' не существует.'.$pageDef);
 
-	if(isset($dialog['field']['deleted']) && $unit['deleted'])
+	if(isset($dialog['field1']['deleted']) && $unit['deleted'])
 		return _contentMsg('Единица списка id'.$id.' была удалена.'.$pageDef);
 
 	return $unit;
@@ -1309,7 +1309,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$UNIT_ISSET)
 				return 'edit';
 
-			return _spisokUnitIconEdit($unit['dialog_id'], $unit['id']);
+			return _spisokUnitIconEdit($el, $unit['id']);
 
 		//Иконка вопрос: Выплывающая подсказка
 		case 42:

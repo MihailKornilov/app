@@ -329,7 +329,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	$sql = "DESCRIBE `"._baseTable($dialog['table_1'])."`";
 	foreach(query_array($sql) as $r)
 		$field[$r['Field']] = 1;
-	$dialog['field'] = $field;
+	$dialog['field1'] = $field;
 
 	//список колонок, присутствующих в таблице 2
 	$field = array();
@@ -852,7 +852,7 @@ function _historySetup($el, $unit) {//настройка шаблона истории действий (подклю
 }
 function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действий
 	//история не вносится, если единица списка удаляется физически из базы
-	if(!isset($dialog['field']['deleted']))
+	if(!isset($dialog['field1']['deleted']))
 		return;
 
 	$active = empty($dialog['history'][$type_id]['tmp_elm']) ? 0 : 1;

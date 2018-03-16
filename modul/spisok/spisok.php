@@ -89,15 +89,9 @@ function _spisokCountAll($el) {//получение общего количества строк списка
 	//диалог, через который вносятся данные списка
 	$dialog = _dialogQuery($el['num_1']);
 
-	$JOIN = '';
-	if($dialog['table_2']) {
-		$JOIN = "INNER JOIN `"._baseTable($dialog['table_2'])."` `t2`
-				 ON `t1`.`id`=`t2`.`".$dialog['table_2_field']."`";
-	}
-
 	$sql = "SELECT COUNT(*)
 			FROM `"._baseTable($dialog['table_1'])."` `t1`
-			".$JOIN."
+			"._spisokJoin($dialog)."
 			WHERE "._spisokCond($el);
 	$all = _num(query_value($sql));
 
@@ -105,6 +99,29 @@ function _spisokCountAll($el) {//получение общего количества строк списка
 
 	return $all;
 }
+function _spisokJoin($dialog) {//подключение второго списка, если требуется
+	if(!$dialog['table_2'])
+		return '';
+
+	return "INNER JOIN `"._baseTable($dialog['table_2'])."` `t2`
+			ON `t1`.`id`=`t2`.`".$dialog['table_2_field']."`";
+}
+function _spisokJoinField($dialog) {//подключение колонок второго списка
+	if(!$dialog['table_2'])
+		return '';
+
+	$send = '';
+	foreach($dialog['cmp'] as $cmp) {
+		if($cmp['table_num'] != 2)
+			continue;
+		if(empty($cmp['col']))
+			continue;
+		$send .= ',`t2`.`'.$cmp['col'].'`';
+	}
+
+	return $send;
+}
+
 function _spisokElemCount($r) {//формирование элемента с содержанием количества списка для вывода на страницу
 	if(!$elem_id = $r['num_1'])
 		return 'Список не указан.';
@@ -222,12 +239,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	//элементы списка
 	$CMP = $spDialog['cmp'];
 
-	$JOIN = '';
-	if($spDialog['table_2']) {
-		$JOIN = "INNER JOIN `"._baseTable($spDialog['table_2'])."` `t2`
-				 ON `t1`.`id`=`t2`.`".$spDialog['table_2_field']."`";
-	}
-
 	$all = _spisokCountAll($ELEM);
 
 	$order = "`t1`.`id` DESC";
@@ -235,11 +246,9 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "SELECT
-				`t1`.*
-				".($JOIN ? ",`t2`.*" : '')."
+	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM `"._baseTable($spDialog['table_1'])."` `t1`
-			".$JOIN."
+			"._spisokJoin($spDialog)."
 			WHERE "._spisokCond($ELEM)."
 			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
@@ -474,7 +483,35 @@ function _spisokUnitUser($el, $u) {//значение единицы списка - имя пользователя
 
 	return _user($u['user_id_add'], 'name');
 }
-function _spisokUnitIconEdit($dialog_id, $unit_id) {//иконки управления - значение единицы списка [34]
+function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение единицы списка [34]
+	if(empty($el['block']))//не переданы с элементом данные блока
+		return '-no-block';
+
+	switch($el['block']['obj_name']) {
+		case 'spisok':
+			$key = 'ICON_EDIT_'.$el['id'];
+			if(defined($key)) {
+				$dialog_id = constant($key);
+				break;
+			}
+			if(!$BL = _blockQuery($el['block']['obj_id']))//блока не существует
+				return '-no-bl-spisok';
+			if(empty($BL['elem']))//нет элемента, размещающего список
+				return '-no-el-spisok';
+
+			$dialog_id = _num($BL['elem']['num_1']);
+			define($key, $dialog_id);
+			break;
+		case 'page':
+			if(!$page = _page($el['block']['obj_id']))
+				return '-no-page';
+			$dialog_id = $page['spisok_id'];
+			break;
+		default: return '-no-spisok';
+	}
+	if(!$dialog_id)
+		return '-no-dialog-id';
+
 	return
 		_iconEdit(array(
 			'class' => 'dialog-open pl',
@@ -540,7 +577,7 @@ function _spisokCond($el) {//формирование строки с условиями поиска
 	//$el - элемент, который размещает список. 14 или 23.
 	//диалог, через который вносятся данные списка
 	$dialog = _dialogQuery($el['num_1']);
-	$field = $dialog['field'];
+	$field = $dialog['field1'];
 
 	$cond = "`t1`.`id`";
 	if(isset($field['deleted']))
