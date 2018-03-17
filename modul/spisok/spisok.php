@@ -430,6 +430,8 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
 	$cond = "`t1`.`id`=".$unit_id;
 	if(isset($dialog['field1']['app_id']) || isset($dialog['field2']['app_id']))
 		$cond .= " AND `app_id`=".APP_ID;
+	if(isset($dialog['field1']['dialog_id']))
+		$cond .= " AND `dialog_id`=".$dialog['id'];
 	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM `"._baseTable($dialog['table_1'])."` `t1`
 			"._spisokJoin($dialog)."
@@ -492,31 +494,43 @@ function _spisokUnitUser($el, $u) {//значение единицы списка - имя пользователя
 	return _user($u['user_id_add'], 'name');
 }
 function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение единицы списка [34]
-	if(empty($el['block']))//не переданы с элементом данные блока
+	if(empty($unit_id))//отсутствует id единицы списка
+		return '-no-unit';
+
+	$dialog_id = 0;
+
+	if($el['block_id'] < 0)
+		if($el = _elemQuery(abs($el['block_id'])))
+			if($el['dialog_id'] == 23)
+				$dialog_id = $el['num_1'];
+
+	if(!$dialog_id && empty($el['block']))//не переданы с элементом данные блока
 		return '-no-block';
 
-	switch($el['block']['obj_name']) {
-		case 'spisok':
-			$key = 'ICON_EDIT_'.$el['id'];
-			if(defined($key)) {
-				$dialog_id = constant($key);
-				break;
-			}
-			if(!$BL = _blockQuery($el['block']['obj_id']))//блока не существует
-				return '-no-bl-spisok';
-			if(empty($BL['elem']))//нет элемента, размещающего список
-				return '-no-el-spisok';
+	if(!$dialog_id)
+		switch($el['block']['obj_name']) {
+			case 'spisok':
+				$key = 'ICON_EDIT_'.$el['id'];
+				if(defined($key)) {
+					$dialog_id = constant($key);
+					break;
+				}
+				if(!$BL = _blockQuery($el['block']['obj_id']))//блока не существует
+					return '-no-bl-spisok';
+				if(empty($BL['elem']))//нет элемента, размещающего список
+					return '-no-el-spisok';
 
-			$dialog_id = _num($BL['elem']['num_1']);
-			define($key, $dialog_id);
-			break;
-		case 'page':
-			if(!$page = _page($el['block']['obj_id']))
-				return '-no-page';
-			$dialog_id = $page['spisok_id'];
-			break;
-		default: return '-no-spisok';
-	}
+				$dialog_id = _num($BL['elem']['num_1']);
+				define($key, $dialog_id);
+				break;
+			case 'page':
+				if(!$page = _page($el['block']['obj_id']))
+					return '-no-page';
+				$dialog_id = $page['spisok_id'];
+				break;
+			default: return '-no-spisok';
+		}
+
 	if(!$dialog_id)
 		return '-no-dialog-id';
 
@@ -555,6 +569,22 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 					$dialog_id = constant($key);
 					break;
 				}
+				if($el['dialog_id'] == 11) {
+					if(!$ids = _ids($el['txt_2'], 1))
+						return $txt;
+					if(!$c = count($ids))//берётся последний элемент
+						return $txt;
+					if(empty($ids[$c - 1]))
+						return $txt;
+					if(!$EL = _elemQuery($ids[$c - 1]))
+						return $txt;
+					if(!$EL['block']['obj_name'] == 'dialog')
+						return $txt;
+
+					$dialog_id = $EL['block']['obj_id'];
+					define($key, $dialog_id);
+					break;
+				}
 				if(!$BL = _blockQuery($el['block']['obj_id']))//блока не существует
 					return $txt;
 				if(empty($BL['elem']))//нет элемента, размещающего список
@@ -564,6 +594,21 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 				define($key, $dialog_id);
 				break;
 			case 'page':
+				if($el['dialog_id'] == 11) {
+					if(!$ids = _ids($el['txt_2'], 1))
+						return $txt;
+					if(!$c = count($ids))//берётся последний элемент
+						return $txt;
+					if(empty($ids[$c - 1]))
+						return $txt;
+					if(!$EL = _elemQuery($ids[$c - 1]))
+						return $txt;
+					if(!$EL['block']['obj_name'] == 'dialog')
+						return $txt;
+
+					$dialog_id = $EL['block']['obj_id'];
+					break;
+				}
 				if(!$page = _page($el['block']['obj_id']))
 					return $txt;
 				$dialog_id = $page['spisok_id'];
