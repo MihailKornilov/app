@@ -2296,6 +2296,16 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			errorClass:'bg-fcc' //ошибка, если попытка переместить элемент на недоступный уровень
 		});
 	},
+	_pageUserAccess = function(el) {
+		_forEq($(el.attr_el).find('._check'), function(sp) {
+			var prev = sp.prev();
+			prev._check({
+				func:function(v) {
+					prev.parents('table').next()[v ? 'slideDown' : 'slideUp'](200);
+				}
+			});
+		});
+	},
 	_imageShow = function() {//просмотр изображений. Подключается функцией [12]
 		var IMS = $('#_image-show'),
 			IU = IMS.find('.iu'),

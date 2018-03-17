@@ -41,6 +41,19 @@ function _page($i='all', $i1=0) {//получение данных страницы
 	if($i === 'all')
 		return $page;
 
+	//страницы приложения
+	if($i == 'app') {
+		$send = array();
+		foreach(_page() as $id => $r) {
+			if(!$r['app_id'])
+				continue;
+			if($r['sa'])
+				continue;
+			$send[$id] = $r;
+		}
+		return $send;
+	}
+
 	//id текущей страницы
 	if($i == 'cur') {
 		if($page_id = _num(@$_GET['p'])) {
@@ -243,12 +256,12 @@ function _pageSetupAppPage() {//управление страницами приложения
 function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
 	if(empty($arr))
 		return '';
-//mjs-nestedSortable-branch
+
 	$send = '';
 	foreach($arr as $r) {
 		$send .= '<li class="mt1'.(!$r['parent_id'] ? ' pb10' : '').'" id="item_'.$r['id'].'">'.
 			'<div>'.
-				'<table class="_stab w100p bor-e8 bg-fff">'.
+				'<table class="_stab w100p bg-fff">'.
 					'<tr><td>'.
 							'<a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
 								($r['def'] ? '<div class="icon icon-ok fr curD'._tooltip('Страница по умолчанию', -76).'</div>' : '').
@@ -279,6 +292,40 @@ function _pasMenu() {//строка меню управления страницей
 			_blockLevelChange('page', _page('cur')).
 		'</div>'.
 	'</div>';
+}
+
+function _pageUserAccess() {//настройка доступа к страницам для пользователя
+	$arr = _page('app');
+	$sort = array();
+	foreach($arr as $id => $r)
+		if($r['parent_id']) {
+			if(empty($sort[$r['parent_id']]))
+				$sort[$r['parent_id']] = array();
+			$sort[$r['parent_id']][] = $r;
+			unset($arr[$id]);
+		}
+
+	return '<dl>'._pageUserAccessSpisok($arr, $sort).'</dl>';
+}
+function _pageUserAccessSpisok($arr, $sort) {//список страниц приложения
+	if(empty($arr))
+		return '';
+
+	$send = '';
+	foreach($arr as $r) {
+		$send .= '<dd class="'._dn($r['parent_id'], ' pb10').'">'.
+				'<table>'.
+					'<tr>'.
+						'<td>'._check(array(
+									'attr_id' => 'page_access_'.$r['id']
+								)).
+						'<td class="pad5 '.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].
+				'</table>';
+		if(!empty($sort[$r['id']]))
+			$send .= '<dl class="ml40'._dn($r['parent_id']).'">'._pageUserAccessSpisok($sort[$r['id']], $sort).'</dl>';
+	}
+
+	return $send;
 }
 
 function _pageShow($page_id) {
@@ -752,6 +799,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				txt_1 - текст кнопки
 				num_1 - цвет
 				num_2 - маленькая кнопка
+				num_3 - принимает значения списка, которое принимает страница
 				num_4 - dialog_id, который назначен на эту кнопку
 			*/
 			$color = array(
@@ -769,6 +817,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			$block = _num(@$US['block_id']) ? ',block_id:'.$US['block_id'] : '';
 			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
 			$dialog_source = !empty($el['block']) && $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
+
+			//кнопка принимает значения списка, которое принимает страница
+			if($el['num_3'] && $UNIT_ISSET)
+				$block = ',unit_id:'.$unit['id'];
 
 			//если новая кнопка, будет создаваться новый диалог для неё
 			if(!$el['num_4'])

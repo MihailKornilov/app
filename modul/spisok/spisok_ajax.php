@@ -541,10 +541,12 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 			$update2[] = "`".$col."`='".addslashes($v)."'";
 	}
 
-	$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
-			SET ".implode(',', $update1)."
-			WHERE `id`=".$unit_id;
-	query($sql);
+	if(!empty($update1)) {
+		$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
+				SET ".implode(',', $update1)."
+				WHERE `id`=".$unit_id;
+		query($sql);
+	}
 
 	if(!empty($update2)) {
 		$sql = "SELECT `id`
