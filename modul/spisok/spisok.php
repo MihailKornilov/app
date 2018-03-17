@@ -427,6 +427,9 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 }
 
 function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
+	if(!$dialog['table_1'])
+		return array();
+
 	$cond = "`t1`.`id`=".$unit_id;
 	if(isset($dialog['field1']['app_id']) || isset($dialog['field2']['app_id']))
 		$cond .= " AND `app_id`=".APP_ID;

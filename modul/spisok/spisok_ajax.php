@@ -176,6 +176,9 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 	if($dialog['sa'] && !SA)
 		jsonError('Нет доступа');
 
+	if(!$dialog['table_1'])
+		return $dialog;
+
 	//проверка наличия таблицы для внесения данных
 	$sql = "SHOW TABLES LIKE '"._baseTable($dialog['table_1'])."'";
 	if(!mysql_num_rows(query($sql)))
@@ -217,7 +220,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$sql = "SELECT *
 			FROM `"._baseTable($dialog['table_1'])."`
 			WHERE `id`=".$unit_id;
-	$unit = query_assoc($sql);
+	$unit = $dialog['table_1'] ? query_assoc($sql) : array();
 	if(IS_ELEM)
 		if($bl = _blockQuery($unit['block_id']))
 			if($bl['obj_name'] == 'dialog') {
@@ -286,6 +289,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	return $send;
 }
 function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалога
+	if(!$dialog['table_1'])
+		return array();
+
 	$POST_CMP = @$_POST['cmp'];
 	if($dialog['cmp_no_req'] && empty($POST_CMP))
 		return array();
@@ -337,6 +343,8 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой единицы списка, если отсутствует
 	if($unit_id > 0)
 		return $unit_id;
+	if(!$dialog['table_1'])
+		return 0;
 
 	$page_id = _num($_POST['page_id']);
 
@@ -445,6 +453,8 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 	return $unit_id;
 }
 function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//если в таблице присутствует колонка `focus`, то предварительное снятие флага фокуса с других элементов объекта (для таблицы _element)
+	if(!$dialog['table_1'])
+		return;
 	if(_baseTable($dialog['table_1']) != '_element')
 		return;
 	if(empty($POST_CMP))
@@ -482,6 +492,8 @@ function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//если в таблице прис
 	}
 }
 function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: очистка `def`, если устанавливается новая страница по умолчанию
+	if(!$dialog['table_1'])
+		return;
 	if(_baseTable($dialog['table_1']) != '_page')
 		return;
 	if(empty($POST_CMP))
@@ -504,6 +516,8 @@ function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: очистка `def`, 
 	}
 }
 function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компонентов единицы списка
+	if(!$dialog['table_1'])
+		return;
 	if(empty($POST_CMP))
 		return;
 

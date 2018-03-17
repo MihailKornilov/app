@@ -571,13 +571,13 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	if($width < 480 || $width > 980)
 		jsonError('”становлена недопустима€ ширина диалога');
 
-	if(!$table_1 = _num($_POST['table_1']))
-		$table_1 = 11;
-	if(!$table = _baseTable($table_1))
-		jsonError('”казана несуществующа€ таблица 1');
-	$sql = "SHOW TABLES LIKE '".$table."'";
-	if(!query_array($sql))
-		jsonError('”казана несуществующа€ таблица 1: "'.$table.'"');
+	if($table_1 = _num($_POST['table_1'])) {
+		if(!$table = _baseTable($table_1))
+			jsonError('”казана несуществующа€ таблица 1');
+		$sql = "SHOW TABLES LIKE '".$table."'";
+		if(!query_array($sql))
+			jsonError('”казана несуществующа€ таблица 1: "'.$table.'"');
+	}
 
 	$table_2_field = '';
 	if($table_2 = _num($_POST['table_2'])) {

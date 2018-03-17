@@ -329,9 +329,11 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	//список колонок, присутствующих в таблице 1
 	$field = array();
-	$sql = "DESCRIBE `"._baseTable($dialog['table_1'])."`";
-	foreach(query_array($sql) as $r)
-		$field[$r['Field']] = 1;
+	if($dialog['table_2']) {
+		$sql = "DESCRIBE `"._baseTable($dialog['table_1'])."`";
+		foreach(query_array($sql) as $r)
+			$field[$r['Field']] = 1;
+	}
 	$dialog['field1'] = $field;
 
 	//список колонок, присутствующих в таблице 2

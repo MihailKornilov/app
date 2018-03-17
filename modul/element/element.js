@@ -356,6 +356,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 
 		DLG('#table_1')._select({
 			width:170,
+			title0:'не выбрана',
 			spisok:o.tables
 		});
 		DLG('#table_2')._select({

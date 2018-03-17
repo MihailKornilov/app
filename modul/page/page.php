@@ -294,7 +294,7 @@ function _pasMenu() {//строка меню управления страницей
 	'</div>';
 }
 
-function _pageUserAccess($el, $unit) {//настройка доступа к страницам для пользователя
+function _pageUserAccess($el, $unit) {//настройка доступа к страницам для пользователя (подключение через [12])
 	if(empty($unit['id']))
 		return _emptyMin('Отсутствует id пользователя.');
 
@@ -344,7 +344,7 @@ function _pageUserAccessSpisok($arr, $sort) {//список страниц для настройки дост
 
 	return $send;
 }
-function _pageUserShow($el, $unit) {
+function _pageUserShow($el, $unit) {//отображение страниц, доступных пользователю (подключение через [12])
 	if(empty($unit['id']))
 		return _emptyMin('Отсутствует id пользователя.');
 
@@ -398,6 +398,36 @@ function _pageUserShowSpisok($arr, $parent_id=0) {//список страниц для настройки
 
 	return $send;
 }
+function _pageUserAccessAll($el) {//настройка входа в приложение всем пользователям (подключение через [12])
+	$sql = "SELECT
+				`u`.*,
+				`ua`.`access`
+			FROM
+				`_user` `u`,
+				`_user_app` `ua`
+			WHERE `ua`.`app_id`=".APP_ID."
+			  AND `u`.`id`=`ua`.`user_id`
+			ORDER BY `ua`.`dtime_add`";
+	if(!$user = query_arr($sql))
+		return '<div class="_empty min mar10">Сотрудников нет.</div>';
+
+	$send = '<table class="">';
+	foreach($user as $r)
+		$send .=
+			'<tr class="over1">'.
+				'<td class="w200 pad5 pl20 curD">'.
+					$r['f'].' '.$r['i'].
+				'<td class="w35">'.
+					_check(array(
+						'value' => $r['access']
+					));
+
+	$send .= '</table>';
+
+	return $send;
+}
+
+
 
 function _pageShow($page_id) {
 	if(!$page = _page($page_id))
