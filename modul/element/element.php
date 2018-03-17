@@ -252,9 +252,9 @@ function _baseTable($id=false) {//таблицы в базе с соответствующими идентификато
 	if($id === false)
 		return $tab;
 	if(!$id = _num($id))
-		return 0;
+		return false;
 	if(!isset($tab[$id]))
-		return 0;
+		return false;
 
 	return $tab[$id];
 }
@@ -329,7 +329,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	//список колонок, присутствующих в таблице 1
 	$field = array();
-	if($dialog['table_2']) {
+	if($dialog['table_1']) {
 		$sql = "DESCRIBE `"._baseTable($dialog['table_1'])."`";
 		foreach(query_array($sql) as $r)
 			$field[$r['Field']] = 1;

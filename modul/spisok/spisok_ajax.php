@@ -198,7 +198,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$dialog = _spisokUnitDialog($unit_id);
 	$unitOld = _spisokUnitQuery($dialog, $unit_id);
 
-	define('IS_ELEM', _baseTable($dialog['table_1']) == '_element');
+	define('IS_ELEM', $dialog['table_1'] == 5);// '_element'
 
 	$act = $unit_id ? 'edit' : 'insert';
 
@@ -221,6 +221,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 			FROM `"._baseTable($dialog['table_1'])."`
 			WHERE `id`=".$unit_id;
 	$unit = $dialog['table_1'] ? query_assoc($sql) : array();
+
 	if(IS_ELEM)
 		if($bl = _blockQuery($unit['block_id']))
 			if($bl['obj_name'] == 'dialog') {
@@ -1278,6 +1279,8 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 }
 
 function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления единицы списка
+	if(!$dialog['table_1'])
+		return;
 	$sql = "SELECT *
 			FROM `"._baseTable($dialog['table_1'])."`
 			WHERE `id`=".$unit_id;
