@@ -294,18 +294,34 @@ function _pasMenu() {//строка меню управления страницей
 	'</div>';
 }
 
-function _pageUserAccess() {//настройка доступа к страницам для пользователя
+function _pageUserAccess($el, $unit) {//настройка доступа к страницам для пользователя
+	if(empty($unit['id']))
+		return _emptyMin('Отсутствует id пользователя.');
+
+	//выбранные страницы
+	$sql = "SELECT `page_id`
+			FROM `_user_page_access`
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".$unit['id'];
+	$ids = _idsAss(query_ids($sql));
+
 	$arr = _page('app');
 	$sort = array();
-	foreach($arr as $id => $r)
+	foreach($arr as $id => $r) {
 		if($r['parent_id']) {
 			if(empty($sort[$r['parent_id']]))
 				$sort[$r['parent_id']] = array();
+			$r['access'] = _num(@$ids[$id]);
 			$sort[$r['parent_id']][] = $r;
 			unset($arr[$id]);
-		}
+		} else
+			$arr[$id]['access'] = _num(@$ids[$id]);
+	}
 
-	return '<dl>'._pageUserAccessSpisok($arr, $sort).'</dl>';
+
+	return
+	'<input type="hidden" id="access-user-id" value="'.$unit['id'].'" />'.
+	'<dl>'._pageUserAccessSpisok($arr, $sort).'</dl>';
 }
 function _pageUserAccessSpisok($arr, $sort) {//список страниц приложения
 	if(empty($arr))
@@ -317,12 +333,13 @@ function _pageUserAccessSpisok($arr, $sort) {//список страниц приложения
 				'<table>'.
 					'<tr>'.
 						'<td>'._check(array(
-									'attr_id' => 'page_access_'.$r['id']
+									'attr_id' => 'pageAccess_'.$r['id'],
+									'value' => $r['access']
 								)).
 						'<td class="pad5 '.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].
 				'</table>';
 		if(!empty($sort[$r['id']]))
-			$send .= '<dl class="ml40'._dn($r['parent_id']).'">'._pageUserAccessSpisok($sort[$r['id']], $sort).'</dl>';
+			$send .= '<dl class="ml40'._dn($r['access']).'">'._pageUserAccessSpisok($sort[$r['id']], $sort).'</dl>';
 	}
 
 	return $send;

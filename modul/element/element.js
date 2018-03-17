@@ -2296,7 +2296,28 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			errorClass:'bg-fcc' //ошибка, если попытка переместить элемент на недоступный уровень
 		});
 	},
-	_pageUserAccess = function(el) {
+	_pageUserAccess = function(el, i) {
+		if(i == 'get') {
+			var user_id = _num($('#access-user-id').val()),
+				send = {},
+				ids = [];
+
+			if(!user_id)
+				return '';
+
+			send.user_id = user_id;
+
+			_forEq($(el.attr_el).find('._check'), function(sp) {
+				var ch = sp.prev(),
+					id = _num(ch.attr('id').split('_')[1]),
+					v = _num(ch.val());
+				if(v)
+					ids.push(id);
+			});
+			send.ids = ids.join(',');
+			return send;
+		}
+
 		_forEq($(el.attr_el).find('._check'), function(sp) {
 			var prev = sp.prev();
 			prev._check({

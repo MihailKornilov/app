@@ -1061,6 +1061,30 @@ function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона ис
 			  AND `dialog_id`=".$dlg_id;
 	query($sql);
 }
+function _pageUserAccessSave($cmp, $val, $unit) {
+	if(!is_array($val))
+		return;
+	if(!$user_id = @$val['user_id'])
+		return;
+
+	$sql = "DELETE FROM `_user_page_access`
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".$user_id;
+	query($sql);
+
+
+	if(!$ids = _ids(@$val['ids'], 1))
+		return;
+
+	$upd = array();
+	foreach($ids as $page_id)
+		$upd[] = "(".APP_ID.",".$user_id.",".$page_id.")";
+
+	$sql = "INSERT INTO `_user_page_access`
+				(`app_id`,`user_id`,`page_id`)
+			VALUES ".implode(',', $upd);
+	query($sql);
+}
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
 	if(!isset($unit['dialog_id']))
 		return;
