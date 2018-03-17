@@ -188,7 +188,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		  (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
 					 '>'.
 							_blockSetka($r, $level, $grid_id, $unit).
-							_blockChoose($r, $unit).
+							_blockChoose($r, $level, $unit).
 							_blockElemChoose($r, $unit).
 							_blockChildHtml($r, $level + 1, $width, $grid_id, $unit).
 	    					_elemDiv($r['elem'], $unit).
@@ -301,11 +301,12 @@ function _blockSetka($r, $level, $grid_id, $unit) {//отображение сетки для настр
 
 	return '<div class="block-unit level'.$bld.' '.($grid_id ? ' grid' : '').'" val="'.$r['id'].'"></div>';
 }
-function _blockChoose($r, $unit) {//подсветка блоков для выбора (к функциям)
+function _blockChoose($r, $level, $unit) {//подсветка блоков для выбора (к функциям)
 	if(empty($unit['choose']))
 		return '';
-	//выбирать можно только корневые блоки
-	if($r['parent_id'])
+//	if($r['parent_id'])//выбирать можно только корневые блоки
+//		return '';
+	if($level != $_COOKIE['block_level_page'])//выбирать можно только блоки уровня элемента
 		return '';
 	if(!$ca = $unit['choose_access'])
 		return '';
