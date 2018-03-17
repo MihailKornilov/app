@@ -590,6 +590,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						DIALOG[id].close();
 						if(!res.dialog_source)
 							break;
+						console.log(res);
 						_dialogOpen(res.dialog_source);
 						break;
 				}
@@ -2327,6 +2328,19 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				}
 			});
 		});
+	},
+	_pageUserAccessAll = function(el, i) {//настройка входа для всех сотрудников
+		if(i == 'get') {
+			var send = [];
+			_forEq($(el.attr_el).find('._check'), function(sp) {
+				var ch = sp.prev(),
+					id = _num(ch.attr('id').split('_')[1]),
+					v = _num(ch.val());
+				if(v)
+					send.push(id);
+			});
+			return send.join(',');
+		}
 	},
 	_imageShow = function() {//просмотр изображений. Подключается функцией [12]
 		var IMS = $('#_image-show'),

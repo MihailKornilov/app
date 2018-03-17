@@ -1077,7 +1077,7 @@ function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона ис
 			  AND `dialog_id`=".$dlg_id;
 	query($sql);
 }
-function _pageUserAccessSave($cmp, $val, $unit) {
+function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страницам для конкретного пользователя
 	if(!is_array($val))
 		return;
 	if(!$user_id = @$val['user_id'])
@@ -1099,6 +1099,21 @@ function _pageUserAccessSave($cmp, $val, $unit) {
 	$sql = "INSERT INTO `_user_page_access`
 				(`app_id`,`user_id`,`page_id`)
 			VALUES ".implode(',', $upd);
+	query($sql);
+}
+function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
+	$sql = "UPDATE `_user_app`
+			SET `access`=0
+			WHERE `app_id`=".APP_ID;
+	query($sql);
+
+	if(!$ids = _ids($val))
+		return;
+
+	$sql = "UPDATE `_user_app`
+			SET `access`=1
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id` IN (".$ids.")";
 	query($sql);
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)

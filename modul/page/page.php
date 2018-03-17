@@ -398,7 +398,7 @@ function _pageUserShowSpisok($arr, $parent_id=0) {//список страниц для настройки
 
 	return $send;
 }
-function _pageUserAccessAll($el) {//настройка входа в приложение всем пользователям (подключение через [12])
+function _pageUserAccessAll() {//настройка входа в приложение всем пользователям (подключение через [12])
 	$sql = "SELECT
 				`u`.*,
 				`ua`.`access`
@@ -409,7 +409,7 @@ function _pageUserAccessAll($el) {//настройка входа в приложение всем пользовате
 			  AND `u`.`id`=`ua`.`user_id`
 			ORDER BY `ua`.`dtime_add`";
 	if(!$user = query_arr($sql))
-		return '<div class="_empty min mar10">Сотрудников нет.</div>';
+		return _emptyMin('Сотрудников нет.');
 
 	$send = '<table class="">';
 	foreach($user as $r)
@@ -419,6 +419,7 @@ function _pageUserAccessAll($el) {//настройка входа в приложение всем пользовате
 					$r['f'].' '.$r['i'].
 				'<td class="w35">'.
 					_check(array(
+						'attr_id' => 'allAcc_'.$r['id'],
 						'value' => $r['access']
 					));
 
