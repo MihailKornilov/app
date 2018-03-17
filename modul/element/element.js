@@ -2708,16 +2708,20 @@ $.fn._check = function(o) {
 		CHECK._tooltip(o.tooltip);
 
 	function checkPrint() {//вывод галочки
-		var nx = t.next();
-		if(nx.hasClass('_check'))   //если галочка была выведена через PHP - обновление и применение функций
+		var nx = t.next(),
+			cls = '';//дополнительные стили, которые были вставлены через PHP
+		if(nx.hasClass('_check')) {  //если галочка была выведена через PHP - обновление и применение функций
 			o = $.extend({
 				title:nx.html() == '&nbsp;' ? '' : nx.html(),
 				disabled:nx.hasClass('disabled'),
 				light:nx.hasClass('light'),
 				block:nx.hasClass('block')
 			}, o);
+			nx.removeClass('_check title light block disabled on');
+			cls = ' ' + nx.attr('class');
+			nx.remove();
+		}
 
-		t.next().remove('._check');
 		o = $.extend({
 			title:'',
 			disabled:0,
@@ -2734,7 +2738,7 @@ $.fn._check = function(o) {
 			block = o.block ? ' block' : '',
 			dis = o.disabled ? ' disabled' : '',
 			html =
-				'<div id="' + div_id + '" class="_check noon' + on + title + light + block + dis + '">' +
+				'<div id="' + div_id + '" class="_check noon' + on + title + light + block + dis + cls + '">' +
 					(o.title ? o.title : '&nbsp;') +
 				'</div>';
 

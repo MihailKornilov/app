@@ -430,7 +430,7 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
 	$cond = "`t1`.`id`=".$unit_id;
 	if(isset($dialog['field1']['app_id']) || isset($dialog['field2']['app_id']))
 		$cond .= " AND `app_id`=".APP_ID;
-	if(isset($dialog['field1']['dialog_id']))
+	if(_baseTable($dialog['table_1']) != '_element' && isset($dialog['field1']['dialog_id']))
 		$cond .= " AND `dialog_id`=".$dialog['id'];
 	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM `"._baseTable($dialog['table_1'])."` `t1`

@@ -193,6 +193,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка на
 }
 function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$dialog = _spisokUnitDialog($unit_id);
+	$unitOld = _spisokUnitQuery($dialog, $unit_id);
 
 	define('IS_ELEM', _baseTable($dialog['table_1']) == '_element');
 
@@ -255,7 +256,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	_spisokUnitUpd54($unit);
 	_spisokUnitUpd55($unit);
 
-	_spisokUnitAfter($dialog, $unit_id);
+	_spisokUnitAfter($dialog, $unit_id, $unitOld);
 
 	if(_baseTable($dialog['table_1']) == '_page')
 		_cache('clear', '_pageCache');
@@ -1138,7 +1139,7 @@ function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (бал
 			WHERE `dialog_id`=".$BL['obj_id'];
 	query($sql);
 }
-function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка
+function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (при создании элемента)
 	if(!isset($unit['dialog_id']))
 		return;
 	if($unit['dialog_id'] != 54)
@@ -1262,7 +1263,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 	}
 }
 
-function _spisokUnitAfter($dialog, $unit_id) {//выполнение действий после обновления единицы списка
+function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления единицы списка
 	$sql = "SELECT *
 			FROM `"._baseTable($dialog['table_1'])."`
 			WHERE `id`=".$unit_id;
@@ -1315,13 +1316,13 @@ function _spisokUnitAfter($dialog, $unit_id) {//выполнение действий после обновл
 				break;
 			//привязанные списки
 			case 29:
-				_spisokUnitCount29($cmp, $dialog, $unit);        //пересчёт количеств привязаного списка [54]
-				$elUpd = _spisokUnitSum29($cmp, $dialog, $unit); //пересчёт cумм привязаного списка [55]
-				_spisokUnitBalans29($elUpd);                     //подсчёт балансов после обновления сумм [27]
+				_spisokUnitCount29($cmp, $dialog, $unit, $unitOld); //пересчёт количеств привязаного списка [54]
+				$elUpd = _spisokUnitSum29($cmp, $dialog, $unit);    //пересчёт cумм привязаного списка [55]
+				_spisokUnitBalans29($elUpd);                        //подсчёт балансов после обновления сумм [27]
 				break;
 		}
 }
-function _spisokUnitCount29($cmp, $dialog, $unit) {//пересчёт количеств привязаного списка
+function _spisokUnitCount29($cmp, $dialog, $unit, $unitOld) {//пересчёт количеств привязаного списка
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=54
@@ -1332,6 +1333,19 @@ function _spisokUnitCount29($cmp, $dialog, $unit) {//пересчёт количеств привязан
 		return;
 	if(!$connect_id = _num($unit[$col]))//значение, id единицы привязанного списка.
 		return;
+
+	$connect_old = 0;
+	$count_old = 0;
+	if(!empty($unitOld))
+		if($connect_old = _num($unitOld[$col])) {
+			//получение старого количества для обновления
+			$sql = "SELECT COUNT(*)
+					FROM `"._baseTable($dialog['table_1'])."`
+					WHERE `dialog_id`=".$dialog['id']."
+					  AND !`deleted`
+					  AND `".$col."`=".$connect_old;
+			$count_old = _num(query_value($sql));
+		}
 
 	//получение нового количества для обновления
 	$sql = "SELECT COUNT(*)
@@ -1344,8 +1358,17 @@ function _spisokUnitCount29($cmp, $dialog, $unit) {//пересчёт количеств привязан
 	foreach($arr as $r) {
 		if(!$col = $r['col'])
 			continue;
+
 		$bl = _blockQuery($r['block_id']);
 		$dlg = _dialogQuery($bl['obj_id']);
+
+		if($connect_old) {
+			$sql = "UPDATE `"._baseTable($dlg['table_1'])."`
+					SET `".$col."`=".$count_old."
+					WHERE `id`=".$connect_old;
+			query($sql);
+		}
+
 		$sql = "UPDATE `"._baseTable($dlg['table_1'])."`
 				SET `".$col."`=".$count."
 				WHERE `id`=".$connect_id;

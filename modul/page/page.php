@@ -44,7 +44,7 @@ function _page($i='all', $i1=0) {//получение данных страницы
 	//страницы приложени€
 	if($i == 'app') {
 		$send = array();
-		foreach(_page() as $id => $r) {
+		foreach($page as $id => $r) {
 			if(!$r['app_id'])
 				continue;
 			if($r['sa'])
@@ -298,7 +298,7 @@ function _pageUserAccess($el, $unit) {//настройка доступа к страницам дл€ пользо
 	if(empty($unit['id']))
 		return _emptyMin('ќтсутствует id пользовател€.');
 
-	//выбранные страницы
+	//доступные страницы
 	$sql = "SELECT `page_id`
 			FROM `_user_page_access`
 			WHERE `app_id`=".APP_ID."
@@ -323,23 +323,77 @@ function _pageUserAccess($el, $unit) {//настройка доступа к страницам дл€ пользо
 	'<input type="hidden" id="access-user-id" value="'.$unit['id'].'" />'.
 	'<dl>'._pageUserAccessSpisok($arr, $sort).'</dl>';
 }
-function _pageUserAccessSpisok($arr, $sort) {//список страниц приложени€
+function _pageUserAccessSpisok($arr, $sort) {//список страниц дл€ настройки доступа
 	if(empty($arr))
 		return '';
 
 	$send = '';
 	foreach($arr as $r) {
 		$send .= '<dd class="'._dn($r['parent_id'], ' pb10').'">'.
-				'<table>'.
-					'<tr>'.
-						'<td>'._check(array(
+				'<table class="bs3">'.
+					'<tr><td>'._check(array(
 									'attr_id' => 'pageAccess_'.$r['id'],
+									'title' => $r['name'],
+									'class' => !$r['parent_id'] ? 'b fs14' : '',
 									'value' => $r['access']
 								)).
-						'<td class="pad5 '.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].
 				'</table>';
 		if(!empty($sort[$r['id']]))
 			$send .= '<dl class="ml40'._dn($r['access']).'">'._pageUserAccessSpisok($sort[$r['id']], $sort).'</dl>';
+	}
+
+	return $send;
+}
+function _pageUserShow($el, $unit) {
+	if(empty($unit['id']))
+		return _emptyMin('ќтсутствует id пользовател€.');
+
+	//доступ в преложние
+	$sql = "SELECT `access`
+			FROM `_user_app`
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".$unit['id']."
+			LIMIT 1";
+	if(!query_value($sql))
+		return '<div class="_empty min mar10 red">¬ход в приложение запрещЄн.</div>';
+
+	//доступные страницы
+	$sql = "SELECT `page_id`
+			FROM `_user_page_access`
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".$unit['id'];
+	$ids = _idsAss(query_ids($sql));
+
+	$page = _page('app');
+	foreach($page as $id => $r)
+		$page[$id]['access'] = _num(@$ids[$id]);
+
+	$child = array();
+	foreach($page as $id => $r) {
+		if(empty($child[$r['parent_id']]))
+			$child[$r['parent_id']] = array();
+		$child[$r['parent_id']][] = $r;
+	}
+
+	if(!$send = _pageUserShowSpisok($child))
+		return _emptyMin('Ќет доступных страниц.');
+
+	return $send;
+}
+function _pageUserShowSpisok($arr, $parent_id=0) {//список страниц дл€ настройки доступа
+	if(empty($arr[$parent_id]))
+		return '';
+
+	$send = '';
+	foreach($arr[$parent_id] as $id => $r) {
+		if(!$r['access'])
+			continue;
+		$send .= '<dd class="'._dn($r['parent_id'], ' pb10').'">'.
+				'<table class="bs3">'.
+					'<tr><td class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].
+				'</table>';
+		if(!empty($arr[$r['id']]))
+			$send .= '<dl class="ml30">'._pageUserShowSpisok($arr, $r['id']).'</dl>';
 	}
 
 	return $send;
