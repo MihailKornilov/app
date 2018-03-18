@@ -7,7 +7,8 @@ function _pageCache() {//получение массива страниц из кеша
 				*,
 				0 `block_count`,
 				0 `elem_count`,
-				1 `del_access`
+				1 `del_access`,
+				0 `access`
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_ID.")
 			  AND `sa` IN (0,".SA.")
@@ -29,6 +30,14 @@ function _pageCache() {//получение массива страниц из кеша
 		$block_count = _num(@$block[$id]);
 		$page[$id]['del_access'] = $block_count || $r['common_id'] ? 0 : 1;
 	}
+
+	$sql = "SELECT *
+			FROM `_user_page_access`
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".USER_ID;
+	foreach(query_arr($sql) as $r)
+		if(!empty($page[$r['page_id']]))
+			$page[$r['page_id']]['access'] = 1;
 
 	return _cache($page);
 }
@@ -74,7 +83,12 @@ function _page($i='all', $i1=0) {//получение данных страницы
 
 		//сначала поиск страницы приложения
 		foreach($page as $p)
-			if(!$p['sa'] && $p['def'])
+			if(!$p['sa'] && $p['def'] && $p['access'])
+				return $p['id'];
+
+		//затем первую доступную страницу
+		foreach($page as $p)
+			if(!$p['sa'] && $p['access'])
 				return $p['id'];
 
 		//затем страницы SA
@@ -151,6 +165,18 @@ function _page($i='all', $i1=0) {//получение данных страницы
 				return $id;
 		}
 		return 0;
+	}
+
+	//список дочерних страниц относительно родительской
+	if($i == 'child') {
+		if(!$parent_id = _num($i1))
+			return array();
+		$send = array();
+		foreach($page as $id => $r) {
+			if($r['parent_id'] == $parent_id)
+				$send[$id] = $r;
+		}
+		return $send;
 	}
 
 	//данные конкретной страницы
@@ -437,6 +463,9 @@ function _pageShow($page_id) {
 	if(!SA && $page['sa'])
 		return _contentMsg();
 
+	if(!SA && !$page['access'])
+		return _contentMsg();
+
 	if(APP_ID && !APP_ACCESS)
 		$page_id = 105;
 
@@ -444,6 +473,7 @@ function _pageShow($page_id) {
 		$page_id = _page('def');
 
 	return
+//	'USER_ID='.USER_ID.' APP_ID='.APP_ID.' APP_ACCESS='.APP_ACCESS.
 //	_block('page', $page_id, 'block_js').
 //	_pr(_block('page', $page_id, 'elem_arr')).
 	_blockHtml('page', $page_id, 1000, 0, _pageSpisokUnit($page_id)).
@@ -1787,6 +1817,8 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 			continue;
 		if($r['sa'])
 			continue;
+		if(!$r['access'])
+			continue;
 		if($unit['num_1'] != $r['parent_id'])
 			continue;
 		$menu[$id] = $r;
@@ -1798,8 +1830,25 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 	$razdel = '';
 	foreach($menu as $r) {
 		$sel = _page('is_cur_parent', $r['id']) ? ' sel' : '';
+		$page_id = $r['id'];
+		if($r['common_id']) {//если страница является ссылкой на другую страницу, при этом она недоступна, поиск первой вложенной доступной
+			$page_id = $r['common_id'];
+			$p = _page($page_id);
+			if(!$p['access']) {
+				$page_id = 0;
+				foreach(_page('child', $r['id']) as $p)
+					if($p['access']) {
+						$page_id = $p['id'];
+						break;
+					}
+			}
+		}
+
+		if(!$page_id)
+			continue;
+
 		$razdel .=
-			'<a class="link'.$sel.'" href="'.URL.'&p='.($r['common_id'] ? $r['common_id'] : $r['id']).'">'.
+			'<a class="link'.$sel.'" href="'.URL.'&p='.$page_id.'">'.
 				$r['name'].
 			'</a>';
 	}

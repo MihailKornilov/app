@@ -39,12 +39,12 @@ function _auth() {//авторизация через сайт
 					FROM `_user_app`
 					WHERE `app_id`=".$r['user_id']."
 					  AND `user_id`=".$r['app_id'];
-			$access = _num(query_value($sql));
+			$r['access'] = _num(query_value($sql));
 
 			_cache(array(
 				'user_id' => $r['user_id'],
 				'app_id' => $r['app_id'],
-				'access' => $access
+				'access' => $r['access']
 			));
 		}
 	};
