@@ -14,8 +14,8 @@ switch(@$_POST['op']) {
 		if(!$ua = query_assoc($sql))
 			jsonError('Приложения не существует');
 
-		if(!$ua['access'])
-			jsonError('Нет доступа в приложение');
+//		if(!$ua['access'])
+//			jsonError('Нет доступа в приложение');
 
 		$sql = "UPDATE `_user_auth`
 				SET `app_id`=".$app_id."

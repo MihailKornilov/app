@@ -34,15 +34,24 @@ function _auth() {//авторизация через сайт
 				FROM `_user_auth`
 				WHERE `code`='".addslashes(CODE)."'
 				LIMIT 1";
-		if($r = query_assoc($sql))
+		if($r = query_assoc($sql)) {
+			$sql = "SELECT `access`
+					FROM `_user_app`
+					WHERE `app_id`=".$r['user_id']."
+					  AND `user_id`=".$r['app_id'];
+			$access = _num(query_value($sql));
+
 			_cache(array(
 				'user_id' => $r['user_id'],
-				'app_id' => $r['app_id']
+				'app_id' => $r['app_id'],
+				'access' => $access
 			));
+		}
 	}
 
 	define('USER_ID', _num(@$r['user_id']));
 	define('APP_ID', _num(@$r['app_id']));
+	define('APP_ACCESS', _num(@$r['access']));
 
 /*
 	//SA: вход от имени другого пользователя

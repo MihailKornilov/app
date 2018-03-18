@@ -437,6 +437,9 @@ function _pageShow($page_id) {
 	if(!SA && $page['sa'])
 		return _contentMsg();
 
+	if(APP_ID && !APP_ACCESS)
+		$page_id = 105;
+
 	return
 //	_block('page', $page_id, 'block_js').
 //	_pr(_block('page', $page_id, 'elem_arr')).
