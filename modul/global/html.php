@@ -47,7 +47,10 @@ function _auth() {//авторизация через сайт
 				'access' => $access
 			));
 		}
-	}
+	};
+
+	if(defined('USER_ID'))
+		return;
 
 	define('USER_ID', _num(@$r['user_id']));
 	define('APP_ID', _num(@$r['app_id']));
@@ -143,7 +146,7 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной
 		setcookie('local', 1, time() + 2592000, '/');
 }
 function _authLogout() {//выход из приложения, если требуется
-	if(!isset($_GET['logout']))
+	if(!isset($_GET['logout']) && @$_GET['p'] != 98)
 		return;
 	if(!CODE)
 		return;

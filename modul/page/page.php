@@ -440,6 +440,9 @@ function _pageShow($page_id) {
 	if(APP_ID && !APP_ACCESS)
 		$page_id = 105;
 
+	if($page_id == 105 && APP_ID && APP_ACCESS)
+		$page_id = _page('def');
+
 	return
 //	_block('page', $page_id, 'block_js').
 //	_pr(_block('page', $page_id, 'elem_arr')).

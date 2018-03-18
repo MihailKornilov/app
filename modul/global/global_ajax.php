@@ -32,6 +32,8 @@ switch(@$_POST['op']) {
 		_cache('clear', '_pageCache');
 		_cache('clear', '_userCache'.USER_ID);
 
+		_auth();
+
 		jsonSuccess();
 		break;
 	case 'sort':
