@@ -622,6 +622,13 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 	if(!$dialog_id)
 		return $txt;
 
+	if(!$dlg = _dialogQuery($dialog_id))
+		return $txt;
+
+	//ссылка на страницу, если это список страниц
+	if(_baseTable($dlg['table_1']) == '_page')
+		return '<a href="'.URL.'&p='.$unit['id'].'" class="inhr">'.$txt.'</a>';
+
 	if(!$page_id = _page('spisok_id', $dialog_id))
 		return $txt;
 

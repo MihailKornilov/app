@@ -2673,8 +2673,7 @@ $(document)
 			delayHide:300
 		});
 	})
-	.ready(function() {
-	});
+	.ready(function() {});
 
 $.fn._check = function(o) {
 	var t = $(this);

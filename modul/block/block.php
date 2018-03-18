@@ -306,7 +306,7 @@ function _blockChoose($r, $level, $unit) {//подсветка блоков для выбора (к функц
 		return '';
 //	if($r['parent_id'])//выбирать можно только корневые блоки
 //		return '';
-	if($level != $_COOKIE['block_level_'.$r['obj_name']])//выбирать можно только блоки установленного уровня (на уровне, котором расположен элемент)
+	if($level != @$_COOKIE['block_level_'.$r['obj_name']])//выбирать можно только блоки установленного уровня (на уровне, котором расположен элемент)
 		return '';
 	if(!$ca = $unit['choose_access'])
 		return '';

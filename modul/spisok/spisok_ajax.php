@@ -1089,17 +1089,33 @@ function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страница
 	query($sql);
 
 
-	if(!$ids = _ids(@$val['ids'], 1))
-		return;
+	if($ids = _ids(@$val['ids'], 1)) {
+		$upd = array();
+		foreach($ids as $page_id)
+			$upd[] = "(".APP_ID.",".$user_id.",".$page_id.")";
 
-	$upd = array();
-	foreach($ids as $page_id)
-		$upd[] = "(".APP_ID.",".$user_id.",".$page_id.")";
+		$sql = "INSERT INTO `_user_page_access`
+					(`app_id`,`user_id`,`page_id`)
+				VALUES ".implode(',', $upd);
+		query($sql);
+	}
 
-	$sql = "INSERT INTO `_user_page_access`
-				(`app_id`,`user_id`,`page_id`)
-			VALUES ".implode(',', $upd);
-	query($sql);
+	//отключение входа в приложение, если нужно
+	$sql = "SELECT `access`
+			FROM `_user_app`
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".$user_id;
+	if(!_num(query_value($sql))) {
+		$sql = "UPDATE `_user_auth`
+				SET `app_id`=0
+				WHERE `app_id`=".APP_ID."
+				  AND `user_id`=".$user_id;
+		query($sql);
+	}
+
+	_cache('clear', '_auth');
+	_cache('clear', '_pageCache');
+	_cache('clear', '_userCache'.$user_id);
 }
 function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
 	$sql = "UPDATE `_user_app`
@@ -1107,14 +1123,28 @@ function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в прило
 			WHERE `app_id`=".APP_ID;
 	query($sql);
 
-	if(!$ids = _ids($val))
-		return;
+	$ids = _ids($val);
 
 	$sql = "UPDATE `_user_app`
 			SET `access`=1
 			WHERE `app_id`=".APP_ID."
 			  AND `user_id` IN (".$ids.")";
 	query($sql);
+
+	$sql = "UPDATE `_user_auth`
+			SET `app_id`=0
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id` NOT IN (".$ids.")";
+	query($sql);
+
+	_cache('clear', '_auth');
+	_cache('clear', '_pageCache');
+
+	$sql = "SELECT *
+			FROM `_user_app`
+			WHERE `app_id`=".APP_ID;
+	foreach(query_arr($sql) as $r)
+		_cache('clear', '_userCache'.$r['user_id']);
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
 	if(!isset($unit['dialog_id']))
