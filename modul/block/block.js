@@ -132,7 +132,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 							BL.save = 1;
 						}
 					});
-					$('#elem-img-size')._count({
+					$('#elem-img-width')._count({
 						width:60,
 						step:[30,50,80,100,150,200,250],
 						func:function(v) {
@@ -140,6 +140,15 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 								.find('img')
 								.width(v)
 								.height('auto');
+							EL.width = v;
+							BL.save = 1;
+						}
+					});
+					$('#elem-img-height')._check({
+						tooltip:'Также ограничивать высоту',
+						func:function(v) {
+							EL.num_7 = v;
+							BL.save = 1;
 						}
 					});
 				}
@@ -453,10 +462,11 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		if(!EL.is_img)
 			return '';
 
-		return '<table class="bs5 ml10">' +
-			'<tr><td class="color-555 fs14 pl5">Ширина фото:' +
-				'<td class="r">' +
-					'<input id="elem-img-size" class="w15" value="80" />' +
+		return '<table class="bs5">' +
+			'<tr><td class="color-555 fs14">Ширина фото:' +
+				'<td><input id="elem-img-width" class="w15" value="' + EL.width + '" />' +
+				'<td class="pl5">' +
+					'<input type="hidden" id="elem-img-height" value="' + EL.num_7 + '" />' +
 		'</table>'
 	};
 

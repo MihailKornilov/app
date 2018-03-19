@@ -684,23 +684,26 @@ function _elemValue($elem_id) {//дополнительне значения к элементу select, настр
 
 	return $spisok;
 }
-function _elemTitle($elem_id) {//имя элемента или его текст
+function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 	if(!$elem_id = _num($elem_id))
 		return '';
 	if(!$el = _elemQuery($elem_id))
 		return '';
+	if(!$el_parent)
+		$el_parent = $el;
 
 	switch($el['dialog_id']) {
 		case 10: return $el['txt_1']; //произвольный текст
 		case 11: //значение диалога
 			$title = '';
 			foreach(_ids($el['txt_2'], 1) as $n => $id)
-				$title .= ($n ? ' » ' : '')._elemTitle($id);
+				$title .= ($n ? ' » ' : '')._elemTitle($id, $el_parent);
 			return $title;
 		case 29: //связки
 		case 59: return _dialogParam($el['num_1'], 'name');
 		case 32: return 'номер';
 		case 33: return 'дата/время';
+		case 60: return _imageNo($el_parent['width']);
 		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
 			_cache('clear', '_dialogQuery'.$el['num_2']);
@@ -1054,13 +1057,23 @@ function _imageServer($v) {//получение сервера (пути) для изображнения
 
 	return query_insert_id('_image_server');
 }
-function _imageNo() {//картинка, если изображнеия нет
-	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="80" height= "80" />';
+function _imageNo($width=80) {//картинка, если изображнеия нет
+	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="'.$width.'" />';
 }
-function _imageHtml($r) {//получение картинки в html-формате
+function _imageHtml($r, $width=80, $h=0) {//получение картинки в html-формате
+	$width = $width ? $width : 80;
+
+	$st = $width > 80 ? 'max' : 80;
+	if($h) {
+		$s = _imageResize($r['max_x'], $r['max_y'], $width, $width);
+		$width = $s['x'];
+		$h = $s['y'];
+	}
+
 	return
-		'<img src="'._imageServer($r['server_id']).$r['80_name'].'"'.
-			' width="'.$r['80_x'].'" height= "'.$r['80_y'].'"'.
+		'<img src="'._imageServer($r['server_id']).$r[$st.'_name'].'"'.
+			' width="'.$width.'"'.
+	  ($h ? ' height= "'.$h.'"' : '').
 			' class="image-open"'.
 			' val="'.$r['id'].'"'.
 		' />';

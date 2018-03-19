@@ -1076,7 +1076,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							break;
 						}
 						if(empty($unit)) {
-							$send .= _imageNo();
+							$send .= _imageNo($el['width']);
 							break;
 						}
 
@@ -1093,10 +1093,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 								  AND !`sort`
 								LIMIT 1";
 						if(!$r = query_assoc($sql)) {
-							$send .= _imageNo();
+							$send .= _imageNo($el['width']);
 							break;
 						}
-						$send .= _imageHtml($r);
+						$send .= _imageHtml($r, $el['width'], $el['num_7']);
 						break;
 				}
 			}
@@ -1557,6 +1557,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Загрузка изображений
 		case 60:
 			/*
+				num_7 - ограничение высоты (настройка стилей)
+
 				num_1 - максимальное количество изображений, которое разрешено загрузить
 			*/
 			if($is_edit)

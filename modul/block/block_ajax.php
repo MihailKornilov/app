@@ -304,12 +304,16 @@ switch(@$_POST['op']) {
 				if($size == 13)
 					$size = 0;
 				$url = _num($EL['url']);
+				$width = _num($EL['width']);
+				$num_7 = _num($EL['num_7']);//ограничение высоты фото [60]
 				$sql = "UPDATE `_element`
 						SET `mar`='".$mar."',
 							`font`='".$font."',
 							`color`='".$color."',
 							`size`=".$size.",
-							`url`=".$url."
+							`url`=".$url.",
+							`width`=".$width.",
+							`num_7`=".$num_7."
 						WHERE `id`=".$elem_id;
 				query($sql);
 			}
