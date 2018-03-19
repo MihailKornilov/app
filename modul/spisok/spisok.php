@@ -193,9 +193,8 @@ function _spisokImage($spisok, $CMP) {//вставка картинок
 				  AND `obj_id` IN ("._idsGet($spisok).")
 				  AND !`sort`";
 		if($arr = query_arr($sql))
-			foreach($arr as$r) {
-				$spisok[$r['obj_id']][$col] = _imageHtml($r);
-			}
+			foreach($arr as$r)
+				$spisok[$r['obj_id']][$col] = _imageHtml($r, 80, 1);
 	}
 
 	return $spisok;

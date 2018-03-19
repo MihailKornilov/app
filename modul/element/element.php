@@ -1064,6 +1064,7 @@ function _imageHtml($r, $width=80, $h=0) {//получение картинки в html-формате
 	$width = $width ? $width : 80;
 
 	$st = $width > 80 ? 'max' : 80;
+	$width = $width > $r['max_x'] ? $r['max_x'] : $width;
 	if($h) {
 		$s = _imageResize($r['max_x'], $r['max_y'], $width, $width);
 		$width = $s['x'];
@@ -1227,7 +1228,7 @@ function _imageDD($img) {//единица изображения для настройки
 		'<div class="icon icon-off'._tooltip('Переместить в корзину', -70).'</div>'.
 		'<table class="_image-unit">'.
 			'<tr><td>'.
-				_imageHtml($img).
+				_imageHtml($img, 80, 1).
 		'</table>'.
 	'</dd>';
 }
@@ -1317,7 +1318,7 @@ function _imageDeleted($el, $unit) {//удалённые изображения (вставляется в блок 
 			'<div val="'.$r['id'].'" class="icon icon-recover'._tooltip('Восстановить', -43).'</div>'.
 			'<table class="_image-unit">'.
 				'<tr><td>'.
-					_imageHtml($r).
+					_imageHtml($r, 80, 1).
 			'</table>'.
 		'</div>';
 	}
