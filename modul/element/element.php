@@ -148,6 +148,15 @@ function _select($v=array()) {//выпадающее поле
 		'</table>'.
 	'</div>';
 }
+function _dropdown($v=array()) {//выпадающее поле - ссылка
+	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
+
+	$value = _num(@$v['value']);
+
+	return
+	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
+	'<div class="_dropdown"></div>';
+}
 function _count($v=array()) {//поле количество
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
 
@@ -773,7 +782,7 @@ function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
 			$show = false;
 
-//		if($show)
+		if($show)
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 

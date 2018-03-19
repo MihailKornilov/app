@@ -798,6 +798,13 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 						}
 					});
 					return;
+				//dropdown
+				case 18:
+					$(el.attr_cmp)._dropdown({
+						title0:el.txt_1,
+						spisok:el.vvv
+					});
+					return;
 				//наполнение дл€ некоторых компонентов
 				case 19: _cmpV19(el); return;
 				//¬—ѕќћќ√ј“≈Ћ№Ќџ… ЁЋ≈ћ≈Ќ“: —писок действий, прив€занных к элементу
@@ -2673,7 +2680,8 @@ $(document)
 			delayHide:300
 		});
 	})
-	.ready(function() {});
+	.ready(function() {
+	});
 
 $.fn._check = function(o) {
 	var t = $(this);
@@ -4846,128 +4854,179 @@ $.fn._menu = function(o) {//меню
 	return tMain;
 };
 $.fn._dropdown = function(o) {//выпадающий список в виде ссылки
-	var t = $(this),
-		id = t.attr('id');
+	var t = $(this);
 
-	if(typeof o == 'number' || typeof o == 'string') {
-		switch(o) {
-			case 'remove':t.next().remove('._dropdown'); break;
-			default: window[id + '_dropdown'].value(o);
-		}
-		return t;
+	if(!t.length)
+		return;
+
+	var attr_id = t.attr('id');
+	if(!attr_id) {
+		attr_id = 'dropdown' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
 	}
+
+	var win = attr_id + '_dropdown',
+		S = window[win],
+		VALUE = _num(t.val());
 
 	o = $.extend({
-		head:'',    // если указано, то ставитс€ в название ссылки, а список из spisok
-		headgrey:0,
-		disabled:0,
+		head:'',    //если указано, то ставитс€ в название ссылки, а список из spisok
+		nosel:0,    //не вставл€ть название при выборе значени€
 		title0:'',
+		grey:0,     //показывать серым, если значение не выбрано
+		disabled:0,
 		spisok:[],
-		func:function() {},
-		nosel:0 // не вставл€ть название при выборе значени€
+		func:function() {}
 	}, o);
-	var n,
-		val = t.val() * 1 || 0,
-		ass = assCreate(),
-		head = o.head || o.title0,
-		len = o.spisok.length,
-		spisok = o.title0 && !o.disabled ? '<a class="ddu grey' + (!len ? ' last' : '') + (!val ? ' seld' : '') + '" val="0">' + o.title0 + '</a>' : '',
-		delay = 0;
-	t.val(val);
-	for(n = 0; n < len; n++) {
-		var sp = o.spisok[n];
-		spisok += '<a class="ddu' + (n == len - 1 ? ' last' : '') + (val == sp.uid ? ' seld' : '') + '" val="' + sp.uid + '">' + sp.title + '</a>';
-		if(val == sp.uid)
-			head = sp.title;
-	}
+
+	if(o.title0)
+		o.head = o.title0;
+
 	t.next().remove('._dropdown');
-	t.after(
-		'<div class="_dropdown' + (o.disabled ? ' disabled' : '') + '" id="' + id + '_dropdown">' +
-			(o.disabled ?
-				'<span>' + head + '</span>'
-				:
-				'<a class="ddhead' + (!val && (o.headgrey || o.title0) ? ' grey' : '') + '">' + head + '</a>'
-			) +
-			'<div class="ddlist">' +
-				'<div class="ddsel">' + head + '</div>' +
-				spisok +
-			'</div>' +
-		'</div>');
 
-	if(!o.disabled) {
-		var dropdown = t.next(),
-			aHead = dropdown.find('.ddhead'),
-			list = dropdown.find('.ddlist'),
-			ddsel = list.find('.ddsel'),
-			ddu = list.find('.ddu');
-		aHead.mouseover(function(e) {
-			e.stopPropagation();
-			delayClear();
-			list.show();
-		});
-		ddsel.click(function(e) {
-			e.stopPropagation();
-			delayClear();
-			list.hide();
-		});
-		ddu.click(function(e) {
-			e.stopPropagation();
-			var th = $(this),
-				v = parseInt(th.attr('val'));
-			setVal(v);
-			if(!o.nosel)
-				th.addClass('seld');
-			list.hide();
-			o.func(v, id);
-		})
-		   .mouseenter(function() {
-				ddu.removeClass('seld');
-		   });
-		list.on({
-			mouseleave:function () {
-				delay = setTimeout(function() {
-					list.fadeOut(200);
-				}, 500);
-			},
-			mouseenter:delayClear
-		});
-	}
+	var dis = o.disabled ? ' disabled' : '',
+		html =  '<div class="_dropdown' + dis + '" id="' + win + '">' +
+					'<a class="dd-head">' + o.head + '</a>' +
+					'<div class="dd-list"></div>' +
+				'</div>';
+	t.after(html);
 
-	function assCreate() {//—оздание ассоциативного массива
-		var arr = o.title0 ? {0:o.title0} : {};
-		for (var n = 0; n < o.spisok.length; n++) {
-			var sp = o.spisok[n];
-			arr[sp.uid] = sp.title;
-		}
-		return arr;
-	}
-	function setVal(v) {
-		delayClear();
-		if(!o.nosel) {
-			t.val(v);
-			aHead.html(ass[v])[(o.title0 && !v ? 'add' : 'remove') + 'Class']('grey');
-			ddsel.html(ass[v]);
-		}
-	}
-	function delayClear() {
-		if(delay) {
-			clearTimeout(delay);
-			delay = 0;
-		}
-	}
+	var DDN = t.next(),
+		HEAD = DDN.find('.dd-head'),
+		LIST = DDN.find('.dd-list'),
+		timer = 0,
+		MASS = [],
+		MASS_ASS = {};
 
-	t.value = function(v) {
-		setVal(v);
-		list.find('.seld').removeClass('seld');
-		for(n = 0; n < ddu.length; n++) {
-			var eq = ddu.eq(n);
-			if(eq.attr('val') == v) {
-				eq.addClass('seld');
-				break;
+	massCreate();
+	spisokPrint();
+	valueSet(VALUE);
+
+	var DDU = DDN.find('.ddu');
+
+	$(document)
+		.off('click._dropdown')
+		 .on('click._dropdown', function(e) {//закрытие всех списков при нажатии на любое место на экране
+			var cur = $(e.target).parents('._dropdown'),
+				attr = '';
+
+			//закрытие селектов, когда нажатие было в стороне
+			if(cur.hasClass('_dropdown'))
+				attr = ':not(#' + cur.attr('id') + ')';
+
+			$('._dropdown' + attr + ' .dd-list').hide();
+		});
+
+	HEAD.on('click mouseenter', function() {
+		timerClear();
+		_forEq(DDU, function(sp) {
+			if(VALUE == sp.attr('val')) {
+				sp.addClass('on');
+				return false;
 			}
+		});
+		LIST.show();
+	});
+	DDU.click(function() {
+		timerClear();
+		LIST.hide();
+		var tt = $(this),
+			v = _num(tt.attr('val'));
+		valueSet(v);
+	});
+	DDU.mouseenter(function() {
+		DDU.removeClass('on');
+	});
+	LIST.on({
+		mouseleave:function () {
+			timer = setTimeout(function() {
+				LIST.fadeOut(200);
+			}, 500);
+		},
+		mouseenter:timerClear
+	});
+
+	function massCreate() {//создание массива дл€ корректного вывода списка
+		var unit;
+
+		if(o.title0)
+			MASS_ASS[0] = o.title0;
+
+		//исходный список €вл€етс€ ассоциативным объектом
+		if(!o.spisok.length) {
+			_forIn(o.spisok, function(sp, id) {
+				id = _num(id);
+				if(!id)
+					return;
+				MASS_ASS[id] = sp;
+				unit = {
+					id:id,
+					title:sp
+				};
+				MASS.push(unit);
+			});
+			return;
 		}
-	};
-	window[id + '_dropdown'] = t;
+
+		//исходный список €вл€етс€ последовательным массивом
+		_forN(o.spisok, function(sp, n) {
+			var id,
+				title;
+
+			//проверка на одномерный последовательный массив
+			if(typeof sp == 'number' || typeof sp == 'string') {
+				id = n + 1;
+				title = sp;
+			} else {
+				id = sp.uid;
+				if(id === undefined)
+					id = sp.id;
+				if(id === undefined)
+					return;
+				id = _num(id);
+				if(!id)
+					return;
+				title = sp.title;
+			}
+
+			MASS_ASS[id] = title || ' ';
+			title = title || '&nbsp;';
+			unit = {
+				id:id,
+				title:title
+			};
+			MASS.push(unit);
+		});
+	}
+	function spisokPrint() {//вывод списка
+		html = '<div class="dd-sel">' + o.head + '</div>';
+
+		if(o.title0)
+			html += '<div class="ddu title0" val="0">' + o.title0 + '</div>';
+
+		_forN(MASS, function(sp) {
+			var on = VALUE == sp.id ? ' on' : '';
+			html += '<div class="ddu' + on + '" val="' + sp.id + '">' +
+						sp.title +
+					'</div>';
+		});
+
+		LIST.html(html);
+	}
+	function valueSet(v) {
+		HEAD.html(MASS_ASS[v])._dn(v, 'grey');
+		DDN.find('.dd-sel').html(MASS_ASS[v]);
+		VALUE = v;
+		t.val(v);
+	}
+	function timerClear() {
+		if(!timer)
+			return;
+		clearTimeout(timer);
+		timer = 0;
+	}
+
+	window[win] = t;
 	return t;
 };
 

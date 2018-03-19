@@ -727,46 +727,34 @@
 
 /* Выпадающее меню по ссылке */
 ._dropdown{position:relative;display:inline-block}
-._dropdown .ddhead{white-space:nowrap}
-._dropdown span{color:#777}
-._dropdown .ddlist{
+._dropdown .dd-head{white-space:nowrap}
+._dropdown .dd-list{
 	display:none;
 	position:absolute;
-	top:-3px;
-	left:-7px;
-	border-left:#EEE solid 1px;
-	border-right:#EEE solid 1px;
-	border-bottom:#EEE solid 1px;
+	top:-7px;
+	left:-13px;
+	border:#C4CFDA solid 1px;
 	background-color:#FFF;
 	cursor:pointer;
+	border-radius:2px;
+	box-shadow:0 1px 3px rgba(0,0,0,.1);
 	z-index:1;
 }
-._dropdown .ddsel{
-	padding:2px 18px 3px 5px;
-	background:#EEF2F6 url("data:image/gif;base64,R0lGODlhEQAEAKIAAAAAAP///11xhXOLo+7y9v///wAAAAAAACH5BAEAAAUALAAAAAARAAQAAAMOWKrSLivGQam8quI9dgIAOw==") no-repeat right 7px;
-	color:#2C587D;
-	border-top:#96AABE solid 1px;
-	border-left:#96AABE solid 1px;
-	border-right:#96AABE solid 1px;
+._dropdown .dd-sel{
+	color:#5C6C7F;
+	background:#DBE0E5 no-repeat right center url("data:image/gif;base64,R0lGODlhEQAEAKIAAAAAAP///11xhXOLo+7y9v///wAAAAAAACH5BAEAAAUALAAAAAARAAQAAAMOKLpS/rCMOaN19OqhYwIAOw==");
+	padding:6px 33px 7px 12px;
+	border-bottom:#C4CFDA solid 1px;
 	white-space:nowrap;
 }
 ._dropdown .ddu{
-	display:block;
-	text-decoration:none;
-	padding:3px 5px 4px 5px;
-	border-left:#96AABE solid 1px;
-	border-right:#96AABE solid 1px;
+	color:#2A5784;
+	padding:6px 12px 7px 12px;
 	white-space:nowrap;
 }
-._dropdown .last{border-bottom:#96AABE solid 1px;padding-bottom:3px}
-._dropdown .ddu:hover,._dropdown .seld{
-	background-color:#6D8FB3;
-	color:#FFF;
-	padding:2px 5px 3px 5px;
-	border:#476D96 solid 1px;
-}
-._dropdown .ddu:not(:hover) tt{color:red}
-
+._dropdown .ddu.title0{color:#777}
+._dropdown .ddu.on,
+._dropdown .ddu:hover{background-color:#E6ECF1}
 
 
 

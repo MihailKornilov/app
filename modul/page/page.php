@@ -737,6 +737,19 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'value' => _num($v) ? _num($v) : $el['def']
 				   ));
 
+		//Dropdown
+		case 18:
+			/*
+                txt_1 - текст нулевого значения
+				значения из _element через dialog_id:19
+			*/
+			return _dropdown(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _num($v) ? _num($v) : $el['def']
+				   ));
+
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: наполнение для некоторых компонентов: radio, select, dropdown
 		case 19:
 			/*
@@ -1924,8 +1937,8 @@ function _page_div() {//todo тест
 	'<br>'.
 	'<br>'.
 	'<br>'.
-	'<div class="w200">'.
-		'<input type="hidden" id="aaa" value="1,2" />'.
+	'<div class="w200 pad20">'.
+		'<input type="hidden" id="aaa" value="2" />'.
 	'</div>'.
 
 	'<div class="w500 mt10">'.
