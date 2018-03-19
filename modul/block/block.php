@@ -505,6 +505,7 @@ function _blockCache($obj_name, $obj_id) {
 		$el['attr_cmp'] = '#cmp_'.$elem_id;
 		$el['size'] = $el['size'] ? _num($el['size']) : 13;
 		$el['is_func'] = _num(@$isFunc[$el['block_id']]);
+		$el['is_img'] = 0;
 		$el['style_access'] = _num($dlg['element_style_access']);
 		$el['url_access'] = _num($dlg['element_url_access']);
 		$el['hint_access'] = _num($dlg['element_hint_access']);
@@ -546,6 +547,28 @@ function _blockCache($obj_name, $obj_id) {
 					);
 
 				$el['vvv'] = $spisok;
+				break;
+			//значение, выбранное из диалога - переустановка некоторых настроек
+			case 11:
+				if(!$ids = _ids($el['txt_2'], 1))
+					break;
+				$c = count($ids) - 1;
+				$last_id = $ids[$c];
+				if(!$el11 = _elemQuery($last_id))
+					break;
+				if(!$dlg11 = _dialogQuery($el11['dialog_id']))
+					break;
+
+				switch($el11['dialog_id']) {
+					case 60://image
+						$el['style_access'] = _num($dlg11['element_style_access']);
+						$el['url_access'] = _num($dlg11['element_url_access']);
+						$el['hint_access'] = _num($dlg11['element_hint_access']);
+						$el['dialog_func'] = _num($dlg11['element_dialog_func']);
+						$el['afics'] = $dlg11['element_afics'];
+						$el['is_img'] = 1;
+						break;
+				}
 				break;
 		}
 

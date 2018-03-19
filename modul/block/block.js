@@ -132,6 +132,16 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 							BL.save = 1;
 						}
 					});
+					$('#elem-img-size')._count({
+						width:60,
+						step:[30,50,80,100,150,200,250],
+						func:function(v) {
+							$(EL.attr_el)
+								.find('img')
+								.width(v)
+								.height('auto');
+						}
+					});
 				}
 			},
 			funcBeforeHide:function() {
@@ -280,7 +290,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		});
 	},
 
-	_elemUpd = function(elm) {//обновление глобальной переменной, содержащей
+	_elemUpd = function(elm) {//обновление глобальной переменной, содержащей элементы
 		for(var k in elm)
 			ELM[k] = elm[k];
 	},
@@ -291,30 +301,24 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		var EL = ELM[BL.elem_id];
 
 		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.id + '">' +
-				'<div class="fs16 blue line-b">' +
-					'Элемент' +
-					'<div class="fr mtm3">' +
-						'<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>' +
-						'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
-						'<div val="dialog_id:43,unit_id:' + EL.id + '" class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
-						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
-						'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
-					'</div>' +
+			'<div class="fs16 blue line-b">' +
+				'Элемент' +
+				'<div class="fr mtm3">' +
+					'<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>' +
+					'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
+					'<div val="dialog_id:43,unit_id:' + EL.id + '" class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
+					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
+					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 				'</div>' +
+			'</div>' +
 
-				'<table class="w100p mt5">' +
-					'<tr><td>' + _elemUnitMar(EL) +
-						'<td>' + _elemUnitPlace(BL) +
-				'</table>' +
+			'<table class="w100p mt5">' +
+				'<tr><td>' + _elemUnitMar(EL) +
+					'<td>' + _elemUnitPlace(BL) +
+			'</table>' +
 
-			(EL.style_access ?
-				'<table class="w100p mt10">' +
-					'<tr><td>' + _elemUnitFont(EL) +
-						'<td>' + _elemUnitColor(EL) +
-						'<td class="r w75">' +
-							'<input id="elem-size" class="w15" value="' + EL.size + '" />' +
-				'</table>'
-			: '') +
+			_elemUnitStyle(EL) +
+			_elemUnitImg(EL) +
 		'</div>';
 	},
 	_elemUnitMar = function(EL) {
@@ -363,6 +367,17 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		return  '<div val="" class="icon-wiki iw3 mr3' + _dn(!BL.pos,'on') + _tooltip('Влево', -15) + '</div>' +
 				'<div val="center" class="icon-wiki iw4 mr3' + _dn(BL.pos == 'center','on') + _tooltip('По центру', -28) + '</div>' +
 				'<div val="r" class="icon-wiki iw5' + _dn(BL.pos == 'r','on') + _tooltip('Вправо', -34, 'r') + '</div>';
+	},
+	_elemUnitStyle = function(EL) {
+		if(!EL.style_access)
+			return '';
+
+		return '<table class="w100p mt10">' +
+					'<tr><td>' + _elemUnitFont(EL) +
+						'<td>' + _elemUnitColor(EL) +
+						'<td class="r w75">' +
+							'<input id="elem-size" class="w15" value="' + EL.size + '" />' +
+				'</table>'
 	},
 	_elemUnitFont = function(EL) {//стили элемента: жирность, наклон, подчёркивание
 		var font = {
@@ -433,6 +448,16 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		};
 
 		return _color(EL.color, func);
+	},
+	_elemUnitImg = function(EL) {
+		if(!EL.is_img)
+			return '';
+
+		return '<table class="bs5 ml10">' +
+			'<tr><td class="color-555 fs14 pl5">Ширина фото:' +
+				'<td class="r">' +
+					'<input id="elem-img-size" class="w15" value="80" />' +
+		'</table>'
 	};
 
 $(document)

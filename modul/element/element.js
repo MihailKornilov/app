@@ -2909,7 +2909,7 @@ $.fn._count = function(o) {//input с количеством
 		min:false,  //минимальное значение
 		max:false,  //максимальное значение
 		minus:0,    //может уходить в минус
-		step:1,     //шаг
+		step:1,     //шаг. Либо массив вариантов: [1,5,10,20]
 		again:0,    //если переключение доходит до крайнего значения, продолжение с начала
 		time:0,     //значение является временем (добавление нуля спереди, если меньше 10)
 		tooltip:'',
@@ -2927,7 +2927,20 @@ $.fn._count = function(o) {//input с количеством
 	 .attr('readonly', true);
 
 	var width = 'width:' + (o.width ? o.width + 'px' : '100%'),
-		dis = o.disabled ? ' disabled' : '';
+		dis = o.disabled ? ' disabled' : '',
+		STEP_COUNT = o.step.length || 0,//количество значений, если шаг-массив
+		STEP_N = 0;//номер шага, если шаг-массив
+
+	if(STEP_COUNT) {
+		o.min = o.step[0];
+		o.max = o.step[STEP_COUNT - 1];
+		_forN(o.step, function(sp, n) {
+			if(sp == val) {
+				STEP_N = n;
+				return false;
+			}
+		});
+	}
 
 	if(t.parent().hasClass('_count')) {
 		t.parent()
@@ -2956,7 +2969,17 @@ $.fn._count = function(o) {//input с количеством
 		if(dis)
 			return;
 		var znak = $(this).hasClass('but-b') ? -1 : 1;
-		val += o.step * znak;
+
+		if(STEP_COUNT) {
+			STEP_N += znak;
+			if(znak > 0 && STEP_N > STEP_COUNT - 1)
+				STEP_N = STEP_COUNT - 1;
+			if(znak < 0 && STEP_N < 0)
+				STEP_N = 0;
+			val = o.step[STEP_N];
+		} else
+			val += o.step * znak;
+
 		val = valCorrect();
 		el._dn(val || o.time, 'nol');
 		t.val((o.time && val < 10 ? '0' : '') + val);
