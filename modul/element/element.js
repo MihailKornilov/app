@@ -1379,6 +1379,25 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						}
 					});
 					return;
+				//Фильтр-календарь
+				case 77:
+					var CAL = $(el.attr_el).find('._filter-calendar');
+					CAL.find('.laquo').click(function() {
+						var send = {
+							op:'filter_calendar_mon_change',
+							mon:CAL.find('.mon-cur').val(),
+							side:$(this).attr('val'),
+							busy_cls:'busy',
+							busy_obj:CAL
+						};
+						_post(send, function(res) {
+							CAL.find('.mon-cur').val(res.mon);
+							CAL.find('.td-mon').html(res.td_mon);
+							CAL.find('.fc-cnt').html(res.cnt);
+
+						});
+					});
+					return;
 			}
 		});
 

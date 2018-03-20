@@ -1054,6 +1054,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 					case 8:
 						if(empty($unit))
 							return '';
+						if(empty($unit[$elem['col']]))
+							return '';
 						$txt = $unit[$elem['col']];
 //						$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 						$txt = _spisokUnitUrl($el, $unit, $txt);
@@ -1793,6 +1795,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				'value' => _num(_spisokFilter('v', $el['id']))
 			));
 
+		//Календарь
+		case 77:
+			/*
+				num_1 - id элемента, размещающего список
+			*/
+			return _filterCalendar($el, $unit);
 
 
 

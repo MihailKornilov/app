@@ -245,7 +245,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
+	$sql = "SELECT `t1`.*"._spisokJoinField($spDialog)."
 			FROM `"._baseTable($spDialog['table_1'])."` `t1`
 			"._spisokJoin($spDialog)."
 			WHERE "._spisokCond($ELEM)."

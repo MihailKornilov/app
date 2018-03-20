@@ -658,6 +658,66 @@
 
 
 
+/* Фильтр-календарь */
+._filter-calendar{
+	position:relative;
+	width:200px;
+	display:inline-block;
+	vertical-align:top;
+}
+._filter-calendar .week-name td{
+	text-align:center;
+	padding:4px 0;
+	background-color:#E1E6EB;
+	border-bottom:#C8D2DC solid 1px;
+	color:#8895A2;
+}
+._filter-calendar td.week-num{
+	width:22px;
+	text-align:center;
+	padding:5px 0;
+	background-color:#E7ECF1;
+	border-right:#CED7DF solid 1px;
+	color:#58a;
+	cursor:pointer;
+}
+._filter-calendar td.d{
+	text-align:center;
+	cursor:default;
+}
+._filter-calendar td.on{
+	text-decoration:underline;
+	color:#3A617E;
+	cursor:pointer;
+}
+._filter-calendar td.on:hover{background-color:#ECEFF4}
+._filter-calendar td.week-num:hover{background-color:#D0DEEB}
+._filter-calendar .td-mon{
+	text-align:center;
+}
+._filter-calendar .laquo{
+	width:25px;
+	font-size:15px;
+	color:#555;
+	padding:3px 0;
+	text-align:center;
+	cursor:pointer;
+}
+._filter-calendar .laquo:hover{
+	background-color:#ECEFF4;
+	color:#000;
+}
+._filter-calendar ._busy{
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	height:23px;
+	background-color:#fff;
+	opacity:.9;
+}
+._filter-calendar:not(.busy) ._busy{display:none}
+
 
 
 

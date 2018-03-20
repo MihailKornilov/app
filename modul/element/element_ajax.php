@@ -468,6 +468,35 @@ switch(@$_POST['op']) {
 		$send['html'] = utf8(_imageDD($img));
 		jsonSuccess($send);
 		break;
+
+	case 'filter_calendar_mon_change':
+		if(!preg_match(REGEXP_YEARMON, $_POST['mon']))
+			jsonError('Некорректные месяц и год');
+
+		$side = _num($_POST['side']);//направление, в котором пролистывается календарь
+
+		$ex = explode('-', $_POST['mon']);
+		$YEAR = _num($ex[0]);
+		$MON = _num($ex[1]);
+
+		$next = $MON + 1 * ($side ? 1 : -1);
+
+		if($side)
+			$mon = $next > 12 ? ($YEAR + 1).'-01' : $YEAR.'-'.($next < 10 ? 0 : '').$next;
+		else
+			$mon = !$next ? ($YEAR - 1).'-12' : $YEAR.'-'.($next < 10 ? 0 : '').$next;
+//
+
+
+		$send['mon'] = $mon;
+		$send['td_mon'] = utf8(_filterCalendarMon($mon));
+		$send['cnt'] = utf8(_filterCalendarContent(array(
+			'mon' => $mon
+		)));
+
+
+		jsonSuccess($send);
+		break;
 }
 
 
