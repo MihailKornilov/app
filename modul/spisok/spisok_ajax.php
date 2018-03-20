@@ -56,8 +56,10 @@ switch(@$_POST['op']) {
 			query($sql);
 
 			//обновление кеша объекта, если это элемент
-			if($elem)
+			if($elem) {
 				_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
+				_spisokFilter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
+			}
 
 			//обновление кеша объекта, если это страница
 			if(_baseTable($dialog['table_1']) == '_page')
@@ -112,7 +114,6 @@ switch(@$_POST['op']) {
 						`v`=VALUES(`v`)";
 			query($sql);
 		}
-
 
 		_spisokFilter('cache_clear');
 

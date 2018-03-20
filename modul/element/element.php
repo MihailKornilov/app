@@ -1391,50 +1391,56 @@ function _imageWebcam($el) {//Веб-камера (вставляется в блок через [12])
 
 
 function _filterCalendar($el) {//Фильтр-календарь
-	$data = array(
-		'mon' => empty($data['mon']) ? strftime('%Y-%m') : $data['mon'],
-		'sel' => empty($data['sel']) ? '' : $data['sel'],
-		'days' => empty($data['days']) ? array() : $data['days'],
-		'norewind' => !empty($data['norewind'])
-	);
+	if(!$v = _spisokFilter('v', $el['id'])) {
+		$v = _calendarWeek();
+		$sql = "INSERT INTO `_user_spisok_filter` (
+					`user_id`,
+					`element_id_spisok`,
+					`element_id_filter`,
+					`v`
+				) VALUES (
+					".USER_ID.",
+					".$el['num_1'].",
+					".$el['id'].",
+					'".$v."'
+				)";
+		query($sql);
+		_spisokFilter('cache_clear');
+	}
+
+	$mon = substr($v, 0, 7);
 
 	return
 	'<div class="_filter-calendar">'.
 		'<div class="_busy"></div>'.
-		'<input type="hidden" class="mon-cur" value="'.$data['mon'].'" />'.
-		'<input type="hidden" class="selected" value="'.$data['sel'].'" />'.
+		'<input type="hidden" class="mon-cur" value="'.$mon.'" />'.
 
 		'<table class="w100p">'.
 			'<tr><td class="laquo" val="0">&laquo;'.
-				'<td class="td-mon">'._filterCalendarMon($data['mon']).
+				'<td class="td-mon">'._filterCalendarMon($mon).
 				'<td class="laquo" val="1">&raquo;'.
 		'</table>'.
 
-		'<div class="fc-cnt">'._filterCalendarContent($data).'</div>'.
+		'<div class="fc-cnt">'._filterCalendarContent($el, $mon, $v).'</div>'.
 	'</div>';
 }
 function _filterCalendarMon($mon) {//имя месяца и год
 	$ex = explode('-', $mon);
 	return _monthDef($ex[1]).' '.$ex[0];
 }
-function _filterCalendarContent($data) {
-	$data = array(
-		'mon' => empty($data['mon']) ? strftime('%Y-%m') : $data['mon'],
-		'sel' => empty($data['sel']) ? '' : $data['sel'],
-		'days' => empty($data['days']) ? array() : $data['days'],
-		'norewind' => !empty($data['norewind'])
-	);
-
-	$unix = strtotime($data['mon'].'-01');
-	$dayCount = date('t', $unix);   // Количество дней в месяце
-	$week = date('w', $unix);       // Номер первого дня недели
+function _filterCalendarContent($el, $mon, $v) {
+	$unix = strtotime($mon.'-01');
+	$dayCount = date('t', $unix);   //Количество дней в месяце
+	$week = date('w', $unix);       //Номер первого дня недели
 	if(!$week)
 		$week = 7;
 
+	$days = _filterCalendarDays($el, $mon);
+
 	$weekNum = intval(date('W', $unix));    // Номер недели с начала месяца
 
-	$range = _calendarWeek($data['mon'].'-01');
-	$send = '<tr'.($range == $data['sel'] ? ' class="sel"' : '').'>'.
+	$range = _calendarWeek($mon.'-01');
+	$send = '<tr'.($range == $v ? ' class="sel"' : '').'>'.
 				'<td class="week-num" val="'.$range.'">'.$weekNum;
 
 	//Вставка пустых полей, если первый день недели не понедельник
@@ -1442,20 +1448,19 @@ function _filterCalendarContent($data) {
 		$send .= '<td>';
 
 	for($n = 1; $n <= $dayCount; $n++) {
-		$day = $data['mon'].'-'.($n < 10 ? '0' : '').$n;
+		$day = $mon.'-'.($n < 10 ? '0' : '').$n;
 		$cur = TODAY == $day ? ' b' : '';
-//		$on = empty($days[$day]) ? '' : ' on';
-		$on = $n != 15 ? '' : ' on';
+		$on = empty($days[$day]) ? '' : ' on';
 		$old = $unix + $n * 86400 <= TODAY_UNIXTIME ? ' grey' : '';
-		$sel = $day == $data['sel'] ? ' sel' : '';
+		$sel = $day == $v ? ' sel' : '';
 		$val = $on ? ' val="'.$day.'"' : '';
 		$send .= '<td class="d '.$cur.$on.$old.$sel.'"'.$val.'>'.$n;
 		$week++;
 		if($week > 7)
 			$week = 1;
 		if($week == 1 && $n < $dayCount) {
-			$range = _calendarWeek($data['mon'].'-'.($n + 1 < 10 ? 0 : '').($n + 1));
-			$send .= '<tr'.($range == $data['sel'] ? ' class="sel"' : '').'>'.
+			$range = _calendarWeek($mon.'-'.($n + 1 < 10 ? 0 : '').($n + 1));
+			$send .= '<tr'.($range == $v ? ' class="sel"' : '').'>'.
 						'<td class="week-num" val="'.$range.'">'.(++$weekNum);
 		}
 	}
@@ -1472,18 +1477,25 @@ function _filterCalendarContent($data) {
 		$send.
 	'</table>';
 }
-function _filterCalendarDays($mon=0) {//отметка дней в календаре, по которым есть записи
-	$sql = "SELECT DATE_FORMAT(`dtime_add`,'%Y-%m-%d') AS `day`
-			FROM `_money_income`
-			WHERE `app_id`=".APP_ID."
-			  AND !`deleted`
-			  AND `dtime_add` LIKE ('".($mon ? $mon : strftime('%Y-%m'))."%')
+function _filterCalendarDays($el, $mon) {//отметка дней в календаре, по которым есть записи
+	if(!$elem = _elemQuery($el['num_1']))
+		return array();
+	if(!$dlg = _dialogQuery($elem['num_1']))
+		return array();
+
+	$cond = "`dtime_add` LIKE ('".$mon."%')";
+	if(isset($dlg['field1']['app_id']))
+		$cond .= " AND `app_id`=".APP_ID;
+	if(isset($dlg['field1']['dialog_id']))
+		$cond .= " AND `dialog_id`=".$dlg['id'];
+	if(isset($dlg['field1']['deleted']))
+		$cond .= " AND !`deleted`";
+
+	$sql = "SELECT DATE_FORMAT(`dtime_add`,'%Y-%m-%d'),1
+			FROM `"._baseTable($dlg['table_1'])."`
+			WHERE ".$cond."
 			GROUP BY DATE_FORMAT(`dtime_add`,'%d')";
-	$q = query($sql);
-	$days = array();
-	while($r = mysql_fetch_assoc($q))
-		$days[$r['day']] = 1;
-	return $days;
+	return query_ass($sql);
 }
 
 
@@ -1598,9 +1610,7 @@ function _calendarPeriod($data) {// Формирование периода для элементов массива з
 		'to' => $ex[1]
 	) + $send;
 }
-function _calendarWeek($day=0) {// Формирование периода за неделю недели
-	if(!$day)
-		$day = strftime('%Y-%m-%d');
+function _calendarWeek($day=TODAY) {// Формирование периода за неделю недели
 	$d = explode('-', $day);
 	$month = $d[0].'-'.$d[1];
 

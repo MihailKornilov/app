@@ -1381,10 +1381,12 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					return;
 				//Фильтр-календарь
 				case 77:
-					var CAL = $(el.attr_el).find('._filter-calendar');
+					var CAL = $(el.attr_el).find('._filter-calendar'),
+						CNT = CAL.find('.fc-cnt');
 					CAL.find('.laquo').click(function() {
 						var send = {
 							op:'filter_calendar_mon_change',
+							elem_id:el.id,
 							mon:CAL.find('.mon-cur').val(),
 							side:$(this).attr('val'),
 							busy_cls:'busy',
@@ -1393,9 +1395,22 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						_post(send, function(res) {
 							CAL.find('.mon-cur').val(res.mon);
 							CAL.find('.td-mon').html(res.td_mon);
-							CAL.find('.fc-cnt').html(res.cnt);
-
+							CNT.html(res.cnt);
 						});
+					});
+					CNT.click(function(e) {
+						var t = $(e.target),
+							on = t.hasClass('on'),
+							week = t.hasClass('week-num'),
+							td = on ? t : t.parent();
+						if(on || week) {
+							CNT.find('.sel').removeClass('sel');
+							td.addClass('sel');
+							if(!FILTER[el.num_1])
+								FILTER[el.num_1] = {};
+							FILTER[el.num_1][el.id] = t.attr('val');
+							_spisokUpdate(el.num_1);
+						}
 					});
 					return;
 			}

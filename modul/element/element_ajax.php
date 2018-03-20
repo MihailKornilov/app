@@ -469,7 +469,13 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
-	case 'filter_calendar_mon_change':
+	case 'filter_calendar_mon_change'://перелистывание фильтра-календар€
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Ќекорректный ID элемента');
+		if(!$el = _elemQuery($elem_id))
+			jsonError('Ёлемента не существует');
+		if($el['dialog_id'] != 77)
+			jsonError('Ёлемент не €вл€етс€ фильтром-календарЄм');
 		if(!preg_match(REGEXP_YEARMON, $_POST['mon']))
 			jsonError('Ќекорректные мес€ц и год');
 
@@ -485,15 +491,10 @@ switch(@$_POST['op']) {
 			$mon = $next > 12 ? ($YEAR + 1).'-01' : $YEAR.'-'.($next < 10 ? 0 : '').$next;
 		else
 			$mon = !$next ? ($YEAR - 1).'-12' : $YEAR.'-'.($next < 10 ? 0 : '').$next;
-//
-
 
 		$send['mon'] = $mon;
 		$send['td_mon'] = utf8(_filterCalendarMon($mon));
-		$send['cnt'] = utf8(_filterCalendarContent(array(
-			'mon' => $mon
-		)));
-
+		$send['cnt'] = utf8(_filterCalendarContent($el, $mon, _spisokFilter('v', $el['id'])));
 
 		jsonSuccess($send);
 		break;

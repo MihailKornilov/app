@@ -674,27 +674,28 @@
 }
 ._filter-calendar td.week-num{
 	width:22px;
+	font-size:11px;
 	text-align:center;
-	padding:5px 0;
 	background-color:#E7ECF1;
 	border-right:#CED7DF solid 1px;
 	color:#58a;
 	cursor:pointer;
 }
 ._filter-calendar td.d{
+	padding:5px 0;
 	text-align:center;
 	cursor:default;
 }
 ._filter-calendar td.on{
 	text-decoration:underline;
-	color:#3A617E;
+	color:#07c;
 	cursor:pointer;
 }
-._filter-calendar td.on:hover{background-color:#ECEFF4}
+._filter-calendar tr:not(.sel) td.on:not(.sel):hover{background-color:#ECEFF4}
 ._filter-calendar td.week-num:hover{background-color:#D0DEEB}
-._filter-calendar .td-mon{
-	text-align:center;
-}
+._filter-calendar tr.sel td.week-num{background-color:#CADEF2;border-right:#DFEFFF solid 1px;}
+._filter-calendar .sel{background-color:#CADEF2}
+._filter-calendar .td-mon{text-align:center}
 ._filter-calendar .laquo{
 	width:25px;
 	font-size:15px;
@@ -703,10 +704,7 @@
 	text-align:center;
 	cursor:pointer;
 }
-._filter-calendar .laquo:hover{
-	background-color:#ECEFF4;
-	color:#000;
-}
+._filter-calendar .laquo:hover{background-color:#ECEFF4;color:#000}
 ._filter-calendar ._busy{
 	position:absolute;
 	top:0;

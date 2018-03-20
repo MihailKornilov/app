@@ -32,6 +32,7 @@ switch(@$_POST['op']) {
 		_cache('clear', '_userCache'.USER_ID);//текущий пользователь
 		_cache('clear', '_pageCache');        //страницы
 		_cache('clear', '_imageServerCache'); //серверы изображений
+		_spisokFilter('cache_clear');                 //очистка фильтров
 
 		//диалоговые окна
 		$sql = "SELECT `id`

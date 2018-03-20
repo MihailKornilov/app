@@ -1800,7 +1800,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			/*
 				num_1 - id элемента, размещающего список
 			*/
-			return _filterCalendar($el, $unit);
+			return _filterCalendar($el);
 
 
 
