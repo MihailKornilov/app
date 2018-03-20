@@ -713,10 +713,9 @@
 	left:0;
 	right:0;
 	height:23px;
-	background-color:#fff;
-	opacity:.9;
 }
 ._filter-calendar:not(.busy) ._busy{display:none}
+._filter-calendar.busy .td-mon{visibility:hidden}
 
 
 

@@ -1390,7 +1390,7 @@ function _imageWebcam($el) {//Веб-камера (вставляется в блок через [12])
 
 
 
-function _filterCalendar($el, $unit) {//Фильтр-календарь
+function _filterCalendar($el) {//Фильтр-календарь
 	$data = array(
 		'mon' => empty($data['mon']) ? strftime('%Y-%m') : $data['mon'],
 		'sel' => empty($data['sel']) ? '' : $data['sel'],
@@ -1398,23 +1398,20 @@ function _filterCalendar($el, $unit) {//Фильтр-календарь
 		'norewind' => !empty($data['norewind'])
 	);
 
+	return
+	'<div class="_filter-calendar">'.
+		'<div class="_busy"></div>'.
+		'<input type="hidden" class="mon-cur" value="'.$data['mon'].'" />'.
+		'<input type="hidden" class="selected" value="'.$data['sel'].'" />'.
 
-	$send =
-		'<div class="_filter-calendar">'.
-			'<div class="_busy"></div>'.
-			'<input type="hidden" class="mon-cur" value="'.$data['mon'].'" />'.
-			'<input type="hidden" class="selected" value="'.$data['sel'].'" />'.
+		'<table class="w100p">'.
+			'<tr><td class="laquo" val="0">&laquo;'.
+				'<td class="td-mon">'._filterCalendarMon($data['mon']).
+				'<td class="laquo" val="1">&raquo;'.
+		'</table>'.
 
-			'<table class="w100p">'.
-				'<tr><td class="laquo" val="0">&laquo;'.
-					'<td class="td-mon">'._filterCalendarMon($data['mon']).
-					'<td class="laquo" val="1">&raquo;'.
-			'</table>'.
-
-			'<div class="fc-cnt">'._filterCalendarContent($data).'</div>'.
-		'</div>';
-
-	return $send;
+		'<div class="fc-cnt">'._filterCalendarContent($data).'</div>'.
+	'</div>';
 }
 function _filterCalendarMon($mon) {//имя месяца и год
 	$ex = explode('-', $mon);
