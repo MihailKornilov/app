@@ -155,11 +155,19 @@ function _spisokInclude($spisok, $CMP) {//вложенные списки
 
 		//получение данных из вложенного списка
 		$incDialog = _dialogQuery($cmp['num_1']);
-		$sql = "SELECT *
-				FROM `"._baseTable($incDialog['table_1'])."`
-				WHERE `app_id`=".APP_ID."
-				  AND `dialog_id`=".$cmp['num_1']."
-				  AND `id` IN (".$ids.")";
+
+		$cond = "`t1`.`id` IN (".$ids.")";
+		if(isset($field['deleted']))
+			$cond .= " AND !`t1`.`deleted`";
+		if(isset($field['app_id']))
+			$cond .= " AND `t1`.`app_id`=".APP_ID;
+		if(isset($field['dialog_id']))
+			$cond .= " AND `t1`.`dialog_id`=".$cmp['num_1'];
+
+		$sql = "SELECT `t1`.*"._spisokJoinField($incDialog)."
+				FROM `"._baseTable($incDialog['table_1'])."` `t1`
+					  "._spisokJoin($incDialog)."
+				WHERE ".$cond;
 		if(!$arr = query_arr($sql))
 			continue;
 
@@ -878,23 +886,31 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 	$cond = array_diff($cond, array(''));
 	$cond = $cond ? " AND (".implode(' OR ', $cond).")" : '';
 
-	$sql = "SELECT *
-			FROM `_spisok`
-			WHERE `app_id`=".APP_ID."
-		      AND `dialog_id`=".$cmp['num_1']."
-			  AND !`deleted`
-			  ".$cond."
-			ORDER BY `sort`,`id` DESC
+	$field = $dialog['field1'];
+
+	$cond = "`t1`.`id`".$cond;
+	if(isset($field['deleted']))
+		$cond .= " AND !`t1`.`deleted`";
+	if(isset($field['app_id']))
+		$cond .= " AND `t1`.`app_id`=".APP_ID;
+	if(isset($field['dialog_id']))
+		$cond .= " AND `t1`.`dialog_id`=".$cmp['num_1'];
+
+	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
+			FROM `"._baseTable($dialog['table_1'])."` `t1`
+				  "._spisokJoin($dialog)."
+			WHERE ".$cond."
+			ORDER BY ".(isset($field['sort']) ? "`sort`," : '')."`id` DESC
 			LIMIT 50";
 	if(!$spisok = query_arr($sql))
 		return array();
 
 	//добавление единицы списка, которая была выбрана ранее
 	if($sel_id && empty($arr[$sel_id])) {
-		$sql = "SELECT *
-				FROM `_spisok`
-				WHERE `dialog_id`=".$cmp['num_1']."
-				  AND `id`=".$sel_id;
+		$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
+				FROM `"._baseTable($dialog['table_1'])."` `t1`
+					  "._spisokJoin($dialog)."
+				WHERE `t1`.`id`=".$sel_id;
 		if($unit = query_assoc($sql))
 			$spisok[$sel_id] = $unit;
 	}
