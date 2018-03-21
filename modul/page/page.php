@@ -2002,6 +2002,65 @@ function gridStackStylePx() {//генерирование стилей для grid-child
 
 
 
+function userImageMove() {//перенос аватарок пользователей в изображения
+	_cache('clear', '_imageServerCache');
+
+	$sql = "SELECT *
+			FROM `_user`
+			WHERE LENGTH(`ava`)";
+	foreach(query_arr($sql) as $r) {
+		$ex = explode('/', $r['ava']);
+		$c = count($ex) - 1;
+		$server = '';
+		foreach($ex as $n => $v) {
+			if($n == $c)
+				continue;
+			$server .= $v.'/';
+		}
+		$name = $ex[$c];
+
+		$sql = "INSERT INTO `_image` (
+					`server_id`,
+	
+					`max_name`,
+					`max_x`,
+					`max_y`,
+	
+					`80_name`,
+					`80_x`,
+					`80_y`,
+	
+					`obj_name`,
+					`obj_id`,
+	
+					`user_id_add`
+				) VALUES (
+					"._imageServer($server).",
+	
+					'".$name."',
+					50,
+					50,
+	
+					'".$name."',
+					50,
+					50,
+	
+					'elem_1778',
+					".$r['id'].",
+	
+					".USER_ID."
+			)";
+		query($sql);
+
+		$image_id = query_insert_id('_image');
+		$sql = "UPDATE `_user`
+				SET `ava`='',
+					`image_ids`=".$image_id."
+				WHERE `id`=".$r['id'];
+		query($sql);
+	}
+}
+
 
 
 
