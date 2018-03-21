@@ -811,6 +811,51 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				case 22:
 					$(el.attr_el).find('DL')._sort({table:'_element_func'});
 					return;
+				//Список - ТАБЛИЦА
+				case 23:
+					if(!el.num_6)
+						return;
+
+					$(el.attr_el).find('OL').nestedSortable({
+						forcePlaceholderSize: true,//сохранять размер места, откуда был взят элемент
+						placeholder:'placeholder',//класс, применяемый для подсветки места, откуда взялся элемент
+//						handle:'mt1',
+						listType:'ol',
+						items:'li',
+//						toleranceElement:'> div',
+						isTree:true,
+						maxLevels:el.num_7,
+						tabSize:30,//расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
+						revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+
+						update:function(e, t) {
+							console.log($(this).nestedSortable('toArray'));
+						},
+
+						expandedClass:'pb10',//раскрытый список
+						errorClass:'bg-fcc' //ошибка, если попытка переместить элемент на недоступный уровень
+					});
+
+					return;
+					//применение сортировки
+					$(el.attr_el).find('DL').sortable({
+						items:'dd',
+						update:function() {
+							var ids = [];
+							_forEq($(el.attr_el).find('DD'), function(sp) {
+								ids.push(sp.attr('val'));
+							});
+							var send = {
+								op:'spisok_23_sort',
+								elem_id:el.id,
+								ids:ids.join(','),
+								busy_obj:$(el.attr_el),
+								busy_cls:'spisok-busy'
+							};
+							_post(send);
+						}
+					});
+					return;
 				//select - выбор списка (все списки приложения)
 				case 24:
 					_elemFunc(el, _num(unit[el.col] || el.def), 1);

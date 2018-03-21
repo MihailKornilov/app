@@ -167,6 +167,29 @@ switch(@$_POST['op']) {
 		$send['html'] = utf8(_spisok59unit($cmp_id, $unit_id));
 		jsonSuccess($send);
 		break;
+	case 'spisok_23_sort':
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Ќекорректный ID элемента');
+		if(!$el = _elemQuery($elem_id))
+			jsonError('Ёлемента id'.$elem_id.' не существует');
+		if($el['dialog_id'] != 23)
+			jsonError('Ёлемент не €вл€етс€ списком-таблицей');
+		if(!$dialog_id = _num($el['num_1']))
+			jsonError('ќтсутствует ID диалога');
+		if(!$dialog = _dialogQuery($dialog_id))
+			jsonError('ƒиалога не существует');
+		if(!$ids = _ids($_POST['ids'], 1))
+			jsonError('ќтсутствуют значени€ дл€ сортировки');
+
+		foreach($ids as $n => $id) {
+			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
+					SET `sort`=".$n."
+					WHERE `id`=".$id;
+			query($sql);
+		}
+
+		jsonSuccess();
+		break;
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличи€ единицы списка

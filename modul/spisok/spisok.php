@@ -211,18 +211,8 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	/*
 	$ELEM:
 		dialog_id = 14: ШАБЛОН
-            num_1 - id диалога, который вносит данные списка (шаблон которого будет настраиваться)
-			num_2 - длина (лимит, количество строк, выводимых за один раз)
-			txt_1 - сообщение пустого запроса
-
 		dialog_id = 23: таблица
-            num_1 - id диалога, который вносит данные списка (шаблон которого будет настраиваться)
-			num_2 - длина (лимит, количество строк, выводимых за один раз)
-			txt_1 - сообщение пустого запроса
-			num_3 - узкие строки таблицы
-			num_4 - подсвечивать строку при наведении мыши
-			num_5 - показывать имена колонок
-			txt_2 - ids элементов через запятую. Сами элементы хранятся в таблице _element
+
 		Значения вставляются диалогом 31.
 		Параметры значений:
 			num_1 - id элемента-значения из диалога
@@ -237,7 +227,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
 		return 'Несуществующий диалог id'.$ELEM['dialog_id'];
 
-	$limit = PAS ? 3 : $ELEM['num_2'];//лимит
+	$limit = $ELEM['num_6'] ? 200 : $ELEM['num_2'];
 
 	//диалог, через который вносятся данные списка
 	$dialog_id = $ELEM['num_1'];
@@ -249,7 +239,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	$all = _spisokCountAll($ELEM);
 
 	$order = "`t1`.`id` DESC";
-	if(_spisokIsSort($ELEM['block_id']))
+	if($ELEM['num_6'] || _spisokIsSort($ELEM['block_id']))
 		$order = "`sort`";
 
 	//получение данных списка
@@ -286,50 +276,30 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					ORDER BY `sort`";
 			$tabCol = query_arr($sql);
 
-			//получение используемых значений списка
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id` IN ("._idsGet($tabCol, 'txt_2').")";
-			$tabElemUse = query_arr($sql);
-
-			$html = !$next ? '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">' : '';
+			$html = !$next && !$ELEM['num_6'] ? '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">' : '';
 
 			//отображение названий колонок
 			if(!$next && $ELEM['num_5']) {
+				if($ELEM['num_6'])
+					$html .= '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">';
 				$html .= '<tr>';
 				foreach($tabCol as $tr)
-					$html .= '<th>'.$tr['txt_7'];
+					$html .= '<th style="width:'.$tr['width'].'px">'.$tr['txt_7'];
+				if($ELEM['num_6'])
+					$html .= '</table>';
 			}
 
+			if($ELEM['num_6'])
+				$html .= '<ol>';
+
 			foreach($spisok as $sp) {
+				if($ELEM['num_6'])
+					$html .= '<li val="'.$sp['id'].'" id="item_'.$sp['id'].'">'.
+								'<table class="_stab mt1 curM'._dn(!$ELEM['num_3'], 'small').'">';
 				$html .= '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
 				foreach($tabCol as $td) {
-//					$txt = '';
 					$cls = array();
 					switch($td['dialog_id']) {
-/*
-						case 1111://из диалога
-							$elemUse = $tabElemUse[$td['txt_2']];
-							$el = $CMP[$elemUse['id']];
-
-							//элементу не присвоена колонка
-							if(!$col = $el['col'])
-								break;
-
-							//в списке не существует такой колонки
-							if(!isset($sp[$col]))
-								break;
-
-							//значение из другого списка
-							if($el['dialog_id'] == 29) {
-								$txt = $sp[$col]['txt_1'];
-								break;
-							}
-
-							$txt = _br($sp[$col]);
-							$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
-						break;
-*/
 						case 34: $cls[] = 'pad0'; //иконки управления
 						default:
 							$txt = _elemUnit($td, $sp);
@@ -344,9 +314,14 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$cls = $cls ? ' class="'.$cls.'"' : '';
 					$html .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
 				}
+				if($ELEM['num_6'])
+					$html .= '</table>';
 			}
 
-			if($limit * ($next + 1) < $all) {
+			if($ELEM['num_6'])
+				$html .= '</ol>';
+
+			if(!$ELEM['num_6'] && $limit * ($next + 1) < $all) {
 				$count_next = $all - $limit * ($next + 1);
 				if($count_next > $limit)
 					$count_next = $limit;
@@ -358,7 +333,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							'</tt>';
 			}
 
-			$html .= !$next ? '</table>' : '';
+			$html .= !$next && !$ELEM['num_6'] ? '</table>' : '';
 			return $html;
 
 		//шаблон

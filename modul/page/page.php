@@ -275,7 +275,7 @@ function _pageSetupAppPage() {//управление страницами приложения
 	return
 	'<style>'.
 		'.placeholder{outline:1px dashed #4183C4;margin-top:1px}'.
-		'ol{list-style-type:none;max-width:700px;padding-left:40px}'.
+		'ol{max-width:700px;padding-left:40px}'.
 	'</style>'.
 	'<ol id="page-sort">'._pageSetupAppPageSpisok($arr, $sort).'</ol>';
 }
@@ -1263,6 +1263,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_3 - узкие строки таблицы
 				num_4 - подсвечивать строку при наведении мыши
 				num_5 - показывать имена колонок
+				num_6 - возможность сортировки строк таблицы (если установлена, длина списка становится 200)
+				num_7 - уровни сортировки (1,2,3)
 				txt_2 - ids элементов через запятую. Сами элементы хранятся в таблице _element
 
 				настройка шаблона через вспомогательный элемент: dialig_id=30
