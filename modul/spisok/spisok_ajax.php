@@ -178,12 +178,22 @@ switch(@$_POST['op']) {
 			jsonError('Отсутствует ID диалога');
 		if(!$dialog = _dialogQuery($dialog_id))
 			jsonError('Диалога не существует');
-		if(!$ids = _ids($_POST['ids'], 1))
-			jsonError('Отсутствуют значения для сортировки');
 
-		foreach($ids as $n => $id) {
+		$arr = $_POST['arr'];
+		if(empty($arr))
+			jsonError('Отсутствуют значения для сортировки');
+		if(!is_array($arr))
+			jsonError('Значения не являются массивом');
+
+		foreach($arr as $n => $r) {
+			if(!$id = _num($r['id']))
+				continue;
+
+			$parent_id = _num($r['parent_id']);
+
 			$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
-					SET `sort`=".$n."
+					SET `parent_id`=".$parent_id.",
+						`sort`=".$n."
 					WHERE `id`=".$id;
 			query($sql);
 		}

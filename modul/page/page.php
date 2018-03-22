@@ -274,8 +274,7 @@ function _pageSetupAppPage() {//управление страницами приложения
 
 	return
 	'<style>'.
-		'.placeholder{outline:1px dashed #4183C4;margin-top:1px}'.
-		'ol{max-width:700px;padding-left:40px}'.
+//		'ol{max-width:700px;padding-left:40px}'.
 	'</style>'.
 	'<ol id="page-sort">'._pageSetupAppPageSpisok($arr, $sort).'</ol>';
 }

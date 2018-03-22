@@ -49,6 +49,8 @@ img{border:none;vertical-align:top}
 table{border:0;border-spacing:0}
 ol{list-style-type:none}
 
+.nested-placeholder{outline:1px dashed #4183C4;margin-top:1px}
+.mjs-nestedSortable-branch ol{padding-left:40px}
 
 
 

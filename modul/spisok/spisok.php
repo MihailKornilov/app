@@ -276,6 +276,71 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					ORDER BY `sort`";
 			$tabCol = query_arr($sql);
 
+			$MASS = array();
+			foreach($spisok as $sp) {
+				$TR = '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
+				foreach($tabCol as $td) {
+					$cls = array();
+					switch($td['dialog_id']) {
+						case 34: $cls[] = 'pad0'; //иконки управления
+						default:
+							$txt = _elemUnit($td, $sp);
+							$txt = _spisokUnitUrl($td, $sp, $txt);
+							break;
+					}
+					$cls[] = $td['font'];
+					$cls[] = $td['color'];
+					$cls[] = $td['txt_8'];//pos - позиция
+					$cls = array_diff($cls, array(''));
+					$cls = implode(' ', $cls);
+					$cls = $cls ? ' class="'.$cls.'"' : '';
+					$TR .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
+				}
+//				$TR .= '<td>'.$sp['parent_id'];
+				$MASS[$sp['id']] = $TR;
+			}
+
+			//tr догрузки списка
+			if(!$ELEM['num_6'] && $limit * ($next + 1) < $all) {
+				$count_next = $all - $limit * ($next + 1);
+				if($count_next > $limit)
+					$count_next = $limit;
+				$MASS[] =
+					'<tr class="over5 curP center blue" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
+						'<td colspan="20">'.
+							'<tt class="db '.($ELEM['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
+								'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
+							'</tt>';
+			}
+
+			//открытие и закрытие таблицы
+			$TABLE_BEGIN = '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">';
+			$TABLE_END = '</table>';
+
+			$BEGIN = !$next && !$ELEM['num_6'] ? $TABLE_BEGIN : '';
+			$END = !$next && !$ELEM['num_6'] ? $TABLE_END : '';
+
+			if($ELEM['num_6']) {//включено условие сортировки
+
+				if($ELEM['num_7'] > 1) {
+					$child = array();
+					foreach($spisok as $id => $r)
+						$child[$r['parent_id']][$id] = $r;
+//return _pr($child);
+					$TR = _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child);
+				} else {
+					$TR = '';
+					foreach($MASS as $id => $sp)
+						$TR .=
+							'<li class="mt1 curM" id="sp_'.$id.'">'.
+								$TABLE_BEGIN.$sp.$TABLE_END.
+							'</li>';
+					$TR = '<ol>'.$TR.'</ol>';
+				}
+			} else
+				$TR = implode('', $MASS);
+
+/*
 			$html = !$next && !$ELEM['num_6'] ? '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">' : '';
 
 			//отображение названий колонок
@@ -294,7 +359,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 			foreach($spisok as $sp) {
 				if($ELEM['num_6'])
-					$html .= '<li val="'.$sp['id'].'" id="item_'.$sp['id'].'">'.
+					$html .= '<li id="sp_'.$sp['id'].'">'.
 								'<table class="_stab mt1 curM'._dn(!$ELEM['num_3'], 'small').'">';
 				$html .= '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
 				foreach($tabCol as $td) {
@@ -314,27 +379,17 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$cls = $cls ? ' class="'.$cls.'"' : '';
 					$html .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
 				}
-				if($ELEM['num_6'])
-					$html .= '</table>';
+				if($ELEM['num_6']) {
+					$html .= '<td>'.$sp['parent_id'].'</table>';
+					$html .= '</li>';
+				}
 			}
 
 			if($ELEM['num_6'])
 				$html .= '</ol>';
+*/
 
-			if(!$ELEM['num_6'] && $limit * ($next + 1) < $all) {
-				$count_next = $all - $limit * ($next + 1);
-				if($count_next > $limit)
-					$count_next = $limit;
-				$html .=
-					'<tr class="over5 curP center blue" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
-						'<td colspan="20">'.
-							'<tt class="db '.($ELEM['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
-								'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
-							'</tt>';
-			}
-
-			$html .= !$next && !$ELEM['num_6'] ? '</table>' : '';
-			return $html;
+			return $BEGIN.$TR.$END;
 
 		//шаблон
 		case 14:
@@ -406,6 +461,20 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	}
 
 	return 'Неизвестный внешний вид списка: '.$ELEM['num_1'];
+}
+function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {//формирование табличного списка по уровням
+	if(!$arr = @$child[$parent_id])
+		return '';
+
+	$send = '';
+	foreach($arr as $id => $r)
+		$send .=
+			'<li class="mt1 curM" id="sp_'.$id.'">'.
+				$TABLE_BEGIN.$MASS[$id].$TABLE_END.
+				(!empty($child[$id]) ? _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $id) : '').
+			'</li>';
+	return
+		'<ol>'.$send.'</ol>';
 }
 
 function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
