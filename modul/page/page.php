@@ -246,6 +246,7 @@ function _pasDefine() {//установка флага включения управления страницей PAS: pag
 
 	define('PAS', APP_ID && $pas);
 }
+/*
 function _pageSetupAppPage() {//управление страницами приложения
 	$arr = array();
 	foreach(_page() as $id => $r) {
@@ -304,6 +305,7 @@ function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
 
 	return $send;
 }
+*/
 function _pasMenu() {//строка меню управления страницей
 	if(!PAS)
 		return '';

@@ -831,7 +831,9 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 							$(t.placeholder).width(w);
 						},
 						update:function(e, t) {
-							console.log($(this).nestedSortable('toArray'));
+//							var pos = t.item.parent().attr('id');
+//							t.item.find('a')._dn(!pos, 'b fs14');
+
 							var send = {
 								op:'spisok_23_sort',
 								elem_id:el.id,
@@ -2341,40 +2343,6 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 		});
 	},
 
-	_pageSetupAppPage = function() {//сортировка страниц приложения с учётом уровней
-		$('#page-sort').nestedSortable({
-			forcePlaceholderSize: true,//сохранять размер места, откуда был взят элемент
-			placeholder:'nested-placeholder',//класс, применяемый для подсветки места, откуда взялся элемент
-			handle:'.icon-move',
-//			helper:	'clone',
-			listType:'ol',
-			items:'li',
-//			tolerance:'pointer',
-			toleranceElement:'> div',
-			isTree:true,
-			maxLevels:3,
-//			startCollapsed: false,
-			tabSize:30,//расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
-//			expandOnHover:700,
-//			opacity:1,
-			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
-
-			update:function(e, t) {
-				//определение уровня расположения страницы. Если корневой, то выделение жирным
-				var pos = t.item.parent().attr('id');
-				t.item.find('a')._dn(!pos, 'b fs14');
-
-				var send = {
-					op:'page_sort',
-					arr:$(this).nestedSortable('toArray')
-				};
-				_post(send);
-			},
-
-			expandedClass:'pb10',//раскрытый список
-			errorClass:'bg-fcc' //ошибка, если попытка переместить элемент на недоступный уровень
-		});
-	},
 	_pageUserAccess = function(el, i) {
 		if(i == 'get') {
 			var user_id = _num($('#access-user-id').val()),
