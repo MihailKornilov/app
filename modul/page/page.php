@@ -1047,7 +1047,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			$send = '';
 
-			foreach(_ids($el['txt_2'], 1) as $elem_id) {
+			$ids = _ids($el['txt_2'], 1);
+			foreach($ids as $n => $elem_id) {
 				$elem = $elemArr[$elem_id];
 				switch($elem['dialog_id']) {
 					//многострочное поле
@@ -1059,6 +1060,26 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						if(empty($unit[$elem['col']]))
 							return '';
 						$txt = $unit[$elem['col']];
+						if($n) {
+							$el0 = $elemArr[$ids[0]];
+							if($el0['dialog_id'] == 29)
+								if($el0['num_5']) {//вывод значения по уровням
+
+
+									if($parent_id = $unit['parent_id'])
+										while($parent_id) {
+											$sql = "SELECT *
+													FROM `_spisok`
+													WHERE `id`=".$parent_id;
+											if(!$u = query_assoc($sql))
+												break;
+											$txt = $u[$elem['col']].' » '.$txt;
+											$parent_id = $u['parent_id'];
+										}
+
+
+								}
+						}
 //						$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
 						$txt = _spisokUnitUrl($el, $unit, $txt);
 						$send .= _br($txt);
