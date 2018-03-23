@@ -893,7 +893,7 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 				  "._spisokJoin($dialog)."
 			WHERE ".$cond."
 			ORDER BY ".(isset($field['sort']) ? "`sort`," : '')."`id` DESC
-			LIMIT 50";
+			".($cmp['num_5'] ? '' : "LIMIT 50");//если включён учёт списка по уровням
 	if(!$spisok = query_arr($sql))
 		return array();
 
@@ -915,8 +915,9 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 			$S[$n]['cnnAss'] = query_ass($sql);
 		}
 
-	$send = array();
-	foreach($spisok as $r) {
+	//предварительное формирование списка
+	$mass = array();
+	foreach($spisok as $id => $r) {
 		$title = 'значение не настроено';
 		if($S[0]['col0']) {
 			$title = $r[$S[0]['col0']];
@@ -934,9 +935,39 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 			$content = '<div class="fs11 grey">'.$content.'</div>';
 
 		$u = array(
-			'id' => _num($r['id']),
+			'parent_id' => $r['parent_id'],
 			'title' => $title,
-			'content' => $title.$content
+			'content' => $content
+		);
+
+		$mass[$id] = $u;
+	}
+
+	$send = array();
+	foreach($mass as $id => $r) {
+		$title = $r['title'];
+		$content = $r['content'];
+
+		if($cmp['num_5']) {
+			if($parent_id = $r['parent_id']) {
+				$level = 0;
+				while($parent_id) {
+					if(empty($mass[$parent_id]))
+						break;
+					$title = $mass[$parent_id]['title'].' » '.$title;
+					$parent_id = $mass[$parent_id]['parent_id'];
+					$level++;
+				}
+				$content = '<div style="margin-left:'.($level * 25).'px">'.$r['title'].'</div>'.$content;
+			} else
+				$content = '<div class="fs14 b">'.$r['title'].'</div>'.$content;
+		} else
+			$content = $title.$content;
+
+		$u = array(
+			'id' => _num($id),
+			'title' => $title,
+			'content' => $content
 		);
 		if($v) {
 			$txt = utf8($u['content']);
