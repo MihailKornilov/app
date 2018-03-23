@@ -296,7 +296,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$cls = $cls ? ' class="'.$cls.'"' : '';
 					$TR .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
 				}
-//				$TR .= '<td>'.$sp['parent_id'];
 				$MASS[$sp['id']] = $TR;
 			}
 
@@ -321,12 +320,10 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			$END = !$next && !$ELEM['num_6'] ? $TABLE_END : '';
 
 			if($ELEM['num_6']) {//включено условие сортировки
-
 				if($ELEM['num_7'] > 1) {
 					$child = array();
 					foreach($spisok as $id => $r)
 						$child[$r['parent_id']][$id] = $r;
-//return _pr($child);
 					$TR = _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child);
 				} else {
 					$TR = '';
@@ -339,55 +336,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				}
 			} else
 				$TR = implode('', $MASS);
-
-/*
-			$html = !$next && !$ELEM['num_6'] ? '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">' : '';
-
-			//отображение названий колонок
-			if(!$next && $ELEM['num_5']) {
-				if($ELEM['num_6'])
-					$html .= '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">';
-				$html .= '<tr>';
-				foreach($tabCol as $tr)
-					$html .= '<th style="width:'.$tr['width'].'px">'.$tr['txt_7'];
-				if($ELEM['num_6'])
-					$html .= '</table>';
-			}
-
-			if($ELEM['num_6'])
-				$html .= '<ol>';
-
-			foreach($spisok as $sp) {
-				if($ELEM['num_6'])
-					$html .= '<li id="sp_'.$sp['id'].'">'.
-								'<table class="_stab mt1 curM'._dn(!$ELEM['num_3'], 'small').'">';
-				$html .= '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
-				foreach($tabCol as $td) {
-					$cls = array();
-					switch($td['dialog_id']) {
-						case 34: $cls[] = 'pad0'; //иконки управления
-						default:
-							$txt = _elemUnit($td, $sp);
-							$txt = _spisokUnitUrl($td, $sp, $txt);
-							break;
-					}
-					$cls[] = $td['font'];
-					$cls[] = $td['color'];
-					$cls[] = $td['txt_8'];//pos - позиция
-					$cls = array_diff($cls, array(''));
-					$cls = implode(' ', $cls);
-					$cls = $cls ? ' class="'.$cls.'"' : '';
-					$html .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
-				}
-				if($ELEM['num_6']) {
-					$html .= '<td>'.$sp['parent_id'].'</table>';
-					$html .= '</li>';
-				}
-			}
-
-			if($ELEM['num_6'])
-				$html .= '</ol>';
-*/
 
 			return $BEGIN.$TR.$END;
 
