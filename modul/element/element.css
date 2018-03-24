@@ -1123,6 +1123,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	width:25px;
 	font-size:18px;
 	color:#ccc;
+	padding-top:2px;
 	text-align:center;
 	cursor:pointer;
 }
