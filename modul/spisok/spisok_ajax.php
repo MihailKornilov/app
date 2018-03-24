@@ -198,6 +198,10 @@ switch(@$_POST['op']) {
 			query($sql);
 		}
 
+		//обновление количеств, если присутствуют
+		foreach($dialog['cmp'] as $r)
+			_spisokUnitUpd54($r);
+
 		jsonSuccess();
 		break;
 }
@@ -1288,6 +1292,30 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (пр
 			$n = 1000;
 			$upd = array();
 		}
+	}
+
+	//обновление сумм родительских значений, если есть дочерние
+	if(!isset($DSrc['field1']['parent_id']))
+		return;
+
+	$sql = "SELECT DISTINCT `parent_id`
+			FROM `"._baseTable($DSrc['table_1'])."`
+			WHERE `dialog_id`=".$BL['obj_id']."
+			  AND `parent_id`";
+	if(!$ids = query_ids($sql))
+		return;
+
+	foreach(_ids($ids, 1) as $id) {
+		$sql = "SELECT SUM(`".$unit['col']."`)
+				FROM `"._baseTable($DSrc['table_1'])."`
+				WHERE `parent_id`=".$id;
+		$count = query_value($sql);
+		$count += empty($ass[$id]) ? 0 : $ass[$id];
+
+		$sql = "UPDATE `"._baseTable($DSrc['table_1'])."`
+				SET `".$unit['col']."`=".$count."
+				WHERE `id`=".$id;
+		query($sql);
 	}
 }
 function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
