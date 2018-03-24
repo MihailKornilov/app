@@ -868,10 +868,11 @@ function _spisokCond78($el) {//фильтр-меню
 	if(!$v)
 		return '';
 
-	if(!$EL = _elemQuery($filter['num_1']))//элемент, размещающий список
+/*	if(!$EL = _elemQuery($filter['num_1']))//элемент, размещающий список
 		return '';
-	if(!$dialog_id = $EL['num_1'])//id диалога-списка
+	if(!$dialog_id = $EL['num_1'])//id диалога-списка, к которому применяется фильтр
 		return '';
+*/
 	if(!$elem_id = $filter['num_2'])//id элемента, содержащего значения
 		return '';
 	if(!$ell = _elemQuery($elem_id))//элемент, размещающий список
@@ -885,7 +886,30 @@ function _spisokCond78($el) {//фильтр-меню
 	if(!$col = $el0['col'])//колонка, которая участвует в фильтре
 		return '';
 
-	return " AND `".$col."`=".$v;
+	//если значение родительское, добавление дочерних ids
+	$c = count($ids) - 1;
+	$elem_id = $ids[$c];
+
+	if(!$EL = _elemQuery($elem_id))//значение отсутствует
+		return '';
+	if(!$BL = $EL['block'])//нет блока
+		return '';
+	if($BL['obj_name'] != 'dialog')//блок не из диалога
+		return '';
+	if(!$dialog_id = $BL['obj_id'])//нет ID диалога
+		return '';
+	if(!$dialog = _dialogQuery($dialog_id))//нет диалога
+		return '';
+
+	if(isset($dialog['field1']['parent_id'])) {
+		$sql = "SELECT `id`
+				FROM `"._baseTable($dialog['table_1'])."`
+				WHERE `parent_id`=".$v;
+		if($ids = query_ids($sql))
+			$v .= ','.$ids;
+	}
+
+	return " AND `".$col."` IN (".$v.")";
 }
 function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)

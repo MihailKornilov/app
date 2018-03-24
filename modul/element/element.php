@@ -1700,11 +1700,13 @@ function _filterMenu($el) {//фильтр-меню
 		return _emptyMin('Фильтр-меню: пустое меню.');
 
 	$send = '';
+	$v = _spisokFilter('v', $el['id']);
 	foreach($arr as $r) {
 		$b = $r['parent_id'] ? ' ml20' : ' b fs14';
 		$bCount = $r['parent_id'] ? '' : ' b';
+		$sel = $v == $r['id'] ? ' sel' : '';
 		$send .=
-			'<div class="fm-unit'.$b.'" val="'.$r['id'].'">'.
+			'<div class="fm-unit'.$b.$sel.'" val="'.$r['id'].'">'.
 				$r[$col].
 				($colCount ? '<span class="ml10 pale'.$bCount.'">'.$r[$colCount].'</span>' : '').
 			'</div>';
