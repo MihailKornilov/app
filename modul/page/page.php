@@ -1407,11 +1407,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 										return _emptyMin('Отсутствует id элемента, размещающего select');
 									if(!$el31 = _elemQuery($el31_id))
 										return _emptyMin('Отсутствует элемент, размещающий select');
-									if($el31['dialog_id'] == 29 && $el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-связку [29]
+									if($el31['dialog_id'] == 24 && $el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-связку [29]
 										if(!$ell = _elemQuery($dialog_id))
 											return _emptyMin('...');
 										$dialog_id = _num($ell['block']['obj_id']);
-										echo $dialog_id;
 									}
 									if($el31['dialog_id'] == 24 && $el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-выбор списка [24]
 										if(!$ell = _elemQuery($dialog_id))
