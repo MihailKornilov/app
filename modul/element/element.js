@@ -1451,6 +1451,21 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						}
 					});
 					return;
+				//Фильтр-меню
+				case 78:
+					var FM = $(el.attr_el).find('.fm-unit');
+					FM.click(function() {
+						var t = $(this),
+							sel = t.hasClass('sel');
+						FM.removeClass('sel');
+						if(!sel)
+							t.addClass('sel');
+							if(!FILTER[el.num_1])
+								FILTER[el.num_1] = {};
+							FILTER[el.num_1][el.id] = sel ? 0 : t.attr('val')
+							_spisokUpdate(el.num_1);
+					});
+					return;
 			}
 		});
 

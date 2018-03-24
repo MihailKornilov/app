@@ -1113,3 +1113,36 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	padding-left:27px;
 	background-color:transparent;
 }
+
+
+
+
+
+/* Фильтр-меню [78] */
+.fm-unit{padding:4px 7px;cursor:pointer}
+.fm-unit:not(.sel):hover{background-color:#E8ECF0}
+.fm-unit.sel{background-color:#CEDCEA}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

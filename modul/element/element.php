@@ -1677,7 +1677,15 @@ function _filterMenu($el) {//фильтр-меню
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin('Фильтр-меню: нет диалога.');
 
-	$col = $EL['col'];
+	$col = $EL['col'];//колонка текстового значения
+	$colCount = '';//колонка значения количества
+	if($el3 = _elemQuery($el['num_3']))
+		if($ids = _ids($el3['txt_2'], 1)) {
+			$c = count($ids) - 1;
+			$elem_id = $ids[$c];
+			if($EL3 = _elemQuery($elem_id))
+				$colCount = $EL3['col'];
+		}
 
 	$cond = " `id`";
 	if(isset($dialog['field1']['deleted']))
@@ -1694,7 +1702,12 @@ function _filterMenu($el) {//фильтр-меню
 	$send = '';
 	foreach($arr as $r) {
 		$b = $r['parent_id'] ? ' ml20' : ' b fs14';
-		$send .= '<div class="over1 curP pt3 pb3 pl5 pr5'.$b.'">'.$r[$col].'</div>';
+		$bCount = $r['parent_id'] ? '' : ' b';
+		$send .=
+			'<div class="fm-unit'.$b.'" val="'.$r['id'].'">'.
+				$r[$col].
+				($colCount ? '<span class="ml10 pale'.$bCount.'">'.$r[$colCount].'</span>' : '').
+			'</div>';
 	}
 
 	return $send;

@@ -681,6 +681,7 @@ function _spisokCond($el) {//формирование строки с услови€ми поиска
 	$cond .= _spisokCond52($el);
 	$cond .= _spisokCond62($el);
 	$cond .= _spisokCond77($el);
+	$cond .= _spisokCond78($el);
 
 	return $cond;
 }
@@ -849,6 +850,42 @@ function _spisokCond77($el) {//фильтр-календарь
 		return " AND `dtime_add` LIKE '".$v."%'";
 
 	return " AND `dtime_add`>='".$ex[0]." 00:00:00' AND `dtime_add`<='".$ex[1]." 23:59:59'";
+}
+function _spisokCond78($el) {//фильтр-меню
+	$filter = false;
+	$v = '';
+
+	//поиск элемента-фильтра-меню
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 78) {
+			$filter = $r['elem'];
+			$v = $r['v'];
+			break;
+		}
+
+	if(!$filter)
+		return '';
+	if(!$v)
+		return '';
+
+	if(!$EL = _elemQuery($filter['num_1']))//элемент, размещающий список
+		return '';
+	if(!$dialog_id = $EL['num_1'])//id диалога-списка
+		return '';
+	if(!$elem_id = $filter['num_2'])//id элемента, содержащего значени€
+		return '';
+	if(!$ell = _elemQuery($elem_id))//элемент, размещающий список
+		return '';
+	if(!$ids = _ids($ell['txt_2'], 1))//значени€, составл€ющие содержание фильтра
+		return '';
+	if(!$el0_id = $ids[0])//id элемента, на который указывает значение
+		return '';
+	if(!$el0 = _elemQuery($el0_id))//сам элемент
+		return '';
+	if(!$col = $el0['col'])//колонка, котора€ участвует в фильтре
+		return '';
+
+	return " AND `".$col."`=".$v;
 }
 function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка дл€ св€зки (dialog_id:29)
 	if(!$cmp_id)
