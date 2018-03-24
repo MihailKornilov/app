@@ -1498,14 +1498,6 @@ function _filterCalendarDays($el, $mon) {//отметка дней в календаре, по которым 
 	return query_ass($sql);
 }
 
-
-
-
-
-
-
-
-
 function _calendarFilter($data=array()) {
 	$data = array(
 		'upd' => empty($data['upd']), // Обновлять существующий календать? (при перемотке масяцев)
@@ -1663,7 +1655,50 @@ function _period($v=0, $action='get') {// Формирование периода для элементов мас
 
 
 
+function _filterMenu($el) {//фильтр-меню
+	if(!$el['num_2'])
+		return _emptyMin('Фильтр-меню: отсутствует ID элемента, содержащий значения.');
+	if(!$ell = _elemQuery($el['num_2']))
+		return _emptyMin('Фильтр-меню: отсутствует элемент, содержащий значения.');
+	if(!$ids = _ids($ell['txt_2'], 1))
+		return _emptyMin('Фильтр-меню: отсутствуют ID значений.');
 
+	$c = count($ids) - 1;
+	$elem_id = $ids[$c];
+
+	if(!$EL = _elemQuery($elem_id))
+		return _emptyMin('Фильтр-меню: значение отсутствует.');
+	if(!$BL = $EL['block'])
+		return _emptyMin('Фильтр-меню: нет блока.');
+	if($BL['obj_name'] != 'dialog')
+		return _emptyMin('Фильтр-меню: блок не из диалога.');
+	if(!$dialog_id = $BL['obj_id'])
+		return _emptyMin('Фильтр-меню: нет ID диалога.');
+	if(!$dialog = _dialogQuery($dialog_id))
+		return _emptyMin('Фильтр-меню: нет диалога.');
+
+	$col = $EL['col'];
+
+	$cond = " `id`";
+	if(isset($dialog['field1']['deleted']))
+		$cond .= " AND !`deleted`";
+	if(isset($dialog['field1']['dialog_id']))
+		$cond .= " AND `dialog_id`=".$dialog_id;
+	$sql = "SELECT *
+			FROM `"._baseTable($dialog['table_1'])."`
+			WHERE ".$cond."
+			ORDER BY `sort`,`id`";
+	if(!$arr = query_arr($sql))
+		return _emptyMin('Фильтр-меню: пустое меню.');
+
+	$send = '';
+	foreach($arr as $r) {
+		$b = $r['parent_id'] ? ' ml20' : ' b fs14';
+		$send .= '<div class="over1 curP pt3 pb3 pl5 pr5'.$b.'">'.$r[$col].'</div>';
+	}
+
+	return $send;
+}
 
 
 
