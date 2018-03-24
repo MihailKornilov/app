@@ -868,11 +868,6 @@ function _spisokCond78($el) {//фильтр-меню
 	if(!$v)
 		return '';
 
-/*	if(!$EL = _elemQuery($filter['num_1']))//элемент, размещающий список
-		return '';
-	if(!$dialog_id = $EL['num_1'])//id диалога-списка, к которому применяется фильтр
-		return '';
-*/
 	if(!$elem_id = $filter['num_2'])//id элемента, содержащего значения
 		return '';
 	if(!$ell = _elemQuery($elem_id))//элемент, размещающий список

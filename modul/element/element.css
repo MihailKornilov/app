@@ -1119,6 +1119,14 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 /* Фильтр-меню [78] */
+.fm-plus{
+	width:25px;
+	font-size:18px;
+	color:#ccc;
+	text-align:center;
+	cursor:pointer;
+}
+.fm-plus:hover{background-color:#E8ECF0;color:#999}
 .fm-unit{padding:4px 7px;cursor:pointer}
 .fm-unit:not(.sel):hover{background-color:#E8ECF0}
 .fm-unit.sel{background-color:#CEDCEA}

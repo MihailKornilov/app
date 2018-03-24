@@ -1701,17 +1701,50 @@ function _filterMenu($el) {//фильтр-меню
 
 	$send = '';
 	$v = _spisokFilter('v', $el['id']);
-	foreach($arr as $r) {
-		$b = $r['parent_id'] ? ' ml20' : ' b fs14';
+
+	$spisok = array();
+	foreach($arr as $r)
+		$spisok[$r['parent_id']][] = $r;
+
+	foreach($spisok[0] as $r) {
+		$child = '';
+		$child_sel = false;//список будет раскрыт, если в нЄм был выбранное значение
+		if(!empty($spisok[$r['id']]))
+			foreach($spisok[$r['id']] as $c) {
+				$sel = $v == $c['id'] ? ' sel' : '';
+				if($sel)
+					$child_sel = true;
+				$child .= '<div class="fm-unit'.$sel.'" val="'.$c['id'].'">'.
+							$c[$col].
+							($colCount ? '<span class="ml10 pale b">'.$c[$colCount].'</span>' : '').
+						'</div>';
+			}
+
+		$sel = $v == $r['id'] ? ' sel' : '';
+		$send .=
+			'<table class="w100p">'.
+				'<tr>'.
+		  ($child ? '<td class="fm-plus">'.($child_sel ? '-' : '+') : '<td class="w25">').//Ч
+					'<td><div class="fm-unit b fs14'.$sel.'" val="'.$r['id'].'">'.
+							$r[$col].
+							($colCount ? '<span class="ml10 pale b">'.$r[$colCount].'</span>' : '').
+						'</div>'.
+			'</table>'.
+			($child ? '<div class="ml40'._dn($child_sel).'">'.$child.'</div>' : '');
+	}
+/*
+	foreach($spisok[0] as $r) {
+		$b = $r['parent_id'] ? ' ml30' : ' b fs14';
 		$bCount = $r['parent_id'] ? '' : ' b';
 		$sel = $v == $r['id'] ? ' sel' : '';
 		$send .=
+			(!$r['parent_id'] ? '<div class="fl fs15 b pale mr5 mt3">+</div> ' : '').
 			'<div class="fm-unit'.$b.$sel.'" val="'.$r['id'].'">'.
 				$r[$col].
 				($colCount ? '<span class="ml10 pale'.$bCount.'">'.$r[$colCount].'</span>' : '').
 			'</div>';
 	}
-
+*/
 	return $send;
 }
 

@@ -1454,6 +1454,13 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				//Фильтр-меню
 				case 78:
 					var FM = $(el.attr_el).find('.fm-unit');
+					$(el.attr_el).find('.fm-plus').click(function() {
+						var t = $(this),
+							plus = t.html() == '+',
+							div = _parent(t, 'TABLE').next();
+						div['slide' + (plus ? 'Down' : 'Up')](200);
+						t.html(plus ? '-' : '+');
+					});
 					FM.click(function() {
 						var t = $(this),
 							sel = t.hasClass('sel');
