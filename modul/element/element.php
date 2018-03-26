@@ -562,7 +562,7 @@ function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списк
 
 	return $send;
 }
-function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка через AJAX
+function _dialogSelArray($v=false) {//список диалогов для Select - отправка через AJAX
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id` IN (".APP_ID.(SA ? ',0' : '').")
@@ -572,8 +572,12 @@ function _dialogSelArray($sa_only=0) {//список диалогов для Select - отправка че
 		return array();
 
 	$spisok = array();
+	$sa_only = $v == 'sa_only';
 	$saFlag = $sa_only;
+	$skip = _num($v);//id диалога, который нужно пропустить
 	foreach($arr as $r) {
+		if($r['id'] == $skip)
+			continue;
 		if(!$saFlag && !$r['app_id']) {//вставка графы для SA
 			$spisok[] = array(
 				'info' => 1,

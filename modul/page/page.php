@@ -376,10 +376,11 @@ function _pageUserShow($el, $unit) {//отображение страниц, доступных пользовател
 		return _emptyMin('Отсутствует id пользователя.');
 
 	//доступ в преложние
-	$sql = "SELECT `access`
-			FROM `_user_app`
+	$sql = "SELECT `num_1`
+			FROM `_spisok`
 			WHERE `app_id`=".APP_ID."
-			  AND `user_id`=".$unit['id']."
+			  AND `dialog_id`=1011
+			  AND `connect_1`=".$unit['id']."
 			LIMIT 1";
 	if(!query_value($sql))
 		return '<div class="_empty min mar10 red">Вход в приложение запрещён.</div>';
@@ -428,12 +429,13 @@ function _pageUserShowSpisok($arr, $parent_id=0) {//список страниц для настройки
 function _pageUserAccessAll() {//настройка входа в приложение всем пользователям (подключение через [12])
 	$sql = "SELECT
 				`u`.*,
-				`ua`.`access`
+				`ua`.`num_1`
 			FROM
 				`_user` `u`,
-				`_user_app` `ua`
+				`_spisok` `ua`
 			WHERE `ua`.`app_id`=".APP_ID."
-			  AND `u`.`id`=`ua`.`user_id`
+			  AND `u`.`id`=`ua`.`connect_1`
+			  AND `ua`.`dialog_id`=1011
 			ORDER BY `ua`.`dtime_add`";
 	if(!$user = query_arr($sql))
 		return _emptyMin('Сотрудников нет.');
@@ -447,7 +449,7 @@ function _pageUserAccessAll() {//настройка входа в приложение всем пользователям
 				'<td class="w35">'.
 					_check(array(
 						'attr_id' => 'allAcc_'.$r['id'],
-						'value' => $r['access']
+						'value' => $r['num_1']
 					));
 
 	$send .= '</table>';
@@ -2091,11 +2093,23 @@ function userImageMove() {//перенос аватарок пользователей в изображения
 		query($sql);
 
 		$image_id = query_insert_id('_image');
+
 		$sql = "UPDATE `_user`
-				SET `ava`='',
-					`image_ids`=".$image_id."
+				SET `ava`=''
 				WHERE `id`=".$r['id'];
 		query($sql);
+
+		$sql = "SELECT `id`
+				FROM `_spisok`
+				WHERE `app_id`=".APP_ID."
+				  AND `dialog_id`=1011
+				  AND `connect_1`=".$r['id'];
+		if($spisok_id = query_value($sql)) {
+			$sql = "UPDATE `_spisok`
+					SET `image_1`=".$image_id."
+					WHERE `id`=".$spisok_id;
+			query($sql);
+		}
 	}
 }
 

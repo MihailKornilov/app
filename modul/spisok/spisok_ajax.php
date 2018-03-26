@@ -255,10 +255,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	_spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id);
 
 	//получение обновлённых данных единицы списка
-	$sql = "SELECT *
-			FROM `"._baseTable($dialog['table_1'])."`
-			WHERE `id`=".$unit_id;
-	$unit = $dialog['table_1'] ? query_assoc($sql) : array();
+	$unit = _spisokUnitQuery($dialog, $unit_id);
 
 	if(IS_ELEM)
 		if($bl = _blockQuery($unit['block_id']))
@@ -328,7 +325,13 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	return $send;
 }
 function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалога
-	if(!$dialog['table_1'])
+	$dlgParent = $dialog;
+
+	if($parent_id = $dialog['dialog_parent_id'])
+		if(!$dlgParent = _dialogQuery($parent_id))
+			return array();
+
+	if(!$dlgParent['table_1'])
 		return array();
 
 	$POST_CMP = @$_POST['cmp'];
@@ -352,7 +355,7 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 				'text' => utf8('Отсутствует имя колонки в компоненте id'.$cmp_id)
 			));
 */
-		if(!isset($dialog['field1'][$col]) && !isset($dialog['field2'][$col]))
+		if(!isset($dlgParent['field1'][$col]) && !isset($dlgParent['field2'][$col]))
 			jsonError('В таблице отсутствует колонка с именем "'.$col.'"');
 
 		$v = _txt($val);
@@ -484,6 +487,32 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 				query($sql);
 				continue;
 			}
+			if($field == 'dialog_id') {
+				$sql = "UPDATE `"._baseTable($dialog['table_2'])."`
+						SET `dialog_id`=".$dialog['id']."
+						WHERE `id`=".$unit_2;
+				query($sql);
+				continue;
+			}
+			if($field == 'num') {//установка порядкового номера
+				$sql = "SELECT IFNULL(MAX(`num`),0)+1
+						FROM `"._baseTable($dialog['table_2'])."`
+						WHERE `app_id`=".APP_ID."
+						  AND `dialog_id`=".$dialog['id'];
+				$num = query_value($sql);
+				$sql = "UPDATE `"._baseTable($dialog['table_2'])."`
+						SET `num`=".$num."
+						WHERE `id`=".$unit_2;
+				query($sql);
+				continue;
+			}
+			if($field == 'user_id_add') {
+				$sql = "UPDATE `"._baseTable($dialog['table_2'])."`
+						SET `user_id_add`=".USER_ID."
+						WHERE `id`=".$unit_2;
+				query($sql);
+				continue;
+			}
 		}
 	}
 
@@ -555,7 +584,12 @@ function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: очистка `def`, 
 	}
 }
 function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компонентов единицы списка
-	if(!$dialog['table_1'])
+	$dlgParent = $dialog;
+	if($parent_id = $dialog['dialog_parent_id'])
+		if(!$dlgParent = _dialogQuery($parent_id))
+			return;
+
+	if(!$dlgParent['table_1'])
 		return;
 	if(empty($POST_CMP))
 		return;
@@ -574,6 +608,9 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 					if($el['block']['obj_name'] == 'dialog')
 						if($dlg = _dialogQuery($el['block']['obj_id'])) {
 
+							if($parent_id = $dlg['dialog_parent_id'])
+								$dlg = _dialogQuery($parent_id);
+
 							if(isset($dlg['field1'][$v]))
 								$num = 1;
 							else
@@ -583,8 +620,6 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 									$v = '';
 
 						}
-
-
 
 			$update1[] = "`table_num`=".$num;
 		}
@@ -596,20 +631,27 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 	}
 
 	if(!empty($update1)) {
-		$sql = "UPDATE `"._baseTable($dialog['table_1'])."`
+		$sql = "UPDATE `"._baseTable($dlgParent['table_1'])."`
 				SET ".implode(',', $update1)."
 				WHERE `id`=".$unit_id;
 		query($sql);
 	}
 
 	if(!empty($update2)) {
+		$field2 = $dlgParent['field2'];
+
+		$cond = "`".$dlgParent['table_2_field']."`=".$unit_id;
+		if(isset($field2['app_id']))
+			$cond .= " AND `app_id`=".APP_ID;
+		if(isset($field2['dialog_id']))
+			$cond .= " AND `dialog_id`=".$dlgParent['id'];
+
 		$sql = "SELECT `id`
-				FROM `"._baseTable($dialog['table_2'])."`
-				WHERE `app_id`=".APP_ID."
-				  AND `".$dialog['table_2_field']."`=".$unit_id."
+				FROM `"._baseTable($dlgParent['table_2'])."`
+				WHERE ".$cond."
 				LIMIT 1";
 		if($unit_2 = _num(query_value($sql))) {
-			$sql = "UPDATE `"._baseTable($dialog['table_2'])."`
+			$sql = "UPDATE `"._baseTable($dlgParent['table_2'])."`
 					SET ".implode(',', $update2)."
 					WHERE `id`=".$unit_2;
 			query($sql);
@@ -1139,10 +1181,11 @@ function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страница
 	}
 
 	//отключение входа в приложение, если нужно
-	$sql = "SELECT `access`
-			FROM `_user_app`
+	$sql = "SELECT `num_1`
+			FROM `_spisok`
 			WHERE `app_id`=".APP_ID."
-			  AND `user_id`=".$user_id;
+			  AND `connect_1`=".$user_id."
+			LIMIT 1";
 	if(!_num(query_value($sql))) {
 		$sql = "UPDATE `_user_auth`
 				SET `app_id`=0
@@ -1156,17 +1199,19 @@ function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страница
 	_cache('clear', '_userCache'.$user_id);
 }
 function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
-	$sql = "UPDATE `_user_app`
-			SET `access`=0
-			WHERE `app_id`=".APP_ID;
+	$sql = "UPDATE `_spisok`
+			SET `num_1`=0
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=1011";
 	query($sql);
 
 	$ids = _ids($val);
 
-	$sql = "UPDATE `_user_app`
-			SET `access`=1
+	$sql = "UPDATE `_spisok`
+			SET `num_1`=1
 			WHERE `app_id`=".APP_ID."
-			  AND `user_id` IN (".$ids.")";
+			  AND `dialog_id`=1011
+			  AND `connect_1` IN (".$ids.")";
 	query($sql);
 
 	$sql = "UPDATE `_user_auth`
@@ -1179,10 +1224,11 @@ function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в прило
 	_cache('clear', '_pageCache');
 
 	$sql = "SELECT *
-			FROM `_user_app`
-			WHERE `app_id`=".APP_ID;
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=1011";
 	foreach(query_arr($sql) as $r)
-		_cache('clear', '_userCache'.$r['user_id']);
+		_cache('clear', '_userCache'.$r['connect_1']);
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
 	if(!isset($unit['dialog_id']))
@@ -1610,7 +1656,6 @@ function _spisokUnitBalans29($elUpd) {
 		}
 	}
 }
-
 
 
 

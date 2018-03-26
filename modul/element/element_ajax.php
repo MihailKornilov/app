@@ -180,6 +180,8 @@ switch(@$_POST['op']) {
 									'title' => 'диалог вносит данные для списка',
 									'value' => $dialog['spisok_on']
 							   )).
+					'<tr><td class="grey r">Родительский диалог:'.
+						'<td><input type="hidden" id="dialog_parent_id" value="'.$dialog['dialog_parent_id'].'" />'.
 				'</table>'.
 			'</div>'.
 
@@ -333,7 +335,8 @@ switch(@$_POST['op']) {
 		$send['tables'] = SA ? _baseTable() : array();
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
-		$send['dialog_spisok'] = SA ? utf8(_dialogSelArray(true)) : array() ;
+		$send['dialog_spisok'] = SA ? utf8(_dialogSelArray('sa_only')) : array() ;
+		$send['dialog_parent'] = utf8(_dialogSelArray($dialog_id));
 
 		jsonSuccess($send);
 		break;
@@ -630,6 +633,10 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	if($spisok_on && !$name)
 		jsonError('Укажите имя диалогового окна');
 
+	$dialog_parent_id = _num($_POST['dialog_parent_id']);
+	if($dialog_parent_id == $dialog_id)
+		jsonError('Диалог не может быть родительским для себя');
+
 	$width_auto = _num($_POST['width_auto']);
 	$cmp_no_req = _num($_POST['cmp_no_req']);
 	$app_any = _num($_POST['app_any']);
@@ -678,6 +685,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`del_action_id`=".$del_action_id.",
 				`del_action_page_id`=".$del_action_page_id.",
 
+				`dialog_parent_id`=".$dialog_parent_id.",
 				`table_1`=".$table_1.",
 				`table_2`=".$table_2.",
 				`table_2_field`='".addslashes($table_2_field)."',
@@ -719,13 +727,23 @@ function _dialogOpenLoad($dialog_id) {
 	$unit = array();
 	$unit_id = _num(@$_POST['unit_id'], 1);
 	if($unit_id > 0) {
+		$dlg = $dialog;
+		if($parent_id = $dialog['dialog_parent_id'])
+			$dlg = _dialogQuery($parent_id);
+
 		$cond = "`t1`.`id`=".$unit_id;
-		if(isset($dialog['field1']['app_id']))
+//		$cond .= _spisokCondDef($dialog_id);
+		if(isset($dlg['field1']['app_id']))
 			$cond .= " AND `app_id` IN (0,".APP_ID.")";
 
-		$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
-				FROM `"._baseTable($dialog['table_1'])."` `t1`
-				"._spisokJoin($dialog)."
+		if(isset($dlg['field2']['app_id']))
+			$cond .= " AND `t2`.`app_id` IN (0,".APP_ID.")";
+		if(isset($dlg['field2']['dialog_id']))
+			$cond .= " AND `t2`.`dialog_id`=".$dlg['id'];
+
+		$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
+				FROM `"._baseTable($dlg['table_1'])."` `t1`
+				"._spisokJoin($dlg)."
 				WHERE ".$cond;
 		if(!$unit = query_assoc($sql))
 			jsonError('Записи не существует');
@@ -734,7 +752,7 @@ function _dialogOpenLoad($dialog_id) {
 		if(@$unit['deleted'])
 			jsonError('Запись была удалена');
 
-		if(!$block_id && isset($dialog['field1']['block_id']))
+		if(!$block_id && isset($dlg['field1']['block_id']))
 			$block_id = _num($unit['block_id']);
 	}
 
@@ -901,6 +919,12 @@ function _dialogOpenLoad($dialog_id) {
 
 				if(!$colDialog = _dialogQuery($block['obj_id']))
 					break;
+
+				//выбор колонок из родительского диалога
+				if($parent_id = $colDialog['dialog_parent_id'])
+					if(!$colDialog = _dialogQuery($parent_id))
+						break;
+
 
 				//получение используемых колонок
 				$colUse = array();

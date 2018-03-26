@@ -35,10 +35,10 @@ function _auth() {//авторизаци€ через сайт
 				WHERE `code`='".addslashes(CODE)."'
 				LIMIT 1";
 		if($r = query_assoc($sql)) {
-			$sql = "SELECT `access`
-					FROM `_user_app`
-					WHERE `app_id`=".$r['user_id']."
-					  AND `user_id`=".$r['app_id'];
+			$sql = "SELECT `num_1`
+					FROM `_spisok`
+					WHERE `app_id`=".$r['app_id']."
+					  AND `connect_1`=".$r['user_id'];
 			$r['access'] = _num(query_value($sql));
 
 			_cache(array(
@@ -394,8 +394,9 @@ function _app_list() {//список приложений, которые доступны пользователю
 		return '«десь будет размещЄн список приложений.';
 
 	$sql = "SELECT *
-			FROM `_user_app`
-			WHERE `user_id`=".USER_ID."
+			FROM `_spisok`
+			WHERE `connect_1`=".USER_ID."
+			  AND `dialog_id`=1011
 			ORDER BY `dtime_add`";
 	if(!$spisok = query_arr($sql))
 		return 'ѕриложени€ не созданы.';

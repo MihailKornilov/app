@@ -7,9 +7,10 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID приложения');
 
 		$sql = "SELECT *
-				FROM `_user_app`
-				WHERE `user_id`=".USER_ID."
-				  AND `app_id`=".$app_id."
+				FROM `_spisok`
+				WHERE `app_id`=".$app_id."
+				  AND `dialog_id`=1011
+				  AND `connect_1`=".USER_ID."
 				LIMIT 1";
 		if(!$ua = query_assoc($sql))
 			jsonError('Приложения не существует');
@@ -20,12 +21,6 @@ switch(@$_POST['op']) {
 		$sql = "UPDATE `_user_auth`
 				SET `app_id`=".$app_id."
 				WHERE `code`='".CODE."'";
-		query($sql);
-
-		//отметка даты последнего посещения приложения
-		$sql = "UPDATE `_user_app`
-				SET `dtime_last`=CURRENT_TIMESTAMP
-				WHERE `id`=".$ua['id'];
 		query($sql);
 
 		_cache('clear', '_auth');

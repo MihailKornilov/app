@@ -387,6 +387,11 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			title0:'не указан',
 			spisok:o.dialog_spisok
 		});
+		DLG('#dialog_parent_id')._select({
+			width:250,
+			title0:'нет',
+			spisok:o.dialog_parent
+		});
 
 		_dialogHeightCorrect(DLG);
 
@@ -440,6 +445,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				del_action_id:DLG('#del_action_id').val(),
 				del_action_page_id:DLG('#del_action_page_id').val(),
 
+				dialog_parent_id:DLG('#dialog_parent_id').val(),
 				spisok_on:DLG('#spisok_on').val(),
 
 				table_1:DLG('#table_1').val(),

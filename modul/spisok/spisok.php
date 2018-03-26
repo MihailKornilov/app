@@ -103,14 +103,34 @@ function _spisokJoinField($dialog) {//подключение колонок второго списка
 	if(!$dialog['table_2'])
 		return '';
 
-	$send = '';
+	$fields = array();
 	foreach($dialog['cmp'] as $cmp) {
 		if($cmp['table_num'] != 2)
 			continue;
 		if(empty($cmp['col']))
 			continue;
-		$send .= ',`t2`.`'.$cmp['col'].'`';
+		$fields[$cmp['col']] = 1;
 	}
+
+	//используемые колонки из дочерних диалогов
+	$sql = "SELECT `id`
+			FROM `_dialog`
+			WHERE `dialog_parent_id`=".$dialog['id'];
+	if($ids = query_ids($sql))
+		foreach(_ids($ids, 1) as $id) {
+			$dialog = _dialogQuery($id);
+			foreach($dialog['cmp'] as $cmp) {
+				if($cmp['table_num'] != 2)
+					continue;
+				if(empty($cmp['col']))
+					continue;
+				$fields[$cmp['col']] = 1;
+			}
+		}
+
+	$send = '';
+	foreach($fields as $col => $r)
+		$send .= ',`t2`.`'.$col.'`';
 
 	return $send;
 }
@@ -426,17 +446,18 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 }
 
 function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
+	if($parent_id = $dialog['dialog_parent_id'])
+		if(!$dialog = _dialogQuery($parent_id))
+			return array();
+
 	if(!$dialog['table_1'])
 		return array();
 
 	$cond = "`t1`.`id`=".$unit_id;
-	if(isset($dialog['field1']['app_id']) || isset($dialog['field2']['app_id']))
-		$cond .= " AND `app_id`=".APP_ID;
-	if(_baseTable($dialog['table_1']) != '_element' && isset($dialog['field1']['dialog_id']))
-		$cond .= " AND `dialog_id`=".$dialog['id'];
+	$cond .= _spisokCondDef($dialog['id']);
 	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM `"._baseTable($dialog['table_1'])."` `t1`
-			"._spisokJoin($dialog)."
+				  "._spisokJoin($dialog)."
 			WHERE ".$cond;
 	return query_assoc($sql);
 }
@@ -666,19 +687,34 @@ function _spisokColSearchBg($txt, $el, $cmp_id) {//подсветка значения колонки пр
 	return $txt;
 }
 
+function _spisokCondDef($dialog_id) {//условия по умолчанию
+	$dialog = _dialogQuery($dialog_id);
+	$field1 = $dialog['field1'];
+	$field2 = $dialog['field2'];
+
+	$cond = '';
+	if(isset($field1['deleted']))
+		$cond .= " AND !`t1`.`deleted`";
+	if(isset($field1['app_id']))
+		$cond .= " AND `t1`.`app_id` IN (0,".APP_ID.")";
+	if(isset($field1['dialog_id']))
+		$cond .= " AND `t1`.`dialog_id`=".$dialog_id;
+
+	if(isset($field2['deleted']))
+		$cond .= " AND !`t2`.`deleted`";
+	if(isset($field2['app_id']))
+		$cond .= " AND `t2`.`app_id` IN (0,".APP_ID.")";
+	if(isset($field2['dialog_id']))
+		$cond .= " AND `t2`.`dialog_id`=".$dialog_id;
+
+	return $cond;
+}
 function _spisokCond($el) {//формирование строки с условиями поиска
 	//$el - элемент, который размещает список. 14 или 23.
 	//диалог, через который вносятся данные списка
-	$dialog = _dialogQuery($el['num_1']);
-	$field = $dialog['field1'];
 
 	$cond = "`t1`.`id`";
-	if(isset($field['deleted']))
-		$cond = "!`t1`.`deleted`";
-	if(isset($field['app_id']))
-		$cond .= " AND `t1`.`app_id` IN (0,".APP_ID.")";
-	if(isset($field['dialog_id']))
-		$cond .= " AND `t1`.`dialog_id`=".$el['num_1'];
+	$cond .= _spisokCondDef($el['num_1']);
 
 	$cond .= _spisokCondSearch($el);
 	$cond .= _spisokCond52($el);
