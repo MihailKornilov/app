@@ -548,10 +548,13 @@ function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение един
 }
 
 function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
-	if(!$el['url'])//если оборачивать не нужно
+	if(!$el['url'])//оборачивать не нужно
 		return $txt;
 	if(empty($unit['id']))//отсутствует единица списка
 		return $txt;
+
+	if($el['url'] > 1)//указана конкретная страница
+		return '<a href="'.URL.'&p='.$el['url'].'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 
 	$dialog_id = 0;
 
@@ -991,7 +994,7 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 			$content = '<div class="fs11 grey">'.$content.'</div>';
 
 		$u = array(
-			'parent_id' => $r['parent_id'],
+			'parent_id' => isset($field['parent_id']) ? $r['parent_id'] : 0,
 			'title' => $title,
 			'content' => $content
 		);

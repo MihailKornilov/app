@@ -2847,8 +2847,12 @@ $.fn._check = function(o) {
 $.fn._radio = function(o) {
 	var t = $(this),
 		n,
-		attr_id = t.attr('id'),
 		s;
+
+	if(!t.length)
+		return;
+
+	var attr_id = t.attr('id');
 
 	if(!attr_id) {
 		attr_id = 'radio' + Math.round(Math.random() * 100000);
@@ -4029,6 +4033,9 @@ $.fn._select1 = function(o, o1, o2) {
 };
 $.fn._hint = function(o) {//выплывающие подсказки
 	var t = $(this);
+
+	if(!t.length)
+		return;
 
 	//счётчик подсказок. Для удаления именно той подсказки, которая была добавлена
 	if(!window.HINT_NUM)

@@ -486,7 +486,6 @@ function _blockCache($obj_name, $obj_id) {
 		unset($el['sort']);
 		unset($el['user_id_add']);
 		unset($el['dtime_add']);
-		unset($el['page_id']);
 
 		if(!$el['hint_on']) {
 			unset($el['hint_msg']);

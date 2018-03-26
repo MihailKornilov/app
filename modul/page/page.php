@@ -1412,7 +1412,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 											return _emptyMin('...');
 										$dialog_id = _num($ell['block']['obj_id']);
 									}
-									if($el31['dialog_id'] == 24 && $el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-выбор списка [24]
+									if($el31['dialog_id'] != 24 && $el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-выбор списка [24]
 										if(!$ell = _elemQuery($dialog_id))
 											return _emptyMin('....');
 										$dialog_id = _num($ell['num_1']);

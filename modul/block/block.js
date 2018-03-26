@@ -420,26 +420,15 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 					return;
 
 				BLK[EL.block_id].save = 1;
-			})
-			.off('click', '.elem-url')
-			.on('click', '.elem-url', function() {
-				var t = $(this),
-					v = t.hasClass('on') ? 0 : 1;
-				t._dn(!v, 'on');
-				EL.url = v;
-
-				if(EL.attr_tr)//настройка для таблицы, без блоков
-					return;
-
-				BLK[EL.block_id].save = 1;
 			});
+
 		return '<div id="elem-font" class="dib">' +
 			'<div val="b" class="icon-wiki ml3' + font.b + _tooltip('Жирный', -23) + '</div>' +
 			'<div val="i" class="icon-wiki iw1 ml3' + font.i + _tooltip('Наклонный', -31) + '</div>' +
 			'<div val="u" class="icon-wiki iw2 ml3' + font.u + _tooltip('Подчёкнутый', -39) + '</div>' +
 		'</div>' +
 		(EL.url_access ?
-			'<div class="elem-url icon-wiki iw12 ml3' + _dn(EL.url, 'on') + _tooltip('Ссылка', -20) + '</div>'
+			'<div val="dialog_id:79,unit_id:' + EL.id + '" class="icon-wiki iw12 ml3 dialog-open' + _dn(EL.url, 'on') + _tooltip('Настроить ссылку', -53) + '</div>'
 		: '');
 	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста
