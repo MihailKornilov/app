@@ -253,7 +253,7 @@ function _baseTable($id=false) {//таблицы в базе с соответствующими идентификато
 		10 => '_page',
 		11 => '_spisok',
 		12 => '_user',
-		13 => '_user_app',
+//		13 => '_user_app',
 		14 => '_user_auth',
 		15 => '_user_spisok_filter'
 	);
@@ -328,6 +328,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	if($dialog = _cache())
 		return $dialog;
 
+
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id` IN(0,".APP_ID.")
@@ -335,6 +336,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 			  AND `id`=".$dialog_id;
 	if(!$dialog = query_assoc($sql))
 		return array();
+
 
 	//список колонок, присутствующих в таблице 1
 	$field = array();
@@ -354,7 +356,9 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	}
 	$dialog['field2'] = $field;
 
-	_cache('clear', 'dialog_'.$dialog_id);
+//	return _cache($dialog);
+
+//	_cache('clear', 'dialog_'.$dialog_id);
 	$dialog['blk'] = _block('dialog', $dialog_id, 'block_arr');
 	$dialog['cmp'] = _block('dialog', $dialog_id, 'elem_arr');
 
@@ -398,6 +402,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		$dialog['history'][$n]['tmp'] = trim($tmp_txt);
 		$dialog['history'][$n]['tmp_elm'] = $tmp_elm;
 	}
+//echo $dialog_id;exit;
 
 	return _cache($dialog);
 }

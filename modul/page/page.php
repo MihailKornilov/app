@@ -1944,6 +1944,9 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 
 function _page_div() {//todo тест
+
+//	$dlg = _dialogQuery(1003);
+
 	return
 	'<div class="mar20 bor-e8 pad20" id="for-hint">'.
 		'Передний текст '.

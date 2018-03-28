@@ -1246,10 +1246,14 @@ function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (бал
 	if(!$DSrc = _dialogQuery($BL['obj_id']))
 		return;
 
+	$DSRC_JOIN = _spisokJoin($DSrc);
+	$DSRC_COND = _spisokCondDef($BL['obj_id']);
+
 	//предварительное обнуление значений перед обновлением
-	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."`
+	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."` `t1`
+					".$DSRC_JOIN."
 			SET `".$unit['col']."`=0
-			WHERE `dialog_id`=".$BL['obj_id'];
+			WHERE `t1`.`id` ".$DSRC_COND;
 	query($sql);
 
 	if(!$ids = _ids($unit['txt_2']))
@@ -1278,9 +1282,10 @@ function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (бал
 	}
 
 	//процесс обновления
-	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."`
+	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."` `t1`
+					".$DSRC_JOIN."
 			SET `".$unit['col']."`=".$upd."
-			WHERE `dialog_id`=".$BL['obj_id'];
+			WHERE `t1`.`id` ".$DSRC_COND;
 	query($sql);
 }
 function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (при создании элемента)
@@ -1384,10 +1389,14 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 	if(!$DSrc = _dialogQuery($DSrc_id))
 		return;
 
+	$DSRC_JOIN = _spisokJoin($DSrc);
+	$DSRC_COND = _spisokCondDef($DSrc_id);
+
 	//предварительное обнуление значений перед обновлением
-	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."`
+	$sql = "UPDATE `"._baseTable($DSrc['table_1'])."` `t1`
+					".$DSRC_JOIN."
 			SET `".$unit['col']."`=0
-			WHERE `dialog_id`=".$DSrc_id;
+			WHERE `t1`.`id` ".$DSRC_COND;
 	query($sql);
 
 	//получение элемента, который указывает на элемент, сумму значения которого нужно будет считать
@@ -1407,6 +1416,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 				SUM(`".$sum_col."`)
 			FROM `"._baseTable($DConn['table_1'])."`
 			WHERE `dialog_id`=".$dialog_id."
+			  AND `app_id`=".APP_ID."
 			  AND `".$cmp['col']."`
 			  AND !`deleted`
 			GROUP BY `".$cmp['col']."`";
@@ -1417,6 +1427,12 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 	$upd = array();
 	$cAss = count($ass);
 	foreach($ass as $id => $c) {
+		$sql = "UPDATE `"._baseTable($DSrc['table_1'])."` `t1`
+						".$DSRC_JOIN."
+				SET `".$unit['col']."`=".$c."
+				WHERE `t1`.`id`=".$id." ".$DSRC_COND;
+		query($sql);
+/*
 		$upd[] = "(".$id.",".$c.")";
 		if(!--$cAss || !--$n) {
 			$sql = "INSERT INTO `"._baseTable($DSrc['table_1'])."`
@@ -1428,6 +1444,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 			$n = 1000;
 			$upd = array();
 		}
+*/
 	}
 }
 
