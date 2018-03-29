@@ -57,15 +57,16 @@ switch(@$_POST['op']) {
 
 			//обновление кеша объекта, если это элемент
 			if($elem) {
+				_cache('clear', '_elemQuery'.$elem['id']);
 				_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 				_spisokFilter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
 			}
 
 			//обновление кеша объекта, если это страница
-			if(_table($dialog['table_1']) == '_page')
+			if($dialog['table_name_1'] == '_page')
 				_cache('clear', '_pageCache');
 
-			if(_table($dialog['table_1']) == '_element_func')
+			if($dialog['table_name_1'] == '_element_func')
 				if($BL = _blockQuery($unit['block_id']))
 					_cache('clear', $BL['obj_name'].'_'.$BL['obj_id']);
 		}
@@ -86,36 +87,16 @@ switch(@$_POST['op']) {
 		if(!is_array($elem_v))
 			jsonError('Некорректные значения фильров');
 
-
 		foreach($elem_v as $elem_filter => $v) {
 			if(!_num($elem_filter))
 				continue;
-			//получение  сохранённого фильтра для пользователя
-			$sql = "SELECT *
-					FROM `_user_spisok_filter`
-					WHERE `user_id`=".USER_ID."
-					  AND `element_id_spisok`=".$elem_spisok."
-					  AND `element_id_filter`=".$elem_filter;
-			$id = _num(query_value($sql));
 
-			$sql = "INSERT INTO `_user_spisok_filter` (
-						`id`,
-						`user_id`,
-						`element_id_spisok`,
-						`element_id_filter`,
-						`v`
-					) VALUES (
-						".$id.",
-						".USER_ID.",
-						".$elem_spisok.",
-						".$elem_filter.",
-						'".addslashes(_txt($v))."'
-					) ON DUPLICATE KEY UPDATE
-						`v`=VALUES(`v`)";
-			query($sql);
+			_spisokFilter('insert', array(
+				'spisok' => $elem_spisok,
+				'filter' => $elem_filter,
+				'v' => $v
+			));
 		}
-
-		_spisokFilter('cache_clear');
 
 		//элемент количества, привязанный к списку
 		$sql = "SELECT *
@@ -128,7 +109,47 @@ switch(@$_POST['op']) {
 			$send['count_html'] = utf8(_spisokElemCount($elCount));
 		}
 
+		//элемент "очистка фильтра", привязанный к списку
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=80
+				  AND `num_1`=".$elem_spisok."
+				LIMIT 1";
+		if($elClear = query_assoc($sql)) {
+			$send['clear_attr'] = '#cmp_'.$elClear['id'];
+			$send['clear_diff'] = _spisokFilter('diff', $elem_spisok);
+		}
+
 		$send['spisok_attr'] = '#el_'.$elem_spisok;
+		$send['spisok_html'] = utf8(_spisokShow($elSpisok));
+		jsonSuccess($send);
+		break;
+	case 'spisok_filter_clear'://очистка фильтра
+		if(!$spisok_id = _num($_POST['spisok_id']))
+			jsonError('Некорректный ID элемента-списка');
+		if(!$elSpisok = _elemQuery($spisok_id))
+			jsonError('Элемента-списка id'.$spisok_id.' не существует');
+
+		$sql = "UPDATE `_user_spisok_filter`
+				SET `v`=`def`
+				WHERE `user_id`=".USER_ID."
+				  AND `element_id_spisok`=".$spisok_id;
+		query($sql);
+
+		_spisokFilter('cache_clear');
+
+		//элемент количества, привязанный к списку
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=15
+				  AND `num_1`=".$spisok_id."
+				LIMIT 1";
+		if($elCount = query_assoc($sql)) {
+			$send['count_attr'] = '#el_'.$elCount['id'];
+			$send['count_html'] = utf8(_spisokElemCount($elCount));
+		}
+
+		$send['spisok_attr'] = '#el_'.$spisok_id;
 		$send['spisok_html'] = utf8(_spisokShow($elSpisok));
 		jsonSuccess($send);
 		break;
@@ -418,6 +439,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 
 	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
 	if(IS_ELEM && $block_id > 0 && !$unit_id) {
+		_cache('clear', '_blockQuery'.$block_id);
 		if(!$block = _blockQuery($block_id))
 			jsonError('Блока не сущетвует');
 		if($block['elem'])

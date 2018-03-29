@@ -23,7 +23,8 @@ function _spisokFilterCache() {//кеширование фильтров списка
 				continue;
 			$v = array(
 				'elem' => $elFilter[$filter_id],
-				'v' => $r['v']
+				'v' => $r['v'],
+				'def' => $r['def']
 			);
 			$send['spisok'][$spisok_id][$filter_id] = $v;
 			$send['filter'][$filter_id] = $v;
@@ -32,7 +33,7 @@ function _spisokFilterCache() {//кеширование фильтров списка
 
 	return _cache($send);
 }
-function _spisokFilter($i='all', $elem_id=0) {//получение значений фильтров списка
+function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
 	if($i == 'cache_clear') {
 		_cache('clear', '_spisokFilterCache');
 		return true;
@@ -42,20 +43,20 @@ function _spisokFilter($i='all', $elem_id=0) {//получение значений фильтров спис
 
 	//значение конкретного элемента-фильтра
 	if($i == 'v') {
-		if(!$elem_id)
-			return '';
-		if(!isset($F['filter'][$elem_id]))
-			return '';
-		return $F['filter'][$elem_id]['v'];
+		if(!$v)
+			return false;
+		if(!isset($F['filter'][$v]))
+			return false;
+		return $F['filter'][$v]['v'];
 	}
 
 	//список элементов-фильтров для конкретного списка
 	if($i == 'spisok') {
-		if(!$elem_id)
+		if(!$v)
 			return array();
-		if(!isset($F['spisok'][$elem_id]))
+		if(!isset($F['spisok'][$v]))
 			return array();
-		return $F['spisok'][$elem_id];
+		return $F['spisok'][$v];
 	}
 
 	if($i == 'page_js') {//значения фильтров в формате JS по каждому списку во всём приложении
@@ -64,6 +65,58 @@ function _spisokFilter($i='all', $elem_id=0) {//получение значений фильтров спис
 			foreach($arr as $elid => $el)
 				$send[$id][$elid] = $el['v'];
 		return $send;
+	}
+
+	//внесение значение фильтра, если отсутствует
+	if($i == 'insert') {
+		if(!is_array($v))
+			return '';
+		if(empty($v))
+			return '';
+		if(!$spisok = _num(@$v['spisok']))
+			return '';
+		if(!$filter = _num(@$v['filter']))
+			return '';
+		$v = @$v['v'];
+
+		$sql = "SELECT *
+				FROM `_user_spisok_filter`
+				WHERE `user_id`=".USER_ID."
+				  AND `element_id_spisok`=".$spisok."
+				  AND `element_id_filter`=".$filter;
+		$id = _num(query_value($sql));
+
+		$sql = "INSERT INTO `_user_spisok_filter` (
+					`id`,
+					`user_id`,
+					`element_id_spisok`,
+					`element_id_filter`,
+					`v`,
+					`def`
+				) VALUES (
+					".$id.",
+					".USER_ID.",
+					".$spisok.",
+					".$filter.",
+					'".addslashes(_txt($v))."',
+					'".addslashes(_txt($v))."'
+				) ON DUPLICATE KEY UPDATE
+					`v`=VALUES(`v`)";
+		query($sql);
+
+		_spisokFilter('cache_clear');
+	}
+
+	//определение отличия значений от условий по умолчанию
+	if($i == 'diff') {
+		if(!$v)
+			return 0;
+		if(empty($F['spisok'][$v]))
+			return 0;
+		foreach($F['spisok'][$v] as $r)
+			if($r['v'] != $r['def'])
+				return 1;
+		return 0;
 	}
 
 	return $F;

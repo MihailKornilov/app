@@ -1372,19 +1372,11 @@ function _imageWebcam($el) {//Веб-камера (вставляется в блок через [12])
 function _filterCalendar($el) {//Фильтр-календарь
 	if(!$v = _spisokFilter('v', $el['id'])) {
 		$v = _calendarWeek();
-		$sql = "INSERT INTO `_user_spisok_filter` (
-					`user_id`,
-					`element_id_spisok`,
-					`element_id_filter`,
-					`v`
-				) VALUES (
-					".USER_ID.",
-					".$el['num_1'].",
-					".$el['id'].",
-					'".$v."'
-				)";
-		query($sql);
-		_spisokFilter('cache_clear');
+		_spisokFilter('insert', array(
+			'spisok' => $el['num_1'],
+			'filter' => $el['id'],
+			'v' => $v
+		));
 	}
 
 	$mon = substr($v, 0, 7);
@@ -1711,19 +1703,7 @@ function _filterMenu($el) {//фильтр-меню
 			'</table>'.
 			($child ? '<div class="ml40'._dn($child_sel).'">'.$child.'</div>' : '');
 	}
-/*
-	foreach($spisok[0] as $r) {
-		$b = $r['parent_id'] ? ' ml30' : ' b fs14';
-		$bCount = $r['parent_id'] ? '' : ' b';
-		$sel = $v == $r['id'] ? ' sel' : '';
-		$send .=
-			(!$r['parent_id'] ? '<div class="fl fs15 b pale mr5 mt3">+</div> ' : '').
-			'<div class="fm-unit'.$b.$sel.'" val="'.$r['id'].'">'.
-				$r[$col].
-				($colCount ? '<span class="ml10 pale'.$bCount.'">'.$r[$colCount].'</span>' : '').
-			'</div>';
-	}
-*/
+
 	return $send;
 }
 

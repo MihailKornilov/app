@@ -7,6 +7,7 @@ var _spisokUpdate = function(elem_spisok, func) {
 			busy_cls:'spisok-busy'
 		};
 		_post(send, function(res) {
+			$(res.clear_attr)._dn(res.clear_diff);
 			$(res.count_attr).html(res.count_html);
 			$(res.spisok_attr).html(res.spisok_html);
 			if(func)

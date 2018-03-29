@@ -1799,11 +1799,22 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_1 - id элемента, содержащего список, по которому происходит поиск
 				txt_2 - по каким полям производить поиск (id элементов через запятую диалога списка)
 			*/
+
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$v = '';
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_1'],
+					'filter' => $el['id'],
+					'v' => $v
+				));
+			}
+
 			return _search(array(
 						'attr_id' => $attr_id,
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'v' => _spisokFilter('v', $el['id']),
+						'v' => $v,
 						'disabled' => $disabled
 					));
 
@@ -1835,11 +1846,21 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_2 - id элемента, размещающего список
 			*/
 
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$v = 0;
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_2'],
+					'filter' => $el['id'],
+					'v' => $v
+				));
+			}
+
 			return _check(array(
 				'attr_id' => $attr_id,
 				'title' => $el['txt_1'],
 				'disabled' => $disabled,
-				'value' => _num(_spisokFilter('v', $el['id']))
+				'value' => $v
 			));
 
 		//Календарь
@@ -1856,6 +1877,23 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_2 - id элемента, содержащего значения, составляющие меню
 			*/
 			return _filterMenu($el);
+
+		//Очистка фильтра
+		case 80:
+			/*
+				txt_1 - имя кнопки
+				num_1 - id элемента, размещающего список
+			*/
+
+			$diff = _spisokFilter('diff', $el['num_1']);
+			return _button(array(
+						'attr_id' => $attr_id,
+						'name' => _br($el['txt_1']),
+						'color' => 'red',
+						'width' => $el['width'],
+						'small' => 1,
+						'class' => _dn($diff)
+					));
 
 
 

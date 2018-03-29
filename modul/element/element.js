@@ -1479,6 +1479,22 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 							_spisokUpdate(el.num_1);
 					});
 					return;
+				//Очистка фильтра
+				case 80:
+					$(el.attr_cmp).click(function() {
+						var t = $(this),
+							send = {
+								op:'spisok_filter_clear',
+								spisok_id:el.num_1,
+								busy_obj:t
+							};
+						_post(send, function(res) {
+							$(res.count_attr).html(res.count_html);
+							$(res.spisok_attr).html(res.spisok_html);
+							t._dn();
+						});
+					});
+					return;
 			}
 		});
 
