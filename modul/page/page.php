@@ -659,15 +659,30 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				txt_1 - текст для placeholder
 				txt_2 - текст по умолчанию
 				num_1 - формат:
-					38 - любой текст
-					39 - цифры и числа
+					32 - любой текст
+					33 - цифры и числа
 				num_2 - количество знаков после запятой
 				num_3 - разрешать отрицательные значения
 				num_4 - разрешать вносить 0
 			*/
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$v = empty($v) ? $el['txt_2'] : $v;
-			return '<input type="text" id="'.$attr_id.'"'.$width.$placeholder.$disabled.' value="'.$v.'" />';
+
+			$value = $el['txt_2'];
+
+			if($UNIT_ISSET)
+				switch($el['num_1']) {
+					default:
+					case 32://любой текст
+						$value = $v;
+						break;
+					case 33://цифры и числа
+						$value = round($v, $el['num_2']);
+						$value = $value || $el['num_4'] ? $value : '';
+						break;
+				}
+
+			return// _pr($el).
+				'<input type="text" id="'.$attr_id.'"'.$width.$placeholder.$disabled.' value="'.$value.'" />';
 
 		//Выбор элемента из диалога или страницы
 		case 13:
@@ -1096,7 +1111,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						if(!is_array($sp)) {
 							$dialog = _dialogQuery($unit['dialog_id']);
 							$sql = "SELECT *
-									FROM `"._baseTable($dialog['table_1'])."`
+									FROM `"._table($dialog['table_1'])."`
 									WHERE `id`=".$sp;
 							$unit = query_assoc($sql);
 							break;
@@ -1945,9 +1960,10 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 function _page_div() {//todo тест
 
-//	$dlg = _dialogQuery(1003);
+	$dlg = _dialogQuery(1003);
 
 	return
+	_pr($dlg).
 	'<div class="mar20 bor-e8 pad20" id="for-hint">'.
 		'Передний текст '.
 		'<div class="icon icon-edit"></div>'.

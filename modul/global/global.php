@@ -41,6 +41,53 @@ define('AJAX', APP_HTML.'/ajax.php?'.TIME);
 $CACHE_ARR = array();
 
 
+function _table($id=false) {//таблицы в базе с соответствующими идентификаторами
+	$tab = array(
+		 1 => '_app',
+		 2 => '_block',
+		 3 => '_dialog',
+		 4 => '_dialog_group',
+		 5 => '_element',
+		 6 => '_element_func',
+		 7 => '_history',
+		 8 => '_image',
+		 9 => '_image_server',
+		10 => '_page',
+		11 => '_spisok',
+		12 => '_user',
+//		13 => '_user_app',
+		14 => '_user_auth',
+		15 => '_user_spisok_filter'
+	);
+
+	if($id === false)
+		return $tab;
+	if(!$id = _num($id))
+		return '';
+	if(empty($tab[$id]))
+		return '';
+
+	return $tab[$id];
+}
+function _tableFrom($dialog) {//составление таблиц для запроса на основании данных из диалога
+	$key = 'TABLE_FROM_'.$dialog['id'];
+
+	if(defined($key))
+		return constant($key);
+
+	if(!$dialog['table_1'])
+		return '';
+
+	$send = "`".$dialog['table_name_1']."` `t1` ";
+
+	if($dialog['table_2'])
+		$send .= "INNER JOIN `".$dialog['table_name_2']."` `t2`
+				  ON `t1`.`id`=`t2`.`".$dialog['table_2_field']."`";
+
+	define($key, $send);
+
+	return $send;
+}
 
 
 function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении

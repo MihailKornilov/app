@@ -90,8 +90,7 @@ function _spisokCountAll($el) {//получение общего количества строк списка
 	$dialog = _dialogQuery($el['num_1']);
 
 	$sql = "SELECT COUNT(*)
-			FROM `"._baseTable($dialog['table_1'])."` `t1`
-			"._spisokJoin($dialog)."
+			FROM "._tableFrom($dialog)."
 			WHERE "._spisokCond($el);
 	$all = _num(query_value($sql));
 
@@ -133,13 +132,6 @@ function _spisokJoinField($dialog) {//подключение колонок второго списка
 		$send .= ',`t2`.`'.$col.'`';
 
 	return $send;
-}
-function _spisokJoin($dialog) {//подключение второго списка, если требуется
-	if(!$dialog['table_2'])
-		return '';
-
-	return "INNER JOIN `"._baseTable($dialog['table_2'])."` `t2`
-			ON `t1`.`id`=`t2`.`".$dialog['table_2_field']."`";
 }
 
 function _spisokElemCount($r) {//формирование элемента с содержанием количества списка для вывода на страницу
@@ -185,8 +177,7 @@ function _spisokInclude($spisok, $CMP) {//вложенные списки
 			$cond .= " AND `t1`.`dialog_id`=".$cmp['num_1'];
 
 		$sql = "SELECT `t1`.*"._spisokJoinField($incDialog)."
-				FROM `"._baseTable($incDialog['table_1'])."` `t1`
-					  "._spisokJoin($incDialog)."
+				FROM "._tableFrom($incDialog)."
 				WHERE ".$cond;
 		if(!$arr = query_arr($sql))
 			continue;
@@ -264,8 +255,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 	//получение данных списка
 	$sql = "SELECT `t1`.*"._spisokJoinField($spDialog)."
-			FROM `"._baseTable($spDialog['table_1'])."` `t1`
-			"._spisokJoin($spDialog)."
+			FROM "._tableFrom($spDialog)."
 			WHERE "._spisokCond($ELEM)."
 			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
@@ -456,8 +446,7 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
 	$cond = "`t1`.`id`=".$unit_id;
 	$cond .= _spisokCondDef($dialog['id']);
 	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
-			FROM `"._baseTable($dialog['table_1'])."` `t1`
-				  "._spisokJoin($dialog)."
+			FROM "._tableFrom($dialog)."
 			WHERE ".$cond;
 	return query_assoc($sql);
 }
@@ -649,7 +638,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 		return $txt;
 
 	//ссылка на страницу, если это список страниц
-	if(_baseTable($dlg['table_1']) == '_page')
+	if(_table($dlg['table_1']) == '_page')
 		return '<a href="'.URL.'&p='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 
 	if(!$page_id = _page('spisok_id', $dialog_id))
@@ -688,6 +677,11 @@ function _spisokColSearchBg($txt, $el, $cmp_id) {//подсветка значения колонки пр
 }
 
 function _spisokCondDef($dialog_id) {//условия по умолчанию
+	$key = 'TABLE_COND_'.$dialog_id;
+
+	if(defined($key))
+		return constant($key);
+
 	$dialog = _dialogQuery($dialog_id);
 	$field1 = $dialog['field1'];
 	$field2 = $dialog['field2'];
@@ -706,6 +700,8 @@ function _spisokCondDef($dialog_id) {//условия по умолчанию
 		$cond .= " AND `t2`.`app_id` IN (0,".APP_ID.")";
 	if(isset($field2['dialog_id']))
 		$cond .= " AND `t2`.`dialog_id`=".$dialog_id;
+
+	define($key, $cond);
 
 	return $cond;
 }
@@ -937,7 +933,7 @@ function _spisokCond78($el) {//фильтр-меню
 
 	if(isset($dialog['field1']['parent_id'])) {
 		$sql = "SELECT `id`
-				FROM `"._baseTable($dialog['table_1'])."`
+				FROM `"._table($dialog['table_1'])."`
 				WHERE `parent_id`=".$v;
 		if($ids = query_ids($sql))
 			$v .= ','.$ids;
@@ -984,8 +980,7 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 		$cond .= " AND `t1`.`dialog_id`=".$cmp['num_1'];
 
 	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
-			FROM `"._baseTable($dialog['table_1'])."` `t1`
-				  "._spisokJoin($dialog)."
+			FROM "._tableFrom($dialog)."
 			WHERE ".$cond."
 			ORDER BY ".(isset($field['sort']) ? "`sort`," : '')."`id` DESC
 			".($cmp['num_5'] ? '' : "LIMIT 50");//если включён учёт списка по уровням
@@ -995,8 +990,7 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 	//добавление единицы списка, которая была выбрана ранее
 	if($sel_id && empty($arr[$sel_id])) {
 		$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
-				FROM `"._baseTable($dialog['table_1'])."` `t1`
-					  "._spisokJoin($dialog)."
+				FROM "._tableFrom($dialog)."
 				WHERE `t1`.`id`=".$sel_id;
 		if($unit = query_assoc($sql))
 			$spisok[$sel_id] = $unit;
@@ -1130,7 +1124,7 @@ function _spisok59unit($cmp_id, $unit_id) {//выбранное значение при связке списк
 		return '';
 
 	$sql = "SELECT *
-			FROM `"._baseTable($dlg['table_1'])."`
+			FROM `"._table($dlg['table_1'])."`
 			WHERE `id`=".$unit_id;
 	if(!$un = query_assoc($sql))
 		return '';

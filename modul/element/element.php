@@ -239,35 +239,6 @@ function _emptyMin($msg) {
 	return '<div class="_empty min mar10">'.$msg.'</div>';
 }
 
-function _baseTable($id=false) {//таблицы в базе с соответствующими идентификаторами
-	$tab = array(
-		 1 => '_app',
-		 2 => '_block',
-		 3 => '_dialog',
-		 4 => '_dialog_group',
-		 5 => '_element',
-		 6 => '_element_func',
-		 7 => '_history',
-		 8 => '_image',
-		 9 => '_image_server',
-		10 => '_page',
-		11 => '_spisok',
-		12 => '_user',
-//		13 => '_user_app',
-		14 => '_user_auth',
-		15 => '_user_spisok_filter'
-	);
-
-	if($id === false)
-		return $tab;
-	if(!$id = _num($id))
-		return false;
-	if(!isset($tab[$id]))
-		return false;
-
-	return $tab[$id];
-}
-
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
 	//если dialog_id получен - отправка его
 	if($dialog_id = _num(@$_POST['dialog_id']))
@@ -338,27 +309,20 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		return array();
 
 
-	//список колонок, присутствующих в таблице 1
-	$field = array();
-	if($dialog['table_1']) {
-		$sql = "DESCRIBE `"._baseTable($dialog['table_1'])."`";
-		foreach(query_array($sql) as $r)
-			$field[$r['Field']] = 1;
-	}
-	$dialog['field1'] = $field;
 
-	//список колонок, присутствующих в таблице 2
-	$field = array();
-	if($dialog['table_2']) {
-		$sql = "DESCRIBE `"._baseTable($dialog['table_2'])."`";
-		foreach(query_array($sql) as $r)
-			$field[$r['Field']] = 1;
+	//список колонок, присутствующих в таблицах 1 и 2
+	foreach(array(1,2) as $id) {
+		$dialog['field'.$id] = array();
+		if($dialog['table_name_'.$id] = _table($dialog['table_'.$id])) {
+			$sql = "DESCRIBE `".$dialog['table_name_'.$id]."`";
+			foreach(query_array($sql) as $r)
+				$dialog['field'.$id][$r['Field']] = 1;
+		}
 	}
-	$dialog['field2'] = $field;
 
 //	return _cache($dialog);
 
-//	_cache('clear', 'dialog_'.$dialog_id);
+	_cache('clear', 'dialog_'.$dialog_id);
 	$dialog['blk'] = _block('dialog', $dialog_id, 'block_arr');
 	$dialog['cmp'] = _block('dialog', $dialog_id, 'elem_arr');
 
@@ -425,7 +389,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 
 	//получение id диалога, который является списком, чтобы было нельзя его выбирать в самом себе (для связок)
 	$dialog = _dialogQuery($dialog_id);
-	if(_baseTable($dialog['table_1']) == '_element') {
+	if(_table($dialog['table_1']) == '_element') {
 		//если редактирование - получение id блока из элемента
 		if($elem_id) {
 			$sql = "SELECT `block_id`
@@ -653,6 +617,9 @@ function _dialogElemChoose($el, $unit) {//выбор элемента (подключение через [12]
 }
 
 function _elemQuery($elem_id) {//запрос одного элемента
+	if($elem = _cache())
+		return $elem;
+
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id`=".abs($elem_id);
@@ -664,11 +631,14 @@ function _elemQuery($elem_id) {//запрос одного элемента
 			WHERE `id`=".$elem['block_id'];
 	$elem['block'] = query_assoc($sql);
 
-	return $elem;
+	return _cache($elem);
 }
 function _blockQuery($block_id) {//запрос одного блока
 	if(empty($block_id))
 		return array();
+
+	if($block = _cache())
+		return $block;
 
 	$sql = "SELECT *
 			FROM `_block`
@@ -681,7 +651,7 @@ function _blockQuery($block_id) {//запрос одного блока
 			WHERE `block_id`=".$block_id;
 	$block['elem'] = query_assoc($sql);
 
-	return $block;
+	return _cache($block);
 }
 
 function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
@@ -1480,7 +1450,7 @@ function _filterCalendarContent($el, $mon, $v) {
 			$send .= '<td>';
 
 	return
-	'<table class="w100p">'.
+	'<table class="w100p ">'.
 		'<tr class="week-name">'.
 			'<th>&nbsp;<td>пн<td>вт<td>ср<td>чт<td>пт<td>сб<td>вс'.
 		$send.
@@ -1501,7 +1471,7 @@ function _filterCalendarDays($el, $mon) {//отметка дней в календаре, по которым 
 		$cond .= " AND !`deleted`";
 
 	$sql = "SELECT DATE_FORMAT(`dtime_add`,'%Y-%m-%d'),1
-			FROM `"._baseTable($dlg['table_1'])."`
+			FROM `"._table($dlg['table_1'])."`
 			WHERE ".$cond."
 			GROUP BY DATE_FORMAT(`dtime_add`,'%d')";
 	return query_ass($sql);
@@ -1702,7 +1672,7 @@ function _filterMenu($el) {//фильтр-меню
 	if(isset($dialog['field1']['dialog_id']))
 		$cond .= " AND `dialog_id`=".$dialog_id;
 	$sql = "SELECT *
-			FROM `"._baseTable($dialog['table_1'])."`
+			FROM `"._table($dialog['table_1'])."`
 			WHERE ".$cond."
 			ORDER BY `sort`,`id`";
 	if(!$arr = query_arr($sql))

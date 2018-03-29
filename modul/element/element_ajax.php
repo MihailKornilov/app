@@ -37,11 +37,11 @@ switch(@$_POST['op']) {
 		$menu_sa = array();
 		if(SA) {
 			//колонки для всех таблиц
-			foreach(_baseTable() as $id => $tab)
+			foreach(_table() as $id => $tab)
 				$tablesFields[$id] = _table2field($tab);
 
 			if($dialog['table_2'])
-				foreach(_table2field(_baseTable($dialog['table_2'])) as $i => $field)
+				foreach(_table2field(_table($dialog['table_2'])) as $i => $field)
 					if($dialog['table_2_field'] == $field) {
 						$tab2field_id = $i;
 						break;
@@ -332,7 +332,7 @@ switch(@$_POST['op']) {
 		$send['cmp'] = utf8($dialog['cmp']);
 		$send['html'] = utf8($html);
 		$send['sa'] = SA;
-		$send['tables'] = SA ? _baseTable() : array();
+		$send['tables'] = SA ? _table() : array();
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
 		$send['dialog_spisok'] = SA ? utf8(_dialogSelArray('sa_only')) : array() ;
@@ -605,7 +605,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 		jsonError('Установлена недопустимая ширина диалога');
 
 	if($table_1 = _num($_POST['table_1'])) {
-		if(!$table = _baseTable($table_1))
+		if(!$table = _table($table_1))
 			jsonError('Указана несуществующая таблица 1');
 		$sql = "SHOW TABLES LIKE '".$table."'";
 		if(!query_array($sql))
@@ -614,7 +614,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 
 	$table_2_field = '';
 	if($table_2 = _num($_POST['table_2'])) {
-		if(!$table = _baseTable($table_2))
+		if(!$table = _table($table_2))
 			jsonError('Указана несуществующая таблица 2');
 		$sql = "SHOW TABLES LIKE '".$table."'";
 		if(!query_array($sql))
@@ -742,8 +742,7 @@ function _dialogOpenLoad($dialog_id) {
 			$cond .= " AND `t2`.`dialog_id`=".$dlg['id'];
 
 		$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
-				FROM `"._baseTable($dlg['table_1'])."` `t1`
-				"._spisokJoin($dlg)."
+				FROM "._tableFrom($dlg)."
 				WHERE ".$cond;
 		if(!$unit = query_assoc($sql))
 			jsonError('Записи не существует');
@@ -844,7 +843,7 @@ function _dialogOpenLoad($dialog_id) {
 					break;
 				if(!$dlg = _dialogQuery($block['obj_id']))
 					break;
-				if(_baseTable($dlg['table_1']) != '_spisok')
+				if(_table($dlg['table_1']) != '_spisok')
 					break;
 
 				//получение количества использования значений
@@ -973,7 +972,7 @@ function _dialogOpenLoad($dialog_id) {
 						'title' => $col,
 						'content' =>
 							'<div class="'.$color.'">'.
-								'<span class="pale">'._baseTable($colDialog['table_1']).'.</span>'.
+								'<span class="pale">'._table($colDialog['table_1']).'.</span>'.
 								$col.
 							'</div>'
 
@@ -993,7 +992,7 @@ function _dialogOpenLoad($dialog_id) {
 						'title' => $col,
 						'content' =>
 							'<div class="'.$color.'">'.
-								'<span class="pale">'._baseTable($colDialog['table_2']).'.</span>'.
+								'<span class="pale">'._table($colDialog['table_2']).'.</span>'.
 								$col.
 							'</div>'
 
