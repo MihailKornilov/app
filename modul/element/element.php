@@ -155,7 +155,9 @@ function _dropdown($v=array()) {//выпадающее поле - ссылка
 
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
-	'<div class="_dropdown"></div>';
+	'<div class="_dropdown">'.
+		'<a class="dd-head grey">'.$v['placeholder'].'</a>'.
+	'</div>';
 }
 function _count($v=array()) {//поле количество
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
@@ -804,12 +806,17 @@ function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 		foreach($r['elem'] as $el)
 				$content .=
 					'<dd val="'.$el['id'].'">'.
-					'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
-				  (SA ? '<div class="icon icon-move-y fr pl"></div><div class="icon icon-edit fr pl mr3"></div>' : '').
-						'<div class="dib w25 fs12 r">'.$n++.'.</div> '.
-						'<b>'.$el['name'].'</b>'.
-						'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
-					'</div>'.
+						'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
+							'<table class="w100p">'.
+								'<tr><td class="num w25 r top pr5 grey">'.$n++.'.'.
+									'<td class="b top">'.$el['name'].
+							  (SA ? '<td class="w50 top">'.
+										'<div class="icon icon-move-y fr pl"></div>'.
+								        '<div class="icon icon-edit fr pl mr3"></div>'
+							  : '').
+							'</table>'.
+							'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
+						'</div>'.
 					'</dd>';
 		$content .=	'</dl>';
 	}

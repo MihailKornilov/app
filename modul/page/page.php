@@ -1892,7 +1892,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'color' => 'red',
 						'width' => $el['width'],
 						'small' => 1,
-						'class' => _dn($diff)
+						'class' => _dn($is_edit || $diff)
 					));
 
 

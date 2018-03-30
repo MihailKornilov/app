@@ -121,12 +121,13 @@
 	z-index:1;
 }
 #elem-group .elem-unit{
-	font-size:12px;
 	padding:10px 10px 10px 0;
+	border:transparent solid 1px;
 	cursor:pointer;
 }
-#elem-group .elem-unit b{font:bold 12px Verdana}
-#elem-group .elem-unit:hover{background-color:#feb}
+#elem-group .elem-unit .num{font:14px Verdana}
+#elem-group .elem-unit .b{font:bold 14px Verdana}
+#elem-group .elem-unit:hover{background-color:#feb;border:#EFD68D solid 1px}
 #elem-group .elem-unit:not(.red):hover{color:#333}
 #elem-group .elem-unit:not(:hover) .icon:not(.spin){display:none}
 #elem-group-content{background-color:#EBF0F3}
@@ -136,7 +137,7 @@
 	padding:10px;
 }
 .elem-img{
-	background:no-repeat 0 200px url(../../img/elem.png?27);
+	background:no-repeat 0 200px url(../../img/elem.png?41);
 	height:0;
 	margin-left:29px;
 }
@@ -152,7 +153,7 @@
 .eli10{background-position-y:-900px;height:30px}/* текст */
 .eli14{background-position-y:-2500px;height:95px}/* список - ШАБЛОН */
 .eli15{background-position-y:-2200px;height:15px}/* количество строк списка */
-.eli16{background-position-y:-300px;height:50px}/* радио */
+.eli16{background-position-y:-300px;height:50px} /* радио */
 .eli17{background-position-y:-1400px;height:30px}/* select - проивольные значения */
 .eli21{background-position-y:-1000px;height:50px}/* информация */
 .eli23{background-position-y:-2100px;height:80px}/* список - ТАБЛИЦА */
@@ -167,6 +168,16 @@
 .eli42{background-position-y:-1100px;height:60px}/* вопрос с подсказкой */
 .eli44{background-position-y:-1200px;height:15px}/* сборный текст */
 .eli51{background-position-y:-1700px;height:30px}/* календарь */
+.eli57{background-position-y:-2700px;height:30px}/* меню переключения блоков */
+.eli18{background-position-y:-2800px;height:120px}/* dropdown */
+.eli60{background-position-y:-3000px;height:100px}/* image */
+.eli66{background-position-y:-3100px;height:60px}/* цвет текста */
+.eli70{background-position-y:-3200px;height:95px}/* цвет фона */
+.eli13{background-position-y:-3300px;height:30px}/* выбор элемента из диалога или страницы */
+.eli78{background-position-y:-3400px;height:130px}/* фильтр-меню */
+.eli77{background-position-y:-3600px;height:170px}/* фильтр-календарь */
+.eli80{background-position-y:-3800px;height:20px}/* очистка фильтра */
+.eli62{background-position-y:-3900px;height:20px}/* фильтр-галочка */
 
 
 
