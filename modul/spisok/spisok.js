@@ -34,3 +34,7 @@ var _spisokUpdate = function(elem_spisok, func) {
 			table:'_spisok'
 		});
 	};
+
+
+
+

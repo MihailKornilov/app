@@ -151,6 +151,20 @@ switch(@$_POST['op']) {
 
 		$send['spisok_attr'] = '#el_'.$spisok_id;
 		$send['spisok_html'] = utf8(_spisokShow($elSpisok));
+
+		//значения по умолчанию для фильтров списка
+		$send['def'] = array();
+		foreach(_spisokFilter('spisok', $spisok_id) as $r) {
+			$send['def'][] = array(
+				'dialog_id' => _num($r['elem']['dialog_id']),
+				'attr_el' => '#el_'.$r['elem']['id'],
+				'attr_cmp' => '#cmp_'.$r['elem']['id'],
+				'v' => $r['def']
+			);
+		}
+
+		$send['filter'] = utf8(_spisokFilter('page_js'));
+
 		jsonSuccess($send);
 		break;
 	case 'spisok_next'://догрузка списка

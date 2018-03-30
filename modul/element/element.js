@@ -1489,9 +1489,20 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 								busy_obj:t
 							};
 						_post(send, function(res) {
+							_forIn(res.def, function(sp) {
+								switch(sp.dialog_id) {
+									//быстрый поиск
+									case 7:  $(sp.attr_cmp)._search('clear'); break;
+									//фильтр-галочка
+									case 62: $(sp.attr_cmp)._check(0); break;
+									//фильтр-меню
+									case 78: $(sp.attr_el).find('.sel').removeClass('sel'); break;
+								}
+							});
 							$(res.count_attr).html(res.count_html);
 							$(res.spisok_attr).html(res.spisok_html);
 							t._dn();
+							FILTER = res.filter;
 						});
 					});
 					return;
@@ -4757,7 +4768,7 @@ $.fn._search = function(o, v) {//поисковая строка
 			if(!S)
 				break;
 			if(o == 'val') {
-				if(v) {
+				if(v !== undefined) {
 					S.inp(v);
 					return S;
 				}
