@@ -155,10 +155,22 @@ switch(@$_POST['op']) {
 		//значения по умолчанию для фильтров списка
 		$send['def'] = array();
 		foreach(_spisokFilter('spisok', $spisok_id) as $r) {
+			$dialog_id = _num($r['elem']['dialog_id']);
+			$dop = array();
+			if($dialog_id == 77) {
+				$v = _spisokFilter('v', $r['elem']['id']);
+				$mon = substr($v, 0, 7);
+				$dop = array(
+					'mon' => $mon,
+					'td_mon' => utf8(_filterCalendarMon($mon)),
+					'cnt' => utf8(_filterCalendarContent($r['elem'], $mon, $v))
+				);
+			}
 			$send['def'][] = array(
-				'dialog_id' => _num($r['elem']['dialog_id']),
+				'dialog_id' => $dialog_id,
 				'attr_el' => '#el_'.$r['elem']['id'],
 				'attr_cmp' => '#cmp_'.$r['elem']['id'],
+				'dop' => $dop,
 				'v' => $r['def']
 			);
 		}

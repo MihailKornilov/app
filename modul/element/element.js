@@ -1495,6 +1495,13 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 									case 7:  $(sp.attr_cmp)._search('clear'); break;
 									//фильтр-галочка
 									case 62: $(sp.attr_cmp)._check(0); break;
+									//фильтр-календарь
+									case 77:
+										var CAL = $(sp.attr_el).find('._filter-calendar');
+										CAL.find('.mon-cur').val(sp.dop.mon);
+										CAL.find('.td-mon').html(sp.dop.td_mon);
+										CAL.find('.fc-cnt').html(sp.dop.cnt);
+										break;
 									//фильтр-меню
 									case 78: $(sp.attr_el).find('.sel').removeClass('sel'); break;
 								}
