@@ -1074,6 +1074,30 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						time:el.num_2
 					});
 					return;
+				//Заметки
+				case 52:
+					var timer = 0,
+						DIV_TXT = $(el.attr_el).find('._note-txt'),
+						DIV_TXT_W = DIV_TXT.width();
+					DIV_TXT
+						.find('textarea').autosize()
+						.keyup(function() {
+							var t = $(this),
+								v = $.trim(t.val());
+							if(timer)
+								clearInterval(timer);
+							timer = setInterval(function() {
+								DIV_TXT
+									.stop()
+									.animate({width:DIV_TXT_W - (v.length ? 33 : 0)});
+								clearInterval(timer);
+								timer = 0;
+							}, 500);
+						});
+					$(el.attr_el).find('._note-to-cmnt').click(function() {
+						$(this).hide().next().slideDown(300);
+					});
+					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка суммы значений единицы списка (для [27])
 				case 56: _cmpV56(el, unit); return;
 				//Меню переключения блоков

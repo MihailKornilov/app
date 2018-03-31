@@ -1150,12 +1150,44 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
-
-
-
-
-
-
+/* Заметки */
+._note-txt{
+	border:#D2D8DD solid 1px;
+	border-radius:5px;
+	background-color:#fff;
+}
+._note-txt textarea{
+	position:relative;
+	font-size:14px;
+	height:28px;
+	border:0;
+	background-color:#fff;
+	width:100%;
+	margin:2px 0;
+}
+._note .ok{
+	position:absolute;
+	right:0;
+	bottom:1px;
+	width:32px;
+	height:32px;
+	background:no-repeat 0 0 url(../../img/icons8-ok-32.png?1);
+	cursor:pointer;
+}
+._note .ava40{width:40px;height:40px;border-radius:20px}
+._note .ava30{width:30px;height:30px;border-radius:15px}
+._note-comment{margin-left:60px}
+._comment-u{border-top:#E8ECF0 solid 1px;padding:5px 0}
+._note table:not(:hover) ._note-icon{display:none}
+._note-to-cmnt{
+	padding:4px 8px;
+	cursor:pointer;
+	color:#356B95;
+	border-radius:3px;
+	margin:0 0 10px;
+}
+._note .icon-comment{float:left;margin:-1px 6px 0 0}
+._note-to-cmnt:not(:hover) .icon{opacity:.6}
 
 
 

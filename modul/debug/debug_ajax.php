@@ -29,10 +29,25 @@ switch(@$_POST['op']) {
 		break;
 	case 'cache_clear'://очистка xCache
 		_cache('clear', '_auth');             //авторизация
-		_cache('clear', '_userCache'.USER_ID);//текущий пользователь
 		_cache('clear', '_pageCache');        //страницы
 		_cache('clear', '_imageServerCache'); //серверы изображений
 		_spisokFilter('cache_clear');                 //очистка фильтров
+
+		//пользователи
+/*
+		$sql = "SELECT `u`.`id`
+				FROM
+					`_user` `u`,
+					`_spisok` `sp`
+				WHERE `u`.`id`=`sp`.`connect_1`
+				  AND `sp`.`app_id`=".APP_ID."
+				  AND `sp`.`dialog_id`=1011";
+*/
+		$sql = "SELECT `u`.`id`
+				FROM `_user` `u`";
+		$ids = query_ids($sql);
+		foreach(_ids($ids, 1) as $user_id)
+			_cache('clear', '_userCache'.$user_id);
 
 		//диалоговые окна
 		$sql = "SELECT `id`

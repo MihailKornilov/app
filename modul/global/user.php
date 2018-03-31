@@ -16,10 +16,13 @@ function _user($user_id=USER_ID, $i='') {//получение данных о пользовате из конт
 		return $u['i'].' '.$u['f'];
 
 	if($i == 'ava')
-		return '<img src="'.$u['ava'].'" />';
+		return '<img src="'.$u['src'].'" />';
 
 	if($i == 'ava30')
-		return '<img src="'.$u['ava'].'" width="30" />';
+		return '<img src="'.$u['src'].'" width="30" />';
+
+	if($i == 'src')
+		return $u['src'];
 
 	return $u;
 }
@@ -30,6 +33,17 @@ function _userCache($user_id) {
 	$sql = "SELECT * FROM `_user` WHERE `id`=".$user_id;
 	if(!$u = query_assoc($sql))
 		return array();
+
+	$u['src'] = 'https://vk.com/images/camera_50.png';
+	$sql = "SELECT *
+			FROM `_image`
+			WHERE `obj_name`='elem_1778'
+			  AND `obj_id`=".$user_id."
+			  AND !`sort`
+			LIMIT 1";
+	if($img = query_assoc($sql))
+		$u['src'] = _imageServer($img['server_id']).$img['80_name'];
+
 
 //		$u = _userVkUpdate($user_id);
 
