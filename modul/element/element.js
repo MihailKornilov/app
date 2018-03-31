@@ -1128,7 +1128,6 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 								busy_cls:'spin',
 								busy_obj:t
 							};
-						t.addClass('spin');return;
 						_post(send, function() {
 							note.addClass('deleted');
 						});
