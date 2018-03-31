@@ -1719,32 +1719,45 @@ function _filterMenu($el) {//фильтр-меню
 
 
 
-function _note($el) {
+function _note($el) {//заметки
+	$page_id = _page('cur');
+	$obj_id = _num(@$_GET['id']);
+	return
+	'<div class="_note" val="'.$page_id.':'.$obj_id.'">'.
+		'<div class="prel">'.
+			'<div class="ok"></div>'.
+			'<div class="icon spin"></div>'.
+			'<div class="_note-txt">'.
+				'<textarea placeholder="напишите заметку..." /></textarea>'.
+			'</div>'.
+		'</div>'.
+		'<div class="_note-list">'._noteList($page_id, $obj_id).'</div>'.
+	'</div>';
+}
+function _noteList($page_id, $obj_id) {
 	$sql = "SELECT *
 			FROM `_note`
 			WHERE `app_id`=".APP_ID."
 			  AND !`parent_id`
 			  AND !`deleted`
-			  AND `page_id`="._page('cur')."
-			  AND `obj_id`="._num(@$_GET['id'])."
+			  AND `page_id`=".$page_id."
+			  AND `obj_id`=".$obj_id."
 			ORDER BY `id` DESC";
-	if($arr = query_arr($sql)) {
-		foreach($arr as $id => $r)
-			$arr[$id]['comment'] = array();
+	if(!$arr = query_arr($sql))
+		return '';
 
-		$sql = "SELECT *
-				FROM `_note`
-				WHERE `parent_id` IN ("._idsGet($arr).")
-				  AND !`deleted`
-				ORDER BY `id`";
-		foreach(query_arr($sql) as $r)
-			$arr[$r['parent_id']]['comment'][] = $r;
-	}
+	foreach($arr as $id => $r)
+		$arr[$id]['comment'] = array();
 
+	$sql = "SELECT *
+			FROM `_note`
+			WHERE `parent_id` IN ("._idsGet($arr).")
+			  AND !`deleted`
+			ORDER BY `id`";
+	foreach(query_arr($sql) as $r)
+		$arr[$r['parent_id']]['comment'][] = $r;
 
-
-
-	$spisok = '';
+	$send = '';
 	$n = 0;
 	foreach($arr as $r) {
 		$cmnt = $r['comment'] ? 'Комментарии '.count($r['comment']) : 'Комментировать';
@@ -1767,41 +1780,38 @@ function _note($el) {
 					'</table>'.
 				'</div>';
 		}
-		$spisok .=
-			'<table class="bs10 w100p'._dn(!$n, 'line-t').'">'.
-				'<tr><td class="w35">'.
-						'<img class="ava40" src="'._user($r['user_id_add'], 'src').'">'.
-					'<td class="">'.
-						'<div class="_note-icon fr">'.
-							'<div class="icon icon-edit pl'._tooltip('Изменить заметку', -98, 'r').'</div>'.
-							'<div class="icon icon-del pl'._tooltip('Удалить заметку', -91, 'r').'</div>'.
-						'</div>'.
-						'<a class="b">'._user($r['user_id_add'], 'name').'</a>'.
-						'<div class="pale mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
-				'<tr>'.
-					'<td colspan="2" class="fs14">'._br($r['txt']).
-			'</table>'.
-			'<div class="_note-to-cmnt dib b over1'._dn($n).'">'.
-				'<div class="icon icon-comment"></div>'.
-				$cmnt.
-			'</div>'.
-			'<div class="_note-comment'._dn(!$n).'">'.$comment.'</div>';
-
+		$send .=
+			'<div class="_note-u'._dn(!$n, 'line-t').'" val="'.$r['id'].'">'.
+				'<div class="_note-is-show">'.
+					'<table class="bs10 w100p">'.
+						'<tr><td class="w35">'.
+								'<img class="ava40" src="'._user($r['user_id_add'], 'src').'">'.
+							'<td class="">'.
+								'<div class="_note-icon fr">'.
+									'<div class="icon icon-edit pl'._tooltip('Изменить заметку', -98, 'r').'</div>'.
+									'<div class="note-del icon icon-del pl'._tooltip('Удалить заметку', -91, 'r').'</div>'.
+								'</div>'.
+								'<a class="b">'._user($r['user_id_add'], 'name').'</a>'.
+								'<div class="pale mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
+						'<tr>'.
+							'<td colspan="2" class="fs14">'._br($r['txt']).
+					'</table>'.
+					'<div class="_note-to-cmnt dib b over1'._dn($n).'">'.
+						'<div class="icon icon-comment"></div>'.
+						$cmnt.
+					'</div>'.
+					'<div class="_note-comment'._dn(!$n).'">'.$comment.'</div>'.
+				'</div>'.
+				'<div class="_note-is-del">'.
+					'Заметка удалена.'.
+					'<a class="note-rest ml10">Восстановить</a>'.
+				'</div>'.
+			'</div>';
 		$n++;
 	}
 
-	return
-	'<div class="_note">'.
-		'<div class="prel">'.
-			'<div class="ok"></div>'.
-			'<div class="_note-txt">'.
-				'<textarea placeholder="напишите заметку..." /></textarea>'.
-			'</div>'.
-		'</div>'.
-		$spisok.
-	'</div>';
+	return $send;
 }
-
 
 
 

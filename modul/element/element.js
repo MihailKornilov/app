@@ -1077,25 +1077,72 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				//Заметки
 				case 52:
 					var timer = 0,
-						DIV_TXT = $(el.attr_el).find('._note-txt'),
-						DIV_TXT_W = DIV_TXT.width();
-					DIV_TXT
-						.find('textarea').autosize()
+						NOTE = $(el.attr_el).find('._note'),
+						ex = NOTE.attr('val').split(':'),
+						page_id = _num(ex[0]),
+						obj_id = _num(ex[1]),
+						NOTE_TXT = NOTE.find('._note-txt'),
+						NOTE_AREA = NOTE_TXT.find('textarea'),
+						NOTE_TXT_W = NOTE_TXT.width();
+					NOTE_AREA
+						.autosize()
 						.keyup(function() {
-							var t = $(this),
-								v = $.trim(t.val());
+							var v = $.trim(NOTE_AREA.val());
 							if(timer)
 								clearInterval(timer);
 							timer = setInterval(function() {
-								DIV_TXT
+								NOTE_TXT
 									.stop()
-									.animate({width:DIV_TXT_W - (v.length ? 33 : 0)});
+									.animate({width:NOTE_TXT_W - (v.length ? 33 : 0)});
 								clearInterval(timer);
 								timer = 0;
 							}, 500);
 						});
-					$(el.attr_el).find('._note-to-cmnt').click(function() {
+					NOTE.find('._note-to-cmnt').click(function() {//раскрытие комментариев
 						$(this).hide().next().slideDown(300);
+					});
+					NOTE.find('.ok').click(function() {
+						var txt = $.trim(NOTE_AREA.val());
+						if(!txt)
+							return;
+						var send = {
+							op:'note_add',
+							page_id:page_id,
+							obj_id:obj_id,
+							txt:txt,
+							busy_cls:'busy',
+							busy_obj:NOTE
+						};
+						_post(send, function(res) {
+							NOTE_AREA.val('').trigger('autosize');
+							NOTE_TXT.width(NOTE_TXT_W);
+							NOTE.find('._note-list').html(res.html);
+						});
+					});
+					NOTE.find('.note-del').click(function() {//удаление заметки
+						var t = $(this),
+							note = t.parents('._note-u'),
+							send = {
+								op:'note_del',
+								note_id:note.attr('val'),
+								busy_cls:'spin',
+								busy_obj:t
+							};
+							_post(send, function() {
+								note.addClass('deleted');
+							});
+					});
+					NOTE.find('.note-rest').click(function() {//восстановление заметки
+						var t = $(this),
+							note = t.parents('._note-u'),
+							send = {
+								op:'note_rest',
+								note_id:note.attr('val'),
+								busy_obj:t
+							};
+							_post(send, function() {
+								note.removeClass('deleted');
+							});
 					});
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка суммы значений единицы списка (для [27])

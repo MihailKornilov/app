@@ -501,6 +501,82 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+
+	case 'note_add'://добавление заметки
+		if(!$page_id = _num($_POST['page_id']))
+			jsonError('Некорректный ID страницы');
+		if(!$txt = _txt(@$_POST['txt']))
+			jsonError('Отсутствует текст заметки');
+
+		$obj_id = _num($_POST['obj_id']);
+
+		$sql = "INSERT INTO `_note` (
+					`app_id`,
+					`page_id`,
+					`obj_id`,
+					`txt`,
+					`user_id_add`
+				) VALUES (
+					".APP_ID.",
+					".$page_id.",
+					".$obj_id.",
+					'".addslashes($txt)."',
+					".USER_ID."
+				)";
+		query($sql);
+
+		$send['html'] = utf8(_noteList($page_id, $obj_id));
+
+		jsonSuccess($send);
+		break;
+	case 'note_del'://удаление заметки
+		if(!$note_id = _num($_POST['note_id']))
+			jsonError('Некорректный ID заметки');
+
+		$sql = "SELECT *
+				FROM `_note`
+				WHERE `app_id`=".APP_ID."
+				  AND !`parent_id`
+				  AND `id`=".$note_id;
+		if(!$note = query_assoc($sql))
+			jsonError('Заметки не существует');
+
+		if($note['deleted'])
+			jsonError('Заметка была удалена');
+
+		$sql = "UPDATE `_note`
+				SET `deleted`=1,
+					`user_id_del`=".USER_ID.",
+					`dtime_del`=CURRENT_TIMESTAMP
+				WHERE `id`=".$note_id;
+		query($sql);
+
+		jsonSuccess();
+		break;
+	case 'note_rest'://восстановление заметки
+		if(!$note_id = _num($_POST['note_id']))
+			jsonError('Некорректный ID заметки');
+
+		$sql = "SELECT *
+				FROM `_note`
+				WHERE `app_id`=".APP_ID."
+				  AND !`parent_id`
+				  AND `id`=".$note_id;
+		if(!$note = query_assoc($sql))
+			jsonError('Заметки не существует');
+
+		if(!$note['deleted'])
+			jsonError('Заметка не была удалена');
+
+		$sql = "UPDATE `_note`
+				SET `deleted`=0,
+					`user_id_del`=0,
+					`dtime_del`='0000-00-00 00:00:00'
+				WHERE `id`=".$note_id;
+		query($sql);
+
+		jsonSuccess();
+		break;
 }
 
 
