@@ -1174,18 +1174,19 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	background:no-repeat 0 0 url(../../img/icons8-ok-32.png?1);
 	cursor:pointer;
 }
-._note .spin{
+._note .icon-ok{
 	position:absolute;
 	right:7px;
 	bottom:12px;
 }
-._note:not(.busy) .spin{display:none}
+._note:not(.busy) .icon-ok{display:none}
 ._note.busy .ok{display:none}
 ._note .ava40{width:40px;height:40px;border-radius:20px}
 ._note .ava30{width:30px;height:30px;border-radius:15px}
 ._note-comment{margin-left:60px}
 ._comment-u{border-top:#E8ECF0 solid 1px;padding:5px 0}
-._note table:not(:hover) ._note-icon{display:none}
+._note table:not(:hover) .icon-edit:not(.spin){display:none}
+._note table:not(:hover) .icon-del:not(.spin){display:none}
 ._note-to-cmnt{
 	padding:4px 8px;
 	cursor:pointer;

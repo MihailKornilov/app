@@ -1726,7 +1726,7 @@ function _note($el) {//заметки
 	'<div class="_note" val="'.$page_id.':'.$obj_id.'">'.
 		'<div class="prel">'.
 			'<div class="ok"></div>'.
-			'<div class="icon spin"></div>'.
+			'<div class="icon-ok spin"></div>'.
 			'<div class="_note-txt">'.
 				'<textarea placeholder="напишите заметку..." /></textarea>'.
 			'</div>'.
@@ -1786,11 +1786,9 @@ function _noteList($page_id, $obj_id) {
 					'<table class="bs10 w100p">'.
 						'<tr><td class="w35">'.
 								'<img class="ava40" src="'._user($r['user_id_add'], 'src').'">'.
-							'<td class="">'.
-								'<div class="_note-icon fr">'.
-									'<div class="icon icon-edit pl'._tooltip('Изменить заметку', -98, 'r').'</div>'.
-									'<div class="note-del icon icon-del pl'._tooltip('Удалить заметку', -91, 'r').'</div>'.
-								'</div>'.
+							'<td>'.
+								'<div class="note-del icon icon-del pl fr'._tooltip('Удалить заметку', -91, 'r').'</div>'.
+								'<div class="icon icon-edit pl fr'._tooltip('Изменить заметку', -98, 'r').'</div>'.
 								'<a class="b">'._user($r['user_id_add'], 'name').'</a>'.
 								'<div class="pale mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
 						'<tr>'.

@@ -1128,9 +1128,10 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 								busy_cls:'spin',
 								busy_obj:t
 							};
-							_post(send, function() {
-								note.addClass('deleted');
-							});
+						t.addClass('spin');return;
+						_post(send, function() {
+							note.addClass('deleted');
+						});
 					});
 					NOTE.find('.note-rest').click(function() {//восстановление заметки
 						var t = $(this),
@@ -1140,9 +1141,9 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 								note_id:note.attr('val'),
 								busy_obj:t
 							};
-							_post(send, function() {
-								note.removeClass('deleted');
-							});
+						_post(send, function() {
+							note.removeClass('deleted');
+						});
 					});
 					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка суммы значений единицы списка (для [27])
