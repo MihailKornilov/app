@@ -300,7 +300,8 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	//элементы списка
 	$CMP = $spDialog['cmp'];
 
-	$all = _spisokCountAll($ELEM);
+	if(!$all = _spisokCountAll($ELEM))
+		return '<div class="_empty min">'._br($ELEM['txt_1']).'</div>';
 
 	$order = "`t1`.`id` DESC";
 	if($ELEM['num_6'] || _spisokIsSort($ELEM['block_id']))
@@ -312,8 +313,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			WHERE "._spisokCond($ELEM)."
 			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
-	if(!$spisok = query_arr($sql))
-		return '<div class="_empty">'._br($ELEM['txt_1']).'</div>';
+	$spisok = query_arr($sql);
 
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok, $CMP);
@@ -397,8 +397,16 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 							'</li>';
 					$TR = '<ol>'.$TR.'</ol>';
 				}
-			} else
-				$TR = implode('', $MASS);
+			} else {
+				//отображение названий колонок
+				$TH = '';
+				if(!$next && $ELEM['num_5']) {
+					$TH .= '<tr>';
+					foreach($tabCol as $tr)
+						$TH .= '<th>'.$tr['txt_7'];
+				}
+				$TR = $TH.implode('', $MASS);
+			}
 
 			return $BEGIN.$TR.$END;
 
@@ -744,7 +752,7 @@ function _spisokCondDef($dialog_id) {//условия по умолчанию
 		$cond .= " AND !`t1`.`deleted`";
 	if(isset($field1['app_id']))
 		$cond .= " AND `t1`.`app_id` IN (0,".APP_ID.")";
-	if(isset($field1['dialog_id']))
+	if(isset($field1['dialog_id']) && $dialog['table_name_1'] != '_element')
 		$cond .= " AND `t1`.`dialog_id`=".$dialog_id;
 
 	if(isset($field2['deleted']))
@@ -764,16 +772,15 @@ function _spisokCond($el) {//формирование строки с условиями поиска
 
 	$cond = "`t1`.`id`";
 	$cond .= _spisokCondDef($el['num_1']);
-
-	$cond .= _spisokCondSearch($el);
-	$cond .= _spisokCond52($el);
+	$cond .= _spisokCondPageUnit($el);
+	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond62($el);
 	$cond .= _spisokCond77($el);
 	$cond .= _spisokCond78($el);
 
 	return $cond;
 }
-function _spisokCondSearch($el) {//значения фильтра-поиска для списка
+function _spisokCond7($el) {//значения фильтра-поиска для списка
 	$search = false;
 	$v = '';
 
@@ -810,26 +817,14 @@ function _spisokCondSearch($el) {//значения фильтра-поиска для списка
 
 	return " AND (".implode($arr, ' OR ').")";
 }
-function _spisokCond52($el) {//связка со другим списком
-	//поиск элемента, который содержит условие связки именно для этого списка
-	$sql = "SELECT COUNT(*)
-			FROM `_element`
-			WHERE `dialog_id`=52
-			  AND `num_1`=".$el['id']."
-			LIMIT 1";
-	if(!query_value($sql))
+function _spisokCondPageUnit($el) {//отображения значений, которые принимает текущая страница
+	if(!$el['num_8'])//настройки нет
 		return '';
-
-	//проверка, чтобы список был размещён именно на странице
-	if($el['block']['obj_name'] != 'page')
+	if($el['block']['obj_name'] != 'page')//проверка, чтобы список был размещён именно на странице
 		return ' AND !`t1`.`id`';
-
-	//страница, на которой размещён список
-	if(!$page = _page($el['block']['obj_id']))
+	if(!$page = _page($el['block']['obj_id']))//страница, на которой размещён список
 		return ' AND !`t1`.`id`';
-
-	//id диалога, единица списка которого размещается на странице
-	if(!$spisok_id = $page['spisok_id'])
+	if(!$spisok_id = $page['spisok_id'])//id диалога, единица списка которого размещается на странице
 		return ' AND !`t1`.`id`';
 
 	$cmp = false;

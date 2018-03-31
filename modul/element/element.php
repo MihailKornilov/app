@@ -619,8 +619,8 @@ function _dialogElemChoose($el, $unit) {//выбор элемента (подключение через [12]
 }
 
 function _elemQuery($elem_id) {//запрос одного элемента
-	if($elem = _cache())
-		return $elem;
+//	if($elem = _cache())
+//		return $elem;
 
 	$sql = "SELECT *
 			FROM `_element`
@@ -633,14 +633,15 @@ function _elemQuery($elem_id) {//запрос одного элемента
 			WHERE `id`=".$elem['block_id'];
 	$elem['block'] = query_assoc($sql);
 
-	return _cache($elem);
+//	return _cache($elem);
+	return $elem;
 }
 function _blockQuery($block_id) {//запрос одного блока
 	if(empty($block_id))
 		return array();
 
-	if($block = _cache())
-		return $block;
+//	if($block = _cache())
+//		return $block;
 
 	$sql = "SELECT *
 			FROM `_block`
@@ -653,7 +654,8 @@ function _blockQuery($block_id) {//запрос одного блока
 			WHERE `block_id`=".$block_id;
 	$block['elem'] = query_assoc($sql);
 
-	return _cache($block);
+	return $block;
+//	return _cache($block);
 }
 
 function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
@@ -693,6 +695,7 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 		case 59: return _dialogParam($el['num_1'], 'name');
 		case 32: return 'номер';
 		case 33: return 'дата/время';
+		case 34: return 'edit';
 		case 60: return _imageNo($el_parent['width']);
 		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
@@ -882,7 +885,7 @@ function _historySpisok($el) {//список истории действий [68]
 			FROM `_history`
 			WHERE `app_id`=".APP_ID."
 			  AND `active`
-			  "._historyCond52($el)."
+			  "._historyCondPageUnit($el)."
 			ORDER BY `dtime_add` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
@@ -953,13 +956,8 @@ function _historySpisok($el) {//список истории действий [68]
 
 	return $send;
 }
-function _historyCond52($el) {//отображение истории для конкретной единицы списка (связка)
-	$sql = "SELECT COUNT(*)
-			FROM `_element`
-			WHERE `dialog_id`=52
-			  AND `num_1`=".$el['id']."
-			LIMIT 1";
-	if(!query_value($sql))
+function _historyCondPageUnit($el) {//отображение истории для конкретной единицы списка, которую принимает страница (связка)
+	if(!$el['num_8'])
 		return '';
 
 	//проверка, чтобы список был размещён именно на странице

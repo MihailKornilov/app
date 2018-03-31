@@ -2354,7 +2354,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			var t = $(this),
 				send = {
 					op:'dialog_edit_load',
-					dialog_id:t.parent().parent().attr('val'),
+					dialog_id:t.parents('.elem-unit').attr('val'),
 					busy_obj:t,
 					busy_cls:'spin'
 				};
