@@ -1085,8 +1085,33 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						NOTE_AREA = NOTE_TXT.find('textarea'),
 						NOTE_TXT_W = NOTE_TXT.width(),
 						noteAfterPrint = function() {
+							NOTE.find('textarea').autosize();
+							NOTE.find('.comment-ok').click(function() {//внесение комментария
+								var t = $(this),
+									comm = t.parents('._note-comment'),
+									note = t.parents('._note-u'),
+									area = comm.find('textarea'),
+									txt = $.trim(area.val());
+								if(!txt)
+									return;
+								var send = {
+									op:'note_comment_add',
+									note_id:note.attr('val'),
+									txt:txt,
+									busy_cls:'busy',
+									busy_obj:comm
+								};
+								_post(send, function(res) {
+									_parent(t, 'TABLE').before(res.html);
+									area.val('');
+									area.trigger('autosize');
+								});
+							});
 							NOTE.find('._note-to-cmnt').click(function() {//раскрытие комментариев
-								$(this).hide().next().slideDown(200);
+								var t = $(this);
+								t.next().show();
+								t.parents('._note-u').find('textarea').focus();
+								t.remove();
 							});
 							NOTE.find('.note-del').click(function() {//удаление заметки
 								var t = $(this),
@@ -1113,47 +1138,20 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 									note.removeClass('deleted');
 								});
 							});
-							NOTE.find('.comment-del').click(function() {//удаление комментария
-								var t = $(this),
-									note = t.parents('._comment-u'),
-									send = {
-										op:'note_comment_del',
-										note_id:note.attr('val'),
-										busy_cls:'spin',
-										busy_obj:t
-									};
-								_post(send, function() {
-									note.addClass('deleted');
-								});
-							});
-							NOTE.find('.comment-rest').click(function() {//восстановление комментария
-								var t = $(this),
-									note = t.parents('._comment-u'),
-									send = {
-										op:'note_comment_rest',
-										note_id:note.attr('val'),
-										busy_obj:t
-									};
-								_post(send, function() {
-									note.removeClass('deleted');
-								});
-							});
 						};
-					NOTE_AREA
-						.autosize()
-						.keyup(function() {
-							var v = $.trim(NOTE_AREA.val());
-							if(timer)
-								clearInterval(timer);
-							timer = setInterval(function() {
-								NOTE_TXT
-									.stop()
-									.animate({width:NOTE_TXT_W - (v.length ? 33 : 0)}, 150);
-								clearInterval(timer);
-								timer = 0;
-							}, 300);
-						});
-					NOTE.find('.ok').click(function() {
+					NOTE_AREA.keyup(function() {
+						var v = $.trim(NOTE_AREA.val());
+						if(timer)
+							clearInterval(timer);
+						timer = setInterval(function() {
+							NOTE_TXT
+								.stop()
+								.animate({width:NOTE_TXT_W - (v.length ? 33 : 0)}, 150);
+							clearInterval(timer);
+							timer = 0;
+						}, 300);
+					});
+					NOTE.find('.note-ok').click(function() {
 						var txt = $.trim(NOTE_AREA.val());
 						if(!txt)
 							return;
@@ -2503,6 +2501,29 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			if(o.func_open)
 				o.func_open(res, dialog);
 		});
+	},
+
+	_noteCDel = function(t, id) {//удаление комментария
+		var send = {
+			op:'note_comment_del',
+			note_id:id,
+			busy_cls:'spin',
+			busy_obj:$(t)
+		};
+		_post(send, function() {
+			$(t).parents('._comment-u').addClass('deleted');
+		});
+	},
+	_noteCRest = function(t, id) {//восстановление комментария
+		var send = {
+			op:'note_comment_rest',
+			note_id:id,
+			busy_obj:$(t)
+		};
+		_post(send, function() {
+			$(t).parents('._comment-u').removeClass('deleted');
+		});
+
 	},
 
 	_pageUserAccess = function(el, i) {

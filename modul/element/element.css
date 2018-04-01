@@ -1165,7 +1165,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	width:100%;
 	margin:2px 0;
 }
-._note .ok{
+._note .note-ok{
 	position:absolute;
 	right:0;
 	bottom:1px;
@@ -1180,10 +1180,10 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	bottom:12px;
 }
 ._note:not(.busy) .icon-ok{display:none}
-._note.busy .ok{display:none}
+._note.busy .note-ok{display:none}
 ._note .ava40{width:40px;height:40px;border-radius:20px}
 ._note .ava30{width:30px;height:30px;border-radius:15px}
-._note-comment{margin-left:60px}
+._note-comment{margin:0 0 15px 60px}
 ._comment-u{border-top:#E8ECF0 solid 1px;padding:5px 0}
 ._note table:not(:hover) .icon-edit:not(.spin){display:none}
 ._note table:not(:hover) .icon-del:not(.spin){display:none}
@@ -1205,7 +1205,27 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 ._comment-u.deleted ._comment-is-show,
 ._comment-u:not(.deleted) ._comment-is-del{display:none}
 
-
+._comment-txt{
+	border:#D2D8DD solid 1px;
+	border-radius:4px;
+	background-color:#fff;
+}
+._comment-txt textarea{
+	position:relative;
+	height:27px;
+	border:0;
+	background-color:#fff;
+	width:100%;
+	margin:1px 0;
+}
+.comment-ok{
+	width:30px;
+	height:31px;
+	background:no-repeat 0 0 url(../../img/icons8-ok-32.png?1);
+	cursor:pointer;
+}
+._note-comment:not(.busy) .icon-empty,
+._note-comment.busy .comment-ok{display:none}
 
 
 

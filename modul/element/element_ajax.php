@@ -577,6 +577,45 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+	case 'note_comment_add'://добавление комментария
+		if(!$note_id = _num($_POST['note_id']))
+			jsonError('Некорректный ID заметки');
+		if(!$txt = _txt(@$_POST['txt']))
+			jsonError('Отсутствует текст комментария');
+
+		$sql = "SELECT *
+				FROM `_note`
+				WHERE `app_id`=".APP_ID."
+				  AND !`parent_id`
+				  AND `id`=".$note_id;
+		if(!$note = query_assoc($sql))
+			jsonError('Заметки не существует');
+
+		$sql = "INSERT INTO `_note` (
+					`app_id`,
+					`parent_id`,
+					`txt`,
+					`user_id_add`
+				) VALUES (
+					".APP_ID.",
+					".$note_id.",
+					'".addslashes($txt)."',
+					".USER_ID."
+				)";
+		query($sql);
+
+		$sql = "SELECT *
+				FROM `_note`
+				WHERE `app_id`=".APP_ID."
+				  AND `parent_id`=".$note_id."
+				ORDER BY `id` DESC
+				LIMIT 1";
+		$comm = _noteCommentUnit(query_assoc($sql));
+
+		$send['html'] = utf8($comm);
+
+		jsonSuccess($send);
+		break;
 	case 'note_comment_del'://удаление комментария
 		if(!$note_id = _num($_POST['note_id']))
 			jsonError('Некорректный ID комментария');

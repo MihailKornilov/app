@@ -1725,8 +1725,8 @@ function _note($el) {//заметки
 	return
 	'<div class="_note" val="'.$page_id.':'.$obj_id.'">'.
 		'<div class="prel">'.
-			'<div class="ok"></div>'.
-			'<div class="icon-ok spin"></div>'.
+			'<div class="note-ok"></div>'.
+			'<div class="icon icon-ok spin"></div>'.
 			'<div class="_note-txt">'.
 				'<textarea placeholder="напишите заметку..." /></textarea>'.
 			'</div>'.
@@ -1762,28 +1762,8 @@ function _noteList($page_id, $obj_id) {
 	foreach($arr as $r) {
 		$cmnt = $r['comment'] ? 'Комментарии '.count($r['comment']) : 'Комментировать';
 		$comment = '';
-		foreach($r['comment'] as $c) {
-			$comment .=
-				'<div class="_comment-u" val="'.$c['id'].'">'.
-					'<table class="_comment-is-show bs5 w100p">'.
-						'<tr><td class="w35">'.
-								'<img class="ava30" src="'._user($c['user_id_add'], 'src').'">'.
-							'<td>'.
-								'<div class="_note-icon fr mr5">'.
-									'<div val="dialog_id:82,unit_id:'.$r['id'].'" class="dialog-open icon icon-edit pl"></div>'.
-									'<div class="comment-del icon icon-del pl"></div>'.
-								'</div>'.
-								'<a class="fs12">'._user($c['user_id_add'], 'name').'</a>'.
-								'<div class="fs12 pale mt2">'.FullDataTime($c['dtime_add'], 1).'</div>'.
-						'<tr>'.
-							'<td colspan="2">'._br($c['txt']).
-					'</table>'.
-					'<div class="_comment-is-del">'.
-						'Комментарий удалён.'.
-						'<a class="comment-rest ml10">Восстановить</a>'.
-					'</div>'.
-				'</div>';
-		}
+		foreach($r['comment'] as $c)
+			$comment .= _noteCommentUnit($c);
 		$send .=
 			'<div class="_note-u'._dn(!$n, 'line-t').'" val="'.$r['id'].'">'.
 				'<div class="_note-is-show">'.
@@ -1802,7 +1782,17 @@ function _noteList($page_id, $obj_id) {
 						'<div class="icon icon-comment"></div>'.
 						$cmnt.
 					'</div>'.
-					'<div class="_note-comment'._dn(!$n).'">'.$comment.'</div>'.
+					'<div class="_note-comment'._dn(!$n).'">'.
+						$comment.
+						'<table class="w100p">'.
+							'<tr><td><div class="_comment-txt">'.
+										'<textarea placeholder="комментировать.." /></textarea>'.
+									'</div>'.
+								'<td class="w35 bottom">'.
+									'<div class="icon icon-empty spin ml5 mb5"></div>'.
+									'<div class="comment-ok"></div>'.
+						'</table>'.
+					'</div>'.
 				'</div>'.
 				'<div class="_note-is-del">'.
 					'Заметка удалена.'.
@@ -1814,7 +1804,28 @@ function _noteList($page_id, $obj_id) {
 
 	return $send;
 }
-
+function _noteCommentUnit($c) {//html одного комментария
+	return
+	'<div class="_comment-u">'.
+		'<table class="_comment-is-show bs5 w100p">'.
+			'<tr><td class="w35">'.
+					'<img class="ava30" src="'._user($c['user_id_add'], 'src').'">'.
+				'<td>'.
+					'<div class="_note-icon fr mr5">'.
+						'<div val="dialog_id:82,unit_id:'.$c['id'].'" class="dialog-open icon icon-edit pl"></div>'.
+						'<div class="comment-del icon icon-del pl" onclick="_noteCDel(this,'.$c['id'].')"></div>'.
+					'</div>'.
+					'<a class="fs12">'._user($c['user_id_add'], 'name').'</a>'.
+					'<div class="fs12 pale mt2">'.FullDataTime($c['dtime_add'], 1).'</div>'.
+			'<tr>'.
+				'<td colspan="2">'._br($c['txt']).
+		'</table>'.
+		'<div class="_comment-is-del">'.
+			'Комментарий удалён.'.
+			'<a class="comment-rest ml10" onclick="_noteCRest(this,'.$c['id'].')">Восстановить</a>'.
+		'</div>'.
+	'</div>';
+}
 
 
 
