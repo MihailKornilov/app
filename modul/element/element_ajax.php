@@ -577,6 +577,54 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+	case 'note_comment_del'://удаление комментария
+		if(!$note_id = _num($_POST['note_id']))
+			jsonError('Некорректный ID комментария');
+
+		$sql = "SELECT *
+				FROM `_note`
+				WHERE `app_id`=".APP_ID."
+				  AND `parent_id`
+				  AND `id`=".$note_id;
+		if(!$note = query_assoc($sql))
+			jsonError('Комментария не существует');
+
+		if($note['deleted'])
+			jsonError('Комментарий был удалён');
+
+		$sql = "UPDATE `_note`
+				SET `deleted`=1,
+					`user_id_del`=".USER_ID.",
+					`dtime_del`=CURRENT_TIMESTAMP
+				WHERE `id`=".$note_id;
+		query($sql);
+
+		jsonSuccess();
+		break;
+	case 'note_comment_rest'://восстановление комментария
+		if(!$note_id = _num($_POST['note_id']))
+			jsonError('Некорректный ID комментария');
+
+		$sql = "SELECT *
+				FROM `_note`
+				WHERE `app_id`=".APP_ID."
+				  AND `parent_id`
+				  AND `id`=".$note_id;
+		if(!$note = query_assoc($sql))
+			jsonError('Комментарий не существует');
+
+		if(!$note['deleted'])
+			jsonError('Комментарий не был удалён');
+
+		$sql = "UPDATE `_note`
+				SET `deleted`=0,
+					`user_id_del`=0,
+					`dtime_del`='0000-00-00 00:00:00'
+				WHERE `id`=".$note_id;
+		query($sql);
+
+		jsonSuccess();
+		break;
 }
 
 

@@ -1201,6 +1201,10 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 ._note-u.deleted ._note-is-show,
 ._note-u:not(.deleted) ._note-is-del{display:none}
 
+._comment-is-del{margin:10px;color:#777}
+._comment-u.deleted ._comment-is-show,
+._comment-u:not(.deleted) ._comment-is-del{display:none}
+
 
 
 

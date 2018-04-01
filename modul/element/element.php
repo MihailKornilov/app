@@ -1764,20 +1764,24 @@ function _noteList($page_id, $obj_id) {
 		$comment = '';
 		foreach($r['comment'] as $c) {
 			$comment .=
-				'<div class="_comment-u">'.
-					'<table class="bs5 w100p">'.
+				'<div class="_comment-u" val="'.$c['id'].'">'.
+					'<table class="_comment-is-show bs5 w100p">'.
 						'<tr><td class="w35">'.
 								'<img class="ava30" src="'._user($c['user_id_add'], 'src').'">'.
 							'<td>'.
 								'<div class="_note-icon fr mr5">'.
-									'<div class="icon icon-edit pl"></div>'.
-									'<div class="icon icon-del pl"></div>'.
+									'<div val="dialog_id:82,unit_id:'.$r['id'].'" class="dialog-open icon icon-edit pl"></div>'.
+									'<div class="comment-del icon icon-del pl"></div>'.
 								'</div>'.
 								'<a class="fs12">'._user($c['user_id_add'], 'name').'</a>'.
 								'<div class="fs12 pale mt2">'.FullDataTime($c['dtime_add'], 1).'</div>'.
 						'<tr>'.
 							'<td colspan="2">'._br($c['txt']).
 					'</table>'.
+					'<div class="_comment-is-del">'.
+						'Комментарий удалён.'.
+						'<a class="comment-rest ml10">Восстановить</a>'.
+					'</div>'.
 				'</div>';
 		}
 		$send .=
@@ -1788,7 +1792,7 @@ function _noteList($page_id, $obj_id) {
 								'<img class="ava40" src="'._user($r['user_id_add'], 'src').'">'.
 							'<td>'.
 								'<div class="note-del icon icon-del pl fr'._tooltip('Удалить заметку', -91, 'r').'</div>'.
-								'<div class="icon icon-edit pl fr'._tooltip('Изменить заметку', -98, 'r').'</div>'.
+								'<div val="dialog_id:81,unit_id:'.$r['id'].'" class="dialog-open icon icon-edit pl fr'._tooltip('Изменить заметку', -98, 'r').'</div>'.
 								'<a class="b">'._user($r['user_id_add'], 'name').'</a>'.
 								'<div class="pale mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
 						'<tr>'.

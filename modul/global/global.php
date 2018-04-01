@@ -57,7 +57,8 @@ function _table($id=false) {//таблицы в базе с соответствующими идентификаторами
 		12 => '_user',
 //		13 => '_user_app',
 		14 => '_user_auth',
-		15 => '_user_spisok_filter'
+		15 => '_user_spisok_filter',
+		16 => '_note'
 	);
 
 	if($id === false)
