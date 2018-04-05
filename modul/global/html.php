@@ -81,6 +81,7 @@ function _auth() {//авторизация через сайт
 function _authLogin() {//отображение ссылки для входа через ВКонтакте
 	if(CODE)
 		return '';
+
 	if(IFRAME)
 		return
 		'<div class="bg-gr1 pad30">'.
@@ -89,7 +90,7 @@ function _authLogin() {//отображение ссылки для входа через ВКонтакте
 			'</div>'.
 		'</div>';
 
-
+	//вход через сайт
 	return
 	'<div class="center mt40">'.
 		'<div class="w1000 pad30 dib mt40">'.
@@ -98,7 +99,7 @@ function _authLogin() {//отображение ссылки для входа через ВКонтакте
 	'</div>'.
 (!LOCAL ?
 	'<script src="https://vk.com/js/api/openapi.js?152"></script>'.
-	'<script>VK.init({apiId:'.AUTH_APP_ID.'})</script>'
+	'<script>VK.init({apiId:'.AUTH_APP_ID.'});</script>'
 : '');
 }
 function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной авторизации
@@ -292,6 +293,11 @@ function _html_script() {//скрипты и стили
 	return
 	//Отслеживание ошибок в скриптах
 (SA ? '<script src="js/errors.js"></script>' : '').
+
+(IFRAME && !LOCAL ?
+	'<script src="https://vk.com/js/api/xd_connection.js?2"></script>'.
+	'<script>VK.init(function() {},function() {},"5.60");</script>'
+: '').
 
 	'<script>'.
 		'var URL="'.URL.'",'.

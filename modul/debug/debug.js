@@ -71,7 +71,7 @@ $(document)
 				sp.addClass('sel');
 		});
 
-
+/*
 		if(_cookie('face') == 'iframe')
 			frame0.onresize = function() {
 				var inn = $(window).innerWidth(),
@@ -83,7 +83,8 @@ $(document)
 				}
 				body._dn(!(out - inn), 'scrl');
 			};
-//		$(window).resize();
+*/
+		//		$(window).resize();
 
 		$('#_debug h1').click(function() {
 			var t = $(this).parent(),

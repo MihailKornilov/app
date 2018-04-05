@@ -5,19 +5,20 @@ var VK_FRAME,       //фрейм для изменения высоты контакта $('#frame0')
 	_faceTest = function() {//определение, как загружена страница: iframe или сайт
 		if(_cookie('local'))
 			return;
+
 		//если текущее значение не совпадает, то установка и перезагрузка страницы
 		var face = window == window.top ? 'site' : 'iframe';
 
+		if(_cookie('face') != face) {
+			_cookie('face', face);
+		//	location.reload();
+			return;
+		}
 		if(face == 'iframe') {
 			VK_FRAME = $('#frame0');
 			_fbhs();
 			window.frame0.onresize = _fbhs;
 		}
-
-		if(_cookie('face') == face)
-			return;
-		_cookie('face', face);
-		location.reload();
 	},
 	_faceGo = function(face) {
 		_cookie('face', face);
@@ -25,6 +26,8 @@ var VK_FRAME,       //фрейм для изменения высоты контакта $('#frame0')
 	},
 
 	_fbhs = function() {//коррекция высоты окна в VK
+		if(_cookie('local'))
+			return;
 		if(_cookie('face') != 'iframe')
 			return;
 
