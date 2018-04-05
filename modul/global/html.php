@@ -413,61 +413,6 @@ function _app_list() {//список приложений, которые доступны пользователю
 
 	return $send;
 }
-function _app_create() {//автоматическое создание приложени€, если пользователь впервые зашЄл на сайт
-	/*
-		ѕриложение создаЄтс€ только с сайта.
-		id начинаетс€ от 1001 и не может быть больше 2.000.000, так как реальные приложени€ VK идут от 2млн
-	*/
-
-	if(APP_ID)
-		return '';
-
-
-	return '';
-
-	$sql = "SELECT MAX(`id`)+1
-			FROM `_app`
-			WHERE `id`<2000000";
-	if(!$app_id = query_value($sql))
-		$app_id = 1001;
-
-	$sql = "INSERT INTO `_app` (
-				`id`,
-				`name`,
-				`user_id_add`
-			) VALUES (
-				".$app_id.",
-				'ѕриложение ".$app_id."',
-				".USER_ID."
-			)";
-	query($sql);
-
-	$sql = "INSERT INTO `_vkuser_app` (
-				`viewer_id`,
-				`app_id`,
-				`last_seen`,
-				`admin`,
-				`worker`
-			) VALUES (
-				".USER_ID.",
-				".$app_id.",
-				CURRENT_TIMESTAMP,
-				1,
-				1
-			)";
-	query($sql);
-
-	$sql = "UPDATE `_vkuser_auth`
-			SET `app_id`=".$app_id."
-			WHERE `code`='".CODE."'
-			  AND `viewer_id`=".USER_ID;
-	query($sql);
-
-	_cache('clear', '_auth');
-	header('Location:'.URL);
-
-	return '<div class="_empty mt20">ѕриложений нет.</div>';
-}
 function _app_content() {//центральное содержание
 	if(!CODE)
 		return '';

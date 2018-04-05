@@ -236,11 +236,12 @@ switch(@$_POST['op']) {
 			if(!$id = _num($r['id']))
 				continue;
 
-			$parent_id = _num($r['parent_id']);
+			$upd = "`sort`=".$n;
+			if(isset($dialog['field1']['parent_id']))
+				$upd .= ",`parent_id`="._num($r['parent_id']);
 
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
-					SET `parent_id`=".$parent_id.",
-						`sort`=".$n."
+			$sql = "UPDATE `".$dialog['table_name_1']."`
+					SET ".$upd."
 					WHERE `id`=".$id;
 			query($sql);
 		}

@@ -1996,6 +1996,18 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 
 function _page_div() {//todo тест
+	return
+	'<div>'.
+		'USER_ID='.USER_ID.
+		'<br>'.
+		'PAGE_ID='._page('cur').
+		'<br>'.
+		'APP_ID='.APP_ID.
+		'<br>'.
+		'APP_ACCESS='.APP_ACCESS.
+	'</div>';
+
+
 
 	$dlg = _dialogQuery(1003);
 
