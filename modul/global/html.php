@@ -16,7 +16,7 @@ function _face() {//определение, как загружена страница: iframe или сайт
 function _saDefine() {//установка флага суперпользовател€ SA
 	//—писок пользователей - SA
 	$SA[1] = true;  //ћихаил  орнилов
-//	$SA[20912036] = true;//»горь
+	$SA[53] = true;
 
 	define('SA', isset($SA[USER_ID]) ? 1 : 0);
 
@@ -81,6 +81,14 @@ function _auth() {//авторизаци€ через сайт
 function _authLogin() {//отображение ссылки дл€ входа через ¬ онтакте
 	if(CODE)
 		return '';
+	if(IFRAME)
+		return
+		'<div class="bg-gr1 pad30">'.
+			'<div class="fs14 center bor-e8 bg-fff pad30 grey">'.
+				'¬ход в приложение недоступен.'.
+			'</div>'.
+		'</div>';
+
 
 	return
 	'<div class="center mt40">'.
@@ -296,6 +304,9 @@ function _html_script() {//скрипты и стили
 	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
 	'<script src="js/autosize.js?3"></script>'.
 
+	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
+	'<script src="modul/global/global'.MIN.'.js?'.VERSION.'"></script>'.
+
 (CODE ?
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
@@ -307,9 +318,6 @@ function _html_script() {//скрипты и стили
 	'<script src="js/gridstack'.MIN.'.js?"></script>'.
 	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'
 : '').
-
-	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
-	'<script src="modul/global/global'.MIN.'.js?'.VERSION.'"></script>'.
 
 	'<script src="modul/page/page'.MIN.'.js?'.VERSION.'"></script>'.
 
@@ -387,10 +395,10 @@ function _hat_but_pas() {//отображение кнопки настройки страницы
 	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
 }
 
-function _app_create($dialog, $unit_id) {//прив€зка пользовател€ к приложению после его создани€
+function _app_create($dialog, $app_id) {//прив€зка пользовател€ к приложению после его создани€
 	if($dialog['id'] != 100)
 		return;
-	if(!$unit_id)
+	if(!$app_id)//ID созданного приложени€ в таблице _app
 		return;
 
 	$sql = "SELECT COUNT(*)
@@ -407,12 +415,23 @@ function _app_create($dialog, $unit_id) {//прив€зка пользовател€ к приложению по
 				`connect_1`,
 				`num_1`
 			) VALUES (
-				".APP_ID.",
+				".$app_id.",
 				1011,
-				".$unit_id.",
+				".USER_ID.",
 				1
 			)";
 	query($sql);
+
+	$sql = "UPDATE `_user_auth`
+			SET `app_id`=".$app_id."
+			WHERE `code`='".CODE."'";
+	query($sql);
+
+	_cache('clear', '_auth');
+	_cache('clear', '_pageCache');
+	_cache('clear', '_userCache'.USER_ID);
+
+	_auth();
 }
 function _app_list() {//список приложений, которые доступны пользователю
 	if(!USER_ID)
@@ -437,8 +456,8 @@ function _app_list() {//список приложений, которые доступны пользователю
 	$send = '';
 	foreach($spisok as $r) {
 		$send .=
-			'<div class="pad10 bg-gr2 mb10 over2 curP" onclick="_appEnter('.$r['id'].')">'.
-				'<span class="grey">'.$r['id'].'</span> '.
+			'<div class="pad10 bg-gr2 mb10 over2 curP" onclick="_appEnter('.$r['app_id'].')">'.
+		  (SA ? '<span class="grey">'.$r['app_id'].'</span> ' : '').
 				_app($r['app_id'], 'name').
 				'<div class="fr grey">'.FullData($r['dtime_add']).'</div>'.
 			'</div>';

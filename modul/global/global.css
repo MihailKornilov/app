@@ -87,6 +87,21 @@ ol{list-style-type:none}
 
 
 
+/* Сообщение пустого запроса */
+._empty{
+	font-size:14px;
+	color:#777;
+	background:#f9f9f9;
+	border:#ddd solid 1px;
+	border-radius:2px;
+	text-align:center;
+	padding:70px 20px;
+}
+._empty.min{padding:20px}
+._empty.red{color:red}
+
+
+
 
 
 /* Иконки */
