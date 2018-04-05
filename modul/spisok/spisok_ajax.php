@@ -356,10 +356,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 		$elem = _elemQuery($unit_id);
 		if($elem['block'])
 			_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
+		$unit['title'] = _elemTitle($unit_id);
 	}
 
-	if(IS_ELEM)
-		$unit['title'] = _elemTitle($unit_id);
+	_app_create($dialog, $unit_id);
 
 	$send = array(
 		'unit' => utf8($unit),

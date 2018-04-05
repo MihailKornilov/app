@@ -387,6 +387,33 @@ function _hat_but_pas() {//отображение кнопки настройки страницы
 	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
 }
 
+function _app_create($dialog, $unit_id) {//привязка пользователя к приложению после его создания
+	if($dialog['id'] != 100)
+		return;
+	if(!$unit_id)
+		return;
+
+	$sql = "SELECT COUNT(*)
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=1011
+			  AND `connect_1`=".USER_ID;
+	if(query_value($sql))
+		return;
+
+	$sql = "INSERT INTO `_spisok` (
+				`app_id`,
+				`dialog_id`,
+				`connect_1`,
+				`num_1`
+			) VALUES (
+				".APP_ID.",
+				1011,
+				".$unit_id.",
+				1
+			)";
+	query($sql);
+}
 function _app_list() {//список приложений, которые доступны пользователю
 	if(!USER_ID)
 		return '';
@@ -399,7 +426,13 @@ function _app_list() {//список приложений, которые доступны пользователю
 			  AND `dialog_id`=1011
 			ORDER BY `dtime_add`";
 	if(!$spisok = query_arr($sql))
-		return 'Приложения не созданы.';
+		return
+			'<div class="center pad30 color-555 fs15">'.
+				'Доступных приложений нет.'.
+				'<br>'.
+				'<br>'.
+				'<button class="vk green dialog-open" val="dialog_id:100">Создать приложение</div>'.
+			'</div>';
 
 	$send = '';
 	foreach($spisok as $r) {
