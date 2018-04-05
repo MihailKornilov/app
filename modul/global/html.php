@@ -263,7 +263,7 @@ function _html() {
 		_html_script().
 	'</head>'.
 
-	'<body class="'.(CODE && FACE ? 'site' : '').'">'.
+	'<body class="'.SITE.'">'.
 		(IFRAME ? '<iframe id="frame0" name="frame0"></iframe>' : '').
 
 		_authLogin().

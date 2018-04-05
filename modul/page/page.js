@@ -1,5 +1,5 @@
-var VK_FRAME,       //фрейм для изменения высоты контакта $('#frame0')
-	VK_FRAME_H = 0,
+var VK_BODY,       //фрейм VK для изменения высоты $('body')
+	VK_BODY_H = 0, //текущая высота фрейма VK
 	VK_SCROLL = 0,
 
 	_faceTest = function() {//определение, как загружена страница: iframe или сайт
@@ -11,12 +11,13 @@ var VK_FRAME,       //фрейм для изменения высоты контакта $('#frame0')
 
 		if(_cookie('face') != face) {
 			_cookie('face', face);
-		//	location.reload();
+			location.reload();
 			return;
 		}
 		if(face == 'iframe') {
-			VK_FRAME = $('#frame0');
+			VK_BODY = $('body');
 			_fbhs();
+
 			window.frame0.onresize = _fbhs;
 		}
 	},
@@ -33,13 +34,13 @@ var VK_FRAME,       //фрейм для изменения высоты контакта $('#frame0')
 
 		var h;
 
-		VK_FRAME.height('auto');
-		h = VK_FRAME.height();
+		VK_BODY.height('auto');
+		h = VK_BODY.height();
 
-		if(VK_FRAME_H == h)
+		if(VK_BODY_H == h)
 			return;
 
-		VK_FRAME_H = h;
+		VK_BODY_H = h;
 
 		VK.callMethod('resizeWindow', 1000, h);
 	},
