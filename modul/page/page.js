@@ -14,12 +14,7 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 			location.reload();
 			return;
 		}
-		if(face == 'iframe') {
-			VK_BODY = $('body');
-			_fbhs();
-
-			window.frame0.onresize = _fbhs;
-		}
+		_fbhs();
 	},
 	_faceGo = function(face) {
 		_cookie('face', face);
@@ -31,6 +26,11 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 			return;
 		if(_cookie('face') != 'iframe')
 			return;
+
+		if(!VK_BODY) {
+			VK_BODY = $('body');
+			window.frame0.onresize = _fbhs;
+		}
 
 		var h;
 
