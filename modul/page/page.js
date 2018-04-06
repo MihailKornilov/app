@@ -39,13 +39,10 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 			});
 		}
 
-		VK_BODY.height('auto');
-		if(!h)
-			h = 0;
-
-		var bodyH = VK_BODY.height();
-		if(h < bodyH)
-			h = bodyH;
+		if(typeof h != 'number') {
+			VK_BODY.height('auto');
+			h = VK_BODY.height();
+		}
 
 		_forEq($('._dialog'), function(sp) {
 			var top = _num(sp.css('top').split('px')[0]),
