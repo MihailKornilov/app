@@ -21,7 +21,7 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 		location.reload();
 	},
 
-	_fbhs = function() {//коррекция высоты окна в VK
+	_fbhs = function(h) {//коррекция высоты окна в VK
 		if(_cookie('local'))
 			return;
 		if(_cookie('face') != 'iframe')
@@ -30,12 +30,29 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 		if(!VK_BODY) {
 			VK_BODY = $('body');
 			window.frame0.onresize = _fbhs;
+
+//			VK.callMethod('scrollWindow', _scroll());
+
+			VK.callMethod('scrollSubscribe');
+			VK.addCallback('onScroll', function(top) {
+				VK_SCROLL = top;
+			});
 		}
 
-		var h;
-
 		VK_BODY.height('auto');
-		h = VK_BODY.height();
+		if(!h)
+			h = 0;
+
+		var bodyH = VK_BODY.height();
+		if(h < bodyH)
+			h = bodyH;
+
+		_forEq($('._dialog'), function(sp) {
+			var top = _num(sp.css('top').split('px')[0]),
+				dH = sp.height() + top + 20;
+			if(h < dH)
+				h = dH;
+		});
 
 		if(VK_BODY_H == h)
 			return;

@@ -108,7 +108,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 			'<div class="_dialog">' +
 				'<div class="head ' + o.color + '">' +
 					'<div class="close fr curP"><a class="icon icon-del wh pl"></a></div>' +
-		            '<div class="edit fr curP' + _dn(!DIALOG_NUM && o.edit_access) + '"><a class="icon icon-edit wh pl"></a></div>' +
+		            '<div class="edit fr curP' + _dn(!DIALOG_NUM && o.edit_access && _cookie('face') == 'site') + '"><a class="icon icon-edit wh pl"></a></div>' +
 					'<div class="fs14 white">' + o.head + '</div>' +
 				'</div>' +
 				'<div class="content bg-fff"' + (o.pad ? ' style="padding:' + o.pad + 'px"' : '') + '>' +
@@ -135,10 +135,10 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				if(o.dialog_id)
 					delete DIALOG[o.dialog_id];
 			},
-			w2 = Math.round(width / 2); // ширина/2. ƒл€ определени€ положени€ по центру
+			w2 = Math.round(width / 2), // ширина/2. ƒл€ определени€ положени€ по центру
+			vkScroll = VK_SCROLL > 110 ? VK_SCROLL - 110 : 0;//корректировка скролла VK
 
 		dialog.find('.close').click(dialogClose);
-//		content.find('input')._enter(submitFunc);//дл€ всех input при нажатии enter примен€етс€ submit
 		butSubmit.click(submitFunc);
 		butCancel.click(function() {
 //			e.stopPropagation();
@@ -171,13 +171,16 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				height:$(document).height()
 			 })
 			 .click(dialogClose);
+
 		dialog.css({
 			width:width + 'px',
-			top:$(window).scrollTop() + VK_SCROLL + o.top + 'px',
+			top:$(window).scrollTop() + vkScroll + o.top + 'px',
 			left:$(document).width() / 2 - w2 + 'px',
 			'z-index':ZINDEX + 5
 		});
 		ZINDEX += 10;
+
+		_fbhs();
 
 		function dialogClose() {
 			DBACK.remove();
@@ -185,6 +188,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 			ZINDEX -= 10;
 			if(o.dialog_id)
 				delete DIALOG[o.dialog_id];
+			_fbhs();
 		}
 		function dialogErr(msg) {
 			butSubmit._hint({
@@ -1092,8 +1096,10 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 									note = t.parents('._note-u'),
 									area = comm.find('textarea'),
 									txt = $.trim(area.val());
-								if(!txt)
+								if(!txt) {
+									area.focus();
 									return;
+								}
 								var send = {
 									op:'note_comment_add',
 									note_id:note.attr('val'),
@@ -3365,8 +3371,9 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2018
 		SEL._dn(rs, 'rs');
 		RES._dn(RES.height() < 250, 'h250');
 
-		//выделение выбранного значени€
-		if(!rs)
+		//открытие списка
+		if(!rs) {
+			//выделение выбранного значени€
 			_forEq(RES.find('.select-unit'), function(sp) {
 				if(VALUE == sp.attr('val')) {
 					RES.find('.select-unit').removeClass('ov');
@@ -3380,6 +3387,11 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2018
 					return false;
 				}
 			});
+
+			//корректировка высоты фрейма VK, чтобы список не уходил за экран
+			_fbhs(RES.offset().top + RES.height() + 20)
+		} else
+			_fbhs();
 	});
 	ICON_DEL.click(function() {
 		valueSet(0);

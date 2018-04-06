@@ -8,4 +8,6 @@ _saDefine();
 _user();
 _pasDefine();
 
-die(_html()._page_div());
+die(_html()
+//	._page_div()
+);
