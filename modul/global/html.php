@@ -94,7 +94,9 @@ function _authLogin() {//отображение ссылки для входа через ВКонтакте
 	return
 	'<div class="center mt40">'.
 		'<div class="w1000 pad30 dib mt40">'.
-			'<button class="vk" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Войти через VK</button>'.
+			'<button class="vk w200" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Войти через VK</button>'.
+			'<br>'.
+			'<button class="vk w200 grey mt10 dialog-open" val="dialog_id:99">Войти по логину и паролю</button>'.
 		'</div>'.
 	'</div>'.
 (!LOCAL ?
@@ -327,10 +329,10 @@ function _html_script() {//скрипты и стили
 
 	'<script src="modul/page/page'.MIN.'.js?'.SCRIPT.'"></script>'.
 
-(CODE ?
 	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.SCRIPT.'" />'.
 	'<script src="modul/element/element'.MIN.'.js?'.SCRIPT.'"></script>'.
 
+(CODE ?
 	'<script src="modul/block/block'.MIN.'.js?'.SCRIPT.'"></script>'.
 
 	'<script src="modul/spisok/spisok'.MIN.'.js?'.SCRIPT.'"></script>'

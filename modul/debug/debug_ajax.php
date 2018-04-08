@@ -103,7 +103,7 @@ switch(@$_POST['op']) {
 			foreach(_ids($spisok_ids, 1) as $id)
 				_cache('clear', 'spisok_'.$id);
 
-		userImageMove();
+		_userImageMove();
 
 		jsonSuccess();
 		break;

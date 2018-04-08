@@ -21,8 +21,10 @@ switch(@$_POST['op']) {
 				FROM `_user`
 				WHERE `vk_id`=".$vkUser_id."
 				LIMIT 1";
-		if(!$user_id = _num(query_value($sql)))
+		if(!$user_id = _num(query_value($sql))) {
 			$user_id = _userVkUpdate($vkUser_id);//если нет - получение данных из VK
+			_userImageMove();
+		}
 
 		_authSuccess($sig, $user_id);
 

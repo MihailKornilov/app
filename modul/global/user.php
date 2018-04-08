@@ -70,7 +70,7 @@ function _userCache($user_id) {
 }
 function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 	if(LOCAL)
-		_appError('Not load user from VK <b>'.$vk_id.'</b> in LOCAL version.');
+		_appError('Данные пользователя VK не были получены <b>'.$vk_id.'</b> в LOCAL версии.');
 
 	$res = _vkapi('users.get', array(
 		'user_ids' => $vk_id,
@@ -98,6 +98,12 @@ function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 			LIMIT 1";
 	$user_id = _num(query_value($sql));
 
+	$pol = array(
+		0 => 0,
+		1 => 1750,//женский
+		2 => 1749 //мужской
+	);
+
 	$sql = "INSERT INTO `_user` (
 				`id`,
 				`vk_id`,
@@ -110,7 +116,7 @@ function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 				".$vk_id.",
 				'".addslashes($u['last_name'])."',
 				'".addslashes($u['first_name'])."',
-				"._num($u['sex']).",
+				"._num(@$pol[$u['sex']]).",
 				'".addslashes($u['photo'])."'
 			) ON DUPLICATE KEY UPDATE
 				`f`=VALUES(`f`),
@@ -123,4 +129,74 @@ function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 		$user_id = query_insert_id('_user');
 
 	return $user_id;
+}
+function _userImageMove() {//перенос аватарок пользователей в изображения
+	_cache('clear', '_imageServerCache');
+
+	$sql = "SELECT *
+			FROM `_user`
+			WHERE LENGTH(`ava`)";
+	foreach(query_arr($sql) as $r) {
+		$ex = explode('/', $r['ava']);
+		$c = count($ex) - 1;
+		$server = '';
+		foreach($ex as $n => $v) {
+			if($n == $c)
+				continue;
+			$server .= $v.'/';
+		}
+		$name = $ex[$c];
+
+		$sql = "INSERT INTO `_image` (
+					`server_id`,
+	
+					`max_name`,
+					`max_x`,
+					`max_y`,
+	
+					`80_name`,
+					`80_x`,
+					`80_y`,
+	
+					`obj_name`,
+					`obj_id`,
+	
+					`user_id_add`
+				) VALUES (
+					"._imageServer($server).",
+	
+					'".$name."',
+					50,
+					50,
+	
+					'".$name."',
+					50,
+					50,
+	
+					'elem_1778',
+					".$r['id'].",
+	
+					".USER_ID."
+			)";
+		query($sql);
+
+		$image_id = query_insert_id('_image');
+
+		$sql = "UPDATE `_user`
+				SET `ava`=''
+				WHERE `id`=".$r['id'];
+		query($sql);
+
+		$sql = "SELECT `id`
+				FROM `_spisok`
+				WHERE `app_id`=".APP_ID."
+				  AND `dialog_id`=1011
+				  AND `connect_1`=".$r['id'];
+		if($spisok_id = query_value($sql)) {
+			$sql = "UPDATE `_spisok`
+					SET `image_1`=".$image_id."
+					WHERE `id`=".$spisok_id;
+			query($sql);
+		}
+	}
 }
