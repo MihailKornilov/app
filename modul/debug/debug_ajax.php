@@ -28,10 +28,16 @@ switch(@$_POST['op']) {
 		jsonSuccess();
 		break;
 	case 'cache_clear'://очистка xCache
+		$sql = "UPDATE `_setting`
+				SET `v`=`v`+1
+				WHERE `key`='SCRIPT'";
+		query($sql);
+		_cache('clear', '_setting');          //настройки
+
 		_cache('clear', '_auth');             //авторизация
 		_cache('clear', '_pageCache');        //страницы
 		_cache('clear', '_imageServerCache'); //серверы изображений
-		_spisokFilter('cache_clear');                 //очистка фильтров
+		_spisokFilter('cache_clear');                //очистка фильтров
 
 		//пользователи
 /*

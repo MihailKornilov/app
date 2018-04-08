@@ -28,7 +28,6 @@ define('YEAR_CUR', strftime('%Y'));
 define('CODE', _txt(@$_COOKIE['code']));
 define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '.min');
-define('VERSION', _num(@$_COOKIE['version']));
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);
 
@@ -40,6 +39,30 @@ define('AJAX', APP_HTML.'/ajax.php?'.TIME);
 //глобальные переменные
 $CACHE_ARR = array();
 
+function _setting() {//установка констант-настроек
+	if(!$arr = _cache()) {
+		$sql = "SELECT `key`,`v`
+				FROM `_setting`";
+		$arr = query_ass($sql);
+
+		if(empty($arr['SCRIPT'])) {
+			$sql = "INSERT INTO `_setting` (
+						`key`,
+						`v`
+					) VALUES (
+						'SCRIPT',
+						100
+					)";
+			query($sql);
+			$arr['SCRIPT'] = 100;
+		}
+
+		_cache($arr);
+	}
+
+	//версия скриптов
+	define('SCRIPT', _num($arr['SCRIPT']));
+}
 
 function _table($id=false) {//таблицы в базе с соответствующими идентификаторами
 	$tab = array(

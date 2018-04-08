@@ -310,8 +310,8 @@ function _html_script() {//скрипты и стили
 	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
 	'<script src="js/autosize.js?3"></script>'.
 
-	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.VERSION.'" />'.
-	'<script src="modul/global/global'.MIN.'.js?'.VERSION.'"></script>'.
+	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.SCRIPT.'" />'.
+	'<script src="modul/global/global'.MIN.'.js?'.SCRIPT.'"></script>'.
 
 (CODE ?
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
@@ -325,15 +325,15 @@ function _html_script() {//скрипты и стили
 	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'
 : '').
 
-	'<script src="modul/page/page'.MIN.'.js?'.VERSION.'"></script>'.
+	'<script src="modul/page/page'.MIN.'.js?'.SCRIPT.'"></script>'.
 
 (CODE ?
-	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.VERSION.'" />'.
-	'<script src="modul/element/element'.MIN.'.js?'.VERSION.'"></script>'.
+	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.SCRIPT.'" />'.
+	'<script src="modul/element/element'.MIN.'.js?'.SCRIPT.'"></script>'.
 
-	'<script src="modul/block/block'.MIN.'.js?'.VERSION.'"></script>'.
+	'<script src="modul/block/block'.MIN.'.js?'.SCRIPT.'"></script>'.
 
-	'<script src="modul/spisok/spisok'.MIN.'.js?'.VERSION.'"></script>'
+	'<script src="modul/spisok/spisok'.MIN.'.js?'.SCRIPT.'"></script>'
 : '').
 
 	_debug('style');

@@ -463,7 +463,6 @@ $(document)
 	})
 	.on('click', '#cache_clear', function() {//очищение кеша
 		_post({'op':'cache_clear'}, 'reload');
-		_cookie('version', _num(_cookie('version')) + 1);
 		_msg('Кеш очищен.');
 	})
 	.on('click', '#page_setup', function() {//включение/выключение управления страницей
