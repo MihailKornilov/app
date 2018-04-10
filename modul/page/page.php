@@ -29,7 +29,8 @@ function _pageCache() {//получение массива страниц из кеша
 	foreach($page as $id => $r) {
 		$block_count = _num(@$block[$id]);
 		$page[$id]['del_access'] = $block_count || $r['common_id'] ? 0 : 1;
-		$page[$id]['access'] = !$r['sa'] && !$r['app_id'];
+		//страница доступна создателю приложения, а также всем, если не SA и для всех приложений
+		$page[$id]['access'] = USER_CREATOR || !$r['sa'] && !$r['app_id'];
 	}
 
 	$sql = "SELECT *

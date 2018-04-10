@@ -120,7 +120,7 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 				FROM `_app`
 				WHERE `id`=".$app_id;
 		if(!$arr = query_assoc($sql))
-			_appError('Невозможно прочитать данные приложения для кеша.');
+			_appError($sql.'Невозможно прочитать данные приложения для кеша.');
 
 		_cache($arr);
 	}
@@ -536,8 +536,8 @@ function _cache($data='', $key='') {//кеширование данных
 	*/
 	global $CACHE_ARR;
 
-	if(!CODE)
-		return false;
+	if(!$CODE = CODE)
+		$CODE = 'default_no_auth';
 
 	if(!$key) {
 		$DBT = debug_backtrace(0);
@@ -554,7 +554,7 @@ function _cache($data='', $key='') {//кеширование данных
 		$key = $DBT['function'].$ARG;
 	}
 
-	$cKey = md5(CODE).$key;
+	$cKey = md5($CODE).$key;
 	if($data == 'clear') {
 		xcache_unset($cKey);
 		$CACHE_ARR[] = array(

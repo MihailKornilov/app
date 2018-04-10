@@ -44,8 +44,8 @@ switch(@$_POST['op']) {
 		break;
 }
 
-if(!CODE)
-	jsonError('Пользователь не авторизирован');
+//if(!CODE)
+//	jsonError('Пользователь не авторизирован');
 
 
 

@@ -292,6 +292,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	$POST_CMP = _spisokUnitCmpTest($dialog);
 
+	_auth99($dialog, $POST_CMP);
+
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 
 

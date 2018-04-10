@@ -932,7 +932,7 @@ function _dialogOpenLoad($dialog_id) {
 	$unit['source'] = $send;
 
 	$send['act'] = $act;
-	$send['edit_access'] = SA || $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
+	$send['edit_access'] = _num(@SA) || $dialog['app_id'] && $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 	$send['head'] = utf8($dialog[$act.'_head']);
 	$send['button_submit'] = utf8($dialog[$act.'_button_submit']);

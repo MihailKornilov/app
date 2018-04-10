@@ -16,6 +16,7 @@ function _face() {//определение, как загружена страница: iframe или сайт
 function _saDefine() {//установка флага суперпользователя SA
 	//Список пользователей - SA
 	$SA[1] = true;  //Михаил Корнилов
+//	$SA[18] = true;
 	$SA[53] = true;
 
 	define('SA', isset($SA[USER_ID]) ? 1 : 0);
@@ -183,7 +184,31 @@ function _authLogout() {//выход из приложения, если требуется
 	header('Location:'.URL);
 	exit;
 }
+function _auth99($dialog, $cmp) {//авторизация по логину и паролю
+	if($dialog['id'] != 99)
+		return;
+	if(empty($cmp[2058]))
+		jsonError('Не указан логин');
+	if(empty($cmp[2059]))
+		jsonError('Не указан пароль');
 
+	$login = $cmp[2058];
+	$pass = $cmp[2059];
+
+	$sql = "SELECT `id`
+			FROM `_user`
+			WHERE `login`='".addslashes($login)."'
+			  AND `pass`='".addslashes($pass)."'
+			LIMIT 1";
+	if(!$user_id = _num(query_value($sql)))
+		jsonError('Неверный логин или пароль');
+
+	$sig = md5($login.$pass.$_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR']);
+	_authSuccess($sig, $user_id);
+
+	$send['action_id'] = 1;
+	jsonSuccess($send);
+}
 
 function i_auth() {//авторизация через iframe
 	if($auth_key = @$_GET['auth_key']) {
@@ -378,7 +403,8 @@ function _hat_but_sa() {//отображение кнопки списка страниц
 function _hat_but_page() {//отображение кнопки списка страниц
 	if(!APP_ID)
 		return '';
-
+	if(!USER_CREATOR)
+		return '';
 	if(_page('cur') == 12)
 		return '';
 
@@ -387,16 +413,14 @@ function _hat_but_page() {//отображение кнопки списка страниц
 function _hat_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)
 		return '';
-
+	if(!USER_CREATOR)
+		return '';
 	if(!$page_id = _page('cur'))
 		return '';
-
 	if(!$page = _page($page_id))
 		return '';
-
 	if($page['sa'] && !SA)
 		return '';
-
 	if(!$page['app_id'] && !SA)
 		return '';
 
