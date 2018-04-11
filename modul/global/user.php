@@ -7,7 +7,7 @@ function _user($user_id=USER_ID, $i='') {//получение данных о пользовате из конт
 		return array();
 
 	if(!defined('USER_NAME')) {
-		define('USER_CREATOR', APP_ID && _app(APP_ID, 'user_id_add') == USER_ID);//создатель приложени€
+		define('USER_CREATOR', 1);//APP_ID && _app(APP_ID, 'user_id_add') == USER_ID);//создатель приложени€
 		define('USER_WORKER', $u['worker']);
 //		define('USER_APP_ONE', $u['app_count'] < 2);
 		define('USER_NAME', $u['i'].' '.$u['f']);//»м€ ‘амили€

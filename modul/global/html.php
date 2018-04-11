@@ -184,6 +184,32 @@ function _authLogout() {//выход из приложения, если требуется
 	header('Location:'.URL);
 	exit;
 }
+function _auth98($dialog, $cmp) {//регистрация нового пользователя
+	if($dialog['id'] != 98)
+		return;
+
+print_r($cmp);
+jsonSuccess();
+
+	$f = $cmp[2065];
+	$i = $cmp[2066];
+	$login = $cmp[2069];
+	$pass = $cmp[2070];
+
+	$sql = "SELECT `id`
+			FROM `_user`
+			WHERE `login`='".addslashes($login)."'
+			  AND `pass`='".addslashes($pass)."'
+			LIMIT 1";
+	if(!$user_id = _num(query_value($sql)))
+		jsonError('Неверный логин или пароль');
+
+	$sig = md5($login.$pass.$_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR']);
+	_authSuccess($sig, $user_id);
+
+	$send['action_id'] = 1;
+	jsonSuccess($send);
+}
 function _auth99($dialog, $cmp) {//авторизация по логину и паролю
 	if($dialog['id'] != 99)
 		return;
