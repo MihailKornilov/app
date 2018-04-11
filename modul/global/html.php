@@ -84,7 +84,7 @@ function _authLoginIframe() {//проверка авторизации через iframe
 		return '';
 
 	if($auth_key = @$_GET['auth_key']) {
-		if(!$vk_app_id = 0)//_num(@$_GET['api_id']))
+		if(!$vk_app_id = _num(@$_GET['api_id']))
 			return _authIframeError('Ќекорректный ID приложени€.');
 
 		$sql = "SELECT `id`
@@ -92,16 +92,23 @@ function _authLoginIframe() {//проверка авторизации через iframe
 				WHERE `vk_app_id`=".$vk_app_id."
 				LIMIT 1";
 		if(!$app_id = _num(query_value($sql)))
-			return _authIframeError($sql.'ѕриложение не зарегистрировано.');
+			return _authIframeError('ѕриложение не зарегистрировано.');
 
-		if(!$user_id = _num(@$_GET['user_id']))
+		if(!$vk_user_id = _num(@$_GET['user_id']))
 			return _authIframeError('Ќекорректный ID пользовател€.');
 
+		$sql = "SELECT `id`
+				FROM `_user`
+				WHERE `vk_id`=".$vk_user_id."
+				LIMIT 1";
+		if(!$user_id = _num(query_value($sql)))
+			return _authIframeError($sql.'ѕользовател€ нет.');
 
-		if($auth_key != md5($vk_app_id.'_'.$user_id.'_'._app($app_id, 'secret')))
+		if($auth_key != md5($vk_app_id.'_'.$vk_user_id.'_'._app($app_id, 'vk_secret')))
 			return _authIframeError('јвторизаци€ не пройдена.');
 
 		_authSuccess($auth_key, $user_id, $app_id);
+		header('Location:'.URL);
 	}
 
 	if(!CODE)
@@ -131,6 +138,9 @@ function _authLoginSite() {//страница авторизации через сайт
 : '');
 }
 function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной авторизации
+	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes($code)."'";
+	query($sql);
+
 	$ip = $_SERVER['REMOTE_ADDR'];
 	$browser = _txt($_SERVER['HTTP_USER_AGENT']);
 	$sql = "INSERT INTO `_user_auth` (
@@ -155,6 +165,10 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной
 	query($sql);
 
 	setcookie('code', $code, time() + 2592000, '/');
+
+	_cache('clear', '_auth');
+	_cache('clear', '_pageCache');
+	_cache('clear', '_userCache'.$user_id);
 
 	if(LOCAL)
 		setcookie('local', 1, time() + 2592000, '/');
