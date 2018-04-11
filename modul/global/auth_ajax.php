@@ -26,19 +26,24 @@ switch(@$_POST['op']) {
 			_userImageMove();
 		}
 
-		_authSuccess($sig, $user_id);
+		$sql = "SELECT `app_id_last`
+				FROM `_user`
+				WHERE `id`=".$user_id;
+		$app_id_last = _num(query_value($sql));
+
+		_authSuccess($sig, $user_id, $app_id_last);
 
 		jsonSuccess();
 		break;
 	case 'auth_vk_local'://авторизация пользователя по VK - локальная версия
-		$sql = "SELECT `id`
+		$sql = "SELECT *
 				FROM `_user`
 				WHERE `vk_id`=982006
 				LIMIT 1";
-		if(!$user_id = _num(query_value($sql)))
+		if(!$user = query_assoc($sql))
 			jsonError('Пользователь не найден');
 
-		_authSuccess('local'.$user_id, $user_id);
+		_authSuccess('local'.$user['id'], $user['id'], $user['app_id_last']);
 
 		jsonSuccess();
 		break;

@@ -23,6 +23,11 @@ switch(@$_POST['op']) {
 				WHERE `code`='".CODE."'";
 		query($sql);
 
+		$sql = "UPDATE `_user`
+				SET `app_id_last`=".$app_id."
+				WHERE `id`=".USER_ID;
+		query($sql);
+
 		_cache('clear', '_auth');
 		_cache('clear', '_pageCache');
 		_cache('clear', '_userCache'.USER_ID);

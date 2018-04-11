@@ -537,7 +537,7 @@ function _cache($data='', $key='') {//кеширование данных
 	global $CACHE_ARR;
 
 	if(!$CODE = CODE)
-		$CODE = 'default_no_auth';
+		$CODE = 'default_no_auth1';
 
 	if(!$key) {
 		$DBT = debug_backtrace(0);

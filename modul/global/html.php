@@ -128,30 +128,7 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной
 			SET `dtime_last`=CURRENT_TIMESTAMP
 			WHERE `id`=".$user_id;
 	query($sql);
-/*
-	//отметка даты последнего посещения приложения. Если пользователь впервые входит в приложение, то внесение приложения для него
-	if($app_id) {
-		$sql = "SELECT `id`
-		        FROM `_vkuser_app`
-				WHERE `app_id`=".$app_id."
-				  AND `viewer_id`=".$user_id;
-		$id = _num(query_value($sql));
 
-		$sql = "INSERT INTO `_vkuser_app` (
-					`id`,
-					`viewer_id`,
-					`app_id`,
-					`last_seen`
-				) VALUES (
-					".$id.",
-					".$user_id.",
-					".$app_id.",
-					CURRENT_TIMESTAMP
-				) ON DUPLICATE KEY UPDATE
-					`last_seen`=CURRENT_TIMESTAMP";
-		query($sql);
-	}
-*/
 	setcookie('code', $code, time() + 2592000, '/');
 
 	if(LOCAL)
@@ -184,25 +161,39 @@ function _authLogout() {//выход из приложения, если требуется
 	header('Location:'.URL);
 	exit;
 }
+function _authPassMD5($pass) {
+	return md5('655005005xX'.$pass);
+}
 function _auth98($dialog, $cmp) {//регистрация нового пользователя
 	if($dialog['id'] != 98)
 		return;
 
-print_r($cmp);
-jsonSuccess();
-
 	$f = $cmp[2065];
 	$i = $cmp[2066];
+	$pol = array(
+		0 => 0,
+		2073 => 1749,//мужской
+		2074 => 1750 //женский
+	);
 	$login = $cmp[2069];
 	$pass = $cmp[2070];
 
-	$sql = "SELECT `id`
-			FROM `_user`
-			WHERE `login`='".addslashes($login)."'
-			  AND `pass`='".addslashes($pass)."'
-			LIMIT 1";
-	if(!$user_id = _num(query_value($sql)))
-		jsonError('Неверный логин или пароль');
+	$sql = "INSERT INTO `_user` (
+				`f`,
+				`i`,
+				`pol`,
+				`login`,
+				`pass`
+			) VALUES (
+				'".addslashes($f)."',
+				'".addslashes($i)."',
+				".$pol[$cmp[2072]].",
+				'".addslashes($login)."',
+				'"._authPassMD5($pass)."'
+			)";
+	query($sql);
+
+	$user_id = query_insert_id('_user');
 
 	$sig = md5($login.$pass.$_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR']);
 	_authSuccess($sig, $user_id);
@@ -224,7 +215,7 @@ function _auth99($dialog, $cmp) {//авторизация по логину и паролю
 	$sql = "SELECT `id`
 			FROM `_user`
 			WHERE `login`='".addslashes($login)."'
-			  AND `pass`='".addslashes($pass)."'
+			  AND `pass`='"._authPassMD5($pass)."'
 			LIMIT 1";
 	if(!$user_id = _num(query_value($sql)))
 		jsonError('Неверный логин или пароль');
