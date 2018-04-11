@@ -10,5 +10,5 @@ _user();
 _pasDefine();
 
 die(_html()
-//	._page_div()
+	._page_div()
 );

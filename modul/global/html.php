@@ -29,7 +29,7 @@ function _saDefine() {//установка флага суперпользователя SA
 }
 
 /* ---=== АВТОРИЗАЦИЯ ===--- */
-function _auth() {//авторизация через сайт
+function _auth() {//получение данных об авторизации из кеша
 	if(!$r = _cache()) {
 		$sql = "SELECT *
 				FROM `_user_auth`
@@ -79,19 +79,44 @@ function _auth() {//авторизация через сайт
 	}
 */
 }
-function _authLogin() {//отображение ссылки для входа через ВКонтакте
-	if(CODE)
+function _authLoginIframe() {//проверка авторизации через iframe
+	if(!IFRAME)
 		return '';
 
-	if(IFRAME)
-		return
-		'<div class="bg-gr1 pad30">'.
-			'<div class="fs14 center bor-e8 bg-fff pad30 grey">'.
-				'Вход в приложение недоступен.'.
-			'</div>'.
-		'</div>';
+	if($auth_key = @$_GET['auth_key']) {
+		if(!$vk_app_id = 0)//_num(@$_GET['api_id']))
+			return _authIframeError('Некорректный ID приложения.');
 
-	//вход через сайт
+		$sql = "SELECT `id`
+				FROM `_app`
+				WHERE `vk_app_id`=".$vk_app_id."
+				LIMIT 1";
+		if(!$app_id = _num(query_value($sql)))
+			return _authIframeError($sql.'Приложение не зарегистрировано.');
+
+		if(!$user_id = _num(@$_GET['user_id']))
+			return _authIframeError('Некорректный ID пользователя.');
+
+
+		if($auth_key != md5($vk_app_id.'_'.$user_id.'_'._app($app_id, 'secret')))
+			return _authIframeError('Авторизация не пройдена.');
+
+		_authSuccess($auth_key, $user_id, $app_id);
+	}
+
+	if(!CODE)
+		return _authIframeError();
+
+	return '';
+}
+function _authLoginSite() {//страница авторизации через сайт
+	if(!defined('IFRAME_AUTH_ERROR'))
+		define('IFRAME_AUTH_ERROR', 0);
+	if(CODE)
+		return '';
+	if(!SITE)
+		return '';
+
 	return
 	'<div class="center mt40">'.
 		'<div class="w1000 pad30 dib mt40">'.
@@ -226,71 +251,15 @@ function _auth99($dialog, $cmp) {//авторизация по логину и паролю
 	$send['action_id'] = 1;
 	jsonSuccess($send);
 }
-
-function i_auth() {//авторизация через iframe
-	if($auth_key = @$_GET['auth_key']) {
-		if(!$app_id = _num(@$_GET['api_id']))
-			_appError('Ошибка авторизации.'.(SA ? ' Отсутствует ID приложения.' : ''));
-		define('APP_ID', $app_id);
-
-		if(!$user_id = _num(@$_GET['user_id']))
-			_appError('Ошибка авторизации.'.(SA ? ' Отсутствует ID пользователя.' : ''));
-		define('USER_ID', $user_id);
-
-		if($auth_key != md5(APP_ID.'_'.$user_id.'_'._app(APP_ID, 'secret')))
-			_appError('Авторизация не пройдена.');
-
-		_authSuccess($auth_key, $user_id, $app_id);
-
-		if(!_user())
-			_appError('Данные пользователя не получены.');
-
-		if(!USER_WORKER)
-			_appError('Нет доступа в приложение.');
-
-		return;
-	}
-
-	if(!CODE)
-		_appError('Авторизация не пройдена.'.(SA ? ' Пустой code.' : ''));
-	if(!_authCache__())
-		_appError('Авторизация не пройдена.'.(SA ? ' Не получены данные по code.' : ''));
-	if(!USER_WORKER)
-		_appError('Нет доступа в приложение.');
+function _authIframeError($msg='Вход в приложение недоступен.') {//сообщение об ошибке входа в приложение через VK iframe
+	define('IFRAME_AUTH_ERROR', 1);
+	return
+	'<div class="bg-gr1 pad30">'.
+		'<div class="fs14 center bor-e8 bg-fff pad30 grey">'.
+			$msg.
+		'</div>'.
+	'</div>';
 }
-function _appError($msg='Приложение не было загружено.') {//вывод сообщения об ошибке приложения и выход
-	$html =
-		'<!DOCTYPE html>'.
-		'<html lang="ru">'.
-			'<head>'.
-				'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
-				'<title>Error</title>'.
-
-				'<script src="https://vk.com/js/api/xd_connection.js?2"></script>'.
-				'<script>VK.init(function() {},function() {},"5.60");</script>'.
-
-				_html_script().
-
-			'</head>'.
-			'<body>'.
-				'<div id="frameBody">'.
-					'<iframe id="frameHidden" name="frameHidden"></iframe>'.
-
-					'<div class="pad30 bg-gr1">'.
-						'<div class="bg-fff pad30 bor-e8">'.
-							'<div class="center grey mt40 mb40">'.
-								$msg.
-							'</div>'.
-						'</div>'.
-					'</div>'.
-
-				'</div>'.
-			'</body>'.
-		'</html>';
-	die($html);
-}
-
-
 
 
 
@@ -310,7 +279,8 @@ function _html() {
 	'<body class="'.SITE.'">'.
 		(IFRAME ? '<iframe id="frame0" name="frame0"></iframe>' : '').
 
-		_authLogin().
+		_authLoginIframe().
+		_authLoginSite().
 
 		_html_hat().
 		_pasMenu().
@@ -383,6 +353,8 @@ function _html_script() {//скрипты и стили
 	_debug('style');
 }
 function _html_hat() {//верхняя строка приложения для сайта
+	if(IFRAME_AUTH_ERROR)
+		return '';
 	if(!CODE)
 		return '';
 	if(!SITE)
@@ -515,6 +487,8 @@ function _app_list() {//список приложений, которые доступны пользователю
 	return $send;
 }
 function _app_content() {//центральное содержание
+	if(IFRAME_AUTH_ERROR)
+		return '';
 	if(!CODE)
 		return '';
 	if(!USER_ID)

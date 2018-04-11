@@ -71,7 +71,7 @@ function _userCache($user_id) {
 }
 function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 	if(LOCAL)
-		_appError('Данные пользователя VK не были получены <b>'.$vk_id.'</b> в LOCAL версии.');
+		die('Данные пользователя VK не были получены <b>'.$vk_id.'</b> в LOCAL версии.');
 
 	$res = _vkapi('users.get', array(
 		'user_ids' => $vk_id,

@@ -120,7 +120,7 @@ function _app($app_id=APP_ID, $i='all') {//ѕолучение данных о приложении
 				FROM `_app`
 				WHERE `id`=".$app_id;
 		if(!$arr = query_assoc($sql))
-			_appError($sql.'Ќевозможно прочитать данные приложени€ дл€ кеша.');
+			die('Ќевозможно получить данные приложени€.');
 
 		_cache($arr);
 	}

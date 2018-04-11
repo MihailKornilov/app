@@ -309,6 +309,8 @@ function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
 }
 */
 function _pasMenu() {//строка меню управления страницей
+	if(IFRAME_AUTH_ERROR)
+		return '';
 	if(!PAS)
 		return '';
 
