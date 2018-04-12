@@ -635,7 +635,7 @@ $(document)
 
 		$('#elem-hint-add').trigger('click');
 	})
-	.on('click', '.block-link', function(e) {//нажатие на блок для перехода на страницу
+	.on('click', '.block-click-page', function(e) {//нажатие на блок для перехода на страницу
 		e.stopPropagation();
 
 		var t = $(this),
