@@ -94,17 +94,17 @@ function _authLoginIframe() {//проверка авторизации через iframe
 		if(!$app_id = _num(query_value($sql)))
 			return _authIframeError('Приложение не зарегистрировано.');
 
-		if(!$vk_user_id = _num(@$_GET['user_id']))
+		if(!$viewer_id = _num(@$_GET['viewer_id']))
 			return _authIframeError('Некорректный ID пользователя.');
 
 		$sql = "SELECT `id`
 				FROM `_user`
-				WHERE `vk_id`=".$vk_user_id."
+				WHERE `vk_id`=".$viewer_id."
 				LIMIT 1";
 		if(!$user_id = _num(query_value($sql)))
 			return _authIframeError($sql.'Пользователя нет.');
 
-		if($auth_key != md5($vk_app_id.'_'.$vk_user_id.'_'._app($app_id, 'vk_secret')))
+		if($auth_key != md5($vk_app_id.'_'.$viewer_id.'_'._app($app_id, 'vk_secret')))
 			return _authIframeError('Авторизация не пройдена.');
 
 		_authSuccess($auth_key, $user_id, $app_id);
