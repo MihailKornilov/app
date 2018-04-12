@@ -345,6 +345,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	_spisokUnitUpd27($unit);
 	_spisokUnitUpd54($unit);
 	_spisokUnitUpd55($unit);
+	_spisokUnitUpd72($dialog, $unit);
 
 	_spisokUnitAfter($dialog, $unit_id, $unitOld);
 
@@ -1523,6 +1524,17 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 */
 	}
 }
+function _spisokUnitUpd72($dialog, $unit) {//обновление кеша после применения действия для блока
+	if($dialog['id'] != 72)
+		return;
+	if(empty($unit['obj_name']))
+		return;
+	if(empty($unit['obj_id']))
+		return;
+
+	_cache('clear', $unit['obj_name'].'_'.$unit['obj_id']);
+}
+
 
 function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления единицы списка
 	if(!$dialog['table_1'])

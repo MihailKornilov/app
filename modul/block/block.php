@@ -171,7 +171,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$cls[] = !$xEnd ? trim($BR) : '';
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
-			$cls[] = $r['link'] ? 'curP block-link pg-'.$r['link'] : '';
+			$cls[] = $r['click_action'] == 2081 && $r['link'] ? 'curP block-link pg-'.$r['link'] : '';
+			$cls[] = $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
@@ -186,6 +187,9 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 						' class="'.$cls.'"'.
 						' style="'._blockStyle($r, $width, $unit).'"'.
 		  (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
+		  (!BLOCK_EDIT && $r['click_action'] == 2082 && $r['click_dialog'] ?
+			            ' val="dialog_id:'.$r['click_dialog'].',unit_id:'.$unit['id'].'"'
+		  : '').
 					 '>'.
 							_blockSetka($r, $level, $grid_id, $unit).
 							_blockChoose($r, $level, $unit).

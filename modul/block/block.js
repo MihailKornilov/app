@@ -28,14 +28,11 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 
 		t._hint({
 			msg:'<div class="pad5">' +
-					'<div class="fs16 blue line-b">' +
-						'Блок' +
-				  (SA ? '<span class="pale ml10">#' + BL.id + '</span>'  : '') +
-					(BL.obj_name == 'spisok' ?
+					'<div class="line-b">' +
+						'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Блок</span>' +
 						'<div class="fr mtm3">' +
 							'<div val="dialog_id:72,unit_id:' + BL.id + '" class="icon-wiki iw12 dialog-open' + _tooltip('Настроить ссылку', -53) + '</div>' +
-						'</div>'
-					: '') +
+						'</div>' +
 					'</div>' +
 					_blockUnitBg(BL) +
 					_blockUnitBor(BL) +
@@ -310,9 +307,8 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		var EL = ELM[BL.elem_id];
 
 		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.id + '">' +
-			'<div class="fs16 blue line-b">' +
-				'Элемент' +
-		  (SA ? '<span class="pale ml10">#' + EL.id + '</span>'  : '') +
+			'<div class="line-b">' +
+				'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + EL.id, 5)  : '">') + 'Элемент</span>' +
 				'<div class="fr mtm3">' +
 					'<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>' +
 					'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
