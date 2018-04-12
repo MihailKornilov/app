@@ -222,13 +222,14 @@ function _spisokInclude($spisok, $CMP) {//вложенные списки
 		$incDialog = _dialogQuery($cmp['num_1']);
 
 		$cond = "`t1`.`id` IN (".$ids.")";
+/*
 		if(isset($field['deleted']))
 			$cond .= " AND !`t1`.`deleted`";
 		if(isset($field['app_id']))
 			$cond .= " AND `t1`.`app_id`=".APP_ID;
 		if(isset($field['dialog_id']))
 			$cond .= " AND `t1`.`dialog_id`=".$cmp['num_1'];
-
+*/
 		$sql = "SELECT `t1`.*"._spisokJoinField($incDialog)."
 				FROM "._tableFrom($incDialog)."
 				WHERE ".$cond;

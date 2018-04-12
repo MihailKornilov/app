@@ -515,6 +515,30 @@ function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, к
 	if(isset($dialog['field1']['deleted']) && $unit['deleted'])
 		return _contentMsg('Единица списка id'.$id.' была удалена.'.$pageDef);
 
+	foreach($dialog['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
+		//должен является вложенным списком
+		if($cmp['dialog_id'] != 29 && $cmp['dialog_id'] != 59)
+			continue;
+
+		//должно быть присвоено имя колонки
+		if(!$col = $cmp['col'])
+			continue;
+
+		//получение данных из вложенного списка
+		$incDialog = _dialogQuery($cmp['num_1']);
+
+		$cond = "`t1`.`id`=".$unit[$col];
+
+		$sql = "SELECT `t1`.*"._spisokJoinField($incDialog)."
+				FROM "._tableFrom($incDialog)."
+				WHERE ".$cond;
+		if(!$inc = query_assoc($sql))
+			continue;
+
+		//идентификаторы будут заменены на массив с данными единицы списка
+		$unit[$col] = $inc;
+	}
+
 	return $unit;
 }
 function _elemDiv($el, $unit=array()) {//формирование div элемента

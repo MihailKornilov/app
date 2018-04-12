@@ -600,7 +600,6 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						DIALOG[id].close();
 						if(!res.dialog_source)
 							break;
-						console.log(res);
 						_dialogOpen(res.dialog_source);
 						break;
 				}

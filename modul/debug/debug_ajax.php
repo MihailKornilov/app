@@ -34,6 +34,7 @@ switch(@$_POST['op']) {
 		query($sql);
 		_cache('clear', '_setting');          //настройки
 
+		_cache('clear', '_app'.APP_ID);              //текущее приложение
 		_cache('clear', '_auth');             //авторизация
 		_cache('clear', '_pageCache');        //страницы
 		_cache('clear', '_imageServerCache'); //серверы изображений

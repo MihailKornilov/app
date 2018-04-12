@@ -192,6 +192,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 							_blockElemChoose($r, $unit).
 							_blockChildHtml($r, $level + 1, $width, $grid_id, $unit).
 	    					_elemDiv($r['elem'], $unit).
+//				($r['id'] == 1083 ? _pr($unit) : '').
 					'';
 
 			$widthMax -= $r['width'];
@@ -432,6 +433,7 @@ function _blockCache($obj_name, $obj_id) {
 	//Иконка показывается, если:
 	//      1. spisok-блоки. id диалога, который вносит значения списка
 	//      2. dialog-блоки. id этого диалога
+	//      3. page-блоки.   id диалога, который вносит значения списка, страница которой получает значения списка
 	$bg70 = 0;
 	if($obj_name == 'spisok')
 		if($bl = _blockQuery($obj_id))
@@ -441,6 +443,9 @@ function _blockCache($obj_name, $obj_id) {
 						$bg70 = $dlg_id;
 	if($obj_name == 'dialog')
 		$bg70 = $obj_id;
+	if($obj_name == 'page')
+		if($page = _page($obj_id))
+			$bg70 = $page['spisok_id'];
 
 
 	$block = array();
