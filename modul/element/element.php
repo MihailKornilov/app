@@ -724,6 +724,10 @@ function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 		$page = _page($BL['obj_id']);
 		$spisok_exist = $page['spisok_id'];
 	}
+	if(BLOCK_DIALOG) {
+		$page = _page($unit['source']['page_id']);
+		$spisok_exist = $page['spisok_id'];
+	}
 	define('IS_SPISOK_UNIT', BLOCK_SPISOK || TD_PASTE || $spisok_exist);
 
 	$head = '';

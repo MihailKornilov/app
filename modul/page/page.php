@@ -1467,7 +1467,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 								break;
 							}
 
-							$dialog_id = $BLS['obj_id'];
+							if(!$dialog_id)
+								if($page = _page($US['page_id']))
+									$dialog_id = $page['spisok_id'];
+
+							if(!$dialog_id)
+								$dialog_id = $BLS['obj_id'];
 							break;
 						}
 						break;
