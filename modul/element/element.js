@@ -1616,6 +1616,20 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						});
 					});
 					return;
+				//select - произвольные значения
+				case 83:
+					if(!FILTER[el.num_1])
+						FILTER[el.num_1] = {};
+					$(el.attr_cmp)._select({
+						width:el.width,
+						title0:el.txt_1,
+						spisok:el.vvv,
+						func:function(v) {
+							FILTER[el.num_1][el.id] = v;
+							_spisokUpdate(el.num_1);
+						}
+					});
+					return;
 			}
 		});
 

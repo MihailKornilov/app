@@ -1060,7 +1060,7 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//select - выбор единицы из другого списка (дл€ св€зки)
 			case 29:
-				$sel_id = $unit_id && $cmp['col'] ? $unit[$cmp['col']] : _spisokCmpConnectIdGet($cmp);
+				$sel_id = $unit_id && $cmp['col'] ? $unit[$cmp['col']]['id'] : _spisokCmpConnectIdGet($cmp);
 				$dialog['cmp'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
 				break;
 			//настройка “јЅЋ»„Ќќ√ќ содержани€ списка

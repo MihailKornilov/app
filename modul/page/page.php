@@ -853,6 +853,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$UNIT_ISSET)
 				$v = _spisokCmpConnectIdGet($el);
 
+			if(is_array($v))
+				$v = $v['id'];
+
 			return _select(array(
 						'attr_id' => $attr_id,
 						'placeholder' => $el['txt_1'],
@@ -1926,6 +1929,31 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						'small' => 1,
 						'class' => _dn($is_edit || $diff)
 					));
+
+		//Фильтр-select: привязанный список
+		case 83:
+			/*
+                num_1 - воздействие на список
+                num_2 - привязанный список
+			*/
+
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$v = 0;
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_1'],
+					'filter' => $el['id'],
+					'v' => $v
+				));
+			}
+
+
+			return _select(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => $v
+				   ));
 
 
 

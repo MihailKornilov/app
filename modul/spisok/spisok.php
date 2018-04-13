@@ -778,6 +778,7 @@ function _spisokCond($el) {//формирование строки с условиями поиска
 	$cond .= _spisokCond62($el);
 	$cond .= _spisokCond77($el);
 	$cond .= _spisokCond78($el);
+	$cond .= _spisokCond83($el);
 
 	return $cond;
 }
@@ -989,6 +990,25 @@ function _spisokCond78($el) {//фильтр-меню
 	}
 
 	return " AND `".$col."` IN (".$v.")";
+}
+function _spisokCond83($el) {//фильтр-календарь
+	$filter = false;
+	$v = '';
+
+	//поиск элемента-фильтра-календаря
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 83) {
+			$filter = true;
+			$v = $r['v'];
+			break;
+		}
+
+	if(!$filter)
+		return '';
+	if(!$v)
+		return '';
+
+	return " AND `id`=".$v;
 }
 function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)
