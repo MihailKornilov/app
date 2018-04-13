@@ -445,8 +445,13 @@ function _blockCache($obj_name, $obj_id) {
 				if($el['dialog_id'] == 14 || $el['dialog_id'] == 59)
 					if($dlg_id = _num($el['num_1']))
 						$bg70 = $dlg_id;
-	if($obj_name == 'dialog')
-		$bg70 = $obj_id;
+	if($obj_name == 'dialog') {
+		$sql = "SELECT `dialog_parent_id`
+				FROM `_dialog`
+				WHERE `id`=".$obj_id;
+		$dialog_parent_id = _num(query_value($sql));
+		$bg70 = $dialog_parent_id ? $dialog_parent_id : $obj_id;
+	}
 	if($obj_name == 'page')
 		if($page = _page($obj_id))
 			$bg70 = $page['spisok_id'];

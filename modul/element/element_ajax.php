@@ -916,6 +916,30 @@ function _dialogOpenLoad($dialog_id) {
 
 		if(!$block_id && isset($dlg['field1']['block_id']))
 			$block_id = _num($unit['block_id']);
+
+		foreach($dlg['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
+			//должен €вл€етс€ вложенным списком
+			if($cmp['dialog_id'] != 29 && $cmp['dialog_id'] != 59)
+				continue;
+
+			//должно быть присвоено им€ колонки
+			if(!$col = $cmp['col'])
+				continue;
+
+			//получение данных из вложенного списка
+			$incDialog = _dialogQuery($cmp['num_1']);
+
+			$cond = "`t1`.`id`=".$unit[$col];
+
+			$sql = "SELECT `t1`.*"._spisokJoinField($incDialog)."
+					FROM "._tableFrom($incDialog)."
+					WHERE ".$cond;
+			if(!$inc = query_assoc($sql))
+				continue;
+
+			//идентификаторы будут заменены на массив с данными единицы списка
+			$unit[$col] = $inc;
+		}
 	}
 
 	$act = $unit_id > 0 ? 'edit' : 'insert';
@@ -1036,7 +1060,7 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//select - выбор единицы из другого списка (дл€ св€зки)
 			case 29:
-				$sel_id = $unit_id ? $unit[$cmp['col']] : _spisokCmpConnectIdGet($cmp);
+				$sel_id = $unit_id && $cmp['col'] ? $unit[$cmp['col']] : _spisokCmpConnectIdGet($cmp);
 				$dialog['cmp'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
 				break;
 			//настройка “јЅЋ»„Ќќ√ќ содержани€ списка
