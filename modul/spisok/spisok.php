@@ -991,21 +991,25 @@ function _spisokCond78($el) {//фильтр-меню
 
 	return " AND `".$col."` IN (".$v.")";
 }
-function _spisokCond83($el) {//фильтр-календарь
+function _spisokCond83($el) {//фильтр-select
 	$filter = false;
-	$v = '';
+	$v = 0;
 
-	//поиск элемента-фильтра-календаря
+	//поиск элемента-фильтра-select
 	foreach(_spisokFilter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 83) {
-			$filter = true;
-			$v = $r['v'];
+			$filter = $r['elem'];
+			$v = _num($r['v']);
 			break;
 		}
 
 	if(!$filter)
 		return '';
 	if(!$v)
+		return '';
+	if(!$dlg_id = $filter['num_2'])
+		return '';
+	if(!$dlg = _dialogQuery($dlg_id))
 		return '';
 
 	return " AND `id`=".$v;

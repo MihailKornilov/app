@@ -781,6 +781,7 @@
 /* Выпадающее меню по ссылке */
 ._dropdown{position:relative;display:inline-block}
 ._dropdown .dd-head{white-space:nowrap}
+._dropdown .dd-head.grey{color:#999}
 ._dropdown .dd-list{
 	display:none;
 	position:absolute;
@@ -805,7 +806,7 @@
 	padding:6px 12px 7px 12px;
 	white-space:nowrap;
 }
-._dropdown .ddu.title0{color:#777}
+._dropdown .ddu.title0{color:#999}
 ._dropdown .ddu.on,
 ._dropdown .ddu:hover{background-color:#E6ECF1}
 

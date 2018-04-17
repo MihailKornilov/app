@@ -713,6 +713,71 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 				//¬ыбор элемента из диалога или страницы
 				case 13:
 					var P = $(el.attr_cmp).next(),
+						inp = P.find('.inp'),
+						del = P.find('.icon-del'),
+						err = function(msg) {
+							P._hint({
+								msg:msg,
+								color:'red',
+								pad:10,
+								show:1
+							});
+						},
+						choosed = function(bec) {
+							_forEq(bec, function(sp) {
+								if(sp.attr('val') == $(el.attr_cmp).val()) {
+									sp.addClass('sel');
+									return false;
+								}
+							});
+						};
+					P.click(function() {
+						switch(el.num_1) {
+							case 2119: alert('страница'); return;
+							case 2120:
+								switch(el.num_2) {
+									case 2123: alert('конкретный диалог'); return;
+									case 2124://значение дл€ поиска диалога
+										var dlg = $('#cmp_' + el.num_3);
+										if(!dlg.length)
+											return;
+										var dlg_id = _num(dlg.val());
+										if(!dlg_id) {
+											err('Ќе выбран список');
+											return;
+										}
+										_dialogLoad({
+											dialog_id:74,
+											dialog_source:dlg_id,
+											busy_obj:inp,
+											busy_cls:'hold',
+											func_open:function(res, dlg) {
+												var bec = dlg.D('.choose');
+												choosed(bec);
+												bec.click(function() {
+													var t = $(this),
+														id = t.attr('val');
+													$(el.attr_cmp).val(id);
+													inp.val(ELMM[id].name);
+													del._dn(1);
+													dlg.close();
+													P._flash();
+												});
+											}
+										});
+								}
+						}
+					});
+					del.click(function(e) {
+						e.stopPropagation();
+						$(el.attr_cmp).val(0);
+						inp.val('');
+						del._dn();
+					});
+					return;
+/*
+				case 13:
+					var P = $(el.attr_cmp).next(),
 						obj_name = P.find('.obj_name').val(),
 						obj_id = P.find('.obj_id').val(),
 						inp = P.find('.inp'),
@@ -795,6 +860,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 						del._dn();
 					});
 					return;
+*/
 				//select - произвольные значени€
 				case 17:
 					_elemFunc(el, _num(unit[el.col] || el.def), 1);
@@ -1607,6 +1673,8 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 										break;
 									//фильтр-меню
 									case 78: $(sp.attr_el).find('.sel').removeClass('sel'); break;
+									//фильтр-select
+									case 83: $(sp.attr_cmp)._select(0); break;
 								}
 							});
 							$(res.count_attr).html(res.count_html);

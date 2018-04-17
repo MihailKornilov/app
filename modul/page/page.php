@@ -484,7 +484,7 @@ function _pageShow($page_id) {
 //	_block('page', $page_id, 'block_js').
 //	_pr(_block('page', $page_id, 'elem_arr')).
 	_blockHtml('page', $page_id, 1000, 0, _pageSpisokUnit($page_id)).
-//	_page_div().
+	_page_div().
 	'<script>'.
 		'var BLK='._block('page', $page_id, 'block_js').','.
 			'ELM='._block('page', $page_id, 'elem_js').','.
@@ -715,9 +715,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 		//Выбор элемента из диалога или страницы
 		case 13:
 			/*
-				Относительно исходного блока определяется страница или диалог, из которого будет выбираться элемент
-
 				txt_1 - текст для placeholder
+				num_1 - источник выбора
+						2119 - текущая страница
+						2120 - диалог
+				num_2 - если источник выбора диалог: (вспомогательный диалог [74] - выводит содержание диалога)
+						2123 - конкретный диалог (из списка диалогов)
+						2124 - указать значение, где находится диалог
+				num_3 - значение для указания местонахождения диалога
 			*/
 
 			$obj_name = '';
@@ -725,12 +730,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
 			if(!empty($unit['source']['block_id'])) {
 				$block_id = _num($unit['source']['block_id']);
-				if($BL = _blockQuery($block_id)) {
+				if($BL = _blockQuery($block_id))
 					if($BL['obj_name'] == 'page' || $BL['obj_name'] == 'dialog') {
 						$obj_name = $BL['obj_name'];
 						$obj_id = $BL['obj_id'];
 					}
-				}
 			}
 
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
@@ -2057,6 +2061,26 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 
 function _page_div() {//todo тест
+	return '';
+
+	//страницы
+	$sql = "SELECT `id`
+			FROM `_page`
+			WHERE `app_id` IN(0,".APP_ID.")";
+	$page_ids = query_ids($sql);
+
+	//блоки, которые используются на страницах
+	$sql = "SELECT count(`id`)
+			FROM `_block`
+			WHERE `obj_name`='page'
+			  AND `obj_id` IN (".$page_ids.")";
+	$block_ids = query_value($sql);
+
+	return $block_ids;
+
+
+
+
 	return
 	'<div>'.
 		'USER_ID='.USER_ID.

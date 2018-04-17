@@ -565,9 +565,7 @@ function _blockCache($obj_name, $obj_id) {
 				$el['vvv'] = _elemValue($elem_id);
 				break;
 			//dropdown
-			case 18:
-				$el['vvv'] = _elemValue($elem_id);
-				break;
+			case 18: $el['vvv'] = _elemValue($elem_id); break;
 			//Меню переключения блоков - список пунктов
 			case 57:
 				$sql = "SELECT *
@@ -589,7 +587,40 @@ function _blockCache($obj_name, $obj_id) {
 				break;
 			//фильтр-select
 			case 83:
-				$el['vvv'] = array(1=>'один',2=>'два');
+				$el['vvv'] = array();
+
+				if(!$dialog_id = $el['num_2'])
+					break;
+				if(!$dlg = _dialogQuery($dialog_id))
+					break;
+
+				$field = $dlg['field1'];
+
+				$cond = "`t1`.`id`";
+				if(isset($field['deleted']))
+					$cond .= " AND !`t1`.`deleted`";
+				if(isset($field['app_id']))
+					$cond .= " AND `t1`.`app_id`=".APP_ID;
+				if(isset($field['dialog_id']))
+					$cond .= " AND `t1`.`dialog_id`=".$dialog_id;
+
+				$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
+						FROM "._tableFrom($dlg)."
+						WHERE ".$cond."
+						ORDER BY `sort` DESC
+						LIMIT 50";
+				if(!$spisok = query_arr($sql))
+					break;
+
+				$vvv = array();
+
+				foreach($spisok as $r)
+					$vvv[] = array(
+						'id' => $r['id'],
+						'title' => $r['txt_1']
+					);
+
+				$el['vvv'] = $vvv;
 				break;
 		}
 

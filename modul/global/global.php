@@ -528,6 +528,65 @@ function _vkapi($method, $param=array()) {//получение данных из api вконтакте
 }
 
 
+function _jsCache() {//формирование файла JS с данными (элементы, блоки)
+	$ELM = array();
+
+	//страницы
+	$sql = "SELECT *
+			FROM `_page`
+			WHERE `app_id` IN(0,".APP_ID.")";
+	$page = query_arr($sql);
+
+	//блоки, которые используются на страницах
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='page'
+			  AND `obj_id` IN ("._idsGet($page).")";
+	$block = query_arr($sql);
+
+	//диалоговые окна
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id` IN(0,".APP_ID.")";
+	$dialog = query_arr($sql);
+
+	//блоки, которые используются на диалогах
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='dialog'
+			  AND `obj_id` IN ("._idsGet($dialog).")";
+	foreach(query_arr($sql) as $id => $r)
+		$block[$id] = $r;
+
+	//элементы, которые используются на страницах
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `block_id` IN ("._idsGet($block).")";
+	$elem = query_arr($sql);
+	foreach($elem as $r) {
+		$val = array();
+		$val[] = 'name:"'.addslashes($r['name']).'"';
+		$val[] = 'block_id:'.$r['block_id'];
+
+		for($n = 1; $n <= 8; $n++) {
+			$num = 'num_'.$n;
+			if($r[$num])
+				$val[] = $num.':'.$r[$num];
+			$txt = 'txt_'.$n;
+			if(!empty($r[$txt]))
+				$val[] = $txt.':"'.addslashes(_br($r[$txt])).'"';
+		}
+
+		$ELM[$r['id']] = $r['id'].':{'.implode(',', $val).'}';
+	}
+
+	$save = 'var ELMM={'.implode(',', $ELM).'};';
+	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
+	fwrite($fp, $save);
+	fclose($fp);
+
+}
+
 function _cache($data='', $key='') {//кеширование данных
 	/*
 		$data - данные, сохраняемые в кеш. Если значение пустое, то попытка получить данные

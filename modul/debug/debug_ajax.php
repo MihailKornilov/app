@@ -38,7 +38,7 @@ switch(@$_POST['op']) {
 		_cache('clear', '_auth');             //авторизация
 		_cache('clear', '_pageCache');        //страницы
 		_cache('clear', '_imageServerCache'); //серверы изображений
-		_spisokFilter('cache_clear');                //очистка фильтров
+		_spisokFilter('cache_clear');                 //очистка фильтров
 
 		//пользователи
 /*
@@ -50,8 +50,7 @@ switch(@$_POST['op']) {
 				  AND `sp`.`app_id`=".APP_ID."
 				  AND `sp`.`dialog_id`=1011";
 */
-		$sql = "SELECT `u`.`id`
-				FROM `_user` `u`";
+		$sql = "SELECT `id` FROM `_user`";
 		$ids = query_ids($sql);
 		foreach(_ids($ids, 1) as $user_id)
 			_cache('clear', '_userCache'.$user_id);
@@ -64,7 +63,7 @@ switch(@$_POST['op']) {
 		foreach(_ids($dialog_ids, 1) as $id)
 			_cache('clear', '_dialogQuery'.$id);
 
-		//блоки, которые используются на в диалогах
+		//блоки, которые используются в диалогах
 		$sql = "SELECT `id`
 				FROM `_block`
 				WHERE `obj_name`='dialog'
@@ -105,6 +104,7 @@ switch(@$_POST['op']) {
 				_cache('clear', 'spisok_'.$id);
 
 		_userImageMove();
+		_jsCache();
 
 		jsonSuccess();
 		break;

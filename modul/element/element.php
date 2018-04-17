@@ -569,24 +569,9 @@ function _dialogSelArray($v=false) {//список диалогов для Select - отправка чере
 
 	return $spisok;
 }
-function _dialogElemChoose($el, $unit) {//выбор элемента (подключение через [12]). Используется в [74] для [13]
-	if(empty($unit['source']['dialog_source']))
+function _dialogElemChoose($el, $unit) {//[74] выбор элемента (подключаемая функция). Используется для [13]
+	if(!$dialog_id = _num(@$unit['source']['dialog_source']))
 		return _emptyMin('Отсутствует исходный диалог.');
-
-/*
-	$block_id = _num($unit['source']['block_id']);
-
-	if(!$BL = _blockQuery($block_id))
-		return _emptyMin('Исходного блока id'.$block_id.' не существует.');
-
-	if($BL['obj_name'] != 'dialog')
-		return _emptyMin('Не диалог.');
-
-	$dialog_id = $BL['obj_id'];
-*/
-
-	if(!$dialog_id = _num($unit['source']['dialog_source']))
-		return _emptyMin('Не найдено ID диалога, который вносит данные списка.');
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin('Диалога не существует, который вносит данные списка.');
 
@@ -603,19 +588,75 @@ function _dialogElemChoose($el, $unit) {//выбор элемента (подключение через [12]
 		'choose_deny' => array()      //ids элементов или блоков, которые выбирать нельзя (если они были выбраны другой фукцией того же элемента)
 	);
 
-	$elemJS = array();
-	foreach($dialog['cmp'] as $id => $r) {
-		if(empty($choose_access[$r['dialog_id']]))
-			continue;
-		$elemJS[] = $id.':"'.addslashes(_elemTitle($id)).'"';
+	return
+	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
+	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
+}
+
+function _elemQuery1($id, $i='elem') {//получение информации о элементе по id элемента или id блока
+	$send = array(
+		'elem_id' => 0,     //ID элемента
+		'elem' => array(),  //массив элемента
+		'block_id' => 0,    //ID блока
+		'block' => array(), //массив блока
+		'dialog_id' => 0,   //ID диалога, в котором (если) размещается элемент или блок
+		'page_id' => 0      //ID страницы, в которой (если) размещается элемент или блок
+	);
+
+	if(empty($id))
+		return $send;
+
+	switch($i) {
+		case 'elem':
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id`=".abs($id);
+			if(!$elem = query_assoc($sql))
+				return $send;
+
+			$send['elem_id'] = $elem['id'];
+			$send['elem'] = $elem;
+
+			$sql = "SELECT *
+					FROM `_block`
+					WHERE `id`=".$elem['block_id'];
+			if($block = query_assoc($sql)) {
+				$send['block_id'] = $block['id'];
+				$send['block'] = $block;
+			}
+			break;
+		case 'block':
+			$sql = "SELECT *
+					FROM `_block`
+					WHERE `id`=".abs($id);
+			if(!$block = query_assoc($sql))
+				return $send;
+
+			$send['block_id'] = $block['id'];
+			$send['block'] = $block;
+
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `block_id`=".$block['id']."
+					LIMIT 1";
+			if($elem = query_assoc($sql)) {
+				$send['elem_id'] = $elem['id'];
+				$send['elem'] = $elem;
+			}
+			break;
+		default: return $send;
+	}
+
+	if($send['block_id']) {
+		if($send['block']['obj_name'] == 'page')
+			$send['page_id'] = $send['block']['obj_id'];
+		if($send['block']['obj_name'] == 'dialog')
+			$send['dialog_id'] = $send['block']['obj_id'];
 	}
 
 
 
-	return
-	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
-	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send).
-	'<script>ELM74={'.implode(',', $elemJS).'};</script>';
+	return $send;
 }
 
 function _elemQuery($elem_id) {//запрос одного элемента
