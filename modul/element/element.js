@@ -732,18 +732,41 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 							});
 						};
 					P.click(function() {
+						console.log('el');
+						console.log(el);
+						console.log('unit');
+						console.log(unit);
 						switch(el.num_1) {
-							case 2119: alert('страница'); return;
-							case 2120:
+							case 2119://страница
+								alert('страница');
+								return;
+							case 2120://диалог
 								switch(el.num_2) {
 									case 2123: alert('конкретный диалог'); return;
-									case 2124://значение дл€ поиска диалога
-										var dlg = $('#cmp_' + el.num_3);
-										if(!dlg.length)
-											return;
-										var dlg_id = _num(dlg.val());
+									case 2124://элемент дл€ поиска диалога
+										var dlg_id = 0;
+										if(el.num_3) {//выбор по указанному значению
+											var dlg = $('#cmp_' + el.num_3);
+											if(!dlg.length) {
+												err('ќтсутствует элемент со списком диалогов.');
+												return;
+											}
+											dlg_id = _num(dlg.val());
+										} else {
+											var block_id = unit.source.block_id;
+											if(!block_id) {
+												err('ќтсутствует исходный блок.');
+												return;
+											}
+											var elem_id = BLKK[block_id].elem_id;
+											if(!elem_id) {
+												err('ќтсутствует исходный элемент.');
+												return;
+											}
+											dlg_id = ELMM[elem_id].ds;
+										}
 										if(!dlg_id) {
-											err('Ќе выбран список');
+											err('Ќе выбран диалог');
 											return;
 										}
 										_dialogLoad({

@@ -530,6 +530,7 @@ function _vkapi($method, $param=array()) {//получение данных из api вконтакте
 
 function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 	$ELM = array();
+	$BLK = array();
 
 	//страницы
 	$sql = "SELECT *
@@ -564,9 +565,15 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 			WHERE `block_id` IN ("._idsGet($block).")";
 	$elem = query_arr($sql);
 	foreach($elem as $r) {
+		$block_id = $r['block_id'];
+
 		$val = array();
 		$val[] = 'name:"'.addslashes($r['name']).'"';
-		$val[] = 'block_id:'.$r['block_id'];
+		$val[] = 'block_id:'.$block_id;
+
+		//исходный диалог (dialog source)
+		if($block[$block_id]['obj_name'] == 'dialog')
+			$val[] = 'ds:'.$block[$block_id]['obj_id'];
 
 		for($n = 1; $n <= 8; $n++) {
 			$num = 'num_'.$n;
@@ -578,9 +585,11 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 		}
 
 		$ELM[$r['id']] = $r['id'].':{'.implode(',', $val).'}';
+		$BLK[] = $block_id.':{elem_id:'.$r['id'].'}';
 	}
 
-	$save = 'var ELMM={'.implode(',', $ELM).'};';
+	$save = 'var ELMM={'.implode(',', $ELM).'},'.
+				'BLKK={'.implode(',', $BLK).'};';
 	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
 	fwrite($fp, $save);
 	fclose($fp);
