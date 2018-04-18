@@ -575,6 +575,10 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 		if($block[$block_id]['obj_name'] == 'dialog')
 			$val[] = 'ds:'.$block[$block_id]['obj_id'];
 
+		//элемент является подключаемым списком
+		if($r['dialog_id'] == 29 || $r['dialog_id'] == 59)
+			$val[] = 'issp:1';
+
 		for($n = 1; $n <= 8; $n++) {
 			$num = 'num_'.$n;
 			if($r[$num])

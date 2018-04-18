@@ -732,10 +732,10 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 							});
 						};
 					P.click(function() {
-						console.log('el');
-						console.log(el);
-						console.log('unit');
-						console.log(unit);
+//						console.log('el');
+//						console.log(el);
+//						console.log('unit');
+//						console.log(unit);
 						switch(el.num_1) {
 							case 2119://страница
 								alert('страница');

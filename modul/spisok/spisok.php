@@ -1023,18 +1023,25 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 		return array();
 	if(!$dialog = _dialogQuery($cmp['num_1']))
 		return array();
-	if(!$elem_ids = _ids($cmp['txt_2']))//элементы, содержащие id элементов, настраивающих содержание select
-		return array();
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id` IN (".$elem_ids.")";
-	if(!$elem_arr = query_arr($sql))
-		return array();
 
 	$S = array();//данные с результатами для содержания select
-	foreach($elem_arr as $el)
-		$S[] = _spisok29connectGet($el, $v);
+
+	//элементы, содержащие id элементов, настраивающих содержание select
+	if($elem_ids = _ids($cmp['txt_2'])) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id` IN (".$elem_ids.")";
+		if(!$elem_arr = query_arr($sql))
+			return array();
+
+		foreach($elem_arr as $el)
+			$S[] = _spisok29connectGet($el['txt_2'], $v);
+	} else {
+		$S[] = _spisok29connectGet($cmp['txt_3'], $v);
+		$S[] = _spisok29connectGet($cmp['txt_4'], $v);
+	}
+
+
 
 	$cond = array();
 	foreach($S as $n => $r)
@@ -1142,7 +1149,7 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 
 	return $send;
 }
-function _spisok29connectGet($el, $v) {
+function _spisok29connectGet($ids, $v) {
 	$send = array(
 		'col0' => '',       //имя колонки основого списка
 		'col1' => '',       //имя колонки привязанного списка
@@ -1151,7 +1158,8 @@ function _spisok29connectGet($el, $v) {
 		'cond' => ''
 	);
 
-	$ids = $el['txt_2'];
+	if(empty($ids))
+		return $send;
 
 	$sql = "SELECT *
 			FROM `_element`
