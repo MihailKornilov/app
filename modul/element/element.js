@@ -723,7 +723,7 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 								show:1
 							});
 						},
-						choosed = function(bec) {
+						choosed = function(bec) {//выделение выбранного значени€
 							_forEq(bec, function(sp) {
 								if(sp.attr('val') == $(el.attr_cmp).val()) {
 									sp.addClass('sel');
@@ -732,10 +732,6 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 							});
 						};
 					P.click(function() {
-//						console.log('el');
-//						console.log(el);
-//						console.log('unit');
-//						console.log(unit);
 						switch(el.num_1) {
 							case 2119://страница
 								alert('страница');
@@ -780,6 +776,28 @@ var DIALOG = {},//массив диалоговых окон дл€ управлени€ другими элементами
 												bec.click(function() {
 													var t = $(this),
 														id = t.attr('val');
+													if(ELMM[id].issp) {
+														_dialogLoad({
+															dialog_id:74,
+															dialog_source:ELMM[id].num_1,
+															busy_obj:t,
+															func_open:function(res, dlg2) {
+																var bec = dlg2.D('.choose');
+																choosed(bec);
+																bec.click(function() {
+																	var t = $(this),
+																		id2 = t.attr('val');
+																	$(el.attr_cmp).val(id + ',' + id2);
+																	inp.val(ELMM[id].name + ' ї ' + ELMM[id2].name);
+																	del._dn(1);
+																	dlg.close();
+																	dlg2.close();
+																	P._flash();
+																});
+															}
+														});
+														return;
+													}
 													$(el.attr_cmp).val(id);
 													inp.val(ELMM[id].name);
 													del._dn(1);
