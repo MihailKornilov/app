@@ -726,29 +726,17 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_4 - ID диалога (список всех диалогов)
 			*/
 
-			$obj_name = '';
-			$obj_id = 0;
-
-			if(!empty($unit['source']['block_id'])) {
-				$block_id = _num($unit['source']['block_id']);
-				if($BL = _blockQuery($block_id))
-					if($BL['obj_name'] == 'page' || $BL['obj_name'] == 'dialog') {
-						$obj_name = $BL['obj_name'];
-						$obj_id = $BL['obj_id'];
-					}
-			}
-
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$v = _num($v);
+			$name = _num($v) ? _elemTitle($v) : $v;
+			if(!empty($v) && empty($name))
+				$name = '-empty-';
 
 			return
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			'<div class="_selem dib prel bg-fff over1" id="'.$attr_id.'_selem"'.$width.'>'.
-				'<input type="hidden" class="obj_name" value="'.$obj_name.'" />'.
-				'<input type="hidden" class="obj_id" value="'.$obj_id.'" />'.
 				'<div class="icon icon-star pabs"></div>'.
 				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-				'<input type="text" readonly class="inp curP w100p"'.$placeholder.$disabled.' value="'._elemTitle($v).'" />'.
+				'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'.$name.'" />'.
 			'</div>';
 
 		//Radio
