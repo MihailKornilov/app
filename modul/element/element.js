@@ -776,7 +776,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 												bec.click(function() {
 													var t = $(this),
 														id = t.attr('val');
-													if(ELMM[id].issp) {
+													if(el.num_5 && ELMM[id].issp) {
 														_dialogLoad({
 															dialog_id:74,
 															dialog_source:ELMM[id].num_1,

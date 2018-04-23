@@ -724,11 +724,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 						2124 - указать значение, где находится диалог
 				num_3 - значение для указания местонахождения диалога
 				num_4 - ID диалога (список всех диалогов)
+				num_5 - разрешать выбор значений во вложенных списках
 			*/
 
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$name = _num($v) ? _elemTitle($v) : $v;
-			if(!empty($v) && empty($name))
+			$name = _num($v) ? _elemTitle($v) : (!empty($v) ? $v : '');
+			if(!$v && $name)
 				$name = '-empty-';
 
 			return
@@ -836,7 +837,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 
                 num_1 - id диалога, через который вносятся данные выбираемого списка
                 txt_1 - текст, когда единица не выбрана
-                    txt_2 - два id элемента, составляющие содержание Select (для удаления)
                 txt_3 - первый id элемента, составляющие содержание Select
                 txt_4 - второй id элемента, составляющие содержание Select
 				num_2 - возможность добавления новых значений
@@ -2052,7 +2052,8 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 
 function _page_div() {//todo тест
-	return elem29remake();
+
+	return '';
 
 	//страницы
 	$sql = "SELECT `id`
@@ -2179,43 +2180,6 @@ function gridStackStylePx() {//генерирование стилей для grid-child
 			".grid-child-item[data-gs-min-width='".$n."']{min-width:".($n*10)."px}<br>".
 			".grid-child-item[data-gs-max-width='".$n."']{max-width:".($n*10)."px}<br>".
 			"<br>";
-	}
-
-	return $send;
-}
-
-function elem29remake() {//переделка значений select 29
-	$send = '';
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `dialog_id`=29";
-	foreach(query_arr($sql) as $r) {
-		if(empty($r['txt_2']))
-			continue;
-
-		$sql = "SELECT `id`,`txt_2`
-				FROM `_element`
-				WHERE `id` IN (".$r['txt_2'].")";
-		$ass = query_ass($sql);
-
-		$send .= $r['id'].' = ';
-
-		foreach(explode(',', $r['txt_2']) as $n => $ex) {
-			if(empty($ex))
-				continue;
-			$exx = explode(',', $ass[$ex]);
-//			if(count($exx) > 1)
-//				continue;
-
-			$sql = "UPDATE `_element`
-					SET `txt_".($n + 5)."`=".$ass[$ex]."
-					WHERE `id`=".$r['id'];
-//			query($sql);
-
-			$send .= $ass[$ex].' : ';
-		}
-		$send .= '<br>';
 	}
 
 	return $send;

@@ -1027,21 +1027,8 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 	$S = array();//данные с результатами для содержания select
 
 	//элементы, содержащие id элементов, настраивающих содержание select
-	if($elem_ids = _ids($cmp['txt_2'])) {
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id` IN (".$elem_ids.")";
-		if(!$elem_arr = query_arr($sql))
-			return array();
-
-		foreach($elem_arr as $el)
-			$S[] = _spisok29connectGet($el['txt_2'], $v);
-	} else {
-		$S[] = _spisok29connectGet($cmp['txt_3'], $v);
-		$S[] = _spisok29connectGet($cmp['txt_4'], $v);
-	}
-
-
+	$S[] = _spisok29connectGet($cmp['txt_3'], $v);
+	$S[] = _spisok29connectGet($cmp['txt_4'], $v);
 
 	$cond = array();
 	foreach($S as $n => $r)
