@@ -324,6 +324,11 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			title:'автоматическая ширина'
 		});
 
+		var ACT_NAME = {
+			insert:'внесения',
+			edit:'редактирования',
+			del:'удаления'
+		};
 		_forN(['insert', 'edit', 'del'], function(act, n) {
 			DLG('#' + act + '_action_id')._select({
 				width:270,
@@ -354,6 +359,20 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						t.val(res.unit.title);
 						t._flash();
 					}
+				});
+			});
+			DLG('#' + act + '_on')._check({
+				func:function(v, t) {
+					t.parent().parent().next()['slide' + (v ? 'Down' : 'Up')]();
+				}
+			});
+			DLG('#' + act + '_on_check').mouseenter(function() {
+				$(this)._hint({
+					pad:10,
+					msg:'Включение ' + ACT_NAME[act] + ' записи',
+					side:'left',
+					show:1,
+					delayShow:1500
 				});
 			});
 		});
@@ -431,18 +450,21 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				width_auto:DLG('#width_auto').val(),
 				cmp_no_req:DLG('#cmp_no_req').val(),
 
+				insert_on:DLG('#insert_on').val(),
 				insert_head:DLG('#insert_head').val(),
 				insert_button_submit:DLG('#insert_button_submit').val(),
 				insert_button_cancel:DLG('#insert_button_cancel').val(),
 				insert_action_id:DLG('#insert_action_id').val(),
 				insert_action_page_id:DLG('#insert_action_page_id').val(),
 
+				edit_on:DLG('#edit_on').val(),
 				edit_head:DLG('#edit_head').val(),
 				edit_button_submit:DLG('#edit_button_submit').val(),
 				edit_button_cancel:DLG('#edit_button_cancel').val(),
 				edit_action_id:DLG('#edit_action_id').val(),
 				edit_action_page_id:DLG('#edit_action_page_id').val(),
 
+				del_on:DLG('#del_on').val(),
 				del_head:DLG('#del_head').val(),
 				del_button_submit:DLG('#del_button_submit').val(),
 				del_button_cancel:DLG('#del_button_cancel').val(),
