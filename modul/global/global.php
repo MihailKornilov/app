@@ -516,7 +516,8 @@ function _json($arr) {//перевод массива в JS
 function _vkapi($method, $param=array()) {//получение данных из api вконтакте
 	$param += array(
 		'v' => 5.64,
-		'lang' => 'ru'
+		'lang' => 'ru',
+		'access_token' => 'be6861a8be6861a8be6861a82cbe519716bbe68be6861a8e74e64410e898fe15cfbac8e'
 	);
 
 	$url = 'https://api.vk.com/method/'.$method.'?'.http_build_query($param);
