@@ -1,6 +1,8 @@
 <?php
 require_once 'modul/global/global.php';
 
+_cacheUpdate();
+
 _setting();
 _face();
 _auth();

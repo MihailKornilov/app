@@ -32,76 +32,8 @@ switch(@$_POST['op']) {
 				SET `v`=`v`+1
 				WHERE `key`='SCRIPT'";
 		query($sql);
-		_cache('clear', '_setting');          //настройки
 
-		_cache('clear', '_app'.APP_ID);              //текущее приложение
-		_cache('clear', '_auth');             //авторизация
-		_cache('clear', '_pageCache');        //страницы
-		_cache('clear', '_imageServerCache'); //серверы изображений
-		_spisokFilter('cache_clear');                 //очистка фильтров
-
-		//пользователи
-/*
-		$sql = "SELECT `u`.`id`
-				FROM
-					`_user` `u`,
-					`_spisok` `sp`
-				WHERE `u`.`id`=`sp`.`connect_1`
-				  AND `sp`.`app_id`=".APP_ID."
-				  AND `sp`.`dialog_id`=1011";
-*/
-		$sql = "SELECT `id` FROM `_user`";
-		$ids = query_ids($sql);
-		foreach(_ids($ids, 1) as $user_id)
-			_cache('clear', '_userCache'.$user_id);
-
-		//диалоговые окна
-		$sql = "SELECT `id`
-				FROM `_dialog`
-				WHERE `app_id` IN(0,".APP_ID.")";
-		$dialog_ids = query_ids($sql);
-		foreach(_ids($dialog_ids, 1) as $id)
-			_cache('clear', '_dialogQuery'.$id);
-
-		//блоки, которые используются в диалогах
-		$sql = "SELECT `id`
-				FROM `_block`
-				WHERE `obj_name`='dialog'
-				  AND `obj_id` IN (".$dialog_ids.")";
-		$block_ids = query_ids($sql);
-
-		//списки, которые расположены в диалогах
-		$sql = "SELECT `block_id`
-				FROM `_element`
-				WHERE `dialog_id` IN (14,59)
-				  AND `block_id` IN (".$block_ids.")";
-		if($spisok_ids = query_ids($sql))
-			foreach(_ids($spisok_ids, 1) as $id)
-				_cache('clear', 'spisok_'.$id);
-
-		//страницы
-		$sql = "SELECT `id`
-				FROM `_page`
-				WHERE `app_id` IN(0,".APP_ID.")";
-		$page_ids = query_ids($sql);
-		foreach(_ids($page_ids, 1) as $id)
-			_cache('clear', 'page_'.$id);
-
-		//блоки, которые используются на страницах
-		$sql = "SELECT `id`
-				FROM `_block`
-				WHERE `obj_name`='page'
-				  AND `obj_id` IN (".$page_ids.")";
-		$block_ids = query_ids($sql);
-
-		//списки, которые расположены на страницах
-		$sql = "SELECT `block_id`
-				FROM `_element`
-				WHERE `dialog_id`=14
-				  AND `block_id` IN (".$block_ids.")";
-		if($spisok_ids = query_ids($sql))
-			foreach(_ids($spisok_ids, 1) as $id)
-				_cache('clear', 'spisok_'.$id);
+		_cache('clear', 'all');      //полная очистка кеша
 
 		_userImageMove();
 		_jsCache();

@@ -290,7 +290,7 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 
 	//обновление кеша объекта, в котором находится блок с кнопкой
 	$bl = _blockQuery($block_id);
-	_cache('clear', $bl['obj_name'].'_'.$bl['obj_id']);
+	_cache_old('clear', $bl['obj_name'].'_'.$bl['obj_id']);
 
 	return $dialog_id;
 }
@@ -298,7 +298,8 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	if(!$dialog_id = _num($dialog_id))
 		return array();
 
-	if($dialog = _cache())
+	$key = 'dialog_'.$dialog_id;
+	if($dialog = _cache('get', $key))
 		return $dialog;
 
 
@@ -322,9 +323,6 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 		}
 	}
 
-//	return _cache($dialog);
-
-	_cache('clear', 'dialog_'.$dialog_id);
 	$dialog['blk'] = _block('dialog', $dialog_id, 'block_arr');
 	$dialog['cmp'] = _block('dialog', $dialog_id, 'elem_arr');
 
@@ -370,7 +368,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	}
 //echo $dialog_id;exit;
 
-	return _cache($dialog);
+	return _cache('set', $key, $dialog);
 }
 function _dialogParam($dialog_id, $param) {//получение конкретного параметра диалога
 	$dialog = _dialogQuery($dialog_id);
@@ -660,9 +658,6 @@ function _elemQuery1($id, $i='elem') {//получение информации о элементе по id эл
 }
 
 function _elemQuery($elem_id) {//запрос одного элемента
-//	if($elem = _cache())
-//		return $elem;
-
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id`=".abs($elem_id);
@@ -674,15 +669,11 @@ function _elemQuery($elem_id) {//запрос одного элемента
 			WHERE `id`=".$elem['block_id'];
 	$elem['block'] = query_assoc($sql);
 
-//	return _cache($elem);
 	return $elem;
 }
 function _blockQuery($block_id) {//запрос одного блока
 	if(empty($block_id))
 		return array();
-
-//	if($block = _cache())
-//		return $block;
 
 	$sql = "SELECT *
 			FROM `_block`
@@ -696,7 +687,6 @@ function _blockQuery($block_id) {//запрос одного блока
 	$block['elem'] = query_assoc($sql);
 
 	return $block;
-//	return _cache($block);
 }
 
 function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
@@ -740,7 +730,7 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 		case 60: return _imageNo($el_parent['width']);
 		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
-			_cache('clear', '_dialogQuery'.$el['num_2']);
+			_cache('clear', 'dialog_'.$el['num_2']);
 			$dlg = _dialogQuery($el['num_2']);
 			return $dlg['history'][$el['num_1']]['tmp'];
 	}
@@ -1053,11 +1043,11 @@ function _historyCondPageUnit($el) {//отображение истории для конкретной единицы
 
 
 function _imageServerCache() {//кеширование серверов изображений
-	if($arr = _cache())
+	if($arr = _cache('get', 'IMG_SERVER'))
 		return $arr;
 
 	$sql = "SELECT `id`,`path` FROM `_image_server`";
-	return _cache(query_ass($sql));
+	return _cache('set', 'IMG_SERVER', query_ass($sql));
 }
 function _imageServer($v) {//получение сервера (пути) для изображнения
 /*
@@ -1091,7 +1081,7 @@ function _imageServer($v) {//получение сервера (пути) для изображнения
 			)";
 	query($sql);
 
-	_cache('clear', '_imageServerCache');
+	_cache('clear', 'IMG_SERVER');
 
 	return query_insert_id('_image_server');
 }

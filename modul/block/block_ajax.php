@@ -68,7 +68,7 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$elem_id;
 		query($sql);
 
-		_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
+		_cache_old('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 
 		jsonSuccess();
 		break;
@@ -249,7 +249,7 @@ switch(@$_POST['op']) {
 
 		define('BLOCK_EDIT', 1);
 
-		_cache('clear', $obj_name.'_'.$obj_id);
+		_cache_old('clear', $obj_name.'_'.$obj_id);
 		$send['level'] = utf8(_blockLevelChange($obj_name, $obj_id, $width));
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width,0, _pageSpisokUnit($obj_id, $obj_name)));
 		$send['blk'] = _block($obj_name, $obj_id, 'block_arr');
@@ -318,7 +318,7 @@ switch(@$_POST['op']) {
 				query($sql);
 			}
 
-		_cache('clear', $block['obj_name'].'_'.$block['obj_id']);
+		_cache_old('clear', $block['obj_name'].'_'.$block['obj_id']);
 
 		jsonSuccess();
 		break;

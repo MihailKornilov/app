@@ -30,6 +30,7 @@ define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '.min');
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);
+define('CACHE_TIME', 20);//врем€ в секундах, которое хранит кеш
 
 //session_name('apppp');
 //session_start();
@@ -40,7 +41,7 @@ define('AJAX', APP_HTML.'/ajax.php?'.TIME);
 $CACHE_ARR = array();
 
 function _setting() {//установка констант-настроек
-	if(!$arr = _cache()) {
+	if(!$arr = _cache('get', 'SETTING')) {
 		$sql = "SELECT `key`,`v`
 				FROM `_setting`";
 		$arr = query_ass($sql);
@@ -57,7 +58,7 @@ function _setting() {//установка констант-настроек
 			$arr['SCRIPT'] = 100;
 		}
 
-		_cache($arr);
+		_cache('set', 'SETTING', $arr);
 	}
 
 	//верси€ скриптов
@@ -115,14 +116,14 @@ function _tableFrom($dialog) {//составление таблиц дл€ запроса на основании данн
 
 
 function _app($app_id=APP_ID, $i='all') {//ѕолучение данных о приложении
-	if(!$arr = _cache()) {
+	if(!$arr = _cache('get', 'APP_'.$app_id)) {
 		$sql = "SELECT *
 				FROM `_app`
 				WHERE `id`=".$app_id;
 		if(!$arr = query_assoc($sql))
 			die('Ќевозможно получить данные приложени€.');
 
-		_cache($arr);
+		_cache('set', 'APP_'.$app_id, $arr);
 	}
 
 	if($i == 'all')
@@ -601,7 +602,7 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 
 }
 
-function _cache($data='', $key='') {//кеширование данных
+function _cache_old($data='', $key='') {//кеширование данных
 	/*
 		$data - данные, сохран€емые в кеш. ≈сли значение пустое, то попытка получить данные
 		$key  - автоматически получаетс€ из второго элемента массива debug_backtrace
@@ -671,7 +672,106 @@ function _cacheErr($txt='Ќеизвестное значение', $i='') {//
 	return '<span class="red">'.$txt.$i.'.</span>';
 }
 
+function _cache($action, $k='', $data='') {
+/*
+	$action: действие
+		set - занесение данных в кеш
+		get - считывание данных из кеша
+		clear - очистка кеша
 
+	$k - частный ключ
+	$data - данные
+*/
 
+	if(empty($k))
+		die('ќтсутствует ключ кеша.');
+	if(is_array($k))
+		die(' люч кеша не может быть массивом.');
 
+	//формирование ключа от конкретного запроса
+	$key = $k;
+
+	//получение списка ключей существующих кешей
+	if(!$CACHE_ARR = xcache_get(AUTH_APP_SECRET))
+		$CACHE_ARR = array();
+
+	switch($action) {
+		case 'set':
+			if($k == 'all')
+				die('«апрещено использование ключа "all" в кеше дл€ установки частных значений.');
+
+			//запись частного кеша
+			xcache_set($key, $data, CACHE_TIME);
+
+			_cacheArrUpd($CACHE_ARR, $key, $data);
+
+			return $data;
+		case 'get':
+			if($k == 'all')
+				return $CACHE_ARR;
+
+			if(!xcache_isset($key)) {
+				unset($CACHE_ARR[$key]);
+				xcache_set(AUTH_APP_SECRET, $CACHE_ARR, CACHE_TIME);
+				return false;
+			}
+
+			$data = xcache_get($key);
+
+			if(empty($CACHE_ARR[$key]))
+				_cacheArrUpd($CACHE_ARR, $key, $data);
+
+			return $data;
+		case 'clear':
+			if($k == 'all') {
+				foreach($CACHE_ARR as $k => $r)
+					if(xcache_isset($k))
+						xcache_unset($k);
+				xcache_unset(AUTH_APP_SECRET);
+				return true;
+			}
+
+			if(xcache_isset($key))
+				xcache_unset($key);
+
+			if(!empty($CACHE_ARR[$key])) {
+				unset($CACHE_ARR[$key]);
+				xcache_set(AUTH_APP_SECRET, $CACHE_ARR, CACHE_TIME);
+			}
+			break;
+		default: die('Ќеизвестное действие кеша.');
+	}
+
+	return true;
+}
+function _cacheArrUpd($CACHE_ARR, $key, $data) {//обновление списка ключей кеша после внесени€ данных
+	$type = 'no';
+	$len = 0;
+	if(is_array($data)) {
+		$type = 'array';
+		$len = strlen(_pr($data));
+	}
+
+	$CACHE_ARR[$key] = array(
+		'created' => time(),
+		'type' => $type,
+		'len' => $len
+	);
+	xcache_set(AUTH_APP_SECRET, $CACHE_ARR, CACHE_TIME);
+}
+function _cacheUpdate() {//очистка кеша от данных, которые были просрочены
+	if(!$CACHE_ARR = xcache_get(AUTH_APP_SECRET))
+		return;
+
+	$time = time();
+	$CACHE_NEW = array();
+	foreach($CACHE_ARR as $k => $r) {
+		if($r['created'] + CACHE_TIME - $time <= 0) {
+			xcache_unset($k);
+			continue;
+		}
+		$CACHE_NEW[$k] = $r;
+	}
+	xcache_set(AUTH_APP_SECRET, $CACHE_NEW, CACHE_TIME);
+}
 

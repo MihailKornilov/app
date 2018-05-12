@@ -57,18 +57,18 @@ switch(@$_POST['op']) {
 
 			//обновление кеша объекта, если это элемент
 			if($elem) {
-				_cache('clear', '_elemQuery'.$elem['id']);
-				_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
+				_cache_old('clear', '_elemQuery'.$elem['id']);
+				_cache_old('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 				_spisokFilter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
 			}
 
 			//обновление кеша объекта, если это страница
 			if($dialog['table_name_1'] == '_page')
-				_cache('clear', '_pageCache');
+				_cache('clear', 'PAGE');
 
 			if($dialog['table_name_1'] == '_element_func')
 				if($BL = _blockQuery($unit['block_id']))
-					_cache('clear', $BL['obj_name'].'_'.$BL['obj_id']);
+					_cache_old('clear', $BL['obj_name'].'_'.$BL['obj_id']);
 		}
 
 		$send = _spisokAction4($send);
@@ -311,7 +311,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	if(IS_ELEM)
 		if($bl = _blockQuery($unit['block_id']))
 			if($bl['obj_name'] == 'dialog') {
-				_cache('clear', '_dialogQuery'.$bl['obj_id']);
+				_cache_old('clear', '_dialogQuery'.$bl['obj_id']);
 				$dlg = _dialogQuery($bl['obj_id']);
 				$unit = $dlg['cmp'][$unit['id']];
 			}
@@ -350,16 +350,16 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	_spisokUnitAfter($dialog, $unit_id, $unitOld);
 
 	if(_table($dialog['table_1']) == '_page')
-		_cache('clear', '_pageCache');
+		_cache('clear', 'PAGE');
 
 	if(_table($dialog['table_1']) == '_element_func')
 		if($BL = _blockQuery($unit['block_id']))
-			_cache('clear', $BL['obj_name'].'_'.$BL['obj_id']);
+			_cache_old('clear', $BL['obj_name'].'_'.$BL['obj_id']);
 
 	if(IS_ELEM) {
 		$elem = _elemQuery($unit_id);
 		if($elem['block'])
-			_cache('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
+			_cache_old('clear', $elem['block']['obj_name'].'_'.$elem['block']['obj_id']);
 		$unit['title'] = _elemTitle($unit_id);
 	}
 
@@ -470,7 +470,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 
 	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
 	if(IS_ELEM && $block_id > 0 && !$unit_id) {
-		_cache('clear', '_blockQuery'.$block_id);
+		_cache_old('clear', '_blockQuery'.$block_id);
 		if(!$block = _blockQuery($block_id))
 			jsonError('Блока не сущетвует');
 		if($block['elem'])
@@ -771,7 +771,7 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление зна
 			$width = floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
 			break;
 		case 'dialog':
-			_cache('clear', '_dialogQuery'.$elem['block']['obj_id']);
+			_cache_old('clear', '_dialogQuery'.$elem['block']['obj_id']);
 			$dlg = _dialogQuery($elem['block']['obj_id']);
 			$width = $dlg['width'];
 			break;
@@ -1273,9 +1273,9 @@ function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страница
 		query($sql);
 	}
 
-	_cache('clear', '_auth');
-	_cache('clear', '_pageCache');
-	_cache('clear', '_userCache'.$user_id);
+	_cache('clear', 'AUTH');
+	_cache('clear', 'PAGE');
+	_cache_old('clear', '_userCache'.$user_id);
 }
 function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
 	$sql = "UPDATE `_spisok`
@@ -1299,15 +1299,15 @@ function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в прило
 			  AND `user_id` NOT IN (".$ids.")";
 	query($sql);
 
-	_cache('clear', '_auth');
-	_cache('clear', '_pageCache');
+	_cache('clear', 'AUTH');
+	_cache('clear', 'PAGE');
 
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=1011";
 	foreach(query_arr($sql) as $r)
-		_cache('clear', '_userCache'.$r['connect_1']);
+		_cache_old('clear', '_userCache'.$r['connect_1']);
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
 	if(!isset($unit['dialog_id']))
@@ -1532,7 +1532,7 @@ function _spisokUnitUpd72($dialog, $unit) {//обновление кеша после применения де
 	if(empty($unit['obj_id']))
 		return;
 
-	_cache('clear', $unit['obj_name'].'_'.$unit['obj_id']);
+	_cache_old('clear', $unit['obj_name'].'_'.$unit['obj_id']);
 }
 
 

@@ -1,6 +1,6 @@
 <?php
 function _spisokFilterCache() {//кеширование фильтров списка
-	if($send = _cache())
+	if($send = _cache('get', 'SPISOK_FILTER'))
 		return $send;
 
 	$send = array(
@@ -31,11 +31,11 @@ function _spisokFilterCache() {//кеширование фильтров списка
 		}
 	}
 
-	return _cache($send);
+	return _cache('set', 'SPISOK_FILTER', $send);
 }
 function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
 	if($i == 'cache_clear') {
-		_cache('clear', '_spisokFilterCache');
+		_cache('clear', 'SPISOK_FILTER');
 		return true;
 	}
 

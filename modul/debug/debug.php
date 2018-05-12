@@ -58,7 +58,30 @@ function _debug($i='') {
 function _debugCache() {//результат использования кеша
 	global $CACHE_ARR;
 
-	$send = '<table class="mar10 bg-fff collaps">'.
+	$send = 'Кеш пуст.';
+
+	if($arr = _cache('get', 'all')) {
+		$send = '<table class="mar10 bg-fff collaps">'.
+			'<tr>'.
+				'<td class="bor-f0">'.
+				'<td class="bor-f0 pad5 center b">key'.
+				'<td class="bor-f0 pad5 center b">type'.
+				'<td class="bor-f0 pad5 center b">len'.
+				'<td class="bor-f0 pad5 center b">time';
+		$time = time();
+		$n = 1;
+		foreach($arr as $k => $r) {
+			$send .= '<tr>'.
+				'<td class="grey r bor-f0 pad5">'.$n++.
+				'<td class="bor-f0 pad5">'.$k.
+				'<td class="bor-f0 pad5 center">'.$r['type'].
+				'<td class="bor-f0 pad5 r">'._sumSpace($r['len']).
+				'<td class="bor-f0 pad5 r">'.($r['created'] + CACHE_TIME - $time);
+		}
+		$send .= '</table>';
+	}
+
+ 	$send .= '<table class="mar10 bg-fff collaps">'.
 			'<tr>'.
 				'<td class="bor-f0">'.
 				'<td class="bor-f0 pad5 center b">act'.

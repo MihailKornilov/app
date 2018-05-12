@@ -406,7 +406,7 @@ switch(@$_POST['op']) {
 					`sort`=VALUES(`sort`)";
 		query($sql);
 
-		_cache('clear', '_pageCache');
+		_cache('clear', 'PAGE');
 
 		jsonSuccess();
 		break;
@@ -901,7 +901,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 			WHERE `id`=".$dialog_id;
 	query($sql);
 
-	_cache('clear', '_dialogQuery'.$dialog_id);
+	_cache('clear', 'dialog_'.$dialog_id);
 
 	return $dialog_id;
 }

@@ -410,8 +410,8 @@ function _blockGrid($arr) {//режим деления на подблоки
 }
 
 function _blockCache($obj_name, $obj_id) {
-	$cacheKey = $obj_name.'_'.$obj_id;
-	if($send = _cache('', $cacheKey))
+	$cacheKey = 'BLOCK_'.$obj_name.'_'.$obj_id;
+	if($send = _cache('get', $cacheKey))
 		return $send;
 
 	$sql = "SELECT *
@@ -421,16 +421,16 @@ function _blockCache($obj_name, $obj_id) {
 			  AND `sa` IN (0,".SA.")
 			ORDER BY `parent_id`,`y`,`x`";
 	if(!$arr = query_arr($sql))
-		return _cache(array(
+		return _cache('set', $cacheKey, array(
 			'block' => array(),
 			'elem' => array()
-		), $cacheKey);
+		));
 
 	if(!$arr = _blockChildClear($arr))
-		return _cache(array(
+		return _cache('set', $cacheKey, array(
 			'block' => array(),
 			'elem' => array()
-		), $cacheKey);
+		));
 
 	//Отображение варианта цвета для динамической окраски блоков
 	//Будет открываться диалог, который вносит данные списка, чтобы указать, откуда брать цвет для окраски
@@ -657,10 +657,10 @@ function _blockCache($obj_name, $obj_id) {
 		);
 	}
 
-	return _cache(array(
+	return _cache('set', $cacheKey, array(
 		'block' => $block,
 		'elem' => $elem
-	), $cacheKey);
+	));
 }
 function _block($obj_name, $obj_id, $i='all') {
 	$mass = _blockCache($obj_name, $obj_id);

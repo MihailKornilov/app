@@ -1,6 +1,7 @@
 <?php
 function _pageCache() {//получение массива страниц из кеша
-	if($arr = _cache())
+	$key = 'PAGE';
+	if($arr = _cache('get', $key))
 		return $arr;
 
 	$sql = "SELECT
@@ -41,7 +42,7 @@ function _pageCache() {//получение массива страниц из кеша
 		if(!empty($page[$r['page_id']]))
 			$page[$r['page_id']]['access'] = 1;
 
-	return _cache($page);
+	return _cache('set', $key, $page);
 }
 function _page($i='all', $i1=0) {//получение данных страницы
 	if(!$i)
@@ -2052,7 +2053,6 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 
 function _page_div() {//todo тест
-
 	return '';
 
 	//страницы
