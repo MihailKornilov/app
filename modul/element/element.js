@@ -405,6 +405,11 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 		});
 		DLG('#element_width')._count({width:60,step:10});
 		DLG('#element_width_min')._count({width:60,step:10});
+		DLG('#element_type')._select({
+			title0:'не указан',
+			width:100,
+			spisok:o.col_type
+		});
 		DLG('#element_dialog_func')._select({
 			width:280,
 			title0:'не указан',
@@ -483,6 +488,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 				element_group_id:DLG('#element_group_id').val(),
 				element_width:DLG('#element_width').val(),
 				element_width_min:DLG('#element_width_min').val(),
+				element_type:DLG('#element_type').val(),
 				element_search_access:DLG('#element_search_access').val(),
 				element_is_insert:DLG('#element_is_insert').val(),
 				element_style_access:DLG('#element_style_access').val(),
@@ -530,6 +536,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 			dialog.bottom.find('.submit').addClass('red');
 		else {
 			window.DIALOG_OPEN = dialog;
+			DIALOG_OPEN.col_type = o.col_type;
 			_blockUpd(o.blk);
 			_elemUpd(o.cmp);
 			_elemActivate(o.cmp, o.unit);
@@ -1070,7 +1077,15 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 						spisok:el.vvv
 					});
 					_forN(el.vvv, function(u) {
-						if(u.title == unit.col) {
+						if(unit.col == u.title) {
+							$(el.attr_cmp)._select(u.id);
+							return false;
+						}
+						if(unit.col)
+							return;
+						if(u.busy)
+							return;
+						if(u.title.split('_')[0] == DIALOG_OPEN.col_type) {
 							$(el.attr_cmp)._select(u.id);
 							return false;
 						}
@@ -1122,6 +1137,8 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					return;
 				//Заметки
 				case 52:
+					if(!$(el.attr_el).length)
+						return;
 					var timer = 0,
 						NOTE = $(el.attr_el).find('._note'),
 						ex = NOTE.attr('val').split(':'),

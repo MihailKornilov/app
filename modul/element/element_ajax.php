@@ -13,7 +13,7 @@ switch(@$_POST['op']) {
 	  		4 => 'Служебное',
 			9 => '<b class=red>SA</b>'
 		);
-		$action = array(
+		$action = array(//действие, которое будет происходить после внесения или изменения единицы списка
 			3 => 'Обновить содержимое блоков',
 			1 => 'Обновить страницу',
 			2 => 'Перейти на страницу',
@@ -255,6 +255,8 @@ switch(@$_POST['op']) {
 						'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
 					'<tr><td class="red r">Минимальная ширина:'.
 						'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
+					'<tr><td class="red r">Тип данных:'.
+						'<td><input type="hidden" id="element_type" value="'.$dialog['element_type'].'" />'.
 					'<tr><td class="red r">CMP-аффикс:'.
 						'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
 					'<tr><td class="red r">Диалог для функций:'.
@@ -349,6 +351,7 @@ switch(@$_POST['op']) {
 		$send['menu'] = _selArray($menu);
 		$send['menu_sa'] = _selArray($menu_sa);
 		$send['action'] = _selArray($action);
+		$send['col_type'] = _selArray(_elemColType());
 		$send['blk'] = $dialog['blk'];
 		$send['cmp'] = utf8($dialog['cmp']);
 		$send['html'] = utf8($html);
@@ -709,8 +712,8 @@ function _table2field($tab) {//список колонок для таблицы 2
 	return $send;
 }
 
-function _dialogEditLoadUse($dialog) {//использование как элемента в других диалогах
 
+function _dialogEditLoadUse($dialog) {//использование как элемента в других диалогах
 	$use_dialog = '';
 	$use_page = '';
 	$sql = "SELECT `block_id`
@@ -829,6 +832,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_group_id = _num($_POST['element_group_id']);
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
+	$element_type = _num($_POST['element_type']);
 	$element_search_access = _num($_POST['element_search_access']);
 	$element_is_insert = _num($_POST['element_is_insert']);
 	$element_style_access = _num($_POST['element_style_access']);
@@ -882,6 +886,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_group_id`=".$element_group_id.",
 				`element_width`=".$element_width.",
 				`element_width_min`=".$element_width_min.",
+				`element_type`=".$element_type.",
 				`element_search_access`=".$element_search_access.",
 				`element_is_insert`=".$element_is_insert.",
 				`element_style_access`=".$element_style_access.",
@@ -901,7 +906,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 			WHERE `id`=".$dialog_id;
 	query($sql);
 
-	_cache('clear', 'dialog_'.$dialog_id);
+	_dialogQuery($dialog_id, 1);
 
 	return $dialog_id;
 }
@@ -983,6 +988,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['act'] = $act;
 	$send['edit_access'] = _num(@SA) || $dialog['app_id'] && $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
+	$send['col_type'] = _elemColType($dialog['element_type']);
 	$send['head'] = utf8($dialog[$act.'_head']);
 	$send['button_submit'] = utf8($dialog[$act.'_button_submit']);
 	$send['button_cancel'] = utf8($dialog[$act.'_button_cancel']);
@@ -1085,7 +1091,12 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//select - выбор единицы из другого списка (для связки)
 			case 29:
-				$sel_id = $unit_id && $cmp['col'] ? $unit[$cmp['col']]['id'] : _spisokCmpConnectIdGet($cmp);
+				$sel_id = 0;
+				if($unit_id && $cmp['col']) {
+					if(!empty($unit[$cmp['col']]))
+						$sel_id = $unit[$cmp['col']]['id'];
+				} else
+					$sel_id = _spisokCmpConnectIdGet($cmp);
 				$dialog['cmp'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
 				break;
 			//настройка ТАБЛИЧНОГО содержания списка
@@ -1150,6 +1161,7 @@ function _dialogOpenLoad($dialog_id) {
 					'id' => 1,
 					'id_old' => 1,
 					'num' => 1,
+					'parent_id' => 1,
 					'app_id' => 1,
 					'user_id' => 1,
 					'page_id' => 1,
@@ -1177,11 +1189,15 @@ function _dialogOpenLoad($dialog_id) {
 						continue;
 
 					$color = '';
-					if(isset($colUse[$col]))
+					$busy = 0;//занята ли колонка
+					if(isset($colUse[$col])) {
 						$color = $unit_id && $unit['col'] == $col ? 'b color-pay' : 'b red';
+						$busy = 1;
+					}
 					$u = array(
 						'id' => $n++,
 						'title' => $col,
+						'busy' => $busy,
 						'content' =>
 							'<div class="'.$color.'">'.
 								'<span class="pale">'._table($colDialog['table_1']).'.</span>'.

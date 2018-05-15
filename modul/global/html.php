@@ -70,7 +70,7 @@ function _auth() {//получение данных об авторизации из кеша
 					WHERE `code`='".CODE."'";
 			query($sql);
 
-			_cache('clear', 'user_'.USER_ID);
+			_cache('clear', 'USER_'.USER_ID);
 			_cache('clear', 'AUTH');
 
 			header('Location:'.URL);
@@ -168,7 +168,7 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной
 
 	_cache('clear', 'AUTH');
 	_cache('clear', 'PAGE');
-	_cache_old('clear', '_userCache'.$user_id);
+	_cache('clear', 'USER_'.$user_id);
 
 	if(LOCAL)
 		setcookie('local', 1, time() + 2592000, '/');
@@ -181,7 +181,7 @@ function _authLogout() {//выход из приложения, если требуется
 
 	_cache('clear', 'AUTH');
 	_cache('clear', 'PAGE');
-	_cache('clear', 'user_'.USER_ID);
+	_cache('clear', 'USER_'.USER_ID);
 
 	//выход только из приложения и попадание в список приложений
 	if(APP_ID) {
@@ -466,7 +466,7 @@ function _app_create($dialog, $app_id) {//привязка пользователя к приложению пос
 
 	_cache('clear', 'AUTH');
 	_cache('clear', 'PAGE');
-	_cache('clear', 'user_'.USER_ID);
+	_cache('clear', 'USER_'.USER_ID);
 
 	_auth();
 }

@@ -290,15 +290,22 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 
 	//обновление кеша объекта, в котором находится блок с кнопкой
 	$bl = _blockQuery($block_id);
-	_cache_old('clear', $bl['obj_name'].'_'.$bl['obj_id']);
+	_blockCache($bl['obj_name'], $bl['obj_id'], 'clear');
 
 	return $dialog_id;
 }
-function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
+function _dialogQuery($dialog_id, $clear=0) {//данные конкретного диалогового окна
 	if(!$dialog_id = _num($dialog_id))
 		return array();
 
-	$key = 'dialog_'.$dialog_id;
+	$key = 'DIALOG_'.$dialog_id;
+
+	if($clear) {
+		_blockCache('dialog', $dialog_id, 1);
+		_cacheClear($key);
+		return true;
+	}
+
 	if($dialog = _cache('get', $key))
 		return $dialog;
 
@@ -658,6 +665,10 @@ function _elemQuery1($id, $i='elem') {//получение информации о элементе по id эл
 }
 
 function _elemQuery($elem_id) {//запрос одного элемента
+	$key = 'ELM_'.$elem_id;
+	if($elem = _cache('get', $key))
+		return $elem;
+
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id`=".abs($elem_id);
@@ -669,11 +680,15 @@ function _elemQuery($elem_id) {//запрос одного элемента
 			WHERE `id`=".$elem['block_id'];
 	$elem['block'] = query_assoc($sql);
 
-	return $elem;
+	return _cache('set', $key, $elem);
 }
 function _blockQuery($block_id) {//запрос одного блока
 	if(empty($block_id))
 		return array();
+
+	$key = 'BLK_'.$block_id;
+	if($elem = _cache('get', $key))
+		return $elem;
 
 	$sql = "SELECT *
 			FROM `_block`
@@ -686,7 +701,7 @@ function _blockQuery($block_id) {//запрос одного блока
 			WHERE `block_id`=".$block_id;
 	$block['elem'] = query_assoc($sql);
 
-	return $block;
+	return _cache('set', $key, $block);
 }
 
 function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
@@ -730,11 +745,31 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 		case 60: return _imageNo($el_parent['width']);
 		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
-			_cache('clear', 'dialog_'.$el['num_2']);
+			_dialogQuery($el['num_2'], 1);
 			$dlg = _dialogQuery($el['num_2']);
 			return $dlg['history'][$el['num_1']]['tmp'];
 	}
 	return $el['name'];
+}
+
+function _elemColType($id='all') {//тип данных, используемый элементом
+	$col_type = array(
+		1 => 'txt',
+		2 => 'num',
+		3 => 'connect',
+		4 => 'count',
+		5 => 'cena',
+		6 => 'sum',
+		7 => 'date',
+		8 => 'image'
+	);
+
+	if($id == 'all')
+		return $col_type;
+	if(!isset($col_type[$id]))
+		return '';
+
+	return $col_type[$id];
 }
 
 function _elementChoose($el, $unit) {//выбор элемента для вставки в блок

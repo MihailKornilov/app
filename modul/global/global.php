@@ -30,7 +30,7 @@ define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '.min');
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);
-define('CACHE_TIME', 20);//врем€ в секундах, которое хранит кеш
+define('CACHE_TIME', 84600);//врем€ в секундах, которое хранит кеш
 
 //session_name('apppp');
 //session_start();
@@ -130,7 +130,7 @@ function _app($app_id=APP_ID, $i='all') {//ѕолучение данных о приложении
 		return $arr;
 
 	if(!isset($arr[$i]))
-		return _cacheErr('_app: неизвестный ключ', $i);
+		return '_app: неизвестный ключ';
 
 	return $arr[$i];
 }
@@ -602,76 +602,6 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 
 }
 
-function _cache_old($data='', $key='') {//кеширование данных
-	/*
-		$data - данные, сохран€емые в кеш. ≈сли значение пустое, то попытка получить данные
-		$key  - автоматически получаетс€ из второго элемента массива debug_backtrace
-				им€ вызываемого файла + значение первого аргумента (если есть)
-	*/
-	global $CACHE_ARR;
-
-	if(!$CODE = CODE)
-		$CODE = 'default_no_auth1';
-
-	if(!$key) {
-		$DBT = debug_backtrace(0);
-		$DBT = $DBT[1];
-		$ARG = empty($DBT['args'][0]) ? '' : $DBT['args'][0];
-		if(is_array($ARG)) {
-			$CACHE_ARR[] = array(
-				'act' => 'key_array!!!',
-				'key' => _pr($ARG),
-				'dbt' => debug_backtrace(0)
-			);
-			return false;
-		}
-		$key = $DBT['function'].$ARG;
-	}
-
-	$cKey = md5($CODE).$key;
-	if($data == 'clear') {
-		xcache_unset($cKey);
-		$CACHE_ARR[] = array(
-			'act' => 'clear',
-			'key' => $key,
-			'dbt' => debug_backtrace(0)
-		);
-		return true;
-	}
-
-	//занесение данных в кеш
-	if($data) {
-		xcache_set($cKey, $data, 86400);
-		$CACHE_ARR[] = array(
-			'act' => 'set',
-			'key' => $key,
-			'dbt' => debug_backtrace(0)
-		);
-		return $data;
-	}
-
-	if(!xcache_isset($cKey)) {
-		$CACHE_ARR[] = array(
-			'act' => 'empty',
-			'key' => $key,
-			'dbt' => debug_backtrace(0)
-		);
-		return false;
-	}
-
-	$CACHE_ARR[] = array(
-		'act' => 'get',
-		'key' => $key,
-		'dbt' => debug_backtrace(0)
-	);
-	return xcache_get($cKey);
-}
-function _cacheErr($txt='Ќеизвестное значение', $i='') {//
-	if($i != '')
-		$i = ': <b>'.$i.'</b>';
-	return '<span class="red">'.$txt.$i.'.</span>';
-}
-
 function _cache($action, $k='', $data='') {
 /*
 	$action: действие
@@ -680,7 +610,7 @@ function _cache($action, $k='', $data='') {
 		clear - очистка кеша
 
 	$k - частный ключ
-	$data - данные
+	$data - данные, сохран€емые в кеш
 */
 
 	if(empty($k))
@@ -702,6 +632,8 @@ function _cache($action, $k='', $data='') {
 
 			//запись частного кеша
 			xcache_set($key, $data, CACHE_TIME);
+			if(!xcache_isset($key))
+				die('Ќе удалось занести данные в кеш.');
 
 			_cacheArrUpd($CACHE_ARR, $key, $data);
 
@@ -738,10 +670,13 @@ function _cache($action, $k='', $data='') {
 				unset($CACHE_ARR[$key]);
 				xcache_set(AUTH_APP_SECRET, $CACHE_ARR, CACHE_TIME);
 			}
-			break;
+		return true;
+
 		default: die('Ќеизвестное действие кеша.');
 	}
-
+}
+function _cacheClear($key) {//очистка кеша по ключу
+	_cache('clear', $key);
 	return true;
 }
 function _cacheArrUpd($CACHE_ARR, $key, $data) {//обновление списка ключей кеша после внесени€ данных

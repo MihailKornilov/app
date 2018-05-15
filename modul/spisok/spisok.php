@@ -34,10 +34,8 @@ function _spisokFilterCache() {//кеширование фильтров списка
 	return _cache('set', 'SPISOK_FILTER', $send);
 }
 function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
-	if($i == 'cache_clear') {
-		_cache('clear', 'SPISOK_FILTER');
-		return true;
-	}
+	if($i == 'cache_clear')
+		return _cacheClear('SPISOK_FILTER');
 
 	$F = _spisokFilterCache();
 
@@ -349,6 +347,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 						case 34: $cls[] = 'pad0'; //иконки управления
 						default:
 							$txt = _elemUnit($td, $sp);
+//							$txt = _spisokColSearchBg($txt, $el, $cmp_id);
 							$txt = _spisokUnitUrl($td, $sp, $txt);
 							break;
 					}

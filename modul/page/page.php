@@ -955,7 +955,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 				num_4 - id диалога, которое открывается при нажатии на кнопку
 			*/
 
-			$v = _num($v);
+			$v = is_array($v) ? _num($v['id']) : _num($v);
+
 			return
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			_button(array(
@@ -1083,10 +1084,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$UNIT_ISSET)
 				return _elemTitle($el['id']);
 
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id` IN ("._ids($el['txt_2']).")";
-			if(!$elemArr = query_arr($sql))
+			$elemArr = array();
+			foreach(_ids($el['txt_2'], 1) as $id)
+				if($elm = _elemQuery($id))
+					$elemArr[$id] = $elm;
+
+			if(empty($elemArr))
 				return 'элемент отсутствует';
 
 			$send = '';

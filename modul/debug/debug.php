@@ -56,48 +56,26 @@ function _debug($i='') {
 }
 
 function _debugCache() {//результат использования кеша
-	global $CACHE_ARR;
+	if(!$arr = _cache('get', 'all'))
+		return 'Кеш пуст.';
 
-	$send = 'Кеш пуст.';
-
-	if($arr = _cache('get', 'all')) {
-		$send = '<table class="mar10 bg-fff collaps">'.
-			'<tr>'.
-				'<td class="bor-f0">'.
-				'<td class="bor-f0 pad5 center b">key'.
-				'<td class="bor-f0 pad5 center b">type'.
-				'<td class="bor-f0 pad5 center b">len'.
-				'<td class="bor-f0 pad5 center b">time';
-		$time = time();
-		$n = 1;
-		foreach($arr as $k => $r) {
-			$send .= '<tr>'.
-				'<td class="grey r bor-f0 pad5">'.$n++.
-				'<td class="bor-f0 pad5">'.$k.
-				'<td class="bor-f0 pad5 center">'.$r['type'].
-				'<td class="bor-f0 pad5 r">'._sumSpace($r['len']).
-				'<td class="bor-f0 pad5 r">'.($r['created'] + CACHE_TIME - $time);
-		}
-		$send .= '</table>';
-	}
-
- 	$send .= '<table class="mar10 bg-fff collaps">'.
-			'<tr>'.
-				'<td class="bor-f0">'.
-				'<td class="bor-f0 pad5 center b">act'.
-				'<td class="bor-f0 pad5 center b">key'.
-				'<td class="bor-f0 pad5 center b">'.
-				'<td class="bor-f0 pad5 center b">func';
-	foreach($CACHE_ARR as $n => $r) {
-		$dbtCount = count($r['dbt']);
+	$send = '<table class="mar10 bg-fff collaps">'.
+		'<tr>'.
+			'<td class="bor-f0">'.
+			'<td class="bor-f0 pad5 center b">key'.
+			'<td class="bor-f0 pad5 center b">type'.
+			'<td class="bor-f0 pad5 center b">len'.
+			'<td class="bor-f0 pad5 center b">time';
+	$time = time();
+	$n = 1;
+	foreach($arr as $k => $r) {
 		$send .= '<tr>'.
-			'<td class="grey r bor-f0 pad5">'.($n + 1).
-			'<td class="bor-f0 pad5'._dn($r['act'] != 'set', 'bg-fcc').'">'.$r['act'].
-			'<td class="bor-f0 pad5">'.$r['key'].
-			'<td class="bor-f0 pad5 center">'.$dbtCount.
-			'<td class="bor-f0 pad5">'.$r['dbt'][$dbtCount - 1]['function'];
+			'<td class="grey r bor-f0 pad5">'.$n++.
+			'<td class="bor-f0 pad5">'.$k.
+			'<td class="bor-f0 pad5 center">'.$r['type'].
+			'<td class="bor-f0 pad5 r">'._sumSpace($r['len']).
+			'<td class="bor-f0 pad5 r">'.($r['created'] + CACHE_TIME - $time);
 	}
-
 	$send .= '</table>';
 
 	return $send;

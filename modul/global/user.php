@@ -28,7 +28,7 @@ function _user($user_id=USER_ID, $i='') {//получение данных о пользовате из конт
 	return $u;
 }
 function _userCache($user_id) {
-	$key = 'user_'.$user_id;
+	$key = 'USER_'.$user_id;
 	if($u = _cache('get', $key))
 		return $u;
 
@@ -133,7 +133,7 @@ function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 	return $user_id;
 }
 function _userImageMove() {//перенос аватарок пользователей в изображения
-	_cache_old('clear', '_imageServerCache');
+	_cache('clear', 'IMG_SERVER');
 
 	$sql = "SELECT *
 			FROM `_user`

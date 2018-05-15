@@ -409,9 +409,13 @@ function _blockGrid($arr) {//режим деления на подблоки
 		'</div>';
 }
 
-function _blockCache($obj_name, $obj_id) {
-	$cacheKey = 'BLOCK_'.$obj_name.'_'.$obj_id;
-	if($send = _cache('get', $cacheKey))
+function _blockCache($obj_name, $obj_id, $clear=0) {
+	$CACHE_KEY = 'BLOCK_'.$obj_name.'_'.$obj_id;
+
+	if($clear)
+		return _cacheClear($CACHE_KEY);
+
+	if($send = _cache('get', $CACHE_KEY))
 		return $send;
 
 	$sql = "SELECT *
@@ -421,13 +425,13 @@ function _blockCache($obj_name, $obj_id) {
 			  AND `sa` IN (0,".SA.")
 			ORDER BY `parent_id`,`y`,`x`";
 	if(!$arr = query_arr($sql))
-		return _cache('set', $cacheKey, array(
+		return _cache('set', $CACHE_KEY, array(
 			'block' => array(),
 			'elem' => array()
 		));
 
 	if(!$arr = _blockChildClear($arr))
-		return _cache('set', $cacheKey, array(
+		return _cache('set', $CACHE_KEY, array(
 			'block' => array(),
 			'elem' => array()
 		));
@@ -657,7 +661,7 @@ function _blockCache($obj_name, $obj_id) {
 		);
 	}
 
-	return _cache('set', $cacheKey, array(
+	return _cache('set', $CACHE_KEY, array(
 		'block' => $block,
 		'elem' => $elem
 	));
