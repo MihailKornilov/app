@@ -68,15 +68,25 @@ function _debugCache() {//результат использования кеша
 			'<td class="bor-f0 pad5 center b">time';
 	$time = time();
 	$n = 1;
+	$len = 0;
 	foreach($arr as $k => $r) {
-		$send .= '<tr>'.
-			'<td class="grey r bor-f0 pad5">'.$n++.
+		$send .= '<tr class="'.($r['inserted'] ? '' : 'pale').'">'.
+			'<td class="bor-f0 pad5 r">'.$n++.
 			'<td class="bor-f0 pad5">'.$k.
 			'<td class="bor-f0 pad5 center">'.$r['type'].
 			'<td class="bor-f0 pad5 r">'._sumSpace($r['len']).
 			'<td class="bor-f0 pad5 r">'.($r['created'] + CACHE_TIME - $time);
+		$len += $r['len'];
 	}
 	$send .= '</table>';
+
+	$send =
+		'<div class="fs14 mar10">'.
+			'Записей: <b>'.--$n.'</b>'.
+			'<br>'.
+			'Общий размер: <b>'._sumSpace($len).'</b> '.
+		'</div>'.
+		$send;
 
 	return $send;
 }

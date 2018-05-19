@@ -1,6 +1,11 @@
 <?php
 define('TIME', microtime(true));
 
+//ini_set('xcache.size', '200M');
+//ini_set('xcache.var_size', '20M');
+//echo ini_get('xcache.size');
+
+
 setlocale(LC_ALL, 'ru_RU.CP1251');
 setlocale(LC_NUMERIC, 'en_US');
 
@@ -602,6 +607,26 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 
 }
 
+
+
+function _cache1($v=array()) {
+	//действие:
+	//	get - считывание данных из кеша (по умолчанию)
+	//	set - занесение данных в кеш
+	//	clear - очистка кеша
+	$action = empty($v['action']) ? 'get' : $v['action'];
+
+	//глобальное значение: доступно для всех приложений
+	//если внутреннее, то к ключу будет прибавляться префикс
+	$global = !empty($v['global']);
+
+
+	$key = '';
+	$data = '';
+
+
+
+}
 function _cache($action, $k='', $data='') {
 /*
 	$action: действие
@@ -632,10 +657,7 @@ function _cache($action, $k='', $data='') {
 
 			//запись частного кеша
 			xcache_set($key, $data, CACHE_TIME);
-			if(!xcache_isset($key))
-				die('Не удалось занести данные в кеш.');
-
-			_cacheArrUpd($CACHE_ARR, $key, $data);
+			_cacheArrUpd($CACHE_ARR, $key, $data, xcache_isset($key) ? 1 : 0);
 
 			return $data;
 		case 'get':
@@ -651,7 +673,7 @@ function _cache($action, $k='', $data='') {
 			$data = xcache_get($key);
 
 			if(empty($CACHE_ARR[$key]))
-				_cacheArrUpd($CACHE_ARR, $key, $data);
+				_cacheArrUpd($CACHE_ARR, $key, $data, 1);
 
 			return $data;
 		case 'clear':
@@ -679,7 +701,7 @@ function _cacheClear($key) {//очистка кеша по ключу
 	_cache('clear', $key);
 	return true;
 }
-function _cacheArrUpd($CACHE_ARR, $key, $data) {//обновление списка ключей кеша после внесения данных
+function _cacheArrUpd($CACHE_ARR, $key, $data, $inserted=0) {//обновление списка ключей кеша после внесения данных
 	$type = 'no';
 	$len = 0;
 	if(is_array($data)) {
@@ -689,6 +711,7 @@ function _cacheArrUpd($CACHE_ARR, $key, $data) {//обновление списка ключей кеша 
 
 	$CACHE_ARR[$key] = array(
 		'created' => time(),
+		'inserted' => $inserted,
 		'type' => $type,
 		'len' => $len
 	);
