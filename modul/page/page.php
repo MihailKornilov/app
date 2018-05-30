@@ -1,7 +1,7 @@
 <?php
 function _pageCache() {//получение массива страниц из кеша
-	$key = 'PAGE';
-	if($arr = _cache('get', $key))
+	$key = 'page';
+	if($arr = _cache_get($key))
 		return $arr;
 
 	$sql = "SELECT
@@ -42,7 +42,7 @@ function _pageCache() {//получение массива страниц из кеша
 		if(!empty($page[$r['page_id']]))
 			$page[$r['page_id']]['access'] = 1;
 
-	return _cache('set', $key, $page);
+	return _cache_set($key, $page);
 }
 function _page($i='all', $i1=0) {//получение данных страницы
 	if(!$i)
@@ -481,14 +481,11 @@ function _pageShow($page_id) {
 		$page_id = _page('def');
 
 	return
-//	'USER_ID='.USER_ID.' APP_ID='.APP_ID.' APP_ACCESS='.APP_ACCESS.
-//	_block('page', $page_id, 'block_js').
-//	_pr(_block('page', $page_id, 'elem_arr')).
 	_blockHtml('page', $page_id, 1000, 0, _pageSpisokUnit($page_id)).
 	_page_div().
 	'<script>'.
-		'var BLK='._block('page', $page_id, 'block_js').','.
-			'ELM='._block('page', $page_id, 'elem_js').','.
+		'var BLK='._BE('block_js','page', $page_id).','.
+			'ELM='._BE('elem_js', 'page', $page_id).','.
 			'PAGE_LIST='._page('for_select', 'js').','.
 			'ELEM_COLOR='._colorJS().','.
 			'FILTER='._json(_spisokFilter('page_js')).';'.
@@ -919,7 +916,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$bs_id = _num(@$US['block_id']))
 				return '<div class="red">Отсутствует ID исходного блока.</div>';
 
-			$BL = _blockQuery($bs_id);
+			$BL = _blockOne($bs_id);
 			if($BL['obj_name'] != 'dialog')
 				return '<div class="red">Исходный блок не является блоком из диалога.</div>';
 
@@ -1084,19 +1081,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$UNIT_ISSET)
 				return _elemTitle($el['id']);
 
-			$elemArr = array();
-			foreach(_ids($el['txt_2'], 1) as $id)
-				if($elm = _elemQuery($id))
-					$elemArr[$id] = $elm;
-
-			if(empty($elemArr))
+			if(!$ids = _ids($el['txt_2'], 1))
 				return 'элемент отсутствует';
 
 			$send = '';
 
-			$ids = _ids($el['txt_2'], 1);
 			foreach($ids as $n => $elem_id) {
-				$elem = $elemArr[$elem_id];
+				$elem = _elemOne($elem_id);
 				switch($elem['dialog_id']) {
 					//многострочное поле
 					case 5:
@@ -1108,10 +1099,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							return '';
 						$txt = $unit[$elem['col']];
 						if($n) {
-							$el0 = $elemArr[$ids[0]];
+							$el0 = _elemOne($ids[0]);
 							if($el0['dialog_id'] == 29)
 								if($el0['num_5']) {//вывод значения по уровням
-
 
 									if($parent_id = $unit['parent_id'])
 										while($parent_id) {
@@ -1124,10 +1114,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 											$parent_id = $u['parent_id'];
 										}
 
-
 								}
 						}
-//						$txt = _spisokColSearchBg($txt, $ELEM, $elemUse['id']);
+						$txt = _spisokColSearchBg($el, $txt);
 						$txt = _spisokUnitUrl($el, $unit, $txt);
 						$send .= _br($txt);
 						break;
@@ -1246,7 +1235,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if(!$bs_id = _num(@$US['block_id']))
 				return _emptyMin('Отсутствует ID исходного блока.');
 
-			if(!$BL = _blockQuery($bs_id))
+			if(!$BL = _blockOne($bs_id))
 				return _emptyMin('Исходного блока id'.$bs_id.' не существует.');
 
 			if($BL['obj_name'] != 'page' && $BL['obj_name'] != 'dialog')
@@ -1403,14 +1392,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			if($bls_id = _num(@$US['block_id'], 1)) {
 				//блок является элементом
 				if($bls_id < 0) {
-					if(!$EL = _elemQuery(abs($bls_id)))
+					if(!$EL = _elemOne(abs($bls_id)))
 						return _emptyMin('Исходного элемента id'.$bls_id.' не существует.');
 					$bls_id = $EL['block_id'];//обновление исходного блока
 				}
 
 				//$history = $el['dialog_id']
 
-				if(!$BLS = _blockQuery($bls_id))
+				if(!$BLS = _blockOne($bls_id))
 					return _emptyMin('Исходный блок id'.$bls_id.' отсутствует.');
 
 				if($el['num_2'] == 43 && $BLS['obj_name'] != 'dialog')
@@ -1423,13 +1412,13 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 							return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента поиска в блок.');
 						if(!$EL['num_1'])
 							return _emptyMin('Содержание диалога будет доступно после выбора списка,<br>по которому будет производиться поиск.');
-						if(!$sp = _elemQuery($EL['num_1']))
+						if(!$sp = _elemOne($EL['num_1']))
 							return _emptyMin('Отсутствует элемент, размещающий список.');
 						$dialog_id = $sp['num_1'];
 						break;
 					case 11://вставка значения...
 						if($BLS['obj_name'] == 'spisok') {//...в блок шаблона [14]
-							$bl = _blockQuery($BLS['obj_id']);
+							$bl = _blockOne($BLS['obj_id']);
 							if(!$bl['elem'])
 								return _emptyMin('Содержание диалога будет доступно<br>после вставки элемента в блок.');
 							if(!$dialog_id = $bl['elem']['num_1'])
@@ -1453,15 +1442,15 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 								if($BLS['elem']['dialog_id'] == 31) {
 									if(!$el31_id = _num($BLS['elem']['num_1']))
 										return _emptyMin('Отсутствует id элемента, размещающего select');
-									if(!$el31 = _elemQuery($el31_id))
+									if(!$el31 = _elemOne($el31_id))
 										return _emptyMin('Отсутствует элемент, размещающий select');
 									if($el31['dialog_id'] == 24 && $el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-связку [29]
-										if(!$ell = _elemQuery($dialog_id))
+										if(!$ell = _elemOne($dialog_id))
 											return _emptyMin('...');
 										$dialog_id = _num($ell['block']['obj_id']);
 									}
 									if($el31['dialog_id'] != 24 && $el31['num_1']) {//$dialog_id - является элементом, размещающий выпадающий список-выбор списка [24]
-										if(!$ell = _elemQuery($dialog_id))
+										if(!$ell = _elemOne($dialog_id))
 											return _emptyMin('....');
 										$dialog_id = _num($ell['num_1']);
 									}
@@ -1554,7 +1543,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send).
 			'<input type="hidden" class="dlg26" value="'.$dialog_id.'" />'.
-			'<script>ELM'.$dialog_id.'='._block('dialog', $dialog_id, 'elem_js').';</script>';
+			'<script>ELM'.$dialog_id.'='._BE('elem_js', 'dialog', $dialog_id).';</script>';
 
 		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ТАБЛИЧНОГО содержания списка
 		case 30:
@@ -2056,25 +2045,7 @@ function _pageElemMenu($unit) {//элемент dialog_id=3: Меню страниц
 
 
 function _page_div() {//todo тест
-	return '';
-
-	//страницы
-	$sql = "SELECT `id`
-			FROM `_page`
-			WHERE `app_id` IN(0,".APP_ID.")";
-	$page_ids = query_ids($sql);
-
-	//блоки, которые используются на страницах
-	$sql = "SELECT count(`id`)
-			FROM `_block`
-			WHERE `obj_name`='page'
-			  AND `obj_id` IN (".$page_ids.")";
-	$block_ids = query_value($sql);
-
-	return $block_ids;
-
-
-
+	return '';//count(_BE('block_all'));
 
 	return
 	'<div>'.

@@ -1,7 +1,7 @@
 <?php
 switch(@$_POST['op']) {
 	case 'block_grid_on'://включение управления блоками
-		if(!$obj_name = _blockObj($_POST['obj_name']))
+		if(!$obj_name = _blockName($_POST['obj_name']))
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
 			jsonError('Некорректный ID объекта');
@@ -19,7 +19,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 	case 'block_grid_off'://выключение управления блоками
-		if(!$obj_name = _blockObj($_POST['obj_name']))
+		if(!$obj_name = _blockName($_POST['obj_name']))
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
 			jsonError('Некорректный ID объекта');
@@ -28,13 +28,13 @@ switch(@$_POST['op']) {
 
 		define('BLOCK_EDIT', 1);
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name)));
-		$send['blk'] = _block($obj_name, $obj_id, 'block_arr');
-		$send['elm'] = _block($obj_name, $obj_id, 'elem_utf8');
+		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
+		$send['elm'] = utf8(_BE('elem_arr', $obj_name, $obj_id));
 
 		jsonSuccess($send);
 		break;
 	case 'block_elem_width_change'://включение/выключение изменения ширины элементов
-		if(!$obj_name = _blockObj($_POST['obj_name']))
+		if(!$obj_name = _blockName($_POST['obj_name']))
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
 			jsonError('Некорректный ID объекта');
@@ -47,7 +47,7 @@ switch(@$_POST['op']) {
 		define('BLOCK_EDIT', 1);
 
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name)));
-		$send['elm'] = _block($obj_name, $obj_id, 'elem_utf8');
+		$send['elm'] = utf8(_BE('elem_arr', $obj_name, $obj_id));
 
 		jsonSuccess($send);
 		break;
@@ -57,7 +57,7 @@ switch(@$_POST['op']) {
 
 		$width = _num($_POST['width']);
 
-		if(!$elem = _elemQuery($elem_id))
+		if(!$elem = _elemOne($elem_id))
 			jsonError('Элемента не существует');
 
 		if(!_dialogParam($elem['dialog_id'], 'element_width'))
@@ -68,12 +68,12 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$elem_id;
 		query($sql);
 
-		_blockCache($elem['block']['obj_name'], $elem['block']['obj_id'], 'clear');
+		_BE('elem_clear');
 
 		jsonSuccess();
 		break;
 	case 'block_grid_save'://сохранение данных блоков после редактирования
-		if(!$obj_name = _blockObj($_POST['obj_name']))
+		if(!$obj_name = _blockName($_POST['obj_name']))
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
 			jsonError('Некорректный ID объекта');
@@ -249,12 +249,12 @@ switch(@$_POST['op']) {
 
 		define('BLOCK_EDIT', 1);
 
-		_blockCache($obj_name, $obj_id, 'clear');
+		_BE( 'block_clear');
 
 		$send['level'] = utf8(_blockLevelChange($obj_name, $obj_id, $width));
 		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width,0, _pageSpisokUnit($obj_id, $obj_name)));
-		$send['blk'] = _block($obj_name, $obj_id, 'block_arr');
-		$send['elm'] = _block($obj_name, $obj_id, 'elem_utf8');
+		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
+		$send['elm'] = utf8(_BE('elem_arr', $obj_name, $obj_id));
 
 		jsonSuccess($send);
 		break;
@@ -280,7 +280,7 @@ switch(@$_POST['op']) {
 				_num($ex[3]);    //слева
 
 		//получение данных блока
-		if(!$block = _blockQuery($block_id))
+		if(!$block = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
 
 		//изменение стилей
@@ -296,7 +296,7 @@ switch(@$_POST['op']) {
 
 		//сохранение стилей элемента в блоке
 		if($elem_id = _num($_POST['elem_id']))
-			if(_elemQuery($elem_id)) {
+			if(_elemOne($elem_id)) {
 				$EL = $_POST['elem'];
 				$mar = _txt($EL['mar']);
 				$font = _txt($EL['font']);
@@ -319,7 +319,8 @@ switch(@$_POST['op']) {
 				query($sql);
 			}
 
-		_blockCache($block['obj_name'], $block['obj_id'], 'clear');
+		_BE( 'block_clear');
+		_BE( 'elem_clear');
 
 		jsonSuccess();
 		break;
@@ -370,7 +371,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 	case 'block_choose_page'://выбор блоков на странице
-		if(!$obj_name = _blockObj($_POST['obj_name']))
+		if(!$obj_name = _blockName($_POST['obj_name']))
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
 			jsonError('Некорректный ID объекта');
@@ -456,9 +457,8 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерн
 	//подсчёт количества рядом стоящих Х-блоков в каждой Y-строке
 	$stroka = array();
 	foreach($child as $block_id => $bl)
-		foreach($bl as $r) {
+		foreach($bl as $r)
 			$stroka[$block_id][$r['y']][] = $r['id'];
-		}
 
 	$xxUpdate = array();
 	foreach($stroka as $str)

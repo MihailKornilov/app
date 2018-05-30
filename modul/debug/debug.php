@@ -56,37 +56,49 @@ function _debug($i='') {
 }
 
 function _debugCache() {//результат использования кеша
-	if(!$arr = _cache('get', 'all'))
-		return 'Кеш пуст.';
+	$xi = xcache_info(XC_TYPE_VAR, 0);
 
-	$send = '<table class="mar10 bg-fff collaps">'.
-		'<tr>'.
-			'<td class="bor-f0">'.
-			'<td class="bor-f0 pad5 center b">key'.
-			'<td class="bor-f0 pad5 center b">type'.
-			'<td class="bor-f0 pad5 center b">len'.
-			'<td class="bor-f0 pad5 center b">time';
+	$size = round($xi['size'] / 1024 / 1024, 2);
+	$avail = round($xi['avail'] / 1024 / 1024, 2);
+	$busy = round($size - $avail, 2);
+
+	$list = xcache_list(XC_TYPE_VAR, 0);
+	$cc = count($list['cache_list']);
 	$time = time();
-	$n = 1;
-	$len = 0;
-	foreach($arr as $k => $r) {
-		$send .= '<tr class="'.($r['inserted'] ? '' : 'pale').'">'.
-			'<td class="bor-f0 pad5 r">'.$n++.
-			'<td class="bor-f0 pad5">'.$k.
-			'<td class="bor-f0 pad5 center">'.$r['type'].
-			'<td class="bor-f0 pad5 r">'._sumSpace($r['len']).
-			'<td class="bor-f0 pad5 r">'.($r['created'] + CACHE_TIME - $time);
-		$len += $r['len'];
-	}
-	$send .= '</table>';
 
 	$send =
-		'<div class="fs14 mar10">'.
-			'Записей: <b>'.--$n.'</b>'.
-			'<br>'.
-			'Общий размер: <b>'._sumSpace($len).'</b> '.
-		'</div>'.
-		$send;
+		'<table class="_stab small mar10">'.
+			'<tr><td class="">Общий кеш:'.
+				'<td class="r"><b>'.$size.'</b> mb'.
+			'<tr><td class="r color-ref">Занято:'.
+				'<td class="color-ref r"><b>'.$busy.'</b> mb'.
+				'<td class="grey">'.($cc ? $cc.' запис'._end($cc, 'ь', 'и', 'ей') : 'записей нет').
+			'<tr><td class="r color-pay">Свободно:'.
+				'<td class="color-pay r"><b>'.$avail.'</b> mb'.
+		'</table>';
+
+	if(!$cc)
+		return $send;
+
+	$send .= '<table class="_stab small mar10">'.
+		'<tr>'.
+			'<th>'.
+			'<th>key'.
+			'<th>size'.
+			'<th>time';
+	foreach($list['cache_list'] as $n => $r) {
+		$t = $time - $r['ctime'];
+		if($t < 60)
+			$t .= ' s';
+		else
+			$t = '<b class="grey">'.floor($t / 60).'</b> m';
+		$send .= '<tr>'.
+			'<td class="r grey">'.($n + 1).
+			'<td><a class="fs12" href="'.APP_HTML.'/xcache/edit.php?name='.$r['name'].'" target="_blank">'.$r['name'].'</a>'.
+			'<td class="r">'._sumSpace($r['size']).
+			'<td class="r pale">'.$t;
+	}
+	$send .= '</table>';
 
 	return $send;
 }

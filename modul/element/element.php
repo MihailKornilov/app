@@ -289,93 +289,65 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 	query($sql);
 
 	//обновление кеша объекта, в котором находится блок с кнопкой
-	$bl = _blockQuery($block_id);
+	$bl = _blockOne($block_id);
 	_blockCache($bl['obj_name'], $bl['obj_id'], 'clear');
 
 	return $dialog_id;
 }
-function _dialogQuery($dialog_id, $clear=0) {//данные конкретного диалогового окна
-	if(!$dialog_id = _num($dialog_id))
+function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
+	if(!$dialog = _BE('dialog', $dialog_id))
 		return array();
 
-	$key = 'DIALOG_'.$dialog_id;
+		//id заглавных элементов настройки шаблона истории действий
+		foreach(array(1,2,3) as $n) {
+			$dialog['history'][$n]['elem_id'] = 0;
+			$dialog['history'][$n]['tmp'] = '';
+			$dialog['history'][$n]['tmp_elm'] = array();
+			continue;
 
-	if($clear) {
-		_blockCache('dialog', $dialog_id, 1);
-		_cacheClear($key);
-		return true;
-	}
-
-	if($dialog = _cache('get', $key))
-		return $dialog;
-
-
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE `app_id` IN(0,".APP_ID.")
-			  AND `sa` IN (0,".SA.")
-			  AND `id`=".$dialog_id;
-	if(!$dialog = query_assoc($sql))
-		return array();
-
-
-
-	//список колонок, присутствующих в таблицах 1 и 2
-	foreach(array(1,2) as $id) {
-		$dialog['field'.$id] = array();
-		if($dialog['table_name_'.$id] = _table($dialog['table_'.$id])) {
-			$sql = "DESCRIBE `".$dialog['table_name_'.$id]."`";
-			foreach(query_array($sql) as $r)
-				$dialog['field'.$id][$r['Field']] = 1;
-		}
-	}
-
-	$dialog['blk'] = _block('dialog', $dialog_id, 'block_arr');
-	$dialog['cmp'] = _block('dialog', $dialog_id, 'elem_arr');
-
-	//id заглавных элементов настройки шаблона истории действий
-	foreach(array(1,2,3) as $n) {
-		$sql = "SELECT `id`
-				FROM `_element`
-				WHERE `dialog_id`=67
-				  AND `num_1`=".$n."
-				  AND `num_2`=".$dialog_id."
-				LIMIT 1";
-		$elem_id = query_value($sql);
-		$dialog['history'][$n]['elem_id'] = $elem_id;
-
-		$tmp_txt = '';//текстовое содержание шаблона истории
-		$tmp_elm = array();//элементы, участвующие в шаблоне истории
-		if($elem_id) {
-			$sql = "SELECT *
+			$sql = "SELECT `id`
 					FROM `_element`
-					WHERE `block_id`=-".$elem_id."
-					ORDER BY `sort`";
-			if($elem = query_arr($sql)) {
-				$sql = "SELECT `id`,`col`
+					WHERE `dialog_id`=67
+					  AND `num_1`=".$n."
+					  AND `num_2`=".$dialog_id."
+					LIMIT 1";
+			$elem_id = query_value($sql);
+			$dialog['history'][$n]['elem_id'] = $elem_id;
+
+			$tmp_txt = '';//текстовое содержание шаблона истории
+			$tmp_elm = array();//элементы, участвующие в шаблоне истории
+			if($elem_id) {
+				$sql = "SELECT *
 						FROM `_element`
-						WHERE `id` IN ("._idsGet($elem, 'num_1').")";
-				$cols = query_ass($sql);
-				foreach($elem as $r) {
-					$num_1 = $r['num_1'] ? '[' . $r['num_1'] . ']' : '';
-					$tmp_txt .= $r['txt_7'].$num_1.$r['txt_8'];
-					switch($r['dialog_id']) {
-						case 11: $col = @$cols[$r['num_1']]; break;
-						case 32: $col = 'num'; break;
-						case 33: $col = 'dtime_add'; break;
-						default: $col = '';
+						WHERE `block_id`=-".$elem_id."
+						ORDER BY `sort`";
+				if($elem = query_arr($sql)) {
+					$sql = "SELECT `id`,`col`
+							FROM `_element`
+							WHERE `id` IN ("._idsGet($elem, 'num_1').")";
+					$cols = query_ass($sql);
+					foreach($elem as $r) {
+						$num_1 = $r['num_1'] ? '[' . $r['num_1'] . ']' : '';
+						$tmp_txt .= $r['txt_7'].$num_1.$r['txt_8'];
+						switch($r['dialog_id']) {
+							case 11: $col = @$cols[$r['num_1']]; break;
+							case 32: $col = 'num'; break;
+							case 33: $col = 'dtime_add'; break;
+							default: $col = '';
+						}
+						$r['col'] = $col;
+						$tmp_elm[] = $r;
 					}
-					$r['col'] = $col;
-					$tmp_elm[] = $r;
 				}
 			}
+			$dialog['history'][$n]['tmp'] = trim($tmp_txt);
+			$dialog['history'][$n]['tmp_elm'] = $tmp_elm;
 		}
-		$dialog['history'][$n]['tmp'] = trim($tmp_txt);
-		$dialog['history'][$n]['tmp_elm'] = $tmp_elm;
-	}
-//echo $dialog_id;exit;
 
-	return _cache('set', $key, $dialog);
+	$dialog['blk'] = _BE('block_arr', 'dialog', $dialog_id);
+	$dialog['cmp'] = _BE('elem_arr', 'dialog', $dialog_id);
+
+	return $dialog;
 }
 function _dialogParam($dialog_id, $param) {//получение конкретного параметра диалога
 	$dialog = _dialogQuery($dialog_id);
@@ -457,13 +429,13 @@ function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые м
 	$block_id - исходный блок, по которому определяется объект
 */
 
-	if(!$block = _blockQuery($block_id))
+	if(!$block = _blockOne($block_id))
 		return array();
 
 	//списки размещаются при помощи диалогов 14 и 23
 	//идентификаторами результата являются id элементов (а не диалогов)
 
-	if(!$elm = _block($block['obj_name'], $block['obj_id'], 'elem_arr'))
+	if(!$elm = _BE('elem_arr', $block['obj_name'], $block['obj_id']))
 		return array();
 
 	$send = array();
@@ -489,12 +461,12 @@ function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списк
 
 	//получение исходного блока, если редактирование значения
 	if($elem_id) {
-		if(!$EL = _elemQuery($elem_id))
+		if(!$EL = _elemOne($elem_id))
 			return array();
 		$block_id = $EL['block_id'];
 	}
 
-	if(!$BL = _blockQuery($block_id))
+	if(!$BL = _blockOne($block_id))
 		return array();
 
 	if($BL['obj_name'] != 'dialog')
@@ -598,110 +570,11 @@ function _dialogElemChoose($el, $unit) {//[74] выбор элемента (подключаемая функ
 	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
 }
 
-function _elemQuery1($id, $i='elem') {//получение информации о элементе по id элемента или id блока
-	$send = array(
-		'elem_id' => 0,     //ID элемента
-		'elem' => array(),  //массив элемента
-		'block_id' => 0,    //ID блока
-		'block' => array(), //массив блока
-		'dialog_id' => 0,   //ID диалога, в котором (если) размещается элемент или блок
-		'page_id' => 0      //ID страницы, в которой (если) размещается элемент или блок
-	);
-
-	if(empty($id))
-		return $send;
-
-	switch($i) {
-		case 'elem':
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id`=".abs($id);
-			if(!$elem = query_assoc($sql))
-				return $send;
-
-			$send['elem_id'] = $elem['id'];
-			$send['elem'] = $elem;
-
-			$sql = "SELECT *
-					FROM `_block`
-					WHERE `id`=".$elem['block_id'];
-			if($block = query_assoc($sql)) {
-				$send['block_id'] = $block['id'];
-				$send['block'] = $block;
-			}
-			break;
-		case 'block':
-			$sql = "SELECT *
-					FROM `_block`
-					WHERE `id`=".abs($id);
-			if(!$block = query_assoc($sql))
-				return $send;
-
-			$send['block_id'] = $block['id'];
-			$send['block'] = $block;
-
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `block_id`=".$block['id']."
-					LIMIT 1";
-			if($elem = query_assoc($sql)) {
-				$send['elem_id'] = $elem['id'];
-				$send['elem'] = $elem;
-			}
-			break;
-		default: return $send;
-	}
-
-	if($send['block_id']) {
-		if($send['block']['obj_name'] == 'page')
-			$send['page_id'] = $send['block']['obj_id'];
-		if($send['block']['obj_name'] == 'dialog')
-			$send['dialog_id'] = $send['block']['obj_id'];
-	}
-
-
-
-	return $send;
+function _elemOne($elem_id) {//запрос одного элемента
+	return _BE('elem_one', $elem_id);
 }
-
-function _elemQuery($elem_id) {//запрос одного элемента
-	$key = 'ELM_'.$elem_id;
-	if($elem = _cache('get', $key))
-		return $elem;
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id`=".abs($elem_id);
-	if(!$elem = query_assoc($sql))
-		return array();
-
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `id`=".$elem['block_id'];
-	$elem['block'] = query_assoc($sql);
-
-	return _cache('set', $key, $elem);
-}
-function _blockQuery($block_id) {//запрос одного блока
-	if(empty($block_id))
-		return array();
-
-	$key = 'BLK_'.$block_id;
-	if($elem = _cache('get', $key))
-		return $elem;
-
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `id`=".$block_id;
-	if(!$block = query_assoc($sql))
-		return array();
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `block_id`=".$block_id;
-	$block['elem'] = query_assoc($sql);
-
-	return _cache('set', $key, $block);
+function _blockOne($block_id) {//запрос одного блока
+	return _BE('block_one', $block_id);
 }
 
 function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
@@ -725,7 +598,7 @@ function _elemValue($elem_id) {//дополнительне значения к элементу select, настр
 function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 	if(!$elem_id = _num($elem_id))
 		return '';
-	if(!$el = _elemQuery($elem_id))
+	if(!$el = _elemOne($elem_id))
 		return '';
 	if(!$el_parent)
 		$el_parent = $el;
@@ -745,7 +618,7 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 		case 60: return _imageNo($el_parent['width']);
 		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
-			_dialogQuery($el['num_2'], 1);
+//			_BE('dialog_clear');
 			$dlg = _dialogQuery($el['num_2']);
 			return $dlg['history'][$el['num_1']]['tmp'];
 	}
@@ -775,7 +648,7 @@ function _elemColType($id='all') {//тип данных, используемый элементом
 function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 	$BL['obj_name'] = $unit['source']['unit_id'] == -115 ? 'spisok' : '';
 	if($block_id = _num($unit['source']['block_id'], 1))
-		if(!$BL = _blockQuery($block_id))
+		if(!$BL = _blockOne($block_id))
 			return _emptyMin('Исходного блока id'.$block_id.' не существует.');
 
 	define('BLOCK_PAGE',   $BL['obj_name'] == 'page');
@@ -1078,11 +951,12 @@ function _historyCondPageUnit($el) {//отображение истории для конкретной единицы
 
 
 function _imageServerCache() {//кеширование серверов изображений
-	if($arr = _cache('get', 'IMG_SERVER'))
+	$key = 'IMG_SERVER';
+	if($arr = _cache_get($key, 1))
 		return $arr;
 
 	$sql = "SELECT `id`,`path` FROM `_image_server`";
-	return _cache('set', 'IMG_SERVER', query_ass($sql));
+	return _cache_set($key, query_ass($sql), 1);
 }
 function _imageServer($v) {//получение сервера (пути) для изображнения
 /*
@@ -1116,7 +990,7 @@ function _imageServer($v) {//получение сервера (пути) для изображнения
 			)";
 	query($sql);
 
-	_cache('clear', 'IMG_SERVER');
+	_cache_clear( 'IMG_SERVER', 1);
 
 	return query_insert_id('_image_server');
 }
@@ -1524,7 +1398,7 @@ function _filterCalendarContent($el, $mon, $v) {
 	'</table>';
 }
 function _filterCalendarDays($el, $mon) {//отметка дней в календаре, по которым есть записи
-	if(!$elem = _elemQuery($el['num_1']))
+	if(!$elem = _elemOne($el['num_1']))
 		return array();
 	if(!$dlg = _dialogQuery($elem['num_1']))
 		return array();
@@ -1704,7 +1578,7 @@ function _period($v=0, $action='get') {// Формирование периода для элементов мас
 function _filterMenu($el) {//фильтр-меню
 	if(!$el['num_2'])
 		return _emptyMin('Фильтр-меню: отсутствует ID элемента, содержащий значения.');
-	if(!$ell = _elemQuery($el['num_2']))
+	if(!$ell = _elemOne($el['num_2']))
 		return _emptyMin('Фильтр-меню: отсутствует элемент, содержащий значения.');
 	if(!$ids = _ids($ell['txt_2'], 1))
 		return _emptyMin('Фильтр-меню: отсутствуют ID значений.');
@@ -1712,7 +1586,7 @@ function _filterMenu($el) {//фильтр-меню
 	$c = count($ids) - 1;
 	$elem_id = $ids[$c];
 
-	if(!$EL = _elemQuery($elem_id))
+	if(!$EL = _elemOne($elem_id))
 		return _emptyMin('Фильтр-меню: значение отсутствует.');
 	if(!$BL = $EL['block'])
 		return _emptyMin('Фильтр-меню: нет блока.');
@@ -1725,11 +1599,11 @@ function _filterMenu($el) {//фильтр-меню
 
 	$col = $EL['col'];//колонка текстового значения
 	$colCount = '';//колонка значения количества
-	if($el3 = _elemQuery($el['num_3']))
+	if($el3 = _elemOne($el['num_3']))
 		if($ids = _ids($el3['txt_2'], 1)) {
 			$c = count($ids) - 1;
 			$elem_id = $ids[$c];
-			if($EL3 = _elemQuery($elem_id))
+			if($EL3 = _elemOne($elem_id))
 				$colCount = $EL3['col'];
 		}
 

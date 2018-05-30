@@ -33,7 +33,7 @@ function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
 
 	return $send;
 }
-function _blockObj($name, $i='name') {//доступные варианты объектов для блоков
+function _blockName($name, $i='name') {//доступные варианты объектов для блоков
 	$empty = array(
 		'page' => '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>',
 
@@ -63,29 +63,10 @@ function _blockObj($name, $i='name') {//доступные варианты объектов для блоков
 	return $name;
 }
 function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) {//вывод на экран всей структуры блоков
-	if(!$blk = _block($obj_name, $obj_id, 'block_arr'))
-		return _blockObj($obj_name, 'empty');
+	if(!$block = _BE('block_obj', $obj_name, $obj_id))
+		return _blockName($obj_name, 'empty');
 	if(!is_array($unit))
 		return $unit;
-
-	$elm = _block($obj_name, $obj_id, 'elem_arr');
-
-	//расстановка элементов в блоки
-	foreach($blk as $id => $r) {
-		$arr[$id]['child'] = array();
-		$blk[$id]['elem'] = array();
-		if($r['elem_id']) {
-			$el = $elm[$r['elem_id']];
-			$el['block'] = $blk[$id];//а также предварительно прикрепление данных блока к элементу
-			$blk[$id]['elem'] = $el;
-		}
-	}
-
-	$child = array();
-	foreach($blk as $id => $r)
-		$child[$r['parent_id']][$id] = $r;
-
-	$block = _blockArrChild($child);
 
 	return _blockLevel($block, $width, $grid_id, 0,1, $unit);
 }
@@ -121,9 +102,12 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	foreach($arr as $r) {
 		if(!BLOCK_EDIT && empty($unit['choose']) && $r['elem_id'] && $r['elem']['hidden'])
 			continue;
-		$block[$r['y']][] = $r;
-		$yEnd = $r['y'];
+		$block[$r['y']][$r['x']] = $r;
 	}
+
+	ksort($block);
+	end($block);
+	$yEnd = key($block);
 
 	if(empty($block))
 		return '';
@@ -136,7 +120,14 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 
 	foreach($block as $y => $str) {
 		$widthMax = $WM;
-		$r = $str[0];
+
+		ksort($str);//выстраивание блоков по X
+
+		$xStr = array();
+		foreach($str as $r)
+			$xStr[] = $r;
+
+		$r = $xStr[0];
 
 		$bt = $y ? $BT : '';
 
@@ -154,8 +145,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$widthMax -= $width;
 		}
 
-		foreach($str as $n => $r) {
-			$next = @$str[$n + 1];
+		foreach($xStr as $n => $r) {
+			$next = @$xStr[$n + 1];
 
 			if($r['width'] > $widthMax)
 				$r['width'] = $widthMax;
@@ -196,7 +187,6 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 							_blockElemChoose($r, $unit).
 							_blockChildHtml($r, $level + 1, $width, $grid_id, $unit).
 	    					_elemDiv($r['elem'], $unit).
-//				($r['id'] == 1083 ? _pr($unit) : '').
 					'';
 
 			$widthMax -= $r['width'];
@@ -409,274 +399,94 @@ function _blockGrid($arr) {//режим деления на подблоки
 		'</div>';
 }
 
-function _blockCache($obj_name, $obj_id, $clear=0) {
-	$CACHE_KEY = 'BLOCK_'.$obj_name.'_'.$obj_id;
+function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
+	global $BE_FLAG, $G_BLOCK, $G_ELEM, $G_DLG;
 
-	if($clear)
-		return _cacheClear($CACHE_KEY);
+	_beDefine();
 
-	if($send = _cache('get', $CACHE_KEY))
+	//получение данных всех блоков
+	if($i == 'block_all')
+		return $G_BLOCK;
+
+	//получение данных одного блока
+	if($i == 'block_one') {
+		//ID блока
+		if(!$i1)
+			return array();
+		if(!isset($G_BLOCK[$i1]))
+			return array();
+
+		$send = $G_BLOCK[$i1];
+		$send['elem'] = $send['elem_id'] ? $G_ELEM[$send['elem_id']] : array();
+
 		return $send;
-
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `obj_name`='".$obj_name."'
-			  AND `obj_id`=".$obj_id."
-			  AND `sa` IN (0,".SA.")
-			ORDER BY `parent_id`,`y`,`x`";
-	if(!$arr = query_arr($sql))
-		return _cache('set', $CACHE_KEY, array(
-			'block' => array(),
-			'elem' => array()
-		));
-
-	if(!$arr = _blockChildClear($arr))
-		return _cache('set', $CACHE_KEY, array(
-			'block' => array(),
-			'elem' => array()
-		));
-
-	//Отображение варианта цвета для динамической окраски блоков
-	//Будет открываться диалог, который вносит данные списка, чтобы указать, откуда брать цвет для окраски
-	//Иконка показывается, если:
-	//      1. spisok-блоки. id диалога, который вносит значения списка
-	//      2. dialog-блоки. id этого диалога
-	//      3. page-блоки.   id диалога, который вносит значения списка, страница которой получает значения списка
-	$bg70 = 0;
-	if($obj_name == 'spisok')
-		if($bl = _blockQuery($obj_id))
-			if($el = $bl['elem'])
-				if($el['dialog_id'] == 14 || $el['dialog_id'] == 59)
-					if($dlg_id = _num($el['num_1']))
-						$bg70 = $dlg_id;
-	if($obj_name == 'dialog') {
-		$sql = "SELECT `dialog_parent_id`
-				FROM `_dialog`
-				WHERE `id`=".$obj_id;
-		$dialog_parent_id = _num(query_value($sql));
-		$bg70 = $dialog_parent_id ? $dialog_parent_id : $obj_id;
-	}
-	if($obj_name == 'page')
-		if($page = _page($obj_id))
-			$bg70 = $page['spisok_id'];
-
-
-	$block = array();
-	$blockYStr = array();//выстраивание id блоков по порядку, чтобы потом по этому порядку выстроить элементы
-	foreach($arr as $bl) {
-		$id = _num($bl['id']);
-		unset($bl['user_id_add']);
-		unset($bl['dtime_add']);
-		foreach($bl as $key => $v)
-			if(preg_match(REGEXP_NUMERIC, $v))
-				$bl[$key] = _num($v);
-		$bl['elem_id'] = 0;
-		$bl['attr_bl'] = '#bl_'.$id;
-		$bl['bg70'] = $bg70;
-		$block[$id] = $bl;
-		$blockYStr[$bl['parent_id']][$bl['y']][] = $id;
 	}
 
-	//получение элементов
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `block_id` IN ("._idsGet($block).")";
-	$elemArr = query_arr($sql);
+	//получение блоков для конкретного объекта
+	if($i == 'block_arr') {
+		$obj_name = $i1;
+		if(!$obj_id = _num($i2))
+			return array();
 
-	//наличие функций в элементах
-	$sql = "SELECT `block_id`,1
-			FROM `_element_func`
-			WHERE `block_id` IN("._idsGet($elemArr, 'block_id').")
-			GROUP BY `block_id`";
-	$isFunc = query_ass($sql);
-
-	//данные настроек из диалога
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE `id` IN ("._idsGet($elemArr, 'dialog_id').")";
-	$dialog = query_arr($sql);
-
-	$elemPrev = array();//предварительная сборка элементов (без порядка по блокам)
-	foreach($elemArr as $el) {
-		$elem_id = _num($el['id']);
-		$dlg = $dialog[$el['dialog_id']];
-		$block[$el['block_id']]['elem_id'] = $elem_id;
-		unset($el['sort']);
-		unset($el['user_id_add']);
-		unset($el['dtime_add']);
-
-		if(!$el['hint_on']) {
-			unset($el['hint_msg']);
-			unset($el['hint_side']);
-			unset($el['hint_obj_pos_h']);
-			unset($el['hint_obj_pos_v']);
-			unset($el['hint_delay_show']);
-			unset($el['hint_delay_hide']);
-		}
-
-		foreach($el as $key => $v)
-			if(preg_match(REGEXP_INTEGER, $v))
-				$el[$key] = _num($v, 1);
-
-		$el['attr_el'] = '#el_'.$elem_id;
-		$el['attr_cmp'] = '#cmp_'.$elem_id;
-		$el['size'] = $el['size'] ? _num($el['size']) : 13;
-		$el['is_func'] = _num(@$isFunc[$el['block_id']]);
-		$el['is_img'] = 0;
-		$el['style_access'] = _num($dlg['element_style_access']);
-		$el['url_access'] = _num($dlg['element_url_access']);
-		$el['hint_access'] = _num($dlg['element_hint_access']);
-		$el['dialog_func'] = _num($dlg['element_dialog_func']);
-		$el['afics'] = $dlg['element_afics'];
-		$el['hidden'] = _num($dlg['element_hidden']);
-		$el['title'] = _elemTitle($el['id']);
-
-		if($el['width_min'] = _num($dlg['element_width_min'])) {
-			//определение максимальной ширины, на которую может растягиваться элемент
-			$ex = explode(' ', $el['mar']);
-			$width_max = $block[$el['block_id']]['width'] - $ex[1] - $ex[3];
-			$el['width_max'] = floor($width_max / 10) * 10;
-		}
-
-		$el['func'] = array();
-		$el['vvv'] = array();//значения для некоторых компонентов
-
-		switch($el['dialog_id']) {
-			//значение, выбранное из диалога - переустановка некоторых настроек
-			case 11:
-				if(!$ids = _ids($el['txt_2'], 1))
-					break;
-				$c = count($ids) - 1;
-				$last_id = $ids[$c];
-				if(!$el11 = _elemQuery($last_id))
-					break;
-				if(!$dlg11 = _dialogQuery($el11['dialog_id']))
-					break;
-
-				switch($el11['dialog_id']) {
-					case 60://image
-						$el['style_access'] = _num($dlg11['element_style_access']);
-						$el['url_access'] = _num($dlg11['element_url_access']);
-						$el['hint_access'] = _num($dlg11['element_hint_access']);
-						$el['dialog_func'] = _num($dlg11['element_dialog_func']);
-						$el['afics'] = $dlg11['element_afics'];
-						$el['is_img'] = 1;
-						break;
-				}
-				break;
-			//select - произвольные значения
-			case 17:
-				$el['vvv'] = _elemValue($elem_id);
-				break;
-			//dropdown
-			case 18: $el['vvv'] = _elemValue($elem_id); break;
-			//Меню переключения блоков - список пунктов
-			case 57:
-				$sql = "SELECT *
-						FROM `_element`
-						WHERE `block_id`=-".$elem_id."
-						ORDER BY `sort`";
-				if(!$arr = query_arr($sql))
-					break;
-
-				$spisok = array();
-				foreach($arr as $id => $r)
-					$spisok[] = array(
-						'id' => _num($id),
-						'title' => $r['txt_1'],
-						'blk' => $r['txt_2']
-					);
-
-				$el['vvv'] = $spisok;
-				break;
-			//фильтр-select
-			case 83:
-				$el['vvv'] = array();
-
-				if(!$dialog_id = $el['num_2'])
-					break;
-				if(!$dlg = _dialogQuery($dialog_id))
-					break;
-
-				$field = $dlg['field1'];
-
-				$cond = "`t1`.`id`";
-				if(isset($field['deleted']))
-					$cond .= " AND !`t1`.`deleted`";
-				if(isset($field['app_id']))
-					$cond .= " AND `t1`.`app_id`=".APP_ID;
-				if(isset($field['dialog_id']))
-					$cond .= " AND `t1`.`dialog_id`=".$dialog_id;
-
-				$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
-						FROM "._tableFrom($dlg)."
-						WHERE ".$cond."
-						ORDER BY `sort` DESC
-						LIMIT 50";
-				if(!$spisok = query_arr($sql))
-					break;
-
-				$vvv = array();
-
-				foreach($spisok as $r)
-					$vvv[] = array(
-						'id' => $r['id'],
-						'title' => $r['txt_1']
-					);
-
-				$el['vvv'] = $vvv;
-				break;
-		}
-
-		$elemPrev[$elem_id] = $el;
-	}
-
-	//выстраивание элементов по порядку
-	$block_ids = array();
-	foreach($blockYStr as $parent)
-		foreach($parent as $y)
-			foreach($y as $block_id)
-				$block_ids[] = $block_id;
-	$elem = array();
-	foreach($block_ids as $block_id) {
-		if(!$elem_id = $block[$block_id]['elem_id'])
-			continue;
-		$elem[$elem_id] = $elemPrev[$elem_id];
-	}
-
-	$sql = "SELECT *
-			FROM `_element_func`
-			WHERE `block_id` IN ("._idsGet($block).")
-			ORDER BY `sort`";
-	foreach(query_arr($sql) as $r) {
-		$elem_id = $block[$r['block_id']]['elem_id'];
-		$elem[$elem_id]['func'][] = array(
-			'dialog_id' => _num($r['dialog_id']),
-			'action_id' => _num($r['action_id']),
-			'cond_id' => _num($r['cond_id']),
-			'action_reverse' => _num($r['action_reverse']),
-			'value_specific' => _num($r['value_specific']),
-			'effect_id' => _num($r['effect_id']),
-			'target' => _idsAss($r['target'])
-		);
-	}
-
-	return _cache('set', $CACHE_KEY, array(
-		'block' => $block,
-		'elem' => $elem
-	));
-}
-function _block($obj_name, $obj_id, $i='all') {
-	$mass = _blockCache($obj_name, $obj_id);
-
-	$BLK = $mass['block'];
-	$ELM = $mass['elem'];
-
-	if($i == 'block_js') {//массив блоков в формате JS
-		if(empty($BLK))
-			return '{}';
 		$send = array();
-		foreach($BLK as $id => $bl) {
+		foreach($G_BLOCK as $id => $r) {
+			if($r['obj_name'] != $obj_name)
+				continue;
+			if($r['obj_id'] != $obj_id)
+				continue;
+
+			$send[$id] = _beBlockBg($r);
+		}
+
+		return $send;
+	}
+
+	//получение блоков для конкретного объекта c учётом иерархии
+	if($i == 'block_obj') {
+		$obj_name = $i1;
+		if(!$obj_id = _num($i2))
+			return array();
+
+		$blk = array();
+		foreach($G_BLOCK as $id => $r) {
+			if($r['obj_name'] != $obj_name)
+				continue;
+			if($r['obj_id'] != $obj_id)
+				continue;
+
+			$r['child'] = array();
+			$r['elem'] = array();
+
+			//вставка элемента в блок
+			if($r['elem_id'] && isset($G_ELEM[$r['elem_id']])) {
+				$el = $G_ELEM[$r['elem_id']];
+				$el['block'] = $G_BLOCK[$id];//предварительно прикрепление данных блока к элементу
+				$r['elem'] = _beElemVvv($el);
+			}
+
+			$blk[$id] = _beBlockBg($r);
+		}
+
+		$child = array();
+		foreach($blk as $id => $r)
+			$child[$r['parent_id']][$id] = $r;
+
+		return _blockArrChild($child);
+	}
+
+	//массив блоков в формате JS для конкретного объекта
+	if($i == 'block_js') {
+		$obj_name = $i1;
+		if(!$obj_id = _num($i2))
+			return '{}';
+
+		$send = array();
+		foreach($G_BLOCK as $id => $bl) {
+			if($bl['obj_name'] != $obj_name)
+				continue;
+			if($bl['obj_id'] != $obj_id)
+				continue;
+
 			$u = array();
 			foreach($bl as $k => $v) {
 				if($k == 'xx_ids')
@@ -691,74 +501,518 @@ function _block($obj_name, $obj_id, $i='all') {
 		return '{'.implode(',', $send).'}';
 	}
 
-	if($i == 'elem_js') {//массив элементов в формате JS
-		if(empty($ELM))
-			return '{}';
-		return _json($ELM);
-/*
+	//очистка кеша блоков
+	if($i == 'block_clear') {
+		_cache_clear('block_page');
+		_cache_clear('block_page', 1);
+		_cache_clear('block_dialog');
+		_cache_clear('block_dialog', 1);
+		_cache_clear('block_spisok');
+		$BE_FLAG = 0;
+	}
+
+	//получение данных всех элементов
+	if($i == 'elem_all')
+		return $G_ELEM;
+
+	//получение данных одного элемента
+	if($i == 'elem_one') {
+		//ID элемента
+		if(!$i1)
+			return array();
+		if(!isset($G_ELEM[$i1]))
+			return array();
+
+		$send = $G_ELEM[$i1];
+		$send['block'] = $G_BLOCK[$send['block_id']];
+
+		return $send;
+	}
+
+	//получение элементов для конкретного объекта
+	if($i == 'elem_arr') {
+		$obj_name = $i1;
+		if(!$obj_id = _num($i2))
+			return array();
+
 		$send = array();
-		foreach($ELM as $id => $bl) {
-			$u = array();
-			foreach($bl as $k => $v) {
-				if($k == 'focus' && !$v)
-					continue;
-				if($k == 'func') {
-					$u[] = $k.':'._json($v);
-					continue;
-				}
-				if(is_array($v)) {
-					if(empty($v))
-						continue;
-					$u[] = $k.':'._json($v);
-					continue;
-				}
-				if(!preg_match(REGEXP_NUMERIC, $v))
-					$v = '"'.addslashes(_br($v)).'"';
-				$u[] = $k.':'.$v;
+		foreach($G_BLOCK as $id => $r) {
+			if($r['obj_name'] != $obj_name)
+				continue;
+			if($r['obj_id'] != $obj_id)
+				continue;
+			if(!$elem_id = $r['elem_id'])
+				continue;
+
+			$send[$elem_id] = _beElemVvv($G_ELEM[$elem_id]);
+		}
+
+		return $send;
+	}
+
+	if($i == 'elem_js') {//массив элементов в формате JS
+		$obj_name = $i1;
+		if(!$obj_id = _num($i2))
+			return '{}';
+
+		$send = array();
+		foreach($G_BLOCK as $id => $r) {
+			if($r['obj_name'] != $obj_name)
+				continue;
+			if($r['obj_id'] != $obj_id)
+				continue;
+			if(!$elem_id = $r['elem_id'])
+				continue;
+
+			$send[$elem_id] = _beElemVvv($G_ELEM[$elem_id]);
+		}
+
+		return _json($send);
+	}
+
+	//очистка кеша элементов
+	if($i == 'elem_clear') {
+		_cache_clear('elem');
+		_cache_clear('elem', 1);
+		$BE_FLAG = 0;
+	}
+
+	//получение данных одного диалога
+	if($i == 'dialog') {
+		//ID диалога
+		if(!$dialog_id = _num($i1))
+			return array();
+		if(!isset($G_DLG[$dialog_id]))
+			return array();
+
+		$send = $G_DLG[$dialog_id];
+
+		return $send;
+	}
+
+	//очистка кеша диалогов
+	if($i == 'dialog_clear') {
+		_cache_clear('dialog');
+		_cache_clear('dialog', 1);
+		$BE_FLAG = 0;
+	}
+
+	return false;
+}
+function _beDefine() {//получение блоков и элементов из кеша
+	global  $BE_FLAG,//флаг заполненных глобальных элементов
+			$G_BLOCK, $G_ELEM, $G_DLG;
+
+	if($BE_FLAG)
+		return;
+
+	//блоки страниц
+	$G_BLOCK = _beBlockType('page');
+	//блоки диалогов
+	$G_BLOCK += _beBlockType('dialog');
+	//блоки списков
+	$G_BLOCK += _beBlockSpisok();
+
+	//диалоги
+	$G_DLG = _beDlg();
+
+	//все элементы, которые расположены в блоках
+	$key = 'elem';
+	if(!$G_ELEM = _cache_get($key)) {
+		//наличие функций в элементах
+		$sql = "SELECT `block_id`,1
+				FROM `_element_func`
+				WHERE `block_id` IN("._idsGet($G_BLOCK).")
+				GROUP BY `block_id`";
+		$isFunc = query_ass($sql);
+
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `block_id` IN ("._idsGet($G_BLOCK).")";
+		foreach(query_arr($sql) as $elem_id => $el) {
+			$el['hidden'] = 0;
+
+			unset($el['sort']);
+			unset($el['user_id_add']);
+			unset($el['dtime_add']);
+
+			//подсказка для элемента
+			if(!$el['hint_on']) {
+				unset($el['hint_msg']);
+				unset($el['hint_side']);
+				unset($el['hint_obj_pos_h']);
+				unset($el['hint_obj_pos_v']);
+				unset($el['hint_delay_show']);
+				unset($el['hint_delay_hide']);
 			}
 
-			$send[] = $id.':{'.implode(',', $u).'}';
-		}
-		return '{'.implode(',', $send).'}';
-*/
-	}
-
-	if($i == 'block_arr') {
-		//если присутствует элемент-цвет фона, получение колонок для цвета, если потребуется окраска блока
-		foreach($BLK as $id => $bl) {
-			$BLK[$id]['xx_ids'] = _idsAss($bl['xx_ids']);
-			$BLK[$id]['bg_col'] = '';    //имя колонки, по которой будет выбираться цвет
-			$BLK[$id]['bg_connect'] = '';//имя колонки, если это подключаемый список
-			if($bl['bg'] == 'bg70')
-				if($ids = _ids($bl['bg_ids'], 1))
-					foreach($ids as $elem_id)
-						if($el = _elemQuery($elem_id))
-							switch($el['dialog_id']) {
-								case 29:
-								case 59:
-									$BLK[$id]['bg_connect'] = $el['col'];
-									break;
-								case 70:
-									$BLK[$id]['bg_col'] = $el['col'];
-									break;
-							}
-		}
-		return $BLK;
-	}
-
-	if($i == 'elem_arr')
-		return $ELM;
-
-	if($i == 'elem_utf8') {
-		foreach($ELM as $id => $el)
+			//переделка значений элемента в INT, если есть
 			foreach($el as $k => $v)
-				if(!is_array($v))
-					if(!preg_match(REGEXP_NUMERIC, $v))
-						$ELM[$id][$k] = utf8($v);
-		return $ELM;
+				if(preg_match(REGEXP_INTEGER, $v))
+					$el[$k] = _num($v, 1);
+
+			$dlg = $G_DLG[$el['dialog_id']];
+
+			$el['attr_el'] = '#el_'.$elem_id;
+			$el['attr_cmp'] = '#cmp_'.$elem_id;
+			$el['size'] = $el['size'] ? _num($el['size']) : 13;
+			$el['is_img'] = 0;
+			$el['is_func'] = _num(@$isFunc[$el['block_id']]);
+			$el['style_access'] = _num($dlg['element_style_access']);
+			$el['url_access'] = _num($dlg['element_url_access']);
+			$el['hint_access'] = _num($dlg['element_hint_access']);
+			$el['dialog_func'] = _num($dlg['element_dialog_func']);
+			$el['afics'] = $dlg['element_afics'];
+			$el['hidden'] = _num($dlg['element_hidden']);
+
+			if($el['width_min'] = _num($dlg['element_width_min'])) {
+				//определение максимальной ширины, на которую может растягиваться элемент
+				$ex = explode(' ', $el['mar']);
+				$width_max = $G_BLOCK[$el['block_id']]['width'] - $ex[1] - $ex[3];
+				$el['width_max'] = floor($width_max / 10) * 10;
+			}
+
+			$el['func'] = array();
+			$el['vvv'] = array();//значения для некоторых компонентов
+
+			$G_ELEM[$elem_id] = $el;
+		}
+
+		$sql = "SELECT *
+				FROM `_element_func`
+				WHERE `block_id` IN ("._idsGet($G_BLOCK).")
+				ORDER BY `sort`";
+		foreach(query_arr($sql) as $r) {
+			$elem_id = $G_BLOCK[$r['block_id']]['elem_id'];
+			$G_ELEM[$elem_id]['func'][] = array(
+				'dialog_id' => _num($r['dialog_id']),
+				'action_id' => _num($r['action_id']),
+				'cond_id' => _num($r['cond_id']),
+				'action_reverse' => _num($r['action_reverse']),
+				'value_specific' => _num($r['value_specific']),
+				'effect_id' => _num($r['effect_id']),
+				'target' => _idsAss($r['target'])
+			);
+		}
+
+		_cache_set($key, $G_ELEM);
 	}
 
-	return $mass;
+	$BE_FLAG = 1;
 }
+function _beBlockType($type) {//получение данных о блоках по типу
+	$key = 'block_'.$type;
 
+	//глобальные
+	if(!$block = _cache_get($key, 1)) {
+		$sql = "SELECT `id`
+				FROM `_".$type."`
+				WHERE !`app_id`";
+		$page_ids = query_ids($sql);
+
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `obj_name`='".$type."'
+				  AND `obj_id` IN (".$page_ids.")
+				ORDER BY `parent_id`,`y`,`x`";
+		$arr = query_arr($sql);
+		$arr = _beBlockForming($arr);
+		$arr = _beElemIdSet($arr);
+
+		_cache_set($key, $arr, 1);
+
+		$block = $arr;
+	}
+
+	if(!APP_ID)
+		return $block;
+
+	//для конкретного приложения
+	if(!$arr = _cache_get($key)) {
+		$sql = "SELECT `id`
+				FROM `_".$type."`
+				WHERE `app_id`=".APP_ID;
+		$page_ids = query_ids($sql);
+
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `obj_name`='".$type."'
+				  AND `obj_id` IN (".$page_ids.")";
+		$arr = query_arr($sql);
+		$arr = _beBlockForming($arr);
+		$arr = _beElemIdSet($arr);
+
+		_cache_set($key, $arr);
+	}
+	return $block + $arr;
+}
+function _beBlockSpisok() {//получение данных о блоках-списках
+	global $G_BLOCK;
+
+	if(empty($G_BLOCK))
+		return array();
+
+	$key = 'block_spisok';
+	if(!$block = _cache_get($key)) {
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `obj_name`='spisok'
+				  AND `obj_id` IN ("._idsGet($G_BLOCK).")";
+		$arr = query_arr($sql);
+		$arr = _beBlockForming($arr);
+		$arr = _beElemIdSet($arr);
+
+		_cache_set($key, $arr);
+
+		$block = $arr;
+	}
+
+	return $block;
+}
+function _beBlockForming($arr) {//формирование массива блоков для кеша
+	$data = array();
+	foreach($arr as $r) {
+		$id = _num($r['id']);
+		$data[$id] = array(
+			'id' => _num($r['id']),
+			'parent_id' => _num($r['parent_id']),
+			'child_count' => _num($r['child_count']),
+			'sa' => _num($r['parent_id']),
+			'obj_name' => $r['obj_name'],
+			'obj_id' => _num($r['obj_id']),
+			'click_action' => _num($r['click_action']),
+			'click_page' => _num($r['click_page']),
+			'click_dialog' => _num($r['click_dialog']),
+			'x' => _num($r['x']),
+			'xx' => _num($r['xx']),
+			'xx_ids' => $r['xx_ids'],
+			'y' => _num($r['y']),
+			'w' => _num($r['w']),
+			'h' => _num($r['h']),
+			'width' => _num($r['width']),
+			'width_auto' => _num($r['width_auto']),
+			'height' => _num($r['height']),
+			'pos' => $r['pos'],
+			'bg' => $r['bg'],
+			'bg_ids' => $r['bg_ids'],
+			'bor' => $r['bor'],
+//			user_id_add: 1
+//			dtime_add: 2017-10-23 00:59:48
+
+			'attr_bl' => '#bl_'.$id,
+			'elem_id' => 0
+		);
+	}
+
+	return $data;
+}
+function _beBlockBg($r) {
+	global $G_BLOCK, $G_ELEM, $G_DLG;
+
+	//если присутствует элемент-цвет фона, получение колонок для цвета, если потребуется окраска блока
+	$r['xx_ids'] = _idsAss($r['xx_ids']);
+	$r['bg_col'] = '';    //имя колонки, по которой будет выбираться цвет
+	$r['bg_connect'] = '';//имя колонки, если это подключаемый список
+	if($r['bg'] == 'bg70')
+		if($ids = _ids($r['bg_ids'], 1))
+			foreach($ids as $elem_id)
+				if($el = $G_ELEM[$elem_id])
+					switch($el['dialog_id']) {
+						case 29:
+						case 59:
+							$r['bg_connect'] = $el['col'];
+							break;
+						case 70:
+							$r['bg_col'] = $el['col'];
+							break;
+					}
+
+
+	//Отображение варианта цвета для динамической окраски блоков
+	//Будет открываться диалог, который вносит данные списка, чтобы указать, откуда брать цвет для окраски
+	//Иконка показывается, если:
+	//      1. spisok-блоки. id диалога, который вносит значения списка
+	//      2. dialog-блоки. id этого диалога
+	//      3. page-блоки.   id диалога, который вносит значения списка, страница которой получает значения списка
+	$bg70 = 0;
+	if($r['obj_name'] == 'spisok')
+		if($bl = $G_BLOCK[$r['obj_id']])
+			if($el = $G_ELEM[$bl['elem_id']])
+				if($el['dialog_id'] == 14 || $el['dialog_id'] == 59)
+					if($dlg_id = _num($el['num_1']))
+						$bg70 = $dlg_id;
+	if($r['obj_name'] == 'dialog') {
+		$dialog_parent_id = _num($G_DLG[$r['obj_id']]['dialog_parent_id']);
+		$bg70 = $dialog_parent_id ? $dialog_parent_id : $r['obj_id'];
+	}
+	if($r['obj_name'] == 'page')
+		if($page = _page($r['obj_id']))
+			$bg70 = $page['spisok_id'];
+
+	$r['bg70'] = $bg70;
+
+	return $r;
+}
+function _beElemIdSet($arr) {//добавление id элемента к блоку
+	if(empty($arr))
+		return array();
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `block_id` IN ("._idsGet($arr).")";
+	$elem = query_arr($sql);
+
+	foreach($elem as $r) {
+		$arr[$r['block_id']]['elem_id'] = _num($r['id']);
+	}
+
+	return $arr;
+}
+function _beElemVvv($el) {//вставка дополнительных значений в элемент
+	global $G_ELEM, $G_DLG;
+
+	switch($el['dialog_id']) {
+		//значение, выбранное из диалога - переустановка некоторых настроек
+		case 11:
+			if(!$ids = _ids($el['txt_2'], 1))
+				break;
+			$c = count($ids) - 1;
+			$last_id = $ids[$c];
+			if(!$el11 = $G_ELEM[$last_id])
+				break;
+			if(!$dlg11 = $G_DLG[$el11['dialog_id']])
+				break;
+
+			switch($el11['dialog_id']) {
+				case 60://image
+					$el['style_access'] = _num($dlg11['element_style_access']);
+					$el['url_access'] = _num($dlg11['element_url_access']);
+					$el['hint_access'] = _num($dlg11['element_hint_access']);
+					$el['dialog_func'] = _num($dlg11['element_dialog_func']);
+					$el['afics'] = $dlg11['element_afics'];
+					$el['is_img'] = 1;
+					break;
+			}
+			break;
+		//select - произвольные значения
+		case 17:
+		//dropdown
+		case 18: $el['vvv'] = _elemValue($el['id']); break;
+		//Меню переключения блоков - список пунктов
+		case 57:
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `block_id`=-".$el['id']."
+					ORDER BY `sort`";
+			if(!$elArr = query_arr($sql))
+				break;
+
+			$spisok = array();
+			foreach($elArr as $idd => $rr)
+				$spisok[] = array(
+					'id' => _num($idd),
+					'title' => $rr['txt_1'],
+					'blk' => $rr['txt_2']
+				);
+
+			$el['vvv'] = $spisok;
+			break;
+		//фильтр-select
+		case 83:
+			if(!$dialog_id = $el['num_2'])
+				break;
+			if(!$dlg = $G_DLG[$dialog_id])
+				break;
+
+			$field = $dlg['field1'];
+
+			$cond = "`t1`.`id`";
+			if(isset($field['deleted']))
+				$cond .= " AND !`t1`.`deleted`";
+			if(isset($field['app_id']))
+				$cond .= " AND `t1`.`app_id`=".APP_ID;
+			if(isset($field['dialog_id']))
+				$cond .= " AND `t1`.`dialog_id`=".$dialog_id;
+
+			$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
+					FROM "._tableFrom($dlg)."
+					WHERE ".$cond."
+					ORDER BY `sort` DESC
+					LIMIT 50";
+			if(!$spisok = query_arr($sql))
+				break;
+
+			$vvv = array();
+
+			foreach($spisok as $rr)
+				$vvv[] = array(
+					'id' => $rr['id'],
+					'title' => $rr['txt_1']
+				);
+
+			$el['vvv'] = $vvv;
+			break;
+	}
+
+	return $el;
+}
+function _beDlg() {//получение данных диалогов из кеша
+	$key = 'dialog';
+	//глобальные диалоги
+	if(!$global = _cache_get($key, 1)) {
+		$sql = "SELECT *
+				FROM `_dialog`
+				WHERE !`app_id`";
+		$global = query_arr($sql);
+
+		_cache_set($key, $global, 1);
+	}
+
+	$global = _beDlgField($global);
+
+	if(!APP_ID)
+		return $global;
+
+	//диалоги конкретного приложения
+	if(!$local = _cache_get($key)) {
+		$sql = "SELECT *
+				FROM `_dialog`
+				WHERE `app_id`=".APP_ID;
+		$local = query_arr($sql);
+
+		_cache_set($key, $local);
+	}
+
+	$local = _beDlgField($local);
+
+	return $global + $local;
+}
+function _beDlgField($dialog) {//вставка колонок таблиц в диалоги
+	//колонки по каждой таблице, используемые в диалогах
+	$key = 'field';
+	if(!$field = _cache_get($key, 1)) {
+		$sql = "SELECT DISTINCT(`table_1`)
+				FROM `_dialog`
+				WHERE `table_1`";
+		$ids = _ids(query_ids($sql), 1);
+		foreach($ids as $table_id) {
+			$sql = "DESCRIBE `"._table($table_id)."`";
+			foreach(query_array($sql) as $r)
+				$field[$table_id][$r['Field']] = 1;
+		}
+
+		_cache_set($key, $field, 1);
+	}
+
+	//список колонок, присутствующих в таблицах 1 и 2
+	foreach($dialog as $dlg_id => $r)
+		foreach(array(1,2) as $id) {
+			$dialog[$dlg_id]['field'.$id] = array();
+			$table_id = $r['table_'.$id];
+			if($dialog[$dlg_id]['table_name_'.$id] = _table($table_id))
+				$dialog[$dlg_id]['field'.$id] = $field[$table_id];
+		}
+
+	return $dialog;
+}
 

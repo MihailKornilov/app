@@ -28,8 +28,8 @@ switch(@$_POST['op']) {
 				WHERE `id`=".USER_ID;
 		query($sql);
 
-		_cache('clear', 'AUTH');
-		_cache('clear', 'PAGE');
+		_cache_clear( 'AUTH', 1);
+		_cache_clear( 'page');
 
 		_auth();
 

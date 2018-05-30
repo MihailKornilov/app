@@ -1,11 +1,6 @@
 <?php
 define('TIME', microtime(true));
 
-//ini_set('xcache.size', '200M');
-//ini_set('xcache.var_size', '20M');
-//echo ini_get('xcache.size');
-
-
 setlocale(LC_ALL, 'ru_RU.CP1251');
 setlocale(LC_NUMERIC, 'en_US');
 
@@ -35,18 +30,17 @@ define('DEBUG', @$_COOKIE['debug']);
 define('MIN', DEBUG ? '' : '.min');
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);
-define('CACHE_TIME', 84600);//время в секундах, которое хранит кеш
 
 //session_name('apppp');
 //session_start();
 
-
-
-//глобальные переменные
-$CACHE_ARR = array();
+//авторизация для xCache
+//$_SERVER["PHP_AUTH_USER"] = "admin";
+//$_SERVER["PHP_AUTH_PW"] = "6000030";
 
 function _setting() {//установка констант-настроек
-	if(!$arr = _cache('get', 'SETTING')) {
+	$key = 'SETTING';
+	if(!$arr = _cache_get($key, 1)) {
 		$sql = "SELECT `key`,`v`
 				FROM `_setting`";
 		$arr = query_ass($sql);
@@ -63,7 +57,7 @@ function _setting() {//установка констант-настроек
 			$arr['SCRIPT'] = 100;
 		}
 
-		_cache('set', 'SETTING', $arr);
+		_cache_set($key, $arr, 1);
 	}
 
 	//версия скриптов
@@ -121,14 +115,15 @@ function _tableFrom($dialog) {//составление таблиц для запроса на основании данн
 
 
 function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
-	if(!$arr = _cache('get', 'APP_'.$app_id)) {
+	$key = 'app'.$app_id;
+	if(!$arr = _cache_get($key)) {
 		$sql = "SELECT *
 				FROM `_app`
 				WHERE `id`=".$app_id;
 		if(!$arr = query_assoc($sql))
 			die('Невозможно получить данные приложения.');
 
-		_cache('set', 'APP_'.$app_id, $arr);
+		_cache_set($key, $arr);
 	}
 
 	if($i == 'all')
@@ -539,39 +534,12 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 	$ELM = array();
 	$BLK = array();
 
-	//страницы
-	$sql = "SELECT *
-			FROM `_page`
-			WHERE `app_id` IN(0,".APP_ID.")";
-	$page = query_arr($sql);
+	$block = _BE('block_all');
 
-	//блоки, которые используются на страницах
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `obj_name`='page'
-			  AND `obj_id` IN ("._idsGet($page).")";
-	$block = query_arr($sql);
+	foreach($block as $block_id => $r)
+		$BLK[] = $block_id.':{elem_id:'.$r['elem_id'].'}';
 
-	//диалоговые окна
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE `app_id` IN(0,".APP_ID.")";
-	$dialog = query_arr($sql);
-
-	//блоки, которые используются на диалогах
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `obj_name`='dialog'
-			  AND `obj_id` IN ("._idsGet($dialog).")";
-	foreach(query_arr($sql) as $id => $r)
-		$block[$id] = $r;
-
-	//элементы, которые используются на страницах
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `block_id` IN ("._idsGet($block).")";
-	$elem = query_arr($sql);
-	foreach($elem as $r) {
+	foreach(_BE('elem_all') as $elem_id => $r) {
 		$block_id = $r['block_id'];
 
 		$val = array();
@@ -595,21 +563,24 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 				$val[] = $txt.':"'.addslashes(_br($r[$txt])).'"';
 		}
 
-		$ELM[$r['id']] = $r['id'].':{'.implode(',', $val).'}';
-		$BLK[] = $block_id.':{elem_id:'.$r['id'].'}';
+		$ELM[] = $elem_id.':{'.implode(',', $val).'}';
 	}
 
-	$save = 'var ELMM={'.implode(',', $ELM).'},'.
-				'BLKK={'.implode(',', $BLK).'};';
+	$save = 'var ELMM={'.implode(",\n", $ELM).'},'.
+				"\n\n".
+				'BLKK={'.implode(",\n", $BLK).'};';
 	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
 	fwrite($fp, $save);
 	fclose($fp);
 
 }
 
+function _cache($v=array()) {
+	if(!defined('CACHE_DEFINE')) {
+		define('CACHE_TTL', 86400);//время в секундах, которое хранит кеш
+		define('CACHE_DEFINE', true);
+	}
 
-
-function _cache1($v=array()) {
 	//действие:
 	//	get - считывание данных из кеша (по умолчанию)
 	//	set - занесение данных в кеш
@@ -620,116 +591,55 @@ function _cache1($v=array()) {
 	//если внутреннее, то к ключу будет прибавляться префикс
 	$global = !empty($v['global']);
 
-
-	$key = '';
-	$data = '';
-
-
-
-}
-function _cache($action, $k='', $data='') {
-/*
-	$action: действие
-		set - занесение данных в кеш
-		get - считывание данных из кеша
-		clear - очистка кеша
-
-	$k - частный ключ
-	$data - данные, сохраняемые в кеш
-*/
-
-	if(empty($k))
+	if(empty($v['key']))
 		die('Отсутствует ключ кеша.');
-	if(is_array($k))
+
+	$key = $v['key'];
+
+	if(is_array($key))
 		die('Ключ кеша не может быть массивом.');
 
-	//формирование ключа от конкретного запроса
-	$key = $k;
-
-	//получение списка ключей существующих кешей
-	if(!$CACHE_ARR = xcache_get(AUTH_APP_SECRET))
-		$CACHE_ARR = array();
+	$key = '__'.($global ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
 
 	switch($action) {
 		case 'set':
-			if($k == 'all')
-				die('Запрещено использование ключа "all" в кеше для установки частных значений.');
+			if(!isset($v['data']))
+				die('Отсутствуют данные для внесения в кеш.');
 
-			//запись частного кеша
-			xcache_set($key, $data, CACHE_TIME);
-			_cacheArrUpd($CACHE_ARR, $key, $data, xcache_isset($key) ? 1 : 0);
+			xcache_set($key, $v['data'], CACHE_TTL);
 
-			return $data;
-		case 'get':
-			if($k == 'all')
-				return $CACHE_ARR;
-
-			if(!xcache_isset($key)) {
-				unset($CACHE_ARR[$key]);
-				xcache_set(AUTH_APP_SECRET, $CACHE_ARR, CACHE_TIME);
-				return false;
-			}
-
-			$data = xcache_get($key);
-
-			if(empty($CACHE_ARR[$key]))
-				_cacheArrUpd($CACHE_ARR, $key, $data, 1);
-
-			return $data;
+			return $v['data'];
+		case 'get': return xcache_get($key);
 		case 'clear':
-			if($k == 'all') {
-				foreach($CACHE_ARR as $k => $r)
-					if(xcache_isset($k))
-						xcache_unset($k);
-				xcache_unset(AUTH_APP_SECRET);
-				return true;
-			}
-
-			if(xcache_isset($key))
-				xcache_unset($key);
-
-			if(!empty($CACHE_ARR[$key])) {
-				unset($CACHE_ARR[$key]);
-				xcache_set(AUTH_APP_SECRET, $CACHE_ARR, CACHE_TIME);
-			}
-		return true;
-
+			xcache_unset($key);
+			return true;
 		default: die('Неизвестное действие кеша.');
 	}
 }
-function _cacheClear($key) {//очистка кеша по ключу
-	_cache('clear', $key);
-	return true;
+function _cache_get($key, $global=0) {//получение значений кеша
+	return _cache(array(
+		'action' => 'get',
+		'key' => $key,
+		'global' => $global
+	));
 }
-function _cacheArrUpd($CACHE_ARR, $key, $data, $inserted=0) {//обновление списка ключей кеша после внесения данных
-	$type = 'no';
-	$len = 0;
-	if(is_array($data)) {
-		$type = 'array';
-		$len = strlen(_pr($data));
+function _cache_set($key, $data, $global=0) {//запись значений в кеш
+	return _cache(array(
+		'action' => 'set',
+		'key' => $key,
+		'data' => $data,
+		'global' => $global
+	));
+}
+function _cache_clear($key, $global=0) {//очистка кеша
+	if($key == 'all') {
+		xcache_clear_cache(1);
+		return true;
 	}
 
-	$CACHE_ARR[$key] = array(
-		'created' => time(),
-		'inserted' => $inserted,
-		'type' => $type,
-		'len' => $len
-	);
-	xcache_set(AUTH_APP_SECRET, $CACHE_ARR, CACHE_TIME);
+	return _cache(array(
+		'action' => 'clear',
+		'key' => $key,
+		'global' => $global
+	));
 }
-function _cacheUpdate() {//очистка кеша от данных, которые были просрочены
-	if(!$CACHE_ARR = xcache_get(AUTH_APP_SECRET))
-		return;
-
-	$time = time();
-	$CACHE_NEW = array();
-	foreach($CACHE_ARR as $k => $r) {
-		if($r['created'] + CACHE_TIME - $time <= 0) {
-			xcache_unset($k);
-			continue;
-		}
-		$CACHE_NEW[$k] = $r;
-	}
-	xcache_set(AUTH_APP_SECRET, $CACHE_NEW, CACHE_TIME);
-}
-

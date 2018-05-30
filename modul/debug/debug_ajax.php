@@ -33,7 +33,7 @@ switch(@$_POST['op']) {
 				WHERE `key`='SCRIPT'";
 		query($sql);
 
-		_cache('clear', 'all');      //полная очистка кеша
+		_cache_clear('all');
 
 		_userImageMove();
 		_jsCache();

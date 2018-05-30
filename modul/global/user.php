@@ -28,8 +28,9 @@ function _user($user_id=USER_ID, $i='') {//получение данных о пользовате из конт
 	return $u;
 }
 function _userCache($user_id) {
-	$key = 'USER_'.$user_id;
-	if($u = _cache('get', $key))
+	$key = 'user'.$user_id;
+
+	if($u = _cache_get($key))
 		return $u;
 
 	$sql = "SELECT * FROM `_user` WHERE `id`=".$user_id;
@@ -68,7 +69,7 @@ function _userCache($user_id) {
 
 	$u['worker'] = 0;//_bool(@$app['worker']);
 
-	return _cache('set', $key, $u);
+	return _cache_set($key, $u);
 }
 function _userVkUpdate($vk_id) {//ќбновление пользовател€ из  онтакта
 	if(LOCAL)
@@ -133,7 +134,7 @@ function _userVkUpdate($vk_id) {//ќбновление пользовател€ из  онтакта
 	return $user_id;
 }
 function _userImageMove() {//перенос аватарок пользователей в изображени€
-	_cache('clear', 'IMG_SERVER');
+	_cache_clear('IMG_SERVER');
 
 	$sql = "SELECT *
 			FROM `_user`

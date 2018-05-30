@@ -34,7 +34,7 @@ switch(@$_POST['op']) {
 		} else {
 			$elem = array();
 			if(_table($dialog['table_1']) == '_element') {//если это элемент
-				$elem = _elemQuery($unit_id);
+				$elem = _elemOne($unit_id);
 				//удаление значений
 				$sql = "DELETE FROM `_element` WHERE `block_id`=-".$unit_id;
 				query($sql);
@@ -57,18 +57,17 @@ switch(@$_POST['op']) {
 
 			//обновление кеша объекта, если это элемент
 			if($elem) {
-				_cacheClear('ELM_'.$elem['id']);
-				_blockCache($elem['block']['obj_name'], $elem['block']['obj_id'], 'clear');
+				_BE('elem_clear');
 				_spisokFilter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
 			}
 
 			//обновление кеша объекта, если это страница
 			if($dialog['table_name_1'] == '_page')
-				_cache('clear', 'PAGE');
+				_cache_clear( 'page');
 
 			if($dialog['table_name_1'] == '_element_func')
-				if($BL = _blockQuery($unit['block_id']))
-					_blockCache($BL['obj_name'], $BL['obj_id'], 'clear');
+				if($BL = _blockOne($unit['block_id']))
+					_BE('block_clear');
 		}
 
 		$send = _spisokAction4($send);
@@ -78,7 +77,7 @@ switch(@$_POST['op']) {
 	case 'spisok_filter_update'://обновление списка после применения фильтра
 		if(!$elem_spisok = _num($_POST['elem_spisok']))
 			jsonError('Некорректный ID элемента-списка');
-		if(!$elSpisok = _elemQuery($elem_spisok))
+		if(!$elSpisok = _elemOne($elem_spisok))
 			jsonError('Элемента-списка id'.$elem_spisok.' не существует');
 		if($elSpisok['dialog_id'] != 14 && $elSpisok['dialog_id'] != 23)
 			jsonError('Элемент id'.$elem_spisok.' не является списком');
@@ -127,7 +126,7 @@ switch(@$_POST['op']) {
 	case 'spisok_filter_clear'://очистка фильтра
 		if(!$spisok_id = _num($_POST['spisok_id']))
 			jsonError('Некорректный ID элемента-списка');
-		if(!$elSpisok = _elemQuery($spisok_id))
+		if(!$elSpisok = _elemOne($spisok_id))
 			jsonError('Элемента-списка id'.$spisok_id.' не существует');
 
 		$sql = "UPDATE `_user_spisok_filter`
@@ -185,7 +184,7 @@ switch(@$_POST['op']) {
 		if(!$next = _num($_POST['next']))
 			jsonError('Некорректное значение очередного блока');
 		//получение данных элемента поиска
-		if(!$el = _elemQuery($elem_id))
+		if(!$el = _elemOne($elem_id))
 			jsonError('Элемента id'.$elem_id.' не существует');
 		if($el['dialog_id'] != 14 && $el['dialog_id'] != 23)
 			jsonError('Элемент не является списком');
@@ -217,7 +216,7 @@ switch(@$_POST['op']) {
 	case 'spisok_23_sort':
 		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Некорректный ID элемента');
-		if(!$el = _elemQuery($elem_id))
+		if(!$el = _elemOne($elem_id))
 			jsonError('Элемента id'.$elem_id.' не существует');
 		if($el['dialog_id'] != 23)
 			jsonError('Элемент не является списком-таблицей');
@@ -309,9 +308,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$unit = _spisokUnitQuery($dialog, $unit_id);
 
 	if(IS_ELEM)
-		if($bl = _blockQuery($unit['block_id']))
+		if($bl = _blockOne($unit['block_id']))
 			if($bl['obj_name'] == 'dialog') {
-				_dialogQuery($bl['obj_id'], 1);
+				_BE('dialog_clear');
 				$dlg = _dialogQuery($bl['obj_id']);
 				$unit = $dlg['cmp'][$unit_id];
 			}
@@ -350,16 +349,16 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	_spisokUnitAfter($dialog, $unit_id, $unitOld);
 
 	if(_table($dialog['table_1']) == '_page')
-		_cache('clear', 'PAGE');
+		_cache_clear( 'page');
 
 	if(_table($dialog['table_1']) == '_element_func')
-		if($BL = _blockQuery($unit['block_id']))
-			_blockCache($BL['obj_name'], $BL['obj_id'], 'clear');
+		if($BL = _blockOne($unit['block_id']))
+			_BE('elem_clear');
 
 	if(IS_ELEM) {
-		$elem = _elemQuery($unit_id);
+		$elem = _elemOne($unit_id);
 		if($elem['block'])
-			_blockCache($elem['block']['obj_name'], $elem['block']['obj_id'], 'clear');
+			_BE('elem_clear');
 		$unit['title'] = _elemTitle($unit_id);
 	}
 
@@ -470,8 +469,8 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 
 	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
 	if(IS_ELEM && $block_id > 0 && !$unit_id) {
-		_cacheClear('BLK_'.$block_id);
-		if(!$block = _blockQuery($block_id))
+//		_cacheClear('BLK_'.$block_id);
+		if(!$block = _blockOne($block_id))
 			jsonError('Блока не сущетвует');
 		if($block['elem'])
 			jsonError('В блоке уже есть элемент');
@@ -683,7 +682,7 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 			$num = 0;
 
 			if($v)
-				if($el = _elemQuery($unit_id))
+				if($el = _elemOne($unit_id))
 					if($el['block']['obj_name'] == 'dialog')
 						if($dlg = _dialogQuery($el['block']['obj_id'])) {
 
@@ -745,7 +744,7 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление зна
 	if($block_id <= 0)//была вставка доп-значения для элемета
 		return $send;
 
-	$elem = _elemQuery($unit_id);
+	$elem = _elemOne($unit_id);
 
 	if($elem['block_id'] < 0)
 		return $send;
@@ -771,7 +770,7 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление зна
 			$width = floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
 			break;
 		case 'dialog':
-			_dialogQuery($elem['block']['obj_id'], 1);
+			_BE('dialog_clear');
 			$dlg = _dialogQuery($elem['block']['obj_id']);
 			$width = $dlg['width'];
 			break;
@@ -1273,9 +1272,9 @@ function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страница
 		query($sql);
 	}
 
-	_cache('clear', 'AUTH');
-	_cache('clear', 'PAGE');
-	_cache('clear', 'USER_'.$user_id);
+	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'page');
+	_cache_clear( 'user'.$user_id);
 }
 function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
 	$sql = "UPDATE `_spisok`
@@ -1299,15 +1298,15 @@ function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в прило
 			  AND `user_id` NOT IN (".$ids.")";
 	query($sql);
 
-	_cache('clear', 'AUTH');
-	_cache('clear', 'PAGE');
+	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'page');
 
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=1011";
 	foreach(query_arr($sql) as $r)
-		_cacheClear('USER_'.$r['connect_1']);
+		_cache_clear('user'.$r['connect_1']);
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
 	if(!isset($unit['dialog_id']))
@@ -1317,7 +1316,7 @@ function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (бал
 	//блок, в котором размещается "баланс"
 	if(!$block_id = _num($unit['block_id']))
 		return;
-	if(!$BL = _blockQuery($block_id))
+	if(!$BL = _blockOne($block_id))
 		return;
 	if($BL['obj_name'] != 'dialog')
 		return;
@@ -1371,7 +1370,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (пр
 		return;
 	if(!$cmp_id = _num($unit['num_1']))//id компонента в диалоге, в котором размещается привязка (количество этих значений будет считаться)
 		return;
-	if(!$cmp = _elemQuery($cmp_id))
+	if(!$cmp = _elemOne($cmp_id))
 		return;
 	if(!$dialog_id = $cmp['block']['obj_id'])//id диалога, в котором размещается привязка
 		return;
@@ -1380,7 +1379,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (пр
 	//блок, в котором размещается "количество"
 	if(!$block_id = _num($unit['block_id']))
 		return;
-	if(!$BL = _blockQuery($block_id))
+	if(!$BL = _blockOne($block_id))
 		return;
 	if($BL['obj_name'] != 'dialog')
 		return;
@@ -1458,7 +1457,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 		return;
 	if(!$cmp_id = _num($unit['num_1']))//id компонента в диалоге, в котором размещается привязка (сумма этих значений будет считаться)
 		return;
-	if(!$cmp = _elemQuery($cmp_id))
+	if(!$cmp = _elemOne($cmp_id))
 		return;
 	if(!$dialog_id = $cmp['block']['obj_id'])//id диалога, в котором размещается привязка
 		return;
@@ -1480,7 +1479,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 	//получение элемента, который указывает на элемент, сумму значения которого нужно будет считать
 	if(!$elem_id = _num($unit['num_2']))
 		return;
-	if(!$elForSum = _elemQuery($elem_id))
+	if(!$elForSum = _elemOne($elem_id))
 		return;
 	if(!$elForSum_id = _num($elForSum['txt_2']))
 		return;
@@ -1532,7 +1531,7 @@ function _spisokUnitUpd72($dialog, $unit) {//обновление кеша после применения де
 	if(empty($unit['obj_id']))
 		return;
 
-	_blockCache($unit['obj_name'], $unit['obj_id'], 'clear');
+	_BE('block_clear');
 }
 
 
@@ -1630,7 +1629,7 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количест
 		if(!$col = $r['col'])
 			continue;
 
-		$bl = _blockQuery($r['block_id']);
+		$bl = _blockOne($r['block_id']);
 		$dlg = _dialogQuery($bl['obj_id']);
 
 		if($connect_old) {
@@ -1663,16 +1662,16 @@ function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм привязаного с
 		if(!$colSumSet = $r['col'])
 			continue;
 		//поиск колонки, по которой будет производиться подсчёт суммы
-		if(!$el = _elemQuery($r['num_2']))
+		if(!$el = _elemOne($r['num_2']))
 			continue;
 		if($el['dialog_id'] != 11)//ссылка элемент с колонкой суммы указывался через [11]
 			continue;
-		if(!$el = _elemQuery($el['txt_2']))
+		if(!$el = _elemOne($el['txt_2']))
 			continue;
 		if(!$colSumGet = $el['col'])
 			continue;
 
-		$bl = _blockQuery($r['block_id']);
+		$bl = _blockOne($r['block_id']);
 		$dlg = _dialogQuery($bl['obj_id']);
 
 		//получение нового количества для обновления
@@ -1700,7 +1699,7 @@ function _spisokUnitAfter27($elUpd) {
 		return;
 
 	foreach($elUpd as $el) {
-		if(!$bl = _blockQuery($el['block_id']))
+		if(!$bl = _blockOne($el['block_id']))
 			continue;
 		if($bl['obj_name'] != 'dialog')
 			continue;

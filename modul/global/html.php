@@ -30,7 +30,7 @@ function _saDefine() {//установка флага суперпользовател€ SA
 
 /* ---=== ј¬“ќ–»«ј÷»я ===--- */
 function _auth() {//получение данных об авторизации из кеша
-	if(!$r = _cache('get', 'AUTH')) {
+	if(!$r = _cache_get('AUTH', 1)) {
 		$sql = "SELECT *
 				FROM `_user_auth`
 				WHERE `code`='".addslashes(CODE)."'
@@ -42,11 +42,13 @@ function _auth() {//получение данных об авторизации из кеша
 					  AND `connect_1`=".$r['user_id'];
 			$r['access'] = _num(query_value($sql));
 
-			_cache('set', 'AUTH', array(
+			$data = array(
 				'user_id' => $r['user_id'],
 				'app_id' => $r['app_id'],
 				'access' => $r['access']
-			));
+			);
+
+			_cache_set('AUTH', $data, 1);
 		}
 	};
 
@@ -70,8 +72,8 @@ function _auth() {//получение данных об авторизации из кеша
 					WHERE `code`='".CODE."'";
 			query($sql);
 
-			_cache('clear', 'USER_'.USER_ID);
-			_cache('clear', 'AUTH');
+			_cache_('clear', 'USER_'.USER_ID);
+			_cache_('clear', 'AUTH');
 
 			header('Location:'.URL);
 			exit;
@@ -166,9 +168,9 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной
 
 	setcookie('code', $code, time() + 2592000, '/');
 
-	_cache('clear', 'AUTH');
-	_cache('clear', 'PAGE');
-	_cache('clear', 'USER_'.$user_id);
+	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'page');
+	_cache_clear( 'user'.$user_id);
 
 	if(LOCAL)
 		setcookie('local', 1, time() + 2592000, '/');
@@ -179,9 +181,9 @@ function _authLogout() {//выход из приложени€, если требуетс€
 	if(!CODE)
 		return;
 
-	_cache('clear', 'AUTH');
-	_cache('clear', 'PAGE');
-	_cache('clear', 'USER_'.USER_ID);
+	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'page');
+	_cache_clear( 'user'.USER_ID);
 
 	//выход только из приложени€ и попадание в список приложений
 	if(APP_ID) {
@@ -464,9 +466,9 @@ function _app_create($dialog, $app_id) {//прив€зка пользовател€ к приложению пос
 			WHERE `code`='".CODE."'";
 	query($sql);
 
-	_cache('clear', 'AUTH');
-	_cache('clear', 'PAGE');
-	_cache('clear', 'USER_'.USER_ID);
+	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'page');
+	_cache_clear( 'user'.USER_ID);
 
 	_auth();
 }

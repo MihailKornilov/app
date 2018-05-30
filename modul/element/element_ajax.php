@@ -409,7 +409,7 @@ switch(@$_POST['op']) {
 					`sort`=VALUES(`sort`)";
 		query($sql);
 
-		_cache('clear', 'PAGE');
+		_cache_clear( 'page');
 
 		jsonSuccess();
 		break;
@@ -499,7 +499,7 @@ switch(@$_POST['op']) {
 	case 'filter_calendar_mon_change'://перелистывание фильтра-календар€
 		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Ќекорректный ID элемента');
-		if(!$el = _elemQuery($elem_id))
+		if(!$el = _elemOne($elem_id))
 			jsonError('Ёлемента не существует');
 		if($el['dialog_id'] != 77)
 			jsonError('Ёлемент не €вл€етс€ фильтром-календарЄм');
@@ -906,7 +906,7 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 			WHERE `id`=".$dialog_id;
 	query($sql);
 
-	_dialogQuery($dialog_id, 1);
+	_BE('dialog_clear');
 
 	return $dialog_id;
 }
@@ -1053,7 +1053,7 @@ function _dialogOpenLoad($dialog_id) {
 					break;
 
 				//объект, в котором находитс€ блок с элементом
-				if(!$block = _blockQuery($unit['block_id']))
+				if(!$block = _blockOne($unit['block_id']))
 					break;
 
 				//пока только дл€ диалогов
@@ -1132,7 +1132,7 @@ function _dialogOpenLoad($dialog_id) {
 				break;
 			//SA: select - выбор имени колонки
 			case 37:
-				if(!$block = _blockQuery($block_id))
+				if(!$block = _blockOne($block_id))
 					break;
 
 				//выбор имени колонки может производитьс€, только если элемент размещаетс€ в диалоге
@@ -1238,7 +1238,7 @@ function _dialogOpenLoad($dialog_id) {
 				if(!$block_id)
 					break;
 
-				$BL = _blockQuery($block_id);
+				$BL = _blockOne($block_id);
 
 				//»сходный блок не €вл€етс€ блоком из диалога
 				if($BL['obj_name'] != 'dialog')

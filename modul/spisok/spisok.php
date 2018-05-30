@@ -1,6 +1,7 @@
 <?php
 function _spisokFilterCache() {//кеширование фильтров списка
-	if($send = _cache('get', 'SPISOK_FILTER'))
+	$key = 'filter_user'.USER_ID;
+	if($send = _cache_get($key))
 		return $send;
 
 	$send = array(
@@ -31,11 +32,11 @@ function _spisokFilterCache() {//кеширование фильтров списка
 		}
 	}
 
-	return _cache('set', 'SPISOK_FILTER', $send);
+	return _cache_set($key, $send);
 }
 function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
 	if($i == 'cache_clear')
-		return _cacheClear('SPISOK_FILTER');
+		return _cache_clear('filter_user'.USER_ID);
 
 	$F = _spisokFilterCache();
 
@@ -121,7 +122,7 @@ function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
 }
 
 function _spisokIsSort($block_id) {//определение, нужно ли производить сортировку этого списка (поиск элемента 71)
-	if(!$spisok_el = _block('spisok', $block_id, 'elem_arr'))
+	if(!$spisok_el = _BE('elem_arr', 'spisok', $block_id))
 		return 0;
 
 	foreach($spisok_el as $elem)
@@ -188,7 +189,7 @@ function _spisokJoinField($dialog) {//подключение колонок второго списка
 function _spisokElemCount($r) {//формирование элемента с содержанием количества списка для вывода на страницу
 	if(!$elem_id = $r['num_1'])
 		return 'Список не указан.';
-	if(!$elem = _elemQuery($elem_id))
+	if(!$elem = _elemOne($elem_id))
 		return 'Элемента, содержащего список, не существует.';
 
 	//если результат нулевой, выводится сообщение из элемента, который размещает список
@@ -321,6 +322,51 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 
 	//выбор внешнего вида
 	switch($ELEM['dialog_id']) {
+		//шаблон
+		case 14:
+			if(!$BLK = _BE('block_arr', 'spisok', $ELEM['block_id']))
+				return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
+
+			//получение элементов, расставленных находящихся в блоках
+			$ELM = _BE('elem_arr', 'spisok', $ELEM['block_id']);
+
+			//ширина единицы списка с учётом отступов
+			$ex = explode(' ', $ELEM['mar']);
+			$width = floor(($ELEM['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
+
+			$send = '';
+			foreach($spisok as $sp) {
+				$child = array();
+				foreach($BLK as $id => $r) {
+					if($r['elem_id']) {
+						$elem = $ELM[$r['elem_id']];
+						$elem['block'] = $r;
+						$r['elem'] = $elem;
+					} else
+						$r['elem'] = array();
+
+					$child[$r['parent_id']][$id] = $r;
+				}
+
+				$block = _blockArrChild($child);
+				$send .=
+					'<div class="sp-unit" val="'.$sp['id'].'">'.
+						_blockLevel($block, $width, 0, 0, 1, $sp).
+					'</div>';
+			}
+
+			if($limit * ($next + 1) < $all) {
+				$count_next = $all - $limit * ($next + 1);
+				if($count_next > $limit)
+					$count_next = $limit;
+				$send .=
+					'<div class="over5" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
+						'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
+					'</div>';
+			}
+
+			return $send;
+
 		//таблица
 		case 23://Таблица
 			if(empty($ELEM['txt_2']))
@@ -409,74 +455,6 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			}
 
 			return $BEGIN.$TR.$END;
-
-		//шаблон
-		case 14:
-			if(!$BLK = _block('spisok', $ELEM['block_id'], 'block_arr'))
-				return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
-
-			//получение элементов, расставленных находящихся в блоках
-			$ELM = _block('spisok', $ELEM['block_id'], 'elem_arr');
-
-			//ширина единицы списка с учётом отступов
-			$ex = explode(' ', $ELEM['mar']);
-			$width = floor(($ELEM['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
-
-			$send = '';
-			foreach($spisok as $sp) {
-				$child = array();
-				foreach($BLK as $id => $r) {
-/*
-					$r['elem'] = array();
-					if($elem_id = $r['elem_id']) {//если элемент есть в блоке
-						$txt = '';
-						$el = $ELM[$elem_id];
-						switch($el['num_1']) {
-							default:
-								$tmp = $ELM_TMP[$el['num_1']];
-								switch($tmp['dialog_id']) {
-									case 10: $txt = $tmp['txt_1']; break;//произвольный текст
-									default://значение колонки
-										if($col = $tmp['col'])
-											$txt = $sp[$col];
-										$txt = _spisokColSearchBg($txt, $ELEM, $el['num_1']);
-								}
-						}
-
-						$el['tmp'] = 1;
-						$el['block'] = $r;
-						$el['txt_real'] = $txt;
-						$r['elem'] = $el;
-					}
-*/
-					if($r['elem_id']) {
-						$elem = $ELM[$r['elem_id']];
-						$elem['block'] = $r;
-						$r['elem'] = $elem;
-					} else
-						$r['elem'] = array();
-
-					$child[$r['parent_id']][$id] = $r;
-				}
-
-				$block = _blockArrChild($child);
-				$send .=
-					'<div class="sp-unit" val="'.$sp['id'].'">'.
-						_blockLevel($block, $width, 0, 0, 1, $sp).
-					'</div>';
-			}
-
-			if($limit * ($next + 1) < $all) {
-				$count_next = $all - $limit * ($next + 1);
-				if($count_next > $limit)
-					$count_next = $limit;
-				$send .=
-					'<div class="over5" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
-						'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
-					'</div>';
-			}
-
-			return $send;
 	}
 
 	return 'Неизвестный внешний вид списка: '.$ELEM['num_1'];
@@ -573,7 +551,7 @@ function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение един
 	$dialog_id = 0;
 
 	if($el['block_id'] < 0)
-		if($el = _elemQuery(abs($el['block_id'])))
+		if($el = _elemOne(abs($el['block_id'])))
 			if($el['dialog_id'] == 23)
 				$dialog_id = $el['num_1'];
 
@@ -588,7 +566,7 @@ function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение един
 					$dialog_id = constant($key);
 					break;
 				}
-				if(!$BL = _blockQuery($el['block']['obj_id']))//блока не существует
+				if(!$BL = _blockOne($el['block']['obj_id']))//блока не существует
 					return '-no-bl-spisok';
 				if(empty($BL['elem']))//нет элемента, размещающего список
 					return '-no-el-spisok';
@@ -630,7 +608,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 	$dialog_id = 0;
 
 	if($el['block_id'] < 0)
-		if($el = _elemQuery(abs($el['block_id'])))
+		if($el = _elemOne(abs($el['block_id'])))
 			if($el['dialog_id'] == 23)
 				$dialog_id = $el['num_1'];
 
@@ -652,7 +630,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 						return $txt;
 					if(empty($ids[$c - 1]))
 						return $txt;
-					if(!$EL = _elemQuery($ids[$c - 1]))
+					if(!$EL = _elemOne($ids[$c - 1]))
 						return $txt;
 					if(!$EL['block']['obj_name'] == 'dialog')
 						return $txt;
@@ -661,7 +639,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 					define($key, $dialog_id);
 					break;
 				}
-				if(!$BL = _blockQuery($el['block']['obj_id']))//блока не существует
+				if(!$BL = _blockOne($el['block']['obj_id']))//блока не существует
 					return $txt;
 				if(empty($BL['elem']))//нет элемента, размещающего список
 					return $txt;
@@ -677,7 +655,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 						return $txt;
 					if(empty($ids[$c - 1]))
 						return $txt;
-					if(!$EL = _elemQuery($ids[$c - 1]))
+					if(!$EL = _elemOne($ids[$c - 1]))
 						return $txt;
 					if(!$EL['block']['obj_name'] == 'dialog')
 						return $txt;
@@ -707,12 +685,23 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 
 	return '<a href="'.URL.'&p='.$page_id.'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 }
-function _spisokColSearchBg($txt, $el, $cmp_id) {//подсветка значения колонки при текстовом (быстром) поиске
+function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстовом (быстром) поиске
+	if($el['block_id'] < 0) {
+		//если таблица
+		$element_id_spisok = abs($el['block_id']);
+	} else {
+		//если список-шаблон
+		if($el['block']['obj_name'] != 'spisok')
+			return $txt;
+		$blSpisok = _blockOne($el['block']['obj_id']);
+		$element_id_spisok = $blSpisok['elem_id'];
+	}
+
 	$search = false;
 	$v = '';
 
 	//поиск элемента-фильтра-поиска
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_spisokFilter('spisok', $element_id_spisok) as $r)
 		if($r['elem']['dialog_id'] == 7) {
 			$search = $r['elem'];
 			$v = $r['v'];
@@ -721,6 +710,8 @@ function _spisokColSearchBg($txt, $el, $cmp_id) {//подсветка значения колонки пр
 	if(!$search)
 		return $txt;
 	if(!$v)
+		return $txt;
+	if(!$cmp_id = _num($el['txt_2']))
 		return $txt;
 
 	//ассоциативный массив колонок, по которым производится поиск
@@ -954,13 +945,13 @@ function _spisokCond78($el) {//фильтр-меню
 
 	if(!$elem_id = $filter['num_2'])//id элемента, содержащего значения
 		return '';
-	if(!$ell = _elemQuery($elem_id))//элемент, размещающий список
+	if(!$ell = _elemOne($elem_id))//элемент, размещающий список
 		return '';
 	if(!$ids = _ids($ell['txt_2'], 1))//значения, составляющие содержание фильтра
 		return '';
 	if(!$el0_id = $ids[0])//id элемента, на который указывает значение
 		return '';
-	if(!$el0 = _elemQuery($el0_id))//сам элемент
+	if(!$el0 = _elemOne($el0_id))//сам элемент
 		return '';
 	if(!$col = $el0['col'])//колонка, которая участвует в фильтре
 		return '';
@@ -969,7 +960,7 @@ function _spisokCond78($el) {//фильтр-меню
 	$c = count($ids) - 1;
 	$elem_id = $ids[$c];
 
-	if(!$EL = _elemQuery($elem_id))//значение отсутствует
+	if(!$EL = _elemOne($elem_id))//значение отсутствует
 		return '';
 	if(!$BL = $EL['block'])//нет блока
 		return '';
@@ -1016,7 +1007,7 @@ function _spisokCond83($el) {//фильтр-select
 function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)
 		return array();
-	if(!$cmp = _elemQuery($cmp_id))
+	if(!$cmp = _elemOne($cmp_id))
 		return array();
 	if(!$cmp['num_1'])
 		return array();
@@ -1183,7 +1174,7 @@ function _spisok29connectGet($ids, $v) {
 function _spisok59unit($cmp_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
 	if(!$unit_id)
 		return '';
-	if(!$el = _elemQuery($cmp_id))
+	if(!$el = _elemOne($cmp_id))
 		return '';
 	if(!$dialog_id = _num($el['num_1']))
 		return '';
