@@ -94,7 +94,8 @@ function _debugCache() {//результат использования кеша
 			$t = '<b class="grey">'.floor($t / 60).'</b> m';
 		$send .= '<tr>'.
 			'<td class="r grey">'.($n + 1).
-			'<td><a class="fs12" href="'.APP_HTML.'/xcache/edit.php?name='.$r['name'].'" target="_blank">'.$r['name'].'</a>'.
+//			'<td><a class="fs12" href="'.APP_HTML.'/xcache/edit.php?name='.$r['name'].'" target="_blank">'.$r['name'].'</a>'.
+			'<td><a class="fs12" onclick=_cacheContentOpen("'.$r['name'].'")>'.$r['name'].'</a>'.
 			'<td class="r">'._sumSpace($r['size']).
 			'<td class="r pale">'.$t;
 	}

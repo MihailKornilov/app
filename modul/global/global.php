@@ -643,3 +643,23 @@ function _cache_clear($key, $global=0) {//очистка кеша
 		'global' => $global
 	));
 }
+function _cache_content($el, $unit) {//содержание кеша в диалоге [84] (подключаемая функция [12])
+	if(!$name = @$_COOKIE['cache_content_name'])
+		$send = 'Отсутствует имя кеша.';
+	else {
+		if(!xcache_isset($name))
+			$send = '<b>'.$name.'</b>: кеш не сохранён.';
+		else {
+			if(!$arr = xcache_get($name))
+				$send = '<b>'.$name.'</b>: кеш пуст.';
+			else
+				$send =
+					'<div class="fs15 b mb10">'.$name.'</div>'.
+					_pr($arr);
+		}
+	}
+	return
+	'<div style="height:700px;overflow-y:scroll" class="bg-fff bor-e8 pad10">'.
+		$send.
+	'</div>';
+}

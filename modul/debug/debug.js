@@ -6,6 +6,14 @@ var debugCookieUpdate = function(t) {//обновление COOKIE
 		_post(send, function(res) {
 			t.next().html(res.html);
 		});
+	},
+	_cacheContentOpen = function(name) {//открытие диалога для просмотра содержания кеша
+		_cookie('cache_content_name', name);
+		if(DIALOG[84])
+			DIALOG[84].close();
+		_dialogLoad({
+			dialog_id:84
+		});
 	};
 
 $(document)

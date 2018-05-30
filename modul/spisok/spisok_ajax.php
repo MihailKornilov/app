@@ -57,6 +57,7 @@ switch(@$_POST['op']) {
 
 			//обновление кеша объекта, если это элемент
 			if($elem) {
+				_BE('block_clear');
 				_BE('elem_clear');
 				_spisokFilter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
 			}
@@ -307,13 +308,16 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	//получение обновлённых данных единицы списка
 	$unit = _spisokUnitQuery($dialog, $unit_id);
 
-	if(IS_ELEM)
+	if(IS_ELEM) {
+		_BE('block_clear');
+		_BE('elem_clear');
 		if($bl = _blockOne($unit['block_id']))
 			if($bl['obj_name'] == 'dialog') {
 				_BE('dialog_clear');
 				$dlg = _dialogQuery($bl['obj_id']);
 				$unit = $dlg['cmp'][$unit_id];
 			}
+	}
 
 	$cmpv = @$_POST['cmpv'];
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
@@ -358,7 +362,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	if(IS_ELEM) {
 		$elem = _elemOne($unit_id);
 		if($elem['block'])
-			_BE('elem_clear');
+			_BE('block_clear');
 		$unit['title'] = _elemTitle($unit_id);
 	}
 
