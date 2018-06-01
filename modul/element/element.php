@@ -288,9 +288,9 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 			WHERE `id`=".$elem['id'];
 	query($sql);
 
-	//обновление кеша объекта, в котором находится блок с кнопкой
-	$bl = _blockOne($block_id);
-	_blockCache($bl['obj_name'], $bl['obj_id'], 'clear');
+	_BE('block_clear');
+	_BE('elem_clear');
+	_BE('dialog_clear');
 
 	return $dialog_id;
 }

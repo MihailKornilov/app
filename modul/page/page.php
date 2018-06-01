@@ -248,6 +248,7 @@ function _pasDefine() {//установка флага включения управления страницей PAS: pag
 					$pas = _bool(@$_COOKIE['page_setup']);
 
 	define('PAS', APP_ID && $pas);
+//	define('PAS', 1);//для настройки страниц, которые доступны всем приложениям
 }
 /*
 function _pageSetupAppPage() {//управление страницами приложения

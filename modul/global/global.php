@@ -121,7 +121,7 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 				FROM `_app`
 				WHERE `id`=".$app_id;
 		if(!$arr = query_assoc($sql))
-			die('Невозможно получить данные приложения.');
+			die('Невозможно получить данные приложения. Кеш: '.$key);
 
 		_cache_set($key, $arr);
 	}
@@ -599,7 +599,7 @@ function _cache($v=array()) {
 	if(is_array($key))
 		die('Ключ кеша не может быть массивом.');
 
-	$key = '__'.($global ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
+	$key = '__'.($global || !APP_ID ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
 
 	switch($action) {
 		case 'set':
