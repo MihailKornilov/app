@@ -603,108 +603,30 @@ function _beDefine() {//получение блоков и элементов из кеша
 	global  $BE_FLAG,//флаг заполненных глобальных элементов
 			$G_BLOCK, $G_ELEM, $G_DLG;
 
+	//если флаг установлен, значит кеш был обновлён, глобальные элементы заполнены
 	if($BE_FLAG)
 		return;
 
-	//блоки страниц
-	$G_BLOCK = _beBlockType('page');
-	//блоки диалогов
-	$G_BLOCK += _beBlockType('dialog');
-	//блоки списков
-	$G_BLOCK += _beBlockSpisok();
+	$G_BLOCK = array();
+	$G_ELEM = array();
 
 	//диалоги
 	$G_DLG = _beDlg();
 
-	//все элементы, которые расположены в блоках
-	$key = 'elem';
-	if(!$G_ELEM = _cache_get($key)) {
-		//наличие функций в элементах
-		$sql = "SELECT `block_id`,1
-				FROM `_element_func`
-				WHERE `block_id` IN("._idsGet($G_BLOCK).")
-				GROUP BY `block_id`";
-		$isFunc = query_ass($sql);
-
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `block_id` IN ("._idsGet($G_BLOCK).")";
-		foreach(query_arr($sql) as $elem_id => $el) {
-			$el['hidden'] = 0;
-
-			unset($el['sort']);
-			unset($el['user_id_add']);
-			unset($el['dtime_add']);
-
-			//подсказка для элемента
-			if(!$el['hint_on']) {
-				unset($el['hint_msg']);
-				unset($el['hint_side']);
-				unset($el['hint_obj_pos_h']);
-				unset($el['hint_obj_pos_v']);
-				unset($el['hint_delay_show']);
-				unset($el['hint_delay_hide']);
-			}
-
-			//переделка значений элемента в INT, если есть
-			foreach($el as $k => $v)
-				if(preg_match(REGEXP_INTEGER, $v))
-					$el[$k] = _num($v, 1);
-
-			$dlg = $G_DLG[$el['dialog_id']];
-
-			$el['attr_el'] = '#el_'.$elem_id;
-			$el['attr_cmp'] = '#cmp_'.$elem_id;
-			$el['size'] = $el['size'] ? _num($el['size']) : 13;
-			$el['is_img'] = 0;
-			$el['is_func'] = _num(@$isFunc[$el['block_id']]);
-			$el['style_access'] = _num($dlg['element_style_access']);
-			$el['url_access'] = _num($dlg['element_url_access']);
-			$el['hint_access'] = _num($dlg['element_hint_access']);
-			$el['dialog_func'] = _num($dlg['element_dialog_func']);
-			$el['afics'] = $dlg['element_afics'];
-			$el['hidden'] = _num($dlg['element_hidden']);
-
-			if($el['width_min'] = _num($dlg['element_width_min'])) {
-				//определение максимальной ширины, на которую может растягиваться элемент
-				$ex = explode(' ', $el['mar']);
-				$width_max = $G_BLOCK[$el['block_id']]['width'] - $ex[1] - $ex[3];
-				$el['width_max'] = floor($width_max / 10) * 10;
-			}
-
-			$el['func'] = array();
-			$el['vvv'] = array();//значения для некоторых компонентов
-
-			$G_ELEM[$elem_id] = $el;
-		}
-
-		$sql = "SELECT *
-				FROM `_element_func`
-				WHERE `block_id` IN ("._idsGet($G_BLOCK).")
-				ORDER BY `sort`";
-		foreach(query_arr($sql) as $r) {
-			$elem_id = $G_BLOCK[$r['block_id']]['elem_id'];
-			$G_ELEM[$elem_id]['func'][] = array(
-				'dialog_id' => _num($r['dialog_id']),
-				'action_id' => _num($r['action_id']),
-				'cond_id' => _num($r['cond_id']),
-				'action_reverse' => _num($r['action_reverse']),
-				'value_specific' => _num($r['value_specific']),
-				'effect_id' => _num($r['effect_id']),
-				'target' => _idsAss($r['target'])
-			);
-		}
-
-		_cache_set($key, $G_ELEM);
-	}
+	//блоки страниц
+	_beBlockType('page');
+	//блоки диалогов
+	_beBlockType('dialog');
 
 	$BE_FLAG = 1;
 }
 function _beBlockType($type) {//получение данных о блоках по типу
-	$key = 'block_'.$type;
+	global $G_BLOCK;
+
+	$key = 'BLK_'.$type;
 
 	//глобальные
-	if(!$block = _cache_get($key, 1)) {
+	if(!$block_global = _cache_get($key, 1)) {
 		$sql = "SELECT `id`
 				FROM `_".$type."`
 				WHERE !`app_id`";
@@ -715,20 +637,22 @@ function _beBlockType($type) {//получение данных о блоках по типу
 				WHERE `obj_name`='".$type."'
 				  AND `obj_id` IN (".$page_ids.")
 				ORDER BY `parent_id`,`y`,`x`";
-		$arr = query_arr($sql);
-		$arr = _beBlockForming($arr);
-		$arr = _beElemIdSet($arr);
+		$block_global = query_arr($sql);
+		$block_global = _beBlockForming($block_global);
+		$block_global = _beElemIdSet($block_global);
 
-		_cache_set($key, $arr, 1);
-
-		$block = $arr;
+		_cache_set($key, $block_global, 1);
 	}
 
+	$G_BLOCK += $block_global;
+	_beBlockSpisok($type, $block_global, 1);
+	_beBlockElem($type, $block_global, 1);
+
 	if(!APP_ID)
-		return $block;
+		return;
 
 	//для конкретного приложения
-	if(!$arr = _cache_get($key)) {
+	if(!$block_app = _cache_get($key)) {
 		$sql = "SELECT `id`
 				FROM `_".$type."`
 				WHERE `app_id`=".APP_ID;
@@ -738,36 +662,42 @@ function _beBlockType($type) {//получение данных о блоках по типу
 				FROM `_block`
 				WHERE `obj_name`='".$type."'
 				  AND `obj_id` IN (".$page_ids.")";
-		$arr = query_arr($sql);
-		$arr = _beBlockForming($arr);
-		$arr = _beElemIdSet($arr);
+		$block_app = query_arr($sql);
+		$block_app = _beBlockForming($block_app);
+		$block_app = _beElemIdSet($block_app);
 
-		_cache_set($key, $arr);
+		_cache_set($key, $block_app);
 	}
-	return $block + $arr;
+
+	$G_BLOCK += $block_app;
+	_beBlockSpisok($type, $block_app);
+	_beBlockElem($type, $block_app);
 }
-function _beBlockSpisok() {//получение данных о блоках-списках
+function _beBlockSpisok($type, $block, $global=0) {//получение данных о блоках-списках
 	global $G_BLOCK;
 
-	if(empty($G_BLOCK))
-		return array();
+	if(empty($block))
+		return;
 
-	$key = 'block_spisok';
-	if(!$block = _cache_get($key)) {
+	$key = 'BLK_SPISOK_'.$type;
+	if(!$arr = _cache_get($key, $global)) {
+		//если получен пустой массив и при этом запись в кеше была, запрос из базы не производится
+		if(_cache_isset($key, $global))
+			return;
+
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `obj_name`='spisok'
-				  AND `obj_id` IN ("._idsGet($G_BLOCK).")";
+				  AND `obj_id` IN ("._idsGet($block).")";
 		$arr = query_arr($sql);
 		$arr = _beBlockForming($arr);
 		$arr = _beElemIdSet($arr);
 
-		_cache_set($key, $arr);
-
-		$block = $arr;
+		_cache_set($key, $arr, $global);
 	}
 
-	return $block;
+	$G_BLOCK += $arr;
+	_beBlockElem('SPISOK_'.$type, $arr, $global);
 }
 function _beBlockForming($arr) {//формирование массива блоков для кеша
 	$data = array();
@@ -852,6 +782,98 @@ function _beBlockBg($r) {
 	$r['bg70'] = $bg70;
 
 	return $r;
+}
+function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в блоках
+	global $G_ELEM, $G_DLG;
+
+	if(empty($BLK))
+		return;
+
+	$key = 'ELM_'.$type;
+	if(!$ELM = _cache_get($key, $global)) {
+		if(_cache_isset($key, $global))
+			return;
+
+		//наличие функций в элементах
+		$sql = "SELECT `block_id`,1
+				FROM `_element_func`
+				WHERE `block_id` IN("._idsGet($BLK).")
+				GROUP BY `block_id`";
+		$isFunc = query_ass($sql);
+
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `block_id` IN ("._idsGet($BLK).")";
+		foreach(query_arr($sql) as $elem_id => $el) {
+			$el['hidden'] = 0;
+
+			unset($el['sort']);
+			unset($el['user_id_add']);
+			unset($el['dtime_add']);
+
+			//подсказка для элемента
+			if(!$el['hint_on']) {
+				unset($el['hint_msg']);
+				unset($el['hint_side']);
+				unset($el['hint_obj_pos_h']);
+				unset($el['hint_obj_pos_v']);
+				unset($el['hint_delay_show']);
+				unset($el['hint_delay_hide']);
+			}
+
+			//переделка значений элемента в INT, если есть
+			foreach($el as $k => $v)
+				if(preg_match(REGEXP_INTEGER, $v))
+					$el[$k] = _num($v, 1);
+
+			$dlg = $G_DLG[$el['dialog_id']];
+
+			$el['attr_el'] = '#el_'.$elem_id;
+			$el['attr_cmp'] = '#cmp_'.$elem_id;
+			$el['size'] = $el['size'] ? _num($el['size']) : 13;
+			$el['is_img'] = 0;
+			$el['is_func'] = _num(@$isFunc[$el['block_id']]);
+			$el['style_access'] = _num($dlg['element_style_access']);
+			$el['url_access'] = _num($dlg['element_url_access']);
+			$el['hint_access'] = _num($dlg['element_hint_access']);
+			$el['dialog_func'] = _num($dlg['element_dialog_func']);
+			$el['afics'] = $dlg['element_afics'];
+			$el['hidden'] = _num($dlg['element_hidden']);
+
+			if($el['width_min'] = _num($dlg['element_width_min'])) {
+				//определение максимальной ширины, на которую может растягиваться элемент
+				$ex = explode(' ', $el['mar']);
+				$width_max = $BLK[$el['block_id']]['width'] - $ex[1] - $ex[3];
+				$el['width_max'] = floor($width_max / 10) * 10;
+			}
+
+			$el['func'] = array();
+			$el['vvv'] = array();//значения для некоторых компонентов
+
+			$ELM[$elem_id] = $el;
+		}
+
+		$sql = "SELECT *
+				FROM `_element_func`
+				WHERE `block_id` IN ("._idsGet($BLK).")
+				ORDER BY `sort`";
+		foreach(query_arr($sql) as $r) {
+			$elem_id = $BLK[$r['block_id']]['elem_id'];
+			$ELM[$elem_id]['func'][] = array(
+				'dialog_id' => _num($r['dialog_id']),
+				'action_id' => _num($r['action_id']),
+				'cond_id' => _num($r['cond_id']),
+				'action_reverse' => _num($r['action_reverse']),
+				'value_specific' => _num($r['value_specific']),
+				'effect_id' => _num($r['effect_id']),
+				'target' => _idsAss($r['target'])
+			);
+		}
+
+		_cache_set($key, $ELM, $global);
+	}
+
+	$G_ELEM += $ELM;
 }
 function _beElemIdSet($arr) {//добавление id элемента к блоку
 	if(empty($arr))

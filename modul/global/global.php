@@ -602,6 +602,7 @@ function _cache($v=array()) {
 	$key = '__'.($global || !APP_ID ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
 
 	switch($action) {
+		case 'get': return xcache_get($key);
 		case 'set':
 			if(!isset($v['data']))
 				die('Отсутствуют данные для внесения в кеш.');
@@ -609,7 +610,7 @@ function _cache($v=array()) {
 			xcache_set($key, $v['data'], CACHE_TTL);
 
 			return $v['data'];
-		case 'get': return xcache_get($key);
+		case 'isset': return xcache_isset($key);
 		case 'clear':
 			xcache_unset($key);
 			return true;
@@ -628,6 +629,13 @@ function _cache_set($key, $data, $global=0) {//запись значений в кеш
 		'action' => 'set',
 		'key' => $key,
 		'data' => $data,
+		'global' => $global
+	));
+}
+function _cache_isset($key, $global=0) {//проверка, производилась ли запись в кеш
+	return _cache(array(
+		'action' => 'isset',
+		'key' => $key,
 		'global' => $global
 	));
 }

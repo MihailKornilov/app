@@ -667,7 +667,7 @@ var DIALOG = {},//массив диалоговых окон для управления другими элементами
 					};
 				$(el.attr_el).mouseenter(function() {
 					var oo = {
-						msg:el.hint_msg,
+						msg:_br(el.hint_msg, 1),
 						pad:10,
 						side:side[el.hint_side],
 						show:1,

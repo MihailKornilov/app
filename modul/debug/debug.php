@@ -41,7 +41,7 @@ function _debug($i='') {
 					'<a>get</a>'.
 					'<a>ajax</a>'.
 				'</div>'.
-				'<div class="pg cache dn">'._debugCache().'</div>'.
+				'<div class="pg cache dn">'._debug_cache().'</div>'.
 				'<ul class="pg sql dn">'.implode('', $sqlQuery).'</ul>'.
 				'<div class="pg cookie dn">'.
 					'<a onclick="debugCookieUpdate($(this))">Обновить</a>'.
@@ -55,7 +55,7 @@ function _debug($i='') {
 	return $send;
 }
 
-function _debugCache() {//результат использования кеша
+function _debug_cache() {//результат использования кеша
 	$xi = xcache_info(XC_TYPE_VAR, 0);
 
 	$size = round($xi['size'] / 1024 / 1024, 2);
@@ -64,7 +64,6 @@ function _debugCache() {//результат использования кеша
 
 	$list = xcache_list(XC_TYPE_VAR, 0);
 	$cc = count($list['cache_list']);
-	$time = time();
 
 	$send =
 		'<table class="_stab small mar10">'.
@@ -80,29 +79,66 @@ function _debugCache() {//результат использования кеша
 	if(!$cc)
 		return $send;
 
+	$ccGlobal = array();//глобальный кеш
+	$ccApp = array();   //кеш по приложениям
+	$ccOther = array();  //кеш из других приложений
+	foreach($list['cache_list'] as $n => $r) {
+		if(preg_match('/^__GLOBAL[a-z0-9_]{1,30}$/i', $r['name'])) {
+			$ccGlobal[] = $r;
+			continue;
+		}
+
+		if(preg_match('/^__APP[a-z0-9_]{1,30}$/i', $r['name'])) {
+			$ex = explode('__APP', $r['name']);
+			$ex = explode('_', $ex[1]);
+			$ccApp[$ex[0]][] = $r;
+			continue;
+		}
+
+		$ccOther[] = $r;
+	}
+
+
+	$TR_E = '<tr><td><td colspan="10" class="h35 b bottom">';
+
 	$send .= '<table class="_stab small mar10">'.
 		'<tr>'.
 			'<th>'.
 			'<th>key'.
 			'<th>size'.
 			'<th>time';
-	foreach($list['cache_list'] as $n => $r) {
-		$t = $time - $r['ctime'];
-		if($t < 60)
-			$t .= ' s';
-		else
-			$t = '<b class="grey">'.floor($t / 60).'</b> m';
-		$send .= '<tr>'.
-			'<td class="r grey">'.($n + 1).
-//			'<td><a class="fs12" href="'.APP_HTML.'/xcache/edit.php?name='.$r['name'].'" target="_blank">'.$r['name'].'</a>'.
-			'<td><a class="fs12" onclick=_cacheContentOpen("'.$r['name'].'")>'.$r['name'].'</a>'.
-			'<td class="r">'._sumSpace($r['size']).
-			'<td class="r pale">'.$t;
+
+	foreach($ccGlobal as $n => $r)
+		$send .= _debug_cache_tr($r, $n);
+
+	foreach($ccApp as $app_id => $app) {
+		$send .= $TR_E.'APP'.$app_id;
+		foreach($app as $n => $r)
+			$send .= _debug_cache_tr($r, $n);
 	}
+
+	$send .= $TR_E.'Другие приложения:';
+	foreach($ccOther as $n => $r)
+		$send .= _debug_cache_tr($r, $n);
+
 	$send .= '</table>';
 
 	return $send;
 }
+function _debug_cache_tr($r, $n) {
+	$t = time() - $r['ctime'];
+	if($t < 60)
+		$t .= ' s';
+	else
+		$t = '<b class="grey">'.floor($t / 60).'</b> m';
+	return '<tr>'.
+		'<td class="r grey">'.($n + 1).
+		'<td><a class="fs12" onclick=_cacheContentOpen("'.$r['name'].'")>'.$r['name'].'</a>'.
+		'<td class="r">'._sumSpace($r['size']).
+		'<td class="r pale">'.$t;
+
+}
+
 function _debug_cookie_count() {
 	$count = 0;
 	if(!empty($_COOKIE))
