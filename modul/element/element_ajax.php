@@ -1410,7 +1410,11 @@ function _dialogOpenLoad($dialog_id) {
 
 		$html =
 			'<div class="pad20">'.
-				'<div class="_info b">Подтвердите удаление запрещено.</div>'.
+				'<div class="_info">'.
+					'<div class="fs15 center color-ref pad30">'.
+						'Подтвердите удаление.'.
+					'</div>'.
+				'</div>'.
 			'</div>';
 
 		if(!$dialog['del_on']) {

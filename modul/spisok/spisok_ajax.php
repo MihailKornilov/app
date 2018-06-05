@@ -250,6 +250,10 @@ switch(@$_POST['op']) {
 		foreach($dialog['cmp'] as $r)
 			_spisokUnitUpd54($r);
 
+		//очистка кеша страниц
+		if($dialog['table_name_1'] == '_page')
+			_cache_clear('page');
+
 		jsonSuccess();
 		break;
 }
