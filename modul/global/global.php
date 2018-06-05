@@ -599,7 +599,7 @@ function _cache($v=array()) {
 	if(is_array($key))
 		die('Ключ кеша не может быть массивом.');
 
-	$key = '__'.($global || !APP_ID ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
+	$key = '__'.($global || !_num(@APP_ID) ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
 
 	switch($action) {
 		case 'get': return xcache_get($key);
