@@ -503,11 +503,14 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 
 	//очистка кеша блоков
 	if($i == 'block_clear') {
-		_cache_clear('block_page');
-		_cache_clear('block_page', 1);
-		_cache_clear('block_dialog');
-		_cache_clear('block_dialog', 1);
-		_cache_clear('block_spisok');
+		_cache_clear('BLK_page');
+		_cache_clear('BLK_page', 1);
+		_cache_clear('BLK_dialog');
+		_cache_clear('BLK_dialog', 1);
+		_cache_clear('BLK_SPISOK_page');
+		_cache_clear('BLK_SPISOK_page', 1);
+		_cache_clear('BLK_SPISOK_dialog');
+		_cache_clear('BLK_SPISOK_dialog', 1);
 		$BE_FLAG = 0;
 	}
 
@@ -572,8 +575,14 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 
 	//очистка кеша элементов
 	if($i == 'elem_clear') {
-		_cache_clear('elem');
-		_cache_clear('elem', 1);
+		_cache_clear('ELM_page');
+		_cache_clear('ELM_page', 1);
+		_cache_clear('ELM_dialog');
+		_cache_clear('ELM_dialog', 1);
+		_cache_clear('ELM_SPISOK_page');
+		_cache_clear('ELM_SPISOK_page', 1);
+		_cache_clear('ELM_SPISOK_dialog');
+		_cache_clear('ELM_SPISOK_dialog', 1);
 		$BE_FLAG = 0;
 	}
 
@@ -793,6 +802,8 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в
 	if(!$ELM = _cache_get($key, $global)) {
 		if(_cache_isset($key, $global))
 			return;
+
+		$ELM = array();
 
 		//наличие функций в элементах
 		$sql = "SELECT `block_id`,1

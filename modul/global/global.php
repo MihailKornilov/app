@@ -605,7 +605,7 @@ function _cache($v=array()) {
 		case 'get': return xcache_get($key);
 		case 'set':
 			if(!isset($v['data']))
-				die('Отсутствуют данные для внесения в кеш.');
+				die('Отсутствуют данные для внесения в кеш. Key: '.$key);
 
 			xcache_set($key, $v['data'], CACHE_TTL);
 
