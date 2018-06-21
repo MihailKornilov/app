@@ -289,10 +289,14 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1; - выбранный список
 	return $send;
 }
 
-function win1251($txt) { return iconv('UTF-8', 'WINDOWS-1251//TRANSLIT', $txt); }
+function win1251($txt) {
+	return $txt;
+//	return iconv('UTF-8', 'WINDOWS-1251//TRANSLIT', $txt);
+}
 function utf8($val) {
 	if(!is_array($val))
-		return iconv('WINDOWS-1251', 'UTF-8', $val);
+		return $val;
+		//return iconv('WINDOWS-1251', 'UTF-8', $val);
 
 	foreach($val as $k => $v) {
 		if(is_array($v)) {
