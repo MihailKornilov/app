@@ -2,23 +2,23 @@
 
 if(SA)
 switch(@$_POST['op']) {
-	case 'count_update'://пересчёт количеств, сумм и балансов
+	case 'count_update'://РїРµСЂРµСЃС‡С‘С‚ РєРѕР»РёС‡РµСЃС‚РІ, СЃСѓРјРј Рё Р±Р°Р»Р°РЅСЃРѕРІ
 
-		//пересчёт количеств [54]
+		//РїРµСЂРµСЃС‡С‘С‚ РєРѕР»РёС‡РµСЃС‚РІ [54]
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `dialog_id`=54";
 		foreach(query_arr($sql) as $r)
 			_spisokUnitUpd54($r);
 
-		//пересчёт сумм [55]
+		//РїРµСЂРµСЃС‡С‘С‚ СЃСѓРјРј [55]
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `dialog_id`=55";
 		foreach(query_arr($sql) as $r)
 			_spisokUnitUpd55($r);
 
-		//пересчёт сумм [27]
+		//РїРµСЂРµСЃС‡С‘С‚ СЃСѓРјРј [27]
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `dialog_id`=27";
@@ -27,7 +27,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'cache_clear'://очистка xCache
+	case 'cache_clear'://РѕС‡РёСЃС‚РєР° xCache
 		$sql = "UPDATE `_setting`
 				SET `v`=`v`+1
 				WHERE `key`='SCRIPT'";

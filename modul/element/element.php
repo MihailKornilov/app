@@ -1,7 +1,7 @@
 <?php
-function _button($v=array()) {//кнопка из контакта
+function _button($v=array()) {//РєРЅРѕРїРєР° РёР· РєРѕРЅС‚Р°РєС‚Р°
 	$attr_id = empty($v['attr_id']) ? '' : ' id="'.$v['attr_id'].'"';
-	$name = empty($v['name']) ? 'Кнопка' : $v['name'];
+	$name = empty($v['name']) ? 'РљРЅРѕРїРєР°' : $v['name'];
 	$small = empty($v['small']) ? '' : ' small';
 	$color = empty($v['color']) ? '' : ' '.$v['color'];
 	$cls = empty($v['class']) ? '' : ' '.$v['class'];
@@ -22,7 +22,7 @@ function _button($v=array()) {//кнопка из контакта
 }
 
 function _tooltip($msg, $left=0, $ugolSide='', $x2=0) {
-	//x2: в две строки
+	//x2: РІ РґРІРµ СЃС‚СЂРѕРєРё
 	$x2 = $x2 ? ' x2' : '';
 	return
 		' _tooltip">'.
@@ -32,24 +32,24 @@ function _tooltip($msg, $left=0, $ugolSide='', $x2=0) {
 		'</div>';
 }
 
-function _iconEdit($v=array()) {//иконка редактирования записи в таблице
+function _iconEdit($v=array()) {//РёРєРѕРЅРєР° СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ Р·Р°РїРёСЃРё РІ С‚Р°Р±Р»РёС†Рµ
 	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
 	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
 	$cls = empty($v['class']) ? '' : ' '.$v['class'];
 
 	$v = array(
-		'tt_name' => !empty($v['tt_name']) ? $v['tt_name'] : 'Изменить',
+		'tt_name' => !empty($v['tt_name']) ? $v['tt_name'] : 'РР·РјРµРЅРёС‚СЊ',
 		'tt_left' => !empty($v['tt_left']) ? $v['tt_left'] : -48,
 		'tt_side' => !empty($v['tt_side']) ? $v['tt_side'] : 'r'
 	);
 
 	return '<div'.$click.$val.' class="icon icon-edit'.$cls._tooltip($v['tt_name'], $v['tt_left'], $v['tt_side']).'</div>';
 }
-function _iconDel($v=array()) {//иконка удаления записи в таблице
+function _iconDel($v=array()) {//РёРєРѕРЅРєР° СѓРґР°Р»РµРЅРёСЏ Р·Р°РїРёСЃРё РІ С‚Р°Р±Р»РёС†Рµ
 	if(!empty($v['nodel']))
 		return '';
 
-	//если указывается дата внесения записи и она не является сегодняшним днём, то удаление невозможно
+	//РµСЃР»Рё СѓРєР°Р·С‹РІР°РµС‚СЃСЏ РґР°С‚Р° РІРЅРµСЃРµРЅРёСЏ Р·Р°РїРёСЃРё Рё РѕРЅР° РЅРµ СЏРІР»СЏРµС‚СЃСЏ СЃРµРіРѕРґРЅСЏС€РЅРёРј РґРЅС‘Рј, С‚Рѕ СѓРґР°Р»РµРЅРёРµ РЅРµРІРѕР·РјРѕР¶РЅРѕ
 	if(empty($v['del']) && !empty($v['dtime_add']) && TODAY != substr($v['dtime_add'], 0, 10))
 		return '';
 
@@ -57,23 +57,23 @@ function _iconDel($v=array()) {//иконка удаления записи в таблице
 	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
 	$cls = empty($v['class']) ? '' : ' '.$v['class'];
 
-	return '<div'.$click.$val.' class="icon icon-del'.$cls._tooltip('Удалить', -42, 'r').'</div>';
+	return '<div'.$click.$val.' class="icon icon-del'.$cls._tooltip('РЈРґР°Р»РёС‚СЊ', -42, 'r').'</div>';
 }
 
-function _check($v=array()) {//элемент ГАЛОЧКА
+function _check($v=array()) {//СЌР»РµРјРµРЅС‚ Р“РђР›РћР§РљРђ
 	$attr_id = empty($v['attr_id']) ? 'check'.rand(1, 100000) : $v['attr_id'];
 
 	$cls = '_check ';
-	$cls .= empty($v['block']) ?    '' : ' block';       //display:block, иначе inline-block
-	$cls .= empty($v['disabled']) ? '' : ' disabled';    //неактивное состояние
-	$cls .= isset($v['light']) && empty($v['light']) ?    '' : ' light';       //если галочка не стоит, текст бледный
-	$cls .= empty($v['class']) ?    '' : ' '.$v['class'];//дополнительные классы
+	$cls .= empty($v['block']) ?    '' : ' block';       //display:block, РёРЅР°С‡Рµ inline-block
+	$cls .= empty($v['disabled']) ? '' : ' disabled';    //РЅРµР°РєС‚РёРІРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
+	$cls .= isset($v['light']) && empty($v['light']) ?    '' : ' light';       //РµСЃР»Рё РіР°Р»РѕС‡РєР° РЅРµ СЃС‚РѕРёС‚, С‚РµРєСЃС‚ Р±Р»РµРґРЅС‹Р№
+	$cls .= empty($v['class']) ?    '' : ' '.$v['class'];//РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РєР»Р°СЃСЃС‹
 
 	$val = _bool(@$v['value']);
-	$cls .= $val ? ' on' : '';      //галочка поставлена или нет
+	$cls .= $val ? ' on' : '';      //РіР°Р»РѕС‡РєР° РїРѕСЃС‚Р°РІР»РµРЅР° РёР»Рё РЅРµС‚
 
 	$title = empty($v['title']) ? '&nbsp;' : $v['title'];
-	$cls .= empty($v['title']) ? '' : ' title'; //отступ от галочки, если есть текст
+	$cls .= empty($v['title']) ? '' : ' title'; //РѕС‚СЃС‚СѓРї РѕС‚ РіР°Р»РѕС‡РєРё, РµСЃР»Рё РµСЃС‚СЊ С‚РµРєСЃС‚
 
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$val.'" />'.
@@ -81,17 +81,17 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 		$title.
 	'</div>';
 }
-function _radio($v=array()) {//элемент RADIO
+function _radio($v=array()) {//СЌР»РµРјРµРЅС‚ RADIO
 	$attr_id = empty($v['attr_id']) ? 'radio'.rand(1, 100000) : $v['attr_id'];
 	$title0 = @$v['title0'];
-	$spisok = @$v['spisok'] ? $v['spisok'] : array();//содержание в виде id => title
+	$spisok = @$v['spisok'] ? $v['spisok'] : array();//СЃРѕРґРµСЂР¶Р°РЅРёРµ РІ РІРёРґРµ id => title
 	$value = _num(@$v['value']);
 	$dis = empty($v['disabled']) ? '' : ' disabled';
 	$light = _num(@$v['light']) ? ' light' : '';
 	$block = _bool(@$v['block']) ? ' block' : '';
 	$interval = _num(@$v['interval']) ? _num(@$v['interval']) : 7;
 
-	//если список пуст и только нулевое значение, отступ снизу не делается
+	//РµСЃР»Рё СЃРїРёСЃРѕРє РїСѓСЃС‚ Рё С‚РѕР»СЊРєРѕ РЅСѓР»РµРІРѕРµ Р·РЅР°С‡РµРЅРёРµ, РѕС‚СЃС‚СѓРї СЃРЅРёР·Сѓ РЅРµ РґРµР»Р°РµС‚СЃСЏ
 	$int = empty($spisok) ? 0 : $interval;
 	$html = _radioUnit(0, $block, $title0, $int, $value == 0);
 
@@ -99,7 +99,7 @@ function _radio($v=array()) {//элемент RADIO
 		end($spisok);
 		$idEnd = key($spisok);
 		foreach($spisok as $id => $title) {
-			//отступ снизу после последнего значения не делается
+			//РѕС‚СЃС‚СѓРї СЃРЅРёР·Сѓ РїРѕСЃР»Рµ РїРѕСЃР»РµРґРЅРµРіРѕ Р·РЅР°С‡РµРЅРёСЏ РЅРµ РґРµР»Р°РµС‚СЃСЏ
 			$int = $idEnd == $id ? 0 : $interval;
 			$html .= _radioUnit($id, $block, $title, $int, $value == $id);
 		}
@@ -125,7 +125,7 @@ function _radioUnit($id, $block, $title, $interval, $on) {
 		$title.
 	'</div>';
 }
-function _select($v=array()) {//выпадающее поле
+function _select($v=array()) {//РІС‹РїР°РґР°СЋС‰РµРµ РїРѕР»Рµ
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
 
 	$width = '150px';
@@ -148,7 +148,7 @@ function _select($v=array()) {//выпадающее поле
 		'</table>'.
 	'</div>';
 }
-function _dropdown($v=array()) {//выпадающее поле - ссылка
+function _dropdown($v=array()) {//РІС‹РїР°РґР°СЋС‰РµРµ РїРѕР»Рµ - СЃСЃС‹Р»РєР°
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
 
 	$value = _num(@$v['value']);
@@ -159,7 +159,7 @@ function _dropdown($v=array()) {//выпадающее поле - ссылка
 		'<a class="dd-head grey">'.$v['placeholder'].'</a>'.
 	'</div>';
 }
-function _count($v=array()) {//поле количество
+function _count($v=array()) {//РїРѕР»Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
 
 	$width = '50px';
@@ -178,7 +178,7 @@ function _count($v=array()) {//поле количество
 		'<div class="but but-b"></div>'.
 	'</div>';
 }
-function _calendar($v=array()) {//поле Календарь
+function _calendar($v=array()) {//РїРѕР»Рµ РљР°Р»РµРЅРґР°СЂСЊ
 	$attr_id = empty($v['attr_id']) ? 'calendar'.rand(1, 100000) : $v['attr_id'];
 
 	if(!$value = @$v['value'])
@@ -191,7 +191,7 @@ function _calendar($v=array()) {//поле Календарь
 		'<input type="text" class="cal-inp" readonly value="'.FullData($value).'" />'.
 	'</div>';
 }
-function _search($v=array()) {//элемент ПОИСК
+function _search($v=array()) {//СЌР»РµРјРµРЅС‚ РџРћРРЎРљ
 	$attr_id = empty($v['attr_id']) ? 'search'.rand(1, 100000) : $v['attr_id'];
 
 	$width = '150px';
@@ -218,22 +218,22 @@ function _search($v=array()) {//элемент ПОИСК
 		'</table>'.
 	'</div>';
 }
-function _colorJS() {//массив цветов для текста в формате JS, доступных элементам
+function _colorJS() {//РјР°СЃСЃРёРІ С†РІРµС‚РѕРІ РґР»СЏ С‚РµРєСЃС‚Р° РІ С„РѕСЂРјР°С‚Рµ JS, РґРѕСЃС‚СѓРїРЅС‹С… СЌР»РµРјРµРЅС‚Р°Рј
 	return '{'.
-		'"":["#000","Чёрный"],'.
-		'"color-555":["#555","Тёмно-серый"],'.
-		'"grey":["#888","Серый"],'.
-		'"pale":["#aaa","Бледный"],'.
-		'"color-ccc":["#ccc","Совсем бледный"],'.
-		'"blue":["#2B587A","Тёмно-синий"],'.
-		'"color-acc":["#07a","Синий"],'.
-		'"color-sal":["#770","Салатовый"],'.
-		'"color-pay":["#090","Зелёный"],'.
-		'"color-aea":["#aea","Ярко-зелёный"],'.
-		'"red":["#e22","Красный"],'.
-		'"color-ref":["#800","Тёмно-красный"],'.
-		'"color-del":["#a66","Тёмно-бордовый"],'.
-		'"color-vin":["#c88","Бордовый"]'.
+		'"":["#000","Р§С‘СЂРЅС‹Р№"],'.
+		'"color-555":["#555","РўС‘РјРЅРѕ-СЃРµСЂС‹Р№"],'.
+		'"grey":["#888","РЎРµСЂС‹Р№"],'.
+		'"pale":["#aaa","Р‘Р»РµРґРЅС‹Р№"],'.
+		'"color-ccc":["#ccc","РЎРѕРІСЃРµРј Р±Р»РµРґРЅС‹Р№"],'.
+		'"blue":["#2B587A","РўС‘РјРЅРѕ-СЃРёРЅРёР№"],'.
+		'"color-acc":["#07a","РЎРёРЅРёР№"],'.
+		'"color-sal":["#770","РЎР°Р»Р°С‚РѕРІС‹Р№"],'.
+		'"color-pay":["#090","Р—РµР»С‘РЅС‹Р№"],'.
+		'"color-aea":["#aea","РЇСЂРєРѕ-Р·РµР»С‘РЅС‹Р№"],'.
+		'"red":["#e22","РљСЂР°СЃРЅС‹Р№"],'.
+		'"color-ref":["#800","РўС‘РјРЅРѕ-РєСЂР°СЃРЅС‹Р№"],'.
+		'"color-del":["#a66","РўС‘РјРЅРѕ-Р±РѕСЂРґРѕРІС‹Р№"],'.
+		'"color-vin":["#c88","Р‘РѕСЂРґРѕРІС‹Р№"]'.
 	'}';
 }
 
@@ -241,14 +241,14 @@ function _emptyMin($msg) {
 	return '<div class="_empty min mar10">'.$msg.'</div>';
 }
 
-function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
-	//если dialog_id получен - отправка его
+function _dialogTest() {//РїСЂРѕРІРµСЂРєР° id РґРёР°Р»РѕРіР°, СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РЅРѕРІРѕРіРѕ, РµСЃР»Рё СЌС‚Рѕ РєРЅРѕРїРєР°
+	//РµСЃР»Рё dialog_id РїРѕР»СѓС‡РµРЅ - РѕС‚РїСЂР°РІРєР° РµРіРѕ
 	if($dialog_id = _num(@$_POST['dialog_id']))
 		return $dialog_id;
 	if(!$block_id = _num(@$_POST['block_id']))
 		return false;
 
-	//получение элемента-кнопки для присвоения нового диалога
+	//РїРѕР»СѓС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚Р°-РєРЅРѕРїРєРё РґР»СЏ РїСЂРёСЃРІРѕРµРЅРёСЏ РЅРѕРІРѕРіРѕ РґРёР°Р»РѕРіР°
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id`=".$block_id."
@@ -257,7 +257,7 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 	if(!$elem = query_assoc($sql))
 		return false;
 
-	//новый диалог кнопке уже был присвоен
+	//РЅРѕРІС‹Р№ РґРёР°Р»РѕРі РєРЅРѕРїРєРµ СѓР¶Рµ Р±С‹Р» РїСЂРёСЃРІРѕРµРЅ
 	if($elem['num_4'])
 		return $elem['num_4'];
 
@@ -279,7 +279,7 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 
 	$sql = "UPDATE `_dialog`
 			SET `num`=".$num.",
-				`name`='Диалог ".$num."'
+				`name`='Р”РёР°Р»РѕРі ".$num."'
 			WHERE `id`=".$dialog_id;
 	query($sql);
 
@@ -294,11 +294,11 @@ function _dialogTest() {//проверка id диалога, создание нового нового, если это 
 
 	return $dialog_id;
 }
-function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
+function _dialogQuery($dialog_id) {//РґР°РЅРЅС‹Рµ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°
 	if(!$dialog = _BE('dialog', $dialog_id))
 		return array();
 
-		//id заглавных элементов настройки шаблона истории действий
+		//id Р·Р°РіР»Р°РІРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ РЅР°СЃС‚СЂРѕР№РєРё С€Р°Р±Р»РѕРЅР° РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№
 		foreach(array(1,2,3) as $n) {
 			$dialog['history'][$n]['elem_id'] = 0;
 			$dialog['history'][$n]['tmp'] = '';
@@ -314,8 +314,8 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 			$elem_id = query_value($sql);
 			$dialog['history'][$n]['elem_id'] = $elem_id;
 
-			$tmp_txt = '';//текстовое содержание шаблона истории
-			$tmp_elm = array();//элементы, участвующие в шаблоне истории
+			$tmp_txt = '';//С‚РµРєСЃС‚РѕРІРѕРµ СЃРѕРґРµСЂР¶Р°РЅРёРµ С€Р°Р±Р»РѕРЅР° РёСЃС‚РѕСЂРёРё
+			$tmp_elm = array();//СЌР»РµРјРµРЅС‚С‹, СѓС‡Р°СЃС‚РІСѓСЋС‰РёРµ РІ С€Р°Р±Р»РѕРЅРµ РёСЃС‚РѕСЂРёРё
 			if($elem_id) {
 				$sql = "SELECT *
 						FROM `_element`
@@ -349,10 +349,10 @@ function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 
 	return $dialog;
 }
-function _dialogParam($dialog_id, $param) {//получение конкретного параметра диалога
+function _dialogParam($dialog_id, $param) {//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР° РґРёР°Р»РѕРіР°
 	$dialog = _dialogQuery($dialog_id);
 	if(!isset($dialog[$param]))
-		return 'Неизвестный параметр диалога: '.$param;
+		return 'РќРµРёР·РІРµСЃС‚РЅС‹Р№ РїР°СЂР°РјРµС‚СЂ РґРёР°Р»РѕРіР°: '.$param;
 
 	$send = $dialog[$param];
 
@@ -361,22 +361,22 @@ function _dialogParam($dialog_id, $param) {//получение конкретного параметра диа
 
 	return $send;
 }
-function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
+function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//РїРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° РґРёР°Р»РѕРіРѕРІ, РєРѕС‚РѕСЂС‹Рµ РјРѕРіСѓС‚ Р±С‹С‚СЊ СЃРїРёСЃРєР°РјРё: spisok_on=1
 	$cond = "`spisok_on`";
 	$cond .= " AND `app_id` IN (0,".APP_ID.")";
 
 
-	//получение id диалога, который является списком, чтобы было нельзя его выбирать в самом себе (для связок)
+	//РїРѕР»СѓС‡РµРЅРёРµ id РґРёР°Р»РѕРіР°, РєРѕС‚РѕСЂС‹Р№ СЏРІР»СЏРµС‚СЃСЏ СЃРїРёСЃРєРѕРј, С‡С‚РѕР±С‹ Р±С‹Р»Рѕ РЅРµР»СЊР·СЏ РµРіРѕ РІС‹Р±РёСЂР°С‚СЊ РІ СЃР°РјРѕРј СЃРµР±Рµ (РґР»СЏ СЃРІСЏР·РѕРє)
 	$dialog = _dialogQuery($dialog_id);
 	if(_table($dialog['table_1']) == '_element') {
-		//если редактирование - получение id блока из элемента
+		//РµСЃР»Рё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ - РїРѕР»СѓС‡РµРЅРёРµ id Р±Р»РѕРєР° РёР· СЌР»РµРјРµРЅС‚Р°
 		if($elem_id) {
 			$sql = "SELECT `block_id`
 					FROM `_element`
 					WHERE `id`=".$elem_id;
 			$block_id = query_value($sql);
 		}
-		//если вставка элемента в блок
+		//РµСЃР»Рё РІСЃС‚Р°РІРєР° СЌР»РµРјРµРЅС‚Р° РІ Р±Р»РѕРє
 		$sql = "SELECT `obj_id`
 				FROM `_block`
 				WHERE `obj_name`='dialog'
@@ -406,11 +406,11 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 	}
 
 
-	//списки, доступные только SA
+	//СЃРїРёСЃРєРё, РґРѕСЃС‚СѓРїРЅС‹Рµ С‚РѕР»СЊРєРѕ SA
 	if(SA) {
 		$send[] = array(
 			'info' => 1,
-			'title' => 'SA-списки:'
+			'title' => 'SA-СЃРїРёСЃРєРё:'
 		);
 		foreach($saArr as $r)
 			$send[] = array(
@@ -423,17 +423,17 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива д
 
 	return $send;
 }
-function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
+function _dialogSpisokOnPage($block_id) {//РїРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° РґРёР°Р»РѕРіРѕРІ, РєРѕС‚РѕСЂС‹Рµ РјРѕРіСѓС‚ Р±С‹С‚СЊ СЃРїРёСЃРєР°РјРё: spisok_on=1
 /*
-	 получены будут списки, размещёные в текущем объекте
-	$block_id - исходный блок, по которому определяется объект
+	 РїРѕР»СѓС‡РµРЅС‹ Р±СѓРґСѓС‚ СЃРїРёСЃРєРё, СЂР°Р·РјРµС‰С‘РЅС‹Рµ РІ С‚РµРєСѓС‰РµРј РѕР±СЉРµРєС‚Рµ
+	$block_id - РёСЃС…РѕРґРЅС‹Р№ Р±Р»РѕРє, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РѕР±СЉРµРєС‚
 */
 
 	if(!$block = _blockOne($block_id))
 		return array();
 
-	//списки размещаются при помощи диалогов 14 и 23
-	//идентификаторами результата являются id элементов (а не диалогов)
+	//СЃРїРёСЃРєРё СЂР°Р·РјРµС‰Р°СЋС‚СЃСЏ РїСЂРё РїРѕРјРѕС‰Рё РґРёР°Р»РѕРіРѕРІ 14 Рё 23
+	//РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°РјРё СЂРµР·СѓР»СЊС‚Р°С‚Р° СЏРІР»СЏСЋС‚СЃСЏ id СЌР»РµРјРµРЅС‚РѕРІ (Р° РЅРµ РґРёР°Р»РѕРіРѕРІ)
 
 	if(!$elm = _BE('elem_arr', $block['obj_name'], $block['obj_id']))
 		return array();
@@ -444,22 +444,22 @@ function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые м
 			continue;
 
 		if($r['dialog_id'] == 68)
-			$spisokName = 'История действий';
+			$spisokName = 'РСЃС‚РѕСЂРёСЏ РґРµР№СЃС‚РІРёР№';
 		else
 			$spisokName = _dialogParam($r['num_1'], 'name');
-		$send[$elem_id] = $spisokName.' (в '.$block['obj_name'].'-блоке '.$r['block_id'].')';
+		$send[$elem_id] = $spisokName.' (РІ '.$block['obj_name'].'-Р±Р»РѕРєРµ '.$r['block_id'].')';
 	}
 
 	return $send;
 }
-function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списков, которые привязаны к текущему (исходному) диалогу
+function _dialogSpisokOnConnect($block_id, $elem_id) {//РїРѕР»СѓС‡РµРЅРёРµ РґРёР°Р»РѕРіРѕРІ-СЃРїРёСЃРєРѕРІ, РєРѕС‚РѕСЂС‹Рµ РїСЂРёРІСЏР·Р°РЅС‹ Рє С‚РµРєСѓС‰РµРјСѓ (РёСЃС…РѕРґРЅРѕРјСѓ) РґРёР°Р»РѕРіСѓ
 /*
-	$block_id - исходный блок, по которому определяется объект
-	Привязка происходит через элемент [29], по нему будет производиться происк
-	Идентификаторами результата являются id элементов (а не диалогов)
+	$block_id - РёСЃС…РѕРґРЅС‹Р№ Р±Р»РѕРє, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РѕРїСЂРµРґРµР»СЏРµС‚СЃСЏ РѕР±СЉРµРєС‚
+	РџСЂРёРІСЏР·РєР° РїСЂРѕРёСЃС…РѕРґРёС‚ С‡РµСЂРµР· СЌР»РµРјРµРЅС‚ [29], РїРѕ РЅРµРјСѓ Р±СѓРґРµС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЊСЃСЏ РїСЂРѕРёСЃРє
+	РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°РјРё СЂРµР·СѓР»СЊС‚Р°С‚Р° СЏРІР»СЏСЋС‚СЃСЏ id СЌР»РµРјРµРЅС‚РѕРІ (Р° РЅРµ РґРёР°Р»РѕРіРѕРІ)
 */
 
-	//получение исходного блока, если редактирование значения
+	//РїРѕР»СѓС‡РµРЅРёРµ РёСЃС…РѕРґРЅРѕРіРѕ Р±Р»РѕРєР°, РµСЃР»Рё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р·РЅР°С‡РµРЅРёСЏ
 	if($elem_id) {
 		if(!$EL = _elemOne($elem_id))
 			return array();
@@ -490,7 +490,7 @@ function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списк
 	if(!$block = query_arr($sql))
 		return array();
 
-	//количество связок для каждого диалога (connect count)
+	//РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРІСЏР·РѕРє РґР»СЏ РєР°Р¶РґРѕРіРѕ РґРёР°Р»РѕРіР° (connect count)
 	$sql = "SELECT
 				`obj_id`,
 				COUNT(`id`)-1
@@ -505,12 +505,12 @@ function _dialogSpisokOnConnect($block_id, $elem_id) {//получение диалогов-списк
 		$BL = $block[$r['block_id']];
 		$obj_id = _num($BL['obj_id']);
 		$dialog = _dialogQuery($obj_id);
-		$send[_num($elem_id)] = $dialog['name'].($cc[$obj_id] ? ' (в блоке '.$r['block_id'].')' : '');
+		$send[_num($elem_id)] = $dialog['name'].($cc[$obj_id] ? ' (РІ Р±Р»РѕРєРµ '.$r['block_id'].')' : '');
 	}
 
 	return $send;
 }
-function _dialogSelArray($v=false) {//список диалогов для Select - отправка через AJAX
+function _dialogSelArray($v=false) {//СЃРїРёСЃРѕРє РґРёР°Р»РѕРіРѕРІ РґР»СЏ Select - РѕС‚РїСЂР°РІРєР° С‡РµСЂРµР· AJAX
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id` IN (".APP_ID.(SA ? ',0' : '').")
@@ -522,14 +522,14 @@ function _dialogSelArray($v=false) {//список диалогов для Select - отправка чере
 	$spisok = array();
 	$sa_only = $v == 'sa_only';
 	$saFlag = $sa_only;
-	$skip = _num($v);//id диалога, который нужно пропустить
+	$skip = _num($v);//id РґРёР°Р»РѕРіР°, РєРѕС‚РѕСЂС‹Р№ РЅСѓР¶РЅРѕ РїСЂРѕРїСѓСЃС‚РёС‚СЊ
 	foreach($arr as $r) {
 		if($r['id'] == $skip)
 			continue;
-		if(!$saFlag && !$r['app_id']) {//вставка графы для SA
+		if(!$saFlag && !$r['app_id']) {//РІСЃС‚Р°РІРєР° РіСЂР°С„С‹ РґР»СЏ SA
 			$spisok[] = array(
 				'info' => 1,
-				'title' => 'SA-диалоги:'
+				'title' => 'SA-РґРёР°Р»РѕРіРё:'
 			);
 			$saFlag = 1;
 		}
@@ -546,11 +546,11 @@ function _dialogSelArray($v=false) {//список диалогов для Select - отправка чере
 
 	return $spisok;
 }
-function _dialogElemChoose($el, $unit) {//[74] выбор элемента (подключаемая функция). Используется для [13]
+function _dialogElemChoose($el, $unit) {//[74] РІС‹Р±РѕСЂ СЌР»РµРјРµРЅС‚Р° (РїРѕРґРєР»СЋС‡Р°РµРјР°СЏ С„СѓРЅРєС†РёСЏ). РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ [13]
 	if(!$dialog_id = _num(@$unit['source']['dialog_source']))
-		return _emptyMin('Отсутствует исходный диалог.');
+		return _emptyMin('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РёСЃС…РѕРґРЅС‹Р№ РґРёР°Р»РѕРі.');
 	if(!$dialog = _dialogQuery($dialog_id))
-		return _emptyMin('Диалога не существует, который вносит данные списка.');
+		return _emptyMin('Р”РёР°Р»РѕРіР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РєРѕС‚РѕСЂС‹Р№ РІРЅРѕСЃРёС‚ РґР°РЅРЅС‹Рµ СЃРїРёСЃРєР°.');
 
 	$sql = "SELECT `id`,1
 			FROM `_dialog`
@@ -561,23 +561,75 @@ function _dialogElemChoose($el, $unit) {//[74] выбор элемента (подключаемая функ
 	$send = array(
 		'choose' => 1,
 		'choose_access' => $choose_access,
-		'choose_sel' => array(),      //ids ранее выбранных элементов или блоков
-		'choose_deny' => array()      //ids элементов или блоков, которые выбирать нельзя (если они были выбраны другой фукцией того же элемента)
+		'choose_sel' => array(),      //ids СЂР°РЅРµРµ РІС‹Р±СЂР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ РёР»Рё Р±Р»РѕРєРѕРІ
+		'choose_deny' => array()      //ids СЌР»РµРјРµРЅС‚РѕРІ РёР»Рё Р±Р»РѕРєРѕРІ, РєРѕС‚РѕСЂС‹Рµ РІС‹Р±РёСЂР°С‚СЊ РЅРµР»СЊР·СЏ (РµСЃР»Рё РѕРЅРё Р±С‹Р»Рё РІС‹Р±СЂР°РЅС‹ РґСЂСѓРіРѕР№ С„СѓРєС†РёРµР№ С‚РѕРіРѕ Р¶Рµ СЌР»РµРјРµРЅС‚Р°)
 	);
 
 	return
-	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
+	'<div class="fs14 pad10 pl15 bg-orange line-b">Р”РёР°Р»РѕРіРѕРІРѕРµ РѕРєРЅРѕ <b class="fs14">'.$dialog['name'].'</b>:</div>'.
 	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
 }
 
-function _elemOne($elem_id) {//запрос одного элемента
+function _dialogSpisokSa($el, $unit) {//СЃРїРёСЃРѕРє РґРёР°Р»РѕРіРѕРІС‹С… РѕРєРѕРЅ [12]
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE !`app_id`
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return 'Р”РёР°Р»РѕРіРѕРІС‹С… РѕРєРѕРЅ РЅРµС‚.';
+
+	$send = '<table class="_stab small">'.
+				'<tr>'.
+					'<th>ID'.
+					'<th>РўР°Р±Р»РёС†Р°'.
+					'<th>РРјСЏ РґРёР°Р»РѕРіР°'.
+					'<th>afics'.
+					'<th>type';
+	foreach($arr as $r) {
+		$send .= '<tr class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.
+					'<td class="w35 r grey'.($r['sa'] ? ' bg-fee' : '').'">'.$r['id'].
+					'<td class="'.(_table($r['table_1']) == '_element' ? 'bg-efe' : '').'">'._table($r['table_1']).
+					'<td>'.$r['name'].
+					'<td>'.$r['element_afics'].
+					'<td class="center">'._elemColType($r['element_type']);
+	}
+	$send .= '</table>';
+
+	return $send;
+}
+function _dialogSpisokApp($el, $unit) {//СЃРїРёСЃРѕРє РґРёР°Р»РѕРіРѕРІС‹С… РѕРєРѕРЅ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ [12]
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return 'Р”РёР°Р»РѕРіРѕРІС‹С… РѕРєРѕРЅ РЅРµС‚.';
+
+	$send = '<table class="_stab small">'.
+				'<tr>'.
+					'<th>ID'.
+					'<th>РРјСЏ РґРёР°Р»РѕРіР°'.
+					'<th>РЎРїРёСЃРѕРє';
+	$n = 1;
+	foreach($arr as $r) {
+		$send .= '<tr class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.
+					'<td class="w35 r grey">'.$n++.
+					'<td>'.$r['name'].
+					'<td class="center">'.($r['spisok_on'] ? 'РґР°' : '');
+	}
+	$send .= '</table>';
+
+	return $send;
+}
+
+function _elemOne($elem_id) {//Р·Р°РїСЂРѕСЃ РѕРґРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
 	return _BE('elem_one', $elem_id);
 }
-function _blockOne($block_id) {//запрос одного блока
+function _blockOne($block_id) {//Р·Р°РїСЂРѕСЃ РѕРґРЅРѕРіРѕ Р±Р»РѕРєР°
 	return _BE('block_one', $block_id);
 }
 
-function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
+function _elemValue($elem_id) {//РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРµ Р·РЅР°С‡РµРЅРёСЏ Рє СЌР»РµРјРµРЅС‚Сѓ select, РЅР°СЃС‚СЂРѕРµРЅРЅС‹Рµ С‡РµСЂРµР· [19]
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id`=-".$elem_id."
@@ -595,7 +647,7 @@ function _elemValue($elem_id) {//дополнительне значения к элементу select, настр
 
 	return $spisok;
 }
-function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
+function _elemTitle($elem_id, $el_parent=array()) {//РёРјСЏ СЌР»РµРјРµРЅС‚Р° РёР»Рё РµРіРѕ С‚РµРєСЃС‚
 	if(!$elem_id = _num($elem_id))
 		return '';
 	if(!$el = _elemOne($elem_id))
@@ -604,20 +656,20 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 		$el_parent = $el;
 
 	switch($el['dialog_id']) {
-		case 10: return $el['txt_1']; //произвольный текст
-		case 11: //значение диалога
+		case 10: return $el['txt_1']; //РїСЂРѕРёР·РІРѕР»СЊРЅС‹Р№ С‚РµРєСЃС‚
+		case 11: //Р·РЅР°С‡РµРЅРёРµ РґРёР°Р»РѕРіР°
 			$title = '';
 			foreach(_ids($el['txt_2'], 1) as $n => $id)
-				$title .= ($n ? ' » ' : '')._elemTitle($id, $el_parent);
+				$title .= ($n ? ' В» ' : '')._elemTitle($id, $el_parent);
 			return $title;
-		case 29: //связки
+		case 29: //СЃРІСЏР·РєРё
 		case 59: return _dialogParam($el['num_1'], 'name');
-		case 32: return 'номер';
-		case 33: return 'дата/время';
+		case 32: return 'РЅРѕРјРµСЂ';
+		case 33: return 'РґР°С‚Р°/РІСЂРµРјСЏ';
 		case 34: return 'edit';
 		case 60: return _imageNo($el_parent['width']);
-		case 62: return 'Фильтр-галочка';
-		case 67://шаблон истории действий
+		case 62: return 'Р¤РёР»СЊС‚СЂ-РіР°Р»РѕС‡РєР°';
+		case 67://С€Р°Р±Р»РѕРЅ РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№
 //			_BE('dialog_clear');
 			$dlg = _dialogQuery($el['num_2']);
 			return $dlg['history'][$el['num_1']]['tmp'];
@@ -625,7 +677,7 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 	return $el['name'];
 }
 
-function _elemColType($id='all') {//тип данных, используемый элементом
+function _elemColType($id='all') {//С‚РёРї РґР°РЅРЅС‹С…, РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ СЌР»РµРјРµРЅС‚РѕРј
 	$col_type = array(
 		1 => 'txt',
 		2 => 'num',
@@ -645,19 +697,19 @@ function _elemColType($id='all') {//тип данных, используемый элементом
 	return $col_type[$id];
 }
 
-function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
+function _elementChoose($el, $unit) {//РІС‹Р±РѕСЂ СЌР»РµРјРµРЅС‚Р° РґР»СЏ РІСЃС‚Р°РІРєРё РІ Р±Р»РѕРє
 	$BL['obj_name'] = $unit['source']['unit_id'] == -115 ? 'spisok' : '';
 	if($block_id = _num($unit['source']['block_id'], 1))
 		if(!$BL = _blockOne($block_id))
-			return _emptyMin('Исходного блока id'.$block_id.' не существует.');
+			return _emptyMin('РСЃС…РѕРґРЅРѕРіРѕ Р±Р»РѕРєР° id'.$block_id.' РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚.');
 
 	define('BLOCK_PAGE',   $BL['obj_name'] == 'page');
 	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
 	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
-	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//сборный текст, шаблон истории действий
-	define('TD_PASTE', $unit['source']['unit_id'] == -112 || $unit['source']['unit_id'] == -115); //ячейка таблицы
+	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//СЃР±РѕСЂРЅС‹Р№ С‚РµРєСЃС‚, С€Р°Р±Р»РѕРЅ РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№
+	define('TD_PASTE', $unit['source']['unit_id'] == -112 || $unit['source']['unit_id'] == -115); //СЏС‡РµР№РєР° С‚Р°Р±Р»РёС†С‹
 
-	//определение, принимает ли страница значения списка
+	//РѕРїСЂРµРґРµР»РµРЅРёРµ, РїСЂРёРЅРёРјР°РµС‚ Р»Рё СЃС‚СЂР°РЅРёС†Р° Р·РЅР°С‡РµРЅРёСЏ СЃРїРёСЃРєР°
 	$spisok_exist = false;
 	if(BLOCK_PAGE) {
 		$page = _page($BL['obj_id']);
@@ -676,7 +728,7 @@ function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 			WHERE `sa` IN (0,".SA.")
 			ORDER BY `sort`";
 	if(!$group = query_arr($sql))
-		return _emptyMin('Отсутствуют группы элементов.');
+		return _emptyMin('РћС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ РіСЂСѓРїРїС‹ СЌР»РµРјРµРЅС‚РѕРІ.');
 
 	foreach($group as $id => $r)
 		$group[$id]['elem'] = array();
@@ -687,9 +739,9 @@ function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 			  AND `sa` IN (0,".SA.")
 			ORDER BY `sort`,`id`";
 	if(!$elem = query_arr($sql))
-		return _emptyMin('Нет элементов для отображения.');
+		return _emptyMin('РќРµС‚ СЌР»РµРјРµРЅС‚РѕРІ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ.');
 
-	//расстановка элементов в группы с учётом правил отображения
+	//СЂР°СЃСЃС‚Р°РЅРѕРІРєР° СЌР»РµРјРµРЅС‚РѕРІ РІ РіСЂСѓРїРїС‹ СЃ СѓС‡С‘С‚РѕРј РїСЂР°РІРёР» РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
 	foreach($elem as $id => $r) {
 		if(_44_ACCESS && !$r['element_44_access'])
 			continue;
@@ -733,7 +785,7 @@ function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 			unset($group[$id]);
 
 	if(empty($group))
-		return _emptyMin('Нет элементов для отображения.').$debug;
+		return _emptyMin('РќРµС‚ СЌР»РµРјРµРЅС‚РѕРІ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ.').$debug;
 
 	reset($group);
 	$firstId = key($group);
@@ -778,29 +830,29 @@ function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
 		$debug;
 }
 
-function _filterCheckSetup() {//настройка условий фильтра для галочки (подключение через [12])
+function _filterCheckSetup() {//РЅР°СЃС‚СЂРѕР№РєР° СѓСЃР»РѕРІРёР№ С„РёР»СЊС‚СЂР° РґР»СЏ РіР°Р»РѕС‡РєРё (РїРѕРґРєР»СЋС‡РµРЅРёРµ С‡РµСЂРµР· [12])
 	return '';
 }
 
-function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])
+function _historySetup($el, $unit) {//РЅР°СЃС‚СЂРѕР№РєР° С€Р°Р±Р»РѕРЅР° РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№ (РїРѕРґРєР»СЋС‡РµРЅРёРµ С‡РµСЂРµР· [12])
 	/*
-		Заглавный элемент: -117
-			num_1 - действие (type_id):
-		              1 - запись внесена
-		              2 - запись изменена
-		              3 - запись удалена
-			num_2 - id диалога, по которому настраивается шаблон
-			txt_1 - список id дочерних элементов
+		Р—Р°РіР»Р°РІРЅС‹Р№ СЌР»РµРјРµРЅС‚: -117
+			num_1 - РґРµР№СЃС‚РІРёРµ (type_id):
+		              1 - Р·Р°РїРёСЃСЊ РІРЅРµСЃРµРЅР°
+		              2 - Р·Р°РїРёСЃСЊ РёР·РјРµРЅРµРЅР°
+		              3 - Р·Р°РїРёСЃСЊ СѓРґР°Р»РµРЅР°
+			num_2 - id РґРёР°Р»РѕРіР°, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РЅР°СЃС‚СЂР°РёРІР°РµС‚СЃСЏ С€Р°Р±Р»РѕРЅ
+			txt_1 - СЃРїРёСЃРѕРє id РґРѕС‡РµСЂРЅРёС… СЌР»РµРјРµРЅС‚РѕРІ
 
-		Дочерние элементы:
-			txt_7 - текст слева от значения
-			num_8 - значение из диалога
-			txt_8 - текст справа от значения
+		Р”РѕС‡РµСЂРЅРёРµ СЌР»РµРјРµРЅС‚С‹:
+			txt_7 - С‚РµРєСЃС‚ СЃР»РµРІР° РѕС‚ Р·РЅР°С‡РµРЅРёСЏ
+			num_8 - Р·РЅР°С‡РµРЅРёРµ РёР· РґРёР°Р»РѕРіР°
+			txt_8 - С‚РµРєСЃС‚ СЃРїСЂР°РІР° РѕС‚ Р·РЅР°С‡РµРЅРёСЏ
 	*/
 	return '<input type="hidden" id="type_id" />';
 }
-function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действий
-	//история не вносится, если единица списка удаляется физически из базы
+function _historyInsert($type_id, $dialog, $unit_id) {//РІРЅРµСЃРµРЅРёРµ РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№
+	//РёСЃС‚РѕСЂРёСЏ РЅРµ РІРЅРѕСЃРёС‚СЃСЏ, РµСЃР»Рё РµРґРёРЅРёС†Р° СЃРїРёСЃРєР° СѓРґР°Р»СЏРµС‚СЃСЏ С„РёР·РёС‡РµСЃРєРё РёР· Р±Р°Р·С‹
 	if(!isset($dialog['field1']['deleted']))
 		return;
 
@@ -823,7 +875,7 @@ function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действи
 			)";
 	query($sql);
 }
-function _historySpisok($el) {//список истории действий [68]
+function _historySpisok($el) {//СЃРїРёСЃРѕРє РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№ [68]
 	$sql = "SELECT *
 			FROM `_history`
 			WHERE `app_id`=".APP_ID."
@@ -832,14 +884,14 @@ function _historySpisok($el) {//список истории действий [68]
 			ORDER BY `dtime_add` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
-		return '<div class="_empty min">Истории нет.</div>';
+		return '<div class="_empty min">РСЃС‚РѕСЂРёРё РЅРµС‚.</div>';
 
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `id` IN ("._idsGet($arr, 'unit_id').")";
 	$spUnit = query_arr($sql);
 
-	//распределение истории по дням
+	//СЂР°СЃРїСЂРµРґРµР»РµРЅРёРµ РёСЃС‚РѕСЂРёРё РїРѕ РґРЅСЏРј
 	$spisok = array();
 	foreach($arr as $r) {
 		$day = substr($r['dtime_add'], 0, 10);
@@ -878,8 +930,8 @@ function _historySpisok($el) {//список истории действий [68]
 						$msg.
 					'</div>';
 
-			$is_user = $user_id != $r['user_id_add'];//изменился пользователь
-			$is_last = $n == $last;//последняя запись
+			$is_user = $user_id != $r['user_id_add'];//РёР·РјРµРЅРёР»СЃСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ
+			$is_last = $n == $last;//РїРѕСЃР»РµРґРЅСЏСЏ Р·Р°РїРёСЃСЊ
 
 			if(!$is_user && !$is_last)
 				continue;
@@ -899,19 +951,19 @@ function _historySpisok($el) {//список истории действий [68]
 
 	return $send;
 }
-function _historyCondPageUnit($el) {//отображение истории для конкретной единицы списка, которую принимает страница (связка)
+function _historyCondPageUnit($el) {//РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РёСЃС‚РѕСЂРёРё РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕР№ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°, РєРѕС‚РѕСЂСѓСЋ РїСЂРёРЅРёРјР°РµС‚ СЃС‚СЂР°РЅРёС†Р° (СЃРІСЏР·РєР°)
 	if(!$el['num_8'])
 		return '';
 
-	//проверка, чтобы список был размещён именно на странице
+	//РїСЂРѕРІРµСЂРєР°, С‡С‚РѕР±С‹ СЃРїРёСЃРѕРє Р±С‹Р» СЂР°Р·РјРµС‰С‘РЅ РёРјРµРЅРЅРѕ РЅР° СЃС‚СЂР°РЅРёС†Рµ
 	if($el['block']['obj_name'] != 'page')
 		return ' AND !`id`';
 
-	//страница, на которой размещён список
+	//СЃС‚СЂР°РЅРёС†Р°, РЅР° РєРѕС‚РѕСЂРѕР№ СЂР°Р·РјРµС‰С‘РЅ СЃРїРёСЃРѕРє
 	if(!$page = _page($el['block']['obj_id']))
 		return ' AND !`id`';
 
-	//id диалога, единица списка которого размещается на странице
+	//id РґРёР°Р»РѕРіР°, РµРґРёРЅРёС†Р° СЃРїРёСЃРєР° РєРѕС‚РѕСЂРѕРіРѕ СЂР°Р·РјРµС‰Р°РµС‚СЃСЏ РЅР° СЃС‚СЂР°РЅРёС†Рµ
 	if(!$spisok_id = $page['spisok_id'])
 		return ' AND !`id`';
 
@@ -920,7 +972,7 @@ function _historyCondPageUnit($el) {//отображение истории для конкретной единицы
 
 	$ids = 0;
 
-	//получение id единиц списка, которые были связаны с текущей единицей
+	//РїРѕР»СѓС‡РµРЅРёРµ id РµРґРёРЅРёС† СЃРїРёСЃРєР°, РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё СЃРІСЏР·Р°РЅС‹ СЃ С‚РµРєСѓС‰РµР№ РµРґРёРЅРёС†РµР№
 	$sql = "SELECT `block_id`,`col`
 			FROM `_element`
 			WHERE `dialog_id`=29
@@ -950,7 +1002,7 @@ function _historyCondPageUnit($el) {//отображение истории для конкретной единицы
 
 
 
-function _imageServerCache() {//кеширование серверов изображений
+function _imageServerCache() {//РєРµС€РёСЂРѕРІР°РЅРёРµ СЃРµСЂРІРµСЂРѕРІ РёР·РѕР±СЂР°Р¶РµРЅРёР№
 	$key = 'IMG_SERVER';
 	if($arr = _cache_get($key, 1))
 		return $arr;
@@ -958,17 +1010,17 @@ function _imageServerCache() {//кеширование серверов изображений
 	$sql = "SELECT `id`,`path` FROM `_image_server`";
 	return _cache_set($key, query_ass($sql), 1);
 }
-function _imageServer($v) {//получение сервера (пути) для изображнения
+function _imageServer($v) {//РїРѕР»СѓС‡РµРЅРёРµ СЃРµСЂРІРµСЂР° (РїСѓС‚Рё) РґР»СЏ РёР·РѕР±СЂР°Р¶РЅРµРЅРёСЏ
 /*
-	если $v - число, получение имени пути
-	если $v - текст, это сам путь и получение id пути. Если нет, то создание
+	РµСЃР»Рё $v - С‡РёСЃР»Рѕ, РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РїСѓС‚Рё
+	РµСЃР»Рё $v - С‚РµРєСЃС‚, СЌС‚Рѕ СЃР°Рј РїСѓС‚СЊ Рё РїРѕР»СѓС‡РµРЅРёРµ id РїСѓС‚Рё. Р•СЃР»Рё РЅРµС‚, С‚Рѕ СЃРѕР·РґР°РЅРёРµ
 */
 	if(empty($v))
 		return '';
 
 	$SRV = _imageServerCache();
 
-	//получение id пути
+	//РїРѕР»СѓС‡РµРЅРёРµ id РїСѓС‚Рё
 	if($server_id = _num($v)) {
 		if(empty($SRV[$server_id]))
 			return '';
@@ -980,7 +1032,7 @@ function _imageServer($v) {//получение сервера (пути) для изображнения
 		if($v == $path)
 			return $id;
 
-	//внесение в базу нового пути
+	//РІРЅРµСЃРµРЅРёРµ РІ Р±Р°Р·Сѓ РЅРѕРІРѕРіРѕ РїСѓС‚Рё
 	$sql = "INSERT INTO `_image_server` (
 				`path`,
 				`user_id_add`
@@ -994,10 +1046,10 @@ function _imageServer($v) {//получение сервера (пути) для изображнения
 
 	return query_insert_id('_image_server');
 }
-function _imageNo($width=80) {//картинка, если изображнеия нет
+function _imageNo($width=80) {//РєР°СЂС‚РёРЅРєР°, РµСЃР»Рё РёР·РѕР±СЂР°Р¶РЅРµРёСЏ РЅРµС‚
 	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="'.$width.'" />';
 }
-function _imageHtml($r, $width=80, $h=0) {//получение картинки в html-формате
+function _imageHtml($r, $width=80, $h=0) {//РїРѕР»СѓС‡РµРЅРёРµ РєР°СЂС‚РёРЅРєРё РІ html-С„РѕСЂРјР°С‚Рµ
 	$width = $width ? $width : 80;
 
 	$st = $width > 80 ? 'max' : 80;
@@ -1016,14 +1068,14 @@ function _imageHtml($r, $width=80, $h=0) {//получение картинки в html-формате
 			' val="'.$r['id'].'"'.
 		' />';
 }
-function _imageNameCreate() {//формирование имени файла из случайных символов
+function _imageNameCreate() {//С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РёРјРµРЅРё С„Р°Р№Р»Р° РёР· СЃР»СѓС‡Р°Р№РЅС‹С… СЃРёРјРІРѕР»РѕРІ
 	$arr = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','1','2','3','4','5','6','7','8','9','0');
 	$name = '';
 	for($i = 0; $i < 10; $i++)
 		$name .= $arr[rand(0,35)];
 	return $name;
 }
-function _imageImCreate($im, $x_cur, $y_cur, $x_new, $y_new, $name) {//сжатие изображения
+function _imageImCreate($im, $x_cur, $y_cur, $x_new, $y_new, $name) {//СЃР¶Р°С‚РёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 	$send = _imageResize($x_cur, $y_cur, $x_new, $y_new);
 
 	$im_new = imagecreatetruecolor($send['x'], $send['y']);
@@ -1035,24 +1087,24 @@ function _imageImCreate($im, $x_cur, $y_cur, $x_new, $y_new, $name) {//сжатие из
 
 	return $send;
 }
-function _imageResize($x_cur, $y_cur, $x_new, $y_new) {//изменение размера изображения с сохранением пропорций
+function _imageResize($x_cur, $y_cur, $x_new, $y_new) {//РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ СЃ СЃРѕС…СЂР°РЅРµРЅРёРµРј РїСЂРѕРїРѕСЂС†РёР№
 	$x = $x_new;
 	$y = $y_new;
-	// если ширина больше или равна высоте
+	// РµСЃР»Рё С€РёСЂРёРЅР° Р±РѕР»СЊС€Рµ РёР»Рё СЂР°РІРЅР° РІС‹СЃРѕС‚Рµ
 	if ($x_cur >= $y_cur) {
-		if ($x > $x_cur) { $x = $x_cur; } // если новая ширина больше, чем исходная, то X остаётся исходным
+		if ($x > $x_cur) { $x = $x_cur; } // РµСЃР»Рё РЅРѕРІР°СЏ С€РёСЂРёРЅР° Р±РѕР»СЊС€Рµ, С‡РµРј РёСЃС…РѕРґРЅР°СЏ, С‚Рѕ X РѕСЃС‚Р°С‘С‚СЃСЏ РёСЃС…РѕРґРЅС‹Рј
 		$y = round($y_cur / $x_cur * $x);
-		if ($y > $y_new) { // если новая высота в итоге осталась меньше исходной, то подравнивание по Y
+		if ($y > $y_new) { // РµСЃР»Рё РЅРѕРІР°СЏ РІС‹СЃРѕС‚Р° РІ РёС‚РѕРіРµ РѕСЃС‚Р°Р»Р°СЃСЊ РјРµРЅСЊС€Рµ РёСЃС…РѕРґРЅРѕР№, С‚Рѕ РїРѕРґСЂР°РІРЅРёРІР°РЅРёРµ РїРѕ Y
 			$y = $y_new;
 			$x = round($x_cur / $y_cur * $y);
 		}
 	}
 
-	// если высота больше ширины
+	// РµСЃР»Рё РІС‹СЃРѕС‚Р° Р±РѕР»СЊС€Рµ С€РёСЂРёРЅС‹
 	if ($y_cur > $x_cur) {
-		if ($y > $y_cur) { $y = $y_cur; } // если новая высота больше, чем исходная, то Y остаётся исходным
+		if ($y > $y_cur) { $y = $y_cur; } // РµСЃР»Рё РЅРѕРІР°СЏ РІС‹СЃРѕС‚Р° Р±РѕР»СЊС€Рµ, С‡РµРј РёСЃС…РѕРґРЅР°СЏ, С‚Рѕ Y РѕСЃС‚Р°С‘С‚СЃСЏ РёСЃС…РѕРґРЅС‹Рј
 		$x = round($x_cur / $y_cur * $y);
-		if ($x > $x_new) { // если новая ширина в итоге осталась меньше исходной, то подравнивание по X
+		if ($x > $x_new) { // РµСЃР»Рё РЅРѕРІР°СЏ С€РёСЂРёРЅР° РІ РёС‚РѕРіРµ РѕСЃС‚Р°Р»Р°СЃСЊ РјРµРЅСЊС€Рµ РёСЃС…РѕРґРЅРѕР№, С‚Рѕ РїРѕРґСЂР°РІРЅРёРІР°РЅРёРµ РїРѕ X
 			$x = $x_new;
 			$y = round($y_cur / $x_cur * $x);
 		}
@@ -1069,7 +1121,7 @@ function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
 	$IMAGE_PATH = APP_PATH.'/.image/'.APP_ID;
 	$server_id = _imageServer('//'.DOMAIN.APP_HTML.'/.image/'.APP_ID.'/');
 
-	//создание директории, если отсутствует
+	//СЃРѕР·РґР°РЅРёРµ РґРёСЂРµРєС‚РѕСЂРёРё, РµСЃР»Рё РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
 	if(!is_dir($IMAGE_PATH))
 		mkdir($IMAGE_PATH, 0777, true);
 
@@ -1082,8 +1134,8 @@ function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
 			$image = NewMagickWand(); // magickwand.org
 			MagickReadImage($image, $file_tmp_name);
 			MagickSetImageFormat($image, 'jpg');
-			MagickWriteImage($image, $tmp); //сохранение результата
-			ClearMagickWand($image); //удаление и выгрузка полученного изображения из памяти
+			MagickWriteImage($image, $tmp); //СЃРѕС…СЂР°РЅРµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚Р°
+			ClearMagickWand($image); //СѓРґР°Р»РµРЅРёРµ Рё РІС‹РіСЂСѓР·РєР° РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РёР· РїР°РјСЏС‚Рё
 			DestroyMagickWand($image);
 			$im = @imagecreatefromjpeg($tmp);
 			unlink($tmp);
@@ -1092,12 +1144,12 @@ function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
 
 
 	if(!$im)
-		jsonError('Загруженный файл не является изображением.<br>Выберите JPG, PNG, GIF или TIFF формат.');
+		jsonError('Р—Р°РіСЂСѓР¶РµРЅРЅС‹Р№ С„Р°Р№Р» РЅРµ СЏРІР»СЏРµС‚СЃСЏ РёР·РѕР±СЂР°Р¶РµРЅРёРµРј.<br>Р’С‹Р±РµСЂРёС‚Рµ JPG, PNG, GIF РёР»Рё TIFF С„РѕСЂРјР°С‚.');
 
 	$x = imagesx($im);
 	$y = imagesy($im);
 	if($x < 100 || $y < 100)
-		jsonError('Изображение слишком маленькое.<br>Используйте размер не менее 100х100 px.');
+		jsonError('РР·РѕР±СЂР°Р¶РµРЅРёРµ СЃР»РёС€РєРѕРј РјР°Р»РµРЅСЊРєРѕРµ.<br>РСЃРїРѕР»СЊР·СѓР№С‚Рµ СЂР°Р·РјРµСЂ РЅРµ РјРµРЅРµРµ 100С…100 px.');
 
 	$fileName = time().'-'._imageNameCreate();
 	$NAME_MAX = $fileName.'-900.jpg';
@@ -1159,10 +1211,10 @@ function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
 			WHERE `id`=".$image_id;
 	return query_assoc($sql);
 }
-function _imageDD($img) {//единица изображения для настройки
+function _imageDD($img) {//РµРґРёРЅРёС†Р° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РґР»СЏ РЅР°СЃС‚СЂРѕР№РєРё
 	return
 	'<dd class="dib mr3 curM" val="'.$img['id'].'">'.
-		'<div class="icon icon-off'._tooltip('Переместить в корзину', -70).'</div>'.
+		'<div class="icon icon-off'._tooltip('РџРµСЂРµРјРµСЃС‚РёС‚СЊ РІ РєРѕСЂР·РёРЅСѓ', -70).'</div>'.
 		'<table class="_image-unit">'.
 			'<tr><td>'.
 				_imageHtml($img, 80, 1).
@@ -1170,11 +1222,11 @@ function _imageDD($img) {//единица изображения для настройки
 	'</dd>';
 }
 
-function _imageShow($el, $unit) {//просмотр изображений (вставляется в блок через [12])
-	$image = 'Изображение отсутствует.';//основная картинка, на которую нажали. Выводится первой
-	$spisok = '';//html-список дополнительных изображений
-	$spisokJs = array();//js-список всех изображений
-	$spisokIds = array();//id картинок по порядку
+function _imageShow($el, $unit) {//РїСЂРѕСЃРјРѕС‚СЂ РёР·РѕР±СЂР°Р¶РµРЅРёР№ (РІСЃС‚Р°РІР»СЏРµС‚СЃСЏ РІ Р±Р»РѕРє С‡РµСЂРµР· [12])
+	$image = 'РР·РѕР±СЂР°Р¶РµРЅРёРµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚.';//РѕСЃРЅРѕРІРЅР°СЏ РєР°СЂС‚РёРЅРєР°, РЅР° РєРѕС‚РѕСЂСѓСЋ РЅР°Р¶Р°Р»Рё. Р’С‹РІРѕРґРёС‚СЃСЏ РїРµСЂРІРѕР№
+	$spisok = '';//html-СЃРїРёСЃРѕРє РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
+	$spisokJs = array();//js-СЃРїРёСЃРѕРє РІСЃРµС… РёР·РѕР±СЂР°Р¶РµРЅРёР№
+	$spisokIds = array();//id РєР°СЂС‚РёРЅРѕРє РїРѕ РїРѕСЂСЏРґРєСѓ
 	if($image_id = _num(@$unit['id'])) {
 		$sql = "SELECT *
 				FROM `_image`
@@ -1231,13 +1283,13 @@ function _imageShow($el, $unit) {//просмотр изображений (вставляется в блок чере
 			'IMG_IDS=['.implode(',', $spisokIds).'];'.
 	'</script>';
 }
-function _imageDeleted($el, $unit) {//удалённые изображения (вставляется в блок через [12])
+function _imageDeleted($el, $unit) {//СѓРґР°Р»С‘РЅРЅС‹Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ (РІСЃС‚Р°РІР»СЏРµС‚СЃСЏ РІ Р±Р»РѕРє С‡РµСЂРµР· [12])
 	if(!$unit_id = _num(@$unit['id']))
-		return '<div class="_empty min">Отсутствует единица списка, к которой прикрепляются изображения.</div>';
+		return '<div class="_empty min">РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РµРґРёРЅРёС†Р° СЃРїРёСЃРєР°, Рє РєРѕС‚РѕСЂРѕР№ РїСЂРёРєСЂРµРїР»СЏСЋС‚СЃСЏ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ.</div>';
 	if(!$block_id = _num($unit['source']['block_id'], 1))
-		return '<div class="_empty min">Отсутствует id блока.</div>';
+		return '<div class="_empty min">РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ id Р±Р»РѕРєР°.</div>';
 	if($block_id > 0)
-		return '<div class="_empty min">Id блока не может быть положительным.</div>';
+		return '<div class="_empty min">Id Р±Р»РѕРєР° РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїРѕР»РѕР¶РёС‚РµР»СЊРЅС‹Рј.</div>';
 
 	$sql = "SELECT *
 			FROM `_image`
@@ -1246,13 +1298,13 @@ function _imageDeleted($el, $unit) {//удалённые изображения (вставляется в блок 
 			  AND `deleted`
 			ORDER BY `dtime_del`";
 	if(!$arr = query_arr($sql))
-		return '<div class="_empty min">Удалённых изображений нет.</div>';
+		return '<div class="_empty min">РЈРґР°Р»С‘РЅРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№ РЅРµС‚.</div>';
 
 	$html = '';
 	foreach($arr as $r) {
 		$html .=
 		'<div class="prel dib ml3 mr3">'.
-			'<div val="'.$r['id'].'" class="icon icon-recover'._tooltip('Восстановить', -43).'</div>'.
+			'<div val="'.$r['id'].'" class="icon icon-recover'._tooltip('Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ', -43).'</div>'.
 			'<table class="_image-unit">'.
 				'<tr><td>'.
 					_imageHtml($r, 80, 1).
@@ -1262,7 +1314,7 @@ function _imageDeleted($el, $unit) {//удалённые изображения (вставляется в блок 
 
 	return '<div class="_image">'.$html.'</div>';
 }
-function _imageWebcam($el) {//Веб-камера (вставляется в блок через [12])
+function _imageWebcam($el) {//Р’РµР±-РєР°РјРµСЂР° (РІСЃС‚Р°РІР»СЏРµС‚СЃСЏ РІ Р±Р»РѕРє С‡РµСЂРµР· [12])
 	$width = $el['block']['width'];
 	$mar = explode(' ', $el['mar']);
 	$width = round($width - $mar[1] - $mar[3]);
@@ -1318,7 +1370,7 @@ function _imageWebcam($el) {//Веб-камера (вставляется в блок через [12])
 
 
 
-function _filterCalendar($el) {//Фильтр-календарь
+function _filterCalendar($el) {//Р¤РёР»СЊС‚СЂ-РєР°Р»РµРЅРґР°СЂСЊ
 	if(!$v = _spisokFilter('v', $el['id'])) {
 		$v = _calendarWeek();
 		_spisokFilter('insert', array(
@@ -1344,26 +1396,26 @@ function _filterCalendar($el) {//Фильтр-календарь
 		'<div class="fc-cnt">'._filterCalendarContent($el, $mon, $v).'</div>'.
 	'</div>';
 }
-function _filterCalendarMon($mon) {//имя месяца и год
+function _filterCalendarMon($mon) {//РёРјСЏ РјРµСЃСЏС†Р° Рё РіРѕРґ
 	$ex = explode('-', $mon);
 	return _monthDef($ex[1]).' '.$ex[0];
 }
 function _filterCalendarContent($el, $mon, $v) {
 	$unix = strtotime($mon.'-01');
-	$dayCount = date('t', $unix);   //Количество дней в месяце
-	$week = date('w', $unix);       //Номер первого дня недели
+	$dayCount = date('t', $unix);   //РљРѕР»РёС‡РµСЃС‚РІРѕ РґРЅРµР№ РІ РјРµСЃСЏС†Рµ
+	$week = date('w', $unix);       //РќРѕРјРµСЂ РїРµСЂРІРѕРіРѕ РґРЅСЏ РЅРµРґРµР»Рё
 	if(!$week)
 		$week = 7;
 
 	$days = _filterCalendarDays($el, $mon);
 
-	$weekNum = intval(date('W', $unix));    // Номер недели с начала месяца
+	$weekNum = intval(date('W', $unix));    // РќРѕРјРµСЂ РЅРµРґРµР»Рё СЃ РЅР°С‡Р°Р»Р° РјРµСЃСЏС†Р°
 
 	$range = _calendarWeek($mon.'-01');
 	$send = '<tr'.($range == $v ? ' class="sel"' : '').'>'.
 				'<td class="week-num" val="'.$range.'">'.$weekNum;
 
-	//Вставка пустых полей, если первый день недели не понедельник
+	//Р’СЃС‚Р°РІРєР° РїСѓСЃС‚С‹С… РїРѕР»РµР№, РµСЃР»Рё РїРµСЂРІС‹Р№ РґРµРЅСЊ РЅРµРґРµР»Рё РЅРµ РїРѕРЅРµРґРµР»СЊРЅРёРє
 	for($n = $week; $n > 1; $n--)
 		$send .= '<td>';
 
@@ -1385,7 +1437,7 @@ function _filterCalendarContent($el, $mon, $v) {
 		}
 	}
 
-	//Вставка пустых полей, если последняя неделя месяца заканчивается не воскресеньем
+	//Р’СЃС‚Р°РІРєР° РїСѓСЃС‚С‹С… РїРѕР»РµР№, РµСЃР»Рё РїРѕСЃР»РµРґРЅСЏСЏ РЅРµРґРµР»СЏ РјРµСЃСЏС†Р° Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ РЅРµ РІРѕСЃРєСЂРµСЃРµРЅСЊРµРј
 	if($week > 1)
 		for($n = $week; $n <= 7; $n++)
 			$send .= '<td>';
@@ -1393,11 +1445,11 @@ function _filterCalendarContent($el, $mon, $v) {
 	return
 	'<table class="w100p ">'.
 		'<tr class="week-name">'.
-			'<th>&nbsp;<td>пн<td>вт<td>ср<td>чт<td>пт<td>сб<td>вс'.
+			'<th>&nbsp;<td>РїРЅ<td>РІС‚<td>СЃСЂ<td>С‡С‚<td>РїС‚<td>СЃР±<td>РІСЃ'.
 		$send.
 	'</table>';
 }
-function _filterCalendarDays($el, $mon) {//отметка дней в календаре, по которым есть записи
+function _filterCalendarDays($el, $mon) {//РѕС‚РјРµС‚РєР° РґРЅРµР№ РІ РєР°Р»РµРЅРґР°СЂРµ, РїРѕ РєРѕС‚РѕСЂС‹Рј РµСЃС‚СЊ Р·Р°РїРёСЃРё
 	if(!$elem = _elemOne($el['num_1']))
 		return array();
 	if(!$dlg = _dialogQuery($elem['num_1']))
@@ -1420,7 +1472,7 @@ function _filterCalendarDays($el, $mon) {//отметка дней в календаре, по которым 
 
 function _calendarFilter($data=array()) {
 	$data = array(
-		'upd' => empty($data['upd']), // Обновлять существующий календать? (при перемотке масяцев)
+		'upd' => empty($data['upd']), // РћР±РЅРѕРІР»СЏС‚СЊ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ РєР°Р»РµРЅРґР°С‚СЊ? (РїСЂРё РїРµСЂРµРјРѕС‚РєРµ РјР°СЃСЏС†РµРІ)
 		'month' => empty($data['month']) ? strftime('%Y-%m') : $data['month'],
 		'sel' => empty($data['sel']) ? '' : $data['sel'],
 		'days' => empty($data['days']) ? array() : $data['days'],
@@ -1456,22 +1508,22 @@ function _calendarFilter($data=array()) {
 		'<table class="month">'.
 			'<tr class="week-name">'.
 				($data['noweek'] ? '' :'<th>&nbsp;').
-				'<td>пн<td>вт<td>ср<td>чт<td>пт<td>сб<td>вс';
+				'<td>РїРЅ<td>РІС‚<td>СЃСЂ<td>С‡С‚<td>РїС‚<td>СЃР±<td>РІСЃ';
 
 	$unix = strtotime($data['month'].'-01');
-	$dayCount = date('t', $unix);   // Количество дней в месяце
-	$week = date('w', $unix);       // Номер первого дня недели
+	$dayCount = date('t', $unix);   // РљРѕР»РёС‡РµСЃС‚РІРѕ РґРЅРµР№ РІ РјРµСЃСЏС†Рµ
+	$week = date('w', $unix);       // РќРѕРјРµСЂ РїРµСЂРІРѕРіРѕ РґРЅСЏ РЅРµРґРµР»Рё
 	if(!$week)
 		$week = 7;
 
 	$curDay = strftime('%Y-%m-%d');
-	$curUnix = strtotime($curDay); // Текущий день для выделения прошедших дней
-	$weekNum = intval(date('W', $unix));    // Номер недели с начала месяца
+	$curUnix = strtotime($curDay); // РўРµРєСѓС‰РёР№ РґРµРЅСЊ РґР»СЏ РІС‹РґРµР»РµРЅРёСЏ РїСЂРѕС€РµРґС€РёС… РґРЅРµР№
+	$weekNum = intval(date('W', $unix));    // РќРѕРјРµСЂ РЅРµРґРµР»Рё СЃ РЅР°С‡Р°Р»Р° РјРµСЃСЏС†Р°
 
 	$range = _calendarWeek($data['month'].'-01');
 	$send .= '<tr'.($range == $data['sel'] ? ' class="sel"' : '').'>'.
 		($data['noweek'] ? '' : '<td class="week-num" val="'.$range.'">'.$weekNum);
-	for($n = $week; $n > 1; $n--, $send .= '<td>'); // Вставка пустых полей, если первый день недели не понедельник
+	for($n = $week; $n > 1; $n--, $send .= '<td>'); // Р’СЃС‚Р°РІРєР° РїСѓСЃС‚С‹С… РїРѕР»РµР№, РµСЃР»Рё РїРµСЂРІС‹Р№ РґРµРЅСЊ РЅРµРґРµР»Рё РЅРµ РїРѕРЅРµРґРµР»СЊРЅРёРє
 	for($n = 1; $n <= $dayCount; $n++) {
 		$day = $data['month'].'-'.($n < 10 ? '0' : '').$n;
 		$cur = $curDay == $day ? ' cur' : '';
@@ -1490,7 +1542,7 @@ function _calendarFilter($data=array()) {
 		}
 	}
 	if($week > 1)
-		for($n = $week; $n <= 7; $n++, $send .= '<td>'); // Вставка пустых полей, если день заканчивается не воскресеньем
+		for($n = $week; $n <= 7; $n++, $send .= '<td>'); // Р’СЃС‚Р°РІРєР° РїСѓСЃС‚С‹С… РїРѕР»РµР№, РµСЃР»Рё РґРµРЅСЊ Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ РЅРµ РІРѕСЃРєСЂРµСЃРµРЅСЊРµРј
 	$send .= '</table>'.($data['upd'] ? '</div></div>' : '');
 
 	return $send;
@@ -1505,7 +1557,7 @@ function _calendarDataCheck($data) {
 		return true;
 	return false;
 }
-function _calendarPeriod($data) {// Формирование периода для элементов массива запросившего фильтра
+function _calendarPeriod($data) {// Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РїРµСЂРёРѕРґР° РґР»СЏ СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР° Р·Р°РїСЂРѕСЃРёРІС€РµРіРѕ С„РёР»СЊС‚СЂР°
 	$send = array(
 		'period' => $data,
 		'day' => '',
@@ -1522,17 +1574,17 @@ function _calendarPeriod($data) {// Формирование периода для элементов массива з
 		'to' => $ex[1]
 	) + $send;
 }
-function _calendarWeek($day=TODAY) {// Формирование периода за неделю недели
+function _calendarWeek($day=TODAY) {// Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РїРµСЂРёРѕРґР° Р·Р° РЅРµРґРµР»СЋ РЅРµРґРµР»Рё
 	$d = explode('-', $day);
 	$month = $d[0].'-'.$d[1];
 
 	$unix = strtotime($day);
-	$dayCount = date('t', $unix);   // Количество дней в месяце
+	$dayCount = date('t', $unix);   // РљРѕР»РёС‡РµСЃС‚РІРѕ РґРЅРµР№ РІ РјРµСЃСЏС†Рµ
 	$week = date('w', $unix);
 	if(!$week)
 		$week = 7;
 
-	$dayStart = $d[2] - $week + 1; // Номер первого дня недели
+	$dayStart = $d[2] - $week + 1; // РќРѕРјРµСЂ РїРµСЂРІРѕРіРѕ РґРЅСЏ РЅРµРґРµР»Рё
 	if($dayStart < 1) {
 		$back = $d[1] - 1;
 		$back = !$back ? ($d[0] - 1).'-12' : $d[0].'-'.($back < 10 ? 0 : '').$back;
@@ -1540,7 +1592,7 @@ function _calendarWeek($day=TODAY) {// Формирование периода за неделю недели
 	} else
 		$start = $month.'-'.($dayStart < 10 ? 0 : '').$dayStart;
 
-	$dayEnd = 7 - $week + $d[2]; // Номер последнего дня недели
+	$dayEnd = 7 - $week + $d[2]; // РќРѕРјРµСЂ РїРѕСЃР»РµРґРЅРµРіРѕ РґРЅСЏ РЅРµРґРµР»Рё
 	if($dayEnd > $dayCount) {
 		$next = $d[1] + 1;
 		$next = $next > 12 ? ($d[0] + 1).'-01' : $d[0].'-'.($next < 10 ? 0 : '').$next;
@@ -1550,7 +1602,7 @@ function _calendarWeek($day=TODAY) {// Формирование периода за неделю недели
 
 	return $start.':'.$end;
 }
-function _period($v=0, $action='get') {// Формирование периода для элементов массива запросившего фильтра
+function _period($v=0, $action='get') {// Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РїРµСЂРёРѕРґР° РґР»СЏ СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР° Р·Р°РїСЂРѕСЃРёРІС€РµРіРѕ С„РёР»СЊС‚СЂР°
 	/*
 		$i: get, sql
 	*/
@@ -1575,30 +1627,30 @@ function _period($v=0, $action='get') {// Формирование периода для элементов мас
 
 
 
-function _filterMenu($el) {//фильтр-меню
+function _filterMenu($el) {//С„РёР»СЊС‚СЂ-РјРµРЅСЋ
 	if(!$el['num_2'])
-		return _emptyMin('Фильтр-меню: отсутствует ID элемента, содержащий значения.');
+		return _emptyMin('Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ: РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ ID СЌР»РµРјРµРЅС‚Р°, СЃРѕРґРµСЂР¶Р°С‰РёР№ Р·РЅР°С‡РµРЅРёСЏ.');
 	if(!$ell = _elemOne($el['num_2']))
-		return _emptyMin('Фильтр-меню: отсутствует элемент, содержащий значения.');
+		return _emptyMin('Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ: РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ СЌР»РµРјРµРЅС‚, СЃРѕРґРµСЂР¶Р°С‰РёР№ Р·РЅР°С‡РµРЅРёСЏ.');
 	if(!$ids = _ids($ell['txt_2'], 1))
-		return _emptyMin('Фильтр-меню: отсутствуют ID значений.');
+		return _emptyMin('Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ: РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ ID Р·РЅР°С‡РµРЅРёР№.');
 
 	$c = count($ids) - 1;
 	$elem_id = $ids[$c];
 
 	if(!$EL = _elemOne($elem_id))
-		return _emptyMin('Фильтр-меню: значение отсутствует.');
+		return _emptyMin('Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ: Р·РЅР°С‡РµРЅРёРµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚.');
 	if(!$BL = $EL['block'])
-		return _emptyMin('Фильтр-меню: нет блока.');
+		return _emptyMin('Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ: РЅРµС‚ Р±Р»РѕРєР°.');
 	if($BL['obj_name'] != 'dialog')
-		return _emptyMin('Фильтр-меню: блок не из диалога.');
+		return _emptyMin('Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ: Р±Р»РѕРє РЅРµ РёР· РґРёР°Р»РѕРіР°.');
 	if(!$dialog_id = $BL['obj_id'])
-		return _emptyMin('Фильтр-меню: нет ID диалога.');
+		return _emptyMin('Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ: РЅРµС‚ ID РґРёР°Р»РѕРіР°.');
 	if(!$dialog = _dialogQuery($dialog_id))
-		return _emptyMin('Фильтр-меню: нет диалога.');
+		return _emptyMin('Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ: РЅРµС‚ РґРёР°Р»РѕРіР°.');
 
-	$col = $EL['col'];//колонка текстового значения
-	$colCount = '';//колонка значения количества
+	$col = $EL['col'];//РєРѕР»РѕРЅРєР° С‚РµРєСЃС‚РѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ
+	$colCount = '';//РєРѕР»РѕРЅРєР° Р·РЅР°С‡РµРЅРёСЏ РєРѕР»РёС‡РµСЃС‚РІР°
 	if($el3 = _elemOne($el['num_3']))
 		if($ids = _ids($el3['txt_2'], 1)) {
 			$c = count($ids) - 1;
@@ -1617,7 +1669,7 @@ function _filterMenu($el) {//фильтр-меню
 			WHERE ".$cond."
 			ORDER BY `sort`,`id`";
 	if(!$arr = query_arr($sql))
-		return _emptyMin('Фильтр-меню: пустое меню.');
+		return _emptyMin('Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ: РїСѓСЃС‚РѕРµ РјРµРЅСЋ.');
 
 	$send = '';
 	$v = _spisokFilter('v', $el['id']);
@@ -1628,7 +1680,7 @@ function _filterMenu($el) {//фильтр-меню
 
 	foreach($spisok[0] as $r) {
 		$child = '';
-		$child_sel = false;//список будет раскрыт, если в нём был выбранное значение
+		$child_sel = false;//СЃРїРёСЃРѕРє Р±СѓРґРµС‚ СЂР°СЃРєСЂС‹С‚, РµСЃР»Рё РІ РЅС‘Рј Р±С‹Р» РІС‹Р±СЂР°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 		if(!empty($spisok[$r['id']]))
 			foreach($spisok[$r['id']] as $c) {
 				$sel = $v == $c['id'] ? ' sel' : '';
@@ -1644,7 +1696,7 @@ function _filterMenu($el) {//фильтр-меню
 		$send .=
 			'<table class="w100p">'.
 				'<tr>'.
-		  ($child ? '<td class="fm-plus">'.($child_sel ? '-' : '+') : '<td class="w25">').//—
+		  ($child ? '<td class="fm-plus">'.($child_sel ? '-' : '+') : '<td class="w25">').//вЂ”
 					'<td><div class="fm-unit b fs14'.$sel.'" val="'.$r['id'].'">'.
 							$r[$col].
 							($colCount ? '<span class="ml10 pale b">'.$r[$colCount].'</span>' : '').
@@ -1663,7 +1715,7 @@ function _filterMenu($el) {//фильтр-меню
 
 
 
-function _note($el) {//заметки
+function _note($el) {//Р·Р°РјРµС‚РєРё
 	$page_id = _page('cur');
 	$obj_id = _num(@$_GET['id']);
 	return
@@ -1672,7 +1724,7 @@ function _note($el) {//заметки
 			'<div class="note-ok"></div>'.
 			'<div class="icon icon-ok spin"></div>'.
 			'<div class="_note-txt">'.
-				'<textarea placeholder="напишите заметку..." /></textarea>'.
+				'<textarea placeholder="РЅР°РїРёС€РёС‚Рµ Р·Р°РјРµС‚РєСѓ..." /></textarea>'.
 			'</div>'.
 		'</div>'.
 		'<div class="_note-list">'._noteList($page_id, $obj_id).'</div>'.
@@ -1704,7 +1756,7 @@ function _noteList($page_id, $obj_id) {
 	$send = '';
 	$n = 0;
 	foreach($arr as $r) {
-		$cmnt = $r['comment'] ? 'Комментарии '.count($r['comment']) : 'Комментировать';
+		$cmnt = $r['comment'] ? 'РљРѕРјРјРµРЅС‚Р°СЂРёРё '.count($r['comment']) : 'РљРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ';
 		$comment = '';
 		foreach($r['comment'] as $c)
 			$comment .= _noteCommentUnit($c);
@@ -1715,8 +1767,8 @@ function _noteList($page_id, $obj_id) {
 						'<tr><td class="w35">'.
 								'<img class="ava40" src="'._user($r['user_id_add'], 'src').'">'.
 							'<td>'.
-								'<div class="note-del icon icon-del pl fr'._tooltip('Удалить заметку', -91, 'r').'</div>'.
-								'<div val="dialog_id:81,unit_id:'.$r['id'].'" class="dialog-open icon icon-edit pl fr'._tooltip('Изменить заметку', -98, 'r').'</div>'.
+								'<div class="note-del icon icon-del pl fr'._tooltip('РЈРґР°Р»РёС‚СЊ Р·Р°РјРµС‚РєСѓ', -91, 'r').'</div>'.
+								'<div val="dialog_id:81,unit_id:'.$r['id'].'" class="dialog-open icon icon-edit pl fr'._tooltip('РР·РјРµРЅРёС‚СЊ Р·Р°РјРµС‚РєСѓ', -98, 'r').'</div>'.
 								'<a class="b">'._user($r['user_id_add'], 'name').'</a>'.
 								'<div class="pale mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
 						'<tr>'.
@@ -1730,7 +1782,7 @@ function _noteList($page_id, $obj_id) {
 						$comment.
 						'<table class="w100p">'.
 							'<tr><td><div class="_comment-txt">'.
-										'<textarea placeholder="комментировать.." /></textarea>'.
+										'<textarea placeholder="РєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ.." /></textarea>'.
 									'</div>'.
 								'<td class="w35 bottom">'.
 									'<div class="icon icon-empty spin ml5 mb5"></div>'.
@@ -1739,8 +1791,8 @@ function _noteList($page_id, $obj_id) {
 					'</div>'.
 				'</div>'.
 				'<div class="_note-is-del">'.
-					'Заметка удалена.'.
-					'<a class="note-rest ml10">Восстановить</a>'.
+					'Р—Р°РјРµС‚РєР° СѓРґР°Р»РµРЅР°.'.
+					'<a class="note-rest ml10">Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ</a>'.
 				'</div>'.
 			'</div>';
 		$n++;
@@ -1748,7 +1800,7 @@ function _noteList($page_id, $obj_id) {
 
 	return $send;
 }
-function _noteCommentUnit($c) {//html одного комментария
+function _noteCommentUnit($c) {//html РѕРґРЅРѕРіРѕ РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
 	return
 	'<div class="_comment-u">'.
 		'<table class="_comment-is-show bs5 w100p">'.
@@ -1765,8 +1817,8 @@ function _noteCommentUnit($c) {//html одного комментария
 				'<td colspan="2">'._br($c['txt']).
 		'</table>'.
 		'<div class="_comment-is-del">'.
-			'Комментарий удалён.'.
-			'<a class="comment-rest ml10" onclick="_noteCRest(this,'.$c['id'].')">Восстановить</a>'.
+			'РљРѕРјРјРµРЅС‚Р°СЂРёР№ СѓРґР°Р»С‘РЅ.'.
+			'<a class="comment-rest ml10" onclick="_noteCRest(this,'.$c['id'].')">Р’РѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ</a>'.
 		'</div>'.
 	'</div>';
 }

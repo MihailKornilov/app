@@ -1,20 +1,20 @@
 <?php
 switch(@$_POST['op']) {
-	case 'spisok_add'://внесение единицы списка из диалога
+	case 'spisok_add'://РІРЅРµСЃРµРЅРёРµ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР° РёР· РґРёР°Р»РѕРіР°
 		$send = _spisokUnitUpdate();
 		jsonSuccess($send);
 		break;
-	case 'spisok_save'://сохранение данных единицы списка для диалога
+	case 'spisok_save'://СЃРѕС…СЂР°РЅРµРЅРёРµ РґР°РЅРЅС‹С… РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР° РґР»СЏ РґРёР°Р»РѕРіР°
 		if(!$unit_id = _num($_POST['unit_id'], 1))
-			jsonError('Некорректный id единицы списка');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ id РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°');
 
 		$send = _spisokUnitUpdate($unit_id);
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_del'://удаление единицы списка
+	case 'spisok_del'://СѓРґР°Р»РµРЅРёРµ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 		if(!$unit_id = _num($_POST['unit_id']))
-			jsonError('Некорректный id единицы списка');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ id РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°');
 
 		$dialog = _spisokUnitDialog($unit_id);
 
@@ -33,18 +33,18 @@ switch(@$_POST['op']) {
 			_spisokUnitAfter($dialog, $unit_id);
 		} else {
 			$elem = array();
-			if(_table($dialog['table_1']) == '_element') {//если это элемент
+			if(_table($dialog['table_1']) == '_element') {//РµСЃР»Рё СЌС‚Рѕ СЌР»РµРјРµРЅС‚
 				$elem = _elemOne($unit_id);
-				//удаление значений
+				//СѓРґР°Р»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№
 				$sql = "DELETE FROM `_element` WHERE `block_id`=-".$unit_id;
 				query($sql);
-				//удаление функций
+				//СѓРґР°Р»РµРЅРёРµ С„СѓРЅРєС†РёР№
 				$sql = "DELETE FROM `_element_func` WHERE `block_id`=".$elem['block_id'];
 				query($sql);
-				//удаление фильтров
+				//СѓРґР°Р»РµРЅРёРµ С„РёР»СЊС‚СЂРѕРІ
 				$sql = "DELETE FROM `_user_spisok_filter` WHERE `element_id_filter`=".$unit_id;
 				query($sql);
-				//установка позиции в блоке по умолчанию
+				//СѓСЃС‚Р°РЅРѕРІРєР° РїРѕР·РёС†РёРё РІ Р±Р»РѕРєРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 				$sql = "UPDATE `_block` SET `pos`='top' WHERE `id`=".$elem['block_id'];
 				query($sql);
 			}
@@ -55,14 +55,14 @@ switch(@$_POST['op']) {
 			$sql = "DELETE FROM `"._table($dialog['table_1'])."` WHERE `id`=".$unit_id;
 			query($sql);
 
-			//обновление кеша объекта, если это элемент
+			//РѕР±РЅРѕРІР»РµРЅРёРµ РєРµС€Р° РѕР±СЉРµРєС‚Р°, РµСЃР»Рё СЌС‚Рѕ СЌР»РµРјРµРЅС‚
 			if($elem) {
 				_BE('block_clear');
 				_BE('elem_clear');
-				_spisokFilter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
+				_spisokFilter('cache_clear');//СЃР±СЂРѕСЃ РєРµС€Р° С„РёР»СЊС‚СЂР°, С‚Р°Рє РєР°Рє РІРѕР·РјРѕР¶РЅРѕ Р±С‹Р» СѓРґР°Р»С‘РЅ С„РёР»СЊС‚СЂ
 			}
 
-			//обновление кеша объекта, если это страница
+			//РѕР±РЅРѕРІР»РµРЅРёРµ РєРµС€Р° РѕР±СЉРµРєС‚Р°, РµСЃР»Рё СЌС‚Рѕ СЃС‚СЂР°РЅРёС†Р°
 			if($dialog['table_name_1'] == '_page')
 				_cache_clear( 'page');
 
@@ -75,17 +75,17 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_filter_update'://обновление списка после применения фильтра
+	case 'spisok_filter_update'://РѕР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРєР° РїРѕСЃР»Рµ РїСЂРёРјРµРЅРµРЅРёСЏ С„РёР»СЊС‚СЂР°
 		if(!$elem_spisok = _num($_POST['elem_spisok']))
-			jsonError('Некорректный ID элемента-списка');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID СЌР»РµРјРµРЅС‚Р°-СЃРїРёСЃРєР°');
 		if(!$elSpisok = _elemOne($elem_spisok))
-			jsonError('Элемента-списка id'.$elem_spisok.' не существует');
+			jsonError('Р­Р»РµРјРµРЅС‚Р°-СЃРїРёСЃРєР° id'.$elem_spisok.' РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 		if($elSpisok['dialog_id'] != 14 && $elSpisok['dialog_id'] != 23)
-			jsonError('Элемент id'.$elem_spisok.' не является списком');
+			jsonError('Р­Р»РµРјРµРЅС‚ id'.$elem_spisok.' РЅРµ СЏРІР»СЏРµС‚СЃСЏ СЃРїРёСЃРєРѕРј');
 		if(!$elem_v = $_POST['elem_v'])
-			jsonError('Отсутствуют значения фильтров');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ Р·РЅР°С‡РµРЅРёСЏ С„РёР»СЊС‚СЂРѕРІ');
 		if(!is_array($elem_v))
-			jsonError('Некорректные значения фильров');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ С„РёР»СЊСЂРѕРІ');
 
 		foreach($elem_v as $elem_filter => $v) {
 			if(!_num($elem_filter))
@@ -98,7 +98,7 @@ switch(@$_POST['op']) {
 			));
 		}
 
-		//элемент количества, привязанный к списку
+		//СЌР»РµРјРµРЅС‚ РєРѕР»РёС‡РµСЃС‚РІР°, РїСЂРёРІСЏР·Р°РЅРЅС‹Р№ Рє СЃРїРёСЃРєСѓ
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `dialog_id`=15
@@ -106,10 +106,10 @@ switch(@$_POST['op']) {
 				LIMIT 1";
 		if($elCount = query_assoc($sql)) {
 			$send['count_attr'] = '#el_'.$elCount['id'];
-			$send['count_html'] = utf8(_spisokElemCount($elCount));
+			$send['count_html'] = _spisokElemCount($elCount);
 		}
 
-		//элемент "очистка фильтра", привязанный к списку
+		//СЌР»РµРјРµРЅС‚ "РѕС‡РёСЃС‚РєР° С„РёР»СЊС‚СЂР°", РїСЂРёРІСЏР·Р°РЅРЅС‹Р№ Рє СЃРїРёСЃРєСѓ
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `dialog_id`=80
@@ -121,14 +121,14 @@ switch(@$_POST['op']) {
 		}
 
 		$send['spisok_attr'] = '#el_'.$elem_spisok;
-		$send['spisok_html'] = utf8(_spisokShow($elSpisok));
+		$send['spisok_html'] = _spisokShow($elSpisok);
 		jsonSuccess($send);
 		break;
-	case 'spisok_filter_clear'://очистка фильтра
+	case 'spisok_filter_clear'://РѕС‡РёСЃС‚РєР° С„РёР»СЊС‚СЂР°
 		if(!$spisok_id = _num($_POST['spisok_id']))
-			jsonError('Некорректный ID элемента-списка');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID СЌР»РµРјРµРЅС‚Р°-СЃРїРёСЃРєР°');
 		if(!$elSpisok = _elemOne($spisok_id))
-			jsonError('Элемента-списка id'.$spisok_id.' не существует');
+			jsonError('Р­Р»РµРјРµРЅС‚Р°-СЃРїРёСЃРєР° id'.$spisok_id.' РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		$sql = "UPDATE `_user_spisok_filter`
 				SET `v`=`def`
@@ -138,7 +138,7 @@ switch(@$_POST['op']) {
 
 		_spisokFilter('cache_clear');
 
-		//элемент количества, привязанный к списку
+		//СЌР»РµРјРµРЅС‚ РєРѕР»РёС‡РµСЃС‚РІР°, РїСЂРёРІСЏР·Р°РЅРЅС‹Р№ Рє СЃРїРёСЃРєСѓ
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `dialog_id`=15
@@ -146,13 +146,13 @@ switch(@$_POST['op']) {
 				LIMIT 1";
 		if($elCount = query_assoc($sql)) {
 			$send['count_attr'] = '#el_'.$elCount['id'];
-			$send['count_html'] = utf8(_spisokElemCount($elCount));
+			$send['count_html'] = _spisokElemCount($elCount);
 		}
 
 		$send['spisok_attr'] = '#el_'.$spisok_id;
-		$send['spisok_html'] = utf8(_spisokShow($elSpisok));
+		$send['spisok_html'] = _spisokShow($elSpisok);
 
-		//значения по умолчанию для фильтров списка
+		//Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РґР»СЏ С„РёР»СЊС‚СЂРѕРІ СЃРїРёСЃРєР°
 		$send['def'] = array();
 		foreach(_spisokFilter('spisok', $spisok_id) as $r) {
 			$dialog_id = _num($r['elem']['dialog_id']);
@@ -162,8 +162,8 @@ switch(@$_POST['op']) {
 				$mon = substr($v, 0, 7);
 				$dop = array(
 					'mon' => $mon,
-					'td_mon' => utf8(_filterCalendarMon($mon)),
-					'cnt' => utf8(_filterCalendarContent($r['elem'], $mon, $v))
+					'td_mon' => _filterCalendarMon($mon),
+					'cnt' => _filterCalendarContent($r['elem'], $mon, $v)
 				);
 			}
 			$send['def'][] = array(
@@ -175,62 +175,62 @@ switch(@$_POST['op']) {
 			);
 		}
 
-		$send['filter'] = utf8(_spisokFilter('page_js'));
+		$send['filter'] = _spisokFilter('page_js');
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_next'://догрузка списка
+	case 'spisok_next'://РґРѕРіСЂСѓР·РєР° СЃРїРёСЃРєР°
 		if(!$elem_id = _num($_POST['elem_id']))
-			jsonError('Некорректный ID элемента станицы');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID СЌР»РµРјРµРЅС‚Р° СЃС‚Р°РЅРёС†С‹');
 		if(!$next = _num($_POST['next']))
-			jsonError('Некорректное значение очередного блока');
-		//получение данных элемента поиска
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РѕС‡РµСЂРµРґРЅРѕРіРѕ Р±Р»РѕРєР°');
+		//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚Р° РїРѕРёСЃРєР°
 		if(!$el = _elemOne($elem_id))
-			jsonError('Элемента id'.$elem_id.' не существует');
+			jsonError('Р­Р»РµРјРµРЅС‚Р° id'.$elem_id.' РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 		if($el['dialog_id'] != 14 && $el['dialog_id'] != 23)
-			jsonError('Элемент не является списком');
+			jsonError('Р­Р»РµРјРµРЅС‚ РЅРµ СЏРІР»СЏРµС‚СЃСЏ СЃРїРёСЃРєРѕРј');
 		if(!$el['block'])
-			jsonError('Отсутствует блок списка');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ Р±Р»РѕРє СЃРїРёСЃРєР°');
 
 		$send['is_table'] = $el['dialog_id'] == 23;
-		$send['spisok'] = utf8(_spisokShow($el, $next));
+		$send['spisok'] = _spisokShow($el, $next);
 		jsonSuccess($send);
 		break;
 	case 'spisok_29_connect':
 		if(!$cmp_id = _num($_POST['cmp_id']))
-			jsonError('Некорректный ID компонента диалога');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РєРѕРјРїРѕРЅРµРЅС‚Р° РґРёР°Р»РѕРіР°');
 
 		$v = _txt($_POST['v']);
 
-		$send['spisok'] = utf8(_spisok29connect($cmp_id, $v));
+		$send['spisok'] = _spisok29connect($cmp_id, $v);
 		jsonSuccess($send);
 		break;
 	case 'spisok_59_unit':
 		if(!$cmp_id = _num($_POST['cmp_id']))
-			jsonError('Некорректный ID компонента');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РєРѕРјРїРѕРЅРµРЅС‚Р°');
 		if(!$unit_id = _num($_POST['unit_id']))
-			jsonError('Некорректный ID выбранного элемента');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РІС‹Р±СЂР°РЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°');
 
-		$send['html'] = utf8(_spisok59unit($cmp_id, $unit_id));
+		$send['html'] = _spisok59unit($cmp_id, $unit_id);
 		jsonSuccess($send);
 		break;
 	case 'spisok_23_sort':
 		if(!$elem_id = _num($_POST['elem_id']))
-			jsonError('Некорректный ID элемента');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID СЌР»РµРјРµРЅС‚Р°');
 		if(!$el = _elemOne($elem_id))
-			jsonError('Элемента id'.$elem_id.' не существует');
+			jsonError('Р­Р»РµРјРµРЅС‚Р° id'.$elem_id.' РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 		if($el['dialog_id'] != 23)
-			jsonError('Элемент не является списком-таблицей');
+			jsonError('Р­Р»РµРјРµРЅС‚ РЅРµ СЏРІР»СЏРµС‚СЃСЏ СЃРїРёСЃРєРѕРј-С‚Р°Р±Р»РёС†РµР№');
 		if(!$dialog_id = _num($el['num_1']))
-			jsonError('Отсутствует ID диалога');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ ID РґРёР°Р»РѕРіР°');
 		if(!$dialog = _dialogQuery($dialog_id))
-			jsonError('Диалога не существует');
+			jsonError('Р”РёР°Р»РѕРіР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		$arr = $_POST['arr'];
 		if(empty($arr))
-			jsonError('Отсутствуют значения для сортировки');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ Р·РЅР°С‡РµРЅРёСЏ РґР»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё');
 		if(!is_array($arr))
-			jsonError('Значения не являются массивом');
+			jsonError('Р—РЅР°С‡РµРЅРёСЏ РЅРµ СЏРІР»СЏСЋС‚СЃСЏ РјР°СЃСЃРёРІРѕРј');
 
 		foreach($arr as $n => $r) {
 			if(!$id = _num($r['id']))
@@ -246,11 +246,11 @@ switch(@$_POST['op']) {
 			query($sql);
 		}
 
-		//обновление количеств, если присутствуют
+		//РѕР±РЅРѕРІР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІ, РµСЃР»Рё РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‚
 		foreach($dialog['cmp'] as $r)
 			_spisokUnitUpd54($r);
 
-		//очистка кеша страниц
+		//РѕС‡РёСЃС‚РєР° РєРµС€Р° СЃС‚СЂР°РЅРёС†
 		if($dialog['table_name_1'] == '_page')
 			_cache_clear('page');
 
@@ -258,33 +258,33 @@ switch(@$_POST['op']) {
 		break;
 }
 
-function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка
+function _spisokUnitDialog($unit_id) {//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… Рѕ РґРёР°Р»РѕРіРµ Рё РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	if(!$dialog_id = _num($_POST['dialog_id']))
-		jsonError('Некорректный ID диалогового окна');
+		jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°');
 	if(!$dialog = _dialogQuery($dialog_id))
-		jsonError('Диалога не существует');
+		jsonError('Р”РёР°Р»РѕРіР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 	if($dialog['sa'] && !SA)
-		jsonError('Нет доступа');
+		jsonError('РќРµС‚ РґРѕСЃС‚СѓРїР°');
 
 	if(!$dialog['table_1'])
 		return $dialog;
 
-	//проверка наличия таблицы для внесения данных
+	//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ С‚Р°Р±Р»РёС†С‹ РґР»СЏ РІРЅРµСЃРµРЅРёСЏ РґР°РЅРЅС‹С…
 	$sql = "SHOW TABLES LIKE '"._table($dialog['table_1'])."'";
 	if(!mysql_num_rows(query($sql)))
-		jsonError('Таблицы не существует');
+		jsonError('РўР°Р±Р»РёС†С‹ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
-	//получение данных единицы списка, если редактируется
+	//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°, РµСЃР»Рё СЂРµРґР°РєС‚РёСЂСѓРµС‚СЃСЏ
 	if($unit_id > 0) {
 		if(!$r = _spisokUnitQuery($dialog, $unit_id))
-			jsonError('Записи не существует');
+			jsonError('Р—Р°РїРёСЃРё РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 		if(@$r['deleted'])
-			jsonError('Запись была удалена');
+			jsonError('Р—Р°РїРёСЃСЊ Р±С‹Р»Р° СѓРґР°Р»РµРЅР°');
 	}
 
 	return $dialog;
 }
-function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
+function _spisokUnitUpdate($unit_id=0) {//РІРЅРµСЃРµРЅРёРµ/СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	$dialog = _spisokUnitDialog($unit_id);
 	$unitOld = _spisokUnitQuery($dialog, $unit_id);
 
@@ -302,14 +302,14 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 
 
-	// ---=== СЕКЦИЯ ОБНОВЛЕНИЯ ДАННЫХ ===---
+	// ---=== РЎР•РљР¦РРЇ РћР‘РќРћР’Р›Р•РќРРЇ Р”РђРќРќР«РҐ ===---
 
 	_elementFocusClear($dialog, $POST_CMP, $unit_id);
 	_pageDefClear($dialog, $POST_CMP);
 
 	_spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id);
 
-	//получение обновлённых данных единицы списка
+	//РїРѕР»СѓС‡РµРЅРёРµ РѕР±РЅРѕРІР»С‘РЅРЅС‹С… РґР°РЅРЅС‹С… РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	$unit = _spisokUnitQuery($dialog, $unit_id);
 
 	if(IS_ELEM) {
@@ -326,26 +326,26 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$cmpv = @$_POST['cmpv'];
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
-			//---=== ДЕЙСТВИЯ ПРИ НАСТРОЙКИ ЭЛЕМЕНТОВ ===---
-			//конкретная функция
+			//---=== Р”Р•Р™РЎРўР’РРЇ РџР Р РќРђРЎРўР РћР™РљР Р­Р›Р•РњР•РќРўРћР’ ===---
+			//РєРѕРЅРєСЂРµС‚РЅР°СЏ С„СѓРЅРєС†РёСЏ
 			case 12:
 				$funcSave = $cmp['txt_1'].'Save';
 				if(!function_exists($funcSave))
 					break;
 				$funcSave($cmp, $cmpv[$cmp_id], $unit);
 				break;
-			//наполнение для некоторых компонентов: radio, select, dropdown
+			//РЅР°РїРѕР»РЅРµРЅРёРµ РґР»СЏ РЅРµРєРѕС‚РѕСЂС‹С… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ: radio, select, dropdown
 			case 19: _cmpV19($cmpv[$cmp_id], $unit); break;
-			//Настройка ТАБЛИЧНОГО содержания списка
+			//РќР°СЃС‚СЂРѕР№РєР° РўРђР‘Р›РР§РќРћР“Рћ СЃРѕРґРµСЂР¶Р°РЅРёСЏ СЃРїРёСЃРєР°
 			case 30: _cmpV30($cmp, $cmpv[$cmp_id], $unit); break;
 			case 49: _cmpV49($cmp, $cmpv[$cmp_id], $unit); break;
-			//Настройка суммы значений единицы списка
+			//РќР°СЃС‚СЂРѕР№РєР° СЃСѓРјРјС‹ Р·РЅР°С‡РµРЅРёР№ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 			case 56: _cmpV56($cmp, $cmpv[$cmp_id], $unit); break;
-			//количество значений связанного списка
-			case 54: /* сделать пересчёт значения */ break;
-			//Настройка пунктов меню переключения блоков
+			//РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°С‡РµРЅРёР№ СЃРІСЏР·Р°РЅРЅРѕРіРѕ СЃРїРёСЃРєР°
+			case 54: /* СЃРґРµР»Р°С‚СЊ РїРµСЂРµСЃС‡С‘С‚ Р·РЅР°С‡РµРЅРёСЏ */ break;
+			//РќР°СЃС‚СЂРѕР№РєР° РїСѓРЅРєС‚РѕРІ РјРµРЅСЋ РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ Р±Р»РѕРєРѕРІ
 			case 58: _cmpV58($cmpv[$cmp_id], $unit); break;
-			//Применение загруженных изображений
+			//РџСЂРёРјРµРЅРµРЅРёРµ Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
 			case 60: _cmpV60($cmp, $unit); break;
 		}
 
@@ -373,7 +373,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	_app_create($dialog, $unit_id);
 
 	$send = array(
-		'unit' => utf8($unit),
+		'unit' => $unit,
 		'action_id' => _num($dialog[$act.'_action_id']),
 		'action_page_id' => _num($dialog[$act.'_action_page_id'])
 	);
@@ -383,7 +383,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 
 	return $send;
 }
-function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалога
+function _spisokUnitCmpTest($dialog) {//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РґРёР°Р»РѕРіР°
 	$dlgParent = $dialog;
 
 	if($parent_id = $dialog['dialog_parent_id'])
@@ -397,39 +397,39 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 	if($dialog['cmp_no_req'] && empty($POST_CMP))
 		return array();
 //	if(empty($POST_CMP))
-//		jsonError('Нет данных для внесения');
+//		jsonError('РќРµС‚ РґР°РЅРЅС‹С… РґР»СЏ РІРЅРµСЃРµРЅРёСЏ');
 	if(!is_array($POST_CMP))
-		jsonError('Компоненты диалога не являются массивом');
+		jsonError('РљРѕРјРїРѕРЅРµРЅС‚С‹ РґРёР°Р»РѕРіР° РЅРµ СЏРІР»СЏСЋС‚СЃСЏ РјР°СЃСЃРёРІРѕРј');
 
 	$send = array();
 	foreach($POST_CMP as $cmp_id => $val) {
 		if(!$cmp_id = _num($cmp_id))
-			jsonError('Некорректный id компонента диалога');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ id РєРѕРјРїРѕРЅРµРЅС‚Р° РґРёР°Р»РѕРіР°');
 		if(!$cmp = @$dialog['cmp'][$cmp_id])
-			jsonError('Отсутствует компонент id'.$cmp_id.' в диалоге');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РєРѕРјРїРѕРЅРµРЅС‚ id'.$cmp_id.' РІ РґРёР°Р»РѕРіРµ');
 		if(!$col = @$cmp['col'])
 			continue;
 /*			jsonError(array(
 				'attr_cmp' => $cmp['attr_cmp']._dialogParam($cmp['dialog_id'], 'element_afics'),
-				'text' => utf8('Отсутствует имя колонки в компоненте id'.$cmp_id)
+				'text' => 'РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РёРјСЏ РєРѕР»РѕРЅРєРё РІ РєРѕРјРїРѕРЅРµРЅС‚Рµ id'.$cmp_id
 			));
 */
 		if(!isset($dlgParent['field1'][$col]) && !isset($dlgParent['field2'][$col]))
-			jsonError('В таблице отсутствует колонка с именем "'.$col.'"');
+			jsonError('Р’ С‚Р°Р±Р»РёС†Рµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РєРѕР»РѕРЅРєР° СЃ РёРјРµРЅРµРј "'.$col.'"');
 
 		$v = _txt($val);
 
-		//массив для отправки ошибки
+		//РјР°СЃСЃРёРІ РґР»СЏ РѕС‚РїСЂР°РІРєРё РѕС€РёР±РєРё
 		$is_err = 0;
-		$err_msg = $cmp['req_msg'] ? $cmp['req_msg'] : 'Необходимо заполнить поле,<br>либо выбрать значение';
+		$err_msg = $cmp['req_msg'] ? $cmp['req_msg'] : 'РќРµРѕР±С…РѕРґРёРјРѕ Р·Р°РїРѕР»РЅРёС‚СЊ РїРѕР»Рµ,<br>Р»РёР±Рѕ РІС‹Р±СЂР°С‚СЊ Р·РЅР°С‡РµРЅРёРµ';
 
 		switch($cmp['dialog_id']) {
-			case 8://текстовое поле
+			case 8://С‚РµРєСЃС‚РѕРІРѕРµ РїРѕР»Рµ
 				if($cmp['req'] && !strlen($v))
 					$is_err = 1;
-				if($cmp['num_1'] == 32)//любой текст
+				if($cmp['num_1'] == 32)//Р»СЋР±РѕР№ С‚РµРєСЃС‚
 					break;
-				if($cmp['num_1'] != 33)//цифры и числа
+				if($cmp['num_1'] != 33)//С†РёС„СЂС‹ Рё С‡РёСЃР»Р°
 					break;
 
 				$v = round($v, $cmp['num_2']);
@@ -437,7 +437,7 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 					$is_err = 1;
 				if($v < 0 && !$cmp['num_3']) {
 					$is_err = 1;
-					$err_msg = 'Значение не может быть отрицательным';
+					$err_msg = 'Р—РЅР°С‡РµРЅРёРµ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј';
 				}
 				break;
 			default:
@@ -456,18 +456,18 @@ function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалог
 		if($is_err)
 			jsonError(array(
 				'attr_cmp' => $cmp['attr_cmp']._dialogParam($cmp['dialog_id'], 'element_afics'),
-				'text' => utf8($err_msg)
+				'text' => $err_msg
 			));
 
 		$send[$cmp_id] = $v;
 	}
 
 	if(!$send)
-		jsonError('Нет данных для внесения');
+		jsonError('РќРµС‚ РґР°РЅРЅС‹С… РґР»СЏ РІРЅРµСЃРµРЅРёСЏ');
 
 	return $send;
 }
-function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой единицы списка, если отсутствует
+function _spisokUnitInsert($unit_id, $dialog, $block_id) {//РІРЅРµСЃРµРЅРёРµ РЅРѕРІРѕР№ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°, РµСЃР»Рё РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
 	if($unit_id > 0)
 		return $unit_id;
 	if(!$dialog['table_1'])
@@ -475,25 +475,25 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 
 	$page_id = _num($_POST['page_id']);
 
-	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
+	//РµСЃР»Рё РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РІСЃС‚Р°РІРєР° РІ Р±Р»РѕРє: РїСЂРѕРІРµСЂРєР°, С‡С‚РѕР±С‹ РІ Р±Р»РѕРє РЅРµ РїРѕРїР°Р»Рѕ 2 СЌР»РµРјРµРЅС‚Р°
 	if(IS_ELEM && $block_id > 0 && !$unit_id) {
 //		_cacheClear('BLK_'.$block_id);
 		if(!$block = _blockOne($block_id))
-			jsonError('Блока не сущетвует');
+			jsonError('Р‘Р»РѕРєР° РЅРµ СЃСѓС‰РµС‚РІСѓРµС‚');
 		if($block['elem'])
-			jsonError('В блоке уже есть элемент');
+			jsonError('Р’ Р±Р»РѕРєРµ СѓР¶Рµ РµСЃС‚СЊ СЌР»РµРјРµРЅС‚');
 	}
 
 	$sql = "INSERT INTO `"._table($dialog['table_1'])."` (`id`) VALUES (0)";
 	query($sql);
 
-	//подмена id блока отрицательным значением для группировки
+	//РїРѕРґРјРµРЅР° id Р±Р»РѕРєР° РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј РґР»СЏ РіСЂСѓРїРїРёСЂРѕРІРєРё
 	if($unit_id < 0)
 		$block_id = $unit_id;
 
 	$unit_id = query_insert_id(_table($dialog['table_1']));
 
-	//обновление некоторых колонок таблицы 1
+	//РѕР±РЅРѕРІР»РµРЅРёРµ РЅРµРєРѕС‚РѕСЂС‹С… РєРѕР»РѕРЅРѕРє С‚Р°Р±Р»РёС†С‹ 1
 	foreach($dialog['field1'] as $field => $i) {
 		if($field == 'app_id') {
 			$sql = "UPDATE `"._table($dialog['table_1'])."`
@@ -509,7 +509,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 			query($sql);
 			continue;
 		}
-		if($field == 'num') {//установка порядкового номера
+		if($field == 'num') {//СѓСЃС‚Р°РЅРѕРІРєР° РїРѕСЂСЏРґРєРѕРІРѕРіРѕ РЅРѕРјРµСЂР°
 			$sql = "SELECT IFNULL(MAX(`num`),0)+1
 					FROM `"._table($dialog['table_1'])."`
 					WHERE `app_id`=".APP_ID."
@@ -559,7 +559,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 	}
 
 
-	//внесение данных таблицы 2, если есть
+	//РІРЅРµСЃРµРЅРёРµ РґР°РЅРЅС‹С… С‚Р°Р±Р»РёС†С‹ 2, РµСЃР»Рё РµСЃС‚СЊ
 	if($dialog['table_2']) {
 		$sql = "INSERT INTO `"._table($dialog['table_2'])."` (`".$dialog['table_2_field']."`) VALUES (".$unit_id.")";
 		query($sql);
@@ -580,7 +580,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 				query($sql);
 				continue;
 			}
-			if($field == 'num') {//установка порядкового номера
+			if($field == 'num') {//СѓСЃС‚Р°РЅРѕРІРєР° РїРѕСЂСЏРґРєРѕРІРѕРіРѕ РЅРѕРјРµСЂР°
 				$sql = "SELECT IFNULL(MAX(`num`),0)+1
 						FROM `"._table($dialog['table_2'])."`
 						WHERE `app_id`=".APP_ID."
@@ -606,7 +606,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой едини
 
 	return $unit_id;
 }
-function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//если в таблице присутствует колонка `focus`, то предварительное снятие флага фокуса с других элементов объекта (для таблицы _element)
+function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//РµСЃР»Рё РІ С‚Р°Р±Р»РёС†Рµ РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ РєРѕР»РѕРЅРєР° `focus`, С‚Рѕ РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕРµ СЃРЅСЏС‚РёРµ С„Р»Р°РіР° С„РѕРєСѓСЃР° СЃ РґСЂСѓРіРёС… СЌР»РµРјРµРЅС‚РѕРІ РѕР±СЉРµРєС‚Р° (РґР»СЏ С‚Р°Р±Р»РёС†С‹ _element)
 	if(!$dialog['table_1'])
 		return;
 	if(_table($dialog['table_1']) != '_element')
@@ -645,7 +645,7 @@ function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//если в таблице прис
 		return;
 	}
 }
-function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: очистка `def`, если устанавливается новая страница по умолчанию
+function _pageDefClear($dialog, $POST_CMP) {//РґР»СЏ С‚Р°Р±Р»РёС†С‹ _page: РѕС‡РёСЃС‚РєР° `def`, РµСЃР»Рё СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РЅРѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	if(!$dialog['table_1'])
 		return;
 	if(_table($dialog['table_1']) != '_page')
@@ -659,7 +659,7 @@ function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: очистка `def`, 
 		if(!$v)
 			return;
 
-		//снятие флага 'страница по умолчанию' со всех страниц приложения
+		//СЃРЅСЏС‚РёРµ С„Р»Р°РіР° 'СЃС‚СЂР°РЅРёС†Р° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ' СЃРѕ РІСЃРµС… СЃС‚СЂР°РЅРёС† РїСЂРёР»РѕР¶РµРЅРёСЏ
 		$sql = "UPDATE `_page`
 				SET `def`=0
 				WHERE `app_id`=".APP_ID."
@@ -669,7 +669,7 @@ function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: очистка `def`, 
 		return;
 	}
 }
-function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компонентов единицы списка
+function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//РѕР±РЅРѕРІР»РµРЅРёРµ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	$dlgParent = $dialog;
 	if($parent_id = $dialog['dialog_parent_id'])
 		if(!$dlgParent = _dialogQuery($parent_id))
@@ -686,7 +686,7 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 		$cmp = $dialog['cmp'][$cmp_id];
 		$col = $cmp['col'];
 
-		if(IS_ELEM && $col == 'col') {//если элемент, установка номера таблицы, в которой содержится колонка
+		if(IS_ELEM && $col == 'col') {//РµСЃР»Рё СЌР»РµРјРµРЅС‚, СѓСЃС‚Р°РЅРѕРІРєР° РЅРѕРјРµСЂР° С‚Р°Р±Р»РёС†С‹, РІ РєРѕС‚РѕСЂРѕР№ СЃРѕРґРµСЂР¶РёС‚СЃСЏ РєРѕР»РѕРЅРєР°
 			$num = 0;
 
 			if($v)
@@ -744,12 +744,12 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компон
 		}
 	}
 }
-function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
+function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//РґРѕР±Р°РІР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РґР»СЏ РѕС‚РїСЂР°РІРєРё, РµСЃР»Рё РґРµР№СЃС‚РІРёРµ 3 - РѕР±РЅРѕРІР»РµРЅРёРµ СЃРѕРґРµСЂР¶Р°РЅРёСЏ Р±Р»РѕРєРѕРІ
 	if($send['action_id'] != 3)
 		return $send;
 	if(_table($dialog['table_1']) != '_element')
 		return $send;
-	if($block_id <= 0)//была вставка доп-значения для элемета
+	if($block_id <= 0)//Р±С‹Р»Р° РІСЃС‚Р°РІРєР° РґРѕРї-Р·РЅР°С‡РµРЅРёСЏ РґР»СЏ СЌР»РµРјРµС‚Р°
 		return $send;
 
 	$elem = _elemOne($unit_id);
@@ -773,7 +773,7 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление зна
 					WHERE `block_id`=".$bl['id'];
 			$el = query_assoc($sql);
 
-			//корректировка ширины с учётом отступов
+			//РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° С€РёСЂРёРЅС‹ СЃ СѓС‡С‘С‚РѕРј РѕС‚СЃС‚СѓРїРѕРІ
 			$ex = explode(' ', $el['mar']);
 			$width = floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
 			break;
@@ -783,11 +783,11 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление зна
 			$width = $dlg['width'];
 			break;
 	}
-	$send['level'] = utf8(_blockLevelChange($elem['block']['obj_name'], $elem['block']['obj_id'], $width));
+	$send['level'] = _blockLevelChange($elem['block']['obj_name'], $elem['block']['obj_id'], $width);
 
 	return $send;
 }
-function _spisokAction4($send) {//действие 4 - обновление исходного диалога
+function _spisokAction4($send) {//РґРµР№СЃС‚РІРёРµ 4 - РѕР±РЅРѕРІР»РµРЅРёРµ РёСЃС…РѕРґРЅРѕРіРѕ РґРёР°Р»РѕРіР°
 	if($send['action_id'] != 4)
 		return $send;
 	if(!$dialog_id = _num(@$_POST['dialog_source']))
@@ -798,7 +798,7 @@ function _spisokAction4($send) {//действие 4 - обновление исходного диалога
 
 	return $send;
 }
-function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, select, dropdown
+function _cmpV19($val, $unit) {//РЅР°РїРѕР»РЅРµРЅРёРµ РґР»СЏ РЅРµРєРѕС‚РѕСЂС‹С… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ: radio, select, dropdown
 	$update = array();
 	$idsNoDel = '0';
 
@@ -824,13 +824,13 @@ function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, se
 		}
 	}
 
-	//удаление удалённых значений
+	//СѓРґР°Р»РµРЅРёРµ СѓРґР°Р»С‘РЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
 	$sql = "DELETE FROM `_element`
 			WHERE `block_id`=-".$unit['id']."
 			  AND `id` NOT IN (".$idsNoDel.")";
 	query($sql);
 
-	//сброс значения по умолчанию
+	//СЃР±СЂРѕСЃ Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	$sql = "UPDATE `_element`
 			SET `def`=0
 			WHERE `id`=".$unit['id'];
@@ -855,7 +855,7 @@ function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, se
 				`sort`=VALUES(`sort`)";
 	query($sql);
 
-	//установка нового значения по умолчанию
+	//СѓСЃС‚Р°РЅРѕРІРєР° РЅРѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	$sql = "SELECT `id` FROM `_element`
 			WHERE `block_id`=-".$unit['id']."
 			  AND `def`
@@ -867,21 +867,21 @@ function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, se
 			WHERE `id`=".$unit['id'];
 	query($sql);
 }
-function _cmpV30($cmp, $val, $unit) {//сохранение настройки ТАБЛИЧНОГО содержания списка (30)
+function _cmpV30($cmp, $val, $unit) {//СЃРѕС…СЂР°РЅРµРЅРёРµ РЅР°СЃС‚СЂРѕР№РєРё РўРђР‘Р›РР§РќРћР“Рћ СЃРѕРґРµСЂР¶Р°РЅРёСЏ СЃРїРёСЃРєР° (30)
 	/*
 		-112
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
+		$cmp  - РєРѕРјРїРѕРЅРµРЅС‚ РёР· РґРёР°Р»РѕРіР°, РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° РЅР°СЃС‚СЂРѕР№РєСѓ С‚Р°Р±Р»РёС†С‹
+		$val  - Р·РЅР°С‡РµРЅРёСЏ, РїРѕР»СѓС‡РµРЅРЅС‹Рµ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ
+		$unit - СЌР»РµРјРµРЅС‚, СЂР°Р·РјРµС‰Р°СЋС‰РёР№ С‚Р°Р±Р»РёС†Сѓ, РґР»СЏ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёСЃС…РѕРґРёС‚ РЅР°СЃС‚СЂРѕР№РєР°
 	*/
 	if(empty($cmp['col']))
 		return;
 
-	//поле, хранящее список id элементов-значений
+	//РїРѕР»Рµ, С…СЂР°РЅСЏС‰РµРµ СЃРїРёСЃРѕРє id СЌР»РµРјРµРЅС‚РѕРІ-Р·РЅР°С‡РµРЅРёР№
 	$col = $cmp['col'];
 	$ids = $unit[$col] ? $unit[$col] : 0;
 
-	//удаление значений, которые были удалены при настройке
+	//СѓРґР°Р»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№, РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё СѓРґР°Р»РµРЅС‹ РїСЂРё РЅР°СЃС‚СЂРѕР№РєРµ
 	$sql = "DELETE FROM `_element`
 			WHERE `block_id`=-".$unit['id']."
 			  AND `id` NOT IN (".$ids.")";
@@ -906,27 +906,27 @@ function _cmpV30($cmp, $val, $unit) {//сохранение настройки ТАБЛИЧНОГО содержани
 		query($sql);
 	}
 
-	//очистка неиспользованных элементов
+	//РѕС‡РёСЃС‚РєР° РЅРµРёСЃРїРѕР»СЊР·РѕРІР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
 	$sql = "DELETE FROM `_element`
 			WHERE `user_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-112)";
 	query($sql);
 }
-function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
+function _cmpV49($cmp, $val, $unit) {//РќР°СЃС‚СЂРѕР№РєР° СЃРѕРґРµСЂР¶Р°РЅРёСЏ РЎР±РѕСЂРЅРѕРіРѕ С‚РµРєСЃС‚Р°
 	/*
 		-111
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
+		$cmp  - РєРѕРјРїРѕРЅРµРЅС‚ РёР· РґРёР°Р»РѕРіР°, РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° РЅР°СЃС‚СЂРѕР№РєСѓ С‚Р°Р±Р»РёС†С‹
+		$val  - Р·РЅР°С‡РµРЅРёСЏ, РїРѕР»СѓС‡РµРЅРЅС‹Рµ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ
+		$unit - СЌР»РµРјРµРЅС‚, СЂР°Р·РјРµС‰Р°СЋС‰РёР№ С‚Р°Р±Р»РёС†Сѓ, РґР»СЏ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёСЃС…РѕРґРёС‚ РЅР°СЃС‚СЂРѕР№РєР°
 	*/
 	if(empty($cmp['col']))
 		return;
 
-	//поле, хранящее список id элементов-значений
+	//РїРѕР»Рµ, С…СЂР°РЅСЏС‰РµРµ СЃРїРёСЃРѕРє id СЌР»РµРјРµРЅС‚РѕРІ-Р·РЅР°С‡РµРЅРёР№
 	$col = $cmp['col'];
 	$ids = $unit[$col] ? $unit[$col] : 0;
 
-	//удаление значений, которые были удалены при настройке
+	//СѓРґР°Р»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№, РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё СѓРґР°Р»РµРЅС‹ РїСЂРё РЅР°СЃС‚СЂРѕР№РєРµ
 	$sql = "DELETE FROM `_element`
 			WHERE `user_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-".$unit['id'].")
@@ -947,27 +947,27 @@ function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
 		query($sql);
 	}
 
-	//очистка неиспользованных элементов
+	//РѕС‡РёСЃС‚РєР° РЅРµРёСЃРїРѕР»СЊР·РѕРІР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
 	$sql = "DELETE FROM `_element`
 			WHERE `user_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-111)";
 	query($sql);
 }
-function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
+function _cmpV56($cmp, $val, $unit) {//РќР°СЃС‚СЂРѕР№РєР° СЃСѓРјРјС‹ Р·РЅР°С‡РµРЅРёР№ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	/*
 		-113
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
+		$cmp  - РєРѕРјРїРѕРЅРµРЅС‚ РёР· РґРёР°Р»РѕРіР°, РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° РЅР°СЃС‚СЂРѕР№РєСѓ С‚Р°Р±Р»РёС†С‹
+		$val  - Р·РЅР°С‡РµРЅРёСЏ, РїРѕР»СѓС‡РµРЅРЅС‹Рµ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ
+		$unit - СЌР»РµРјРµРЅС‚, СЂР°Р·РјРµС‰Р°СЋС‰РёР№ С‚Р°Р±Р»РёС†Сѓ, РґР»СЏ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёСЃС…РѕРґРёС‚ РЅР°СЃС‚СЂРѕР№РєР°
 	*/
 	if(empty($cmp['col']))
 		return;
 
-	//поле, хранящее список id элементов-значений
+	//РїРѕР»Рµ, С…СЂР°РЅСЏС‰РµРµ СЃРїРёСЃРѕРє id СЌР»РµРјРµРЅС‚РѕРІ-Р·РЅР°С‡РµРЅРёР№
 	$col = $cmp['col'];
 	$ids = $unit[$col] ? $unit[$col] : 0;
 
-	//удаление значений, которые были удалены при настройке
+	//СѓРґР°Р»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№, РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё СѓРґР°Р»РµРЅС‹ РїСЂРё РЅР°СЃС‚СЂРѕР№РєРµ
 	$sql = "DELETE FROM `_element`
 			WHERE `user_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-".$unit['id'].")
@@ -988,13 +988,13 @@ function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
 		query($sql);
 	}
 
-	//очистка неиспользованных элементов
+	//РѕС‡РёСЃС‚РєР° РЅРµРёСЃРїРѕР»СЊР·РѕРІР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
 	$sql = "DELETE FROM `_element`
 			WHERE `user_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-113)";
 	query($sql);
 }
-function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
+function _cmpV58($val, $unit) {//РќР°СЃС‚СЂРѕР№РєР° РїСѓРЅРєС‚РѕРІ РјРµРЅСЋ РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ Р±Р»РѕРєРѕРІ
 	$update = array();
 	$idsNoDel = '0';
 
@@ -1020,13 +1020,13 @@ function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
 		}
 	}
 
-	//удаление удалённых значений
+	//СѓРґР°Р»РµРЅРёРµ СѓРґР°Р»С‘РЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
 	$sql = "DELETE FROM `_element`
 			WHERE `block_id`=-".$unit['id']."
 			  AND `id` NOT IN (".$idsNoDel.")";
 	query($sql);
 
-	//сброс значения по умолчанию
+	//СЃР±СЂРѕСЃ Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	$sql = "UPDATE `_element`
 			SET `def`=0
 			WHERE `id`=".$unit['id'];
@@ -1051,7 +1051,7 @@ function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
 				`sort`=VALUES(`sort`)";
 	query($sql);
 
-	//установка нового значения по умолчанию
+	//СѓСЃС‚Р°РЅРѕРІРєР° РЅРѕРІРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	$sql = "SELECT `id` FROM `_element`
 			WHERE `block_id`=-".$unit['id']."
 			  AND `def`
@@ -1063,12 +1063,12 @@ function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
 			WHERE `id`=".$unit['id'];
 	query($sql);
 }
-function _cmpV60($cmp, $unit) {//Применение загруженных изображений
-	//поле, хранящее список id изображений
+function _cmpV60($cmp, $unit) {//РџСЂРёРјРµРЅРµРЅРёРµ Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… РёР·РѕР±СЂР°Р¶РµРЅРёР№
+	//РїРѕР»Рµ, С…СЂР°РЅСЏС‰РµРµ СЃРїРёСЃРѕРє id РёР·РѕР±СЂР°Р¶РµРЅРёР№
 	if(!$col = $cmp['col'])
 		return;
 
-	//прикрепление изображений к единице списка
+	//РїСЂРёРєСЂРµРїР»РµРЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёР№ Рє РµРґРёРЅРёС†Рµ СЃРїРёСЃРєР°
 	$sql = "UPDATE `_image`
 			SET `obj_name`='elem_".$cmp['id']."',
 				`obj_id`=".$unit['id']."
@@ -1084,7 +1084,7 @@ function _cmpV60($cmp, $unit) {//Применение загруженных изображений
 			  AND `id` NOT IN ("._ids($unit[$col]).")";
 	query($sql);
 
-	//обновление сортировки
+	//РѕР±РЅРѕРІР»РµРЅРёРµ СЃРѕСЂС‚РёСЂРѕРІРєРё
 	$sort = 0;
 	foreach(_ids($unit[$col], 1) as $id) {
 		$sql = "UPDATE `_image`
@@ -1096,12 +1096,12 @@ function _cmpV60($cmp, $unit) {//Применение загруженных изображений
 		query($sql);
 	}
 }
-function _filterCheckSetupSave($cmp, $val, $unit) {//сохранение настройки фильтра для галочки. Подключаемая функция [12]
+function _filterCheckSetupSave($cmp, $val, $unit) {//СЃРѕС…СЂР°РЅРµРЅРёРµ РЅР°СЃС‚СЂРѕР№РєРё С„РёР»СЊС‚СЂР° РґР»СЏ РіР°Р»РѕС‡РєРё. РџРѕРґРєР»СЋС‡Р°РµРјР°СЏ С„СѓРЅРєС†РёСЏ [12]
 	/*
 		-114
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
+		$cmp  - РєРѕРјРїРѕРЅРµРЅС‚ РёР· РґРёР°Р»РѕРіР°, РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° РЅР°СЃС‚СЂРѕР№РєСѓ С‚Р°Р±Р»РёС†С‹
+		$val  - Р·РЅР°С‡РµРЅРёСЏ, РїРѕР»СѓС‡РµРЅРЅС‹Рµ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ
+		$unit - СЌР»РµРјРµРЅС‚, СЂР°Р·РјРµС‰Р°СЋС‰РёР№ С‚Р°Р±Р»РёС†Сѓ, РґР»СЏ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёСЃС…РѕРґРёС‚ РЅР°СЃС‚СЂРѕР№РєР°
 	*/
 
 	$update = array();
@@ -1126,7 +1126,7 @@ function _filterCheckSetupSave($cmp, $val, $unit) {//сохранение настройки фильтр
 		}
 	}
 
-	//удаление удалённых значений
+	//СѓРґР°Р»РµРЅРёРµ СѓРґР°Р»С‘РЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
 	$sql = "DELETE FROM `_element`
 			WHERE `block_id`=-".$unit['id']."
 			  AND `id` NOT IN (".$idsNoDel.")";
@@ -1148,18 +1148,18 @@ function _filterCheckSetupSave($cmp, $val, $unit) {//сохранение настройки фильтр
 	}
 
 
-	//очистка неиспользованных элементов
+	//РѕС‡РёСЃС‚РєР° РЅРµРёСЃРїРѕР»СЊР·РѕРІР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
 	$sql = "DELETE FROM `_element`
 			WHERE `user_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-114)";
 	query($sql);
 }
-function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона истории действий. Подключаемая функция [12]
+function _historySetupSave($cmp, $val, $unit) {//СЃРѕС…СЂР°РЅРµРЅРёРµ РЅР°СЃС‚СЂРѕР№РєРё С€Р°Р±Р»РѕРЅР° РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№. РџРѕРґРєР»СЋС‡Р°РµРјР°СЏ С„СѓРЅРєС†РёСЏ [12]
 	/*
 		-115
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
+		$cmp  - РєРѕРјРїРѕРЅРµРЅС‚ РёР· РґРёР°Р»РѕРіР°, РѕС‚РІРµС‡Р°СЋС‰РёР№ Р·Р° РЅР°СЃС‚СЂРѕР№РєСѓ С‚Р°Р±Р»РёС†С‹
+		$val  - Р·РЅР°С‡РµРЅРёСЏ, РїРѕР»СѓС‡РµРЅРЅС‹Рµ РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ
+		$unit - СЌР»РµРјРµРЅС‚, СЂР°Р·РјРµС‰Р°СЋС‰РёР№ С‚Р°Р±Р»РёС†Сѓ, РґР»СЏ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёСЃС…РѕРґРёС‚ РЅР°СЃС‚СЂРѕР№РєР°
 	*/
 
 	$update = array();
@@ -1192,7 +1192,7 @@ function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона ис
 		}
 	}
 
-	//удаление удалённых значений
+	//СѓРґР°Р»РµРЅРёРµ СѓРґР°Р»С‘РЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
 	$sql = "DELETE FROM `_element`
 			WHERE `block_id`=-".$unit['id']."
 			  AND `id` NOT IN (".$idsNoDel.")";
@@ -1216,13 +1216,13 @@ function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона ис
 		query($sql);
 	}
 
-	//очистка неиспользованных элементов
+	//РѕС‡РёСЃС‚РєР° РЅРµРёСЃРїРѕР»СЊР·РѕРІР°РЅРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
 	$sql = "DELETE FROM `_element`
 			WHERE `user_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-115)";
 	query($sql);
 
-	//обновление значений главного элемента шаблона
+	//РѕР±РЅРѕРІР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РіР»Р°РІРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р° С€Р°Р±Р»РѕРЅР°
 	$sql = "SELECT `id`
 			FROM `_element`
 			WHERE `block_id`=-".$unit['id']."
@@ -1236,14 +1236,14 @@ function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона ис
 			WHERE `id`=".$unit['id'];
 	query($sql);
 
-	//обновление активности в истории
+	//РѕР±РЅРѕРІР»РµРЅРёРµ Р°РєС‚РёРІРЅРѕСЃС‚Рё РІ РёСЃС‚РѕСЂРёРё
 	$sql = "UPDATE `_history`
 			SET `active`=".($ids ? 1 : 0)."
 			WHERE `type_id`=".$type_id."
 			  AND `dialog_id`=".$dlg_id;
 	query($sql);
 }
-function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страницам для конкретного пользователя
+function _pageUserAccessSave($cmp, $val, $unit) {//СЃРѕС…СЂР°РЅРµРЅРёРµ РґРѕСЃС‚СѓРїР° Рє СЃС‚СЂР°РЅРёС†Р°Рј РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 	if(!is_array($val))
 		return;
 	if(!$user_id = @$val['user_id'])
@@ -1266,7 +1266,7 @@ function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страница
 		query($sql);
 	}
 
-	//отключение входа в приложение, если нужно
+	//РѕС‚РєР»СЋС‡РµРЅРёРµ РІС…РѕРґР° РІ РїСЂРёР»РѕР¶РµРЅРёРµ, РµСЃР»Рё РЅСѓР¶РЅРѕ
 	$sql = "SELECT `num_1`
 			FROM `_spisok`
 			WHERE `app_id`=".APP_ID."
@@ -1284,7 +1284,7 @@ function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страница
 	_cache_clear( 'page');
 	_cache_clear( 'user'.$user_id);
 }
-function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
+function _pageUserAccessAllSave($cmp, $val, $unit) {//СЃРѕС…СЂР°РЅРµРЅРёРµ РґРѕСЃС‚СѓРїР° РІ РїСЂРёР»РѕР¶РµРЅРёРµ РґР»СЏ РІСЃРµС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№
 	$sql = "UPDATE `_spisok`
 			SET `num_1`=0
 			WHERE `app_id`=".APP_ID."
@@ -1316,25 +1316,25 @@ function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в прило
 	foreach(query_arr($sql) as $r)
 		_cache_clear('user'.$r['connect_1']);
 }
-function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
+function _spisokUnitUpd27($unit) {//РѕР±РЅРѕРІР»РµРЅРёРµ СЃСѓРјРј Р·РЅР°С‡РµРЅРёР№ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР° (Р±Р°Р»Р°РЅСЃ)
 	if(!isset($unit['dialog_id']))
 		return;
 	if($unit['dialog_id'] != 27)
 		return;
-	//блок, в котором размещается "баланс"
+	//Р±Р»РѕРє, РІ РєРѕС‚РѕСЂРѕРј СЂР°Р·РјРµС‰Р°РµС‚СЃСЏ "Р±Р°Р»Р°РЅСЃ"
 	if(!$block_id = _num($unit['block_id']))
 		return;
 	if(!$BL = _blockOne($block_id))
 		return;
 	if($BL['obj_name'] != 'dialog')
 		return;
-	//диалог, в котором размещаются значения (данные этого списка будут обновляться)
+	//РґРёР°Р»РѕРі, РІ РєРѕС‚РѕСЂРѕРј СЂР°Р·РјРµС‰Р°СЋС‚СЃСЏ Р·РЅР°С‡РµРЅРёСЏ (РґР°РЅРЅС‹Рµ СЌС‚РѕРіРѕ СЃРїРёСЃРєР° Р±СѓРґСѓС‚ РѕР±РЅРѕРІР»СЏС‚СЊСЃСЏ)
 	if(!$DSrc = _dialogQuery($BL['obj_id']))
 		return;
 
 	$DSRC_COND = _spisokCondDef($BL['obj_id']);
 
-	//предварительное обнуление значений перед обновлением
+	//РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕРµ РѕР±РЅСѓР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РїРµСЂРµРґ РѕР±РЅРѕРІР»РµРЅРёРµРј
 	$sql = "UPDATE "._tableFrom($DSrc)."
 			SET `".$unit['col']."`=0
 			WHERE `t1`.`id` ".$DSRC_COND;
@@ -1343,14 +1343,14 @@ function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (бал
 	if(!$ids = _ids($unit['txt_2']))
 		return;
 
-	//получение данных значений для подсчёта
+	//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№ РґР»СЏ РїРѕРґСЃС‡С‘С‚Р°
 	$sql = "SELECT `txt_2`,`num_8`
 			FROM `_element`
 			WHERE `id` IN (".$ids.")";
 	if(!$elData = query_ass($sql))
 		return;
 
-	//получение самих значений для подсчёта
+	//РїРѕР»СѓС‡РµРЅРёРµ СЃР°РјРёС… Р·РЅР°С‡РµРЅРёР№ РґР»СЏ РїРѕРґСЃС‡С‘С‚Р°
 	$sql = "SELECT `id`,`col`
 			FROM `_element`
 			WHERE LENGTH(`col`)
@@ -1365,36 +1365,36 @@ function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (бал
 		$upd .= $znak.'`'.$col.'`';
 	}
 
-	//процесс обновления
+	//РїСЂРѕС†РµСЃСЃ РѕР±РЅРѕРІР»РµРЅРёСЏ
 	$sql = "UPDATE "._tableFrom($DSrc)."
 			SET `".$unit['col']."`=".$upd."
 			WHERE `t1`.`id` ".$DSRC_COND;
 	query($sql);
 }
-function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (при создании элемента)
+function _spisokUnitUpd54($unit) {//РѕР±РЅРѕРІР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІ РїСЂРёРІСЏР·Р°РЅРЅРѕРіРѕ СЃРїРёСЃРєР° (РїСЂРё СЃРѕР·РґР°РЅРёРё СЌР»РµРјРµРЅС‚Р°)
 	if(!isset($unit['dialog_id']))
 		return;
 	if($unit['dialog_id'] != 54)
 		return;
-	if(!$cmp_id = _num($unit['num_1']))//id компонента в диалоге, в котором размещается привязка (количество этих значений будет считаться)
+	if(!$cmp_id = _num($unit['num_1']))//id РєРѕРјРїРѕРЅРµРЅС‚Р° РІ РґРёР°Р»РѕРіРµ, РІ РєРѕС‚РѕСЂРѕРј СЂР°Р·РјРµС‰Р°РµС‚СЃСЏ РїСЂРёРІСЏР·РєР° (РєРѕР»РёС‡РµСЃС‚РІРѕ СЌС‚РёС… Р·РЅР°С‡РµРЅРёР№ Р±СѓРґРµС‚ СЃС‡РёС‚Р°С‚СЊСЃСЏ)
 		return;
 	if(!$cmp = _elemOne($cmp_id))
 		return;
-	if(!$dialog_id = $cmp['block']['obj_id'])//id диалога, в котором размещается привязка
+	if(!$dialog_id = $cmp['block']['obj_id'])//id РґРёР°Р»РѕРіР°, РІ РєРѕС‚РѕСЂРѕРј СЂР°Р·РјРµС‰Р°РµС‚СЃСЏ РїСЂРёРІСЏР·РєР°
 		return;
 	if(!$DConn = _dialogQuery($dialog_id))
 		return;
-	//блок, в котором размещается "количество"
+	//Р±Р»РѕРє, РІ РєРѕС‚РѕСЂРѕРј СЂР°Р·РјРµС‰Р°РµС‚СЃСЏ "РєРѕР»РёС‡РµСЃС‚РІРѕ"
 	if(!$block_id = _num($unit['block_id']))
 		return;
 	if(!$BL = _blockOne($block_id))
 		return;
 	if($BL['obj_name'] != 'dialog')
 		return;
-	if(!$DSrc = _dialogQuery($BL['obj_id']))//диалог, к которому привязан список (данные этого списка будут обновляться)
+	if(!$DSrc = _dialogQuery($BL['obj_id']))//РґРёР°Р»РѕРі, Рє РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРІСЏР·Р°РЅ СЃРїРёСЃРѕРє (РґР°РЅРЅС‹Рµ СЌС‚РѕРіРѕ СЃРїРёСЃРєР° Р±СѓРґСѓС‚ РѕР±РЅРѕРІР»СЏС‚СЊСЃСЏ)
 		return;
 
-	//предварительное обнуление значений перед обновлением
+	//РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕРµ РѕР±РЅСѓР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РїРµСЂРµРґ РѕР±РЅРѕРІР»РµРЅРёРµРј
 	$sql = "UPDATE "._tableFrom($DSrc)."
 			SET `".$unit['col']."`=0
 			WHERE `t1`.`id` "._spisokCondDef($BL['obj_id']);
@@ -1408,7 +1408,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (пр
 			  AND `".$cmp['col']."`
 			  AND !`deleted`
 			GROUP BY `".$cmp['col']."`";
-	if(!$ass = query_ass($sql))//выход, если нечего обновлять
+	if(!$ass = query_ass($sql))//РІС‹С…РѕРґ, РµСЃР»Рё РЅРµС‡РµРіРѕ РѕР±РЅРѕРІР»СЏС‚СЊ
 		return;
 
 	$n = 1000;
@@ -1434,7 +1434,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (пр
 */
 	}
 
-	//обновление сумм родительских значений, если есть дочерние
+	//РѕР±РЅРѕРІР»РµРЅРёРµ СЃСѓРјРј СЂРѕРґРёС‚РµР»СЊСЃРєРёС… Р·РЅР°С‡РµРЅРёР№, РµСЃР»Рё РµСЃС‚СЊ РґРѕС‡РµСЂРЅРёРµ
 	if(!isset($DSrc['field1']['parent_id']))
 		return;
 
@@ -1458,33 +1458,33 @@ function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (пр
 		query($sql);
 	}
 }
-function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
+function _spisokUnitUpd55($unit) {//РѕР±РЅРѕРІР»РµРЅРёРµ СЃСѓРјРј РїСЂРёРІСЏР·Р°РЅРЅРѕРіРѕ СЃРїРёСЃРєР°
 	if(!isset($unit['dialog_id']))
 		return;
 	if($unit['dialog_id'] != 55)
 		return;
-	if(!$cmp_id = _num($unit['num_1']))//id компонента в диалоге, в котором размещается привязка (сумма этих значений будет считаться)
+	if(!$cmp_id = _num($unit['num_1']))//id РєРѕРјРїРѕРЅРµРЅС‚Р° РІ РґРёР°Р»РѕРіРµ, РІ РєРѕС‚РѕСЂРѕРј СЂР°Р·РјРµС‰Р°РµС‚СЃСЏ РїСЂРёРІСЏР·РєР° (СЃСѓРјРјР° СЌС‚РёС… Р·РЅР°С‡РµРЅРёР№ Р±СѓРґРµС‚ СЃС‡РёС‚Р°С‚СЊСЃСЏ)
 		return;
 	if(!$cmp = _elemOne($cmp_id))
 		return;
-	if(!$dialog_id = $cmp['block']['obj_id'])//id диалога, в котором размещается привязка
+	if(!$dialog_id = $cmp['block']['obj_id'])//id РґРёР°Р»РѕРіР°, РІ РєРѕС‚РѕСЂРѕРј СЂР°Р·РјРµС‰Р°РµС‚СЃСЏ РїСЂРёРІСЏР·РєР°
 		return;
 	if(!$DConn = _dialogQuery($dialog_id))
 		return;
 
-	//диалог, к которому привязан список (данные этого списка будут обновляться)
+	//РґРёР°Р»РѕРі, Рє РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРІСЏР·Р°РЅ СЃРїРёСЃРѕРє (РґР°РЅРЅС‹Рµ СЌС‚РѕРіРѕ СЃРїРёСЃРєР° Р±СѓРґСѓС‚ РѕР±РЅРѕРІР»СЏС‚СЊСЃСЏ)
 	if(!$DSrc_id = _num($cmp['num_1']))
 		return;
 	if(!$DSrc = _dialogQuery($DSrc_id))
 		return;
 
-	//предварительное обнуление значений перед обновлением
+	//РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕРµ РѕР±РЅСѓР»РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РїРµСЂРµРґ РѕР±РЅРѕРІР»РµРЅРёРµРј
 	$sql = "UPDATE "._tableFrom($DSrc)."
 			SET `".$unit['col']."`=0
 			WHERE `t1`.`id` "._spisokCondDef($DSrc_id);
 	query($sql);
 
-	//получение элемента, который указывает на элемент, сумму значения которого нужно будет считать
+	//РїРѕР»СѓС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚Р°, РєРѕС‚РѕСЂС‹Р№ СѓРєР°Р·С‹РІР°РµС‚ РЅР° СЌР»РµРјРµРЅС‚, СЃСѓРјРјСѓ Р·РЅР°С‡РµРЅРёСЏ РєРѕС‚РѕСЂРѕРіРѕ РЅСѓР¶РЅРѕ Р±СѓРґРµС‚ СЃС‡РёС‚Р°С‚СЊ
 	if(!$elem_id = _num($unit['num_2']))
 		return;
 	if(!$elForSum = _elemOne($elem_id))
@@ -1505,7 +1505,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 			  AND `".$cmp['col']."`
 			  AND !`deleted`
 			GROUP BY `".$cmp['col']."`";
-	if(!$ass = query_ass($sql))//выход, если нечего обновлять
+	if(!$ass = query_ass($sql))//РІС‹С…РѕРґ, РµСЃР»Рё РЅРµС‡РµРіРѕ РѕР±РЅРѕРІР»СЏС‚СЊ
 		return;
 
 	$n = 1000;
@@ -1531,7 +1531,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
 */
 	}
 }
-function _spisokUnitUpd72($dialog, $unit) {//обновление кеша после применения действия для блока
+function _spisokUnitUpd72($dialog, $unit) {//РѕР±РЅРѕРІР»РµРЅРёРµ РєРµС€Р° РїРѕСЃР»Рµ РїСЂРёРјРµРЅРµРЅРёСЏ РґРµР№СЃС‚РІРёСЏ РґР»СЏ Р±Р»РѕРєР°
 	if($dialog['id'] != 72)
 		return;
 	if(empty($unit['obj_name']))
@@ -1543,7 +1543,7 @@ function _spisokUnitUpd72($dialog, $unit) {//обновление кеша после применения де
 }
 
 
-function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления единицы списка
+function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//РІС‹РїРѕР»РЅРµРЅРёРµ РґРµР№СЃС‚РІРёР№ РїРѕСЃР»Рµ РѕР±РЅРѕРІР»РµРЅРёСЏ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	if(!$dialog['table_1'])
 		return;
 	$sql = "SELECT *
@@ -1552,8 +1552,8 @@ function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение дей
 	if(!$unit = query_assoc($sql))
 		return;
 
-	//получение компонентов диалога, которые отвечают за внесение данных
-	//будет проверка, есть ли какой-то компонент, который участвует в подсчёте баланса
+	//РїРѕР»СѓС‡РµРЅРёРµ РєРѕРјРїРѕРЅРµРЅС‚РѕРІ РґРёР°Р»РѕРіР°, РєРѕС‚РѕСЂС‹Рµ РѕС‚РІРµС‡Р°СЋС‚ Р·Р° РІРЅРµСЃРµРЅРёРµ РґР°РЅРЅС‹С…
+	//Р±СѓРґРµС‚ РїСЂРѕРІРµСЂРєР°, РµСЃС‚СЊ Р»Рё РєР°РєРѕР№-С‚Рѕ РєРѕРјРїРѕРЅРµРЅС‚, РєРѕС‚РѕСЂС‹Р№ СѓС‡Р°СЃС‚РІСѓРµС‚ РІ РїРѕРґСЃС‡С‘С‚Рµ Р±Р°Р»Р°РЅСЃР°
 	$cmpInsertIds = array();
 	foreach($dialog['cmp'] as $cmp) {
 		if(!$cmp['col'])
@@ -1570,7 +1570,7 @@ function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение дей
 
 	foreach($dialog['cmp'] as $cmp)
 		switch($cmp['dialog_id']) {
-			//обновление суммы, если какой-то элемент самого диалога участвует в подсчёте (для стартовых сумм)
+			//РѕР±РЅРѕРІР»РµРЅРёРµ СЃСѓРјРјС‹, РµСЃР»Рё РєР°РєРѕР№-С‚Рѕ СЌР»РµРјРµРЅС‚ СЃР°РјРѕРіРѕ РґРёР°Р»РѕРіР° СѓС‡Р°СЃС‚РІСѓРµС‚ РІ РїРѕРґСЃС‡С‘С‚Рµ (РґР»СЏ СЃС‚Р°СЂС‚РѕРІС‹С… СЃСѓРјРј)
 			case 27:
 				if(empty($cmpInsertIds))
 					break;
@@ -1590,44 +1590,44 @@ function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение дей
 					$send[] = array(
 						'id' => $el['id'],
 						'block_id' => $el['block_id'],
-						'connect_id' => $unit_id     //id единицы списка, баланс которой будет пересчитан
+						'connect_id' => $unit_id     //id РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°, Р±Р°Р»Р°РЅСЃ РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµС‚ РїРµСЂРµСЃС‡РёС‚Р°РЅ
 					);
 				}
 
 				_spisokUnitAfter27($send);
 				break;
-			//привязанные списки
+			//РїСЂРёРІСЏР·Р°РЅРЅС‹Рµ СЃРїРёСЃРєРё
 			case 29:
-				_spisokUnitAfter54($cmp, $dialog, $unit, $unitOld); //пересчёт количеств привязаного списка [54]
-				$elUpd = _spisokUnitAfter55($cmp, $dialog, $unit);    //пересчёт cумм привязаного списка [55]
-				_spisokUnitAfter27($elUpd);                        //подсчёт балансов после обновления сумм [27]
+				_spisokUnitAfter54($cmp, $dialog, $unit, $unitOld); //РїРµСЂРµСЃС‡С‘С‚ РєРѕР»РёС‡РµСЃС‚РІ РїСЂРёРІСЏР·Р°РЅРѕРіРѕ СЃРїРёСЃРєР° [54]
+				$elUpd = _spisokUnitAfter55($cmp, $dialog, $unit);    //РїРµСЂРµСЃС‡С‘С‚ cСѓРјРј РїСЂРёРІСЏР·Р°РЅРѕРіРѕ СЃРїРёСЃРєР° [55]
+				_spisokUnitAfter27($elUpd);                        //РїРѕРґСЃС‡С‘С‚ Р±Р°Р»Р°РЅСЃРѕРІ РїРѕСЃР»Рµ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃСѓРјРј [27]
 				break;
 		}
 }
-function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количеств привязаного списка
+function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//РїРµСЂРµСЃС‡С‘С‚ РєРѕР»РёС‡РµСЃС‚РІ РїСЂРёРІСЏР·Р°РЅРѕРіРѕ СЃРїРёСЃРєР°
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=54
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
 		return;
-	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
+	if(!$col = $cmp['col'])//РёРјСЏ РєРѕР»РѕРЅРєРё, РїРѕ РєРѕС‚РѕСЂРѕР№ РїСЂРёРІСЏР·Р°РЅ СЃРїРёСЃРѕРє
 		return;
-	if(!$connect_id = _num($unit[$col]))//значение, id единицы привязанного списка.
+	if(!$connect_id = _num($unit[$col]))//Р·РЅР°С‡РµРЅРёРµ, id РµРґРёРЅРёС†С‹ РїСЂРёРІСЏР·Р°РЅРЅРѕРіРѕ СЃРїРёСЃРєР°.
 		return;
 
 	$connect_old = 0;
 	$count_old = 0;
 	if(!empty($unitOld))
 		if($connect_old = _num($unitOld[$col])) {
-			//получение старого количества для обновления
+			//РїРѕР»СѓС‡РµРЅРёРµ СЃС‚Р°СЂРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёСЏ
 			$sql = "SELECT COUNT(*)
 					FROM "._tableFrom($dialog)."
 					WHERE `".$col."`=".$connect_old." "._spisokCondDef($dialog['id']);
 			$count_old = _num(query_value($sql));
 		}
 
-	//получение нового количества для обновления
+	//РїРѕР»СѓС‡РµРЅРёРµ РЅРѕРІРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёСЏ
 	$sql = "SELECT COUNT(*)
 			FROM "._tableFrom($dialog)."
 			WHERE `".$col."`=".$connect_id." "._spisokCondDef($dialog['id']);
@@ -1653,26 +1653,26 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количест
 		query($sql);
 	}
 }
-function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм привязаного списка после внесения/удаления данных
+function _spisokUnitAfter55($cmp, $dialog, $unit) {//РїРµСЂРµСЃС‡С‘С‚ СЃСѓРјРј РїСЂРёРІСЏР·Р°РЅРѕРіРѕ СЃРїРёСЃРєР° РїРѕСЃР»Рµ РІРЅРµСЃРµРЅРёСЏ/СѓРґР°Р»РµРЅРёСЏ РґР°РЅРЅС‹С…
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=55
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
 		return array();
-	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
+	if(!$col = $cmp['col'])//РёРјСЏ РєРѕР»РѕРЅРєРё, РїРѕ РєРѕС‚РѕСЂРѕР№ РїСЂРёРІСЏР·Р°РЅ СЃРїРёСЃРѕРє
 		return array();
-	if(!$connect_id = _num($unit[$col]))//значение, id единицы привязанного списка.
+	if(!$connect_id = _num($unit[$col]))//Р·РЅР°С‡РµРЅРёРµ, id РµРґРёРЅРёС†С‹ РїСЂРёРІСЏР·Р°РЅРЅРѕРіРѕ СЃРїРёСЃРєР°.
 		return array();
 
-	$send = array();//значения, которые были пересчитаны. По ним будет потом посчитан баланс, если потребуется.
+	$send = array();//Р·РЅР°С‡РµРЅРёСЏ, РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё РїРµСЂРµСЃС‡РёС‚Р°РЅС‹. РџРѕ РЅРёРј Р±СѓРґРµС‚ РїРѕС‚РѕРј РїРѕСЃС‡РёС‚Р°РЅ Р±Р°Р»Р°РЅСЃ, РµСЃР»Рё РїРѕС‚СЂРµР±СѓРµС‚СЃСЏ.
 	foreach($arr as $elem_id => $r) {
 		if(!$colSumSet = $r['col'])
 			continue;
-		//поиск колонки, по которой будет производиться подсчёт суммы
+		//РїРѕРёСЃРє РєРѕР»РѕРЅРєРё, РїРѕ РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЊСЃСЏ РїРѕРґСЃС‡С‘С‚ СЃСѓРјРјС‹
 		if(!$el = _elemOne($r['num_2']))
 			continue;
-		if($el['dialog_id'] != 11)//ссылка элемент с колонкой суммы указывался через [11]
+		if($el['dialog_id'] != 11)//СЃСЃС‹Р»РєР° СЌР»РµРјРµРЅС‚ СЃ РєРѕР»РѕРЅРєРѕР№ СЃСѓРјРјС‹ СѓРєР°Р·С‹РІР°Р»СЃСЏ С‡РµСЂРµР· [11]
 			continue;
 		if(!$el = _elemOne($el['txt_2']))
 			continue;
@@ -1682,7 +1682,7 @@ function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм привязаного с
 		$bl = _blockOne($r['block_id']);
 		$dlg = _dialogQuery($bl['obj_id']);
 
-		//получение нового количества для обновления
+		//РїРѕР»СѓС‡РµРЅРёРµ РЅРѕРІРѕРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёСЏ
 		$sql = "SELECT IFNULL(SUM(`".$colSumGet."`),0)
 				FROM "._tableFrom($dialog)."
 				WHERE `".$col."`=".$connect_id." "._spisokCondDef($dialog['id']);
@@ -1696,7 +1696,7 @@ function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм привязаного с
 		$send[] = array(
 			'id' => $elem_id,
 			'block_id' => $r['block_id'],
-			'connect_id' => $connect_id     //id единицы списка, баланс которой будет пересчитан
+			'connect_id' => $connect_id     //id РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°, Р±Р°Р»Р°РЅСЃ РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµС‚ РїРµСЂРµСЃС‡РёС‚Р°РЅ
 		);
 	}
 
@@ -1717,9 +1717,9 @@ function _spisokUnitAfter27($elUpd) {
 		foreach($dialog['cmp'] as $cmp) {
 			if($cmp['dialog_id'] != 27)
 				continue;
-			if(empty($cmp['col']))//имя колонки, являющаяся балансом
+			if(empty($cmp['col']))//РёРјСЏ РєРѕР»РѕРЅРєРё, СЏРІР»СЏСЋС‰Р°СЏСЃСЏ Р±Р°Р»Р°РЅСЃРѕРј
 				continue;
-			if(empty($cmp['txt_2']))//список id элементов, составляющих сумму
+			if(empty($cmp['txt_2']))//СЃРїРёСЃРѕРє id СЌР»РµРјРµРЅС‚РѕРІ, СЃРѕСЃС‚Р°РІР»СЏСЋС‰РёС… СЃСѓРјРјСѓ
 				continue;
 
 			$sql = "SELECT *
@@ -1728,7 +1728,7 @@ function _spisokUnitAfter27($elUpd) {
 			if(!$arr = query_arr($sql))
 				continue;
 
-			$upd_flag = 0;//флаг обновления баланса. Будет установлен, если присутствует элемент, участвующий в обновлении.
+			$upd_flag = 0;//С„Р»Р°Рі РѕР±РЅРѕРІР»РµРЅРёСЏ Р±Р°Р»Р°РЅСЃР°. Р‘СѓРґРµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅ, РµСЃР»Рё РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ СЌР»РµРјРµРЅС‚, СѓС‡Р°СЃС‚РІСѓСЋС‰РёР№ РІ РѕР±РЅРѕРІР»РµРЅРёРё.
 			foreach($arr as $r)
 				if($r['txt_2'] == $el['id']) {
 					$upd_flag = 1;
@@ -1754,7 +1754,7 @@ function _spisokUnitAfter27($elUpd) {
 				$upd .= $znak."`".$col."`";
 			}
 
-			//процесс обновления
+			//РїСЂРѕС†РµСЃСЃ РѕР±РЅРѕРІР»РµРЅРёСЏ
 			$sql = "UPDATE "._tableFrom($dialog)."
 					SET `".$cmp['col']."`=".$upd."
 					WHERE `t1`.`id`=".$el['connect_id']." "._spisokCondDef($dialog['id']);

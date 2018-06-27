@@ -1,10 +1,10 @@
 <?php
 switch(@$_POST['op']) {
-	case 'block_grid_on'://включение управления блоками
+	case 'block_grid_on'://РІРєР»СЋС‡РµРЅРёРµ СѓРїСЂР°РІР»РµРЅРёСЏ Р±Р»РѕРєР°РјРё
 		if(!$obj_name = _blockName($_POST['obj_name']))
-			jsonError('Несуществующее имя объекта');
+			jsonError('РќРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРµ РёРјСЏ РѕР±СЉРµРєС‚Р°');
 		if(!$obj_id = _num($_POST['obj_id']))
-			jsonError('Некорректный ID объекта');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РѕР±СЉРµРєС‚Р°');
 
 		$sql = "SELECT *
 				FROM `_block`
@@ -14,54 +14,54 @@ switch(@$_POST['op']) {
 				ORDER BY `y`,`x`";
 		$arr = query_arr($sql);
 
-		$send['html'] = utf8(_blockGrid($arr));
+		$send['html'] = _blockGrid($arr);
 
 		jsonSuccess($send);
 		break;
-	case 'block_grid_off'://выключение управления блоками
+	case 'block_grid_off'://РІС‹РєР»СЋС‡РµРЅРёРµ СѓРїСЂР°РІР»РµРЅРёСЏ Р±Р»РѕРєР°РјРё
 		if(!$obj_name = _blockName($_POST['obj_name']))
-			jsonError('Несуществующее имя объекта');
+			jsonError('РќРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРµ РёРјСЏ РѕР±СЉРµРєС‚Р°');
 		if(!$obj_id = _num($_POST['obj_id']))
-			jsonError('Некорректный ID объекта');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РѕР±СЉРµРєС‚Р°');
 		if(!$width = _num($_POST['width']))
-			jsonError('Некорректная ширина');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅР°СЏ С€РёСЂРёРЅР°');
 
 		define('BLOCK_EDIT', 1);
-		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name)));
+		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name));
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
-		$send['elm'] = utf8(_BE('elem_arr', $obj_name, $obj_id));
+		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;
-	case 'block_elem_width_change'://включение/выключение изменения ширины элементов
+	case 'block_elem_width_change'://РІРєР»СЋС‡РµРЅРёРµ/РІС‹РєР»СЋС‡РµРЅРёРµ РёР·РјРµРЅРµРЅРёСЏ С€РёСЂРёРЅС‹ СЌР»РµРјРµРЅС‚РѕРІ
 		if(!$obj_name = _blockName($_POST['obj_name']))
-			jsonError('Несуществующее имя объекта');
+			jsonError('РќРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРµ РёРјСЏ РѕР±СЉРµРєС‚Р°');
 		if(!$obj_id = _num($_POST['obj_id']))
-			jsonError('Некорректный ID объекта');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РѕР±СЉРµРєС‚Р°');
 		if(!$width = _num($_POST['width']))
-			jsonError('Некорректная ширина');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅР°СЏ С€РёСЂРёРЅР°');
 
 		$on = _num($_POST['on']);
 
 		define('ELEM_WIDTH_CHANGE', $on);
 		define('BLOCK_EDIT', 1);
 
-		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name)));
-		$send['elm'] = utf8(_BE('elem_arr', $obj_name, $obj_id));
+		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name));
+		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;
-	case 'block_elem_width_save'://сохранение ширины элемента
+	case 'block_elem_width_save'://СЃРѕС…СЂР°РЅРµРЅРёРµ С€РёСЂРёРЅС‹ СЌР»РµРјРµРЅС‚Р°
 		if(!$elem_id = _num($_POST['elem_id']))
-			jsonError('Некорректный ID элемента');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID СЌР»РµРјРµРЅС‚Р°');
 
 		$width = _num($_POST['width']);
 
 		if(!$elem = _elemOne($elem_id))
-			jsonError('Элемента не существует');
+			jsonError('Р­Р»РµРјРµРЅС‚Р° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		if(!_dialogParam($elem['dialog_id'], 'element_width'))
-			jsonError('У этого элемента не может настраиваться ширина');
+			jsonError('РЈ СЌС‚РѕРіРѕ СЌР»РµРјРµРЅС‚Р° РЅРµ РјРѕР¶РµС‚ РЅР°СЃС‚СЂР°РёРІР°С‚СЊСЃСЏ С€РёСЂРёРЅР°');
 
 		$sql = "UPDATE `_element`
 				SET `width`=".$width."
@@ -72,15 +72,15 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'block_grid_save'://сохранение данных блоков после редактирования
+	case 'block_grid_save'://СЃРѕС…СЂР°РЅРµРЅРёРµ РґР°РЅРЅС‹С… Р±Р»РѕРєРѕРІ РїРѕСЃР»Рµ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ
 		if(!$obj_name = _blockName($_POST['obj_name']))
-			jsonError('Несуществующее имя объекта');
+			jsonError('РќРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРµ РёРјСЏ РѕР±СЉРµРєС‚Р°');
 		if(!$obj_id = _num($_POST['obj_id']))
-			jsonError('Некорректный ID объекта');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РѕР±СЉРµРєС‚Р°');
 		if(!$width = _num($_POST['width']))
-			jsonError('Некорректная ширина');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅР°СЏ С€РёСЂРёРЅР°');
 
-		//проверка наличия родительского блока
+		//РїСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ Р±Р»РѕРєР°
 		$parent = array();
 		if($parent_id = _num(@$_POST['parent_id'])) {
 			$sql = "SELECT *
@@ -89,7 +89,7 @@ switch(@$_POST['op']) {
 					  AND `obj_id`=".$obj_id."
 					  AND `id`=".$parent_id;
 			if(!$parent = query_ass($sql))
-				jsonError('Родительского блока не существует');
+				jsonError('Р РѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ Р±Р»РѕРєР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 			switch($obj_name) {
 				default:
@@ -99,15 +99,15 @@ switch(@$_POST['op']) {
 							FROM `_block`
 							WHERE `id`=".$obj_id;
 					if(!$block = query_assoc($sql))
-						jsonError('Блока для элемента-списка не существует');
+						jsonError('Р‘Р»РѕРєР° РґР»СЏ СЌР»РµРјРµРЅС‚Р°-СЃРїРёСЃРєР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 					$sql = "SELECT *
 							FROM `_element`
 							WHERE `block_id`=".$obj_id;
 					if(!$elem = query_assoc($sql))
-						jsonError('Элемента-списка не существует');
+						jsonError('Р­Р»РµРјРµРЅС‚Р°-СЃРїРёСЃРєР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
-					//корректировка ширины с учётом отступов
+					//РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєР° С€РёСЂРёРЅС‹ СЃ СѓС‡С‘С‚РѕРј РѕС‚СЃС‚СѓРїРѕРІ
 					$ex = explode(' ', $elem['mar']);
 					$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
 					break;
@@ -118,7 +118,7 @@ switch(@$_POST['op']) {
 			}
 		}
 
-		//получение id элементов, содержащихся в блоках (для последующего их удаления в удалённых блоках)
+		//РїРѕР»СѓС‡РµРЅРёРµ id СЌР»РµРјРµРЅС‚РѕРІ, СЃРѕРґРµСЂР¶Р°С‰РёС…СЃСЏ РІ Р±Р»РѕРєР°С… (РґР»СЏ РїРѕСЃР»РµРґСѓСЋС‰РµРіРѕ РёС… СѓРґР°Р»РµРЅРёСЏ РІ СѓРґР°Р»С‘РЅРЅС‹С… Р±Р»РѕРєР°С…)
 		$elemIdsPrev = 0;
 		$sql = "SELECT `id`
 				FROM `_block`
@@ -162,7 +162,7 @@ switch(@$_POST['op']) {
 			}
 		}
 
-		//удаление удалённых блоков
+		//СѓРґР°Р»РµРЅРёРµ СѓРґР°Р»С‘РЅРЅС‹С… Р±Р»РѕРєРѕРІ
 		$sql = "DELETE FROM `_block`
 				WHERE `obj_name`='".$obj_name."'
 				  AND `obj_id`=".$obj_id."
@@ -170,7 +170,7 @@ switch(@$_POST['op']) {
 				  AND `id` NOT IN (".implode(',', $idsNotDel).")";
 		query($sql);
 
-		//удаление потомков удалённых блоков
+		//СѓРґР°Р»РµРЅРёРµ РїРѕС‚РѕРјРєРѕРІ СѓРґР°Р»С‘РЅРЅС‹С… Р±Р»РѕРєРѕРІ
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `obj_name`='".$obj_name."'
@@ -203,7 +203,7 @@ switch(@$_POST['op']) {
 		}
 
 
-		//удаление элементов в удалённых блоках
+		//СѓРґР°Р»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РІ СѓРґР°Р»С‘РЅРЅС‹С… Р±Р»РѕРєР°С…
 		$elemIdsNotDel = 0;
 		$sql = "SELECT `id`
 				FROM `_block`
@@ -251,16 +251,16 @@ switch(@$_POST['op']) {
 
 		_BE( 'block_clear');
 
-		$send['level'] = utf8(_blockLevelChange($obj_name, $obj_id, $width));
-		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width,0, _pageSpisokUnit($obj_id, $obj_name)));
+		$send['level'] = _blockLevelChange($obj_name, $obj_id, $width);
+		$send['html'] = _blockHtml($obj_name, $obj_id, $width,0, _pageSpisokUnit($obj_id, $obj_name));
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
-		$send['elm'] = utf8(_BE('elem_arr', $obj_name, $obj_id));
+		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;
-	case 'block_unit_style_save'://применение стилей блока
+	case 'block_unit_style_save'://РїСЂРёРјРµРЅРµРЅРёРµ СЃС‚РёР»РµР№ Р±Р»РѕРєР°
 		if(!$block_id = _num($_POST['id']))
-			jsonError('Некорректный ID блока');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID Р±Р»РѕРєР°');
 
 		$sa = _num($_POST['sa']);
 		$width_auto = _num($_POST['width_auto']);
@@ -272,18 +272,18 @@ switch(@$_POST['op']) {
 			$bg_ids = '';
 		}
 
-		//границы
+		//РіСЂР°РЅРёС†С‹
 		$ex = explode(' ', $_POST['bor']);
-		$bor =  _num($ex[0]).' './/сверху
-				_num($ex[1]).' './/справа
-				_num($ex[2]).' './/снизу
-				_num($ex[3]);    //слева
+		$bor =  _num($ex[0]).' './/СЃРІРµСЂС…Сѓ
+				_num($ex[1]).' './/СЃРїСЂР°РІР°
+				_num($ex[2]).' './/СЃРЅРёР·Сѓ
+				_num($ex[3]);    //СЃР»РµРІР°
 
-		//получение данных блока
+		//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… Р±Р»РѕРєР°
 		if(!$block = _blockOne($block_id))
-			jsonError('Блока id'.$block_id.' не существует');
+			jsonError('Р‘Р»РѕРєР° id'.$block_id.' РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
-		//изменение стилей
+		//РёР·РјРµРЅРµРЅРёРµ СЃС‚РёР»РµР№
 		$sql = "UPDATE `_block`
 				SET `sa`='".$sa."',
 					`width_auto`='".$width_auto."',
@@ -294,7 +294,7 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$block_id;
 		query($sql);
 
-		//сохранение стилей элемента в блоке
+		//СЃРѕС…СЂР°РЅРµРЅРёРµ СЃС‚РёР»РµР№ СЌР»РµРјРµРЅС‚Р° РІ Р±Р»РѕРєРµ
 		if($elem_id = _num($_POST['elem_id']))
 			if(_elemOne($elem_id)) {
 				$EL = $_POST['elem'];
@@ -306,7 +306,7 @@ switch(@$_POST['op']) {
 					$size = 0;
 				$url = _num($EL['url']);
 				$width = _num($EL['width']);
-				$num_7 = _num($EL['num_7']);//ограничение высоты фото [60]
+				$num_7 = _num($EL['num_7']);//РѕРіСЂР°РЅРёС‡РµРЅРёРµ РІС‹СЃРѕС‚С‹ С„РѕС‚Рѕ [60]
 				$sql = "UPDATE `_element`
 						SET `mar`='".$mar."',
 							`font`='".$font."',
@@ -324,59 +324,59 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'block_unit_gird'://включение деления блока на подблоки
+	case 'block_unit_gird'://РІРєР»СЋС‡РµРЅРёРµ РґРµР»РµРЅРёСЏ Р±Р»РѕРєР° РЅР° РїРѕРґР±Р»РѕРєРё
 		if(!$id = _num($_POST['id']))
-			jsonError('Некорректный ID блока');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID Р±Р»РѕРєР°');
 
 		$width = 1000;
 
-		//получение данных блока
+		//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… Р±Р»РѕРєР°
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `id`=".$id;
 		if(!$block = query_assoc($sql))
-			jsonError('Блока id'.$id.' не существует');
+			jsonError('Р‘Р»РѕРєР° id'.$id.' РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		foreach($block as $key => $v)
 			if(preg_match(REGEXP_INTEGER, $v))
 				$block[$key] = _num($v, 1);
 
-		if($block['obj_name'] == 'spisok') {//деление происходит для элемента списка
-			//получение данных главного блока списка
+		if($block['obj_name'] == 'spisok') {//РґРµР»РµРЅРёРµ РїСЂРѕРёСЃС…РѕРґРёС‚ РґР»СЏ СЌР»РµРјРµРЅС‚Р° СЃРїРёСЃРєР°
+			//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РіР»Р°РІРЅРѕРіРѕ Р±Р»РѕРєР° СЃРїРёСЃРєР°
 			$sql = "SELECT *
 					FROM `_block`
 					WHERE `id`=".$block['obj_id'];
 			if(!$iss = query_assoc($sql))
-				jsonError('Главного блока списка id'.$block['obj_id'].' не существует');
+				jsonError('Р“Р»Р°РІРЅРѕРіРѕ Р±Р»РѕРєР° СЃРїРёСЃРєР° id'.$block['obj_id'].' РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
-			//получение элемента, который содержит список (для корректировки ширины с отступами)
+			//РїРѕР»СѓС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚Р°, РєРѕС‚РѕСЂС‹Р№ СЃРѕРґРµСЂР¶РёС‚ СЃРїРёСЃРѕРє (РґР»СЏ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєРё С€РёСЂРёРЅС‹ СЃ РѕС‚СЃС‚СѓРїР°РјРё)
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `block_id`=".$iss['id']."
 					LIMIT 1";
 			if(!$elem = query_assoc($sql))
-				jsonError('Элемента в блоке не существует');
+				jsonError('Р­Р»РµРјРµРЅС‚Р° РІ Р±Р»РѕРєРµ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 			$ex = explode(' ', $elem['mar']);
 			$width = floor(($iss['width'] - $ex[1] - $ex[3]) / 10) * 10;
 		}
 
-		if($block['obj_name'] == 'dialog')//деление происходит для диалогового окна
+		if($block['obj_name'] == 'dialog')//РґРµР»РµРЅРёРµ РїСЂРѕРёСЃС…РѕРґРёС‚ РґР»СЏ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°
 			$width = _dialogParam($block['obj_id'], 'width');
 
 		define('BLOCK_EDIT', 1);
 		$send['block'] = $block;
-		$send['html'] = utf8(_blockHtml($block['obj_name'], $block['obj_id'], $width, $id, _pageSpisokUnit($block['obj_id'], $block['obj_name'])));
+		$send['html'] = _blockHtml($block['obj_name'], $block['obj_id'], $width, $id, _pageSpisokUnit($block['obj_id'], $block['obj_name']));
 
 		jsonSuccess($send);
 		break;
-	case 'block_choose_page'://выбор блоков на странице
+	case 'block_choose_page'://РІС‹Р±РѕСЂ Р±Р»РѕРєРѕРІ РЅР° СЃС‚СЂР°РЅРёС†Рµ
 		if(!$obj_name = _blockName($_POST['obj_name']))
-			jsonError('Несуществующее имя объекта');
+			jsonError('РќРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРµ РёРјСЏ РѕР±СЉРµРєС‚Р°');
 		if(!$obj_id = _num($_POST['obj_id']))
-			jsonError('Некорректный ID объекта');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РѕР±СЉРµРєС‚Р°');
 		if(!$width = _num($_POST['width']))
-			jsonError('Некорректная ширина');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅР°СЏ С€РёСЂРёРЅР°');
 
 		$sel = _idsAss($_POST['sel']);
 		$deny = @$_POST['deny'];
@@ -385,38 +385,38 @@ switch(@$_POST['op']) {
 		$unit += array(
 			'choose' => 1,
 			'choose_access' => array('block'=>1),
-			'choose_sel' => $sel,       //ids ранее выбранных блоков
+			'choose_sel' => $sel,       //ids СЂР°РЅРµРµ РІС‹Р±СЂР°РЅРЅС‹С… Р±Р»РѕРєРѕРІ
 			'choose_deny' => empty($deny) ? array() : $deny
 		);
 
-		$send['html'] = utf8(_blockHtml($obj_name, $obj_id, $width, 0, $unit));
+		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, $unit);
 
 		jsonSuccess($send);
 		break;
-	case 'elem_choose_page'://выбор элемента на странице
+	case 'elem_choose_page'://РІС‹Р±РѕСЂ СЌР»РµРјРµРЅС‚Р° РЅР° СЃС‚СЂР°РЅРёС†Рµ
 		if(!$page_id = _num($_POST['page_id']))
-			jsonError('Некорректный ID страницы');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID СЃС‚СЂР°РЅРёС†С‹');
 		if(!$page = _page($page_id))
-			jsonError('Страницы не существует');
+			jsonError('РЎС‚СЂР°РЅРёС†С‹ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 		if(!SA && $page['sa'])
-			jsonError('Нет доступа');
+			jsonError('РќРµС‚ РґРѕСЃС‚СѓРїР°');
 
 		$unit = _pageSpisokUnit($page_id);
 		$unit += array(
 			'choose' => 1,
 			'choose_access' => array('all'=>1),
-			'choose_sel' => array(),       //ids ранее выбранных блоков
+			'choose_sel' => array(),       //ids СЂР°РЅРµРµ РІС‹Р±СЂР°РЅРЅС‹С… Р±Р»РѕРєРѕРІ
 			'choose_deny' => array()
 		);
 
-		$send['html'] = utf8(_blockHtml('page', $page_id, 1000, 0, $unit));
+		$send['html'] = _blockHtml('page', $page_id, 1000, 0, $unit);
 
 		jsonSuccess($send);
 		break;
 }
 
 
-function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерних блоков
+function _blockChildCountSet($obj_name, $obj_id) {//РѕР±РЅРѕРІР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РґРѕС‡РµСЂРЅРёС… Р±Р»РѕРєРѕРІ
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `obj_name`='".$obj_name."'
@@ -425,7 +425,7 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерн
 	if(!$arr = query_arr($sql))
 		return;
 
-	//предварительное обнуление количества дочерних блоков
+	//РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕРµ РѕР±РЅСѓР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РґРѕС‡РµСЂРЅРёС… Р±Р»РѕРєРѕРІ
 	$sql = "UPDATE `_block`
 			SET `child_count`=0,
 				`xx`=1,
@@ -454,7 +454,7 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерн
 		query($sql);
 	}
 
-	//подсчёт количества рядом стоящих Х-блоков в каждой Y-строке
+	//РїРѕРґСЃС‡С‘С‚ РєРѕР»РёС‡РµСЃС‚РІР° СЂСЏРґРѕРј СЃС‚РѕСЏС‰РёС… РҐ-Р±Р»РѕРєРѕРІ РІ РєР°Р¶РґРѕР№ Y-СЃС‚СЂРѕРєРµ
 	$stroka = array();
 	foreach($child as $block_id => $bl)
 		foreach($bl as $r)
@@ -485,7 +485,7 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерн
 		query($sql);
 	}
 }
-function _blockChildCountAllUpdate() {//обновление количества дочерних блоков у всех объектов (разовая функция)
+function _blockChildCountAllUpdate() {//РѕР±РЅРѕРІР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РґРѕС‡РµСЂРЅРёС… Р±Р»РѕРєРѕРІ Сѓ РІСЃРµС… РѕР±СЉРµРєС‚РѕРІ (СЂР°Р·РѕРІР°СЏ С„СѓРЅРєС†РёСЏ)
 	$sql = " SELECT DISTINCT `obj_name` FROM `_block`";
 	foreach(query_array($sql) as $arr)
 		foreach($arr as $name) {

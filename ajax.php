@@ -19,7 +19,7 @@ require_once 'modul/debug/debug_ajax.php';
 
 
 
-jsonError('Условие [op: '.@$_POST['op'].'] не найдено');
+jsonError('РЈСЃР»РѕРІРёРµ [op: '.@$_POST['op'].'] РЅРµ РЅР°Р№РґРµРЅРѕ');
 
 
 
@@ -27,11 +27,11 @@ jsonError('Условие [op: '.@$_POST['op'].'] не найдено');
 function jsonError($values=null) {
 	$send['error'] = 1;
 	if(empty($values))
-		$send['text'] = utf8('Произошла неизвестная ошибка.');
+		$send['text'] = 'РџСЂРѕРёР·РѕС€Р»Р° РЅРµРёР·РІРµСЃС‚РЅР°СЏ РѕС€РёР±РєР°.';
 	elseif(is_array($values))
 		$send += $values;
 	else
-		$send['text'] = utf8($values);
+		$send['text'] = $values;
 	die(json_encode($send + jsonDebugParam()));
 }
 function jsonSuccess($send=array()) {

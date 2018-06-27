@@ -1,10 +1,10 @@
 <?php
 switch(@$_POST['op']) {
-	case 'app_enter'://âõîä â ïðèëîæåíèå èç ñïèñêà ïðèëîæåíèé
+	case 'app_enter'://Ð²Ñ…Ð¾Ð´ Ð² Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð¸Ð· ÑÐ¿Ð¸ÑÐºÐ° Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ð¹
 		if(!SITE)
 			jsonError();
 		if(!$app_id = _num($_POST['app_id']))
-			jsonError('Íåêîððåêòíûé ID ïðèëîæåíèÿ');
+			jsonError('ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ ID Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ');
 
 		$sql = "SELECT *
 				FROM `_spisok`
@@ -13,10 +13,10 @@ switch(@$_POST['op']) {
 				  AND `connect_1`=".USER_ID."
 				LIMIT 1";
 		if(!$ua = query_assoc($sql))
-			jsonError('Ïðèëîæåíèÿ íå ñóùåñòâóåò');
+			jsonError('ÐŸÑ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚');
 
 //		if(!$ua['access'])
-//			jsonError('Íåò äîñòóïà â ïðèëîæåíèå');
+//			jsonError('ÐÐµÑ‚ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð° Ð² Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ');
 
 		$sql = "UPDATE `_user_auth`
 				SET `app_id`=".$app_id."
@@ -47,15 +47,15 @@ switch(@$_POST['op']) {
 			if(mysql_num_rows(query($sql)))
 				$conn = GLOBAL_MYSQL_CONNECT;
 			else
-				jsonError('Òàáëèöû íå ñóùåñòâóåò');
+				jsonError('Ð¢Ð°Ð±Ð»Ð¸Ñ†Ñ‹ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚');
 
 		$sort = explode(',', $_POST['ids']);
 		if(empty($sort))
-			jsonError('Îòñóòñòâóþò ýëåìåíòû äëÿ ñîðòèðîâêè');
+			jsonError('ÐžÑ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÑŽÑ‚ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ñ‹ Ð´Ð»Ñ ÑÐ¾Ñ€Ñ‚Ð¸Ñ€Ð¾Ð²ÐºÐ¸');
 
 		for($n = 0; $n < count($sort); $n++)
 			if(!preg_match(REGEXP_NUMERIC, $sort[$n]))
-				jsonError('Íåêîððåêòíûé èäåíòèôèêàòîð îäíîãî èç ýëåìåíòîâ');
+				jsonError('ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ Ð¾Ð´Ð½Ð¾Ð³Ð¾ Ð¸Ð· ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð¾Ð²');
 
 		for($n = 0; $n < count($sort); $n++) {
 			$sql = "UPDATE `".$table."` SET `sort`=".$n." WHERE `id`=".intval($sort[$n]);

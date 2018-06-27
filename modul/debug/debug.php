@@ -12,10 +12,10 @@ function _debug($i='') {
 	$send =
 		'<div id="debug-footer"'.(SITE ? ' style="bottom:0;position:fixed;width:100%"' : '').'>'.
 			'<div class="w1000 mara center">'.
-				'<a class="debug_toggle'.(DEBUG ? ' on' : '').'">'.(DEBUG ? 'От' : 'В').'ключить Debug</a> :: '.
-				'<a id="cookie_clear">Очисить cookie</a> :: '.
-				'<a id="count_update">Обновить суммы</a> :: '.
-				'<a id="cache_clear">Очисить кэш ('.SCRIPT.')</a> :: '.
+				'<a class="debug_toggle'.(DEBUG ? ' on' : '').'">'.(DEBUG ? 'РћС‚' : 'Р’').'РєР»СЋС‡РёС‚СЊ Debug</a> :: '.
+				'<a id="cookie_clear">РћС‡РёСЃРёС‚СЊ cookie</a> :: '.
+				'<a id="count_update">РћР±РЅРѕРІРёС‚СЊ СЃСѓРјРјС‹</a> :: '.
+				'<a id="cache_clear">РћС‡РёСЃРёС‚СЊ РєСЌС€ ('.SCRIPT.')</a> :: '.
 				'sql <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).') :: '.
 				'php '.round(microtime(true) - TIME, 3).' :: '.
 				'js <em></em>'.
@@ -44,7 +44,7 @@ function _debug($i='') {
 				'<div class="pg cache dn">'._debug_cache().'</div>'.
 				'<ul class="pg sql dn">'.implode('', $sqlQuery).'</ul>'.
 				'<div class="pg cookie dn">'.
-					'<a onclick="debugCookieUpdate($(this))">Обновить</a>'.
+					'<a onclick="debugCookieUpdate($(this))">РћР±РЅРѕРІРёС‚СЊ</a>'.
 					'<div class="mt10">'._debug_cookie().'</div>'.
 				'</div>'.
 				'<div class="pg get dn">'.$get.'</div>'.
@@ -55,7 +55,7 @@ function _debug($i='') {
 	return $send;
 }
 
-function _debug_cache() {//результат использования кеша
+function _debug_cache() {//СЂРµР·СѓР»СЊС‚Р°С‚ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РєРµС€Р°
 	$xi = xcache_info(XC_TYPE_VAR, 0);
 
 	$size = round($xi['size'] / 1024 / 1024, 2);
@@ -67,21 +67,21 @@ function _debug_cache() {//результат использования кеша
 
 	$send =
 		'<table class="_stab small mar10">'.
-			'<tr><td class="">Общий кеш:'.
+			'<tr><td class="">РћР±С‰РёР№ РєРµС€:'.
 				'<td class="r"><b>'.$size.'</b> mb'.
-			'<tr><td class="r color-ref">Занято:'.
+			'<tr><td class="r color-ref">Р—Р°РЅСЏС‚Рѕ:'.
 				'<td class="color-ref r"><b>'.$busy.'</b> mb'.
-				'<td class="grey">'.($cc ? $cc.' запис'._end($cc, 'ь', 'и', 'ей') : 'записей нет').
-			'<tr><td class="r color-pay">Свободно:'.
+				'<td class="grey">'.($cc ? $cc.' Р·Р°РїРёСЃ'._end($cc, 'СЊ', 'Рё', 'РµР№') : 'Р·Р°РїРёСЃРµР№ РЅРµС‚').
+			'<tr><td class="r color-pay">РЎРІРѕР±РѕРґРЅРѕ:'.
 				'<td class="color-pay r"><b>'.$avail.'</b> mb'.
 		'</table>';
 
 	if(!$cc)
 		return $send;
 
-	$ccGlobal = array();//глобальный кеш
-	$ccApp = array();   //кеш по приложениям
-	$ccOther = array();  //кеш из других приложений
+	$ccGlobal = array();//РіР»РѕР±Р°Р»СЊРЅС‹Р№ РєРµС€
+	$ccApp = array();   //РєРµС€ РїРѕ РїСЂРёР»РѕР¶РµРЅРёСЏРј
+	$ccOther = array();  //РєРµС€ РёР· РґСЂСѓРіРёС… РїСЂРёР»РѕР¶РµРЅРёР№
 	foreach($list['cache_list'] as $n => $r) {
 		if(preg_match('/^__GLOBAL[a-z0-9_]{1,30}$/i', $r['name'])) {
 			$ccGlobal[] = $r;
@@ -117,7 +117,7 @@ function _debug_cache() {//результат использования кеша
 			$send .= _debug_cache_tr($r, $n);
 	}
 
-	$send .= $TR_E.'Другие приложения:';
+	$send .= $TR_E.'Р”СЂСѓРіРёРµ РїСЂРёР»РѕР¶РµРЅРёСЏ:';
 	foreach($ccOther as $n => $r)
 		$send .= _debug_cache_tr($r, $n);
 
@@ -158,7 +158,7 @@ function _debug_cookie() {
 }
 
 
-function jsonDebugParam() {//возвращение дополнительных параметров json, если включен debug
+function jsonDebugParam() {//РІРѕР·РІСЂР°С‰РµРЅРёРµ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ json, РµСЃР»Рё РІРєР»СЋС‡РµРЅ debug
 	if(!@DEBUG)
 		return array();
 
@@ -170,7 +170,7 @@ function jsonDebugParam() {//возвращение дополнительных параметров json, если вк
 		'php_time' => round(microtime(true) - TIME, 3),
 		'sql_count' => count($sqlQuery),
 		'sql_time' => round($sqlTime, 3),
-		'sql' => utf8(implode('', $sqlQuery)),
+		'sql' => implode('', $sqlQuery),
 		'php_file' => $d[1]['file'],
 		'php_line' => $d[1]['line']
 	);

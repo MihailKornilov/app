@@ -1,28 +1,31 @@
 <?php
 
-/* ---=== Управление базой данных ===--- */
-function _db() {//заглавная страница
+/* ---=== РЈРїСЂР°РІР»РµРЅРёРµ Р±Р°Р·РѕР№ РґР°РЅРЅС‹С… ===--- */
+function _db() {//Р·Р°РіР»Р°РІРЅР°СЏ СЃС‚СЂР°РЅРёС†Р°
 	$sql = "SHOW TABLES";
 	$arr = query_array($sql);
 
 	$send = '';
-	foreach($arr as $r)
+	foreach($arr as $r) {
+		$key = key($r);
+		$table = $r[$key];
 		$send .=
 			'<div>'.
-				'<a href="'.URL.'&p=6&table='.$r['Tables_in__global_n'].'">'.$r['Tables_in__global_n'].'</a>'.
+				'<a href="'.URL.'&p=6&table='.$table.'">'.$table.'</a>'.
 			'</div>';
+	}
 
 	return $send;
 }
-function _db_table() {//содержание таблицы
+function _db_table() {//СЃРѕРґРµСЂР¶Р°РЅРёРµ С‚Р°Р±Р»РёС†С‹
 	if(empty($_GET['table']) || !preg_match(REGEXP_MYSQLTABLE, $_GET['table']))
-		return 'Таблицы не существует';
+		return 'РўР°Р±Р»РёС†С‹ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚';
 	
 	$table = $_GET['table'];
 
 	$sql = "SHOW TABLES LIKE '".$table."'";
 		if(!mysql_num_rows(query($sql)))
-			return 'Таблицы <b>'.$table.'</b> не существует';
+			return 'РўР°Р±Р»РёС†С‹ <b>'.$table.'</b> РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚';
 
 	$sql = "DESCRIBE `".$table."`";
 	$arr = query_array($sql);

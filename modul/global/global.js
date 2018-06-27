@@ -8,10 +8,10 @@ var ZINDEX = 1000,
 	REGEXP_MS =            /^[\d]+(.[\d]{1,3})?(,[\d]{1,3})?$/,
 	REGEXP_DATE =          /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
 
-	_post = function(send, func) {//отправка ajax-запроса методом POST
+	_post = function(send, func) {//РѕС‚РїСЂР°РІРєР° ajax-Р·Р°РїСЂРѕСЃР° РјРµС‚РѕРґРѕРј POST
 		var v = $.extend({
-			busy_obj:null,  //объект, к которому применяется процесс ожидания
-			busy_cls:'_busy'//класс, показвыающий процесс ожидания
+			busy_obj:null,  //РѕР±СЉРµРєС‚, Рє РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ РїСЂРѕС†РµСЃСЃ РѕР¶РёРґР°РЅРёСЏ
+			busy_cls:'_busy'//РєР»Р°СЃСЃ, РїРѕРєР°Р·РІС‹Р°СЋС‰РёР№ РїСЂРѕС†РµСЃСЃ РѕР¶РёРґР°РЅРёСЏ
 		}, send);
 
 		if(v.busy_obj) {
@@ -75,13 +75,13 @@ var ZINDEX = 1000,
 			a[s[n].uid] = s[n].title;
 		return a
 	},
-	_yearSpisok = function(yearFirst) {//года для выпадающего списка
-		//установка начального года
+	_yearSpisok = function(yearFirst) {//РіРѕРґР° РґР»СЏ РІС‹РїР°РґР°СЋС‰РµРіРѕ СЃРїРёСЃРєР°
+		//СѓСЃС‚Р°РЅРѕРІРєР° РЅР°С‡Р°Р»СЊРЅРѕРіРѕ РіРѕРґР°
 		yearFirst = _num(yearFirst);
 		if(!yearFirst)
 			yearFirst = 2010;
 
-		//определение текущего года
+		//РѕРїСЂРµРґРµР»РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ РіРѕРґР°
 		var d = new Date(),
 			cur = d.getFullYear(),
 			arr = [];
@@ -111,8 +111,8 @@ var ZINDEX = 1000,
 		var val = minus ? REGEXP_NUMERIC_MINUS.test(v) : REGEXP_NUMERIC.test(v);
 		return val ? v * 1 : 0;
 	},
-	_cena = function(v, minus) {//цена в виде: 100    16,34     0.5
-		//Может быть отрицательным значением
+	_cena = function(v, minus) {//С†РµРЅР° РІ РІРёРґРµ: 100    16,34     0.5
+		//РњРѕР¶РµС‚ Р±С‹С‚СЊ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј Р·РЅР°С‡РµРЅРёРµРј
 		if(typeof v == 'string')
 			v = v.replace(',', '.');
 		if(v == 0)
@@ -123,7 +123,7 @@ var ZINDEX = 1000,
 			return 0;
 		return Math.round(v * 100) / 100;
 	},
-	_size = function(v) {//размер в виде: 100    16,3    (только десятичные дроби, не может быть отрицательным)
+	_size = function(v) {//СЂР°Р·РјРµСЂ РІ РІРёРґРµ: 100    16,3    (С‚РѕР»СЊРєРѕ РґРµСЃСЏС‚РёС‡РЅС‹Рµ РґСЂРѕР±Рё, РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј)
 		if(typeof v == 'string')
 			v = v.replace(',', '.');
 		if(v == 0)
@@ -132,7 +132,7 @@ var ZINDEX = 1000,
 			return 0;
 		return v * 1;
 	},
-	_ms = function(v) {//единица измерения с дробями 0.000
+	_ms = function(v) {//РµРґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ СЃ РґСЂРѕР±СЏРјРё 0.000
 		if(typeof v == 'string')
 			v = v.replace(',', '.');
 		if(v == 0)
@@ -141,9 +141,9 @@ var ZINDEX = 1000,
 			return 0;
 		return v * 1;
 	},
-	_msg = function(txt, func) {//Сообщение о результате выполненных действий
+	_msg = function(txt, func) {//РЎРѕРѕР±С‰РµРЅРёРµ Рѕ СЂРµР·СѓР»СЊС‚Р°С‚Рµ РІС‹РїРѕР»РЅРµРЅРЅС‹С… РґРµР№СЃС‚РІРёР№
 		if(!txt)
-			txt = 'Выполнено';
+			txt = 'Р’С‹РїРѕР»РЅРµРЅРѕ';
 		$('#_msg').remove();
 		$('body').append('<div id="_msg">' + txt + '</div>');
 		$('#_msg')
@@ -162,7 +162,7 @@ var ZINDEX = 1000,
 		return v.replace(new RegExp('<br />','g'), "\n")
 				.replace(new RegExp('<br>','g'), "\n");
 	},
-	_copySel = function(arr, id) {//копирование массива для селекта. Если указан id - игнорируется
+	_copySel = function(arr, id) {//РєРѕРїРёСЂРѕРІР°РЅРёРµ РјР°СЃСЃРёРІР° РґР»СЏ СЃРµР»РµРєС‚Р°. Р•СЃР»Рё СѓРєР°Р·Р°РЅ id - РёРіРЅРѕСЂРёСЂСѓРµС‚СЃСЏ
 		var send = [];
 		for(var n = 0; n < arr.length; n++) {
 			var sp = arr[n];
@@ -172,7 +172,7 @@ var ZINDEX = 1000,
 		}
 		return send;
 	},
-	_copyObj = function(arr) {//копирование ассоциативного массива
+	_copyObj = function(arr) {//РєРѕРїРёСЂРѕРІР°РЅРёРµ Р°СЃСЃРѕС†РёР°С‚РёРІРЅРѕРіРѕ РјР°СЃСЃРёРІР°
 		var send = {};
 		_forIn(arr, function(v, i) {
 			send[i] = v;
@@ -189,7 +189,7 @@ var ZINDEX = 1000,
 			'<div class="ttug' + ugolSide + '"></div>' +
 		'</div>';
 	},
-	_parent = function(t, tag) {//поиск нужного тега методом parent()
+	_parent = function(t, tag) {//РїРѕРёСЃРє РЅСѓР¶РЅРѕРіРѕ С‚РµРіР° РјРµС‚РѕРґРѕРј parent()
 		tag = tag || 'TR';
 		var max = 10,
 			cls = tag[0] == '.';
@@ -204,8 +204,8 @@ var ZINDEX = 1000,
 		}
 		return t;
 	},
-	_busy = function(v, obj) {//отображение прогресса ожидания
-		//установка места прогресса
+	_busy = function(v, obj) {//РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РїСЂРѕРіСЂРµСЃСЃР° РѕР¶РёРґР°РЅРёСЏ
+		//СѓСЃС‚Р°РЅРѕРІРєР° РјРµСЃС‚Р° РїСЂРѕРіСЂРµСЃСЃР°
 		if(v == 'set') {
 			window.BUSY_OBJ = obj;
 			return;
@@ -225,15 +225,15 @@ var ZINDEX = 1000,
 
 		m.addClass('_busy');
 	},
-	_forEq = function(arr, func) {//перечисление последовательного массива jQuery $(...)
+	_forEq = function(arr, func) {//РїРµСЂРµС‡РёСЃР»РµРЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕРіРѕ РјР°СЃСЃРёРІР° jQuery $(...)
 
-		//перебор будет осуществляться до тех пор, пока не будет встречено значение false в функции
+		//РїРµСЂРµР±РѕСЂ Р±СѓРґРµС‚ РѕСЃСѓС‰РµСЃС‚РІР»СЏС‚СЊСЃСЏ РґРѕ С‚РµС… РїРѕСЂ, РїРѕРєР° РЅРµ Р±СѓРґРµС‚ РІСЃС‚СЂРµС‡РµРЅРѕ Р·РЅР°С‡РµРЅРёРµ false РІ С„СѓРЅРєС†РёРё
 		for(var n = 0; n < arr.length; n++)
 			if(func(arr.eq(n), n) === false)
 				return false;
 		return true;
 	},
-	_forN = function(arr, func) {//перечисление последовательного массива js
+	_forN = function(arr, func) {//РїРµСЂРµС‡РёСЃР»РµРЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕРіРѕ РјР°СЃСЃРёРІР° js
 		if(!arr)
 			return false;
 		for(var n = 0; n < arr.length; n++)
@@ -241,13 +241,13 @@ var ZINDEX = 1000,
 				return false;
 		return true;
 	},
-	_forIn = function(arr, func) {//перечисление ассоциативного массива или объекта
+	_forIn = function(arr, func) {//РїРµСЂРµС‡РёСЃР»РµРЅРёРµ Р°СЃСЃРѕС†РёР°С‚РёРІРЅРѕРіРѕ РјР°СЃСЃРёРІР° РёР»Рё РѕР±СЉРµРєС‚Р°
 		for(var n in arr)
 			if(func(arr[n], n) === false)
 				return false;
 		return true;
 	},
-	_dn = function(v, cls) {//скрытие/показ элемента
+	_dn = function(v, cls) {//СЃРєСЂС‹С‚РёРµ/РїРѕРєР°Р· СЌР»РµРјРµРЅС‚Р°
 		cls = cls || 'dn';
 		v = cls == 'dn' ? v : !v;
 		return v ? '' : ' ' + cls;
@@ -279,7 +279,7 @@ $.fn._enter = function(func) {
 	});
 	return $(this);
 };
-$.fn._flash = function(o) {//вспышка и затухание элемента в списке
+$.fn._flash = function(o) {//РІСЃРїС‹С€РєР° Рё Р·Р°С‚СѓС…Р°РЅРёРµ СЌР»РµРјРµРЅС‚Р° РІ СЃРїРёСЃРєРµ
 	var t = $(this);
 
 	if(!t.length)
@@ -305,17 +305,17 @@ $.fn._flash = function(o) {//вспышка и затухание элемента в списке
 
 	return t;
 };
-$.fn._dn = function(v, cls) {//скрытие/показ элемента
+$.fn._dn = function(v, cls) {//СЃРєСЂС‹С‚РёРµ/РїРѕРєР°Р· СЌР»РµРјРµРЅС‚Р°
 	var t = $(this);
 	t[(v ? 'remove' : 'add') + 'Class'](cls || 'dn');
 	return t;
 };
-$.fn._busy = function(v) {//проверка/установка/снятие процесса ожидания для элемента - класс _busy
+$.fn._busy = function(v) {//РїСЂРѕРІРµСЂРєР°/СѓСЃС‚Р°РЅРѕРІРєР°/СЃРЅСЏС‚РёРµ РїСЂРѕС†РµСЃСЃР° РѕР¶РёРґР°РЅРёСЏ РґР»СЏ СЌР»РµРјРµРЅС‚Р° - РєР»Р°СЃСЃ _busy
 	var t = $(this);
 
 	if(v === undefined) {
 		v = t.hasClass('_busy');
-		//если процесса не было, то установка
+		//РµСЃР»Рё РїСЂРѕС†РµСЃСЃР° РЅРµ Р±С‹Р»Рѕ, С‚Рѕ СѓСЃС‚Р°РЅРѕРІРєР°
 		if(!v)
 			t.addClass('_busy');
 		return v;
@@ -325,7 +325,7 @@ $.fn._busy = function(v) {//проверка/установка/снятие процесса ожидания для элем
 
 	return t;
 };
-$.fn._sort = function(o) {//сортировка
+$.fn._sort = function(o) {//СЃРѕСЂС‚РёСЂРѕРІРєР°
 	var t = $(this);
 
 	o = $.extend({
@@ -379,7 +379,7 @@ $(document)
 			post =
 				'<div class="hd ' + (req.success ? 'res1' : '') + (req.error ? 'res0' : '') + '">' +
 					'<b>post</b>' +
-					'<a id="repeat">повтор</a>' +
+					'<a id="repeat">РїРѕРІС‚РѕСЂ</a>' +
 	 (req.success ? '<b id="res-success">success</b>' : '') +
 	   (req.error ? '<b id="res-error">error</b>' : '') +
 				'</div>' +
@@ -443,29 +443,29 @@ $(document)
 			width:770,
 			top:10,
 			pad:10,
-			head:'Ошибка AJAX-запроса',
+			head:'РћС€РёР±РєР° AJAX-Р·Р°РїСЂРѕСЃР°',
 			content:'<textarea style="width:730px;background-color:#fdd">' + request.responseText + '</textarea>',
 			butSubmit:'',
-			butCancel:'Закрыть'
+			butCancel:'Р—Р°РєСЂС‹С‚СЊ'
 		});
 		d.content.find('textarea').autosize();
 	})
 
-	.on('click', '#count_update', function() {//обновление количеств и сумм
+	.on('click', '#count_update', function() {//РѕР±РЅРѕРІР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІ Рё СЃСѓРјРј
 		var send = {
 			op:'count_update',
 			busy_obj:$(this)
 		};
 		_post(send, function() {
-			_msg('Суммы обновлены.');
+			_msg('РЎСѓРјРјС‹ РѕР±РЅРѕРІР»РµРЅС‹.');
 			location.reload();
 		});
 	})
-	.on('click', '#cache_clear', function() {//очищение кеша
+	.on('click', '#cache_clear', function() {//РѕС‡РёС‰РµРЅРёРµ РєРµС€Р°
 		_post({'op':'cache_clear'}, 'reload');
-		_msg('Кеш очищен.');
+		_msg('РљРµС€ РѕС‡РёС‰РµРЅ.');
 	})
-	.on('click', '#page_setup', function() {//включение/выключение управления страницей
+	.on('click', '#page_setup', function() {//РІРєР»СЋС‡РµРЅРёРµ/РІС‹РєР»СЋС‡РµРЅРёРµ СѓРїСЂР°РІР»РµРЅРёСЏ СЃС‚СЂР°РЅРёС†РµР№
 		_cookie('page_setup', _cookie('page_setup') == 1 ? 0 : 1);
 		_msg();
 		location.reload();

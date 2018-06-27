@@ -1,5 +1,5 @@
 <?php
-function _face() {//определение, как загружена страница: iframe или сайт
+function _face() {//РѕРїСЂРµРґРµР»РµРЅРёРµ, РєР°Рє Р·Р°РіСЂСѓР¶РµРЅР° СЃС‚СЂР°РЅРёС†Р°: iframe РёР»Рё СЃР°Р№С‚
 	$face = 'site';
 
 	if(@$_COOKIE['face'] == 'iframe')
@@ -13,9 +13,9 @@ function _face() {//определение, как загружена страница: iframe или сайт
 	define('SITE', FACE == 'site' ? 'site' : '');
 	define('IFRAME', FACE == 'iframe');
 }
-function _saDefine() {//установка флага суперпользователя SA
-	//Список пользователей - SA
-	$SA[1] = true;  //Михаил Корнилов
+function _saDefine() {//СѓСЃС‚Р°РЅРѕРІРєР° С„Р»Р°РіР° СЃСѓРїРµСЂРїРѕР»СЊР·РѕРІР°С‚РµР»СЏ SA
+	//РЎРїРёСЃРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ - SA
+	$SA[1] = true;  //РњРёС…Р°РёР» РљРѕСЂРЅРёР»РѕРІ
 //	$SA[18] = true;
 	$SA[53] = true;
 
@@ -28,8 +28,8 @@ function _saDefine() {//установка флага суперпользователя SA
 	}
 }
 
-/* ---=== АВТОРИЗАЦИЯ ===--- */
-function _auth() {//получение данных об авторизации из кеша
+/* ---=== РђР’РўРћР РР—РђР¦РРЇ ===--- */
+function _auth() {//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РѕР± Р°РІС‚РѕСЂРёР·Р°С†РёРё РёР· РєРµС€Р°
 	if(!$r = _cache_get('AUTH', 1)) {
 		$sql = "SELECT *
 				FROM `_user_auth`
@@ -60,7 +60,7 @@ function _auth() {//получение данных об авторизации из кеша
 	define('APP_ACCESS', _num(@$r['access']));
 
 /*
-	//SA: вход от имени другого пользователя
+	//SA: РІС…РѕРґ РѕС‚ РёРјРµРЅРё РґСЂСѓРіРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 	if(SA && $user_id = _num(@$_GET['user_id'])) {
 		$sql = "SELECT COUNT(*)
 				FROM `_vkuser`
@@ -81,33 +81,33 @@ function _auth() {//получение данных об авторизации из кеша
 	}
 */
 }
-function _authLoginIframe() {//проверка авторизации через iframe
+function _authLoginIframe() {//РїСЂРѕРІРµСЂРєР° Р°РІС‚РѕСЂРёР·Р°С†РёРё С‡РµСЂРµР· iframe
 	if(!IFRAME)
 		return '';
 
 	if($auth_key = @$_GET['auth_key']) {
 		if(!$vk_app_id = _num(@$_GET['api_id']))
-			return _authIframeError('Некорректный ID приложения.');
+			return _authIframeError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РїСЂРёР»РѕР¶РµРЅРёСЏ.');
 
 		$sql = "SELECT `id`
 				FROM `_app`
 				WHERE `vk_app_id`=".$vk_app_id."
 				LIMIT 1";
 		if(!$app_id = _num(query_value($sql)))
-			return _authIframeError('Приложение не зарегистрировано.');
+			return _authIframeError('РџСЂРёР»РѕР¶РµРЅРёРµ РЅРµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРѕ.');
 
 		if(!$viewer_id = _num(@$_GET['viewer_id']))
-			return _authIframeError('Некорректный ID пользователя.');
+			return _authIframeError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ.');
 
 		$sql = "SELECT `id`
 				FROM `_user`
 				WHERE `vk_id`=".$viewer_id."
 				LIMIT 1";
 		if(!$user_id = _num(query_value($sql)))
-			return _authIframeError($sql.'Пользователя нет.');
+			return _authIframeError($sql.'РџРѕР»СЊР·РѕРІР°С‚РµР»СЏ РЅРµС‚.');
 
 		if($auth_key != md5($vk_app_id.'_'.$viewer_id.'_'._app($app_id, 'vk_secret')))
-			return _authIframeError('Авторизация не пройдена.');
+			return _authIframeError('РђРІС‚РѕСЂРёР·Р°С†РёСЏ РЅРµ РїСЂРѕР№РґРµРЅР°.');
 
 		_authSuccess($auth_key, $user_id, $app_id);
 		header('Location:'.URL);
@@ -118,7 +118,7 @@ function _authLoginIframe() {//проверка авторизации через iframe
 
 	return '';
 }
-function _authLoginSite() {//страница авторизации через сайт
+function _authLoginSite() {//СЃС‚СЂР°РЅРёС†Р° Р°РІС‚РѕСЂРёР·Р°С†РёРё С‡РµСЂРµР· СЃР°Р№С‚
 	if(!defined('IFRAME_AUTH_ERROR'))
 		define('IFRAME_AUTH_ERROR', 0);
 	if(CODE)
@@ -129,9 +129,9 @@ function _authLoginSite() {//страница авторизации через сайт
 	return
 	'<div class="center mt40">'.
 		'<div class="w1000 pad30 dib mt40">'.
-			'<button class="vk w200" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Войти через VK</button>'.
+			'<button class="vk w200" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Р’РѕР№С‚Рё С‡РµСЂРµР· VK</button>'.
 			'<br>'.
-			'<button class="vk w200 grey mt10 dialog-open" val="dialog_id:99">Войти по логину и паролю</button>'.
+			'<button class="vk w200 grey mt10 dialog-open" val="dialog_id:99">Р’РѕР№С‚Рё РїРѕ Р»РѕРіРёРЅСѓ Рё РїР°СЂРѕР»СЋ</button>'.
 		'</div>'.
 	'</div>'.
 (!LOCAL ?
@@ -139,7 +139,7 @@ function _authLoginSite() {//страница авторизации через сайт
 	'<script>VK.init({apiId:'.AUTH_APP_ID.'});</script>'
 : '');
 }
-function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной авторизации
+function _authSuccess($code, $user_id, $app_id=0) {//РІРЅРµСЃРµРЅРёРµ Р·Р°РїРёСЃРё РѕР± СѓСЃРїРµС€РЅРѕР№ Р°РІС‚РѕСЂРёР·Р°С†РёРё
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes($code)."'";
 	query($sql);
 
@@ -160,7 +160,7 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной
 			)";
 	query($sql);
 
-	//отметка даты последнего посещения пользователя
+	//РѕС‚РјРµС‚РєР° РґР°С‚С‹ РїРѕСЃР»РµРґРЅРµРіРѕ РїРѕСЃРµС‰РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 	$sql = "UPDATE `_user`
 			SET `dtime_last`=CURRENT_TIMESTAMP
 			WHERE `id`=".$user_id;
@@ -175,7 +175,7 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной
 	if(LOCAL)
 		setcookie('local', 1, time() + 2592000, '/');
 }
-function _authLogout() {//выход из приложения, если требуется
+function _authLogout() {//РІС‹С…РѕРґ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ, РµСЃР»Рё С‚СЂРµР±СѓРµС‚СЃСЏ
 	if(!isset($_GET['logout']) && @$_GET['p'] != 98)
 		return;
 	if(!CODE)
@@ -185,7 +185,7 @@ function _authLogout() {//выход из приложения, если требуется
 	_cache_clear( 'page');
 	_cache_clear( 'user'.USER_ID);
 
-	//выход только из приложения и попадание в список приложений
+	//РІС‹С…РѕРґ С‚РѕР»СЊРєРѕ РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ Рё РїРѕРїР°РґР°РЅРёРµ РІ СЃРїРёСЃРѕРє РїСЂРёР»РѕР¶РµРЅРёР№
 	if(APP_ID) {
 		$sql = "UPDATE `_user_auth`
 				SET `app_id`=0
@@ -205,7 +205,7 @@ function _authLogout() {//выход из приложения, если требуется
 function _authPassMD5($pass) {
 	return md5('655005005xX'.$pass);
 }
-function _auth98($dialog, $cmp) {//регистрация нового пользователя
+function _auth98($dialog, $cmp) {//СЂРµРіРёСЃС‚СЂР°С†РёСЏ РЅРѕРІРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 	if($dialog['id'] != 98)
 		return;
 
@@ -213,8 +213,8 @@ function _auth98($dialog, $cmp) {//регистрация нового пользователя
 	$i = $cmp[2066];
 	$pol = array(
 		0 => 0,
-		2073 => 1749,//мужской
-		2074 => 1750 //женский
+		2073 => 1749,//РјСѓР¶СЃРєРѕР№
+		2074 => 1750 //Р¶РµРЅСЃРєРёР№
 	);
 	$login = $cmp[2069];
 	$pass = $cmp[2070];
@@ -242,13 +242,13 @@ function _auth98($dialog, $cmp) {//регистрация нового пользователя
 	$send['action_id'] = 1;
 	jsonSuccess($send);
 }
-function _auth99($dialog, $cmp) {//авторизация по логину и паролю
+function _auth99($dialog, $cmp) {//Р°РІС‚РѕСЂРёР·Р°С†РёСЏ РїРѕ Р»РѕРіРёРЅСѓ Рё РїР°СЂРѕР»СЋ
 	if($dialog['id'] != 99)
 		return;
 	if(empty($cmp[2058]))
-		jsonError('Не указан логин');
+		jsonError('РќРµ СѓРєР°Р·Р°РЅ Р»РѕРіРёРЅ');
 	if(empty($cmp[2059]))
-		jsonError('Не указан пароль');
+		jsonError('РќРµ СѓРєР°Р·Р°РЅ РїР°СЂРѕР»СЊ');
 
 	$login = $cmp[2058];
 	$pass = $cmp[2059];
@@ -259,7 +259,7 @@ function _auth99($dialog, $cmp) {//авторизация по логину и паролю
 			  AND `pass`='"._authPassMD5($pass)."'
 			LIMIT 1";
 	if(!$user_id = _num(query_value($sql)))
-		jsonError('Неверный логин или пароль');
+		jsonError('РќРµРІРµСЂРЅС‹Р№ Р»РѕРіРёРЅ РёР»Рё РїР°СЂРѕР»СЊ');
 
 	$sig = md5($login.$pass.$_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR']);
 	_authSuccess($sig, $user_id);
@@ -267,7 +267,7 @@ function _auth99($dialog, $cmp) {//авторизация по логину и паролю
 	$send['action_id'] = 1;
 	jsonSuccess($send);
 }
-function _authIframeError($msg='Вход в приложение недоступен.') {//сообщение об ошибке входа в приложение через VK iframe
+function _authIframeError($msg='Р’С…РѕРґ РІ РїСЂРёР»РѕР¶РµРЅРёРµ РЅРµРґРѕСЃС‚СѓРїРµРЅ.') {//СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ РІС…РѕРґР° РІ РїСЂРёР»РѕР¶РµРЅРёРµ С‡РµСЂРµР· VK iframe
 	define('IFRAME_AUTH_ERROR', 1);
 	return
 	'<div class="bg-gr1 pad30">'.
@@ -279,14 +279,14 @@ function _authIframeError($msg='Вход в приложение недоступен.') {//сообщение об 
 
 
 
-/* ---=== СОДЕРЖАНИЕ ===--- */
+/* ---=== РЎРћР”Р•Р Р–РђРќРР• ===--- */
 function _html() {
 	return
 	'<!DOCTYPE html>'.
 	'<html lang="ru">'.
 
 	'<head>'.
-		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
+		'<meta http-equiv="content-type" content="text/html; charset=utf-8" />'.
 		'<title>'._html_title().'</title>'.
 		'<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">'.
 		_html_script().
@@ -307,21 +307,21 @@ function _html() {
 }
 function _html_title() {
 	if(!CODE)
-		return 'Авторизация';
+		return 'РђРІС‚РѕСЂРёР·Р°С†РёСЏ';
 	if(!APP_ID)
-		return 'Мои приложения';
+		return 'РњРѕРё РїСЂРёР»РѕР¶РµРЅРёСЏ';
 
 	return _app(APP_ID, 'name');
 }
-function _html_script() {//скрипты и стили
-	//глобальная ссылка для отправки запросов ajax
+function _html_script() {//СЃРєСЂРёРїС‚С‹ Рё СЃС‚РёР»Рё
+	//РіР»РѕР±Р°Р»СЊРЅР°СЏ СЃСЃС‹Р»РєР° РґР»СЏ РѕС‚РїСЂР°РІРєРё Р·Р°РїСЂРѕСЃРѕРІ ajax
 	$GET_ARR = '';
 	foreach($_GET as $i => $v)
 		if($v)
 			$GET_ARR .= '&'.$i.'='.$v;
 
 	return
-	//Отслеживание ошибок в скриптах
+	//РћС‚СЃР»РµР¶РёРІР°РЅРёРµ РѕС€РёР±РѕРє РІ СЃРєСЂРёРїС‚Р°С…
 (SA ? '<script src="js/errors.js"></script>' : '').
 
 (IFRAME && !LOCAL ?
@@ -370,7 +370,7 @@ function _html_script() {//скрипты и стили
 
 	_debug('style');
 }
-function _html_hat() {//верхняя строка приложения для сайта
+function _html_hat() {//РІРµСЂС…РЅСЏСЏ СЃС‚СЂРѕРєР° РїСЂРёР»РѕР¶РµРЅРёСЏ РґР»СЏ СЃР°Р№С‚Р°
 	if(IFRAME_AUTH_ERROR)
 		return '';
 	if(!CODE)
@@ -385,7 +385,7 @@ function _html_hat() {//верхняя строка приложения для сайта
 
 			'<a href="'.URL.'&logout" class="fr white mt10">'.
 				'<span class="dib mr20 pale">'.USER_NAME.'</span>'.
-				'Выход'.
+				'Р’С‹С…РѕРґ'.
 			'</a>'.
 
 			'<div class="fr w300 mt8 r mr20">'.
@@ -396,7 +396,7 @@ function _html_hat() {//верхняя строка приложения для сайта
 		'</div>'.
 	'</div>';
 }
-function _hat_but_sa() {//отображение кнопки списка страниц
+function _hat_but_sa() {//РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РєРЅРѕРїРєРё СЃРїРёСЃРєР° СЃС‚СЂР°РЅРёС†
 	if(!SA)
 		return '';
 	if(!APP_ID)
@@ -407,7 +407,7 @@ function _hat_but_sa() {//отображение кнопки списка страниц
 
 	return '<button class="vk small red" onclick="location.href=\''.URL.'&p=1\'">SA</button>';
 }
-function _hat_but_page() {//отображение кнопки списка страниц
+function _hat_but_page() {//РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РєРЅРѕРїРєРё СЃРїРёСЃРєР° СЃС‚СЂР°РЅРёС†
 	if(!APP_ID)
 		return '';
 	if(!USER_CREATOR)
@@ -415,9 +415,9 @@ function _hat_but_page() {//отображение кнопки списка страниц
 	if(_page('cur') == 12)
 		return '';
 
-	return '<button class="vk small ml10" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>';
+	return '<button class="vk small ml10" onclick="location.href=\''.URL.'&p=12\'">CС‚СЂР°РЅРёС†С‹</button>';
 }
-function _hat_but_pas() {//отображение кнопки настройки страницы
+function _hat_but_pas() {//РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РєРЅРѕРїРєРё РЅР°СЃС‚СЂРѕР№РєРё СЃС‚СЂР°РЅРёС†С‹
 	if(!APP_ID)
 		return '';
 	if(!USER_CREATOR)
@@ -434,10 +434,10 @@ function _hat_but_pas() {//отображение кнопки настройки страницы
 	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
 }
 
-function _app_create($dialog, $app_id) {//привязка пользователя к приложению после его создания
+function _app_create($dialog, $app_id) {//РїСЂРёРІСЏР·РєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Рє РїСЂРёР»РѕР¶РµРЅРёСЋ РїРѕСЃР»Рµ РµРіРѕ СЃРѕР·РґР°РЅРёСЏ
 	if($dialog['id'] != 100)
 		return;
-	if(!$app_id)//ID созданного приложения в таблице _app
+	if(!$app_id)//ID СЃРѕР·РґР°РЅРЅРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ РІ С‚Р°Р±Р»РёС†Рµ _app
 		return;
 
 	$sql = "SELECT COUNT(*)
@@ -472,11 +472,11 @@ function _app_create($dialog, $app_id) {//привязка пользователя к приложению пос
 
 	_auth();
 }
-function _app_list() {//список приложений, которые доступны пользователю
+function _app_list() {//СЃРїРёСЃРѕРє РїСЂРёР»РѕР¶РµРЅРёР№, РєРѕС‚РѕСЂС‹Рµ РґРѕСЃС‚СѓРїРЅС‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ
 	if(!USER_ID)
 		return '';
 	if(APP_ID)
-		return 'Здесь будет размещён список приложений.';
+		return 'Р—РґРµСЃСЊ Р±СѓРґРµС‚ СЂР°Р·РјРµС‰С‘РЅ СЃРїРёСЃРѕРє РїСЂРёР»РѕР¶РµРЅРёР№.';
 
 	$sql = "SELECT *
 			FROM `_spisok`
@@ -486,10 +486,10 @@ function _app_list() {//список приложений, которые доступны пользователю
 	if(!$spisok = query_arr($sql))
 		return
 			'<div class="center pad30 color-555 fs15">'.
-				'Доступных приложений нет.'.
+				'Р”РѕСЃС‚СѓРїРЅС‹С… РїСЂРёР»РѕР¶РµРЅРёР№ РЅРµС‚.'.
 				'<br>'.
 				'<br>'.
-				'<button class="vk green dialog-open" val="dialog_id:100">Создать приложение</div>'.
+				'<button class="vk green dialog-open" val="dialog_id:100">РЎРѕР·РґР°С‚СЊ РїСЂРёР»РѕР¶РµРЅРёРµ</div>'.
 			'</div>';
 
 	$send = '';
@@ -504,7 +504,7 @@ function _app_list() {//список приложений, которые доступны пользователю
 
 	return $send;
 }
-function _app_content() {//центральное содержание
+function _app_content() {//С†РµРЅС‚СЂР°Р»СЊРЅРѕРµ СЃРѕРґРµСЂР¶Р°РЅРёРµ
 	if(IFRAME_AUTH_ERROR)
 		return '';
 	if(!CODE)
@@ -521,7 +521,7 @@ function _app_content() {//центральное содержание
 function _contentMsg($msg='') {
 	if(!$msg) {
 		$_GET['p'] = 0;
-		$msg = 'Несуществующая страница<br><br><a href="'.URL.'&p='._page('cur').'">Перейти на страницу по умолчанию</a>';
+		$msg = 'РќРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰Р°СЏ СЃС‚СЂР°РЅРёС†Р°<br><br><a href="'.URL.'&p='._page('cur').'">РџРµСЂРµР№С‚Рё РЅР° СЃС‚СЂР°РЅРёС†Сѓ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ</a>';
 	}
 	return '<div class="_empty mar20">'.$msg.'</div>';
 }

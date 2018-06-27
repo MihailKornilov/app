@@ -44,35 +44,35 @@ function query_assoc($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
 		return array();
 	return $r;
 }
-function query_ass($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Ассоциативный массив
+function query_ass($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//РђСЃСЃРѕС†РёР°С‚РёРІРЅС‹Р№ РјР°СЃСЃРёРІ
 	$send = array();
 	$q = query($sql, $resource_id);
 	while($r = mysql_fetch_row($q))
 		$send[$r[0]] = preg_match(REGEXP_NUMERIC, $r[1]) ? intval($r[1]) : $r[1];
 	return $send;
 }
-function query_array($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//последовательный массив без ключей
+function query_array($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Р№ РјР°СЃСЃРёРІ Р±РµР· РєР»СЋС‡РµР№
 	$send = array();
 	$q = query($sql, $resource_id);
 	while($r = mysql_fetch_assoc($q))
 		$send[] = $r;
 	return $send;
 }
-function query_arr($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Массив, где ключами является id
+function query_arr($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//РњР°СЃСЃРёРІ, РіРґРµ РєР»СЋС‡Р°РјРё СЏРІР»СЏРµС‚СЃСЏ id
 	$send = array();
 	$q = query($sql, $resource_id);
 	while($r = mysql_fetch_assoc($q))
 		$send[$r['id']] = $r;
 	return $send;
 }
-function query_ids($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Список идентификаторов
+function query_ids($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//РЎРїРёСЃРѕРє РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂРѕРІ
 	$q = query($sql, $resource_id);
 	$send = array();
 	while($sp = mysql_fetch_row($q))
 		$send[] = $sp[0];
 	return empty($send) ? 0 : implode(',', array_unique($send));
 }
-function query_insert_id($tab, $resource_id=GLOBAL_MYSQL_CONNECT) {//id последнего внесённого элемента
+function query_insert_id($tab, $resource_id=GLOBAL_MYSQL_CONNECT) {//id РїРѕСЃР»РµРґРЅРµРіРѕ РІРЅРµСЃС‘РЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
 	$sql = "SELECT `id` FROM `".$tab."` ORDER BY `id` DESC LIMIT 1";
 	return query_value($sql, $resource_id);
 }
@@ -85,11 +85,11 @@ function _maxSql($table, $pole='sort', $app=0) {
 }
 
 function _dbDump() {
-	define('INSERT_COUNT_MAX', 500); //записей в одном INSERT
-	define('DUMP_NAME', GLOBAL_MYSQL_DATABASE.'_'.strftime('%Y-%m-%d_%H-%M-%S').'.sql');//только название файла
-	define('DUMP_FILE', APP_PATH.'/'.DUMP_NAME); //полный путь с названием
-	define('DUMP_FILE_ZIP', DUMP_FILE.'.zip');   //полный путь запакованного файла с названием
-	define('DUMP_NAME_ZIP', DUMP_NAME.'.zip');   //название запакованного файла
+	define('INSERT_COUNT_MAX', 500); //Р·Р°РїРёСЃРµР№ РІ РѕРґРЅРѕРј INSERT
+	define('DUMP_NAME', GLOBAL_MYSQL_DATABASE.'_'.strftime('%Y-%m-%d_%H-%M-%S').'.sql');//С‚РѕР»СЊРєРѕ РЅР°Р·РІР°РЅРёРµ С„Р°Р№Р»Р°
+	define('DUMP_FILE', APP_PATH.'/'.DUMP_NAME); //РїРѕР»РЅС‹Р№ РїСѓС‚СЊ СЃ РЅР°Р·РІР°РЅРёРµРј
+	define('DUMP_FILE_ZIP', DUMP_FILE.'.zip');   //РїРѕР»РЅС‹Р№ РїСѓС‚СЊ Р·Р°РїР°РєРѕРІР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р° СЃ РЅР°Р·РІР°РЅРёРµРј
+	define('DUMP_NAME_ZIP', DUMP_NAME.'.zip');   //РЅР°Р·РІР°РЅРёРµ Р·Р°РїР°РєРѕРІР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р°
 
 	$spisok = array();
 	$sql = "SHOW TABLES";
@@ -125,7 +125,7 @@ function _dbDumpTable($fp, $table) {
 	$r = mysql_fetch_row($q);
 	fwrite($fp, $r[1].";\n");
 
-	//получение форматов столбцов
+	//РїРѕР»СѓС‡РµРЅРёРµ С„РѕСЂРјР°С‚РѕРІ СЃС‚РѕР»Р±С†РѕРІ
 	$sql = "DESCRIBE `".$table."`";
 	$q = query($sql, GLOBAL_MYSQL_CONNECT);
 	$desc = array();
@@ -160,7 +160,7 @@ function _dbDumpTable($fp, $table) {
 	_dbDumpInsert($fp, $table, $values);
 	fwrite($fp, "\n\n\n");
 }
-function _dbDumpInsert($fp, $table, $values) {//внесение блока INSERT в файл
+function _dbDumpInsert($fp, $table, $values) {//РІРЅРµСЃРµРЅРёРµ Р±Р»РѕРєР° INSERT РІ С„Р°Р№Р»
 	if(empty($values))
 		return 0;
 
@@ -168,14 +168,14 @@ function _dbDumpInsert($fp, $table, $values) {//внесение блока INSERT в файл
 	fwrite($fp, $insert);
 	return 0;
 }
-function _dbDumpTime() {//вставка даты и времени выполнения в начало дампа
+function _dbDumpTime() {//РІСЃС‚Р°РІРєР° РґР°С‚С‹ Рё РІСЂРµРјРµРЅРё РІС‹РїРѕР»РЅРµРЅРёСЏ РІ РЅР°С‡Р°Р»Рѕ РґР°РјРїР°
 	$fp = fopen(DUMP_FILE, 'r+');
 	fwrite($fp, "#Dump created ".curTime()."\n");
 	fwrite($fp, "#Time: ".round(microtime(true) - TIME, 3)."\n\n");
 	fclose($fp);
 	return true;
 }
-function _dbDumpZip() {//создание архива базы
+function _dbDumpZip() {//СЃРѕР·РґР°РЅРёРµ Р°СЂС…РёРІР° Р±Р°Р·С‹
 	$zip = new ZipArchive();
 	if($zip->open(DUMP_FILE_ZIP, ZIPARCHIVE::CREATE) !== true) {
 	    echo 'Error while creating archive file';
@@ -186,16 +186,16 @@ function _dbDumpZip() {//создание архива базы
 
 	return true;
 }
-function _dbDumpMail() {//отправка архива на почту
-	//чтение содержания архива
+function _dbDumpMail() {//РѕС‚РїСЂР°РІРєР° Р°СЂС…РёРІР° РЅР° РїРѕС‡С‚Сѓ
+	//С‡С‚РµРЅРёРµ СЃРѕРґРµСЂР¶Р°РЅРёСЏ Р°СЂС…РёРІР°
 	$file = fopen(DUMP_FILE_ZIP, 'r');
-	$size = filesize(DUMP_FILE_ZIP);//получение размера файла
+	$size = filesize(DUMP_FILE_ZIP);//РїРѕР»СѓС‡РµРЅРёРµ СЂР°Р·РјРµСЂР° С„Р°Р№Р»Р°
 	$text = fread($file, $size);
 	fclose($file);
 
 	$from = 'global@dump';
-	$subject = GLOBAL_MYSQL_DATABASE.' dump'; //Тема
-	$boundary = '---'; //Разделитель
+	$subject = GLOBAL_MYSQL_DATABASE.' dump'; //РўРµРјР°
+	$boundary = '---'; //Р Р°Р·РґРµР»РёС‚РµР»СЊ
 
 	$headers = "From: $from\nReply-To: $from\n".
 			   'Content-Type: multipart/mixed; boundary="'.$boundary.'"';
@@ -205,7 +205,7 @@ function _dbDumpMail() {//отправка архива на почту
 		"Content-Transfer-Encoding: quoted-printablenn".
 		"Content-Disposition: attachment;filename==?windows-1251?B?".base64_encode(DUMP_NAME_ZIP)."?=\n\n".
 
-		//текст сообщения
+		//С‚РµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ
 		"Size: "._sumSpace($size)." bytes.\n".
 		"Time: ".round(microtime(true) - TIME, 3)."\n".
 

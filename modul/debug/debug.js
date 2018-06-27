@@ -1,4 +1,4 @@
-var debugCookieUpdate = function(t) {//обновление COOKIE
+var debugCookieUpdate = function(t) {//РѕР±РЅРѕРІР»РµРЅРёРµ COOKIE
 		var send = {
 			op:'debug_cookie',
 			busy_obj:t
@@ -7,7 +7,7 @@ var debugCookieUpdate = function(t) {//обновление COOKIE
 			t.next().html(res.html);
 		});
 	},
-	_cacheContentOpen = function(name) {//открытие диалога для просмотра содержания кеша
+	_cacheContentOpen = function(name) {//РѕС‚РєСЂС‹С‚РёРµ РґРёР°Р»РѕРіР° РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° СЃРѕРґРµСЂР¶Р°РЅРёСЏ РєРµС€Р°
 		_cookie('cache_content_name', name);
 		if(DIALOG[84])
 			DIALOG[84].close();
@@ -26,7 +26,7 @@ $(document)
 		var t = $(this),
 			txt = '<div class="sql-hd">' +
 					'time: ' + t.next().html() +
-					'<a>Обновить</a>' +
+					'<a>РћР±РЅРѕРІРёС‚СЊ</a>' +
 					'<a>NOCACHE</a>' +
 					'<a>EXPLAIN</a>' +
 					'<h3></h3>' +
@@ -63,7 +63,7 @@ $(document)
 	.on('click', '#cookie_clear', function() {
 		$.post(AJAX, {'op':'cookie_clear'}, function(res) {
 			if(res.success) {
-				_msg('Cookie очищены');
+				_msg('Cookie РѕС‡РёС‰РµРЅС‹');
 				location.reload();
 			}
 		}, 'json');
@@ -98,7 +98,7 @@ $(document)
 			var t = $(this).parent(),
 				s = t.hasClass('show');
 			t[(s ? 'remove' : 'add') + 'Class']('show');
-			$(this).html(s ? '+' : '—');
+			$(this).html(s ? '+' : 'вЂ”');
 			_cookie('debug_show', s ? 0 : 1);
 		});
 		$('#_debug .dmenu a').click(function() {

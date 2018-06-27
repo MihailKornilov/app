@@ -6,7 +6,6 @@ setlocale(LC_NUMERIC, 'en_US');
 
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 define('DOMAIN', $_SERVER['SERVER_NAME']);
-define('LOCAL', DOMAIN != 'nyandoma.ru');
 
 require_once GLOBAL_DIR.'/syncro.php';
 require_once GLOBAL_DIR.'/modul/global/regexp.php';
@@ -27,18 +26,21 @@ define('YEAR_CUR', strftime('%Y'));
 
 define('CODE', _txt(@$_COOKIE['code']));
 define('DEBUG', @$_COOKIE['debug']);
-define('MIN', DEBUG ? '' : '.min');
+
+//define('MIN', DEBUG ? '' : '.min');
+define('MIN', '');
+
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);
 
 //session_name('apppp');
 //session_start();
 
-//авторизация для xCache
+//Р°РІС‚РѕСЂРёР·Р°С†РёСЏ РґР»СЏ xCache
 //$_SERVER["PHP_AUTH_USER"] = "admin";
 //$_SERVER["PHP_AUTH_PW"] = "6000030";
 
-function _setting() {//установка констант-настроек
+function _setting() {//СѓСЃС‚Р°РЅРѕРІРєР° РєРѕРЅСЃС‚Р°РЅС‚-РЅР°СЃС‚СЂРѕРµРє
 	$key = 'SETTING';
 	if(!$arr = _cache_get($key, 1)) {
 		$sql = "SELECT `key`,`v`
@@ -60,11 +62,11 @@ function _setting() {//установка констант-настроек
 		_cache_set($key, $arr, 1);
 	}
 
-	//версия скриптов
+	//РІРµСЂСЃРёСЏ СЃРєСЂРёРїС‚РѕРІ
 	define('SCRIPT', _num($arr['SCRIPT']));
 }
 
-function _table($id=false) {//таблицы в базе с соответствующими идентификаторами
+function _table($id=false) {//С‚Р°Р±Р»РёС†С‹ РІ Р±Р°Р·Рµ СЃ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРјРё РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°РјРё
 	$tab = array(
 		 1 => '_app',
 		 2 => '_block',
@@ -93,7 +95,7 @@ function _table($id=false) {//таблицы в базе с соответствующими идентификаторами
 
 	return $tab[$id];
 }
-function _tableFrom($dialog) {//составление таблиц для запроса на основании данных из диалога
+function _tableFrom($dialog) {//СЃРѕСЃС‚Р°РІР»РµРЅРёРµ С‚Р°Р±Р»РёС† РґР»СЏ Р·Р°РїСЂРѕСЃР° РЅР° РѕСЃРЅРѕРІР°РЅРёРё РґР°РЅРЅС‹С… РёР· РґРёР°Р»РѕРіР°
 	$key = 'TABLE_FROM_'.$dialog['id'];
 
 	if(defined($key))
@@ -114,14 +116,14 @@ function _tableFrom($dialog) {//составление таблиц для запроса на основании данн
 }
 
 
-function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
+function _app($app_id=APP_ID, $i='all') {//РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… Рѕ РїСЂРёР»РѕР¶РµРЅРёРё
 	$key = 'app'.$app_id;
 	if(!$arr = _cache_get($key)) {
 		$sql = "SELECT *
 				FROM `_app`
 				WHERE `id`=".$app_id;
 		if(!$arr = query_assoc($sql))
-			die('Невозможно получить данные приложения. Кеш: '.$key);
+			die('РќРµРІРѕР·РјРѕР¶РЅРѕ РїРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ РїСЂРёР»РѕР¶РµРЅРёСЏ. РљРµС€: '.$key);
 
 		_cache_set($key, $arr);
 	}
@@ -130,13 +132,13 @@ function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 		return $arr;
 
 	if(!isset($arr[$i]))
-		return '_app: неизвестный ключ';
+		return '_app: РЅРµРёР·РІРµСЃС‚РЅС‹Р№ РєР»СЋС‡';
 
 	return $arr[$i];
 }
 
-function _regFilter($v) {//проверка регулярного выражения на недопустимые символы
-	$reg = '/(\[)/'; // скобка [
+function _regFilter($v) {//РїСЂРѕРІРµСЂРєР° СЂРµРіСѓР»СЏСЂРЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ РЅР° РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹
+	$reg = '/(\[)/'; // СЃРєРѕР±РєР° [
 	if(preg_match($reg, $v))
 		return '';
 	return '/('.$v.')/iu';
@@ -155,7 +157,7 @@ function _end($count, $o1, $o2, $o5=false) {
 		}
 	return $o5;
 }
-function _dn($v, $cls='dn') {//показ/скрытие блока на основании условия
+function _dn($v, $cls='dn') {//РїРѕРєР°Р·/СЃРєСЂС‹С‚РёРµ Р±Р»РѕРєР° РЅР° РѕСЃРЅРѕРІР°РЅРёРё СѓСЃР»РѕРІРёСЏ
 	if(empty($v))
 		return ' '.$cls;
 	return '';
@@ -173,16 +175,16 @@ function _num($v, $minus=0) {
 
 	return intval($v);
 }
-function _bool($v) {//проверка на булево число
+function _bool($v) {//РїСЂРѕРІРµСЂРєР° РЅР° Р±СѓР»РµРІРѕ С‡РёСЃР»Рѕ
 	if(empty($v) || is_array($v) || !preg_match(REGEXP_BOOL, $v))
 		return 0;
 	return 1;
 }
-function _cena($v, $minus=0, $kop=0, $del='.') {//проверка на цену.
+function _cena($v, $minus=0, $kop=0, $del='.') {//РїСЂРѕРІРµСЂРєР° РЅР° С†РµРЅСѓ.
 	/*
-		$minus - может ли цена быть минусовой.
-		$kop - возвращать с копейками, даже если 00
-		$del - знак после запятой
+		$minus - РјРѕР¶РµС‚ Р»Рё С†РµРЅР° Р±С‹С‚СЊ РјРёРЅСѓСЃРѕРІРѕР№.
+		$kop - РІРѕР·РІСЂР°С‰Р°С‚СЊ СЃ РєРѕРїРµР№РєР°РјРё, РґР°Р¶Рµ РµСЃР»Рё 00
+		$del - Р·РЅР°Рє РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№
 	*/
 	if(empty($v) || is_array($v) || !preg_match($minus ? REGEXP_CENA_MINUS : REGEXP_CENA, $v))
 		return 0;
@@ -204,9 +206,9 @@ function _cena($v, $minus=0, $kop=0, $del='.') {//проверка на цену.
 
 	return $v;
 }
-function _ms($v, $del='.') {//проверка на единицу измерения с дробями 0.000
+function _ms($v, $del='.') {//РїСЂРѕРІРµСЂРєР° РЅР° РµРґРёРЅРёС†Сѓ РёР·РјРµСЂРµРЅРёСЏ СЃ РґСЂРѕР±СЏРјРё 0.000
 	/*
-		$del - знак после запятой
+		$del - Р·РЅР°Рє РїРѕСЃР»Рµ Р·Р°РїСЏС‚РѕР№
 	*/
 	if(empty($v) || is_array($v) || !preg_match(REGEXP_MS, $v))
 		return 0;
@@ -219,7 +221,7 @@ function _ms($v, $del='.') {//проверка на единицу измерения с дробями 0.000
 
 	return $v;
 }
-function _sumSpace($sum, $oo=0, $znak=',') {//Приведение суммы к удобному виду с пробелами
+function _sumSpace($sum, $oo=0, $znak=',') {//РџСЂРёРІРµРґРµРЅРёРµ СЃСѓРјРјС‹ Рє СѓРґРѕР±РЅРѕРјСѓ РІРёРґСѓ СЃ РїСЂРѕР±РµР»Р°РјРё
 	$minus = $sum < 0 ? -1 : 1;
 	$sum *= $minus;
 	$send = '';
@@ -238,20 +240,19 @@ function _sumSpace($sum, $oo=0, $znak=',') {//Приведение суммы к удобному виду с
 	$send = $oo && !$drob ? $send.$znak.'00' : $send;
 	return ($minus < 0 ? '-' : '').$send;
 }
-function _txt($v, $utf8=0, $no_trim=0) {
+function _txt($v) {
 	$v = htmlspecialchars($v);
-	if(!$no_trim)
-		$v = trim($v);
-	return $utf8 ? $v : win1251($v);
+	$v = trim($v);
+	return $v;
 }
-function _br($v, $replace='<br />') {//вставка br в текст при нахождении enter
+function _br($v, $replace='<br />') {//РІСЃС‚Р°РІРєР° br РІ С‚РµРєСЃС‚ РїСЂРё РЅР°С…РѕР¶РґРµРЅРёРё enter
 	return str_replace("\n", $replace, $v);
 }
-function _daNet($v) {//$v: 1 -> да, 0 -> нет
-	return $v ? 'да' : 'нет';
+function _daNet($v) {//$v: 1 -> РґР°, 0 -> РЅРµС‚
+	return $v ? 'РґР°' : 'РЅРµС‚';
 }
 
-function _ids($ids, $return_arr=0) {//проверка корректности списка id, составленные через запятую
+function _ids($ids, $return_arr=0) {//РїСЂРѕРІРµСЂРєР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚Рё СЃРїРёСЃРєР° id, СЃРѕСЃС‚Р°РІР»РµРЅРЅС‹Рµ С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ
 	$arr = array();
 	foreach(explode(',', $ids) as $i => $id) {
 		if(!preg_match(REGEXP_NUMERIC, $id))
@@ -260,9 +261,9 @@ function _ids($ids, $return_arr=0) {//проверка корректности списка id, составлен
 	}
 	return $return_arr ? $arr : implode(',', $arr);
 }
-function _idsGet($arr, $i='id') {//возвращение из массива списка id через запятую
+function _idsGet($arr, $i='id') {//РІРѕР·РІСЂР°С‰РµРЅРёРµ РёР· РјР°СЃСЃРёРІР° СЃРїРёСЃРєР° id С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ
 /*
-	key: сборка id по ключу
+	key: СЃР±РѕСЂРєР° id РїРѕ РєР»СЋС‡Сѓ
 */
 	$ids = array();
 	foreach($arr as $id => $r) {
@@ -275,7 +276,7 @@ function _idsGet($arr, $i='id') {//возвращение из массива списка id через запяту
 	}
 	return empty($ids) ? 0 : implode(',', array_unique($ids));
 }
-function _idsAss($v) {//получение списка id вида: $v[25] = 1; - выбранный список
+function _idsAss($v) {//РїРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° id РІРёРґР°: $v[25] = 1; - РІС‹Р±СЂР°РЅРЅС‹Р№ СЃРїРёСЃРѕРє
 	$send = array();
 
 	if(empty($v))
@@ -289,37 +290,17 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1; - выбранный список
 	return $send;
 }
 
-function win1251($txt) {
-	return $txt;
-//	return iconv('UTF-8', 'WINDOWS-1251//TRANSLIT', $txt);
-}
-function utf8($val) {
-	if(!is_array($val))
-		return $val;
-		//return iconv('WINDOWS-1251', 'UTF-8', $val);
-
-	foreach($val as $k => $v) {
-		if(is_array($v)) {
-			$val[$k] = utf8($v);
-			continue;
-		}
-		$val[$k] = preg_match(REGEXP_INTEGER, $v) ? _num($v, 1) : utf8($v);
-	}
-
-	return $val;
-}
-function mb_ucfirst($txt) {//делание заклавной первую букву текста
-	mb_internal_encoding('UTF-8');
-	$txt = utf8($txt);
+function mb_ucfirst($txt) {//РґРµР»Р°РЅРёРµ Р·Р°РєР»Р°РІРЅРѕР№ РїРµСЂРІСѓСЋ Р±СѓРєРІСѓ С‚РµРєСЃС‚Р°
+//	mb_internal_encoding('UTF-8');
 	$txt = mb_strtoupper(mb_substr($txt, 0, 1)).mb_substr($txt, 1);
-	return win1251($txt);
+	return $txt;
 }
 function unescape($str){
 	$escape_chars = '0410 0430 0411 0431 0412 0432 0413 0433 0490 0491 0414 0434 0415 0435 0401 0451 0404 0454 '.
 		'0416 0436 0417 0437 0418 0438 0406 0456 0419 0439 041A 043A 041B 043B 041C 043C 041D 043D '.
 		'041E 043E 041F 043F 0420 0440 0421 0441 0422 0442 0423 0443 0424 0444 0425 0445 0426 0446 '.
 		'0427 0447 0428 0448 0429 0449 042A 044A 042B 044B 042C 044C 042D 044D 042E 044E 042F 044F';
-	$russian_chars = 'А а Б б В в Г г Ґ ґ Д д Е е Ё ё Є є Ж ж З з И и І і Й й К к Л л М м Н н О о П п Р р С с Т т У у Ф ф Х х Ц ц Ч ч Ш ш Щ щ Ъ ъ Ы ы Ь ь Э э Ю ю Я я';
+	$russian_chars = 'Рђ Р° Р‘ Р± Р’ РІ Р“ Рі Тђ Т‘ Р” Рґ Р• Рµ РЃ С‘ Р„ С” Р– Р¶ Р— Р· Р Рё Р† С– Р™ Р№ Рљ Рє Р› Р» Рњ Рј Рќ РЅ Рћ Рѕ Рџ Рї Р  СЂ РЎ СЃ Рў С‚ РЈ Сѓ Р¤ С„ РҐ С… Р¦ С† Р§ С‡ РЁ С€ Р© С‰ РЄ СЉ Р« С‹ Р¬ СЊ Р­ СЌ Р® СЋ РЇ СЏ';
 	$e = explode(' ', $escape_chars);
 	$r = explode(' ', $russian_chars);
 	$rus_array = explode('%u', $str);
@@ -329,85 +310,85 @@ function unescape($str){
 }
 function translit($str) {
 	$list = array(
-		'А' => 'A',
-		'Б' => 'B',
-		'В' => 'V',
-		'Г' => 'G',
-		'Д' => 'D',
-		'Е' => 'E',
-		'Ё' => 'E',
-		'Ж' => 'J',
-		'З' => 'Z',
-		'И' => 'I',
-		'Й' => 'Y',
-		'К' => 'K',
-		'Л' => 'L',
-		'М' => 'M',
-		'Н' => 'N',
-		'О' => 'O',
-		'П' => 'P',
-		'Р' => 'R',
-		'С' => 'S',
-		'Т' => 'T',
-		'У' => 'U',
-		'Ф' => 'F',
-		'Х' => 'H',
-		'Ц' => 'TS',
-		'Ч' => 'CH',
-		'Ш' => 'SH',
-		'Щ' => 'SCH',
-		'Ъ' => '',
-		'Ы' => 'YI',
-		'Ь' => '',
-		'Э' => 'E',
-		'Ю' => 'YU',
-		'Я' => 'YA',
-		'а' => 'a',
-		'б' => 'b',
-		'в' => 'v',
-		'г' => 'g',
-		'д' => 'd',
-		'е' => 'e',
-		'ё' => 'e',
-		'ж' => 'j',
-		'з' => 'z',
-		'и' => 'i',
-		'й' => 'y',
-		'к' => 'k',
-		'л' => 'l',
-		'м' => 'm',
-		'н' => 'n',
-		'о' => 'o',
-		'п' => 'p',
-		'р' => 'r',
-		'с' => 's',
-		'т' => 't',
-		'у' => 'u',
-		'ф' => 'f',
-		'х' => 'h',
-		'ц' => 'ts',
-		'ч' => 'ch',
-		'ш' => 'sh',
-		'щ' => 'sch',
-		'ъ' => 'y',
-		'ы' => 'yi',
-		'ь' => '',
-		'э' => 'e',
-		'ю' => 'yu',
-		'я' => 'ya',
+		'Рђ' => 'A',
+		'Р‘' => 'B',
+		'Р’' => 'V',
+		'Р“' => 'G',
+		'Р”' => 'D',
+		'Р•' => 'E',
+		'РЃ' => 'E',
+		'Р–' => 'J',
+		'Р—' => 'Z',
+		'Р' => 'I',
+		'Р™' => 'Y',
+		'Рљ' => 'K',
+		'Р›' => 'L',
+		'Рњ' => 'M',
+		'Рќ' => 'N',
+		'Рћ' => 'O',
+		'Рџ' => 'P',
+		'Р ' => 'R',
+		'РЎ' => 'S',
+		'Рў' => 'T',
+		'РЈ' => 'U',
+		'Р¤' => 'F',
+		'РҐ' => 'H',
+		'Р¦' => 'TS',
+		'Р§' => 'CH',
+		'РЁ' => 'SH',
+		'Р©' => 'SCH',
+		'РЄ' => '',
+		'Р«' => 'YI',
+		'Р¬' => '',
+		'Р­' => 'E',
+		'Р®' => 'YU',
+		'РЇ' => 'YA',
+		'Р°' => 'a',
+		'Р±' => 'b',
+		'РІ' => 'v',
+		'Рі' => 'g',
+		'Рґ' => 'd',
+		'Рµ' => 'e',
+		'С‘' => 'e',
+		'Р¶' => 'j',
+		'Р·' => 'z',
+		'Рё' => 'i',
+		'Р№' => 'y',
+		'Рє' => 'k',
+		'Р»' => 'l',
+		'Рј' => 'm',
+		'РЅ' => 'n',
+		'Рѕ' => 'o',
+		'Рї' => 'p',
+		'СЂ' => 'r',
+		'СЃ' => 's',
+		'С‚' => 't',
+		'Сѓ' => 'u',
+		'С„' => 'f',
+		'С…' => 'h',
+		'С†' => 'ts',
+		'С‡' => 'ch',
+		'С€' => 'sh',
+		'С‰' => 'sch',
+		'СЉ' => 'y',
+		'С‹' => 'yi',
+		'СЊ' => '',
+		'СЌ' => 'e',
+		'СЋ' => 'yu',
+		'СЏ' => 'ya',
 		' ' => '_',
-		'№' => 'N',
-		'¦' => ''
+		'в„–' => 'N',
+		'В¦' => ''
 	);
 	return strtr($str, $list);
 }
 
-function _pr($arr) {//аналог функции print_r
+function _pr($arr) {//Р°РЅР°Р»РѕРі С„СѓРЅРєС†РёРё print_r
 	if(empty($arr))
-		return _prMsg('массив пуст');
+		return _prMsg('РјР°СЃСЃРёРІ РїСѓСЃС‚');
 
 	if(!is_array($arr))
-		return _prMsg('не является массивом');
+		return _prMsg('РЅРµ СЏРІР»СЏРµС‚СЃСЏ РјР°СЃСЃРёРІРѕРј');
 
 	return
 	'<div class="dib pad5 bor-e8">'.
@@ -417,7 +398,7 @@ function _pr($arr) {//аналог функции print_r
 function _prMsg($msg) {
 	return '<div class="dib grey i pad5 bor-e8">'.$msg.'</div>';
 }
-function _prFor($arr, $sub=0) {//перебор массива
+function _prFor($arr, $sub=0) {//РїРµСЂРµР±РѕСЂ РјР°СЃСЃРёРІР°
 	$send = '';
 	foreach($arr as $id => $r) {
 		$send .=
@@ -433,11 +414,11 @@ function _prFor($arr, $sub=0) {//перебор массива
 	return $send;
 }
 
-function _arr($arr, $i=false) {//Последовательный массив
+function _arr($arr, $i=false) {//РџРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Р№ РјР°СЃСЃРёРІ
 	$send = array();
 	foreach($arr as $r) {
 		$v = $i === false ? $r : $r[$i];
-		$send[] = preg_match(REGEXP_CENA, $v) ? _cena($v) : utf8(htmlspecialchars_decode($v));
+		$send[] = preg_match(REGEXP_CENA, $v) ? _cena($v) : htmlspecialchars_decode($v);
 	}
 	return $send;
 }
@@ -446,7 +427,7 @@ function _sel($arr) {
 	foreach($arr as $uid => $title) {
 		$send[] = array(
 			'uid' => $uid,
-			'title' => utf8(trim($title))
+			'title' => trim($title)
 		);
 	}
 	return $send;
@@ -468,17 +449,17 @@ function _selJson($arr) {
 	}
 	return '['.implode(',',$send).']';
 }
-function _selArray($arr) {//список для _select при отправке через ajax
+function _selArray($arr) {//СЃРїРёСЃРѕРє РґР»СЏ _select РїСЂРё РѕС‚РїСЂР°РІРєРµ С‡РµСЂРµР· ajax
 	$send = array();
 	foreach($arr as $uid => $title) {
 		$send[] = array(
 			'id' => _num($uid),
-			'title' => utf8(addslashes(htmlspecialchars_decode(trim($title))))
+			'title' => addslashes(htmlspecialchars_decode(trim($title)))
 		);
 	}
 	return $send;
 }
-function _assJson($arr) {//Ассоциативный массив одного элемента
+function _assJson($arr) {//РђСЃСЃРѕС†РёР°С‚РёРІРЅС‹Р№ РјР°СЃСЃРёРІ РѕРґРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
 	$send = array();
 	foreach($arr as $id => $v)
 		$send[] =
@@ -487,7 +468,7 @@ function _assJson($arr) {//Ассоциативный массив одного элемента
 			(preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.$v.'"');
 	return '{'.implode(',', $send).'}';
 }
-function _arrJson($arr, $i=false) {//Последовательный массив
+function _arrJson($arr, $i=false) {//РџРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Р№ РјР°СЃСЃРёРІ
 	$send = array();
 	foreach($arr as $r) {
 		$v = $i === false ? $r : $r[$i];
@@ -495,11 +476,11 @@ function _arrJson($arr, $i=false) {//Последовательный массив
 	}
 	return '['.implode(',', $send).']';
 }
-function _json($arr) {//перевод массива в JS
+function _json($arr) {//РїРµСЂРµРІРѕРґ РјР°СЃСЃРёРІР° РІ JS
 	if(empty($arr))
 		return '[]';
 
-	//определение, ассоциативный массив или последовательный
+	//РѕРїСЂРµРґРµР»РµРЅРёРµ, Р°СЃСЃРѕС†РёР°С‚РёРІРЅС‹Р№ РјР°СЃСЃРёРІ РёР»Рё РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹Р№
 	$is_ass = range(0,count($arr) - 1) !== array_keys($arr);
 
 	$send = array();
@@ -518,7 +499,7 @@ function _json($arr) {//перевод массива в JS
 		($is_ass ? '}' : ']');
 }
 
-function _vkapi($method, $param=array()) {//получение данных из api вконтакте
+function _vkapi($method, $param=array()) {//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РёР· api РІРєРѕРЅС‚Р°РєС‚Рµ
 	$param += array(
 		'v' => 5.64,
 		'lang' => 'ru',
@@ -534,7 +515,7 @@ function _vkapi($method, $param=array()) {//получение данных из api вконтакте
 }
 
 
-function _jsCache() {//формирование файла JS с данными (элементы, блоки)
+function _jsCache() {//С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»Р° JS СЃ РґР°РЅРЅС‹РјРё (СЌР»РµРјРµРЅС‚С‹, Р±Р»РѕРєРё)
 	$ELM = array();
 	$BLK = array();
 
@@ -550,11 +531,11 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 		$val[] = 'name:"'.addslashes($r['name']).'"';
 		$val[] = 'block_id:'.$block_id;
 
-		//исходный диалог (dialog source)
+		//РёСЃС…РѕРґРЅС‹Р№ РґРёР°Р»РѕРі (dialog source)
 		if($block[$block_id]['obj_name'] == 'dialog')
 			$val[] = 'ds:'.$block[$block_id]['obj_id'];
 
-		//элемент является подключаемым списком
+		//СЌР»РµРјРµРЅС‚ СЏРІР»СЏРµС‚СЃСЏ РїРѕРґРєР»СЋС‡Р°РµРјС‹Рј СЃРїРёСЃРєРѕРј
 		if($r['dialog_id'] == 29 || $r['dialog_id'] == 59)
 			$val[] = 'issp:1';
 
@@ -581,27 +562,27 @@ function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 
 function _cache($v=array()) {
 	if(!defined('CACHE_DEFINE')) {
-		define('CACHE_TTL', 86400);//время в секундах, которое хранит кеш
+		define('CACHE_TTL', 86400);//РІСЂРµРјСЏ РІ СЃРµРєСѓРЅРґР°С…, РєРѕС‚РѕСЂРѕРµ С…СЂР°РЅРёС‚ РєРµС€
 		define('CACHE_DEFINE', true);
 	}
 
-	//действие:
-	//	get - считывание данных из кеша (по умолчанию)
-	//	set - занесение данных в кеш
-	//	clear - очистка кеша
+	//РґРµР№СЃС‚РІРёРµ:
+	//	get - СЃС‡РёС‚С‹РІР°РЅРёРµ РґР°РЅРЅС‹С… РёР· РєРµС€Р° (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ)
+	//	set - Р·Р°РЅРµСЃРµРЅРёРµ РґР°РЅРЅС‹С… РІ РєРµС€
+	//	clear - РѕС‡РёСЃС‚РєР° РєРµС€Р°
 	$action = empty($v['action']) ? 'get' : $v['action'];
 
-	//глобальное значение: доступно для всех приложений
-	//если внутреннее, то к ключу будет прибавляться префикс
+	//РіР»РѕР±Р°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ: РґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РІСЃРµС… РїСЂРёР»РѕР¶РµРЅРёР№
+	//РµСЃР»Рё РІРЅСѓС‚СЂРµРЅРЅРµРµ, С‚Рѕ Рє РєР»СЋС‡Сѓ Р±СѓРґРµС‚ РїСЂРёР±Р°РІР»СЏС‚СЊСЃСЏ РїСЂРµС„РёРєСЃ
 	$global = !empty($v['global']);
 
 	if(empty($v['key']))
-		die('Отсутствует ключ кеша.');
+		die('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РєР»СЋС‡ РєРµС€Р°.');
 
 	$key = $v['key'];
 
 	if(is_array($key))
-		die('Ключ кеша не может быть массивом.');
+		die('РљР»СЋС‡ РєРµС€Р° РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РјР°СЃСЃРёРІРѕРј.');
 
 	$key = '__'.($global || !_num(@APP_ID) ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
 
@@ -609,7 +590,7 @@ function _cache($v=array()) {
 		case 'get': return xcache_get($key);
 		case 'set':
 			if(!isset($v['data']))
-				die('Отсутствуют данные для внесения в кеш. Key: '.$key);
+				die('РћС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ РґР°РЅРЅС‹Рµ РґР»СЏ РІРЅРµСЃРµРЅРёСЏ РІ РєРµС€. Key: '.$key);
 
 			xcache_set($key, $v['data'], CACHE_TTL);
 
@@ -618,17 +599,17 @@ function _cache($v=array()) {
 		case 'clear':
 			xcache_unset($key);
 			return true;
-		default: die('Неизвестное действие кеша.');
+		default: die('РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ РєРµС€Р°.');
 	}
 }
-function _cache_get($key, $global=0) {//получение значений кеша
+function _cache_get($key, $global=0) {//РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ РєРµС€Р°
 	return _cache(array(
 		'action' => 'get',
 		'key' => $key,
 		'global' => $global
 	));
 }
-function _cache_set($key, $data, $global=0) {//запись значений в кеш
+function _cache_set($key, $data, $global=0) {//Р·Р°РїРёСЃСЊ Р·РЅР°С‡РµРЅРёР№ РІ РєРµС€
 	return _cache(array(
 		'action' => 'set',
 		'key' => $key,
@@ -636,14 +617,14 @@ function _cache_set($key, $data, $global=0) {//запись значений в кеш
 		'global' => $global
 	));
 }
-function _cache_isset($key, $global=0) {//проверка, производилась ли запись в кеш
+function _cache_isset($key, $global=0) {//РїСЂРѕРІРµСЂРєР°, РїСЂРѕРёР·РІРѕРґРёР»Р°СЃСЊ Р»Рё Р·Р°РїРёСЃСЊ РІ РєРµС€
 	return _cache(array(
 		'action' => 'isset',
 		'key' => $key,
 		'global' => $global
 	));
 }
-function _cache_clear($key, $global=0) {//очистка кеша
+function _cache_clear($key, $global=0) {//РѕС‡РёСЃС‚РєР° РєРµС€Р°
 	if($key == 'all') {
 		xcache_clear_cache(1);
 		return true;
@@ -655,15 +636,15 @@ function _cache_clear($key, $global=0) {//очистка кеша
 		'global' => $global
 	));
 }
-function _cache_content($el, $unit) {//содержание кеша в диалоге [84] (подключаемая функция [12])
+function _cache_content($el, $unit) {//СЃРѕРґРµСЂР¶Р°РЅРёРµ РєРµС€Р° РІ РґРёР°Р»РѕРіРµ [84] (РїРѕРґРєР»СЋС‡Р°РµРјР°СЏ С„СѓРЅРєС†РёСЏ [12])
 	if(!$name = @$_COOKIE['cache_content_name'])
-		$send = 'Отсутствует имя кеша.';
+		$send = 'РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РёРјСЏ РєРµС€Р°.';
 	else {
 		if(!xcache_isset($name))
-			$send = '<b>'.$name.'</b>: кеш не сохранён.';
+			$send = '<b>'.$name.'</b>: РєРµС€ РЅРµ СЃРѕС…СЂР°РЅС‘РЅ.';
 		else {
 			if(!$arr = xcache_get($name))
-				$send = '<b>'.$name.'</b>: кеш пуст.';
+				$send = '<b>'.$name.'</b>: РєРµС€ РїСѓСЃС‚.';
 			else
 				$send =
 					'<div class="fs15 b mb10">'.$name.'</div>'.

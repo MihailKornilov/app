@@ -1,12 +1,12 @@
 <?php
-function _spisokFilterCache() {//кеширование фильтров списка
+function _spisokFilterCache() {//РєРµС€РёСЂРѕРІР°РЅРёРµ С„РёР»СЊС‚СЂРѕРІ СЃРїРёСЃРєР°
 	$key = 'filter_user'.USER_ID;
 	if($send = _cache_get($key))
 		return $send;
 
 	$send = array(
-		'spisok' => array(),//все списки с фильтрами
-		'filter' => array() //ассоциативный список элемент-фильтр -> значение
+		'spisok' => array(),//РІСЃРµ СЃРїРёСЃРєРё СЃ С„РёР»СЊС‚СЂР°РјРё
+		'filter' => array() //Р°СЃСЃРѕС†РёР°С‚РёРІРЅС‹Р№ СЃРїРёСЃРѕРє СЌР»РµРјРµРЅС‚-С„РёР»СЊС‚СЂ -> Р·РЅР°С‡РµРЅРёРµ
 	);
 
 	$sql = "SELECT *
@@ -34,13 +34,13 @@ function _spisokFilterCache() {//кеширование фильтров списка
 
 	return _cache_set($key, $send);
 }
-function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
+function _spisokFilter($i='all', $v=0) {//РїРѕР»СѓС‡РµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ С„РёР»СЊС‚СЂРѕРІ СЃРїРёСЃРєР°
 	if($i == 'cache_clear')
 		return _cache_clear('filter_user'.USER_ID);
 
 	$F = _spisokFilterCache();
 
-	//значение конкретного элемента-фильтра
+	//Р·РЅР°С‡РµРЅРёРµ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°-С„РёР»СЊС‚СЂР°
 	if($i == 'v') {
 		if(!$v)
 			return false;
@@ -49,7 +49,7 @@ function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
 		return $F['filter'][$v]['v'];
 	}
 
-	//список элементов-фильтров для конкретного списка
+	//СЃРїРёСЃРѕРє СЌР»РµРјРµРЅС‚РѕРІ-С„РёР»СЊС‚СЂРѕРІ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ СЃРїРёСЃРєР°
 	if($i == 'spisok') {
 		if(!$v)
 			return array();
@@ -58,7 +58,7 @@ function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
 		return $F['spisok'][$v];
 	}
 
-	if($i == 'page_js') {//значения фильтров в формате JS по каждому списку во всём приложении
+	if($i == 'page_js') {//Р·РЅР°С‡РµРЅРёСЏ С„РёР»СЊС‚СЂРѕРІ РІ С„РѕСЂРјР°С‚Рµ JS РїРѕ РєР°Р¶РґРѕРјСѓ СЃРїРёСЃРєСѓ РІРѕ РІСЃС‘Рј РїСЂРёР»РѕР¶РµРЅРёРё
 		$send = array();
 		foreach($F['spisok'] as $id => $arr)
 			foreach($arr as $elid => $el)
@@ -66,7 +66,7 @@ function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
 		return $send;
 	}
 
-	//внесение значение фильтра, если отсутствует
+	//РІРЅРµСЃРµРЅРёРµ Р·РЅР°С‡РµРЅРёРµ С„РёР»СЊС‚СЂР°, РµСЃР»Рё РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
 	if($i == 'insert') {
 		if(!is_array($v))
 			return '';
@@ -106,7 +106,7 @@ function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
 		_spisokFilter('cache_clear');
 	}
 
-	//определение отличия значений от условий по умолчанию
+	//РѕРїСЂРµРґРµР»РµРЅРёРµ РѕС‚Р»РёС‡РёСЏ Р·РЅР°С‡РµРЅРёР№ РѕС‚ СѓСЃР»РѕРІРёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	if($i == 'diff') {
 		if(!$v)
 			return 0;
@@ -121,7 +121,7 @@ function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
 	return $F;
 }
 
-function _spisokIsSort($block_id) {//определение, нужно ли производить сортировку этого списка (поиск элемента 71)
+function _spisokIsSort($block_id) {//РѕРїСЂРµРґРµР»РµРЅРёРµ, РЅСѓР¶РЅРѕ Р»Рё РїСЂРѕРёР·РІРѕРґРёС‚СЊ СЃРѕСЂС‚РёСЂРѕРІРєСѓ СЌС‚РѕРіРѕ СЃРїРёСЃРєР° (РїРѕРёСЃРє СЌР»РµРјРµРЅС‚Р° 71)
 	if(!$spisok_el = _BE('elem_arr', 'spisok', $block_id))
 		return 0;
 
@@ -132,13 +132,13 @@ function _spisokIsSort($block_id) {//определение, нужно ли производить сортировк
 	return 0;
 }
 
-function _spisokCountAll($el) {//получение общего количества строк списка
+function _spisokCountAll($el) {//РїРѕР»СѓС‡РµРЅРёРµ РѕР±С‰РµРіРѕ РєРѕР»РёС‡РµСЃС‚РІР° СЃС‚СЂРѕРє СЃРїРёСЃРєР°
 	$key = 'SPISOK_COUNT_ALL'.$el['id'];
 
 	if(defined($key))
 		return constant($key);
 
-	//диалог, через который вносятся данные списка
+	//РґРёР°Р»РѕРі, С‡РµСЂРµР· РєРѕС‚РѕСЂС‹Р№ РІРЅРѕСЃСЏС‚СЃСЏ РґР°РЅРЅС‹Рµ СЃРїРёСЃРєР°
 	$dialog = _dialogQuery($el['num_1']);
 
 	$sql = "SELECT COUNT(*)
@@ -150,7 +150,7 @@ function _spisokCountAll($el) {//получение общего количества строк списка
 
 	return $all;
 }
-function _spisokJoinField($dialog) {//подключение колонок второго списка
+function _spisokJoinField($dialog) {//РїРѕРґРєР»СЋС‡РµРЅРёРµ РєРѕР»РѕРЅРѕРє РІС‚РѕСЂРѕРіРѕ СЃРїРёСЃРєР°
 	if(!$dialog['table_2'])
 		return '';
 
@@ -163,7 +163,7 @@ function _spisokJoinField($dialog) {//подключение колонок второго списка
 		$fields[$cmp['col']] = 1;
 	}
 
-	//используемые колонки из дочерних диалогов
+	//РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РєРѕР»РѕРЅРєРё РёР· РґРѕС‡РµСЂРЅРёС… РґРёР°Р»РѕРіРѕРІ
 	$sql = "SELECT `id`
 			FROM `_dialog`
 			WHERE `dialog_parent_id`=".$dialog['id'];
@@ -186,13 +186,13 @@ function _spisokJoinField($dialog) {//подключение колонок второго списка
 	return $send;
 }
 
-function _spisokElemCount($r) {//формирование элемента с содержанием количества списка для вывода на страницу
+function _spisokElemCount($r) {//С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЌР»РµРјРµРЅС‚Р° СЃ СЃРѕРґРµСЂР¶Р°РЅРёРµРј РєРѕР»РёС‡РµСЃС‚РІР° СЃРїРёСЃРєР° РґР»СЏ РІС‹РІРѕРґР° РЅР° СЃС‚СЂР°РЅРёС†Сѓ
 	if(!$elem_id = $r['num_1'])
-		return 'Список не указан.';
+		return 'РЎРїРёСЃРѕРє РЅРµ СѓРєР°Р·Р°РЅ.';
 	if(!$elem = _elemOne($elem_id))
-		return 'Элемента, содержащего список, не существует.';
+		return 'Р­Р»РµРјРµРЅС‚Р°, СЃРѕРґРµСЂР¶Р°С‰РµРіРѕ СЃРїРёСЃРѕРє, РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚.';
 
-	//если результат нулевой, выводится сообщение из элемента, который размещает список
+	//РµСЃР»Рё СЂРµР·СѓР»СЊС‚Р°С‚ РЅСѓР»РµРІРѕР№, РІС‹РІРѕРґРёС‚СЃСЏ СЃРѕРѕР±С‰РµРЅРёРµ РёР· СЌР»РµРјРµРЅС‚Р°, РєРѕС‚РѕСЂС‹Р№ СЂР°Р·РјРµС‰Р°РµС‚ СЃРїРёСЃРѕРє
 	if(!$all = _spisokCountAll($elem))
 		return $elem['txt_1'];
 
@@ -203,21 +203,21 @@ function _spisokElemCount($r) {//формирование элемента с содержанием количества 
 	' '.
 	_end($all, $r['txt_2'], $r['txt_4'], $r['txt_6']);
 }
-function _spisokInclude($spisok, $CMP) {//вложенные списки
-	foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
-		//должен является вложенным списком
+function _spisokInclude($spisok, $CMP) {//РІР»РѕР¶РµРЅРЅС‹Рµ СЃРїРёСЃРєРё
+	foreach($CMP as $cmp_id => $cmp) {//РїРѕРёСЃРє РєРѕРјРїРѕРЅРµРЅС‚Р° РґРёР°Р»РѕРіР° СЃ РІР»РѕР¶РµРЅРЅС‹Рј СЃРїРёСЃРєРѕРј
+		//РґРѕР»Р¶РµРЅ СЏРІР»СЏРµС‚СЃСЏ РІР»РѕР¶РµРЅРЅС‹Рј СЃРїРёСЃРєРѕРј
 		if($cmp['dialog_id'] != 29 && $cmp['dialog_id'] != 59)
 			continue;
 
-		//должно быть присвоено имя колонки
+		//РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСЂРёСЃРІРѕРµРЅРѕ РёРјСЏ РєРѕР»РѕРЅРєРё
 		if(!$col = $cmp['col'])
 			continue;
 
-		//выборка будет производиться только по нужным строкам списка
+		//РІС‹Р±РѕСЂРєР° Р±СѓРґРµС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЊСЃСЏ С‚РѕР»СЊРєРѕ РїРѕ РЅСѓР¶РЅС‹Рј СЃС‚СЂРѕРєР°Рј СЃРїРёСЃРєР°
 		if(!$ids = _idsGet($spisok, $col))
 			continue;
 
-		//получение данных из вложенного списка
+		//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РёР· РІР»РѕР¶РµРЅРЅРѕРіРѕ СЃРїРёСЃРєР°
 		$incDialog = _dialogQuery($cmp['num_1']);
 
 		$cond = "`t1`.`id` IN (".$ids.")";
@@ -235,7 +235,7 @@ function _spisokInclude($spisok, $CMP) {//вложенные списки
 		if(!$arr = query_arr($sql))
 			continue;
 
-		//идентификаторы будут заменены на массив с данными единицы списка
+		//РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹ Р±СѓРґСѓС‚ Р·Р°РјРµРЅРµРЅС‹ РЅР° РјР°СЃСЃРёРІ СЃ РґР°РЅРЅС‹РјРё РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 		foreach($spisok as $id => $r) {
 			$connect_id = $r[$col];
 			if(empty($arr[$connect_id]))
@@ -246,13 +246,13 @@ function _spisokInclude($spisok, $CMP) {//вложенные списки
 
 	return $spisok;
 }
-function _spisokImage($spisok, $CMP) {//вставка картинок
-	foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с изображениями
-		//должен является компонентом "загрузка изображений"
+function _spisokImage($spisok, $CMP) {//РІСЃС‚Р°РІРєР° РєР°СЂС‚РёРЅРѕРє
+	foreach($CMP as $cmp_id => $cmp) {//РїРѕРёСЃРє РєРѕРјРїРѕРЅРµРЅС‚Р° РґРёР°Р»РѕРіР° СЃ РёР·РѕР±СЂР°Р¶РµРЅРёСЏРјРё
+		//РґРѕР»Р¶РµРЅ СЏРІР»СЏРµС‚СЃСЏ РєРѕРјРїРѕРЅРµРЅС‚РѕРј "Р·Р°РіСЂСѓР·РєР° РёР·РѕР±СЂР°Р¶РµРЅРёР№"
 		if($cmp['dialog_id'] != 60)
 			continue;
 
-		//должно быть присвоено имя колонки
+		//РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСЂРёСЃРІРѕРµРЅРѕ РёРјСЏ РєРѕР»РѕРЅРєРё
 		if(!$col = $cmp['col'])
 			continue;
 
@@ -271,33 +271,33 @@ function _spisokImage($spisok, $CMP) {//вставка картинок
 
 	return $spisok;
 }
-function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
+function _spisokShow($ELEM, $next=0) {//СЃРїРёСЃРѕРє, РІС‹РІРѕРґРёРјС‹Р№ РЅР° СЃС‚СЂР°РЅРёС†Рµ
 	/*
 	$ELEM:
-		dialog_id = 14: ШАБЛОН
-		dialog_id = 23: таблица
+		dialog_id = 14: РЁРђР‘Р›РћРќ
+		dialog_id = 23: С‚Р°Р±Р»РёС†Р°
 
-		Значения вставляются диалогом 31.
-		Параметры значений:
-			num_1 - id элемента-значения из диалога
-			txt_1 - имя заголовка TR
-			width - ширина колонки
+		Р—РЅР°С‡РµРЅРёСЏ РІСЃС‚Р°РІР»СЏСЋС‚СЃСЏ РґРёР°Р»РѕРіРѕРј 31.
+		РџР°СЂР°РјРµС‚СЂС‹ Р·РЅР°С‡РµРЅРёР№:
+			num_1 - id СЌР»РµРјРµРЅС‚Р°-Р·РЅР°С‡РµРЅРёСЏ РёР· РґРёР°Р»РѕРіР°
+			txt_1 - РёРјСЏ Р·Р°РіРѕР»РѕРІРєР° TR
+			width - С€РёСЂРёРЅР° РєРѕР»РѕРЅРєРё
 			font
 			color
-			txt_6 - pos (позиция)
-			num_2 - является ссылкой
+			txt_6 - pos (РїРѕР·РёС†РёСЏ)
+			num_2 - СЏРІР»СЏРµС‚СЃСЏ СЃСЃС‹Р»РєРѕР№
 			sort
 	*/
 	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
-		return 'Несуществующий диалог id'.$ELEM['dialog_id'];
+		return 'РќРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ РґРёР°Р»РѕРі id'.$ELEM['dialog_id'];
 
 	$limit = $ELEM['num_6'] ? 200 : $ELEM['num_2'];
 
-	//диалог, через который вносятся данные списка
+	//РґРёР°Р»РѕРі, С‡РµСЂРµР· РєРѕС‚РѕСЂС‹Р№ РІРЅРѕСЃСЏС‚СЃСЏ РґР°РЅРЅС‹Рµ СЃРїРёСЃРєР°
 	$dialog_id = $ELEM['num_1'];
 	$spDialog = _dialogQuery($dialog_id);
 
-	//элементы списка
+	//СЌР»РµРјРµРЅС‚С‹ СЃРїРёСЃРєР°
 	$CMP = $spDialog['cmp'];
 
 	if(!$all = _spisokCountAll($ELEM))
@@ -307,7 +307,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 	if($ELEM['num_6'] || _spisokIsSort($ELEM['block_id']))
 		$order = "`sort`";
 
-	//получение данных списка
+	//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… СЃРїРёСЃРєР°
 	$sql = "SELECT `t1`.*"._spisokJoinField($spDialog)."
 			FROM "._tableFrom($spDialog)."
 			WHERE "._spisokCond($ELEM)."
@@ -315,22 +315,22 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
-	//вставка значений из вложенных списков
+	//РІСЃС‚Р°РІРєР° Р·РЅР°С‡РµРЅРёР№ РёР· РІР»РѕР¶РµРЅРЅС‹С… СЃРїРёСЃРєРѕРІ
 	$spisok = _spisokInclude($spisok, $CMP);
-	//вставка картинок
+	//РІСЃС‚Р°РІРєР° РєР°СЂС‚РёРЅРѕРє
 	$spisok = _spisokImage($spisok, $CMP);
 
-	//выбор внешнего вида
+	//РІС‹Р±РѕСЂ РІРЅРµС€РЅРµРіРѕ РІРёРґР°
 	switch($ELEM['dialog_id']) {
-		//шаблон
+		//С€Р°Р±Р»РѕРЅ
 		case 14:
 			if(!$BLK = _BE('block_arr', 'spisok', $ELEM['block_id']))
-				return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
+				return '<div class="_empty"><span class="fs15 red">РЁР°Р±Р»РѕРЅ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР° РЅРµ РЅР°СЃС‚СЂРѕРµРЅ.</span></div>';
 
-			//получение элементов, расставленных находящихся в блоках
+			//РїРѕР»СѓС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ, СЂР°СЃСЃС‚Р°РІР»РµРЅРЅС‹С… РЅР°С…РѕРґСЏС‰РёС…СЃСЏ РІ Р±Р»РѕРєР°С…
 			$ELM = _BE('elem_arr', 'spisok', $ELEM['block_id']);
 
-			//ширина единицы списка с учётом отступов
+			//С€РёСЂРёРЅР° РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР° СЃ СѓС‡С‘С‚РѕРј РѕС‚СЃС‚СѓРїРѕРІ
 			$ex = explode(' ', $ELEM['mar']);
 			$width = floor(($ELEM['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
 
@@ -361,22 +361,22 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$count_next = $limit;
 				$send .=
 					'<div class="over5" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
-						'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
+						'<tt class="db center curP fs14 blue pad10">РџРѕРєР°Р·Р°С‚СЊ РµС‰С‘ '.$count_next.' Р·Р°РїРёСЃ'._end($count_next, 'СЊ', 'Рё', 'РµР№').'</tt>'.
 					'</div>';
 			}
 
 			return $send;
 
-		//таблица
-		case 23://Таблица
+		//С‚Р°Р±Р»РёС†Р°
+		case 23://РўР°Р±Р»РёС†Р°
 			if(empty($ELEM['txt_2']))
-				return '<div class="_empty"><span class="fs15 red">Таблица не настроена.</span></div>';
+				return '<div class="_empty"><span class="fs15 red">РўР°Р±Р»РёС†Р° РЅРµ РЅР°СЃС‚СЂРѕРµРЅР°.</span></div>';
 			if(!$ELEM['num_1'])
-				return '<div class="_empty"><span class="fs15 red">Не указан список для вывода данных.</span></div>';
+				return '<div class="_empty"><span class="fs15 red">РќРµ СѓРєР°Р·Р°РЅ СЃРїРёСЃРѕРє РґР»СЏ РІС‹РІРѕРґР° РґР°РЅРЅС‹С….</span></div>';
 			if(!$tabDialog = _dialogQuery($ELEM['num_1']))
-				return '<div class="_empty"><span class="fs15 red">Списка <b>'.$ELEM['num_1'].'</b> не существует.</span></div>';
+				return '<div class="_empty"><span class="fs15 red">РЎРїРёСЃРєР° <b>'.$ELEM['num_1'].'</b> РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚.</span></div>';
 
-			//получение настроек колонок таблицы
+			//РїРѕР»СѓС‡РµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє РєРѕР»РѕРЅРѕРє С‚Р°Р±Р»РёС†С‹
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `id` IN (".$ELEM['txt_2'].")
@@ -390,7 +390,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				foreach($tabCol as $td) {
 					$cls = array();
 					switch($td['dialog_id']) {
-						case 34: $cls[] = 'pad0'; //иконки управления
+						case 34: $cls[] = 'pad0'; //РёРєРѕРЅРєРё СѓРїСЂР°РІР»РµРЅРёСЏ
 						default:
 							$txt = _elemUnit($td, $sp);
 //							$txt = _spisokColSearchBg($txt, $el, $cmp_id);
@@ -399,7 +399,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					}
 					$cls[] = $td['font'];
 					$cls[] = $td['color'];
-					$cls[] = $td['txt_8'];//pos - позиция
+					$cls[] = $td['txt_8'];//pos - РїРѕР·РёС†РёСЏ
 					$cls = array_diff($cls, array(''));
 					$cls = implode(' ', $cls);
 					$cls = $cls ? ' class="'.$cls.'"' : '';
@@ -408,7 +408,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 				$MASS[$sp['id']] = $TR;
 			}
 
-			//tr догрузки списка
+			//tr РґРѕРіСЂСѓР·РєРё СЃРїРёСЃРєР°
 			if(!$ELEM['num_6'] && $limit * ($next + 1) < $all) {
 				$count_next = $all - $limit * ($next + 1);
 				if($count_next > $limit)
@@ -417,18 +417,18 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					'<tr class="over5 curP center blue" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
 						'<td colspan="20">'.
 							'<tt class="db '.($ELEM['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
-								'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
+								'РџРѕРєР°Р·Р°С‚СЊ РµС‰С‘ '.$count_next.' Р·Р°РїРёСЃ'._end($count_next, 'СЊ', 'Рё', 'РµР№').
 							'</tt>';
 			}
 
-			//открытие и закрытие таблицы
+			//РѕС‚РєСЂС‹С‚РёРµ Рё Р·Р°РєСЂС‹С‚РёРµ С‚Р°Р±Р»РёС†С‹
 			$TABLE_BEGIN = '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">';
 			$TABLE_END = '</table>';
 
 			$BEGIN = !$next && !$ELEM['num_6'] ? $TABLE_BEGIN : '';
 			$END = !$next && !$ELEM['num_6'] ? $TABLE_END : '';
 
-			if($ELEM['num_6']) {//включено условие сортировки
+			if($ELEM['num_6']) {//РІРєР»СЋС‡РµРЅРѕ СѓСЃР»РѕРІРёРµ СЃРѕСЂС‚РёСЂРѕРІРєРё
 				if($ELEM['num_7'] > 1) {
 					$child = array();
 					foreach($spisok as $id => $r)
@@ -444,7 +444,7 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 					$TR = '<ol>'.$TR.'</ol>';
 				}
 			} else {
-				//отображение названий колонок
+				//РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РЅР°Р·РІР°РЅРёР№ РєРѕР»РѕРЅРѕРє
 				$TH = '';
 				if(!$next && $ELEM['num_5']) {
 					$TH .= '<tr>';
@@ -457,9 +457,9 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
 			return $BEGIN.$TR.$END;
 	}
 
-	return 'Неизвестный внешний вид списка: '.$ELEM['num_1'];
+	return 'РќРµРёР·РІРµСЃС‚РЅС‹Р№ РІРЅРµС€РЅРёР№ РІРёРґ СЃРїРёСЃРєР°: '.$ELEM['num_1'];
 }
-function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {//формирование табличного списка по уровням
+function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {//С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ С‚Р°Р±Р»РёС‡РЅРѕРіРѕ СЃРїРёСЃРєР° РїРѕ СѓСЂРѕРІРЅСЏРј
 	if(!$arr = @$child[$parent_id])
 		return '';
 
@@ -474,7 +474,7 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 		'<ol>'.$send.'</ol>';
 }
 
-function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
+function _spisokUnitQuery($dialog, $unit_id) {//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	if($parent_id = $dialog['dialog_parent_id'])
 		if(!$dialog = _dialogQuery($parent_id))
 			return array();
@@ -489,26 +489,26 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
 			WHERE ".$cond;
 	return query_assoc($sql);
 }
-function _spisokUnitNum($el, $u) {//порядковый номер - значение единицы списка
+function _spisokUnitNum($el, $u) {//РїРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ - Р·РЅР°С‡РµРЅРёРµ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	if(empty($u))
 		return _elemTitle($el['id']);
 	if(empty($u['num']))
 		return $u['id'];
 	return $u['num'];
 }
-function _spisokUnitData($el, $unit) {//дата и время - значение единицы списка [33]
+function _spisokUnitData($el, $unit) {//РґР°С‚Р° Рё РІСЂРµРјСЏ - Р·РЅР°С‡РµРЅРёРµ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР° [33]
 	if(empty($unit) || empty($unit['dtime_add']))
 		return _elemTitle($el['id']);
 
 	$dtime = $unit['dtime_add'];
 
 	if(!preg_match(REGEXP_DATE, $dtime))
-		return 'некорректный формат даты';
+		return 'РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ С„РѕСЂРјР°С‚ РґР°С‚С‹';
 
 	$ex = explode(' ', $dtime);
 	$d = explode('-', $ex[0]);
 
-	//время
+	//РІСЂРµРјСЏ
 	$hh = '';
 	if($el['num_4'] && !empty($ex[1])) {
 		$h = explode(':', $ex[1]);
@@ -518,24 +518,24 @@ function _spisokUnitData($el, $unit) {//дата и время - значение единицы списка [
 	if($el['num_1'] == 31)
 		return $d[2].'/'.$d[1].'/'.$d[0].$hh;
 
-	$hh = $hh ? ' в'.$hh : '';
+	$hh = $hh ? ' РІ'.$hh : '';
 
 	if($el['num_3']) {
 		$dCount = floor((strtotime($ex[0]) - TODAY_UNIXTIME) / 3600 / 24);
 		switch($dCount) {
-			case -1: return 'вчера'.$hh;
-			case 0: return 'сегодня'.$hh;
-			case 1: return 'завтра'.$hh;
+			case -1: return 'РІС‡РµСЂР°'.$hh;
+			case 0: return 'СЃРµРіРѕРґРЅСЏ'.$hh;
+			case 1: return 'Р·Р°РІС‚СЂР°'.$hh;
 		}
 	}
 
 	return
-		_num($d[2]).                                                     //день
-		' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //месяц
-		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
-		$hh;                                                             //время
+		_num($d[2]).                                                     //РґРµРЅСЊ
+		' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //РјРµСЃСЏС†
+		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //РіРѕРґ
+		$hh;                                                             //РІСЂРµРјСЏ
 }
-function _spisokUnitUser($el, $u) {//значение единицы списка - имя пользователя
+function _spisokUnitUser($el, $u) {//Р·РЅР°С‡РµРЅРёРµ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР° - РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 	if(empty($u))
 		return $el['name'];
 
@@ -544,8 +544,8 @@ function _spisokUnitUser($el, $u) {//значение единицы списка - имя пользователя
 
 	return _user($u['user_id_add'], 'name');
 }
-function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение единицы списка [34]
-	if(empty($unit_id))//отсутствует id единицы списка
+function _spisokUnitIconEdit($el, $unit_id) {//РёРєРѕРЅРєРё СѓРїСЂР°РІР»РµРЅРёСЏ - Р·РЅР°С‡РµРЅРёРµ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР° [34]
+	if(empty($unit_id))//РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ id РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 		return '-no-unit';
 
 	$dialog_id = 0;
@@ -555,7 +555,7 @@ function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение един
 			if($el['dialog_id'] == 23)
 				$dialog_id = $el['num_1'];
 
-	if(!$dialog_id && empty($el['block']))//не переданы с элементом данные блока
+	if(!$dialog_id && empty($el['block']))//РЅРµ РїРµСЂРµРґР°РЅС‹ СЃ СЌР»РµРјРµРЅС‚РѕРј РґР°РЅРЅС‹Рµ Р±Р»РѕРєР°
 		return '-no-block';
 
 	if(!$dialog_id)
@@ -566,9 +566,9 @@ function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение един
 					$dialog_id = constant($key);
 					break;
 				}
-				if(!$BL = _blockOne($el['block']['obj_id']))//блока не существует
+				if(!$BL = _blockOne($el['block']['obj_id']))//Р±Р»РѕРєР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚
 					return '-no-bl-spisok';
-				if(empty($BL['elem']))//нет элемента, размещающего список
+				if(empty($BL['elem']))//РЅРµС‚ СЌР»РµРјРµРЅС‚Р°, СЂР°Р·РјРµС‰Р°СЋС‰РµРіРѕ СЃРїРёСЃРѕРє
 					return '-no-el-spisok';
 
 				$dialog_id = _num($BL['elem']['num_1']);
@@ -596,13 +596,13 @@ function _spisokUnitIconEdit($el, $unit_id) {//иконки управления - значение един
 		));
 }
 
-function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
-	if(!$el['url'])//оборачивать не нужно
+function _spisokUnitUrl($el, $unit, $txt) {//РѕР±С‘СЂС‚РєР° Р·РЅР°С‡РµРЅРёСЏ РєРѕР»РѕРЅРєРё РІ СЃСЃС‹Р»РєСѓ
+	if(!$el['url'])//РѕР±РѕСЂР°С‡РёРІР°С‚СЊ РЅРµ РЅСѓР¶РЅРѕ
 		return $txt;
-	if(empty($unit['id']))//отсутствует единица списка
+	if(empty($unit['id']))//РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РµРґРёРЅРёС†Р° СЃРїРёСЃРєР°
 		return $txt;
 
-	if($el['url'] > 1)//указана конкретная страница
+	if($el['url'] > 1)//СѓРєР°Р·Р°РЅР° РєРѕРЅРєСЂРµС‚РЅР°СЏ СЃС‚СЂР°РЅРёС†Р°
 		return '<a href="'.URL.'&p='.$el['url'].'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 
 	$dialog_id = 0;
@@ -612,7 +612,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 			if($el['dialog_id'] == 23)
 				$dialog_id = $el['num_1'];
 
-	if(!$dialog_id && empty($el['block']))//не переданы с элементом данные блока
+	if(!$dialog_id && empty($el['block']))//РЅРµ РїРµСЂРµРґР°РЅС‹ СЃ СЌР»РµРјРµРЅС‚РѕРј РґР°РЅРЅС‹Рµ Р±Р»РѕРєР°
 		return $txt;
 
 	if(!$dialog_id)
@@ -626,7 +626,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 				if($el['dialog_id'] == 11) {
 					if(!$ids = _ids($el['txt_2'], 1))
 						return $txt;
-					if(!$c = count($ids))//берётся последний элемент
+					if(!$c = count($ids))//Р±РµСЂС‘С‚СЃСЏ РїРѕСЃР»РµРґРЅРёР№ СЌР»РµРјРµРЅС‚
 						return $txt;
 					if(empty($ids[$c - 1]))
 						return $txt;
@@ -639,9 +639,9 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 					define($key, $dialog_id);
 					break;
 				}
-				if(!$BL = _blockOne($el['block']['obj_id']))//блока не существует
+				if(!$BL = _blockOne($el['block']['obj_id']))//Р±Р»РѕРєР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚
 					return $txt;
-				if(empty($BL['elem']))//нет элемента, размещающего список
+				if(empty($BL['elem']))//РЅРµС‚ СЌР»РµРјРµРЅС‚Р°, СЂР°Р·РјРµС‰Р°СЋС‰РµРіРѕ СЃРїРёСЃРѕРє
 					return $txt;
 
 				$dialog_id = _num($BL['elem']['num_1']);
@@ -651,7 +651,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 				if($el['dialog_id'] == 11) {
 					if(!$ids = _ids($el['txt_2'], 1))
 						return $txt;
-					if(!$c = count($ids))//берётся последний элемент
+					if(!$c = count($ids))//Р±РµСЂС‘С‚СЃСЏ РїРѕСЃР»РµРґРЅРёР№ СЌР»РµРјРµРЅС‚
 						return $txt;
 					if(empty($ids[$c - 1]))
 						return $txt;
@@ -676,7 +676,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 	if(!$dlg = _dialogQuery($dialog_id))
 		return $txt;
 
-	//ссылка на страницу, если это список страниц
+	//СЃСЃС‹Р»РєР° РЅР° СЃС‚СЂР°РЅРёС†Сѓ, РµСЃР»Рё СЌС‚Рѕ СЃРїРёСЃРѕРє СЃС‚СЂР°РЅРёС†
 	if(_table($dlg['table_1']) == '_page')
 		return '<a href="'.URL.'&p='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 
@@ -685,12 +685,12 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения колонки в ссылку
 
 	return '<a href="'.URL.'&p='.$page_id.'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 }
-function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстовом (быстром) поиске
+function _spisokColSearchBg($el, $txt) {//РїРѕРґСЃРІРµС‚РєР° Р·РЅР°С‡РµРЅРёСЏ РєРѕР»РѕРЅРєРё РїСЂРё С‚РµРєСЃС‚РѕРІРѕРј (Р±С‹СЃС‚СЂРѕРј) РїРѕРёСЃРєРµ
 	if($el['block_id'] < 0) {
-		//если таблица
+		//РµСЃР»Рё С‚Р°Р±Р»РёС†Р°
 		$element_id_spisok = abs($el['block_id']);
 	} else {
-		//если список-шаблон
+		//РµСЃР»Рё СЃРїРёСЃРѕРє-С€Р°Р±Р»РѕРЅ
 		if($el['block']['obj_name'] != 'spisok')
 			return $txt;
 		$blSpisok = _blockOne($el['block']['obj_id']);
@@ -700,7 +700,7 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстов
 	$search = false;
 	$v = '';
 
-	//поиск элемента-фильтра-поиска
+	//РїРѕРёСЃРє СЌР»РµРјРµРЅС‚Р°-С„РёР»СЊС‚СЂР°-РїРѕРёСЃРєР°
 	foreach(_spisokFilter('spisok', $element_id_spisok) as $r)
 		if($r['elem']['dialog_id'] == 7) {
 			$search = $r['elem'];
@@ -714,21 +714,18 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстов
 	if(!$cmp_id = _num($el['txt_2']))
 		return $txt;
 
-	//ассоциативный массив колонок, по которым производится поиск
+	//Р°СЃСЃРѕС†РёР°С‚РёРІРЅС‹Р№ РјР°СЃСЃРёРІ РєРѕР»РѕРЅРѕРє, РїРѕ РєРѕС‚РѕСЂС‹Рј РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РїРѕРёСЃРє
 	$colIds = _idsAss($search['txt_2']);
-	//если по данной колонке поиск разрешён, то выделение цветом найденные символы
+	//РµСЃР»Рё РїРѕ РґР°РЅРЅРѕР№ РєРѕР»РѕРЅРєРµ РїРѕРёСЃРє СЂР°Р·СЂРµС€С‘РЅ, С‚Рѕ РІС‹РґРµР»РµРЅРёРµ С†РІРµС‚РѕРј РЅР°Р№РґРµРЅРЅС‹Рµ СЃРёРјРІРѕР»С‹
 	if(!isset($colIds[$cmp_id]))
 		return $txt;
 
-	$v = utf8($v);
-	$txt = utf8($txt);
 	$txt = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $txt, 1);
-	$txt = win1251($txt);
 
 	return $txt;
 }
 
-function _spisokCondDef($dialog_id) {//условия по умолчанию
+function _spisokCondDef($dialog_id) {//СѓСЃР»РѕРІРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	$key = 'TABLE_COND_'.$dialog_id;
 
 	if(defined($key))
@@ -757,9 +754,9 @@ function _spisokCondDef($dialog_id) {//условия по умолчанию
 
 	return $cond;
 }
-function _spisokCond($el) {//формирование строки с условиями поиска
-	//$el - элемент, который размещает список. 14 или 23.
-	//диалог, через который вносятся данные списка
+function _spisokCond($el) {//С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё СЃ СѓСЃР»РѕРІРёСЏРјРё РїРѕРёСЃРєР°
+	//$el - СЌР»РµРјРµРЅС‚, РєРѕС‚РѕСЂС‹Р№ СЂР°Р·РјРµС‰Р°РµС‚ СЃРїРёСЃРѕРє. 14 РёР»Рё 23.
+	//РґРёР°Р»РѕРі, С‡РµСЂРµР· РєРѕС‚РѕСЂС‹Р№ РІРЅРѕСЃСЏС‚СЃСЏ РґР°РЅРЅС‹Рµ СЃРїРёСЃРєР°
 
 	$cond = "`t1`.`id`";
 	$cond .= _spisokCondDef($el['num_1']);
@@ -772,11 +769,11 @@ function _spisokCond($el) {//формирование строки с условиями поиска
 
 	return $cond;
 }
-function _spisokCond7($el) {//значения фильтра-поиска для списка
+function _spisokCond7($el) {//Р·РЅР°С‡РµРЅРёСЏ С„РёР»СЊС‚СЂР°-РїРѕРёСЃРєР° РґР»СЏ СЃРїРёСЃРєР°
 	$search = false;
 	$v = '';
 
-	//поиск элемента-фильтра-поиска
+	//РїРѕРёСЃРє СЌР»РµРјРµРЅС‚Р°-С„РёР»СЊС‚СЂР°-РїРѕРёСЃРєР°
 	foreach(_spisokFilter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 7) {
 			$search = $r['elem'];
@@ -789,11 +786,11 @@ function _spisokCond7($el) {//значения фильтра-поиска для списка
 	if(!$v)
 		return '';
 
-	//если поиск не производится ни по каким колонкам, то выход
+	//РµСЃР»Рё РїРѕРёСЃРє РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РЅРё РїРѕ РєР°РєРёРј РєРѕР»РѕРЅРєР°Рј, С‚Рѕ РІС‹С…РѕРґ
 	if(!$colIds = _ids($search['txt_2'], 1))
 		return '';
 
-	//диалог, через который вносятся данные списка
+	//РґРёР°Р»РѕРі, С‡РµСЂРµР· РєРѕС‚РѕСЂС‹Р№ РІРЅРѕСЃСЏС‚СЃСЏ РґР°РЅРЅС‹Рµ СЃРїРёСЃРєР°
 	$dialog = _dialogQuery($el['num_1']);
 	$cmp = $dialog['cmp'];
 
@@ -809,14 +806,14 @@ function _spisokCond7($el) {//значения фильтра-поиска для списка
 
 	return " AND (".implode($arr, ' OR ').")";
 }
-function _spisokCondPageUnit($el) {//отображения значений, которые принимает текущая страница
-	if(!$el['num_8'])//настройки нет
+function _spisokCondPageUnit($el) {//РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ Р·РЅР°С‡РµРЅРёР№, РєРѕС‚РѕСЂС‹Рµ РїСЂРёРЅРёРјР°РµС‚ С‚РµРєСѓС‰Р°СЏ СЃС‚СЂР°РЅРёС†Р°
+	if(!$el['num_8'])//РЅР°СЃС‚СЂРѕР№РєРё РЅРµС‚
 		return '';
-	if($el['block']['obj_name'] != 'page')//проверка, чтобы список был размещён именно на странице
+	if($el['block']['obj_name'] != 'page')//РїСЂРѕРІРµСЂРєР°, С‡С‚РѕР±С‹ СЃРїРёСЃРѕРє Р±С‹Р» СЂР°Р·РјРµС‰С‘РЅ РёРјРµРЅРЅРѕ РЅР° СЃС‚СЂР°РЅРёС†Рµ
 		return ' AND !`t1`.`id`';
-	if(!$page = _page($el['block']['obj_id']))//страница, на которой размещён список
+	if(!$page = _page($el['block']['obj_id']))//СЃС‚СЂР°РЅРёС†Р°, РЅР° РєРѕС‚РѕСЂРѕР№ СЂР°Р·РјРµС‰С‘РЅ СЃРїРёСЃРѕРє
 		return ' AND !`t1`.`id`';
-	if(!$spisok_id = $page['spisok_id'])//id диалога, единица списка которого размещается на странице
+	if(!$spisok_id = $page['spisok_id'])//id РґРёР°Р»РѕРіР°, РµРґРёРЅРёС†Р° СЃРїРёСЃРєР° РєРѕС‚РѕСЂРѕРіРѕ СЂР°Р·РјРµС‰Р°РµС‚СЃСЏ РЅР° СЃС‚СЂР°РЅРёС†Рµ
 		return ' AND !`t1`.`id`';
 
 	$cmp = false;
@@ -836,10 +833,10 @@ function _spisokCondPageUnit($el) {//отображения значений, которые принимает тек
 
 	return " AND `t1`.`".$cmp['col']."`=".$unit_id;
 }
-function _spisokCond62($el) {//фильтр-галочка
+function _spisokCond62($el) {//С„РёР»СЊС‚СЂ-РіР°Р»РѕС‡РєР°
 	$send = '';
 
-	//поиск элемента-фильтра-галочки
+	//РїРѕРёСЃРє СЌР»РµРјРµРЅС‚Р°-С„РёР»СЊС‚СЂР°-РіР°Р»РѕС‡РєРё
 	foreach(_spisokFilter('spisok', $el['id']) as $F) {
 		$filter = $F['elem'];
 
@@ -848,20 +845,20 @@ function _spisokCond62($el) {//фильтр-галочка
 
 		$v = $F['v'];
 
-		//условие срабатывает, если 1439: установлена, 1440 - НЕ установлена
+		//СѓСЃР»РѕРІРёРµ СЃСЂР°Р±Р°С‚С‹РІР°РµС‚, РµСЃР»Рё 1439: СѓСЃС‚Р°РЅРѕРІР»РµРЅР°, 1440 - РќР• СѓСЃС‚Р°РЅРѕРІР»РµРЅР°
 		if($filter['num_1'] == 1439 && !$v)
 			continue;
 		if($filter['num_1'] == 1440 && $v)
 			continue;
 
-		//условия, формирующие фильтр
+		//СѓСЃР»РѕРІРёСЏ, С„РѕСЂРјРёСЂСѓСЋС‰РёРµ С„РёР»СЊС‚СЂ
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `block_id`=-".$filter['id'];
 		if(!$cond = query_arr($sql))
 			continue;
 
-		//колонки, по которым будет производиться фильтр
+		//РєРѕР»РѕРЅРєРё, РїРѕ РєРѕС‚РѕСЂС‹Рј Р±СѓРґРµС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЊСЃСЏ С„РёР»СЊС‚СЂ
 		$sql = "SELECT `id`,`col`
 				FROM `_element`
 				WHERE `id` IN ("._idsGet($cond, 'txt_2').")";
@@ -869,16 +866,16 @@ function _spisokCond62($el) {//фильтр-галочка
 			continue;
 
 		/*
-			 1: отсутствует
-			 2: присутствует
-			 3: равно
-			 4: не равно
-			 5: больше
-			 6: больше или равно
-			 7: меньше
-			 8: меньше или равно
-			 9: содержит
-			10: не содержит
+			 1: РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
+			 2: РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚
+			 3: СЂР°РІРЅРѕ
+			 4: РЅРµ СЂР°РІРЅРѕ
+			 5: Р±РѕР»СЊС€Рµ
+			 6: Р±РѕР»СЊС€Рµ РёР»Рё СЂР°РІРЅРѕ
+			 7: РјРµРЅСЊС€Рµ
+			 8: РјРµРЅСЊС€Рµ РёР»Рё СЂР°РІРЅРѕ
+			 9: СЃРѕРґРµСЂР¶РёС‚
+			10: РЅРµ СЃРѕРґРµСЂР¶РёС‚
 		*/
 
 		foreach($cond as $r) {
@@ -902,11 +899,11 @@ function _spisokCond62($el) {//фильтр-галочка
 
 	return $send;
 }
-function _spisokCond77($el) {//фильтр-календарь
+function _spisokCond77($el) {//С„РёР»СЊС‚СЂ-РєР°Р»РµРЅРґР°СЂСЊ
 	$filter = false;
 	$v = '';
 
-	//поиск элемента-фильтра-календаря
+	//РїРѕРёСЃРє СЌР»РµРјРµРЅС‚Р°-С„РёР»СЊС‚СЂР°-РєР°Р»РµРЅРґР°СЂСЏ
 	foreach(_spisokFilter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 77) {
 			$filter = true;
@@ -926,11 +923,11 @@ function _spisokCond77($el) {//фильтр-календарь
 
 	return " AND `dtime_add`>='".$ex[0]." 00:00:00' AND `dtime_add`<='".$ex[1]." 23:59:59'";
 }
-function _spisokCond78($el) {//фильтр-меню
+function _spisokCond78($el) {//С„РёР»СЊС‚СЂ-РјРµРЅСЋ
 	$filter = false;
 	$v = '';
 
-	//поиск элемента-фильтра-меню
+	//РїРѕРёСЃРє СЌР»РµРјРµРЅС‚Р°-С„РёР»СЊС‚СЂР°-РјРµРЅСЋ
 	foreach(_spisokFilter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 78) {
 			$filter = $r['elem'];
@@ -943,32 +940,32 @@ function _spisokCond78($el) {//фильтр-меню
 	if(!$v)
 		return '';
 
-	if(!$elem_id = $filter['num_2'])//id элемента, содержащего значения
+	if(!$elem_id = $filter['num_2'])//id СЌР»РµРјРµРЅС‚Р°, СЃРѕРґРµСЂР¶Р°С‰РµРіРѕ Р·РЅР°С‡РµРЅРёСЏ
 		return '';
-	if(!$ell = _elemOne($elem_id))//элемент, размещающий список
+	if(!$ell = _elemOne($elem_id))//СЌР»РµРјРµРЅС‚, СЂР°Р·РјРµС‰Р°СЋС‰РёР№ СЃРїРёСЃРѕРє
 		return '';
-	if(!$ids = _ids($ell['txt_2'], 1))//значения, составляющие содержание фильтра
+	if(!$ids = _ids($ell['txt_2'], 1))//Р·РЅР°С‡РµРЅРёСЏ, СЃРѕСЃС‚Р°РІР»СЏСЋС‰РёРµ СЃРѕРґРµСЂР¶Р°РЅРёРµ С„РёР»СЊС‚СЂР°
 		return '';
-	if(!$el0_id = $ids[0])//id элемента, на который указывает значение
+	if(!$el0_id = $ids[0])//id СЌР»РµРјРµРЅС‚Р°, РЅР° РєРѕС‚РѕСЂС‹Р№ СѓРєР°Р·С‹РІР°РµС‚ Р·РЅР°С‡РµРЅРёРµ
 		return '';
-	if(!$el0 = _elemOne($el0_id))//сам элемент
+	if(!$el0 = _elemOne($el0_id))//СЃР°Рј СЌР»РµРјРµРЅС‚
 		return '';
-	if(!$col = $el0['col'])//колонка, которая участвует в фильтре
+	if(!$col = $el0['col'])//РєРѕР»РѕРЅРєР°, РєРѕС‚РѕСЂР°СЏ СѓС‡Р°СЃС‚РІСѓРµС‚ РІ С„РёР»СЊС‚СЂРµ
 		return '';
 
-	//если значение родительское, добавление дочерних ids
+	//РµСЃР»Рё Р·РЅР°С‡РµРЅРёРµ СЂРѕРґРёС‚РµР»СЊСЃРєРѕРµ, РґРѕР±Р°РІР»РµРЅРёРµ РґРѕС‡РµСЂРЅРёС… ids
 	$c = count($ids) - 1;
 	$elem_id = $ids[$c];
 
-	if(!$EL = _elemOne($elem_id))//значение отсутствует
+	if(!$EL = _elemOne($elem_id))//Р·РЅР°С‡РµРЅРёРµ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
 		return '';
-	if(!$BL = $EL['block'])//нет блока
+	if(!$BL = $EL['block'])//РЅРµС‚ Р±Р»РѕРєР°
 		return '';
-	if($BL['obj_name'] != 'dialog')//блок не из диалога
+	if($BL['obj_name'] != 'dialog')//Р±Р»РѕРє РЅРµ РёР· РґРёР°Р»РѕРіР°
 		return '';
-	if(!$dialog_id = $BL['obj_id'])//нет ID диалога
+	if(!$dialog_id = $BL['obj_id'])//РЅРµС‚ ID РґРёР°Р»РѕРіР°
 		return '';
-	if(!$dialog = _dialogQuery($dialog_id))//нет диалога
+	if(!$dialog = _dialogQuery($dialog_id))//РЅРµС‚ РґРёР°Р»РѕРіР°
 		return '';
 
 	if(isset($dialog['field1']['parent_id'])) {
@@ -981,11 +978,11 @@ function _spisokCond78($el) {//фильтр-меню
 
 	return " AND `".$col."` IN (".$v.")";
 }
-function _spisokCond83($el) {//фильтр-select
+function _spisokCond83($el) {//С„РёР»СЊС‚СЂ-select
 	$filter = false;
 	$v = 0;
 
-	//поиск элемента-фильтра-select
+	//РїРѕРёСЃРє СЌР»РµРјРµРЅС‚Р°-С„РёР»СЊС‚СЂР°-select
 	foreach(_spisokFilter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 83) {
 			$filter = $r['elem'];
@@ -1004,7 +1001,7 @@ function _spisokCond83($el) {//фильтр-select
 
 	return " AND `id`=".$v;
 }
-function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
+function _spisok29connect($cmp_id, $v='', $sel_id=0) {//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… СЃРїРёСЃРєР° РґР»СЏ СЃРІСЏР·РєРё (dialog_id:29)
 	if(!$cmp_id)
 		return array();
 	if(!$cmp = _elemOne($cmp_id))
@@ -1014,9 +1011,9 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 	if(!$dialog = _dialogQuery($cmp['num_1']))
 		return array();
 
-	$S = array();//данные с результатами для содержания select
+	$S = array();//РґР°РЅРЅС‹Рµ СЃ СЂРµР·СѓР»СЊС‚Р°С‚Р°РјРё РґР»СЏ СЃРѕРґРµСЂР¶Р°РЅРёСЏ select
 
-	//элементы, содержащие id элементов, настраивающих содержание select
+	//СЌР»РµРјРµРЅС‚С‹, СЃРѕРґРµСЂР¶Р°С‰РёРµ id СЌР»РµРјРµРЅС‚РѕРІ, РЅР°СЃС‚СЂР°РёРІР°СЋС‰РёС… СЃРѕРґРµСЂР¶Р°РЅРёРµ select
 	$S[] = _spisok29connectGet($cmp['txt_3'], $v);
 	$S[] = _spisok29connectGet($cmp['txt_4'], $v);
 
@@ -1040,11 +1037,11 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 			FROM "._tableFrom($dialog)."
 			WHERE ".$cond."
 			ORDER BY ".(isset($field['sort']) ? "`sort`," : '')."`id` DESC
-			".($cmp['num_5'] ? '' : "LIMIT 50");//если включён учёт списка по уровням
+			".($cmp['num_5'] ? '' : "LIMIT 50");//РµСЃР»Рё РІРєР»СЋС‡С‘РЅ СѓС‡С‘С‚ СЃРїРёСЃРєР° РїРѕ СѓСЂРѕРІРЅСЏРј
 	if(!$spisok = query_arr($sql))
 		return array();
 
-	//добавление единицы списка, которая была выбрана ранее
+	//РґРѕР±Р°РІР»РµРЅРёРµ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°, РєРѕС‚РѕСЂР°СЏ Р±С‹Р»Р° РІС‹Р±СЂР°РЅР° СЂР°РЅРµРµ
 	if($sel_id && empty($arr[$sel_id])) {
 		$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
 				FROM "._tableFrom($dialog)."
@@ -1061,10 +1058,10 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 			$S[$n]['cnnAss'] = query_ass($sql);
 		}
 
-	//предварительное формирование списка
+	//РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕРµ С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃРїРёСЃРєР°
 	$mass = array();
 	foreach($spisok as $id => $r) {
-		$title = 'значение не настроено';
+		$title = 'Р·РЅР°С‡РµРЅРёРµ РЅРµ РЅР°СЃС‚СЂРѕРµРЅРѕ';
 		if($S[0]['col0']) {
 			$title = $r[$S[0]['col0']];
 			if($S[0]['cnn'])
@@ -1100,7 +1097,7 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 				while($parent_id) {
 					if(empty($mass[$parent_id]))
 						break;
-					$title = $mass[$parent_id]['title'].' » '.$title;
+					$title = $mass[$parent_id]['title'].' В» '.$title;
 					$parent_id = $mass[$parent_id]['parent_id'];
 					$level++;
 				}
@@ -1115,11 +1112,8 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 			'title' => $title,
 			'content' => $content
 		);
-		if($v) {
-			$txt = utf8($u['content']);
-			$txt = preg_replace(_regFilter(utf8($v)), '<em class="fndd">\\1</em>', $txt, 1);
-			$u['content'] = win1251($txt);
-		}
+		if($v)
+			$u['content'] = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $u['content'], 1);
 
 		$send[] = $u;
 	}
@@ -1128,10 +1122,10 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка 
 }
 function _spisok29connectGet($ids, $v) {
 	$send = array(
-		'col0' => '',       //имя колонки основого списка
-		'col1' => '',       //имя колонки привязанного списка
-		'cnn' => 0,         //был ли привязанный список
-		'cnnAss' => array(),//ассоциативный массив привязанного списка
+		'col0' => '',       //РёРјСЏ РєРѕР»РѕРЅРєРё РѕСЃРЅРѕРІРѕРіРѕ СЃРїРёСЃРєР°
+		'col1' => '',       //РёРјСЏ РєРѕР»РѕРЅРєРё РїСЂРёРІСЏР·Р°РЅРЅРѕРіРѕ СЃРїРёСЃРєР°
+		'cnn' => 0,         //Р±С‹Р» Р»Рё РїСЂРёРІСЏР·Р°РЅРЅС‹Р№ СЃРїРёСЃРѕРє
+		'cnnAss' => array(),//Р°СЃСЃРѕС†РёР°С‚РёРІРЅС‹Р№ РјР°СЃСЃРёРІ РїСЂРёРІСЏР·Р°РЅРЅРѕРіРѕ СЃРїРёСЃРєР°
 		'cond' => ''
 	);
 
@@ -1171,7 +1165,7 @@ function _spisok29connectGet($ids, $v) {
 
 	return $send;
 }
-function _spisok59unit($cmp_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
+function _spisok59unit($cmp_id, $unit_id) {//РІС‹Р±СЂР°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РїСЂРё СЃРІСЏР·РєРµ СЃРїРёСЃРєРѕРІ С‡РµСЂРµР· РєРЅРѕРїРєСѓ [59]
 	if(!$unit_id)
 		return '';
 	if(!$el = _elemOne($cmp_id))
@@ -1190,8 +1184,8 @@ function _spisok59unit($cmp_id, $unit_id) {//выбранное значение при связке списк
 	return _blockHtml('spisok', $el['block_id'], 350, 0, $un);
 }
 
-function _spisokCmpConnectIdGet($el) {//получение id привязонного списка, если рядом стоит родительский список (для страницы, принимающей значения списка)
-	if($el['dialog_id'] != 29)//только для связок
+function _spisokCmpConnectIdGet($el) {//РїРѕР»СѓС‡РµРЅРёРµ id РїСЂРёРІСЏР·РѕРЅРЅРѕРіРѕ СЃРїРёСЃРєР°, РµСЃР»Рё СЂСЏРґРѕРј СЃС‚РѕРёС‚ СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СЃРїРёСЃРѕРє (РґР»СЏ СЃС‚СЂР°РЅРёС†С‹, РїСЂРёРЅРёРјР°СЋС‰РµР№ Р·РЅР°С‡РµРЅРёСЏ СЃРїРёСЃРєР°)
+	if($el['dialog_id'] != 29)//С‚РѕР»СЊРєРѕ РґР»СЏ СЃРІСЏР·РѕРє
 		return 0;
 	if(!$get_id = _num(@$_GET['id']))
 		return 0;
@@ -1199,9 +1193,9 @@ function _spisokCmpConnectIdGet($el) {//получение id привязонного списка, если р
 		return 0;
 	if(!$page = _page($page_id))
 		return 0;
-	if(!$page['spisok_id'])//страница не принмает значения
+	if(!$page['spisok_id'])//СЃС‚СЂР°РЅРёС†Р° РЅРµ РїСЂРёРЅРјР°РµС‚ Р·РЅР°С‡РµРЅРёСЏ
 		return 0;
-	if($page['spisok_id'] == $el['num_1'])//если список является страницей, принимающей значение, возврат $_GET['id']
+	if($page['spisok_id'] == $el['num_1'])//РµСЃР»Рё СЃРїРёСЃРѕРє СЏРІР»СЏРµС‚СЃСЏ СЃС‚СЂР°РЅРёС†РµР№, РїСЂРёРЅРёРјР°СЋС‰РµР№ Р·РЅР°С‡РµРЅРёРµ, РІРѕР·РІСЂР°С‚ $_GET['id']
 		return $get_id;
 
 	if(!$dlg = _dialogQuery($page['spisok_id']))

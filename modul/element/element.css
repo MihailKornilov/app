@@ -1,4 +1,4 @@
-/* ---=== СПИСОК В ТАБЛИЦЕ ===--- */
+/* ---=== РЎРџРРЎРћРљ Р’ РўРђР‘Р›РР¦Р• ===--- */
 ._stab{
 	border-collapse:collapse;
 	border:#D3DBE1 solid 1px;
@@ -20,7 +20,7 @@
 }
 ._stab td.topi{vertical-align:top;padding-top:9px}
 ._stab.small td{padding:4px 5px 3px;font-size:12px}
-._stab td.pad0{padding:0}/* для иконок */
+._stab td.pad0{padding:0}/* РґР»СЏ РёРєРѕРЅРѕРє */
 
 
 
@@ -29,7 +29,7 @@
 
 
 
-/* Заголовок 1 - на сером фоне */
+/* Р—Р°РіРѕР»РѕРІРѕРє 1 - РЅР° СЃРµСЂРѕРј С„РѕРЅРµ */
 .hd1{
 	font-size:14px;
 	color:#333;
@@ -41,7 +41,7 @@
 .hd1 a.link{color:#777}
 
 
-/* Заголовок 2 - подчёркнутая линия */
+/* Р—Р°РіРѕР»РѕРІРѕРє 2 - РїРѕРґС‡С‘СЂРєРЅСѓС‚Р°СЏ Р»РёРЅРёСЏ */
 .hd2{
 	color:#31618C;
 	font-size:16px;
@@ -55,7 +55,7 @@
 
 
 
-/* Текст с информацией на жёлтом форе */
+/* РўРµРєСЃС‚ СЃ РёРЅС„РѕСЂРјР°С†РёРµР№ РЅР° Р¶С‘Р»С‚РѕРј С„РѕСЂРµ */
 ._info{
 	color:#000;
 	background:#ffffe6;
@@ -76,12 +76,12 @@
 
 
 
-/* Список в режиме ожидания */
+/* РЎРїРёСЃРѕРє РІ СЂРµР¶РёРјРµ РѕР¶РёРґР°РЅРёСЏ */
 .spisok-busy{opacity:.3}
 
 
 
-/* Меню групп элементов */
+/* РњРµРЅСЋ РіСЂСѓРїРї СЌР»РµРјРµРЅС‚РѕРІ */
 .el-group-head{
 	position:relative;
 	width:100%;
@@ -126,43 +126,43 @@
 	height:0;
 	margin-left:29px;
 }
-.eli1{background-position-y:0;height:20px}/* галочка */
-.eli2{background-position-y:-600px;height:30px}/* кнопка */
-.eli3{background-position-y:-500px;height:30px}/* меню */
-.eli4{background-position-y:-700px;height:20px}/* заголовок */
-.eli5{background-position-y:-200px;height:50px}/* многострочное поле */
-.eli6{background-position-y:-1500px;height:30px}/* select - выбор страницы */
-.eli7{background-position-y:-400px;height:30px}/* фильтр: поиск */
-.eli8{background-position-y:-100px;height:30px}/* однострочное поле */
-.eli9{background-position-y:-800px;height:20px}/* ссылка на страницу */
-.eli10{background-position-y:-900px;height:30px}/* текст */
-.eli14{background-position-y:-2500px;height:95px}/* список - ШАБЛОН */
-.eli15{background-position-y:-2200px;height:15px}/* количество строк списка */
-.eli16{background-position-y:-300px;height:50px} /* радио */
-.eli17{background-position-y:-1400px;height:30px}/* select - проивольные значения */
-.eli21{background-position-y:-1000px;height:50px}/* информация */
-.eli23{background-position-y:-2100px;height:80px}/* список - ТАБЛИЦА */
-.eli24{background-position-y:-1600px;height:30px}/* select - списки приложения */
-.eli29{background-position-y:-1800px;height:100px}/* select - связка с другим списком */
-.eli32{background-position-y:-2400px;height:15px}/* список - порядковый номер */
-.eli33{background-position-y:-2300px;height:15px}/* список - дата и время */
-.eli34{background-position-y:-2600px;height:15px}/* список - иконки редактирования */
-.eli35{background-position-y:-1300px;height:30px}/* список - количество строк */
-.eli37{background-position-y:-1920px;height:30px}/* select - выбор колонки */
-.eli38{background-position-y:-2000px;height:30px}/* select - выбор диалога */
-.eli42{background-position-y:-1100px;height:60px}/* вопрос с подсказкой */
-.eli44{background-position-y:-1200px;height:15px}/* сборный текст */
-.eli51{background-position-y:-1700px;height:30px}/* календарь */
-.eli57{background-position-y:-2700px;height:30px}/* меню переключения блоков */
+.eli1{background-position-y:0;height:20px}/* РіР°Р»РѕС‡РєР° */
+.eli2{background-position-y:-600px;height:30px}/* РєРЅРѕРїРєР° */
+.eli3{background-position-y:-500px;height:30px}/* РјРµРЅСЋ */
+.eli4{background-position-y:-700px;height:20px}/* Р·Р°РіРѕР»РѕРІРѕРє */
+.eli5{background-position-y:-200px;height:50px}/* РјРЅРѕРіРѕСЃС‚СЂРѕС‡РЅРѕРµ РїРѕР»Рµ */
+.eli6{background-position-y:-1500px;height:30px}/* select - РІС‹Р±РѕСЂ СЃС‚СЂР°РЅРёС†С‹ */
+.eli7{background-position-y:-400px;height:30px}/* С„РёР»СЊС‚СЂ: РїРѕРёСЃРє */
+.eli8{background-position-y:-100px;height:30px}/* РѕРґРЅРѕСЃС‚СЂРѕС‡РЅРѕРµ РїРѕР»Рµ */
+.eli9{background-position-y:-800px;height:20px}/* СЃСЃС‹Р»РєР° РЅР° СЃС‚СЂР°РЅРёС†Сѓ */
+.eli10{background-position-y:-900px;height:30px}/* С‚РµРєСЃС‚ */
+.eli14{background-position-y:-2500px;height:95px}/* СЃРїРёСЃРѕРє - РЁРђР‘Р›РћРќ */
+.eli15{background-position-y:-2200px;height:15px}/* РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє СЃРїРёСЃРєР° */
+.eli16{background-position-y:-300px;height:50px} /* СЂР°РґРёРѕ */
+.eli17{background-position-y:-1400px;height:30px}/* select - РїСЂРѕРёРІРѕР»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ */
+.eli21{background-position-y:-1000px;height:50px}/* РёРЅС„РѕСЂРјР°С†РёСЏ */
+.eli23{background-position-y:-2100px;height:80px}/* СЃРїРёСЃРѕРє - РўРђР‘Р›РР¦Рђ */
+.eli24{background-position-y:-1600px;height:30px}/* select - СЃРїРёСЃРєРё РїСЂРёР»РѕР¶РµРЅРёСЏ */
+.eli29{background-position-y:-1800px;height:100px}/* select - СЃРІСЏР·РєР° СЃ РґСЂСѓРіРёРј СЃРїРёСЃРєРѕРј */
+.eli32{background-position-y:-2400px;height:15px}/* СЃРїРёСЃРѕРє - РїРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ */
+.eli33{background-position-y:-2300px;height:15px}/* СЃРїРёСЃРѕРє - РґР°С‚Р° Рё РІСЂРµРјСЏ */
+.eli34{background-position-y:-2600px;height:15px}/* СЃРїРёСЃРѕРє - РёРєРѕРЅРєРё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ */
+.eli35{background-position-y:-1300px;height:30px}/* СЃРїРёСЃРѕРє - РєРѕР»РёС‡РµСЃС‚РІРѕ СЃС‚СЂРѕРє */
+.eli37{background-position-y:-1920px;height:30px}/* select - РІС‹Р±РѕСЂ РєРѕР»РѕРЅРєРё */
+.eli38{background-position-y:-2000px;height:30px}/* select - РІС‹Р±РѕСЂ РґРёР°Р»РѕРіР° */
+.eli42{background-position-y:-1100px;height:60px}/* РІРѕРїСЂРѕСЃ СЃ РїРѕРґСЃРєР°Р·РєРѕР№ */
+.eli44{background-position-y:-1200px;height:15px}/* СЃР±РѕСЂРЅС‹Р№ С‚РµРєСЃС‚ */
+.eli51{background-position-y:-1700px;height:30px}/* РєР°Р»РµРЅРґР°СЂСЊ */
+.eli57{background-position-y:-2700px;height:30px}/* РјРµРЅСЋ РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ Р±Р»РѕРєРѕРІ */
 .eli18{background-position-y:-2800px;height:120px}/* dropdown */
 .eli60{background-position-y:-3000px;height:100px}/* image */
-.eli66{background-position-y:-3100px;height:60px}/* цвет текста */
-.eli70{background-position-y:-3200px;height:95px}/* цвет фона */
-.eli13{background-position-y:-3300px;height:30px}/* выбор элемента из диалога или страницы */
-.eli78{background-position-y:-3400px;height:130px}/* фильтр-меню */
-.eli77{background-position-y:-3600px;height:170px}/* фильтр-календарь */
-.eli80{background-position-y:-3800px;height:20px}/* очистка фильтра */
-.eli62{background-position-y:-3900px;height:20px}/* фильтр-галочка */
+.eli66{background-position-y:-3100px;height:60px}/* С†РІРµС‚ С‚РµРєСЃС‚Р° */
+.eli70{background-position-y:-3200px;height:95px}/* С†РІРµС‚ С„РѕРЅР° */
+.eli13{background-position-y:-3300px;height:30px}/* РІС‹Р±РѕСЂ СЌР»РµРјРµРЅС‚Р° РёР· РґРёР°Р»РѕРіР° РёР»Рё СЃС‚СЂР°РЅРёС†С‹ */
+.eli78{background-position-y:-3400px;height:130px}/* С„РёР»СЊС‚СЂ-РјРµРЅСЋ */
+.eli77{background-position-y:-3600px;height:170px}/* С„РёР»СЊС‚СЂ-РєР°Р»РµРЅРґР°СЂСЊ */
+.eli80{background-position-y:-3800px;height:20px}/* РѕС‡РёСЃС‚РєР° С„РёР»СЊС‚СЂР° */
+.eli62{background-position-y:-3900px;height:20px}/* С„РёР»СЊС‚СЂ-РіР°Р»РѕС‡РєР° */
 
 
 
@@ -172,7 +172,7 @@
 
 
 
-/* ---=== ДИАЛОГОВОЕ ОКНО ===--- */
+/* ---=== Р”РРђР›РћР“РћР’РћР• РћРљРќРћ ===--- */
 ._dialog-back{
 	position:absolute;
 	top:0;
@@ -206,7 +206,7 @@
 	border-radius:0 0 2px 2px;
 }
 
-/* линия для настройки ширины диалога */
+/* Р»РёРЅРёСЏ РґР»СЏ РЅР°СЃС‚СЂРѕР№РєРё С€РёСЂРёРЅС‹ РґРёР°Р»РѕРіР° */
 #dialog-w-change{
 	position:absolute;
 	cursor:e-resize;
@@ -223,7 +223,7 @@
 
 
 
-/* ---=== ЧЕКБОКС ===--- */
+/* ---=== Р§Р•РљР‘РћРљРЎ ===--- */
 ._check{
 	display:inline-block;
 	min-height:15px;
@@ -254,7 +254,7 @@
 
 
 
-/* ---=== РАДИО ===--- */
+/* ---=== Р РђР”РРћ ===--- */
 ._radio{display:inline-block}
 ._radio div{
 	display:inline-block;
@@ -285,7 +285,7 @@
 
 
 
-/* ---=== ПОИСК ===--- */
+/* ---=== РџРћРРЎРљ ===--- */
 ._search{
 	display:inline-block;
 	vertical-align:top;
@@ -320,7 +320,7 @@
 
 
 
-/* ---=== ВЫПАДАЮЩИЙ СПИСОК ===--- */
+/* ---=== Р’Р«РџРђР”РђР®Р©РР™ РЎРџРРЎРћРљ ===--- */
 ._select{
 	position:relative;
 	box-sizing:border-box;
@@ -490,7 +490,7 @@
 	cursor:default;
 }
 */
-/* было 90 строк */
+/* Р±С‹Р»Рѕ 90 СЃС‚СЂРѕРє */
 
 
 
@@ -504,7 +504,7 @@
 
 
 
-/* ---=== ПОДСКАЗКИ ===--- 2017-12-20 */
+/* ---=== РџРћР”РЎРљРђР—РљР ===--- 2017-12-20 */
 ._hint{
 	position:absolute;
 	left:-9999px;
@@ -516,23 +516,23 @@
 	box-shadow:0 0 7px rgba(196,207,218,.5);
 	z-index:999;
 }
-/* параметры для всех уголков */
+/* РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РІСЃРµС… СѓРіРѕР»РєРѕРІ */
 ._hint .ug{
 	position:absolute;
 	box-sizing:border-box;
 	z-index:1000;
 }
 ._hint .ug div{background:transparent no-repeat 0 0 url(data:image/gif;base64,R0lGODlhIgALAKIAABkZGf///8fW5f///////////xkZGRkZGSH5BAEAAAUALAAAAAAiAAsAAANCWKqyHDBG0ZytDz8JW9COECxid3GVeY5FOa3f8pJRy6m0JlXud88kC6rHshiPit0GgmwKcTamcwrdTKkg2tWZDSUAADs=)}
-/* уголок сверху */
+/* СѓРіРѕР»РѕРє СЃРІРµСЂС…Сѓ */
 ._hint .ugt{width:100%;height:6px;top:-6px;left:0}
 ._hint .ugt div{width:11px;height:6px}
-/* уголок снизу */
+/* СѓРіРѕР»РѕРє СЃРЅРёР·Сѓ */
 ._hint .ugb{width:100%;height:6px;bottom:-6px;left:0}
 ._hint .ugb div{width:11px;height:6px;background-position:-11px 0}
-/* уголок справа */
+/* СѓРіРѕР»РѕРє СЃРїСЂР°РІР° */
 ._hint .ugr{width:6px;height:100%;top:0;right:-6px}
 ._hint .ugr div{width:6px;height:11px;background-position:-22px 0}
-/* уголок слева */
+/* СѓРіРѕР»РѕРє СЃР»РµРІР° */
 ._hint .ugl{width:6px;height:100%;top:0;left:-6px}
 ._hint .ugl div{width:6px;height:11px;background-position:-28px 0}
 
@@ -543,7 +543,7 @@
 
 
 
-/* Подсказка на тёмном фоне */
+/* РџРѕРґСЃРєР°Р·РєР° РЅР° С‚С‘РјРЅРѕРј С„РѕРЅРµ */
 ._tooltip{position:relative}
 ._tooltip .ttdiv{
 	position:absolute;
@@ -578,7 +578,7 @@
 
 
 
-/* Календарь */
+/* РљР°Р»РµРЅРґР°СЂСЊ */
 ._calendar{display:inline-block;position:relative}
 ._calendar .icon{position:absolute;left:127px;top:4px}
 ._calendar .cal-inp{cursor:pointer;width:150px}
@@ -654,7 +654,7 @@
 
 
 
-/* Фильтр-календарь */
+/* Р¤РёР»СЊС‚СЂ-РєР°Р»РµРЅРґР°СЂСЊ */
 ._filter-calendar{
 	position:relative;
 	width:200px;
@@ -720,8 +720,8 @@
 
 
 
-/* Меню */
-/* type 0: Основной вид - горизонтальное меню */
+/* РњРµРЅСЋ */
+/* type 0: РћСЃРЅРѕРІРЅРѕР№ РІРёРґ - РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРѕРµ РјРµРЅСЋ */
 ._menu0{
 	border-bottom:#31618C solid 1px;
 	padding:15px 5px 0 5px;
@@ -737,7 +737,7 @@
 ._menu0 .link:not(.sel):hover{background-color:#DEE3EF}
 ._menu0 .link.sel{color:#FFF;background-color:#31618C}
 
-/* type 1: С подчёркиванием (гориз.) */
+/* type 1: РЎ РїРѕРґС‡С‘СЂРєРёРІР°РЅРёРµРј (РіРѕСЂРёР·.) */
 ._menu1{border-bottom:#E7E8EC solid 1px}
 ._menu1 .link{
 	display:inline-block;
@@ -749,7 +749,7 @@
 ._menu1 .link:hover{text-decoration:none}
 ._menu1 .link:not(.sel):hover{border-bottom:#CAD2DB solid 2px}
 
-/* type 2: Синие маленькие кнопки (гориз.) */
+/* type 2: РЎРёРЅРёРµ РјР°Р»РµРЅСЊРєРёРµ РєРЅРѕРїРєРё (РіРѕСЂРёР·.) */
 ._menu2 .link{
 	display:inline-block;
 	color:#45688e;
@@ -762,7 +762,7 @@
 ._menu2 .link:hover{text-decoration:none}
 ._menu2 .link:not(.sel):hover{background-color:#e9edf1}
 
-/* type 3: Боковое вертикальное меню */
+/* type 3: Р‘РѕРєРѕРІРѕРµ РІРµСЂС‚РёРєР°Р»СЊРЅРѕРµ РјРµРЅСЋ */
 ._menu3 .link{display:block;padding:10px 12px}
 ._menu3 .link.sel{background-color:#6b8eb5;color:#fff}
 ._menu3 .link:hover{text-decoration:none}
@@ -778,7 +778,7 @@
 
 
 
-/* Выпадающее меню по ссылке */
+/* Р’С‹РїР°РґР°СЋС‰РµРµ РјРµРЅСЋ РїРѕ СЃСЃС‹Р»РєРµ */
 ._dropdown{position:relative;display:inline-block}
 ._dropdown .dd-head{white-space:nowrap}
 ._dropdown .dd-head.grey{color:#999}
@@ -819,7 +819,7 @@
 
 
 
-/* Переключатель количество */
+/* РџРµСЂРµРєР»СЋС‡Р°С‚РµР»СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ */
 ._count{display:inline-block;position:relative}
 ._count input{
 	width:100%;
@@ -863,7 +863,7 @@
 
 
 
-/* Загрузка изображений */
+/* Р—Р°РіСЂСѓР·РєР° РёР·РѕР±СЂР°Р¶РµРЅРёР№ */
 .icon-image{
 	background:transparent 22px 22px no-repeat url(../../img/icon-image.png?1);
 }
@@ -981,7 +981,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	z-index:22;
 }
 ._image-load:not(.progress) ._image-prc{display:none}
-/* блокировка добавления изображений */
+/* Р±Р»РѕРєРёСЂРѕРІРєР° РґРѕР±Р°РІР»РµРЅРёСЏ РёР·РѕР±СЂР°Р¶РµРЅРёР№ */
 ._image-load.dis{border-color:#eee}
 ._image-dis{
 	position:absolute;
@@ -997,7 +997,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 ._image-link{max-width:415px}
 
 
-/* Просмотр изображений */
+/* РџСЂРѕСЃРјРѕС‚СЂ РёР·РѕР±СЂР°Р¶РµРЅРёР№ */
 #_image-main{
 	height:400px;
 	text-align:center;
@@ -1025,7 +1025,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
-/* настройка цвета элемента */
+/* РЅР°СЃС‚СЂРѕР№РєР° С†РІРµС‚Р° СЌР»РµРјРµРЅС‚Р° */
 ._color{
 	display:inline-block;
 	position:relative;
@@ -1048,7 +1048,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
-/* цвет фона */
+/* С†РІРµС‚ С„РѕРЅР° */
 ._color-bg,
 ._color-bg-choose div{
 	display:inline-block;
@@ -1076,7 +1076,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
-/* история действий */
+/* РёСЃС‚РѕСЂРёСЏ РґРµР№СЃС‚РІРёР№ */
 .history-day{
 	margin-left:35px;
 	font:bold 14px Verdana;
@@ -1099,7 +1099,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
-/* выбор элемента из диалога или страницы */
+/* РІС‹Р±РѕСЂ СЌР»РµРјРµРЅС‚Р° РёР· РґРёР°Р»РѕРіР° РёР»Рё СЃС‚СЂР°РЅРёС†С‹ */
 ._selem .icon-star{
 	left:5px;
 	top:6px;
@@ -1115,7 +1115,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
-/* Фильтр-меню [78] */
+/* Р¤РёР»СЊС‚СЂ-РјРµРЅСЋ [78] */
 .fm-plus{
 	width:25px;
 	font-size:18px;
@@ -1136,7 +1136,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
-/* Заметки */
+/* Р—Р°РјРµС‚РєРё */
 ._note-txt{
 	border:#D2D8DD solid 1px;
 	border-radius:5px;

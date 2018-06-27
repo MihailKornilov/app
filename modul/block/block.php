@@ -1,5 +1,5 @@
 <?php
-function _blockChildClear($arr) {//изъятие дочерних блоков, если отсутствует родитель
+function _blockChildClear($arr) {//РёР·СЉСЏС‚РёРµ РґРѕС‡РµСЂРЅРёС… Р±Р»РѕРєРѕРІ, РµСЃР»Рё РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ СЂРѕРґРёС‚РµР»СЊ
 	$idsForDel = array();
 	foreach($arr as $id => $r) {
 		if(!$parent_id = $r['parent_id'])
@@ -24,7 +24,7 @@ function _blockChildClear($arr) {//изъятие дочерних блоков, если отсутствует род
 
 	return $arr;
 }
-function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
+function _blockArrChild($child, $parent_id=0) {//СЂР°СЃСЃС‚Р°РЅРѕРІРєР° РґРѕС‡РµСЂРЅРёС… Р±Р»РѕРєРѕРІ
 	if(!$send = @$child[$parent_id])
 		return array();
 
@@ -33,22 +33,22 @@ function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
 
 	return $send;
 }
-function _blockName($name, $i='name') {//доступные варианты объектов для блоков
+function _blockName($name, $i='name') {//РґРѕСЃС‚СѓРїРЅС‹Рµ РІР°СЂРёР°РЅС‚С‹ РѕР±СЉРµРєС‚РѕРІ РґР»СЏ Р±Р»РѕРєРѕРІ
 	$empty = array(
-		'page' => '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>',
+		'page' => '<div class="_empty mar20">Р­С‚Р° СЃС‚СЂР°РЅРёС†Р° РїСѓСЃС‚Р°СЏ Рё РµС‰С‘ РЅРµ Р±С‹Р»Р° РЅР°СЃС‚СЂРѕРµРЅР°.</div>',
 
 		'spisok' =>
 			'<div class="bg-ffe pad10">'.
 				'<div class="_empty min">'.
-					'Шаблон пуст.'.
-					'<div class="mt10 pale">Начните с настройки блоков.</div>'.
+					'РЁР°Р±Р»РѕРЅ РїСѓСЃС‚.'.
+					'<div class="mt10 pale">РќР°С‡РЅРёС‚Рµ СЃ РЅР°СЃС‚СЂРѕР№РєРё Р±Р»РѕРєРѕРІ.</div>'.
 				'</div>'.
 			'</div>',
 
 		'dialog' => '<div class="pad10">'.
 						'<div class="_empty min">'.
-							'Пустое содержание диалога.'.
-	   (_num(@BLOCK_EDIT) ? '<div class="mt10 pale">Начните с управления блоками.</div>' : '').
+							'РџСѓСЃС‚РѕРµ СЃРѕРґРµСЂР¶Р°РЅРёРµ РґРёР°Р»РѕРіР°.'.
+	   (_num(@BLOCK_EDIT) ? '<div class="mt10 pale">РќР°С‡РЅРёС‚Рµ СЃ СѓРїСЂР°РІР»РµРЅРёСЏ Р±Р»РѕРєР°РјРё.</div>' : '').
 						'</div>'.
 					'</div>'
 	);
@@ -56,13 +56,13 @@ function _blockName($name, $i='name') {//доступные варианты объектов для блоков
 	if(!isset($empty[$name]))
 		return 0;
 
-	//сообщение отсутствия блоков
+	//СЃРѕРѕР±С‰РµРЅРёРµ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ Р±Р»РѕРєРѕРІ
 	if($i == 'empty')
 		return $empty[$name];
 
 	return $name;
 }
-function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) {//вывод на экран всей структуры блоков
+function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) {//РІС‹РІРѕРґ РЅР° СЌРєСЂР°РЅ РІСЃРµР№ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р»РѕРєРѕРІ
 	if(!$block = _BE('block_obj', $obj_name, $obj_id))
 		return _blockName($obj_name, 'empty');
 	if(!is_array($unit))
@@ -70,15 +70,15 @@ function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) 
 
 	return _blockLevel($block, $width, $grid_id, 0,1, $unit);
 }
-function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {//формирование блоков по уровням
+function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {//С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ Р±Р»РѕРєРѕРІ РїРѕ СѓСЂРѕРІРЅСЏРј
 	if(empty($arr))
 		return '';
 
-	//условие изменения ширины элемента
+	//СѓСЃР»РѕРІРёРµ РёР·РјРµРЅРµРЅРёСЏ С€РёСЂРёРЅС‹ СЌР»РµРјРµРЅС‚Р°
 	if(!defined('ELEM_WIDTH_CHANGE'))
 		define('ELEM_WIDTH_CHANGE', 0);
 
-	//условия для настройки блоков конкретного объекта
+	//СѓСЃР»РѕРІРёСЏ РґР»СЏ РЅР°СЃС‚СЂРѕР№РєРё Р±Р»РѕРєРѕРІ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 	if(!defined('BLOCK_EDIT')) {
 		$id = key($arr);
 		switch($arr[$id]['obj_name']) {
@@ -90,14 +90,14 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		define('BLOCK_EDIT', $v);
 	}
 
-	$MN = 10;//множитель
+	$MN = 10;//РјРЅРѕР¶РёС‚РµР»СЊ
 	$wMax = round($WM / $MN);
 
-	//подстановка нижней линии, если блоки не доходят до низу
+	//РїРѕРґСЃС‚Р°РЅРѕРІРєР° РЅРёР¶РЅРµР№ Р»РёРЅРёРё, РµСЃР»Рё Р±Р»РѕРєРё РЅРµ РґРѕС…РѕРґСЏС‚ РґРѕ РЅРёР·Сѓ
 	$yEnd = 0;
 	$hSum = 0;
 
-	//составление структуры блоков по строкам
+	//СЃРѕСЃС‚Р°РІР»РµРЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р»РѕРєРѕРІ РїРѕ СЃС‚СЂРѕРєР°Рј
 	$block = array();
 	foreach($arr as $r) {
 		if(!BLOCK_EDIT && empty($unit['choose']) && $r['elem_id'] && $r['elem']['hidden'])
@@ -116,12 +116,12 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	$BT = BLOCK_EDIT ? ' bor-t-dash' : '';
 	$BR = BLOCK_EDIT ? ' bor-r-dash' : '';
 	$BB = BLOCK_EDIT ? ' bor-b-dash' : '';
-	$br1px = BLOCK_EDIT ? 1 : 0;//показ красной разделительной линии справа
+	$br1px = BLOCK_EDIT ? 1 : 0;//РїРѕРєР°Р· РєСЂР°СЃРЅРѕР№ СЂР°Р·РґРµР»РёС‚РµР»СЊРЅРѕР№ Р»РёРЅРёРё СЃРїСЂР°РІР°
 
 	foreach($block as $y => $str) {
 		$widthMax = $WM;
 
-		ksort($str);//выстраивание блоков по X
+		ksort($str);//РІС‹СЃС‚СЂР°РёРІР°РЅРёРµ Р±Р»РѕРєРѕРІ РїРѕ X
 
 		$xStr = array();
 		foreach($str as $r)
@@ -138,7 +138,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			'<div class="bl-div">'.
 			'<table class="bl-tab" style="height:'.$r['height'].'px">'.
 				'<tr>';
-		//пустота в начале
+		//РїСѓСЃС‚РѕС‚Р° РІ РЅР°С‡Р°Р»Рµ
 		if($r['x']) {
 			$width = $r['x'] * $MN - $br1px;
 			$send .= '<td class="'.$BR.$bt.$bb.'" style="width:'.$width.'px">';
@@ -171,7 +171,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$borPx = $bor[3] + (BLOCK_EDIT ? 0 : $bor[1]);
 			$width = $r['width'] - ($xEnd ? 0 : $br1px) - $borPx;
 
-			//если блок списка шаблона, attr_id не ставится
+			//РµСЃР»Рё Р±Р»РѕРє СЃРїРёСЃРєР° С€Р°Р±Р»РѕРЅР°, attr_id РЅРµ СЃС‚Р°РІРёС‚СЃСЏ
 			$attr_id = !BLOCK_EDIT && $r['obj_name'] == 'spisok' ? '' : ' id="bl_'.$r['id'].'"';
 
 			$send .= '<td'.$attr_id.
@@ -191,7 +191,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 
 			$widthMax -= $r['width'];
 
-			//пустота в середине
+			//РїСѓСЃС‚РѕС‚Р° РІ СЃРµСЂРµРґРёРЅРµ
 			if($next)
 				if($next['x'] > $r['x'] + $r['w']) {
 					$w = $next['x'] - $r['x'] - $r['w'];
@@ -200,7 +200,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 					$widthMax -= $width;
 				}
 
-			//пустота в конце
+			//РїСѓСЃС‚РѕС‚Р° РІ РєРѕРЅС†Рµ
 			if(!$next && $widthMax)
 				$send .= '<td class="'.$bt.$bb.'" style="width:'.$widthMax.'px">';
 		}
@@ -210,7 +210,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 
 	return $send;
 }
-function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для изменения уровня редактирования блоков
+function _blockLevelChange($obj_name, $obj_id, $width=1000) {//РєРЅРѕРїРєРё РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ СѓСЂРѕРІРЅСЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ Р±Р»РѕРєРѕРІ
 	$max = 1;
 	$html = '';
 
@@ -219,7 +219,7 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для измене
 			WHERE `obj_name`='".$obj_name."'
 			  AND `obj_id`=".$obj_id;
 	if($arr = query_arr($sql)) {
-		//определение количества уровней блоков
+		//РѕРїСЂРµРґРµР»РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° СѓСЂРѕРІРЅРµР№ Р±Р»РѕРєРѕРІ
 		foreach($arr as $r) {
 			if(!$parent_id = $r['parent_id'])
 				continue;
@@ -234,7 +234,7 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для измене
 				$max = $level;
 		}
 
-		//обновление текущего уровня настройки блоков, если у предыдущего объекта было больше уровней
+		//РѕР±РЅРѕРІР»РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СѓСЂРѕРІРЅСЏ РЅР°СЃС‚СЂРѕР№РєРё Р±Р»РѕРєРѕРІ, РµСЃР»Рё Сѓ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РѕР±СЉРµРєС‚Р° Р±С‹Р»Рѕ Р±РѕР»СЊС€Рµ СѓСЂРѕРІРЅРµР№
 		$selected = _blockLevelDefine($obj_name);
 		if($selected > $max) {
 			_blockLevelDefine($obj_name, 1);
@@ -246,28 +246,28 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для измене
 			$html .= '<button class="block-level-change vk small ml5 '.$sel.'">'.$n.'</button>';
 		}
 
-		//опделеление, есть ли элементы, у которых можно изменять ширину, чтобы выводить кнопку настройки
+		//РѕРїРґРµР»РµР»РµРЅРёРµ, РµСЃС‚СЊ Р»Рё СЌР»РµРјРµРЅС‚С‹, Сѓ РєРѕС‚РѕСЂС‹С… РјРѕР¶РЅРѕ РёР·РјРµРЅСЏС‚СЊ С€РёСЂРёРЅСѓ, С‡С‚РѕР±С‹ РІС‹РІРѕРґРёС‚СЊ РєРЅРѕРїРєСѓ РЅР°СЃС‚СЂРѕР№РєРё
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `block_id` IN ("._idsGet($arr).")";
 		foreach(query_arr($sql) as $r)
 			if(_dialogParam($r['dialog_id'], 'element_width')) {
-				$html .= '<button class="vk small grey ml30 elem-width-change">Настройка ширины элементов</button>';
+				$html .= '<button class="vk small grey ml30 elem-width-change">РќР°СЃС‚СЂРѕР№РєР° С€РёСЂРёРЅС‹ СЌР»РµРјРµРЅС‚РѕРІ</button>';
 				break;
 			}
 	}
 
 	return
 	'<div id="block-level-'.$obj_name.'" val="'.$obj_name.':'.$obj_id.':'.$width.'">'.
-		'<button class="vk small grey block-grid-on">Управление блоками</button>'.
+		'<button class="vk small grey block-grid-on">РЈРїСЂР°РІР»РµРЅРёРµ Р±Р»РѕРєР°РјРё</button>'.
 		$html.
 		'<div class="dn fr">'.
-			'<button class="vk small green mr5 block-choose-submit">Блоки выбраны</button>'.
-			'<button class="vk small cancel block-choose-cancel">Вернуться к диалогу</button>'.
+			'<button class="vk small green mr5 block-choose-submit">Р‘Р»РѕРєРё РІС‹Р±СЂР°РЅС‹</button>'.
+			'<button class="vk small cancel block-choose-cancel">Р’РµСЂРЅСѓС‚СЊСЃСЏ Рє РґРёР°Р»РѕРіСѓ</button>'.
 		'</div>'.
 	'</div>';
 }
-function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
+function _blockLevelDefine($obj_name, $v = 0) {//СѓСЂРѕРІРµРЅСЊ СЂРµРґР°РєС‚РёСЂСѓРµРјС‹С… Р±Р»РѕРєРѕРІ
 	$key = 'block_level_'.$obj_name;
 	if($v) {
 		$_COOKIE[$key] = $v;
@@ -276,10 +276,10 @@ function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
 	}
 	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
 }
-function _blockSetka($r, $level, $grid_id, $unit) {//отображение сетки для настраиваемого блока
+function _blockSetka($r, $level, $grid_id, $unit) {//РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРµС‚РєРё РґР»СЏ РЅР°СЃС‚СЂР°РёРІР°РµРјРѕРіРѕ Р±Р»РѕРєР°
 	if(!BLOCK_EDIT)
 		return '';
-	//включенное изменение ширины элемента отключает настройку блоков
+	//РІРєР»СЋС‡РµРЅРЅРѕРµ РёР·РјРµРЅРµРЅРёРµ С€РёСЂРёРЅС‹ СЌР»РµРјРµРЅС‚Р° РѕС‚РєР»СЋС‡Р°РµС‚ РЅР°СЃС‚СЂРѕР№РєСѓ Р±Р»РѕРєРѕРІ
 	if(ELEM_WIDTH_CHANGE)
 		return '';
 	if(!empty($unit['choose']))
@@ -296,37 +296,37 @@ function _blockSetka($r, $level, $grid_id, $unit) {//отображение сетки для настр
 
 	return '<div class="block-unit level'.$bld.' '.($grid_id ? ' grid' : '').'" val="'.$r['id'].'"></div>';
 }
-function _blockChoose($r, $level, $unit) {//подсветка блоков для выбора (к функциям)
+function _blockChoose($r, $level, $unit) {//РїРѕРґСЃРІРµС‚РєР° Р±Р»РѕРєРѕРІ РґР»СЏ РІС‹Р±РѕСЂР° (Рє С„СѓРЅРєС†РёСЏРј)
 	if(empty($unit['choose']))
 		return '';
-//	if($r['parent_id'])//выбирать можно только корневые блоки
+//	if($r['parent_id'])//РІС‹Р±РёСЂР°С‚СЊ РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ РєРѕСЂРЅРµРІС‹Рµ Р±Р»РѕРєРё
 //		return '';
-	if($level != @$_COOKIE['block_level_'.$r['obj_name']])//выбирать можно только блоки установленного уровня (на уровне, котором расположен элемент)
+	if($level != @$_COOKIE['block_level_'.$r['obj_name']])//РІС‹Р±РёСЂР°С‚СЊ РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ Р±Р»РѕРєРё СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ (РЅР° СѓСЂРѕРІРЅРµ, РєРѕС‚РѕСЂРѕРј СЂР°СЃРїРѕР»РѕР¶РµРЅ СЌР»РµРјРµРЅС‚)
 		return '';
 	if(!$ca = $unit['choose_access'])
 		return '';
 	if(!@$ca['block'])
 		return '';
 
-	//отметка выбранных полей
+	//РѕС‚РјРµС‚РєР° РІС‹Р±СЂР°РЅРЅС‹С… РїРѕР»РµР№
 	$block_id = $r['id'];
 	$sel = isset($unit['choose_sel'][$block_id]) ? ' sel' : '';
 	$deny = isset($unit['choose_deny'][$block_id]) ? ' deny' : '';
 
 	return '<div class="choose block-choose'.$sel.$deny.'" val="'.$block_id.'"></div>';
 }
-function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
-	//условие выбора
+function _blockElemChoose($r, $unit) {//РїРѕРґСЃРІРµС‚РєР° СЌР»РµРјРµРЅС‚РѕРІ РґР»СЏ РІСЃС‚Р°РІРєРё РІ С€Р°Р±Р»РѕРЅ
+	//СѓСЃР»РѕРІРёРµ РІС‹Р±РѕСЂР°
 	if(empty($unit['choose']))
 		return '';
-	if(empty($r['elem']))//блок не подсвечивается, если в нём нет элемента
+	if(empty($r['elem']))//Р±Р»РѕРє РЅРµ РїРѕРґСЃРІРµС‡РёРІР°РµС‚СЃСЏ, РµСЃР»Рё РІ РЅС‘Рј РЅРµС‚ СЌР»РµРјРµРЅС‚Р°
 		return '';
-//	if($r['obj_name'] != 'dialog')//выбор элементов можно производить только у диалогов (пока)
+//	if($r['obj_name'] != 'dialog')//РІС‹Р±РѕСЂ СЌР»РµРјРµРЅС‚РѕРІ РјРѕР¶РЅРѕ РїСЂРѕРёР·РІРѕРґРёС‚СЊ С‚РѕР»СЊРєРѕ Сѓ РґРёР°Р»РѕРіРѕРІ (РїРѕРєР°)
 //		return '';
 
 	$dialog_id = $r['elem']['dialog_id'];
 
-	//подсветка полей, которые разрешено выбирать
+	//РїРѕРґСЃРІРµС‚РєР° РїРѕР»РµР№, РєРѕС‚РѕСЂС‹Рµ СЂР°Р·СЂРµС€РµРЅРѕ РІС‹Р±РёСЂР°С‚СЊ
 	if(!$ca = $unit['choose_access'])
 		return '';
 
@@ -336,16 +336,16 @@ function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
 	if(!@$ca['all'] && !isset($ca[$dialog_id]))
 		return '';
 
-	//отметка выбранных полей
+	//РѕС‚РјРµС‚РєР° РІС‹Р±СЂР°РЅРЅС‹С… РїРѕР»РµР№
 	$elem_id = $r['elem']['id'];
 	$sel = isset($unit['choose_sel'][$elem_id]) ? ' sel' : '';
 
 	return '<div class="choose block-elem-choose'.$sel.'" val="'.$elem_id.'"></div>';
 }
-function _blockStyle($r, $width, $unit) {//стили css для блока
+function _blockStyle($r, $width, $unit) {//СЃС‚РёР»Рё css РґР»СЏ Р±Р»РѕРєР°
 	$send = array();
 
-	//границы
+	//РіСЂР°РЅРёС†С‹
 	$bor = explode(' ', $r['bor']);
 	foreach($bor as $i => $b) {
 		if(!$b)
@@ -360,7 +360,7 @@ function _blockStyle($r, $width, $unit) {//стили css для блока
 
 	$send[] = ($r['width_auto'] ? 'min-' : '').'width:'.$width.'px';
 
-	//цвет фона из единицы списка
+	//С†РІРµС‚ С„РѕРЅР° РёР· РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	if($r['bg'] == 'bg70')
 		if(!empty($r['bg_col'])) {
 			$col = $r['bg_col'];
@@ -374,13 +374,13 @@ function _blockStyle($r, $width, $unit) {//стили css для блока
 
 	return implode(';', $send);
 }
-function _blockChildHtml($block, $level, $width, $grid_id, $unit) {//деление блока на части
+function _blockChildHtml($block, $level, $width, $grid_id, $unit) {//РґРµР»РµРЅРёРµ Р±Р»РѕРєР° РЅР° С‡Р°СЃС‚Рё
 	if($block['id'] != $grid_id)
 		return _blockLevel($block['child'], $width, $grid_id, $block['h'], $level, $unit);
 
 	return _blockGrid($block['child']);
 }
-function _blockGrid($arr) {//режим деления на подблоки
+function _blockGrid($arr) {//СЂРµР¶РёРј РґРµР»РµРЅРёСЏ РЅР° РїРѕРґР±Р»РѕРєРё
 	$spisok = '';
 	foreach($arr as $r) {
 		$spisok .=
@@ -392,25 +392,25 @@ function _blockGrid($arr) {//режим деления на подблоки
 
 	return
 		'<div id="grid-stack" class="prel">'.$spisok.'</div>'.
-		'<div id="grid-add" class="pad5 bg-gr2 bor-e8 fs14 center color-555 curP over5 mt1">Добавить блок</div> '.
+		'<div id="grid-add" class="pad5 bg-gr2 bor-e8 fs14 center color-555 curP over5 mt1">Р”РѕР±Р°РІРёС‚СЊ Р±Р»РѕРє</div> '.
 		'<div class="pad5 center">'.
-			'<button class="vk small orange" id="grid-save">Сохранить</button>'.
-			'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
+			'<button class="vk small orange" id="grid-save">РЎРѕС…СЂР°РЅРёС‚СЊ</button>'.
+			'<button class="vk small cancel ml5" id="grid-cancel">РћС‚РјРµРЅР°</button>'.
 		'</div>';
 }
 
-function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
+function _BE($i, $i1=0, $i2=0) {//РєРµС€РёСЂРѕРІР°РЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РїСЂРёР»РѕР¶РµРЅРёСЏ
 	global $BE_FLAG, $G_BLOCK, $G_ELEM, $G_DLG;
 
 	_beDefine();
 
-	//получение данных всех блоков
+	//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РІСЃРµС… Р±Р»РѕРєРѕРІ
 	if($i == 'block_all')
 		return $G_BLOCK;
 
-	//получение данных одного блока
+	//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РѕРґРЅРѕРіРѕ Р±Р»РѕРєР°
 	if($i == 'block_one') {
-		//ID блока
+		//ID Р±Р»РѕРєР°
 		if(!$i1)
 			return array();
 		if(!isset($G_BLOCK[$i1]))
@@ -422,7 +422,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		return $send;
 	}
 
-	//получение блоков для конкретного объекта
+	//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РѕРєРѕРІ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 	if($i == 'block_arr') {
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
@@ -441,7 +441,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		return $send;
 	}
 
-	//получение блоков для конкретного объекта c учётом иерархии
+	//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РѕРєРѕРІ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РѕР±СЉРµРєС‚Р° c СѓС‡С‘С‚РѕРј РёРµСЂР°СЂС…РёРё
 	if($i == 'block_obj') {
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
@@ -457,10 +457,10 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 			$r['child'] = array();
 			$r['elem'] = array();
 
-			//вставка элемента в блок
+			//РІСЃС‚Р°РІРєР° СЌР»РµРјРµРЅС‚Р° РІ Р±Р»РѕРє
 			if($r['elem_id'] && isset($G_ELEM[$r['elem_id']])) {
 				$el = $G_ELEM[$r['elem_id']];
-				$el['block'] = $G_BLOCK[$id];//предварительно прикрепление данных блока к элементу
+				$el['block'] = $G_BLOCK[$id];//РїСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ РїСЂРёРєСЂРµРїР»РµРЅРёРµ РґР°РЅРЅС‹С… Р±Р»РѕРєР° Рє СЌР»РµРјРµРЅС‚Сѓ
 				$r['elem'] = _beElemVvv($el);
 			}
 
@@ -474,7 +474,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		return _blockArrChild($child);
 	}
 
-	//массив блоков в формате JS для конкретного объекта
+	//РјР°СЃСЃРёРІ Р±Р»РѕРєРѕРІ РІ С„РѕСЂРјР°С‚Рµ JS РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 	if($i == 'block_js') {
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
@@ -501,7 +501,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		return '{'.implode(',', $send).'}';
 	}
 
-	//очистка кеша блоков
+	//РѕС‡РёСЃС‚РєР° РєРµС€Р° Р±Р»РѕРєРѕРІ
 	if($i == 'block_clear') {
 		_cache_clear('BLK_page');
 		_cache_clear('BLK_page', 1);
@@ -514,13 +514,13 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		$BE_FLAG = 0;
 	}
 
-	//получение данных всех элементов
+	//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РІСЃРµС… СЌР»РµРјРµРЅС‚РѕРІ
 	if($i == 'elem_all')
 		return $G_ELEM;
 
-	//получение данных одного элемента
+	//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РѕРґРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
 	if($i == 'elem_one') {
-		//ID элемента
+		//ID СЌР»РµРјРµРЅС‚Р°
 		if(!$i1)
 			return array();
 		if(!isset($G_ELEM[$i1]))
@@ -532,7 +532,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		return $send;
 	}
 
-	//получение элементов для конкретного объекта
+	//РїРѕР»СѓС‡РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
 	if($i == 'elem_arr') {
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
@@ -553,7 +553,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		return $send;
 	}
 
-	if($i == 'elem_js') {//массив элементов в формате JS
+	if($i == 'elem_js') {//РјР°СЃСЃРёРІ СЌР»РµРјРµРЅС‚РѕРІ РІ С„РѕСЂРјР°С‚Рµ JS
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
 			return '{}';
@@ -573,7 +573,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		return _json($send);
 	}
 
-	//очистка кеша элементов
+	//РѕС‡РёСЃС‚РєР° РєРµС€Р° СЌР»РµРјРµРЅС‚РѕРІ
 	if($i == 'elem_clear') {
 		_cache_clear('ELM_page');
 		_cache_clear('ELM_page', 1);
@@ -586,9 +586,9 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		$BE_FLAG = 0;
 	}
 
-	//получение данных одного диалога
+	//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РѕРґРЅРѕРіРѕ РґРёР°Р»РѕРіР°
 	if($i == 'dialog') {
-		//ID диалога
+		//ID РґРёР°Р»РѕРіР°
 		if(!$dialog_id = _num($i1))
 			return array();
 		if(!isset($G_DLG[$dialog_id]))
@@ -599,7 +599,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 		return $send;
 	}
 
-	//очистка кеша диалогов
+	//РѕС‡РёСЃС‚РєР° РєРµС€Р° РґРёР°Р»РѕРіРѕРІ
 	if($i == 'dialog_clear') {
 		_cache_clear('dialog');
 		_cache_clear('dialog', 1);
@@ -608,33 +608,33 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 
 	return false;
 }
-function _beDefine() {//получение блоков и элементов из кеша
-	global  $BE_FLAG,//флаг заполненных глобальных элементов
+function _beDefine() {//РїРѕР»СѓС‡РµРЅРёРµ Р±Р»РѕРєРѕРІ Рё СЌР»РµРјРµРЅС‚РѕРІ РёР· РєРµС€Р°
+	global  $BE_FLAG,//С„Р»Р°Рі Р·Р°РїРѕР»РЅРµРЅРЅС‹С… РіР»РѕР±Р°Р»СЊРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
 			$G_BLOCK, $G_ELEM, $G_DLG;
 
-	//если флаг установлен, значит кеш был обновлён, глобальные элементы заполнены
+	//РµСЃР»Рё С„Р»Р°Рі СѓСЃС‚Р°РЅРѕРІР»РµРЅ, Р·РЅР°С‡РёС‚ РєРµС€ Р±С‹Р» РѕР±РЅРѕРІР»С‘РЅ, РіР»РѕР±Р°Р»СЊРЅС‹Рµ СЌР»РµРјРµРЅС‚С‹ Р·Р°РїРѕР»РЅРµРЅС‹
 	if($BE_FLAG)
 		return;
 
 	$G_BLOCK = array();
 	$G_ELEM = array();
 
-	//диалоги
+	//РґРёР°Р»РѕРіРё
 	$G_DLG = _beDlg();
 
-	//блоки страниц
+	//Р±Р»РѕРєРё СЃС‚СЂР°РЅРёС†
 	_beBlockType('page');
-	//блоки диалогов
+	//Р±Р»РѕРєРё РґРёР°Р»РѕРіРѕРІ
 	_beBlockType('dialog');
 
 	$BE_FLAG = 1;
 }
-function _beBlockType($type) {//получение данных о блоках по типу
+function _beBlockType($type) {//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… Рѕ Р±Р»РѕРєР°С… РїРѕ С‚РёРїСѓ
 	global $G_BLOCK;
 
 	$key = 'BLK_'.$type;
 
-	//глобальные
+	//РіР»РѕР±Р°Р»СЊРЅС‹Рµ
 	if(!$block_global = _cache_get($key, 1)) {
 		$sql = "SELECT `id`
 				FROM `_".$type."`
@@ -660,7 +660,7 @@ function _beBlockType($type) {//получение данных о блоках по типу
 	if(!APP_ID)
 		return;
 
-	//для конкретного приложения
+	//РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ
 	if(!$block_app = _cache_get($key)) {
 		$sql = "SELECT `id`
 				FROM `_".$type."`
@@ -682,7 +682,7 @@ function _beBlockType($type) {//получение данных о блоках по типу
 	_beBlockSpisok($type, $block_app);
 	_beBlockElem($type, $block_app);
 }
-function _beBlockSpisok($type, $block, $global=0) {//получение данных о блоках-списках
+function _beBlockSpisok($type, $block, $global=0) {//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… Рѕ Р±Р»РѕРєР°С…-СЃРїРёСЃРєР°С…
 	global $G_BLOCK;
 
 	if(empty($block))
@@ -690,7 +690,7 @@ function _beBlockSpisok($type, $block, $global=0) {//получение данных о блоках-с
 
 	$key = 'BLK_SPISOK_'.$type;
 	if(!$arr = _cache_get($key, $global)) {
-		//если получен пустой массив и при этом запись в кеше была, запрос из базы не производится
+		//РµСЃР»Рё РїРѕР»СѓС‡РµРЅ РїСѓСЃС‚РѕР№ РјР°СЃСЃРёРІ Рё РїСЂРё СЌС‚РѕРј Р·Р°РїРёСЃСЊ РІ РєРµС€Рµ Р±С‹Р»Р°, Р·Р°РїСЂРѕСЃ РёР· Р±Р°Р·С‹ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
 		if(_cache_isset($key, $global))
 			return;
 
@@ -708,7 +708,7 @@ function _beBlockSpisok($type, $block, $global=0) {//получение данных о блоках-с
 	$G_BLOCK += $arr;
 	_beBlockElem('SPISOK_'.$type, $arr, $global);
 }
-function _beBlockForming($arr) {//формирование массива блоков для кеша
+function _beBlockForming($arr) {//С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ РјР°СЃСЃРёРІР° Р±Р»РѕРєРѕРІ РґР»СЏ РєРµС€Р°
 	$data = array();
 	foreach($arr as $r) {
 		$id = _num($r['id']);
@@ -748,10 +748,10 @@ function _beBlockForming($arr) {//формирование массива блоков для кеша
 function _beBlockBg($r) {
 	global $G_BLOCK, $G_ELEM, $G_DLG;
 
-	//если присутствует элемент-цвет фона, получение колонок для цвета, если потребуется окраска блока
+	//РµСЃР»Рё РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ СЌР»РµРјРµРЅС‚-С†РІРµС‚ С„РѕРЅР°, РїРѕР»СѓС‡РµРЅРёРµ РєРѕР»РѕРЅРѕРє РґР»СЏ С†РІРµС‚Р°, РµСЃР»Рё РїРѕС‚СЂРµР±СѓРµС‚СЃСЏ РѕРєСЂР°СЃРєР° Р±Р»РѕРєР°
 	$r['xx_ids'] = _idsAss($r['xx_ids']);
-	$r['bg_col'] = '';    //имя колонки, по которой будет выбираться цвет
-	$r['bg_connect'] = '';//имя колонки, если это подключаемый список
+	$r['bg_col'] = '';    //РёРјСЏ РєРѕР»РѕРЅРєРё, РїРѕ РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµС‚ РІС‹Р±РёСЂР°С‚СЊСЃСЏ С†РІРµС‚
+	$r['bg_connect'] = '';//РёРјСЏ РєРѕР»РѕРЅРєРё, РµСЃР»Рё СЌС‚Рѕ РїРѕРґРєР»СЋС‡Р°РµРјС‹Р№ СЃРїРёСЃРѕРє
 	if($r['bg'] == 'bg70')
 		if($ids = _ids($r['bg_ids'], 1))
 			foreach($ids as $elem_id)
@@ -767,12 +767,12 @@ function _beBlockBg($r) {
 					}
 
 
-	//Отображение варианта цвета для динамической окраски блоков
-	//Будет открываться диалог, который вносит данные списка, чтобы указать, откуда брать цвет для окраски
-	//Иконка показывается, если:
-	//      1. spisok-блоки. id диалога, который вносит значения списка
-	//      2. dialog-блоки. id этого диалога
-	//      3. page-блоки.   id диалога, который вносит значения списка, страница которой получает значения списка
+	//РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РІР°СЂРёР°РЅС‚Р° С†РІРµС‚Р° РґР»СЏ РґРёРЅР°РјРёС‡РµСЃРєРѕР№ РѕРєСЂР°СЃРєРё Р±Р»РѕРєРѕРІ
+	//Р‘СѓРґРµС‚ РѕС‚РєСЂС‹РІР°С‚СЊСЃСЏ РґРёР°Р»РѕРі, РєРѕС‚РѕСЂС‹Р№ РІРЅРѕСЃРёС‚ РґР°РЅРЅС‹Рµ СЃРїРёСЃРєР°, С‡С‚РѕР±С‹ СѓРєР°Р·Р°С‚СЊ, РѕС‚РєСѓРґР° Р±СЂР°С‚СЊ С†РІРµС‚ РґР»СЏ РѕРєСЂР°СЃРєРё
+	//РРєРѕРЅРєР° РїРѕРєР°Р·С‹РІР°РµС‚СЃСЏ, РµСЃР»Рё:
+	//      1. spisok-Р±Р»РѕРєРё. id РґРёР°Р»РѕРіР°, РєРѕС‚РѕСЂС‹Р№ РІРЅРѕСЃРёС‚ Р·РЅР°С‡РµРЅРёСЏ СЃРїРёСЃРєР°
+	//      2. dialog-Р±Р»РѕРєРё. id СЌС‚РѕРіРѕ РґРёР°Р»РѕРіР°
+	//      3. page-Р±Р»РѕРєРё.   id РґРёР°Р»РѕРіР°, РєРѕС‚РѕСЂС‹Р№ РІРЅРѕСЃРёС‚ Р·РЅР°С‡РµРЅРёСЏ СЃРїРёСЃРєР°, СЃС‚СЂР°РЅРёС†Р° РєРѕС‚РѕСЂРѕР№ РїРѕР»СѓС‡Р°РµС‚ Р·РЅР°С‡РµРЅРёСЏ СЃРїРёСЃРєР°
 	$bg70 = 0;
 	if($r['obj_name'] == 'spisok')
 		if($bl = $G_BLOCK[$r['obj_id']])
@@ -792,7 +792,7 @@ function _beBlockBg($r) {
 
 	return $r;
 }
-function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в блоках
+function _beBlockElem($type, $BLK, $global=0) {//СЌР»РµРјРµРЅС‚С‹, РєРѕС‚РѕСЂС‹Рµ СЂР°СЃРїРѕР»РѕР¶РµРЅС‹ РІ Р±Р»РѕРєР°С…
 	global $G_ELEM, $G_DLG;
 
 	if(empty($BLK))
@@ -805,7 +805,7 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в
 
 		$ELM = array();
 
-		//наличие функций в элементах
+		//РЅР°Р»РёС‡РёРµ С„СѓРЅРєС†РёР№ РІ СЌР»РµРјРµРЅС‚Р°С…
 		$sql = "SELECT `block_id`,1
 				FROM `_element_func`
 				WHERE `block_id` IN("._idsGet($BLK).")
@@ -822,7 +822,7 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в
 			unset($el['user_id_add']);
 			unset($el['dtime_add']);
 
-			//подсказка для элемента
+			//РїРѕРґСЃРєР°Р·РєР° РґР»СЏ СЌР»РµРјРµРЅС‚Р°
 			if(!$el['hint_on']) {
 				unset($el['hint_msg']);
 				unset($el['hint_side']);
@@ -832,7 +832,7 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в
 				unset($el['hint_delay_hide']);
 			}
 
-			//переделка значений элемента в INT, если есть
+			//РїРµСЂРµРґРµР»РєР° Р·РЅР°С‡РµРЅРёР№ СЌР»РµРјРµРЅС‚Р° РІ INT, РµСЃР»Рё РµСЃС‚СЊ
 			foreach($el as $k => $v)
 				if(preg_match(REGEXP_INTEGER, $v))
 					$el[$k] = _num($v, 1);
@@ -852,14 +852,14 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в
 			$el['hidden'] = _num($dlg['element_hidden']);
 
 			if($el['width_min'] = _num($dlg['element_width_min'])) {
-				//определение максимальной ширины, на которую может растягиваться элемент
+				//РѕРїСЂРµРґРµР»РµРЅРёРµ РјР°РєСЃРёРјР°Р»СЊРЅРѕР№ С€РёСЂРёРЅС‹, РЅР° РєРѕС‚РѕСЂСѓСЋ РјРѕР¶РµС‚ СЂР°СЃС‚СЏРіРёРІР°С‚СЊСЃСЏ СЌР»РµРјРµРЅС‚
 				$ex = explode(' ', $el['mar']);
 				$width_max = $BLK[$el['block_id']]['width'] - $ex[1] - $ex[3];
 				$el['width_max'] = floor($width_max / 10) * 10;
 			}
 
 			$el['func'] = array();
-			$el['vvv'] = array();//значения для некоторых компонентов
+			$el['vvv'] = array();//Р·РЅР°С‡РµРЅРёСЏ РґР»СЏ РЅРµРєРѕС‚РѕСЂС‹С… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
 
 			$ELM[$elem_id] = $el;
 		}
@@ -886,7 +886,7 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в
 
 	$G_ELEM += $ELM;
 }
-function _beElemIdSet($arr) {//добавление id элемента к блоку
+function _beElemIdSet($arr) {//РґРѕР±Р°РІР»РµРЅРёРµ id СЌР»РµРјРµРЅС‚Р° Рє Р±Р»РѕРєСѓ
 	if(empty($arr))
 		return array();
 
@@ -901,11 +901,11 @@ function _beElemIdSet($arr) {//добавление id элемента к блоку
 
 	return $arr;
 }
-function _beElemVvv($el) {//вставка дополнительных значений в элемент
+function _beElemVvv($el) {//РІСЃС‚Р°РІРєР° РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… Р·РЅР°С‡РµРЅРёР№ РІ СЌР»РµРјРµРЅС‚
 	global $G_ELEM, $G_DLG;
 
 	switch($el['dialog_id']) {
-		//значение, выбранное из диалога - переустановка некоторых настроек
+		//Р·РЅР°С‡РµРЅРёРµ, РІС‹Р±СЂР°РЅРЅРѕРµ РёР· РґРёР°Р»РѕРіР° - РїРµСЂРµСѓСЃС‚Р°РЅРѕРІРєР° РЅРµРєРѕС‚РѕСЂС‹С… РЅР°СЃС‚СЂРѕРµРє
 		case 11:
 			if(!$ids = _ids($el['txt_2'], 1))
 				break;
@@ -927,11 +927,11 @@ function _beElemVvv($el) {//вставка дополнительных значений в элемент
 					break;
 			}
 			break;
-		//select - произвольные значения
+		//select - РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
 		case 17:
 		//dropdown
 		case 18: $el['vvv'] = _elemValue($el['id']); break;
-		//Меню переключения блоков - список пунктов
+		//РњРµРЅСЋ РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ Р±Р»РѕРєРѕРІ - СЃРїРёСЃРѕРє РїСѓРЅРєС‚РѕРІ
 		case 57:
 			$sql = "SELECT *
 					FROM `_element`
@@ -950,7 +950,7 @@ function _beElemVvv($el) {//вставка дополнительных значений в элемент
 
 			$el['vvv'] = $spisok;
 			break;
-		//фильтр-select
+		//С„РёР»СЊС‚СЂ-select
 		case 83:
 			if(!$dialog_id = $el['num_2'])
 				break;
@@ -989,9 +989,9 @@ function _beElemVvv($el) {//вставка дополнительных значений в элемент
 
 	return $el;
 }
-function _beDlg() {//получение данных диалогов из кеша
+function _beDlg() {//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РґРёР°Р»РѕРіРѕРІ РёР· РєРµС€Р°
 	$key = 'dialog';
-	//глобальные диалоги
+	//РіР»РѕР±Р°Р»СЊРЅС‹Рµ РґРёР°Р»РѕРіРё
 	if(!$global = _cache_get($key, 1)) {
 		$sql = "SELECT *
 				FROM `_dialog`
@@ -1006,7 +1006,7 @@ function _beDlg() {//получение данных диалогов из кеша
 	if(!APP_ID)
 		return $global;
 
-	//диалоги конкретного приложения
+	//РґРёР°Р»РѕРіРё РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ
 	if(!$local = _cache_get($key)) {
 		$sql = "SELECT *
 				FROM `_dialog`
@@ -1020,8 +1020,8 @@ function _beDlg() {//получение данных диалогов из кеша
 
 	return $global + $local;
 }
-function _beDlgField($dialog) {//вставка колонок таблиц в диалоги
-	//колонки по каждой таблице, используемые в диалогах
+function _beDlgField($dialog) {//РІСЃС‚Р°РІРєР° РєРѕР»РѕРЅРѕРє С‚Р°Р±Р»РёС† РІ РґРёР°Р»РѕРіРё
+	//РєРѕР»РѕРЅРєРё РїРѕ РєР°Р¶РґРѕР№ С‚Р°Р±Р»РёС†Рµ, РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РІ РґРёР°Р»РѕРіР°С…
 	$key = 'field';
 	if(!$field = _cache_get($key, 1)) {
 		$sql = "SELECT DISTINCT(`table_1`)
@@ -1037,7 +1037,7 @@ function _beDlgField($dialog) {//вставка колонок таблиц в диалоги
 		_cache_set($key, $field, 1);
 	}
 
-	//список колонок, присутствующих в таблицах 1 и 2
+	//СЃРїРёСЃРѕРє РєРѕР»РѕРЅРѕРє, РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РІ С‚Р°Р±Р»РёС†Р°С… 1 Рё 2
 	foreach($dialog as $dlg_id => $r)
 		foreach(array(1,2) as $id) {
 			$dialog[$dlg_id]['field'.$id] = array();

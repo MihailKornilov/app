@@ -1,12 +1,12 @@
-var VK_BODY,       //фрейм VK для изменения высоты $('body')
-	VK_BODY_H = 0, //текущая высота фрейма VK
+var VK_BODY,       //С„СЂРµР№Рј VK РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ РІС‹СЃРѕС‚С‹ $('body')
+	VK_BODY_H = 0, //С‚РµРєСѓС‰Р°СЏ РІС‹СЃРѕС‚Р° С„СЂРµР№РјР° VK
 	VK_SCROLL = 0,
 
-	_faceTest = function() {//определение, как загружена страница: iframe или сайт
+	_faceTest = function() {//РѕРїСЂРµРґРµР»РµРЅРёРµ, РєР°Рє Р·Р°РіСЂСѓР¶РµРЅР° СЃС‚СЂР°РЅРёС†Р°: iframe РёР»Рё СЃР°Р№С‚
 		if(_cookie('local'))
 			return;
 
-		//если текущее значение не совпадает, то установка и перезагрузка страницы
+		//РµСЃР»Рё С‚РµРєСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ РЅРµ СЃРѕРІРїР°РґР°РµС‚, С‚Рѕ СѓСЃС‚Р°РЅРѕРІРєР° Рё РїРµСЂРµР·Р°РіСЂСѓР·РєР° СЃС‚СЂР°РЅРёС†С‹
 		var face = window == window.top ? 'site' : 'iframe';
 
 		if(_cookie('face') != face) {
@@ -21,7 +21,7 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 		location.reload();
 	},
 
-	_fbhs = function(h) {//коррекция высоты окна в VK
+	_fbhs = function(h) {//РєРѕСЂСЂРµРєС†РёСЏ РІС‹СЃРѕС‚С‹ РѕРєРЅР° РІ VK
 		if(_cookie('local'))
 			return;
 		if(_cookie('face') != 'iframe')
@@ -59,16 +59,16 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 		VK.callMethod('resizeWindow', 1000, h);
 	},
 
-	_authVk = function(but) {//авторазация через VK
+	_authVk = function(but) {//Р°РІС‚РѕСЂР°Р·Р°С†РёСЏ С‡РµСЂРµР· VK
 		but = $(but);
 		but.addClass('_busy');
 
-		VK.Auth.login(function(res) {//проверка статуса авторизации
+		VK.Auth.login(function(res) {//РїСЂРѕРІРµСЂРєР° СЃС‚Р°С‚СѓСЃР° Р°РІС‚РѕСЂРёР·Р°С†РёРё
 			but.removeClass('_busy');
 			if(res.status != 'connected')
 				return;
 
-			//вход на сайт
+			//РІС…РѕРґ РЅР° СЃР°Р№С‚
 			var send = {
 				op:'auth_vk',
 				session:res.session
@@ -83,7 +83,7 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 			});
 		});
 	},
-	_authVkLocal = function(but) {//авторазация через VK - локальная версия
+	_authVkLocal = function(but) {//Р°РІС‚РѕСЂР°Р·Р°С†РёСЏ С‡РµСЂРµР· VK - Р»РѕРєР°Р»СЊРЅР°СЏ РІРµСЂСЃРёСЏ
 		$(but).addClass('_busy');
 		_post({op:'auth_vk_local'}, function(res) {
 			if(res.success) {
@@ -93,7 +93,7 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 			$(but).removeClass('_busy');
 		});
 	},
-	_appEnter = function(app_id) {//вход в приложение из списка приложений
+	_appEnter = function(app_id) {//РІС…РѕРґ РІ РїСЂРёР»РѕР¶РµРЅРёРµ РёР· СЃРїРёСЃРєР° РїСЂРёР»РѕР¶РµРЅРёР№
 		var send = {
 			op:'app_enter',
 			app_id:app_id
@@ -102,7 +102,7 @@ var VK_BODY,       //фрейм VK для изменения высоты $('body')
 		_post(send, 'reload');
 	},
 
-	_pageAct = function(pas) {//активация элементов после вывода страницы
+	_pageAct = function(pas) {//Р°РєС‚РёРІР°С†РёСЏ СЌР»РµРјРµРЅС‚РѕРІ РїРѕСЃР»Рµ РІС‹РІРѕРґР° СЃС‚СЂР°РЅРёС†С‹
 		if(pas)
 			return;
 		_elemActivate(ELM, {});

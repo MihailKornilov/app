@@ -1,8 +1,8 @@
 <?php
-/* Óñëîâèÿ, íå òðåáóþùèå àâòîðèçàöèè */
+/* Ð£ÑÐ»Ð¾Ð²Ð¸Ñ, Ð½Ðµ Ñ‚Ñ€ÐµÐ±ÑƒÑŽÑ‰Ð¸Ðµ Ð°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð°Ñ†Ð¸Ð¸ */
 
 switch(@$_POST['op']) {
-	case 'auth_vk'://àâòîðèçàöèÿ ïîëüçîâàòåëÿ ïî VK
+	case 'auth_vk'://Ð°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð°Ñ†Ð¸Ñ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ Ð¿Ð¾ VK
 		$session = @$_POST['session'];
 		$valid_keys = array('expire', 'mid', 'secret', 'sid');
 
@@ -13,16 +13,16 @@ switch(@$_POST['op']) {
 		$sig = md5($key.AUTH_APP_SECRET);
 
 		if($sig != $session['sig'])
-			jsonError('Íåóñïåøíàÿ àâòîðèçàöèÿ');
+			jsonError('ÐÐµÑƒÑÐ¿ÐµÑˆÐ½Ð°Ñ Ð°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð°Ñ†Ð¸Ñ');
 
-		//ïðîâåðêà, åñòü ëè ïîëüçîâàòåëü â áàçå
+		//Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ°, ÐµÑÑ‚ÑŒ Ð»Ð¸ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒ Ð² Ð±Ð°Ð·Ðµ
 		$vkUser_id = _num($session['mid']);
 		$sql = "SELECT `id`
 				FROM `_user`
 				WHERE `vk_id`=".$vkUser_id."
 				LIMIT 1";
 		if(!$user_id = _num(query_value($sql))) {
-			$user_id = _userVkUpdate($vkUser_id);//åñëè íåò - ïîëó÷åíèå äàííûõ èç VK
+			$user_id = _userVkUpdate($vkUser_id);//ÐµÑÐ»Ð¸ Ð½ÐµÑ‚ - Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ… Ð¸Ð· VK
 			_userImageMove();
 		}
 
@@ -35,13 +35,13 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'auth_vk_local'://àâòîðèçàöèÿ ïîëüçîâàòåëÿ ïî VK - ëîêàëüíàÿ âåðñèÿ
+	case 'auth_vk_local'://Ð°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð°Ñ†Ð¸Ñ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ Ð¿Ð¾ VK - Ð»Ð¾ÐºÐ°Ð»ÑŒÐ½Ð°Ñ Ð²ÐµÑ€ÑÐ¸Ñ
 		$sql = "SELECT *
 				FROM `_user`
 				WHERE `vk_id`=982006
 				LIMIT 1";
 		if(!$user = query_assoc($sql))
-			jsonError('Ïîëüçîâàòåëü íå íàéäåí');
+			jsonError('ÐŸÐ¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½');
 
 		_authSuccess('local'.$user['id'], $user['id'], $user['app_id_last']);
 
@@ -50,7 +50,7 @@ switch(@$_POST['op']) {
 }
 
 //if(!CODE)
-//	jsonError('Ïîëüçîâàòåëü íå àâòîðèçèðîâàí');
+//	jsonError('ÐŸÐ¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒ Ð½Ðµ Ð°Ð²Ñ‚Ð¾Ñ€Ð¸Ð·Ð¸Ñ€Ð¾Ð²Ð°Ð½');
 
 
 

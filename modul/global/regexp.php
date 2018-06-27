@@ -3,11 +3,11 @@ define('REGEXP_NUMERIC',    '/^[0-9]{1,20}$/i');
 define('REGEXP_INTEGER',    '/^-?[0-9]{1,20}$/i');
 define('REGEXP_CENA',       '/^[0-9]{1,10}(.[0-9]{1,2})?(,[0-9]{1,2})?$/i');
 define('REGEXP_CENA_MINUS', '/^-?[0-9]{1,10}(.[0-9]{1,2})?(,[0-9]{1,2})?$/i');
-define('REGEXP_MS',         '/^[0-9]{1,10}(.[0-9]{1,3})?(,[0-9]{1,3})?$/i'); //единица измерения с дробями 0.000
+define('REGEXP_MS',         '/^[0-9]{1,10}(.[0-9]{1,3})?(,[0-9]{1,3})?$/i'); //РµРґРёРЅРёС†Р° РёР·РјРµСЂРµРЅРёСЏ СЃ РґСЂРѕР±СЏРјРё 0.000
 define('REGEXP_BOOL',       '/^[0-1]$/');
 define('REGEXP_DATE',       '/^[0-9]{4}-[0-9]{2}-[0-9]{2}( [0-9]{2}:[0-9]{2}:[0-9]{2})?$/');
 define('REGEXP_YEAR',       '/^[0-9]{4}$/');
 define('REGEXP_YEARMON',    '/^[0-9]{4}-[0-9]{2}$/');
 define('REGEXP_WORD',       '/^[a-z0-9]{1,20}$/i');
 define('REGEXP_MYSQLTABLE', '/^[a-z0-9_]{1,30}$/i');
-define('REGEXP_WORDFIND',   '/^[a-zA-Zа-яА-Я0-9,\.; ]{1,}$/i');
+define('REGEXP_WORDFIND',   '/^[a-zA-ZР°-СЏРђ-РЇ0-9,\.; ]{1,}$/i');

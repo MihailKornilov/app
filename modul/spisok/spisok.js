@@ -1,9 +1,9 @@
 var _spisokUpdate = function(elem_spisok, func) {
 		var send = {
 			op:'spisok_filter_update',
-			elem_spisok:elem_spisok,            //id элемента-списка
-			elem_v:FILTER[elem_spisok],         //значения фильтра по каждому элементу
-			busy_obj:$('#el_' + elem_spisok),   //id элемента, размещающего список
+			elem_spisok:elem_spisok,            //id СЌР»РµРјРµРЅС‚Р°-СЃРїРёСЃРєР°
+			elem_v:FILTER[elem_spisok],         //Р·РЅР°С‡РµРЅРёСЏ С„РёР»СЊС‚СЂР° РїРѕ РєР°Р¶РґРѕРјСѓ СЌР»РµРјРµРЅС‚Сѓ
+			busy_obj:$('#el_' + elem_spisok),   //id СЌР»РµРјРµРЅС‚Р°, СЂР°Р·РјРµС‰Р°СЋС‰РµРіРѕ СЃРїРёСЃРѕРє
 			busy_cls:'spisok-busy'
 		};
 		_post(send, function(res) {

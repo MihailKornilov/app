@@ -2,22 +2,22 @@
 switch(@$_POST['op']) {
 	case 'dialog_edit_load':
 		if(!$dialog_id = _num($_POST['dialog_id']))
-			jsonError('Некорректный ID диалогового окна');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°');
 		if(!$dialog = _dialogQuery($dialog_id))
-			jsonError('Диалога не существует');
+			jsonError('Р”РёР°Р»РѕРіР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		$menu = array(
-			1 => 'Диалог',
-			2 => 'История',
-			3 => 'Содержание',
-	  		4 => 'Служебное',
+			1 => 'Р”РёР°Р»РѕРі',
+			2 => 'РСЃС‚РѕСЂРёСЏ',
+			3 => 'РЎРѕРґРµСЂР¶Р°РЅРёРµ',
+	  		4 => 'РЎР»СѓР¶РµР±РЅРѕРµ',
 			9 => '<b class=red>SA</b>'
 		);
-		$action = array(//действие, которое будет происходить после внесения или изменения единицы списка
-			3 => 'Обновить содержимое блоков',
-			1 => 'Обновить страницу',
-			2 => 'Перейти на страницу',
-			4 => 'Обновить исходный диалог'
+		$action = array(//РґРµР№СЃС‚РІРёРµ, РєРѕС‚РѕСЂРѕРµ Р±СѓРґРµС‚ РїСЂРѕРёСЃС…РѕРґРёС‚СЊ РїРѕСЃР»Рµ РІРЅРµСЃРµРЅРёСЏ РёР»Рё РёР·РјРµРЅРµРЅРёСЏ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
+			3 => 'РћР±РЅРѕРІРёС‚СЊ СЃРѕРґРµСЂР¶РёРјРѕРµ Р±Р»РѕРєРѕРІ',
+			1 => 'РћР±РЅРѕРІРёС‚СЊ СЃС‚СЂР°РЅРёС†Сѓ',
+			2 => 'РџРµСЂРµР№С‚Рё РЅР° СЃС‚СЂР°РЅРёС†Сѓ',
+			4 => 'РћР±РЅРѕРІРёС‚СЊ РёСЃС…РѕРґРЅС‹Р№ РґРёР°Р»РѕРі'
 		);
 
 		if(!SA) {
@@ -31,12 +31,12 @@ switch(@$_POST['op']) {
 
 		define('BLOCK_EDIT', 1);
 
-		$tab2field_id = 0;   //id колонка для связки с первой таблицей
-		$tablesFields = array();//колонки по каждой таблице
+		$tab2field_id = 0;   //id РєРѕР»РѕРЅРєР° РґР»СЏ СЃРІСЏР·РєРё СЃ РїРµСЂРІРѕР№ С‚Р°Р±Р»РёС†РµР№
+		$tablesFields = array();//РєРѕР»РѕРЅРєРё РїРѕ РєР°Р¶РґРѕР№ С‚Р°Р±Р»РёС†Рµ
 		$group = array();
 		$menu_sa = array();
 		if(SA) {
-			//колонки для всех таблиц
+			//РєРѕР»РѕРЅРєРё РґР»СЏ РІСЃРµС… С‚Р°Р±Р»РёС†
 			foreach(_table() as $id => $tab)
 				$tablesFields[$id] = _table2field($tab);
 
@@ -47,132 +47,132 @@ switch(@$_POST['op']) {
 						break;
 					}
 
-			//группы элементов
+			//РіСЂСѓРїРїС‹ СЌР»РµРјРµРЅС‚РѕРІ
 			$sql = "SELECT *
 					FROM `_dialog_group`
 					ORDER BY `sort`";
 			foreach(query_arr($sql) as $r) {
 				$group[] = array(
 					'id' => _num($r['id']),
-					'title' => utf8(_br($r['name'], ' ')),
-					'content' => '<div class="'._dn(!$r['sa'], 'red').'">'.utf8(_br($r['name'])).'</div>'
+					'title' => _br($r['name'], ' '),
+					'content' => '<div class="'._dn(!$r['sa'], 'red').'">'._br($r['name']).'</div>'
 				);
 			}
 
 			$menu_sa = array(
-				1 => 'Диалог',
-				2 => 'Элемент',
-				3 => 'Использование'
+				1 => 'Р”РёР°Р»РѕРі',
+				2 => 'Р­Р»РµРјРµРЅС‚',
+				3 => 'РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ'
 			);
 		}
 
 		$html =
-			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
+			'<div id="dialog-w-change"></div>'.//РїСЂР°РІР°СЏ РІРµСЂС‚РёРєР°Р»СЊРЅР°СЏ Р»РёРЅРёСЏ РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ С€РёСЂРёРЅС‹ РґРёР°Р»РѕРіР°
 
 			'<div class="pad10 center bg-gr3 line-b">'.
 				'<input type="hidden" id="dialog-menu" value="'.$dialog['menu_edit_last'].'" />'.
 			'</div>'.
 
-			//Заголовок и кнопки
+			//Р—Р°РіРѕР»РѕРІРѕРє Рё РєРЅРѕРїРєРё
 			'<div class="dialog-menu-1'._dn($dialog['menu_edit_last'] == 1).'">'.
 				'<div class="pad10 bg-dfd">'.
 					'<div class="hd2 mt5">'.
-						'Внесение новой записи'.
+						'Р’РЅРµСЃРµРЅРёРµ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё'.
 						'<div class="fr">'.
 							'<input type="hidden" id="insert_on" value="'.$dialog['insert_on'].'" />'.
 						'</div>'.
 					'</div>'.
 					'<div class="'._dn($dialog['insert_on']).'">'.
 						'<table class="bs5 w100p">'.
-							'<tr><td class="grey w150 r">Заголовок:'.
-								'<td><input type="text" id="insert_head" class="w100p" maxlength="200" placeholder="название диалогового окна - новая запись" value="'.$dialog['insert_head'].'" />'.
-							'<tr><td class="grey r">Текст кнопок:'.
+							'<tr><td class="grey w150 r">Р—Р°РіРѕР»РѕРІРѕРє:'.
+								'<td><input type="text" id="insert_head" class="w100p" maxlength="200" placeholder="РЅР°Р·РІР°РЅРёРµ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР° - РЅРѕРІР°СЏ Р·Р°РїРёСЃСЊ" value="'.$dialog['insert_head'].'" />'.
+							'<tr><td class="grey r">РўРµРєСЃС‚ РєРЅРѕРїРѕРє:'.
 								'<td><input type="text" id="insert_button_submit" class="w150" maxlength="100" value="'.$dialog['insert_button_submit'].'" />'.
 									'<input type="text" id="insert_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['insert_button_cancel'].'" />'.
-							'<tr><td class="blue r">Дальнейшее действие:'.
+							'<tr><td class="blue r">Р”Р°Р»СЊРЅРµР№С€РµРµ РґРµР№СЃС‚РІРёРµ:'.
 								'<td><input type="hidden" id="insert_action_id" value="'.$dialog['insert_action_id'].'" />'.
 							'<tr class="td-insert-action-page'._dn($dialog['insert_action_id'] == 2).'">'.
-								'<td class="grey r">Страница:'.
+								'<td class="grey r">РЎС‚СЂР°РЅРёС†Р°:'.
 								'<td><input type="hidden" id="insert_action_page_id" value="'.$dialog['insert_action_page_id'].'" />'.
 						'</table>'.
 					'</div>'.
 				'</div>'.
 				'<div class="bg-ffd line-t1 pad10">'.
 					'<div class="hd2 mt5">'.
-						'Редактирование записи'.
+						'Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р·Р°РїРёСЃРё'.
 						'<div class="fr">'.
 							'<input type="hidden" id="edit_on" value="'.$dialog['edit_on'].'" />'.
 						'</div>'.
 					'</div>'.
 					'<div class="'._dn($dialog['edit_on']).'">'.
 						'<table class="bs5 w100p">'.
-							'<tr><td class="grey w150 r">Заголовок:'.
-								'<td><input type="text" id="edit_head" class="w100p" maxlength="200" placeholder="название диалогового окна - редактирование" value="'.$dialog['edit_head'].'" />'.
-							'<tr><td class="grey r">Текст кнопок:'.
+							'<tr><td class="grey w150 r">Р—Р°РіРѕР»РѕРІРѕРє:'.
+								'<td><input type="text" id="edit_head" class="w100p" maxlength="200" placeholder="РЅР°Р·РІР°РЅРёРµ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР° - СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ" value="'.$dialog['edit_head'].'" />'.
+							'<tr><td class="grey r">РўРµРєСЃС‚ РєРЅРѕРїРѕРє:'.
 								'<td><input type="text" id="edit_button_submit" class="w150" maxlength="100" value="'.$dialog['edit_button_submit'].'" />'.
 									'<input type="text" id="edit_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['edit_button_cancel'].'" />'.
-							'<tr><td class="blue r">Дальнейшее действие:'.
+							'<tr><td class="blue r">Р”Р°Р»СЊРЅРµР№С€РµРµ РґРµР№СЃС‚РІРёРµ:'.
 								'<td><input type="hidden" id="edit_action_id" value="'.$dialog['edit_action_id'].'" />'.
 							'<tr class="td-edit-action-page'._dn($dialog['edit_action_id'] == 2).'">'.
-								'<td class="grey r">Страница:'.
+								'<td class="grey r">РЎС‚СЂР°РЅРёС†Р°:'.
 								'<td><input type="hidden" id="edit_action_page_id" value="'.$dialog['edit_action_page_id'].'" />'.
 						'</table>'.
 					'</div>'.
 				'</div>'.
 				'<div class="bg-fee line-t1 pad10">'.
 					'<div class="hd2 mt5">'.
-						'Удаление записи'.
+						'РЈРґР°Р»РµРЅРёРµ Р·Р°РїРёСЃРё'.
 						'<div class="fr">'.
 							'<input type="hidden" id="del_on" value="'.$dialog['del_on'].'" />'.
 						'</div>'.
 					'</div>'.
 					'<div class="'._dn($dialog['del_on']).'">'.
 						'<table class="bs5 w100p">'.
-							'<tr><td class="grey w150 r">Заголовок:'.
-								'<td><input type="text" id="del_head" class="w100p" maxlength="200" placeholder="название диалогового окна - удаление" value="'.$dialog['del_head'].'" />'.
-							'<tr><td class="grey r">Текст кнопок:'.
+							'<tr><td class="grey w150 r">Р—Р°РіРѕР»РѕРІРѕРє:'.
+								'<td><input type="text" id="del_head" class="w100p" maxlength="200" placeholder="РЅР°Р·РІР°РЅРёРµ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР° - СѓРґР°Р»РµРЅРёРµ" value="'.$dialog['del_head'].'" />'.
+							'<tr><td class="grey r">РўРµРєСЃС‚ РєРЅРѕРїРѕРє:'.
 								'<td><input type="text" id="del_button_submit" class="w150" maxlength="100" value="'.$dialog['del_button_submit'].'" />'.
 									'<input type="text" id="del_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['del_button_cancel'].'" />'.
-							'<tr><td class="blue r">Дальнейшее действие:'.
+							'<tr><td class="blue r">Р”Р°Р»СЊРЅРµР№С€РµРµ РґРµР№СЃС‚РІРёРµ:'.
 								'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
 							'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
-								'<td class="grey r">Страница:'.
+								'<td class="grey r">РЎС‚СЂР°РЅРёС†Р°:'.
 								'<td><input type="hidden" id="del_action_page_id" value="'.$dialog['del_action_page_id'].'" />'.
 						'</table>'.
 					'</div>'.
 				'</div>'.
 			'</div>'.
 
-			//История действий
+			//РСЃС‚РѕСЂРёСЏ РґРµР№СЃС‚РІРёР№
 			'<div class="dialog-menu-2'._dn($dialog['menu_edit_last'] == 2).'">'.
 				'<div class="pad10 pb20 bg-dfd">'.
-					'<div class="hd2 mt5">Внесение новой записи</div>'.
+					'<div class="hd2 mt5">Р’РЅРµСЃРµРЅРёРµ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё</div>'.
 					'<textarea class="mt5 w450 over1 curP"'.
 							 ' id="history_insert"'.
 							 ' readonly'.
-							 ' placeholder="шаблон истории действий для внесения новой записи"'.
+							 ' placeholder="С€Р°Р±Р»РѕРЅ РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№ РґР»СЏ РІРЅРµСЃРµРЅРёСЏ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё"'.
 							 ' val="'.$dialog['history'][1]['elem_id'].'"'.
 					'>'.
 						$dialog['history'][1]['tmp'].
 					'</textarea>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-ffd line-t1">'.
-					'<div class="hd2 mt5">Редактирование записи</div>'.
+					'<div class="hd2 mt5">Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р·Р°РїРёСЃРё</div>'.
 					'<textarea class="mt5 w450 over1 curP"'.
 							 ' id="history_edit"'.
 							 ' readonly'.
-							 ' placeholder="шаблон истории действий для редактирования записи"'.
+							 ' placeholder="С€Р°Р±Р»РѕРЅ РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ Р·Р°РїРёСЃРё"'.
 							 ' val="'.$dialog['history'][2]['elem_id'].'"'.
 					'>'.
 						$dialog['history'][2]['tmp'].
 					'</textarea>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-fee line-t1">'.
-					'<div class="hd2 mt5">Удаление записи</div>'.
+					'<div class="hd2 mt5">РЈРґР°Р»РµРЅРёРµ Р·Р°РїРёСЃРё</div>'.
 					'<textarea class="mt5 w450 over1 curP"'.
 							 ' id="history_del"'.
 							 ' readonly'.
-							 ' placeholder="шаблон истории действий для удаления записи"'.
+							 ' placeholder="С€Р°Р±Р»РѕРЅ РёСЃС‚РѕСЂРёРё РґРµР№СЃС‚РІРёР№ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ Р·Р°РїРёСЃРё"'.
 							 ' val="'.$dialog['history'][3]['elem_id'].'"'.
 					'>'.
 						$dialog['history'][3]['tmp'].
@@ -180,7 +180,7 @@ switch(@$_POST['op']) {
 				'</div>'.
 			'</div>'.
 
-			//Содержание
+			//РЎРѕРґРµСЂР¶Р°РЅРёРµ
 			'<div class="dialog-menu-3'._dn($dialog['menu_edit_last'] == 3).'">'.
 				'<div class="pad10 line-b bg-ffc">'.
 					_blockLevelChange('dialog', $dialog_id, $dialog['width']).
@@ -190,18 +190,18 @@ switch(@$_POST['op']) {
 				'</div>'.
 			'</div>'.
 
-			//Служебное
+			//РЎР»СѓР¶РµР±РЅРѕРµ
 			'<div class="dialog-menu-4 bg-gr2 pad20'._dn($dialog['menu_edit_last'] == 4).'">'.
 				'<table class="bs10">'.
-					'<tr><td class="grey r">Имя диалогового окна:'.
+					'<tr><td class="grey r">РРјСЏ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°:'.
 						'<td><input type="text" id="dialog_name" class="w250" maxlength="100" value="'.$dialog['name'].'" />'.
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'spisok_on',
-									'title' => 'диалог вносит данные для списка',
+									'title' => 'РґРёР°Р»РѕРі РІРЅРѕСЃРёС‚ РґР°РЅРЅС‹Рµ РґР»СЏ СЃРїРёСЃРєР°',
 									'value' => $dialog['spisok_on']
 							   )).
-					'<tr><td class="grey r">Родительский диалог:'.
+					'<tr><td class="grey r">Р РѕРґРёС‚РµР»СЊСЃРєРёР№ РґРёР°Р»РѕРі:'.
 						'<td><input type="hidden" id="dialog_parent_id" value="'.$dialog['dialog_parent_id'].'" />'.
 				'</table>'.
 			'</div>'.
@@ -214,12 +214,12 @@ switch(@$_POST['op']) {
 
 				'<table class="menu_sa-1 bs10">'.
 					'<tr><td class="red r w80">ID:<td class="b">'.$dialog['id'].
-					'<tr><td class="red r">Ширина:'.
+					'<tr><td class="red r">РЁРёСЂРёРЅР°:'.
 		                '<td><div id="dialog-width" class="dib w50">'.$dialog['width'].'</div>'.
 		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
-					'<tr><td class="red r">Таблица 1:'.
+					'<tr><td class="red r">РўР°Р±Р»РёС†Р° 1:'.
 						'<td><input type="hidden" id="table_1"   value="'.$dialog['table_1'].'" />'.
-					'<tr><td class="red r">Таблица 2:'.
+					'<tr><td class="red r">РўР°Р±Р»РёС†Р° 2:'.
 						'<td><table>'.
 								'<tr><td><input type="hidden" id="table_2" value="'.$dialog['table_2'].'" />'.
 									'<td class="pl5'._dn($dialog['table_2']).'" id="td-bt2c">'.
@@ -228,115 +228,115 @@ switch(@$_POST['op']) {
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'cmp_no_req',
-									'title' => 'компоненты в содержании не требуются',
+									'title' => 'РєРѕРјРїРѕРЅРµРЅС‚С‹ РІ СЃРѕРґРµСЂР¶Р°РЅРёРё РЅРµ С‚СЂРµР±СѓСЋС‚СЃСЏ',
 									'value' => $dialog['cmp_no_req']
 							   )).
-					//доступность диалога. На основании app_id.
-		            //0 - доступен только конкретному приложению
-		            //1 - всем приложениям
+					//РґРѕСЃС‚СѓРїРЅРѕСЃС‚СЊ РґРёР°Р»РѕРіР°. РќР° РѕСЃРЅРѕРІР°РЅРёРё app_id.
+		            //0 - РґРѕСЃС‚СѓРїРµРЅ С‚РѕР»СЊРєРѕ РєРѕРЅРєСЂРµС‚РЅРѕРјСѓ РїСЂРёР»РѕР¶РµРЅРёСЋ
+		            //1 - РІСЃРµРј РїСЂРёР»РѕР¶РµРЅРёСЏРј
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'app_any',
-									'title' => 'доступно всем приложениям',
+									'title' => 'РґРѕСЃС‚СѓРїРЅРѕ РІСЃРµРј РїСЂРёР»РѕР¶РµРЅРёСЏРј',
 									'value' => $dialog['id'] ? ($dialog['app_id'] ? 0 : 1) : 0
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'sa',
-									'title' => 'доступно только SA',
+									'title' => 'РґРѕСЃС‚СѓРїРЅРѕ С‚РѕР»СЊРєРѕ SA',
 									'value' => $dialog['sa']
 							   )).
 				'</table>'.
 
 				'<table class="menu_sa-2 bs5">'.
-					'<tr><td class="red r w150">Группа элемента:'.
+					'<tr><td class="red r w150">Р“СЂСѓРїРїР° СЌР»РµРјРµРЅС‚Р°:'.
 		                '<td><input type="hidden" id="element_group_id" value="'.$dialog['element_group_id'].'" />'.
-					'<tr><td class="red r">Начальная ширина:'.
+					'<tr><td class="red r">РќР°С‡Р°Р»СЊРЅР°СЏ С€РёСЂРёРЅР°:'.
 						'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
-					'<tr><td class="red r">Минимальная ширина:'.
+					'<tr><td class="red r">РњРёРЅРёРјР°Р»СЊРЅР°СЏ С€РёСЂРёРЅР°:'.
 						'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
-					'<tr><td class="red r">Тип данных:'.
+					'<tr><td class="red r">РўРёРї РґР°РЅРЅС‹С…:'.
 						'<td><input type="hidden" id="element_type" value="'.$dialog['element_type'].'" />'.
-					'<tr><td class="red r">CMP-аффикс:'.
+					'<tr><td class="red r">CMP-Р°С„С„РёРєСЃ:'.
 						'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
-					'<tr><td class="red r">Диалог для функций:'.
+					'<tr><td class="red r">Р”РёР°Р»РѕРі РґР»СЏ С„СѓРЅРєС†РёР№:'.
 						'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
 
-					'<tr><td class="red r pt20">Разрешения:'.
+					'<tr><td class="red r pt20">Р Р°Р·СЂРµС€РµРЅРёСЏ:'.
 						'<td class="pt20">'.
 		                        _check(array(
 									'attr_id' => 'element_search_access',
-									'title' => 'разрешать быстрый поиск по элементу',
+									'title' => 'СЂР°Р·СЂРµС€Р°С‚СЊ Р±С‹СЃС‚СЂС‹Р№ РїРѕРёСЃРє РїРѕ СЌР»РµРјРµРЅС‚Сѓ',
 									'value' => $dialog['element_search_access']
 								)).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_style_access',
-									'title' => 'разрешать настройку стилей',
+									'title' => 'СЂР°Р·СЂРµС€Р°С‚СЊ РЅР°СЃС‚СЂРѕР№РєСѓ СЃС‚РёР»РµР№',
 									'value' => $dialog['element_style_access']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_url_access',
-									'title' => 'разрешать делать ссылкой',
+									'title' => 'СЂР°Р·СЂРµС€Р°С‚СЊ РґРµР»Р°С‚СЊ СЃСЃС‹Р»РєРѕР№',
 									'value' => $dialog['element_url_access']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_hint_access',
-									'title' => 'разрешать прикрепление подсказки',
+									'title' => 'СЂР°Р·СЂРµС€Р°С‚СЊ РїСЂРёРєСЂРµРїР»РµРЅРёРµ РїРѕРґСЃРєР°Р·РєРё',
 									'value' => $dialog['element_hint_access']
 							   )).
 
-					'<tr><td class="red r pt20">Дополнительно:'.
+					'<tr><td class="red r pt20">Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ:'.
 						'<td class="pt20">'.
 		                        _check(array(
 									'attr_id' => 'element_is_insert',
-									'title' => 'элемент вносит данные',
+									'title' => 'СЌР»РµРјРµРЅС‚ РІРЅРѕСЃРёС‚ РґР°РЅРЅС‹Рµ',
 									'value' => $dialog['element_is_insert']
 								)).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_is_spisok_unit',
-									'title' => 'является значением списка',
+									'title' => 'СЏРІР»СЏРµС‚СЃСЏ Р·РЅР°С‡РµРЅРёРµРј СЃРїРёСЃРєР°',
 									'value' => $dialog['element_is_spisok_unit']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_hidden',
-									'title' => 'скрытый элемент',
+									'title' => 'СЃРєСЂС‹С‚С‹Р№ СЌР»РµРјРµРЅС‚',
 									'value' => $dialog['element_hidden']
 							   )).
 
-					'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
+					'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">РџСЂР°РІРёР»Р° РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РІ РґРёР°Р»РѕРіРµ РІС‹Р±РѕСЂР° СЌР»РµРјРµРЅС‚Р°:</div>'.
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_page_paste',
-									'title' => 'вставка в блок страницы',
+									'title' => 'РІСЃС‚Р°РІРєР° РІ Р±Р»РѕРє СЃС‚СЂР°РЅРёС†С‹',
 									'value' => $dialog['element_page_paste']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_dialog_paste',
-									'title' => 'вставка в блок диалога',
+									'title' => 'РІСЃС‚Р°РІРєР° РІ Р±Р»РѕРє РґРёР°Р»РѕРіР°',
 									'value' => $dialog['element_dialog_paste']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_spisok_paste',
-									'title' => 'вставка в блок шаблона списка',
+									'title' => 'РІСЃС‚Р°РІРєР° РІ Р±Р»РѕРє С€Р°Р±Р»РѕРЅР° СЃРїРёСЃРєР°',
 									'value' => $dialog['element_spisok_paste']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_44_access',
-									'title' => 'вставка в сборный текст',
+									'title' => 'РІСЃС‚Р°РІРєР° РІ СЃР±РѕСЂРЅС‹Р№ С‚РµРєСЃС‚',
 									'value' => $dialog['element_44_access']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'element_td_paste',
-									'title' => 'вставка в ячейку таблицы',
+									'title' => 'РІСЃС‚Р°РІРєР° РІ СЏС‡РµР№РєСѓ С‚Р°Р±Р»РёС†С‹',
 									'value' => $dialog['element_td_paste']
 							   )).
 				'</table>'.
@@ -353,20 +353,20 @@ switch(@$_POST['op']) {
 		$send['action'] = _selArray($action);
 		$send['col_type'] = _selArray(_elemColType());
 		$send['blk'] = $dialog['blk'];
-		$send['cmp'] = utf8($dialog['cmp']);
-		$send['html'] = utf8($html);
+		$send['cmp'] = $dialog['cmp'];
+		$send['html'] = $html;
 		$send['sa'] = SA;
 		$send['tables'] = SA ? _table() : array();
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
-		$send['dialog_spisok'] = SA ? utf8(_dialogSelArray('sa_only')) : array() ;
-		$send['dialog_parent'] = utf8(_dialogSelArray($dialog_id));
+		$send['dialog_spisok'] = SA ? _dialogSelArray('sa_only') : array() ;
+		$send['dialog_parent'] = _dialogSelArray($dialog_id);
 
 		jsonSuccess($send);
 		break;
-	case 'dialog_save'://сохранение диалогового окна
+	case 'dialog_save'://СЃРѕС…СЂР°РЅРµРЅРёРµ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°
 		if(!$dialog_id = _num($_POST['dialog_id']))
-			jsonError('Некорректный ID диалогового окна');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°');
 
 		_dialogUpdate($dialog_id);
 
@@ -374,19 +374,19 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'dialog_open_load'://получение данных диалога
+	case 'dialog_open_load'://РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РґРёР°Р»РѕРіР°
 		if(!$dialog_id = _dialogTest())
-			jsonError('Некорректный ID диалога');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РґРёР°Р»РѕРіР°');
 
 		$send = _dialogOpenLoad($dialog_id);
 
 		jsonSuccess($send);
 		break;
 
-	case 'page_sort'://сортировка страниц
+	case 'page_sort'://СЃРѕСЂС‚РёСЂРѕРІРєР° СЃС‚СЂР°РЅРёС†
 		$arr = $_POST['arr'];
 		if(!is_array($arr))
-			jsonError('Не является массивом');
+			jsonError('РќРµ СЏРІР»СЏРµС‚СЃСЏ РјР°СЃСЃРёРІРѕРј');
 
 		$update = array();
 		foreach($arr as $n => $r) {
@@ -397,7 +397,7 @@ switch(@$_POST['op']) {
 		}
 
 		if(empty($update))
-			jsonError('Нет данных для обновления');
+			jsonError('РќРµС‚ РґР°РЅРЅС‹С… РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёСЏ');
 
 		$sql = "INSERT INTO `_page` (
 					`id`,
@@ -414,55 +414,55 @@ switch(@$_POST['op']) {
 		jsonSuccess();
 		break;
 
-	case 'image_upload'://добавление изображения
+	case 'image_upload'://РґРѕР±Р°РІР»РµРЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 		if(!$obj_name = _txt(@$_POST['obj_name']))
-			jsonError('Отсутствует имя объекта');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РёРјСЏ РѕР±СЉРµРєС‚Р°');
 		if(!$f = @$_FILES['f1'])
-			jsonError('Файл отсутствует');
+			jsonError('Р¤Р°Р№Р» РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚');
 		if($f['size'] > 15728640)
-			jsonError('Размер изображения не должен быть более 15 Мб');
+			jsonError('Р Р°Р·РјРµСЂ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РЅРµ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»РµРµ 15 РњР±');
 
 		$obj_id = _num(@$_POST['obj_id']);
 
 		$img = _imageSave($obj_name, $obj_id, $f['type'], $f['tmp_name']);
 
-		$send['html'] = utf8(_imageDD($img));
+		$send['html'] = _imageDD($img);
 
 		jsonSuccess($send);
 		break;
-	case 'image_link'://загрузка изображения по ссылке
+	case 'image_link'://Р·Р°РіСЂСѓР·РєР° РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РїРѕ СЃСЃС‹Р»РєРµ
 		if(!$url = _txt(@$_POST['url']))
-			jsonError('Отсутствует ссылка');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ СЃСЃС‹Р»РєР°');
 		if(!$obj_name = _txt(@$_POST['obj_name']))
-			jsonError('Отсутствует имя объекта');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РёРјСЏ РѕР±СЉРµРєС‚Р°');
 
 		$obj_id = _num(@$_POST['obj_id']);
 
 		$ch = curl_init($url);
 		curl_setopt_array($ch, array(
-		    CURLOPT_TIMEOUT => 60,//максимальное время работы cURL
-		    CURLOPT_FOLLOWLOCATION => 1,//следовать перенаправлениям
-		    CURLOPT_RETURNTRANSFER => 1,//результат писать в переменную
-		    CURLOPT_NOPROGRESS => 0,//индикатор загрузки данных
-		    CURLOPT_BUFFERSIZE => 1024,//размер буфера 1 Кбайт
-		    //функцию для подсчёта скачанных данных. Подробнее: http://stackoverflow.com/a/17642638
+		    CURLOPT_TIMEOUT => 60,//РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ cURL
+		    CURLOPT_FOLLOWLOCATION => 1,//СЃР»РµРґРѕРІР°С‚СЊ РїРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёСЏРј
+		    CURLOPT_RETURNTRANSFER => 1,//СЂРµР·СѓР»СЊС‚Р°С‚ РїРёСЃР°С‚СЊ РІ РїРµСЂРµРјРµРЅРЅСѓСЋ
+		    CURLOPT_NOPROGRESS => 0,//РёРЅРґРёРєР°С‚РѕСЂ Р·Р°РіСЂСѓР·РєРё РґР°РЅРЅС‹С…
+		    CURLOPT_BUFFERSIZE => 1024,//СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° 1 РљР±Р°Р№С‚
+		    //С„СѓРЅРєС†РёСЋ РґР»СЏ РїРѕРґСЃС‡С‘С‚Р° СЃРєР°С‡Р°РЅРЅС‹С… РґР°РЅРЅС‹С…. РџРѕРґСЂРѕР±РЅРµРµ: http://stackoverflow.com/a/17642638
 		    CURLOPT_PROGRESSFUNCTION => function ($ch, $dwnldSize, $dwnld, $upldSize) {
-		        if($dwnld > 1024 * 1024 * 15)//Когда будет скачано больше 15 Мбайт, cURL прервёт работу
+		        if($dwnld > 1024 * 1024 * 15)//РљРѕРіРґР° Р±СѓРґРµС‚ СЃРєР°С‡Р°РЅРѕ Р±РѕР»СЊС€Рµ 15 РњР±Р°Р№С‚, cURL РїСЂРµСЂРІС‘С‚ СЂР°Р±РѕС‚Сѓ
 		            return 1;
 		        return 0;
 		    },
-		    CURLOPT_SSL_VERIFYPEER => 0//проверка сертификата
-	//	    CURLOPT_SSL_VERIFYHOST => 2,//имя сертификата и его совпадение с указанным хостом
-	//	    CURLOPT_CAINFO => __DIR__ . '/cacert.pem'//сертификат проверки. Скачать: https://curl.haxx.se/docs/caextract.html
+		    CURLOPT_SSL_VERIFYPEER => 0//РїСЂРѕРІРµСЂРєР° СЃРµСЂС‚РёС„РёРєР°С‚Р°
+	//	    CURLOPT_SSL_VERIFYHOST => 2,//РёРјСЏ СЃРµСЂС‚РёС„РёРєР°С‚Р° Рё РµРіРѕ СЃРѕРІРїР°РґРµРЅРёРµ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј С…РѕСЃС‚РѕРј
+	//	    CURLOPT_CAINFO => __DIR__ . '/cacert.pem'//СЃРµСЂС‚РёС„РёРєР°С‚ РїСЂРѕРІРµСЂРєРё. РЎРєР°С‡Р°С‚СЊ: https://curl.haxx.se/docs/caextract.html
 		));
 
-		//код последней ошибки
+		//РєРѕРґ РїРѕСЃР»РµРґРЅРµР№ РѕС€РёР±РєРё
 		if(curl_errno($ch))
-			jsonError('При загрузке произошла ошибка');
+			jsonError('РџСЂРё Р·Р°РіСЂСѓР·РєРµ РїСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР°');
 
-		$raw   = curl_exec($ch);    //данные в переменную
-		$info  = curl_getinfo($ch); //информация об операции
-		curl_close($ch);//завершение сеанса cURL
+		$raw   = curl_exec($ch);    //РґР°РЅРЅС‹Рµ РІ РїРµСЂРµРјРµРЅРЅСѓСЋ
+		$info  = curl_getinfo($ch); //РёРЅС„РѕСЂРјР°С†РёСЏ РѕР± РѕРїРµСЂР°С†РёРё
+		curl_close($ch);//Р·Р°РІРµСЂС€РµРЅРёРµ СЃРµР°РЅСЃР° cURL
 
 		if(!is_dir(APP_PATH.'/.tmp'))
 			mkdir(APP_PATH.'/.tmp', 0777, true);
@@ -475,38 +475,38 @@ switch(@$_POST['op']) {
 		$img = _imageSave($obj_name, $obj_id, $info['content_type'], $file_tmp_name);
 		unlink($file_tmp_name);
 
-		$send['html'] = utf8(_imageDD($img));
+		$send['html'] = _imageDD($img);
 
 		jsonSuccess($send);
 		break;
-	case 'image_recover'://восстановелние изображения из корзины
+	case 'image_recover'://РІРѕСЃСЃС‚Р°РЅРѕРІРµР»РЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РёР· РєРѕСЂР·РёРЅС‹
 		if(!$image_id = _num($_POST['id']))
-			jsonError('Некорректный id изображения');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ id РёР·РѕР±СЂР°Р¶РµРЅРёСЏ');
 
 		$sql = "SELECT *
 				FROM `_image`
 				WHERE `id`=".$image_id;
 		if(!$img = query_assoc($sql))
-			jsonError('Изображения не существует');
+			jsonError('РР·РѕР±СЂР°Р¶РµРЅРёСЏ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		if(!$img['deleted'])
-			jsonError('Изображение не было удалено');
+			jsonError('РР·РѕР±СЂР°Р¶РµРЅРёРµ РЅРµ Р±С‹Р»Рѕ СѓРґР°Р»РµРЅРѕ');
 
-		$send['html'] = utf8(_imageDD($img));
+		$send['html'] = _imageDD($img);
 		jsonSuccess($send);
 		break;
 
-	case 'filter_calendar_mon_change'://перелистывание фильтра-календаря
+	case 'filter_calendar_mon_change'://РїРµСЂРµР»РёСЃС‚С‹РІР°РЅРёРµ С„РёР»СЊС‚СЂР°-РєР°Р»РµРЅРґР°СЂСЏ
 		if(!$elem_id = _num($_POST['elem_id']))
-			jsonError('Некорректный ID элемента');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID СЌР»РµРјРµРЅС‚Р°');
 		if(!$el = _elemOne($elem_id))
-			jsonError('Элемента не существует');
+			jsonError('Р­Р»РµРјРµРЅС‚Р° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 		if($el['dialog_id'] != 77)
-			jsonError('Элемент не является фильтром-календарём');
+			jsonError('Р­Р»РµРјРµРЅС‚ РЅРµ СЏРІР»СЏРµС‚СЃСЏ С„РёР»СЊС‚СЂРѕРј-РєР°Р»РµРЅРґР°СЂС‘Рј');
 		if(!preg_match(REGEXP_YEARMON, $_POST['mon']))
-			jsonError('Некорректные месяц и год');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РјРµСЃСЏС† Рё РіРѕРґ');
 
-		$side = _num($_POST['side']);//направление, в котором пролистывается календарь
+		$side = _num($_POST['side']);//РЅР°РїСЂР°РІР»РµРЅРёРµ, РІ РєРѕС‚РѕСЂРѕРј РїСЂРѕР»РёСЃС‚С‹РІР°РµС‚СЃСЏ РєР°Р»РµРЅРґР°СЂСЊ
 
 		$ex = explode('-', $_POST['mon']);
 		$YEAR = _num($ex[0]);
@@ -520,17 +520,17 @@ switch(@$_POST['op']) {
 			$mon = !$next ? ($YEAR - 1).'-12' : $YEAR.'-'.($next < 10 ? 0 : '').$next;
 
 		$send['mon'] = $mon;
-		$send['td_mon'] = utf8(_filterCalendarMon($mon));
-		$send['cnt'] = utf8(_filterCalendarContent($el, $mon, _spisokFilter('v', $el['id'])));
+		$send['td_mon'] = _filterCalendarMon($mon);
+		$send['cnt'] = _filterCalendarContent($el, $mon, _spisokFilter('v', $el['id']));
 
 		jsonSuccess($send);
 		break;
 
-	case 'note_add'://добавление заметки
+	case 'note_add'://РґРѕР±Р°РІР»РµРЅРёРµ Р·Р°РјРµС‚РєРё
 		if(!$page_id = _num($_POST['page_id']))
-			jsonError('Некорректный ID страницы');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID СЃС‚СЂР°РЅРёС†С‹');
 		if(!$txt = _txt(@$_POST['txt']))
-			jsonError('Отсутствует текст заметки');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ С‚РµРєСЃС‚ Р·Р°РјРµС‚РєРё');
 
 		$obj_id = _num($_POST['obj_id']);
 
@@ -549,13 +549,13 @@ switch(@$_POST['op']) {
 				)";
 		query($sql);
 
-		$send['html'] = utf8(_noteList($page_id, $obj_id));
+		$send['html'] = _noteList($page_id, $obj_id);
 
 		jsonSuccess($send);
 		break;
-	case 'note_del'://удаление заметки
+	case 'note_del'://СѓРґР°Р»РµРЅРёРµ Р·Р°РјРµС‚РєРё
 		if(!$note_id = _num($_POST['note_id']))
-			jsonError('Некорректный ID заметки');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID Р·Р°РјРµС‚РєРё');
 
 		$sql = "SELECT *
 				FROM `_note`
@@ -563,10 +563,10 @@ switch(@$_POST['op']) {
 				  AND !`parent_id`
 				  AND `id`=".$note_id;
 		if(!$note = query_assoc($sql))
-			jsonError('Заметки не существует');
+			jsonError('Р—Р°РјРµС‚РєРё РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		if($note['deleted'])
-			jsonError('Заметка была удалена');
+			jsonError('Р—Р°РјРµС‚РєР° Р±С‹Р»Р° СѓРґР°Р»РµРЅР°');
 
 		$sql = "UPDATE `_note`
 				SET `deleted`=1,
@@ -577,9 +577,9 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'note_rest'://восстановление заметки
+	case 'note_rest'://РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ Р·Р°РјРµС‚РєРё
 		if(!$note_id = _num($_POST['note_id']))
-			jsonError('Некорректный ID заметки');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID Р·Р°РјРµС‚РєРё');
 
 		$sql = "SELECT *
 				FROM `_note`
@@ -587,10 +587,10 @@ switch(@$_POST['op']) {
 				  AND !`parent_id`
 				  AND `id`=".$note_id;
 		if(!$note = query_assoc($sql))
-			jsonError('Заметки не существует');
+			jsonError('Р—Р°РјРµС‚РєРё РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		if(!$note['deleted'])
-			jsonError('Заметка не была удалена');
+			jsonError('Р—Р°РјРµС‚РєР° РЅРµ Р±С‹Р»Р° СѓРґР°Р»РµРЅР°');
 
 		$sql = "UPDATE `_note`
 				SET `deleted`=0,
@@ -601,11 +601,11 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'note_comment_add'://добавление комментария
+	case 'note_comment_add'://РґРѕР±Р°РІР»РµРЅРёРµ РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
 		if(!$note_id = _num($_POST['note_id']))
-			jsonError('Некорректный ID заметки');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID Р·Р°РјРµС‚РєРё');
 		if(!$txt = _txt(@$_POST['txt']))
-			jsonError('Отсутствует текст комментария');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ С‚РµРєСЃС‚ РєРѕРјРјРµРЅС‚Р°СЂРёСЏ');
 
 		$sql = "SELECT *
 				FROM `_note`
@@ -613,7 +613,7 @@ switch(@$_POST['op']) {
 				  AND !`parent_id`
 				  AND `id`=".$note_id;
 		if(!$note = query_assoc($sql))
-			jsonError('Заметки не существует');
+			jsonError('Р—Р°РјРµС‚РєРё РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		$sql = "INSERT INTO `_note` (
 					`app_id`,
@@ -636,13 +636,13 @@ switch(@$_POST['op']) {
 				LIMIT 1";
 		$comm = _noteCommentUnit(query_assoc($sql));
 
-		$send['html'] = utf8($comm);
+		$send['html'] = $comm;
 
 		jsonSuccess($send);
 		break;
-	case 'note_comment_del'://удаление комментария
+	case 'note_comment_del'://СѓРґР°Р»РµРЅРёРµ РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
 		if(!$note_id = _num($_POST['note_id']))
-			jsonError('Некорректный ID комментария');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РєРѕРјРјРµРЅС‚Р°СЂРёСЏ');
 
 		$sql = "SELECT *
 				FROM `_note`
@@ -650,10 +650,10 @@ switch(@$_POST['op']) {
 				  AND `parent_id`
 				  AND `id`=".$note_id;
 		if(!$note = query_assoc($sql))
-			jsonError('Комментария не существует');
+			jsonError('РљРѕРјРјРµРЅС‚Р°СЂРёСЏ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		if($note['deleted'])
-			jsonError('Комментарий был удалён');
+			jsonError('РљРѕРјРјРµРЅС‚Р°СЂРёР№ Р±С‹Р» СѓРґР°Р»С‘РЅ');
 
 		$sql = "UPDATE `_note`
 				SET `deleted`=1,
@@ -664,9 +664,9 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'note_comment_rest'://восстановление комментария
+	case 'note_comment_rest'://РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
 		if(!$note_id = _num($_POST['note_id']))
-			jsonError('Некорректный ID комментария');
+			jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ ID РєРѕРјРјРµРЅС‚Р°СЂРёСЏ');
 
 		$sql = "SELECT *
 				FROM `_note`
@@ -674,10 +674,10 @@ switch(@$_POST['op']) {
 				  AND `parent_id`
 				  AND `id`=".$note_id;
 		if(!$note = query_assoc($sql))
-			jsonError('Комментарий не существует');
+			jsonError('РљРѕРјРјРµРЅС‚Р°СЂРёР№ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 		if(!$note['deleted'])
-			jsonError('Комментарий не был удалён');
+			jsonError('РљРѕРјРјРµРЅС‚Р°СЂРёР№ РЅРµ Р±С‹Р» СѓРґР°Р»С‘РЅ');
 
 		$sql = "UPDATE `_note`
 				SET `deleted`=0,
@@ -691,7 +691,7 @@ switch(@$_POST['op']) {
 }
 
 
-function _table2field($tab) {//список колонок для таблицы 2
+function _table2field($tab) {//СЃРїРёСЃРѕРє РєРѕР»РѕРЅРѕРє РґР»СЏ С‚Р°Р±Р»РёС†С‹ 2
 	if(empty($tab))
 		return array();
 
@@ -704,7 +704,7 @@ function _table2field($tab) {//список колонок для таблицы 2
 	foreach($arr as $r) {
 		if($r['Field'] == 'id')
 			continue;
-		if(!preg_match('/^int+/', $r['Type']))//только INT
+		if(!preg_match('/^int+/', $r['Type']))//С‚РѕР»СЊРєРѕ INT
 			continue;
 		$send[$n++] = $r['Field'];
 	}
@@ -713,7 +713,7 @@ function _table2field($tab) {//список колонок для таблицы 2
 }
 
 
-function _dialogEditLoadUse($dialog) {//использование как элемента в других диалогах
+function _dialogEditLoadUse($dialog) {//РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ РєР°Рє СЌР»РµРјРµРЅС‚Р° РІ РґСЂСѓРіРёС… РґРёР°Р»РѕРіР°С…
 	$use_dialog = '';
 	$use_page = '';
 	$sql = "SELECT `block_id`
@@ -749,68 +749,68 @@ function _dialogEditLoadUse($dialog) {//использование как элемента в других диал
 
 	return
 	'<table class="menu_sa-3 bs10">'.
-		'<tr><td class="w125 r color-pay top">В диалогах:'.
+		'<tr><td class="w125 r color-pay top">Р’ РґРёР°Р»РѕРіР°С…:'.
 			'<td>'.($use_dialog ? $use_dialog : '-').
-		'<tr><td class="r color-pay top">На страницах:'.
+		'<tr><td class="r color-pay top">РќР° СЃС‚СЂР°РЅРёС†Р°С…:'.
 			'<td>'.($use_page ? $use_page : '-').
 	'</table>';
 }
-function _dialogUpdate($dialog_id) {//обновление диалога
+function _dialogUpdate($dialog_id) {//РѕР±РЅРѕРІР»РµРЅРёРµ РґРёР°Р»РѕРіР°
 	if(!_dialogQuery($dialog_id))
-		jsonError('Диалога не существует');
+		jsonError('Р”РёР°Р»РѕРіР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 	$insert_on = _bool($_POST['insert_on']);
 	if(!$insert_head = _txt($_POST['insert_head']))
-		jsonError('Не указан заголовок для внесения записи');
+		jsonError('РќРµ СѓРєР°Р·Р°РЅ Р·Р°РіРѕР»РѕРІРѕРє РґР»СЏ РІРЅРµСЃРµРЅРёСЏ Р·Р°РїРёСЃРё');
 	$insert_button_submit = _txt($_POST['insert_button_submit']);
 	if(!$insert_button_cancel = _txt($_POST['insert_button_cancel']))
-		jsonError('Не указан текст кнопки отмены для новой записи');
+		jsonError('РќРµ СѓРєР°Р·Р°РЅ С‚РµРєСЃС‚ РєРЅРѕРїРєРё РѕС‚РјРµРЅС‹ РґР»СЏ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё');
 	$insert_action_id = _num($_POST['insert_action_id']);
 	$insert_action_page_id = _num($_POST['insert_action_page_id']);
 
 	$edit_on = _bool($_POST['edit_on']);
 	if(!$edit_head = _txt($_POST['edit_head']))
-		jsonError('Не указан заголовок редактирования');
+		jsonError('РќРµ СѓРєР°Р·Р°РЅ Р·Р°РіРѕР»РѕРІРѕРє СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ');
 	$edit_button_submit = _txt($_POST['edit_button_submit']);
 	if(!$edit_button_cancel = _txt($_POST['edit_button_cancel']))
-		jsonError('Не указан текст кнопки отмены редактирования');
+		jsonError('РќРµ СѓРєР°Р·Р°РЅ С‚РµРєСЃС‚ РєРЅРѕРїРєРё РѕС‚РјРµРЅС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ');
 	$edit_action_id = _num($_POST['edit_action_id']);
 	$edit_action_page_id = _num($_POST['edit_action_page_id']);
 
 	$del_on = _bool($_POST['del_on']);
 	if(!$del_head = _txt($_POST['del_head']))
-		jsonError('Не указан заголовок удаления');
+		jsonError('РќРµ СѓРєР°Р·Р°РЅ Р·Р°РіРѕР»РѕРІРѕРє СѓРґР°Р»РµРЅРёСЏ');
 	if(!$del_button_submit = _txt($_POST['del_button_submit']))
-		jsonError('Не указан текст кнопки удаления');
+		jsonError('РќРµ СѓРєР°Р·Р°РЅ С‚РµРєСЃС‚ РєРЅРѕРїРєРё СѓРґР°Р»РµРЅРёСЏ');
 	if(!$del_button_cancel = _txt($_POST['del_button_cancel']))
-		jsonError('Не указан текст кнопки отмены удаления');
+		jsonError('РќРµ СѓРєР°Р·Р°РЅ С‚РµРєСЃС‚ РєРЅРѕРїРєРё РѕС‚РјРµРЅС‹ СѓРґР°Р»РµРЅРёСЏ');
 	$del_action_id = _num($_POST['del_action_id']);
 	$del_action_page_id = _num($_POST['del_action_page_id']);
 
 	if(!$width = _num($_POST['width']))
-		jsonError('Некорректное значение ширины диалога');
+		jsonError('РќРµРєРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ С€РёСЂРёРЅС‹ РґРёР°Р»РѕРіР°');
 	if($width < 480 || $width > 980)
-		jsonError('Установлена недопустимая ширина диалога');
+		jsonError('РЈСЃС‚Р°РЅРѕРІР»РµРЅР° РЅРµРґРѕРїСѓСЃС‚РёРјР°СЏ С€РёСЂРёРЅР° РґРёР°Р»РѕРіР°');
 
 	if($table_1 = _num($_POST['table_1'])) {
 		if(!$table = _table($table_1))
-			jsonError('Указана несуществующая таблица 1');
+			jsonError('РЈРєР°Р·Р°РЅР° РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰Р°СЏ С‚Р°Р±Р»РёС†Р° 1');
 		$sql = "SHOW TABLES LIKE '".$table."'";
 		if(!query_array($sql))
-			jsonError('Указана несуществующая таблица 1: "'.$table.'"');
+			jsonError('РЈРєР°Р·Р°РЅР° РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰Р°СЏ С‚Р°Р±Р»РёС†Р° 1: "'.$table.'"');
 	}
 
 	$table_2_field = '';
 	if($table_2 = _num($_POST['table_2'])) {
 		if(!$table = _table($table_2))
-			jsonError('Указана несуществующая таблица 2');
+			jsonError('РЈРєР°Р·Р°РЅР° РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰Р°СЏ С‚Р°Р±Р»РёС†Р° 2');
 		$sql = "SHOW TABLES LIKE '".$table."'";
 		if(!query_array($sql))
-			jsonError('Указана несуществующая таблица 2: "'.$table.'"');
+			jsonError('РЈРєР°Р·Р°РЅР° РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰Р°СЏ С‚Р°Р±Р»РёС†Р° 2: "'.$table.'"');
 		if($table_1 == $table_2)
-			jsonError('Таблицы не могут совпадать');
+			jsonError('РўР°Р±Р»РёС†С‹ РЅРµ РјРѕРіСѓС‚ СЃРѕРІРїР°РґР°С‚СЊ');
 		if(!$table_2_field = _txt($_POST['table_2_field']))
-			jsonError('Не указана колонка для связки');
+			jsonError('РќРµ СѓРєР°Р·Р°РЅР° РєРѕР»РѕРЅРєР° РґР»СЏ СЃРІСЏР·РєРё');
 	}
 
 	$menu_edit_last = _num($_POST['menu_edit_last']);
@@ -819,11 +819,11 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$name = _txt($_POST['name']);
 	$spisok_on = _bool($_POST['spisok_on']);
 	if($spisok_on && !$name)
-		jsonError('Укажите имя диалогового окна');
+		jsonError('РЈРєР°Р¶РёС‚Рµ РёРјСЏ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°');
 
 	$dialog_parent_id = _num($_POST['dialog_parent_id']);
 	if($dialog_parent_id == $dialog_id)
-		jsonError('Диалог не может быть родительским для себя');
+		jsonError('Р”РёР°Р»РѕРі РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СЂРѕРґРёС‚РµР»СЊСЃРєРёРј РґР»СЏ СЃРµР±СЏ');
 
 	$width_auto = _num($_POST['width_auto']);
 	$cmp_no_req = _num($_POST['cmp_no_req']);
@@ -912,11 +912,11 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 }
 function _dialogOpenLoad($dialog_id) {
 	if(!$dialog = _dialogQuery($dialog_id))
-		jsonError('Диалога не существует');
+		jsonError('Р”РёР°Р»РѕРіР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 
 	$block_id = _num(@$_POST['block_id'], 1);
 
-	//получение данных единицы списка
+	//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	$unit = array();
 	$unit_id = _num(@$_POST['unit_id'], 1);
 	if($unit_id > 0) {
@@ -938,25 +938,25 @@ function _dialogOpenLoad($dialog_id) {
 				FROM "._tableFrom($dlg)."
 				WHERE ".$cond;
 		if(!$unit = query_assoc($sql))
-			jsonError('Записи не существует');
+			jsonError('Р—Р°РїРёСЃРё РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚');
 		if(@$unit['sa'] && !SA)
-			jsonError('Нет доступа');
+			jsonError('РќРµС‚ РґРѕСЃС‚СѓРїР°');
 		if(@$unit['deleted'])
-			jsonError('Запись была удалена');
+			jsonError('Р—Р°РїРёСЃСЊ Р±С‹Р»Р° СѓРґР°Р»РµРЅР°');
 
 		if(!$block_id && isset($dlg['field1']['block_id']))
 			$block_id = _num($unit['block_id']);
 
-		foreach($dlg['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
-			//должен является вложенным списком
+		foreach($dlg['cmp'] as $cmp_id => $cmp) {//РїРѕРёСЃРє РєРѕРјРїРѕРЅРµРЅС‚Р° РґРёР°Р»РѕРіР° СЃ РІР»РѕР¶РµРЅРЅС‹Рј СЃРїРёСЃРєРѕРј
+			//РґРѕР»Р¶РµРЅ СЏРІР»СЏРµС‚СЃСЏ РІР»РѕР¶РµРЅРЅС‹Рј СЃРїРёСЃРєРѕРј
 			if($cmp['dialog_id'] != 29 && $cmp['dialog_id'] != 59)
 				continue;
 
-			//должно быть присвоено имя колонки
+			//РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСЂРёСЃРІРѕРµРЅРѕ РёРјСЏ РєРѕР»РѕРЅРєРё
 			if(!$col = $cmp['col'])
 				continue;
 
-			//получение данных из вложенного списка
+			//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РёР· РІР»РѕР¶РµРЅРЅРѕРіРѕ СЃРїРёСЃРєР°
 			$incDialog = _dialogQuery($cmp['num_1']);
 
 			$cond = "`t1`.`id`=".$unit[$col];
@@ -967,7 +967,7 @@ function _dialogOpenLoad($dialog_id) {
 			if(!$inc = query_assoc($sql))
 				continue;
 
-			//идентификаторы будут заменены на массив с данными единицы списка
+			//РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹ Р±СѓРґСѓС‚ Р·Р°РјРµРЅРµРЅС‹ РЅР° РјР°СЃСЃРёРІ СЃ РґР°РЅРЅС‹РјРё РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 			$unit[$col] = $inc;
 		}
 	}
@@ -982,22 +982,22 @@ function _dialogOpenLoad($dialog_id) {
 	$send['unit_id'] = $unit_id;
 	$send['dialog_source'] = _num(@$_POST['dialog_source']);
 
-	//исходные данные, полученные для открытия диалога
+	//РёСЃС…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ, РїРѕР»СѓС‡РµРЅРЅС‹Рµ РґР»СЏ РѕС‚РєСЂС‹С‚РёСЏ РґРёР°Р»РѕРіР°
 	$unit['source'] = $send;
 
 	$send['act'] = $act;
-	$send['edit_access'] = _num(@SA) || $dialog['app_id'] && $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
+	$send['edit_access'] = _num(@SA) || $dialog['app_id'] && $dialog['app_id'] == APP_ID ? 1 : 0;//РїСЂР°РІР° РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РґРёР°Р»РѕРіР°
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 	$send['col_type'] = _elemColType($dialog['element_type']);
-	$send['head'] = utf8($dialog[$act.'_head']);
-	$send['button_submit'] = utf8($dialog[$act.'_button_submit']);
-	$send['button_cancel'] = utf8($dialog[$act.'_button_cancel']);
-	$send['html'] = utf8(_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit));
+	$send['head'] = $dialog[$act.'_head'];
+	$send['button_submit'] = $dialog[$act.'_button_submit'];
+	$send['button_cancel'] = $dialog[$act.'_button_cancel'];
+	$send['html'] = _blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit);
 
-	//заполнение значениями некоторых компонентов
+	//Р·Р°РїРѕР»РЅРµРЅРёРµ Р·РЅР°С‡РµРЅРёСЏРјРё РЅРµРєРѕС‚РѕСЂС‹С… РєРѕРјРїРѕРЅРµРЅС‚РѕРІ
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
-			//подключаемая функция
+			//РїРѕРґРєР»СЋС‡Р°РµРјР°СЏ С„СѓРЅРєС†РёСЏ
 			case 12:
 				if(!$unit_id)
 					break;
@@ -1024,7 +1024,7 @@ function _dialogOpenLoad($dialog_id) {
 
 				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
-			//значения для select, radio, dropdown
+			//Р·РЅР°С‡РµРЅРёСЏ РґР»СЏ select, radio, dropdown
 			case 19:
 				if(!$unit_id)
 					break;
@@ -1043,20 +1043,20 @@ function _dialogOpenLoad($dialog_id) {
 						'title' => $r['txt_1'],
 						'content' => $r['txt_2'],
 						'def' => _num($r['def']),
-						'use' => 0  //количество использования значений, чтобы нельзя было удалять
+						'use' => 0  //РєРѕР»РёС‡РµСЃС‚РІРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ Р·РЅР°С‡РµРЅРёР№, С‡С‚РѕР±С‹ РЅРµР»СЊР·СЏ Р±С‹Р»Рѕ СѓРґР°Р»СЏС‚СЊ
 					);
 
 				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 
-				//если элемент пока не применяется
+				//РµСЃР»Рё СЌР»РµРјРµРЅС‚ РїРѕРєР° РЅРµ РїСЂРёРјРµРЅСЏРµС‚СЃСЏ
 				if(empty($unit['col']))
 					break;
 
-				//объект, в котором находится блок с элементом
+				//РѕР±СЉРµРєС‚, РІ РєРѕС‚РѕСЂРѕРј РЅР°С…РѕРґРёС‚СЃСЏ Р±Р»РѕРє СЃ СЌР»РµРјРµРЅС‚РѕРј
 				if(!$block = _blockOne($unit['block_id']))
 					break;
 
-				//пока только для диалогов
+				//РїРѕРєР° С‚РѕР»СЊРєРѕ РґР»СЏ РґРёР°Р»РѕРіРѕРІ
 				if($block['obj_name'] != 'dialog')
 					break;
 				if(!$dlg = _dialogQuery($block['obj_id']))
@@ -1064,7 +1064,7 @@ function _dialogOpenLoad($dialog_id) {
 				if(_table($dlg['table_1']) != '_spisok')
 					break;
 
-				//получение количества использования значений
+				//РїРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ Р·РЅР°С‡РµРЅРёР№
 				$sql = "SELECT
 							`".$unit['col']."` `id`,
 							COUNT(*) `use`
@@ -1080,7 +1080,7 @@ function _dialogOpenLoad($dialog_id) {
 
 				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
-			//select - выбор списка (все списки приложения)
+			//select - РІС‹Р±РѕСЂ СЃРїРёСЃРєР° (РІСЃРµ СЃРїРёСЃРєРё РїСЂРёР»РѕР¶РµРЅРёСЏ)
 			case 24:
 				switch($cmp['num_1']) {
 					case 960: $vvv = _dialogSpisokOnPage($block_id); break;
@@ -1089,7 +1089,7 @@ function _dialogOpenLoad($dialog_id) {
 				}
 				$dialog['cmp'][$cmp_id]['vvv'] = $vvv;
 				break;
-			//select - выбор единицы из другого списка (для связки)
+			//select - РІС‹Р±РѕСЂ РµРґРёРЅРёС†С‹ РёР· РґСЂСѓРіРѕРіРѕ СЃРїРёСЃРєР° (РґР»СЏ СЃРІСЏР·РєРё)
 			case 29:
 				$sel_id = 0;
 				if($unit_id && $cmp['col']) {
@@ -1099,7 +1099,7 @@ function _dialogOpenLoad($dialog_id) {
 					$sel_id = _spisokCmpConnectIdGet($cmp);
 				$dialog['cmp'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
 				break;
-			//настройка ТАБЛИЧНОГО содержания списка
+			//РЅР°СЃС‚СЂРѕР№РєР° РўРђР‘Р›РР§РќРћР“Рћ СЃРѕРґРµСЂР¶Р°РЅРёСЏ СЃРїРёСЃРєР°
 			case 30:
 				if(!$unit_id)
 					break;
@@ -1130,25 +1130,25 @@ function _dialogOpenLoad($dialog_id) {
 				}
 				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
-			//SA: select - выбор имени колонки
+			//SA: select - РІС‹Р±РѕСЂ РёРјРµРЅРё РєРѕР»РѕРЅРєРё
 			case 37:
 				if(!$block = _blockOne($block_id))
 					break;
 
-				//выбор имени колонки может производиться, только если элемент размещается в диалоге
+				//РІС‹Р±РѕСЂ РёРјРµРЅРё РєРѕР»РѕРЅРєРё РјРѕР¶РµС‚ РїСЂРѕРёР·РІРѕРґРёС‚СЊСЃСЏ, С‚РѕР»СЊРєРѕ РµСЃР»Рё СЌР»РµРјРµРЅС‚ СЂР°Р·РјРµС‰Р°РµС‚СЃСЏ РІ РґРёР°Р»РѕРіРµ
 				if($block['obj_name'] != 'dialog')
 					break;
 
 				if(!$colDialog = _dialogQuery($block['obj_id']))
 					break;
 
-				//выбор колонок из родительского диалога
+				//РІС‹Р±РѕСЂ РєРѕР»РѕРЅРѕРє РёР· СЂРѕРґРёС‚РµР»СЊСЃРєРѕРіРѕ РґРёР°Р»РѕРіР°
 				if($parent_id = $colDialog['dialog_parent_id'])
 					if(!$colDialog = _dialogQuery($parent_id))
 						break;
 
 
-				//получение используемых колонок
+				//РїРѕР»СѓС‡РµРЅРёРµ РёСЃРїРѕР»СЊР·СѓРµРјС‹С… РєРѕР»РѕРЅРѕРє
 				$colUse = array();
 				foreach($colDialog['cmp'] as $r) {
 					if(!$col = $r['col'])
@@ -1156,7 +1156,7 @@ function _dialogOpenLoad($dialog_id) {
 					$colUse[$col] = 1;
 				}
 
-				//колонки, которые не должны выбираться
+				//РєРѕР»РѕРЅРєРё, РєРѕС‚РѕСЂС‹Рµ РЅРµ РґРѕР»Р¶РЅС‹ РІС‹Р±РёСЂР°С‚СЊСЃСЏ
 				$fieldNo = array(
 					'id' => 1,
 					'id_old' => 1,
@@ -1189,7 +1189,7 @@ function _dialogOpenLoad($dialog_id) {
 						continue;
 
 					$color = '';
-					$busy = 0;//занята ли колонка
+					$busy = 0;//Р·Р°РЅСЏС‚Р° Р»Рё РєРѕР»РѕРЅРєР°
 					if(isset($colUse[$col])) {
 						$color = $unit_id && $unit['col'] == $col ? 'b color-pay' : 'b red';
 						$busy = 1;
@@ -1230,32 +1230,32 @@ function _dialogOpenLoad($dialog_id) {
 
 				$dialog['cmp'][$cmp_id]['vvv'] = $field;
 				break;
-			//SA: Select - выбор диалогового окна
+			//SA: Select - РІС‹Р±РѕСЂ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°
 			case 38: $dialog['cmp'][$cmp_id]['vvv'] = _dialogSelArray(); break;
-			//SA: Select - дублирование
+			//SA: Select - РґСѓР±Р»РёСЂРѕРІР°РЅРёРµ
 			case 41:
-				//Отсутствует ID исходного блока.
+				//РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ ID РёСЃС…РѕРґРЅРѕРіРѕ Р±Р»РѕРєР°.
 				if(!$block_id)
 					break;
 
 				$BL = _blockOne($block_id);
 
-				//Исходный блок не является блоком из диалога
+				//РСЃС…РѕРґРЅС‹Р№ Р±Р»РѕРє РЅРµ СЏРІР»СЏРµС‚СЃСЏ Р±Р»РѕРєРѕРј РёР· РґРёР°Р»РѕРіР°
 				if($BL['obj_name'] != 'dialog')
 					break;
 
-				//Отсутствует исходный элемент
+				//РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РёСЃС…РѕРґРЅС‹Р№ СЌР»РµРјРµРЅС‚
 				if(!$EL = $BL['elem'])
 					break;
 
-				//Исходный элемент не является выпадающим полем
+				//РСЃС…РѕРґРЅС‹Р№ СЌР»РµРјРµРЅС‚ РЅРµ СЏРІР»СЏРµС‚СЃСЏ РІС‹РїР°РґР°СЋС‰РёРј РїРѕР»РµРј
 				if($EL['dialog_id'] != 17)
 					break;
 
 				$dialog['cmp'][$cmp_id]['txt_1'] = $EL['txt_1'];
 				$dialog['cmp'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 				break;
-			//Настройка содержания Сборного текста
+			//РќР°СЃС‚СЂРѕР№РєР° СЃРѕРґРµСЂР¶Р°РЅРёСЏ РЎР±РѕСЂРЅРѕРіРѕ С‚РµРєСЃС‚Р°
 			case 49:
 				if($unit_id <= 0)
 					break;
@@ -1276,12 +1276,12 @@ function _dialogOpenLoad($dialog_id) {
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
 						'title' => _elemTitle($r['id']),
-						'spc' => _num($r['num_8']) //пробел справа
+						'spc' => _num($r['num_8']) //РїСЂРѕР±РµР» СЃРїСЂР°РІР°
 					);
 				}
 				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
-			//Настройка суммы значений единицы списка
+			//РќР°СЃС‚СЂРѕР№РєР° СЃСѓРјРјС‹ Р·РЅР°С‡РµРЅРёР№ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 			case 56:
 				if($unit_id <= 0)
 					break;
@@ -1301,13 +1301,13 @@ function _dialogOpenLoad($dialog_id) {
 					$spisok[] = array(
 						'id' => _num($r['id']),
 						'dialog_id' => _num($r['dialog_id']),
-						'minus' => _num($r['num_8']), //вычитание=1, сложение=0
+						'minus' => _num($r['num_8']), //РІС‹С‡РёС‚Р°РЅРёРµ=1, СЃР»РѕР¶РµРЅРёРµ=0
 						'title' => _elemUnit($r)
 					);
 				}
 				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
-			//Настройка пунктов меню переключения блоков
+			//РќР°СЃС‚СЂРѕР№РєР° РїСѓРЅРєС‚РѕРІ РјРµРЅСЋ РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ Р±Р»РѕРєРѕРІ
 			case 58:
 				if(!$unit_id)
 					break;
@@ -1322,7 +1322,7 @@ function _dialogOpenLoad($dialog_id) {
 				$spisok = array();
 				foreach($arr as $id => $r) {
 					$c = count(_ids($r['txt_2'], 1));
-					$blk_title = $r['txt_2'] ? $c.' блок'._end($c, '', 'а', 'ов') : '';
+					$blk_title = $r['txt_2'] ? $c.' Р±Р»РѕРє'._end($c, '', 'Р°', 'РѕРІ') : '';
 					$spisok[] = array(
 						'id' => _num($id),
 						'title' => $r['txt_1'],
@@ -1334,7 +1334,7 @@ function _dialogOpenLoad($dialog_id) {
 
 				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
-			//Цвета для фона
+			//Р¦РІРµС‚Р° РґР»СЏ С„РѕРЅР°
 			case 70:
 				$color = array(
 					'#fff',
@@ -1362,7 +1362,7 @@ function _dialogOpenLoad($dialog_id) {
 					'#fcc'
 				);
 
-				$sel = '#fff';//выбранное значение
+				$sel = '#fff';//РІС‹Р±СЂР°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
 				if($unit_id)
 					$sel = $unit[$cmp['col']];
 
@@ -1377,42 +1377,40 @@ function _dialogOpenLoad($dialog_id) {
 		}
 
 	$send['blk'] = $dialog['blk'];
-	$send['cmp'] = utf8($dialog['cmp']);
-	$send['unit'] = utf8($unit);
+	$send['cmp'] = $dialog['cmp'];
+	$send['unit'] = $unit;
 
-	//проверка доступа внесения новой записи
+	//РїСЂРѕРІРµСЂРєР° РґРѕСЃС‚СѓРїР° РІРЅРµСЃРµРЅРёСЏ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё
 	if($act == 'insert' && !$dialog['insert_on']) {
-		$send['html'] = utf8(
+		$send['html'] =
 			'<div class="pad10">'.
-				'<div class="_empty">Внесение новой записи запрещено.</div>'.
-			'</div>'
-		);
+				'<div class="_empty">Р’РЅРµСЃРµРЅРёРµ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё Р·Р°РїСЂРµС‰РµРЅРѕ.</div>'.
+			'</div>';
 		$send['button_submit'] = '';
-		$send['button_cancel'] = utf8('Закрыть');
+		$send['button_cancel'] = 'Р—Р°РєСЂС‹С‚СЊ';
 	}
 
-	//проверка доступа редактирования записи
+	//РїСЂРѕРІРµСЂРєР° РґРѕСЃС‚СѓРїР° СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ Р·Р°РїРёСЃРё
 	if($act == 'edit' && !$dialog['edit_on']) {
-		$send['html'] = utf8(
+		$send['html'] =
 			'<div class="pad10">'.
-				'<div class="_empty">Редактирование запрещено.</div>'.
-			'</div>'
-		);
+				'<div class="_empty">Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р·Р°РїСЂРµС‰РµРЅРѕ.</div>'.
+			'</div>';
 		$send['button_submit'] = '';
-		$send['button_cancel'] = utf8('Закрыть');
+		$send['button_cancel'] = 'Р—Р°РєСЂС‹С‚СЊ';
 	}
 
 
-	//если производится удаление единицы списка
+	//РµСЃР»Рё РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ СѓРґР°Р»РµРЅРёРµ РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°
 	if($act == 'del') {
 		if(!$unit_id)
-			jsonError('Отсутствует единица списка для удаления');
+			jsonError('РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РµРґРёРЅРёС†Р° СЃРїРёСЃРєР° РґР»СЏ СѓРґР°Р»РµРЅРёСЏ');
 
 		$html =
 			'<div class="pad20">'.
 				'<div class="_info">'.
 					'<div class="fs15 center color-ref pad30">'.
-						'Подтвердите удаление.'.
+						'РџРѕРґС‚РІРµСЂРґРёС‚Рµ СѓРґР°Р»РµРЅРёРµ.'.
 					'</div>'.
 				'</div>'.
 			'</div>';
@@ -1420,14 +1418,14 @@ function _dialogOpenLoad($dialog_id) {
 		if(!$dialog['del_on']) {
 			$html =
 				'<div class="pad10">'.
-					'<div class="_empty">Удаление записи недоступно.</div>'.
+					'<div class="_empty">РЈРґР°Р»РµРЅРёРµ Р·Р°РїРёСЃРё РЅРµРґРѕСЃС‚СѓРїРЅРѕ.</div>'.
 				'</div>';
 			$send['button_submit'] = '';
-			$send['button_cancel'] = utf8('Закрыть');
+			$send['button_cancel'] = 'Р—Р°РєСЂС‹С‚СЊ';
 		}
 
 		$send['width'] = 480;
-		$send['html'] = utf8($html);
+		$send['html'] = $html;
 	}
 
 	return $send;

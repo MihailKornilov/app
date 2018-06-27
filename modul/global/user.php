@@ -1,5 +1,5 @@
 <?php
-function _user($user_id=USER_ID, $i='') {//получение данных о пользовате из контакта
+function _user($user_id=USER_ID, $i='') {//РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… Рѕ РїРѕР»СЊР·РѕРІР°С‚Рµ РёР· РєРѕРЅС‚Р°РєС‚Р°
 	if(!_num($user_id))
 		return array();
 
@@ -7,10 +7,10 @@ function _user($user_id=USER_ID, $i='') {//получение данных о пользовате из конт
 		return array();
 
 	if(!defined('USER_NAME')) {
-		define('USER_CREATOR', APP_ID && _app(APP_ID, 'user_id_add') == USER_ID);//создатель приложения
+		define('USER_CREATOR', APP_ID && _app(APP_ID, 'user_id_add') == USER_ID);//СЃРѕР·РґР°С‚РµР»СЊ РїСЂРёР»РѕР¶РµРЅРёСЏ
 		define('USER_WORKER', $u['worker']);
 //		define('USER_APP_ONE', $u['app_count'] < 2);
-		define('USER_NAME', $u['i'].' '.$u['f']);//Имя Фамилия
+		define('USER_NAME', $u['i'].' '.$u['f']);//РРјСЏ Р¤Р°РјРёР»РёСЏ
 	}
 
 	if($i == 'name')
@@ -51,7 +51,7 @@ function _userCache($user_id) {
 //		$u = _userVkUpdate($user_id);
 
 /*
-	//количества приложений, в которых участвует пользователь
+	//РєРѕР»РёС‡РµСЃС‚РІР° РїСЂРёР»РѕР¶РµРЅРёР№, РІ РєРѕС‚РѕСЂС‹С… СѓС‡Р°СЃС‚РІСѓРµС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ
 	$sql = "SELECT COUNT(*)
 			FROM `_vkuser_app`
 			WHERE `viewer_id`=".$user_id."
@@ -71,9 +71,9 @@ function _userCache($user_id) {
 
 	return _cache_set($key, $u);
 }
-function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
+function _userVkUpdate($vk_id) {//РћР±РЅРѕРІР»РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РёР· РљРѕРЅС‚Р°РєС‚Р°
 	if(LOCAL)
-		die('Данные пользователя VK не были получены <b>'.$vk_id.'</b> в LOCAL версии.');
+		die('Р”Р°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ VK РЅРµ Р±С‹Р»Рё РїРѕР»СѓС‡РµРЅС‹ <b>'.$vk_id.'</b> РІ LOCAL РІРµСЂСЃРёРё.');
 
 	$res = _vkapi('users.get', array(
 		'user_ids' => $vk_id,
@@ -89,8 +89,8 @@ function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 	$res = $res['response'][0];
 	$u = array(
 		'user_id' => $vk_id,
-		'first_name' => win1251($res['first_name']),
-		'last_name' => win1251($res['last_name']),
+		'first_name' => $res['first_name'],
+		'last_name' => $res['last_name'],
 		'sex' => $res['sex'],
 		'photo' => $res['photo']
 	);
@@ -103,8 +103,8 @@ function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 
 	$pol = array(
 		0 => 0,
-		1 => 1750,//женский
-		2 => 1749 //мужской
+		1 => 1750,//Р¶РµРЅСЃРєРёР№
+		2 => 1749 //РјСѓР¶СЃРєРѕР№
 	);
 
 	$sql = "INSERT INTO `_user` (
@@ -133,7 +133,7 @@ function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 
 	return $user_id;
 }
-function _userImageMove() {//перенос аватарок пользователей в изображения
+function _userImageMove() {//РїРµСЂРµРЅРѕСЃ Р°РІР°С‚Р°СЂРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ РІ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 	_cache_clear('IMG_SERVER');
 
 	$sql = "SELECT *

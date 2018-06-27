@@ -1,12 +1,12 @@
-var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей блоки
+var _blockUpd = function(blk) {//РѕР±РЅРѕРІР»РµРЅРёРµ РіР»РѕР±Р°Р»СЊРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№, СЃРѕРґРµСЂР¶Р°С‰РµР№ Р±Р»РѕРєРё
 		for(var k in blk)
 			BLK[k] = blk[k];
 	},
-	_blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
-		if(!window.BLK)//страница ещё не догрузилась
+	_blockUnitSetup = function() {//РЅР°СЃС‚СЂРѕР№РєР° СЃС‚РёР»РµР№ Р±Р»РѕРєР° РІ РІС‹РїР»С‹РІР°СЋС‰РµРј РѕРєРЅРµ
+		if(!window.BLK)//СЃС‚СЂР°РЅРёС†Р° РµС‰С‘ РЅРµ РґРѕРіСЂСѓР·РёР»Р°СЃСЊ
 			return;
 
-		//если производится процесс деления блока на части, настройка стилей не выводится
+		//РµСЃР»Рё РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РїСЂРѕС†РµСЃСЃ РґРµР»РµРЅРёСЏ Р±Р»РѕРєР° РЅР° С‡Р°СЃС‚Рё, РЅР°СЃС‚СЂРѕР№РєР° СЃС‚РёР»РµР№ РЅРµ РІС‹РІРѕРґРёС‚СЃСЏ
 		if($('.block-unit-grid').length)
 			return;
 
@@ -14,7 +14,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 			block_id = _num(t.attr('val')),
 			BL = BLK[block_id],
 			obj = $(BL.attr_bl),
-			borSave = function() {//нажатие на галочку для установки/снятия бордюра
+			borSave = function() {//РЅР°Р¶Р°С‚РёРµ РЅР° РіР°Р»РѕС‡РєСѓ РґР»СЏ СѓСЃС‚Р°РЅРѕРІРєРё/СЃРЅСЏС‚РёСЏ Р±РѕСЂРґСЋСЂР°
 				BL.bor = $('#block-unit-bor0').val() + ' ' +
 						 $('#block-unit-bor1').val() + ' ' +
 						 $('#block-unit-bor2').val() + ' ' +
@@ -22,16 +22,16 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				BL.save = 1;
 			};
 
-		//идёт процес сохранения
+		//РёРґС‘С‚ РїСЂРѕС†РµСЃ СЃРѕС…СЂР°РЅРµРЅРёСЏ
 		if(BL.save || obj.hasClass('_busy'))
 			return;
 
 		t._hint({
 			msg:'<div class="pad5">' +
 					'<div class="line-b">' +
-						'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Блок</span>' +
+						'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Р‘Р»РѕРє</span>' +
 						'<div class="fr mtm3">' +
-							'<div val="dialog_id:72,unit_id:' + BL.id + '" class="icon-wiki iw12 dialog-open' + _tooltip('Настроить ссылку', -53) + '</div>' +
+							'<div val="dialog_id:72,unit_id:' + BL.id + '" class="icon-wiki iw12 dialog-open' + _tooltip('РќР°СЃС‚СЂРѕРёС‚СЊ СЃСЃС‹Р»РєСѓ', -53) + '</div>' +
 						'</div>' +
 					'</div>' +
 					_blockUnitBg(BL) +
@@ -46,28 +46,28 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 			delayHide:300,
 			func:function() {
 				$('#block-unit-bor0')._check({
-					tooltip:'сверху',
+					tooltip:'СЃРІРµСЂС…Сѓ',
 					func:function(v) {
 						obj.css('border-top', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
 				$('#block-unit-bor1')._check({
-					tooltip:'справа',
+					tooltip:'СЃРїСЂР°РІР°',
 					func:function(v) {
 						obj.css('border-right', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
 				$('#block-unit-bor2')._check({
-					tooltip:'снизу',
+					tooltip:'СЃРЅРёР·Сѓ',
 					func:function(v) {
 						obj.css('border-bottom', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
 				$('#block-unit-bor3')._check({
-					tooltip:'слева',
+					tooltip:'СЃР»РµРІР°',
 					func:function(v) {
 						obj.css('border-left', v ? '#DEE3EF solid 1px' : '');
 						borSave();
@@ -91,16 +91,16 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				if(BL.elem_id) {
 					var EL = ELM[BL.elem_id],
 						tMar = {
-							0:'сверху',
-							1:'справа',
-							2:'снизу',
-							3:'слева'
+							0:'СЃРІРµСЂС…Сѓ',
+							1:'СЃРїСЂР°РІР°',
+							2:'СЃРЅРёР·Сѓ',
+							3:'СЃР»РµРІР°'
 						};
 					for(var n = 0; n < 4; n++)
 						$('#el-mar' + n)._count({
 							step:5,
 							max:50,
-							tooltip:'Отступ ' + tMar[n],
+							tooltip:'РћС‚СЃС‚СѓРї ' + tMar[n],
 							func:function(v, id) {
 								var pos = _num(id.split('el-mar')[1]),
 									top =    pos == 0 ? v : _num($('#el-mar0').val()),
@@ -143,7 +143,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 						}
 					});
 					$('#elem-img-height')._check({
-						tooltip:'Также ограничивать высоту',
+						tooltip:'РўР°РєР¶Рµ РѕРіСЂР°РЅРёС‡РёРІР°С‚СЊ РІС‹СЃРѕС‚Сѓ',
 						func:function(v) {
 							EL.num_7 = v;
 							BL.save = 1;
@@ -156,7 +156,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 			}
 		});
 	},
-	_blockUnitBg = function(BL) {//заливка блока
+	_blockUnitBg = function(BL) {//Р·Р°Р»РёРІРєР° Р±Р»РѕРєР°
 		var BGS = 'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg-fee',
 			div = '';
 
@@ -218,7 +218,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 					});
 				});
 			div += '<div class="bg70 prel dib center w25 bor-e8 grey ml3' +
-							_tooltip('Окраска блока согласно<br>цвету фона единицы списка', -83, '', 1) +
+							_tooltip('РћРєСЂР°СЃРєР° Р±Р»РѕРєР° СЃРѕРіР»Р°СЃРЅРѕ<br>С†РІРµС‚Сѓ С„РѕРЅР° РµРґРёРЅРёС†С‹ СЃРїРёСЃРєР°', -83, '', 1) +
 						'<div class="galka pabs fs17 pl5' + _dn(BL.bg == 'bg70') + '">&#10004;</div>' +
 						'<div class="pabs icon spin"></div>' +
 						'<table class="w100p curP">' +
@@ -230,13 +230,13 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		}
 
 
-		return '<div class="color-555 fs14 mt5">Заливка:</div>' +
+		return '<div class="color-555 fs14 mt5">Р—Р°Р»РёРІРєР°:</div>' +
 			   '<div id="block-set-bg" class="mt3">' + div + '</div>';
 	},
-	_blockUnitBor = function(BL) {//границы блока
+	_blockUnitBor = function(BL) {//РіСЂР°РЅРёС†С‹ Р±Р»РѕРєР°
 		var bor = BL.bor.split(' ');
 		return '<table class="mt10">' +
-				'<tr><td class="color-555 fs14">Границы:' +
+				'<tr><td class="color-555 fs14">Р“СЂР°РЅРёС†С‹:' +
 					'<td class="pr3">' +
 						'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor0" value="' + bor[0] + '"></div>' +
 						'<table class="bs5">' +
@@ -248,7 +248,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 					_blockUnitSa(BL) +
 				'</table>';
 	},
-	_blockUnitSa = function(BL) {//настройка блока для SA
+	_blockUnitSa = function(BL) {//РЅР°СЃС‚СЂРѕР№РєР° Р±Р»РѕРєР° РґР»СЏ SA
 		if(!SA)
 			return '';
 
@@ -258,13 +258,13 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				'<input type="hidden" id="block-sa-view" value="' + BL.sa + '" />' +
 			'</div>';
 	},
-	_blockUnitBut = function(BL) {//кнопки
+	_blockUnitBut = function(BL) {//РєРЅРѕРїРєРё
 		if(BL.elem_id)
 			return '';
 
 		return '<div class="mt20 center">' +
-					'<button class="vk small orange mb5" onclick="_blockUnitGrid($(this),' + BL.id + ')">Настроить подблоки</button>' +
- (!BL.child_count ? '<button class="dialog-open vk small green" id="elem-hint-add" val="dialog_id:50,block_id:' + BL.id + '">Вставить элемент</button>' : '') +
+					'<button class="vk small orange mb5" onclick="_blockUnitGrid($(this),' + BL.id + ')">РќР°СЃС‚СЂРѕРёС‚СЊ РїРѕРґР±Р»РѕРєРё</button>' +
+ (!BL.child_count ? '<button class="dialog-open vk small green" id="elem-hint-add" val="dialog_id:50,block_id:' + BL.id + '">Р’СЃС‚Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚</button>' : '') +
 				'</div>';
 	},
 	_blockUnitGrid = function(obj, block_id) {
@@ -296,11 +296,11 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 		});
 	},
 
-	_elemUpd = function(elm) {//обновление глобальной переменной, содержащей элементы
+	_elemUpd = function(elm) {//РѕР±РЅРѕРІР»РµРЅРёРµ РіР»РѕР±Р°Р»СЊРЅРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№, СЃРѕРґРµСЂР¶Р°С‰РµР№ СЌР»РµРјРµРЅС‚С‹
 		for(var k in elm)
 			ELM[k] = elm[k];
 	},
-	_elemUnit = function(BL) {//настройки элемента в выплывающем окне
+	_elemUnit = function(BL) {//РЅР°СЃС‚СЂРѕР№РєРё СЌР»РµРјРµРЅС‚Р° РІ РІС‹РїР»С‹РІР°СЋС‰РµРј РѕРєРЅРµ
 		if(!BL.elem_id)
 			return '';
 
@@ -308,13 +308,13 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 
 		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.id + '">' +
 			'<div class="line-b">' +
-				'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + EL.id, 5)  : '">') + 'Элемент</span>' +
+				'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + EL.id, 5)  : '">') + 'Р­Р»РµРјРµРЅС‚</span>' +
 				'<div class="fr mtm3">' +
-					'<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>' +
-					'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
-					'<div val="dialog_id:43,unit_id:' + EL.id + '" class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
-					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
-					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
+					'<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('РЈСЃР»РѕРІРёСЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ', -67) + '</div>' +
+					'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('РќР°СЃС‚СЂРѕРёС‚СЊ РґРµР№СЃС‚РІРёСЏ', -62) + '</div>' +
+					'<div val="dialog_id:43,unit_id:' + EL.id + '" class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('РќР°СЃС‚СЂРѕРёС‚СЊ РїРѕРґСЃРєР°Р·РєСѓ', -65) + '</div>' +
+					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ СЌР»РµРјРµРЅС‚', -134, 'r') + '</div>' +
+					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('РЈРґР°Р»РёС‚СЊ СЌР»РµРјРµРЅС‚', -94, 'r') + '</div>' +
 				'</div>' +
 			'</div>' +
 
@@ -341,19 +341,19 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 					'<input type="hidden" id="el-mar2" value="' + mar[2] + '" />' +
 				'</div>';
 	},
-	_elemUnitPlace = function(BL) {//позиция элемента
+	_elemUnitPlace = function(BL) {//РїРѕР·РёС†РёСЏ СЌР»РµРјРµРЅС‚Р°
 		return  '<table id="elem-pos">' +
-			'<tr><td class="fs14 color-555 pb3 center">Позиция' +
-			'<tr><td><div val="top" class="icon-wiki iw6 mr3' + _dn(BL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
-					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(BL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
-					'<div val="top r" class="icon-wiki iw8' + _dn(BL.pos == 'top r','on') + _tooltip('Вверх-вправо', -73, 'r') + '</div>' +
+			'<tr><td class="fs14 color-555 pb3 center">РџРѕР·РёС†РёСЏ' +
+			'<tr><td><div val="top" class="icon-wiki iw6 mr3' + _dn(BL.pos == 'top','on') + _tooltip('Р’РІРµСЂС…-РІР»РµРІРѕ', -37) + '</div>' +
+					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(BL.pos == 'top center','on') + _tooltip('Р’РІРµСЂС…-С†РµРЅС‚СЂ', -35) + '</div>' +
+					'<div val="top r" class="icon-wiki iw8' + _dn(BL.pos == 'top r','on') + _tooltip('Р’РІРµСЂС…-РІРїСЂР°РІРѕ', -73, 'r') + '</div>' +
 			'<tr><td>' + _elemUnitPlaceMiddle(BL) +
-			'<tr><td><div val="bottom" class="icon-wiki iw9 mr3' + _dn(BL.pos == 'bottom','on') + _tooltip('Вниз-влево', -33) + '</div>' +
-					'<div val="bottom center" class="icon-wiki iw10 mr3' + _dn(BL.pos == 'bottom center','on') + _tooltip('Вниз-центр', -32) + '</div>' +
-					'<div val="bottom r" class="icon-wiki iw11' + _dn(BL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -65, 'r') + '</div>' +
+			'<tr><td><div val="bottom" class="icon-wiki iw9 mr3' + _dn(BL.pos == 'bottom','on') + _tooltip('Р’РЅРёР·-РІР»РµРІРѕ', -33) + '</div>' +
+					'<div val="bottom center" class="icon-wiki iw10 mr3' + _dn(BL.pos == 'bottom center','on') + _tooltip('Р’РЅРёР·-С†РµРЅС‚СЂ', -32) + '</div>' +
+					'<div val="bottom r" class="icon-wiki iw11' + _dn(BL.pos == 'bottom r','on') + _tooltip('Р’РЅРёР·-РІРїСЂР°РІРѕ', -65, 'r') + '</div>' +
 		'</table>';
 	},
-	_elemUnitPlaceMiddle = function(BL) {//центральная часть позиции
+	_elemUnitPlaceMiddle = function(BL) {//С†РµРЅС‚СЂР°Р»СЊРЅР°СЏ С‡Р°СЃС‚СЊ РїРѕР·РёС†РёРё
 		$(document)
 			.off('click', '#elem-pos div')
 			.on('click', '#elem-pos div', function() {
@@ -370,9 +370,9 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				BL.pos = v;
 				BL.save = 1;
 			});
-		return  '<div val="" class="icon-wiki iw3 mr3' + _dn(!BL.pos,'on') + _tooltip('Влево', -15) + '</div>' +
-				'<div val="center" class="icon-wiki iw4 mr3' + _dn(BL.pos == 'center','on') + _tooltip('По центру', -28) + '</div>' +
-				'<div val="r" class="icon-wiki iw5' + _dn(BL.pos == 'r','on') + _tooltip('Вправо', -34, 'r') + '</div>';
+		return  '<div val="" class="icon-wiki iw3 mr3' + _dn(!BL.pos,'on') + _tooltip('Р’Р»РµРІРѕ', -15) + '</div>' +
+				'<div val="center" class="icon-wiki iw4 mr3' + _dn(BL.pos == 'center','on') + _tooltip('РџРѕ С†РµРЅС‚СЂСѓ', -28) + '</div>' +
+				'<div val="r" class="icon-wiki iw5' + _dn(BL.pos == 'r','on') + _tooltip('Р’РїСЂР°РІРѕ', -34, 'r') + '</div>';
 	},
 	_elemUnitStyle = function(EL) {
 		if(!EL.style_access)
@@ -385,7 +385,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 							'<input id="elem-size" class="w15" value="' + EL.size + '" />' +
 				'</table>'
 	},
-	_elemUnitFont = function(EL) {//стили элемента: жирность, наклон, подчёркивание
+	_elemUnitFont = function(EL) {//СЃС‚РёР»Рё СЌР»РµРјРµРЅС‚Р°: Р¶РёСЂРЅРѕСЃС‚СЊ, РЅР°РєР»РѕРЅ, РїРѕРґС‡С‘СЂРєРёРІР°РЅРёРµ
 		var font = {
 			b:'',
 			i:'',
@@ -413,22 +413,22 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 				});
 				EL.font = font.join(' ');
 
-				if(EL.attr_tr)//настройка для таблицы, без блоков
+				if(EL.attr_tr)//РЅР°СЃС‚СЂРѕР№РєР° РґР»СЏ С‚Р°Р±Р»РёС†С‹, Р±РµР· Р±Р»РѕРєРѕРІ
 					return;
 
 				BLK[EL.block_id].save = 1;
 			});
 
 		return '<div id="elem-font" class="dib">' +
-			'<div val="b" class="icon-wiki ml3' + font.b + _tooltip('Жирный', -23) + '</div>' +
-			'<div val="i" class="icon-wiki iw1 ml3' + font.i + _tooltip('Наклонный', -31) + '</div>' +
-			'<div val="u" class="icon-wiki iw2 ml3' + font.u + _tooltip('Подчёкнутый', -39) + '</div>' +
+			'<div val="b" class="icon-wiki ml3' + font.b + _tooltip('Р–РёСЂРЅС‹Р№', -23) + '</div>' +
+			'<div val="i" class="icon-wiki iw1 ml3' + font.i + _tooltip('РќР°РєР»РѕРЅРЅС‹Р№', -31) + '</div>' +
+			'<div val="u" class="icon-wiki iw2 ml3' + font.u + _tooltip('РџРѕРґС‡С‘РєРЅСѓС‚С‹Р№', -39) + '</div>' +
 		'</div>' +
 		(EL.url_access ?
-			'<div val="dialog_id:79,unit_id:' + EL.id + '" class="icon-wiki iw12 ml3 dialog-open' + _dn(EL.url, 'on') + _tooltip('Настроить ссылку', -53) + '</div>'
+			'<div val="dialog_id:79,unit_id:' + EL.id + '" class="icon-wiki iw12 ml3 dialog-open' + _dn(EL.url, 'on') + _tooltip('РќР°СЃС‚СЂРѕРёС‚СЊ СЃСЃС‹Р»РєСѓ', -53) + '</div>'
 		: '');
 	},
-	_elemUnitColor = function(EL) {//стили элемента: цвет текста
+	_elemUnitColor = function(EL) {//СЃС‚РёР»Рё СЌР»РµРјРµРЅС‚Р°: С†РІРµС‚ С‚РµРєСЃС‚Р°
 		var func = function(v) {
 			$(EL.attr_el)
 				.removeClass(EL.color)
@@ -436,7 +436,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 
 			EL.color = v;
 
-			if(EL.attr_tr)//настройка для таблицы, без блоков
+			if(EL.attr_tr)//РЅР°СЃС‚СЂРѕР№РєР° РґР»СЏ С‚Р°Р±Р»РёС†С‹, Р±РµР· Р±Р»РѕРєРѕРІ
 				return;
 
 			BLK[EL.block_id].save = 1;
@@ -449,7 +449,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 			return '';
 
 		return '<table class="bs5">' +
-			'<tr><td class="color-555 fs14">Ширина фото:' +
+			'<tr><td class="color-555 fs14">РЁРёСЂРёРЅР° С„РѕС‚Рѕ:' +
 				'<td><input id="elem-img-width" class="w15" value="' + EL.width + '" />' +
 				'<td class="pl5">' +
 					'<input type="hidden" id="elem-img-height" value="' + EL.num_7 + '" />' +
@@ -457,7 +457,7 @@ var _blockUpd = function(blk) {//обновление глобальной переменной, содержащей бл
 	};
 
 $(document)
-	.on('click', '.block-grid-on', function() {//включение/выключение управления блоками
+	.on('click', '.block-grid-on', function() {//РІРєР»СЋС‡РµРЅРёРµ/РІС‹РєР»СЋС‡РµРЅРёРµ СѓРїСЂР°РІР»РµРЅРёСЏ Р±Р»РѕРєР°РјРё
 		var t = $(this),
 			p = t.parent(),
 			v = t.hasClass('grey'),
@@ -491,7 +491,7 @@ $(document)
 			}
 		});
 	})
-	.on('click', '.elem-width-change', function() {//включение/выключение изменения ширины элементов
+	.on('click', '.elem-width-change', function() {//РІРєР»СЋС‡РµРЅРёРµ/РІС‹РєР»СЋС‡РµРЅРёРµ РёР·РјРµРЅРµРЅРёСЏ С€РёСЂРёРЅС‹ СЌР»РµРјРµРЅС‚РѕРІ
 		var t = $(this),
 			p = t.parent(),
 			on = t.hasClass('grey') ? 1 : 0,
@@ -544,7 +544,7 @@ $(document)
 			});
 		});
 	})
-	.on('mouseenter', '.ewc .ui-resizable-e', function() {//подсказка с возможностью установить ширину 100% для элемента
+	.on('mouseenter', '.ewc .ui-resizable-e', function() {//РїРѕРґСЃРєР°Р·РєР° СЃ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊСЋ СѓСЃС‚Р°РЅРѕРІРёС‚СЊ С€РёСЂРёРЅСѓ 100% РґР»СЏ СЌР»РµРјРµРЅС‚Р°
 		var t = $(this),
 			div = t.parent(),
 			block = div.parent(),
@@ -561,11 +561,11 @@ $(document)
 		t._hint({
 			msg:'<input type="hidden" id="elem-width-max" value="' + val + '" />' +
 				'<div class="mt5 ml20 fs11 i pale">' +
-					'<b class="i fs11">Размер элемента</b> будет ' +
+					'<b class="i fs11">Р Р°Р·РјРµСЂ СЌР»РµРјРµРЅС‚Р°</b> Р±СѓРґРµС‚ ' +
 					'<br>' +
-					'подстраиваться под <b class="i fs11">размер блока</b>,' +
+					'РїРѕРґСЃС‚СЂР°РёРІР°С‚СЊСЃСЏ РїРѕРґ <b class="i fs11">СЂР°Р·РјРµСЂ Р±Р»РѕРєР°</b>,' +
 					'<br>' +
-					'в котором он находится.' +
+					'РІ РєРѕС‚РѕСЂРѕРј РѕРЅ РЅР°С…РѕРґРёС‚СЃСЏ.' +
 				'</div>',
 			width:240,
 			pad:10,
@@ -573,7 +573,7 @@ $(document)
 			show:1,
 			func:function() {
 				$('#elem-width-max')._check({
-					title:'максимальная ширина',
+					title:'РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ С€РёСЂРёРЅР°',
 					func:function(v) {
 						save = 1;
 						save_v = v ? 0 : EL.width_max - 10;
@@ -596,7 +596,7 @@ $(document)
 			}
 		});
 	})
-	.on('click', '.block-level-change', function() {//изменения уровня редактирования блоков
+	.on('click', '.block-level-change', function() {//РёР·РјРµРЅРµРЅРёСЏ СѓСЂРѕРІРЅСЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ Р±Р»РѕРєРѕРІ
 		var t = $(this),
 			v = _num(t.html()),
 			p = t.parent(),
@@ -614,11 +614,11 @@ $(document)
 		but.removeClass('grey').trigger('click');
 	})
 	.on('mouseenter', '.block-unit', _blockUnitSetup)
-	.on('click', '.block-unit', function() {//нажатие на блок для настройки
-		if(!window.BLK)//страница ещё не догрузилась
+	.on('click', '.block-unit', function() {//РЅР°Р¶Р°С‚РёРµ РЅР° Р±Р»РѕРє РґР»СЏ РЅР°СЃС‚СЂРѕР№РєРё
+		if(!window.BLK)//СЃС‚СЂР°РЅРёС†Р° РµС‰С‘ РЅРµ РґРѕРіСЂСѓР·РёР»Р°СЃСЊ
 			return;
 
-		//если производится процесс деления блока на части, действие не производится
+		//РµСЃР»Рё РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РїСЂРѕС†РµСЃСЃ РґРµР»РµРЅРёСЏ Р±Р»РѕРєР° РЅР° С‡Р°СЃС‚Рё, РґРµР№СЃС‚РІРёРµ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
 		if($('.block-unit-grid').length)
 			return;
 
@@ -626,7 +626,7 @@ $(document)
 			block_id = _num(t.attr('val')),
 			BL = BLK[block_id];
 
-		//если есть подблоки, действие не производится
+		//РµСЃР»Рё РµСЃС‚СЊ РїРѕРґР±Р»РѕРєРё, РґРµР№СЃС‚РІРёРµ РЅРµ РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ
 		if(BL.child_count)
 			return;
 
@@ -635,7 +635,7 @@ $(document)
 
 		$('#elem-hint-add').trigger('click');
 	})
-	.on('click', '.block-click-page', function(e) {//нажатие на блок для перехода на страницу
+	.on('click', '.block-click-page', function(e) {//РЅР°Р¶Р°С‚РёРµ РЅР° Р±Р»РѕРє РґР»СЏ РїРµСЂРµС…РѕРґР° РЅР° СЃС‚СЂР°РЅРёС†Сѓ
 		e.stopPropagation();
 
 		var t = $(this),
@@ -664,24 +664,24 @@ $.fn._grid = function(o) {
 
 	o = $.extend({
 		width:1000,
-		parent_id:0,//родительский блок
-		obj_name:'page',//имя объекта, где располагаются блоки
-		obj_id:PAGE_ID  //id объекта
+		parent_id:0,//СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ Р±Р»РѕРє
+		obj_name:'page',//РёРјСЏ РѕР±СЉРµРєС‚Р°, РіРґРµ СЂР°СЃРїРѕР»Р°РіР°СЋС‚СЃСЏ Р±Р»РѕРєРё
+		obj_id:PAGE_ID  //id РѕР±СЉРµРєС‚Р°
 	}, o);
 
 	t.gridstack({
 		itemClass:'grid-item',
-		handle:'.grid-content',  //область, за которую можно перетаскивать
-		animate:false,           //плавная пристыковка после отпускания при растягивании
-		verticalMargin:1,       //отступ сверху
-		cellHeight:10,          //минимальная высота блока
-		float:false,            //если true - блок можно расположить в любом месте, иначе блок всегда тянется к верху
-		width:o.width / 10      //количество элементов минимальной ширины может поместиться по всей длине
+		handle:'.grid-content',  //РѕР±Р»Р°СЃС‚СЊ, Р·Р° РєРѕС‚РѕСЂСѓСЋ РјРѕР¶РЅРѕ РїРµСЂРµС‚Р°СЃРєРёРІР°С‚СЊ
+		animate:false,           //РїР»Р°РІРЅР°СЏ РїСЂРёСЃС‚С‹РєРѕРІРєР° РїРѕСЃР»Рµ РѕС‚РїСѓСЃРєР°РЅРёСЏ РїСЂРё СЂР°СЃС‚СЏРіРёРІР°РЅРёРё
+		verticalMargin:1,       //РѕС‚СЃС‚СѓРї СЃРІРµСЂС…Сѓ
+		cellHeight:10,          //РјРёРЅРёРјР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р° Р±Р»РѕРєР°
+		float:false,            //РµСЃР»Рё true - Р±Р»РѕРє РјРѕР¶РЅРѕ СЂР°СЃРїРѕР»РѕР¶РёС‚СЊ РІ Р»СЋР±РѕРј РјРµСЃС‚Рµ, РёРЅР°С‡Рµ Р±Р»РѕРє РІСЃРµРіРґР° С‚СЏРЅРµС‚СЃСЏ Рє РІРµСЂС…Сѓ
+		width:o.width / 10      //РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РјРёРЅРёРјР°Р»СЊРЅРѕР№ С€РёСЂРёРЅС‹ РјРѕР¶РµС‚ РїРѕРјРµСЃС‚РёС‚СЊСЃСЏ РїРѕ РІСЃРµР№ РґР»РёРЅРµ
 	});
 
 	var grid = t.data('gridstack'),
 		num = 1;
-	//добавление нового блока
+	//РґРѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕРіРѕ Р±Р»РѕРєР°
 	$('#grid-add').click(function() {
 		grid.addWidget($('<div id="gn' + num++ + '">' +
 			'<div class="grid-content"></div>' +
@@ -690,7 +690,7 @@ $.fn._grid = function(o) {
 			0, 0, o.width, 3, true);
 	});
 
-	//сохранение данных
+	//СЃРѕС…СЂР°РЅРµРЅРёРµ РґР°РЅРЅС‹С…
 	$('#grid-save').click(function() {
 		var t = $(this),
 			arr = [];
