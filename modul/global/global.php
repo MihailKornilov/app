@@ -562,6 +562,7 @@ function _jsCache() {//формирование файла JS с данными 
 
 function _cache($v=array()) {
 	if(!defined('CACHE_DEFINE')) {
+		define('CACHE_USE', true);//включение кеша
 		define('CACHE_TTL', 86400);//время в секундах, которое хранит кеш
 		define('CACHE_DEFINE', true);
 	}
@@ -587,17 +588,19 @@ function _cache($v=array()) {
 	$key = '__'.($global || !_num(@APP_ID) ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
 
 	switch($action) {
-		case 'get': return xcache_get($key);
+		case 'get': return CACHE_USE ? xcache_get($key) : false;
 		case 'set':
-			if(!isset($v['data']))
-				die('Отсутствуют данные для внесения в кеш. Key: '.$key);
+//			if(!isset($v['data']))
+//				die('Отсутствуют данные для внесения в кеш. Key: '.$key);
 
-			xcache_set($key, $v['data'], CACHE_TTL);
+			if(CACHE_USE)
+				xcache_set($key, $v['data'], CACHE_TTL);
 
 			return $v['data'];
-		case 'isset': return xcache_isset($key);
+		case 'isset': return CACHE_USE ? xcache_isset($key) : false;
 		case 'clear':
-			xcache_unset($key);
+			if(CACHE_USE)
+				xcache_unset($key);
 			return true;
 		default: die('Неизвестное действие кеша.');
 	}
@@ -626,7 +629,8 @@ function _cache_isset($key, $global=0) {//проверка, производил
 }
 function _cache_clear($key, $global=0) {//очистка кеша
 	if($key == 'all') {
-		xcache_clear_cache(1);
+		if(CACHE_USE)
+			xcache_clear_cache(1);
 		return true;
 	}
 
@@ -637,20 +641,22 @@ function _cache_clear($key, $global=0) {//очистка кеша
 	));
 }
 function _cache_content($el, $unit) {//содержание кеша в диалоге [84] (подключаемая функция [12])
-	if(!$name = @$_COOKIE['cache_content_name'])
-		$send = 'Отсутствует имя кеша.';
-	else {
-		if(!xcache_isset($name))
-			$send = '<b>'.$name.'</b>: кеш не сохранён.';
+	if(!CACHE_USE)
+		$send = 'Кеш отключен.';
+	elseif(!$name = @$_COOKIE['cache_content_name'])
+			$send = 'Отсутствует имя кеша.';
 		else {
-			if(!$arr = xcache_get($name))
-				$send = '<b>'.$name.'</b>: кеш пуст.';
-			else
-				$send =
-					'<div class="fs15 b mb10">'.$name.'</div>'.
-					_pr($arr);
+			if(!xcache_isset($name))
+				$send = '<b>'.$name.'</b>: кеш не сохранён.';
+			else {
+				if(!$arr = xcache_get($name))
+					$send = '<b>'.$name.'</b>: кеш пуст.';
+				else
+					$send =
+						'<div class="fs15 b mb10">'.$name.'</div>'.
+						_pr($arr);
+			}
 		}
-	}
 	return
 	'<div style="height:700px;overflow-y:scroll" class="bg-fff bor-e8 pad10">'.
 		$send.
