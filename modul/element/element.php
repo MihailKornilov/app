@@ -63,7 +63,7 @@ function _iconDel($v=array()) {//иконка удаления записи в �
 function _check($v=array()) {//элемент ГАЛОЧКА
 	$attr_id = empty($v['attr_id']) ? 'check'.rand(1, 100000) : $v['attr_id'];
 
-	$cls = '_check ';
+	$cls = '_check php ';
 	$cls .= empty($v['block']) ?    '' : ' block';       //display:block, иначе inline-block
 	$cls .= empty($v['disabled']) ? '' : ' disabled';    //неактивное состояние
 	$cls .= isset($v['light']) && empty($v['light']) ?    '' : ' light';       //если галочка не стоит, текст бледный
@@ -143,7 +143,7 @@ function _select($v=array()) {//выпадающее поле
 	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
 	'<div class="_select disabled dib" id="'.$attr_id.'_select"'.$width.'">'.
 		'<table class="w100p">'.
-			'<tr><td><input type="text" class="select-inp"'.$placeholder.' readonly />'.
+			'<tr><td><input type="text" class="select-inp w100p"'.$placeholder.' readonly />'.
 				'<td class="arrow">'.
 		'</table>'.
 	'</div>';
@@ -828,6 +828,19 @@ function _elementChoose($el, $unit) {//выбор элемента для вст
 					'<div class="cnt-div">'.$content.'<div>'.
 		'</table>'.
 		$debug;
+}
+
+function PHP12_v_from_dialog($el, $unit) {//выбор значения из диалога [86]
+	$dialog_id = 48;
+
+	if(!$dialog = _dialogQuery($dialog_id))
+		return _emptyMin('Диалога не существует, который вносит данные списка.');
+
+	$unit = array();
+
+	return
+	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
+	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit);
 }
 
 function _filterCheckSetup() {//настройка условий фильтра для галочки (подключение через [12])

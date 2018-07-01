@@ -361,6 +361,9 @@ function _html_script() {//скрипты и стили
 
 	'<script src="modul/page/page'.MIN.'.js?'.SCRIPT.'"></script>'.
 
+	'<link rel="stylesheet" type="text/css" href="modul/element_tag/element_tag'.MIN.'.css?'.SCRIPT.'" />'.
+	'<script src="modul/element_tag/element_tag'.MIN.'.js?'.SCRIPT.'"></script>'.
+
 	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.SCRIPT.'" />'.
 	'<script src="modul/element/element'.MIN.'.js?'.SCRIPT.'"></script>'.
 

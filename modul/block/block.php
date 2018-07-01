@@ -911,8 +911,9 @@ function _beElemVvv($el) {//вставка дополнительных знач
 				break;
 			$c = count($ids) - 1;
 			$last_id = $ids[$c];
-			if(!$el11 = $G_ELEM[$last_id])
+			if(empty($G_ELEM[$last_id]))
 				break;
+			$el11 = $G_ELEM[$last_id];
 			if(!$dlg11 = $G_DLG[$el11['dialog_id']])
 				break;
 
