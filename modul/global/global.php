@@ -1,8 +1,11 @@
 <?php
 define('TIME', microtime(true));
 
-setlocale(LC_ALL, 'ru_RU.CP1251');
+//setlocale(LC_ALL, 'ru_RU.CP1251');
+setlocale(LC_ALL, 'ru_RU.UTF-8');
+//setlocale(LC_ALL, 'Russian_Russia.65001');
 setlocale(LC_NUMERIC, 'en_US');
+//iconv_set_encoding('output_encoding'  , 'UTF-8');
 
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 define('DOMAIN', $_SERVER['SERVER_NAME']);
@@ -27,8 +30,8 @@ define('YEAR_CUR', strftime('%Y'));
 define('CODE', _txt(@$_COOKIE['code']));
 define('DEBUG', @$_COOKIE['debug']);
 
-//define('MIN', DEBUG ? '' : '.min');
-define('MIN', '');
+define('MIN', DEBUG ? '' : '.min');
+//define('MIN', '');
 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);

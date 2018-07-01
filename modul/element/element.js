@@ -1678,7 +1678,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						});
 					});
 					return;
-				//select - произвольные значения
+				//Select - фильтр
 				case 83:
 					if(!FILTER[el.num_1])
 						FILTER[el.num_1] = {};
@@ -1689,6 +1689,18 @@ var DIALOG = {},//массив диалоговых окон для управл
 						func:function(v) {
 							FILTER[el.num_1][el.id] = v;
 							_spisokUpdate(el.num_1);
+						}
+					});
+					return;
+				//Select - выбор значения списка
+				case 85:
+					$(el.attr_cmp)._select({
+						width:el.width,
+						title0:el.txt_1,
+//						spisok:el.vvv,
+						msg_empty:'Не указан список',
+						func:function(v) {
+//							_elemFunc(el, v);
 						}
 					});
 					return;

@@ -985,6 +985,19 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 				'<div class="_color-bg" style="background-color:'.$v.'"></div>';
 
+		//Select - выбор значения списка
+		case 85:
+			/*
+                num_1 - ID элемента select, который содержит списки
+                txt_1 - текст нулевого значения
+			*/
+			return _select(array(
+						'attr_id' => $attr_id,
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _num($v)
+				   ));
+
 
 
 
@@ -1088,7 +1101,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			$send = '';
 
 			foreach($ids as $n => $elem_id) {
-				$elem = _elemOne($elem_id);
+				if(!$elem = _elemOne($elem_id))
+					return '-удалено-';
 				switch($elem['dialog_id']) {
 					//многострочное поле
 					case 5:

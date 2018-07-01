@@ -338,12 +338,12 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на с
 			foreach($spisok as $sp) {
 				$child = array();
 				foreach($BLK as $id => $r) {
+					$r['elem'] = array();
 					if($r['elem_id']) {
 						$elem = $ELM[$r['elem_id']];
 						$elem['block'] = $r;
 						$r['elem'] = $elem;
-					} else
-						$r['elem'] = array();
+					}
 
 					$child[$r['parent_id']][$id] = $r;
 				}
@@ -1140,6 +1140,10 @@ function _spisok29connectGet($ids, $v) {
 
 	$ids = _ids($ids, 1);
 	$id0 = $ids[0];
+
+	if(!isset($arr[$id0]))
+		return $send;
+
 	$send['col0'] = $arr[$id0]['col'];
 	if(count($ids) == 1 && $v)
 		$send['cond'] = "`".$send['col0']."` LIKE '%".addslashes($v)."%'";

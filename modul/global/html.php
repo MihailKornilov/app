@@ -18,6 +18,7 @@ function _saDefine() {//установка флага суперпользова
 	$SA[1] = true;  //Михаил Корнилов
 //	$SA[18] = true;
 	$SA[53] = true;
+	$SA[54] = true;//Краснобаев Олег
 
 	define('SA', isset($SA[USER_ID]) ? 1 : 0);
 
@@ -287,6 +288,7 @@ function _html() {
 
 	'<head>'.
 		'<meta http-equiv="content-type" content="text/html; charset=utf-8" />'.
+//		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
 		'<title>'._html_title().'</title>'.
 		'<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">'.
 		_html_script().
