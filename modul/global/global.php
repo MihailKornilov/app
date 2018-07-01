@@ -20,6 +20,7 @@ require_once GLOBAL_DIR.'/modul/global/html.php';
 require_once GLOBAL_DIR.'/modul/global/user.php';
 require_once GLOBAL_DIR.'/modul/page/page.php';
 require_once GLOBAL_DIR.'/modul/block/block.php';
+require_once GLOBAL_DIR.'/modul/element_tag/element_tag.php';
 require_once GLOBAL_DIR.'/modul/element/element.php';
 require_once GLOBAL_DIR.'/modul/spisok/spisok.php';
 
