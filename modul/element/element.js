@@ -2966,8 +2966,6 @@ $(document)
 			delayShow:500,
 			delayHide:300
 		});
-	})
-	.ready(function() {
 	});
 
 

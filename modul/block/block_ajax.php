@@ -43,10 +43,10 @@ switch(@$_POST['op']) {
 
 		$on = _num($_POST['on']);
 
-		define('ELEM_WIDTH_CHANGE', $on);
 		define('BLOCK_EDIT', 1);
 
-		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name));
+		$unit = _pageSpisokUnit($obj_id, $obj_name) + array('elem_width_change' => $on);
+		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, $unit);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
 		jsonSuccess($send);
