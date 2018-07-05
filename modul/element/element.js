@@ -496,13 +496,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 				element_hint_access:DLG('#element_hint_access').val(),
 				element_dialog_func:DLG('#element_dialog_func').val(),
 				element_afics:DLG('#element_afics').val(),
-				element_page_paste:DLG('#element_page_paste').val(),
-				element_dialog_paste:DLG('#element_dialog_paste').val(),
-				element_spisok_paste:DLG('#element_spisok_paste').val(),
-				element_is_spisok_unit:DLG('#element_is_spisok_unit').val(),
-				element_44_access:DLG('#element_44_access').val(),
-				element_td_paste:DLG('#element_td_paste').val(),
 				element_hidden:DLG('#element_hidden').val(),
+				element_is_spisok_unit:DLG('#element_is_spisok_unit').val(),
+
+				element_paste_page:  DLG('#element_paste_page').val(),
+				element_paste_dialog:DLG('#element_paste_dialog').val(),
+				element_paste_spisok:DLG('#element_paste_spisok').val(),
+				element_paste_td:    DLG('#element_paste_td').val(),
+				element_paste_44:    DLG('#element_paste_44').val(),
 
 				menu_edit_last:DLG('#dialog-menu').val()
 			};

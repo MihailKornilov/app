@@ -311,33 +311,33 @@ switch(@$_POST['op']) {
 					'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
 					'<tr><td>'.
 						'<td>'._check(array(
-									'attr_id' => 'element_page_paste',
+									'attr_id' => 'element_paste_page',
 									'title' => 'вставка в блок страницы',
-									'value' => $dialog['element_page_paste']
+									'value' => $dialog['element_paste_page']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
-									'attr_id' => 'element_dialog_paste',
+									'attr_id' => 'element_paste_dialog',
 									'title' => 'вставка в блок диалога',
-									'value' => $dialog['element_dialog_paste']
+									'value' => $dialog['element_paste_dialog']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
-									'attr_id' => 'element_spisok_paste',
+									'attr_id' => 'element_paste_spisok',
 									'title' => 'вставка в блок шаблона списка',
-									'value' => $dialog['element_spisok_paste']
+									'value' => $dialog['element_paste_spisok']
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
-									'attr_id' => 'element_44_access',
-									'title' => 'вставка в сборный текст',
-									'value' => $dialog['element_44_access']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_td_paste',
+									'attr_id' => 'element_paste_td',
 									'title' => 'вставка в ячейку таблицы',
-									'value' => $dialog['element_td_paste']
+									'value' => $dialog['element_paste_td']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'element_paste_44',
+									'title' => 'вставка в сборный текст',
+									'value' => $dialog['element_paste_44']
 							   )).
 				'</table>'.
 
@@ -840,13 +840,15 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 	$element_hint_access = _num($_POST['element_hint_access']);
 	$element_dialog_func = _num($_POST['element_dialog_func']);
 	$element_afics = _txt($_POST['element_afics']);
-	$element_page_paste = _num($_POST['element_page_paste']);
-	$element_dialog_paste = _num($_POST['element_dialog_paste']);
-	$element_spisok_paste = _num($_POST['element_spisok_paste']);
-	$element_is_spisok_unit = _num($_POST['element_is_spisok_unit']);
-	$element_44_access = _num($_POST['element_44_access']);
-	$element_td_paste = _num($_POST['element_td_paste']);
+
 	$element_hidden = _num($_POST['element_hidden']);
+	$element_is_spisok_unit = _num($_POST['element_is_spisok_unit']);
+
+	$element_paste_page =   _num($_POST['element_paste_page']);
+	$element_paste_dialog = _num($_POST['element_paste_dialog']);
+	$element_paste_spisok = _num($_POST['element_paste_spisok']);
+	$element_paste_td = _num($_POST['element_paste_td']);
+	$element_paste_44 = _num($_POST['element_paste_44']);
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
@@ -894,13 +896,15 @@ function _dialogUpdate($dialog_id) {//обновление диалога
 				`element_hint_access`=".$element_hint_access.",
 				`element_dialog_func`=".$element_dialog_func.",
 				`element_afics`='".addslashes($element_afics)."',
-				`element_page_paste`=".$element_page_paste.",
-				`element_dialog_paste`=".$element_dialog_paste.",
-				`element_spisok_paste`=".$element_spisok_paste.",
-				`element_is_spisok_unit`=".$element_is_spisok_unit.",
-				`element_44_access`=".$element_44_access.",
-				`element_td_paste`=".$element_td_paste.",
+
 				`element_hidden`=".$element_hidden.",
+				`element_is_spisok_unit`=".$element_is_spisok_unit.",
+
+				`element_paste_page`=".$element_paste_page.",
+				`element_paste_dialog`=".$element_paste_dialog.",
+				`element_paste_spisok`=".$element_paste_spisok.",
+				`element_paste_td`=".$element_paste_td.",
+				`element_paste_44`=".$element_paste_44.",
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;

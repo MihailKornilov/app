@@ -529,7 +529,30 @@ function _elemColType($id='all') {//тип данных, используемы�
 	return $col_type[$id];
 }
 
-function _elementChoose($el, $unit) {//выбор элемента для вставки в блок
+
+function PHP12_v_from_dialog($el, $unit) {//выбор значения из диалога [86]
+	$dialog_id = 48;
+
+	if(!$dialog = _dialogQuery($dialog_id))
+		return _emptyMin('Диалога не существует, который вносит данные списка.');
+
+	$unit = array();
+
+	return
+	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
+	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit);
+}
+
+function _filterCheckSetup() {//настройка условий фильтра для галочки (подключение через [12])
+	return '';
+}
+
+
+
+
+
+/* ---=== ВЫБОР ЭЛЕМЕНТА ===--- */
+function PHP12_elem_choose($el, $unit) {//выбор элемента для вставки в блок. Диалог [50]
 	$BL['obj_name'] = $unit['source']['unit_id'] == -115 ? 'spisok' : '';
 	if($block_id = _num($unit['source']['block_id'], 1))
 		if(!$BL = _blockOne($block_id))
@@ -575,25 +598,28 @@ function _elementChoose($el, $unit) {//выбор элемента для вст
 
 	//расстановка элементов в группы с учётом правил отображения
 	foreach($elem as $id => $r) {
-		if(_44_ACCESS && !$r['element_44_access'])
+/*
+		if(_44_ACCESS && !$r['element_paste_44'])
 			continue;
-		if(TD_PASTE && !$r['element_td_paste'])
+		if(TD_PASTE && !$r['element_paste_td'])
 			continue;
 //		if(IS_SPISOK_UNIT && !$r['element_is_spisok_unit'])
 //			continue;
 
 		$show = false;
 
-		if(BLOCK_PAGE && $r['element_page_paste'])
+		if(BLOCK_PAGE && $r['element_paste_page'])
 			$show = true;
-		if(BLOCK_DIALOG && $r['element_dialog_paste'])
+		if(BLOCK_DIALOG && $r['element_paste_dialog'])
 			$show = true;
-		if(BLOCK_SPISOK && $r['element_spisok_paste'])
+		if(BLOCK_SPISOK && $r['element_paste_spisok'])
 			$show = true;
 		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
 			$show = false;
 
 		if($show)
+
+*/
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
 
@@ -662,23 +688,11 @@ function _elementChoose($el, $unit) {//выбор элемента для вст
 		$debug;
 }
 
-function PHP12_v_from_dialog($el, $unit) {//выбор значения из диалога [86]
-	$dialog_id = 48;
 
-	if(!$dialog = _dialogQuery($dialog_id))
-		return _emptyMin('Диалога не существует, который вносит данные списка.');
 
-	$unit = array();
 
-	return
-	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
-	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit);
-}
 
-function _filterCheckSetup() {//настройка условий фильтра для галочки (подключение через [12])
-	return '';
-}
-
+/* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
 function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])
 	/*
 		Заглавный элемент: -117
@@ -842,6 +856,9 @@ function _historyCondPageUnit($el) {//отображение истории дл
 
 	return " AND `unit_id` IN (".$unit_id.",".$ids.")";
 }
+
+
+
 
 
 
