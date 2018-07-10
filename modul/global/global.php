@@ -529,7 +529,8 @@ function _jsCache() {//формирование файла JS с данными 
 		$BLK[] = $block_id.':{elem_id:'.$r['elem_id'].'}';
 
 	foreach(_BE('elem_all') as $elem_id => $r) {
-		$block_id = $r['block_id'];
+		if(!$block_id = $r['block_id'])
+			continue;
 
 		$val = array();
 		$val[] = 'name:"'.addslashes($r['name']).'"';

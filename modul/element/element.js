@@ -575,9 +575,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						case 19://наполнение для некоторых компонентов
 							send.cmpv[id] = _cmpV19(sp, 1);
 							return;
-						case 30://Настройка ТАБЛИЧНОГО содержания списка
-							send.cmpv[id] = _cmpV30(sp, 'get');
-							break;
 						case 37://SA: Select - выбор имени колонки
 							send.cmp[id] = $(sp.attr_cmp)._select('inp');
 							return;
@@ -603,7 +600,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				if(o.func)
 					return o.func(res);
 
-//return;
+return;
 
 				switch(res.action_id) {
 					case 1: location.reload(); break;
@@ -1027,8 +1024,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						};
 					$(el.attr_cmp)._select(o);
 					return;
-				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ТАБЛИЧНОГО содержания списка
-				case 30: _cmpV30(el, unit); return;
 				//Выбор значений для содержания Select
 				case 31:
 					var sv = $(el.attr_el).find('.sv'),
@@ -1793,7 +1788,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 			NUM++;
 		}
 	},
-	_cmpV30 = function(o, unit) {//Настройка ТАБЛИЧНОГО содержания списка. dialog_id=30
+	_cmpV30_ = function(o, unit) {//Настройка ТАБЛИЧНОГО содержания списка. dialog_id=30
+/*
 		if(unit == 'get') {//получение данных для сохранения
 			var send = {};
 			_forN(TABLE30, function(sp) {
@@ -1812,10 +1808,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 		}
 
 		window.TABLE30 = [];
-
+*/
 		if(!unit.block_id)
 			return {};
-
+/*
 		var el = $(o.attr_el),
 			cmp = $(o.attr_cmp),
 			html = '<dl></dl>' +
@@ -1823,13 +1819,18 @@ var DIALOG = {},//массив диалоговых окон для управл
 			DL = el.append(html).find('dl'),
 			BUT_ADD = el.find('div:last'),
 			NUM = 1;
+*/
 
+/*
 		$('#cmp_531')._check({//показ-скрытие настройки заголовков
 			func:function(v) {
 				unit.num_5 = v;
 				DL.find('.div-inp-tr')['slide' + (v ? 'Down' : 'Up')]();
 			}
 		});
+*/
+
+/*
 		BUT_ADD.click(function() {
 			valueAdd();
 		});
@@ -1937,6 +1938,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 			NUM++;
 			TABLE30.push(v);
 		}
+*/
+
+/*
 		function valueResize(v) {//включение изменения ширины, если есть значение
 			if(!v.id)
 				return;
@@ -1952,6 +1956,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 				}
 			});
 		}
+*/
+
+/*
 		function cmpUpdate() {//обновление значения компонента
 			var val = [];
 			_forEq(el.find('dd'), function(sp) {
@@ -1962,6 +1969,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 			cmp.val(val);
 		}
+*/
 	},
 	_cmpV49 = function(o, unit) {//Настройка содержания Сборного текста [44]
 		var el = $(o.attr_el);
@@ -2520,6 +2528,178 @@ var DIALOG = {},//массив диалоговых окон для управл
 		});
 
 		return arr;
+	},
+
+	/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ ===--- */
+	PHP12_spisok_td_setting = function(el, unit) {//настройка ячеек таблицы
+		if(unit == 'get')
+			return PHP12_spisok_td_get(el);
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
+			DL = $(el.attr_el).append(html).find('dl'),
+			NUM = 1;
+
+		//кнопка добавления новой ячейки
+		$(el.attr_el).find('div:last').click(tdAdd);
+
+		//показ-скрытие настройки TH-заголовков
+		$('#cmp_531')._check({
+			func:function(v) {
+				unit.num_5 = v;
+				DL.find('.div-th-name')['slide' + (v ? 'Down' : 'Up')]();
+			}
+		});
+
+		console.log(el.vvv);
+
+		for(var i in el.vvv)
+			tdAdd(el.vvv[i])
+
+		//добавление новой колонки в таблицу
+		function tdAdd(v) {
+			v = $.extend({
+				id:0,           //id элемента
+				dialog_id:50,   //id диалога, через который был вставлен этот элемент
+				name:'',        //имя значения
+				width:150,      //ширина колонки
+				font:'',        //выделение: b, i, u
+				color:'',       //цвет текста
+				url:0,          //текст в колонке является ссылкой
+				txt_7:'',       //имя колонки
+				txt_8:''        //позиция по горизонтали (l, center, r)
+			}, v.id ? v : {});
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w80 grey r topi">Колонка ' + NUM + ':' +
+							'<td><div style="width:' + v.width + 'px">' +
+									'<div class="div-th-name' + _dn(unit.num_5) + '">' +
+										'<input type="text"' +
+											  ' id="tr_' + NUM + '"' +
+											  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
+											  ' placeholder="имя колонки"' +
+											  ' value="' + v.txt_7 + '"' +
+										' />' +
+									'</div>' +
+									'<input type="text"' +
+										  ' id="inp_' + NUM + '"' +
+										  ' class="inp w100p curP ' + v.font + ' ' + v.color + ' ' + v.txt_8 + '"' +
+										  ' readonly' +
+										  ' placeholder="значение не выбрано"' +
+										  ' value="' + v.name + '"' +
+									' />' +
+								'</div>' +
+							'<td class="w50 r top pt5">' +
+								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var INP = $('#inp_' + NUM),
+				DD = DL.find('dd:last');
+//			tdResize(v);
+
+			//открытие диалога для выбора элемента или его редактирования
+			INP.click(function() {
+				_dialogLoad({
+					dialog_id:v.dialog_id,
+					block_id:unit.source.block_id,  //блок, в котором размещена таблица
+					unit_id:v.id,                   //id выбранного элемента (при редактировании)
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_save:function(ia) {
+						DD.attr('val', ia.unit.id);
+						v.id = ia.unit.id;
+						v.dialog_id = ia.unit.dialog_id;
+						INP.val(ia.unit.title);
+//						tdResize(v);
+					}
+				});
+			});
+
+			//отображение выплывающего окна настройки стилей
+			INP.mouseenter(function() {
+				if(INP.hasClass('_busy'))
+					return;
+				if(!INP.parent().hasClass('ui-resizable'))
+					return;
+				if(INP.parent().hasClass('ui-resizable-resizing'))
+					return;
+				INP._hint({
+					msg:'<table class="bs5">' +
+							'<tr><td class="pt3">' + _elemUnitFont(v) +
+								'<td class="pt3">' + _elemUnitColor(v) +
+								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
+						'</table>' +
+						'',
+					side:'right',
+					show:1,
+					delayShow:700,
+					delayHide:300
+				});
+			});
+
+			//сортировка колонок
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-move-y'
+			});
+
+			//удаление элемента
+			DL.find('.icon-del:last').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+			});
+			NUM++;
+		}
+
+		//включение изменения ширины, если присутствует значение
+		function tdResize(v) {
+			if(!v.id)
+				return;
+			if($(v.attr_el).parent().hasClass('ui-resizable'))
+				return;
+			$(v.attr_el).parent().resizable({
+				minWidth:40,
+				maxWidth:400,
+				grid:10,
+				handles:'e',
+				stop:function(e, ui) {
+					v.width = ui.size.width;
+				}
+			});
+		}
+	},
+	PHP12_spisok_td_get = function(el) {//сохранение ячеек таблицы
+		var send = [];
+		_forEq($(el.attr_el).find('dd'), function(sp) {
+			var v = {},
+				inp = sp.find('.inp');
+
+			v.id = _num(sp.attr('val'));
+
+//			if(!v.id)
+//				return;
+
+			v.width = _num(sp.find('.div-th-name').parent().width());
+			v.txt_7 = sp.find('.th-name').val();
+
+			/*
+				font:sp.font,
+				color:sp.color,
+				txt_8:sp.txt_8,
+				url:sp.url
+
+*/
+			send.push(v);
+		});
+
+		console.log(send);
+		return send;
 	},
 
 	_elemGroup = function(v, dlg) {//функция, которая выполняется после открытия окна выбора элемента

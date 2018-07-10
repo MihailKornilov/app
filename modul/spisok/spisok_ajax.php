@@ -329,15 +329,14 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 			//---=== ДЕЙСТВИЯ ПРИ НАСТРОЙКИ ЭЛЕМЕНТОВ ===---
 			//конкретная функция
 			case 12:
-				$funcSave = $cmp['txt_1'].'Save';
-				if(!function_exists($funcSave))
+				$func = $cmp['txt_1'].'_save';
+				if(!function_exists($func))
 					break;
-				$funcSave($cmp, $cmpv[$cmp_id], $unit);
+				$func($cmp, $cmpv[$cmp_id], $unit);
 				break;
 			//наполнение для некоторых компонентов: radio, select, dropdown
 			case 19: _cmpV19($cmpv[$cmp_id], $unit); break;
 			//Настройка ТАБЛИЧНОГО содержания списка
-			case 30: _cmpV30($cmp, $cmpv[$cmp_id], $unit); break;
 			case 49: _cmpV49($cmp, $cmpv[$cmp_id], $unit); break;
 			//Настройка суммы значений единицы списка
 			case 56: _cmpV56($cmp, $cmpv[$cmp_id], $unit); break;
@@ -364,8 +363,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 			_BE('elem_clear');
 
 	if(IS_ELEM) {
-//		echo $unit_id;
 		$elem = _elemOne($unit_id);
+//		print_r($elem);
 		if($elem['block'])
 			_BE('block_clear');
 		$unit['title'] = _elemTitle($unit_id);
@@ -475,22 +474,28 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 		return 0;
 
 	$page_id = _num($_POST['page_id']);
+	$parent_id = 0;//группировка в таблице _element
 
 	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
 	if(IS_ELEM && $block_id > 0 && !$unit_id) {
-//		_cacheClear('BLK_'.$block_id);
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока не сущетвует');
-		if($block['elem'])
-			jsonError('В блоке уже есть элемент');
+		if($elem = $block['elem']) {
+			//исходный элемент является таблицей
+			if($elem['dialog_id'] == 23) {
+				$block_id = 0;
+				$parent_id = $elem['id'];
+			} else
+				jsonError('В блоке уже есть элемент');
+		}
 	}
 
 	$sql = "INSERT INTO `"._table($dialog['table_1'])."` (`id`) VALUES (0)";
 	query($sql);
 
 	//подмена id блока отрицательным значением для группировки
-	if($unit_id < 0)
-		$block_id = $unit_id;
+//	if($unit_id < 0)
+//		$block_id = $unit_id;
 
 	$unit_id = query_insert_id(_table($dialog['table_1']));
 
@@ -532,6 +537,13 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 		if($field == 'block_id' && $block_id) {
 			$sql = "UPDATE `"._table($dialog['table_1'])."`
 					SET `block_id`=".$block_id."
+					WHERE `id`=".$unit_id;
+			query($sql);
+			continue;
+		}
+		if($field == 'parent_id' && $parent_id && _table($dialog['table_1']) == '_element') {
+			$sql = "UPDATE `"._table($dialog['table_1'])."`
+					SET `parent_id`=".$parent_id."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;
@@ -755,7 +767,7 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавле
 
 	$elem = _elemOne($unit_id);
 
-	if($elem['block_id'] < 0)
+	if(!$elem['block_id'])
 		return $send;
 
 	$send['block_obj_name'] = $elem['block']['obj_name'];
@@ -866,51 +878,6 @@ function _cmpV19($val, $unit) {//наполнение для некоторых 
 	$sql = "UPDATE `_element`
 			SET `def`=".$def."
 			WHERE `id`=".$unit['id'];
-	query($sql);
-}
-function _cmpV30($cmp, $val, $unit) {//сохранение настройки ТАБЛИЧНОГО содержания списка (30)
-	/*
-		-112
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
-	*/
-	if(empty($cmp['col']))
-		return;
-
-	//поле, хранящее список id элементов-значений
-	$col = $cmp['col'];
-	$ids = $unit[$col] ? $unit[$col] : 0;
-
-	//удаление значений, которые были удалены при настройке
-	$sql = "DELETE FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `id` NOT IN (".$ids.")";
-	query($sql);
-
-	if(!$ids)
-		return;
-
-	$sort = 0;
-	foreach(_ids($ids, 1) as $id) {
-		$r = $val[$id];
-		$sql = "UPDATE `_element`
-				SET `block_id`=-".$unit['id'].",
-					`width`="._num($r['width']).",
-					`txt_7`='".addslashes(_txt($r['tr']))."',
-					`font`='".$r['font']."',
-					`color`='".$r['color']."',
-					`txt_8`='".$r['pos']."',
-					`url`="._num($r['url']).",
-					`sort`=".$sort++."
-				WHERE `id`=".$id;
-		query($sql);
-	}
-
-	//очистка неиспользованных элементов
-	$sql = "DELETE FROM `_element`
-			WHERE `user_id_add`=".USER_ID."
-			  AND `block_id` IN (0,-112)";
 	query($sql);
 }
 function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
@@ -1097,7 +1064,7 @@ function _cmpV60($cmp, $unit) {//Применение загруженных и�
 		query($sql);
 	}
 }
-function _filterCheckSetupSave($cmp, $val, $unit) {//сохранение настройки фильтра для галочки. Подключаемая функция [12]
+function _filterCheckSetup_save($cmp, $val, $unit) {//сохранение настройки фильтра для галочки. Подключаемая функция [12]
 	/*
 		-114
 		$cmp  - компонент из диалога, отвечающий за настройку таблицы
@@ -1155,7 +1122,7 @@ function _filterCheckSetupSave($cmp, $val, $unit) {//сохранение нас
 			  AND `block_id` IN (0,-114)";
 	query($sql);
 }
-function _historySetupSave($cmp, $val, $unit) {//сохранение настройки шаблона истории действий. Подключаемая функция [12]
+function _historySetup_save($cmp, $val, $unit) {//сохранение настройки шаблона истории действий. Подключаемая функция [12]
 	/*
 		-115
 		$cmp  - компонент из диалога, отвечающий за настройку таблицы
@@ -1244,7 +1211,7 @@ function _historySetupSave($cmp, $val, $unit) {//сохранение настр
 			  AND `dialog_id`=".$dlg_id;
 	query($sql);
 }
-function _pageUserAccessSave($cmp, $val, $unit) {//сохранение доступа к страницам для конкретного пользователя
+function _pageUserAccess_save($cmp, $val, $unit) {//сохранение доступа к страницам для конкретного пользователя
 	if(!is_array($val))
 		return;
 	if(!$user_id = @$val['user_id'])
@@ -1285,7 +1252,7 @@ function _pageUserAccessSave($cmp, $val, $unit) {//сохранение дост
 	_cache_clear( 'page');
 	_cache_clear( 'user'.$user_id);
 }
-function _pageUserAccessAllSave($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
+function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
 	$sql = "UPDATE `_spisok`
 			SET `num_1`=0
 			WHERE `app_id`=".APP_ID."

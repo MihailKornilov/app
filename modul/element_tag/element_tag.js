@@ -84,7 +84,7 @@ $.fn._check = function(o) {
 				light:nx.hasClass('light'),
 				block:nx.hasClass('block')
 			}, o);
-			nx.removeClass('_check title light block disabled on');
+			nx.removeClass('_check title light block disabled on php');
 			cls = ' ' + nx.attr('class');
 			nx.remove();
 		}

@@ -551,30 +551,59 @@ function _filterCheckSetup() {//настройка условий фильтра
 
 
 
-/* ---=== ВЫБОР ЭЛЕМЕНТА ===--- */
+/* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 function PHP12_elem_choose($el, $unit) {//выбор элемента для вставки в блок. Диалог [50]
+	if(empty($unit['source']))
+		return _emptyMin('Отсутствуют исходные данные.');
+
+	$SRC = $unit['source'];
+
+	//данные исходного блока
+	$BL = _blockOne($SRC['block_id']);
+	$EL = $BL['elem'];
+
+	define('OBJ_ID', _num($BL['obj_id']));
+
+	//ячейка таблицы
+	define('TD_UNIT', $EL && $EL['dialog_id'] == 23);
+
+	//блок со страницы
+	define('BLOCK_PAGE', !TD_UNIT && $BL['obj_name'] == 'page');
+
+	//блок из диалога
+	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
+
+	//блок единицы списка
+	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
+
+	//сборный текст
+	define('_44_UNIT', 0);
+
+	//принимает ли страница значения единицы списка
+	$spisok_id = 0;
+	if(BLOCK_PAGE) {
+		$page = _page(OBJ_ID);
+		$spisok_id = $page['spisok_id'];
+	}
+	define('PAGE_SPISOK_UNIT', $spisok_id);
+
+	//принимает ли диалог значения единицы списка
+	define('DIALOG_SPISOK_UNIT', 0);
+
+/*
 	$BL['obj_name'] = $unit['source']['unit_id'] == -115 ? 'spisok' : '';
 	if($block_id = _num($unit['source']['block_id'], 1))
 		if(!$BL = _blockOne($block_id))
 			return _emptyMin('Исходного блока id'.$block_id.' не существует.');
 
-	define('BLOCK_PAGE',   $BL['obj_name'] == 'page');
-	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
-	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
 	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//сборный текст, шаблон истории действий
-	define('TD_PASTE', $unit['source']['unit_id'] == -112 || $unit['source']['unit_id'] == -115); //ячейка таблицы
 
-	//определение, принимает ли страница значения списка
-	$spisok_exist = false;
-	if(BLOCK_PAGE) {
-		$page = _page($BL['obj_id']);
-		$spisok_exist = $page['spisok_id'];
-	}
 	if(BLOCK_DIALOG) {
 		$page = _page($unit['source']['page_id']);
 		$spisok_exist = $page['spisok_id'];
 	}
 	define('IS_SPISOK_UNIT', BLOCK_SPISOK || TD_PASTE || $spisok_exist);
+*/
 
 	$head = '';
 	$content = '';
@@ -601,49 +630,31 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 /*
 		if(_44_ACCESS && !$r['element_paste_44'])
 			continue;
-		if(TD_PASTE && !$r['element_paste_td'])
-			continue;
 //		if(IS_SPISOK_UNIT && !$r['element_is_spisok_unit'])
 //			continue;
+*/
 
 		$show = false;
 
-		if(BLOCK_PAGE && $r['element_paste_page'])
-			$show = true;
-		if(BLOCK_DIALOG && $r['element_paste_dialog'])
-			$show = true;
-		if(BLOCK_SPISOK && $r['element_paste_spisok'])
-			$show = true;
-		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
-			$show = false;
+		if(BLOCK_PAGE && $r['element_paste_page']
+		|| BLOCK_DIALOG && $r['element_paste_dialog']
+		|| BLOCK_SPISOK && $r['element_paste_spisok']
+		|| TD_UNIT && $r['element_paste_td']
+		) $show = true;
+
+//		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
+//			$show = false;
 
 		if($show)
-
-*/
 			$group[$r['element_group_id']]['elem'][] = $r;
 	}
-
-	$debug =
-		(DEBUG ?
-			'<div class="line-t pad10 bg-ffe">'.
-				'<div class="'.(BLOCK_PAGE ? 'color-pay b' : 'pale').'">BLOCK_PAGE</div>'.
-				'<div class="'.(BLOCK_DIALOG ? 'color-pay b' : 'pale').'">BLOCK_DIALOG</div>'.
-				'<div class="'.(BLOCK_SPISOK ? 'color-pay b' : 'pale').'">BLOCK_SPISOK</div>'.
-				'<div class="'.($spisok_exist ? 'color-pay b' : 'pale').'">$spisok_exist</div>'.
-				'<div class="'.(IS_SPISOK_UNIT ? 'color-pay b' : 'pale').'">IS_SPISOK_UNIT</div>'.
-				'<div class="'.(_44_ACCESS ? 'color-pay b' : 'pale').'">_44_ACCESS</div>'.
-				'<div class="'.(TD_PASTE ? 'color-pay b' : 'pale').'">TD_PASTE</div>'.
-				_pr($unit).
-//				_pr($BL).
-			'</div>'
-		: '');
 
 	foreach($group as $id => $r)
 		if(empty($r['elem']))
 			unset($group[$id]);
 
 	if(empty($group))
-		return _emptyMin('Нет элементов для отображения.').$debug;
+		return _emptyMin('Нет элементов для отображения.');
 
 	reset($group);
 	$firstId = key($group);
@@ -685,12 +696,144 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 				'<td id="elem-group-content" class="top">'.
 					'<div class="cnt-div">'.$content.'<div>'.
 		'</table>'.
-		$debug;
+		_elem_choose_gebug($el, $unit).
+		'';
+}
+function _elem_choose_gebug($el, $unit) {//выбор элемента - группы
+	if(!DEBUG)
+		return '';
+
+	$SRC = $unit['source'];
+	$block_id = $SRC['block_id'];
+	$BL = _blockOne($SRC['block_id']);
+
+	return
+//	_pr($unit).
+//	_pr($BL).
+	'<div class="line-t pad10 bg-ffe">'.
+		'<div class="'.(BLOCK_PAGE ? 'color-pay b' : 'pale').'">'.
+			'Блок '.(BLOCK_PAGE ? $block_id : '').' на странице '.
+			(BLOCK_PAGE ? OBJ_ID : '').
+		'</div>'.
+
+		'<div class="'.(PAGE_SPISOK_UNIT ? 'color-pay b' : 'pale').'">'.
+			'Страница '.(PAGE_SPISOK_UNIT ? '' : 'не ').'принимает значения списка'.
+			(PAGE_SPISOK_UNIT ? ' из диалога '.PAGE_SPISOK_UNIT : '').
+		'</div>'.
+
+		'<div class="mt10 '.(BLOCK_DIALOG ? 'color-pay b' : 'pale').'">'.
+			'Блок '.(BLOCK_DIALOG ? $block_id : '').' в диалоге '.
+			(BLOCK_DIALOG ? OBJ_ID : '').
+		'</div>'.
+
+		'<div class="'.(DIALOG_SPISOK_UNIT ? 'color-pay b' : 'pale').'">'.
+			'Диалог '.(DIALOG_SPISOK_UNIT ? '' : 'не ').'принимает значения списка'.
+		'</div>'.
+
+		'<div class="mt10 '.(BLOCK_SPISOK ? 'color-pay b' : 'pale').'">'.
+			'Блок '.(BLOCK_SPISOK ? $block_id : '').' из единицы списка'.
+			(BLOCK_SPISOK ? '. Список размещён в блоке '.OBJ_ID : '').
+		'</div>'.
+
+		'<div class="'.(TD_UNIT ? 'color-pay b' : 'pale').'">'.
+			'Ячейка таблицы'.
+			(TD_UNIT ? '. Элемент(таблица) '.$BL['elem_id'].' размещён в блоке '.$block_id : '').
+		'</div>'.
+
+		'<div class="'.(_44_UNIT ? 'color-pay b' : 'pale').'">Сборный текст</div>'.
+	'</div>';
 }
 
 
+/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ ===--- */
+function PHP12_spisok_td_setting($el, $unit) {//используется в диалоге [23]
+	/*
+		все действия через JS
 
+		имя объекта: spisok
+		 id объекта: block_id, в котором размещается список
+	*/
 
+//	return _pr($unit);
+
+	if(empty($unit['id']))
+		return '<div class="_empty min">Настройка таблицы будет доступна после вставки списка в блок.</div>';
+
+	return '';
+}
+function PHP12_spisok_td_setting_save($cmp, $val, $unit) {//сохранение данных ячеек таблицы
+	/*
+		$cmp  - компонент из диалога, отвечающий за настройку ячеек таблицы
+		$val  - значения, полученные для сохранения
+		$unit - элемент, в которой размещается таблица
+
+		Данные колонок таблицы записываются в _element
+		parent_id = $unit['id'] (ID элемента-таблицы [23])
+
+		num_8 - флаг активности ячейки. Если 1 - ячейка настроена и активна
+	*/
+
+	if(empty($unit['id']))
+		return;
+
+	//Сброс флага активности ячейки
+	$sql = "UPDATE `_element`
+			SET `num_8`=0
+			WHERE `parent_id`=".$unit['id'];
+	query($sql);
+
+	if(!empty($val) && is_array($val))
+		foreach($val as $sort => $r) {
+			if(!$id = _num($r['id']))
+				continue;
+/*
+					`font`='".$r['font']."',
+					`color`='".$r['color']."',
+					`url`="._num($r['url']).",
+					`txt_8`='".$r['pos']."',
+*/
+			$sql = "UPDATE `_element`
+					SET `num_8`=1,
+						`width`="._num($r['width']).",
+						`txt_7`='".addslashes(_txt($r['txt_7']))."',
+						`sort`=".$sort."
+					WHERE `parent_id`=".$unit['id']."
+					  AND `id`=".$id;
+			query($sql);
+		}
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$unit['id']."
+			  AND !`num_8`";
+	query($sql);
+}
+function PHP12_spisok_td_setting_vvv($parent_id) {//получение данных ячеек таблицы
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `num_8`
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$send = array();
+	foreach($arr as $r) {
+		$send[] = array(
+			'id' => _num($r['id']),
+			'dialog_id' => _num($r['dialog_id']),
+			'name' => _elemTitle($r['id']),
+			'width' => _num($r['width']),
+			'font' => $r['font'],
+			'color' => $r['color'],
+			'url' => _num($r['url']),
+			'txt_7' => $r['txt_7'],
+			'txt_8' => $r['txt_8']
+		);
+	}
+
+	return $send;
+}
 
 /* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
 function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])

@@ -1206,9 +1206,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				num_6 - возможность сортировки строк таблицы (если установлена, длина списка становится 200)
 				num_7 - уровни сортировки (1,2,3)
 				num_8 - показывать только те значения, которые принимает текущая страница
-				txt_2 - ids элементов через запятую. Сами элементы хранятся в таблице _element
 
-				настройка шаблона через вспомогательный элемент: dialig_id=30
+				настройка шаблона через функцию PHP12_spisok_td_setting
 			*/
 			if(PAS) {
 				$dialog = _dialogQuery($el['num_1']);
@@ -1426,17 +1425,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			'<input type="hidden" class="dlg26" value="'.$dialog_id.'" />'.
 			'<script>ELM'.$dialog_id.'='._BE('elem_js', 'dialog', $dialog_id).';</script>';
 
-		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка ТАБЛИЧНОГО содержания списка
-		case 30:
-			/*
-				имя объекта: spisok
-				 id объекта: block_id, в котором размещается список
-			*/
-			if(!$UNIT_ISSET)
-				return '<div class="_empty min">Настройка таблицы будет доступна после вставки списка в блок.</div>';
-
-			//все действия через JS
-			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
+		//
+		case 30: return '30 - свободно';
 
 		//Значение списка: порядковый номер
 		case 32: return _spisokUnitNum($el, $unit);
@@ -1984,7 +1974,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			return array();
 
 		$send = $G_ELEM[$i1];
-		$send['block'] = $G_BLOCK[$send['block_id']];
+		$send['block'] = $send['block_id'] ? $G_BLOCK[$send['block_id']] : array();
 
 		return $send;
 	}
@@ -2096,12 +2086,12 @@ function _beBlockType($type) {//получение данных о блоках 
 		$sql = "SELECT `id`
 				FROM `_".$type."`
 				WHERE !`app_id`";
-		$page_ids = query_ids($sql);
+		$obj_ids = query_ids($sql);
 
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `obj_name`='".$type."'
-				  AND `obj_id` IN (".$page_ids.")
+				  AND `obj_id` IN (".$obj_ids.")
 				ORDER BY `parent_id`,`y`,`x`";
 		$block_global = query_arr($sql);
 		$block_global = _beBlockForming($block_global);
@@ -2122,12 +2112,12 @@ function _beBlockType($type) {//получение данных о блоках 
 		$sql = "SELECT `id`
 				FROM `_".$type."`
 				WHERE `app_id`=".APP_ID;
-		$page_ids = query_ids($sql);
+		$obj_ids = query_ids($sql);
 
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `obj_name`='".$type."'
-				  AND `obj_id` IN (".$page_ids.")";
+				  AND `obj_id` IN (".$obj_ids.")";
 		$block_app = query_arr($sql);
 		$block_app = _beBlockForming($block_app);
 		$block_app = _beElemIdSet($block_app);
@@ -2269,10 +2259,16 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 				GROUP BY `block_id`";
 		$isFunc = query_ass($sql);
 
+		//переменная для сбора ID элементов-таблиц
+		$elem23 = array();
+
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `block_id` IN ("._idsGet($BLK).")";
 		foreach(query_arr($sql) as $elem_id => $el) {
+			if($el['dialog_id'] == 23)
+				$elem23[] = $elem_id;
+
 			$el['hidden'] = 0;
 
 			unset($el['sort']);
@@ -2319,6 +2315,26 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 			$el['vvv'] = array();//значения для некоторых компонентов
 
 			$ELM[$elem_id] = $el;
+		}
+
+		//элементы-ячейки таблиц
+		if(!empty($elem23)) {
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE !`block_id`
+					  AND `parent_id` IN (".implode(',', array_unique($elem23)).")";
+			foreach(query_arr($sql) as $elem_id => $el) {
+				unset($el['sort']);
+				unset($el['user_id_add']);
+				unset($el['dtime_add']);
+				unset($el['hint_msg']);
+				unset($el['hint_side']);
+				unset($el['hint_obj_pos_h']);
+				unset($el['hint_obj_pos_v']);
+				unset($el['hint_delay_show']);
+				unset($el['hint_delay_hide']);
+				$ELM[$elem_id] = $el;
+			}
 		}
 
 		$sql = "SELECT *

@@ -1003,9 +1003,12 @@ function _dialogOpenLoad($dialog_id) {
 		switch($cmp['dialog_id']) {
 			//подключаемая функция
 			case 12:
+				$func = $cmp['txt_1'].'_vvv';
+				if(!function_exists($func))
+					break;
 				if(!$unit_id)
 					break;
-
+/*
 				$sql = "SELECT *
 						FROM `_element`
 						WHERE `block_id`=-".$unit_id."
@@ -1025,8 +1028,8 @@ function _dialogOpenLoad($dialog_id) {
 						'txt_8' => $r['txt_8']
 					);
 				}
-
-				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
+*/
+				$dialog['cmp'][$cmp_id]['vvv'] = $func($unit_id);
 				break;
 			//значения для select, radio, dropdown
 			case 19:
@@ -1102,37 +1105,6 @@ function _dialogOpenLoad($dialog_id) {
 				} else
 					$sel_id = _spisokCmpConnectIdGet($cmp);
 				$dialog['cmp'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
-				break;
-			//настройка ТАБЛИЧНОГО содержания списка
-			case 30:
-				if(!$unit_id)
-					break;
-				if(!$col = $cmp['col'])
-					break;
-				if(!$ids = $unit[$col])
-					break;
-				$sql = "SELECT *
-						FROM `_element`
-						WHERE `id` IN (".$ids.")
-						ORDER BY `sort`";
-				if(!$arr = query_arr($sql))
-					break;
-
-				$spisok = array();
-				foreach($arr as $r) {
-					$spisok[] = array(
-						'id' => _num($r['id']),
-						'dialog_id' => _num($r['dialog_id']),
-						'width' => _num($r['width']),
-						'tr' => $r['txt_7'],
-						'title' => _elemTitle($r['id']),
-						'font' => $r['font'],
-						'color' => $r['color'],
-						'pos' => $r['txt_8'],
-						'url' => _num($r['url']),
-					);
-				}
-				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
 			//SA: select - выбор имени колонки
 			case 37:
