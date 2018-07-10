@@ -787,15 +787,15 @@ function PHP12_spisok_td_setting_save($cmp, $val, $unit) {//сохранение
 			if(!$id = _num($r['id']))
 				continue;
 /*
-					`font`='".$r['font']."',
-					`color`='".$r['color']."',
 					`url`="._num($r['url']).",
-					`txt_8`='".$r['pos']."',
 */
 			$sql = "UPDATE `_element`
 					SET `num_8`=1,
 						`width`="._num($r['width']).",
+						`font`='".$r['font']."',
+						`color`='".$r['color']."',
 						`txt_7`='".addslashes(_txt($r['txt_7']))."',
+						`txt_8`='".$r['pos']."',
 						`sort`=".$sort."
 					WHERE `parent_id`=".$unit['id']."
 					  AND `id`=".$id;
@@ -828,7 +828,7 @@ function PHP12_spisok_td_setting_vvv($parent_id) {//получение данн�
 			'color' => $r['color'],
 			'url' => _num($r['url']),
 			'txt_7' => $r['txt_7'],
-			'txt_8' => $r['txt_8']
+			'pos' => $r['txt_8']
 		);
 	}
 

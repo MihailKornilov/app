@@ -1354,6 +1354,12 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send['blk'] = $dialog['blk'];
 	$send['cmp'] = $dialog['cmp'];
+
+	//переделка значений $unit в INT, если есть
+	foreach($unit as $k => $v)
+		if(!is_array($v))
+			if(preg_match(REGEXP_INTEGER, $v))
+				$unit[$k] = _num($v, 1);
 	$send['unit'] = $unit;
 
 	//проверка доступа внесения новой записи
