@@ -1406,8 +1406,27 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			'<input type="hidden" class="dlg26" value="'.$dialog_id.'" />'.
 			'<script>ELM'.$dialog_id.'='._BE('elem_js', 'dialog', $dialog_id).';</script>';
 
-		//
-		case 30: return '30 - свободно';
+		//Иконка удаления
+		case 30:
+			/*
+				num_1 - иконка красного цвета
+			*/
+
+			if(!$UNIT_ISSET)
+				return 'del';
+
+			$dialog = _dialogQuery($unit['dialog_id']);
+
+			//если редактирование запрещено, иконка не выводится
+			if(!$dialog['del_on'])
+				return '';
+
+			return
+			_iconDel(array(
+				'red' => $el['num_1'],
+				'class' => 'dialog-open pl',
+				'val' => 'dialog_id:'.$unit['dialog_id'].',unit_id:'.$unit['id'].',del:1'
+			));
 
 		//Значение списка: порядковый номер
 		case 32: return _spisokUnitNum($el, $unit);
@@ -1429,12 +1448,22 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			return _spisokUnitData($el, $unit);
 
-		//Значение списка: иконки управления
+		//Значение списка: иконка редактирования
 		case 34:
 			if(!$UNIT_ISSET)
 				return 'edit';
 
-			return _spisokUnitIconEdit($el, $unit['id']);
+			$dialog = _dialogQuery($unit['dialog_id']);
+
+			//если редактирование запрещено, иконка не выводится
+			if(!$dialog['edit_on'])
+				return '';
+
+			return
+			_iconEdit(array(
+				'class' => 'dialog-open pl',
+				'val' => 'dialog_id:'.$unit['dialog_id'].',unit_id:'.$unit['id']
+			));
 
 		//Иконка вопрос: Выплывающая подсказка
 		case 42:

@@ -262,7 +262,7 @@ switch(@$_POST['op']) {
 		if(!$block_id = _num($_POST['id']))
 			jsonError('Некорректный ID блока');
 
-		$sa = _num($_POST['sa']);
+		$sa = _bool($_POST['sa']);
 		$width_auto = _num($_POST['width_auto']);
 		$pos = _txt($_POST['pos']);
 		$bg = _txt($_POST['bg']);

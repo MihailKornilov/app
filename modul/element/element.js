@@ -2483,7 +2483,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			if(res.hasClass('ui-resizable'))
 				return;
 			res.resizable({
-				minWidth:40,
+				minWidth:30,
 				maxWidth:400,
 				grid:10,
 				handles:'e'

@@ -45,9 +45,10 @@ function _iconDel($v=array()) {//иконка удаления записи в �
 
 	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
 	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
+	$red = empty($v['red']) ? '' : '-red';
 	$cls = empty($v['class']) ? '' : ' '.$v['class'];
 
-	return '<div'.$click.$val.' class="icon icon-del'.$cls._tooltip('Удалить', -42, 'r').'</div>';
+	return '<div'.$click.$val.' class="icon icon-del'.$red.$cls._tooltip('Удалить', -42, 'r').'</div>';
 }
 
 function _colorJS() {//массив цветов для текста в формате JS, доступных элементам
