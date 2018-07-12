@@ -164,12 +164,11 @@ var ZINDEX = 1000,
 	},
 	_copySel = function(arr, id) {//копирование массива для селекта. Если указан id - игнорируется
 		var send = [];
-		for(var n = 0; n < arr.length; n++) {
-			var sp = arr[n];
-			if(sp.uid == id)
-				continue;
+		_forN(arr, function(sp) {
+			if(!sp.info && sp.id == id)
+				return;
 			send.push(sp);
-		}
+		});
 		return send;
 	},
 	_copyObj = function(arr) {//копирование ассоциативного массива

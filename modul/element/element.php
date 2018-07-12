@@ -499,6 +499,7 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 		case 59: return _dialogParam($el['num_1'], 'name');
 		case 32: return 'номер';
 		case 33: return 'дата/время';
+		case 30: return 'del';
 		case 34: return 'edit';
 		case 60: return _imageNo($el_parent['width']);
 		case 62: return 'Фильтр-галочка';
@@ -506,6 +507,7 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 //			_BE('dialog_clear');
 			$dlg = _dialogQuery($el['num_2']);
 			return $dlg['history'][$el['num_1']]['tmp'];
+		case 71: return 'sort';
 	}
 	return $el['name'];
 }

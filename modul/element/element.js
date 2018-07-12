@@ -694,10 +694,19 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//select - выбор страницы
 				case 6:
 					_elemFunc(el, _num(unit[el.col]), 1);
+					var spisok = _copySel(PAGE_LIST);
+
+					//если выбирается страница для ссылки, то добавляется вариант: 3 => Автоматически
+					if(el.id == 1959)
+						spisok.unshift({
+							id:3,
+							title:'Автоматически'
+						});
+
 					$(el.attr_cmp)._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:PAGE_LIST,
+						spisok:spisok,
 						func:function(v) {
 							_elemFunc(el, v);
 						}

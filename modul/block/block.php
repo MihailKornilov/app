@@ -1620,7 +1620,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 		case 69: return _spisokUnitUser($el, $unit);
 
 		//Значение списка: иконка сортировки
-		case 71: return '<div class="icon icon-move pl"></div>';
+		case 71:
+			if(!$UNIT_ISSET)
+				return 'sort';
+
+			return '<div class="icon icon-move pl"></div>';
 
 
 
