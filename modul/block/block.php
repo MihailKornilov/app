@@ -1406,7 +1406,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			'<input type="hidden" class="dlg26" value="'.$dialog_id.'" />'.
 			'<script>ELM'.$dialog_id.'='._BE('elem_js', 'dialog', $dialog_id).';</script>';
 
-		//Иконка удаления
+		//Значение списка: иконка удаления
 		case 30:
 			/*
 				num_1 - иконка красного цвета

@@ -301,6 +301,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 
+	if(IS_ELEM)
+		_BE('elem_clear');
 
 	// ---=== СЕКЦИЯ ОБНОВЛЕНИЯ ДАННЫХ ===---
 
@@ -364,7 +366,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	if(IS_ELEM) {
 		$elem = _elemOne($unit_id);
-//		print_r($elem);
 		if($elem['block'])
 			_BE('block_clear');
 		$unit['title'] = _elemTitle($unit_id);
@@ -394,6 +395,7 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 		return array();
 
 	$POST_CMP = @$_POST['cmp'];
+
 	if($dialog['cmp_no_req'] && empty($POST_CMP))
 		return array();
 //	if(empty($POST_CMP))
