@@ -878,6 +878,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						placeholder:'nested-placeholder', //класс, применяемый для подсветки места, откуда взялся элемент
 						listType:'ol',
 						items:'li',
+						handle:'.icon-move',
 						isTree:el.num_7 > 1,
 						maxLevels:el.num_7,
 						tabSize:30, //расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень

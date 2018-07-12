@@ -472,18 +472,28 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		num_8 - показывать только те значения, которые принимает текущая страница
 
 		настройка шаблона через функцию PHP12_spisok_td_setting
+
+		Свойства ячеек:
+			num_8:      ячейка активна
+			width:      ширина колонки
+			font:       выделение: b, i, u
+			color:      цвет текста
+			url_access: отображение иконки для настройки ссылки
+			url:        текст в колонке является ссылкой
+			txt_7:      TH-заголовок колонки
+			pos:        txt_8: позиция по горизонтали (l, center, r)
 	*/
 
 	//диалог, через который вносятся данные списка
 	if(!$dialog_id = $ELEM['num_1'])
 		return '<div class="_empty"><span class="fs15 red">Не указан список для вывода данных.</span></div>';
-	if(!$spDialog = _dialogQuery($dialog_id))
+	if(!$DLG = _dialogQuery($dialog_id))
 		return '<div class="_empty"><span class="fs15 red">Списка <b>'.$dialog_id.'</b> не существует.</span></div>';
 
 	if(PAS)
 		return
 		'<div class="_empty">'.
-			'Список-таблица <b class="fs14">'.$spDialog['name'].'</b>'.
+			'Список-таблица <b class="fs14">'.$DLG['name'].'</b>'.
 		'</div>';
 
 	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
@@ -491,8 +501,9 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 
 	$limit = $ELEM['num_2'];
 
-	//элементы списка
-	$CMP = $spDialog['cmp'];
+	//если включена сортировка, количество максимальное
+	if($ELEM['num_6'])
+		$limit = 1000;
 
 	if(!$all = _spisokCountAll($ELEM))
 		return '<div class="_empty min">'._br($ELEM['txt_1']).'</div>';
@@ -502,17 +513,17 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "SELECT `t1`.*"._spisokJoinField($spDialog)."
-			FROM "._tableFrom($spDialog)."
+	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
+			FROM "._tableFrom($DLG)."
 			WHERE "._spisokCond($ELEM)."
 			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
 	//вставка значений из вложенных списков
-	$spisok = _spisokInclude($spisok, $CMP);
+	$spisok = _spisokInclude($spisok, $DLG['cmp']);
 	//вставка картинок
-	$spisok = _spisokImage($spisok, $CMP);
+	$spisok = _spisokImage($spisok, $DLG['cmp']);
 
 	//получение настроек колонок таблицы
 	$sql = "SELECT *
@@ -530,13 +541,15 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		foreach($tabCol as $td) {
 			$cls = array();
 			switch($td['dialog_id']) {
-				case 34: $cls[] = 'pad0'; //иконки управления
-				default:
-					$txt = _elemUnit($td, $sp);
-//							$txt = _spisokColSearchBg($txt, $el, $cmp_id);
-					$txt = _spisokUnitUrl($td, $sp, $txt);
-					break;
+				case 30: //иконка удаления
+				case 34: //иконка редактирования
+				case 71: //иконка сортировки
+					$cls[] = 'pad0';
 			}
+			$txt = _elemUnit($td, $sp);
+//			$txt = _spisokColSearchBg($txt, $el, $cmp_id);
+			$txt = _spisokUnitUrl($td, $sp, $txt);
+
 			$cls[] = $td['font'];
 			$cls[] = $td['color'];
 			$cls[] = $td['txt_8'];//pos - позиция
@@ -568,7 +581,8 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	$BEGIN = !$next && !$ELEM['num_6'] ? $TABLE_BEGIN : '';
 	$END = !$next && !$ELEM['num_6'] ? $TABLE_END : '';
 
-	if($ELEM['num_6']) {//включено условие сортировки
+	//включено условие сортировки
+	if($ELEM['num_6']) {
 		if($ELEM['num_7'] > 1) {
 			$child = array();
 			foreach($spisok as $id => $r)
@@ -578,7 +592,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 			$TR = '';
 			foreach($MASS as $id => $sp)
 				$TR .=
-					'<li class="mt1 curM" id="sp_'.$id.'">'.
+					'<li class="mt1" id="sp_'.$id.'">'.
 						$TABLE_BEGIN.$sp.$TABLE_END.
 					'</li>';
 			$TR = '<ol>'.$TR.'</ol>';
@@ -603,7 +617,7 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 	$send = '';
 	foreach($arr as $id => $r)
 		$send .=
-			'<li class="mt1 curM" id="sp_'.$id.'">'.
+			'<li class="mt1" id="sp_'.$id.'">'.
 				$TABLE_BEGIN.$MASS[$id].$TABLE_END.
 				(!empty($child[$id]) ? _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $id) : '').
 			'</li>';
