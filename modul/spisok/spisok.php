@@ -705,8 +705,10 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в 
 	if($el['url'] != 3)//указана конкретная страница
 		return '<a href="'.URL.'&p='.$el['url'].'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 
-	$dialog_id = 0;
+	if(!$dlg = _elem_11_dialog($el))
+		return $txt;
 
+/*
 	if($el['block_id'] < 0)
 		if($el = _elemOne(abs($el['block_id'])))
 			if($el['dialog_id'] == 23)
@@ -769,18 +771,13 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в 
 				break;
 			default: return $txt;
 		}
-
-	if(!$dialog_id)
-		return $txt;
-
-	if(!$dlg = _dialogQuery($dialog_id))
-		return $txt;
+*/
 
 	//ссылка на страницу, если это список страниц
 	if(_table($dlg['table_1']) == '_page')
 		return '<a href="'.URL.'&p='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 
-	if(!$page_id = _page('spisok_id', $dialog_id))
+	if(!$page_id = _page('spisok_id', $dlg['id']))
 		return $txt;
 
 	return '<a href="'.URL.'&p='.$page_id.'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';

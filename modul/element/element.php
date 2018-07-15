@@ -511,6 +511,21 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 	}
 	return $el['name'];
 }
+function _elem_11_dialog($el) {//получение массива диалога по элементу 11
+	if(!$el['dialog_id'] = 11)
+		return 0;
+	if(!$el11 = _elemOne($el['txt_2']))
+		return 0;
+	if($el11['block']['obj_name'] != 'dialog')
+		return 0;
+
+	$dialog_id = _num($el11['block']['obj_id']);
+
+	if(!$dlg = _dialogQuery($dialog_id))
+		return 0;
+
+	return $dlg;
+}
 
 function _elemColType($id='all') {//тип данных, используемый элементом
 	$col_type = array(
