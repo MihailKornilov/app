@@ -359,8 +359,7 @@ function _block_v_choose($r, $unit) {//подсветка элементов д�
 
 	//отметка выбранных полей
 	$elem_id = $r['elem']['id'];
-//	$sel = ' sel';
-	$sel = '';
+	$sel = $unit['v_id_sel'] == $elem_id ? ' sel' : '';
 
 	return '<div class="v-choose'.$sel.'" val="'.$elem_id.'"></div>';
 }

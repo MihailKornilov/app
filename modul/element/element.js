@@ -568,9 +568,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 				_forIn(o.cmp, function(sp, id) {
 					switch(sp.dialog_id) {
 						case 12://подключаемая функция
-							if(!window[sp.txt_1])
-								return;
-							send.cmpv[id] = window[sp.txt_1](sp, 'get');
+							if(window[sp.txt_1])
+								send.cmpv[id] = window[sp.txt_1](sp, 'get');
+							if(sp.col)
+								send.cmp[id] = $(sp.attr_cmp).val();
 							return;
 						case 19://наполнение для некоторых компонентов
 							send.cmpv[id] = _cmpV19(sp, 1);
@@ -2549,7 +2550,21 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 	PHP12_v_choose = function(el, unit) {
-		console.log(el);
+		//элементы для выбора
+		var VC = $(el.attr_el).find('.v-choose');
+
+		//выбор одного из элеметов
+		VC.click(function() {
+			var t = $(this),
+				v = t.attr('val');
+
+			VC.removeClass('sel');
+			t.addClass('sel');
+
+			$(el.attr_cmp).val(v);
+		});
+
+//		console.log(el);
 	},
 
 	_elemGroup = function(v, dlg) {//функция, которая выполняется после открытия окна выбора элемента

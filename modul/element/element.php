@@ -558,18 +558,26 @@ function _filterCheckSetup() {//настройка условий фильтра
 
 /* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 function PHP12_v_choose($el, $unit) {
+	$SRC = $unit['source'];
+
+	//данные исходного блока
+	$BL = _blockOne($SRC['block_id']);
+	$EL = $BL['elem'];
+
+	return _pr($EL);
 	$dialog_id = 48;
 
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin('Диалога не существует, который вносит данные списка.');
 
-	$unit = array(
-		'v_choose' => 1
+	$cond = array(
+		'v_choose' => 1,
+		'v_id_sel' => _num(@$unit['txt_2'])
 	);
 
 	return
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
-	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit);
+	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $cond);
 }
 
 

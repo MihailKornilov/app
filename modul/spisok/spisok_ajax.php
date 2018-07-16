@@ -366,7 +366,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	if(IS_ELEM) {
 		$elem = _elemOne($unit_id);
-		if($elem['block'])
+		if(!empty($elem['block']))
 			_BE('block_clear');
 		$unit['title'] = _elemTitle($unit_id);
 	}
