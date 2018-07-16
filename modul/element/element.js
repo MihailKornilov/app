@@ -2547,6 +2547,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
+	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
+	PHP12_v_choose = function(el, unit) {
+		console.log(el);
+	},
+
 	_elemGroup = function(v, dlg) {//функция, которая выполняется после открытия окна выбора элемента
 		var D = dlg.D;
 		D('.el-group-head').click(function() {//переключение меню

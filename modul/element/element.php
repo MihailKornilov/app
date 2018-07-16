@@ -548,25 +548,29 @@ function _elemColType($id='all') {//тип данных, используемы�
 }
 
 
-function PHP12_v_from_dialog($el, $unit) {//выбор значения из диалога [86]
-	$dialog_id = 48;
-
-	if(!$dialog = _dialogQuery($dialog_id))
-		return _emptyMin('Диалога не существует, который вносит данные списка.');
-
-	$unit = array();
-
-	return
-	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
-	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit);
-}
-
 function _filterCheckSetup() {//настройка условий фильтра для галочки (подключение через [12])
 	return '';
 }
 
 
 
+
+
+/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
+function PHP12_v_choose($el, $unit) {
+	$dialog_id = 48;
+
+	if(!$dialog = _dialogQuery($dialog_id))
+		return _emptyMin('Диалога не существует, который вносит данные списка.');
+
+	$unit = array(
+		'v_choose' => 1
+	);
+
+	return
+	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
+	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit);
+}
 
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
@@ -714,10 +718,10 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 				'<td id="elem-group-content" class="top">'.
 					'<div class="cnt-div">'.$content.'<div>'.
 		'</table>'.
-		_elem_choose_gebug($el, $unit).
+		PHP12_elem_choose_gebug($el, $unit).
 		'';
 }
-function _elem_choose_gebug($el, $unit) {//выбор элемента - группы
+function PHP12_elem_choose_gebug($el, $unit) {//выбор элемента - группы
 	if(!DEBUG)
 		return '';
 

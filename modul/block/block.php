@@ -62,7 +62,7 @@ function _blockName($name, $i='name') {//доступные варианты о�
 
 	return $name;
 }
-function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) {//вывод на экран всей структуры блоков
+function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) {//вывод структуры блоков для конкретного объекта
 	if(!$block = _BE('block_obj', $obj_name, $obj_id))
 		return _blockName($obj_name, 'empty');
 	if(!is_array($unit))
@@ -189,7 +189,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 					 '>'.
 							_blockSetka($r, $level, $grid_id, $unit).
 							_blockChoose($r, $level, $unit).
-							_blockElemChoose($r, $unit).
+							_block_v_choose($r, $unit).
 							_blockChildHtml($r, $level + 1, $width, $grid_id, $unit).
 	    					_elemDiv($r['elem'], $unit).
 					'';
@@ -321,7 +321,7 @@ function _blockChoose($r, $level, $unit) {//подсветка блоков дл
 
 	return '<div class="choose block-choose'.$sel.$deny.'" val="'.$block_id.'"></div>';
 }
-function _blockElemChoose($r, $unit) {//подсветка элементов для вставки в шаблон
+function _blockElemChoose_old($r, $unit) {//подсветка для выбора элементов
 	//условие выбора
 	if(empty($unit['choose']))
 		return '';
@@ -347,6 +347,22 @@ function _blockElemChoose($r, $unit) {//подсветка элементов д
 	$sel = isset($unit['choose_sel'][$elem_id]) ? ' sel' : '';
 
 	return '<div class="choose block-elem-choose'.$sel.'" val="'.$elem_id.'"></div>';
+}
+function _block_v_choose($r, $unit) {//подсветка элементов для выбора значения
+	//(не)разрешён выбор значения
+	if(empty($unit['v_choose']))
+		return '';
+
+	//блок не подсвечивается, если в нём нет элемента
+	if(empty($r['elem']))
+		return '';
+
+	//отметка выбранных полей
+	$elem_id = $r['elem']['id'];
+//	$sel = ' sel';
+	$sel = '';
+
+	return '<div class="v-choose'.$sel.'" val="'.$elem_id.'"></div>';
 }
 function _blockStyle($r, $width, $unit) {//стили css для блока
 	$send = array();

@@ -313,8 +313,8 @@ body:not(.site){position:relative}
 	opacity:.7;
 }
 
-/* подсветка блока при выборе элемента */
-.block-elem-choose{
+/* подсветка блока с элементом при выборе значения */
+.v-choose{
 	position:absolute;
 	top:0;
 	right:0;
@@ -326,8 +326,8 @@ body:not(.site){position:relative}
 	cursor:pointer;
 	z-index:1;
 }
-.block-elem-choose:not(.sel):hover{opacity:1;border-color:#0ad}
-.block-elem-choose.sel{
+.v-choose:not(.sel):hover{opacity:1;border-color:#0ad}
+.v-choose.sel{
 	border-color:#00607D;
 	background-color:#6ce;
 	opacity:.35;
