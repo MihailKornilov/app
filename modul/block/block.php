@@ -106,7 +106,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	//составление структуры блоков по строкам
 	$block = array();
 	foreach($arr as $r) {
-		if(!BLOCK_EDIT && empty($unit['choose']) && $r['elem_id'] && $r['elem']['hidden'])
+		if(!BLOCK_EDIT && empty($unit['v_choose']) && empty($unit['choose']) && $r['elem_id'] && $r['elem']['hidden'])
 			continue;
 		$block[$r['y']][$r['x']] = $r;
 	}

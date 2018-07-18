@@ -560,13 +560,29 @@ function _filterCheckSetup() {//настройка условий фильтра
 function PHP12_v_choose($el, $unit) {
 	$SRC = $unit['source'];
 
-	//данные исходного блока
-	$BL = _blockOne($SRC['block_id']);
-	$EL = $BL['elem'];
+	//изначально проверяется исходный диалог
+	if(!$dialog_id = $SRC['dialog_source']) {
+		//данные исходного блока
+		$BL = _blockOne($SRC['block_id']);
+		$EL = $BL['elem'];
 
-	return _pr($EL);
-	$dialog_id = 48;
+		//ячейка таблицы
+		if($EL && $EL['dialog_id'] == 23)
+			$dialog_id = _num($EL['num_1']);
+		//блок со страницы
+		elseif($BL['obj_name'] == 'page') {
+			$page = _page($BL['obj_id']);
+			$dialog_id = $page['spisok_id'];
+		}
+		//блок единицы списка
+		elseif($BL['obj_name'] == 'spisok') {
+			$bl_spisok = _blockOne($BL['obj_id']);
+			$dialog_id = $bl_spisok['elem']['num_1'];
+		}
+	}
 
+	if(!$dialog_id)
+		return _emptyMin('Не найден диалог, который вносит данные списка.');
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin('Диалога не существует, который вносит данные списка.');
 
@@ -577,7 +593,8 @@ function PHP12_v_choose($el, $unit) {
 
 	return
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
-	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $cond);
+	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $cond).
+	_pr($unit);
 }
 
 

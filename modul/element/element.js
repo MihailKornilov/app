@@ -135,14 +135,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 				if(o.dialog_id)
 					delete DIALOG[o.dialog_id];
 			},
+			//функция, которая выполняется при отмене или закрытии диалога
+			closeFunc = function() {},
 			w2 = Math.round(width / 2), // ширина/2. Для определения положения по центру
 			vkScroll = VK_SCROLL > 110 ? VK_SCROLL - 110 : 0;//корректировка скролла VK
 
 		dialog.find('.close').click(dialogClose);
 		butSubmit.click(submitFunc);
 		butCancel.click(function() {
-//			e.stopPropagation();
-//			dialogClose();
 			if(butCancel.hasClass('_busy'))
 				return;
 			o.cancel();
@@ -188,6 +188,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			ZINDEX -= 10;
 			if(o.dialog_id)
 				delete DIALOG[o.dialog_id];
+			closeFunc();
 			_fbhs();
 		}
 		function dialogErr(msg) {
@@ -236,8 +237,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 				butCancel[(name ? 'remove' : 'add') + 'Class']('dn');
 				butCancel.html(name);
 			},
-			submit:function(func) {
+			submit:function(func) {//изменение функции сохранения данных диалога
 				o.submit = func;
+			},
+			go:function() {//нажатие на кнопку сохранения данных диалога
+				butSubmit.trigger('click');
+			},
+			closeFunc:function(func) {
+				closeFunc = func;
 			},
 			post:function(send, success) {//отправка формы
 				butSubmit.addClass('_busy');
@@ -2550,8 +2557,25 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 	PHP12_v_choose = function(el, unit) {
-		//элементы для выбора
-		var VC = $(el.attr_el).find('.v-choose');
+		if(unit == 'get')
+			return '';
+
+		var DLG = DIALOG_OPEN;
+		if(!DLG)
+			return;
+
+		var D = function(attr) {
+				return DLG.content.find(attr);
+			},
+			VC = D(el.attr_el).find('.v-choose');//элементы в открытом диалоге для выбора
+
+		//описание глобальных переменных при открытии исходного диалога
+		if(unit.source.block_id) {
+			V11_CMP = D(el.attr_cmp);//переменная в исходном диалоге для хранения значений
+			V11_DLG = [];   //массив диалогов, открывающиеся последовательно
+			V11_V = [];     //массив выбранных значений
+			V11_COUNT = 0;  //счётчик открытых диалогов
+		}
 
 		//выбор одного из элеметов
 		VC.click(function() {
@@ -2561,10 +2585,51 @@ var DIALOG = {},//массив диалоговых окон для управл
 			VC.removeClass('sel');
 			t.addClass('sel');
 
-			$(el.attr_cmp).val(v);
-		});
+			V11_V.length = V11_COUNT;
+			V11_V[V11_COUNT] = v;
+			V11_DLG.length = V11_COUNT;
+			V11_DLG[V11_COUNT] = DLG;
 
-//		console.log(el);
+			V11_CMP.val(V11_V.join());
+
+			//нажатие по обычному элементу (не список)
+			if(!ELMM[v].issp)
+				return;
+
+			V11_COUNT++;
+
+			_dialogLoad({
+				dialog_id:11,
+				dialog_source:ELMM[v].num_1,
+				func_open:function(res, dlg) {
+					dlg.submit(function() {
+						var sel = dlg.content.find('.v-choose.sel');
+						if(!sel.length) {
+							dlg.err('Значение не выбрано');
+							return;
+						}
+
+						//проверка чтобы невозможно было выбрать элемент-список
+						var sel_v = sel.attr('val');
+						if(ELMM[sel_v].issp)
+							dlg.err('Не выбрано конечное значение ' + sel_v);
+
+						//закрытие всех открытых диалогов кроме последнего
+						_forIn(V11_DLG, function(sp, n) {
+							if(!_num(n))
+								return;
+							sp.close();
+						});
+
+						//запуск первого (исходного) диалога
+						V11_DLG[0].go();
+					});
+					dlg.closeFunc(function() {
+						V11_COUNT--;
+					});
+				}
+			});
+		});
 	},
 
 	_elemGroup = function(v, dlg) {//функция, которая выполняется после открытия окна выбора элемента
