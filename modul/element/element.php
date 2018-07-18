@@ -526,6 +526,39 @@ function _elem_11_dialog($el) {//получение массива диалог�
 
 	return $dlg;
 }
+function _elem_11_v($elem_id, $unit) {//получение значения из единицы списка
+	if(!$el = _elemOne($elem_id))
+		return '-no-el-'.$elem_id.'-';
+
+	switch($el['dialog_id']) {
+		//многострочное поле
+		case 5:
+		//однострочное поле
+		case 8:
+			//отсутствует имя колонки
+			if(!$col = $el['col'])
+				return 'no-col';
+			//имени колонки не существует в единице списка
+			if(!isset($unit[$col]))
+				return 'no-unit-col';
+
+			$txt = $unit[$col];
+//			$txt = _spisokColSearchBg($el, $txt);
+//			$txt = _spisokUnitUrl($el, $unit, $txt);
+
+			return _br($txt);
+		//произвольный текст
+		case 10: return _br($el['txt_1']);
+		//сумма значений единицы списка (баланс)
+		case 27:
+		//количество связанного списка
+		case 54:
+		//сумма связанного списка
+		case 55: return $unit[$el['col']];
+	}
+
+	return '-no-11-';
+}
 
 function _elemColType($id='all') {//тип данных, используемый элементом
 	$col_type = array(
@@ -586,9 +619,15 @@ function PHP12_v_choose($el, $unit) {
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin('Диалога не существует, который вносит данные списка.');
 
+	$sel = 0;
+	if(!empty($unit['txt_2'])) {
+		$ex = explode(',', $unit['txt_2']);
+		$sel = _num($ex[0]);
+	}
+
 	$cond = array(
 		'v_choose' => 1,
-		'v_id_sel' => _num(@$unit['txt_2'])
+		'v_id_sel' => $sel
 	);
 
 	return
