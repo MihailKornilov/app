@@ -979,14 +979,38 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				return _elemTitle($el['id']);
 
 			if(!$ids = _ids($el['txt_2'], 1))
-				return '-el-yok-';
+				return '-el-yok-';//id элементов отсутствуют
 
-			$send = '';
-
+			//получение значения, если нет вложенных списков
 			if(count($ids) == 1)
 				return _elem_11_v($ids[0], $unit);
 
-			return _pr($ids);
+			$u = $unit;
+			$eid = 0;
+			foreach($ids as $n => $elem_id) {
+				$eid = $elem_id;
+				if(!$ell = _elemOne($elem_id))
+					return '-no-el-'.$elem_id.'-';
+
+				switch($ell['dialog_id']) {
+					case 29:
+					case 59:
+						if(!$col = $ell['col'])
+							return 'нет имени колонки';
+						if(empty($u))
+							return DEBUG ? 'единица списка пуста. Шаг: '.$n : '';
+						if(!$u = $u[$col])
+							return DEBUG ? 'вложенное значение отсутствует. Шаг: '.$n.'. col: '.$col : '';
+						if(!is_array($u)) {
+							$sql = "SELECT *
+									FROM `_spisok`
+									WHERE `id`=".$u;
+							$u = query_assoc($sql);
+						}
+				}
+			}
+
+			return _elem_11_v($eid, $u);
 
 
 
