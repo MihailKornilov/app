@@ -528,7 +528,7 @@ function _elem_11_dialog($el) {//получение массива диалог�
 }
 function _elem_11_v($elem_id, $unit) {//получение значения из единицы списка
 	if(!$el = _elemOne($elem_id))
-		return '-no-el-'.$elem_id.'-';
+		return _msgRed('-no-el-'.$elem_id.'-');
 
 	switch($el['dialog_id']) {
 		//многострочное поле
@@ -537,10 +537,10 @@ function _elem_11_v($elem_id, $unit) {//получение значения из
 		case 8:
 			//отсутствует имя колонки
 			if(!$col = $el['col'])
-				return 'no-col';
+				return _msgRed('no-col');
 			//имени колонки не существует в единице списка
 			if(!isset($unit[$col]))
-				return 'no-unit-col';
+				return _msgRed('no-unit-col');
 
 			$txt = $unit[$col];
 //			$txt = _spisokColSearchBg($el, $txt);
@@ -557,7 +557,7 @@ function _elem_11_v($elem_id, $unit) {//получение значения из
 		case 55: return $unit[$el['col']];
 	}
 
-	return '-no-11-';
+	return _msgRed('-no-11-');
 }
 
 function _elemColType($id='all') {//тип данных, используемый элементом

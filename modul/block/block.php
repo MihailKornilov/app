@@ -979,7 +979,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				return _elemTitle($el['id']);
 
 			if(!$ids = _ids($el['txt_2'], 1))
-				return '-el-yok-';//id элементов отсутствуют
+				return _msgRed('-el-yok-');//id элементов отсутствуют
 
 			//получение значения, если нет вложенных списков
 			if(count($ids) == 1)
@@ -990,7 +990,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			foreach($ids as $n => $elem_id) {
 				$eid = $elem_id;
 				if(!$ell = _elemOne($elem_id))
-					return '-no-el-'.$elem_id.'-';
+					return _msgRed('-no-el-'.$elem_id.'-');
 
 				switch($ell['dialog_id']) {
 					case 29:
@@ -998,9 +998,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						if(!$col = $ell['col'])
 							return 'нет имени колонки';
 						if(empty($u))
-							return DEBUG ? 'единица списка пуста. Шаг: '.$n : '';
+							return _msgRed('единица списка пуста. Шаг: '.$n);
 						if(!$u = $u[$col])
-							return DEBUG ? 'вложенное значение отсутствует. Шаг: '.$n.'. col: '.$col : '';
+							return _msgRed('вложенное значение отсутствует. Шаг: '.$n.'. col: '.$col);
 						if(!is_array($u)) {
 							$sql = "SELECT *
 									FROM `_spisok`

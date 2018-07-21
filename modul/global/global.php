@@ -255,6 +255,11 @@ function _br($v, $replace='<br />') {//вставка br в текст при н
 function _daNet($v) {//$v: 1 -> да, 0 -> нет
 	return $v ? 'да' : 'нет';
 }
+function _msgRed($msg) {//сообщение об ошибке красного цвета
+	if(!DEBUG)
+		return '';
+	return '<div class="fs10 red">'.$msg.'</div>';
+}
 
 function _ids($ids, $return_arr=0) {//проверка корректности списка id, составленные через запятую
 	$arr = array();
