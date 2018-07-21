@@ -517,6 +517,10 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 	//обновление некоторых колонок таблицы 1
 	foreach($dialog['field1'] as $field => $i) {
 		if($field == 'app_id') {
+			//если вносится страница SA, id приложения не присваивается
+			if(_table($dialog['table_1']) == '_page' && $dialog['id'] == '101')
+				continue;
+
 			$sql = "UPDATE `"._table($dialog['table_1'])."`
 					SET `app_id`=".APP_ID."
 					WHERE `id`=".$unit_id;

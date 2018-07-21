@@ -403,7 +403,7 @@ function _dialogElemChoose($el, $unit) {//[74] выбор элемента (по
 	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
 }
 
-function _dialogSpisokSa($el, $unit) {//список диалоговых окон [12]
+function PHP12_dialog_sa($el, $unit) {//список диалоговых окон [12]
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE !`app_id`
@@ -430,7 +430,7 @@ function _dialogSpisokSa($el, $unit) {//список диалоговых око
 
 	return $send;
 }
-function _dialogSpisokApp($el, $unit) {//список диалоговых окон для конкретного приложения [12]
+function PHP12_dialog_app($el, $unit) {//список диалоговых окон для конкретного приложения [12]
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID."
@@ -454,6 +454,37 @@ function _dialogSpisokApp($el, $unit) {//список диалоговых ок�
 
 	return $send;
 }
+
+function PHP12_spisok14_app($el, $unit) {//списки для текущего приложения. Страница 127
+
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=14
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return 'Списков-шаблонов нет.';
+
+	$send = '<table class="_stab small">'.
+				'<tr>'.
+					'<th class="w50">el-id'.
+					'<th>';
+	foreach($arr as $r) {
+		if(!$el = _elemOne($r['id'])) {
+			$send .=
+				'<tr><td colspan="10" class="red">'.
+						'Элемента '.$r['id'].' нет в кеше.';
+			continue;
+		}
+
+		$send .= '<tr class="over1">'.
+					'<td class="r grey">'.$r['id'];
+	}
+	$send .= '</table>';
+
+	return $send;
+}
+
 
 function _elemOne($elem_id) {//запрос одного элемента
 	return _BE('elem_one', $elem_id);

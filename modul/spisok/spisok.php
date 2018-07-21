@@ -271,34 +271,36 @@ function _spisokImage($spisok, $CMP) {//вставка картинок
 
 	return $spisok;
 }
-function _spisokShow($ELEM, $next=0) {//список, выводимый на странице
+function _spisok14($ELEM, $next=0) {//список-шаблон
 	/*
-	$ELEM:
-		dialog_id = 14: ШАБЛОН
-		dialog_id = 23: таблица
+        num_1 - id диалога, который вносит данные списка (шаблон которого будет настраиваться)
+		num_2 - длина (количество строк, выводимых за один раз)
+		txt_1 - сообщение пустого запроса
 
-		Значения вставляются диалогом 31.
-		Параметры значений:
-			num_1 - id элемента-значения из диалога
-			txt_1 - имя заголовка TR
-			width - ширина колонки
-			font
-			color
-			txt_6 - pos (позиция)
-			num_2 - является ссылкой
-			sort
+		настройка шаблона через функцию PHP12_spisok14_setup
 	*/
+
+	//диалог, через который вносятся данные списка
+	if(!$dialog_id = $ELEM['num_1'])
+		return '<div class="_empty"><span class="fs15 red">Не указан список для вывода данных.</span></div>';
+	if(!$DLG = _dialogQuery($dialog_id))
+		return '<div class="_empty"><span class="fs15 red">Списка <b>'.$dialog_id.'</b> не существует.</span></div>';
+
+	if(PAS)
+		return
+		'<div class="_empty">'.
+			'Список-шаблон <b class="fs14">'.$DLG['name'].'</b>'.
+		'</div>';
+
+//		(_spisokIsSort($el['block_id']) ?
+//			'<script>_spisokSort("'.$el['attr_el'].'")</script>'
+//		: '');
+
+
 	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
 		return 'Несуществующий диалог id'.$ELEM['dialog_id'];
 
-	$limit = $ELEM['num_6'] ? 200 : $ELEM['num_2'];
-
-	//диалог, через который вносятся данные списка
-	$dialog_id = $ELEM['num_1'];
-	$spDialog = _dialogQuery($dialog_id);
-
-	//элементы списка
-	$CMP = $spDialog['cmp'];
+	$limit = $ELEM['num_2'];
 
 	if(!$all = _spisokCountAll($ELEM))
 		return '<div class="_empty min">'._br($ELEM['txt_1']).'</div>';
@@ -308,156 +310,60 @@ function _spisokShow($ELEM, $next=0) {//список, выводимый на с
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "SELECT `t1`.*"._spisokJoinField($spDialog)."
-			FROM "._tableFrom($spDialog)."
+	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
+			FROM "._tableFrom($DLG)."
 			WHERE "._spisokCond($ELEM)."
 			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
 	//вставка значений из вложенных списков
-	$spisok = _spisokInclude($spisok, $CMP);
+	$spisok = _spisokInclude($spisok, $DLG['cmp']);
 	//вставка картинок
-	$spisok = _spisokImage($spisok, $CMP);
+	$spisok = _spisokImage($spisok, $DLG['cmp']);
 
-	//выбор внешнего вида
-	switch($ELEM['dialog_id']) {
-		//шаблон
-		case 14:
-			if(!$BLK = _BE('block_arr', 'spisok', $ELEM['block_id']))
-				return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
+	if(!$BLK = _BE('block_arr', 'spisok', $ELEM['block_id']))
+		return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
 
-			//получение элементов, расставленных находящихся в блоках
-			$ELM = _BE('elem_arr', 'spisok', $ELEM['block_id']);
+	//получение элементов, расставленных находящихся в блоках
+	$ELM = _BE('elem_arr', 'spisok', $ELEM['block_id']);
 
-			//ширина единицы списка с учётом отступов
-			$ex = explode(' ', $ELEM['mar']);
-			$width = floor(($ELEM['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
+	//ширина единицы списка с учётом отступов
+	$ex = explode(' ', $ELEM['mar']);
+	$width = floor(($ELEM['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
 
-			$send = '';
-			foreach($spisok as $sp) {
-				$child = array();
-				foreach($BLK as $id => $r) {
-					$r['elem'] = array();
-					if($r['elem_id']) {
-						$elem = $ELM[$r['elem_id']];
-						$elem['block'] = $r;
-						$r['elem'] = $elem;
-					}
-
-					$child[$r['parent_id']][$id] = $r;
-				}
-
-				$block = _blockArrChild($child);
-				$send .=
-					'<div class="sp-unit" val="'.$sp['id'].'">'.
-						_blockLevel($block, $width, 0, 0, 1, $sp).
-					'</div>';
+	$send = '';
+	foreach($spisok as $sp) {
+		$child = array();
+		foreach($BLK as $id => $r) {
+			$r['elem'] = array();
+			if($r['elem_id']) {
+				$elem = $ELM[$r['elem_id']];
+				$elem['block'] = $r;
+				$r['elem'] = $elem;
 			}
 
-			if($limit * ($next + 1) < $all) {
-				$count_next = $all - $limit * ($next + 1);
-				if($count_next > $limit)
-					$count_next = $limit;
-				$send .=
-					'<div class="over5" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
-						'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
-					'</div>';
-			}
+			$child[$r['parent_id']][$id] = $r;
+		}
 
-			return $send;
-
-		//таблица
-		case 23://Таблица
-			if(empty($ELEM['txt_2']))
-				return '<div class="_empty"><span class="fs15 red">Таблица не настроена.</span></div>';
-			if(!$ELEM['num_1'])
-				return '<div class="_empty"><span class="fs15 red">Не указан список для вывода данных.</span></div>';
-			if(!$tabDialog = _dialogQuery($ELEM['num_1']))
-				return '<div class="_empty"><span class="fs15 red">Списка <b>'.$ELEM['num_1'].'</b> не существует.</span></div>';
-
-			//получение настроек колонок таблицы
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id` IN (".$ELEM['txt_2'].")
-					  AND `block_id`=-".$ELEM['id']."
-					ORDER BY `sort`";
-			$tabCol = query_arr($sql);
-
-			$MASS = array();
-			foreach($spisok as $sp) {
-				$TR = '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
-				foreach($tabCol as $td) {
-					$cls = array();
-					switch($td['dialog_id']) {
-						case 34: $cls[] = 'pad0'; //иконки управления
-						default:
-							$txt = _elemUnit($td, $sp);
-//							$txt = _spisokColSearchBg($txt, $el, $cmp_id);
-							$txt = _spisokUnitUrl($td, $sp, $txt);
-							break;
-					}
-					$cls[] = $td['font'];
-					$cls[] = $td['color'];
-					$cls[] = $td['txt_8'];//pos - позиция
-					$cls = array_diff($cls, array(''));
-					$cls = implode(' ', $cls);
-					$cls = $cls ? ' class="'.$cls.'"' : '';
-					$TR .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
-				}
-				$MASS[$sp['id']] = $TR;
-			}
-
-			//tr догрузки списка
-			if(!$ELEM['num_6'] && $limit * ($next + 1) < $all) {
-				$count_next = $all - $limit * ($next + 1);
-				if($count_next > $limit)
-					$count_next = $limit;
-				$MASS[] =
-					'<tr class="over5 curP center blue" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
-						'<td colspan="20">'.
-							'<tt class="db '.($ELEM['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
-								'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
-							'</tt>';
-			}
-
-			//открытие и закрытие таблицы
-			$TABLE_BEGIN = '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">';
-			$TABLE_END = '</table>';
-
-			$BEGIN = !$next && !$ELEM['num_6'] ? $TABLE_BEGIN : '';
-			$END = !$next && !$ELEM['num_6'] ? $TABLE_END : '';
-
-			if($ELEM['num_6']) {//включено условие сортировки
-				if($ELEM['num_7'] > 1) {
-					$child = array();
-					foreach($spisok as $id => $r)
-						$child[$r['parent_id']][$id] = $r;
-					$TR = _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child);
-				} else {
-					$TR = '';
-					foreach($MASS as $id => $sp)
-						$TR .=
-							'<li class="mt1 curM" id="sp_'.$id.'">'.
-								$TABLE_BEGIN.$sp.$TABLE_END.
-							'</li>';
-					$TR = '<ol>'.$TR.'</ol>';
-				}
-			} else {
-				//отображение названий колонок
-				$TH = '';
-				if(!$next && $ELEM['num_5']) {
-					$TH .= '<tr>';
-					foreach($tabCol as $tr)
-						$TH .= '<th>'.$tr['txt_7'];
-				}
-				$TR = $TH.implode('', $MASS);
-			}
-
-			return $BEGIN.$TR.$END;
+		$block = _blockArrChild($child);
+		$send .=
+			'<div class="sp-unit" val="'.$sp['id'].'">'.
+				_blockLevel($block, $width, 0, 0, 1, $sp).
+			'</div>';
 	}
 
-	return 'Неизвестный внешний вид списка: '.$ELEM['num_1'];
+	if($limit * ($next + 1) < $all) {
+		$count_next = $all - $limit * ($next + 1);
+		if($count_next > $limit)
+			$count_next = $limit;
+		$send .=
+			'<div class="over5" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
+				'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
+			'</div>';
+	}
+
+	return $send;
 }
 function _spisok23($ELEM, $next=0) {//вывод списка в виде таблицы
 	/*
