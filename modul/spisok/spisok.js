@@ -27,6 +27,19 @@ var _spisokUpdate = function(elem_spisok, func) {
 			t.remove();
 		});
 	},
+	_spisok23next = function(t, elem_id, next) {//догрузка списка-таблицы
+		var send = {
+			op:'spisok_23_next',
+			elem_id:elem_id,
+			next:next,
+			busy_obj:t
+		};
+		_post(send, function(res) {
+			var obj = _parent(t, '._stab');
+			obj.append(res.spisok);
+			t.remove();
+		});
+	},
 	_spisokSort = function(attr_el) {
 		$(attr_el)._sort({
 			items:'.sp-unit',

@@ -637,6 +637,44 @@ function PHP12_v_choose($el, $unit) {
 }
 
 
+/* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
+function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
+	/*
+		имя объекта: spisok
+		 id объекта: block_id, в котором размещается список
+	*/
+	if(empty($unit['id']))
+		return
+		'<div class="bg-ffe pad10">'.
+			'<div class="_empty min">'.
+				'Настройка шаблона будет доступна после вставки списка в блок.'.
+			'</div>'.
+		'</div>';
+
+	return _pr($unit);
+
+	//определение ширины шаблона
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `id`=".$unit['block_id'];
+	if(!$block = query_assoc($sql))
+		return 'Блока, в котором находится список, не существует.';
+
+	setcookie('block_level_spisok', 1, time() + 2592000, '/');
+	$_COOKIE['block_level_spisok'] = 1;
+
+	//корректировка ширины с учётом отступов
+	$ex = explode(' ', $unit['mar']);
+	$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
+	$line_r = $width < 980 ? ' line-r' : '';
+
+	return
+		'<div class="bg-ffc pad10 line-b">'.
+			_blockLevelChange('spisok', $unit['block_id'], $width).
+		'</div>'.
+		'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'._blockHtml('spisok', $unit['block_id'], $width).'</div>';
+}
+
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 function PHP12_elem_choose($el, $unit) {//выбор элемента для вставки в блок. Диалог [50]
 	if(empty($unit['source']))
@@ -920,6 +958,7 @@ function PHP12_spisok_td_setting_vvv($parent_id) {//получение данн�
 
 	return $send;
 }
+
 
 /* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
 function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])

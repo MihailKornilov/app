@@ -196,6 +196,19 @@ switch(@$_POST['op']) {
 		$send['spisok'] = _spisokShow($el, $next);
 		jsonSuccess($send);
 		break;
+	case 'spisok_23_next'://догрузка списка-таблицы
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента станицы');
+		if(!$el = _elemOne($elem_id))
+			jsonError('Элемента id'.$elem_id.' не существует');
+		if($el['dialog_id'] != 23)
+			jsonError('Элемент не является списком-таблицей');
+		if(!$next = _num($_POST['next']))
+			jsonError('Некорректное значение очередного блока списка');
+
+		$send['spisok'] = _spisok23($el, $next);
+		jsonSuccess($send);
+		break;
 	case 'spisok_29_connect':
 		if(!$cmp_id = _num($_POST['cmp_id']))
 			jsonError('Некорректный ID компонента диалога');

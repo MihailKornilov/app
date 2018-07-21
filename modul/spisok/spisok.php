@@ -567,7 +567,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		if($count_next > $limit)
 			$count_next = $limit;
 		$MASS[] =
-			'<tr class="over5 curP center blue" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
+			'<tr class="over5 curP center blue" onclick="_spisok23next($(this),'.$ELEM['id'].','.($next + 1).')">'.
 				'<td colspan="20">'.
 					'<tt class="db '.($ELEM['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
 						'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
