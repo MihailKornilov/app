@@ -358,7 +358,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		if($count_next > $limit)
 			$count_next = $limit;
 		$send .=
-			'<div class="over5" onclick="_spisokNext($(this),'.$ELEM['id'].','.($next + 1).')">'.
+			'<div class="over5" onclick="_spisok14Next($(this),'.$ELEM['id'].','.($next + 1).')">'.
 				'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
 			'</div>';
 	}

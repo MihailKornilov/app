@@ -443,10 +443,9 @@ function PHP12_dialog_app($el, $unit) {//список диалоговых ок�
 					'<th>ID'.
 					'<th>Имя диалога'.
 					'<th>Список';
-	$n = 1;
 	foreach($arr as $r) {
 		$send .= '<tr class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.
-					'<td class="w35 r grey">'.$n++.
+					'<td class="w35 r grey">'.$r['id'].
 					'<td>'.$r['name'].
 					'<td class="center">'.($r['spisok_on'] ? 'да' : '');
 	}
@@ -455,20 +454,28 @@ function PHP12_dialog_app($el, $unit) {//список диалоговых ок�
 	return $send;
 }
 
-function PHP12_spisok14_app($el, $unit) {//списки для текущего приложения. Страница 127
+function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод списков по условиям
+	$arr = array();
 
+	foreach(_BE('elem_all') as $el) {
+		if($el['dialog_id'] != $type_id)
+			continue;
+		if(!$dlg = _dialogQuery($el['num_1']))
+			continue;
+		if($appAll && !$dlg['app_id'] || !$appAll && $dlg['app_id']) {
+			$el['dlg'] = $dlg;
+			$arr[] = $el;
+		}
+	}
 
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `dialog_id`=14
-			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
-		return 'Списков-шаблонов нет.';
+	if(empty($arr))
+		return $msgEmpty;
 
-	$send = '<table class="_stab small">'.
+	$send = '<table class="_stab">'.
 				'<tr>'.
 					'<th class="w50">el-id'.
-					'<th>';
+					'<th>Диалог, создающий список'.
+					'<th>Местонахождение списка';
 	foreach($arr as $r) {
 		if(!$el = _elemOne($r['id'])) {
 			$send .=
@@ -477,14 +484,41 @@ function PHP12_spisok14_app($el, $unit) {//списки для текущего 
 			continue;
 		}
 
-		$send .= '<tr class="over1">'.
-					'<td class="r grey">'.$r['id'];
+		$bl = _blockOne($r['block_id']);
+
+		$link = '';
+		//ссылка на страницу, в котором расположен список
+		if($bl['obj_name'] == 'page') {
+			$page = _page($bl['obj_id']);
+			$link = '<a href="'.URL.'&p='.$bl['obj_id'].'" class="color-pay">Страница '.$bl['obj_id'].' - '.$page['name'].'</a>';
+		}
+		//диалог, в котором расположен список
+		if($bl['obj_name'] == 'dialog') {
+			$dlg = _dialogQuery($bl['obj_id']);
+			$link = '<a class="dialog-open" val="dialog_id:'.$bl['obj_id'].'">Диалог '.$bl['obj_id'].' - '.$dlg['name'].'</a>';
+		}
+
+		$send .= '<tr>'.
+					'<td class="r grey">'.$r['id'].
+					'<td class="b over1 curP dialog-open" val="dialog_id:'.$r['dlg']['id'].'"">'.$r['dlg']['name'].
+					'<td>'.$link;
 	}
 	$send .= '</table>';
 
 	return $send;
 }
-
+function PHP12_spisok14_all() {//списки-шаблоны для всех приложений. Страница 126
+	return PHP12_spisok_app(14, 'Списков-шаблонов нет.', 1);
+}
+function PHP12_spisok23_all() {//списки-таблицы для всех приложений. Страница 126
+	return PHP12_spisok_app(23, 'Списков-таблиц нет.', 1);
+}
+function PHP12_spisok14_app() {//списки-шаблоны для текущего приложения. Страница 127
+	return PHP12_spisok_app(14, 'Списков-шаблонов нет.');
+}
+function PHP12_spisok23_app() {//списки-таблицы для текущего приложения. Страница 127
+	return PHP12_spisok_app(23, 'Списков-таблиц нет.');
+}
 
 function _elemOne($elem_id) {//запрос одного элемента
 	return _BE('elem_one', $elem_id);

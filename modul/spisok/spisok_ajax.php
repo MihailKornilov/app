@@ -121,7 +121,8 @@ switch(@$_POST['op']) {
 		}
 
 		$send['spisok_attr'] = '#el_'.$elem_spisok;
-		$send['spisok_html'] = _spisokShow($elSpisok);
+		$spFunc = '_spisok'.$elSpisok['dialog_id'];
+		$send['spisok_html'] = $spFunc($elSpisok);
 		jsonSuccess($send);
 		break;
 	case 'spisok_filter_clear'://очистка фильтра
@@ -150,7 +151,8 @@ switch(@$_POST['op']) {
 		}
 
 		$send['spisok_attr'] = '#el_'.$spisok_id;
-		$send['spisok_html'] = _spisokShow($elSpisok);
+		$spFunc = '_spisok'.$elSpisok['dialog_id'];
+		$send['spisok_html'] = $spFunc($elSpisok);
 
 		//значения по умолчанию для фильтров списка
 		$send['def'] = array();
@@ -179,21 +181,17 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_next'://догрузка списка
+	case 'spisok_14_next'://догрузка списка-шаблона
 		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Некорректный ID элемента станицы');
-		if(!$next = _num($_POST['next']))
-			jsonError('Некорректное значение очередного блока');
-		//получение данных элемента поиска
 		if(!$el = _elemOne($elem_id))
 			jsonError('Элемента id'.$elem_id.' не существует');
-		if($el['dialog_id'] != 14 && $el['dialog_id'] != 23)
-			jsonError('Элемент не является списком');
-		if(!$el['block'])
-			jsonError('Отсутствует блок списка');
+		if($el['dialog_id'] != 14)
+			jsonError('Элемент не является списком-шаблоном');
+		if(!$next = _num($_POST['next']))
+			jsonError('Некорректное значение очередного блока');
 
-		$send['is_table'] = $el['dialog_id'] == 23;
-		$send['spisok'] = _spisokShow($el, $next);
+		$send['spisok'] = _spisok14($el, $next);
 		jsonSuccess($send);
 		break;
 	case 'spisok_23_next'://догрузка списка-таблицы
