@@ -284,7 +284,11 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	if(!$dialog_id = $ELEM['num_1'])
 		return '<div class="_empty"><span class="fs15 red">Не указан список для вывода данных.</span></div>';
 	if(!$DLG = _dialogQuery($dialog_id))
-		return '<div class="_empty"><span class="fs15 red">Списка <b>'.$dialog_id.'</b> не существует.</span></div>';
+		return '<div class="_empty">'.
+					'<span class="fs15 red">'.
+						'Списка <b class="fs15">'.$dialog_id.'</b> не существует.'.
+					'</span>'.
+			   '</div>';
 
 	if(PAS)
 		return
@@ -297,17 +301,14 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 //		: '');
 
 
-	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
-		return 'Несуществующий диалог id'.$ELEM['dialog_id'];
-
 	$limit = $ELEM['num_2'];
 
 	if(!$all = _spisokCountAll($ELEM))
 		return '<div class="_empty min">'._br($ELEM['txt_1']).'</div>';
 
 	$order = "`t1`.`id` DESC";
-	if($ELEM['num_6'] || _spisokIsSort($ELEM['block_id']))
-		$order = "`sort`";
+//	if(_spisokIsSort($ELEM['block_id']))
+//		$order = "`sort`";
 
 	//получение данных списка
 	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
@@ -322,11 +323,11 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	//вставка картинок
 	$spisok = _spisokImage($spisok, $DLG['cmp']);
 
-	if(!$BLK = _BE('block_arr', 'spisok', $ELEM['block_id']))
+	if(!$BLK = _BE('block_arr', 'spisok', $ELEM['id']))
 		return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
 
 	//получение элементов, расставленных находящихся в блоках
-	$ELM = _BE('elem_arr', 'spisok', $ELEM['block_id']);
+	$ELM = _BE('elem_arr', 'spisok', $ELEM['id']);
 
 	//ширина единицы списка с учётом отступов
 	$ex = explode(' ', $ELEM['mar']);
@@ -373,7 +374,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		num_3 - узкие строки таблицы
 		num_4 - подсвечивать строку при наведении мыши
 		num_5 - показывать имена колонок
-		num_6 - возможность сортировки строк таблицы (если установлена, длина списка становится 200)
+		num_6 - возможность сортировки строк таблицы (если установлена, длина списка становится 1000)
 		num_7 - уровни сортировки (1,2,3)
 		num_8 - показывать только те значения, которые принимает текущая страница
 
@@ -401,9 +402,6 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		'<div class="_empty">'.
 			'Список-таблица <b class="fs14">'.$DLG['name'].'</b>'.
 		'</div>';
-
-	if(!$dialog = _dialogQuery($ELEM['dialog_id']))
-		return 'Несуществующий диалог id'.$ELEM['dialog_id'];
 
 	$limit = $ELEM['num_2'];
 

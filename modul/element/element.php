@@ -473,6 +473,7 @@ function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод спис
 
 	$send = '<table class="_stab">'.
 				'<tr>'.
+					'<th class="w50">bl-id'.
 					'<th class="w50">el-id'.
 					'<th>Диалог, создающий список'.
 					'<th>Местонахождение списка';
@@ -499,6 +500,7 @@ function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод спис
 		}
 
 		$send .= '<tr>'.
+					'<td class="r grey">'.$r['block_id'].
 					'<td class="r grey">'.$r['id'].
 					'<td class="b over1 curP dialog-open" val="dialog_id:'.$r['dlg']['id'].'"">'.$r['dlg']['name'].
 					'<td>'.$link;

@@ -2131,7 +2131,7 @@ function _beBlockSpisok($type, $block, $global=0) {//получение данн
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `obj_name`='spisok'
-				  AND `obj_id` IN ("._idsGet($block).")";
+				  AND `obj_id` IN ("._idsGet($block, 'elem_id').")";
 		$arr = query_arr($sql);
 		$arr = _beBlockForming($arr);
 		$arr = _beElemIdSet($arr);
@@ -2209,11 +2209,11 @@ function _beBlockBg($r) {
 	//      3. page-блоки.   id диалога, который вносит значения списка, страница которой получает значения списка
 	$bg70 = 0;
 	if($r['obj_name'] == 'spisok')
-		if($bl = $G_BLOCK[$r['obj_id']])
-			if($el = $G_ELEM[$bl['elem_id']])
+//		if($bl = $G_BLOCK[$r['obj_id']])
+//			if($el = $G_ELEM[$bl['elem_id']])
+			if($el = $G_ELEM[$r['obj_id']])
 				if($el['dialog_id'] == 14 || $el['dialog_id'] == 59)
-					if($dlg_id = _num($el['num_1']))
-						$bg70 = $dlg_id;
+					$bg70 = _num($el['num_1']);
 	if($r['obj_name'] == 'dialog') {
 		$dialog_parent_id = _num($G_DLG[$r['obj_id']]['dialog_parent_id']);
 		$bg70 = $dialog_parent_id ? $dialog_parent_id : $r['obj_id'];
