@@ -473,7 +473,6 @@ function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод спис
 
 	$send = '<table class="_stab">'.
 				'<tr>'.
-					'<th class="w50">bl-id'.
 					'<th class="w50">el-id'.
 					'<th>Диалог, создающий список'.
 					'<th>Местонахождение списка';
@@ -500,7 +499,6 @@ function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод спис
 		}
 
 		$send .= '<tr>'.
-					'<td class="r grey">'.$r['block_id'].
 					'<td class="r grey">'.$r['id'].
 					'<td class="b over1 curP dialog-open" val="dialog_id:'.$r['dlg']['id'].'"">'.$r['dlg']['name'].
 					'<td>'.$link;
@@ -674,10 +672,10 @@ function PHP12_v_choose($el, $unit) {
 			$page = _page($BL['obj_id']);
 			$dialog_id = $page['spisok_id'];
 		}
-		//блок единицы списка
+		//элемент единицы списка
 		elseif($BL['obj_name'] == 'spisok') {
-			$bl_spisok = _blockOne($BL['obj_id']);
-			$dialog_id = $bl_spisok['elem']['num_1'];
+			$el_spisok = _elemOne($BL['obj_id']);
+			$dialog_id = $el_spisok['num_1'];
 		}
 	}
 
@@ -708,7 +706,7 @@ function PHP12_v_choose($el, $unit) {
 function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 	/*
 		имя объекта: spisok
-		 id объекта: block_id, в котором размещается список
+		 id объекта: id элемента, который размещает список
 	*/
 	if(empty($unit['id']))
 		return
@@ -718,13 +716,8 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 			'</div>'.
 		'</div>';
 
-	return _pr($unit);
-
 	//определение ширины шаблона
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `id`=".$unit['block_id'];
-	if(!$block = query_assoc($sql))
+	if(!$block = _blockOne($unit['block_id']))
 		return 'Блока, в котором находится список, не существует.';
 
 	setcookie('block_level_spisok', 1, time() + 2592000, '/');
@@ -737,9 +730,9 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 
 	return
 		'<div class="bg-ffc pad10 line-b">'.
-			_blockLevelChange('spisok', $unit['block_id'], $width).
+			_blockLevelChange('spisok', $unit['id'], $width).
 		'</div>'.
-		'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'._blockHtml('spisok', $unit['block_id'], $width).'</div>';
+		'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'._blockHtml('spisok', $unit['id'], $width).'</div>';
 }
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */

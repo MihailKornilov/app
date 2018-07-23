@@ -288,7 +288,7 @@ function _blockSetka($r, $level, $grid_id, $unit) {//отображение се
 	if(!empty($unit['elem_width_change']))
 		return '';
 	//выход, если выбор элемента
-	if(!empty($unit['choose']))
+	if(!empty($unit['v_choose']))
 		return '';
 	if($r['id'] == $grid_id)
 		return '';
