@@ -936,13 +936,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						}
 					});
 					return;
-				//настройка шаблона единицы списка todo на удаление
-				case 25:
-					$('#block-level-spisok')
-						.find('.block-grid-on')
-						.removeClass('grey')
-						.trigger('click');
-					return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
 				case 26:
 					if(!window.DIALOG_OPEN)

@@ -792,25 +792,17 @@ function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавле
 	switch($elem['block']['obj_name']) {
 		default:
 		case 'page': $width = 1000; break;
-		case 'spisok':
-			$sql = "SELECT *
-					FROM `_block`
-					WHERE `id`=".$elem['block']['obj_id'];
-			$bl = query_assoc($sql);
-
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `block_id`=".$bl['id'];
-			$el = query_assoc($sql);
-
-			//корректировка ширины с учётом отступов
-			$ex = explode(' ', $el['mar']);
-			$width = floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
-			break;
 		case 'dialog':
 			_BE('dialog_clear');
 			$dlg = _dialogQuery($elem['block']['obj_id']);
 			$width = $dlg['width'];
+			break;
+		case 'spisok':
+			$el = _elemOne($elem['block']['obj_id']);
+			$bl = $el['block'];
+			//корректировка ширины с учётом отступов
+			$ex = explode(' ', $el['mar']);
+			$width = floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
 			break;
 	}
 	$send['level'] = _blockLevelChange($elem['block']['obj_name'], $elem['block']['obj_id'], $width);

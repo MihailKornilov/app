@@ -48,7 +48,6 @@ function _blockName($name, $i='name') {//доступные варианты о�
 		'dialog' => '<div class="pad10">'.
 						'<div class="_empty min">'.
 							'Пустое содержание диалога.'.
-	   (_num(@BLOCK_EDIT) ? '<div class="mt10 pale">Начните с управления блоками.</div>' : '').
 						'</div>'.
 					'</div>'
 	);
@@ -79,6 +78,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		$level:     уровень блоков
 		$unit:      данные единицы списка.
 					А также дополнительные настройки:
+						blk_edit: включение настройки блоков
 						elem_width_change: изменение ширины элементов
 						elem_choose: выбор элемента
 	*/
@@ -86,16 +86,18 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		return '';
 
 	//условия для настройки блоков конкретного объекта
-	if(!defined('BLOCK_EDIT')) {
+	if(!isset($unit['blk_edit'])) {
 		$id = key($arr);
 		switch($arr[$id]['obj_name']) {
 			default:
 			case 'page': $v = PAS; break;
-			case 'spisok': $v = 0; break;
 			case 'dialog': $v = 0; break;
+			case 'spisok': $v = 0; break;
 		}
-		define('BLOCK_EDIT', $v);
+		$unit['blk_edit'] = $v;
 	}
+
+	$BLK_EDIT = $unit['blk_edit'];
 
 	$MN = 10;//множитель
 	$wMax = round($WM / $MN);
@@ -106,7 +108,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	//составление структуры блоков по строкам
 	$block = array();
 	foreach($arr as $r) {
-		if(!BLOCK_EDIT && empty($unit['v_choose']) && empty($unit['choose']) && $r['elem_id'] && $r['elem']['hidden'])
+		if(!$BLK_EDIT && empty($unit['v_choose']) && empty($unit['choose']) && $r['elem_id'] && $r['elem']['hidden'])
 			continue;
 		$block[$r['y']][$r['x']] = $r;
 	}
@@ -119,10 +121,10 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	$yEnd = key($block);
 
 	$send = '';
-	$BT = BLOCK_EDIT ? ' bor-t-dash' : '';
-	$BR = BLOCK_EDIT ? ' bor-r-dash' : '';
-	$BB = BLOCK_EDIT ? ' bor-b-dash' : '';
-	$br1px = BLOCK_EDIT ? 1 : 0;//показ красной разделительной линии справа
+	$BT = $BLK_EDIT ? ' bor-t-dash' : '';
+	$BR = $BLK_EDIT ? ' bor-r-dash' : '';
+	$BB = $BLK_EDIT ? ' bor-b-dash' : '';
+	$br1px = $BLK_EDIT ? 1 : 0;//показ красной разделительной линии справа
 
 	foreach($block as $y => $str) {
 		$widthMax = $WM;
@@ -173,17 +175,17 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$cls = implode(' ', $cls);
 
 			$bor = explode(' ', $r['bor']);
-			$borPx = $bor[3] + (BLOCK_EDIT ? 0 : $bor[1]);
+			$borPx = $bor[3] + ($BLK_EDIT ? 0 : $bor[1]);
 			$width = $r['width'] - ($xEnd ? 0 : $br1px) - $borPx;
 
 			//если блок списка шаблона, attr_id не ставится
-			$attr_id = !BLOCK_EDIT && $r['obj_name'] == 'spisok' ? '' : ' id="bl_'.$r['id'].'"';
+			$attr_id = !$BLK_EDIT && $r['obj_name'] == 'spisok' ? '' : ' id="bl_'.$r['id'].'"';
 
 			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
 						' style="'._blockStyle($r, $width, $unit).'"'.
-		  (BLOCK_EDIT ? ' val="'.$r['id'].'"' : '').
-		  (!BLOCK_EDIT && $r['click_action'] == 2082 && $r['click_dialog'] ?
+		  ($BLK_EDIT ? ' val="'.$r['id'].'"' : '').
+		  (!$BLK_EDIT && $r['click_action'] == 2082 && $r['click_dialog'] ?
 			            ' val="dialog_id:'.$r['click_dialog'].',unit_id:'.$unit['id'].'"'
 		  : '').
 					 '>'.
@@ -282,7 +284,7 @@ function _blockLevelDefine($obj_name, $v = 0) {//уровень редактир
 	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
 }
 function _blockSetka($r, $level, $grid_id, $unit) {//отображение сетки для настраиваемого блока
-	if(!BLOCK_EDIT)
+	if(empty($unit['blk_edit']))
 		return '';
 	//выход, если включено изменение ширины элемента
 	if(!empty($unit['elem_width_change']))
@@ -428,7 +430,7 @@ function _elemDiv($el, $unit=array()) {//формирование div элеме
 	$txt = _elemUnit($el, $unit);
 
 	//если элемент списка шаблона, attr_id не ставится
-	$attr_id = !BLOCK_EDIT && $el['block']['obj_name'] == 'spisok' ? '' : ' id="el_'.$el['id'].'"';
+	$attr_id = empty($unit['blk_edit']) && $el['block']['obj_name'] == 'spisok' ? '' : ' id="el_'.$el['id'].'"';
 
 	$cls = array();
 	$cls[] = _elemFormatColor($txt, $el, $el['color']);
@@ -512,7 +514,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 	//значение из списка
 	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']] : '';
-	$is_edit = @BLOCK_EDIT || !empty($unit['elem_width_change']) || !empty($unit['choose']);
+	$is_edit = !empty($unit['blk_edit']) || !empty($unit['elem_width_change']) || !empty($unit['v_choose']);
 	$attr_id = 'cmp_'.$el['id'].($is_edit ? '_edit' : '');
 	$disabled = $is_edit ? ' disabled' : '';
 
@@ -2180,7 +2182,7 @@ function _beBlockForming($arr) {//формирование массива бло
 	return $data;
 }
 function _beBlockBg($r) {
-	global $G_BLOCK, $G_ELEM, $G_DLG;
+	global $G_ELEM, $G_DLG;
 
 	//если присутствует элемент-цвет фона, получение колонок для цвета, если потребуется окраска блока
 	$r['xx_ids'] = _idsAss($r['xx_ids']);

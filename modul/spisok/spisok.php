@@ -548,7 +548,8 @@ function _spisokUnitNum($el, $u) {//порядковый номер - значе
 	if(empty($u))
 		return _elemTitle($el['id']);
 	if(empty($u['num']))
-		return $u['id'];
+//		return _pr($u);
+		return @$u['id'];
 	return $u['num'];
 }
 function _spisokUnitData($el, $unit) {//дата и время - значение единицы списка [33]

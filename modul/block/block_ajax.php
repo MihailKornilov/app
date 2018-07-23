@@ -26,8 +26,9 @@ switch(@$_POST['op']) {
 		if(!$width = _num($_POST['width']))
 			jsonError('Некорректная ширина');
 
-		define('BLOCK_EDIT', 1);
-		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, _pageSpisokUnit($obj_id, $obj_name));
+		$unit = _pageSpisokUnit($obj_id, $obj_name) + array('blk_edit' => 1);
+
+		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, $unit);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
@@ -43,9 +44,10 @@ switch(@$_POST['op']) {
 
 		$on = _num($_POST['on']);
 
-		define('BLOCK_EDIT', 1);
-
-		$unit = _pageSpisokUnit($obj_id, $obj_name) + array('elem_width_change' => $on);
+		$unit = _pageSpisokUnit($obj_id, $obj_name) +
+				array(
+					'elem_width_change' => $on
+				);
 		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, $unit);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
@@ -247,12 +249,11 @@ switch(@$_POST['op']) {
 
 		_blockChildCountSet($obj_name, $obj_id);
 
-		define('BLOCK_EDIT', 1);
-
 		_BE( 'block_clear');
 
+		$unit = _pageSpisokUnit($obj_id, $obj_name) + array('blk_edit' => 1);
 		$send['level'] = _blockLevelChange($obj_name, $obj_id, $width);
-		$send['html'] = _blockHtml($obj_name, $obj_id, $width,0, _pageSpisokUnit($obj_id, $obj_name));
+		$send['html'] = _blockHtml($obj_name, $obj_id, $width,0, $unit);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
@@ -364,9 +365,15 @@ switch(@$_POST['op']) {
 		if($block['obj_name'] == 'dialog')//деление происходит для диалогового окна
 			$width = _dialogParam($block['obj_id'], 'width');
 
-		define('BLOCK_EDIT', 1);
 		$send['block'] = $block;
-		$send['html'] = _blockHtml($block['obj_name'], $block['obj_id'], $width, $id, _pageSpisokUnit($block['obj_id'], $block['obj_name']));
+		$send['html'] =
+			_blockHtml(
+				$block['obj_name'],
+				$block['obj_id'],
+				$width,
+				$id,
+				_pageSpisokUnit($block['obj_id'], $block['obj_name']) + array('blk_edit' => 1)
+			);
 
 		jsonSuccess($send);
 		break;

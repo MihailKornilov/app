@@ -698,7 +698,8 @@ function PHP12_v_choose($el, $unit) {
 	return
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
 	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $cond).
-	_pr($unit);
+//	_pr($unit).
+	'';
 }
 
 
@@ -732,7 +733,9 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 		'<div class="bg-ffc pad10 line-b">'.
 			_blockLevelChange('spisok', $unit['id'], $width).
 		'</div>'.
-		'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'._blockHtml('spisok', $unit['id'], $width).'</div>';
+		'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'.
+			_blockHtml('spisok', $unit['id'], $width, 0, array('blk_edit' => 1)).
+		'</div>';
 }
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */

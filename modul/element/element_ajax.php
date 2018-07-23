@@ -29,8 +29,6 @@ switch(@$_POST['op']) {
 		if(!isset($menu[$dialog['menu_edit_last']]))
 			$dialog['menu_edit_last'] = 1;
 
-		define('BLOCK_EDIT', 1);
-
 		$tab2field_id = 0;   //id колонка для связки с первой таблицей
 		$tablesFields = array();//колонки по каждой таблице
 		$group = array();
@@ -186,7 +184,7 @@ switch(@$_POST['op']) {
 					_blockLevelChange('dialog', $dialog_id, $dialog['width']).
 				'</div>'.
 				'<div class="block-content-dialog" style="width:'.$dialog['width'].'px">'.
-					_blockHtml('dialog', $dialog_id, $dialog['width']).
+					_blockHtml('dialog', $dialog_id, $dialog['width'], 0, array('blk_edit' => 1)).
 				'</div>'.
 			'</div>'.
 
