@@ -688,16 +688,24 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в 
 	return '<a href="'.URL.'&p='.$page_id.'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 }
 function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстовом (быстром) поиске
-	if(!$el['block_id']) {
-		//если таблица
-		$element_id_spisok = abs($el['block_id']);
-	} else {
-		//если список-шаблон
-		if($el['block']['obj_name'] != 'spisok')
+	$element_id_spisok = 0;
+
+	//список-шаблон
+	if(!empty($el['block']))
+		if($el['block']['obj_name'] == 'spisok')
+			$element_id_spisok = $el['block']['obj_id'];
+
+	//список-таблица
+	if($el['parent_id']) {
+		if(!$ell = _elemOne($el['parent_id']))
 			return $txt;
-		$blSpisok = _blockOne($el['block']['obj_id']);
-		$element_id_spisok = $blSpisok['elem_id'];
+		if($ell['dialog_id'] != 23)
+			return $txt;
+		$element_id_spisok = $el['parent_id'];
 	}
+
+	if(!$element_id_spisok)
+		return $txt;
 
 	$search = false;
 	$v = '';

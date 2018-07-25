@@ -577,7 +577,7 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 	return $el['name'];
 }
 function _elem_11_dialog($el) {//получение массива диалога по элементу 11
-	if(!$el['dialog_id'] = 11)
+	if($el['dialog_id'] != 11)
 		return 0;
 	if(!$el11 = _elemOne($el['txt_2']))
 		return 0;
@@ -591,35 +591,35 @@ function _elem_11_dialog($el) {//получение массива диалог�
 
 	return $dlg;
 }
-function _elem_11_v($elem_id, $unit) {//получение значения из единицы списка
-	if(!$el = _elemOne($elem_id))
-		return _msgRed('-no-el-'.$elem_id.'-');
+function _elem_11_v($EL, $ell_id, $unit) {//получение значения из единицы списка
+	if(!$ell = _elemOne($ell_id))
+		return _msgRed('-no-el11-'.$ell_id.'-');
 
-	switch($el['dialog_id']) {
+	switch($ell['dialog_id']) {
 		//многострочное поле
 		case 5:
 		//однострочное поле
 		case 8:
 			//отсутствует имя колонки
-			if(!$col = $el['col'])
+			if(!$col = $ell['col'])
 				return _msgRed('no-col');
 			//имени колонки не существует в единице списка
 			if(!isset($unit[$col]))
 				return _msgRed('no-unit-col');
 
 			$txt = $unit[$col];
-//			$txt = _spisokColSearchBg($el, $txt);
-//			$txt = _spisokUnitUrl($el, $unit, $txt);
+			$txt = _spisokUnitUrl($EL, $unit, $txt);
+			$txt = _spisokColSearchBg($EL, $txt);
 
 			return _br($txt);
 		//произвольный текст
-		case 10: return _br($el['txt_1']);
+		case 10: return _br($ell['txt_1']);
 		//сумма значений единицы списка (баланс)
 		case 27:
 		//количество связанного списка
 		case 54:
 		//сумма связанного списка
-		case 55: return $unit[$el['col']];
+		case 55: return $unit[$ell['col']];
 	}
 
 	return _msgRed('-no-11-');

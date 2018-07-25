@@ -170,7 +170,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
 			$cls[] = $r['click_action'] == 2081 && $r['click_page']   ? 'curP block-click-page pg-'.$r['click_page'] : '';
-			$cls[] = $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
+			$cls[] = !$BLK_EDIT && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
@@ -184,7 +184,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
 						' style="'._blockStyle($r, $width, $unit).'"'.
-		  ($BLK_EDIT ? ' val="'.$r['id'].'"' : '').
+		   ($BLK_EDIT ? ' val="'.$r['id'].'"' : '').
 		  (!$BLK_EDIT && $r['click_action'] == 2082 && $r['click_dialog'] ?
 			            ' val="dialog_id:'.$r['click_dialog'].',unit_id:'.$unit['id'].'"'
 		  : '').
@@ -720,12 +720,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			//получение значения, если нет вложенных списков
 			if(count($ids) == 1)
-				return _elem_11_v($ids[0], $unit);
+				return _elem_11_v($el, $ids[0], $unit);
 
 			$u = $unit;
-			$eid = 0;
+			$ell_id = 0;//id элемента, который содержит элемент 11 (в txt_2)
 			foreach($ids as $n => $elem_id) {
-				$eid = $elem_id;
+				$ell_id = $elem_id;
 				if(!$ell = _elemOne($elem_id))
 					return _msgRed('-no-el-'.$elem_id.'-');
 
@@ -733,7 +733,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 					case 29:
 					case 59:
 						if(!$col = $ell['col'])
-							return 'нет имени колонки';
+							return _msgRed('нет имени колонки');
 						if(empty($u))
 							return _msgRed('единица списка пуста. Шаг: '.$n);
 						if(!$u = $u[$col])
@@ -747,7 +747,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				}
 			}
 
-			return _elem_11_v($eid, $u);
+			return _elem_11_v($el, $ell_id, $u);
 
 
 
@@ -1357,6 +1357,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			//если редактирование запрещено, иконка не выводится
 			if(!$dialog['edit_on'])
 				return '';
+
+			if(PAS)
+				return _iconEdit();
 
 			return
 			_iconEdit(array(
