@@ -797,35 +797,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						}
 						$unit = $sp;
 						break;
-					//Изображение
-					case 60:
-						if(!$col = $elem['col']) {
-							$send .= '';
-							break;
-						}
-						if(empty($unit)) {
-							$send .= _imageNo($el['width']);
-							break;
-						}
-
-	//					if(empty($unit[$elem['col']]))//id картинки хранится в колонке
-	//						$send .= '';
-	//					if(!$img_id = _num($unit[$elem['col']]))//получение id картинки, либо вывод её, если уже сформирована
-	//						$send .= $unit[$elem['col']];
-
-						$sql = "SELECT *
-								FROM `_image`
-								WHERE `obj_name`='elem_".$elem['id']."'
-								  AND `obj_id`=".$unit['id']."
-								  AND !`deleted`
-								  AND !`sort`
-								LIMIT 1";
-						if(!$r = query_assoc($sql)) {
-							$send .= _imageNo($el['width']);
-							break;
-						}
-						$send .= _imageHtml($r, $el['width'], $el['num_7']);
-						break;
 				}
 			}
 			return $send;

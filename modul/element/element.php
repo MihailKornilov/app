@@ -620,6 +620,25 @@ function _elem_11_v($EL, $ell_id, $unit) {//получение значения 
 		case 54:
 		//сумма связанного списка
 		case 55: return $unit[$ell['col']];
+		//Изображение
+		case 60:
+			if(!$col = $ell['col'])
+				return _msgRed('no-col-60');
+			if(empty($unit))
+				return _imageNo($EL['width']);
+
+			$sql = "SELECT *
+					FROM `_image`
+					WHERE `obj_name`='elem_".$ell['id']."'
+					  AND `obj_id`=".$unit['id']."
+					  AND !`deleted`
+					  AND !`sort`
+					LIMIT 1";
+			if(!$r = query_assoc($sql))
+				return _imageNo($EL['width']);
+
+			return _imageHtml($r, $EL['width'], $EL['num_7']);
+
 	}
 
 	return _msgRed('-no-11-');
