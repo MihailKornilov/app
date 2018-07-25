@@ -79,8 +79,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		$unit:      данные единицы списка.
 					А также дополнительные настройки:
 						blk_edit: включение настройки блоков
+						v_choose: выбор элемента
 						elem_width_change: изменение ширины элементов
-						elem_choose: выбор элемента
 	*/
 	if(empty($arr))
 		return '';

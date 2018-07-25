@@ -730,12 +730,13 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 	$line_r = $width < 980 ? ' line-r' : '';
 
 	return
-		'<div class="bg-ffc pad10 line-b">'.
-			_blockLevelChange('spisok', $unit['id'], $width).
-		'</div>'.
-		'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'.
-			_blockHtml('spisok', $unit['id'], $width, 0, array('blk_edit' => 1)).
-		'</div>';
+	'<div class="bg-ffc pad10 line-b">'.
+		_blockLevelChange('spisok', $unit['id'], $width).
+	'</div>'.
+	'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'.
+		_blockHtml('spisok', $unit['id'], $width, 0, array('blk_edit' => 1)).
+	'</div>'.
+	'<script>_blockUpd('._BE('block_js', 'spisok', $unit['id']).');</script>';
 }
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */

@@ -207,24 +207,6 @@ switch(@$_POST['op']) {
 		$send['spisok'] = _spisok23($el, $next);
 		jsonSuccess($send);
 		break;
-	case 'spisok_29_connect':
-		if(!$cmp_id = _num($_POST['cmp_id']))
-			jsonError('Некорректный ID компонента диалога');
-
-		$v = _txt($_POST['v']);
-
-		$send['spisok'] = _spisok29connect($cmp_id, $v);
-		jsonSuccess($send);
-		break;
-	case 'spisok_59_unit':
-		if(!$cmp_id = _num($_POST['cmp_id']))
-			jsonError('Некорректный ID компонента');
-		if(!$unit_id = _num($_POST['unit_id']))
-			jsonError('Некорректный ID выбранного элемента');
-
-		$send['html'] = _spisok59unit($cmp_id, $unit_id);
-		jsonSuccess($send);
-		break;
 	case 'spisok_23_sort':
 		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Некорректный ID элемента');
@@ -266,6 +248,24 @@ switch(@$_POST['op']) {
 			_cache_clear('page');
 
 		jsonSuccess();
+		break;
+	case 'spisok_29_connect':
+		if(!$cmp_id = _num($_POST['cmp_id']))
+			jsonError('Некорректный ID компонента диалога');
+
+		$v = _txt($_POST['v']);
+
+		$send['spisok'] = _spisok29connect($cmp_id, $v);
+		jsonSuccess($send);
+		break;
+	case 'spisok_59_unit':
+		if(!$cmp_id = _num($_POST['cmp_id']))
+			jsonError('Некорректный ID компонента');
+		if(!$unit_id = _num($_POST['unit_id']))
+			jsonError('Некорректный ID выбранного элемента');
+
+		$send['html'] = _spisok59unit($cmp_id, $unit_id);
+		jsonSuccess($send);
 		break;
 }
 

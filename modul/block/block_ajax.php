@@ -96,26 +96,16 @@ switch(@$_POST['op']) {
 			switch($obj_name) {
 				default:
 				case 'page': $width = 1000; break;
-				case 'spisok':
-					$sql = "SELECT *
-							FROM `_block`
-							WHERE `id`=".$obj_id;
-					if(!$block = query_assoc($sql))
-						jsonError('Блока для элемента-списка не существует');
-
-					$sql = "SELECT *
-							FROM `_element`
-							WHERE `block_id`=".$obj_id;
-					if(!$elem = query_assoc($sql))
-						jsonError('Элемента-списка не существует');
-
-					//корректировка ширины с учётом отступов
-					$ex = explode(' ', $elem['mar']);
-					$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
-					break;
 				case 'dialog':
 					$dialog = _dialogQuery($obj_id);
 					$width = $dialog['width'];
+					break;
+				case 'spisok':
+					if(!$elm14 = _elemOne($obj_id))
+						jsonError('Элемента id'.$obj_id.', который размещает список, не существует');
+					//корректировка ширины с учётом отступов
+					$ex = explode(' ', $elm14['mar']);
+					$width = floor(($elm14['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
 					break;
 			}
 		}
@@ -326,44 +316,33 @@ switch(@$_POST['op']) {
 		jsonSuccess();
 		break;
 	case 'block_unit_gird'://включение деления блока на подблоки
-		if(!$id = _num($_POST['id']))
+		if(!$block_id = _num($_POST['id']))
 			jsonError('Некорректный ID блока');
-
-		$width = 1000;
-
-		//получение данных блока
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$id;
-		if(!$block = query_assoc($sql))
-			jsonError('Блока id'.$id.' не существует');
+		if(!$block = _blockOne($block_id))
+			jsonError('Блока id'.$block_id.' не существует');
 
 		foreach($block as $key => $v)
-			if(preg_match(REGEXP_INTEGER, $v))
-				$block[$key] = _num($v, 1);
+			if(!is_array($v))
+				if(preg_match(REGEXP_INTEGER, $v))
+					$block[$key] = _num($v, 1);
 
-		if($block['obj_name'] == 'spisok') {//деление происходит для элемента списка
-			//получение данных главного блока списка
-			$sql = "SELECT *
-					FROM `_block`
-					WHERE `id`=".$block['obj_id'];
-			if(!$iss = query_assoc($sql))
-				jsonError('Главного блока списка id'.$block['obj_id'].' не существует');
+		switch($block['obj_name']) {
+			default:
+			case 'page':
+				$width = 1000;
+				break;
+			case 'dialog':
+				$width = _dialogParam($block['obj_id'], 'width');
+				break;
+			case 'spisok':
+				//получение элемента, который содержит список (для корректировки ширины с отступами)
+				if(!$elm14 = _elemOne($block['obj_id']))
+					jsonError('Элемента id'.$block['obj_id'].', который размещает список, не существует');
 
-			//получение элемента, который содержит список (для корректировки ширины с отступами)
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `block_id`=".$iss['id']."
-					LIMIT 1";
-			if(!$elem = query_assoc($sql))
-				jsonError('Элемента в блоке не существует');
-
-			$ex = explode(' ', $elem['mar']);
-			$width = floor(($iss['width'] - $ex[1] - $ex[3]) / 10) * 10;
+				$ex = explode(' ', $elm14['mar']);
+				$width = floor(($elm14['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
 		}
 
-		if($block['obj_name'] == 'dialog')//деление происходит для диалогового окна
-			$width = _dialogParam($block['obj_id'], 'width');
 
 		$send['block'] = $block;
 		$send['html'] =
@@ -371,7 +350,7 @@ switch(@$_POST['op']) {
 				$block['obj_name'],
 				$block['obj_id'],
 				$width,
-				$id,
+				$block_id,
 				_pageSpisokUnit($block['obj_id'], $block['obj_name']) + array('blk_edit' => 1)
 			);
 
