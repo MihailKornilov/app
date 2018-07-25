@@ -749,58 +749,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			return _elem_11_v($el, $ell_id, $u);
 
-
-
-			foreach($ids as $n => $elem_id) {
-				if(!$elem = _elemOne($elem_id))
-					return '-удалено-';
-				switch($elem['dialog_id']) {
-					//однострочное поле
-					case 8:
-						if(empty($unit))
-							return '';
-						if(empty($unit[$elem['col']]))
-							return '';
-						$txt = $unit[$elem['col']];
-						if($n) {
-							$el0 = _elemOne($ids[0]);
-							if($el0['dialog_id'] == 29)
-								if($el0['num_5']) {//вывод значения по уровням
-
-									if($parent_id = $unit['parent_id'])
-										while($parent_id) {
-											$sql = "SELECT *
-													FROM `_spisok`
-													WHERE `id`=".$parent_id;
-											if(!$u = query_assoc($sql))
-												break;
-											$txt = $u[$elem['col']].' » '.$txt;
-											$parent_id = $u['parent_id'];
-										}
-
-								}
-						}
-						$send .= _br($txt);
-						break;
-					//связки
-					case 29:
-					case 59:
-						if(!$sp = $unit[$elem['col']])
-							break;
-						if(!is_array($sp)) {
-							$dialog = _dialogQuery($unit['dialog_id']);
-							$sql = "SELECT *
-									FROM `"._table($dialog['table_1'])."`
-									WHERE `id`=".$sp;
-							$unit = query_assoc($sql);
-							break;
-						}
-						$unit = $sp;
-						break;
-				}
-			}
-			return $send;
-
 		//SA: Функция PHP
 		case 12:
 			/*
@@ -849,7 +797,31 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			'</div>';
 
 		//Содержание единицы списка - шаблон
-		case 14: return _spisok14($el);
+		case 14:
+			//диалог, через который вносятся данные списка
+			if(!$dialog_id = $el['num_1'])
+				return
+				'<div class="_empty">'.
+					'<span class="fs15 red">'.
+						'Не указан список для вывода данных.'.
+					'</span>'.
+				'</div>';
+
+			if(!$DLG = _dialogQuery($dialog_id))
+				return
+				'<div class="_empty">'.
+					'<span class="fs15 red">'.
+						'Списка <b class="fs15">'.$dialog_id.'</b> не существует.'.
+					'</span>'.
+				'</div>';
+
+			if($is_edit)
+				return
+				'<div class="_empty">'.
+					'Список-шаблон <b class="fs14">'.$DLG['name'].'</b>'.
+				'</div>';
+
+			return _spisok14($el);
 
 		//Количество строк списка
 		case 15:

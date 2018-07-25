@@ -698,6 +698,12 @@ function PHP12_v_choose($el, $unit) {
 		}
 	}
 
+	//принимает ли страница значения списка
+	if(!$dialog_id) {
+		$page = _page($SRC['page_id']);
+		$dialog_id = $page['spisok_id'];
+	}
+
 	if(!$dialog_id)
 		return _emptyMin('Не найден диалог, который вносит данные списка.');
 	if(!$dialog = _dialogQuery($dialog_id))

@@ -121,8 +121,8 @@ function _spisokFilter($i='all', $v=0) {//получение значений ф
 	return $F;
 }
 
-function _spisokIsSort($block_id) {//определение, нужно ли производить сортировку этого списка (поиск элемента 71)
-	if(!$spisok_el = _BE('elem_arr', 'spisok', $block_id))
+function _spisokIsSort($elem_id) {//определение, нужно ли производить сортировку этого списка (поиск элемента 71)
+	if(!$spisok_el = _BE('elem_arr', 'spisok', $elem_id))
 		return 0;
 
 	foreach($spisok_el as $elem)
@@ -280,35 +280,18 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		настройка шаблона через функцию PHP12_spisok14_setup
 	*/
 
-	//диалог, через который вносятся данные списка
-	if(!$dialog_id = $ELEM['num_1'])
-		return '<div class="_empty"><span class="fs15 red">Не указан список для вывода данных.</span></div>';
-	if(!$DLG = _dialogQuery($dialog_id))
-		return '<div class="_empty">'.
-					'<span class="fs15 red">'.
-						'Списка <b class="fs15">'.$dialog_id.'</b> не существует.'.
-					'</span>'.
-			   '</div>';
-
-	if(PAS)
-		return
-		'<div class="_empty">'.
-			'Список-шаблон <b class="fs14">'.$DLG['name'].'</b>'.
-		'</div>';
-
-//		(_spisokIsSort($el['block_id']) ?
-//			'<script>_spisokSort("'.$el['attr_el'].'")</script>'
-//		: '');
-
+	$DLG = _dialogQuery($ELEM['num_1']);
 
 	$limit = $ELEM['num_2'];
 
 	if(!$all = _spisokCountAll($ELEM))
 		return '<div class="_empty min">'._br($ELEM['txt_1']).'</div>';
 
+	$IS_SORT = _spisokIsSort($ELEM['id']);
+
 	$order = "`t1`.`id` DESC";
-//	if(_spisokIsSort($ELEM['block_id']))
-//		$order = "`sort`";
+	if($IS_SORT)
+		$order = "`sort`";
 
 	//получение данных списка
 	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
@@ -363,6 +346,9 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 				'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
 			'</div>';
 	}
+
+	if($IS_SORT)
+		$send .= '<script>_spisokSort("'.$ELEM['attr_el'].'")</script>';
 
 	return $send;
 }
