@@ -1273,8 +1273,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						func:toggle
 					});
 					return;
-				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка пунктов меню переключения блоков (для [57])
-				case 58: _cmpV58(el); return;
 				//Связка списка при помощи кнопки
 				case 59:
 					var but = $(el.attr_cmp + el.afics),
@@ -2008,162 +2006,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			cmp.val(val);
 		}
 	},
-	_cmpV58 = function(o, get) {//Настройка пунктов меню переключения блоков
-		var el = $(o.attr_el);
-
-		//получение данных для сохранения
-		if(get) {
-			var send = [];
-			_forEq(el.find('dd'), function(sp) {
-				send.push({
-					id:sp.attr('val'),
-					title:sp.find('.pk-title').val(),
-					blk:sp.find('.pk-block').attr('val'),
-					def:sp.find('.def').val()
-				});
-			});
-			return send;
-		}
-
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Новый пункт меню</div>',
-			DL = el.append(html).find('dl'),
-			BUT_ADD = el.find('div:last'),
-			NUM = 1,
-			BCS = $('.block-choose-submit');//кнопка сохранения выбора блоков
-
-		//отмена выбора блоков на странице
-		$('.block-choose-cancel').click(dlgShow);
-
-		BUT_ADD.click(valueAdd);
-
-		if(!o.vvv.length)
-			valueAdd();
-
-		for(var i in o.vvv)
-			valueAdd(o.vvv[i])
-
-		function valueAdd(v) {
-			v = $.extend({
-				id:0,                  //id элемента
-				num:NUM,
-				title:'Имя пункта ' + NUM++, //имя пункта меню
-				blk:'',
-				blk_title:'',
-				def:0
-			}, v);
-
-			DL.append(
-				'<dd class="over3" val="' + v.id + '" data-num="' + v.num + '">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w35 pl5">' +
-								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w15">' +
-								'<input type="hidden" class="def" value="' + v.def + '" />' +
-							'<td><input type="text"' +
-									  ' class="pk-title w100p"' +
-									  ' placeholder="имя не указано"' +
-									  ' value="' + v.title + '"' +
-								' />' +
-							'<td class="w125">' +
-								'<input type="text"' +
-									  ' class="pk-block w100p curP color-ref over1"' +
-									  ' readonly' +
-									  ' placeholder="выбрать блоки"' +
-									  ' value="' + v.blk_title + '"' +
-									  ' val="' + v.blk + '"' +
-								' />' +
-							'<td class="w35 r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить пункт', -44) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			var DD = DL.find('dd:last'),
-				NAME = DD.find('.pk-title'),
-				BLOCK = DD.find('.pk-block');
-			NAME.focus();
-			BLOCK.click(function() {
-				var deny = [];
-				_forEq(el.find('dd'), function(sp) {
-					var num = _num(sp.attr('data-num')),
-						blk = sp.find('.pk-block').attr('val');
-					if(num == v.num)
-						return;
-					if(!blk)
-						return;
-					deny.push(blk);
-				});
-				var spl = BCS.parent().parent().attr('val').split(':'),
-					send = {
-						op:'block_choose_page',
-						obj_name:spl[0],
-						obj_id:spl[1],
-						width:spl[2],
-						sel:BLOCK.attr('val'),
-						deny:_idsAss(deny.join(',')),
-						busy_obj:BLOCK,
-						busy_cls:'hold'
-					};
-				_post(send, function(res) {
-					$('#_content').html(res.html);
-					$('.block-grid-on').hide();
-					$('.block-level-change').hide();
-					$('.elem-width-change').hide();
-					BCS.parent().show();
-					DIALOG_OPEN.hide();
-					var bec = $('#_content').find('.choose');
-					bec.click(function() {
-						var t = $(this),
-							sel = t.hasClass('sel');
-						t._dn(sel, 'sel');
-					});
-					BCS.click(function() {
-						var ids = [];
-						_forEq(bec, function(el) {
-							if(el.hasClass('sel'))
-								ids.push(_num(el.attr('val')));
-						});
-						BLOCK.attr('val', ids.join(','));
-						BLOCK.val(ids.length ? ids.length + ' блок' + _end(ids.length, ['', 'а', 'ов']) : '');
-						dlgShow();
-					});
-				});
-			});
-			DD.find('.def')._check({
-				tooltip:'По умолчанию',
-				func:function(v, ch) {
-					if(!v)
-						return;
-					//снятие галочек с остальных значений
-					_forEq(DL.find('.def'), function(sp) {
-						if(sp.attr('id') == ch.attr('id'))
-							return;
-						sp._check(0);
-					});
-				}
-			});
-			DL.sortable({
-				axis:'y',
-				handle:'.icon-move-y'
-			});
-			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
-			});
-		}
-		function dlgShow() {
-			$('.block-grid-on')
-				.show()
-				.removeClass('grey')
-				.trigger('click');
-			$('.block-level-change').show();
-			$('.elem-width-change').show();
-			BCS.parent().hide();
-			DIALOG_OPEN.show();
-		}
-	},
 	_elemFunc = function(el, v, is_open) {//применение функций, привязанных к элементам
 		/*
 			is_open - окно открылось, эффектов нет, только применение функций
@@ -2627,6 +2469,164 @@ var DIALOG = {},//массив диалоговых окон для управл
 				}
 			});
 		});
+	},
+
+	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ ===--- */
+	PHP12_menu_block_setup = function(o, unit) {//Настройка пунктов меню переключения блоков
+		var el = $(o.attr_el);
+
+		//получение данных для сохранения
+		if(unit == 'get') {
+			var send = [];
+			_forEq(el.find('dd'), function(sp) {
+				send.push({
+					id:sp.attr('val'),
+					title:sp.find('.pk-title').val(),
+					blk:sp.find('.pk-block').attr('val'),
+					def:sp.find('.def').val()
+				});
+			});
+			return send;
+		}
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Новый пункт меню</div>',
+			DL = el.append(html).find('dl'),
+			BUT_ADD = el.find('div:last'),
+			NUM = 1,
+			BCS = $('.block-choose-submit');//кнопка сохранения выбора блоков
+
+		//отмена выбора блоков на странице
+		$('.block-choose-cancel').click(dlgShow);
+
+		BUT_ADD.click(valueAdd);
+
+		if(!o.vvv.length)
+			valueAdd();
+
+		for(var i in o.vvv)
+			valueAdd(o.vvv[i])
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,                  //id элемента
+				num:NUM,
+				title:'Имя пункта ' + NUM++, //имя пункта меню
+				blk:'',
+				blk_title:'',
+				def:0
+			}, v);
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '" data-num="' + v.num + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w35 pl5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w15">' +
+								'<input type="hidden" class="def" value="' + v.def + '" />' +
+							'<td><input type="text"' +
+									  ' class="pk-title w100p"' +
+									  ' placeholder="имя не указано"' +
+									  ' value="' + v.title + '"' +
+								' />' +
+							'<td class="w125">' +
+								'<input type="text"' +
+									  ' class="pk-block w100p curP color-ref over1"' +
+									  ' readonly' +
+									  ' placeholder="выбрать блоки"' +
+									  ' value="' + v.blk_title + '"' +
+									  ' val="' + v.blk + '"' +
+								' />' +
+							'<td class="w35 r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить пункт', -44) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				NAME = DD.find('.pk-title'),
+				BLOCK = DD.find('.pk-block');
+			NAME.focus();
+			BLOCK.click(function() {
+				var deny = [];
+				_forEq(el.find('dd'), function(sp) {
+					var num = _num(sp.attr('data-num')),
+						blk = sp.find('.pk-block').attr('val');
+					if(num == v.num)
+						return;
+					if(!blk)
+						return;
+					deny.push(blk);
+				});
+				var spl = BCS.parent().parent().attr('val').split(':'),
+					send = {
+						op:'block_choose_page',
+						obj_name:spl[0],
+						obj_id:spl[1],
+						width:spl[2],
+						sel:BLOCK.attr('val'),
+						deny:_idsAss(deny.join(',')),
+						busy_obj:BLOCK,
+						busy_cls:'hold'
+					};
+				_post(send, function(res) {
+					$('#_content').html(res.html);
+					$('.block-grid-on').hide();
+					$('.block-level-change').hide();
+					$('.elem-width-change').hide();
+					BCS.parent().show();
+					DIALOG_OPEN.hide();
+					var bec = $('#_content').find('.choose');
+					bec.click(function() {
+						var t = $(this),
+							sel = t.hasClass('sel');
+						t._dn(sel, 'sel');
+					});
+					BCS.click(function() {
+						var ids = [];
+						_forEq(bec, function(el) {
+							if(el.hasClass('sel'))
+								ids.push(_num(el.attr('val')));
+						});
+						BLOCK.attr('val', ids.join(','));
+						BLOCK.val(ids.length ? ids.length + ' блок' + _end(ids.length, ['', 'а', 'ов']) : '');
+						dlgShow();
+					});
+				});
+			});
+			DD.find('.def')._check({
+				tooltip:'По умолчанию',
+				func:function(v, ch) {
+					if(!v)
+						return;
+					//снятие галочек с остальных значений
+					_forEq(DL.find('.def'), function(sp) {
+						if(sp.attr('id') == ch.attr('id'))
+							return;
+						sp._check(0);
+					});
+				}
+			});
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-move-y'
+			});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+			});
+		}
+		function dlgShow() {
+			$('.block-grid-on')
+				.show()
+				.removeClass('grey')
+				.trigger('click');
+			$('.block-level-change').show();
+			$('.elem-width-change').show();
+			BCS.parent().hide();
+			DIALOG_OPEN.show();
+		}
 	},
 
 	_elemGroup = function(v, dlg) {//функция, которая выполняется после открытия окна выбора элемента

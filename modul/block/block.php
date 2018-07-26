@@ -507,6 +507,20 @@ function _elemStyle($el, $unit) {//стили css для элемента
 
 	return ' style="'.implode(';', $send).'"';
 }
+function _elemUnitIsEdit($unit) {//определение в каком режиме находится блочная структура (рабочий или настройка)
+	$edit = 0;
+
+	if(!empty($unit['blk_edit']))
+		$edit = 1;
+
+	if(!empty($unit['elem_width_change']))
+		$edit = 1;
+
+	if(!empty($unit['v_choose']))
+		$edit = 1;
+
+	return $edit;
+}
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	$UNIT_ISSET = isset($unit['id']);
 	if(!$US = @$unit['source'])
@@ -514,7 +528,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 	//значение из списка
 	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']] : '';
-	$is_edit = !empty($unit['blk_edit']) || !empty($unit['elem_width_change']) || !empty($unit['v_choose']);
+	$is_edit = _elemUnitIsEdit($unit);
 	$attr_id = 'cmp_'.$el['id'].($is_edit ? '_edit' : '');
 	$disabled = $is_edit ? ' disabled' : '';
 
@@ -1530,16 +1544,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$el['def'].'" />'.
 				'<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
-
-		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка пунктов меню переключения блоков (для [57])
-		case 58:
-			/*
-				Все действия через JS.
-			*/
-			if($is_edit)
-				return '<div class="_empty min">Настройка пунктов меню переключения блоков</div>';
-
-			return '';
 
 		//Связка списка при помощи кнопки
 		case 59:
