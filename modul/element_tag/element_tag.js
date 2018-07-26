@@ -2291,6 +2291,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		var tt = $(this),
 			v = _num(tt.attr('val'));
 		valueSet(v);
+		o.func(v);
 	});
 	DDU.mouseenter(function() {
 		DDU.removeClass('on');

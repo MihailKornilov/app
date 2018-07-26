@@ -1223,7 +1223,7 @@ function _dialogOpenLoad($dialog_id) {
 					break;
 
 				//Исходный элемент не является выпадающим полем
-				if($EL['dialog_id'] != 17)
+				if($EL['dialog_id'] != 17 && $EL['dialog_id'] != 18)
 					break;
 
 				$dialog['cmp'][$cmp_id]['txt_1'] = $EL['txt_1'];

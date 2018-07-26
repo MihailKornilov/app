@@ -810,7 +810,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 											return;
 										}
 										_dialogLoad({
-											dialog_id:74,
+											dialog_id:11,
 											dialog_source:dlg_id,
 											busy_obj:inp,
 											busy_cls:'hold',
@@ -874,9 +874,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//dropdown
 				case 18:
+					_elemFunc(el, _num(unit[el.col] || el.def), 1);
 					$(el.attr_cmp)._dropdown({
 						title0:el.txt_1,
-						spisok:el.vvv
+						spisok:el.vvv,
+						func:function(v) {
+							_elemFunc(el, v);
+						}
 					});
 					return;
 				//наполнение для некоторых компонентов

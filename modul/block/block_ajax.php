@@ -46,6 +46,7 @@ switch(@$_POST['op']) {
 
 		$unit = _pageSpisokUnit($obj_id, $obj_name) +
 				array(
+					'blk_edit' => 1,
 					'elem_width_change' => $on
 				);
 		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, $unit);

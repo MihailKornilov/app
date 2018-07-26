@@ -1400,7 +1400,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			if(!$EL = $BL['elem'])
 				return '<div class="red">Отсутствует исходный элемент.</div>';
 
-			if($EL['dialog_id'] != 17)
+			if($EL['dialog_id'] != 17 && $EL['dialog_id'] != 18)
 				return '<div class="red">Исходный элемент не является выпадающим полем.</div>';
 
 			return _select(array(

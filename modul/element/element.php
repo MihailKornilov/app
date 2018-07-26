@@ -379,29 +379,6 @@ function _dialogSelArray($v=false) {//список диалогов для Selec
 
 	return $spisok;
 }
-function _dialogElemChoose($el, $unit) {//[74] выбор элемента (подключаемая функция). Используется для [13]
-	if(!$dialog_id = _num(@$unit['source']['dialog_source']))
-		return _emptyMin('Отсутствует исходный диалог.');
-	if(!$dialog = _dialogQuery($dialog_id))
-		return _emptyMin('Диалога не существует, который вносит данные списка.');
-
-	$sql = "SELECT `id`,1
-			FROM `_dialog`
-			WHERE !`app_id`
-			  AND `element_is_insert`";
-	$choose_access = query_ass($sql);
-
-	$send = array(
-		'choose' => 1,
-		'choose_access' => $choose_access,
-		'choose_sel' => array(),      //ids ранее выбранных элементов или блоков
-		'choose_deny' => array()      //ids элементов или блоков, которые выбирать нельзя (если они были выбраны другой фукцией того же элемента)
-	);
-
-	return
-	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
-	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send);
-}
 
 function PHP12_dialog_sa($el, $unit) {//список диалоговых окон [12]
 	$sql = "SELECT *
