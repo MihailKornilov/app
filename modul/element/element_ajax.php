@@ -1281,33 +1281,6 @@ function _dialogOpenLoad($dialog_id) {
 				}
 				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 				break;
-			//Настройка пунктов меню переключения блоков
-			case 58:
-				if(!$unit_id)
-					break;
-
-				$sql = "SELECT *
-						FROM `_element`
-						WHERE `block_id`=-".$unit_id."
-						ORDER BY `sort`";
-				if(!$arr = query_arr($sql))
-					break;
-
-				$spisok = array();
-				foreach($arr as $id => $r) {
-					$c = count(_ids($r['txt_2'], 1));
-					$blk_title = $r['txt_2'] ? $c.' блок'._end($c, '', 'а', 'ов') : '';
-					$spisok[] = array(
-						'id' => _num($id),
-						'title' => $r['txt_1'],
-						'blk' => $r['txt_2'],
-						'blk_title' => $blk_title,
-						'def' => _num($r['def'])
-					);
-				}
-
-				$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
-				break;
 			//Цвета для фона
 			case 70:
 				$color = array(

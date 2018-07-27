@@ -1035,6 +1035,29 @@ function PHP12_menu_block_setup($el, $unit) {//используется в ди�
 		return '<div class="_empty min">Настройка пунктов меню переключения блоков</div>';
 	return '';
 }
+function PHP12_menu_block_setup_vvv($parent_id) {//получение данных о пунктах меню
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$spisok = array();
+	foreach($arr as $id => $r) {
+		$c = count(_ids($r['txt_2'], 1));
+		$blk_title = $r['txt_2'] ? $c.' блок'._end($c, '', 'а', 'ов') : '';
+		$spisok[] = array(
+			'id' => _num($id),
+			'title' => $r['txt_1'],
+			'blk' => $r['txt_2'],
+			'blk_title' => $blk_title,
+			'def' => _num($r['def'])
+		);
+	}
+
+	return $spisok;
+}
 
 
 /* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
