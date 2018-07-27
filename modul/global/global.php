@@ -553,7 +553,7 @@ function _jsCache() {//формирование файла JS с данными 
 		if($r['dialog_id'] == 57) {
 			$vvv = array();
 			foreach(PHP12_menu_block_setup_vvv($r['id']) as $v) {
-				$vvv[] = '{id:'.$v['id'].',title:"'.$v['txt_1'].'",blk:"'.$v['txt_2'].'"}';
+				$vvv[] = '{id:'.$v['id'].',title:"'.$v['title'].'",blk:"'.$v['blk'].'"}';
 			}
 			$val[] = 'vvv:['.implode(',', $vvv).']';
 		}
