@@ -1257,19 +1257,18 @@ var DIALOG = {},//массив диалоговых окон для управл
 							1159:1
 						},
 						toggle = function(id) {
-						_forN(el.vvv, function(sp) {
-							_forN(_elemFuncBlockObj(_idsAss(sp.blk)), function(oo) {
-								if(!oo.obj.length)
-									return;
-								oo.obj[sp.id == id ? 'show' : 'hide']();
-//								oo.obj[sp.id == id ? 'slideDown' : 'slideUp'](300);
+							_forN(ELMM[el.id].vvv, function(sp) {
+								_forN(_elemFuncBlockObj(_idsAss(sp.blk)), function(oo) {
+									if(!oo.obj.length)
+										return;
+									oo.obj[sp.id == id ? 'show' : 'hide']();
+								});
 							});
-						});
-					};
+						};
 					toggle(el.def);
 					$(el.attr_cmp)._menu({
 						type:type[el.num_1],
-						spisok:el.vvv,
+						spisok:ELMM[el.id].vvv,
 						func:toggle
 					});
 					return;

@@ -549,6 +549,15 @@ function _jsCache() {//формирование файла JS с данными 
 		if($r['dialog_id'] == 29 || $r['dialog_id'] == 59)
 			$val[] = 'issp:1';
 
+		//элемент-меню переключеня блоков
+		if($r['dialog_id'] == 57) {
+			$vvv = array();
+			foreach(PHP12_menu_block_setup_vvv($r['id']) as $v) {
+				$vvv[] = '{id:'.$v['id'].',title:"'.$v['txt_1'].'",blk:"'.$v['txt_2'].'"}';
+			}
+			$val[] = 'vvv:['.implode(',', $vvv).']';
+		}
+
 		for($n = 1; $n <= 8; $n++) {
 			$num = 'num_'.$n;
 			if($r[$num])

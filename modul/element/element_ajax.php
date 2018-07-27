@@ -1006,27 +1006,6 @@ function _dialogOpenLoad($dialog_id) {
 					break;
 				if(!$unit_id)
 					break;
-/*
-				$sql = "SELECT *
-						FROM `_element`
-						WHERE `block_id`=-".$unit_id."
-						ORDER BY `sort`";
-				if(!$arr = query_arr($sql))
-					break;
-
-				$spisok = array();
-				foreach($arr as $id => $r) {
-					$spisok[] = array(
-						'id' => _num($id),
-						'title' => _elemTitle($id),
-						'dialog_id' => _num($r['dialog_id']),
-						'num_1' => _num($r['num_1']),
-						'num_8' => _num($r['num_8']),
-						'txt_7' => $r['txt_7'],
-						'txt_8' => $r['txt_8']
-					);
-				}
-*/
 				$dialog['cmp'][$cmp_id]['vvv'] = $func($unit_id);
 				break;
 			//значения для select, radio, dropdown

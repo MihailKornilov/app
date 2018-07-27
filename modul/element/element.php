@@ -1049,8 +1049,8 @@ function PHP12_menu_block_setup_vvv($parent_id) {//получение данны
 		$blk_title = $r['txt_2'] ? $c.' блок'._end($c, '', 'а', 'ов') : '';
 		$spisok[] = array(
 			'id' => _num($id),
-			'title' => $r['txt_1'],
-			'blk' => $r['txt_2'],
+			'title' => $r['txt_1'],//название пункта меню
+			'blk' => $r['txt_2'],//блоки
 			'blk_title' => $blk_title,
 			'def' => _num($r['def'])
 		);

@@ -1527,19 +1527,23 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				num_1 - внешний вид меню:
 						1158 - Маленькие синие кнопки
 						1159 - С нижним подчёркиванием
-			*/
 
-			if(empty($el['vvv']))
-				return '';
+				для настройки блоков используется функция PHP12_menu_block_setup
+			*/
 
 			$type = array(
 				1158 => 2,
 				1159 => 1
 			);
 
+			//получение пунктов меню
+			$vvv = PHP12_menu_block_setup_vvv($el['id']);
+
 			$razdel = '';
-			foreach($el['vvv'] as $r)
-				$razdel .= '<a class="link'._dn($el['def'] != $r['id'], 'sel').'">'.$r['title'].'</a>';
+			foreach($vvv as $r) {
+				$sel = _dn($el['def'] != $r['id'], 'sel');
+				$razdel .= '<a class="link'.$sel.'">'.$r['title'].'</a>';
+			}
 
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$el['def'].'" />'.
