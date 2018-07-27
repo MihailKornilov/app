@@ -538,6 +538,7 @@ function _jsCache() {//формирование файла JS с данными 
 			continue;
 
 		$val = array();
+		$val[] = 'dialog_id:'.$r['dialog_id'];
 		$val[] = 'name:"'.addslashes($r['name']).'"';
 		$val[] = 'block_id:'.$block_id;
 
@@ -551,6 +552,8 @@ function _jsCache() {//формирование файла JS с данными 
 
 		//элемент-меню переключеня блоков
 		if($r['dialog_id'] == 57) {
+			$val[] = 'def:'.$r['def'];
+
 			$vvv = array();
 			foreach(PHP12_menu_block_setup_vvv($r['id']) as $v) {
 				$vvv[] = '{id:'.$v['id'].',title:"'.$v['title'].'",blk:"'.$v['blk'].'"}';

@@ -486,10 +486,17 @@ function _pageShow($page_id) {
 	_page_div().
 	'<script>'.
 		'var BLK='._BE('block_js','page', $page_id).','.
-			'ELM='._BE('elem_js', 'page', $page_id).','.
+			"\n\n".
+//			'ELM='._BE('elem_js', 'page', $page_id).','.
+//			"\n\n".
+			'ELM='._BE('elem_ids_js', 'page', $page_id).','.
+			"\n\n".
 			'PAGE_LIST='._page('for_select', 'js').','.
+			"\n\n".
 			'ELEM_COLOR='._colorJS().','.
+			"\n\n".
 			'FILTER='._json(_spisokFilter('page_js')).';'.
+			"\n\n".
 		'_pageAct('.PAS.');'.
 	'</script>';
 }
