@@ -313,8 +313,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 				return dialog.content.find(attr);
 			};
 
-		_blockUpd(o.blk);
-		_elemUpd(o.cmp);
+//		_blockUpd(o.blk);
+//		_elemUpd(o.cmp);
 
 		DLG('#dialog-menu')._menu({
 			type:2,
@@ -545,9 +545,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		else {
 			window.DIALOG_OPEN = dialog;
 			DIALOG_OPEN.col_type = o.col_type;
-			_blockUpd(o.blk);
-			_elemUpd(o.cmp);
-			_elemActivate(o.cmp, o.unit);
+//			_blockUpd(o.blk);
+//			_elemUpd(o.cmp);
+			_ELM_ACT(o.elm_ids, o.unit);
 		}
 
 		return dialog;
@@ -641,15 +641,17 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 		}
 	},
-	_elemActivate = function(elem, unit) {//активирование элементов
+
+	_ELM_ACT = function(elm_ids, unit) {//активирование элементов
 		var attr_focus = false;//элемент, на который будет поставлен фокус
 
-		_forN(elem, function(elmm_id) {
-			var el = ELMM[elmm_id],
-				ATTR_CMP = $('#cmp_' + elmm_id);
+		_forN(elm_ids, function(elm_id) {
+			var el = ELMM[elm_id],
+				ATTR_CMP = $('#cmp_' + elm_id),
+				ATTR_EL =  $('#el_' + elm_id);
 
 			if(el.focus)
-				attr_focus = el.attr_cmp;
+				attr_focus = ATTR_CMP;
 
 			if(el.hint_on) {
 				var side = {
@@ -674,7 +676,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						773:'top',
 						774:'bottom'
 					};
-				$(el.attr_el).mouseenter(function() {
+				ATTR_EL.mouseenter(function() {
 					var oo = {
 						msg:_br(el.hint_msg, 1),
 						pad:10,
@@ -685,7 +687,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					};
 					if(el.hint_side)
 						oo.objPos = objPos[el['hint_obj_pos_' + sideObj[el.hint_side]]];
-					$(el.attr_el)._hint(oo);
+					ATTR_EL._hint(oo);
 				});
 			}
 
@@ -708,7 +710,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var spisok = _copySel(PAGE_LIST);
 
 					//если выбирается страница для ссылки, то добавляется вариант: 3 => Автоматически
-					if(elmm_id == 1959)
+					if(elm_id == 1959)
 						spisok.unshift({
 							id:3,
 							title:'Автоматически',
@@ -742,7 +744,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								v_last = v;
 								if(!FILTER[el.num_1])
 									FILTER[el.num_1] = {};
-								FILTER[el.num_1][elmm_id] = v;
+								FILTER[el.num_1][elm_id] = v;
 								_spisokUpdate(el.num_1, function() {
 									started = 0;
 									clearInterval(timer);
@@ -891,14 +893,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 19: _cmpV19(el); return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Список действий, привязанных к элементу
 				case 22:
-					$(el.attr_el).find('DL')._sort({table:'_element_func'});
+					ATTR_EL.find('DL')._sort({table:'_element_func'});
 					return;
 				//Список - ТАБЛИЦА
 				case 23:
 					if(!el.num_6)
 						return;
 
-					$(el.attr_el).find('ol:first').nestedSortable({
+					ATTR_EL.find('ol:first').nestedSortable({
 						forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
 						placeholder:'nested-placeholder', //класс, применяемый для подсветки места, откуда взялся элемент
 						listType:'ol',
@@ -919,9 +921,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 							var send = {
 								op:'spisok_23_sort',
-								elem_id:elmm_id,
+								elem_id:elm_id,
 								arr:$(this).nestedSortable('toArray'),
-								busy_obj:$(el.attr_el),
+								busy_obj:ATTR_EL,
 								busy_cls:'spisok-busy'
 							};
 							_post(send);
@@ -1009,7 +1011,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						funcWrite:function(v, t) {
 							var send = {
 								op:'spisok_29_connect',
-								cmp_id:elmm_id,
+								cmp_id:elm_id,
 								v:v,
 								busy_obj:t.icon_del,
 								busy_cls:'spin'
@@ -1045,7 +1047,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Выбор значений для содержания Select
 				case 31:
-					var sv = $(el.attr_el).find('.sv'),
+					var sv = ATTR_EL.find('.sv'),
 						ex = ATTR_CMP.val().split(','),
 						v = [];
 
@@ -1060,7 +1062,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							attr_cmp = ELM[el.num_1].attr_cmp;
 						_dialogLoad({
 							dialog_id:11,
-							block_id:elmm_id * -1,
+							block_id:elm_id * -1,
 							dialog_source:$(attr_cmp).val(),
 							unit_id:v[n],
 							busy_obj:t,
@@ -1152,10 +1154,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Заметки
 				case 52:
-					if(!$(el.attr_el).length)
+					if(!ATTR_EL.length)
 						return;
 					var timer = 0,
-						NOTE = $(el.attr_el).find('._note'),
+						NOTE = ATTR_EL.find('._note'),
 						ex = NOTE.attr('val').split(':'),
 						page_id = _num(ex[0]),
 						obj_id = _num(ex[1]),
@@ -1283,7 +1285,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						unitSel = function(id) {//действие после выбора значения
 							var send = {
 								op:'spisok_59_unit',
-								cmp_id:elmm_id,
+								cmp_id:elm_id,
 								unit_id:id,
 								busy_obj:but
 							};
@@ -1324,7 +1326,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Загрузка изображений
 				case 60:
-					var AEL = $(el.attr_el),
+					var AEL = ATTR_EL,
 						load = AEL.find('._image-load'),
 						prc = AEL.find('._image-prc'), //div для отображения процентов
 						ids_upd = function() {//обновление id загруженных изображений
@@ -1382,7 +1384,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						    var data = new FormData;
 						    data.append('f1', file);
 						    data.append('op', 'image_upload');
-						    data.append('obj_name', 'elem_' + elmm_id + '_' + USER_ID);
+						    data.append('obj_name', 'elem_' + elm_id + '_' + USER_ID);
 						    data.append('obj_id', _num(unit.id));
 						    xhr.send(data);
 						};
@@ -1434,7 +1436,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						linkOkFunc = function() {
 							var send = {
 								op:'image_link',
-								obj_name:'elem_' + elmm_id + '_' + USER_ID,
+								obj_name:'elem_' + elm_id + '_' + USER_ID,
 								obj_id:_num(unit.id),
 								url:$.trim(linkInp.val()),
 								busy_obj:iconOk,
@@ -1536,7 +1538,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 						_dialogLoad({
 							dialog_id:63,
-							block_id:elmm_id * -1,
+							block_id:elm_id * -1,
 							unit_id:_num(unit.id),
 							busy_obj:load,
 							busy_cls:'busy',
@@ -1564,7 +1566,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATTR_CMP._check({
 						func:function(v) {
 							_elemFunc(el, v);
-							FILTER[el.num_2][elmm_id] = v;
+							FILTER[el.num_2][elm_id] = v;
 							_spisokUpdate(el.num_2);
 						}
 					});
@@ -1600,12 +1602,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр-календарь
 				case 77:
-					var CAL = $(el.attr_el).find('._filter-calendar'),
+					var CAL = ATTR_EL.find('._filter-calendar'),
 						CNT = CAL.find('.fc-cnt');
 					CAL.find('.laquo').click(function() {
 						var send = {
 							op:'filter_calendar_mon_change',
-							elem_id:elmm_id,
+							elem_id:elm_id,
 							mon:CAL.find('.mon-cur').val(),
 							side:$(this).attr('val'),
 							busy_cls:'busy',
@@ -1627,15 +1629,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 							td.addClass('sel');
 							if(!FILTER[el.num_1])
 								FILTER[el.num_1] = {};
-							FILTER[el.num_1][elmm_id] = t.attr('val');
+							FILTER[el.num_1][elm_id] = t.attr('val');
 							_spisokUpdate(el.num_1);
 						}
 					});
 					return;
 				//Фильтр-меню
 				case 78:
-					var FM = $(el.attr_el).find('.fm-unit');
-					$(el.attr_el).find('.fm-plus').click(function() {
+					var FM = ATTR_EL.find('.fm-unit');
+					ATTR_EL.find('.fm-plus').click(function() {
 						var t = $(this),
 							plus = t.html() == '+',
 							div = _parent(t, 'TABLE').next();
@@ -1650,7 +1652,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							t.addClass('sel');
 							if(!FILTER[el.num_1])
 								FILTER[el.num_1] = {};
-							FILTER[el.num_1][elmm_id] = sel ? 0 : t.attr('val')
+							FILTER[el.num_1][elm_id] = sel ? 0 : t.attr('val')
 							_spisokUpdate(el.num_1);
 					});
 					return;
@@ -1699,7 +1701,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						title0:el.txt_1,
 						spisok:el.vvv,
 						func:function(v) {
-							FILTER[el.num_1][elmm_id] = v;
+							FILTER[el.num_1][elm_id] = v;
 							_spisokUpdate(el.num_1);
 						}
 					});
@@ -1720,8 +1722,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		});
 
 		if(attr_focus)
-			$(attr_focus).focus();
+			attr_focus.focus();
 	},
+
 	_cmpV19 = function(o, get) {//наполнение для некоторых компонентов. dialog_id=19
 		var el = $(o.attr_el);
 

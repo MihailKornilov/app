@@ -542,6 +542,12 @@ function _jsCache() {//формирование файла JS с данными 
 		$val[] = 'name:"'.addslashes($r['name']).'"';
 		$val[] = 'block_id:'.$block_id;
 
+		if($r['focus'])
+			$val[] = 'focus:1';
+
+		if($r['width'])
+			$val[] = 'width:'.$r['width'];
+
 		//исходный диалог (dialog source)
 		if($block[$block_id]['obj_name'] == 'dialog')
 			$val[] = 'ds:'.$block[$block_id]['obj_id'];
@@ -550,7 +556,7 @@ function _jsCache() {//формирование файла JS с данными 
 		if($r['dialog_id'] == 29 || $r['dialog_id'] == 59)
 			$val[] = 'issp:1';
 
-		//элемент-меню переключеня блоков
+		//элемент-меню переключения блоков
 		if($r['dialog_id'] == 57) {
 			$val[] = 'def:'.$r['def'];
 

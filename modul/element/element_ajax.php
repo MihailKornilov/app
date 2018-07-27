@@ -1302,8 +1302,9 @@ function _dialogOpenLoad($dialog_id) {
 				$dialog['cmp'][$cmp_id]['vvv'] = '<div class="_color-bg-choose">'.$spisok.'</div>';
 		}
 
-	$send['blk'] = $dialog['blk'];
-	$send['cmp'] = $dialog['cmp'];
+//	$send['blk'] = $dialog['blk'];
+//	$send['cmp'] = $dialog['cmp'];
+	$send['elm_ids'] = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
 	//переделка значений $unit в INT, если есть
 	foreach($unit as $k => $v)

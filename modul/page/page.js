@@ -100,12 +100,6 @@ var VK_BODY,       //фрейм VK для изменения высоты $('bod
 		};
 
 		_post(send, 'reload');
-	},
-
-	_pageAct = function(pas) {//активация элементов после вывода страницы
-		if(pas)
-			return;
-		_elemActivate(ELM, {});
 	};
 
 	$(document).ready(_faceTest);

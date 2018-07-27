@@ -489,15 +489,13 @@ function _pageShow($page_id) {
 			"\n\n".
 //			'ELM='._BE('elem_js', 'page', $page_id).','.
 //			"\n\n".
-			'ELM='._BE('elem_ids_js', 'page', $page_id).','.
-			"\n\n".
 			'PAGE_LIST='._page('for_select', 'js').','.
 			"\n\n".
 			'ELEM_COLOR='._colorJS().','.
 			"\n\n".
 			'FILTER='._json(_spisokFilter('page_js')).';'.
 			"\n\n".
-		'_pageAct('.PAS.');'.
+		'_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');'.
 	'</script>';
 }
 function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, которая размещается на странице. Получение по $_GET['id']

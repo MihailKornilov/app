@@ -1963,6 +1963,27 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		return _json($send);
 	}
 
+	//массив ID элементов в формате JS
+	if($i == 'elem_ids_arr') {
+		$obj_name = $i1;
+		if(!$obj_id = _num($i2))
+			return '[]';
+
+		$send = array();
+		foreach($G_BLOCK as $id => $r) {
+			if($r['obj_name'] != $obj_name)
+				continue;
+			if($r['obj_id'] != $obj_id)
+				continue;
+			if(!$elem_id = $r['elem_id'])
+				continue;
+
+			$send[] = $elem_id;
+		}
+
+		return $send;
+	}
+
 	if($i == 'elem_ids_js') {//массив ID элементов в формате JS
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
