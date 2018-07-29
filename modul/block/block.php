@@ -592,7 +592,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						'color' => $color[$el['num_1']],
 						'width' => $el['width'],
 						'small' => $el['num_2'],
-						'class' => 'dialog-open',
+						'class' => $is_edit ? '' : 'dialog-open',
 						'val' => 'dialog_id:'.$el['num_4'].$block.$dialog_source
 					));
 
@@ -606,7 +606,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						12 - Синие маленькие кнопки (гориз.)
 						13 - Боковое вертикальное меню
 			*/
-			return _menu($el);
+			return _menu($el, $is_edit);
 
 		//Заголовок
 		case 4:
@@ -1203,7 +1203,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send).
 			'<input type="hidden" class="dlg26" value="'.$dialog_id.'" />'.
-			'<script>ELM'.$dialog_id.'='._BE('elem_js', 'dialog', $dialog_id).';</script>';
+			'<script>ELM_OLD'.$dialog_id.'='._BE('elem_js', 'dialog', $dialog_id).';</script>';
 
 		//Настройка суммы значений единицы списка
 		case 27:
@@ -2147,7 +2147,7 @@ function _beBlockForming($arr) {//формирование массива бло
 			'id' => _num($r['id']),
 			'parent_id' => _num($r['parent_id']),
 			'child_count' => _num($r['child_count']),
-			'sa' => _num($r['parent_id']),
+			'sa' => _num($r['sa']),
 			'obj_name' => $r['obj_name'],
 			'obj_id' => _num($r['obj_id']),
 			'click_action' => _num($r['click_action']),
@@ -2166,10 +2166,6 @@ function _beBlockForming($arr) {//формирование массива бло
 			'bg' => $r['bg'],
 			'bg_ids' => $r['bg_ids'],
 			'bor' => $r['bor'],
-//			user_id_add: 1
-//			dtime_add: 2017-10-23 00:59:48
-
-			'attr_bl' => '#bl_'.$id,
 			'elem_id' => 0
 		);
 	}

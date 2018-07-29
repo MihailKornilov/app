@@ -530,8 +530,19 @@ function _jsCache() {//формирование файла JS с данными 
 
 	$block = _BE('block_all');
 
-	foreach($block as $block_id => $r)
-		$BLK[] = $block_id.':{elem_id:'.$r['elem_id'].'}';
+	foreach($block as $block_id => $r) {
+		$val = array();
+		$val[] = 'elem_id:'.$r['elem_id'];
+		$val[] = 'sa:'.$r['sa'];
+		$val[] = 'width_auto:'.$r['width_auto'];
+		$val[] = 'bor:"'.$r['bor'].'"';
+		$val[] = 'pos:"'.$r['pos'].'"';
+		$val[] = 'bg:"'.$r['bg'].'"';
+		$val[] = 'bg_ids:"'.$r['bg_ids'].'"';
+		$val[] = 'child_count:'.$r['child_count'];
+
+		$BLK[] = $block_id.':{'.implode(',', $val).'}';
+	}
 
 	foreach(_BE('elem_all') as $elem_id => $r) {
 		if(!$block_id = $r['block_id'])
@@ -541,12 +552,26 @@ function _jsCache() {//формирование файла JS с данными 
 		$val[] = 'dialog_id:'.$r['dialog_id'];
 		$val[] = 'name:"'.addslashes($r['name']).'"';
 		$val[] = 'block_id:'.$block_id;
+		$val[] = 'mar:"'.$r['mar'].'"';
+		$val[] = 'func:""';
+
+		$val[] = 'font:"'.$r['font'].'"';
+		$val[] = 'color:"'.$r['color'].'"';
+		$val[] = 'size:'.$r['size'];
+		$val[] = 'url:'.$r['url'];
+//		$val[] = 'num_7:'.$r['num_7'];//ограничение высоты фото [60]
 
 		if($r['focus'])
 			$val[] = 'focus:1';
 
-		if($r['width'])
-			$val[] = 'width:'.$r['width'];
+		if($dlg = _BE('dialog', $r['dialog_id']))
+			if($dlg['element_style_access'])
+				$val[] = 'style_access:'.$dlg['element_style_access'];
+
+		$val[] = 'width:'.$r['width'];
+
+//		if($r['is_img'])
+//			$val[] = 'is_img:'.$r['is_img'];
 
 		//исходный диалог (dialog source)
 		if($block[$block_id]['obj_name'] == 'dialog')
@@ -579,9 +604,17 @@ function _jsCache() {//формирование файла JS с данными 
 		$ELM[] = $elem_id.':{'.implode(',', $val).'}';
 	}
 
-	$save = 'var ELMM={'.implode(",\n", $ELM).'},'.
-				"\n\n".
-				'BLKK={'.implode(",\n", $BLK).'};';
+	$save =
+	'var ELMM={'.implode(",\n", $ELM).'},'.
+		"\n\n".
+		'BLKK={'.implode(",\n", $BLK).'},'.
+		"\n\n".
+		'PAGE_LIST='._page('for_select', 'js').','.
+		"\n\n".
+		'ELEM_COLOR='._colorJS().','.
+		"\n\n".
+		'FILTER='._json(_spisokFilter('page_js')).';';
+
 	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
 	fwrite($fp, $save);
 	fclose($fp);

@@ -165,7 +165,7 @@ function _search($v=array()) {//поле ПОИСК
 		'</table>'.
 	'</div>';
 }
-function _menu($unit) {//Меню страниц, dialog_id=3
+function _menu($unit, $is_edit) {//Меню страниц, dialog_id=3
 	$menu = array();
 	foreach(_page() as $id => $r) {
 		if(!$r['app_id'])
@@ -202,8 +202,10 @@ function _menu($unit) {//Меню страниц, dialog_id=3
 		if(!$page_id)
 			continue;
 
+		$href = $is_edit ? '' : ' href="'.URL.'&p='.$page_id.'"';
+
 		$razdel .=
-			'<a class="link'.$sel.'" href="'.URL.'&p='.$page_id.'">'.
+			'<a class="link'.$sel.'"'.$href.'>'.
 				$r['name'].
 			'</a>';
 	}

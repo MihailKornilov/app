@@ -740,8 +740,7 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 	'</div>'.
 	'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'.
 		_blockHtml('spisok', $unit['id'], $width, 0, array('blk_edit' => 1)).
-	'</div>'.
-	'<script>_blockUpd('._BE('block_js', 'spisok', $unit['id']).');</script>';
+	'</div>';
 }
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */

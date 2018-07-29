@@ -302,6 +302,7 @@ function _html() {
 
 		_html_hat().
 		_pasMenu().
+		_pageInfo().
 		_app_content().
 
 		_debug().
@@ -405,6 +406,8 @@ function _hat_but_sa() {//отображение кнопки списка ст�
 		return '';
 	if(!APP_ID)
 		return '';
+	if(PAS)
+		return '';
 
 	if(_page('cur') == 1)
 		return '';
@@ -413,6 +416,8 @@ function _hat_but_sa() {//отображение кнопки списка ст�
 }
 function _hat_but_page() {//отображение кнопки списка страниц
 	if(!APP_ID)
+		return '';
+	if(PAS)
 		return '';
 	if(!USER_CREATOR)
 		return '';

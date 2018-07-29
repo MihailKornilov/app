@@ -253,6 +253,10 @@ switch(@$_POST['op']) {
 	case 'block_unit_style_save'://применение стилей блока
 		if(!$block_id = _num($_POST['id']))
 			jsonError('Некорректный ID блока');
+		if(!$block = _blockOne($block_id))
+			jsonError('Блока id'.$block_id.' не существует');
+
+		print_r($_POST);
 
 		$sa = _bool($_POST['sa']);
 		$width_auto = _num($_POST['width_auto']);
@@ -271,11 +275,8 @@ switch(@$_POST['op']) {
 				_num($ex[2]).' './/снизу
 				_num($ex[3]);    //слева
 
-		//получение данных блока
-		if(!$block = _blockOne($block_id))
-			jsonError('Блока id'.$block_id.' не существует');
 
-		//изменение стилей
+		//сохранение данных блока
 		$sql = "UPDATE `_block`
 				SET `sa`='".$sa."',
 					`width_auto`='".$width_auto."',
@@ -285,6 +286,8 @@ switch(@$_POST['op']) {
 					`bor`='".$bor."'
 				WHERE `id`=".$block_id;
 		query($sql);
+
+		_BE( 'block_clear');
 
 		//сохранение стилей элемента в блоке
 		if($elem_id = _num($_POST['elem_id']))
@@ -309,10 +312,9 @@ switch(@$_POST['op']) {
 							`num_7`=".$num_7."
 						WHERE `id`=".$elem_id;
 				query($sql);
-			}
 
-		_BE( 'block_clear');
-		_BE( 'elem_clear');
+				_BE( 'elem_clear');
+			}
 
 		jsonSuccess();
 		break;

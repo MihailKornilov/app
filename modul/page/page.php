@@ -153,7 +153,7 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		}
 
 		if($i1 == 'js')
-			return json_encode($send);
+			return _json($send);
 
 		return $send;
 	}
@@ -318,11 +318,38 @@ function _pasMenu() {//строка меню управления страниц
 
 	return
 	'<div id="pas">'.
-		'<div class="w1000 mara pad5">'.
+		'<div class="w1000 mara pt5">'.
 			'<div class="dib fs16 b">'._page('name').	'</div>'.
 		'</div>'.
-		'<div class="w1000 mara pad5">'.
+		'<div class="w1000 mara pt5">'.
 			_blockLevelChange('page', _page('cur')).
+		'</div>'.
+	'</div>';
+}
+function _pageInfo() {//информация о странице
+	if(IFRAME_AUTH_ERROR)
+		return '';
+	if(!PAS)
+		return '';
+
+	$page_id = _page('cur');
+	$page = _page($page_id);
+
+	$blk = _BE('block_arr', 'page', $page_id);
+	$elm = _BE('elem_arr', 'page', $page_id);
+
+	return
+	'<div class="bg-fee line-b">'.
+		'<div class="w1000 mara pad5">'.
+
+			'<table class="w300">'.
+				'<tr class="center">'.
+					'<td>APP_ID: '.$page['app_id'].
+					'<td class="'.($page['sa'] ? 'fs15 b color-ref' : 'pale').'">SA'.
+					'<td>BLK: <b>'.count($blk).'</b>'.
+					'<td>ELM: <b>'.count($elm).'</b>'.
+			'</table>'.
+
 		'</div>'.
 	'</div>';
 }
@@ -485,17 +512,7 @@ function _pageShow($page_id) {
 	_blockHtml('page', $page_id, 1000, 0, _pageSpisokUnit($page_id)).
 	_page_div().
 	'<script>'.
-		'var BLK='._BE('block_js','page', $page_id).','.
-			"\n\n".
-//			'ELM='._BE('elem_js', 'page', $page_id).','.
-//			"\n\n".
-			'PAGE_LIST='._page('for_select', 'js').','.
-			"\n\n".
-			'ELEM_COLOR='._colorJS().','.
-			"\n\n".
-			'FILTER='._json(_spisokFilter('page_js')).';'.
-			"\n\n".
-		'_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');'.
+		(!PAS ? '_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');' : '').
 	'</script>';
 }
 function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, которая размещается на странице. Получение по $_GET['id']
