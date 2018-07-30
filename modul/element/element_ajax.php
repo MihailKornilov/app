@@ -718,18 +718,23 @@ function _dialogEditLoadUse($dialog) {//использование как эле
 			FROM `_element`
 			WHERE `dialog_id`=".$dialog['id'];
 	if($block_ids = query_ids($sql)) {
-		$sql = "SELECT *
+		$sql = "SELECT
+					DISTINCT `obj_id`,
+					`obj_name`,
+					COUNT(`id`) `c`
 				FROM `_block`
 				WHERE `id` IN (".$block_ids.")
-				ORDER BY `obj_id`";
-		$arr = query_arr($sql);
-		foreach($arr as $r) {
+				GROUP BY `obj_name`,`obj_id`
+				ORDER BY `obj_name`,`obj_id`";
+		foreach(query_array($sql) as $r) {
+			$count = $r['c'] > 1 ? ' <span class="grey">('.$r['c'].'x)</span>' : '';
 			switch($r['obj_name']) {
 				case 'dialog':
 					$use_dialog .=
 						'<div>'.
 							'<div class="dib w35 mr5">'.$r['obj_id'].':</div>'.
 							'<a class="dialog-open" val="dialog_id:'.$r['obj_id'].'">'._dialogParam($r['obj_id'], 'name').'</a>'.
+							$count.
 						'</div>';
 					break;
 				case 'page':
@@ -739,6 +744,7 @@ function _dialogEditLoadUse($dialog) {//использование как эле
 						'<div>'.
 							'<div class="dib w35 mr5">'.$r['obj_id'].':</div>'.
 							'<a class="'._dn(!$p['sa'], 'color-ref').'" href="'.URL.'&p='.$r['obj_id'].'">'.$p['name'].'</a>'.
+							$count.
 						'</div>';
 					break;
 			}
