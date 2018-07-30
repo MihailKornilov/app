@@ -405,7 +405,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 		DLG('#element_group_id')._select({
 			title0:'нет',
 			width:230,
-			spisok:o.group
+			spisok:o.group,
+			func:function(v) {
+				DLG('.elememt-setup')['slide' + (v ? 'Down' : 'Up')]();
+			}
 		});
 		DLG('#element_width')._count({width:60,step:10});
 		DLG('#element_width_min')._count({width:60,step:10});

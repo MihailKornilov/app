@@ -59,9 +59,10 @@ switch(@$_POST['op']) {
 
 			$menu_sa = array(
 				1 => 'Диалог',
-				2 => 'Элемент',
-				3 => 'Использование'
+				2 => 'Элемент'
 			);
+			if($dialog['element_group_id'])
+				$menu_sa[3] = 'Использование';
 		}
 
 		$html =
@@ -246,98 +247,105 @@ switch(@$_POST['op']) {
 							   )).
 				'</table>'.
 
-				'<table class="menu_sa-2 bs5">'.
-					'<tr><td class="red r w150">Группа элемента:'.
-		                '<td><input type="hidden" id="element_group_id" value="'.$dialog['element_group_id'].'" />'.
-					'<tr><td class="red r">Начальная ширина:'.
-						'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
-					'<tr><td class="red r">Минимальная ширина:'.
-						'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
-					'<tr><td class="red r">Тип данных:'.
-						'<td><input type="hidden" id="element_type" value="'.$dialog['element_type'].'" />'.
-					'<tr><td class="red r">CMP-аффикс:'.
-						'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
-					'<tr><td class="red r">Диалог для функций:'.
-						'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
 
-					'<tr><td class="red r pt20">Разрешения:'.
-						'<td class="pt20">'.
-		                        _check(array(
-									'attr_id' => 'element_search_access',
-									'title' => 'разрешать быстрый поиск по элементу',
-									'value' => $dialog['element_search_access']
-								)).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_style_access',
-									'title' => 'разрешать настройку стилей',
-									'value' => $dialog['element_style_access']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_url_access',
-									'title' => 'разрешать делать ссылкой',
-									'value' => $dialog['element_url_access']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_hint_access',
-									'title' => 'разрешать прикрепление подсказки',
-									'value' => $dialog['element_hint_access']
-							   )).
+				'<div class="menu_sa-2">'.
+					'<table class="bs5">'.
+						'<tr><td class="red r w150">Группа элемента:'.
+			                '<td><input type="hidden" id="element_group_id" value="'.$dialog['element_group_id'].'" />'.
+					'</table>'.
+					'<div class="elememt-setup'._dn($dialog['element_group_id']).'">'.
+					'<table class="bs5">'.
+						'<tr><td class="red r w150">Начальная ширина:'.
+							'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
+						'<tr><td class="red r">Минимальная ширина:'.
+							'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
+						'<tr><td class="red r">Тип данных:'.
+							'<td><input type="hidden" id="element_type" value="'.$dialog['element_type'].'" />'.
+						'<tr><td class="red r">CMP-аффикс:'.
+							'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
+						'<tr><td class="red r">Диалог для функций:'.
+							'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
 
-					'<tr><td class="red r pt20">Дополнительно:'.
-						'<td class="pt20">'.
-		                        _check(array(
-									'attr_id' => 'element_is_insert',
-									'title' => 'элемент вносит данные',
-									'value' => $dialog['element_is_insert']
-								)).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_is_spisok_unit',
-									'title' => 'является значением списка',
-									'value' => $dialog['element_is_spisok_unit']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_hidden',
-									'title' => 'скрытый элемент',
-									'value' => $dialog['element_hidden']
-							   )).
+						'<tr><td class="red r pt20">Разрешения:'.
+							'<td class="pt20">'.
+			                        _check(array(
+										'attr_id' => 'element_search_access',
+										'title' => 'разрешать быстрый поиск по элементу',
+										'value' => $dialog['element_search_access']
+									)).
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_style_access',
+										'title' => 'разрешать настройку стилей',
+										'value' => $dialog['element_style_access']
+								   )).
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_url_access',
+										'title' => 'разрешать делать ссылкой',
+										'value' => $dialog['element_url_access']
+								   )).
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_hint_access',
+										'title' => 'разрешать прикрепление подсказки',
+										'value' => $dialog['element_hint_access']
+								   )).
 
-					'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_paste_page',
-									'title' => 'вставка в блок страницы',
-									'value' => $dialog['element_paste_page']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_paste_dialog',
-									'title' => 'вставка в блок диалога',
-									'value' => $dialog['element_paste_dialog']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_paste_spisok',
-									'title' => 'вставка в блок шаблона списка',
-									'value' => $dialog['element_paste_spisok']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_paste_td',
-									'title' => 'вставка в ячейку таблицы',
-									'value' => $dialog['element_paste_td']
-							   )).
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'element_paste_44',
-									'title' => 'вставка в сборный текст',
-									'value' => $dialog['element_paste_44']
-							   )).
-				'</table>'.
+						'<tr><td class="red r pt20">Дополнительно:'.
+							'<td class="pt20">'.
+			                        _check(array(
+										'attr_id' => 'element_is_insert',
+										'title' => 'элемент вносит данные',
+										'value' => $dialog['element_is_insert']
+									)).
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_is_spisok_unit',
+										'title' => 'является значением списка',
+										'value' => $dialog['element_is_spisok_unit']
+								   )).
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_hidden',
+										'title' => 'скрытый элемент',
+										'value' => $dialog['element_hidden']
+								   )).
+
+						'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_paste_page',
+										'title' => 'вставка в блок страницы',
+										'value' => $dialog['element_paste_page']
+								   )).
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_paste_dialog',
+										'title' => 'вставка в блок диалога',
+										'value' => $dialog['element_paste_dialog']
+								   )).
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_paste_spisok',
+										'title' => 'вставка в блок шаблона списка',
+										'value' => $dialog['element_paste_spisok']
+								   )).
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_paste_td',
+										'title' => 'вставка в ячейку таблицы',
+										'value' => $dialog['element_paste_td']
+								   )).
+						'<tr><td>'.
+							'<td>'._check(array(
+										'attr_id' => 'element_paste_44',
+										'title' => 'вставка в сборный текст',
+										'value' => $dialog['element_paste_44']
+								   )).
+					'</table>'.
+					'</div>'.
+				'</div>'.
 
 				_dialogEditLoadUse($dialog).
 
@@ -712,6 +720,9 @@ function _table2field($tab) {//список колонок для таблицы
 
 
 function _dialogEditLoadUse($dialog) {//использование как элемента в других диалогах
+	if(!$dialog['element_group_id'])
+		return '';
+
 	$use_dialog = '';
 	$use_page = '';
 	$sql = "SELECT `block_id`
