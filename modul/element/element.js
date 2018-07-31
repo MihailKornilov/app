@@ -543,6 +543,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		else {
 			window.DIALOG_OPEN = dialog;
 			DIALOG_OPEN.col_type = o.col_type;
+			window.VVV = o.vvv;
 			_ELM_ACT(o.elm_ids, o.unit);
 		}
 
@@ -689,7 +690,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_forN(elm_ids, function(elm_id) {
 			var el = ELMM[elm_id],
 				ATTR_CMP = _attr_cmp(elm_id),
-				ATTR_EL =  $('#el_' + elm_id);
+				ATTR_EL =  _attr_el(elm_id);
+
+			el.id = elm_id;
 
 			if(el.focus)
 				attr_focus = ATTR_CMP;
@@ -2675,6 +2678,90 @@ var DIALOG = {},//массив диалоговых окон для управл
 			BCS.parent().hide();
 			DIALOG_OPEN.show();
 		}
+	},
+
+	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
+	PHP12_radio_vvv_setup = function(el, unit) {//для [16]
+		if(unit == 'get')
+			return PHP12_radio_vvv_get(el);
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			ATTR_EL = _attr_el(el.id),
+			DL = ATTR_EL.html(html).find('dl'),
+			BUT_ADD = ATTR_EL.find('div:last'),
+			NUM = 1;
+
+		BUT_ADD.click(valueAdd);
+
+		for(var i in VVV[el.id])
+			valueAdd(VVV[el.id][i])
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,
+				title:'имя значения ' + NUM,
+				content:'',
+				def:0,
+				use:0
+			}, v);
+
+			DL.append(
+				'<dd class="over1" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center top pt5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w90 grey r topi">Значение ' + NUM + ':' +
+							'<td><input type="text" class="title w100p b" value="' + v.title + '" />' +
+								'<textarea class="w100p min mtm1' + _dn(el.num_1) + '" placeholder="описание значения">' + v.content + '</textarea>' +
+							'<td class="w15 topi">' +
+								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
+							'<td class="w50 r top pt5">' +
+					   (v.use ? '<div class="dib fs11 color-ccc mr3 curD' + _tooltip('Использование', -53) + v.use + '</div>'
+								:
+								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
+					   ) +
+					'</table>' +
+				'</dd>'
+			);
+
+			DL.sortable({axis:'y',handle:'.icon-move-y'});
+			var DD = DL.find('dd:last');
+			DD.find('textarea').autosize();
+			DD.find('.def')._check({
+				tooltip:'По умолчанию',
+				func:function(v, ch) {
+					if(!v)
+						return;
+					//снятие галочек с остальных значений
+					_forEq(DL.find('.def'), function(sp) {
+						if(sp.attr('id') == ch.attr('id'))
+							return;
+						sp._check(0);
+					});
+				}
+			});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+			});
+			if(!v.id)
+				DD.find('.title').select();
+			NUM++;
+		}
+	},
+	PHP12_radio_vvv_get = function(el) {
+		var send = [];
+		_forEq(el.find('dd'), function(sp) {
+			send.push({
+				id:_num(sp.attr('val')),
+				title:sp.find('.title').val(),
+				content:sp.find('textarea').val(),
+				def:_num(sp.find('.def').val())
+			});
+		});
+		return send;
 	},
 
 	_elemGroup = function(v, dlg) {//функция, которая выполняется после открытия окна выбора элемента

@@ -1382,6 +1382,31 @@ function PHP12_menu_block_setup_vvv($parent_id) {//получение данны
 }
 
 
+/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
+function PHP12_radio_vvv_setup($el, $unit) {//используется в диалоге [16]
+	return '';
+}
+function PHP12_radio_vvv_setup_vvv($parent_id) {
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$send = array();
+	foreach($arr as $r) {
+		$send[] = array(
+			'id' => _num($r['id']),
+			'title' => $r['txt_1'],
+			'def' => _num($r['def']),
+			'use' => 0
+		);
+	}
+
+	return $send;
+}
+
 /* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
 function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])
 	/*
