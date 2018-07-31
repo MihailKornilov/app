@@ -256,8 +256,6 @@ switch(@$_POST['op']) {
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
 
-		print_r($_POST);
-
 		$sa = _bool($_POST['sa']);
 		$width_auto = _num($_POST['width_auto']);
 		$pos = _txt($_POST['pos']);
@@ -289,6 +287,8 @@ switch(@$_POST['op']) {
 
 		_BE( 'block_clear');
 
+		$send = array();
+
 		//сохранение стилей элемента в блоке
 		if($elem_id = _num($_POST['elem_id']))
 			if(_elemOne($elem_id)) {
@@ -314,9 +314,12 @@ switch(@$_POST['op']) {
 				query($sql);
 
 				_BE( 'elem_clear');
+
+				$send['elem_js'] = _jsCacheElemOne($elem_id);
 			}
 
-		jsonSuccess();
+
+		jsonSuccess($send);
 		break;
 	case 'block_unit_gird'://включение деления блока на подблоки
 		if(!$block_id = _num($_POST['id']))

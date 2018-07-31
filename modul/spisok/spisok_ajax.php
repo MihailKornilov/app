@@ -60,6 +60,8 @@ switch(@$_POST['op']) {
 				_BE('block_clear');
 				_BE('elem_clear');
 				_spisokFilter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
+				_jsCache();
+				$send['elem_del'] = 1;
 			}
 
 			//обновление кеша объекта, если это страница
@@ -394,7 +396,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	$send = _spisokAction3($send, $dialog, $unit_id, $block_id);
 	$send = _spisokAction4($send);
 
-	$send = _elementJsCache($send, $unit_id);
+	if(IS_ELEM)
+		$send['elem_js'] = _jsCacheElemOne($unit_id);
 
 	return $send;
 }
@@ -1741,15 +1744,6 @@ function _spisokUnitAfter27($elUpd) {
 			query($sql);
 		}
 	}
-}
-
-function _elementJsCache($send, $unit_id) {//получение новых данных элемента для кеша JS для быстрого обновления
-	if(!IS_ELEM)
-		return $send;
-
-	$send['elem_js'] = _jsCacheElemOne($unit_id);
-
-	return $send;
 }
 
 

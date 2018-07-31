@@ -284,10 +284,24 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 			return;
 
 		BL.op = 'block_unit_style_save';
-		BL.elem = ELMM[BL.elem_id];
+
+		if(BL.elem_id)
+			BL.elem = $.extend({
+				mar:'0 0 0 0',
+	            font:'',
+				color:'',
+				size:13,
+				url:0,
+				width:0,
+				num_7:0//ограничение высоты фото [60]
+			}, ELMM[BL.elem_id]);
+
 		BL.busy_obj = _attr_bl(BL.id);
-		_post(BL, function() {
+
+		_post(BL, function(res) {
 			BL.save = 0;
+			if(res.elem_js)
+				ELMM[BL.elem_id] = res.elem_js;
 		});
 	},
 
