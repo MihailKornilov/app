@@ -854,11 +854,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				num_1 - горизонтальное положение
 				значения из _element через dialog_id:19
 			*/
-			$sql = "SELECT `id`,`txt_1`
-					FROM `_element`
-					WHERE `block_id`=-".$el['id']."
-					ORDER BY `sort`";
-			$spisok = query_ass($sql);
 
 			return _radio(array(
 				'attr_id' => $attr_id,
@@ -867,7 +862,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				'interval' => 5,
 				'value' => _num($v) ? _num($v) : $el['def'],
 				'title0' => $el['txt_1'],
-				'spisok' => $spisok,
+				'spisok' => _elemVvv($el['id']),
 				'disabled' => $disabled
 			));
 
