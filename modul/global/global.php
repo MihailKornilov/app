@@ -485,7 +485,7 @@ function _arrJson($arr, $i=false) {//Последовательный масси
 	}
 	return '['.implode(',', $send).']';
 }
-function _json($arr) {//перевод массива в JS
+function _json($arr, $n=0) {//перевод массива в JS
 	if(empty($arr))
 		return '[]';
 
@@ -495,7 +495,7 @@ function _json($arr) {//перевод массива в JS
 	$send = array();
 	foreach($arr as $k => $v) {
 		if(is_array($v))
-			$v = _json($v);
+			$v = _json($v, 1);
 		else
 			$v = preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.addslashes(_br($v)).'"';
 		if($is_ass)
@@ -504,7 +504,7 @@ function _json($arr) {//перевод массива в JS
 	}
 	return
 		($is_ass ? '{' : '[').
-		implode(',', $send).
+		implode(','.(!$n ? "\n" : ''), $send).
 		($is_ass ? '}' : ']');
 }
 
@@ -545,67 +545,14 @@ function _jsCache() {//формирование файла JS с данными 
 	}
 
 	foreach(_BE('elem_all') as $elem_id => $r) {
-		if(!$block_id = $r['block_id'])
+		if(!$el = _jsCacheElemOne($elem_id))
 			continue;
 
-		$val = array();
-		$val[] = 'dialog_id:'.$r['dialog_id'];
-		$val[] = 'name:"'.addslashes($r['name']).'"';
-		$val[] = 'block_id:'.$block_id;
-		$val[] = 'mar:"'.$r['mar'].'"';
-		$val[] = 'func:""';
-
-		$val[] = 'font:"'.$r['font'].'"';
-		$val[] = 'color:"'.$r['color'].'"';
-		$val[] = 'size:'.$r['size'];
-		$val[] = 'url:'.$r['url'];
-//		$val[] = 'num_7:'.$r['num_7'];//ограничение высоты фото [60]
-
-		if($r['focus'])
-			$val[] = 'focus:1';
-
-		if($dlg = _BE('dialog', $r['dialog_id']))
-			if($dlg['element_style_access'])
-				$val[] = 'style_access:'.$dlg['element_style_access'];
-
-		$val[] = 'width:'.$r['width'];
-
-//		if($r['is_img'])
-//			$val[] = 'is_img:'.$r['is_img'];
-
-		//исходный диалог (dialog source)
-		if($block[$block_id]['obj_name'] == 'dialog')
-			$val[] = 'ds:'.$block[$block_id]['obj_id'];
-
-		//элемент является подключаемым списком
-		if($r['dialog_id'] == 29 || $r['dialog_id'] == 59)
-			$val[] = 'issp:1';
-
-		//элемент-меню переключения блоков
-		if($r['dialog_id'] == 57) {
-			$val[] = 'def:'.$r['def'];
-
-			$vvv = array();
-			foreach(PHP12_menu_block_setup_vvv($r['id']) as $v) {
-				$vvv[] = '{id:'.$v['id'].',title:"'.$v['title'].'",blk:"'.$v['blk'].'"}';
-			}
-			$val[] = 'vvv:['.implode(',', $vvv).']';
-		}
-
-		for($n = 1; $n <= 8; $n++) {
-			$num = 'num_'.$n;
-			if($r[$num])
-				$val[] = $num.':'.$r[$num];
-			$txt = 'txt_'.$n;
-			if(!empty($r[$txt]))
-				$val[] = $txt.':"'.addslashes(_br($r[$txt])).'"';
-		}
-
-		$ELM[] = $elem_id.':{'.implode(',', $val).'}';
+		$ELM[$elem_id] = $el;
 	}
 
 	$save =
-	'var ELMM={'.implode(",\n", $ELM).'},'.
+	'var ELMM='._json($ELM).','.
 		"\n\n".
 		'BLKK={'.implode(",\n", $BLK).'},'.
 		"\n\n".
@@ -619,6 +566,73 @@ function _jsCache() {//формирование файла JS с данными 
 	fwrite($fp, $save);
 	fclose($fp);
 
+}
+function _jsCacheElemOne($elem_id) {
+	if(!$r = _elemOne($elem_id))
+		return array();
+	if(!$block_id = $r['block_id'])
+		return array();
+
+	$val = array();
+
+	$val['dialog_id'] = $r['dialog_id'];
+	$val['name'] = $r['name'];
+	$val['block_id'] = $block_id;
+	$val['mar'] = $r['mar'];
+	$val['func'] = '';
+
+	$val['font'] = $r['font'];
+	$val['color'] = $r['color'];
+	$val['size'] = $r['size'];
+	$val['url'] = $r['url'];
+
+//		$val[] = 'num_7:'.$r['num_7'];//ограничение высоты фото [60]
+
+	if($r['focus'])
+		$val['focus'] = 1;
+
+	if($dlg = _BE('dialog', $r['dialog_id']))
+		if($dlg['element_style_access'])
+			$val['style_access'] = $dlg['element_style_access'];
+
+	$val['width'] = $r['width'];
+
+//		if($r['is_img'])
+//			$val[] = 'is_img:'.$r['is_img'];
+
+	//исходный диалог (dialog source)
+	if($r['block']['obj_name'] == 'dialog')
+		$val['ds'] = $r['block']['obj_id'];
+
+	//элемент является подключаемым списком
+	if($r['dialog_id'] == 29 || $r['dialog_id'] == 59)
+		$val['issp'] = 1;
+
+	//элемент-меню переключения блоков
+	if($r['dialog_id'] == 57) {
+		$val['def'] = $r['def'];
+
+		$vvv = array();
+		foreach(PHP12_menu_block_setup_vvv($r['id']) as $v) {
+			$vvv[] = array(
+				'id' => $v['id'],
+				'title' => $v['title'],
+				'blk' => $v['blk']
+			);
+		}
+		$val['vvv'] = $vvv;
+	}
+
+	for($n = 1; $n <= 8; $n++) {
+		$num = 'num_'.$n;
+		if($r[$num])
+			$val[$num] = $r[$num];
+		$txt = 'txt_'.$n;
+		if(!empty($r[$txt]))
+			$val[$txt] = $r[$txt];
+	}
+
+	return $val;
 }
 
 function _cache($v=array()) {

@@ -309,9 +309,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				}
 			}),
 			DIALOG_WIDTH = o.width,
-			DLG = function(attr) {//получение элемента данного диалога по атрибуту (для устранения конфликта с другими диалогами)
-				return dialog.content.find(attr);
-			};
+			DLG = dialog.D;
 
 		DLG('#dialog-menu')._menu({
 			type:2,
@@ -642,6 +640,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 							break;
 						_dialogOpen(res.dialog_source);
 						break;
+				}
+
+				//обновление значения JS-кеша, если это элемент
+				if(res.elem_js) {
+					ELMM[res.unit.id] = res.elem_js;
+					BLKK[res.unit.block_id].elem_id = res.unit.id;
 				}
 			});
 		}

@@ -380,6 +380,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 		if(!empty($elem['block']))
 			_BE('block_clear');
 		$unit['title'] = _elemTitle($unit_id);
+		_jsCache();
 	}
 
 	_app_create($dialog, $unit_id);
@@ -392,6 +393,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	$send = _spisokAction3($send, $dialog, $unit_id, $block_id);
 	$send = _spisokAction4($send);
+
+	$send = _elementJsCache($send, $unit_id);
 
 	return $send;
 }
@@ -1740,6 +1743,13 @@ function _spisokUnitAfter27($elUpd) {
 	}
 }
 
+function _elementJsCache($send, $unit_id) {//получение новых данных элемента для кеша JS для быстрого обновления
+	if(!IS_ELEM)
+		return $send;
 
+	$send['elem_js'] = _jsCacheElemOne($unit_id);
+
+	return $send;
+}
 
 
