@@ -1280,7 +1280,7 @@ function PHP12_spisok_td_setting_save($cmp, $val, $unit) {//сохранение
 	/*
 		$cmp  - компонент из диалога, отвечающий за настройку ячеек таблицы
 		$val  - значения, полученные для сохранения
-		$unit - элемент, в которой размещается таблица
+		$unit - элемент, в котором размещается таблица
 
 		Данные колонок таблицы записываются в _element
 		parent_id = $unit['id'] (ID элемента-таблицы [23])
@@ -1385,6 +1385,81 @@ function PHP12_menu_block_setup_vvv($parent_id) {//получение данны
 /* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
 function PHP12_radio_vvv_setup($el, $unit) {//используется в диалоге [16]
 	return '';
+}
+function PHP12_radio_vvv_setup_save($cmp, $val, $unit) {//сохранение значений radio
+	/*
+		$cmp  - компонент из диалога, отвечающий за настройку значений radio
+		$val  - значения, полученные для сохранения
+		$unit - элемент, в котором размещается radio
+
+		Данные колонок таблицы записываются в _element
+		parent_id = $unit['id'] (ID элемента-radio [16])
+	*/
+
+	$update = array();
+	$idsNoDel = '0';
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		$sort = 0;
+		foreach($val as $r) {
+			if(!$title = _txt($r['title']))
+				continue;
+			if($id = _num($r['id']))
+				$idsNoDel .= ','.$id;
+			$update[] = "(
+				".$id.",
+				".$unit['id'].",
+				'".addslashes($title)."',
+				"._num($r['def']).",
+				".$sort++."
+			)";
+		}
+	}
+
+	//удаление удалённых значений
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$unit['id']."
+			  AND `id` NOT IN (".$idsNoDel.")";
+	query($sql);
+
+	//сброс значения по умолчанию
+	$sql = "UPDATE `_element`
+			SET `def`=0
+			WHERE `id`=".$unit['id'];
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	$sql = "INSERT INTO `_element` (
+				`id`,
+				`parent_id`,
+				`txt_1`,
+				`def`,
+				`sort`
+			)
+			VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`txt_1`=VALUES(`txt_1`),
+				`def`=VALUES(`def`),
+				`sort`=VALUES(`sort`)";
+	query($sql);
+
+	//установка нового значения по умолчанию
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `parent_id`=".$unit['id']."
+			  AND `def`
+			LIMIT 1";
+	$def = _num(query_value($sql));
+
+	$sql = "UPDATE `_element`
+			SET `def`=".$def."
+			WHERE `id`=".$unit['id'];
+	query($sql);
 }
 function PHP12_radio_vvv_setup_vvv($parent_id) {
 	$sql = "SELECT *

@@ -558,7 +558,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				unit_id:o.unit_id,
 				dialog_source:o.dialog_source,//id исходного диалогового окна
 				cmp:{},
-				cmpv:{}
+				vvv:{}
 			};
 
 			if(o.unit_id) {
@@ -573,35 +573,32 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var sp = ELMM[id],
 						ATTR_CMP = _attr_cmp(id);
 
-					if(!ATTR_CMP)
-						return;
-
 					switch(sp.dialog_id) {
 						case 12://подключаемая функция
 							if(window[sp.txt_1])
-								send.cmpv[id] = window[sp.txt_1](sp, 'get');
-							if(sp.col)
+								send.vvv[id] = window[sp.txt_1](sp, 'get');
+							if(sp.col && ATTR_CMP)
 								send.cmp[id] = ATTR_CMP.val();
-							return;
-						case 19://наполнение для некоторых компонентов
-							send.cmpv[id] = _cmpV19(sp, 1);
 							return;
 						case 37://SA: Select - выбор имени колонки
 							send.cmp[id] = ATTR_CMP._select('inp');
 							return;
 						case 49://Настройка содержания Сборного текста
-							send.cmpv[id] = _cmpV49(sp, 'get');
+							send.vvv[id] = _cmpV49(sp, 'get');
 							break;
 						case 56://Настройка суммы значений единицы списка
-							send.cmpv[id] = _cmpV56(sp, 'get');
+							send.vvv[id] = _cmpV56(sp, 'get');
 							break;
 						case 58://наполнение для некоторых компонентов
-							send.cmpv[id] = _cmpV58(sp, 1);
+							send.vvv[id] = _cmpV58(sp, 1);
 							return;
 					}
 
-					send.cmp[id] = ATTR_CMP.val();
+					if(ATTR_CMP)
+						send.cmp[id] = ATTR_CMP.val();
 				});
+
+			console.log(send);
 
 			dialog.post(send, function(res) {
 				//закрытие диалога 50 - выбор элемента, если вызов был из него
@@ -933,8 +930,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						}
 					});
 					return;
-				//наполнение для некоторых компонентов
-				case 19: _cmpV19(el); return;
 				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Список действий, привязанных к элементу
 				case 22:
 					ATTR_EL.find('DL')._sort({table:'_element_func'});
@@ -2688,7 +2683,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
 			ATTR_EL = _attr_el(el.id),
-			DL = ATTR_EL.html(html).find('dl'),
+			DL = ATTR_EL.append(html).find('dl'),
 			BUT_ADD = ATTR_EL.find('div:last'),
 			NUM = 1;
 
@@ -2701,7 +2696,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			v = $.extend({
 				id:0,
 				title:'имя значения ' + NUM,
-				content:'',
 				def:0,
 				use:0
 			}, v);
@@ -2713,7 +2707,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w90 grey r topi">Значение ' + NUM + ':' +
 							'<td><input type="text" class="title w100p b" value="' + v.title + '" />' +
-								'<textarea class="w100p min mtm1' + _dn(el.num_1) + '" placeholder="описание значения">' + v.content + '</textarea>' +
 							'<td class="w15 topi">' +
 								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
 							'<td class="w50 r top pt5">' +
@@ -2753,11 +2746,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 	PHP12_radio_vvv_get = function(el) {
 		var send = [];
-		_forEq(el.find('dd'), function(sp) {
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
 				id:_num(sp.attr('val')),
 				title:sp.find('.title').val(),
-				content:sp.find('textarea').val(),
 				def:_num(sp.find('.def').val())
 			});
 		});

@@ -338,7 +338,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 			}
 	}
 
-	$cmpv = @$_POST['cmpv'];
+	$vvv = @$_POST['vvv'];
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
 			//---=== ДЕЙСТВИЯ ПРИ НАСТРОЙКИ ЭЛЕМЕНТОВ ===---
@@ -347,18 +347,16 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 				$func = $cmp['txt_1'].'_save';
 				if(!function_exists($func))
 					break;
-				$func($cmp, $cmpv[$cmp_id], $unit);
+				$func($cmp, $vvv[$cmp_id], $unit);
 				break;
-			//наполнение для некоторых компонентов: radio, select, dropdown
-			case 19: _cmpV19($cmpv[$cmp_id], $unit); break;
-			//Настройка ТАБЛИЧНОГО содержания списка
-			case 49: _cmpV49($cmp, $cmpv[$cmp_id], $unit); break;
+			//Настройка содержания Сборного текста
+			case 49: _cmpV49($cmp, $vvv[$cmp_id], $unit); break;
 			//Настройка суммы значений единицы списка
-			case 56: _cmpV56($cmp, $cmpv[$cmp_id], $unit); break;
+			case 56: _cmpV56($cmp, $vvv[$cmp_id], $unit); break;
 			//количество значений связанного списка
 			case 54: /* сделать пересчёт значения */ break;
 			//Настройка пунктов меню переключения блоков
-			case 58: _cmpV58($cmpv[$cmp_id], $unit); break;
+			case 58: _cmpV58($vvv[$cmp_id], $unit); break;
 			//Применение загруженных изображений
 			case 60: _cmpV60($cmp, $unit); break;
 		}
@@ -825,75 +823,6 @@ function _spisokAction4($send) {//действие 4 - обновление ис
 	$send['dialog_source'] = _dialogOpenLoad($dialog_id);
 
 	return $send;
-}
-function _cmpV19($val, $unit) {//наполнение для некоторых компонентов: radio, select, dropdown
-	$update = array();
-	$idsNoDel = '0';
-
-	if(!empty($val)) {
-		if(!is_array($val))
-			return;
-
-		$sort = 0;
-		foreach($val as $r) {
-			if(!$title = _txt($r['title']))
-				continue;
-			if($id = _num($r['id']))
-				$idsNoDel .= ','.$id;
-			$content = _txt($r['content']);
-			$update[] = "(
-				".$id.",
-				-".$unit['id'].",
-				'".addslashes($title)."',
-				'".addslashes($content)."',
-				"._num($r['def']).",
-				".$sort++."
-			)";
-		}
-	}
-
-	//удаление удалённых значений
-	$sql = "DELETE FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `id` NOT IN (".$idsNoDel.")";
-	query($sql);
-
-	//сброс значения по умолчанию
-	$sql = "UPDATE `_element`
-			SET `def`=0
-			WHERE `id`=".$unit['id'];
-	query($sql);
-
-	if(empty($update))
-		return;
-
-	$sql = "INSERT INTO `_element` (
-				`id`,
-				`block_id`,
-				`txt_1`,
-				`txt_2`,
-				`def`,
-				`sort`
-			)
-			VALUES ".implode(',', $update)."
-			ON DUPLICATE KEY UPDATE
-				`txt_1`=VALUES(`txt_1`),
-				`txt_2`=VALUES(`txt_2`),
-				`def`=VALUES(`def`),
-				`sort`=VALUES(`sort`)";
-	query($sql);
-
-	//установка нового значения по умолчанию
-	$sql = "SELECT `id` FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `def`
-			LIMIT 1";
-	$def = _num(query_value($sql));
-
-	$sql = "UPDATE `_element`
-			SET `def`=".$def."
-			WHERE `id`=".$unit['id'];
-	query($sql);
 }
 function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
 	/*
