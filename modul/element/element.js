@@ -2676,9 +2676,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
-	PHP12_radio_vvv_setup = function(el, unit) {//для [16]
+	PHP12_radio_setup = function(el, unit) {//для [16]
 		if(unit == 'get')
-			return PHP12_radio_vvv_get(el);
+			return PHP12_radio_get(el);
 
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
@@ -2744,7 +2744,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			NUM++;
 		}
 	},
-	PHP12_radio_vvv_get = function(el) {
+	PHP12_radio_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({

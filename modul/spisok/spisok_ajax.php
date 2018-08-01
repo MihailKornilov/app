@@ -36,7 +36,8 @@ switch(@$_POST['op']) {
 			if(_table($dialog['table_1']) == '_element') {//если это элемент
 				$elem = _elemOne($unit_id);
 				//удаление значений
-				$sql = "DELETE FROM `_element` WHERE `block_id`=-".$unit_id;
+query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удаление
+				$sql = "DELETE FROM `_element` WHERE `parent_id`=".$unit_id;
 				query($sql);
 				//удаление функций
 				$sql = "DELETE FROM `_element_func` WHERE `block_id`=".$elem['block_id'];
@@ -376,6 +377,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 			_BE('elem_clear');
 
 	if(IS_ELEM) {
+		_BE('elem_clear');
 		$elem = _elemOne($unit_id);
 		if(!empty($elem['block']))
 			_BE('block_clear');

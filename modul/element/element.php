@@ -394,14 +394,18 @@ function PHP12_dialog_sa($el, $unit) {//список диалоговых око
 					'<th>Таблица'.
 					'<th>Имя диалога'.
 					'<th>afics'.
-					'<th>type';
+					'<th>type'.
+					'<th>col';
 	foreach($arr as $r) {
 		$send .= '<tr class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.
 					'<td class="w35 r grey'.($r['sa'] ? ' bg-fee' : '').'">'.$r['id'].
-					'<td class="'.(_table($r['table_1']) == '_element' ? 'bg-efe' : '').'">'._table($r['table_1']).
+					'<td class="'.(_table($r['table_1']) == '_element' ? 'b color-pay' : '').'">'.
+						_table($r['table_1']).
+						($r['table_2'] ? '<br>'._table($r['table_2']) : '').
 					'<td>'.$r['name'].
 					'<td>'.$r['element_afics'].
-					'<td class="center">'._elemColType($r['element_type']);
+					'<td class="center">'._elemColType($r['element_type']).
+					'<td class="grey">'.PHP12_dialog_col($r['id']);
 	}
 	$send .= '</table>';
 
@@ -419,16 +423,53 @@ function PHP12_dialog_app($el, $unit) {//список диалоговых ок�
 				'<tr>'.
 					'<th>ID'.
 					'<th>Имя диалога'.
-					'<th>Список';
+					'<th>Список'.
+					'<th>Колонки';
 	foreach($arr as $r) {
 		$send .= '<tr class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.
 					'<td class="w35 r grey">'.$r['id'].
 					'<td>'.$r['name'].
-					'<td class="center">'.($r['spisok_on'] ? 'да' : '');
+					'<td class="center'.($r['spisok_on'] ? ' bg-dfd' : '').'">'.($r['spisok_on'] ? 'да' : '').
+					'<td class="grey">'.PHP12_dialog_col($r['id']);
 	}
 	$send .= '</table>';
 
 	return $send;
+}
+function PHP12_dialog_col($dialog_id) {//колонки, используемые в элементе
+	$send = array();
+	foreach(_BE('elem_arr', 'dialog', $dialog_id) as $el) {
+		//поиск элементам, которым не назначена колонка таблицы
+		if(!$col = $el['col'])
+			foreach(_BE('elem_arr', 'dialog', $el['dialog_id']) as $ell)
+				if($ell['col'] == 'col')
+					if($el['dialog_id'] != 12) {
+						$dlg = _dialogQuery($el['dialog_id']);
+						$col = '<span class="bg-fee'._tooltip('Отсутствует имя колонки<br>'.$dlg['name'], 5, 'l', 1).'--- ['.$el['dialog_id'].']</span>';
+						break;
+					}
+
+		if(!$col)
+			continue;
+
+		if(isset($send[$col])) {
+			$send[$col.'dub'.rand(0, 10000)] = '<span class="bg-fcc">'.$col.' - повтор</span>';
+			continue;
+		}
+
+		if($col == 'col')
+			$send[$col] = '<span class="red b">'.$col.'</span>';
+		elseif($col == 'name')
+			$send[$col] = '<span class="color-pay b">'.$col.'</span>';
+		elseif($col == 'req' || $col == 'req_msg')
+			$send[$col] = '<span class="color-ref b">'.$col.'</span>';
+		else
+			$send[$col] = $col;
+	}
+
+	ksort($send);
+
+	return implode('<br>', $send);
 }
 
 function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод списков по условиям
@@ -1383,10 +1424,10 @@ function PHP12_menu_block_setup_vvv($parent_id) {//получение данны
 
 
 /* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
-function PHP12_radio_vvv_setup($el, $unit) {//используется в диалоге [16]
+function PHP12_radio_setup($el, $unit) {//используется в диалоге [16]
 	return '';
 }
-function PHP12_radio_vvv_setup_save($cmp, $val, $unit) {//сохранение значений radio
+function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение значений radio
 	/*
 		$cmp  - компонент из диалога, отвечающий за настройку значений radio
 		$val  - значения, полученные для сохранения
@@ -1461,7 +1502,7 @@ function PHP12_radio_vvv_setup_save($cmp, $val, $unit) {//сохранение �
 			WHERE `id`=".$unit['id'];
 	query($sql);
 }
-function PHP12_radio_vvv_setup_vvv($parent_id) {
+function PHP12_radio_setup_vvv($parent_id) {
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `parent_id`=".$parent_id."
@@ -1478,6 +1519,41 @@ function PHP12_radio_vvv_setup_vvv($parent_id) {
 			'use' => 0
 		);
 	}
+
+	$send = PHP12_radio_setup_vvv_use($send, $parent_id);
+
+	return $send;
+}
+function PHP12_radio_setup_vvv_use($send, $parent_id) {//использование значений radio (чтобы нельзя было удалять значения)
+	$el = _elemOne($parent_id);
+
+	if(empty($el['block']))
+		return $send;
+
+	//пока только для диалогов
+	if($el['block']['obj_name'] != 'dialog')
+		return $send;
+	if(!$dlg = _dialogQuery($el['block']['obj_id']))
+		return $send;
+	if(!$col = $el['col'])
+		return $send;
+	//только для таблиц, в которых есть колонка dialog_id
+	if(empty($dlg['field1']['dialog_id']))
+		return $send;
+
+	//получение количества использования значений
+	$sql = "SELECT
+				`".$col."` `id`,
+				COUNT(*) `use`
+			FROM `"._table($dlg['table_1'])."`
+			WHERE `dialog_id`=".$el['block']['obj_id']."
+			GROUP BY `".$col."`";
+	if($ass = query_ass($sql))
+		foreach($send as $n => $r) {
+			if(empty($ass[$r['id']]))
+				continue;
+			$send[$n]['use'] = $ass[$r['id']];
+		}
 
 	return $send;
 }
