@@ -913,7 +913,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATTR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.vvv,
+						spisok:VVV[el.id],
 						func:function(v) {
 							_elemFunc(el, v);
 						}
@@ -924,7 +924,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					_elemFunc(el, _num(unit[el.col] || el.def), 1);
 					ATTR_CMP._dropdown({
 						title0:el.txt_1,
-						spisok:el.vvv,
+						spisok:VVV[el.id],
 						func:function(v) {
 							_elemFunc(el, v);
 						}
@@ -979,7 +979,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATTR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.vvv,
+						spisok:VVV[el.id],
 						func:function(v) {
 							_elemFunc(el, v);
 						}
@@ -1045,7 +1045,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						title0:el.txt_1,
 						write:el.num_1 && el.num_3,
 						msg_empty:'Не найдено',
-						spisok:el.vvv,
+						spisok:VVV[el.id],
 						blocked:el.num_4,
 						funcWrite:function(v, t) {
 							var send = {
@@ -1130,9 +1130,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 						width:el.width,
 						title0:'не выбрано',
 						msg_empty:'колонок нет',
-						spisok:el.vvv
+						spisok:VVV[el.id]
 					});
-					_forN(el.vvv, function(u) {
+					_forN(VVV[el.id], function(u) {
 						if(unit.col == u.title) {
 							ATTR_CMP._select(u.id);
 							return false;
@@ -1153,7 +1153,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						width:el.width,
 						title0:el.txt_1,
 						msg_empty:'диалоги ещё не были созданы',
-						spisok:el.vvv
+						spisok:VVV[el.id]
 					});
 					return;
 				//SA: Select - дублирование
@@ -1161,7 +1161,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATTR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.vvv
+						spisok:VVV[el.id]
 					});
 					return;
 				//Иконка вопрос: Выплывающая подсказка
@@ -1302,7 +1302,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							1159:1
 						},
 						toggle = function(id) {
-							_forN(el.vvv, function(sp) {
+							_forN(VVV[el.id], function(sp) {
 								_forN(_elemFuncBlockObj(_idsAss(sp.blk)), function(oo) {
 									if(!oo.obj.length)
 										return;
@@ -1313,7 +1313,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					toggle(el.def);
 					ATTR_CMP._menu({
 						type:type[el.num_1],
-						spisok:el.vvv,
+						spisok:VVV[el.id],
 						func:toggle
 					});
 					return;
@@ -1622,7 +1622,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//Выбор цвета фона
 				case 70:
 					ATTR_CMP.next()._hint({
-						msg:el.vvv,
+						msg:VVV[el.id],
 						pad:3,
 						side:'right',
 						func:function(h) {
@@ -1738,7 +1738,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATTR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:el.vvv,
+						spisok:VVV[el.id],
 						func:function(v) {
 							FILTER[el.num_1][elm_id] = v;
 							_spisokUpdate(el.num_1);
@@ -1750,7 +1750,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATTR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-//						spisok:el.vvv,
+//						spisok:VVV[el.id],
 						msg_empty:'Не указан список',
 						func:function(v) {
 //							_elemFunc(el, v);
@@ -1764,88 +1764,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			attr_focus.focus();
 	},
 
-	_cmpV19 = function(o, get) {//наполнение для некоторых компонентов. dialog_id=19
-		var el = $(o.attr_el);
-
-		//получение данных для сохранения
-		if(get) {
-			var send = [];
-			_forEq(el.find('dd'), function(sp) {
-				send.push({
-					id:_num(sp.attr('val')),
-					title:sp.find('.title').val(),
-					content:sp.find('textarea').val(),
-					def:_num(sp.find('.def').val())
-				});
-			});
-			return send;
-		}
-
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
-			DL = el.html(html).find('dl'),
-			BUT_ADD = el.find('div:last'),
-			NUM = 1;
-
-		BUT_ADD.click(valueAdd);
-
-		for(var i in o.vvv)
-			valueAdd(o.vvv[i])
-
-		function valueAdd(v) {
-			v = $.extend({
-				id:0,
-				title:'имя значения ' + NUM,
-				content:'',
-				def:0,
-				use:0
-			}, v);
-
-			DL.append(
-				'<dd class="over1" val="' + v.id + '">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center top pt5">' +
-								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w90 grey r topi">Значение ' + NUM + ':' +
-							'<td><input type="text" class="title w100p b" value="' + v.title + '" />' +
-								'<textarea class="w100p min mtm1' + _dn(o.num_1) + '" placeholder="описание значения">' + v.content + '</textarea>' +
-							'<td class="w15 topi">' +
-								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
-							'<td class="w50 r top pt5">' +
-					   (v.use ? '<div class="dib fs11 color-ccc mr3 curD' + _tooltip('Использование', -53) + v.use + '</div>'
-								:
-								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
-					   ) +
-					'</table>' +
-				'</dd>'
-			);
-
-			DL.sortable({axis:'y',handle:'.icon-move-y'});
-			var DD = DL.find('dd:last');
-			DD.find('textarea').autosize();
-			DD.find('.def')._check({
-				tooltip:'По умолчанию',
-				func:function(v, ch) {
-					if(!v)
-						return;
-					//снятие галочек с остальных значений
-					_forEq(DL.find('.def'), function(sp) {
-						if(sp.attr('id') == ch.attr('id'))
-							return;
-						sp._check(0);
-					});
-				}
-			});
-			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
-			});
-			if(!v.id)
-				DD.find('.title').select();
-			NUM++;
-		}
-	},
 	_cmpV49 = function(o, unit) {//Настройка содержания Сборного текста [44]
 		var el = $(o.attr_el);
 
@@ -2272,8 +2190,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 		});
 
 		//вывод списка ячеек для настройки
-		for(var i in el.vvv)
-			tdAdd(el.vvv[i])
+		for(var i in VVV[el.id])
+			tdAdd(VVV[el.id][i])
 
 		//добавление новой колонки в таблицу
 		function tdAdd(v) {
@@ -2696,6 +2614,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			v = $.extend({
 				id:0,
 				title:'имя значения ' + NUM,
+				content:'',
 				def:0,
 				use:0
 			}, v);
@@ -2707,6 +2626,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w90 grey r topi">Значение ' + NUM + ':' +
 							'<td><input type="text" class="title w100p b" value="' + v.title + '" />' +
+								'<textarea class="w100p min mtm1' + _dn(el.ds != 16) + '" placeholder="описание значения">' + v.content + '</textarea>' +
 							'<td class="w15 topi">' +
 								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
 							'<td class="w50 r top pt5">' +
@@ -2750,6 +2670,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			send.push({
 				id:_num(sp.attr('val')),
 				title:sp.find('.title').val(),
+				content:sp.find('textarea').val(),
 				def:_num(sp.find('.def').val())
 			});
 		});

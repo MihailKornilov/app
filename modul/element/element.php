@@ -198,7 +198,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение 
 	$cond = "`spisok_on`";
 	$cond .= " AND `app_id` IN (0,".APP_ID.")";
 
-
+/*
 	//получение id диалога, который является списком, чтобы было нельзя его выбирать в самом себе (для связок)
 	$dialog = _dialogQuery($dialog_id);
 	if(_table($dialog['table_1']) == '_element') {
@@ -217,7 +217,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение 
 		if($dialog_id_skip = query_value($sql))
 			$cond .= " AND `id`!=".$dialog_id_skip;
 	}
-
+*/
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE ".$cond."
@@ -258,8 +258,9 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение 
 }
 function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
 /*
-	 получены будут списки, размещёные в текущем объекте
-	$block_id - исходный блок, по которому определяется объект
+	получены будут списки, размещёные в текущем объекте
+	$elem_id - размещённый на странице или в диалоге, по которому определяется объект
+	Идентификаторами результата являются id элементов (а не диалогов)
 */
 
 	if(!$block = _blockOne($block_id))
@@ -545,9 +546,14 @@ function _blockOne($block_id) {//запрос одного блока
 	return _BE('block_one', $block_id);
 }
 
-function _elemVvv($elem_id, $unit_id=0) {
+function _elemVvv($elem_id, $src=array()) {
 	if(!$el = _elemOne($elem_id))
 		return array();
+
+	$block_id =  _num(@$src['block_id']);
+	$dialog_id = _num(@$src['dialog_id']);
+	$unit_id = _num(@$src['unit_id']);
+	$unit = $unit_id ? $src['unit'] : array();
 
 	switch($el['dialog_id']) {
 		//подключаемая функция
@@ -565,86 +571,35 @@ function _elemVvv($elem_id, $unit_id=0) {
 		case 16:
 			$sql = "SELECT `id`,`txt_1`
 					FROM `_element`
-					WHERE `parent_id`=".$el['id']."
+					WHERE `parent_id`=".$elem_id."
 					ORDER BY `sort`";
 			return query_ass($sql);
 
-/*
-		//значения для select, radio, dropdown
-		case 19:
-			if(!$unit_id)
-				break;
-
+		//Select
+		case 17:
+		//dropdown
+		case 18:
+			$send = array();
 			$sql = "SELECT *
 					FROM `_element`
-					WHERE `block_id`=-".$unit_id."
+					WHERE `parent_id`=".$elem_id."
 					ORDER BY `sort`";
-			if(!$arr = query_arr($sql))
-				break;
-
-			$spisok = array();
-			foreach($arr as $id => $r)
-				$spisok[] = array(
-					'id' => _num($id),
+			foreach(query_arr($sql) as $r)
+				$send[] = array(
+					'id' => _num($r['id']),
 					'title' => $r['txt_1'],
-					'content' => $r['txt_2'],
-					'def' => _num($r['def']),
-					'use' => 0  //количество использования значений, чтобы нельзя было удалять
+					'content' => $r['txt_2']
 				);
+			return $send;
 
-			$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
-
-			//если элемент пока не применяется
-			if(empty($unit['col']))
-				break;
-
-			//объект, в котором находится блок с элементом
-			if(!$block = _blockOne($unit['block_id']))
-				break;
-
-			//пока только для диалогов
-			if($block['obj_name'] != 'dialog')
-				break;
-			if(!$dlg = _dialogQuery($block['obj_id']))
-				break;
-			if(_table($dlg['table_1']) != '_spisok')
-				break;
-
-			//получение количества использования значений
-			$sql = "SELECT
-						`".$unit['col']."` `id`,
-						COUNT(*) `use`
-					FROM `_spisok`
-					WHERE `dialog_id`=".$block['obj_id']."
-					GROUP BY `".$unit['col']."`";
-			if($ass = query_ass($sql))
-				foreach($spisok as $n => $r) {
-					if(empty($ass[$r['id']]))
-						continue;
-					$spisok[$n]['use'] = $ass[$r['id']];
-				}
-
-			$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
-			break;
 		//select - выбор списка (все списки приложения)
 		case 24:
-			switch($cmp['num_1']) {
-				case 960: $vvv = _dialogSpisokOnPage($block_id); break;
-				case 961: $vvv = _dialogSpisokOnConnect($block_id, $unit_id); break;
-				default:  $vvv = _dialogSpisokOn($dialog_id, $block_id, $unit_id); break;
+			switch($el['num_1']) {
+				case 960: return _dialogSpisokOnPage($block_id);
+				case 961: return _dialogSpisokOnConnect($block_id, $unit_id);
 			}
-			$dialog['cmp'][$cmp_id]['vvv'] = $vvv;
-			break;
-		//select - выбор единицы из другого списка (для связки)
-		case 29:
-			$sel_id = 0;
-			if($unit_id && $cmp['col']) {
-				if(!empty($unit[$cmp['col']]))
-					$sel_id = $unit[$cmp['col']]['id'];
-			} else
-				$sel_id = _spisokCmpConnectIdGet($cmp);
-			$dialog['cmp'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
-			break;
+			return _dialogSpisokOn($dialog_id, $block_id, $elem_id);
+
 		//SA: select - выбор имени колонки
 		case 37:
 			if(!$block = _blockOne($block_id))
@@ -743,7 +698,18 @@ function _elemVvv($elem_id, $unit_id=0) {
 				$field[] = $u;
 			}
 
-			$dialog['cmp'][$cmp_id]['vvv'] = $field;
+			return $field;
+
+/*
+		//select - выбор единицы из другого списка (для связки)
+		case 29:
+			$sel_id = 0;
+			if($unit_id && $cmp['col']) {
+				if(!empty($unit[$cmp['col']]))
+					$sel_id = $unit[$cmp['col']]['id'];
+			} else
+				$sel_id = _spisokCmpConnectIdGet($cmp);
+			$dialog['cmp'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
 			break;
 		//SA: Select - выбор диалогового окна
 		case 38: $dialog['cmp'][$cmp_id]['vvv'] = _dialogSelArray(); break;
@@ -1450,10 +1416,12 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 				continue;
 			if($id = _num($r['id']))
 				$idsNoDel .= ','.$id;
+			$content = _txt($r['content']);
 			$update[] = "(
 				".$id.",
 				".$unit['id'].",
 				'".addslashes($title)."',
+				'".addslashes($content)."',
 				"._num($r['def']).",
 				".$sort++."
 			)";
@@ -1479,12 +1447,14 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 				`id`,
 				`parent_id`,
 				`txt_1`,
+				`txt_2`,
 				`def`,
 				`sort`
 			)
 			VALUES ".implode(',', $update)."
 			ON DUPLICATE KEY UPDATE
 				`txt_1`=VALUES(`txt_1`),
+				`txt_2`=VALUES(`txt_2`),
 				`def`=VALUES(`def`),
 				`sort`=VALUES(`sort`)";
 	query($sql);
@@ -1515,6 +1485,7 @@ function PHP12_radio_setup_vvv($parent_id) {
 		$send[] = array(
 			'id' => _num($r['id']),
 			'title' => $r['txt_1'],
+			'content' => $r['txt_2'],
 			'def' => _num($r['def']),
 			'use' => 0
 		);

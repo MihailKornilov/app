@@ -1015,18 +1015,18 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send['elm_ids'] = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
-	//заполнение значениями некоторых компонентов
-	$send['vvv'] = array();
-	foreach($send['elm_ids'] as $elem_id)
-		$send['vvv'][$elem_id] = _elemVvv($elem_id, $unit_id);
-
-
 	//переделка значений $unit в INT, если есть
 	foreach($unit as $k => $v)
 		if(!is_array($v))
 			if(preg_match(REGEXP_INTEGER, $v))
 				$unit[$k] = _num($v, 1);
 	$send['unit'] = $unit;
+
+	//заполнение значениями некоторых компонентов
+	$send['vvv'] = array();
+	foreach($send['elm_ids'] as $elem_id)
+		$send['vvv'][$elem_id] = _elemVvv($elem_id, $send);
+
 
 	//проверка доступа внесения новой записи
 	if($act == 'insert' && !$dialog['insert_on']) {
