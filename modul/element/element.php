@@ -198,7 +198,6 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение 
 	$cond = "`spisok_on`";
 	$cond .= " AND `app_id` IN (0,".APP_ID.")";
 
-/*
 	//получение id диалога, который является списком, чтобы было нельзя его выбирать в самом себе (для связок)
 	$dialog = _dialogQuery($dialog_id);
 	if(_table($dialog['table_1']) == '_element') {
@@ -217,7 +216,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение 
 		if($dialog_id_skip = query_value($sql))
 			$cond .= " AND `id`!=".$dialog_id_skip;
 	}
-*/
+
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE ".$cond."

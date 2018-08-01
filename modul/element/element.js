@@ -1297,6 +1297,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 56: _cmpV56(el, unit); return;
 				//Меню переключения блоков
 				case 57:
+					return;
 					var type = {
 							1158:2,
 							1159:1
@@ -1738,7 +1739,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATTR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:VVV[el.id],
+//						spisok:VVV[el.id],
 						func:function(v) {
 							FILTER[el.num_1][elm_id] = v;
 							_spisokUpdate(el.num_1);
