@@ -599,6 +599,16 @@ function _elemVvv($elem_id, $src=array()) {
 			}
 			return _dialogSpisokOn($dialog_id, $block_id, $elem_id);
 
+		//select - выбор единицы из другого списка (для связки)
+		case 29:
+			$sel_id = 0;
+			if($unit_id && $el['col']) {
+				if(!empty($unit[$el['col']]))
+					$sel_id = $unit[$el['col']]['id'];
+			} else
+				$sel_id = _spisokCmpConnectIdGet($el);
+			return _spisok29connect($elem_id, $v='', $sel_id);
+
 		//SA: select - выбор имени колонки
 		case 37:
 			if(!$block = _blockOne($block_id))
@@ -699,19 +709,63 @@ function _elemVvv($elem_id, $src=array()) {
 
 			return $field;
 
-/*
-		//select - выбор единицы из другого списка (для связки)
-		case 29:
-			$sel_id = 0;
-			if($unit_id && $cmp['col']) {
-				if(!empty($unit[$cmp['col']]))
-					$sel_id = $unit[$cmp['col']]['id'];
-			} else
-				$sel_id = _spisokCmpConnectIdGet($cmp);
-			$dialog['cmp'][$cmp_id]['vvv'] = _spisok29connect($cmp_id, $v='', $sel_id);
-			break;
 		//SA: Select - выбор диалогового окна
-		case 38: $dialog['cmp'][$cmp_id]['vvv'] = _dialogSelArray(); break;
+		case 38:
+			return _dialogSelArray();
+
+		//Меню переключения блоков - список пунктов
+		case 57:
+			$send = array();
+			foreach(PHP12_menu_block_setup_vvv($elem_id) as $v) {
+				$send[] = array(
+					'id' => $v['id'],
+					'title' => $v['title'],
+					'blk' => $v['blk']
+				);
+			}
+			return $send;
+
+		//Цвета для фона
+		case 70:
+			$color = array(
+				'#fff',
+				'#ffffe4',
+				'#e4ffe4',
+				'#dff',
+				'#ffe8ff',
+
+				'#f9f9f9',
+				'#ffb',
+				'#cfc',
+				'#aff',
+				'#fcf',
+
+				'#f3f3f3',
+				'#fec',
+				'#F2F2B6',
+				'#D7EBFF',
+				'#ffe4e4',
+
+				'#ededed',
+				'#FFDA8F',
+				'#E3E3AA',
+				'#B2D9FF',
+				'#fcc'
+			);
+
+			$sel = '#fff';//выбранное значение
+			if($unit_id)
+				$sel = $unit[$el['col']];
+
+			$spisok = '';
+			for($n = 0; $n < count($color); $n++) {
+				$cls = $sel == $color[$n] ? ' class="sel"' : '';
+				$spisok .= '<div'.$cls.' style="background-color:'.$color[$n].'" val="'.$color[$n].'">'.
+								'&#10004;'.
+						   '</div>';
+			}
+			return '<div class="_color-bg-choose">'.$spisok.'</div>';
+/*
 		//SA: Select - дублирование
 		case 41:
 			//Отсутствует ID исходного блока.
@@ -787,70 +841,12 @@ function _elemVvv($elem_id, $src=array()) {
 			}
 			$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
 			break;
-		//Цвета для фона
-		case 70:
-			$color = array(
-				'#fff',
-				'#ffffe4',
-				'#e4ffe4',
-				'#dff',
-				'#ffe8ff',
-
-				'#f9f9f9',
-				'#ffb',
-				'#cfc',
-				'#aff',
-				'#fcf',
-
-				'#f3f3f3',
-				'#fec',
-				'#F2F2B6',
-				'#D7EBFF',
-				'#ffe4e4',
-
-				'#ededed',
-				'#FFDA8F',
-				'#E3E3AA',
-				'#B2D9FF',
-				'#fcc'
-			);
-
-			$sel = '#fff';//выбранное значение
-			if($unit_id)
-				$sel = $unit[$cmp['col']];
-
-			$spisok = '';
-			for($n = 0; $n < count($color); $n++) {
-				$cls = $sel == $color[$n] ? ' class="sel"' : '';
-				$spisok .= '<div'.$cls.' style="background-color:'.$color[$n].'" val="'.$color[$n].'">'.
-								'&#10004;'.
-						   '</div>';
-			}
-			$dialog['cmp'][$cmp_id]['vvv'] = '<div class="_color-bg-choose">'.$spisok.'</div>';
 */
 	}
 
 	return array();
 }
 
-function _elemValue($elem_id) {//дополнительне значения к элементу select, настроенные через [19]
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `block_id`=-".$elem_id."
-			ORDER BY `sort`";
-	if(!$arr = query_arr($sql))
-		return array();
-
-	$spisok = array();
-	foreach($arr as $id => $r)
-		$spisok[] = array(
-			'id' => _num($id),
-			'title' => $r['txt_1'],
-			'content' => $r['txt_1'].'<div class="fs11 grey">'._br($r['txt_2']).'</div>'
-		);
-
-	return $spisok;
-}
 function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 	if(!$elem_id = _num($elem_id))
 		return '';
@@ -1378,7 +1374,7 @@ function PHP12_menu_block_setup_vvv($parent_id) {//получение данны
 		$spisok[] = array(
 			'id' => _num($id),
 			'title' => $r['txt_1'],//название пункта меню
-			'blk' => $r['txt_2'],//блоки
+			'blk' => $r['txt_2'],  //блоки
 			'blk_title' => $blk_title,
 			'def' => _num($r['def'])
 		);

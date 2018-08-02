@@ -543,7 +543,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 		else {
 			window.DIALOG_OPEN = dialog;
 			DIALOG_OPEN.col_type = o.col_type;
-			window.VVV = o.vvv;
+			for(var i in o.vvv)
+				VVV[i] = o.vvv[i];
 			_ELM_ACT(o.elm_ids, o.unit);
 		}
 
@@ -1297,7 +1298,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 56: _cmpV56(el, unit); return;
 				//Меню переключения блоков
 				case 57:
-					return;
 					var type = {
 							1158:2,
 							1159:1

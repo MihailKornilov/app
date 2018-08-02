@@ -527,6 +527,7 @@ function _vkapi($method, $param=array()) {//получение данных из
 function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 	$ELM = array();
 	$BLK = array();
+	$VVV = array();
 
 	$block = _BE('block_all');
 
@@ -549,12 +550,17 @@ function _jsCache() {//формирование файла JS с данными 
 			continue;
 
 		$ELM[$elem_id] = $el;
+
+		if($v = _jsCacheVvv($elem_id))
+			$VVV[$elem_id] = $v;
 	}
 
 	$save =
 	'var ELMM='._json($ELM).','.
 		"\n\n".
 		'BLKK={'.implode(",\n", $BLK).'},'.
+		"\n\n".
+		'VVV='._json($VVV).','.
 		"\n\n".
 		'PAGE_LIST='._page('for_select', 'js').','.
 		"\n\n".
@@ -609,19 +615,8 @@ function _jsCacheElemOne($elem_id) {
 		$val['issp'] = 1;
 
 	//элемент-меню переключения блоков
-	if($r['dialog_id'] == 57) {
+	if($r['dialog_id'] == 57)
 		$val['def'] = $r['def'];
-
-		$vvv = array();
-		foreach(PHP12_menu_block_setup_vvv($r['id']) as $v) {
-			$vvv[] = array(
-				'id' => $v['id'],
-				'title' => $v['title'],
-				'blk' => $v['blk']
-			);
-		}
-		$val['vvv'] = $vvv;
-	}
 
 	for($n = 1; $n <= 8; $n++) {
 		$num = 'num_'.$n;
@@ -633,6 +628,17 @@ function _jsCacheElemOne($elem_id) {
 	}
 
 	return $val;
+}
+function _jsCacheVvv($elem_id) {//значения для элементов (только статические значения)
+	$el = _elemOne($elem_id);
+
+	switch($el['dialog_id']) {
+		//Меню переключения блоков - список пунктов
+		case 57:
+			return _elemVvv($elem_id);
+	}
+
+	return array();
 }
 
 function _cache($v=array()) {

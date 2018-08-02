@@ -2376,29 +2376,6 @@ function _beElemVvv($el) {//вставка дополнительных знач
 					break;
 			}
 			break;
-		//select - произвольные значения
-		case 17:
-		//dropdown
-		case 18: $el['vvv'] = _elemValue($el['id']); break;
-		//Меню переключения блоков - список пунктов
-		case 57:
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `block_id`=-".$el['id']."
-					ORDER BY `sort`";
-			if(!$elArr = query_arr($sql))
-				break;
-
-			$spisok = array();
-			foreach($elArr as $idd => $rr)
-				$spisok[] = array(
-					'id' => _num($idd),
-					'title' => $rr['txt_1'],
-					'blk' => $rr['txt_2']
-				);
-
-			$el['vvv'] = $spisok;
-			break;
 		//фильтр-select
 		case 83:
 			if(!$dialog_id = $el['num_2'])
