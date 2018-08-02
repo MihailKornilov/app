@@ -68,6 +68,8 @@ function _setting() {//установка констант-настроек
 
 	//версия скриптов
 	define('SCRIPT', _num($arr['SCRIPT']));
+	//версия кеша JS - app0.js
+	define('JS_CACHE', _num($arr['JS_CACHE']));
 }
 
 function _table($id=false) {//таблицы в базе с соответствующими идентификаторами
@@ -572,6 +574,12 @@ function _jsCache() {//формирование файла JS с данными 
 	fwrite($fp, $save);
 	fclose($fp);
 
+	$sql = "UPDATE `_setting`
+			SET `v`=`v`+1
+			WHERE `key`='JS_CACHE'";
+	query($sql);
+
+	_cache_clear('SETTING', 1);
 }
 function _jsCacheElemOne($elem_id) {
 	if(!$r = _elemOne($elem_id))
@@ -597,9 +605,12 @@ function _jsCacheElemOne($elem_id) {
 	if($r['focus'])
 		$val['focus'] = 1;
 
-	if($dlg = _BE('dialog', $r['dialog_id']))
+	if($dlg = _BE('dialog', $r['dialog_id'])) {
 		if($dlg['element_style_access'])
 			$val['style_access'] = $dlg['element_style_access'];
+		if($dlg['element_afics'])
+			$val['afics'] = $dlg['element_afics'];
+	}
 
 	$val['width'] = $r['width'];
 

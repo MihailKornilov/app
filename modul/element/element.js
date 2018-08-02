@@ -665,8 +665,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		return send;
 	},
-	_attr_cmp = function(id) {//аттрибут компонента
-		var send = $('#cmp_' + id);
+	_attr_cmp = function(id, afics) {//аттрибут компонента
+		var el = ELMM[id],
+			_afics = afics && el.afics ? el.afics : '',
+			send = $('#cmp_' + id + _afics);
 
 		if(!send.length)
 			return false;
@@ -686,8 +688,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 		var attr_focus = false;//элемент, на который будет поставлен фокус
 
 		_forN(elm_ids, function(elm_id) {
-			var el = ELMM[elm_id],
-				ATTR_CMP = _attr_cmp(elm_id),
+			var el = ELMM[elm_id];
+
+			if(!el)
+				alert('несуществующий элемент ' + elem_id);
+
+			var ATTR_CMP = _attr_cmp(elm_id),
+				ATTR_CMP_AFICS = _attr_cmp(elm_id, 1),
 				ATTR_EL =  _attr_el(elm_id);
 
 			el.id = elm_id;
@@ -1320,26 +1327,25 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Связка списка при помощи кнопки
 				case 59:
-					var but = $(el.attr_cmp + el.afics),
-						div = but.next(),
+					var div = ATTR_CMP_AFICS.next(),
 						unitSel = function(id) {//действие после выбора значения
 							var send = {
 								op:'spisok_59_unit',
 								cmp_id:elm_id,
 								unit_id:id,
-								busy_obj:but
+								busy_obj:ATTR_CMP_AFICS
 							};
 							_post(send, function(res) {
 								div.find('.un-html').html(res.html);
 								div._dn(1);
-								but._dn();
+								ATTR_CMP_AFICS._dn();
 							});
 						};
-					but.click(function() {
+					ATTR_CMP_AFICS.click(function() {
 						_dialogLoad({
 							block_id:el.block_id,
 							dialog_id:el.num_4,
-							busy_obj:but,
+							busy_obj:ATTR_CMP_AFICS,
 							func_open:function(res, dlg) {
 								dlg.content.click(function(e) {
 									var un = $(e.target).parents('.sp-unit');
@@ -1359,7 +1365,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					});
 					//отмена выбора
 					div.find('.icon').click(function() {
-						but._dn(1);
+						ATTR_CMP_AFICS._dn(1);
 						div._dn();
 						ATTR_CMP.val(0);
 					});

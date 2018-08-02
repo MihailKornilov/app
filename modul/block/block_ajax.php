@@ -318,6 +318,7 @@ switch(@$_POST['op']) {
 				$send['elem_js'] = _jsCacheElemOne($elem_id);
 			}
 
+		_jsCache();
 
 		jsonSuccess($send);
 		break;

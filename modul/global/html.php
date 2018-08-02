@@ -346,7 +346,7 @@ function _html_script() {//скрипты и стили
 	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.SCRIPT.'" />'.
 	'<script src="modul/global/global'.MIN.'.js?'.SCRIPT.'"></script>'.
 
-	'<script src="js_cache/app0.js?'.SCRIPT.'"></script>'.
+	'<script src="js_cache/app0.js?'.JS_CACHE.'"></script>'.
 
 (CODE ?
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
