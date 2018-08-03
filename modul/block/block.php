@@ -930,7 +930,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			$sql = "SELECT *
 					FROM `_element_func`
-					WHERE `block_id`=".$bs_id."
+					WHERE `element_id`=".$BL['elem_id']."
 					ORDER BY `sort`";
 			if(!$arr = query_arr($sql))
 				return _emptyMin('Действий не назначено.');
@@ -2270,10 +2270,9 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 		$ELM = array();
 
 		//наличие функций в элементах
-		$sql = "SELECT `block_id`,1
+		$sql = "SELECT `element_id`,1
 				FROM `_element_func`
-				WHERE `block_id` IN("._idsGet($BLK).")
-				GROUP BY `block_id`";
+				GROUP BY `element_id`";
 		$isFunc = query_ass($sql);
 
 		//переменная для сбора ID элементов-таблиц
@@ -2313,7 +2312,7 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 			$el['attr_cmp'] = '#cmp_'.$elem_id;
 			$el['size'] = $el['size'] ? _num($el['size']) : 13;
 			$el['is_img'] = 0;
-			$el['is_func'] = _num(@$isFunc[$el['block_id']]);
+			$el['is_func'] = _num(@$isFunc[$elem_id]);
 			$el['style_access'] = _num($dlg['element_style_access']);
 			$el['url_access'] = _num($dlg['element_url_access']);
 			$el['hint_access'] = _num($dlg['element_hint_access']);
@@ -2356,11 +2355,10 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 
 		$sql = "SELECT *
 				FROM `_element_func`
-				WHERE `block_id` IN ("._idsGet($BLK).")
+				WHERE `element_id` IN ("._idsGet($ELM).")
 				ORDER BY `sort`";
 		foreach(query_arr($sql) as $r) {
-			$elem_id = $BLK[$r['block_id']]['elem_id'];
-			$ELM[$elem_id]['func'][] = array(
+			$ELM[$r['element_id']]['func'][] = array(
 				'dialog_id' => _num($r['dialog_id']),
 				'action_id' => _num($r['action_id']),
 				'cond_id' => _num($r['cond_id']),

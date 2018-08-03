@@ -598,13 +598,16 @@ function _jsCacheElemOne($elem_id) {
 	$val['dialog_id'] = $r['dialog_id'];
 	$val['name'] = $r['name'];
 	$val['block_id'] = $block_id;
-	$val['mar'] = $r['mar'];
-	$val['func'] = '';
 
+	$val['mar'] = $r['mar'];
 	$val['font'] = $r['font'];
 	$val['color'] = $r['color'];
 	$val['size'] = $r['size'];
 	$val['url'] = $r['url'];
+
+	if($r['func'])
+		$val['func'] = $r['func'];
+
 
 //		$val[] = 'num_7:'.$r['num_7'];//ограничение высоты фото [60]
 
@@ -616,6 +619,8 @@ function _jsCacheElemOne($elem_id) {
 			$val['style_access'] = $dlg['element_style_access'];
 		if($dlg['element_afics'])
 			$val['afics'] = $dlg['element_afics'];
+		if($dlg['element_dialog_func'])
+			$val['dialog_func'] = $dlg['element_dialog_func'];
 	}
 
 	$val['width'] = $r['width'];

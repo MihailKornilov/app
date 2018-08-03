@@ -748,7 +748,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			switch(el.dialog_id) {
 				case 1://галочка
-					if(el.func.length) {
+					if(el.func) {
 						_elemFunc(el, _num(unit[el.col] || 0), 1);
 						ATTR_CMP._check({
 							func:function(v) {
