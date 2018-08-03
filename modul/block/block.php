@@ -1827,6 +1827,25 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		return $send;
 	}
 
+	//получение блоков для конкретного объекта (новая схема)
+	if($i == 'block_arr1') {
+		$obj_name = $i1;
+		if(!$obj_id = _num($i2))
+			return array();
+
+		$send = array();
+		foreach($G_BLOCK as $id => $r) {
+			if($r['obj_name'] != $obj_name)
+				continue;
+			if($r['obj_id'] != $obj_id)
+				continue;
+
+			$send[$id] = _jsCacheBlockOne($id);
+		}
+
+		return $send;
+	}
+
 	//получение блоков для конкретного объекта c учётом иерархии
 	if($i == 'block_obj') {
 		$obj_name = $i1;
@@ -1939,7 +1958,29 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		return $send;
 	}
 
-	if($i == 'elem_js') {//массив элементов в формате JS
+	//получение элементов для конкретного объекта (новая схема)
+	if($i == 'elem_arr1') {
+		$obj_name = $i1;
+		if(!$obj_id = _num($i2))
+			return array();
+
+		$send = array();
+		foreach($G_BLOCK as $id => $r) {
+			if($r['obj_name'] != $obj_name)
+				continue;
+			if($r['obj_id'] != $obj_id)
+				continue;
+			if(!$elem_id = $r['elem_id'])
+				continue;
+
+			$send[$elem_id] = _jsCacheElemOne($elem_id);
+		}
+
+		return $send;
+	}
+
+	//массив элементов в формате JS
+	if($i == 'elem_js') {
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
 			return '{}';
@@ -1963,7 +2004,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 	if($i == 'elem_ids_arr') {
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
-			return '[]';
+			return array();
 
 		$send = array();
 		foreach($G_BLOCK as $id => $r) {

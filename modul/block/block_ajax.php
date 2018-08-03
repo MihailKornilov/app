@@ -29,8 +29,6 @@ switch(@$_POST['op']) {
 		$unit = _pageSpisokUnit($obj_id, $obj_name) + array('blk_edit' => 1);
 
 		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, $unit);
-		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
-		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;
@@ -241,12 +239,13 @@ switch(@$_POST['op']) {
 		_blockChildCountSet($obj_name, $obj_id);
 
 		_BE( 'block_clear');
+		_jsCache();
 
 		$unit = _pageSpisokUnit($obj_id, $obj_name) + array('blk_edit' => 1);
 		$send['level'] = _blockLevelChange($obj_name, $obj_id, $width);
 		$send['html'] = _blockHtml($obj_name, $obj_id, $width,0, $unit);
-		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
-		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
+		$send['blk'] = _BE('block_arr1', $obj_name, $obj_id);
+		$send['elm'] = _BE('elem_arr1', $obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;

@@ -718,6 +718,10 @@ $.fn._grid = function(o) {
 		_post(send, function(res) {
 			$('#block-level-' + o.obj_name).after(res.level).remove();
 			$('.block-content-' + o.obj_name).html(res.html);
+			for(var i in res.blk)
+				BLKK[i] = res.blk[i];
+			for(var i in res.elm)
+				ELMM[i] = res.elm[i];
 		});
 	});
 	$('#grid-cancel').click(function() {

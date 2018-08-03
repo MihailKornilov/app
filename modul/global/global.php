@@ -534,17 +534,7 @@ function _jsCache() {//формирование файла JS с данными 
 	$block = _BE('block_all');
 
 	foreach($block as $block_id => $r) {
-		$val = array();
-		$val[] = 'elem_id:'.$r['elem_id'];
-		$val[] = 'sa:'.$r['sa'];
-		$val[] = 'width_auto:'.$r['width_auto'];
-		$val[] = 'bor:"'.$r['bor'].'"';
-		$val[] = 'pos:"'.$r['pos'].'"';
-		$val[] = 'bg:"'.$r['bg'].'"';
-		$val[] = 'bg_ids:"'.$r['bg_ids'].'"';
-		$val[] = 'child_count:'.$r['child_count'];
-
-		$BLK[] = $block_id.':{'.implode(',', $val).'}';
+		$BLK[$block_id] = _jsCacheBlockOne($block_id);
 	}
 
 	foreach(_BE('elem_all') as $elem_id => $r) {
@@ -560,7 +550,7 @@ function _jsCache() {//формирование файла JS с данными 
 	$save =
 	'var ELMM='._json($ELM).','.
 		"\n\n".
-		'BLKK={'.implode(",\n", $BLK).'},'.
+		'BLKK='._json($BLK).','.
 		"\n\n".
 		'VVV='._json($VVV).','.
 		"\n\n".
@@ -580,6 +570,22 @@ function _jsCache() {//формирование файла JS с данными 
 	query($sql);
 
 	_cache_clear('SETTING', 1);
+}
+function _jsCacheBlockOne($block_id) {
+	if(!$r = _blockOne($block_id))
+		return array();
+
+	$val = array();
+	$val['elem_id'] = $r['elem_id'];
+	$val['sa'] = $r['sa'];
+	$val['width_auto'] = $r['width_auto'];
+	$val['bor'] = $r['bor'];
+	$val['pos'] = $r['pos'];
+	$val['bg'] = $r['bg'];
+	$val['bg_ids'] = $r['bg_ids'];
+	$val['child_count'] = $r['child_count'];
+
+	return $val;
 }
 function _jsCacheElemOne($elem_id) {
 	if(!$r = _elemOne($elem_id))

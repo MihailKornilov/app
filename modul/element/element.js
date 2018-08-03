@@ -578,7 +578,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						case 12://подключаемая функция
 							if(window[sp.txt_1])
 								send.vvv[id] = window[sp.txt_1](sp, 'get');
-							if(sp.col && ATTR_CMP)
+							if(ATTR_CMP)
 								send.cmp[id] = ATTR_CMP.val();
 							return;
 						case 37://SA: Select - выбор имени колонки
@@ -2376,14 +2376,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(!DLG)
 			return;
 
-		var D = function(attr) {
-				return DLG.content.find(attr);
-			},
-			VC = D(el.attr_el).find('.v-choose');//элементы в открытом диалоге для выбора
+		var D = DLG.D,
+			VC = D('#el_' + el.id).find('.v-choose');//элементы в открытом диалоге для выбора
 
 		//описание глобальных переменных при открытии исходного диалога
 		if(unit.source.block_id) {
-			V11_CMP = D(el.attr_cmp);//переменная в исходном диалоге для хранения значений
+			V11_CMP = D('#cmp_' + el.id);//переменная в исходном диалоге для хранения значений
 			V11_DLG = [];   //массив диалогов, открывающиеся последовательно
 			V11_V = [];     //массив выбранных значений
 			V11_COUNT = 0;  //счётчик открытых диалогов
