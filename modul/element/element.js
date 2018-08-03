@@ -657,8 +657,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 		}
 	},
 
+	ATTR_EL = function(id) {
+		return '#el_' + id;
+	},
 	_attr_el = function(id) {//аттрибут элемента
-		var send = $('#el_' + id);
+		var send = $(ATTR_EL(id));
 
 		if(!send.length)
 			return false;
@@ -675,8 +678,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		return send;
 	},
+	ATTR_BL = function(id) {
+		return '#bl_' + id;
+	},
 	_attr_bl = function(id) {//аттрибут блока
-		var send = $('#bl_' + id);
+		var send = $(ATTR_BL(id));
 
 		if(!send.length)
 			return false;
@@ -2184,11 +2190,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
-			DL = $(el.attr_el).append(html).find('dl'),
+			DL = _attr_el(el.id).append(html).find('dl'),
 			NUM = 1;
 
 		//кнопка добавления новой ячейки
-		$(el.attr_el).find('div:last').click(tdAdd);
+		_attr_el(el.id).find('div:last').click(tdAdd);
 
 		//показ-скрытие настройки TH-заголовков
 		$('#cmp_531')._check({
@@ -2322,7 +2328,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 	PHP12_spisok_td_get = function(el) {//сохранение ячеек таблицы
 		var send = [];
-		_forEq($(el.attr_el).find('dd'), function(sp) {
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			var v = {},
 				inp = sp.find('.inp');
 
@@ -2793,7 +2799,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			send.user_id = user_id;
 
-			_forEq($(el.attr_el).find('._check'), function(sp) {
+			_forEq(_attr_el(el.id).find('._check'), function(sp) {
 				var ch = sp.prev(),
 					id = _num(ch.attr('id').split('_')[1]),
 					v = _num(ch.val());
@@ -2804,7 +2810,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			return send;
 		}
 
-		_forEq($(el.attr_el).find('._check'), function(sp) {
+		_forEq(_attr_el(el.id).find('._check'), function(sp) {
 			var prev = sp.prev();
 			prev._check({
 				func:function(v) {
@@ -2816,7 +2822,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 	_pageUserAccessAll = function(el, i) {//настройка входа для всех сотрудников
 		if(i == 'get') {
 			var send = [];
-			_forEq($(el.attr_el).find('._check'), function(sp) {
+			_forEq(_attr_el(el.id).find('._check'), function(sp) {
 				var ch = sp.prev(),
 					id = _num(ch.attr('id').split('_')[1]),
 					v = _num(ch.val());

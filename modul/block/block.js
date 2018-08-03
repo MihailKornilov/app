@@ -7,7 +7,6 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 		var t = $(this),
 			block_id = _num(t.attr('val')),
 			BL = BLKK[block_id],
-			ATTR_BL = _attr_bl(block_id),
 			borSave = function() {//нажатие на галочку для установки/снятия бордюра
 				BL.bor = $('#block-unit-bor0').val() + ' ' +
 						 $('#block-unit-bor1').val() + ' ' +
@@ -16,9 +15,10 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 				BL.save = 1;
 			};
 		BL.id = block_id;
+		BL.attr_bl = ATTR_BL(block_id);
 
 		//идёт процес сохранения
-		if(BL.save || ATTR_BL.hasClass('_busy'))
+		if(BL.save || $(BL.attr_bl).hasClass('_busy'))
 			return;
 
 		t._hint({
@@ -43,28 +43,28 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 				$('#block-unit-bor0')._check({
 					tooltip:'сверху',
 					func:function(v) {
-						ATTR_BL.css('border-top', v ? '#DEE3EF solid 1px' : '');
+						$(BL.attr_bl).css('border-top', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
 				$('#block-unit-bor1')._check({
 					tooltip:'справа',
 					func:function(v) {
-						ATTR_BL.css('border-right', v ? '#DEE3EF solid 1px' : '');
+						$(BL.attr_bl).css('border-right', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
 				$('#block-unit-bor2')._check({
 					tooltip:'снизу',
 					func:function(v) {
-						ATTR_BL.css('border-bottom', v ? '#DEE3EF solid 1px' : '');
+						$(BL.attr_bl).css('border-bottom', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
 				$('#block-unit-bor3')._check({
 					tooltip:'слева',
 					func:function(v) {
-						ATTR_BL.css('border-left', v ? '#DEE3EF solid 1px' : '');
+						$(BL.attr_bl).css('border-left', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
@@ -311,6 +311,7 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 
 		var EL = ELMM[BL.elem_id];
 		EL.id = BL.elem_id;
+		EL.attr_el = ATTR_EL(EL.id);
 
 		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.id + '">' +
 			'<div class="line-b">' +
@@ -369,9 +370,9 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 				_parent(unit, 'TABLE').find('.on').removeClass('on');
 				unit.addClass('on');
 
-				_attr_bl(BL.id).removeClass('top r center bottom');
+				$(BL.attr_bl).removeClass('top r center bottom');
 				if(v)
-					_attr_bl(BL.id).addClass(v);
+					$(BL.attr_bl).addClass(v);
 
 				BL.pos = v;
 				BL.save = 1;
@@ -412,7 +413,7 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 					font = [];
 				td._dn(cls, 'on');
 
-				_attr_el(EL.id)._dn(cls, v);
+				$(EL.attr_el)._dn(cls, v);
 
 				_forEq($('#elem-font .on'), function(eq) {
 					font.push(eq.attr('val'));
@@ -437,7 +438,7 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста
 		var func = function(v) {
-			_attr_el(EL.id)
+			$(EL.attr_el)
 				.removeClass(EL.color)
 				.addClass(v);
 
