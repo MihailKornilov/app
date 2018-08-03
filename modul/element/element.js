@@ -1341,12 +1341,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 								ATTR_CMP_AFICS._dn();
 							});
 						};
+					//нажатие на кнопку для открытыя диалога
 					ATTR_CMP_AFICS.click(function() {
 						_dialogLoad({
 							block_id:el.block_id,
 							dialog_id:el.num_4,
 							busy_obj:ATTR_CMP_AFICS,
 							func_open:function(res, dlg) {
+								//выбор значения списка
 								dlg.content.click(function(e) {
 									var un = $(e.target).parents('.sp-unit');
 									if(!un.length)

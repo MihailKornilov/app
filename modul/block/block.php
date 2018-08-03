@@ -1278,7 +1278,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			: '');
 
 		//Значение списка: порядковый номер
-		case 32: return _spisokUnitNum($el, $unit);
+		case 32:
+			if($is_edit)
+				return _elemTitle($el['id']);
+			return _spisokUnitNum($unit);
 
 		//Значение списка: дата
 		case 33:

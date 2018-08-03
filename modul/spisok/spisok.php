@@ -534,12 +534,9 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 			WHERE ".$cond;
 	return query_assoc($sql);
 }
-function _spisokUnitNum($el, $u) {//порядковый номер - значение единицы списка
-	if(empty($u))
-		return _elemTitle($el['id']);
+function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
 	if(empty($u['num']))
-//		return _pr($u);
-		return @$u['id'];
+		return $u['id'];
 	return $u['num'];
 }
 function _spisokUnitData($el, $unit) {//дата и время - значение единицы списка [33]
@@ -1169,10 +1166,10 @@ function _spisok29connectGet($ids, $v) {
 
 	return $send;
 }
-function _spisok59unit($cmp_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
+function _spisok59unit($elem_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
 	if(!$unit_id)
 		return '';
-	if(!$el = _elemOne($cmp_id))
+	if(!$el = _elemOne($elem_id))
 		return '';
 	if(!$dialog_id = _num($el['num_1']))
 		return '';
@@ -1182,10 +1179,10 @@ function _spisok59unit($cmp_id, $unit_id) {//выбранное значение
 	$sql = "SELECT *
 			FROM `"._table($dlg['table_1'])."`
 			WHERE `id`=".$unit_id;
-	if(!$un = query_assoc($sql))
+	if(!$unit = query_assoc($sql))
 		return '';
 
-	return _blockHtml('spisok', $el['block_id'], 350, 0, $un);
+	return _blockHtml('spisok', $elem_id, 350, 0, $unit);
 }
 
 function _spisokCmpConnectIdGet($el) {//получение id привязонного списка, если рядом стоит родительский список (для страницы, принимающей значения списка)
