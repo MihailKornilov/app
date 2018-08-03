@@ -40,7 +40,7 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 				$sql = "DELETE FROM `_element` WHERE `parent_id`=".$unit_id;
 				query($sql);
 				//удаление функций
-				$sql = "DELETE FROM `_element_func` WHERE `block_id`=".$elem['block_id'];
+				$sql = "DELETE FROM `_element_func` WHERE `element_id`=".$unit_id;
 				query($sql);
 				//удаление фильтров
 				$sql = "DELETE FROM `_user_spisok_filter` WHERE `element_id_filter`=".$unit_id;

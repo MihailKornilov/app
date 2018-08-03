@@ -668,10 +668,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		return send;
 	},
+	ATTR_CMP = function(id) {
+		return '#cmp_' + id;
+	},
 	_attr_cmp = function(id, afics) {//аттрибут компонента
 		var el = ELMM[id],
 			_afics = afics && el.afics ? el.afics : '',
-			send = $('#cmp_' + id + _afics);
+			send = $(ATTR_CMP(id) + _afics);
 
 		if(!send.length)
 			return false;
@@ -2383,11 +2386,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 			return;
 
 		var D = DLG.D,
-			VC = D('#el_' + el.id).find('.v-choose');//элементы в открытом диалоге для выбора
+			VC = D(ATTR_EL(el.id)).find('.v-choose');//элементы в открытом диалоге для выбора
 
 		//описание глобальных переменных при открытии исходного диалога
 		if(unit.source.block_id) {
-			V11_CMP = D('#cmp_' + el.id);//переменная в исходном диалоге для хранения значений
+			V11_CMP = D(ATTR_CMP(el.id));//переменная в исходном диалоге для хранения значений
 			V11_DLG = [];   //массив диалогов, открывающиеся последовательно
 			V11_V = [];     //массив выбранных значений
 			V11_COUNT = 0;  //счётчик открытых диалогов

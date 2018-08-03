@@ -583,12 +583,15 @@ function _elemVvv($elem_id, $src=array()) {
 					FROM `_element`
 					WHERE `parent_id`=".$elem_id."
 					ORDER BY `sort`";
-			foreach(query_arr($sql) as $r)
-				$send[] = array(
+			foreach(query_arr($sql) as $r) {
+				$u = array(
 					'id' => _num($r['id']),
-					'title' => $r['txt_1'],
-					'content' => $r['txt_2']
+					'title' => $r['txt_1']
 				);
+				if($r['txt_2'])
+					$u['content'] = $r['txt_1'].'<div class="fs12 grey ml10 mt3">'.$r['txt_2'].'</div>';
+				$send[] = $u;
+			}
 			return $send;
 
 		//select - выбор списка (все списки приложения)
