@@ -2260,7 +2260,13 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 				FROM `_element`
 				WHERE `block_id` IN ("._idsGet($BLK).")";
 		foreach(query_arr($sql) as $elem_id => $el) {
-			if($el['dialog_id'] == 23)
+			if($el['dialog_id'] == 23//ячейки таблиц
+			|| $el['dialog_id'] == 16//значения radio
+			|| $el['dialog_id'] == 17//значения select
+			|| $el['dialog_id'] == 18//значения dropdown
+			|| $el['dialog_id'] == 44//ячейки сборного текста
+			|| $el['dialog_id'] == 57//пункты меню переключения блоков
+			)
 				$elem23[] = $elem_id;
 
 			$el['hidden'] = 0;

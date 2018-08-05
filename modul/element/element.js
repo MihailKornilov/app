@@ -1740,106 +1740,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			attr_focus.focus();
 	},
 
-	_cmpV49 = function(o, unit) {//Настройка содержания Сборного текста [44]
-		var el = $(o.attr_el);
-
-		//получение данных для сохранения
-		if(unit == 'get') {
-			var send = {};
-			_forEq(el.find('dd'), function(sp) {
-				var id = _num(sp.attr('val'));
-				if(!id)
-					return;
-				send[id] = {
-					spc:sp.find('.spc').val()
-				};
-			});
-			return send;
-		}
-
-		var cmp = $(o.attr_cmp),
-			html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить элемент</div>',
-			DL = el.append(html).find('dl'),
-			BUT_ADD = el.find('div:last'),
-			NUM = 1;
-
-		BUT_ADD.click(valueAdd);
-
-		for(var i in o.vvv)
-			valueAdd(o.vvv[i])
-
-		function valueAdd(v) {
-			v = $.extend({
-				id:0,       //id элемента
-				dialog_id:50,
-				title:'',
-				spc:1     //пробел справа
-			}, v);
-
-			DL.append(
-				'<dd class="over3" val="' + v.id + '">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center">' +
-								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td><input type="text"' +
-									  ' class="inp w100p curP"' +
-									  ' readonly' +
-									  ' placeholder="элемент не выбран"' +
-									  ' value="' + _br(v.title) + '"' +
-								' />' +
-							'<td class="w25">' +
-								'<input type="hidden" class="spc" value="' + v.spc + '" />' +
-							'<td class="w50 r">' +
-								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить элемент', -52) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			var DD = DL.find('dd:last'),
-				INP = DD.find('.inp');
-			INP.click(function() {
-				_dialogLoad({
-					dialog_id:v.dialog_id,
-					block_id:unit.source.block_id,
-					unit_id:v.id || -111,           //id выбранного элемента (при редактировании)
-					busy_obj:INP,
-					busy_cls:'hold',
-					func_save:function(ia) {
-						DD.attr('val', ia.unit.id);
-						cmpUpdate();
-						v.id = ia.unit.id;
-						v.dialog_id = ia.unit.dialog_id;
-						INP.val(_br(ia.unit.title));
-					}
-				});
-			});
-			DD.find('.spc')._check({tooltip:'Пробел справа'});
-			DL.sortable({
-				axis:'y',
-				handle:'.icon-move-y',
-				stop:cmpUpdate
-			});
-			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
-				cmpUpdate();
-				v.id = 0;
-			});
-			NUM++;
-		}
-		function cmpUpdate() {//обновление значения компонента
-			var val = [];
-			_forEq(el.find('dd'), function(sp) {
-				var id = _num(sp.attr('val'));
-				if(!id)
-					return;
-				val.push(id);
-			});
-			cmp.val(val);
-		}
-	},
 	_cmpV56 = function(o, unit) {//Настройка суммы значений единицы списка
 		var el = $(o.attr_el);
 
@@ -2413,27 +2313,17 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 
 	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ ===--- */
-	PHP12_menu_block_setup = function(o, unit) {//используется в диалоге [57]
-		var el = $(o.attr_el);
+	PHP12_menu_block_setup = function(el, unit) {//используется в диалоге [57]
 
 		//получение данных для сохранения
-		if(unit == 'get') {
-			var send = [];
-			_forEq(el.find('dd'), function(sp) {
-				send.push({
-					id:sp.attr('val'),
-					title:sp.find('.pk-title').val(),
-					blk:sp.find('.pk-block').attr('val'),
-					def:sp.find('.def').val()
-				});
-			});
-			return send;
-		}
+		if(unit == 'get')
+			return PHP12_menu_block_get(el);
 
-		var html = '<dl></dl>' +
+		var ATR_EL = _attr_el(el.id),
+			html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Новый пункт меню</div>',
-			DL = el.append(html).find('dl'),
-			BUT_ADD = el.find('div:last'),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last'),
 			NUM = 1,
 			BCS = $('.block-choose-submit');//кнопка сохранения выбора блоков
 
@@ -2442,11 +2332,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		BUT_ADD.click(valueAdd);
 
-		if(!o.vvv.length)
+		if(!VVV[el.id].length)
 			valueAdd();
-
-		for(var i in o.vvv)
-			valueAdd(o.vvv[i])
+		else
+			for(var i in VVV[el.id])
+				valueAdd(VVV[el.id][i])
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -2569,6 +2459,18 @@ var DIALOG = {},//массив диалоговых окон для управл
 			DIALOG_OPEN.show();
 		}
 	},
+	PHP12_menu_block_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			send.push({
+				id:sp.attr('val'),
+				title:sp.find('.pk-title').val(),
+				blk:sp.find('.pk-block').attr('val'),
+				def:sp.find('.def').val()
+			});
+		});
+		return send;
+	},
 
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
 	PHP12_radio_setup = function(el, unit) {//для [16]
@@ -2657,6 +2559,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 	/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА ===--- */
 	PHP12_44_setup = function(el, unit) {//для [44]
+
 		//получение данных для сохранения
 		if(unit == 'get')
 			PHP12_44_get(el);
