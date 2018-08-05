@@ -1071,6 +1071,7 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 	'</div>';
 }
 
+
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 function PHP12_elem_choose($el, $unit) {//выбор элемента для вставки в блок. Диалог [50]
 	if(empty($unit['source']))
@@ -1079,7 +1080,11 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 	$SRC = $unit['source'];
 
 	//данные исходного блока
-	$BL = _blockOne($SRC['block_id']);
+	if(!$block_id = _num($SRC['block_id']))
+		return _emptyMin('Не получен ID исходного блока.');
+	if(!$BL = _blockOne($block_id))
+		return _emptyMin('Исходного блока '.$block_id.' не существует.');
+
 	$EL = $BL['elem'];
 
 	define('OBJ_ID', _num($BL['obj_id']));
@@ -1269,12 +1274,7 @@ function PHP12_elem_choose_gebug($el, $unit) {//выбор элемента - г
 function PHP12_spisok_td_setting($el, $unit) {//используется в диалоге [23]
 	/*
 		все действия через JS
-
-		имя объекта: spisok
-		 id объекта: block_id, в котором размещается список
 	*/
-
-//	return _pr($unit);
 
 	if(empty($unit['id']))
 		return '<div class="_empty min">Настройка таблицы будет доступна после вставки списка в блок.</div>';
@@ -1523,6 +1523,35 @@ function PHP12_radio_setup_vvv_use($send, $parent_id) {//использован�
 				continue;
 			$send[$n]['use'] = $ass[$r['id']];
 		}
+
+	return $send;
+}
+
+
+/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА ===--- */
+function PHP12_44_setup($el, $unit) {//используется в диалоге [44]
+	/*
+		все действия через JS
+	*/
+
+	if(empty($unit['id']))
+		return '<div class="_empty min">Настройка сборного текста будет доступна<br>после вставки элемента в блок.</div>';
+
+	return '';
+}
+function PHP12_44_setup_vvv($parent_id) {
+	$send = array();
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			ORDER BY `sort`";
+	foreach(query_arr($sql) as $r)
+		$send[] = array(
+			'id' => _num($r['id']),
+			'dialog_id' => _num($r['dialog_id']),
+			'title' => _elemTitle($r['id']),
+			'spc' => _num($r['num_8'])
+		);
 
 	return $send;
 }

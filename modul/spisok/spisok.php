@@ -169,8 +169,8 @@ function _spisokJoinField($dialog) {//подключение колонок вт
 			WHERE `dialog_parent_id`=".$dialog['id'];
 	if($ids = query_ids($sql))
 		foreach(_ids($ids, 1) as $id) {
-			$dialog = _dialogQuery($id);
-			foreach($dialog['cmp'] as $cmp) {
+			$dlg_child = _dialogQuery($id);
+			foreach($dlg_child['cmp'] as $cmp) {
 				if($cmp['table_num'] != 2)
 					continue;
 				if(empty($cmp['col']))
@@ -182,6 +182,11 @@ function _spisokJoinField($dialog) {//подключение колонок вт
 	$send = '';
 	foreach($fields as $col => $r)
 		$send .= ',`t2`.`'.$col.'`';
+
+	//вставка колонки `dialog_id` из второй таблицы, если отсутствует в первой
+	if(!isset($dialog['field1']['dialog_id']))
+		if(isset($dialog['field2']['dialog_id']))
+			$send .= ',`t2`.`dialog_id`';
 
 	return $send;
 }
@@ -1023,13 +1028,15 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение да�
 	$field = $dialog['field1'];
 
 	$cond = "`t1`.`id`".$cond;
+	$cond .= _spisokCondDef($dialog['id']);
+/*
 	if(isset($field['deleted']))
 		$cond .= " AND !`t1`.`deleted`";
 	if(isset($field['app_id']))
 		$cond .= " AND `t1`.`app_id`=".APP_ID;
 	if(isset($field['dialog_id']))
 		$cond .= " AND `t1`.`dialog_id`=".$cmp['num_1'];
-
+*/
 	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM "._tableFrom($dialog)."
 			WHERE ".$cond."

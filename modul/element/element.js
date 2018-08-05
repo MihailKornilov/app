@@ -584,9 +584,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						case 37://SA: Select - выбор имени колонки
 							send.cmp[id] = ATTR_CMP._select('inp');
 							return;
-						case 49://Настройка содержания Сборного текста
-							send.vvv[id] = _cmpV49(sp, 'get');
-							break;
 						case 56://Настройка суммы значений единицы списка
 							send.vvv[id] = _cmpV56(sp, 'get');
 							break;
@@ -598,8 +595,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					if(ATTR_CMP)
 						send.cmp[id] = ATTR_CMP.val();
 				});
-
-			console.log(send);
 
 			dialog.post(send, function(res) {
 				//закрытие диалога 50 - выбор элемента, если вызов был из него
@@ -1164,8 +1159,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						});
 					});
 					return;
-				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Наполнение для некоторых компонентов
-				case 49: _cmpV49(el, unit); return;
 				//Календарь
 				case 51:
 					ATTR_CMP._calendar({
@@ -2156,6 +2149,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(unit == 'get')
 			return PHP12_spisok_td_get(el);
 
+		if(!unit.id)
+			return;
+
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
 			DL = _attr_el(el.id).append(html).find('dl'),
@@ -2654,6 +2650,105 @@ var DIALOG = {},//массив диалоговых окон для управл
 				content:sp.find('textarea').val(),
 				def:_num(sp.find('.def').val())
 			});
+		});
+		return send;
+	},
+
+
+	/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА ===--- */
+	PHP12_44_setup = function(el, unit) {//для [44]
+		//получение данных для сохранения
+		if(unit == 'get')
+			PHP12_44_get(el);
+
+		if(!unit.id)
+			return;
+
+		var ATR_EL = _attr_el(el.id),
+			html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить элемент</div>',
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last'),
+			NUM = 1;
+
+		BUT_ADD.click(valueAdd);
+
+		//вывод двух первых элементов, если начало настройки
+		if(!VVV[el.id].length) {
+			valueAdd();
+			valueAdd({spc:0});
+		} else
+			for(var i in VVV[el.id])
+				valueAdd(VVV[el.id][i])
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,           //id элемента
+				dialog_id:50,   //id диалога, через который был вставлен этот элемент
+				title:'',       //имя элемента
+				spc:1           //пробел справа
+			}, v || {});
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td><input type="text"' +
+									  ' class="inp w100p curP"' +
+									  ' readonly' +
+									  ' placeholder="элемент не выбран"' +
+									  ' value="' + (v.title || v.id || '') + '"' +
+								' />' +
+							'<td class="w25">' +
+								'<input type="hidden" class="spc" value="' + v.spc + '" />' +
+							'<td class="w50 r">' +
+								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить элемент', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				INP = DD.find('.inp');
+			INP.click(function() {
+				_dialogLoad({
+					dialog_id:v.dialog_id,
+					block_id:unit.source.block_id,
+					unit_id:v.id,           //id выбранного элемента (при редактировании)
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_save:function(ia) {
+						DD.attr('val', ia.unit.id);
+						v.id = ia.unit.id;
+						v.dialog_id = ia.unit.dialog_id;
+						INP.val(_br(ia.unit.title));
+					}
+				});
+			});
+			DD.find('.spc')._check({tooltip:'Пробел справа'});
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-move-y'
+			});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+				v.id = 0;
+			});
+			NUM++;
+		}
+	},
+	PHP12_44_get = function(el) {
+		return [];
+		var send = {};
+		_forEq(el.find('dd'), function(sp) {
+			var id = _num(sp.attr('val'));
+			if(!id)
+				return;
+			send[id] = {
+				spc:sp.find('.spc').val()
+			};
 		});
 		return send;
 	},

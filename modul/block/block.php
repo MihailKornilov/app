@@ -1302,17 +1302,14 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 		//Значение списка: иконка редактирования
 		case 34:
-			if(!$UNIT_ISSET)
-				return 'edit';
+			if($is_edit)
+				return _iconEdit(array('class'=>'curD'));
 
 			$dialog = _dialogQuery($unit['dialog_id']);
 
 			//если редактирование запрещено, иконка не выводится
 			if(!$dialog['edit_on'])
 				return '';
-
-			if(PAS)
-				return _iconEdit();
 
 			return
 			_iconEdit(array(
@@ -1434,37 +1431,18 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 		//Сборный текст
 		case 44:
-			/*
-				txt_1 - ids элементов, наполняющих содержание
-			*/
-
-			if(!$el['txt_1'])
-				return '';
+			if(!$spisok = PHP12_44_setup_vvv($el['id']))
+				return '<div class="fs11 red">сборный текст не настроен</div>';
 
 			$txt = '';
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id` IN (".$el['txt_1'].")
-					ORDER BY `sort`";
-			foreach(query_arr($sql) as $r) {
-				$txt .= _elemUnit($r, $unit);
-				$txt .= $r['num_8'] ? ' ' : ''; //добавление пробела справа, если нужно
+			foreach($spisok as $r) {
+				$txt .= $r['id'].',';//_elemUnit($r, $unit);
+				$txt .= $r['spc'] ? ' ' : ''; //добавление пробела справа, если нужно
 			}
 
-			$txt = _spisokUnitUrl($el, $unit, $txt);
+//	$txt = _spisokUnitUrl($el, $unit, $txt);
 
 			return $txt;
-
-		//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка содержания сборного текста
-		case 49:
-			/*
-				Все действия через JS.
-				cmp_id получает ids используемых элементов в определённом порядке
-			*/
-			if($is_edit)
-				return '<div class="_empty min">Содержание сборного текста</div>';
-
-			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />';
 
 		//Календарь
 		case 51:

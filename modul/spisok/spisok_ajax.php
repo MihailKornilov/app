@@ -353,8 +353,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 					break;
 				$func($cmp, $vvv[$cmp_id], $unit);
 				break;
-			//Настройка содержания Сборного текста
-			case 49: _cmpV49($cmp, $vvv[$cmp_id], $unit); break;
 			//Настройка суммы значений единицы списка
 			case 56: _cmpV56($cmp, $vvv[$cmp_id], $unit); break;
 			//количество значений связанного списка
@@ -483,6 +481,9 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 
 		$send[$cmp_id] = $v;
 	}
+
+	if($dialog['cmp_no_req'] && !$send)
+		return array();
 
 	if(!$send)
 		jsonError('Нет данных для внесения');
