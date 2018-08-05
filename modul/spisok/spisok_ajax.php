@@ -313,6 +313,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_auth98($dialog, $POST_CMP);
 	_auth99($dialog, $POST_CMP);
 
+	//элемент выбирает значение из диалога - через [11] - перехват внесения данных
+	_elem13_v_choose($block_id, $dialog, $POST_CMP);
+
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 
 	if(IS_ELEM)
@@ -1456,6 +1459,42 @@ function _spisokUnitUpd72($dialog, $unit) {//обновление кеша по�
 	_BE('block_clear');
 }
 
+function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор значения из диалога [13] через [11]
+	if(!IS_ELEM)
+		return;
+
+	//блок, который размещает элемент [13]
+	if(!$block = _blockOne($block_id))
+		return;
+
+	//сам элемент [13]
+	if(!$el = $block['elem'])
+		return;
+	if($el['dialog_id'] != 13)
+		return;
+
+	//сохранение данных (выбор значения) должно происходить через [11]
+	if($dialog['id'] != 11)
+		return;
+
+	//получение элемента-функции [12], отображающего диалог для выбора
+	if(empty($dialog['cmp']))
+		jsonError('Пустой диалог 11');
+
+	$elem_func_id = key($dialog['cmp']);
+
+	if(!$v = $POST_CMP[$elem_func_id])
+		jsonError('Значение не выбрано');
+
+	$title = _num($v) ? _elemTitle($v) : $v;
+
+	$send = array(
+		'v' => $v,
+		'title' => $title
+	);
+
+	jsonSuccess($send);
+}
 
 function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления единицы списка
 	if(!$dialog['table_1'])

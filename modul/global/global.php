@@ -596,6 +596,7 @@ function _jsCacheElemOne($elem_id) {
 	$val = array();
 
 	$val['dialog_id'] = $r['dialog_id'];
+	$val['col'] = $r['col'];
 	$val['name'] = $r['name'];
 	$val['block_id'] = $block_id;
 
@@ -607,9 +608,6 @@ function _jsCacheElemOne($elem_id) {
 
 	if($r['func'])
 		$val['func'] = $r['func'];
-
-
-//		$val[] = 'num_7:'.$r['num_7'];//ограничение высоты фото [60]
 
 	if($r['focus'])
 		$val['focus'] = 1;
@@ -644,6 +642,10 @@ function _jsCacheElemOne($elem_id) {
 		$num = 'num_'.$n;
 		if($r[$num])
 			$val[$num] = $r[$num];
+		elseif($r['dialog_id'] == 60 && $n == 7)//ограничение высоты фото [60] - обязательный num_7
+			$val[$num] = 0;
+
+
 		$txt = 'txt_'.$n;
 		if(!empty($r[$txt]))
 			$val[$txt] = $r[$txt];

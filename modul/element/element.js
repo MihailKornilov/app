@@ -847,71 +847,36 @@ var DIALOG = {},//массив диалоговых окон для управл
 							case 2120://диалог
 								switch(el.num_2) {
 									case 2123: alert('конкретный диалог'); return;
-									case 2124://элемент для поиска диалога
-										var dlg_id = 0;
-										if(el.num_3) {//выбор по указанному значению
-											var dlg = _attr_cmp(el.num_3);
-											if(!dlg) {
-												err('Отсутствует элемент со списком диалогов.');
-												return;
-											}
-											dlg_id = _num(dlg.val());
-										} else {
-											var block_id = unit.source.block_id;
-											if(!block_id) {
-												err('Отсутствует исходный блок.');
-												return;
-											}
-											var elem_id = BLKK[block_id].elem_id;
-											if(!elem_id) {
-												err('Отсутствует исходный элемент.');
-												return;
-											}
-											dlg_id = ELMM[elem_id].ds;
+									case 2124://элемент-значение, указывающее где искать диалог
+										if(!el.num_3) {
+											err('Не указано значение, указывающее на диалог.');
+											return;
 										}
+
+										//расположение элемента, который содержит диалог
+										var elm_dlg = _attr_cmp(el.num_3);
+										if(!elm_dlg) {
+											err('Отсутствует элемент со списком диалогов.');
+											return;
+										}
+
+										//определение выбран ли диалог
+										dlg_id = _num(elm_dlg.val());
 										if(!dlg_id) {
 											err('Не выбран диалог');
 											return;
 										}
+
 										_dialogLoad({
 											dialog_id:11,
 											dialog_source:dlg_id,
+											block_id:el.block_id,
 											busy_obj:inp,
 											busy_cls:'hold',
-											func_open:function(res, dlg) {
-												var bec = dlg.D('.choose');
-												choosed(bec);
-												bec.click(function() {
-													var t = $(this),
-														id = t.attr('val');
-													if(el.num_5 && ELMM[id].issp) {
-														_dialogLoad({
-															dialog_id:74,
-															dialog_source:ELMM[id].num_1,
-															busy_obj:t,
-															func_open:function(res, dlg2) {
-																var bec = dlg2.D('.choose');
-																choosed(bec);
-																bec.click(function() {
-																	var t = $(this),
-																		id2 = t.attr('val');
-																	ATTR_CMP.val(id + ',' + id2);
-																	inp.val(ELMM[id].name + ' » ' + ELMM[id2].name);
-																	del._dn(1);
-																	dlg.close();
-																	dlg2.close();
-																	P._flash();
-																});
-															}
-														});
-														return;
-													}
-													ATTR_CMP.val(id);
-													inp.val(ELMM[id].name);
-													del._dn(1);
-													dlg.close();
-													P._flash();
-												});
+											func_save:function(res, dlg) {
+												ATTR_CMP.val(res.v);
+												inp.val(res.title);
+												del._dn(1);
 											}
 										});
 								}
@@ -2388,7 +2353,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		var D = DLG.D,
 			VC = D(ATTR_EL(el.id)).find('.v-choose');//элементы в открытом диалоге для выбора
 
-		//описание глобальных переменных при открытии исходного диалога
+		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
 		if(unit.source.block_id) {
 			V11_CMP = D(ATTR_CMP(el.id));//переменная в исходном диалоге для хранения значений
 			V11_DLG = [];   //массив диалогов, открывающиеся последовательно
