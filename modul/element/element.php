@@ -897,6 +897,12 @@ function _elem_11_dialog($el) {//получение массива диалог�
 	return $dlg;
 }
 function _elem_11_v($EL, $ell_id, $unit) {//получение значения из единицы списка
+/*
+	$EL - элемент [11], содержащий значение в txt_2
+	$ell_id - ID элемента-значения, который выводится
+	$unit - единица списка
+*/
+
 	if(!$ell = _elemOne($ell_id))
 		return _msgRed('-no-el11-'.$ell_id.'-');
 
@@ -919,6 +925,8 @@ function _elem_11_v($EL, $ell_id, $unit) {//получение значения 
 			return _br($txt);
 		//произвольный текст
 		case 10: return _br($ell['txt_1']);
+		//сборный текст
+		case 44: return PHP12_44_print($ell_id, $unit);
 		//сумма значений единицы списка (баланс)
 		case 27:
 		//количество связанного списка
@@ -994,6 +1002,13 @@ function PHP12_v_choose($el, $unit) {
 		//ячейка таблицы
 		if($EL && $EL['dialog_id'] == 23)
 			$dialog_id = _num($EL['num_1']);
+		//сборный текст
+		elseif($EL && $EL['dialog_id'] == 44) {
+			if($BL['obj_name'] == 'dialog')
+				$dialog_id = _num($BL['obj_id']);
+			else
+				return _emptyMin('Расположение сборного текста не в Диалоге');
+		}
 		//блок со страницы
 		elseif($BL['obj_name'] == 'page') {
 			$page = _page($BL['obj_id']);
@@ -1099,7 +1114,7 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 	define('BLOCK_PAGE', !TD_UNIT && !_44_UNIT && $BL['obj_name'] == 'page');
 
 	//блок из диалога
-	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
+	define('BLOCK_DIALOG', !TD_UNIT && !_44_UNIT && $BL['obj_name'] == 'dialog');
 
 	//блок единицы списка
 	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
@@ -1233,6 +1248,14 @@ function PHP12_elem_choose_gebug($el, $unit) {//выбор элемента - г
 	$block_id = $SRC['block_id'];
 	$BL = _blockOne($SRC['block_id']);
 
+	//определение местоположения блока
+	$place = '';
+	switch($BL['obj_name']) {
+		case 'page': $place = 'страницы'; break;
+		case 'dialog': $place = 'диалога '.$BL['obj_id']; break;
+		case 'spisok': $place = 'единицы списка'; break;
+	}
+
 	return
 //	_pr($unit).
 //	_pr($BL).
@@ -1263,12 +1286,12 @@ function PHP12_elem_choose_gebug($el, $unit) {//выбор элемента - г
 
 		'<div class="'.(TD_UNIT ? 'color-pay b' : 'pale').'">'.
 			'Ячейка таблицы'.
-			(TD_UNIT ? '. Элемент(таблица) '.$BL['elem_id'].' размещён в блоке '.$block_id : '').
+			(TD_UNIT ? '. Элемент(таблица) '.$BL['elem_id'].' размещён в блоке '.$block_id.' '.$place : '').
 		'</div>'.
 
 		'<div class="'.(_44_UNIT ? 'color-pay b' : 'pale').'">'.
 			'Сборный текст'.
-			(_44_UNIT ? '. Элемент '.$BL['elem_id'].' размещён в блоке '.$block_id : '').
+			(_44_UNIT ? '. Элемент '.$BL['elem_id'].' размещён в блоке '.$block_id.' '.$place : '').
 		'</div>'.
 	'</div>';
 }
@@ -1536,6 +1559,9 @@ function PHP12_radio_setup_vvv_use($send, $parent_id) {//использован�
 function PHP12_44_setup($el, $unit) {//используется в диалоге [44]
 	/*
 		все действия через JS
+
+		num_8 - пробел справа от значения
+		txt_2 - ID элементов-значений, составляющих сборный текст
 	*/
 
 	if(empty($unit['id']))
@@ -1553,7 +1579,7 @@ function PHP12_44_setup_save($cmp, $val, $unit) {//сохранение соде
 	if(!$parent_id = _num($unit['id']))
 		return;
 
-	$idsNoDel = '0';
+	$ids = array();
 	$update = array();
 
 	if(!empty($val)) {
@@ -1561,8 +1587,9 @@ function PHP12_44_setup_save($cmp, $val, $unit) {//сохранение соде
 			return;
 
 		foreach($val as $r) {
-			if($id = _num($r['id']))
-				$idsNoDel .= ','.$id;
+			if(!$id = _num($r['id']))
+				continue;
+			$ids[] = $id;
 			$spc = _num($r['spc']);
 			$update[] = array(
 				'id' => $id,
@@ -1571,10 +1598,18 @@ function PHP12_44_setup_save($cmp, $val, $unit) {//сохранение соде
 		}
 	}
 
+	$ids = implode(',', $ids);
+
 	//удаление значений, которые были удалены при настройке
 	$sql = "DELETE FROM `_element`
 			WHERE `parent_id`=".$parent_id."
-			  AND `id` NOT IN (".$idsNoDel.")";
+			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
+	query($sql);
+
+	//ID элементов-значений, составляющих сборный текст
+	$sql = "UPDATE `_element`
+			SET `txt_2`='".$ids."'
+			WHERE `id`=".$parent_id;
 	query($sql);
 
 	if(empty($update))
@@ -1605,7 +1640,22 @@ function PHP12_44_setup_vvv($parent_id) {
 
 	return $send;
 }
+function PHP12_44_print($elem_id, $unit=array()) {//печать сборного текста
+	if(!$el = _elemOne($elem_id))
+		return _msgRed('-no-el44-'.$elem_id.'-');
+	if(!$ids = _ids($el['txt_2'], 1))
+		return _msgRed('-no-el44-ids-');
 
+	$send = '';
+	foreach($ids as $id) {
+		$ell = _elemOne($id);
+		$send .= _elemUnit($ell, $unit);
+		if($ell['num_8'])
+			$send .= ' ';
+	}
+
+	return $send;
+}
 
 /* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
 function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])

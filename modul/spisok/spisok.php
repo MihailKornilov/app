@@ -540,8 +540,12 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 	return query_assoc($sql);
 }
 function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
+	if(empty($u['id']))
+		return 'номер';
+
 	if(empty($u['num']))
 		return $u['id'];
+
 	return $u['num'];
 }
 function _spisokUnitData($el, $unit) {//дата и время - значение единицы списка [33]
