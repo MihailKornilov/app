@@ -605,7 +605,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				if(o.func)
 					return o.func(res);
 
-//return;
+return;
 
 				switch(res.action_id) {
 					case 1: location.reload(); break;
@@ -2562,7 +2562,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		//получение данных для сохранения
 		if(unit == 'get')
-			PHP12_44_get(el);
+			return PHP12_44_get(el);
 
 		if(!unit.id)
 			return;
@@ -2624,7 +2624,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						DD.attr('val', ia.unit.id);
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
-						INP.val(_br(ia.unit.title));
+						INP.val(ia.unit.title);
 					}
 				});
 			});
@@ -2643,15 +2643,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 		}
 	},
 	PHP12_44_get = function(el) {
-		return [];
-		var send = {};
-		_forEq(el.find('dd'), function(sp) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			var id = _num(sp.attr('val'));
 			if(!id)
 				return;
-			send[id] = {
+			send.push({
+				id:id,
 				spc:sp.find('.spc').val()
-			};
+			});
 		});
 		return send;
 	},

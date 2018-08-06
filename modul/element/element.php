@@ -1539,6 +1539,52 @@ function PHP12_44_setup($el, $unit) {//используется в диалог�
 
 	return '';
 }
+function PHP12_44_setup_save($cmp, $val, $unit) {//сохранение содержания Сборного текста
+	/*
+		$cmp  - компонент-функция, размещающий в диалоге настройку значений сборного текста
+		$val  - значения, полученные для сохранения
+		$unit - элемент, который размещает сборный текст
+	*/
+
+	if(!$parent_id = _num($unit['id']))
+		return;
+
+	$idsNoDel = '0';
+	$update = array();
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		foreach($val as $r) {
+			if($id = _num($r['id']))
+				$idsNoDel .= ','.$id;
+			$spc = _num($r['spc']);
+			$update[] = array(
+				'id' => $id,
+				'spc' => $spc
+			);
+		}
+	}
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `id` NOT IN (".$idsNoDel.")";
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	foreach($update as $sort => $r) {
+		$sql = "UPDATE `_element`
+				SET `parent_id`=".$parent_id.",
+					`num_8`=".$r['spc'].",
+					`sort`=".$sort."
+				WHERE `id`=".$r['id'];
+		query($sql);
+	}
+}
 function PHP12_44_setup_vvv($parent_id) {
 	$send = array();
 	$sql = "SELECT *
@@ -1555,6 +1601,7 @@ function PHP12_44_setup_vvv($parent_id) {
 
 	return $send;
 }
+
 
 /* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
 function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])

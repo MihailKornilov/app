@@ -830,47 +830,6 @@ function _spisokAction4($send) {//действие 4 - обновление ис
 
 	return $send;
 }
-function _cmpV49($cmp, $val, $unit) {//Настройка содержания Сборного текста
-	/*
-		-111
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
-	*/
-	if(empty($cmp['col']))
-		return;
-
-	//поле, хранящее список id элементов-значений
-	$col = $cmp['col'];
-	$ids = $unit[$col] ? $unit[$col] : 0;
-
-	//удаление значений, которые были удалены при настройке
-	$sql = "DELETE FROM `_element`
-			WHERE `user_id_add`=".USER_ID."
-			  AND `block_id` IN (0,-".$unit['id'].")
-			  AND `id` NOT IN (".$ids.")";
-	query($sql);
-
-	if(!$ids)
-		return;
-
-	$sort = 0;
-	foreach(_ids($ids, 1) as $id) {
-		$r = $val[$id];
-		$sql = "UPDATE `_element`
-				SET `block_id`=-".$unit['id'].",
-					`num_8`=".$r['spc'].",
-					`sort`=".$sort++."
-				WHERE `id`=".$id;
-		query($sql);
-	}
-
-	//очистка неиспользованных элементов
-	$sql = "DELETE FROM `_element`
-			WHERE `user_id_add`=".USER_ID."
-			  AND `block_id` IN (0,-111)";
-	query($sql);
-}
 function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
 	/*
 		-113
