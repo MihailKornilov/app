@@ -505,7 +505,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 			jsonError('Блока не сущетвует');
 		if($elem = $block['elem']) {
 			//исходный элемент является таблицей
-			if($elem['dialog_id'] == 23) {
+			if($elem['dialog_id'] == 23 || $elem['dialog_id'] == 44) {
 				$block_id = 0;
 				$parent_id = $elem['id'];
 			} else

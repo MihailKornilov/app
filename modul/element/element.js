@@ -605,7 +605,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				if(o.func)
 					return o.func(res);
 
-return;
+//return;
 
 				switch(res.action_id) {
 					case 1: location.reload(); break;

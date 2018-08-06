@@ -1436,7 +1436,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			$txt = '';
 			foreach($spisok as $r) {
-				$txt .= $r['id'].',';//_elemUnit($r, $unit);
+				$elem = _elemOne($r['id']);
+				$txt .= _elemUnit($elem, $unit);
 				$txt .= $r['spc'] ? ' ' : ''; //добавление пробела справа, если нужно
 			}
 

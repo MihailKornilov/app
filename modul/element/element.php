@@ -1092,17 +1092,17 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 	//ячейка таблицы
 	define('TD_UNIT', $EL && $EL['dialog_id'] == 23);
 
+	//сборный текст
+	define('_44_UNIT',  $EL && $EL['dialog_id'] == 44);
+
 	//блок со страницы
-	define('BLOCK_PAGE', !TD_UNIT && $BL['obj_name'] == 'page');
+	define('BLOCK_PAGE', !TD_UNIT && !_44_UNIT && $BL['obj_name'] == 'page');
 
 	//блок из диалога
 	define('BLOCK_DIALOG', $BL['obj_name'] == 'dialog');
 
 	//блок единицы списка
 	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
-
-	//сборный текст
-	define('_44_UNIT', 0);
 
 	//принимает ли страница значения единицы списка
 	$spisok_id = 0;
@@ -1165,6 +1165,7 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 		|| BLOCK_DIALOG && $r['element_paste_dialog']
 		|| BLOCK_SPISOK && $r['element_paste_spisok']
 		|| TD_UNIT && $r['element_paste_td']
+		|| _44_UNIT && $r['element_paste_44']
 		) $show = true;
 
 //		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
@@ -1265,7 +1266,10 @@ function PHP12_elem_choose_gebug($el, $unit) {//выбор элемента - г
 			(TD_UNIT ? '. Элемент(таблица) '.$BL['elem_id'].' размещён в блоке '.$block_id : '').
 		'</div>'.
 
-		'<div class="'.(_44_UNIT ? 'color-pay b' : 'pale').'">Сборный текст</div>'.
+		'<div class="'.(_44_UNIT ? 'color-pay b' : 'pale').'">'.
+			'Сборный текст'.
+			(_44_UNIT ? '. Элемент '.$BL['elem_id'].' размещён в блоке '.$block_id : '').
+		'</div>'.
 	'</div>';
 }
 
