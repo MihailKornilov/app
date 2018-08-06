@@ -1163,7 +1163,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//Календарь
 				case 51:
 					ATTR_CMP._calendar({
-						lost:el.num_1,
+						lost:_num(el.num_1),
 						time:el.num_2
 					});
 					return;

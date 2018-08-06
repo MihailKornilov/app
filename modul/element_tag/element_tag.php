@@ -128,8 +128,13 @@ function _tooltip($msg, $left=0, $ugolSide='', $x2=0) {//подсказка на
 function _calendar($v=array()) {//поле Календарь
 	$attr_id = empty($v['attr_id']) ? 'calendar'.rand(1, 100000) : $v['attr_id'];
 
-	if(!$value = @$v['value'])
-		$value = strftime('%Y-%m-%d');
+	$value = TODAY;
+	if(!empty($v['value'])) {
+		$ex = explode('-', $v['value']);
+		if(count($ex) == 3)
+			if(_num($ex[0]) && _num($ex[1]) && _num($ex[2]))
+				$value = $v['value'];
+	}
 
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
