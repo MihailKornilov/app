@@ -389,7 +389,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_app_create($dialog, $unit_id);
 
 	$send = array(
-		'unit' => $unit,
+		'unit' => _arrNum($unit),
 		'action_id' => _num($dialog[$act.'_action_id']),
 		'action_page_id' => _num($dialog[$act.'_action_page_id'])
 	);

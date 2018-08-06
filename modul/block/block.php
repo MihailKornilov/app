@@ -750,8 +750,11 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 							return _msgRed('нет имени колонки');
 						if(empty($u))
 							return _msgRed('единица списка пуста. Шаг: '.$n);
-						if(!$u = $u[$col])
+						if(!isset($u[$col]))
 							return _msgRed('вложенное значение отсутствует. Шаг: '.$n.'. col: '.$col);
+						if(!is_array($u[$col]) && $u[$col] == 0)
+							return $ell['txt_1'];
+						$u = $u[$col];
 						if(!is_array($u)) {
 							$sql = "SELECT *
 									FROM `_spisok`

@@ -639,7 +639,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//обновление значения JS-кеша, если элемент вносился или изменялся
 				if(res.elem_js) {
 					ELMM[res.unit.id] = res.elem_js;
-					BLKK[res.unit.block_id].elem_id = res.unit.id;
+					if(res.unit.block_id)
+						BLKK[res.unit.block_id].elem_id = res.unit.id;
 				}
 
 				//обновление значения JS-кеша, если элемент удалён

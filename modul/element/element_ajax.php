@@ -1015,12 +1015,7 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send['elm_ids'] = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
-	//переделка значений $unit в INT, если есть
-	foreach($unit as $k => $v)
-		if(!is_array($v))
-			if(preg_match(REGEXP_INTEGER, $v))
-				$unit[$k] = _num($v, 1);
-	$send['unit'] = $unit;
+	$send['unit'] = _arrNum($unit);
 
 	//заполнение значениями некоторых компонентов
 	$send['vvv'] = array();
