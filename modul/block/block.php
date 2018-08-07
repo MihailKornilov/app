@@ -524,10 +524,13 @@ function _elemUnitIsEdit($unit) {//определение в каком режи
 	if(!empty($unit['blk_edit']))
 		$edit = 1;
 
-	if(!empty($unit['elem_width_change']))
+	if(!empty($unit['blk_choose']))
 		$edit = 1;
 
 	if(!empty($unit['v_choose']))
+		$edit = 1;
+
+	if(!empty($unit['elem_width_change']))
 		$edit = 1;
 
 	return $edit;

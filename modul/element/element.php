@@ -1067,18 +1067,19 @@ function PHP12_block_choose($el, $unit) {
 	$obj_name = $BL['obj_name'];
 	$obj_id = $BL['obj_id'];
 
-	$sel = _idsAss(0);
-	$deny = '';
+	$PRM = $SRC['prm'];
 
-//	$unit = _pageSpisokUnit($obj_id, $obj_name);
+	$sel = _idsAss($PRM['sel']);
+
+	$unit += _pageSpisokUnit($obj_id, $obj_name);
 	$unit += array(
 		'blk_choose' => 1,
-		'blk_sel' => $sel,       //ids ранее выбранных блоков
-		'blk_deny' => empty($deny) ? array() : $deny
+		'blk_sel' => $sel,          //ids ранее выбранных блоков
+		'blk_deny' => _idsAss($PRM['deny'])  //блоки, которые запрещено выбирать
 	);
 
 	return
-//	_pr($unit1).
+//	_pr($unit).
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Страница <b class="fs14">Клиенты</b>:</div>'.
 	_blockHtml($obj_name, $obj_id, $unit);
 }

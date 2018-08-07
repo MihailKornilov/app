@@ -2123,7 +2123,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 	/* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 	PHP12_block_choose = function(el, unit) {
 		if(unit == 'get')
-			return '';
+			return PHP12_block_choose_get(el);
 
 		var DLG = DIALOG_OPEN;
 		if(!DLG)
@@ -2140,6 +2140,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			t[(sel ? 'remove' : 'add') + 'Class']('sel');
 		});
+	},
+	PHP12_block_choose_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('.blk-choose'), function(sp) {
+			if(!sp.hasClass('sel'))
+				return;
+			send.push(sp.attr('val'));
+		});
+		return send.join();
 	},
 
 	/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ ===--- */
@@ -2399,29 +2408,32 @@ var DIALOG = {},//массив диалоговых окон для управл
 			NAME.focus();
 
 			BLOCK.click(function() {
+				var deny = [];
+				_forEq(ATR_EL.find('dd'), function(sp) {
+					if(_num(sp.attr('data-num')) == v.num)
+						return;
+					_forN(sp.find('.pk-block').attr('val').split(','), function(id) {
+						deny.push(id);
+					});
+				});
+
 				_dialogLoad({
 					dialog_id:19,
 					dialog_source:0,
 					block_id:unit.source.block_id,
-					prm:[],
+					prm:{
+						sel:BLOCK.attr('val'),
+						deny:deny
+					},
 					busy_obj:BLOCK,
 					busy_cls:'hold',
-					func_open:function(res, dlg) {
+					func_save:function(res) {
+						BLOCK.attr('val', res.ids);
 					}
 				});
 			});
 /*
 			BLOCK.click(function() {
-				var deny = [];
-				_forEq(el.find('dd'), function(sp) {
-					var num = _num(sp.attr('data-num')),
-						blk = sp.find('.pk-block').attr('val');
-					if(num == v.num)
-						return;
-					if(!blk)
-						return;
-					deny.push(blk);
-				});
 				var spl = BCS.parent().parent().attr('val').split(':'),
 					send = {
 						op:'block_choose_page',

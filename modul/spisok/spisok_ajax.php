@@ -316,6 +316,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	//элемент выбирает значение из диалога - через [11] - перехват внесения данных
 	_elem13_v_choose($block_id, $dialog, $POST_CMP);
 
+	//элемент выбирает блоки из диалога - через [19] - перехват внесения данных
+	_elem19_block_choose($dialog, $_POST['vvv']);
+
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 
 	if(IS_ELEM)
@@ -1435,6 +1438,21 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 		'v' => $v,
 		'title' => $title
 	);
+
+	jsonSuccess($send);
+}
+function _elem19_block_choose($dialog, $vvv) {//выбор блоков через [11]
+	//выбор блоков должен происходить через [19]
+	if($dialog['id'] != 19)
+		return;
+
+	//получение элемента-функции [12], отображающего диалог для выбора
+	if(empty($dialog['cmp']))
+		jsonError('Пустой диалог 19');
+
+	$elem_func_id = key($dialog['cmp']);
+
+	$send['ids'] = _ids($vvv[$elem_func_id]);
 
 	jsonSuccess($send);
 }
