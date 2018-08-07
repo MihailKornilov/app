@@ -1419,6 +1419,155 @@ function PHP12_menu_block_setup($el, $unit) {//используется в ди�
 		return '<div class="_empty min">Настройка пунктов меню переключения блоков</div>';
 	return '';
 }
+function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
+	$update = array();
+	$idsNoDel = '0';
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		$sort = 0;
+		foreach($val as $r) {
+			if(!$title = _txt($r['title']))
+				continue;
+			if($id = _num($r['id']))
+				$idsNoDel .= ','.$id;
+			$blk = _ids($r['blk']);
+			$update[] = "(
+				".$id.",
+				-".$unit['id'].",
+				'".addslashes($title)."',
+				'".$blk."',
+				"._num($r['def']).",
+				".$sort++."
+			)";
+		}
+	}
+
+	//удаление удалённых значений
+	$sql = "DELETE FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			  AND `id` NOT IN (".$idsNoDel.")";
+	query($sql);
+
+	//сброс значения по умолчанию
+	$sql = "UPDATE `_element`
+			SET `def`=0
+			WHERE `id`=".$unit['id'];
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	$sql = "INSERT INTO `_element` (
+				`id`,
+				`block_id`,
+				`txt_1`,
+				`txt_2`,
+				`def`,
+				`sort`
+			)
+			VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`txt_1`=VALUES(`txt_1`),
+				`txt_2`=VALUES(`txt_2`),
+				`def`=VALUES(`def`),
+				`sort`=VALUES(`sort`)";
+	query($sql);
+
+	//установка нового значения по умолчанию
+	$sql = "SELECT `id` FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			  AND `def`
+			LIMIT 1";
+	$def = _num(query_value($sql));
+
+	$sql = "UPDATE `_element`
+			SET `def`=".$def."
+			WHERE `id`=".$unit['id'];
+	query($sql);
+}
+function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение данных о пунктах меню
+	if(!$parent_id = _num($unit['id']))
+		return;
+
+	$ids = array();
+	$update = array();
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		foreach($val as $sort => $r) {
+			if($id = _num($r['id']))
+				$ids[] = $id;
+			if(!$title = _txt($r['title']))
+				continue;
+			$blk = _ids($r['blk']);
+			$update[] = "(
+				".$id.",
+				".$parent_id.",
+				'".addslashes($title)."',
+				'".($blk ? $blk : '')."',
+				"._num($r['def']).",
+				".$sort."
+			)";
+		}
+	}
+
+	$ids = implode(',', $ids);
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
+	query($sql);
+
+	//ID элементов-значений, составляющих сборный текст
+	$sql = "UPDATE `_element`
+			SET `txt_2`='".$ids."'
+			WHERE `id`=".$parent_id;
+	query($sql);
+
+	//сброс значения по умолчанию
+	$sql = "UPDATE `_element`
+			SET `def`=0
+			WHERE `id`=".$unit['id'];
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	$sql = "INSERT INTO `_element` (
+				`id`,
+				`parent_id`,
+				`txt_1`,
+				`txt_2`,
+				`def`,
+				`sort`
+			)
+			VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`txt_1`=VALUES(`txt_1`),
+				`txt_2`=VALUES(`txt_2`),
+				`def`=VALUES(`def`),
+				`sort`=VALUES(`sort`)";
+	query($sql);
+
+	//установка нового значения по умолчанию
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `def`
+			LIMIT 1";
+	$def = _num(query_value($sql));
+
+	$sql = "UPDATE `_element`
+			SET `def`=".$def."
+			WHERE `id`=".$parent_id;
+	query($sql);
+}
 function PHP12_menu_block_setup_vvv($parent_id) {//получение данных о пунктах меню
 	$sql = "SELECT *
 			FROM `_element`
@@ -1429,13 +1578,10 @@ function PHP12_menu_block_setup_vvv($parent_id) {//получение данны
 
 	$spisok = array();
 	foreach($arr as $id => $r) {
-		$c = count(_ids($r['txt_2'], 1));
-		$blk_title = $r['txt_2'] ? $c.' блок'._end($c, '', 'а', 'ов') : '';
 		$spisok[] = array(
 			'id' => _num($id),
 			'title' => $r['txt_1'],//название пункта меню
 			'blk' => $r['txt_2'],  //блоки
-			'blk_title' => $blk_title,
 			'def' => _num($r['def'])
 		);
 	}

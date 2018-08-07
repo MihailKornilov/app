@@ -317,7 +317,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_elem13_v_choose($block_id, $dialog, $POST_CMP);
 
 	//элемент выбирает блоки из диалога - через [19] - перехват внесения данных
-	_elem19_block_choose($dialog, $_POST['vvv']);
+	_elem19_block_choose($dialog);
 
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 
@@ -360,8 +360,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 			case 56: _cmpV56($cmp, $vvv[$cmp_id], $unit); break;
 			//количество значений связанного списка
 			case 54: /* сделать пересчёт значения */ break;
-			//Настройка пунктов меню переключения блоков
-			case 58: _cmpV58($vvv[$cmp_id], $unit); break;
 			//Применение загруженных изображений
 			case 60: _cmpV60($cmp, $unit); break;
 		}
@@ -855,75 +853,6 @@ function _cmpV56($cmp, $val, $unit) {//Настройка суммы значе�
 	$sql = "DELETE FROM `_element`
 			WHERE `user_id_add`=".USER_ID."
 			  AND `block_id` IN (0,-113)";
-	query($sql);
-}
-function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
-	$update = array();
-	$idsNoDel = '0';
-
-	if(!empty($val)) {
-		if(!is_array($val))
-			return;
-
-		$sort = 0;
-		foreach($val as $r) {
-			if(!$title = _txt($r['title']))
-				continue;
-			if($id = _num($r['id']))
-				$idsNoDel .= ','.$id;
-			$blk = _ids($r['blk']);
-			$update[] = "(
-				".$id.",
-				-".$unit['id'].",
-				'".addslashes($title)."',
-				'".$blk."',
-				"._num($r['def']).",
-				".$sort++."
-			)";
-		}
-	}
-
-	//удаление удалённых значений
-	$sql = "DELETE FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `id` NOT IN (".$idsNoDel.")";
-	query($sql);
-
-	//сброс значения по умолчанию
-	$sql = "UPDATE `_element`
-			SET `def`=0
-			WHERE `id`=".$unit['id'];
-	query($sql);
-
-	if(empty($update))
-		return;
-
-	$sql = "INSERT INTO `_element` (
-				`id`,
-				`block_id`,
-				`txt_1`,
-				`txt_2`,
-				`def`,
-				`sort`
-			)
-			VALUES ".implode(',', $update)."
-			ON DUPLICATE KEY UPDATE
-				`txt_1`=VALUES(`txt_1`),
-				`txt_2`=VALUES(`txt_2`),
-				`def`=VALUES(`def`),
-				`sort`=VALUES(`sort`)";
-	query($sql);
-
-	//установка нового значения по умолчанию
-	$sql = "SELECT `id` FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `def`
-			LIMIT 1";
-	$def = _num(query_value($sql));
-
-	$sql = "UPDATE `_element`
-			SET `def`=".$def."
-			WHERE `id`=".$unit['id'];
 	query($sql);
 }
 function _cmpV60($cmp, $unit) {//Применение загруженных изображений
@@ -1441,7 +1370,7 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 
 	jsonSuccess($send);
 }
-function _elem19_block_choose($dialog, $vvv) {//выбор блоков через [11]
+function _elem19_block_choose($dialog) {//выбор блоков через [11]
 	//выбор блоков должен происходить через [19]
 	if($dialog['id'] != 19)
 		return;
@@ -1450,6 +1379,7 @@ function _elem19_block_choose($dialog, $vvv) {//выбор блоков чере
 	if(empty($dialog['cmp']))
 		jsonError('Пустой диалог 19');
 
+	$vvv = @$_POST['vvv'];
 	$elem_func_id = key($dialog['cmp']);
 
 	$send['ids'] = _ids($vvv[$elem_func_id]);
