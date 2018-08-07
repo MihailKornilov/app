@@ -2045,6 +2045,103 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return arr;
 	},
 
+	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
+	PHP12_v_choose = function(el, unit) {
+		if(unit == 'get')
+			return '';
+
+		var DLG = DIALOG_OPEN;
+		if(!DLG)
+			return;
+
+		var D = DLG.D,
+			VC = D(ATTR_EL(el.id)).find('.v-choose');//элементы в открытом диалоге для выбора
+
+		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
+		if(unit.source.block_id) {
+			V11_CMP = D(ATTR_CMP(el.id));//переменная в исходном диалоге для хранения значений
+			V11_DLG = [];   //массив диалогов, открывающиеся последовательно
+			V11_V = [];     //массив выбранных значений
+			V11_COUNT = 0;  //счётчик открытых диалогов
+		}
+
+		//выбор одного из элеметов
+		VC.click(function() {
+			var t = $(this),
+				v = t.attr('val');
+
+			VC.removeClass('sel');
+			t.addClass('sel');
+
+			V11_V.length = V11_COUNT;
+			V11_V[V11_COUNT] = v;
+			V11_DLG.length = V11_COUNT;
+			V11_DLG[V11_COUNT] = DLG;
+
+			V11_CMP.val(V11_V.join());
+
+			//нажатие по обычному элементу (не список)
+			if(!ELMM[v].issp)
+				return;
+
+			V11_COUNT++;
+
+			_dialogLoad({
+				dialog_id:11,
+				dialog_source:ELMM[v].num_1,
+				func_open:function(res, dlg) {
+					dlg.submit(function() {
+						var sel = dlg.content.find('.v-choose.sel');
+						if(!sel.length) {
+							dlg.err('Значение не выбрано');
+							return;
+						}
+
+						//проверка чтобы невозможно было выбрать элемент-список
+						var sel_v = sel.attr('val');
+						if(ELMM[sel_v].issp)
+							dlg.err('Не выбрано конечное значение ' + sel_v);
+
+						//закрытие всех открытых диалогов кроме последнего
+						_forIn(V11_DLG, function(sp, n) {
+							if(!_num(n))
+								return;
+							sp.close();
+						});
+
+						//запуск первого (исходного) диалога
+						V11_DLG[0].go();
+					});
+					dlg.closeFunc(function() {
+						V11_COUNT--;
+					});
+				}
+			});
+		});
+	},
+
+	/* ---=== ВЫБОР БЛОКОВ [19] ===--- */
+	PHP12_block_choose = function(el, unit) {
+		if(unit == 'get')
+			return '';
+
+		var DLG = DIALOG_OPEN;
+		if(!DLG)
+			return;
+
+		var D = DLG.D,
+			BC = D(ATTR_EL(el.id)).find('.blk-choose');//блоки в открытом диалоге для выбора
+
+		//выбор одного из элеметов
+		BC.click(function() {
+			var t = $(this),
+				v = t.attr('val'),
+				sel = t.hasClass('sel');
+
+			t[(sel ? 'remove' : 'add') + 'Class']('sel');
+		});
+	},
+
 	/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ ===--- */
 	PHP12_spisok_td_setting = function(el, unit) {//настройка ячеек таблицы
 		if(unit == 'get')
@@ -2238,81 +2335,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
-	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
-	PHP12_v_choose = function(el, unit) {
-		if(unit == 'get')
-			return '';
-
-		var DLG = DIALOG_OPEN;
-		if(!DLG)
-			return;
-
-		var D = DLG.D,
-			VC = D(ATTR_EL(el.id)).find('.v-choose');//элементы в открытом диалоге для выбора
-
-		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
-		if(unit.source.block_id) {
-			V11_CMP = D(ATTR_CMP(el.id));//переменная в исходном диалоге для хранения значений
-			V11_DLG = [];   //массив диалогов, открывающиеся последовательно
-			V11_V = [];     //массив выбранных значений
-			V11_COUNT = 0;  //счётчик открытых диалогов
-		}
-
-		//выбор одного из элеметов
-		VC.click(function() {
-			var t = $(this),
-				v = t.attr('val');
-
-			VC.removeClass('sel');
-			t.addClass('sel');
-
-			V11_V.length = V11_COUNT;
-			V11_V[V11_COUNT] = v;
-			V11_DLG.length = V11_COUNT;
-			V11_DLG[V11_COUNT] = DLG;
-
-			V11_CMP.val(V11_V.join());
-
-			//нажатие по обычному элементу (не список)
-			if(!ELMM[v].issp)
-				return;
-
-			V11_COUNT++;
-
-			_dialogLoad({
-				dialog_id:11,
-				dialog_source:ELMM[v].num_1,
-				func_open:function(res, dlg) {
-					dlg.submit(function() {
-						var sel = dlg.content.find('.v-choose.sel');
-						if(!sel.length) {
-							dlg.err('Значение не выбрано');
-							return;
-						}
-
-						//проверка чтобы невозможно было выбрать элемент-список
-						var sel_v = sel.attr('val');
-						if(ELMM[sel_v].issp)
-							dlg.err('Не выбрано конечное значение ' + sel_v);
-
-						//закрытие всех открытых диалогов кроме последнего
-						_forIn(V11_DLG, function(sp, n) {
-							if(!_num(n))
-								return;
-							sp.close();
-						});
-
-						//запуск первого (исходного) диалога
-						V11_DLG[0].go();
-					});
-					dlg.closeFunc(function() {
-						V11_COUNT--;
-					});
-				}
-			});
-		});
-	},
-
 	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ ===--- */
 	PHP12_menu_block_setup = function(el, unit) {//используется в диалоге [57]
 
@@ -2325,11 +2347,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				   '<div class="fs15 color-555 pad10 center over1 curP">Новый пункт меню</div>',
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
-			NUM = 1,
-			BCS = $('.block-choose-submit');//кнопка сохранения выбора блоков
-
-		//отмена выбора блоков на странице
-		$('.block-choose-cancel').click(dlgShow);
+			NUM = 1;
 
 		BUT_ADD.click(valueAdd);
 
@@ -2379,6 +2397,20 @@ var DIALOG = {},//массив диалоговых окон для управл
 				NAME = DD.find('.pk-title'),
 				BLOCK = DD.find('.pk-block');
 			NAME.focus();
+
+			BLOCK.click(function() {
+				_dialogLoad({
+					dialog_id:19,
+					dialog_source:0,
+					block_id:unit.source.block_id,
+					prm:[],
+					busy_obj:BLOCK,
+					busy_cls:'hold',
+					func_open:function(res, dlg) {
+					}
+				});
+			});
+/*
 			BLOCK.click(function() {
 				var deny = [];
 				_forEq(el.find('dd'), function(sp) {
@@ -2422,10 +2454,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 						});
 						BLOCK.attr('val', ids.join(','));
 						BLOCK.val(ids.length ? ids.length + ' блок' + _end(ids.length, ['', 'а', 'ов']) : '');
-						dlgShow();
 					});
 				});
 			});
+*/
+
+			//галочка по-умолчанию для блока
 			DD.find('.def')._check({
 				tooltip:'По умолчанию',
 				func:function(v, ch) {
@@ -2439,25 +2473,16 @@ var DIALOG = {},//массив диалоговых окон для управл
 					});
 				}
 			});
-			DL.sortable({
-				axis:'y',
-				handle:'.icon-move-y'
-			});
+
+			//сортировка пунктов меню
+			DL.sortable({axis:'y',handle:'.icon-move-y'});
+
+			//удаление пункта меню
 			DD.find('.icon-del').click(function() {
 				var t = $(this),
 					p = _parent(t, 'DD');
 				p.remove();
 			});
-		}
-		function dlgShow() {
-			$('.block-grid-on')
-				.show()
-				.removeClass('grey')
-				.trigger('click');
-			$('.block-level-change').show();
-			$('.elem-width-change').show();
-			BCS.parent().hide();
-			DIALOG_OPEN.show();
 		}
 	},
 	PHP12_menu_block_get = function(el) {
@@ -2704,6 +2729,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 			dialog_source:_num(o.dialog_source),//исходный диалог, либо настраиваемый
 			block_id:_num(o.block_id, 1),       //блок (или отрицательный id: элемент-группировка), в который вставляется элемент
 			unit_id:_num(o.unit_id, 1),         //id единицы списка (элемент или функция)
+
+			prm:o.prm || [],                    //дополнительные параметры
 
 			del:_num(o.del),                    //удаление элемента
 

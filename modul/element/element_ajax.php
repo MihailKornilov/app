@@ -185,7 +185,7 @@ switch(@$_POST['op']) {
 					_blockLevelChange('dialog', $dialog_id, $dialog['width']).
 				'</div>'.
 				'<div class="block-content-dialog" style="width:'.$dialog['width'].'px">'.
-					_blockHtml('dialog', $dialog_id, $dialog['width'], 0, array('blk_edit' => 1)).
+					_blockHtml('dialog', $dialog_id, array('blk_edit' => 1)).
 				'</div>'.
 			'</div>'.
 
@@ -1004,6 +1004,9 @@ function _dialogOpenLoad($dialog_id) {
 	//исходные данные, полученные для открытия диалога
 	$unit['source'] = $send;
 
+	//дополнительные параметры
+	$unit['source']['prm'] = isset($_POST['prm']) ? $_POST['prm'] : array();
+
 	$send['act'] = $act;
 	$send['edit_access'] = _num(@SA) || $dialog['app_id'] && $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
@@ -1011,7 +1014,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['head'] = $dialog[$act.'_head'];
 	$send['button_submit'] = $dialog[$act.'_button_submit'];
 	$send['button_cancel'] = $dialog[$act.'_button_cancel'];
-	$send['html'] = _blockHtml('dialog', $dialog_id, $dialog['width'], 0, $unit);
+	$send['html'] = _blockHtml('dialog', $dialog_id, $unit);
 
 	$send['elm_ids'] = _BE('elem_ids_arr', 'dialog', $dialog_id);
 

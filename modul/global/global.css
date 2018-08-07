@@ -288,7 +288,7 @@ body:not(.site){position:relative}
 }
 
 /* подсветка блока при выборе блока */
-.block-choose{
+.blk-choose{
 	position:absolute;
 	top:0;
 	right:0;
@@ -300,13 +300,13 @@ body:not(.site){position:relative}
 	cursor:pointer;
 	z-index:1;
 }
-.block-choose:not(.sel):not(.deny):hover{opacity:1;border-color:#d90}
-.block-choose.sel{
+.blk-choose:not(.sel):not(.deny):hover{opacity:1;border-color:#d90}
+.blk-choose.sel{
 	border-color:#d60;
 	background-color:#ec6;
 	opacity:.5;
 }
-.block-choose.deny{
+.blk-choose.deny{
 	cursor:default;
 	border-color:#999;
 	background-color:#ccc;

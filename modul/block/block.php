@@ -61,11 +61,13 @@ function _blockName($name, $i='name') {//доступные варианты о�
 
 	return $name;
 }
-function _blockHtml($obj_name, $obj_id, $width=1000, $grid_id=0, $unit=array()) {//вывод структуры блоков для конкретного объекта
+function _blockHtml($obj_name, $obj_id, $unit=array(), $grid_id=0) {//вывод структуры блоков для конкретного объекта
 	if(!$block = _BE('block_obj', $obj_name, $obj_id))
 		return _blockName($obj_name, 'empty');
 	if(!is_array($unit))
 		return $unit;
+
+	$width = _blockObjWidth($obj_name, $obj_id);
 
 	return _blockLevel($block, $width, $grid_id, 0,1, $unit);
 }
@@ -79,6 +81,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		$unit:      данные единицы списка.
 					А также дополнительные настройки:
 						blk_edit: включение настройки блоков
+						blk_choose: выбор блоков (только корневых)
 						v_choose: выбор элемента
 						elem_width_change: изменение ширины элементов
 	*/
@@ -98,6 +101,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	}
 
 	$BLK_EDIT = $unit['blk_edit'];
+	if(!empty($unit['blk_choose']))
+		$BLK_EDIT = 1;
 
 	$MN = 10;//множитель
 	$wMax = round($WM / $MN);
@@ -108,8 +113,12 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	//составление структуры блоков по строкам
 	$block = array();
 	foreach($arr as $r) {
-		if(!$BLK_EDIT && empty($unit['v_choose']) && empty($unit['choose']) && $r['elem_id'] && $r['elem']['hidden'])
-			continue;
+		if(!$BLK_EDIT
+		&& empty($unit['v_choose'])
+		&& $r['elem_id']
+		&& $r['elem']['hidden']
+		) continue;
+
 		$block[$r['y']][$r['x']] = $r;
 	}
 
@@ -268,10 +277,6 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки дл
 	'<div id="block-level-'.$obj_name.'" val="'.$obj_name.':'.$obj_id.':'.$width.'">'.
 		'<button class="vk small grey block-grid-on">Управление блоками</button>'.
 		$html.
-		'<div class="dn fr">'.
-			'<button class="vk small green mr5 block-choose-submit">Блоки выбраны</button>'.
-			'<button class="vk small cancel block-choose-cancel">Вернуться к диалогу</button>'.
-		'</div>'.
 	'</div>';
 }
 function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
@@ -305,27 +310,21 @@ function _blockSetka($r, $level, $grid_id, $unit) {//отображение се
 	return '<div class="block-unit level'.$bld.' '.($grid_id ? ' grid' : '').'" val="'.$r['id'].'"></div>';
 }
 function _blockChoose($r, $level, $unit) {//подсветка блоков для выбора (к функциям)
-	if(empty($unit['choose']))
+	if(empty($unit['blk_choose']))
 		return '';
-//	if($r['parent_id'])//выбирать можно только корневые блоки
-//		return '';
-	if($level != @$_COOKIE['block_level_'.$r['obj_name']])//выбирать можно только блоки установленного уровня (на уровне, котором расположен элемент)
-		return '';
-	if(!$ca = $unit['choose_access'])
-		return '';
-	if(!@$ca['block'])
+	if($r['parent_id'])//выбирать можно только корневые блоки
 		return '';
 
 	//отметка выбранных полей
 	$block_id = $r['id'];
-	$sel = isset($unit['choose_sel'][$block_id]) ? ' sel' : '';
-	$deny = isset($unit['choose_deny'][$block_id]) ? ' deny' : '';
+	$sel = isset($unit['blk_sel'][$block_id]) ? ' sel' : '';
+	$deny = isset($unit['blk_deny'][$block_id]) ? ' deny' : '';
 
-	return '<div class="choose block-choose'.$sel.$deny.'" val="'.$block_id.'"></div>';
+	return '<div class="blk-choose'.$sel.$deny.'" val="'.$block_id.'"></div>';
 }
 function _blockElemChoose_old($r, $unit) {//подсветка для выбора элементов
 	//условие выбора
-	if(empty($unit['choose']))
+	if(empty($unit['choose_old']))
 		return '';
 	if(empty($r['elem']))//блок не подсвечивается, если в нём нет элемента
 		return '';
@@ -421,7 +420,19 @@ function _blockGrid($arr) {//режим деления на подблоки
 			'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
 		'</div>';
 }
-
+function _blockObjWidth($obj_name, $obj_id) {//получение ширины объекта (страницы, диалога, списка)
+	switch($obj_name) {
+		case 'page': return 1000;
+		case 'dialog': return _dialogParam($obj_id, 'width');
+		case 'spisok':
+			//получение элемента, который содержит список (для корректировки ширины с отступами)
+			if(!$elm14 = _elemOne($obj_id))
+				return 0;
+			$ex = explode(' ', $elm14['mar']);
+			return floor(($elm14['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
+	}
+	return 0;
+}
 
 function _elemDiv($el, $unit=array()) {//формирование div элемента
 	if(!$el)
@@ -1197,7 +1208,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			return
 			'<div class="fs14 pad10 pl15 bg-gr2 line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-			_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $send).
+			_blockHtml('dialog', $dialog_id, $send).
 			'<input type="hidden" class="dlg26" value="'.$dialog_id.'" />'.
 			'<script>ELM_OLD'.$dialog_id.'='._BE('elem_js', 'dialog', $dialog_id).';</script>';
 
@@ -1787,7 +1798,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		$send = $G_BLOCK[$i1];
 		$send['elem'] = $send['elem_id'] ? $G_ELEM[$send['elem_id']] : array();
 
-		return $send;
+		return _arrNum($send);
 	}
 
 	//получение блоков для конкретного объекта

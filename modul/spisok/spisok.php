@@ -1193,7 +1193,7 @@ function _spisok59unit($elem_id, $unit_id) {//выбранное значени�
 	if(!$unit = query_assoc($sql))
 		return '';
 
-	return _blockHtml('spisok', $elem_id, 350, 0, $unit);
+	return _blockHtml('spisok', $elem_id, $unit);
 }
 
 function _spisokCmpConnectIdGet($el) {//получение id привязонного списка, если рядом стоит родительский список (для страницы, принимающей значения списка)

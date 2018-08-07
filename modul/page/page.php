@@ -509,7 +509,7 @@ function _pageShow($page_id) {
 		$page_id = _page('def');
 
 	return
-	_blockHtml('page', $page_id, 1000, 0, _pageSpisokUnit($page_id)).
+	_blockHtml('page', $page_id,  _pageSpisokUnit($page_id)).
 	_page_div().
 	'<script>'.
 		(!PAS ? '_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');' : '').

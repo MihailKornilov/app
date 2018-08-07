@@ -23,12 +23,10 @@ switch(@$_POST['op']) {
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
 			jsonError('Некорректный ID объекта');
-		if(!$width = _num($_POST['width']))
-			jsonError('Некорректная ширина');
 
 		$unit = _pageSpisokUnit($obj_id, $obj_name) + array('blk_edit' => 1);
 
-		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, $unit);
+		$send['html'] = _blockHtml($obj_name, $obj_id,  $unit);
 
 		jsonSuccess($send);
 		break;
@@ -37,8 +35,6 @@ switch(@$_POST['op']) {
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
 			jsonError('Некорректный ID объекта');
-		if(!$width = _num($_POST['width']))
-			jsonError('Некорректная ширина');
 
 		$on = _num($_POST['on']);
 
@@ -47,7 +43,7 @@ switch(@$_POST['op']) {
 					'blk_edit' => 1,
 					'elem_width_change' => $on
 				);
-		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, $unit);
+		$send['html'] = _blockHtml($obj_name, $obj_id,  $unit);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
 		jsonSuccess($send);
@@ -78,8 +74,6 @@ switch(@$_POST['op']) {
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
 			jsonError('Некорректный ID объекта');
-		if(!$width = _num($_POST['width']))
-			jsonError('Некорректная ширина');
 
 		//проверка наличия родительского блока
 		$parent = array();
@@ -91,22 +85,6 @@ switch(@$_POST['op']) {
 					  AND `id`=".$parent_id;
 			if(!$parent = query_ass($sql))
 				jsonError('Родительского блока не существует');
-
-			switch($obj_name) {
-				default:
-				case 'page': $width = 1000; break;
-				case 'dialog':
-					$dialog = _dialogQuery($obj_id);
-					$width = $dialog['width'];
-					break;
-				case 'spisok':
-					if(!$elm14 = _elemOne($obj_id))
-						jsonError('Элемента id'.$obj_id.', который размещает список, не существует');
-					//корректировка ширины с учётом отступов
-					$ex = explode(' ', $elm14['mar']);
-					$width = floor(($elm14['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
-					break;
-			}
 		}
 
 		//получение id элементов, содержащихся в блоках (для последующего их удаления в удалённых блоках)
@@ -239,11 +217,12 @@ switch(@$_POST['op']) {
 		_blockChildCountSet($obj_name, $obj_id);
 
 		_BE( 'block_clear');
+		_BE( 'elem_clear');
 		_jsCache();
 
 		$unit = _pageSpisokUnit($obj_id, $obj_name) + array('blk_edit' => 1);
-		$send['level'] = _blockLevelChange($obj_name, $obj_id, $width);
-		$send['html'] = _blockHtml($obj_name, $obj_id, $width,0, $unit);
+		$send['level'] = _blockLevelChange($obj_name, $obj_id);
+		$send['html'] = _blockHtml($obj_name, $obj_id, $unit);
 		$send['blk'] = _BE('block_arr1', $obj_name, $obj_id);
 		$send['elm'] = _BE('elem_arr1', $obj_name, $obj_id);
 
@@ -327,81 +306,16 @@ switch(@$_POST['op']) {
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
 
-		foreach($block as $key => $v)
-			if(!is_array($v))
-				if(preg_match(REGEXP_INTEGER, $v))
-					$block[$key] = _num($v, 1);
-
-		switch($block['obj_name']) {
-			default:
-			case 'page':
-				$width = 1000;
-				break;
-			case 'dialog':
-				$width = _dialogParam($block['obj_id'], 'width');
-				break;
-			case 'spisok':
-				//получение элемента, который содержит список (для корректировки ширины с отступами)
-				if(!$elm14 = _elemOne($block['obj_id']))
-					jsonError('Элемента id'.$block['obj_id'].', который размещает список, не существует');
-
-				$ex = explode(' ', $elm14['mar']);
-				$width = floor(($elm14['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
-		}
-
+		$unit = _pageSpisokUnit($block['obj_id'], $block['obj_name']) + array('blk_edit' => 1);
 
 		$send['block'] = $block;
 		$send['html'] =
 			_blockHtml(
 				$block['obj_name'],
 				$block['obj_id'],
-				$width,
-				$block_id,
-				_pageSpisokUnit($block['obj_id'], $block['obj_name']) + array('blk_edit' => 1)
+				$unit,
+				$block_id
 			);
-
-		jsonSuccess($send);
-		break;
-	case 'block_choose_page'://выбор блоков на странице
-		if(!$obj_name = _blockName($_POST['obj_name']))
-			jsonError('Несуществующее имя объекта');
-		if(!$obj_id = _num($_POST['obj_id']))
-			jsonError('Некорректный ID объекта');
-		if(!$width = _num($_POST['width']))
-			jsonError('Некорректная ширина');
-
-		$sel = _idsAss($_POST['sel']);
-		$deny = @$_POST['deny'];
-
-		$unit = _pageSpisokUnit($obj_id, $obj_name);
-		$unit += array(
-			'choose' => 1,
-			'choose_access' => array('block'=>1),
-			'choose_sel' => $sel,       //ids ранее выбранных блоков
-			'choose_deny' => empty($deny) ? array() : $deny
-		);
-
-		$send['html'] = _blockHtml($obj_name, $obj_id, $width, 0, $unit);
-
-		jsonSuccess($send);
-		break;
-	case 'elem_choose_page'://выбор элемента на странице
-		if(!$page_id = _num($_POST['page_id']))
-			jsonError('Некорректный ID страницы');
-		if(!$page = _page($page_id))
-			jsonError('Страницы не существует');
-		if(!SA && $page['sa'])
-			jsonError('Нет доступа');
-
-		$unit = _pageSpisokUnit($page_id);
-		$unit += array(
-			'choose' => 1,
-			'choose_access' => array('all'=>1),
-			'choose_sel' => array(),       //ids ранее выбранных блоков
-			'choose_deny' => array()
-		);
-
-		$send['html'] = _blockHtml('page', $page_id, 1000, 0, $unit);
 
 		jsonSuccess($send);
 		break;

@@ -475,7 +475,6 @@ $(document)
 				op:'block_grid_' + (v ? 'on' : 'off'),
 				obj_name:spl[0],
 				obj_id:spl[1],
-				width:spl[2],
 				busy_obj:t
 			};
 		_post(send, function(res) {
@@ -505,7 +504,6 @@ $(document)
 				op:'block_elem_width_change',
 				obj_name:spl[0],
 				obj_id:spl[1],
-				width:spl[2],
 				on:on,
 				busy_obj:t
 			};
@@ -712,7 +710,6 @@ $.fn._grid = function(o) {
 			parent_id:o.parent_id,
 			obj_name:o.obj_name,
 			obj_id:o.obj_id,
-			width:o.width,
 			arr:arr,
 			busy_obj:t
 		};

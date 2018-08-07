@@ -1050,11 +1050,38 @@ function PHP12_v_choose($el, $unit) {
 
 	return
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
-	_blockHtml('dialog', $dialog_id, $dialog['width'], 0, $cond).
+	_blockHtml('dialog', $dialog_id, $cond).
 //	_pr($unit).
 	'';
 }
 
+/* ---=== ВЫБОР БЛОКОВ [19] ===--- */
+function PHP12_block_choose($el, $unit) {
+	$SRC = $unit['source'];
+
+	if(!$block_id = _num($SRC['block_id']))
+		return _emptyMin('Отсутствует исходный блок.');
+	if(!$BL = _blockOne($block_id))
+		return _emptyMin('Исходного блока '.$block_id.' не существует.');
+
+	$obj_name = $BL['obj_name'];
+	$obj_id = $BL['obj_id'];
+
+	$sel = _idsAss(0);
+	$deny = '';
+
+//	$unit = _pageSpisokUnit($obj_id, $obj_name);
+	$unit += array(
+		'blk_choose' => 1,
+		'blk_sel' => $sel,       //ids ранее выбранных блоков
+		'blk_deny' => empty($deny) ? array() : $deny
+	);
+
+	return
+//	_pr($unit1).
+	'<div class="fs14 pad10 pl15 bg-orange line-b">Страница <b class="fs14">Клиенты</b>:</div>'.
+	_blockHtml($obj_name, $obj_id, $unit);
+}
 
 /* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
 function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
@@ -1077,17 +1104,14 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 	setcookie('block_level_spisok', 1, time() + 2592000, '/');
 	$_COOKIE['block_level_spisok'] = 1;
 
-	//корректировка ширины с учётом отступов
-	$ex = explode(' ', $unit['mar']);
-	$width = floor(($block['width'] - $ex[1] - $ex[3]) / 10) * 10;
-	$line_r = $width < 980 ? ' line-r' : '';
+	$width = _blockObjWidth('spisok', $unit['id']);
 
 	return
 	'<div class="bg-ffc pad10 line-b">'.
 		_blockLevelChange('spisok', $unit['id'], $width).
 	'</div>'.
-	'<div class="block-content-spisok'.$line_r.'" style="width:'.$width.'px">'.
-		_blockHtml('spisok', $unit['id'], $width, 0, array('blk_edit' => 1)).
+	'<div class="block-content-spisok" style="width:'.$width.'px">'.
+		_blockHtml('spisok', $unit['id'], array('blk_edit' => 1)).
 	'</div>';
 }
 
