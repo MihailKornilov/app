@@ -927,6 +927,12 @@ function _elem_11_v($EL, $ell_id, $unit) {//получение значения 
 		case 10: return _br($ell['txt_1']);
 		//сборный текст
 		case 44: return PHP12_44_print($ell_id, $unit);
+		//календарь
+		case 51:
+			$data = $unit[$ell['col']];
+			if($data == '0000-00-00')
+				return '-';
+			return FullData($data);
 		//сумма значений единицы списка (баланс)
 		case 27:
 		//количество связанного списка
@@ -951,7 +957,6 @@ function _elem_11_v($EL, $ell_id, $unit) {//получение значения 
 				return _imageNo($EL['width']);
 
 			return _imageHtml($r, $EL['width'], $EL['num_7']);
-
 	}
 
 	return _msgRed('-no-11-');
