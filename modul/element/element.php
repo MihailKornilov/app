@@ -1108,7 +1108,7 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 
 	return
 	'<div class="bg-ffc pad10 line-b">'.
-		_blockLevelChange('spisok', $unit['id'], $width).
+		_blockLevelChange('spisok', $unit['id']).
 	'</div>'.
 	'<div class="block-content-spisok" style="width:'.$width.'px">'.
 		_blockHtml('spisok', $unit['id'], array('blk_edit' => 1)).

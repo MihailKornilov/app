@@ -616,7 +616,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						location.href = url;
 						break;
 					case 3://обновление содержимого блоков
-						var bln = '#block-level-' + res.block_obj_name;
+						var bln = '#block-level-' + res.obj_name;
 						$(bln).after(res.level).remove();
 						$(bln)
 							.find('.block-grid-on')

@@ -182,7 +182,7 @@ switch(@$_POST['op']) {
 			//Содержание
 			'<div class="dialog-menu-3'._dn($dialog['menu_edit_last'] == 3).'">'.
 				'<div class="pad10 line-b bg-ffc">'.
-					_blockLevelChange('dialog', $dialog_id, $dialog['width']).
+					_blockLevelChange('dialog', $dialog_id).
 				'</div>'.
 				'<div class="block-content-dialog" style="width:'.$dialog['width'].'px">'.
 					_blockHtml('dialog', $dialog_id, array('blk_edit' => 1)).

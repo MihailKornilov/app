@@ -226,7 +226,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 
 	return $send;
 }
-function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки для изменения уровня редактирования блоков
+function _blockLevelChange($obj_name, $obj_id) {//кнопки для изменения уровня редактирования блоков
 	$max = 1;
 	$html = '';
 
@@ -274,7 +274,7 @@ function _blockLevelChange($obj_name, $obj_id, $width=1000) {//кнопки дл
 	}
 
 	return
-	'<div id="block-level-'.$obj_name.'" val="'.$obj_name.':'.$obj_id.':'.$width.'">'.
+	'<div id="block-level-'.$obj_name.'" val="'.$obj_name.':'.$obj_id.'">'.
 		'<button class="vk small grey block-grid-on">Управление блоками</button>'.
 		$html.
 	'</div>';

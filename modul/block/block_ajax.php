@@ -14,6 +14,9 @@ switch(@$_POST['op']) {
 				ORDER BY `y`,`x`";
 		$arr = query_arr($sql);
 
+		$send['obj_name'] = $obj_name;
+		$send['obj_id'] = $obj_id;
+		$send['width'] = _blockObjWidth($obj_name, $obj_id);
 		$send['html'] = _blockGrid($arr);
 
 		jsonSuccess($send);
@@ -308,7 +311,9 @@ switch(@$_POST['op']) {
 
 		$unit = _pageSpisokUnit($block['obj_id'], $block['obj_name']) + array('blk_edit' => 1);
 
-		$send['block'] = $block;
+		$send['obj_name'] = $block['obj_name'];
+		$send['obj_id'] = $block['obj_id'];
+		$send['width'] = $block['width'];
 		$send['html'] =
 			_blockHtml(
 				$block['obj_name'],

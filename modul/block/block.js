@@ -270,12 +270,12 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 		};
 		_post(send, function(res) {
 			$('._hint').remove();
-			$('.block-content-' + res.block.obj_name).html(res.html);
+			$('.block-content-' + res.obj_name).html(res.html);
 			$('#grid-stack')._grid({
-				width:res.block.width,
 				parent_id:block_id,
-				obj_name:res.block.obj_name,
-				obj_id:res.block.obj_id
+				obj_name:res.obj_name,
+				obj_id:res.obj_id,
+				width:res.width
 			});
 		});
 	},
@@ -488,9 +488,9 @@ $(document)
 			if(v) {
 				$('._hint').remove();
 				$('#grid-stack')._grid({
-					obj_name:spl[0],
-					obj_id:spl[1],
-					width:spl[2]
+					obj_name:res.obj_name,
+					obj_id:res.obj_id,
+					width:res.width
 				});
 			}
 		});
