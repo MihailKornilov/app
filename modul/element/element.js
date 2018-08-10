@@ -572,25 +572,25 @@ var DIALOG = {},//массив диалоговых окон для управл
 			if(o.act != 'del')
 				_forN(o.elm_ids, function(id) {
 					var sp = ELMM[id],
-						ATTR_CMP = _attr_cmp(id);
+						ATR_CMP = _attr_cmp(id);
 
 					switch(sp.dialog_id) {
 						case 12://подключаемая функция
 							if(window[sp.txt_1])
 								send.vvv[id] = window[sp.txt_1](sp, 'get');
-							if(ATTR_CMP)
-								send.cmp[id] = ATTR_CMP.val();
+							if(ATR_CMP)
+								send.cmp[id] = ATR_CMP.val();
 							return;
 						case 37://SA: Select - выбор имени колонки
-							send.cmp[id] = ATTR_CMP._select('inp');
+							send.cmp[id] = ATR_CMP._select('inp');
 							return;
 						case 56://Настройка суммы значений единицы списка
 							send.vvv[id] = _cmpV56(sp, 'get');
 							break;
 					}
 
-					if(ATTR_CMP)
-						send.cmp[id] = ATTR_CMP.val();
+					if(ATR_CMP)
+						send.cmp[id] = ATR_CMP.val();
 				});
 
 			dialog.post(send, function(res) {
@@ -695,14 +695,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 			if(!el)
 				alert('несуществующий элемент ' + elem_id);
 
-			var ATTR_CMP = _attr_cmp(elm_id),
+			var ATR_CMP = _attr_cmp(elm_id),
 				ATTR_CMP_AFICS = _attr_cmp(elm_id, 1),
 				ATTR_EL =  _attr_el(elm_id);
 
 			el.id = elm_id;
 
 			if(el.focus)
-				attr_focus = ATTR_CMP;
+				attr_focus = ATR_CMP;
 
 			if(el.hint_on) {
 				var side = {
@@ -746,7 +746,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 1://галочка
 					if(el.func) {
 						_elemFunc(el, _num(unit[el.col] || 0), 1);
-						ATTR_CMP._check({
+						ATR_CMP._check({
 							func:function(v) {
 								_elemFunc(el, v);
 							}
@@ -754,7 +754,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					}
 					return;
 				//textarea
-				case 5:	ATTR_CMP.autosize(); return;
+				case 5:	ATR_CMP.autosize(); return;
 				//select - выбор страницы
 				case 6:
 					_elemFunc(el, _num(unit[el.col]), 1);
@@ -768,7 +768,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							content:'<b class="color-pay">Автоматически</b>'
 						});
 
-					ATTR_CMP._select({
+					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
 						spisok:spisok,
@@ -782,7 +782,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var timer,
 						started = 0,
 						v_last;
-					ATTR_CMP._search({
+					ATR_CMP._search({
 						func:function(v) {
 							if(started)
 								return;
@@ -813,7 +813,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Выбор элемента из диалога или страницы
 				case 13:
-					var P = ATTR_CMP.next(),
+					var P = ATR_CMP.next(),
 						inp = P.find('.inp'),
 						del = P.find('.icon-del'),
 						err = function(msg) {
@@ -826,12 +826,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 						},
 						choosed = function(bec) {//выделение выбранного значения
 							_forEq(bec, function(sp) {
-								if(sp.attr('val') == ATTR_CMP.val()) {
+								if(sp.attr('val') == ATR_CMP.val()) {
 									sp.addClass('sel');
 									return false;
 								}
 							});
 						};
+
 					P.click(function() {
 						switch(el.num_1) {
 							case 2119://страница
@@ -839,24 +840,36 @@ var DIALOG = {},//массив диалоговых окон для управл
 								return;
 							case 2120://диалог
 								switch(el.num_2) {
-									case 2123: alert('конкретный диалог'); return;
-									case 2124://элемент-значение, указывающее где искать диалог
-										if(!el.num_3) {
-											err('Не указано значение, указывающее на диалог.');
-											return;
-										}
+									case 2123://конкретный диалог
+										alert('конкретный диалог');
+										return;
+									case 2124://исходный диалог
+										var dlg_id = 0;
+										//элемент, который указывает, где искать диалог (как правило выпадающий список)
+										if(el.num_3) {
+											var D = DIALOG_OPEN.D;
+											//расположение элемента, который содержит диалог
+											var elm_dlg = D(ATTR_CMP(el.num_3));
+											if(!elm_dlg) {
+												err('Отсутствует элемент со списком диалогов.');
+												return;
+											}
+											dlg_id = _num(elm_dlg.val());
+										} else
+											if(unit.source.block_id) {//если этот элемент не указан, то открывается диалог по исходному блоку
+												var bl = BLKK[unit.source.block_id];
+												if(bl.obj_name != 'dialog') {
+													err('Исходный блок не является блоком диалога.');
+													return;
+												}
+												dlg_id = bl.obj_id;
+											} else {
+												err('Отсутствует исходный блок исходного диалога.');
+												return;
+											}
 
-										//расположение элемента, который содержит диалог
-										var elm_dlg = _attr_cmp(el.num_3);
-										if(!elm_dlg) {
-											err('Отсутствует элемент со списком диалогов.');
-											return;
-										}
-
-										//определение выбран ли диалог
-										dlg_id = _num(elm_dlg.val());
 										if(!dlg_id) {
-											err('Не выбран диалог');
+											err('Диалог не найден');
 											return;
 										}
 
@@ -867,7 +880,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 											busy_obj:inp,
 											busy_cls:'hold',
 											func_save:function(res, dlg) {
-												ATTR_CMP.val(res.v);
+												ATR_CMP.val(res.v);
 												inp.val(res.title);
 												del._dn(1);
 											}
@@ -877,7 +890,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					});
 					del.click(function(e) {
 						e.stopPropagation();
-						ATTR_CMP.val(0);
+						ATR_CMP.val(0);
 						inp.val('');
 						del._dn();
 					});
@@ -885,7 +898,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//select - произвольные значения
 				case 17:
 					_elemFunc(el, _num(unit[el.col] || el.def), 1);
-					ATTR_CMP._select({
+					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
 						spisok:VVV[el.id],
@@ -897,7 +910,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//dropdown
 				case 18:
 					_elemFunc(el, _num(unit[el.col] || el.def), 1);
-					ATTR_CMP._dropdown({
+					ATR_CMP._dropdown({
 						title0:el.txt_1,
 						spisok:VVV[el.id],
 						func:function(v) {
@@ -951,7 +964,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//select - выбор списка (все списки приложения)
 				case 24:
 					_elemFunc(el, _num(unit[el.col] || el.def), 1);
-					ATTR_CMP._select({
+					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
 						spisok:VVV[el.id],
@@ -1057,18 +1070,18 @@ var DIALOG = {},//массив диалоговых окон для управл
 								_dialogOpen(res);
 							});
 						};
-					ATTR_CMP._select(o);
+					ATR_CMP._select(o);
 					return;
 				//Выбор значений для содержания Select
 				case 31:
 					var sv = ATTR_EL.find('.sv'),
-						ex = ATTR_CMP.val().split(','),
+						ex = ATR_CMP.val().split(','),
 						v = [];
 
 					v.push(_num(ex[0]));
 					if(el.num_2 && _num(ex[1]))
 						v.push(_num(ex[1]));
-					ATTR_CMP.val(v.join(','));
+					ATR_CMP.val(v.join(','));
 
 					sv.click(function() {
 						var t = $(this),
@@ -1084,14 +1097,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 							func_save:function(ia) {
 								v[n] = ia.unit.id;
 								t.val(ia.unit.title);
-								ATTR_CMP.val(v.join(','));
+								ATR_CMP.val(v.join(','));
 							}
 						});
 					});
 					return;
 				//count - количество
 				case 35:
-					ATTR_CMP._count({
+					ATR_CMP._count({
 						width:el.width,
 						min:el.num_1,
 						max:el.num_2,
@@ -1101,7 +1114,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//SA: Select - выбор имени колонки
 				case 37:
-					ATTR_CMP._select({
+					ATR_CMP._select({
 						width:el.width,
 						title0:'не выбрано',
 						msg_empty:'колонок нет',
@@ -1109,7 +1122,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					});
 					_forN(VVV[el.id], function(u) {
 						if(unit.col == u.title) {
-							ATTR_CMP._select(u.id);
+							ATR_CMP._select(u.id);
 							return false;
 						}
 						if(unit.col)
@@ -1117,14 +1130,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 						if(u.busy)
 							return;
 						if(u.title.split('_')[0] == DIALOG_OPEN.col_type) {
-							ATTR_CMP._select(u.id);
+							ATR_CMP._select(u.id);
 							return false;
 						}
 					});
 					return;
 				//SA: Select - выбор диалогового окна
 				case 38:
-					ATTR_CMP._select({
+					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
 						msg_empty:'диалоги ещё не были созданы',
@@ -1133,7 +1146,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//SA: Select - дублирование
 				case 41:
-					ATTR_CMP._select({
+					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
 						spisok:VVV[el.id]
@@ -1148,8 +1161,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 						743:'left',
 						744:'right'
 					};
-					ATTR_CMP.mouseenter(function() {
-						ATTR_CMP._hint({
+					ATR_CMP.mouseenter(function() {
+						ATR_CMP._hint({
 							msg:_br(el.txt_1, 1),
 							pad:10,
 							side:side[el.num_1],
@@ -1159,7 +1172,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Календарь
 				case 51:
-					ATTR_CMP._calendar({
+					ATR_CMP._calendar({
 						lost:_num(el.num_1),
 						time:el.num_2
 					});
@@ -1284,7 +1297,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							});
 						};
 					toggle(el.def);
-					ATTR_CMP._menu({
+					ATR_CMP._menu({
 						type:type[el.num_1],
 						spisok:VVV[el.id],
 						func:toggle
@@ -1323,7 +1336,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 									if(!id)
 										return;
 
-									ATTR_CMP.val(id);
+									ATR_CMP.val(id);
 									dlg.close();
 									unitSel(id);
 								});
@@ -1334,7 +1347,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					div.find('.icon').click(function() {
 						ATTR_CMP_AFICS._dn(1);
 						div._dn();
-						ATTR_CMP.val(0);
+						ATR_CMP.val(0);
 					});
 					return;
 				//Загрузка изображений
@@ -1347,7 +1360,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							_forEq(AEL.find('dd.curM'), function(sp) {
 								ids.push(sp.attr('val'));
 							});
-							ATTR_CMP.val(ids.join(','));
+							ATR_CMP.val(ids.join(','));
 
 							//установка действия для удаления изображения
 							AEL.find('.icon-off').off('click');
@@ -1576,7 +1589,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр-галочка
 				case 62:
-					ATTR_CMP._check({
+					ATR_CMP._check({
 						func:function(v) {
 							_elemFunc(el, v);
 							FILTER[el.num_2][elm_id] = v;
@@ -1587,15 +1600,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//Выбор цвета текста
 				case 66:
 					var func = function(v) {
-							ATTR_CMP.val(v);
+							ATR_CMP.val(v);
 						},
-						html = _color(ATTR_CMP.val(), func);
-					ATTR_CMP.next().remove('._color');
-					ATTR_CMP.after(html);
+						html = _color(ATR_CMP.val(), func);
+					ATR_CMP.next().remove('._color');
+					ATR_CMP.after(html);
 					return;
 				//Выбор цвета фона
 				case 70:
-					ATTR_CMP.next()._hint({
+					ATR_CMP.next()._hint({
 						msg:VVV[el.id],
 						pad:3,
 						side:'right',
@@ -1606,7 +1619,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 									c = t.attr('val');
 								div.removeClass('sel');
 								t.addClass('sel');
-								ATTR_CMP
+								ATR_CMP
 									.val(c)
 									.next().css('background-color', c);
 							});
@@ -1671,7 +1684,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Очистка фильтра
 				case 80:
-					ATTR_CMP.click(function() {
+					ATR_CMP.click(function() {
 						var t = $(this),
 							send = {
 								op:'spisok_filter_clear',
@@ -1682,9 +1695,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 							_forIn(res.def, function(sp) {
 								switch(sp.dialog_id) {
 									//быстрый поиск
-									case 7:  ATTR_CMP._search('clear'); break;
+									case 7:  ATR_CMP._search('clear'); break;
 									//фильтр-галочка
-									case 62: ATTR_CMP._check(0); break;
+									case 62: ATR_CMP._check(0); break;
 									//фильтр-календарь
 									case 77:
 										var CAL = $(sp.attr_el).find('._filter-calendar');
@@ -1695,7 +1708,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 									//фильтр-меню
 									case 78: $(sp.attr_el).find('.sel').removeClass('sel'); break;
 									//фильтр-select
-									case 83: ATTR_CMP._select(0); break;
+									case 83: ATR_CMP._select(0); break;
 								}
 							});
 							$(res.count_attr).html(res.count_html);
@@ -1709,7 +1722,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 83:
 					if(!FILTER[el.num_1])
 						FILTER[el.num_1] = {};
-					ATTR_CMP._select({
+					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
 //						spisok:VVV[el.id],
@@ -1721,7 +1734,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Select - выбор значения списка
 				case 85:
-					ATTR_CMP._select({
+					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
 //						spisok:VVV[el.id],
@@ -2001,12 +2014,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_forIn(TRG, function(n, block_id) {
 			if(!n)
 				return;
-			var BL = BLKK[block_id],
-				ATTR_BL = _attr_bl(block_id);
+			var D = DIALOG_OPEN.D,
+				BL = BLKK[block_id],
+				ATR_BL = D(ATTR_BL(block_id));
 
 			if(BL.xx == 1) {//если блок в ряду один, фукнция применится ко всей таблице
 				arr.push({
-					obj:_parent(ATTR_BL, '.bl-div'),
+					obj:_parent(ATR_BL, '.bl-div'),
 					slide:1
 				});
 				return;
@@ -2026,7 +2040,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					TRG[id] = 0;//блоки в том же ряду отмечаются, чтобы к ним функция не применялась
 				});
 				arr.push({
-					obj:_parent(ATTR_BL, '.bl-div'),
+					obj:_parent(ATR_BL, '.bl-div'),
 					slide:1
 				});
 				return;
@@ -2034,7 +2048,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			//функция будет применена к конкретному блоку
 			arr.push({
-				obj:ATTR_BL,
+				obj:ATR_BL,
 				slide:0
 			});
 		});

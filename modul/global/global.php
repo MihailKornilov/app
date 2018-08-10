@@ -585,6 +585,8 @@ function _jsCacheBlockOne($block_id) {
 		return array();
 
 	$val = array();
+	$val['obj_name'] = $r['obj_name'];
+	$val['obj_id'] = $r['obj_id'];
 	$val['elem_id'] = $r['elem_id'];
 	$val['sa'] = $r['sa'];
 	$val['width_auto'] = $r['width_auto'];

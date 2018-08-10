@@ -1164,18 +1164,23 @@ function _spisokUnitUpd27($unit) {//обновление сумм значени
 	query($sql);
 }
 function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (при создании элемента)
-	if(!isset($unit['dialog_id']))
+	if(!IS_ELEM)
 		return;
 	if($unit['dialog_id'] != 54)
 		return;
-	if(!$cmp_id = _num($unit['num_1']))//id компонента в диалоге, в котором размещается привязка (количество этих значений будет считаться)
+
+	//id компонента в диалоге, в котором размещается привязка (количество этих значений будет считаться)
+	if(!$cmp_id = _num($unit['num_1']))
 		return;
 	if(!$cmp = _elemOne($cmp_id))
 		return;
-	if(!$dialog_id = $cmp['block']['obj_id'])//id диалога, в котором размещается привязка
+
+	//id диалога, в котором размещается привязка
+	if(!$dialog_id = $cmp['block']['obj_id'])
 		return;
 	if(!$DConn = _dialogQuery($dialog_id))
 		return;
+
 	//блок, в котором размещается "количество"
 	if(!$block_id = _num($unit['block_id']))
 		return;
