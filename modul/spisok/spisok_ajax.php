@@ -149,11 +149,11 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 				  AND `num_1`=".$spisok_id."
 				LIMIT 1";
 		if($elCount = query_assoc($sql)) {
-			$send['count_attr'] = '#el_'.$elCount['id'];
+			$send['count_elem_id'] = $elCount['id'];
 			$send['count_html'] = _spisokElemCount($elCount);
 		}
 
-		$send['spisok_attr'] = '#el_'.$spisok_id;
+		$send['spisok_elem_id'] = $spisok_id;
 		$spFunc = '_spisok'.$elSpisok['dialog_id'];
 		$send['spisok_html'] = $spFunc($elSpisok);
 
@@ -173,8 +173,7 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 			}
 			$send['def'][] = array(
 				'dialog_id' => $dialog_id,
-				'attr_el' => '#el_'.$r['elem']['id'],
-				'attr_cmp' => '#cmp_'.$r['elem']['id'],
+				'elem_id' => $r['elem']['id'],
 				'dop' => $dop,
 				'v' => $r['def']
 			);

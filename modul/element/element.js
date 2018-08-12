@@ -1642,7 +1642,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							t.addClass('sel');
 							if(!FILTER[el.num_1])
 								FILTER[el.num_1] = {};
-							FILTER[el.num_1][elm_id] = sel ? 0 : t.attr('val')
+							FILTER[el.num_1][elm_id] = sel ? 0 : t.attr('val');
 							_spisokUpdate(el.num_1);
 					});
 					return;
@@ -1656,28 +1656,34 @@ var DIALOG = {},//массив диалоговых окон для управл
 								busy_obj:t
 							};
 						_post(send, function(res) {
+							//скрытие кнопки
+							t._dn();
+
+							//обновление количества
+							if(res.count_elem_id)
+								_attr_el(res.count_elem_id).html(res.count_html);
+
+							_attr_el(res.spisok_elem_id).html(res.spisok_html);
+
 							_forIn(res.def, function(sp) {
 								switch(sp.dialog_id) {
 									//быстрый поиск
-									case 7:  ATR_CMP._search('clear'); break;
+									case 7:  _attr_cmp(sp.elem_id)._search('clear'); break;
 									//фильтр-галочка
-									case 62: ATR_CMP._check(0); break;
+									case 62: _attr_cmp(sp.elem_id)._check(0); break;
 									//фильтр-календарь
 									case 77:
-										var CAL = $(sp.attr_el).find('._filter-calendar');
+										var CAL = _attr_el(sp.elem_id).find('._filter-calendar');
 										CAL.find('.mon-cur').val(sp.dop.mon);
 										CAL.find('.td-mon').html(sp.dop.td_mon);
 										CAL.find('.fc-cnt').html(sp.dop.cnt);
 										break;
 									//фильтр-меню
-									case 78: $(sp.attr_el).find('.sel').removeClass('sel'); break;
+									case 78: _attr_cmp(sp.elem_id).find('.sel').removeClass('sel'); break;
 									//фильтр-select
-									case 83: ATR_CMP._select(0); break;
+									case 83: _attr_cmp(sp.elem_id)._select(0); break;
 								}
 							});
-							$(res.count_attr).html(res.count_html);
-							$(res.spisok_attr).html(res.spisok_html);
-							t._dn();
 							FILTER = res.filter;
 						});
 					});
