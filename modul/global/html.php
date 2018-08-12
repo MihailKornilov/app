@@ -394,12 +394,28 @@ function _html_hat() {//верхняя строка приложения для 
 			'</a>'.
 
 			'<div class="fr w300 mt8 r mr20">'.
+				_hat_but_app().
 				_hat_but_sa().
 				_hat_but_page().
 				_hat_but_pas().
 			'</div>'.
 		'</div>'.
 	'</div>';
+}
+function _hat_but_app() {//кнопка входа в приложение
+	if(!SA)
+		return '';
+	if(!APP_ID)
+		return '';
+	if(PAS)
+		return '';
+
+	$page_id = _page('cur');
+	$page = _page($page_id);
+	if($page['app_id'])
+		return '';
+
+	return '<button class="vk small green ml10" onclick="location.href=\''.URL.'&p='._page('def').'\'">app</button>';
 }
 function _hat_but_sa() {//отображение кнопки списка страниц
 	if(!SA)
@@ -412,7 +428,7 @@ function _hat_but_sa() {//отображение кнопки списка ст�
 	if(_page('cur') == 1)
 		return '';
 
-	return '<button class="vk small red" onclick="location.href=\''.URL.'&p=1\'">SA</button>';
+	return '<button class="vk small red ml10" onclick="location.href=\''.URL.'&p=1\'">SA</button>';
 }
 function _hat_but_page() {//отображение кнопки списка страниц
 	if(!APP_ID)
