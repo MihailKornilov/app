@@ -815,6 +815,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 13:
 					var P = ATR_CMP.next(),
 						inp = P.find('.inp'),
+						sel = _num(ATR_CMP.val()),
 						del = P.find('.icon-del'),
 						D = DIALOG_OPEN.D,
 						err = function(msg) {
@@ -824,97 +825,32 @@ var DIALOG = {},//массив диалоговых окон для управл
 								pad:10,
 								show:1
 							});
-						},
-						choosed = function(bec) {//выделение выбранного значения
-							_forEq(bec, function(sp) {
-								if(sp.attr('val') == ATR_CMP.val()) {
-									sp.addClass('sel');
-									return false;
-								}
-							});
 						};
 
 					P.click(function() {
 						_dialogLoad({
 							dialog_id:11,
 							block_id:el.block_id,
-//							block_id:unit.source.block_id,
 							prm:{
 								src:unit.source,
 								num_3:_num(D(ATTR_CMP(el.num_3)).val()),
-								sel:_num(ATR_CMP.val())
+								sel:sel
 							},
 							busy_obj:inp,
 							busy_cls:'hold',
+							func_open:function(res, dlg) {
+								dlg.D(ATTR_CMP(res.elm_ids[0])).val(sel);
+							},
 							func_save:function(res) {
-								ATR_CMP.val(res.v);
+								sel = res.v;
+								ATR_CMP.val(sel);
 								inp.val(res.title);
 								del._dn(1);
 							}
 						});
 					});
-/*
-					P.click(function() {
-						switch(el.num_1) {
-							case 2119://страница
-								alert('страница');
-								return;
-							case 2120://диалог
-								switch(el.num_2) {
-									case 2123://конкретный диалог
-										alert('конкретный диалог');
-										return;
-									case 2124://исходный диалог
-										var dlg_id = 0,
-											el_id = 0;  //ID элемента, который размещает выпадающий список с диалогами
-										//элемент, который указывает, где искать диалог (как правило выпадающий список)
-										if(el.num_3) {
-											//расположение элемента, который содержит диалог
-											var elm_dlg = D(ATTR_CMP(el.num_3));
-											if(!elm_dlg) {
-												err('Отсутствует элемент со списком диалогов.');
-												return;
-											}
-											dlg_id = _num(elm_dlg.val());
-											el_id = el.num_3;
-										} else
-											if(unit.source.block_id) {//если этот элемент не указан, то открывается диалог по исходному блоку
-												var bl = BLKK[unit.source.block_id];
-												if(bl.obj_name != 'dialog') {
-													err('Исходный блок не является блоком диалога.');
-													return;
-												}
-												dlg_id = bl.obj_id;
-											} else {
-												err('Отсутствует исходный блок исходного диалога.');
-												return;
-											}
-
-										if(!dlg_id) {
-											err('Диалог не найден');
-											return;
-										}
-
-										_dialogLoad({
-											dialog_id:11,
-											dialog_source:dlg_id,
-											block_id:el.block_id,
-											prm:{
-												elem_id:el_id
-											},
-											busy_obj:inp,
-											busy_cls:'hold',
-											func_save:function(res, dlg) {
-												ATR_CMP.val(res.v);
-												inp.val(res.title);
-												del._dn(1);
-											}
-										});
-								}
-						}
-					});
-*/
 					del.click(function(e) {
+						sel = 0;
 						e.stopPropagation();
 						ATR_CMP.val(0);
 						inp.val('');

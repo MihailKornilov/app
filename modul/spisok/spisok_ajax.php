@@ -1164,7 +1164,7 @@ function _spisokUnitUpd27($unit) {//обновление сумм значени
 	query($sql);
 }
 function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (при создании элемента)
-	if(!IS_ELEM)
+	if(!isset($unit['dialog_id']))
 		return;
 	if($unit['dialog_id'] != 54)
 		return;
@@ -1286,11 +1286,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм привяза
 		return;
 	if(!$elForSum = _elemOne($elem_id))
 		return;
-	if(!$elForSum_id = _num($elForSum['txt_2']))
-		return;
-	if(!$cmpSum = @$DConn['cmp'][$elForSum_id])
-		return;
-	if(!$sum_col = $cmpSum['col'])
+	if(!$sum_col = $elForSum['col'])
 		return;
 
 	$sql = "SELECT

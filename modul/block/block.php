@@ -817,7 +817,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$title = _num($v) ? _elemTitle($v) : (!empty($v) ? $v : '');
 			if(!$v && $title)
-				$name = '-empty-';
+				$title = '-empty-';
 
 			return
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
