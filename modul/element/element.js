@@ -815,7 +815,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 13:
 					var P = ATR_CMP.next(),
 						inp = P.find('.inp'),
-						sel = _num(ATR_CMP.val()),
+						sel = ATR_CMP.val(),
 						del = P.find('.icon-del'),
 						D = DIALOG_OPEN.D,
 						err = function(msg) {
@@ -834,7 +834,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 							prm:{
 								src:unit.source,
 								num_3:_num(D(ATTR_CMP(el.num_3)).val()),
-								sev:_num(el.num_6),//выбор нескольких значений
+								nest:_num(el.num_5),//выбор значений во вложенных списках
+								sev:_num(el.num_6), //выбор нескольких значений
 								sel:sel
 							},
 							busy_obj:inp,
@@ -2028,40 +2029,53 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(unit == 'get')
 			return '';
 
-console.log(unit);
-
 		var DLG = DIALOG_OPEN;
 		if(!DLG)
 			return;
 
 		var D = DLG.D,
-			VC = D(ATTR_EL(el.id)).find('.v-choose');//элементы в открытом диалоге для выбора
+			VC = D(ATTR_EL(el.id)).find('.v-choose'),//элементы в открытом диалоге для выбора
+			sev = unit.source.prm.sev,               //выбор нескольких значений
+			nest = !sev && unit.source.prm.nest;     //выбор во вложенных списках
 
 		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
 		if(unit.source.block_id) {
-			V11_CMP = D(ATTR_CMP(el.id));//переменная в исходном диалоге для хранения значений
-			V11_DLG = [];   //массив диалогов, открывающиеся последовательно
-			V11_V = [];     //массив выбранных значений
-			V11_COUNT = 0;  //счётчик открытых диалогов
+			V11_CMP = D(ATTR_CMP(el.id));   //переменная в исходном диалоге для хранения значений
+			V11_DLG = [];                   //массив диалогов, открывающиеся последовательно
+			V11_V = sev ? _idsAss(unit.source.prm.sel) : []; //массив выбранных значений
+			V11_COUNT = 0;                  //счётчик открытых диалогов
 		}
 
 		//выбор одного из элеметов
 		VC.click(function() {
 			var t = $(this),
-				v = t.attr('val');
+				v = _num(t.attr('val'));
 
-			VC.removeClass('sel');
-			t.addClass('sel');
+			if(sev) {
+				var sel = !t.hasClass('sel');
+				t[(sel ? 'add' : 'remove') + 'Class']('sel');
+				if(sel)
+					V11_V[v] = 1;
+				else
+					delete V11_V[v];
+				var vvv = [];
+				for(var k in V11_V)
+					vvv.push(k);
+				V11_CMP.val(vvv.join());
+			} else {
+				VC.removeClass('sel');
+				t.addClass('sel');
 
-			V11_V.length = V11_COUNT;
-			V11_V[V11_COUNT] = v;
-			V11_DLG.length = V11_COUNT;
-			V11_DLG[V11_COUNT] = DLG;
+				V11_V.length = V11_COUNT;
+				V11_V[V11_COUNT] = v;
+				V11_DLG.length = V11_COUNT;
+				V11_DLG[V11_COUNT] = DLG;
 
-			V11_CMP.val(V11_V.join());
+				V11_CMP.val(V11_V.join());
+			}
 
 			//нажатие по обычному элементу (не список)
-			if(!ELMM[v].issp)
+			if(!nest || !ELMM[v].issp)
 				return;
 
 			V11_COUNT++;
@@ -2069,6 +2083,7 @@ console.log(unit);
 			_dialogLoad({
 				dialog_id:11,
 				dialog_source:ELMM[v].num_1,
+				prm:unit.source.prm,
 				func_open:function(res, dlg) {
 					dlg.submit(function() {
 						var sel = dlg.content.find('.v-choose.sel');

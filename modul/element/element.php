@@ -1032,14 +1032,14 @@ function PHP12_v_choose($el, $unit) {
 	if(defined('DLG_SEL'))
 		$sel = DLG_SEL;
 
-	if(!empty($unit['txt_2'])) {
-		$ex = explode(',', $unit['txt_2']);
-		$sel = _num($ex[0]);
-	}
+	if(!empty($unit['txt_2']))
+		$sel = $unit['txt_2'];
+	if(!empty($SRC['prm']['sel']))
+		$sel = $SRC['prm']['sel'];
 
 	$cond = array(
 		'v_choose' => 1,
-		'v_id_sel' => $sel
+		'v_id_sel' => _idsAss($sel)
 	);
 
 	return
