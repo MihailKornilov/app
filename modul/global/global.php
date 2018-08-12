@@ -510,10 +510,14 @@ function _json($arr, $n=0) {//перевод массива в JS
 		($is_ass ? '}' : ']');
 }
 function _arrNum($arr) {//переделка значений массива в INT, если есть
-	foreach($arr as $k => $v)
-		if(!is_array($v))
-			if(preg_match(REGEXP_INTEGER, $v))
-				$arr[$k] = _num($v, 1);
+	foreach($arr as $k => $v) {
+		if(is_array($v)) {
+			$arr[$k] = _arrNum($v);
+			continue;
+		}
+		if(preg_match(REGEXP_INTEGER, $v))
+			$arr[$k] = _num($v, 1);
+	}
 
 	return $arr;
 }

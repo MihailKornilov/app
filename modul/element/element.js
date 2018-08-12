@@ -834,6 +834,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							prm:{
 								src:unit.source,
 								num_3:_num(D(ATTR_CMP(el.num_3)).val()),
+								sev:_num(el.num_6),//выбор нескольких значений
 								sel:sel
 							},
 							busy_obj:inp,
@@ -2026,6 +2027,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 	PHP12_v_choose = function(el, unit) {
 		if(unit == 'get')
 			return '';
+
+console.log(unit);
 
 		var DLG = DIALOG_OPEN;
 		if(!DLG)

@@ -1005,7 +1005,7 @@ function _dialogOpenLoad($dialog_id) {
 	$unit['source'] = $send;
 
 	//дополнительные параметры
-	$unit['source']['prm'] = isset($_POST['prm']) ? $_POST['prm'] : array();
+	$unit['source']['prm'] = isset($_POST['prm']) ? _arrNum($_POST['prm']) : array();
 
 	$send['act'] = $act;
 	$send['edit_access'] = _num(@SA) || $dialog['app_id'] && $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
