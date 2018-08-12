@@ -1045,7 +1045,6 @@ function PHP12_v_choose($el, $unit) {
 	return
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
 	_blockHtml('dialog', $dialog_id, $cond).
-//	_pr($unit).
 	'';
 }
 function PHP12_v_choose_ds($SRC) {//ID диалога из dialog_source
@@ -1134,8 +1133,10 @@ function PHP12_v_choose_13($SRC, $dialog_id) {//выбор элемента-зн
 			define('DLG_NO_MSG', _emptyMin('Блока '.$blk_id.' исходного диалога не существует.'));
 			return 0;
 		}
+		define('DLG_SEL', _num($SRC['prm']['sel']));
 		return _num($blk['obj_id']);
 	}
+
 
 	if(!$elPlace = _elemOne($num_3_place)) {
 		define('DLG_NO_MSG', _emptyMin('Элемента '.$num_3_place.', размещающего список с диалогами, не существует.'));
@@ -1145,11 +1146,18 @@ function PHP12_v_choose_13($SRC, $dialog_id) {//выбор элемента-зн
 		define('DLG_NO_MSG', _emptyMin('Диалог не выбран.'));
 		return 0;
 	}
+
 	if($elPlace['dialog_id'] == 24) {
 		//значение является не диалогом, а элементом
-		if($elPlace['num_1']) {
-			$el = _elemOne($elPlaceV);
-			$elPlaceV = $el['block']['obj_id'];
+		switch($elPlace['num_1']) {
+			case 960:
+				$el = _elemOne($elPlaceV);
+				$elPlaceV = $el['num_1'];
+				break;
+			case 961:
+				$el = _elemOne($elPlaceV);
+				$elPlaceV = $el['block']['obj_id'];
+				break;
 		}
 		define('DLG_SEL', _num($SRC['prm']['sel']));
 	}
