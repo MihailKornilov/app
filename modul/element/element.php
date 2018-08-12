@@ -2703,11 +2703,7 @@ function _period($v=0, $action='get') {// Формирование период�
 
 
 function _filterMenu($el) {//фильтр-меню
-	if(!$el['num_2'])
-		return _emptyMin('Фильтр-меню: отсутствует ID элемента, содержащий значения.');
-	if(!$ell = _elemOne($el['num_2']))
-		return _emptyMin('Фильтр-меню: отсутствует элемент, содержащий значения.');
-	if(!$ids = _ids($ell['txt_2'], 1))
+	if(!$ids = _ids($el['txt_1'], 1))
 		return _emptyMin('Фильтр-меню: отсутствуют ID значений.');
 
 	$c = count($ids) - 1;
@@ -2726,13 +2722,12 @@ function _filterMenu($el) {//фильтр-меню
 
 	$col = $EL['col'];//колонка текстового значения
 	$colCount = '';//колонка значения количества
-	if($el3 = _elemOne($el['num_3']))
-		if($ids = _ids($el3['txt_2'], 1)) {
-			$c = count($ids) - 1;
-			$elem_id = $ids[$c];
-			if($EL3 = _elemOne($elem_id))
-				$colCount = $EL3['col'];
-		}
+	if($ids = _ids($el['txt_2'], 1)) {
+		$c = count($ids) - 1;
+		$elem_id = $ids[$c];
+		if($EL3 = _elemOne($elem_id))
+			$colCount = $EL3['col'];
+	}
 
 	$cond = " `id`";
 	if(isset($dialog['field1']['deleted']))
