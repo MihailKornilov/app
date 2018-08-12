@@ -993,51 +993,45 @@ function _filterCheckSetup() {//настройка условий фильтра
 
 /* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 function PHP12_v_choose($el, $unit) {
+/*
+	DLG_NO_MSG - сообщение об ошибке при поиске диалога
+	DLG_SEL - выбранное значение
+*/
+
 	$SRC = $unit['source'];
 
-	//изначально проверяется исходный диалог
-	if(!$dialog_id = $SRC['dialog_source']) {
-		if(!$SRC['block_id'])
-			return _emptyMin('Отсутствует исходный блок.');
+	//ID диалога из dialog_source
+	$dialog_id = PHP12_v_choose_ds($SRC);
 
-		//данные исходного блока
-		$BL = _blockOne($SRC['block_id']);
-		$EL = $BL['elem'];
+	//ячейка таблицы
+	$dialog_id = PHP12_v_choose_23($SRC, $dialog_id);
 
-		//ячейка таблицы
-		if($EL && $EL['dialog_id'] == 23)
-			$dialog_id = _num($EL['num_1']);
-		//сборный текст
-		elseif($EL && $EL['dialog_id'] == 44) {
-			if($BL['obj_name'] == 'dialog')
-				$dialog_id = _num($BL['obj_id']);
-			else
-				return _emptyMin('Расположение сборного текста не в Диалоге');
-		}
-		//блок со страницы
-		elseif($BL['obj_name'] == 'page') {
-			$page = _page($BL['obj_id']);
-			$dialog_id = $page['spisok_id'];
-		}
-		//элемент единицы списка
-		elseif($BL['obj_name'] == 'spisok') {
-			$el_spisok = _elemOne($BL['obj_id']);
-			$dialog_id = $el_spisok['num_1'];
-		}
-	}
+	//сборный текст
+	$dialog_id = PHP12_v_choose_44($SRC, $dialog_id);
 
-	//принимает ли страница значения списка
-	if(!$dialog_id) {
-		$page = _page($SRC['page_id']);
-		$dialog_id = $page['spisok_id'];
-	}
+	//выбор элемента-значения
+	$dialog_id = PHP12_v_choose_13($SRC, $dialog_id);
 
+	//блок со страницы
+	$dialog_id = PHP12_v_choose_page($SRC, $dialog_id);
+
+	//элемент единицы списка
+	$dialog_id = PHP12_v_choose_spisok($SRC, $dialog_id);
+
+	//страница принимает значения списка
+	$dialog_id = PHP12_v_choose_page_spisok_unit($SRC, $dialog_id);
+
+	if(defined('DLG_NO_MSG'))
+		return DLG_NO_MSG;
 	if(!$dialog_id)
 		return _emptyMin('Не найден диалог, который вносит данные списка.');
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin('Диалога не существует, который вносит данные списка.');
 
 	$sel = 0;
+	if(defined('DLG_SEL'))
+		$sel = DLG_SEL;
+
 	if(!empty($unit['txt_2'])) {
 		$ex = explode(',', $unit['txt_2']);
 		$sel = _num($ex[0]);
@@ -1054,6 +1048,145 @@ function PHP12_v_choose($el, $unit) {
 //	_pr($unit).
 	'';
 }
+function PHP12_v_choose_ds($SRC) {//ID диалога из dialog_source
+	return _num($SRC['dialog_source']);
+}
+function PHP12_v_choose_BL($SRC) {//получение данных исходного блока
+	if(!$block_id = _num($SRC['block_id'])) {
+		define('DLG_NO_MSG', _emptyMin('Отсутствует исходный блок.'));
+		return 0;
+	}
+	if(!$BL = _blockOne($block_id)) {//данные исходного блока
+		define('DLG_NO_MSG', _emptyMin('Блока '.$block_id.' не существует.'));
+		return 0;
+	}
+	return $BL;
+}
+function PHP12_v_choose_23($SRC, $dialog_id) {//ячейка таблицы
+	if($dialog_id)
+		return $dialog_id;
+	if(!$BL = PHP12_v_choose_BL($SRC))
+		return 0;
+	if(!$EL = $BL['elem'])
+		return 0;
+	if($EL['dialog_id'] != 23)
+		return 0;
+
+	return _num($EL['num_1']);
+}
+function PHP12_v_choose_44($SRC, $dialog_id) {//сборный текст
+	if($dialog_id)
+		return $dialog_id;
+	if(!$BL = PHP12_v_choose_BL($SRC))
+		return 0;
+	if(!$EL = $BL['elem'])
+		return 0;
+	if($EL['dialog_id'] != 44)
+		return 0;
+	if($BL['obj_name'] != 'dialog')
+		return 0;
+
+	return _num($BL['obj_id']);
+}
+function PHP12_v_choose_13($SRC, $dialog_id) {//выбор элемента-значения
+	if($dialog_id)
+		return $dialog_id;
+	if(!$BL = PHP12_v_choose_BL($SRC))
+		return 0;
+	if(!$EL = $BL['elem'])
+		return 0;
+	if($EL['dialog_id'] != 13)
+		return 0;
+
+	//num_1 - источник выбора
+	if($EL['num_1'] == 2119) {
+		define('DLG_NO_MSG', _emptyMin('Не доделано: выбор значения с текущей страницы.'));
+		return 0;
+	}
+	if($EL['num_1'] != 2120) {
+		define('DLG_NO_MSG', _emptyMin('Некорректное значение num_1: источник выбора.'));
+		return 0;
+	}
+
+	//num_2 - где искать диалог (если выбор из диалога)
+	if($EL['num_2'] == 2123) {//конкретный диалог
+		define('DLG_NO_MSG', _emptyMin('Конкретный диалог.'));
+		return 0;
+	}
+
+	if($EL['num_2'] != 2124) {//исходный диалог
+		define('DLG_NO_MSG', _emptyMin('Некорректное значение num_2: поиск диалога.'));
+		return 0;
+	}
+
+	//num_3 - элемент-значение поиска диалога
+	if(!$num_3_place = _num($EL['num_3'])) {//если пустое - получение исходного диалога
+		if($BL['obj_name'] != 'dialog') {
+			define('DLG_NO_MSG', _emptyMin('Блок не из диалога.'));
+			return 0;
+		}
+		//исходный диалог: поиск по исходному блоку
+		if(!$blk_id = $SRC['prm']['src']['block_id']) {
+			define('DLG_NO_MSG', _emptyMin('Отсутствует блок из исходного диалога.'));
+			return 0;
+		}
+		if(!$blk = _blockOne($blk_id)) {
+			define('DLG_NO_MSG', _emptyMin('Блока '.$blk_id.' исходного диалога не существует.'));
+			return 0;
+		}
+		return _num($blk['obj_id']);
+	}
+
+	if(!$elPlace = _elemOne($num_3_place)) {
+		define('DLG_NO_MSG', _emptyMin('Элемента '.$num_3_place.', размещающего список с диалогами, не существует.'));
+		return 0;
+	}
+	if(!$elPlaceV = _num($SRC['prm']['num_3'])) {
+		define('DLG_NO_MSG', _emptyMin('Диалог не выбран.'));
+		return 0;
+	}
+	if($elPlace['dialog_id'] == 24) {
+		//значение является не диалогом, а элементом
+		if($elPlace['num_1']) {
+			$el = _elemOne($elPlaceV);
+			$elPlaceV = $el['block']['obj_id'];
+		}
+		define('DLG_SEL', _num($SRC['prm']['sel']));
+	}
+
+	return $elPlaceV;
+}
+function PHP12_v_choose_page($SRC, $dialog_id) {//блок со страницы
+	if($dialog_id)
+		return $dialog_id;
+	if(!$BL = PHP12_v_choose_BL($SRC))
+		return 0;
+	if($BL['obj_name'] != 'page')
+		return 0;
+
+	$page = _page($BL['obj_id']);
+	return $page['spisok_id'];
+}
+function PHP12_v_choose_spisok($SRC, $dialog_id) {//элемент единицы списка
+	if($dialog_id)
+		return $dialog_id;
+	if(!$BL = PHP12_v_choose_BL($SRC))
+		return 0;
+	if($BL['obj_name'] != 'spisok')
+		return 0;
+
+	$el_spisok = _elemOne($BL['obj_id']);
+	return $el_spisok['num_1'];
+}
+function PHP12_v_choose_page_spisok_unit($SRC, $dialog_id) {//страница принимает значения списка
+	if($dialog_id)
+		return $dialog_id;
+
+	$page = _page($SRC['page_id']);
+	return _num($page['spisok_id']);
+}
+
+
 
 /* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 function PHP12_block_choose($el, $unit) {
@@ -1418,75 +1551,6 @@ function PHP12_menu_block_setup($el, $unit) {//используется в ди�
 	if(_elemUnitIsEdit($unit))
 		return '<div class="_empty min">Настройка пунктов меню переключения блоков</div>';
 	return '';
-}
-function _cmpV58($val, $unit) {//Настройка пунктов меню переключения блоков
-	$update = array();
-	$idsNoDel = '0';
-
-	if(!empty($val)) {
-		if(!is_array($val))
-			return;
-
-		$sort = 0;
-		foreach($val as $r) {
-			if(!$title = _txt($r['title']))
-				continue;
-			if($id = _num($r['id']))
-				$idsNoDel .= ','.$id;
-			$blk = _ids($r['blk']);
-			$update[] = "(
-				".$id.",
-				-".$unit['id'].",
-				'".addslashes($title)."',
-				'".$blk."',
-				"._num($r['def']).",
-				".$sort++."
-			)";
-		}
-	}
-
-	//удаление удалённых значений
-	$sql = "DELETE FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `id` NOT IN (".$idsNoDel.")";
-	query($sql);
-
-	//сброс значения по умолчанию
-	$sql = "UPDATE `_element`
-			SET `def`=0
-			WHERE `id`=".$unit['id'];
-	query($sql);
-
-	if(empty($update))
-		return;
-
-	$sql = "INSERT INTO `_element` (
-				`id`,
-				`block_id`,
-				`txt_1`,
-				`txt_2`,
-				`def`,
-				`sort`
-			)
-			VALUES ".implode(',', $update)."
-			ON DUPLICATE KEY UPDATE
-				`txt_1`=VALUES(`txt_1`),
-				`txt_2`=VALUES(`txt_2`),
-				`def`=VALUES(`def`),
-				`sort`=VALUES(`sort`)";
-	query($sql);
-
-	//установка нового значения по умолчанию
-	$sql = "SELECT `id` FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `def`
-			LIMIT 1";
-	$def = _num(query_value($sql));
-
-	$sql = "UPDATE `_element`
-			SET `def`=".$def."
-			WHERE `id`=".$unit['id'];
-	query($sql);
 }
 function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение данных о пунктах меню
 	if(!$parent_id = _num($unit['id']))

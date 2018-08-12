@@ -816,6 +816,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var P = ATR_CMP.next(),
 						inp = P.find('.inp'),
 						del = P.find('.icon-del'),
+						D = DIALOG_OPEN.D,
 						err = function(msg) {
 							P._hint({
 								msg:msg,
@@ -834,6 +835,26 @@ var DIALOG = {},//массив диалоговых окон для управл
 						};
 
 					P.click(function() {
+						_dialogLoad({
+							dialog_id:11,
+							block_id:el.block_id,
+//							block_id:unit.source.block_id,
+							prm:{
+								src:unit.source,
+								num_3:_num(D(ATTR_CMP(el.num_3)).val()),
+								sel:_num(ATR_CMP.val())
+							},
+							busy_obj:inp,
+							busy_cls:'hold',
+							func_save:function(res) {
+								ATR_CMP.val(res.v);
+								inp.val(res.title);
+								del._dn(1);
+							}
+						});
+					});
+/*
+					P.click(function() {
 						switch(el.num_1) {
 							case 2119://страница
 								alert('страница');
@@ -844,10 +865,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 										alert('конкретный диалог');
 										return;
 									case 2124://исходный диалог
-										var dlg_id = 0;
+										var dlg_id = 0,
+											el_id = 0;  //ID элемента, который размещает выпадающий список с диалогами
 										//элемент, который указывает, где искать диалог (как правило выпадающий список)
 										if(el.num_3) {
-											var D = DIALOG_OPEN.D;
 											//расположение элемента, который содержит диалог
 											var elm_dlg = D(ATTR_CMP(el.num_3));
 											if(!elm_dlg) {
@@ -855,6 +876,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 												return;
 											}
 											dlg_id = _num(elm_dlg.val());
+											el_id = el.num_3;
 										} else
 											if(unit.source.block_id) {//если этот элемент не указан, то открывается диалог по исходному блоку
 												var bl = BLKK[unit.source.block_id];
@@ -877,6 +899,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 											dialog_id:11,
 											dialog_source:dlg_id,
 											block_id:el.block_id,
+											prm:{
+												elem_id:el_id
+											},
 											busy_obj:inp,
 											busy_cls:'hold',
 											func_save:function(res, dlg) {
@@ -888,6 +913,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								}
 						}
 					});
+*/
 					del.click(function(e) {
 						e.stopPropagation();
 						ATR_CMP.val(0);
@@ -2009,13 +2035,17 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 	_elemFuncBlockObj = function(blk_ass) {//получение $(obj) блоков
 		var arr = [],
-			TRG = _copyObj(blk_ass);
+			TRG = _copyObj(blk_ass),
+			D = $;
+
+//		if(window.DIALOG_OPEN)
+//			D = DIALOG_OPEN.D;
 
 		_forIn(TRG, function(n, block_id) {
 			if(!n)
 				return;
-			var D = DIALOG_OPEN.D,
-				BL = BLKK[block_id],
+
+			var BL = BLKK[block_id],
 				ATR_BL = D(ATTR_BL(block_id));
 
 			if(BL.xx == 1) {//если блок в ряду один, фукнция применится ко всей таблице
