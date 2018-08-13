@@ -1036,36 +1036,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						};
 					ATR_CMP._select(o);
 					return;
-				//Выбор значений для содержания Select
-				case 31:
-					var sv = ATTR_EL.find('.sv'),
-						ex = ATR_CMP.val().split(','),
-						v = [];
-
-					v.push(_num(ex[0]));
-					if(el.num_2 && _num(ex[1]))
-						v.push(_num(ex[1]));
-					ATR_CMP.val(v.join(','));
-
-					sv.click(function() {
-						var t = $(this),
-							n = _num(t.attr('val')),
-							attr_cmp = ELM[el.num_1].attr_cmp;
-						_dialogLoad({
-							dialog_id:11,
-							block_id:elm_id * -1,
-							dialog_source:$(attr_cmp).val(),
-							unit_id:v[n],
-							busy_obj:t,
-							busy_cls:'hold',
-							func_save:function(ia) {
-								v[n] = ia.unit.id;
-								t.val(ia.unit.title);
-								ATR_CMP.val(v.join(','));
-							}
-						});
-					});
-					return;
 				//count - количество
 				case 35:
 					ATR_CMP._count({
@@ -1243,8 +1213,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					});
 					noteAfterPrint();
 					return;
-				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Настройка суммы значений единицы списка (для [27])
-				case 56: _cmpV56(el, unit); return;
 				//Меню переключения блоков
 				case 57:
 					var type = {
@@ -2565,11 +2533,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
-
 	/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА ===--- */
 	PHP12_44_setup = function(el, unit) {//для [44]
-
-		//получение данных для сохранения
 		if(unit == 'get')
 			return PHP12_44_get(el);
 
@@ -2660,6 +2625,104 @@ var DIALOG = {},//массив диалоговых окон для управл
 			send.push({
 				id:id,
 				spc:sp.find('.spc').val()
+			});
+		});
+		return send;
+	},
+
+	PHP12_balans_setup = function(el, unit) {
+		if(unit == 'get')
+			return PHP12_balans_get(el);
+
+		if(!unit.id)
+			return;
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last');
+
+		BUT_ADD.click(valueAdd);
+
+		for(var i in VVV[el.id])
+			valueAdd(VVV[el.id][i])
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,       //id элемента
+				minus:0,    //минусовое значение
+				title:''
+			}, v);
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w50 pl5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w25 r">' +
+								'<button class="vk short ' + (v.minus ? 'red' : 'green') + ' w35">' + (v.minus ? '—' : '+') + '</button>' +
+							'<td><input type="text"' +
+									  ' class="inp w100p curP"' +
+									  ' readonly' +
+									  ' placeholder="значение не выбрано"' +
+									  ' value="' + v.title + '"' +
+								' />' +
+							'<td class="w50 r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить значение', -54) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				INP = DD.find('.inp'),
+				DS = BLKK[unit.source.block_id].obj_id;
+			INP.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					dialog_source:DS,
+					block_id:unit.source.block_id,
+					unit_id:v.id,      //id выбранного элемента (при редактировании)
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_save:function(ia) {
+						DD.attr('val', ia.unit.id);
+						v.id = ia.unit.id;
+						INP.val(ia.unit.title);
+					}
+				});
+			});
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-move-y'
+			});
+			DD.find('button')
+				._tooltip('Прибавление', -33)
+				.click(function() {
+					var t = $(this),
+						plus = t.hasClass('green');
+					t.html(plus ? '—' : '+');
+					t._dn(plus, 'green');
+					t._dn(!plus, 'red');
+					t._tooltip(plus ? 'Вычитание' : 'Прибавление', plus ? -26 : -33);
+				});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+				v.id = 0;
+			});
+		}
+	},
+	PHP12_balans_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var id = _num(sp.attr('val'));
+			if(!id)
+				return;
+			send.push({
+				id:id,
+				minus:sp.find('button').hasClass('green') ? 0 : 1
 			});
 		});
 		return send;

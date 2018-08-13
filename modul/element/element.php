@@ -792,58 +792,6 @@ function _elemVvv($elem_id, $src=array()) {
 			$dialog['cmp'][$cmp_id]['txt_1'] = $EL['txt_1'];
 			$dialog['cmp'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 			break;
-		//Настройка содержания Сборного текста
-		case 49:
-			if($unit_id <= 0)
-				break;
-			if(!$col = $cmp['col'])
-				break;
-			if(!$ids = $unit[$col])
-				break;
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id` IN (".$ids.")
-					ORDER BY `sort`";
-			if(!$arr = query_arr($sql))
-				break;
-
-			$spisok = array();
-			foreach($arr as $r) {
-				$spisok[] = array(
-					'id' => _num($r['id']),
-					'dialog_id' => _num($r['dialog_id']),
-					'title' => _elemTitle($r['id']),
-					'spc' => _num($r['num_8']) //пробел справа
-				);
-			}
-			$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
-			break;
-		//Настройка суммы значений единицы списка
-		case 56:
-			if($unit_id <= 0)
-				break;
-			if(!$col = $cmp['col'])
-				break;
-			if(!$ids = $unit[$col])
-				break;
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id` IN (".$ids.")
-					ORDER BY `sort`";
-			if(!$arr = query_arr($sql))
-				break;
-
-			$spisok = array();
-			foreach($arr as $r) {
-				$spisok[] = array(
-					'id' => _num($r['id']),
-					'dialog_id' => _num($r['dialog_id']),
-					'minus' => _num($r['num_8']), //вычитание=1, сложение=0
-					'title' => _elemUnit($r)
-				);
-			}
-			$dialog['cmp'][$cmp_id]['vvv'] = $spisok;
-			break;
 */
 	}
 
@@ -1051,6 +999,8 @@ function PHP12_v_choose_ds($SRC) {//ID диалога из dialog_source
 	return _num($SRC['dialog_source']);
 }
 function PHP12_v_choose_BL($SRC) {//получение данных исходного блока
+	if(defined('DLG_NO_MSG'))
+		return 0;
 	if(!$block_id = _num($SRC['block_id'])) {
 		define('DLG_NO_MSG', _emptyMin('Отсутствует исходный блок.'));
 		return 0;
@@ -1224,6 +1174,7 @@ function PHP12_block_choose($el, $unit) {
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Страница <b class="fs14">Клиенты</b>:</div>'.
 	_blockHtml($obj_name, $obj_id, $unit);
 }
+
 
 /* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
 function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
@@ -1902,6 +1853,94 @@ function PHP12_44_print($elem_id, $unit=array()) {//печать сборног�
 			$send .= ' ';
 	}
 
+	return $send;
+}
+
+
+/* ---=== НАСТРОЙКА БАЛАНСА - СУММ ЗНАЧЕНИЙ ЕДИНИЦЫ СПИСКА ===--- */
+function PHP12_balans_setup($el, $unit) {//используется в диалоге [27]
+	/*
+		все действия через JS
+
+		num_8: знак 1=вычитание, 0=сложение
+	*/
+
+	if(empty($unit['id']))
+		return '<div class="_empty min">Настройка значений будет доступна<br>после вставки элемента в блок.</div>';
+
+	return '';
+}
+function PHP12_balans_setup_save($cmp, $val, $unit) {//сохранение содержания баланса
+	/*
+		$cmp  - компонент-функция, размещающий в диалоге настройку значений баланса
+		$val  - значения, полученные для сохранения
+		$unit - элемент, который размещает баланс
+	*/
+
+	if(!$parent_id = _num($unit['id']))
+		return;
+
+	$ids = array();
+	$update = array();
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		foreach($val as $r) {
+			if(!$id = _num($r['id']))
+				continue;
+			$ids[] = $id;
+			$spc = _num($r['minus']);
+			$update[] = array(
+				'id' => $id,
+				'minus' => $spc
+			);
+		}
+	}
+
+	$ids = implode(',', $ids);
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
+	query($sql);
+
+	//ID элементов-значений, составляющих сборный текст
+	$sql = "UPDATE `_element`
+			SET `txt_2`='".$ids."'
+			WHERE `id`=".$parent_id;
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	foreach($update as $sort => $r) {
+		$sql = "UPDATE `_element`
+				SET `parent_id`=".$parent_id.",
+					`num_8`=".$r['minus'].",
+					`sort`=".$sort."
+				WHERE `id`=".$r['id'];
+		query($sql);
+	}
+}
+function PHP12_balans_setup_vvv($parent_id) {
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$send = array();
+	foreach($arr as $r) {
+		$send[] = array(
+			'id' => _num($r['id']),
+			'minus' => _num($r['num_8']), //вычитание=1, сложение=0
+			'title' => _elemTitle($r['id'])
+		);
+	}
 	return $send;
 }
 

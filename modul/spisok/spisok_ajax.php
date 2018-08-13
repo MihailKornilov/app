@@ -355,10 +355,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 					break;
 				$func($cmp, $vvv[$cmp_id], $unit);
 				break;
-			//Настройка суммы значений единицы списка
-			case 56: _cmpV56($cmp, $vvv[$cmp_id], $unit); break;
-			//количество значений связанного списка
-			case 54: /* сделать пересчёт значения */ break;
 			//Применение загруженных изображений
 			case 60: _cmpV60($cmp, $unit); break;
 		}
@@ -504,8 +500,10 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока не сущетвует');
 		if($elem = $block['elem']) {
-			//исходный элемент является таблицей
-			if($elem['dialog_id'] == 23 || $elem['dialog_id'] == 44) {
+			if($elem['dialog_id'] == 23//таблица
+			|| $elem['dialog_id'] == 27//баланс
+			|| $elem['dialog_id'] == 44//сборный текст
+			) {
 				$block_id = 0;
 				$parent_id = $elem['id'];
 			} else
@@ -785,15 +783,14 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновлен�
 	}
 }
 function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
+	if(!IS_ELEM)
+		return $send;
 	if($send['action_id'] != 3)
 		return $send;
-	if(_table($dialog['table_1']) != '_element')
+	if(!$elem = _elemOne($unit_id))
 		return $send;
-	if($block_id <= 0)//была вставка доп-значения для элемета
+	if($elem['parent_id'])//была вставка доп-значения для элемета
 		return $send;
-
-	$elem = _elemOne($unit_id);
-
 	if(!$elem['block_id'])
 		return $send;
 
@@ -812,47 +809,6 @@ function _spisokAction4($send) {//действие 4 - обновление ис
 	$send['dialog_source'] = _dialogOpenLoad($dialog_id);
 
 	return $send;
-}
-function _cmpV56($cmp, $val, $unit) {//Настройка суммы значений единицы списка
-	/*
-		-113
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
-	*/
-	if(empty($cmp['col']))
-		return;
-
-	//поле, хранящее список id элементов-значений
-	$col = $cmp['col'];
-	$ids = $unit[$col] ? $unit[$col] : 0;
-
-	//удаление значений, которые были удалены при настройке
-	$sql = "DELETE FROM `_element`
-			WHERE `user_id_add`=".USER_ID."
-			  AND `block_id` IN (0,-".$unit['id'].")
-			  AND `id` NOT IN (".$ids.")";
-	query($sql);
-
-	if(!$ids)
-		return;
-
-	$sort = 0;
-	foreach(_ids($ids, 1) as $id) {
-		$r = $val[$id];
-		$sql = "UPDATE `_element`
-				SET `block_id`=-".$unit['id'].",
-					`num_8`=".$r['minus'].",
-					`sort`=".$sort++."
-				WHERE `id`=".$id;
-		query($sql);
-	}
-
-	//очистка неиспользованных элементов
-	$sql = "DELETE FROM `_element`
-			WHERE `user_id_add`=".USER_ID."
-			  AND `block_id` IN (0,-113)";
-	query($sql);
 }
 function _cmpV60($cmp, $unit) {//Применение загруженных изображений
 	//поле, хранящее список id изображений
