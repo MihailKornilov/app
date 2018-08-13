@@ -20,7 +20,7 @@ switch(@$_POST['op']) {
 
 		$send['action_id'] = _num($dialog['del_action_id']);
 		$send['action_page_id'] = _num($dialog['del_action_page_id']);
-		$send = _spisokAction3($send, $dialog, $unit_id, 1);
+		$send = _spisokAction3($send, $dialog, $unit_id);
 
 		if(isset($dialog['field1']['deleted'])) {
 			$sql = "UPDATE `"._table($dialog['table_1'])."`
@@ -390,7 +390,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 		'action_page_id' => _num($dialog[$act.'_action_page_id'])
 	);
 
-	$send = _spisokAction3($send, $dialog, $unit_id, $block_id);
+	$send = _spisokAction3($send, $dialog, $unit_id);
 	$send = _spisokAction4($send);
 
 	if(IS_ELEM)
@@ -782,8 +782,8 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновлен�
 		}
 	}
 }
-function _spisokAction3($send, $dialog, $unit_id, $block_id=0) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
-	if(!IS_ELEM)
+function _spisokAction3($send, $dialog, $unit_id) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
+	if($dialog['table_1'] != 5)
 		return $send;
 	if($send['action_id'] != 3)
 		return $send;
