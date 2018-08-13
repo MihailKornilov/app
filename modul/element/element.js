@@ -584,9 +584,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						case 37://SA: Select - выбор имени колонки
 							send.cmp[id] = ATR_CMP._select('inp');
 							return;
-						case 56://Настройка суммы значений единицы списка
-							send.vvv[id] = _cmpV56(sp, 'get');
-							break;
 					}
 
 					if(ATR_CMP)
