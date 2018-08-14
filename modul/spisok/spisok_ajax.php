@@ -318,6 +318,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	//элемент выбирает блоки из диалога - через [19] - перехват внесения данных
 	_elem19_block_choose($dialog);
 
+	//настройка истории действий - через [67] - перехват внесения данных
+	_elem67_history_setup($dialog);
+
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 
 	if(IS_ELEM)
@@ -901,95 +904,6 @@ function _filterCheckSetup_save($cmp, $val, $unit) {//сохранение на�
 			  AND `block_id` IN (0,-114)";
 	query($sql);
 }
-function _historySetup_save($cmp, $val, $unit) {//сохранение настройки шаблона истории действий. Подключаемая функция [12]
-	/*
-		-115
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
-	*/
-
-	$update = array();
-	$idsNoDel = '0';
-
-	if(!$dlg_id = $val['dialog_id'])
-		return;
-	if(!$type_id = $val['type_id'])
-		return;
-
-	$val = @$val['val'];
-	if(!empty($val) && is_array($val)) {
-		$sort = 0;
-		foreach($val as $r) {
-			$num_1 = _num($r['num_1']);
-			$txt_7 = _txt($r['txt_7'], 0, 1);
-			$txt_8 = _txt($r['txt_8'], 0, 1);
-			if(!$num_1 && !$txt_7 && !$txt_8)
-				continue;
-			if($id = _num($r['id']))
-				$idsNoDel .= ','.$id;
-			$update[] = "(
-				".$id.",
-				-".$unit['id'].",
-				'".addslashes($txt_7)."',
-				'".addslashes($txt_8)."',
-				".$sort++.",
-				".USER_ID."
-			)";
-		}
-	}
-
-	//удаление удалённых значений
-	$sql = "DELETE FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `id` NOT IN (".$idsNoDel.")";
-	query($sql);
-
-	if(!empty($update)) {
-		$sql = "INSERT INTO `_element` (
-					`id`,
-					`block_id`,
-					`txt_7`,
-					`txt_8`,
-					`sort`,
-					`user_id_add`
-				)
-				VALUES ".implode(',', $update)."
-				ON DUPLICATE KEY UPDATE
-					`block_id`=VALUES(`block_id`),
-					`txt_7`=VALUES(`txt_7`),
-					`txt_8`=VALUES(`txt_8`),
-					`sort`=VALUES(`sort`)";
-		query($sql);
-	}
-
-	//очистка неиспользованных элементов
-	$sql = "DELETE FROM `_element`
-			WHERE `user_id_add`=".USER_ID."
-			  AND `block_id` IN (0,-115)";
-	query($sql);
-
-	//обновление значений главного элемента шаблона
-	$sql = "SELECT `id`
-			FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			ORDER BY `sort`";
-	$ids = query_ids($sql);
-
-	$sql = "UPDATE `_element`
-			SET `num_1`=".$type_id.",
-				`num_2`=".$dlg_id.",
-				`txt_1`='".($ids ? $ids : '')."'
-			WHERE `id`=".$unit['id'];
-	query($sql);
-
-	//обновление активности в истории
-	$sql = "UPDATE `_history`
-			SET `active`=".($ids ? 1 : 0)."
-			WHERE `type_id`=".$type_id."
-			  AND `dialog_id`=".$dlg_id;
-	query($sql);
-}
 function _pageUserAccess_save($cmp, $val, $unit) {//сохранение доступа к страницам для конкретного пользователя
 	if(!is_array($val))
 		return;
@@ -1341,6 +1255,12 @@ function _elem19_block_choose($dialog) {//выбор блоков через [11
 	$send['ids'] = _ids($vvv[$elem_func_id]);
 
 	jsonSuccess($send);
+}
+function _elem67_history_setup($dialog) {
+	if($dialog['id'] != 67)
+		return;
+
+	jsonSuccess();
 }
 
 function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления единицы списка

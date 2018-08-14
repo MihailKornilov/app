@@ -150,9 +150,9 @@ switch(@$_POST['op']) {
 							 ' id="history_insert"'.
 							 ' readonly'.
 							 ' placeholder="шаблон истории действий для внесения новой записи"'.
-							 ' val="'.$dialog['history'][1]['elem_id'].'"'.
+							 ' val="'.$dialog['insert_history_elem'].'"'.
 					'>'.
-						$dialog['history'][1]['tmp'].
+						$dialog['insert_history_elem'].
 					'</textarea>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-ffd line-t1">'.
@@ -161,9 +161,9 @@ switch(@$_POST['op']) {
 							 ' id="history_edit"'.
 							 ' readonly'.
 							 ' placeholder="шаблон истории действий для редактирования записи"'.
-							 ' val="'.$dialog['history'][2]['elem_id'].'"'.
+							 ' val="'.$dialog['edit_history_elem'].'"'.
 					'>'.
-						$dialog['history'][2]['tmp'].
+						$dialog['edit_history_elem'].
 					'</textarea>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-fee line-t1">'.
@@ -172,9 +172,9 @@ switch(@$_POST['op']) {
 							 ' id="history_del"'.
 							 ' readonly'.
 							 ' placeholder="шаблон истории действий для удаления записи"'.
-							 ' val="'.$dialog['history'][3]['elem_id'].'"'.
+							 ' val="'.$dialog['del_history_elem'].'"'.
 					'>'.
-						$dialog['history'][3]['tmp'].
+						$dialog['del_history_elem'].
 					'</textarea>'.
 				'</div>'.
 			'</div>'.

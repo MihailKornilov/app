@@ -331,7 +331,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			edit:'редактирования',
 			del:'удаления'
 		};
-		_forN(['insert', 'edit', 'del'], function(act, n) {
+		_forN(['insert', 'edit', 'del'], function(act) {
 			DLG('#' + act + '_action_id')._select({
 				width:270,
 				title0:'действия нет, закрыть окно',
@@ -351,14 +351,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 				_dialogLoad({
 					dialog_id:67,
 					dialog_source:o.dialog_id,
-					unit_id:_num(t.attr('val')) || -117,
-					busy_obj:$(this),
-					busy_cls:'hold',
-					func_open:function(res, dlg) {
-						dlg.content.find('#type_id').val(n + 1);
+					prm:{
+						act:act
 					},
+					busy_obj:t,
+					busy_cls:'hold',
 					func_save:function(res) {
-						t.val(res.unit.title);
+//						t.val(res.unit.title);
 						t._flash();
 					}
 				});
@@ -2038,8 +2037,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(!VVV[el.id].length)
 			valueAdd();
 		else
-			for(var i in VVV[el.id])
-				valueAdd(VVV[el.id][i])
+			_forIn(VVV[el.id], valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -2172,9 +2170,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			}
 		});
 
-		//вывод списка ячеек для настройки
-		for(var i in VVV[el.id])
-			tdAdd(VVV[el.id][i])
+		_forIn(VVV[el.id], tdAdd);
 
 		//добавление новой колонки в таблицу
 		function tdAdd(v) {
@@ -2355,8 +2351,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		BUT_ADD.click(valueAdd);
 
-		for(var i in VVV[el.id])
-			valueAdd(VVV[el.id][i])
+		_forIn(VVV[el.id], valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -2447,8 +2442,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			valueAdd();
 			valueAdd({spc:0});
 		} else
-			for(var i in VVV[el.id])
-				valueAdd(VVV[el.id][i])
+			_forIn(VVV[el.id], valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -2522,6 +2516,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
+	/* ---=== НАСТРОЙКА БАЛАНСА - СУММ ЗНАЧЕНИЙ ЕДИНИЦЫ СПИСКА ===--- */
 	PHP12_balans_setup = function(el, unit) {
 		if(unit == 'get')
 			return PHP12_balans_get(el);
@@ -2615,6 +2610,119 @@ var DIALOG = {},//массив диалоговых окон для управл
 			send.push({
 				id:id,
 				minus:sp.find('button').hasClass('green') ? 0 : 1
+			});
+		});
+		return send;
+	},
+
+	/* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ ===--- */
+	PHP12_history_setup = function(el, unit) {
+		if(unit == 'get')
+			return PHP12_history_get(el);
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last');
+
+		BUT_ADD.click(valueAdd);
+
+		if(!VVV[el.id].length)
+			valueAdd();
+		else
+			_forIn(VVV[el.id], valueAdd);
+
+		DL.sortable({
+			axis:'y',
+			handle:'.icon-move-y'
+		});
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,     //id элемента-сборки
+
+				ds:unit.source.dialog_source,   //id диалога, для которого производится настройка
+				act:unit.source.prm.act,        //действие: indert, edit, del
+
+				dialog_id:50,  //id диалога, вносившего элемента-значения
+				num_1:0,  //id элемента-значения
+				title:'', //имя элемента-значения
+				txt_7:'', //текст слева
+				txt_8:''  //текст справа
+			}, v || {});
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<input type="hidden" class="ds"  value="' + v.ds + '" />' +
+					'<input type="hidden" class="act" value="' + v.act + '" />' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w35 center">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w200">' +
+								'<input type="text"' +
+									  ' class="txt_7 w100p"' +
+									  ' placeholder="текст слева"' +
+									  ' value="' + v.txt_7 + '"' +
+								' />' +
+							'<td class="w150">' +
+								'<input type="text"' +
+									  ' readonly' +
+									  ' class="title w100p curP over4"' +
+									  ' placeholder="значение из диалога"' +
+									  ' value="' + v.title + '"' +
+									  ' val="' + v.num_1 + '"' +
+								' />' +
+							'<td class="w200">' +
+								'<input type="text"' +
+									  ' class="txt_8 w100p"' +
+									  ' placeholder="текст справа"' +
+									  ' value="' + v.txt_8 + '"' +
+								' />' +
+							'<td class="r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить сборку', -48) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				TITLE = DD.find('.title');
+			TITLE.click(function() {
+				if(!v.dialog_id)
+					v.dialog_id = 50;
+				_dialogLoad({
+					dialog_id:v.dialog_id,
+					dialog_source:unit.source.dialog_source,
+					unit_id:v.id,
+					busy_obj:$(this),
+					busy_cls:'hold',
+					func_save:function(res) {
+						v.id = res.unit.id;
+						DD.attr('val', v.id);
+						TITLE.attr('val', res.unit.num_1);
+						TITLE.val(v.id);
+						DD.find('.txt_8').focus();
+					}
+				});
+			});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+			});
+			DD.find('.txt_7').focus();
+		}
+	},
+	PHP12_history_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			send.push({
+				id:_num(sp.attr('val')),
+				ds:sp.find('.ds').val(),
+				act:sp.find('.act').val(),
+				num_1:sp.find('.title').attr('val'),
+				txt_7:sp.find('.txt_7').val(),
+				txt_8:sp.find('.txt_8').val()
 			});
 		});
 		return send;
@@ -2912,117 +3020,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					p = _parent(t, 'DD');
 				p.remove();
 			});
-		}
-	},
-	_historySetup = function(o, i) {//настройка шаблона истории действий (подключение через [12])
-		var el = $(o.attr_el);
-
-		//получение данных для сохранения
-		if(i == 'get') {
-			var send = [];
-			_forEq(el.find('dd'), function(sp) {
-				send.push({
-					id:_num(sp.attr('val')),
-					num_1:sp.find('.title').attr('val'),
-					txt_7:sp.find('.txt_7').val(),
-					txt_8:sp.find('.txt_8').val()
-				});
-			});
-			return {
-				type_id:$(o.attr_cmp).next().val(),
-				dialog_id:$(o.attr_cmp).val(),
-				val:send
-			};
-		}
-
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',
-			DL = el.append(html).find('dl'),
-			BUT_ADD = el.find('div:last');
-
-		$(o.attr_cmp).val(i.source.dialog_source);
-
-		BUT_ADD.click(valueAdd);
-
-		if(!o.vvv.length)
-			valueAdd();
-		else {
-			$('#cmp_1443')._select('disable');
-			_forIn(o.vvv, valueAdd);
-		}
-
-		DL.sortable({
-			axis:'y',
-			handle:'.icon-move-y'
-		});
-
-		function valueAdd(v) {
-			v = $.extend({
-				id:0,     //id элемента-сборки
-				dialog_id:50,  //id диалога, вносившего элемента-значения
-				num_1:0,  //id элемента-значения
-				title:'', //имя элемента-значения
-				txt_7:'', //текст слева
-				txt_8:''  //текст справа
-			}, v);
-
-			DL.append(
-				'<dd class="over3" val="' + v.id + '">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w35 center">' +
-								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w200">' +
-								'<input type="text"' +
-									  ' class="txt_7 w100p"' +
-									  ' placeholder="текст слева"' +
-									  ' value="' + v.txt_7 + '"' +
-								' />' +
-							'<td class="w150">' +
-								'<input type="text"' +
-									  ' readonly' +
-									  ' class="title w100p curP over4"' +
-									  ' placeholder="значение из диалога"' +
-									  ' value="' + v.title + '"' +
-									  ' val="' + v.num_1 + '"' +
-								' />' +
-							'<td class="w200">' +
-								'<input type="text"' +
-									  ' class="txt_8 w100p"' +
-									  ' placeholder="текст справа"' +
-									  ' value="' + v.txt_8 + '"' +
-								' />' +
-							'<td class="r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить сборку', -48) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			var DD = DL.find('dd:last'),
-				TITLE = DD.find('.title');
-			TITLE.click(function() {
-				if(!v.dialog_id)
-					v.dialog_id = 50;
-				_dialogLoad({
-					dialog_id:v.dialog_id,
-					dialog_source:i.source.dialog_source,
-					unit_id:v.dialog_id != 50 ? v.id || -115 : -115,
-					busy_obj:$(this),
-					busy_cls:'hold',
-					func_save:function(res) {
-						v.id = res.unit.id;
-						DD.attr('val', v.id);
-						TITLE.attr('val', res.unit.num_1);
-						TITLE.val(v.id);
-						DD.find('.txt_8').focus();
-					}
-				});
-			});
-			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
-			});
-			DD.find('.txt_7').focus();
 		}
 	};
 

@@ -182,7 +182,8 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 		});
 
 
-		if(BL.bg70) {
+//		if(BL.bg70)
+		{
 			$(document)
 				.off('click', '#block-set-bg .bg70')
 				.on('click', '#block-set-bg .bg70', function() {
@@ -432,7 +433,7 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 			'<div val="i" class="icon-wiki iw1 ml3' + font.i + _tooltip('Наклонный', -31) + '</div>' +
 			'<div val="u" class="icon-wiki iw2 ml3' + font.u + _tooltip('Подчёкнутый', -39) + '</div>' +
 		'</div>' +
-		(EL.url_access ?
+		(true || EL.url_access ?
 			'<div val="dialog_id:79,unit_id:' + EL.id + '" class="icon-wiki iw12 ml3 dialog-open' + _dn(EL.url, 'on') + _tooltip('Настроить ссылку', -53) + '</div>'
 		: '');
 	},

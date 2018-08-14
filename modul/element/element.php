@@ -1944,24 +1944,112 @@ function PHP12_balans_setup_vvv($parent_id) {
 	return $send;
 }
 
-/* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
-function _historySetup($el, $unit) {//настройка шаблона истории действий (подключение через [12])
+
+/* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ ===--- */
+function PHP12_history_setup($el, $unit) {
 	/*
-		Заглавный элемент: -117
-			num_1 - действие (type_id):
-		              1 - запись внесена
-		              2 - запись изменена
-		              3 - запись удалена
-			num_2 - id диалога, по которому настраивается шаблон
-			txt_1 - список id дочерних элементов
+		действие (type_id):
+			1 - запись внесена
+			2 - запись изменена
+			3 - запись удалена
 
 		Дочерние элементы:
 			txt_7 - текст слева от значения
 			num_8 - значение из диалога
 			txt_8 - текст справа от значения
 	*/
-	return '<input type="hidden" id="type_id" />';
+	return _pr($unit);
 }
+function _historySetup_save($cmp, $val, $unit) {//сохранение настройки шаблона истории действий. Подключаемая функция [12]
+	/*
+		-115
+		$cmp  - компонент из диалога, отвечающий за настройку таблицы
+		$val  - значения, полученные для сохранения
+		$unit - элемент, размещающий таблицу, для которой происходит настройка
+	*/
+
+	$update = array();
+	$idsNoDel = '0';
+
+	if(!$dlg_id = $val['dialog_id'])
+		return;
+	if(!$type_id = $val['type_id'])
+		return;
+
+	$val = @$val['val'];
+	if(!empty($val) && is_array($val)) {
+		$sort = 0;
+		foreach($val as $r) {
+			$num_1 = _num($r['num_1']);
+			$txt_7 = _txt($r['txt_7'], 0, 1);
+			$txt_8 = _txt($r['txt_8'], 0, 1);
+			if(!$num_1 && !$txt_7 && !$txt_8)
+				continue;
+			if($id = _num($r['id']))
+				$idsNoDel .= ','.$id;
+			$update[] = "(
+				".$id.",
+				-".$unit['id'].",
+				'".addslashes($txt_7)."',
+				'".addslashes($txt_8)."',
+				".$sort++.",
+				".USER_ID."
+			)";
+		}
+	}
+
+	//удаление удалённых значений
+	$sql = "DELETE FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			  AND `id` NOT IN (".$idsNoDel.")";
+	query($sql);
+
+	if(!empty($update)) {
+		$sql = "INSERT INTO `_element` (
+					`id`,
+					`block_id`,
+					`txt_7`,
+					`txt_8`,
+					`sort`,
+					`user_id_add`
+				)
+				VALUES ".implode(',', $update)."
+				ON DUPLICATE KEY UPDATE
+					`block_id`=VALUES(`block_id`),
+					`txt_7`=VALUES(`txt_7`),
+					`txt_8`=VALUES(`txt_8`),
+					`sort`=VALUES(`sort`)";
+		query($sql);
+	}
+
+	//очистка неиспользованных элементов
+	$sql = "DELETE FROM `_element`
+			WHERE `user_id_add`=".USER_ID."
+			  AND `block_id` IN (0,-115)";
+	query($sql);
+
+	//обновление значений главного элемента шаблона
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `block_id`=-".$unit['id']."
+			ORDER BY `sort`";
+	$ids = query_ids($sql);
+
+	$sql = "UPDATE `_element`
+			SET `num_1`=".$type_id.",
+				`num_2`=".$dlg_id.",
+				`txt_1`='".($ids ? $ids : '')."'
+			WHERE `id`=".$unit['id'];
+	query($sql);
+
+	//обновление активности в истории
+	$sql = "UPDATE `_history`
+			SET `active`=".($ids ? 1 : 0)."
+			WHERE `type_id`=".$type_id."
+			  AND `dialog_id`=".$dlg_id;
+	query($sql);
+}
+
 function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действий
 	//история не вносится, если единица списка удаляется физически из базы
 	if(!isset($dialog['field1']['deleted']))
