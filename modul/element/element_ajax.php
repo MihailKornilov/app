@@ -151,7 +151,7 @@ switch(@$_POST['op']) {
 							 ' readonly'.
 							 ' placeholder="шаблон истории действий для внесения новой записи"'.
 					'>'.
-						_historyTmp($dialog, 'insert').
+						$dialog['insert_history_tmp'].
 					'</textarea>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-ffd line-t1">'.
@@ -161,7 +161,7 @@ switch(@$_POST['op']) {
 							 ' readonly'.
 							 ' placeholder="шаблон истории действий для редактирования записи"'.
 					'>'.
-						_historyTmp($dialog, 'edit').
+						$dialog['edit_history_tmp'].
 					'</textarea>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-fee line-t1">'.
@@ -171,7 +171,7 @@ switch(@$_POST['op']) {
 							 ' readonly'.
 							 ' placeholder="шаблон истории действий для удаления записи"'.
 					'>'.
-						_historyTmp($dialog, 'del').
+						$dialog['del_history_tmp'].
 					'</textarea>'.
 				'</div>'.
 			'</div>'.

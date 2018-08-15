@@ -131,51 +131,86 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 	if(!$dialog = _BE('dialog', $dialog_id))
 		return array();
 
-		//id заглавных элементов настройки шаблона истории действий
-		foreach(array(1,2,3) as $n) {
-			$dialog['history'][$n]['elem_id'] = 0;
-			$dialog['history'][$n]['tmp'] = '';
-			$dialog['history'][$n]['tmp_elm'] = array();
+	//история действий - сбор id элементов-шаблонов
+	$ids_tmp = array();
+	foreach(_historyAct() as $act => $act_id) {
+		$dialog[$act.'_history_tmp'] = '';      //текст шаблона для отображения в настройках
+		$dialog[$act_id.'_history_elm'] = array();  //элементы, которые участвуют в шаблоне
+
+		if(!$ids = $dialog[$act.'_history_elem'])
 			continue;
 
-			$sql = "SELECT `id`
-					FROM `_element`
-					WHERE `dialog_id`=67
-					  AND `num_1`=".$n."
-					  AND `num_2`=".$dialog_id."
-					LIMIT 1";
-			$elem_id = query_value($sql);
-			$dialog['history'][$n]['elem_id'] = $elem_id;
+		$ids_tmp[] = $ids;
+	}
+	if($ids_tmp = implode(',', $ids_tmp)) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id` IN (".$ids_tmp.")
+				ORDER BY `sort`";
+		$arr = query_arr($sql);
 
-			$tmp_txt = '';//текстовое содержание шаблона истории
-			$tmp_elm = array();//элементы, участвующие в шаблоне истории
-			if($elem_id) {
-				$sql = "SELECT *
+		foreach(_historyAct() as $act => $act_id) {
+			if(!$ids = $dialog[$act.'_history_elem'])
+				continue;
+
+			foreach(_ids($ids, 1) as $id) {
+				if(!isset($arr[$id]))
+					continue;
+
+				$el = $arr[$id];
+
+				$dialog[$act.'_history_tmp'] .= $el['txt_7'].$el['txt_8'].' ';
+				$dialog[$act_id.'_history_elm'][] = $el;
+			}
+		}
+	}
+
+
+	//id заглавных элементов настройки шаблона истории действий
+	foreach(array(1,2,3) as $n) {
+		continue;
+		$dialog['history'][$n]['elem_id'] = 0;
+		$dialog['history'][$n]['tmp'] = '';
+		$dialog['history'][$n]['tmp_elm'] = array();
+
+		$sql = "SELECT `id`
+				FROM `_element`
+				WHERE `dialog_id`=67
+				  AND `num_1`=".$n."
+				  AND `num_2`=".$dialog_id."
+				LIMIT 1";
+		$elem_id = query_value($sql);
+		$dialog['history'][$n]['elem_id'] = $elem_id;
+
+		$tmp_txt = '';      //текстовое содержание шаблона истории
+		$tmp_elm = array();//элементы, участвующие в шаблоне истории
+		if($elem_id) {
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `block_id`=-".$elem_id."
+					ORDER BY `sort`";
+			if($elem = query_arr($sql)) {
+				$sql = "SELECT `id`,`col`
 						FROM `_element`
-						WHERE `block_id`=-".$elem_id."
-						ORDER BY `sort`";
-				if($elem = query_arr($sql)) {
-					$sql = "SELECT `id`,`col`
-							FROM `_element`
-							WHERE `id` IN ("._idsGet($elem, 'num_1').")";
-					$cols = query_ass($sql);
-					foreach($elem as $r) {
-						$num_1 = $r['num_1'] ? '[' . $r['num_1'] . ']' : '';
-						$tmp_txt .= $r['txt_7'].$num_1.$r['txt_8'];
-						switch($r['dialog_id']) {
-							case 11: $col = @$cols[$r['num_1']]; break;
-							case 32: $col = 'num'; break;
-							case 33: $col = 'dtime_add'; break;
-							default: $col = '';
-						}
-						$r['col'] = $col;
-						$tmp_elm[] = $r;
+						WHERE `id` IN ("._idsGet($elem, 'num_1').")";
+				$cols = query_ass($sql);
+				foreach($elem as $r) {
+					$num_1 = $r['num_1'] ? '[' . $r['num_1'] . ']' : '';
+					$tmp_txt .= $r['txt_7'].$num_1.$r['txt_8'];
+					switch($r['dialog_id']) {
+						case 11: $col = @$cols[$r['num_1']]; break;
+						case 32: $col = 'num'; break;
+						case 33: $col = 'dtime_add'; break;
+						default: $col = '';
 					}
+					$r['col'] = $col;
+					$tmp_elm[] = $r;
 				}
 			}
-			$dialog['history'][$n]['tmp'] = trim($tmp_txt);
-			$dialog['history'][$n]['tmp_elm'] = $tmp_elm;
 		}
+		$dialog['history'][$n]['tmp'] = trim($tmp_txt);
+		$dialog['history'][$n]['tmp_elm'] = $tmp_elm;
+	}
 
 	$dialog['blk'] = _BE('block_arr', 'dialog', $dialog_id);
 	$dialog['cmp'] = _BE('elem_arr', 'dialog', $dialog_id);
@@ -1960,40 +1995,33 @@ function PHP12_history_setup($el, $unit) {
 	*/
 	return '';
 }
-function PHP12_history_setup_save($dialog) {//сохранение настройки шаблона истории действий
+function PHP12_history_setup_save($dlg) {//сохранение настройки шаблона истории действий
 	/*
 		одна сборка = один элемент
 		HISTORY_ACT - действие: insert, edit, del
 		HISTORY_KEY - ключ, по которому будут определяться вносимые элементы (временное хранение в `col`)
 	*/
 
-	if($dialog['id'] != 67)
+	if($dlg['id'] != 67)
 		return;
 	if(empty($_POST['vvv']))
 		jsonError('Отсутствуют данные для сохранения');
 	if(!$dialog_id = _num(@$_POST['dialog_source']))
 		jsonError('Отсутствует исходный диалог');
-	if(!$DLG = _dialogQuery($dialog_id))
+	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('Диалога '.$dialog_id.' не существует');
 	if(!$i = _num(key($_POST['vvv'])))
 		jsonError('Отсутствует ключ, по которому находятся данные vvv');
 
 	$v = $_POST['vvv'][$i];
-	define('HISTORY_ACT', $v['act']);
-
-	switch(HISTORY_ACT) {
-		case 'insert': $type_id = 1; break;
-		case 'edit':   $type_id = 2; break;
-		case 'del':    $type_id = 3; break;
-		default:
-			jsonError('Неизвестное действие');
-	}
-
 	$vvv = empty($v['v']) ? array() : $v['v'];
 
 	if(!is_array($vvv))
 		jsonError('Данные не являются массивом');
+	if(!$type_id = _historyAct($v['act']))
+			jsonError('Неизвестное действие');
 
+	define('HISTORY_ACT', $v['act']);
 	define('HISTORY_KEY', '67_'.$dialog_id.'_'.HISTORY_ACT);
 
 	//ID ранее внесённых элементов, которые не будут удалены
@@ -2023,7 +2051,7 @@ function PHP12_history_setup_save($dialog) {//сохранение настро�
 
 	//удаление элементов, которые были удалены
 	$sql = "DELETE FROM `_element`
-			WHERE `id` IN ("._ids($DLG[HISTORY_ACT.'_history_elem']).")
+			WHERE `id` IN ("._ids($dialog[HISTORY_ACT.'_history_elem']).")
 			  AND `id` NOT IN ("._ids($ids).")";
 	query($sql);
 
@@ -2062,15 +2090,11 @@ function PHP12_history_setup_save($dialog) {//сохранение настро�
 			WHERE `id`=".$dialog_id;
 	query($sql);
 
-	$dialog[HISTORY_ACT.'_history_elem'] = $ids;
-
 	//очистка временного ключа
 	$sql = "UPDATE `_element`
 			SET `col`=''
 			WHERE `col`='".HISTORY_KEY."'";
 	query($sql);
-
-	_BE('dialog_clear');
 
 	//обновление активности в истории
 	$sql = "UPDATE `_history`
@@ -2079,7 +2103,10 @@ function PHP12_history_setup_save($dialog) {//сохранение настро�
 			  AND `dialog_id`=".$dialog_id;
 	query($sql);
 
-	$send['tmp'] = _historyTmp($dialog, HISTORY_ACT);
+	_BE('dialog_clear');
+	$dialog = _dialogQuery($dialog_id);
+
+	$send['tmp'] = $dialog[HISTORY_ACT.'_history_tmp'];
 	jsonSuccess($send);
 }
 function PHP12_history_setup_vvv($unit_id, $src) {//получение значений для настройки истории действий
@@ -2120,30 +2147,27 @@ function PHP12_history_setup_vvv($unit_id, $src) {//получение знач�
 	return $send;
 }
 
-function _historyTmp($dialog, $act) {//текст шаблона для конкретного действия
-	if(!$ids = $dialog[$act.'_history_elem'])
-		return '';
+function _historyAct($i='all') {//действия истории - ассоциативный массив
+	$action =  array(
+		'insert' => 1,
+		'edit' => 2,
+		'del' => 3
+	);
 
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id` IN (".$ids.")
-			ORDER BY `sort`";
-	if(!$arr = query_arr($sql))
-		return '';
+	if($i == 'all')
+		return $action;
 
-	$send = '';
-	foreach($arr as $r) {
-		$send .= $r['txt_7'].$r['txt_8'].' ';
-	}
-	return trim($send);
+	if(!isset($action[$i]))
+		return false;
+
+	return $action[$i];
 }
-
 function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действий
 	//история не вносится, если единица списка удаляется физически из базы
 	if(!isset($dialog['field1']['deleted']))
 		return;
 
-	$active = empty($dialog['history'][$type_id]['tmp_elm']) ? 0 : 1;
+	$active = empty($dialog[$type_id.'_history_elm']) ? 0 : 1;
 
 	$sql = "INSERT INTO `_history` (
 				`app_id`,
@@ -2199,7 +2223,7 @@ function _historySpisok($el) {//список истории действий [68
 			$dlg = _dialogQuery($r['dialog_id']);
 			$msg = '';
 			$unit = $spUnit[$r['unit_id']];
-			foreach($dlg['history'][$r['type_id']]['tmp_elm'] as $el) {
+			foreach($dlg[$r['type_id'].'_history_elm'] as $el) {
 				$colVal = '';
 				if($col = $el['col']) {
 					if(!isset($unit[$col]))
