@@ -275,7 +275,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о ди�
 	if(!$dialog_id = _num($_POST['dialog_id']))
 		jsonError('Некорректный ID диалогового окна');
 	if(!$dialog = _dialogQuery($dialog_id))
-		jsonError('Диалога не существует');
+		jsonError('Диалога '.$dialog_id.' не существует');
 	if($dialog['sa'] && !SA)
 		jsonError('Нет доступа');
 
@@ -318,8 +318,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	//элемент выбирает блоки из диалога - через [19] - перехват внесения данных
 	_elem19_block_choose($dialog);
 
-	//настройка истории действий - через [67] - перехват внесения данных
-	_elem67_history_setup($dialog);
+	//сохранение настройки истории действий - через [67] - перехват внесения данных
+	PHP12_history_setup_save($dialog);
 
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 
@@ -1255,12 +1255,6 @@ function _elem19_block_choose($dialog) {//выбор блоков через [11
 	$send['ids'] = _ids($vvv[$elem_func_id]);
 
 	jsonSuccess($send);
-}
-function _elem67_history_setup($dialog) {
-	if($dialog['id'] != 67)
-		return;
-
-	jsonSuccess();
 }
 
 function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления единицы списка

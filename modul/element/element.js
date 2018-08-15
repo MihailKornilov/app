@@ -351,13 +351,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 				_dialogLoad({
 					dialog_id:67,
 					dialog_source:o.dialog_id,
+					unit_id:-1,
 					prm:{
 						act:act
 					},
 					busy_obj:t,
 					busy_cls:'hold',
 					func_save:function(res) {
-//						t.val(res.unit.title);
+						t.val(res.tmp);
 						t._flash();
 					}
 				});
@@ -373,7 +374,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					msg:'Включение ' + ACT_NAME[act] + ' записи',
 					side:'left',
 					show:1,
-					delayShow:1500
+					delayShow:750
 				});
 			});
 		});
@@ -2620,7 +2621,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(unit == 'get')
 			return PHP12_history_get(el);
 
-		var html = '<dl></dl>' +
+		var html = '<input type="hidden" class="act" value="' + unit.source.prm.act + '" />' +  //действие: insert, edit, del
+				   '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
@@ -2641,10 +2643,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,     //id элемента-сборки
-
-				ds:unit.source.dialog_source,   //id диалога, для которого производится настройка
-				act:unit.source.prm.act,        //действие: indert, edit, del
-
 				dialog_id:50,  //id диалога, вносившего элемента-значения
 				num_1:0,  //id элемента-значения
 				title:'', //имя элемента-значения
@@ -2654,8 +2652,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			DL.append(
 				'<dd class="over3" val="' + v.id + '">' +
-					'<input type="hidden" class="ds"  value="' + v.ds + '" />' +
-					'<input type="hidden" class="act" value="' + v.act + '" />' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w35 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
@@ -2688,8 +2684,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			var DD = DL.find('dd:last'),
 				TITLE = DD.find('.title');
 			TITLE.click(function() {
-				if(!v.dialog_id)
-					v.dialog_id = 50;
 				_dialogLoad({
 					dialog_id:v.dialog_id,
 					dialog_source:unit.source.dialog_source,
@@ -2718,14 +2712,16 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
 				id:_num(sp.attr('val')),
-				ds:sp.find('.ds').val(),
 				act:sp.find('.act').val(),
 				num_1:sp.find('.title').attr('val'),
 				txt_7:sp.find('.txt_7').val(),
 				txt_8:sp.find('.txt_8').val()
 			});
 		});
-		return send;
+		return {
+			act:_attr_el(el.id).find('.act').val(),
+			v:send
+		};
 	},
 
 	_elemGroup = function(v, dlg) {//функция, которая выполняется после открытия окна выбора элемента

@@ -551,7 +551,7 @@ function _elemVvv($elem_id, $src=array()) {
 
 	$block_id =  _num(@$src['block_id']);
 	$dialog_id = _num(@$src['dialog_id']);
-	$unit_id = _num(@$src['unit_id']);
+	$unit_id = _num(@$src['unit_id'], 1);
 	$unit = $unit_id ? $src['unit'] : array();
 
 	switch($el['dialog_id']) {
@@ -564,7 +564,7 @@ function _elemVvv($elem_id, $src=array()) {
 			if(!function_exists($func))
 				break;
 
-			return $func($unit_id);
+			return $func($unit_id, $src);
 
 		//Radio
 		case 16:
@@ -1958,96 +1958,184 @@ function PHP12_history_setup($el, $unit) {
 			num_8 - значение из диалога
 			txt_8 - текст справа от значения
 	*/
-	return _pr($unit);
+	return '';
 }
-function _historySetup_save($cmp, $val, $unit) {//сохранение настройки шаблона истории действий. Подключаемая функция [12]
+function PHP12_history_setup_save($dialog) {//сохранение настройки шаблона истории действий
 	/*
-		-115
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
+		одна сборка = один элемент
+		HISTORY_ACT - действие: insert, edit, del
+		HISTORY_KEY - ключ, по которому будут определяться вносимые элементы (временное хранение в `col`)
 	*/
 
-	$update = array();
-	$idsNoDel = '0';
-
-	if(!$dlg_id = $val['dialog_id'])
+	if($dialog['id'] != 67)
 		return;
-	if(!$type_id = $val['type_id'])
-		return;
+	if(empty($_POST['vvv']))
+		jsonError('Отсутствуют данные для сохранения');
+	if(!$dialog_id = _num(@$_POST['dialog_source']))
+		jsonError('Отсутствует исходный диалог');
+	if(!$DLG = _dialogQuery($dialog_id))
+		jsonError('Диалога '.$dialog_id.' не существует');
+	if(!$i = _num(key($_POST['vvv'])))
+		jsonError('Отсутствует ключ, по которому находятся данные vvv');
 
-	$val = @$val['val'];
-	if(!empty($val) && is_array($val)) {
-		$sort = 0;
-		foreach($val as $r) {
-			$num_1 = _num($r['num_1']);
-			$txt_7 = _txt($r['txt_7'], 0, 1);
-			$txt_8 = _txt($r['txt_8'], 0, 1);
-			if(!$num_1 && !$txt_7 && !$txt_8)
-				continue;
-			if($id = _num($r['id']))
-				$idsNoDel .= ','.$id;
-			$update[] = "(
-				".$id.",
-				-".$unit['id'].",
-				'".addslashes($txt_7)."',
-				'".addslashes($txt_8)."',
-				".$sort++.",
-				".USER_ID."
-			)";
-		}
+	$v = $_POST['vvv'][$i];
+	define('HISTORY_ACT', $v['act']);
+
+	switch(HISTORY_ACT) {
+		case 'insert': $type_id = 1; break;
+		case 'edit':   $type_id = 2; break;
+		case 'del':    $type_id = 3; break;
+		default:
+			jsonError('Неизвестное действие');
 	}
 
-	//удаление удалённых значений
+	$vvv = empty($v['v']) ? array() : $v['v'];
+
+	if(!is_array($vvv))
+		jsonError('Данные не являются массивом');
+
+	define('HISTORY_KEY', '67_'.$dialog_id.'_'.HISTORY_ACT);
+
+	//ID ранее внесённых элементов, которые не будут удалены
+	$ids = array();
+	$update = array();
+
+	foreach($vvv as $sort => $r) {
+		$txt_7 = _txt($r['txt_7']);
+		$num_1 = _num($r['num_1']);
+		$txt_8 = _txt($r['txt_8']);
+		if(!$txt_7 && !$num_1 && !$txt_8)
+			continue;
+		if($id = _num($r['id']))
+			$ids[] = $id;
+		$update[] = "(
+			".$id.",
+			'".HISTORY_KEY."',
+			'".addslashes($txt_7)."',
+			".$num_1.",
+			'".addslashes($txt_8)."',
+			".$sort.",
+			".USER_ID."
+		)";
+	}
+
+	$ids = implode(',', $ids);
+
+	//удаление элементов, которые были удалены
 	$sql = "DELETE FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `id` NOT IN (".$idsNoDel.")";
+			WHERE `id` IN ("._ids($DLG[HISTORY_ACT.'_history_elem']).")
+			  AND `id` NOT IN ("._ids($ids).")";
 	query($sql);
 
 	if(!empty($update)) {
 		$sql = "INSERT INTO `_element` (
 					`id`,
-					`block_id`,
+					`col`,
 					`txt_7`,
+					`num_1`,
 					`txt_8`,
 					`sort`,
 					`user_id_add`
 				)
 				VALUES ".implode(',', $update)."
 				ON DUPLICATE KEY UPDATE
-					`block_id`=VALUES(`block_id`),
+					`col`=VALUES(`col`),
 					`txt_7`=VALUES(`txt_7`),
+					`num_1`=VALUES(`num_1`),
 					`txt_8`=VALUES(`txt_8`),
 					`sort`=VALUES(`sort`)";
 		query($sql);
 	}
 
-	//очистка неиспользованных элементов
-	$sql = "DELETE FROM `_element`
-			WHERE `user_id_add`=".USER_ID."
-			  AND `block_id` IN (0,-115)";
-	query($sql);
-
-	//обновление значений главного элемента шаблона
+	//получение ID элементов, которые были сохранены
 	$sql = "SELECT `id`
 			FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
+			WHERE `col`='".HISTORY_KEY."'
+			  AND `user_id_add`=".USER_ID."
 			ORDER BY `sort`";
 	$ids = query_ids($sql);
+	$ids = $ids ? $ids : '';
 
-	$sql = "UPDATE `_element`
-			SET `num_1`=".$type_id.",
-				`num_2`=".$dlg_id.",
-				`txt_1`='".($ids ? $ids : '')."'
-			WHERE `id`=".$unit['id'];
+	//сохранение ID элементов в диалоге
+	$sql = "UPDATE `_dialog`
+			SET `".HISTORY_ACT."_history_elem`='".$ids."'
+			WHERE `id`=".$dialog_id;
 	query($sql);
+
+	$dialog[HISTORY_ACT.'_history_elem'] = $ids;
+
+	//очистка временного ключа
+	$sql = "UPDATE `_element`
+			SET `col`=''
+			WHERE `col`='".HISTORY_KEY."'";
+	query($sql);
+
+	_BE('dialog_clear');
 
 	//обновление активности в истории
 	$sql = "UPDATE `_history`
 			SET `active`=".($ids ? 1 : 0)."
 			WHERE `type_id`=".$type_id."
-			  AND `dialog_id`=".$dlg_id;
+			  AND `dialog_id`=".$dialog_id;
 	query($sql);
+
+	$send['tmp'] = _historyTmp($dialog, HISTORY_ACT);
+	jsonSuccess($send);
+}
+function PHP12_history_setup_vvv($unit_id, $src) {//получение значений для настройки истории действий
+	if(empty($src['unit']['source']))
+		return array();
+
+	$src = $src['unit']['source'];
+
+	if(!$dialog_id = _num($src['dialog_source']))
+		return array();
+	if(!$DLG = _dialogQuery($dialog_id))
+		return array();
+
+	$act = $src['prm']['act'];
+
+	if(!$ids = $DLG[$act.'_history_elem'])
+		return array();
+
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id` IN (".$ids.")
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$send = array();
+	foreach($arr as $r) {
+		$send[] = array(
+			'id' => _num($r['id']),
+			'dialog_id' => $r['dialog_id'],
+			'title' => _elemTitle($r['id']),
+			'txt_7' => $r['txt_7'],
+			'num_1' => _num($r['num_1']),
+			'txt_8' => $r['txt_8']
+		);
+	}
+	return $send;
+}
+
+function _historyTmp($dialog, $act) {//текст шаблона для конкретного действия
+	if(!$ids = $dialog[$act.'_history_elem'])
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id` IN (".$ids.")
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$send = '';
+	foreach($arr as $r) {
+		$send .= $r['txt_7'].$r['txt_8'].' ';
+	}
+	return trim($send);
 }
 
 function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действий
