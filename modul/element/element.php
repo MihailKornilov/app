@@ -972,6 +972,213 @@ function _filterCheckSetup() {//настройка условий фильтра
 
 
 
+/* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
+function PHP12_elem_choose($el, $unit) {//выбор элемента для вставки в блок. Диалог [50]
+	if(empty($unit['source']))
+		return _emptyMin('Отсутствуют исходные данные.');
+
+	$SRC = $unit['source'];
+
+	//данные исходного блока
+	$block_id = _num($SRC['block_id']);
+	if(!$BL = _blockOne($block_id))
+		$BL = array(
+			'obj_id' => 0,
+			'obj_name' => '',
+			'elem' => array()
+		);
+	$EL = $BL['elem'];
+
+	define('OBJ_ID', _num($BL['obj_id']));
+
+	//ячейка таблицы
+	define('TD_UNIT', $EL && $EL['dialog_id'] == 23);
+
+	//сборный текст
+	define('_44_UNIT',  $EL && $EL['dialog_id'] == 44);
+
+	//блок со страницы
+	define('BLOCK_PAGE', !TD_UNIT && !_44_UNIT && $BL['obj_name'] == 'page');
+
+	//блок из диалога
+	define('BLOCK_DIALOG', !TD_UNIT && !_44_UNIT && $BL['obj_name'] == 'dialog');
+
+	//блок единицы списка
+	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
+
+	//принимает ли страница значения единицы списка
+	$spisok_id = 0;
+	if(BLOCK_PAGE) {
+		$page = _page(OBJ_ID);
+		$spisok_id = $page['spisok_id'];
+	}
+	define('PAGE_SPISOK_UNIT', $spisok_id);
+
+	//принимает ли диалог значения единицы списка
+	define('DIALOG_SPISOK_UNIT', 0);
+
+/*
+	$BL['obj_name'] = $unit['source']['unit_id'] == -115 ? 'spisok' : '';
+	if($block_id = _num($unit['source']['block_id'], 1))
+		if(!$BL = _blockOne($block_id))
+			return _emptyMin('Исходного блока id'.$block_id.' не существует.');
+
+	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//сборный текст, шаблон истории действий
+
+	if(BLOCK_DIALOG) {
+		$page = _page($unit['source']['page_id']);
+		$spisok_exist = $page['spisok_id'];
+	}
+	define('IS_SPISOK_UNIT', BLOCK_SPISOK || TD_PASTE || $spisok_exist);
+*/
+
+	$head = '';
+	$content = '';
+	$sql = "SELECT *
+			FROM `_dialog_group`
+			WHERE `sa` IN (0,".SA.")
+			ORDER BY `sort`";
+	if(!$group = query_arr($sql))
+		return _emptyMin('Отсутствуют группы элементов.');
+
+	foreach($group as $id => $r)
+		$group[$id]['elem'] = array();
+
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `element_group_id` IN ("._idsGet($group).")
+			  AND `sa` IN (0,".SA.")
+			ORDER BY `sort`,`id`";
+	if(!$elem = query_arr($sql))
+		return _emptyMin('Нет элементов для отображения.');
+
+	//расстановка элементов в группы с учётом правил отображения
+	foreach($elem as $id => $r) {
+/*
+		if(_44_ACCESS && !$r['element_paste_44'])
+			continue;
+//		if(IS_SPISOK_UNIT && !$r['element_is_spisok_unit'])
+//			continue;
+*/
+
+		$show = false;
+
+		if(BLOCK_PAGE && $r['element_paste_page']
+		|| BLOCK_DIALOG && $r['element_paste_dialog']
+		|| BLOCK_SPISOK && $r['element_paste_spisok']
+		|| TD_UNIT && $r['element_paste_td']
+		|| _44_UNIT && $r['element_paste_44']
+		) $show = true;
+
+//		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
+//			$show = false;
+
+//		if($show)
+			$group[$r['element_group_id']]['elem'][] = $r;
+	}
+
+	foreach($group as $id => $r)
+		if(empty($r['elem']))
+			unset($group[$id]);
+
+	if(empty($group))
+		return _emptyMin('Нет элементов для отображения.').
+			   PHP12_elem_choose_gebug($BL)._pr($unit);
+
+	reset($group);
+	$firstId = key($group);
+	foreach($group as $id => $r) {
+		$sel = _dn($id != $firstId, 'sel');
+		$first = _dn($id != $firstId, 'first');
+		$head .=
+			'<table class="el-group-head'.$first.$sel.'" val="'.$id.'">'.
+				'<tr>'.
+	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
+					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'.$r['name'].
+			'</table>';
+
+		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == $firstId).'">';
+		$n = 1;
+		foreach($r['elem'] as $el)
+				$content .=
+					'<dd val="'.$el['id'].'">'.
+						'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
+							'<table class="w100p">'.
+								'<tr><td class="num w25 r top pr5 grey">'.$n++.'.'.
+									'<td class="b top">'.$el['name'].
+							  (SA ? '<td class="w50 top">'.
+										'<div class="icon icon-move-y fr pl"></div>'.
+								        '<div class="icon icon-edit fr pl mr3"></div>'
+							  : '').
+							'</table>'.
+							'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
+						'</div>'.
+					'</dd>';
+		$content .=	'</dl>';
+	}
+
+	return
+		'<table id="elem-group" class="w100p">'.
+			'<tr><td class="w150 top prel">'.
+					'<div id="head-back"></div>'.
+					$head.
+				'<td id="elem-group-content" class="top">'.
+					'<div class="cnt-div">'.$content.'<div>'.
+		'</table>'.
+		PHP12_elem_choose_gebug($BL).
+		'';
+}
+function PHP12_elem_choose_gebug($BL) {//выбор элемента - группы
+	if(!DEBUG)
+		return '';
+
+	//определение местоположения блока
+	$place = '';
+	switch($BL['obj_name']) {
+		case 'page': $place = 'страницы'; break;
+		case 'dialog': $place = 'диалога '.$BL['obj_id']; break;
+		case 'spisok': $place = 'единицы списка'; break;
+	}
+
+	return
+//	_pr($unit).
+//	_pr($BL).
+	'<div class="line-t pad10 bg-ffe">'.
+		'<div class="'.(BLOCK_PAGE ? 'color-pay b' : 'pale').'">'.
+			'Блок '.(BLOCK_PAGE ? $BL['id'] : '').' на странице '.
+			(BLOCK_PAGE ? OBJ_ID : '').
+		'</div>'.
+
+		'<div class="'.(PAGE_SPISOK_UNIT ? 'color-pay b' : 'pale').'">'.
+			'Страница '.(PAGE_SPISOK_UNIT ? '' : 'не ').'принимает значения списка'.
+			(PAGE_SPISOK_UNIT ? ' из диалога '.PAGE_SPISOK_UNIT : '').
+		'</div>'.
+
+		'<div class="mt10 '.(BLOCK_DIALOG ? 'color-pay b' : 'pale').'">'.
+			'Блок '.(BLOCK_DIALOG ? $BL['id'] : '').' в диалоге '.
+			(BLOCK_DIALOG ? OBJ_ID : '').
+		'</div>'.
+
+		'<div class="'.(DIALOG_SPISOK_UNIT ? 'color-pay b' : 'pale').'">'.
+			'Диалог '.(DIALOG_SPISOK_UNIT ? '' : 'не ').'принимает значения списка'.
+		'</div>'.
+
+		'<div class="mt10 '.(BLOCK_SPISOK ? 'color-pay b' : 'pale').'">'.
+			'Блок '.(BLOCK_SPISOK ? $BL['id'] : '').' из единицы списка'.
+			(BLOCK_SPISOK ? '. Список размещён в блоке '.OBJ_ID : '').
+		'</div>'.
+
+		'<div class="'.(TD_UNIT ? 'color-pay b' : 'pale').'">'.
+			'Ячейка таблицы'.
+			(TD_UNIT ? '. Элемент(таблица) '.$BL['elem_id'].' размещён в блоке '.$BL['id'].' '.$place : '').
+		'</div>'.
+
+		'<div class="'.(_44_UNIT ? 'color-pay b' : 'pale').'">'.
+			'Сборный текст'.
+			(_44_UNIT ? '. Элемент '.$BL['elem_id'].' размещён в блоке '.$BL['id'].' '.$place : '').
+		'</div>'.
+	'</div>';
+}
 
 
 /* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
@@ -1180,7 +1387,6 @@ function PHP12_v_choose_page_spisok_unit($SRC, $dialog_id) {//страница �
 }
 
 
-
 /* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 function PHP12_block_choose($el, $unit) {
 	$SRC = $unit['source'];
@@ -1240,216 +1446,6 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 	'</div>'.
 	'<div class="block-content-spisok" style="width:'.$width.'px">'.
 		_blockHtml('spisok', $unit['id'], array('blk_edit' => 1)).
-	'</div>';
-}
-
-
-/* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
-function PHP12_elem_choose($el, $unit) {//выбор элемента для вставки в блок. Диалог [50]
-	if(empty($unit['source']))
-		return _emptyMin('Отсутствуют исходные данные.');
-
-	$SRC = $unit['source'];
-
-	//данные исходного блока
-	if(!$block_id = _num($SRC['block_id']))
-		return _emptyMin('Не получен ID исходного блока.');
-	if(!$BL = _blockOne($block_id))
-		return _emptyMin('Исходного блока '.$block_id.' не существует.');
-
-	$EL = $BL['elem'];
-
-	define('OBJ_ID', _num($BL['obj_id']));
-
-	//ячейка таблицы
-	define('TD_UNIT', $EL && $EL['dialog_id'] == 23);
-
-	//сборный текст
-	define('_44_UNIT',  $EL && $EL['dialog_id'] == 44);
-
-	//блок со страницы
-	define('BLOCK_PAGE', !TD_UNIT && !_44_UNIT && $BL['obj_name'] == 'page');
-
-	//блок из диалога
-	define('BLOCK_DIALOG', !TD_UNIT && !_44_UNIT && $BL['obj_name'] == 'dialog');
-
-	//блок единицы списка
-	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
-
-	//принимает ли страница значения единицы списка
-	$spisok_id = 0;
-	if(BLOCK_PAGE) {
-		$page = _page(OBJ_ID);
-		$spisok_id = $page['spisok_id'];
-	}
-	define('PAGE_SPISOK_UNIT', $spisok_id);
-
-	//принимает ли диалог значения единицы списка
-	define('DIALOG_SPISOK_UNIT', 0);
-
-/*
-	$BL['obj_name'] = $unit['source']['unit_id'] == -115 ? 'spisok' : '';
-	if($block_id = _num($unit['source']['block_id'], 1))
-		if(!$BL = _blockOne($block_id))
-			return _emptyMin('Исходного блока id'.$block_id.' не существует.');
-
-	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//сборный текст, шаблон истории действий
-
-	if(BLOCK_DIALOG) {
-		$page = _page($unit['source']['page_id']);
-		$spisok_exist = $page['spisok_id'];
-	}
-	define('IS_SPISOK_UNIT', BLOCK_SPISOK || TD_PASTE || $spisok_exist);
-*/
-
-	$head = '';
-	$content = '';
-	$sql = "SELECT *
-			FROM `_dialog_group`
-			WHERE `sa` IN (0,".SA.")
-			ORDER BY `sort`";
-	if(!$group = query_arr($sql))
-		return _emptyMin('Отсутствуют группы элементов.');
-
-	foreach($group as $id => $r)
-		$group[$id]['elem'] = array();
-
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE `element_group_id` IN ("._idsGet($group).")
-			  AND `sa` IN (0,".SA.")
-			ORDER BY `sort`,`id`";
-	if(!$elem = query_arr($sql))
-		return _emptyMin('Нет элементов для отображения.');
-
-	//расстановка элементов в группы с учётом правил отображения
-	foreach($elem as $id => $r) {
-/*
-		if(_44_ACCESS && !$r['element_paste_44'])
-			continue;
-//		if(IS_SPISOK_UNIT && !$r['element_is_spisok_unit'])
-//			continue;
-*/
-
-		$show = false;
-
-		if(BLOCK_PAGE && $r['element_paste_page']
-		|| BLOCK_DIALOG && $r['element_paste_dialog']
-		|| BLOCK_SPISOK && $r['element_paste_spisok']
-		|| TD_UNIT && $r['element_paste_td']
-		|| _44_UNIT && $r['element_paste_44']
-		) $show = true;
-
-//		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
-//			$show = false;
-
-		if($show)
-			$group[$r['element_group_id']]['elem'][] = $r;
-	}
-
-	foreach($group as $id => $r)
-		if(empty($r['elem']))
-			unset($group[$id]);
-
-	if(empty($group))
-		return _emptyMin('Нет элементов для отображения.');
-
-	reset($group);
-	$firstId = key($group);
-	foreach($group as $id => $r) {
-		$sel = _dn($id != $firstId, 'sel');
-		$first = _dn($id != $firstId, 'first');
-		$head .=
-			'<table class="el-group-head'.$first.$sel.'" val="'.$id.'">'.
-				'<tr>'.
-	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
-					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'.$r['name'].
-			'</table>';
-
-		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == $firstId).'">';
-		$n = 1;
-		foreach($r['elem'] as $el)
-				$content .=
-					'<dd val="'.$el['id'].'">'.
-						'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
-							'<table class="w100p">'.
-								'<tr><td class="num w25 r top pr5 grey">'.$n++.'.'.
-									'<td class="b top">'.$el['name'].
-							  (SA ? '<td class="w50 top">'.
-										'<div class="icon icon-move-y fr pl"></div>'.
-								        '<div class="icon icon-edit fr pl mr3"></div>'
-							  : '').
-							'</table>'.
-							'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
-						'</div>'.
-					'</dd>';
-		$content .=	'</dl>';
-	}
-
-	return
-		'<table id="elem-group" class="w100p">'.
-			'<tr><td class="w150 top prel">'.
-					'<div id="head-back"></div>'.
-					$head.
-				'<td id="elem-group-content" class="top">'.
-					'<div class="cnt-div">'.$content.'<div>'.
-		'</table>'.
-		PHP12_elem_choose_gebug($el, $unit).
-		'';
-}
-function PHP12_elem_choose_gebug($el, $unit) {//выбор элемента - группы
-	if(!DEBUG)
-		return '';
-
-	$SRC = $unit['source'];
-	$block_id = $SRC['block_id'];
-	$BL = _blockOne($SRC['block_id']);
-
-	//определение местоположения блока
-	$place = '';
-	switch($BL['obj_name']) {
-		case 'page': $place = 'страницы'; break;
-		case 'dialog': $place = 'диалога '.$BL['obj_id']; break;
-		case 'spisok': $place = 'единицы списка'; break;
-	}
-
-	return
-//	_pr($unit).
-//	_pr($BL).
-	'<div class="line-t pad10 bg-ffe">'.
-		'<div class="'.(BLOCK_PAGE ? 'color-pay b' : 'pale').'">'.
-			'Блок '.(BLOCK_PAGE ? $block_id : '').' на странице '.
-			(BLOCK_PAGE ? OBJ_ID : '').
-		'</div>'.
-
-		'<div class="'.(PAGE_SPISOK_UNIT ? 'color-pay b' : 'pale').'">'.
-			'Страница '.(PAGE_SPISOK_UNIT ? '' : 'не ').'принимает значения списка'.
-			(PAGE_SPISOK_UNIT ? ' из диалога '.PAGE_SPISOK_UNIT : '').
-		'</div>'.
-
-		'<div class="mt10 '.(BLOCK_DIALOG ? 'color-pay b' : 'pale').'">'.
-			'Блок '.(BLOCK_DIALOG ? $block_id : '').' в диалоге '.
-			(BLOCK_DIALOG ? OBJ_ID : '').
-		'</div>'.
-
-		'<div class="'.(DIALOG_SPISOK_UNIT ? 'color-pay b' : 'pale').'">'.
-			'Диалог '.(DIALOG_SPISOK_UNIT ? '' : 'не ').'принимает значения списка'.
-		'</div>'.
-
-		'<div class="mt10 '.(BLOCK_SPISOK ? 'color-pay b' : 'pale').'">'.
-			'Блок '.(BLOCK_SPISOK ? $block_id : '').' из единицы списка'.
-			(BLOCK_SPISOK ? '. Список размещён в блоке '.OBJ_ID : '').
-		'</div>'.
-
-		'<div class="'.(TD_UNIT ? 'color-pay b' : 'pale').'">'.
-			'Ячейка таблицы'.
-			(TD_UNIT ? '. Элемент(таблица) '.$BL['elem_id'].' размещён в блоке '.$block_id.' '.$place : '').
-		'</div>'.
-
-		'<div class="'.(_44_UNIT ? 'color-pay b' : 'pale').'">'.
-			'Сборный текст'.
-			(_44_UNIT ? '. Элемент '.$BL['elem_id'].' размещён в блоке '.$block_id.' '.$place : '').
-		'</div>'.
 	'</div>';
 }
 
@@ -2136,15 +2132,15 @@ function PHP12_history_setup_vvv($unit_id, $src) {//получение знач�
 	$send = array();
 	foreach($arr as $r) {
 		$send[] = array(
-			'id' => _num($r['id']),
+			'id' => $r['id'],
 			'dialog_id' => $r['dialog_id'],
 			'title' => _elemTitle($r['id']),
 			'txt_7' => $r['txt_7'],
-			'num_1' => _num($r['num_1']),
+			'num_1' => $r['num_1'],
 			'txt_8' => $r['txt_8']
 		);
 	}
-	return $send;
+	return _arrNum($send);
 }
 
 function _historyAct($i='all') {//действия истории - ассоциативный массив

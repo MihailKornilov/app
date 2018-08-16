@@ -1899,6 +1899,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(!DLG)
 			return;
 
+		console.log(unit.source);
+
 		var D = DLG.D,
 			VC = D(ATTR_EL(el.id)).find('.v-choose'),//элементы в открытом диалоге для выбора
 			sev = unit.source.prm.sev,               //выбор нескольких значений
@@ -2685,8 +2687,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 				TITLE = DD.find('.title');
 			TITLE.click(function() {
 				_dialogLoad({
-					dialog_id:v.dialog_id,
+					dialog_id:v.dialog_id || 50,
 					dialog_source:unit.source.dialog_source,
+					block_id:-1,
 					unit_id:v.id,
 					busy_obj:$(this),
 					busy_cls:'hold',
