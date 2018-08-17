@@ -2646,7 +2646,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			v = $.extend({
 				id:0,     //id элемента-сборки
 				dialog_id:50,  //id диалога, вносившего элемента-значения
-				num_1:0,  //id элемента-значения
 				title:'', //имя элемента-значения
 				txt_7:'', //текст слева
 				txt_8:''  //текст справа
@@ -2669,7 +2668,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 									  ' class="title w100p curP over4"' +
 									  ' placeholder="значение из диалога"' +
 									  ' value="' + v.title + '"' +
-									  ' val="' + v.num_1 + '"' +
 								' />' +
 							'<td class="w200">' +
 								'<input type="text"' +
@@ -2696,8 +2694,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					func_save:function(res) {
 						v.id = res.unit.id;
 						DD.attr('val', v.id);
-						TITLE.attr('val', res.unit.num_1);
-						TITLE.val(v.id);
+						TITLE.val(res.unit.title);
 						DD.find('.txt_8').focus();
 					}
 				});
@@ -2715,8 +2712,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
 				id:_num(sp.attr('val')),
-				act:sp.find('.act').val(),
-				num_1:sp.find('.title').attr('val'),
 				txt_7:sp.find('.txt_7').val(),
 				txt_8:sp.find('.txt_8').val()
 			});

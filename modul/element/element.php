@@ -158,8 +158,9 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 					continue;
 
 				$el = $arr[$id];
+				$title = $el['dialog_id'] ? '['._elemTitle($el['id']).']' : '';
 
-				$dialog[$act.'_history_tmp'] .= $el['txt_7'].$el['txt_8'].' ';
+				$dialog[$act.'_history_tmp'] .= $el['txt_7'].' '.$title.' '.$el['txt_8'].' ';
 				$dialog[$act_id.'_history_elm'][] = $el;
 			}
 		}
@@ -836,8 +837,13 @@ function _elemVvv($elem_id, $src=array()) {
 function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
 	if(!$elem_id = _num($elem_id))
 		return '';
-	if(!$el = _elemOne($elem_id))
-		return '';
+	if(!$el = _elemOne($elem_id)) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id`=".$elem_id;
+		if(!$el = _arrNum(query_assoc($sql)))
+			return '';
+	}
 	if(!$el_parent)
 		$el_parent = $el;
 
@@ -2026,9 +2032,8 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 
 	foreach($vvv as $sort => $r) {
 		$txt_7 = _txt($r['txt_7']);
-		$num_1 = _num($r['num_1']);
 		$txt_8 = _txt($r['txt_8']);
-		if(!$txt_7 && !$num_1 && !$txt_8)
+		if(!$txt_7 && !$txt_8)
 			continue;
 		if($id = _num($r['id']))
 			$ids[] = $id;
@@ -2036,7 +2041,6 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 			".$id.",
 			'".HISTORY_KEY."',
 			'".addslashes($txt_7)."',
-			".$num_1.",
 			'".addslashes($txt_8)."',
 			".$sort.",
 			".USER_ID."
@@ -2056,7 +2060,6 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 					`id`,
 					`col`,
 					`txt_7`,
-					`num_1`,
 					`txt_8`,
 					`sort`,
 					`user_id_add`
@@ -2065,7 +2068,6 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 				ON DUPLICATE KEY UPDATE
 					`col`=VALUES(`col`),
 					`txt_7`=VALUES(`txt_7`),
-					`num_1`=VALUES(`num_1`),
 					`txt_8`=VALUES(`txt_8`),
 					`sort`=VALUES(`sort`)";
 		query($sql);
@@ -2136,7 +2138,6 @@ function PHP12_history_setup_vvv($unit_id, $src) {//получение знач�
 			'dialog_id' => $r['dialog_id'],
 			'title' => _elemTitle($r['id']),
 			'txt_7' => $r['txt_7'],
-			'num_1' => $r['num_1'],
 			'txt_8' => $r['txt_8']
 		);
 	}
@@ -2220,6 +2221,7 @@ function _historySpisok($el) {//список истории действий [68
 			$msg = '';
 			$unit = $spUnit[$r['unit_id']];
 			foreach($dlg[$r['type_id'].'_history_elm'] as $el) {
+/*
 				$colVal = '';
 				if($col = $el['col']) {
 					if(!isset($unit[$col]))
@@ -2229,7 +2231,12 @@ function _historySpisok($el) {//список истории действий [68
 					if($col == 'dtime_add')
 						$colVal = _spisokUnitData($el, $unit);
 				}
-				$msg .= $el['txt_7'].$colVal.$el['txt_8'];
+*/
+				$val = '';
+				if($el['dialog_id']) {
+					$val = _elemUnit($el, $unit);
+				}
+				$msg .= $el['txt_7'].' '.$val.' '.$el['txt_8'];
 			}
 			$un .= '<div class="history-un">'.
 						'<div class="history-o o'.$r['type_id'].'"></div>'.
