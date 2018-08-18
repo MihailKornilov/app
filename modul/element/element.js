@@ -357,7 +357,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					},
 					busy_obj:t,
 					func_save:function(res) {
-						t.val(res.tmp);
+						t.find('.pale')._dn(!res.tmp);
+						t.find('.msg').html(res.tmp);
 						t._flash();
 					}
 				});

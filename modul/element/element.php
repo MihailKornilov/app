@@ -158,59 +158,25 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 					continue;
 
 				$el = $arr[$id];
-				$title = $el['dialog_id'] ? '['._elemTitle($el['id']).']' : '';
+				$title = '';
+				if($el['dialog_id']) {
+					$title = _elemTitle($el['id']);
+					$cls = array();
+					if($el['font'])
+						$cls[] = $el['font'];
+					if($el['color'])
+						$cls[] = $el['color'];
+					if(!empty($cls)) {
+						$cls = implode(' ', $cls);
+						$title = '<span class="'.$cls.'">'.$title.'</span>';
+					}
+					$title = '['.$title.']';
+				}
 
 				$dialog[$act.'_history_tmp'] .= $el['txt_7'].' '.$title.' '.$el['txt_8'].' ';
 				$dialog[$act_id.'_history_elm'][] = $el;
 			}
 		}
-	}
-
-
-	//id заглавных элементов настройки шаблона истории действий
-	foreach(array(1,2,3) as $n) {
-		continue;
-		$dialog['history'][$n]['elem_id'] = 0;
-		$dialog['history'][$n]['tmp'] = '';
-		$dialog['history'][$n]['tmp_elm'] = array();
-
-		$sql = "SELECT `id`
-				FROM `_element`
-				WHERE `dialog_id`=67
-				  AND `num_1`=".$n."
-				  AND `num_2`=".$dialog_id."
-				LIMIT 1";
-		$elem_id = query_value($sql);
-		$dialog['history'][$n]['elem_id'] = $elem_id;
-
-		$tmp_txt = '';      //текстовое содержание шаблона истории
-		$tmp_elm = array();//элементы, участвующие в шаблоне истории
-		if($elem_id) {
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `block_id`=-".$elem_id."
-					ORDER BY `sort`";
-			if($elem = query_arr($sql)) {
-				$sql = "SELECT `id`,`col`
-						FROM `_element`
-						WHERE `id` IN ("._idsGet($elem, 'num_1').")";
-				$cols = query_ass($sql);
-				foreach($elem as $r) {
-					$num_1 = $r['num_1'] ? '[' . $r['num_1'] . ']' : '';
-					$tmp_txt .= $r['txt_7'].$num_1.$r['txt_8'];
-					switch($r['dialog_id']) {
-						case 11: $col = @$cols[$r['num_1']]; break;
-						case 32: $col = 'num'; break;
-						case 33: $col = 'dtime_add'; break;
-						default: $col = '';
-					}
-					$r['col'] = $col;
-					$tmp_elm[] = $r;
-				}
-			}
-		}
-		$dialog['history'][$n]['tmp'] = trim($tmp_txt);
-		$dialog['history'][$n]['tmp_elm'] = $tmp_elm;
 	}
 
 	$dialog['blk'] = _BE('block_arr', 'dialog', $dialog_id);
@@ -2258,7 +2224,7 @@ function _historySpisok($el) {//список истории действий [68
 				$msg .= $el['txt_7'].' '.$val.' '.$el['txt_8'];
 			}
 			$un .= '<div class="history-un">'.
-				  (SA ? '<div class="icon icon-edit fr pl dialog-edit" val="dialog_id:'.$r['dialog_id'].',menu:2"></div>' : '').
+				  (SA ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-edit'._tooltip('Настроить историю', -60).'</div>' : '').
 						'<div class="history-o o'.$r['type_id'].'"></div>'.
 						'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
 						$msg.

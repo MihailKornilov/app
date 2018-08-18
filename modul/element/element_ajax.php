@@ -149,20 +149,23 @@ switch(@$_POST['op']) {
 			'<div class="dialog-menu-2'._dn($dialog['menu_edit_last'] == 2).'">'.
 				'<div class="pad10 pb20 bg-dfd">'.
 					'<div class="hd2 mt5">Внесение новой записи</div>'.
-					'<div class="mt5 bg-fff bor-e8 pad10 over1 curP'._dn($dialog['insert_history_tmp'], 'pale').'" id="history_insert">'.
-						($dialog['insert_history_tmp'] ? $dialog['insert_history_tmp'] : 'шаблон истории действий для внесения новой записи').
+					'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_insert">'.
+						'<div class="mar10 pale'._dn(!$dialog['insert_history_tmp']).'">шаблон истории действий для внесения новой записи</div>'.
+						'<div class="mar10 msg">'.$dialog['insert_history_tmp'].'</div>'.
 					'</div>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-ffd line-t1">'.
 					'<div class="hd2 mt5">Редактирование записи</div>'.
-					'<div class="mt5 bg-fff bor-e8 pad10 over1 curP'._dn($dialog['edit_history_tmp'], 'pale').'" id="history_edit">'.
-						($dialog['edit_history_tmp'] ? $dialog['edit_history_tmp'] : 'шаблон истории действий для редактирования записи').
+					'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_edit">'.
+						'<div class="mar10 pale'._dn(!$dialog['edit_history_tmp']).'">шаблон истории действий для редактирования записи</div>'.
+						'<div class="mar10 msg">'.$dialog['edit_history_tmp'].'</div>'.
 					'</div>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-fee line-t1">'.
 					'<div class="hd2 mt5">Удаление записи</div>'.
-					'<div class="mt5 bg-fff bor-e8 pad10 over1 curP'._dn($dialog['del_history_tmp'], 'pale').'" id="history_del">'.
-						($dialog['del_history_tmp'] ? $dialog['del_history_tmp'] : 'шаблон истории действий для удаления записи').
+					'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_del">'.
+						'<div class="mar10 pale'._dn(!$dialog['del_history_tmp']).'">шаблон истории действий для удаления записи</div>'.
+						'<div class="mar10 msg">'.$dialog['del_history_tmp'].'</div>'.
 					'</div>'.
 				'</div>'.
 			'</div>'.
