@@ -356,7 +356,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						act:act
 					},
 					busy_obj:t,
-					busy_cls:'hold',
 					func_save:function(res) {
 						t.val(res.tmp);
 						t._flash();
@@ -2628,7 +2627,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
-			BUT_ADD = ATR_EL.find('div:last');
+			BUT_ADD = ATR_EL.find('div:last'),
+			NUM = 1;
 
 		BUT_ADD.click(valueAdd);
 
@@ -2648,7 +2648,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 				dialog_id:50,  //id диалога, вносившего элемента-значения
 				title:'', //имя элемента-значения
 				txt_7:'', //текст слева
-				txt_8:''  //текст справа
+				txt_8:'', //текст справа
+
+				attr_el:'#inp_' + NUM,//требуется для настройки стилей в выплывающем окне
+				font:'',  //выделение: b, i, u
+				color:''  //цвет текста
 			}, v || {});
 
 			DL.append(
@@ -2656,20 +2660,21 @@ var DIALOG = {},//массив диалоговых окон для управл
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w35 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w200">' +
+							'<td class="w250">' +
 								'<input type="text"' +
 									  ' class="txt_7 w100p"' +
 									  ' placeholder="текст слева"' +
 									  ' value="' + v.txt_7 + '"' +
 								' />' +
-							'<td class="w150">' +
+							'<td class="w200">' +
 								'<input type="text"' +
 									  ' readonly' +
-									  ' class="title w100p curP over4"' +
+									  ' id="inp_' + NUM++ + '"' +
+									  ' class="title w100p curP over4 ' + v.font + ' ' + v.color + '"' +
 									  ' placeholder="значение из диалога"' +
 									  ' value="' + v.title + '"' +
 								' />' +
-							'<td class="w200">' +
+							'<td class="w250">' +
 								'<input type="text"' +
 									  ' class="txt_8 w100p"' +
 									  ' placeholder="текст справа"' +
@@ -2699,6 +2704,29 @@ var DIALOG = {},//массив диалоговых окон для управл
 					}
 				});
 			});
+
+			//отображение выплывающего окна настройки стилей
+			TITLE.mouseenter(function() {
+				if(!v.id)
+					return;
+				if(TITLE.hasClass('hold'))
+					return;
+				TITLE._hint({
+					msg:'<table class="bs5">' +
+							'<tr><td class="pt3">' + _elemUnitFont(v) +
+								'<td class="pt3">' + _elemUnitColor(v) +
+						'</table>' +
+						'',
+					side:'top',
+					ugPos:'left',
+					objPos:20,
+					show:1,
+					delayShow:700,
+					delayHide:300
+				});
+			});
+
+
 			DD.find('.icon-del').click(function() {
 				var t = $(this),
 					p = _parent(t, 'DD');
@@ -2710,11 +2738,30 @@ var DIALOG = {},//массив диалоговых окон для управл
 	PHP12_history_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			send.push({
-				id:_num(sp.attr('val')),
-				txt_7:sp.find('.txt_7').val(),
-				txt_8:sp.find('.txt_8').val()
-			});
+			//выделение: b, i, u
+			var arr = ['b', 'i', 'u'],
+				font = [],
+				title = sp.find('.title'),
+				u = {
+					id:_num(sp.attr('val')),
+					txt_7:sp.find('.txt_7').val(),
+					txt_8:sp.find('.txt_8').val(),
+					color:''
+				};
+
+			for(var k in arr)
+				if(title.hasClass(arr[k]))
+					font.push(arr[k]);
+			u.font = font.join(' ');
+
+			//цвет текста
+			for(k in ELEM_COLOR)
+				if(title.hasClass(k)) {
+					u.color = k;
+					break;
+				}
+
+			send.push(u);
 		});
 		return {
 			act:_attr_el(el.id).find('.act').val(),
@@ -3033,6 +3080,23 @@ $(document)
 		});
 
 		_dialogLoad(send);
+	})
+	.on('click', '.dialog-edit', function() {//нажатие на кнопку, иконку для открытия редактирования диалога
+		var t = $(this),
+			val = t.attr('val'),
+			send = {
+				op:'dialog_edit_load',
+				busy_obj:t,
+				busy_cls:t.hasClass('icon') ? 'spin' : '_busy'
+			};
+
+		_forN(val.split(','), function(sp) {
+			var spl = sp.split(':'),
+				k = spl[0];
+			send[k] = _num(spl[1], 1);
+		});
+
+		_post(send, _dialogEdit);
 	})
 	.on('click', '.image-open', function() {//открытие изображения при нажатии на миниатюру
 		var t = $(this),

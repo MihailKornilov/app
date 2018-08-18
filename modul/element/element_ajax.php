@@ -28,6 +28,9 @@ switch(@$_POST['op']) {
 			unset($menu[2]);
 		if(!isset($menu[$dialog['menu_edit_last']]))
 			$dialog['menu_edit_last'] = 1;
+		//установка раздела меню по запросу
+		if($menu_id = _num(@$_POST['menu']))
+			$dialog['menu_edit_last'] = $menu_id;
 
 		$tab2field_id = 0;   //id колонка для связки с первой таблицей
 		$tablesFields = array();//колонки по каждой таблице
@@ -146,33 +149,21 @@ switch(@$_POST['op']) {
 			'<div class="dialog-menu-2'._dn($dialog['menu_edit_last'] == 2).'">'.
 				'<div class="pad10 pb20 bg-dfd">'.
 					'<div class="hd2 mt5">Внесение новой записи</div>'.
-					'<textarea class="mt5 w450 over1 curP"'.
-							 ' id="history_insert"'.
-							 ' readonly'.
-							 ' placeholder="шаблон истории действий для внесения новой записи"'.
-					'>'.
-						$dialog['insert_history_tmp'].
-					'</textarea>'.
+					'<div class="mt5 bg-fff bor-e8 pad10 over1 curP'._dn($dialog['insert_history_tmp'], 'pale').'" id="history_insert">'.
+						($dialog['insert_history_tmp'] ? $dialog['insert_history_tmp'] : 'шаблон истории действий для внесения новой записи').
+					'</div>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-ffd line-t1">'.
 					'<div class="hd2 mt5">Редактирование записи</div>'.
-					'<textarea class="mt5 w450 over1 curP"'.
-							 ' id="history_edit"'.
-							 ' readonly'.
-							 ' placeholder="шаблон истории действий для редактирования записи"'.
-					'>'.
-						$dialog['edit_history_tmp'].
-					'</textarea>'.
+					'<div class="mt5 bg-fff bor-e8 pad10 over1 curP'._dn($dialog['edit_history_tmp'], 'pale').'" id="history_edit">'.
+						($dialog['edit_history_tmp'] ? $dialog['edit_history_tmp'] : 'шаблон истории действий для редактирования записи').
+					'</div>'.
 				'</div>'.
 				'<div class="pad10 pb20 bg-fee line-t1">'.
 					'<div class="hd2 mt5">Удаление записи</div>'.
-					'<textarea class="mt5 w450 over1 curP"'.
-							 ' id="history_del"'.
-							 ' readonly'.
-							 ' placeholder="шаблон истории действий для удаления записи"'.
-					'>'.
-						$dialog['del_history_tmp'].
-					'</textarea>'.
+					'<div class="mt5 bg-fff bor-e8 pad10 over1 curP'._dn($dialog['del_history_tmp'], 'pale').'" id="history_del">'.
+						($dialog['del_history_tmp'] ? $dialog['del_history_tmp'] : 'шаблон истории действий для удаления записи').
+					'</div>'.
 				'</div>'.
 			'</div>'.
 

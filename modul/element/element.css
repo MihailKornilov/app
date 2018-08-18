@@ -598,6 +598,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 .history-o.o2{background-color:#ee0}
 .history-o.o3{background-color:#f98888}
 .history-un{margin-top:7px}
+.history-un:not(:hover) .icon{visibility:hidden}
 
 
 

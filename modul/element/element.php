@@ -2031,6 +2031,8 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 	$update = array();
 
 	foreach($vvv as $sort => $r) {
+		$font = _txt($r['font']);
+		$color = _txt($r['color']);
 		$txt_7 = _txt($r['txt_7']);
 		$txt_8 = _txt($r['txt_8']);
 		if(!$txt_7 && !$txt_8)
@@ -2040,6 +2042,8 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 		$update[] = "(
 			".$id.",
 			'".HISTORY_KEY."',
+			'".$font."',
+			'".$color."',
 			'".addslashes($txt_7)."',
 			'".addslashes($txt_8)."',
 			".$sort.",
@@ -2059,6 +2063,8 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 		$sql = "INSERT INTO `_element` (
 					`id`,
 					`col`,
+					`font`,
+					`color`,
 					`txt_7`,
 					`txt_8`,
 					`sort`,
@@ -2067,6 +2073,8 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 				VALUES ".implode(',', $update)."
 				ON DUPLICATE KEY UPDATE
 					`col`=VALUES(`col`),
+					`font`=VALUES(`font`),
+					`color`=VALUES(`color`),
 					`txt_7`=VALUES(`txt_7`),
 					`txt_8`=VALUES(`txt_8`),
 					`sort`=VALUES(`sort`)";
@@ -2136,6 +2144,8 @@ function PHP12_history_setup_vvv($unit_id, $src) {//получение знач�
 		$send[] = array(
 			'id' => $r['id'],
 			'dialog_id' => $r['dialog_id'],
+			'font' => $r['font'],
+			'color' => $r['color'],
 			'title' => _elemTitle($r['id']),
 			'txt_7' => $r['txt_7'],
 			'txt_8' => $r['txt_8']
@@ -2235,10 +2245,20 @@ function _historySpisok($el) {//список истории действий [68
 				$val = '';
 				if($el['dialog_id']) {
 					$val = _elemUnit($el, $unit);
+					$cls = array();
+					if($el['font'])
+						$cls[] = $el['font'];
+					if($el['color'])
+						$cls[] = $el['color'];
+					if(!empty($cls)) {
+						$cls = implode(' ', $cls);
+						$val = '<span class="'.$cls.'">'.$val.'</span>';
+					}
 				}
 				$msg .= $el['txt_7'].' '.$val.' '.$el['txt_8'];
 			}
 			$un .= '<div class="history-un">'.
+				  (SA ? '<div class="icon icon-edit fr pl dialog-edit" val="dialog_id:'.$r['dialog_id'].',menu:2"></div>' : '').
 						'<div class="history-o o'.$r['type_id'].'"></div>'.
 						'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
 						$msg.
