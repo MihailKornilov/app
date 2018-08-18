@@ -772,7 +772,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						$u = $u[$col];
 						if(!is_array($u)) {
 							$sql = "SELECT *
-									FROM `_spisoK`
+									FROM `_spisok`
 									WHERE `id`=".$u;
 							$u = query_assoc($sql);
 						}

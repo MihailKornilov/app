@@ -785,7 +785,7 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 		return '';
 	if(!$el = _elemOne($elem_id)) {
 		$sql = "SELECT *
-				FROM `_elemenT`
+				FROM `_element`
 				WHERE `id`=".$elem_id;
 		if(!$el = _arrNum(query_assoc($sql)))
 			return '';
