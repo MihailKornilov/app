@@ -1897,7 +1897,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			return array();
 
 		$send = $G_ELEM[$i1];
-		$send['block'] = $send['block_id'] ? $G_BLOCK[$send['block_id']] : array();
+		$send['block'] = $send['block_id'] > 0 ? $G_BLOCK[$send['block_id']] : array();
 
 		return $send;
 	}
@@ -2059,6 +2059,8 @@ function _beDefine() {//получение блоков и элементов и
 	_beBlockType('page');
 	//блоки диалогов
 	_beBlockType('dialog');
+	//элементы истории действий
+	_beElemHistory();
 
 	$BE_FLAG = 1;
 }
@@ -2426,6 +2428,30 @@ function _beElemVvv($el) {//вставка дополнительных знач
 	}
 
 	return $el;
+}
+function _beElemHistory() {//элементы истории действий
+	global $G_DLG, $G_ELEM;
+
+	$ids = array();
+	foreach($G_DLG as $r)
+		foreach(_historyAct() as $act => $act_id)
+			if($r[$act.'_history_elem'])
+				$ids[] = $r[$act.'_history_elem'];
+
+	if(!$ids = implode(',', $ids))
+		return;
+
+	$key = 'ELM_HISTORY';
+	if(!$arr = _cache_get($key, 1)) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id` IN (".$ids.")";
+		$arr = query_arr($sql);
+
+		_cache_set($key, $arr, 1);
+	}
+
+	$G_ELEM += $arr;
 }
 function _beDlg() {//получение данных диалогов из кеша
 	$key = 'dialog';

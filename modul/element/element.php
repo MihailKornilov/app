@@ -132,48 +132,30 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 		return array();
 
 	//история действий - сбор id элементов-шаблонов
-	$ids_tmp = array();
 	foreach(_historyAct() as $act => $act_id) {
-		$dialog[$act.'_history_tmp'] = '';      //текст шаблона для отображения в настройках
+		$dialog[$act.'_history_tmp'] = '';          //текст шаблона для отображения в настройках
 		$dialog[$act_id.'_history_elm'] = array();  //элементы, которые участвуют в шаблоне
 
 		if(!$ids = $dialog[$act.'_history_elem'])
 			continue;
 
-		$ids_tmp[] = $ids;
-	}
-	if($ids_tmp = implode(',', $ids_tmp)) {
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id` IN (".$ids_tmp.")
-				ORDER BY `sort`";
-		$arr = query_arr($sql);
-
-		foreach(_historyAct() as $act => $act_id) {
-			if(!$ids = $dialog[$act.'_history_elem'])
-				continue;
-
-			foreach(_ids($ids, 1) as $id) {
-				if(!isset($arr[$id]))
-					continue;
-
-				$el = $arr[$id];
-				$title = '';
-				if($el['dialog_id']) {
-					$title = _elemTitle($el['id']);
-					$cls = array('wsnw');
-					if($el['font'])
-						$cls[] = $el['font'];
-					if($el['color'])
-						$cls[] = $el['color'];
-					$cls = implode(' ', $cls);
-					$title = '<span class="'.$cls.'">'.$title.'</span>';
-					$title = '['.$title.']';
-				}
-
-				$dialog[$act.'_history_tmp'] .= $el['txt_7'].$title.$el['txt_8'];
-				$dialog[$act_id.'_history_elm'][] = $el;
+		foreach(_ids($ids, 1) as $id) {
+			$el = _elemOne($id);
+			$title = '';
+			if($el['dialog_id']) {
+				$title = _elemTitle($el['id']);
+				$cls = array('wsnw');
+				if($el['font'])
+					$cls[] = $el['font'];
+				if($el['color'])
+					$cls[] = $el['color'];
+				$cls = implode(' ', $cls);
+				$title = '<span class="'.$cls.'">'.$title.'</span>';
+				$title = '['.$title.']';
 			}
+
+			$dialog[$act.'_history_tmp'] .= $el['txt_7'].$title.$el['txt_8'];
+			$dialog[$act_id.'_history_elm'][] = $el;
 		}
 	}
 
@@ -803,7 +785,7 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 		return '';
 	if(!$el = _elemOne($elem_id)) {
 		$sql = "SELECT *
-				FROM `_element`
+				FROM `_elemenT`
 				WHERE `id`=".$elem_id;
 		if(!$el = _arrNum(query_assoc($sql)))
 			return '';

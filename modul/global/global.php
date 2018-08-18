@@ -608,6 +608,8 @@ function _jsCacheElemOne($elem_id) {
 		return array();
 	if(!$block_id = $r['block_id'])
 		return array();
+	if($block_id < 0)
+		return array();
 
 	$val = array();
 
