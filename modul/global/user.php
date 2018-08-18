@@ -20,7 +20,7 @@ function _user($user_id=USER_ID, $i='') {//получение данных о п
 		return '<img src="'.$u['src'].'" />';
 
 	if($i == 'ava30')
-		return '<img src="'.$u['src'].'" width="30" />';
+		return '<img class="ava30" src="'.$u['src'].'" />';
 
 	if($i == 'src')
 		return $u['src'];

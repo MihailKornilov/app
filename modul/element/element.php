@@ -2206,19 +2206,20 @@ function _historySpisok($el) {//список истории действий [68
 						$colVal = _spisokUnitData($el, $unit);
 				}
 */
-				$txt = '';
 				if($el['dialog_id']) {
-					$txt = _elemUnit($el, $unit);
-					$cls = array('wsnw');
-					if($el['font'])
-						$cls[] = $el['font'];
-					if($el['color'])
-						$cls[] = $el['color'];
-					$cls = implode(' ', $cls);
-					$txt = _elemFormat($txt, $el);
-					$txt = '<span class="'.$cls.'">'.$txt.'</span>';
-				}
-				$msg .= $el['txt_7'].$txt.$el['txt_8'];
+					if($txt = _elemUnit($el, $unit)) {
+						$cls = array('wsnw');
+						if($el['font'])
+							$cls[] = $el['font'];
+						if($el['color'])
+							$cls[] = $el['color'];
+						$cls = implode(' ', $cls);
+						$txt = _elemFormat($txt, $el);
+						$txt = '<span class="'.$cls.'">'.$txt.'</span>';
+						$msg .= $el['txt_7'].$txt.$el['txt_8'];
+					}
+				} else
+					$msg .= $el['txt_7'].$el['txt_8'];
 			}
 
 			$is_last = $n == $last;//последняя запись

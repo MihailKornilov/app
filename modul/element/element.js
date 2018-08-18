@@ -2258,6 +2258,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					msg:'<table class="bs5">' +
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
+								'<td class="pt3">' + _elemUnitEye(v) +
 								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
 						'</table>' +
 						'',
