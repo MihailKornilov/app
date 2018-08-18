@@ -318,7 +318,7 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 			'<div class="line-b">' +
 				'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + EL.id, 5)  : '">') + 'Элемент</span>' +
 				'<div class="fr mtm3">' +
-					'<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>' +
+					_elemUnitEye(EL) +
 					'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
 					'<div val="dialog_id:43,unit_id:' + EL.id + '" class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
 					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
@@ -334,6 +334,9 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 			_elemUnitStyle(EL) +
 			_elemUnitImg(EL) +
 		'</div>';
+	},
+	_elemUnitEye = function(EL) {//иконка с условиями отображения
+		return '<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
 	},
 	_elemUnitMar = function(EL) {
 		var mar = EL.mar.split(' ');

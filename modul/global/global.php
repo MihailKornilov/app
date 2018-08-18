@@ -246,9 +246,10 @@ function _sumSpace($sum, $oo=0, $znak=',') {//Приведение суммы к
 	$send = $oo && !$drob ? $send.$znak.'00' : $send;
 	return ($minus < 0 ? '-' : '').$send;
 }
-function _txt($v) {
+function _txt($v, $notrim=false) {
 	$v = htmlspecialchars($v);
-	$v = trim($v);
+	if(!$notrim)
+		$v = trim($v);
 	return $v;
 }
 function _br($v, $replace='<br />') {//вставка br в текст при нахождении enter

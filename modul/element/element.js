@@ -348,6 +348,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 			DLG('#history_' + act).click(function() {
 				var t = $(this);
+				t.find('div')._dn(0, 'vh');
 				_dialogLoad({
 					dialog_id:67,
 					dialog_source:o.dialog_id,
@@ -356,6 +357,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 						act:act
 					},
 					busy_obj:t,
+					func_open:function() {
+						t.find('div')._dn(1, 'vh');
+					},
 					func_save:function(res) {
 						t.find('.pale')._dn(!res.tmp);
 						t.find('.msg').html(res.tmp);
@@ -633,7 +637,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//обновление значения JS-кеша, если элемент вносился или изменялся
 				if(res.elem_js) {
 					ELMM[res.unit.id] = res.elem_js;
-					if(res.unit.block_id)
+					if(res.unit.block_id > 0)
 						BLKK[res.unit.block_id].elem_id = res.unit.id;
 				}
 
@@ -2716,6 +2720,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					msg:'<table class="bs5">' +
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
+								'<td class="pt3">' + _elemUnitEye(v) +
 						'</table>' +
 						'',
 					side:'top',

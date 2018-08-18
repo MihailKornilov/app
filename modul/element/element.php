@@ -171,7 +171,7 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 					$title = '['.$title.']';
 				}
 
-				$dialog[$act.'_history_tmp'] .= $el['txt_7'].' '.$title.' '.$el['txt_8'].' ';
+				$dialog[$act.'_history_tmp'] .= $el['txt_7'].$title.$el['txt_8'];
 				$dialog[$act_id.'_history_elm'][] = $el;
 			}
 		}
@@ -1997,8 +1997,8 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 	foreach($vvv as $sort => $r) {
 		$font = _txt($r['font']);
 		$color = _txt($r['color']);
-		$txt_7 = _txt($r['txt_7']);
-		$txt_8 = _txt($r['txt_8']);
+		$txt_7 = _txt($r['txt_7'], 1);
+		$txt_8 = _txt($r['txt_8'], 1);
 		if(!$txt_7 && !$txt_8)
 			continue;
 		if($id = _num($r['id']))
@@ -2206,21 +2206,20 @@ function _historySpisok($el) {//список истории действий [68
 						$colVal = _spisokUnitData($el, $unit);
 				}
 */
-				$val = '';
+				$txt = '';
 				if($el['dialog_id']) {
-					$val = _elemUnit($el, $unit);
+					$txt = _elemUnit($el, $unit);
 					$cls = array('wsnw');
 					if($el['font'])
 						$cls[] = $el['font'];
 					if($el['color'])
 						$cls[] = $el['color'];
 					$cls = implode(' ', $cls);
-					$val = '<span class="'.$cls.'">'.$val.'</span>';
+					$txt = _elemFormat($txt, $el);
+					$txt = '<span class="'.$cls.'">'.$txt.'</span>';
 				}
-				$msg .= $el['txt_7'].' '.$val.' '.$el['txt_8'];
+				$msg .= $el['txt_7'].$txt.$el['txt_8'];
 			}
-
-//		 (SA && DEBUG ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-edit'._tooltip('Настроить историю', -60).'</div>' : '').
 
 			$is_last = $n == $last;//последняя запись
 
@@ -2229,6 +2228,7 @@ function _historySpisok($el) {//список истории действий [68
 								'<div class="history-o o'.$r['type_id'].'"></div>'.
 								'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
 							'<td>'.$msg.
+				   (SA && DEBUG ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-edit'._tooltip('Настроить историю', -60).'</div>' : '').
 					'</table>';
 
 			$is_user = $user_id != $r['user_id_add'];//изменился пользователь
