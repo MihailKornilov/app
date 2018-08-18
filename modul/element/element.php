@@ -2117,7 +2117,7 @@ function _historyAct($i='all') {//действия истории - ассоци
 function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действий
 	//история не вносится, если единица списка удаляется физически из базы
 	if(!isset($dialog['field1']['deleted']))
-		return;
+		return 0;
 
 	$active = empty($dialog[$type_id.'_history_elm']) ? 0 : 1;
 
@@ -2137,21 +2137,43 @@ function _historyInsert($type_id, $dialog, $unit_id) {//внесение ист�
 				".USER_ID."
 			)";
 	query($sql);
+
+	return query_insert_id('_history');
 }
 function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение истории действий при редактировании
 	if(empty($unitOld))
 		return;
 
-	$edited = 0;
+	$edited = array();
 	foreach($unitOld as $i => $v)
-		if($unit[$i] != $v) {
-			$edited = 1;
-		}
+		if($unit[$i] != $v)
+			$edited[] = array(
+				'name' => $i,
+				'old' => $v,
+				'new' => $unit[$i]
+			);
 
 	if(!$edited)
 		return;
 
-	_historyInsert(2, $dialog, $unit['id']);
+	$history_id = _historyInsert(2, $dialog, $unit['id']);
+
+	$insert = array();
+	foreach($edited as $r)
+		$insert[] = "(
+			".$history_id.",
+			'".$r['name']."',
+			'".addslashes($r['old'])."',
+			'".addslashes($r['new'])."'
+		)";
+
+	$sql = "INSERT INTO `_history_edited` (
+				`history_id`,
+				`name`,
+				`old`,
+				`new`
+			) VALUES ".implode(',', $insert);
+	query($sql);
 }
 function _historySpisok($el) {//список истории действий [68]
 	$sql = "SELECT *
