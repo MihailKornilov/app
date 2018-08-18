@@ -2016,6 +2016,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		_cache_clear('ELM_SPISOK_page', 1);
 		_cache_clear('ELM_SPISOK_dialog');
 		_cache_clear('ELM_SPISOK_dialog', 1);
+		_cache_clear('ELM_HISTORY', 1);
 		$BE_FLAG = 0;
 	}
 
@@ -2036,6 +2037,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 	if($i == 'dialog_clear') {
 		_cache_clear('dialog');
 		_cache_clear('dialog', 1);
+		_cache_clear('ELM_HISTORY', 1);
 		$BE_FLAG = 0;
 	}
 
