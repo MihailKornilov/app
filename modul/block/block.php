@@ -451,6 +451,7 @@ function _elemDiv($el, $unit=array()) {//формирование div элеме
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
 	$txt = _elemFormat($txt, $el);
+	$txt = _spisokUnitUrl($el, $unit, $txt);
 
 	return '<div'.$attr_id.$cls._elemStyle($el, $unit).'>'.$txt.'</div>';
 }
@@ -771,7 +772,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						$u = $u[$col];
 						if(!is_array($u)) {
 							$sql = "SELECT *
-									FROM `_spisok`
+									FROM `_spisoK`
 									WHERE `id`=".$u;
 							$u = query_assoc($sql);
 						}
@@ -1436,8 +1437,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				$txt .= _elemUnit($elem, $unit);
 				$txt .= $r['spc'] ? ' ' : ''; //добавление пробела справа, если нужно (num_8)
 			}
-
-//	$txt = _spisokUnitUrl($el, $unit, $txt);
 
 			return $txt;
 

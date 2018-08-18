@@ -208,7 +208,7 @@ function _spisokElemCount($r) {//формирование элемента с с
 	' '.
 	_end($all, $r['txt_2'], $r['txt_4'], $r['txt_6']);
 }
-function _spisokInclude($spisok, $CMP) {//вложенные списки
+function _spisokInclude_($spisok, $CMP) {//вложенные списки
 	foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
 		//должен является вложенным списком
 		if($cmp['dialog_id'] != 29 && $cmp['dialog_id'] != 59)
@@ -246,6 +246,64 @@ function _spisokInclude($spisok, $CMP) {//вложенные списки
 			if(empty($arr[$connect_id]))
 				continue;
 			$spisok[$id][$col] = $arr[$connect_id];
+		}
+	}
+
+	return $spisok;
+}
+function _spisokInclude($spisok) {//вложенные списки
+	if(empty($spisok))
+		return array();
+	
+	//проверка наличия колонки dialog_id в содержании списка
+	$key = key($spisok);
+	$sp0 = $spisok[$key];
+	if(!isset($sp0['dialog_id']))
+		return $spisok;
+	
+	//сбор ID диалогов
+	$DLG_IDS = array();
+	foreach($spisok as $r)
+		if($r['dialog_id'])
+			$DLG_IDS[$r['dialog_id']] = 1;
+	
+	if(empty($DLG_IDS))
+		return $spisok;
+
+	foreach($DLG_IDS as $dlg_id => $i) {
+		$dlg = _dialogQuery($dlg_id);
+		$CMP = $dlg['cmp'];
+		foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
+			//должен является вложенным списком
+			if($cmp['dialog_id'] != 29 && $cmp['dialog_id'] != 59)
+				continue;
+
+			//должно быть присвоено имя колонки
+			if(!$col = $cmp['col'])
+				continue;
+
+			//выборка будет производиться только по нужным строкам списка
+			if(!$ids = _idsGet($spisok, $col))
+				continue;
+
+			//получение данных из вложенного списка
+			$incDialog = _dialogQuery($cmp['num_1']);
+
+			$cond = "`t1`.`id` IN (".$ids.")";
+			$sql = "SELECT `t1`.*"._spisokJoinField($incDialog)."
+					FROM "._tableFrom($incDialog)."
+					WHERE ".$cond;
+			if(!$arr = query_arr($sql))
+				continue;
+
+			//идентификаторы будут заменены на массив с данными единицы списка
+			foreach($spisok as $id => $r)
+				if($dlg_id == $r['dialog_id']) {
+					$connect_id = $r[$col];
+					if(empty($arr[$connect_id]))
+						continue;
+					$spisok[$id][$col] = $arr[$connect_id];
+				}
 		}
 	}
 
@@ -312,7 +370,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	$spisok = query_arr($sql);
 
 	//вставка значений из вложенных списков
-	$spisok = _spisokInclude($spisok, $DLG['cmp']);
+	$spisok = _spisokInclude($spisok);
 	//вставка картинок
 	$spisok = _spisokImage($spisok, $DLG['cmp']);
 
@@ -421,7 +479,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	$spisok = query_arr($sql);
 
 	//вставка значений из вложенных списков
-	$spisok = _spisokInclude($spisok, $DLG['cmp']);
+	$spisok = _spisokInclude($spisok);
 	//вставка картинок
 	$spisok = _spisokImage($spisok, $DLG['cmp']);
 
@@ -605,76 +663,24 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в 
 	if(empty($unit['id']))//отсутствует единица списка
 		return $txt;
 
-	if($el['url'] != 3)//указана конкретная страница
-		return '<a href="'.URL.'&p='.$el['url'].'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
+	if($el['url'] != 3) {//указана конкретная страница
+		$unit_id = $unit['id'];
+		$page = _page($el['url']);
+		if($page['spisok_id'] != $unit['dialog_id'])
+			if($el['dialog_id'] == 11) {
+				if(!$ids = _ids($el['txt_2'], 1))
+					return $txt;
+				if(!$EL = _elemOne($ids[0]))
+					return $txt;
+				if(!$col = $EL['col'])
+					return $txt;
+				$unit_id = is_array($unit) ? $unit[$col]['id'] : $unit[$col];
+			}
+		return '<a href="'.URL.'&p='.$el['url'].'&id='.$unit_id.'" class="inhr">'.$txt.'</a>';
+	}
 
 	if(!$dlg = _elem_11_dialog($el))
 		return $txt;
-
-/*
-	if($el['block_id'] < 0)
-		if($el = _elemOne(abs($el['block_id'])))
-			if($el['dialog_id'] == 23)
-				$dialog_id = $el['num_1'];
-
-	if(!$dialog_id && empty($el['block']))//не переданы с элементом данные блока
-		return $txt;
-
-	if(!$dialog_id)
-		switch($el['block']['obj_name']) {
-			case 'spisok':
-				$key = 'ELEM_LINK_'.$el['id'];
-				if(defined($key)) {
-					$dialog_id = constant($key);
-					break;
-				}
-				if($el['dialog_id'] == 11) {
-					if(!$ids = _ids($el['txt_2'], 1))
-						return $txt;
-					if(!$c = count($ids))//берётся последний элемент
-						return $txt;
-					if(empty($ids[$c - 1]))
-						return $txt;
-					if(!$EL = _elemOne($ids[$c - 1]))
-						return $txt;
-					if(!$EL['block']['obj_name'] == 'dialog')
-						return $txt;
-
-					$dialog_id = $EL['block']['obj_id'];
-					define($key, $dialog_id);
-					break;
-				}
-				if(!$BL = _blockOne($el['block']['obj_id']))//блока не существует
-					return $txt;
-				if(empty($BL['elem']))//нет элемента, размещающего список
-					return $txt;
-
-				$dialog_id = _num($BL['elem']['num_1']);
-				define($key, $dialog_id);
-				break;
-			case 'page':
-				if($el['dialog_id'] == 11) {
-					if(!$ids = _ids($el['txt_2'], 1))
-						return $txt;
-					if(!$c = count($ids))//берётся последний элемент
-						return $txt;
-					if(empty($ids[$c - 1]))
-						return $txt;
-					if(!$EL = _elemOne($ids[$c - 1]))
-						return $txt;
-					if(!$EL['block']['obj_name'] == 'dialog')
-						return $txt;
-
-					$dialog_id = $EL['block']['obj_id'];
-					break;
-				}
-				if(!$page = _page($el['block']['obj_id']))
-					return $txt;
-				$dialog_id = $page['spisok_id'];
-				break;
-			default: return $txt;
-		}
-*/
 
 	//ссылка на страницу, если это список страниц
 	if(_table($dlg['table_1']) == '_page')

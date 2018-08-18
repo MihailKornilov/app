@@ -283,6 +283,8 @@ function _idsGet($arr, $i='id') {//возвращение из массива с
 			$ids[] = $id;
 			continue;
 		}
+		if(is_array($r[$i]))
+			continue;
 		if(!empty($r[$i]))
 			$ids[] = $r[$i];
 	}

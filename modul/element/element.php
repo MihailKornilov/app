@@ -854,7 +854,6 @@ function _elem_11_v($EL, $ell_id, $unit) {//получение значения 
 				return _msgRed('no-unit-col');
 
 			$txt = $unit[$col];
-			$txt = _spisokUnitUrl($EL, $unit, $txt);
 			$txt = _spisokColSearchBg($EL, $txt);
 
 			return _br($txt);
@@ -2155,6 +2154,9 @@ function _historySpisok($el) {//список истории действий [68
 			WHERE `id` IN ("._idsGet($arr, 'unit_id').")";
 	$spUnit = query_arr($sql);
 
+	//вставка значений из вложенных списков
+	$spUnit = _spisokInclude($spUnit);
+
 	//распределение истории по дням
 	$spisok = array();
 	foreach($arr as $r) {
@@ -2177,17 +2179,6 @@ function _historySpisok($el) {//список истории действий [68
 			$msg = '';
 			$unit = $spUnit[$r['unit_id']];
 			foreach($dlg[$r['type_id'].'_history_elm'] as $el) {
-/*
-				$colVal = '';
-				if($col = $el['col']) {
-					if(!isset($unit[$col]))
-						continue;
-					if(!$colVal = $unit[$col])
-						continue;
-					if($col == 'dtime_add')
-						$colVal = _spisokUnitData($el, $unit);
-				}
-*/
 				if($el['dialog_id']) {
 					if($txt = _elemUnit($el, $unit)) {
 						$cls = array('wsnw');
@@ -2197,6 +2188,7 @@ function _historySpisok($el) {//список истории действий [68
 							$cls[] = $el['color'];
 						$cls = implode(' ', $cls);
 						$txt = _elemFormat($txt, $el);
+						$txt = _spisokUnitUrl($el, $unit, $txt);
 						$txt = '<span class="'.$cls.'">'.$txt.'</span>';
 						$msg .= $el['txt_7'].$txt.$el['txt_8'];
 					}
