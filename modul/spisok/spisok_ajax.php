@@ -794,7 +794,7 @@ function _spisokAction3($send, $dialog, $unit_id) {//добавление зна
 		return $send;
 	if($elem['parent_id'])//была вставка доп-значения для элемета
 		return $send;
-	if(!$elem['block_id'])
+	if($elem['block_id'] < 0)
 		return $send;
 
 	$send['obj_name'] = $elem['block']['obj_name'];

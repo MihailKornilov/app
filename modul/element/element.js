@@ -2728,7 +2728,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ugPos:'left',
 					objPos:20,
 					show:1,
-					delayShow:700,
+					delayShow:500,
 					delayHide:300
 				});
 			});
