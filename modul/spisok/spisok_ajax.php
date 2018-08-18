@@ -336,6 +336,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	//получение обновлённых данных единицы списка
 	$unit = _spisokUnitQuery($dialog, $unit_id);
 
+	_historyInsertEdit($dialog, $unitOld, $unit);
+
 	if(IS_ELEM) {
 		_BE('block_clear');
 		_BE('elem_clear');
@@ -1317,6 +1319,8 @@ function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполне
 				_spisokUnitAfter27($elUpd);                        //подсчёт балансов после обновления сумм [27]
 				break;
 		}
+
+
 }
 function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количеств привязаного списка
 	$sql = "SELECT *

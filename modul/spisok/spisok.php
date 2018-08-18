@@ -585,6 +585,9 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 }
 
 function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
+	if(!$unit_id)
+		return array();
+
 	if($parent_id = $dialog['dialog_parent_id'])
 		if(!$dialog = _dialogQuery($parent_id))
 			return array();

@@ -2138,6 +2138,21 @@ function _historyInsert($type_id, $dialog, $unit_id) {//внесение ист�
 			)";
 	query($sql);
 }
+function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение истории действий при редактировании
+	if(empty($unitOld))
+		return;
+
+	$edited = 0;
+	foreach($unitOld as $i => $v)
+		if($unit[$i] != $v) {
+			$edited = 1;
+		}
+
+	if(!$edited)
+		return;
+
+	_historyInsert(2, $dialog, $unit['id']);
+}
 function _historySpisok($el) {//список истории действий [68]
 	$sql = "SELECT *
 			FROM `_history`
