@@ -161,15 +161,13 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 				$title = '';
 				if($el['dialog_id']) {
 					$title = _elemTitle($el['id']);
-					$cls = array();
+					$cls = array('wsnw');
 					if($el['font'])
 						$cls[] = $el['font'];
 					if($el['color'])
 						$cls[] = $el['color'];
-					if(!empty($cls)) {
-						$cls = implode(' ', $cls);
-						$title = '<span class="'.$cls.'">'.$title.'</span>';
-					}
+					$cls = implode(' ', $cls);
+					$title = '<span class="'.$cls.'">'.$title.'</span>';
 					$title = '['.$title.']';
 				}
 
@@ -2211,27 +2209,29 @@ function _historySpisok($el) {//список истории действий [68
 				$val = '';
 				if($el['dialog_id']) {
 					$val = _elemUnit($el, $unit);
-					$cls = array();
+					$cls = array('wsnw');
 					if($el['font'])
 						$cls[] = $el['font'];
 					if($el['color'])
 						$cls[] = $el['color'];
-					if(!empty($cls)) {
-						$cls = implode(' ', $cls);
-						$val = '<span class="'.$cls.'">'.$val.'</span>';
-					}
+					$cls = implode(' ', $cls);
+					$val = '<span class="'.$cls.'">'.$val.'</span>';
 				}
 				$msg .= $el['txt_7'].' '.$val.' '.$el['txt_8'];
 			}
-			$un .= '<div class="history-un">'.
-				  (SA ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-edit'._tooltip('Настроить историю', -60).'</div>' : '').
-						'<div class="history-o o'.$r['type_id'].'"></div>'.
-						'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
-						$msg.
-					'</div>';
+
+//		 (SA && DEBUG ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-edit'._tooltip('Настроить историю', -60).'</div>' : '').
+
+			$is_last = $n == $last;//последняя запись
+
+			$un .= '<table class="history-un'._dn($is_last, 'mb5').'">'.
+						'<tr><td class="top tdo">'.
+								'<div class="history-o o'.$r['type_id'].'"></div>'.
+								'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
+							'<td>'.$msg.
+					'</table>';
 
 			$is_user = $user_id != $r['user_id_add'];//изменился пользователь
-			$is_last = $n == $last;//последняя запись
 
 			if(!$is_user && !$is_last)
 				continue;
