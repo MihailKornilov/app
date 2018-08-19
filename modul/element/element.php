@@ -2145,13 +2145,27 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 		return;
 
 	$edited = array();
-	foreach($unitOld as $i => $v)
-		if($unit[$i] != $v)
-			$edited[] = array(
-				'name' => $i,
-				'old' => $v,
-				'new' => $unit[$i]
-			);
+	foreach($unitOld as $i => $v) {
+		if($unit[$i] == $v)
+			continue;
+
+		$name = '';
+		foreach($dialog['cmp'] as $cmp_id => $cmp)
+			if($i == $cmp['col']) {
+				if($cmp['dialog_id'] == 29 || $cmp['dialog_id'] == 59) {
+					$name = $cmp['name'];
+					break;
+				}
+				$name = _elemTitle($cmp_id);
+				break;
+			}
+
+		$edited[] = array(
+			'name' => $name,
+			'old' => $v,
+			'new' => $unit[$i]
+		);
+	}
 
 	if(!$edited)
 		return;
