@@ -677,7 +677,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в 
 					return $txt;
 				if(!$col = $EL['col'])
 					return $txt;
-				$unit_id = is_array($unit) ? $unit[$col]['id'] : $unit[$col];
+				$unit_id = is_array($unit[$col]) ? $unit[$col]['id'] : $unit[$col];
 			}
 		return '<a href="'.URL.'&p='.$el['url'].'&id='.$unit_id.'" class="inhr">'.$txt.'</a>';
 	}

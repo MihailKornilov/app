@@ -1,7 +1,6 @@
 /* ---=== СПИСОК В ТАБЛИЦЕ ===--- */
 ._stab{
 	border-collapse:collapse;
-	border:#D3DBE1 solid 1px;
 	background:#fff;
 }
 ._stab th{
@@ -21,7 +20,12 @@
 ._stab td.topi{vertical-align:top;padding-top:9px}
 ._stab.small td{padding:4px 5px 3px;font-size:12px}
 ._stab td.pad0{padding:0}/* для иконок */
-
+/* история действий */
+._stab.hist td{
+	border:#DDD solid 1px;
+	padding:3px 5px 2px;
+	font-size:12px;
+}
 
 
 

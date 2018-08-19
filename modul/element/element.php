@@ -2186,6 +2186,17 @@ function _historySpisok($el) {//список истории действий [68
 	if(!$arr = query_arr($sql))
 		return '<div class="_empty min">Истории нет.</div>';
 
+	foreach($arr as $id => $r)
+		$arr[$id]['edited'] = array();
+
+	//история - редактирование
+	$sql = "SELECT *
+			FROM `_history_edited`
+			WHERE `history_id` IN ("._idsGet($arr).")
+			ORDER BY `id`";
+	foreach(query_arr($sql) as $r)
+		$arr[$r['history_id']]['edited'][] = $r;
+
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `id` IN ("._idsGet($arr, 'unit_id').")";
@@ -2239,8 +2250,10 @@ function _historySpisok($el) {//список истории действий [68
 						'<tr><td class="top tdo">'.
 								'<div class="history-o o'.$r['type_id'].'"></div>'.
 								'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
-							'<td>'.$msg.
+							'<td>'.
 				   (SA && DEBUG ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-edit'._tooltip('Настроить историю', -60).'</div>' : '').
+								$msg.
+								_historySpisokEdited($r).
 					'</table>';
 
 			$is_user = $user_id != $r['user_id_add'];//изменился пользователь
@@ -2260,6 +2273,23 @@ function _historySpisok($el) {//список истории действий [68
 			$un = '';
 		}
 	}
+
+	return $send;
+}
+function _historySpisokEdited($hist) {//история при редактировании
+	if(empty($hist['edited']))
+		return '';
+
+	$send = '<table class="_stab hist mb10 mt3">';
+	foreach($hist['edited'] as $r) {
+		$send .=
+			'<tr><td class="grey r b">'.$r['name'].
+				'<td class="grey">'.$r['old'].
+				'<td class="grey">»'.
+				'<td class="grey">'.$r['new'];
+	}
+
+	$send .= '</table>';
 
 	return $send;
 }
