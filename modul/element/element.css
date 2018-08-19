@@ -21,6 +21,7 @@
 ._stab.small td{padding:4px 5px 3px;font-size:12px}
 ._stab td.pad0{padding:0}/* для иконок */
 /* история действий */
+._stab.hist{margin:3px 0 10px}
 ._stab.hist td{
 	border:#DDD solid 1px;
 	padding:3px 5px 2px;
@@ -604,7 +605,17 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 .history-un{margin-top:7px}
 .history-un .tdo{width:65px}
 .history-un:not(:hover) .icon{visibility:hidden}
-
+/* история действий - старая версия при переносе */
+.history-old{margin:3px 0 7px}
+.history-old table{border-collapse:collapse;background:#fff}
+.history-old th,
+.history-old td{
+	border:#DDD solid 1px;
+	padding:3px 5px 2px;
+	font-size:12px;
+	color:#888;
+}
+.history-old th{font-weight:bold}
 
 
 

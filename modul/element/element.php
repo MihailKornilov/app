@@ -2291,10 +2291,16 @@ function _historySpisok($el) {//список истории действий [68
 	return $send;
 }
 function _historySpisokEdited($hist) {//история при редактировании
+	if($hist['edited_old'])
+		return
+		'<div class="history-old ">'.
+			$hist['edited_old'].
+		'</div>';
+
 	if(empty($hist['edited']))
 		return '';
 
-	$send = '<table class="_stab hist mb10 mt3">';
+	$send = '<table class="_stab hist">';
 	foreach($hist['edited'] as $r) {
 		$send .=
 			'<tr><td class="grey r b">'.$r['name'].
