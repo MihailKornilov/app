@@ -2260,6 +2260,13 @@ function _historySpisok($el) {//список истории действий [68
 
 			$is_last = $n == $last;//последняя запись
 
+			//изменился пользователь
+			if($user_id != $r['user_id_add']) {
+				$send .= _historySpisokU($user_id, $un);
+				$user_id = $r['user_id_add'];
+				$un = '';
+			}
+
 			$un .= '<table class="history-un'._dn($is_last, 'mb5').'">'.
 						'<tr><td class="top tdo">'.
 								'<div class="history-o o'.$r['type_id'].'"></div>'.
@@ -2270,25 +2277,23 @@ function _historySpisok($el) {//список истории действий [68
 								_historySpisokEdited($r).
 					'</table>';
 
-			$is_user = $user_id != $r['user_id_add'];//изменился пользователь
-
-			if(!$is_user && !$is_last)
-				continue;
-
-			$send .=
-				'<table class="mt5">'.
-					'<tr><td class="top">'._user($r['user_id_add'], 'ava30').
-						'<td class="top">'.
-							'<div class="fs12 ml5 color-555">'._user($r['user_id_add'], 'name').'</div>'.
-							$un.
-				'</table>';
-
-			$user_id = $r['user_id_add'];
-			$un = '';
+			if($is_last) {
+				$send .= _historySpisokU($user_id, $un);
+				$un = '';
+			}
 		}
 	}
 
 	return $send;
+}
+function _historySpisokU($user_id, $un) {//вывод пользователя для отдельной группы истории
+	return
+	'<table class="mt5">'.
+		'<tr><td class="top">'._user($user_id, 'ava30').
+			'<td class="top">'.
+				'<div class="fs12 ml5 color-555">'._user($user_id, 'name').'</div>'.
+				$un.
+	'</table>';
 }
 function _historySpisokEdited($hist) {//история при редактировании
 	if($hist['edited_old'])
