@@ -379,12 +379,12 @@ function PHP12_dialog_sa($el, $unit) {//список диалоговых око
 					'<th>type'.
 					'<th>col';
 	foreach($arr as $r) {
-		$send .= '<tr class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.
+		$send .= '<tr>'.
 					'<td class="w35 r grey'.($r['sa'] ? ' bg-fee' : '').'">'.$r['id'].
 					'<td class="'.(_table($r['table_1']) == '_element' ? 'b color-pay' : '').'">'.
 						_table($r['table_1']).
 						($r['table_2'] ? '<br>'._table($r['table_2']) : '').
-					'<td>'.$r['name'].
+					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
 					'<td>'.$r['element_afics'].
 					'<td class="center">'._elemColType($r['element_type']).
 					'<td class="grey">'.PHP12_dialog_col($r['id']);
@@ -426,6 +426,7 @@ function PHP12_dialog_app($el, $unit) {//список диалоговых ок�
 }
 function PHP12_dialog_col($dialog_id) {//колонки, используемые в элементе
 	$send = array();
+	$dub = false;//флаг повторяющейся колонки
 	foreach(_BE('elem_arr', 'dialog', $dialog_id) as $el) {
 		//поиск элементам, которым не назначена колонка таблицы
 		if(!$col = $el['col'])
@@ -442,6 +443,7 @@ function PHP12_dialog_col($dialog_id) {//колонки, используемы�
 
 		if(isset($send[$col])) {
 			$send[$col.'dub'.rand(0, 10000)] = '<span class="bg-fcc">'.$col.' - повтор</span>';
+			$dub = true;
 			continue;
 		}
 
@@ -461,7 +463,7 @@ function PHP12_dialog_col($dialog_id) {//колонки, используемы�
 	ksort($send);
 
 	return
-	'<div class="curP center" onclick="$(this).slideUp().next().slideDown()">'.count($send).'</div>'.
+	'<div class="curP center'._dn(!$dub, 'bg-fcc').'" onclick="$(this).slideUp().next().slideDown()">'.count($send).'</div>'.
 	'<div class="dn">'.implode('<br>', $send).'</div>';
 }
 
