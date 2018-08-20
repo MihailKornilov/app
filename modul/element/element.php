@@ -406,13 +406,19 @@ function PHP12_dialog_app($el, $unit) {//список диалоговых ок�
 					'<th>ID'.
 					'<th>Имя диалога'.
 					'<th>Список'.
-					'<th>Колонки';
+					'<th>Колонки'.
+					'<th>h1'.
+					'<th>h2'.
+					'<th>h3';
 	foreach($arr as $r) {
-		$send .= '<tr class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.
+		$send .= '<tr>'.
 					'<td class="w35 r grey">'.$r['id'].
-					'<td>'.$r['name'].
+					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
 					'<td class="center'.($r['spisok_on'] ? ' bg-dfd' : '').'">'.($r['spisok_on'] ? 'да' : '').
-					'<td class="grey">'.PHP12_dialog_col($r['id']);
+					'<td class="grey">'.PHP12_dialog_col($r['id']).
+					'<td>'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+					'<td>'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+					'<td>'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '');
 	}
 	$send .= '</table>';
 
@@ -449,9 +455,14 @@ function PHP12_dialog_col($dialog_id) {//колонки, используемы�
 			$send[$col] = $col;
 	}
 
+	if(empty($send))
+		return '';
+
 	ksort($send);
 
-	return implode('<br>', $send);
+	return
+	'<div class="curP center" onclick="$(this).slideUp().next().slideDown()">'.count($send).'</div>'.
+	'<div class="dn">'.implode('<br>', $send).'</div>';
 }
 
 function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод списков по условиям
