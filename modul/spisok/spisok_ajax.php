@@ -1296,7 +1296,8 @@ function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполне
 				$sql = "SELECT *
 						FROM `_element`
 						WHERE `num_1` IN (".implode(',', $cmpInsertIds).")
-						  AND `id` IN (".$cmp['txt_2'].")";
+						  AND `id` IN (".$cmp['txt_2'].")
+						ORDER BY `id` DESC";
 				if(!$arr = query_arr($sql))
 					break;
 
@@ -1315,8 +1316,8 @@ function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполне
 			//привязанные списки
 			case 29:
 				_spisokUnitAfter54($cmp, $dialog, $unit, $unitOld); //пересчёт количеств привязаного списка [54]
-				$elUpd = _spisokUnitAfter55($cmp, $dialog, $unit);    //пересчёт cумм привязаного списка [55]
-				_spisokUnitAfter27($elUpd);                        //подсчёт балансов после обновления сумм [27]
+				$elUpd = _spisokUnitAfter55($cmp, $dialog, $unit);  //пересчёт cумм привязаного списка [55]
+				_spisokUnitAfter27($elUpd);                         //подсчёт балансов после обновления сумм [27]
 				break;
 		}
 
@@ -1390,18 +1391,14 @@ function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм �
 		//поиск колонки, по которой будет производиться подсчёт суммы
 		if(!$el = _elemOne($r['num_2']))
 			continue;
-		if($el['dialog_id'] != 11)//ссылка элемент с колонкой суммы указывался через [11]
-			continue;
-		if(!$el = _elemOne($el['txt_2']))
-			continue;
-		if(!$colSumGet = $el['col'])
+		if(!$colSum = $el['col'])
 			continue;
 
 		$bl = _blockOne($r['block_id']);
 		$dlg = _dialogQuery($bl['obj_id']);
 
 		//получение нового количества для обновления
-		$sql = "SELECT IFNULL(SUM(`".$colSumGet."`),0)
+		$sql = "SELECT IFNULL(SUM(`".$colSum."`),0)
 				FROM "._tableFrom($dialog)."
 				WHERE `".$col."`=".$connect_id." "._spisokCondDef($dialog['id']);
 		$sum = query_value($sql);

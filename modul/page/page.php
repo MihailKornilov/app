@@ -569,7 +569,7 @@ function _pageSpisokUnit($page_id, $obj_name='page') {//данные едини�
 
 
 function _page_div() {//todo тест
-	return '';//count(_BE('block_all'));
+	return '';//_pr(_BE('elem_arr', 'dialog', 48));
 
 	return
 	'<div>'.

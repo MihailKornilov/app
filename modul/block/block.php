@@ -1901,25 +1901,73 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		return $send;
 	}
 
-	//получение элементов для конкретного объекта
+	//получение элементов для конкретного объекта с последовательным расположением
 	if($i == 'elem_arr') {
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
 			return array();
 
-		$send = array();
+		$blk = array();
 		foreach($G_BLOCK as $id => $r) {
 			if($r['obj_name'] != $obj_name)
 				continue;
 			if($r['obj_id'] != $obj_id)
 				continue;
-			if(!$elem_id = $r['elem_id'])
+			$blk[$id] = array(
+				'id' => $id,
+				'parent_id' => $r['parent_id'],
+				'x' => $r['x'],
+				'y' => $r['y']
+			);
+		}
+
+		$child = array();
+		foreach($blk as $id => $r)
+			$child[$r['parent_id']][$id] = $r;
+
+		$blk = _blockArrChild($child);
+		$blk = _beBlockSort($blk);
+
+		$send = array();
+		foreach($blk as $block_id) {
+			$bl = $G_BLOCK[$block_id];
+
+			if(!$elem_id = $bl['elem_id'])
 				continue;
 
 			$send[$elem_id] = _beElemVvv($G_ELEM[$elem_id]);
 		}
 
 		return $send;
+	}
+
+	//получение элементов для конкретного объекта
+	if($i == 'elem_arrr') {
+		$obj_name = $i1;
+		if(!$obj_id = _num($i2))
+			return array();
+
+		$blk = array();
+		foreach($G_BLOCK as $id => $r) {
+			if($r['obj_name'] != $obj_name)
+				continue;
+			if($r['obj_id'] != $obj_id)
+				continue;
+			$blk[$id] = array(
+				'id' => $id,
+				'parent_id' => $r['parent_id'],
+				'x' => $r['x'],
+				'y' => $r['y']
+			);
+		}
+
+		$child = array();
+		foreach($blk as $id => $r)
+			$child[$r['parent_id']][$id] = $r;
+
+		$blk = _blockArrChild($child);
+
+		return _beBlockSort($blk);
 	}
 
 	//получение элементов для конкретного объекта (новая схема)
@@ -2513,4 +2561,25 @@ function _beDlgField($dialog) {//вставка колонок таблиц в �
 
 	return $dialog;
 }
+function _beBlockSort($BLK, $RES=array()) {//выстраивание блоков по порядку
+	//составление структуры блоков по строкам
+	$block = array();
+	foreach($BLK as $r)
+		$block[$r['y']][$r['x']] = $r;
 
+	//выстраивание блоков по Y
+	ksort($block);
+
+	foreach($block as $y => $xx) {
+		//выстраивание блоков по X
+		ksort($xx);
+
+		foreach($xx as $r) {
+			$RES[] = $r['id'];
+			if(!empty($r['child']))
+				$RES = _beBlockSort($r['child'], $RES);
+		}
+	}
+
+	return $RES;
+}
