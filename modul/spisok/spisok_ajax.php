@@ -422,12 +422,18 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 	if(!is_array($POST_CMP))
 		jsonError('Компоненты диалога не являются массивом');
 
-	$send = array();
+	$CMP = array();
 	foreach($POST_CMP as $cmp_id => $val) {
 		if(!$cmp_id = _num($cmp_id))
 			jsonError('Некорректный id компонента диалога');
-		if(!$cmp = @$dialog['cmp'][$cmp_id])
+		if(empty($dialog['cmp'][$cmp_id]))
 			jsonError('Отсутствует компонент id'.$cmp_id.' в диалоге');
+		$CMP[$cmp_id] = $val;
+	}
+	$send = array();
+	foreach($dialog['cmp'] as $cmp_id => $cmp) {
+		if(!isset($CMP[$cmp_id]))
+			continue;
 		if(!$col = @$cmp['col'])
 			continue;
 /*			jsonError(array(
@@ -438,7 +444,7 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 		if(!isset($dlgParent['field1'][$col]) && !isset($dlgParent['field2'][$col]))
 			jsonError('В таблице отсутствует колонка с именем "'.$col.'"');
 
-		$v = _txt($val);
+		$v = _txt($CMP[$cmp_id]);
 
 		//массив для отправки ошибки
 		$is_err = 0;
