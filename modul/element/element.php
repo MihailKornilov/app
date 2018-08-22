@@ -2162,9 +2162,14 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 		if($unit[$i] == $v)
 			continue;
 
+		$hidden = false;//скрытые элементы в историю не попадают
 		$name = '';
 		foreach($dialog['cmp'] as $cmp_id => $cmp)
 			if($i == $cmp['col']) {
+				if($cmp['hidden']) {
+					$hidden = true;
+					break;
+				}
 				if($cmp['dialog_id'] == 29 || $cmp['dialog_id'] == 59) {
 					$name = $cmp['name'];
 					break;
@@ -2172,6 +2177,9 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 				$name = _elemTitle($cmp_id);
 				break;
 			}
+
+		if($hidden)
+			continue;
 
 		$edited[] = array(
 			'name' => $name,

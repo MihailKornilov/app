@@ -332,6 +332,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_pageDefClear($dialog, $POST_CMP);
 
 	_spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id);
+	_spisokUnitBalansUpd($dialog, $POST_CMP);
 
 	//получение обновлённых данных единицы списка
 	$unit = _spisokUnitQuery($dialog, $unit_id);
@@ -417,11 +418,10 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 
 	if($dialog['cmp_no_req'] && empty($POST_CMP))
 		return array();
-//	if(empty($POST_CMP))
-//		jsonError('Нет данных для внесения');
 	if(!is_array($POST_CMP))
 		jsonError('Компоненты диалога не являются массивом');
 
+	//выбор значений, которые существуют в диалоговом окне, чтобы в дальнейшем выстроить по порядку в соответствии с блоками
 	$CMP = array();
 	foreach($POST_CMP as $cmp_id => $val) {
 		if(!$cmp_id = _num($cmp_id))
@@ -430,6 +430,7 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 			jsonError('Отсутствует компонент id'.$cmp_id.' в диалоге');
 		$CMP[$cmp_id] = $val;
 	}
+
 	$send = array();
 	foreach($dialog['cmp'] as $cmp_id => $cmp) {
 		if(!isset($CMP[$cmp_id]))
@@ -984,6 +985,32 @@ function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение до
 			  AND `dialog_id`=1011";
 	foreach(query_arr($sql) as $r)
 		_cache_clear('user'.$r['connect_1']);
+}
+function _spisokUnitBalansUpd($dialog, $POST_CMP) {//обновление значения стартовой суммы (для правильного подсчёта баланса)
+	/*
+		Стартовая сумма нужна для корректного отображения баланса (например, расчётного счёта)
+		Если при расчёте баланса содержится значение, которое было изменено, этот баланс должен будет пересчитан
+	*/
+	foreach($dialog['cmp'] as $cmp_id => $cmp) {
+		//только для элементов-балансов
+		if($cmp['dialog_id'] != 27)
+			continue;
+
+		//получение всех слагаемых баланса
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `parent_id`=".$cmp_id;
+		if(!$arr = query_arr($sql))
+			continue;
+
+		//поиск значения сохраняемого диалога, которое содержится в балансе
+		foreach($arr as $id => $r) {
+			if(!$elm_id = _num($r['txt_2']))
+				continue;
+			if(isset($POST_CMP[$elm_id]))
+				_spisokUnitUpd27($cmp);
+		}
+	}
 }
 function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
 	if(!isset($unit['dialog_id']))
