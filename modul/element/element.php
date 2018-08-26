@@ -605,7 +605,8 @@ function _elemVvv($elem_id, $src=array()) {
 					$sel_id = $unit[$el['col']]['id'];
 			} else
 				$sel_id = _spisokCmpConnectIdGet($el);
-			return _spisok29connect($elem_id, $v='', $sel_id);
+//			return _spisok29connect($elem_id, $v='', $sel_id);
+			return _29cnn($elem_id);
 
 		//SA: select - выбор имени колонки
 		case 37:

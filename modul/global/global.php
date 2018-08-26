@@ -303,6 +303,17 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1;
 
 	return $send;
 }
+function _idsLast($v) {//последнее значение последовательного массива (или идентификаторов через запятую)
+	if(empty($v))
+		return 0;
+
+	if(!is_array($v))
+		$v = _ids($v, 1);
+
+	$c = count($v);
+
+	return _num($v[$c - 1]);
+}
 
 function mb_ucfirst($txt) {//делание заклавной первую букву текста
 //	mb_internal_encoding('UTF-8');

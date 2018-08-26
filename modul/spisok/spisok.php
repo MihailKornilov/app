@@ -1018,6 +1018,74 @@ function _spisokCond83($el) {//фильтр-select
 
 	return " AND `id`=".$v;
 }
+
+function _29cnn($elem_id) {
+	if(!$EL = _elemOne($elem_id))
+		return array();
+	//диалог привязанного списка
+	if(!$DLG = _dialogQuery($EL['num_1']))
+		return array();
+	//элементы для отображения
+	if(!$ids = _ids($EL['txt_3'], 1))
+		return array();
+	//последний элемент для отображения
+	if(!$id = _idsLast($EL['txt_3']))
+		return array();
+	if(!$el0 = _elemOne($id))
+		return array();
+
+	//значения списка, которые будут выводится
+	if(!$spisok = _29cnnSpisok($DLG, $EL['num_5']))
+		return array();
+
+	//вставка значений из вложенных списков
+	$spisok = _spisokInclude($spisok);
+
+	$send = array();
+
+	switch($el0['dialog_id']) {
+		case 8://text
+			foreach($spisok as $sid => $sp) {
+				$title = $sp;
+				foreach($ids as $id) {
+					$el = _elemOne($id);
+					$title = $title[$el['col']];
+				}
+				$send[] = array(
+					'id' => $sid,
+					'title' => $title
+				);
+			}
+			break;
+		case 44://сборный текст
+//			break;
+		default:
+			foreach($spisok as $id => $r) {
+				$title = '- значение не настроено -';
+				$send[] = array(
+					'id' => $id,
+					'title' => $title,
+					'content' => '<div class="red">'.$title.'</div>'
+				);
+			}
+	}
+
+	return $send;
+}
+function _29cnnSpisok($DLG, $sort) {
+	$field = $DLG['field1'];
+
+	$cond = "`t1`.`id`";
+	$cond .= _spisokCondDef($DLG['id']);
+
+	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
+			FROM "._tableFrom($DLG)."
+			WHERE ".$cond."
+			ORDER BY ".(isset($field['sort']) ? "`sort`," : '')."`id` DESC
+			"._dn($sort, "LIMIT 50");//если включён учёт списка по уровням
+	return query_arr($sql);
+}
+
 function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)
 		return array();
@@ -1044,14 +1112,7 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение да�
 
 	$cond = "`t1`.`id`".$cond;
 	$cond .= _spisokCondDef($dialog['id']);
-/*
-	if(isset($field['deleted']))
-		$cond .= " AND !`t1`.`deleted`";
-	if(isset($field['app_id']))
-		$cond .= " AND `t1`.`app_id`=".APP_ID;
-	if(isset($field['dialog_id']))
-		$cond .= " AND `t1`.`dialog_id`=".$cmp['num_1'];
-*/
+
 	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM "._tableFrom($dialog)."
 			WHERE ".$cond."
@@ -1141,6 +1202,7 @@ function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение да�
 }
 function _spisok29connectGet($ids, $v) {
 	$send = array(
+		'dlg0' => 0,        //id диалога элемента
 		'col0' => '',       //имя колонки основого списка
 		'col1' => '',       //имя колонки привязанного списка
 		'cnn' => 0,         //был ли привязанный список
@@ -1163,6 +1225,7 @@ function _spisok29connectGet($ids, $v) {
 	if(!isset($arr[$id0]))
 		return $send;
 
+	$send['dlg0'] = $arr[$id0]['dialog_id'];
 	$send['col0'] = $arr[$id0]['col'];
 	if(count($ids) == 1 && $v)
 		$send['cond'] = "`".$send['col0']."` LIKE '%".addslashes($v)."%'";
