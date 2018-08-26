@@ -1043,31 +1043,32 @@ function _29cnn($elem_id) {
 
 	$send = array();
 
-	switch($el0['dialog_id']) {
-		case 8://text
-			foreach($spisok as $sid => $sp) {
+	foreach($spisok as $sid => $sp) {
+		$content = '';
+		switch($el0['dialog_id']) {
+			case 8://text
 				$title = $sp;
 				foreach($ids as $id) {
 					$el = _elemOne($id);
 					$title = $title[$el['col']];
 				}
-				$send[] = array(
-					'id' => $sid,
-					'title' => $title
-				);
-			}
-			break;
-		case 44://сборный текст
-//			break;
-		default:
-			foreach($spisok as $id => $r) {
+				break;
+			case 44://сборный текст
+				$title = PHP12_44_print($el0['id'], $sp);
+				break;
+			default:
 				$title = '- значение не настроено -';
-				$send[] = array(
-					'id' => $id,
-					'title' => $title,
-					'content' => '<div class="red">'.$title.'</div>'
-				);
-			}
+				$content = '<div class="red">'.$title.'</div>';
+		}
+
+		$u = array(
+			'id' => $sid,
+			'title' => $title
+		);
+		if($content)
+			$u['content'] = $content;
+
+		$send[] = $u;
 	}
 
 	return $send;
