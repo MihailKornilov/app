@@ -708,8 +708,7 @@ function _elemVvv($elem_id, $src=array()) {
 			return $field;
 
 		//SA: Select - выбор диалогового окна
-		case 38:
-			return _dialogSelArray();
+		case 38: return _dialogSelArray();
 
 		//Меню переключения блоков - список пунктов
 		case 57:
@@ -788,6 +787,36 @@ function _elemVvv($elem_id, $src=array()) {
 			$dialog['cmp'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 			break;
 */
+		case 85:
+			if(empty($unit))
+				break;
+			//ID элемента, который размещает селект со списком
+			if(!$elem_id = _num($el['num_1']))
+				break;
+			if(!$el = _elemOne($elem_id))
+				break;
+			//колонка, по которой будет получено ID диалога-списка
+			if(!$col = $el['col'])
+				break;
+			if(!$dlg_id = _num($unit[$col]))
+				break;
+			if(!$dlg = _dialogQuery($dlg_id))
+				break;
+
+			//получение данных списка
+			$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
+					FROM "._tableFrom($dlg)."
+					WHERE `t1`.`id`"._spisokCondDef($dlg_id)."
+					ORDER BY `id`
+					LIMIT 200";
+			if(!$spisok = query_arr($sql))
+				break;
+
+			$send = array();
+			foreach($spisok as $id => $r)
+				$send[$id] = $r['txt_1'];
+
+			return $send;
 	}
 
 	return array();

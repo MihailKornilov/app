@@ -1237,10 +1237,12 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				num_3 - поиск значений вручную
 				num_4 - блокировать выбор
 				num_5 - учитывать уровни
+				num_6 - по умолчанию
 			*/
 
 			if(!$UNIT_ISSET)
-				$v = _spisokCmpConnectIdGet($el);
+//				$v = _spisokCmpConnectIdGet($el);
+				$v = $el['num_6'];
 
 			if(is_array($v))
 				$v = $v['id'];
@@ -2583,3 +2585,20 @@ function _beBlockSort($BLK, $RES=array()) {//выстраивание блоко
 
 	return $RES;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

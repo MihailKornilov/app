@@ -1676,8 +1676,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-//						spisok:VVV[el.id],
-						msg_empty:'Не указан список',
+						spisok:VVV[el.id],
+						msg_empty:el.num_1 ? 'Список пуст' : 'Не указан список',
 						func:function(v) {
 //							_elemFunc(el, v);
 						}
