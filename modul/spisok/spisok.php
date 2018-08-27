@@ -1019,21 +1019,20 @@ function _spisokCond83($el) {//фильтр-select
 	return " AND `id`=".$v;
 }
 
-function _29cnn($elem_id) {
+function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select подключённого списка
+	/*
+		Три варианта вывода значений:
+			1. Прямое значение
+			2. Значения из вложенного списка
+			3. Сборный текст
+		$v - быстрый поиск
+		$sel_id - единица списка, которая была выбрана ранее
+	*/
 	if(!$EL = _elemOne($elem_id))
 		return array();
 	//диалог привязанного списка
 	if(!$DLG = _dialogQuery($EL['num_1']))
 		return array();
-	//элементы для отображения
-	if(!$ids = _ids($EL['txt_3'], 1))
-		return array();
-	//последний элемент для отображения
-	if(!$id = _idsLast($EL['txt_3']))
-		return array();
-	if(!$el0 = _elemOne($id))
-		return array();
-
 	//значения списка, которые будут выводится
 	if(!$spisok = _29cnnSpisok($DLG, $EL['num_5']))
 		return array();
@@ -1044,36 +1043,20 @@ function _29cnn($elem_id) {
 	$send = array();
 
 	foreach($spisok as $sid => $sp) {
-		$content = '';
-		switch($el0['dialog_id']) {
-			case 8://text
-				$title = $sp;
-				foreach($ids as $id) {
-					$el = _elemOne($id);
-					$title = $title[$el['col']];
-				}
-				break;
-			case 44://сборный текст
-				$title = PHP12_44_print($el0['id'], $sp);
-				break;
-			default:
-				$title = '- значение не настроено -';
-				$content = '<div class="red">'.$title.'</div>';
-		}
-
+		$title = _29cnnTitle($EL['txt_3'], $sp);
 		$u = array(
 			'id' => $sid,
 			'title' => $title
 		);
-		if($content)
-			$u['content'] = $content;
+		if($content = _29cnnTitle($EL['txt_4'], $sp, 1))
+			$u['content'] = $title.'<div class="grey fs12">'.$content.'</div>';
 
 		$send[] = $u;
 	}
 
 	return $send;
 }
-function _29cnnSpisok($DLG, $sort) {
+function _29cnnSpisok($DLG, $sort) {//значения списка для формирования содержания
 	$field = $DLG['field1'];
 
 	$cond = "`t1`.`id`";
@@ -1085,6 +1068,32 @@ function _29cnnSpisok($DLG, $sort) {
 			ORDER BY ".(isset($field['sort']) ? "`sort`," : '')."`id` DESC
 			"._dn($sort, "LIMIT 50");//если включён учёт списка по уровням
 	return query_arr($sql);
+}
+function _29cnnTitle($ids, $sp, $content=false) {//формирование содержания для одной единицы списка
+	//элементы для отображения
+	if(!$ids = _ids($ids, 1))
+		return $content ? '' : '- значение не настроено -';
+
+	//последний элемент для отображения
+	$last = _idsLast($ids);
+
+	if(!$el = _elemOne($last))
+		return $content ? '' : '- несуществующий элемент '.$last.' -';
+
+	switch($el['dialog_id']) {
+		//текстовое поле
+		case 8:
+			$title = $sp;
+			foreach($ids as $id) {
+				$el = _elemOne($id);
+				$title = $title[$el['col']];
+			}
+			return $title;
+		//сборный текст
+		case 44: return PHP12_44_print($el['id'], $sp);
+	}
+
+	return $content ? '' : '- незвестный тип: '.$el['dialog_id'].' -';
 }
 
 function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)

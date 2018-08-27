@@ -257,7 +257,7 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 
 		$v = _txt($_POST['v']);
 
-		$send['spisok'] = _spisok29connect($cmp_id, $v);
+		$send['spisok'] = _29cnn($cmp_id, $v);
 		jsonSuccess($send);
 		break;
 	case 'spisok_59_unit':
