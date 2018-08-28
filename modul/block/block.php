@@ -1241,8 +1241,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			*/
 
 			if(!$UNIT_ISSET)
-//				$v = _spisokCmpConnectIdGet($el);
-				$v = $el['num_6'];
+				if(!$v = $el['num_6'])
+					$v = _spisokCmpConnectIdGet($el);
 
 			if(is_array($v))
 				$v = $v['id'];

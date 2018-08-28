@@ -1122,7 +1122,8 @@ function _29cnnTitle($ids, $sp, $content=false) {//формирование со
 		case 8:
 			$title = $sp;
 			foreach($ids as $id) {
-				$el = _elemOne($id);
+				if(!$el = _elemOne($id))
+					return $content ? '' : '- несуществующий элемент: '.$id.' -';
 				$title = $title[$el['col']];
 			}
 			return $title;
@@ -1132,7 +1133,7 @@ function _29cnnTitle($ids, $sp, $content=false) {//формирование со
 
 	return $content ? '' : '- незвестный тип: '.$el['dialog_id'].' -';
 }
-
+/*
 function _spisok29connect($cmp_id, $v='', $sel_id=0) {//получение данных списка для связки (dialog_id:29)
 	if(!$cmp_id)
 		return array();
@@ -1298,7 +1299,7 @@ function _spisok29connectGet($ids, $v) {
 
 	return $send;
 }
-
+*/
 function _spisok59unit($elem_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
 	if(!$unit_id)
 		return '';
