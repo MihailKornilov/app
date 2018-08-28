@@ -1034,8 +1034,12 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 	if(!$DLG = _dialogQuery($EL['num_1']))
 		return array();
 	//значения списка, которые будут выводится
-	if(!$spisok = _29cnnSpisok($DLG, $EL['num_5']))
+	if(!$spisok = _29cnnSpisok($EL, $v))
 		return array();
+
+	//добавление единицы списка, которая была выбрана ранее
+	if($sel_id && empty($spisok[$sel_id]))
+		$spisok[$sel_id] = _spisokUnitQuery($DLG, $sel_id);
 
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);
@@ -1046,28 +1050,61 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 		$title = _29cnnTitle($EL['txt_3'], $sp);
 		$u = array(
 			'id' => $sid,
-			'title' => $title
+			'title' => $title,
+			'content' => $title
 		);
 		if($content = _29cnnTitle($EL['txt_4'], $sp, 1))
 			$u['content'] = $title.'<div class="grey fs12">'.$content.'</div>';
+		if($v)
+			$u['content'] = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $u['content'], 1);
 
 		$send[] = $u;
 	}
 
 	return $send;
 }
-function _29cnnSpisok($DLG, $sort) {//значения списка для формирования содержания
+function _29cnnSpisok($el, $v) {//значения списка для формирования содержания
+	$DLG = _dialogQuery($el['num_1']);
+
+	//учитываются уровни (отключается лимит списка)
+	$sort = $el['num_5'];
 	$field = $DLG['field1'];
 
 	$cond = "`t1`.`id`";
 	$cond .= _spisokCondDef($DLG['id']);
 
+	$C = array();
+	$C[] = _29cnnCond($el['txt_3'], $v);
+	$C[] = _29cnnCond($el['txt_4'], $v);
+	$C = array_diff($C, array(''));
+	if(!empty($C))
+		$cond .= " AND (".implode(' OR ', $C).")";
+
 	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
 			FROM "._tableFrom($DLG)."
 			WHERE ".$cond."
 			ORDER BY ".(isset($field['sort']) ? "`sort`," : '')."`id` DESC
-			"._dn($sort, "LIMIT 50");//если включён учёт списка по уровням
+			"._dn($sort, "LIMIT 50");
 	return query_arr($sql);
+}
+function _29cnnCond($ids, $v) {//получение условия при быстром поиске
+	if(empty($v))
+		return '';
+	if(!$ids = _ids($ids, 1))
+		return '';
+	if(count($ids) != 1)//пока только для прямых значений (без вложенных списков)
+		return '';
+
+	$last = _idsLast($ids);
+
+	if(!$el = _elemOne($last))
+		return '';
+	if($el['dialog_id'] != 8)//пока только для текстового поля
+		return '';
+	if(!$col = $el['col'])
+		return '';
+
+	return "`".$col."` LIKE '%".addslashes($v)."%'";
 }
 function _29cnnTitle($ids, $sp, $content=false) {//формирование содержания для одной единицы списка
 	//элементы для отображения
@@ -1261,6 +1298,7 @@ function _spisok29connectGet($ids, $v) {
 
 	return $send;
 }
+
 function _spisok59unit($elem_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
 	if(!$unit_id)
 		return '';
