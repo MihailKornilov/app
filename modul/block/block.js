@@ -193,7 +193,6 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 					if(!galka.hasClass('dn')) {
 						galka._dn();
 						BL.bg = '';
-						BL.bg_ids = '';
 						BL.save = 1;
 						return;
 					}
@@ -201,12 +200,13 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 					_dialogLoad({
 						dialog_id:11,
 						dialog_source:BL.bg70,
-						unit_id:-118,
+						block_id:-1,
+//						unit_id:-118,
+						prm:{nest:1},
 						busy_obj:$(this),
 						busy_cls:'busy',
 						func_save:function(res) {
 							BL.bg = 'bg70';
-							BL.bg_ids = res.unit.txt_2;
 							BL.save = 1;
 							_attr_bl(BL.id).removeClass(BGS);
 							_blockUnitSave(BL);

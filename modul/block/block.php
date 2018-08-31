@@ -172,7 +172,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 
 			$cls = array('bl-td');
 			$cls[] = 'prel';
-			$cls[] = $r['bg'];
+			if($r['bg'] && !_ids($r['bg']))
+				$cls[] = $r['bg'];
 			$cls[] = trim($bt);
 			$cls[] = trim($bb);
 			$cls[] = !$xEnd ? trim($BR) : '';
@@ -383,15 +384,15 @@ function _blockStyle($r, $width, $unit) {//стили css для блока
 	$send[] = ($r['width_auto'] ? 'min-' : '').'width:'.$width.'px';
 
 	//цвет фона из единицы списка
-	if($r['bg'] == 'bg70')
-		if(!empty($r['bg_col'])) {
-			$col = $r['bg_col'];
-			if(!empty($r['bg_connect']))
-				$bg = @$unit[$r['bg_connect']][$col];
-			else
-				$bg = @$unit[$col];
-			if($bg)
-				$send[] = 'background-color:'.$bg;
+	if(!_elemUnitIsEdit($unit))
+		if($ids = _ids($r['bg'], 1)) {
+			$bg = $unit;
+			foreach($ids as $id) {
+				if($el = _elemOne($id)) {
+					$bg = $bg[$el['col']];
+				}
+			}
+			$send[] = 'background-color:'.$bg;
 		}
 
 	return implode(';', $send);
@@ -1768,7 +1769,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		if(!isset($G_BLOCK[$i1]))
 			return array();
 
-		$send = $G_BLOCK[$i1];
+		$send = _beBlockBg($G_BLOCK[$i1]);
 		$send['elem'] = $send['elem_id'] ? $G_ELEM[$send['elem_id']] : array();
 
 		return _arrNum($send);
@@ -2219,7 +2220,6 @@ function _beBlockForming($arr) {//формирование массива бло
 			'height' => _num($r['height']),
 			'pos' => $r['pos'],
 			'bg' => $r['bg'],
-			'bg_ids' => $r['bg_ids'],
 			'bor' => $r['bor'],
 			'elem_id' => 0
 		);
@@ -2230,24 +2230,7 @@ function _beBlockForming($arr) {//формирование массива бло
 function _beBlockBg($r) {
 	global $G_ELEM, $G_DLG;
 
-	//если присутствует элемент-цвет фона, получение колонок для цвета, если потребуется окраска блока
 	$r['xx_ids'] = _idsAss($r['xx_ids']);
-	$r['bg_col'] = '';    //имя колонки, по которой будет выбираться цвет
-	$r['bg_connect'] = '';//имя колонки, если это подключаемый список
-	if($r['bg'] == 'bg70')
-		if($ids = _ids($r['bg_ids'], 1))
-			foreach($ids as $elem_id)
-				if($el = $G_ELEM[$elem_id])
-					switch($el['dialog_id']) {
-						case 29:
-						case 59:
-							$r['bg_connect'] = $el['col'];
-							break;
-						case 70:
-							$r['bg_col'] = $el['col'];
-							break;
-					}
-
 
 	//Отображение варианта цвета для динамической окраски блоков
 	//Будет открываться диалог, который вносит данные списка, чтобы указать, откуда брать цвет для окраски

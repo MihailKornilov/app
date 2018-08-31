@@ -611,7 +611,7 @@ function _jsCacheBlockOne($block_id) {
 	$val['bor'] = $r['bor'];
 	$val['pos'] = $r['pos'];
 	$val['bg'] = $r['bg'];
-	$val['bg_ids'] = $r['bg_ids'];
+	$val['bg70'] = $r['bg70'];
 	$val['child_count'] = $r['child_count'];
 
 	return $val;

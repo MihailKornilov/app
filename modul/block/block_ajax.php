@@ -241,11 +241,6 @@ switch(@$_POST['op']) {
 		$width_auto = _num($_POST['width_auto']);
 		$pos = _txt($_POST['pos']);
 		$bg = _txt($_POST['bg']);
-		if(!$bg_ids = _ids($_POST['bg_ids'])) {
-			if($bg == 'bg70')
-				$bg = '';
-			$bg_ids = '';
-		}
 
 		//границы
 		$ex = explode(' ', $_POST['bor']);
@@ -261,7 +256,6 @@ switch(@$_POST['op']) {
 					`width_auto`='".$width_auto."',
 					`pos`='".$pos."',
 					`bg`='".$bg."',
-					`bg_ids`='".$bg_ids."',
 					`bor`='".$bor."'
 				WHERE `id`=".$block_id;
 		query($sql);
