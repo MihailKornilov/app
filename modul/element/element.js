@@ -2419,6 +2419,79 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
+	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА RADIO ===--- */
+	PHP12_filter_radio_setup = function(el, unit) {//для [74]
+		if(unit == 'get')
+			return PHP12_filter_radio_get(el);
+
+		if(!unit.id)
+			return;
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last'),
+			ATR_SP = $('#cmp_2585'),
+			NUM = 1;
+
+		ATR_SP._select('disable');
+		BUT_ADD.click(valueAdd);
+
+		if(!VVV[el.id].length)
+			valueAdd();
+		else
+			_forIn(VVV[el.id], valueAdd);
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
+				title:'имя значения ' + NUM++,
+				num_8:0,  //id условия из выпадающего списка [num_8]
+				txt_8:''  //значеие условия                  [txt_8]
+			}, v);
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center top pt5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td><input type="text"' +
+									  ' class="title w150"' +
+									  ' value="' + v.title + '"' +
+								' />' +
+							'<td class="w35 r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			DL.sortable({axis:'y',handle:'.icon-move-y'});
+
+			var DD = DL.find('dd:last'),
+				TITLE = DD.find('.title');
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+			});
+		}
+	},
+	PHP12_filter_radio_get = function(el) {//получение данных для сохранения
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var id = _num(sp.attr('val'));
+			if(!id)
+				return;
+			send.push({
+				id:id,
+				num_8:sp.find('.cond-id').val(),
+				txt_8:sp.find('.cond-val').val()
+			});
+		});
+		return send;
+	},
+
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА ГАЛОЧКИ ===--- */
 	PHP12_filter_check_setup = function(el, unit) {//для [62]
 		if(unit == 'get')
@@ -2429,20 +2502,18 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
-			ATTR_EL = _attr_el(el.id),
-			DL = ATTR_EL.append(html).find('dl'),
-			BUT_ADD = ATTR_EL.find('div:last'),
-			ATTR_SPISOK = $('#cmp_1443');
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last'),
+			ATR_SP = $('#cmp_1443');
 
-		ATTR_SPISOK._select('disable');
-
+		ATR_SP._select('disable');
 		BUT_ADD.click(valueAdd);
 
 		if(!VVV[el.id].length)
 			valueAdd();
 		else
 			_forIn(VVV[el.id], valueAdd);
-
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -2480,7 +2551,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			TITLE.click(function() {
 				_dialogLoad({
 					dialog_id:11,
-					dialog_source:ELMM[ATTR_SPISOK.val()].num_1,
+					dialog_source:ELMM[ATR_SP.val()].num_1,
 					block_id:unit.source.block_id,
 					unit_id:v.id,
 					busy_obj:$(this),
