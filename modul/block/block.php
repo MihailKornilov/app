@@ -1532,7 +1532,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				'class' => _dn(!$v)
 			)).
 			'<div class="'._dn($v).'">'.
-				'<div class="icon icon-del-red pl fr'._tooltip('Отменить выбор', -53).'</div>'.
+				'<div class="icon icon-del-red pl fr'._tooltip('Отменить выбор', -52).'</div>'.
 				'<div class="un-html">'._spisok59unit($el['id'], $v).'</div>'.
 			'</div>';
 
