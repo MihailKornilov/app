@@ -1688,7 +1688,7 @@ function PHP12_filter_check_setup_save($cmp, $val, $unit) {//сохранени�
 		$sql = "UPDATE `_element`
 				SET `parent_id`=".$parent_id.",
 					`num_8`=".$r['num_8'].",
-					`txt_8`=".addslashes($r['txt_8'])."
+					`txt_8`='".addslashes($r['txt_8'])."'
 				WHERE `id`=".$r['id'];
 		query($sql);
 	}

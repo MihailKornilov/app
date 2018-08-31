@@ -1821,12 +1821,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 					}
 
 					_forIn(sp.target, function(tar, elem_id) {
-						var EL = ELM[elem_id];
+						var EL = ELMM[elem_id];
 						//свои способы действия на каждый элемент
 						switch(EL.dialog_id) {
 							case 1: //галочка
 							case 62://фильтр-галочка
-								$(EL.attr_cmp)._check(is_set);
+								_attr_cmp(elem_id)._check(is_set);
 								FILTER[el.num_2][EL.id] = is_set;
 								break;
 						}

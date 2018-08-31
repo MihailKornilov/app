@@ -871,7 +871,7 @@ function _spisokCond62($el) {//фильтр-галочка
 		//условия, формирующие фильтр
 		$sql = "SELECT *
 				FROM `_element`
-				WHERE `block_id`=-".$filter['id'];
+				WHERE `parent_id`=".$filter['id'];
 		if(!$cond = query_arr($sql))
 			continue;
 
