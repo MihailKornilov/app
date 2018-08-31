@@ -1641,7 +1641,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 										CAL.find('.fc-cnt').html(sp.dop.cnt);
 										break;
 									//фильтр-меню
-									case 78: _attr_cmp(sp.elem_id).find('.sel').removeClass('sel'); break;
+									case 78: _attr_el(sp.elem_id).find('.sel').removeClass('sel'); break;
 									//фильтр-select
 									case 83: _attr_cmp(sp.elem_id)._select(0); break;
 								}
