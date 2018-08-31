@@ -321,6 +321,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	//сохранение настройки истории действий - через [67] - перехват внесения данных
 	PHP12_history_setup_save($dialog);
 
+	//выбор цвета для динамической заливки - через [11] - перехват внесения данных
+	_block_bg70($block_id, $dialog, $POST_CMP);
+
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 
 	if(IS_ELEM)
@@ -1246,7 +1249,6 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 	//блок, который размещает элемент [13]
 	if(!$block = _blockOne($block_id))
 		return;
-
 	//сам элемент [13]
 	if(!$el = $block['elem'])
 		return;
@@ -1288,6 +1290,28 @@ function _elem19_block_choose($dialog) {//выбор блоков через [11
 	$elem_func_id = key($dialog['cmp']);
 
 	$send['ids'] = _ids($vvv[$elem_func_id]);
+
+	jsonSuccess($send);
+}
+
+function _block_bg70($block_id, $dialog, $POST_CMP) {//выбор пути к динамической заливке блока через [11]
+	if(empty($_POST['prm']['bg70_choose']))
+		return;
+	//блок, для которого применяется заливка
+	if(!$block = _blockOne($block_id))
+		return;
+	//выбор пути должно происходить через [11]
+	if($dialog['id'] != 11)
+		return;
+
+	//получение элемента-функции [12], отображающего диалог для выбора
+	if(empty($dialog['cmp']))
+		jsonError('Пустой диалог 11');
+
+	$elem_func_id = key($dialog['cmp']);
+
+	if(!$send['bg'] = _ids($POST_CMP[$elem_func_id]))
+		jsonError('Значение не выбрано');
 
 	jsonSuccess($send);
 }

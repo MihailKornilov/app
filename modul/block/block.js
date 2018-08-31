@@ -182,8 +182,7 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 		});
 
 
-//		if(BL.bg70)
-		{
+		if(BL.bg70) {
 			$(document)
 				.off('click', '#block-set-bg .bg70')
 				.on('click', '#block-set-bg .bg70', function() {
@@ -200,13 +199,12 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 					_dialogLoad({
 						dialog_id:11,
 						dialog_source:BL.bg70,
-						block_id:-1,
-//						unit_id:-118,
-						prm:{nest:1},
+						block_id:BL.id,
+						prm:{nest:1,bg70_choose:1},
 						busy_obj:$(this),
 						busy_cls:'busy',
 						func_save:function(res) {
-							BL.bg = 'bg70';
+							BL.bg = res.bg;
 							BL.save = 1;
 							_attr_bl(BL.id).removeClass(BGS);
 							_blockUnitSave(BL);
@@ -215,7 +213,7 @@ var _blockUnitSetup = function() {//настройка стилей блока �
 				});
 			div += '<div class="bg70 prel dib center w25 bor-e8 grey ml3' +
 							_tooltip('Окраска блока согласно<br>цвету фона единицы списка', -83, '', 1) +
-						'<div class="galka pabs fs17 pl5' + _dn(BL.bg == 'bg70') + '">&#10004;</div>' +
+						'<div class="galka pabs fs17 pl5' + _dn(_ids(BL.bg)) + '">&#10004;</div>' +
 						'<div class="pabs icon spin"></div>' +
 						'<table class="w100p curP">' +
 							'<tr><td class="bg-efe" style="width:24px;height:8px">' +

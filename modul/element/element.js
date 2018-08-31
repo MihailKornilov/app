@@ -562,6 +562,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				block_id:o.block_id,
 				unit_id:o.unit_id,
 				dialog_source:o.dialog_source,//id исходного диалогового окна
+				prm:o.unit.source.prm,
 				cmp:{},
 				vvv:{}
 			};
@@ -818,15 +819,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						inp = P.find('.inp'),
 						sel = ATR_CMP.val(),
 						del = P.find('.icon-del'),
-						D = DIALOG_OPEN.D,
-						err = function(msg) {
-							P._hint({
-								msg:msg,
-								color:'red',
-								pad:10,
-								show:1
-							});
-						};
+						D = DIALOG_OPEN.D;
 
 					P.click(function() {
 						_dialogLoad({
