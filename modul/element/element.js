@@ -2419,6 +2419,126 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
+	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА ГАЛОЧКИ ===--- */
+	PHP12_filter_check_setup = function(el, unit) {//для [62]
+		if(unit == 'get')
+			return PHP12_filter_check_get(el);
+
+		if(!unit.id)
+			return;
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			ATTR_EL = _attr_el(el.id),
+			DL = ATTR_EL.append(html).find('dl'),
+			BUT_ADD = ATTR_EL.find('div:last'),
+			ATTR_SPISOK = $('#cmp_1443');
+
+		ATTR_SPISOK._select('disable');
+
+		BUT_ADD.click(valueAdd);
+
+		if(!VVV[el.id].length)
+			valueAdd();
+		else
+			_forIn(VVV[el.id], valueAdd);
+
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
+				title:'', //имя элемента
+				num_8:0,  //id условия из выпадающего списка [num_8]
+				txt_8:''  //значеие условия                  [txt_8]
+			}, v);
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w50 r color-sal">Если:' +
+							'<td><input type="text"' +
+									  ' readonly' +
+									  ' class="title w150 curP over4"' +
+									  ' placeholder="выберите значение..."' +
+									  ' value="' + v.title + '"' +
+								' />' +
+							'<td><input type="hidden" class="cond-id" value="' + v.num_8 + '" />' +
+							'<td class="w100p">' +
+								'<input type="text"' +
+									  ' class="cond-val w125' + _dn(v.num_8 > 2) + '"' +
+									  ' value="' + v.txt_8 + '"' +
+								' />' +
+							'<td class="w35 r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				TITLE = DD.find('.title'),
+				COND_ID = DD.find('.cond-id');
+			TITLE.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					dialog_source:ELMM[ATTR_SPISOK.val()].num_1,
+					block_id:unit.source.block_id,
+					unit_id:v.id,
+					busy_obj:$(this),
+					busy_cls:'hold',
+					func_save:function(res) {
+						COND_ID._select('enable');
+						if(!v.id)
+							COND_ID._select(1);
+						v.id = res.unit.id;
+						DD.attr('val', v.id);
+						TITLE.val(res.unit.title);
+					}
+				});
+			});
+			COND_ID._select({//условие
+				width:150,
+				title0:'не выбрано',
+				disabled:!v.id,
+				spisok:[
+					{id:1,title:'отсутствует'},
+					{id:2,title:'присутствует'},
+					{id:3,title:'равно'},
+					{id:4,title:'не равно'},
+					{id:5,title:'больше'},
+					{id:6,title:'больше или равно'},
+					{id:7,title:'меньше'},
+					{id:8,title:'меньше или равно'},
+					{id:9,title:'содержит'},
+					{id:10,title:'не содержит'}
+				],
+				func:function(v) {
+					DD.find('.cond-val')
+						._dn(v > 2)
+						.focus();
+				}
+			});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+			});
+		}
+	},
+	PHP12_filter_check_get = function(el) {//получение данных для сохранения
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var id = _num(sp.attr('val'));
+			if(!id)
+				return;
+			send.push({
+				id:id,
+				num_8:sp.find('.cond-id').val(),
+				txt_8:sp.find('.cond-val').val()
+			});
+		});
+		return send;
+	},
+
 	/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА ===--- */
 	PHP12_44_setup = function(el, unit) {//для [44]
 		if(unit == 'get')
@@ -2948,118 +3068,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 				id = _num(t.attr('val'));
 			imNext(id);
 		});
-	},
-	_filterCheckSetup = function(o, i) {//настройка условий фильтра для галочки (подключение через [12])
-		var el = $(o.attr_el);
-
-		//получение данных для сохранения
-		if(i == 'get') {
-			var send = {};
-			_forEq(el.find('dd'), function(sp) {
-				var id = _num(sp.find('.title').attr('val'));
-				if(!id)
-					return;
-				send[id] = {
-					num_8:sp.find('.cond_id').val(),
-					txt_8:sp.find('.cond_val').val()
-				};
-			});
-			return send;
-		}
-		
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить условие</div>',
-			DL = el.append(html).find('dl'),
-			BUT_ADD = el.find('div:last');
-
-		BUT_ADD.click(valueAdd);
-
-		if(!o.vvv.length)
-			valueAdd();
-		else {
-			$('#cmp_1443')._select('disable');
-			_forIn(o.vvv, valueAdd);
-		}
-
-		function valueAdd(v) {
-			v = $.extend({
-				id:0,       //id элемента из диалога, по которому будет выполняться условие фильтра
-				title:'',   //имя элемента
-				num_8:0,  //id условия из выпадающего списка [num_8]
-				txt_8:''  //значеие условия                  [txt_8]
-			}, v);
-
-			DL.append(
-				'<dd class="over3">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w50 r color-sal">Если:' +
-							'<td><input type="text"' +
-									  ' readonly' +
-									  ' class="title w150 curP over4"' +
-									  ' placeholder="выберите значение..."' +
-									  ' value="' + v.title + '"' +
-									  ' val="' + v.id + '"' +
-								' />' +
-							'<td><input type="hidden" class="cond_id" value="' + v.num_8 + '" />' +
-							'<td class="w100p">' +
-								'<input type="text"' +
-									  ' class="cond_val w125' + _dn(v.num_8 > 2) + '"' +
-									  ' value="' + v.txt_8 + '"' +
-								' />' +
-							'<td class="w35 r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			var DD = DL.find('dd:last'),
-				COND_ID = DD.find('.cond_id'),
-				TITLE = DD.find('.title');
-			TITLE.click(function() {
-				_dialogLoad({
-					dialog_id:11,
-					block_id:_num($('#cmp_1443').val()) * -1,
-					unit_id:v.id || -114,           //id выбранного элемента (при редактировании)
-					busy_obj:$(this),
-					busy_cls:'hold',
-					func_save:function(res) {
-						COND_ID._select('enable');
-						$('#cmp_1443')._select('disable');
-						if(!v.id)
-							COND_ID._select(1);
-						v.id = res.unit.id;
-						TITLE.val(res.unit.title);
-						TITLE.attr('val', v.id);
-					}
-				});
-			});
-			COND_ID._select({//условие
-				width:150,
-				disabled:!v.id,
-				spisok:[
-					{id:1,title:'отсутствует'},
-					{id:2,title:'присутствует'},
-					{id:3,title:'равно'},
-					{id:4,title:'не равно'},
-					{id:5,title:'больше'},
-					{id:6,title:'больше или равно'},
-					{id:7,title:'меньше'},
-					{id:8,title:'меньше или равно'},
-					{id:9,title:'содержит'},
-					{id:10,title:'не содержит'}
-				],
-				func:function(v) {
-					DD.find('.cond_val')
-						._dn(v > 2)
-						.focus();
-				}
-			});
-			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
-			});
-		}
 	};
 
 $(document)

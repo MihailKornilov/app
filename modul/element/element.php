@@ -959,11 +959,6 @@ function _elemColType($id='all') {//тип данных, используемы�
 }
 
 
-function _filterCheckSetup() {//настройка условий фильтра для галочки (подключение через [12])
-	return '';
-}
-
-
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 function PHP12_elem_choose($el, $unit) {//выбор элемента для вставки в блок. Диалог [50]
@@ -1637,6 +1632,89 @@ function PHP12_menu_block_setup_vvv($parent_id) {//получение данны
 }
 
 
+/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА ГАЛОЧКИ ===--- */
+function PHP12_filter_check_setup($el, $unit) {//используется в диалоге [62]
+	if(empty($unit['id']))
+		return '<div class="_empty min">Настройка значений фильтра будет доступна<br>после вставки элемента в блок.</div>';
+
+	return '';
+}
+function PHP12_filter_check_setup_save($cmp, $val, $unit) {//сохранение настройки фильтра для галочки. Подключаемая функция [12]
+	/*
+		$cmp  - компонент из диалога, отвечающий за настройку значений фильтра
+		$val  - значения, полученные для сохранения
+		$unit - элемент, размещающий фильтр, для которого происходит настройка
+	*/
+
+	if(!$parent_id = _num($unit['id']))
+		return;
+
+	//ID элементов, которые не должны будут удалены
+	$ids = array();
+	$update = array();
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		foreach($val as $r) {
+			if(!$id = _num($r['id']))
+				continue;
+			if(!$num_8 = _num($r['num_8']))
+				continue;
+
+			$ids[] = $id;
+			$txt_8 = _txt($r['txt_8']);
+			$update[] = array(
+				'id' => $id,
+				'num_8' => $num_8,
+				'txt_8' => $txt_8
+			);
+		}
+	}
+
+	$ids = implode(',', $ids);
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	foreach($update as $r) {
+		$sql = "UPDATE `_element`
+				SET `parent_id`=".$parent_id.",
+					`num_8`=".$r['num_8'].",
+					`txt_8`=".addslashes($r['txt_8'])."
+				WHERE `id`=".$r['id'];
+		query($sql);
+	}
+}
+function PHP12_filter_check_setup_vvv($parent_id) {
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$send = array();
+	foreach($arr as $r) {
+		$send[] = array(
+			'id' => _num($r['id']),
+			'title' => _elemTitle($r['id']),
+			'num_8' => _num($r['num_8']),
+			'txt_8' => $r['txt_8']
+		);
+	}
+
+	return $send;
+}
+
+
 /* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
 function PHP12_radio_setup($el, $unit) {//используется в диалоге [16]
 	return '';
@@ -1775,6 +1853,15 @@ function PHP12_radio_setup_vvv_use($send, $parent_id) {//использован�
 		}
 
 	return $send;
+}
+
+
+/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА RADIO ===--- */
+function PHP12_filter_radio_setup($el, $unit) {//используется в диалоге [74]
+	if(empty($unit['id']))
+		return '<div class="_empty min">Настройка значений фильтра будет доступна<br>после вставки элемента в блок.</div>';
+
+	return '';
 }
 
 

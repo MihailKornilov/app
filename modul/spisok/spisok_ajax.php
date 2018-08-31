@@ -518,6 +518,8 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 			if($elem['dialog_id'] == 23//таблица
 			|| $elem['dialog_id'] == 27//баланс
 			|| $elem['dialog_id'] == 44//сборный текст
+			|| $elem['dialog_id'] == 62//фильтр: галочка
+			|| $elem['dialog_id'] == 74//фильтр: радио
 			) {
 				$block_id = 0;
 				$parent_id = $elem['id'];
@@ -857,64 +859,6 @@ function _cmpV60($cmp, $unit) {//Применение загруженных и�
 				WHERE `id`=".$id;
 		query($sql);
 	}
-}
-function _filterCheckSetup_save($cmp, $val, $unit) {//сохранение настройки фильтра для галочки. Подключаемая функция [12]
-	/*
-		-114
-		$cmp  - компонент из диалога, отвечающий за настройку таблицы
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий таблицу, для которой происходит настройка
-	*/
-
-	$update = array();
-	$idsNoDel = '0';
-
-	if(!empty($val)) {
-		if(!is_array($val))
-			return;
-
-		foreach($val as $id => $r) {
-			if($id = _num($id))
-				$idsNoDel .= ','.$id;
-			if(!$num_8 = _num($r['num_8']))
-				continue;
-			$txt_8 = $num_8 > 2 ? _txt($r['txt_8']) : '';
-			$update[] = "(
-				".$id.",
-				-".$unit['id'].",
-				".$num_8.",
-				'".addslashes($txt_8)."'
-			)";
-		}
-	}
-
-	//удаление удалённых значений
-	$sql = "DELETE FROM `_element`
-			WHERE `block_id`=-".$unit['id']."
-			  AND `id` NOT IN (".$idsNoDel.")";
-	query($sql);
-
-	if(!empty($update)) {
-		$sql = "INSERT INTO `_element` (
-					`id`,
-					`block_id`,
-					`num_8`,
-					`txt_8`
-				)
-				VALUES ".implode(',', $update)."
-				ON DUPLICATE KEY UPDATE
-					`block_id`=VALUES(`block_id`),
-					`num_8`=VALUES(`num_8`),
-					`txt_8`=VALUES(`txt_8`)";
-		query($sql);
-	}
-
-
-	//очистка неиспользованных элементов
-	$sql = "DELETE FROM `_element`
-			WHERE `user_id_add`=".USER_ID."
-			  AND `block_id` IN (0,-114)";
-	query($sql);
 }
 function _pageUserAccess_save($cmp, $val, $unit) {//сохранение доступа к страницам для конкретного пользователя
 	if(!is_array($val))
@@ -1303,7 +1247,6 @@ function _block_bg70($block_id, $dialog, $POST_CMP) {//выбор пути к д
 	//выбор пути должно происходить через [11]
 	if($dialog['id'] != 11)
 		return;
-
 	//получение элемента-функции [12], отображающего диалог для выбора
 	if(empty($dialog['cmp']))
 		jsonError('Пустой диалог 11');
