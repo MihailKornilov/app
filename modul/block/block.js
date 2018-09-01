@@ -1,4 +1,21 @@
-var _blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
+var _ids = function(v) {
+		if(!v)
+			return 0;
+		if(typeof v == 'number')
+			return ids;
+		if(typeof v == 'string') {
+			var send = [];
+			_forN(v.split(','), function(id) {
+				id = _num(id);
+				if(!id)
+					return;
+				send.push(id);
+			});
+			return send.join();
+		}
+		return 0;
+	},
+	_blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
 
 		//если производится процесс деления блока на части, настройка стилей не выводится
 		if($('.block-unit-grid').length)
