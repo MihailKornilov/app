@@ -508,11 +508,19 @@ function _pageShow($page_id) {
 	if($page_id == 105 && APP_ID && APP_ACCESS)
 		$page_id = _page('def');
 
+	$vvvPage = array();
+	foreach(_BE('elem_ids_arr', 'page', $page_id) as $elem_id)
+		$vvvPage[$elem_id] = _elemVvv($elem_id);
+
 	return
 	_blockHtml('page', $page_id,  _pageSpisokUnit($page_id)).
 	_page_div().
 	'<script>'.
-		(!PAS ? '_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');' : '').
+		(!PAS ?
+			'var VVV_PAGE='._json($vvvPage).';'.
+			'for(var i in VVV_PAGE)VVV[i]=VVV_PAGE[i];'.
+			'_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');'
+		: '').
 	'</script>';
 }
 function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, которая размещается на странице. Получение по $_GET['id']

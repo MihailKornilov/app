@@ -800,6 +800,11 @@ function _elemVvv($elem_id, $src=array()) {
 			$dialog['cmp'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 			break;
 */
+
+		case 83:
+			return array(1=>1223);
+
+		//Select - выбор значения списка
 		case 85:
 			if(empty($unit))
 				break;

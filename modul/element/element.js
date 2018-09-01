@@ -711,7 +711,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			var ATR_CMP = _attr_cmp(elm_id),
 				ATTR_CMP_AFICS = _attr_cmp(elm_id, 1),
-				ATTR_EL =  _attr_el(elm_id);
+				ATTR_EL =  _attr_el(elm_id),
+				UNIT_V = unit && unit.id ? _num(unit[el.col] || el.def) : 0;//значение для функции
 
 			el.id = elm_id;
 
@@ -759,7 +760,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			switch(el.dialog_id) {
 				case 1://галочка
 					if(el.func) {
-						_elemFunc(el, _num(unit[el.col] || 0), 1);
+						_elemFunc(el, UNIT_V, 1);
 						ATR_CMP._check({
 							func:function(v) {
 								_elemFunc(el, v);
@@ -771,7 +772,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 5:	ATR_CMP.autosize(); return;
 				//select - выбор страницы
 				case 6:
-					_elemFunc(el, _num(unit[el.col]), 1);
+					_elemFunc(el, UNIT_V, 1);
 					var spisok = _copySel(PAGE_LIST);
 
 					//если выбирается страница для ссылки, то добавляется вариант: 3 => Автоматически
@@ -867,7 +868,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//select - произвольные значения
 				case 17:
-					_elemFunc(el, _num(unit[el.col] || el.def), 1);
+					_elemFunc(el, UNIT_V, 1);
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
@@ -879,7 +880,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//dropdown
 				case 18:
-					_elemFunc(el, _num(unit[el.col] || el.def), 1);
+					_elemFunc(el, UNIT_V, 1);
 					ATR_CMP._dropdown({
 						title0:el.txt_1,
 						spisok:VVV[el.id],
@@ -933,7 +934,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//select - выбор списка (все списки приложения)
 				case 24:
-					_elemFunc(el, _num(unit[el.col] || el.def), 1);
+					_elemFunc(el, UNIT_V, 1);
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
@@ -1669,7 +1670,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-//						spisok:VVV[el.id],
+						spisok:VVV[el.id],
 						func:function(v) {
 							FILTER[el.num_1][elm_id] = v;
 							_spisokUpdate(el.num_1);
