@@ -149,11 +149,11 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 				  AND `num_1`=".$spisok_id."
 				LIMIT 1";
 		if($elCount = query_assoc($sql)) {
-			$send['count_elem_id'] = $elCount['id'];
+			$send['count_id'] = $elCount['id'];
 			$send['count_html'] = _spisokElemCount($elCount);
 		}
 
-		$send['spisok_elem_id'] = $spisok_id;
+		$send['spisok_id'] = $spisok_id;
 		$spFunc = '_spisok'.$elSpisok['dialog_id'];
 		$send['spisok_html'] = $spFunc($elSpisok);
 

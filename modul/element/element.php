@@ -361,6 +361,17 @@ function _dialogSelArray($v=false) {//список диалогов для Selec
 
 	return $spisok;
 }
+function _dialogSpisokCmp($cmp) {//список колонок, используемых в диалоге (для выбора колонки по уполчанию)
+	$send = array();
+
+	foreach($cmp as $id => $r) {
+		if(!$col = $r['col'])
+			continue;
+		$send[$id] = $col.': '.$r['name'];
+	}
+
+	return $send;
+}
 
 function PHP12_dialog_sa($el, $unit) {//список диалоговых окон [12]
 	$sql = "SELECT *
@@ -441,20 +452,22 @@ function PHP12_dialog_col($dialog_id) {//колонки, используемы�
 		if(!$col)
 			continue;
 
+		$colName = $col.': '.$el['name'];
+
 		if(isset($send[$col])) {
-			$send[$col.'dub'.rand(0, 10000)] = '<span class="bg-fcc">'.$col.' - повтор</span>';
+			$send[$col.'dub'.rand(0, 10000)] = '<span class="bg-fcc">'.$colName.' - повтор</span>';
 			$dub = true;
 			continue;
 		}
 
 		if($col == 'col')
-			$send[$col] = '<span class="red b">'.$col.'</span>';
+			$send[$col] = '<span class="red b">'.$colName.'</span>';
 		elseif($col == 'name')
-			$send[$col] = '<span class="color-pay b">'.$col.'</span>';
+			$send[$col] = '<span class="color-pay b">'.$colName.'</span>';
 		elseif($col == 'req' || $col == 'req_msg')
-			$send[$col] = '<span class="color-ref b">'.$col.'</span>';
+			$send[$col] = '<span class="color-ref b">'.$colName.'</span>';
 		else
-			$send[$col] = $col;
+			$send[$col] = $colName;
 	}
 
 	if(empty($send))

@@ -424,6 +424,16 @@ var DIALOG = {},//массив диалоговых окон для управл
 			title0:'не указан',
 			spisok:o.dialog_spisok
 		});
+		DLG('#spisok_on')._check({
+			func:function(v) {
+				DLG('.tr-spisok-col')._dn(v);
+			}
+		});
+		DLG('#spisok_elem_id')._select({
+			width:250,
+			title0:'не указана',
+			spisok:o.spisok_cmp
+		});
 		DLG('#dialog_parent_id')._select({
 			width:250,
 			title0:'нет',
@@ -487,6 +497,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 				dialog_parent_id:DLG('#dialog_parent_id').val(),
 				spisok_on:DLG('#spisok_on').val(),
+				spisok_elem_id:DLG('#spisok_elem_id').val(),
 
 				table_1:DLG('#table_1').val(),
 				table_2:DLG('#table_2').val(),
@@ -1622,10 +1633,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 							t._dn();
 
 							//обновление количества
-							if(res.count_elem_id)
-								_attr_el(res.count_elem_id).html(res.count_html);
+							if(res.count_id)
+								_attr_el(res.count_id).html(res.count_html);
 
-							_attr_el(res.spisok_elem_id).html(res.spisok_html);
+							_attr_el(res.spisok_id).html(res.spisok_html);
 
 							_forIn(res.def, function(sp) {
 								switch(sp.dialog_id) {

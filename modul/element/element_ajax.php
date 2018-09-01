@@ -183,7 +183,7 @@ switch(@$_POST['op']) {
 			//Служебное
 			'<div class="dialog-menu-4 bg-gr2 pad20'._dn($dialog['menu_edit_last'] == 4).'">'.
 				'<table class="bs10">'.
-					'<tr><td class="grey r">Имя диалогового окна:'.
+					'<tr><td class="grey r w150">Имя диалогового окна:'.
 						'<td><input type="text" id="dialog_name" class="w250" maxlength="100" value="'.$dialog['name'].'" />'.
 					'<tr><td>'.
 						'<td>'._check(array(
@@ -191,6 +191,9 @@ switch(@$_POST['op']) {
 									'title' => 'диалог вносит данные для списка',
 									'value' => $dialog['spisok_on']
 							   )).
+					'<tr class="tr-spisok-col'._dn($dialog['spisok_on']).'">'.
+						'<td class="grey r">Колонка по умолчанию:'.
+						'<td><input type="hidden" id="spisok_elem_id" value="'.$dialog['spisok_elem_id'].'" />'.
 					'<tr><td class="grey r">Родительский диалог:'.
 						'<td><input type="hidden" id="dialog_parent_id" value="'.$dialog['dialog_parent_id'].'" />'.
 				'</table>'.
@@ -356,7 +359,8 @@ switch(@$_POST['op']) {
 		$send['tables'] = SA ? _table() : array();
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
-		$send['dialog_spisok'] = SA ? _dialogSelArray('sa_only') : array() ;
+		$send['dialog_spisok'] = SA ? _dialogSelArray('sa_only') : array();
+		$send['spisok_cmp'] = _dialogSpisokCmp($dialog['cmp']);
 		$send['dialog_parent'] = _dialogSelArray($dialog_id);
 
 		jsonSuccess($send);
@@ -826,6 +830,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$spisok_on = _bool($_POST['spisok_on']);
 	if($spisok_on && !$name)
 		jsonError('Укажите имя диалогового окна');
+	$spisok_elem_id = $spisok_on ? _num($_POST['spisok_elem_id']) : 0;
 
 	$dialog_parent_id = _num($_POST['dialog_parent_id']);
 	if($dialog_parent_id == $dialog_id)
@@ -890,6 +895,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`table_2`=".$table_2.",
 				`table_2_field`='".addslashes($table_2_field)."',
 				`spisok_on`=".$spisok_on.",
+				`spisok_elem_id`=".$spisok_elem_id.",
 
 				`element_group_id`=".$element_group_id.",
 				`element_width`=".$element_width.",
