@@ -251,23 +251,6 @@ var ZINDEX = 1000,
 		v = cls == 'dn' ? v : !v;
 		return v ? '' : ' ' + cls;
 	},
-	_ids = function(v) {
-		if(!v)
-			return 0;
-		if(typeof v == 'number')
-			return v;
-		if(typeof v == 'string') {
-			var send = [];
-			_forN(v.split(','), function(id) {
-				id = _num(id);
-				if(!id)
-					return;
-				send.push(id);
-			});
-			return send.join();
-		}
-		return 0;
-	},
 	_idsAss = function(ids) {
 		var send = {};
 

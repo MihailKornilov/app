@@ -1011,12 +1011,17 @@ function _spisokCond83($el) {//фильтр-select
 		return '';
 	if(!$v)
 		return '';
-	if(!$dlg_id = $filter['num_2'])
-		return '';
-	if(!$dlg = _dialogQuery($dlg_id))
+	if(!$elem_ids = _ids($filter['txt_2'], 1))
 		return '';
 
-	return " AND `id`=".$v;
+	$elem_id = $elem_ids[0];
+
+	if(!$ell = _elemOne($elem_id))
+		return '';
+	if(!$col = $ell['col'])
+		return '';
+
+	return " AND `".$col."`=".$v;
 }
 
 function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select подключённого списка

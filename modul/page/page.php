@@ -508,6 +508,7 @@ function _pageShow($page_id) {
 	if($page_id == 105 && APP_ID && APP_ACCESS)
 		$page_id = _page('def');
 
+	//значения элементов страницы
 	$vvvPage = array();
 	foreach(_BE('elem_ids_arr', 'page', $page_id) as $elem_id)
 		$vvvPage[$elem_id] = _elemVvv($elem_id);

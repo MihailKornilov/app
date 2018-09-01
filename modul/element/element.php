@@ -802,7 +802,39 @@ function _elemVvv($elem_id, $src=array()) {
 */
 
 		case 83:
-			return array(1=>1223);
+			//элементы, указывающие на привязанный список
+			if(!$last_id = _idsLast($el['txt_2']))
+				break;
+			if(!$el = _elemOne($last_id))
+				break;
+			if(!$bl = $el['block'])
+				break;
+			if($bl['obj_name'] != 'dialog')
+				break;
+			if(!$dlg_id = _num($bl['obj_id']))
+				break;
+			if(!$dlg = _dialogQuery($dlg_id))
+				break;
+			if(!$col = $el['col'])
+				break;
+
+			//получение данных списка
+			$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
+					FROM "._tableFrom($dlg)."
+					WHERE `t1`.`id`"._spisokCondDef($dlg_id)."
+					ORDER BY `sort`,`id`
+					LIMIT 200";
+			if(!$spisok = query_arr($sql))
+				break;
+
+			$send = array();
+			foreach($spisok as $id => $r)
+				$send[] = array(
+					'id' => $id,
+					'title' => $r[$col]
+				);
+
+			return $send;
 
 		//Select - выбор значения списка
 		case 85:
