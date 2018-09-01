@@ -72,6 +72,7 @@ switch(@$_POST['op']) {
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
 
 			'<div class="pad10 center bg-gr3 line-b">'.
+				'<div class="fr mt5 b pale curD dw'._tooltip('Ширина диалога', -50).$dialog['width'].'</div>'.
 				'<input type="hidden" id="dialog-menu" value="'.$dialog['menu_edit_last'].'" />'.
 			'</div>'.
 

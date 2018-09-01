@@ -455,7 +455,7 @@ function PHP12_dialog_col($dialog_id) {//колонки, используемы�
 		$colName = $col.': '.$el['name'];
 
 		if(isset($send[$col])) {
-			$send[$col.'dub'.rand(0, 10000)] = '<span class="bg-fcc">'.$colName.' - повтор</span>';
+			$send[$col.'dub'.rand(0, 10000)] = $colName.' <span class="bg-fcc">повтор</span>';
 			$dub = true;
 			continue;
 		}

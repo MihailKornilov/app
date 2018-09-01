@@ -289,7 +289,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				top:20,
 				color:'orange',
 				width:o.width,
-				head:'Настройка диалогового окна',
+				head:'Настройка диалогового окна ' + '#' + o.dialog_id,
 				content:o.html,
 				butSubmit:'Сохранить диалоговое окно',
 				submit:submit,
@@ -456,6 +456,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					DIALOG_WIDTH = w;
 					dialog.width(w);
 					DLG('#dialog-width').html(w);
+					DLG('.dw').html(w);
 				}
 			});
 
