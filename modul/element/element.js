@@ -2468,20 +2468,34 @@ var DIALOG = {},//массив диалоговых окон для управл
 						'<tr><td class="w25 center top pt5">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td><input type="text"' +
-									  ' class="title w150"' +
+									  ' class="title w250"' +
+									  ' placeholder="имя значения"' +
 									  ' value="' + v.title + '"' +
 								' />' +
+								'<div class="icon icon-add pl ml5' + _tooltip('Добавить условие', -57) + '</div>' +
 							'<td class="w35 r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
+								'<div class="icon icon-del-red pl' + _tooltip('Удалить значение', -54) + '</div>' +
 					'</table>' +
 				'</dd>'
 			);
 
 			DL.sortable({axis:'y',handle:'.icon-move-y'});
 
-			var DD = DL.find('dd:last'),
-				TITLE = DD.find('.title');
-			DD.find('.icon-del').click(function() {
+			var DD = DL.find('dd:last');
+
+			//добавление условия к значению
+			DD.find('.icon-add').click(function() {
+				_dialogLoad({
+					dialog_id:25,
+					busy_obj:$(this),
+					busy_cls:'spin',
+					func_save:function(ia) {
+					}
+				});
+			});
+
+			//удаление значения radio вместе с условиями
+			DD.find('.icon-del-red').click(function() {
 				var t = $(this),
 					p = _parent(t, 'DD');
 				p.remove();
