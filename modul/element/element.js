@@ -2459,9 +2459,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
-				title:'имя значения ' + NUM++,
-				num_8:0,  //id условия из выпадающего списка [num_8]
-				txt_8:''  //значеие условия                  [txt_8]
+				title:'Значение ' + NUM++
 			}, v);
 
 			DL.append(
@@ -2493,13 +2491,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 	PHP12_filter_radio_get = function(el) {//получение данных для сохранения
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			var id = _num(sp.attr('val'));
-			if(!id)
-				return;
 			send.push({
-				id:id,
-				num_8:sp.find('.cond-id').val(),
-				txt_8:sp.find('.cond-val').val()
+				id:_num(sp.attr('val')),
+				title:sp.find('.title').val()
 			});
 		});
 		return send;

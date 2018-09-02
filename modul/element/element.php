@@ -801,6 +801,14 @@ function _elemVvv($elem_id, $src=array()) {
 			break;
 */
 
+		//Фильтр radio
+		case 74:
+			$sql = "SELECT `id`,`txt_1`
+					FROM `_element`
+					WHERE `parent_id`=".$elem_id."
+					ORDER BY `sort`";
+			return query_ass($sql);
+
 		case 83:
 			//элементы, указывающие на привязанный список
 			if(!$last_id = _idsLast($el['txt_2']))
@@ -1912,6 +1920,77 @@ function PHP12_filter_radio_setup($el, $unit) {//используется в д�
 		return '<div class="_empty min">Настройка значений фильтра будет доступна<br>после вставки элемента в блок.</div>';
 
 	return '';
+}
+function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранение значений фильтра radio
+	/*
+		$cmp  - компонент-функция, размещающий в диалоге настройку значений фильтра radio
+		$val  - значения, полученные для сохранения
+		$unit - элемент, который размещает сборный текст
+	*/
+
+	if(!$parent_id = _num($unit['id']))
+		return;
+
+	$ids = '0';
+	$update = array();
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		$sort = 0;
+		foreach($val as $r) {
+			if($id = _num($r['id']))
+				$ids .= ','.$id;
+			if(!$title = _txt($r['title']))
+				continue;
+			$update[] = "(
+				".$id.",
+				".$parent_id.",
+				'".addslashes($title)."',
+				".$sort++."
+			)";
+		}
+	}
+
+	//удаление удалённых значений
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `id` NOT IN (".$ids.")";
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	$sql = "INSERT INTO `_element` (
+				`id`,
+				`parent_id`,
+				`txt_1`,
+				`sort`
+			)
+			VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`txt_1`=VALUES(`txt_1`),
+				`sort`=VALUES(`sort`)";
+	query($sql);
+}
+function PHP12_filter_radio_setup_vvv($parent_id) {
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$send = array();
+	foreach($arr as $r) {
+		$send[] = array(
+			'id' => _num($r['id']),
+			'title' => $r['txt_1']
+		);
+	}
+
+	return $send;
 }
 
 

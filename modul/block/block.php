@@ -1687,6 +1687,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			return _radio(array(
 				'attr_id' => $attr_id,
+				'block' => 1,
 				'light' => 1,
 				'interval' => 5,
 				'value' => _num($v) ? _num($v) : $el['def'],
