@@ -2459,7 +2459,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
-				title:'Значение ' + NUM++
+				title:'Значение ' + NUM++,
+				def:0
 			}, v);
 
 			DL.append(
@@ -2468,11 +2469,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 						'<tr><td class="w25 center top pt5">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td><input type="text"' +
-									  ' class="title w250"' +
+									  ' class="title w250 mr10"' +
 									  ' placeholder="имя значения"' +
 									  ' value="' + v.title + '"' +
 								' />' +
-								'<div class="icon icon-add pl ml5' + _tooltip('Добавить условие', -57) + '</div>' +
+								'<input type="hidden" class="def" value="' + v.def + '" />' +
+								'<div class="icon icon-add pl ml10' + _tooltip('Добавить условие', -57) + '</div>' +
 							'<td class="w35 r">' +
 								'<div class="icon icon-del-red pl' + _tooltip('Удалить значение', -54) + '</div>' +
 					'</table>' +
@@ -2482,6 +2484,21 @@ var DIALOG = {},//массив диалоговых окон для управл
 			DL.sortable({axis:'y',handle:'.icon-move-y'});
 
 			var DD = DL.find('dd:last');
+
+			//установка галочки по умолчанию
+			DD.find('.def')._check({
+				tooltip:'По умолчанию',
+				func:function(v, ch) {
+					if(!v)
+						return;
+					//снятие галочек с остальных значений
+					_forEq(DL.find('.def'), function(sp) {
+						if(sp.attr('id') == ch.attr('id'))
+							return;
+						sp._check(0);
+					});
+				}
+			});
 
 			//добавление условия к значению
 			DD.find('.icon-add').click(function() {
@@ -2507,7 +2524,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
 				id:_num(sp.attr('val')),
-				title:sp.find('.title').val()
+				title:sp.find('.title').val(),
+				def:sp.find('.def').val()
 			});
 		});
 		return send;

@@ -1948,6 +1948,7 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 				".$id.",
 				".$parent_id.",
 				'".addslashes($title)."',
+				"._num($r['def']).",
 				".$sort++."
 			)";
 		}
@@ -1959,6 +1960,12 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 			  AND `id` NOT IN (".$ids.")";
 	query($sql);
 
+	//сброс значения по умолчанию
+	$sql = "UPDATE `_element`
+			SET `def`=0
+			WHERE `id`=".$parent_id;
+	query($sql);
+
 	if(empty($update))
 		return;
 
@@ -1966,12 +1973,27 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 				`id`,
 				`parent_id`,
 				`txt_1`,
+				`def`,
 				`sort`
 			)
 			VALUES ".implode(',', $update)."
 			ON DUPLICATE KEY UPDATE
 				`txt_1`=VALUES(`txt_1`),
+				`def`=VALUES(`def`),
 				`sort`=VALUES(`sort`)";
+	query($sql);
+
+	//установка нового значения по умолчанию
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `def`
+			LIMIT 1";
+	$def = _num(query_value($sql));
+
+	$sql = "UPDATE `_element`
+			SET `def`=".$def."
+			WHERE `id`=".$parent_id;
 	query($sql);
 }
 function PHP12_filter_radio_setup_vvv($parent_id) {
@@ -1986,7 +2008,8 @@ function PHP12_filter_radio_setup_vvv($parent_id) {
 	foreach($arr as $r) {
 		$send[] = array(
 			'id' => _num($r['id']),
-			'title' => $r['txt_1']
+			'title' => $r['txt_1'],
+			'def' => _num($r['def'])
 		);
 	}
 

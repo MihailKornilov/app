@@ -1681,7 +1681,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 		case 74:
 			/*
 				num_1 - список, к которому применяется фильтр
-				txt_1 - текст нулевого значения
 				значения: PHP12_filter_radio_setup
 			*/
 
@@ -1691,7 +1690,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				'light' => 1,
 				'interval' => 5,
 				'value' => _num($v) ? _num($v) : $el['def'],
-				'title0' => $el['txt_1'],
 				'spisok' => _elemVvv($el['id']),
 				'disabled' => $disabled
 			));
