@@ -838,6 +838,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						_dialogLoad({
 							dialog_id:11,
 							block_id:el.block_id,
+							dialog_source:unit.source.dialog_source,
 							prm:{
 								src:unit.source,
 								num_3:_num(D(ATTR_CMP(el.num_3)).val()),
@@ -942,59 +943,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						func:function(v) {
 							_elemFunc(el, v);
 						}
-					});
-					return;
-				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Содержание диалога для выбора значения
-				case 26:
-					if(!window.DIALOG_OPEN)
-						return;
-					var DLG = DIALOG_OPEN,
-						D = function(attr) {
-							return DLG.content.find(attr);
-						},
-						bec = D('.choose'),
-						dlg_id =  _num(D('.dlg26').val());
-					bec.click(function() {
-						var t = $(this),
-							ids = [];
-						if(t.hasClass('deny'))
-							return;
-						if(el.num_3) {
-							var sel = t.hasClass('sel');
-							t._dn(sel, 'sel');
-						} else {
-							bec.removeClass('sel');
-							t.addClass('sel');
-						}
-						_forEq(bec, function(el) {
-							if(el.hasClass('sel'))
-								ids.push(_num(el.attr('val')));
-						});
-						D(el.attr_cmp).val(ids.join(','));
-
-						if(el.num_3)
-							return;
-
-						//выбор подзначения из вложенного списка
-						var id = _num(D(el.attr_cmp).val()),
-							elm = window['ELM_OLD' + dlg_id][id];
-						if(elm.dialog_id != 29 && elm.dialog_id != 59)
-							return;
-
-						_dialogLoad({
-							dialog_id:11,
-							dialog_source:elm.num_1,
-							func_open:function(res, dlg) {
-								dlg.submit(function() {
-									var sel = dlg.content.find('.choose.sel').attr('val');
-									if(!sel)
-										return;
-									id = id + ',' + sel;
-									D(el.attr_cmp).val(id);
-									dlg.close();
-								});
-							}
-						});
 					});
 					return;
 				//select - выбор единицы из другого списка (для связки)
@@ -1912,7 +1860,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		var D = DLG.D,
 			VC = D(ATTR_EL(el.id)).find('.v-choose'),//элементы в открытом диалоге для выбора
 			sev = unit.source.prm.sev,               //выбор нескольких значений
-			nest = !sev && unit.source.prm.nest != undefined ? 1 : 0;     //выбор во вложенных списках
+			nest = !sev && unit.source.prm.nest ? 1 : 0;     //выбор во вложенных списках
 
 		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
 		if(unit.source.block_id) {
@@ -2504,6 +2452,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			DD.find('.icon-add').click(function() {
 				_dialogLoad({
 					dialog_id:25,
+					dialog_source:ELMM[ATR_SP.val()].num_1,
 					busy_obj:$(this),
 					busy_cls:'spin',
 					func_save:function(ia) {
