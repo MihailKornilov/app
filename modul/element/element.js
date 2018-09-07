@@ -1858,9 +1858,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 			return;
 
 		var D = DLG.D,
-			VC = D(ATTR_EL(el.id)).find('.v-choose'),//элементы в открытом диалоге для выбора
-			sev = unit.source.prm.sev,               //выбор нескольких значений
-			nest = !sev && unit.source.prm.nest ? 1 : 0;     //выбор во вложенных списках
+			VC = D(ATTR_EL(el.id)).find('.v-choose'),   //элементы в открытом диалоге для выбора
+			sev = unit.source.prm.sev,                  //выбор нескольких значений
+			nest = !sev && unit.source.prm.nest ? 1 : 0;//выбор во вложенных списках
 
 		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
 		if(unit.source.block_id) {

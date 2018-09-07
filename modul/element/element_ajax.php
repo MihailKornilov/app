@@ -1003,7 +1003,13 @@ function _dialogOpenLoad($dialog_id) {
 	$unit['source'] = $send;
 
 	//дополнительные параметры
-	$unit['source']['prm'] = isset($_POST['prm']) ? _arrNum($_POST['prm']) : array();
+	$PRM = isset($_POST['prm']) ? _arrNum($_POST['prm']) : array();
+	if(!isset($PRM['sev']))//выбор нескольких значений
+		$PRM['sev'] = 0;
+	if(!isset($PRM['nest']))//выбор значения из вложенного списка
+		$PRM['nest'] = 1;
+	$unit['source']['prm'] = $PRM;
+
 
 	$send['act'] = $act;
 	$send['edit_access'] = _num(@SA) || $dialog['app_id'] && $dialog['app_id'] == APP_ID ? 1 : 0;//права для редактирования диалога
