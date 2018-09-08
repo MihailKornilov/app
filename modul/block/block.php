@@ -119,9 +119,6 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		&& $r['elem']['hidden']
 		) continue;
 
-		if(!$BLK_EDIT && $r['hidden'])
-			continue;
-
 		$block[$r['y']][$r['x']] = $r;
 	}
 
@@ -154,8 +151,17 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		$hSum += $r['h'];
 		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
+		//скрытие всей строки, если все блоки в строке являются скрытыми
+		$strHide = !$BLK_EDIT && empty($unit['v_choose']);
+		if(!$BLK_EDIT && empty($unit['v_choose']))
+			foreach($xStr as $n => $r)
+				if(!$r['hidden']) {//если хотя бы один блок не скрыт, вся строка не будет скрыта
+					$strHide = 0;
+					break;
+				}
+
 		$send .=
-			'<div class="bl-div">'.
+			'<div class="bl-div'._dn(!$strHide).'">'.
 			'<table class="bl-tab" style="height:'.$r['height'].'px">'.
 				'<tr>';
 		//пустота в начале
@@ -182,6 +188,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 			$cls[] = !$xEnd ? trim($BR) : '';
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
+			$cls[] = _dn(!(!$BLK_EDIT && empty($unit['v_choose']) && $r['hidden']));
 			$cls[] = $r['click_action'] == 2081 && $r['click_page']   ? 'curP block-click-page pg-'.$r['click_page'] : '';
 			$cls[] = !$BLK_EDIT && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
 			$cls = array_diff($cls, array(''));
