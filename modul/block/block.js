@@ -99,6 +99,13 @@ var _ids = function(v) {
 						BL.save = 1;
 					}
 				});
+				$('#block-hidden')._check({
+					title:'<div class="fs12">hidden</div>',
+					func:function(v) {
+						BL.hidden = v;
+						BL.save = 1;
+					}
+				});
 
 				if(BL.elem_id) {
 					var EL = ELMM[BL.elem_id],
@@ -265,9 +272,9 @@ var _ids = function(v) {
 
 		return '<td class="bg-ffc bor-f0 pl5 pr3">' +
 			'<input type="hidden" id="block-width-auto" value="' + BL.width_auto + '" />' +
-			'<div class="mt8">' +
-				'<input type="hidden" id="block-sa-view" value="' + BL.sa + '" />' +
-			'</div>';
+			'<input type="hidden" id="block-sa-view" value="' + BL.sa + '" />' +
+			'<input type="hidden" id="block-hidden" value="' + BL.hidden + '" />' +
+			'';
 	},
 	_blockUnitBut = function(BL) {//кнопки
 		if(BL.elem_id)

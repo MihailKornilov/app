@@ -613,6 +613,7 @@ function _jsCacheBlockOne($block_id) {
 	$val['bg'] = $r['bg'];
 	$val['bg70'] = $r['bg70'];
 	$val['child_count'] = $r['child_count'];
+	$val['hidden'] = $r['hidden'];
 
 	return $val;
 }

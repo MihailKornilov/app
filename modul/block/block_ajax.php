@@ -241,6 +241,7 @@ switch(@$_POST['op']) {
 		$width_auto = _num($_POST['width_auto']);
 		$pos = _txt($_POST['pos']);
 		$bg = _txt($_POST['bg']);
+		$hidden = _num($_POST['hidden']);
 
 		//границы
 		$ex = explode(' ', $_POST['bor']);
@@ -256,7 +257,8 @@ switch(@$_POST['op']) {
 					`width_auto`='".$width_auto."',
 					`pos`='".$pos."',
 					`bg`='".$bg."',
-					`bor`='".$bor."'
+					`bor`='".$bor."',
+					`hidden`=".$hidden."
 				WHERE `id`=".$block_id;
 		query($sql);
 

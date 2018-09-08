@@ -119,6 +119,9 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		&& $r['elem']['hidden']
 		) continue;
 
+		if(!$BLK_EDIT && $r['hidden'])
+			continue;
+
 		$block[$r['y']][$r['x']] = $r;
 	}
 
@@ -2048,6 +2051,7 @@ function _beBlockForming($arr) {//формирование массива бло
 			'pos' => $r['pos'],
 			'bg' => $r['bg'],
 			'bor' => $r['bor'],
+			'hidden' => _num($r['hidden']),
 			'elem_id' => 0
 		);
 	}
