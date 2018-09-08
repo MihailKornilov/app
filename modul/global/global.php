@@ -654,8 +654,8 @@ function _jsCacheElemOne($elem_id) {
 
 	$val['width'] = $r['width'];
 
-//		if($r['is_img'])
-//			$val[] = 'is_img:'.$r['is_img'];
+//	if($r['is_img'])
+		$val['is_img'] = 1;
 
 	//исходный диалог (dialog source)
 	if($r['block']['obj_name'] == 'dialog')

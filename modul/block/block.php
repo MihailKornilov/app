@@ -750,7 +750,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			//получение значения, если нет вложенных списков
 			if(count($ids) == 1)
-				return _elem_11_v($el, $ids[0], $unit);
+				return _elem_11_v($el, $ids[0], $unit, $is_edit);
 
 			$u = $unit;
 			$ell_id = 0;//id элемента, который содержит элемент 11 (в txt_2)
@@ -780,7 +780,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				}
 			}
 
-			return _elem_11_v($el, $ell_id, $u);
+			return _elem_11_v($el, $ell_id, $u, $is_edit);
 
 		//SA: Функция PHP
 		case 12:

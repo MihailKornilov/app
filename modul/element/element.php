@@ -931,7 +931,7 @@ function _elem_11_dialog($el) {//получение массива диалог�
 
 	return $dlg;
 }
-function _elem_11_v($EL, $ell_id, $unit) {//получение значения из единицы списка
+function _elem_11_v($EL, $ell_id, $unit, $is_edit) {//получение значения из единицы списка
 /*
 	$EL - элемент [11], содержащий значение в txt_2
 	$ell_id - ID элемента-значения, который выводится
@@ -990,7 +990,7 @@ function _elem_11_v($EL, $ell_id, $unit) {//получение значения 
 			if(!$r = query_assoc($sql))
 				return _imageNo($EL['width']);
 
-			return _imageHtml($r, $EL['width'], $EL['num_7']);
+			return _imageHtml($r, $EL['width'], $EL['num_7'], $is_edit);
 	}
 
 	return _msgRed('-no-11-');
@@ -2708,7 +2708,7 @@ function _imageServer($v) {//получение сервера (пути) для
 function _imageNo($width=80) {//картинка, если изображнеия нет
 	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="'.$width.'" />';
 }
-function _imageHtml($r, $width=80, $h=0) {//получение картинки в html-формате
+function _imageHtml($r, $width=80, $h=0, $is_edit=0) {//получение картинки в html-формате
 	$width = $width ? $width : 80;
 
 	$st = $width > 80 ? 'max' : 80;
@@ -2723,8 +2723,10 @@ function _imageHtml($r, $width=80, $h=0) {//получение картинки 
 		'<img src="'._imageServer($r['server_id']).$r[$st.'_name'].'"'.
 			' width="'.$width.'"'.
 	  ($h ? ' height= "'.$h.'"' : '').
+	  (!$is_edit ?
 			' class="image-open"'.
-			' val="'.$r['id'].'"'.
+			' val="'.$r['id'].'"'
+	  : '').
 		' />';
 }
 function _imageNameCreate() {//формирование имени файла из случайных символов
