@@ -1065,7 +1065,7 @@ function _dialogOpenLoad($dialog_id) {
 			$send['button_cancel'] = 'Закрыть';
 		}
 
-		$send['width'] = 500;
+		$send['width'] = _blockObjWidth('dialog_del');
 		$send['html'] = _dialogOpenUnitDelContent($dialog);
 	}
 
@@ -1078,7 +1078,7 @@ function _dialogOpenUnitDelContent($dialog) {//содержание диалог
 			'<div class="_empty">Удаление записи запрещено.</div>'.
 		'</div>';
 
-	if(!$block = _BE('block_obj', 'dialod_del', $dialog['id']))
+	if(!$block = _BE('block_obj', 'dialog_del', $dialog['id']))
 		return
 		'<div class="pad20">'.
 			'<div class="_info">'.
@@ -1088,7 +1088,7 @@ function _dialogOpenUnitDelContent($dialog) {//содержание диалог
 			'</div>'.
 		'</div>';
 
-	$width = _blockObjWidth('dialod_del');
+	$width = _blockObjWidth('dialog_del');
 
 	return _blockLevel($block, $width);
 }
