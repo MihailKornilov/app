@@ -141,6 +141,10 @@ switch(@$_POST['op']) {
 							'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
 								'<td class="grey r">Страница:'.
 								'<td><input type="hidden" id="del_action_page_id" value="'.$dialog['del_action_page_id'].'" />'.
+							'<tr><td class="grey r h35">Содержание удаления:'.
+								'<td><a class="dialog-open" val="dialog_id:56">Настроить</a>'.
+							'<tr><td class="grey r">Условия удаления:'.
+								'<td class="pale">условий нет. <a class="dialog-open" val="dialog_id:58">Настроить</a>'.
 						'</table>'.
 					'</div>'.
 				'</div>'.
