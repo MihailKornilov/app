@@ -49,7 +49,13 @@ function _blockName($name, $i='name') {//доступные варианты о�
 						'<div class="_empty min">'.
 							'Пустое содержание диалога.'.
 						'</div>'.
-					'</div>'
+					'</div>',
+
+		'dialog_del' => '<div class="pad10">'.
+							'<div class="_empty min">'.
+								'Содержание удаления записи не настроено.'.
+							'</div>'.
+						'</div>'
 	);
 
 	if(!isset($empty[$name]))
@@ -93,9 +99,10 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		$id = key($arr);
 		switch($arr[$id]['obj_name']) {
 			default:
-			case 'page': $v = PAS; break;
-			case 'dialog': $v = 0; break;
-			case 'spisok': $v = 0; break;
+			case 'page':        $v = PAS; break;
+			case 'dialog':      $v = 0; break;
+			case 'dialog_del':  $v = 0; break;
+			case 'spisok':      $v = 0; break;
 		}
 		$unit['blk_edit'] = $v;
 	}
@@ -431,10 +438,11 @@ function _blockGrid($arr) {//режим деления на подблоки
 			'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
 		'</div>';
 }
-function _blockObjWidth($obj_name, $obj_id) {//получение ширины объекта (страницы, диалога, списка)
+function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины объекта (страницы, диалога, списка)
 	switch($obj_name) {
 		case 'page': return 1000;
 		case 'dialog': return _dialogParam($obj_id, 'width');
+		case 'dialog_del': return 500;
 		case 'spisok':
 			//получение элемента, который содержит список (для корректировки ширины с отступами)
 			if(!$elm14 = _elemOne($obj_id))
@@ -1971,6 +1979,7 @@ function _beBlockType($type) {//получение данных о блоках 
 				  AND `obj_id` IN (".$obj_ids.")
 				ORDER BY `parent_id`,`y`,`x`";
 		$block_global = query_arr($sql);
+		$block_global += _beBlockDialogDel($type, $obj_ids);
 		$block_global = _beBlockForming($block_global);
 		$block_global = _beElemIdSet($block_global);
 
@@ -1996,6 +2005,7 @@ function _beBlockType($type) {//получение данных о блоках 
 				WHERE `obj_name`='".$type."'
 				  AND `obj_id` IN (".$obj_ids.")";
 		$block_app = query_arr($sql);
+		$block_app += _beBlockDialogDel($type, $obj_ids);
 		$block_app = _beBlockForming($block_app);
 		$block_app = _beElemIdSet($block_app);
 
@@ -2005,6 +2015,16 @@ function _beBlockType($type) {//получение данных о блоках 
 	$G_BLOCK += $block_app;
 	_beBlockSpisok($type, $block_app);
 	_beBlockElem($type, $block_app);
+}
+function _beBlockDialogDel($type, $obj_ids) {//добавление блоков содержания удаления
+	if($type != 'dialog')
+		return array();
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='dialog_del'
+			  AND `obj_id` IN (".$obj_ids.")
+			ORDER BY `parent_id`,`y`,`x`";
+	return query_arr($sql);
 }
 function _beBlockSpisok($type, $block, $global=0) {//получение данных о блоках-списках
 	global $G_BLOCK;

@@ -1227,6 +1227,27 @@ function PHP12_elem_choose_gebug($BL) {//выбор элемента - груп�
 }
 
 
+/* ---=== НАСТРОЙКА СОДЕРЖАНИЯ УДАЛЕНИЯ ЗАПИСИ [56] ===--- */
+function PHP12_dialog_del_setup($el, $unit) {
+	$SRC = $unit['source'];
+	$obj_name = 'dialog_del';
+
+	if(!$dialog_id = $SRC['dialog_source'])
+		return _emptyMin('Не найден диалог.');
+	if(!$dialog = _dialogQuery($dialog_id))
+		return _emptyMin('Диалога '.$dialog_id.' не существует.');
+
+	return
+	'<div class="fs14 pad10 pl15 bg-orange line-b">Настройка содержания удаления для диалога <b class="fs14">'.$dialog['name'].'</b>:</div>'.
+	'<div class="bg-ffc pad10 line-b">'.
+		_blockLevelChange($obj_name, $dialog_id).
+	'</div>'.
+	'<div class="block-content-'.$obj_name.'" style="width:500px">'.
+		_blockHtml($obj_name, $dialog_id, array('blk_edit' => 1)).
+	'</div>';
+}
+
+
 /* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 function PHP12_v_choose($el, $unit) {
 /*

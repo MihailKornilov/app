@@ -142,7 +142,7 @@ switch(@$_POST['op']) {
 								'<td class="grey r">Страница:'.
 								'<td><input type="hidden" id="del_action_page_id" value="'.$dialog['del_action_page_id'].'" />'.
 							'<tr><td class="grey r h35">Содержание удаления:'.
-								'<td><a class="dialog-open" val="dialog_id:56">Настроить</a>'.
+								'<td><a class="dialog-open" val="dialog_id:56,dialog_source:'.$dialog_id.'">Настроить</a>'.
 							'<tr><td class="grey r">Условия удаления:'.
 								'<td class="pale">условий нет. <a class="dialog-open" val="dialog_id:58">Настроить</a>'.
 						'</table>'.
@@ -1060,30 +1060,37 @@ function _dialogOpenLoad($dialog_id) {
 		if(!$unit_id)
 			jsonError('Отсутствует единица списка для удаления');
 
-		$html =
-			'<div class="pad20">'.
-				'<div class="_info">'.
-					'<div class="fs15 center color-ref pad30">'.
-						'Подтвердите удаление.'.
-					'</div>'.
-				'</div>'.
-			'</div>';
-
 		if(!$dialog['del_on']) {
-			$html =
-				'<div class="pad10">'.
-					'<div class="_empty">Удаление записи недоступно.</div>'.
-				'</div>';
 			$send['button_submit'] = '';
 			$send['button_cancel'] = 'Закрыть';
 		}
 
-		$send['width'] = 480;
-		$send['html'] = $html;
+		$send['width'] = 500;
+		$send['html'] = _dialogOpenUnitDelContent($dialog);
 	}
 
 	return $send;
 }
+function _dialogOpenUnitDelContent($dialog) {//содержание диалога при удалении единицы списка
+	if(!$dialog['del_on'])
+		return
+		'<div class="pad10">'.
+			'<div class="_empty">Удаление записи запрещено.</div>'.
+		'</div>';
 
+	if(!$block = _BE('block_obj', 'dialod_del', $dialog['id']))
+		return
+		'<div class="pad20">'.
+			'<div class="_info">'.
+				'<div class="fs15 center color-ref pad30">'.
+					'Подтвердите удаление.'.
+				'</div>'.
+			'</div>'.
+		'</div>';
+
+	$width = _blockObjWidth('dialod_del');
+
+	return _blockLevel($block, $width);
+}
 
 
