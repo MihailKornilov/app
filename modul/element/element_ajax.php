@@ -147,13 +147,12 @@ switch(@$_POST['op']) {
 							'<tr><td class="grey r h35">Содержание удаления:'.
 								'<td>'.
 									($contentDel ? '<span class="color-pay b">Настроено.</span> ' : '').
-									'<div val="dialog_id:56,dialog_source:'.$dialog_id.'"'.
-										' class="icon icon-edit dialog-open'._tooltip(($contentDel ? 'Изменить' : 'Настроить').' содержание', -67).
+									_dialogContentDelSetupIcon($dialog_id, $contentDel).
 									'</div>'.
 							'<tr><td class="grey r">Условия удаления:'.
 								'<td class="pale">'.
 									'условий нет. '.
-									'<div val="dialog_id:58,dialog_source:'.$dialog_id.'" class="icon icon-edit dialog-open'._tooltip('Настроить условия', -59).'</div>'.
+									'<div val="dialog_id:58,dialog_source:'.$dialog_id.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить условия', -59).'</div>'.
 						'</table>'.
 					'</div>'.
 				'</div>'.

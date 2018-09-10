@@ -373,6 +373,13 @@ function _dialogSpisokCmp($cmp) {//список колонок, использу
 	return $send;
 }
 
+function _dialogContentDelSetupIcon($dialog_id, $isEdit) {//иконка настройки содежания удаления записи (единицы списка)
+	$tooltip = _tooltip(($isEdit ? 'Изменить' : 'Настроить').' содержание', -67);
+	return
+	'<div val="dialog_id:56,dialog_source:'.$dialog_id.'"'.
+		' class="icon icon-edit pl dialog-open'.$tooltip;
+}
+
 function PHP12_dialog_sa($el, $unit) {//список диалоговых окон [12]
 	$sql = "SELECT *
 			FROM `_dialog`
@@ -412,6 +419,12 @@ function PHP12_dialog_app($el, $unit) {//список диалоговых ок�
 	if(!$arr = query_arr($sql))
 		return 'Диалоговых окон нет.';
 
+	$sql = "SELECT `obj_id`,1
+			FROM `_block`
+			WHERE `obj_name`='dialog_del'
+			  AND `obj_id` IN ("._idsGet($arr).")";
+	$contentDelAss = query_ass($sql);
+
 	$send = '<table class="_stab small">'.
 				'<tr>'.
 					'<th>ID'.
@@ -420,16 +433,19 @@ function PHP12_dialog_app($el, $unit) {//список диалоговых ок�
 					'<th>Колонки'.
 					'<th>h1'.
 					'<th>h2'.
-					'<th>h3';
-	foreach($arr as $r) {
+					'<th>h3'.
+					'<th>content<br>del';
+	foreach($arr as $dialog_id => $r) {
 		$send .= '<tr>'.
-					'<td class="w35 r grey">'.$r['id'].
+					'<td class="w35 r grey">'.$dialog_id.
 					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
 					'<td class="center'.($r['spisok_on'] ? ' bg-dfd' : '').'">'.($r['spisok_on'] ? 'да' : '').
 					'<td class="grey">'.PHP12_dialog_col($r['id']).
 					'<td>'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 					'<td>'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-					'<td>'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '');
+					'<td>'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+					'<td class="center'.(!empty($contentDelAss[$dialog_id]) ? ' bg-dfd' : '').'">'.
+						_dialogContentDelSetupIcon($dialog_id, !empty($contentDelAss[$dialog_id]));
 	}
 	$send .= '</table>';
 
