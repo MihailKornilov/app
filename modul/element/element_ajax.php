@@ -71,6 +71,14 @@ switch(@$_POST['op']) {
 		//содержание для удаления единицы списка
 		$contentDel = _BE('block_obj', 'dialog_del', $dialog_id);
 
+		//условия удаления
+		$sql = "SELECT `id`
+				FROM `_element`
+				WHERE `dialog_id`=58
+				  AND `num_1`=".$dialog_id."
+				LIMIT 1";
+		$del58 = _num(query_value($sql));
+
 		$html =
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
 
@@ -139,11 +147,6 @@ switch(@$_POST['op']) {
 							'<tr><td class="grey r">Текст кнопок:'.
 								'<td><input type="text" id="del_button_submit" class="w150" maxlength="100" value="'.$dialog['del_button_submit'].'" />'.
 									'<input type="text" id="del_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['del_button_cancel'].'" />'.
-							'<tr><td class="blue r">Дальнейшее действие:'.
-								'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
-							'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
-								'<td class="grey r">Страница:'.
-								'<td><input type="hidden" id="del_action_page_id" value="'.$dialog['del_action_page_id'].'" />'.
 							'<tr><td class="grey r h35">Содержание удаления:'.
 								'<td>'.
 									($contentDel ? '<span class="color-pay b">Настроено.</span> ' : '').
@@ -151,8 +154,13 @@ switch(@$_POST['op']) {
 									'</div>'.
 							'<tr><td class="grey r">Условия удаления:'.
 								'<td class="pale">'.
-									'условий нет. '.
-									'<div val="dialog_id:58,dialog_source:'.$dialog_id.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить условия', -59).'</div>'.
+									($del58 ? '' : 'условий нет. ').
+									'<div val="dialog_id:58,dialog_source:'.$dialog_id.',unit_id:'.$del58.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить условия', -59).'</div>'.
+							'<tr><td class="blue r">Дальнейшее действие:'.
+								'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
+							'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
+								'<td class="grey r">Страница:'.
+								'<td><input type="hidden" id="del_action_page_id" value="'.$dialog['del_action_page_id'].'" />'.
 						'</table>'.
 					'</div>'.
 				'</div>'.

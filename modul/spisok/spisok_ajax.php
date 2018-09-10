@@ -335,6 +335,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_pageDefClear($dialog, $POST_CMP);
 
 	_spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id);
+	_spisokUnitDelSetup($dialog, $unit_id);
 	_spisokUnitBalansUpd($dialog, $POST_CMP);
 
 	//получение обновлённых данных единицы списка
@@ -933,6 +934,19 @@ function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение до
 	foreach(query_arr($sql) as $r)
 		_cache_clear('user'.$r['connect_1']);
 }
+
+function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id диалога при создании условий удаления записи
+	if($dialog['id'] != 58)
+		return;
+	if(!$dlg_id = _num(@$_POST['dialog_source']))
+		return;
+
+	$sql = "UPDATE `_element`
+			SET `num_1`=".$dlg_id."
+			WHERE `id`=".$unit_id;
+	query($sql);
+}
+
 function _spisokUnitBalansUpd($dialog, $POST_CMP) {//обновление значения стартовой суммы (для правильного подсчёта баланса)
 	/*
 		Стартовая сумма нужна для корректного отображения баланса (например, расчётного счёта)
