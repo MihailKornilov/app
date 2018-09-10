@@ -1260,6 +1260,9 @@ function PHP12_v_choose($el, $unit) {
 	//ID диалога из dialog_source
 	$dialog_id = PHP12_v_choose_ds($SRC);
 
+	//блок из содержания удаления единицы списка
+	$dialog_id = PHP12_v_choose_dialog_del($SRC, $dialog_id);
+
 	//ячейка таблицы
 	$dialog_id = PHP12_v_choose_23($SRC, $dialog_id);
 
@@ -1319,6 +1322,16 @@ function PHP12_v_choose_BL($SRC) {//получение данных исходн
 		return 0;
 	}
 	return $BL;
+}
+function PHP12_v_choose_dialog_del($SRC, $dialog_id) {//блок из содержания удаления единицы списка
+	if($dialog_id)
+		return $dialog_id;
+	if(!$BL = PHP12_v_choose_BL($SRC))
+		return 0;
+	if($BL['obj_name'] != 'dialog_del')
+		return 0;
+
+	return _num($BL['obj_id']);
 }
 function PHP12_v_choose_23($SRC, $dialog_id) {//ячейка таблицы
 	if($dialog_id)

@@ -1066,12 +1066,12 @@ function _dialogOpenLoad($dialog_id) {
 		}
 
 		$send['width'] = _blockObjWidth('dialog_del');
-		$send['html'] = _dialogOpenUnitDelContent($dialog);
+		$send['html'] = _dialogOpenUnitDelContent($dialog, $unit);
 	}
 
 	return $send;
 }
-function _dialogOpenUnitDelContent($dialog) {//содержание диалога при удалении единицы списка
+function _dialogOpenUnitDelContent($dialog, $unit) {//содержание диалога при удалении единицы списка
 	if(!$dialog['del_on'])
 		return
 		'<div class="pad10">'.
@@ -1090,7 +1090,7 @@ function _dialogOpenUnitDelContent($dialog) {//содержание диалог
 
 	$width = _blockObjWidth('dialog_del');
 
-	return _blockLevel($block, $width);
+	return _blockLevel($block, $width, 0, 0, 1, $unit);
 }
 
 
