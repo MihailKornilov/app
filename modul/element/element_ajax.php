@@ -68,6 +68,9 @@ switch(@$_POST['op']) {
 				$menu_sa[3] = 'Использование';
 		}
 
+		//содержание для удаления единицы списка
+		$contentDel = _BE('block_obj', 'dialog_del', $dialog_id);
+
 		$html =
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
 
@@ -142,9 +145,15 @@ switch(@$_POST['op']) {
 								'<td class="grey r">Страница:'.
 								'<td><input type="hidden" id="del_action_page_id" value="'.$dialog['del_action_page_id'].'" />'.
 							'<tr><td class="grey r h35">Содержание удаления:'.
-								'<td><a class="dialog-open" val="dialog_id:56,dialog_source:'.$dialog_id.'">Настроить</a>'.
+								'<td>'.
+									($contentDel ? '<span class="color-pay b">Настроено.</span> ' : '').
+									'<div val="dialog_id:56,dialog_source:'.$dialog_id.'"'.
+										' class="icon icon-edit dialog-open'._tooltip(($contentDel ? 'Изменить' : 'Настроить').' содержание', -67).
+									'</div>'.
 							'<tr><td class="grey r">Условия удаления:'.
-								'<td class="pale">условий нет. <a class="dialog-open" val="dialog_id:58">Настроить</a>'.
+								'<td class="pale">'.
+									'условий нет. '.
+									'<div val="dialog_id:58,dialog_source:'.$dialog_id.'" class="icon icon-edit dialog-open'._tooltip('Настроить условия', -59).'</div>'.
 						'</table>'.
 					'</div>'.
 				'</div>'.
