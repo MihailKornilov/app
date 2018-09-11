@@ -1092,9 +1092,16 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			$dialog = _dialogQuery($unit['dialog_id']);
 
-			//если редактирование запрещено, иконка не выводится
+			//иконка не выводится, если удаление запрещено
 			if(!$dialog['del_on'])
 				return '';
+
+			//иконка не выводится, если наступили другие сутки
+			if($dialog['del_cond']['num_2']) {
+				$day = explode(' ', $unit['dtime_add']);
+				if(TODAY != $day[0])
+					return '';
+			}
 
 			return
 			_iconDel(array(
@@ -1133,7 +1140,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			$dialog = _dialogQuery($unit['dialog_id']);
 
-			//если редактирование запрещено, иконка не выводится
+			//иконка не выводится, если редактирование запрещено
 			if(!$dialog['edit_on'])
 				return '';
 
@@ -2358,6 +2365,7 @@ function _beDlg() {//получение данных диалогов из ке�
 	}
 
 	$global = _beDlgField($global);
+	$global = _beDlgDelCond($global);
 
 	if(!APP_ID)
 		return $global;
@@ -2373,6 +2381,7 @@ function _beDlg() {//получение данных диалогов из ке�
 	}
 
 	$local = _beDlgField($local);
+	$local = _beDlgDelCond($local);
 
 	return $global + $local;
 }
@@ -2403,6 +2412,24 @@ function _beDlgField($dialog) {//вставка колонок таблиц в �
 		}
 
 	return $dialog;
+}
+function _beDlgDelCond($dlg) {//дополнительные условия удаления записи
+	if(empty($dlg))
+		return array();
+
+	foreach($dlg as $id => $r)
+		$dlg[$id]['del_cond']['num_2'] = 0;
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=58
+			  AND `num_1` IN ("._idsGet($dlg).")";
+	foreach(query_arr($sql) as $r) {
+		$dlg_id = $r['num_1'];
+		$dlg[$dlg_id]['del_cond']['num_2'] = _num($r['num_2']);
+	}
+
+	return $dlg;
 }
 function _beBlockSort($BLK, $RES=array()) {//выстраивание блоков по порядку
 	//составление структуры блоков по строкам

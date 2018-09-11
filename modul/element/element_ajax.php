@@ -1076,23 +1076,33 @@ function _dialogOpenLoad($dialog_id) {
 		if(!$unit_id)
 			jsonError('Отсутствует единица списка для удаления');
 
-		if(!$dialog['del_on']) {
+		$delOn = $dialog['del_on'];
+		//запрет удаления, если наступили другие сутки
+		if($delOn && $dialog['del_cond']['num_2']) {
+			$day = explode(' ', $unit['dtime_add']);
+			if(TODAY != $day[0])
+				$delOn = 0;
+		}
+
+		if(!$delOn) {
 			$send['button_submit'] = '';
 			$send['button_cancel'] = 'Закрыть';
 		}
 
 		$send['width'] = _blockObjWidth('dialog_del');
-		$send['html'] = _dialogOpenUnitDelContent($dialog, $unit);
+		$send['html'] = _dialogOpenUnitDelContent($dialog, $unit, $delOn);
 	}
 
 	return $send;
 }
-function _dialogOpenUnitDelContent($dialog, $unit) {//содержание диалога при удалении единицы списка
-	if(!$dialog['del_on'])
+function _dialogOpenUnitDelContent($dialog, $unit, $delOn) {//содержание диалога при удалении единицы списка
+	if(!$delOn)
 		return
 		'<div class="pad10">'.
 			'<div class="_empty">Удаление записи запрещено.</div>'.
 		'</div>';
+
+
 
 	if(!$block = _BE('block_obj', 'dialog_del', $dialog['id']))
 		return
