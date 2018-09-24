@@ -515,7 +515,6 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';
 
-//			$txt = _spisokColSearchBg($txt, $el, $cmp_id);
 			$txt = _spisokUnitUrl($td, $sp, $txt);
 			$txt = _elemFormat($txt, $td);
 
