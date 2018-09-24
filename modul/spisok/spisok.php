@@ -497,6 +497,8 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	foreach($spisok as $sp) {
 		$TR = '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
 		foreach($tabCol as $td) {
+			$txt = _elemUnit($td, $sp);
+
 			$cls = array();
 			switch($td['dialog_id']) {
 				case 30: //иконка удаления
@@ -504,17 +506,19 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 				case 71: //иконка сортировки
 					$cls[] = 'pad0';
 			}
-			$txt = _elemUnit($td, $sp);
-//			$txt = _spisokColSearchBg($txt, $el, $cmp_id);
-			$txt = _spisokUnitUrl($td, $sp, $txt);
-			$txt = _elemFormat($txt, $td);
 
 			$cls[] = $td['font'];
 			$cls[] = $td['color'];
 			$cls[] = $td['txt_8'];//pos - позиция
+			$cls[] = _elemFormatColor($txt, $td, $td['color']);
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';
+
+//			$txt = _spisokColSearchBg($txt, $el, $cmp_id);
+			$txt = _spisokUnitUrl($td, $sp, $txt);
+			$txt = _elemFormat($txt, $td);
+
 			$TR .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
 		}
 		$MASS[$sp['id']] = $TR;
