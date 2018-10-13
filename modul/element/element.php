@@ -380,6 +380,115 @@ function _dialogContentDelSetupIcon($dialog_id, $isEdit) {//иконка нас�
 		' class="icon icon-edit pl dialog-open'.$tooltip;
 }
 
+function PHP12_app_export() {//экспорт / импорт текущего прилоежния
+	if(!APP_ID)
+		return _emptyMin('Приложение не выбрано.');
+
+	$app = _app();
+
+
+	//количество пользователей
+	$sql = "SELECT COUNT(*)
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=1011";
+	$userCount = query_value($sql);
+
+
+	//количество страниц
+	$sql = "SELECT `id`
+			FROM `_page`
+			WHERE `app_id`=".APP_ID;
+	$pageIds = query_ids($sql);
+
+	//количество диалогов
+	$sql = "SELECT `id`
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID;
+	$dlgIds = query_ids($sql);
+
+	//количество блоков в страницах
+	$sql = "SELECT `id`
+			FROM `_block`
+			WHERE `obj_name`='page'
+			  AND `obj_id` IN (".$pageIds.")";
+	$blkPageIds = query_ids($sql);
+
+	//количество блоков в диалогах
+	$sql = "SELECT `id`
+			FROM `_block`
+			WHERE `obj_name`='dialog'
+			  AND `obj_id` IN (".$dlgIds.")";
+	$blkDlgIds = query_ids($sql);
+
+	$blkCount = count(_ids($blkPageIds, 1)) + count(_ids($blkDlgIds, 1));
+
+	//количество элементов
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `block_id` IN (".$blkPageIds.",".$blkDlgIds.")";
+	$elmIds = query_ids($sql);
+
+	//количество функций
+	$sql = "SELECT COUNT(*)
+			FROM `_element_func`
+			WHERE `element_id` IN (".$elmIds.")";
+	$elmFunc = query_value($sql);
+
+
+
+
+
+
+
+	//данные в списках
+	$sql = "SELECT COUNT(*)
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id` IN (".$dlgIds.")";
+	$spCount = query_ids($sql);
+
+	//история действий
+	$sql = "SELECT COUNT(*)
+			FROM `_history`
+			WHERE `app_id`=".APP_ID;
+	$histCount = query_ids($sql);
+
+	//изображения
+	$sql = "SELECT COUNT(*)
+			FROM `_image`";
+	$imgCount = query_ids($sql);
+
+	//заметки
+	$sql = "SELECT COUNT(*)
+			FROM `_note`
+			WHERE `app_id`=".APP_ID;
+	$noteCount = query_ids($sql);
+
+
+	return
+	'<div class="fs18">Приложение: <b class="fs18">'.$app['name'].'</b></div>'.
+
+	'<div class="mt15 fs14">Структура:</div>'.
+	'<table class="_stab small mt5 ml10">'.
+		'<tr><td class="grey r w150">Пользователи:<td class="center w50">'.$userCount.
+		'<tr><td class="grey r">Страницы:<td class="center">'.count(_ids($pageIds, 1)).
+		'<tr><td class="grey r">Диалоги:<td class="center">'.count(_ids($dlgIds, 1)).
+		'<tr><td class="grey r">Блоки:<td class="center">'.$blkCount.
+		'<tr><td class="grey r">Элементы:<td class="center">'.count(_ids($elmIds, 1)).
+		'<tr><td class="grey r">Функции:<td class="center">'.$elmFunc.
+	'</table>'.
+
+	'<div class="mt15 fs14">Данные:</div>'.
+	'<table class="_stab small mt5 ml10">'.
+		'<tr><td class="grey r w150">В списках:<td class="center w50">'.$spCount.
+		'<tr><td class="grey r">История действий:<td class="center">'.$histCount.
+		'<tr><td class="grey r">Изображения:<td class="center">'.$imgCount.
+		'<tr><td class="grey r">Заметки:<td class="center">'.$noteCount.
+	'</table>'.
+	'';
+}
+
 function PHP12_dialog_sa($el, $unit) {//список диалоговых окон [12]
 	$sql = "SELECT *
 			FROM `_dialog`
