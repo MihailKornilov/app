@@ -263,15 +263,40 @@ function _msgRed($msg) {//сообщение об ошибке красного 
 		return '';
 	return '<div class="fs10 red">'.$msg.'</div>';
 }
+function _empty($v) {//возвращает пустоту, если значение 0 или негатив
+	return $v ? $v : '';
+}
 
-function _ids($ids, $return_arr=0) {//проверка корректности списка id, составленные через запятую
+function _ids($ids, $return='ids') {//проверка корректности списка id, составленные через запятую
+	/*
+		$return - формат возвращаемого значения
+				ids: id через запятую (по умолчанию)
+				arr: массив (также если 1)
+			  count: количество
+		count_empty: количество, если = 0, то пустота
+	*/
+	if(!$ids)
+		return _idsReturn(0, $return);
+
 	$arr = array();
+
 	foreach(explode(',', $ids) as $i => $id) {
 		if(!preg_match(REGEXP_NUMERIC, $id))
-			return $return_arr ? array() : 0;
+			return _idsReturn(0, $return);
 		$arr[$i] = _num($id);
 	}
-	return $return_arr ? $arr : implode(',', $arr);
+
+	return _idsReturn(implode(',', $arr), $return);
+}
+function _idsReturn($v, $return) {//для _ids - формат возвращаемого результата
+	switch($return) {
+		default:
+		case 'ids': return $v;
+		case 1:
+		case 'arr': return $v ? explode(',', $v) : array();
+		case 'count':return $v ? count(explode(',', $v)) : 0;
+		case 'count_empty': return $v ? count(explode(',', $v)) : '';
+	}
 }
 function _idsGet($arr, $i='id') {//возвращение из массива списка id через запятую
 /*

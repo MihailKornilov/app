@@ -394,50 +394,55 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 			  AND `dialog_id`=1011";
 	$userCount = query_value($sql);
 
-
-	//количество страниц
+	//ids страниц
 	$sql = "SELECT `id`
 			FROM `_page`
 			WHERE `app_id`=".APP_ID;
 	$pageIds = query_ids($sql);
 
-	//количество диалогов
+	//ids диалогов
 	$sql = "SELECT `id`
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID;
 	$dlgIds = query_ids($sql);
 
-	//количество блоков в страницах
+	//ids блоков в страницах
 	$sql = "SELECT `id`
 			FROM `_block`
 			WHERE `obj_name`='page'
 			  AND `obj_id` IN (".$pageIds.")";
 	$blkPageIds = query_ids($sql);
 
-	//количество блоков в диалогах
+	//ids блоков в диалогах
 	$sql = "SELECT `id`
 			FROM `_block`
 			WHERE `obj_name`='dialog'
 			  AND `obj_id` IN (".$dlgIds.")";
 	$blkDlgIds = query_ids($sql);
 
-	//количество блоков в диалогах-удаления
+	//ids блоков в диалогах-удаления
 	$sql = "SELECT `id`
 			FROM `_block`
 			WHERE `obj_name`='dialog_del'
 			  AND `obj_id` IN (".$dlgIds.")";
 	$blkDlgDelIds = query_ids($sql);
 
-	//количество элементов
+
+	//блоки со страниц, диалогов и диалогов-удаления
+	$blkIds = $blkPageIds.",".$blkDlgIds.",".$blkDlgDelIds;
+
+	//элементы
 	$sql = "SELECT `id`
 			FROM `_element`
-			WHERE `block_id` IN (".$blkPageIds.",".$blkDlgIds.",".$blkDlgDelIds.")";
+			WHERE `block_id`
+			  AND `block_id` IN (".$blkIds.")";
 	$elmIds = query_ids($sql);
 
-	//количество элементов-списков
+	//элементы-списки
 	$sql = "SELECT `id`
 			FROM `_element`
-			WHERE `block_id` IN (".$blkPageIds.",".$blkDlgIds.",".$blkDlgDelIds.")
+			WHERE `block_id`
+			  AND `block_id` IN (".$blkIds.")
 			  AND `dialog_id`=14";
 	$elmSpisokIds = query_ids($sql);
 
@@ -448,37 +453,68 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 			  AND `obj_id` IN (".$elmSpisokIds.")";
 	$blkSpisokIds = query_ids($sql);
 
-	$blkCount = count(_ids($blkPageIds, 1))
-			  + count(_ids($blkDlgIds, 1))
-			  + count(_ids($blkDlgDelIds, 1))
-			  + count(_ids($blkSpisokIds, 1));
+	$blkCount = _ids($blkPageIds, 'count')
+			  + _ids($blkDlgIds, 'count')
+			  + _ids($blkDlgDelIds, 'count')
+			  + _ids($blkSpisokIds, 'count');
 
 	//количество элементов на страницах
 	$sql = "SELECT COUNT(*)
 			FROM `_element`
 			WHERE `block_id` IN (".$blkPageIds.")";
-	$elmPageCount = query_value($sql);
+	$elmPageCount = $blkPageIds ? query_value($sql) : 0;
 
 	//количество элементов в диалогах
 	$sql = "SELECT COUNT(*)
 			FROM `_element`
 			WHERE `block_id` IN (".$blkDlgIds.")";
-	$elmDlgCount = query_value($sql);
+	$elmDlgCount = $blkDlgIds ? query_value($sql) : 0;
 
 	//количество элементов в диалогах-удаления
 	$sql = "SELECT COUNT(*)
 			FROM `_element`
 			WHERE `block_id` IN (".$blkDlgDelIds.")";
-	$elmDlgDelCount = query_value($sql);
+	$elmDlgDelCount = $blkDlgDelIds ? query_value($sql) : 0;
 
 	//ids элементов в списках
 	$sql = "SELECT `id`
 			FROM `_element`
 			WHERE `block_id` IN (".$blkSpisokIds.")";
-	$elmSpIds = query_ids($sql);
+	$elmSpIds = $blkSpisokIds ? query_ids($sql) : 0;
 
-	$emlCount = count(_ids($elmIds, 1))
-			  + count(_ids($elmSpIds, 1));
+	$emlCount = _ids($elmIds, 'count')
+			  + _ids($elmSpIds, 'count');
+
+
+
+
+	//диалоги, которые вносят элементы, использующие дополнительные элементы-значения
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `element_val_use`";
+	$dlgValUse = query_ids($sql);
+
+	//элементы с дополнительными значениями
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `dialog_id` IN (".$dlgValUse.")
+			  AND `id` IN (".$elmIds.",".$elmSpIds.")";
+	$elmValUse = query_ids($sql);
+
+	//элементы-значения
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `parent_id` IN (".$elmValUse.")";
+	$elmValCount = $elmValUse ? query_value($sql) : 0;
+
+
+
+
+
+
+
+
+
 
 
 	//количество функций
@@ -498,24 +534,24 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 			FROM `_spisok`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id` IN (".$dlgIds.")";
-	$spCount = query_ids($sql);
+	$spCount = query_value($sql);
 
 	//история действий
 	$sql = "SELECT COUNT(*)
 			FROM `_history`
 			WHERE `app_id`=".APP_ID;
-	$histCount = query_ids($sql);
+	$histCount = query_value($sql);
 
 	//изображения
 	$sql = "SELECT COUNT(*)
 			FROM `_image`";
-	$imgCount = query_ids($sql);
+	$imgCount = query_value($sql);
 
 	//заметки
 	$sql = "SELECT COUNT(*)
 			FROM `_note`
 			WHERE `app_id`=".APP_ID;
-	$noteCount = query_ids($sql);
+	$noteCount = query_value($sql);
 
 
 	return
@@ -527,10 +563,11 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 		'<tr><td>'.
 				'<table class="_stab small">'.
 					'<tr><td class="grey r w200">Пользователи:<td class="center w70">'.$userCount.
-					'<tr><td class="grey r">Страницы:<td class="center">'.count(_ids($pageIds, 1)).
-					'<tr><td class="grey r">Диалоги:<td class="center">'.count(_ids($dlgIds, 1)).
-					'<tr><td class="grey r">Вспомогательные элементы:<td class="center">'.
-					'<tr><td class="grey r">Функции:<td class="center">'.$elmFunc.
+					'<tr><td class="grey r">Страницы:<td class="center">'._ids($pageIds, 'count_empty').
+					'<tr><td class="grey r">Диалоги:<td class="center">'._ids($dlgIds, 'count_empty').
+					'<tr><td class="grey r">Вспомогательные элементы:<td class="center">'._empty($elmValCount).
+					'<tr><td class="grey r">Элементы истории действий:<td class="center">'.
+					'<tr><td class="grey r">Функции:<td class="center">'._empty($elmFunc).
 				'</table>'.
 			'<td class="top pl10">'.
 				'<table class="_stab small">'.
@@ -543,28 +580,28 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 						'<td>списки'.
 					'<tr class="center">'.
 						'<td class="grey r">Блоки:'.
-						'<td class="b">'.$blkCount.
-						'<td>'.count(_ids($blkPageIds, 1)).
-						'<td>'.count(_ids($blkDlgIds, 1)).
-						'<td>'.count(_ids($blkDlgDelIds, 1)).
-						'<td>'.count(_ids($blkSpisokIds, 1)).
+						'<td class="b">'._empty($blkCount).
+						'<td>'._ids($blkPageIds, 'count_empty').
+						'<td>'._ids($blkDlgIds, 'count_empty').
+						'<td>'._ids($blkDlgDelIds, 'count_empty').
+						'<td>'._ids($blkSpisokIds, 'count_empty').
 					'<tr class="center">'.
 						'<td class="grey r">Элементы:'.
-						'<td class="b">'.$emlCount.
-						'<td>'.$elmPageCount.
-						'<td>'.$elmDlgCount.
-						'<td>'.$elmDlgDelCount.
-						'<td>'.count(_ids($elmSpIds, 1)).
+						'<td class="b">'._empty($emlCount).
+						'<td>'._empty($elmPageCount).
+						'<td>'._empty($elmDlgCount).
+						'<td>'._empty($elmDlgDelCount).
+						'<td>'._ids($elmSpIds, 'count_empty').
 				'</table>'.
 	'</table>'.
 
 
 	'<div class="mt15 fs14">Данные:</div>'.
 	'<table class="_stab small mt5 ml10">'.
-		'<tr><td class="grey r w150">В списках:<td class="center w70">'.$spCount.
-		'<tr><td class="grey r">История действий:<td class="center">'.$histCount.
-		'<tr><td class="grey r">Изображения:<td class="center">'.$imgCount.
-		'<tr><td class="grey r">Заметки:<td class="center">'.$noteCount.
+		'<tr><td class="grey r w150">В списках:<td class="center w70">'._empty($spCount).
+		'<tr><td class="grey r">История действий:<td class="center">'._empty($histCount).
+		'<tr><td class="grey r">Изображения:<td class="center">'._empty($imgCount).
+		'<tr><td class="grey r">Заметки:<td class="center">'._empty($noteCount).
 	'</table>'.
 	'';
 }
