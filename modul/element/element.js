@@ -517,6 +517,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				element_hint_access:DLG('#element_hint_access').val(),
 				element_dialog_func:DLG('#element_dialog_func').val(),
 				element_afics:DLG('#element_afics').val(),
+				element_val_use:DLG('#element_val_use').val(),
 				element_hidden:DLG('#element_hidden').val(),
 				element_is_spisok_unit:DLG('#element_is_spisok_unit').val(),
 

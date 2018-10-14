@@ -322,6 +322,12 @@ switch(@$_POST['op']) {
 								   )).
 						'<tr><td>'.
 							'<td>'._check(array(
+										'attr_id' => 'element_val_use',
+										'title' => 'использует дополнительные значения',
+										'value' => $dialog['element_val_use']
+								   )).
+						'<tr><td>'.
+							'<td>'._check(array(
 										'attr_id' => 'element_hidden',
 										'title' => 'скрытый элемент',
 										'value' => $dialog['element_hidden']
@@ -873,6 +879,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$element_dialog_func = _num($_POST['element_dialog_func']);
 	$element_afics = _txt($_POST['element_afics']);
 
+	$element_val_use = _num($_POST['element_val_use']);
 	$element_hidden = _num($_POST['element_hidden']);
 	$element_is_spisok_unit = _num($_POST['element_is_spisok_unit']);
 
@@ -930,6 +937,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`element_dialog_func`=".$element_dialog_func.",
 				`element_afics`='".addslashes($element_afics)."',
 
+				`element_val_use`=".$element_val_use.",
 				`element_hidden`=".$element_hidden.",
 				`element_is_spisok_unit`=".$element_is_spisok_unit.",
 

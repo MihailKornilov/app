@@ -453,7 +453,25 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 			  + count(_ids($blkDlgDelIds, 1))
 			  + count(_ids($blkSpisokIds, 1));
 
-	//количество элементов в списках
+	//количество элементов на страницах
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `block_id` IN (".$blkPageIds.")";
+	$elmPageCount = query_value($sql);
+
+	//количество элементов в диалогах
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `block_id` IN (".$blkDlgIds.")";
+	$elmDlgCount = query_value($sql);
+
+	//количество элементов в диалогах-удаления
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `block_id` IN (".$blkDlgDelIds.")";
+	$elmDlgDelCount = query_value($sql);
+
+	//ids элементов в списках
 	$sql = "SELECT `id`
 			FROM `_element`
 			WHERE `block_id` IN (".$blkSpisokIds.")";
@@ -504,14 +522,42 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 	'<div class="fs18">Приложение: <b class="fs18">'.$app['name'].'</b></div>'.
 
 	'<div class="mt15 fs14">Структура:</div>'.
-	'<table class="_stab small mt5 ml10">'.
-		'<tr><td class="grey r w150">Пользователи:<td class="center w70">'.$userCount.
-		'<tr><td class="grey r">Страницы:<td class="center">'.count(_ids($pageIds, 1)).
-		'<tr><td class="grey r">Диалоги:<td class="center">'.count(_ids($dlgIds, 1)).
-		'<tr><td class="grey r">Блоки:<td class="center">'.$blkCount.
-		'<tr><td class="grey r">Элементы:<td class="center">'.$emlCount.
-		'<tr><td class="grey r">Функции:<td class="center">'.$elmFunc.
+
+	'<table class="bs10">'.
+		'<tr><td>'.
+				'<table class="_stab small">'.
+					'<tr><td class="grey r w200">Пользователи:<td class="center w70">'.$userCount.
+					'<tr><td class="grey r">Страницы:<td class="center">'.count(_ids($pageIds, 1)).
+					'<tr><td class="grey r">Диалоги:<td class="center">'.count(_ids($dlgIds, 1)).
+					'<tr><td class="grey r">Вспомогательные элементы:<td class="center">'.
+					'<tr><td class="grey r">Функции:<td class="center">'.$elmFunc.
+				'</table>'.
+			'<td class="top pl10">'.
+				'<table class="_stab small">'.
+					'<tr class="center">'.
+						'<td>'.
+						'<td class="b">все'.
+						'<td>страницы'.
+						'<td>диалоги'.
+						'<td>диалоги<br>del'.
+						'<td>списки'.
+					'<tr class="center">'.
+						'<td class="grey r">Блоки:'.
+						'<td class="b">'.$blkCount.
+						'<td>'.count(_ids($blkPageIds, 1)).
+						'<td>'.count(_ids($blkDlgIds, 1)).
+						'<td>'.count(_ids($blkDlgDelIds, 1)).
+						'<td>'.count(_ids($blkSpisokIds, 1)).
+					'<tr class="center">'.
+						'<td class="grey r">Элементы:'.
+						'<td class="b">'.$emlCount.
+						'<td>'.$elmPageCount.
+						'<td>'.$elmDlgCount.
+						'<td>'.$elmDlgDelCount.
+						'<td>'.count(_ids($elmSpIds, 1)).
+				'</table>'.
 	'</table>'.
+
 
 	'<div class="mt15 fs14">Данные:</div>'.
 	'<table class="_stab small mt5 ml10">'.
@@ -536,8 +582,9 @@ function PHP12_dialog_sa($el, $unit) {//список диалоговых око
 					'<th>ID'.
 					'<th>Таблица'.
 					'<th>Имя диалога'.
-					'<th>afics'.
 					'<th>type'.
+					'<th>afics'.
+					'<th>val<br>use'.
 					'<th>col';
 	foreach($arr as $r) {
 		$send .= '<tr>'.
@@ -546,8 +593,9 @@ function PHP12_dialog_sa($el, $unit) {//список диалоговых око
 						_table($r['table_1']).
 						($r['table_2'] ? '<br>'._table($r['table_2']) : '').
 					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
-					'<td>'.$r['element_afics'].
 					'<td class="center">'._elemColType($r['element_type']).
+					'<td>'.$r['element_afics'].
+					'<td>'.($r['element_val_use'] ? '<div class="icon icon-ok curD"></div>' : '').
 					'<td class="grey">'.PHP12_dialog_col($r['id']);
 	}
 	$send .= '</table>';
