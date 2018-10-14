@@ -511,7 +511,18 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 
 
 
-
+	//ids элементов истории действий в диалогах
+	$dlgHist = array();
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID;
+	foreach(query_arr($sql) as $r) {
+		$dlgHist[] = $r['insert_history_elem'];
+		$dlgHist[] = $r['edit_history_elem'];
+		$dlgHist[] = $r['del_history_elem'];
+	}
+	$dlgHist = array_diff($dlgHist, array(''));
+	$dlgHist = implode(',', $dlgHist);
 
 
 
@@ -522,8 +533,6 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 			FROM `_element_func`
 			WHERE `element_id` IN (".$elmIds.")";
 	$elmFunc = query_value($sql);
-
-
 
 
 
@@ -566,7 +575,7 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 					'<tr><td class="grey r">Страницы:<td class="center">'._ids($pageIds, 'count_empty').
 					'<tr><td class="grey r">Диалоги:<td class="center">'._ids($dlgIds, 'count_empty').
 					'<tr><td class="grey r">Вспомогательные элементы:<td class="center">'._empty($elmValCount).
-					'<tr><td class="grey r">Элементы истории действий:<td class="center">'.
+					'<tr><td class="grey r">Элементы истории действий:<td class="center">'._ids($dlgHist, 'count_empty').
 					'<tr><td class="grey r">Функции:<td class="center">'._empty($elmFunc).
 				'</table>'.
 			'<td class="top pl10">'.
