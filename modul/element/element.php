@@ -380,7 +380,7 @@ function _dialogContentDelSetupIcon($dialog_id, $isEdit) {//иконка нас�
 		' class="icon icon-edit pl dialog-open'.$tooltip;
 }
 
-function PHP12_app_export() {//экспорт / импорт текущего прилоежния
+function PHP12_app_export() {//экспорт / импорт текущего приложения
 	if(!APP_ID)
 		return _emptyMin('Приложение не выбрано.');
 
@@ -443,7 +443,7 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 			FROM `_element`
 			WHERE `block_id`
 			  AND `block_id` IN (".$blkIds.")
-			  AND `dialog_id`=14";
+			  AND `dialog_id` IN (14,59)";
 	$elmSpisokIds = query_ids($sql);
 
 	//количество блоков в списках

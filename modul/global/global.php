@@ -577,6 +577,15 @@ function _vkapi($method, $param=array()) {//получение данных из
 	return $res;
 }
 
+function _jsCacheApp($app_id=APP_ID) {//формирование файла JS с данными для конкретного приложения
+	$sql = "select * from _block group by obj_name,obj_id";
+	foreach(query_arr($sql) as $r) {
+		_blockAppIdUpdate($r['obj_name'], $r['obj_id']);
+	}
+}
+function _jsCacheAppBlk() {//блоки конкретного приложения
+
+}
 
 function _jsCache() {//формирование файла JS с данными (элементы, блоки)
 	$ELM = array();

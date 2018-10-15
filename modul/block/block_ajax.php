@@ -174,7 +174,6 @@ switch(@$_POST['op']) {
 			}
 		}
 
-
 		//удаление элементов в удалённых блоках
 		$elemIdsNotDel = 0;
 		$sql = "SELECT `id`
@@ -218,6 +217,7 @@ switch(@$_POST['op']) {
 		}
 
 		_blockChildCountSet($obj_name, $obj_id);
+		_blockAppIdUpdate($obj_name, $obj_id);
 
 		_BE( 'block_clear');
 		_BE( 'elem_clear');
@@ -399,7 +399,65 @@ function _blockChildCountAllUpdate() {//обновление количеств�
 			$sql = "SELECT DISTINCT `obj_id`
 					FROM `_block`
 					WHERE `obj_name`='".$name."'";
-			foreach(_ids(query_ids($sql), 1) as $id)
+			foreach(_ids(query_ids($sql), 'arr') as $id)
 				_blockChildCountSet($name, $id);
 		}
+}
+function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id приложения в блоках конкретного объекта
+	$app_id = 0;
+	switch($obj_name) {
+		case 'page':
+			$sql = "SELECT *
+					FROM `_page`
+					WHERE `id`=".$obj_id;
+			if($page = query_assoc($sql))
+				$app_id = $page['app_id'];
+			break;
+		case 'dialog':
+		case 'dialog_del':
+			$sql = "SELECT *
+					FROM `_dialog`
+					WHERE `id`=".$obj_id;
+			if($dlg = query_assoc($sql))
+				$app_id = $dlg['app_id'];
+			break;
+		case 'spisok':
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id`=".$obj_id;
+			if(!$elm = query_assoc($sql))
+				jsonError('Несуществующий элемент '.$obj_id.', размещающий список.');
+			if(!$block_id = $elm['block_id'])
+				jsonError('Отсутствует блок, размещающий элемент со списком.');
+			$sql = "SELECT *
+					FROM `_block`
+					WHERE `id`=".$block_id;
+			if(!$blk = query_assoc($sql))
+				jsonError('Несуществующий блок '.$block_id.', размещающий элемент со списком.');
+
+			switch($blk['obj_name']) {
+				case 'page':
+					$sql = "SELECT *
+							FROM `_page`
+							WHERE `id`=".$blk['obj_id'];
+					if($page = query_assoc($sql))
+						$app_id = $page['app_id'];
+					break;
+				case 'dialog':
+				case 'dialog_del':
+					$sql = "SELECT *
+							FROM `_dialog`
+							WHERE `id`=".$blk['obj_id'];
+					if($dlg = query_assoc($sql))
+						$app_id = $dlg['app_id'];
+					break;
+			}
+			break;
+	}
+
+	$sql = "UPDATE `_block`
+			SET `app_id`=".$app_id."
+			WHERE `obj_name`='".$obj_name."'
+			  AND `obj_id`=".$obj_id;
+	query($sql);
 }
