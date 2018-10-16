@@ -182,10 +182,10 @@ function PHP12_BUG_block_dialog_lost() {//потерянные блоки от �
 		'<tr><td class="grey b">Кол-во всех диалогов:<td class="r b">'.$dlgCount.'<td>'.
 		'<tr><td class="grey">Кол-во диалогов, заполненных блоками:'.
 			'<td class="r">'.$dlgBlkDstCount.
-			'<td class="r">'._empty($dlgDelBlkDstCount).
+			'<td class="r w35'._tooltip('Содержание удаления', -60)._empty($dlgDelBlkDstCount).
 		'<tr><td class="grey">Кол-во блоков во всех диалогах:'.
 			'<td class="r">'.$dlgBlkCount.
-			'<td class="r">'._empty($dlgDelBlkCount).
+			'<td class="r'._tooltip('Содержание удаления', -60)._empty($dlgDelBlkCount).
 		'<tr><td class="grey">Кол-во удалённых диалогов, от которых остались блоки:'.
 			'<td class="r red">'._ids($dlgLostIds, 'count_empty').
 			'<td class="r red">'._ids($dlgDelLostIds, 'count_empty').
