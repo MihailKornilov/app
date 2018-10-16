@@ -203,5 +203,77 @@ function PHP12_BUG_block_dialog_lost() {//потерянные блоки от �
 : '');
 }
 
+function PHP12_BUG_block_spisok_lost() {//потерянные блоки от несуществующих (удалённых) списков
+	$getv = 'spisok-block-lost-del';//переменная для GET
 
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `dialog_id` IN (14,59)";
+	$spisokCount = query_value($sql);
+
+	//Кол-во списков, заполненных блоками
+	$sql = "SELECT COUNT(DISTINCT `obj_id`)
+			FROM `_block`
+			WHERE `obj_name`='spisok'";
+	$spisokBlkDstCount = query_value($sql);
+
+	//Кол-во блоков во всех списках
+	$sql = "SELECT COUNT(*)
+			FROM `_block`
+			WHERE `obj_name`='spisok'";
+	$spisokBlkCount = query_value($sql);
+
+	$blkLostCount = 0;//количество потерянных блоков
+
+	$sql = "SELECT id FROM (
+				SELECT
+					DISTINCT b.obj_id `id`,
+					COUNT(el.id) `c`
+				FROM _block b
+					LEFT JOIN _element el
+					ON b.obj_id=el.id
+				   AND `el`.`dialog_id` IN (14,59)
+				WHERE b.obj_name='spisok'
+				GROUP BY b.obj_id
+				ORDER BY b.obj_id
+			) t
+			WHERE !`c`";
+	if($spisokDelIds = query_ids($sql)) {
+
+		//удаление потерянных блоков
+		if(SA && @$_GET[$getv]) {
+			$sql = "DELETE
+					FROM `_block`
+					WHERE `obj_name`='spisok'
+					  AND `obj_id` IN (".$spisokDelIds.")";
+			query($sql);
+			_debug_cache_clear();
+			header('Location:'.URL.'&p='._page('cur'));
+		}
+
+		$sql = "SELECT COUNT(*)
+				FROM `_block`
+				WHERE `obj_name`='spisok'
+				  AND `obj_id` IN (".$spisokDelIds.")";
+		$blkLostCount = query_value($sql);
+	}
+
+	return
+	'<div class="b fs14 color-555">Потерянные блоки из списков:</div>'.
+	'<table class="_stab mt5">'.
+		'<tr><td class="grey b">Кол-во всех списков:<td class="r b">'.$spisokCount.
+		'<tr><td class="grey">Кол-во списков, заполненных блоками:<td class="r">'.$spisokBlkDstCount.
+		'<tr><td class="grey">Кол-во блоков во всех списках:<td class="r">'.$spisokBlkCount.
+		'<tr><td class="grey">Кол-во удалённых списков, от которых остались блоки:<td class="r red">'._ids($spisokDelIds, 'count_empty').
+		'<tr><td class="grey">Кол-во потерянных блоков:<td class="r b red">'._empty($blkLostCount).
+	'</table>'.
+
+	($blkLostCount ?
+	'<div class="center mt10">'.
+		'<button class="vk small red'._dn(!@$_GET[$getv], '_busy').'" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\'">'.
+			'Удалить потерянные блоки списков'.
+		'</button>'.
+	'</div>'
+: '');
+}
 
