@@ -14,6 +14,7 @@ require_once GLOBAL_DIR.'/syncro.php';
 require_once GLOBAL_DIR.'/modul/global/regexp.php';
 require_once GLOBAL_DIR.'/modul/global/mysql.php';
 require_once GLOBAL_DIR.'/modul/global/date.php';
+require_once GLOBAL_DIR.'/modul/global/bug_func.php';
 require_once GLOBAL_DIR.'/modul/debug/debug.php';
 require_once GLOBAL_DIR.'/modul/db/db.php';
 require_once GLOBAL_DIR.'/modul/global/html.php';
@@ -618,11 +619,37 @@ function appUpdate() {//применение app_id к блокам и элем�
 	query($sql);
 }
 */
-function _jsCacheAppBlk() {//блоки конкретного приложения
 
+function _jsCacheGlobal() {//файл JS с блоками и элементами - для всех приложений
+	$BLK = array();
+
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE !`app_id`
+			ORDER BY `id`";
+	$arr = query_arr($sql);
+	foreach($arr as $block_id => $r)
+		$BLK[$block_id] = _jsCacheBlockOne($block_id);
+
+	$save =
+	'var BLKK='._json($BLK).','.
+		"\n\n".
+		'end;';
+
+	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
+	fwrite($fp, $save);
+	fclose($fp);
+
+	$sql = "UPDATE `_setting`
+			SET `v`=`v`+1
+			WHERE `key`='JS_CACHE'";
+	query($sql);
+
+	_cache_clear('SETTING', 1);
 }
 
 function _jsCache() {//формирование файла JS с данными (элементы, блоки)
+	_jsCacheGlobal(); return;
 	$ELM = array();
 	$BLK = array();
 	$VVV = array();

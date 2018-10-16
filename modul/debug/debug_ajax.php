@@ -28,16 +28,7 @@ switch(@$_POST['op']) {
 		jsonSuccess();
 		break;
 	case 'cache_clear'://очистка xCache
-		$sql = "UPDATE `_setting`
-				SET `v`=`v`+1
-				WHERE `key`='SCRIPT'";
-		query($sql);
-
-		_cache_clear('all');
-
-		_userImageMove();
-		_jsCache();
-
+		_debug_cache_clear();
 		jsonSuccess();
 		break;
 	case 'cookie_clear':

@@ -138,6 +138,17 @@ function _debug_cache_tr($r, $n) {
 		'<td class="r pale">'.$t;
 
 }
+function _debug_cache_clear() {//очистка кеша
+	$sql = "UPDATE `_setting`
+			SET `v`=`v`+1
+			WHERE `key`='SCRIPT'";
+	query($sql);
+
+	_cache_clear('all');
+
+	_userImageMove();
+	_jsCache();
+}
 
 function _debug_cookie_count() {
 	$count = 0;
