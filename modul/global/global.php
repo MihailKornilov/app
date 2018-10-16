@@ -577,12 +577,47 @@ function _vkapi($method, $param=array()) {//получение данных из
 	return $res;
 }
 
-function _jsCacheApp($app_id=APP_ID) {//формирование файла JS с данными для конкретного приложения
+/*
+function appUpdate() {//применение app_id к блокам и элементам - разовая функция
 	$sql = "select * from _block group by obj_name,obj_id";
 	foreach(query_arr($sql) as $r) {
 		_blockAppIdUpdate($r['obj_name'], $r['obj_id']);
 	}
+
+	$sql = "update _element e set app_id=IFNULL((select app_id from _block where e.block_id=id),0)";
+	query($sql);
+
+	$sql = "SELECT
+				distinct `parent_id` id,
+				(select app_id from _element where id=e.parent_id) app_id
+			FROM _element e
+			WHERE parent_id";
+	foreach(query_arr($sql) as $r) {
+		$sql = "UPDATE _element
+				SET app_id=".$r['app_id']."
+				WHERE parent_id=".$r['id'];
+		query($sql);
+	}
+
+	//ids элементов истории действий в диалогах
+	$dlgHist = array();
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=1";
+	foreach(query_arr($sql) as $r) {
+		$dlgHist[] = $r['insert_history_elem'];
+		$dlgHist[] = $r['edit_history_elem'];
+		$dlgHist[] = $r['del_history_elem'];
+	}
+	$dlgHist = array_diff($dlgHist, array(''));
+	$dlgHist = implode(',', $dlgHist);
+
+	$sql = "UPDATE `_element`
+			SET `app_id`=1
+			WHERE `id` IN (".$dlgHist.")";
+	query($sql);
 }
+*/
 function _jsCacheAppBlk() {//блоки конкретного приложения
 
 }

@@ -380,7 +380,7 @@ function _dialogContentDelSetupIcon($dialog_id, $isEdit) {//иконка нас�
 		' class="icon icon-edit pl dialog-open'.$tooltip;
 }
 
-function PHP12_app_export() {//экспорт / импорт текущего приложения
+function PHP12_app_export() {//экспорт / импорт текущего приложения todo не доделано
 	if(!APP_ID)
 		return _emptyMin('Приложение не выбрано.');
 
@@ -1894,6 +1894,7 @@ function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение 
 			$blk = _ids($r['blk']);
 			$update[] = "(
 				".$id.",
+				".$unit['app_id'].",
 				".$parent_id.",
 				'".addslashes($title)."',
 				'".($blk ? $blk : '')."',
@@ -1928,6 +1929,7 @@ function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение 
 
 	$sql = "INSERT INTO `_element` (
 				`id`,
+				`app_id`,
 				`parent_id`,
 				`txt_1`,
 				`txt_2`,
@@ -2090,6 +2092,7 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 			$content = _txt($r['content']);
 			$update[] = "(
 				".$id.",
+				".$unit['app_id'].",
 				".$unit['id'].",
 				'".addslashes($title)."',
 				'".addslashes($content)."',
@@ -2116,6 +2119,7 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 
 	$sql = "INSERT INTO `_element` (
 				`id`,
+				`app_id`,
 				`parent_id`,
 				`txt_1`,
 				`txt_2`,
@@ -2233,6 +2237,7 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 				continue;
 			$update[] = "(
 				".$id.",
+				".$unit['app_id'].",
 				".$parent_id.",
 				'".addslashes($title)."',
 				"._num($r['def']).",
@@ -2258,6 +2263,7 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 
 	$sql = "INSERT INTO `_element` (
 				`id`,
+				`app_id`,
 				`parent_id`,
 				`txt_1`,
 				`def`,
@@ -2554,6 +2560,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 			$ids[] = $id;
 		$update[] = "(
 			".$id.",
+			".$dialog['app_id'].",
 			'".HISTORY_KEY."',
 			'".$font."',
 			'".$color."',
@@ -2575,6 +2582,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 	if(!empty($update)) {
 		$sql = "INSERT INTO `_element` (
 					`id`,
+					`app_id`,
 					`col`,
 					`font`,
 					`color`,
@@ -2585,6 +2593,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 				)
 				VALUES ".implode(',', $update)."
 				ON DUPLICATE KEY UPDATE
+					`app_id`=VALUES(`app_id`),
 					`col`=VALUES(`col`),
 					`font`=VALUES(`font`),
 					`color`=VALUES(`color`),

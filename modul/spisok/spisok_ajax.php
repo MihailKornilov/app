@@ -532,10 +532,6 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 	$sql = "INSERT INTO `"._table($dialog['table_1'])."` (`id`) VALUES (0)";
 	query($sql);
 
-	//подмена id блока отрицательным значением для группировки
-//	if($unit_id < 0)
-//		$block_id = $unit_id;
-
 	$unit_id = query_insert_id(_table($dialog['table_1']));
 
 	//обновление некоторых колонок таблицы 1
@@ -544,6 +540,29 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 			//если вносится страница SA, id приложения не присваивается
 			if(_table($dialog['table_1']) == '_page' && $dialog['id'] == '101')
 				continue;
+
+			//обновление app_id для элемента
+			if(IS_ELEM) {
+				$app_id = 0;
+				if($block_id) {
+					$sql = "SELECT `app_id`
+							FROM `_block`
+							WHERE `id`=".$block_id;
+					$app_id = _num(query_value($sql));
+				}
+				if($parent_id) {
+					$sql = "SELECT `app_id`
+							FROM `_element`
+							WHERE `id`=".$parent_id;
+					$app_id = _num(query_value($sql));
+				}
+
+				$sql = "UPDATE `_element`
+						SET `app_id`=".$app_id."
+						WHERE `id`=".$unit_id;
+				query($sql);
+				continue;
+			}
 
 			$sql = "UPDATE `"._table($dialog['table_1'])."`
 					SET `app_id`=".APP_ID."
@@ -584,7 +603,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 			query($sql);
 			continue;
 		}
-		if($field == 'parent_id' && $parent_id && _table($dialog['table_1']) == '_element') {
+		if($field == 'parent_id' && $parent_id && IS_ELEM) {
 			$sql = "UPDATE `"._table($dialog['table_1'])."`
 					SET `parent_id`=".$parent_id."
 					WHERE `id`=".$unit_id;
