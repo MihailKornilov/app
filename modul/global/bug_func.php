@@ -277,3 +277,52 @@ function PHP12_BUG_block_spisok_lost() {//потерянные блоки от �
 : '');
 }
 
+function PHP12_BUG_elem_in_block_lost() {//элементы, оставшиеся без блоков
+	$getv = 'elem-lost';//переменная для GET
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `block_id`>0";
+	$elmCount = query_value($sql);
+
+	$sql = "SELECT `id`
+			FROM (
+				SELECT
+					el.`id`,
+					IFNULL(bl.id,0) `blid`
+				FROM _element el
+					LEFT JOIN _block bl
+					ON bl.id=el.block_id
+				WHERE el.block_id>0
+				ORDER BY el.id
+			) t
+			WHERE !`blid`";
+	if($elmLost = query_ids($sql)) {
+		//удаление потерянных элементов
+		if(SA && @$_GET[$getv]) {
+			$sql = "DELETE
+					FROM `_element`
+					WHERE `id` IN (".$elmLost.")";
+			query($sql);
+			_debug_cache_clear();
+			header('Location:'.URL.'&p='._page('cur'));
+		}
+	}
+
+	return
+	'<div class="b fs14 color-555">Элементы, которые остались без блоков:</div>'.
+	'<table class="_stab mt5">'.
+		'<tr><td class="grey b">Кол-во всех элементов с блоками:<td class="r b">'.$elmCount.
+		'<tr><td class="grey">Кол-во элементов с несуществующими блоками:<td class="r red">'._ids($elmLost, 'count_empty').
+	'</table>'.
+
+($elmLost ?
+	'<div class="center mt10">'.
+		'<button class="vk small red'._dn(!@$_GET[$getv], '_busy').'" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\'">'.
+			'Удалить элементы без блоков'.
+		'</button>'.
+	'</div>'
+: '');
+}
+
+
