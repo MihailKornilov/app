@@ -62,8 +62,10 @@ function PHP12_BUG_block_page_lost() {//потерянные блоки от н�
 		'<tr><td class="grey b">Кол-во всех страниц:<td class="r b">'.$pageCount.
 		'<tr><td class="grey">Кол-во страниц, заполненных блоками:<td class="r">'.$pageBlkDstCount.
 		'<tr><td class="grey">Кол-во всех блоков на страницах:<td class="r">'.$pageBlkCount.
-		'<tr><td class="grey">Кол-во удалённых страниц, от которых остались блоки:<td class="r red">'._ids($pageDelIds, 'count_empty').
-		'<tr><td class="grey">Кол-во потерянных блоков:<td class="r b red">'._empty($blkLostCount).
+($blkLostCount ?
+		'<tr><td class="color-ref">Кол-во удалённых страниц, от которых остались блоки:<td class="r red">'._ids($pageDelIds, 'count_empty').
+		'<tr><td class="color-ref">Кол-во потерянных блоков:<td class="r b red">'._empty($blkLostCount)
+: '').
 	'</table>'.
 
 ($blkLostCount ?
@@ -186,12 +188,14 @@ function PHP12_BUG_block_dialog_lost() {//потерянные блоки от �
 		'<tr><td class="grey">Кол-во блоков во всех диалогах:'.
 			'<td class="r">'.$dlgBlkCount.
 			'<td class="r'._tooltip('Содержание удаления', -60)._empty($dlgDelBlkCount).
-		'<tr><td class="grey">Кол-во удалённых диалогов, от которых остались блоки:'.
+($blkLostCount || $blkDelLostCount ?
+		'<tr><td class="color-ref">Кол-во удалённых диалогов, от которых остались блоки:'.
 			'<td class="r red">'._ids($dlgLostIds, 'count_empty').
 			'<td class="r red">'._ids($dlgDelLostIds, 'count_empty').
-		'<tr><td class="grey">Кол-во потерянных блоков:'.
+		'<tr><td class="color-ref">Кол-во потерянных блоков:'.
 			'<td class="r b red">'._empty($blkLostCount).
-			'<td class="r b red">'._empty($blkDelLostCount).
+			'<td class="r b red">'._empty($blkDelLostCount)
+: '').
 	'</table>'.
 
 ($blkLostCount || $blkDelLostCount ?
@@ -264,11 +268,13 @@ function PHP12_BUG_block_spisok_lost() {//потерянные блоки от �
 		'<tr><td class="grey b">Кол-во всех списков:<td class="r b">'.$spisokCount.
 		'<tr><td class="grey">Кол-во списков, заполненных блоками:<td class="r">'.$spisokBlkDstCount.
 		'<tr><td class="grey">Кол-во блоков во всех списках:<td class="r">'.$spisokBlkCount.
-		'<tr><td class="grey">Кол-во удалённых списков, от которых остались блоки:<td class="r red">'._ids($spisokDelIds, 'count_empty').
-		'<tr><td class="grey">Кол-во потерянных блоков:<td class="r b red">'._empty($blkLostCount).
+($blkLostCount ?
+		'<tr><td class="color-ref">Кол-во удалённых списков, от которых остались блоки:<td class="r red">'._ids($spisokDelIds, 'count_empty').
+		'<tr><td class="color-ref">Кол-во потерянных блоков:<td class="r b red">'._empty($blkLostCount)
+: '').
 	'</table>'.
 
-	($blkLostCount ?
+($blkLostCount ?
 	'<div class="center mt10">'.
 		'<button class="vk small red'._dn(!@$_GET[$getv], '_busy').'" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\'">'.
 			'Удалить потерянные блоки списков'.
@@ -313,7 +319,9 @@ function PHP12_BUG_elem_in_block_lost() {//элементы, оставшиес�
 	'<div class="b fs14 color-555">Элементы, которые остались без блоков:</div>'.
 	'<table class="_stab mt5">'.
 		'<tr><td class="grey b">Кол-во всех элементов с блоками:<td class="r b">'.$elmCount.
-		'<tr><td class="grey">Кол-во элементов с несуществующими блоками:<td class="r red">'._ids($elmLost, 'count_empty').
+($elmLost ?
+		'<tr><td class="color-ref">Кол-во элементов с несуществующими блоками:<td class="r red">'._ids($elmLost, 'count_empty')
+: '').
 	'</table>'.
 
 ($elmLost ?
@@ -324,5 +332,73 @@ function PHP12_BUG_elem_in_block_lost() {//элементы, оставшиес�
 	'</div>'
 : '');
 }
+
+function PHP12_BUG_elm_child_without_parent() {//дочерние элементы без родителя
+	$getv = 'elem-parent-lost';//переменная для GET
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `parent_id`";
+	$elmCount = query_value($sql);
+
+	//элементы-родители
+	$sql = "SELECT DISTINCT `parent_id`
+			FROM `_element`
+			WHERE `parent_id`";
+	$elmParentIds = query_ids($sql);
+
+	$lost = array();
+
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `id` IN (".$elmParentIds.")";
+	$ass = _idsAss(query_ids($sql));
+	foreach(_ids($elmParentIds, 'arr') as $id)
+		if(!isset($ass[$id]))
+			$lost[] = $id;
+
+	$lost = implode(',', $lost);
+
+	$childLostCount = 0;
+
+	if($lost) {
+		if(SA && @$_GET[$getv]) {
+			$sql = "DELETE
+					FROM `_element`
+					WHERE `parent_id` IN (".$lost.")";
+			query($sql);
+			_debug_cache_clear();
+			header('Location:'.URL.'&p='._page('cur'));
+		}
+		$sql = "SELECT COUNT(*)
+				FROM `_element`
+				WHERE `parent_id` IN (".$lost.")";
+		$childLostCount = query_value($sql);
+	}
+
+	return
+	'<div class="b fs14 color-555">Дочерние элементы без родителей:</div>'.
+	'<table class="_stab mt5">'.
+		'<tr><td class="grey b">Кол-во всех дочерних элементов:<td class="r b">'.$elmCount.
+($childLostCount ?
+		'<tr><td class="color-ref">Кол-во элементов с несуществующими родителями:<td class="r red">'._empty($childLostCount)
+: '').
+	'</table>'.
+
+($childLostCount ?
+	'<div class="center mt10">'.
+		'<button class="vk small red'._dn(!@$_GET[$getv], '_busy').'" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\'">'.
+			'Удалить элементы без родителей'.
+		'</button>'.
+	'</div>'
+: '');
+}
+
+
+
+
+
+
+
 
 
