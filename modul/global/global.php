@@ -649,7 +649,7 @@ function _jsCacheGlobal() {//файл JS с блоками и элементам
 }
 
 function _jsCache() {//формирование файла JS с данными (элементы, блоки)
-	_jsCacheGlobal(); return;
+//	_jsCacheGlobal(); return;
 	$ELM = array();
 	$BLK = array();
 	$VVV = array();
