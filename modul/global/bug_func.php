@@ -70,7 +70,7 @@ function PHP12_BUG_block_page_lost() {//потерянные блоки от н�
 
 ($blkLostCount ?
 	'<div class="center mt10">'.
-		'<button class="vk small red'._dn(!@$_GET[$getv], '_busy').'" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\'">'.
+		'<button class="vk small red" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\';$(this).addClass(\'_busy\')">'.
 			'Удалить потерянные блоки страниц'.
 		'</button>'.
 	'</div>'
@@ -200,7 +200,7 @@ function PHP12_BUG_block_dialog_lost() {//потерянные блоки от �
 
 ($blkLostCount || $blkDelLostCount ?
 	'<div class="center mt10">'.
-		'<button class="vk small red'._dn(!@$_GET[$getv], '_busy').'" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\'">'.
+		'<button class="vk small red" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\';$(this).addClass(\'_busy\')">'.
 			'Удалить потерянные блоки диалогов'.
 		'</button>'.
 	'</div>'
@@ -276,7 +276,7 @@ function PHP12_BUG_block_spisok_lost() {//потерянные блоки от �
 
 ($blkLostCount ?
 	'<div class="center mt10">'.
-		'<button class="vk small red'._dn(!@$_GET[$getv], '_busy').'" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\'">'.
+		'<button class="vk small red" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\';$(this).addClass(\'_busy\')">'.
 			'Удалить потерянные блоки списков'.
 		'</button>'.
 	'</div>'
@@ -326,7 +326,7 @@ function PHP12_BUG_elem_in_block_lost() {//элементы, оставшиес�
 
 ($elmLost ?
 	'<div class="center mt10">'.
-		'<button class="vk small red'._dn(!@$_GET[$getv], '_busy').'" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\'">'.
+		'<button class="vk small red" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\';$(this).addClass(\'_busy\')">'.
 			'Удалить элементы без блоков'.
 		'</button>'.
 	'</div>'
@@ -387,16 +387,82 @@ function PHP12_BUG_elm_child_without_parent() {//дочерние элемент
 
 ($childLostCount ?
 	'<div class="center mt10">'.
-		'<button class="vk small red'._dn(!@$_GET[$getv], '_busy').'" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\'">'.
+		'<button class="vk small red" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\';$(this).addClass(\'_busy\')">'.
 			'Удалить элементы без родителей'.
 		'</button>'.
 	'</div>'
 : '');
 }
 
+function PHP12_BUG_elm_dialog_history_lost() {//элементы истории действий
+	$getv = 'elem-dlg-hist-lost';//переменная для GET
 
+	$dlgHist = array();
+	$sql = "SELECT * FROM `_dialog`";
+	foreach(query_arr($sql) as $r) {
+		$dlgHist[] = $r['insert_history_elem'];
+		$dlgHist[] = $r['edit_history_elem'];
+		$dlgHist[] = $r['del_history_elem'];
+	}
+	$dlgHist = array_diff($dlgHist, array(''));
+	$dlgHist = implode(',', $dlgHist);
 
+	define('ELM_DLG_HIST', $dlgHist);
 
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `id` IN (".$dlgHist.")";
+	$histExist = query_value($sql);
+
+	return
+	'<div class="b fs14 color-555">Элементы для настройки истории действий:</div>'.
+	'<table class="_stab mt5">'.
+		'<tr><td class="grey">Кол-во ID элементов истории в таблице _dialog:<td class="r b">'._ids($dlgHist, 'count').
+		'<tr><td class="grey">Существующие элементы истории:<td class="r">'.$histExist.
+	'</table>';
+}
+
+function PHP12_BUG_elm_unit_del_setup() {//элементы настройки удаления записи
+	$getv = 'elem-unit-del-setup';//переменная для GET
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `dialog_id`=58";
+	$elmCount = query_value($sql);
+
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `id` NOT IN (".ELM_DLG_HIST.")
+			  AND `block_id`<=0
+			  AND !`parent_id`
+			  AND `dialog_id`!=58";
+	if($lost = query_ids($sql)) {
+		if(SA && @$_GET[$getv]) {
+			$sql = "DELETE
+					FROM `_element`
+					WHERE `id` IN (".$lost.")";
+			query($sql);
+			_debug_cache_clear();
+			header('Location:'.URL.'&p='._page('cur'));
+		}
+	}
+
+	return
+	'<div class="b fs14 color-555">Элементы для настройки удаления записи:</div>'.
+	'<table class="_stab mt5">'.
+		'<tr><td class="grey">Кол-во всех элементов настройки удаления записи:<td class="r b">'.$elmCount.
+	'</table>'.
+
+($lost ?
+	'<table class="_stab mt5">'.
+		'<tr><td class="color-ref">Потерянные элементы:'.
+			'<td class="r red">'._ids($lost, 'count').
+			'<td><button class="vk small red" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\';$(this).addClass(\'_busy\')">'.
+					'Удалить'.
+				'</button>'.
+	'</table>'
+: '');
+}
 
 
 

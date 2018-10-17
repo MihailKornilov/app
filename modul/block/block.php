@@ -811,7 +811,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			if(!$el['txt_1'])
 				return '<div class="_empty min">Отсутствует имя функции.</div>';
 			if(!function_exists($el['txt_1']))
-				return '<div class="_empty min">Фукнции <b class="fs14">'.$el['txt_1'].'</b> не существует.</div>';
+				return '<div class="_empty min red">Фукнции <b class="fs14">'.$el['txt_1'].'</b> не существует.</div>';
 			if($is_edit)
 				return '<div class="_empty min">Функция '.$el['txt_1'].'</div>';
 
