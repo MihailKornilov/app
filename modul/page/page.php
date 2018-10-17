@@ -129,35 +129,6 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		return false;
 	}
 
-	//список страниц для select
-	if($i == 'for_select') {
-		$child = array();
-		foreach($page as $id => $r) {
-			if(!$r['parent_id'])
-				continue;
-
-			if(empty($child[$r['parent_id']]))
-				$child[$r['parent_id']] = array();
-
-			$child[$r['parent_id']][] = $r;
-			unset($page[$id]);
-		}
-		$send = _pageChildArr($page, $child);
-		if(SA) {
-			$send[] = array(
-				'title' => 'Страницы SA',
-				'info' => 1
-			);
-			foreach(_pageSaForSelect($page, $child) as $r)
-				$send[] = $r;
-		}
-
-		if($i1 == 'js')
-			return _json($send);
-
-		return $send;
-	}
-
 	//получение страницы, которая принимает значения списка
 	//  $i1 - id диалога, который вносит данные этого списка
 	if($i == 'spisok_id') {

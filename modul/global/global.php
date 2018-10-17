@@ -620,81 +620,115 @@ function appUpdate() {//применение app_id к блокам и элем�
 }
 */
 
-function _jsCacheGlobal() {//файл JS с блоками и элементами - для всех приложений
+function _jsCache() {//файл JS с блоками и элементами
+	$save =
+	'var PAGE_LIST=[],'.
+		"\n".
+		'PLSA='._jsCachePageSa().','.//страницы SA
+		"\n\n".
+		'ELEM_COLOR='._colorJS().','.
+		"\n\n".
+		'FILTER='._json(_spisokFilter('page_js')).','.
+		"\n\n".
+		'BLKK='._jsCacheBlk().','.
+		"\n\n".
+		'ELMM='._jsCacheElm().','.
+		"\n\n".
+		'VVV={};';
+
+	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
+	fwrite($fp, $save);
+	fclose($fp);
+
+	if(APP_ID) {
+		$save =
+			'PAGE_LIST='._jsCachePage().';'.
+			"\n".'if(SA)for(i in PLSA)PAGE_LIST.push(PLSA[i]);'.
+			"\n\n".
+		'var TMP='._jsCacheBlk(APP_ID).';'."\n".'for(i in TMP)BLKK[i]=TMP[i];'.
+			"\n\n".
+			'TMP='._jsCacheElm(APP_ID).';'."\n".'for(i in TMP)ELMM[i]=TMP[i];'.
+			"\n\n";
+
+		$fp = fopen(APP_PATH.'/js_cache/app'.APP_ID.'.js', 'w+');
+		fwrite($fp, $save);
+		fclose($fp);
+	}
+
+	$sql = "UPDATE `_setting`
+			SET `v`=`v`+1
+			WHERE `key`='JS_CACHE'";
+	query($sql);
+
+	_cache_clear('SETTING', 1);
+}
+function _jsCacheAppControl() {//проверка наличия файла JS для текущего приложения
+	if(!APP_ID)
+		return;
+	if(file_exists(APP_PATH.'/js_cache/app'.APP_ID.'.js'))
+		return;
+	_jsCache();
+}
+function _jsCachePageSa() {//страницы SA для select
+	$page = _pageCache();
+	$child = array();
+	$send[] = array(
+		'title' => 'Страницы SA',
+		'info' => 1
+	);
+	foreach(_pageSaForSelect($page, $child) as $r)
+		$send[] = $r;
+	return _json($send);
+}
+function _jsCachePage() {//страницы APP для select
+	$page = _pageCache();
+	$child = array();
+	foreach($page as $id => $r) {
+		if(!$r['parent_id'])
+			continue;
+
+		if(empty($child[$r['parent_id']]))
+			$child[$r['parent_id']] = array();
+
+		$child[$r['parent_id']][] = $r;
+		unset($page[$id]);
+	}
+	$send = _pageChildArr($page, $child);
+	return _json($send);
+}
+function _jsCacheBlk($app_id=0) {
 	$BLK = array();
 
 	$sql = "SELECT *
 			FROM `_block`
-			WHERE !`app_id`
+			WHERE `app_id`=".$app_id."
 			ORDER BY `id`";
 	$arr = query_arr($sql);
 	foreach($arr as $block_id => $r)
-		$BLK[$block_id] = _jsCacheBlockOne($block_id);
+		$BLK[$block_id] = _jsCacheBlkOne($block_id);
 
-	$save =
-	'var BLKK='._json($BLK).','.
-		"\n\n".
-		'end;';
-
-	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
-	fwrite($fp, $save);
-	fclose($fp);
-
-	$sql = "UPDATE `_setting`
-			SET `v`=`v`+1
-			WHERE `key`='JS_CACHE'";
-	query($sql);
-
-	_cache_clear('SETTING', 1);
+	return _json($BLK);
 }
-
-function _jsCache() {//формирование файла JS с данными (элементы, блоки)
-//	_jsCacheGlobal(); return;
+function _jsCacheElm($app_id=0) {
 	$ELM = array();
-	$BLK = array();
-	$VVV = array();
 
-	$block = _BE('block_all');
-
-	foreach($block as $block_id => $r) {
-		$BLK[$block_id] = _jsCacheBlockOne($block_id);
-	}
-
-	foreach(_BE('elem_all') as $elem_id => $r) {
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".$app_id."
+			ORDER BY `id`";
+	$arr = query_arr($sql);
+	foreach($arr as $elem_id => $r) {
 		if(!$el = _jsCacheElemOne($elem_id))
 			continue;
-
 		$ELM[$elem_id] = $el;
 
-		if($v = _jsCacheVvv($elem_id))
-			$VVV[$elem_id] = $v;
+//		if($v = _jsCacheVvv($elem_id))
+//			$VVV[$elem_id] = $v;
 	}
 
-	$save =
-	'var ELMM='._json($ELM).','.
-		"\n\n".
-		'BLKK='._json($BLK).','.
-		"\n\n".
-		'VVV='._json($VVV).','.
-		"\n\n".
-		'PAGE_LIST='._page('for_select', 'js').','.
-		"\n\n".
-		'ELEM_COLOR='._colorJS().','.
-		"\n\n".
-		'FILTER='._json(_spisokFilter('page_js')).';';
-
-	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
-	fwrite($fp, $save);
-	fclose($fp);
-
-	$sql = "UPDATE `_setting`
-			SET `v`=`v`+1
-			WHERE `key`='JS_CACHE'";
-	query($sql);
-
-	_cache_clear('SETTING', 1);
+	return _json($ELM);
 }
-function _jsCacheBlockOne($block_id) {
+function _jsCacheBlkOne($block_id) {
 	if(!$r = _blockOne($block_id))
 		return array();
 

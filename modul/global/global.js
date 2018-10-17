@@ -468,5 +468,8 @@ $(document)
 		_cookie('page_setup', _cookie('page_setup') == 1 ? 0 : 1);
 		_msg();
 		location.reload();
+	})
+	.ready(function() {
+		$("#debug-footer em").html(((new Date().getTime()) - TIME) / 1000);
 	});
 

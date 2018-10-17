@@ -664,7 +664,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 		case 6:
 			/*
                 txt_1 - текст, когда страница не выбрана
-				функция _page('for_select', 'js')
+				содержание: PAGE_LIST
 			*/
 			return _select(array(
 						'attr_id' => $attr_id,

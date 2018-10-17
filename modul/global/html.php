@@ -16,9 +16,6 @@ function _face() {//определение, как загружена стран
 function _saDefine() {//установка флага суперпользователя SA
 	//Список пользователей - SA
 	$SA[1] = true;  //Михаил Корнилов
-//	$SA[18] = true;
-	$SA[53] = true;
-	$SA[54] = true;//Краснобаев Олег
 
 	define('SA', isset($SA[USER_ID]) ? 1 : 0);
 
@@ -343,10 +340,16 @@ function _html_script() {//скрипты и стили
 	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
 	'<script src="js/autosize.js?3"></script>'.
 
+	//Установка начального значения таймера JS
+	(SA ? '<script>var TIME=(new Date()).getTime();</script>' : '').
+
 	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.SCRIPT.'" />'.
 	'<script src="modul/global/global'.MIN.'.js?'.SCRIPT.'"></script>'.
 
 	'<script src="js_cache/app0.js?'.JS_CACHE.'"></script>'.
+(APP_ID ?
+	'<script src="js_cache/app'.APP_ID.'.js?'.JS_CACHE.'"></script>'
+: '').
 
 (CODE ?
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.

@@ -110,7 +110,4 @@ $(document)
 			t.addClass('sel');
 			_cookie('debug_pg', sel);
 		});
-
-		if($('#admin').length)
-			$('#admin em').html(((new Date().getTime()) - TIME) / 1000);
 	});

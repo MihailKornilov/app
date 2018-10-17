@@ -52,6 +52,7 @@ function _debug($i='') {
 			'</h2>'.
 		'</div>';
 	}
+
 	return $send;
 }
 

@@ -57,7 +57,7 @@ function PHP12_BUG_block_page_lost() {//потерянные блоки от н�
 	}
 
 	return
-	'<div class="b fs14 color-555">Потерянные блоки со страниц:</div>'.
+	'<div class="b fs14 color-555">Блоки со страниц:</div>'.
 	'<table class="_stab mt5">'.
 		'<tr><td class="grey b">Кол-во всех страниц:<td class="r b">'.$pageCount.
 		'<tr><td class="grey">Кол-во страниц, заполненных блоками:<td class="r">'.$pageBlkDstCount.
@@ -179,7 +179,7 @@ function PHP12_BUG_block_dialog_lost() {//потерянные блоки от �
 	}
 
 	return
-	'<div class="b fs14 color-555">Потерянные блоки из диалоговых окон:</div>'.
+	'<div class="b fs14 color-555">Блоки из диалоговых окон:</div>'.
 	'<table class="_stab mt5">'.
 		'<tr><td class="grey b">Кол-во всех диалогов:<td class="r b">'.$dlgCount.'<td>'.
 		'<tr><td class="grey">Кол-во диалогов, заполненных блоками:'.
@@ -263,7 +263,7 @@ function PHP12_BUG_block_spisok_lost() {//потерянные блоки от �
 	}
 
 	return
-	'<div class="b fs14 color-555">Потерянные блоки из списков:</div>'.
+	'<div class="b fs14 color-555">Блоки из списков:</div>'.
 	'<table class="_stab mt5">'.
 		'<tr><td class="grey b">Кол-во всех списков:<td class="r b">'.$spisokCount.
 		'<tr><td class="grey">Кол-во списков, заполненных блоками:<td class="r">'.$spisokBlkDstCount.
@@ -316,7 +316,7 @@ function PHP12_BUG_elem_in_block_lost() {//элементы, оставшиес�
 	}
 
 	return
-	'<div class="b fs14 color-555">Элементы, которые остались без блоков:</div>'.
+	'<div class="b fs14 color-555">Элементы, размещаемые в блоках:</div>'.
 	'<table class="_stab mt5">'.
 		'<tr><td class="grey b">Кол-во всех элементов с блоками:<td class="r b">'.$elmCount.
 ($elmLost ?
@@ -377,7 +377,7 @@ function PHP12_BUG_elm_child_without_parent() {//дочерние элемент
 	}
 
 	return
-	'<div class="b fs14 color-555">Дочерние элементы без родителей:</div>'.
+	'<div class="b fs14 color-555">Дочерние элементы:</div>'.
 	'<table class="_stab mt5">'.
 		'<tr><td class="grey b">Кол-во всех дочерних элементов:<td class="r b">'.$elmCount.
 ($childLostCount ?

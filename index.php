@@ -7,6 +7,7 @@ _auth();
 _authLogout();
 _saDefine();
 _user();
+_jsCacheAppControl();
 _pasDefine();
 
 die(_html());
