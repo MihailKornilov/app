@@ -464,7 +464,47 @@ function PHP12_BUG_elm_unit_del_setup() {//элементы настройки �
 : '');
 }
 
+function PHP12_BUG_elm_func_lost() {//Функции, привязанные к элементам
+	$getv = 'elem-func-lost';//переменная для GET
 
+	$sql = "SELECT COUNT(*) FROM `_element_func`";
+	$funcCount = query_value($sql);
+
+	$sql = "SELECT `id`
+			FROM (
+				SELECT
+					f.`id`,
+					IFNULL(el.id,0) `elid`
+				FROM _element_func f
+					LEFT JOIN _element el
+					ON el.id=f.element_id
+				ORDER BY el.id
+			) t
+			WHERE !`elid`";
+	if($funcLost = query_ids($sql)) {
+		if(SA && @$_GET[$getv]) {
+			$sql = "DELETE
+					FROM `_element_func`
+					WHERE `id` IN (".$funcLost.")";
+			query($sql);
+			_debug_cache_clear();
+			header('Location:'.URL.'&p='._page('cur'));
+		}
+	}
+
+	return
+	'<div class="b fs14 color-555">Функции, привязанные к элементам:</div>'.
+	'<table class="_stab mt5">'.
+		'<tr><td class="grey b">Кол-во всех функций:<td class="r b">'.$funcCount.
+($funcLost ?
+		'<tr><td class="grey color-ref">Функции без элементов:'.
+			'<td class="r red">'._ids($funcLost, 'count').
+			'<td><button class="vk small red" onclick="location.href=\''.URL.'&p='._page('cur').'&'.$getv.'=1\';$(this).addClass(\'_busy\')">'.
+					'Удалить'.
+				'</button>'
+: '').
+	'</table>';
+}
 
 
 
