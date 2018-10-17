@@ -1659,7 +1659,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			if($r['obj_id'] != $obj_id)
 				continue;
 
-			$send[$id] = _jsCacheBlockOne($id);
+			$send[$id] = _jsCacheBlkOne($id);
 		}
 
 		return $send;
