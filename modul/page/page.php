@@ -489,12 +489,12 @@ function _pageShow($page_id) {
 	_page_div().
 	'<script>'.
 		(!PAS ?
+			(APP_ID && USER_ID ?
+				'var FILTER='._json(_spisokFilter('page_js'), 1).';'
+			: '').
 			'var VVV_PAGE='._json($vvvPage).';'.
 			'for(var i in VVV_PAGE)VVV[i]=VVV_PAGE[i];'.
 			'_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');'
-		: '').
-		(APP_ID && USER_ID ?
-			'var FILTER='._json(_spisokFilter('page_js'), 1).';'
 		: '').
 	'</script>';
 }

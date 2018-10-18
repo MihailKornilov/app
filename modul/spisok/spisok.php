@@ -1055,6 +1055,10 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);
 
+	//формирование списка по уровням
+	if($EL['num_5'])
+		return _29cnnLevel($EL, $spisok);
+
 	$send = array();
 
 	foreach($spisok as $sid => $sp) {
@@ -1070,6 +1074,38 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 			$u['content'] = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $u['content'], 1);
 
 		$send[] = $u;
+	}
+
+	return $send;
+}
+function _29cnnLevel($EL, $spisok) {//вывод списка по уровням
+	$send = array();
+
+	$child = array();
+	foreach($spisok as $id => $sp)
+		if($sp['parent_id'])
+			$child[$sp['parent_id']][] = $sp;
+
+	foreach($spisok as $id => $sp) {
+		if($sp['parent_id'])
+			continue;
+
+		$title = _29cnnTitle($EL['txt_3'], $sp);
+		$send[] = array(
+			'id' => $id,
+			'title' => $title,
+			'content' => '<b>'.$title.'</b>'
+		);
+
+		if(!empty($child[$id]))
+			foreach($child[$id] as $r) {
+				$ch = _29cnnTitle($EL['txt_3'], $r);
+				$send[] = array(
+					'id' => $r['id'],
+					'title' => $title.' » '.$ch,
+					'content' => '<div class="ml20">'.$ch.'</div>'
+				);
+			}
 	}
 
 	return $send;
