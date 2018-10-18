@@ -11,7 +11,8 @@ function _spisokFilterCache() {//кеширование фильтров спи�
 
 	$sql = "SELECT *
 			FROM `_user_spisok_filter`
-			WHERE `user_id`=".USER_ID;
+			WHERE `app_id`=".APP_ID."
+			  and `user_id`=".USER_ID;
 	if($arr = query_arr($sql)) {
 		$sql = "SELECT *
 				FROM `_element`
@@ -87,6 +88,7 @@ function _spisokFilter($i='all', $v=0) {//получение значений ф
 
 		$sql = "INSERT INTO `_user_spisok_filter` (
 					`id`,
+					`app_id`,
 					`user_id`,
 					`element_id_spisok`,
 					`element_id_filter`,
@@ -94,6 +96,7 @@ function _spisokFilter($i='all', $v=0) {//получение значений ф
 					`def`
 				) VALUES (
 					".$id.",
+					".APP_ID.",
 					".USER_ID.",
 					".$spisok.",
 					".$filter.",

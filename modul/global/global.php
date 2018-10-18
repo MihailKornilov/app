@@ -628,8 +628,6 @@ function _jsCache() {//файл JS с блоками и элементами
 		"\n\n".
 		'ELEM_COLOR='._colorJS().','.
 		"\n\n".
-		'FILTER='._json(_spisokFilter('page_js')).','.
-		"\n\n".
 		'BLKK='._jsCacheBlk().','.
 		"\n\n".
 		'ELMM='._jsCacheElm().','.

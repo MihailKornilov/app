@@ -493,6 +493,9 @@ function _pageShow($page_id) {
 			'for(var i in VVV_PAGE)VVV[i]=VVV_PAGE[i];'.
 			'_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');'
 		: '').
+		(APP_ID && USER_ID ?
+			'var FILTER='._json(_spisokFilter('page_js'), 1).';'
+		: '').
 	'</script>';
 }
 function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, которая размещается на странице. Получение по $_GET['id']
