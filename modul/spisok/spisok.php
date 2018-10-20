@@ -785,12 +785,40 @@ function _spisokCond($el) {//формирование строки с услов
 	$cond .= _spisokCondDef($el['num_1']);
 	$cond .= _spisokCondPageUnit($el);
 	$cond .= _spisokCond7($el);
+	$cond .= _spisokCond26($el);
 	$cond .= _spisokCond62($el);
 	$cond .= _spisokCond77($el);
 	$cond .= _spisokCond78($el);
 	$cond .= _spisokCond83($el);
 
 	return $cond;
+}
+function _spisokCondPageUnit($el) {//отображения значений, которые принимает текущая страница
+	if(!$el['num_8'])//настройки нет
+		return '';
+	if($el['block']['obj_name'] != 'page')//проверка, чтобы список был размещён именно на странице
+		return ' AND !`t1`.`id`';
+	if(!$page = _page($el['block']['obj_id']))//страница, на которой размещён список
+		return ' AND !`t1`.`id`';
+	if(!$spisok_id = $page['spisok_id'])//id диалога, единица списка которого размещается на странице
+		return ' AND !`t1`.`id`';
+
+	$cmp = false;
+	foreach(_dialogParam($el['num_1'], 'cmp') as $r) {
+		if($r['dialog_id'] != 29)
+			continue;
+		if($r['num_1'] != $spisok_id)
+			continue;
+		$cmp = $r;
+	}
+
+	if(!$cmp)
+		return ' AND !`t1`.`id`';
+
+	if(!$unit_id = _num(@$_GET['id']))
+		return ' AND !`t1`.`id`';
+
+	return " AND `t1`.`".$cmp['col']."`=".$unit_id;
 }
 function _spisokCond7($el) {//значения фильтра-поиска для списка
 	$search = false;
@@ -829,32 +857,33 @@ function _spisokCond7($el) {//значения фильтра-поиска дл�
 
 	return " AND (".implode($arr, ' OR ').")";
 }
-function _spisokCondPageUnit($el) {//отображения значений, которые принимает текущая страница
-	if(!$el['num_8'])//настройки нет
+function _spisokCond26($el) {//дополнительные условия - в отдельном элементе [26]
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=26
+			  AND `num_1`=".$el['id']."
+			LIMIT 1";
+	if(!$elem26 = query_assoc($sql))
 		return '';
-	if($el['block']['obj_name'] != 'page')//проверка, чтобы список был размещён именно на странице
-		return ' AND !`t1`.`id`';
-	if(!$page = _page($el['block']['obj_id']))//страница, на которой размещён список
-		return ' AND !`t1`.`id`';
-	if(!$spisok_id = $page['spisok_id'])//id диалога, единица списка которого размещается на странице
-		return ' AND !`t1`.`id`';
 
-	$cmp = false;
-	foreach(_dialogParam($el['num_1'], 'cmp') as $r) {
-		if($r['dialog_id'] != 29)
-			continue;
-		if($r['num_1'] != $spisok_id)
-			continue;
-		$cmp = $r;
+	//элемент-колонка, по которому будет применяться фильтр
+	if(!$elCol = _elemOne($elem26['num_2']))
+		return '';
+	if(!$col = $elCol['col'])
+		return '';
+
+	//если у основного значнеия есть дочерние, получение их ID, чтобы добавить к запросу
+	if($v = _num($elem26['num_3'])) {
+		$sql = "SELECT `id`
+				FROM `_spisok`
+				WHERE `parent_id`=".$v."
+				  AND !`deleted`";
+		if($ids = query_ids($sql))
+			$v .= ','.$ids;
 	}
 
-	if(!$cmp)
-		return ' AND !`t1`.`id`';
 
-	if(!$unit_id = _num(@$_GET['id']))
-		return ' AND !`t1`.`id`';
-
-	return " AND `t1`.`".$cmp['col']."`=".$unit_id;
+	return " AND `".$col."` IN (".$v.")";
 }
 function _spisokCond62($el) {//фильтр-галочка
 	$send = '';

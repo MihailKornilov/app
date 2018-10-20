@@ -2501,6 +2501,114 @@ function PHP12_balans_setup_vvv($parent_id) {
 }
 
 
+/* ---=== НАСТРОЙКА ДОПОЛНИТЕЛЬНЫХ УСЛОВИЙ ОТОБРАЖЕНИЯ СПИСКА [26] ===--- */
+function PHP12_spisok_cond($el, $unit) {
+	$SRC = $unit['source'];
+	if(!$block_id = $SRC['block_id'])
+		return _emptyMin('Отсутствует ID исходного блока.');
+	if(!$BL = _blockOne($block_id))
+		return _emptyMin('Исходного блока '.$block_id.' не существует.');
+	if(!$EL = $BL['elem'])
+		return _emptyMin('Настройка условий будет доступна после вставки списка в блок.');
+	if($EL['dialog_id'] != 14)
+		return _emptyMin('Элемент не является списком.');
+	if(!$dialog_id = $EL['num_1'])
+		return _emptyMin('Отсутствует ID диалога.');
+	if(!$DLG = _dialogQuery($dialog_id))
+		return _emptyMin('Диалога '.$dialog_id.' не существует.');
+
+	//получение значений диалога только вложенных списков
+	$cmp29 = array();
+	foreach($DLG['cmp'] as $r)
+		if($r['dialog_id'] == 29)
+			$cmp29[] = array(
+				'id' => $r['id'],
+				'title' => $r['name']
+			);
+
+	//получение данных условий, если были внесены ранее
+	$filter = array();
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=26
+			  AND `num_1`=".$EL['id']."
+			LIMIT 1";
+	if($elem26 = query_assoc($sql))
+		$filter = _29cnn($elem26['num_2']);
+
+	return
+	'<script>'.
+		'var CMP29='._json($cmp29).','.
+			'FILTER26='._json($filter).';'.
+	'</script>'.
+	'<table class="bs10">'.
+		'<tr><td class="grey r w125">Список:<td class="b">'.$DLG['name'].
+		'<tr><td class="grey r">Условие:<td><input type="hidden" id="sp-cond" value="'._num(@$elem26['num_2']).'" />'.
+		'<tr><td class="grey r">Значения фильтра:<td><input type="hidden" id="sp-filter" value="'._num(@$elem26['num_3']).'" />'.
+	'</div>';
+}
+function PHP12_spisok_cond_save($block_id, $dialog) {
+	if($dialog['id'] != 26)
+		return;
+	if(!$block_id)
+		jsonError('Отсутствует ID исходного блока.');
+	if(!$BL = _blockOne($block_id))
+		jsonError('Исходного блока '.$block_id.' не существует.');
+	if(!$EL = $BL['elem'])
+		jsonError('Отсутствует элемент в блоке.');
+	if($EL['dialog_id'] != 14)
+		jsonError('Элемент не является списком.');
+	if(!$dialog_id = $EL['num_1'])
+		jsonError('Отсутствует ID диалога.');
+	if(!$DLG = _dialogQuery($dialog_id))
+		jsonError('Диалога '.$dialog_id.' не существует.');
+
+	if(!$vvv = @$_POST['vvv']['2722'])
+		jsonError('Отсутствует элемент с условиями');
+
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `dialog_id`=26
+			  AND `num_1`=".$EL['id'];
+	$elem_id_26 = _num(query_value($sql));
+
+	//условие удаляется, если не указано
+	if(!$cond = _num($vvv['cond'])) {
+		if($elem_id_26) {
+			$sql = "DELETE FROM `_element` WHERE `id`=".$elem_id_26;
+			query($sql);
+		}
+		jsonSuccess();
+	}
+
+	if(!$filter = _num($vvv['filter']))
+		jsonError('Не выбрано значение фильтра');
+
+	$sql = "INSERT INTO `_element` (
+				`id`,
+				`app_id`,
+				`dialog_id`,
+				`num_1`,
+				`num_2`,
+				`num_3`
+			) VALUES (
+				".$elem_id_26.",
+				".APP_ID.",
+				26,
+				".$EL['id'].",
+				".$cond.",
+				".$filter."
+			) ON DUPLICATE KEY UPDATE
+				`num_2`=VALUES(`num_2`),
+				`num_3`=VALUES(`num_3`)";
+	query($sql);
+
+	jsonSuccess();
+}
+
+
+
+
 /* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ ===--- */
 function PHP12_history_setup($el, $unit) {
 	/*

@@ -269,6 +269,14 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 		$send['html'] = _spisok59unit($cmp_id, $unit_id);
 		jsonSuccess($send);
 		break;
+	case 'spisok_cond_load'://получение данных списка для настройки условий [26]
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента');
+
+		$send['spisok'] = _29cnn($elem_id);
+		jsonSuccess($send);
+		break;
+
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка
@@ -323,6 +331,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	//выбор цвета для динамической заливки - через [11] - перехват внесения данных
 	_block_bg70($block_id, $dialog, $POST_CMP);
+
+	//добавление условия к списку - через [26] - перехват внесения данных
+	PHP12_spisok_cond_save($block_id, $dialog);
 
 	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
 

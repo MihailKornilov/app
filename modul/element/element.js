@@ -2794,6 +2794,55 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
+	/* ---=== НАСТРОЙКА ДОПОЛНИТЕЛЬНЫХ УСЛОВИЙ ОТОБРАЖЕНИЯ СПИСКА [26] ===--- */
+	PHP12_spisok_cond = function(el, unit) {
+		if(!window.CMP29)
+			return;
+
+		if(unit == 'get')
+			return PHP12_spisok_cond_get();
+
+		//условие
+		$('#sp-cond')._select({
+			width:250,
+			title0:'не выбрано',
+			msg_empty:'Подключенные списки отсутствуют',
+			spisok:CMP29,
+			func:function(v) {
+				$('#sp-filter')
+					._select(0)
+					._select('spisok', []);
+
+				if(!v)
+					return;
+
+				$('#sp-filter')._select('process');
+
+				var send = {
+					op:'spisok_cond_load',
+					elem_id:v
+				};
+				_post(send, function(res) {
+					$('#sp-filter')._select('spisok', res.spisok);
+				});
+			}
+		});
+		
+		//подгружаемые значения фильтра
+		$('#sp-filter')._select({
+			width:400,
+			title0:'не выбраны',
+			msg_empty:'Выберите условие',
+			spisok:FILTER26
+		});
+	},
+	PHP12_spisok_cond_get = function() {
+		return {
+			'cond':$('#sp-cond').val(),
+			'filter':$('#sp-filter').val()
+		};
+	},
+
 	/* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ ===--- */
 	PHP12_history_setup = function(el, unit) {
 		if(unit == 'get')

@@ -736,6 +736,8 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 			case 'enable': s.enable(); break;
 			case 'inp': return s.inp();
 			case 'spisok': s.spisok(o1); break;
+			case 'process': s.process(); break;
+			case 'cancel': s.cancel(); break;
 		}
 
 		return s;
@@ -759,12 +761,16 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 		dis = false;
 	};
 	t.process = function() {//показ процесса ожидания
+		if(!o.write)
+			ICON_DEL.parent().removeClass('dn');
 		ICON_DEL.addClass('spin');
 	};
 	t.isProcess = function() {//получение флага процесса ожидания
 		return ICON_DEL.hasClass('spin');
 	};
 	t.cancel = function() {//отмена процесса ожидания
+		if(!o.write)
+			ICON_DEL.parent().addClass('dn');
 		ICON_DEL.removeClass('spin');
 	};
 	t.spisok = function(spisok) {//вставка нового списка
