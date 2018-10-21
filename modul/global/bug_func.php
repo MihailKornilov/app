@@ -422,20 +422,26 @@ function PHP12_BUG_elm_dialog_history_lost() {//элементы истории 
 	'</table>';
 }
 
-function PHP12_BUG_elm_unit_del_setup() {//элементы настройки удаления записи
+function PHP12_BUG_elm_unit_del_setup() {//элементы, используемые отдельно для дополнительных настроек
 	$getv = 'elem-unit-del-setup';//переменная для GET
 
 	$sql = "SELECT COUNT(*)
 			FROM `_element`
 			WHERE `dialog_id`=58";
-	$elmCount = query_value($sql);
+	$elm58Count = query_value($sql);
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `dialog_id`=26";
+	$elm26Count = query_value($sql);
 
 	$sql = "SELECT `id`
 			FROM `_element`
 			WHERE `id` NOT IN (".ELM_DLG_HIST.")
 			  AND `block_id`<=0
 			  AND !`parent_id`
-			  AND `dialog_id`!=58";
+			  AND `dialog_id`!=58
+			  AND `dialog_id`!=26";
 	if($lost = query_ids($sql)) {
 		if(SA && @$_GET[$getv]) {
 			$sql = "DELETE
@@ -450,7 +456,8 @@ function PHP12_BUG_elm_unit_del_setup() {//элементы настройки �
 	return
 	'<div class="b fs14 color-555">Элементы для настройки удаления записи:</div>'.
 	'<table class="_stab mt5">'.
-		'<tr><td class="grey">Кол-во всех элементов настройки удаления записи:<td class="r b">'.$elmCount.
+		'<tr><td class="grey">Кол-во всех элементов настройки удаления записи:<td class="r b">'.$elm58Count.
+		'<tr><td class="grey">Кол-во всех элементов настройки дополнительных условий отображения списка:<td class="r b">'.$elm26Count.
 	'</table>'.
 
 ($lost ?

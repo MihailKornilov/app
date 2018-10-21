@@ -1210,8 +1210,44 @@ function _elem_11_v($EL, $ell_id, $unit, $is_edit) {//получение зна�
 			$txt = _spisokColSearchBg($EL, $txt);
 
 			return _br($txt);
+		//Radio - произвольные значения
+		case 16:
+			if(!$col = $ell['col'])
+				return _msgRed('no-col');
+			//имени колонки не существует в единице списка
+			if(!isset($unit[$col]))
+				return _msgRed('no-unit-col');
+
+			if(!$elDop = _elemOne($unit[$col]))
+				return _msgRed('no-el-'.$unit[$col]);
+
+			return $elDop['txt_1'];
 		//произвольный текст
 		case 10: return _br($ell['txt_1']);
+		//Выбор нескольких значений галочками
+		case 31:
+			if(!$col = $ell['col'])
+				return _msgRed('no-col');
+			//имени колонки не существует в единице списка
+			if(!isset($unit[$col]))
+				return _msgRed('no-unit-col');
+
+			$DLG = _dialogQuery($ell['num_1']);
+
+			//получение данных списка
+			$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
+					FROM "._tableFrom($DLG)."
+					WHERE `t1`.`id`"._spisokCondDef($DLG['id'])."
+					ORDER BY `sort`";
+			$spisok = query_arr($sql);
+
+			$send = array();
+			$sel = _idsAss($unit[$col]);
+			foreach($spisok as $r)
+				if(!empty($sel[$r['num']]))
+					$send[] = $r['txt_1'];
+
+			return implode(', ', $send);
 		//сборный текст
 		case 44: return PHP12_44_print($ell_id, $unit);
 		//календарь

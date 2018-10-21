@@ -992,6 +992,16 @@ var DIALOG = {},//массив диалоговых окон для управл
 						};
 					ATR_CMP._select(o);
 					return;
+				//Выбор нескольких значений галочками
+				case 31:
+					$(document).on('click', '#el_' + elm_id + ' ._check', function() {
+						var cmpv = [];
+						_forEq(ATTR_EL.find('._check.on'), function(sp) {
+							cmpv.push(sp.prev().attr('id').split('_')[1]);
+						});
+						ATR_CMP.val(cmpv.join())
+					});
+					return;
 				//count - количество
 				case 35:
 					ATR_CMP._count({

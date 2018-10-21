@@ -885,7 +885,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			*/
 			return _spisokElemCount($el);
 
-		//Radio
+		//Radio - произвольные значения
 		case 16:
 			/*
 				txt_1 - текст нулевого значения
@@ -1109,6 +1109,39 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				'class' => 'dialog-open pl',
 				'val' => 'dialog_id:'.$unit['dialog_id'].',unit_id:'.$unit['id'].',del:1'
 			));
+
+		//Выбор нескольких значений галочками
+		case 31:
+			/*
+				num_1 - список, из которого будут выбираться галочки
+			*/
+			$DLG = _dialogQuery($el['num_1']);
+
+			//получение данных списка
+			$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
+					FROM "._tableFrom($DLG)."
+					WHERE `t1`.`id`"._spisokCondDef($DLG['id'])."
+					ORDER BY `sort`";
+			$spisok = query_arr($sql);
+
+			$chk = '';
+			$n = 0;
+			$sel = _idsAss($v);
+			foreach($spisok as $r) {
+				$chk .=
+					'<div class="'._dn(!$n++, 'mt5').'">'.
+						_check(array(
+							'attr_id' => 'chk31_'.$r['num'],
+							'light' => 1,
+							'title' => $r['txt_1'],
+							'value' => _num(@$sel[$r['num']])
+						)).
+					'</div>';
+			}
+
+			return
+			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+			$chk;
 
 		//Значение списка: порядковый номер
 		case 32:
@@ -1364,8 +1397,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				'small' => 1,
 				'class' => _dn(!$v)
 			)).
-			'<div class="'._dn($v).'">'.
-				'<div class="icon icon-del-red pl fr'._tooltip('Отменить выбор', -52).'</div>'.
+			'<div class="prel'._dn($v).'">'.
+				'<div style="position:absolute;top:2px;right:3px;z-index:100" class="icon icon-del-red pl'._tooltip('Отменить выбор', -52).'</div>'.
 				'<div class="un-html">'._spisok59unit($el['id'], $v).'</div>'.
 			'</div>';
 
