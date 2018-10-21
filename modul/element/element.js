@@ -1046,6 +1046,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//SA: Select - дублирование
 				case 41:
+					return;
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,

@@ -621,17 +621,19 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
+/* выбор блоков из диалога или страницы */
+._sebl .icon-cube{left:5px;top:5px;opacity:.7}
+._sebl .icon-del{right:5px;top:5px}
+._sebl input{padding-left:28px;background-color:transparent}
+
+
+
+
+
 /* выбор элемента из диалога или страницы */
-._selem .icon-star{
-	left:5px;
-	top:6px;
-	opacity:.7;
-}
+._selem .icon-star{left:5px;top:6px;opacity:.7}
 ._selem .icon-del{right:5px;top:5px}
-._selem input{
-	padding-left:27px;
-	background-color:transparent;
-}
+._selem input{padding-left:27px;background-color:transparent}
 
 
 

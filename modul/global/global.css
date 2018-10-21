@@ -108,7 +108,7 @@ body:not(.site){position:relative}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:0 0 no-repeat url(../../img/icon18.png?27);
+	background:0 0 no-repeat url(../../img/icon18.png?30);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -151,6 +151,7 @@ body:not(.site){position:relative}
 .icon-eye    {background-position-x:-620px}/* формат отображения текста: глаз */
 .icon-star   {background-position-x:-640px}/* звезда */
 .icon-comment{background-position-x:-660px}/* комментарий */
+.icon-cube   {background-position-x:-680px}/* блоки: три кубика */
 /* ожидание процесса загрузки для любой иконки */
 .icon.spin{
 	height:16px;

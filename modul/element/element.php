@@ -1780,7 +1780,6 @@ function PHP12_block_choose($el, $unit) {
 	);
 
 	return
-//	_pr($unit).
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Страница <b class="fs14">Клиенты</b>:</div>'.
 	_blockHtml($obj_name, $obj_id, $unit);
 }

@@ -1309,6 +1309,25 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			return $txt;
 
+		//Выбор блоков из диалога или страницы
+		case 49:
+			/*
+				txt_1 - текст для placeholder
+			*/
+
+			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+			$title = _num($v) ? _elemTitle($v) : (!empty($v) ? $v : '');
+			if(!$v && $title)
+				$title = '-empty-';
+
+			return
+			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+			'<div class="_sebl dib prel bg-fff over1" id="'.$attr_id.'_sebl"'.$width.'>'.
+				'<div class="icon icon-cube pabs"></div>'.
+				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+				'<input type="text" readonly class="inp curP w100p color-ref"'.$placeholder.$disabled.' value="'.$title.'" />'.
+			'</div>';
+
 		//Календарь
 		case 51:
 			/*
