@@ -1418,7 +1418,8 @@ function _spisokCmpConnectIdGet($el) {//получение id привязонн
 					FROM `_spisok`
 					WHERE `id`=".$get_id;
 			if($unit = query_assoc($sql))
-				return $unit[$cmp['col']];
+				if($cmp['col'])
+					return $unit[$cmp['col']];
 		}
 
 	return 0;

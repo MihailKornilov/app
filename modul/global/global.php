@@ -743,6 +743,10 @@ function _jsCacheBlkOne($block_id) {
 	$val['child_count'] = $r['child_count'];
 	$val['hidden'] = $r['hidden'];
 
+	//скрытие/показ блоков - действие для элементов
+	$val['xx'] = $r['xx'];
+	$val['xx_ids'] = $r['xx_ids'];
+
 	return $val;
 }
 function _jsCacheElemOne($elem_id) {
