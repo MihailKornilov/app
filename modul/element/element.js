@@ -891,10 +891,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						}
 					});
 					return;
-				//ВСПОМОГАТЕЛЬНЫЙ ЭЛЕМЕНТ: Список действий, привязанных к элементу
-				case 22:
-					ATTR_EL.find('DL')._sort({table:'_element_func'});
-					return;
 				//Список - ТАБЛИЦА
 				case 23:
 					if(!el.num_6)
@@ -948,6 +944,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
+					_elemFunc(el, _num(ATR_CMP.val()), 1);
 					var o = {
 						width:el.width,
 						title0:el.txt_1,
@@ -955,6 +952,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 						msg_empty:'Не найдено',
 						spisok:VVV[el.id],
 						blocked:el.num_4,
+						func:function(v) {
+							_elemFunc(el, v);
+						},
 						funcWrite:function(v, t) {
 							var send = {
 								op:'spisok_29_connect',
@@ -1241,6 +1241,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Связка списка при помощи кнопки
 				case 59:
+					//выполнение действия
+					_elemFunc(el, _num(ATR_CMP.val()), 1);
+
 					var div = ATTR_CMP_AFICS.next(),
 						unitSel = function(id) {//действие после выбора значения
 							var send = {
@@ -1253,6 +1256,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								div.find('.un-html').html(res.html);
 								div._dn(1);
 								ATTR_CMP_AFICS._dn();
+								_elemFunc(el, 1);
 							});
 						};
 					//нажатие на кнопку для открытыя диалога
@@ -1284,6 +1288,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						ATTR_CMP_AFICS._dn(1);
 						div._dn();
 						ATR_CMP.val(0);
+						_elemFunc(el, 0);
 					});
 					return;
 				//Загрузка изображений
@@ -1704,8 +1709,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_forN(el.func, function(sp) {
 			switch(sp.dialog_id) {
 				//показ/скрытие блоков
-				case 36://Галочка[1]:
-				case 40://Выпадающее поле[17]:
+				case 36: //Галочка[1]:
+				case 40: //Выпадающее поле[17]:
+				case 201://По умолчанию - для остальных элементов
 					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
 
 					//ДЕЙСТВИЕ
@@ -1713,10 +1719,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 						//скрыть
 						case 709:
 						case 726:
+						case 2783:
 						default: break;
 						//показать
 						case 710:
 						case 727:
+						case 2784:
 							is_show = 1;
 							break;
 					}
@@ -1725,6 +1733,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					switch(sp.cond_id) {
 						case 703://значение не выбрано
 						case 730://галочка снята
+						case 2786://значение НЕ установлено (не выбрано)
 							if(v && sp.action_reverse) {
 								is_show = is_show ? 0 : 1;
 								break;
@@ -1734,6 +1743,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							break;
 						case 704://значение выбрано
 						case 731://галочка установлена
+						case 2787://значение установлено (выбрано)
 							if(!v && sp.action_reverse) {
 								is_show = is_show ? 0 : 1;
 								break;
@@ -1762,6 +1772,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							//изчезновение/появление
 							case 44:
 							case 715:
+							case 2789:
 								if(is_open) {
 									oo.obj._dn(is_show, 'vh');
 									oo.obj.css({opacity:is_show});
@@ -1775,6 +1786,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							//сворачивание/разворачивание
 							case 45:
 							case 716:
+							case 2790:
 								if(!oo.slide) {
 									oo.obj._dn(is_show, 'vh');
 									return;
@@ -2889,6 +2901,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 			'cond':$('#sp-cond').val(),
 			'filter':$('#sp-filter').val()
 		};
+	},
+
+	/* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ===--- */
+	PHP12_elem_action_list = function(el, unit) {
+		_attr_el(el.id).find('DL')._sort({table:'_element_func'});
 	},
 
 	/* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ ===--- */
