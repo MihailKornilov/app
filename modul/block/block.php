@@ -1316,9 +1316,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			*/
 
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$title = _num($v) ? _elemTitle($v) : (!empty($v) ? $v : '');
-			if(!$v && $title)
-				$title = '-empty-';
+
+			$ids = _ids($v);
+			$count = _ids($ids, 'count');
+			$title = $count ? $count.' блок'._end($count, '', 'а', 'ов') : '';
 
 			return
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.

@@ -1071,6 +1071,43 @@ var DIALOG = {},//массив диалоговых окон для управл
 						});
 					});
 					return;
+				//Выбор блоков из диалога или страницы
+				case 49:
+					var P = ATR_CMP.next(),
+						inp = P.find('.inp'),
+						sel = ATR_CMP.val(),
+						del = P.find('.icon-del'),
+						D = DIALOG_OPEN.D;
+
+					P.click(function() {
+						_dialogLoad({
+							dialog_id:19,
+							block_id:unit.source.block_id,
+//							dialog_source:unit.source.dialog_source,
+							prm:{
+								src:unit.source,
+								sel:sel
+							},
+							busy_obj:inp,
+							busy_cls:'hold',
+							func_open:function(res, dlg) {
+							},
+							func_save:function(res) {
+								sel = res.ids;
+								ATR_CMP.val(sel);
+								inp.val(res.title);
+								del._dn(1);
+							}
+						});
+					});
+					del.click(function(e) {
+						sel = 0;
+						e.stopPropagation();
+						ATR_CMP.val(0);
+						inp.val('');
+						del._dn();
+					});
+					return;
 				//Календарь
 				case 51:
 					ATR_CMP._calendar({

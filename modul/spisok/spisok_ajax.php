@@ -70,8 +70,10 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 				_cache_clear( 'page');
 
 			if($dialog['table_name_1'] == '_element_func')
-				if($BL = _blockOne($unit['block_id']))
-					_BE('block_clear');
+				if(_elemOne($unit['element_id'])) {
+					_BE('elem_clear');
+					_jsCache();
+				}
 		}
 
 		$send = _spisokAction4($send);
@@ -391,8 +393,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 		_cache_clear( 'page');
 
 	if(_table($dialog['table_1']) == '_element_func')
-		if($BL = _blockOne($unit['block_id']))
+		if(_elemOne($unit['element_id'])) {
 			_BE('elem_clear');
+			_jsCache();
+		}
 
 	if(IS_ELEM) {
 		_BE('elem_clear');
@@ -617,6 +621,20 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 		if($field == 'parent_id' && $parent_id && IS_ELEM) {
 			$sql = "UPDATE `"._table($dialog['table_1'])."`
 					SET `parent_id`=".$parent_id."
+					WHERE `id`=".$unit_id;
+			query($sql);
+			continue;
+		}
+		if($field == 'element_id' && _table($dialog['table_1']) == '_element_func') {
+			if(!$block_id)
+				continue;
+			if(!$BL = _blockOne($block_id))
+				continue;
+			if(!$elem_id = $BL['elem_id'])
+				continue;
+
+			$sql = "UPDATE `_element_func`
+					SET `element_id`=".$elem_id."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;
@@ -1281,7 +1299,11 @@ function _elem19_block_choose($dialog) {//выбор блоков через [11
 	$vvv = @$_POST['vvv'];
 	$elem_func_id = key($dialog['cmp']);
 
-	$send['ids'] = _ids($vvv[$elem_func_id]);
+	$ids = _ids($vvv[$elem_func_id]);
+	$count = _ids($ids, 'count');
+
+	$send['ids'] = $ids;
+	$send['title'] = $count ? $count.' блок'._end($count, '', 'а', 'ов') : '';
 
 	jsonSuccess($send);
 }

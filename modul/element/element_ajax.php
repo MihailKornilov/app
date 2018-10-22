@@ -992,6 +992,10 @@ function _dialogOpenLoad($dialog_id) {
 		if(!$block_id && isset($dlg['field1']['block_id']))
 			$block_id = _num($unit['block_id']);
 
+		if(!$block_id && isset($dlg['field1']['element_id']))
+			if($EL = _elemOne($unit['element_id']))
+				$block_id = _num($EL['block_id']);
+
 		foreach($dlg['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
 			//должен является вложенным списком
 			if($cmp['dialog_id'] != 29 && $cmp['dialog_id'] != 59)

@@ -1768,19 +1768,34 @@ function PHP12_block_choose($el, $unit) {
 	$obj_name = $BL['obj_name'];
 	$obj_id = $BL['obj_id'];
 
-	$PRM = $SRC['prm'];
+	switch($obj_name) {
+		case 'page':
+			$title = 'Страница';
+			if(!$page = _page($obj_id))
+				return _emptyMin('Страницы '.$obj_id.' не существует.');
+			$name = $page['name'];
+			break;
+		case 'dialog':
+			$title = 'Диалог';
+			if(!$dlg = _dialogQuery($obj_id))
+				return _emptyMin('Диалога '.$obj_id.' не существует.');
+			$name = $dlg['name'];
+			break;
+		default:
+			return _emptyMin('Неизвестный объект <b>'.$obj_name.'</b>.');
+	}
 
-	$sel = _idsAss($PRM['sel']);
+	$PRM = $SRC['prm'];
 
 	$unit += _pageSpisokUnit($obj_id, $obj_name);
 	$unit += array(
 		'blk_choose' => 1,
-		'blk_sel' => $sel,          //ids ранее выбранных блоков
-		'blk_deny' => _idsAss($PRM['deny'])  //блоки, которые запрещено выбирать
+		'blk_sel' => _idsAss($PRM['sel']),          //ids ранее выбранных блоков
+		'blk_deny' => _idsAss(@$PRM['deny'])  //блоки, которые запрещено выбирать
 	);
 
 	return
-	'<div class="fs14 pad10 pl15 bg-orange line-b">Страница <b class="fs14">Клиенты</b>:</div>'.
+	'<div class="fs14 pad10 pl15 bg-orange line-b">'.$title.' <b class="fs14">'.$name.'</b>:</div>'.
 	_blockHtml($obj_name, $obj_id, $unit);
 }
 
