@@ -298,6 +298,8 @@ function _pasMenu() {//строка меню управления страниц
 	'</div>';
 }
 function _pageInfo() {//информация о странице
+	if(!SA)
+		return '';
 	if(IFRAME_AUTH_ERROR)
 		return '';
 	if(!PAS)

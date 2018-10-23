@@ -248,8 +248,10 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 			_spisokUnitUpd54($r);
 
 		//очистка кеша страниц
-		if($dialog['table_name_1'] == '_page')
+		if($dialog['table_name_1'] == '_page') {
 			_cache_clear('page');
+			_jsCache();
+		}
 
 		jsonSuccess();
 		break;
@@ -389,8 +391,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	_spisokUnitAfter($dialog, $unit_id, $unitOld);
 
-	if(_table($dialog['table_1']) == '_page')
-		_cache_clear( 'page');
+	if(_table($dialog['table_1']) == '_page') {
+		_cache_clear('page');
+		_jsCache();
+	}
 
 	if(_table($dialog['table_1']) == '_element_func')
 		if(_elemOne($unit['element_id'])) {
