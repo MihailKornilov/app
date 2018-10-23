@@ -70,8 +70,8 @@ function _colorJS() {//массив цветов для текста в форм
 	'}';
 }
 
-function _emptyMin($msg) {
-	return '<div class="_empty min mar10">'.$msg.'</div>';
+function _emptyMin($msg, $mar=10) {
+	return '<div class="_empty min'.($mar ? ' mar'.$mar : '').'">'.$msg.'</div>';
 }
 
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
@@ -1787,16 +1787,41 @@ function PHP12_block_choose($el, $unit) {
 
 	$PRM = $SRC['prm'];
 
+	//запрет изменения уровня блоков. Только верхний (первый) уровень
+	$level_deny = _num(@$PRM['level_deny']);
+
 	$unit += _pageSpisokUnit($obj_id, $obj_name);
 	$unit += array(
 		'blk_choose' => 1,
-		'blk_sel' => _idsAss($PRM['sel']),          //ids ранее выбранных блоков
+		'blk_level' => $level_deny ? 1 : _blockLevelDefine($obj_name),
+		'blk_sel' => _idsAss($PRM['sel']),    //ids ранее выбранных блоков
 		'blk_deny' => _idsAss(@$PRM['deny'])  //блоки, которые запрещено выбирать
 	);
 
 	return
-	'<div class="fs14 pad10 pl15 bg-orange line-b">'.$title.' <b class="fs14">'.$name.'</b>:</div>'.
-	_blockHtml($obj_name, $obj_id, $unit);
+	'<div class="fs14 pad10 pl15 bg-orange">'.$title.' <b class="fs14">'.$name.'</b>:</div>'.
+	($level_deny ? '' : PHP12_block_choose_but_level($obj_name, $obj_id)).
+	'<div id="block-choose-div">'.
+		_blockHtml($obj_name, $obj_id, $unit).
+	'</div>';
+}
+function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уровня блоков
+	$arr = _blockLevelButArr($obj_name, $obj_id);
+	if(count($arr) < 2)
+		return '';
+
+	$html = '';
+	foreach($arr as $n => $color)
+		$html .= '<button class="block-choose-level-change vk small ml5 '.$color.'">'.$n.'</button>';
+
+	return
+	'<div class="bg-ffc">'.
+		'<table class="bs5 ml10">'.
+			'<tr><td class="color-sal">Уровни блоков:'.
+				'<td>'.$html.
+				'<td class="w50 level-hold">'.
+		'</table>'.
+	'</div>';
 }
 
 
@@ -2675,7 +2700,7 @@ function PHP12_elem_action_list($el, $unit) {
 			WHERE `element_id`=".$BL['elem_id']."
 			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))
-		return _emptyMin('Действий не назначено.');
+		return _emptyMin('Действий не назначено.', 0);
 
 	//Названия действий
 	$sql = "SELECT `id`,`txt_1`

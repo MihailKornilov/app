@@ -87,7 +87,8 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 		$unit:      данные единицы списка.
 					А также дополнительные настройки:
 						blk_edit: включение настройки блоков
-						blk_choose: выбор блоков (только корневых)
+						blk_choose: выбор блоков
+						blk_level: уровень выбираемых блоков
 						v_choose: выбор элемента
 						elem_width_change: изменение ширины элементов
 	*/
@@ -245,57 +246,62 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	return $send;
 }
 function _blockLevelChange($obj_name, $obj_id) {//кнопки для изменения уровня редактирования блоков
-	$max = 1;
 	$html = '';
 
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `obj_name`='".$obj_name."'
-			  AND `obj_id`=".$obj_id;
-	if($arr = query_arr($sql)) {
-		//определение количества уровней блоков
-		foreach($arr as $r) {
-			if(!$parent_id = $r['parent_id'])
-				continue;
-
-			$level = 2;
-
-			while($parent_id)
-				if($parent_id = $arr[$parent_id]['parent_id'])
-					$level++;
-
-			if($max < $level)
-				$max = $level;
-		}
-
-		//обновление текущего уровня настройки блоков, если у предыдущего объекта было больше уровней
-		$selected = _blockLevelDefine($obj_name);
-		if($selected > $max) {
-			_blockLevelDefine($obj_name, 1);
-			$selected = 1;
-		}
-
-		for($n = 1; $n <= $max; $n++) {
-			$sel = $selected == $n ? 'orange' : 'cancel';
-			$html .= '<button class="block-level-change vk small ml5 '.$sel.'">'.$n.'</button>';
-		}
-
-		//опделеление, есть ли элементы, у которых можно изменять ширину, чтобы выводить кнопку настройки
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `block_id` IN ("._idsGet($arr).")";
-		foreach(query_arr($sql) as $r)
-			if(_dialogParam($r['dialog_id'], 'element_width')) {
-				$html .= '<button class="vk small grey ml30 elem-width-change">Настройка ширины элементов</button>';
-				break;
-			}
-	}
+	$arr = _blockLevelButArr($obj_name, $obj_id);
+	foreach($arr as $n => $color)
+		$html .= '<button class="block-level-change vk small ml5 '.$color.'">'.$n.'</button>';
 
 	return
 	'<div id="block-level-'.$obj_name.'" val="'.$obj_name.':'.$obj_id.'">'.
 		'<button class="vk small grey block-grid-on">Управление блоками</button>'.
 		$html.
+		_blockWidthChange($obj_name, $obj_id).
 	'</div>';
+}
+function _blockLevelButArr($obj_name, $obj_id) {//кнопки для изменения уровня редактирования блоков в виде массива
+	if(!$arr = _BE('block_arr1', $obj_name, $obj_id))
+		return '';
+
+	$max = 1;
+	$send = array();
+
+	//определение количества уровней блоков
+	foreach($arr as $r) {
+		if(!$parent_id = $r['parent_id'])
+			continue;
+
+		$level = 2;
+
+		while($parent_id)
+			if($parent_id = $arr[$parent_id]['parent_id'])
+				$level++;
+
+		if($max < $level)
+			$max = $level;
+	}
+
+	//обновление текущего уровня настройки блоков, если у предыдущего объекта было больше уровней
+	$selected = _blockLevelDefine($obj_name);
+	if($selected > $max) {
+		_blockLevelDefine($obj_name, 1);
+		$selected = 1;
+	}
+
+	for($n = 1; $n <= $max; $n++)
+		$send[$n] = $selected == $n ? 'orange' : 'cancel';
+
+	return $send;
+}
+function _blockWidthChange($obj_name, $obj_id) {//кнопка изменения ширины элементов
+	if(!$arr = _BE('elem_arr1', $obj_name, $obj_id))
+		return '';
+
+	foreach($arr as $r)
+		if(_dialogParam($r['dialog_id'], 'element_width'))
+			return '<button class="vk small grey ml30 elem-width-change">Настройка ширины элементов</button>';
+
+	return '';
 }
 function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
 	$key = 'block_level_'.$obj_name;
@@ -330,7 +336,7 @@ function _blockSetka($r, $level, $grid_id, $unit) {//отображение се
 function _blockChoose($r, $level, $unit) {//подсветка блоков для выбора (к функциям)
 	if(empty($unit['blk_choose']))
 		return '';
-	if($r['parent_id'])//выбирать можно только корневые блоки
+	if($unit['blk_level'] != $level)
 		return '';
 
 	//отметка выбранных полей

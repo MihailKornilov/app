@@ -320,6 +320,25 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'block_choose_level_change':
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный ID блока');
+		if(!$level = _num($_POST['level']))
+			jsonError('Некорректный уровень блоков');
+		if(!$BL = _blockOne($block_id))
+			jsonError('Блока id'.$block_id.' не существует');
+
+		$unit = _pageSpisokUnit($BL['obj_id'], $BL['obj_name']);
+		$unit += array(
+			'blk_choose' => 1,
+			'blk_level' => $level,
+			'blk_sel' => array(),    //ids ранее выбранных блоков
+			'blk_deny' => array()    //блоки, которые запрещено выбирать
+		);
+
+		$send['html'] = _blockHtml($BL['obj_name'], $BL['obj_id'], $unit);
+
+		jsonSuccess($send);
 }
 
 

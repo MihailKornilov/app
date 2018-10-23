@@ -1083,7 +1083,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						_dialogLoad({
 							dialog_id:19,
 							block_id:unit.source.block_id,
-//							dialog_source:unit.source.dialog_source,
 							prm:{
 								src:unit.source,
 								sel:sel
@@ -1861,9 +1860,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			TRG = _copyObj(blk_ass),
 			D = $;
 
-//		if(window.DIALOG_OPEN)
-//			D = DIALOG_OPEN.D;
-
 		_forIn(TRG, function(n, block_id) {
 			if(!n)
 				return;
@@ -2007,11 +2003,26 @@ var DIALOG = {},//массив диалоговых окон для управл
 			return;
 
 		var D = DLG.D,
-			BC = D(ATTR_EL(el.id)).find('.blk-choose');//блоки в открытом диалоге для выбора
+			ATR_EL = D(ATTR_EL(el.id)),
+			LEVEL = ATR_EL.find('.block-choose-level-change'),
+			__bc = function() {//получение блоков в открытом диалоге для выбора
+				var bc = ATR_EL.find('.blk-choose');
+
+				//подсветка блока при выборе
+				bc.click(function() {
+					var t = $(this),
+						v = t.attr('val'),
+						sel = t.hasClass('sel');
+
+					t[(sel ? 'remove' : 'add') + 'Class']('sel');
+				});
+
+				return bc;
+			};
 
 		if(unit == 'get') {
 			var send = [];
-			_forEq(BC, function(sp) {
+			_forEq(__bc(), function(sp) {
 				if(!sp.hasClass('sel'))
 					return;
 				send.push(sp.attr('val'));
@@ -2019,14 +2030,28 @@ var DIALOG = {},//массив диалоговых окон для управл
 			return send.join();
 		}
 
-		//подсветка блока при выборе
-		BC.click(function() {
+		//переключение уровней блоков
+		LEVEL.click(function() {
 			var t = $(this),
-				v = t.attr('val'),
-				sel = t.hasClass('sel');
+				send = {
+					op:'block_choose_level_change',
+					block_id:unit.source.block_id,
+					level:_num(t.html()),
+					busy_obj:ATR_EL.find('.level-hold')
+				};
+			if(t.hasClass('orange'))
+				return;
 
-			t[(sel ? 'remove' : 'add') + 'Class']('sel');
+			_post(send, function(res) {
+				ATR_EL.find('#block-choose-div').html(res.html);
+				LEVEL.removeClass('orange')
+					.addClass('cancel');
+				t.removeClass('cancel').addClass('orange');
+				__bc();
+			});
 		});
+
+		__bc();
 	},
 
 	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ ===--- */
@@ -2114,6 +2139,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					dialog_source:0,
 					block_id:unit.source.block_id,
 					prm:{
+						level_deny:1,
 						sel:BLOCK.attr('val'),
 						deny:deny
 					},
