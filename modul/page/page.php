@@ -549,6 +549,56 @@ function _pageSpisokUnit($page_id, $obj_name='page') {//данные едини�
 }
 
 
+/* ----==== СПИСОК СТРАНИЦ (page12) ====---- */
+function PHP12_page_list() {
+	$send = '';
+	foreach(_page('app') as $id => $r) {
+		if($r['parent_id'])
+			continue;
+
+		$send .= PHP12_page_list_li($r, 0).
+				 PHP12_page_list_child($id);
+	}
+
+	return '<ol class="page-sort">'.$send.'</ol>';
+}
+function PHP12_page_list_child($parent_id, $level=1) {//дочерний уровень страниц
+	if(!$arr = _page('child', $parent_id))
+		return '';
+
+	$send = '';
+	foreach($arr as $id => $r)
+		$send .= PHP12_page_list_li($r, $level).
+				 PHP12_page_list_child($id, $level+1);
+
+	return '<ol>'.$send.'</ol>';
+}
+function PHP12_page_list_li($r, $level=0) {//данные одной страницы
+	return
+		'<li id="pg_'.$r['id'].'" class="'.(!$level ? 'mb30' : 'mb1').'">'.
+			'<table class="_stab small w100p">'.
+				'<tr>'.
+					'<td class="w25"><div class="icon icon-move pl"></div>'.
+					'<td>'.
+						'<a href="'.URL.'&p='.$r['id'].'" class="pg-name'._dn($r['parent_id'], 'b fs14').'">'.$r['name'].'</a>'.
+		   ($r['def'] ? '<div class="icon icon-ok curD ml10'._tooltip('Страница используется<br>по умолчанию', -72, '', 1).'</div>' : '').
+					'<td class="w50">'.
+						'<div val="dialog_id:20,unit_id:'.$r['id'].'" class="icon icon-edit pl dialog-open'._tooltip('Настроить страницу', -60).'</div>'.
+	($r['del_access'] ? '<div val="dialog_id:20,unit_id:'.$r['id'].',del:1" class="icon icon-del-red pl dialog-open'._tooltip('Удалить страницу', -54).'</div>' : '').
+			'</table>';
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

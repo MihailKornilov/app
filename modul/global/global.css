@@ -51,6 +51,11 @@ ol{list-style-type:none}
 
 .nested-placeholder{outline:1px dashed #4183C4;margin-top:1px}
 .mjs-nestedSortable-branch ol{padding-left:40px}
+.page-sort ol{padding-left:29px}
+.page-sort-hold{
+	outline:1px dashed #33ABFF;
+	background-color:#DCF1FF;
+}
 
 
 

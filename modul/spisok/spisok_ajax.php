@@ -66,8 +66,10 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 			}
 
 			//обновление кеша объекта, если это страница
-			if($dialog['table_name_1'] == '_page')
-				_cache_clear( 'page');
+			if($dialog['table_name_1'] == '_page') {
+				_cache_clear('page');
+				_jsCache();
+			}
 
 			if($dialog['table_name_1'] == '_element_func')
 				if(_elemOne($unit['element_id'])) {

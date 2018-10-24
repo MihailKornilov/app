@@ -355,7 +355,7 @@ function _html_script() {//скрипты и стили
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
 
-	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?1"></script>'.
+	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?2"></script>'.
 
 	'<script src="js/lodash.min.js"></script>'.
 	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css" />'.

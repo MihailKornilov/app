@@ -62,9 +62,6 @@ switch(@$_POST['op']) {
 			query($sql, $conn);
 		}
 
-//		_globalCacheClear();
-//		_appJsValues();
-
 		jsonSuccess();
 		break;
 }

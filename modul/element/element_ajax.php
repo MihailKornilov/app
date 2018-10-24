@@ -438,6 +438,7 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		_cache_clear( 'page');
+		_jsCache();
 
 		jsonSuccess();
 		break;

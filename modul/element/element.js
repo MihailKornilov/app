@@ -1905,6 +1905,47 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return arr;
 	},
 
+	/* ----==== СПИСОК СТРАНИЦ (page12) ====---- */
+	PHP12_page_list = function(el) {
+		_attr_el(el.id).find('ol.page-sort').nestedSortable({
+			forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
+			placeholder:'page-sort-hold', //класс, применяемый для подсветки места, откуда взялся элемент
+			listType:'ol',
+			items:'li',
+			handle:'.icon-move',
+			isTree:1,
+			maxLevels:3,
+			tabSize:20, //расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
+			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+
+			start:function(e, t) {//установка ширины placeholder
+				if($(t.placeholder).prev().hasClass('mb30'))
+					$(t.placeholder).addClass('mb30');
+				if($(t.placeholder).prev().hasClass('mb1'))
+					$(t.placeholder).addClass('mb1');
+			},
+			update:function(e, t) {
+				var send = {
+					op:'page_sort',
+					arr:$(this).nestedSortable('toArray'),
+					busy_obj:_attr_el(el.id),
+					busy_cls:'spisok-busy'
+				};
+				_post(send, function() {
+					var item = $(t.item),
+						p = item.parent(),
+						prn = p.hasClass('page-sort');
+
+					item.removeClass(prn ? 'mb1' : 'mb30');
+					item.addClass(!prn ? 'mb1' : 'mb30');
+					item.find('.pg-name')[(prn ? 'add' : 'remove') + 'Class']('b fs14');
+				});
+			},
+
+			errorClass:'bg-fcc'  //ошибка, если попытка переместить элемент на недоступный уровень
+		});
+	},
+
 	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 	PHP12_v_choose = function(el, unit) {
 		if(unit == 'get')
