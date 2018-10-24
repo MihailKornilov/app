@@ -1938,7 +1938,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 					item.removeClass(prn ? 'mb1' : 'mb30');
 					item.addClass(!prn ? 'mb1' : 'mb30');
-					item.find('.pg-name')[(prn ? 'add' : 'remove') + 'Class']('b fs14');
+					item.find('.pg-name:first')[(prn ? 'add' : 'remove') + 'Class']('b fs14');
 				});
 			},
 
