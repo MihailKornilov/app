@@ -221,66 +221,6 @@ function _pasDefine() {//установка флага включения упр
 	define('PAS', APP_ID && $pas);
 //	define('PAS', 1);//для настройки страниц, которые доступны всем приложениям
 }
-/*
-function _pageSetupAppPage() {//управление страницами приложения
-	$arr = array();
-	foreach(_page() as $id => $r) {
-		if(!$r['app_id'])
-			continue;
-		if($r['sa'])
-			continue;
-		$arr[$id] = $r;
-	}
-
-	if(empty($arr))
-		return
-		'<div class="_empty">'.
-			'Ещё не создано ни одной страницы.'.
-			'<div class="mt10 fs15 black">Создайте первую!</div>'.
-		'</div>';
-
-	$sort = array();
-	foreach($arr as $id => $r)
-		if($r['parent_id']) {
-			if(empty($sort[$r['parent_id']]))
-				$sort[$r['parent_id']] = array();
-			$sort[$r['parent_id']][] = $r;
-			unset($arr[$id]);
-		}
-
-	return
-	'<style>'.
-//		'ol{max-width:700px;padding-left:40px}'.
-	'</style>'.
-	'<ol id="page-sort">'._pageSetupAppPageSpisok($arr, $sort).'</ol>';
-}
-function _pageSetupAppPageSpisok($arr, $sort) {//список страниц приложения
-	if(empty($arr))
-		return '';
-
-	$send = '';
-	foreach($arr as $r) {
-		$send .= '<li class="mt1'.(!$r['parent_id'] ? ' pb10' : '').'" id="item_'.$r['id'].'">'.
-			'<div>'.
-				'<table class="_stab w100p bg-fff">'.
-					'<tr><td>'.
-							'<a href="'.URL.'&p='.$r['id'].'" class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].'</a>'.
-								($r['def'] ? '<div class="icon icon-ok fr curD'._tooltip('Страница по умолчанию', -76).'</div>' : '').
-						'<td class="w35 wsnw">'.
-							'<div class="icon icon-move pl"></div>'.
-							'<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].'" class="icon icon-edit pl dialog-open'._tooltip('Изменить название', -58).'</div>'.
-		($r['del_access'] ? '<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',del:1" class="icon icon-del-red dialog-open'._tooltip('Страница пустая, удалить', -79).'</div>'
-						  : '<div class="icon icon-empty"></div>'
-		).
-				'</table>'.
-			'</div>';
-		if(!empty($sort[$r['id']]))
-			$send .= '<ol>'._pageSetupAppPageSpisok($sort[$r['id']], $sort).'</ol>';
-	}
-
-	return $send;
-}
-*/
 function _pasMenu() {//строка меню управления страницей
 	if(IFRAME_AUTH_ERROR)
 		return '';
@@ -559,6 +499,15 @@ function PHP12_page_list() {
 		$send .= PHP12_page_list_li($r, 0).
 				 PHP12_page_list_child($id);
 	}
+
+	if(!$send)
+		return
+		'<div class="_empty">'.
+			'Ещё не создано ни одной страницы.'.
+			'<br>'.
+			'<br>'.
+			'<button class="vk green dialog-open" val="dialog_id:20">Создать страницу</button>'.
+		'</div>';
 
 	return '<ol class="page-sort">'.$send.'</ol>';
 }

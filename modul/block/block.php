@@ -1070,7 +1070,9 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 		case 32:
 			if($is_edit)
 				return _elemTitle($el['id']);
-			return _spisokUnitNum($unit);
+			$num = _spisokUnitNum($unit);
+			$num = _spisokColSearchBg($el, $num);
+			return $num;
 
 		//Значение списка: дата
 		case 33:

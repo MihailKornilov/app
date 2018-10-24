@@ -135,7 +135,7 @@ function _spisokIsSort($elem_id) {//определение, нужно ли пр
 	return 0;
 }
 
-function _spisokCountAll($el) {//получение общего количества строк списка
+function _spisokCountAll($el, $next=0) {//получение общего количества строк списка
 	$key = 'SPISOK_COUNT_ALL'.$el['id'];
 
 	if(defined($key))
@@ -148,6 +148,10 @@ function _spisokCountAll($el) {//получение общего количес�
 			FROM "._tableFrom($dialog)."
 			WHERE "._spisokCond($el);
 	$all = _num(query_value($sql));
+
+	//проверка, есть ли единица списка, которую нашли по номеру (num)
+	if(!$next && _spisok7num(array(), $el))
+		$all++;
 
 	define($key, $all);
 
@@ -210,6 +214,78 @@ function _spisokElemCount($r) {//формирование элемента с с
 	$all.
 	' '.
 	_end($all, $r['txt_2'], $r['txt_4'], $r['txt_6']);
+}
+function _spisok7num($spisok, $el) {//добавление единицы списка, если был быстрый поиск по номеру
+	/*
+		Единица списка с найденным номером будет добавляться при двух условиях:
+		  1. Если существует быстрый поиск по этому списку
+		  2. Если в шаблоне списка вставлен номер
+
+		Найденное значение будет перемещено или вставлено в начало списка
+	*/
+
+	//пока только для списков-шаблонов
+	if($el['dialog_id'] != 14)
+		return $spisok;
+
+	$search = false;
+	$num = 0;
+
+	//1. Поиск элемента-фильтра-поиска
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 7) {
+			$search = $r['elem'];
+			$num = _num($r['v']);
+			break;
+		}
+
+	if(!$search)
+		return $spisok;
+	if(!$num)
+		return $spisok;
+
+	//2. Определение, есть ли в шаблоне номер списка
+	//получение элементов, находящихся в блоках
+	if(!$ELM = _BE('elem_arr', 'spisok', $el['id']))
+		return $spisok;
+
+	$is_num = false;
+	foreach($ELM as $r) {
+		//сам порядковый номер
+		if($r['dialog_id'] == 32)
+			$is_num = true;
+
+		//сборный текст
+		if($r['dialog_id'] == 44)
+			if($child = PHP12_44_setup_vvv($r['id']))
+				foreach($child as $rr)
+					if($rr['dialog_id'] == 32) {
+						$is_num = true;
+						break;
+					}
+
+		if($is_num)
+			break;
+	}
+
+	//в шаблоне нет номера списка
+	if(!$is_num)
+		return $spisok;
+
+	$DLG = _dialogQuery($el['num_1']);
+
+	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
+			FROM "._tableFrom($DLG)."
+			WHERE `t1`.`num`=".$num."
+			  "._spisokCondDef($el['num_1'])."
+			LIMIT 1";
+	if(!$u = query_assoc($sql))
+		return $spisok;
+
+	array_unshift($spisok, $u);
+	$spisok[0] = $u;
+
+	return $spisok;
 }
 function _spisokInclude_($spisok, $CMP) {//вложенные списки
 	foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
@@ -355,7 +431,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 
 	$limit = $ELEM['num_2'];
 
-	if(!$all = _spisokCountAll($ELEM))
+	if(!$all = _spisokCountAll($ELEM, $next))
 		return '<div class="_empty min">'._br($ELEM['txt_1']).'</div>';
 
 	$IS_SORT = _spisokIsSort($ELEM['id']);
@@ -372,6 +448,9 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
+	//добавление единицы списка, если был быстрый поиск по номеру
+	if(!$next)
+		$spisok = _spisok7num($spisok, $ELEM);
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);
 	//вставка картинок
@@ -380,7 +459,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	if(!$BLK = _BE('block_arr', 'spisok', $ELEM['id']))
 		return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
 
-	//получение элементов, расставленных находящихся в блоках
+	//получение элементов, находящихся в блоках
 	$ELM = _BE('elem_arr', 'spisok', $ELEM['id']);
 
 	//ширина единицы списка с учётом отступов
@@ -712,9 +791,12 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения к
 	if($el['parent_id']) {
 		if(!$ell = _elemOne($el['parent_id']))
 			return $txt;
-		if($ell['dialog_id'] != 23)
-			return $txt;
-		$element_id_spisok = $el['parent_id'];
+		if($ell['dialog_id'] == 23)
+			$element_id_spisok = $el['parent_id'];
+		elseif($ell['dialog_id'] == 44)
+				if(!empty($ell['block']))
+					if($ell['block']['obj_name'] == 'spisok')
+						$element_id_spisok = $ell['block']['obj_id'];
 	}
 
 	if(!$element_id_spisok)
@@ -734,6 +816,12 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения к
 		return $txt;
 	if(!$v)
 		return $txt;
+
+	//совпадение с номером единицы списка
+	if($num = _num($v))
+		if($num == $txt)
+			return '<em class="fndd">'.$txt.'</em>';
+
 	if(!$cmp_id = _num($el['txt_2']))
 		return $txt;
 
