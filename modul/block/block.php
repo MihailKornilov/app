@@ -261,7 +261,7 @@ function _blockLevelChange($obj_name, $obj_id) {//кнопки для измен
 }
 function _blockLevelButArr($obj_name, $obj_id) {//кнопки для изменения уровня редактирования блоков в виде массива
 	if(!$arr = _BE('block_arr1', $obj_name, $obj_id))
-		return '';
+		return array();
 
 	$max = 1;
 	$send = array();
