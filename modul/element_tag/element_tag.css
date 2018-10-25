@@ -623,3 +623,61 @@
 
 
 
+
+
+
+
+
+
+
+
+/* Фильтр - Выбор нескольких групп значений */
+._filter102{
+	vertical-align:top;
+	box-sizing:border-box;
+	background-color:#fff;
+	border:#d3d9de solid 1px;
+	border-radius:2px;
+	position:relative;
+	cursor:pointer;
+	min-height:29px;
+}
+._filter102 .holder{
+	position:absolute;
+	color:#999;
+	left:8px;
+	top:7px;
+}
+._filter102 .td-un{padding:0 2px 2px 2px}
+._filter102 .un{
+	display:inline-block;
+	padding:5px 8px;
+	background-color:#eee;
+	color:#555;
+	font-size:12px;
+	font-weight:bold;
+	margin:2px 2px 0 0;
+	border-radius:2px;
+}
+._filter102 .icon-del{margin:4px 3px 0 0}
+._filter102 .icon-empty{margin-top:8px}
+._filter102 .list{
+	position:absolute;
+	right:-1px;
+	border-radius:2px;
+	box-shadow:0 3px 7px rgba(0,0,0,.1);
+	z-index:100;
+}
+._filter102:not(.rs) .list{display:none}
+._filter102 .list table{
+	background-color:#fff;
+	border:#d3d9de solid 1px;
+}
+._filter102 .list td{padding:8px}
+
+
+
+
+
+
+

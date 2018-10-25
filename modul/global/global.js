@@ -309,6 +309,11 @@ $.fn._dn = function(v, cls) {//скрытие/показ элемента
 	t[(v ? 'remove' : 'add') + 'Class'](cls || 'dn');
 	return t;
 };
+$.fn._vh = function(v) {//скрытие/показ элемента visibility:hidden
+	var t = $(this);
+	t[(v ? 'remove' : 'add') + 'Class']('vh');
+	return t;
+};
 $.fn._busy = function(v) {//проверка/установка/снятие процесса ожидания для элемента - класс _busy
 	var t = $(this);
 

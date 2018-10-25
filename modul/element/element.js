@@ -1690,6 +1690,105 @@ var DIALOG = {},//массив диалоговых окон для управл
 						}
 					});
 					return;
+				//Фильтр - Выбор нескольких групп значений
+				case 102:
+					if(!FILTER[el.num_1])
+						FILTER[el.num_1] = {};
+
+					var HLD = ATTR_EL.find('.holder'),//текст пустого значения
+						TDUN = ATTR_EL.find('.td-un'),//выбранные значения
+						DEL = ATTR_EL.find('.icon-del'),//иконка удаления
+						ICON_EMPTY = '<div class="icon icon-empty"></div>',
+						TITLE = window['EL' + el.id + '_F102_TITLE'],
+						COUNT = window['EL' + el.id + '_F102_C'],
+						BG = window['EL' + el.id + '_F102_BG'],
+						un = function(id, tl) {//формирование значения для вставки
+							var bg = BG[id] ? ' style="background-color:' + BG[id] + '"' : '',
+								title = tl ? TITLE[id] : _num(COUNT[id]);
+							return '<div class="un"' + bg + '>' + title +'</div>';
+						},
+						sevSet = function() {//обновление выбранных значений
+							var sel = '',
+								ids = [];
+							_forEq(ATTR_EL.find('._check'), function(sp) {
+								var p = sp.prev(),
+									v = _num(p.val()),
+									id = p.parent().parent().attr('val');
+
+								if(v) {
+									sel += un(id);
+									ids.push(id);
+								}
+							});
+
+							if(ids.length == 1)
+								sel = un(ids[0], 1);
+
+							HLD._dn(!sel);
+							TDUN.html(sel || ICON_EMPTY);
+							DEL._vh(sel);
+							FILTER[el.num_1][elm_id] = ids.join();
+							_spisokUpdate(el.num_1);
+						},
+						chkUpd = function(id) {//обновление галочек
+							_forEq(ATTR_EL.find('._check'), function(sp) {
+								var p = sp.prev(),
+									chk_id = p.parent().parent().attr('val');
+								p._check(chk_id == id ? 1 : 0);
+							});
+						};
+
+					_forEq(ATTR_EL.find('._check'), function(sp) {
+						sp.prev()._check({func:sevSet});
+					});
+
+					ATTR_CMP_AFICS.click(function(e) {
+						var tar = $(e.target);
+
+						//очистка фильтра
+						if(tar.hasClass('icon-del')) {
+							HLD._dn(1);
+							TDUN.html(ICON_EMPTY);
+							DEL._vh();
+							ATTR_CMP_AFICS.removeClass('rs');
+							chkUpd();
+							FILTER[el.num_1][elm_id] = 0;
+							_spisokUpdate(el.num_1);
+							return;
+						}
+
+
+						if(tar.parents('.list').hasClass('list')) {
+							//выбор одного значения
+							if(tar[0].tagName == 'TD') {
+								var id = tar.parent().attr('val');
+								HLD._dn();
+								TDUN.html(un(id, 1));
+								DEL._vh(1);
+								ATTR_CMP_AFICS.removeClass('rs');
+								chkUpd(id);
+								FILTER[el.num_1][elm_id] = id;
+								_spisokUpdate(el.num_1);
+							}
+							return;
+						}
+
+						ATTR_CMP_AFICS._dn(ATTR_CMP_AFICS.hasClass('rs'), 'rs');
+					});
+
+					$(document)
+						.off('click._filter102')
+						 .on('click._filter102', function(e) {
+							var cur = $(e.target).parents('._filter102'),
+								attr = '';
+
+							//закрытие фильтров-102, когда нажатие было в стороне
+							if(cur.hasClass('_filter102'))
+								attr = ':not(#' + cur.attr('id') + ')';
+
+							$('._filter102' + attr).removeClass('rs');
+						});
+					return;
 			}
 		});
 

@@ -1062,40 +1062,8 @@ function _elemVvv($elem_id, $src=array()) {
 					ORDER BY `sort`";
 			return query_ass($sql);
 
-		case 83:
-			//элементы, указывающие на привязанный список
-			if(!$last_id = _idsLast($el['txt_2']))
-				break;
-			if(!$el = _elemOne($last_id))
-				break;
-			if(!$bl = $el['block'])
-				break;
-			if($bl['obj_name'] != 'dialog')
-				break;
-			if(!$dlg_id = _num($bl['obj_id']))
-				break;
-			if(!$dlg = _dialogQuery($dlg_id))
-				break;
-			if(!$col = $el['col'])
-				break;
-
-			//получение данных списка
-			$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
-					FROM "._tableFrom($dlg)."
-					WHERE `t1`.`id`"._spisokCondDef($dlg_id)."
-					ORDER BY `sort`,`id`
-					LIMIT 200";
-			if(!$spisok = query_arr($sql))
-				break;
-
-			$send = array();
-			foreach($spisok as $id => $r)
-				$send[] = array(
-					'id' => $id,
-					'title' => $r[$col]
-				);
-
-			return $send;
+		//Фильтр: Select - привязанный список
+		case 83: return _elemSpisokConnect($el['txt_2']);
 
 		//Select - выбор значения списка
 		case 85:
@@ -1131,6 +1099,47 @@ function _elemVvv($elem_id, $src=array()) {
 	}
 
 	return array();
+}
+
+function _elemSpisokConnect($ids, $return='select') {//значения привязанного списка
+	if(!$last_id = _idsLast($ids))
+		return array();
+	if(!$el = _elemOne($last_id))
+		return array();
+	if(!$bl = $el['block'])
+		return array();
+	if($bl['obj_name'] != 'dialog')
+		return array();
+	if(!$dlg_id = _num($bl['obj_id']))
+		return array();
+	if(!$dlg = _dialogQuery($dlg_id))
+		return array();
+	if(!$col = $el['col'])
+		return array();
+
+	//получение данных списка
+	$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
+			FROM "._tableFrom($dlg)."
+			WHERE `t1`.`id`"._spisokCondDef($dlg_id)."
+			ORDER BY `sort`,`id`
+			LIMIT 200";
+	if(!$spisok = query_arr($sql))
+		return array();
+
+	$select = array();
+	$ass = array();
+	foreach($spisok as $id => $r) {
+		$select[] = array(
+			'id' => $id,
+			'title' => $r[$col]
+		);
+		$ass[$id] = $r[$col];
+	}
+
+	if($return == 'ass')
+		return $ass;
+
+	return $select;
 }
 
 function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст

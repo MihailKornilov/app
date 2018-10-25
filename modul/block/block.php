@@ -1538,7 +1538,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						'class' => _dn($is_edit || $diff)
 					));
 
-		//Фильтр-select: привязанный список
+		//Фильтр: Select - привязанный список
 		case 83:
 			/*
                 num_1 - список, на который воздействует фильтр
@@ -1555,7 +1555,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 					'v' => $v
 				));
 			}
-
 
 			return _select(array(
 						'attr_id' => $attr_id,
@@ -1576,6 +1575,85 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						'width' => $el['width'],
 						'value' => _num($v)
 				   ));
+
+		//Фильтр - Выбор нескольких групп значений
+		case 102:
+			/*
+                num_1 - список, на который воздействует фильтр
+				txt_1 - нулевое значение
+                txt_2 - привязанный список
+                txt_3 - счётчик количеств
+                txt_4 - путь к цветам
+			*/
+
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$v = 0;
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_1'],
+					'filter' => $el['id'],
+					'v' => $v
+				));
+			}
+
+			$vAss = _idsAss($v);
+
+			//количества
+			$count = _elemSpisokConnect($el['txt_3'], 'ass');
+
+			//цвета
+			$color = _elemSpisokConnect($el['txt_4'], 'ass');
+
+			$title = '';//для JS
+			$spisok = '';
+			$sel = '';//выбранные значения
+			if($arr = _elemSpisokConnect($el['txt_2'])) {
+				$n = 0;
+				$selOne = '';
+				foreach($arr as $r) {
+					$id = $r['id'];
+					$bg = isset($color[$id]) ? ' style="background-color:'.$color[$id].'"' : '';
+					$c = _empty(@$count[$id]);
+					$spisok .=
+						'<tr class="over1" val="'.$r['id'].'">'.
+							'<th class="w35 pad8 center"'.$bg.'>'.
+								_check(array(
+									'attr_id' => 'chk'.$id,
+									'value' => isset($vAss[$id])
+								)).
+							'<td class="wsnw">'.$r['title'].
+							'<td class="r fs12 grey b">'.$c;
+
+					$title[$id] = $r['title'];
+
+					if(isset($vAss[$id])) {
+						$sel .= '<div class="un"'.$bg.'>'._num($c).'</div>';
+						$selOne = '<div class="un"'.$bg.'>'.$r['title'].'</div>';
+						$n++;
+					}
+				}
+				if($n == 1)
+					$sel = $selOne;
+			}
+
+
+			return
+			'<div class="_filter102"'.$width.' id="'.$attr_id.'_filter102">'.
+				'<div class="holder'._dn(!$sel).'">'.$el['txt_1'].'</div>'.
+				'<table class="w100p">'.
+					'<tr><td class="td-un">'.$sel.
+						'<td class="w25 top r">'.
+							'<div class="icon icon-del pl'._dn($sel, 'vh')._tooltip('Очистить фильтр', -53).'</div>'.
+				'</table>'.
+				'<div class="list">'.
+					'<table>'.$spisok.'</table>'.
+				'</div>'.
+			'</div>'.
+			'<script>'.
+				'var EL'.$el['id'].'_F102_TITLE='._json($title).','.
+					'EL'.$el['id'].'_F102_C='._json($count).','.
+					'EL'.$el['id'].'_F102_BG='._json($color).';'.
+			'</script>';
 	}
 
 	return '<div class="fs10 red">неизвестный элемент '.$el['dialog_id'].'</div>';

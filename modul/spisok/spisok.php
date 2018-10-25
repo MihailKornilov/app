@@ -878,6 +878,7 @@ function _spisokCond($el) {//формирование строки с услов
 	$cond .= _spisokCond77($el);
 	$cond .= _spisokCond78($el);
 	$cond .= _spisokCond83($el);
+	$cond .= _spisokCond102($el);
 
 	return $cond;
 }
@@ -1145,6 +1146,34 @@ function _spisokCond83($el) {//фильтр-select
 		return '';
 
 	return " AND `".$col."`=".$v;
+}
+function _spisokCond102($el) {//Фильтр - Выбор нескольких групп значений
+	$filter = false;
+	$v = 0;
+
+	//поиск элемента-фильтра-select
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 102) {
+			$filter = $r['elem'];
+			$v = _ids($r['v']);
+			break;
+		}
+
+	if(!$filter)
+		return '';
+	if(!$v)
+		return '';
+	if(!$elem_ids = _ids($filter['txt_2'], 1))
+		return '';
+
+	$elem_id = $elem_ids[0];
+
+	if(!$ell = _elemOne($elem_id))
+		return '';
+	if(!$col = $ell['col'])
+		return '';
+
+	return " AND `".$col."` IN (".$v.")";
 }
 
 function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select подключённого списка
