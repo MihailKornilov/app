@@ -162,11 +162,11 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 		$send['spisok_html'] = $spFunc($elSpisok);
 
 		//значения по умолчанию для фильтров списка
-		$send['def'] = array();
+		$def = array();
 		foreach(_spisokFilter('spisok', $spisok_id) as $r) {
 			$dialog_id = _num($r['elem']['dialog_id']);
 			$dop = array();
-			if($dialog_id == 77) {
+			if($dialog_id == 77) {//фильтр-календарь
 				$v = _spisokFilter('v', $r['elem']['id']);
 				$mon = substr($v, 0, 7);
 				$dop = array(
@@ -175,13 +175,14 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 					'cnt' => _filterCalendarContent($r['elem'], $mon, $v)
 				);
 			}
-			$send['def'][] = array(
+			$def[] = array(
 				'dialog_id' => $dialog_id,
 				'elem_id' => $r['elem']['id'],
 				'dop' => $dop,
 				'v' => $r['def']
 			);
 		}
+		$send['def'] = _arrNum($def);
 
 		$send['filter'] = _spisokFilter('page_js');
 
@@ -282,7 +283,6 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 		$send['spisok'] = _29cnn($elem_id);
 		jsonSuccess($send);
 		break;
-
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка
@@ -350,6 +350,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	_elementFocusClear($dialog, $POST_CMP, $unit_id);
 	_pageDefClear($dialog, $POST_CMP);
+	_filterDefSet($dialog, $unit_id);
 
 	_spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id);
 	_spisokUnitDelSetup($dialog, $unit_id);
@@ -462,11 +463,6 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 			continue;
 		if(!$col = @$cmp['col'])
 			continue;
-/*			jsonError(array(
-				'attr_cmp' => $cmp['attr_cmp']._dialogParam($cmp['dialog_id'], 'element_afics'),
-				'text' => 'Отсутствует имя колонки в компоненте id'.$cmp_id
-			));
-*/
 		if(!isset($dlgParent['field1'][$col]) && !isset($dlgParent['field2'][$col]))
 			jsonError('В таблице отсутствует колонка с именем "'.$col.'"');
 
@@ -777,6 +773,17 @@ function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: оч�
 		query($sql);
 
 		return;
+	}
+}
+function _filterDefSet($dialog, $elem_id) {//установка значения фильтра по умолчанию
+	switch($dialog['id']) {
+		//Фильтр: галочка
+		case 62:
+			$sql = "DELETE FROM `_user_spisok_filter`
+					WHERE `element_id_filter`=".$elem_id;
+			query($sql);
+			_spisokFilter('cache_clear');
+			break;
 	}
 }
 function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компонентов единицы списка

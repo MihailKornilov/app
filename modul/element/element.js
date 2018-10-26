@@ -1644,20 +1644,20 @@ var DIALOG = {},//массив диалоговых окон для управл
 							_forIn(res.def, function(sp) {
 								switch(sp.dialog_id) {
 									//быстрый поиск
-									case 7:  _attr_cmp(sp.elem_id)._search('clear'); break;
+									case 7:  _attr_cmp(sp.elem_id)._search('clear'); return;
 									//фильтр-галочка
-									case 62: _attr_cmp(sp.elem_id)._check(0); break;
+									case 62: _attr_cmp(sp.elem_id)._check(sp.v); return;
 									//фильтр-календарь
 									case 77:
 										var CAL = _attr_el(sp.elem_id).find('._filter-calendar');
 										CAL.find('.mon-cur').val(sp.dop.mon);
 										CAL.find('.td-mon').html(sp.dop.td_mon);
 										CAL.find('.fc-cnt').html(sp.dop.cnt);
-										break;
+										return;
 									//фильтр-меню
-									case 78: _attr_el(sp.elem_id).find('.sel').removeClass('sel'); break;
+									case 78: _attr_el(sp.elem_id).find('.sel').removeClass('sel'); return;
 									//фильтр-select
-									case 83: _attr_cmp(sp.elem_id)._select(0); break;
+									case 83: _attr_cmp(sp.elem_id)._select(0); return;
 								}
 							});
 							FILTER = res.filter;
