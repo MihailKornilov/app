@@ -168,6 +168,7 @@ query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удал
 			$dop = array();
 			if($dialog_id == 77) {//фильтр-календарь
 				$v = _spisokFilter('v', $r['elem']['id']);
+				$v = _filterCalendarDef($v);
 				$mon = substr($v, 0, 7);
 				$dop = array(
 					'mon' => $mon,
@@ -779,6 +780,8 @@ function _filterDefSet($dialog, $elem_id) {//установка значения
 	switch($dialog['id']) {
 		//Фильтр: галочка
 		case 62:
+		//Фильтр: календарь
+		case 77:
 			$sql = "DELETE FROM `_user_spisok_filter`
 					WHERE `element_id_filter`=".$elem_id;
 			query($sql);

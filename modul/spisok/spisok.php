@@ -1057,6 +1057,7 @@ function _spisokCond77($el) {//фильтр-календарь
 	if(!$v)
 		return ' AND !`id`';
 
+	$v = _filterCalendarDef($v);
 	$ex = explode(':', $v);
 
 	if(empty($ex[1]))

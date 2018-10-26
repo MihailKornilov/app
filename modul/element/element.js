@@ -1570,6 +1570,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 77:
 					var CAL = ATTR_EL.find('._filter-calendar'),
 						CNT = CAL.find('.fc-cnt');
+
+					//перемотка месяцев
 					CAL.find('.laquo').click(function() {
 						var send = {
 							op:'filter_calendar_mon_change',
@@ -1585,6 +1587,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 							CNT.html(res.cnt);
 						});
 					});
+
+					//нажатие на неделю или на день
 					CNT.click(function(e) {
 						var t = $(e.target),
 							on = t.hasClass('on'),

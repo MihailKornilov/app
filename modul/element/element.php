@@ -3606,7 +3606,7 @@ function _imageWebcam($el) {//Веб-камера (вставляется в б�
 
 function _filterCalendar($el) {//Фильтр-календарь
 	if(!$v = _spisokFilter('v', $el['id'])) {
-		$v = _calendarWeek();
+		$v = $el['num_2'];
 		_spisokFilter('insert', array(
 			'spisok' => $el['num_1'],
 			'filter' => $el['id'],
@@ -3614,6 +3614,7 @@ function _filterCalendar($el) {//Фильтр-календарь
 		));
 	}
 
+	$v = _filterCalendarDef($v);
 	$mon = substr($v, 0, 7);
 
 	return
@@ -3629,6 +3630,17 @@ function _filterCalendar($el) {//Фильтр-календарь
 
 		'<div class="fc-cnt">'._filterCalendarContent($el, $mon, $v).'</div>'.
 	'</div>';
+}
+function _filterCalendarDef($v) {//получение значения по умолчанию
+	switch($v) {
+		//текущий день
+		case 2819: return TODAY;
+		//текущая неделя
+		case 2820: return _calendarWeek();
+		//текущий месяц
+		case 2821: return substr(TODAY, 0, 7);
+	}
+	return $v;
 }
 function _filterCalendarMon($mon) {//имя месяца и год
 	$ex = explode('-', $mon);
