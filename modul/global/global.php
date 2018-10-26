@@ -292,6 +292,9 @@ function _ids($ids, $return='ids') {//проверка корректности 
 function _idsReturn($v, $return) {//для _ids - формат возвращаемого результата
 	switch($return) {
 		default:
+		case 'first'://первое значение
+			$v = explode(',', $v);
+			return _num($v[0]);
 		case 'ids': return $v;
 		case 1:
 		case 'arr': return $v ? explode(',', $v) : array();

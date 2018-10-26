@@ -384,6 +384,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 					break;
 				$func($cmp, $vvv[$cmp_id], $unit);
 				break;
+			//Дополнительные условия к фильтру
+			case 22: _cmpV22($cmp, $vvv, $unit); break;
 			//Применение загруженных изображений
 			case 60: _cmpV60($cmp, $unit); break;
 		}
@@ -782,6 +784,8 @@ function _filterDefSet($dialog, $elem_id) {//установка значения
 		case 62:
 		//Фильтр: календарь
 		case 77:
+		//Фильтр - Выбор нескольких групп значений
+		case 102:
 			$sql = "DELETE FROM `_user_spisok_filter`
 					WHERE `element_id_filter`=".$elem_id;
 			query($sql);
@@ -891,6 +895,67 @@ function _spisokAction4($send) {//действие 4 - обновление ис
 	$send['dialog_source'] = _dialogOpenLoad($dialog_id);
 
 	return $send;
+}
+function _cmpV22($cmp, $vvv, $unit) {//Дополнительные условия к фильтру
+	/*
+		$cmp  - компонент из диалога, отвечающий за настройку значений фильтра
+		$val  - значения, полученные для сохранения
+		$unit - элемент, размещающий фильтр, для которого происходит настройка
+	*/
+
+	if(!$parent_id = _num($unit['id']))
+		return;
+
+	//ID элементов, которые не должны будут удалены
+	$ids = array();
+	$update = array();
+
+	if($val = @$vvv[$cmp['id']])
+		if(is_array($val))
+			foreach($val as $r) {
+				if($id = _num($r['id']))
+					$ids[] = $id;
+				if(!$num_1 = _num($r['num_1']))
+					continue;
+				if(!$num_2 = _num($r['num_2']))
+					continue;
+
+				$txt_1 = _txt($r['txt_1']);
+				$update[] = "(
+					".$id.",
+					".APP_ID.",
+					".$parent_id.",
+					".$num_1.",
+					".$num_2.",
+					'".addslashes($txt_1)."'
+				)";
+			}
+
+	$ids = implode(',', $ids);
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	$sql = "INSERT INTO `_element` (
+				`id`,
+				`app_id`,
+				`parent_id`,
+				`num_1`,
+				`num_2`,
+				`txt_1`
+			)
+			VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`num_1`=VALUES(`num_1`),
+				`num_2`=VALUES(`num_2`),
+				`txt_1`=VALUES(`txt_1`)";
+	query($sql);
 }
 function _cmpV60($cmp, $unit) {//Применение загруженных изображений
 	//поле, хранящее список id изображений
@@ -1278,8 +1343,9 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 	//сам элемент [13]
 	if(!$el = $block['elem'])
 		return;
-	if($el['dialog_id'] != 13)
-		return;
+
+//	if($el['dialog_id'] != 13) //или 102 todo пока отключена за ненадобностью
+//		return;
 
 	//сохранение данных (выбор значения) должно происходить через [11]
 	if($dialog['id'] != 11)
@@ -1294,7 +1360,9 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 	if(!$v = $POST_CMP[$elem_func_id])
 		jsonError('Значение не выбрано');
 
-	$title = _num($v) ? _elemTitle($v) : $v;
+	$title = '';
+	foreach(_ids($v, 'arr') as $n => $id)
+		$title .= ($n ? ' » ' : '')._elemTitle($id);
 
 	$send = array(
 		'v' => $v,

@@ -842,9 +842,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			*/
 
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$title = _num($v) ? _elemTitle($v) : (!empty($v) ? $v : '');
-			if(!$v && $title)
-				$title = '-empty-';
+
+			$title = '';
+			foreach(_ids($v, 'arr') as $n => $id)
+				$title .= ($n ? ' » ' : '')._elemTitle($id);
 
 			return
 			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
@@ -942,6 +943,41 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
                 txt_1 - содержание
 			*/
 			return '<div class="_info">'._br($el['txt_1']).'</div>';
+
+		//Дополнительные условия к фильтру (вспомогательный элемент)
+		case 22:
+			/*
+                num_1 - id элемента, в котором нужно искать список
+			*/
+			if(!$UNIT_ISSET)
+				return _emptyMin('Дополнительные условия к фильтру', 0);
+			if(!$elem_id = $el['num_1'])
+				return _emptyMin('Не выбран элемент, указывающий на список', 0);
+			if(!$EL = _elemOne($el['num_1']))
+				return _emptyMin('Элемента '.$elem_id.' не существует', 0);
+			if(!$col = $EL['col'])
+				return _emptyMin('Не назначена колонка', 0);
+			if(!isset($unit[$col]))
+				return _emptyMin('Колонка отсутствует в единице списка', 0);
+			if(!$id = _ids($unit[$col], 'first'))
+				return _emptyMin('Значение в элементе ещё не выбрано', 0);
+			if(!$ELL = _elemOne($id))
+				return _emptyMin('Выбранного элемента '.$id.' не существует', 0);
+
+			$dialog_id = 0;
+			switch($ELL['dialog_id']) {
+				case 14:
+				case 29:
+				case 59: $dialog_id = $ELL['num_1']; break;
+			}
+
+			if(!$dialog_id)
+				return _emptyMin('Диалог не найден', 0);
+
+			return
+			'<script>'.
+				'var EL'.$el['id'].'_DS='.$dialog_id.';'.
+			'</script>';
 
 		//Содержание единицы списка - таблица
 		case 23: return _spisok23($el);
@@ -1433,7 +1469,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						1440 - галочка НЕ установлена
 				num_2 - id элемента, размещающего список
 				num_3 - значение по умолчанию
-				значения: PHP12_filter_check_setup
+				значения: элемент [22]
 			*/
 
 			$v = _spisokFilter('v', $el['id']);
@@ -1483,11 +1519,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				'<div class="_color-bg" style="background-color:'.$v.'"></div>';
 
 		//Значение списка: иконка сортировки
-		case 71:
-			if(!$UNIT_ISSET)
-				return 'sort';
-
-			return '<div class="icon icon-move pl"></div>';
+		case 71: return '<div class="icon icon-move '.($UNIT_ISSET ? 'pl' : 'curD').'"></div>';
 
 		//Фильтр - Radio
 		case 74:
@@ -1593,7 +1625,8 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			$v = _spisokFilter('v', $el['id']);
 			if($v === false) {
-				$v = 0;
+				$cond = _22cond($el['id']);
+				$v = _elemSpisokConnect($el['txt_2'], 'ids', $cond);
 				_spisokFilter('insert', array(
 					'spisok' => $el['num_1'],
 					'filter' => $el['id'],
@@ -1646,7 +1679,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			'<div class="_filter102"'.$width.' id="'.$attr_id.'_filter102">'.
 				'<div class="holder'._dn(!$sel).'">'.$el['txt_1'].'</div>'.
 				'<table class="w100p">'.
-					'<tr><td class="td-un">'.$sel.
+					'<tr><td class="td-un">'.($sel ? $sel : '<div class="icon icon-empty"></div>').
 						'<td class="w25 top r">'.
 							'<div class="icon icon-del pl'._dn($sel, 'vh')._tooltip('Очистить фильтр', -53).'</div>'.
 				'</table>'.

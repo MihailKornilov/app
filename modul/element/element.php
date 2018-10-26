@@ -855,6 +855,28 @@ function _elemVvv($elem_id, $src=array()) {
 			}
 			return $send;
 
+		//Дополнительные условия к фильтру
+		case 22:
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `parent_id`=".$unit_id."
+					ORDER BY `id`";
+			if(!$arr = query_arr($sql))
+				return array();
+
+			$send = array();
+			foreach($arr as $r) {
+				$send[] = array(
+					'id' => _num($r['id']),
+					'title' => _elemTitle($r['num_1']),
+					'num_1' => _num($r['num_1']),
+					'num_2' => _num($r['num_2']),
+					'txt_1' => $r['txt_1']
+				);
+			}
+
+			return $send;
+
 		//select - выбор списка (все списки приложения)
 		case 24:
 			switch($el['num_1']) {
@@ -1101,7 +1123,7 @@ function _elemVvv($elem_id, $src=array()) {
 	return array();
 }
 
-function _elemSpisokConnect($ids, $return='select') {//значения привязанного списка
+function _elemSpisokConnect($ids, $return='select', $cond='') {//значения привязанного списка
 	if(!$last_id = _idsLast($ids))
 		return array();
 	if(!$el = _elemOne($last_id))
@@ -1120,7 +1142,9 @@ function _elemSpisokConnect($ids, $return='select') {//значения прив
 	//получение данных списка
 	$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
 			FROM "._tableFrom($dlg)."
-			WHERE `t1`.`id`"._spisokCondDef($dlg_id)."
+			WHERE `t1`.`id`
+			  "._spisokCondDef($dlg_id)."
+			  ".$cond."
 			ORDER BY `sort`,`id`
 			LIMIT 200";
 	if(!$spisok = query_arr($sql))
@@ -1138,6 +1162,8 @@ function _elemSpisokConnect($ids, $return='select') {//значения прив
 
 	if($return == 'ass')
 		return $ass;
+	if($return == 'ids')
+		return _idsGet($select);
 
 	return $select;
 }
@@ -1171,7 +1197,6 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 		case 60: return _imageNo($el_parent['width']);
 		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
-//			_BE('dialog_clear');
 			$dlg = _dialogQuery($el['num_2']);
 			return $dlg['history'][$el['num_1']]['tmp'];
 		case 71: return 'sort';
@@ -2060,89 +2085,6 @@ function PHP12_menu_block_setup_vvv($parent_id) {//получение данны
 	}
 
 	return $spisok;
-}
-
-
-/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА ГАЛОЧКИ ===--- */
-function PHP12_filter_check_setup($el, $unit) {//используется в диалоге [62]
-	if(empty($unit['id']))
-		return '<div class="_empty min">Настройка значений фильтра будет доступна<br>после вставки элемента в блок.</div>';
-
-	return '';
-}
-function PHP12_filter_check_setup_save($cmp, $val, $unit) {//сохранение настройки фильтра для галочки. Подключаемая функция [12]
-	/*
-		$cmp  - компонент из диалога, отвечающий за настройку значений фильтра
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий фильтр, для которого происходит настройка
-	*/
-
-	if(!$parent_id = _num($unit['id']))
-		return;
-
-	//ID элементов, которые не должны будут удалены
-	$ids = array();
-	$update = array();
-
-	if(!empty($val)) {
-		if(!is_array($val))
-			return;
-
-		foreach($val as $r) {
-			if(!$id = _num($r['id']))
-				continue;
-			if(!$num_8 = _num($r['num_8']))
-				continue;
-
-			$ids[] = $id;
-			$txt_8 = _txt($r['txt_8']);
-			$update[] = array(
-				'id' => $id,
-				'num_8' => $num_8,
-				'txt_8' => $txt_8
-			);
-		}
-	}
-
-	$ids = implode(',', $ids);
-
-	//удаление значений, которые были удалены при настройке
-	$sql = "DELETE FROM `_element`
-			WHERE `parent_id`=".$parent_id."
-			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
-	query($sql);
-
-	if(empty($update))
-		return;
-
-	foreach($update as $r) {
-		$sql = "UPDATE `_element`
-				SET `parent_id`=".$parent_id.",
-					`num_8`=".$r['num_8'].",
-					`txt_8`='".addslashes($r['txt_8'])."'
-				WHERE `id`=".$r['id'];
-		query($sql);
-	}
-}
-function PHP12_filter_check_setup_vvv($parent_id) {
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `parent_id`=".$parent_id."
-			ORDER BY `sort`";
-	if(!$arr = query_arr($sql))
-		return array();
-
-	$send = array();
-	foreach($arr as $r) {
-		$send[] = array(
-			'id' => _num($r['id']),
-			'title' => _elemTitle($r['id']),
-			'num_8' => _num($r['num_8']),
-			'txt_8' => $r['txt_8']
-		);
-	}
-
-	return $send;
 }
 
 

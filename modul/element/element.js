@@ -599,6 +599,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 							if(ATR_CMP)
 								send.cmp[id] = ATR_CMP.val();
 							return;
+						case 22://Дополнительные условия к фильтру
+							send.vvv[id] = _elm22get(sp);
+							return;
 						case 37://SA: Select - выбор имени колонки
 							send.cmp[id] = ATR_CMP._select('inp');
 							return;
@@ -891,6 +894,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 						}
 					});
 					return;
+				//Дополнительные условия к фильтру (вспомогательный элемент)
+				case 22: _elm22(el, unit); return;
 				//Список - ТАБЛИЦА
 				case 23:
 					if(!el.num_6)
@@ -1662,6 +1667,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 									case 78: _attr_el(sp.elem_id).find('.sel').removeClass('sel'); return;
 									//фильтр-select
 									case 83: _attr_cmp(sp.elem_id)._select(0); return;
+									//Фильтр - Выбор нескольких групп значений
+									case 102:
+										_attr_el(sp.elem_id).find('.holder')._dn(1);
+										_attr_el(sp.elem_id).find('.td-un').html('<div class="icon icon-empty"></div>');
+										_attr_el(sp.elem_id).find('.icon-del')._dn();
+										return;
 								}
 							});
 							FILTER = res.filter;
@@ -2006,6 +2017,120 @@ var DIALOG = {},//массив диалоговых окон для управл
 		});
 
 		return arr;
+	},
+
+	_elm22 = function(el, unit) {//Дополнительные условия к фильтру
+		//ID диалога, значения которого будут настраиваться
+		var DS = window['EL' + el.id + '_DS'];
+		if(!DS)
+			return;
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить условие</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last');
+
+		BUT_ADD.click(valueAdd);
+
+		if(!VVV[el.id].length)
+			valueAdd();
+		else
+			_forIn(VVV[el.id], valueAdd);
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,     //id элемента, хранящего настройки
+				title:'', //имя выбранного элемента
+				num_1:0,  //id выбранного элемента из диалога, по которому будет выполняться условие фильтра
+				num_2:0,  //id условия из выпадающего списка
+				txt_1:''  //значеие условия
+			}, v);
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w50 r color-sal">Если:' +
+							'<td><input type="text"' +
+									  ' readonly' +
+									  ' class="title w150 curP over4 color-pay"' +
+									  ' placeholder="выберите значение..."' +
+									  ' value="' + v.title + '"' +
+									  ' val="' + v.num_1 + '"' +
+								' />' +
+							'<td><input type="hidden" class="cond-id" value="' + v.num_2 + '" />' +
+							'<td class="w100p">' +
+								'<input type="text"' +
+									  ' class="cond-val w125' + _dn(v.num_2 > 2) + '"' +
+									  ' value="' + v.txt_1 + '"' +
+								' />' +
+							'<td class="w35 r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				TITLE = DD.find('.title'),
+				COND_ID = DD.find('.cond-id');
+			TITLE.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					dialog_source:DS,
+					block_id:unit.source.block_id,
+					prm:{sel:v.num_1},
+					busy_obj:$(this),
+					busy_cls:'hold',
+					func_save:function(res) {
+						COND_ID._select('enable');
+						if(!v.num_1)
+							COND_ID._select(1);
+						v.num_1 = res.v;
+						TITLE.attr('val', v.num_1);
+						TITLE.val(res.title);
+					}
+				});
+			});
+			COND_ID._select({//условие
+				width:150,
+				title0:'не выбрано',
+				disabled:!v.id,
+				spisok:[
+					{id:1,title:'отсутствует'},
+					{id:2,title:'присутствует'},
+					{id:3,title:'равно'},
+					{id:4,title:'не равно'},
+					{id:5,title:'больше'},
+					{id:6,title:'больше или равно'},
+					{id:7,title:'меньше'},
+					{id:8,title:'меньше или равно'},
+					{id:9,title:'содержит'},
+					{id:10,title:'не содержит'}
+				],
+				func:function(v) {
+					DD.find('.cond-val')
+						._dn(v > 2)
+						.focus();
+				}
+			});
+			DD.find('.icon-del').click(function() {
+				var t = $(this),
+					p = _parent(t, 'DD');
+				p.remove();
+			});
+		}
+	},
+	_elm22get = function(el) {//получение данных для сохранения
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			send.push({
+				id:_num(sp.attr('val')),
+				num_1:sp.find('.title').attr('val'),
+				num_2:sp.find('.cond-id').val(),
+				txt_1:sp.find('.cond-val').val()
+			});
+		});
+		return send;
 	},
 
 	/* ----==== СПИСОК СТРАНИЦ (page12) ====---- */
@@ -2706,124 +2831,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 				id:_num(sp.attr('val')),
 				title:sp.find('.title').val(),
 				def:sp.find('.def').val()
-			});
-		});
-		return send;
-	},
-
-	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА ГАЛОЧКИ ===--- */
-	PHP12_filter_check_setup = function(el, unit) {//для [62]
-		if(unit == 'get')
-			return PHP12_filter_check_get(el);
-
-		if(!unit.id)
-			return;
-
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
-			ATR_EL = _attr_el(el.id),
-			DL = ATR_EL.append(html).find('dl'),
-			BUT_ADD = ATR_EL.find('div:last'),
-			ATR_SP = $('#cmp_1443');
-
-		ATR_SP._select('disable');
-		BUT_ADD.click(valueAdd);
-
-		if(!VVV[el.id].length)
-			valueAdd();
-		else
-			_forIn(VVV[el.id], valueAdd);
-
-		function valueAdd(v) {
-			v = $.extend({
-				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
-				title:'', //имя элемента
-				num_8:0,  //id условия из выпадающего списка [num_8]
-				txt_8:''  //значеие условия                  [txt_8]
-			}, v);
-
-			DL.append(
-				'<dd class="over3" val="' + v.id + '">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w50 r color-sal">Если:' +
-							'<td><input type="text"' +
-									  ' readonly' +
-									  ' class="title w150 curP over4"' +
-									  ' placeholder="выберите значение..."' +
-									  ' value="' + v.title + '"' +
-								' />' +
-							'<td><input type="hidden" class="cond-id" value="' + v.num_8 + '" />' +
-							'<td class="w100p">' +
-								'<input type="text"' +
-									  ' class="cond-val w125' + _dn(v.num_8 > 2) + '"' +
-									  ' value="' + v.txt_8 + '"' +
-								' />' +
-							'<td class="w35 r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			var DD = DL.find('dd:last'),
-				TITLE = DD.find('.title'),
-				COND_ID = DD.find('.cond-id');
-			TITLE.click(function() {
-				_dialogLoad({
-					dialog_id:11,
-					dialog_source:ELMM[ATR_SP.val()].num_1,
-					block_id:unit.source.block_id,
-					unit_id:v.id,
-					busy_obj:$(this),
-					busy_cls:'hold',
-					func_save:function(res) {
-						COND_ID._select('enable');
-						if(!v.id)
-							COND_ID._select(1);
-						v.id = res.unit.id;
-						DD.attr('val', v.id);
-						TITLE.val(res.unit.title);
-					}
-				});
-			});
-			COND_ID._select({//условие
-				width:150,
-				title0:'не выбрано',
-				disabled:!v.id,
-				spisok:[
-					{id:1,title:'отсутствует'},
-					{id:2,title:'присутствует'},
-					{id:3,title:'равно'},
-					{id:4,title:'не равно'},
-					{id:5,title:'больше'},
-					{id:6,title:'больше или равно'},
-					{id:7,title:'меньше'},
-					{id:8,title:'меньше или равно'},
-					{id:9,title:'содержит'},
-					{id:10,title:'не содержит'}
-				],
-				func:function(v) {
-					DD.find('.cond-val')
-						._dn(v > 2)
-						.focus();
-				}
-			});
-			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
-			});
-		}
-	},
-	PHP12_filter_check_get = function(el) {//получение данных для сохранения
-		var send = [];
-		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			var id = _num(sp.attr('val'));
-			if(!id)
-				return;
-			send.push({
-				id:id,
-				num_8:sp.find('.cond-id').val(),
-				txt_8:sp.find('.cond-val').val()
 			});
 		});
 		return send;

@@ -992,50 +992,7 @@ function _spisokCond62($el) {//фильтр-галочка
 		if($filter['num_1'] == 1440 && $v)
 			continue;
 
-		//условия, формирующие фильтр
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `parent_id`=".$filter['id'];
-		if(!$cond = query_arr($sql))
-			continue;
-
-		//колонки, по которым будет производиться фильтр
-		$sql = "SELECT `id`,`col`
-				FROM `_element`
-				WHERE `id` IN ("._idsGet($cond, 'txt_2').")";
-		if(!$elCol = query_ass($sql))
-			continue;
-
-		/*
-			 1: отсутствует
-			 2: присутствует
-			 3: равно
-			 4: не равно
-			 5: больше
-			 6: больше или равно
-			 7: меньше
-			 8: меньше или равно
-			 9: содержит
-			10: не содержит
-		*/
-
-		foreach($cond as $r) {
-			if(!$col = $elCol[$r['txt_2']])
-				continue;
-			$val = addslashes($r['txt_8']);
-			switch($r['num_8']) {
-				case 1: $send.= " AND !`t1`.`".$col."`"; break;
-				case 2: $send.= " AND `t1`.`".$col."`"; break;
-				case 3: $send.= " AND `t1`.`".$col."`='".$val."'"; break;
-				case 4: $send.= " AND `t1`.`".$col."`!='".$val."'"; break;
-				case 5: $send.= " AND `t1`.`".$col."`>'".$val."'"; break;
-				case 6: $send.= " AND `t1`.`".$col."`>='".$val."'"; break;
-				case 7: $send.= " AND `t1`.`".$col."`<'".$val."'"; break;
-				case 8: $send.= " AND `t1`.`".$col."`<='".$val."'"; break;
-				case 9: $send.= " AND `t1`.`".$col."` LIKE '%".$val."%'"; break;
-				case 10:$send.= " AND `t1`.`".$col."` NOT LIKE '%".$val."%'"; break;
-			}
-		}
+		$send .= _22cond($filter['id']);
 	}
 
 	return $send;
@@ -1175,6 +1132,56 @@ function _spisokCond102($el) {//Фильтр - Выбор нескольких �
 		return '';
 
 	return " AND `".$col."` IN (".$v.")";
+}
+
+function _22cond($parent_id) {//получение условий запроса из базы при помощи: Дополнительные условия к фильтру (вспомогательный элемент)
+	//условия, формирующие фильтр
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id;
+	if(!$cond = query_arr($sql))
+		return '';
+
+	//колонки, по которым будет производиться фильтр
+	$sql = "SELECT `id`,`col`
+			FROM `_element`
+			WHERE `id` IN ("._idsGet($cond, 'num_1').")";
+	if(!$elCol = query_ass($sql))
+		return '';
+
+	/*
+		 1: отсутствует
+		 2: присутствует
+		 3: равно
+		 4: не равно
+		 5: больше
+		 6: больше или равно
+		 7: меньше
+		 8: меньше или равно
+		 9: содержит
+		10: не содержит
+	*/
+
+	$send = '';
+	foreach($cond as $r) {
+		if(!$col = $elCol[$r['num_1']])
+			continue;
+		$val = addslashes($r['txt_1']);
+		switch($r['num_2']) {
+			case 1: $send .= " AND !`t1`.`".$col."`"; break;
+			case 2: $send .= " AND `t1`.`".$col."`"; break;
+			case 3: $send .= " AND `t1`.`".$col."`='".$val."'"; break;
+			case 4: $send .= " AND `t1`.`".$col."`!='".$val."'"; break;
+			case 5: $send .= " AND `t1`.`".$col."`>'".$val."'"; break;
+			case 6: $send .= " AND `t1`.`".$col."`>='".$val."'"; break;
+			case 7: $send .= " AND `t1`.`".$col."`<'".$val."'"; break;
+			case 8: $send .= " AND `t1`.`".$col."`<='".$val."'"; break;
+			case 9: $send .= " AND `t1`.`".$col."` LIKE '%".$val."%'"; break;
+			case 10:$send .= " AND `t1`.`".$col."` NOT LIKE '%".$val."%'"; break;
+		}
+	}
+
+	return 	$send;
 }
 
 function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select подключённого списка
