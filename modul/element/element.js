@@ -1611,6 +1611,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр-меню
 				case 78:
+					if(!FILTER[el.num_1])
+						FILTER[el.num_1] = {};
 					var FM = ATTR_EL.find('.fm-unit');
 					ATTR_EL.find('.fm-plus').click(function() {
 						var t = $(this),
@@ -1625,10 +1627,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 						FM.removeClass('sel');
 						if(!sel)
 							t.addClass('sel');
-							if(!FILTER[el.num_1])
-								FILTER[el.num_1] = {};
-							FILTER[el.num_1][elm_id] = sel ? 0 : t.attr('val');
-							_spisokUpdate(el.num_1);
+						FILTER[el.num_1][elm_id] = sel ? 0 : t.attr('val');
+						_spisokUpdate(el.num_1);
 					});
 					return;
 				//Очистка фильтра
@@ -1671,7 +1671,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 									case 102:
 										_attr_el(sp.elem_id).find('.holder')._dn(1);
 										_attr_el(sp.elem_id).find('.td-un').html('<div class="icon icon-empty"></div>');
-										_attr_el(sp.elem_id).find('.icon-del')._dn();
+										_attr_el(sp.elem_id).find('.icon-del')._vh();
 										return;
 								}
 							});

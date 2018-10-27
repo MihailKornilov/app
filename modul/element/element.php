@@ -3856,6 +3856,14 @@ function _filterMenu($el) {//фильтр-меню
 
 	$send = '';
 	$v = _spisokFilter('v', $el['id']);
+	if($v === false) {
+		$v = 0;
+		_spisokFilter('insert', array(
+			'spisok' => $el['num_1'],
+			'filter' => $el['id'],
+			'v' => $v
+		));
+	}
 
 	$spisok = array();
 	foreach($arr as $r)

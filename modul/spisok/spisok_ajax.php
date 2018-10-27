@@ -784,6 +784,8 @@ function _filterDefSet($dialog, $elem_id) {//установка значения
 		case 62:
 		//Фильтр: календарь
 		case 77:
+		//Фильтр: меню
+		case 78:
 		//Фильтр - Выбор нескольких групп значений
 		case 102:
 			$sql = "DELETE FROM `_user_spisok_filter`

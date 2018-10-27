@@ -1030,7 +1030,7 @@ function _spisokCond78($el) {//фильтр-меню
 	foreach(_spisokFilter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 78) {
 			$filter = $r['elem'];
-			$v = $r['v'];
+			$v = _num($r['v']);
 			break;
 		}
 
@@ -1039,33 +1039,21 @@ function _spisokCond78($el) {//фильтр-меню
 	if(!$v)
 		return '';
 
-	if(!$elem_id = $filter['num_2'])//id элемента, содержащего значения
-		return '';
-	if(!$ell = _elemOne($elem_id))//элемент, размещающий список
-		return '';
-	if(!$ids = _ids($ell['txt_2'], 1))//значения, составляющие содержание фильтра
-		return '';
-	if(!$el0_id = $ids[0])//id элемента, на который указывает значение
-		return '';
-	if(!$el0 = _elemOne($el0_id))//сам элемент
-		return '';
-	if(!$col = $el0['col'])//колонка, которая участвует в фильтре
-		return '';
+	//элемент, указывающий на подключенный список
+	if(!$elem_id = _ids($filter['txt_1'], 'first'))
+		return " AND !`id`";
+	if(!$EL = _elemOne($elem_id))
+		return " AND !`id`";
 
-	//если значение родительское, добавление дочерних ids
-	$c = count($ids) - 1;
-	$elem_id = $ids[$c];
+	//колонка, по которой будет производиться фильтрование
+	if(!$col = $EL['col'])
+		return " AND !`id`";
 
-	if(!$EL = _elemOne($elem_id))//значение отсутствует
-		return '';
-	if(!$BL = $EL['block'])//нет блока
-		return '';
-	if($BL['obj_name'] != 'dialog')//блок не из диалога
-		return '';
-	if(!$dialog_id = $BL['obj_id'])//нет ID диалога
-		return '';
-	if(!$dialog = _dialogQuery($dialog_id))//нет диалога
-		return '';
+	//получение диалога подключенного списка
+	if($EL['dialog_id'] == 29 && !$dialog_id = _num($EL['num_1']))
+		return " AND !`id`";
+	if(!$dialog = _dialogQuery($dialog_id))
+		return " AND !`id`";
 
 	if(isset($dialog['field1']['parent_id'])) {
 		$sql = "SELECT `id`

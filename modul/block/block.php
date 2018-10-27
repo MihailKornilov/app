@@ -968,6 +968,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			switch($ELL['dialog_id']) {
 				case 14:
 				case 29:
+				case 23:
 				case 59: $dialog_id = $ELL['num_1']; break;
 			}
 
