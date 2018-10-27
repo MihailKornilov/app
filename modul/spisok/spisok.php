@@ -894,8 +894,11 @@ function _spisokCondPageUnit($el) {//отображения значений, к
 
 	$cmp = false;
 	foreach(_dialogParam($el['num_1'], 'cmp') as $r) {
-		if($r['dialog_id'] != 29)
-			continue;
+		switch($r['dialog_id']) {
+			case 29:
+			case 59: break;
+			default: continue;
+		}
 		if($r['num_1'] != $spisok_id)
 			continue;
 		$cmp = $r;
@@ -903,7 +906,6 @@ function _spisokCondPageUnit($el) {//отображения значений, к
 
 	if(!$cmp)
 		return ' AND !`t1`.`id`';
-
 	if(!$unit_id = _num(@$_GET['id']))
 		return ' AND !`t1`.`id`';
 
