@@ -2014,8 +2014,12 @@ $.fn._search = function(o, v) {//поисковая строка
 		Оборачивается input:text
 		attr_id не обязателен
 	*/
-	var t = $(this),
-		attr_id = t.attr('id'),
+	var t = $(this);
+
+	if(!t.length)
+		return;
+
+	var attr_id = t.attr('id'),
 		VALUE = $.trim(t.val());
 
 	if(!attr_id) {

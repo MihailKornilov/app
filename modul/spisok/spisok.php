@@ -885,6 +885,8 @@ function _spisokCond($el) {//формирование строки с услов
 function _spisokCondPageUnit($el) {//отображения значений, которые принимает текущая страница
 	if(!$el['num_8'])//настройки нет
 		return '';
+	if(!$unit_id = _num(@$_GET['id']))
+		return ' AND !`t1`.`id`';
 	if($el['block']['obj_name'] != 'page')//проверка, чтобы список был размещён именно на странице
 		return ' AND !`t1`.`id`';
 	if(!$page = _page($el['block']['obj_id']))//страница, на которой размещён список
@@ -902,11 +904,10 @@ function _spisokCondPageUnit($el) {//отображения значений, к
 		if($r['num_1'] != $spisok_id)
 			continue;
 		$cmp = $r;
+		break;
 	}
 
 	if(!$cmp)
-		return ' AND !`t1`.`id`';
-	if(!$unit_id = _num(@$_GET['id']))
 		return ' AND !`t1`.`id`';
 
 	return " AND `t1`.`".$cmp['col']."`=".$unit_id;
