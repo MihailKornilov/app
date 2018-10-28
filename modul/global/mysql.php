@@ -15,14 +15,14 @@ function _dbConnect($prefix='') {
 	$sql = "SET NAMES `".constant($prefix.'MYSQL_NAMES')."`";
 //	query($sql, $conn);
 
-	mysql_query($sql, $conn) or die($sql.'<br />'.mysql_error());
+	mysql_query($sql, $conn) or die($sql.'<br>'.mysql_error());
 
 	define($prefix.'MYSQL_CONNECT', $conn);
 }
 function query($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
 	global $sqlQuery, $sqlTime;
 	$t = microtime(true);
-	$res = mysql_query($sql, $resource_id ? $resource_id : GLOBAL_MYSQL_CONNECT) or die($sql.'<br />'.mysql_error());
+	$res = mysql_query($sql, $resource_id ? $resource_id : GLOBAL_MYSQL_CONNECT) or die($sql.'<br>'.mysql_error());
 	$t = microtime(true) - $t;
 
 	$sqlTime += $t;

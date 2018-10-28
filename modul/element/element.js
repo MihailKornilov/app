@@ -801,6 +801,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var timer,
 						started = 0,
 						v_last;
+					if(!ATR_CMP)
+						return;
 					ATR_CMP._search({
 						func:function(v) {
 							if(started)
@@ -1223,6 +1225,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Меню переключения блоков
 				case 57:
+					if(!ATR_CMP)
+						return;
 					var type = {
 							1158:2,
 							1159:1

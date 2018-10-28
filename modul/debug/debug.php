@@ -28,7 +28,7 @@ function _debug($i='') {
 		$get = '';
 		ksort($_GET);
 		foreach($_GET as $k => $v)
-			$get .= '<b>'.$k.'</b>='.$v.'<br />';
+			$get .= '<b>'.$k.'</b>='.$v.'<br>';
 		$get .= '<textarea>http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'].'</textarea>';
 
 		$send .=

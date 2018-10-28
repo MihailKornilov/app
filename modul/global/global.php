@@ -253,7 +253,7 @@ function _txt($v, $notrim=false) {
 		$v = trim($v);
 	return $v;
 }
-function _br($v, $replace='<br />') {//вставка br в текст при нахождении enter
+function _br($v, $replace='<br>') {//вставка br в текст при нахождении enter
 	return str_replace("\n", $replace, $v);
 }
 function _daNet($v) {//$v: 1 -> да, 0 -> нет
@@ -777,6 +777,16 @@ function _jsCacheElemOne($elem_id) {
 	if($r['func'])
 		$val['func'] = $r['func'];
 
+	if($r['hint_on']) {
+		$val['hint_on'] = 1;
+		$val['hint_msg'] = $r['hint_msg'];
+		$val['hint_side'] = $r['hint_side'];
+		$val['hint_obj_pos_h'] = $r['hint_obj_pos_h'];
+		$val['hint_obj_pos_v'] = $r['hint_obj_pos_v'];
+		$val['hint_delay_show'] = $r['hint_delay_show'];
+		$val['hint_delay_hide'] = $r['hint_delay_hide'];
+	}
+
 	if($r['focus'])
 		$val['focus'] = 1;
 
@@ -787,6 +797,8 @@ function _jsCacheElemOne($elem_id) {
 			$val['afics'] = $dlg['element_afics'];
 		if($dlg['element_dialog_func'])
 			$val['dialog_func'] = $dlg['element_dialog_func'];
+		if($dlg['element_hint_access'])
+			$val['hint_access'] = 1;
 	}
 
 	$val['width'] = $r['width'];

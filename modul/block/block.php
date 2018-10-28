@@ -214,7 +214,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 						' style="'._blockStyle($r, $width, $unit).'"'.
 		   ($BLK_EDIT ? ' val="'.$r['id'].'"' : '').
 		  (!$BLK_EDIT && $r['click_action'] == 2082 && $r['click_dialog'] ?
-			            ' val="dialog_id:'.$r['click_dialog'].',unit_id:'.$unit['id'].'"'
+			            ' val="dialog_id:'.$r['click_dialog'].($r['click_unit_id'] ? ',unit_id:'.$unit['id'] : '').'"'
 		  : '').
 					 '>'.
 							_blockSetka($r, $level, $grid_id, $unit).
@@ -2168,6 +2168,7 @@ function _beBlockForming($arr) {//формирование массива бло
 			'click_action' => _num($r['click_action']),
 			'click_page' => _num($r['click_page']),
 			'click_dialog' => _num($r['click_dialog']),
+			'click_unit_id' => _num($r['click_unit_id']),
 			'x' => _num($r['x']),
 			'xx' => _num($r['xx']),
 			'xx_ids' => $r['xx_ids'],
