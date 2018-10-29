@@ -1164,24 +1164,60 @@ function _22cond($parent_id) {//получение условий запроса
 
 	$send = '';
 	foreach($cond as $r) {
-		if(!$col = $elCol[_idsLast($r['txt_1'])])
+		//если вложение более чем одно - пока такое не отработано
+		if(_ids($r['txt_1'], 'count') > 2)
+			return " AND !(`t1`.`id`)";
+
+		//если присутствует одно вложенное значение
+		if(_ids($r['txt_1'], 'count') == 2) {
+			if(!$EL = _elemOne(_ids($r['txt_1'], 'first')))
+				return "  AND !((`t1`.`id`))";
+			if(!$col = $EL['col'])
+				return "  AND !(((`t1`.`id`)))";
+
+			$dialog = _dialogQuery($EL['num_1']);
+			$send .= " AND `".$col."` IN (
+						SELECT `id`
+						FROM "._tableFrom($dialog)."
+						WHERE `id`"._spisokCondDef($dialog['id']).
+							_22condV(
+									$r['num_2'],
+									$elCol[_idsLast($r['txt_1'])],
+									$r['txt_2']
+								 )."
+						)";
 			continue;
-		$val = addslashes($r['txt_2']);
-		switch($r['num_2']) {
-			case 1: $send .= " AND !`t1`.`".$col."`"; break;
-			case 2: $send .= " AND `t1`.`".$col."`"; break;
-			case 3: $send .= " AND `t1`.`".$col."`='".$val."'"; break;
-			case 4: $send .= " AND `t1`.`".$col."`!='".$val."'"; break;
-			case 5: $send .= " AND `t1`.`".$col."`>'".$val."'"; break;
-			case 6: $send .= " AND `t1`.`".$col."`>='".$val."'"; break;
-			case 7: $send .= " AND `t1`.`".$col."`<'".$val."'"; break;
-			case 8: $send .= " AND `t1`.`".$col."`<='".$val."'"; break;
-			case 9: $send .= " AND `t1`.`".$col."` LIKE '%".$val."%'"; break;
-			case 10:$send .= " AND `t1`.`".$col."` NOT LIKE '%".$val."%'"; break;
 		}
+
+		$send .= _22condV(
+					$r['num_2'],
+					$elCol[_idsLast($r['txt_1'])],
+					$r['txt_2']
+				 );
 	}
 
 	return 	$send;
+}
+function _22condV($act, $col, $val) {//значение запроса по конкретному условию
+	if(!$col)
+		return '';
+
+	$val = addslashes($val);
+	$val = preg_match(REGEXP_INTEGER, $val) ? $val : "'".$val."'";
+	switch($act) {
+		case 1: return " AND !`t1`.`".$col."`";
+		case 2: return " AND `t1`.`".$col."`";
+		case 3: return " AND `t1`.`".$col."`=".$val;
+		case 4: return " AND `t1`.`".$col."`!=".$val;
+		case 5: return " AND `t1`.`".$col."`>".$val;
+		case 6: return " AND `t1`.`".$col."`>=".$val;
+		case 7: return " AND `t1`.`".$col."`<".$val;
+		case 8: return " AND `t1`.`".$col."`<=".$val;
+		case 9: return " AND `t1`.`".$col."` LIKE '%".$val."%'";
+		case 10:return " AND `t1`.`".$col."` NOT LIKE '%".$val."%'";
+	}
+
+	return '';
 }
 
 function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select подключённого списка

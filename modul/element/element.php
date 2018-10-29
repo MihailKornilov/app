@@ -873,7 +873,7 @@ function _elemVvv($elem_id, $src=array()) {
 				$send[] = array(
 					'id' => _num($r['id']),
 					'title' => $title,
-					'txt_1' => _num($r['txt_1']),
+					'txt_1' => _ids($r['txt_1']),
 					'num_2' => _num($r['num_2']),
 					'txt_2' => $r['txt_2']
 				);
