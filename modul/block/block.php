@@ -33,10 +33,8 @@ function _blockArrChild($child, $parent_id=0) {//расстановка доче
 
 	return $send;
 }
-function _blockName($name, $i='name') {//доступные варианты объектов для блоков
+function _blockName($name, $i='name', $obj_id=0) {//доступные варианты объектов для блоков
 	$empty = array(
-		'page' => '<div class="_empty mar20">Эта страница пустая и ещё не была настроена.</div>',
-
 		'spisok' =>
 			'<div class="bg-ffe pad10">'.
 				'<div class="_empty min">'.
@@ -58,6 +56,15 @@ function _blockName($name, $i='name') {//доступные варианты о�
 						'</div>'
 	);
 
+	if($name = 'page') {
+		$pName = '';
+		if($page = _page($obj_id))
+			$pName = $page['name'];
+		$empty['page'] = '<div class="_empty mar20">'.
+							'Cтраница <b class="fs14 color-555">'.$pName.'</b> пустая и ещё не была настроена.'.
+						 '</div>';
+	}
+
 	if(!isset($empty[$name]))
 		return 0;
 
@@ -69,7 +76,7 @@ function _blockName($name, $i='name') {//доступные варианты о�
 }
 function _blockHtml($obj_name, $obj_id, $unit=array(), $grid_id=0) {//вывод структуры блоков для конкретного объекта
 	if(!$block = _BE('block_obj', $obj_name, $obj_id))
-		return _blockName($obj_name, 'empty');
+		return _blockName($obj_name, 'empty', $obj_id);
 	if(!is_array($unit))
 		return $unit;
 

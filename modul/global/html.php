@@ -549,7 +549,7 @@ function _app_content() {//центральное содержание
 function _contentMsg($msg='') {
 	if(!$msg) {
 		$_GET['p'] = 0;
-		$msg = 'Несуществующая страница<br><br><a href="'.URL.'&p='._page('cur').'">Перейти на страницу по умолчанию</a>';
+		$msg = 'Несуществующая страница<br><br><a href="'.URL.'&p='._page('cur').'">Перейти на <b>стартовую страницу</b></a>';
 	}
 	return '<div class="_empty mar20">'.$msg.'</div>';
 }
