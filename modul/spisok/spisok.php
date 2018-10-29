@@ -1191,7 +1191,7 @@ function _22cond($parent_id) {//получение условий запроса
 
 		$send .= _22condV(
 					$r['num_2'],
-					$elCol[_idsLast($r['txt_1'])],
+					$elCol[$r['txt_1']],
 					$r['txt_2']
 				 );
 	}
