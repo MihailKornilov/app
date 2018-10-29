@@ -56,7 +56,7 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 						'</div>'
 	);
 
-	if($name = 'page') {
+	if($name == 'page') {
 		$pName = '';
 		if($page = _page($obj_id))
 			$pName = $page['name'];
