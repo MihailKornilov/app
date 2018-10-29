@@ -84,12 +84,12 @@ function _debug_cache() {//результат использования кеш�
 	$ccApp = array();   //кеш по приложениям
 	$ccOther = array();  //кеш из других приложений
 	foreach($list['cache_list'] as $n => $r) {
-		if(preg_match('/^__GLOBAL[a-z0-9_]{1,30}$/i', $r['name'])) {
+		if(preg_match('/^__GLOBAL[a-z0-9_]{1,50}$/i', $r['name'])) {
 			$ccGlobal[] = $r;
 			continue;
 		}
 
-		if(preg_match('/^__APP[a-z0-9_]{1,30}$/i', $r['name'])) {
+		if(preg_match('/^__APP[a-z0-9_]{1,50}$/i', $r['name'])) {
 			$ex = explode('__APP', $r['name']);
 			$ex = explode('_', $ex[1]);
 			$ccApp[$ex[0]][] = $r;

@@ -44,7 +44,7 @@ switch(@$_POST['op']) {
 		if(!$user = query_assoc($sql))
 			jsonError('Пользователь не найден');
 
-		_authSuccess('local'.$user['id'], $user['id'], $user['app_id_last']);
+		_authSuccess(md5('local'.$user['id']), $user['id'], $user['app_id_last']);
 
 		jsonSuccess();
 		break;

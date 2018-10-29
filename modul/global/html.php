@@ -28,7 +28,8 @@ function _saDefine() {//установка флага суперпользова
 
 /* ---=== АВТОРИЗАЦИЯ ===--- */
 function _auth() {//получение данных об авторизации из кеша
-	if(!$r = _cache_get('AUTH', 1)) {
+	$key = 'AUTH_'.CODE;
+	if(!$r = _cache_get($key, 1)) {
 		$sql = "SELECT *
 				FROM `_user_auth`
 				WHERE `code`='".addslashes(CODE)."'
@@ -46,7 +47,7 @@ function _auth() {//получение данных об авторизации 
 				'access' => $r['access']
 			);
 
-			_cache_set('AUTH', $data, 1);
+			_cache_set($key, $data, 1);
 		}
 	};
 
@@ -56,28 +57,6 @@ function _auth() {//получение данных об авторизации 
 	define('USER_ID', _num(@$r['user_id']));
 	define('APP_ID', _num(@$r['app_id']));
 	define('APP_ACCESS', _num(@$r['access']));
-
-/*
-	//SA: вход от имени другого пользователя
-	if(SA && $user_id = _num(@$_GET['user_id'])) {
-		$sql = "SELECT COUNT(*)
-				FROM `_vkuser`
-				WHERE `viewer_id`=".$user_id;
-		if(query_value($sql)) {
-			$sql = "UPDATE `_vkuser_auth`
-					SET `viewer_id_show`=".$user_id.",
-						`app_id`=0
-					WHERE `code`='".CODE."'";
-			query($sql);
-
-			_cache_('clear', 'USER_'.USER_ID);
-			_cache_('clear', 'AUTH');
-
-			header('Location:'.URL);
-			exit;
-		}
-	}
-*/
 }
 function _authLoginIframe() {//проверка авторизации через iframe
 	if(!IFRAME)
@@ -166,7 +145,7 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение запис
 
 	setcookie('code', $code, time() + 2592000, '/');
 
-	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'AUTH_'.$code, 1);
 	_cache_clear( 'page');
 	_cache_clear( 'user'.$user_id);
 
@@ -179,7 +158,7 @@ function _authLogout() {//выход из приложения, если тре�
 	if(!CODE)
 		return;
 
-	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'AUTH_'.CODE, 1);
 	_cache_clear( 'page');
 	_cache_clear( 'user'.USER_ID);
 
@@ -385,6 +364,11 @@ function _html_hat() {//верхняя строка приложения для 
 		return '';
 	if(!SITE)
 		return '';
+//	if(!defined('USER_NAME')) {
+//		header('Location:'.URL.'&logout');
+//		exit;
+//	}
+
 
 	return
 	'<div id="hat">'.
@@ -494,7 +478,7 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 			WHERE `code`='".CODE."'";
 	query($sql);
 
-	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'AUTH_'.CODE, 1);
 	_cache_clear( 'page');
 	_cache_clear( 'user'.USER_ID);
 

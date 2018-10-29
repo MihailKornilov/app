@@ -1029,7 +1029,7 @@ function _pageUserAccess_save($cmp, $val, $unit) {//сохранение дос�
 		query($sql);
 	}
 
-	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'AUTH_'.CODE, 1);
 	_cache_clear( 'page');
 	_cache_clear( 'user'.$user_id);
 }
@@ -1055,7 +1055,7 @@ function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение до
 			  AND `user_id` NOT IN (".$ids.")";
 	query($sql);
 
-	_cache_clear( 'AUTH', 1);
+	_cache_clear( 'AUTH _'.CODE, 1);
 	_cache_clear( 'page');
 
 	$sql = "SELECT *
