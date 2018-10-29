@@ -866,12 +866,16 @@ function _elemVvv($elem_id, $src=array()) {
 
 			$send = array();
 			foreach($arr as $r) {
+				$title = '';
+				foreach(_ids($r['txt_1'], 'arr') as $n => $id)
+					$title .= ($n ? ' » ' : '')._elemTitle($id);
+
 				$send[] = array(
 					'id' => _num($r['id']),
-					'title' => _elemTitle($r['num_1']),
-					'num_1' => _num($r['num_1']),
+					'title' => $title,
+					'txt_1' => _num($r['txt_1']),
 					'num_2' => _num($r['num_2']),
-					'txt_1' => $r['txt_1']
+					'txt_2' => $r['txt_2']
 				);
 			}
 
@@ -1188,8 +1192,8 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 			foreach(_ids($el['txt_2'], 1) as $n => $id)
 				$title .= ($n ? ' » ' : '')._elemTitle($id, $el_parent);
 			return $title;
-		case 29: //связки
-		case 59: return _dialogParam($el['num_1'], 'name');
+//		case 29: //связки
+//		case 59: return _dialogParam($el['num_1'], 'name');
 		case 32: return 'номер';
 		case 33: return 'дата/время';
 		case 30: return 'del';

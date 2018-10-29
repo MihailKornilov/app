@@ -1133,10 +1133,19 @@ function _22cond($parent_id) {//получение условий запроса
 	if(!$cond = query_arr($sql))
 		return '';
 
+	//получение id элементов, содержащих колонки
+	$idsCol = array();
+	foreach($cond as $r)
+		if(_idsLast($r['txt_1']))
+			$idsCol[] = _idsLast($r['txt_1']);
+
+	if(empty($idsCol))
+		return '';
+
 	//колонки, по которым будет производиться фильтр
 	$sql = "SELECT `id`,`col`
 			FROM `_element`
-			WHERE `id` IN ("._idsGet($cond, 'num_1').")";
+			WHERE `id` IN (".implode(',', $idsCol).")";
 	if(!$elCol = query_ass($sql))
 		return '';
 
@@ -1155,9 +1164,9 @@ function _22cond($parent_id) {//получение условий запроса
 
 	$send = '';
 	foreach($cond as $r) {
-		if(!$col = $elCol[$r['num_1']])
+		if(!$col = $elCol[_idsLast($r['txt_1'])])
 			continue;
-		$val = addslashes($r['txt_1']);
+		$val = addslashes($r['txt_2']);
 		switch($r['num_2']) {
 			case 1: $send .= " AND !`t1`.`".$col."`"; break;
 			case 2: $send .= " AND `t1`.`".$col."`"; break;

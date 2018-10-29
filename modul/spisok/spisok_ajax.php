@@ -917,19 +917,19 @@ function _cmpV22($cmp, $vvv, $unit) {//Дополнительные услови
 			foreach($val as $r) {
 				if($id = _num($r['id']))
 					$ids[] = $id;
-				if(!$num_1 = _num($r['num_1']))
+				if(!$txt_1 = _ids($r['txt_1']))
 					continue;
 				if(!$num_2 = _num($r['num_2']))
 					continue;
 
-				$txt_1 = _txt($r['txt_1']);
+				$txt_2 = _txt($r['txt_2']);
 				$update[] = "(
 					".$id.",
 					".APP_ID.",
 					".$parent_id.",
-					".$num_1.",
+					'".$txt_1."',
 					".$num_2.",
-					'".addslashes($txt_1)."'
+					'".addslashes($txt_2)."'
 				)";
 			}
 
@@ -948,15 +948,15 @@ function _cmpV22($cmp, $vvv, $unit) {//Дополнительные услови
 				`id`,
 				`app_id`,
 				`parent_id`,
-				`num_1`,
+				`txt_1`,
 				`num_2`,
-				`txt_1`
+				`txt_2`
 			)
 			VALUES ".implode(',', $update)."
 			ON DUPLICATE KEY UPDATE
-				`num_1`=VALUES(`num_1`),
+				`txt_1`=VALUES(`txt_1`),
 				`num_2`=VALUES(`num_2`),
-				`txt_1`=VALUES(`txt_1`)";
+				`txt_2`=VALUES(`txt_2`)";
 	query($sql);
 }
 function _cmpV60($cmp, $unit) {//Применение загруженных изображений

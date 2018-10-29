@@ -158,9 +158,8 @@ var ZINDEX = 1000,
 	},
 	_br = function(v, back) {
 		if(back)
-			return v.replace(new RegExp("\n",'g'), '<br />');
-		return v.replace(new RegExp('<br />','g'), "\n")
-				.replace(new RegExp('<br>','g'), "\n");
+			return v.replace(new RegExp("\n",'g'), '<br>');
+		return v.replace(new RegExp('<br>','g'), "\n");
 	},
 	_copySel = function(arr, id) {//копирование массива для селекта. Если указан id - игнорируется
 		var send = [];

@@ -2046,9 +2046,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 			v = $.extend({
 				id:0,     //id элемента, хранящего настройки
 				title:'', //имя выбранного элемента
-				num_1:0,  //id выбранного элемента из диалога, по которому будет выполняться условие фильтра
+				txt_1:0,  //id выбранного элемента из диалога, по которому будет выполняться условие фильтра
 				num_2:0,  //id условия из выпадающего списка
-				txt_1:''  //значеие условия
+				txt_2:''  //значеие условия
 			}, v);
 
 			DL.append(
@@ -2060,13 +2060,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 									  ' class="title w150 curP over4 color-pay"' +
 									  ' placeholder="выберите значение..."' +
 									  ' value="' + v.title + '"' +
-									  ' val="' + v.num_1 + '"' +
+									  ' val="' + v.txt_1 + '"' +
 								' />' +
 							'<td><input type="hidden" class="cond-id" value="' + v.num_2 + '" />' +
 							'<td class="w100p">' +
 								'<input type="text"' +
 									  ' class="cond-val w125' + _dn(v.num_2 > 2) + '"' +
-									  ' value="' + v.txt_1 + '"' +
+									  ' value="' + v.txt_2 + '"' +
 								' />' +
 							'<td class="w35 r">' +
 								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
@@ -2082,15 +2082,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 					dialog_id:11,
 					dialog_source:DS,
 					block_id:unit.source.block_id,
-					prm:{sel:v.num_1},
+					prm:{sel:v.txt_1},
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {
 						COND_ID._select('enable');
-						if(!v.num_1)
+						if(!v.txt_1)
 							COND_ID._select(1);
-						v.num_1 = res.v;
-						TITLE.attr('val', v.num_1);
+						v.txt_1 = res.v;
+						TITLE.attr('val', v.txt_1);
 						TITLE.val(res.title);
 					}
 				});
@@ -2129,9 +2129,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
 				id:_num(sp.attr('val')),
-				num_1:sp.find('.title').attr('val'),
+				txt_1:sp.find('.title').attr('val'),
 				num_2:sp.find('.cond-id').val(),
-				txt_1:sp.find('.cond-val').val()
+				txt_2:sp.find('.cond-val').val()
 			});
 		});
 		return send;
