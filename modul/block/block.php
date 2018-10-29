@@ -1048,7 +1048,10 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			*/
 
 			if(!$UNIT_ISSET)
-				return 'del';
+				return _iconDel(array(
+					'red' => $el['num_1'],
+					'class'=>'curD'
+				));
 
 			$dialog = _dialogQuery($unit['dialog_id']);
 

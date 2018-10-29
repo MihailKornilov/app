@@ -1188,6 +1188,12 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 	switch($el['dialog_id']) {
 		case 10: return $el['txt_1']; //произвольный текст
 		case 11: //значение диалога
+			//если выбрана картинка, показывается только она, без пути
+			$last = _idsLast($el['txt_2']);
+			$ell = _elemOne($last);
+			if($ell['dialog_id'] == 60)
+				return _elemTitle($last, $el_parent);
+
 			$title = '';
 			foreach(_ids($el['txt_2'], 1) as $n => $id)
 				$title .= ($n ? ' » ' : '')._elemTitle($id, $el_parent);
