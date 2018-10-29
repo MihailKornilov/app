@@ -144,7 +144,8 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 	//диалог, через который вносятся данные списка
 	$dialog = _dialogQuery($el['num_1']);
 
-	$sql = "SELECT COUNT(*)
+	$sql = "/* Количество значений списка <u>".$dialog['name']."</u> */\n".
+		   "SELECT COUNT(*)
 			FROM "._tableFrom($dialog)."
 			WHERE "._spisokCond($el);
 	$all = _num(query_value($sql));
@@ -422,7 +423,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 					0 - автоматически
 					2318 - по дате добавления
 					2319 - сотрировка (на основании поля sort)
-		num_8 - показывать только те значения, которые принимает текущая страница
+		num_8 - показывать только те значения, которые связаны с выбранным списком
 
 		настройка шаблона через функцию PHP12_spisok14_setup
 	*/
@@ -441,7 +442,8 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
+	$sql = "/* Данные списка ".$DLG['name']." */".
+		   "SELECT `t1`.*"._spisokJoinField($DLG)."
 			FROM "._tableFrom($DLG)."
 			WHERE "._spisokCond($ELEM)."
 			ORDER BY ".$order."
@@ -512,7 +514,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		num_5 - показывать имена колонок
 		num_6 - возможность сортировки строк таблицы (если установлена, длина списка становится 1000)
 		num_7 - уровни сортировки (1,2,3)
-		num_8 - показывать только те значения, которые принимает текущая страница
+		num_8 - показывать только те значения, которые связаны с выбранным списком
 
 		настройка шаблона через функцию PHP12_spisok_td_setting
 
@@ -871,7 +873,7 @@ function _spisokCond($el) {//формирование строки с услов
 
 	$cond = "`t1`.`id`";
 	$cond .= _spisokCondDef($el['num_1']);
-	$cond .= _spisokCondPageUnit($el);
+	$cond .= _spisokCondBind($el);
 	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond26($el);
 	$cond .= _spisokCond62($el);
@@ -882,35 +884,75 @@ function _spisokCond($el) {//формирование строки с услов
 
 	return $cond;
 }
-function _spisokCondPageUnit($el) {//отображения значений, которые принимает текущая страница
-	if(!$el['num_8'])//настройки нет
+function _spisokCondBind($el) {//отображения значений единицы привязанного списка
+	//элемент, который указывает на привязанный список
+	if(!$el_id_conn = $el['num_8'])
 		return '';
+	if(!$EL = _elemOne($el_id_conn))
+		return '';
+	//должен быть указан именно привязанный список
+	switch($EL['dialog_id']) {
+		case 29:
+		case 59: break;
+		default: return '';
+	}
+
+	//id диалога, единицу списка которого нужно будет отображать
+	if(!$DLG_ID_CONN = $EL['num_1'])
+		return '';
+
+	//проверка, чтобы список был размещён именно на странице
+	if($el['block']['obj_name'] != 'page')
+		return ' AND !`t1`.`id`';
+	if(!$page_id = $el['block']['obj_id'])
+		return ' AND !`t1`.`id`';
+	//страница, на которой размещён список
+	if(!$page = _page($page_id))
+		return ' AND !`t1`.`id`';
+	//id диалога, данные единицы списка которого выводится на странице
+	if(!$dlg_id = $page['spisok_id'])
+		return ' AND !`t1`.`id`';
 	if(!$unit_id = _num(@$_GET['id']))
 		return ' AND !`t1`.`id`';
-	if($el['block']['obj_name'] != 'page')//проверка, чтобы список был размещён именно на странице
-		return ' AND !`t1`.`id`';
-	if(!$page = _page($el['block']['obj_id']))//страница, на которой размещён список
-		return ' AND !`t1`.`id`';
-	if(!$spisok_id = $page['spisok_id'])//id диалога, единица списка которого размещается на странице
+	//получение данных единицы списка, которое принимает страница
+	if(!$unit = _pageSpisokUnit($page_id))
 		return ' AND !`t1`.`id`';
 
+
+	if(!$col = $EL['col'])
+		return ' AND !`t1`.`id`';
+
+	//выбранный привязанный список совпадает с принимаемым страницей
+	if($DLG_ID_CONN == $dlg_id)
+		return " AND `t1`.`".$col."`=".$unit_id;
+
+	//поиск элемента, который содержит привязанный список выбранного значения для отображения
 	$cmp = false;
-	foreach(_dialogParam($el['num_1'], 'cmp') as $r) {
+	foreach(_dialogParam($dlg_id, 'cmp') as $r) {
 		switch($r['dialog_id']) {
 			case 29:
 			case 59: break;
 			default: continue;
 		}
-		if($r['num_1'] != $spisok_id)
-			continue;
-		$cmp = $r;
-		break;
+		if($r['num_1'] == $DLG_ID_CONN) {
+			$cmp = $r;
+			break;
+		}
 	}
 
-	if(!$cmp)
-		return ' AND !`t1`.`id`';
+/*
+	echo 'указатель на связку='.$DLG_ID_CONN.' ('._dialogParam($DLG_ID_CONN, 'name').') col='.$col.'<br>';
+	echo 'страница принимает='.$dlg_id.' ('._dialogParam($dlg_id, 'name').') единицу списка '.$unit_id.'<br>';
+	echo 'найденная колонка из связки '.$cmp['col'].'<br>';
+	echo 'получен id от указателя '.$unit[$cmp['col']]['id'].'<br>';
+	echo 'выводится список='.$el['num_1'].' ('._dialogParam($el['num_1'], 'name').')<br>';
+	echo '<br>';
+*/
 
-	return " AND `t1`.`".$cmp['col']."`=".$unit_id;
+	if(!$cmp)
+		return ' AND !`t1`.`id` /* no cmp */';
+
+	return " AND `t1`.`".$col."`=".$unit[$cmp['col']]['id'];
 }
 function _spisokCond7($el) {//значения фильтра-поиска для списка
 	$search = false;

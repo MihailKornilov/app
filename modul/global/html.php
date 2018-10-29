@@ -364,10 +364,10 @@ function _html_hat() {//верхняя строка приложения для 
 		return '';
 	if(!SITE)
 		return '';
-//	if(!defined('USER_NAME')) {
-//		header('Location:'.URL.'&logout');
-//		exit;
-//	}
+	if(!defined('USER_NAME')) {
+		header('Location:'.URL.'&logout');
+		exit;
+	}
 
 
 	return
