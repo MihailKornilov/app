@@ -26,8 +26,17 @@ switch(@$_POST['op']) {
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
 			jsonError('Некорректный ID объекта');
+		if(!$level = _num($_POST['level']))
+			jsonError('Некорректный уровень блоков');
 
-		$unit = _pageSpisokUnit($obj_id, $obj_name) + array('blk_edit' => 1);
+		$blk_choose = _bool($_POST['blk_choose']);
+
+		$unit = _pageSpisokUnit($obj_id, $obj_name);
+		$unit += array(
+			'blk_edit' => 1,
+			'blk_choose' => $blk_choose,
+			'blk_level' => $level
+		);
 
 		$send['html'] = _blockHtml($obj_name, $obj_id,  $unit);
 
@@ -339,6 +348,30 @@ switch(@$_POST['op']) {
 		$send['html'] = _blockHtml($BL['obj_name'], $BL['obj_id'], $unit);
 
 		jsonSuccess($send);
+		break;
+/*
+	case 'block_choose_on'://включение выбора блоков
+		if(!$obj_name = _blockName($_POST['obj_name']))
+			jsonError('Несуществующее имя объекта');
+		if(!$obj_id = _num($_POST['obj_id']))
+			jsonError('Некорректный ID объекта');
+		if(!$level = _num($_POST['level']))
+			jsonError('Некорректный уровень блоков');
+
+		$on = _bool($_POST['on']);
+
+		$unit = _pageSpisokUnit($obj_name, $obj_id);
+		$unit += array(
+			'blk_choose' => $on,
+			'blk_level' => $level,
+			'blk_sel' => array(),    //ids ранее выбранных блоков
+			'blk_deny' => array()    //блоки, которые запрещено выбирать
+		);
+
+		$send['html'] = _blockHtml($obj_name, $obj_id, $unit);
+		jsonSuccess($send);
+		break;
+*/
 }
 
 

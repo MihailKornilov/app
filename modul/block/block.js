@@ -497,10 +497,14 @@ $(document)
 			p = t.parent(),
 			v = t.hasClass('grey'),
 			spl = p.attr('val').split(':'),
+			CONTENT = $('.block-content-' + spl[0]),
+			BCH = p.find('.block-choose-on').hasClass('orange') ? 1 : 0,
 			send = {
 				op:'block_grid_' + (v ? 'on' : 'off'),
 				obj_name:spl[0],
 				obj_id:spl[1],
+				blk_choose:BCH,
+				level:p.find('.block-level-change.orange').html(),
 				busy_obj:t
 			};
 		_post(send, function(res) {
@@ -508,8 +512,9 @@ $(document)
 			t._dn(!v, 'orange');
 			p.find('.block-level-change')._dn(!v);
 			p.find('.elem-width-change')._dn(!v);
+			p.find('.block-choose-on')._dn(!v).removeClass('_busy');
 
-			$('.block-content-' + spl[0]).html(res.html);
+			CONTENT.html(res.html);
 
 			if(v) {
 				$('._hint').remove();
@@ -517,6 +522,19 @@ $(document)
 					obj_name:res.obj_name,
 					obj_id:res.obj_id,
 					width:res.width
+				});
+			}
+
+			if(BCH) {
+				var bc = CONTENT.find('.blk-choose');
+
+				//подсветка блока при выборе
+				bc.click(function() {
+					var t = $(this),
+						v = t.attr('val'),
+						sel = t.hasClass('sel');
+
+					t[(sel ? 'remove' : 'add') + 'Class']('sel');
 				});
 			}
 		});
@@ -539,6 +557,7 @@ $(document)
 			t._dn(!on, 'on');
 			p.find('.block-grid-on')._dn(!on, 'vh');
 			p.find('.block-level-change')._dn(!on, 'vh');
+			p.find('.block-choose-on')._dn(!on, 'vh');
 			$('.block-content-' + spl[0]).html(res.html);
 			_forIn(res.elm, function(sp, k) {
 				if(!on || !sp.width_min)
@@ -640,6 +659,22 @@ $(document)
 		_cookie('block_level_' + obj_name, v);
 
 		but.removeClass('grey').trigger('click');
+	})
+	.on('click', '.block-choose-on', function() {//включение выбора блоков
+		var t = $(this),
+			on = t.hasClass('orange') ? 0 : 1,
+			p = t.parent(),
+			but = p.find('.block-grid-on');
+
+		t._dn(on, 'grey');
+		t._dn(!on, 'orange');
+		t.addClass('_busy');
+
+		but._dn(!on, 'vh');
+		p.find('.elem-width-change')._dn(!on, 'vh');
+
+		but.removeClass('grey').trigger('click');
+		but.removeClass('_busy');
 	})
 	.on('mouseenter', '.block-unit', _blockUnitSetup)
 	.on('click', '.block-unit', function() {//нажатие на блок для настройки

@@ -252,7 +252,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 
 	return $send;
 }
-function _blockLevelChange($obj_name, $obj_id) {//кнопки для изменения уровня редактирования блоков
+function _blockLevelChange($obj_name, $obj_id) {//кнопки изменения уровня редактирования блоков
 	$html = '';
 
 	$arr = _blockLevelButArr($obj_name, $obj_id);
@@ -264,6 +264,7 @@ function _blockLevelChange($obj_name, $obj_id) {//кнопки для измен
 		'<button class="vk small grey block-grid-on">Управление блоками</button>'.
 		$html.
 		_blockWidthChange($obj_name, $obj_id).
+		_blockChooseBut($obj_name, $obj_id).
 	'</div>';
 }
 function _blockLevelButArr($obj_name, $obj_id) {//кнопки для изменения уровня редактирования блоков в виде массива
@@ -310,6 +311,9 @@ function _blockWidthChange($obj_name, $obj_id) {//кнопка изменени�
 
 	return '';
 }
+function _blockChooseBut($obj_name, $obj_id) {//кнопка включения выбора блоков
+	return '<button class="vk small grey ml30 block-choose-on">выбрать блоки</button>';
+}
 function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
 	$key = 'block_level_'.$obj_name;
 	if($v) {
@@ -324,6 +328,9 @@ function _blockSetka($r, $level, $grid_id, $unit) {//отображение се
 		return '';
 	//выход, если включено изменение ширины элемента
 	if(!empty($unit['elem_width_change']))
+		return '';
+	//выход, если выбор блоков
+	if(!empty($unit['blk_choose']))
 		return '';
 	//выход, если выбор элемента
 	if(!empty($unit['v_choose']))
