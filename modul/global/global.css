@@ -113,7 +113,7 @@ body:not(.site){position:relative}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:0 0 no-repeat url(../../img/icon18.png?30);
+	background:0 0 no-repeat url(../../img/icon18.png?34);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -157,6 +157,18 @@ body:not(.site){position:relative}
 .icon-star   {background-position-x:-640px}/* звезда */
 .icon-comment{background-position-x:-660px}/* комментарий */
 .icon-cube   {background-position-x:-680px}/* блоки: три кубика */
+
+/* настройка ширины блоков */
+.icon-width  {
+	background-position-x:-700px;
+	width:44px;
+	height:21px;
+}
+.icon-width.on  {background-position-x:-750px}
+.icon-width.on .ttdiv{display:none}
+.icon-width:not(.on):not(:hover){opacity:.7}
+.icon-width._busy{background-position-x:center}
+
 /* ожидание процесса загрузки для любой иконки */
 .icon.spin{
 	height:16px;
@@ -266,7 +278,7 @@ body:not(.site){position:relative}
 
 /* Строка управления страницей page_setup */
 #pas{
-	background-color: #ffaf64;
+	background-color: #FFCB80;/*ffaf64*/
 	border-bottom:#C3864C solid 1px;
 	margin-left:-15px;
 	padding-left:15px;

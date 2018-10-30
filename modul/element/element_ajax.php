@@ -375,6 +375,7 @@ switch(@$_POST['op']) {
 
 		$send['dialog_id'] = $dialog_id;
 		$send['width'] = _num($dialog['width']);
+		$send['width_min'] = _dialogWidthMin($dialog['blk']);
 		$send['menu'] = _selArray($menu);
 		$send['menu_sa'] = _selArray($menu_sa);
 		$send['action'] = _selArray($action);
@@ -1131,5 +1132,22 @@ function _dialogOpenUnitDelContent($dialog, $unit, $delOn) {//содержани
 
 	return _blockLevel($block, $width, 0, 0, 1, $unit);
 }
+function _dialogWidthMin($blk) {//получение минимальной ширины диалога на основании корневых блоков
+	$width = 480;
+	if(empty($blk))
+		return $width;
+
+	foreach($blk as $r) {
+		if($r['parent_id'])
+			continue;
+		$w = $r['x'] * 10 + $r['width'];
+		if($width < $w)
+			$width = $w;
+	}
+
+	return $width;
+}
+
+
 
 

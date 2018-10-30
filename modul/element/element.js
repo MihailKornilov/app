@@ -451,7 +451,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				drag:function(event, ui) {
 					DLG('#width_auto')._check(0);
 					var w = ui.position.left - 8;
-					if(w < 480 || w > 980)
+					if(w < o.width_min || w > 980)
 						return false;
 					DIALOG_WIDTH = w;
 					dialog.width(w);

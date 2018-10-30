@@ -524,7 +524,7 @@ $(document)
 	.on('click', '.elem-width-change', function() {//включение/выключение изменения ширины элементов
 		var t = $(this),
 			p = t.parent(),
-			on = t.hasClass('grey') ? 1 : 0,
+			on = t.hasClass('on') ? 0 : 1,
 			spl = p.attr('val').split(':'),
 			send = {
 				op:'block_elem_width_change',
@@ -536,8 +536,7 @@ $(document)
 
 		_post(send, function(res) {
 			$('._hint').remove();
-			t._dn(on, 'grey');
-			t._dn(!on, 'orange');
+			t._dn(!on, 'on');
 			p.find('.block-grid-on')._dn(!on, 'vh');
 			p.find('.block-level-change')._dn(!on, 'vh');
 			$('.block-content-' + spl[0]).html(res.html);

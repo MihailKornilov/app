@@ -306,7 +306,7 @@ function _blockWidthChange($obj_name, $obj_id) {//кнопка изменени�
 
 	foreach($arr as $r)
 		if(_dialogParam($r['dialog_id'], 'element_width'))
-			return '<button class="vk small grey ml30 elem-width-change">Настройка ширины элементов</button>';
+			return '<div class="icon icon-width ml40 elem-width-change'._tooltip('Настройка ширины элементов', -79).'</div>';
 
 	return '';
 }
