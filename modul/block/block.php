@@ -312,7 +312,11 @@ function _blockWidthChange($obj_name, $obj_id) {//кнопка изменени�
 	return '';
 }
 function _blockChooseBut($obj_name, $obj_id) {//кнопка включения выбора блоков
-	return '<button class="vk small grey ml30 block-choose-on">выбрать блоки</button>';
+	return
+	'<button class="vk small grey ml30 block-choose-on">'.
+		'выбор блоков'.
+		'<b class="ml5 fs12">0</b>'.
+	'</button>';
 }
 function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
 	$key = 'block_level_'.$obj_name;
@@ -1061,7 +1065,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				num_1 - иконка красного цвета
 			*/
 
-			if(!$UNIT_ISSET)
+			if($is_edit)
 				return _iconDel(array(
 					'red' => $el['num_1'],
 					'class'=>'curD'

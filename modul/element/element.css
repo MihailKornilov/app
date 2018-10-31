@@ -177,6 +177,17 @@
 
 
 
+
+/* Кнопка включения выбора блоков */
+.block-choose-on.grey b{display:none}
+
+
+
+
+
+
+
+
 /* ---=== ДИАЛОГОВОЕ ОКНО ===--- */
 ._dialog-back{
 	position:absolute;

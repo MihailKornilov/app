@@ -39,6 +39,7 @@ switch(@$_POST['op']) {
 		);
 
 		$send['html'] = _blockHtml($obj_name, $obj_id,  $unit);
+		$send['blk'] = _BE('block_arr1', $obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;
@@ -349,29 +350,96 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-/*
-	case 'block_choose_on'://включение выбора блоков
-		if(!$obj_name = _blockName($_POST['obj_name']))
-			jsonError('Несуществующее имя объекта');
-		if(!$obj_id = _num($_POST['obj_id']))
-			jsonError('Некорректный ID объекта');
-		if(!$level = _num($_POST['level']))
-			jsonError('Некорректный уровень блоков');
+	case 'block_choose_clone'://клонирование блоков
+		if(!$ids = _ids($_POST['ids']))
+			jsonError('Блоки не выбраны');
 
-		$on = _bool($_POST['on']);
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id` IN (".$ids.")
+				ORDER BY `parent_id`,`y`,`x`";
+		if(!$arr = query_arr($sql))
+			jsonError('Выбранные блоки не существуют');
 
-		$unit = _pageSpisokUnit($obj_name, $obj_id);
-		$unit += array(
-			'blk_choose' => $on,
-			'blk_level' => $level,
-			'blk_sel' => array(),    //ids ранее выбранных блоков
-			'blk_deny' => array()    //блоки, которые запрещено выбирать
-		);
+		$key0 = key($arr);
+		$obj_name = $arr[$key0]['obj_name'];
+		$obj_id = $arr[$key0]['obj_id'];
 
-		$send['html'] = _blockHtml($obj_name, $obj_id, $unit);
-		jsonSuccess($send);
+		//получение конечной высоты для каждого parent_id
+		$blk = _BE('block_arr', $obj_name, $obj_id);
+		$hMax = array();
+		foreach($blk as $r) {
+			$pid = $r['parent_id'];
+			if(empty($hMax[$pid]))
+				$hMax[$pid] = 0;
+
+			$h = $r['y'] + $r['h'];
+			if($hMax[$pid] < $h)
+				$hMax[$pid] = $h;
+		}
+
+		$yCur = array();
+		$hCur = array();//текущая высота во время вставки блоков. Высота изменяется, если появляется блок из новой строки
+		$cloneIds = array();
+		foreach($arr as $id => $r) {
+			$pid = $r['parent_id'];
+			if(!isset($yCur[$pid])) {
+				$yCur[$pid] = $r['y'];
+				$hCur[$pid] = $r['h'];
+			}
+			if($yCur[$pid] != $r['y']) {
+				$yCur[$pid] = $r['y'];
+				$hMax[$pid] += $hCur[$pid];
+				$hCur[$pid] = $r['h'];
+			}
+			$sql = "INSERT INTO `_block` (
+						`app_id`,
+						`parent_id`,
+						`obj_name`,
+						`obj_id`,
+						`x`,
+						`y`,
+						`w`,
+						`h`,
+						`width`,
+						`width_auto`,
+						`height`,
+						`bg`,
+						`bor`,
+						`hidden`,
+						`user_id_add`
+					) VALUES (
+						".APP_ID.",
+						".$pid.",
+						'".$r['obj_name']."',
+						".$r['obj_id'].",
+						".$r['x'].",
+						".$hMax[$pid].",
+						".$r['w'].",
+						".$r['h'].",
+						".$r['width'].",
+						".$r['width_auto'].",
+						".$r['height'].",
+						'".$r['bg']."',
+						'".$r['bor']."',
+						'".$r['hidden']."',
+						".USER_ID."
+					)";
+			query($sql);
+
+			$cloneIds[$id] = query_insert_id('_block');
+		}
+
+		//внесение дочерних блоков
+		foreach($cloneIds as $id_old => $id_new)
+			_blockChildClone($id_old, $id_new);
+
+		_blockChildCountSet($obj_name, $obj_id);
+		_BE( 'block_clear');
+		_jsCache();
+
+		jsonSuccess();
 		break;
-*/
 }
 
 
@@ -513,3 +581,54 @@ function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id при
 			  AND `obj_id`=".$obj_id;
 	query($sql);
 }
+function _blockChildClone($id_old, $id_new) {//внесение дочерних блоков в скопированные
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `parent_id`=".$id_old."
+			ORDER BY `parent_id`,`y`,`x`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	foreach($arr as $r) {
+		$sql = "INSERT INTO `_block` (
+					`app_id`,
+					`parent_id`,
+					`obj_name`,
+					`obj_id`,
+					`x`,
+					`y`,
+					`w`,
+					`h`,
+					`width`,
+					`width_auto`,
+					`height`,
+					`bg`,
+					`bor`,
+					`hidden`,
+					`user_id_add`
+				) VALUES (
+					".APP_ID.",
+					".$id_new.",
+					'".$r['obj_name']."',
+					".$r['obj_id'].",
+					".$r['x'].",
+					".$r['y'].",
+					".$r['w'].",
+					".$r['h'].",
+					".$r['width'].",
+					".$r['width_auto'].",
+					".$r['height'].",
+					'".$r['bg']."',
+					'".$r['bor']."',
+					'".$r['hidden']."',
+					".USER_ID."
+				)";
+		query($sql);
+
+		if($r['child_count'])
+			_blockChildClone($r['id'], query_insert_id('_block'));
+	}
+}
+
+
+

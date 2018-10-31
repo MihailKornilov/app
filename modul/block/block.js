@@ -498,34 +498,42 @@ $(document)
 			v = t.hasClass('grey'),
 			spl = p.attr('val').split(':'),
 			CONTENT = $('.block-content-' + spl[0]),
-			BCH = p.find('.block-choose-on').hasClass('orange') ? 1 : 0,
+			BCO = p.find('.block-choose-on'),
+			BCO_on = BCO.hasClass('orange') ? 1 : 0,
 			send = {
 				op:'block_grid_' + (v ? 'on' : 'off'),
 				obj_name:spl[0],
 				obj_id:spl[1],
-				blk_choose:BCH,
+				blk_choose:BCO_on,
 				level:p.find('.block-level-change.orange').html(),
 				busy_obj:t
 			};
+
 		_post(send, function(res) {
+			$('._hint').remove();
 			t._dn(v, 'grey');
 			t._dn(!v, 'orange');
 			p.find('.block-level-change')._dn(!v);
 			p.find('.elem-width-change')._dn(!v);
-			p.find('.block-choose-on')._dn(!v).removeClass('_busy');
+			BCO._dn(!v).removeClass('_busy');
+			BCO.find('b').html(0);
+			BCO.attr('val', '');
 
 			CONTENT.html(res.html);
 
-			if(v) {
-				$('._hint').remove();
+			//включена настройка корневых блоков
+			if(v)
 				$('#grid-stack')._grid({
 					obj_name:res.obj_name,
 					obj_id:res.obj_id,
 					width:res.width
 				});
-			}
+			else
+				for(var i in res.blk)
+					BLKK[i] = res.blk[i];
 
-			if(BCH) {
+			//включен выбор блоков
+			if(BCO_on) {
 				var bc = CONTENT.find('.blk-choose');
 
 				//подсветка блока при выборе
@@ -535,6 +543,14 @@ $(document)
 						sel = t.hasClass('sel');
 
 					t[(sel ? 'remove' : 'add') + 'Class']('sel');
+
+					var seld = [];
+					_forEq(bc, function(sp) {
+						if(sp.hasClass('sel'))
+							seld.push(sp.attr('val'));
+					});
+					BCO.find('b').html(seld.length);
+					BCO.attr('val', seld.join());
 				});
 			}
 		});
@@ -660,6 +676,7 @@ $(document)
 
 		but.removeClass('grey').trigger('click');
 	})
+
 	.on('click', '.block-choose-on', function() {//включение выбора блоков
 		var t = $(this),
 			on = t.hasClass('orange') ? 0 : 1,
@@ -676,6 +693,56 @@ $(document)
 		but.removeClass('grey').trigger('click');
 		but.removeClass('_busy');
 	})
+	.on('mouseenter', '.block-choose-on', function() {//выплывающая подсказка для действий с выбранными блоками
+		var t = $(this),
+			p = t.parent(),
+			c = _num(t.find('b').html()),
+			ids = t.attr('val'),
+			GRID_ON = p.find('.block-grid-on');
+
+		if(!c)
+			return;
+		if(t.hasClass('grey'))
+			return;
+
+		var msg = '<table class="bs5">' +
+				'<tr><td><div class="b color-555">Выбран' + _end(c, ['', 'о']) + ' ' + c + ' блок' + _end(c, ['', 'а', 'ов']) + '</div>' +
+				'<tr><td class="line-b pb3">' +
+						'<button class="vk small w100 fl mr3">клонировать</button>'+
+						'<div class="grey fs11">Блоки будут скопированы и добавлены снизу, включая дочерние блоки. Размеры и уровни будут сохранены. Без элементов.<div>' +
+
+				'<tr><td class="line-b pb3"><button class="vk small w100 fl mr3 orange">вырезать</button>'+
+						'<div class="grey fs11">После нажатия этой кнопки укажите блок, в который нужно вставить выбранные блоки. Элементы и дочерние блоки будут перенесены.<div>' +
+
+				'<tr><td><button class="vk small w100 fl mr3 red">удалить</button>'+
+						'<div class="grey fs11">Блоки будут удалены вместе с элементами и дочерними блоками.<div>' +
+				'</table>';
+
+		t._hint({
+			width:260,
+			msg:msg,
+			side:'right',
+			ugPos:40,
+			show:1,
+			delayHide:300,
+			func:function(o) {
+				//клонирование
+				o.find('button:first').click(function() {
+					var but = $(this),
+						send = {
+							op:'block_choose_clone',
+							ids:ids,
+							busy_obj:but
+						};
+					_post(send, function() {
+						GRID_ON.removeClass('grey').trigger('click');
+						GRID_ON.removeClass('_busy');
+					});
+				});
+			}
+		});
+	})
+
 	.on('mouseenter', '.block-unit', _blockUnitSetup)
 	.on('click', '.block-unit', function() {//нажатие на блок для настройки
 
