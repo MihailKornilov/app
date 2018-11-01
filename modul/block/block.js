@@ -751,7 +751,7 @@ $(document)
 				'<div class="_info">' +
 					'Укажите блок, в который будут <b>перенесены</b> выбранные блоки. ' +
 					'<br>' +
-					'Указанный блок не должен содержать элементов, а также его <b>ширина</b> должна быть <b>больше или равна</b> максимальной ширине вставляемых блоков.' +
+					'Указанный блок не должен содержать элемент, а также его <b>ширина</b> должна быть <b>больше или равна</b> максимальной ширине вставляемых блоков.' +
 				'</div>' +
 			'</div>';
 
@@ -782,6 +782,19 @@ $(document)
 					$('#blk-cho-but')._dn();
 					$('#blk-cho-cut-info')._dn(1);
 					$('.blk-choose.sel').removeClass('sel');
+				});
+				//удаление
+				o.find('button:last').click(function() {
+					var but = $(this),
+						send = {
+							op:'block_choose_del',
+							ids:ids,
+							busy_obj:but
+						};
+					_post(send, function() {
+						GRID_ON.removeClass('grey').trigger('click');
+						GRID_ON.removeClass('_busy');
+					});
 				});
 			}
 		});

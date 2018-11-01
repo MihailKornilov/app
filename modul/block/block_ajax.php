@@ -476,6 +476,86 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+	case 'block_choose_del'://удаление выбранных блоков
+		if(!$ids = _ids($_POST['ids']))
+			jsonError('Блоки не выбраны');
+
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id` IN (".$ids.")
+				ORDER BY `parent_id`,`y`,`x`";
+		if(!$arr = query_arr($sql))
+			jsonError('Выбранные блоки не существуют');
+
+		$key0 = key($arr);
+		$obj_name = $arr[$key0]['obj_name'];
+		$obj_id = $arr[$key0]['obj_id'];
+
+		//получение всех дочерних блоков у выбранных
+		$ass = array();
+		foreach(_ids($ids, 'arr') as $id)
+			$ass += _BE('block_child_ids', $id);
+
+		$ass += _idsAss($ids);
+		$blkIds = _idsGet($ass, 'key');
+
+		//все элементы, содержащиеся в блоках
+		$sql = "SELECT `id`
+				FROM `_element`
+				WHERE `block_id` IN (".$blkIds.")";
+		if($elmIds = query_ids($sql)) {
+			//удаление дочерних элементов
+			$sql = "DELETE FROM `_element`
+					WHERE `parent_id` IN (".$elmIds.")";
+			query($sql);
+
+			//удаление элементов, являющихся списками-шаблонами
+			$sql = "SELECT `id`
+					FROM `_block`
+					WHERE `obj_name`='spisok'
+					  AND `obj_id` IN (".$elmIds.")";
+			if($spisokIds = query_ids($sql)) {
+				$sql = "DELETE FROM `_element`
+						WHERE `block_id` IN (".$spisokIds.")";
+				query($sql);
+
+				$sql = "DELETE FROM `_block`
+						WHERE `id` IN (".$spisokIds.")";
+				query($sql);
+			}
+
+			$sql = "DELETE FROM `_element`
+					WHERE `parent_id` IN (".$elmIds.")";
+			query($sql);
+
+			//удаление функций у элементов
+			$sql = "DELETE FROM `_element_func`
+					WHERE `element_id` IN (".$elmIds.")";
+			query($sql);
+
+			//удаление фильтров
+			$sql = "DELETE FROM `_user_spisok_filter`
+					WHERE `element_id_filter` IN (".$elmIds.")";
+			query($sql);
+		}
+
+		//удаление самих элементов
+		$sql = "DELETE FROM `_element`
+				WHERE `id` IN (".$elmIds.")";
+		query($sql);
+
+		//удаление блоков
+		$sql = "DELETE FROM `_block`
+				WHERE `id` IN (".$blkIds.")";
+		query($sql);
+
+		_blockChildCountSet($obj_name, $obj_id);
+		_BE( 'elem_clear');
+		_BE( 'block_clear');
+		_jsCache();
+
+		jsonSuccess();
+		break;
 }
 
 
