@@ -152,7 +152,9 @@ function _regFilter($v) {//проверка регулярного выраже�
 }
 
 function _end($count, $o1, $o2, $o5=false) {
-	if($o5 === false) $o5 = $o2;
+	$count = abs($count);
+	if($o5 === false)
+		$o5 = $o2;
 	if($count / 10 % 10 == 1)
 		return $o5;
 	else

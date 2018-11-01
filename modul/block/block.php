@@ -487,8 +487,7 @@ function _elemDiv($el, $unit=array()) {//формирование div элеме
 	$attr_id = empty($unit['blk_edit']) && $el['block']['obj_name'] == 'spisok' ? '' : ' id="el_'.$el['id'].'"';
 
 	$cls = array();
-	$cls[] = _elemFormatColor($txt, $el, $el['color']);
-	$cls[] = _elemFormatColorDate($el, $unit);
+	$cls[] = _elemFormatColorDate($txt, $el, $unit);
 	$cls[] = $el['font'];
 	$cls[] = $el['size'] ? 'fs'.$el['size'] : '';
 	$cls = array_diff($cls, array(''));
@@ -517,9 +516,9 @@ function _elemFormat($txt, $el) {//дополнительное форматир
 
 	return $txt;
 }
-function _elemFormatColor($txt, $el, $color) {//подмена цвета при дополнительном форматировании для чисел
+function _elemFormatColor($txt, $el) {//подмена цвета при дополнительном форматировании для чисел
 	if(!preg_match(REGEXP_CENA_MINUS, $txt))
-		return $color;
+		return $el['color'];
 
 	switch($el['format_color_cond']) {
 		case 1457:
@@ -536,14 +535,14 @@ function _elemFormatColor($txt, $el, $color) {//подмена цвета при
 			break;
 	}
 
-	return $color;
+	return $el['color'];
 }
-function _elemFormatColorDate($el, $unit) {//подмена цвета для даты todo тестовая версия
+function _elemFormatColorDate($txt, $el, $unit) {//подмена цвета для даты todo тестовая версия
 	if(_elemUnitIsEdit($unit))
 		return '';
 
 	if($el['dialog_id'] != 86)
-		return '';
+		return _elemFormatColor($txt, $el);
 
 	if(!$elem_id = $el['num_1'])
 		return '';
@@ -563,7 +562,7 @@ function _elemFormatColorDate($el, $unit) {//подмена цвета для д
 
 	$day = (strtotime($date) - TODAY_UNIXTIME) / 86400;
 
-	return _elemFormatColor($day, $el, $el['color']);
+	return _elemFormatColor($day, $el);
 }
 function _elemStyle($el, $unit) {//стили css для элемента
 	$send = array();
