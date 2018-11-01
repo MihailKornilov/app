@@ -488,6 +488,7 @@ function _elemDiv($el, $unit=array()) {//формирование div элеме
 
 	$cls = array();
 	$cls[] = _elemFormatColor($txt, $el, $el['color']);
+	$cls[] = _elemFormatColorDate($el, $unit);
 	$cls[] = $el['font'];
 	$cls[] = $el['size'] ? 'fs'.$el['size'] : '';
 	$cls = array_diff($cls, array(''));
@@ -536,6 +537,33 @@ function _elemFormatColor($txt, $el, $color) {//подмена цвета при
 	}
 
 	return $color;
+}
+function _elemFormatColorDate($el, $unit) {//подмена цвета для даты todo тестовая версия
+	if(_elemUnitIsEdit($unit))
+		return '';
+
+	if($el['dialog_id'] != 86)
+		return '';
+
+	if(!$elem_id = $el['num_1'])
+		return '';
+	if(!$EL = _elemOne($elem_id))
+		return '';
+	if(!$col = $EL['col'])
+		return '';
+	if(!isset($unit[$col]))
+		return '';
+
+	$date = substr($unit[$col], 0, 10);
+
+	if(!preg_match(REGEXP_DATE, $date))
+		return '';
+	if($date == '0000-00-00')
+		return '';
+
+	$day = (strtotime($date) - TODAY_UNIXTIME) / 86400;
+
+	return _elemFormatColor($day, $el, $el['color']);
 }
 function _elemStyle($el, $unit) {//стили css для элемента
 	$send = array();
@@ -1635,6 +1663,62 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 						'value' => _num($v)
 				   ));
 
+		//Количество дней - единица списка
+		case 86:
+			/*
+                num_1 - ID элемента, который указывает на дату
+                txt_1 - текст "Прошёл" 1
+                txt_2 - текст "Остался" 1
+                txt_3 - текст "День" 1
+                txt_4 - текст "Прошло" 2
+                txt_5 - текст "Осталось" 2
+                txt_6 - текст "Дня" 2
+                txt_7 - текст "Прошло" 5
+                txt_8 - текст "Осталось" 5
+                txt_9 - текст "Дней" 5
+                txt_10 - текст для "сегодня"
+				num_2 - показывать "вчера"
+				num_3 - показывать "завтра"
+			*/
+			if($is_edit)
+				return 'Количество дней';
+
+			if(!$elem_id = $el['num_1'])
+				return _msgRed('-no-elem-date');
+			if(!$EL = _elemOne($elem_id))
+				return _msgRed('-no-elem-'.$elem_id);
+			if(!$col = $EL['col'])
+				return _msgRed('-no-elem-col');
+			if(!isset($unit[$col]))
+				return _msgRed('-no-unit-col');
+
+			$date = substr($unit[$col], 0, 10);
+
+			if(!preg_match(REGEXP_DATE, $date))
+				return _msgRed('-no-date-format');
+			if($date == '0000-00-00')
+				return '';
+
+			$day = (strtotime($date) - TODAY_UNIXTIME) / 86400;
+
+			$day_txt =
+				($day > 0 ?
+				_end($day, $el['txt_2'], $el['txt_5'], $el['txt_8'])
+				:
+				_end($day, $el['txt_1'], $el['txt_4'], $el['txt_7'])
+				).
+				' '.abs($day).' '.
+				_end($day, $el['txt_3'], $el['txt_6'], $el['txt_9']);
+
+			if($day == -1 && $el['num_2'])
+				$day_txt = $el['txt_10'].' вчера';
+			if(!$day)
+				$day_txt = $el['txt_10'].' сегодня';
+			if($day == 1 && $el['num_3'])
+				$day_txt = $el['txt_10'].' завтра';
+
+			return $day_txt;
+
 		//Фильтр - Выбор нескольких групп значений
 		case 102:
 			/*
@@ -1718,7 +1802,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 	return '<div class="fs10 red">неизвестный элемент '.$el['dialog_id'].'</div>';
 }
-
 
 function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
 	global $BE_FLAG, $G_BLOCK, $G_ELEM, $G_DLG;

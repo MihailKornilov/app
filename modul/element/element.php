@@ -1739,6 +1739,16 @@ function PHP12_v_choose_13($SRC, $dialog_id) {//выбор элемента-зн
 			return 0;
 		}
 		define('DLG_SEL', _num($SRC['prm']['sel']));
+
+		//исходным блоком является блок списка
+		if($blk['obj_name'] == 'spisok') {
+			if(!$el = _elemOne($blk['obj_id'])) {
+				define('DLG_NO_MSG', _emptyMin('Элемент '.$blk['obj_id'].' существует, размещающий список.'));
+				return 0;
+			}
+			return _num($el['num_1']);
+		}
+
 		return _num($blk['obj_id']);
 	}
 
