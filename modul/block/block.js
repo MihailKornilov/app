@@ -552,7 +552,7 @@ $(document)
 							return;
 
 						var send = {
-								op:'block_choose_cut',
+								op:'block_choose_move',
 								parent_id:v,
 								ids:BLOCK_CUT_IDS,
 								busy_obj:tt
@@ -740,7 +740,7 @@ $(document)
 						'<button class="vk small w100 fl mr3">клонировать</button>'+
 						'<div class="grey fs11">Блоки будут скопированы и добавлены снизу, включая дочерние блоки. Размеры и уровни будут сохранены. Без элементов.<div>' +
 
-				'<tr><td class="line-b pb3"><button class="vk small w100 fl mr3 orange">вырезать</button>'+
+				'<tr><td class="line-b pb3"><button class="vk small w100 fl mr3 orange">переместить</button>'+
 						'<div class="grey fs11">После нажатия этой кнопки укажите блок, в который нужно вставить выбранные блоки. Элементы и дочерние блоки будут перенесены.<div>' +
 
 				'<tr><td><button class="vk small w100 fl mr3 red">удалить</button>'+

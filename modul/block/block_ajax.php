@@ -440,7 +440,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'block_choose_cut'://перенос блоков
+	case 'block_choose_move'://перенос блоков
 		if(!$parent_id = _num($_POST['parent_id']))
 			jsonError('Не корректный ID блока, в который нужно делать перенос');
 		if(!$ids = _ids($_POST['ids']))
