@@ -440,6 +440,42 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+	case 'block_choose_cut'://перенос блоков
+		if(!$parent_id = _num($_POST['parent_id']))
+			jsonError('Не корректный ID блока, в который нужно делать перенос');
+		if(!$ids = _ids($_POST['ids']))
+			jsonError('Блоки не выбраны');
+		if(!$BL = _blockOne($parent_id))
+			jsonError('Блок не существует, в который нужно делать перенос');
+		if($BL['elem_id'])
+			jsonError('Блок не должен содержать элемент');
+
+		foreach(_ids($ids, 'arr') as $id) {
+			if($id == $parent_id)
+				jsonError('Невозможно вставить блок в самого себя');
+
+			$ass = _BE('block_child_ids', $id);
+			if(isset($ass[$parent_id]))
+				jsonError('Невозможна вставка в дочерний блок одного из переносимых блоков');
+
+			if(!$bl = _blockOne($id))
+				jsonError('Переносимого блока '.$id.' не существует');
+
+			if($bl['x'] + $bl['w'] > $BL['w'])
+				jsonError('Ширина переносимого блока не может превышать ширину выбранного блока');
+		}
+
+		$sql = "UPDATE `_block`
+				SET `parent_id`=".$parent_id."
+				WHERE `id` IN (".$ids.")";
+		query($sql);
+
+		_blockChildCountSet($BL['obj_name'], $BL['obj_id']);
+		_BE( 'block_clear');
+		_jsCache();
+
+		jsonSuccess();
+		break;
 }
 
 

@@ -318,7 +318,7 @@ body:not(.site){position:relative}
 	cursor:pointer;
 	z-index:1;
 }
-.blk-choose:not(.sel):not(.deny):hover{opacity:1;border-color:#d90}
+.blk-choose:not(.sel):not(.deny):not(._busy):hover{opacity:1;border-color:#d90}
 .blk-choose.sel{
 	border-color:#d60;
 	background-color:#ec6;
@@ -329,6 +329,12 @@ body:not(.site){position:relative}
 	border-color:#999;
 	background-color:#ccc;
 	opacity:.7;
+}
+.blk-choose._busy{
+	cursor:default;
+	border-color:#bbb;
+	background-color:#eee;
+	opacity:.9;
 }
 
 /* подсветка блока с элементом при выборе значения */

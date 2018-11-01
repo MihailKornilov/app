@@ -1,4 +1,5 @@
-var _ids = function(v) {
+var BLOCK_CUT_IDS = 0,//id блоков, выбранные для переноса
+	_ids = function(v) {
 		if(!v)
 			return 0;
 		if(typeof v == 'number')
@@ -516,8 +517,11 @@ $(document)
 			p.find('.block-level-change')._dn(!v);
 			p.find('.elem-width-change')._dn(!v);
 			BCO._dn(!v).removeClass('_busy');
-			BCO.find('b').html(0);
-			BCO.attr('val', '');
+
+			if(!BLOCK_CUT_IDS) {
+				BCO.find('b').html(0);
+				BCO.attr('val', '');
+			}
 
 			CONTENT.html(res.html);
 
@@ -538,11 +542,33 @@ $(document)
 
 				//подсветка блока при выборе
 				bc.click(function() {
-					var t = $(this),
-						v = t.attr('val'),
-						sel = t.hasClass('sel');
+					var tt = $(this),
+						v = tt.attr('val'),
+						sel = tt.hasClass('sel');
 
-					t[(sel ? 'remove' : 'add') + 'Class']('sel');
+					//процесс переноса блоков
+					if(BLOCK_CUT_IDS) {
+						if(bc.hasClass('_busy'))
+							return;
+
+						var send = {
+								op:'block_choose_cut',
+								parent_id:v,
+								ids:BLOCK_CUT_IDS,
+								busy_obj:tt
+							};
+						_post(send, function() {
+							BLOCK_CUT_IDS = 0;
+							t.removeClass('grey').trigger('click');
+							t.removeClass('_busy');
+							_msg();
+						});
+
+						return;
+
+					}
+
+					tt[(sel ? 'remove' : 'add') + 'Class']('sel');
 
 					var seld = [];
 					_forEq(bc, function(sp) {
@@ -692,6 +718,7 @@ $(document)
 
 		but.removeClass('grey').trigger('click');
 		but.removeClass('_busy');
+		BLOCK_CUT_IDS = 0;
 	})
 	.on('mouseenter', '.block-choose-on', function() {//выплывающая подсказка для действий с выбранными блоками
 		var t = $(this),
@@ -705,8 +732,10 @@ $(document)
 		if(t.hasClass('grey'))
 			return;
 
-		var msg = '<table class="bs5">' +
-				'<tr><td><div class="b color-555">Выбран' + _end(c, ['', 'о']) + ' ' + c + ' блок' + _end(c, ['', 'а', 'ов']) + '</div>' +
+		var msg =
+			'<div class="b color-555 mt5 ml5">Выбран' + _end(c, ['', 'о']) + ' ' + c + ' блок' + _end(c, ['', 'а', 'ов']) + '</div>' +
+
+			'<table class="bs5' + _dn(!BLOCK_CUT_IDS) + '" id="blk-cho-but">' +
 				'<tr><td class="line-b pb3">' +
 						'<button class="vk small w100 fl mr3">клонировать</button>'+
 						'<div class="grey fs11">Блоки будут скопированы и добавлены снизу, включая дочерние блоки. Размеры и уровни будут сохранены. Без элементов.<div>' +
@@ -716,7 +745,15 @@ $(document)
 
 				'<tr><td><button class="vk small w100 fl mr3 red">удалить</button>'+
 						'<div class="grey fs11">Блоки будут удалены вместе с элементами и дочерними блоками.<div>' +
-				'</table>';
+			'</table>' +
+
+			'<div class="mar5' + _dn(BLOCK_CUT_IDS) + '" id="blk-cho-cut-info">' +
+				'<div class="_info">' +
+					'Укажите блок, в который будут <b>перенесены</b> выбранные блоки. ' +
+					'<br>' +
+					'Указанный блок не должен содержать элементов, а также его <b>ширина</b> должна быть <b>больше или равна</b> максимальной ширине вставляемых блоков.' +
+				'</div>' +
+			'</div>';
 
 		t._hint({
 			width:260,
@@ -738,6 +775,13 @@ $(document)
 						GRID_ON.removeClass('grey').trigger('click');
 						GRID_ON.removeClass('_busy');
 					});
+				});
+				//вырезка и перенос
+				o.find('button').eq(1).click(function() {
+					BLOCK_CUT_IDS = ids;
+					$('#blk-cho-but')._dn();
+					$('#blk-cho-cut-info')._dn(1);
+					$('.blk-choose.sel').removeClass('sel');
 				});
 			}
 		});

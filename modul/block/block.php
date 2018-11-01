@@ -311,7 +311,7 @@ function _blockWidthChange($obj_name, $obj_id) {//кнопка изменени�
 
 	return '';
 }
-function _blockChooseBut($obj_name, $obj_id) {//кнопка включения выбора блоков
+function _blockChooseBut() {//кнопка включения выбора блоков
 	return
 	'<button class="vk small grey ml30 block-choose-on">'.
 		'выбор блоков'.
@@ -1812,6 +1812,31 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			$child[$r['parent_id']][$id] = $r;
 
 		return _blockArrChild($child);
+	}
+
+	//получение id дочерних блоков (с учётом вложенных) для конкретного блока. Возврат: ассоциативный массив
+	if($i == 'block_child_ids') {
+		if(!$parent_id = _num($i1))
+			return array('1');
+		if(empty($G_BLOCK[$parent_id]))
+			return array('2');
+
+		$send[$parent_id] = 1;
+		$to_find = true;//флаг продолжения поиска дочерних блоков
+		while($to_find) {
+			$to_find = false;
+			foreach($send as $pid => $i)//перечисление всех найденных дочерних блоков
+				foreach($G_BLOCK as $id => $r)
+					if($r['parent_id'] == $pid)//блок является дочерним одного из найденных
+						if(!isset($send[$id])) {
+							$send[$id] = 1;
+							$to_find = true;
+						}
+		}
+
+		unset($send[$parent_id]);
+
+		return $send;
 	}
 
 	//массив блоков в формате JS для конкретного объекта
