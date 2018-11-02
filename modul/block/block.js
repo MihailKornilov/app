@@ -364,9 +364,10 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 	_elemUnitHint = function(EL) {//иконка для настройки выплывающей подсказки
 		if(!EL.hint_access)
 			return '';
-		var hint_id = EL.hint ? EL.hint.id : 0;
+		var hint_id = EL.hint ? EL.hint.id : 0,
+			pl = EL.hint && EL.hint.on;
 		return '<div val="dialog_id:43,block_id:' + EL.block_id + ',unit_id:' + hint_id + '"' +
-				   ' class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint, 'pl') + _tooltip('Настроить подсказку', -65) +
+				   ' class="icon icon-hint ml3 curP dialog-open' + _dn(!pl, 'pl') + _tooltip('Настроить подсказку', -65) +
 			   '</div>';
 	},
 	_elemUnitMar = function(EL) {

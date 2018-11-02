@@ -725,9 +725,6 @@ function _jsCacheElm($app_id=0) {
 		if(!$el = _jsCacheElemOne($elem_id))
 			continue;
 		$ELM[$elem_id] = $el;
-
-//		if($v = _jsCacheVvv($elem_id))
-//			$VVV[$elem_id] = $v;
 	}
 
 	return _json($ELM);

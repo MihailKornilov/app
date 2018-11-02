@@ -36,15 +36,25 @@ switch(@$_POST['op']) {
 			if(_table($dialog['table_1']) == '_element') {//если это элемент
 				$elem = _elemOne($unit_id);
 				//удаление значений
-query("DELETE FROM `_element` WHERE `block_id`=-".$unit_id);//todo на удаление
 				$sql = "DELETE FROM `_element` WHERE `parent_id`=".$unit_id;
 				query($sql);
+
+				//удаление дополнительного форматирования
+				$sql = "DELETE FROM `_element_format` WHERE `element_id`=".$unit_id;
+				query($sql);
+
 				//удаление функций
 				$sql = "DELETE FROM `_element_func` WHERE `element_id`=".$unit_id;
 				query($sql);
+
+				//удаление подсказок
+				$sql = "DELETE FROM `_element_hint` WHERE `element_id`=".$unit_id;
+				query($sql);
+
 				//удаление фильтров
 				$sql = "DELETE FROM `_user_spisok_filter` WHERE `element_id_filter`=".$unit_id;
 				query($sql);
+
 				//установка позиции в блоке по умолчанию
 				$sql = "UPDATE `_block` SET `pos`='top' WHERE `id`=".$elem['block_id'];
 				query($sql);
@@ -416,6 +426,19 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 		$unit['title'] = _elemTitle($unit_id);
 		_jsCache();
 	}
+
+	//изменено дополнительное форматирование
+	if($dialog['id'] == 64) {
+		_BE('elem_clear');
+		_jsCache();
+	}
+
+	//изменена выплывающая подсказка
+	if($dialog['id'] == 43) {
+		_BE('elem_clear');
+		_jsCache();
+	}
+
 
 	_app_create($dialog, $unit_id);
 
