@@ -75,22 +75,22 @@ function _setting() {//установка констант-настроек
 
 function _table($id=false) {//таблицы в базе с соответствующими идентификаторами
 	$tab = array(
-		 1 => '_app',
-		 2 => '_block',
-		 3 => '_dialog',
-		 4 => '_dialog_group',
-		 5 => '_element',
-		 6 => '_element_func',
-		 7 => '_history',
-		 8 => '_image',
-		 9 => '_image_server',
-		10 => '_page',
-		11 => '_spisok',
-		12 => '_user',
-//		13 => '_user_app',
-		14 => '_user_auth',
-		15 => '_user_spisok_filter',
-		16 => '_note'
+		 1 =>  '_app',
+		 2 =>  '_block',
+		 3 =>  '_dialog',
+		 4 =>  '_dialog_group',
+		 5 =>  '_element',
+		 6 =>  '_element_func',
+		 17 => '_element_format',
+		 7 =>  '_history',
+		 8 =>  '_image',
+		 9 =>  '_image_server',
+		10 =>  '_page',
+		11 =>  '_spisok',
+		12 =>  '_user',
+		14 =>  '_user_auth',
+		15 =>  '_user_spisok_filter',
+		16 => ' _note'
 	);
 
 	if($id === false)
