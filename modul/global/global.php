@@ -90,7 +90,7 @@ function _table($id=false) {//таблицы в базе с соответств
 		12 =>  '_user',
 		14 =>  '_user_auth',
 		15 =>  '_user_spisok_filter',
-		16 => ' _note'
+		16 =>  '_note'
 	);
 
 	if($id === false)
