@@ -359,7 +359,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 		'</div>';
 	},
 	_elemUnitEye = function(EL) {//иконка с условиями отображения
-		return '<div val="dialog_id:64,unit_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
+		return '<div val="dialog_id:64,block_id:' + EL.block_id + ',unit_id:' + _num(EL.format) + '" class="icon icon-eye ml3 dialog-open' + _dn(!EL.format, 'pl') + _tooltip('Условия отображения', -67) + '</div>';
 	},
 	_elemUnitMar = function(EL) {
 		var mar = EL.mar.split(' ');

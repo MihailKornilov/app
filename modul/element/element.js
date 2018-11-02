@@ -664,6 +664,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 					BLKK[el.block_id].elem_id = 0;
 					delete ELMM[o.unit.id];
 				}
+
+				//присвоение id дополнительного форматирования
+				if(o.dialog_id == 64)
+					ELMM[res.unit.element_id].format = res.unit.id;
 			});
 		}
 	},
@@ -3287,8 +3291,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			dialog_id:_num(o.dialog_id),        //диалог, который вносит элемент
 			dialog_source:_num(o.dialog_source),//исходный диалог, либо настраиваемый
-			block_id:_num(o.block_id, 1),       //блок (или отрицательный id: элемент-группировка), в который вставляется элемент
-			unit_id:_num(o.unit_id, 1),         //id единицы списка (элемент или функция)
+			block_id:_num(o.block_id),          //блок в который вставляется элемент
+			unit_id:_num(o.unit_id, 1),         //id единицы списка - если редактирование
 
 			prm:o.prm || [],                    //дополнительные параметры
 

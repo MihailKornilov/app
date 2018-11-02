@@ -779,6 +779,9 @@ function _jsCacheElemOne($elem_id) {
 	if($r['func'])
 		$val['func'] = $r['func'];
 
+	if(!empty($r['format']))
+		$val['format'] = $r['format']['id'];
+
 	if($r['hint_on']) {
 		$val['hint_on'] = 1;
 		$val['hint_msg'] = $r['hint_msg'];

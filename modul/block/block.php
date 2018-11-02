@@ -535,15 +535,15 @@ function _elemFormatColor($txt, $el) {//подмена цвета при доп�
 	switch($el['format']['color_cond']) {
 		case 1457:
 			if($txt == 0)
-				return $el['format']['color'];
+				return $el['format']['color_alt'];
 			break;
 		case 1458:
 			if($txt < 0)
-				return $el['format']['color'];
+				return $el['format']['color_alt'];
 			break;
 		case 1459:
 			if($txt > 0)
-				return $el['format']['color'];
+				return $el['format']['color_alt'];
 			break;
 	}
 
@@ -2389,29 +2389,7 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 			|| $el['dialog_id'] == 27//значения баланса
 			|| $el['dialog_id'] == 44//ячейки сборного текста
 			|| $el['dialog_id'] == 57//пункты меню переключения блоков
-			)
-				$elem23[] = $elem_id;
-
-			$el['hidden'] = 0;
-
-			unset($el['sort']);
-			unset($el['user_id_add']);
-			unset($el['dtime_add']);
-
-			//подсказка для элемента
-			if(!$el['hint_on']) {
-				unset($el['hint_msg']);
-				unset($el['hint_side']);
-				unset($el['hint_obj_pos_h']);
-				unset($el['hint_obj_pos_v']);
-				unset($el['hint_delay_show']);
-				unset($el['hint_delay_hide']);
-			}
-
-			//переделка значений элемента в INT, если есть
-			foreach($el as $k => $v)
-				if(preg_match(REGEXP_INTEGER, $v))
-					$el[$k] = _num($v, 1);
+			) $elem23[] = $elem_id;
 
 			$dlg = $G_DLG[$el['dialog_id']];
 
@@ -2434,10 +2412,25 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 				$el['width_max'] = floor($width_max / 10) * 10;
 			}
 
-			$el['func'] = array();
-			$el['vvv'] = array();//значения для некоторых компонентов
+			$el['format'] = array();//дополнительное форматирование
+			$el['func'] = array();  //привязанные функции
+			$el['vvv'] = array();   //значения для некоторых компонентов
 
-			$ELM[$elem_id] = $el;
+			unset($el['sort']);
+			unset($el['user_id_add']);
+			unset($el['dtime_add']);
+
+			//подсказка для элемента
+			if(!$el['hint_on']) {
+				unset($el['hint_msg']);
+				unset($el['hint_side']);
+				unset($el['hint_obj_pos_h']);
+				unset($el['hint_obj_pos_v']);
+				unset($el['hint_delay_show']);
+				unset($el['hint_delay_hide']);
+			}
+
+			$ELM[$elem_id] = _arrNum($el);
 		}
 
 		//элементы-ячейки таблиц
@@ -2458,6 +2451,19 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 				unset($el['hint_delay_hide']);
 				$ELM[$elem_id] = $el;
 			}
+		}
+
+		//дополнительное форматирование
+		$sql = "SELECT *
+				FROM `_element_format`
+				WHERE `element_id` IN ("._idsGet($ELM).")";
+		foreach(query_arr($sql) as $r) {
+			$format = _arrNum($r);
+			unset($format['app_id']);
+			unset($format['element_id']);
+			unset($format['user_id_add']);
+			unset($format['dtime_add']);
+			$ELM[$r['element_id']]['format'] = $format;
 		}
 
 		$sql = "SELECT *

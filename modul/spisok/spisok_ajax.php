@@ -630,7 +630,10 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 			query($sql);
 			continue;
 		}
-		if($field == 'element_id' && _table($dialog['table_1']) == '_element_func') {
+		if($field == 'element_id') {
+			if(_table($dialog['table_1']) != '_element_format' &&
+			   _table($dialog['table_1']) == '_element_func')
+				continue;
 			if(!$block_id)
 				continue;
 			if(!$BL = _blockOne($block_id))
@@ -638,7 +641,7 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 			if(!$elem_id = $BL['elem_id'])
 				continue;
 
-			$sql = "UPDATE `_element_func`
+			$sql = "UPDATE `"._table($dialog['table_1'])."`
 					SET `element_id`=".$elem_id."
 					WHERE `id`=".$unit_id;
 			query($sql);
@@ -666,7 +669,6 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 			continue;
 		}
 	}
-
 
 	//внесение данных таблицы 2, если есть
 	if($dialog['table_2']) {
