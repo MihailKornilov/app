@@ -493,25 +493,35 @@ function _elemDiv($el, $unit=array()) {//формирование div элеме
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
-	$txt = _elemFormat($txt, $el);
+	$txt = _elemFormatHide($txt, $el);
+	$txt = _elemFormatDigital($txt, $el);
 	$txt = _spisokUnitUrl($el, $unit, $txt);
 
 	return '<div'.$attr_id.$cls._elemStyle($el, $unit).'>'.$txt.'</div>';
 }
-function _elemFormat($txt, $el) {//дополнительное форматирование для чисел
-	if($el['format_hide'] && empty($txt))
+function _elemFormatHide($txt, $el) {//Дополнительное форматирование: скрытие при нулевом значении
+	if(empty($el['format']))
+		return $txt;
+	if($el['format']['hide'] && empty($txt))
 		return '';
 	if(!preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
-	if($el['format_hide'] && !_cena($txt, 1))
+	if($el['format']['hide'] && !_cena($txt, 1))
 		return '';
 
-	if($el['format_space'])
-		$txt = _sumSpace($txt, $el['format_fract_0_show'], $el['format_fract_char']);
+	return $txt;
+}
+function _elemFormatDigital($txt, $el) {//Дополнительное форматирование для чисел
+	if(!preg_match(REGEXP_CENA_MINUS, $txt))
+		return $txt;
+	if(empty($el['format']))
+		return round($txt, 2);
+	if($el['format']['space'])
+		$txt = _sumSpace($txt, $el['format']['fract_0_show'], $el['format']['fract_char']);
 	else {
-		if(!$el['format_fract_0_show'])
+		if(!$el['format']['fract_0_show'])
 			$txt = round($txt, 2);
-		$txt = str_replace('.', $el['format_fract_char'], $txt);
+		$txt = str_replace('.', $el['format']['fract_char'], $txt);
 	}
 
 	return $txt;
@@ -519,19 +529,21 @@ function _elemFormat($txt, $el) {//дополнительное форматир
 function _elemFormatColor($txt, $el) {//подмена цвета при дополнительном форматировании для чисел
 	if(!preg_match(REGEXP_CENA_MINUS, $txt))
 		return $el['color'];
+	if(empty($el['format']))
+		return $el['color'];
 
-	switch($el['format_color_cond']) {
+	switch($el['format']['color_cond']) {
 		case 1457:
 			if($txt == 0)
-				return $el['format_color'];
+				return $el['format']['color'];
 			break;
 		case 1458:
 			if($txt < 0)
-				return $el['format_color'];
+				return $el['format']['color'];
 			break;
 		case 1459:
 			if($txt > 0)
-				return $el['format_color'];
+				return $el['format']['color'];
 			break;
 	}
 
@@ -539,11 +551,9 @@ function _elemFormatColor($txt, $el) {//подмена цвета при доп�
 }
 function _elemFormatColorDate($txt, $el, $unit) {//подмена цвета для даты todo тестовая версия
 	if(_elemUnitIsEdit($unit))
-		return '';
-
+		return _elemFormatColor($txt, $el);
 	if($el['dialog_id'] != 86)
 		return _elemFormatColor($txt, $el);
-
 	if(!$elem_id = $el['num_1'])
 		return '';
 	if(!$EL = _elemOne($elem_id))

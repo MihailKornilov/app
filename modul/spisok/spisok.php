@@ -594,13 +594,14 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 			$cls[] = $td['font'];
 			$cls[] = $td['color'];
 			$cls[] = $td['txt_8'];//pos - позиция
-			$cls[] = _elemFormatColor($txt, $td, $td['color']);
+			$cls[] = _elemFormatColorDate($txt, $td, $td['color']);
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';
 
+			$txt = _elemFormatHide($txt, $td);
+			$txt = _elemFormatDigital($txt, $td);
 			$txt = _spisokUnitUrl($td, $sp, $txt);
-			$txt = _elemFormat($txt, $td);
 
 			$TR .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
 		}
