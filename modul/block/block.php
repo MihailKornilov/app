@@ -1004,36 +1004,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			/*
                 num_1 - id элемента, в котором нужно искать список
 			*/
-			if(!$UNIT_ISSET)
-				return _emptyMin('Дополнительные условия к фильтру', 0);
-			if(!$elem_id = $el['num_1'])
-				return _emptyMin('Не выбран элемент, указывающий на список', 0);
-			if(!$EL = _elemOne($el['num_1']))
-				return _emptyMin('Элемента '.$elem_id.' не существует', 0);
-			if(!$col = $EL['col'])
-				return _emptyMin('Не назначена колонка', 0);
-			if(!isset($unit[$col]))
-				return _emptyMin('Колонка отсутствует в единице списка', 0);
-			if(!$id = _ids($unit[$col], 'first'))
-				return _emptyMin('Значение в элементе ещё не выбрано', 0);
-			if(!$ELL = _elemOne($id))
-				return _emptyMin('Выбранного элемента '.$id.' не существует', 0);
-
-			$dialog_id = 0;
-			switch($ELL['dialog_id']) {
-				case 14:
-				case 29:
-				case 23:
-				case 59: $dialog_id = $ELL['num_1']; break;
-			}
-
-			if(!$dialog_id)
-				return _emptyMin('Диалог не найден', 0);
-
-			return
-			'<script>'.
-				'var EL'.$el['id'].'_DS='.$dialog_id.';'.
-			'</script>';
+			return PHP12_elem22($el, $unit);
 
 		//Содержание единицы списка - таблица
 		case 23: return _spisok23($el);

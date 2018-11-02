@@ -1879,6 +1879,46 @@ function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уро
 }
 
 
+
+/* ---=== УСЛОВИЯ ДЛЯ ФИЛЬТРОВ [22] ===--- */
+function PHP12_elem22($el, $unit) {
+	/*
+		Используется в виде элемента, а также как подключаемая функция
+	*/
+	if(empty($unit['id']))
+		return _emptyMin('Дополнительные условия к фильтру', 0);
+	if(!$elem_id = $el['num_1'])
+		return _emptyMin('Не выбран элемент, указывающий на список', 0);
+	if(!$EL = _elemOne($el['num_1']))
+		return _emptyMin('Элемента '.$elem_id.' не существует', 0);
+	if(!$col = $EL['col'])
+		return _emptyMin('Не назначена колонка', 0);
+	if(!isset($unit[$col]))
+		return _emptyMin('Колонка отсутствует в единице списка', 0);
+	if(!$id = _ids($unit[$col], 'first'))
+		return _emptyMin('Значение в элементе ещё не выбрано', 0);
+	if(!$ELL = _elemOne($id))
+		return _emptyMin('Выбранного элемента '.$id.' не существует', 0);
+
+	$dialog_id = 0;
+	switch($ELL['dialog_id']) {
+		case 14:
+		case 23:
+		case 29:
+		case 59: $dialog_id = $ELL['num_1']; break;
+	}
+
+	if(!$dialog_id)
+		return _emptyMin('Диалог не найден', 0);
+
+	return
+	'<script>'.
+		'var EL'.$el['id'].'_DS='.$dialog_id.';'.
+	'</script>';
+}
+
+
+
 /* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
 function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 	/*
@@ -1912,7 +1952,7 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 }
 
 
-/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ ===--- */
+/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ [23] ===--- */
 function PHP12_spisok_td_setting($el, $unit) {//используется в диалоге [23]
 	/*
 		все действия через JS

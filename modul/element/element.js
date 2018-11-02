@@ -600,7 +600,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								send.cmp[id] = ATR_CMP.val();
 							return;
 						case 22://Дополнительные условия к фильтру
-							send.vvv[id] = _elm22get(sp);
+							send.vvv[id] = PHP12_elem22_get(sp);
 							return;
 						case 37://SA: Select - выбор имени колонки
 							send.cmp[id] = ATR_CMP._select('inp');
@@ -873,7 +873,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					});
 					return;
 				//Дополнительные условия к фильтру (вспомогательный элемент)
-				case 22: _elm22(el, unit); return;
+				case 22: PHP12_elem22(el, unit); return;
 				//Список - ТАБЛИЦА
 				case 23:
 					if(!el.num_6)
@@ -2023,7 +2023,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return arr;
 	},
 
-	_elm22 = function(el, unit) {//Дополнительные условия к фильтру
+	PHP12_elem22 = function(el, unit) {//Дополнительные условия к фильтру
+		if(unit == 'get')
+			return PHP12_elem22_get(el);
+
 		//ID диалога, значения которого будут настраиваться
 		var DS = window['EL' + el.id + '_DS'];
 		if(!DS)
@@ -2124,7 +2127,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 		}
 	},
-	_elm22get = function(el) {//получение данных для сохранения
+	PHP12_elem22_get = function(el) {//получение данных для сохранения
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
