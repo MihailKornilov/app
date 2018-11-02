@@ -1376,6 +1376,7 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 	switch($el['dialog_id']) {
 		case 13:
 		case 62:
+		case 74:
 		case 102: break;
 		default: return;
 	}
@@ -1401,6 +1402,14 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 		'v' => $v,
 		'title' => $title
 	);
+
+	//получение значений привязанного списка
+	if($elem_id = _num($v))
+		if(_elemIsConnect($elem_id)) {
+			$send['spisok'] = _29cnn($elem_id);
+
+		}
+
 
 	jsonSuccess($send);
 }

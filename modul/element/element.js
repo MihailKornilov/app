@@ -2085,7 +2085,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 					dialog_id:11,
 					dialog_source:DS,
 					block_id:unit.source.block_id,
-					prm:{sel:v.txt_1},
+					prm:{
+						sel:v.txt_1,
+						nest:unit.source.prm.nest
+					},
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {
@@ -2095,6 +2098,17 @@ var DIALOG = {},//массив диалоговых окон для управл
 						v.txt_1 = res.v;
 						TITLE.attr('val', v.txt_1);
 						TITLE.val(res.title);
+
+						//если выбран подключаемый список, то выбор значений этого списка
+						if(res.spisok) {
+							DD.find('.cond-val')
+								.attr('type', 'hidden')
+								._select({
+									width:125,
+									title0:'не выбрано',
+									spisok:res.spisok
+								});
+						}
 					}
 				});
 			});
@@ -2816,6 +2830,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 				_dialogLoad({
 					dialog_id:25,
 					dialog_source:ELMM[ATR_SP.val()].num_1,
+					block_id:unit.source.block_id,
+					prm:{nest:0},
 					busy_obj:$(this),
 					busy_cls:'spin',
 					func_save:function(ia) {

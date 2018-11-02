@@ -806,6 +806,7 @@ function _blockOne($block_id) {//запрос одного блока
 	return _BE('block_one', $block_id);
 }
 
+
 function _elemVvv($elem_id, $src=array()) {
 	if(!$el = _elemOne($elem_id))
 		return array();
@@ -1127,6 +1128,23 @@ function _elemVvv($elem_id, $src=array()) {
 	return array();
 }
 
+function _elemIsConnect($el) {//определение, является ли элемент подключаемым списком
+	if(empty($el))
+		return false;
+
+	if(!is_array($el))
+		if(!$el = _elemOne(_num($el)))
+			return false;
+
+	if(!isset($el['dialog_id']))
+		return false;
+
+	switch($el['dialog_id']) {
+		case 29:
+		case 59: return true;
+	}
+	return false;
+}
 function _elemSpisokConnect($ids, $return='select', $cond='') {//значения привязанного списка
 	if(!$last_id = _idsLast($ids))
 		return array();
@@ -1885,6 +1903,25 @@ function PHP12_elem22($el, $unit) {
 	/*
 		Используется в виде элемента, а также как подключаемая функция
 	*/
+
+	$dialog_id = 0;
+	switch($el['dialog_id']) {
+		case 12:
+			$SRC = $unit['source'];
+			$dialog_id = $SRC['dialog_source'];
+			break;
+		case 22: $dialog_id = PHP12_elem22_paste($el, $unit); break;
+	}
+
+	if(!$dialog_id)
+		return _emptyMin('Диалог не найден', 0);
+
+	return
+	'<script>'.
+		'var EL'.$el['id'].'_DS='.$dialog_id.';'.
+	'</script>';
+}
+function PHP12_elem22_paste($el, $unit) {//условия были вставлены как элемент [22]
 	if(empty($unit['id']))
 		return _emptyMin('Дополнительные условия к фильтру', 0);
 	if(!$elem_id = $el['num_1'])
@@ -1900,23 +1937,15 @@ function PHP12_elem22($el, $unit) {
 	if(!$ELL = _elemOne($id))
 		return _emptyMin('Выбранного элемента '.$id.' не существует', 0);
 
-	$dialog_id = 0;
 	switch($ELL['dialog_id']) {
 		case 14:
 		case 23:
 		case 29:
-		case 59: $dialog_id = $ELL['num_1']; break;
+		case 59: return $ELL['num_1'];
 	}
 
-	if(!$dialog_id)
-		return _emptyMin('Диалог не найден', 0);
-
-	return
-	'<script>'.
-		'var EL'.$el['id'].'_DS='.$dialog_id.';'.
-	'</script>';
+	return 0;
 }
-
 
 
 /* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
