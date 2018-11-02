@@ -82,6 +82,7 @@ function _table($id=false) {//таблицы в базе с соответств
 		 5 =>  '_element',
 		 6 =>  '_element_func',
 		 17 => '_element_format',
+		 18 => '_element_hint',
 		 7 =>  '_history',
 		 8 =>  '_image',
 		 9 =>  '_image_server',
@@ -782,15 +783,8 @@ function _jsCacheElemOne($elem_id) {
 	if(!empty($r['format']))
 		$val['format'] = $r['format']['id'];
 
-	if($r['hint_on']) {
-		$val['hint_on'] = 1;
-		$val['hint_msg'] = $r['hint_msg'];
-		$val['hint_side'] = $r['hint_side'];
-		$val['hint_obj_pos_h'] = $r['hint_obj_pos_h'];
-		$val['hint_obj_pos_v'] = $r['hint_obj_pos_v'];
-		$val['hint_delay_show'] = $r['hint_delay_show'];
-		$val['hint_delay_hide'] = $r['hint_delay_hide'];
-	}
+	if($r['hint'])
+		$val['hint'] = $r['hint'];
 
 	if($r['focus'])
 		$val['focus'] = 1;

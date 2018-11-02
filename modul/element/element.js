@@ -727,43 +727,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			if(el.focus)
 				attr_focus = ATR_CMP;
 
-			if(el.hint_on) {
-				var side = {
-						0:'auto',
-						755:'top',
-						756:'bottom',
-						757:'left',
-						758:'right'
-					},
-					sideObj = {
-						755:'h',
-						756:'h',
-						757:'v',
-						758:'v'
-					},
-					objPos = {
-						767:'center',
-						768:'left',
-						769:'right',
-
-						772:'center',
-						773:'top',
-						774:'bottom'
-					};
-				ATTR_EL.mouseenter(function() {
-					var oo = {
-						msg:_br(el.hint_msg, 1),
-						pad:10,
-						side:side[el.hint_side],
-						show:1,
-						delayShow:el.hint_delay_show,
-						delayHide:el.hint_delay_hide
-					};
-					if(el.hint_side)
-						oo.objPos = objPos[el['hint_obj_pos_' + sideObj[el.hint_side]]];
-					ATTR_EL._hint(oo);
-				});
-			}
+			_elemHint(el);
 
 			switch(el.dialog_id) {
 				case 1://галочка
@@ -1817,6 +1781,48 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		if(attr_focus)
 			attr_focus.focus();
+	},
+
+	_elemHint = function(el) {//подключение подсказки к элементу
+		if(!el.hint)
+			return;
+
+		var hint = el.hint,
+			side = {
+				0:'auto',
+				755:'top',
+				756:'bottom',
+				757:'left',
+				758:'right'
+			},
+			sideObj = {
+				755:'h',
+				756:'h',
+				757:'v',
+				758:'v'
+			},
+			objPos = {
+				767:'center',
+				768:'left',
+				769:'right',
+
+				772:'center',
+				773:'top',
+				774:'bottom'
+			};
+		_attr_el(el.id).mouseenter(function() {
+			var o = {
+				msg:_br(hint.msg, 1),
+				pad:10,
+				side:side[hint.side],
+				show:1,
+				delayShow:hint.delay_show,
+				delayHide:hint.delay_hide
+			};
+			if(hint.side)
+				o.objPos = objPos[hint['pos_' + sideObj[hint.side]]];
+			$(this)._hint(o);
+		});
 	},
 
 	_elemFunc = function(el, v, is_open) {//применение функций, привязанных к элементам

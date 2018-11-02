@@ -341,9 +341,9 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 			'<div class="line-b">' +
 				'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + EL.id, 5)  : '">') + 'Элемент</span>' +
 				'<div class="fr mtm3">' +
-					_elemUnitEye(EL) +
+					_elemUnitFormat(EL) +
 					'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
-					'<div val="dialog_id:43,unit_id:' + EL.id + '" class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint_on, 'pl') + _dn(EL.hint_access) + _tooltip('Настроить подсказку', -65) + '</div>' +
+					_elemUnitHint(EL) +
 					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
 					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 				'</div>' +
@@ -358,8 +358,16 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 			_elemUnitImg(EL) +
 		'</div>';
 	},
-	_elemUnitEye = function(EL) {//иконка с условиями отображения
+	_elemUnitFormat = function(EL) {//иконка с дополнительными условиями отображения
 		return '<div val="dialog_id:64,block_id:' + EL.block_id + ',unit_id:' + _num(EL.format) + '" class="icon icon-eye ml3 dialog-open' + _dn(!EL.format, 'pl') + _tooltip('Условия отображения', -67) + '</div>';
+	},
+	_elemUnitHint = function(EL) {//иконка для настройки выплывающей подсказки
+		if(!EL.hint_access)
+			return '';
+		var hint_id = EL.hint ? EL.hint.id : 0;
+		return '<div val="dialog_id:43,block_id:' + EL.block_id + ',unit_id:' + hint_id + '"' +
+				   ' class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint, 'pl') + _tooltip('Настроить подсказку', -65) +
+			   '</div>';
 	},
 	_elemUnitMar = function(EL) {
 		var mar = EL.mar.split(' ');

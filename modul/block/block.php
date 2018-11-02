@@ -2414,21 +2414,12 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 
 			$el['format'] = array();//дополнительное форматирование
 			$el['func'] = array();  //привязанные функции
+			$el['hint'] = array();  //выплывающая подсказка
 			$el['vvv'] = array();   //значения для некоторых компонентов
 
 			unset($el['sort']);
 			unset($el['user_id_add']);
 			unset($el['dtime_add']);
-
-			//подсказка для элемента
-			if(!$el['hint_on']) {
-				unset($el['hint_msg']);
-				unset($el['hint_side']);
-				unset($el['hint_obj_pos_h']);
-				unset($el['hint_obj_pos_v']);
-				unset($el['hint_delay_show']);
-				unset($el['hint_delay_hide']);
-			}
 
 			$ELM[$elem_id] = _arrNum($el);
 		}
@@ -2440,16 +2431,11 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 					WHERE !`block_id`
 					  AND `parent_id` IN (".implode(',', array_unique($elem23)).")";
 			foreach(query_arr($sql) as $elem_id => $el) {
+				unset($el['app_id']);
 				unset($el['sort']);
 				unset($el['user_id_add']);
 				unset($el['dtime_add']);
-				unset($el['hint_msg']);
-				unset($el['hint_side']);
-				unset($el['hint_obj_pos_h']);
-				unset($el['hint_obj_pos_v']);
-				unset($el['hint_delay_show']);
-				unset($el['hint_delay_hide']);
-				$ELM[$elem_id] = $el;
+				$ELM[$elem_id] = _arrNum($el);
 			}
 		}
 
@@ -2480,6 +2466,21 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 				'effect_id' => _num($r['effect_id']),
 				'target' => _idsAss($r['target'])
 			);
+		}
+
+		//выплывающая подсказка
+		$sql = "SELECT *
+				FROM `_element_hint`
+				WHERE `element_id` IN ("._idsGet($ELM).")
+				  AND `on`
+				  AND LENGTH(`msg`)";
+		foreach(query_arr($sql) as $r) {
+			$hint = _arrNum($r);
+			unset($hint['app_id']);
+			unset($hint['element_id']);
+			unset($hint['user_id_add']);
+			unset($hint['dtime_add']);
+			$ELM[$r['element_id']]['hint'] = $hint;
 		}
 
 		_cache_set($key, $ELM, $global);

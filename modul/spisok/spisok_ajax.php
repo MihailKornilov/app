@@ -632,7 +632,8 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 		}
 		if($field == 'element_id') {
 			if(_table($dialog['table_1']) != '_element_format' &&
-			   _table($dialog['table_1']) == '_element_func')
+			   _table($dialog['table_1']) == '_element_func' &&
+			   _table($dialog['table_1']) == '_element_hint')
 				continue;
 			if(!$block_id)
 				continue;
