@@ -375,7 +375,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			DLG('#' + act + '_on_check').mouseenter(function() {
 				$(this)._hint({
 					pad:10,
-					msg:'Включение ' + ACT_NAME[act] + ' записи',
+					msg:'Разрешение ' + ACT_NAME[act] + ' записи',
 					side:'left',
 					show:1,
 					delayShow:750
@@ -1034,24 +1034,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						width:el.width,
 						title0:el.txt_1,
 						spisok:VVV[el.id]
-					});
-					return;
-				//Иконка вопрос: Выплывающая подсказка
-				case 42:
-					var side = {
-						0:'auto',
-						741:'top',
-						742:'bottom',
-						743:'left',
-						744:'right'
-					};
-					ATR_CMP.mouseenter(function() {
-						ATR_CMP._hint({
-							msg:_br(el.txt_1, 1),
-							pad:10,
-							side:side[el.num_1],
-							show:1
-						});
 					});
 					return;
 				//Выбор блоков из диалога или страницы
@@ -3484,22 +3466,6 @@ $(document)
 			dialog_id:65,
 			unit_id:id,
 			busy_obj:t.parent()
-		});
-	})
-
-	.on('mouseenter', '.dialog-hint', function() {//отображение подсказки при наведении на вопрос в диалоге
-		var t = $(this),
-			msg = t.attr('val');
-
-		if(!msg)
-			return;
-
-		t._hint({
-			msg:msg,
-			pad:10,
-			show:1,
-			delayShow:500,
-			delayHide:300
 		});
 	});
 
