@@ -1533,6 +1533,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 						}
 					});
 					return;
+				//Фильтр-галочка
+				case 74:
+					ATR_CMP._radio({
+						func:function(v) {
+							FILTER[el.num_1][elm_id] = v;
+							_spisokUpdate(el.num_1);
+						}
+					});
+					return;
 				//Фильтр-календарь
 				case 77:
 					var CAL = ATTR_EL.find('._filter-calendar'),
@@ -2053,6 +2062,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				num_2:0,  //id условия из выпадающего списка
 				txt_2:'', //текстовое значение
 				issp:0,   //можно выбирать значения из списка. Только при условиях: [3:равно], [4:не равно]
+				spisok:[],//содержание выпадающего списка
 				num_3:''  //значение выпадающего списка
 			}, v);
 
@@ -2068,14 +2078,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 									  ' val="' + v.txt_1 + '"' +
 								' />' +
 							'<td><input type="hidden" class="cond-id" value="' + v.num_2 + '" />' +
-							'<td class="w100p">' +
+							'<td class="w100p pr20">' +
 								'<input type="text"' +
-									  ' class="cond-val w125' + _dn(v.num_2 > 2) + '"' +
+									  ' class="cond-val w125' + _dn(!v.issp && v.num_2 > 2) + '"' +
 									  ' value="' + v.txt_2 + '"' +
 								' />' +
-								'<div class="div-cond-sel dn">' +
+								'<div class="div-cond-sel' + _dn(v.issp) + '">' +
 									'<input type="hidden"' +
 										  ' class="cond-sel"' +
+										  ' value="' + v.num_3 + '"' +
 									' />' +
 								'</div>' +
 							'<td class="w35 r">' +
@@ -2141,7 +2152,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 			DD.find('.cond-sel')._select({
 				width:0,
-				title0:'не выбрано'
+				title0:'не выбрано',
+				spisok:v.spisok
 			});
 			DD.find('.icon-del').click(function() {
 				var t = $(this),
@@ -2854,9 +2866,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					dialog_source:ELMM[ATR_SP.val()].num_1,
 					block_id:unit.source.block_id,
 					unit_id:v.id,
-					prm:{
-						nest:0
-					},
+					prm:{nest:0},
 					busy_obj:$(this),
 					busy_cls:'spin',
 					func_save:function(ia) {

@@ -878,6 +878,7 @@ function _spisokCond($el) {//формирование строки с услов
 	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond26($el);
 	$cond .= _spisokCond62($el);
+	$cond .= _spisokCond74($el);
 	$cond .= _spisokCond77($el);
 	$cond .= _spisokCond78($el);
 	$cond .= _spisokCond83($el);
@@ -1032,6 +1033,27 @@ function _spisokCond62($el) {//фильтр-галочка
 	}
 
 	return $send;
+}
+function _spisokCond74($el) {//фильтр-радио
+	$filter = false;
+
+	//поиск элемента-фильтра-радио
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 74) {
+			$filter = true;
+			if(!$v = _num($r['v']))
+				return ' AND !`id` /* некорректное значение фильтра */';
+			break;
+		}
+
+	if(!$filter)
+		return '';
+
+	//получение выбранного элемента
+//	if(!_elemOne($v))
+//		return ' AND !`id` /* элемента значения '.$v.' не существует */';
+
+	return _22cond($v);
 }
 function _spisokCond77($el) {//фильтр-календарь
 	$filter = false;
@@ -1191,9 +1213,9 @@ function _22cond($parent_id) {//получение условий запроса
 		//если присутствует одно вложенное значение
 		if(_ids($r['txt_1'], 'count') == 2) {
 			if(!$EL = _elemOne(_ids($r['txt_1'], 'first')))
-				return "  AND !((`t1`.`id`))";
+				return " AND !((`t1`.`id`))";
 			if(!$col = $EL['col'])
-				return "  AND !(((`t1`.`id`)))";
+				return " AND !(((`t1`.`id`)))";
 
 			$dialog = _dialogQuery($EL['num_1']);
 			$send .= " AND `".$col."` IN (
@@ -1209,10 +1231,12 @@ function _22cond($parent_id) {//получение условий запроса
 			continue;
 		}
 
+		$val = _elemIsConnect($r['txt_1']) && $r['num_3'] ? $r['num_3'] : $r['txt_2'];
+
 		$send .= _22condV(
 					$r['num_2'],
 					$elCol[$r['txt_1']],
-					$r['txt_2']
+					$val
 				 );
 	}
 
@@ -1236,7 +1260,8 @@ function _22condV($act, $col, $val) {//значение запроса по ко
 		return '';
 
 	$val = addslashes($val);
-	$val = preg_match(REGEXP_INTEGER, $val) ? $val : "'".$val."'";
+	if($act != 9 && $act != 10)
+		$val = preg_match(REGEXP_INTEGER, $val) ? $val : "'".$val."'";
 	switch($act) {
 		case 1: return " AND !`t1`.`".$col."`";
 		case 2: return " AND `t1`.`".$col."`";

@@ -857,32 +857,7 @@ function _elemVvv($elem_id, $src=array()) {
 			return $send;
 
 		//Дополнительные условия к фильтру
-		case 22:
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `parent_id`=".$unit_id."
-					ORDER BY `id`";
-			if(!$arr = query_arr($sql))
-				return array();
-
-			$send = array();
-			foreach($arr as $r) {
-				$title = '';
-				foreach(_ids($r['txt_1'], 'arr') as $n => $id)
-					$title .= ($n ? ' » ' : '')._elemTitle($id);
-
-				$send[] = array(
-					'id' => _num($r['id']),
-					'title' => $title,
-					'txt_1' => _ids($r['txt_1']),
-					'num_2' => _num($r['num_2']),
-					'txt_2' => $r['txt_2'],
-					'issp' => $r['num_3'] && ($r['num_2'] == 3 || $r['num_2'] == 4) ? 1 : 0,
-					'num_3' => _num($r['num_3'])
-				);
-			}
-
-			return $send;
+		case 22: return PHP12_elem22_vvv($unit_id);
 
 		//select - выбор списка
 		case 24:
@@ -1899,13 +1874,12 @@ function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уро
 }
 
 
-
 /* ---=== УСЛОВИЯ ДЛЯ ФИЛЬТРОВ [22] ===--- */
 function PHP12_elem22($el, $unit) {
 	/*
 		Используется в виде элемента, а также как подключаемая функция
-		_cmpV22 - сохранение значений после редактирования
-		_elemVvv:22 - получение значений для редактирования
+		PHP12_elem22_save - сохранение значений после редактирования
+		PHP12_elem22_vvv - получение значений для редактирования
 		_22cond - применение в фильтре
 	*/
 
@@ -1955,6 +1929,100 @@ function PHP12_elem22_paste($el, $unit) {//условия были вставл�
 	}
 
 	return 0;
+}
+function PHP12_elem22_save($cmp, $val, $unit) {//Дополнительные условия к фильтру - сохранение настроек
+	/*
+		$cmp  - компонент из диалога, отвечающий за настройку значений фильтра
+		$val  - значения, полученные для сохранения
+		$unit - элемент, размещающий фильтр, для которого происходит настройка
+	*/
+
+	if(!$parent_id = _num($unit['id']))
+		return;
+
+	//ID элементов, которые не должны будут удалены
+	$ids = array();
+	$update = array();
+
+	if(is_array($val))
+		foreach($val as $r) {
+			if($id = _num($r['id']))
+				$ids[] = $id;
+			//выбранный элемент
+			if(!$txt_1 = _ids($r['txt_1']))
+				continue;
+			//выбранное условие
+			if(!$num_2 = _num($r['num_2']))
+				continue;
+
+			$txt_2 = _txt($r['txt_2']);//произвольное текстовое значение
+			$num_3 = _num($r['num_3']);//значение из select
+			$update[] = "(
+				".$id.",
+				".APP_ID.",
+				".$parent_id.",
+				'".$txt_1."',
+				".$num_2.",
+				'".addslashes($txt_2)."',
+				".$num_3."
+			)";
+		}
+
+	$ids = implode(',', $ids);
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	$sql = "INSERT INTO `_element` (
+				`id`,
+				`app_id`,
+				`parent_id`,
+				`txt_1`,
+				`num_2`,
+				`txt_2`,
+				`num_3`
+			)
+			VALUES ".implode(',', $update)."
+			ON DUPLICATE KEY UPDATE
+				`txt_1`=VALUES(`txt_1`),
+				`num_2`=VALUES(`num_2`),
+				`txt_2`=VALUES(`txt_2`),
+				`num_3`=VALUES(`num_3`)";
+	query($sql);
+}
+function PHP12_elem22_vvv($parent_id) {//Дополнительные условия к фильтру - получение настроек
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$parent_id."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$send = array();
+	foreach($arr as $r) {
+		$title = '';
+		foreach(_ids($r['txt_1'], 'arr') as $n => $id)
+			$title .= ($n ? ' » ' : '')._elemTitle($id);
+
+		$send[] = array(
+			'id' => _num($r['id']),
+			'title' => $title,
+			'txt_1' => _ids($r['txt_1']),
+			'num_2' => _num($r['num_2']),
+			'txt_2' => $r['txt_2'],
+			'issp' => $r['num_3'] && ($r['num_2'] == 3 || $r['num_2'] == 4) ? 1 : 0,
+			'spisok' => _29cnn($r['txt_1']),
+			'num_3' => _num($r['num_3'])
+		);
+	}
+
+	return $send;
 }
 
 

@@ -1546,12 +1546,22 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				значения: PHP12_filter_radio_setup
 			*/
 
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$v = $el['def'];
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_1'],
+					'filter' => $el['id'],
+					'v' => $v
+				));
+			}
+
 			return _radio(array(
 				'attr_id' => $attr_id,
 				'block' => 1,
 				'light' => 1,
 				'interval' => 5,
-				'value' => _num($v) ? _num($v) : $el['def'],
+				'value' => $v,
 				'spisok' => _elemVvv($el['id']),
 				'disabled' => $disabled
 			));

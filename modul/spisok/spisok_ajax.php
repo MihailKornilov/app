@@ -395,7 +395,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 				$func($cmp, $vvv[$cmp_id], $unit);
 				break;
 			//Дополнительные условия к фильтру
-			case 22: _cmpV22($cmp, $vvv, $unit); break;
+			case 22: PHP12_elem22_save($cmp, $vvv[$cmp_id], $unit); break;
 			//Применение загруженных изображений
 			case 60: _cmpV60($cmp, $unit); break;
 		}
@@ -923,73 +923,6 @@ function _spisokAction4($send) {//действие 4 - обновление ис
 	$send['dialog_source'] = _dialogOpenLoad($dialog_id);
 
 	return $send;
-}
-function _cmpV22($cmp, $vvv, $unit) {//Дополнительные условия к фильтру
-	/*
-		$cmp  - компонент из диалога, отвечающий за настройку значений фильтра
-		$val  - значения, полученные для сохранения
-		$unit - элемент, размещающий фильтр, для которого происходит настройка
-	*/
-
-	if(!$parent_id = _num($unit['id']))
-		return;
-
-	//ID элементов, которые не должны будут удалены
-	$ids = array();
-	$update = array();
-
-	if($val = @$vvv[$cmp['id']])
-		if(is_array($val))
-			foreach($val as $r) {
-				if($id = _num($r['id']))
-					$ids[] = $id;
-				//выбранный элемент
-				if(!$txt_1 = _ids($r['txt_1']))
-					continue;
-				//выбранное условие
-				if(!$num_2 = _num($r['num_2']))
-					continue;
-
-				$txt_2 = _txt($r['txt_2']);//произвольное текстовое значение
-				$num_3 = _num($r['num_3']);//значение из select
-				$update[] = "(
-					".$id.",
-					".APP_ID.",
-					".$parent_id.",
-					'".$txt_1."',
-					".$num_2.",
-					'".addslashes($txt_2)."',
-					".$num_3.",
-				)";
-			}
-
-	$ids = implode(',', $ids);
-
-	//удаление значений, которые были удалены при настройке
-	$sql = "DELETE FROM `_element`
-			WHERE `parent_id`=".$parent_id."
-			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
-	query($sql);
-
-	if(empty($update))
-		return;
-
-	$sql = "INSERT INTO `_element` (
-				`id`,
-				`app_id`,
-				`parent_id`,
-				`txt_1`,
-				`num_2`,
-				`txt_2`,
-				`num_3`
-			)
-			VALUES ".implode(',', $update)."
-			ON DUPLICATE KEY UPDATE
-				`txt_1`=VALUES(`txt_1`),
-				`num_2`=VALUES(`num_2`),
-				`txt_2`=VALUES(`txt_2`),
-				`num_3`=VALUES(`num_3`)";
-	query($sql);
 }
 function _cmpV60($cmp, $unit) {//Применение загруженных изображений
 	//поле, хранящее список id изображений
