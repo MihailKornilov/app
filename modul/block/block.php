@@ -1556,13 +1556,23 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				));
 			}
 
+			$spisok = array();
+			$n = 1;
+			foreach(_elemVvv($el['id']) as $id => $txt) {
+				$spisok[$id] =
+						$txt.
+						'<span class="fr inhr">'.$n.'</span>';
+				$n *= 9;
+			}
+
 			return _radio(array(
 				'attr_id' => $attr_id,
 				'block' => 1,
+				'width' => '100%',
+				'interval' => 6,
 				'light' => 1,
-				'interval' => 5,
 				'value' => $v,
-				'spisok' => _elemVvv($el['id']),
+				'spisok' => $spisok,
 				'disabled' => $disabled
 			));
 

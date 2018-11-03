@@ -38,6 +38,14 @@ function _radio($v=array()) {//элемент RADIO
 	$block = _bool(@$v['block']) ? ' block' : '';
 	$interval = _num(@$v['interval']) ? _num(@$v['interval']) : 7;
 
+	$width = '';
+	if(isset($v['width'])) {
+		if($v['width'] == '100%')
+			$width = ' style="width:'.$v['width'].'"';
+		if(_num($v['width']))
+			$width = ' style="width:'.$v['width'].'px"';
+	}
+
 	//если список пуст и только нулевое значение, отступ снизу не делается
 	$int = empty($spisok) ? 0 : $interval;
 	$html = _radioUnit(0, $block, $title0, $int, $value == 0);
@@ -54,7 +62,7 @@ function _radio($v=array()) {//элемент RADIO
 
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
-	'<div id="'.$attr_id.'_radio" class="_radio php'.$block.$dis.$light.'">'.
+	'<div id="'.$attr_id.'_radio" class="_radio php'.$block.$dis.$light.'"'.$width.'>'.
 		$html.
 	'</div>';
 }
