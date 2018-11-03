@@ -251,7 +251,7 @@ function _sumSpace($sum, $oo=0, $znak=',') {//Приведение суммы к
 	return ($minus < 0 ? '-' : '').$send;
 }
 function _txt($v, $notrim=false) {
-	if(empty($v))
+	if(!isset($v))
 		return '';
 	$v = htmlspecialchars($v);
 	if(!$notrim)

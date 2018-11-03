@@ -1233,6 +1233,17 @@ function _22cond($parent_id) {//получение условий запроса
 
 		$val = _elemIsConnect($r['txt_1']) && $r['num_3'] ? $r['num_3'] : $r['txt_2'];
 
+		//если элемент является датой, преобразование значения в дату, если это число.
+		if(_elemIsDate($r['txt_1']))
+			if(preg_match(REGEXP_INTEGER, $val)) {
+				//число - это количество дней
+				//нулевое значение = сегодня
+				//положительное = дни в будущем
+				//отрицательное = дни в прошлом
+				$val = TODAY_UNIXTIME + $val * 86400;
+				$val = strftime('%Y-%m-%d', $val);
+			}
+
 		$send .= _22condV(
 					$r['num_2'],
 					$elCol[$r['txt_1']],

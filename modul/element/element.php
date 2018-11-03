@@ -1122,6 +1122,22 @@ function _elemIsConnect($el) {//определение, является ли э
 	}
 	return false;
 }
+function _elemIsDate($el) {//определение, является ли элемент подключаемым списком
+	if(empty($el))
+		return false;
+
+	if(!is_array($el))
+		if(!$el = _elemOne(_num($el)))
+			return false;
+
+	if(!isset($el['dialog_id']))
+		return false;
+
+	switch($el['dialog_id']) {
+		case 51: return true;
+	}
+	return false;
+}
 function _elemSpisokConnect($ids, $return='select', $cond='') {//значения привязанного списка
 	if(!$last_id = _idsLast($ids))
 		return array();
