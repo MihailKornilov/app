@@ -392,7 +392,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 				$func = $cmp['txt_1'].'_save';
 				if(!function_exists($func))
 					break;
-				$func($cmp, $vvv[$cmp_id], $unit);
+				$unit['func12'] = $func($cmp, $vvv[$cmp_id], $unit);
 				break;
 			//Дополнительные условия к фильтру
 			case 22: PHP12_elem22_save($cmp, $vvv[$cmp_id], $unit); break;

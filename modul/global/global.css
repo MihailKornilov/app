@@ -581,6 +581,7 @@ button.vk._busy{color:transparent}
 .ml5{margin-left:5px}
 .ml8{margin-left:8px}
 .ml10{margin-left:10px}
+.ml15{margin-left:15px}
 .ml20{margin-left:20px}
 .ml30{margin-left:30px}
 .ml40{margin-left:40px}
@@ -701,6 +702,8 @@ td.bottom{vertical-align:bottom}
 .over3:hover,.over3:hover textarea{background-color:#ffc} /* жёлтый */
 .over4:hover{background-color:#F9F9F9}/* светло-серый */
 .over5:not(._busy):hover{background-color:#E8ECF0}/* серо-синий */
+
+.over3:not(:hover) .over3-show{display:none}
 
 /* Линии */
 .line-t{border-top:#DEE3EF solid 1px}    /* насыщенная верхняя линия */

@@ -1556,13 +1556,23 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				));
 			}
 
+			//получение количества значений по каждому пункту
+			$EL = _elemOne($el['num_1']);
+			$DLG = _dialogQuery($EL['num_1']);
 			$spisok = array();
-			$n = 1;
-			foreach(_elemVvv($el['id']) as $id => $txt) {
-				$spisok[$id] =
-						$txt.
-						'<span class="fr inhr">'.$n.'</span>';
-				$n *= 9;
+			foreach(_elemVvv($el['id']) as $id => $r) {
+				$spisok[$id] = $r['txt_1'];
+
+				if(!$r['num_1'])
+					continue;
+
+				$sql = "SELECT COUNT(*)
+						FROM "._tableFrom($DLG)."
+						WHERE `t1`.`id`
+							"._spisokCondDef($DLG['id'])."
+							"._22cond($id);
+				if($c = query_value($sql))
+					$spisok[$id] .= '<span class="fr inhr">'.$c.'</span>';
 			}
 
 			return _radio(array(

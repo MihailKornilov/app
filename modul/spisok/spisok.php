@@ -1049,10 +1049,6 @@ function _spisokCond74($el) {//фильтр-радио
 	if(!$filter)
 		return '';
 
-	//получение выбранного элемента
-//	if(!_elemOne($v))
-//		return ' AND !`id` /* элемента значения '.$v.' не существует */';
-
 	return _22cond($v);
 }
 function _spisokCond77($el) {//фильтр-календарь

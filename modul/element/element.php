@@ -1060,11 +1060,11 @@ function _elemVvv($elem_id, $src=array()) {
 
 		//Фильтр radio
 		case 74:
-			$sql = "SELECT `id`,`txt_1`
+			$sql = "SELECT *
 					FROM `_element`
 					WHERE `parent_id`=".$elem_id."
 					ORDER BY `sort`";
-			return query_ass($sql);
+			return query_arr($sql);
 
 		//Фильтр: Select - привязанный список
 		case 83: return _elemSpisokConnect($el['txt_2']);
@@ -1954,7 +1954,7 @@ function PHP12_elem22_save($cmp, $val, $unit) {//Дополнительные у
 	*/
 
 	if(!$parent_id = _num($unit['id']))
-		return;
+		return 0;
 
 	//ID элементов, которые не должны будут удалены
 	$ids = array();
@@ -1993,7 +1993,7 @@ function PHP12_elem22_save($cmp, $val, $unit) {//Дополнительные у
 	query($sql);
 
 	if(empty($update))
-		return;
+		return 0;
 
 	$sql = "INSERT INTO `_element` (
 				`id`,
@@ -2011,6 +2011,8 @@ function PHP12_elem22_save($cmp, $val, $unit) {//Дополнительные у
 				`txt_2`=VALUES(`txt_2`),
 				`num_3`=VALUES(`num_3`)";
 	query($sql);
+
+	return count($update);
 }
 function PHP12_elem22_vvv($parent_id) {//Дополнительные условия к фильтру - получение настроек
 	$sql = "SELECT *
@@ -2449,6 +2451,7 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 				".$unit['app_id'].",
 				".$parent_id.",
 				'".addslashes($title)."',
+				"._num($r['num_1']).",
 				"._num($r['def']).",
 				".$sort++."
 			)";
@@ -2475,12 +2478,14 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 				`app_id`,
 				`parent_id`,
 				`txt_1`,
+				`num_1`,
 				`def`,
 				`sort`
 			)
 			VALUES ".implode(',', $update)."
 			ON DUPLICATE KEY UPDATE
 				`txt_1`=VALUES(`txt_1`),
+				`num_1`=VALUES(`num_1`),
 				`def`=VALUES(`def`),
 				`sort`=VALUES(`sort`)";
 	query($sql);
@@ -2506,14 +2511,24 @@ function PHP12_filter_radio_setup_vvv($parent_id) {
 	if(!$arr = query_arr($sql))
 		return array();
 
+	//количество настроек условий фильтра по каждому значению
+	$sql = "SELECT
+				`parent_id`,
+				COUNT(*)
+			FROM `_element`
+			WHERE `parent_id` IN ("._idsGet($arr).")
+			GROUP BY `parent_id`";
+	$ass = query_ass($sql);
+
 	$send = array();
-	foreach($arr as $r) {
+	foreach($arr as $r)
 		$send[] = array(
 			'id' => _num($r['id']),
 			'title' => $r['txt_1'],
-			'def' => _num($r['def'])
+			'def' => _num($r['def']),
+			'c' => _num(@$ass[$r['id']]),
+			'num_1' => _num($r['num_1'])
 		);
-	}
 
 	return $send;
 }
