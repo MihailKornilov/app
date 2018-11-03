@@ -813,7 +813,7 @@ function _elemVvv($elem_id, $src=array()) {
 
 	$block_id =  _num(@$src['block_id']);
 	$dialog_id = _num(@$src['dialog_id']);
-	$unit_id = _num(@$src['unit_id'], 1);
+	$unit_id =   _num(@$src['unit_id'], 1);
 	$unit = $unit_id ? $src['unit'] : array();
 
 	switch($el['dialog_id']) {
@@ -876,7 +876,9 @@ function _elemVvv($elem_id, $src=array()) {
 					'title' => $title,
 					'txt_1' => _ids($r['txt_1']),
 					'num_2' => _num($r['num_2']),
-					'txt_2' => $r['txt_2']
+					'txt_2' => $r['txt_2'],
+					'issp' => $r['num_3'] && ($r['num_2'] == 3 || $r['num_2'] == 4) ? 1 : 0,
+					'num_3' => _num($r['num_3'])
 				);
 			}
 
@@ -1902,6 +1904,9 @@ function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уро
 function PHP12_elem22($el, $unit) {
 	/*
 		Используется в виде элемента, а также как подключаемая функция
+		_cmpV22 - сохранение значений после редактирования
+		_elemVvv:22 - получение значений для редактирования
+		_22cond - применение в фильтре
 	*/
 
 	$dialog_id = 0;
@@ -1910,7 +1915,12 @@ function PHP12_elem22($el, $unit) {
 			$SRC = $unit['source'];
 			$dialog_id = $SRC['dialog_source'];
 			break;
-		case 22: $dialog_id = PHP12_elem22_paste($el, $unit); break;
+		case 22:
+			$v = PHP12_elem22_paste($el, $unit);
+			if(!preg_match(REGEXP_NUMERIC, $v))
+				return $v;
+			$dialog_id = _num($v);
+			break;
 	}
 
 	if(!$dialog_id)
@@ -1922,7 +1932,7 @@ function PHP12_elem22($el, $unit) {
 	'</script>';
 }
 function PHP12_elem22_paste($el, $unit) {//условия были вставлены как элемент [22]
-	if(empty($unit['id']))
+	if(_elemUnitIsEdit($unit))
 		return _emptyMin('Дополнительные условия к фильтру', 0);
 	if(!$elem_id = $el['num_1'])
 		return _emptyMin('Не выбран элемент, указывающий на список', 0);

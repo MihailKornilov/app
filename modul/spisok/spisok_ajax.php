@@ -943,19 +943,23 @@ function _cmpV22($cmp, $vvv, $unit) {//Дополнительные услови
 			foreach($val as $r) {
 				if($id = _num($r['id']))
 					$ids[] = $id;
+				//выбранный элемент
 				if(!$txt_1 = _ids($r['txt_1']))
 					continue;
+				//выбранное условие
 				if(!$num_2 = _num($r['num_2']))
 					continue;
 
-				$txt_2 = _txt($r['txt_2']);
+				$txt_2 = _txt($r['txt_2']);//произвольное текстовое значение
+				$num_3 = _num($r['num_3']);//значение из select
 				$update[] = "(
 					".$id.",
 					".APP_ID.",
 					".$parent_id.",
 					'".$txt_1."',
 					".$num_2.",
-					'".addslashes($txt_2)."'
+					'".addslashes($txt_2)."',
+					".$num_3.",
 				)";
 			}
 
@@ -976,13 +980,15 @@ function _cmpV22($cmp, $vvv, $unit) {//Дополнительные услови
 				`parent_id`,
 				`txt_1`,
 				`num_2`,
-				`txt_2`
+				`txt_2`,
+				`num_3`
 			)
 			VALUES ".implode(',', $update)."
 			ON DUPLICATE KEY UPDATE
 				`txt_1`=VALUES(`txt_1`),
 				`num_2`=VALUES(`num_2`),
-				`txt_2`=VALUES(`txt_2`)";
+				`txt_2`=VALUES(`txt_2`),
+				`num_3`=VALUES(`num_3`)";
 	query($sql);
 }
 function _cmpV60($cmp, $unit) {//Применение загруженных изображений
@@ -1400,16 +1406,17 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 
 	$send = array(
 		'v' => $v,
-		'title' => $title
+		'title' => $title,
+		'issp' => 0,
+		'spisok' => array()
 	);
 
 	//получение значений привязанного списка
 	if($elem_id = _num($v))
 		if(_elemIsConnect($elem_id)) {
+			$send['issp'] = 1;
 			$send['spisok'] = _29cnn($elem_id);
-
 		}
-
 
 	jsonSuccess($send);
 }

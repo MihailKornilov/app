@@ -2051,7 +2051,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 				title:'', //имя выбранного элемента
 				txt_1:0,  //id выбранного элемента из диалога, по которому будет выполняться условие фильтра
 				num_2:0,  //id условия из выпадающего списка
-				txt_2:''  //значеие условия
+				txt_2:'', //текстовое значение
+				issp:0,   //можно выбирать значения из списка. Только при условиях: [3:равно], [4:не равно]
+				num_3:''  //значение выпадающего списка
 			}, v);
 
 			DL.append(
@@ -2060,7 +2062,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						'<tr><td class="w50 r color-sal">Если:' +
 							'<td><input type="text"' +
 									  ' readonly' +
-									  ' class="title w150 curP over4 color-pay"' +
+									  ' class="title w175 curP over4 color-pay"' +
 									  ' placeholder="выберите значение..."' +
 									  ' value="' + v.title + '"' +
 									  ' val="' + v.txt_1 + '"' +
@@ -2071,6 +2073,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 									  ' class="cond-val w125' + _dn(v.num_2 > 2) + '"' +
 									  ' value="' + v.txt_2 + '"' +
 								' />' +
+								'<div class="div-cond-sel dn">' +
+									'<input type="hidden"' +
+										  ' class="cond-sel"' +
+									' />' +
+								'</div>' +
 							'<td class="w35 r">' +
 								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
 					'</table>' +
@@ -2092,23 +2099,19 @@ var DIALOG = {},//массив диалоговых окон для управл
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {
-						COND_ID._select('enable');
-						if(!v.txt_1)
-							COND_ID._select(1);
+						COND_ID._select('enable')
+							   ._select(v.txt_1 ? 0 : 1);
 						v.txt_1 = res.v;
 						TITLE.attr('val', v.txt_1);
 						TITLE.val(res.title);
+						DD.find('.cond-val')._dn().val('');
 
 						//если выбран подключаемый список, то выбор значений этого списка
-						if(res.spisok) {
-							DD.find('.cond-val')
-								.attr('type', 'hidden')
-								._select({
-									width:125,
-									title0:'не выбрано',
-									spisok:res.spisok
-								});
-						}
+						v.issp = res.issp;
+						DD.find('.div-cond-sel')._dn();
+						DD.find('.cond-sel')
+							._select('spisok', res.spisok)
+							._select(0);
 					}
 				});
 			});
@@ -2128,11 +2131,17 @@ var DIALOG = {},//массив диалоговых окон для управл
 					{id:9,title:'содержит'},
 					{id:10,title:'не содержит'}
 				],
-				func:function(v) {
+				func:function(vv) {
+					var issp = v.issp && (vv == 3 || vv == 4);
 					DD.find('.cond-val')
-						._dn(v > 2)
+						._dn(!issp && vv > 2)
 						.focus();
+					DD.find('.div-cond-sel')._dn(issp);
 				}
+			});
+			DD.find('.cond-sel')._select({
+				width:0,
+				title0:'не выбрано'
 			});
 			DD.find('.icon-del').click(function() {
 				var t = $(this),
@@ -2148,7 +2157,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 				id:_num(sp.attr('val')),
 				txt_1:sp.find('.title').attr('val'),
 				num_2:sp.find('.cond-id').val(),
-				txt_2:sp.find('.cond-val').val()
+				txt_2:sp.find('.cond-val').val(),
+				num_3:sp.find('.cond-sel').val()
 			});
 		});
 		return send;
@@ -2799,7 +2809,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 									  ' value="' + v.title + '"' +
 								' />' +
 								'<input type="hidden" class="def" value="' + v.def + '" />' +
-								'<div class="icon icon-add pl ml10' + _tooltip('Добавить условие', -57) + '</div>' +
+						(v.id ? '<div class="icon icon-add pl ml10' + _tooltip('Добавить условие', -57) + '</div>'
+							  : '<div class="icon icon-hint ml10"></div>'
+						) +
 							'<td class="w35 r">' +
 								'<div class="icon icon-del-red pl' + _tooltip('Удалить значение', -54) + '</div>' +
 					'</table>' +
@@ -2825,13 +2837,26 @@ var DIALOG = {},//массив диалоговых окон для управл
 				}
 			});
 
+			if(!v.id)
+				DD.find('.icon-hint').mouseenter(function() {
+					$(this)._hint({
+						width:200,
+						pad:10,
+						msg:'Для настройки условий этого значения сохраните фильтр и откройте его снова.',
+						show:1
+					})
+				});
+
 			//добавление условия к значению
 			DD.find('.icon-add').click(function() {
 				_dialogLoad({
 					dialog_id:25,
 					dialog_source:ELMM[ATR_SP.val()].num_1,
 					block_id:unit.source.block_id,
-					prm:{nest:0},
+					unit_id:v.id,
+					prm:{
+						nest:0
+					},
 					busy_obj:$(this),
 					busy_cls:'spin',
 					func_save:function(ia) {
