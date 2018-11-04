@@ -457,13 +457,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	return $send;
 }
 function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалога
-	$dlgParent = $dialog;
-
-	if($parent_id = $dialog['dialog_parent_id'])
-		if(!$dlgParent = _dialogQuery($parent_id))
-			return array();
-
-	if(!$dlgParent['table_1'])
+	if(!$dialog['table_1'])
 		return array();
 
 	$POST_CMP = @$_POST['cmp'];
@@ -489,8 +483,8 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 			continue;
 		if(!$col = @$cmp['col'])
 			continue;
-		if(!isset($dlgParent['field1'][$col]) && !isset($dlgParent['field2'][$col]))
-			jsonError('В таблице отсутствует колонка с именем "'.$col.'"');
+//		if(!isset($dlgParent['field1'][$col]) && !isset($dlgParent['field2'][$col]))
+//			jsonError('В таблице отсутствует колонка с именем "'.$col.'"');
 
 		$v = _txt($CMP[$cmp_id]);
 
@@ -821,13 +815,8 @@ function _filterDefSet($dialog, $elem_id) {//установка значения
 			break;
 	}
 }
-function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновление компонентов единицы списка
-	$dlgParent = $dialog;
-	if($parent_id = $dialog['dialog_parent_id'])
-		if(!$dlgParent = _dialogQuery($parent_id))
-			return;
-
-	if(!$dlgParent['table_1'])
+function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление компонентов единицы списка
+	if(!$DLG['table_1'])
 		return;
 	if(empty($POST_CMP))
 		return;
@@ -835,7 +824,7 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновлен�
 	$update1 = array();
 	$update2 = array();
 	foreach($POST_CMP as $cmp_id => $v) {
-		$cmp = $dialog['cmp'][$cmp_id];
+		$cmp = $DLG['cmp'][$cmp_id];
 		$col = $cmp['col'];
 
 		if(IS_ELEM && $col == 'col') {//если элемент, установка номера таблицы, в которой содержится колонка
@@ -845,10 +834,6 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновлен�
 				if($el = _elemOne($unit_id))
 					if($el['block']['obj_name'] == 'dialog')
 						if($dlg = _dialogQuery($el['block']['obj_id'])) {
-
-							if($parent_id = $dlg['dialog_parent_id'])
-								$dlg = _dialogQuery($parent_id);
-
 							if(isset($dlg['field1'][$v]))
 								$num = 1;
 							else
@@ -869,27 +854,27 @@ function _spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id) {//обновлен�
 	}
 
 	if(!empty($update1)) {
-		$sql = "UPDATE `"._table($dlgParent['table_1'])."`
+		$sql = "UPDATE `"._table($DLG['table_1'])."`
 				SET ".implode(',', $update1)."
 				WHERE `id`=".$unit_id;
 		query($sql);
 	}
 
 	if(!empty($update2)) {
-		$field2 = $dlgParent['field2'];
+		$field2 = $DLG['field2'];
 
-		$cond = "`".$dlgParent['table_2_field']."`=".$unit_id;
+		$cond = "`".$DLG['table_2_field']."`=".$unit_id;
 		if(isset($field2['app_id']))
 			$cond .= " AND `app_id`=".APP_ID;
 		if(isset($field2['dialog_id']))
-			$cond .= " AND `dialog_id`=".$dlgParent['id'];
+			$cond .= " AND `dialog_id`=".$DLG['id'];
 
 		$sql = "SELECT `id`
-				FROM `"._table($dlgParent['table_2'])."`
+				FROM `"._table($DLG['table_2'])."`
 				WHERE ".$cond."
 				LIMIT 1";
 		if($unit_2 = _num(query_value($sql))) {
-			$sql = "UPDATE `"._table($dlgParent['table_2'])."`
+			$sql = "UPDATE `"._table($DLG['table_2'])."`
 					SET ".implode(',', $update2)."
 					WHERE `id`=".$unit_2;
 			query($sql);

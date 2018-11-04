@@ -870,11 +870,17 @@ function _elemVvv($elem_id, $src=array()) {
 		//select - выбор единицы из другого списка (для связки)
 		case 29:
 			$sel_id = 0;
-			if($unit_id && $el['col']) {
-				if(!empty($unit[$el['col']]))
-					$sel_id = $unit[$el['col']]['id'];
-			} else
-				$sel_id = _spisokCmpConnectIdGet($el);
+			if($unit_id) {
+				if(@$unit['accept'])
+					$sel_id = $unit_id;
+				elseif($el['col']) {
+					if(!empty($unit[$el['col']]))
+						$sel_id = $unit[$el['col']]['id'];
+				}
+			}
+
+			$sel_id = _spisokCmpConnectIdGet($el, $sel_id);
+
 			return _29cnn($elem_id, '', $sel_id);
 
 		//SA: select - выбор имени колонки
@@ -888,12 +894,6 @@ function _elemVvv($elem_id, $src=array()) {
 
 			if(!$colDialog = _dialogQuery($block['obj_id']))
 				break;
-
-			//выбор колонок из родительского диалога
-			if($parent_id = $colDialog['dialog_parent_id'])
-				if(!$colDialog = _dialogQuery($parent_id))
-					break;
-
 
 			//получение используемых колонок
 			$colUse = array();
@@ -1625,6 +1625,9 @@ function PHP12_v_choose($el, $unit) {
 	//страница принимает значения списка
 	$dialog_id = PHP12_v_choose_page_spisok_unit($SRC, $dialog_id);
 
+	//диалог принимает значения списка
+	$dialog_id = PHP12_v_choose_dialog_spisok_unit($SRC, $dialog_id);
+
 	if(defined('DLG_NO_MSG'))
 		return DLG_NO_MSG;
 	if(!$dialog_id)
@@ -1818,6 +1821,18 @@ function PHP12_v_choose_page_spisok_unit($SRC, $dialog_id) {//страница �
 
 	$page = _page($SRC['page_id']);
 	return _num($page['spisok_id']);
+}
+function PHP12_v_choose_dialog_spisok_unit($SRC, $dialog_id) {//диалог принимает значения списка
+	if($dialog_id)
+		return $dialog_id;
+	if(!$BL = PHP12_v_choose_BL($SRC))
+		return 0;
+	if($BL['obj_name'] != 'dialog')
+		return 0;
+	if(!$dlg = _dialogQuery($BL['obj_id']))
+		return 0;
+
+	return _num($dlg['dialog_id_unit']);
 }
 
 

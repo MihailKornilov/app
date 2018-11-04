@@ -426,15 +426,15 @@ function _blockStyle($r, $width, $unit) {//стили css для блока
 
 	//цвет фона из единицы списка
 	if(!_elemUnitIsEdit($unit))
-		if($ids = _ids($r['bg'], 1)) {
-			$bg = $unit;
-			foreach($ids as $id) {
-				if($el = _elemOne($id)) {
-					$bg = $bg[$el['col']];
+		if(!empty($unit['id']))
+			if($ids = _ids($r['bg'], 1)) {
+				$bg = $unit;
+				foreach($ids as $id) {
+					if($el = _elemOne($id))
+						$bg = $bg[$el['col']];
 				}
+				$send[] = 'background-color:'.$bg;
 			}
-			$send[] = 'background-color:'.$bg;
-		}
 
 	return implode(';', $send);
 }
@@ -600,21 +600,15 @@ function _elemStyle($el, $unit) {//стили css для элемента
 	return ' style="'.implode(';', $send).'"';
 }
 function _elemUnitIsEdit($unit) {//определение в каком режиме находится блочная структура (рабочий или настройка)
-	$edit = 0;
-
 	if(!empty($unit['blk_edit']))
-		$edit = 1;
-
+		return 1;
 	if(!empty($unit['blk_choose']))
-		$edit = 1;
-
+		return 1;
 	if(!empty($unit['v_choose']))
-		$edit = 1;
-
+		return 1;
 	if(!empty($unit['elem_width_change']))
-		$edit = 1;
-
-	return $edit;
+		return 1;
+	return 0;
 }
 function _elemUnit($el, $unit=array()) {//формирование элемента страницы
 	$UNIT_ISSET = isset($unit['id']);
@@ -654,7 +648,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				txt_1 - текст кнопки
 				num_1 - цвет
 				num_2 - маленькая кнопка
-				num_3 - принимает значения списка, которое принимает страница
+				num_3 - принимает значения единицы списка
 				num_4 - dialog_id, который назначен на эту кнопку
 			*/
 			$color = array(
@@ -673,9 +667,15 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
 			$dialog_source = !empty($el['block']) && $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
 
-			//кнопка принимает значения списка, которое принимает страница
-			if($el['num_3'] && $UNIT_ISSET)
+			//кнопка принимает значения единицы списка
+			//Если единица списка совпадает с открываемым диалогом, который вносил её данные, значит редактирование
+			//Если не совпадает, то получение данных единицы списка для использования значений в полях
+			if($el['num_3'] && $UNIT_ISSET) {
+//				$DLG = _dialogQuery($el['num_4']);
+//				$u = _spisokUnitQuery($DLG, $unit['id']);
+//				$block = ','.($u ? 'unit' : 'accept').'_id:'.$unit['id'];
 				$block = ',unit_id:'.$unit['id'];
+			}
 
 			//если новая кнопка, будет создаваться новый диалог для неё
 			if(!$el['num_4'])
@@ -2162,6 +2162,8 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		_cache_clear('dialog');
 		_cache_clear('dialog', 1);
 		_cache_clear('ELM_HISTORY', 1);
+		_cache_clear('dialog_del_cond');
+		_cache_clear('dialog_del_cond', 1);
 		$BE_FLAG = 0;
 	}
 
@@ -2333,10 +2335,8 @@ function _beBlockBg($r) {
 			if($el = $G_ELEM[$r['obj_id']])
 				if($el['dialog_id'] == 14 || $el['dialog_id'] == 59)
 					$bg70 = _num($el['num_1']);
-	if($r['obj_name'] == 'dialog') {
-		$dialog_parent_id = _num($G_DLG[$r['obj_id']]['dialog_parent_id']);
-		$bg70 = $dialog_parent_id ? $dialog_parent_id : $r['obj_id'];
-	}
+	if($r['obj_name'] == 'dialog')
+		$bg70 = $r['obj_id'];
 	if($r['obj_name'] == 'page')
 		if($page = _page($r['obj_id']))
 			$bg70 = $page['spisok_id'];
@@ -2595,7 +2595,7 @@ function _beDlg() {//получение данных диалогов из ке�
 	}
 
 	$global = _beDlgField($global);
-	$global = _beDlgDelCond($global);
+	$global = _beDlgDelCond($global, 1);
 
 	if(!APP_ID)
 		return $global;
@@ -2643,21 +2643,31 @@ function _beDlgField($dialog) {//вставка колонок таблиц в �
 
 	return $dialog;
 }
-function _beDlgDelCond($dlg) {//дополнительные условия удаления записи
+function _beDlgDelCond($dlg, $global=0) {//дополнительные условия удаления записи
 	if(empty($dlg))
 		return array();
 
 	foreach($dlg as $id => $r)
 		$dlg[$id]['del_cond']['num_2'] = 0;
 
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `dialog_id`=58
-			  AND `num_1` IN ("._idsGet($dlg).")";
-	foreach(query_arr($sql) as $r) {
+	$key = 'dialog_del_cond';
+	if(!_cache_isset($key, $global)) {
+		$sql = "/* ".__FUNCTION__.":".__LINE__." */
+				SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=58
+				  AND `num_1` IN ("._idsGet($dlg).")
+				  AND `num_2`";
+		$arr = query_arr($sql);
+		_cache_set($key, $arr, $global);
+	} else
+		$arr = _cache_get($key, $global);
+
+	foreach($arr as $r) {
 		$dlg_id = $r['num_1'];
 		$dlg[$dlg_id]['del_cond']['num_2'] = _num($r['num_2']);
 	}
+
 
 	return $dlg;
 }

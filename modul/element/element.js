@@ -439,6 +439,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 			title0:'нет',
 			spisok:o.dialog_parent
 		});
+		DLG('#dialog_id_unit')._select({
+			width:250,
+			title0:'нет',
+			spisok:o.dialog_parent
+		});
 
 		_dialogHeightCorrect(DLG);
 
@@ -499,6 +504,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				dialog_parent_id:DLG('#dialog_parent_id').val(),
 				spisok_on:DLG('#spisok_on').val(),
 				spisok_elem_id:DLG('#spisok_elem_id').val(),
+				dialog_id_unit:DLG('#dialog_id_unit').val(),
 
 				table_1:DLG('#table_1').val(),
 				table_2:DLG('#table_2').val(),
@@ -562,7 +568,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 			DIALOG_OPEN.col_type = o.col_type;
 			for(var i in o.vvv)
 				VVV[i] = o.vvv[i];
-			_ELM_ACT(o.elm_ids, o.unit);
+			if(!o.err)
+				_ELM_ACT(o.elm_ids, o.unit);
 		}
 
 		return dialog;
@@ -777,8 +784,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var timer,
 						started = 0,
 						v_last;
-					if(!ATR_CMP)
-						return;
 					ATR_CMP._search({
 						func:function(v) {
 							if(started)
@@ -1183,8 +1188,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Меню переключения блоков
 				case 57:
-					if(!ATR_CMP)
-						return;
 					var type = {
 							1158:2,
 							1159:1
@@ -3361,8 +3364,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			dialog_id:_num(o.dialog_id),        //диалог, который вносит элемент
 			dialog_source:_num(o.dialog_source),//исходный диалог, либо настраиваемый
-			block_id:_num(o.block_id),          //блок в который вставляется элемент
-			unit_id:_num(o.unit_id, 1),         //id единицы списка - если редактирование
+			block_id:_num(o.block_id, 1),       //блок в который вставляется элемент
+			unit_id:_num(o.unit_id),            //id единицы списка - если редактирование
 
 			prm:o.prm || [],                    //дополнительные параметры
 

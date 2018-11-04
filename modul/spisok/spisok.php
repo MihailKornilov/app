@@ -144,8 +144,8 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 	//диалог, через который вносятся данные списка
 	$dialog = _dialogQuery($el['num_1']);
 
-	$sql = "/* Количество значений списка <u>".$dialog['name']."</u> */\n".
-		   "SELECT COUNT(*)
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Количество значений списка <u>".$dialog['name']."</u> */
+			SELECT COUNT(*)
 			FROM "._tableFrom($dialog)."
 			WHERE "._spisokCond($el);
 	$all = _num(query_value($sql));
@@ -171,10 +171,11 @@ function _spisokJoinField($dialog) {//подключение колонок вт
 		$fields[$cmp['col']] = 1;
 	}
 
+/*
 	//используемые колонки из дочерних диалогов
 	$sql = "SELECT `id`
 			FROM `_dialog`
-			WHERE `dialog_parent_id`=".$dialog['id'];
+			WHERE `dialog_parent_id_`=".$dialog['id'];
 	if($ids = query_ids($sql))
 		foreach(_ids($ids, 1) as $id) {
 			$dlg_child = _dialogQuery($id);
@@ -186,6 +187,7 @@ function _spisokJoinField($dialog) {//подключение колонок вт
 				$fields[$cmp['col']] = 1;
 			}
 		}
+*/
 
 	$send = '';
 	foreach($fields as $col => $r)
@@ -314,7 +316,8 @@ function _spisokInclude_($spisok, $CMP) {//вложенные списки
 		if(isset($field['dialog_id']))
 			$cond .= " AND `t1`.`dialog_id`=".$cmp['num_1'];
 */
-		$sql = "SELECT `t1`.*"._spisokJoinField($incDialog)."
+		$sql =  "/* Получение вложенного списка из диалога ".$cmp['num_1']." */".
+				"SELECT `t1`.*"._spisokJoinField($incDialog)."
 				FROM "._tableFrom($incDialog)."
 				WHERE ".$cond;
 		if(!$arr = query_arr($sql))
@@ -334,7 +337,8 @@ function _spisokInclude_($spisok, $CMP) {//вложенные списки
 function _spisokInclude($spisok) {//вложенные списки
 	if(empty($spisok))
 		return array();
-	
+
+//print_r($spisok);
 	//проверка наличия колонки dialog_id в содержании списка
 	$key = key($spisok);
 	$sp0 = $spisok[$key];
@@ -344,8 +348,8 @@ function _spisokInclude($spisok) {//вложенные списки
 	//сбор ID диалогов
 	$DLG_IDS = array();
 	foreach($spisok as $r)
-		if($r['dialog_id'])
-			$DLG_IDS[$r['dialog_id']] = 1;
+		if($dialog_id = _num(@$r['dialog_id']))
+			$DLG_IDS[$dialog_id] = 1;
 	
 	if(empty($DLG_IDS))
 		return $spisok;
@@ -442,8 +446,8 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "/* Данные списка ".$DLG['name']." */".
-		   "SELECT `t1`.*"._spisokJoinField($DLG)."
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Данные списка <u>".$DLG['name']."</u> */
+			SELECT `t1`.*"._spisokJoinField($DLG)."
 			FROM "._tableFrom($DLG)."
 			WHERE "._spisokCond($ELEM)."
 			ORDER BY ".$order."
@@ -675,17 +679,13 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
 	if(!$unit_id)
 		return array();
-
-	if($parent_id = $dialog['dialog_parent_id'])
-		if(!$dialog = _dialogQuery($parent_id))
-			return array();
-
 	if(!$dialog['table_1'])
 		return array();
 
 	$cond = "`t1`.`id`=".$unit_id;
 	$cond .= _spisokCondDef($dialog['id']);
-	$sql = "SELECT `t1`.*"._spisokJoinField($dialog)."
+	$sql = "/* ".__FUNCTION__.":".__LINE__." получение данных единицы списка */
+			SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM "._tableFrom($dialog)."
 			WHERE ".$cond;
 	return query_assoc($sql);
@@ -1624,7 +1624,9 @@ function _spisok59unit($elem_id, $unit_id) {//выбранное значени�
 	return _blockHtml('spisok', $elem_id, $unit);
 }
 
-function _spisokCmpConnectIdGet($el) {//получение id привязонного списка, если рядом стоит родительский список (для страницы, принимающей значения списка)
+function _spisokCmpConnectIdGet($el, $sel_id=0) {//получение id привязонного списка, если рядом стоит родительский список (для страницы, принимающей значения списка)
+	if($sel_id)
+		return $sel_id;
 	if($el['dialog_id'] != 29)//только для связок
 		return 0;
 	if(!$get_id = _num(@$_GET['id']))
