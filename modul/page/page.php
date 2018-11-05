@@ -131,13 +131,12 @@ function _page($i='all', $i1=0) {//получение данных страни�
 
 	//получение страницы, которая принимает значения списка
 	//  $i1 - id диалога, который вносит данные этого списка
-	if($i == 'spisok_id') {
+	if($i == 'dialog_id_unit_get') {
 		if(!$dialog_id = _num($i1))
 			return 0;
-		foreach($page as $id => $r) {
-			if($r['spisok_id'] == $dialog_id)
+		foreach($page as $id => $r)
+			if($r['dialog_id_unit_get'] == $dialog_id)
 				return $id;
-		}
 		return 0;
 	}
 
@@ -445,7 +444,7 @@ function _pageSpisokUnit($page_id, $obj_name='page') {//данные едини�
 		return array();
 
 	$page = _page($page_id);
-	if(!$dialog_id = $page['spisok_id'])
+	if(!$dialog_id = $page['dialog_id_unit_get'])
 		return array();
 
 	$pageDef = '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>';
@@ -463,7 +462,7 @@ function _pageSpisokUnit($page_id, $obj_name='page') {//данные едини�
 
 	foreach($dialog['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
 		//должен является вложенным списком
-		if($cmp['dialog_id'] != 29 && $cmp['dialog_id'] != 59)
+		if(!_elemIsConnect($cmp))
 			continue;
 
 		//должно быть присвоено имя колонки

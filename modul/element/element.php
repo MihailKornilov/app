@@ -1397,15 +1397,15 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
 
 	//принимает ли страница значения единицы списка
-	$spisok_id = 0;
+	$unit_get = 0;
 	if(BLOCK_PAGE) {
 		$page = _page(OBJ_ID);
-		$spisok_id = $page['spisok_id'];
+		$unit_get = $page['dialog_id_unit_get'];
 	}
-	define('PAGE_SPISOK_UNIT', $spisok_id);
+	define('PAGE_UNIT_GET', $unit_get);
 
 	//принимает ли диалог значения единицы списка
-	define('DIALOG_SPISOK_UNIT', 0);
+	define('DIALOG_UNIT_GET', 0);
 
 /*
 	$BL['obj_name'] = $unit['source']['unit_id'] == -115 ? 'spisok' : '';
@@ -1417,7 +1417,7 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 
 	if(BLOCK_DIALOG) {
 		$page = _page($unit['source']['page_id']);
-		$spisok_exist = $page['spisok_id'];
+		$spisok_exist = $page['dialog_id_unit_get'];
 	}
 	define('IS_SPISOK_UNIT', BLOCK_SPISOK || TD_PASTE || $spisok_exist);
 */
@@ -1539,9 +1539,9 @@ function PHP12_elem_choose_gebug($BL) {//выбор элемента - груп�
 			(BLOCK_PAGE ? OBJ_ID : '').
 		'</div>'.
 
-		'<div class="'.(PAGE_SPISOK_UNIT ? 'color-pay b' : 'pale').'">'.
-			'Страница '.(PAGE_SPISOK_UNIT ? '' : 'не ').'принимает значения списка'.
-			(PAGE_SPISOK_UNIT ? ' из диалога '.PAGE_SPISOK_UNIT : '').
+		'<div class="'.(PAGE_UNIT_GET ? 'color-pay b' : 'pale').'">'.
+			'Страница '.(PAGE_UNIT_GET ? '' : 'не ').'принимает значения списка'.
+			(PAGE_UNIT_GET ? ' из диалога '.PAGE_UNIT_GET : '').
 		'</div>'.
 
 		'<div class="mt10 '.(BLOCK_DIALOG ? 'color-pay b' : 'pale').'">'.
@@ -1549,8 +1549,8 @@ function PHP12_elem_choose_gebug($BL) {//выбор элемента - груп�
 			(BLOCK_DIALOG ? OBJ_ID : '').
 		'</div>'.
 
-		'<div class="'.(DIALOG_SPISOK_UNIT ? 'color-pay b' : 'pale').'">'.
-			'Диалог '.(DIALOG_SPISOK_UNIT ? '' : 'не ').'принимает значения списка'.
+		'<div class="'.(DIALOG_UNIT_GET ? 'color-pay b' : 'pale').'">'.
+			'Диалог '.(DIALOG_UNIT_GET ? '' : 'не ').'принимает значения списка'.
 		'</div>'.
 
 		'<div class="mt10 '.(BLOCK_SPISOK ? 'color-pay b' : 'pale').'">'.
@@ -1802,7 +1802,7 @@ function PHP12_v_choose_page($SRC, $dialog_id) {//блок со страницы
 		return 0;
 
 	$page = _page($BL['obj_id']);
-	return $page['spisok_id'];
+	return $page['dialog_id_unit_get'];
 }
 function PHP12_v_choose_spisok($SRC, $dialog_id) {//элемент единицы списка
 	if($dialog_id)
@@ -1820,7 +1820,7 @@ function PHP12_v_choose_page_spisok_unit($SRC, $dialog_id) {//страница �
 		return $dialog_id;
 
 	$page = _page($SRC['page_id']);
-	return _num($page['spisok_id']);
+	return _num($page['dialog_id_unit_get']);
 }
 function PHP12_v_choose_dialog_spisok_unit($SRC, $dialog_id) {//диалог принимает значения списка
 	if($dialog_id)
@@ -3349,7 +3349,7 @@ function _historyCondPageUnit($el) {//отображение истории дл
 		return ' AND !`id`';
 
 	//id диалога, единица списка которого размещается на странице
-	if(!$spisok_id = $page['spisok_id'])
+	if(!$dialog_id_unit_get = $page['dialog_id_unit_get'])
 		return ' AND !`id`';
 
 	if(!$unit_id = _num(@$_GET['id']))
@@ -3361,7 +3361,7 @@ function _historyCondPageUnit($el) {//отображение истории дл
 	$sql = "SELECT `block_id`,`col`
 			FROM `_element`
 			WHERE `dialog_id`=29
-			  AND `num_1`=".$spisok_id."
+			  AND `num_1`=".$dialog_id_unit_get."
 			  AND LENGTH(`col`)";
 	if($cols = query_ass($sql)) {
 		$cond = array();

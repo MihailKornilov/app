@@ -2318,7 +2318,7 @@ function _beBlockForming($arr) {//формирование массива бло
 	return $data;
 }
 function _beBlockBg($r) {
-	global $G_ELEM, $G_DLG;
+	global $G_ELEM;
 
 	$r['xx_ids'] = _idsAss($r['xx_ids']);
 
@@ -2333,13 +2333,13 @@ function _beBlockBg($r) {
 //		if($bl = $G_BLOCK[$r['obj_id']])
 //			if($el = $G_ELEM[$bl['elem_id']])
 			if($el = $G_ELEM[$r['obj_id']])
-				if($el['dialog_id'] == 14 || $el['dialog_id'] == 59)
+				if($el['dialog_id'] == 14)// || $el['dialog_id'] == 59
 					$bg70 = _num($el['num_1']);
 	if($r['obj_name'] == 'dialog')
 		$bg70 = $r['obj_id'];
 	if($r['obj_name'] == 'page')
 		if($page = _page($r['obj_id']))
-			$bg70 = $page['spisok_id'];
+			$bg70 = $page['dialog_id_unit_get'];
 
 	$r['bg70'] = $bg70;
 

@@ -739,7 +739,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в 
 	if($el['url'] != 3) {//указана конкретная страница
 		$unit_id = $unit['id'];
 		$page = _page($el['url']);
-		if($page['spisok_id'] != $unit['dialog_id'])
+		if($page['dialog_id_unit_get'] != $unit['dialog_id'])
 			if($el['dialog_id'] == 11) {
 				if(!$ids = _ids($el['txt_2'], 1))
 					return $txt;
@@ -759,7 +759,7 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в 
 	if(_table($dlg['table_1']) == '_page')
 		return '<a href="'.URL.'&p='.$unit['id'].'" class="inhr">'.$txt.'</a>';
 
-	if(!$page_id = _page('spisok_id', $dlg['id']))
+	if(!$page_id = _page('dialog_id_unit_get', $dlg['id']))
 		return $txt;
 
 	return '<a href="'.URL.'&p='.$page_id.'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
@@ -889,7 +889,7 @@ function _spisokCondBind($el) {//отображения значений еди�
 	if(!$page = _page($page_id))
 		return ' AND !`t1`.`id`';
 	//id диалога, данные единицы списка которого выводится на странице
-	if(!$dlg_id = $page['spisok_id'])
+	if(!$dlg_id = $page['dialog_id_unit_get'])
 		return ' AND !`t1`.`id`';
 	if(!$unit_id = _num(@$_GET['id']))
 		return ' AND !`t1`.`id`';
@@ -1617,12 +1617,12 @@ function _spisokCmpConnectIdGet($el, $sel_id=0) {//получение id при�
 		return 0;
 	if(!$page = _page($page_id))
 		return 0;
-	if(!$page['spisok_id'])//страница не принмает значения
+	if(!$page['dialog_id_unit_get'])//страница не принмает значения
 		return 0;
-	if($page['spisok_id'] == $el['num_1'])//если список является страницей, принимающей значение, возврат $_GET['id']
+	if($page['dialog_id_unit_get'] == $el['num_1'])//если список является страницей, принимающей значение, возврат $_GET['id']
 		return $get_id;
 
-	if(!$dlg = _dialogQuery($page['spisok_id']))
+	if(!$dlg = _dialogQuery($page['dialog_id_unit_get']))
 		return 0;
 
 	foreach($dlg['cmp'] as $cmp)
