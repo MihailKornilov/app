@@ -77,8 +77,8 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 function _blockHtml($obj_name, $obj_id, $unit=array(), $grid_id=0) {//вывод структуры блоков для конкретного объекта
 	if(!$block = _BE('block_obj', $obj_name, $obj_id))
 		return _blockName($obj_name, 'empty', $obj_id);
-	if(!is_array($unit))
-		return $unit;
+	if(!empty($unit['msg_err']))
+		return _empty($unit['msg_err']);
 
 	$width = _blockObjWidth($obj_name, $obj_id);
 
@@ -1755,7 +1755,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 				foreach($arr as $r) {
 					$id = $r['id'];
 					$bg = isset($color[$id]) ? ' style="background-color:'.$color[$id].'"' : '';
-					$c = _empty(@$count[$id]);
+					$c = _hide0(@$count[$id]);
 					$spisok .=
 						'<tr class="over1" val="'.$r['id'].'">'.
 							'<th class="w35 pad8 center"'.$bg.'>'.

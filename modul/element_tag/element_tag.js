@@ -580,7 +580,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 				if(id === undefined)
 					id = sp.id;
 				if(sp.info)
-					id = -1;
+					id = -9999999999;
 				if(id === undefined)
 					return;
 				id = _num(id, 1);
@@ -669,7 +669,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 	function valueSet(v) {//установка значения
 		if(o.multi)
 			return multiValueSet(v);
-		v = _num(v);
+		v = _num(v, 1);
 		VALUE = v;
 		t.val(v);
 		INP.val(MASS_ASS[v] ? MASS_ASS[v].replace(/&quot;/g,'"') : '');

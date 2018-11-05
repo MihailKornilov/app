@@ -422,7 +422,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		DLG('#element_dialog_func')._select({
 			width:280,
 			title0:'не указан',
-			spisok:o.dialog_spisok
+			spisok:o.dlg_spisok
 		});
 		DLG('#spisok_on')._check({
 			func:function(v) {
@@ -437,7 +437,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		DLG('#dialog_id_unit_get')._select({
 			width:250,
 			title0:'нет',
-			spisok:o.dialog_parent
+			spisok:o.dlg_unit_get
 		});
 
 		_dialogHeightCorrect(DLG);

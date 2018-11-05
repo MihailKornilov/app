@@ -405,14 +405,17 @@ function _pageUserAccessAll() {//настройка входа в приложе
 
 
 function _pageShow($page_id) {
+	define('PAGE_MSG_ERR', 'Несуществующая страница'.
+						   '<br><br>'.
+						   '<a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>'
+	);
+
 	if(!$page = _page($page_id))
-		return _contentMsg();
-
+		return _empty(PAGE_MSG_ERR);
 	if(!SA && $page['sa'])
-		return _contentMsg();
-
+		return _empty(PAGE_MSG_ERR);
 	if(!SA && !$page['access'])
-		return _contentMsg();
+		return _empty(PAGE_MSG_ERR);
 
 	if(APP_ID && !APP_ACCESS)
 		$page_id = 105;
@@ -420,69 +423,49 @@ function _pageShow($page_id) {
 	if($page_id == 105 && APP_ID && APP_ACCESS)
 		$page_id = _page('def');
 
+	$unit = _pageUnitGet($page_id);
+
+	return
+	_blockHtml('page', $page_id, $unit).
+	_page_div().
+	_pageShowScript($page_id, empty($unit['msg_err']));
+}
+function _pageShowScript($page_id, $elmActUse) {
+	if(PAS)
+		return '';
+
 	//значения элементов страницы
 	$vvvPage = array();
 	foreach(_BE('elem_ids_arr', 'page', $page_id) as $elem_id)
 		$vvvPage[$elem_id] = _elemVvv($elem_id);
 
 	return
-	_blockHtml('page', $page_id,  _pageSpisokUnit($page_id)).
-	_page_div().
 	'<script>'.
-		(!PAS ?
-			(APP_ID && USER_ID ?
-				'var FILTER='._json(_spisokFilter('page_js'), 1).';'
-			: '').
-			'var VVV_PAGE='._json($vvvPage).';'.
-			'for(var i in VVV_PAGE)VVV[i]=VVV_PAGE[i];'.
-			'_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');'
-		: '').
+	(APP_ID && USER_ID ?
+		'var FILTER='._json(_spisokFilter('page_js'), 1).';'
+	: '').
+		'var VVV_PAGE='._json($vvvPage).';'.
+		'for(var i in VVV_PAGE)VVV[i]=VVV_PAGE[i];'.
+	($elmActUse ?
+		'_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');'
+	: '').
 	'</script>';
 }
-function _pageSpisokUnit($page_id, $obj_name='page') {//данные единицы списка, которая размещается на странице. Получение по $_GET['id']
-	if($obj_name != 'page')
-		return array();
+function _pageUnitGet($page_id) {
+	$PAGE_START_MSG = '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>';
 
-	$page = _page($page_id);
+	if(!$page_id)
+		return array('msg_err'=>'Некорректный ID страницы'.$PAGE_START_MSG);
+	if(!$page = _page($page_id))
+		return array('msg_err'=>'Страницы '.$page_id.' не существует'.$PAGE_START_MSG);
 	if(!$dialog_id = $page['dialog_id_unit_get'])
 		return array();
-
-	$pageDef = '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>';
 	if(!$id = _num(@$_GET['id']))
-		return _contentMsg('Некорректный идентификатор единицы списка.'.$pageDef);
-
+		return array('msg_err'=>'Некорректный идентификатор единицы списка.'.$PAGE_START_MSG);
 	if(!$dialog = _dialogQuery($dialog_id))
-		return _contentMsg('Отсутствует диалог, который вносит данные.'.$pageDef);
-
+		return array('msg_err'=>'Отсутствует диалог, который вносит данные.'.$PAGE_START_MSG);
 	if(!$unit = _spisokUnitQuery($dialog, $id))
-		return _contentMsg('Единицы списка id'.$id.' не существует.'.$pageDef);
-
-	if(isset($dialog['field1']['deleted']) && $unit['deleted'])
-		return _contentMsg('Единица списка id'.$id.' была удалена.'.$pageDef);
-
-	foreach($dialog['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
-		//должен является вложенным списком
-		if(!_elemIsConnect($cmp))
-			continue;
-
-		//должно быть присвоено имя колонки
-		if(!$col = $cmp['col'])
-			continue;
-
-		//получение данных из вложенного списка
-		$incDialog = _dialogQuery($cmp['num_1']);
-
-		$cond = "`t1`.`id`=".$unit[$col];
-
-		$sql = "SELECT `t1`.*"._spisokJoinField($incDialog)."
-				FROM "._tableFrom($incDialog)."
-				WHERE ".$cond;
-		if(!$inc = query_assoc($sql))
-			continue;
-
-		//идентификаторы будут заменены на массив с данными единицы списка
-		$unit[$col] = $inc;
-	}
+		return array('msg_err'=>'Единицы списка id'.$id.' не существует.'.$PAGE_START_MSG);
 
 	return $unit;
 }

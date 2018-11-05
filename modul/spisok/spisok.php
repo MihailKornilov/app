@@ -419,7 +419,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	$limit = $ELEM['num_2'];
 
 	if(!$all = _spisokCountAll($ELEM, $next))
-		return '<div class="_empty min">'._br($ELEM['txt_1']).'</div>';
+		return _emptyMin(_br($ELEM['txt_1']));
 
 	$IS_SORT = _spisokIsSort($ELEM['id']);
 
@@ -534,7 +534,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		$limit = 1000;
 
 	if(!$all = _spisokCountAll($ELEM))
-		return '<div class="_empty min">'._br($ELEM['txt_1']).'</div>';
+		return _emptyMin(_br($ELEM['txt_1']));
 
 	$order = "`t1`.`id` DESC";
 	if($ELEM['num_6'] || _spisokIsSort($ELEM['block_id']))
@@ -664,13 +664,41 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 	if(!$dialog['table_1'])
 		return array();
 
-	$cond = "`t1`.`id`=".$unit_id;
-	$cond .= _spisokCondDef($dialog['id']);
 	$sql = "/* ".__FUNCTION__.":".__LINE__." получение данных единицы списка */
 			SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM "._tableFrom($dialog)."
-			WHERE ".$cond;
-	return query_assoc($sql);
+			WHERE `t1`.`id`=".$unit_id.
+				  _spisokCondDef($dialog['id']);
+	if(!$unit = query_assoc($sql))
+		return array();
+
+	foreach($dialog['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
+		//должен является вложенным списком
+		if(!_elemIsConnect($cmp))
+			continue;
+		//должно быть присвоено имя колонки
+		if(!$col = $cmp['col'])
+			continue;
+		//должен быть идентификатор
+		if(!$uid = $unit[$col])
+			continue;
+		//диалог вложенного списка вложенного списка
+		if(!$DLG_INC = _dialogQuery($cmp['num_1']))
+			continue;
+
+		$sql = "SELECT `t1`.*"._spisokJoinField($DLG_INC)."
+				FROM "._tableFrom($DLG_INC)."
+				WHERE `t1`.`id`=".$uid.
+					_spisokCondDef($cmp['num_1']);
+		if(!$inc = query_assoc($sql))
+			continue;
+
+		//идентификаторы будут заменены на массив с данными единицы списка
+		$unit[$col] = $inc;
+	}
+
+	return $unit;
+
 }
 function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
 	if(empty($u['id']))
@@ -894,9 +922,8 @@ function _spisokCondBind($el) {//отображения значений еди�
 	if(!$unit_id = _num(@$_GET['id']))
 		return ' AND !`t1`.`id`';
 	//получение данных единицы списка, которое принимает страница
-	if(!$unit = _pageSpisokUnit($page_id))
+	if(!$unit = _pageUnitGet($page_id))
 		return ' AND !`t1`.`id`';
-
 
 	if(!$col = $EL['col'])
 		return ' AND !`t1`.`id`';

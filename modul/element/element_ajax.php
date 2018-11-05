@@ -215,7 +215,7 @@ switch(@$_POST['op']) {
 					'<tr class="tr-spisok-col'._dn($dialog['spisok_on']).'">'.
 						'<td class="grey r">Колонка по умолчанию:'.
 						'<td><input type="hidden" id="spisok_elem_id" value="'.$dialog['spisok_elem_id'].'" />'.
-					'<tr><td class="grey r">Принимает значения списка:'.
+					'<tr><td class="grey r">Принимает данные<br>единицы списка:'.
 						'<td><input type="hidden" id="dialog_id_unit_get" value="'.$dialog['dialog_id_unit_get'].'" />'.
 				'</table>'.
 			'</div>'.
@@ -387,9 +387,17 @@ switch(@$_POST['op']) {
 		$send['tables'] = SA ? _table() : array();
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
-		$send['dialog_spisok'] = SA ? _dialogSelArray('sa_only') : array();
+		$send['dlg_spisok'] = SA ? _dialogSelArray('sa_only') : array();
 		$send['spisok_cmp'] = _dialogSpisokCmp($dialog['cmp']);
-		$send['dialog_parent'] = _dialogSelArray($dialog_id);
+
+		$dlgUnitGet = _dialogSelArray('spisok_only', $dialog_id);
+		array_unshift($dlgUnitGet, array(
+			'id' => -1,
+			'title' => 'Совпадает с текущей страницей',
+			'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
+						 '<div class="fs12 grey ml10 mt3 i">Диалог будет принимать данные единицы списка, которые принимает страница</div>'
+		));
+		$send['dlg_unit_get'] = $dlgUnitGet;
 
 		jsonSuccess($send);
 		break;
@@ -861,7 +869,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 		jsonError('Укажите имя диалогового окна');
 	$spisok_elem_id = $spisok_on ? _num($_POST['spisok_elem_id']) : 0;
 
-	$dialog_id_unit_get = _num($_POST['dialog_id_unit_get']);
+	$dialog_id_unit_get = _num($_POST['dialog_id_unit_get'], 1);
 	if($dialog_id_unit_get == $dialog_id)
 		jsonError('Диалог не может принимать значения самого себя');
 
@@ -967,6 +975,7 @@ function _dialogOpenLoad($dialog_id) {
 	define('ACT', _dialogOpenAct($unit_id));
 
 	$unit = _dialogOpenUnitGet($dialog, $unit_id);
+//	$unit = _unitGet($dialog, $unit_id);
 
 	$block_id = _dialogOpenBlockIdSet($dialog, $unit);
 
@@ -1087,13 +1096,13 @@ function _dialogOpenUnitGet($dlg, $unit_id) {//получение данных �
 		jsonError('Нет доступа');
 	if(@$unit['deleted'])
 		jsonError('Запись была удалена');
-
+/*
 	//единица списка от другого диалога
-	if($dlg['id'] != $unit['dialog_id']) {
+	if(isset($unit['dialog_id']) && $dlg['id'] != $unit['dialog_id']) {
 		$unit['accept'] = $dlg['id'];
 		$dlg = _dialogQuery($unit['dialog_id']);
 	}
-
+*/
 	foreach($dlg['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
 		//должен является вложенным списком
 		if(!_elemIsConnect($cmp))

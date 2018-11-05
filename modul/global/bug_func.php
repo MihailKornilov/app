@@ -64,7 +64,7 @@ function PHP12_BUG_block_page_lost() {//потерянные блоки от н�
 		'<tr><td class="grey">Кол-во всех блоков на страницах:<td class="r">'.$pageBlkCount.
 ($blkLostCount ?
 		'<tr><td class="color-ref">Кол-во удалённых страниц, от которых остались блоки:<td class="r red">'._ids($pageDelIds, 'count_empty').
-		'<tr><td class="color-ref">Кол-во потерянных блоков:<td class="r b red">'._empty($blkLostCount)
+		'<tr><td class="color-ref">Кол-во потерянных блоков:<td class="r b red">'._hide0($blkLostCount)
 : '').
 	'</table>'.
 
@@ -184,17 +184,17 @@ function PHP12_BUG_block_dialog_lost() {//потерянные блоки от �
 		'<tr><td class="grey b">Кол-во всех диалогов:<td class="r b">'.$dlgCount.'<td>'.
 		'<tr><td class="grey">Кол-во диалогов, заполненных блоками:'.
 			'<td class="r">'.$dlgBlkDstCount.
-			'<td class="r w35'._tooltip('Содержание удаления', -60)._empty($dlgDelBlkDstCount).
+			'<td class="r w35'._tooltip('Содержание удаления', -60)._hide0($dlgDelBlkDstCount).
 		'<tr><td class="grey">Кол-во блоков во всех диалогах:'.
 			'<td class="r">'.$dlgBlkCount.
-			'<td class="r'._tooltip('Содержание удаления', -60)._empty($dlgDelBlkCount).
+			'<td class="r'._tooltip('Содержание удаления', -60)._hide0($dlgDelBlkCount).
 ($blkLostCount || $blkDelLostCount ?
 		'<tr><td class="color-ref">Кол-во удалённых диалогов, от которых остались блоки:'.
 			'<td class="r red">'._ids($dlgLostIds, 'count_empty').
 			'<td class="r red">'._ids($dlgDelLostIds, 'count_empty').
 		'<tr><td class="color-ref">Кол-во потерянных блоков:'.
-			'<td class="r b red">'._empty($blkLostCount).
-			'<td class="r b red">'._empty($blkDelLostCount)
+			'<td class="r b red">'._hide0($blkLostCount).
+			'<td class="r b red">'._hide0($blkDelLostCount)
 : '').
 	'</table>'.
 
@@ -270,7 +270,7 @@ function PHP12_BUG_block_spisok_lost() {//потерянные блоки от �
 		'<tr><td class="grey">Кол-во блоков во всех списках:<td class="r">'.$spisokBlkCount.
 ($blkLostCount ?
 		'<tr><td class="color-ref">Кол-во удалённых списков, от которых остались блоки:<td class="r red">'._ids($spisokDelIds, 'count_empty').
-		'<tr><td class="color-ref">Кол-во потерянных блоков:<td class="r b red">'._empty($blkLostCount)
+		'<tr><td class="color-ref">Кол-во потерянных блоков:<td class="r b red">'._hide0($blkLostCount)
 : '').
 	'</table>'.
 
@@ -381,7 +381,7 @@ function PHP12_BUG_elm_child_without_parent() {//дочерние элемент
 	'<table class="_stab mt5">'.
 		'<tr><td class="grey b">Кол-во всех дочерних элементов:<td class="r b">'.$elmCount.
 ($childLostCount ?
-		'<tr><td class="color-ref">Кол-во элементов с несуществующими родителями:<td class="r red">'._empty($childLostCount)
+		'<tr><td class="color-ref">Кол-во элементов с несуществующими родителями:<td class="r red">'._hide0($childLostCount)
 : '').
 	'</table>'.
 

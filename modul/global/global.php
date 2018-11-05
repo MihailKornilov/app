@@ -123,7 +123,6 @@ function _tableFrom($dialog) {//составление таблиц для за�
 	return $send;
 }
 
-
 function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
 	$key = 'app'.$app_id;
 	if(!$arr = _cache_get($key)) {
@@ -269,7 +268,7 @@ function _msgRed($msg) {//сообщение об ошибке красного 
 		return '';
 	return '<div class="fs10 red">'.$msg.'</div>';
 }
-function _empty($v) {//возвращает пустоту, если значение 0 или негатив
+function _hide0($v) {//возвращает пустоту, если значение 0 или негатив
 	return $v ? $v : '';
 }
 
@@ -568,6 +567,13 @@ function _arrNum($arr) {//переделка значений массива в 
 	}
 
 	return $arr;
+}
+
+function _empty($msg) {//Информация на сером фоне
+	return '<div class="_empty mar20">'.$msg.'</div>';
+}
+function _emptyMin($msg, $mar=10) {
+	return '<div class="_empty min'.($mar ? ' mar'.$mar : '').'">'.$msg.'</div>';
 }
 
 

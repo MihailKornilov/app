@@ -70,8 +70,13 @@ function _colorJS() {//массив цветов для текста в форм
 	'}';
 }
 
-function _emptyMin($msg, $mar=10) {
-	return '<div class="_empty min'.($mar ? ' mar'.$mar : '').'">'.$msg.'</div>';
+function _unitGet($obj_name, $obj_id) {//данные единицы списка, которые принимают Страница или Диалог
+	if($obj_name == 'page')
+		return _pageUnitGet($obj_id);
+	if($obj_name != 'dialog')
+		return array();
+
+	return array();
 }
 
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
@@ -325,7 +330,7 @@ function _dialogSpisokOnConnect($block_id, $elem_id) {//получение ди�
 
 	return $send;
 }
-function _dialogSelArray($v=false) {//список диалогов для Select - отправка через AJAX
+function _dialogSelArray($v=0, $v1=0) {//список диалогов для Select - отправка через AJAX
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id` IN (".APP_ID.(SA ? ',0' : '').")
@@ -336,10 +341,13 @@ function _dialogSelArray($v=false) {//список диалогов для Selec
 
 	$spisok = array();
 	$sa_only = $v == 'sa_only';
+	$spisok_only = $v == 'spisok_only';
 	$saFlag = $sa_only;
-	$skip = _num($v);//id диалога, который нужно пропустить
+	$skip = _num($v1);//id диалога, который нужно пропустить
 	foreach($arr as $r) {
 		if($r['id'] == $skip)
+			continue;
+		if($spisok_only && !$r['spisok_on'])
 			continue;
 		if(!$saFlag && !$r['app_id']) {//вставка графы для SA
 			$spisok[] = array(
@@ -574,9 +582,9 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 					'<tr><td class="grey r w200">Пользователи:<td class="center w70">'.$userCount.
 					'<tr><td class="grey r">Страницы:<td class="center">'._ids($pageIds, 'count_empty').
 					'<tr><td class="grey r">Диалоги:<td class="center">'._ids($dlgIds, 'count_empty').
-					'<tr><td class="grey r">Вспомогательные элементы:<td class="center">'._empty($elmValCount).
+					'<tr><td class="grey r">Вспомогательные элементы:<td class="center">'._hide0($elmValCount).
 					'<tr><td class="grey r">Элементы истории действий:<td class="center">'._ids($dlgHist, 'count_empty').
-					'<tr><td class="grey r">Функции:<td class="center">'._empty($elmFunc).
+					'<tr><td class="grey r">Функции:<td class="center">'._hide0($elmFunc).
 				'</table>'.
 			'<td class="top pl10">'.
 				'<table class="_stab small">'.
@@ -589,17 +597,17 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 						'<td>списки'.
 					'<tr class="center">'.
 						'<td class="grey r">Блоки:'.
-						'<td class="b">'._empty($blkCount).
+						'<td class="b">'._hide0($blkCount).
 						'<td>'._ids($blkPageIds, 'count_empty').
 						'<td>'._ids($blkDlgIds, 'count_empty').
 						'<td>'._ids($blkDlgDelIds, 'count_empty').
 						'<td>'._ids($blkSpisokIds, 'count_empty').
 					'<tr class="center">'.
 						'<td class="grey r">Элементы:'.
-						'<td class="b">'._empty($emlCount).
-						'<td>'._empty($elmPageCount).
-						'<td>'._empty($elmDlgCount).
-						'<td>'._empty($elmDlgDelCount).
+						'<td class="b">'._hide0($emlCount).
+						'<td>'._hide0($elmPageCount).
+						'<td>'._hide0($elmDlgCount).
+						'<td>'._hide0($elmDlgDelCount).
 						'<td>'._ids($elmSpIds, 'count_empty').
 				'</table>'.
 	'</table>'.
@@ -607,10 +615,10 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 
 	'<div class="mt15 fs14">Данные:</div>'.
 	'<table class="_stab small mt5 ml10">'.
-		'<tr><td class="grey r w150">В списках:<td class="center w70">'._empty($spCount).
-		'<tr><td class="grey r">История действий:<td class="center">'._empty($histCount).
-		'<tr><td class="grey r">Изображения:<td class="center">'._empty($imgCount).
-		'<tr><td class="grey r">Заметки:<td class="center">'._empty($noteCount).
+		'<tr><td class="grey r w150">В списках:<td class="center w70">'._hide0($spCount).
+		'<tr><td class="grey r">История действий:<td class="center">'._hide0($histCount).
+		'<tr><td class="grey r">Изображения:<td class="center">'._hide0($imgCount).
+		'<tr><td class="grey r">Заметки:<td class="center">'._hide0($noteCount).
 	'</table>'.
 	'';
 }
@@ -1870,7 +1878,7 @@ function PHP12_block_choose($el, $unit) {
 	//запрет изменения уровня блоков. Только верхний (первый) уровень
 	$level_deny = _num(@$PRM['level_deny']);
 
-	$unit += _pageSpisokUnit($obj_id, $obj_name);
+	$unit += _unitGet($obj_name, $obj_id);
 	$unit += array(
 		'blk_choose' => 1,
 		'blk_level' => $level_deny ? 1 : _blockLevelDefine($obj_name),
@@ -3166,7 +3174,7 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 					$hidden = true;
 					break;
 				}
-				if($cmp['dialog_id'] == 29 || $cmp['dialog_id'] == 59) {
+				if(_elemIsConnect($cmp)) {
 					$name = $cmp['name'];
 					break;
 				}
