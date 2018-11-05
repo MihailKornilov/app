@@ -215,11 +215,8 @@ switch(@$_POST['op']) {
 					'<tr class="tr-spisok-col'._dn($dialog['spisok_on']).'">'.
 						'<td class="grey r">Колонка по умолчанию:'.
 						'<td><input type="hidden" id="spisok_elem_id" value="'.$dialog['spisok_elem_id'].'" />'.
-					'<tr class="'._dn($dialog['dialog_parent_id']).'">'.
-						'<td class="grey r">Родительский диалог:'.
-						'<td><input type="hidden" id="dialog_parent_id" value="'.$dialog['dialog_parent_id'].'" />'.
 					'<tr><td class="grey r">Принимает значения списка:'.
-						'<td><input type="hidden" id="dialog_id_unit" value="'.$dialog['dialog_id_unit'].'" />'.
+						'<td><input type="hidden" id="dialog_id_unit_get" value="'.$dialog['dialog_id_unit_get'].'" />'.
 				'</table>'.
 			'</div>'.
 
@@ -864,12 +861,8 @@ function _dialogSave($dialog_id) {//сохранение диалога
 		jsonError('Укажите имя диалогового окна');
 	$spisok_elem_id = $spisok_on ? _num($_POST['spisok_elem_id']) : 0;
 
-	$dialog_parent_id = _num($_POST['dialog_parent_id']);
-	if($dialog_parent_id == $dialog_id)
-		jsonError('Диалог не может быть родительским для себя');
-
-	$dialog_id_unit = _num($_POST['dialog_id_unit']);
-	if($dialog_id_unit == $dialog_id)
+	$dialog_id_unit_get = _num($_POST['dialog_id_unit_get']);
+	if($dialog_id_unit_get == $dialog_id)
 		jsonError('Диалог не может принимать значения самого себя');
 
 	$width_auto = _num($_POST['width_auto']);
@@ -927,13 +920,12 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`del_action_id`=".$del_action_id.",
 				`del_action_page_id`=".$del_action_page_id.",
 
-				`dialog_parent_id`=".$dialog_parent_id.",
 				`table_1`=".$table_1.",
 				`table_2`=".$table_2.",
 				`table_2_field`='".addslashes($table_2_field)."',
 				`spisok_on`=".$spisok_on.",
 				`spisok_elem_id`=".$spisok_elem_id.",
-				`dialog_id_unit`=".$dialog_id_unit.",
+				`dialog_id_unit_get`=".$dialog_id_unit_get.",
 
 				`element_group_id`=".$element_group_id.",
 				`element_width`=".$element_width.",
@@ -1051,10 +1043,10 @@ function _dialogOpenLoad($dialog_id) {
 //	print_r($unit);
 
 	//если диалог принимает значение единицы списка, проверка, чтобы эта единица списка была и соответстовала принимаемому диалогу
-	if(!$msgErr && $dialog['dialog_id_unit']) {
+	if(!$msgErr && $dialog['dialog_id_unit_get']) {
 		if(!$unit_id)
 			$msgErr = 'Не получен идентификатор единицы списка.';
-		elseif($dialog['dialog_id_unit'] != $unit['dialog_id'])
+		elseif($dialog['dialog_id_unit_get'] != $unit['dialog_id'])
 			$msgErr = 'Единицы списка '.$unit_id.' не существует.';
 	}
 

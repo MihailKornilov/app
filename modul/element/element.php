@@ -1832,7 +1832,7 @@ function PHP12_v_choose_dialog_spisok_unit($SRC, $dialog_id) {//диалог п�
 	if(!$dlg = _dialogQuery($BL['obj_id']))
 		return 0;
 
-	return _num($dlg['dialog_id_unit']);
+	return _num($dlg['dialog_id_unit_get']);
 }
 
 

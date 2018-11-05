@@ -171,24 +171,6 @@ function _spisokJoinField($dialog) {//подключение колонок вт
 		$fields[$cmp['col']] = 1;
 	}
 
-/*
-	//используемые колонки из дочерних диалогов
-	$sql = "SELECT `id`
-			FROM `_dialog`
-			WHERE `dialog_parent_id_`=".$dialog['id'];
-	if($ids = query_ids($sql))
-		foreach(_ids($ids, 1) as $id) {
-			$dlg_child = _dialogQuery($id);
-			foreach($dlg_child['cmp'] as $cmp) {
-				if($cmp['table_num'] != 2)
-					continue;
-				if(empty($cmp['col']))
-					continue;
-				$fields[$cmp['col']] = 1;
-			}
-		}
-*/
-
 	$send = '';
 	foreach($fields as $col => $r)
 		$send .= ',`t2`.`'.$col.'`';

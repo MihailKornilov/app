@@ -434,12 +434,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			title0:'не указана',
 			spisok:o.spisok_cmp
 		});
-		DLG('#dialog_parent_id')._select({
-			width:250,
-			title0:'нет',
-			spisok:o.dialog_parent
-		});
-		DLG('#dialog_id_unit')._select({
+		DLG('#dialog_id_unit_get')._select({
 			width:250,
 			title0:'нет',
 			spisok:o.dialog_parent
@@ -501,10 +496,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 				del_action_id:DLG('#del_action_id').val(),
 				del_action_page_id:DLG('#del_action_page_id').val(),
 
-				dialog_parent_id:DLG('#dialog_parent_id').val(),
 				spisok_on:DLG('#spisok_on').val(),
 				spisok_elem_id:DLG('#spisok_elem_id').val(),
-				dialog_id_unit:DLG('#dialog_id_unit').val(),
+				dialog_id_unit_get:DLG('#dialog_id_unit_get').val(),
 
 				table_1:DLG('#table_1').val(),
 				table_2:DLG('#table_2').val(),
