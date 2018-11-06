@@ -191,7 +191,7 @@ function _spisokElemCount($r) {//формирование элемента с с
 
 	//если результат нулевой, выводится сообщение из элемента, который размещает список
 	if(!$all = _spisokCountAll($elem))
-		return $elem['txt_1'];
+		return $r['txt_7'];
 
 	return
 	_end($all, $r['txt_1'], $r['txt_3'], $r['txt_5']).
