@@ -70,13 +70,31 @@ function _colorJS() {//массив цветов для текста в форм
 	'}';
 }
 
-function _unitGet($obj_name, $obj_id) {//данные единицы списка, которые принимают Страница или Диалог
+function _unitGet($obj_name, $obj_id, $unit_id=0) {//данные единицы списка, которые принимают Страница или Диалог
 	if($obj_name == 'page')
 		return _pageUnitGet($obj_id);
 	if($obj_name != 'dialog')
 		return array();
 
-	return array();
+	if(!$obj_id)
+		return array('msg_err'=>'Некорректный ID диалога');
+	if(!$DLG = _dialogQuery($obj_id))
+		return array('msg_err'=>'Диалога '.$obj_id.' не существует');
+
+	if(!$dialog_id_unit_get = $DLG['dialog_id_unit_get']) {
+		if(!$unit_id)
+			return array();
+		if(!$unit = _spisokUnitQuery($DLG, $unit_id))
+			return array('msg_err'=>'Записи id'.$unit_id.' не существует.');
+		return $unit;
+	}
+
+
+	if($dialog_id_unit_get == -1)
+		_pageUnitGet(_page('cur'));
+
+
+	return array('msg_err'=>'ОК');
 }
 
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
@@ -340,8 +358,8 @@ function _dialogSelArray($v=0, $v1=0) {//список диалогов для Se
 		return array();
 
 	$spisok = array();
-	$sa_only = $v == 'sa_only';
-	$spisok_only = $v == 'spisok_only';
+	$sa_only = $v === 'sa_only';
+	$spisok_only = $v === 'spisok_only';
 	$saFlag = $sa_only;
 	$skip = _num($v1);//id диалога, который нужно пропустить
 	foreach($arr as $r) {
@@ -875,9 +893,11 @@ function _elemVvv($elem_id, $src=array()) {
 			}
 			return _dialogSpisokOn($dialog_id, $block_id, $elem_id);//все списки приложения
 
-		//select - выбор единицы из другого списка (для связки)
+		//select - выбор записи из другого списка (для связки)
 		case 29:
-			$sel_id = 0;
+			$sel_id = 0; //ID выбранной записи при редактировании
+
+/*
 			if($unit_id) {
 				if(@$unit['accept'])
 					$sel_id = $unit_id;
@@ -888,7 +908,7 @@ function _elemVvv($elem_id, $src=array()) {
 			}
 
 			$sel_id = _spisokCmpConnectIdGet($el, $sel_id);
-
+*/
 			return _29cnn($elem_id, '', $sel_id);
 
 		//SA: select - выбор имени колонки

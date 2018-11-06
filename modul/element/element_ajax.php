@@ -974,8 +974,17 @@ function _dialogOpenLoad($dialog_id) {
 
 	define('ACT', _dialogOpenAct($unit_id));
 
-	$unit = _dialogOpenUnitGet($dialog, $unit_id);
-//	$unit = _unitGet($dialog, $unit_id);
+	//флаг ошибки. Если установлен, то при открытии диалога функции к элементам не применяются
+	$send['err'] = 0;
+	$msgErr = '';
+
+	//	$unit = _dialogOpenUnitGet($dialog, $unit_id);
+	$unit = _unitGet('dialog', $dialog_id, $unit_id);
+	if(!empty($unit['msg_err'])) {
+		$msgErr = $unit['msg_err'];
+		$unit = array();
+	}
+
 
 	$block_id = _dialogOpenBlockIdSet($dialog, $unit);
 
@@ -1008,10 +1017,6 @@ function _dialogOpenLoad($dialog_id) {
 	$send['elm_ids'] = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
 	$send['unit'] = _arrNum($unit);
-
-	//флаг ошибки. Если установлен, то при открытии диалога функции к элементам не применяются
-	$send['err'] = 0;
-	$msgErr = '';
 
 	//заполнение значениями некоторых компонентов
 	$send['vvv'] = array();
@@ -1050,7 +1055,7 @@ function _dialogOpenLoad($dialog_id) {
 
 //	print_r($dialog);
 //	print_r($unit);
-
+/*
 	//если диалог принимает значение единицы списка, проверка, чтобы эта единица списка была и соответстовала принимаемому диалогу
 	if(!$msgErr && $dialog['dialog_id_unit_get']) {
 		if(!$unit_id)
@@ -1058,7 +1063,7 @@ function _dialogOpenLoad($dialog_id) {
 		elseif($dialog['dialog_id_unit_get'] != $unit['dialog_id'])
 			$msgErr = 'Единицы списка '.$unit_id.' не существует.';
 	}
-
+*/
 	if($msgErr) {
 		$send['html'] = '<div class="pad10"><div class="_empty">'.$msgErr.'</div></div>';
 		$send['button_submit'] = '';

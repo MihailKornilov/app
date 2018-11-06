@@ -465,7 +465,7 @@ function _pageUnitGet($page_id) {
 	if(!$dialog = _dialogQuery($dialog_id))
 		return array('msg_err'=>'Отсутствует диалог, который вносит данные.'.$PAGE_START_MSG);
 	if(!$unit = _spisokUnitQuery($dialog, $id))
-		return array('msg_err'=>'Единицы списка id'.$id.' не существует.'.$PAGE_START_MSG);
+		return array('msg_err'=>'Записи id'.$id.' не существует.'.$PAGE_START_MSG);
 
 	return $unit;
 }
