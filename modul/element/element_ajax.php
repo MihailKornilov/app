@@ -1,6 +1,6 @@
 <?php
 switch(@$_POST['op']) {
-	case 'dialog_edit_load':
+	case 'dialog_setup_load'://получение данных диалога для его настройки
 		if(!$dialog_id = _num($_POST['dialog_id']))
 			jsonError('Некорректный ID диалогового окна');
 		if(!$dialog = _dialogQuery($dialog_id))
@@ -401,7 +401,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'dialog_save'://сохранение диалогового окна
+	case 'dialog_setup_save'://сохранение диалогового окна
 		if(!$dialog_id = _num($_POST['dialog_id']))
 			jsonError('Некорректный ID диалогового окна');
 
@@ -969,157 +969,101 @@ function _dialogSave($dialog_id) {//сохранение диалога
 function _dialogOpenLoad($dialog_id) {
 	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('Диалога не существует');
+
+	$send = array(
+		'dialog_id' => $dialog_id,
+		'setup_access' => _dialogSetupAccess($dialog)
+	);
+
+	/* --- Удаление записи --- */
 	if($del_id = _num(@$_POST['del_id']))
-		return _dialogOpenUnitDel($dialog, $del_id);
+		return $send + _dialogOpenUnitDel($dialog, $del_id);
 
-	$unit_id = _num(@$_POST['unit_id']);
+	$src = _dialogOpenSrc($dialog_id);
+	$send += array(
+		'width' => $dialog['width_auto'] ? 0 : _num($dialog['width']),
+		'src' => $src,
+		'elm_ids' => _BE('elem_ids_arr', 'dialog', $dialog_id),
+		'edit_id' => 0,         //id редактируемой записи
+		'edit_arr' => array()   //редактируемая запись в виде массива
+	);
 
-	define('ACT', _dialogOpenAct($unit_id));
+	/* --- Редактирование записи --- */
+	if($edit_id = _num(@$_POST['edit_id']))
+		return _dialogOpenUnitEdit($send, $dialog, $edit_id);
 
-	//Сообщение об ошибке.
-	//Если сообщение есть:
-	//  1. Передаётся флаг ошибки
-	//  2. Выводится сообщение с содержанием ошибки
-	//  3. Функции к элементам не применяются
-	$MSG_ERR = '';
 
-	//	$unit = _dialogOpenUnitGet($dialog, $unit_id);
-	$unit = _unitGet('dialog', $dialog_id, $unit_id);
-	if(!empty($unit['msg_err'])) {
-		$MSG_ERR = $unit['msg_err'];
-		$unit = array();
-	}
 
-	$send['page_id'] = _num(@$_POST['page_id']);
-	$send['dialog_id'] = $dialog_id;
-	$send['block_id'] = _dialogOpenBlockIdSet($dialog, $unit);;
-	$send['unit_id'] = $unit_id;
-	$send['dialog_source'] = _num(@$_POST['dialog_source']);
+	/* --- Внесение новой записи --- */
 
-	//исходные данные, полученные для открытия диалога
-	$unit['source'] = $send;
-
-	//дополнительные параметры
-	$PRM = isset($_POST['prm']) ? _arrNum($_POST['prm']) : array();
-	if(!isset($PRM['sev']))//выбор нескольких значений
-		$PRM['sev'] = 0;
-	if(!isset($PRM['nest']))//выбор значения из вложенного списка
-		$PRM['nest'] = 1;
-	$unit['source']['prm'] = $PRM;
-
-	$send['act'] = ACT;
-
-	//права для редактирования диалога
-	$send['edit_access'] = _num(@SA) || $dialog['app_id'] && $dialog['app_id'] == APP_ID ? 1 : 0;
-
-	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 	$send['col_type'] = _elemColType($dialog['element_type']);
-	$send['head'] = $dialog[ACT.'_head'];
-	$send['button_submit'] = $dialog[ACT.'_button_submit'];
-	$send['button_cancel'] = $dialog[ACT.'_button_cancel'];
-	$send['html'] = _blockHtml('dialog', $dialog_id, $unit);
+	$send['head'] = $dialog['insert_head'];
+	$send['button_submit'] = $dialog['insert_button_submit'];
+	$send['button_cancel'] = $dialog['insert_button_cancel'];
+	$send['vvv'] = _dialogOpenVvv($dialog_id, $src);
+	$send['html'] = _blockHtml('dialog', $dialog_id, array('src'=>$src));
 
-	$send['elm_ids'] = _BE('elem_ids_arr', 'dialog', $dialog_id);
+	if(!$dialog['insert_on'])
+		return _dialogOpenErr($send, 'Внесение новой записи запрещено.');
 
-	$send['unit'] = _arrNum($unit);
-
-	//заполнение значениями некоторых компонентов
-	$send['vvv'] = array();
-	foreach($send['elm_ids'] as $elem_id)
-		$send['vvv'][$elem_id] = _elemVvv($elem_id, $send);
-
-
-	//проверка доступа внесения новой записи
-	if(ACT == 'insert' && !$dialog['insert_on'])
-		$MSG_ERR = 'Внесение новой записи запрещено.';
-
-	//проверка доступа редактирования записи
-	if(ACT == 'edit' && !$dialog['edit_on'])
-		$MSG_ERR = 'Редактирование запрещено.';
-
-//	print_r($dialog);
-//	print_r($unit);
-/*
-	//если диалог принимает значение единицы списка, проверка, чтобы эта единица списка была и соответстовала принимаемому диалогу
-	if(!$MSG_ERR && $dialog['dialog_id_unit_get']) {
-		if(!$unit_id)
-			$MSG_ERR = 'Не получен идентификатор единицы списка.';
-		elseif($dialog['dialog_id_unit_get'] != $unit['dialog_id'])
-			$MSG_ERR = 'Единицы списка '.$unit_id.' не существует.';
-	}
-*/
 	return $send;
 }
-function _dialogOpenAct($unit_id) {//вид действия открываемого диалога
-	if(_num(@$_POST['del']))
-		return 'del';
-	return $unit_id ? 'edit' : 'insert';
+function _dialogOpenSrc($dialog_id) {//некоторые исходные данные диалога
+	//дополнительные параметры
+	$PRM = isset($_POST['prm']) ? _arrNum($_POST['prm']) : array();
+	//выбор нескольких значений
+	if(!isset($PRM['sev']))
+		$PRM['sev'] = 0;
+	//выбор значения из вложенного списка
+	if(!isset($PRM['nest']))
+		$PRM['nest'] = 1;
+
+	return array(
+		'dialog_id' => $dialog_id,
+		'dialog_source' => _num(@$_POST['dialog_source']),
+		'page_id' => _num(@$_POST['page_id']),
+		'block_id' => _num(@$_POST['block_id'], 1),
+
+		'edit_id' => 0,
+		'edit_arr' => array(),
+
+		'get_id' => _num(@$_POST['get_id']),
+
+		'prm' => $PRM,
+	);
 }
-function _dialogOpenUnitGet($dlg, $unit_id) {//получение данных единицы списка
-	if(!$unit_id)
-		return array();
+function _dialogOpenVvv($dialog_id, $src) {//заполнение значениями компонентов
+	$send = array();
+	$arr = _BE('elem_ids_arr', 'dialog', $dialog_id);
+	foreach($arr as $elem_id)
+		$send[$elem_id] = _elemVvv($elem_id, $src);
+	return $send;
+}
+function _dialogOpenUnitEdit($send, $dialog, $edit_id) {//вывод содержания при редактировании записи
+	$send['head'] = $dialog['edit_head'];
 
-	$cond = "`t1`.`id`=".$unit_id;
-	if(isset($dlg['field1']['app_id']))
-		$cond .= " AND `app_id` IN (0,".APP_ID.")";
+	if(!$dialog['edit_on'])
+		return _dialogOpenErr($send, 'Редактирование записи запрещено.');
+	if(!$unit = _spisokUnitQuery($dialog, $edit_id))
+		return _dialogOpenErr($send, 'Записи '.$edit_id.' не существует.');
 
-	if(isset($dlg['field2']['app_id']))
-		$cond .= " AND `t2`.`app_id` IN (0,".APP_ID.")";
-	if(isset($dlg['field2']['dialog_id']))
-		$cond .= " AND `t2`.`dialog_id`=".$dlg['id'];
+	$send['edit_id'] = $edit_id;
+	$send['edit_arr'] = _arrNum($unit);
+	$send['src']['edit_id'] = $edit_id;
+	$send['src']['edit_arr'] = _arrNum($unit);
+	$send['src']['block_id'] = _dialogOpenBlockIdSet($send['src']['block_id'], $dialog, $unit);
+	$send['vvv'] = _dialogOpenVvv($dialog['id'], $send['src']);
+	$send['button_submit'] = $dialog['edit_button_submit'];
+	$send['button_cancel'] = $dialog['edit_button_cancel'];
+	$send['html'] = _blockHtml('dialog', $dialog['id'], $unit);
 
-	$sql = "/* ".__FUNCTION__.":".__LINE__." получение данных единицы списка dialog_id=".$dlg['id']." */
-			SELECT `t1`.*"._spisokJoinField($dlg)."
-			FROM "._tableFrom($dlg)."
-			WHERE ".$cond;
-	if(!$unit = query_assoc($sql))
-		jsonError('Записи не существует');
-	if(@$unit['sa'] && !SA)
-		jsonError('Нет доступа');
-	if(@$unit['deleted'])
-		jsonError('Запись была удалена');
-/*
-	//единица списка от другого диалога
-	if(isset($unit['dialog_id']) && $dlg['id'] != $unit['dialog_id']) {
-		$unit['accept'] = $dlg['id'];
-		$dlg = _dialogQuery($unit['dialog_id']);
-	}
-*/
-	foreach($dlg['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
-		//должен является вложенным списком
-		if(!_elemIsConnect($cmp))
-			continue;
-		//должно быть присвоено имя колонки
-		if(!$col = $cmp['col'])
-			continue;
-		//должен быть идентификатор
-		if(!$uid = $unit[$col])
-			continue;
-
-		//получение данных из вложенного списка
-		$incDialog = _dialogQuery($cmp['num_1']);
-
-		$sql = "/* ".__FUNCTION__.":".__LINE__." вложенное значение единицы списка */
-				SELECT `t1`.*"._spisokJoinField($incDialog)."
-				FROM "._tableFrom($incDialog)."
-				WHERE `t1`.`id`=".$uid.
-					_spisokCondDef($cmp['num_1']);
-		if(!$inc = query_assoc($sql))
-			continue;
-
-		//идентификаторы будут заменены на массив с данными единицы списка
-		$unit[$col] = $inc;
-	}
-
-	return $unit;
+	return $send;
 }
 function _dialogOpenUnitDel($dialog, $del_id) {//вывод содержания при удалении записи
-	$send['dialog_id'] = _num($dialog['id']);
 	$send['del_id'] = $del_id;
-	$send['head'] = $dialog['del_head'];
-	$send['button_submit'] = $dialog['del_button_submit'];
-	$send['button_cancel'] = $dialog['del_button_cancel'];
+
 	$send['width'] = _blockObjWidth('dialog_del');
+	$send['head'] = $dialog['del_head'];
 
 	if(!$dialog['del_on'])
 		return _dialogOpenErr($send, 'Удаление записи запрещено.');
@@ -1132,6 +1076,8 @@ function _dialogOpenUnitDel($dialog, $del_id) {//вывод содержания
 			return _dialogOpenErr($send, 'Время удаления записи истекло.');
 	}
 
+	$send['button_submit'] = $dialog['del_button_submit'];
+	$send['button_cancel'] = $dialog['del_button_cancel'];
 	$send['html'] = _dialogOpenUnitDelContent($dialog, $unit);
 
 	return $send;
@@ -1158,20 +1104,18 @@ function _dialogOpenErr($send, $msg) {//формирование сообщен�
 	$send['button_cancel'] = 'Закрыть';
 	return $send;
 }
-function _dialogOpenBlockIdSet($dlg, $unit) {//установка ID блока
-	$block_id = _num(@$_POST['block_id'], 1);
-
+function _dialogOpenBlockIdSet($block_id, $dlg, $edit_arr) {//установка ID блока
 	if($block_id < 0)
 		echo 'block_id = MINUS!!!';
 
-	if(empty($unit))
+	if(empty($edit_arr))
 		return $block_id;
 
 	if(!$block_id && isset($dlg['field1']['block_id']))
-		$block_id = _num($unit['block_id']);
+		$block_id = _num($edit_arr['block_id']);
 
 	if(!$block_id && isset($dlg['field1']['element_id']))
-		if($EL = _elemOne($unit['element_id']))
+		if($EL = _elemOne($edit_arr['element_id']))
 			$block_id = _num($EL['block_id']);
 
 	return $block_id;
@@ -1192,7 +1136,15 @@ function _dialogWidthMin($blk) {//получение минимальной ши
 
 	return $width;
 }
-
+function _dialogSetupAccess($dlg) {//права для настройки диалога
+	if(_num(@SA))
+		return 1;
+	if(!$dlg['app_id'])
+		return 0;
+	if($dlg['app_id'] == APP_ID)
+		return 1;
+	return 0;
+}
 
 
 

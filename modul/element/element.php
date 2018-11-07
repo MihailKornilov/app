@@ -645,7 +645,7 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 	'';
 }
 
-function PHP12_dialog_sa($el, $unit) {//список диалоговых окон [12]
+function PHP12_dialog_sa() {//список диалоговых окон [12]
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE !`app_id`
@@ -678,7 +678,7 @@ function PHP12_dialog_sa($el, $unit) {//список диалоговых око
 
 	return $send;
 }
-function PHP12_dialog_app($el, $unit) {//список диалоговых окон для конкретного приложения [12]
+function PHP12_dialog_app() {//список диалоговых окон для конкретного приложения [12]
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID."
@@ -841,22 +841,26 @@ function _elemVvv($elem_id, $src=array()) {
 	if(!$el = _elemOne($elem_id))
 		return array();
 
-	$block_id =  _num(@$src['block_id']);
 	$dialog_id = _num(@$src['dialog_id']);
+	$block_id =  _num(@$src['block_id']);
+
+	$edit_id = _num(@$src['edit_id']);
+	$edit_arr = $edit_id ? $src['edit_arr'] : array();
+
 	$unit_id =   _num(@$src['unit_id'], 1);
 	$unit = $unit_id ? $src['unit'] : array();
 
 	switch($el['dialog_id']) {
 		//подключаемая функция
 		case 12:
-			if(!$unit_id)
+			if(!$edit_id)
 				break;
 
 			$func = $el['txt_1'].'_vvv';
 			if(!function_exists($func))
 				break;
 
-			return $func($unit_id, $src);
+			return $func($edit_id, $src);
 
 		//Radio
 		case 16:
@@ -970,7 +974,7 @@ function _elemVvv($elem_id, $src=array()) {
 				$color = '';
 				$busy = 0;//занята ли колонка
 				if(isset($colUse[$col])) {
-					$color = $unit_id && $unit['col'] == $col ? 'b color-pay' : 'b red';
+					$color = $edit_id && $edit_arr['col'] == $col ? 'b color-pay' : 'b red';
 					$busy = 1;
 				}
 				$u = array(
@@ -993,7 +997,7 @@ function _elemVvv($elem_id, $src=array()) {
 
 				$color = '';
 				if(isset($colUse[$col]))
-					$color = $unit_id && $unit['col'] == $col ? 'b color-pay' : 'b red';
+					$color = $edit_id && $edit_arr['col'] == $col ? 'b color-pay' : 'b red';
 				$u = array(
 					'id' => $n++,
 					'title' => $col,
@@ -1395,15 +1399,12 @@ function _elemColType($id='all') {//тип данных, используемы�
 
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
-function PHP12_elem_choose($el, $unit) {//выбор элемента для вставки в блок. Диалог [50]
-	if(empty($unit['source']))
+function PHP12_elem_choose($el, $SRC) {//выбор элемента для вставки в блок. Диалог [50]
+	if(empty($SRC))
 		return _emptyMin('Отсутствуют исходные данные.');
 
-	$SRC = $unit['source'];
-
 	//данные исходного блока
-	$block_id = _num($SRC['block_id']);
-	if(!$BL = _blockOne($block_id))
+	if(!$BL = _blockOne($SRC['block_id']))
 		$BL = array(
 			'obj_id' => 0,
 			'obj_name' => '',
@@ -1505,7 +1506,7 @@ function PHP12_elem_choose($el, $unit) {//выбор элемента для в�
 
 	if(empty($group))
 		return _emptyMin('Нет элементов для отображения.').
-			   PHP12_elem_choose_gebug($BL)._pr($unit);
+			   PHP12_elem_choose_gebug($BL);
 
 	reset($group);
 	$firstId = key($group);
@@ -1563,8 +1564,6 @@ function PHP12_elem_choose_gebug($BL) {//выбор элемента - груп�
 	}
 
 	return
-//	_pr($unit).
-//	_pr($BL).
 	'<div class="line-t pad10 bg-ffe">'.
 		'<div class="'.(BLOCK_PAGE ? 'color-pay b' : 'pale').'">'.
 			'Блок '.(BLOCK_PAGE ? $BL['id'] : '').' на странице '.
@@ -1625,13 +1624,11 @@ function PHP12_dialog_del_setup($el, $unit) {
 
 
 /* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
-function PHP12_v_choose($el, $unit) {
+function PHP12_v_choose($el, $SRC) {
 /*
 	DLG_NO_MSG - сообщение об ошибке при поиске диалога
 	DLG_SEL - выбранное значение
 */
-
-	$SRC = $unit['source'];
 
 	//ID диалога из dialog_source
 	$dialog_id = PHP12_v_choose_ds($SRC);
@@ -1671,8 +1668,8 @@ function PHP12_v_choose($el, $unit) {
 	if(defined('DLG_SEL'))
 		$sel = DLG_SEL;
 
-	if(!empty($unit['txt_2']))
-		$sel = $unit['txt_2'];
+//	if(!empty($unit['txt_2']))
+//		$sel = $unit['txt_2'];
 	if(!empty($SRC['prm']['sel']))
 		$sel = $SRC['prm']['sel'];
 
@@ -1969,7 +1966,7 @@ function PHP12_elem22($el, $unit) {
 	'</script>';
 }
 function PHP12_elem22_paste($el, $unit) {//условия были вставлены как элемент [22]
-	if(_elemUnitIsEdit($unit))
+	if(_elemUnitIsSetup($unit))
 		return _emptyMin('Дополнительные условия к фильтру', 0);
 	if(!$elem_id = $el['num_1'])
 		return _emptyMin('Не выбран элемент, указывающий на список', 0);
@@ -2212,7 +2209,7 @@ function PHP12_spisok_td_setting_vvv($parent_id) {//получение данн�
 
 /* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ ===--- */
 function PHP12_menu_block_setup($el, $unit) {//используется в диалоге [57]
-	if(_elemUnitIsEdit($unit))
+	if(_elemUnitIsSetup($unit))
 		return '<div class="_empty min">Настройка пунктов меню переключения блоков</div>';
 	return '';
 }
@@ -2321,7 +2318,7 @@ function PHP12_menu_block_setup_vvv($parent_id) {//получение данны
 
 
 /* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
-function PHP12_radio_setup($el, $unit) {//используется в диалоге [16]
+function PHP12_radio_setup() {//используется в диалоге [16]
 	return '';
 }
 function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение значений radio
@@ -2966,7 +2963,7 @@ function PHP12_elem_action_list($el, $unit) {
 
 
 /* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ ===--- */
-function PHP12_history_setup($el, $unit) {
+function PHP12_history_setup() {
 	/*
 		действие (type_id):
 			1 - запись внесена
@@ -3322,7 +3319,7 @@ function _historySpisok($el) {//список истории действий [68
 								'<div class="history-o o'.$r['type_id'].'"></div>'.
 								'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
 							'<td>'.
-				   (SA && DEBUG ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-edit'._tooltip('Настроить историю', -60).'</div>' : '').
+				   (SA && DEBUG ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-setup'._tooltip('Настроить историю', -60).'</div>' : '').
 								$msg.
 								_historySpisokEdited($r).
 					'</table>';
@@ -3644,12 +3641,12 @@ function _imageDD($img) {//единица изображения для наст
 	'</dd>';
 }
 
-function _imageShow($el, $unit) {//просмотр изображений (вставляется в блок через [12])
+function _imageShow($el, $SRC) {//просмотр изображений (вставляется в блок через [12])
 	$image = 'Изображение отсутствует.';//основная картинка, на которую нажали. Выводится первой
 	$spisok = '';//html-список дополнительных изображений
 	$spisokJs = array();//js-список всех изображений
 	$spisokIds = array();//id картинок по порядку
-	if($image_id = _num(@$unit['id'])) {
+	if($image_id = $SRC['get_id']) {
 		$sql = "SELECT *
 				FROM `_image`
 				WHERE `id`=".$image_id;
@@ -3705,18 +3702,16 @@ function _imageShow($el, $unit) {//просмотр изображений (вс
 			'IMG_IDS=['.implode(',', $spisokIds).'];'.
 	'</script>';
 }
-function _imageDeleted($el, $unit) {//удалённые изображения (вставляется в блок через [12])
-	if(!$unit_id = _num(@$unit['id']))
-		return '<div class="_empty min">Отсутствует единица списка, к которой прикрепляются изображения.</div>';
-	if(!$block_id = _num($unit['source']['block_id'], 1))
-		return '<div class="_empty min">Отсутствует id блока.</div>';
-	if($block_id > 0)
-		return '<div class="_empty min">Id блока не может быть положительным.</div>';
+function _imageDeleted($el, $SRC) {//удалённые изображения (вставляется в блок через [12])
+	if(!$obj_id = $SRC['get_id'])
+		return '<div class="_empty min">Отсутствует запись, к которой прикрепляются изображения.</div>';
+	if(!$elem_id = _num($SRC['prm']['elem_id']))
+		return '<div class="_empty min">Отсутствует id элемента.</div>';
 
 	$sql = "SELECT *
 			FROM `_image`
-			WHERE `obj_name`='elem_".abs($block_id)."'
-			  AND `obj_id`=".$unit_id."
+			WHERE `obj_name`='elem_".$elem_id."'
+			  AND `obj_id`=".$obj_id."
 			  AND `deleted`
 			ORDER BY `dtime_del`";
 	if(!$arr = query_arr($sql))

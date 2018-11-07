@@ -425,7 +425,7 @@ function _blockStyle($r, $width, $unit) {//стили css для блока
 	$send[] = ($r['width_auto'] ? 'min-' : '').'width:'.$width.'px';
 
 	//цвет фона из единицы списка
-	if(!_elemUnitIsEdit($unit))
+	if(!_elemUnitIsSetup($unit))
 		if(!empty($unit['id']))
 			if($ids = _ids($r['bg'], 1)) {
 				$bg = $unit;
@@ -550,7 +550,7 @@ function _elemFormatColor($txt, $el) {//подмена цвета при доп�
 	return $el['color'];
 }
 function _elemFormatColorDate($txt, $el, $unit) {//подмена цвета для даты todo тестовая версия
-	if(_elemUnitIsEdit($unit))
+	if(_elemUnitIsSetup($unit))
 		return _elemFormatColor($txt, $el);
 	if($el['dialog_id'] != 86)
 		return _elemFormatColor($txt, $el);
@@ -599,7 +599,7 @@ function _elemStyle($el, $unit) {//стили css для элемента
 
 	return ' style="'.implode(';', $send).'"';
 }
-function _elemUnitIsEdit($unit) {//определение в каком режиме находится блочная структура (рабочий или настройка)
+function _elemUnitIsSetup($unit) {//определение в каком режиме находится блочная структура (рабочий или настройка)
 	if(!empty($unit['blk_edit']))
 		return 1;
 	if(!empty($unit['blk_choose']))
@@ -610,14 +610,14 @@ function _elemUnitIsEdit($unit) {//определение в каком режи
 		return 1;
 	return 0;
 }
-function _elemUnit($el, $unit=array()) {//формирование элемента страницы
+function _elemUnit($el, $unit) {//формирование элемента страницы
 	$UNIT_ISSET = isset($unit['id']);
-	if(!$US = @$unit['source'])
-		$US = array();
+
+	$SRC = !empty($unit['src']) ? $unit['src'] : array();
 
 	//значение из списка
 	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']] : '';
-	$is_edit = _elemUnitIsEdit($unit);
+	$is_edit = _elemUnitIsSetup($unit);
 	$attr_id = 'cmp_'.$el['id'].($is_edit ? '_edit' : '');
 	$disabled = $is_edit ? ' disabled' : '';
 
@@ -628,7 +628,6 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 	}
 
 	switch($el['dialog_id']) {
-		//---=== КОМПОНЕНТЫ ДЛЯ ВНЕСЕНИЯ ДАННЫХ ===--- (используется $unit)
 		//галочка
 		case 1:
 			/*
@@ -663,7 +662,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			);
 
 			//вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
-			$block = _num(@$US['block_id']) ? ',block_id:'.$US['block_id'] : '';
+			$block = isset($SRC['block_id']) ? ',block_id:'.$SRC['block_id'] : '';
 			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
 			$dialog_source = !empty($el['block']) && $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
 
@@ -878,7 +877,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				$el['txt_1']($el, $unit);
+				$el['txt_1']($el, $SRC);
 
 		//Выбор элемента из диалога или страницы
 		case 13:
@@ -1172,7 +1171,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			return
 			_iconEdit(array(
 				'class' => 'dialog-open pl',
-				'val' => 'dialog_id:'.$unit['dialog_id'].',unit_id:'.$unit['id']
+				'val' => 'dialog_id:'.$unit['dialog_id'].',edit_id:'.$unit['id']
 			));
 
 		//Count - количество
@@ -1255,7 +1254,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 
 			*/
 
-			if(!$bs_id = _num(@$US['block_id']))
+			if(!$bs_id = _num(@$SRC['block_id']))
 				return '<div class="red">Отсутствует ID исходного блока.</div>';
 
 			$BL = _blockOne($bs_id);

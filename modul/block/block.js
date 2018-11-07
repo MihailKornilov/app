@@ -344,8 +344,8 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 					_elemUnitFormat(EL) +
 					'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
 					_elemUnitHint(EL) +
-					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
-					'<div val="dialog_id:' + EL.dialog_id + ',unit_id:' + EL.id + ',del:1" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
+					'<div val="dialog_id:' + EL.dialog_id + ',edit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
+					'<div val="dialog_id:' + EL.dialog_id + ',del_id:' + EL.id + '" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 				'</div>' +
 			'</div>' +
 

@@ -447,7 +447,7 @@ function _pageShowScript($page_id, $elmActUse) {
 		'var VVV_PAGE='._json($vvvPage).';'.
 		'for(var i in VVV_PAGE)VVV[i]=VVV_PAGE[i];'.
 	($elmActUse ?
-		'_ELM_ACT('._BE('elem_ids_js', 'page', $page_id).');'
+		'_ELM_ACT({elm_ids:'._BE('elem_ids_js', 'page', $page_id).'});'
 	: '').
 	'</script>';
 }
@@ -465,7 +465,7 @@ function _pageUnitGet($page_id) {
 	if(!$dialog = _dialogQuery($dialog_id))
 		return array('msg_err'=>'Отсутствует диалог, который вносит данные.'.$PAGE_START_MSG);
 	if(!$unit = _spisokUnitQuery($dialog, $id))
-		return array('msg_err'=>'Записи id'.$id.' не существует.'.$PAGE_START_MSG);
+		return array('msg_err'=>'Записи '.$id.' не существует.'.$PAGE_START_MSG);
 
 	return $unit;
 }
