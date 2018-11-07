@@ -419,7 +419,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	$limit = $ELEM['num_2'];
 
 	if(!$all = _spisokCountAll($ELEM, $next))
-		return _emptyMin(_br($ELEM['txt_1']));
+		return _emptyMin(_br($ELEM['txt_1']), 0);
 
 	$IS_SORT = _spisokIsSort($ELEM['id']);
 
@@ -534,7 +534,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		$limit = 1000;
 
 	if(!$all = _spisokCountAll($ELEM))
-		return _emptyMin(_br($ELEM['txt_1']));
+		return _emptyMin(_br($ELEM['txt_1']), 0);
 
 	$order = "`t1`.`id` DESC";
 	if($ELEM['num_6'] || _spisokIsSort($ELEM['block_id']))

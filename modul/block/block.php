@@ -1097,7 +1097,7 @@ function _elemUnit($el, $unit=array()) {//формирование элемен�
 			_iconDel(array(
 				'red' => $el['num_1'],
 				'class' => 'dialog-open pl',
-				'val' => 'dialog_id:'.$unit['dialog_id'].',unit_id:'.$unit['id'].',del:1'
+				'val' => 'dialog_id:'.$unit['dialog_id'].',del_id:'.$unit['id']
 			));
 
 		//Выбор нескольких значений галочками

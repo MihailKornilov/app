@@ -115,8 +115,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					o.content +
 				'</div>' +
 				'<div class="btm">' +
-					'<button class="vk submit mr10 ' + o.color + (o.butSubmit ? '' : ' dn') + '">' + o.butSubmit + '</button>' +
-					'<button class="vk cancel' + (o.butCancel ? '' : ' dn') + '">' + o.butCancel + '</button>' +
+					'<button class="vk submit mr10 ' + o.color + _dn(o.butSubmit) + '">' + o.butSubmit + '</button>' +
+					'<button class="vk cancel' + _dn(o.butCancel) + '">' + o.butCancel + '</button>' +
 				'</div>' +
 			'</div>',
 
@@ -538,6 +538,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 
 	_dialogOpen = function(o) {//открытие диалогового окна
+		if(o.del_id)
+			return _dialogOpenDel(o);
+
 		var dialog = _dialog({
 			dialog_id:o.dialog_id,
 			block_id:o.block_id,  //для передачи значений, если будет требоваться редактирование диалога
@@ -554,17 +557,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 			submit:submit
 		});
 
-		//если удаление единицы списка, то кнопка красная
-		if(o.act == 'del')
-			dialog.bottom.find('.submit').addClass('red');
-		else {
-			window.DIALOG_OPEN = dialog;
-			DIALOG_OPEN.col_type = o.col_type;
-			for(var i in o.vvv)
-				VVV[i] = o.vvv[i];
-			if(!o.err)
-				_ELM_ACT(o.elm_ids, o.unit);
-		}
+		window.DIALOG_OPEN = dialog;
+		DIALOG_OPEN.col_type = o.col_type;
+		for(var i in o.vvv)
+			VVV[i] = o.vvv[i];
+		if(!o.err)
+			_ELM_ACT(o.elm_ids, o.unit);
 
 		return dialog;
 
@@ -581,36 +579,32 @@ var DIALOG = {},//массив диалоговых окон для управл
 				vvv:{}
 			};
 
-			if(o.unit_id) {
+			if(o.unit_id)
 				send.op = 'spisok_save';
-				if(o.act == 'del')
-					send.op = 'spisok_del';
-			}
 
 			//получение значений компонентов
-			if(o.act != 'del')
-				_forN(o.elm_ids, function(id) {
-					var sp = ELMM[id],
-						ATR_CMP = _attr_cmp(id);
+			_forN(o.elm_ids, function(id) {
+				var sp = ELMM[id],
+					ATR_CMP = _attr_cmp(id);
 
-					switch(sp.dialog_id) {
-						case 12://подключаемая функция
-							if(window[sp.txt_1])
-								send.vvv[id] = window[sp.txt_1](sp, 'get');
-							if(ATR_CMP)
-								send.cmp[id] = ATR_CMP.val();
-							return;
-						case 22://Дополнительные условия к фильтру
-							send.vvv[id] = PHP12_elem22_get(sp);
-							return;
-						case 37://SA: Select - выбор имени колонки
-							send.cmp[id] = ATR_CMP._select('inp');
-							return;
-					}
+				switch(sp.dialog_id) {
+					case 12://подключаемая функция
+						if(window[sp.txt_1])
+							send.vvv[id] = window[sp.txt_1](sp, 'get');
+						if(ATR_CMP)
+							send.cmp[id] = ATR_CMP.val();
+						return;
+					case 22://Дополнительные условия к фильтру
+						send.vvv[id] = PHP12_elem22_get(sp);
+						return;
+					case 37://SA: Select - выбор имени колонки
+						send.cmp[id] = ATR_CMP._select('inp');
+						return;
+				}
 
-					if(ATR_CMP)
-						send.cmp[id] = ATR_CMP.val();
-				});
+				if(ATR_CMP)
+					send.cmp[id] = ATR_CMP.val();
+			});
 
 			dialog.post(send, function(res) {
 				//закрытие диалога 50 - выбор элемента, если вызов был из него
@@ -623,47 +617,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 //return;
 
-				switch(res.action_id) {
-					case 1: location.reload(); break;
-					case 2:
-						var url = URL + '&p=' + res.action_page_id;
-						if(res.unit)
-							url += '&id=' + res.unit.id;
-						location.href = url;
-						break;
-					case 3://обновление содержимого блоков
-						var bln = '#block-level-' + res.obj_name;
-						$(bln).after(res.level).remove();
-						$(bln)
-							.find('.block-grid-on')
-							.removeClass('grey')
-							.trigger('click');
-						break;
-					case 4://обновление исходного диалога
-						var id = _num(o.dialog_source);
-						if(!id)
-							break;
-						if(!DIALOG[id])
-							break;
-						DIALOG[id].close();
-						if(!res.dialog_source)
-							break;
-						_dialogOpen(res.dialog_source);
-						break;
-				}
+				_dialogSubmitAction(res);
 
 				//обновление значения JS-кеша, если элемент вносился или изменялся
 				if(res.elem_js) {
 					ELMM[res.unit.id] = res.elem_js;
 					if(res.unit.block_id > 0)
 						BLKK[res.unit.block_id].elem_id = res.unit.id;
-				}
-
-				//обновление значения JS-кеша, если элемент удалён
-				if(res.elem_del) {
-					var el = ELMM[o.unit.id];
-					BLKK[el.block_id].elem_id = 0;
-					delete ELMM[o.unit.id];
 				}
 
 				//присвоение id дополнительного форматирования
@@ -678,6 +638,63 @@ var DIALOG = {},//массив диалоговых окон для управл
 					};
 				}
 			});
+		}
+	},
+	_dialogOpenDel = function(o) {
+		var dialog = _dialog({
+			top:20,
+			width:o.width,
+			color:'red',
+			head:o.head,
+			content:o.html,
+			butSubmit:o.button_submit,
+			butCancel:o.button_cancel,
+			submit:function() {
+				var send = {
+					op:'spisok_del',
+					dialog_id:o.dialog_id,
+					unit_id:o.del_id
+				};
+				dialog.post(send, _dialogSubmitAction);
+			}
+		});
+		return dialog;
+	},
+	_dialogSubmitAction = function(res) {//применение действий после выполнения диалога
+		switch(res.action_id) {
+			case 1: location.reload(); break;
+			case 2:
+				var url = URL + '&p=' + res.action_page_id;
+				if(res.unit)
+					url += '&id=' + res.unit.id;
+				location.href = url;
+				break;
+			case 3://обновление содержимого блоков
+				var bln = '#block-level-' + res.obj_name;
+				$(bln).after(res.level).remove();
+				$(bln)
+					.find('.block-grid-on')
+					.removeClass('grey')
+					.trigger('click');
+				break;
+			case 4://обновление исходного диалога
+				var id = _num(o.dialog_source);
+				if(!id)
+					break;
+				if(!DIALOG[id])
+					break;
+				DIALOG[id].close();
+				if(!res.dialog_source)
+					break;
+				_dialogOpen(res.dialog_source);
+				break;
+		}
+
+		//обновление значения JS-кеша, если был удалён элемент
+		if(res.elem_del) {
+			var el = ELMM[o.unit.id];
+			BLKK[el.block_id].elem_id = 0;
+			delete ELMM[o.unit.id];
 		}
 	},
 
@@ -3359,11 +3376,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 			dialog_id:_num(o.dialog_id),        //диалог, который вносит элемент
 			dialog_source:_num(o.dialog_source),//исходный диалог, либо настраиваемый
 			block_id:_num(o.block_id, 1),       //блок в который вставляется элемент
-			unit_id:_num(o.unit_id),            //id единицы списка - если редактирование
+
+			unit_id:_num(o.unit_id),            //id записи - todo на удаление
+
+			get_id:_num(o.get_id),              //id записи, содержание которой будет размещаться в диалоге
+			edit_id:_num(o.edit_id),            //id записи при редактировании
+			del_id:_num(o.del_id),              //id записи при удалении
 
 			prm:o.prm || [],                    //дополнительные параметры
-
-			del:_num(o.del),                    //удаление элемента
 
 			busy_obj:o.busy_obj,
 			busy_cls:o.busy_cls

@@ -211,6 +211,7 @@
 	height:40px;
 }
 ._dialog .head.orange{background-color:#CC8E4F}
+._dialog .head.red{background-color:#B66}
 ._dialog .head div{padding:12px 9px 8px 13px}
 ._dialog .head .close:hover .icon{opacity:1}
 ._dialog .head .edit:hover .icon{opacity:1}

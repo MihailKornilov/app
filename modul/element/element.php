@@ -73,6 +73,8 @@ function _colorJS() {//массив цветов для текста в форм
 function _unitGet($obj_name, $obj_id, $unit_id=0) {//данные единицы списка, которые принимают Страница или Диалог
 	if($obj_name == 'page')
 		return _pageUnitGet($obj_id);
+	if(!$unit_id)
+		return array();
 	if($obj_name != 'dialog')
 		return array();
 
@@ -81,20 +83,22 @@ function _unitGet($obj_name, $obj_id, $unit_id=0) {//данные единицы
 	if(!$DLG = _dialogQuery($obj_id))
 		return array('msg_err'=>'Диалога '.$obj_id.' не существует');
 
+	//диалог НЕ принимает значения записи
 	if(!$dialog_id_unit_get = $DLG['dialog_id_unit_get']) {
-		if(!$unit_id)
-			return array();
 		if(!$unit = _spisokUnitQuery($DLG, $unit_id))
-			return array('msg_err'=>'Записи id'.$unit_id.' не существует.');
+			return array('msg_err'=>'Записи '.$unit_id.' не существует.');
 		return $unit;
 	}
 
-
 	if($dialog_id_unit_get == -1)
-		_pageUnitGet(_page('cur'));
+		return _pageUnitGet(_page('cur'));
 
+	if(!$DLG_GET = _dialogQuery($dialog_id_unit_get))
+		return array('msg_err'=>'Диалога '.$dialog_id_unit_get.', принимающего значения записи, не существует');
+	if(!$unit = _spisokUnitQuery($DLG_GET, $unit_id))
+		return array('msg_err'=>'Записи '.$unit_id.', которую принимает диалог, не существует.');
 
-	return array('msg_err'=>'ОК');
+	return $unit;
 }
 
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
