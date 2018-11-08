@@ -257,13 +257,35 @@ var ZINDEX = 1000,
 		return send;
 	},
 	_pr = function(v) {//представление массива в виде таблицы
-		var send = '<table>',
+		if(v instanceof jQuery)
+			return '<div class="fs11 red">jQuery</div>';
+		var send = '<div class="dib bor1 pad5 mt2 bg-gr1">' +
+				   '<table>',
 			i;
-		for(i in v)
+		for(i in v) {
+			var txt = v[i];
+			if(typeof v[i] == 'object')
+				txt = _pr(v[i]);
+			if(typeof v[i] == 'function')
+				txt = '<div class="fs11 color-acc">Function</div>';
+			if(typeof v[i] == 'undefined')
+				txt = '<div class="fs11 pale">undefined</div>';
 			send += '<tr><td class="r top b pr3">' + i + ': ' +
-						'<td>' + (typeof v[i] == 'object' ? _pr(v[i]) : v[i]);
-		send += '</table>';
+						'<td>' + txt;
+		}
+		send += '</table></div>';
 		return send;
+	},
+	_cons = function(v) {//вывод значения как в console.log
+		if(!$('#_debug').length)
+			return;
+		var cons = $('#_debug .cons'),
+			tpf = typeof v,
+			log = '<div class="fs14 mb5 grey">' + tpf + '</div>' +
+				  (tpf == 'object' ? _pr(v) : v);
+		cons.find('.cons-div').html(log);
+		if(!cons.hasClass('dn'))
+			cons._flash();
 	};
 
 $.fn._enter = function(func) {
@@ -417,6 +439,9 @@ $(document)
 		});
 	})
 	.ajaxError(function(event, request) {
+		if(!$('#_debug').length)
+			return;
+
 		var txt = request.responseText;
 
 		if(!txt)

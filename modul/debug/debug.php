@@ -39,6 +39,7 @@ function _debug($i='') {
 					'<a>sql</a>'.// <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).')
 					'<a>cookie</a>'.
 					'<a>get</a>'.
+					'<a>cons</a>'.
 					'<a>ajax</a>'.
 				'</div>'.
 				'<div class="pg cache dn">'._debug_cache().'</div>'.
@@ -48,6 +49,9 @@ function _debug($i='') {
 					'<div class="mt10">'._debug_cookie().'</div>'.
 				'</div>'.
 				'<div class="pg get dn">'.$get.'</div>'.
+				'<div class="pg cons pad5 dn">'.
+					'<div class="cons-div mar5">&nbsp;</div>'.
+				'</div>'.
 				'<div class="pg ajax dn">&nbsp;</div>'.
 			'</h2>'.
 		'</div>';

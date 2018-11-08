@@ -1047,11 +1047,14 @@ function _dialogOpenUnitEdit($send, $dialog, $edit_id) {//вывод содер�
 	if(!$unit = _spisokUnitQuery($dialog, $edit_id))
 		return _dialogOpenErr($send, 'Записи '.$edit_id.' не существует.');
 
+	$unit = _arrNum($unit);
+
 	$send['edit_id'] = $edit_id;
-	$send['edit_arr'] = _arrNum($unit);
 	$send['src']['edit_id'] = $edit_id;
-	$send['src']['edit_arr'] = _arrNum($unit);
 	$send['src']['block_id'] = _dialogOpenBlockIdSet($send['src']['block_id'], $dialog, $unit);
+	$unit['src'] = $send['src'];
+	$send['edit_arr'] = $unit;
+	$send['src']['edit_arr'] = $unit;
 	$send['vvv'] = _dialogOpenVvv($dialog['id'], $send['src']);
 	$send['button_submit'] = $dialog['edit_button_submit'];
 	$send['button_cancel'] = $dialog['edit_button_cancel'];

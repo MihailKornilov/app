@@ -723,8 +723,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 			return;
 
 		var attr_focus = false,//элемент, на который будет поставлен фокус
-			unit = OBJ.edit_arr || {},
-			SRC = OBJ.src || {};
+			SRC = OBJ.src || {},
+			unit = OBJ.edit_arr && OBJ.edit_arr.id ? OBJ.edit_arr : {src:SRC};
 
 		_forN(OBJ.elm_ids, function(elm_id) {
 			var el = ELMM[elm_id];
@@ -2236,7 +2236,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(unit.src.block_id) {
 			V11_CMP = D(ATTR_CMP(el.id));   //переменная в исходном диалоге для хранения значений
 			V11_DLG = [];                   //массив диалогов, открывающиеся последовательно
-			V11_V = sev ? _idsAss(unit.src.prm.sel) : []; //массив выбранных значений
+			V11_V = sev ? _idsAss(unit.txt_2) : []; //массив выбранных значений
 			V11_COUNT = 0;                  //счётчик открытых диалогов
 		}
 
@@ -2263,7 +2263,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				V11_V.length = V11_COUNT;
 				V11_V[V11_COUNT] = v;
 				V11_DLG.length = V11_COUNT;
-				V11_DLG[V11_COUNT] = DLG;
+				V11_DLG[V11_COUNT] = DIALOG_OPEN;
 
 				V11_CMP.val(V11_V.join());
 			}
@@ -3355,6 +3355,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			o.func_open - функция, выполняемая после открытия диалога
 			o.func_save - функция, выполняемая после успешного выполнения диалога (после нажатия кнопки submit)
 		*/
+
 		var send = {
 			op:'dialog_open_load',
 			page_id:PAGE_ID,
@@ -3369,6 +3370,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			edit_id:_num(o.edit_id),            //id записи при редактировании
 			del_id:_num(o.del_id),              //id записи при удалении
 
+			src:o.src || [],                    //дополнительные параметры
 			prm:o.prm || [],                    //дополнительные параметры
 
 			busy_obj:o.busy_obj,
