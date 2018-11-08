@@ -920,98 +920,7 @@ function _elemVvv($elem_id, $src=array()) {
 			return _29cnn($elem_id, '', $sel_id);
 
 		//SA: select - выбор имени колонки
-		case 37:
-			if(!$block = _blockOne($block_id))
-				break;
-
-			//выбор имени колонки может производиться, только если элемент размещается в диалоге
-			if($block['obj_name'] != 'dialog')
-				break;
-
-			if(!$colDialog = _dialogQuery($block['obj_id']))
-				break;
-
-			//получение используемых колонок
-			$colUse = array();
-			foreach($colDialog['cmp'] as $r) {
-				if(!$col = $r['col'])
-					continue;
-				$colUse[$col] = 1;
-			}
-
-			//колонки, которые не должны выбираться
-			$fieldNo = array(
-				'id' => 1,
-				'id_old' => 1,
-				'num' => 1,
-				'parent_id' => 1,
-				'app_id' => 1,
-				'user_id' => 1,
-				'page_id' => 1,
-				'block_id' => 1,
-				'element_id' => 1,
-				'dialog_id' => 1,
-				'width' => 1,
-				'color' => 1,
-				'font' => 1,
-				'size' => 1,
-				'mar' => 1,
-				'sort' => 1,
-				'deleted' => 1,
-				'user_id_add' => 1,
-				'user_id_del' => 1,
-				'dtime_add' => 1,
-				'dtime_del' => 1,
-				'dtime_last' => 1
-			);
-
-			$field = array();
-			$n = 1;
-			foreach($colDialog['field1'] as $col => $k) {
-				if(isset($fieldNo[$col]))
-					continue;
-
-				$color = '';
-				$busy = 0;//занята ли колонка
-				if(isset($colUse[$col])) {
-					$color = $edit_id && $edit_arr['col'] == $col ? 'b color-pay' : 'b red';
-					$busy = 1;
-				}
-				$u = array(
-					'id' => $n++,
-					'title' => $col,
-					'busy' => $busy,
-					'content' =>
-						'<div class="'.$color.'">'.
-							'<span class="pale">'._table($colDialog['table_1']).'.</span>'.
-							$col.
-						'</div>'
-
-				);
-				$field[] = $u;
-			}
-
-			foreach($colDialog['field2'] as $col => $k) {
-				if(isset($fieldNo[$col]))
-					continue;
-
-				$color = '';
-				if(isset($colUse[$col]))
-					$color = $edit_id && $edit_arr['col'] == $col ? 'b color-pay' : 'b red';
-				$u = array(
-					'id' => $n++,
-					'title' => $col,
-					'content' =>
-						'<div class="'.$color.'">'.
-							'<span class="pale">'._table($colDialog['table_2']).'.</span>'.
-							$col.
-						'</div>'
-
-				);
-				$field[] = $u;
-			}
-
-			return $field;
+		case 37: return _elemVvv37($block_id, $edit_id, $edit_arr);
 
 		//SA: Select - выбор диалогового окна
 		case 38: return _dialogSelArray();
@@ -1139,6 +1048,97 @@ function _elemVvv($elem_id, $src=array()) {
 	}
 
 	return array();
+}
+function _elemVvv37($block_id, $edit_id, $edit_arr) {//select - выбор имени колонки [37]
+	if(!$block = _blockOne($block_id))
+		return array();
+	//может производиться, только если элемент размещается в диалоге
+	if($block['obj_name'] != 'dialog')
+		return array();
+	if(!$dlg = _dialogQuery($block['obj_id']))
+		return array();
+
+	//получение используемых колонок
+	$colUse = array();
+	foreach($dlg['cmp'] as $r) {
+		if(!$col = $r['col'])
+			continue;
+		$colUse[$col] = 1;
+	}
+
+	//колонки, которые не должны выбираться
+	$fieldNo = array(
+		'id' => 1,
+		'id_old' => 1,
+		'num' => 1,
+		'parent_id' => 1,
+		'app_id' => 1,
+		'user_id' => 1,
+		'page_id' => 1,
+		'block_id' => 1,
+		'element_id' => 1,
+		'dialog_id' => 1,
+		'width' => 1,
+		'color' => 1,
+		'font' => 1,
+		'size' => 1,
+		'mar' => 1,
+		'sort' => 1,
+		'deleted' => 1,
+		'user_id_add' => 1,
+		'user_id_del' => 1,
+		'dtime_add' => 1,
+		'dtime_del' => 1,
+		'dtime_last' => 1
+	);
+
+	$field = array();
+	$n = 1;
+	foreach($dlg['field1'] as $col => $k) {
+		if(isset($fieldNo[$col]))
+			continue;
+
+		$color = '';
+		$busy = 0;//занята ли колонка
+		if(isset($colUse[$col])) {
+			$color = $edit_id && $edit_arr['col'] == $col ? 'b color-pay' : 'b red';
+			$busy = 1;
+		}
+		$u = array(
+			'id' => $n++,
+			'title' => $col,
+			'busy' => $busy,
+			'content' =>
+				'<div class="'.$color.'">'.
+					'<span class="pale">'._table($dlg['table_1']).'.</span>'.
+					$col.
+				'</div>'
+
+		);
+		$field[] = $u;
+	}
+
+	foreach($dlg['field2'] as $col => $k) {
+		if(isset($fieldNo[$col]))
+			continue;
+
+		$color = '';
+		if(isset($colUse[$col]))
+			$color = $edit_id && $edit_arr['col'] == $col ? 'b color-pay' : 'b red';
+		$u = array(
+			'id' => $n++,
+			'title' => $col,
+			'content' =>
+				'<div class="'.$color.'">'.
+					'<span class="pale">'._table($dlg['table_2']).'.</span>'.
+					$col.
+				'</div>'
+
+		);
+		$field[] = $u;
+	}
+
+	return $field;
 }
 
 function _elemIsConnect($el) {//определение, является ли элемент подключаемым списком

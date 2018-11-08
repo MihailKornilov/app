@@ -8,6 +8,10 @@ var ZINDEX = 1000,
 	REGEXP_MS =            /^[\d]+(.[\d]{1,3})?(,[\d]{1,3})?$/,
 	REGEXP_DATE =          /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
 
+	POST_SEND,              //отправленные данные в _post
+	POST_BUSY_OBJ = null,   //объект, к которому применяется класс ожидания. Будет сброшен при условии возникновения ошибки
+	POST_BUSY_CLS,          //класс, показвыающий процесс ожидания
+
 	_post = function(send, func) {//отправка ajax-запроса методом POST
 		var v = $.extend({
 			busy_obj:null,  //объект, к которому применяется процесс ожидания
@@ -20,11 +24,15 @@ var ZINDEX = 1000,
 			$(v.busy_obj).addClass(v.busy_cls);
 		}
 
+		POST_BUSY_OBJ = send.busy_obj;
+		POST_BUSY_CLS = send.busy_cls;
+
 		delete send.busy_obj;
 		delete send.busy_cls;
 
+		POST_SEND = send;
+
 		$.post(AJAX, send, function(res) {
-	//		return;
 			if(v.busy_obj)
 				$(v.busy_obj).removeClass(v.busy_cls);
 
@@ -202,27 +210,6 @@ var ZINDEX = 1000,
 		}
 		return t;
 	},
-	_busy = function(v, obj) {//отображение прогресса ожидания
-		//установка места прогресса
-		if(v == 'set') {
-			window.BUSY_OBJ = obj;
-			return;
-		}
-
-		if(!window.BUSY_OBJ)
-			window.BUSY_OBJ = $('#_menu');
-
-		var m = window.BUSY_OBJ;
-		if(v === 0) {
-			m.removeClass('_busy');
-			return;
-		}
-
-		if(m.hasClass('_busy'))
-			return true;
-
-		m.addClass('_busy');
-	},
 	_forEq = function(arr, func) {//перечисление последовательного массива jQuery $(...)
 
 		//перебор будет осуществляться до тех пор, пока не будет встречено значение false в функции
@@ -267,6 +254,15 @@ var ZINDEX = 1000,
 				return;
 			send[id] = 1;
 		});
+		return send;
+	},
+	_pr = function(v) {//представление массива в виде таблицы
+		var send = '<table>',
+			i;
+		for(i in v)
+			send += '<tr><td class="r top b pr3">' + i + ': ' +
+						'<td>' + (typeof v[i] == 'object' ? _pr(v[i]) : v[i]);
+		send += '</table>';
 		return send;
 	};
 
@@ -367,14 +363,10 @@ $.fn._sort = function(o) {//сортировка
 
 $(document)
 	.ajaxSuccess(function(event, request) {
-		_busy(0);
 		var req = request.responseJSON;
 
-		if(req.pin) {
-			location.reload();
+		if(!req)
 			return;
-		}
-
 		if(!$('#_debug').length)
 			return;
 
@@ -392,12 +384,12 @@ $(document)
 
 		for(var i in req) {
 			switch(i) {
-				case 'success': break;
-				case 'error': break;
-				case 'php_time': break;
-				case 'sql_count': break;
-				case 'sql_time': break;
-				case 'link': break;
+				case 'success':
+				case 'error':
+				case 'php_time':
+				case 'sql_count':
+				case 'sql_time':
+				case 'link':
 				case 'post': break;
 				case 'sql':
 					sql += '<ul>' + req[i] + '</ul>';
@@ -406,11 +398,11 @@ $(document)
 					var len = req[i] && req[i].length ? '<tt>' + req[i].length + '</tt>' : '';
 					html += '<div class="hd"><b>' + i + '</b>' + len + '<em>' + typeof req[i] + '</em></div>';
 					if(typeof req[i] == 'object') {
-						html += obj(req[i]);
+						html += _pr(req[i]);
 						break;
 					}
-					if(typeof req[i] == 'string')
-						req[i] = req[i].replace(/<\/textarea>/g,'</ textarea>');
+					if(typeof req[i] === 'string')
+						req[i] = req[i].replace(/textarea/g, 'text_area');
 					html += '<textarea>' + req[i] + '</textarea>';
 			}
 		}
@@ -423,35 +415,24 @@ $(document)
 			t.addClass('_busy');
 			$.post(req.link, req.post, function() {}, 'json');
 		});
-		function obj(v) {
-			var send = '<table>',
-				i;
-			for(i in v)
-				send += '<tr><td class="val"><b>' + i + '</b>: ' +
-							'<td>' + (typeof v[i] == 'object' ? obj(v[i]) : v[i]);
-			send += '</table>';
-			return send;
-		}
 	})
 	.ajaxError(function(event, request) {
-		if(!request.responseText)
-			return;
+		var txt = request.responseText;
 
-		if(request.responseText.substr(0, 15) == '<!DOCTYPE html>') {
-			location.reload();
+		if(!txt)
 			return;
+		if(txt.substr(0, 15) == '<!DOCTYPE html>')
+			return location.reload();
+
+		if(POST_BUSY_OBJ) {
+			$(POST_BUSY_OBJ).removeClass(POST_BUSY_CLS);
+			POST_BUSY_OBJ = null;
 		}
 
-		var d = _dialog({
-			width:770,
-			top:10,
-			pad:10,
-			head:'Ошибка AJAX-запроса',
-			content:'<textarea style="width:730px;background-color:#fdd">' + request.responseText + '</textarea>',
-			butSubmit:'',
-			butCancel:'Закрыть'
-		});
-		d.content.find('textarea').autosize();
+		$('#_debug').addClass('show');
+		$('#_debug .ajax').html('<textarea class="w100p bg-fcc">' + txt + '</textarea>');
+		$('#_debug .ajax textarea').autosize().before(_pr(POST_SEND));
+		$('#_debug .dmenu a:last').trigger('click');
 	})
 
 	.on('click', '#count_update', function() {//обновление количеств и сумм
@@ -465,12 +446,18 @@ $(document)
 		});
 	})
 	.on('click', '#cache_clear', function() {//очищение кеша
-		_post({'op':'cache_clear'}, 'reload');
-		_msg('Кеш очищен.');
+		var send = {
+			op:'cache_clear',
+			busy_obj:$(this)
+		};
+		_post(send, function() {
+			_msg('Кеш очищен');
+			location.reload();
+		});
 	})
 	.on('click', '#page_setup', function() {//включение/выключение управления страницей
 		_cookie('page_setup', _cookie('page_setup') == 1 ? 0 : 1);
-		_msg();
+		$(this).addClass('_busy');
 		location.reload();
 	})
 	.ready(function() {

@@ -17,7 +17,7 @@ var debugCookieUpdate = function(t) {//обновление COOKIE
 	};
 
 $(document)
-	.on('click', '.debug_toggle', function() {
+	.on('click', '.debug_toggle', function() {//включение-выключение debug (нажатие на строку снизу)
 		_cookie('debug', _cookie('debug') == 1 ? 0 : 1);
 		_msg();
 		location.reload();
@@ -45,28 +45,33 @@ $(document)
 				op:'debug_sql',
 				query:p.next().val(),
 				nocache:t.html() == 'NOCACHE' ? 1 : 0,
-				explain:t.html() == 'EXPLAIN' ? 1 : 0
+				explain:t.html() == 'EXPLAIN' ? 1 : 0,
+				busy_obj:p
 			};
-		if(p.hasClass('_busy'))
-			return;
 		h3.html('');
-		p.addClass('_busy');
-		$.post(AJAX, send, function(res) {
-			p.removeClass('_busy');
-			if(res.success) {
-				h3.html(res.html);
-				if(res.exp)
-					p.next().next().html(res.exp);
-			}
-		}, 'json');
+		_post(send, function(res) {
+			h3.html(res.html);
+			if(res.exp)
+				p.next().next().html(res.exp);
+		});
 	})
-	.on('click', '#cookie_clear', function() {
-		$.post(AJAX, {'op':'cookie_clear'}, function(res) {
-			if(res.success) {
-				_msg('Cookie очищены');
-				location.reload();
-			}
-		}, 'json');
+	.on('click', '#_debug h1', function() {//нажатие на плюсик - открытие поля debug
+		var t = $(this),
+			p = t.parent(),
+			s = p.hasClass('show');
+		p._dn(s, 'show');
+		t.html(s ? '+' : '—');
+		_cookie('debug_show', s ? 0 : 1);
+	})
+	.on('click', '#cookie_clear', function() {//очистка cookies
+		var send = {
+			op:'cookie_clear',
+			busy_obj:$(this)
+		};
+		_post(send, function() {
+			_msg('Cookie очищены');
+			location.reload();
+		});
 	})
 
 	.ready(function() {
@@ -94,13 +99,6 @@ $(document)
 */
 		//		$(window).resize();
 
-		$('#_debug h1').click(function() {
-			var t = $(this).parent(),
-				s = t.hasClass('show');
-			t[(s ? 'remove' : 'add') + 'Class']('show');
-			$(this).html(s ? '+' : '—');
-			_cookie('debug_show', s ? 0 : 1);
-		});
 		$('#_debug .dmenu a').click(function() {
 			var t = $(this),
 				sel = t.html();
