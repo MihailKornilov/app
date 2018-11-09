@@ -282,8 +282,9 @@ var ZINDEX = 1000,
 		var cons = $('#_debug .cons'),
 			tpf = typeof v,
 			log = '<div class="fs14 mb5 grey">' + tpf + '</div>' +
-				  (tpf == 'object' ? _pr(v) : v);
-		cons.find('.cons-div').html(log);
+				  (tpf == 'object' ? _pr(v) : v) +
+				  '<div class="line-t mt10">&nbsp;</div>';
+		cons.find('.cons-div').prepend(log);
 		if(!cons.hasClass('dn'))
 			cons._flash();
 	};

@@ -1636,15 +1636,21 @@ function _spisok59unit($elem_id, $unit_id) {//выбранное значени�
 function _spisokCmpConnectIdGet($el, $sel_id=0) {//получение id привязонного списка, если рядом стоит родительский список (для страницы, принимающей значения списка)
 	if($sel_id)
 		return $sel_id;
-	if($el['dialog_id'] != 29)//только для связок
+	if(!_elemIsConnect($el))//только для связок
 		return 0;
+
+
+	return 0;
+
+
+
 	if(!$get_id = _num(@$_GET['id']))
 		return 0;
 	if(!$page_id = _page('cur'))
 		return 0;
 	if(!$page = _page($page_id))
 		return 0;
-	if(!$page['dialog_id_unit_get'])//страница не принмает значения
+	if(!$page['dialog_id_unit_get'])//страница не принимает значения
 		return 0;
 	if($page['dialog_id_unit_get'] == $el['num_1'])//если список является страницей, принимающей значение, возврат $_GET['id']
 		return $get_id;
@@ -1653,7 +1659,7 @@ function _spisokCmpConnectIdGet($el, $sel_id=0) {//получение id при�
 		return 0;
 
 	foreach($dlg['cmp'] as $cmp)
-		if($cmp['dialog_id'] == 29 && $cmp['num_1'] == $el['num_1']) {
+		if(_elemIsConnect($cmp) && $cmp['num_1'] == $el['num_1']) {
 			$sql = "SELECT *
 					FROM `_spisok`
 					WHERE `id`=".$get_id;

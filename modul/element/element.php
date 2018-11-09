@@ -3241,6 +3241,8 @@ function _historySpisok($el) {//список истории действий [68
 			WHERE `app_id`=".APP_ID."
 			  AND `active`
 			  "._historyCondPageUnit($el)."
+			  AND `user_id_add`
+			  AND `dtime_add`
 			ORDER BY `dtime_add` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))

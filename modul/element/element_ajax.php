@@ -215,7 +215,7 @@ switch(@$_POST['op']) {
 					'<tr class="tr-spisok-col'._dn($dialog['spisok_on']).'">'.
 						'<td class="grey r">Колонка по умолчанию:'.
 						'<td><input type="hidden" id="spisok_elem_id" value="'.$dialog['spisok_elem_id'].'" />'.
-					'<tr><td class="grey r">Принимает данные<br>единицы списка:'.
+					'<tr><td class="grey r">Получает данные списка:'.
 						'<td><input type="hidden" id="dialog_id_unit_get" value="'.$dialog['dialog_id_unit_get'].'" />'.
 				'</table>'.
 			'</div>'.
