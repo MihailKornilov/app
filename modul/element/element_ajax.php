@@ -1096,9 +1096,7 @@ function _dialogOpenUnitDelContent($dialog, $unit) {//содержание ди�
 			'</div>'.
 		'</div>';
 
-	$width = _blockObjWidth('dialog_del');
-
-	return _blockLevel($block, $width, 0, 0, 1, $unit);
+	return _blockLevel($block, $unit);
 }
 function _dialogOpenErr($send, $msg) {//формирование сообщения об ошибке при открытии диалога
 	$send['err'] = 1;

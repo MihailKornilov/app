@@ -80,16 +80,12 @@ function _blockHtml($obj_name, $obj_id, $unit=array(), $grid_id=0) {//вывод
 	if(!empty($unit['msg_err']))
 		return _empty($unit['msg_err']);
 
-	$width = _blockObjWidth($obj_name, $obj_id);
-
-	return _blockLevel($block, $width, $grid_id, 0,1, $unit);
+	return _blockLevel($block, $unit, $grid_id);
 }
-function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {//формирование блоков по уровням
+function _blockLevel($arr, $unit=array(), $grid_id=0, $level=1, $WM=0) {//формирование блоков по уровням
 	/*
 		$arr:       список блоков
-		$WM:        width max, максимальная ширина группы блоков
 		$grid_id:   ID блока, который делится на части в конкретный момент
-		$hMax:      максимальная высота блока (для отображения нижней разделительной полосы при редактировании)
 		$level:     уровень блоков
 		$unit:      данные единицы списка.
 					А также дополнительные настройки:
@@ -98,14 +94,18 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 						blk_level: уровень выбираемых блоков
 						v_choose: выбор элемента
 						elem_width_change: изменение ширины элементов
+		$WM:        width max - максимальная ширина группы блоков
 	*/
 	if(empty($arr))
 		return '';
 
+	//данные первого блока в массиве
+	$firt_id = key($arr);
+	$FIRST = $arr[$firt_id];
+
 	//условия для настройки блоков конкретного объекта
 	if(!isset($unit['blk_edit'])) {
-		$id = key($arr);
-		switch($arr[$id]['obj_name']) {
+		switch($FIRST['obj_name']) {
 			default:
 			case 'page':        $v = PAS; break;
 			case 'dialog':      $v = 0; break;
@@ -119,8 +119,19 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 	if(!empty($unit['blk_choose']))
 		$BLK_EDIT = 1;
 
+	//если первый уровень, получение максимальной ширины всей структуры блоков
+	if($level == 1 && !$WM)
+		$WM = _blockObjWidth($FIRST['obj_name'], $FIRST['obj_id']);
 	$MN = 10;//множитель
 	$wMax = round($WM / $MN);
+
+	//если дочерний уровень, получение высоты родительского блока
+	$hMax = 0;  //высота родительского блока (для отображения нижней разделительной полосы при редактировании)
+	if($level > 1) {
+		$parent_id = $FIRST['parent_id'];
+		$parent = _blockOne($parent_id);
+		$hMax = $parent['h'];
+	}
 
 	//подстановка нижней линии, если блоки не доходят до низу
 	$hSum = 0;
@@ -227,7 +238,7 @@ function _blockLevel($arr, $WM, $grid_id=0, $hMax=0, $level=1, $unit=array()) {/
 							_blockSetka($r, $level, $grid_id, $unit).
 							_blockChoose($r, $level, $unit).
 							_block_v_choose($r, $unit).
-							_blockChildHtml($r, $level + 1, $width, $grid_id, $unit).
+							_blockChildHtml($r, $unit, $grid_id, $level + 1, $width).
 	    					_elemDiv($r['elem'], $unit).
 					'';
 
@@ -438,9 +449,9 @@ function _blockStyle($r, $width, $unit) {//стили css для блока
 
 	return implode(';', $send);
 }
-function _blockChildHtml($block, $level, $width, $grid_id, $unit) {//деление блока на части
+function _blockChildHtml($block, $unit, $grid_id, $level, $width) {//деление блока на части
 	if($block['id'] != $grid_id)
-		return _blockLevel($block['child'], $width, $grid_id, $block['h'], $level, $unit);
+		return _blockLevel($block['child'], $unit, $grid_id, $level, $width);
 
 	return _blockGrid($block['child']);
 }

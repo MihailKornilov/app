@@ -450,10 +450,6 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	//получение элементов, находящихся в блоках
 	$ELM = _BE('elem_arr', 'spisok', $ELEM['id']);
 
-	//ширина единицы списка с учётом отступов
-	$ex = explode(' ', $ELEM['mar']);
-	$width = floor(($ELEM['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
-
 	$send = '';
 	foreach($spisok as $sp) {
 		$child = array();
@@ -471,7 +467,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		$block = _blockArrChild($child);
 		$send .=
 			'<div class="sp-unit" val="'.$sp['id'].'">'.
-				_blockLevel($block, $width, 0, 0, 1, $sp).
+				_blockLevel($block, $sp).
 			'</div>';
 	}
 
