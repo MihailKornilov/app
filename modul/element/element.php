@@ -1618,7 +1618,7 @@ function PHP12_dialog_del_setup($el, $unit) {
 		_blockLevelChange($obj_name, $dialog_id).
 	'</div>'.
 	'<div class="block-content-'.$obj_name.'" style="width:500px">'.
-		_blockHtml($obj_name, $dialog_id, array('blk_edit' => 1)).
+		_blockHtml($obj_name, $dialog_id, array('blk_setup' => 1)).
 	'</div>';
 }
 
@@ -2116,7 +2116,7 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 		_blockLevelChange('spisok', $unit['id']).
 	'</div>'.
 	'<div class="block-content-spisok" style="width:'.$width.'px">'.
-		_blockHtml('spisok', $unit['id'], array('blk_edit' => 1)).
+		_blockHtml('spisok', $unit['id'], array('blk_setup' => 1)).
 	'</div>';
 }
 

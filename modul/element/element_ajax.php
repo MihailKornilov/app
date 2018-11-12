@@ -197,7 +197,7 @@ switch(@$_POST['op']) {
 					_blockLevelChange('dialog', $dialog_id).
 				'</div>'.
 				'<div class="block-content-dialog" style="width:'.$dialog['width'].'px">'.
-					_blockHtml('dialog', $dialog_id, array('blk_edit' => 1)).
+					_blockHtml('dialog', $dialog_id, array('blk_setup' => 1)).
 				'</div>'.
 			'</div>'.
 

@@ -82,29 +82,29 @@ function _blockHtml($obj_name, $obj_id, $unit=array(), $grid_id=0) {//вывод
 
 	return _blockLevel($block, $unit, $grid_id);
 }
-function _blockLevel($arr, $unit=array(), $grid_id=0, $level=1, $WM=0) {//формирование блоков по уровням
+function _blockLevel($BLK, $unit=array(), $grid_id=0, $level=1, $WM=0) {//формирование блоков по уровням
 	/*
-		$arr:       список блоков
-		$grid_id:   ID блока, который делится на части в конкретный момент
-		$level:     уровень блоков
+		$BLK:       список блоков
 		$unit:      данные единицы списка.
 					А также дополнительные настройки:
-						blk_edit: включение настройки блоков
+						blk_setup:  включение настройки блоков
 						blk_choose: выбор блоков
-						blk_level: уровень выбираемых блоков
-						v_choose: выбор элемента
+						blk_level:  уровень выбираемых блоков
+						v_choose:   выбор элемента
 						elem_width_change: изменение ширины элементов
+		$grid_id:   ID блока, который делится на части в конкретный момент
+		$level:     уровень блоков
 		$WM:        width max - максимальная ширина группы блоков
 	*/
-	if(empty($arr))
+	if(empty($BLK))
 		return '';
 
 	//данные первого блока в массиве
-	$firt_id = key($arr);
-	$FIRST = $arr[$firt_id];
+	$firt_id = key($BLK);
+	$FIRST = $BLK[$firt_id];
 
 	//условия для настройки блоков конкретного объекта
-	if(!isset($unit['blk_edit'])) {
+	if(!isset($unit['blk_setup'])) {
 		switch($FIRST['obj_name']) {
 			default:
 			case 'page':        $v = PAS; break;
@@ -112,15 +112,15 @@ function _blockLevel($arr, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 			case 'dialog_del':  $v = 0; break;
 			case 'spisok':      $v = 0; break;
 		}
-		$unit['blk_edit'] = $v;
+		$unit['blk_setup'] = $v;
 	}
 
-	$BLK_EDIT = $unit['blk_edit'];
+	$BLK_SETUP = $unit['blk_setup'];
 	if(!empty($unit['blk_choose']))
-		$BLK_EDIT = 1;
+		$BLK_SETUP = 1;
 
 	//если первый уровень, получение максимальной ширины всей структуры блоков
-	if($level == 1 && !$WM)
+	if($level == 1)
 		$WM = _blockObjWidth($FIRST['obj_name'], $FIRST['obj_id']);
 	$MN = 10;//множитель
 	$wMax = round($WM / $MN);
@@ -138,8 +138,8 @@ function _blockLevel($arr, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 
 	//составление структуры блоков по строкам
 	$block = array();
-	foreach($arr as $r) {
-		if(!$BLK_EDIT
+	foreach($BLK as $r) {
+		if(!$BLK_SETUP
 		&& empty($unit['v_choose'])
 		&& $r['elem_id']
 		&& $r['elem']['hidden']
@@ -156,10 +156,10 @@ function _blockLevel($arr, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 	$yEnd = key($block);
 
 	$send = '';
-	$BT = $BLK_EDIT ? ' bor-t-dash' : '';
-	$BR = $BLK_EDIT ? ' bor-r-dash' : '';
-	$BB = $BLK_EDIT ? ' bor-b-dash' : '';
-	$br1px = $BLK_EDIT ? 1 : 0;//показ красной разделительной линии справа
+	$BT = $BLK_SETUP ? ' bor-t-dash' : '';
+	$BR = $BLK_SETUP ? ' bor-r-dash' : '';
+	$BB = $BLK_SETUP ? ' bor-b-dash' : '';
+	$br1px = $BLK_SETUP ? 1 : 0;//показ красной разделительной линии справа
 
 	foreach($block as $y => $str) {
 		$widthMax = $WM;
@@ -178,8 +178,8 @@ function _blockLevel($arr, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
 		//скрытие всей строки, если все блоки в строке являются скрытыми
-		$strHide = !$BLK_EDIT && empty($unit['v_choose']);
-		if(!$BLK_EDIT && empty($unit['v_choose']))
+		$strHide = !$BLK_SETUP && empty($unit['v_choose']);
+		if(!$BLK_SETUP && empty($unit['v_choose']))
 			foreach($xStr as $n => $r)
 				if(!$r['hidden']) {//если хотя бы один блок не скрыт, вся строка не будет скрыта
 					$strHide = 0;
@@ -214,24 +214,24 @@ function _blockLevel($arr, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 			$cls[] = !$xEnd ? trim($BR) : '';
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
-			$cls[] = _dn(!(!$BLK_EDIT && empty($unit['v_choose']) && $r['hidden']));
+			$cls[] = _dn(!(!$BLK_SETUP && empty($unit['v_choose']) && $r['hidden']));
 			$cls[] = $r['click_action'] == 2081 && $r['click_page']   ? 'curP block-click-page pg-'.$r['click_page'] : '';
-			$cls[] = !$BLK_EDIT && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
+			$cls[] = !$BLK_SETUP && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
 			$bor = explode(' ', $r['bor']);
-			$borPx = $bor[3] + ($BLK_EDIT ? 0 : $bor[1]);
+			$borPx = $bor[3] + ($BLK_SETUP ? 0 : $bor[1]);
 			$width = $r['width'] - ($xEnd ? 0 : $br1px) - $borPx;
 
 			//если блок списка шаблона, attr_id не ставится
-			$attr_id = !$BLK_EDIT && $r['obj_name'] == 'spisok' ? '' : ' id="bl_'.$r['id'].'"';
+			$attr_id = !$BLK_SETUP && $r['obj_name'] == 'spisok' ? '' : ' id="bl_'.$r['id'].'"';
 
 			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
 						' style="'._blockStyle($r, $width, $unit).'"'.
-		   ($BLK_EDIT ? ' val="'.$r['id'].'"' : '').
-		  (!$BLK_EDIT && $r['click_action'] == 2082 && $r['click_dialog'] ?
+		   ($BLK_SETUP ? ' val="'.$r['id'].'"' : '').
+		  (!$BLK_SETUP && $r['click_action'] == 2082 && $r['click_dialog'] ?
 			            ' val="dialog_id:'.$r['click_dialog'].($r['click_unit_id'] ? ',unit_id:'.$unit['id'] : '').'"'
 		  : '').
 					 '>'.
@@ -339,7 +339,7 @@ function _blockLevelDefine($obj_name, $v = 0) {//уровень редактир
 	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
 }
 function _blockSetka($r, $level, $grid_id, $unit) {//отображение сетки для настраиваемого блока
-	if(empty($unit['blk_edit']))
+	if(empty($unit['blk_setup']))
 		return '';
 	//выход, если включено изменение ширины элемента
 	if(!empty($unit['elem_width_change']))
@@ -406,7 +406,6 @@ function _block_v_choose($r, $unit) {//подсветка элементов д�
 	//(не)разрешён выбор значения
 	if(empty($unit['v_choose']))
 		return '';
-
 	//блок не подсвечивается, если в нём нет элемента
 	if(empty($r['elem']))
 		return '';
@@ -495,7 +494,7 @@ function _elemDiv($el, $unit=array()) {//формирование div элеме
 	$txt = _elemUnit($el, $unit);
 
 	//если элемент списка шаблона, attr_id не ставится
-	$attr_id = empty($unit['blk_edit']) && $el['block']['obj_name'] == 'spisok' ? '' : ' id="el_'.$el['id'].'"';
+	$attr_id = empty($unit['blk_setup']) && $el['block']['obj_name'] == 'spisok' ? '' : ' id="el_'.$el['id'].'"';
 
 	$cls = array();
 	$cls[] = _elemFormatColorDate($txt, $el, $unit);
@@ -611,7 +610,7 @@ function _elemStyle($el, $unit) {//стили css для элемента
 	return ' style="'.implode(';', $send).'"';
 }
 function _elemUnitIsSetup($unit) {//определение в каком режиме находится блочная структура (рабочий или настройка)
-	if(!empty($unit['blk_edit']))
+	if(!empty($unit['blk_setup']))
 		return 1;
 	if(!empty($unit['blk_choose']))
 		return 1;

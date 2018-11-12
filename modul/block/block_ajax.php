@@ -33,7 +33,7 @@ switch(@$_POST['op']) {
 
 		$unit = _unitGet($obj_name, $obj_id);
 		$unit += array(
-			'blk_edit' => 1,
+			'blk_setup' => 1,
 			'blk_choose' => $blk_choose,
 			'blk_level' => $level
 		);
@@ -53,7 +53,7 @@ switch(@$_POST['op']) {
 
 		$unit = _unitGet($obj_name, $obj_id) +
 				array(
-					'blk_edit' => 1,
+					'blk_setup' => 1,
 					'elem_width_change' => $on
 				);
 		$send['html'] = _blockHtml($obj_name, $obj_id,  $unit);
@@ -233,7 +233,7 @@ switch(@$_POST['op']) {
 		_BE( 'elem_clear');
 		_jsCache();
 
-		$unit = _unitGet($obj_name, $obj_id) + array('blk_edit' => 1);
+		$unit = _unitGet($obj_name, $obj_id) + array('blk_setup' => 1);
 		$send['level'] = _blockLevelChange($obj_name, $obj_id);
 		$send['html'] = _blockHtml($obj_name, $obj_id, $unit);
 		$send['blk'] = _BE('block_arr1', $obj_name, $obj_id);
@@ -315,7 +315,7 @@ switch(@$_POST['op']) {
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
 
-		$unit = _unitGet($block['obj_name'], $block['obj_id']) + array('blk_edit' => 1);
+		$unit = _unitGet($block['obj_name'], $block['obj_id']) + array('blk_setup' => 1);
 
 		$send['obj_name'] = $block['obj_name'];
 		$send['obj_id'] = $block['obj_id'];
