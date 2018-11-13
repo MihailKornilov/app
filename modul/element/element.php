@@ -1674,7 +1674,7 @@ function PHP12_v_choose($el, $SRC) {
 		$sel = $SRC['prm']['sel'];
 
 	$cond = array(
-		'v_choose' => 1,
+		'elem_choose' => 1,
 		'v_id_sel' => _idsAss($sel)
 	);
 

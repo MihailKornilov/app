@@ -576,7 +576,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 			$cls[] = $td['font'];
 			$cls[] = $td['color'];
 			$cls[] = $td['txt_8'];//pos - позиция
-			$cls[] = _elemFormatColorDate($txt, $td, $td['color']);
+			$cls[] = _elemFormatColorDate($txt, $td, $sp);
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';

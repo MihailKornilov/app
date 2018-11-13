@@ -82,16 +82,37 @@ function _blockHtml($obj_name, $obj_id, $unit=array(), $grid_id=0) {//вывод
 
 	return _blockLevel($block, $unit, $grid_id);
 }
-function _blockLevel($BLK, $unit=array(), $grid_id=0, $level=1, $WM=0) {//формирование блоков по уровням
+function _blockParam($PARAM, $obj_name='') {//значения-параметры, формирующие настройки блоков
+	//если параметры получены, настройка не нужна
+	if(isset($arr['param_flag']))
+		return $PARAM;
+
+	$setup = array(
+		'param_flag' => true,       //флаг полученных параметров
+
+		'blk_setup' => 0,           //включена настройка блоков
+		'blk_level' => 1,           //уровень выбираемых блоков
+		'blk_choose' => 0,          //выбор блоков
+		'elem_choose' => 0,         //выбор элемента
+		'elem_width_change' => 0,   //изменение ширины элементов
+	);
+
+	//условия для настройки блоков конкретного объекта
+	if(!isset($PARAM['blk_setup']))
+		if($obj_name == 'page')
+			$PARAM['blk_setup'] = PAS;
+
+	if(!empty($PARAM['blk_choose']))
+		$PARAM['blk_setup'] = 1;
+	if(!empty($PARAM['elem_width_change']))
+		$PARAM['blk_setup'] = 1;
+
+	return $PARAM + $setup;
+}
+function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//формирование блоков по уровням
 	/*
 		$BLK:       список блоков
-		$unit:      данные единицы списка.
-					А также дополнительные настройки:
-						blk_setup:  включение настройки блоков
-						blk_choose: выбор блоков
-						blk_level:  уровень выбираемых блоков
-						v_choose:   выбор элемента
-						elem_width_change: изменение ширины элементов
+		$PARAM:     параметры блоков. Все параметры в _blockParam
 		$grid_id:   ID блока, который делится на части в конкретный момент
 		$level:     уровень блоков
 		$WM:        width max - максимальная ширина группы блоков
@@ -103,21 +124,7 @@ function _blockLevel($BLK, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 	$firt_id = key($BLK);
 	$FIRST = $BLK[$firt_id];
 
-	//условия для настройки блоков конкретного объекта
-	if(!isset($unit['blk_setup'])) {
-		switch($FIRST['obj_name']) {
-			default:
-			case 'page':        $v = PAS; break;
-			case 'dialog':      $v = 0; break;
-			case 'dialog_del':  $v = 0; break;
-			case 'spisok':      $v = 0; break;
-		}
-		$unit['blk_setup'] = $v;
-	}
-
-	$BLK_SETUP = $unit['blk_setup'];
-	if(!empty($unit['blk_choose']))
-		$BLK_SETUP = 1;
+	$PARAM = _blockParam($PARAM, $FIRST['obj_name']);
 
 	//если первый уровень, получение максимальной ширины всей структуры блоков
 	if($level == 1)
@@ -139,8 +146,7 @@ function _blockLevel($BLK, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 	//составление структуры блоков по строкам
 	$block = array();
 	foreach($BLK as $r) {
-		if(!$BLK_SETUP
-		&& empty($unit['v_choose'])
+		if(!$PARAM['blk_setup']
 		&& $r['elem_id']
 		&& $r['elem']['hidden']
 		) continue;
@@ -156,10 +162,10 @@ function _blockLevel($BLK, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 	$yEnd = key($block);
 
 	$send = '';
-	$BT = $BLK_SETUP ? ' bor-t-dash' : '';
-	$BR = $BLK_SETUP ? ' bor-r-dash' : '';
-	$BB = $BLK_SETUP ? ' bor-b-dash' : '';
-	$br1px = $BLK_SETUP ? 1 : 0;//показ красной разделительной линии справа
+	$BT = $PARAM['blk_setup'] ? ' bor-t-dash' : '';
+	$BR = $PARAM['blk_setup'] ? ' bor-r-dash' : '';
+	$BB = $PARAM['blk_setup'] ? ' bor-b-dash' : '';
+	$br1px = $PARAM['blk_setup'];//место в 1px для показа красной разделительной линии справа
 
 	foreach($block as $y => $str) {
 		$widthMax = $WM;
@@ -178,8 +184,8 @@ function _blockLevel($BLK, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
 		//скрытие всей строки, если все блоки в строке являются скрытыми
-		$strHide = !$BLK_SETUP && empty($unit['v_choose']);
-		if(!$BLK_SETUP && empty($unit['v_choose']))
+		$strHide = !$PARAM['blk_setup'] && !$PARAM['elem_choose'];
+		if(!$PARAM['blk_setup'] && !$PARAM['elem_choose'])
 			foreach($xStr as $n => $r)
 				if(!$r['hidden']) {//если хотя бы один блок не скрыт, вся строка не будет скрыта
 					$strHide = 0;
@@ -214,32 +220,32 @@ function _blockLevel($BLK, $unit=array(), $grid_id=0, $level=1, $WM=0) {//фор
 			$cls[] = !$xEnd ? trim($BR) : '';
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
-			$cls[] = _dn(!(!$BLK_SETUP && empty($unit['v_choose']) && $r['hidden']));
+			$cls[] = _dn(!(!$PARAM['blk_setup'] && !$PARAM['elem_choose'] && $r['hidden']));
 			$cls[] = $r['click_action'] == 2081 && $r['click_page']   ? 'curP block-click-page pg-'.$r['click_page'] : '';
-			$cls[] = !$BLK_SETUP && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
+			$cls[] = !$PARAM['blk_setup'] && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
 			$bor = explode(' ', $r['bor']);
-			$borPx = $bor[3] + ($BLK_SETUP ? 0 : $bor[1]);
+			$borPx = $bor[3] + ($PARAM['blk_setup'] ? 0 : $bor[1]);
 			$width = $r['width'] - ($xEnd ? 0 : $br1px) - $borPx;
 
 			//если блок списка шаблона, attr_id не ставится
-			$attr_id = !$BLK_SETUP && $r['obj_name'] == 'spisok' ? '' : ' id="bl_'.$r['id'].'"';
+			$attr_id = !$PARAM['blk_setup'] && $r['obj_name'] == 'spisok' ? '' : ' id="bl_'.$r['id'].'"';
 
 			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
-						' style="'._blockStyle($r, $width, $unit).'"'.
-		   ($BLK_SETUP ? ' val="'.$r['id'].'"' : '').
-		  (!$BLK_SETUP && $r['click_action'] == 2082 && $r['click_dialog'] ?
-			            ' val="dialog_id:'.$r['click_dialog'].($r['click_unit_id'] ? ',unit_id:'.$unit['id'] : '').'"'
+						' style="'._blockStyle($r, $width, $PARAM).'"'.
+		   ($PARAM['blk_setup'] ? ' val="'.$r['id'].'"' : '').
+		  (!$PARAM['blk_setup'] && $r['click_action'] == 2082 && $r['click_dialog'] ?
+			            ' val="dialog_id:'.$r['click_dialog'].($r['click_unit_id'] ? ',unit_id:'.$PARAM['id'] : '').'"'
 		  : '').
 					 '>'.
-							_blockSetka($r, $level, $grid_id, $unit).
-							_blockChoose($r, $level, $unit).
-							_block_v_choose($r, $unit).
-							_blockChildHtml($r, $unit, $grid_id, $level + 1, $width).
-	    					_elemDiv($r['elem'], $unit).
+							_blockSetka($r, $level, $grid_id, $PARAM).
+							_blockChoose($r, $level, $PARAM).
+							_block_v_choose($r, $PARAM).
+							_blockChildHtml($r, $PARAM, $grid_id, $level + 1, $width).
+	    					_elemDiv($r['elem'], $PARAM).
 					'';
 
 			$widthMax -= $r['width'];
@@ -339,17 +345,18 @@ function _blockLevelDefine($obj_name, $v = 0) {//уровень редактир
 	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
 }
 function _blockSetka($r, $level, $grid_id, $unit) {//отображение сетки для настраиваемого блока
-	if(empty($unit['blk_setup']))
+	if(!$unit['blk_setup'])
 		return '';
 	//выход, если включено изменение ширины элемента
-	if(!empty($unit['elem_width_change']))
+	if($unit['elem_width_change'])
 		return '';
 	//выход, если выбор блоков
-	if(!empty($unit['blk_choose']))
+	if($unit['blk_choose'])
 		return '';
 	//выход, если выбор элемента
-	if(!empty($unit['v_choose']))
+	if($unit['elem_choose'])
 		return '';
+	//выход, если происходит настройка подблоков
 	if($r['id'] == $grid_id)
 		return '';
 
@@ -363,7 +370,7 @@ function _blockSetka($r, $level, $grid_id, $unit) {//отображение се
 	return '<div class="block-unit level'.$bld.' '.($grid_id ? ' grid' : '').'" val="'.$r['id'].'"></div>';
 }
 function _blockChoose($r, $level, $unit) {//подсветка блоков для выбора (к функциям)
-	if(empty($unit['blk_choose']))
+	if(!$unit['blk_choose'])
 		return '';
 	if($unit['blk_level'] != $level)
 		return '';
@@ -404,7 +411,7 @@ function _blockElemChoose_old($r, $unit) {//подсветка для выбор
 }
 function _block_v_choose($r, $unit) {//подсветка элементов для выбора значения
 	//(не)разрешён выбор значения
-	if(empty($unit['v_choose']))
+	if(!$unit['elem_choose'])
 		return '';
 	//блок не подсвечивается, если в нём нет элемента
 	if(empty($r['elem']))
@@ -601,7 +608,7 @@ function _elemStyle($el, $unit) {//стили css для элемента
 
 	//когда включена настройка ширины элементов,
 	//те элементы, которые могут настраиваться, остаются, остальные скрываются
-	if(!empty($unit['elem_width_change']) && !_dialogParam($el['dialog_id'], 'element_width'))
+	if($unit['elem_width_change'] && !_dialogParam($el['dialog_id'], 'element_width'))
 		$send[] = 'visibility:hidden';
 
 	if(!$send)
@@ -610,13 +617,11 @@ function _elemStyle($el, $unit) {//стили css для элемента
 	return ' style="'.implode(';', $send).'"';
 }
 function _elemUnitIsSetup($unit) {//определение в каком режиме находится блочная структура (рабочий или настройка)
-	if(!empty($unit['blk_setup']))
+	$unit = _blockParam($unit);
+
+	if($unit['blk_setup'])
 		return 1;
-	if(!empty($unit['blk_choose']))
-		return 1;
-	if(!empty($unit['v_choose']))
-		return 1;
-	if(!empty($unit['elem_width_change']))
+	if($unit['elem_choose'])
 		return 1;
 	return 0;
 }

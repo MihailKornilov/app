@@ -217,7 +217,7 @@ function _pasDefine() {//установка флага включения упр
 				if(!(!$page['app_id'] && !SA))
 					$pas = _bool(@$_COOKIE['page_setup']);
 
-	define('PAS', APP_ID && $pas);
+	define('PAS', APP_ID && $pas ? 1 : 0);
 //	define('PAS', 1);//для настройки страниц, которые доступны всем приложениям
 }
 function _pasMenu() {//строка меню управления страницей
