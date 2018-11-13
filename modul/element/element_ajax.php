@@ -993,7 +993,6 @@ function _dialogOpenLoad($dialog_id) {
 		return _dialogOpenUnitEdit($send, $dialog, $edit_id);
 
 
-
 	/* --- Внесение новой записи --- */
 
 	$send['col_type'] = _elemColType($dialog['element_type']);

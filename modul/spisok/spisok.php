@@ -183,22 +183,22 @@ function _spisokJoinField($dialog) {//подключение колонок вт
 	return $send;
 }
 
-function _spisokElemCount($r) {//формирование элемента с содержанием количества списка для вывода на страницу
-	if(!$elem_id = $r['num_1'])
+function _spisokElemCount($el) {//формирование элемента с содержанием количества списка для вывода на страницу
+	if(!$elem_id = $el['num_1'])
 		return 'Список не указан.';
-	if(!$elem = _elemOne($elem_id))
+	if(!$ELEM = _elemOne($elem_id))
 		return 'Элемента, содержащего список, не существует.';
 
 	//если результат нулевой, выводится сообщение из элемента, который размещает список
-	if(!$all = _spisokCountAll($elem))
-		return $r['txt_7'];
+	if(!$all = _spisokCountAll($ELEM))
+		return $el['txt_7'];
 
 	return
-	_end($all, $r['txt_1'], $r['txt_3'], $r['txt_5']).
+	_end($all, $el['txt_1'], $el['txt_3'], $el['txt_5']).
 	' '.
 	$all.
 	' '.
-	_end($all, $r['txt_2'], $r['txt_4'], $r['txt_6']);
+	_end($all, $el['txt_2'], $el['txt_4'], $el['txt_6']);
 }
 function _spisok7num($spisok, $el) {//добавление единицы списка, если был быстрый поиск по номеру
 	/*
@@ -576,7 +576,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 			$cls[] = $td['font'];
 			$cls[] = $td['color'];
 			$cls[] = $td['txt_8'];//pos - позиция
-			$cls[] = _elemFormatColorDate($txt, $td, $sp);
+			$cls[] = _elemFormatColorDate($td, $sp, $txt);
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';
@@ -660,7 +660,7 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 	if(!$dialog['table_1'])
 		return array();
 
-	$sql = "/* ".__FUNCTION__.":".__LINE__." получение данных единицы списка */
+	$sql = "/* ".__FUNCTION__.":".__LINE__." получение данных записи */
 			SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM "._tableFrom($dialog)."
 			WHERE `t1`.`id`=".$unit_id.
@@ -918,8 +918,8 @@ function _spisokCondBind($el) {//отображения значений еди�
 	if(!$unit_id = _num(@$_GET['id']))
 		return ' AND !`t1`.`id`';
 	//получение данных единицы списка, которое принимает страница
-	if(!$unit = _pageUnitGet($page_id))
-		return ' AND !`t1`.`id`';
+//	if(!$unit = _pageUnitGet($page_id))
+//		return ' AND !`t1`.`id`';
 
 	if(!$col = $EL['col'])
 		return ' AND !`t1`.`id`';

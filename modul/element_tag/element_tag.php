@@ -162,7 +162,7 @@ function _search($v=array()) {//поле ПОИСК
 			$width .= 'px';
 	$width = ' style="width:'.$width.'"';
 
-	$dis = empty($v['disabled']) ? '' : ' disabled';
+	$dis = $v['disabled'] ? ' disabled' : '';
 	$readonly = $dis ? ' readonly' : '';
 	$placeholder = empty($v['placeholder']) ? '' : ' placeholder="'.trim($v['placeholder']).'"';
 	$v = trim(@$v['v']);
@@ -178,7 +178,7 @@ function _search($v=array()) {//поле ПОИСК
 		'</table>'.
 	'</div>';
 }
-function _menu($unit, $is_edit) {//Меню страниц, dialog_id=3
+function _menu($el, $is_edit) {//Меню страниц [3]
 	$menu = array();
 	foreach(_page() as $id => $r) {
 		if(!$r['app_id'])
@@ -187,7 +187,7 @@ function _menu($unit, $is_edit) {//Меню страниц, dialog_id=3
 			continue;
 		if(!$r['access'])
 			continue;
-		if($unit['num_1'] != $r['parent_id'])
+		if($el['num_1'] != $r['parent_id'])
 			continue;
 		$menu[$id] = $r;
 	}
@@ -232,7 +232,7 @@ function _menu($unit, $is_edit) {//Меню страниц, dialog_id=3
 		13 => 3 //Боковое вертикальное меню
 	);
 
-	return '<div class="_menu'.$type[$unit['num_2']].'">'.$razdel.'</div>';
+	return '<div class="_menu'.$type[$el['num_2']].'">'.$razdel.'</div>';
 }
 function _dropdown($v=array()) {//выпадающее поле - ссылка
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];

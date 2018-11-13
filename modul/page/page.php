@@ -405,32 +405,43 @@ function _pageUserAccessAll() {//настройка входа в приложе
 
 
 function _pageShow($page_id) {
-	define('PAGE_MSG_ERR', 'Несуществующая страница'.
-						   '<br><br>'.
-						   '<a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>'
-	);
+	define('PAGE_MSG_ERR', '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>');
 
-	if(!$page = _page($page_id))
-		return _empty(PAGE_MSG_ERR);
-	if(!SA && $page['sa'])
-		return _empty(PAGE_MSG_ERR);
-	if(!SA && !$page['access'])
-		return _empty(PAGE_MSG_ERR);
 
+	//нет доступа в приложение
 	if(APP_ID && !APP_ACCESS)
 		$page_id = 105;
 
+	//если доступ в приложение есть, но попали на страницу о недоступности, то переход на стартовую страницу
 	if($page_id == 105 && APP_ID && APP_ACCESS)
 		$page_id = _page('def');
 
-	$unit = _pageUnitGet($page_id);
+	if(!$page = _page($page_id))
+		return _empty20('Несуществующая страница.'.PAGE_MSG_ERR);
+	if(!SA && $page['sa'])
+		return _empty20('Нет доступа.'.PAGE_MSG_ERR);
+	if(!SA && !$page['access'])
+		return _empty20('Вход в приложение невозможен.'.PAGE_MSG_ERR);
+
+	$prm = array();
+
+	//страница принимает значенпия записи
+	if($dialog_id = $page['dialog_id_unit_get']) {
+		if(!$id = _num(@$_GET['id']))
+			return _empty20('Некорректный идентификатор записи.'.PAGE_MSG_ERR);
+		if(!$dialog = _dialogQuery($dialog_id))
+			return _empty20('Отсутствует диалог, который вносит данные записи.'.PAGE_MSG_ERR);
+		if(!$unit = _spisokUnitQuery($dialog, $id))
+			return _empty20('Записи '.$id.' не существует.'.PAGE_MSG_ERR);
+		$prm['unit_get'] = $unit;
+	}
 
 	return
-	_blockHtml('page', $page_id, $unit).
+	_blockHtml('page', $page_id, $prm).
 	_page_div().
-	_pageShowScript($page_id, empty($unit['msg_err']));
+	_pageShowScript($page_id);
 }
-function _pageShowScript($page_id, $elmActUse) {
+function _pageShowScript($page_id, $elmActUse=true) {
 	if(PAS)
 		return '';
 
@@ -452,12 +463,14 @@ function _pageShowScript($page_id, $elmActUse) {
 	'</script>';
 }
 function _pageUnitGet($page_id) {
+	return array();
 	$PAGE_START_MSG = '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>';
 
 	if(!$page_id)
 		return array('msg_err'=>'Некорректный ID страницы'.$PAGE_START_MSG);
 	if(!$page = _page($page_id))
 		return array('msg_err'=>'Страницы '.$page_id.' не существует'.$PAGE_START_MSG);
+
 	if(!$dialog_id = $page['dialog_id_unit_get'])
 		return array();
 	if(!$id = _num(@$_GET['id']))

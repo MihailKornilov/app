@@ -74,13 +74,13 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 
 	return $name;
 }
-function _blockHtml($obj_name, $obj_id, $unit=array(), $grid_id=0) {//вывод структуры блоков для конкретного объекта
+function _blockHtml($obj_name, $obj_id, $PARAM=array(), $grid_id=0) {//вывод структуры блоков для конкретного объекта
 	if(!$block = _BE('block_obj', $obj_name, $obj_id))
 		return _blockName($obj_name, 'empty', $obj_id);
-	if(!empty($unit['msg_err']))
-		return _empty($unit['msg_err']);
+	if(!empty($PARAM['msg_err']))
+		return _empty20($PARAM['msg_err']);
 
-	return _blockLevel($block, $unit, $grid_id);
+	return _blockLevel($block, $PARAM, $grid_id);
 }
 function _blockParam($PARAM, $obj_name='') {//значения-параметры, формирующие настройки блоков
 	//если параметры получены, настройка не нужна
@@ -95,6 +95,8 @@ function _blockParam($PARAM, $obj_name='') {//значения-параметр�
 		'blk_choose' => 0,          //выбор блоков
 		'elem_choose' => 0,         //выбор элемента
 		'elem_width_change' => 0,   //изменение ширины элементов
+
+		'unit_get' => array(),      //данные записи для отображения
 	);
 
 	//условия для настройки блоков конкретного объекта
@@ -241,8 +243,8 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			            ' val="dialog_id:'.$r['click_dialog'].($r['click_unit_id'] ? ',unit_id:'.$PARAM['id'] : '').'"'
 		  : '').
 					 '>'.
-							_blockSetka($r, $level, $grid_id, $PARAM).
-							_blockChoose($r, $level, $PARAM).
+							_blockSetka($r, $PARAM, $grid_id, $level).
+							_blockChoose($r, $PARAM, $level).
 							_block_v_choose($r, $PARAM).
 							_blockChildHtml($r, $PARAM, $grid_id, $level + 1, $width).
 	    					_elemDiv($r['elem'], $PARAM).
@@ -344,41 +346,41 @@ function _blockLevelDefine($obj_name, $v = 0) {//уровень редактир
 	}
 	return empty($_COOKIE[$key]) ? 1 : _num($_COOKIE[$key]);
 }
-function _blockSetka($r, $level, $grid_id, $unit) {//отображение сетки для настраиваемого блока
-	if(!$unit['blk_setup'])
+function _blockSetka($bl, $prm, $grid_id, $level) {//отображение сетки для настраиваемого блока
+	if(!$prm['blk_setup'])
 		return '';
 	//выход, если включено изменение ширины элемента
-	if($unit['elem_width_change'])
+	if($prm['elem_width_change'])
 		return '';
 	//выход, если выбор блоков
-	if($unit['blk_choose'])
+	if($prm['blk_choose'])
 		return '';
 	//выход, если выбор элемента
-	if($unit['elem_choose'])
+	if($prm['elem_choose'])
 		return '';
 	//выход, если происходит настройка подблоков
-	if($r['id'] == $grid_id)
+	if($bl['id'] == $grid_id)
 		return '';
 
-	$bld = _blockLevelDefine($r['obj_name']);
+	$BLD = _blockLevelDefine($bl['obj_name']);
 
-	if($bld != $level)
+	if($BLD != $level)
 		return '';
 
-	$bld += $r['obj_name'] == 'page' ? 0 : 2;
+	$BLD += $bl['obj_name'] == 'page' ? 0 : 2;
 
-	return '<div class="block-unit level'.$bld.' '.($grid_id ? ' grid' : '').'" val="'.$r['id'].'"></div>';
+	return '<div class="block-unit level'.$BLD.' '.($grid_id ? ' grid' : '').'" val="'.$bl['id'].'"></div>';
 }
-function _blockChoose($r, $level, $unit) {//подсветка блоков для выбора (к функциям)
-	if(!$unit['blk_choose'])
+function _blockChoose($bl, $prm, $level) {//подсветка блоков для выбора (к функциям)
+	if(!$prm['blk_choose'])
 		return '';
-	if($unit['blk_level'] != $level)
+	if($prm['blk_level'] != $level)
 		return '';
 
 	//отметка выбранных полей
-	$block_id = $r['id'];
-	$sel = isset($unit['blk_sel'][$block_id]) ? ' sel' : '';
-	$deny = isset($unit['blk_deny'][$block_id]) ? ' deny' : '';
+	$block_id = $bl['id'];
+	$sel = isset($prm['blk_sel'][$block_id]) ? ' sel' : '';
+	$deny = isset($prm['blk_deny'][$block_id]) ? ' deny' : '';
 
 	return '<div class="blk-choose'.$sel.$deny.'" val="'.$block_id.'"></div>';
 }
@@ -494,17 +496,14 @@ function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины
 	return 0;
 }
 
-function _elemDiv($el, $unit=array()) {//формирование div элемента
+function _elemDiv($el, $prm=array()) {//формирование div элемента
 	if(!$el)
 		return '';
 
-	$txt = _elemUnit($el, $unit);
-
-	//если элемент списка шаблона, attr_id не ставится
-	$attr_id = empty($unit['blk_setup']) && $el['block']['obj_name'] == 'spisok' ? '' : ' id="el_'.$el['id'].'"';
+	$txt = _elemPrint($el, $prm);
 
 	$cls = array();
-	$cls[] = _elemFormatColorDate($txt, $el, $unit);
+	$cls[] = _elemFormatColorDate($el, $prm, $txt);
 	$cls[] = $el['font'];
 	$cls[] = $el['size'] ? 'fs'.$el['size'] : '';
 	$cls = array_diff($cls, array(''));
@@ -512,9 +511,18 @@ function _elemDiv($el, $unit=array()) {//формирование div элеме
 
 	$txt = _elemFormatHide($txt, $el);
 	$txt = _elemFormatDigital($txt, $el);
-	$txt = _spisokUnitUrl($el, $unit, $txt);
+	$txt = _spisokUnitUrl($el, $prm, $txt);
 
-	return '<div'.$attr_id.$cls._elemStyle($el, $unit).'>'.$txt.'</div>';
+	return '<div'._elemDivAttrId($el, $prm).$cls._elemStyle($el, $prm).'>'.$txt.'</div>';
+}
+function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элемента
+	if($prm['blk_setup'])
+		return '';
+	//attr_id не ставится в элементе шаблона
+	if($el['block']['obj_name'] == 'spisok')
+		return '';
+
+	return ' id="el_'.$el['id'].'"';
 }
 function _elemFormatHide($txt, $el) {//Дополнительное форматирование: скрытие при нулевом значении
 	if(empty($el['format']))
@@ -566,7 +574,7 @@ function _elemFormatColor($txt, $el) {//подмена цвета при доп�
 
 	return $el['color'];
 }
-function _elemFormatColorDate($txt, $el, $unit) {//подмена цвета для даты todo тестовая версия
+function _elemFormatColorDate($el, $unit, $txt) {//подмена цвета для даты todo тестовая версия
 	if(_elemUnitIsSetup($unit))
 		return _elemFormatColor($txt, $el);
 	if($el['dialog_id'] != 86)
@@ -625,7 +633,289 @@ function _elemUnitIsSetup($unit) {//определение в каком реж�
 		return 1;
 	return 0;
 }
+
+function _elemAttrId($el, $prm) {//аттрибут id для DIV элемента
+	$attr_id = 'cmp_'.$el['id'];
+
+	if($prm['blk_setup'])
+		$attr_id .= '_edit';
+
+	return $attr_id;
+}
+function _elemStyleWidth($el) {//ширина элемента
+	if(!$el['width'])
+		return ' style="width:100%"';
+
+	return ' style="width:'.$el['width'].'px"';
+}
+function _elemPrint($el, $prm) {//формирование и отображение элемента
+	switch($el['dialog_id']) {
+		//Меню страниц
+		case 3:
+			/*
+				num_1 - раздел (страница-родитель). В меню будут дочерние страницы
+				num_2 - внешний вид:
+						10 - Основной вид - горизонтальное меню
+						11 - С подчёркиванием (гориз.)
+						12 - Синие маленькие кнопки (гориз.)
+						13 - Боковое вертикальное меню
+			*/
+			return _menu($el, $prm['blk_setup']);
+
+		//Заголовок
+		case 4:
+			/*
+                txt_1 - текст заголовка
+			*/
+			return '<div class="hd2">'.$el['txt_1'].'</div>';
+
+		//Фильтр - быстрый поиск
+		case 7:
+			/*
+                txt_1 - текст поиска
+				num_1 - id элемента, содержащего список, по которому происходит поиск
+				txt_2 - по каким полям производить поиск (id элементов через запятую диалога списка)
+			*/
+
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$v = '';
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_1'],
+					'filter' => $el['id'],
+					'v' => $v
+				));
+			}
+
+			return _search(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'v' => $v,
+						'disabled' => $prm['blk_setup']
+					));
+
+		//произвольный текст
+		case 10:
+			/*
+                txt_1 - текст
+			*/
+			return _br($el['txt_1']);
+
+		//Содержание единицы списка - шаблон
+		case 14:
+			if(!$dialog_id = $el['num_1'])
+				return _emptyRed('Не указан список для вывода данных.');
+			if(!$DLG = _dialogQuery($dialog_id))
+				return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
+			if($prm['blk_setup'])
+				return _empty('Список-шаблон <b>'.$DLG['name'].'</b>');
+
+			return _spisok14($el);
+
+		//Количество строк списка
+		case 15:
+			/*
+                num_1 - id элемента, содержащего список, количество строк которого нужно выводить
+				txt_1 "1" txt_2 - показана "1" запись
+				txt_3 "2" txt_4 - показано "2" записи
+				txt_5 "5" txt_6 - показано "5" записей
+				txt_7 - сообщение об отсутствии записей
+			*/
+			return _spisokElemCount($el);
+
+		//Меню переключения блоков
+		case 57:
+			/*
+				num_1 - внешний вид меню:
+						1158 - Маленькие синие кнопки
+						1159 - С нижним подчёркиванием
+
+				для настройки блоков используется функция PHP12_menu_block_setup
+			*/
+
+			$type = array(
+				1158 => 2,
+				1159 => 1
+			);
+
+			//получение пунктов меню
+			$vvv = PHP12_menu_block_setup_vvv($el['id']);
+
+			$razdel = '';
+			foreach($vvv as $r) {
+				$sel = _dn($el['def'] != $r['id'], 'sel');
+				$razdel .= '<a class="link'.$sel.'">'.$r['title'].'</a>';
+			}
+
+			return
+				'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$el['def'].'" />'.
+				'<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
+
+		//Фильтр: галочка
+		case 62:
+			/*
+				txt_1 - текст для галочки
+				num_1 - условие применяется:
+						1439 - галочка установлена
+						1440 - галочка НЕ установлена
+				num_2 - id элемента, размещающего список
+				num_3 - значение по умолчанию
+				значения: элемент [22]
+			*/
+
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$v = 0;
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_2'],
+					'filter' => $el['id'],
+					'v' => $el['num_3']
+				));
+			}
+
+			return _check(array(
+				'attr_id' => _elemAttrId($el, $prm),
+				'title' => $el['txt_1'],
+				'disabled' => $prm['blk_setup'],
+				'value' => $v
+			));
+
+		//Список истории действий
+		case 68:
+			if($prm['blk_setup'])
+				return _emptyMin('История действий', 0);
+
+			/*
+				num_8 - показывать только записи единицы списка, которые принимает текущая страница
+			*/
+
+			return _historySpisok($el);
+
+		//Фильтр: календарь
+		case 77:
+			/*
+				num_1 - id элемента, размещающего список
+				num_2 - значение по умолчанию:
+							2819 - текущий день
+							2820 - текущая неделя
+							2821 - текущий месяц
+			*/
+			return _filterCalendar($el);
+
+		//Фильтр: меню
+		case 78:
+			/*
+				num_1 - id элемента, размещающего список
+				txt_1 - id элемента (с учётом вложений), содержащего значения (названия), составляющие меню
+				txt_2 - id элемента (с учётом вложений), содержащего количество записей по каждому пункту
+			*/
+			return _filterMenu($el);
+
+		//Очистка фильтра
+		case 80:
+			/*
+				txt_1 - имя кнопки
+				num_1 - id элемента, размещающего список
+			*/
+
+			$diff = _spisokFilter('diff', $el['num_1']);
+			return _button(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'name' => _br($el['txt_1']),
+						'color' => 'red',
+						'width' => $el['width'],
+						'small' => 1,
+						'class' => _dn($prm['blk_setup'] || $diff)
+					));
+
+		//Фильтр - Выбор нескольких групп значений
+		case 102:
+			/*
+                num_1 - список, на который воздействует фильтр
+				txt_1 - нулевое значение
+                txt_2 - привязанный список
+                txt_3 - счётчик количеств
+                txt_4 - путь к цветам
+			*/
+
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$cond = _22cond($el['id']);
+				$v = _elemSpisokConnect($el['txt_2'], 'ids', $cond);
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_1'],
+					'filter' => $el['id'],
+					'v' => $v
+				));
+			}
+
+			$vAss = _idsAss($v);
+
+			//количества
+			$count = _elemSpisokConnect($el['txt_3'], 'ass');
+
+			//цвета
+			$color = _elemSpisokConnect($el['txt_4'], 'ass');
+
+			$title = '';//для JS
+			$spisok = '';
+			$sel = '';//выбранные значения
+			if($arr = _elemSpisokConnect($el['txt_2'])) {
+				$n = 0;
+				$selOne = '';
+				foreach($arr as $r) {
+					$id = $r['id'];
+					$bg = isset($color[$id]) ? ' style="background-color:'.$color[$id].'"' : '';
+					$c = _hide0(@$count[$id]);
+					$spisok .=
+						'<tr class="over1" val="'.$r['id'].'">'.
+							'<th class="w35 pad8 center"'.$bg.'>'.
+								_check(array(
+									'attr_id' => 'chk'.$id,
+									'value' => isset($vAss[$id])
+								)).
+							'<td class="wsnw">'.$r['title'].
+							'<td class="r fs12 grey b">'.$c;
+
+					$title[$id] = $r['title'];
+
+					if(isset($vAss[$id])) {
+						$sel .= '<div class="un"'.$bg.'>'._num($c).'</div>';
+						$selOne = '<div class="un"'.$bg.'>'.$r['title'].'</div>';
+						$n++;
+					}
+				}
+				if($n == 1)
+					$sel = $selOne;
+			}
+
+
+			return
+			'<div class="_filter102"'._elemStyleWidth($el).' id="'._elemAttrId($el, $prm).'_filter102">'.
+				'<div class="holder'._dn(!$sel).'">'.$el['txt_1'].'</div>'.
+				'<table class="w100p">'.
+					'<tr><td class="td-un">'.($sel ? $sel : '<div class="icon icon-empty"></div>').
+						'<td class="w25 top r">'.
+							'<div class="icon icon-del pl'._dn($sel, 'vh')._tooltip('Очистить фильтр', -53).'</div>'.
+				'</table>'.
+				'<div class="list">'.
+					'<table>'.$spisok.'</table>'.
+				'</div>'.
+			'</div>'.
+			'<script>'.
+				'var EL'.$el['id'].'_F102_TITLE='._json($title).','.
+					'EL'.$el['id'].'_F102_C='._json($count).','.
+					'EL'.$el['id'].'_F102_BG='._json($color).';'.
+			'</script>';
+	}
+
+	return '<div class="fs10 red">no-elem-dlg-'.$el['dialog_id'].'</div>';
+}
 function _elemUnit($el, $unit) {//формирование элемента страницы
+	return '<div class="fs10 b color-sal">_elemUnit</div>';
+
+/*
 	$UNIT_ISSET = isset($unit['id']);
 
 	$SRC = !empty($unit['src']) ? $unit['src'] : array();
@@ -641,8 +931,8 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 //		case -1: $width = ' style="width:100%"'; break;
 		default: $width = ' style="width:'.$el['width'].'px"';
 	}
-
-	switch($el['dialog_id']) {
+*/
+	switch(false) {
 		//галочка
 		case 1:
 			/*
@@ -705,25 +995,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 						'val' => 'dialog_id:'.$el['num_4'].$block.$dialog_source
 					));
 
-		//Меню страниц
-		case 3:
-			/*
-				num_1 - раздел (страница-родитель). В меню будут дочерние страницы
-				num_2 - внешний вид:
-						10 - Основной вид - горизонтальное меню
-						11 - С подчёркиванием (гориз.)
-						12 - Синие маленькие кнопки (гориз.)
-						13 - Боковое вертикальное меню
-			*/
-			return _menu($el, $is_edit);
-
-		//Заголовок
-		case 4:
-			/*
-                txt_1 - текст заголовка
-			*/
-			return '<div class="hd2">'.$el['txt_1'].'</div>';
-
 		//textarea (многострочное текстовое поле)
 		case 5:
 			/*
@@ -747,32 +1018,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 						'width' => $el['width'],
 						'value' => _num($v)
 				   ));
-
-		//Фильтр - быстрый поиск
-		case 7:
-			/*
-                txt_1 - текст поиска
-				num_1 - id элемента, содержащего список, по которому происходит поиск
-				txt_2 - по каким полям производить поиск (id элементов через запятую диалога списка)
-			*/
-
-			$v = _spisokFilter('v', $el['id']);
-			if($v === false) {
-				$v = '';
-				_spisokFilter('insert', array(
-					'spisok' => $el['num_1'],
-					'filter' => $el['id'],
-					'v' => $v
-				));
-			}
-
-			return _search(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'v' => $v,
-						'disabled' => $disabled
-					));
 
 		//input:text (однострочное текстовое поле)
 		case 8:
@@ -818,13 +1063,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			return '<a class="inhr" href="'.URL.'&p='.$el['num_1'].'">'.
 						$txt.
 				   '</a>';
-
-		//произвольный текст
-		case 10:
-			/*
-                txt_1 - текст
-			*/
-			return _br($el['txt_1']);
 
 		//Выбор значения для шаблона (выводится окно для выбора)
 		case 11:
@@ -923,44 +1161,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
 				'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'.$title.'" />'.
 			'</div>';
-
-		//Содержание единицы списка - шаблон
-		case 14:
-			//диалог, через который вносятся данные списка
-			if(!$dialog_id = $el['num_1'])
-				return
-				'<div class="_empty">'.
-					'<span class="fs15 red">'.
-						'Не указан список для вывода данных.'.
-					'</span>'.
-				'</div>';
-
-			if(!$DLG = _dialogQuery($dialog_id))
-				return
-				'<div class="_empty">'.
-					'<span class="fs15 red">'.
-						'Списка <b class="fs15">'.$dialog_id.'</b> не существует.'.
-					'</span>'.
-				'</div>';
-
-			if($is_edit)
-				return
-				'<div class="_empty">'.
-					'Список-шаблон <b class="fs14">'.$DLG['name'].'</b>'.
-				'</div>';
-
-			return _spisok14($el);
-
-		//Количество строк списка
-		case 15:
-			/*
-                num_1 - id элемента, содержащего список, количество строк которого нужно выводить
-				txt_1 "1" txt_2 - показана "1" запись
-				txt_3 "2" txt_4 - показано "2" записи
-				txt_5 "5" txt_6 - показано "5" записей
-				txt_7 - сообщение об отсутствии записей
-			*/
-			return _spisokElemCount($el);
 
 		//Radio - произвольные значения
 		case 16:
@@ -1363,34 +1563,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			*/
 			return $el['name'];
 
-		//Меню переключения блоков
-		case 57:
-			/*
-				num_1 - внешний вид меню:
-						1158 - Маленькие синие кнопки
-						1159 - С нижним подчёркиванием
-
-				для настройки блоков используется функция PHP12_menu_block_setup
-			*/
-
-			$type = array(
-				1158 => 2,
-				1159 => 1
-			);
-
-			//получение пунктов меню
-			$vvv = PHP12_menu_block_setup_vvv($el['id']);
-
-			$razdel = '';
-			foreach($vvv as $r) {
-				$sel = _dn($el['def'] != $r['id'], 'sel');
-				$razdel .= '<a class="link'.$sel.'">'.$r['title'].'</a>';
-			}
-
-			return
-				'<input type="hidden" id="'.$attr_id.'" value="'.$el['def'].'" />'.
-				'<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
-
 		//Связка списка при помощи кнопки
 		case 59:
 			/*
@@ -1493,35 +1665,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 				'</div>'.
 			'</div>';
 
-		//Фильтр - галочка
-		case 62:
-			/*
-				txt_1 - текст для галочки
-				num_1 - условие применяется:
-						1439 - галочка установлена
-						1440 - галочка НЕ установлена
-				num_2 - id элемента, размещающего список
-				num_3 - значение по умолчанию
-				значения: элемент [22]
-			*/
-
-			$v = _spisokFilter('v', $el['id']);
-			if($v === false) {
-				$v = 0;
-				_spisokFilter('insert', array(
-					'spisok' => $el['num_2'],
-					'filter' => $el['id'],
-					'v' => $el['num_3']
-				));
-			}
-
-			return _check(array(
-				'attr_id' => $attr_id,
-				'title' => $el['txt_1'],
-				'disabled' => $disabled,
-				'value' => $v
-			));
-
 		//Выбор цвета текста
 		case 66:
 			/*
@@ -1529,17 +1672,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 				'<div class="_color" style="background-color:#000"></div>';
-
-		//Список истории действий
-		case 68:
-			if($is_edit)
-				return '<div class="_empty min">История действий.</div>';
-
-			/*
-				num_8 - показывать только записи единицы списка, которые принимает текущая страница
-			*/
-
-			return _historySpisok($el);
 
 		//Значение списка: имя пользователя
 		case 69: return _spisokUnitUser($el, $unit);
@@ -1600,43 +1732,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 				'spisok' => $spisok,
 				'disabled' => $disabled
 			));
-
-		//Календарь
-		case 77:
-			/*
-				num_1 - id элемента, размещающего список
-				num_2 - значение по умолчанию:
-							2819 - текущий день
-							2820 - текущая неделя
-							2821 - текущий месяц
-			*/
-			return _filterCalendar($el);
-
-		//Меню
-		case 78:
-			/*
-				num_1 - id элемента, размещающего список
-				txt_1 - id элемента (с учётом вложений), содержащего значения (названия), составляющие меню
-				txt_2 - id элемента (с учётом вложений), содержащего количество записей по каждому пункту
-			*/
-			return _filterMenu($el);
-
-		//Очистка фильтра
-		case 80:
-			/*
-				txt_1 - имя кнопки
-				num_1 - id элемента, размещающего список
-			*/
-
-			$diff = _spisokFilter('diff', $el['num_1']);
-			return _button(array(
-						'attr_id' => $attr_id,
-						'name' => _br($el['txt_1']),
-						'color' => 'red',
-						'width' => $el['width'],
-						'small' => 1,
-						'class' => _dn($is_edit || $diff)
-					));
 
 		//Фильтр: Select - привязанный список
 		case 83:
@@ -1731,89 +1826,7 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 				$day_txt = $el['txt_10'].' завтра';
 
 			return $day_txt;
-
-		//Фильтр - Выбор нескольких групп значений
-		case 102:
-			/*
-                num_1 - список, на который воздействует фильтр
-				txt_1 - нулевое значение
-                txt_2 - привязанный список
-                txt_3 - счётчик количеств
-                txt_4 - путь к цветам
-			*/
-
-			$v = _spisokFilter('v', $el['id']);
-			if($v === false) {
-				$cond = _22cond($el['id']);
-				$v = _elemSpisokConnect($el['txt_2'], 'ids', $cond);
-				_spisokFilter('insert', array(
-					'spisok' => $el['num_1'],
-					'filter' => $el['id'],
-					'v' => $v
-				));
-			}
-
-			$vAss = _idsAss($v);
-
-			//количества
-			$count = _elemSpisokConnect($el['txt_3'], 'ass');
-
-			//цвета
-			$color = _elemSpisokConnect($el['txt_4'], 'ass');
-
-			$title = '';//для JS
-			$spisok = '';
-			$sel = '';//выбранные значения
-			if($arr = _elemSpisokConnect($el['txt_2'])) {
-				$n = 0;
-				$selOne = '';
-				foreach($arr as $r) {
-					$id = $r['id'];
-					$bg = isset($color[$id]) ? ' style="background-color:'.$color[$id].'"' : '';
-					$c = _hide0(@$count[$id]);
-					$spisok .=
-						'<tr class="over1" val="'.$r['id'].'">'.
-							'<th class="w35 pad8 center"'.$bg.'>'.
-								_check(array(
-									'attr_id' => 'chk'.$id,
-									'value' => isset($vAss[$id])
-								)).
-							'<td class="wsnw">'.$r['title'].
-							'<td class="r fs12 grey b">'.$c;
-
-					$title[$id] = $r['title'];
-
-					if(isset($vAss[$id])) {
-						$sel .= '<div class="un"'.$bg.'>'._num($c).'</div>';
-						$selOne = '<div class="un"'.$bg.'>'.$r['title'].'</div>';
-						$n++;
-					}
-				}
-				if($n == 1)
-					$sel = $selOne;
-			}
-
-
-			return
-			'<div class="_filter102"'.$width.' id="'.$attr_id.'_filter102">'.
-				'<div class="holder'._dn(!$sel).'">'.$el['txt_1'].'</div>'.
-				'<table class="w100p">'.
-					'<tr><td class="td-un">'.($sel ? $sel : '<div class="icon icon-empty"></div>').
-						'<td class="w25 top r">'.
-							'<div class="icon icon-del pl'._dn($sel, 'vh')._tooltip('Очистить фильтр', -53).'</div>'.
-				'</table>'.
-				'<div class="list">'.
-					'<table>'.$spisok.'</table>'.
-				'</div>'.
-			'</div>'.
-			'<script>'.
-				'var EL'.$el['id'].'_F102_TITLE='._json($title).','.
-					'EL'.$el['id'].'_F102_C='._json($count).','.
-					'EL'.$el['id'].'_F102_BG='._json($color).';'.
-			'</script>';
 	}
-
-	return '<div class="fs10 red">неизвестный элемент '.$el['dialog_id'].'</div>';
 }
 
 function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения

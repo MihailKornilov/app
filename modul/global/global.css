@@ -105,6 +105,7 @@ body:not(.site){position:relative}
 }
 ._empty.min{padding:20px}
 ._empty.red{color:red}
+._empty b{font-size:14px}
 
 
 

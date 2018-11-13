@@ -569,11 +569,17 @@ function _arrNum($arr) {//переделка значений массива в 
 	return $arr;
 }
 
-function _empty($msg) {//Информация на сером фоне
+function _empty($msg) {//Информация на сером фоне без отступов
+	return '<div class="_empty">'.$msg.'</div>';
+}
+function _empty20($msg) {//Информация на сером фоне c отступами 20px
 	return '<div class="_empty mar20">'.$msg.'</div>';
 }
 function _emptyMin($msg, $mar=10) {
 	return '<div class="_empty min'.($mar ? ' mar'.$mar : '').'">'.$msg.'</div>';
+}
+function _emptyRed($msg) {
+	return '<div class="_empty red">'.$msg.'</div>';
 }
 
 
