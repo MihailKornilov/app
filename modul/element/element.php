@@ -1248,7 +1248,6 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 //		case 29: //связки
 //		case 59: return _dialogParam($el['num_1'], 'name');
 		case 32: return 'номер';
-		case 33: return 'дата/время';
 		case 30: return 'del';
 		case 34: return 'edit';
 		case 60: return _imageNo($el_parent['width']);
@@ -3246,7 +3245,7 @@ function _historySpisok($el) {//список истории действий [68
 			ORDER BY `dtime_add` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
-		return '<div class="_empty min">Истории нет.</div>';
+		return _emptyMin('Истории нет.');
 
 	foreach($arr as $id => $r)
 		$arr[$id]['edited'] = array();
@@ -3262,10 +3261,10 @@ function _historySpisok($el) {//список истории действий [68
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `id` IN ("._idsGet($arr, 'unit_id').")";
-	$spUnit = query_arr($sql);
+	$unitArr = query_arr($sql);
 
 	//вставка значений из вложенных списков
-	$spUnit = _spisokInclude($spUnit);
+	$unitArr = _spisokInclude($unitArr);
 
 	//распределение истории по дням
 	$spisok = array();
@@ -3287,19 +3286,19 @@ function _historySpisok($el) {//список истории действий [68
 		foreach($day_arr as $n => $r) {
 			$dlg = _dialogQuery($r['dialog_id']);
 			$msg = '';
-			$unit = $spUnit[$r['unit_id']];
+			$prm['unit_get'] = $unitArr[$r['unit_id']];
 			foreach($dlg[$r['type_id'].'_history_elm'] as $el) {
 				if($el['dialog_id']) {
-					if($txt = _elemUnit($el, $unit)) {
+					if($txt = _elemPrint($el, $prm)) {
 						$cls = array('wsnw');
 						if($el['font'])
 							$cls[] = $el['font'];
 						if($el['color'])
 							$cls[] = $el['color'];
 						$cls = implode(' ', $cls);
-						$txt = _elemFormatHide($txt, $el);
-						$txt = _elemFormatDigital($txt, $el);
-						$txt = _spisokUnitUrl($el, $unit, $txt);
+						$txt = _elemFormatHide($el, $txt);
+						$txt = _elemFormatDigital($el, $txt);
+						$txt = _spisokUnitUrl($el, $prm, $txt);
 						$txt = '<span class="'.$cls.'">'.$txt.'</span>';
 						$msg .= $el['txt_7'].$txt.$el['txt_8'];
 					}

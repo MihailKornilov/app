@@ -414,6 +414,9 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		настройка шаблона через функцию PHP12_spisok14_setup
 	*/
 
+	if(!_BE('block_arr', 'spisok', $ELEM['id']))
+		return _emptyRed('Шаблон единицы списка не настроен.');
+
 	$DLG = _dialogQuery($ELEM['num_1']);
 
 	$limit = $ELEM['num_2'];
@@ -444,31 +447,13 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	//вставка картинок
 	$spisok = _spisokImage($spisok, $DLG['cmp']);
 
-	if(!$BLK = _BE('block_arr', 'spisok', $ELEM['id']))
-		return '<div class="_empty"><span class="fs15 red">Шаблон единицы списка не настроен.</span></div>';
-
-	//получение элементов, находящихся в блоках
-	$ELM = _BE('elem_arr', 'spisok', $ELEM['id']);
-
 	$send = '';
-	foreach($spisok as $sp) {
-		$child = array();
-		foreach($BLK as $id => $r) {
-			$r['elem'] = array();
-			if($r['elem_id']) {
-				$elem = $ELM[$r['elem_id']];
-				$elem['block'] = $r;
-				$r['elem'] = $elem;
-			}
-
-			$child[$r['parent_id']][$id] = $r;
-		}
-
-		$block = _blockArrChild($child);
-		$send .=
-			'<div class="sp-unit" val="'.$sp['id'].'">'.
-				_blockLevel($block, $sp).
-			'</div>';
+	foreach($spisok as $id => $sp) {
+		$block = _BE('block_obj', 'spisok', $ELEM['id']);
+		$prm = array('unit_get'=>$sp);
+		$send .= '<div class="sp-unit" val="'.$id.'">'.
+					_blockLevel($block, $prm).
+				 '</div>';
 	}
 
 	if($limit * ($next + 1) < $all) {
@@ -554,10 +539,11 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		return '<div class="_empty"><span class="fs15 red">Таблица не настроена.</span></div>';
 
 	$MASS = array();
-	foreach($spisok as $sp) {
+	foreach($spisok as $uid => $u) {
 		$TR = '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
+		$prm = array('unit_get'=>$u);
 		foreach($tabCol as $td) {
-			$txt = _elemUnit($td, $sp);
+			$txt = _elemPrint($td, $prm);
 
 			$cls = array();
 			switch($td['dialog_id']) {
@@ -570,18 +556,18 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 			$cls[] = $td['font'];
 			$cls[] = $td['color'];
 			$cls[] = $td['txt_8'];//pos - позиция
-			$cls[] = _elemFormatColorDate($td, $sp, $txt);
+			$cls[] = _elemFormatColorDate($td, $prm, $txt);
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';
 
-			$txt = _elemFormatHide($txt, $td);
-			$txt = _elemFormatDigital($txt, $td);
-			$txt = _spisokUnitUrl($td, $sp, $txt);
+			$txt = _elemFormatHide($td, $txt);
+			$txt = _elemFormatDigital($td, $txt);
+			$txt = _spisokUnitUrl($td, $prm, $txt);
 
-			$TR .= '<td'.$cls.' style="width:'.$td['width'].'px">'.$txt;
+			$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
 		}
-		$MASS[$sp['id']] = $TR;
+		$MASS[$uid] = $TR;
 	}
 
 	//tr догрузки списка
@@ -699,45 +685,6 @@ function _spisokUnitNum($u) {//порядковый номер - значени�
 
 	return $u['num'];
 }
-function _spisokUnitData($el, $unit) {//дата и время - значение единицы списка [33]
-	if(empty($unit) || empty($unit['dtime_add']))
-		return _elemTitle($el['id']);
-
-	$dtime = $unit['dtime_add'];
-
-	if(!preg_match(REGEXP_DATE, $dtime))
-		return 'некорректный формат даты';
-
-	$ex = explode(' ', $dtime);
-	$d = explode('-', $ex[0]);
-
-	//время
-	$hh = '';
-	if($el['num_4'] && !empty($ex[1])) {
-		$h = explode(':', $ex[1]);
-		$hh .= ' '.$h[0].':'.$h[1];
-	}
-
-	if($el['num_1'] == 31)
-		return $d[2].'/'.$d[1].'/'.$d[0].$hh;
-
-	$hh = $hh ? ' в'.$hh : '';
-
-	if($el['num_3']) {
-		$dCount = floor((strtotime($ex[0]) - TODAY_UNIXTIME) / 3600 / 24);
-		switch($dCount) {
-			case -1: return 'вчера'.$hh;
-			case 0: return 'сегодня'.$hh;
-			case 1: return 'завтра'.$hh;
-		}
-	}
-
-	return
-		_num($d[2]).                                                     //день
-		' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //месяц
-		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
-		$hh;                                                             //время
-}
 function _spisokUnitUser($el, $u) {//значение единицы списка - имя пользователя
 	if(empty($u))
 		return $el['name'];
@@ -748,16 +695,19 @@ function _spisokUnitUser($el, $u) {//значение единицы списк�
 	return _user($u['user_id_add'], 'name');
 }
 
-function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в ссылку
-	if(!$el['url'])//оборачивать не нужно
+function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в ссылку
+	//оборачивать не нужно
+	if(!$el['url'])
 		return $txt;
-	if(empty($unit['id']))//отсутствует единица списка
+	//отсутствует запись
+	if(!$u = $prm['unit_get'])
 		return $txt;
 
-	if($el['url'] != 3) {//указана конкретная страница
-		$unit_id = $unit['id'];
+	//указана конкретная страница
+	if($el['url'] != 3) {
 		$page = _page($el['url']);
-		if($page['dialog_id_unit_get'] != $unit['dialog_id'])
+		$uid = $u['id'];
+		if($page['dialog_id_unit_get'] != $u['dialog_id'])
 			if($el['dialog_id'] == 11) {
 				if(!$ids = _ids($el['txt_2'], 1))
 					return $txt;
@@ -765,9 +715,9 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в 
 					return $txt;
 				if(!$col = $EL['col'])
 					return $txt;
-				$unit_id = is_array($unit[$col]) ? $unit[$col]['id'] : $unit[$col];
+				$uid = is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
 			}
-		return '<a href="'.URL.'&p='.$el['url'].'&id='.$unit_id.'" class="inhr">'.$txt.'</a>';
+		return '<a href="'.URL.'&p='.$el['url'].'&id='.$uid.'" class="inhr">'.$txt.'</a>';
 	}
 
 	if(!$dlg = _elem_11_dialog($el))
@@ -775,12 +725,12 @@ function _spisokUnitUrl($el, $unit, $txt) {//обёртка значения в 
 
 	//ссылка на страницу, если это список страниц
 	if(_table($dlg['table_1']) == '_page')
-		return '<a href="'.URL.'&p='.$unit['id'].'" class="inhr">'.$txt.'</a>';
+		return '<a href="'.URL.'&p='.$u['id'].'" class="inhr">'.$txt.'</a>';
 
 	if(!$page_id = _page('dialog_id_unit_get', $dlg['id']))
 		return $txt;
 
-	return '<a href="'.URL.'&p='.$page_id.'&id='.$unit['id'].'" class="inhr">'.$txt.'</a>';
+	return '<a href="'.URL.'&p='.$page_id.'&id='.$u['id'].'" class="inhr">'.$txt.'</a>';
 }
 function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстовом (быстром) поиске
 	$element_id_spisok = 0;

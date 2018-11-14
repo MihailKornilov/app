@@ -237,11 +237,9 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 
 			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
-						' style="'._blockStyle($r, $width, $PARAM).'"'.
+						_blockStyle($r, $PARAM, $width).
 		   ($PARAM['blk_setup'] ? ' val="'.$r['id'].'"' : '').
-		  (!$PARAM['blk_setup'] && $r['click_action'] == 2082 && $r['click_dialog'] ?
-			            ' val="dialog_id:'.$r['click_dialog'].($r['click_unit_id'] ? ',unit_id:'.$PARAM['id'] : '').'"'
-		  : '').
+						_blockClick($r, $PARAM).
 					 '>'.
 							_blockSetka($r, $PARAM, $grid_id, $level).
 							_blockChoose($r, $PARAM, $level).
@@ -270,6 +268,21 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 	}
 
 	return $send;
+}
+function _blockClick($r, $prm) {//настройки клика по блоку для открытия диалога
+	if($prm['blk_setup'])
+		return '';
+	if($r['click_action'] != 2082)
+		return '';
+	if(!$r['click_dialog'])
+		return '';
+
+	//открытие диалога для отображения содержания записи
+	$clickUnit = '';
+	if($r['click_unit_id'] && $u = $prm['unit_get'])
+		$clickUnit = ',get_id:'.$u['id'];
+
+	return ' val="dialog_id:'.$r['click_dialog'].$clickUnit.'"';
 }
 function _blockLevelChange($obj_name, $obj_id) {//кнопки изменения уровня редактирования блоков
 	$html = '';
@@ -425,11 +438,11 @@ function _block_v_choose($r, $unit) {//подсветка элементов д�
 
 	return '<div class="v-choose'.$sel.'" val="'.$elem_id.'"></div>';
 }
-function _blockStyle($r, $width, $unit) {//стили css для блока
+function _blockStyle($bl, $prm, $width) {//стили css для блока
 	$send = array();
 
 	//границы
-	$bor = explode(' ', $r['bor']);
+	$bor = explode(' ', $bl['bor']);
 	foreach($bor as $i => $b) {
 		if(!$b)
 			continue;
@@ -441,21 +454,27 @@ function _blockStyle($r, $width, $unit) {//стили css для блока
 		}
 	}
 
-	$send[] = ($r['width_auto'] ? 'min-' : '').'width:'.$width.'px';
+	$send[] = ($bl['width_auto'] ? 'min-' : '').'width:'.$width.'px';
 
-	//цвет фона из единицы списка
-	if(!_elemUnitIsSetup($unit))
-		if(!empty($unit['id']))
-			if($ids = _ids($r['bg'], 1)) {
-				$bg = $unit;
+	//цвет фона из записи
+	if(!$prm['blk_setup'])
+		if($u = $prm['unit_get'])
+			if($ids = _ids($bl['bg'], 'arr')) {
+				$bg = $u;
 				foreach($ids as $id) {
 					if($el = _elemOne($id))
-						$bg = $bg[$el['col']];
+						if($col = $el['col'])
+							$bg = $bg[$col];
 				}
 				$send[] = 'background-color:'.$bg;
 			}
 
-	return implode(';', $send);
+	$send = array_diff($send, array(''));
+
+	if(empty($send))
+		return '';
+
+	return ' style="'.implode(';', $send).'"';
 }
 function _blockChildHtml($block, $unit, $grid_id, $level, $width) {//деление блока на части
 	if($block['id'] != $grid_id)
@@ -523,13 +542,13 @@ function _elemDiv($el, $prm=array()) {//формирование div элеме�
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
-	$txt = _elemFormatHide($txt, $el);
-	$txt = _elemFormatDigital($txt, $el);
+	$txt = _elemFormatHide($el, $txt);
+	$txt = _elemFormatDigital($el, $txt);
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 
 	return '<div'._elemDivAttrId($el, $prm).$cls._elemStyle($el, $prm).'>'.$txt.'</div>';
 }
-function _elemFormatHide($txt, $el) {//Дополнительное форматирование: скрытие при нулевом значении
+function _elemFormatHide($el, $txt) {//Дополнительное форматирование: скрытие при нулевом значении
 	if(empty($el['format']))
 		return $txt;
 	if($el['format']['hide'] && empty($txt))
@@ -541,7 +560,7 @@ function _elemFormatHide($txt, $el) {//Дополнительное формат
 
 	return $txt;
 }
-function _elemFormatDigital($txt, $el) {//Дополнительное форматирование для чисел
+function _elemFormatDigital($el, $txt) {//Дополнительное форматирование для чисел
 	if(!preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
 	if(empty($el['format']))
@@ -556,7 +575,7 @@ function _elemFormatDigital($txt, $el) {//Дополнительное форм�
 
 	return $txt;
 }
-function _elemFormatColor($txt, $el) {//подмена цвета при дополнительном форматировании для чисел
+function _elemFormatColor($el, $txt) {//подмена цвета при дополнительном форматировании для чисел
 	if(!preg_match(REGEXP_CENA_MINUS, $txt))
 		return $el['color'];
 	if(empty($el['format']))
@@ -579,21 +598,23 @@ function _elemFormatColor($txt, $el) {//подмена цвета при доп�
 
 	return $el['color'];
 }
-function _elemFormatColorDate($el, $unit, $txt) {//подмена цвета для даты todo тестовая версия
-	if(_elemUnitIsSetup($unit))
-		return _elemFormatColor($txt, $el);
+function _elemFormatColorDate($el, $prm, $txt) {//подмена цвета для даты todo тестовая версия
+	if(!empty($prm['blk_setup']))
+		return _elemFormatColor($el, $txt);
 	if($el['dialog_id'] != 86)
-		return _elemFormatColor($txt, $el);
+		return _elemFormatColor($el, $txt);
 	if(!$elem_id = $el['num_1'])
 		return '';
 	if(!$EL = _elemOne($elem_id))
 		return '';
 	if(!$col = $EL['col'])
 		return '';
-	if(!isset($unit[$col]))
+	if(!$u = $prm['unit_get'])
+		return '';
+	if(!isset($u[$col]))
 		return '';
 
-	$date = substr($unit[$col], 0, 10);
+	$date = substr($u[$col], 0, 10);
 
 	if(!preg_match(REGEXP_DATE, $date))
 		return '';
@@ -602,9 +623,9 @@ function _elemFormatColorDate($el, $unit, $txt) {//подмена цвета д�
 
 	$day = (strtotime($date) - TODAY_UNIXTIME) / 86400;
 
-	return _elemFormatColor($day, $el);
+	return _elemFormatColor($el, $day);
 }
-function _elemStyle($el, $unit) {//стили css для элемента
+function _elemStyle($el, $prm) {//стили css для элемента
 	$send = array();
 
 	//отступы
@@ -621,7 +642,7 @@ function _elemStyle($el, $unit) {//стили css для элемента
 
 	//когда включена настройка ширины элементов,
 	//те элементы, которые могут настраиваться, остаются, остальные скрываются
-	if($unit['elem_width_change'] && !_dialogParam($el['dialog_id'], 'element_width'))
+	if($prm['elem_width_change'] && !_dialogParam($el['dialog_id'], 'element_width'))
 		$send[] = 'visibility:hidden';
 
 	if(!$send)
@@ -819,6 +840,109 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				return _empty('Список-таблица <b>'._dialogParam($el['num_1'], 'name').'</b>');
 
 			return _spisok23($el);
+
+		//Иконка удаления записи
+		case 30:
+			/*
+				num_1 - иконка красного цвета
+			*/
+
+			if(!empty($prm['blk_setup']))
+				return _iconDel(array(
+					'red' => $el['num_1'],
+					'class'=>'curD'
+				));
+			if(!$u = $prm['unit_get'])
+				return '--';
+			if(!$dlg = _dialogQuery($u['dialog_id']))
+				return '--';
+			//иконка не выводится, если удаление запрещено
+			if(!$dlg['del_on'])
+				return '';
+			//иконка не выводится, если наступили другие сутки
+			if($dlg['del_cond']['num_2']) {
+				$day = explode(' ', $u['dtime_add']);
+				if(TODAY != $day[0])
+					return '';
+			}
+
+			return
+			_iconDel(array(
+				'red' => $el['num_1'],
+				'class' => 'dialog-open pl',
+				'val' => 'dialog_id:'.$dlg['id'].',del_id:'.$u['id']
+			));
+
+		//Значение записи: дата
+		case 33:
+			/*
+				num_1 - формат:
+					29: 5 августа 2017
+					30: 5 авг 2017
+					31: 05/08/2017
+				num_2 - не показывать текущий год
+				num_3 - имена у ближайших дней:
+					вчера
+					сегодня
+					завтра
+				num_4 - показывать время в формате 12:45
+			*/
+			if(!empty($prm['blk_setup']))
+				return 'дата/время';
+			if(!$u = $prm['unit_get'])
+				return '--';
+			if(empty($u['dtime_add']))
+				return '';
+			if(!preg_match(REGEXP_DATE, $u['dtime_add']))
+				return 'некорректный формат даты';
+
+			$ex = explode(' ', $u['dtime_add']);
+			$d = explode('-', $ex[0]);
+
+			//время
+			$hh = '';
+			if($el['num_4'] && !empty($ex[1])) {
+				$h = explode(':', $ex[1]);
+				$hh .= ' '.$h[0].':'.$h[1];
+			}
+
+			if($el['num_1'] == 31)
+				return $d[2].'/'.$d[1].'/'.$d[0].$hh;
+
+			$hh = $hh ? ' в'.$hh : '';
+
+			if($el['num_3']) {
+				$dCount = floor((strtotime($ex[0]) - TODAY_UNIXTIME) / 3600 / 24);
+				switch($dCount) {
+					case -1: return 'вчера'.$hh;
+					case 0: return 'сегодня'.$hh;
+					case 1: return 'завтра'.$hh;
+				}
+			}
+
+			return
+				_num($d[2]).                                                     //день
+				' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //месяц
+				($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
+				$hh;                                                             //время
+
+		//Иконка редактирования записи
+		case 34:
+			if(!empty($prm['blk_setup']))
+				return _iconEdit(array('class'=>'curD'));
+			if(!$u = $prm['unit_get'])
+				return '--';
+			if(!$dlg = _dialogQuery($u['dialog_id']))
+				return '--';
+			//иконка не выводится, если редактирование запрещено
+			if(!$dlg['edit_on'])
+				return '';
+
+			return
+			_iconEdit(array(
+				'class' => 'dialog-open pl',
+				'val' => 'dialog_id:'.$dlg['id'].',edit_id:'.$u['id']
+			));
 
 		//Меню переключения блоков
 		case 57:
@@ -1341,38 +1465,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 						'value' => _num($v)
 				   ));
 
-		//Значение списка: иконка удаления
-		case 30:
-			/*
-				num_1 - иконка красного цвета
-			*/
-
-			if($is_edit)
-				return _iconDel(array(
-					'red' => $el['num_1'],
-					'class'=>'curD'
-				));
-
-			$dialog = _dialogQuery($unit['dialog_id']);
-
-			//иконка не выводится, если удаление запрещено
-			if(!$dialog['del_on'])
-				return '';
-
-			//иконка не выводится, если наступили другие сутки
-			if($dialog['del_cond']['num_2']) {
-				$day = explode(' ', $unit['dtime_add']);
-				if(TODAY != $day[0])
-					return '';
-			}
-
-			return
-			_iconDel(array(
-				'red' => $el['num_1'],
-				'class' => 'dialog-open pl',
-				'val' => 'dialog_id:'.$unit['dialog_id'].',del_id:'.$unit['id']
-			));
-
 		//Выбор нескольких значений галочками
 		case 31:
 			/*
@@ -1413,40 +1505,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			$num = _spisokUnitNum($unit);
 			$num = _spisokColSearchBg($el, $num);
 			return $num;
-
-		//Значение списка: дата
-		case 33:
-			/*
-				num_1 - формат:
-					29: 5 августа 2017
-					30: 5 авг 2017
-					31: 05/08/2017
-				num_2 - не показывать текущий год
-				num_3 - имена у ближайших дней:
-					вчера
-					сегодня
-					завтра
-				num_4 - показывать время в формате 12:45
-			*/
-
-			return _spisokUnitData($el, $unit);
-
-		//Значение списка: иконка редактирования
-		case 34:
-			if($is_edit)
-				return _iconEdit(array('class'=>'curD'));
-
-			$dialog = _dialogQuery($unit['dialog_id']);
-
-			//иконка не выводится, если редактирование запрещено
-			if(!$dialog['edit_on'])
-				return '';
-
-			return
-			_iconEdit(array(
-				'class' => 'dialog-open pl',
-				'val' => 'dialog_id:'.$unit['dialog_id'].',edit_id:'.$unit['id']
-			));
 
 		//Count - количество
 		case 35:
