@@ -513,15 +513,9 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 
 	//диалог, через который вносятся данные списка
 	if(!$dialog_id = $ELEM['num_1'])
-		return '<div class="_empty"><span class="fs15 red">Не указан список для вывода данных.</span></div>';
+		return _emptyRed('Не указан список для вывода данных.');
 	if(!$DLG = _dialogQuery($dialog_id))
-		return '<div class="_empty"><span class="fs15 red">Списка <b>'.$dialog_id.'</b> не существует.</span></div>';
-
-	if(PAS)
-		return
-		'<div class="_empty">'.
-			'Список-таблица <b class="fs14">'.$DLG['name'].'</b>'.
-		'</div>';
+		return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
 
 	$limit = $ELEM['num_2'];
 

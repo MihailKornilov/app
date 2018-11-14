@@ -496,6 +496,20 @@ function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины
 	return 0;
 }
 
+function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элемента
+	//attr_id не ставится в элементе шаблона в рабочей версии
+	if(!$prm['blk_setup'] && $el['block']['obj_name'] == 'spisok')
+		return '';
+
+	return ' id="el_'.$el['id'].'"';
+}
+function _elemDivSize($el) {//класс - размер шрифта
+	if(!$el['size'])
+		return '';
+	if($el['size'] == 13)
+		return '';
+	return 'fs'.$el['size'];
+}
 function _elemDiv($el, $prm=array()) {//формирование div элемента
 	if(!$el)
 		return '';
@@ -505,7 +519,7 @@ function _elemDiv($el, $prm=array()) {//формирование div элеме�
 	$cls = array();
 	$cls[] = _elemFormatColorDate($el, $prm, $txt);
 	$cls[] = $el['font'];
-	$cls[] = $el['size'] ? 'fs'.$el['size'] : '';
+	$cls[] = _elemDivSize($el);
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
@@ -514,15 +528,6 @@ function _elemDiv($el, $prm=array()) {//формирование div элеме�
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 
 	return '<div'._elemDivAttrId($el, $prm).$cls._elemStyle($el, $prm).'>'.$txt.'</div>';
-}
-function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элемента
-	if($prm['blk_setup'])
-		return '';
-	//attr_id не ставится в элементе шаблона
-	if($el['block']['obj_name'] == 'spisok')
-		return '';
-
-	return ' id="el_'.$el['id'].'"';
 }
 function _elemFormatHide($txt, $el) {//Дополнительное форматирование: скрытие при нулевом значении
 	if(empty($el['format']))
@@ -643,13 +648,64 @@ function _elemAttrId($el, $prm) {//аттрибут id для DIV элемент
 	return $attr_id;
 }
 function _elemStyleWidth($el) {//ширина элемента
-	if(!$el['width'])
+	if(!isset($el['width']))
+		return '';
+	if(!$width = _num($el['width']))
 		return ' style="width:100%"';
 
-	return ' style="width:'.$el['width'].'px"';
+	return ' style="width:'.$width.'px"';
 }
 function _elemPrint($el, $prm) {//формирование и отображение элемента
 	switch($el['dialog_id']) {
+		//button
+		case 2:
+			/*
+				txt_1 - текст кнопки
+				num_1 - цвет
+				num_2 - маленькая кнопка
+				num_3 - принимает значения единицы списка
+				num_4 - dialog_id, который назначен на эту кнопку
+			*/
+			$color = array(
+				0 => '',      //Синий - по умолчанию
+				1 => '',      //Синий
+				2 => 'green', //Зелёный
+				3 => 'red',   //Красный
+				4 => 'grey',  //Серый
+				5 => 'cancel',//Прозрачный
+				6 => 'pink',  //Розовый
+				7 => 'orange' //Оранжевый
+			);
+/*
+			//вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
+			$block = isset($SRC['block_id']) ? ',block_id:'.$SRC['block_id'] : '';
+			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
+			$dialog_source = !empty($el['block']) && $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
+
+			//кнопка принимает значения единицы списка
+			//Если единица списка совпадает с открываемым диалогом, который вносил её данные, значит редактирование
+			//Если не совпадает, то получение данных единицы списка для использования значений в полях
+			if($el['num_3'] && $UNIT_ISSET) {
+//				$DLG = _dialogQuery($el['num_4']);
+//				$u = _spisokUnitQuery($DLG, $unit['id']);
+//				$block = ','.($u ? 'unit' : 'accept').'_id:'.$unit['id'];
+				$block = ',unit_id:'.$unit['id'];
+			}
+
+			//если новая кнопка, будет создаваться новый диалог для неё
+			if(!$el['num_4'])
+				$block = ',block_id:'.$el['block_id'];
+*/
+			return _button(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'name' => _br($el['txt_1']),
+						'color' => $color[$el['num_1']],
+						'width' => $el['width'],
+						'small' => $el['num_2'],
+//						'class' => $is_edit ? '' : 'dialog-open',
+						'val' => 'dialog_id:'.$el['num_4']//.$block.$dialog_source
+					));
+
 		//Меню страниц
 		case 3:
 			/*
@@ -668,6 +724,18 @@ function _elemPrint($el, $prm) {//формирование и отображен
                 txt_1 - текст заголовка
 			*/
 			return '<div class="hd2">'.$el['txt_1'].'</div>';
+
+		//textarea (многострочное текстовое поле)
+		case 5:
+			/*
+				txt_1 - текст для placeholder
+			*/
+			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+			return
+			'<textarea id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.'>'.
+//				$v.
+			'</textarea>';
 
 		//Фильтр - быстрый поиск
 		case 7:
@@ -694,6 +762,20 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'v' => $v,
 						'disabled' => $prm['blk_setup']
 					));
+
+		//Ссылка на страницу
+		case 9:
+			/*
+                txt_1 - текст ссылки
+				num_1 - id страницы
+			*/
+			if(!$txt = $el['txt_1']) {
+				$page = _page($el['num_1']);
+				$txt = $page['name'];
+			}
+			return '<a class="inhr" href="'.URL.'&p='.$el['num_1'].'">'.
+						$txt.
+				   '</a>';
 
 		//произвольный текст
 		case 10:
@@ -723,6 +805,20 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				txt_7 - сообщение об отсутствии записей
 			*/
 			return _spisokElemCount($el);
+
+		//Информационный блок
+		case 21:
+			/*
+                txt_1 - содержание
+			*/
+			return '<div class="_info">'._br($el['txt_1']).'</div>';
+
+		//Содержание единицы списка - таблица
+		case 23:
+			if($prm['blk_setup'])
+				return _empty('Список-таблица <b>'._dialogParam($el['num_1'], 'name').'</b>');
+
+			return _spisok23($el);
 
 		//Меню переключения блоков
 		case 57:
@@ -791,6 +887,53 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			*/
 
 			return _historySpisok($el);
+
+		//Фильтр - Radio
+		case 74:
+			/*
+				num_1 - список, к которому применяется фильтр
+				значения: PHP12_filter_radio_setup
+			*/
+
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$v = $el['def'];
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_1'],
+					'filter' => $el['id'],
+					'v' => $v
+				));
+			}
+
+			//получение количества значений по каждому пункту
+			$EL = _elemOne($el['num_1']);
+			$DLG = _dialogQuery($EL['num_1']);
+			$spisok = array();
+			foreach(_elemVvv($el['id']) as $id => $r) {
+				$spisok[$id] = $r['txt_1'];
+
+				if(!$r['num_1'])
+					continue;
+
+				$sql = "SELECT COUNT(*)
+						FROM "._tableFrom($DLG)."
+						WHERE `t1`.`id`
+							"._spisokCondDef($DLG['id'])."
+							"._22cond($id);
+				if($c = query_value($sql))
+					$spisok[$id] .= '<span class="fr inhr">'.$c.'</span>';
+			}
+
+			return _radio(array(
+				'attr_id' => _elemAttrId($el, $prm),
+				'block' => 1,
+				'width' => '100%',
+				'interval' => 6,
+				'light' => 1,
+				'value' => $v,
+				'spisok' => $spisok,
+				'disabled' => $prm['blk_setup']
+			));
 
 		//Фильтр: календарь
 		case 77:
@@ -946,66 +1089,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 				'value' => _num($v)
 			));
 
-		//button
-		case 2:
-			/*
-				txt_1 - текст кнопки
-				num_1 - цвет
-				num_2 - маленькая кнопка
-				num_3 - принимает значения единицы списка
-				num_4 - dialog_id, который назначен на эту кнопку
-			*/
-			$color = array(
-				0 => '',      //Синий - по умолчанию
-				1 => '',      //Синий
-				2 => 'green', //Зелёный
-				3 => 'red',   //Красный
-				4 => 'grey',  //Серый
-				5 => 'cancel',//Прозрачный
-				6 => 'pink',  //Розовый
-				7 => 'orange' //Оранжевый
-			);
-
-			//вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
-			$block = isset($SRC['block_id']) ? ',block_id:'.$SRC['block_id'] : '';
-			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
-			$dialog_source = !empty($el['block']) && $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
-
-			//кнопка принимает значения единицы списка
-			//Если единица списка совпадает с открываемым диалогом, который вносил её данные, значит редактирование
-			//Если не совпадает, то получение данных единицы списка для использования значений в полях
-			if($el['num_3'] && $UNIT_ISSET) {
-//				$DLG = _dialogQuery($el['num_4']);
-//				$u = _spisokUnitQuery($DLG, $unit['id']);
-//				$block = ','.($u ? 'unit' : 'accept').'_id:'.$unit['id'];
-				$block = ',unit_id:'.$unit['id'];
-			}
-
-			//если новая кнопка, будет создаваться новый диалог для неё
-			if(!$el['num_4'])
-				$block = ',block_id:'.$el['block_id'];
-
-			return _button(array(
-						'attr_id' => $attr_id,
-						'name' => _br($el['txt_1']),
-						'color' => $color[$el['num_1']],
-						'width' => $el['width'],
-						'small' => $el['num_2'],
-						'class' => $is_edit ? '' : 'dialog-open',
-						'val' => 'dialog_id:'.$el['num_4'].$block.$dialog_source
-					));
-
-		//textarea (многострочное текстовое поле)
-		case 5:
-			/*
-				txt_1 - текст для placeholder
-			*/
-			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			return
-			'<textarea id="'.$attr_id.'"'.$width.$placeholder.$disabled.'>'.
-				$v.
-			'</textarea>';
-
 		//Select - выбор страницы
 		case 6:
 			/*
@@ -1049,20 +1132,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 
 			return// _pr($el).
 				'<input type="text" id="'.$attr_id.'"'.$width.$placeholder.$disabled.' value="'.$value.'" />';
-
-		//Ссылка на страницу
-		case 9:
-			/*
-                txt_1 - текст ссылки
-				num_1 - id страницы
-			*/
-			if(!$txt = $el['txt_1']) {
-				$page = _page($el['num_1']);
-				$txt = $page['name'];
-			}
-			return '<a class="inhr" href="'.URL.'&p='.$el['num_1'].'">'.
-						$txt.
-				   '</a>';
 
 		//Выбор значения для шаблона (выводится окно для выбора)
 		case 11:
@@ -1207,22 +1276,12 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 						'value' => _num($v) ? _num($v) : $el['def']
 				   ));
 
-		//Информационный блок
-		case 21:
-			/*
-                txt_1 - содержание
-			*/
-			return '<div class="_info">'._br($el['txt_1']).'</div>';
-
 		//Дополнительные условия к фильтру (вспомогательный элемент)
 		case 22:
 			/*
                 num_1 - id элемента, в котором нужно искать список
 			*/
 			return PHP12_elem22($el, $unit);
-
-		//Содержание единицы списка - таблица
-		case 23: return _spisok23($el);
 
 		//Select - выбор списка приложения
 		case 24:
@@ -1686,53 +1745,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 		//Значение списка: иконка сортировки
 		case 71: return '<div class="icon icon-move '.($UNIT_ISSET ? 'pl' : 'curD').'"></div>';
 
-		//Фильтр - Radio
-		case 74:
-			/*
-				num_1 - список, к которому применяется фильтр
-				значения: PHP12_filter_radio_setup
-			*/
-
-			$v = _spisokFilter('v', $el['id']);
-			if($v === false) {
-				$v = $el['def'];
-				_spisokFilter('insert', array(
-					'spisok' => $el['num_1'],
-					'filter' => $el['id'],
-					'v' => $v
-				));
-			}
-
-			//получение количества значений по каждому пункту
-			$EL = _elemOne($el['num_1']);
-			$DLG = _dialogQuery($EL['num_1']);
-			$spisok = array();
-			foreach(_elemVvv($el['id']) as $id => $r) {
-				$spisok[$id] = $r['txt_1'];
-
-				if(!$r['num_1'])
-					continue;
-
-				$sql = "SELECT COUNT(*)
-						FROM "._tableFrom($DLG)."
-						WHERE `t1`.`id`
-							"._spisokCondDef($DLG['id'])."
-							"._22cond($id);
-				if($c = query_value($sql))
-					$spisok[$id] .= '<span class="fr inhr">'.$c.'</span>';
-			}
-
-			return _radio(array(
-				'attr_id' => $attr_id,
-				'block' => 1,
-				'width' => '100%',
-				'interval' => 6,
-				'light' => 1,
-				'value' => $v,
-				'spisok' => $spisok,
-				'disabled' => $disabled
-			));
-
 		//Фильтр: Select - привязанный список
 		case 83:
 			/*
@@ -1789,7 +1801,7 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 				num_3 - показывать "завтра"
 			*/
 			if($is_edit)
-				return 'Количество дней';
+				return 'Кол-во дней';
 
 			if(!$elem_id = $el['num_1'])
 				return _msgRed('-no-elem-date');

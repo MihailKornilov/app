@@ -37,14 +37,7 @@ function _radio($v=array()) {//элемент RADIO
 	$light = _num(@$v['light']) ? ' light' : '';
 	$block = _bool(@$v['block']) ? ' block' : '';
 	$interval = _num(@$v['interval']) ? _num(@$v['interval']) : 7;
-
-	$width = '';
-	if(isset($v['width'])) {
-		if($v['width'] == '100%')
-			$width = ' style="width:'.$v['width'].'"';
-		if(_num($v['width']))
-			$width = ' style="width:'.$v['width'].'px"';
-	}
+	$width = _elemStyleWidth($v);
 
 	//если список пуст и только нулевое значение, отступ снизу не делается
 	$int = empty($spisok) ? 0 : $interval;
