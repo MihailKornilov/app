@@ -1,56 +1,4 @@
 <?php
-function _button($v=array()) {//кнопка из контакта
-	$attr_id = empty($v['attr_id']) ? '' : ' id="'.$v['attr_id'].'"';
-	$name = empty($v['name']) ? 'Кнопка' : $v['name'];
-	$small = empty($v['small']) ? '' : ' small';
-	$color = empty($v['color']) ? '' : ' '.$v['color'];
-	$cls = empty($v['class']) ? '' : ' '.$v['class'];
-	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
-	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
-
-	$width = '';
-	if(isset($v['width']))
-		switch($v['width']) {
-			case 0: $width = ' style="width:100%"'; break;
-			default: $width = ' style="width:'._num($v['width']).'px"';
-		}
-
-	return
-	'<button class="vk'.$color.$small.$cls.'"'.$attr_id.$width.$click.$val.'>'.
-		$name.
-	'</button>';
-}
-
-
-function _iconEdit($v=array()) {//иконка редактирования записи в таблице
-	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
-	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
-	$cls = empty($v['class']) ? '' : ' '.$v['class'];
-
-	$v = array(
-		'tt_name' => !empty($v['tt_name']) ? $v['tt_name'] : 'Изменить',
-		'tt_left' => !empty($v['tt_left']) ? $v['tt_left'] : -48,
-		'tt_side' => !empty($v['tt_side']) ? $v['tt_side'] : 'r'
-	);
-
-	return '<div'.$click.$val.' class="icon icon-edit'.$cls._tooltip($v['tt_name'], $v['tt_left'], $v['tt_side']).'</div>';
-}
-function _iconDel($v=array()) {//иконка удаления записи в таблице
-	if(!empty($v['nodel']))
-		return '';
-
-	//если указывается дата внесения записи и она не является сегодняшним днём, то удаление невозможно
-	if(empty($v['del']) && !empty($v['dtime_add']) && TODAY != substr($v['dtime_add'], 0, 10))
-		return '';
-
-	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
-	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
-	$red = empty($v['red']) ? '' : '-red';
-	$cls = empty($v['class']) ? '' : ' '.$v['class'];
-
-	return '<div'.$click.$val.' class="icon icon-del'.$red.$cls._tooltip('Удалить', -42, 'r').'</div>';
-}
-
 function _colorJS() {//массив цветов для текста в формате JS, доступных элементам
 	return '{'.
 		'"":["#000","Чёрный"],'.
@@ -836,6 +784,25 @@ function _blockOne($block_id) {//запрос одного блока
 	return _BE('block_one', $block_id);
 }
 
+function _elemColType($id='all') {//тип данных, используемый элементом
+	$col_type = array(
+		1 => 'txt',
+		2 => 'num',
+		3 => 'connect',
+		4 => 'count',
+		5 => 'cena',
+		6 => 'sum',
+		7 => 'date',
+		8 => 'image'
+	);
+
+	if($id == 'all')
+		return $col_type;
+	if(!isset($col_type[$id]))
+		return '';
+
+	return $col_type[$id];
+}
 
 function _elemVvv($elem_id, $src=array()) {
 	if(!$el = _elemOne($elem_id))
@@ -1285,73 +1252,8 @@ function _elem_11_v($EL, $ell_id, $unit, $is_edit) {//получение зна�
 		return _msgRed('-no-el11-'.$ell_id.'-');
 
 	switch($ell['dialog_id']) {
-		//многострочное поле
-		case 5:
-		//однострочное поле
-		case 8:
-			//отсутствует имя колонки
-			if(!$col = $ell['col'])
-				return _msgRed('no-col');
-			//имени колонки не существует в единице списка
-			if(!isset($unit[$col]))
-				return _msgRed('no-unit-col');
-
-			$txt = $unit[$col];
-			$txt = _spisokColSearchBg($EL, $txt);
-
-			return _br($txt);
-		//Radio - произвольные значения
-		case 16:
-			if(!$col = $ell['col'])
-				return _msgRed('no-col');
-			//имени колонки не существует в единице списка
-			if(!isset($unit[$col]))
-				return _msgRed('no-unit-col');
-
-			if(!$elDop = _elemOne($unit[$col]))
-				return _msgRed('no-el-'.$unit[$col]);
-
-			return $elDop['txt_1'];
-		//произвольный текст
-		case 10: return _br($ell['txt_1']);
-		//Выбор нескольких значений галочками
-		case 31:
-			if(!$col = $ell['col'])
-				return _msgRed('no-col');
-			//имени колонки не существует в единице списка
-			if(!isset($unit[$col]))
-				return _msgRed('no-unit-col');
-
-			$DLG = _dialogQuery($ell['num_1']);
-
-			//получение данных списка
-			$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
-					FROM "._tableFrom($DLG)."
-					WHERE `t1`.`id`"._spisokCondDef($DLG['id'])."
-					ORDER BY `sort`";
-			$spisok = query_arr($sql);
-
-			$send = array();
-			$sel = _idsAss($unit[$col]);
-			foreach($spisok as $r)
-				if(!empty($sel[$r['num']]))
-					$send[] = $r['txt_1'];
-
-			return implode(', ', $send);
 		//сборный текст
 		case 44: return PHP12_44_print($ell_id, $unit);
-		//календарь
-		case 51:
-			$data = $unit[$ell['col']];
-			if($data == '0000-00-00')
-				return '-';
-			return FullData($data);
-		//сумма значений единицы списка (баланс)
-		case 27:
-		//количество связанного списка
-		case 54:
-		//сумма связанного списка
-		case 55: return $unit[$ell['col']];
 		//Изображение
 		case 60:
 			if(!$col = $ell['col'])
@@ -1375,27 +1277,98 @@ function _elem_11_v($EL, $ell_id, $unit, $is_edit) {//получение зна�
 	return _msgRed('-no-11-');
 }
 
-function _elemColType($id='all') {//тип данных, используемый элементом
-	$col_type = array(
-		1 => 'txt',
-		2 => 'num',
-		3 => 'connect',
-		4 => 'count',
-		5 => 'cena',
-		6 => 'sum',
-		7 => 'date',
-		8 => 'image'
-	);
+function _elem11($el, $prm) {//отображение элемента, вставленного через диалог [11]
+	//ids элементов отсутствуют
+	if(!$ids = _ids($el['txt_2'], 1))
+		return _msgRed('-11-yok-');
+	if(count($ids) == 1)
+		return _elem11one($el, $prm, $ids[0]);
 
-	if($id == 'all')
-		return $col_type;
-	if(!isset($col_type[$id]))
-		return '';
-
-	return $col_type[$id];
+	return _pr($ids);
 }
+function _elem11one($EL, $prm, $id) {//прямая ссылка на элемент через [11]
+	if(!$ell = _elemOne($id))
+		return _msgRed('-11.1-yok-');
 
 
+
+	/* --- Простой вывод без данных записи --- */
+
+	switch($ell['dialog_id']) {
+		//произвольный текст
+		case 10: return _elemPrint($ell, $prm);
+	}
+
+
+
+
+	/* --- Вывод из данных записи по колонке --- */
+
+	if(!$u = $prm['unit_get'])
+		return '<div class="fs10 color-acc">11.title.'.$ell['dialog_id'].'</div>';
+	//не присвоена колонка элементу 11
+	if(!$col = $ell['col'])
+		return _msgRed('no-11-col');
+	//колонки в записи не существует
+	if(!isset($u[$col]))
+		return _msgRed('no-u-col');
+
+	$txt = $u[$col];
+
+	switch($ell['dialog_id']) {
+		//textarea (многострочное текстовое поле)
+		case 5:
+		//input:text (однострочное текстовое поле)
+		case 8:
+			$txt = _spisokColSearchBg($EL, $txt);
+			return _br($txt);
+		//Radio - произвольные значения
+		case 16:
+			if(!$id = _num($txt))
+				return '11.radio.empty';
+			if(!$dop = _elemOne($txt))
+				return _msgRed('no-16-dop');
+
+			return $dop['txt_1'];
+
+		//сумма значений единицы списка (баланс)
+		case 27:
+		//количество связанного списка
+		case 54:
+		//сумма связанного списка
+		case 55: return $txt;
+
+		//Выбор нескольких значений галочками
+		case 31:
+			if(!$sel = _idsAss($txt))
+				return '';
+
+			//получение данных списка
+			$DLG = _dialogQuery($ell['num_1']);
+			$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
+					FROM "._tableFrom($DLG)."
+					WHERE `t1`.`id`"._spisokCondDef($DLG['id'])."
+					ORDER BY `sort`";
+			$spisok = query_arr($sql);
+
+			$send = array();
+
+			foreach($spisok as $r)
+				if(!empty($sel[$r['num']]))
+					$send[] = $r['txt_1'];
+
+			return implode(', ', $send);
+
+		//календарь
+		case 51:
+			if($txt == '0000-00-00')
+				return '-';
+			return FullData($txt);
+	}
+
+
+	return '<div class="fs10 color-sal">11.'.$ell['dialog_id'].'</div>';
+}
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 function PHP12_elem_choose($el, $SRC) {//выбор элемента для вставки в блок. Диалог [50]
@@ -3287,6 +3260,7 @@ function _historySpisok($el) {//список истории действий [68
 			$dlg = _dialogQuery($r['dialog_id']);
 			$msg = '';
 			$prm['unit_get'] = $unitArr[$r['unit_id']];
+			$prm = _blockParam($prm);
 			foreach($dlg[$r['type_id'].'_history_elm'] as $el) {
 				if($el['dialog_id']) {
 					if($txt = _elemPrint($el, $prm)) {

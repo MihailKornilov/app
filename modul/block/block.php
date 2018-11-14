@@ -865,6 +865,54 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			*/
 			return _br($el['txt_1']);
 
+		//Выбор значения для шаблона (выводится окно для выбора)
+		case 11:
+			/*
+				Вставка элемента через функцию PHP12_v_choose
+
+				txt_2 - id элемента, выбранного из диалога, который вносит данные списка
+						возможна иерархия элементов через запятую 256,1312,560
+			*/
+
+			return _elem11($el, $prm);
+
+			if(!$ids = _ids($el['txt_2'], 1))
+				return _msgRed('-el-yok-');//id элементов отсутствуют
+
+			//получение значения, если нет вложенных списков
+			if(count($ids) == 1)
+				return _elem_11_v($el, $ids[0], $unit, $is_edit);
+
+			$u = $unit;
+			$ell_id = 0;//id элемента, который содержит элемент 11 (в txt_2)
+			foreach($ids as $n => $elem_id) {
+				$ell_id = $elem_id;
+				if(!$ell = _elemOne($elem_id))
+					return _msgRed('-no-el-'.$elem_id.'-');
+
+				switch($ell['dialog_id']) {
+					case 29:
+					case 59:
+						if(!$col = $ell['col'])
+							return _msgRed('нет имени колонки');
+						if(empty($u))
+							return _msgRed('единица списка пуста. Шаг: '.$n);
+						if(!isset($u[$col]))
+							return _msgRed('вложенное значение отсутствует. Шаг: '.$n.'. col: '.$col);
+						if(!is_array($u[$col]) && $u[$col] == 0)
+							return $ell['txt_1'];
+						$u = $u[$col];
+						if(!is_array($u)) {
+							$sql = "SELECT *
+									FROM `_spisok`
+									WHERE `id`=".$u;
+							$u = query_assoc($sql);
+						}
+				}
+			}
+
+			return _elem_11_v($el, $ell_id, $u, $is_edit);
+
 		//Содержание единицы списка - шаблон
 		case 14:
 			if(!$dialog_id = $el['num_1'])
@@ -1239,6 +1287,29 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			return _historySpisok($el);
 
+		//Значение записи: имя пользователя
+		case 69:
+			if(!$u = $prm['unit_get'])
+				return $el['name'];
+			if(empty($u['user_id_add']))
+				return 'no user';
+
+			return _user($u['user_id_add'], 'name');
+
+		//Выбор цвета фона
+		case 70:
+			$v = '#fff';
+			if($u = $prm['unit_edit']) {
+				$col = $el['col'];
+				$v = $u[$col];
+			}
+
+			return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+				   '<div class="_color-bg" style="background-color:'.$v.'"></div>';
+
+		//Значение записи: иконка сортировки
+		case 71: return '<div class="icon icon-move '.($prm['unit_get'] ? 'pl' : 'curD').'"></div>';
+
 		//Фильтр - Radio
 		case 74:
 			/*
@@ -1323,6 +1394,61 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'class' => _dn($prm['blk_setup'] || $diff)
 					));
 
+		//Значение записи: количество дней
+		case 86:
+			/*
+                num_1 - ID элемента, который указывает на дату
+                txt_1 - текст "Прошёл" 1
+                txt_2 - текст "Остался" 1
+                txt_3 - текст "День" 1
+                txt_4 - текст "Прошло" 2
+                txt_5 - текст "Осталось" 2
+                txt_6 - текст "Дня" 2
+                txt_7 - текст "Прошло" 5
+                txt_8 - текст "Осталось" 5
+                txt_9 - текст "Дней" 5
+                txt_10 - текст для "сегодня"
+				num_2 - показывать "вчера"
+				num_3 - показывать "завтра"
+			*/
+			if(!$u = $prm['unit_get'])
+				return 'Кол-во дней';
+			if(!$elem_id = $el['num_1'])
+				return _msgRed('-no-elem-date');
+			if(!$EL = _elemOne($elem_id))
+				return _msgRed('-no-elem-'.$elem_id);
+			if(!$col = $EL['col'])
+				return _msgRed('-no-elem-col');
+			if(!isset($u[$col]))
+				return _msgRed('-no-unit-col');
+
+			$date = substr($u[$col], 0, 10);
+
+			if(!preg_match(REGEXP_DATE, $date))
+				return _msgRed('-no-date-format');
+			if($date == '0000-00-00')
+				return '';
+
+			$day = (strtotime($date) - TODAY_UNIXTIME) / 86400;
+
+			$day_txt =
+				($day > 0 ?
+				_end($day, $el['txt_2'], $el['txt_5'], $el['txt_8'])
+				:
+				_end($day, $el['txt_1'], $el['txt_4'], $el['txt_7'])
+				).
+				' '.abs($day).' '.
+				_end($day, $el['txt_3'], $el['txt_6'], $el['txt_9']);
+
+			if($day == -1 && $el['num_2'])
+				$day_txt = $el['txt_10'].' вчера';
+			if(!$day)
+				$day_txt = $el['txt_10'].' сегодня';
+			if($day == 1 && $el['num_3'])
+				$day_txt = $el['txt_10'].' завтра';
+
+			return $day_txt;
+
 		//Фильтр - Выбор нескольких групп значений
 		case 102:
 			/*
@@ -1404,7 +1530,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			'</script>';
 	}
 
-	return '<div class="fs10 red">dlg-'.$el['dialog_id'].'</div>';
+	return _msgRed('dlg-'.$el['dialog_id']);
 }
 function _elemUnit($el, $unit) {//формирование элемента страницы
 	return '<div class="fs10 b color-sal">_elemUnit</div>';
@@ -1439,55 +1565,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 						'width' => $el['width'],
 						'value' => _num($v)
 				   ));
-
-		//Выбор значения для шаблона (выводится окно для выбора)
-		case 11:
-			/*
-				Вставка элемента через функцию PHP12_v_choose
-
-				txt_2 - id элемента, выбранного из диалога, который вносит данные списка
-						возможна иерархия элементов через запятую 256,1312,560
-			*/
-
-			if(!$UNIT_ISSET)
-				return _elemTitle($el['id']);
-
-			if(!$ids = _ids($el['txt_2'], 1))
-				return _msgRed('-el-yok-');//id элементов отсутствуют
-
-			//получение значения, если нет вложенных списков
-			if(count($ids) == 1)
-				return _elem_11_v($el, $ids[0], $unit, $is_edit);
-
-			$u = $unit;
-			$ell_id = 0;//id элемента, который содержит элемент 11 (в txt_2)
-			foreach($ids as $n => $elem_id) {
-				$ell_id = $elem_id;
-				if(!$ell = _elemOne($elem_id))
-					return _msgRed('-no-el-'.$elem_id.'-');
-
-				switch($ell['dialog_id']) {
-					case 29:
-					case 59:
-						if(!$col = $ell['col'])
-							return _msgRed('нет имени колонки');
-						if(empty($u))
-							return _msgRed('единица списка пуста. Шаг: '.$n);
-						if(!isset($u[$col]))
-							return _msgRed('вложенное значение отсутствует. Шаг: '.$n.'. col: '.$col);
-						if(!is_array($u[$col]) && $u[$col] == 0)
-							return $ell['txt_1'];
-						$u = $u[$col];
-						if(!is_array($u)) {
-							$sql = "SELECT *
-									FROM `_spisok`
-									WHERE `id`=".$u;
-							$u = query_assoc($sql);
-						}
-				}
-			}
-
-			return _elem_11_v($el, $ell_id, $u, $is_edit);
 
 		//SA: Функция PHP
 		case 12:
@@ -1828,19 +1905,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 				'<div class="_color" style="background-color:#000"></div>';
 
-		//Значение списка: имя пользователя
-		case 69: return _spisokUnitUser($el, $unit);
-
-		//Выбор цвета фона
-		case 70:
-			$v = empty($v) ? '#fff' : $v;
-			return
-				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				'<div class="_color-bg" style="background-color:'.$v.'"></div>';
-
-		//Значение списка: иконка сортировки
-		case 71: return '<div class="icon icon-move '.($UNIT_ISSET ? 'pl' : 'curD').'"></div>';
-
 		//Фильтр: Select - привязанный список
 		case 83:
 			/*
@@ -1878,62 +1942,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 						'width' => $el['width'],
 						'value' => _num($v)
 				   ));
-
-		//Количество дней - единица списка
-		case 86:
-			/*
-                num_1 - ID элемента, который указывает на дату
-                txt_1 - текст "Прошёл" 1
-                txt_2 - текст "Остался" 1
-                txt_3 - текст "День" 1
-                txt_4 - текст "Прошло" 2
-                txt_5 - текст "Осталось" 2
-                txt_6 - текст "Дня" 2
-                txt_7 - текст "Прошло" 5
-                txt_8 - текст "Осталось" 5
-                txt_9 - текст "Дней" 5
-                txt_10 - текст для "сегодня"
-				num_2 - показывать "вчера"
-				num_3 - показывать "завтра"
-			*/
-			if($is_edit)
-				return 'Кол-во дней';
-
-			if(!$elem_id = $el['num_1'])
-				return _msgRed('-no-elem-date');
-			if(!$EL = _elemOne($elem_id))
-				return _msgRed('-no-elem-'.$elem_id);
-			if(!$col = $EL['col'])
-				return _msgRed('-no-elem-col');
-			if(!isset($unit[$col]))
-				return _msgRed('-no-unit-col');
-
-			$date = substr($unit[$col], 0, 10);
-
-			if(!preg_match(REGEXP_DATE, $date))
-				return _msgRed('-no-date-format');
-			if($date == '0000-00-00')
-				return '';
-
-			$day = (strtotime($date) - TODAY_UNIXTIME) / 86400;
-
-			$day_txt =
-				($day > 0 ?
-				_end($day, $el['txt_2'], $el['txt_5'], $el['txt_8'])
-				:
-				_end($day, $el['txt_1'], $el['txt_4'], $el['txt_7'])
-				).
-				' '.abs($day).' '.
-				_end($day, $el['txt_3'], $el['txt_6'], $el['txt_9']);
-
-			if($day == -1 && $el['num_2'])
-				$day_txt = $el['txt_10'].' вчера';
-			if(!$day)
-				$day_txt = $el['txt_10'].' сегодня';
-			if($day == 1 && $el['num_3'])
-				$day_txt = $el['txt_10'].' завтра';
-
-			return $day_txt;
 	}
 }
 

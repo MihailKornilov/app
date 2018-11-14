@@ -541,7 +541,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	$MASS = array();
 	foreach($spisok as $uid => $u) {
 		$TR = '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
-		$prm = array('unit_get'=>$u);
+		$prm = _blockParam(array('unit_get'=>$u));
 		foreach($tabCol as $td) {
 			$txt = _elemPrint($td, $prm);
 
@@ -684,15 +684,6 @@ function _spisokUnitNum($u) {//порядковый номер - значени�
 		return $u['id'];
 
 	return $u['num'];
-}
-function _spisokUnitUser($el, $u) {//значение единицы списка - имя пользователя
-	if(empty($u))
-		return $el['name'];
-
-	if(empty($u['user_id_add']))
-		return 'no user';
-
-	return _user($u['user_id_add'], 'name');
 }
 
 function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в ссылку

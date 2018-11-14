@@ -239,4 +239,54 @@ function _dropdown($v=array()) {//выпадающее поле - ссылка
 	'</div>';
 }
 
+function _button($v=array()) {//кнопка из контакта
+	$attr_id = empty($v['attr_id']) ? '' : ' id="'.$v['attr_id'].'"';
+	$name = empty($v['name']) ? 'Кнопка' : $v['name'];
+	$small = empty($v['small']) ? '' : ' small';
+	$color = empty($v['color']) ? '' : ' '.$v['color'];
+	$cls = empty($v['class']) ? '' : ' '.$v['class'];
+	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
+	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
+
+	$width = '';
+	if(isset($v['width']))
+		switch($v['width']) {
+			case 0: $width = ' style="width:100%"'; break;
+			default: $width = ' style="width:'._num($v['width']).'px"';
+		}
+
+	return
+	'<button class="vk'.$color.$small.$cls.'"'.$attr_id.$width.$click.$val.'>'.
+		$name.
+	'</button>';
+}
+
+function _iconEdit($v=array()) {//иконка редактирования записи в таблице
+	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
+	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
+	$cls = empty($v['class']) ? '' : ' '.$v['class'];
+
+	$v = array(
+		'tt_name' => !empty($v['tt_name']) ? $v['tt_name'] : 'Изменить',
+		'tt_left' => !empty($v['tt_left']) ? $v['tt_left'] : -48,
+		'tt_side' => !empty($v['tt_side']) ? $v['tt_side'] : 'r'
+	);
+
+	return '<div'.$click.$val.' class="icon icon-edit'.$cls._tooltip($v['tt_name'], $v['tt_left'], $v['tt_side']).'</div>';
+}
+function _iconDel($v=array()) {//иконка удаления записи в таблице
+	if(!empty($v['nodel']))
+		return '';
+
+	//если указывается дата внесения записи и она не является сегодняшним днём, то удаление невозможно
+	if(empty($v['del']) && !empty($v['dtime_add']) && TODAY != substr($v['dtime_add'], 0, 10))
+		return '';
+
+	$click = empty($v['click']) ? '' : ' onclick="'.$v['click'].'"';
+	$val = empty($v['val']) ? '' : ' val="'.$v['val'].'"';
+	$red = empty($v['red']) ? '' : '-red';
+	$cls = empty($v['class']) ? '' : ' '.$v['class'];
+
+	return '<div'.$click.$val.' class="icon icon-del'.$red.$cls._tooltip('Удалить', -42, 'r').'</div>';
+}
 
