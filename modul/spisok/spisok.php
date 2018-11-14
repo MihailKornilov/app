@@ -673,7 +673,7 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 		$unit[$col] = $inc;
 	}
 
-	return $unit;
+	return _arrNum($unit);
 
 }
 function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
@@ -824,7 +824,7 @@ function _spisokCond($el) {//формирование строки с услов
 
 	$cond = "`t1`.`id`";
 	$cond .= _spisokCondDef($el['num_1']);
-	$cond .= _spisokCondBind($el);
+//	$cond .= _spisokCondBind($el);
 	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond26($el);
 	$cond .= _spisokCond62($el);
@@ -836,7 +836,7 @@ function _spisokCond($el) {//формирование строки с услов
 
 	return $cond;
 }
-function _spisokCondBind($el) {//отображения значений единицы привязанного списка
+function _spisokCondBind($el) {//отображения значений записи привязанного списка
 	//элемент, который указывает на привязанный список
 	if(!$el_id_conn = $el['num_8'])
 		return '';

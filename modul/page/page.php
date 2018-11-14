@@ -437,7 +437,7 @@ function _pageShow($page_id) {
 	}
 
 	return
-	_pr($prm).
+//	_pr($prm).
 	_blockHtml('page', $page_id, $prm).
 	_page_div().
 	_pageShowScript($page_id);

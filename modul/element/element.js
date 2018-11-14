@@ -719,7 +719,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 
 	_ELM_ACT = function(OBJ) {//активирование элементов
-		if(OBJ.err)
+		if(OBJ.dlgerr)
 			return;
 
 		var attr_focus = false,//элемент, на который будет поставлен фокус
