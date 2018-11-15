@@ -981,6 +981,7 @@ function _dialogOpenParam($dlg) {//все возможные параметны 
 		'elm_ids' => array(),       //массив элементов для конкретного диалога
 		'edit_id' => 0,             //id редактируемой записи
 		'del_id' => 0,              //id записи для удаления
+		'vvv' => array(),           //содержание для элементов
 	);
 }
 function _dialogOpenLoad($dialog_id) {

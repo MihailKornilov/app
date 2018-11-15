@@ -1254,24 +1254,6 @@ function _elem_11_v($EL, $ell_id, $unit, $is_edit) {//получение зна�
 	switch($ell['dialog_id']) {
 		//сборный текст
 		case 44: return PHP12_44_print($ell_id, $unit);
-		//Изображение
-		case 60:
-			if(!$col = $ell['col'])
-				return _msgRed('no-col-60');
-			if(empty($unit))
-				return _imageNo($EL['width']);
-
-			$sql = "SELECT *
-					FROM `_image`
-					WHERE `obj_name`='elem_".$ell['id']."'
-					  AND `obj_id`=".$unit['id']."
-					  AND !`deleted`
-					  AND !`sort`
-					LIMIT 1";
-			if(!$r = query_assoc($sql))
-				return _imageNo($EL['width']);
-
-			return _imageHtml($r, $EL['width'], $EL['num_7'], $is_edit);
 	}
 
 	return _msgRed('-no-11-');
@@ -1359,11 +1341,18 @@ function _elem11one($EL, $prm, $id) {//прямая ссылка на элеме
 
 			return implode(', ', $send);
 
-		//календарь
+		//Календарь
 		case 51:
 			if($txt == '0000-00-00')
 				return '-';
+
 			return FullData($txt);
+		//Изображение
+		case 60:
+			if(empty($txt))
+				return _imageNo($EL['width']);
+
+			return _imageHtml($txt, $EL['width'], $EL['num_7'], $prm['blk_setup']);
 	}
 
 

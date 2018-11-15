@@ -272,55 +272,10 @@ function _spisok7num($spisok, $el) {//добавление единицы спи
 
 	return $spisok;
 }
-function _spisokInclude_($spisok, $CMP) {//вложенные списки
-	foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
-		//должен является вложенным списком
-		if(!_elemIsConnect($cmp))
-			continue;
-
-		//должно быть присвоено имя колонки
-		if(!$col = $cmp['col'])
-			continue;
-
-		//выборка будет производиться только по нужным строкам списка
-		if(!$ids = _idsGet($spisok, $col))
-			continue;
-
-		//получение данных из вложенного списка
-		$incDialog = _dialogQuery($cmp['num_1']);
-
-		$cond = "`t1`.`id` IN (".$ids.")";
-/*
-		if(isset($field['deleted']))
-			$cond .= " AND !`t1`.`deleted`";
-		if(isset($field['app_id']))
-			$cond .= " AND `t1`.`app_id`=".APP_ID;
-		if(isset($field['dialog_id']))
-			$cond .= " AND `t1`.`dialog_id`=".$cmp['num_1'];
-*/
-		$sql =  "/* Получение вложенного списка из диалога ".$cmp['num_1']." */".
-				"SELECT `t1`.*"._spisokJoinField($incDialog)."
-				FROM "._tableFrom($incDialog)."
-				WHERE ".$cond;
-		if(!$arr = query_arr($sql))
-			continue;
-
-		//идентификаторы будут заменены на массив с данными единицы списка
-		foreach($spisok as $id => $r) {
-			$connect_id = $r[$col];
-			if(empty($arr[$connect_id]))
-				continue;
-			$spisok[$id][$col] = $arr[$connect_id];
-		}
-	}
-
-	return $spisok;
-}
 function _spisokInclude($spisok) {//вложенные списки
 	if(empty($spisok))
 		return array();
 
-//print_r($spisok);
 	//проверка наличия колонки dialog_id в содержании списка
 	$key = key($spisok);
 	$sp0 = $spisok[$key];
@@ -355,10 +310,10 @@ function _spisokInclude($spisok) {//вложенные списки
 			//получение данных из вложенного списка
 			$incDialog = _dialogQuery($cmp['num_1']);
 
-			$cond = "`t1`.`id` IN (".$ids.")";
-			$sql = "SELECT `t1`.*"._spisokJoinField($incDialog)."
+			$sql = "/* ".__FUNCTION__.":".__LINE__." вложенные списки */
+					SELECT `t1`.*"._spisokJoinField($incDialog)."
 					FROM "._tableFrom($incDialog)."
-					WHERE ".$cond;
+					WHERE `t1`.`id` IN (".$ids.")";
 			if(!$arr = query_arr($sql))
 				continue;
 
@@ -375,8 +330,19 @@ function _spisokInclude($spisok) {//вложенные списки
 
 	return $spisok;
 }
-function _spisokImage($spisok, $CMP) {//вставка картинок
-	foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с изображениями
+function _spisokImage($spisok) {//вставка картинок
+	if(empty($spisok))
+		return array();
+
+	//проверка наличия колонки dialog_id в содержании списка
+	$key = key($spisok);
+	$sp0 = $spisok[$key];
+	if(!isset($sp0['dialog_id']))
+		return $spisok;
+
+	$DLG = _dialogQuery($sp0['dialog_id']);
+
+	foreach($DLG['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с изображениями
 		//должен является компонентом "загрузка изображений"
 		if($cmp['dialog_id'] != 60)
 			continue;
@@ -386,16 +352,18 @@ function _spisokImage($spisok, $CMP) {//вставка картинок
 			continue;
 
 		foreach($spisok as $id => $r)
-			$spisok[$id][$col] = 'no img';
+			$spisok[$id][$col] = array();
 
-		$sql = "SELECT *
+		$sql = "/* ".__FUNCTION__.":".__LINE__." Картинки для элемента <u>".$cmp_id."</u> */
+				SELECT *
 				FROM `_image`
-				WHERE `obj_name`='_spisok'
+				WHERE `obj_name`='elem_".$cmp_id."'
 				  AND `obj_id` IN ("._idsGet($spisok).")
+				  AND !`deleted`
 				  AND !`sort`";
 		if($arr = query_arr($sql))
 			foreach($arr as$r)
-				$spisok[$r['obj_id']][$col] = _imageHtml($r, 80, 1);
+				$spisok[$r['obj_id']][$col] = $r;
 	}
 
 	return $spisok;
@@ -442,10 +410,12 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	//добавление единицы списка, если был быстрый поиск по номеру
 	if(!$next)
 		$spisok = _spisok7num($spisok, $ELEM);
+
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);
+
 	//вставка картинок
-	$spisok = _spisokImage($spisok, $DLG['cmp']);
+	$spisok = _spisokImage($spisok);
 
 	$send = '';
 	foreach($spisok as $id => $sp) {
@@ -526,7 +496,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);
 	//вставка картинок
-	$spisok = _spisokImage($spisok, $DLG['cmp']);
+	$spisok = _spisokImage($spisok);
 
 	//получение настроек колонок таблицы
 	$sql = "SELECT *
@@ -645,35 +615,13 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 			FROM "._tableFrom($dialog)."
 			WHERE `t1`.`id`=".$unit_id.
 				  _spisokCondDef($dialog['id']);
-	if(!$unit = query_assoc($sql))
+	if(!$spisok[$unit_id] = query_assoc($sql))
 		return array();
 
-	foreach($dialog['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
-		//должен является вложенным списком
-		if(!_elemIsConnect($cmp))
-			continue;
-		//должно быть присвоено имя колонки
-		if(!$col = $cmp['col'])
-			continue;
-		//должен быть идентификатор
-		if(!$uid = $unit[$col])
-			continue;
-		//диалог вложенного списка вложенного списка
-		if(!$DLG_INC = _dialogQuery($cmp['num_1']))
-			continue;
+	$spisok = _spisokInclude($spisok);
+	$spisok = _spisokImage($spisok);
 
-		$sql = "SELECT `t1`.*"._spisokJoinField($DLG_INC)."
-				FROM "._tableFrom($DLG_INC)."
-				WHERE `t1`.`id`=".$uid.
-					_spisokCondDef($cmp['num_1']);
-		if(!$inc = query_assoc($sql))
-			continue;
-
-		//идентификаторы будут заменены на массив с данными единицы списка
-		$unit[$col] = $inc;
-	}
-
-	return _arrNum($unit);
+	return _arrNum($spisok[$unit_id]);
 
 }
 function _spisokUnitNum($u) {//порядковый номер - значение единицы списка

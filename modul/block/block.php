@@ -974,6 +974,34 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			return _spisok23($el);
 
+		//Select - выбор списка приложения
+		case 24:
+			/*
+                txt_1 - текст, когда список не выбран
+				num_1 - содержание селекта:
+						0   - все списки приложения. Функция _dialogSpisokOn()
+						960 - размещённые на текущем объекте
+							  Списки размещаются диалогами 14(шаблон), 23(таблица), История действий
+							  Идентификаторами результата являются id элементов (а не диалогов)
+							  Функция _dialogSpisokOnPage()
+						961 - привязанные к данному диалогу
+							  Идентификаторами результата являются id элементов (а не диалогов)
+							  Функция _dialogSpisokOnConnect()
+			*/
+
+			$v = 0;
+			if($u = $prm['unit_edit']) {
+				$col = $el['col'];
+				$v = _num($u[$col]);
+			}
+
+			return _select(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => $v
+				   ));
+
 		//Настройка суммы значений единицы списка
 		case 27: return $el['name'];
 
@@ -1151,6 +1179,32 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'val' => 'dialog_id:'.$dlg['id'].',edit_id:'.$u['id']
 			));
 
+		//SA: Select - выбор колонки таблицы
+		case 37:
+			return _select(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'width' => $el['width']
+				   ));
+
+		//SA: Select - выбор диалогового окна
+		case 38:
+			/*
+                txt_1 - нулевое значение
+			*/
+
+			$v = 0;
+			if($u = $prm['unit_edit']) {
+				$col = $el['col'];
+				$v = _num($u[$col]);
+			}
+
+			return _select(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => $v
+				   ));
+
 		//Календарь
 		case 51:
 			/*
@@ -1247,6 +1301,84 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'<div class="un-html">'._spisok59unit($el['id'], $v).'</div>'.
 			'</div>';
 
+		//Загрузка изображений
+		case 60:
+			/*
+				num_1 - максимальное количество изображений, которое разрешено загрузить
+				num_7 - ограничение высоты (настройка стилей)
+			*/
+			if($prm['blk_setup'])
+				return _emptyMin('Изображения');
+
+			//отметка загруженных изображений как неиспользуемые, которые были не сохранены в предыдущий раз
+			$sql = "UPDATE `_image`
+					SET `obj_name`='elem_".$el['id']."',
+						`deleted`=1,
+						`user_id_del`=".USER_ID.",
+						`dtime_del`=CURRENT_TIMESTAMP
+					WHERE `obj_name`='elem_".$el['id']."_".USER_ID."'";
+			query($sql);
+
+			$v = 0;
+			$html = '';
+			$del_count = 0;
+			if($u = $prm['unit_edit']) {
+				$sql = "SELECT *
+						FROM `_image`
+						WHERE `obj_name`='elem_".$el['id']."'
+						  AND `obj_id`=".$u['id']."
+						  AND !`deleted`
+						ORDER BY `sort`";
+				if($spisok = query_arr($sql))
+					foreach($spisok as $r)
+						$html .= _imageDD($r);
+
+				$sql = "SELECT COUNT(*)
+						FROM `_image`
+						WHERE `obj_name`='elem_".$el['id']."'
+						  AND `obj_id`=".$u['id']."
+						  AND `deleted`";
+				$del_count = query_value($sql);
+
+				$col = $el['col'];
+				$v = _num($u[$col]);
+			}
+			return
+			'<div class="_image">'.
+				'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+				'<dl>'.
+					$html.
+					'<dd class="dib">'.
+						'<table class="_image-load">'.
+							'<tr><td>'.
+									'<div class="_image-add icon-image"></div>'.
+									'<div class="icon-image spin"></div>'.
+									'<div class="_image-prc"></div>'.
+									'<div class="_image-dis"></div>'.
+									'<table class="tab-load">'.
+										'<tr><td class="icon-image ii1">'.//Выбрать из файлов
+												'<form>'.
+													'<input type="file" accept="image/jpeg,image/png,image/gif,image/tiff" />'.
+												'</form>'.
+											'<td class="icon-image ii2">'.      //Указать ссылку на изображение
+										'<tr><td class="icon-image ii3">'.      //Фото с вебкамеры
+											'<td class="icon-image ii4'._dn($del_count, 'empty').'" val="'.$del_count.'">'.//Достать из корзины
+									'</table>'.
+
+						'</table>'.
+					'</dd>'.
+				'</dl>'.
+				'<div class="_image-link dn mt5">'.
+					'<table class="w100p">'.
+						'<tr><td>'.
+								'<input type="text" class="w100p" placeholder="вставьте ссылку или скриншот и нажмите Enter" />'.
+							'<td class="w50 center">'.
+								'<div class="icon icon-ok"></div>'.
+								'<div class="icon icon-del pl ml5"></div>'.
+					'</table>'.
+				'</div>'.
+			'</div>';
+
 		//Фильтр: галочка
 		case 62:
 			/*
@@ -1278,12 +1410,12 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 		//Список истории действий
 		case 68:
-			if($prm['blk_setup'])
-				return _emptyMin('История действий', 0);
-
 			/*
 				num_8 - показывать только записи единицы списка, которые принимает текущая страница
 			*/
+
+			if($prm['blk_setup'])
+				return _emptyMin('История действий', 0);
 
 			return _historySpisok($el);
 
@@ -1648,27 +1780,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			*/
 			return PHP12_elem22($el, $unit);
 
-		//Select - выбор списка приложения
-		case 24:
-			/*
-                txt_1 - текст, когда список не выбран
-				num_1 - содержание селекта:
-						0   - все списки приложения. Функция _dialogSpisokOn()
-						960 - размещённые на текущем объекте
-							  Списки размещаются диалогами 14(шаблон), 23(таблица), История действий
-							  Идентификаторами результата являются id элементов (а не диалогов)
-							  Функция _dialogSpisokOnPage()
-						961 - привязанные к данному диалогу
-							  Идентификаторами результата являются id элементов (а не диалогов)
-							  Функция _dialogSpisokOnConnect()
-			*/
-			return _select(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'value' => _num($v)
-				   ));
-
 		//Список действий для Галочки [1]
 		case 28: return 28;
 
@@ -1711,25 +1822,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 					target - id блоков, на которые воздействует галочка
 			*/
 			return 36;
-
-		//SA: Select - выбор колонки таблицы
-		case 37:
-			return _select(array(
-						'attr_id' => $attr_id,
-						'width' => $el['width']
-				   ));
-
-		//SA: Select - выбор диалогового окна
-		case 38:
-			/*
-                txt_1 - нулевое значение
-			*/
-			return _select(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'value' => _num($v)
-				   ));
 
 		//Список действий для Выпадающего поля [17]
 		case 39: return 39;
@@ -1819,83 +1911,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			/*
 			*/
 			return 'порядок';
-
-		//Загрузка изображений
-		case 60:
-			/*
-				num_7 - ограничение высоты (настройка стилей)
-
-				num_1 - максимальное количество изображений, которое разрешено загрузить
-			*/
-			if($is_edit)
-				return '<div class="_empty min">Изображения</div>';
-
-			$v = _num($v);
-
-			//отметка загруженных изображений как неиспользуемые, которые были не сохранены в предыдущий раз
-			$sql = "UPDATE `_image`
-					SET `obj_name`='elem_".$el['id']."',
-						`deleted`=1,
-						`user_id_del`=".USER_ID.",
-						`dtime_del`=CURRENT_TIMESTAMP
-					WHERE `obj_name`='elem_".$el['id']."_".USER_ID."'";
-			query($sql);
-
-			$html = '';
-			$del_count = 0;
-			if($unit_id = _num(@$unit['id'])) {
-				$sql = "SELECT *
-						FROM `_image`
-						WHERE `obj_name`='elem_".$el['id']."'
-						  AND `obj_id`=".$unit_id."
-						  AND !`deleted`
-						ORDER BY `sort`";
-				if($spisok = query_arr($sql))
-					foreach($spisok as $r)
-						$html .= _imageDD($r);
-
-				$sql = "SELECT COUNT(*)
-						FROM `_image`
-						WHERE `obj_name`='elem_".$el['id']."'
-						  AND `obj_id`=".$unit_id."
-						  AND `deleted`";
-				$del_count = query_value($sql);
-			}
-			return
-			'<div class="_image">'.
-				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				'<dl>'.
-					$html.
-					'<dd class="dib">'.
-						'<table class="_image-load">'.
-							'<tr><td>'.
-									'<div class="_image-add icon-image"></div>'.
-									'<div class="icon-image spin"></div>'.
-									'<div class="_image-prc"></div>'.
-									'<div class="_image-dis"></div>'.
-									'<table class="tab-load">'.
-										'<tr><td class="icon-image ii1">'.//Выбрать из файлов
-												'<form>'.
-													'<input type="file" accept="image/jpeg,image/png,image/gif,image/tiff" />'.
-												'</form>'.
-											'<td class="icon-image ii2">'.      //Указать ссылку на изображение
-										'<tr><td class="icon-image ii3">'.      //Фото с вебкамеры
-											'<td class="icon-image ii4'._dn($del_count, 'empty').'" val="'.$del_count.'">'.//Достать из корзины
-									'</table>'.
-
-						'</table>'.
-					'</dd>'.
-				'</dl>'.
-				'<div class="_image-link dn mt5">'.
-					'<table class="w100p">'.
-						'<tr><td>'.
-								'<input type="text" class="w100p" placeholder="вставьте ссылку или скриншот и нажмите Enter" />'.
-							'<td class="w50 center">'.
-								'<div class="icon icon-ok"></div>'.
-								'<div class="icon icon-del pl ml5"></div>'.
-					'</table>'.
-				'</div>'.
-			'</div>';
 
 		//Выбор цвета текста
 		case 66:
