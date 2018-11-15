@@ -436,19 +436,20 @@ function _pageShow($page_id) {
 	}
 
 	return
-//	_pr($prm).
 	_blockHtml('page', $page_id, $prm).
 	_page_div().
-	_pageShowScript($page_id);
+	_pageShowScript($page_id, $prm);
 }
-function _pageShowScript($page_id, $elmActUse=true) {
+function _pageShowScript($page_id, $prm) {
 	if(PAS)
 		return '';
+
+	$prm = _blockParam($prm, 'page');
 
 	//значения элементов страницы
 	$vvvPage = array();
 	foreach(_BE('elem_ids_arr', 'page', $page_id) as $elem_id)
-		$vvvPage[$elem_id] = _elemVvv($elem_id);
+		$vvvPage[$elem_id] = _elemVvv($elem_id, $prm);
 
 	return
 	'<script>'.
@@ -457,9 +458,7 @@ function _pageShowScript($page_id, $elmActUse=true) {
 	: '').
 		'var VVV_PAGE='._json($vvvPage).';'.
 		'for(var i in VVV_PAGE)VVV[i]=VVV_PAGE[i];'.
-	($elmActUse ?
-		'_ELM_ACT({elm_ids:'._BE('elem_ids_js', 'page', $page_id).'});'
-	: '').
+		'_ELM_ACT({elm_ids:'._BE('elem_ids_js', 'page', $page_id).'});'.
 	'</script>';
 }
 function _pageUnitGet($page_id) {

@@ -804,7 +804,73 @@ function _elemColType($id='all') {//тип данных, используемы�
 	return $col_type[$id];
 }
 
-function _elemVvv($elem_id, $src=array()) {
+function _elemVvv($elem_id, $prm) {//дополнительные значения, привязанные к элементу. Для рабочей версии.
+	if(!$el = _elemOne($elem_id))
+		return array();
+
+	switch($el['dialog_id']) {
+		//Radio
+		case 16:
+			$sql = "SELECT `id`,`txt_1`
+					FROM `_element`
+					WHERE `parent_id`=".$elem_id."
+					ORDER BY `sort`";
+			return query_ass($sql);
+
+		//Select - произвольные значения
+		case 17:
+		//dropdown
+		case 18:
+			$send = array();
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `parent_id`=".$elem_id."
+					ORDER BY `sort`";
+			foreach(query_arr($sql) as $r) {
+				$u = array(
+					'id' => _num($r['id']),
+					'title' => $r['txt_1']
+				);
+				if($r['txt_2'])
+					$u['content'] = $r['txt_1'].'<div class="fs12 grey ml10 mt3">'.$r['txt_2'].'</div>';
+				$send[] = $u;
+			}
+			return $send;
+
+		//Дополнительные условия к фильтру
+		case 22:
+			if(!$u = $prm['unit_edit'])
+				return array();
+			return PHP12_elem22_vvv($u['id']);
+
+		//SA: select - выбор имени колонки
+		case 37: return _elemVvv37($prm);
+
+		//Меню переключения блоков - список пунктов
+		case 57:
+			$send = array();
+			foreach(PHP12_menu_block_setup_vvv($elem_id) as $v) {
+				$send[] = array(
+					'id' => $v['id'],
+					'title' => $v['title'],
+					'blk' => $v['blk']
+				);
+			}
+			return $send;
+
+		//Фильтр radio
+		case 74:
+			$sql = "/* ".__FUNCTION__.":".__LINE__." VVV ".$el['dialog_id']." */
+					SELECT *
+					FROM `_element`
+					WHERE `parent_id`=".$elem_id."
+					ORDER BY `sort`";
+			return query_arr($sql);
+	}
+
+	return array();
+}
+function _elemVvv_($elem_id, $src=array()) {
 	if(!$el = _elemOne($elem_id))
 		return array();
 
@@ -829,36 +895,8 @@ function _elemVvv($elem_id, $src=array()) {
 
 			return $func($edit_id, $src);
 
-		//Radio
-		case 16:
-			$sql = "SELECT `id`,`txt_1`
-					FROM `_element`
-					WHERE `parent_id`=".$elem_id."
-					ORDER BY `sort`";
-			return query_ass($sql);
 
-		//Select
-		case 17:
-		//dropdown
-		case 18:
-			$send = array();
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `parent_id`=".$elem_id."
-					ORDER BY `sort`";
-			foreach(query_arr($sql) as $r) {
-				$u = array(
-					'id' => _num($r['id']),
-					'title' => $r['txt_1']
-				);
-				if($r['txt_2'])
-					$u['content'] = $r['txt_1'].'<div class="fs12 grey ml10 mt3">'.$r['txt_2'].'</div>';
-				$send[] = $u;
-			}
-			return $send;
 
-		//Дополнительные условия к фильтру
-		case 22: return PHP12_elem22_vvv($unit_id);
 
 		//select - выбор списка
 		case 24:
@@ -886,23 +924,8 @@ function _elemVvv($elem_id, $src=array()) {
 */
 			return _29cnn($elem_id, '', $sel_id);
 
-		//SA: select - выбор имени колонки
-		case 37: return _elemVvv37($block_id, $edit_id, $edit_arr);
-
 		//SA: Select - выбор диалогового окна
 		case 38: return _dialogSelArray();
-
-		//Меню переключения блоков - список пунктов
-		case 57:
-			$send = array();
-			foreach(PHP12_menu_block_setup_vvv($elem_id) as $v) {
-				$send[] = array(
-					'id' => $v['id'],
-					'title' => $v['title'],
-					'blk' => $v['blk']
-				);
-			}
-			return $send;
 
 		//Цвета для фона
 		case 70:
@@ -970,14 +993,6 @@ function _elemVvv($elem_id, $src=array()) {
 			break;
 */
 
-		//Фильтр radio
-		case 74:
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `parent_id`=".$elem_id."
-					ORDER BY `sort`";
-			return query_arr($sql);
-
 		//Фильтр: Select - привязанный список
 		case 83: return _elemSpisokConnect($el['txt_2']);
 
@@ -1013,17 +1028,20 @@ function _elemVvv($elem_id, $src=array()) {
 
 			return $send;
 	}
-
-	return array();
 }
-function _elemVvv37($block_id, $edit_id, $edit_arr) {//select - выбор имени колонки [37]
-	if(!$block = _blockOne($block_id))
+function _elemVvv37($prm) {//select - выбор имени колонки [37]
+	if(!$block = _blockOne($prm['srce']['block_id']))
 		return array();
 	//может производиться, только если элемент размещается в диалоге
 	if($block['obj_name'] != 'dialog')
 		return array();
 	if(!$dlg = _dialogQuery($block['obj_id']))
 		return array();
+
+	//колонка, которая занята редактируемой записью
+	$uCol = '';
+	if($u = $prm['unit_edit'])
+		$uCol = $u['col'];
 
 	//получение используемых колонок
 	$colUse = array();
@@ -1068,7 +1086,7 @@ function _elemVvv37($block_id, $edit_id, $edit_arr) {//select - выбор им�
 		$color = '';
 		$busy = 0;//занята ли колонка
 		if(isset($colUse[$col])) {
-			$color = $edit_id && $edit_arr['col'] == $col ? 'b color-pay' : 'b red';
+			$color = $uCol == $col ? 'b color-pay' : 'b red';
 			$busy = 1;
 		}
 		$u = array(
@@ -1091,7 +1109,7 @@ function _elemVvv37($block_id, $edit_id, $edit_arr) {//select - выбор им�
 
 		$color = '';
 		if(isset($colUse[$col]))
-			$color = $edit_id && $edit_arr['col'] == $col ? 'b color-pay' : 'b red';
+			$color = $uCol == $col ? 'b color-pay' : 'b red';
 		$u = array(
 			'id' => $n++,
 			'title' => $col,
@@ -1293,7 +1311,7 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 		//Radio - произвольные значения
 		case 16:
 			if(!$id = _num($txt))
-				return '11.radio.empty';
+				return _msgRed('11.radio.empty');
 			if(!$dop = _elemOne($id))
 				return _msgRed('no-16-dop');
 
@@ -1882,7 +1900,7 @@ function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уро
 
 
 /* ---=== УСЛОВИЯ ДЛЯ ФИЛЬТРОВ [22] ===--- */
-function PHP12_elem22($el, $unit) {
+function PHP12_elem22($el, $prm) {
 	/*
 		Используется в виде элемента, а также как подключаемая функция
 		PHP12_elem22_save - сохранение значений после редактирования
@@ -1893,11 +1911,11 @@ function PHP12_elem22($el, $unit) {
 	$dialog_id = 0;
 	switch($el['dialog_id']) {
 		case 12:
-			$SRC = $unit['source'];
-			$dialog_id = $SRC['dialog_source'];
+			$SRC = $prm['srce'];
+			$dialog_id = $SRC['dss'];
 			break;
 		case 22:
-			$v = PHP12_elem22_paste($el, $unit);
+			$v = PHP12_elem22_paste($el, $prm);
 			if(!preg_match(REGEXP_NUMERIC, $v))
 				return $v;
 			$dialog_id = _num($v);
@@ -1912,8 +1930,8 @@ function PHP12_elem22($el, $unit) {
 		'var EL'.$el['id'].'_DS='.$dialog_id.';'.
 	'</script>';
 }
-function PHP12_elem22_paste($el, $unit) {//условия были вставлены как элемент [22]
-	if(_elemUnitIsSetup($unit))
+function PHP12_elem22_paste($el, $prm) {//условия были вставлены как элемент [22]
+	if($prm['blk_setup'])
 		return _emptyMin('Дополнительные условия к фильтру', 0);
 	if(!$elem_id = $el['num_1'])
 		return _emptyMin('Не выбран элемент, указывающий на список', 0);
@@ -1921,9 +1939,11 @@ function PHP12_elem22_paste($el, $unit) {//условия были вставл�
 		return _emptyMin('Элемента '.$elem_id.' не существует', 0);
 	if(!$col = $EL['col'])
 		return _emptyMin('Не назначена колонка', 0);
-	if(!isset($unit[$col]))
-		return _emptyMin('Колонка отсутствует в единице списка', 0);
-	if(!$id = _ids($unit[$col], 'first'))
+	if(!$u = $prm['unit_edit'])
+		return _emptyMin('Отсутствует запись', 0);
+	if(!isset($u[$col]))
+		return _emptyMin('Колонка в записи отсутствует', 0);
+	if(!$id = _ids($u[$col], 'first'))
 		return _emptyMin('Значение в элементе ещё не выбрано', 0);
 	if(!$ELL = _elemOne($id))
 		return _emptyMin('Выбранного элемента '.$id.' не существует', 0);

@@ -977,10 +977,11 @@ function _dialogOpenParam($dlg) {//все возможные параметны 
 		'button_submit' => '',
 		'button_cancel' => 'Закрыть',
 
-		'dlgerr' => 0,              //флаг ошибки
-		'elm_ids' => array(),       //массив элементов для конкретного диалога
 		'edit_id' => 0,             //id редактируемой записи
 		'del_id' => 0,              //id записи для удаления
+
+		'dlgerr' => 0,              //флаг ошибки
+		'elm_ids' => array(),       //массив элементов для конкретного диалога
 		'vvv' => array(),           //содержание для элементов
 	);
 }
@@ -1019,9 +1020,12 @@ function _dialogOpenLoad($dialog_id) {
 
 
 
-//	$src = _dialogOpenSrc($dialog_id);
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 	$send['elm_ids'] = _BE('elem_ids_arr', 'dialog', $dialog_id);
+
+	$prm['srce']['dialog_id'] = $dialog_id;
+	$prm['srce']['block_id'] = _num($_POST['block_id'], 1);
+	$prm['srce']['dss'] = _num($_POST['dss']);
 
 	/* --- Редактирование записи --- */
 	if($edit_id = _num(@$_POST['edit_id'])) {
@@ -1029,11 +1033,16 @@ function _dialogOpenLoad($dialog_id) {
 
 		if(!$dialog['edit_on'])
 			return _dialogOpenErr($send, 'Редактирование записи запрещено.');
-		if(!$unit = _spisokUnitQuery($dialog, $edit_id))
+		if(!$prm['unit_edit'] = _spisokUnitQuery($dialog, $edit_id))
 			return _dialogOpenErr($send, 'Записи '.$edit_id.' не существует.');
 
 		$send['edit_id'] = $edit_id;
-		$send['html'] = _blockHtml('dialog', $dialog['id'], array('unit_edit'=>$unit));
+		$prm['srce']['block_id'] = _dialogOpenBlockIdUpd($dialog, $prm);
+
+		foreach($send['elm_ids'] as $elem_id)
+			$send['vvv'][$elem_id] = _elemVvv($elem_id, $prm);
+
+		$send['html'] = _blockHtml('dialog', $dialog['id'], $prm);
 		$send['button_submit'] = $dialog['edit_button_submit'];
 		$send['button_cancel'] = $dialog['edit_button_cancel'];
 
@@ -1050,8 +1059,11 @@ function _dialogOpenLoad($dialog_id) {
 	if(!$dialog['insert_on'])
 		return _dialogOpenErr($send, 'Внесение новой записи запрещено.');
 
-//	$send['vvv'] = _dialogOpenVvv($dialog_id, $src);
-	$send['html'] = _blockHtml('dialog', $dialog_id, array());
+
+	foreach($send['elm_ids'] as $elem_id)
+		$send['vvv'][$elem_id] = _elemVvv($elem_id, $prm);
+
+	$send['html'] = _blockHtml('dialog', $dialog_id, $prm);
 	$send['button_submit'] = $dialog['insert_button_submit'];
 	$send['button_cancel'] = $dialog['insert_button_cancel'];
 //	$send['col_type'] = _elemColType($dialog['element_type']);
@@ -1072,7 +1084,6 @@ function _dialogOpenSrc($dialog_id) {//некоторые исходные да�
 		'dialog_id' => $dialog_id,
 		'dialog_source' => _num(@$_POST['dialog_source']),
 		'page_id' => _num(@$_POST['page_id']),
-		'block_id' => _num(@$_POST['block_id'], 1),
 
 		'edit_id' => 0,
 		'edit_arr' => array(),
@@ -1081,21 +1092,6 @@ function _dialogOpenSrc($dialog_id) {//некоторые исходные да�
 
 		'prm' => $PRM,
 	);
-}
-function _dialogOpenVvv($dialog_id, $src) {//заполнение значениями компонентов
-	$send = array();
-	$arr = _BE('elem_ids_arr', 'dialog', $dialog_id);
-	foreach($arr as $elem_id)
-		$send[$elem_id] = _elemVvv($elem_id, $src);
-	return $send;
-}
-function _dialogOpenUnitEdit($send, $dialog, $edit_id) {//вывод содержания при редактировании записи
-	$send['src']['edit_id'] = $edit_id;
-	$send['src']['block_id'] = _dialogOpenBlockIdSet($send['src']['block_id'], $dialog, $unit);
-	$unit['src'] = $send['src'];
-	$send['edit_arr'] = $unit;
-	$send['src']['edit_arr'] = $unit;
-	$send['vvv'] = _dialogOpenVvv($dialog['id'], $send['src']);
 }
 function _dialogOpenUnitDelHtml($dialog, $unit) {//содержание диалога при удалении единицы списка
 	if(!$block = _BE('block_obj', 'dialog_del', $dialog['id']))
@@ -1108,7 +1104,7 @@ function _dialogOpenUnitDelHtml($dialog, $unit) {//содержание диал
 			'</div>'.
 		'</div>';
 
-	$prm = array('unit_get'=>$unit);
+	$prm['unit_get'] = $unit;
 
 	return _blockLevel($block, $prm);
 }
@@ -1117,18 +1113,19 @@ function _dialogOpenErr($send, $msg) {//формирование сообщен�
 	$send['html'] = '<div class="pad10">'._empty($msg).'</div>';
 	return $send;
 }
-function _dialogOpenBlockIdSet($block_id, $dlg, $unit) {//установка ID блока
+function _dialogOpenBlockIdUpd($dlg, $prm) {//обновление ID блока, если требуется
+	$block_id = $prm['srce']['block_id'];
+
 	if($block_id < 0)
 		echo 'block_id = MINUS!!!';
 
-	if(empty($unit))
-		return $block_id;
+	$u = $prm['unit_edit'];
 
 	if(!$block_id && isset($dlg['field1']['block_id']))
-		$block_id = _num($unit['block_id']);
+		$block_id = _num($u['block_id']);
 
 	if(!$block_id && isset($dlg['field1']['element_id']))
-		if($EL = _elemOne($unit['element_id']))
+		if($EL = _elemOne($u['element_id']))
 			$block_id = _num($EL['block_id']);
 
 	return $block_id;

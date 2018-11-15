@@ -97,7 +97,7 @@ function _blockParam($PARAM, $obj_name='') {//значения-параметр�
 		'elem_width_change' => 0,   //изменение ширины элементов
 
 		'unit_get' => array(),      //данные записи для отображения
-		'unit_edit' => array(),     //данные записи для редактирования
+		'unit_edit' => array()     //данные записи для редактирования
 	);
 
 	//условия для настройки блоков конкретного объекта
@@ -109,6 +109,19 @@ function _blockParam($PARAM, $obj_name='') {//значения-параметр�
 		$PARAM['blk_setup'] = 1;
 	if(!empty($PARAM['elem_width_change']))
 		$PARAM['blk_setup'] = 1;
+
+	//исходные данные, полученные при открытии диалога
+	if(!isset($PARAM['srce']))
+		$PARAM['srce'] = array();
+
+	$PARAM['srce'] += array(
+		'dialog_id' => 0,
+		'dss' => 0,
+//		'page_id' => 0,
+		'block_id' => 0,
+		'sev' => 0,             //выбор нескольких значений (блоков или элементов)
+		'nest' => 1,            //выбор значения из вложенного списка
+	);
 
 	return $PARAM + $setup;
 }
@@ -919,9 +932,29 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'interval' => 5,
 				'value' => $v,
 				'title0' => $el['txt_1'],
-				'spisok' => _elemVvv($el['id']),
+				'spisok' => _elemVvv($el['id'], $prm),
 				'disabled' => $prm['blk_setup']
 			));
+
+		//Select - произвольные значения
+		case 17:
+			/*
+                txt_1 - текст нулевого значения
+				значения: PHP12_select_setup
+			*/
+
+			$v = $el['def'];
+			if($u = $prm['unit_edit']) {
+				$col = $el['col'];
+				$v = _num($u[$col]);
+			}
+
+			return _select(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => $v
+				   ));
 
 		//Информационный блок
 		case 21:
@@ -929,6 +962,13 @@ function _elemPrint($el, $prm) {//формирование и отображен
                 txt_1 - содержание
 			*/
 			return '<div class="_info">'._br($el['txt_1']).'</div>';
+
+		//Дополнительные условия к фильтру (вспомогательный элемент)
+		case 22:
+			/*
+                num_1 - id элемента, в котором нужно искать список
+			*/
+			return PHP12_elem22($el, $prm);
 
 		//Содержание единицы списка - таблица
 		case 23:
@@ -1150,6 +1190,27 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'class' => 'dialog-open pl',
 				'val' => 'dialog_id:'.$dlg['id'].',edit_id:'.$u['id']
 			));
+
+		//Count - количество
+		case 35:
+			/*
+                num_1 - минимальное значение
+                num_2 - максимальное значение
+                num_3 - шаг
+                num_4 - может быть отрицательным (галочка)
+			*/
+
+			$v = 0;
+			if($u = $prm['unit_edit']) {
+				$col = $el['col'];
+				$v = _num($u[$col]);
+			}
+
+			return _count(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'width' => $el['width'],
+						'value' => $v
+				   ));
 
 		//SA: Select - выбор колонки таблицы
 		case 37:
@@ -1435,7 +1496,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$EL = _elemOne($el['num_1']);
 			$DLG = _dialogQuery($EL['num_1']);
 			$spisok = array();
-			foreach(_elemVvv($el['id']) as $id => $r) {
+			foreach(_elemVvv($el['id'], $prm) as $id => $r) {
 				$spisok[$id] = $r['txt_1'];
 
 				if(!$r['num_1'])
@@ -1639,23 +1700,6 @@ function _elemPrint($el, $prm) {//формирование и отображен
 function _elemUnit($el, $unit) {//формирование элемента страницы
 	return '<div class="fs10 b color-sal">_elemUnit</div>';
 
-/*
-	$UNIT_ISSET = isset($unit['id']);
-
-	$SRC = !empty($unit['src']) ? $unit['src'] : array();
-
-	//значение из списка
-	$v = $UNIT_ISSET && $el['col'] ? $unit[$el['col']] : '';
-	$is_edit = _elemUnitIsSetup($unit);
-	$attr_id = 'cmp_'.$el['id'].($is_edit ? '_edit' : '');
-	$disabled = $is_edit ? ' disabled' : '';
-
-	switch($el['width']) {
-		case 0: $width = ' style="width:100%"'; break;
-//		case -1: $width = ' style="width:100%"'; break;
-		default: $width = ' style="width:'.$el['width'].'px"';
-	}
-*/
 	switch(false) {
 		//Select - выбор страницы
 		case 6:
@@ -1719,19 +1763,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 				'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'.$title.'" />'.
 			'</div>';
 
-		//Select - произвольные значения
-		case 17:
-			/*
-                txt_1 - текст нулевого значения
-				значения: PHP12_select_setup
-			*/
-			return _select(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'value' => _num($v) ? _num($v) : $el['def']
-				   ));
-
 		//Dropdown
 		case 18:
 			/*
@@ -1745,29 +1776,8 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 						'value' => _num($v) ? _num($v) : $el['def']
 				   ));
 
-		//Дополнительные условия к фильтру (вспомогательный элемент)
-		case 22:
-			/*
-                num_1 - id элемента, в котором нужно искать список
-			*/
-			return PHP12_elem22($el, $unit);
-
 		//Список действий для Галочки [1]
 		case 28: return 28;
-
-		//Count - количество
-		case 35:
-			/*
-                num_1 - минимальное значение
-                num_2 - максимальное значение
-                num_3 - шаг
-                num_4 - может быть отрицательным (галочка)
-			*/
-			return _count(array(
-						'attr_id' => $attr_id,
-						'width' => $el['width'],
-						'value' => _num($v)
-				   ));
 
 		//Назначение действия для Галочки [1]: скрытие/показ блоков
 		case 36:

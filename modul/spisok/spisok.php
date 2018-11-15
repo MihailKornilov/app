@@ -615,7 +615,7 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 	if(!$dialog['table_1'])
 		return array();
 
-	$sql = "/* ".__FUNCTION__.":".__LINE__." получение данных записи */
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Данные записи */
 			SELECT `t1`.*"._spisokJoinField($dialog)."
 			FROM "._tableFrom($dialog)."
 			WHERE `t1`.`id`=".$unit_id.

@@ -821,7 +821,7 @@ function _jsCacheElemOne($elem_id) {
 		$val['ds'] = $r['block']['obj_id'];
 
 	//элемент является подключаемым списком
-	if($r['dialog_id'] == 29 || $r['dialog_id'] == 59)
+	if(_elemIsConnect($r))
 		$val['issp'] = 1;
 
 	//элемент-меню переключения блоков
@@ -842,17 +842,6 @@ function _jsCacheElemOne($elem_id) {
 	}
 
 	return $val;
-}
-function _jsCacheVvv($elem_id) {//значения для элементов (только статические значения)
-	$el = _elemOne($elem_id);
-
-	switch($el['dialog_id']) {
-		//Меню переключения блоков - список пунктов
-		case 57:
-			return _elemVvv($elem_id);
-	}
-
-	return array();
 }
 
 function _cache($v=array()) {

@@ -3361,10 +3361,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 			page_id:PAGE_ID,
 
 			dialog_id:_num(o.dialog_id),        //диалог, который вносит элемент
-			dialog_source:_num(o.dialog_source),//исходный диалог, либо настраиваемый
+			dss:_num(o.dialog_source),          //id исходного диалога, либо настраиваемого
 			block_id:_num(o.block_id, 1),       //блок в который вставляется элемент
-
-			unit_id:_num(o.unit_id),            //id записи - todo на удаление
 
 			get_id:_num(o.get_id),              //id записи, содержание которой будет размещаться в диалоге
 			edit_id:_num(o.edit_id),            //id записи при редактировании
