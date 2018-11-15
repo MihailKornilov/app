@@ -1226,59 +1226,51 @@ function _elemTitle($elem_id, $el_parent=array()) {//имя элемента и�
 	}
 	return $el['name'];
 }
-function _elem_11_dialog($el) {//получение массива диалога по элементу 11
+function _elem_11_dialog($el) {//получение данных диалога по элементу 11
 	if($el['dialog_id'] != 11)
 		return 0;
-	if(!$el11 = _elemOne($el['txt_2']))
+	if(!$ell = _elemOne($el['txt_2']))
 		return 0;
-	if($el11['block']['obj_name'] != 'dialog')
+	if($ell['block']['obj_name'] != 'dialog')
 		return 0;
-
-	$dialog_id = _num($el11['block']['obj_id']);
-
+	if($dialog_id = _num($ell['block']['obj_id']))
+		return 0;
 	if(!$dlg = _dialogQuery($dialog_id))
 		return 0;
 
 	return $dlg;
-}
-function _elem_11_v($EL, $ell_id, $unit, $is_edit) {//получение значения из единицы списка
-/*
-	$EL - элемент [11], содержащий значение в txt_2
-	$ell_id - ID элемента-значения, который выводится
-	$unit - единица списка
-*/
-
-	if(!$ell = _elemOne($ell_id))
-		return _msgRed('-no-el11-'.$ell_id.'-');
-
-	switch($ell['dialog_id']) {
-		//сборный текст
-		case 44: return PHP12_44_print($ell_id, $unit);
-	}
-
-	return _msgRed('-no-11-');
 }
 
 function _elem11($el, $prm) {//отображение элемента, вставленного через диалог [11]
 	//ids элементов отсутствуют
 	if(!$ids = _ids($el['txt_2'], 1))
 		return _msgRed('-11-yok-');
-	if(count($ids) == 1)
-		return _elem11one($el, $prm, $ids[0]);
 
-	return _pr($ids);
+	if(!$unit = $prm['unit_get'])
+		return '<div class="fs10 color-acc">11.title</div>';
+
+	foreach($ids as $id) {
+		if(!$ell = _elemOne($id))
+			return _msgRed('-ell-yok-');
+		//вложенное значение становится записью
+		if(_elemIsConnect($ell)) {
+			if(!$col = $ell['col'])
+				return _msgRed('-cnn-col-yok-');
+			$unit = $unit[$col];
+			continue;
+		}
+		return _elem11one($el, $ell, $unit);
+	}
+
+	return _msgRed('---11---');
 }
-function _elem11one($EL, $prm, $id) {//прямая ссылка на элемент через [11]
-	if(!$ell = _elemOne($id))
-		return _msgRed('-11.1-yok-');
-
-
-
+function _elem11one($EL, $ell, $unit) {//прямая ссылка на элемент через [11]
 	/* --- Простой вывод без данных записи --- */
 
 	switch($ell['dialog_id']) {
 		//произвольный текст
-		case 10: return _elemPrint($ell, $prm);
+		case 10: return _br($ell['txt_1']);
+		case 44: return '<div class="fs10 color-sal">11.44</div>';//PHP12_44_print($ell_id, $unit)
 	}
 
 
@@ -1286,16 +1278,14 @@ function _elem11one($EL, $prm, $id) {//прямая ссылка на элеме
 
 	/* --- Вывод из данных записи по колонке --- */
 
-	if(!$u = $prm['unit_get'])
-		return '<div class="fs10 color-acc">11.title.'.$ell['dialog_id'].'</div>';
 	//не присвоена колонка элементу 11
 	if(!$col = $ell['col'])
-		return _msgRed('no-11-col');
+		return _msgRed('no-11-col.'.$ell['dialog_id']);
 	//колонки в записи не существует
-	if(!isset($u[$col]))
-		return _msgRed('no-u-col');
+	if(!isset($unit[$col]))
+		return _msgRed('no-u-val.'.$ell['dialog_id']);
 
-	$txt = $u[$col];
+	$txt = $unit[$col];
 
 	switch($ell['dialog_id']) {
 		//textarea (многострочное текстовое поле)
@@ -1308,7 +1298,7 @@ function _elem11one($EL, $prm, $id) {//прямая ссылка на элеме
 		case 16:
 			if(!$id = _num($txt))
 				return '11.radio.empty';
-			if(!$dop = _elemOne($txt))
+			if(!$dop = _elemOne($id))
 				return _msgRed('no-16-dop');
 
 			return $dop['txt_1'];
@@ -1352,7 +1342,7 @@ function _elem11one($EL, $prm, $id) {//прямая ссылка на элеме
 			if(empty($txt))
 				return _imageNo($EL['width']);
 
-			return _imageHtml($txt, $EL['width'], $EL['num_7'], $prm['blk_setup']);
+			return _imageHtml($txt, $EL['width'], $EL['num_7']);
 	}
 
 
@@ -3430,7 +3420,7 @@ function _imageServer($v) {//получение сервера (пути) для
 function _imageNo($width=80) {//картинка, если изображнеия нет
 	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="'.$width.'" />';
 }
-function _imageHtml($r, $width=80, $h=0, $is_edit=0) {//получение картинки в html-формате
+function _imageHtml($r, $width=80, $h=0) {//получение картинки в html-формате
 	$width = $width ? $width : 80;
 
 	$st = $width > 80 ? 'max' : 80;
@@ -3445,10 +3435,8 @@ function _imageHtml($r, $width=80, $h=0, $is_edit=0) {//получение ка�
 		'<img src="'._imageServer($r['server_id']).$r[$st.'_name'].'"'.
 			' width="'.$width.'"'.
 	  ($h ? ' height= "'.$h.'"' : '').
-	  (!$is_edit ?
 			' class="image-open"'.
-			' val="'.$r['id'].'"'
-	  : '').
+			' val="'.$r['id'].'"'.
 		' />';
 }
 function _imageNameCreate() {//формирование имени файла из случайных символов

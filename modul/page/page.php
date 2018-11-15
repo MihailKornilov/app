@@ -431,9 +431,8 @@ function _pageShow($page_id) {
 			return _empty20('Некорректный идентификатор записи.'.PAGE_MSG_ERR);
 		if(!$dialog = _dialogQuery($dialog_id))
 			return _empty20('Отсутствует диалог, который вносит данные записи.'.PAGE_MSG_ERR);
-		if(!$unit = _spisokUnitQuery($dialog, $id))
+		if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $id))
 			return _empty20('Записи '.$id.' не существует.'.PAGE_MSG_ERR);
-		$prm['unit_get'] = $unit;
 	}
 
 	return

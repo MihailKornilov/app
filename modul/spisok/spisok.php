@@ -144,7 +144,7 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 	//диалог, через который вносятся данные списка
 	$dialog = _dialogQuery($el['num_1']);
 
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Количество значений списка <u>".$dialog['name']."</u> */
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Кол-во списка <u>".$dialog['name']."</u> */
 			SELECT COUNT(*)
 			FROM "._tableFrom($dialog)."
 			WHERE "._spisokCond($el);
@@ -310,12 +310,16 @@ function _spisokInclude($spisok) {//вложенные списки
 			//получение данных из вложенного списка
 			$incDialog = _dialogQuery($cmp['num_1']);
 
-			$sql = "/* ".__FUNCTION__.":".__LINE__." вложенные списки */
+			$sql = "/* ".__FUNCTION__.":".__LINE__." Вложенный список <u>".$incDialog['name']."</u> */
 					SELECT `t1`.*"._spisokJoinField($incDialog)."
 					FROM "._tableFrom($incDialog)."
 					WHERE `t1`.`id` IN (".$ids.")";
 			if(!$arr = query_arr($sql))
 				continue;
+
+			//вложения во вложенных списках
+			$arr = _spisokInclude($arr);
+			$arr = _spisokImage($arr);
 
 			//идентификаторы будут заменены на массив с данными единицы списка
 			foreach($spisok as $id => $r)
@@ -399,7 +403,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Данные списка <u>".$DLG['name']."</u> */
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Список-шаблон <u>".$DLG['name']."</u> */
 			SELECT `t1`.*"._spisokJoinField($DLG)."
 			FROM "._tableFrom($DLG)."
 			WHERE "._spisokCond($ELEM)."
@@ -486,7 +490,8 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Список-таблица <u>".$DLG['name']."</u> */
+			SELECT `t1`.*"._spisokJoinField($DLG)."
 			FROM "._tableFrom($DLG)."
 			WHERE "._spisokCond($ELEM)."
 			ORDER BY ".$order."
@@ -506,7 +511,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 			  AND `num_8`
 			ORDER BY `sort`";
 	if(!$tabCol = query_arr($sql))
-		return '<div class="_empty"><span class="fs15 red">Таблица не настроена.</span></div>';
+		return _emptyRed('Таблица не настроена.');
 
 	$MASS = array();
 	foreach($spisok as $uid => $u) {
@@ -623,15 +628,6 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 
 	return _arrNum($spisok[$unit_id]);
 
-}
-function _spisokUnitNum($u) {//порядковый номер - значение единицы списка
-	if(empty($u['id']))
-		return 'номер';
-
-	if(empty($u['num']))
-		return $u['id'];
-
-	return $u['num'];
 }
 
 function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в ссылку
@@ -763,7 +759,7 @@ function _spisokCond($el) {//формирование строки с услов
 
 	$cond = "`t1`.`id`";
 	$cond .= _spisokCondDef($el['num_1']);
-//	$cond .= _spisokCondBind($el);
+	$cond .= _spisokCondBind($el);
 	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond26($el);
 	$cond .= _spisokCond62($el);
@@ -798,11 +794,13 @@ function _spisokCondBind($el) {//отображения значений зап�
 	//id диалога, данные единицы списка которого выводится на странице
 	if(!$dlg_id = $page['dialog_id_unit_get'])
 		return ' AND !`t1`.`id`';
+	if(!$DLG = _dialogQuery($dlg_id))
+		return ' AND !`t1`.`id`';
 	if(!$unit_id = _num(@$_GET['id']))
 		return ' AND !`t1`.`id`';
 	//получение данных единицы списка, которое принимает страница
-//	if(!$unit = _pageUnitGet($page_id))
-//		return ' AND !`t1`.`id`';
+	if(!$unit = _spisokUnitQuery($DLG, $unit_id))
+		return ' AND !`t1`.`id`';
 
 	if(!$col = $EL['col'])
 		return ' AND !`t1`.`id`';
@@ -813,7 +811,7 @@ function _spisokCondBind($el) {//отображения значений зап�
 
 	//поиск первого элемента, который содержит привязанный список выбранного значения для отображения
 	$cmp = false;
-	foreach(_dialogParam($dlg_id, 'cmp') as $r)
+	foreach($DLG['cmp'] as $r)
 		if(_elemIsConnect($r))
 			if($r['num_1'] == $DLG_ID_CONN) {
 			$cmp = $r;

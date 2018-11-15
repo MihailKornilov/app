@@ -600,7 +600,7 @@ function _elemFormatColor($el, $txt) {//подмена цвета при доп�
 	return $el['color'];
 }
 function _elemFormatColorDate($el, $prm, $txt) {//подмена цвета для даты todo тестовая версия
-	if(!empty($prm['blk_setup']))
+	if($prm['blk_setup'])
 		return _elemFormatColor($el, $txt);
 	if($el['dialog_id'] != 86)
 		return _elemFormatColor($el, $txt);
@@ -876,43 +876,6 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			return _elem11($el, $prm);
 
-			if(!$ids = _ids($el['txt_2'], 1))
-				return _msgRed('-el-yok-');//id элементов отсутствуют
-
-			//получение значения, если нет вложенных списков
-			if(count($ids) == 1)
-				return _elem_11_v($el, $ids[0], $unit, $is_edit);
-
-			$u = $unit;
-			$ell_id = 0;//id элемента, который содержит элемент 11 (в txt_2)
-			foreach($ids as $n => $elem_id) {
-				$ell_id = $elem_id;
-				if(!$ell = _elemOne($elem_id))
-					return _msgRed('-no-el-'.$elem_id.'-');
-
-				switch($ell['dialog_id']) {
-					case 29:
-					case 59:
-						if(!$col = $ell['col'])
-							return _msgRed('нет имени колонки');
-						if(empty($u))
-							return _msgRed('единица списка пуста. Шаг: '.$n);
-						if(!isset($u[$col]))
-							return _msgRed('вложенное значение отсутствует. Шаг: '.$n.'. col: '.$col);
-						if(!is_array($u[$col]) && $u[$col] == 0)
-							return $ell['txt_1'];
-						$u = $u[$col];
-						if(!is_array($u)) {
-							$sql = "SELECT *
-									FROM `_spisok`
-									WHERE `id`=".$u;
-							$u = query_assoc($sql);
-						}
-				}
-			}
-
-			return _elem_11_v($el, $ell_id, $u, $is_edit);
-
 		//Содержание единицы списка - шаблон
 		case 14:
 			if(!$dialog_id = $el['num_1'])
@@ -1043,7 +1006,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_1 - иконка красного цвета
 			*/
 
-			if(!empty($prm['blk_setup']))
+			if($prm['blk_setup'])
 				return _iconDel(array(
 					'red' => $el['num_1'],
 					'class'=>'curD'
@@ -1108,6 +1071,15 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 			$chk;
 
+		//Значение списка: порядковый номер
+		case 32:
+			if(!$u = $prm['unit_get'])
+				return 'num';
+
+			$num = empty($u['num']) ? $u['id'] : $u['num'];
+			$num = _spisokColSearchBg($el, $num);
+			return $num;
+
 		//Значение записи: дата
 		case 33:
 			/*
@@ -1122,7 +1094,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					завтра
 				num_4 - показывать время в формате 12:45
 			*/
-			if(!empty($prm['blk_setup']))
+			if($prm['blk_setup'])
 				return 'дата/время';
 			if(!$u = $prm['unit_get'])
 				return '--';
@@ -1163,7 +1135,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 		//Иконка редактирования записи
 		case 34:
-			if(!empty($prm['blk_setup']))
+			if($prm['blk_setup'])
 				return _iconEdit(array('class'=>'curD'));
 			if(!$u = $prm['unit_get'])
 				return '--';
@@ -1782,14 +1754,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 
 		//Список действий для Галочки [1]
 		case 28: return 28;
-
-		//Значение списка: порядковый номер
-		case 32:
-			if($is_edit)
-				return _elemTitle($el['id']);
-			$num = _spisokUnitNum($unit);
-			$num = _spisokColSearchBg($el, $num);
-			return $num;
 
 		//Count - количество
 		case 35:
