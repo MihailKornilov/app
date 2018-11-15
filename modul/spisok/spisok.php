@@ -629,7 +629,6 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 	return _arrNum($spisok[$unit_id]);
 
 }
-
 function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в ссылку
 	//оборачивать не нужно
 	if(!$el['url'])

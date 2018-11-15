@@ -1233,7 +1233,7 @@ function _elem_11_dialog($el) {//получение данных диалога 
 		return 0;
 	if($ell['block']['obj_name'] != 'dialog')
 		return 0;
-	if($dialog_id = _num($ell['block']['obj_id']))
+	if(!$dialog_id = _num($ell['block']['obj_id']))
 		return 0;
 	if(!$dlg = _dialogQuery($dialog_id))
 		return 0;
@@ -1242,14 +1242,10 @@ function _elem_11_dialog($el) {//получение данных диалога 
 }
 
 function _elem11($el, $prm) {//отображение элемента, вставленного через диалог [11]
-	//ids элементов отсутствуют
-	if(!$ids = _ids($el['txt_2'], 1))
-		return _msgRed('-11-yok-');
-
 	if(!$unit = $prm['unit_get'])
 		return '<div class="fs10 color-acc">11.title</div>';
 
-	foreach($ids as $id) {
+	foreach(_ids($el['txt_2'], 'arr') as $id) {
 		if(!$ell = _elemOne($id))
 			return _msgRed('-ell-yok-');
 		//вложенное значение становится записью
@@ -1262,7 +1258,7 @@ function _elem11($el, $prm) {//отображение элемента, вста
 		return _elem11one($el, $ell, $unit);
 	}
 
-	return _msgRed('---11---');
+	return _msgRed('-11-yok-');
 }
 function _elem11one($EL, $ell, $unit) {//прямая ссылка на элемент через [11]
 	/* --- Простой вывод без данных записи --- */
