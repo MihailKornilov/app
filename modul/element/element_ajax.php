@@ -978,6 +978,7 @@ function _dialogOpenParam($dlg) {//все возможные параметны 
 		'button_cancel' => 'Закрыть',
 
 
+//		'get_id' => 0,              //id просматриваемой записи
 		'edit_id' => 0,             //id редактируемой записи
 		'del_id' => 0,              //id записи для удаления
 
@@ -1068,6 +1069,12 @@ function _dialogOpenLoad($dialog_id) {
 
 	foreach($ELM_IDS as $elem_id)
 		$send['vvv'][$elem_id] = _elemVvv($elem_id, _blockParam($prm));
+
+	if($get_id = _num(@$_POST['get_id'])) {
+//		if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $get_id))
+//			return _dialogOpenErr($send, 'Записи '.$get_id.' не существует.');
+		$prm['unit_get_id'] = $get_id;
+	}
 
 	$send['html'] = _blockHtml('dialog', $dialog_id, $prm);
 	$send['button_submit'] = $dialog['insert_button_submit'];
