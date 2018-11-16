@@ -843,72 +843,13 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 				return array();
 			return PHP12_elem22_vvv($u['id']);
 
-		//SA: select - выбор имени колонки
-		case 37: return _elemVvv37($prm);
-
-		//Меню переключения блоков - список пунктов
-		case 57:
-			$send = array();
-			foreach(PHP12_menu_block_setup_vvv($elem_id) as $v) {
-				$send[] = array(
-					'id' => $v['id'],
-					'title' => $v['title'],
-					'blk' => $v['blk']
-				);
-			}
-			return $send;
-
-		//Фильтр radio
-		case 74:
-			$sql = "/* ".__FUNCTION__.":".__LINE__." VVV ".$el['dialog_id']." */
-					SELECT *
-					FROM `_element`
-					WHERE `parent_id`=".$elem_id."
-					ORDER BY `sort`";
-			return query_arr($sql);
-	}
-
-	return array();
-}
-function _elemVvv_($elem_id, $src=array()) {
-	if(!$el = _elemOne($elem_id))
-		return array();
-
-	$dialog_id = _num(@$src['dialog_id']);
-	$block_id =  _num(@$src['block_id']);
-
-	$edit_id = _num(@$src['edit_id']);
-	$edit_arr = $edit_id ? $src['edit_arr'] : array();
-
-	$unit_id =   _num(@$src['unit_id'], 1);
-	$unit = $unit_id ? $src['unit'] : array();
-
-	switch($el['dialog_id']) {
-		//подключаемая функция
-		case 12:
-			if(!$edit_id)
-				break;
-
-			$func = $el['txt_1'].'_vvv';
-			if(!function_exists($func))
-				break;
-
-			return $func($edit_id, $src);
-
-
-
-
-		//select - выбор списка
-		case 24:
-			switch($el['num_1']) {
-				case 960: return _dialogSpisokOnPage($block_id);
-				case 961: return _dialogSpisokOnConnect($block_id, $unit_id);
-			}
-			return _dialogSpisokOn($dialog_id, $block_id, $elem_id);//все списки приложения
-
-		//select - выбор записи из другого списка (для связки)
+		//Select - выбор записи из другого списка (для связки)
 		case 29:
-			$sel_id = 0; //ID выбранной записи при редактировании
+			$edit_id = 0; //ID выбранной записи при редактировании
+			if($u = $prm['unit_edit']) {
+				$col = $el['col'];
+				$edit_id = _num($u[$col]['id']);
+			}
 
 /*
 			if($unit_id) {
@@ -922,10 +863,25 @@ function _elemVvv_($elem_id, $src=array()) {
 
 			$sel_id = _spisokCmpConnectIdGet($el, $sel_id);
 */
-			return _29cnn($elem_id, '', $sel_id);
+			return _29cnn($elem_id, '', $edit_id);
+
+		//SA: select - выбор имени колонки
+		case 37: return _elemVvv37($prm);
 
 		//SA: Select - выбор диалогового окна
 		case 38: return _dialogSelArray();
+
+		//Меню переключения блоков - список пунктов
+		case 57:
+			$send = array();
+			foreach(PHP12_menu_block_setup_vvv($elem_id) as $v) {
+				$send[] = array(
+					'id' => $v['id'],
+					'title' => $v['title'],
+					'blk' => $v['blk']
+				);
+			}
+			return $send;
 
 		//Цвета для фона
 		case 70:
@@ -956,8 +912,10 @@ function _elemVvv_($elem_id, $src=array()) {
 			);
 
 			$sel = '#fff';//выбранное значение
-			if($unit_id)
-				$sel = $unit[$el['col']];
+			if($u = $prm['unit_edit']) {
+				$col = $el['col'];
+				$sel = $u[$col];
+			}
 
 			$spisok = '';
 			for($n = 0; $n < count($color); $n++) {
@@ -967,6 +925,51 @@ function _elemVvv_($elem_id, $src=array()) {
 						   '</div>';
 			}
 			return '<div class="_color-bg-choose">'.$spisok.'</div>';
+
+		//Фильтр radio
+		case 74:
+			$sql = "/* ".__FUNCTION__.":".__LINE__." VVV ".$el['dialog_id']." */
+					SELECT *
+					FROM `_element`
+					WHERE `parent_id`=".$elem_id."
+					ORDER BY `sort`";
+			return query_arr($sql);
+	}
+
+	return array();
+}
+function _elemVvv_($elem_id, $src=array()) {
+	if(!$el = _elemOne($elem_id))
+		return array();
+
+	$dialog_id = _num(@$src['dialog_id']);
+	$block_id =  _num(@$src['block_id']);
+
+	$unit_id =   _num(@$src['unit_id'], 1);
+	$unit = $unit_id ? $src['unit'] : array();
+
+	switch($el['dialog_id']) {
+		//подключаемая функция
+		case 12:
+			if(!$edit_id)
+				break;
+
+			$func = $el['txt_1'].'_vvv';
+			if(!function_exists($func))
+				break;
+
+			return $func($edit_id, $src);
+
+
+
+
+		//select - выбор списка
+		case 24:
+			switch($el['num_1']) {
+				case 960: return _dialogSpisokOnPage($block_id);
+				case 961: return _dialogSpisokOnConnect($block_id, $unit_id);
+			}
+			return _dialogSpisokOn($dialog_id, $block_id, $elem_id);//все списки приложения
 /*
 		//SA: Select - дублирование
 		case 41:

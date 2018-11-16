@@ -325,6 +325,8 @@ function _spisokInclude($spisok) {//вложенные списки
 			foreach($spisok as $id => $r)
 				if($dlg_id == $r['dialog_id']) {
 					$connect_id = $r[$col];
+					if(is_array($connect_id))
+						continue;
 					if(empty($arr[$connect_id]))
 						continue;
 					$spisok[$id][$col] = $arr[$connect_id];
@@ -1499,14 +1501,10 @@ function _spisok59unit($elem_id, $unit_id) {//выбранное значени�
 		return '';
 	if(!$dlg = _dialogQuery($dialog_id))
 		return '';
-
-	$sql = "SELECT *
-			FROM `"._table($dlg['table_1'])."`
-			WHERE `id`=".$unit_id;
-	if(!$unit = query_assoc($sql))
+	if(!$prm['unit_get'] = _spisokUnitQuery($dlg, $unit_id))
 		return '';
 
-	return _blockHtml('spisok', $elem_id, $unit);
+	return _blockHtml('spisok', $elem_id, $prm);
 }
 
 function _spisokCmpConnectIdGet($el, $sel_id=0) {//получение id привязонного списка, если рядом стоит родительский список (для страницы, принимающей значения списка)

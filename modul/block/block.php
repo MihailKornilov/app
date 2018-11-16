@@ -1028,7 +1028,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$v = $el['num_6'];
 			if($u = $prm['unit_edit']) {
 				$col = $el['col'];
-				$v = _num($u[$col]);
+				$v = _num($u[$col]['id']);
 			}
 
 //			$v = _spisokCmpConnectIdGet($el);
@@ -1316,7 +1316,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$v = 0;
 			if($u = $prm['unit_edit']) {
 				$col = $el['col'];
-				$v = _num($u[$col]);
+				$v = _num($u[$col]['id']);
 			}
 
 			return

@@ -1061,7 +1061,7 @@ function _dialogOpenLoad($dialog_id) {
 
 
 	foreach($send['elm_ids'] as $elem_id)
-		$send['vvv'][$elem_id] = _elemVvv($elem_id, $prm);
+		$send['vvv'][$elem_id] = _elemVvv($elem_id, _blockParam($prm));
 
 	$send['html'] = _blockHtml('dialog', $dialog_id, $prm);
 	$send['button_submit'] = $dialog['insert_button_submit'];

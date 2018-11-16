@@ -316,10 +316,11 @@ function _idsGet($arr, $i='id') {//возвращение из массива с
 			$ids[] = $id;
 			continue;
 		}
+		if(empty($r[$i]))
+			continue;
 		if(is_array($r[$i]))
 			continue;
-		if(!empty($r[$i]))
-			$ids[] = $r[$i];
+		$ids[] = $r[$i];
 	}
 	return empty($ids) ? 0 : implode(',', array_unique($ids));
 }
