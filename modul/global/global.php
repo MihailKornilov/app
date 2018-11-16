@@ -651,9 +651,7 @@ function _jsCache() {//файл JS с блоками и элементами
 		"\n\n".
 		'BLKK='._jsCacheBlk().','.
 		"\n\n".
-		'ELMM='._jsCacheElm().','.
-		"\n\n".
-		'VVV={};';
+		'ELMM='._jsCacheElm().';';
 
 	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
 	fwrite($fp, $save);

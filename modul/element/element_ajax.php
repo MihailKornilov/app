@@ -980,8 +980,9 @@ function _dialogOpenParam($dlg) {//все возможные параметны 
 		'edit_id' => 0,             //id редактируемой записи
 		'del_id' => 0,              //id записи для удаления
 
+		'unit' => array(),          //содержание записи (редактируемой или просматриваемой)
+
 		'dlgerr' => 0,              //флаг ошибки
-		'elm_ids' => array(),       //массив элементов для конкретного диалога
 		'vvv' => array(),           //содержание для элементов
 	);
 }
@@ -1021,11 +1022,12 @@ function _dialogOpenLoad($dialog_id) {
 
 
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
-	$send['elm_ids'] = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
 	$prm['srce']['dialog_id'] = $dialog_id;
 	$prm['srce']['block_id'] = _num($_POST['block_id'], 1);
 	$prm['srce']['dss'] = _num($_POST['dss']);
+
+	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
 	/* --- Редактирование записи --- */
 	if($edit_id = _num(@$_POST['edit_id'])) {
@@ -1037,9 +1039,10 @@ function _dialogOpenLoad($dialog_id) {
 			return _dialogOpenErr($send, 'Записи '.$edit_id.' не существует.');
 
 		$send['edit_id'] = $edit_id;
+		$send['unit'] = $prm['unit_edit'];
 		$prm['srce']['block_id'] = _dialogOpenBlockIdUpd($dialog, $prm);
 
-		foreach($send['elm_ids'] as $elem_id)
+		foreach($ELM_IDS as $elem_id)
 			$send['vvv'][$elem_id] = _elemVvv($elem_id, $prm);
 
 		$send['html'] = _blockHtml('dialog', $dialog['id'], $prm);
@@ -1059,8 +1062,7 @@ function _dialogOpenLoad($dialog_id) {
 	if(!$dialog['insert_on'])
 		return _dialogOpenErr($send, 'Внесение новой записи запрещено.');
 
-
-	foreach($send['elm_ids'] as $elem_id)
+	foreach($ELM_IDS as $elem_id)
 		$send['vvv'][$elem_id] = _elemVvv($elem_id, _blockParam($prm));
 
 	$send['html'] = _blockHtml('dialog', $dialog_id, $prm);

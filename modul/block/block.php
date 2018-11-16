@@ -697,18 +697,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			/*
 				txt_1 - текст для галочки
 			*/
-
-			$v = 0;
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = _num($u[$col]);
-			}
-
 			return _check(array(
 				'attr_id' => _elemAttrId($el, $prm),
 				'title' => $el['txt_1'],
 				'disabled' => $prm['blk_setup'],
-				'value' => $v
+				'value' => _elemPrintV($el, $prm, 0)
 			));
 
 		//button
@@ -787,15 +780,23 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
-			$v = '';
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = $u[$col];
-			}
 			return
 			'<textarea id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.'>'.
-				$v.
+				_elemPrintV($el, $prm).
 			'</textarea>';
+
+		//Select - выбор страницы
+		case 6:
+			/*
+                txt_1 - текст, когда страница не выбрана
+				содержание: PAGE_LIST
+			*/
+			return _select(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _elemPrintV($el, $prm, 0)
+				   ));
 
 		//Фильтр - быстрый поиск
 		case 7:
@@ -889,6 +890,42 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			return _elem11($el, $prm);
 
+		//Выбор элемента из диалога или страницы
+		case 13:
+			/*
+				txt_1 - текст для placeholder
+				num_1 - источник выбора
+						2119 - текущая страница
+						2120 - диалог
+				num_2 - если источник выбора диалог: (вспомогательный диалог [11] - выводит содержание диалога)
+						2123 - конкретный диалог (из списка диалогов)
+						2124 - указать значение, где находится диалог
+				num_3 - элемент-значение для указания местонахождения диалога
+				num_4 - ID диалога (список всех диалогов)
+				num_5 - выбор значений во вложенных списках
+				num_6 - выбор нескольких значений
+			*/
+
+			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+			$v = '';
+			$title = '';
+			if($u = $prm['unit_edit']) {
+				$col = $el['col'];
+				$v = $u[$col];
+				foreach(_ids($v, 'arr') as $n => $id)
+					$title .= ($n ? ' » ' : '')._elemTitle($id);
+			}
+
+			return
+			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+			'<div class="_selem dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
+				'<div class="icon icon-star pabs"></div>'.
+				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+				'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'.$title.'" />'.
+			'</div>';
+
 		//Содержание единицы списка - шаблон
 		case 14:
 			if(!$dialog_id = $el['num_1'])
@@ -918,19 +955,12 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_1 - горизонтальное положение
 				значения: PHP12_radio_setup
 			*/
-
-			$v = $el['def'];
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = _num($u[$col]);
-			}
-
 			return _radio(array(
 				'attr_id' => _elemAttrId($el, $prm),
 				'light' => 1,
 				'block' => !$el['num_1'],
 				'interval' => 5,
-				'value' => $v,
+				'value' => _elemPrintV($el, $prm, $el['def']),
 				'title0' => $el['txt_1'],
 				'spisok' => _elemVvv($el['id'], $prm),
 				'disabled' => $prm['blk_setup']
@@ -942,18 +972,24 @@ function _elemPrint($el, $prm) {//формирование и отображен
                 txt_1 - текст нулевого значения
 				значения: PHP12_select_setup
 			*/
-
-			$v = $el['def'];
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = _num($u[$col]);
-			}
-
 			return _select(array(
 						'attr_id' => _elemAttrId($el, $prm),
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'value' => $v
+						'value' => _elemPrintV($el, $prm, $el['def'])
+				   ));
+
+		//Dropdown
+		case 18:
+			/*
+                txt_1 - текст нулевого значения
+				значения из _element через dialog_id:19
+			*/
+			return _dropdown(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _elemPrintV($el, $prm, $el['def'])
 				   ));
 
 		//Информационный блок
@@ -991,18 +1027,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 							  Идентификаторами результата являются id элементов (а не диалогов)
 							  Функция _dialogSpisokOnConnect()
 			*/
-
-			$v = 0;
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = _num($u[$col]);
-			}
-
 			return _select(array(
 						'attr_id' => _elemAttrId($el, $prm),
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'value' => $v
+						'value' => _elemPrintV($el, $prm, 0)
 				   ));
 
 		//Настройка суммы значений единицы списка
@@ -1025,11 +1054,6 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_6 - значение по умолчанию
 			*/
 
-			$v = $el['num_6'];
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = _num($u[$col]['id']);
-			}
 
 //			$v = _spisokCmpConnectIdGet($el);
 
@@ -1037,7 +1061,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'attr_id' => _elemAttrId($el, $prm),
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'value' => $v
+						'value' => _elemPrintV($el, $prm, $el['num_6'])
 				   ));
 
 		//Иконка удаления записи
@@ -1078,11 +1102,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_1 - список, из которого будут выбираться галочки
 			*/
 
-			$v = '';
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = $u[$col];
-			}
+			$v = _elemPrintV($el, $prm);
 
 			//получение данных списка
 			$DLG = _dialogQuery($el['num_1']);
@@ -1199,17 +1219,10 @@ function _elemPrint($el, $prm) {//формирование и отображен
                 num_3 - шаг
                 num_4 - может быть отрицательным (галочка)
 			*/
-
-			$v = 0;
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = _num($u[$col]);
-			}
-
 			return _count(array(
 						'attr_id' => _elemAttrId($el, $prm),
 						'width' => $el['width'],
-						'value' => $v
+						'value' => _elemPrintV($el, $prm, 0)
 				   ));
 
 		//SA: Select - выбор колонки таблицы
@@ -1224,18 +1237,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			/*
                 txt_1 - нулевое значение
 			*/
-
-			$v = 0;
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = _num($u[$col]);
-			}
-
 			return _select(array(
 						'attr_id' => _elemAttrId($el, $prm),
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'value' => $v
+						'value' => _elemPrintV($el, $prm, 0)
 				   ));
 
 		//Календарь
@@ -1244,14 +1250,9 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_1 - разрешать выбор прошедших дней
 				num_2 - показывать время
 			*/
-			$v = '';
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = $u[$col];
-			}
 			return _calendar(array(
 				'attr_id' => _elemAttrId($el, $prm),
-				'value' => $v
+				'value' => _elemPrintV($el, $prm)
 			));
 
 		//Заметки
@@ -1313,11 +1314,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_4 - id диалога, которое открывается при нажатии на кнопку
 			*/
 
-			$v = 0;
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = _num($u[$col]['id']);
-			}
+			$v = _elemPrintV($el, $prm, 0);
 
 			return
 			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
@@ -1463,11 +1460,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 		//Выбор цвета фона
 		case 70:
-			$v = '#fff';
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = $u[$col];
-			}
+			$v = _elemPrintV($el, $prm, '#fff');
 
 			return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 				   '<div class="_color-bg" style="background-color:'.$v.'"></div>';
@@ -1558,6 +1551,20 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'small' => 1,
 						'class' => _dn($prm['blk_setup'] || $diff)
 					));
+
+		//Select - выбор значения списка по умолчанию
+		case 85:
+			/*
+                num_1 - ID элемента select, который содержит списки
+                txt_1 - текст нулевого значения
+			*/
+
+			return _select(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _elemPrintV($el, $prm, 0)
+				   ));
 
 		//Значение записи: количество дней
 		case 86:
@@ -1697,23 +1704,25 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 	return _msgRed('dlg-'.$el['dialog_id']);
 }
+function _elemPrintV($el, $prm, $def='') {//значение записи при редактировании
+	if(!$u = $prm['unit_edit'])
+		return $def;
+	if(!$col = $el['col'])
+		return $def;
+
+	$v = $u[$col];
+
+	if(is_array($v))
+		return _num($v['id']);
+	if(preg_match(REGEXP_NUMERIC, $v))
+		return intval($v);
+
+	return $v;
+}
 function _elemUnit($el, $unit) {//формирование элемента страницы
 	return '<div class="fs10 b color-sal">_elemUnit</div>';
 
 	switch(false) {
-		//Select - выбор страницы
-		case 6:
-			/*
-                txt_1 - текст, когда страница не выбрана
-				содержание: PAGE_LIST
-			*/
-			return _select(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'value' => _num($v)
-				   ));
-
 		//SA: Функция PHP
 		case 12:
 			/*
@@ -1732,49 +1741,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			return
 				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
 				$el['txt_1']($el, $SRC);
-
-		//Выбор элемента из диалога или страницы
-		case 13:
-			/*
-				txt_1 - текст для placeholder
-				num_1 - источник выбора
-						2119 - текущая страница
-						2120 - диалог
-				num_2 - если источник выбора диалог: (вспомогательный диалог [11] - выводит содержание диалога)
-						2123 - конкретный диалог (из списка диалогов)
-						2124 - указать значение, где находится диалог
-				num_3 - элемент-значение для указания местонахождения диалога
-				num_4 - ID диалога (список всех диалогов)
-				num_5 - выбор значений во вложенных списках
-				num_6 - выбор нескольких значений
-			*/
-
-			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-
-			$title = '';
-			foreach(_ids($v, 'arr') as $n => $id)
-				$title .= ($n ? ' » ' : '')._elemTitle($id);
-
-			return
-			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-			'<div class="_selem dib prel bg-fff over1" id="'.$attr_id.'_selem"'.$width.'>'.
-				'<div class="icon icon-star pabs"></div>'.
-				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-				'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'.$title.'" />'.
-			'</div>';
-
-		//Dropdown
-		case 18:
-			/*
-                txt_1 - текст нулевого значения
-				значения из _element через dialog_id:19
-			*/
-			return _dropdown(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'value' => _num($v) ? _num($v) : $el['def']
-				   ));
 
 		//Список действий для Галочки [1]
 		case 28: return 28;
@@ -1917,19 +1883,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
 						'value' => $v
-				   ));
-
-		//Select - выбор значения списка
-		case 85:
-			/*
-                num_1 - ID элемента select, который содержит списки
-                txt_1 - текст нулевого значения
-			*/
-			return _select(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'value' => _num($v)
 				   ));
 	}
 }

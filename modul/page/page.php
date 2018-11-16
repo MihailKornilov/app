@@ -447,18 +447,16 @@ function _pageShowScript($page_id, $prm) {
 	$prm = _blockParam($prm, 'page');
 
 	//значения элементов страницы
-	$vvvPage = array();
+	$vvv = array();
 	foreach(_BE('elem_ids_arr', 'page', $page_id) as $elem_id)
-		$vvvPage[$elem_id] = _elemVvv($elem_id, $prm);
+		$vvv[$elem_id] = _elemVvv($elem_id, $prm);
 
 	return
 	'<script>'.
 	(APP_ID && USER_ID ?
 		'var FILTER='._json(_spisokFilter('page_js'), 1).';'
 	: '').
-		'var VVV_PAGE='._json($vvvPage).';'.
-		'for(var i in VVV_PAGE)VVV[i]=VVV_PAGE[i];'.
-		'_ELM_ACT({elm_ids:'._BE('elem_ids_js', 'page', $page_id).'});'.
+		'_ELM_ACT({vvv:'._json($vvv).',unit:'._json($prm['unit_get']).'});'.
 	'</script>';
 }
 function _pageUnitGet($page_id) {

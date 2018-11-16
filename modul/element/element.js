@@ -545,8 +545,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 		});
 
 		window.DIALOG_OPEN = dialog;
-		for(var i in o.vvv)
-			VVV[i] = o.vvv[i];
 		_ELM_ACT(o);
 
 		return dialog;
@@ -722,25 +720,21 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(OBJ.dlgerr)
 			return;
 
-		var attr_focus = false,//элемент, на который будет поставлен фокус
-			SRC = OBJ.src || {},
-			unit = OBJ.edit_arr && OBJ.edit_arr.id ? OBJ.edit_arr : {src:SRC};
+		var SRC = {},
+			unit = OBJ.unit;
 
-		_forN(OBJ.elm_ids, function(elm_id) {
+		_forIn(OBJ.vvv, function(vvv, elm_id) {
 			var el = ELMM[elm_id];
 
 			if(!el)
-				alert('несуществующий элемент ' + elem_id);
+				alert('несуществующий элемент ' + elm_id);
+
+			el.id = elm_id;
 
 			var ATR_CMP = _attr_cmp(elm_id),
 				ATTR_CMP_AFICS = _attr_cmp(elm_id, 1),
 				ATTR_EL =  _attr_el(elm_id),
 				UNIT_V = unit.id ? _num(unit[el.col] || el.def) : 0;//значение для функции
-
-			el.id = elm_id;
-
-			if(el.focus)
-				attr_focus = ATR_CMP;
 
 			_elemHint(el);
 
@@ -795,8 +789,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 							timer = setInterval(function() {
 								started = 1;
 								v_last = v;
-								if(!FILTER[el.num_1])
-									FILTER[el.num_1] = {};
+//								if(!FILTER[el.num_1])
+//									FILTER[el.num_1] = {};
 								FILTER[el.num_1][elm_id] = v;
 								_spisokUpdate(el.num_1, function() {
 									started = 0;
@@ -860,7 +854,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:VVV[el.id],
+						spisok:vvv,
 						func:function(v) {
 							_elemFunc(el, v);
 						}
@@ -871,7 +865,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					_elemFunc(el, UNIT_V, 1);
 					ATR_CMP._dropdown({
 						title0:el.txt_1,
-						spisok:VVV[el.id],
+						spisok:vvv,
 						func:function(v) {
 							_elemFunc(el, v);
 						}
@@ -924,7 +918,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:VVV[el.id],
+						spisok:vvv,
 						func:function(v) {
 							_elemFunc(el, v);
 						}
@@ -938,7 +932,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						title0:el.txt_1,
 						write:el.num_1 && el.num_3,
 						msg_empty:'Не найдено',
-						spisok:VVV[el.id],
+						spisok:vvv,
 						blocked:el.num_4,
 						func:function(v) {
 							_elemFunc(el, v);
@@ -1006,9 +1000,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 						width:el.width,
 						title0:'не выбрано',
 						msg_empty:'колонок нет',
-						spisok:VVV[el.id]
+						spisok:vvv
 					});
-					_forN(VVV[el.id], function(u) {
+					_forN(vvv, function(u) {
 						if(unit.col == u.title) {
 							ATR_CMP._select(u.id);
 							return false;
@@ -1029,7 +1023,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						width:el.width,
 						title0:el.txt_1,
 						msg_empty:'диалоги ещё не были созданы',
-						spisok:VVV[el.id]
+						spisok:vvv
 					});
 					return;
 				//SA: Select - дублирование
@@ -1038,7 +1032,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:VVV[el.id]
+						spisok:vvv
 					});
 					return;
 				//Выбор блоков из диалога или страницы
@@ -1193,7 +1187,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							1159:1
 						},
 						toggle = function(id) {
-							_forN(VVV[el.id], function(sp) {
+							_forN(vvv, function(sp) {
 								_forN(_elemFuncBlockObj(_idsAss(sp.blk)), function(oo) {
 									if(!oo.obj.length)
 										return;
@@ -1204,7 +1198,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					toggle(el.def);
 					ATR_CMP._menu({
 						type:type[el.num_1],
-						spisok:VVV[el.id],
+						spisok:vvv,
 						func:toggle
 					});
 					return;
@@ -1519,7 +1513,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//Выбор цвета фона
 				case 70:
 					ATR_CMP.next()._hint({
-						msg:VVV[el.id],
+						msg:vvv,
 						pad:3,
 						side:'right',
 						func:function(h) {
@@ -1576,8 +1570,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 						if(on || week) {
 							CNT.find('.sel').removeClass('sel');
 							td.addClass('sel');
-							if(!FILTER[el.num_1])
-								FILTER[el.num_1] = {};
+//							if(!FILTER[el.num_1])
+//								FILTER[el.num_1] = {};
 							FILTER[el.num_1][elm_id] = t.attr('val');
 							_spisokUpdate(el.num_1);
 						}
@@ -1585,8 +1579,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр-меню
 				case 78:
-					if(!FILTER[el.num_1])
-						FILTER[el.num_1] = {};
+//					if(!FILTER[el.num_1])
+//						FILTER[el.num_1] = {};
 					var FM = ATTR_EL.find('.fm-unit');
 					ATTR_EL.find('.fm-plus').click(function() {
 						var t = $(this),
@@ -1655,12 +1649,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Select - фильтр
 				case 83:
-					if(!FILTER[el.num_1])
-						FILTER[el.num_1] = {};
+//					if(!FILTER[el.num_1])
+//						FILTER[el.num_1] = {};
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:VVV[el.id],
+						spisok:vvv,
 						func:function(v) {
 							FILTER[el.num_1][elm_id] = v;
 							_spisokUpdate(el.num_1);
@@ -1672,7 +1666,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
-						spisok:VVV[el.id],
+						spisok:vvv,
 						msg_empty:el.num_1 ? 'Список пуст' : 'Не указан список',
 						func:function(v) {
 //							_elemFunc(el, v);
@@ -1681,8 +1675,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102:
-					if(!FILTER[el.num_1])
-						FILTER[el.num_1] = {};
+//					if(!FILTER[el.num_1])
+//						FILTER[el.num_1] = {};
 
 					var HLD = ATTR_EL.find('.holder'),//текст пустого значения
 						TDUN = ATTR_EL.find('.td-un'),//выбранные значения
@@ -1781,10 +1775,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 			}
 		});
 
-		if(attr_focus)
-			attr_focus.focus();
+		_forIn(OBJ.vvv, function(vvv, id) {
+			if(ELMM[id].focus) {
+				_attr_cmp(id).focus();
+				return false;
+			}
+		});
 	},
-
 	_elemHint = function(el) {//подключение подсказки к элементу
 		if(!el.hint)
 			return;
@@ -1826,7 +1823,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			$(this)._hint(o);
 		});
 	},
-
 	_elemFunc = function(el, v, is_open) {//применение функций, привязанных к элементам
 		/*
 			is_open - окно открылось, эффектов нет, только применение функций
