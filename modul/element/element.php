@@ -809,6 +809,17 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		return array();
 
 	switch($el['dialog_id']) {
+		//подключаемая функция
+		case 12:
+			if(!$u = $prm['unit_edit'])
+				return array();
+
+			$func = $el['txt_1'].'_vvv';
+			if(!function_exists($func))
+				return array();
+
+			return $func($u['id'], $prm);
+
 		//Radio
 		case 16:
 			$sql = "SELECT `id`,`txt_1`
@@ -950,34 +961,41 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 					WHERE `parent_id`=".$elem_id."
 					ORDER BY `sort`";
 			return query_arr($sql);
+
+		//Select - выбор значения списка. Для значений по умолчанию.
+		case 85:
+			if(!$u = $prm['unit_edit'])
+				break;
+			//ID элемента, который размещает селект со списком
+			if(!$elem_id = _num($el['num_1']))
+				break;
+			if(!$el = _elemOne($elem_id))
+				break;
+			//колонка, по которой будет получено ID диалога-списка
+			if(!$col = $el['col'])
+				break;
+			if(!$dlg_id = _num($u[$col]))
+				break;
+			if(!$dlg = _dialogQuery($dlg_id))
+				break;
+
+			//получение данных списка
+			$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
+					FROM "._tableFrom($dlg)."
+					WHERE `t1`.`id`"._spisokCondDef($dlg_id)."
+					ORDER BY `id`
+					LIMIT 200";
+			if(!$spisok = query_arr($sql))
+				break;
+
+			$send = array();
+			foreach($spisok as $id => $r)
+				$send[$id] = $r['txt_1'];
+
+			return $send;
 	}
 
 	return array();
-}
-function _elemVvv_($elem_id, $src=array()) {
-	if(!$el = _elemOne($elem_id))
-		return array();
-
-	$dialog_id = _num(@$src['dialog_id']);
-	$block_id =  _num(@$src['block_id']);
-
-	$unit_id =   _num(@$src['unit_id'], 1);
-	$unit = $unit_id ? $src['unit'] : array();
-
-	switch($el['dialog_id']) {
-		//подключаемая функция
-		case 12:
-			if(!$edit_id)
-				break;
-
-			$func = $el['txt_1'].'_vvv';
-			if(!function_exists($func))
-				break;
-
-			return $func($edit_id, $src);
-
-
-
 
 /*
 		//SA: Select - дублирование
@@ -1003,43 +1021,10 @@ function _elemVvv_($elem_id, $src=array()) {
 			$dialog['cmp'][$cmp_id]['txt_1'] = $EL['txt_1'];
 			$dialog['cmp'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 			break;
-*/
 
 		//Фильтр: Select - привязанный список
 		case 83: return _elemSpisokConnect($el['txt_2']);
-
-		//Select - выбор значения списка
-		case 85:
-			if(empty($unit))
-				break;
-			//ID элемента, который размещает селект со списком
-			if(!$elem_id = _num($el['num_1']))
-				break;
-			if(!$el = _elemOne($elem_id))
-				break;
-			//колонка, по которой будет получено ID диалога-списка
-			if(!$col = $el['col'])
-				break;
-			if(!$dlg_id = _num($unit[$col]))
-				break;
-			if(!$dlg = _dialogQuery($dlg_id))
-				break;
-
-			//получение данных списка
-			$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
-					FROM "._tableFrom($dlg)."
-					WHERE `t1`.`id`"._spisokCondDef($dlg_id)."
-					ORDER BY `id`
-					LIMIT 200";
-			if(!$spisok = query_arr($sql))
-				break;
-
-			$send = array();
-			foreach($spisok as $id => $r)
-				$send[$id] = $r['txt_1'];
-
-			return $send;
-	}
+*/
 }
 function _elemVvv37($prm) {//select - выбор имени колонки [37]
 	if(!$block = _blockOne($prm['srce']['block_id']))
@@ -1216,38 +1201,20 @@ function _elemSpisokConnect($ids, $return='select', $cond='') {//значени�
 	return $select;
 }
 
-function _elemTitle($elem_id, $el_parent=array()) {//имя элемента или его текст
+function _elemTitle($elem_id) {//имя элемента или его текст
 	if(!$elem_id = _num($elem_id))
 		return '';
-	if(!$el = _elemOne($elem_id)) {
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id`=".$elem_id;
-		if(!$el = _arrNum(query_assoc($sql)))
-			return '';
-	}
-	if(!$el_parent)
-		$el_parent = $el;
+	if(!$el = _elemOne($elem_id))
+		return '';
 
 	switch($el['dialog_id']) {
 		case 10: return $el['txt_1']; //произвольный текст
-		case 11: //значение диалога
-			//если выбрана картинка, показывается только она, без пути
-			$last = _idsLast($el['txt_2']);
-			$ell = _elemOne($last);
-			if($ell['dialog_id'] == 60)
-				return _elemTitle($last, $el_parent);
-
-			$title = '';
-			foreach(_ids($el['txt_2'], 1) as $n => $id)
-				$title .= ($n ? ' » ' : '')._elemTitle($id, $el_parent);
-			return $title;
-//		case 29: //связки
-//		case 59: return _dialogParam($el['num_1'], 'name');
+		case 11: return _elem11title($el);
 		case 32: return 'номер';
+		case 33: return 'дата';
 		case 30: return 'del';
 		case 34: return 'edit';
-		case 60: return _imageNo($el_parent['width']);
+		case 60: return _imageNo($el['width']);
 		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
 			$dlg = _dialogQuery($el['num_2']);
@@ -1273,7 +1240,7 @@ function _elem_11_dialog($el) {//получение данных диалога 
 
 function _elem11($el, $prm) {//отображение элемента, вставленного через диалог [11]
 	if(!$unit = $prm['unit_get'])
-		return '<div class="fs10 color-acc">11.title</div>';
+		return _elem11title($el);
 
 	foreach(_ids($el['txt_2'], 'arr') as $id) {
 		if(!$ell = _elemOne($id))
@@ -1316,10 +1283,12 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 	switch($ell['dialog_id']) {
 		//textarea (многострочное текстовое поле)
 		case 5:
+
 		//input:text (однострочное текстовое поле)
 		case 8:
 			$txt = _spisokColSearchBg($EL, $txt);
 			return _br($txt);
+
 		//Radio - произвольные значения
 		case 16:
 			if(!$id = _num($txt))
@@ -1363,6 +1332,7 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 				return '-';
 
 			return FullData($txt);
+
 		//Изображение
 		case 60:
 			if(empty($txt))
@@ -1373,6 +1343,34 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 
 
 	return '<div class="fs10 color-sal">11.'.$ell['dialog_id'].'</div>';
+}
+function _elem11title($EL) {//имя элемента, если нет записи
+	$title = '';
+	foreach(_ids($EL['txt_2'], 'arr') as $id) {
+		if(!$ell = _elemOne($id))
+			return _msgRed('-ell-yok-');
+
+		//вложенное значение
+		if(_elemIsConnect($ell)) {
+			$dlg = _dialogQuery($ell['num_1']);
+			$title .= $dlg['name'].' » ';
+			continue;
+		}
+
+		$title .= $ell['name'];
+
+		switch($ell['dialog_id']) {
+			//произвольный текст
+			case 10: return $ell['txt_1'];
+			//Изображение
+			case 60: return _imageNo($EL['width']);
+		}
+	}
+
+	if(!$title)
+		return '<div class="fs10 color-acc">11.title</div>';
+
+	return $title;
 }
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
@@ -1912,7 +1910,7 @@ function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уро
 
 
 /* ---=== УСЛОВИЯ ДЛЯ ФИЛЬТРОВ [22] ===--- */
-function PHP12_elem22($el, $prm) {
+function PHP12_elem22($prm) {
 	/*
 		Используется в виде элемента, а также как подключаемая функция
 		PHP12_elem22_save - сохранение значений после редактирования
@@ -1920,26 +1918,14 @@ function PHP12_elem22($el, $prm) {
 		_22cond - применение в фильтре
 	*/
 
-	$dialog_id = 0;
-	switch($el['dialog_id']) {
-		case 12:
-			$SRC = $prm['srce'];
-			$dialog_id = $SRC['dss'];
-			break;
-		case 22:
-			$v = PHP12_elem22_paste($el, $prm);
-			if(!preg_match(REGEXP_NUMERIC, $v))
-				return $v;
-			$dialog_id = _num($v);
-			break;
-	}
+	$src = $prm['srce'];
 
-	if(!$dialog_id)
-		return _emptyMin('Диалог не найден', 0);
+	if(!$dialog_id = $src['dss'])
+		return _emptyMin('Отсутствует id исходного диалога', 0);
 
 	return
 	'<script>'.
-		'var EL'.$el['id'].'_DS='.$dialog_id.';'.
+		'var EL'.$prm['el12']['id'].'_DS='.$dialog_id.';'.
 	'</script>';
 }
 function PHP12_elem22_paste($el, $prm) {//условия были вставлены как элемент [22]
@@ -1960,14 +1946,21 @@ function PHP12_elem22_paste($el, $prm) {//условия были вставле
 	if(!$ELL = _elemOne($id))
 		return _emptyMin('Выбранного элемента '.$id.' не существует', 0);
 
+	$dialog_id = 0;
 	switch($ELL['dialog_id']) {
 		case 14:
 		case 23:
 		case 29:
-		case 59: return $ELL['num_1'];
+		case 59: $dialog_id = $ELL['num_1'];
 	}
 
-	return 0;
+	if(!$dialog_id)
+		return _emptyMin('Диалог не найден', 0);
+
+	return
+	'<script>'.
+		'var EL'.$el['id'].'_DS='.$dialog_id.';'.
+	'</script>';
 }
 function PHP12_elem22_save($cmp, $val, $unit) {//Дополнительные условия к фильтру - сохранение настроек
 	/*
@@ -2068,17 +2061,15 @@ function PHP12_elem22_vvv($parent_id) {//Дополнительные услов
 
 
 /* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
-function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
+function PHP12_spisok14_setup($prm) {//настройка шаблона
 	/*
 		имя объекта: spisok
 		 id объекта: id элемента, который размещает список
 	*/
-	if(empty($unit['id']))
+	if(!$unit = $prm['unit_edit'])
 		return
 		'<div class="bg-ffe pad10">'.
-			'<div class="_empty min">'.
-				'Настройка шаблона будет доступна после вставки списка в блок.'.
-			'</div>'.
+			_emptyMin('Настройка шаблона будет доступна после вставки списка в блок.', 0).
 		'</div>';
 
 	//определение ширины шаблона
@@ -2101,13 +2092,13 @@ function PHP12_spisok14_setup($el, $unit) {//настройка шаблона
 
 
 /* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ [23] ===--- */
-function PHP12_spisok_td_setting($el, $unit) {//используется в диалоге [23]
+function PHP12_spisok_td_setting($prm) {//используется в диалоге [23]
 	/*
 		все действия через JS
 	*/
 
-	if(empty($unit['id']))
-		return '<div class="_empty min">Настройка таблицы будет доступна после вставки списка в блок.</div>';
+	if(!$prm['unit_edit'])
+		return _emptyMin('Настройка таблицы будет доступна после вставки списка в блок.');
 
 	return '';
 }

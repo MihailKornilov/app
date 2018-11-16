@@ -977,13 +977,14 @@ function _dialogOpenParam($dlg) {//все возможные параметны 
 		'button_submit' => '',
 		'button_cancel' => 'Закрыть',
 
+
 		'edit_id' => 0,             //id редактируемой записи
 		'del_id' => 0,              //id записи для удаления
 
 		'unit' => array(),          //содержание записи (редактируемой или просматриваемой)
 
 		'dlgerr' => 0,              //флаг ошибки
-		'vvv' => array(),           //содержание для элементов
+		'vvv' => array()            //содержание для элементов
 	);
 }
 function _dialogOpenLoad($dialog_id) {
@@ -1049,6 +1050,9 @@ function _dialogOpenLoad($dialog_id) {
 		$send['button_submit'] = $dialog['edit_button_submit'];
 		$send['button_cancel'] = $dialog['edit_button_cancel'];
 
+		$prm = _blockParam($prm);
+		$send['srce'] = $prm['srce'];
+
 		return $send;
 	}
 
@@ -1068,6 +1072,10 @@ function _dialogOpenLoad($dialog_id) {
 	$send['html'] = _blockHtml('dialog', $dialog_id, $prm);
 	$send['button_submit'] = $dialog['insert_button_submit'];
 	$send['button_cancel'] = $dialog['insert_button_cancel'];
+
+	$prm = _blockParam($prm);
+	$send['srce'] = $prm['srce'];
+
 //	$send['col_type'] = _elemColType($dialog['element_type']);
 
 	return $send;

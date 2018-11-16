@@ -554,25 +554,23 @@ var DIALOG = {},//массив диалоговых окон для управл
 				op:!o.edit_id ? 'spisok_add' : 'spisok_save',
 				page_id:PAGE_ID,
 				dialog_id:o.dialog_id,
-				dialog_source:o.src.dialog_source,//id исходного диалогового окна
-				block_id:o.src.block_id,
+//				dialog_source:o.src.dialog_source,//id исходного диалогового окна
+				block_id:o.srce.block_id,
 				unit_id:o.edit_id,
-				prm:o.src.prm,
 				cmp:{},
 				vvv:{}
 			};
 
 			//получение значений компонентов
-			_forN(o.elm_ids, function(id) {
+			_forIn(o.vvv, function(vvv, id) {
 				var sp = ELMM[id],
 					ATR_CMP = _attr_cmp(id);
 
 				switch(sp.dialog_id) {
 					case 12://подключаемая функция
-						if(window[sp.txt_1])
-							send.vvv[id] = window[sp.txt_1](sp, 'get');
-						if(ATR_CMP)
-							send.cmp[id] = ATR_CMP.val();
+						var func = sp.txt_1 + '_get';
+						if(window[func])
+							send.vvv[id] = window[func](sp);
 						return;
 					case 22://Дополнительные условия к фильтру
 						send.vvv[id] = PHP12_elem22_get(sp);
@@ -805,7 +803,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				case 12:
 					if(!window[el.txt_1])
 						return;
-					window[el.txt_1](el, unit);
+					window[el.txt_1](el, vvv, OBJ);
 					return;
 				//Выбор элемента из диалога или страницы
 				case 13:
@@ -872,7 +870,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					});
 					return;
 				//Дополнительные условия к фильтру (вспомогательный элемент)
-				case 22: PHP12_elem22(el, unit); return;
+				case 22: PHP12_elem22(el, vvv, OBJ); return;
 				//Список - ТАБЛИЦА
 				case 23:
 					if(!el.num_6)
@@ -2031,10 +2029,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return arr;
 	},
 
-	PHP12_elem22 = function(el, unit) {//Дополнительные условия к фильтру
-		if(unit == 'get')
-			return PHP12_elem22_get(el);
-
+	PHP12_elem22 = function(el, vvv, obj) {//Дополнительные условия к фильтру
 		//ID диалога, значения которого будут настраиваться
 		var DS = window['EL' + el.id + '_DS'];
 		if(!DS)
@@ -2048,10 +2043,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		BUT_ADD.click(valueAdd);
 
-		if(!VVV[el.id].length)
+		if(!vvv.length)
 			valueAdd();
 		else
-			_forIn(VVV[el.id], valueAdd);
+			_forIn(vvv, valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -2079,7 +2074,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							'<td><input type="hidden" class="cond-id" value="' + v.num_2 + '" />' +
 							'<td class="w100p pr20">' +
 								'<input type="text"' +
-									  ' class="cond-val w125' + _dn(!v.issp && v.num_2 > 2) + '"' +
+									  ' class="cond-val w100' + _dn(!v.issp && v.num_2 > 2) + '"' +
 									  ' value="' + v.txt_2 + '"' +
 								' />' +
 								'<div class="div-cond-sel' + _dn(v.issp) + '">' +
@@ -2101,7 +2096,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				_dialogLoad({
 					dialog_id:11,
 					dialog_source:DS,
-					block_id:unit.src.block_id,
+					block_id:obj.block_id,
 					prm:{
 						sel:v.txt_1,
 						nest:unit.src.prm.nest
@@ -2501,11 +2496,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 
 	/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ ===--- */
-	PHP12_spisok_td_setting = function(el, unit) {//настройка ячеек таблицы
-		if(unit == 'get')
-			return PHP12_spisok_td_get(el);
-
-		if(!unit.id)
+	PHP12_spisok_td_setting = function(el, vvv, obj) {//настройка ячеек таблицы
+		if(!obj.unit.id)
 			return;
 
 		var html = '<dl></dl>' +
@@ -2519,12 +2511,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 		//показ-скрытие настройки TH-заголовков
 		$('#cmp_531')._check({
 			func:function(v) {
-				unit.num_5 = v;
+				obj.unit.num_5 = v;
 				DL.find('.div-th-name')['slide' + (v ? 'Down' : 'Up')]();
 			}
 		});
 
-		_forIn(VVV[el.id], tdAdd);
+		_forIn(vvv, tdAdd);
 
 		//добавление новой колонки в таблицу
 		function tdAdd(v) {
@@ -2550,7 +2542,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w80 grey r topi">Колонка ' + NUM + ':' +
 							'<td><div style="width:' + v.width + 'px">' +
-									'<div class="div-th-name' + _dn(unit.num_5) + '">' +
+									'<div class="div-th-name' + _dn(obj.unit.num_5) + '">' +
 										'<input type="text"' +
 											  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
 											  ' placeholder="имя колонки"' +
@@ -2579,7 +2571,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			INP.click(function() {
 				_dialogLoad({
 					dialog_id:v.dialog_id,
-					block_id:unit.src.block_id,  //блок, в котором размещена таблица
+					block_id:obj.srce.block_id,  //блок, в котором размещена таблица
 					unit_id:v.id,                   //id выбранного элемента (при редактировании)
 					busy_obj:INP,
 					busy_cls:'hold',
@@ -2605,7 +2597,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					msg:'<table class="bs5">' +
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
-								'<td class="pt3">' + _elemUnitEye(v) +
+								'<td class="pt3">' + _elemUnitFormat(v) +
 								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
 						'</table>' +
 						'',
@@ -3257,7 +3249,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					msg:'<table class="bs5">' +
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
-								'<td class="pt3">' + _elemUnitEye(v) +
+								'<td class="pt3">' + _elemUnitFormat(v) +
 						'</table>' +
 						'',
 					side:'top',
@@ -3363,9 +3355,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			get_id:_num(o.get_id),              //id записи, содержание которой будет размещаться в диалоге
 			edit_id:_num(o.edit_id),            //id записи при редактировании
 			del_id:_num(o.del_id),              //id записи при удалении
-
-			src:o.src || [],                    //дополнительные параметры
-			prm:o.prm || [],                    //дополнительные параметры
 
 			busy_obj:o.busy_obj,
 			busy_cls:o.busy_cls

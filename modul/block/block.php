@@ -890,6 +890,27 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			return _elem11($el, $prm);
 
+		//SA: Функция PHP
+		case 12:
+			/*
+				После размещения данных PHP-функции будет выполняться JS-функция с таким же именем, если существует.
+
+                txt_1 - имя функции (начинается с PHP12)
+			*/
+
+			if(!$el['txt_1'])
+				return _emptyMin('Отсутствует имя функции.', 0);
+			if(!function_exists($el['txt_1']))
+				return _emptyRed('Фукнции <b>'.$el['txt_1'].'</b> не существует.');
+			if($prm['blk_setup'])
+				return _emptyMin('Функция '.$el['txt_1'], 0);
+
+			//'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm).'" />'.
+
+			$prm['el12'] = $el;
+
+			return $el['txt_1']($prm);
+
 		//Выбор элемента из диалога или страницы
 		case 13:
 			/*
@@ -1004,7 +1025,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			/*
                 num_1 - id элемента, в котором нужно искать список
 			*/
-			return PHP12_elem22($el, $prm);
+			return PHP12_elem22_paste($el, $prm);
 
 		//Содержание единицы списка - таблица
 		case 23:
@@ -1155,7 +1176,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_4 - показывать время в формате 12:45
 			*/
 			if($prm['blk_setup'])
-				return 'дата/время';
+				return 'дата';
 			if(!$u = $prm['unit_get'])
 				return '--';
 			if(empty($u['dtime_add']))
@@ -1437,6 +1458,13 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'disabled' => $prm['blk_setup'],
 				'value' => $v
 			));
+
+		//Выбор цвета текста
+		case 66:
+			/*
+			*/
+			return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm).'" />'.
+				   '<div class="_color" style="background-color:#000"></div>';
 
 		//Список истории действий
 		case 68:
@@ -1723,24 +1751,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 	return '<div class="fs10 b color-sal">_elemUnit</div>';
 
 	switch(false) {
-		//SA: Функция PHP
-		case 12:
-			/*
-				После размещения данных PHP-функции будет выполняться JS-функция с таким же именем, если существует.
-
-                txt_1 - имя функции (начинается с PHP12)
-			*/
-
-			if(!$el['txt_1'])
-				return '<div class="_empty min">Отсутствует имя функции.</div>';
-			if(!function_exists($el['txt_1']))
-				return '<div class="_empty min red">Фукнции <b class="fs14">'.$el['txt_1'].'</b> не существует.</div>';
-			if($is_edit)
-				return '<div class="_empty min">Функция '.$el['txt_1'].'</div>';
-
-			return
-				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				$el['txt_1']($el, $SRC);
 
 		//Список действий для Галочки [1]
 		case 28: return 28;
@@ -1851,14 +1861,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			/*
 			*/
 			return 'порядок';
-
-		//Выбор цвета текста
-		case 66:
-			/*
-			*/
-			return
-				'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				'<div class="_color" style="background-color:#000"></div>';
 
 		//Фильтр: Select - привязанный список
 		case 83:

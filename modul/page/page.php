@@ -456,7 +456,7 @@ function _pageShowScript($page_id, $prm) {
 	(APP_ID && USER_ID ?
 		'var FILTER='._json(_spisokFilter('page_js'), 1).';'
 	: '').
-		'_ELM_ACT({vvv:'._json($vvv).',unit:'._json($prm['unit_get']).'});'.
+		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.//'._json($prm['unit_get']).'
 	'</script>';
 }
 function _pageUnitGet($page_id) {
