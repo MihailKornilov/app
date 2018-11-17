@@ -144,7 +144,7 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 	//диалог, через который вносятся данные списка
 	$dialog = _dialogQuery($el['num_1']);
 
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Кол-во списка <u>".$dialog['name']."</u> */
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Кол-во списка ".$dialog['name']." */
 			SELECT COUNT(*)
 			FROM "._tableFrom($dialog)."
 			WHERE "._spisokCond($el);
@@ -310,7 +310,7 @@ function _spisokInclude($spisok) {//вложенные списки
 			//получение данных из вложенного списка
 			$incDialog = _dialogQuery($cmp['num_1']);
 
-			$sql = "/* ".__FUNCTION__.":".__LINE__." Вложенный список <u>".$incDialog['name']."</u> */
+			$sql = "/* ".__FUNCTION__.":".__LINE__." Вложенный список ".$incDialog['name']." */
 					SELECT `t1`.*"._spisokJoinField($incDialog)."
 					FROM "._tableFrom($incDialog)."
 					WHERE `t1`.`id` IN (".$ids.")";
@@ -360,7 +360,7 @@ function _spisokImage($spisok) {//вставка картинок
 		foreach($spisok as $id => $r)
 			$spisok[$id][$col] = array();
 
-		$sql = "/* ".__FUNCTION__.":".__LINE__." Картинки для элемента <u>".$cmp_id."</u> */
+		$sql = "/* ".__FUNCTION__.":".__LINE__." Картинки для списка ".$DLG['name']." */
 				SELECT *
 				FROM `_image`
 				WHERE `obj_name`='elem_".$cmp_id."'
@@ -612,6 +612,13 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 }
 
 function _spisokUnitQuery($dialog, $unit_id) {//получение данных единицы списка
+	global $SUQ;
+
+	$key = $dialog['id'].'_'.$unit_id;
+
+	if(isset($SUQ[$key]))
+		return $SUQ[$key];
+
 	if(!$unit_id)
 		return array();
 
@@ -633,8 +640,9 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 	$spisok = _spisokInclude($spisok);
 	$spisok = _spisokImage($spisok);
 
-	return _arrNum($spisok[$unit_id]);
-
+	$SUQ[$key] = _arrNum($spisok[$unit_id]);
+	
+	return $SUQ[$key];
 }
 function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в ссылку
 	//оборачивать не нужно
