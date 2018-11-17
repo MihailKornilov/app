@@ -1035,6 +1035,10 @@ function _elemVvv37($prm) {//select - выбор имени колонки [37]
 	if(!$dlg = _dialogQuery($block['obj_id']))
 		return array();
 
+	//если диалог родительский, получение колонок родителя
+	if($parent_id = $dlg['dialog_id_parent'])
+		return _elemVvv37parent($parent_id, $prm);
+
 	//колонка, которая занята редактируемой записью
 	$uCol = '';
 	if($u = $prm['unit_edit'])
@@ -1121,6 +1125,35 @@ function _elemVvv37($prm) {//select - выбор имени колонки [37]
 	}
 
 	return $field;
+}
+function _elemVvv37parent($dlg_id, $prm) {//колонки родительского диалога
+	if(!$dlg = _dialogQuery($dlg_id))
+		return array();
+
+	$send = array();
+	foreach($dlg['cmp'] as $id => $cmp) {
+		if(!$col = $cmp['col'])
+			continue;
+
+		//выбирать можно только колонки элементов, которые вносят данные
+		if($cmp['dialog_id'] != 8
+		&& $cmp['dialog_id'] != 10
+		&& $cmp['dialog_id'] != 16
+		&& $cmp['dialog_id'] != 17
+		&& $cmp['dialog_id'] != 29
+		&& $cmp['dialog_id'] != 59
+		&& $cmp['dialog_id'] != 31
+		&& $cmp['dialog_id'] != 51
+		) continue;
+
+		$send[] = array(
+			'id' => $id,
+			'title' => $dlg['name'].': '.$cmp['name'],
+			'content' => $dlg['name'].': '.$cmp['name'].' <b class="pale">'.$col.'</b>',
+		);
+	}
+
+	return $send;
 }
 
 function _elemIsConnect($el) {//определение, является ли элемент подключаемым списком

@@ -414,7 +414,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		DLG('#element_dialog_func')._select({
 			width:280,
 			title0:'не указан',
-			spisok:o.dlg_spisok
+			spisok:o.dlg_sa
 		});
 		DLG('#spisok_on')._check({
 			func:function(v) {
@@ -425,6 +425,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 			width:250,
 			title0:'не указана',
 			spisok:o.spisok_cmp
+		});
+		DLG('#dialog_id_parent')._select({
+			width:250,
+			title0:'нет',
+			spisok:o.dlg_spisok_on
 		});
 		DLG('#dialog_id_unit_get')._select({
 			width:250,
@@ -459,6 +464,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 				page_id:PAGE_ID,
 				dialog_id:o.dialog_id,
+				dialog_id_parent:DLG('#dialog_id_parent').val(),
 
 				name:DLG('#dialog_name').val(),
 
@@ -608,6 +614,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						var func = sp.txt_1 + '_get';
 						if(window[func])
 							send.vvv[id] = window[func](sp);
+						send.cmp[id] = ATR_CMP.val();
 						return;
 					case 22://Дополнительные условия к фильтру
 						send.vvv[id] = PHP12_elem22_get(sp);
@@ -1080,8 +1087,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 							},
 							busy_obj:inp,
 							busy_cls:'hold',
-							func_open:function(res, dlg) {
-							},
 							func_save:function(res) {
 								sel = res.ids;
 								ATR_CMP.val(sel);
@@ -2753,9 +2758,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
 	PHP12_radio_setup = function(el, unit) {//для [16]
-		if(unit == 'get')
-			return PHP12_radio_get(el);
-
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
 			ATTR_EL = _attr_el(el.id),

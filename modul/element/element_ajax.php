@@ -215,7 +215,10 @@ switch(@$_POST['op']) {
 					'<tr class="tr-spisok-col'._dn($dialog['spisok_on']).'">'.
 						'<td class="grey r">Колонка по умолчанию:'.
 						'<td><input type="hidden" id="spisok_elem_id" value="'.$dialog['spisok_elem_id'].'" />'.
-					'<tr><td class="grey r">Получает данные списка:'.
+					'<tr><td class="grey r">Родительский диалог:'.
+						'<td><input type="hidden" id="dialog_id_parent" value="'.$dialog['dialog_id_parent'].'" />'.
+					'<tr class="dn">'.
+						'<td class="grey r">Получает данные списка:'.
 						'<td><input type="hidden" id="dialog_id_unit_get" value="'.$dialog['dialog_id_unit_get'].'" />'.
 				'</table>'.
 			'</div>'.
@@ -387,7 +390,8 @@ switch(@$_POST['op']) {
 		$send['tables'] = SA ? _table() : array();
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
-		$send['dlg_spisok'] = SA ? _dialogSelArray('sa_only') : array();
+		$send['dlg_sa'] = SA ? _dialogSelArray('sa_only') : array();
+		$send['dlg_spisok_on'] = _dialogSelArray('spisok_only');
 		$send['spisok_cmp'] = _dialogSpisokCmp($dialog['cmp']);
 
 		$dlgUnitGet = _dialogSelArray('spisok_only', $dialog_id);
@@ -863,6 +867,8 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$menu_edit_last = _num($_POST['menu_edit_last']);
 	$sa = _bool($_POST['sa']);
 
+	$dialog_id_parent =   _num($_POST['dialog_id_parent']);
+
 	$name = _txt($_POST['name']);
 	$spisok_on = _bool($_POST['spisok_on']);
 	if($spisok_on && !$name)
@@ -902,6 +908,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
 				`sa`=".$sa.",
+				`dialog_id_parent`=".$dialog_id_parent.",
 				`name`='".addslashes($name)."',
 				`width`=".$width.",
 				`width_auto`=".$width_auto.",
@@ -1074,8 +1081,7 @@ function _dialogOpenLoad($dialog_id) {
 		$send['vvv'][$elem_id] = _elemVvv($elem_id, _blockParam($prm));
 
 	if($get_id = _num(@$_POST['get_id'])) {
-//		if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $get_id))
-//			return _dialogOpenErr($send, 'Записи '.$get_id.' не существует.');
+		$prm['unit_get'] = _spisokUnitQuery($dialog, $get_id);
 		$prm['unit_get_id'] = $get_id;
 	}
 

@@ -714,7 +714,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				txt_1 - текст кнопки
 				num_1 - цвет
 				num_2 - маленькая кнопка
-				num_3 - принимает значения единицы списка
+				num_3 - передаёт данные записи
 				num_4 - dialog_id, который назначен на эту кнопку
 			*/
 			$color = array(
@@ -744,11 +744,20 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			}
 
 */
-			$block = '';
+			$val = 'dialog_id:'.$el['num_4'];
+
+			if($el['num_3'])
+				if($prm['unit_get']) {
+					$val .=',get_id:'.$prm['unit_get']['id'];
+//					$DLG = _dialogQuery($el['num_4']);
+//				$u = _spisokUnitQuery($DLG, $unit['id']);
+//				$block = ','.($u ? 'unit' : 'accept').'_id:'.$unit['id'];
+//				$block = ',unit_id:'.$unit['id'];
+			}
 
 			//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
 			if(!$el['num_4'])
-				$block = ',block_id:'.$el['block_id'];
+				$val .= ',block_id:'.$el['block_id'];
 
 			return _button(array(
 						'attr_id' => _elemAttrId($el, $prm),
@@ -757,7 +766,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'width' => $el['width'],
 						'small' => $el['num_2'],
 						'class' => $prm['blk_setup'] ? '' : 'dialog-open',
-						'val' => 'dialog_id:'.$el['num_4'].$block//.$dialog_source
+						'val' => $val
 					));
 
 		//Меню страниц
@@ -912,11 +921,10 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			if($prm['blk_setup'])
 				return _emptyMin('Функция '.$el['txt_1']);
 
-			//'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm).'" />'.
-
 			$prm['el12'] = $el;
 
-			return $el['txt_1']($prm);
+			return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm).'" />'.
+				   $el['txt_1']($prm);
 
 		//Выбор элемента из диалога или страницы
 		case 13:
