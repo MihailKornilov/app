@@ -72,7 +72,7 @@ switch(@$_POST['op']) {
 				_BE('elem_clear');
 				_spisokFilter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
 				_jsCache();
-				$send['elem_del'] = 1;
+				$send['elem_del'] = $unit_id;
 			}
 
 			//обновление кеша объекта, если это страница

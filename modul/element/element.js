@@ -622,13 +622,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 
 			dialog.post(send, function(res) {
-				//закрытие диалога 50 - выбор элемента, если вызов был из него
-//				if(o.d50close)
-//					o.d50close();
-
-				//если присутствует функция, выполняется она
+				//если присутствует функция, выполняется она. Для того, чтобы продолжить выполнение после функции, нужно чтобы она вернула любой результат
 				if(o.src.func_save)
-					return o.src.func_save(res);
+					if(!o.src.func_save(res))
+						return;
 
 //return;
 
@@ -709,9 +706,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		//обновление значения JS-кеша, если был удалён элемент
 		if(res.elem_del) {
-			var el = ELMM[o.unit.id];
+			var el = ELMM[res.elem_del];
 			BLKK[el.block_id].elem_id = 0;
-			delete ELMM[o.unit.id];
+			delete ELMM[res.elem_del];
 		}
 	},
 
@@ -761,8 +758,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_forIn(OBJ.vvv, function(vvv, elm_id) {
 			var el = ELMM[elm_id];
 
-			if(!el)
+			if(!el) {
 				alert('несуществующий элемент ' + elm_id);
+				return;
+			}
 
 			el.id = elm_id;
 
@@ -2074,7 +2073,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 		D('.elem-unit').click(function() {//открытие диалога
 			var t = $(this);
 			_dialogLoad({
-				dialog_id:t.attr('val')
+				dialog_id:t.attr('val'),
+				block_id:obj.src.block_id,
+				func_save:function() {
+					obj.dlg.close();
+					return true;
+				}
 			});
 		});
 
