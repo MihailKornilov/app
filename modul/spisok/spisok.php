@@ -313,7 +313,8 @@ function _spisokInclude($spisok) {//вложенные списки
 			$sql = "/* ".__FUNCTION__.":".__LINE__." Вложенный список ".$incDialog['name']." */
 					SELECT `t1`.*"._spisokJoinField($incDialog)."
 					FROM "._tableFrom($incDialog)."
-					WHERE `t1`.`id` IN (".$ids.")";
+					WHERE `t1`.`id` IN (".$ids.")".
+						_spisokCondDef($incDialog['id']);
 			if(!$arr = query_arr($sql))
 				continue;
 

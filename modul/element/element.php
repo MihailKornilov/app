@@ -103,6 +103,11 @@ function _dialogTest() {//проверка id диалога, создание �
 	return $dialog_id;
 }
 function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
+	global $_DQ;
+
+	if(isset($_DQ[$dialog_id]))
+		return $_DQ[$dialog_id];
+
 	if(!$dialog = _BE('dialog', $dialog_id))
 		return array();
 
@@ -136,6 +141,8 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 
 	$dialog['blk'] = _BE('block_arr', 'dialog', $dialog_id);
 	$dialog['cmp'] = _BE('elem_arr', 'dialog', $dialog_id);
+
+	$_DQ[$dialog_id] = $dialog;
 
 	return $dialog;
 }
