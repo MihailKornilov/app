@@ -1820,7 +1820,7 @@ function PHP12_v_choose_page_spisok_unit($prm, $dialog_id) {//страница �
 	if($dialog_id)
 		return $dialog_id;
 
-	$page = _page($prm['page_id']);
+	$page = _page($prm['srce']['page_id']);
 	return _num($page['dialog_id_unit_get']);
 }
 function PHP12_v_choose_dialog_spisok_unit($prm, $dialog_id) {//диалог принимает значения списка

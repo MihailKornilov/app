@@ -14,8 +14,17 @@ var ZINDEX = 1000,
 
 	_post = function(send, func) {//отправка ajax-запроса методом POST
 		var v = $.extend({
-			busy_obj:null,  //объект, к которому применяется процесс ожидания
-			busy_cls:'_busy'//класс, показвыающий процесс ожидания
+			busy_obj:null,   //объект, к которому применяется процесс ожидания
+			busy_cls:'_busy',//класс, показвыающий процесс ожидания
+			func_err:function(res) {//функция в случае ошибки, если не получен success
+				if(v.busy_obj)
+					$(v.busy_obj)._hint({
+						msg:res.text,
+						color:'red',
+						pad:10,
+						show:1
+					});
+			}
 		}, send);
 
 		if(v.busy_obj) {
@@ -29,6 +38,10 @@ var ZINDEX = 1000,
 
 		delete send.busy_obj;
 		delete send.busy_cls;
+		delete send.func_open_before;
+		delete send.func_open;
+		delete send.func_save;
+		delete send.func_err;
 
 		POST_SEND = send;
 
@@ -44,16 +57,9 @@ var ZINDEX = 1000,
 					return;
 				}
 				func(res);
-				return;
-			}
+			} else
+				v.func_err(res);
 
-			if(v.busy_obj)
-				$(v.busy_obj)._hint({
-					msg:res.text,
-					color:'red',
-					pad:10,
-					show:1
-				});
 		}, 'json');
 	},
 	_cookie = function(name, value) {

@@ -1026,8 +1026,11 @@ function _dialogOpenLoad($dialog_id) {
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 
 	$prm['srce']['dialog_id'] = $dialog_id;
+	$prm['srce']['page_id'] = _num($_POST['page_id']);
 	$prm['srce']['block_id'] = _num($_POST['block_id'], 1);
 	$prm['srce']['dss'] = _num($_POST['dss']);
+	$prm['srce']['sev'] = _num($_POST['sev']);
+	$prm['srce']['nest'] = _num($_POST['nest']);
 
 	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
@@ -1086,29 +1089,6 @@ function _dialogOpenLoad($dialog_id) {
 //	$send['col_type'] = _elemColType($dialog['element_type']);
 
 	return $send;
-}
-function _dialogOpenSrc($dialog_id) {//некоторые исходные данные диалога
-	//дополнительные параметры
-	$PRM = isset($_POST['prm']) ? _arrNum($_POST['prm']) : array();
-	//выбор нескольких значений
-	if(!isset($PRM['sev']))
-		$PRM['sev'] = 0;
-	//выбор значения из вложенного списка
-	if(!isset($PRM['nest']))
-		$PRM['nest'] = 1;
-
-	return array(
-		'dialog_id' => $dialog_id,
-		'dialog_source' => _num(@$_POST['dialog_source']),
-		'page_id' => _num(@$_POST['page_id']),
-
-		'edit_id' => 0,
-		'edit_arr' => array(),
-
-		'get_id' => _num(@$_POST['get_id']),
-
-		'prm' => $PRM,
-	);
 }
 function _dialogOpenUnitDelHtml($dialog, $unit) {//содержание диалога при удалении единицы списка
 	if(!$block = _BE('block_obj', 'dialog_del', $dialog['id']))
