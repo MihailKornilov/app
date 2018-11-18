@@ -855,24 +855,20 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
-			$value = $el['txt_2'];
+			$v = _elemPrintV($el, $prm, $el['txt_2']);
 
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = $u[$col];
-				switch($el['num_1']) {
-					default:
-					case 32://любой текст
-						$value = $v;
-						break;
-					case 33://цифры и числа
-						$value = round($v, $el['num_2']);
-						$value = $value || $el['num_4'] ? $value : '';
-						break;
-				}
+			switch($el['num_1']) {
+				default:
+				//любой текст
+				case 32: break;
+				//цифры и числа
+				case 33:
+					$v = round($v, $el['num_2']);
+					$v = $v || $el['num_4'] ? $v : '';
+					break;
 			}
 
-			return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$value.'" />';
+			return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
 
 		//Ссылка на страницу
 		case 9:
@@ -1265,7 +1261,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		case 37:
 			return _select(array(
 						'attr_id' => _elemAttrId($el, $prm),
-						'width' => $el['width']
+						'width' => $el['width'],
+						'value' => _elemPrintV($el, $prm)
 				   ));
 
 		//SA: Select - выбор диалогового окна
@@ -1753,12 +1750,20 @@ function _elemPrintV($el, $prm, $def='') {//значение записи при
 	if(!$col = $el['col'])
 		return $def;
 
+	//имя колонки является id элемента из родительского диалога
+	if($id = _num($col)) {
+		if(!$elp = _elemOne($id))
+			return $def;
+		if(!$col = $elp['col'])
+			return $def;
+	}
+
 	$v = $u[$col];
 
 	if(is_array($v))
 		return _num($v['id']);
 	if(preg_match(REGEXP_NUMERIC, $v))
-		return intval($v);
+		return $v * 1;
 
 	return $v;
 }

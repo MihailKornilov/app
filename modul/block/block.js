@@ -44,7 +44,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 					'<div class="line-b">' +
 						'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Блок</span>' +
 						'<div class="fr mtm3">' +
-							'<div val="dialog_id:72,unit_id:' + BL.id + '" class="icon-wiki iw12 dialog-open' + _tooltip('Настроить ссылку', -53) + '</div>' +
+							'<div val="dialog_id:72,edit_id:' + BL.id + '" class="icon-wiki iw12 dialog-open' + _tooltip('Настроить ссылку', -53) + '</div>' +
 						'</div>' +
 					'</div>' +
 					_blockUnitBg(BL) +
@@ -359,14 +359,14 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 		'</div>';
 	},
 	_elemUnitFormat = function(EL) {//иконка с дополнительными условиями отображения
-		return '<div val="dialog_id:64,block_id:' + EL.block_id + ',unit_id:' + _num(EL.format) + '" class="icon icon-eye ml3 dialog-open' + _dn(!EL.format, 'pl') + _tooltip('Условия отображения', -67) + '</div>';
+		return '<div val="dialog_id:64,block_id:' + EL.block_id + ',edit_id:' + _num(EL.format) + '" class="icon icon-eye ml3 dialog-open' + _dn(!EL.format, 'pl') + _tooltip('Условия отображения', -67) + '</div>';
 	},
 	_elemUnitHint = function(EL) {//иконка для настройки выплывающей подсказки
 		if(!EL.hint_access)
 			return '';
 		var hint_id = EL.hint ? EL.hint.id : 0,
 			pl = EL.hint && EL.hint.on;
-		return '<div val="dialog_id:43,block_id:' + EL.block_id + ',unit_id:' + hint_id + '"' +
+		return '<div val="dialog_id:43,block_id:' + EL.block_id + ',edit_id:' + hint_id + '"' +
 				   ' class="icon icon-hint ml3 curP dialog-open' + _dn(!pl, 'pl') + _tooltip('Настроить подсказку', -65) +
 			   '</div>';
 	},
@@ -469,7 +469,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 			'<div val="u" class="icon-wiki iw2 ml3' + font.u + _tooltip('Подчёкнутый', -39) + '</div>' +
 		'</div>' +
 		(true || EL.url_access ?
-			'<div val="dialog_id:79,unit_id:' + EL.id + '" class="icon-wiki iw12 ml3 dialog-open' + _dn(EL.url, 'on') + _tooltip('Настроить ссылку', -53) + '</div>'
+			'<div val="dialog_id:79,edit_id:' + EL.id + '" class="icon-wiki iw12 ml3 dialog-open' + _dn(EL.url, 'on') + _tooltip('Настроить ссылку', -53) + '</div>'
 		: '');
 	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста
@@ -844,11 +844,11 @@ $(document)
 				return false;
 
 			var unit = t.parents('.sp-unit'),
-				unit_id = _num(unit.attr('val'));
-			if(!unit_id)
+				id = _num(unit.attr('val'));
+			if(!id)
 				return false;
 
-			location.href = URL + '&p=' + page_id + '&id=' + unit_id;
+			location.href = URL + '&p=' + page_id + '&id=' + id;
 			return false;
 		});
 	});

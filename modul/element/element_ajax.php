@@ -1082,6 +1082,7 @@ function _dialogOpenLoad($dialog_id) {
 
 	if($get_id = _num(@$_POST['get_id'])) {
 		$prm['unit_get'] = _spisokUnitQuery($dialog, $get_id);
+		$prm['unit_edit'] = $prm['unit_get'];
 		$prm['unit_get_id'] = $get_id;
 	}
 
@@ -1091,8 +1092,6 @@ function _dialogOpenLoad($dialog_id) {
 
 	$prm = _blockParam($prm);
 	$send['srce'] = $prm['srce'];
-
-//	$send['col_type'] = _elemColType($dialog['element_type']);
 
 	return $send;
 }

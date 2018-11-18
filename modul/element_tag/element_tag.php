@@ -104,10 +104,9 @@ function _select($v=array()) {//выпадающее поле
 	$width = ' style="width:'.$width.'"';
 
 	$placeholder = empty($v['placeholder']) ? '' : ' placeholder="'.trim($v['placeholder']).'"';
-	$value = _num(@$v['value']);
 
 	return
-	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
+	'<input type="hidden" id="'.$attr_id.'" value="'.@$v['value'].'" />'.
 	'<div class="_select disabled dib" id="'.$attr_id.'_select"'.$width.'">'.
 		'<table class="w100p">'.
 			'<tr><td><input type="text" class="select-inp w100p"'.$placeholder.' readonly />'.

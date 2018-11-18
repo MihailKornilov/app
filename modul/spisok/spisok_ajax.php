@@ -830,19 +830,24 @@ function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление
 		if(IS_ELEM && $col == 'col') {//если элемент, установка номера таблицы, в которой содержится колонка
 			$num = 0;
 
-			if($v)
-				if($el = _elemOne($unit_id))
-					if($el['block']['obj_name'] == 'dialog')
-						if($dlg = _dialogQuery($el['block']['obj_id'])) {
-							if(isset($dlg['field1'][$v]))
-								$num = 1;
-							else
-								if(isset($dlg['field2'][$v]))
-									$num = 2;
+			if($v) {
+				//если число, то это id элемента, который из родительского диалога. С ним будет связь.
+				if($id = _num($v)) {
+					if($el = _elemOne($id))
+						$v = $id;
+				} elseif($el = _elemOne($unit_id))
+						if($el['block']['obj_name'] == 'dialog')
+							if($dlg = _dialogQuery($el['block']['obj_id'])) {
+								if(isset($dlg['field1'][$v]))
+									$num = 1;
 								else
-									$v = '';
+									if(isset($dlg['field2'][$v]))
+										$num = 2;
+									else
+										$v = '';
 
-						}
+							}
+			}
 
 			$update1[] = "`table_num`=".$num;
 		}

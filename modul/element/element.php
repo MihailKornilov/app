@@ -1044,19 +1044,25 @@ function _elemVvv37($prm) {//select - выбор имени колонки [37]
 
 	//если диалог родительский, получение колонок родителя
 	if($parent_id = $dlg['dialog_id_parent'])
-		return _elemVvv37parent($parent_id, $prm);
+		return _elemVvv37parent($parent_id);
 
 	//колонка, которая занята редактируемой записью
 	$uCol = '';
 	if($u = $prm['unit_edit'])
 		$uCol = $u['col'];
 
+	$field = _elemVvv37field($dlg, 1, $uCol);
+	$field = _elemVvv37field($dlg, 2, $uCol, $field);
+
+	return $field;
+}
+function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки по каждой таблице
 	//получение используемых колонок
 	$colUse = array();
 	foreach($dlg['cmp'] as $r) {
 		if(!$col = $r['col'])
 			continue;
-		$colUse[$col] = 1;
+		$colUse[$col] = '<i class="color-555 ml10">('.$r['name'].')</i>';
 	}
 
 	//колонки, которые не должны выбираться
@@ -1085,55 +1091,36 @@ function _elemVvv37($prm) {//select - выбор имени колонки [37]
 		'dtime_last' => 1
 	);
 
-	$field = array();
-	$n = 1;
-	foreach($dlg['field1'] as $col => $k) {
+	foreach($dlg['field'.$num] as $col => $k) {
 		if(isset($fieldNo[$col]))
 			continue;
 
 		$color = '';
 		$busy = 0;//занята ли колонка
+		$name = '';
 		if(isset($colUse[$col])) {
 			$color = $uCol == $col ? 'b color-pay' : 'b red';
 			$busy = 1;
+			$name = $colUse[$col];
 		}
 		$u = array(
-			'id' => $n++,
+			'id' => $col,
 			'title' => $col,
 			'busy' => $busy,
 			'content' =>
 				'<div class="'.$color.'">'.
-					'<span class="pale">'._table($dlg['table_1']).'.</span>'.
+					'<span class="pale">'._table($dlg['table_'.$num]).'.</span>'.
 					$col.
+					$name.
 				'</div>'
 
 		);
-		$field[] = $u;
+		$send[] = $u;
 	}
 
-	foreach($dlg['field2'] as $col => $k) {
-		if(isset($fieldNo[$col]))
-			continue;
-
-		$color = '';
-		if(isset($colUse[$col]))
-			$color = $uCol == $col ? 'b color-pay' : 'b red';
-		$u = array(
-			'id' => $n++,
-			'title' => $col,
-			'content' =>
-				'<div class="'.$color.'">'.
-					'<span class="pale">'._table($dlg['table_2']).'.</span>'.
-					$col.
-				'</div>'
-
-		);
-		$field[] = $u;
-	}
-
-	return $field;
+	return $send;
 }
-function _elemVvv37parent($dlg_id, $prm) {//колонки родительского диалога
+function _elemVvv37parent($dlg_id) {//колонки родительского диалога
 	if(!$dlg = _dialogQuery($dlg_id))
 		return array();
 

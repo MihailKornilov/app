@@ -619,9 +619,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					case 22://Дополнительные условия к фильтру
 						send.vvv[id] = PHP12_elem22_get(sp);
 						return;
-					case 37://SA: Select - выбор имени колонки
-						send.cmp[id] = ATR_CMP._select('inp');
-						return;
 				}
 
 				if(ATR_CMP)
@@ -634,7 +631,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					if(!o.src.func_save(res))
 						return;
 
-//return;
+return;
 
 				_dialogOpenSubmitAction(res);
 
@@ -1035,20 +1032,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						title0:'не выбрано',
 						msg_empty:'колонок нет',
 						spisok:vvv
-					});
-					_forN(vvv, function(u) {
-						if(unit.col == u.title) {
-							ATR_CMP._select(u.id);
-							return false;
-						}
-						if(unit.col)
-							return;
-						if(u.busy)
-							return;
-						if(u.title.split('_')[0] == OBJ.col_type) {
-							ATR_CMP._select(u.id);
-							return false;
-						}
 					});
 					return;
 				//SA: Select - выбор диалогового окна
