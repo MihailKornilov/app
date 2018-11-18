@@ -539,9 +539,13 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 
 	return $send;
 }
-function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой единицы списка, если отсутствует
+function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой записи, если отсутствует
 	if($unit_id > 0)
 		return $unit_id;
+
+	if($parent_id = $dialog['dialog_id_parent'])
+		jsonError('Дочерний диалог не может вносить новую запись');
+
 	if(!$dialog['table_1'])
 		return 0;
 
@@ -816,7 +820,15 @@ function _filterDefSet($dialog, $elem_id) {//установка значения
 	}
 }
 function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление компонентов единицы списка
-	if(!$DLG['table_1'])
+	$table_1 = $DLG['table_1'];
+
+	if($parent_id = $DLG['dialog_id_parent']) {
+		if(!$dialog = _dialogQuery($parent_id))
+			return;
+		$table_1 = $dialog['table_1'];
+	}
+
+	if(!$table_1)
 		return;
 	if(empty($POST_CMP))
 		return;
@@ -850,6 +862,14 @@ function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление
 			}
 
 			$update1[] = "`table_num`=".$num;
+		}
+
+		//переключение на родительский элемент
+		if($parent_id && $elem_id = _num($col)) {
+			if(!$cmp = _elemOne($elem_id))
+				continue;
+			if(!$col = $cmp['col'])
+				continue;
 		}
 
 		if($cmp['table_num'] == 1)
