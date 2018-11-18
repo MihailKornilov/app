@@ -897,8 +897,9 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		//Select - выбор записи из другого списка (для связки)
 		case 29:
 			//id выбранной записи
-			$sel_id = 0;
+			$sel_id = _elemPrintV($el, $prm, 0);
 
+/*
 			//данные записи редактируются
 			if($u = $prm['unit_edit']) {
 				$col = $el['col'];
@@ -907,7 +908,6 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 
 			}
 
-/*
 			if($unit_id) {
 				if(@$unit['accept'])
 					$sel_id = $unit_id;
