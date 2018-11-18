@@ -253,7 +253,6 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
 						_blockStyle($r, $PARAM, $width).
-		   ($PARAM['blk_setup'] ? ' val="'.$r['id'].'"' : '').
 						_blockClick($r, $PARAM).
 					 '>'.
 							_blockSetka($r, $PARAM, $grid_id, $level).
@@ -286,18 +285,13 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 }
 function _blockClick($r, $prm) {//настройки клика по блоку для открытия диалога
 	if($prm['blk_setup'])
-		return '';
+		return ' val="'.$r['id'].'"';
 	if($r['click_action'] != 2082)
 		return '';
-	if(!$r['click_dialog'])
+	if(!$dialog_id = $r['click_dialog'])
 		return '';
 
-	//открытие диалога для отображения содержания записи
-	$clickUnit = '';
-	if($r['click_unit_id'] && $u = $prm['unit_get'])
-		$clickUnit = ',get_id:'.$u['id'];
-
-	return ' val="dialog_id:'.$r['click_dialog'].$clickUnit.'"';
+	return ' val="dialog_id:'.$r['click_dialog']._dialogOpenVal($dialog_id, $prm, $r['click_unit_id']).'"';
 }
 function _blockLevelChange($obj_name, $obj_id) {//кнопки изменения уровня редактирования блоков
 	$html = '';
@@ -727,36 +721,13 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				6 => 'pink',  //Розовый
 				7 => 'orange' //Оранжевый
 			);
-/*
-			//вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
-			$block = isset($SRC['block_id']) ? ',block_id:'.$SRC['block_id'] : '';
-			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
-			$dialog_source = !empty($el['block']) && $el['block']['obj_name'] == 'dialog' ? ',dialog_source:'.$el['block']['obj_id'] : '';
 
-			//кнопка принимает значения единицы списка
-			//Если единица списка совпадает с открываемым диалогом, который вносил её данные, значит редактирование
-			//Если не совпадает, то получение данных единицы списка для использования значений в полях
-			if($el['num_3'] && $UNIT_ISSET) {
-//				$DLG = _dialogQuery($el['num_4']);
-//				$u = _spisokUnitQuery($DLG, $unit['id']);
-//				$block = ','.($u ? 'unit' : 'accept').'_id:'.$unit['id'];
-				$block = ',unit_id:'.$unit['id'];
-			}
-
-*/
 			$val = 'dialog_id:'.$el['num_4'];
 
-			if($el['num_3'])
-				if($prm['unit_get']) {
-					$val .=',get_id:'.$prm['unit_get']['id'];
-//					$DLG = _dialogQuery($el['num_4']);
-//				$u = _spisokUnitQuery($DLG, $unit['id']);
-//				$block = ','.($u ? 'unit' : 'accept').'_id:'.$unit['id'];
-//				$block = ',unit_id:'.$unit['id'];
-			}
-
-			//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
-			if(!$el['num_4'])
+			if($dialog_id = $el['num_4'])
+				$val .= _dialogOpenVal($dialog_id, $prm, $el['num_3']);
+			else
+				//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
 				$val .= ',block_id:'.$el['block_id'];
 
 			return _button(array(

@@ -630,9 +630,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				if(o.src.func_save)
 					if(!o.src.func_save(res))
 						return;
-
-return;
-
+//return;
 				_dialogOpenSubmitAction(res);
 
 				//обновление значения JS-кеша, если элемент вносился или изменялся

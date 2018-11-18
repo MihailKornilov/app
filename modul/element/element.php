@@ -158,6 +158,28 @@ function _dialogParam($dialog_id, $param) {//получение конкретн
 
 	return $send;
 }
+function _dialogOpenVal($dialog_id, $prm, $unit_id_send) {//получение параметров открытия диалога для кнопки или блока
+	if(!$dialog_id)
+		return '';
+	if(!$dlg = _dialogQuery($dialog_id))
+		return '';
+	if(!$prm['unit_get'])
+		return '';
+
+	$uid = $prm['unit_get']['id'];
+
+	//если используется дочерний диалог, обязательно только редактирование данных
+	//Будут переданы значения и для отображения, и для редактирования
+	if($dlg['dialog_id_parent'])
+		return ',edit_id:'.$uid.
+			   ',get_id:'.$uid;
+
+	//передаёт id записи. Берётся со страницы, либо с единицы списка
+	if($unit_id_send)
+		return ',get_id:'.$uid;
+
+	return '';
+}
 function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$cond = "`spisok_on`";
 	$cond .= " AND `app_id` IN (0,".APP_ID.")";

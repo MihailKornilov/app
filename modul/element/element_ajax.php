@@ -1041,6 +1041,11 @@ function _dialogOpenLoad($dialog_id) {
 
 	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
+	if($get_id = _num(@$_POST['get_id'])) {
+		$prm['unit_get'] = _spisokUnitQuery($dialog, $get_id);
+		$prm['unit_get_id'] = $get_id;
+	}
+
 	/* --- Редактирование записи --- */
 	if($edit_id = _num(@$_POST['edit_id'])) {
 		$send['head'] = $dialog['edit_head'];
@@ -1079,12 +1084,6 @@ function _dialogOpenLoad($dialog_id) {
 
 	foreach($ELM_IDS as $elem_id)
 		$send['vvv'][$elem_id] = _elemVvv($elem_id, _blockParam($prm));
-
-	if($get_id = _num(@$_POST['get_id'])) {
-		$prm['unit_get'] = _spisokUnitQuery($dialog, $get_id);
-		$prm['unit_edit'] = $prm['unit_get'];
-		$prm['unit_get_id'] = $get_id;
-	}
 
 	$send['html'] = _blockHtml('dialog', $dialog_id, $prm);
 	$send['button_submit'] = $dialog['insert_button_submit'];
