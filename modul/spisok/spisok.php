@@ -273,6 +273,8 @@ function _spisok7num($spisok, $el) {//добавление единицы спи
 	return $spisok;
 }
 function _spisokInclude($spisok) {//вложенные списки
+	global $_SI;
+
 	if(empty($spisok))
 		return array();
 
@@ -315,12 +317,20 @@ function _spisokInclude($spisok) {//вложенные списки
 					FROM "._tableFrom($incDialog)."
 					WHERE `t1`.`id` IN (".$ids.")".
 						_spisokCondDef($incDialog['id']);
-			if(!$arr = query_arr($sql))
-				continue;
+			$key = md5($sql);
+			if(!isset($_SI[$key])) {
+				if($arr = query_arr($sql)) {
+					//вложения во вложенных списках
+					$arr = _spisokInclude($arr);
+					$arr = _spisokImage($arr);
 
-			//вложения во вложенных списках
-			$arr = _spisokInclude($arr);
-			$arr = _spisokImage($arr);
+				}
+				$_SI[$key] = $arr;
+			} else
+				$arr = $_SI[$key];
+
+			if(empty($arr))
+				continue;
 
 			//идентификаторы будут заменены на массив с данными единицы списка
 			foreach($spisok as $id => $r)
