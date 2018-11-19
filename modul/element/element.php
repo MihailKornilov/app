@@ -1691,12 +1691,10 @@ function PHP12_v_choose($prm) {
 
 //	if(!empty($unit['txt_2']))
 //		$sel = $unit['txt_2'];
-	if(!empty($prm['srce']['sel']))
-		$sel = $prm['srce']['sel'];
 
 	$cond = array(
-		'elem_choose' => 1,
-		'v_id_sel' => _idsAss($sel)
+		'elm_choose' => 1,
+		'elm_choose_sel' => $prm['elm_choose_sel']
 	);
 
 	return
@@ -1781,7 +1779,6 @@ function PHP12_v_choose_13($prm, $dialog_id) {//выбор элемента-зн
 		define('DLG_NO_MSG', _emptyMin10('Конкретный диалог.'));
 		return 0;
 	}
-
 	if($EL['num_2'] != 2124) {//исходный диалог
 		define('DLG_NO_MSG', _emptyMin10('Некорректное значение num_2: поиск диалога.'));
 		return 0;
@@ -1821,6 +1818,8 @@ function PHP12_v_choose_13($prm, $dialog_id) {//выбор элемента-зн
 		define('DLG_NO_MSG', _emptyMin10('Элемента '.$num_3_place.', размещающего список с диалогами, не существует.'));
 		return 0;
 	}
+
+	//значение диалога в выпадающем списке
 	if(!$elPlaceV = _num($prm['srce']['num_3'])) {
 		define('DLG_NO_MSG', _emptyMin10('Диалог не выбран.'));
 		return 0;
@@ -1881,7 +1880,6 @@ function PHP12_v_choose_dialog_spisok_unit($prm, $dialog_id) {//диалог п�
 		return 0;
 	if(!$dlg = _dialogQuery($BL['obj_id']))
 		return 0;
-
 	if($dlg['dialog_id_parent'])
 		return _num($dlg['dialog_id_parent']);
 

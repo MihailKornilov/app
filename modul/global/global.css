@@ -339,7 +339,7 @@ body:not(.site){position:relative}
 }
 
 /* подсветка блока с элементом при выборе значения */
-.v-choose{
+.elm-choose{
 	position:absolute;
 	top:0;
 	right:0;
@@ -351,8 +351,8 @@ body:not(.site){position:relative}
 	cursor:pointer;
 	z-index:1;
 }
-.v-choose:not(.sel):hover{opacity:1;border-color:#0ad}
-.v-choose.sel{
+.elm-choose:not(.sel):hover{opacity:1;border-color:#0ad}
+.elm-choose.sel{
 	border-color:#00607D;
 	background-color:#6ce;
 	opacity:.35;

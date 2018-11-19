@@ -1036,7 +1036,6 @@ function _dialogOpenLoad($dialog_id) {
 	$prm['srce']['page_id'] = _num($_POST['page_id']);
 	$prm['srce']['block_id'] = _num($_POST['block_id'], 1);
 	$prm['srce']['dss'] = _num($_POST['dss']);
-	$prm['srce']['sev'] = _num($_POST['sev']);
 	$prm['srce']['nest'] = _num($_POST['nest']);
 
 	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
@@ -1085,9 +1084,19 @@ function _dialogOpenLoad($dialog_id) {
 	foreach($ELM_IDS as $elem_id)
 		$send['vvv'][$elem_id] = _elemVvv($elem_id, _blockParam($prm));
 
+
+
+	//допольнительные (разовые) параметры, используемые частными элементами
+	$prm['elm_choose_sel'] = @$_POST['elm_choose_sel'];
+
+
+
+
 	$send['html'] = _blockHtml('dialog', $dialog_id, $prm);
 	$send['button_submit'] = $dialog['insert_button_submit'];
 	$send['button_cancel'] = $dialog['insert_button_cancel'];
+
+
 
 	$prm = _blockParam($prm);
 	$send['srce'] = $prm['srce'];

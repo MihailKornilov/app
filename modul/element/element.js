@@ -96,7 +96,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			submit:function() {},
 			cancel:dialogClose,
 
-			src:{} //исходные данные, полученные при открытии предыдущего диалога. Для кнопки редактирования.
+			send:{} //исходные данные, полученные при открытии предыдущего диалога. Для кнопки редактирования.
 		}, o);
 
 		var DIALOG_NUM = $('._dialog').length,
@@ -157,7 +157,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			};
 			_post(send, function(res) {
 				dialogClose();
-				res.src = o.src;
+				res.send = o.send;
 				_dialogSetup(res);
 			});
 		});
@@ -291,14 +291,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 				butSubmit:'Сохранить диалоговое окно',
 				submit:submit,
 				cancel:function() {
-					o.src.busy_obj = dialog.bottom.find('.cancel');
-					o.src.busy_cls = '_busy';
-					o.src.func_open_before = function() {
+					o.send.busy_obj = dialog.bottom.find('.cancel');
+					o.send.busy_cls = '_busy';
+					o.send.func_open_before = function() {
 						dialog.close();
 					};
-					_dialogLoad(o.src);
+					_dialogLoad(o.send);
 				},
-				src:o.src
+				send:o.send
 			}),
 			DIALOG_WIDTH = o.width,
 			DLG = dialog.D;
@@ -458,7 +458,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 
 		function submit() {
-			delete o.src.op;
+			delete o.send.op;
 			var send = $.extend({
 				op:'dialog_setup_save',
 
@@ -525,10 +525,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 				element_paste_44:    DLG('#element_paste_44').val(),
 
 				menu_edit_last:DLG('#dialog-menu').val()
-			}, o.src);
+			}, o.send);
 
 			dialog.post(send, function(res) {
-				res.src = o.src;
+				res.send = o.send;
 				_dialogOpen(res);
 			});
 		}
@@ -565,7 +565,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		o = _copyObj(send);
 
 		_post(send, function(res) {
-			res.src = o;
+			res.send = o;
 			o.func_open_before(res, dialog);
 			var dialog = _dialogOpen(res);
 			o.func_open(res, dialog);
@@ -585,7 +585,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			butSubmit:o.button_submit,
 			butCancel:o.button_cancel,
 			submit:submit,
-			src:o.src
+			send:o.send
 		});
 
 		o.dlg = dialog;
@@ -627,8 +627,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			dialog.post(send, function(res) {
 				//если присутствует функция, выполняется она. Для того, чтобы продолжить выполнение после функции, нужно чтобы она вернула любой результат
-				if(o.src.func_save)
-					if(!o.src.func_save(res))
+				if(o.send.func_save)
+					if(!o.send.func_save(res))
 						return;
 //return;
 				_dialogOpenSubmitAction(res);
@@ -754,8 +754,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(OBJ.dlgerr)
 			return;
 
-		var SRC = {},
-			unit = OBJ.unit;
+		var unit = OBJ.unit;
 
 		_forIn(OBJ.vvv, function(vvv, elm_id) {
 			var el = ELMM[elm_id];
@@ -846,42 +845,33 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//Выбор элемента из диалога или страницы
 				case 13:
 					var P = ATR_CMP.next(),
-						inp = P.find('.inp'),
-						sel = ATR_CMP.val(),
-						del = P.find('.icon-del'),
-						D = OBJ.dlg.D;
+						INP = P.find('.inp'),
+						DEL = P.find('.icon-del');
 
 					P.click(function() {
 						_dialogLoad({
 							dialog_id:11,
 							block_id:el.block_id,
-							dialog_source:SRC.dialog_source,
-							prm:{
-								src:SRC,
-								num_3:_num(D(ATTR_CMP(el.num_3)).val()),
-								nest:_num(el.num_5),//выбор значений во вложенных списках
-								sev:_num(el.num_6), //выбор нескольких значений
-								sel:sel
-							},
-							busy_obj:inp,
+							dss:_num(OBJ.dlg.D(ATTR_CMP(el.num_3)).val()),
+							nest:_num(el.num_5),//выбор значений во вложенных списках
+							sev:_num(el.num_6), //выбор нескольких значений
+
+							elm_choose_sel:ATR_CMP.val(),
+
+							busy_obj:INP,
 							busy_cls:'hold',
-							func_open:function(res, dlg) {
-								dlg.D(ATTR_CMP(res.elm_ids[0])).val(sel);
-							},
 							func_save:function(res) {
-								sel = res.v;
-								ATR_CMP.val(sel);
-								inp.val(res.title);
-								del._dn(1);
+								ATR_CMP.val(res.v);
+								INP.val(res.title);
+								DEL._dn(1);
 							}
 						});
 					});
-					del.click(function(e) {
-						sel = 0;
+					DEL.click(function(e) {
 						e.stopPropagation();
 						ATR_CMP.val(0);
-						inp.val('');
-						del._dn();
+						INP.val('');
+						DEL._dn();
 					});
 					return;
 				//select - произвольные значения
@@ -2003,8 +1993,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 			if(!n)
 				return;
 
-			var BL = BLKK[block_id],
-				ATR_BL = D(ATTR_BL(block_id));
+			var BL = BLKK[block_id];
+
+			//блок мог быть удалён, но в функциях id остался
+			if(!BL)
+				return;
+
+			var ATR_BL = D(ATTR_BL(block_id));
 
 			if(BL.xx == 1) {//если блок в ряду один, фукнция применится ко всей таблице
 				arr.push({
@@ -2060,7 +2055,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			var t = $(this);
 			_dialogLoad({
 				dialog_id:t.attr('val'),
-				block_id:obj.src.block_id,
+				block_id:obj.send.block_id,
 				func_save:function() {
 					obj.dlg.close();
 					return true;
@@ -2273,7 +2268,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 	PHP12_v_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
-			VC = D(ATTR_EL(el.id)).find('.v-choose'),//элементы в открытом диалоге для выбора
+			VC = D(ATTR_EL(el.id)).find('.elm-choose'),//элементы в открытом диалоге для выбора
 			sev = obj.srce.sev,                  //выбор нескольких значений
 			nest = !sev && obj.srce.nest ? 1 : 0;//выбор во вложенных списках
 
@@ -2327,7 +2322,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				nest:nest,
 				func_open:function(res, dlg) {
 					dlg.submit(function() {
-						var sel = dlg.content.find('.v-choose.sel');
+						var sel = dlg.content.find('.elm-choose.sel');
 						if(!sel.length) {
 							dlg.err('Значение не выбрано');
 							return;

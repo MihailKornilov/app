@@ -173,16 +173,16 @@ function _dn($v, $cls='dn') {//показ/скрытие блока на осн�
 }
 
 function _num($v, $minus=0) {
-	if(empty($v) || is_array($v))
+	if(empty($v))
+		return 0;
+	if(is_array($v))
+		return 0;
+	if(is_string($v) && $minus && !preg_match(REGEXP_INTEGER, $v))
+		return 0;
+	if(is_string($v) && !$minus && !preg_match(REGEXP_NUMERIC, $v))
 		return 0;
 
-	if($minus && !preg_match(REGEXP_INTEGER, $v))
-		return 0;
-
-	if(!$minus && !preg_match(REGEXP_NUMERIC, $v))
-		return 0;
-
-	return intval($v);
+	return $v * 1;
 }
 function _bool($v) {//проверка на булево число
 	if(empty($v) || is_array($v) || !preg_match(REGEXP_BOOL, $v))
@@ -195,7 +195,11 @@ function _cena($v, $minus=0, $kop=0, $del='.') {//проверка на цену
 		$kop - возвращать с копейками, даже если 00
 		$del - знак после запятой
 	*/
-	if(empty($v) || is_array($v) || !preg_match($minus ? REGEXP_CENA_MINUS : REGEXP_CENA, $v))
+	if(empty($v))
+		return 0;
+	if(is_array($v))
+		return 0;
+	if(is_string($v) && !preg_match($minus ? REGEXP_CENA_MINUS : REGEXP_CENA, $v))
 		return 0;
 
 	$v = str_replace(',', '.', $v);
@@ -258,6 +262,8 @@ function _txt($v, $notrim=false) {
 	return $v;
 }
 function _br($v, $replace='<br>') {//вставка br в текст при нахождении enter
+	if(!is_string($v))
+		return $v;
 	return str_replace("\n", $replace, $v);
 }
 function _daNet($v) {//$v: 1 -> да, 0 -> нет
@@ -563,8 +569,8 @@ function _arrNum($arr) {//переделка значений массива в 
 			$arr[$k] = _arrNum($v);
 			continue;
 		}
-		if(preg_match(REGEXP_CENA_MINUS, $v))
-			$arr[$k] = $v * 1;
+//		if(is_string($v) && preg_match(REGEXP_CENA_MINUS, $v))
+//			$arr[$k] = $v * 1;
 	}
 
 	return $arr;

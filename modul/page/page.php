@@ -433,9 +433,14 @@ function _pageShow($page_id) {
 			return _empty20('Отсутствует диалог, который вносит данные записи.'.PAGE_MSG_ERR);
 		if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $id))
 			return _empty20('Записи '.$id.' не существует.'.PAGE_MSG_ERR);
+		$prm['unit_get']['txt_1'] = '993456789012345';
 	}
 
+
 	return
+	gettype($prm['unit_get']['txt_1']).
+	'<br>'.
+	$prm['unit_get']['txt_1'].
 	_blockHtml('page', $page_id, $prm).
 	_page_div().
 	_pageShowScript($page_id, $prm);

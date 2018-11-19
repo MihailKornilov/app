@@ -93,7 +93,9 @@ function _blockParam($PARAM, $obj_name='') {//значения-параметр�
 		'blk_setup' => 0,           //включена настройка блоков
 		'blk_level' => 1,           //уровень выбираемых блоков
 		'blk_choose' => 0,          //выбор блоков
-		'elem_choose' => 0,         //выбор элемента
+		'elm_choose' => 0,          //выбор элемента
+		'elm_choose_sel' => '',     //выбранные элементы
+
 		'elem_width_change' => 0,   //изменение ширины элементов
 
 		'unit_get_id' => 0,         //id записи для просмотра
@@ -201,8 +203,8 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
 		//скрытие всей строки, если все блоки в строке являются скрытыми
-		$strHide = !$PARAM['blk_setup'] && !$PARAM['elem_choose'];
-		if(!$PARAM['blk_setup'] && !$PARAM['elem_choose'])
+		$strHide = !$PARAM['blk_setup'] && !$PARAM['elm_choose'];
+		if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'])
 			foreach($xStr as $n => $r)
 				if(!$r['hidden']) {//если хотя бы один блок не скрыт, вся строка не будет скрыта
 					$strHide = 0;
@@ -237,7 +239,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$cls[] = !$xEnd ? trim($BR) : '';
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
-			$cls[] = _dn(!(!$PARAM['blk_setup'] && !$PARAM['elem_choose'] && $r['hidden']));
+			$cls[] = _dn(!(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden']));
 			$cls[] = $r['click_action'] == 2081 && $r['click_page']   ? 'curP block-click-page pg-'.$r['click_page'] : '';
 			$cls[] = !$PARAM['blk_setup'] && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
 			$cls = array_diff($cls, array(''));
@@ -257,7 +259,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 					 '>'.
 							_blockSetka($r, $PARAM, $grid_id, $level).
 							_blockChoose($r, $PARAM, $level).
-							_block_v_choose($r, $PARAM).
+							_blockElemChoose($r, $PARAM).
 							_blockChildHtml($r, $PARAM, $grid_id, $level + 1, $width).
 	    					_elemDiv($r['elem'], $PARAM).
 					'';
@@ -381,7 +383,7 @@ function _blockSetka($bl, $prm, $grid_id, $level) {//отображение се
 	if($prm['blk_choose'])
 		return '';
 	//выход, если выбор элемента
-	if($prm['elem_choose'])
+	if($prm['elm_choose'])
 		return '';
 	//выход, если происходит настройка подблоков
 	if($bl['id'] == $grid_id)
@@ -409,46 +411,20 @@ function _blockChoose($bl, $prm, $level) {//подсветка блоков дл
 
 	return '<div class="blk-choose'.$sel.$deny.'" val="'.$block_id.'"></div>';
 }
-function _blockElemChoose_old($r, $unit) {//подсветка для выбора элементов
-	//условие выбора
-	if(empty($unit['choose_old']))
-		return '';
-	if(empty($r['elem']))//блок не подсвечивается, если в нём нет элемента
-		return '';
-//	if($r['obj_name'] != 'dialog')//выбор элементов можно производить только у диалогов (пока)
-//		return '';
-
-	$dialog_id = $r['elem']['dialog_id'];
-
-	//подсветка полей, которые разрешено выбирать
-	if(!$ca = $unit['choose_access'])
-		return '';
-
-	if(@$ca['block'])
-		return '';
-
-	if(!@$ca['all'] && !isset($ca[$dialog_id]))
-		return '';
-
-	//отметка выбранных полей
-	$elem_id = $r['elem']['id'];
-	$sel = isset($unit['choose_sel'][$elem_id]) ? ' sel' : '';
-
-	return '<div class="choose block-elem-choose'.$sel.'" val="'.$elem_id.'"></div>';
-}
-function _block_v_choose($r, $unit) {//подсветка элементов для выбора значения
+function _blockElemChoose($bl, $prm) {//подсветка элементов для выбора значения
 	//(не)разрешён выбор значения
-	if(!$unit['elem_choose'])
+	if(!$prm['elm_choose'])
 		return '';
 	//блок не подсвечивается, если в нём нет элемента
-	if(empty($r['elem']))
+	if(!$el = $bl['elem'])
 		return '';
 
 	//отметка выбранных полей
-	$elem_id = $r['elem']['id'];
-	$sel = empty($unit['v_id_sel'][$elem_id]) ? '' : ' sel';
+	$id = $el['id'];
+	$ass = _idsAss($prm['elm_choose_sel']);
+	$sel = isset($ass[$id]) ? ' sel' : '';
 
-	return '<div class="v-choose'.$sel.'" val="'.$elem_id.'"></div>';
+	return '<div class="elm-choose'.$sel.'" val="'.$id.'"></div>';
 }
 function _blockStyle($bl, $prm, $width) {//стили css для блока
 	$send = array();
@@ -667,7 +643,7 @@ function _elemUnitIsSetup($unit) {//определение в каком реж�
 
 	if($unit['blk_setup'])
 		return 1;
-	if($unit['elem_choose'])
+	if($unit['elm_choose'])
 		return 1;
 	return 0;
 }
@@ -1048,8 +1024,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
                 num_1 - id диалога, через который вносятся данные выбираемого списка
                 txt_1 - текст, когда единица не выбрана
-                txt_3 - первый id элемента, составляющие содержание Select
-                txt_4 - второй id элемента, составляющие содержание Select
+                txt_3 - первый id элемента, составляющие содержание Select. Выбор через [13]
+                txt_4 - второй id элемента, составляющие содержание Select. Выбор через [13]
 				num_2 - возможность добавления новых значений
 				num_3 - поиск значений вручную
 				num_4 - блокировать выбор
@@ -1733,7 +1709,7 @@ function _elemPrintV($el, $prm, $def='') {//значение записи при
 
 	if(is_array($v))
 		return _num($v['id']);
-	if(preg_match(REGEXP_NUMERIC, $v))
+	if(is_string($v) && preg_match(REGEXP_INTEGER, $v))
 		return $v * 1;
 
 	return $v;
