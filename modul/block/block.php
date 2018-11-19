@@ -541,7 +541,7 @@ function _elemFormatHide($el, $txt) {//Дополнительное формат
 		return $txt;
 	if($el['format']['hide'] && empty($txt))
 		return '';
-	if(!preg_match(REGEXP_CENA_MINUS, $txt))
+	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
 	if($el['format']['hide'] && !_cena($txt, 1))
 		return '';
@@ -549,10 +549,13 @@ function _elemFormatHide($el, $txt) {//Дополнительное формат
 	return $txt;
 }
 function _elemFormatDigital($el, $txt) {//Дополнительное форматирование для чисел
-	if(!preg_match(REGEXP_CENA_MINUS, $txt))
+	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
-	if(empty($el['format']))
+	if(empty($el['format'])) {
+		if(is_string($txt))
+			return $txt;
 		return round($txt, 2);
+	}
 	if($el['format']['space'])
 		$txt = _sumSpace($txt, $el['format']['fract_0_show'], $el['format']['fract_char']);
 	else {
@@ -564,7 +567,7 @@ function _elemFormatDigital($el, $txt) {//Дополнительное форм�
 	return $txt;
 }
 function _elemFormatColor($el, $txt) {//подмена цвета при дополнительном форматировании для чисел
-	if(!preg_match(REGEXP_CENA_MINUS, $txt))
+	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
 		return $el['color'];
 	if(empty($el['format']))
 		return $el['color'];

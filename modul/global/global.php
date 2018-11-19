@@ -569,8 +569,8 @@ function _arrNum($arr) {//переделка значений массива в 
 			$arr[$k] = _arrNum($v);
 			continue;
 		}
-//		if(is_string($v) && preg_match(REGEXP_CENA_MINUS, $v))
-//			$arr[$k] = $v * 1;
+		if(is_string($v) && preg_match(REGEXP_CENA_MINUS, $v))
+			$arr[$k] = $v * 1;
 	}
 
 	return $arr;
