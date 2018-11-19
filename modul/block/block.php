@@ -93,6 +93,7 @@ function _blockParam($PARAM, $obj_name='') {//значения-параметр�
 		'blk_setup' => 0,           //включена настройка блоков
 		'blk_level' => 1,           //уровень выбираемых блоков
 		'blk_choose' => 0,          //выбор блоков
+		'blk_choose_sel' => '',     //выбранные блоки
 		'elm_choose' => 0,          //выбор элемента
 		'elm_choose_sel' => '',     //выбранные элементы
 
@@ -405,11 +406,14 @@ function _blockChoose($bl, $prm, $level) {//подсветка блоков дл
 		return '';
 
 	//отметка выбранных полей
-	$block_id = $bl['id'];
-	$sel = isset($prm['blk_sel'][$block_id]) ? ' sel' : '';
-	$deny = isset($prm['blk_deny'][$block_id]) ? ' deny' : '';
+	$id = $bl['id'];
+//	$sel = isset($prm['blk_sel'][$block_id]) ? ' sel' : '';
+//	$deny = isset($prm['blk_deny'][$block_id]) ? ' deny' : '';
+	$ass = _idsAss($prm['blk_choose_sel']);
+	$sel = isset($ass[$id]) ? ' sel' : '';
 
-	return '<div class="blk-choose'.$sel.$deny.'" val="'.$block_id.'"></div>';
+
+	return '<div class="blk-choose'.$sel.'" val="'.$id.'"></div>';
 }
 function _blockElemChoose($bl, $prm) {//подсветка элементов для выбора значения
 	//(не)разрешён выбор значения
@@ -702,6 +706,16 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			);
 
 			$val = 'dialog_id:'.$el['num_4'];
+
+			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
+			//а также вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
+			//Нужно для назначения функций (пока)
+			if($el['block']['obj_name'] == 'dialog') {
+				$val .= ',dss:'.$el['block']['obj_id'].
+						',block_id:'.$prm['srce']['block_id'];
+
+			}
+
 
 			if($dialog_id = $el['num_4'])
 				$val .= _dialogOpenVal($dialog_id, $prm, $el['num_3']);
@@ -1227,6 +1241,28 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'value' => _elemPrintV($el, $prm, 0)
 				   ));
 
+		//Выбор блоков из диалога или страницы
+		case 49:
+			/*
+				txt_1 - текст для placeholder
+			*/
+
+			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+			$v = _elemPrintV($el, $prm);
+			$ids = _ids($v);
+			$count = _ids($ids, 'count');
+			$title = $count ? $count.' блок'._end($count, '', 'а', 'ов') : '';
+
+			return
+			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+			'<div class="_sebl dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_sebl"'._elemStyleWidth($el).'>'.
+				'<div class="icon icon-cube pabs"></div>'.
+				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+				'<input type="text" readonly class="inp curP w100p color-ref"'.$placeholder.$disabled.' value="'.$title.'" />'.
+			'</div>';
+
 		//Календарь
 		case 51:
 			/*
@@ -1697,6 +1733,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 function _elemPrintV($el, $prm, $def='') {//значение записи при редактировании
 	if(!$u = $prm['unit_edit'])
 		return $def;
+	//установлен флаг "Всегда по умолчанию"
 	if($el['nosel'])
 		return $def;
 	if(!$col = $el['col'])
@@ -1807,26 +1844,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			}
 
 			return $txt;
-
-		//Выбор блоков из диалога или страницы
-		case 49:
-			/*
-				txt_1 - текст для placeholder
-			*/
-
-			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-
-			$ids = _ids($v);
-			$count = _ids($ids, 'count');
-			$title = $count ? $count.' блок'._end($count, '', 'а', 'ов') : '';
-
-			return
-			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-			'<div class="_sebl dib prel bg-fff over1" id="'.$attr_id.'_sebl"'.$width.'>'.
-				'<div class="icon icon-cube pabs"></div>'.
-				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-				'<input type="text" readonly class="inp curP w100p color-ref"'.$placeholder.$disabled.' value="'.$title.'" />'.
-			'</div>';
 
 		//порядок - не доделано
 		case 53:

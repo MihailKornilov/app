@@ -1889,10 +1889,8 @@ function PHP12_v_choose_dialog_spisok_unit($prm, $dialog_id) {//диалог п�
 
 
 /* ---=== ВЫБОР БЛОКОВ [19] ===--- */
-function PHP12_block_choose($el, $unit) {
-	$SRC = $unit['source'];
-
-	if(!$block_id = _num($SRC['block_id']))
+function PHP12_block_choose($prm) {
+	if(!$block_id = _num($prm['srce']['block_id']))
 		return _emptyMin10('Отсутствует исходный блок.');
 	if(!$BL = _blockOne($block_id))
 		return _emptyMin10('Исходного блока '.$block_id.' не существует.');
@@ -1917,22 +1915,20 @@ function PHP12_block_choose($el, $unit) {
 			return _emptyMin10('Неизвестный объект <b>'.$obj_name.'</b>.');
 	}
 
-	$PRM = $SRC['prm'];
-
 	//запрет изменения уровня блоков. Только верхний (первый) уровень
-	$level_deny = _num(@$PRM['level_deny']);
+//	$level_deny = _num(@$PRM['level_deny']);
 
-	$unit += _unitGet($obj_name, $obj_id);
-	$unit += array(
+//	$unit += _unitGet($obj_name, $obj_id);
+	$unit = array(
 		'blk_choose' => 1,
-		'blk_level' => $level_deny ? 1 : _blockLevelDefine($obj_name),
-		'blk_sel' => _idsAss($PRM['sel']),    //ids ранее выбранных блоков
-		'blk_deny' => _idsAss(@$PRM['deny'])  //блоки, которые запрещено выбирать
+//		'blk_level' => $level_deny ? 1 : _blockLevelDefine($obj_name),
+		'blk_choose_sel' => $prm['blk_choose_sel'],    //ids ранее выбранных блоков
+//		'blk_deny' => _idsAss(@$PRM['deny'])  //блоки, которые запрещено выбирать
 	);
 
 	return
 	'<div class="fs14 pad10 pl15 bg-orange">'.$title.' <b class="fs14">'.$name.'</b>:</div>'.
-	($level_deny ? '' : PHP12_block_choose_but_level($obj_name, $obj_id)).
+//	($level_deny ? '' : PHP12_block_choose_but_level($obj_name, $obj_id)).
 	'<div id="block-choose-div">'.
 		_blockHtml($obj_name, $obj_id, $unit).
 	'</div>';
@@ -2894,15 +2890,11 @@ function PHP12_spisok_cond_save($block_id, $dialog) {
 
 
 /* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ===--- */
-function PHP12_elem_action_list($el, $unit) {
-	$SRC = $unit['source'];
-
-	if(!$bs_id = _num($SRC['block_id']))
+function PHP12_elem_action_list($prm) {
+	if(!$bs_id = _num($prm['srce']['block_id']))
 		return _emptyMin10('Отсутствует ID исходного блока.');
-
 	if(!$BL = _blockOne($bs_id))
 		return _emptyMin10('Исходного блока id'.$bs_id.' не существует.');
-
 	if($BL['obj_name'] != 'page' && $BL['obj_name'] != 'dialog')
 		return _emptyMin10('Действия можно назначать<br>только компонентам на страницах и диалоговых окнах.');
 
@@ -2938,8 +2930,9 @@ function PHP12_elem_action_list($el, $unit) {
 	$effect = query_ass($sql);
 	$effect[0] = 'нет';
 
+	$dss = $prm['el12']['block']['obj_id'];
 	$spisok = '';
-	foreach($arr as $r) {
+	foreach($arr as $id => $r) {
 		$c = count(_ids($r['target'], 1));
 		$targetName = 'блок'._end($c, '', 'а', 'ов');
 		$targetColor = 'color-ref';
@@ -2948,7 +2941,7 @@ function PHP12_elem_action_list($el, $unit) {
 			$targetColor = 'color-pay';
 		}
 		$spisok .=
-			'<dd val="'.$r['id'].'">'.
+			'<dd val="'.$id.'">'.
 			'<table class="bs5 bor1 bg-gr2 over2 mb5 curD">'.
 				'<tr>'.
 					'<td class="w25 top">'.
@@ -2967,10 +2960,10 @@ function PHP12_elem_action_list($el, $unit) {
 					'<td class="w70 b '.$targetColor.' top center pt3">'.
 						$c.' '.$targetName.
 					'<td class="w50 r top">'.
-						'<div val="dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',dialog_source:'.$el['block']['obj_id'].'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
+						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
 						_iconDel(array(
 							'class' => 'pl ml5 dialog-open',
-							'val' => 'dialog_id:'.$r['dialog_id'].',unit_id:'.$r['id'].',del:1,dialog_source:'.$el['block']['obj_id']
+							'val' => 'dialog_id:'.$r['dialog_id'].',del_id:'.$id.'dss:'.$dss
 						)).
 			'</table>'.
 			'</dd>';

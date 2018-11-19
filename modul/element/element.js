@@ -598,6 +598,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				op:!o.edit_id ? 'spisok_add' : 'spisok_save',
 				page_id:PAGE_ID,
 				dialog_id:o.dialog_id,
+				dss:o.srce.dss,
 				block_id:o.srce.block_id,
 				unit_id:o.edit_id,
 				cmp:{},
@@ -613,7 +614,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					case 12://подключаемая функция
 						var func = sp.txt_1 + '_get';
 						if(window[func])
-							send.vvv[id] = window[func](sp);
+							send.vvv[id] = window[func](sp, o);
 						send.cmp[id] = ATR_CMP.val();
 						return;
 					case 22://Дополнительные условия к фильтру
@@ -694,15 +695,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 					.trigger('click');
 				break;
 			case 4://обновление исходного диалога
-				var id = _num(o.dialog_source);
+				if(!res.dss_arr)
+					break;
+				var id = _num(res.dss_arr.dialog_id);
 				if(!id)
 					break;
 				if(!DIALOG[id])
 					break;
 				DIALOG[id].close();
-				if(!res.dialog_source)
-					break;
-				_dialogOpen(res.dialog_source);
+				_dialogOpen(res.dss_arr);
 				break;
 		}
 
@@ -1043,35 +1044,28 @@ var DIALOG = {},//массив диалоговых окон для управл
 				//Выбор блоков из диалога или страницы
 				case 49:
 					var P = ATR_CMP.next(),
-						inp = P.find('.inp'),
-						sel = ATR_CMP.val(),
-						del = P.find('.icon-del'),
-						D = OBJ.dlg.D;
+						INP = P.find('.inp'),
+						DEL = P.find('.icon-del');
 
 					P.click(function() {
 						_dialogLoad({
 							dialog_id:19,
-							block_id:SRC.block_id,
-							prm:{
-								src:SRC,
-								sel:sel
-							},
-							busy_obj:inp,
+							block_id:OBJ.srce.block_id,
+							blk_choose_sel:ATR_CMP.val(),
+							busy_obj:INP,
 							busy_cls:'hold',
 							func_save:function(res) {
-								sel = res.ids;
-								ATR_CMP.val(sel);
-								inp.val(res.title);
-								del._dn(1);
+								ATR_CMP.val(res.ids);
+								INP.val(res.title);
+								DEL._dn(1);
 							}
 						});
 					});
-					del.click(function(e) {
-						sel = 0;
+					DEL.click(function(e) {
 						e.stopPropagation();
 						ATR_CMP.val(0);
-						inp.val('');
-						del._dn();
+						INP.val('');
+						DEL._dn();
 					});
 					return;
 				//Календарь
@@ -2355,38 +2349,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 	PHP12_block_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
 			ATR_EL = D(ATTR_EL(el.id)),
-			LEVEL = ATR_EL.find('.block-choose-level-change'),
-			__bc = function() {//получение блоков в открытом диалоге для выбора
-				var bc = ATR_EL.find('.blk-choose');
-
-				//подсветка блока при выборе
-				bc.click(function() {
-					var t = $(this),
-						v = t.attr('val'),
-						sel = t.hasClass('sel');
-
-					t[(sel ? 'remove' : 'add') + 'Class']('sel');
-				});
-
-				return bc;
-			};
-
-		if(unit == 'get') {
-			var send = [];
-			_forEq(__bc(), function(sp) {
-				if(!sp.hasClass('sel'))
-					return;
-				send.push(sp.attr('val'));
-			});
-			return send.join();
-		}
+			LEVEL = ATR_EL.find('.block-choose-level-change');
 
 		//переключение уровней блоков
 		LEVEL.click(function() {
 			var t = $(this),
 				send = {
 					op:'block_choose_level_change',
-					block_id:unit.src.block_id,
+					block_id:obj.srce.block_id,
 					level:_num(t.html()),
 					busy_obj:ATR_EL.find('.level-hold')
 				};
@@ -2398,11 +2368,35 @@ var DIALOG = {},//массив диалоговых окон для управл
 				LEVEL.removeClass('orange')
 					.addClass('cancel');
 				t.removeClass('cancel').addClass('orange');
-				__bc();
+				PHP12_block_choose_bc(el, obj);
 			});
 		});
 
-		__bc();
+		PHP12_block_choose_bc(el, obj);
+	},
+	PHP12_block_choose_bc = function(el, obj) {//получение блоков в открытом диалоге для выбора, а также обновление кликов по ним
+		var D = obj.dlg.D,
+			ATR_EL = D(ATTR_EL(el.id)),
+			bc = ATR_EL.find('.blk-choose');
+
+		//подсветка блока при выборе
+		bc.click(function() {
+			var t = $(this),
+				v = t.attr('val'),
+				sel = t.hasClass('sel');
+
+			t[(sel ? 'remove' : 'add') + 'Class']('sel');
+		});
+
+		return bc;
+	},
+	PHP12_block_choose_get = function(el, obj) {
+		var send = [];
+		_forEq(PHP12_block_choose_bc(el, obj), function(sp) {
+			if(sp.hasClass('sel'))
+				send.push(sp.attr('val'));
+		});
+		return send.join();
 	},
 
 	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ ===--- */
@@ -3198,9 +3192,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 	/* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ ===--- */
 	PHP12_history_setup = function(el, unit) {
-		if(unit == 'get')
-			return PHP12_history_get(el);
-
 		var html = '<input type="hidden" class="act" value="' + unit.src.prm.act + '" />' +  //действие: insert, edit, del
 				   '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',

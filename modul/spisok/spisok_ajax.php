@@ -926,11 +926,11 @@ function _spisokAction3($send, $dialog, $unit_id) {//добавление зна
 function _spisokAction4($send) {//действие 4 - обновление исходного диалога
 	if($send['action_id'] != 4)
 		return $send;
-	if(!$dialog_id = _num(@$_POST['dialog_source']))
+	if(!$dialog_id = _num(@$_POST['dss']))
 		return $send;
 
 	$_POST['unit_id'] = 0;
-	$send['dialog_source'] = _dialogOpenLoad($dialog_id);
+	$send['dss_arr'] = _dialogOpenLoad($dialog_id);
 
 	return $send;
 }

@@ -669,7 +669,8 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 	function valueSet(v) {//установка значения
 		if(o.multi)
 			return multiValueSet(v);
-//		v = _num(v, 1);
+		if(REGEXP_CENA_MINUS.test(v))
+			v = _num(v, 1);
 		VALUE = v;
 		t.val(v);
 		INP.val(MASS_ASS[v] ? MASS_ASS[v].replace(/&quot;/g,'"') : '');

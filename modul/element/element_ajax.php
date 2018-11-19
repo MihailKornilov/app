@@ -1036,7 +1036,7 @@ function _dialogOpenLoad($dialog_id) {
 	$prm['srce']['page_id'] = _num($_POST['page_id']);
 	$prm['srce']['block_id'] = _num($_POST['block_id'], 1);
 	$prm['srce']['dss'] = _num($_POST['dss']);
-	$prm['srce']['nest'] = _num($_POST['nest']);
+	$prm['srce']['nest'] = _num(@$_POST['nest']);
 
 	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
@@ -1086,7 +1086,8 @@ function _dialogOpenLoad($dialog_id) {
 
 
 
-	//допольнительные (разовые) параметры, используемые частными элементами
+	//дополнительные (разовые) параметры, используемые некоторыми элементами
+	$prm['blk_choose_sel'] = @$_POST['blk_choose_sel'];
 	$prm['elm_choose_sel'] = @$_POST['elm_choose_sel'];
 
 
