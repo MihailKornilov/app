@@ -825,8 +825,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 							timer = setInterval(function() {
 								started = 1;
 								v_last = v;
-//								if(!FILTER[el.num_1])
-//									FILTER[el.num_1] = {};
 								FILTER[el.num_1][elm_id] = v;
 								_spisokUpdate(el.num_1, function() {
 									started = 0;
@@ -850,10 +848,17 @@ var DIALOG = {},//массив диалоговых окон для управл
 						DEL = P.find('.icon-del');
 
 					P.click(function() {
+						//выбранный диалог в селекте, на который указывает num_3
+						var DLG_SEL = 0;
+						if(el.num_3) {
+							var attr = ATTR_CMP(el.num_3);
+							DLG_SEL = _num(OBJ.dlg.D(attr).val());
+						}
+
 						_dialogLoad({
 							dialog_id:11,
 							block_id:el.block_id,
-							dss:_num(OBJ.dlg.D(ATTR_CMP(el.num_3)).val()),
+							dss:DLG_SEL,
 							nest:_num(el.num_5),//выбор значений во вложенных списках
 							sev:_num(el.num_6), //выбор нескольких значений
 
@@ -1567,8 +1572,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 						if(on || week) {
 							CNT.find('.sel').removeClass('sel');
 							td.addClass('sel');
-//							if(!FILTER[el.num_1])
-//								FILTER[el.num_1] = {};
 							FILTER[el.num_1][elm_id] = t.attr('val');
 							_spisokUpdate(el.num_1);
 						}
@@ -1576,8 +1579,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр-меню
 				case 78:
-//					if(!FILTER[el.num_1])
-//						FILTER[el.num_1] = {};
 					var FM = ATTR_EL.find('.fm-unit');
 					ATTR_EL.find('.fm-plus').click(function() {
 						var t = $(this),
@@ -1646,8 +1647,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Select - фильтр
 				case 83:
-//					if(!FILTER[el.num_1])
-//						FILTER[el.num_1] = {};
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
@@ -1672,9 +1671,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102:
-//					if(!FILTER[el.num_1])
-//						FILTER[el.num_1] = {};
-
 					var HLD = ATTR_EL.find('.holder'),//текст пустого значения
 						TDUN = ATTR_EL.find('.td-un'),//выбранные значения
 						DEL = ATTR_EL.find('.icon-del'),//иконка удаления
@@ -2272,7 +2268,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			V11_DLG = [];                   //массив диалогов, открывающиеся последовательно
 			V11_V = sev ? _idsAss(obj.unit.txt_2) : []; //массив выбранных значений
 			V11_COUNT = 0;                  //счётчик открытых диалогов
-			nest = 1;
+//			nest = 1;
 		}
 
 		//выбор одного из элеметов

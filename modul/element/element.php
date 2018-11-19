@@ -329,6 +329,30 @@ function _dialogSpisokOnConnect($block_id) {//получение диалого�
 
 	return $send;
 }
+function _dialogSel24($elem_id, $dlg_id) {//получение id диалога, который выбирается через элемент [24]
+	if(!$el = _elemOne($elem_id))
+		return 0;
+	if($el['dialog_id'] != 24)
+		return 0;
+	if(!$dlg_id)
+		return 0;
+
+	//список, размещённый на странице
+	if($el['num_1'] == 960) {
+		if(!$ell = _elemOne($dlg_id))
+			return 0;
+		return $ell['num_1'];
+	}
+
+	//привязанный диалог
+	if($el['num_1'] == 961) {
+		if(!$ell = _elemOne($dlg_id))
+			return 0;
+		return $ell['block']['obj_id'];
+	}
+
+	return $dlg_id;
+}
 function _dialogSelArray($v=0, $v1=0) {//список диалогов для Select - отправка через AJAX
 	$sql = "SELECT *
 			FROM `_dialog`
@@ -1652,8 +1676,7 @@ function PHP12_v_choose($prm) {
 	DLG_SEL - выбранное значение
 */
 
-	//ID диалога из dialog_source
-	$dialog_id = PHP12_v_choose_ds($prm);
+	$dialog_id = 0;
 
 	//блок из содержания удаления единицы списка
 	$dialog_id = PHP12_v_choose_dialog_del($prm, $dialog_id);
@@ -1679,12 +1702,15 @@ function PHP12_v_choose($prm) {
 	//диалог принимает значения списка
 	$dialog_id = PHP12_v_choose_dialog_spisok_unit($prm, $dialog_id);
 
+	//ID диалога из dss
+	$dialog_id = PHP12_v_choose_ds($prm, $dialog_id);
+
 	if(defined('DLG_NO_MSG'))
 		return DLG_NO_MSG;
 	if(!$dialog_id)
 		return _emptyMin10('Не найден диалог, который вносит данные списка.');
 	if(!$dialog = _dialogQuery($dialog_id))
-		return _emptyMin10('Диалога не существует, который вносит данные списка.');
+		return _emptyMin10('Диалога '.$dialog_id.' не существует.');
 
 	$sel = 0;
 	if(defined('DLG_SEL'))
@@ -1703,7 +1729,9 @@ function PHP12_v_choose($prm) {
 	_blockHtml('dialog', $dialog_id, $cond).
 	'';
 }
-function PHP12_v_choose_ds($prm) {//ID диалога из dialog_source
+function PHP12_v_choose_ds($prm, $dialog_id) {//ID диалога из dss
+	if($dialog_id)
+		return $dialog_id;
 	return _num($prm['srce']['dss']);
 }
 function PHP12_v_choose_BL($prm) {//получение данных исходного блока
@@ -1800,7 +1828,7 @@ function PHP12_v_choose_13($prm, $dialog_id) {//выбор элемента-зн
 			define('DLG_NO_MSG', _emptyMin10('Блока '.$blk_id.' исходного диалога не существует.'));
 			return 0;
 		}
-		define('DLG_SEL', _num($prm['srce']['sel']));
+		define('DLG_SEL', _num($prm['elm_choose_sel']));
 
 		//исходным блоком является блок списка
 		if($blk['obj_name'] == 'spisok') {
@@ -1814,34 +1842,7 @@ function PHP12_v_choose_13($prm, $dialog_id) {//выбор элемента-зн
 		return _num($blk['obj_id']);
 	}
 
-
-	if(!$elPlace = _elemOne($num_3_place)) {
-		define('DLG_NO_MSG', _emptyMin10('Элемента '.$num_3_place.', размещающего список с диалогами, не существует.'));
-		return 0;
-	}
-
-	//значение диалога в выпадающем списке
-	if(!$elPlaceV = _num($prm['srce']['num_3'])) {
-		define('DLG_NO_MSG', _emptyMin10('Диалог не выбран.'));
-		return 0;
-	}
-
-	if($elPlace['dialog_id'] == 24) {
-		//значение является не диалогом, а элементом
-		switch($elPlace['num_1']) {
-			case 960:
-				$el = _elemOne($elPlaceV);
-				$elPlaceV = $el['num_1'];
-				break;
-			case 961:
-				$el = _elemOne($elPlaceV);
-				$elPlaceV = $el['block']['obj_id'];
-				break;
-		}
-		define('DLG_SEL', _num($prm['srce']['sel']));
-	}
-
-	return $elPlaceV;
+	return _dialogSel24($num_3_place, $prm['srce']['dss']);
 }
 function PHP12_v_choose_page($SRC, $dialog_id) {//блок со страницы
 	if($dialog_id)
@@ -1886,6 +1887,7 @@ function PHP12_v_choose_dialog_spisok_unit($prm, $dialog_id) {//диалог п�
 
 	return 0;
 }
+
 
 
 /* ---=== ВЫБОР БЛОКОВ [19] ===--- */
@@ -2784,9 +2786,8 @@ function PHP12_balans_setup_vvv($parent_id) {
 
 
 /* ---=== НАСТРОЙКА ДОПОЛНИТЕЛЬНЫХ УСЛОВИЙ ОТОБРАЖЕНИЯ СПИСКА [26] ===--- */
-function PHP12_spisok_cond($el, $unit) {
-	$SRC = $unit['source'];
-	if(!$block_id = $SRC['block_id'])
+function PHP12_spisok_cond($prm) {
+	if(!$block_id = $prm['srce']['block_id'])
 		return _emptyMin10('Отсутствует ID исходного блока.');
 	if(!$BL = _blockOne($block_id))
 		return _emptyMin10('Исходного блока '.$block_id.' не существует.');
@@ -2963,7 +2964,7 @@ function PHP12_elem_action_list($prm) {
 						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
 						_iconDel(array(
 							'class' => 'pl ml5 dialog-open',
-							'val' => 'dialog_id:'.$r['dialog_id'].',del_id:'.$id.'dss:'.$dss
+							'val' => 'dialog_id:'.$r['dialog_id'].',del_id:'.$id.',dss:'.$dss
 						)).
 			'</table>'.
 			'</dd>';
