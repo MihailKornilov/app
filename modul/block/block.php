@@ -1697,6 +1697,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 function _elemPrintV($el, $prm, $def='') {//значение записи при редактировании
 	if(!$u = $prm['unit_edit'])
 		return $def;
+	if($el['nosel'])
+		return $def;
 	if(!$col = $el['col'])
 		return $def;
 

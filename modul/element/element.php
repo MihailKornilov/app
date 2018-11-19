@@ -1091,6 +1091,7 @@ function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки п�
 	$fieldNo = array(
 		'id' => 1,
 		'id_old' => 1,
+		'table_num' => 1,
 		'num' => 1,
 		'parent_id' => 1,
 		'app_id' => 1,
