@@ -54,7 +54,7 @@ switch(@$_POST['op']) {
 		$unit = _unitGet($obj_name, $obj_id) +
 				array(
 					'blk_setup' => 1,
-					'elem_width_change' => $on
+					'elm_width_change' => $on
 				);
 		$send['html'] = _blockHtml($obj_name, $obj_id,  $unit);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);

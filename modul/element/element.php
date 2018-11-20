@@ -864,14 +864,12 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 	switch($el['dialog_id']) {
 		//подключаемая функция
 		case 12:
-			if(!$u = $prm['unit_edit'])
-				return array();
-
 			$func = $el['txt_1'].'_vvv';
+
 			if(!function_exists($func))
 				return array();
 
-			return $func($u['id'], $prm);
+			return $func($prm);
 
 		//Radio
 		case 16:
@@ -1676,7 +1674,17 @@ function PHP12_v_choose($prm) {
 	DLG_SEL - выбранное значение
 */
 
-	$dialog_id = 0;
+
+//	sev:0,           //выбор нескольких значений (блоков или элементов)
+//	nest:1,          //выбор значения из вложенного списка
+//  sel - выбранные значения
+
+
+//print_r($prm);
+
+	$dialog_id = 47;
+
+/*
 
 	//блок из содержания удаления единицы списка
 	$dialog_id = PHP12_v_choose_dialog_del($prm, $dialog_id);
@@ -1707,21 +1715,16 @@ function PHP12_v_choose($prm) {
 
 	if(defined('DLG_NO_MSG'))
 		return DLG_NO_MSG;
+
+*/
 	if(!$dialog_id)
 		return _emptyMin10('Не найден диалог, который вносит данные списка.');
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin10('Диалога '.$dialog_id.' не существует.');
 
-	$sel = 0;
-	if(defined('DLG_SEL'))
-		$sel = DLG_SEL;
-
-//	if(!empty($unit['txt_2']))
-//		$sel = $unit['txt_2'];
-
 	$cond = array(
 		'elm_choose' => 1,
-		'elm_choose_sel' => $prm['elm_choose_sel']
+		'elm_sel' => $prm['dop']['sel']
 	);
 
 	return
@@ -1729,6 +1732,10 @@ function PHP12_v_choose($prm) {
 	_blockHtml('dialog', $dialog_id, $cond).
 	'';
 }
+function PHP12_v_choose_vvv($prm) {
+	return $prm['dop'];
+}
+
 function PHP12_v_choose_ds($prm, $dialog_id) {//ID диалога из dss
 	if($dialog_id)
 		return $dialog_id;
@@ -1793,25 +1800,16 @@ function PHP12_v_choose_13($prm, $dialog_id) {//выбор элемента-зн
 	if($EL['dialog_id'] != 13)
 		return 0;
 
-	//num_1 - источник выбора
-	if($EL['num_1'] == 2119) {
-		define('DLG_NO_MSG', _emptyMin10('Не доделано: выбор значения с текущей страницы.'));
-		return 0;
-	}
-	if($EL['num_1'] != 2120) {
-		define('DLG_NO_MSG', _emptyMin10('Некорректное значение num_1: источник выбора.'));
-		return 0;
+	print_r($prm);
+	return 0;
+
+	//поиск диалога в выпадающем списке [24]
+	if($dlg_place = $EL['num_1']) {
+		$el = _elemOne($dlg_place);
+		print_r($el);
+		return _dialogSel24($dlg_place, $prm['srce']['dss']);
 	}
 
-	//num_2 - где искать диалог (если выбор из диалога)
-	if($EL['num_2'] == 2123) {//конкретный диалог
-		define('DLG_NO_MSG', _emptyMin10('Конкретный диалог.'));
-		return 0;
-	}
-	if($EL['num_2'] != 2124) {//исходный диалог
-		define('DLG_NO_MSG', _emptyMin10('Некорректное значение num_2: поиск диалога.'));
-		return 0;
-	}
 
 	//num_3 - элемент-значение поиска диалога
 	if(!$num_3_place = _num($EL['num_3'])) {//если пустое - получение исходного диалога
@@ -1828,7 +1826,7 @@ function PHP12_v_choose_13($prm, $dialog_id) {//выбор элемента-зн
 			define('DLG_NO_MSG', _emptyMin10('Блока '.$blk_id.' исходного диалога не существует.'));
 			return 0;
 		}
-		define('DLG_SEL', _num($prm['elm_choose_sel']));
+		define('DLG_SEL', _num($prm['_elm_choose_sel']));
 
 		//исходным блоком является блок списка
 		if($blk['obj_name'] == 'spisok') {
@@ -1842,7 +1840,6 @@ function PHP12_v_choose_13($prm, $dialog_id) {//выбор элемента-зн
 		return _num($blk['obj_id']);
 	}
 
-	return _dialogSel24($num_3_place, $prm['srce']['dss']);
 }
 function PHP12_v_choose_page($SRC, $dialog_id) {//блок со страницы
 	if($dialog_id)
@@ -2076,10 +2073,13 @@ function PHP12_elem22_save($cmp, $val, $unit) {//Дополнительные у
 
 	return count($update);
 }
-function PHP12_elem22_vvv($parent_id) {//Дополнительные условия к фильтру - получение настроек
+function PHP12_elem22_vvv($prm) {//Дополнительные условия к фильтру - получение настроек
+	if(!$u = $prm['unit_edit'])
+		return array();
+
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `parent_id`=".$parent_id."
+			WHERE `parent_id`=".$u['id']."
 			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
 		return array();
@@ -2311,10 +2311,13 @@ function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение 
 			WHERE `id`=".$parent_id;
 	query($sql);
 }
-function PHP12_menu_block_setup_vvv($parent_id) {//получение данных о пунктах меню
+function PHP12_menu_block_setup_vvv($prm) {//получение данных о пунктах меню
+	if(!$u = $prm['unit_edit'])
+		return array();
+
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `parent_id`=".$parent_id."
+			WHERE `parent_id`=".$u['id']."
 			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))
 		return array();

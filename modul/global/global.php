@@ -564,6 +564,8 @@ function _json($arr, $n=0) {//перевод массива в JS
 		($is_ass ? '}' : ']');
 }
 function _arrNum($arr) {//переделка значений массива в INT, если есть
+	if(empty($arr))
+		return array();
 	foreach($arr as $k => $v) {
 		if(is_array($v)) {
 			$arr[$k] = _arrNum($v);

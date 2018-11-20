@@ -547,12 +547,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 			dss:0,           //id исходного диалога, либо настраиваемого
 			block_id:0,      //блок в который вставляется элемент
 
-			sev:0,           //выбор нескольких значений (блоков или элементов)
-			nest:1,          //выбор значения из вложенного списка
-
 			get_id:0,        //id записи, содержание которой будет размещаться в диалоге
 			edit_id:0,       //id записи при редактировании
 			del_id:0,        //id записи при удалении
+
+			dop:'',          //дополнительные параметры для некоторых элементов
 
 			busy_obj:null,   //объект, к которому применяется процесс ожидания
 			busy_cls:'_busy',//класс, показвыающий процесс ожидания
@@ -770,7 +769,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			var ATR_CMP = _attr_cmp(elm_id),
 				ATTR_CMP_AFICS = _attr_cmp(elm_id, 1),
 				ATTR_EL =  _attr_el(elm_id),
-				UNIT_V = unit.id ? _num(unit[el.col] || el.def) : 0;//значение для функции
+				UNIT_V = unit.id ? unit[el.col] || el.def : 0;//значение для функции
 
 			_elemHint(el);
 
@@ -846,23 +845,17 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var P = ATR_CMP.next(),
 						INP = P.find('.inp'),
 						DEL = P.find('.icon-del');
-
 					P.click(function() {
-						//выбранный диалог в селекте, на который указывает num_3
-						var DLG_SEL = 0;
-						if(el.num_3) {
-							var attr = ATTR_CMP(el.num_3);
-							DLG_SEL = _num(OBJ.dlg.D(attr).val());
-						}
-
 						_dialogLoad({
 							dialog_id:11,
 							block_id:el.block_id,
-							dss:DLG_SEL,
-							nest:_num(el.num_5),//выбор значений во вложенных списках
-							sev:_num(el.num_6), //выбор нескольких значений
 
-							elm_choose_sel:ATR_CMP.val(),
+							dop:{
+								nest:_num(el.num_5),//выбор значений во вложенных списках
+								sev:_num(el.num_6), //выбор нескольких значений
+								dlg_id:el.num_1 ? _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val()) : 0,//выбранный диалог в селекте, на который указывает num_1
+								sel:UNIT_V          //выбранные элементы
+							},
 
 							busy_obj:INP,
 							busy_cls:'hold',
@@ -2261,7 +2254,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			VC = D(ATTR_EL(el.id)).find('.elm-choose'),//элементы в открытом диалоге для выбора
 			sev = obj.srce.sev,                  //выбор нескольких значений
 			nest = !sev && obj.srce.nest ? 1 : 0;//выбор во вложенных списках
-
+_cons(vvv);
 		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
 		if(obj.srce.block_id) {
 			V11_CMP = D(ATTR_CMP(el.id));   //переменная в исходном диалоге для хранения значений
