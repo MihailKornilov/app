@@ -2267,6 +2267,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 			V11_V = vvv.sev ? _idsAss(vvv.sel) : []; //массив выбранных значений
 			V11_COUNT = 0;                  //счётчик открытых диалогов
 
+			if(vvv.sel)
+				V11_CMP.val(vvv.sel);
+
 			vvv.first = 0;
 		}
 

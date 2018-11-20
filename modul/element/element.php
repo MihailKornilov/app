@@ -1672,9 +1672,6 @@ function PHP12_v_choose($prm) {
 
 	$prm['dop'] = PHP12_v_choose_vvv($prm);
 
-	if($u = $prm['unit_edit'])
-		$prm['dop']['sel'] = $u['txt_2'];
-
 	//Изначально id диалога = false. По этому флагу будет определяться, в какой именно функции будет производиться поиск диалога
 	//В начале всегда проверяется прямое указание на диалог
 	$dialog_id = PHP12_v_choose_dss($prm);
@@ -1738,6 +1735,10 @@ function PHP12_v_choose_vvv($prm) {
 		'sel' => 0,     //выбранные значения
 		'first' => 1    //открытие первого диалога [11]. При этом создаются глобальные переменные в JS
 	);
+
+	if($u = $prm['unit_edit'])
+		$dop['sel'] = $u['txt_2'];
+
 	return $prm['dop'] + $dop;
 }
 function PHP12_v_choose_dss($prm) {//ID диалога из dss

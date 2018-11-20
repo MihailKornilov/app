@@ -323,7 +323,6 @@ function _spisokUnitDialog($unit_id) {//получение данных о ди�
 	return $dialog;
 }
 function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
-print_r($_POST);
 	$dialog = _spisokUnitDialog($unit_id);
 	$unitOld = _spisokUnitQuery($dialog, $unit_id);
 
@@ -1321,9 +1320,10 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 	//сам элемент [13]
 	if(!$el = $block['elem'])
 		return;
-
+//print_r($el);
 	//элементы, в которых используется перехват
 	switch($el['dialog_id']) {
+		case 7:
 		case 13:
 		case 62:
 		case 74:
