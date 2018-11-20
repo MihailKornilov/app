@@ -110,6 +110,8 @@ function _blockParam($PARAM, $obj_name='') {//значения-параметр�
 
 	if(!empty($PARAM['blk_choose']))
 		$PARAM['blk_setup'] = 1;
+	if(!empty($PARAM['elm_choose']))
+		$PARAM['blk_setup'] = 1;
 	if(!empty($PARAM['elm_width_change']))
 		$PARAM['blk_setup'] = 1;
 
@@ -179,9 +181,9 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 	$yEnd = key($block);
 
 	$send = '';
-	$BT = $PARAM['blk_setup'] ? ' bor-t-dash' : '';
-	$BR = $PARAM['blk_setup'] ? ' bor-r-dash' : '';
-	$BB = $PARAM['blk_setup'] ? ' bor-b-dash' : '';
+	$BT = $PARAM['blk_setup'] && !$PARAM['elm_choose'] ? ' bor-t-dash' : '';
+	$BR = $PARAM['blk_setup'] && !$PARAM['elm_choose'] ? ' bor-r-dash' : '';
+	$BB = $PARAM['blk_setup'] && !$PARAM['elm_choose'] ? ' bor-b-dash' : '';
 	$br1px = $PARAM['blk_setup'];//место в 1px для показа красной разделительной линии справа
 
 	foreach($block as $y => $str) {
@@ -885,6 +887,12 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+			//в самом себе выбор элемента невозможен
+			if($block_id = $prm['srce']['block_id'])//должен быть блок 2214
+				if($BL = _blockOne($block_id))
+					if($BL['obj_name'] == 'dialog' && $BL['obj_id'] == 13)
+						$disabled = ' disabled';
 
 			$v = _elemPrintV($el, $prm);
 

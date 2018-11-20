@@ -323,6 +323,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о ди�
 	return $dialog;
 }
 function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
+print_r($_POST);
 	$dialog = _spisokUnitDialog($unit_id);
 	$unitOld = _spisokUnitQuery($dialog, $unit_id);
 

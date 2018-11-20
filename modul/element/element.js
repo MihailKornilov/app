@@ -845,12 +845,17 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var P = ATR_CMP.next(),
 						INP = P.find('.inp'),
 						DEL = P.find('.icon-del');
+
+					if(INP.attr('disabled'))
+						return;
+
 					P.click(function() {
 						_dialogLoad({
 							dialog_id:11,
-							block_id:el.block_id,
+							block_id:OBJ.srce.block_id,
 
 							dop:{
+								is13:elm_id,
 								nest:_num(el.num_5),//выбор значений во вложенных списках
 								sev:_num(el.num_6), //выбор нескольких значений
 								dlg24:el.num_1 ? _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val()) : 0,//выбранный диалог в селекте, на который указывает num_1
@@ -859,6 +864,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 							busy_obj:INP,
 							busy_cls:'hold',
+//							func_open:PHP12_v_choose_submit
 							func_save:function(res) {
 								ATR_CMP.val(res.v);
 								INP.val(res.title);
@@ -2071,6 +2077,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 		var DS = window['EL' + el.id + '_DS'];
 		if(!DS)
 			return;
+		if(!obj.unit.id)
+			return;
 
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить условие</div>',
@@ -2132,11 +2140,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 			TITLE.click(function() {
 				_dialogLoad({
 					dialog_id:11,
-					dialog_source:DS,
-					block_id:obj.block_id,
-					prm:{
-						sel:v.txt_1,
-						nest:unit.src.prm.nest
+					dss:DS,
+					block_id:obj.srce.block_id,
+					dop:{
+						sel:v.txt_1
 					},
 					busy_obj:$(this),
 					busy_cls:'hold',
@@ -2302,36 +2309,38 @@ var DIALOG = {},//массив диалоговых окон для управл
 				block_id:obj.srce.block_id,
 				dss:ELMM[v].num_1,
 				dop:vvv,
-				func_open:function(res, dlg) {
-					dlg.submit(function() {
-						var sel = dlg.content.find('.elm-choose.sel');
-						if(!sel.length) {
-							dlg.err('Значение не выбрано');
-							return;
-						}
-
-						//проверка чтобы невозможно было выбрать элемент-список
-						var sel_v = sel.attr('val');
-						if(ELMM[sel_v].issp)
-							dlg.err('Не выбрано конечное значение ' + sel_v);
-
-						//закрытие всех открытых диалогов кроме последнего
-						_forIn(V11_DLG, function(sp, n) {
-							if(!_num(n))
-								return;
-							sp.close();
-						});
-
-						//запуск первого (исходного) диалога
-						V11_DLG[0].go();
-					});
-					dlg.closeFunc(function() {
-						V11_COUNT--;
-					});
-				}
+				func_open:PHP12_v_choose_submit
 			});
 		});
 	},
+	PHP12_v_choose_submit = function(res, dlg) {//действие после выбора значений. Используется для всех элементов, которые открывают диалог [11]
+		dlg.submit(function() {
+			var sel = dlg.content.find('.elm-choose.sel');
+			if(!sel.length) {
+				dlg.err('Значение не выбрано');
+				return;
+			}
+
+			//проверка чтобы невозможно было выбрать элемент-список
+			var sel_v = sel.attr('val');
+			if(ELMM[sel_v].issp)
+				dlg.err('Не выбрано конечное значение ' + sel_v);
+
+			//закрытие всех открытых диалогов кроме последнего
+			_forIn(V11_DLG, function(sp, n) {
+				if(!_num(n))
+					return;
+				sp.close();
+			});
+
+			//запуск первого (исходного) диалога
+			V11_DLG[0].go();
+		});
+		dlg.closeFunc(function() {
+			V11_COUNT--;
+		});
+	},
+
 
 	/* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 	PHP12_block_choose = function(el, vvv, obj) {
