@@ -1670,19 +1670,26 @@ function PHP12_dialog_del_setup($el, $unit) {
 /* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 function PHP12_v_choose($prm) {
 /*
-	DLG_NO_MSG - сообщение об ошибке при поиске диалога
-	DLG_SEL - выбранное значение
+	Исходные данные $prm['dop']:
+		sev     - выбор нескольких значений-элементов
+		nest    - возможность выбора из вложенного списка
+		dlg_id  - выбранный диалог через элемент [24]
+		sel     - выбранные значения
 */
 
+	if(!$block_id = _num($prm['srce']['block_id']))
+		return _emptyMin10('Отсутствует исходный блок.');
+	if(!$BL = _blockOne($block_id))
+		return _emptyMin10('Блока '.$block_id.' не существует.');
 
-//	sev:0,           //выбор нескольких значений (блоков или элементов)
-//	nest:1,          //выбор значения из вложенного списка
-//  sel - выбранные значения
+	//Изначально id диалога = false. По этому флагу будет определяться, в какой именно функции будет производиться поиск диалога
+	//В начале всегда проверяется прямое указание на диалог
+	$dialog_id = PHP12_v_choose_dss($prm);
+
+	//выбор элемента-значения через [13]
+	$dialog_id = PHP12_v_choose_13($BL, $prm, $dialog_id);
 
 
-//print_r($prm);
-
-	$dialog_id = 47;
 
 /*
 
@@ -1695,8 +1702,6 @@ function PHP12_v_choose($prm) {
 	//сборный текст
 	$dialog_id = PHP12_v_choose_44($prm, $dialog_id);
 
-	//выбор элемента-значения
-	$dialog_id = PHP12_v_choose_13($prm, $dialog_id);
 
 	//блок со страницы
 	$dialog_id = PHP12_v_choose_page($prm, $dialog_id);
@@ -1710,15 +1715,14 @@ function PHP12_v_choose($prm) {
 	//диалог принимает значения списка
 	$dialog_id = PHP12_v_choose_dialog_spisok_unit($prm, $dialog_id);
 
-	//ID диалога из dss
-	$dialog_id = PHP12_v_choose_ds($prm, $dialog_id);
-
-	if(defined('DLG_NO_MSG'))
-		return DLG_NO_MSG;
-
 */
+	if($dialog_id === false)
+		return _emptyMin10('Не найдена схема поиска диалога.');
 	if(!$dialog_id)
-		return _emptyMin10('Не найден диалог, который вносит данные списка.');
+		return _emptyMin10('Диалог не найден.');
+	//сообщение об ошибке из одной из схем поиска
+	if(!_num($dialog_id))
+		return _emptyMin10($dialog_id);
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin10('Диалога '.$dialog_id.' не существует.');
 
@@ -1736,23 +1740,10 @@ function PHP12_v_choose_vvv($prm) {
 	return $prm['dop'];
 }
 
-function PHP12_v_choose_ds($prm, $dialog_id) {//ID диалога из dss
-	if($dialog_id)
-		return $dialog_id;
-	return _num($prm['srce']['dss']);
-}
-function PHP12_v_choose_BL($prm) {//получение данных исходного блока
-	if(defined('DLG_NO_MSG'))
-		return 0;
-	if(!$block_id = _num($prm['srce']['block_id'])) {
-		define('DLG_NO_MSG', _emptyMin10('Отсутствует исходный блок.'));
-		return 0;
-	}
-	if(!$BL = _blockOne($block_id)) {//данные исходного блока
-		define('DLG_NO_MSG', _emptyMin10('Блока '.$block_id.' не существует.'));
-		return 0;
-	}
-	return $BL;
+function PHP12_v_choose_dss($prm) {//ID диалога из dss
+	if(!$dss = _num($prm['srce']['dss']))
+		return false;
+	return $dss;
 }
 function PHP12_v_choose_dialog_del($prm, $dialog_id) {//блок из содержания удаления единицы списка
 	if($dialog_id)
@@ -1790,26 +1781,26 @@ function PHP12_v_choose_44($prm, $dialog_id) {//сборный текст
 
 	return _num($BL['obj_id']);
 }
-function PHP12_v_choose_13($prm, $dialog_id) {//выбор элемента-значения
-	if($dialog_id)
+function PHP12_v_choose_13($BL, $prm, $dialog_id) {//выбор элемента-значения
+	if($dialog_id !== false)
 		return $dialog_id;
-	if(!$BL = PHP12_v_choose_BL($prm))
-		return 0;
 	if(!$EL = $BL['elem'])
-		return 0;
+		return false;
 	if($EL['dialog_id'] != 13)
-		return 0;
-
-	print_r($prm);
-	return 0;
+		return false;
 
 	//поиск диалога в выпадающем списке [24]
 	if($dlg_place = $EL['num_1']) {
-		$el = _elemOne($dlg_place);
-		print_r($el);
-		return _dialogSel24($dlg_place, $prm['srce']['dss']);
+		if(!$el = _elemOne($dlg_place))
+			return 'Элемента со списком диалогов не существует.';
+		if(!$dlg_id = $prm['dop']['dlg_id'])
+			return 'Не выбран диалог в списке';
+		return _dialogSel24($dlg_place, $dlg_id);
 	}
 
+	/*  */
+
+	return 'end';
 
 	//num_3 - элемент-значение поиска диалога
 	if(!$num_3_place = _num($EL['num_3'])) {//если пустое - получение исходного диалога

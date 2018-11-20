@@ -854,7 +854,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								nest:_num(el.num_5),//выбор значений во вложенных списках
 								sev:_num(el.num_6), //выбор нескольких значений
 								dlg_id:el.num_1 ? _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val()) : 0,//выбранный диалог в селекте, на который указывает num_1
-								sel:UNIT_V          //выбранные элементы
+								sel:ATR_CMP.val()   //выбранные элементы
 							},
 
 							busy_obj:INP,
@@ -2251,17 +2251,16 @@ var DIALOG = {},//массив диалоговых окон для управл
 	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 	PHP12_v_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
-			VC = D(ATTR_EL(el.id)).find('.elm-choose'),//элементы в открытом диалоге для выбора
-			sev = obj.srce.sev,                  //выбор нескольких значений
-			nest = !sev && obj.srce.nest ? 1 : 0;//выбор во вложенных списках
-_cons(vvv);
+			VC = D(ATTR_EL(el.id)).find('.elm-choose');//элементы в открытом диалоге для выбора
+
 		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
-		if(obj.srce.block_id) {
+		if(!vvv.create) {
 			V11_CMP = D(ATTR_CMP(el.id));   //переменная в исходном диалоге для хранения значений
 			V11_DLG = [];                   //массив диалогов, открывающиеся последовательно
-			V11_V = sev ? _idsAss(obj.unit.txt_2) : []; //массив выбранных значений
+			V11_V = vvv.sev ? _idsAss(vvv.sel) : []; //массив выбранных значений
 			V11_COUNT = 0;                  //счётчик открытых диалогов
-//			nest = 1;
+
+			vvv.create = 1;
 		}
 
 		//выбор одного из элеметов
@@ -2269,17 +2268,17 @@ _cons(vvv);
 			var t = $(this),
 				v = _num(t.attr('val'));
 
-			if(sev) {
+			if(vvv.sev) {
 				var sel = !t.hasClass('sel');
 				t[(sel ? 'add' : 'remove') + 'Class']('sel');
 				if(sel)
 					V11_V[v] = 1;
 				else
 					delete V11_V[v];
-				var vvv = [];
+				var v11 = [];
 				for(var k in V11_V)
-					vvv.push(k);
-				V11_CMP.val(vvv.join());
+					v11.push(k);
+				V11_CMP.val(v11.join());
 			} else {
 				VC.removeClass('sel');
 				t.addClass('sel');
@@ -2293,16 +2292,16 @@ _cons(vvv);
 			}
 
 			//нажатие по обычному элементу (не список)
-			if(!nest || !ELMM[v].issp)
+			if(vvv.sev || !vvv.nest || !ELMM[v].issp)
 				return;
 
 			V11_COUNT++;
 
 			_dialogLoad({
 				dialog_id:11,
+				block_id:obj.srce.block_id,
 				dss:ELMM[v].num_1,
-				sev:sev,
-				nest:nest,
+				dop:vvv,
 				func_open:function(res, dlg) {
 					dlg.submit(function() {
 						var sel = dlg.content.find('.elm-choose.sel');
