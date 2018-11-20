@@ -1293,6 +1293,10 @@ function _elemTitle($elem_id) {//имя элемента или его текс�
 			return $dlg['history'][$el['num_1']]['tmp'];
 		case 71: return 'sort';
 	}
+
+	if(_elemIsConnect($el))
+		return _dialogParam($el['num_1'], 'name');
+
 	return $el['name'];
 }
 function _elem_11_dialog($el) {//получение данных диалога по элементу 11
@@ -1443,6 +1447,18 @@ function _elem11title($EL) {//имя элемента, если нет запи�
 		return '<div class="fs10 color-acc">11.title</div>';
 
 	return $title;
+}
+
+function _elemIdsTitle($v) {//получение имён по id элементов
+	if(!$ids = _ids($v, 'arr'))
+		return '';
+
+	$send = '';
+	$znak = _elemIsConnect($ids[0]) ? ' » ' : ', ';
+	foreach($ids as $n => $id)
+		$send .= ($n ? $znak : '') . _elemTitle($id);
+
+	return $send;
 }
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
@@ -1670,11 +1686,7 @@ function PHP12_dialog_del_setup($el, $unit) {
 /* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 function PHP12_v_choose($prm) {
 /*
-	Исходные данные $prm['dop']:
-		sev     - выбор нескольких значений-элементов
-		nest    - возможность выбора из вложенного списка
-		dlg_id  - выбранный диалог через элемент [24]
-		sel     - выбранные значения
+	Исходные данные через PHP12_v_choose_vvv
 */
 
 	if(!$block_id = _num($prm['srce']['block_id']))
@@ -1737,7 +1749,14 @@ function PHP12_v_choose($prm) {
 	'';
 }
 function PHP12_v_choose_vvv($prm) {
-	return $prm['dop'];
+	$dop = array(
+		'sev' => 0,     // выбор нескольких значений-элементов
+		'nest' => 1,    // возможность выбора из вложенного списка
+		'dlg24' => 0,   // выбранный диалог через select [24]
+		'sel' => 0,     // выбранные значения
+		'first' => 1    // открытие первого диалога [11]. При этом создаются глобальные переменные в JS
+	);
+	return $prm['dop'] + $dop;
 }
 
 function PHP12_v_choose_dss($prm) {//ID диалога из dss
@@ -1793,9 +1812,9 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//выбор элемента
 	if($dlg_place = $EL['num_1']) {
 		if(!$el = _elemOne($dlg_place))
 			return 'Элемента со списком диалогов не существует.';
-		if(!$dlg_id = $prm['dop']['dlg_id'])
+		if(!$dlg24 = $prm['dop']['dlg24'])
 			return 'Не выбран диалог в списке';
-		return _dialogSel24($dlg_place, $dlg_id);
+		return _dialogSel24($dlg_place, $dlg24);
 	}
 
 	/*  */
@@ -2076,14 +2095,10 @@ function PHP12_elem22_vvv($prm) {//Дополнительные условия �
 		return array();
 
 	$send = array();
-	foreach($arr as $r) {
-		$title = '';
-		foreach(_ids($r['txt_1'], 'arr') as $n => $id)
-			$title .= ($n ? ' » ' : '')._elemTitle($id);
-
+	foreach($arr as $r)
 		$send[] = array(
 			'id' => _num($r['id']),
-			'title' => $title,
+			'title' => _elemIdsTitle($r['txt_1']),
 			'txt_1' => _ids($r['txt_1']),
 			'num_2' => _num($r['num_2']),
 			'txt_2' => $r['txt_2'],
@@ -2091,7 +2106,6 @@ function PHP12_elem22_vvv($prm) {//Дополнительные условия �
 			'spisok' => _29cnn($r['txt_1']),
 			'num_3' => _num($r['num_3'])
 		);
-	}
 
 	return $send;
 }

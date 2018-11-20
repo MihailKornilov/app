@@ -1343,13 +1343,9 @@ function _elem13_v_choose($block_id, $dialog, $POST_CMP) {//выбор знач�
 	if(!$v = $POST_CMP[$elem_func_id])
 		jsonError('Значение не выбрано');
 
-	$title = '';
-	foreach(_ids($v, 'arr') as $n => $id)
-		$title .= ($n ? ' » ' : '')._elemTitle($id);
-
 	$send = array(
 		'v' => $v,
-		'title' => $title,
+		'title' => _elemIdsTitle($v),
 		'issp' => 0,
 		'spisok' => array()
 	);

@@ -886,21 +886,14 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
-			$v = '';
-			$title = '';
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$v = $u[$col];
-				foreach(_ids($v, 'arr') as $n => $id)
-					$title .= ($n ? ' » ' : '')._elemTitle($id);
-			}
+			$v = _elemPrintV($el, $prm);
 
 			return
 			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 			'<div class="_selem dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
 				'<div class="icon icon-star pabs"></div>'.
 				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-				'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'.$title.'" />'.
+				'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
 			'</div>';
 
 		//Содержание единицы списка - шаблон
