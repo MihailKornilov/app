@@ -3058,12 +3058,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
-	/* ---=== НАСТРОЙКА БАЛАНСА - СУММ ЗНАЧЕНИЙ ЕДИНИЦЫ СПИСКА ===--- */
-	PHP12_balans_setup = function(el, unit) {
-		if(unit == 'get')
-			return PHP12_balans_get(el);
-
-		if(!unit.id)
+	/* ---=== НАСТРОЙКА БАЛАНСА - СУММ ЗНАЧЕНИЙ ЕДИНИЦЫ СПИСКА для [27] ===--- */
+	PHP12_balans_setup = function(el, vvv, obj) {
+		if(!obj.unit.id)
 			return;
 
 		var html = '<dl></dl>' +
@@ -3074,8 +3071,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		BUT_ADD.click(valueAdd);
 
-		for(var i in VVV[el.id])
-			valueAdd(VVV[el.id][i])
+		_forIn(vvv, valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -3104,14 +3100,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 			);
 
 			var DD = DL.find('dd:last'),
-				INP = DD.find('.inp'),
-				DS = BLKK[unit.src.block_id].obj_id;
+				INP = DD.find('.inp');
 			INP.click(function() {
 				_dialogLoad({
 					dialog_id:11,
-					dialog_source:DS,
-					block_id:unit.src.block_id,
-					unit_id:v.id,      //id выбранного элемента (при редактировании)
+					block_id:obj.srce.block_id,
+					edit_id:v.id,      //id выбранного элемента (при редактировании)
+					dop:{nest:0},
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {

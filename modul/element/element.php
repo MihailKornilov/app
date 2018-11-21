@@ -1667,6 +1667,9 @@ function PHP12_v_choose($prm) {
 	//блок из содержания удаления записи
 	$obj_id = PHP12_v_choose_dialog_del($BL, $obj_id);
 
+	//настройка баланса [27]
+	$obj_id = PHP12_v_choose_27balans($BL, $obj_id);
+
 /*
 
 	//сборный текст
@@ -1800,6 +1803,16 @@ function PHP12_v_choose_dialog_del($BL, $obj_id) {//блок из содержа
 	if($obj_id)
 		return $obj_id;
 	if($BL['obj_name'] != 'dialog_del')
+		return false;
+
+	return _num($BL['obj_id']);
+}
+function PHP12_v_choose_27balans($BL, $dialog_id) {//ячейка таблицы
+	if($dialog_id)
+		return $dialog_id;
+	if(!$EL = $BL['elem'])
+		return false;
+	if($EL['dialog_id'] != 27)
 		return false;
 
 	return _num($BL['obj_id']);
@@ -2669,16 +2682,16 @@ function PHP12_44_print($elem_id, $unit=array()) {//печать сборног�
 }
 
 
-/* ---=== НАСТРОЙКА БАЛАНСА - СУММ ЗНАЧЕНИЙ ЕДИНИЦЫ СПИСКА ===--- */
-function PHP12_balans_setup($el, $unit) {//используется в диалоге [27]
+/* ---=== НАСТРОЙКА БАЛАНСА - СУММ ЗНАЧЕНИЙ ЕДИНИЦЫ СПИСКА для [27] ===--- */
+function PHP12_balans_setup($prm) {
 	/*
 		все действия через JS
 
 		num_8: знак 1=вычитание, 0=сложение
 	*/
 
-	if(empty($unit['id']))
-		return '<div class="_empty min">Настройка значений будет доступна<br>после вставки элемента в блок.</div>';
+	if(!$prm['unit_edit'])
+		return _emptyMin('Настройка значений будет доступна<br>после вставки элемента в блок.');
 
 	return '';
 }
@@ -2737,10 +2750,13 @@ function PHP12_balans_setup_save($cmp, $val, $unit) {//сохранение со
 		query($sql);
 	}
 }
-function PHP12_balans_setup_vvv($parent_id) {
+function PHP12_balans_setup_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `parent_id`=".$parent_id."
+			WHERE `parent_id`=".$u['id']."
 			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))
 		return array();
