@@ -2165,7 +2165,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					block_id:obj.srce.block_id,
 					dop:{
 						mysave:1,
-						sel:v.txt_1
+						sel:v.txt_1,
+						nest:obj.srce.dop.nest
 					},
 					busy_obj:$(this),
 					busy_cls:'hold',
@@ -2746,8 +2747,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
-	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
-	PHP12_radio_setup = function(el, unit) {//для [16]
+	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO для [16] ===--- */
+	PHP12_radio_setup = function(el, vvv) {
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
 			ATTR_EL = _attr_el(el.id),
@@ -2757,7 +2758,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		BUT_ADD.click(valueAdd);
 
-		_forIn(VVV[el.id], valueAdd);
+		_forIn(vvv, valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -2826,12 +2827,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return send;
 	},
 
-	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА RADIO ===--- */
-	PHP12_filter_radio_setup = function(el, unit) {//для [74]
-		if(unit == 'get')
-			return PHP12_filter_radio_get(el);
-
-		if(!unit.id)
+	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА RADIO для [74] ===--- */
+	PHP12_filter_radio_setup = function(el, vvv, obj) {
+		if(!obj.unit.id)
 			return;
 
 		var html = '<dl></dl>' +
@@ -2854,10 +2852,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 		ATR_SP._select('disable');
 		BUT_ADD.click(valueAdd);
 
-		if(!VVV[el.id].length)
+		if(!vvv.length)
 			valueAdd();
 		else
-			_forIn(VVV[el.id], valueAdd);
+			_forIn(vvv, valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -2918,14 +2916,17 @@ var DIALOG = {},//массив диалоговых окон для управл
 				});
 
 			//добавление условия к значению
-			DD.find('.cond-setup').click(function() {
+			DD.find('.span-cs').click(function() {
+				var cs = $(this).find('.cond-setup');
+				if(!cs.length)
+					return;
 				_dialogLoad({
 					dialog_id:25,
-					dialog_source:ELMM[ATR_SP.val()].num_1,
-					block_id:unit.src.block_id,
-					unit_id:v.id,
-					prm:{nest:0},
-					busy_obj:$(this),
+					dss:ELMM[ATR_SP.val()].num_1,
+					block_id:obj.srce.block_id,
+					edit_id:v.id,
+					dop:{nest:0},
+					busy_obj:cs,
 					busy_cls:v.c ? '_busy' : 'spin',
 					func_save:function(ia) {
 						DD.find('.span-cs').html(_CS(1, ia.unit.func12));

@@ -354,7 +354,7 @@ function _spisokImage($spisok) {//вставка картинок
 	//проверка наличия колонки dialog_id в содержании списка
 	$key = key($spisok);
 	$sp0 = $spisok[$key];
-	if(!isset($sp0['dialog_id']))
+	if(empty($sp0['dialog_id']))
 		return $spisok;
 
 	$DLG = _dialogQuery($sp0['dialog_id']);

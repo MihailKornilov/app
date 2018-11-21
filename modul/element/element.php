@@ -2300,8 +2300,8 @@ function PHP12_menu_block_arr($parent_id) {//получение данных о 
 
 
 
-/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */
-function PHP12_radio_setup() {//используется в диалоге [16]
+/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO для [16] ===--- */
+function PHP12_radio_setup() {
 	return '';
 }
 function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение значений radio
@@ -2385,10 +2385,13 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 			WHERE `id`=".$unit['id'];
 	query($sql);
 }
-function PHP12_radio_setup_vvv($parent_id) {
+function PHP12_radio_setup_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `parent_id`=".$parent_id."
+			WHERE `parent_id`=".$u['id']."
 			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))
 		return array();
@@ -2404,7 +2407,7 @@ function PHP12_radio_setup_vvv($parent_id) {
 		);
 	}
 
-	$send = PHP12_radio_setup_vvv_use($send, $parent_id);
+	$send = PHP12_radio_setup_vvv_use($send, $u['id']);
 
 	return $send;
 }
@@ -2443,11 +2446,10 @@ function PHP12_radio_setup_vvv_use($send, $parent_id) {//использован�
 }
 
 
-/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА RADIO ===--- */
-function PHP12_filter_radio_setup($el, $unit) {//используется в диалоге [74]
-	if(empty($unit['id']))
-		return '<div class="_empty min">Настройка значений фильтра будет доступна<br>после вставки элемента в блок.</div>';
-
+/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА RADIO для [74] ===--- */
+function PHP12_filter_radio_setup($prm) {
+	if(!$prm['unit_edit'])
+		return _emptyMin('Настройка значений фильтра будет доступна<br>после вставки элемента в блок.');
 	return '';
 }
 function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранение значений фильтра radio
@@ -2530,10 +2532,13 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 			WHERE `id`=".$parent_id;
 	query($sql);
 }
-function PHP12_filter_radio_setup_vvv($parent_id) {
+function PHP12_filter_radio_setup_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `parent_id`=".$parent_id."
+			WHERE `parent_id`=".$u['id']."
 			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))
 		return array();
