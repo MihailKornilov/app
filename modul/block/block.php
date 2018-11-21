@@ -398,21 +398,23 @@ function _blockSetka($bl, $prm, $grid_id, $level) {//отображение се
 
 	return '<div class="block-unit level'.$BLD.' '.($grid_id ? ' grid' : '').'" val="'.$bl['id'].'"></div>';
 }
-function _blockChoose($bl, $prm, $level) {//подсветка блоков для выбора (к функциям)
+function _blockChoose($bl, $prm, $level) {//подсветка блоков для выбора
 	if(!$prm['blk_choose'])
 		return '';
 	if($prm['blk_level'] != $level)
 		return '';
 
-	//отметка выбранных полей
 	$id = $bl['id'];
-//	$sel = isset($prm['blk_sel'][$block_id]) ? ' sel' : '';
-//	$deny = isset($prm['blk_deny'][$block_id]) ? ' deny' : '';
-	$ass = _idsAss($prm['blk_choose_sel']);
-	$sel = isset($ass[$id]) ? ' sel' : '';
 
+	//подсветка блоков, которые запрещено выбирать
+	$ass = _idsAss($prm['blk_deny']);
+	$deny = isset($ass[$id]) ? ' deny' : '';
 
-	return '<div class="blk-choose'.$sel.'" val="'.$id.'"></div>';
+	//подсветка выбранный блоков
+	$ass = _idsAss($prm['blk_sel']);
+	$sel = isset($ass[$id]) && !$deny ? ' sel' : '';
+
+	return '<div class="blk-choose'.$sel.$deny.'" val="'.$id.'"></div>';
 }
 function _blockElemChoose($bl, $prm) {//подсветка элементов для выбора значения
 	//(не)разрешён выбор значения
@@ -1296,18 +1298,14 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				1159 => 1
 			);
 
-			//получение пунктов меню
-			$vvv = PHP12_menu_block_setup_vvv($el['id']);
-
 			$razdel = '';
-			foreach($vvv as $r) {
+			foreach(PHP12_menu_block_arr($el['id']) as $r) {
 				$sel = _dn($el['def'] != $r['id'], 'sel');
 				$razdel .= '<a class="link'.$sel.'">'.$r['title'].'</a>';
 			}
 
-			return
-				'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$el['def'].'" />'.
-				'<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
+			return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$el['def'].'" />'.
+				   '<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
 
 		//Связка списка при помощи кнопки
 		case 59:

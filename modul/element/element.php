@@ -955,17 +955,8 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		//SA: Select - выбор диалогового окна
 		case 38: return _dialogSelArray();
 
-		//Меню переключения блоков - список пунктов
-		case 57:
-			$send = array();
-			foreach(PHP12_menu_block_setup_vvv($elem_id) as $v) {
-				$send[] = array(
-					'id' => $v['id'],
-					'title' => $v['title'],
-					'blk' => $v['blk']
-				);
-			}
-			return $send;
+		//Меню переключения блоков - список пунктов для управления в рабочей версии
+		case 57: return PHP12_menu_block_arr($elem_id);
 
 		//Цвета для фона
 		case 70:
@@ -1056,32 +1047,6 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 	}
 
 	return array();
-
-/*
-		//SA: Select - дублирование
-		case 41:
-			//Отсутствует ID исходного блока.
-			if(!$block_id)
-				break;
-
-			$BL = _blockOne($block_id);
-
-			//Исходный блок не является блоком из диалога
-			if($BL['obj_name'] != 'dialog')
-				break;
-
-			//Отсутствует исходный элемент
-			if(!$EL = $BL['elem'])
-				break;
-
-			//Исходный элемент не является выпадающим полем
-			if($EL['dialog_id'] != 17 && $EL['dialog_id'] != 18)
-				break;
-
-			$dialog['cmp'][$cmp_id]['txt_1'] = $EL['txt_1'];
-			$dialog['cmp'][$cmp_id]['vvv'] = _elemValue($EL['id']);
-			break;
-*/
 }
 function _elemVvv37($prm) {//select - выбор имени колонки [37]
 	if(!$block = _blockOne($prm['srce']['block_id']))
@@ -1673,7 +1638,7 @@ function PHP12_v_choose($prm) {
 /*
 	Исходные данные через PHP12_v_choose_vvv
 
-	OBJ_NAME_CHOOSE - по умолчанию диалог. Будет меняться, если требуется
+	OBJ_NAME_CHOOSE - по умолчанию выводится диалог. Будет меняться, если требуется
 */
 
 	if(!$block_id = _num($prm['srce']['block_id']))
@@ -1696,25 +1661,16 @@ function PHP12_v_choose($prm) {
 	//блок со страницы
 	$obj_id = PHP12_v_choose_page($BL, $obj_id);
 
+	//элемент записи
+	$obj_id = PHP12_v_choose_spisok($BL, $obj_id);
+
+	//блок из содержания удаления записи
+	$obj_id = PHP12_v_choose_dialog_del($BL, $obj_id);
 
 /*
 
-	//блок из содержания удаления единицы списка
-	$obj_id = PHP12_v_choose_dialog_del($prm, $obj_id);
-
 	//сборный текст
 	$obj_id = PHP12_v_choose_44($prm, $obj_id);
-
-
-
-	//элемент единицы списка
-	$obj_id = PHP12_v_choose_spisok($prm, $obj_id);
-
-	//страница принимает значения списка
-	$obj_id = PHP12_v_choose_page_spisok_unit($prm, $obj_id);
-
-	//диалог принимает значения списка
-	$obj_id = PHP12_v_choose_dialog_spisok_unit($prm, $obj_id);
 
 */
 	if($obj_id === false)
@@ -1830,17 +1786,25 @@ function PHP12_v_choose_page($BL, $dialog_id) {//блок со страницы
 
 	return $dialog_id;
 }
+function PHP12_v_choose_spisok($BL, $obj_id) {//элемент из записи
+	if($obj_id)
+		return $obj_id;
+	if($BL['obj_name'] != 'spisok')
+		return false;
+	if(!$el = _elemOne($BL['obj_id']))
+		return 'Элемента-списка не существует.';
 
-function PHP12_v_choose_dialog_del($prm, $dialog_id) {//блок из содержания удаления единицы списка
-	if($dialog_id)
-		return $dialog_id;
-	if(!$BL = PHP12_v_choose_BL($prm))
-		return 0;
+	return $el['num_1'];
+}
+function PHP12_v_choose_dialog_del($BL, $obj_id) {//блок из содержания удаления единицы списка
+	if($obj_id)
+		return $obj_id;
 	if($BL['obj_name'] != 'dialog_del')
-		return 0;
+		return false;
 
 	return _num($BL['obj_id']);
 }
+
 function PHP12_v_choose_44($prm, $dialog_id) {//сборный текст
 	if($dialog_id)
 		return $dialog_id;
@@ -1855,38 +1819,6 @@ function PHP12_v_choose_44($prm, $dialog_id) {//сборный текст
 
 	return _num($BL['obj_id']);
 }
-function PHP12_v_choose_spisok($prm, $dialog_id) {//элемент единицы списка
-	if($dialog_id)
-		return $dialog_id;
-	if(!$BL = PHP12_v_choose_BL($prm))
-		return 0;
-	if($BL['obj_name'] != 'spisok')
-		return 0;
-
-	$el_spisok = _elemOne($BL['obj_id']);
-	return $el_spisok['num_1'];
-}
-function PHP12_v_choose_page_spisok_unit($prm, $dialog_id) {//страница принимает значения списка
-	if($dialog_id)
-		return $dialog_id;
-
-	$page = _page($prm['srce']['page_id']);
-	return _num($page['dialog_id_unit_get']);
-}
-function PHP12_v_choose_dialog_spisok_unit($prm, $dialog_id) {//диалог принимает значения списка
-	if($dialog_id)
-		return $dialog_id;
-	if(!$BL = PHP12_v_choose_BL($prm))
-		return 0;
-	if($BL['obj_name'] != 'dialog')
-		return 0;
-	if(!$dlg = _dialogQuery($BL['obj_id']))
-		return 0;
-	if($dlg['dialog_id_parent'])
-		return _num($dlg['dialog_id_parent']);
-
-	return 0;
-}
 
 
 
@@ -1895,7 +1827,7 @@ function PHP12_block_choose($prm) {
 	if(!$block_id = _num($prm['srce']['block_id']))
 		return _emptyMin10('Отсутствует исходный блок.');
 	if(!$BL = _blockOne($block_id))
-		return _emptyMin10('Исходного блока '.$block_id.' не существует.');
+		return _emptyMin10('Блока '.$block_id.' не существует.');
 
 	$obj_name = $BL['obj_name'];
 	$obj_id = $BL['obj_id'];
@@ -1917,22 +1849,24 @@ function PHP12_block_choose($prm) {
 			return _emptyMin10('Неизвестный объект <b>'.$obj_name.'</b>.');
 	}
 
-	//запрет изменения уровня блоков. Только верхний (первый) уровень
-//	$level_deny = _num(@$PRM['level_deny']);
+	$prm['dop'] += array(
+		'level_deny' => 0,  //запрет изменения уровня блоков. Только верхний (первый) уровень
+		'blk_deny' => 0,    //блоки, которые запрещено выбирать
+		'sel' => 0          //выбранные блоки
+	);
 
-//	$unit += _unitGet($obj_name, $obj_id);
-	$unit = array(
+	$cond = array(
 		'blk_choose' => 1,
-//		'blk_level' => $level_deny ? 1 : _blockLevelDefine($obj_name),
-		'blk_choose_sel' => $prm['blk_choose_sel'],    //ids ранее выбранных блоков
-//		'blk_deny' => _idsAss(@$PRM['deny'])  //блоки, которые запрещено выбирать
+		'blk_level' => $prm['dop']['level_deny'] ? 1 : _blockLevelDefine($obj_name),
+		'blk_deny' => $prm['dop']['blk_deny'],
+		'blk_sel' => $prm['dop']['sel']
 	);
 
 	return
 	'<div class="fs14 pad10 pl15 bg-orange">'.$title.' <b class="fs14">'.$name.'</b>:</div>'.
-//	($level_deny ? '' : PHP12_block_choose_but_level($obj_name, $obj_id)).
+	($prm['dop']['level_deny'] ? '' : PHP12_block_choose_but_level($obj_name, $obj_id)).
 	'<div id="block-choose-div">'.
-		_blockHtml($obj_name, $obj_id, $unit).
+		_blockHtml($obj_name, $obj_id, $cond).
 	'</div>';
 }
 function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уровня блоков
@@ -2251,9 +2185,7 @@ function PHP12_spisok_td_setting_vvv($prm) {//получение данных я
 
 
 /* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ ===--- */
-function PHP12_menu_block_setup($el, $unit) {//используется в диалоге [57]
-	if(_elemUnitIsSetup($unit))
-		return '<div class="_empty min">Настройка пунктов меню переключения блоков</div>';
+function PHP12_menu_block_setup() {//используется в диалоге [57]
 	return '';
 }
 function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение данных о пунктах меню
@@ -2338,13 +2270,16 @@ function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение 
 			WHERE `id`=".$parent_id;
 	query($sql);
 }
-function PHP12_menu_block_setup_vvv($prm) {//получение данных о пунктах меню
+function PHP12_menu_block_setup_vvv($prm) {//получение данных о пунктах меню для настройки
 	if(!$u = $prm['unit_edit'])
 		return array();
 
+	return PHP12_menu_block_arr($u['id']);
+}
+function PHP12_menu_block_arr($parent_id) {//получение данных о пунктах меню
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `parent_id`=".$u['id']."
+			WHERE `parent_id`=".$parent_id."
 			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))
 		return array();
@@ -2361,6 +2296,7 @@ function PHP12_menu_block_setup_vvv($prm) {//получение данных о 
 
 	return $spisok;
 }
+
 
 
 /* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO ===--- */

@@ -1070,7 +1070,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 						_dialogLoad({
 							dialog_id:19,
 							block_id:OBJ.srce.block_id,
-							blk_choose_sel:ATR_CMP.val(),
+							dop:{
+								sel:ATR_CMP.val()
+							},
 							busy_obj:INP,
 							busy_cls:'hold',
 							func_save:function(res) {
@@ -2423,12 +2425,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 
 	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ ===--- */
-	PHP12_menu_block_setup = function(el, unit) {//используется в диалоге [57]
-
-		//получение данных для сохранения
-		if(unit == 'get')
-			return PHP12_menu_block_get(el);
-
+	PHP12_menu_block_setup = function(el, vvv, obj) {//используется в диалоге [57]
 		var ATR_EL = _attr_el(el.id),
 			html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Новый пункт меню</div>',
@@ -2447,10 +2444,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		BUT_ADD.click(valueAdd);
 
-		if(!VVV[el.id].length)
+		if(!vvv.length)
 			valueAdd();
 		else
-			_forIn(VVV[el.id], valueAdd);
+			_forIn(vvv, valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -2498,18 +2495,18 @@ var DIALOG = {},//массив диалоговых окон для управл
 					if(_num(sp.attr('data-num')) == v.num)
 						return;
 					_forN(sp.find('.pk-block').attr('val').split(','), function(id) {
-						deny.push(id);
+						if(id)
+							deny.push(id);
 					});
 				});
 
 				_dialogLoad({
 					dialog_id:19,
-					dialog_source:0,
-					block_id:unit.src.block_id,
-					prm:{
+					block_id:obj.srce.block_id,
+					dop:{
 						level_deny:1,
-						sel:BLOCK.attr('val'),
-						deny:deny
+						blk_deny:deny.join(),
+						sel:BLOCK.attr('val')
 					},
 					busy_obj:BLOCK,
 					busy_cls:'hold',
