@@ -2547,7 +2547,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 		}
 	},
-	PHP12_menu_block_get = function(el) {
+	PHP12_menu_block_setup_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
@@ -2702,7 +2702,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 		}
 	},
-	PHP12_spisok_td_get = function(el) {//сохранение ячеек таблицы
+	PHP12_spisok_td_setting_get = function(el) {//сохранение ячеек таблицы
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			var v = {},
@@ -2816,7 +2816,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			NUM++;
 		}
 	},
-	PHP12_radio_get = function(el) {
+	PHP12_radio_setup_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
@@ -2951,7 +2951,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 		}
 	},
-	PHP12_filter_radio_get = function(el) {//получение данных для сохранения
+	PHP12_filter_radio_setup_get = function(el) {//получение данных для сохранения
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
@@ -3046,7 +3046,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			NUM++;
 		}
 	},
-	PHP12_44_get = function(el) {
+	PHP12_44_setup_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			var id = _num(sp.attr('val'));
@@ -3145,7 +3145,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 		}
 	},
-	PHP12_balans_get = function(el) {
+	PHP12_balans_setup_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			var id = _num(sp.attr('val'));
@@ -3329,7 +3329,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			DD.find('.txt_7').focus();
 		}
 	},
-	PHP12_history_get = function(el) {
+	PHP12_history_setup_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			//выделение: b, i, u

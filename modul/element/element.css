@@ -118,6 +118,7 @@
 #elem-group .elem-unit .num{font:14px Verdana}
 #elem-group .elem-unit .b{font:bold 14px Verdana}
 #elem-group .elem-unit:hover{background-color:#feb;border:#EFD68D solid 1px}
+#elem-group .elem-unit._busy{opacity:.4}
 #elem-group .elem-unit:not(.red):hover{color:#333}
 #elem-group .elem-unit:not(:hover) .icon:not(.spin){display:none}
 #elem-group-content{background-color:#EBF0F3}

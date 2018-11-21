@@ -1037,7 +1037,7 @@ function _dialogOpenLoad($dialog_id) {
 	$prm['srce']['block_id'] = _num($_POST['block_id'], 1);
 	$prm['srce']['dss'] = _num($_POST['dss']);
 
-	$prm['dop'] = _arrNum($_POST['dop']);
+	$prm['dop'] = _arrNum(@$_POST['dop']);
 
 	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
 

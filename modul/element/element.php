@@ -1019,6 +1019,9 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 					ORDER BY `sort`";
 			return query_arr($sql);
 
+		//Фильтр: Select - привязанный список
+		case 83: return _elem102CnnList($el['txt_2']);
+
 		//Select - выбор значения списка. Для значений по умолчанию.
 		case 85:
 			if(!$u = $prm['unit_edit'])
@@ -1078,9 +1081,6 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 			$dialog['cmp'][$cmp_id]['txt_1'] = $EL['txt_1'];
 			$dialog['cmp'][$cmp_id]['vvv'] = _elemValue($EL['id']);
 			break;
-
-		//Фильтр: Select - привязанный список
-		case 83: return _elem102CnnList($el['txt_2']);
 */
 }
 function _elemVvv37($prm) {//select - выбор имени колонки [37]
@@ -1672,6 +1672,8 @@ function PHP12_elem_choose_gebug($BL) {//выбор элемента - груп�
 function PHP12_v_choose($prm) {
 /*
 	Исходные данные через PHP12_v_choose_vvv
+
+	OBJ_NAME_CHOOSE - по умолчанию диалог. Будет меняться, если требуется
 */
 
 	if(!$block_id = _num($prm['srce']['block_id']))
@@ -1681,49 +1683,68 @@ function PHP12_v_choose($prm) {
 
 	$prm['dop'] = PHP12_v_choose_vvv($prm);
 
-	//Изначально id диалога = false. По этому флагу будет определяться, в какой именно функции будет производиться поиск диалога
+	//Изначально obj_id = false. По этому флагу будет определяться, в какой именно функции будет производиться поиск объекта
 	//В начале всегда проверяется прямое указание на диалог
-	$dialog_id = PHP12_v_choose_dss($prm);
+	$obj_id = PHP12_v_choose_dss($prm);
 
 	//выбор элемента-значения через [13]
-	$dialog_id = PHP12_v_choose_13($BL, $prm, $dialog_id);
+	$obj_id = PHP12_v_choose_13($BL, $prm, $obj_id);
 
 	//ячейка таблицы
-	$dialog_id = PHP12_v_choose_23($BL, $dialog_id);
+	$obj_id = PHP12_v_choose_23($BL, $obj_id);
 
 	//блок со страницы
-	$dialog_id = PHP12_v_choose_page($BL, $dialog_id);
+	$obj_id = PHP12_v_choose_page($BL, $obj_id);
 
 
 /*
 
 	//блок из содержания удаления единицы списка
-	$dialog_id = PHP12_v_choose_dialog_del($prm, $dialog_id);
+	$obj_id = PHP12_v_choose_dialog_del($prm, $obj_id);
 
 	//сборный текст
-	$dialog_id = PHP12_v_choose_44($prm, $dialog_id);
+	$obj_id = PHP12_v_choose_44($prm, $obj_id);
 
 
 
 	//элемент единицы списка
-	$dialog_id = PHP12_v_choose_spisok($prm, $dialog_id);
+	$obj_id = PHP12_v_choose_spisok($prm, $obj_id);
 
 	//страница принимает значения списка
-	$dialog_id = PHP12_v_choose_page_spisok_unit($prm, $dialog_id);
+	$obj_id = PHP12_v_choose_page_spisok_unit($prm, $obj_id);
 
 	//диалог принимает значения списка
-	$dialog_id = PHP12_v_choose_dialog_spisok_unit($prm, $dialog_id);
+	$obj_id = PHP12_v_choose_dialog_spisok_unit($prm, $obj_id);
 
 */
-	if($dialog_id === false)
-		return _emptyMin10('Не найдена схема поиска диалога.');
-	if(!$dialog_id)
-		return _emptyMin10('Диалог не найден.');
+	if($obj_id === false)
+		return _emptyMin10('Не найдена схема поиска объекта.');
+	if(!$obj_id)
+		return _emptyMin10('Объект не найден.');
 	//сообщение об ошибке из одной из схем поиска
-	if(!_num($dialog_id))
-		return _emptyMin10($dialog_id);
-	if(!$dialog = _dialogQuery($dialog_id))
-		return _emptyMin10('Диалога '.$dialog_id.' не существует.');
+	if(!_num($obj_id))
+		return _emptyMin10($obj_id);
+
+	if(!defined('OBJ_NAME_CHOOSE'))
+		define('OBJ_NAME_CHOOSE', 'dialog');
+
+	switch(OBJ_NAME_CHOOSE) {
+		case 'page':
+			if(!$page = _page($obj_id))
+				return _emptyMin10('Страницы '.$obj_id.' не существует.');
+			$TITLE = 'Страница';
+			$NAME = $page['name'];
+			break;
+		case 'dialog':
+			if(!$dialog = _dialogQuery($obj_id))
+				return _emptyMin10('Диалога '.$obj_id.' не существует.');
+			$TITLE = 'Диалоговое окно';
+			$NAME = $dialog['name'];
+			break;
+		default:
+			return _emptyMin10('Неизвестный объект <b>'.OBJ_NAME_CHOOSE.'</b>.');
+	}
+
 
 	$cond = array(
 		'elm_choose' => 1,
@@ -1731,8 +1752,8 @@ function PHP12_v_choose($prm) {
 	);
 
 	return
-	'<div class="fs14 pad10 pl15 bg-orange line-b">Диалоговое окно <b class="fs14">'.$dialog['name'].'</b>:</div>'.
-	_blockHtml('dialog', $dialog_id, $cond).
+	'<div class="fs14 pad10 pl15 bg-orange line-b">'.$TITLE.' <b class="fs14">'.$NAME.'</b>:</div>'.
+	_blockHtml(OBJ_NAME_CHOOSE, $obj_id, $cond).
 	'';
 }
 function PHP12_v_choose_vvv($prm) {
@@ -1774,9 +1795,17 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 		return _dialogSel24($dlg_place, $dlg24);
 	}
 
-	//если не указан на элемент со списком диалогов, открывается исходный диалог
-	if($BL['obj_name'] != 'dialog')
-		return 'Исходный блок не из диалога';
+	//если список, получение id диалога, размещающего список
+	if($BL['obj_name'] == 'spisok') {
+		if(!$el = _elemOne($BL['obj_id']))
+			return 'Элемента, размещающего список, не существует.';
+		return $el['num_1'];
+	}
+
+	//также может происходить выбор со страницы
+	if($BL['obj_name'] == 'page')
+		define('OBJ_NAME_CHOOSE', 'page');
+
 	return $BL['obj_id'];
 }
 function PHP12_v_choose_23($BL, $dialog_id) {//ячейка таблицы

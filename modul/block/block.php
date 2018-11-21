@@ -1562,6 +1562,31 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'class' => _dn($prm['blk_setup'] || $diff)
 					));
 
+		//Фильтр: Select - привязанный список
+		case 83:
+			/*
+                num_1 - список, на который воздействует фильтр
+				txt_1 - нулевое значение
+                txt_2 - привязанный список
+			*/
+
+			$v = _spisokFilter('v', $el['id']);
+			if($v === false) {
+				$v = 0;
+				_spisokFilter('insert', array(
+					'spisok' => $el['num_1'],
+					'filter' => $el['id'],
+					'v' => $v
+				));
+			}
+
+			return _select(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => $v
+				   ));
+
 		//Select - выбор значения списка по умолчанию
 		case 85:
 			/*
@@ -1834,31 +1859,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 			/*
 			*/
 			return 'порядок';
-
-		//Фильтр: Select - привязанный список
-		case 83:
-			/*
-                num_1 - список, на который воздействует фильтр
-				txt_1 - нулевое значение
-                txt_2 - привязанный список
-			*/
-
-			$v = _spisokFilter('v', $el['id']);
-			if($v === false) {
-				$v = 0;
-				_spisokFilter('insert', array(
-					'spisok' => $el['num_1'],
-					'filter' => $el['id'],
-					'v' => $v
-				));
-			}
-
-			return _select(array(
-						'attr_id' => $attr_id,
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'value' => $v
-				   ));
 	}
 }
 
