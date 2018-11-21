@@ -1688,6 +1688,9 @@ function PHP12_v_choose($prm) {
 	//выбор элемента-значения через [13]
 	$dialog_id = PHP12_v_choose_13($BL, $prm, $dialog_id);
 
+	//ячейка таблицы
+	$dialog_id = PHP12_v_choose_23($BL, $dialog_id);
+
 	//блок со страницы
 	$dialog_id = PHP12_v_choose_page($BL, $dialog_id);
 
@@ -1696,9 +1699,6 @@ function PHP12_v_choose($prm) {
 
 	//блок из содержания удаления единицы списка
 	$dialog_id = PHP12_v_choose_dialog_del($prm, $dialog_id);
-
-	//ячейка таблицы
-	$dialog_id = PHP12_v_choose_23($prm, $dialog_id);
 
 	//сборный текст
 	$dialog_id = PHP12_v_choose_44($prm, $dialog_id);
@@ -1779,6 +1779,16 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 		return 'Исходный блок не из диалога';
 	return $BL['obj_id'];
 }
+function PHP12_v_choose_23($BL, $dialog_id) {//ячейка таблицы
+	if($dialog_id)
+		return $dialog_id;
+	if(!$EL = $BL['elem'])
+		return false;
+	if($EL['dialog_id'] != 23)
+		return false;
+
+	return _num($EL['num_1']);
+}
 function PHP12_v_choose_page($BL, $dialog_id) {//блок со страницы
 	if($dialog_id !== false)
 		return $dialog_id;
@@ -1801,18 +1811,6 @@ function PHP12_v_choose_dialog_del($prm, $dialog_id) {//блок из содер
 		return 0;
 
 	return _num($BL['obj_id']);
-}
-function PHP12_v_choose_23($prm, $dialog_id) {//ячейка таблицы
-	if($dialog_id)
-		return $dialog_id;
-	if(!$BL = PHP12_v_choose_BL($prm))
-		return 0;
-	if(!$EL = $BL['elem'])
-		return 0;
-	if($EL['dialog_id'] != 23)
-		return 0;
-
-	return _num($EL['num_1']);
 }
 function PHP12_v_choose_44($prm, $dialog_id) {//сборный текст
 	if($dialog_id)
@@ -2192,10 +2190,13 @@ function PHP12_spisok_td_setting_save($cmp, $val, $unit) {//сохранение
 			  AND !`num_8`";
 	query($sql);
 }
-function PHP12_spisok_td_setting_vvv($parent_id) {//получение данных ячеек таблицы
+function PHP12_spisok_td_setting_vvv($prm) {//получение данных ячеек таблицы
+	if(!$u = $prm['unit_edit'])
+		return array();
+
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `parent_id`=".$parent_id."
+			WHERE `parent_id`=".$u['id']."
 			  AND `num_8`
 			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))

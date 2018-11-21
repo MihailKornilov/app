@@ -2060,8 +2060,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 			_dialogLoad({
 				dialog_id:t.attr('val'),
 				block_id:obj.send.block_id,
-				func_save:function() {
+				busy_obj:t,
+				busy_cls:'_busy',
+				func_save:function(res) {
 					obj.dlg.close();
+					if(obj.send.func_save)
+						return obj.send.func_save(res);
 					return true;
 				}
 			});
@@ -2359,7 +2363,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			V11_COUNT--;
 		});
 	},
-	PHP12_v_choose_get = function(el, obj) {
+	PHP12_v_choose_get = function(el, obj) {//отправка значений настройки для определения типа сохранения данных. Конкретно по "mysave"
 		return obj.vvv[el.id];
 	},
 
@@ -2633,7 +2637,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				_dialogLoad({
 					dialog_id:v.dialog_id,
 					block_id:obj.srce.block_id,  //блок, в котором размещена таблица
-					unit_id:v.id,                   //id выбранного элемента (при редактировании)
+					edit_id:v.id,                //id выбранного элемента (при редактировании)
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
