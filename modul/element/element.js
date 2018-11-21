@@ -850,6 +850,21 @@ var DIALOG = {},//массив диалоговых окон для управл
 						return;
 
 					P.click(function() {
+						var dlg24 = 0;
+						if(el.num_1) {
+							dlg24 = _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
+							if(!dlg24) {
+								_attr_cmp(el.num_1, 1)._flash({color:'red'});
+								_attr_cmp(elm_id, 1)._hint({
+									msg:'Не выбрано значение',
+									color:'red',
+									pad:10,
+									show:1
+								});
+								return;
+							}
+						}
+
 						_dialogLoad({
 							dialog_id:11,
 							block_id:OBJ.srce.block_id,
@@ -859,7 +874,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								is13:elm_id,
 								nest:_num(el.num_5),//выбор значений во вложенных списках
 								sev:_num(el.num_6), //выбор нескольких значений
-								dlg24:el.num_1 ? _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val()) : 0,//выбранный диалог в селекте, на который указывает num_1
+								dlg24:dlg24,        //выбранный диалог в селекте, на который указывает num_1
 								sel:ATR_CMP.val()   //выбранные элементы
 							},
 

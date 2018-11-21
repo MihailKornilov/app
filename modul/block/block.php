@@ -1636,15 +1636,15 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			/*
                 num_1 - список, на который воздействует фильтр
 				txt_1 - нулевое значение
-                txt_2 - привязанный список
-                txt_3 - счётчик количеств
-                txt_4 - путь к цветам
+                txt_2 - привязанный список (зависит от num_1)
+                txt_3 - счётчик количеств  (зависит от num_1)
+                txt_4 - путь к цветам (зависит от num_1)
 			*/
 
 			$v = _spisokFilter('v', $el['id']);
 			if($v === false) {
 				$cond = _22cond($el['id']);
-				$v = _elemSpisokConnect($el['txt_2'], 'ids', $cond);
+				$v = _elem102CnnList($el['txt_2'], 'ids', $cond);
 				_spisokFilter('insert', array(
 					'spisok' => $el['num_1'],
 					'filter' => $el['id'],
@@ -1654,22 +1654,22 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			$vAss = _idsAss($v);
 
-			//количества
-			$count = _elemSpisokConnect($el['txt_3'], 'ass');
+			//ассоциативный массив с количествами
+			$countAss = _elem102CnnList($el['txt_3'], 'ass');
 
-			//цвета
-			$color = _elemSpisokConnect($el['txt_4'], 'ass');
+			//ассоциативный массив с цветами
+			$bgAss = _elem102CnnList($el['txt_4'], 'ass');
 
-			$title = '';//для JS
+			$title = array();//ассоциативный массив с именами значений фильтра для JS
 			$spisok = '';
 			$sel = '';//выбранные значения
-			if($arr = _elemSpisokConnect($el['txt_2'])) {
+			if($arr = _elem102CnnList($el['txt_2'])) {
 				$n = 0;
 				$selOne = '';
 				foreach($arr as $r) {
 					$id = $r['id'];
-					$bg = isset($color[$id]) ? ' style="background-color:'.$color[$id].'"' : '';
-					$c = _hide0(@$count[$id]);
+					$bg = isset($bgAss[$id]) ? ' style="background-color:'.$bgAss[$id].'"' : '';
+					$c = _hide0(@$countAss[$id]);
 					$spisok .=
 						'<tr class="over1" val="'.$r['id'].'">'.
 							'<th class="w35 pad8 center"'.$bg.'>'.
@@ -1707,8 +1707,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			'</div>'.
 			'<script>'.
 				'var EL'.$el['id'].'_F102_TITLE='._json($title).','.
-					'EL'.$el['id'].'_F102_C='._json($count).','.
-					'EL'.$el['id'].'_F102_BG='._json($color).';'.
+					'EL'.$el['id'].'_F102_C='._json($countAss).','.
+					'EL'.$el['id'].'_F102_BG='._json($bgAss).';'.
 			'</script>';
 	}
 

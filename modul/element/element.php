@@ -332,26 +332,35 @@ function _dialogSpisokOnConnect($block_id) {//получение диалого�
 function _dialogSel24($elem_id, $dlg_id) {//получение id диалога, который выбирается через элемент [24]
 	if(!$el = _elemOne($elem_id))
 		return 0;
-	if($el['dialog_id'] != 24)
-		return 0;
 	if(!$dlg_id)
 		return 0;
 
-	//список, размещённый на странице
-	if($el['num_1'] == 960) {
-		if(!$ell = _elemOne($dlg_id))
-			return 0;
-		return $ell['num_1'];
+	if($el['dialog_id'] == 24) {
+		//список, размещённый на странице
+		if($el['num_1'] == 960) {
+			if(!$ell = _elemOne($dlg_id))
+				return 0;
+			return $ell['num_1'];
+		}
+
+		//привязанный диалог
+		if($el['num_1'] == 961) {
+			if(!$ell = _elemOne($dlg_id))
+				return 0;
+			return $ell['block']['obj_id'];
+		}
+
+		return $dlg_id;
 	}
 
-	//привязанный диалог
-	if($el['num_1'] == 961) {
+	if($el['dialog_id'] == 13) {
 		if(!$ell = _elemOne($dlg_id))
 			return 0;
-		return $ell['block']['obj_id'];
+		if(_elemIsConnect($ell))
+			return $ell['num_1'];
 	}
 
-	return $dlg_id;
+	return 0;
 }
 function _dialogSelArray($v=0, $v1=0) {//список диалогов для Select - отправка через AJAX
 	$sql = "SELECT *
@@ -1071,7 +1080,7 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 			break;
 
 		//Фильтр: Select - привязанный список
-		case 83: return _elemSpisokConnect($el['txt_2']);
+		case 83: return _elem102CnnList($el['txt_2']);
 */
 }
 function _elemVvv37($prm) {//select - выбор имени колонки [37]
@@ -1225,7 +1234,7 @@ function _elemIsDate($el) {//определение, является ли эл�
 	}
 	return false;
 }
-function _elemSpisokConnect($ids, $return='select', $cond='') {//значения привязанного списка
+function _elem102CnnList($ids, $return='select', $cond='') {//значения привязанного списка (пока для фильтра 102)
 	if(!$last_id = _idsLast($ids))
 		return array();
 	if(!$el = _elemOne($last_id))
