@@ -330,7 +330,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	$act = $unit_id ? 'edit' : 'insert';
 
-	$block_id = _num($_POST['block_id'], 1);
+	$block_id = _num($_POST['block_id']);
 
 	$POST_CMP = _spisokUnitCmpTest($dialog);
 

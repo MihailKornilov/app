@@ -1641,34 +1641,35 @@ function PHP12_v_choose($prm) {
 	OBJ_NAME_CHOOSE - по умолчанию выводится диалог. Будет меняться, если требуется
 */
 
-	if(!$block_id = _num($prm['srce']['block_id']))
-		return _emptyMin10('Отсутствует исходный блок.');
-	if(!$BL = _blockOne($block_id))
-		return _emptyMin10('Блока '.$block_id.' не существует.');
-
 	$prm['dop'] = PHP12_v_choose_vvv($prm);
 
 	//Изначально obj_id = false. По этому флагу будет определяться, в какой именно функции будет производиться поиск объекта
 	//В начале всегда проверяется прямое указание на диалог
-	$obj_id = PHP12_v_choose_dss($prm);
+	if(!$obj_id = PHP12_v_choose_dss($prm)) {
+		if(!$block_id = _num($prm['srce']['block_id']))
+			return _emptyMin10('Отсутствует исходный блок.');
+		if(!$BL = _blockOne($block_id))
+			return _emptyMin10('Блока '.$block_id.' не существует.');
 
-	//выбор элемента-значения через [13]
-	$obj_id = PHP12_v_choose_13($BL, $prm, $obj_id);
 
-	//ячейка таблицы
-	$obj_id = PHP12_v_choose_23($BL, $obj_id);
+		//выбор элемента-значения через [13]
+		$obj_id = PHP12_v_choose_13($BL, $prm, $obj_id);
 
-	//блок со страницы
-	$obj_id = PHP12_v_choose_page($BL, $obj_id);
+		//ячейка таблицы
+		$obj_id = PHP12_v_choose_23($BL, $obj_id);
 
-	//элемент записи
-	$obj_id = PHP12_v_choose_spisok($BL, $obj_id);
+		//блок со страницы
+		$obj_id = PHP12_v_choose_page($BL, $obj_id);
 
-	//блок из содержания удаления записи
-	$obj_id = PHP12_v_choose_dialog_del($BL, $obj_id);
+		//элемент записи
+		$obj_id = PHP12_v_choose_spisok($BL, $obj_id);
 
-	//настройка баланса [27]
-	$obj_id = PHP12_v_choose_27balans($BL, $obj_id);
+		//блок из содержания удаления записи
+		$obj_id = PHP12_v_choose_dialog_del($BL, $obj_id);
+
+		//настройка баланса [27]
+		$obj_id = PHP12_v_choose_27balans($BL, $obj_id);
+	}
 
 /*
 
@@ -2962,7 +2963,7 @@ function PHP12_elem_action_list($prm) {
 }
 
 
-/* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ ===--- */
+/* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
 function PHP12_history_setup() {
 	/*
 		действие (type_id):
@@ -2988,7 +2989,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 		return;
 	if(empty($_POST['vvv']))
 		jsonError('Отсутствуют данные для сохранения');
-	if(!$dialog_id = _num(@$_POST['dialog_source']))
+	if(!$dialog_id = _num($_POST['dss']))
 		jsonError('Отсутствует исходный диалог');
 	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('Диалога '.$dialog_id.' не существует');
@@ -3098,22 +3099,13 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 	$send['tmp'] = $dialog[HISTORY_ACT.'_history_tmp'];
 	jsonSuccess($send);
 }
-function PHP12_history_setup_vvv($unit_id, $src) {//получение значений для настройки истории действий
-	if(empty($src['unit']['source']))
-		return array();
-
-	$src = $src['unit']['source'];
-
-	if(!$dialog_id = _num($src['dialog_source']))
+function PHP12_history_setup_vvv($prm) {//получение значений для настройки истории действий
+	if(!$dialog_id = _num($prm['srce']['dss']))
 		return array();
 	if(!$DLG = _dialogQuery($dialog_id))
 		return array();
-
-	$act = $src['prm']['act'];
-
-	if(!$ids = $DLG[$act.'_history_elem'])
+	if(!$ids = $DLG[$prm['dop']['act'].'_history_elem'])
 		return array();
-
 
 	$sql = "SELECT *
 			FROM `_element`

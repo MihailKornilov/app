@@ -340,17 +340,16 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 			DLG('#history_' + act).click(function() {
 				var t = $(this);
-				t.find('div')._dn(0, 'vh');
+				t.find('div')._vh();
 				_dialogLoad({
 					dialog_id:67,
-					dialog_source:o.dialog_id,
-					unit_id:-1,
-					prm:{
+					dss:o.dialog_id,
+					dop:{
 						act:act
 					},
 					busy_obj:t,
 					func_open:function() {
-						t.find('div')._dn(1, 'vh');
+						t.find('div')._vh(1);
 					},
 					func_save:function(res) {
 						t.find('.pale')._dn(!res.tmp);
@@ -2062,6 +2061,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			_dialogLoad({
 				dialog_id:t.attr('val'),
 				block_id:obj.send.block_id,
+				dss:obj.send.dss,
 				busy_obj:t,
 				busy_cls:'_busy',
 				func_save:function(res) {
@@ -2963,11 +2963,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 
 	/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА ===--- */
-	PHP12_44_setup = function(el, unit) {//для [44]
-		if(unit == 'get')
-			return PHP12_44_get(el);
-
-		if(!unit.id)
+	PHP12_44_setup = function(el, vvv, obj) {//для [44]
+		if(!obj.unit.id)
 			return;
 
 		var ATR_EL = _attr_el(el.id),
@@ -2980,11 +2977,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 		BUT_ADD.click(valueAdd);
 
 		//вывод двух первых элементов, если начало настройки
-		if(!VVV[el.id].length) {
+		if(!vvv.length) {
 			valueAdd();
 			valueAdd({spc:0});
 		} else
-			_forIn(VVV[el.id], valueAdd);
+			_forIn(vvv, valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -3206,10 +3203,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_attr_el(el.id).find('DL')._sort({table:'_element_func'});
 	},
 
-	/* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ ===--- */
-	PHP12_history_setup = function(el, unit) {
-		var html = '<input type="hidden" class="act" value="' + unit.src.prm.act + '" />' +  //действие: insert, edit, del
-				   '<dl></dl>' +
+	/* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
+	PHP12_history_setup = function(el, vvv, obj) {
+		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
@@ -3218,10 +3214,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		BUT_ADD.click(valueAdd);
 
-		if(!VVV[el.id].length)
+		if(!vvv.length)
 			valueAdd();
 		else
-			_forIn(VVV[el.id], valueAdd);
+			_forIn(vvv, valueAdd);
 
 		DL.sortable({
 			axis:'y',
@@ -3277,13 +3273,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 			TITLE.click(function() {
 				_dialogLoad({
 					dialog_id:v.dialog_id || 50,
-					dialog_source:unit.src.dialog_source,
-					block_id:-1,
-					unit_id:v.id,
+					dss:obj.srce.dss,
+					edit_id:v.id,
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {
 						v.id = res.unit.id;
+						v.dialog_id = res.unit.dialog_id
 						DD.attr('val', v.id);
 						TITLE.val(res.unit.title);
 						DD.find('.txt_8').focus();
@@ -3322,7 +3318,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			DD.find('.txt_7').focus();
 		}
 	},
-	PHP12_history_setup_get = function(el) {
+	PHP12_history_setup_get = function(el, obj) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			//выделение: b, i, u
@@ -3351,7 +3347,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			send.push(u);
 		});
 		return {
-			act:_attr_el(el.id).find('.act').val(),
+			act:obj.srce.dop.act,
 			v:send
 		};
 	},
