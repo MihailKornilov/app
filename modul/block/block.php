@@ -407,11 +407,11 @@ function _blockChoose($bl, $prm, $level) {//подсветка блоков дл
 	$id = $bl['id'];
 
 	//подсветка блоков, которые запрещено выбирать
-	$ass = _idsAss($prm['blk_deny']);
+	$ass = _idsAss(@$prm['blk_deny']);
 	$deny = isset($ass[$id]) ? ' deny' : '';
 
 	//подсветка выбранный блоков
-	$ass = _idsAss($prm['blk_sel']);
+	$ass = _idsAss(@$prm['blk_sel']);
 	$sel = isset($ass[$id]) && !$deny ? ' sel' : '';
 
 	return '<div class="blk-choose'.$sel.$deny.'" val="'.$id.'"></div>';

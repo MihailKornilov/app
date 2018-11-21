@@ -31,8 +31,7 @@ switch(@$_POST['op']) {
 
 		$blk_choose = _bool($_POST['blk_choose']);
 
-		$unit = _unitGet($obj_name, $obj_id);
-		$unit += array(
+		$unit = array(
 			'blk_setup' => 1,
 			'blk_choose' => $blk_choose,
 			'blk_level' => $level
@@ -341,9 +340,7 @@ switch(@$_POST['op']) {
 		$unit = _unitGet($BL['obj_name'], $BL['obj_id']);
 		$unit += array(
 			'blk_choose' => 1,
-			'blk_level' => $level,
-			'blk_sel' => array(),    //ids ранее выбранных блоков
-			'blk_deny' => array()    //блоки, которые запрещено выбирать
+			'blk_level' => $level
 		);
 
 		$send['html'] = _blockHtml($BL['obj_name'], $BL['obj_id'], $unit);
