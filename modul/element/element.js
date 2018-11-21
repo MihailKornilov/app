@@ -855,6 +855,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							block_id:OBJ.srce.block_id,
 
 							dop:{
+								mysave:1,
 								is13:elm_id,
 								nest:_num(el.num_5),//выбор значений во вложенных списках
 								sev:_num(el.num_6), //выбор нескольких значений
@@ -864,7 +865,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 							busy_obj:INP,
 							busy_cls:'hold',
-//							func_open:PHP12_v_choose_submit
 							func_save:function(res) {
 								ATR_CMP.val(res.v);
 								INP.val(res.title);
@@ -2143,6 +2143,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					dss:DS,
 					block_id:obj.srce.block_id,
 					dop:{
+						mysave:1,
 						sel:v.txt_1
 					},
 					busy_obj:$(this),
@@ -2342,6 +2343,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		dlg.closeFunc(function() {
 			V11_COUNT--;
 		});
+	},
+	PHP12_v_choose_get = function(el, obj) {
+		return obj.vvv[el.id];
 	},
 
 
