@@ -1108,7 +1108,22 @@ function _22cond($parent_id) {//получение условий запроса
 			continue;
 		}
 
-		$val = _elemIsConnect($r['txt_1']) && $r['num_3'] ? $r['num_3'] : $r['txt_2'];
+		//произвольное текстовое значение
+		$val = $r['txt_2'];
+
+		//значение из подключаемого списка
+		$in = 0;
+		if(_elemIsConnect($r['txt_1']) && $r['num_3']) {
+			$val = $r['num_3'];
+			//также проверяются дочерние значения
+			$sql = "SELECT `id`
+					FROM `_spisok`
+					WHERE `parent_id`=".$val;
+			if($ids = query_ids($sql)) {
+				$val .= ','.$ids;
+				$in = 1;
+			}
+		}
 
 		//если элемент является датой, преобразование значения в дату, если это число.
 		if(_elemIsDate($r['txt_1']))
@@ -1124,13 +1139,14 @@ function _22cond($parent_id) {//получение условий запроса
 		$send .= _22condV(
 					$r['num_2'],
 					$elCol[$r['txt_1']],
-					$val
+					$val,
+					$in
 				 );
 	}
 
 	return 	$send;
 }
-function _22condV($act, $col, $val) {//значение запроса по конкретному условию
+function _22condV($act, $col, $val, $in=0) {//значение запроса по конкретному условию
 	/*
 		 1: отсутствует
 		 2: присутствует
@@ -1142,23 +1158,29 @@ function _22condV($act, $col, $val) {//значение запроса по ко
 		 8: меньше или равно
 		 9: содержит
 		10: не содержит
+
+		Если val получены идентификаторы через запятую, применяется IN для пунктов 3 и 4
 	*/
 
 	if(!$col)
 		return '';
 
 	$val = addslashes($val);
-	if($act != 9 && $act != 10)
-		$val = preg_match(REGEXP_INTEGER, $val) ? $val : "'".$val."'";
 	switch($act) {
 		case 1: return " AND !`t1`.`".$col."`";
 		case 2: return " AND `t1`.`".$col."`";
-		case 3: return " AND `t1`.`".$col."`=".$val;
-		case 4: return " AND `t1`.`".$col."`!=".$val;
-		case 5: return " AND `t1`.`".$col."`>".$val;
-		case 6: return " AND `t1`.`".$col."`>=".$val;
-		case 7: return " AND `t1`.`".$col."`<".$val;
-		case 8: return " AND `t1`.`".$col."`<=".$val;
+		case 3:
+			if($in)
+				return " AND `t1`.`".$col."` IN (".$val.")";
+			return " AND `t1`.`".$col."`='".$val."'";
+		case 4:
+			if($in)
+				return " AND `t1`.`".$col."` NOT IN (".$val.")";
+			return " AND `t1`.`".$col."`!='".$val."'";
+		case 5: return " AND `t1`.`".$col."`>'".$val."'";
+		case 6: return " AND `t1`.`".$col."`>='".$val."'";
+		case 7: return " AND `t1`.`".$col."`<'".$val."'";
+		case 8: return " AND `t1`.`".$col."`<='".$val."'";
 		case 9: return " AND `t1`.`".$col."` LIKE '%".$val."%'";
 		case 10:return " AND `t1`.`".$col."` NOT LIKE '%".$val."%'";
 	}
