@@ -786,7 +786,6 @@ function _spisokCond($el) {//формирование строки с услов
 	$cond .= _spisokCondDef($el['num_1']);
 	$cond .= _spisokCondBind($el);
 	$cond .= _spisokCond7($el);
-	$cond .= _spisokCond26($el);
 	$cond .= _spisokCond62($el);
 	$cond .= _spisokCond74($el);
 	$cond .= _spisokCond77($el);
@@ -893,34 +892,6 @@ function _spisokCond7($el) {//значения фильтра-поиска дл�
 		return '';
 
 	return " AND (".implode($arr, ' OR ').")";
-}
-function _spisokCond26($el) {//дополнительные условия - в отдельном элементе [26]
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `dialog_id`=26
-			  AND `num_1`=".$el['id']."
-			LIMIT 1";
-	if(!$elem26 = query_assoc($sql))
-		return '';
-
-	//элемент-колонка, по которому будет применяться фильтр
-	if(!$elCol = _elemOne($elem26['num_2']))
-		return '';
-	if(!$col = $elCol['col'])
-		return '';
-
-	//если у основного значнеия есть дочерние, получение их ID, чтобы добавить к запросу
-	if($v = _num($elem26['num_3'])) {
-		$sql = "SELECT `id`
-				FROM `_spisok`
-				WHERE `parent_id`=".$v."
-				  AND !`deleted`";
-		if($ids = query_ids($sql))
-			$v .= ','.$ids;
-	}
-
-
-	return " AND `".$col."` IN (".$v.")";
 }
 function _spisokCond62($el) {//фильтр-галочка
 	$send = '';

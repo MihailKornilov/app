@@ -430,18 +430,12 @@ function PHP12_BUG_elm_unit_del_setup() {//элементы, используе�
 			WHERE `dialog_id`=58";
 	$elm58Count = query_value($sql);
 
-	$sql = "SELECT COUNT(*)
-			FROM `_element`
-			WHERE `dialog_id`=26";
-	$elm26Count = query_value($sql);
-
 	$sql = "SELECT `id`
 			FROM `_element`
 			WHERE `id` NOT IN (".ELM_DLG_HIST.")
 			  AND `block_id`<=0
 			  AND !`parent_id`
-			  AND `dialog_id`!=58
-			  AND `dialog_id`!=26";
+			  AND `dialog_id`!=58";
 	if($lost = query_ids($sql)) {
 		if(SA && @$_GET[$getv]) {
 			$sql = "DELETE
@@ -457,7 +451,6 @@ function PHP12_BUG_elm_unit_del_setup() {//элементы, используе�
 	'<div class="b fs14 color-555">Элементы для настройки удаления записи:</div>'.
 	'<table class="_stab mt5">'.
 		'<tr><td class="grey">Кол-во всех элементов настройки удаления записи:<td class="r b">'.$elm58Count.
-		'<tr><td class="grey">Кол-во всех элементов настройки дополнительных условий отображения списка:<td class="r b">'.$elm26Count.
 	'</table>'.
 
 ($lost ?
