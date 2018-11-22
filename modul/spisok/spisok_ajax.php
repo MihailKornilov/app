@@ -287,13 +287,6 @@ switch(@$_POST['op']) {
 		$send['html'] = _spisok59unit($cmp_id, $unit_id);
 		jsonSuccess($send);
 		break;
-	case 'spisok_cond_load'://получение данных списка для настройки условий [26]
-		if(!$elem_id = _num($_POST['elem_id']))
-			jsonError('Некорректный ID элемента');
-
-		$send['spisok'] = _29cnn($elem_id);
-		jsonSuccess($send);
-		break;
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка
