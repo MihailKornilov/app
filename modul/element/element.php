@@ -413,11 +413,14 @@ function _dialogSpisokCmp($cmp) {//список колонок, использу
 	return $send;
 }
 
-function _dialogContentDelSetupIcon($dialog_id, $isEdit) {//иконка настройки содежания удаления записи (единицы списка)
-	$tooltip = _tooltip(($isEdit ? 'Изменить' : 'Настроить').' содержание', -67);
+function _dialogContentDelSetup($dialog_id) {//иконка настройки содежания удаления записи (единицы списка)
+	$isSetup = _BE('block_obj', 'dialog_del', $dialog_id);
+	$tooltip = _tooltip(($isSetup ? 'Изменить' : 'Настроить').' содержание', -67);
 	return
-	'<div val="dialog_id:56,dialog_source:'.$dialog_id.'"'.
-		' class="icon icon-edit pl dialog-open'.$tooltip;
+	($isSetup ?'<span class="color-pay b">Настроено.</span> ' : '').
+	'<div val="dialog_id:56,dss:'.$dialog_id.'"'.
+		' class="icon icon-edit pl dialog-open'.$tooltip.
+	'</div>';
 }
 
 function PHP12_app_export() {//экспорт / импорт текущего приложения todo не доделано
@@ -722,7 +725,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 					'<td>'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 					'<td>'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 					'<td class="center'.(!empty($contentDelAss[$dialog_id]) ? ' bg-dfd' : '').'">'.
-						_dialogContentDelSetupIcon($dialog_id, !empty($contentDelAss[$dialog_id]));
+						_dialogContentDelSetup($dialog_id);
 	}
 	$send .= '</table>';
 
@@ -1907,14 +1910,13 @@ function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уро
 
 
 /* ---=== НАСТРОЙКА СОДЕРЖАНИЯ УДАЛЕНИЯ ЗАПИСИ [56] ===--- */
-function PHP12_dialog_del_setup($el, $unit) {
-	$SRC = $unit['source'];
-	$obj_name = 'dialog_del';
-
-	if(!$dialog_id = $SRC['dialog_source'])
+function PHP12_dialog_del_setup($prm) {
+	if(!$dialog_id = $prm['srce']['dss'])
 		return _emptyMin10('Не найден диалог.');
 	if(!$dialog = _dialogQuery($dialog_id))
 		return _emptyMin10('Диалога '.$dialog_id.' не существует.');
+
+	$obj_name = 'dialog_del';
 
 	return
 	'<div class="fs14 pad10 pl15 bg-orange line-b">Настройка содержания удаления для диалога <b class="fs14">'.$dialog['name'].'</b>:</div>'.

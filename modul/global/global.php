@@ -934,7 +934,7 @@ function _cache_clear($key, $global=0) {//очистка кеша
 		'global' => $global
 	));
 }
-function _cache_content($el, $unit) {//содержание кеша в диалоге [84] (подключаемая функция [12])
+function _cache_content() {//содержание кеша в диалоге [84] (подключаемая функция [12])
 	if(!CACHE_USE)
 		$send = 'Кеш отключен.';
 	elseif(!$name = @$_COOKIE['cache_content_name'])

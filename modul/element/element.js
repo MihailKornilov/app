@@ -671,7 +671,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					unit_id:o.del_id
 				};
 				dialog.post(send, _dialogOpenSubmitAction);
-			}
+			},
+			send:o.send
 		});
 		return dialog;
 	},

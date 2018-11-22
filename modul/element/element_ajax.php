@@ -68,9 +68,6 @@ switch(@$_POST['op']) {
 				$menu_sa[3] = 'Использование';
 		}
 
-		//содержание для удаления единицы списка
-		$contentDel = _BE('block_obj', 'dialog_del', $dialog_id);
-
 		//условия удаления
 		$sql = "SELECT `id`
 				FROM `_element`
@@ -148,14 +145,11 @@ switch(@$_POST['op']) {
 								'<td><input type="text" id="del_button_submit" class="w150" maxlength="100" value="'.$dialog['del_button_submit'].'" />'.
 									'<input type="text" id="del_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['del_button_cancel'].'" />'.
 							'<tr><td class="grey r h35">Содержание удаления:'.
-								'<td>'.
-									($contentDel ? '<span class="color-pay b">Настроено.</span> ' : '').
-									_dialogContentDelSetupIcon($dialog_id, $contentDel).
-									'</div>'.
+								'<td>'._dialogContentDelSetup($dialog_id).
 							'<tr><td class="grey r">Условия удаления:'.
 								'<td class="pale">'.
 									($del58 ? '' : 'условий нет. ').
-									'<div val="dialog_id:58,dialog_source:'.$dialog_id.',unit_id:'.$del58.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить условия', -59).'</div>'.
+									'<div val="dialog_id:58,dss:'.$dialog_id.',edit_id:'.$del58.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить условия', -59).'</div>'.
 							'<tr><td class="blue r">Дальнейшее действие:'.
 								'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
 							'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
@@ -1001,6 +995,10 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send = _dialogOpenParam($dialog);
 
+	$prm['srce']['dialog_id'] = $dialog_id;
+	$prm['srce']['page_id'] = _num($_POST['page_id']);
+	$prm['srce']['block_id'] = _num($_POST['block_id'], 1);
+
 	/* --- Удаление записи --- */
 	if($del_id = _num(@$_POST['del_id'])) {
 		$send['del_id'] = $del_id;
@@ -1032,9 +1030,6 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 
-	$prm['srce']['dialog_id'] = $dialog_id;
-	$prm['srce']['page_id'] = _num($_POST['page_id']);
-	$prm['srce']['block_id'] = _num($_POST['block_id'], 1);
 	$prm['srce']['dss'] = _num($_POST['dss']);
 
 	$prm['dop'] = _arrNum(@$_POST['dop']);

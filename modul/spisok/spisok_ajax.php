@@ -1044,9 +1044,8 @@ function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение до
 function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id диалога при создании условий удаления записи
 	if($dialog['id'] != 58)
 		return;
-	if(!$dlg_id = _num(@$_POST['dialog_source'])) {
-		$sql = "DELETE FROM `_element`
-				WHERE `id`=".$unit_id;
+	if(!$dlg_id = _num($_POST['dss'])) {
+		$sql = "DELETE FROM `_element` WHERE `id`=".$unit_id;
 		query($sql);
 		jsonError('Отсутствует исходный диалог');
 	}
