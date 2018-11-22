@@ -1056,9 +1056,9 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					'class'=>'curD'
 				));
 			if(!$u = $prm['unit_get'])
-				return '--';
+				return 'х';
 			if(!$dlg = _dialogQuery($u['dialog_id']))
-				return '--';
+				return 'хх';
 			//иконка не выводится, если удаление запрещено
 			if(!$dlg['del_on'])
 				return '';
@@ -1137,7 +1137,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			if($prm['blk_setup'])
 				return 'дата';
 			if(!$u = $prm['unit_get'])
-				return '--';
+				return 'дата';
 			if(empty($u['dtime_add']))
 				return '';
 			if(!preg_match(REGEXP_DATE, $u['dtime_add']))
@@ -1178,9 +1178,9 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			if($prm['blk_setup'])
 				return _iconEdit(array('class'=>'curD'));
 			if(!$u = $prm['unit_get'])
-				return '--';
+				return 'х';
 			if(!$dlg = _dialogQuery($u['dialog_id']))
-				return '--';
+				return 'хх';
 			//иконка не выводится, если редактирование запрещено
 			if(!$dlg['edit_on'])
 				return '';
@@ -1224,6 +1224,9 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'width' => $el['width'],
 						'value' => _elemPrintV($el, $prm, 0)
 				   ));
+
+		//Сборный текст
+		case 44: return PHP12_44_print($el, $prm['unit_get']);
 
 		//Выбор блоков из диалога или страницы
 		case 49:
@@ -1736,38 +1739,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 	}
 
 	return _msgRed('dlg-'.$el['dialog_id']);
-}
-function _elemPrintV($el, $prm, $def='') {//значение записи при редактировании
-	if(!$u = $prm['unit_edit'])
-		return $def;
-	//установлен флаг "Всегда по умолчанию"
-	if($el['nosel'])
-		return $def;
-	if(!$col = $el['col'])
-		return $def;
 
-	//имя колонки является id элемента из родительского диалога
-	if($id = _num($col)) {
-		if(!$elp = _elemOne($id))
-			return $def;
-		if(!$col = $elp['col'])
-			return $def;
-	}
 
-	$v = $u[$col];
 
-	if(is_array($v))
-		return _num($v['id']);
-	if(is_string($v) && preg_match(REGEXP_INTEGER, $v))
-		return $v * 1;
-
-	return $v;
-}
-function _elemUnit($el, $unit) {//формирование элемента страницы
-	return '<div class="fs10 b color-sal">_elemUnit</div>';
 
 	switch(false) {
-
 		//Список действий для Галочки [1]
 		case 28: return 28;
 
@@ -1814,10 +1790,6 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 
 		//SA: Select - значения из существующего селекта
 		case 41:
-			/*
-
-			*/
-
 			if(!$bs_id = _num(@$SRC['block_id']))
 				return '<div class="red">Отсутствует ID исходного блока.</div>';
 
@@ -1837,31 +1809,37 @@ function _elemUnit($el, $unit) {//формирование элемента ст
 						'width' => $el['width'],
 						'value' => _num($v) ? _num($v) : $EL['def']
 				   ));
-
-		//Сборный текст
-		case 44:
-			if(!$spisok = PHP12_44_setup_vvv($el['id']))
-				return '<div class="fs11 red">сборный текст не настроен</div>';
-
-			$txt = '';
-			foreach($spisok as $r) {
-				$elem = _elemOne($r['id']);
-				$txt .= _elemUnit($elem, $unit);
-				$txt .= $r['spc'] ? ' ' : ''; //добавление пробела справа, если нужно (num_8)
-			}
-
-			return $txt;
-
-		//порядок - не доделано
-		case 53:
-			/*
-			*/
-			return 'порядок';
 	}
+}
+function _elemPrintV($el, $prm, $def='') {//значение записи при редактировании
+	if(!$u = $prm['unit_edit'])
+		return $def;
+	//установлен флаг "Всегда по умолчанию"
+	if($el['nosel'])
+		return $def;
+	if(!$col = $el['col'])
+		return $def;
+
+	//имя колонки является id элемента из родительского диалога
+	if($id = _num($col)) {
+		if(!$elp = _elemOne($id))
+			return $def;
+		if(!$col = $elp['col'])
+			return $def;
+	}
+
+	$v = $u[$col];
+
+	if(is_array($v))
+		return _num($v['id']);
+	if(is_string($v) && preg_match(REGEXP_INTEGER, $v))
+		return $v * 1;
+
+	return $v;
 }
 
 function _BE($i, $i1=0, $i2=0) {//кеширование элементов приложения
-	global $BE_FLAG, $G_BLOCK, $G_ELEM, $G_DLG;
+	global $BE_FLAG, $G_BLOCK, $G_ELEM, $G_DLG, $_DQ;
 
 	_beDefine();
 
@@ -2223,6 +2201,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		_cache_clear('ELM_HISTORY', 1);
 		_cache_clear('dialog_del_cond');
 		_cache_clear('dialog_del_cond', 1);
+		$_DQ = array();
 		$BE_FLAG = 0;
 	}
 

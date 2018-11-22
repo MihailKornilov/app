@@ -1308,16 +1308,12 @@ function _elem11($el, $prm) {//отображение элемента, вста
 	return _msgRed('-11-yok-');
 }
 function _elem11one($EL, $ell, $unit) {//прямая ссылка на элемент через [11]
-	/* --- Простой вывод без данных записи --- */
-
 	switch($ell['dialog_id']) {
 		//произвольный текст
 		case 10: return _br($ell['txt_1']);
-		case 44: return '<div class="fs10 color-sal">11.44</div>';//PHP12_44_print($ell_id, $unit)
+		//сборный текст
+		case 44: return PHP12_44_print($ell, $unit);
 	}
-
-
-
 
 	/* --- Вывод из данных записи по колонке --- */
 
@@ -2582,8 +2578,8 @@ function PHP12_filter_radio_setup_vvv($prm) {
 }
 
 
-/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА ===--- */
-function PHP12_44_setup($el, $unit) {//используется в диалоге [44]
+/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА для [44] ===--- */
+function PHP12_44_setup($prm) {
 	/*
 		все действия через JS
 
@@ -2591,8 +2587,8 @@ function PHP12_44_setup($el, $unit) {//используется в диалог�
 		txt_2 - ID элементов-значений, составляющих сборный текст
 	*/
 
-	if(empty($unit['id']))
-		return '<div class="_empty min">Настройка сборного текста будет доступна<br>после вставки элемента в блок.</div>';
+	if(!$prm['unit_edit'])
+		return _emptyMin('Настройка сборного текста будет доступна<br>после вставки элемента в блок.');
 
 	return '';
 }
@@ -2651,11 +2647,14 @@ function PHP12_44_setup_save($cmp, $val, $unit) {//сохранение соде
 		query($sql);
 	}
 }
-function PHP12_44_setup_vvv($parent_id) {
+function PHP12_44_setup_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+
 	$send = array();
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `parent_id`=".$parent_id."
+			WHERE `parent_id`=".$u['id']."
 			ORDER BY `sort`";
 	foreach(query_arr($sql) as $r)
 		$send[] = array(
@@ -2667,16 +2666,14 @@ function PHP12_44_setup_vvv($parent_id) {
 
 	return $send;
 }
-function PHP12_44_print($elem_id, $unit=array()) {//печать сборного текста
-	if(!$el = _elemOne($elem_id))
-		return _msgRed('-no-el44-'.$elem_id.'-');
-	if(!$ids = _ids($el['txt_2'], 1))
-		return _msgRed('-no-el44-ids-');
+function PHP12_44_print($el, $u) {//печать сборного текста
+	if(!$ids = _ids($el['txt_2'], 'arr'))
+		return _msgRed('-no-44-ids-');
 
 	$send = '';
 	foreach($ids as $id) {
 		$ell = _elemOne($id);
-		$send .= _elemUnit($ell, $unit);
+		$send .= _elemPrint($ell, _blockParam(array('unit_get'=>$u)));
 		if($ell['num_8'])
 			$send .= ' ';
 	}

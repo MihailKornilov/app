@@ -2972,8 +2972,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 			html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить элемент</div>',
 			DL = ATR_EL.append(html).find('dl'),
-			BUT_ADD = ATR_EL.find('div:last'),
-			NUM = 1;
+			BUT_ADD = ATR_EL.find('div:last');
 
 		BUT_ADD.click(valueAdd);
 
@@ -3006,7 +3005,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							'<td class="w25">' +
 								'<input type="hidden" class="spc" value="' + v.spc + '" />' +
 							'<td class="w50 r">' +
-								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить элемент', -52) + '</div>' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить элемент', -52) + '</div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -3016,8 +3015,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 			INP.click(function() {
 				_dialogLoad({
 					dialog_id:v.dialog_id,
-					block_id:unit.src.block_id,
-					unit_id:v.id,           //id выбранного элемента (при редактировании)
+					block_id:obj.srce.block_id,
+					edit_id:v.id,           //id выбранного элемента (при редактировании)
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
@@ -3039,7 +3038,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 				p.remove();
 				v.id = 0;
 			});
-			NUM++;
 		}
 	},
 	PHP12_44_setup_get = function(el) {
@@ -3200,7 +3198,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 	},
 
 	/* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ===--- */
-	PHP12_elem_action_list = function(el, unit) {
+	PHP12_elem_action_list = function(el) {
 		_attr_el(el.id).find('DL')._sort({table:'_element_func'});
 	},
 

@@ -1344,7 +1344,7 @@ function _29cnnTitle($ids, $sp, $content=false) {//формирование со
 			}
 			return $title;
 		//сборный текст
-		case 44: return PHP12_44_print($el['id'], $sp);
+		case 44: return PHP12_44_print($el, $sp);
 	}
 
 	return $content ? '' : '- незвестный тип: '.$el['dialog_id'].' -';
