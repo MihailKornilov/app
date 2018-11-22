@@ -793,6 +793,9 @@ function _spisokCond($el) {//формирование строки с услов
 	$cond .= _spisokCond83($el);
 	$cond .= _spisokCond102($el);
 
+	if($el['dialog_id'] == 14)
+		$cond .= _22cond($el['id']);
+
 	return $cond;
 }
 function _spisokCondBind($el) {//отображения значений записи привязанного списка
@@ -1060,26 +1063,22 @@ function _spisokCond102($el) {//Фильтр - Выбор нескольких �
 
 function _22cond($parent_id) {//получение условий запроса из базы при помощи: Дополнительные условия к фильтру (вспомогательный элемент)
 	//условия, формирующие фильтр
-	$sql = "SELECT *
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Доп.условия 22 для <u>".$parent_id."</u> */
+			SELECT *
 			FROM `_element`
 			WHERE `parent_id`=".$parent_id;
 	if(!$cond = query_arr($sql))
 		return '';
 
-	//получение id элементов, содержащих колонки
-	$idsCol = array();
-	foreach($cond as $r)
-		if(_idsLast($r['txt_1']))
-			$idsCol[] = _idsLast($r['txt_1']);
-
-	if(empty($idsCol))
-		return '';
-
 	//колонки, по которым будет производиться фильтр
-	$sql = "SELECT `id`,`col`
-			FROM `_element`
-			WHERE `id` IN (".implode(',', $idsCol).")";
-	if(!$elCol = query_ass($sql))
+	$elCol = array();
+	foreach($cond as $r)
+		if($id = _idsLast($r['txt_1']))
+			if($el = _elemOne($id))
+				if($col = $el['col'])
+					$elCol[$id] = $col;
+
+	if(empty($elCol))
 		return '';
 
 	$send = '';

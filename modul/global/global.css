@@ -265,7 +265,7 @@ body:not(.site){position:relative}
 }
 
 /* блоки из таблиц */
-.bl-tab{table-layout:fixed}/* каким образом вычисляется ширина ячеек, чтобы ячейки не сдвигали друг друга */
+/*.bl-tab{table-layout:fixed} каким образом вычисляется ширина ячеек, чтобы ячейки не сдвигали друг друга */
 .bl-td{/*overflow-x:hidden*/}
 .bl-td .ui-resizable-e{
 	background-color:#ffaf64;

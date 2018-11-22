@@ -1981,7 +1981,7 @@ function PHP12_elem22_save($cmp, $val, $unit) {//Дополнительные у
 		return 0;
 
 	//ID элементов, которые не должны будут удалены
-	$ids = array();
+	$ids = array(0);
 	$update = array();
 
 	if(is_array($val))
@@ -2008,12 +2008,10 @@ function PHP12_elem22_save($cmp, $val, $unit) {//Дополнительные у
 			)";
 		}
 
-	$ids = implode(',', $ids);
-
 	//удаление значений, которые были удалены при настройке
 	$sql = "DELETE FROM `_element`
 			WHERE `parent_id`=".$parent_id."
-			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
+			  AND `id` NOT IN (".implode(',', $ids).")";
 	query($sql);
 
 	if(empty($update))

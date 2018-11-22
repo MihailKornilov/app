@@ -2167,7 +2167,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					dop:{
 						mysave:1,
 						sel:v.txt_1,
-						nest:obj.srce.dop.nest
+						nest:0//obj.srce.dop.nest
 					},
 					busy_obj:$(this),
 					busy_cls:'hold',
@@ -2926,7 +2926,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 					dss:ELMM[ATR_SP.val()].num_1,
 					block_id:obj.srce.block_id,
 					edit_id:v.id,
-					dop:{nest:0},
 					busy_obj:cs,
 					busy_cls:v.c ? '_busy' : 'spin',
 					func_save:function(ia) {
