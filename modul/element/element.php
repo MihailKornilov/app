@@ -1962,18 +1962,7 @@ function PHP12_elem22_paste($el, $prm) {//условия были вставле
 		return _emptyMin('Колонка в записи отсутствует');
 	if(!$id = _ids($u[$col], 'first'))
 		return _emptyMin('Значение в элементе ещё не выбрано');
-	if(!$ELL = _elemOne($id))
-		return _emptyMin('Выбранного элемента '.$id.' не существует');
-
-	$dialog_id = 0;
-	switch($ELL['dialog_id']) {
-		case 14:
-		case 23:
-		case 29:
-		case 59: $dialog_id = $ELL['num_1'];
-	}
-
-	if(!$dialog_id)
+	if(!$dialog_id = _dialogSel24($el['num_1'], $id))
 		return _emptyMin('Диалог не найден');
 
 	return

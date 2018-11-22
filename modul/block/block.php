@@ -211,9 +211,12 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 					break;
 				}
 
+		//если блок в строке один и для него выбрана автоматическая ширина - таблица будет максимальной ширины
+		$table_w100p = count($xStr) == 1 && $r['width_auto'] ? 'w100p' : '';
+
 		$send .=
 			'<div class="bl-div'._dn(!$strHide).'">'.
-			'<table class="bl-tab" style="height:'.$r['height'].'px">'.
+			'<table class="'.$table_w100p.'" style="height:'.$r['height'].'px">'.
 				'<tr>';
 		//пустота в начале
 		if($r['x']) {
