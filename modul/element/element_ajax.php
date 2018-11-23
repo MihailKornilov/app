@@ -306,13 +306,7 @@ switch(@$_POST['op']) {
 
 						'<tr><td class="red r pt20">Дополнительно:'.
 							'<td class="pt20">'.
-			                        _check(array(
-										'attr_id' => 'element_is_insert',
-										'title' => 'элемент вносит данные',
-										'value' => $dialog['element_is_insert']
-									)).
-						'<tr><td>'.
-							'<td>'._check(array(
+			                       _check(array(
 										'attr_id' => 'element_is_spisok_unit',
 										'title' => 'является значением списка',
 										'value' => $dialog['element_is_spisok_unit']
@@ -882,7 +876,6 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$element_width_min = _num($_POST['element_width_min']);
 	$element_type = _num($_POST['element_type']);
 	$element_search_access = _num($_POST['element_search_access']);
-	$element_is_insert = _num($_POST['element_is_insert']);
 	$element_style_access = _num($_POST['element_style_access']);
 	$element_url_access = _num($_POST['element_url_access']);
 	$element_hint_access = _num($_POST['element_hint_access']);
@@ -941,7 +934,6 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`element_width_min`=".$element_width_min.",
 				`element_type`=".$element_type.",
 				`element_search_access`=".$element_search_access.",
-				`element_is_insert`=".$element_is_insert.",
 				`element_style_access`=".$element_style_access.",
 				`element_url_access`=".$element_url_access.",
 				`element_hint_access`=".$element_hint_access.",
@@ -997,7 +989,7 @@ function _dialogOpenLoad($dialog_id) {
 
 	$prm['srce']['dialog_id'] = $dialog_id;
 	$prm['srce']['page_id'] = _num($_POST['page_id']);
-	$prm['srce']['block_id'] = _num($_POST['block_id'], 1);
+	$prm['srce']['block_id'] = _num(@$_POST['block_id']);
 
 	/* --- Удаление записи --- */
 	if($del_id = _num(@$_POST['del_id'])) {
@@ -1030,7 +1022,7 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 
-	$prm['srce']['dss'] = _num($_POST['dss']);
+	$prm['srce']['dss'] = _num(@$_POST['dss']);
 
 	$prm['dop'] = _arrNum(@$_POST['dop']);
 	$prm['srce']['dop'] = $prm['dop'];

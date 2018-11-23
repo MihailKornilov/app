@@ -291,6 +291,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 				butSubmit:'Сохранить диалоговое окно',
 				submit:submit,
 				cancel:function() {
+					if(!o.send)
+						return dialog.close();
+
 					o.send.busy_obj = dialog.bottom.find('.cancel');
 					o.send.busy_cls = '_busy';
 					o.send.func_open_before = function() {
@@ -457,7 +460,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 
 		function submit() {
-			delete o.send.op;
+			if(o.send)
+				delete o.send.op;
 			var send = $.extend({
 				op:'dialog_setup_save',
 
@@ -507,7 +511,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 				element_width_min:DLG('#element_width_min').val(),
 				element_type:DLG('#element_type').val(),
 				element_search_access:DLG('#element_search_access').val(),
-				element_is_insert:DLG('#element_is_insert').val(),
 				element_style_access:DLG('#element_style_access').val(),
 				element_url_access:DLG('#element_url_access').val(),
 				element_hint_access:DLG('#element_hint_access').val(),
@@ -524,9 +527,11 @@ var DIALOG = {},//массив диалоговых окон для управл
 				element_paste_44:    DLG('#element_paste_44').val(),
 
 				menu_edit_last:DLG('#dialog-menu').val()
-			}, o.send);
+			}, o.send || {});
 
 			dialog.post(send, function(res) {
+				if(!o.send)
+					return;
 				res.send = o.send;
 				_dialogOpen(res);
 			});
