@@ -2062,7 +2062,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 			D('#elem-group .cnt')._dn(0);
 			D('#cnt_' + id)._dn(1);
 		});
-		D('.elem-unit').click(function() {//открытие диалога
+		D('.elem-unit').click(function(e) {//открытие диалога
+			if($(e.target).hasClass('dialog-setup'))
+				return;
 			var t = $(this);
 			_dialogLoad({
 				dialog_id:t.attr('val'),
@@ -2082,17 +2084,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 		if(!SA)
 			return;
 
-		D('#elem-group .icon-edit').click(function(e) {//редактирование диалога
-			e.stopPropagation();
-			var t = $(this),
-				send = {
-					op:'dialog_setup_load',
-					dialog_id:t.parents('.elem-unit').attr('val'),
-					busy_obj:t,
-					busy_cls:'spin'
-				};
-			_post(send, _dialogSetup);
-		});
 		_forEq(D('#elem-group .cnt'), function(sp) {
 			sp._sort({table:'_dialog'});
 		});
@@ -3230,6 +3221,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					dialog_id:v.dialog_id || 50,
 					dss:obj.srce.dss,
 					edit_id:v.id,
+					dop:{history_setup:1},
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {

@@ -1466,7 +1466,6 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 
 	if(empty($group))
 		return _emptyMin10('Нет элементов для отображения.');
-//			   PHP12_elem_choose_gebug($BL);
 
 	reset($group);
 	$firstId = key($group);
@@ -1491,7 +1490,7 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 									'<td class="b top">'.$el['name'].
 							  (SA ? '<td class="w50 top">'.
 										'<div class="icon icon-move-y fr pl"></div>'.
-								        '<div class="icon icon-edit fr pl mr3"></div>'
+								        '<div class="icon icon-edit fr pl mr3 dialog-setup" val="dialog_id:'.$el['id'].'"></div>'
 							  : '').
 							'</table>'.
 							'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
@@ -1501,47 +1500,22 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 	}
 
 	return
-		'<table id="elem-group" class="w100p">'.
-			'<tr><td class="w150 top prel">'.
-					'<div id="head-back"></div>'.
-					$head.
-				'<td id="elem-group-content" class="top">'.
-					'<div class="cnt-div">'.$content.'<div>'.
-		'</table>'.
-//		PHP12_elem_choose_gebug($BL).
-		'';
+	'<table id="elem-group" class="w100p">'.
+		'<tr><td class="w150 top prel">'.
+				'<div id="head-back"></div>'.
+				$head.
+			'<td id="elem-group-content" class="top">'.
+				'<div class="cnt-div">'.$content.'<div>'.
+	'</table>'.
+
+	'<div class="pad10 line-t bg-ffc">'.PHP12_elem_choose_gebug($prm).'</div>'.
+	'';
 }
 function PHP12_elem_choose_rule($prm) {
 	return true;
 
 
 /*
-	//данные исходного блока
-	if(!$BL = _blockOne($prm['srce']['block_id']))
-		$BL = array(
-			'obj_id' => 0,
-			'obj_name' => '',
-			'elem' => array()
-		);
-	$EL = $BL['elem'];
-
-	define('OBJ_ID', _num($BL['obj_id']));
-
-	//ячейка таблицы
-	define('TD_UNIT', $EL && $EL['dialog_id'] == 23);
-
-	//сборный текст
-	define('_44_UNIT',  $EL && $EL['dialog_id'] == 44);
-
-	//блок со страницы
-	define('BLOCK_PAGE', !TD_UNIT && !_44_UNIT && $BL['obj_name'] == 'page');
-
-	//блок из диалога
-	define('BLOCK_DIALOG', !TD_UNIT && !_44_UNIT && $BL['obj_name'] == 'dialog');
-
-	//блок единицы списка
-	define('BLOCK_SPISOK', $BL['obj_name'] == 'spisok');
-
 	//принимает ли страница значения единицы списка
 	$unit_get = 0;
 	if(BLOCK_PAGE) {
@@ -1586,8 +1560,32 @@ function PHP12_elem_choose_rule($prm) {
 //			$show = false;
 */
 }
-function PHP12_elem_choose_gebug($BL) {//информация о месте куда происходит вставка элемента
-	return '';
+function PHP12_elem_choose_gebug($prm) {//информация о месте куда происходит вставка элемента
+	if($block_id = $prm['srce']['block_id']) {
+		if(!$BL = _blockOne($block_id))
+			return _msgRed('Исходного блока '.$block_id.' не существует.');
+
+		$EL = $BL['elem'];
+
+		//ячейка таблицы
+		if($EL && $EL['dialog_id'] == 23)
+			return 'Ячейка таблицы';
+
+		//сборный текст
+		if($EL && $EL['dialog_id'] == 44)
+			return 'Сборный текст';
+
+		switch($BL['obj_name']) {
+			case 'page':        return 'Блок со страницы';
+			case 'dialog':      return 'Блок с диалога';
+			case 'dialog_del':  return 'Блок с настройки содержания удаления записи';
+			case 'spisok':      return 'Блок единицы списка';
+		}
+
+		return _msgRed('Неизвестное местоположение.');
+	}
+
+	return _pr($prm['srce']).'Исходный блок отсутствует.';
 
 	if(!DEBUG)
 		return '';
