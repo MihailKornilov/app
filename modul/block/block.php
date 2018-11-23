@@ -1059,9 +1059,25 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					'class'=>'curD'
 				));
 			if(!$u = $prm['unit_get'])
-				return 'х';
+				return _iconDel(array(
+					'red' => $el['num_1'],
+					'class'=>'curD'
+				));
+
+			//если используется сторонняя таблица (не _spisok), поиск диалога, который вносит данные
+			if(!isset($u['dialog_id'])) {
+				if(!$elp = _elemOne($el['parent_id']))
+					return _msgRed('-elp-yok-');
+
+				$u['dialog_id'] = 0;
+				switch($elp['dialog_id']) {
+					//список-таблица
+					case 23: $u['dialog_id'] = $elp['num_1']; break;
+				}
+			}
+
 			if(!$dlg = _dialogQuery($u['dialog_id']))
-				return 'хх';
+				return _msgRed('-dlg-yok-');
 			//иконка не выводится, если удаление запрещено
 			if(!$dlg['del_on'])
 				return '';
@@ -1181,9 +1197,22 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			if($prm['blk_setup'])
 				return _iconEdit(array('class'=>'curD'));
 			if(!$u = $prm['unit_get'])
-				return 'х';
+				return _iconEdit(array('class'=>'curD'));
+
+			//если используется сторонняя таблица (не _spisok), поиск диалога, который вносит данные
+			if(!isset($u['dialog_id'])) {
+				if(!$elp = _elemOne($el['parent_id']))
+					return _msgRed('-elp-yok-');
+
+				$u['dialog_id'] = 0;
+				switch($elp['dialog_id']) {
+					//список-таблица
+					case 23: $u['dialog_id'] = $elp['num_1']; break;
+				}
+			}
+
 			if(!$dlg = _dialogQuery($u['dialog_id']))
-				return 'хх';
+				return _msgRed('-dlg-yok-');
 			//иконка не выводится, если редактирование запрещено
 			if(!$dlg['edit_on'])
 				return '';

@@ -1657,6 +1657,9 @@ function PHP12_v_choose($prm) {
 		//ячейка таблицы
 		$obj_id = PHP12_v_choose_23($BL, $obj_id);
 
+		//сборный текст
+		$obj_id = PHP12_v_choose_44($BL, $obj_id);
+
 		//блок со страницы
 		$obj_id = PHP12_v_choose_page($BL, $obj_id);
 
@@ -1670,12 +1673,6 @@ function PHP12_v_choose($prm) {
 		$obj_id = PHP12_v_choose_27balans($BL, $obj_id);
 	}
 
-/*
-
-	//сборный текст
-	$obj_id = PHP12_v_choose_44($prm, $obj_id);
-
-*/
 	if($obj_id === false)
 		return _emptyMin10('Не найдена схема поиска объекта.');
 	if(!$obj_id)
@@ -1777,6 +1774,21 @@ function PHP12_v_choose_23($BL, $dialog_id) {//ячейка таблицы
 
 	return _num($EL['num_1']);
 }
+function PHP12_v_choose_44($BL, $obj_id) {//сборный текст
+	if($obj_id)
+		return $obj_id;
+	if(!$EL = $BL['elem'])
+		return false;
+	if($EL['dialog_id'] != 44)
+		return false;
+
+	switch($BL['obj_name']) {
+		case 'page':   return false; //диалог будет найден в PHP12_v_choose_page
+		case 'dialog': return _num($BL['obj_id']);
+		case 'spisok': return false; //диалог будет найден в PHP12_v_choose_spisok
+	}
+	return 0;
+}
 function PHP12_v_choose_page($BL, $dialog_id) {//блок со страницы
 	if($dialog_id !== false)
 		return $dialog_id;
@@ -1818,20 +1830,6 @@ function PHP12_v_choose_27balans($BL, $dialog_id) {//ячейка таблицы
 	return _num($BL['obj_id']);
 }
 
-function PHP12_v_choose_44($prm, $dialog_id) {//сборный текст
-	if($dialog_id)
-		return $dialog_id;
-	if(!$BL = PHP12_v_choose_BL($prm))
-		return 0;
-	if(!$EL = $BL['elem'])
-		return 0;
-	if($EL['dialog_id'] != 44)
-		return 0;
-	if($BL['obj_name'] != 'dialog')
-		return 0;
-
-	return _num($BL['obj_id']);
-}
 
 
 
@@ -2655,7 +2653,7 @@ function PHP12_44_setup_vvv($prm) {
 }
 function PHP12_44_print($el, $u) {//печать сборного текста
 	if(!$ids = _ids($el['txt_2'], 'arr'))
-		return _msgRed('-no-44-ids-');
+		return $el['name'];
 
 	$send = '';
 	foreach($ids as $id) {
