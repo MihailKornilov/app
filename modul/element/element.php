@@ -531,28 +531,6 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 
 
 
-	//диалоги, которые вносят элементы, использующие дополнительные элементы-значения
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE `element_val_use`";
-	$dlgValUse = query_ids($sql);
-
-	//элементы с дополнительными значениями
-	$sql = "SELECT `id`
-			FROM `_element`
-			WHERE `dialog_id` IN (".$dlgValUse.")
-			  AND `id` IN (".$elmIds.",".$elmSpIds.")";
-	$elmValUse = query_ids($sql);
-
-	//элементы-значения
-	$sql = "SELECT COUNT(*)
-			FROM `_element`
-			WHERE `parent_id` IN (".$elmValUse.")";
-	$elmValCount = $elmValUse ? query_value($sql) : 0;
-
-
-
-
 
 	//ids элементов истории действий в диалогах
 	$dlgHist = array();
@@ -566,6 +544,16 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 	}
 	$dlgHist = array_diff($dlgHist, array(''));
 	$dlgHist = implode(',', $dlgHist);
+
+
+
+
+
+	//элементы-значения
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `parent_id`";
+	$elmValCount = query_value($sql) - _ids($dlgHist, 'count');
 
 
 
@@ -673,7 +661,6 @@ function PHP12_dialog_sa() {//список диалоговых окон [12]
 					'<th>Имя диалога'.
 					'<th>type'.
 					'<th>afics'.
-					'<th>val<br>use'.
 					'<th>col';
 	foreach($arr as $r) {
 		$send .= '<tr>'.
@@ -684,7 +671,6 @@ function PHP12_dialog_sa() {//список диалоговых окон [12]
 					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
 					'<td class="center">'._elemColType($r['element_type']).
 					'<td>'.$r['element_afics'].
-					'<td>'.($r['element_val_use'] ? '<div class="icon icon-ok curD"></div>' : '').
 					'<td class="grey">'.PHP12_dialog_col($r['id']);
 	}
 	$send .= '</table>';
@@ -1436,7 +1422,7 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 	$head = '';
 	$content = '';
 	$sql = "SELECT *
-			FROM `_dialog_group`
+			FROM `_element_group`
 			WHERE `sa` IN (0,".SA.")
 			ORDER BY `sort`";
 	if(!$group = query_arr($sql))
@@ -1539,16 +1525,9 @@ function PHP12_elem_choose_rule($prm) {
 		$page = _page($unit['source']['page_id']);
 		$spisok_exist = $page['dialog_id_unit_get'];
 	}
-	define('IS_SPISOK_UNIT', BLOCK_SPISOK || TD_PASTE || $spisok_exist);
 */
 
 /*
-		if(_44_ACCESS && !$r['element_paste_44'])
-			continue;
-//		if(IS_SPISOK_UNIT && !$r['element_is_spisok_unit'])
-//			continue;
-
-
 		if(BLOCK_PAGE && $r['element_paste_page']
 		|| BLOCK_DIALOG && $r['element_paste_dialog']
 		|| BLOCK_SPISOK && $r['element_paste_spisok']
@@ -1556,8 +1535,6 @@ function PHP12_elem_choose_rule($prm) {
 		|| _44_UNIT && $r['element_paste_44']
 		) $show = true;
 
-//		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
-//			$show = false;
 */
 }
 function PHP12_elem_choose_gebug($prm) {//информация о месте куда происходит вставка элемента

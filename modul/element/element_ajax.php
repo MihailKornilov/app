@@ -50,7 +50,7 @@ switch(@$_POST['op']) {
 
 			//группы элементов
 			$sql = "SELECT *
-					FROM `_dialog_group`
+					FROM `_element_group`
 					ORDER BY `sort`";
 			foreach(query_arr($sql) as $r) {
 				$group[] = array(
@@ -278,6 +278,14 @@ switch(@$_POST['op']) {
 						'<tr><td class="red r">Диалог для функций:'.
 							'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
 
+						'<tr><td class="red r pt20">Дополнительно:'.
+							'<td class="pt20">'.
+			                       _check(array(
+										'attr_id' => 'element_hidden',
+										'title' => 'скрытый элемент',
+										'value' => $dialog['element_hidden']
+								   )).
+
 						'<tr><td class="red r pt20">Разрешения:'.
 							'<td class="pt20">'.
 			                        _check(array(
@@ -302,26 +310,6 @@ switch(@$_POST['op']) {
 										'attr_id' => 'element_hint_access',
 										'title' => 'разрешать прикрепление подсказки',
 										'value' => $dialog['element_hint_access']
-								   )).
-
-						'<tr><td class="red r pt20">Дополнительно:'.
-							'<td class="pt20">'.
-			                       _check(array(
-										'attr_id' => 'element_is_spisok_unit',
-										'title' => 'является значением списка',
-										'value' => $dialog['element_is_spisok_unit']
-								   )).
-						'<tr><td>'.
-							'<td>'._check(array(
-										'attr_id' => 'element_val_use',
-										'title' => 'использует дополнительные значения',
-										'value' => $dialog['element_val_use']
-								   )).
-						'<tr><td>'.
-							'<td>'._check(array(
-										'attr_id' => 'element_hidden',
-										'title' => 'скрытый элемент',
-										'value' => $dialog['element_hidden']
 								   )).
 
 						'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
@@ -882,9 +870,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$element_dialog_func = _num($_POST['element_dialog_func']);
 	$element_afics = _txt($_POST['element_afics']);
 
-	$element_val_use = _num($_POST['element_val_use']);
 	$element_hidden = _num($_POST['element_hidden']);
-	$element_is_spisok_unit = _num($_POST['element_is_spisok_unit']);
 
 	$element_paste_page =   _num($_POST['element_paste_page']);
 	$element_paste_dialog = _num($_POST['element_paste_dialog']);
@@ -940,9 +926,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`element_dialog_func`=".$element_dialog_func.",
 				`element_afics`='".addslashes($element_afics)."',
 
-				`element_val_use`=".$element_val_use.",
 				`element_hidden`=".$element_hidden.",
-				`element_is_spisok_unit`=".$element_is_spisok_unit.",
 
 				`element_paste_page`=".$element_paste_page.",
 				`element_paste_dialog`=".$element_paste_dialog.",
