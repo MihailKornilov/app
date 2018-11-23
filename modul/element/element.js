@@ -2127,6 +2127,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 				num_3:''  //значение выпадающего списка
 			}, v);
 
+			var issp34 = v.issp && (v.num_2 == 3 || v.num_2 == 4);
+
 			DL.append(
 				'<dd class="over3" val="' + v.id + '">' +
 					'<table class="bs5 w100p">' +
@@ -2138,13 +2140,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 									  ' value="' + v.title + '"' +
 									  ' val="' + v.txt_1 + '"' +
 								' />' +
-							'<td><input type="hidden" class="cond-id" value="' + v.num_2 + '" />' +
+							'<td class="cond-td' + _dn(v.txt_1) + '">' +
+								'<input type="hidden" class="cond-id" value="' + v.num_2 + '" />' +
 							'<td class="w100p pr20">' +
 								'<input type="text"' +
-									  ' class="cond-val w100' + _dn(!v.issp && v.num_2 > 2) + '"' +
+									  ' class="cond-val w100' + _dn(!issp34 && v.num_2 > 2) + '"' +
 									  ' value="' + v.txt_2 + '"' +
 								' />' +
-								'<div class="div-cond-sel' + _dn(v.issp) + '">' +
+								'<div class="div-cond-sel' + _dn(issp34) + '">' +
 									'<input type="hidden"' +
 										  ' class="cond-sel"' +
 										  ' value="' + v.num_3 + '"' +
@@ -2172,8 +2175,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {
-						COND_ID._select('enable')
-							   ._select(v.txt_1 ? 0 : 1);
+						DD.find('.cond-td')._dn(1);
+						COND_ID._select(2);
 						v.txt_1 = res.v;
 						TITLE.attr('val', v.txt_1);
 						TITLE.val(res.title);
@@ -2190,8 +2193,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 			});
 			COND_ID._select({//условие
 				width:150,
-				title0:'не выбрано',
-				disabled:!v.id,
 				spisok:[
 					{id:1,title:'отсутствует'},
 					{id:2,title:'присутствует'},

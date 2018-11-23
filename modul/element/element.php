@@ -2055,7 +2055,7 @@ function PHP12_elem22_vvv($prm) {//Дополнительные условия �
 			'txt_1' => _ids($r['txt_1']),
 			'num_2' => _num($r['num_2']),
 			'txt_2' => $r['txt_2'],
-			'issp' => $r['num_3'] && ($r['num_2'] == 3 || $r['num_2'] == 4) ? 1 : 0,
+			'issp' => _elemIsConnect($r['txt_1']),
 			'spisok' => _29cnn($r['txt_1']),
 			'num_3' => _num($r['num_3'])
 		);
