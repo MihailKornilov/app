@@ -1388,7 +1388,7 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 	}
 
 
-	return '<div class="fs10 color-sal">11.'.$ell['dialog_id'].'</div>';
+	return '11.'.$ell['dialog_id'].'.one';
 }
 function _elem11title($EL) {//имя элемента, если нет записи
 	$title = '';
@@ -1414,7 +1414,7 @@ function _elem11title($EL) {//имя элемента, если нет запи�
 	}
 
 	if(!$title)
-		return '<div class="fs10 color-acc">11.title</div>';
+		return '11.title';
 
 	return $title;
 }
@@ -1433,6 +1433,89 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 function PHP12_elem_choose($prm) {//выбор элемента для вставки в блок. Диалог [50]
+	$head = '';
+	$content = '';
+	$sql = "SELECT *
+			FROM `_dialog_group`
+			WHERE `sa` IN (0,".SA.")
+			ORDER BY `sort`";
+	if(!$group = query_arr($sql))
+		return _emptyMin10('Отсутствуют группы элементов.');
+
+	foreach($group as $id => $r)
+		$group[$id]['elem'] = array();
+
+	//получение всех элементов
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `element_group_id` IN ("._idsGet($group).")
+			  AND `sa` IN (0,".SA.")
+			ORDER BY `sort`,`id`";
+	if(!$elem = query_arr($sql))
+		return _emptyMin10('Нет элементов для отображения.');
+
+	//расстановка элементов в группы с учётом правил отображения
+	foreach($elem as $id => $r)
+		if(PHP12_elem_choose_rule($prm))
+			$group[$r['element_group_id']]['elem'][] = $r;
+
+	//скрытие разделов без элементов
+	foreach($group as $id => $r)
+		if(empty($r['elem']))
+			unset($group[$id]);
+
+	if(empty($group))
+		return _emptyMin10('Нет элементов для отображения.');
+//			   PHP12_elem_choose_gebug($BL);
+
+	reset($group);
+	$firstId = key($group);
+	foreach($group as $id => $r) {
+		$sel = _dn($id != $firstId, 'sel');
+		$first = _dn($id != $firstId, 'first');
+		$head .=
+			'<table class="el-group-head'.$first.$sel.'" val="'.$id.'">'.
+				'<tr>'.
+	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
+					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'.$r['name'].
+			'</table>';
+
+		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == $firstId).'">';
+		$n = 1;
+		foreach($r['elem'] as $el)
+				$content .=
+					'<dd val="'.$el['id'].'">'.
+						'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
+							'<table class="w100p">'.
+								'<tr><td class="num w25 r top pr5 grey">'.$n++.'.'.
+									'<td class="b top">'.$el['name'].
+							  (SA ? '<td class="w50 top">'.
+										'<div class="icon icon-move-y fr pl"></div>'.
+								        '<div class="icon icon-edit fr pl mr3"></div>'
+							  : '').
+							'</table>'.
+							'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
+						'</div>'.
+					'</dd>';
+		$content .=	'</dl>';
+	}
+
+	return
+		'<table id="elem-group" class="w100p">'.
+			'<tr><td class="w150 top prel">'.
+					'<div id="head-back"></div>'.
+					$head.
+				'<td id="elem-group-content" class="top">'.
+					'<div class="cnt-div">'.$content.'<div>'.
+		'</table>'.
+//		PHP12_elem_choose_gebug($BL).
+		'';
+}
+function PHP12_elem_choose_rule($prm) {
+	return true;
+
+
+/*
 	//данные исходного блока
 	if(!$BL = _blockOne($prm['srce']['block_id']))
 		$BL = array(
@@ -1485,36 +1568,12 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 	define('IS_SPISOK_UNIT', BLOCK_SPISOK || TD_PASTE || $spisok_exist);
 */
 
-	$head = '';
-	$content = '';
-	$sql = "SELECT *
-			FROM `_dialog_group`
-			WHERE `sa` IN (0,".SA.")
-			ORDER BY `sort`";
-	if(!$group = query_arr($sql))
-		return _emptyMin10('Отсутствуют группы элементов.');
-
-	foreach($group as $id => $r)
-		$group[$id]['elem'] = array();
-
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE `element_group_id` IN ("._idsGet($group).")
-			  AND `sa` IN (0,".SA.")
-			ORDER BY `sort`,`id`";
-	if(!$elem = query_arr($sql))
-		return _emptyMin10('Нет элементов для отображения.');
-
-	//расстановка элементов в группы с учётом правил отображения
-	foreach($elem as $id => $r) {
 /*
 		if(_44_ACCESS && !$r['element_paste_44'])
 			continue;
 //		if(IS_SPISOK_UNIT && !$r['element_is_spisok_unit'])
 //			continue;
-*/
 
-		$show = false;
 
 		if(BLOCK_PAGE && $r['element_paste_page']
 		|| BLOCK_DIALOG && $r['element_paste_dialog']
@@ -1525,63 +1584,11 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 
 //		if($r['element_is_spisok_unit'] && !IS_SPISOK_UNIT)
 //			$show = false;
-
-//		if($show)
-			$group[$r['element_group_id']]['elem'][] = $r;
-	}
-
-	foreach($group as $id => $r)
-		if(empty($r['elem']))
-			unset($group[$id]);
-
-	if(empty($group))
-		return _emptyMin10('Нет элементов для отображения.').
-			   PHP12_elem_choose_gebug($BL);
-
-	reset($group);
-	$firstId = key($group);
-	foreach($group as $id => $r) {
-		$sel = _dn($id != $firstId, 'sel');
-		$first = _dn($id != $firstId, 'first');
-		$head .=
-			'<table class="el-group-head'.$first.$sel.'" val="'.$id.'">'.
-				'<tr>'.
-	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
-					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'.$r['name'].
-			'</table>';
-
-		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == $firstId).'">';
-		$n = 1;
-		foreach($r['elem'] as $el)
-				$content .=
-					'<dd val="'.$el['id'].'">'.
-						'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
-							'<table class="w100p">'.
-								'<tr><td class="num w25 r top pr5 grey">'.$n++.'.'.
-									'<td class="b top">'.$el['name'].
-							  (SA ? '<td class="w50 top">'.
-										'<div class="icon icon-move-y fr pl"></div>'.
-								        '<div class="icon icon-edit fr pl mr3"></div>'
-							  : '').
-							'</table>'.
-							'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
-						'</div>'.
-					'</dd>';
-		$content .=	'</dl>';
-	}
-
-	return
-		'<table id="elem-group" class="w100p">'.
-			'<tr><td class="w150 top prel">'.
-					'<div id="head-back"></div>'.
-					$head.
-				'<td id="elem-group-content" class="top">'.
-					'<div class="cnt-div">'.$content.'<div>'.
-		'</table>'.
-		PHP12_elem_choose_gebug($BL).
-		'';
+*/
 }
-function PHP12_elem_choose_gebug($BL) {//выбор элемента - группы
+function PHP12_elem_choose_gebug($BL) {//информация о месте куда происходит вставка элемента
+	return '';
+
 	if(!DEBUG)
 		return '';
 
