@@ -330,7 +330,7 @@ switch(@$_POST['op']) {
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
 		$send['dlg_sa'] = SA ? _dialogSelArray('sa_only') : array();
-		$send['dlg_spisok_on'] = _dialogSelArray('spisok_only');
+		$send['dlg_spisok_on'] = _dialogSelArray('spisok_only', $dialog_id);
 		$send['spisok_cmp'] = _dialogSpisokCmp($dialog['cmp']);
 
 		$dlgUnitGet = _dialogSelArray('spisok_only', $dialog_id);
@@ -820,6 +820,8 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$spisok_elem_id = $spisok_on ? _num($_POST['spisok_elem_id']) : 0;
 
 	$dialog_id_parent =   _num($_POST['dialog_id_parent']);
+	if($dialog_id_parent == $dialog_id)
+		jsonError('Диалог не может родительским для самого себя');
 
 	$dialog_id_unit_get = _num($_POST['dialog_id_unit_get'], 1);
 	if($dialog_id_unit_get == $dialog_id)

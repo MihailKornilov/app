@@ -550,7 +550,6 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 		//исходный список является ассоциативным объектом
 		if(!o.spisok.length) {
 			_forIn(o.spisok, function(sp, id) {
-//				id = _num(id);
 				if(!id)
 					return;
 				MASS_ASS[id] = sp;
@@ -581,9 +580,6 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 					id = sp.id;
 				if(sp.info)
 					id = -9999999999;
-				if(id === undefined)
-					return;
-//				id = _num(id, 1);
 				if(!id)
 					return;
 				title = sp.title;
@@ -610,7 +606,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 	}
 	function spisokPrint() {//вставка списка в select
 		RES.removeClass('h250');
-		if(!MASS_SEL.length) {
+		if(!MASS_SEL.length && !o.title0) {
 			RES.html('<div class="empty">' + o.msg_empty + '</div>');
 			return;
 		}
