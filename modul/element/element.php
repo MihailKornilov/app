@@ -1676,7 +1676,7 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 function PHP12_elem_choose_rule($prm, $isMsg=0) {
 	//прямое указание на правило
 	if($rule_id = _num(@$prm['srce']['dop']['rule_id']))
-		return !$isMsg ? $rule_id : 'Правило '.$rule_id;
+		return !$isMsg ? $rule_id : 'Правило '.$rule_id.'.';
 
 	if($block_id = $prm['srce']['block_id']) {
 		if(!$BL = _blockOne($block_id))
@@ -1684,25 +1684,25 @@ function PHP12_elem_choose_rule($prm, $isMsg=0) {
 
 		if($EL = $BL['elem'])
 			switch($EL['dialog_id']) {
-				case 23: return !$isMsg ? 5 : 'Ячейка таблицы';
-				case 44: return !$isMsg ? 4 : 'Сборный текст';
+				case 23: return !$isMsg ? 5 : 'Ячейка таблицы.';
+				case 44: return !$isMsg ? 4 : 'Сборный текст.';
 			}
 
 		switch($BL['obj_name']) {
 			case 'page':
 				if(!$page = _page($BL['obj_id']))
-					return !$isMsg ? 0 : 'Несуществующая страница '.$BL['obj_id'];
+					return !$isMsg ? 0 : 'Несуществующая страница '.$BL['obj_id'].'.';
 				if($page['dialog_id_unit_get'])
-					return !$isMsg ? 9 : 'Блок страницы, принимающей данные записи';
-				return !$isMsg ? 1 : 'Блок со страницы';
+					return !$isMsg ? 9 : 'Блок страницы, принимающей данные записи.';
+				return !$isMsg ? 1 : 'Блок со страницы.';
 			case 'dialog':
 				if(!$dlg = _dialogQuery($BL['obj_id']))
-					return !$isMsg ? 0 : 'Несуществующий диалог '.$BL['obj_id'];
+					return !$isMsg ? 0 : 'Несуществующий диалог '.$BL['obj_id'].'.';
 				if($dlg['dialog_id_unit_get'])
-					return !$isMsg ? 10 : 'Блок диалога, принимающего данные записи';
-				return !$isMsg ? 2 : 'Блок с диалога';
-			case 'dialog_del':  return !$isMsg ? 8 : 'Блок содержания удаления записи';
-			case 'spisok':      return !$isMsg ? 3 : 'Блок единицы списка';
+					return !$isMsg ? 10 : 'Блок диалога, принимающего данные записи.';
+				return !$isMsg ? 2 : 'Блок с диалога.';
+			case 'dialog_del':  return !$isMsg ? 8 : 'Блок содержания удаления записи.';
+			case 'spisok':      return !$isMsg ? 3 : 'Блок единицы списка.';
 		}
 
 		return !$isMsg ? 0 : 'Неизвестное местоположение.';
