@@ -513,17 +513,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 				element_afics:DLG('#element_afics').val(),
 				element_hidden:DLG('#element_hidden').val(),
 
-				element_search_access:DLG('#element_search_access').val(),
 				element_style_access:DLG('#element_style_access').val(),
 				element_url_access:DLG('#element_url_access').val(),
 				element_hint_access:DLG('#element_hint_access').val(),
 				element_dialog_func:DLG('#element_dialog_func').val(),
-
-				element_paste_page:  DLG('#element_paste_page').val(),
-				element_paste_dialog:DLG('#element_paste_dialog').val(),
-				element_paste_spisok:DLG('#element_paste_spisok').val(),
-				element_paste_td:    DLG('#element_paste_td').val(),
-				element_paste_44:    DLG('#element_paste_44').val(),
 
 				menu_edit_last:DLG('#dialog-menu').val()
 			}, o.send || {});
@@ -3148,7 +3141,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		_attr_el(el.id).find('DL')._sort({table:'_element_func'});
 	},
 
-	/* ---=== НАСТРЙОКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
+	/* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
 	PHP12_history_setup = function(el, vvv, obj) {
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',

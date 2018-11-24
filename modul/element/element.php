@@ -1513,28 +1513,10 @@ function PHP12_elem_choose_rule($prm) {
 	//принимает ли диалог значения единицы списка
 	define('DIALOG_UNIT_GET', 0);
 
-/*
-	$BL['obj_name'] = $unit['source']['unit_id'] == -115 ? 'spisok' : '';
-	if($block_id = _num($unit['source']['block_id'], 1))
-		if(!$BL = _blockOne($block_id))
-			return _emptyMin10('Исходного блока id'.$block_id.' не существует.');
-
-	define('_44_ACCESS', $unit['source']['unit_id'] == -111);//сборный текст, шаблон истории действий
-
 	if(BLOCK_DIALOG) {
 		$page = _page($unit['source']['page_id']);
 		$spisok_exist = $page['dialog_id_unit_get'];
 	}
-*/
-
-/*
-		if(BLOCK_PAGE && $r['element_paste_page']
-		|| BLOCK_DIALOG && $r['element_paste_dialog']
-		|| BLOCK_SPISOK && $r['element_paste_spisok']
-		|| TD_UNIT && $r['element_paste_td']
-		|| _44_UNIT && $r['element_paste_44']
-		) $show = true;
-
 */
 }
 function PHP12_elem_choose_gebug($prm) {//информация о месте куда происходит вставка элемента
@@ -1542,15 +1524,11 @@ function PHP12_elem_choose_gebug($prm) {//информация о месте к�
 		if(!$BL = _blockOne($block_id))
 			return _msgRed('Исходного блока '.$block_id.' не существует.');
 
-		$EL = $BL['elem'];
-
-		//ячейка таблицы
-		if($EL && $EL['dialog_id'] == 23)
-			return 'Ячейка таблицы';
-
-		//сборный текст
-		if($EL && $EL['dialog_id'] == 44)
-			return 'Сборный текст';
+		if($EL = $BL['elem'])
+			switch($EL['dialog_id']) {
+				case 23: return 'Ячейка таблицы';
+				case 44: return 'Сборный текст';
+			}
 
 		switch($BL['obj_name']) {
 			case 'page':        return 'Блок со страницы';
@@ -3555,11 +3533,12 @@ function _imageShow($prm) {//просмотр изображений (встав
 			'IMG_IDS=['.implode(',', $spisokIds).'];'.
 	'</script>';
 }
-function _imageDeleted($el, $SRC) {//удалённые изображения (вставляется в блок через [12])
-	if(!$obj_id = $SRC['get_id'])
-		return '<div class="_empty min">Отсутствует запись, к которой прикрепляются изображения.</div>';
+function _imageDeleted($prm) {//удалённые изображения (вставляется в блок через [12])
+	return 'Требуется переделать функцию.';
+	if(!$obj_id = $prm['unit_get_id'])
+		return _emptyMin('Отсутствует запись, к которой прикрепляются изображения.');
 	if(!$elem_id = _num($SRC['prm']['elem_id']))
-		return '<div class="_empty min">Отсутствует id элемента.</div>';
+		return _emptyMin('Отсутствует id элемента.');
 
 	$sql = "SELECT *
 			FROM `_image`

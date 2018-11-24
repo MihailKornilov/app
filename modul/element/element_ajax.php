@@ -289,12 +289,6 @@ switch(@$_POST['op']) {
 						'<tr><td class="red r pt20">Разрешения:'.
 							'<td class="pt20">'.
 			                        _check(array(
-										'attr_id' => 'element_search_access',
-										'title' => 'разрешать быстрый поиск по элементу',
-										'value' => $dialog['element_search_access']
-									)).
-						'<tr><td>'.
-							'<td>'._check(array(
 										'attr_id' => 'element_style_access',
 										'title' => 'разрешать настройку стилей',
 										'value' => $dialog['element_style_access']
@@ -313,36 +307,6 @@ switch(@$_POST['op']) {
 								   )).
 
 						'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
-						'<tr><td>'.
-							'<td>'._check(array(
-										'attr_id' => 'element_paste_page',
-										'title' => 'вставка в блок страницы',
-										'value' => $dialog['element_paste_page']
-								   )).
-						'<tr><td>'.
-							'<td>'._check(array(
-										'attr_id' => 'element_paste_dialog',
-										'title' => 'вставка в блок диалога',
-										'value' => $dialog['element_paste_dialog']
-								   )).
-						'<tr><td>'.
-							'<td>'._check(array(
-										'attr_id' => 'element_paste_spisok',
-										'title' => 'вставка в блок шаблона списка',
-										'value' => $dialog['element_paste_spisok']
-								   )).
-						'<tr><td>'.
-							'<td>'._check(array(
-										'attr_id' => 'element_paste_td',
-										'title' => 'вставка в ячейку таблицы',
-										'value' => $dialog['element_paste_td']
-								   )).
-						'<tr><td>'.
-							'<td>'._check(array(
-										'attr_id' => 'element_paste_44',
-										'title' => 'вставка в сборный текст',
-										'value' => $dialog['element_paste_44']
-								   )).
 					'</table>'.
 					'</div>'.
 				'</div>'.
@@ -863,7 +827,6 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
 	$element_type = _num($_POST['element_type']);
-	$element_search_access = _num($_POST['element_search_access']);
 	$element_style_access = _num($_POST['element_style_access']);
 	$element_url_access = _num($_POST['element_url_access']);
 	$element_hint_access = _num($_POST['element_hint_access']);
@@ -871,12 +834,6 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$element_afics = _txt($_POST['element_afics']);
 
 	$element_hidden = _num($_POST['element_hidden']);
-
-	$element_paste_page =   _num($_POST['element_paste_page']);
-	$element_paste_dialog = _num($_POST['element_paste_dialog']);
-	$element_paste_spisok = _num($_POST['element_paste_spisok']);
-	$element_paste_td = _num($_POST['element_paste_td']);
-	$element_paste_44 = _num($_POST['element_paste_44']);
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
@@ -919,20 +876,12 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`element_width`=".$element_width.",
 				`element_width_min`=".$element_width_min.",
 				`element_type`=".$element_type.",
-				`element_search_access`=".$element_search_access.",
+				`element_afics`='".addslashes($element_afics)."',
+				`element_hidden`=".$element_hidden.",
 				`element_style_access`=".$element_style_access.",
 				`element_url_access`=".$element_url_access.",
 				`element_hint_access`=".$element_hint_access.",
 				`element_dialog_func`=".$element_dialog_func.",
-				`element_afics`='".addslashes($element_afics)."',
-
-				`element_hidden`=".$element_hidden.",
-
-				`element_paste_page`=".$element_paste_page.",
-				`element_paste_dialog`=".$element_paste_dialog.",
-				`element_paste_spisok`=".$element_paste_spisok.",
-				`element_paste_td`=".$element_paste_td.",
-				`element_paste_44`=".$element_paste_44.",
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;
