@@ -142,7 +142,10 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 		return constant($key);
 
 	//диалог, через который вносятся данные списка
-	$dialog = _dialogQuery($el['num_1']);
+	if(!$dialog = _dialogQuery($el['num_1']))
+		return 0;
+	if(!$dialog['table_1'])
+		return 0;
 
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Кол-во списка ".$dialog['name']." */
 			SELECT COUNT(*)
