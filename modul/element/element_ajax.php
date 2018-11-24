@@ -242,20 +242,26 @@ switch(@$_POST['op']) {
 									'title' => 'компоненты в содержании не требуются',
 									'value' => $dialog['cmp_no_req']
 							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'sa',
+									'title' => 'SA only',
+									'value' => $dialog['sa']
+							   )).
 					//доступность диалога. На основании app_id.
 		            //0 - доступен только конкретному приложению
 		            //1 - всем приложениям
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'app_any',
-									'title' => 'доступно всем приложениям',
-									'value' => $dialog['id'] ? ($dialog['app_id'] ? 0 : 1) : 0
+									'title' => 'доступен во всех приложениях',
+									'value' => $dialog['app_id'] ? 0 : 1
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
-									'attr_id' => 'sa',
-									'title' => 'доступно только SA',
-									'value' => $dialog['sa']
+									'attr_id' => 'parent_any',
+									'title' => 'может быть выбран родительским во всех приложениях',
+									'value' => $dialog['parent_any']
 							   )).
 				'</table>'.
 
@@ -875,6 +881,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 		return;
 
 	$sa = _bool($_POST['sa']);
+	$parent_any = _bool($_POST['parent_any']);
 	$width_auto = _num($_POST['width_auto']);
 	$cmp_no_req = _num($_POST['cmp_no_req']);
 	$app_any = _num($_POST['app_any']);
@@ -914,6 +921,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
 				`sa`=".$sa.",
+				`parent_any`=".$parent_any.",
 				`width_auto`=".$width_auto.",
 				`cmp_no_req`=".$cmp_no_req.",
 

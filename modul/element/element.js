@@ -505,6 +505,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 				table_2_field:DLG('#table_2_field')._select('inp'),
 				app_any:DLG('#app_any').val(),
 				sa:DLG('#sa').val(),
+				parent_any:DLG('#parent_any').val(),
 
 				element_group_id:DLG('#element_group_id').val(),
 				element_width:DLG('#element_width').val(),
