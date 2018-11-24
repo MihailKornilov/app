@@ -1714,9 +1714,14 @@ function PHP12_elem_choose_debug($prm) {//информация о месте к�
 	if(!DEBUG)
 		return '';
 
+	$rule_setup = '';
+	if($rule_id = PHP12_elem_choose_rule($prm))
+		$rule_setup = '<a class="dialog-open ml10" val="dialog_id:1000,get_id:'.$rule_id.'">настроить правило</a>';
+
 	return
 	'<div class="pad10 line-t bg-ffc">'.
 		PHP12_elem_choose_rule($prm, 1).
+		$rule_setup.
 	'</div>';
 }
 
