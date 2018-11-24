@@ -521,6 +521,19 @@ var DIALOG = {},//массив диалоговых окон для управл
 				menu_edit_last:DLG('#dialog-menu').val()
 			}, o.send || {});
 
+			//выбранные правила для элемента
+			var rule = [];
+			_forEq(DLG('#element-rule input'), function(sp) {
+				var id = _num(sp.attr('id').split('element_rule_')[1]),
+					v = _num(sp.val());
+				if(!id)
+					return;
+				if(!v)
+					return;
+				rule.push(id);
+			});
+			send.element_rule = rule.join();
+
 			dialog.post(send, function(res) {
 				if(!o.send)
 					return;
@@ -3213,7 +3226,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					dialog_id:v.dialog_id || 50,
 					dss:obj.srce.dss,
 					edit_id:v.id,
-					dop:{history_setup:1},
+					dop:{rule_id:6},
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {

@@ -305,9 +305,8 @@ switch(@$_POST['op']) {
 										'title' => 'разрешать прикрепление подсказки',
 										'value' => $dialog['element_hint_access']
 								   )).
-
-						'<tr><td colspan="2"><div class="hd2 ml20 mt20 mb5">Правила отображения в диалоге выбора элемента:</div>'.
 					'</table>'.
+		            _dialogSetupRule($dialog_id).
 					'</div>'.
 				'</div>'.
 
@@ -693,6 +692,30 @@ function _table2field($tab) {//список колонок для таблицы
 
 	return $send;
 }
+function _dialogSetupRule($dialog_id) {
+	$sql = "SELECT `rule_id`,1
+			FROM `_element_rule_use`
+			WHERE `dialog_id`=".$dialog_id;
+	$ass = query_ass($sql);
+
+	$send = '';
+	$sql = "SELECT *
+			FROM `_element_rule_name`
+			ORDER BY `sort`";
+	foreach(query_arr($sql) as $id => $r) {
+		$send .=
+		'<tr><td class="w150">'.
+			'<td>'._check(array(
+						'attr_id' => 'element_rule_'.$id,
+						'title' => $r['name'],
+						'value' => _num(@$ass[$id])
+				   ));
+	}
+
+	return
+	'<div class="hd2 mar20 mb5">Правила для элемента:</div>'.
+	'<table id="element-rule" class="bs5">'.$send.'</table>';
+}
 
 
 function _dialogEditLoadUse($dialog) {//использование как элемента в других диалогах
@@ -886,6 +909,20 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;
 	query($sql);
+
+
+	//Обновление правил элемента
+	$sql = "DELETE FROM `_element_rule_use` WHERE `dialog_id`=".$dialog_id;
+	query($sql);
+	if($element_group_id)
+		if($ids = _ids($_POST['element_rule'], 'arr'))
+			foreach($ids as $id) {
+				$sql = "INSERT INTO `_element_rule_use`
+							(`dialog_id`,`rule_id`)
+						VALUES
+							(".$dialog_id.",".$id.")";
+				query($sql);
+			}
 
 	_BE('dialog_clear');
 

@@ -595,6 +595,9 @@ function _emptyMin10($msg) {
 function _emptyRed($msg) {
 	return '<div class="_empty red">'.$msg.'</div>';
 }
+function _emptyRed10($msg) {
+	return '<div class="_empty red mar10">'.$msg.'</div>';
+}
 
 
 function _vkapi($method, $param=array()) {//получение данных из api вконтакте
