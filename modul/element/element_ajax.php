@@ -773,6 +773,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	if(!_dialogQuery($dialog_id))
 		jsonError('Диалога не существует');
 
+	/* ---=== Настройки внесения данных ===--- */
 	$insert_on = _bool($_POST['insert_on']);
 	if(!$insert_head = _txt($_POST['insert_head']))
 		jsonError('Не указан заголовок для внесения записи');
@@ -782,6 +783,8 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$insert_action_id = _num($_POST['insert_action_id']);
 	$insert_action_page_id = _num($_POST['insert_action_page_id']);
 
+
+	/* ---=== Настройки редактирования данных ===--- */
 	$edit_on = _bool($_POST['edit_on']);
 	if(!$edit_head = _txt($_POST['edit_head']))
 		jsonError('Не указан заголовок редактирования');
@@ -791,6 +794,8 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$edit_action_id = _num($_POST['edit_action_id']);
 	$edit_action_page_id = _num($_POST['edit_action_page_id']);
 
+
+	/* ---=== Настройки удаления данных ===--- */
 	$del_on = _bool($_POST['del_on']);
 	if(!$del_head = _txt($_POST['del_head']))
 		jsonError('Не указан заголовок удаления');
@@ -801,71 +806,31 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$del_action_id = _num($_POST['del_action_id']);
 	$del_action_page_id = _num($_POST['del_action_page_id']);
 
+
+	/* ---=== Настройки ширины ===--- */
 	if(!$width = _num($_POST['width']))
 		jsonError('Некорректное значение ширины диалога');
 	if($width < 480 || $width > 980)
 		jsonError('Установлена недопустимая ширина диалога');
 
-	if($table_1 = _num($_POST['table_1'])) {
-		if(!$table = _table($table_1))
-			jsonError('Указана несуществующая таблица 1');
-		$sql = "SHOW TABLES LIKE '".$table."'";
-		if(!query_array($sql))
-			jsonError('Указана несуществующая таблица 1: "'.$table.'"');
-	}
+	if(!$name = _txt($_POST['name']))
+		jsonError('Укажите имя диалогового окна');
 
-	$table_2_field = '';
-	if($table_2 = _num($_POST['table_2'])) {
-		if(!$table = _table($table_2))
-			jsonError('Указана несуществующая таблица 2');
-		$sql = "SHOW TABLES LIKE '".$table."'";
-		if(!query_array($sql))
-			jsonError('Указана несуществующая таблица 2: "'.$table.'"');
-		if($table_1 == $table_2)
-			jsonError('Таблицы не могут совпадать');
-		if(!$table_2_field = _txt($_POST['table_2_field']))
-			jsonError('Не указана колонка для связки');
-	}
-
-	$menu_edit_last = _num($_POST['menu_edit_last']);
-	$sa = _bool($_POST['sa']);
+	$spisok_on = _bool($_POST['spisok_on']);
+	$spisok_elem_id = $spisok_on ? _num($_POST['spisok_elem_id']) : 0;
 
 	$dialog_id_parent =   _num($_POST['dialog_id_parent']);
-
-	$name = _txt($_POST['name']);
-	$spisok_on = _bool($_POST['spisok_on']);
-	if($spisok_on && !$name)
-		jsonError('Укажите имя диалогового окна');
-	$spisok_elem_id = $spisok_on ? _num($_POST['spisok_elem_id']) : 0;
 
 	$dialog_id_unit_get = _num($_POST['dialog_id_unit_get'], 1);
 	if($dialog_id_unit_get == $dialog_id)
 		jsonError('Диалог не может принимать значения самого себя');
 
-	$width_auto = _num($_POST['width_auto']);
-	$cmp_no_req = _num($_POST['cmp_no_req']);
-	$app_any = _num($_POST['app_any']);
-
-	$element_group_id = _num($_POST['element_group_id']);
-	$element_width = _num($_POST['element_width']);
-	$element_width_min = _num($_POST['element_width_min']);
-	$element_type = _num($_POST['element_type']);
-	$element_style_access = _num($_POST['element_style_access']);
-	$element_url_access = _num($_POST['element_url_access']);
-	$element_hint_access = _num($_POST['element_hint_access']);
-	$element_dialog_func = _num($_POST['element_dialog_func']);
-	$element_afics = _txt($_POST['element_afics']);
-
-	$element_hidden = _num($_POST['element_hidden']);
+	$menu_edit_last = _num($_POST['menu_edit_last']);
 
 	$sql = "UPDATE `_dialog`
-			SET `app_id`=".($app_any ? 0 : APP_ID).",
-				`sa`=".$sa.",
-				`dialog_id_parent`=".$dialog_id_parent.",
+			SET `dialog_id_parent`=".$dialog_id_parent.",
 				`name`='".addslashes($name)."',
 				`width`=".$width.",
-				`width_auto`=".$width_auto.",
-				`cmp_no_req`=".$cmp_no_req.",
 
 				`insert_on`=".$insert_on.",
 				`insert_head`='".addslashes($insert_head)."',
@@ -888,12 +853,71 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`del_action_id`=".$del_action_id.",
 				`del_action_page_id`=".$del_action_page_id.",
 
+				`spisok_on`=".$spisok_on.",
+				`spisok_elem_id`=".$spisok_elem_id.",
+
+				`dialog_id_unit_get`=".$dialog_id_unit_get.",
+
+				`menu_edit_last`=".$menu_edit_last."
+			WHERE `id`=".$dialog_id;
+	query($sql);
+
+	_dialogSaveSA($dialog_id);
+
+	_BE('dialog_clear');
+
+	return $dialog_id;
+}
+function _dialogSaveSA($dialog_id) {//сохрание настроек диалога SA
+	if(!SA)
+		return;
+
+	$sa = _bool($_POST['sa']);
+	$width_auto = _num($_POST['width_auto']);
+	$cmp_no_req = _num($_POST['cmp_no_req']);
+	$app_any = _num($_POST['app_any']);
+
+	if($table_1 = _num($_POST['table_1'])) {
+		if(!$table = _table($table_1))
+			jsonError('Указана несуществующая таблица 1');
+		$sql = "SHOW TABLES LIKE '".$table."'";
+		if(!query_array($sql))
+			jsonError('Указана несуществующая таблица 1: "'.$table.'"');
+	}
+
+	$table_2_field = '';
+	if($table_2 = _num($_POST['table_2'])) {
+		if(!$table = _table($table_2))
+			jsonError('Указана несуществующая таблица 2');
+		$sql = "SHOW TABLES LIKE '".$table."'";
+		if(!query_array($sql))
+			jsonError('Указана несуществующая таблица 2: "'.$table.'"');
+		if($table_1 == $table_2)
+			jsonError('Таблицы не могут совпадать');
+		if(!$table_2_field = _txt($_POST['table_2_field']))
+			jsonError('Не указана колонка для связки');
+	}
+
+	$element_group_id = _num($_POST['element_group_id']);
+	$element_width = _num($_POST['element_width']);
+	$element_width_min = _num($_POST['element_width_min']);
+	$element_type = _num($_POST['element_type']);
+	$element_style_access = _num($_POST['element_style_access']);
+	$element_afics = _txt($_POST['element_afics']);
+	$element_hidden = _num($_POST['element_hidden']);
+	$element_url_access = _num($_POST['element_url_access']);
+	$element_hint_access = _num($_POST['element_hint_access']);
+	$element_dialog_func = _num($_POST['element_dialog_func']);
+
+	$sql = "UPDATE `_dialog`
+			SET `app_id`=".($app_any ? 0 : APP_ID).",
+				`sa`=".$sa.",
+				`width_auto`=".$width_auto.",
+				`cmp_no_req`=".$cmp_no_req.",
+
 				`table_1`=".$table_1.",
 				`table_2`=".$table_2.",
 				`table_2_field`='".addslashes($table_2_field)."',
-				`spisok_on`=".$spisok_on.",
-				`spisok_elem_id`=".$spisok_elem_id.",
-				`dialog_id_unit_get`=".$dialog_id_unit_get.",
 
 				`element_group_id`=".$element_group_id.",
 				`element_width`=".$element_width.",
@@ -904,12 +928,9 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`element_style_access`=".$element_style_access.",
 				`element_url_access`=".$element_url_access.",
 				`element_hint_access`=".$element_hint_access.",
-				`element_dialog_func`=".$element_dialog_func.",
-
-				`menu_edit_last`=".$menu_edit_last."
+				`element_dialog_func`=".$element_dialog_func."
 			WHERE `id`=".$dialog_id;
 	query($sql);
-
 
 	//Обновление правил элемента
 	$sql = "DELETE FROM `_element_rule_use` WHERE `dialog_id`=".$dialog_id;
@@ -923,10 +944,6 @@ function _dialogSave($dialog_id) {//сохранение диалога
 							(".$dialog_id.",".$id.")";
 				query($sql);
 			}
-
-	_BE('dialog_clear');
-
-	return $dialog_id;
 }
 
 function _dialogOpenParam($dlg) {//все возможные параметны для диалогового окна

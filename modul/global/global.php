@@ -30,10 +30,8 @@ define('TODAY_UNIXTIME', strtotime(TODAY));
 define('YEAR_CUR', strftime('%Y'));
 
 define('CODE', _txt(@$_COOKIE['code']));
-define('DEBUG', @$_COOKIE['debug']);
-
+define('DEBUG', _num(@$_COOKIE['debug']));
 define('MIN', DEBUG ? '' : '.min');
-//define('MIN', '');
 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);

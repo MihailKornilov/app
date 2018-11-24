@@ -23,6 +23,8 @@ function _saDefine() {//установка флага суперпользова
 		error_reporting(E_ALL);
 		ini_set('display_errors', true);
 		ini_set('display_startup_errors', true);
+	} else {
+		setcookie('debug', 0, time() - 1, '/');
 	}
 }
 
