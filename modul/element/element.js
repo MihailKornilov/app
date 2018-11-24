@@ -3304,6 +3304,23 @@ var DIALOG = {},//массив диалоговых окон для управл
 		};
 	},
 
+	/* ---=== УКАЗАНИЕ ЭЛЕМЕНТОВ ПОД КОНКРЕТНОЕ ПРАВИЛО [1000] ===--- */
+	PHP12_elem_all_rule_setup_get = function(el, obj) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('input'), function(sp) {
+			var id = _num(sp.attr('id').split('rule-el')[1]),
+				v = _num(sp.val());
+			if(!id)
+				return;
+			if(!v)
+				return;
+			send.push(id);
+		});
+		return {
+			rule_id:obj.get_id,
+			ids:send.join()
+		};
+	},
 
 	_noteCDel = function(t, id) {//удаление комментария
 		var send = {

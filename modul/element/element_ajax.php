@@ -941,7 +941,7 @@ function _dialogOpenParam($dlg) {//все возможные параметны 
 		'button_cancel' => 'Закрыть',
 
 
-//		'get_id' => 0,              //id просматриваемой записи
+		'get_id' => 0,              //id просматриваемой записи
 		'edit_id' => 0,             //id редактируемой записи
 		'del_id' => 0,              //id записи для удаления
 
@@ -1000,6 +1000,7 @@ function _dialogOpenLoad($dialog_id) {
 	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
 	if($get_id = _num(@$_POST['get_id'])) {
+		$send['get_id'] = $get_id;
 		$prm['unit_get'] = _spisokUnitQuery($dialog, $get_id);
 		$prm['unit_get_id'] = $get_id;
 	}

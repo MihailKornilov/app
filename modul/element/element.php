@@ -1295,6 +1295,7 @@ function _elemTitle($elem_id) {//имя элемента или его текс�
 		return '';
 
 	switch($el['dialog_id']) {
+		case 2:  return $el['txt_1']; //кнопка
 		case 10: return $el['txt_1']; //произвольный текст
 		case 11: return _elem11title($el);
 		case 32: return 'номер';
@@ -1474,10 +1475,109 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 
 
 /* ---=== УКАЗАНИЕ ЭЛЕМЕНТОВ ПОД КОНКРЕТНОЕ ПРАВИЛО [1000] ===--- */
-function PHP12_elem_all_rule_setup() {
-	return 1000;
-}
+function PHP12_elem_all_rule_setup($prm) {
+	if(!$rule_id = $prm['unit_get_id'])
+		return _empty('Не получен id правила.');
 
+	$sql = "SELECT *
+			FROM `_element_rule_name`
+			WHERE `id`=".$rule_id;
+	if(!$rule = query_assoc($sql))
+		return _empty('Правила '.$rule_id.' не существует.');
+
+	//элементы, используемые в правиле
+	$sql = "SELECT `dialog_id`,1
+			FROM `_element_rule_use`
+			WHERE `rule_id`=".$rule_id;
+	$ass = query_ass($sql);
+
+	$sql = "SELECT *
+			FROM `_element_group`
+			ORDER BY `sort`";
+	if(!$group = query_arr($sql))
+		return _empty('Отсутствуют группы элементов.');
+
+	//получение всех элементов
+	$sql = "SELECT
+				*
+			FROM `_dialog`
+			WHERE `element_group_id` IN ("._idsGet($group).")
+			ORDER BY `sort`,`id`";
+	if(!$elem = query_arr($sql))
+		return _empty('Нет элементов для отображения.');
+
+	foreach($group as $id => $r)
+		$group[$id]['elem'] = array();
+
+	//расстановка элементов в группы согласно правилу отображения
+	foreach($elem as $id => $r)
+		$group[$r['element_group_id']]['elem'][] = $r;
+
+	$send = '';
+	foreach($group as $r) {
+		if(empty($r['elem']))
+			continue;
+
+		$send .= '<div class="fs15 mt20 mb5">'.$r['name'].':</div>';
+		foreach($r['elem'] as $el) {
+			$send .=
+			'<div class="ml30 mt3">'.
+				_check(array(
+					'attr_id' => 'rule-el'.$el['id'],
+					'title' => $el['name'].' <span class="pale">['.$el['id'].']</span>',
+					'value' => _num(@$ass[$el['id']])
+				)).
+			'</div>';
+		}
+	}
+
+	return
+	'<div class="fs16 color-555">'.
+		'Элементы, используемые в правиле'.
+		'<br>'.
+		'<b class="fs16">'.$rule['name'].'</b>:'.
+	'</div>'.
+	$send;
+}
+function PHP12_elem_all_rule_setup_save($dlg) {
+	if($dlg['id'] != 1000)
+		return;
+	if(!SA)
+		jsonError('Действие только для SA');
+
+	//получение элемента-функции [12], отображающего диалог для выбора
+	if(empty($dlg['cmp']))
+		jsonError('Пустой диалог 1000');
+
+	$elem_func_id = key($dlg['cmp']);
+
+	if(!$vvv = $_POST['vvv'][$elem_func_id])
+		jsonError('Нет данных');
+	if(!$rule_id = _num($vvv['rule_id']))
+		jsonError('Не получено id правила');
+	$sql = "SELECT *
+			FROM `_element_rule_name`
+			WHERE `id`=".$rule_id;
+	if(!$rule = query_assoc($sql))
+		jsonError('Правила '.$rule_id.' не существует.');
+
+	//Обновление элементов для правила
+	$sql = "DELETE FROM `_element_rule_use` WHERE `rule_id`=".$rule_id;
+	query($sql);
+
+	if($ids = _ids($vvv['ids'], 'arr'))
+		foreach($ids as $dialog_id) {
+			$sql = "INSERT INTO `_element_rule_use`
+						(`rule_id`,`dialog_id`)
+					VALUES
+						(".$rule_id.",".$dialog_id.")";
+			query($sql);
+		}
+
+	_BE('dialog_clear');
+
+	jsonSuccess();
+}
 
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 function PHP12_elem_choose($prm) {//выбор элемента для вставки в блок. Диалог [50]
