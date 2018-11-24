@@ -681,52 +681,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			));
 
 		//button
-		case 2:
-			/*
-				txt_1 - текст кнопки
-				num_1 - цвет
-				num_2 - маленькая кнопка
-				num_3 - передаёт данные записи
-				num_4 - dialog_id, который назначен на эту кнопку
-			*/
-			$color = array(
-				0 => '',      //Синий - по умолчанию
-				1 => '',      //Синий
-				2 => 'green', //Зелёный
-				3 => 'red',   //Красный
-				4 => 'grey',  //Серый
-				5 => 'cancel',//Прозрачный
-				6 => 'pink',  //Розовый
-				7 => 'orange' //Оранжевый
-			);
-
-			$val = 'dialog_id:'.$el['num_4'];
-
-			//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
-			//а также вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
-			//Нужно для назначения функций (пока)
-			if($el['block']['obj_name'] == 'dialog') {
-				$val .= ',dss:'.$el['block']['obj_id'].
-						',block_id:'.$prm['srce']['block_id'];
-
-			}
-
-
-			if($dialog_id = $el['num_4'])
-				$val .= _dialogOpenVal($dialog_id, $prm, $el['num_3']);
-			else
-				//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
-				$val .= ',block_id:'.$el['block_id'];
-
-			return _button(array(
-						'attr_id' => _elemAttrId($el, $prm),
-						'name' => _br($el['txt_1']),
-						'color' => $color[$el['num_1']],
-						'width' => $el['width'],
-						'small' => $el['num_2'],
-						'class' => $prm['blk_setup'] ? '' : 'dialog-open',
-						'val' => $val
-					));
+		case 2: return _elemButton($el, $prm);
 
 		//Меню страниц
 		case 3:
