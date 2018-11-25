@@ -368,6 +368,7 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 			FROM `_dialog`
 			WHERE `app_id` IN (".APP_ID._dn(!SA, ',0').")
 			  AND `sa` IN (0"._dn(!SA, ',1').")
+			  OR `parent_any`
 			ORDER BY `app_id` DESC,`id`";
 	if(!$arr = query_arr($sql))
 		return array();
@@ -503,7 +504,7 @@ function _dialogSelArrayUnit($r, $idShow=0) {//составление едини
 	if(!$r['app_id'])
 		$color = 'color-pay';
 	if($r['spisok_on'])
-		$color = 'color-sal';
+		$color = 'color-sal'.(!$r['app_id'] ? ' b' : '');
 	if($r['sa'])
 		$color = 'color-ref';
 
