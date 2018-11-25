@@ -335,7 +335,7 @@ switch(@$_POST['op']) {
 		$send['tables'] = SA ? _table() : array();
 		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
-		$send['dlg_sa'] = SA ? _dialogSelArray('sa_only') : array();
+		$send['dlg_func'] = _dialogSelArray('dlg_func');
 		$send['dlg_spisok_on'] = _dialogSelArray('spisok_only', $dialog_id);
 		$send['spisok_cmp'] = _dialogSpisokCmp($dialog['cmp']);
 

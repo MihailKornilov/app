@@ -362,44 +362,155 @@ function _dialogSel24($elem_id, $dlg_id) {//получение id диалога
 
 	return 0;
 }
-function _dialogSelArray($v=0, $v1=0) {//список диалогов для Select - отправка через AJAX
+
+function _dialogSelArray($v='all', $skip=0) {//список диалогов для Select - отправка через AJAX
 	$sql = "SELECT *
 			FROM `_dialog`
-			WHERE `app_id` IN (".APP_ID.(SA ? ',0' : '').")
-			  AND `sa` IN(0".(SA ? ',1' : '').")
+			WHERE `app_id` IN (".APP_ID._dn(!SA, ',0').")
+			  AND `sa` IN (0"._dn(!SA, ',1').")
 			ORDER BY `app_id` DESC,`id`";
 	if(!$arr = query_arr($sql))
 		return array();
 
-	$spisok = array();
-	$sa_only = $v === 'sa_only';
-	$spisok_only = $v === 'spisok_only';
-	$saFlag = $sa_only;
-	$skip = _num($v1);//id диалога, который нужно пропустить
-	foreach($arr as $r) {
-		if($r['id'] == $skip)
-			continue;
-		if($spisok_only && !$r['spisok_on'])
-			continue;
-		if(!$saFlag && !$r['app_id']) {//вставка графы для SA
-			$spisok[] = array(
-				'info' => 1,
-				'title' => 'SA-диалоги:'
-			);
-			$saFlag = 1;
-		}
-		if($sa_only && $r['app_id'])
-			continue;
-		$u = array(
-			'id' => _num($r['id']),
-			'title' => $r['name']
-		);
-		if(!$r['app_id'])
-			$u['content'] = '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'"><b>'.$r['id'].'</b>. '.$r['name'].'</div>';
-		$spisok[] = $u;
-	}
 
-	return $spisok;
+
+	//Базовые диалоги
+	$dlg_base = array();
+	foreach($arr as $r) {
+		if($r['element_group_id'])
+			continue;
+		if(!$r['parent_any'])
+			continue;
+		if($r['app_id'])
+			continue;
+
+		$dlg_base[] = _dialogSelArrayUnit($r);
+	}
+	if(!empty($dlg_base))
+		array_unshift($dlg_base, array(
+			'info' => 1,
+			'title' => 'Базовые диалоги:'
+		));
+
+
+
+
+	//Списки приложения
+	$dlg_app_spisok = array();
+	foreach($arr as $r) {
+		if($r['element_group_id'])
+			continue;
+		if($r['parent_any'])
+			continue;
+		if(!$r['app_id'])
+			continue;
+		if(!$r['spisok_on'])
+			continue;
+
+		$dlg_app_spisok[] = _dialogSelArrayUnit($r);
+	}
+	if(!empty($dlg_app_spisok))
+		array_unshift($dlg_app_spisok, array(
+			'info' => 1,
+			'title' => 'Диалоги-списки:'
+		));
+
+
+
+
+	//Списки приложения
+	$dlg_app = array();
+	foreach($arr as $r) {
+		if($r['element_group_id'])
+			continue;
+		if($r['parent_any'])
+			continue;
+		if(!$r['app_id'])
+			continue;
+		if($r['spisok_on'])
+			continue;
+
+		$dlg_app[] = _dialogSelArrayUnit($r);
+	}
+	if(!empty($dlg_app))
+		array_unshift($dlg_app, array(
+			'info' => 1,
+			'title' => 'Остальные:'
+		));
+
+
+
+
+	//диалоги-элементы
+	$dlg_elem = array();
+	foreach($arr as $r) {
+		if(!$r['element_group_id'])
+			continue;
+		if($r['parent_any'])
+			continue;
+		if($r['app_id'])
+			continue;
+
+		$dlg_elem[] = _dialogSelArrayUnit($r, 1);
+	}
+	if(!empty($dlg_elem))
+		array_unshift($dlg_elem, array(
+			'info' => 1,
+			'title' => 'Диалоги-элементы:'
+		));
+
+
+	//SA-диалоги
+	$dlg_sa = array();
+	foreach($arr as $r) {
+		if($r['element_group_id'])
+			continue;
+		if($r['parent_any'])
+			continue;
+		if($r['app_id'])
+			continue;
+
+		$dlg_sa[] = _dialogSelArrayUnit($r, 1);
+	}
+	if(!empty($dlg_sa))
+		array_unshift($dlg_sa, array(
+			'info' => 1,
+			'title' => 'SA-диалоги:'
+		));
+
+
+
+	if($v == 'dlg_func')
+		return SA ? array_merge($dlg_sa) : array();
+
+	if($v == 'spisok_only')
+		return array_merge($dlg_base, $dlg_app_spisok);
+
+	if(SA)
+		return array_merge($dlg_base, $dlg_app_spisok, $dlg_app, $dlg_elem, $dlg_sa);
+
+	return array_merge($dlg_app_spisok, $dlg_app);
+}
+function _dialogSelArrayUnit($r, $idShow=0) {//составление единицы значения селекта
+	$u = array(
+		'id' => _num($r['id']),
+		'title' => $r['name']
+	);
+
+	$color = '';
+	if(!$r['app_id'])
+		$color = 'color-pay';
+	if($r['spisok_on'])
+		$color = 'color-sal';
+	if($r['sa'])
+		$color = 'color-ref';
+
+	$u['content'] = '<div class="'.$color.'">'.
+			 ($idShow ? '<b>'.$r['id'].'</b>. ' : '').
+						$r['name'].
+					'</div>';
+
+	return $u;
 }
 function _dialogSpisokCmp($cmp) {//список колонок, используемых в диалоге (для выбора колонки по умолчанию)
 	$send = array();

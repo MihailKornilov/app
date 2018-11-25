@@ -416,7 +416,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 		DLG('#element_dialog_func')._select({
 			width:280,
 			title0:'не указан',
-			spisok:o.dlg_sa
+			spisok:o.dlg_func
 		});
 		DLG('#spisok_on')._check({
 			func:function(v) {
