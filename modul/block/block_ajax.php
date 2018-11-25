@@ -16,8 +16,9 @@ switch(@$_POST['op']) {
 
 		$send['obj_name'] = $obj_name;
 		$send['obj_id'] = $obj_id;
-		$send['width'] = _blockObjWidth($obj_name, $obj_id);
-		$send['html'] = _blockGrid($arr);
+		$width = _blockObjWidth($obj_name, $obj_id);
+		$send['width'] = $width;
+		$send['html'] = _blockGrid($arr, $width);
 
 		jsonSuccess($send);
 		break;

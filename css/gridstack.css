@@ -1,7 +1,17 @@
-.grid-item {
-  min-width:10px;
-  position: absolute;
+/* Линейка для разметки блоков */
+#grid-line{
+    height:17px;
+    background:#fff 0 5px no-repeat url(../img/pas-line.gif?3);
+    position:absolute;
+    top:-17px;
+    cursor:move;
+    box-shadow:0 -1px 15px rgba(0,0,0,.5);
+    z-index:500;
 }
+
+
+
+.grid-item {min-width:10px;position: absolute}
 
 .grid-stack-placeholder .placeholder-content {
   border: 1px dashed #33ABFF;

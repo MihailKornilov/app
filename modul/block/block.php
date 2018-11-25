@@ -476,9 +476,9 @@ function _blockChildHtml($block, $unit, $grid_id, $level, $width) {//делен�
 	if($block['id'] != $grid_id)
 		return _blockLevel($block['child'], $unit, $grid_id, $level, $width);
 
-	return _blockGrid($block['child']);
+	return _blockGrid($block['child'], $width);
 }
-function _blockGrid($arr) {//режим деления на подблоки
+function _blockGrid($arr, $width) {//режим деления на подблоки
 	$spisok = '';
 	foreach($arr as $r) {
 		$spisok .=
@@ -489,12 +489,15 @@ function _blockGrid($arr) {//режим деления на подблоки
 	}
 
 	return
-		'<div id="grid-stack" class="prel">'.$spisok.'</div>'.
-		'<div id="grid-add" class="pad5 bg-gr2 bor-e8 fs14 center color-555 curP over5 mt1">Добавить блок</div> '.
-		'<div class="pad5 center">'.
-			'<button class="vk small orange" id="grid-save">Сохранить</button>'.
-			'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
-		'</div>';
+	'<div id="grid-stack" class="prel">'.
+		'<div id="grid-line" style="width:'.($width-1).'px"></div>'.
+		$spisok.
+	'</div>'.
+	'<div id="grid-add" class="pad5 bg-gr2 bor-e8 fs14 center color-555 curP over5 mt1">Добавить блок</div> '.
+	'<div class="pad5 center">'.
+		'<button class="vk small orange" id="grid-save">Сохранить</button>'.
+		'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.
+	'</div>';
 }
 function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины объекта (страницы, диалога, списка)
 	switch($obj_name) {

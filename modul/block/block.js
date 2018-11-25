@@ -295,6 +295,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 		_post(send, function(res) {
 			$('._hint').remove();
 			$('.block-content-' + res.obj_name).html(res.html);
+			$('#grid-line').draggable({axis:'y',grid:[10,10]});
 			$('#grid-stack')._grid({
 				parent_id:block_id,
 				obj_name:res.obj_name,
@@ -535,13 +536,14 @@ $(document)
 			CONTENT.html(res.html);
 
 			//включена настройка корневых блоков
-			if(v)
+			if(v) {
+				$('#grid-line').draggable({axis:'y',grid:[10,10]});
 				$('#grid-stack')._grid({
 					obj_name:res.obj_name,
 					obj_id:res.obj_id,
 					width:res.width
 				});
-			else
+			} else
 				for(var i in res.blk)
 					BLKK[i] = res.blk[i];
 
