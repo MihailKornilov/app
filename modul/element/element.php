@@ -406,6 +406,8 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 			continue;
 		if(!$r['spisok_on'])
 			continue;
+		if($r['id'] == $skip)
+			continue;
 
 		$dlg_app_spisok[] = _dialogSelArrayUnit($r);
 	}
@@ -418,7 +420,7 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 
 
 
-	//Списки приложения
+	//Не являются списками
 	$dlg_app = array();
 	foreach($arr as $r) {
 		if($r['element_group_id'])
@@ -512,6 +514,7 @@ function _dialogSelArrayUnit($r, $idShow=0) {//составление едини
 
 	return $u;
 }
+
 function _dialogSpisokCmp($cmp) {//список колонок, используемых в диалоге (для выбора колонки по умолчанию)
 	$send = array();
 
