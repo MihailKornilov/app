@@ -339,8 +339,8 @@ function _html_script() {//скрипты и стили
 	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?2"></script>'.
 
 	'<script src="js/lodash.min.js"></script>'.
-	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css?1" />'.
-	'<script src="js/gridstack'.MIN.'.js?"></script>'.
+	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css?1" />'.//'.SCRIPT.'
+	'<script src="js/gridstack'.MIN.'.js?1"></script>'.//'.SCRIPT.'
 	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'
 : '').
 

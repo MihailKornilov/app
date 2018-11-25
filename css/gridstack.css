@@ -1,17 +1,80 @@
 /* Линейка для разметки блоков */
 #grid-line{
-    height:17px;
-    background:#fff 0 5px no-repeat url(../img/pas-line.gif?3);
-    position:absolute;
-    top:-17px;
-    cursor:move;
-    box-shadow:0 -1px 15px rgba(0,0,0,.5);
-    z-index:500;
+  height:17px;
+  background:#fff 0 5px no-repeat url('data:image/gif;base64,R0lGODlh6AMHAKIAAAAAAP///8zMzKqqqnd3dwAAAAAAAAAAACwAAAAA6AMHAAAD/xi63P4wMiKrtVSRHPb9YBeOladxJqlOa3suaeqq3LxmcW2D+n5tppxv1BuWUEgjT/kB4pJMTPQH7RSnLKxE+NJCrt7wTfwIakRo8lkNO+PQYGx8+q6v2Wm8Fc7Hz+lZFG9+enx2eWR/WoJud2qKTIeMiGKQSpJ9bJaFAQIRnhCgD6IOYKQNpwypC6eDkxmrCrGdnxGmtaG4LJi0ub6jtroOs8QNr5nFv8PByqjCzm3Hg8nAzVnV2Mu/QGvHvdnQ4Nfa4qy6NbzU5OvGz6ru5oGNaOrh7OP2+e/b8971++Uc6YsX8BumafBkJaRE8F7DgRb+PQRYaqFEhfJEILQ2sf2jQIoQv7Fz1eeiyJC3OGLMRnLQSZAwPTJc6ZBmuINrTJpMWfCftJwWF/Ks+ZIgN0NAVRa1iS8mU5mtupUMqnRoSHVmNCbtKZQqVxge0nklatXp0rMSdHZVqjajv7Eo4ZolhaLf07tnZ5WF+uxnmrYF9+Kl5sTMxq+B5fJtJ5btWsREReGkpxiv4Lx9pR6O/JizY812MX8uU1n0rtCAyZY2yakip5Yfw2wagi60Jj2TZ/vQbcQv7xm/gdt1+ahQbtyv22iducj48Nhegrs4Tqi1ddLJu+xBjvsol+p+qsi43foJWOfGxUtvsZ69evTctY9P9Pp9/PDntZO/HiABADs=');
+  position:absolute;
+  top:-17px;
+  cursor:move;
+  box-shadow:0 -1px 15px rgba(0,0,0,.5);
+  z-index:101;
+}
+#grid-line span{
+  display:block;
+  position:absolute;
+  right:-37px;
+  width:37px;
+  height:15px;
+  padding-top:2px;
+  text-align:center;
+  font-size:12px;
+  color:#fff;
+  border-radius:2px;
+  background-color:#777;
+  box-shadow:1px -1px 8px rgba(0,0,0,.5);
 }
 
 
 
-.grid-item {min-width:10px;position: absolute}
+
+
+/* Кнопка добавления нового блока */
+#grid-add{
+  margin:1px 1px 0 0;
+  background-color:#DFEBF3;
+  color:#3C8AA0;
+  font-size:14px;
+  text-align:center;
+  padding:8px 3px;
+  cursor:pointer;
+}
+#grid-add:hover{background-color:#C4E0F3;color:#00719B}
+
+
+
+
+/* Один блок */
+.grid-item{min-width:10px;position: absolute}
+
+
+/* Линии-границы справа и слева во время настройки конкретного блока */
+.grid-edge{
+  display:none;
+  position:absolute;
+  left:-1px;
+  border-right:#07e dashed 1px;/* dotted */
+  opacity:.7;
+}
+.grid-edge.er{right:0}
+/* Показ информации о блоке */
+.grid-info{
+  display:none;
+  position:absolute;
+  right:-40px;
+  bottom:0;
+  width:35px;
+  min-height:12px;
+  padding:3px 0 4px;
+  color:#772;
+  text-align:center;
+  background-color:#ffc;
+  border-radius:2px;
+  font:11px tahoma;
+  box-shadow:0 0 4px rgba(50,50,0,.5);
+  z-index:1000;
+}
+
+
+
 
 .grid-stack-placeholder .placeholder-content {
   border: 1px dashed #33ABFF;
@@ -39,20 +102,19 @@
 /* значок удаления */
 .grid-del{
   position:absolute;
+  right:-4px;
+  top:-4px;
   width:12px;
   height:12px;
   background-color:#fff;
   border:#d99 solid 1px;
   border-radius:3px;
-  font-family:tahoma;
-  font-size:11px;
+  font:11px tahoma;
   line-height:.9;
   color:red;
   text-align:center;
-  z-index:1000;
-  right:-4px;
-  top:-4px;
   cursor:pointer;
+  z-index:1000;
 }
 
 /* содержание блока */
@@ -82,6 +144,14 @@
 .grid-item.ui-resizable-resizing .grid-del{
   display: none;
 }
+
+.grid-item.ui-draggable-dragging .grid-edge,
+.grid-item.ui-resizable-resizing .grid-edge,
+.grid-item.ui-resizable-resizing .grid-info{
+  display:block;
+}
+
+
 
 .grid-item.ui-draggable-dragging,
 .grid-item.ui-resizable-resizing {

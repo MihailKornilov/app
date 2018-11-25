@@ -605,7 +605,7 @@
             auto: true,
             minWidth: 768,
             float: false,
-            staticGrid: false,
+            staticGrid: false,//блоки показываются, но их невозможно изменять и перетаскивать
             _class: 'grid-stack-instance-' + (Math.random() * 10000).toFixed(0),
             animate: Boolean(this.container.attr('data-gs-animate')) || false,
             alwaysShowResizeHandle: opts.alwaysShowResizeHandle || false,

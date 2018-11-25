@@ -483,6 +483,9 @@ function _blockGrid($arr, $width) {//режим деления на подбло
 	foreach($arr as $r) {
 		$spisok .=
 		    '<div id="pb_'.$r['id'].'" class="grid-item" data-gs-x="'.$r['x'].'" data-gs-y="'.$r['y'].'" data-gs-width="'.$r['w'].'" data-gs-height="'.$r['h'].'">'.
+		        '<div class="grid-info">'.$r['width'].'</div>'.
+		        '<div class="grid-edge"></div>'.
+		        '<div class="grid-edge er"></div>'.
 				'<div class="grid-content"></div>'.
 				'<div class="grid-del">x</div>'.
 		    '</div>';
@@ -490,10 +493,12 @@ function _blockGrid($arr, $width) {//режим деления на подбло
 
 	return
 	'<div id="grid-stack" class="prel">'.
-		'<div id="grid-line" style="width:'.($width-1).'px"></div>'.
+		'<div id="grid-line" style="width:'.($width-1).'px">'.
+			'<span>'.$width.'</span>'.
+		'</div>'.
 		$spisok.
 	'</div>'.
-	'<div id="grid-add" class="pad5 bg-gr2 bor-e8 fs14 center color-555 curP over5 mt1">Добавить блок</div> '.
+	'<div id="grid-add">Добавить блок</div> '.
 	'<div class="pad5 center">'.
 		'<button class="vk small orange" id="grid-save">Сохранить</button>'.
 		'<button class="vk small cancel ml5" id="grid-cancel">Отмена</button>'.

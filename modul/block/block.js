@@ -295,7 +295,6 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 		_post(send, function(res) {
 			$('._hint').remove();
 			$('.block-content-' + res.obj_name).html(res.html);
-			$('#grid-line').draggable({axis:'y',grid:[10,10]});
 			$('#grid-stack')._grid({
 				parent_id:block_id,
 				obj_name:res.obj_name,
@@ -536,14 +535,13 @@ $(document)
 			CONTENT.html(res.html);
 
 			//включена настройка корневых блоков
-			if(v) {
-				$('#grid-line').draggable({axis:'y',grid:[10,10]});
+			if(v)
 				$('#grid-stack')._grid({
 					obj_name:res.obj_name,
 					obj_id:res.obj_id,
 					width:res.width
 				});
-			} else
+			else
 				for(var i in res.blk)
 					BLKK[i] = res.blk[i];
 
@@ -866,20 +864,28 @@ $.fn._grid = function(o) {
 	}, o);
 
 	t.gridstack({
+		draggable:{grid:[10,1]},
+		resizable:{grid:[10,10]},
 		itemClass:'grid-item',
-		handle:'.grid-content',  //область, за которую можно перетаскивать
-		animate:false,           //плавная пристыковка после отпускания при растягивании
+		handle:'.grid-content', //область, за которую можно перетаскивать
+		animate:false,          //плавная пристыковка после отпускания при растягивании
 		verticalMargin:1,       //отступ сверху
 		cellHeight:10,          //минимальная высота блока
 		float:false,            //если true - блок можно расположить в любом месте, иначе блок всегда тянется к верху
 		width:o.width / 10      //количество элементов минимальной ширины может поместиться по всей длине
 	});
 
+	//включение перетаскивания линейки
+	$('#grid-line').draggable({axis:'y',grid:[10,10]});
+
 	var grid = t.data('gridstack'),
 		num = 1;
 	//добавление нового блока
 	$('#grid-add').click(function() {
 		grid.addWidget($('<div id="gn' + num++ + '">' +
+	        '<div class="grid-info">' + o.width + '</div>' +
+	        '<div class="grid-edge"></div>' +
+	        '<div class="grid-edge er"></div>' +
 			'<div class="grid-content"></div>' +
 			'<div class="grid-del">x</div>' +
 			'</div>'),
@@ -924,47 +930,61 @@ $.fn._grid = function(o) {
 			.trigger('click');
 	});
 
-	t.on('gsresizestop', function(event, elem) {
-			var h = _num($(elem).attr('data-gs-height')),
-				y = $(elem).attr('data-gs-y'),
-				attr_id = $(elem).attr('id');
-			_forEq($('.grid-item'), function(eq) {
-				if(eq.attr('data-gs-y') != y)
-					return;
-				if(eq.attr('id') == attr_id)
-					return;
-				grid.resize(eq, null, h);
-			});
-		})
-	 .on('dragstop', function(event) {
-			var elem = $(event.target),
-				h = _num(elem.attr('data-gs-height')),
-				h_new = 0,
-				y = -1,
-				attr_id = elem.attr('id');
-			_forEq($('.grid-item'), function(eq) {
-				if(!eq.attr('id')) {
-					y = eq.attr('data-gs-y');
-					return false;
-				}
-			});
-			if(y < 0)
+	t.on('gsresizestop', function(event, elem) {//действие после остановки изменения размера блока
+		var h = _num($(elem).attr('data-gs-height')),
+			y = $(elem).attr('data-gs-y'),
+			attr_id = $(elem).attr('id');
+		_forEq($('.grid-item'), function(eq) {
+			if(eq.attr('data-gs-y') != y)
 				return;
-			_forEq($('.grid-item'), function(eq) {
-				if(!eq.attr('id'))
-					return;
-				if(attr_id == eq.attr('id'))
-					return;
-				if(y != eq.attr('data-gs-y'))
-					return;
-				if(h == eq.attr('data-gs-height'))
-					return;
-				h_new = _num(eq.attr('data-gs-height'));
-			});
-			if(!h_new)
+			if(eq.attr('id') == attr_id)
 				return;
-			grid.resize(elem, null, h_new);
+			grid.resize(eq, null, h);
 		});
+	})
+	 .on('drag resize', function(e) {//действие во время перетаскивания блока
+		var item = $(e.target),
+			offset = item.offset(),
+			info = item.find('.grid-info'),
+			WH = $(window).height(),//высота экрана видимой области
+			scrollTop = $(window).scrollTop(),
+			cr = 50,//отступ линии сверху и снизу
+			сrt = scrollTop > cr ? cr : scrollTop;//корректировка при скролле
+		info.html(item.width());
+		item.find('.grid-edge').css({
+			height:WH - 100 + сrt,
+			top:-offset.top + scrollTop + cr - сrt
+		});
+	 })
+	 .on('dragstop', function(event) {//действие после остановки перетаскивания блока
+		 var elem = $(event.target),
+			 h = _num(elem.attr('data-gs-height')),
+			 h_new = 0,
+			 y = -1,
+			 attr_id = elem.attr('id');
+		 _forEq($('.grid-item'), function(eq) {
+			 if(!eq.attr('id')) {
+				 y = eq.attr('data-gs-y');
+				 return false;
+			 }
+		 });
+		 if(y < 0)
+			 return;
+		 _forEq($('.grid-item'), function(eq) {
+			 if(!eq.attr('id'))
+				 return;
+			 if(attr_id == eq.attr('id'))
+				 return;
+			 if(y != eq.attr('data-gs-y'))
+				 return;
+			 if(h == eq.attr('data-gs-height'))
+				 return;
+			 h_new = _num(eq.attr('data-gs-height'));
+		 });
+		 if(!h_new)
+			 return;
+		 grid.resize(elem, null, h_new);
+	 });
 
 	$(document)
 		.off('click', '.grid-del')
