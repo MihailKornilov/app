@@ -116,13 +116,10 @@ function _queryCol($DLG) {//получение колонок, для котор
 		return constant($key);
 
 	$field = array('id');
-
-	if(isset($DLG['field1']['dialog_id']))
-		$field[] = 'dialog_id';
-	if(isset($DLG['field1']['dtime_add']))
-		$field[] = 'dtime_add';
-	if(isset($DLG['field1']['user_id_add']))
-		$field[] = 'user_id_add';
+	$field = _queryColReq($DLG, 'dialog_id', $field);
+	$field = _queryColReq($DLG, 'block_id', $field);
+	$field = _queryColReq($DLG, 'dtime_add', $field);
+	$field = _queryColReq($DLG, 'user_id_add', $field);
 
 	foreach($DLG['cmp'] as $cmp) {
 		if(!$col = $cmp['col'])
@@ -138,9 +135,14 @@ function _queryCol($DLG) {//получение колонок, для котор
 
 	return constant($key);
 }
+function _queryColReq($DLG, $col, $field) {//добавление обязательных колонок
+	if(isset($DLG['field1'][$col]))
+		$field[] = $col;
+	return $field;
+}
 function _queryFrom($DLG) {//составление таблиц для запроса
 /*
-	Диалог предварительно должен быть проверен и использовать таблицу:
+	Диалог предварительно должен быть проверен и использовать таблицу
 */
 	$key = 'QUERY_FROM_'.$DLG['id'];
 

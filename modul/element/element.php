@@ -1176,7 +1176,7 @@ function _elemVvv37($prm) {//select - выбор имени колонки [37]
 		$uCol = $u['col'];
 
 	$field = _elemVvv37field($dlg, 1, $uCol, $field);
-	$field = _elemVvv37field($dlg, 2, $uCol, $field);
+//	$field = _elemVvv37field($dlg, 2, $uCol, $field);
 
 	return $field;
 }
