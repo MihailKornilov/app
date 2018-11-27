@@ -773,9 +773,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_2 - количество знаков после запятой
 				num_3 - разрешать отрицательные значения
 				num_4 - разрешать вносить 0
+				num_5 - поле-пароль
 			*/
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+			$type = $el['num_5'] ? 'password' : 'text';
 
 			$v = _elemPrintV($el, $prm, $el['txt_2']);
 
@@ -790,7 +792,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					break;
 			}
 
-			return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
+			return '<input type="'.$type.'" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
 
 		//Ссылка на страницу
 		case 9:
