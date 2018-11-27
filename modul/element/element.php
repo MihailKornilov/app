@@ -780,9 +780,7 @@ function PHP12_dialog_sa() {//список диалоговых окон [12]
 	foreach($arr as $r) {
 		$send .= '<tr>'.
 					'<td class="w35 r grey'.($r['sa'] ? ' bg-fee' : '').'">'.$r['id'].
-					'<td class="'.(_table($r['table_1']) == '_element' ? 'b color-pay' : '').'">'.
-						_table($r['table_1']).
-						($r['table_2'] ? '<br>'._table($r['table_2']) : '').
+					'<td class="'.(_table($r['table_1']) == '_element' ? 'b color-pay' : '').'">'._table($r['table_1']).
 					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
 					'<td class="center">'._elemColType($r['element_type']).
 					'<td>'.$r['element_afics'].
@@ -1198,7 +1196,6 @@ function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки п�
 	$fieldNo = array(
 		'id' => 1,
 		'id_old' => 1,
-		'table_num' => 1,
 		'num' => 1,
 		'parent_id' => 1,
 		'app_id' => 1,

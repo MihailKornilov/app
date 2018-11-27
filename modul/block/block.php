@@ -2669,7 +2669,7 @@ function _beDlgField($dialog) {//вставка колонок таблиц в �
 
 	//список колонок, присутствующих в таблицах 1 и 2
 	foreach($dialog as $dlg_id => $r)
-		foreach(array(1,2) as $id) {
+		foreach(array(1) as $id) {
 			$dialog[$dlg_id]['field'.$id] = array();
 			$table_id = $r['table_'.$id];
 			if($dialog[$dlg_id]['table_name_'.$id] = _table($table_id))

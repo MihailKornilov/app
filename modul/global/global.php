@@ -103,6 +103,56 @@ function _table($id=false) {//таблицы в базе с соответств
 
 	return $tab[$id];
 }
+function _queryCol($DLG) {//получение колонок, для которых будет происходить запрос
+/*
+	Диалог предварительно должен быть проверен:
+		* использует таблицу
+        * содержит колонки, по которым будет получение данных
+*/
+
+	$key = 'QUERY_COL_'.$DLG['id'];
+
+	if(defined($key))
+		return constant($key);
+
+	$field = array('id');
+
+	if(isset($DLG['field1']['dialog_id']))
+		$field[] = 'dialog_id';
+	if(isset($DLG['field1']['dtime_add']))
+		$field[] = 'dtime_add';
+	if(isset($DLG['field1']['user_id_add']))
+		$field[] = 'user_id_add';
+
+	foreach($DLG['cmp'] as $cmp) {
+		if(!$col = $cmp['col'])
+			continue;
+		$field[] = $col;
+	}
+
+	//обведение колонок в кавычки
+	foreach($field as $n => $col)
+		$field[$n] = '`t1`.`'.$col.'`';
+
+	define($key, implode(',', $field));
+
+	return constant($key);
+}
+function _queryFrom($DLG) {//составление таблиц для запроса
+/*
+	Диалог предварительно должен быть проверен и использовать таблицу:
+*/
+	$key = 'QUERY_FROM_'.$DLG['id'];
+
+	if(defined($key))
+		return constant($key);
+
+	$send = "`".$DLG['table_name_1']."` `t1` ";
+
+	define($key, $send);
+
+	return $send;
+}
 function _tableFrom($dialog) {//составление таблиц для запроса на основании данных из диалога
 	$key = 'TABLE_FROM_'.$dialog['id'];
 
@@ -114,10 +164,12 @@ function _tableFrom($dialog) {//составление таблиц для за�
 
 	$send = "`".$dialog['table_name_1']."` `t1` ";
 
-	if($dialog['table_2'])
+
+/*	//todo переделать
+	if($dialog['table_2_'])
 		$send .= "INNER JOIN `".$dialog['table_name_2']."` `t2`
 				  ON `t1`.`id`=`t2`.`".$dialog['table_2_field']."`";
-
+*/
 	define($key, $send);
 
 	return $send;

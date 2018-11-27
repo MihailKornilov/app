@@ -32,22 +32,9 @@ switch(@$_POST['op']) {
 		if($menu_id = _num(@$_POST['menu']))
 			$dialog['menu_edit_last'] = $menu_id;
 
-		$tab2field_id = 0;   //id колонка для связки с первой таблицей
-		$tablesFields = array();//колонки по каждой таблице
 		$group = array();
 		$menu_sa = array();
 		if(SA) {
-			//колонки для всех таблиц
-			foreach(_table() as $id => $tab)
-				$tablesFields[$id] = _table2field($tab);
-
-			if($dialog['table_2'])
-				foreach(_table2field(_table($dialog['table_2'])) as $i => $field)
-					if($dialog['table_2_field'] == $field) {
-						$tab2field_id = $i;
-						break;
-					}
-
 			//группы элементов
 			$sql = "SELECT *
 					FROM `_element_group`
@@ -62,10 +49,11 @@ switch(@$_POST['op']) {
 
 			$menu_sa = array(
 				1 => 'Диалог',
-				2 => 'Элемент'
+				2 => 'Элемент',
+				3 => 'Использование'
 			);
-			if($dialog['element_group_id'])
-				$menu_sa[3] = 'Использование';
+			if(!$dialog['element_group_id'])
+				unset($menu_sa[3]);
 		}
 
 		//условия удаления
@@ -230,24 +218,22 @@ switch(@$_POST['op']) {
 		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
 					'<tr><td class="red r">Таблица 1:'.
 						'<td><input type="hidden" id="table_1"   value="'.$dialog['table_1'].'" />'.
-					'<tr><td class="red r">Таблица 2:'.
-						'<td><table>'.
-								'<tr><td><input type="hidden" id="table_2" value="'.$dialog['table_2'].'" />'.
-									'<td class="pl5'._dn($dialog['table_2']).'" id="td-bt2c">'.
-										'<input type="hidden" id="table_2_field" value="'.$tab2field_id.'" />'.
-		                    '</table>'.
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'cmp_no_req',
 									'title' => 'компоненты в содержании не требуются',
 									'value' => $dialog['cmp_no_req']
 							   )).
+
+					'<tr><td><td>'.
+
 					'<tr><td>'.
-						'<td>'._check(array(
+						'<td>'.
+		                        _check(array(
 									'attr_id' => 'sa',
 									'title' => 'SA only',
 									'value' => $dialog['sa']
-							   )).
+								)).
 					//доступность диалога. На основании app_id.
 		            //0 - доступен только конкретному приложению
 		            //1 - всем приложениям
@@ -333,7 +319,6 @@ switch(@$_POST['op']) {
 		$send['html'] = $html;
 		$send['sa'] = SA;
 		$send['tables'] = SA ? _table() : array();
-		$send['tablesFields'] = $tablesFields;
 		$send['group'] = $group;
 		$send['dlg_func'] = _dialogSelArray('dlg_func');
 		$send['dlg_spisok_on'] = _dialogSelArray('spisok_only', $dialog_id);
@@ -894,19 +879,6 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 			jsonError('Указана несуществующая таблица 1: "'.$table.'"');
 	}
 
-	$table_2_field = '';
-	if($table_2 = _num($_POST['table_2'])) {
-		if(!$table = _table($table_2))
-			jsonError('Указана несуществующая таблица 2');
-		$sql = "SHOW TABLES LIKE '".$table."'";
-		if(!query_array($sql))
-			jsonError('Указана несуществующая таблица 2: "'.$table.'"');
-		if($table_1 == $table_2)
-			jsonError('Таблицы не могут совпадать');
-		if(!$table_2_field = _txt($_POST['table_2_field']))
-			jsonError('Не указана колонка для связки');
-	}
-
 	$element_group_id = _num($_POST['element_group_id']);
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
@@ -926,8 +898,6 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 				`cmp_no_req`=".$cmp_no_req.",
 
 				`table_1`=".$table_1.",
-				`table_2`=".$table_2.",
-				`table_2_field`='".addslashes($table_2_field)."',
 
 				`element_group_id`=".$element_group_id.",
 				`element_width`=".$element_width.",

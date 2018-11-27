@@ -225,7 +225,10 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 						dialog_id:11,
 						dialog_source:BL.bg70,
 						block_id:BL.id,
-						prm:{nest:1,bg70_choose:1},
+						prm:{
+							nest:1,
+							bg70_choose:1
+						},
 						busy_obj:$(this),
 						busy_cls:'busy',
 						func_save:function(res) {

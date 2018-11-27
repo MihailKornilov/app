@@ -20,7 +20,7 @@ switch(@$_POST['op']) {
 
 		$send['action_id'] = _num($dialog['del_action_id']);
 		$send['action_page_id'] = _num($dialog['del_action_page_id']);
-		$send = _spisokAction3($send, $dialog, $unit_id);
+		$send = _spisokAction3($dialog, $unit_id, $send);
 
 		if(isset($dialog['field1']['deleted'])) {
 			$sql = "UPDATE `"._table($dialog['table_1'])."`
@@ -296,7 +296,6 @@ function _spisokUnitDialog($unit_id) {//получение данных о ди�
 		jsonError('Диалога '.$dialog_id.' не существует');
 	if($dialog['sa'] && !SA)
 		jsonError('Нет доступа');
-
 	if(!$dialog['table_1'])
 		return $dialog;
 
@@ -306,7 +305,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о ди�
 		jsonError('Таблицы не существует');
 
 	//получение данных единицы списка, если редактируется
-	if($unit_id > 0) {
+	if($unit_id) {
 		if(!$r = _spisokUnitQuery($dialog, $unit_id))
 			jsonError('Записи не существует');
 		if(@$r['deleted'])
@@ -320,32 +319,28 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	$unitOld = _spisokUnitQuery($dialog, $unit_id);
 
 	define('IS_ELEM', $dialog['table_1'] == 5);// '_element'
-
-	$act = $unit_id ? 'edit' : 'insert';
-
-	$block_id = _num($_POST['block_id']);
+	define('ACT', $unit_id ? 'edit' : 'insert');
 
 	$POST_CMP = _spisokUnitCmpTest($dialog);
 
+	//регистрация нового пользователя [98] - перехват внесения данных
 	_auth98($dialog, $POST_CMP);
+	//авторизация по логину и паролю [99] - перехват внесения данных
 	_auth99($dialog, $POST_CMP);
-
 	//элемент выбирает значение из диалога - через [11] - перехват внесения данных
 	_elem11_choose_mysave($dialog, $POST_CMP);
-
 	//элемент выбирает блоки из диалога - через [19] - перехват внесения данных
 	_elem19_block_choose($dialog);
-
 	//сохранение настройки истории действий - через [67] - перехват внесения данных
 	PHP12_history_setup_save($dialog);
-
 	//сохранение выбранных элементов для правила - через [1000] - перехват внесения данных
 	PHP12_elem_all_rule_setup_save($dialog);
-
 	//выбор цвета для динамической заливки - через [11] - перехват внесения данных
-	_block_bg70($block_id, $dialog, $POST_CMP);
+	_block_bg70($dialog, $POST_CMP);
 
-	$unit_id = _spisokUnitInsert($unit_id, $dialog, $block_id);
+
+
+	$unit_id = _spisokUnitInsert($dialog, $unit_id);
 
 	if(IS_ELEM)
 		_BE('elem_clear');
@@ -437,11 +432,11 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	$send = array(
 		'unit' => _arrNum($unit),
-		'action_id' => _num($dialog[$act.'_action_id']),
-		'action_page_id' => _num($dialog[$act.'_action_page_id'])
+		'action_id' => _num($dialog[ACT.'_action_id']),
+		'action_page_id' => _num($dialog[ACT.'_action_page_id'])
 	);
 
-	$send = _spisokAction3($send, $dialog, $unit_id);
+	$send = _spisokAction3($dialog, $unit_id, $send);
 	$send = _spisokAction4($send);
 
 	if(IS_ELEM)
@@ -532,13 +527,11 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 
 	return $send;
 }
-function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение новой записи, если отсутствует
-	if($unit_id > 0)
+function _spisokUnitInsert($dialog, $unit_id) {//внесение новой записи, если отсутствует
+	if($unit_id)
 		return $unit_id;
-
 	if($parent_id = $dialog['dialog_id_parent'])
 		jsonError('Дочерний диалог не может вносить новую запись');
-
 	if(!$dialog['table_1'])
 		return 0;
 
@@ -546,7 +539,8 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 	$parent_id = 0;//группировка в таблице _element
 
 	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
-	if(IS_ELEM && $block_id > 0 && !$unit_id) {
+	$block_id = _num($_POST['block_id']);
+	if(IS_ELEM && $block_id) {
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока не сущетвует');
 		if($elem = $block['elem']) {
@@ -685,9 +679,10 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 		}
 	}
 
+/*
 	//внесение данных таблицы 2, если есть
-	if($dialog['table_2']) {
-		$sql = "INSERT INTO `"._table($dialog['table_2'])."` (`".$dialog['table_2_field']."`) VALUES (".$unit_id.")";
+	if($dialog['table_2_']) {
+		$sql = "INSERT INTO `"._table($dialog['table_2_'])."` (`".$dialog['table_2_field']."`) VALUES (".$unit_id.")";
 		query($sql);
 
 		$unit_2 = query_insert_id(_table($dialog['table_2']));
@@ -727,17 +722,17 @@ function _spisokUnitInsert($unit_id, $dialog, $block_id) {//внесение н�
 			}
 		}
 	}
-
+*/
 	_historyInsert(1, $dialog, $unit_id);
 
 	return $unit_id;
 }
-function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//если в таблице присутствует колонка `focus`, то предварительное снятие флага фокуса с других элементов объекта (для таблицы _element)
-	if(!$dialog['table_1'])
-		return;
-	if(_table($dialog['table_1']) != '_element')
+function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//предварительное снятие флага фокуса `focus` с элементов
+	if(!IS_ELEM)
 		return;
 	if(empty($POST_CMP))
+		return;
+	if(!$unit_id)
 		return;
 
 	foreach($POST_CMP as $cmp_id => $v) {
@@ -749,12 +744,14 @@ function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//если в таб�
 		$sql = "SELECT `block_id`
 				FROM `_element`
 				WHERE `id`=".$unit_id;
-		$block_id = _num(query_value($sql));
+		if(!$block_id = query_value($sql))
+			return;
 
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `id`=".$block_id;
-		$block = query_assoc($sql);
+		if(!$block = query_assoc($sql))
+			return;
 
 		$sql = "SELECT `id`
 				FROM `_block`
@@ -772,8 +769,6 @@ function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//если в таб�
 	}
 }
 function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: очистка `def`, если устанавливается новая страница по умолчанию
-	if(!$dialog['table_1'])
-		return;
 	if(_table($dialog['table_1']) != '_page')
 		return;
 	if(empty($POST_CMP))
@@ -827,7 +822,6 @@ function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление
 		return;
 
 	$update1 = array();
-	$update2 = array();
 	foreach($POST_CMP as $cmp_id => $v) {
 		$cmp = $DLG['cmp'][$cmp_id];
 		$col = $cmp['col'];
@@ -853,8 +847,6 @@ function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление
 
 							}
 			}
-
-			$update1[] = "`table_num`=".$num;
 		}
 
 		//переключение на родительский элемент
@@ -865,10 +857,7 @@ function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление
 				continue;
 		}
 
-		if($cmp['table_num'] == 1)
-			$update1[] = "`".$col."`='".addslashes($v)."'";
-		if($cmp['table_num'] == 2)
-			$update2[] = "`".$col."`='".addslashes($v)."'";
+		$update1[] = "`".$col."`='".addslashes($v)."'";
 	}
 
 	if(!empty($update1)) {
@@ -877,7 +866,7 @@ function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление
 				WHERE `id`=".$unit_id;
 		query($sql);
 	}
-
+/*
 	if(!empty($update2)) {
 		$field2 = $DLG['field2'];
 
@@ -898,17 +887,20 @@ function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление
 			query($sql);
 		}
 	}
+*/
 }
-function _spisokAction3($send, $dialog, $unit_id) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
+function _spisokAction3($dialog, $unit_id, $send) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
+	//должено быть действие над элементом
 	if($dialog['table_1'] != 5)
 		return $send;
 	if($send['action_id'] != 3)
 		return $send;
 	if(!$elem = _elemOne($unit_id))
 		return $send;
-	if($elem['parent_id'])//была вставка доп-значения для элемета
+	//была вставка доп-значения для элемета
+	if($elem['parent_id'])
 		return $send;
-	if($elem['block_id'] < 0)
+	if(!$elem['block_id'])
 		return $send;
 
 	$send['obj_name'] = $elem['block']['obj_name'];
@@ -1357,15 +1349,17 @@ function _elem19_block_choose($dialog) {//выбор блоков через [11
 	jsonSuccess($send);
 }
 
-function _block_bg70($block_id, $dialog, $POST_CMP) {//выбор пути к динамической заливке блока через [11]
+function _block_bg70($dialog, $POST_CMP) {//выбор пути к динамической заливке блока через [11]
 	if(empty($_POST['prm']['bg70_choose']))
 		return;
+	if(!$block_id = _num($_POST['block_id']))
+		jsonError('Отсутствует исходный блок');
 	//блок, для которого применяется заливка
 	if(!$block = _blockOne($block_id))
-		return;
+		jsonError('Исходного блока '.$block_id.' не существует');
 	//выбор пути должно происходить через [11]
 	if($dialog['id'] != 11)
-		return;
+		jsonError('Некорректный диалог для выбора заливки');
 	//получение элемента-функции [12], отображающего диалог для выбора
 	if(empty($dialog['cmp']))
 		jsonError('Пустой диалог 11');
