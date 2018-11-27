@@ -811,16 +811,21 @@ function PHP12_dialog_app() {//список диалоговых окон для
 					'<th>ID'.
 					'<th>Имя диалога'.
 					'<th>Список'.
+					'<th>Родитель'.
 					'<th>Колонки'.
 					'<th>h1'.
 					'<th>h2'.
 					'<th>h3'.
 					'<th>content<br>del';
 	foreach($arr as $dialog_id => $r) {
+		$parent = '';
+		if($parent_id = $r['dialog_id_parent'])
+			$parent = _dialogParam($parent_id, 'name');
 		$send .= '<tr>'.
 					'<td class="w35 r grey">'.$dialog_id.
 					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
 					'<td class="center'.($r['spisok_on'] ? ' bg-dfd' : '').'">'.($r['spisok_on'] ? 'да' : '').
+					'<td class="color-sal'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
 					'<td class="grey">'.PHP12_dialog_col($r['id']).
 					'<td>'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 					'<td>'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
@@ -1161,21 +1166,26 @@ function _elemVvv37($prm) {//select - выбор имени колонки [37]
 	if(!$dlg = _dialogQuery($block['obj_id']))
 		return array();
 
+	$field = array();
+
 	//если диалог родительский, получение колонок родителя
 	if($parent_id = $dlg['dialog_id_parent'])
-		return _elemVvv37parent($parent_id);
+		$field = _elemVvv37parent($parent_id);
 
-	//колонка, которая занята редактируемой записью
+	//выбранная колонка, если редактирование записи
 	$uCol = '';
 	if($u = $prm['unit_edit'])
 		$uCol = $u['col'];
 
-	$field = _elemVvv37field($dlg, 1, $uCol);
+	$field = _elemVvv37field($dlg, 1, $uCol, $field);
 	$field = _elemVvv37field($dlg, 2, $uCol, $field);
 
 	return $field;
 }
 function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки по каждой таблице
+	if(!$dlg['table_'.$num])
+		return $send;
+
 	//получение используемых колонок
 	$colUse = array();
 	foreach($dlg['cmp'] as $r) {
@@ -1229,7 +1239,7 @@ function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки п�
 			'busy' => $busy,
 			'content' =>
 				'<div class="'.$color.'">'.
-					'<span class="pale">'._table($dlg['table_'.$num]).'.</span>'.
+					'<span class="pale">'.$dlg['name'].'.</span>'.//_table($dlg['table_'.$num])
 					$col.
 					$name.
 				'</div>'

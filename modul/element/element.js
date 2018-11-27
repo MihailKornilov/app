@@ -3438,6 +3438,9 @@ $(document)
 				busy_cls:t.hasClass('icon') ? 'spin' : '_busy'
 			};
 
+		if(!val)
+			return;
+
 		_forN(val.split(','), function(sp) {
 			var spl = sp.split(':'),
 				k = spl[0];
