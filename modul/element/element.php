@@ -1410,6 +1410,27 @@ function _elemButtonVal($el, $prm) {//значения аттрибута val д
 	return $val;
 }
 
+function _elemCol($el) {//получение имени колонки
+	if(!is_array($el))
+		if(!$id = _num($el))
+			return '';
+		elseif(!$el = _elemOne($id))
+			return '';
+
+	if(empty($el))
+		return '';
+	if(!isset($el['col']))
+		return '';
+	if(!$col = $el['col'])
+		return '';
+	if(!$id = _num($col))
+		return $col;
+	if(!$ell = _elemOne($id))
+		return '';
+
+	return $ell['col'];
+}
+
 function _elemTitle($elem_id) {//имя элемента или его текст
 	if(!$elem_id = _num($elem_id))
 		return '';

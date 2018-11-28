@@ -127,12 +127,12 @@ function _queryCol($DLG) {//получение колонок, для котор
 	$field[] = $DLG['id'].' `dialog_id_use`';
 
 	foreach($DLG['cmp'] as $cmp)
-		$field[] = _queryColTest($DLG, $cmp);
+		$field[] = _queryColReq($DLG, _elemCol($cmp));
 
 	if($parent_id = $DLG['dialog_id_parent']) {
 		$PAR = _dialogQuery($parent_id);
 		foreach($PAR['cmp'] as $cmp)
-			$field[] = _queryColTest($DLG, $cmp);
+			$field[] = _queryColReq($DLG, _elemCol($cmp));
 	}
 
 	$field = array_diff($field, array(''));
@@ -140,20 +140,6 @@ function _queryCol($DLG) {//получение колонок, для котор
 	define($key, implode(',', $field));
 
 	return constant($key);
-}
-function _queryColTest($DLG, $cmp) {//проверка существования колонки в компоненте и добавление её
-	if(!$col = $cmp['col'])
-		return '';
-
-	//имя колонки нужно получить из элемента родительского диалога
-	if($elem_id = _num($col)) {
-		if(!$el = _elemOne($elem_id))
-			return '';
-		if(!$col = $el['col'])
-			return '';
-	}
-
-	return _queryColReq($DLG, $col);
 }
 function _queryColReq($DLG, $col) {//добавление обязательных колонок
 	//колонка не используется ни в одной таблице
@@ -232,6 +218,9 @@ function _queryWhere($DLG) {//составление условий для за�
 	return $send;
 }
 function _queryTN($DLG, $name) {//получение имени таблицы для определённой колонки
+	if(!$name)
+		return '';
+
 	if($parent_id = $DLG['dialog_id_parent']) {
 		$PAR = _dialogQuery($parent_id);
 		if(isset($PAR['field1'][$name]))

@@ -642,13 +642,12 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 	if($el['url'] != 3) {
 		$page = _page($el['url']);
 		$uid = $u['id'];
-		if($page['dialog_id_unit_get'] != $u['dialog_id'])
+
+		if($page['dialog_id_unit_get'] != $u['dialog_id_use'])
 			if($el['dialog_id'] == 11) {
-				if(!$ids = _ids($el['txt_2'], 1))
+				if(!$ids = _ids($el['txt_2'], 'arr'))
 					return $txt;
-				if(!$EL = _elemOne($ids[0]))
-					return $txt;
-				if(!$col = $EL['col'])
+				if(!$col = _elemCol($ids[0]))
 					return $txt;
 				$uid = is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
 			}
