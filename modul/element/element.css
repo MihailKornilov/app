@@ -128,7 +128,7 @@
 	padding:10px;
 }
 .elem-img{
-	background:no-repeat 0 200px url(../../img/elem.png?41);
+	background:no-repeat 0 200px url(../../img/elem.png?46);
 	height:0;
 	margin-left:29px;
 }
@@ -150,25 +150,30 @@
 .eli23{background-position-y:-2100px;height:80px}/* список - ТАБЛИЦА */
 .eli24{background-position-y:-1600px;height:30px}/* select - списки приложения */
 .eli29{background-position-y:-1800px;height:100px}/* select - связка с другим списком */
-.eli32{background-position-y:-2400px;height:15px}/* список - порядковый номер */
-.eli33{background-position-y:-2300px;height:15px}/* список - дата и время */
-.eli34{background-position-y:-2600px;height:15px}/* список - иконки редактирования */
-.eli35{background-position-y:-1300px;height:30px}/* список - количество строк */
-.eli37{background-position-y:-1920px;height:30px}/* select - выбор колонки */
-.eli38{background-position-y:-2000px;height:30px}/* select - выбор диалога */
-.eli42{background-position-y:-1100px;height:60px}/* вопрос с подсказкой */
-.eli44{background-position-y:-1200px;height:15px}/* сборный текст */
-.eli51{background-position-y:-1700px;height:30px}/* календарь */
-.eli57{background-position-y:-2700px;height:30px}/* меню переключения блоков */
+.eli32{background-position-y:-2400px;height:15px} /* список - порядковый номер */
+.eli33{background-position-y:-2300px;height:15px} /* список - дата и время */
+.eli34{background-position-y:-2600px;height:15px} /* список - иконка редактирования */
+.eli35{background-position-y:-1300px;height:30px} /* список - количество строк */
+.eli37{background-position-y:-1920px;height:30px} /* select - выбор колонки */
+.eli38{background-position-y:-2000px;height:30px} /* select - выбор диалога */
+.eli42{background-position-y:-1100px;height:60px} /* вопрос с подсказкой */
+.eli44{background-position-y:-1200px;height:15px} /* сборный текст */
+.eli51{background-position-y:-1700px;height:30px} /* календарь */
+.eli57{background-position-y:-2700px;height:30px} /* меню переключения блоков */
 .eli18{background-position-y:-2800px;height:120px}/* dropdown */
 .eli60{background-position-y:-3000px;height:100px}/* image */
-.eli66{background-position-y:-3100px;height:60px}/* цвет текста */
-.eli70{background-position-y:-3200px;height:95px}/* цвет фона */
-.eli13{background-position-y:-3300px;height:30px}/* выбор элемента из диалога или страницы */
+.eli66{background-position-y:-3100px;height:60px} /* цвет текста */
+.eli70{background-position-y:-3200px;height:95px} /* цвет фона */
+.eli13{background-position-y:-3300px;height:30px} /* выбор элемента из диалога или страницы */
 .eli78{background-position-y:-3400px;height:130px}/* фильтр-меню */
 .eli77{background-position-y:-3600px;height:170px}/* фильтр-календарь */
-.eli80{background-position-y:-3800px;height:20px}/* очистка фильтра */
-.eli62{background-position-y:-3900px;height:20px}/* фильтр-галочка */
+.eli80{background-position-y:-3800px;height:20px} /* очистка фильтра */
+.eli62{background-position-y:-3900px;height:20px} /* фильтр-галочка */
+.eli30{background-position-y:-4000px;height:15px} /* список - иконка удаления */
+.eli11{background-position-y:-4100px;height:100px}/* список - выбор значения */
+.eli71{background-position-y:-4200px;height:15px} /* список - иконка сортировки */
+.eli102{background-position-y:-4300px;height:30px}/* фильтр - выбор групп значений */
+.eli49{background-position-y:-4400px;height:30px} /* выбор блоков */
 
 
 
