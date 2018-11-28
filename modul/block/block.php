@@ -1029,19 +1029,9 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					'class'=>'curD'
 				));
 
-			//если используется сторонняя таблица (не _spisok), поиск диалога, который вносит данные
-			if(!isset($u['dialog_id'])) {
-				if(!$elp = _elemOne($el['parent_id']))
-					return _msgRed('-elp-yok-');
-
-				$u['dialog_id'] = 0;
-				switch($elp['dialog_id']) {
-					//список-таблица
-					case 23: $u['dialog_id'] = $elp['num_1']; break;
-				}
-			}
-
-			if(!$dlg = _dialogQuery($u['dialog_id']))
+			if(!$dlg_id = _num(@$u['dialog_id_use']))
+				return _msgRed('-dlg-id-yok-');
+			if(!$dlg = _dialogQuery($dlg_id))
 				return _msgRed('-dlg-yok-');
 			//иконка не выводится, если удаление запрещено
 			if(!$dlg['del_on'])
@@ -1057,7 +1047,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			_iconDel(array(
 				'red' => $el['num_1'],
 				'class' => 'dialog-open pl',
-				'val' => 'dialog_id:'.$dlg['id'].',del_id:'.$u['id']
+				'val' => 'dialog_id:'.$dlg_id.',del_id:'.$u['id']
 			));
 
 		//Выбор нескольких значений галочками
@@ -1163,21 +1153,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				return _iconEdit(array('class'=>'curD'));
 			if(!$u = $prm['unit_get'])
 				return _iconEdit(array('class'=>'curD'));
-
-			//если используется сторонняя таблица (не _spisok), поиск диалога, который вносит данные
-			if(!isset($u['dialog_id'])) {
-				if(!$elp = _elemOne($el['parent_id']))
-					return _msgRed('-elp-yok-');
-
-				$u['dialog_id'] = 0;
-				switch($elp['dialog_id']) {
-					//список-таблица
-					case 23: $u['dialog_id'] = $elp['num_1']; break;
-				}
-			}
-
-			if(!$dlg = _dialogQuery($u['dialog_id']))
+			if(!$dlg_id = _num(@$u['dialog_id_use']))
+				return _msgRed('-dlg-id-yok-');
+			if(!$dlg = _dialogQuery($dlg_id))
 				return _msgRed('-dlg-yok-');
+
 			//иконка не выводится, если редактирование запрещено
 			if(!$dlg['edit_on'])
 				return '';
@@ -1185,7 +1165,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			return
 			_iconEdit(array(
 				'class' => 'dialog-open pl',
-				'val' => 'dialog_id:'.$dlg['id'].',edit_id:'.$u['id']
+				'val' => 'dialog_id:'.$dlg_id.',edit_id:'.$u['id']
 			));
 
 		//Count - количество

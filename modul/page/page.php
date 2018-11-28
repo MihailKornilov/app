@@ -320,14 +320,9 @@ function _pageUserShow($el, $unit) {//отображение страниц, д�
 	if(empty($unit['id']))
 		return _emptyMin10('Отсутствует id пользователя.');
 
-	//доступ в преложние
-	$sql = "SELECT `num_1`
-			FROM `_spisok`
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=1011
-			  AND `connect_1`=".$unit['id']."
-			LIMIT 1";
-	if(!query_value($sql))
+	//доступ в приложение
+	$u = _userApp(APP_ID, $unit['id']);
+	if(!$u)//доступ планировалос сделать через _spisok.num_1
 		return '<div class="_empty min mar10 red">Вход в приложение запрещён.</div>';
 
 	//доступные страницы
@@ -374,14 +369,14 @@ function _pageUserShowSpisok($arr, $parent_id=0) {//список страниц 
 function _pageUserAccessAll() {//настройка входа в приложение всем пользователям (подключение через [12])
 	$sql = "SELECT
 				`u`.*,
-				`ua`.`num_1`
+				`sp`.`num_1`
 			FROM
 				`_user` `u`,
-				`_spisok` `ua`
-			WHERE `ua`.`app_id`=".APP_ID."
-			  AND `u`.`id`=`ua`.`connect_1`
-			  AND `ua`.`dialog_id`=1011
-			ORDER BY `ua`.`dtime_add`";
+				`_spisok` `sp`
+			WHERE `sp`.`app_id`=".APP_ID."
+			  AND `u`.`id`=`sp`.`cnn_id`
+			  AND `sp`.`dialog_id`=111
+			ORDER BY `sp`.`dtime_add`";
 	if(!$user = query_arr($sql))
 		return _emptyMin10('Сотрудников нет.');
 

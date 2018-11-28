@@ -549,7 +549,7 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 	$sql = "SELECT COUNT(*)
 			FROM `_spisok`
 			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=1011";
+			  AND `dialog_id`=111";
 	$userCount = query_value($sql);
 
 	//ids страниц
@@ -1197,8 +1197,9 @@ function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки п�
 		'id' => 1,
 		'id_old' => 1,
 		'num' => 1,
-		'parent_id' => 1,
 		'app_id' => 1,
+		'cnn_id' => 1,
+		'parent_id' => 1,
 		'user_id' => 1,
 		'page_id' => 1,
 		'block_id' => 1,
@@ -1484,6 +1485,15 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 	//не присвоена колонка элементу 11
 	if(!$col = $ell['col'])
 		return _msgRed('no-11-col.'.$ell['dialog_id']);
+
+	//получение имени колонки из элемента родительского диалога
+	if($elem_id = _num($col)) {
+		if(!$el = _elemOne($elem_id))
+			return _msgRed('no-elp.'.$elem_id);
+		if(!$col = $el['col'])
+			return _msgRed('no-elp-col.'.$ell['dialog_id']);
+	}
+
 	//колонки в записи не существует
 	if(!isset($unit[$col]))
 		return _msgRed('no-u-val.'.$ell['dialog_id']);

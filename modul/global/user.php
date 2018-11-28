@@ -190,16 +190,23 @@ function _userImageMove() {//перенос аватарок пользоват�
 				WHERE `id`=".$r['id'];
 		query($sql);
 
-		$sql = "SELECT `id`
-				FROM `_spisok`
-				WHERE `app_id`=".APP_ID."
-				  AND `dialog_id`=1011
-				  AND `connect_1`=".$r['id'];
-		if($spisok_id = query_value($sql)) {
+		if($u = _userApp(APP_ID, $r['id'])) {
 			$sql = "UPDATE `_spisok`
 					SET `image_1`=".$image_id."
-					WHERE `id`=".$spisok_id;
+					WHERE `id`=".$u['id'];
 			query($sql);
 		}
 	}
 }
+
+
+function _userApp($app_id, $user_id=USER_ID) {//получение данных пользователя, связанного с конкретным приложением
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `app_id`=".$app_id."
+			  AND `dialog_id`=111
+			  AND `cnn_id`=".$user_id."
+			LIMIT 1";
+	return query_assoc($sql);
+}
+

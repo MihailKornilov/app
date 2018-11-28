@@ -37,11 +37,8 @@ function _auth() {//получение данных об авторизации 
 				WHERE `code`='".addslashes(CODE)."'
 				LIMIT 1";
 		if($r = query_assoc($sql)) {
-			$sql = "SELECT `num_1`
-					FROM `_spisok`
-					WHERE `app_id`=".$r['app_id']."
-					  AND `connect_1`=".$r['user_id'];
-			$r['access'] = _num(query_value($sql));
+			$u = _userApp($r['app_id'], $r['user_id']);
+			$r['access'] = _num(@$u['num_1']);
 
 			$data = array(
 				'user_id' => $r['user_id'],
@@ -451,25 +448,20 @@ function _hat_but_pas() {//отображение кнопки настройк�
 function _app_create($dialog, $app_id) {//привязка пользователя к приложению после его создания
 	if($dialog['id'] != 100)
 		return;
-	if(!$app_id)//ID созданного приложения в таблице _app
+	//ID созданного приложения в таблице _app
+	if(!$app_id)
 		return;
-
-	$sql = "SELECT COUNT(*)
-			FROM `_spisok`
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=1011
-			  AND `connect_1`=".USER_ID;
-	if(query_value($sql))
+	if(_userApp($app_id))
 		return;
 
 	$sql = "INSERT INTO `_spisok` (
 				`app_id`,
 				`dialog_id`,
-				`connect_1`,
-				`num_1`
+				`cnn_id`,
+				`num_1`     /* доступ в приложение */
 			) VALUES (
 				".$app_id.",
-				1011,
+				111,
 				".USER_ID.",
 				1
 			)";
@@ -494,8 +486,8 @@ function _app_list() {//список приложений, которые дос
 
 	$sql = "SELECT *
 			FROM `_spisok`
-			WHERE `connect_1`=".USER_ID."
-			  AND `dialog_id`=1011
+			WHERE `cnn_id`=".USER_ID."
+			  AND `dialog_id`=111
 			ORDER BY `dtime_add`";
 	if(!$spisok = query_arr($sql))
 		return

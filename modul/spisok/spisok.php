@@ -149,8 +149,8 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Кол-во списка ".$dialog['name']." */
 			SELECT COUNT(*)
-			FROM "._tableFrom($dialog)."
-			WHERE "._spisokCond($el);
+			FROM "._queryFrom($dialog)."
+			WHERE "._queryWhere($dialog);
 	$all = _num(query_value($sql));
 
 	//проверка, есть ли единица списка, которую нашли по номеру (num)
@@ -507,7 +507,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	//получение данных списка
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Список-таблица <u>".$DLG['name']."</u> */
 			SELECT "._queryCol($DLG)."
-			FROM   "._tableFrom($DLG)."
+			FROM   "._queryFrom($DLG)."
 			WHERE  "._spisokCond($ELEM)."
 			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
@@ -635,18 +635,18 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 	if(!$unit_id)
 		return array();
 
-	if($parent_id = $dialog['dialog_id_parent'])
-		if(!$dialog = _dialogQuery($parent_id))
-			return array();
+//	if($parent_id = $dialog['dialog_id_parent'])
+//		if(!$dialog = _dialogQuery($parent_id))
+//			return array();
 
 	if(!$dialog['table_1'])
 		return array();
 
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Данные записи */
 			SELECT "._queryCol($dialog)."
-			FROM "._tableFrom($dialog)."
-			WHERE `id`=".$unit_id.
-				  _spisokCondDef($dialog['id']);
+			FROM "._queryFrom($dialog)."
+			WHERE `t1`.`id`=".$unit_id."
+			  AND "._queryWhere($dialog);
 	if(!$spisok[$unit_id] = query_assoc($sql))
 		return array();
 
@@ -785,8 +785,11 @@ function _spisokCond($el) {//формирование строки с услов
 	//$el - элемент, который размещает список. 14 или 23.
 	//диалог, через который вносятся данные списка
 
-	$cond = "`t1`.`id`";
-	$cond .= _spisokCondDef($el['num_1']);
+	$dlg = _dialogQuery($el['num_1']);
+
+//	$cond = "`t1`.`id`";
+//	$cond .= _spisokCondDef($el['num_1']);
+	$cond = _queryWhere($dlg);
 	$cond .= _spisokCondBind($el);
 	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond62($el);

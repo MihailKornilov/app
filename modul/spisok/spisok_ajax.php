@@ -976,12 +976,8 @@ function _pageUserAccess_save($cmp, $val, $unit) {//сохранение дос�
 	}
 
 	//отключение входа в приложение, если нужно
-	$sql = "SELECT `num_1`
-			FROM `_spisok`
-			WHERE `app_id`=".APP_ID."
-			  AND `connect_1`=".$user_id."
-			LIMIT 1";
-	if(!_num(query_value($sql))) {
+	$u = _userApp(APP_ID, $user_id);
+	if(!$u['num_1']) {
 		$sql = "UPDATE `_user_auth`
 				SET `app_id`=0
 				WHERE `app_id`=".APP_ID."
@@ -997,7 +993,8 @@ function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение до
 	$sql = "UPDATE `_spisok`
 			SET `num_1`=0
 			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=1011";
+			  AND `dialog_id`=111
+			  AND `cnn_id`";
 	query($sql);
 
 	$ids = _ids($val);
@@ -1005,8 +1002,8 @@ function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение до
 	$sql = "UPDATE `_spisok`
 			SET `num_1`=1
 			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=1011
-			  AND `connect_1` IN (".$ids.")";
+			  AND `dialog_id`=111
+			  AND `cnn_id` IN (".$ids.")";
 	query($sql);
 
 	$sql = "UPDATE `_user_auth`
@@ -1021,9 +1018,10 @@ function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение до
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=1011";
+			  AND `dialog_id`=111
+			  AND `cnn_id`";
 	foreach(query_arr($sql) as $r)
-		_cache_clear('user'.$r['connect_1']);
+		_cache_clear('user'.$r['cnn_id']);
 }
 
 function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id диалога при создании условий удаления записи
