@@ -1060,9 +1060,10 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			//получение данных списка
 			$DLG = _dialogQuery($el['num_1']);
-			$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
-					FROM "._tableFrom($DLG)."
-					WHERE `t1`.`id`"._spisokCondDef($DLG['id'])."
+			$sql = "/* ".__FUNCTION__.":".__LINE__." Выбор галочками из ".$DLG['name']." */
+					SELECT "._queryCol($DLG)."
+					FROM   "._queryFrom($DLG)."
+					WHERE  "._queryWhere($DLG)."
 					ORDER BY `sort`";
 			$spisok = query_arr($sql);
 
@@ -1484,9 +1485,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					continue;
 
 				$sql = "SELECT COUNT(*)
-						FROM "._tableFrom($DLG)."
-						WHERE `t1`.`id`
-							"._spisokCondDef($DLG['id'])."
+						FROM  "._queryFrom($DLG)."
+						WHERE "._queryWhere($DLG)."
 							"._22cond($id);
 				if($c = query_value($sql))
 					$spisok[$id] .= '<span class="fr inhr">'.$c.'</span>';
@@ -2533,41 +2533,6 @@ function _beElemVvv($el) {//вставка дополнительных знач
 					$el['is_img'] = 1;
 					break;
 			}
-			break;
-		//фильтр-select
-		case 83:
-			if(!$dialog_id = $el['num_2'])
-				break;
-			if(!$dlg = $G_DLG[$dialog_id])
-				break;
-
-			$field = $dlg['field1'];
-
-			$cond = "`t1`.`id`";
-			if(isset($field['deleted']))
-				$cond .= " AND !`t1`.`deleted`";
-			if(isset($field['app_id']))
-				$cond .= " AND `t1`.`app_id`=".APP_ID;
-			if(isset($field['dialog_id']))
-				$cond .= " AND `t1`.`dialog_id`=".$dialog_id;
-
-			$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
-					FROM "._tableFrom($dlg)."
-					WHERE ".$cond."
-					ORDER BY `sort` DESC
-					LIMIT 50";
-			if(!$spisok = query_arr($sql))
-				break;
-
-			$vvv = array();
-
-			foreach($spisok as $rr)
-				$vvv[] = array(
-					'id' => $rr['id'],
-					'title' => $rr['txt_1']
-				);
-
-			$el['vvv'] = $vvv;
 			break;
 	}
 

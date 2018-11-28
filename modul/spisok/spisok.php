@@ -149,8 +149,8 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Кол-во списка ".$dialog['name']." */
 			SELECT COUNT(*)
-			FROM "._queryFrom($dialog)."
-			WHERE "._queryWhere($dialog);
+			FROM  "._queryFrom($dialog)."
+			WHERE "._spisokWhere($el);
 	$all = _num(query_value($sql));
 
 	//проверка, есть ли единица списка, которую нашли по номеру (num)
@@ -160,29 +160,6 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 	define($key, $all);
 
 	return $all;
-}
-function _spisokJoinField($dialog) {//подключение колонок второго списка
-	return '';
-
-	$fields = array();
-	foreach($dialog['cmp'] as $cmp) {
-		if($cmp['table_num_'] != 2)
-			continue;
-		if(empty($cmp['col']))
-			continue;
-		$fields[$cmp['col']] = 1;
-	}
-
-	$send = '';
-	foreach($fields as $col => $r)
-		$send .= ',`t2`.`'.$col.'`';
-
-	//вставка колонки `dialog_id` из второй таблицы, если отсутствует в первой
-	if(!isset($dialog['field1']['dialog_id']))
-		if(isset($dialog['field2']['dialog_id']))
-			$send .= ',`t2`.`dialog_id`';
-
-	return $send;
 }
 
 function _spisokElemCount($el) {//формирование элемента с содержанием количества списка для вывода на страницу
@@ -202,7 +179,7 @@ function _spisokElemCount($el) {//формирование элемента с �
 	' '.
 	_end($all, $el['txt_2'], $el['txt_4'], $el['txt_6']);
 }
-function _spisok7num($spisok, $el) {//добавление единицы списка, если был быстрый поиск по номеру
+function _spisok7num($spisok, $el) {//добавление записи, если был быстрый поиск по номеру
 	/*
 		Единица списка с найденным номером будет добавляться при двух условиях:
 		  1. Если существует быстрый поиск по этому списку
@@ -244,12 +221,13 @@ function _spisok7num($spisok, $el) {//добавление единицы спи
 
 		//сборный текст
 		if($r['dialog_id'] == 44)
-			if($child = PHP12_44_setup_vvv($r['id']))
-				foreach($child as $rr)
-					if($rr['dialog_id'] == 32) {
-						$is_num = true;
-						break;
-					}
+			if($ids = _ids($r['txt_2'], 'arr'))
+				foreach($ids as $id)
+					if($ell = _elemOne($id))
+						if($ell['dialog_id'] == 32) {
+							$is_num = true;
+							break;
+						}
 
 		if($is_num)
 			break;
@@ -261,10 +239,10 @@ function _spisok7num($spisok, $el) {//добавление единицы спи
 
 	$DLG = _dialogQuery($el['num_1']);
 
-	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
-			FROM "._tableFrom($DLG)."
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
 			WHERE `t1`.`num`=".$num."
-			  "._spisokCondDef($el['num_1'])."
+			  AND "._queryWhere($DLG)."
 			LIMIT 1";
 	if(!$u = query_assoc($sql))
 		return $spisok;
@@ -315,10 +293,10 @@ function _spisokInclude($spisok) {//вложенные списки
 			$incDialog = _dialogQuery($cmp['num_1']);
 
 			$sql = "/* ".__FUNCTION__.":".__LINE__." Вложенный список ".$incDialog['name']." */
-					SELECT `t1`.*"._spisokJoinField($incDialog)."
-					FROM "._tableFrom($incDialog)."
-					WHERE `t1`.`id` IN (".$ids.")".
-						_spisokCondDef($incDialog['id']);
+					SELECT "._queryCol($incDialog)."
+					FROM   "._queryFrom($incDialog)."
+					WHERE `t1`.`id` IN (".$ids.")
+					  AND "._queryWhere($incDialog);
 			$key = md5($sql);
 			if(!isset($_SI[$key])) {
 				if($arr = query_arr($sql)) {
@@ -420,8 +398,8 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	//получение данных списка
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Список-шаблон <u>".$DLG['name']."</u> */
 			SELECT "._queryCol($DLG)."
-			FROM   "._tableFrom($DLG)."
-			WHERE "._spisokCond($ELEM)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._spisokWhere($ELEM)."
 			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
@@ -508,7 +486,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Список-таблица <u>".$DLG['name']."</u> */
 			SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
-			WHERE  "._spisokCond($ELEM)."
+			WHERE  "._spisokWhere($ELEM)."
 			ORDER BY ".$order."
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
@@ -634,17 +612,12 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 
 	if(!$unit_id)
 		return array();
-
-//	if($parent_id = $dialog['dialog_id_parent'])
-//		if(!$dialog = _dialogQuery($parent_id))
-//			return array();
-
 	if(!$dialog['table_1'])
 		return array();
 
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Данные записи */
 			SELECT "._queryCol($dialog)."
-			FROM "._queryFrom($dialog)."
+			FROM   "._queryFrom($dialog)."
 			WHERE `t1`.`id`=".$unit_id."
 			  AND "._queryWhere($dialog);
 	if(!$spisok[$unit_id] = query_assoc($sql))
@@ -751,44 +724,15 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения к
 	return $txt;
 }
 
-function _spisokCondDef($dialog_id) {//условия по умолчанию
-	$key = 'TABLE_COND_'.$dialog_id;
+function _spisokWhere($el) {//формирование строки с условиями поиска
+	//$el - элемент, который размещает список 14 или 23.
 
-	if(defined($key))
-		return constant($key);
+	if($el['dialog_id'] != 14 && $el['dialog_id'] != 23)
+		return "!`t1`.`id`";
 
-	$dialog = _dialogQuery($dialog_id);
-	$field1 = $dialog['field1'];
-//	$field2 = $dialog['field2'];
-
-	$cond = '';
-	if(isset($field1['deleted']))
-		$cond .= " AND !`t1`.`deleted`";
-	if(isset($field1['app_id']))
-		$cond .= " AND `t1`.`app_id` IN (0,".APP_ID.")";
-	if(isset($field1['dialog_id']) && $dialog['table_name_1'] != '_element')
-		$cond .= " AND `t1`.`dialog_id`=".$dialog_id;
-
-/*
-	if(isset($field2['deleted']))
-		$cond .= " AND !`t2`.`deleted`";
-	if(isset($field2['app_id']))
-		$cond .= " AND `t2`.`app_id` IN (0,".APP_ID.")";
-	if(isset($field2['dialog_id']))
-		$cond .= " AND `t2`.`dialog_id`=".$dialog_id;
-*/
-	define($key, $cond);
-
-	return $cond;
-}
-function _spisokCond($el) {//формирование строки с условиями поиска
-	//$el - элемент, который размещает список. 14 или 23.
 	//диалог, через который вносятся данные списка
-
 	$dlg = _dialogQuery($el['num_1']);
 
-//	$cond = "`t1`.`id`";
-//	$cond .= _spisokCondDef($el['num_1']);
 	$cond = _queryWhere($dlg);
 	$cond .= _spisokCondBind($el);
 	$cond .= _spisokCond7($el);
@@ -1102,9 +1046,9 @@ function _22cond($parent_id) {//получение условий запроса
 
 			$dialog = _dialogQuery($EL['num_1']);
 			$send .= " AND `".$col."` IN (
-						SELECT `id`
-						FROM "._tableFrom($dialog)."
-						WHERE `id`"._spisokCondDef($dialog['id']).
+						SELECT `t1`.`id`
+						FROM "._queryFrom($dialog)."
+						WHERE `id`"._queryWhere($dialog).
 							_22condV(
 									$r['num_2'],
 									$elCol[_idsLast($r['txt_1'])],
@@ -1284,8 +1228,7 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 	$sort = $el['num_5'];
 	$field = $DLG['field1'];
 
-	$cond = "`t1`.`id`";
-	$cond .= _spisokCondDef($DLG['id']);
+	$cond = _queryWhere($DLG);
 
 	$C = array();
 	$C[] = _29cnnCond($el['txt_3'], $v);
@@ -1294,8 +1237,8 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 	if(!empty($C))
 		$cond .= " AND (".implode(' OR ', $C).")";
 
-	$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
-			FROM "._tableFrom($DLG)."
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
 			WHERE ".$cond."
 			ORDER BY ".(isset($field['sort']) ? "`sort`," : '')."`id` DESC
 			"._dn($sort, "LIMIT 50");

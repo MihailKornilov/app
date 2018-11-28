@@ -119,25 +119,20 @@ function _queryCol($DLG) {//получение колонок, для котор
 	$field[] = _queryColReq($DLG, 'dialog_id');
 	$field[] = _queryColReq($DLG, 'block_id');
 	$field[] = _queryColReq($DLG, 'element_id');
+	$field[] = _queryColReq($DLG, 'num');
 	$field[] = _queryColReq($DLG, 'dtime_add');
 	$field[] = _queryColReq($DLG, 'user_id_add');
 
 	//id диалога, который использовался при создании записи
 	$field[] = $DLG['id'].' `dialog_id_use`';
 
-	foreach($DLG['cmp'] as $cmp) {
-		if(!$col = $cmp['col'])
-			continue;
+	foreach($DLG['cmp'] as $cmp)
+		$field[] = _queryColTest($DLG, $cmp);
 
-		//имя колонки нужно получить из элемента родительского диалога
-		if($elem_id = _num($col)) {
-			if(!$el = _elemOne($elem_id))
-				continue;
-			if(!$col = $el['col'])
-				continue;
-		}
-
-		$field[] = _queryColReq($DLG, $col);
+	if($parent_id = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($parent_id);
+		foreach($PAR['cmp'] as $cmp)
+			$field[] = _queryColTest($DLG, $cmp);
 	}
 
 	$field = array_diff($field, array(''));
@@ -145,6 +140,20 @@ function _queryCol($DLG) {//получение колонок, для котор
 	define($key, implode(',', $field));
 
 	return constant($key);
+}
+function _queryColTest($DLG, $cmp) {//проверка существования колонки в компоненте и добавление её
+	if(!$col = $cmp['col'])
+		return '';
+
+	//имя колонки нужно получить из элемента родительского диалога
+	if($elem_id = _num($col)) {
+		if(!$el = _elemOne($elem_id))
+			return '';
+		if(!$col = $el['col'])
+			return '';
+	}
+
+	return _queryColReq($DLG, $col);
 }
 function _queryColReq($DLG, $col) {//добавление обязательных колонок
 	//колонка не используется ни в одной таблице
@@ -172,12 +181,12 @@ function _queryFrom($DLG) {//составление таблиц для запр
 	if(defined($key))
 		return constant($key);
 
-	$send = "`".$DLG['table_name_1']."` `t1` /* ".$DLG['dialog_id_parent']." */";
+	$send = "`".$DLG['table_name_1']."` `t1`";
 
 	//если присутствует родительский диалог, основной становится таблица родителя
 	if($parent_id = $DLG['dialog_id_parent']) {
 		$PAR = _dialogQuery($parent_id);
-		$send = "`".$PAR['table_name_1']."` `t1`";
+		$send = "`".$PAR['table_name_1']."` `t1` /* Таблица-родитель */";
 		if($PAR['table_1'] != $DLG['table_1'])
 			$send .= ",`".$DLG['table_name_1']."` `t2`";
 	}
@@ -250,28 +259,6 @@ function _queryWhereDialogId($DLG) {//получение условия по `di
 
 	$dialog_id = $parent_id ? $parent_id : $DLG['id'];
 	return "`".$tn."`.`dialog_id`=".$dialog_id;
-}
-
-function _tableFrom($dialog) {//составление таблиц для запроса на основании данных из диалога
-	$key = 'TABLE_FROM_'.$dialog['id'];
-
-	if(defined($key))
-		return constant($key);
-
-	if(!$dialog['table_1'])
-		return '';
-
-	$send = "`".$dialog['table_name_1']."` `t1` ";
-
-
-/*	//todo переделать
-	if($dialog['table_2_'])
-		$send .= "INNER JOIN `".$dialog['table_name_2']."` `t2`
-				  ON `t1`.`id`=`t2`.`".$dialog['table_2_field']."`";
-*/
-	define($key, $send);
-
-	return $send;
 }
 
 function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении

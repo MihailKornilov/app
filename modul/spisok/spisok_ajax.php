@@ -1081,12 +1081,10 @@ function _spisokUnitUpd27($unit) {//обновление сумм значени
 	if(!$DSrc = _dialogQuery($BL['obj_id']))
 		return;
 
-	$DSRC_COND = _spisokCondDef($BL['obj_id']);
-
 	//предварительное обнуление значений перед обновлением
-	$sql = "UPDATE "._tableFrom($DSrc)."
+	$sql = "UPDATE "._queryFrom($DSrc)."
 			SET `".$unit['col']."`=0
-			WHERE `t1`.`id` ".$DSRC_COND;
+			WHERE "._queryWhere($DSrc);
 	query($sql);
 
 	if(!$ids = _ids($unit['txt_2']))
@@ -1115,9 +1113,9 @@ function _spisokUnitUpd27($unit) {//обновление сумм значени
 	}
 
 	//процесс обновления
-	$sql = "UPDATE "._tableFrom($DSrc)."
+	$sql = "UPDATE "._queryFrom($DSrc)."
 			SET `".$unit['col']."`=".$upd."
-			WHERE `t1`.`id` ".$DSRC_COND;
+			WHERE "._queryWhere($DSrc);
 	query($sql);
 }
 function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (при создании элемента)
@@ -1149,9 +1147,9 @@ function _spisokUnitUpd54($unit) {//обновление количеств пр
 		return;
 
 	//предварительное обнуление значений перед обновлением
-	$sql = "UPDATE "._tableFrom($DSrc)."
+	$sql = "UPDATE "._queryFrom($DSrc)."
 			SET `".$unit['col']."`=0
-			WHERE `t1`.`id` "._spisokCondDef($BL['obj_id']);
+			WHERE "._queryWhere($DSrc);
 	query($sql);
 
 	$sql = "SELECT
@@ -1169,9 +1167,10 @@ function _spisokUnitUpd54($unit) {//обновление количеств пр
 	$upd = array();
 	$cAss = count($ass);
 	foreach($ass as $id => $c) {
-		$sql = "UPDATE "._tableFrom($DSrc)."
+		$sql = "UPDATE "._queryFrom($DSrc)."
 				SET `".$unit['col']."`=".$c."
-				WHERE `t1`.`id`=".$id." "._spisokCondDef($BL['obj_id']);
+				WHERE `t1`.`id`=".$id."
+				  AND "._queryWhere($DSrc);
 		query($sql);
 /*
 		$upd[] = "(".$id.",".$c.")";
@@ -1233,9 +1232,9 @@ function _spisokUnitUpd55($unit) {//обновление сумм привяза
 		return;
 
 	//предварительное обнуление значений перед обновлением
-	$sql = "UPDATE "._tableFrom($DSrc)."
+	$sql = "UPDATE "._queryFrom($DSrc)."
 			SET `".$unit['col']."`=0
-			WHERE `t1`.`id` "._spisokCondDef($DSrc_id);
+			WHERE "._queryWhere($DSrc);
 	query($sql);
 
 	//получение элемента, который указывает на элемент, сумму значения которого нужно будет считать
@@ -1262,9 +1261,10 @@ function _spisokUnitUpd55($unit) {//обновление сумм привяза
 	$upd = array();
 	$cAss = count($ass);
 	foreach($ass as $id => $c) {
-		$sql = "UPDATE "._tableFrom($DSrc)."
+		$sql = "UPDATE "._queryFrom($DSrc)."
 				SET `".$unit['col']."`=".$c."
-				WHERE `t1`.`id`=".$id." "._spisokCondDef($DSrc_id);
+				WHERE `t1`.`id`=".$id."
+				  AND "._queryWhere($DSrc);
 		query($sql);
 /*
 		$upd[] = "(".$id.",".$c.")";
@@ -1452,15 +1452,17 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 		if($connect_old = _num($unitOld[$col])) {
 			//получение старого количества для обновления
 			$sql = "SELECT COUNT(*)
-					FROM "._tableFrom($dialog)."
-					WHERE `".$col."`=".$connect_old." "._spisokCondDef($dialog['id']);
+					FROM "._queryFrom($dialog)."
+					WHERE `".$col."`=".$connect_old."
+					  AND "._queryWhere($dialog);
 			$count_old = _num(query_value($sql));
 		}
 
 	//получение нового количества для обновления
 	$sql = "SELECT COUNT(*)
-			FROM "._tableFrom($dialog)."
-			WHERE `".$col."`=".$connect_id." "._spisokCondDef($dialog['id']);
+			FROM "._queryFrom($dialog)."
+			WHERE `".$col."`=".$connect_id."
+			  AND "._queryWhere($dialog);
 	$count = _num(query_value($sql));
 
 	foreach($arr as $r) {
@@ -1471,15 +1473,17 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 		$dlg = _dialogQuery($bl['obj_id']);
 
 		if($connect_old) {
-			$sql = "UPDATE "._tableFrom($dlg)."
+			$sql = "UPDATE "._queryFrom($dlg)."
 					SET `".$col."`=".$count_old."
-					WHERE `t1`.`id`=".$connect_old." "._spisokCondDef($dlg['id']);
+					WHERE `t1`.`id`=".$connect_old."
+					  AND "._queryWhere($dlg['id']);
 			query($sql);
 		}
 
-		$sql = "UPDATE "._tableFrom($dlg)."
+		$sql = "UPDATE "._queryFrom($dlg)."
 				SET `".$col."`=".$count."
-				WHERE `t1`.`id`=".$connect_id." "._spisokCondDef($dlg['id']);
+				WHERE `t1`.`id`=".$connect_id."
+				  AND "._queryWhere($dlg['id']);
 		query($sql);
 	}
 }
@@ -1510,13 +1514,15 @@ function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм �
 
 		//получение нового количества для обновления
 		$sql = "SELECT IFNULL(SUM(`".$colSum."`),0)
-				FROM "._tableFrom($dialog)."
-				WHERE `".$col."`=".$connect_id." "._spisokCondDef($dialog['id']);
+				FROM "._queryFrom($dialog)."
+				WHERE `".$col."`=".$connect_id."
+				  AND "._queryWhere($dialog['id']);
 		$sum = query_value($sql);
 
-		$sql = "UPDATE "._tableFrom($dlg)."
+		$sql = "UPDATE "._queryFrom($dlg)."
 				SET `".$colSumSet."`=".$sum."
-				WHERE `t1`.`id`=".$connect_id." "._spisokCondDef($dlg['id']);
+				WHERE `t1`.`id`=".$connect_id."
+				  AND "._queryWhere($dlg['id']);
 		query($sql);
 
 		$send[] = array(
@@ -1581,9 +1587,10 @@ function _spisokUnitAfter27($elUpd) {
 			}
 
 			//процесс обновления
-			$sql = "UPDATE "._tableFrom($dialog)."
+			$sql = "UPDATE "._queryFrom($dialog)."
 					SET `".$cmp['col']."`=".$upd."
-					WHERE `t1`.`id`=".$el['connect_id']." "._spisokCondDef($dialog['id']);
+					WHERE `t1`.`id`=".$el['connect_id']."
+					  AND "._queryWhere($dialog['id']);
 			query($sql);
 		}
 	}

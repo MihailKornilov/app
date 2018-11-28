@@ -1138,9 +1138,9 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 				break;
 
 			//получение данных списка
-			$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
-					FROM "._tableFrom($dlg)."
-					WHERE `t1`.`id`"._spisokCondDef($dlg_id)."
+			$sql = "SELECT "._queryCol($dlg)."
+					FROM   "._queryFrom($dlg)."
+					WHERE  "._queryWhere($dlg)."
 					ORDER BY `id`
 					LIMIT 200";
 			if(!$spisok = query_arr($sql))
@@ -1328,11 +1328,10 @@ function _elem102CnnList($ids, $return='select', $cond='') {//значения �
 		return array();
 
 	//получение данных списка
-	$sql = "SELECT `t1`.*"._spisokJoinField($dlg)."
-			FROM "._tableFrom($dlg)."
-			WHERE `t1`.`id`
-			  "._spisokCondDef($dlg_id)."
-			  ".$cond."
+	$sql = "SELECT "._queryCol($dlg)."
+			FROM   "._queryFrom($dlg)."
+			WHERE  "._queryWhere($dlg)."
+				   ".$cond."
 			ORDER BY `sort`,`id`
 			LIMIT 200";
 	if(!$spisok = query_arr($sql))
@@ -1532,9 +1531,9 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 
 			//получение данных списка
 			$DLG = _dialogQuery($ell['num_1']);
-			$sql = "SELECT `t1`.*"._spisokJoinField($DLG)."
-					FROM "._tableFrom($DLG)."
-					WHERE `t1`.`id`"._spisokCondDef($DLG['id'])."
+			$sql = "SELECT "._queryCol($DLG)."
+					FROM   "._queryFrom($DLG)."
+					WHERE  "._queryWhere($DLG)."
 					ORDER BY `sort`";
 			$spisok = query_arr($sql);
 
