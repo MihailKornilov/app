@@ -19,6 +19,9 @@ function _db_connect() {//подключение к базе данных
 		MYSQLI_DATABASE
 	))
 	    die('Can`t mysql connect: '.mysqli_connect_error());
+
+	$sql = "SET NAMES '".MYSQLI_NAMES."'";
+	mysqli_query($SQL_CNN, $sql);
 }
 
 function query($sql) {

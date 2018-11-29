@@ -314,7 +314,7 @@ function _html_script() {//скрипты и стили
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
-	'<script src="js/autosize.min.js?4"></script>'.
+	'<script src="js/autosize.min.js?5"></script>'.
 
 	//Установка начального значения таймера JS
 	(SA ? '<script>var TIME=(new Date()).getTime();</script>' : '').
