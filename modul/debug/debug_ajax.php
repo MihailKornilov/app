@@ -51,7 +51,7 @@ switch(@$_POST['op']) {
 		if($explain) {
 			$exp = '<table>';
 			$n = 1;
-			while($r = mysql_fetch_assoc($q)) {
+			while($r = mysqli_fetch_assoc($q)) {
 				$exp .= '<tr>';
 				if($n++ == 1) {
 					foreach($r as $i => $v)

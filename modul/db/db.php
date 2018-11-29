@@ -24,7 +24,7 @@ function _db_table() {//содержание таблицы
 	$table = $_GET['table'];
 
 	$sql = "SHOW TABLES LIKE '".$table."'";
-		if(!mysql_num_rows(query($sql)))
+		if(!mysqli_num_rows(query($sql)))
 			return 'Таблицы <b>'.$table.'</b> не существует';
 
 	$sql = "DESCRIBE `".$table."`";

@@ -600,7 +600,6 @@ textarea.hold::-moz-placeholder{color:transparent}
 .color-sal{color:#770}/* салатовый - расчётный счёт */
 
 /* фоны */
-.bge{background-color:#ffa}
 .bg-fff{background-color:#fff}
 .bg-eee{background-color:#eee}
 .bg-gr1{background-color:#FaFaFa}/* светло-серый */
@@ -609,7 +608,6 @@ textarea.hold::-moz-placeholder{color:transparent}
 .bg-fee{background-color:#fee}   /* бледно-красный */
 .bg-ffe{background-color:#ffe}
 .bg-ffd{background-color:#ffd}
-.edtd,/* отредактировано. При наведении класс удаляется */
 .bg-ffc{background-color:#ffc}  /* жёлтый - данные изменены */
 .bg-fcc{background-color:#fcc}  /* красный - ошибка */
 .bg-dfd{background-color:#dfd}  /* зелёный */

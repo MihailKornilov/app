@@ -181,9 +181,7 @@ function _userImageMove() {//перенос аватарок пользоват�
 	
 					".USER_ID."
 			)";
-		query($sql);
-
-		$image_id = query_insert_id('_image');
+		$image_id = query_id($sql);
 
 		$sql = "UPDATE `_user`
 				SET `ava`=''

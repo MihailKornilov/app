@@ -208,9 +208,7 @@ function _auth98($dialog, $cmp) {//регистрация нового поль�
 				'".addslashes($login)."',
 				'"._authPassMD5($pass)."'
 			)";
-	query($sql);
-
-	$user_id = query_insert_id('_user');
+	$user_id = query_id($sql);
 
 	$sig = md5($login.$pass.$_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR']);
 	_authSuccess($sig, $user_id);
@@ -316,7 +314,7 @@ function _html_script() {//скрипты и стили
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
-	'<script src="js/autosize.js?3"></script>'.
+	'<script src="js/autosize.min.js?4"></script>'.
 
 	//Установка начального значения таймера JS
 	(SA ? '<script>var TIME=(new Date()).getTime();</script>' : '').

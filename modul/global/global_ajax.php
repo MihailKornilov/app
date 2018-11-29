@@ -33,11 +33,8 @@ switch(@$_POST['op']) {
 		$conn = 0;
 
 		$sql = "SHOW TABLES LIKE '".$table."'";
-		if(!mysql_num_rows(query($sql)))
-			if(mysql_num_rows(query($sql)))
-				$conn = GLOBAL_MYSQL_CONNECT;
-			else
-				jsonError('Таблицы не существует');
+		if(!mysqli_num_rows(query($sql)))
+			jsonError('Таблицы не существует');
 
 		$sort = explode(',', $_POST['ids']);
 		if(empty($sort))

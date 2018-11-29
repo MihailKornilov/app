@@ -10,4 +10,7 @@ _user();
 _jsCacheAppControl();
 _pasDefine();
 
+
 die(_html());
+
+

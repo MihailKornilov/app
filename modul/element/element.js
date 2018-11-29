@@ -778,7 +778,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					}
 					return;
 				//textarea
-				case 5:	ATR_CMP.autosize(); return;
+				case 5:	ATR_CMP._autosize(); return;
 				//select - выбор страницы
 				case 6:
 					_elemFunc(el, UNIT_V, 1);
@@ -1102,7 +1102,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						NOTE_AREA = NOTE_TXT.find('textarea'),
 						NOTE_TXT_W = NOTE_TXT.width(),
 						noteAfterPrint = function() {
-							NOTE.find('textarea').autosize();
+							NOTE.find('textarea')._autosize();
 							NOTE.find('.comment-ok').click(function() {//внесение комментария
 								var t = $(this),
 									comm = t.parents('._note-comment'),
@@ -1123,7 +1123,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								_post(send, function(res) {
 									_parent(t, 'TABLE').before(res.html);
 									area.val('');
-									area.trigger('autosize');
+									area.trigger('_autosize');
 								});
 							});
 							NOTE.find('._note-to-cmnt').click(function() {//раскрытие комментариев
@@ -1183,7 +1183,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							busy_obj:NOTE
 						};
 						_post(send, function(res) {
-							NOTE_AREA.val('').trigger('autosize');
+							NOTE_AREA.val('').trigger('_autosize');
 							NOTE_TXT.width(NOTE_TXT_W);
 							NOTE.find('._note-list').html(res.html);
 							noteAfterPrint();
@@ -2776,7 +2776,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			DL.sortable({axis:'y',handle:'.icon-move-y'});
 			var DD = DL.find('dd:last');
-			DD.find('textarea').autosize();
+			DD.find('textarea')._autosize();
 			DD.find('.def')._check({
 				tooltip:'По умолчанию',
 				func:function(v, ch) {

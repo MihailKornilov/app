@@ -76,14 +76,12 @@ function _dialogTest() {//проверка id диалога, создание �
 				".APP_ID.",
 				".USER_ID."
 			)";
-	query($sql);
+	$dialog_id = query_id($sql);
 
 	$sql = "SELECT IFNULL(MAX(`num`),0)+1
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID;
 	$num = query_value($sql);
-
-	$dialog_id = query_insert_id('_dialog');
 
 	$sql = "UPDATE `_dialog`
 			SET `num`=".$num.",
@@ -3291,9 +3289,7 @@ function _historyInsert($type_id, $dialog, $unit_id) {//внесение ист�
 				".$active.",
 				".USER_ID."
 			)";
-	query($sql);
-
-	return query_insert_id('_history');
+	return query_id($sql);
 }
 function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение истории действий при редактировании
 	if(empty($unitOld))
@@ -3577,11 +3573,11 @@ function _imageServer($v) {//получение сервера (пути) для
 				'".addslashes($v)."',
 				".USER_ID."
 			)";
-	query($sql);
+	$insert_id = query_id($sql);
 
 	_cache_clear( 'IMG_SERVER', 1);
 
-	return query_insert_id('_image_server');
+	return $insert_id;
 }
 function _imageNo($width=80) {//картинка, если изображнеия нет
 	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="'.$width.'" />';
@@ -3739,9 +3735,7 @@ function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
 				".$sort.",
 				".USER_ID."
 		)";
-	query($sql);
-
-	$image_id = query_insert_id('_image');
+	$image_id = query_id($sql);
 
 	$sql = "SELECT *
 			FROM `_image`

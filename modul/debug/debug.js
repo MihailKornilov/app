@@ -22,39 +22,6 @@ $(document)
 		_msg();
 		location.reload();
 	})
-	.on('click', '#_debug .sql-un', function() {
-		var t = $(this),
-			txt = '<div class="sql-hd">' +
-					'time: ' + t.next().html() +
-					'<a>Обновить</a>' +
-					'<a>NOCACHE</a>' +
-					'<a>EXPLAIN</a>' +
-					'<h3></h3>' +
-				  '</div>' +
-				  '<textarea>' + t.html() + '</textarea>' +
-				  '<div class="exp"></div>';
-		t.parent()
-		 .html(txt)
-		 .find('textarea').select().autosize();
-	})
-	.on('click', '#_debug .sql-hd a', function() {
-		var t = $(this),
-			p = t.parent(),
-			h3 = p.find('h3'),
-			send = {
-				op:'debug_sql',
-				query:p.next().val(),
-				nocache:t.html() == 'NOCACHE' ? 1 : 0,
-				explain:t.html() == 'EXPLAIN' ? 1 : 0,
-				busy_obj:p
-			};
-		h3.html('');
-		_post(send, function(res) {
-			h3.html(res.html);
-			if(res.exp)
-				p.next().next().html(res.exp);
-		});
-	})
 	.on('click', '#_debug h1', function() {//нажатие на плюсик - открытие поля debug
 		var t = $(this),
 			p = t.parent(),
@@ -62,6 +29,7 @@ $(document)
 		p._dn(s, 'show');
 		t.html(s ? '+' : '—');
 		_cookie('debug_show', s ? 0 : 1);
+		$('#_debug textarea')._autosize('update');
 	})
 	.on('click', '#cookie_clear', function() {//очистка cookies
 		var send = {
@@ -107,5 +75,7 @@ $(document)
 			t.parent().find('.sel').removeClass('sel');
 			t.addClass('sel');
 			_cookie('debug_pg', sel);
+			$('#_debug textarea')._autosize('update');
 		});
+		$('#_debug textarea')._autosize();
 	});

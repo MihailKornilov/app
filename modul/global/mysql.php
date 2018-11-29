@@ -1,88 +1,106 @@
 <?php
-_dbConnect('GLOBAL_');
 
-function _dbConnect($prefix='') {
-	global $sqlQuery;
-	$sqlQuery = array();
-	$conn = mysql_connect(
-				constant($prefix.'MYSQL_HOST'),
-				constant($prefix.'MYSQL_USER'),
-				constant($prefix.'MYSQL_PASS'),
-				1
-			) or die("Can't connect to database");
-	mysql_select_db(constant($prefix.'MYSQL_DATABASE'), $conn) or die("Can't select database");
+_db_connect();
 
-	$sql = "SET NAMES `".constant($prefix.'MYSQL_NAMES')."`";
-//	query($sql, $conn);
+function _db_connect() {//подключение к базе данных
+	global $SQL_CNN,    //соединение с базой
+		   $SQL_TIME,   //общее время выполнения запросов
+	       $SQL_QUERY,  //массив запросов
+	       $SQL_QUERY_T;//массив времени выполнения по каждому запросу
 
-	mysql_query($sql, $conn) or die($sql.'<br>'.mysql_error());
+	$SQL_TIME = 0;
+	$SQL_QUERY = array();
+	$SQL_QUERY_T = array();
 
-	define($prefix.'MYSQL_CONNECT', $conn);
+	if(!$SQL_CNN = mysqli_connect(
+		MYSQLI_HOST,
+		MYSQLI_USER,
+		MYSQLI_PASS,
+		MYSQLI_DATABASE
+	))
+	    die('Can`t mysql connect: '.mysqli_connect_error());
 }
-function query($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
-	global $sqlQuery, $sqlTime;
+
+function query($sql) {
+	global $SQL_CNN, $SQL_TIME, $SQL_QUERY, $SQL_QUERY_T;
+
 	$t = microtime(true);
-	$res = mysql_query($sql, $resource_id ? $resource_id : GLOBAL_MYSQL_CONNECT) or die($sql.'<br>'.mysql_error());
+	$res = mysqli_query($SQL_CNN, $sql);
 	$t = microtime(true) - $t;
 
-	$sqlTime += $t;
-	$t = round($t, 3);
-	$sqlQuery[] = '<li><a class="sql-un">'.trim(str_replace ('	', '',  $sql)).'</a><b class="t'.($t > 0.05 ? ' long' : '').'">'.$t.'</b>';
-	if(mysql_insert_id() && strpos(strtoupper($sql), 'INSERT INTO') !== false)
-		return mysql_insert_id();
+	$SQL_TIME += $t;
+	$SQL_QUERY[] = $sql;
+	$SQL_QUERY_T[] = round($t, 3);
+
 	return $res;
 }
-function query_value($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
-	$q = query($sql, $resource_id);
-	if(!$r = mysql_fetch_row($q))
+function query_value($sql) {//запрос одного значения
+	$q = query($sql);
+
+	if(!$r = mysqli_fetch_row($q))
 		return 0;
+	if(preg_match(REGEXP_INTEGER, $r[0]))
+		return $r[0] * 1;
+
 	return $r[0];
 }
-function query_assoc($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {
-	$q = query($sql, $resource_id);
-	if(!$r = mysql_fetch_assoc($q))
+function query_arr($sql, $key='id') {//массив по ключу
+	$q = query($sql);
+
+	$send = array();
+	while($r = mysqli_fetch_assoc($q))
+		$send[$r[$key]] = $r;
+
+	return $send;
+}
+function query_array($sql) {//последовательный массив без ключей
+	$q = query($sql);
+
+	$send = array();
+	while($r = mysqli_fetch_assoc($q))
+		$send[] = $r;
+
+	return $send;
+}
+function query_ass($sql) {//ассоциативный массив из двух значений: a => b
+	$q = query($sql);
+
+	$send = array();
+	while($r = mysqli_fetch_row($q))
+		$send[$r[0]] = preg_match(REGEXP_NUMERIC, $r[1]) ? $r[1] * 1 : $r[1];
+
+	return $send;
+}
+function query_assoc($sql) {//ассоциативный массив одной записи
+	$q = query($sql);
+	if(!$r = mysqli_fetch_assoc($q))
 		return array();
 	return $r;
 }
-function query_ass($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Ассоциативный массив
+function query_ids($sql) {//идентификаторы через запятую
+	$q = query($sql);
+
 	$send = array();
-	$q = query($sql, $resource_id);
-	while($r = mysql_fetch_row($q))
-		$send[$r[0]] = preg_match(REGEXP_NUMERIC, $r[1]) ? intval($r[1]) : $r[1];
-	return $send;
+	while($r = mysqli_fetch_row($q))
+		$send[] = $r[0];
+
+	return !$send ? 0 : implode(',', array_unique($send));
 }
-function query_array($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//последовательный массив без ключей
-	$send = array();
-	$q = query($sql, $resource_id);
-	while($r = mysql_fetch_assoc($q))
-		$send[] = $r;
-	return $send;
+function query_id($sql) {//получение id внесённой записи
+	global $SQL_CNN;
+
+	query($sql);
+
+	return _num(mysqli_insert_id($SQL_CNN));
 }
-function query_arr($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Массив, где ключами является id
-	$send = array();
-	$q = query($sql, $resource_id);
-	while($r = mysql_fetch_assoc($q))
-		$send[$r['id']] = $r;
-	return $send;
-}
-function query_ids($sql, $resource_id=GLOBAL_MYSQL_CONNECT) {//Список идентификаторов
-	$q = query($sql, $resource_id);
-	$send = array();
-	while($sp = mysql_fetch_row($q))
-		$send[] = $sp[0];
-	return empty($send) ? 0 : implode(',', array_unique($send));
-}
-function query_insert_id($tab, $resource_id=GLOBAL_MYSQL_CONNECT) {//id последнего внесённого элемента
+function query_insert_id($tab) {//id последнего внесённого элемента
 	$sql = "SELECT `id` FROM `".$tab."` ORDER BY `id` DESC LIMIT 1";
-	return query_value($sql, $resource_id);
-}
-function _maxSql($table, $pole='sort', $app=0) {
-	$sql = "SELECT IFNULL(MAX(`".$pole."`)+1,1)
-			FROM `".$table."`
-			WHERE `id`".
-			($app ? " AND `app_id`=".APP_ID : '');
 	return query_value($sql);
 }
+
+
+
+
 
 function _dbDump() {
 	define('INSERT_COUNT_MAX', 500); //записей в одном INSERT
@@ -93,8 +111,8 @@ function _dbDump() {
 
 	$spisok = array();
 	$sql = "SHOW TABLES";
-	$q = query($sql, GLOBAL_MYSQL_CONNECT);
-	while($r = mysql_fetch_row($q))
+	$q = query($sql);
+	while($r = mysqli_fetch_row($q))
 		$spisok[] = $r[0];
 
 	if(empty($spisok))
@@ -121,22 +139,22 @@ function _dbDumpTable($fp, $table) {
 	fwrite($fp, "DROP TABLE IF EXISTS `".$table."`;\n");
 
 	$sql = "SHOW CREATE TABLE `".$table."`";
-	$q = query($sql, GLOBAL_MYSQL_CONNECT);
-	$r = mysql_fetch_row($q);
+	$q = query($sql);
+	$r = mysqli_fetch_row($q);
 	fwrite($fp, $r[1].";\n");
 
 	//получение форматов столбцов
 	$sql = "DESCRIBE `".$table."`";
-	$q = query($sql, GLOBAL_MYSQL_CONNECT);
+	$q = query($sql);
 	$desc = array();
-	while($r = mysql_fetch_assoc($q))
+	while($r = mysqli_fetch_assoc($q))
 		array_push($desc, $r['Type']);
 
 	$values = array();
 	$sql = "SELECT * FROM `".$table."`";
-	$q = query($sql, GLOBAL_MYSQL_CONNECT);
+	$q = query($sql);
 	$count = 0;
-	while($row = mysql_fetch_row($q)) {
+	while($row = mysqli_fetch_row($q)) {
 		$count++;
 
 		$cols = array();

@@ -301,7 +301,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о ди�
 
 	//проверка наличия таблицы для внесения данных
 	$sql = "SHOW TABLES LIKE '"._table($dialog['table_1'])."'";
-	if(!mysql_num_rows(query($sql)))
+	if(!mysqli_num_rows(query($sql)))
 		jsonError('Таблицы не существует');
 
 	//получение данных единицы списка, если редактируется
@@ -558,9 +558,7 @@ function _spisokUnitInsert($dialog, $unit_id) {//внесение новой з�
 	}
 
 	$sql = "INSERT INTO `"._table($dialog['table_1'])."` (`id`) VALUES (0)";
-	query($sql);
-
-	$unit_id = query_insert_id(_table($dialog['table_1']));
+	$unit_id = query_id($sql);
 
 	//обновление некоторых колонок таблицы 1
 	foreach($dialog['field1'] as $field => $i) {
@@ -664,8 +662,13 @@ function _spisokUnitInsert($dialog, $unit_id) {//внесение новой з�
 			continue;
 		}
 		if($field == 'sort') {
+			$sql = "SELECT IFNULL(MAX(`sort`)+1,1)
+					FROM `".$dialog['table_name_1']."`
+					WHERE `id`";
+			$sort = query_value($sql);
+
 			$sql = "UPDATE `"._table($dialog['table_1'])."`
-					SET `sort`="._maxSql(_table($dialog['table_1']))."
+					SET `sort`=".$sort."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;

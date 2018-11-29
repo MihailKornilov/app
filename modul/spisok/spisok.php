@@ -643,7 +643,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 		$page = _page($el['url']);
 		$uid = $u['id'];
 
-		if($page['dialog_id_unit_get'] != $u['dialog_id_use'])
+		if($page['dialog_id_unit_get'] != @$u['dialog_id_use'])
 			if($el['dialog_id'] == 11) {
 				if(!$ids = _ids($el['txt_2'], 'arr'))
 					return $txt;

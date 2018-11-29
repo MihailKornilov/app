@@ -423,9 +423,7 @@ switch(@$_POST['op']) {
 						'".$r['hidden']."',
 						".USER_ID."
 					)";
-			query($sql);
-
-			$cloneIds[$id] = query_insert_id('_block');
+			$cloneIds[$id] = query_id($sql);
 		}
 
 		//внесение дочерних блоков
@@ -737,10 +735,10 @@ function _blockChildClone($id_old, $id_new) {//внесение дочерних
 					'".$r['hidden']."',
 					".USER_ID."
 				)";
-		query($sql);
+		$block_id = query_id($sql);
 
 		if($r['child_count'])
-			_blockChildClone($r['id'], query_insert_id('_block'));
+			_blockChildClone($r['id'], $block_id);
 	}
 }
 

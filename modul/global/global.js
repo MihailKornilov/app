@@ -389,6 +389,18 @@ $.fn._sort = function(o) {//сортировка
 		}
 	});
 };
+$.fn._autosize = function(v) {//автоматическое изменение поля textarea
+	var t = $(this);
+
+	if(v == 'update') {
+		autosize.update(t);
+		return t;
+	}
+
+	autosize(t);
+
+	return t;
+};
 
 $(document)
 	.ajaxSuccess(function(event, request) {
@@ -401,42 +413,53 @@ $(document)
 
 		var html = '',
 			post =
-				'<div class="hd ' + (req.success ? 'res1' : '') + (req.error ? 'res0' : '') + '">' +
+				'<div class="pad5 ' + _dn(req.success, 'bg-dfd') + _dn(req.error, 'bg-fcc') + '">' +
 					'<b>post</b>' +
 					'<a id="repeat">повтор</a>' +
-	 (req.success ? '<b id="res-success">success</b>' : '') +
-	   (req.error ? '<b id="res-error">error</b>' : '') +
+	 (req.success ? '<b class="color-pay fr">success</b>' : '') +
+	   (req.error ? '<b class="color-ref fr">error</b>' : '') +
 				'</div>' +
-				req.post,
-			link = '<div class="hd"><b>link</b></div><textarea>' + req.link + '</textarea>',
-			sql = '<div class="hd">sql <b>' + req.sql_count + '</b> (' + req.sql_time + ') :: php ' + req.php_time + '</div>';
+				'<div class="mt3">' + _pr(req.post) + '</div>',
+			link =  '<div class="bg-gr1 bor1 pad5 mt10">' +
+						'<b>link:</b> ' +
+						'<span class="color-acc">' + req.link + '</span>' +
+					'</div>',
+			file =  '<div class="bg-gr1 bor1 pad5 mt3">' +
+						'<b>file:</b> ' +
+						req.file +
+					'</div>',
+			sql = '';
 
 		for(var i in req) {
 			switch(i) {
 				case 'success':
 				case 'error':
-				case 'php_time':
-				case 'sql_count':
-				case 'sql_time':
 				case 'link':
+				case 'file':
 				case 'post': break;
 				case 'sql':
-					sql += '<ul>' + req[i] + '</ul>';
+					sql = '<div class="mt20">' + req[i] + '</div>';
 					break;
 				default:
-					var len = req[i] && req[i].length ? '<tt>' + req[i].length + '</tt>' : '';
-					html += '<div class="hd"><b>' + i + '</b>' + len + '<em>' + typeof req[i] + '</em></div>';
+					var len = req[i] && req[i].length ? '<b class="pale ml10">' + req[i].length + '</b>' : '';
+					html += '<div class="bg-eee bor1 pad5 mt20 curP over1" onclick="$(this).next().slideToggle()">' +
+								'<b>' + i + '</b>' +
+								len +
+								'<em class="fr">' + typeof req[i] + '</em>' +
+							'</div>';
 					if(typeof req[i] == 'object') {
 						html += _pr(req[i]);
 						break;
 					}
 					if(typeof req[i] === 'string')
 						req[i] = req[i].replace(/textarea/g, 'text_area');
-					html += '<textarea>' + req[i] + '</textarea>';
+					html += '<div>' +
+								'<textarea class="w100p mt3 h20">' + req[i] + '</textarea>' +
+							'</div>';
 			}
 		}
-		$('#_debug .ajax').html(post + link + sql + html);
-		$('#_debug .ajax textarea').autosize();
+		$('#_debug .ajax').html(post + link + file + sql + html);
+		$('#_debug textarea')._autosize();
 		$('#_debug #repeat').click(function() {
 			var t = $(this).parent();
 			if(t.hasClass('_busy'))
@@ -463,7 +486,7 @@ $(document)
 
 		$('#_debug').addClass('show');
 		$('#_debug .ajax').html('<textarea class="w100p bg-fcc">' + txt + '</textarea>');
-		$('#_debug .ajax textarea').autosize().before(_pr(POST_SEND));
+		$('#_debug .ajax textarea')._autosize().before(_pr(POST_SEND));
 		$('#_debug .dmenu a:last').trigger('click');
 	})
 

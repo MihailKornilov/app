@@ -6,7 +6,7 @@ function _debug($i='') {
 	if($i == 'style')
 		return '<link rel="stylesheet" type="text/css" href="modul/debug/debug'.MIN.'.css?'.SCRIPT.'" />';
 
-	global $sqlQuery, $sqlTime;
+	global $SQL_TIME, $SQL_QUERY, $SQL_QUERY_T;
 
 	$goFace = SITE ? 'iframe' : 'site';
 	$send =
@@ -16,7 +16,7 @@ function _debug($i='') {
 				'<a id="cookie_clear">Очисить cookie</a> :: '.
 				'<a id="count_update">Обновить суммы</a> :: '.
 				'<a id="cache_clear">Очисить кэш ('.SCRIPT.')</a> :: '.
-				'sql <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).') :: '.
+				'sql <b>'.count($SQL_QUERY).'</b> ('.round($SQL_TIME, 3).') :: '.
 				'php '.round(microtime(true) - TIME, 3).' :: '.
 				'js <em></em>'.
 	   (LOCAL ? ' :: <a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
@@ -31,19 +31,21 @@ function _debug($i='') {
 			$get .= '<b>'.$k.'</b>='.$v.'<br>';
 		$get .= '<textarea>http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'].'</textarea>';
 
+
+
 		$send .=
 		'<div id="_debug" class="'._dn(empty($_COOKIE['debug_show']), 'show').'">'.
 			'<h1>+</h1>'.
 			'<h2><div class="dmenu">'.
 					'<a>cache</a>'.
-					'<a>sql</a>'.// <b>'.count($sqlQuery).'</b> ('.round($sqlTime, 3).')
+					'<a>sql</a>'.
 					'<a>cookie</a>'.
 					'<a>get</a>'.
 					'<a>cons</a>'.
 					'<a>ajax</a>'.
 				'</div>'.
 				'<div class="pg cache dn">'._debug_cache().'</div>'.
-				'<ul class="pg sql dn">'.implode('', $sqlQuery).'</ul>'.
+				'<div class="pg sql pad10 dn">'._debug_sql().'</div>'.
 				'<div class="pg cookie dn">'.
 					'<a onclick="debugCookieUpdate($(this))">Обновить</a>'.
 					'<div class="mt10">'._debug_cookie().'</div>'.
@@ -52,7 +54,7 @@ function _debug($i='') {
 				'<div class="pg cons pad5 dn">'.
 					'<div class="cons-div mar5">&nbsp;</div>'.
 				'</div>'.
-				'<div class="pg ajax dn">&nbsp;</div>'.
+				'<div class="pg ajax pad10 dn">&nbsp;</div>'.
 			'</h2>'.
 		'</div>';
 	}
@@ -155,6 +157,31 @@ function _debug_cache_clear() {//очистка кеша
 	_jsCache();
 }
 
+function _debug_sql() {//получение всех запросов
+	global $SQL_TIME, $SQL_QUERY, $SQL_QUERY_T;
+
+	$txt = '<table class="_stab small w100p mt5">';
+	foreach($SQL_QUERY as $n => $r) {
+		$t = $SQL_QUERY_T[$n];
+		$txt .=
+			'<tr class="over5">'.
+				'<td class="w25 pale r top">'.($n+1).
+				'<td class="top '.($t > 0.05 ? 'bg-fcc' : 'bg-dfd').'">'.
+					'<textarea class="w100p h20 bg-fff fs12">'.$r.';</textarea>'.
+				'<td class="w35 r top '.($t > 0.05 ? 'b red' : 'grey').'">'._hide0($t);
+	}
+	$txt .= '</table>';
+
+	return
+	'<div class="bg-eee bor1 pad5 curP over1" onclick="$(this).next().slideToggle()">'.
+		'sql <b>'.count($SQL_QUERY).'</b> '.
+		'('.round($SQL_TIME, 3).')'.
+		' :: '.
+		'php '.round(microtime(true) - TIME, 3).
+	'</div>'.
+	'<div>'.$txt.'</div>';
+}
+
 function _debug_cookie_count() {
 	$count = 0;
 	if(!empty($_COOKIE))
@@ -178,16 +205,12 @@ function jsonDebugParam() {//возвращение дополнительных
 	if(!@DEBUG)
 		return array();
 
-	global $sqlQuery, $sqlTime;
 	$d = debug_backtrace();
+
 	return array(
-		'post' => _pr($_POST),
+		'post' => $_POST,
 		'link' => 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'],
-		'php_time' => round(microtime(true) - TIME, 3),
-		'sql_count' => count($sqlQuery),
-		'sql_time' => round($sqlTime, 3),
-		'sql' => implode('', $sqlQuery),
-		'php_file' => $d[1]['file'],
-		'php_line' => $d[1]['line']
+		'file' => $d[1]['file'].':<b>'.$d[1]['line'].'</b>',
+		'sql' => _debug_sql(),
 	);
 }
