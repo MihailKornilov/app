@@ -119,6 +119,7 @@ function _queryCol($DLG) {//получение колонок, для котор
 	$field[] = _queryColReq($DLG, 'dialog_id');
 	$field[] = _queryColReq($DLG, 'block_id');
 	$field[] = _queryColReq($DLG, 'element_id');
+	$field[] = _queryColReq($DLG, 'parent_id');
 	$field[] = _queryColReq($DLG, 'num');
 	$field[] = _queryColReq($DLG, 'dtime_add');
 	$field[] = _queryColReq($DLG, 'user_id_add');
