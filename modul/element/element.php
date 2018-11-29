@@ -1165,8 +1165,13 @@ function _elemVvv37($prm) {//select - выбор имени колонки [37]
 	$field = array();
 
 	//если диалог родительский, получение колонок родителя
-	if($parent_id = $dlg['dialog_id_parent'])
+	if($parent_id = $dlg['dialog_id_parent']) {
 		$field = _elemVvv37parent($parent_id);
+		$PAR = _dialogQuery($parent_id);
+		//если таблицы одинаковые, отправка только родительских колонок
+		if($dlg['table_1'] == $PAR['table_1'])
+			return $field;
+	}
 
 	//выбранная колонка, если редактирование записи
 	$uCol = '';

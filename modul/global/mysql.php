@@ -103,6 +103,189 @@ function query_insert_id($tab) {//id последнего внесённого �
 
 
 
+function _table($id=false) {//таблицы в базе с соответствующими идентификаторами
+	$tab = array(
+		 1 =>  '_app',
+		 2 =>  '_block',
+		 3 =>  '_dialog',
+		 4 =>  '_element_group',
+		 5 =>  '_element',
+		 6 =>  '_element_func',
+		 17 => '_element_format',
+		 18 => '_element_hint',
+		 19 => '_element_rule_name',
+		 20 => '_element_rule_use',
+		 7 =>  '_history',
+		 8 =>  '_image',
+		 9 =>  '_image_server',
+		10 =>  '_page',
+		11 =>  '_spisok',
+		12 =>  '_user',
+		14 =>  '_user_auth',
+		15 =>  '_user_spisok_filter',
+		16 =>  '_note'
+	);
+
+	if($id === false)
+		return $tab;
+	if(!$id = _num($id))
+		return '';
+	if(empty($tab[$id]))
+		return '';
+
+	return $tab[$id];
+}
+function _queryCol($DLG) {//получение колонок, для которых будет происходить запрос
+/*
+	Диалог предварительно должен быть проверен:
+		* использует таблицу
+        * содержит колонки, по которым будет получение данных
+*/
+
+	$key = 'QUERY_COL_'.$DLG['id'];
+
+	if(defined($key))
+		return constant($key);
+
+	$field = array("`t1`.`id`");
+	$field[] = _queryColReq($DLG, 'dialog_id');
+	$field[] = _queryColReq($DLG, 'block_id');
+	$field[] = _queryColReq($DLG, 'element_id');
+	$field[] = _queryColReq($DLG, 'parent_id');
+	$field[] = _queryColReq($DLG, 'num');
+	$field[] = _queryColReq($DLG, 'dtime_add');
+	$field[] = _queryColReq($DLG, 'user_id_add');
+
+	//id диалога, который использовался при создании записи
+	$field[] = $DLG['id'].' `dialog_id_use`';
+
+	foreach($DLG['cmp'] as $cmp)
+		$field[] = _queryColReq($DLG, _elemCol($cmp));
+
+	if($parent_id = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($parent_id);
+		foreach($PAR['cmp'] as $cmp)
+			$field[] = _queryColReq($DLG, _elemCol($cmp));
+	}
+
+	$field = array_diff($field, array(''));
+
+	define($key, implode(',', $field));
+
+	return constant($key);
+}
+function _queryColReq($DLG, $col) {//добавление обязательных колонок
+	//колонка не используется ни в одной таблице
+	if(!$tn = _queryTN($DLG, $col))
+		return '';
+
+	//сначала проверяется использование в родительской таблице
+	if($parent_id = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($parent_id);
+		if(isset($PAR['field1'][$col]))
+			return "`".$tn."`.`".$col."`";
+	}
+
+	if(isset($DLG['field1'][$col]))
+		return "`".$tn."`.`".$col."`";
+
+	return '';
+}
+function _queryFrom($DLG) {//составление таблиц для запроса
+/*
+	Диалог предварительно должен быть проверен и использовать таблицу
+*/
+	$key = 'QUERY_FROM_'.$DLG['id'];
+
+	if(defined($key))
+		return constant($key);
+
+	$send = "`".$DLG['table_name_1']."` `t1`";
+
+	//если присутствует родительский диалог, основной становится таблица родителя
+	if($parent_id = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($parent_id);
+		$send = "`".$PAR['table_name_1']."` `t1` /* Таблица-родитель */";
+		if($PAR['table_1'] != $DLG['table_1'])
+			$send .= ",`".$DLG['table_name_1']."` `t2`";
+	}
+
+
+	define($key, $send);
+
+	return $send;
+}
+function _queryWhere($DLG) {//составление условий для запроса
+	$key = 'QUERY_WHERE_'.$DLG['id'];
+
+	if(defined($key))
+		return constant($key);
+
+
+	$send = array();
+
+	//если присутствует родительский диалог и разные таблицы, происходит связка через `cnn_id`
+	if($parent_id = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($parent_id);
+		if($PAR['table_1'] != $DLG['table_1'])
+			if(isset($PAR['field1']['cnn_id']))
+				$send[] = "`t1`.`cnn_id`=`t2`.`id`";
+			elseif(isset($DLG['field1']['cnn_id']))
+				$send[] = "`t2`.`cnn_id`=`t1`.`id`";
+	}
+
+	if($tn = _queryTN($DLG, 'deleted'))
+		$send[] = "!`".$tn."`.`deleted`";
+	if($tn = _queryTN($DLG, 'app_id'))
+		$send[] = "`".$tn."`.`app_id`=".APP_ID;
+
+	$send[] = _queryWhereDialogId($DLG);
+
+	$send = array_diff($send, array(''));
+
+	if(!$send = implode(' AND ', $send))
+		$send = "`t1`.`id`";
+
+	define($key, $send);
+
+	return $send;
+}
+function _queryTN($DLG, $name, $full=false) {//получение имени таблицы для определённой колонки
+	// $full - возвращать полное название таблицы
+	if(!$name)
+		return '';
+
+	if($parent_id = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($parent_id);
+		if(isset($PAR['field1'][$name]))
+			return $full ? $PAR['table_name_1'] : 't1';
+		elseif(isset($DLG['field1'][$name]))
+			return $full ? $DLG['table_name_1'] : 't2';
+	}
+
+	if(isset($DLG['field1'][$name]))
+		return $full ? $DLG['table_name_1'] : 't1';
+
+	return '';
+}
+function _queryWhereDialogId($DLG) {//получение условия по `dialog_id`
+	if($DLG['table_name_1'] == '_element')
+		return '';
+	if($parent_id = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($parent_id);
+		if($PAR['table_name_1'] == '_element')
+			return '';
+	}
+
+	if(!$tn = _queryTN($DLG, 'dialog_id'))
+		return '';
+
+	$dialog_id = $parent_id ? $parent_id : $DLG['id'];
+	return "`".$tn."`.`dialog_id`=".$dialog_id;
+}
+
+
+
 
 
 function _dbDump() {

@@ -321,7 +321,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	define('IS_ELEM', $dialog['table_1'] == 5);// '_element'
 	define('ACT', $unit_id ? 'edit' : 'insert');
 
-	$POST_CMP = _spisokUnitCmpTest($dialog);
+	$POST_CMP = _SUN_CMP_TEST($dialog);
 
 	//регистрация нового пользователя [98] - перехват внесения данных
 	_auth98($dialog, $POST_CMP);
@@ -340,7 +340,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 
 
-	$unit_id = _spisokUnitInsert($dialog, $unit_id);
+	$unit_id = _SUN_INSERT($dialog, $unit_id);
 
 	if(IS_ELEM)
 		_BE('elem_clear');
@@ -351,7 +351,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_pageDefClear($dialog, $POST_CMP);
 	_filterDefSet($dialog, $unit_id);
 
-	_spisokUnitCmpUpdate($dialog, $POST_CMP, $unit_id);
+	_SUN_CMP_UPDATE($dialog, $POST_CMP, $unit_id);
 	_spisokUnitDelSetup($dialog, $unit_id);
 	_spisokUnitBalansUpd($dialog, $POST_CMP);
 
@@ -444,7 +444,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	return $send;
 }
-function _spisokUnitCmpTest($dialog) {//проверка корректности компонентов диалога
+function _SUN_CMP_TEST($dialog) {//проверка корректности компонентов диалога
 	if(!$dialog['table_1'])
 		return array();
 
@@ -527,15 +527,13 @@ function _spisokUnitCmpTest($dialog) {//проверка корректност�
 
 	return $send;
 }
-function _spisokUnitInsert($dialog, $unit_id) {//внесение новой записи, если отсутствует
+function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи, если отсутствует
 	if($unit_id)
 		return $unit_id;
-	if($parent_id = $dialog['dialog_id_parent'])
-		jsonError('Дочерний диалог не может вносить новую запись');
-	if(!$dialog['table_1'])
-		return 0;
+	if(!$DLG['table_1'])
+		jsonError('Не указана таблица для внесения записи');
 
-	$page_id = _num($_POST['page_id']);
+	$dialog_id = $DLG['id'];
 	$parent_id = 0;//группировка в таблице _element
 
 	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
@@ -557,89 +555,146 @@ function _spisokUnitInsert($dialog, $unit_id) {//внесение новой з�
 		}
 	}
 
-	$sql = "INSERT INTO `"._table($dialog['table_1'])."` (`id`) VALUES (0)";
-	$unit_id = query_id($sql);
 
-	//обновление некоторых колонок таблицы 1
-	foreach($dialog['field1'] as $field => $i) {
-		if($field == 'app_id') {
-			//если вносится страница SA, id приложения не присваивается
-			if(_table($dialog['table_1']) == '_page' && $dialog['id'] == '101')
-				continue;
+	/*
+		Если диалог является дочерним, проверяется, совпадают ли таблицы.
+		Если таблицы разные, то у дочернего всегда `_spisok`
+		Сначала вносится запись в родительскую таблицу, её ID становится основным и привязывается к cnn_id в дочерней таблице
+		`dialog_id` вносится от родительского диалога
+	*/
 
-			//обновление app_id для элемента
+	$table_1 = _table($DLG['table_1']);
+	$table_2 = '';
+
+	if($dip = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($dip);
+		if($PAR['table_1'] != $DLG['table_1']) {
+			$table_1 = _table($PAR['table_1']);
+			$table_2 = _table($DLG['table_1']);
+			$dialog_id = $dip;
+		}
+	}
+
+	$sql = "INSERT INTO `".$table_1."` (`id`) VALUES (0)";
+	$uid[$table_1] = query_id($sql);
+
+	if($table_2) {
+		$sql = "INSERT INTO `".$table_2."` (`cnn_id`) VALUES (".$uid[$table_1].")";
+		$uid[$table_2] = query_id($sql);
+	}
+
+
+
+
+	/* ---=== Обновление обязательных колонок для обеих таблиц ===--- */
+
+	if($tab = _queryTN($DLG, 'app_id', 1))
+		//если вносится страница SA, id приложения не присваивается
+		if(!($tab == '_page' && $dialog_id == '101')) {
+			$app_id = APP_ID;
+			//получение app_id для элемента
 			if(IS_ELEM) {
 				$app_id = 0;
 				if($block_id) {
 					$sql = "SELECT `app_id`
 							FROM `_block`
 							WHERE `id`=".$block_id;
-					$app_id = _num(query_value($sql));
+					$app_id = query_value($sql);
 				}
 				if($parent_id) {
 					$sql = "SELECT `app_id`
 							FROM `_element`
 							WHERE `id`=".$parent_id;
-					$app_id = _num(query_value($sql));
+					$app_id = query_value($sql);
 				}
-
-				$sql = "UPDATE `_element`
-						SET `app_id`=".$app_id."
-						WHERE `id`=".$unit_id;
-				query($sql);
-				continue;
 			}
 
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
-					SET `app_id`=".APP_ID."
-					WHERE `id`=".$unit_id;
+			$sql = "UPDATE `".$tab."`
+					SET `app_id`=".$app_id."
+					WHERE `id`=".$uid[$tab];
 			query($sql);
-			continue;
 		}
-		if($field == 'dialog_id') {
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
-					SET `dialog_id`=".$dialog['id']."
-					WHERE `id`=".$unit_id;
-			query($sql);
-			continue;
-		}
-		if($field == 'num') {//установка порядкового номера
-			$sql = "SELECT IFNULL(MAX(`num`),0)+1
-					FROM `"._table($dialog['table_1'])."`
-					WHERE `app_id`=".APP_ID."
-					  AND `dialog_id`=".$dialog['id'];
-			$num = query_value($sql);
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
-					SET `num`=".$num."
-					WHERE `id`=".$unit_id;
-			query($sql);
-			continue;
-		}
-		if($field == 'page_id') {
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
+
+	if($tab = _queryTN($DLG, 'dialog_id', 1)) {
+		$sql = "UPDATE `".$tab."`
+				SET `dialog_id`=".$dialog_id."
+				WHERE `id`=".$uid[$tab];
+		query($sql);
+	}
+
+	//установка порядкового номера
+	if($tab = _queryTN($DLG, 'num', 1)) {
+		$sql = "SELECT IFNULL(MAX(`num`),0)+1
+				FROM `".$tab."`
+				WHERE `app_id`=".APP_ID."
+				  AND `dialog_id`=".$dialog_id;
+		$num = query_value($sql);
+		$sql = "UPDATE `".$tab."`
+				SET `num`=".$num."
+				WHERE `id`=".$uid[$tab];
+		query($sql);
+	}
+
+	if($tab = _queryTN($DLG, 'page_id', 1))
+		if($page_id = _num($_POST['page_id'])) {
+			$sql = "UPDATE `".$tab."`
 					SET `page_id`=".$page_id."
-					WHERE `id`=".$unit_id;
+					WHERE `id`=".$uid[$tab];
 			query($sql);
-			continue;
 		}
-		if($field == 'block_id' && $block_id) {
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
-					SET `block_id`=".$block_id."
-					WHERE `id`=".$unit_id;
-			query($sql);
-			continue;
-		}
-		if($field == 'parent_id' && $parent_id && IS_ELEM) {
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
-					SET `parent_id`=".$parent_id."
-					WHERE `id`=".$unit_id;
-			query($sql);
-			continue;
-		}
+
+	if($tab = _queryTN($DLG, 'block_id', 1) && $block_id) {
+		$sql = "UPDATE `".$tab."`
+				SET `block_id`=".$block_id."
+				WHERE `id`=".$uid[$tab];
+		query($sql);
+	}
+
+	//присвоение родительского значения элементу
+	if(IS_ELEM && $parent_id) {
+		$sql = "UPDATE `element`
+				SET `parent_id`=".$parent_id."
+				WHERE `id`=".$uid[$table_1];
+		query($sql);
+	}
+
+	//установка начальной ширины элементу
+	if(IS_ELEM && $DLG['element_width']) {
+		$sql = "UPDATE `_element`
+				SET `width`=".$DLG['element_width']."
+				WHERE `id`=".$uid[$table_1];
+		query($sql);
+	}
+
+	if($tab = _queryTN($DLG, 'sort', 1)) {
+		$sql = "SELECT IFNULL(MAX(`sort`)+1,1)
+				FROM `".$tab."`
+				WHERE `id`";
+		$sort = query_value($sql);
+
+		$sql = "UPDATE `".$tab."`
+				SET `sort`=".$sort."
+				WHERE `id`=".$uid[$tab];
+		query($sql);
+	}
+
+	if($tab = _queryTN($DLG, 'user_id_add', 1)) {
+		$sql = "UPDATE `".$tab."`
+				SET `user_id_add`=".USER_ID."
+				WHERE `id`=".$uid[$tab];
+		query($sql);
+	}
+
+
+	_historyInsert(1, $DLG, $uid[$table_1]);
+
+	return $uid[$table_1];
+/*
+	foreach($DLG['field1'] as $field => $i) {
 		if($field == 'element_id') {
-			if(_table($dialog['table_1']) != '_element_format' &&
-			   _table($dialog['table_1']) == '_element_func' &&
-			   _table($dialog['table_1']) == '_element_hint')
+			if(_table($DLG['table_1']) != '_element_format' &&
+			   _table($DLG['table_1']) == '_element_func' &&
+			   _table($DLG['table_1']) == '_element_hint')
 				continue;
 			if(!$block_id)
 				continue;
@@ -648,87 +703,14 @@ function _spisokUnitInsert($dialog, $unit_id) {//внесение новой з�
 			if(!$elem_id = $BL['elem_id'])
 				continue;
 
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
+			$sql = "UPDATE `"._table($DLG['table_1'])."`
 					SET `element_id`=".$elem_id."
 					WHERE `id`=".$unit_id;
 			query($sql);
 			continue;
 		}
-		if($field == 'width' && IS_ELEM && $dialog['element_width']) {
-			$sql = "UPDATE `_element`
-					SET `width`=".$dialog['element_width']."
-					WHERE `id`=".$unit_id;
-			query($sql);
-			continue;
-		}
-		if($field == 'sort') {
-			$sql = "SELECT IFNULL(MAX(`sort`)+1,1)
-					FROM `".$dialog['table_name_1']."`
-					WHERE `id`";
-			$sort = query_value($sql);
-
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
-					SET `sort`=".$sort."
-					WHERE `id`=".$unit_id;
-			query($sql);
-			continue;
-		}
-		if($field == 'user_id_add') {
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
-					SET `user_id_add`=".USER_ID."
-					WHERE `id`=".$unit_id;
-			query($sql);
-			continue;
-		}
-	}
-
-/*
-	//внесение данных таблицы 2, если есть
-	if($dialog['table_2_']) {
-		$sql = "INSERT INTO `"._table($dialog['table_2_'])."` (`".$dialog['table_2_field']."`) VALUES (".$unit_id.")";
-		query($sql);
-
-		$unit_2 = query_insert_id(_table($dialog['table_2']));
-		foreach($dialog['field2'] as $field => $i) {
-			if($field == 'app_id') {
-				$sql = "UPDATE `"._table($dialog['table_2'])."`
-						SET `app_id`=".APP_ID."
-						WHERE `id`=".$unit_2;
-				query($sql);
-				continue;
-			}
-			if($field == 'dialog_id') {
-				$sql = "UPDATE `"._table($dialog['table_2'])."`
-						SET `dialog_id`=".$dialog['id']."
-						WHERE `id`=".$unit_2;
-				query($sql);
-				continue;
-			}
-			if($field == 'num') {//установка порядкового номера
-				$sql = "SELECT IFNULL(MAX(`num`),0)+1
-						FROM `"._table($dialog['table_2'])."`
-						WHERE `app_id`=".APP_ID."
-						  AND `dialog_id`=".$dialog['id'];
-				$num = query_value($sql);
-				$sql = "UPDATE `"._table($dialog['table_2'])."`
-						SET `num`=".$num."
-						WHERE `id`=".$unit_2;
-				query($sql);
-				continue;
-			}
-			if($field == 'user_id_add') {
-				$sql = "UPDATE `"._table($dialog['table_2'])."`
-						SET `user_id_add`=".USER_ID."
-						WHERE `id`=".$unit_2;
-				query($sql);
-				continue;
-			}
-		}
 	}
 */
-	_historyInsert(1, $dialog, $unit_id);
-
-	return $unit_id;
 }
 function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//предварительное снятие флага фокуса `focus` с элементов
 	if(!IS_ELEM)
@@ -810,87 +792,37 @@ function _filterDefSet($dialog, $elem_id) {//установка значения
 			break;
 	}
 }
-function _spisokUnitCmpUpdate($DLG, $POST_CMP, $unit_id) {//обновление компонентов единицы списка
-	$table_1 = $DLG['table_1'];
-
-	if($parent_id = $DLG['dialog_id_parent']) {
-		if(!$dialog = _dialogQuery($parent_id))
-			return;
-		$table_1 = $dialog['table_1'];
-	}
-
-	if(!$table_1)
-		return;
+function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление компонентов единицы списка
 	if(empty($POST_CMP))
 		return;
 
-	$update1 = array();
-	foreach($POST_CMP as $cmp_id => $v) {
-		$cmp = $DLG['cmp'][$cmp_id];
-		$col = $cmp['col'];
+	$uid[$DLG['table_name_1']] = $unit_id;
 
-		if(IS_ELEM && $col == 'col') {//если элемент, установка номера таблицы, в которой содержится колонка
-			$num = 0;
-
-			if($v) {
-				//если число, то это id элемента, который из родительского диалога. С ним будет связь.
-				if($id = _num($v)) {
-					if($el = _elemOne($id))
-						$v = $id;
-				} elseif($el = _elemOne($unit_id))
-						if($el['block']['obj_name'] == 'dialog')
-							if($dlg = _dialogQuery($el['block']['obj_id'])) {
-								if(isset($dlg['field1'][$v]))
-									$num = 1;
-								else
-									if(isset($dlg['field2'][$v]))
-										$num = 2;
-									else
-										$v = '';
-
-							}
-			}
+	//при наличии двух таблиц главной первой становится родительская
+	if($dip = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($dip);
+		if($PAR['table_1'] != $DLG['table_1']) {
+			$sql = "SELECT `id`
+					FROM `".$DLG['table_name_1']."`
+					WHERE `cnn_id`=".$unit_id."
+					LIMIT 1";
+			$id2 = query_value($sql);
+			$uid[$PAR['table_name_1']] = $unit_id;
+			$uid[$DLG['table_name_1']] = $id2;
 		}
-
-		//переключение на родительский элемент
-		if($parent_id && $elem_id = _num($col)) {
-			if(!$cmp = _elemOne($elem_id))
-				continue;
-			if(!$col = $cmp['col'])
-				continue;
-		}
-
-		$update1[] = "`".$col."`='".addslashes($v)."'";
 	}
 
-	if(!empty($update1)) {
-		$sql = "UPDATE `"._table($DLG['table_1'])."`
-				SET ".implode(',', $update1)."
-				WHERE `id`=".$unit_id;
+	foreach($POST_CMP as $cmp_id => $v) {
+		if(!$col = _elemCol($cmp_id))
+			continue;
+		if(!$tab = _queryTN($DLG, $col, 1))
+			continue;
+
+		$sql = "UPDATE `".$tab."`
+				SET `".$col."`='".addslashes($v)."'
+				WHERE `id`=".$uid[$tab];
 		query($sql);
 	}
-/*
-	if(!empty($update2)) {
-		$field2 = $DLG['field2'];
-
-		$cond = "`".$DLG['table_2_field']."`=".$unit_id;
-		if(isset($field2['app_id']))
-			$cond .= " AND `app_id`=".APP_ID;
-		if(isset($field2['dialog_id']))
-			$cond .= " AND `dialog_id`=".$DLG['id'];
-
-		$sql = "SELECT `id`
-				FROM `"._table($DLG['table_2'])."`
-				WHERE ".$cond."
-				LIMIT 1";
-		if($unit_2 = _num(query_value($sql))) {
-			$sql = "UPDATE `"._table($DLG['table_2'])."`
-					SET ".implode(',', $update2)."
-					WHERE `id`=".$unit_2;
-			query($sql);
-		}
-	}
-*/
 }
 function _spisokAction3($dialog, $unit_id, $send) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
 	//должено быть действие над элементом
@@ -1373,7 +1305,7 @@ function _block_bg70($dialog, $POST_CMP) {//выбор пути к динами�
 	jsonSuccess($send);
 }
 
-function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления единицы списка
+function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления записи
 	if(!$dialog['table_1'])
 		return;
 	$sql = "SELECT *
@@ -1396,7 +1328,6 @@ function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполне
 			continue;
 		$cmpInsertIds[] = $cmp['id'];
 	}
-
 
 	foreach($dialog['cmp'] as $cmp)
 		switch($cmp['dialog_id']) {
@@ -1461,6 +1392,7 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 			$count_old = _num(query_value($sql));
 		}
 
+
 	//получение нового количества для обновления
 	$sql = "SELECT COUNT(*)
 			FROM "._queryFrom($dialog)."
@@ -1479,14 +1411,14 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 			$sql = "UPDATE "._queryFrom($dlg)."
 					SET `".$col."`=".$count_old."
 					WHERE `t1`.`id`=".$connect_old."
-					  AND "._queryWhere($dlg['id']);
+					  AND "._queryWhere($dlg);
 			query($sql);
 		}
 
 		$sql = "UPDATE "._queryFrom($dlg)."
 				SET `".$col."`=".$count."
 				WHERE `t1`.`id`=".$connect_id."
-				  AND "._queryWhere($dlg['id']);
+				  AND "._queryWhere($dlg);
 		query($sql);
 	}
 }
