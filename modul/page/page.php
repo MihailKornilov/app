@@ -314,6 +314,32 @@ function PHP12_page_access_for_user_setup_spisok($arr, $sort) {//список с
 
 	return $send;
 }
+function PHP12_page_access_for_user_setup_save($cmp, $val, $unit) {//сохранение доступа к страницам для конкретного пользователя
+	if(!$user_id = $unit['id'])
+		return;
+
+	$sql = "DELETE FROM `_user_page_access`
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".$user_id;
+	query($sql);
+
+	if($ids = _ids($val, 'arr')) {
+		$upd = array();
+		foreach($ids as $page_id)
+			$upd[] = "(".APP_ID.",".$user_id.",".$page_id.")";
+
+		$sql = "INSERT INTO `_user_page_access`
+					(`app_id`,`user_id`,`page_id`)
+				VALUES ".implode(',', $upd);
+		query($sql);
+	}
+
+	_cache_clear( 'AUTH_'.CODE, 1);
+	_cache_clear( 'page');
+	_cache_clear( 'user'.$user_id);
+}
+
+
 function PHP12_page_access_for_user_view($prm) {//отображение страниц, доступных пользователю
 	if(!$u = $prm['unit_get'])
 		return _emptyMin10('Данные пользователя не получены.');

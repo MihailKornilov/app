@@ -445,7 +445,9 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	return $send;
 }
 function _SUN_CMP_TEST($dialog) {//проверка корректности компонентов диалога
-	if(!$dialog['table_1'])
+	$DLG = _dialogParent($dialog);
+
+	if(!$DLG['table_1'])
 		return array();
 
 	$POST_CMP = @$_POST['cmp'];
@@ -785,6 +787,8 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 	if(empty($POST_CMP))
 		return;
 
+	$DLG = _dialogParent($DLG);
+
 	$uid[$DLG['table_name_1']] = $unit_id;
 
 	//при наличии двух таблиц главной первой становится родительская
@@ -875,43 +879,6 @@ function _cmpV60($cmp, $unit) {//Применение загруженных и�
 				WHERE `id`=".$id;
 		query($sql);
 	}
-}
-function _pageUserAccess_save($cmp, $val, $unit) {//сохранение доступа к страницам для конкретного пользователя
-	if(!is_array($val))
-		return;
-	if(!$user_id = @$val['user_id'])
-		return;
-
-	$sql = "DELETE FROM `_user_page_access`
-			WHERE `app_id`=".APP_ID."
-			  AND `user_id`=".$user_id;
-	query($sql);
-
-
-	if($ids = _ids(@$val['ids'], 1)) {
-		$upd = array();
-		foreach($ids as $page_id)
-			$upd[] = "(".APP_ID.",".$user_id.",".$page_id.")";
-
-		$sql = "INSERT INTO `_user_page_access`
-					(`app_id`,`user_id`,`page_id`)
-				VALUES ".implode(',', $upd);
-		query($sql);
-	}
-
-	//отключение входа в приложение, если нужно
-	$u = _userApp(APP_ID, $user_id);
-	if(!$u['num_1']) {
-		$sql = "UPDATE `_user_auth`
-				SET `app_id`=0
-				WHERE `app_id`=".APP_ID."
-				  AND `user_id`=".$user_id;
-		query($sql);
-	}
-
-	_cache_clear( 'AUTH_'.CODE, 1);
-	_cache_clear( 'page');
-	_cache_clear( 'user'.$user_id);
 }
 function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
 	$sql = "UPDATE `_spisok`

@@ -191,7 +191,7 @@ switch(@$_POST['op']) {
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'spisok_on',
-									'title' => 'диалог вносит данные для списка',
+									'title' => 'диалог вносит данные',
 									'value' => $dialog['spisok_on']
 							   )).
 					'<tr class="tr-spisok-col'._dn($dialog['spisok_on']).'">'.
