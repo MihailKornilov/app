@@ -13,11 +13,18 @@ function _face() {//определение, как загружена стран
 	define('SITE', FACE == 'site' ? 'site' : '');
 	define('IFRAME', FACE == 'iframe');
 }
-function _saDefine() {//установка флага суперпользователя SA
+function _sa($user_id=USER_ID) {
 	//Список пользователей - SA
 	$SA[1] = true;  //Михаил Корнилов
 
-	define('SA', isset($SA[USER_ID]) ? 1 : 0);
+
+	$issa = isset($SA[$user_id]) ? 1 : 0;
+
+	if(defined('SA'))
+		return $issa;
+
+	//установка флага суперпользователя SA при первом запуске
+	define('SA', $issa);
 
 	if(SA) {
 		error_reporting(E_ALL);
@@ -26,6 +33,8 @@ function _saDefine() {//установка флага суперпользова
 	} else {
 		setcookie('debug', 0, time() - 1, '/');
 	}
+
+	return $issa;
 }
 
 /* ---=== АВТОРИЗАЦИЯ ===--- */
@@ -206,7 +215,7 @@ function _auth98($dialog, $cmp) {//регистрация нового поль�
 				'".addslashes($i)."',
 				".$pol[$cmp[2072]].",
 				'".addslashes($login)."',
-				'"._authPassMD5($pass)."'
+				'".$pass."'
 			)";
 	$user_id = query_id($sql);
 
@@ -230,9 +239,9 @@ function _auth99($dialog, $cmp) {//авторизация по логину и �
 	$sql = "SELECT `id`
 			FROM `_user`
 			WHERE `login`='".addslashes($login)."'
-			  AND `pass`='"._authPassMD5($pass)."'
+			  AND `pass`='".$pass."'
 			LIMIT 1";
-	if(!$user_id = _num(query_value($sql)))
+	if(!$user_id = query_value($sql))
 		jsonError('Неверный логин или пароль');
 
 	$sig = md5($login.$pass.$_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR']);

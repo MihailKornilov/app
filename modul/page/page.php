@@ -270,6 +270,9 @@ function PHP12_page_access_for_user_setup($prm) {//настройка досту
 	if(!$u = $prm['unit_get'])
 		return _emptyMin10('Данные пользователя не получены.');
 
+	if(_sa($u['id']))
+		return _empty('SA: Доступны все страницы.');
+
 	//доступные страницы
 	$sql = "SELECT `page_id`
 			FROM `_user_page_access`
@@ -316,6 +319,8 @@ function PHP12_page_access_for_user_setup_spisok($arr, $sort) {//список с
 }
 function PHP12_page_access_for_user_setup_save($cmp, $val, $unit) {//сохранение доступа к страницам для конкретного пользователя
 	if(!$user_id = $unit['id'])
+		return;
+	if(_sa($user_id))
 		return;
 
 	$sql = "DELETE FROM `_user_page_access`
@@ -442,7 +447,7 @@ function _pageShow($page_id) {
 	if(!SA && $page['sa'])
 		return _empty20('Нет доступа.'.PAGE_MSG_ERR);
 	if(!SA && !$page['access'])
-		return _empty20('Вход в приложение невозможен.'.PAGE_MSG_ERR);
+		return _empty20('Страница недоступна или не существует.'.PAGE_MSG_ERR);
 
 	$prm = array();
 

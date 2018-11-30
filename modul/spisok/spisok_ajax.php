@@ -471,14 +471,14 @@ function _SUN_CMP_TEST($dialog) {//проверка корректности к�
 	foreach($dialog['cmp'] as $cmp_id => $cmp) {
 		if(!isset($CMP[$cmp_id]))
 			continue;
-		if(!$col = @$cmp['col'])
+		if(!$col = $cmp['col'])
 			continue;
 //		if(!isset($dlgParent['field1'][$col]) && !isset($dlgParent['field2'][$col]))
 //			jsonError('В таблице отсутствует колонка с именем "'.$col.'"');
 
 		$v = _txt($CMP[$cmp_id]);
 
-		//массив для отправки ошибки
+		//данные для формирования и отправки ошибки
 		$is_err = 0;
 		$err_msg = $cmp['req_msg'] ? $cmp['req_msg'] : 'Необходимо заполнить поле,<br>либо выбрать значение';
 
@@ -486,18 +486,24 @@ function _SUN_CMP_TEST($dialog) {//проверка корректности к�
 			case 8://текстовое поле
 				if($cmp['req'] && !strlen($v))
 					$is_err = 1;
-				if($cmp['num_1'] == 32)//любой текст
-					break;
-				if($cmp['num_1'] != 33)//цифры и числа
-					break;
-
-				$v = round($v, $cmp['num_2']);
-				if($cmp['req'] && !$v && !$cmp['num_4'])
-					$is_err = 1;
-				if($v < 0 && !$cmp['num_3']) {
-					$is_err = 1;
-					$err_msg = 'Значение не может быть отрицательным';
+				//цифры и числа
+				if($cmp['num_1'] == 33) {
+					$v = round($v, $cmp['num_2']);
+					if($cmp['req'] && !$v && !$cmp['num_4'])
+						$is_err = 1;
+					if($v < 0 && !$cmp['num_3']) {
+						$is_err = 1;
+						$err_msg = 'Значение не может быть отрицательным';
+					}
 				}
+				//поле-пароль
+				if($cmp['num_5'])
+					if($v)
+						$v = _authPassMD5($v);
+					else
+						break;//если поле пароля пустое, то значение не вносится
+
+				$send[$cmp_id] = $v;
 				break;
 			default:
 				if($cmp['req'] && !$v)
@@ -507,9 +513,11 @@ function _SUN_CMP_TEST($dialog) {//проверка корректности к�
 				if($ex[0] == 'num')
 					$v = _num($v, 1);
 				if($ex[0] == 'count')
-					$v = _num($v,1);
+					$v = _num($v, 1);
 				if($ex[0] == 'cena')
 					$v = _cena($v, 1);
+
+				$send[$cmp_id] = $v;
 		}
 
 		if($is_err)
@@ -517,8 +525,6 @@ function _SUN_CMP_TEST($dialog) {//проверка корректности к�
 				'attr_cmp' => $cmp['attr_cmp']._dialogParam($cmp['dialog_id'], 'element_afics'),
 				'text' => $err_msg
 			));
-
-		$send[$cmp_id] = $v;
 	}
 
 	if($dialog['cmp_no_req'] && !$send)

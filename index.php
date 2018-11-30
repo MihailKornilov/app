@@ -5,7 +5,7 @@ _setting();
 _face();
 _auth();
 _authLogout();
-_saDefine();
+_sa();
 _user();
 _jsCacheAppControl();
 _pasDefine();

@@ -792,6 +792,10 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					break;
 			}
 
+			//поле пароля не выводится при редактировании
+			if($el['num_5'])
+				$v = '';
+
 			return '<input type="'.$type.'" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
 
 		//Ссылка на страницу
