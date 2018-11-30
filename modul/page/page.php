@@ -291,9 +291,7 @@ function PHP12_page_access_for_user_setup($prm) {//настройка досту
 	}
 
 
-	return
-	'<input type="hidden" id="access-user-id" value="'.$u['id'].'" />'.
-	'<dl>'.PHP12_page_access_for_user_setup_spisok($arr, $sort).'</dl>';
+	return '<dl>'.PHP12_page_access_for_user_setup_spisok($arr, $sort).'</dl>';
 }
 function PHP12_page_access_for_user_setup_spisok($arr, $sort) {//список страниц для настройки доступа
 	if(empty($arr))

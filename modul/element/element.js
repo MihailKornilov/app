@@ -3328,28 +3328,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 	},
 
-	_pageUserAccess = function(el, i) {
-		if(i == 'get') {
-			var user_id = _num($('#access-user-id').val()),
-				send = {},
-				ids = [];
-
-			if(!user_id)
-				return '';
-
-			send.user_id = user_id;
-
-			_forEq(_attr_el(el.id).find('._check'), function(sp) {
-				var ch = sp.prev(),
-					id = _num(ch.attr('id').split('_')[1]),
-					v = _num(ch.val());
-				if(v)
-					ids.push(id);
-			});
-			send.ids = ids.join(',');
-			return send;
-		}
-
+	//настройка доступа к страницам для пользователя
+	PHP12_page_access_for_user_setup = function(el) {
 		_forEq(_attr_el(el.id).find('._check'), function(sp) {
 			var prev = sp.prev();
 			prev._check({
@@ -3358,6 +3338,26 @@ var DIALOG = {},//массив диалоговых окон для управл
 				}
 			});
 		});
+	},
+	PHP12_page_access_for_user_setup_get = function() {
+		var user_id = _num($('#access-user-id').val()),
+			send = {},
+			ids = [];
+
+		if(!user_id)
+			return '';
+
+		send.user_id = user_id;
+
+		_forEq(_attr_el(el.id).find('._check'), function(sp) {
+			var ch = sp.prev(),
+				id = _num(ch.attr('id').split('_')[1]),
+				v = _num(ch.val());
+			if(v)
+				ids.push(id);
+		});
+		send.ids = ids.join(',');
+		return send;
 	},
 	_pageUserAccessAll = function(el, i) {//настройка входа для всех сотрудников
 		if(i == 'get') {
