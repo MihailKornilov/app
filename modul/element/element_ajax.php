@@ -199,8 +199,10 @@ switch(@$_POST['op']) {
 						'<td><input type="hidden" id="spisok_elem_id" value="'.$dialog['spisok_elem_id'].'" />'.
 					'<tr><td class="grey r">Родительский диалог:'.
 						'<td><input type="hidden" id="dialog_id_parent" value="'.$dialog['dialog_id_parent'].'" />'.
-					'<tr class="dn">'.
-						'<td class="grey r">Получает данные списка:'.
+
+					'<tr><td colspan="2">&nbsp;'.
+					'<tr><td colspan="2" class="line-t">&nbsp;'.
+					'<tr><td class="grey r">Получает данные записи:'.
 						'<td><input type="hidden" id="dialog_id_unit_get" value="'.$dialog['dialog_id_unit_get'].'" />'.
 				'</table>'.
 			'</div>'.
@@ -996,10 +998,15 @@ function _dialogOpenLoad($dialog_id) {
 
 	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
+	//если получен id записи
 	if($get_id = _num(@$_POST['get_id'])) {
 		$send['get_id'] = $get_id;
-		$prm['unit_get'] = _spisokUnitQuery($dialog, $get_id);
 		$prm['unit_get_id'] = $get_id;
+		//в диалоге должна быть настройка, какого списка принимать данные записи
+		if($dlgGetId = $dialog['dialog_id_unit_get']) {
+			$DLG_GET = _dialogQuery($dlgGetId);
+			$prm['unit_get'] = _spisokUnitQuery($DLG_GET, $get_id);
+		}
 	}
 
 	/* --- Редактирование записи --- */

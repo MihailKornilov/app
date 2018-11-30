@@ -237,7 +237,8 @@ function _queryWhere($DLG) {//составление условий для за�
 	if($tn = _queryTN($DLG, 'deleted'))
 		$send[] = "!`".$tn."`.`deleted`";
 	if($tn = _queryTN($DLG, 'app_id'))
-		$send[] = "`".$tn."`.`app_id`=".APP_ID;
+		if($DLG['table_name_1'] != '_element')
+			$send[] = "`".$tn."`.`app_id`=".APP_ID;
 
 	$send[] = _queryWhereDialogId($DLG);
 

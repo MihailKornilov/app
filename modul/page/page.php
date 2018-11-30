@@ -266,15 +266,15 @@ function _pageInfo() {//информация о странице
 	'</div>';
 }
 
-function _pageUserAccess($el, $unit) {//настройка доступа к страницам для пользователя (подключение через [12])
-	if(empty($unit['id']))
-		return _emptyMin10('Отсутствует id пользователя.');
+function PHP12_page_access_for_user_setup($prm) {//настройка доступа к страницам для пользователя
+	if(!$u = $prm['unit_get'])
+		return _emptyMin10('Данные пользователя не получены.');
 
 	//доступные страницы
 	$sql = "SELECT `page_id`
 			FROM `_user_page_access`
 			WHERE `app_id`=".APP_ID."
-			  AND `user_id`=".$unit['id'];
+			  AND `user_id`=".$u['id'];
 	$ids = _idsAss(query_ids($sql));
 
 	$arr = _page('app');
@@ -292,10 +292,10 @@ function _pageUserAccess($el, $unit) {//настройка доступа к с�
 
 
 	return
-	'<input type="hidden" id="access-user-id" value="'.$unit['id'].'" />'.
-	'<dl>'._pageUserAccessSpisok($arr, $sort).'</dl>';
+	'<input type="hidden" id="access-user-id" value="'.$u['id'].'" />'.
+	'<dl>'.PHP12_page_access_for_user_setup_spisok($arr, $sort).'</dl>';
 }
-function _pageUserAccessSpisok($arr, $sort) {//список страниц для настройки доступа
+function PHP12_page_access_for_user_setup_spisok($arr, $sort) {//список страниц для настройки доступа
 	if(empty($arr))
 		return '';
 
@@ -311,18 +311,20 @@ function _pageUserAccessSpisok($arr, $sort) {//список страниц дл�
 								)).
 				'</table>';
 		if(!empty($sort[$r['id']]))
-			$send .= '<dl class="ml40'._dn($r['access']).'">'._pageUserAccessSpisok($sort[$r['id']], $sort).'</dl>';
+			$send .= '<dl class="ml40'._dn($r['access']).'">'.PHP12_page_access_for_user_setup_spisok($sort[$r['id']], $sort).'</dl>';
 	}
 
 	return $send;
 }
-function _pageUserShow($el, $unit) {//отображение страниц, доступных пользователю (подключение через [12])
-	if(empty($unit['id']))
-		return _emptyMin10('Отсутствует id пользователя.');
+function PHP12_page_access_for_user_view($prm) {//отображение страниц, доступных пользователю
+	if(!$u = $prm['unit_get'])
+		return _emptyMin10('Данные пользователя не получены.');
+
+	return _pr($u);
 
 	//доступ в приложение
 	$u = _userApp(APP_ID, $unit['id']);
-	if(!$u)//доступ планировалос сделать через _spisok.num_1
+	if(!$u)//доступ планировалось сделать через _spisok.num_1
 		return '<div class="_empty min mar10 red">Вход в приложение запрещён.</div>';
 
 	//доступные страницы

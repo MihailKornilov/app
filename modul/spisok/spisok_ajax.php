@@ -583,9 +583,6 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 		$uid[$table_2] = query_id($sql);
 	}
 
-
-
-
 	/* ---=== Обновление обязательных колонок для обеих таблиц ===--- */
 
 	if($tab = _queryTN($DLG, 'app_id', 1))
@@ -643,12 +640,13 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 			query($sql);
 		}
 
-	if($tab = _queryTN($DLG, 'block_id', 1) && $block_id) {
-		$sql = "UPDATE `".$tab."`
-				SET `block_id`=".$block_id."
-				WHERE `id`=".$uid[$tab];
-		query($sql);
-	}
+	if($block_id)
+		if($tab = _queryTN($DLG, 'block_id', 1)) {
+			$sql = "UPDATE `".$tab."`
+					SET `block_id`=".$block_id."
+					WHERE `id`=".$uid[$tab];
+			query($sql);
+		}
 
 	//присвоение родительского значения элементу
 	if(IS_ELEM && $parent_id) {
