@@ -3353,8 +3353,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		return ids.join(',');
 	},
-	_pageUserAccessAll = function(el, i) {//настройка входа для всех сотрудников
-		if(i == 'get') {
+
+	//настройка входа в приложение для всех сотрудников
+	PHP12_app_enter_for_all_user_get = function(el) {
 			var send = [];
 			_forEq(_attr_el(el.id).find('._check'), function(sp) {
 				var ch = sp.prev(),
@@ -3364,8 +3365,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					send.push(id);
 			});
 			return send.join(',');
-		}
 	},
+
 	_imageShow = function() {//просмотр изображений. Подключается функцией [12]
 		var IMS = $('#_image-show'),
 			IU = IMS.find('.iu'),

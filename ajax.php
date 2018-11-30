@@ -4,7 +4,7 @@ require_once 'modul/global/auth_ajax.php';
 
 _face();
 _auth();
-_saDefine();
+_sa();
 _user();
 _pasDefine();
 

@@ -269,9 +269,10 @@ function _pageInfo() {//информация о странице
 function PHP12_page_access_for_user_setup($prm) {//настройка доступа к страницам для пользователя
 	if(!$u = $prm['unit_get'])
 		return _emptyMin10('Данные пользователя не получены.');
-
 	if(_sa($u['id']))
 		return _empty('SA: Доступны все страницы.');
+	if($u['id'] == _app(APP_ID, 'user_id_add'))
+		return _empty('Создатель приложения: доступны все страницы.');
 
 	//доступные страницы
 	$sql = "SELECT `page_id`
@@ -322,6 +323,9 @@ function PHP12_page_access_for_user_setup_save($cmp, $val, $unit) {//сохра�
 		return;
 	if(_sa($user_id))
 		return;
+	//создатель приложения
+	if($user_id == _app(APP_ID, 'user_id_add'))
+		return;
 
 	$sql = "DELETE FROM `_user_page_access`
 			WHERE `app_id`=".APP_ID."
@@ -344,23 +348,24 @@ function PHP12_page_access_for_user_setup_save($cmp, $val, $unit) {//сохра�
 	_cache_clear( 'user'.$user_id);
 }
 
-
 function PHP12_page_access_for_user_view($prm) {//отображение страниц, доступных пользователю
 	if(!$u = $prm['unit_get'])
 		return _emptyMin10('Данные пользователя не получены.');
 
-	return _pr($u);
+	if(_sa($u['id']))
+		return _emptyMin('SA: Доступны все страницы.');
+	if($u['id'] == _app(APP_ID, 'user_id_add'))
+		return _emptyMin('Создатель приложения: доступны все страницы.');
 
 	//доступ в приложение
-	$u = _userApp(APP_ID, $unit['id']);
-	if(!$u)//доступ планировалось сделать через _spisok.num_1
-		return '<div class="_empty min mar10 red">Вход в приложение запрещён.</div>';
+	if(!$u['num_1'])
+		return _emptyRed10('Вход в приложение запрещён.');
 
 	//доступные страницы
 	$sql = "SELECT `page_id`
 			FROM `_user_page_access`
 			WHERE `app_id`=".APP_ID."
-			  AND `user_id`=".$unit['id'];
+			  AND `user_id`=".$u['id'];
 	$ids = _idsAss(query_ids($sql));
 
 	$page = _page('app');
@@ -374,12 +379,12 @@ function PHP12_page_access_for_user_view($prm) {//отображение стр�
 		$child[$r['parent_id']][] = $r;
 	}
 
-	if(!$send = _pageUserShowSpisok($child))
+	if(!$send = PHP12_page_access_for_user_view_spisok($child))
 		return _emptyMin10('Нет доступных страниц.');
 
 	return $send;
 }
-function _pageUserShowSpisok($arr, $parent_id=0) {//список страниц для настройки доступа
+function PHP12_page_access_for_user_view_spisok($arr, $parent_id=0) {//список страниц для настройки доступа
 	if(empty($arr[$parent_id]))
 		return '';
 
@@ -392,12 +397,13 @@ function _pageUserShowSpisok($arr, $parent_id=0) {//список страниц 
 					'<tr><td class="'.(!$r['parent_id'] ? 'b fs14' : '').'">'.$r['name'].
 				'</table>';
 		if(!empty($arr[$r['id']]))
-			$send .= '<dl class="ml30">'._pageUserShowSpisok($arr, $r['id']).'</dl>';
+			$send .= '<dl class="ml30">'.PHP12_page_access_for_user_view_spisok($arr, $r['id']).'</dl>';
 	}
 
 	return $send;
 }
-function _pageUserAccessAll() {//настройка входа в приложение всем пользователям (подключение через [12])
+
+function PHP12_app_enter_for_all_user() {//настройка входа в приложение всем пользователям
 	$sql = "SELECT
 				`u`.*,
 				`sp`.`num_1`
@@ -427,6 +433,40 @@ function _pageUserAccessAll() {//настройка входа в приложе
 
 	return $send;
 }
+function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
+	$sql = "UPDATE `_spisok`
+			SET `num_1`=0
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=111
+			  AND `cnn_id`";
+	query($sql);
+
+	if($ids = _ids($val)) {
+		$sql = "UPDATE `_spisok`
+				SET `num_1`=1
+				WHERE `app_id`=".APP_ID."
+				  AND `dialog_id`=111
+				  AND `cnn_id` IN (".$ids.")";
+		query($sql);
+	}
+
+	$sql = "UPDATE `_user_auth`
+			SET `app_id`=0
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id` NOT IN (".$ids.")";
+	query($sql);
+
+	_cache_clear( 'AUTH _'.CODE, 1);
+	_cache_clear( 'page');
+
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=111
+			  AND `cnn_id`";
+	foreach(query_arr($sql) as $r)
+		_cache_clear('user'.$r['cnn_id']);
+}
 
 
 
@@ -435,7 +475,7 @@ function _pageShow($page_id) {
 
 
 	//нет доступа в приложение
-	if(APP_ID && !APP_ACCESS)
+	if(!SA && APP_ID && !APP_ACCESS)
 		$page_id = 105;
 
 	//если доступ в приложение есть, но попали на страницу о недоступности, то переход на стартовую страницу

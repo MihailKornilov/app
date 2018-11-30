@@ -886,40 +886,6 @@ function _cmpV60($cmp, $unit) {//Применение загруженных и�
 		query($sql);
 	}
 }
-function _pageUserAccessAll_save($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
-	$sql = "UPDATE `_spisok`
-			SET `num_1`=0
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=111
-			  AND `cnn_id`";
-	query($sql);
-
-	$ids = _ids($val);
-
-	$sql = "UPDATE `_spisok`
-			SET `num_1`=1
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=111
-			  AND `cnn_id` IN (".$ids.")";
-	query($sql);
-
-	$sql = "UPDATE `_user_auth`
-			SET `app_id`=0
-			WHERE `app_id`=".APP_ID."
-			  AND `user_id` NOT IN (".$ids.")";
-	query($sql);
-
-	_cache_clear( 'AUTH _'.CODE, 1);
-	_cache_clear( 'page');
-
-	$sql = "SELECT *
-			FROM `_spisok`
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=111
-			  AND `cnn_id`";
-	foreach(query_arr($sql) as $r)
-		_cache_clear('user'.$r['cnn_id']);
-}
 
 function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id диалога при создании условий удаления записи
 	if($dialog['id'] != 58)
