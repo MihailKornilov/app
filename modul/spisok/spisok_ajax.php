@@ -683,32 +683,23 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 		query($sql);
 	}
 
+	//пока только для `_element_func`
+	//также есть `_element_func` и `_element_hint`
+	if($tab = _queryTN($DLG, 'element_id', 1))
+		if($tab == '_element_func')
+			if($block_id)
+				if($BL = _blockOne($block_id))
+					if($elem_id = $BL['elem_id']) {
+						$sql = "UPDATE `".$tab."`
+								SET `element_id`=".$elem_id."
+								WHERE `id`=".$uid[$table_1];
+						query($sql);
+					}
+
 
 	_historyInsert(1, $DLG, $uid[$table_1]);
 
 	return $uid[$table_1];
-/*
-	foreach($DLG['field1'] as $field => $i) {
-		if($field == 'element_id') {
-			if(_table($DLG['table_1']) != '_element_format' &&
-			   _table($DLG['table_1']) == '_element_func' &&
-			   _table($DLG['table_1']) == '_element_hint')
-				continue;
-			if(!$block_id)
-				continue;
-			if(!$BL = _blockOne($block_id))
-				continue;
-			if(!$elem_id = $BL['elem_id'])
-				continue;
-
-			$sql = "UPDATE `"._table($DLG['table_1'])."`
-					SET `element_id`=".$elem_id."
-					WHERE `id`=".$unit_id;
-			query($sql);
-			continue;
-		}
-	}
-*/
 }
 function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//предварительное снятие флага фокуса `focus` с элементов
 	if(!IS_ELEM)

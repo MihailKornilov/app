@@ -1916,6 +1916,9 @@ function PHP12_v_choose($prm) {
 		//блок со страницы
 		$obj_id = PHP12_v_choose_page($BL, $obj_id);
 
+		//блок из диалога
+		$obj_id = PHP12_v_choose_dialog($BL, $obj_id);
+
 		//элемент записи
 		$obj_id = PHP12_v_choose_spisok($BL, $obj_id);
 
@@ -2051,6 +2054,18 @@ function PHP12_v_choose_page($BL, $dialog_id) {//блок со страницы
 		return 'Страницы '.$BL['obj_id'].' не существует.';
 	if(!$dialog_id = $page['dialog_id_unit_get'])
 		return 'Страница не принимает данные записи';
+
+	return $dialog_id;
+}
+function PHP12_v_choose_dialog($BL, $dialog_id) {//блок из диалога
+	if($dialog_id !== false)
+		return $dialog_id;
+	if($BL['obj_name'] != 'dialog')
+		return false;
+	if(!$DLG = _dialogQuery($BL['obj_id']))
+		return 'Диалога '.$BL['obj_id'].' не существует.';
+	if(!$dialog_id = $DLG['dialog_id_unit_get'])
+		return 'Диалог не принимает данные записи';
 
 	return $dialog_id;
 }
