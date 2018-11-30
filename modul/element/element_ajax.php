@@ -326,7 +326,7 @@ switch(@$_POST['op']) {
 		$send['dlg_spisok_on'] = _dialogSelArray('spisok_only', $dialog_id);
 		$send['spisok_cmp'] = _dialogSpisokCmp($dialog['cmp']);
 
-		$dlgUnitGet = _dialogSelArray('spisok_only', $dialog_id);
+		$dlgUnitGet = _dialogSelArray('unit_get', $dialog_id);
 		array_unshift($dlgUnitGet, array(
 			'id' => -1,
 			'title' => 'Совпадает с текущей страницей',

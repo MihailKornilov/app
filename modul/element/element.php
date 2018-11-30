@@ -487,6 +487,10 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 	if($v == 'spisok_only')
 		return array_merge($dlg_base, $dlg_app_spisok);
 
+	//диалоги, которые разрешено указывать для получения данных записи
+	if($v == 'unit_get')
+		return array_merge($dlg_app_spisok);
+
 	if(SA)
 		return array_merge($dlg_base, $dlg_app_spisok, $dlg_app, $dlg_elem, $dlg_sa);
 
