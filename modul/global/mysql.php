@@ -28,7 +28,22 @@ function query($sql) {
 	global $SQL_CNN, $SQL_TIME, $SQL_QUERY, $SQL_QUERY_T;
 
 	$t = microtime(true);
-	$res = mysqli_query($SQL_CNN, $sql);
+	if(!$res = mysqli_query($SQL_CNN, $sql)) {
+		$path = array();
+		$DD = debug_backtrace();
+		foreach($DD as $n => $r)
+			$path[] = $r['function'].' - '.$r['file'].':'.$r['line'];
+		$msg =  $sql."\n\n".
+				mysqli_error($SQL_CNN)."\n".
+				"---------------------------------\n".
+				implode("\n", $path);
+
+		$c = count($DD) - 1;
+		if($DD[$c]['function'] == '_html')
+			$msg = _br($msg);
+
+		die($msg);
+	};
 	$t = microtime(true) - $t;
 
 	$SQL_TIME += $t;

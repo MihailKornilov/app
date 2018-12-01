@@ -1050,7 +1050,7 @@ function _22cond($parent_id) {//получение условий запроса
 			$send .= " AND `".$col."` IN (
 						SELECT `t1`.`id`
 						FROM "._queryFrom($dialog)."
-						WHERE `id`"._queryWhere($dialog).
+						WHERE "._queryWhere($dialog).
 							_22condV(
 									$r['num_2'],
 									$elCol[_idsLast($r['txt_1'])],
