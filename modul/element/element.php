@@ -1431,6 +1431,7 @@ function _elemButtonVal($el, $prm) {//значения аттрибута val д
 	return $val;
 }
 
+
 function _elemCol($el) {//получение имени колонки
 	if(!is_array($el))
 		if(!$id = _num($el))
@@ -1646,6 +1647,26 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 	return $send;
 }
 
+function _elem300Place($res) {//страна и город пользователя ВК
+	$place = array();
+	if(!empty($res['country']))
+		$place[] = $res['country']['title'];
+	if(!empty($res['city']))
+		$place[] = $res['city']['title'];
+
+	return implode(', ', $place);
+}
+function _elem300Sel($res) {//выбранный пользователь ВК
+	return
+	'<table>'.
+		'<tr><td class="pr5"><img src="'.$res['photo'].'" class="ava35">'.
+			'<td><div class="icon icon-del-red pl fr ml20 mtm2'._tooltip('Отменить', -31).'</div>'.
+				'<a href="//vk.com/id'.$res['id'].'" target="_blank">'.
+					$res['first_name'].' '.$res['last_name'].
+				'</a>'.
+				'<div class="grey mt3">'._elem300Place($res).'</div>'.
+	'</table>';
+}
 
 /* ---=== УКАЗАНИЕ ЭЛЕМЕНТОВ ПОД КОНКРЕТНОЕ ПРАВИЛО [1000] ===--- */
 function PHP12_elem_all_rule_setup($prm) {

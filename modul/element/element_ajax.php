@@ -663,7 +663,7 @@ switch(@$_POST['op']) {
 		jsonSuccess();
 		break;
 
-	case 'vk_user_get'://получение данных пользователя VK
+	case 'vk_user_get'://получение данных пользователя VK [300]
 		if(!$user_id = _num($_POST['val']))
 			jsonError('Не получен ID пользователя');
 
@@ -680,11 +680,6 @@ switch(@$_POST['op']) {
 
 		$res = $res['response'][0];
 
-		$place = array();
-		if(!empty($res['country']))
-			$place[] = $res['country']['title'];
-		if(!empty($res['city']))
-			$place[] = $res['city']['title'];
 
 		$send['html'] =
 			'<table class="mt5">'.
@@ -693,18 +688,11 @@ switch(@$_POST['op']) {
 						'<a href="//vk.com/id'.$user_id.'" class="b" target="_blank">'.
 							$res['first_name'].' '.$res['last_name'].
 						'</a>'.
-						'<div class="grey mt3">'.implode(', ', $place).'</div>'.
+						'<div class="grey mt3">'._elem300Place($res).'</div>'.
 						'<button class="vk small mt3">выбрать</button>'.
 			'</table>';
-		$send['sel'] =
-			'<table class="">'.
-				'<tr><td class="pr5"><img src="'.$res['photo'].'" class="ava35">'.
-					'<td><div class="icon icon-del-red pl fr ml20 mtm2'._tooltip('Отменить', -31).'</div>'.
-						'<a href="//vk.com/id'.$user_id.'" target="_blank">'.
-							$res['first_name'].' '.$res['last_name'].
-						'</a>'.
-						'<div class="grey mt3">'.implode(', ', $place).'</div>'.
-			'</table>';
+
+		$send['sel'] = _elem300Sel($res);
 		$send['user_id'] = $user_id;
 
 		jsonSuccess($send);

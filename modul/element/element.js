@@ -1781,9 +1781,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Привязка пользователя к странице ВК
 				case 300:
-					var VK_RES = ATR_CMP.next(),
-						VK_SEL;
-					ATR_CMP.keyup(function() {
+					var VK300 = ATR_CMP.next(),
+						INP = VK300.find('input'),
+						VK_RES = INP.next(),
+						VK_SEL,                 //выбранный пользователь в виде html
+						VK_ID = ATR_CMP.val();  //id выбранного пользователя ВК
+					INP.keyup(function() {
 						var t = $(this),
 							val = $.trim(t.val());
 
@@ -1795,12 +1798,13 @@ var DIALOG = {},//массив диалоговых окон для управл
 						var send = {
 							op:'vk_user_get',
 							val:val,
-							busy_obj:ATTR_CMP_AFICS,
+							busy_obj:VK300,
 							busy_cls:'busy'
 						};
 						_post(send, function(res) {
 							VK_RES.html(res.html);
 							VK_SEL = res.sel;
+							VK_ID = res.user_id
 						});
 					});
 
@@ -1809,13 +1813,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 					   .off('click', ATTR_EL(el.id) + ' button')
 						.on('click', ATTR_EL(el.id) + ' button', function() {
 							VK_RES.html(VK_SEL);
-							ATR_CMP._dn();
+							INP._dn();
+							ATR_CMP.val(VK_ID);
 						})
 						//отмена выбранного пользователя
 					   .off('click', ATTR_EL(el.id) + ' .icon-del-red')
 						.on('click', ATTR_EL(el.id) + ' .icon-del-red', function() {
 							VK_RES.html('');
-							ATR_CMP.val('')._dn(1);
+							INP.val('')._dn(1);
+							ATR_CMP.val(0);
 						});
 					return;
 			}

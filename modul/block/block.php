@@ -1720,16 +1720,30 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 		//Привязка пользователя к странице ВК
 		case 300:
-			/*
-				num_1 - путь к полю Имя
-				num_2 - путь к полю Фамилия
-			*/
+			$vkRes = '';
+			if($user_id = _elemPrintV($el, $prm, 0)) {
+				$res = _vkapi('users.get', array(
+					'user_ids' => $user_id,
+					'fields' => 'photo,'.
+								'sex,'.
+								'country,'.
+								'city'
+				));
+
+				if(empty($res['response']))
+					$vkRes = '<div class="red">Данные из VK не получены';
+				else
+					$vkRes = _elem300Sel($res['response'][0]);
+			}
+
 			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
 			return
+			'<input type="hidden" id="'._elemAttrId($el, $prm).'"'.$disabled.' value="'.$user_id.'" />'.
 			'<div id="'._elemAttrId($el, $prm).'_vk300" class="_vk300"'._elemStyleWidth($el).'>'.
 				'<div class="icon spin"></div>'.
-				'<input type="text" class="w100p" id="'._elemAttrId($el, $prm).'"'.$disabled.' />'.
-				'<div class="vk-res"></div>'.
+				'<input type="text" class="w100p'._dn(!$user_id).'"'.$disabled.' />'.
+				'<div class="vk-res">'.$vkRes.'</div>'.
 			'</div>';
 	}
 
