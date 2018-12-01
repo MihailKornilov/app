@@ -766,7 +766,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 			var ATR_CMP = _attr_cmp(elm_id),
 				ATTR_CMP_AFICS = _attr_cmp(elm_id, 1),
-				ATTR_EL =  _attr_el(elm_id),
+				ATR_EL =  _attr_el(elm_id),
 				UNIT_V = unit.id ? unit[el.col] || el.def : 0;//значение для функции
 
 			_elemHint(el);
@@ -922,7 +922,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					if(!el.num_6)
 						return;
 
-					ATTR_EL.find('ol:first').nestedSortable({
+					ATR_EL.find('ol:first').nestedSortable({
 						forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
 						placeholder:'nested-placeholder', //класс, применяемый для подсветки места, откуда взялся элемент
 						listType:'ol',
@@ -945,7 +945,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								op:'spisok_23_sort',
 								elem_id:elm_id,
 								arr:$(this).nestedSortable('toArray'),
-								busy_obj:ATTR_EL,
+								busy_obj:ATR_EL,
 								busy_cls:'spisok-busy'
 							};
 							_post(send);
@@ -1013,9 +1013,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Выбор нескольких значений галочками
 				case 31:
-					$(document).on('click', '#el_' + elm_id + ' ._check', function() {
+					$(document).on('click', ATTR_EL(elm_id) + ' ._check', function() {
 						var cmpv = [];
-						_forEq(ATTR_EL.find('._check.on'), function(sp) {
+						_forEq(ATR_EL.find('._check.on'), function(sp) {
 							cmpv.push(sp.prev().attr('id').split('_')[1]);
 						});
 						ATR_CMP.val(cmpv.join())
@@ -1096,10 +1096,10 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Заметки
 				case 52:
-					if(!ATTR_EL.length)
+					if(!ATR_EL.length)
 						return;
 					var timer = 0,
-						NOTE = ATTR_EL.find('._note'),
+						NOTE = ATR_EL.find('._note'),
 						ex = NOTE.attr('val').split(':'),
 						page_id = _num(ex[0]),
 						obj_id = _num(ex[1]),
@@ -1272,7 +1272,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Загрузка изображений
 				case 60:
-					var AEL = ATTR_EL,
+					var AEL = ATR_EL,
 						load = AEL.find('._image-load'),
 						prc = AEL.find('._image-prc'), //div для отображения процентов
 						ids_upd = function() {//обновление id загруженных изображений
@@ -1557,7 +1557,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр-календарь
 				case 77:
-					var CAL = ATTR_EL.find('._filter-calendar'),
+					var CAL = ATR_EL.find('._filter-calendar'),
 						CNT = CAL.find('.fc-cnt');
 
 					//перемотка месяцев
@@ -1593,8 +1593,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр-меню
 				case 78:
-					var FM = ATTR_EL.find('.fm-unit');
-					ATTR_EL.find('.fm-plus').click(function() {
+					var FM = ATR_EL.find('.fm-unit');
+					ATR_EL.find('.fm-plus').click(function() {
 						var t = $(this),
 							plus = t.html() == '+',
 							div = _parent(t, 'TABLE').next();
@@ -1685,9 +1685,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102:
-					var HLD = ATTR_EL.find('.holder'),//текст пустого значения
-						TDUN = ATTR_EL.find('.td-un'),//выбранные значения
-						DEL = ATTR_EL.find('.icon-del'),//иконка удаления
+					var HLD = ATR_EL.find('.holder'),//текст пустого значения
+						TDUN = ATR_EL.find('.td-un'),//выбранные значения
+						DEL = ATR_EL.find('.icon-del'),//иконка удаления
 						ICON_EMPTY = '<div class="icon icon-empty"></div>',
 						TITLE = window['EL' + el.id + '_F102_TITLE'],
 						COUNT = window['EL' + el.id + '_F102_C'],
@@ -1700,7 +1700,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 						sevSet = function() {//обновление выбранных значений
 							var sel = '',
 								ids = [];
-							_forEq(ATTR_EL.find('._check'), function(sp) {
+							_forEq(ATR_EL.find('._check'), function(sp) {
 								var p = sp.prev(),
 									v = _num(p.val()),
 									id = p.parent().parent().attr('val');
@@ -1721,14 +1721,14 @@ var DIALOG = {},//массив диалоговых окон для управл
 							_spisokUpdate(el.num_1);
 						},
 						chkUpd = function(id) {//обновление галочек
-							_forEq(ATTR_EL.find('._check'), function(sp) {
+							_forEq(ATR_EL.find('._check'), function(sp) {
 								var p = sp.prev(),
 									chk_id = p.parent().parent().attr('val');
 								p._check(chk_id == id ? 1 : 0);
 							});
 						};
 
-					_forEq(ATTR_EL.find('._check'), function(sp) {
+					_forEq(ATR_EL.find('._check'), function(sp) {
 						sp.prev()._check({func:sevSet});
 					});
 
@@ -1781,7 +1781,8 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Привязка пользователя к странице ВК
 				case 300:
-					var VK_RES = ATR_CMP.next();
+					var VK_RES = ATR_CMP.next(),
+						VK_SEL;
 					ATR_CMP.keyup(function() {
 						var t = $(this),
 							val = $.trim(t.val());
@@ -1799,8 +1800,23 @@ var DIALOG = {},//массив диалоговых окон для управл
 						};
 						_post(send, function(res) {
 							VK_RES.html(res.html);
+							VK_SEL = res.sel;
 						});
 					});
+
+					$(document)
+						//выбор пользователя
+					   .off('click', ATTR_EL(el.id) + ' button')
+						.on('click', ATTR_EL(el.id) + ' button', function() {
+							VK_RES.html(VK_SEL);
+							ATR_CMP._dn();
+						})
+						//отмена выбранного пользователя
+					   .off('click', ATTR_EL(el.id) + ' .icon-del-red')
+						.on('click', ATTR_EL(el.id) + ' .icon-del-red', function() {
+							VK_RES.html('');
+							ATR_CMP.val('')._dn(1);
+						});
 					return;
 			}
 		});

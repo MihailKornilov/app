@@ -680,8 +680,6 @@ switch(@$_POST['op']) {
 
 		$res = $res['response'][0];
 
-		$send['res'] = $res;
-
 		$place = array();
 		if(!empty($res['country']))
 			$place[] = $res['country']['title'];
@@ -689,10 +687,20 @@ switch(@$_POST['op']) {
 			$place[] = $res['city']['title'];
 
 		$send['html'] =
-			'<table class="bs5">'.
-				'<tr><td><img src="'.$res['photo'].'" class="h35 w35">'.
+			'<table class="mt5">'.
+				'<tr><td class="top pr5"><img src="'.$res['photo'].'" class="ava50">'.
 					'<td class="top">'.
 						'<a href="//vk.com/id'.$user_id.'" class="b" target="_blank">'.
+							$res['first_name'].' '.$res['last_name'].
+						'</a>'.
+						'<div class="grey mt3">'.implode(', ', $place).'</div>'.
+						'<button class="vk small mt3">выбрать</button>'.
+			'</table>';
+		$send['sel'] =
+			'<table class="">'.
+				'<tr><td class="pr5"><img src="'.$res['photo'].'" class="ava35">'.
+					'<td><div class="icon icon-del-red pl fr ml20 mtm2'._tooltip('Отменить', -31).'</div>'.
+						'<a href="//vk.com/id'.$user_id.'" target="_blank">'.
 							$res['first_name'].' '.$res['last_name'].
 						'</a>'.
 						'<div class="grey mt3">'.implode(', ', $place).'</div>'.
