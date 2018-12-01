@@ -1781,12 +1781,15 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//Привязка пользователя к странице ВК
 				case 300:
+					var VK_RES = ATR_CMP.next();
 					ATR_CMP.keyup(function() {
 						var t = $(this),
 							val = $.trim(t.val());
 
-						if(!val)
+						if(!val) {
+							VK_RES.html('');
 							return;
+						}
 
 						var send = {
 							op:'vk_user_get',
@@ -1795,7 +1798,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 							busy_cls:'busy'
 						};
 						_post(send, function(res) {
-							ATR_CMP.next().html(res.html);
+							VK_RES.html(res.html);
 						});
 					});
 					return;

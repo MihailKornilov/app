@@ -690,7 +690,7 @@ switch(@$_POST['op']) {
 
 		$send['html'] =
 			'<table class="bs5">'.
-				'<tr><td><img src="'.$res['photo'].'" class="h35">'.
+				'<tr><td><img src="'.$res['photo'].'" class="h35 w35">'.
 					'<td class="top">'.
 						'<a href="//vk.com/id'.$user_id.'" class="b" target="_blank">'.
 							$res['first_name'].' '.$res['last_name'].
