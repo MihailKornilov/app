@@ -1717,6 +1717,20 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					'EL'.$el['id'].'_F102_C='._json($countAss).','.
 					'EL'.$el['id'].'_F102_BG='._json($bgAss).';'.
 			'</script>';
+
+		//Привязка пользователя к странице ВК
+		case 300:
+			/*
+				num_1 - путь к полю Имя
+				num_2 - путь к полю Фамилия
+			*/
+			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+			return
+			'<div id="'._elemAttrId($el, $prm).'_vk300" class="_vk300"'._elemStyleWidth($el).'>'.
+				'<div class="icon spin"></div>'.
+				'<input type="text" class="w100p" id="'._elemAttrId($el, $prm).'"'.$disabled.' />'.
+				'<div class="vk-res"></div>'.
+			'</div>';
 	}
 
 	return _msgRed('dlg-'.$el['dialog_id']);

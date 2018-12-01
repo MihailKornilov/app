@@ -662,6 +662,45 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+
+	case 'vk_user_get'://получение данных пользователя VK
+		if(!$user_id = _num($_POST['val']))
+			jsonError('Не получен ID пользователя');
+
+		$res = _vkapi('users.get', array(
+			'user_ids' => $user_id,
+			'fields' => 'photo,'.
+						'sex,'.
+						'country,'.
+						'city'
+		));
+
+		if(empty($res['response']))
+			jsonError('Не получены данные из VK');
+
+		$res = $res['response'][0];
+
+		$send['res'] = $res;
+
+		$place = array();
+		if(!empty($res['country']))
+			$place[] = $res['country']['title'];
+		if(!empty($res['city']))
+			$place[] = $res['city']['title'];
+
+		$send['html'] =
+			'<table class="bs5">'.
+				'<tr><td><img src="'.$res['photo'].'" class="h35">'.
+					'<td class="top">'.
+						'<a href="//vk.com/id'.$user_id.'" class="b" target="_blank">'.
+							$res['first_name'].' '.$res['last_name'].
+						'</a>'.
+						'<div class="grey mt3">'.implode(', ', $place).'</div>'.
+			'</table>';
+		$send['user_id'] = $user_id;
+
+		jsonSuccess($send);
+		break;
 }
 
 

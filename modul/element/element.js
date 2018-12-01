@@ -1779,6 +1779,26 @@ var DIALOG = {},//массив диалоговых окон для управл
 							$('._filter102' + attr).removeClass('rs');
 						});
 					return;
+				//Привязка пользователя к странице ВК
+				case 300:
+					ATR_CMP.keyup(function() {
+						var t = $(this),
+							val = $.trim(t.val());
+
+						if(!val)
+							return;
+
+						var send = {
+							op:'vk_user_get',
+							val:val,
+							busy_obj:ATTR_CMP_AFICS,
+							busy_cls:'busy'
+						};
+						_post(send, function(res) {
+							ATR_CMP.next().html(res.html);
+						});
+					});
+					return;
 			}
 		});
 
@@ -2361,7 +2381,6 @@ var DIALOG = {},//массив диалоговых окон для управл
 	PHP12_v_choose_get = function(el, obj) {//отправка значений настройки для определения типа сохранения данных. Конкретно по "mysave"
 		return obj.vvv[el.id];
 	},
-
 
 	/* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 	PHP12_block_choose = function(el, vvv, obj) {

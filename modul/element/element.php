@@ -1813,7 +1813,7 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 			'<table class="el-group-head'.$first.$sel.'" val="'.$id.'">'.
 				'<tr>'.
 	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
-					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'.$r['name'].
+					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'._br($r['name']).
 			'</table>';
 
 		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == $firstId).'">';

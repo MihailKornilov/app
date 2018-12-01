@@ -737,3 +737,30 @@ button.vk._busy{color:transparent}
 
 
 
+
+
+
+
+
+
+
+
+
+/* Привязка пользователя к странице ВК */
+._vk300{position:relative}
+._vk300 .icon{
+	position:absolute;
+	right:6px;
+	top:6px;
+}
+._vk300:not(.busy) .icon{display:none}
+
+
+
+
+
+
+
+
+
+
