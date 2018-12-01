@@ -998,8 +998,13 @@ function _dialogOpenLoad($dialog_id) {
 
 	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
 
+	$get_id = _num(@$_POST['get_id']);
+
+	if($dialog['dialog_id_unit_get'] && !$get_id)
+		return _dialogOpenErr($send, 'Не получены данные записи');
+
 	//если получен id записи
-	if($get_id = _num(@$_POST['get_id'])) {
+	if($get_id) {
 		$send['get_id'] = $get_id;
 		$prm['unit_get_id'] = $get_id;
 		//в диалоге должна быть настройка, какого списка принимать данные записи

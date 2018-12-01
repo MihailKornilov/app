@@ -199,6 +199,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 		var DLG = {
 			id:o.dialog_id,
+			send:o.send,
 			D:function(attr) {//получение значений по аттрибутам конкретно из этого диалога
 				return content.find(attr);
 			},
@@ -687,15 +688,19 @@ var DIALOG = {},//массив диалоговых окон для управл
 					.trigger('click');
 				break;
 			case 4://обновление исходного диалога
-				if(!res.dss_arr)
-					break;
-				var id = _num(res.dss_arr.dialog_id);
+				var id = _num(res.dss4);
 				if(!id)
 					break;
 				if(!DIALOG[id])
 					break;
-				DIALOG[id].close();
-				_dialogOpen(res.dss_arr);
+
+				var send = DIALOG[id].send;
+
+				send.func_open_before = function() {
+					DIALOG[id].close();
+				};
+
+				_dialogLoad(send);
 				break;
 		}
 

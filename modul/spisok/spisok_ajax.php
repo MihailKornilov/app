@@ -848,8 +848,7 @@ function _spisokAction4($send) {//действие 4 - обновление ис
 	if(!$dialog_id = _num(@$_POST['dss']))
 		return $send;
 
-	$_POST['unit_id'] = 0;
-	$send['dss_arr'] = _dialogOpenLoad($dialog_id);
+	$send['dss4'] = $dialog_id;
 
 	return $send;
 }

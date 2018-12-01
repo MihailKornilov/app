@@ -36,12 +36,7 @@ var ZINDEX = 1000,
 		POST_BUSY_OBJ = send.busy_obj;
 		POST_BUSY_CLS = send.busy_cls;
 
-		delete send.busy_obj;
-		delete send.busy_cls;
-		delete send.func_open_before;
-		delete send.func_open;
-		delete send.func_save;
-		delete send.func_err;
+		send = _postSend(send);
 
 		POST_SEND = send;
 
@@ -61,6 +56,30 @@ var ZINDEX = 1000,
 				v.func_err(res);
 
 		}, 'json');
+	},
+	_postSend = function(send) {//очистка данных от лишних значений перед отправкой POST
+		delete send.busy_obj;
+		delete send.busy_cls;
+		delete send.func_open_before;
+		delete send.func_open;
+		delete send.func_save;
+		delete send.func_err;
+
+		for(var i in send) {
+			if(send[i] instanceof jQuery) {
+				delete send[i];
+				continue;
+			}
+
+			switch(typeof send[i]) {
+				case 'number':
+				case 'string':
+				case 'object': continue;
+			}
+			delete send[i];
+		}
+
+		return send;
 	},
 	_cookie = function(name, value) {
 		if(value !== undefined) {
