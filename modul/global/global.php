@@ -744,7 +744,7 @@ function _jsCacheElemOne($elem_id) {
 	$val = array();
 
 	$val['dialog_id'] = $r['dialog_id'];
-	$val['col'] = _elemCol($r['col']);
+	$val['col'] = _elemCol($r);
 	$val['name'] = $r['name'];
 	$val['block_id'] = $block_id;
 

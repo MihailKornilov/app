@@ -498,6 +498,10 @@ $(document)
 		if(txt.substr(0, 15) == '<!DOCTYPE html>')
 			return location.reload();
 
+		txt = txt.replace(new RegExp('<br />', 'g'), '');
+		txt = txt.replace(new RegExp('<b>', 'g'), '');
+		txt = txt.replace(new RegExp('</b>', 'g'), '');
+
 		if(POST_BUSY_OBJ) {
 			$(POST_BUSY_OBJ).removeClass(POST_BUSY_CLS);
 			POST_BUSY_OBJ = null;

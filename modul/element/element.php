@@ -1047,7 +1047,10 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		//Select - выбор записи из другого списка (для связки)
 		case 29:
 			//id выбранной записи
-			$sel_id = _elemPrintV($el, $prm, 0);
+			if(!$sel_id = _elemPrintV($el, $prm, 0)) {
+//				$sel_id = _num(@$_GET['id']);
+			}
+
 
 /*
 			//данные записи редактируются
@@ -1507,6 +1510,11 @@ function _elem11($el, $prm) {//отображение элемента, вста
 			if(!$col = $ell['col'])
 				return _msgRed('-cnn-col-yok-');
 			$unit = $unit[$col];
+			if(!is_array($unit)) {
+				if($ell['dialog_id'] == 29)
+					return $ell['txt_1'];
+				return _msgRed('пустое значение не настроено');
+			}
 			continue;
 		}
 		return _elem11one($el, $ell, $unit);

@@ -970,7 +970,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					return;
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
-					_elemFunc(el, _num(ATR_CMP.val()), 1);
+					_elemFunc(el, UNIT_V, 1);
 					var o = {
 						width:el.width,
 						title0:el.txt_1,

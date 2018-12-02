@@ -331,7 +331,7 @@ switch(@$_POST['op']) {
 			'id' => -1,
 			'title' => 'Совпадает с текущей страницей',
 			'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
-						 '<div class="fs12 grey ml10 mt3 i">Диалог будет принимать данные единицы списка, которые принимает страница</div>'
+						 '<div class="fs12 grey ml10 mt3 i">Диалог будет принимать данные списка, которые принимает страница</div>'
 		));
 		$send['dlg_unit_get'] = $dlgUnitGet;
 
@@ -991,8 +991,10 @@ function _dialogOpenLoad($dialog_id) {
 
 	$send = _dialogOpenParam($dialog);
 
+	$page_id = _num($_POST['page_id']);
+
 	$prm['srce']['dialog_id'] = $dialog_id;
-	$prm['srce']['page_id'] = _num($_POST['page_id']);
+	$prm['srce']['page_id'] = $page_id;
 	$prm['srce']['block_id'] = _num(@$_POST['block_id']);
 
 	/* --- Удаление записи --- */
@@ -1044,6 +1046,12 @@ function _dialogOpenLoad($dialog_id) {
 		$prm['unit_get_id'] = $get_id;
 		//в диалоге должна быть настройка, какого списка принимать данные записи
 		if($dlgGetId = $dialog['dialog_id_unit_get']) {
+			//диалог принимает данные записи, которые принимает страница
+			if($dlgGetId == -1) {
+				$page = _page($page_id);
+				if(!$dlgGetId = $page['dialog_id_unit_get'])
+					return _dialogOpenErr($send, 'Текущая страница не принимает данные записи');
+			}
 			$DLG_GET = _dialogQuery($dlgGetId);
 			$prm['unit_get'] = _spisokUnitQuery($DLG_GET, $get_id);
 		}
