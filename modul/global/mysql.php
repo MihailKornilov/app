@@ -119,27 +119,31 @@ function query_insert_id($tab) {//id последнего внесённого �
 
 
 function _table($id=false) {//таблицы в базе с соответствующими идентификаторами
-	$tab = array(
-		 1 =>  '_app',
-		 2 =>  '_block',
-		 3 =>  '_dialog',
-		 4 =>  '_element_group',
-		 5 =>  '_element',
-		 6 =>  '_element_func',
-		 17 => '_element_format',
-		 18 => '_element_hint',
-		 19 => '_element_rule_name',
-		 20 => '_element_rule_use',
-		 7 =>  '_history',
-		 8 =>  '_image',
-		 9 =>  '_image_server',
-		10 =>  '_page',
-		11 =>  '_spisok',
-		12 =>  '_user',
-		14 =>  '_user_auth',
-		15 =>  '_user_spisok_filter',
-		16 =>  '_note'
-	);
+	$key = 'TABLE';
+	if(!$tab = _cache_get($key, 1)) {
+		$sql = "SELECT `id`,`name`
+				FROM `_table`
+				ORDER BY `name`";
+		$tab = query_ass($sql);
+
+		//внесение таблиц, которых нет в таблице `_table`
+		$ass = array();
+		foreach($tab as $t)
+			$ass[$t] = 1;
+		$sql = "SHOW TABLES";
+		foreach(query_array($sql) as $r) {
+			$i = key($r);
+			$t = $r[$i];
+			if($t == '_table')
+				continue;
+			if(!isset($ass[$t])) {
+				$sql = "INSERT INTO `_table` (`name`) VALUES ('".$t."')";
+				$tab_id = query_id($sql);
+				$tab[$tab_id] = $t;
+			}
+		}
+		_cache_set($key, $tab, 1);
+	}
 
 	if($id === false)
 		return $tab;
