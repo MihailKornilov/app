@@ -321,7 +321,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	define('IS_ELEM', $dialog['table_1'] == 5);// '_element'
 	define('ACT', $unit_id ? 'edit' : 'insert');
 
-	$POST_CMP = _SUN_CMP_TEST($dialog);
+	$POST_CMP = _SUN_CMP_TEST($dialog, $unit_id);
 
 	//регистрация нового пользователя [98] - перехват внесения данных
 	_auth98($dialog, $POST_CMP);
@@ -444,7 +444,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	return $send;
 }
-function _SUN_CMP_TEST($dialog) {//проверка корректности компонентов диалога
+function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректности компонентов диалога
 	$DLG = _dialogParent($dialog);
 
 	if(!$DLG['table_1'])
@@ -503,6 +503,15 @@ function _SUN_CMP_TEST($dialog) {//проверка корректности к�
 					else
 						break;//если поле пароля пустое, то значение не вносится
 
+				$send[$cmp_id] = $v;
+				break;
+			case 300://страница ВК
+				if(_elem300VkIdTest($DLG, $v, $unit_id)) {
+					$is_err = 1;
+					$err_msg = 'Учётная запись vk.com: '.$v.' закреплена'.
+							   '<br>'.
+							   'за другим пользователем приложения.';
+				}
 				$send[$cmp_id] = $v;
 				break;
 			default:

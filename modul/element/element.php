@@ -1667,6 +1667,28 @@ function _elem300Sel($res) {//выбранный пользователь ВК
 				'<div class="grey mt3">'._elem300Place($res).'</div>'.
 	'</table>';
 }
+function _elem300VkIdTest($DLG, $v, $user_id) {//проверка, чтобы два одинаковый `vk_id` не попали в таблицу `_user`
+	if(!$vk_id = _num($v))
+		return false;
+
+	//поиск таблицы `_user`
+	$tab = $DLG['table_name_1'];
+
+	if($parent_id = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($parent_id);
+		$tab = $PAR['table_name_1'];
+	}
+
+	if($tab == '_user') {
+		$sql = "SELECT COUNT(*)
+				FROM `_user`
+				WHERE `vk_id`=".$vk_id.
+	($user_id ? " AND `id`!=".$user_id : '');
+		return query_value($sql);
+	}
+
+	return false;
+}
 
 /* ---=== УКАЗАНИЕ ЭЛЕМЕНТОВ ПОД КОНКРЕТНОЕ ПРАВИЛО [1000] ===--- */
 function PHP12_elem_all_rule_setup($prm) {
