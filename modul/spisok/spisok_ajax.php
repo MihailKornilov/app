@@ -822,6 +822,15 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 				WHERE `id`=".$uid[$tab];
 		query($sql);
 	}
+
+	//изменение элемента из временного в постоянный после использования предварительной вставки (функция _dialogOpenPreLoad)
+	if(IS_ELEM) {
+		$sql = "UPDATE `_element`
+				SET `user_id_add`=".USER_ID."
+				WHERE `id`=".$unit_id."
+				  AND `user_id_add`=-".USER_ID;
+		query($sql);
+	}
 }
 function _spisokAction3($dialog, $unit_id, $send) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
 	//должено быть действие над элементом
