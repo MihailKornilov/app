@@ -473,7 +473,6 @@ function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохране�
 function _pageShow($page_id) {
 	define('PAGE_MSG_ERR', '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>');
 
-
 	//нет доступа в приложение
 	if(!SA && APP_ID && !APP_ACCESS)
 		$page_id = 105;
@@ -491,7 +490,7 @@ function _pageShow($page_id) {
 
 	$prm = array();
 
-	//страница принимает значенпия записи
+	//страница принимает значения записи
 	if($dialog_id = $page['dialog_id_unit_get']) {
 		if(!$id = _num(@$_GET['id']))
 			return _empty20('Некорректный идентификатор записи.'.PAGE_MSG_ERR);
@@ -526,25 +525,19 @@ function _pageShowScript($page_id, $prm) {
 		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.//'._json($prm['unit_get']).'
 	'</script>';
 }
-function _pageUnitGet($page_id) {
-	return array();
-	$PAGE_START_MSG = '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>';
-
-	if(!$page_id)
-		return array('msg_err'=>'Некорректный ID страницы'.$PAGE_START_MSG);
-	if(!$page = _page($page_id))
-		return array('msg_err'=>'Страницы '.$page_id.' не существует'.$PAGE_START_MSG);
-
+function _pageUnitGet($obj_name, $obj_id) {//получение данных записи, которые принимает страница (для отображения в настройке страницы)
+	if($obj_name != 'page')
+		return array();
+	if(!$get_id = _num(@$_GET['id']))
+		return array();
+	if(!$page = _page($obj_id))
+		return array();
 	if(!$dialog_id = $page['dialog_id_unit_get'])
 		return array();
-	if(!$id = _num(@$_GET['id']))
-		return array('msg_err'=>'Некорректный идентификатор единицы списка.'.$PAGE_START_MSG);
 	if(!$dialog = _dialogQuery($dialog_id))
-		return array('msg_err'=>'Отсутствует диалог, который вносит данные.'.$PAGE_START_MSG);
-	if(!$unit = _spisokUnitQuery($dialog, $id))
-		return array('msg_err'=>'Записи '.$id.' не существует.'.$PAGE_START_MSG);
+		return array();
 
-	return $unit;
+	return _spisokUnitQuery($dialog, $get_id);
 }
 
 

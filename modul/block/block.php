@@ -77,8 +77,6 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 function _blockHtml($obj_name, $obj_id, $PARAM=array(), $grid_id=0) {//вывод структуры блоков для конкретного объекта
 	if(!$block = _BE('block_obj', $obj_name, $obj_id))
 		return _blockName($obj_name, 'empty', $obj_id);
-	if(!empty($PARAM['msg_err']))
-		return _empty20($PARAM['msg_err']);
 
 	return _blockLevel($block, $PARAM, $grid_id);
 }

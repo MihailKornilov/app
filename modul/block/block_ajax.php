@@ -32,13 +32,14 @@ switch(@$_POST['op']) {
 
 		$blk_choose = _bool($_POST['blk_choose']);
 
-		$unit = array(
+		$prm = array(
 			'blk_setup' => 1,
 			'blk_choose' => $blk_choose,
-			'blk_level' => $level
+			'blk_level' => $level,
+			'unit_get' => _pageUnitGet($obj_name, $obj_id)
 		);
 
-		$send['html'] = _blockHtml($obj_name, $obj_id,  $unit);
+		$send['html'] = _blockHtml($obj_name, $obj_id,  $prm);
 		$send['blk'] = _BE('block_arr1', $obj_name, $obj_id);
 
 		jsonSuccess($send);
@@ -51,12 +52,12 @@ switch(@$_POST['op']) {
 
 		$on = _num($_POST['on']);
 
-		$unit = _unitGet($obj_name, $obj_id) +
-				array(
-					'blk_setup' => 1,
-					'elm_width_change' => $on
-				);
-		$send['html'] = _blockHtml($obj_name, $obj_id,  $unit);
+		$prm = array(
+			'blk_setup' => 1,
+			'elm_width_change' => $on,
+			'unit_get' => _pageUnitGet($obj_name, $obj_id)
+		);
+		$send['html'] = _blockHtml($obj_name, $obj_id,  $prm);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
 		jsonSuccess($send);
@@ -233,9 +234,12 @@ switch(@$_POST['op']) {
 		_BE( 'elem_clear');
 		_jsCache();
 
-		$unit = _unitGet($obj_name, $obj_id) + array('blk_setup' => 1);
+		$prm = array(
+			'blk_setup' => 1,
+			'unit_get' => _pageUnitGet($obj_name, $obj_id)
+		);
 		$send['level'] = _blockLevelChange($obj_name, $obj_id);
-		$send['html'] = _blockHtml($obj_name, $obj_id, $unit);
+		$send['html'] = _blockHtml($obj_name, $obj_id, $prm);
 		$send['blk'] = _BE('block_arr1', $obj_name, $obj_id);
 		$send['elm'] = _BE('elem_arr1', $obj_name, $obj_id);
 
@@ -315,7 +319,10 @@ switch(@$_POST['op']) {
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
 
-		$unit = _unitGet($block['obj_name'], $block['obj_id']) + array('blk_setup' => 1);
+		$prm = array(
+			'blk_setup' => 1,
+			'unit_get' => _pageUnitGet($block['obj_name'], $block['obj_id'])
+		);
 
 		$send['obj_name'] = $block['obj_name'];
 		$send['obj_id'] = $block['obj_id'];
@@ -324,7 +331,7 @@ switch(@$_POST['op']) {
 			_blockHtml(
 				$block['obj_name'],
 				$block['obj_id'],
-				$unit,
+				$prm,
 				$block_id
 			);
 
@@ -338,13 +345,13 @@ switch(@$_POST['op']) {
 		if(!$BL = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
 
-		$unit = _unitGet($BL['obj_name'], $BL['obj_id']);
-		$unit += array(
+		$prm = array(
 			'blk_choose' => 1,
-			'blk_level' => $level
+			'blk_level' => $level,
+			'unit_get' => _pageUnitGet($BL['obj_name'], $BL['obj_id'])
 		);
 
-		$send['html'] = _blockHtml($BL['obj_name'], $BL['obj_id'], $unit);
+		$send['html'] = _blockHtml($BL['obj_name'], $BL['obj_id'], $prm);
 
 		jsonSuccess($send);
 		break;
