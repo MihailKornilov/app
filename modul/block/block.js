@@ -847,11 +847,13 @@ $(document)
 				return false;
 
 			var unit = t.parents('.sp-unit'),
-				id = _num(unit.attr('val'));
-			if(!id)
-				return false;
+				id = _num(unit.attr('val')),
+				link = '&p=' + page_id;
 
-			location.href = URL + '&p=' + page_id + '&id=' + id;
+			if(id)
+				link += '&id=' + id;
+
+			location.href = URL + link;
 			return false;
 		});
 	});
