@@ -356,7 +356,7 @@
 	position:absolute;
 	display:inline-block;
 	top:-29px;
-	z-index:998;
+	z-index:1001;/* должен быть больше, чем треугольник в подсказке */
 }
 ._tooltip .ttdiv.x2{top:-45px;text-align:center}
 ._tooltip:not(:hover) .ttdiv,._tooltip .ttdiv:hover{display:none}
