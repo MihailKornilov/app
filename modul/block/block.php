@@ -1005,13 +1005,16 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			*/
 
 
-//			$v = _spisokCmpConnectIdGet($el);
+			$v = _elemPrintV($el, $prm, $el['num_6']);
+			//id записи берётся с текущей страницы
+			if($v == -1)
+				$v = _num(@$_GET['id']);
 
 			return _select(array(
 						'attr_id' => _elemAttrId($el, $prm),
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'value' => _elemPrintV($el, $prm, $el['num_6'])
+						'value' => $v
 				   ));
 
 		//Иконка удаления записи

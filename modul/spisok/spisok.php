@@ -809,7 +809,9 @@ function _spisokCondBind($el) {//отображения значений зап�
 	if(!$cmp)
 		return ' AND !`t1`.`id` /* no cmp */';
 
-	return " AND `t1`.`".$col."`=".$unit[$cmp['col']]['id'];
+	$v = is_array($unit[$cmp['col']]) ? $unit[$cmp['col']]['id'] : $unit[$cmp['col']];
+
+	return " AND `t1`.`".$col."`="._num($v)." /* <-bind */";
 }
 function _spisokCond7($el) {//значения фильтра-поиска для списка
 	$search = false;
@@ -1226,7 +1228,7 @@ function _29cnnLevel($EL, $spisok) {//вывод списка по уровня�
 function _29cnnSpisok($el, $v) {//значения списка для формирования содержания
 	$DLG = _dialogQuery($el['num_1']);
 
-	//учитываются уровни (отключается лимит списка)
+	//если учитываются уровни, отключается лимит списка
 	$sort = $el['num_5'];
 	$field = $DLG['field1'];
 
@@ -1307,45 +1309,6 @@ function _spisok59unit($elem_id, $unit_id) {//выбранное значени�
 
 	return _blockHtml('spisok', $elem_id, $prm);
 }
-
-function _spisokCmpConnectIdGet($el, $sel_id=0) {//получение id привязонного списка, если рядом стоит родительский список (для страницы, принимающей значения списка)
-	if($sel_id)
-		return $sel_id;
-	if(!_elemIsConnect($el))//только для связок
-		return 0;
-
-
-	return 0;
-
-
-
-	if(!$get_id = _num(@$_GET['id']))
-		return 0;
-	if(!$page_id = _page('cur'))
-		return 0;
-	if(!$page = _page($page_id))
-		return 0;
-	if(!$page['dialog_id_unit_get'])//страница не принимает значения
-		return 0;
-	if($page['dialog_id_unit_get'] == $el['num_1'])//если список является страницей, принимающей значение, возврат $_GET['id']
-		return $get_id;
-
-	if(!$dlg = _dialogQuery($page['dialog_id_unit_get']))
-		return 0;
-
-	foreach($dlg['cmp'] as $cmp)
-		if(_elemIsConnect($cmp) && $cmp['num_1'] == $el['num_1']) {
-			$sql = "SELECT *
-					FROM `_spisok`
-					WHERE `id`=".$get_id;
-			if($unit = query_assoc($sql))
-				if($cmp['col'])
-					return $unit[$cmp['col']];
-		}
-
-	return 0;
-}
-
 
 
 

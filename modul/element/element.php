@@ -1015,32 +1015,10 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 
 		//Select - выбор записи из другого списка (для связки)
 		case 29:
-			//id выбранной записи
-			if(!$sel_id = _elemPrintV($el, $prm, 0)) {
-//				$sel_id = _num(@$_GET['id']);
-			}
-
-
-/*
-			//данные записи редактируются
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$sel_id = _num($u[$col]['id']);
-			} else {
-
-			}
-
-			if($unit_id) {
-				if(@$unit['accept'])
-					$sel_id = $unit_id;
-				elseif($el['col']) {
-					if(!empty($unit[$el['col']]))
-						$sel_id = $unit[$el['col']]['id'];
-				}
-			}
-
-			$sel_id = _spisokCmpConnectIdGet($el, $sel_id);
-*/
+			$sel_id = _elemPrintV($el, $prm, $el['num_6']);
+			//id записи берётся с текущей страницы
+			if($sel_id == -1)
+				$sel_id = _num(@$_GET['id']);
 			return _29cnn($elem_id, '', $sel_id);
 
 		//SA: select - выбор имени колонки
@@ -1111,18 +1089,26 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		case 85:
 			if(!$u = $prm['unit_edit'])
 				break;
+
+			$send[] = array(
+				'id' => -1,
+				'title' => 'Совпадает с текущей страницей',
+				'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
+							 '<div class="fs12 grey ml10 mt3 i">Будет установлено значение записи, которое принимает страница</div>'
+			);
+
 			//ID элемента, который размещает селект со списком
 			if(!$elem_id = _num($el['num_1']))
-				break;
+				return $send;
 			if(!$el = _elemOne($elem_id))
-				break;
+				return $send;
 			//колонка, по которой будет получено ID диалога-списка
 			if(!$col = $el['col'])
-				break;
+				return $send;
 			if(!$dlg_id = _num($u[$col]))
-				break;
+				return $send;
 			if(!$dlg = _dialogQuery($dlg_id))
-				break;
+				return $send;
 
 			//получение данных списка
 			$sql = "SELECT "._queryCol($dlg)."
@@ -1131,11 +1117,37 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 					ORDER BY `id`
 					LIMIT 200";
 			if(!$spisok = query_arr($sql))
-				break;
+				return $send;
 
-			$send = array();
-			foreach($spisok as $id => $r)
-				$send[$id] = $r['txt_1'];
+			$spisok = _spisokInclude($spisok);
+
+			//содержание выпадающего списка будет взято из настроек диалога
+			$cols = array();
+			while(true) {
+				if(!$elem_id = $dlg['spisok_elem_id'])
+					break;
+				$ell = _elemOne($elem_id);
+				$cols[] = $ell['col'];
+				if(_elemIsConnect($elem_id)) {
+					$dlg = _dialogQuery($ell['num_1']);
+					continue;
+				}
+				break;
+			}
+
+			foreach($spisok as $id => $sp) {
+				foreach($cols as $col) {
+					if(empty($sp[$col])) {
+						$sp = '- значение отсутствует -';
+						break;
+					}
+					$sp = $sp[$col];
+				}
+				$send[] = array(
+					'id' => $id,
+					'title' => $sp
+				);
+			}
 
 			return $send;
 	}
@@ -1482,7 +1494,7 @@ function _elem11($el, $prm) {//отображение элемента, вста
 			if(!is_array($unit)) {
 				if($ell['dialog_id'] == 29)
 					return $ell['txt_1'];
-				return _msgRed('пустое значение не настроено');
+				return _msgRed('значение отсутствует');
 			}
 			continue;
 		}
