@@ -3210,6 +3210,74 @@ function PHP12_elem_action_list($prm) {
 	return '<dl>'.$spisok.'</dl>';
 }
 
+/* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ БЛОКУ ===--- */
+function PHP12_block_action_list($prm) {
+	if(!$bs_id = _num($prm['srce']['block_id']))
+		return _emptyMin('Отсутствует ID исходного блока.');
+	if(!$BL = _blockOne($bs_id))
+		return _emptyMin('Исходного блока id'.$bs_id.' не существует.');
+	if($BL['obj_name'] != 'page' && $BL['obj_name'] != 'dialog')
+		return _emptyMin('Действия можно назначать<br>только блокам на страницах и диалоговых окнах.');
+
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `block_id`=".$bs_id."
+			ORDER BY `sort`";
+	if(!$arr = query_arr($sql))
+		return _emptyMin('Действий не назначено.');
+
+	//Названия типов действий
+	$sql = "SELECT `id`,`txt_1`
+			FROM `_element`
+			WHERE `id` IN ("._idsGet($arr, 'type_id').")";
+	$act = query_ass($sql);
+
+	//Названия эффектов
+	$sql = "SELECT `id`,`txt_1`
+			FROM `_element`
+			WHERE `id` IN ("._idsGet($arr, 'effect_id').")";
+	$effect = query_ass($sql);
+	$effect[0] = 'нет';
+
+	$dss = $prm['el12']['block']['obj_id'];
+	$spisok = '';
+	foreach($arr as $id => $r) {
+		$c = count(_ids($r['target'], 1));
+		$targetName = 'блок'._end($c, '', 'а', 'ов');
+		$targetColor = 'color-ref';
+		if($r['dialog_id'] == 73) {
+			$targetName = 'элем.';
+			$targetColor = 'color-pay';
+		}
+		$spisok .=
+			'<dd val="'.$id.'">'.
+			'<table class="bs5 bor1 bg-gr2 over2 mb5 curD">'.
+				'<tr>'.
+					'<td class="w25 top">'.
+						'<div class="icon icon-move-y pl"></div>'.
+					'<td class="w300">'.
+						'<div class="fs15">'._dialogParam($r['dialog_id'], 'name').'</div>'.
+						'<table class="bs3">'.
+							'<tr><td class="fs12 grey top">Действие:'.
+								'<td class="fs12">'.
+									'<b class="fs12">'.$act[$r['type_id']].'</b>'.
+			($r['action_reverse'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
+			 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Эффект:<td class="fs12 color-pay">'.$effect[$r['effect_id']] : '').
+						'</table>'.
+					'<td class="w70 b '.$targetColor.' top center pt3">'.
+						$c.' '.$targetName.
+					'<td class="w50 r top">'.
+						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
+						_iconDel(array(
+							'class' => 'pl ml5 dialog-open',
+							'val' => 'dialog_id:'.$r['dialog_id'].',del_id:'.$id.',dss:'.$dss
+						)).
+			'</table>'.
+			'</dd>';
+	}
+
+	return '<dl>'.$spisok.'</dl>';
+}
 
 /* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
 function PHP12_history_setup() {
