@@ -1006,9 +1006,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 
 			$v = _elemPrintV($el, $prm, $el['num_6']);
-			//id записи берётся с текущей страницы
-			if($v == -1)
-				$v = _num(@$_GET['id']);
+			$v = _elem29PageSel($el['num_1'], $v);
 
 			return _select(array(
 						'attr_id' => _elemAttrId($el, $prm),

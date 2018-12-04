@@ -1016,9 +1016,7 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		//Select - выбор записи из другого списка (для связки)
 		case 29:
 			$sel_id = _elemPrintV($el, $prm, $el['num_6']);
-			//id записи берётся с текущей страницы
-			if($sel_id == -1)
-				$sel_id = _num(@$_GET['id']);
+			$sel_id = _elem29PageSel($el['num_1'], $sel_id);
 			return _29cnn($elem_id, '', $sel_id);
 
 		//SA: select - выбор имени колонки
@@ -1281,6 +1279,35 @@ function _elemVvv37parent($dlg_id) {//колонки родительского 
 	}
 
 	return $send;
+}
+
+function _elem29PageSel($dlg_cur, $sel_id) {//подмена id записи, если не совпадает со списком текущей страницы
+	//id записи берётся с текущей страницы
+	if($sel_id != -1)
+		return $sel_id;
+	if(!$sel_id = _num(@$_GET['id']))
+		return 0;
+
+	$page_id = _page('cur');
+	$page = _page($page_id);
+	if(!$dlg_id = $page['dialog_id_unit_get'])
+		return $sel_id;
+
+	//если страница принимает значения другого списка, нужно поменять id записи
+	if($dlg_id == $dlg_cur)
+		return $sel_id;
+	if(!$DLG = _dialogQuery($dlg_id))
+		return 0;
+	if(!$u = _spisokUnitQuery($DLG, $sel_id))
+		return 0;
+
+	foreach($DLG['cmp'] as $cmp)
+		if(_elemIsConnect($cmp))
+			if($dlg_cur == $cmp['num_1'])
+				if(!empty($u[$cmp['col']]))
+					return $u[$cmp['col']]['id'];
+
+	return 0;
 }
 
 function _elemIsConnect($el) {//определение, является ли элемент подключаемым списком
