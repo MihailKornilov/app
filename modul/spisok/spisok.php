@@ -1162,7 +1162,8 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 
 	//добавление единицы списка, которая была выбрана ранее
 	if($sel_id && empty($spisok[$sel_id]))
-		$spisok[$sel_id] = _spisokUnitQuery($DLG, $sel_id);
+		if($sel = _spisokUnitQuery($DLG, $sel_id))
+			$spisok[$sel_id] = $sel;
 
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);
