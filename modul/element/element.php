@@ -1017,6 +1017,7 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		case 29:
 			$sel_id = _elemPrintV($el, $prm, $el['num_6']);
 			$sel_id = _elem29PageSel($el['num_1'], $sel_id);
+			$sel_id = _elem29DialogSel($prm, $sel_id);
 			return _29cnn($elem_id, '', $sel_id);
 
 		//SA: select - выбор имени колонки
@@ -1314,6 +1315,29 @@ function _elem29PageSel($dlg_cur, $sel_id) {//подмена id записи, е
 
 	return 0;
 }
+function _elem29DialogSel($prm, $sel_id) {//подстановка id записи, которая приходит на диалоговое окно
+	//id записи берётся с текущей страницы
+	if($sel_id != -2)
+		return $sel_id;
+	//должен передаваться id записи
+	if(!$get_id = $prm['unit_get_id'])
+		return 0;
+	if(!$block_id = $prm['srce']['block_id'])
+		return 0;
+	if(!$blk = _blockOne($block_id))
+		return 0;
+	//поиск id диалога: пока только получение из данных списка
+	if($blk['obj_name'] != 'spisok')
+		return 0;
+	if(!$el = _elemOne($blk['obj_id']))
+		return 0;
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return 0;
+	if(!$u = _spisokUnitQuery($DLG, $get_id))
+		return 0;
+
+	return $get_id;
+}
 
 function _elemIsConnect($el) {//определение, является ли элемент подключаемым списком
 	if(empty($el))
@@ -1428,7 +1452,9 @@ function _elemButton($el, $prm) {//кнопка [2]
 			));
 }
 function _elemButtonVal($el, $prm) {//значения аттрибута val для кнопки
-	$val = 'dialog_id:'.$el['num_4'];
+	$val = 'dialog_id:'.$el['num_4'].
+			//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
+		  ',block_id:'.$el['block_id'];
 
 	//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
 	//а также вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
@@ -1440,9 +1466,6 @@ function _elemButtonVal($el, $prm) {//значения аттрибута val д
 
 	if($dialog_id = $el['num_4'])
 		$val .= _dialogOpenVal($dialog_id, $prm, $el['num_3']);
-	else
-		//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
-		$val .= ',block_id:'.$el['block_id'];
 
 	return $val;
 }

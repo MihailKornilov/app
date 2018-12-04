@@ -1007,6 +1007,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			$v = _elemPrintV($el, $prm, $el['num_6']);
 			$v = _elem29PageSel($el['num_1'], $v);
+			$v = _elem29DialogSel($prm, $v);
 
 			return _select(array(
 						'attr_id' => _elemAttrId($el, $prm),
