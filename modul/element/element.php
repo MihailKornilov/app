@@ -660,7 +660,7 @@ function PHP12_app_export() {//экспорт / импорт текущего п
 
 	//количество функций
 	$sql = "SELECT COUNT(*)
-			FROM `_element_func`
+			FROM `_action`
 			WHERE `element_id` IN (".$elmIds.")";
 	$elmFunc = query_value($sql);
 
@@ -3130,14 +3130,14 @@ function PHP12_balans_setup_vvv($prm) {
 /* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ===--- */
 function PHP12_elem_action_list($prm) {
 	if(!$bs_id = _num($prm['srce']['block_id']))
-		return _emptyMin10('Отсутствует ID исходного блока.');
+		return _emptyMin('Отсутствует ID исходного блока.');
 	if(!$BL = _blockOne($bs_id))
-		return _emptyMin10('Исходного блока id'.$bs_id.' не существует.');
+		return _emptyMin('Исходного блока id'.$bs_id.' не существует.');
 	if($BL['obj_name'] != 'page' && $BL['obj_name'] != 'dialog')
-		return _emptyMin10('Действия можно назначать<br>только компонентам на страницах и диалоговых окнах.');
+		return _emptyMin('Действия можно назначать<br>только компонентам на страницах и диалоговых окнах.');
 
 	$sql = "SELECT *
-			FROM `_element_func`
+			FROM `_action`
 			WHERE `element_id`=".$BL['elem_id']."
 			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))
@@ -3146,7 +3146,7 @@ function PHP12_elem_action_list($prm) {
 	//Названия действий
 	$sql = "SELECT `id`,`txt_1`
 			FROM `_element`
-			WHERE `id` IN ("._idsGet($arr, 'action_id').")";
+			WHERE `id` IN ("._idsGet($arr, 'type_id').")";
 	$act = query_ass($sql);
 
 	//Названия условий
@@ -3189,7 +3189,7 @@ function PHP12_elem_action_list($prm) {
 						'<table class="bs3">'.
 							'<tr><td class="fs12 grey top">Действие:'.
 								'<td class="fs12">'.
-									'<b class="fs12">'.$act[$r['action_id']].'</b>, если '.
+									'<b class="fs12">'.$act[$r['type_id']].'</b>, если '.
 		   (!$r['value_specific'] ? '<b class="fs12">'.$cond[$r['cond_id']].'</b>' : '').
 			($r['value_specific'] ? 'выбрано: <b>'.$vs[$r['value_specific']].'</b>' : '').
 			($r['action_reverse'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').

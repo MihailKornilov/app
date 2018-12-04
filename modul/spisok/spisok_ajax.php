@@ -44,7 +44,7 @@ switch(@$_POST['op']) {
 				query($sql);
 
 				//удаление функций
-				$sql = "DELETE FROM `_element_func` WHERE `element_id`=".$unit_id;
+				$sql = "DELETE FROM `_action` WHERE `element_id`=".$unit_id;
 				query($sql);
 
 				//удаление подсказок
@@ -81,7 +81,7 @@ switch(@$_POST['op']) {
 				_jsCache();
 			}
 
-			if($dialog['table_name_1'] == '_element_func')
+			if($dialog['table_name_1'] == '_action')
 				if(_elemOne($unit['element_id'])) {
 					_BE('elem_clear');
 					_jsCache();
@@ -400,7 +400,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 		_jsCache();
 	}
 
-	if(_table($dialog['table_1']) == '_element_func')
+	if(_table($dialog['table_1']) == '_action')
 		if(_elemOne($unit['element_id'])) {
 			_BE('elem_clear');
 			_jsCache();
@@ -700,10 +700,10 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 		query($sql);
 	}
 
-	//пока только для `_element_func`
-	//также есть `_element_func` и `_element_hint`
+	//пока только для `_action`
+	//также есть `_element_format` и `_element_hint`
 	if($tab = _queryTN($DLG, 'element_id', 1))
-		if($tab == '_element_func')
+		if($tab == '_action')
 			if($block_id)
 				if($BL = _blockOne($block_id))
 					if($elem_id = $BL['elem_id']) {

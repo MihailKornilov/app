@@ -467,24 +467,26 @@ function PHP12_BUG_elm_unit_del_setup() {//элементы, используе�
 function PHP12_BUG_elm_func_lost() {//Функции, привязанные к элементам
 	$getv = 'elem-func-lost';//переменная для GET
 
-	$sql = "SELECT COUNT(*) FROM `_element_func`";
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `element_id`";
 	$funcCount = query_value($sql);
 
 	$sql = "SELECT `id`
 			FROM (
 				SELECT
-					f.`id`,
-					IFNULL(el.id,0) `elid`
-				FROM _element_func f
-					LEFT JOIN _element el
-					ON el.id=f.element_id
-				ORDER BY el.id
+					`f`.`id`,
+					IFNULL(`el`.`id`,0) `elid`
+				FROM `_action` `f`
+					LEFT JOIN `_element` `el`
+					ON `el`.`id`=`f`.`element_id`
+				ORDER BY `el`.`id`
 			) t
 			WHERE !`elid`";
 	if($funcLost = query_ids($sql)) {
 		if(SA && @$_GET[$getv]) {
 			$sql = "DELETE
-					FROM `_element_func`
+					FROM `_action`
 					WHERE `id` IN (".$funcLost.")";
 			query($sql);
 			_debug_cache_clear();

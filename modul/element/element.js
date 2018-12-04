@@ -1893,7 +1893,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
 
 					//ДЕЙСТВИЕ
-					switch(sp.action_id) {
+					switch(sp.type_id) {
 						//скрыть
 						case 709:
 						case 726:
@@ -1989,7 +1989,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 					var is_set = 0;//по умолчанию: сбросить значение
 
 					//ДЕЙСТВИЕ
-					switch(sp.action_id) {
+					switch(sp.type_id) {
 						//сбросить значение
 						case 1718:
 						default: break;
@@ -3184,7 +3184,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 
 	/* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ===--- */
 	PHP12_elem_action_list = function(el) {
-		_attr_el(el.id).find('DL')._sort({table:'_element_func'});
+		_attr_el(el.id).find('DL')._sort({table:'_action'});
 	},
 
 	/* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */

@@ -532,7 +532,7 @@ switch(@$_POST['op']) {
 			query($sql);
 
 			//удаление функций у элементов
-			$sql = "DELETE FROM `_element_func`
+			$sql = "DELETE FROM `_action`
 					WHERE `element_id` IN (".$elmIds.")";
 			query($sql);
 

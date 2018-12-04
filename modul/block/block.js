@@ -101,7 +101,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 					}
 				});
 				$('#block-hidden')._check({
-					title:'<div class="fs12">hidden</div>',
+					title:'<div class="fs12">Скрыт</div>',
 					func:function(v) {
 						BL.hidden = v;
 						BL.save = 1;

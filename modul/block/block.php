@@ -1759,8 +1759,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		//Назначение действия для Галочки [1]: скрытие/показ блоков
 		case 36:
 			/*
-				таблица _element_func
-					action_id - действие для блоков
+				таблица `_action`
+					type_id - действие для блоков
 						726 - скрыть
 						727 - показать
 					cond_id - условие действия
@@ -1780,8 +1780,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		//Назначение действия для Выпадающего поля [17]: скрытие/показ блоков
 		case 40:
 			/*
-				таблица _element_func
-					action_id - действие для блоков
+				таблица `_action`
+					type_id - действие для блоков
 						709 - скрыть
 						710 - показать
 					cond_id - условие действия
@@ -2407,7 +2407,8 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 
 		//наличие функций в элементах
 		$sql = "SELECT `element_id`,1
-				FROM `_element_func`
+				FROM `_action`
+				WHERE `element_id`
 				GROUP BY `element_id`";
 		$isFunc = query_ass($sql);
 
@@ -2489,13 +2490,13 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 		}
 
 		$sql = "SELECT *
-				FROM `_element_func`
+				FROM `_action`
 				WHERE `element_id` IN ("._idsGet($ELM).")
 				ORDER BY `sort`";
 		foreach(query_arr($sql) as $r) {
 			$ELM[$r['element_id']]['func'][] = array(
 				'dialog_id' => _num($r['dialog_id']),
-				'action_id' => _num($r['action_id']),
+				'type_id' => _num($r['type_id']),
 				'cond_id' => _num($r['cond_id']),
 				'action_reverse' => _num($r['action_reverse']),
 				'value_specific' => _num($r['value_specific']),
