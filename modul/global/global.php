@@ -731,6 +731,9 @@ function _jsCacheBlkOne($block_id) {
 	$val['xx'] = $r['xx'];
 	$val['xx_ids'] = $r['xx_ids'];
 
+	if(!empty($r['action']))
+		$val['action'] = $r['action'];
+
 	return $val;
 }
 function _jsCacheElemOne($elem_id) {

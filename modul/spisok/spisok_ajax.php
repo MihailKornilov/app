@@ -400,11 +400,13 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 		_jsCache();
 	}
 
-	if(_table($dialog['table_1']) == '_action')
-		if(_elemOne($unit['element_id'])) {
+	if($dialog['table_name_1'] == '_action') {
+		if($unit['block_id'])
+			_BE('block_clear');
+		if($unit['element_id'])
 			_BE('elem_clear');
-			_jsCache();
-		}
+		_jsCache();
+	}
 
 	if(IS_ELEM) {
 		_BE('elem_clear');
@@ -622,7 +624,6 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 					$app_id = query_value($sql);
 				}
 			}
-
 			$sql = "UPDATE `".$tab."`
 					SET `app_id`=".$app_id."
 					WHERE `id`=".$uid[$tab];
@@ -704,15 +705,39 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 	//также есть `_element_format` и `_element_hint`
 	if($tab = _queryTN($DLG, 'element_id', 1))
 		if($tab == '_action')
-			if($block_id)
-				if($BL = _blockOne($block_id))
-					if($elem_id = $BL['elem_id']) {
-						$sql = "UPDATE `".$tab."`
-								SET `element_id`=".$elem_id."
-								WHERE `id`=".$uid[$table_1];
-						query($sql);
-					}
+			//только для диалогов, предназначенных для элементов
+			switch($DLG['id']) {
+				case 36:
+				case 40:
+				case 73:
+				case 201:
+				case 202:
+				case 203:
+					if($block_id)
+						if($BL = _blockOne($block_id))
+							if($elem_id = $BL['elem_id']) {
+								$sql = "UPDATE `".$tab."`
+										SET `block_id`=0,       /* удаление id блока, потому что действие для элемента */
+											`element_id`=".$elem_id."
+										WHERE `id`=".$uid[$table_1];
+								query($sql);
+							}
 
+			}
+
+	//установка `app_id` для `_action`
+	if($table_1 == '_action')
+		if($block_id) {
+			$sql = "SELECT `app_id`
+					FROM `_block`
+					WHERE `id`=".$block_id;
+			if($app_id = query_value($sql)) {
+				$sql = "UPDATE `_action`
+						SET `app_id`=".$app_id."
+						WHERE `id`=".$uid[$tab];
+				query($sql);
+			}
+		}
 
 	_historyInsert(1, $DLG, $uid[$table_1]);
 

@@ -243,6 +243,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$cls[] = _dn(!(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden']));
 			$cls[] = $r['click_action'] == 2081 && $r['click_page']   ? 'curP block-click-page pg-'.$r['click_page'] : '';
 			$cls[] = !$PARAM['blk_setup'] && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
+			$cls[] = !$PARAM['blk_setup'] && !empty($r['action']) ? 'curP' : '';
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
@@ -257,6 +258,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 						' class="'.$cls.'"'.
 						_blockStyle($r, $PARAM, $width).
 						_blockClick($r, $PARAM).
+						_blockAction($r, $PARAM).
 					 '>'.
 							_blockSetka($r, $PARAM, $grid_id, $level).
 							_blockChoose($r, $PARAM, $level).
@@ -295,6 +297,14 @@ function _blockClick($r, $prm) {//настройки клика по блоку 
 		return '';
 
 	return ' val="dialog_id:'.$r['click_dialog']._dialogOpenVal($dialog_id, $prm, $r['click_unit_id']).'"';
+}
+function _blockAction($r, $prm) {//действие при нажатии на блок
+	if($prm['blk_setup'])
+		return '';
+	if(empty($r['action']))
+		return '';
+
+	return ' onclick="_blockAction('.$r['id'].')"';
 }
 function _blockLevelChange($obj_name, $obj_id) {//кнопки изменения уровня редактирования блоков
 	$html = '';
@@ -2259,6 +2269,7 @@ function _beBlockType($type) {//получение данных о блоках 
 		$block_global = query_arr($sql);
 		$block_global += _beBlockDialogDel($type, $obj_ids);
 		$block_global = _beBlockForming($block_global);
+		$block_global = _beBlockAction($block_global);
 		$block_global = _beElemIdSet($block_global);
 
 		_cache_set($key, $block_global, 1);
@@ -2285,6 +2296,7 @@ function _beBlockType($type) {//получение данных о блоках 
 		$block_app = query_arr($sql);
 		$block_app += _beBlockDialogDel($type, $obj_ids);
 		$block_app = _beBlockForming($block_app);
+		$block_app = _beBlockAction($block_app, APP_ID);
 		$block_app = _beElemIdSet($block_app);
 
 		_cache_set($key, $block_app);
@@ -2363,6 +2375,38 @@ function _beBlockForming($arr) {//формирование массива бло
 	}
 
 	return $data;
+}
+function _beBlockAction($blk, $app_id=0) {//вставка действий для блоков
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `block_id`
+			  AND `app_id`=".$app_id."
+			ORDER BY `block_id`,`sort`";
+	if(!$action = query_arr($sql))
+		return $blk;
+
+	foreach($action as $r) {
+		$block_id = $r['block_id'];
+
+		if(!isset($blk[$block_id]))
+			continue;
+
+		unset($r['id']);
+		unset($r['app_id']);
+		unset($r['block_id']);
+		unset($r['element_id']);
+		unset($r['cond_id']);
+		unset($r['value_specific']);
+		unset($r['sort']);
+		unset($r['user_id_add']);
+		unset($r['dtime_add']);
+
+		$r['target'] = _idsAss($r['target']);
+
+		$blk[$block_id]['action'][] = _arrNum($r);
+	}
+
+	return $blk;
 }
 function _beBlockBg($r) {
 	global $G_ELEM;

@@ -2089,6 +2089,73 @@ var DIALOG = {},//массив диалоговых окон для управл
 		return arr;
 	},
 
+	_blockAction = function(id) {//выполнение действия при нажатии на блок
+		if(!BLKK[id])
+			return;
+
+		var BL = BLKK[id];
+
+		if(!BL.action)
+			return;
+
+		_forN(BL.action, function(sp) {
+			switch(sp.dialog_id) {
+				//показ/скрытие блоков
+				case 211://По умолчанию - для остальных элементов
+					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
+
+					//ДЕЙСТВИЕ
+					switch(sp.type_id) {
+						//скрыть
+						case 3166:
+						default: break;
+						//показать
+						case 3167:
+							is_show = 1;
+							break;
+					}
+
+					if(sp.action_reverse) {
+						if(sp.on)
+							is_show = is_show ? 0 : 1;
+						sp.on = sp.on ? 0 : 1;
+					}
+
+
+					//ПРОЦЕСС
+					_forN(_elemFuncBlockObj(sp.target), function(oo) {
+						if(!oo.obj.length)
+							return;
+
+						switch(sp.effect_id) {
+							//исчезновение/появление
+							case 3171:
+								oo.obj._dn(1, 'vh');
+								oo.obj.animate({opacity:is_show}, 300, function() {
+									oo.obj._dn(is_show, 'vh');
+								});
+								return;
+							//сворачивание/разворачивание
+							case 3172:
+								if(!oo.slide) {
+									oo.obj._dn(is_show, 'vh');
+									return;
+								}
+								oo.obj['slide' + (is_show ? 'Down' : 'Up')](300);
+								return;
+							default:
+								if(!oo.slide) {
+									oo.obj._dn(is_show, 'vh');
+									return;
+								}
+								oo.obj[is_show ? 'show' : 'hide']();
+						}
+					});
+					break;
+			}
+		});
+	},
+
 	/* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 	PHP12_elem_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D;

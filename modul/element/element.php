@@ -3461,7 +3461,7 @@ function _historyAct($i='all') {//действия истории - ассоци
 	return $action[$i];
 }
 function _historyInsert($type_id, $dialog, $unit_id) {//внесение истории действий
-	//история не вносится, если единица списка удаляется физически из базы
+	//история не вносится, если запись физически может удаляться из базы
 	if(!isset($dialog['field1']['deleted']))
 		return 0;
 
