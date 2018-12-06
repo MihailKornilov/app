@@ -2402,12 +2402,9 @@ function _beBlockAction($blk, $app_id=0) {//вставка действий дл
 		unset($r['block_id']);
 		unset($r['element_id']);
 		unset($r['cond_id']);
-		unset($r['value_specific']);
 		unset($r['sort']);
 		unset($r['user_id_add']);
 		unset($r['dtime_add']);
-
-		$r['target'] = _idsAss($r['target']);
 
 		$blk[$block_id]['action'][] = _arrNum($r);
 	}

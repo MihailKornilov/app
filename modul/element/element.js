@@ -1,5 +1,7 @@
 /* Все элементы визуального отображения, используемые в приложении */
-var DIALOG = {},//массив диалоговых окон для управления другими элементами
+var DIALOG = {},    //массив диалоговых окон для управления другими элементами
+	ELM_RELOAD = {},//массив элементов, ожидающих перезагрузки. В виде: [id кто перезагружает] = id кого перезагружают
+					//пезагрузка происходит при помощи фукнции _elemReload
 
 	MONTH_DEF = {
 		1:'Январь',
@@ -882,6 +884,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 								ATR_CMP.val(res.v);
 								INP.val(res.title);
 								DEL._dn(1);
+								_elemReload(el, res);
 							}
 						});
 					});
@@ -1682,6 +1685,7 @@ var DIALOG = {},//массив диалоговых окон для управл
 //							_elemFunc(el, v);
 						}
 					});
+					ELM_RELOAD[el.num_1] = el.id;
 					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102:
@@ -2035,6 +2039,9 @@ var DIALOG = {},//массив диалоговых окон для управл
 		});
 	},
 	_elemFuncBlockObj = function(blk_ass) {//получение $(obj) блоков
+		if(typeof blk_ass != 'object')
+			blk_ass = _idsAss(blk_ass);
+
 		var arr = [],
 			TRG = _copyObj(blk_ass),
 			D = $;
@@ -2087,6 +2094,19 @@ var DIALOG = {},//массив диалоговых окон для управл
 		});
 
 		return arr;
+	},
+
+	_elemReload = function(el, res) {//перезагрузка элемента
+		//выход, если нечего перезагружать
+		if(!ELM_RELOAD[el.id])
+			return;
+
+		var reload_id = ELM_RELOAD[el.id];
+
+		//пока с элементом [85]
+		_attr_cmp(reload_id)
+			._select(0)
+			._select('spisok', res.spisok);
 	},
 
 	_blockAction = function(id) {//выполнение действия при нажатии на блок
@@ -2151,6 +2171,12 @@ var DIALOG = {},//массив диалоговых окон для управл
 								oo.obj[is_show ? 'show' : 'hide']();
 						}
 					});
+					break;
+				//установка значения элементу
+				case 212:
+					var target_id = _num(sp.target);
+					//пока только для элемента [29]
+					_attr_cmp(target_id)._select(sp.value_specific);
 					break;
 			}
 		});
