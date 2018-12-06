@@ -1117,6 +1117,7 @@ function _dialogOpenPreLoad($dialog_id) {//предварительное вне
 	//удаление элементов, которые в итоге не были вставлены после использования предварительной вставки
 	$sql = "DELETE FROM `_element`
 			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=".$dialog_id."
 			  AND `user_id_add`=-".USER_ID;
 	query($sql);
 

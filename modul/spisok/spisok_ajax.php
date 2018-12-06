@@ -668,7 +668,7 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 
 	//присвоение родительского значения элементу
 	if(IS_ELEM && $parent_id) {
-		$sql = "UPDATE `element`
+		$sql = "UPDATE `_element`
 				SET `parent_id`=".$parent_id."
 				WHERE `id`=".$uid[$table_1];
 		query($sql);
