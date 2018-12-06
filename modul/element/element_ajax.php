@@ -1114,6 +1114,8 @@ function _dialogOpenLoad($dialog_id) {
 	return $send;
 }
 function _dialogOpenPreLoad($dialog_id) {//предварительное внесение элемента, который использует доп.параметры. Нужно для возможности сразу настраивать доп.параметры
+	return;
+
 	//удаление элементов, которые в итоге не были вставлены после использования предварительной вставки
 	$sql = "DELETE FROM `_element`
 			WHERE `app_id`=".APP_ID."

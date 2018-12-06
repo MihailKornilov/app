@@ -1270,6 +1270,7 @@ function _elemVvv37parent($dlg_id) {//колонки родительского 
 		if(!$col = $cmp['col'])
 			continue;
 
+/*
 		//выбирать можно только колонки элементов, которые вносят данные
 		if($cmp['dialog_id'] != 1
 		&& $cmp['dialog_id'] != 8
@@ -1280,8 +1281,9 @@ function _elemVvv37parent($dlg_id) {//колонки родительского 
 		&& $cmp['dialog_id'] != 59
 		&& $cmp['dialog_id'] != 31
 		&& $cmp['dialog_id'] != 51
+		&& $cmp['dialog_id'] != 300
 		) continue;
-
+*/
 		$send[] = array(
 			'id' => $id,
 			'title' => $dlg['name'].': '.$cmp['name'],

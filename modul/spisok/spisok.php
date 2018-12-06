@@ -762,28 +762,39 @@ function _spisokCondBind($el) {//отображения значений зап�
 	//id диалога, единицу списка которого нужно будет отображать
 	if(!$DLG_ID_CONN = $EL['num_1'])
 		return '';
-	//проверка, чтобы список был размещён именно на странице
-	if($el['block']['obj_name'] != 'page')
-		return ' AND !`t1`.`id`';
-	if(!$page_id = $el['block']['obj_id'])
-		return ' AND !`t1`.`id`';
-	//страница, на которой размещён список
-	if(!$page = _page($page_id))
-		return ' AND !`t1`.`id`';
-	//id диалога, данные единицы списка которого выводится на странице
-	if(!$dlg_id = $page['dialog_id_unit_get'])
-		return ' AND !`t1`.`id`';
+	if(!$col = $EL['col'])
+		return ' AND !`t1`.`id` /* no el.col */';
+	//проверка, чтобы список был размещён на странице или в диалоге
+	switch($el['block']['obj_name']) {
+		case 'page':
+			if(!$page_id = $el['block']['obj_id'])
+				return ' AND !`t1`.`id` /* no page_id */';
+			//страница, на которой размещён список
+			if(!$page = _page($page_id))
+				return ' AND !`t1`.`id` /* no page */';
+			//id диалога, данные единицы списка которого выводится на странице
+			if(!$dlg_id = $page['dialog_id_unit_get'])
+				return ' AND !`t1`.`id` /* no page unit_get */';
+			if(!$unit_id = _num(@$_GET['id']))
+				return ' AND !`t1`.`id` /* no page unit_id */';
+			break;
+		case 'dialog':
+			if(!$dlg_id = $el['block']['obj_id'])
+				return ' AND !`t1`.`id` /* no dialog_id */';
+			if(!$DLG = _dialogQuery($dlg_id))
+				return ' AND !`t1`.`id` /* no dialog */';
+			if(!$dlg_id = $DLG['dialog_id_unit_get'])
+				return ' AND !`t1`.`id` /* no dialog_unit_get */';
+			if(!$unit_id = _num(@$_GET['id']))
+				return ' AND !`t1`.`id` /* no dialog unit_id */';
+			break;
+		default: return ' AND !`t1`.`id` /* !is_page && !is_dialog */';
+	}
 	if(!$DLG = _dialogQuery($dlg_id))
-		return ' AND !`t1`.`id`';
-	if(!$unit_id = _num(@$_GET['id']))
-		return ' AND !`t1`.`id`';
+		return ' AND !`t1`.`id`  /* no dialog='.$dlg_id.' */';
 	//получение данных единицы списка, которое принимает страница
 	if(!$unit = _spisokUnitQuery($DLG, $unit_id))
 		return ' AND !`t1`.`id`';
-
-	if(!$col = $EL['col'])
-		return ' AND !`t1`.`id`';
-
 	//выбранный привязанный список совпадает с принимаемым страницей
 	if($DLG_ID_CONN == $dlg_id)
 		return " AND `t1`.`".$col."`=".$unit_id;
