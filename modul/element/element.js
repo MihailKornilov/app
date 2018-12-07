@@ -1789,6 +1789,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 300:
 					var VK300 = ATR_CMP.next(),
 						INP = VK300.find('input'),
+						VK_ICON = VK300.find('.icon-vk'),
 						VK_RES = INP.next(),
 						VK_SEL,                 //выбранный пользователь в виде html
 						VK_ID = ATR_CMP.val();  //id выбранного пользователя ВК
@@ -1804,7 +1805,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						var send = {
 							op:'vk_user_get',
 							val:val,
-							busy_obj:VK300.find('.icon-vk'),
+							busy_obj:VK_ICON,
 							busy_cls:'spin'
 						};
 						_post(send, function(res) {
@@ -1820,6 +1821,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						.on('click', ATTR_EL(el.id) + ' button', function() {
 							VK_RES.html(VK_SEL);
 							INP._dn();
+							VK_ICON._dn();
 							ATR_CMP.val(VK_ID);
 						})
 						//отмена выбранного пользователя
@@ -1827,6 +1829,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						.on('click', ATTR_EL(el.id) + ' .icon-del-red', function() {
 							VK_RES.html('');
 							INP.val('')._dn(1);
+							VK_ICON._dn(1);
 							ATR_CMP.val(0);
 						});
 					return;

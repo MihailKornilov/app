@@ -1759,7 +1759,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			return
 			'<input type="hidden" id="'._elemAttrId($el, $prm).'"'.$disabled.' value="'.$user_id.'" />'.
 			'<div id="'._elemAttrId($el, $prm).'_vk300" class="_vk300"'._elemStyleWidth($el).'>'.
-				'<div class="icon icon-vk curD"></div>'.
+				'<div class="icon icon-vk curD'._dn(!$user_id).'"></div>'.
 				'<input type="text" class="w100p'._dn(!$user_id).'"'.$disabled.' />'.
 				'<div class="vk-res">'.$vkRes.'</div>'.
 			'</div>';
