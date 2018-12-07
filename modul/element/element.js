@@ -569,6 +569,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(o.del_id)
 			return _dialogOpenDel(o);
 
+		o.send.dialog_id = o.dialog_id;
+
 		var dialog = _dialog({
 			dialog_id:o.dialog_id,
 			top:20,

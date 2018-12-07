@@ -300,7 +300,9 @@ function _blockClick($r, $prm) {//настройки клика по блоку 
 	if(!$dialog_id = $r['click_dialog'])
 		return '';
 
-	return ' val="dialog_id:'.$r['click_dialog']._dialogOpenVal($dialog_id, $prm, $r['click_unit_id']).'"';
+	return ' val="dialog_id:'.$r['click_dialog'].
+				',block_id:'.$r['id'].
+				_dialogOpenVal($dialog_id, $prm, $r['click_unit_id']).'"';
 }
 function _blockAction($r, $prm) {//действие при нажатии на блок
 	if($prm['blk_setup'])
