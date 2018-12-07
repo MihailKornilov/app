@@ -1096,7 +1096,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 51:
 					ATR_CMP._calendar({
 						lost:_num(el.num_1),
-						time:el.num_2
+						time:el.num_2,
+						func:function() {
+							if(el.num_3)
+								_attr_cmp(el.num_3).focus();
+						}
 					});
 					return;
 				//Заметки

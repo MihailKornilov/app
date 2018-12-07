@@ -1786,19 +1786,6 @@ $.fn._calendar = function(o) {
 		});
 	}
 
-/*
-	if(o.tomorrow) {
-		inp
-			.after('<a class="dib ml10 grey">завтра</a>')
-			.next().click(function() {
-				var tmr = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-				o.year = tmr.getFullYear();
-				o.mon = tmr.getMonth() + 1;
-				daySel(tmr.getDate());
-			});
-	}
-*/
-
 	var D = new Date(),
 		CUR_YEAR = D.getFullYear(), //текущий год
 		CUR_MON =  D.getMonth() + 1,//текущий месяц
@@ -1935,6 +1922,7 @@ $.fn._calendar = function(o) {
 		CAL_ABS._dn();
 		valUpd();
 		dayPrint();
+		o.func();
 	}
 	function monPrint() {//отображение месяцев, когда пролистывание по году
 		var html = '',

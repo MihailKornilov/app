@@ -1255,6 +1255,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			/*
 				num_1 - разрешать выбор прошедших дней
 				num_2 - показывать время
+				num_3 - После выбора даты установить фокус элементу
 			*/
 			return _calendar(array(
 				'attr_id' => _elemAttrId($el, $prm),
