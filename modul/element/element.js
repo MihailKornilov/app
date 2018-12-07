@@ -1804,8 +1804,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						var send = {
 							op:'vk_user_get',
 							val:val,
-							busy_obj:VK300,
-							busy_cls:'busy'
+							busy_obj:VK300.find('.icon-vk'),
+							busy_cls:'spin'
 						};
 						_post(send, function(res) {
 							VK_RES.html(res.html);
