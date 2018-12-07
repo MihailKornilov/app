@@ -74,6 +74,14 @@ switch(@$_POST['op']) {
 
 			//Заголовок и кнопки
 			'<div class="dialog-menu-1'._dn($dialog['menu_edit_last'] == 1).'">'.
+
+				'<div class="pad10 bg-gr2 line-b">'.
+					'<table class="bs5 w100p">'.
+						'<tr><td class="w150 r color-555">Имя диалогового окна:'.
+							'<td><input type="text" id="dialog_name" class="w100p b" maxlength="100" value="'.$dialog['name'].'" />'.
+					'</table>'.
+				'</div>'.
+
 				'<div class="pad10 bg-dfd">'.
 					'<div class="hd2 mt5">'.
 						'Внесение новой записи'.
@@ -186,8 +194,6 @@ switch(@$_POST['op']) {
 			//Служебное
 			'<div class="dialog-menu-4 bg-gr2 pad10'._dn($dialog['menu_edit_last'] == 4).'">'.
 				'<table class="bs10">'.
-					'<tr><td class="grey r w175">Имя диалогового окна:'.
-						'<td><input type="text" id="dialog_name" class="w250" maxlength="100" value="'.$dialog['name'].'" />'.
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'spisok_on',

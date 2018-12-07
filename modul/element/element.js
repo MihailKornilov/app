@@ -168,8 +168,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		DBACK.css({
 				'z-index':ZINDEX + 3,
 				height:$(document).height()
-			 })
-			 .click(dialogClose);
+			 });
+//			 .click(dialogClose);
 
 		dialog.css({
 			width:width + 'px',
