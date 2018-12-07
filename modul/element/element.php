@@ -762,9 +762,14 @@ function PHP12_dialog_sa() {//список диалоговых окон [12]
 					'<th>afics'.
 					'<th>col';
 	foreach($arr as $r) {
+		$color = '';
+		if(_table($r['table_1']) == '_element')
+			$color = 'b color-pay';
+		if(_table($r['table_1']) == '_action')
+			$color = 'red';
 		$send .= '<tr>'.
 					'<td class="w35 r grey'.($r['sa'] ? ' bg-fee' : '').'">'.$r['id'].
-					'<td class="'.(_table($r['table_1']) == '_element' ? 'b color-pay' : '').'">'._table($r['table_1']).
+					'<td class="'.$color.'">'._table($r['table_1']).
 					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
 					'<td class="center">'._elemColType($r['element_type']).
 					'<td>'.$r['element_afics'].

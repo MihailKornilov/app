@@ -1227,6 +1227,14 @@ function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значени�
 		if(_elemIsConnect($elem_id)) {
 			$send['issp'] = 1;
 			$send['spisok'] = _29cnn($elem_id);
+/*
+			array_unshift($send['spisok'], array(
+				'id' => -1,
+				'title' => 'Сбросить значение',
+				'content' => '<div class="color-ref">Сбросить значение</div>'.
+							 '<div class="grey i ml20">При нажатии на блок значение будет сброшено, либо поле очищено</div>'
+			));
+*/
 		}
 
 	jsonSuccess($send);
