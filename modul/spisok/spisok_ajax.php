@@ -1237,8 +1237,7 @@ function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значени�
 				  AND `num_1`=".$el13_id."
 				LIMIT 1";
 		if($el_id = query_value($sql))
-			if($el = _elemOne($el_id))
-				$send['spisok'] = _elem212ActionFormat($el, $send['spisok']);
+			$send['spisok'] = _elem212ActionFormat($el_id, $v, $send['spisok']);
 
 	}
 

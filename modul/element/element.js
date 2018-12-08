@@ -2185,13 +2185,28 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//установка значения элементу
 				case 212:
 					var target_id = _num(sp.target),
+						ATR_CMP = _attr_cmp(target_id),
+						EL = ELMM[target_id],
 						v = sp.value_specific;
+
+					if(!EL)
+						return;
 					if(!v)
 						return;
-					//пока только для элемента [29]
+
+					//-1 - означает сброс значения
 					if(v == -1)
 						v = 0;
-					_attr_cmp(target_id)._select(v);
+
+					switch(EL.dialog_id) {
+						case 1:
+							//активирование галочки, если требуется
+							if(ATR_CMP.next().hasClass('php'))
+								ATR_CMP._check();
+							ATR_CMP._check(v);
+							return;
+						case 29: ATR_CMP._select(v); return;
+					}
 					break;
 			}
 		});

@@ -1119,51 +1119,11 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 			//колонка, по которой будет получено ID диалога-списка
 			if(!$col = $ell['col'])
 				return $send;
-			if(!$dlg_id = _dialogSel24($ell_id, _num($u[$col])))
-				return $send;
-			if(!$dlg = _dialogQuery($dlg_id))
+			if(!$v = _num($u[$col]))
 				return $send;
 
-			//получение данных списка
-			$sql = "SELECT "._queryCol($dlg)."
-					FROM   "._queryFrom($dlg)."
-					WHERE  "._queryWhere($dlg)."
-					ORDER BY `id`
-					LIMIT 200";
-			if(!$spisok = query_arr($sql))
-				return $send;
-
-			$spisok = _spisokInclude($spisok);
-
-			//содержание выпадающего списка будет взято из настроек диалога
-			$cols = array();
-			while(true) {
-				if(!$elem_id = $dlg['spisok_elem_id'])
-					break;
-				$ell = _elemOne($elem_id);
-				$cols[] = $ell['col'];
-				if(_elemIsConnect($elem_id)) {
-					$dlg = _dialogQuery($ell['num_1']);
-					continue;
-				}
-				break;
-			}
-
-			foreach($spisok as $id => $sp) {
-				foreach($cols as $col) {
-					if(empty($sp[$col])) {
-						$sp = '- значение отсутствует -';
-						break;
-					}
-					$sp = $sp[$col];
-				}
-				$send[] = array(
-					'id' => $id,
-					'title' => $sp
-				);
-			}
-
-			$send = _elem212ActionFormat($el, $send);
+			$send = _elem85mass($ell_id, $v, $send);
+			$send = _elem212ActionFormat($elem_id, $v, $send);
 
 			return $send;
 	}
@@ -1484,10 +1444,60 @@ function _elemButtonVal($el, $prm) {//значения аттрибута val д
 	return $val;
 }
 
-function _elem212ActionFormat($el, $send) {//преобразование данных для выбора в действиях [212]
-	if(empty($send))
-		return array();
-	if(!$BL = $el['block'])
+function _elem85mass($ell_id, $v, $send) {//получение значений для элемента [85]
+	if(!$dlg_id = _dialogSel24($ell_id, $v))
+		return $send;
+	if(!$dlg = _dialogQuery($dlg_id))
+		return $send;
+
+	//получение данных списка
+	$sql = "SELECT "._queryCol($dlg)."
+			FROM   "._queryFrom($dlg)."
+			WHERE  "._queryWhere($dlg)."
+			ORDER BY `id`
+			LIMIT 200";
+	if(!$spisok = query_arr($sql))
+		return $send;
+
+	$spisok = _spisokInclude($spisok);
+
+	//содержание выпадающего списка будет взято из настроек диалога
+	$cols = array();
+	while(true) {
+		if(!$elem_id = $dlg['spisok_elem_id'])
+			break;
+		$ell = _elemOne($elem_id);
+		$cols[] = $ell['col'];
+		if(_elemIsConnect($elem_id)) {
+			$dlg = _dialogQuery($ell['num_1']);
+			continue;
+		}
+		break;
+	}
+
+	foreach($spisok as $id => $sp) {
+		foreach($cols as $col) {
+			if(empty($sp[$col])) {
+				$sp = '- значение отсутствует -';
+				break;
+			}
+			$sp = $sp[$col];
+		}
+		$send[] = array(
+			'id' => $id,
+			'title' => $sp
+		);
+	}
+
+	return $send;
+}
+function _elem212ActionFormat($el85_id, $elv_id, $send) {//преобразование данных для выбора в действиях [212]
+	//СНАЧАЛА получение информации об элементе [85]
+	if(!$el85 = _elemOne($el85_id))
+		return $send;
+	if($el85['dialog_id'] != 85)
+		return $send;
+	if(!$BL = $el85['block'])
 		return $send;
 	if($BL['obj_name'] != 'dialog')
 		return $send;
@@ -1495,19 +1505,36 @@ function _elem212ActionFormat($el, $send) {//преобразование дан
 	if($BL['obj_id'] != 212)
 		return $send;
 
-	foreach($send as $n => $r) {
-		if($r['id'] <= 0)
-			continue;
-		$send[$n]['title'] = 'Установить значение "'.$r['title'].'"';
-		$send[$n]['content'] = 'Установить значение "<b>'.$r['title'].'</b>"';
-	}
+	//ЗАТЕМ получение информации о выбранном элементе, который выбран для воздействия
+	if(!$elv = _elemOne($elv_id))
+		return $send;
 
-	array_unshift($send, array(
-		'id' => -1,
-		'title' => 'Сбросить значение',
-		'content' => '<div class="color-ref">Сбросить значение</div>'.
-					 '<div class="grey i ml20">При нажатии на блок значение будет сброшено, либо поле очищено</div>'
-	));
+	switch($elv['dialog_id']) {
+		case 1://галочка
+			array_unshift($send, array(
+				'id' => 1,
+				'title' => 'Установить галочку'
+			));
+			array_unshift($send, array(
+				'id' => -1,
+				'title' => 'Снять галочку'
+			));
+			break;
+		case 29://подключаемый список
+			foreach($send as $n => $r) {
+				if($r['id'] <= 0)
+					continue;
+				$send[$n]['title'] = 'Установить значение "'.$r['title'].'"';
+				$send[$n]['content'] = 'Установить значение "<b>'.$r['title'].'</b>"';
+			}
+			array_unshift($send, array(
+				'id' => -1,
+				'title' => 'Сбросить значение',
+				'content' => '<div class="color-ref">Сбросить значение</div>'.
+							 '<div class="grey i ml20">При нажатии на блок значение будет сброшено, либо поле очищено</div>'
+			));
+			break;
+	}
 
 	return $send;
 }
