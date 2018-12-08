@@ -2157,7 +2157,8 @@ function PHP12_v_choose($prm) {
 
 	$cond = array(
 		'elm_choose' => 1,
-		'elm_sel' => $prm['dop']['sel']
+		'elm_sel' => $prm['dop']['sel'],
+		'elm_allow' => $prm['dop']['allow']
 	);
 
 	return
@@ -2173,6 +2174,7 @@ function PHP12_v_choose_vvv($prm) {
 		'nest' => 1,    //возможность выбора из вложенного списка
 		'dlg24' => 0,   //выбранный диалог через select [24]
 		'sel' => 0,     //выбранные значения
+		'allow' => '',  //разрешённые значения
 		'first' => 1    //открытие первого диалога [11]. При этом создаются глобальные переменные в JS
 	);
 

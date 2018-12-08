@@ -440,6 +440,11 @@ function _blockElemChoose($bl, $prm) {//подсветка элементов д
 	//блок не подсвечивается, если в нём нет элемента
 	if(!$el = $bl['elem'])
 		return '';
+	//если указано какие элементы можно выбирать, проверка разрешения
+	if($allow = _idsAss($prm['elm_allow']))
+		if(!isset($allow[$el['dialog_id']]))
+			return '';
+
 
 	//отметка выбранных полей
 	$id = $el['id'];
