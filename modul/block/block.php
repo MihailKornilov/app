@@ -2551,15 +2551,15 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 				WHERE `element_id` IN ("._idsGet($ELM).")
 				ORDER BY `sort`";
 		foreach(query_arr($sql) as $r) {
-			$ELM[$r['element_id']]['func'][] = array(
-				'dialog_id' => _num($r['dialog_id']),
-				'type_id' => _num($r['type_id']),
-				'cond_id' => _num($r['cond_id']),
-				'action_reverse' => _num($r['action_reverse']),
-				'value_specific' => _num($r['value_specific']),
-				'effect_id' => _num($r['effect_id']),
-				'target' => _idsAss($r['target'])
-			);
+			$elid = $r['element_id'];
+			unset($r['id']);
+			unset($r['app_id']);
+			unset($r['block_id']);
+			unset($r['element_id']);
+			unset($r['sort']);
+			unset($r['user_id_add']);
+			unset($r['dtime_add']);
+			$ELM[$elid]['func'][] = _arrNum($r);
 		}
 
 		//выплывающая подсказка

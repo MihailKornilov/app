@@ -1109,8 +1109,11 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 								 '<div class="fs12 grey ml10 mt3 i">Будет установлено значение записи, которая приходит на открываемое диалоговое окно</div>'
 				);
 
+			$send = _elem201ActionFormat($elem_id, $prm, $send);
+
 			if(!$u = $prm['unit_edit'])
 				return $send;
+
 			//ID элемента, содержащее значение
 			if(!$ell_id = _num($el['num_1']))
 				return $send;
@@ -1532,6 +1535,44 @@ function _elem212ActionFormat($el85_id, $elv_id, $send) {//преобразов�
 				'title' => 'Сбросить значение',
 				'content' => '<div class="color-ref">Сбросить значение</div>'.
 							 '<div class="grey i ml20">При нажатии на блок значение будет сброшено, либо поле очищено</div>'
+			));
+			break;
+	}
+
+	return $send;
+}
+function _elem201ActionFormat($el85_id, $prm, $send) {//получение данных элемента для настройки действия [201]
+	$srce = $prm['srce'];
+
+	if($srce['dialog_id'] != 201)
+		return $send;
+	//получение настраиваемого элемента
+	if(!$block_id = $srce['block_id'])
+		return $send;
+	if(!$BL = _blockOne($block_id))
+		return $send;
+	if(!$EL = $BL['elem'])
+		return $send;
+
+	switch($EL['dialog_id']) {
+		case 59:
+			if($spisok = _29cnn($EL['id']))
+				foreach($spisok as $n => $r) {
+					$r['content'] = '<span class="color-pay">выбрано</span> <b>'.$r['title'].'</b>';
+					$r['title'] = 'выбрано "'.$r['title'].'"';
+					array_push($send, $r);
+				}
+			array_unshift($send, array(
+				'id' => -2,
+				'title' => 'выбрано любое значение',
+				'content' => '<div class="color-pay b">выбрано любое значение</div>'.
+							 '<div class="grey i ml20">Действие с блоками будет совершено при выборе любого значения</div>'
+			));
+			array_unshift($send, array(
+				'id' => -1,
+				'title' => 'значение сброшено',
+				'content' => '<div class="color-ref b">значение сброшено</div>'.
+							 '<div class="grey i ml20">Действие с блоками будет совершено, если значение было сброшено</div>'
 			));
 			break;
 	}
@@ -3314,8 +3355,8 @@ function PHP12_elem_action_list($prm) {
 							'<tr><td class="fs12 grey top">Действие:'.
 								'<td class="fs12">'.
 									'<b class="fs12">'.$act[$r['type_id']].'</b>, если '.
-		   (!$r['value_specific'] ? '<b class="fs12">'.$cond[$r['cond_id']].'</b>' : '').
-			($r['value_specific'] ? 'выбрано: <b>'.$vs[$r['value_specific']].'</b>' : '').
+		   (!$r['value_specific'] ? '<b class="fs12">'.@$cond[$r['cond_id']].'</b>' : '').
+			($r['value_specific'] ? 'выбрано: <b>'.@$vs[$r['value_specific']].'</b>' : '').
 			($r['action_reverse'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
 			 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Эффект:<td class="fs12 color-pay">'.$effect[$r['effect_id']] : '').
 						'</table>'.

@@ -1245,7 +1245,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								div.find('.un-html').html(res.html);
 								div._dn(1);
 								ATTR_CMP_AFICS._dn();
-								_elemFunc(el, 1);
+								_elemFunc(el, id);
 							});
 						};
 					//нажатие на кнопку для открытыя диалога
@@ -1925,7 +1925,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					switch(sp.cond_id) {
 						case 703://значение не выбрано
 						case 730://галочка снята
-						case 2786://значение НЕ установлено (не выбрано)
 							if(v && sp.action_reverse) {
 								is_show = is_show ? 0 : 1;
 								break;
@@ -1935,7 +1934,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							break;
 						case 704://значение выбрано
 						case 731://галочка установлена
-						case 2787://значение установлено (выбрано)
 							if(!v && sp.action_reverse) {
 								is_show = is_show ? 0 : 1;
 								break;
@@ -1952,7 +1950,23 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								return;
 							}
 							break;
-						default: return;
+						default:
+							if(sp.dialog_id == 201) {
+								if(!sp.value_specific)
+									return;
+
+								//значение установлено
+								if(v)
+									if(sp.value_specific != -2)//любое значение
+										if(v != sp.value_specific)//конкретное значение
+											return;
+
+								//значение сброшено
+								if(!v && sp.value_specific != -1)
+									return;
+
+							} else
+								return;
 					}
 
 					//ПРОЦЕСС
