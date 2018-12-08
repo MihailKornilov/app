@@ -2422,6 +2422,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
+	/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МОЖНО ВЫБИРАТЬ В НАСТРОЙКЕ ДИАЛОГА [13] ===--- */
+	PHP12_elem_rule7_get = function(el) {
+		var ids = [];
+		_forEq(_attr_el(el.id).find('input'), function(sp) {
+			var id = _num(sp.attr('id').split('rule7-el')[1]),
+				v = _num(sp.val());
+			if(!id)
+				return;
+			if(!v)
+				return;
+			ids.push(id);
+		});
+		_attr_cmp(el.id).val(ids.join());
+	},
+
 	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 	PHP12_v_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,

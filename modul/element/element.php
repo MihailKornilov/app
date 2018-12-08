@@ -1913,6 +1913,8 @@ function PHP12_elem_rule7($prm) {
 	foreach($elem as $id => $r)
 		$group[$r['element_group_id']]['elem'][] = $r;
 
+	$ass = _idsAss(_elemPrintV($prm['el12'], $prm));
+
 	$send = '';
 	foreach($group as $r) {
 		$send .= '<div class="fs15 mt15 mb5 color-555">'.$r['name'].':</div>';
@@ -1922,7 +1924,7 @@ function PHP12_elem_rule7($prm) {
 				_check(array(
 					'attr_id' => 'rule7-el'.$el['id'],
 					'title' => $el['name'],
-					'value' => 0
+					'value' => _num(@$ass[$el['id']]) ? 1 : 0
 				)).
 			'</div>';
 		}
