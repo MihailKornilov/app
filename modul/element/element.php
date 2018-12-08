@@ -1880,6 +1880,59 @@ function PHP12_elem_all_rule_setup_save($dlg) {
 	jsonSuccess();
 }
 
+
+
+/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МОЖНО ВЫБИРАТЬ В НАСТРОЙКЕ ДИАЛОГА [13] ===--- */
+function PHP12_elem_rule7($prm) {
+	//элементы, используемые в правиле 7
+	$sql = "SELECT `dialog_id`
+			FROM `_element_rule_use`
+			WHERE `rule_id`=7";
+	if(!$ids = query_ids($sql))
+		return _emptyMin('Нет элементов для выбора');
+
+	//получение разрешённых элементов
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `id` IN (".$ids.")
+			ORDER BY `sort`,`id`";
+	if(!$elem = query_arr($sql))
+		return _empty('Нет элементов для отображения.');
+
+	$sql = "SELECT *
+			FROM `_element_group`
+			WHERE `id` IN ("._idsGet($elem, 'element_group_id').")
+			ORDER BY `sort`";
+	if(!$group = query_arr($sql))
+		return _emptyMin('Отсутствуют группы элементов.');
+
+	foreach($group as $id => $r)
+		$group[$id]['elem'] = array();
+
+	//расстановка элементов в группы
+	foreach($elem as $id => $r)
+		$group[$r['element_group_id']]['elem'][] = $r;
+
+	$send = '';
+	foreach($group as $r) {
+		$send .= '<div class="fs15 mt15 mb5 color-555">'.$r['name'].':</div>';
+		foreach($r['elem'] as $el) {
+			$send .=
+			'<div class="ml15 mt3">'.
+				_check(array(
+					'attr_id' => 'rule7-el'.$el['id'],
+					'title' => $el['name'],
+					'value' => 0
+				)).
+			'</div>';
+		}
+	}
+
+	return $send;
+}
+
+
+
 /* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 function PHP12_elem_choose($prm) {//выбор элемента для вставки в блок. Диалог [50]
 	$head = '';
@@ -2239,7 +2292,6 @@ function PHP12_v_choose_27balans($BL, $dialog_id) {//ячейка таблицы
 
 	return _num($BL['obj_id']);
 }
-
 
 
 
@@ -3301,7 +3353,7 @@ function PHP12_block_action_list($prm) {
 						'<table class="bs3">'.
 							'<tr><td class="fs12 grey top">Действие:'.
 								'<td class="fs12">'.
-									'<b class="fs12">'.$act[$r['type_id']].'</b>'.
+									'<b class="fs12">'.@$act[$r['type_id']].'</b>'.
 			($r['action_reverse'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
 			 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Эффект:<td class="fs12 color-pay">'.$effect[$r['effect_id']] : '').
 						'</table>'.
