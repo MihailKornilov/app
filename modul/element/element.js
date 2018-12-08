@@ -2183,9 +2183,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					break;
 				//установка значения элементу
 				case 212:
-					var target_id = _num(sp.target);
+					var target_id = _num(sp.target),
+						v = sp.value_specific;
+					if(!v)
+						return;
 					//пока только для элемента [29]
-					_attr_cmp(target_id)._select(sp.value_specific);
+					if(v == -1)
+						v = 0;
+					_attr_cmp(target_id)._select(v);
 					break;
 			}
 		});

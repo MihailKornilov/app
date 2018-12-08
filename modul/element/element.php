@@ -1101,7 +1101,7 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 								 '<div class="fs12 grey ml10 mt3 i">Будет установлено значение записи, которую принимает текущая страница</div>'
 				);
 
-			if($el['num_2'])
+			if($el['num_3'])
 				$send[] = array(
 					'id' => -2,
 					'title' => 'Совпадает с данными, приходящими на диалог',
@@ -1111,15 +1111,15 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 
 			if(!$u = $prm['unit_edit'])
 				return $send;
-			//ID элемента, который размещает селект со списком
-			if(!$elem_id = _num($el['num_1']))
+			//ID элемента, содержащее значение
+			if(!$ell_id = _num($el['num_1']))
 				return $send;
-			if(!$el = _elemOne($elem_id))
+			if(!$ell = _elemOne($ell_id))
 				return $send;
 			//колонка, по которой будет получено ID диалога-списка
-			if(!$col = $el['col'])
+			if(!$col = $ell['col'])
 				return $send;
-			if(!$dlg_id = _num($u[$col]))
+			if(!$dlg_id = _dialogSel24($ell_id, _num($u[$col])))
 				return $send;
 			if(!$dlg = _dialogQuery($dlg_id))
 				return $send;
@@ -1162,6 +1162,8 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 					'title' => $sp
 				);
 			}
+
+			$send = _elem212ActionFormat($el, $send);
 
 			return $send;
 	}
@@ -1482,6 +1484,33 @@ function _elemButtonVal($el, $prm) {//значения аттрибута val д
 	return $val;
 }
 
+function _elem212ActionFormat($el, $send) {//преобразование данных для выбора в действиях [212]
+	if(empty($send))
+		return array();
+	if(!$BL = $el['block'])
+		return $send;
+	if($BL['obj_name'] != 'dialog')
+		return $send;
+	//элемент [85] должен располагаться в диалоге [212]
+	if($BL['obj_id'] != 212)
+		return $send;
+
+	foreach($send as $n => $r) {
+		if($r['id'] <= 0)
+			continue;
+		$send[$n]['title'] = 'Установить значение "'.$r['title'].'"';
+		$send[$n]['content'] = 'Установить значение "<b>'.$r['title'].'</b>"';
+	}
+
+	array_unshift($send, array(
+		'id' => -1,
+		'title' => 'Сбросить значение',
+		'content' => '<div class="color-ref">Сбросить значение</div>'.
+					 '<div class="grey i ml20">При нажатии на блок значение будет сброшено, либо поле очищено</div>'
+	));
+
+	return $send;
+}
 
 function _elemCol($el) {//получение имени колонки
 	if(!is_array($el))
