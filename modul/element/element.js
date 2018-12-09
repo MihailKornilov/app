@@ -769,16 +769,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			el.id = elm_id;
 
 			var ATR_CMP = _attr_cmp(elm_id),
-				ATTR_CMP_AFICS = _attr_cmp(elm_id, 1),
-				ATR_EL =  _attr_el(elm_id),
-				UNIT_V = unit.id ? unit[el.col] || el.def : 0;//значение для функции
+				ATR_CMP_AFICS = _attr_cmp(elm_id, 1),
+				ATR_EL =  _attr_el(elm_id);
 
 			_elemHint(el);
 
 			switch(el.dialog_id) {
 				case 1://галочка
 					if(el.func) {
-						_elemAction(el, UNIT_V, 1);
+						_elemAction(el, _num(ATR_CMP.val()), 1);
 						ATR_CMP._check({
 							func:function(v) {
 								_elemAction(el, v);
@@ -790,7 +789,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 5:	ATR_CMP._autosize(); return;
 				//select - выбор страницы
 				case 6:
-					_elemAction(el, UNIT_V, 1);
+					_elemAction(el, _num(ATR_CMP.val()), 1);
 					var spisok = _copySel(PAGE_LIST);
 
 					//если выбирается страница для ссылки, то добавляется вариант: 3 => Автоматически
@@ -900,7 +899,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//select - произвольные значения
 				case 17:
-					_elemAction(el, UNIT_V, 1);
+					_elemAction(el, _num(ATR_CMP.val()), 1);
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
@@ -912,7 +911,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//dropdown
 				case 18:
-					_elemAction(el, UNIT_V, 1);
+					_elemAction(el, _num(ATR_CMP.val()), 1);
 					ATR_CMP._dropdown({
 						title0:el.txt_1,
 						spisok:vvv,
@@ -964,7 +963,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//select - выбор списка (все списки приложения)
 				case 24:
-					_elemAction(el, UNIT_V, 1);
+					_elemAction(el, _num(ATR_CMP.val()), 1);
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
@@ -976,7 +975,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
-					_elemAction(el, UNIT_V, 1);
+					_elemAction(el, _num(ATR_CMP.val()), 1);
 					var o = {
 						width:el.width,
 						title0:el.txt_1,
@@ -1233,27 +1232,27 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					//выполнение действия
 					_elemAction(el, _num(ATR_CMP.val()), 1);
 
-					var div = ATTR_CMP_AFICS.next(),
+					var div = ATR_CMP_AFICS.next(),
 						unitSel = function(id) {//действие после выбора значения
 							var send = {
 								op:'spisok_59_unit',
 								cmp_id:elm_id,
 								unit_id:id,
-								busy_obj:ATTR_CMP_AFICS
+								busy_obj:ATR_CMP_AFICS
 							};
 							_post(send, function(res) {
 								div.find('.un-html').html(res.html);
 								div._dn(1);
-								ATTR_CMP_AFICS._dn();
+								ATR_CMP_AFICS._dn();
 								_elemAction(el, id);
 							});
 						};
 					//нажатие на кнопку для открытыя диалога
-					ATTR_CMP_AFICS.click(function() {
+					ATR_CMP_AFICS.click(function() {
 						_dialogLoad({
 							block_id:el.block_id,
 							dialog_id:el.num_4,
-							busy_obj:ATTR_CMP_AFICS,
+							busy_obj:ATR_CMP_AFICS,
 							func_open:function(res, dlg) {
 								//выбор значения списка
 								dlg.content.click(function(e) {
@@ -1274,7 +1273,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 					//отмена выбора
 					div.find('.icon').click(function() {
-						ATTR_CMP_AFICS._dn(1);
+						ATR_CMP_AFICS._dn(1);
 						div._dn();
 						ATR_CMP.val(0);
 						_elemAction(el, 0);
@@ -1743,7 +1742,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						sp.prev()._check({func:sevSet});
 					});
 
-					ATTR_CMP_AFICS.click(function(e) {
+					ATR_CMP_AFICS.click(function(e) {
 						var tar = $(e.target);
 
 						//очистка фильтра
@@ -1751,7 +1750,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							HLD._dn(1);
 							TDUN.html(ICON_EMPTY);
 							DEL._vh();
-							ATTR_CMP_AFICS.removeClass('rs');
+							ATR_CMP_AFICS.removeClass('rs');
 							chkUpd();
 							FILTER[el.num_1][elm_id] = 0;
 							_spisokUpdate(el.num_1);
@@ -1766,7 +1765,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								HLD._dn();
 								TDUN.html(un(id, 1));
 								DEL._vh(1);
-								ATTR_CMP_AFICS.removeClass('rs');
+								ATR_CMP_AFICS.removeClass('rs');
 								chkUpd(id);
 								FILTER[el.num_1][elm_id] = id;
 								_spisokUpdate(el.num_1);
@@ -1774,7 +1773,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							return;
 						}
 
-						ATTR_CMP_AFICS._dn(ATTR_CMP_AFICS.hasClass('rs'), 'rs');
+						ATR_CMP_AFICS._dn(ATR_CMP_AFICS.hasClass('rs'), 'rs');
 					});
 
 					$(document)
@@ -1955,6 +1954,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(!sp.value_specific)
 						return;
 
+_cons('is_show = ' + is_show +
+	  '<br>' +
+	  'value_specific = ' + sp.value_specific +
+	  '<br>' +
+	  'v = ' + v
+);
+
+
 					//значение установлено
 					if(v) {
 						//любое значение
@@ -1975,6 +1982,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								return;
 						}
 					}
+
+
+
+_cons('new is_show = ' + is_show);
+
 
 					//ПРОЦЕСС
 					_forN(_elemFuncBlockObj(sp.target), function(oo) {

@@ -1523,6 +1523,7 @@ function _elem201ActionFormat($el85_id, $prm, $send) {//получение да�
 							 '<div class="grey i ml20">Действие с блоками будет совершено, если галочка не будет установлена</div>'
 			));
 			break;
+		case 29:
 		case 59:
 			if($spisok = _29cnn($EL['id']))
 				foreach($spisok as $n => $r) {
