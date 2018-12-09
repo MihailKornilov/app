@@ -1950,20 +1950,24 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								return;
 							}
 							break;
-						default:
 							if(sp.dialog_id == 201) {
 								if(!sp.value_specific)
 									return;
 
 								//значение установлено
-								if(v)
-									if(sp.value_specific != -2)//любое значение
-										if(v != sp.value_specific)//конкретное значение
-											return;
+								if(v) {
+									//любое значение
+									if(!sp.action_reverse && sp.value_specific != -2)// && v != sp.value_specific)
+										return;
+									is_show = is_show ? 0 : 1;
+								}
 
 								//значение сброшено
-								if(!v && sp.value_specific != -1)
-									return;
+								if(!v) {
+									if(!sp.action_reverse && sp.value_specific != -1)
+										return;
+									is_show = is_show ? 0 : 1;
+								}
 
 							} else
 								return;

@@ -731,12 +731,12 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 			$sql = "SELECT `app_id`
 					FROM `_block`
 					WHERE `id`=".$block_id;
-			if($app_id = query_value($sql)) {
-				$sql = "UPDATE `_action`
-						SET `app_id`=".$app_id."
-						WHERE `id`=".$uid[$tab];
-				query($sql);
-			}
+			$app_id = query_value($sql);
+
+			$sql = "UPDATE `_action`
+					SET `app_id`=".$app_id."
+					WHERE `id`=".$uid[$tab];
+			query($sql);
 		}
 
 	_historyInsert(1, $DLG, $uid[$table_1]);

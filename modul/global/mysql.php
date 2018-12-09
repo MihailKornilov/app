@@ -240,7 +240,6 @@ function _queryWhere($DLG) {//составление условий для за�
 	if(defined($key))
 		return constant($key);
 
-
 	$send = array();
 
 	//если присутствует родительский диалог и разные таблицы, происходит связка через `cnn_id`
@@ -256,8 +255,12 @@ function _queryWhere($DLG) {//составление условий для за�
 	if($tn = _queryTN($DLG, 'deleted'))
 		$send[] = "!`".$tn."`.`deleted`";
 	if($tn = _queryTN($DLG, 'app_id'))
-		if($DLG['table_name_1'] != '_element')
-			$send[] = "`".$tn."`.`app_id`=".APP_ID;
+		switch($DLG['table_name_1']) {
+			case '_element': break;
+			case '_action':  break;
+			default: $send[] = "`".$tn."`.`app_id`=".APP_ID;
+		}
+
 
 	$send[] = _queryWhereDialogId($DLG);
 
