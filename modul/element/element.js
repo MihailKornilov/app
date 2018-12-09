@@ -778,10 +778,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			switch(el.dialog_id) {
 				case 1://галочка
 					if(el.func) {
-						_elemFunc(el, UNIT_V, 1);
+						_elemAction(el, UNIT_V, 1);
 						ATR_CMP._check({
 							func:function(v) {
-								_elemFunc(el, v);
+								_elemAction(el, v);
 							}
 						});
 					}
@@ -790,7 +790,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 5:	ATR_CMP._autosize(); return;
 				//select - выбор страницы
 				case 6:
-					_elemFunc(el, UNIT_V, 1);
+					_elemAction(el, UNIT_V, 1);
 					var spisok = _copySel(PAGE_LIST);
 
 					//если выбирается страница для ссылки, то добавляется вариант: 3 => Автоматически
@@ -806,7 +806,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						title0:el.txt_1,
 						spisok:spisok,
 						func:function(v) {
-							_elemFunc(el, v);
+							_elemAction(el, v);
 						}
 					});
 					return;
@@ -900,24 +900,24 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//select - произвольные значения
 				case 17:
-					_elemFunc(el, UNIT_V, 1);
+					_elemAction(el, UNIT_V, 1);
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
 						spisok:vvv,
 						func:function(v) {
-							_elemFunc(el, v);
+							_elemAction(el, v);
 						}
 					});
 					return;
 				//dropdown
 				case 18:
-					_elemFunc(el, UNIT_V, 1);
+					_elemAction(el, UNIT_V, 1);
 					ATR_CMP._dropdown({
 						title0:el.txt_1,
 						spisok:vvv,
 						func:function(v) {
-							_elemFunc(el, v);
+							_elemAction(el, v);
 						}
 					});
 					return;
@@ -964,19 +964,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//select - выбор списка (все списки приложения)
 				case 24:
-					_elemFunc(el, UNIT_V, 1);
+					_elemAction(el, UNIT_V, 1);
 					ATR_CMP._select({
 						width:el.width,
 						title0:el.txt_1,
 						spisok:vvv,
 						func:function(v) {
-							_elemFunc(el, v);
+							_elemAction(el, v);
 						}
 					});
 					return;
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
-					_elemFunc(el, UNIT_V, 1);
+					_elemAction(el, UNIT_V, 1);
 					var o = {
 						width:el.width,
 						title0:el.txt_1,
@@ -985,7 +985,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						spisok:vvv,
 						blocked:el.num_4,
 						func:function(v) {
-							_elemFunc(el, v);
+							_elemAction(el, v);
 						},
 						funcWrite:function(v, t) {
 							var send = {
@@ -1231,7 +1231,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//Связка списка при помощи кнопки
 				case 59:
 					//выполнение действия
-					_elemFunc(el, _num(ATR_CMP.val()), 1);
+					_elemAction(el, _num(ATR_CMP.val()), 1);
 
 					var div = ATTR_CMP_AFICS.next(),
 						unitSel = function(id) {//действие после выбора значения
@@ -1245,7 +1245,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								div.find('.un-html').html(res.html);
 								div._dn(1);
 								ATTR_CMP_AFICS._dn();
-								_elemFunc(el, id);
+								_elemAction(el, id);
 							});
 						};
 					//нажатие на кнопку для открытыя диалога
@@ -1277,7 +1277,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						ATTR_CMP_AFICS._dn(1);
 						div._dn();
 						ATR_CMP.val(0);
-						_elemFunc(el, 0);
+						_elemAction(el, 0);
 					});
 					return;
 				//Загрузка изображений
@@ -1521,7 +1521,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 62:
 					ATR_CMP._check({
 						func:function(v) {
-							_elemFunc(el, v);
+							_elemAction(el, v);
 							FILTER[el.num_2][elm_id] = v;
 							_spisokUpdate(el.num_2);
 						}
@@ -1689,7 +1689,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						spisok:vvv,
 						msg_empty:el.num_1 ? 'Список пуст' : 'Не указан список',
 						func:function(v) {
-//							_elemFunc(el, v);
+//							_elemAction(el, v);
 						}
 					});
 					ELM_RELOAD[el.num_1] = el.id;
@@ -1890,9 +1890,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			$(this)._hint(o);
 		});
 	},
-	_elemFunc = function(el, v, is_open) {//применение функций, привязанных к элементам
+	_elemAction = function(el, v, is_open) {//применение функций, привязанных к элементам
 		/*
-			is_open - окно открылось, эффектов нет, только применение функций
+			is_open - окно открылось - применение функций без эффектов
 		*/
 
 		if(!el.func)
@@ -1901,8 +1901,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		_forN(el.func, function(sp) {
 			switch(sp.dialog_id) {
 				//показ/скрытие блоков
-				case 36: //Галочка[1]:
-				case 40: //Выпадающее поле[17]:
+//				case 36: //Галочка[1]:
+//				case 40: //Выпадающее поле[17]:
 				case 201://По умолчанию - для остальных элементов
 					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
 
@@ -1921,7 +1921,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							break;
 					}
 
-					//УСЛОВИЕ
+/*					//УСЛОВИЕ
 					switch(sp.cond_id) {
 						case 703://значение не выбрано
 						case 730://галочка снята
@@ -1950,27 +1950,30 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								return;
 							}
 							break;
-							if(sp.dialog_id == 201) {
-								if(!sp.value_specific)
-									return;
+					}
+*/
+					if(!sp.value_specific)
+						return;
 
-								//значение установлено
-								if(v) {
-									//любое значение
-									if(!sp.action_reverse && sp.value_specific != -2)// && v != sp.value_specific)
-										return;
-									is_show = is_show ? 0 : 1;
-								}
-
-								//значение сброшено
-								if(!v) {
-									if(!sp.action_reverse && sp.value_specific != -1)
-										return;
-									is_show = is_show ? 0 : 1;
-								}
-
-							} else
+					//значение установлено
+					if(v) {
+						//любое значение
+						if(sp.value_specific != -2 && sp.value_specific != v) {
+							if(sp.action_reverse)
+								is_show = is_show ? 0 : 1;
+							else
 								return;
+						}
+					}
+
+					//значение НЕ установлено
+					if(!v) {
+						if(sp.value_specific != -1) {
+							if(sp.action_reverse)
+								is_show = is_show ? 0 : 1;
+							else
+								return;
+						}
 					}
 
 					//ПРОЦЕСС

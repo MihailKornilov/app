@@ -1494,6 +1494,59 @@ function _elem85mass($ell_id, $v, $send) {//получение значений 
 
 	return $send;
 }
+function _elem201ActionFormat($el85_id, $prm, $send) {//получение данных элемента для настройки действия [201]
+	$srce = $prm['srce'];
+
+	if($srce['dialog_id'] != 201)
+		return $send;
+	//получение настраиваемого элемента
+	if(!$block_id = $srce['block_id'])
+		return $send;
+	if(!$BL = _blockOne($block_id))
+		return $send;
+	if(!$EL = $BL['elem'])
+		return $send;
+
+	switch($EL['dialog_id']) {
+		//галочка
+		case 1:
+			array_unshift($send, array(
+				'id' => -2,
+				'title' => 'галочка установлена',
+				'content' => '<div class="color-pay b">галочка установлена</div>'.
+							 '<div class="grey i ml20">Действие с блоками будет совершено при установленной галочке</div>'
+			));
+			array_unshift($send, array(
+				'id' => -1,
+				'title' => 'галочка НЕ установлена',
+				'content' => '<div class="color-ref b">галочка НЕ установлена</div>'.
+							 '<div class="grey i ml20">Действие с блоками будет совершено, если галочка не будет установлена</div>'
+			));
+			break;
+		case 59:
+			if($spisok = _29cnn($EL['id']))
+				foreach($spisok as $n => $r) {
+					$r['content'] = '<span class="color-pay">выбрано</span> <b>'.$r['title'].'</b>';
+					$r['title'] = 'выбрано "'.$r['title'].'"';
+					array_push($send, $r);
+				}
+			array_unshift($send, array(
+				'id' => -2,
+				'title' => 'выбрано любое значение',
+				'content' => '<div class="color-pay b">выбрано любое значение</div>'.
+							 '<div class="grey i ml20">Действие с блоками будет совершено при выборе любого значения</div>'
+			));
+			array_unshift($send, array(
+				'id' => -1,
+				'title' => 'значение сброшено',
+				'content' => '<div class="color-ref b">значение сброшено</div>'.
+							 '<div class="grey i ml20">Действие с блоками будет совершено, если значение было сброшено</div>'
+			));
+			break;
+	}
+
+	return $send;
+}
 function _elem212ActionFormat($el85_id, $elv_id, $send) {//преобразование данных для выбора в действиях [212]
 	//СНАЧАЛА получение информации об элементе [85]
 	if(!$el85 = _elemOne($el85_id))
@@ -1535,44 +1588,6 @@ function _elem212ActionFormat($el85_id, $elv_id, $send) {//преобразов�
 				'title' => 'Сбросить значение',
 				'content' => '<div class="color-ref">Сбросить значение</div>'.
 							 '<div class="grey i ml20">При нажатии на блок значение будет сброшено, либо поле очищено</div>'
-			));
-			break;
-	}
-
-	return $send;
-}
-function _elem201ActionFormat($el85_id, $prm, $send) {//получение данных элемента для настройки действия [201]
-	$srce = $prm['srce'];
-
-	if($srce['dialog_id'] != 201)
-		return $send;
-	//получение настраиваемого элемента
-	if(!$block_id = $srce['block_id'])
-		return $send;
-	if(!$BL = _blockOne($block_id))
-		return $send;
-	if(!$EL = $BL['elem'])
-		return $send;
-
-	switch($EL['dialog_id']) {
-		case 59:
-			if($spisok = _29cnn($EL['id']))
-				foreach($spisok as $n => $r) {
-					$r['content'] = '<span class="color-pay">выбрано</span> <b>'.$r['title'].'</b>';
-					$r['title'] = 'выбрано "'.$r['title'].'"';
-					array_push($send, $r);
-				}
-			array_unshift($send, array(
-				'id' => -2,
-				'title' => 'выбрано любое значение',
-				'content' => '<div class="color-pay b">выбрано любое значение</div>'.
-							 '<div class="grey i ml20">Действие с блоками будет совершено при выборе любого значения</div>'
-			));
-			array_unshift($send, array(
-				'id' => -1,
-				'title' => 'значение сброшено',
-				'content' => '<div class="color-ref b">значение сброшено</div>'.
-							 '<div class="grey i ml20">Действие с блоками будет совершено, если значение было сброшено</div>'
 			));
 			break;
 	}
