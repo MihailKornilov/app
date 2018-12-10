@@ -2223,10 +2223,11 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		VALUE = _num(t.val());
 
 	o = $.extend({
-		head:'',    //если указано, то ставится в название ссылки, а список из spisok
-		nosel:0,    //не вставлять название при выборе значения
+		head:'',        //если указано, то ставится в название ссылки, а список из spisok
 		title0:'',
-		grey:0,     //показывать серым, если значение не выбрано
+		title0_grey:1,  //показывать серым, если значение не выбрано
+		title0_hide:0,  //не показывать нулевое значение в меню выбора
+		nosel:0,        //не изменять имя нулевого значения после выбора
 		disabled:0,
 		spisok:[],
 		func:function() {}
@@ -2355,7 +2356,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 	function spisokPrint() {//вывод списка
 		html = '<div class="dd-sel">' + o.head + '</div>';
 
-		if(o.title0)
+		if(o.title0 && !o.title0_hide)
 			html += '<div class="ddu title0" val="0">' + o.title0 + '</div>';
 
 		_forN(MASS, function(sp) {
@@ -2368,7 +2369,10 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		LIST.html(html);
 	}
 	function valueSet(v) {
-		HEAD.html(MASS_ASS[v])._dn(v, 'grey');
+		HEAD._dn(!(o.title0_grey && (!v || o.nosel)), 'grey');
+		if(o.nosel)
+			return;
+		HEAD.html(MASS_ASS[v]);
 		DDN.find('.dd-sel').html(MASS_ASS[v]);
 		VALUE = v;
 		t.val(v);

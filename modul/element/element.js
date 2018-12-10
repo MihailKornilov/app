@@ -915,6 +915,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					_elemAction(el, _num(ATR_CMP.val()), 1);
 					ATR_CMP._dropdown({
 						title0:el.txt_1,
+						title0_hide:el.num_1,
+						nosel:el.num_2,
 						spisok:vvv,
 						func:function(v) {
 							_elemAction(el, v);
