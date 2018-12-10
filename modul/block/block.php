@@ -1325,7 +1325,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'color' => 'grey',
 				'width' => $el['width'],
 				'small' => 1,
-				'class' => _dn(!$v)
+				'class' => _dn(!$v)._dn(!$prm['blk_setup'], 'curD')
 			)).
 			'<div class="prel'._dn($v).'">'.
 				'<div style="position:absolute;top:2px;right:3px;z-index:100" class="icon icon-del-red pl'._tooltip('Отменить выбор', -52).'</div>'.

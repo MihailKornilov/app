@@ -896,6 +896,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						ATR_CMP.val(0);
 						INP.val('');
 						DEL._dn();
+						_elemReload(el);
 					});
 					return;
 				//select - произвольные значения
@@ -2106,7 +2107,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//пока с элементом [85]
 		_attr_cmp(reload_id)
 			._select(0)
-			._select('spisok', res.spisok);
+			._select('spisok', res ? res.spisok : []);
 	},
 
 	_blockActionJS = function(bo, block_id, unit_id) {//выполнение действия при нажатии на блок
