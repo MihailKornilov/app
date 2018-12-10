@@ -391,7 +391,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_spisokUnitUpd27($unit);
 	_spisokUnitUpd54($unit);
 	_spisokUnitUpd55($unit);
-	_spisokUnitUpd72($dialog, $unit);
 
 	_spisokUnitAfter($dialog, $unit_id, $unitOld);
 
@@ -1190,16 +1189,6 @@ function _spisokUnitUpd55($unit) {//обновление сумм привяза
 		}
 */
 	}
-}
-function _spisokUnitUpd72($dialog, $unit) {//обновление кеша после применения действия для блока
-	if($dialog['id'] != 72)
-		return;
-	if(empty($unit['obj_name']))
-		return;
-	if(empty($unit['obj_id']))
-		return;
-
-	_BE('block_clear');
 }
 
 function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значения из диалога через [11]
