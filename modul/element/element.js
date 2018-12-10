@@ -2204,20 +2204,35 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var page_id = _num(sp.target);
 					if(!page_id)
 						break;
+
+					var link = '&p=' + page_id;
+
+					if(sp.value_specific)
+						link += '&id' + unit_id;
+
 					$(bo).addClass('_busy');
-					location.href = URL + '&p=' + page_id;
+					location.href = URL + link;
+
 					return false;
 				//открытие диалога
 				case 215:
 					var dlg_id = _num(sp.target);
 					if(!dlg_id)
 						break;
-					_dialogLoad({
+					var send = {
 						dialog_id:dlg_id,
 						block_id:block_id,
-						get_id:unit_id,
 						busy_obj:$(bo)
-					});
+					};
+
+					//блок передаёт id записи для отображения
+					if(sp.value_specific)
+						send.get_id = unit_id;
+					//блок передаёт id записи для редактирования
+					if(sp.effect_id)
+						send.edit_id = unit_id;
+
+					_dialogLoad(send);
 					break;
 			}
 		});
