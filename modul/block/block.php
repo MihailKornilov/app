@@ -312,7 +312,11 @@ function _blockAction($r, $prm) {//действие при нажатии на �
 	if(empty($r['action']))
 		return '';
 
-	return ' onclick="_blockAction('.$r['id'].')"';
+	$uid = 0;
+	if($prm['unit_get'])
+		$uid = $prm['unit_get']['id'];
+
+	return ' onclick="_blockActionJS($(this),'.$r['id'].','.$uid.')"';
 }
 function _blockLevelChange($obj_name, $obj_id) {//кнопки изменения уровня редактирования блоков
 	$html = '';

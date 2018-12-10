@@ -2107,11 +2107,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			._select('spisok', res.spisok);
 	},
 
-	_blockAction = function(id) {//выполнение действия при нажатии на блок
-		if(!BLKK[id])
+	_blockActionJS = function(bo, block_id, unit_id) {//выполнение действия при нажатии на блок
+		if(!BLKK[block_id])
 			return;
 
-		var BL = BLKK[id];
+		var BL = BLKK[block_id];
 
 		if(!BL.action)
 			return;
@@ -2204,10 +2204,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var page_id = _num(sp.target);
 					if(!page_id)
 						break;
+					bo.addClass('_busy');
 					location.href = URL + '&p=' + page_id;
 					return false;
 				//открытие диалога
 				case 215:
+					var dlg_id = _num(sp.target);
+					if(!dlg_id)
+						break;
+					_dialogLoad({
+						dialog_id:dlg_id,
+						block_id:block_id,
+						get_id:unit_id,
+						busy_obj:bo
+					});
 					break;
 			}
 		});
