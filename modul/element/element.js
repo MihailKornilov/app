@@ -2208,7 +2208,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var link = '&p=' + page_id;
 
 					if(sp.value_specific)
-						link += '&id' + unit_id;
+						link += '&id=' + unit_id;
 
 					$(bo).addClass('_busy');
 					location.href = URL + link;

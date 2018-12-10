@@ -502,6 +502,7 @@ function _pageShow($page_id) {
 
 
 	return
+	_pr(_elemOne(1544)).
 	_blockHtml('page', $page_id, $prm).
 	_page_div().
 	_pageShowScript($page_id, $prm);
