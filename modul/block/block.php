@@ -245,8 +245,6 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
 			$cls[] = _dn(!(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden']));
-//			$cls[] = $r['click_action'] == 2081 && $r['click_page']   ? 'curP block-click-page pg-'.$r['click_page'] : '';
-//			$cls[] = !$PARAM['blk_setup'] && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
 			$cls[] = !$PARAM['blk_setup'] && !empty($r['action']) ? 'curP' : '';
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
@@ -261,7 +259,6 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$send .= '<td'.$attr_id.
 						' class="'.$cls.'"'.
 						_blockStyle($r, $PARAM, $width).
-						_blockClick($r, $PARAM).
 						_blockAction($r, $PARAM).
 					 '>'.
 							_blockSetka($r, $PARAM, $grid_id, $level).
@@ -292,20 +289,6 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 
 	return $send;
 }
-function _blockClick($r, $prm) {//настройки клика по блоку для открытия диалога
-		return '';
-
-	if($prm['blk_setup'])
-		return ' val="'.$r['id'].'"';
-	if($r['click_action'] != 2082)
-		return '';
-	if(!$dialog_id = $r['click_dialog'])
-		return '';
-
-	return ' val="dialog_id:'.$r['click_dialog'].
-				',block_id:'.$r['id'].
-				_dialogOpenVal($dialog_id, $prm, $r['click_unit_id']).'"';
-}
 function _blockAction($r, $prm) {//действие при нажатии на блок
 	if($prm['blk_setup'])
 		return '';
@@ -316,7 +299,7 @@ function _blockAction($r, $prm) {//действие при нажатии на �
 	if($prm['unit_get'])
 		$uid = $prm['unit_get']['id'];
 
-	return ' onclick="_blockActionJS($(this),'.$r['id'].','.$uid.')"';
+	return ' onclick="_blockActionJS(this,'.$r['id'].','.$uid.')"';
 }
 function _blockLevelChange($obj_name, $obj_id) {//кнопки изменения уровня редактирования блоков
 	$html = '';

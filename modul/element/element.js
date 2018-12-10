@@ -2204,7 +2204,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var page_id = _num(sp.target);
 					if(!page_id)
 						break;
-					bo.addClass('_busy');
+					$(bo).addClass('_busy');
 					location.href = URL + '&p=' + page_id;
 					return false;
 				//открытие диалога
@@ -2216,7 +2216,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						dialog_id:dlg_id,
 						block_id:block_id,
 						get_id:unit_id,
-						busy_obj:bo
+						busy_obj:$(bo)
 					});
 					break;
 			}
