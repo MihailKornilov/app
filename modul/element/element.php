@@ -987,22 +987,7 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		//Select - произвольные значения
 		case 17:
 		//dropdown
-		case 18:
-			$send = array();
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `parent_id`=".$elem_id."
-					ORDER BY `sort`";
-			foreach(query_arr($sql) as $r) {
-				$u = array(
-					'id' => _num($r['id']),
-					'title' => $r['txt_1']
-				);
-				if($r['txt_2'])
-					$u['content'] = $r['txt_1'].'<div class="fs12 grey ml10 mt3">'.$r['txt_2'].'</div>';
-				$send[] = $u;
-			}
-			return $send;
+		case 18: return _elemVvv17($elem_id);
 
 		//Дополнительные условия к фильтру
 		case 22: return PHP12_elem22_vvv($prm);
@@ -1132,6 +1117,23 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 	}
 
 	return array();
+}
+function _elemVvv17($elem_id) {
+	$send = array();
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$elem_id."
+			ORDER BY `sort`";
+	foreach(query_arr($sql) as $r) {
+		$u = array(
+			'id' => _num($r['id']),
+			'title' => $r['txt_1']
+		);
+		if($r['txt_2'])
+			$u['content'] = $r['txt_1'].'<div class="fs12 grey ml10 mt3">'.$r['txt_2'].'</div>';
+		$send[] = $u;
+	}
+	return $send;
 }
 function _elemVvv37($prm) {//select - выбор имени колонки [37]
 	if(!$block = _blockOne($prm['srce']['block_id']))
@@ -1523,29 +1525,37 @@ function _elem201ActionFormat($el85_id, $prm, $send) {//получение да�
 							 '<div class="grey i ml20">Действие с блоками будет совершено, если галочка не будет установлена</div>'
 			));
 			break;
+		case 6: return _elem201ActionCnn($send, _jsCachePage());
+
+		case 17: return _elem201ActionCnn($send, _elemVvv17($EL['id']));
+
+		case 24: return _elem201ActionCnn($send);
+
 		case 29:
-		case 59:
-			if($spisok = _29cnn($EL['id']))
-				foreach($spisok as $n => $r) {
-					$r['content'] = '<span class="color-pay">выбрано</span> <b>'.$r['title'].'</b>';
-					$r['title'] = 'выбрано "'.$r['title'].'"';
-					array_push($send, $r);
-				}
-			array_unshift($send, array(
-				'id' => -2,
-				'title' => 'выбрано любое значение',
-				'content' => '<div class="color-pay b">выбрано любое значение</div>'.
-							 '<div class="grey i ml20">Действие с блоками будет совершено при выборе любого значения</div>'
-			));
-			array_unshift($send, array(
-				'id' => -1,
-				'title' => 'значение сброшено',
-				'content' => '<div class="color-ref b">значение сброшено</div>'.
-							 '<div class="grey i ml20">Действие с блоками будет совершено, если значение было сброшено</div>'
-			));
-			break;
+		case 59: return _elem201ActionCnn($send, _29cnn($EL['id']));
 	}
 
+	return $send;
+}
+function _elem201ActionCnn($send, $vvv=array()) {
+	foreach($vvv as $n => $r) {
+		$r['content'] = '<span class="color-pay">выбрано</span> <b>'.$r['title'].'</b>';
+		$r['title'] = 'выбрано "'.$r['title'].'"';
+		array_push($send, $r);
+	}
+
+	array_unshift($send, array(
+		'id' => -2,
+		'title' => 'выбрано любое значение',
+		'content' => '<div class="color-pay b">выбрано любое значение</div>'.
+					 '<div class="grey i ml20">Действие с блоками будет совершено при выборе любого значения</div>'
+	));
+	array_unshift($send, array(
+		'id' => -1,
+		'title' => 'значение сброшено',
+		'content' => '<div class="color-ref b">значение сброшено</div>'.
+					 '<div class="grey i ml20">Действие с блоками будет совершено, если значение было сброшено</div>'
+	));
 	return $send;
 }
 function _elem212ActionFormat($el85_id, $elv_id, $send) {//преобразование данных для выбора в действиях [212]
@@ -3370,11 +3380,11 @@ function PHP12_elem_action_list($prm) {
 						'<table class="bs3">'.
 							'<tr><td class="fs12 grey top">Действие:'.
 								'<td class="fs12">'.
-									'<b class="fs12">'.$act[$r['type_id']].'</b>, если '.
+									'<b class="fs12">'.@$act[$r['type_id']].'</b>, если '.
 		   (!$r['value_specific'] ? '<b class="fs12">'.@$cond[$r['cond_id']].'</b>' : '').
 			($r['value_specific'] ? 'выбрано: <b>'.@$vs[$r['value_specific']].'</b>' : '').
 			($r['action_reverse'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
-			 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Эффект:<td class="fs12 color-pay">'.$effect[$r['effect_id']] : '').
+			 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Эффект:<td class="fs12 color-pay">'.@$effect[$r['effect_id']] : '').
 						'</table>'.
 					'<td class="w70 b '.$targetColor.' top center pt3">'.
 						$c.' '.$targetName.

@@ -625,7 +625,7 @@ function _jsCache() {//файл JS с блоками и элементами
 
 	if(APP_ID) {
 		$save =
-			'PAGE_LIST='._jsCachePage().';'.
+			'PAGE_LIST='._json(_jsCachePage()).';'.
 			"\n".'if(SA)for(i in PLSA)PAGE_LIST.push(PLSA[i]);'.
 			"\n\n".
 		'var TMP='._jsCacheBlk(APP_ID).';'."\n".'for(i in TMP)BLKK[i]=TMP[i];'.
@@ -677,7 +677,7 @@ function _jsCachePage() {//страницы APP для select
 		unset($page[$id]);
 	}
 	$send = _pageChildArr($page, $child);
-	return _json($send);
+	return $send;
 }
 function _jsCacheBlk($app_id=0) {
 	$BLK = array();

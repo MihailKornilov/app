@@ -666,6 +666,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				var send = {
 					op:'spisok_del',
 					dialog_id:o.dialog_id,
+					dss:o.send.dss,
 					unit_id:o.del_id
 				};
 				dialog.post(send, _dialogOpenSubmitAction);
@@ -1051,15 +1052,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						width:el.width,
 						title0:el.txt_1,
 						msg_empty:'диалоги ещё не были созданы',
-						spisok:vvv
-					});
-					return;
-				//SA: Select - дублирование
-				case 41:
-					return;
-					ATR_CMP._select({
-						width:el.width,
-						title0:el.txt_1,
 						spisok:vvv
 					});
 					return;
@@ -1900,57 +1892,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		_forN(el.func, function(sp) {
 			switch(sp.dialog_id) {
 				//показ/скрытие блоков
-//				case 36: //Галочка[1]:
-//				case 40: //Выпадающее поле[17]:
 				case 201://По умолчанию - для остальных элементов
 					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
 
 					//ДЕЙСТВИЕ
 					switch(sp.type_id) {
 						//скрыть
-						case 709:
-						case 726:
 						case 2783:
 						default: break;
 						//показать
-						case 710:
-						case 727:
 						case 2784:
 							is_show = 1;
 							break;
 					}
 
-/*					//УСЛОВИЕ
-					switch(sp.cond_id) {
-						case 703://значение не выбрано
-						case 730://галочка снята
-							if(v && sp.action_reverse) {
-								is_show = is_show ? 0 : 1;
-								break;
-							}
-							if(v)
-								return;
-							break;
-						case 704://значение выбрано
-						case 731://галочка установлена
-							if(!v && sp.action_reverse) {
-								is_show = is_show ? 0 : 1;
-								break;
-							}
-							if(!v)
-								return;
-							break;
-						case 705://конкретное значение
-							if(v != sp.value_specific) {
-								if(sp.action_reverse) {
-									is_show = is_show ? 0 : 1;
-									break;
-								}
-								return;
-							}
-							break;
-					}
-*/
 					if(!sp.value_specific)
 						return;
 
@@ -2955,7 +2910,7 @@ _cons('new is_show = ' + is_show);
 	},
 
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO для [16] ===--- */
-	PHP12_radio_setup = function(el, vvv) {
+	PHP12_radio_setup = function(el, vvv, obj) {
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
 			ATTR_EL = _attr_el(el.id),
@@ -2965,7 +2920,11 @@ _cons('new is_show = ' + is_show);
 
 		BUT_ADD.click(valueAdd);
 
-		_forIn(vvv, valueAdd);
+		if(!obj.unit.id) {
+			valueAdd();
+			valueAdd();
+		} else
+			_forIn(vvv, valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
