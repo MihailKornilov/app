@@ -1073,7 +1073,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							func_save:function(res) {
 								ATR_CMP.val(res.ids);
 								INP.val(res.title);
-								DEL._dn(1);
+								DEL._dn(res.ids);
 							}
 						});
 					});
@@ -1909,13 +1909,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(!sp.value_specific)
 						return;
 
-_cons('is_show = ' + is_show +
+/*_cons('is_show = ' + is_show +
 	  '<br>' +
 	  'value_specific = ' + sp.value_specific +
 	  '<br>' +
 	  'v = ' + v
 );
-
+*/
 
 					//значение установлено
 					if(v) {
@@ -1940,7 +1940,7 @@ _cons('is_show = ' + is_show +
 
 
 
-_cons('new is_show = ' + is_show);
+//_cons('new is_show = ' + is_show);
 
 
 					//ПРОЦЕСС
