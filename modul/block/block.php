@@ -1301,7 +1301,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$razdel = '';
 			foreach(PHP12_menu_block_arr($el['id']) as $r) {
 				$sel = _dn($el['def'] != $r['id'], 'sel');
-				$razdel .= '<a class="link'.$sel.'">'.$r['title'].'</a>';
+				$razdel .= '<a class="link'.$sel._dn(!$prm['blk_setup'], 'curD').'">'.$r['title'].'</a>';
 			}
 
 			return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$el['def'].'" />'.
@@ -1556,7 +1556,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'color' => 'red',
 						'width' => $el['width'],
 						'small' => 1,
-						'class' => _dn($prm['blk_setup'] || $diff)
+						'class' => _dn($prm['blk_setup'] || $diff)._dn(!$prm['blk_setup'], 'curD')
 					));
 
 		//Фильтр: Select - привязанный список

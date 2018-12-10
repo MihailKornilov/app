@@ -1426,7 +1426,7 @@ function _elemButton($el, $prm) {//кнопка [2]
 				'color' => $color[$el['num_1']],
 				'width' => $el['width'],
 				'small' => $el['num_2'],
-				'class' => $prm['blk_setup'] ? '' : 'dialog-open',
+				'class' => $prm['blk_setup'] ? 'curD' : 'dialog-open',
 				'val' => _elemButtonVal($el, $prm)
 			));
 }

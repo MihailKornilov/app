@@ -208,9 +208,10 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 			continue;
 
 		$href = $is_edit ? '' : ' href="'.URL.'&p='.$page_id.'"';
+		$curd = _dn(!$is_edit, 'curD');
 
 		$razdel .=
-			'<a class="link'.$sel.'"'.$href.'>'.
+			'<a class="link'.$sel.$curd.'"'.$href.'>'.
 				$r['name'].
 			'</a>';
 	}
