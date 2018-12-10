@@ -1527,7 +1527,8 @@ function _elem201ActionFormat($el85_id, $prm, $send) {//получение да�
 			break;
 		case 6: return _elem201ActionCnn($send, _jsCachePage());
 
-		case 17: return _elem201ActionCnn($send, _elemVvv17($EL['id']));
+		case 17:
+		case 18: return _elem201ActionCnn($send, _elemVvv17($EL['id']));
 
 		case 24: return _elem201ActionCnn($send);
 
