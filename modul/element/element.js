@@ -2947,8 +2947,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
-	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO для [16] ===--- */
+	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ для [16][17][18] ===--- */
 	PHP12_radio_setup = function(el, vvv, obj) {
+		/*
+			num_1 - использовать описание значений
+		*/
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
 			ATTR_EL = _attr_el(el.id),
@@ -2980,7 +2983,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w90 grey r topi">Значение ' + NUM + ':' +
 							'<td><input type="text" class="title w100p b" value="' + v.title + '" />' +
-								'<textarea class="w100p min mtm1' + _dn(el.ds != 16) + '" placeholder="описание значения">' + v.content + '</textarea>' +
+								'<textarea class="w100p min mtm1' + _dn(el.num_1) + '" placeholder="описание значения">' + v.content + '</textarea>' +
 							'<td class="w15 topi">' +
 								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
 							'<td class="w50 r top pt5">' +

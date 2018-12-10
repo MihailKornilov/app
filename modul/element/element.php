@@ -1174,7 +1174,7 @@ function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки п�
 	foreach($dlg['cmp'] as $r) {
 		if(!$col = $r['col'])
 			continue;
-		$colUse[$col] = '<i class="color-555 ml10">('.$r['name'].')</i>';
+		$colUse[$col] = $r['name'] ? '<i class="color-555 ml10">('.$r['name'].')</i>' : '';
 	}
 
 	//колонки, которые не должны выбираться
@@ -1222,7 +1222,7 @@ function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки п�
 			'busy' => $busy,
 			'content' =>
 				'<div class="'.$color.'">'.
-					'<span class="pale">'.$dlg['name'].'.</span>'.//_table($dlg['table_'.$num])
+					'<span class="pale">'.$dlg['name'].'.</span>'.
 					$col.
 					$name.
 				'</div>'
@@ -2884,6 +2884,12 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 		parent_id = $unit['id'] (ID элемента-radio [16])
 	*/
 
+	//получение id приложения у родительского элемента
+	$sql = "SELECT `app_id`
+			FROM `_element`
+			WHERE `id`=".$unit['id'];
+	$app_id = query_value($sql);
+
 	$update = array();
 	$idsNoDel = '0';
 
@@ -2900,7 +2906,7 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 			$content = _txt($r['content']);
 			$update[] = "(
 				".$id.",
-				".$unit['app_id'].",
+				".$app_id.",
 				".$unit['id'].",
 				'".addslashes($title)."',
 				'".addslashes($content)."',
