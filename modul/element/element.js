@@ -2196,6 +2196,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						case 29: ATR_CMP._select(v); return;
 					}
 					break;
+				//блокировка элементов
+				case 213:
+					break;
+				//переход на страницу
+				case 214:
+					var page_id = _num(sp.target);
+					if(!page_id)
+						break;
+					location.href = URL + '&p=' + page_id;
+					return false;
+				//открытие диалога
+				case 215:
+					break;
 			}
 		});
 	},

@@ -3420,8 +3420,6 @@ function PHP12_block_action_list($prm) {
 		return _emptyMin('Отсутствует ID исходного блока.');
 	if(!$BL = _blockOne($bs_id))
 		return _emptyMin('Исходного блока id'.$bs_id.' не существует.');
-	if($BL['obj_name'] != 'page' && $BL['obj_name'] != 'dialog')
-		return _emptyMin('Действия можно назначать<br>только блокам на страницах и диалоговых окнах.');
 
 	$sql = "SELECT *
 			FROM `_action`

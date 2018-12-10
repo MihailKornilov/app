@@ -245,8 +245,8 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
 			$cls[] = _dn(!(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden']));
-			$cls[] = $r['click_action'] == 2081 && $r['click_page']   ? 'curP block-click-page pg-'.$r['click_page'] : '';
-			$cls[] = !$PARAM['blk_setup'] && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
+//			$cls[] = $r['click_action'] == 2081 && $r['click_page']   ? 'curP block-click-page pg-'.$r['click_page'] : '';
+//			$cls[] = !$PARAM['blk_setup'] && $r['click_action'] == 2082 && $r['click_dialog'] ? 'curP dialog-open' : '';
 			$cls[] = !$PARAM['blk_setup'] && !empty($r['action']) ? 'curP' : '';
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
@@ -293,6 +293,8 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 	return $send;
 }
 function _blockClick($r, $prm) {//настройки клика по блоку для открытия диалога
+		return '';
+
 	if($prm['blk_setup'])
 		return ' val="'.$r['id'].'"';
 	if($r['click_action'] != 2082)
@@ -2279,6 +2281,7 @@ function _beBlockSpisok($type, $block, $global=0) {//получение данн
 				  AND `obj_id` IN ("._idsGet($block, 'elem_id').")";
 		$arr = query_arr($sql);
 		$arr = _beBlockForming($arr);
+		$arr = _beBlockAction($arr, $global ? 0 : APP_ID);
 		$arr = _beElemIdSet($arr);
 
 		_cache_set($key, $arr, $global);
