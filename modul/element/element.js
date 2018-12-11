@@ -1895,7 +1895,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		_forN(el.func, function(sp) {
 			switch(sp.dialog_id) {
 				//показ/скрытие блоков
-				case 201://По умолчанию - для остальных элементов
+				case 201:
 					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
 
 					//ДЕЙСТВИЕ
@@ -1990,21 +1990,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 					break;
 				//установка/снятие значений
-				case 73://фильтр-галочка[62]
+				case 202:
 					var is_set = 0;//по умолчанию: сбросить значение
 
-					//ДЕЙСТВИЕ
+					//ТИП СОБЫТИЯ - что должно быть на исходном элементе
 					switch(sp.type_id) {
-						//сбросить значение
-						case 1718:
+						//значение было сброшено
+						case -1:
 						default: break;
-						//установить значение
-						case 1719:
+						//установлено какое-то значение
+						case -2:
 							is_set = 1;
 							break;
 					}
-
-					//УСЛОВИЕ
+/*
 					switch(sp.cond_id) {
 						case 1715://галочка снята
 							if(v && sp.action_reverse) {
@@ -2024,15 +2023,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							break;
 						default: return;
 					}
+*/
 
-					_forIn(sp.target, function(tar, elem_id) {
-						var EL = ELMM[elem_id];
+					_forIn(_idsAss(sp.target), function(ex, id) {
+						var EL = ELMM[id];
 						//свои способы действия на каждый элемент
 						switch(EL.dialog_id) {
-							case 1: //галочка
-							case 62://фильтр-галочка
-								_attr_cmp(elem_id)._check(is_set);
-								FILTER[el.num_2][EL.id] = is_set;
+							//галочка
+							case 1:
+								_attr_cmp(id)._check(is_set);
+								break;
+							//фильтр-галочка
+							case 62:
+								_attr_cmp(id)._check(is_set);
+								FILTER[el.num_2][id] = is_set;
 								break;
 						}
 					});
