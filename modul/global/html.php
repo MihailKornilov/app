@@ -169,6 +169,7 @@ function _authLogout() {//выход из приложения, если тре�
 	_cache_clear( 'AUTH_'.CODE, 1);
 	_cache_clear( 'page');
 	_cache_clear( 'user'.USER_ID);
+	setcookie('page_setup', '', time() - 1, '/');
 
 	//выход только из приложения и попадание в список приложений
 	if(APP_ID) {
