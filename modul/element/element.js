@@ -1899,7 +1899,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
 
 					//ДЕЙСТВИЕ
-					switch(sp.type_id) {
+					switch(sp.initial_id) {
 						//скрыть
 						case 2783:
 						default: break;
@@ -1909,12 +1909,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							break;
 					}
 
-					if(!sp.value_specific)
+					if(!sp.apply_id)
 						return;
 
 /*_cons('is_show = ' + is_show +
 	  '<br>' +
-	  'value_specific = ' + sp.value_specific +
+	  'apply_id = ' + sp.apply_id +
 	  '<br>' +
 	  'v = ' + v
 );
@@ -1923,8 +1923,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					//значение установлено
 					if(v) {
 						//любое значение
-						if(sp.value_specific != -2 && sp.value_specific != v) {
-							if(sp.action_reverse)
+						if(sp.apply_id != -2 && sp.apply_id != v) {
+							if(sp.revers)
 								is_show = is_show ? 0 : 1;
 							else
 								return;
@@ -1933,8 +1933,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 					//значение НЕ установлено
 					if(!v) {
-						if(sp.value_specific != -1) {
-							if(sp.action_reverse)
+						if(sp.apply_id != -1) {
+							if(sp.revers)
 								is_show = is_show ? 0 : 1;
 							else
 								return;
@@ -1947,7 +1947,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 
 					//ПРОЦЕСС
-					_forN(_elemFuncBlockObj(sp.target), function(oo) {
+					_forN(_elemFuncBlockObj(sp.target_ids), function(oo) {
 						if(!oo.obj.length)
 							return;
 
@@ -1994,7 +1994,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var is_set = 0;//по умолчанию: сбросить значение
 
 					//ТИП СОБЫТИЯ - что должно быть на исходном элементе
-					switch(sp.type_id) {
+					switch(sp.initial_id) {
 						//значение было сброшено
 						case -1:
 						default: break;
@@ -2006,7 +2006,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 /*
 					switch(sp.cond_id) {
 						case 1715://галочка снята
-							if(v && sp.action_reverse) {
+							if(v && sp.revers) {
 								is_set = is_set ? 0 : 1;
 								break;
 							}
@@ -2014,7 +2014,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								return;
 							break;
 						case 1716://галочка установлена
-							if(!v && sp.action_reverse) {
+							if(!v && sp.revers) {
 								is_set = is_set ? 0 : 1;
 								break;
 							}
@@ -2025,7 +2025,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					}
 */
 
-					_forIn(_idsAss(sp.target), function(ex, id) {
+					_forIn(_idsAss(sp.target_ids), function(ex, id) {
 						var EL = ELMM[id];
 						//свои способы действия на каждый элемент
 						switch(EL.dialog_id) {
@@ -2130,7 +2130,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
 
 					//ДЕЙСТВИЕ
-					switch(sp.type_id) {
+					switch(sp.initial_id) {
 						//скрыть
 						case 3166:
 						default: break;
@@ -2140,7 +2140,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							break;
 					}
 
-					if(sp.action_reverse) {
+					if(sp.revers) {
 						if(sp.on)
 							is_show = is_show ? 0 : 1;
 						sp.on = sp.on ? 0 : 1;
@@ -2148,7 +2148,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 
 					//ПРОЦЕСС
-					_forN(_elemFuncBlockObj(sp.target), function(oo) {
+					_forN(_elemFuncBlockObj(sp.target_ids), function(oo) {
 						if(!oo.obj.length)
 							return;
 
@@ -2179,10 +2179,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					break;
 				//установка значения элементу
 				case 212:
-					var target_id = _num(sp.target),
+					var target_id = _num(sp.target_ids),
 						ATR_CMP = _attr_cmp(target_id),
 						EL = ELMM[target_id],
-						v = sp.value_specific;
+						v = sp.apply_id;
 
 					if(!EL)
 						return;
@@ -2208,13 +2208,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					break;
 				//переход на страницу
 				case 214:
-					var page_id = _num(sp.target);
+					var page_id = _num(sp.target_ids);
 					if(!page_id)
 						break;
 
 					var link = '&p=' + page_id;
 
-					if(sp.value_specific)
+					if(sp.apply_id)
 						link += '&id=' + unit_id;
 
 					$(bo).addClass('_busy');
@@ -2223,7 +2223,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return false;
 				//открытие диалога
 				case 215:
-					var dlg_id = _num(sp.target);
+					var dlg_id = _num(sp.target_ids);
 					if(!dlg_id)
 						break;
 					var send = {
@@ -2233,7 +2233,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					};
 
 					//блок передаёт id записи для отображения
-					if(sp.value_specific)
+					if(sp.apply_id)
 						send.get_id = unit_id;
 					//блок передаёт id записи для редактирования
 					if(sp.effect_id)

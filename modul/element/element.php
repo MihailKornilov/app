@@ -1501,7 +1501,7 @@ function _elem201ActionFormat($el85, $prm, $send) {//получение данн
 
 	if($srce['dialog_id'] != 201)
 		if($srce['dialog_id'] == 202)
-			if($el85['col'] != 'type_id')
+			if($el85['col'] != 'initial_id')
 				return $send;
 
 	//получение настраиваемого элемента
@@ -1575,7 +1575,7 @@ function _elem212ActionFormat($el85_id, $elv_id, $send) {//преобразов�
 	//элемент [85] должен располагаться в диалоге [212]
 	if($BL['obj_id'] != 212)
 		if($BL['obj_id'] == 202)//либо в диалоге [202]
-			if($el85['col'] != 'value_specific')//и обязательно должен использовать колонку `value_specific`
+			if($el85['col'] != 'apply_id')//и обязательно должен использовать колонку `apply_id`
 				return $send;
 
 	//ЗАТЕМ получение информации о выбранном элементе, который выбран для воздействия
@@ -3362,13 +3362,13 @@ function PHP12_elem_action_list($prm) {
 	//Названия действий
 	$sql = "SELECT `id`,`txt_1`
 			FROM `_element`
-			WHERE `id` IN ("._idsGet($arr, 'type_id').")";
+			WHERE `id` IN ("._idsGet($arr, 'initial_id').")";
 	$act = query_ass($sql);
 
 	//Конкретные значения
 	$sql = "SELECT `id`,`txt_1`
 			FROM `_element`
-			WHERE `id` IN ("._idsGet($arr, 'value_specific').")";
+			WHERE `id` IN ("._idsGet($arr, 'apply_id').")";
 	$vs = query_ass($sql);
 
 	//Названия эффектов
@@ -3381,7 +3381,7 @@ function PHP12_elem_action_list($prm) {
 	$dss = $prm['el12']['block']['obj_id'];
 	$spisok = '';
 	foreach($arr as $id => $r) {
-		$c = count(_ids($r['target'], 1));
+		$c = count(_ids($r['target_ids'], 1));
 		$targetName = 'блок'._end($c, '', 'а', 'ов');
 		$targetColor = 'color-ref';
 		if($r['dialog_id'] == 73) {
@@ -3399,10 +3399,9 @@ function PHP12_elem_action_list($prm) {
 						'<table class="bs3">'.
 							'<tr><td class="fs12 grey top">Действие:'.
 								'<td class="fs12">'.
-									'<b class="fs12">'.@$act[$r['type_id']].'</b>, если '.
-//		   (!$r['value_specific'] ? '<b class="fs12">'.@$cond[$r['cond_id']].'</b>' : '').
-			($r['value_specific'] ? 'выбрано: <b>'.@$vs[$r['value_specific']].'</b>' : '').
-			($r['action_reverse'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
+									'<b class="fs12">'.@$act[$r['initial_id']].'</b>, если '.
+			($r['apply_id'] ? 'выбрано: <b>'.@$vs[$r['apply_id']].'</b>' : '').
+			($r['revers'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
 			 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Эффект:<td class="fs12 color-pay">'.@$effect[$r['effect_id']] : '').
 						'</table>'.
 					'<td class="w70 b '.$targetColor.' top center pt3">'.
@@ -3437,7 +3436,7 @@ function PHP12_block_action_list($prm) {
 	//Названия типов действий
 	$sql = "SELECT `id`,`txt_1`
 			FROM `_element`
-			WHERE `id` IN ("._idsGet($arr, 'type_id').")";
+			WHERE `id` IN ("._idsGet($arr, 'initial_id').")";
 	$act = query_ass($sql);
 
 	//Названия эффектов
@@ -3450,7 +3449,7 @@ function PHP12_block_action_list($prm) {
 	$dss = $prm['el12']['block']['obj_id'];
 	$spisok = '';
 	foreach($arr as $id => $r) {
-		$c = count(_ids($r['target'], 1));
+		$c = count(_ids($r['target_ids'], 1));
 		$targetName = 'блок'._end($c, '', 'а', 'ов');
 		$targetColor = 'color-ref';
 		if($r['dialog_id'] == 73) {
@@ -3468,8 +3467,8 @@ function PHP12_block_action_list($prm) {
 						'<table class="bs3">'.
 							'<tr><td class="fs12 grey top">Действие:'.
 								'<td class="fs12">'.
-									'<b class="fs12">'.@$act[$r['type_id']].'</b>'.
-			($r['action_reverse'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
+									'<b class="fs12">'.@$act[$r['initial_id']].'</b>'.
+			($r['revers'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
 			 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Эффект:<td class="fs12 color-pay">'.$effect[$r['effect_id']] : '').
 						'</table>'.
 					'<td class="w70 b '.$targetColor.' top center pt3">'.
