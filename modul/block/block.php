@@ -2328,7 +2328,6 @@ function _beBlockAction($blk, $app_id=0) {//вставка действий дл
 		unset($r['app_id']);
 		unset($r['block_id']);
 		unset($r['element_id']);
-		unset($r['cond_id']);
 		unset($r['sort']);
 		unset($r['user_id_add']);
 		unset($r['dtime_add']);

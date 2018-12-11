@@ -3365,12 +3365,6 @@ function PHP12_elem_action_list($prm) {
 			WHERE `id` IN ("._idsGet($arr, 'type_id').")";
 	$act = query_ass($sql);
 
-	//Названия условий
-	$sql = "SELECT `id`,`txt_1`
-			FROM `_element`
-			WHERE `id` IN ("._idsGet($arr, 'cond_id').")";
-	$cond = query_ass($sql);
-
 	//Конкретные значения
 	$sql = "SELECT `id`,`txt_1`
 			FROM `_element`
@@ -3406,7 +3400,7 @@ function PHP12_elem_action_list($prm) {
 							'<tr><td class="fs12 grey top">Действие:'.
 								'<td class="fs12">'.
 									'<b class="fs12">'.@$act[$r['type_id']].'</b>, если '.
-		   (!$r['value_specific'] ? '<b class="fs12">'.@$cond[$r['cond_id']].'</b>' : '').
+//		   (!$r['value_specific'] ? '<b class="fs12">'.@$cond[$r['cond_id']].'</b>' : '').
 			($r['value_specific'] ? 'выбрано: <b>'.@$vs[$r['value_specific']].'</b>' : '').
 			($r['action_reverse'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
 			 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Эффект:<td class="fs12 color-pay">'.@$effect[$r['effect_id']] : '').

@@ -711,9 +711,6 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 		if($tab == '_action')
 			//только для диалогов, предназначенных для элементов
 			switch($DLG['id']) {
-				case 36:
-				case 40:
-				case 73:
 				case 201:
 				case 202:
 				case 203:
