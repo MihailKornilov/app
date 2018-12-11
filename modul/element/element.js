@@ -1896,10 +1896,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			switch(sp.dialog_id) {
 				//показ/скрытие блоков
 				case 201:
-					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
+					var is_show = 0;//по умолчанию скрывать.
 
 					//ДЕЙСТВИЕ
-					switch(sp.initial_id) {
+					switch(sp.apply_id) {
 						//скрыть
 						case 2783:
 						default: break;
@@ -1909,21 +1909,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							break;
 					}
 
-					if(!sp.apply_id)
+					if(!sp.initial_id)
 						return;
-
-/*_cons('is_show = ' + is_show +
-	  '<br>' +
-	  'apply_id = ' + sp.apply_id +
-	  '<br>' +
-	  'v = ' + v
-);
-*/
 
 					//значение установлено
 					if(v) {
 						//любое значение
-						if(sp.apply_id != -2 && sp.apply_id != v) {
+						if(sp.initial_id != -2 && sp.initial_id != v) {
 							if(sp.revers)
 								is_show = is_show ? 0 : 1;
 							else
@@ -1933,17 +1925,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 					//значение НЕ установлено
 					if(!v) {
-						if(sp.apply_id != -1) {
+						if(sp.initial_id != -1) {
 							if(sp.revers)
 								is_show = is_show ? 0 : 1;
 							else
 								return;
 						}
 					}
-
-
-
-//_cons('new is_show = ' + is_show);
 
 
 					//ПРОЦЕСС
@@ -2130,7 +2118,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
 
 					//ДЕЙСТВИЕ
-					switch(sp.initial_id) {
+					switch(sp.apply_id) {
 						//скрыть
 						case 3166:
 						default: break;
