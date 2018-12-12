@@ -3368,10 +3368,6 @@ function PHP12_action_list($prm) {
 	if(!$arr = query_arr($sql))
 		return _emptyMin('Действий не назначено.');
 
-
-
-
-
 	$spisok = '';
 	foreach($arr as $id => $r) {
 		$spisok .=
@@ -3380,11 +3376,10 @@ function PHP12_action_list($prm) {
 				'<tr>'.
 					'<td class="w25 top">'.
 						'<div class="icon icon-move-y pl"></div>'.
-					'<td><div class="fs15">'._dialogParam($r['dialog_id'], 'name').'</div>'.
-						'<table class="bs3">'.
-							'<tr><td class="fs12 grey top">Действие:'.
-								'<td class="fs12">'.
-						'</table>'.
+					'<td><div class="fs15 color-555">'._dialogParam($r['dialog_id'], 'name').'</div>'.
+						'<div class="mt3 ml10">'.
+							PHP12_action_201($r).
+						'</div>'.
 					'<td class="w50 r top">'.
 						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
 						_iconDel(array(
@@ -3397,66 +3392,42 @@ function PHP12_action_list($prm) {
 	}
 
 	return '<dl>'.$spisok.'</dl>';
+}
+function PHP12_action_201($r) {//скрытие/показ блоков
+	if($r['dialog_id'] != 201)
+		return '';
 
-
-
-
-
-	//Названия действий
-	$sql = "SELECT `id`,`txt_1`
+	//Названия действия
+	$sql = "SELECT `txt_1`
 			FROM `_element`
-			WHERE `id` IN ("._idsGet($arr, 'initial_id').")";
-	$act = query_ass($sql);
+			WHERE `id`=".$r['apply_id'];
+	$apply = query_value($sql);
 
-	//Конкретные значения
-	$sql = "SELECT `id`,`txt_1`
-			FROM `_element`
-			WHERE `id` IN ("._idsGet($arr, 'apply_id').")";
-	$vs = query_ass($sql);
 
-	//Названия эффектов
-	$sql = "SELECT `id`,`txt_1`
-			FROM `_element`
-			WHERE `id` IN ("._idsGet($arr, 'effect_id').")";
-	$effect = query_ass($sql);
-	$effect[0] = 'нет';
+	$c = count(_ids($r['target_ids'], 1));
+	$target = $c.' блок'._end($c, '', 'а', 'ов');
 
-	foreach($arr as $id => $r) {
-		$c = count(_ids($r['target_ids'], 1));
-		$targetName = 'блок'._end($c, '', 'а', 'ов');
-		$targetColor = 'color-ref';
-		if($r['dialog_id'] == 73) {
-			$targetName = 'элем.';
-			$targetColor = 'color-pay';
-		}
-		$spisok .=
-			'<dd val="'.$id.'">'.
-			'<table class="bs5 bor1 bg-gr2 over2 mb5 curD">'.
-				'<tr>'.
-					'<td class="w25 top">'.
-						'<div class="icon icon-move-y pl"></div>'.
-					'<td class="w300">'.
-						'<div class="fs15">'._dialogParam($r['dialog_id'], 'name').'</div>'.
-						'<table class="bs3">'.
-							'<tr><td class="fs12 grey top">Действие:'.
-								'<td class="fs12">'.
-									'<b class="fs12">'.@$act[$r['initial_id']].'</b>, если '.
-			($r['apply_id'] ? 'выбрано: <b>'.@$vs[$r['apply_id']].'</b>' : '').
-			($r['revers'] ? '<div class="fs11 color-555">(применяется обратное действие)</div>' : '').
-			 ($r['effect_id'] ? '<tr><td class="fs12 grey r">Эффект:<td class="fs12 color-pay">'.@$effect[$r['effect_id']] : '').
-						'</table>'.
-					'<td class="w70 b '.$targetColor.' top center pt3">'.
-						$c.' '.$targetName.
-					'<td class="w50 r top">'.
-						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
-						_iconDel(array(
-							'class' => 'pl ml5 dialog-open',
-							'val' => 'dialog_id:'.$r['dialog_id'].',del_id:'.$id.',dss:'.$dss
-						)).
-			'</table>'.
-			'</dd>';
+
+	$effect = '';
+	if($r['effect_id']) {
+		//Названия эффектов
+		$sql = "SELECT `txt_1`
+				FROM `_element`
+				WHERE `id`=".$r['effect_id'];
+		$name = query_value($sql);
+		$effect =   '<div class="fs12 grey mt2">'.
+						'Эффект: '.
+						'<span class="fs12 color-pay">'.$name.'</span>'.
+					'</div>';
+
 	}
 
+	$revers = $r['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
+
+	return
+	'<div class="b">'.$apply.' '.$target.'</div>'.
+	$effect.
+	$revers;
 }
 
 /* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
