@@ -2027,6 +2027,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								break;
 						}
 					});
+				//установка фокуса
+				case 206:
+					var is_set = 0;//по умолчанию: сбросить значение
+
+					//ТИП СОБЫТИЯ - что должно быть на исходном элементе
+					switch(sp.initial_id) {
+						//значение было сброшено
+						case -1:
+						default: break;
+						//установлено какое-то значение
+						case -2:
+							is_set = 1;
+							break;
+					}
+
+					var elem_id = _num(sp.target_ids);
+					if(!elem_id)
+						return;
+					_attr_cmp(elem_id).focus();
 			}
 		});
 	},

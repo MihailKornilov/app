@@ -1500,8 +1500,8 @@ function _elem201init($el85, $prm, $send) {//получение данных э�
 	$srce = $prm['srce'];
 
 	if($srce['dialog_id'] != 201)
-		if($srce['dialog_id'] == 202)
-			if($el85['col'] != 'initial_id')
+		if($srce['dialog_id'] == 202 && $el85['col'] != 'initial_id')
+			if($srce['dialog_id'] != 206)//установка фокуса
 				return $send;
 
 	//получение настраиваемого элемента
@@ -1537,6 +1537,13 @@ function _elem201init($el85, $prm, $send) {//получение данных э�
 
 		case 29:
 		case 59: return _elem201initCnn($send, _29cnn($EL['id']));
+
+		case 51://календарь
+			array_unshift($send, array(
+				'id' => -2,
+				'title' => 'выбран любой день'
+			));
+
 	}
 
 	return $send;
