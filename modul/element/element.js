@@ -1093,8 +1093,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						lost:_num(el.num_1),
 						time:el.num_2,
 						func:function() {
-							if(el.num_3)
-								_attr_cmp(el.num_3).focus();
+							_elemAction(el, 1);
 						}
 					});
 					return;
