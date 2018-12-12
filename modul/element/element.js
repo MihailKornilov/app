@@ -3348,8 +3348,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
-	/* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ===--- */
-	PHP12_elem_action_list = function(el) {
+	/* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ИЛИ БЛОКУ ===--- */
+	PHP12_action_list = function(el) {
 		_attr_el(el.id).find('DL')._sort({table:'_action'});
 	},
 
