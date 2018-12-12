@@ -3379,6 +3379,10 @@ function PHP12_action_list($prm) {
 					'<td><div class="fs15 color-555">'._dialogParam($r['dialog_id'], 'name').'</div>'.
 						'<div class="mt3 ml10">'.
 							PHP12_action_201($r).
+							PHP12_action_211($r).
+							PHP12_action_212($r).
+							PHP12_action_214($r).
+							PHP12_action_215($r).
 						'</div>'.
 					'<td class="w50 r top">'.
 						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
@@ -3393,7 +3397,7 @@ function PHP12_action_list($prm) {
 
 	return '<dl>'.$spisok.'</dl>';
 }
-function PHP12_action_201($r) {//скрытие/показ блоков
+function PHP12_action_201($r) {//ЭЛЕМЕНТ: скрытие/показ блоков
 	if($r['dialog_id'] != 201)
 		return '';
 
@@ -3428,6 +3432,93 @@ function PHP12_action_201($r) {//скрытие/показ блоков
 	'<div class="b">'.$apply.' '.$target.'</div>'.
 	$effect.
 	$revers;
+}
+function PHP12_action_211($r) {//БЛОК: скрытие/показ блоков
+	if($r['dialog_id'] != 211)
+		return '';
+
+	//Названия действия
+	$sql = "SELECT `txt_1`
+			FROM `_element`
+			WHERE `id`=".$r['apply_id'];
+	$apply = query_value($sql);
+
+
+	$c = count(_ids($r['target_ids'], 1));
+	$target = $c.' блок'._end($c, '', 'а', 'ов');
+
+
+	$effect = '';
+	if($r['effect_id']) {
+		//Названия эффектов
+		$sql = "SELECT `txt_1`
+				FROM `_element`
+				WHERE `id`=".$r['effect_id'];
+		$name = query_value($sql);
+		$effect =   '<div class="fs12 grey mt2">'.
+						'Эффект: '.
+						'<span class="fs12 color-pay">'.$name.'</span>'.
+					'</div>';
+
+	}
+
+	$revers = $r['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
+
+	return
+	'<div class="b">'.$apply.' '.$target.'</div>'.
+	$effect.
+	$revers;
+}
+function PHP12_action_212($r) {//БЛОК: Установка значения элементу
+	if($r['dialog_id'] != 212)
+		return '';
+	if(!$elem_id = _num($r['target_ids']))
+		return '<div class="red">Отсутствует id элемента</div>';
+	if(!$el = _elemOne($elem_id))
+		return '<div class="red">Элемента не существует</div>';
+
+	$send = '<div class="red">Неизвестный элемент ['.$el['dialog_id'].']</div>';
+
+	switch($el['dialog_id']) {
+		case 1:
+		case 62:
+			$send = '<div class="red">Неизвестное действие для галочки</div>';
+			if($r['apply_id'] == -1)
+				$send = '<b>Снять галочку</b>';
+			if($r['apply_id'] == 1)
+				$send = '<b>Установить галочку</b>';
+			break;
+	}
+
+
+	return $send;
+}
+function PHP12_action_214($r) {//БЛОК: переход на страницу
+	if($r['dialog_id'] != 214)
+		return '';
+	if(!$page_id = _num($r['target_ids']))
+		return '<div class="red">Отсутствует id страницы</div>';
+	if(!$page = _page($page_id))
+		return '<div class="red">Страницы не существует</div>';
+
+	return
+	'<span class="grey">Cтраница:</span> '.
+	'<b>'.$page['name'].'</b>'.
+	($r['apply_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи</div>' : '');
+}
+function PHP12_action_215($r) {//БЛОК: открытие диалога
+	if($r['dialog_id'] != 215)
+		return '';
+	if(!$dlg_id = _num($r['target_ids']))
+		return '<div class="red">Отсутствует id диалога</div>';
+	if(!$DLG = _dialogQuery($dlg_id))
+		return '<div class="red">Диалога не существует</div>';
+
+	return
+	'<span class="grey">Диалог:</span> '.
+	'<b>'.$DLG['name'].'</b>'.
+	($r['apply_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для отображения</div>' : '').
+	($r['effect_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для редактирования</div>' : '');
 }
 
 /* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
