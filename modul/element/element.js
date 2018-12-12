@@ -2193,6 +2193,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					break;
 				//блокировка элементов
 				case 213:
+					/*
+						3365 - заблокировать
+						3366 - разблокировать
+					*/
+					var lock = sp.apply_id == 3365;
+
+					_forIn(_idsAss(sp.target_ids), function(n, id) {
+						var EL = ELMM[id];
+						if(!EL)
+							return;
+						switch(EL.dialog_id) {
+							case 5:
+							case 8: _attr_cmp(id).attr('disabled', lock); break;
+						}
+					});
 					break;
 				//переход на страницу
 				case 214:

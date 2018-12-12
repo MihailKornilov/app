@@ -3381,6 +3381,7 @@ function PHP12_action_list($prm) {
 							PHP12_action_201($r).
 							PHP12_action_211($r).
 							PHP12_action_212($r).
+							PHP12_action_213($r).
 							PHP12_action_214($r).
 							PHP12_action_215($r).
 							PHP12_action_216($r).
@@ -3438,7 +3439,7 @@ function PHP12_action_211($r) {//БЛОК: скрытие/показ блоко�
 	if($r['dialog_id'] != 211)
 		return '';
 
-	//Названия действия
+	//Название действия
 	$sql = "SELECT `txt_1`
 			FROM `_element`
 			WHERE `id`=".$r['apply_id'];
@@ -3493,6 +3494,29 @@ function PHP12_action_212($r) {//БЛОК: Установка значения �
 
 
 	return $send;
+}
+function PHP12_action_213($r) {//БЛОК: блокировка элементов
+	if($r['dialog_id'] != 213)
+		return '';
+	if(!$ids = _ids($r['target_ids'], 'arr'))
+		return '<div class="red">Отсутствует элементы для блокировки</div>';
+
+	//Название действия
+	$sql = "SELECT `txt_1`
+			FROM `_element`
+			WHERE `id`=".$r['apply_id'];
+	$apply = query_value($sql);
+
+	$elem = array();
+	foreach($ids as $id)
+		$elem[] = '<b>'._elemTitle($id).'</b>';
+
+	$target = implode(', ', $elem);
+
+	return
+	$apply.' '.
+	'элемент'.(count($elem) > 1 ? 'ы' : '').' '.
+	$target;
 }
 function PHP12_action_214($r) {//БЛОК: переход на страницу
 	if($r['dialog_id'] != 214)
