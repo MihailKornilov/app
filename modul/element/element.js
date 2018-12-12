@@ -2229,6 +2229,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 					_dialogLoad(send);
 					break;
+				//установка фокуса на элемент
+				case 216:
+					var elem_id = _num(sp.target_ids);
+					if(!elem_id)
+						break;
+					_attr_cmp(elem_id).focus();
+					break;
 			}
 		});
 	},

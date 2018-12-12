@@ -3383,6 +3383,7 @@ function PHP12_action_list($prm) {
 							PHP12_action_212($r).
 							PHP12_action_214($r).
 							PHP12_action_215($r).
+							PHP12_action_216($r).
 						'</div>'.
 					'<td class="w50 r top">'.
 						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
@@ -3519,6 +3520,14 @@ function PHP12_action_215($r) {//БЛОК: открытие диалога
 	'<b>'.$DLG['name'].'</b>'.
 	($r['apply_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для отображения</div>' : '').
 	($r['effect_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для редактирования</div>' : '');
+}
+function PHP12_action_216($r) {//БЛОК: Установка фокуса на элемент
+	if($r['dialog_id'] != 216)
+		return '';
+	if(!$elem_id = _num($r['target_ids']))
+		return '<div class="red">Отсутствует id элемента</div>';
+
+	return '<span class="grey">Элемент:</span> <b>'._elemTitle($elem_id).'</b>';
 }
 
 /* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
