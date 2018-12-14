@@ -861,6 +861,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	_dialogSaveSA($dialog_id);
 
 	_BE('dialog_clear');
+	_cache_clear('RULE_USE', 1);
 
 	return $dialog_id;
 }

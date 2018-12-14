@@ -771,6 +771,10 @@ function _jsCacheElemOne($elem_id) {
 	if(_elemRule($r['dialog_id'], 12))
 		$val['stl'] = 1;
 
+	//разрешать настройку перехода на страницу или открытие диалога
+	if(_elemRule($r['dialog_id'], 13))
+		$val['url_use'] = 1;
+
 	//разрешать условий отображения
 	if(_elemRule($r['dialog_id'], 14)) {
 		$val['rule14'] = 1;

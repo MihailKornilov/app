@@ -2018,6 +2018,7 @@ function PHP12_elem_all_rule_setup_save($dlg) {
 		}
 
 	_BE('dialog_clear');
+	_cache_clear('RULE_USE', 1);
 
 	jsonSuccess();
 }
