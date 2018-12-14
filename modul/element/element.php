@@ -3403,7 +3403,9 @@ function PHP12_action_list($prm) {
 
 	switch($dss) {
 		//действия для элемента
-		case 200: $where = "`element_id`=".$BL['elem_id']; break;
+		case 200:
+		case 220:
+			$where = "`element_id`=".$BL['elem_id']; break;
 		//действия для блока
 		case 210: $where = "`block_id`=".$bs_id; break;
 		default: return _emptyMin('Неизвестный диалог для настройки действий.');
@@ -3600,6 +3602,30 @@ function PHP12_action_216($r) {//БЛОК: Установка фокуса на 
 		return '<div class="red">Отсутствует id элемента</div>';
 
 	return '<span class="grey">Элемент:</span> <b>'._elemTitle($elem_id).'</b>';
+}
+function PHP12_action_221($r) {//ЭЛЕМЕНТ: переход на страницу
+	if($r['dialog_id'] != 221)
+		return '';
+	if(!$page_id = _num($r['target_ids']))
+		return '<div class="red">Отсутствует id страницы</div>';
+	if(!$page = _page($page_id))
+		return '<div class="red">Страницы не существует</div>';
+
+	return
+	'<span class="grey">Cтраница:</span> '.
+	'<b>'.$page['name'].'</b>';
+}
+function PHP12_action_222($r) {//ЭЛЕМЕНТ: открытие диалога
+	if($r['dialog_id'] != 222)
+		return '';
+	if(!$dlg_id = _num($r['target_ids']))
+		return '<div class="red">Отсутствует id диалога</div>';
+	if(!$DLG = _dialogQuery($dlg_id))
+		return '<div class="red">Диалога не существует</div>';
+
+	return
+	'<span class="grey">Диалог:</span> '.
+	'<b>'.$DLG['name'].'</b>';
 }
 
 /* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
