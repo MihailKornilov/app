@@ -935,6 +935,38 @@ function PHP12_spisok23_app() {//списки-таблицы для текуще
 	return PHP12_spisok_app(23, 'Списков-таблиц нет.');
 }
 
+function _elemRule($i='all', $v=0) {//кеш правил для элементов
+	global $DLG_RULE,//элемент содержит правило
+		   $RULE_DLG;//правило содержит элемен
+
+	$key = 'ELM_RULE';
+	if(!$arr = _cache_get($key, 1)) {
+		$sql = "SELECT *
+				FROM `_element_rule_use`
+				ORDER BY `dialog_id`,`rule_id`";
+		$arr = query_arr($sql);
+		_cache_set($key, $arr, 1);
+	}
+
+	if(!defined('ELM_RULE')) {
+		$DLG_RULE = array();
+		$RULE_DLG = array();
+		foreach($arr as $r) {
+			$did = _num($r['dialog_id']);
+			$rid = _num($r['rule_id']);
+			$DLG_RULE[$did][$rid] = 1;
+			$RULE_DLG[$rid][$did] = 1;
+		}
+	}
+
+
+	//содержит ли элемент правило
+	if($dlg_id = _num($i))
+		return isset($DLG_RULE[$dlg_id][$v]);
+
+	return $arr;
+}
+
 function _elemOne($elem_id) {//запрос одного элемента
 	return _BE('elem_one', $elem_id);
 }

@@ -560,8 +560,7 @@ function _vkapi($method, $param=array()) {//получение данных из
 	$url = 'https://api.vk.com/method/'.$method.'?'.http_build_query($param);
 	$res = file_get_contents($url);
 	$res = json_decode($res, true);
-//	if(DEBUG)
-//		$res['url'] = $url;
+
 	return $res;
 }
 
@@ -739,7 +738,7 @@ function _jsCacheElemOne($elem_id) {
 		return array();
 	if(!$block_id = $r['block_id'])
 		return array();
-	if($block_id < 0)
+	if(!$block_id)
 		return array();
 
 	$val = array();
@@ -754,6 +753,13 @@ function _jsCacheElemOne($elem_id) {
 	$val['color'] = $r['color'];
 	$val['size'] = $r['size'];
 	$val['url'] = $r['url'];
+	$val['width'] = $r['width'];
+
+	if($r['focus'])
+		$val['focus'] = 1;
+
+	if($r['hint'])
+		$val['hint'] = $r['hint'];
 
 	if($r['func'])
 		$val['func'] = $r['func'];
@@ -761,11 +767,14 @@ function _jsCacheElemOne($elem_id) {
 	if(!empty($r['format']))
 		$val['format'] = $r['format']['id'];
 
-	if($r['hint'])
-		$val['hint'] = $r['hint'];
 
-	if($r['focus'])
-		$val['focus'] = 1;
+	//элемент является подключаемым списком
+	if(_elemIsConnect($r))
+		$val['issp'] = 1;
+
+	//разрешать настройку стилей
+	if(_elemRule($r['dialog_id'], 11))
+		$val['rule11'] = 1;
 
 	if($dlg = _BE('dialog', $r['dialog_id'])) {
 		if($dlg['element_afics'])
@@ -776,18 +785,12 @@ function _jsCacheElemOne($elem_id) {
 			$val['hint_access'] = 1;
 	}
 
-	$val['width'] = $r['width'];
-
 	if($r['is_img'])
 		$val['is_img'] = 1;
 
 	//исходный диалог (dialog source)
 	if($r['block']['obj_name'] == 'dialog')
 		$val['ds'] = $r['block']['obj_id'];
-
-	//элемент является подключаемым списком
-	if(_elemIsConnect($r))
-		$val['issp'] = 1;
 
 	//элемент-меню переключения блоков
 	if($r['dialog_id'] == 57)

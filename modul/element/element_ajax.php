@@ -699,27 +699,7 @@ switch(@$_POST['op']) {
 }
 
 
-function _table2field($tab) {//список колонок для таблицы 2
-	if(empty($tab))
-		return array();
-
-	$sql = "DESCRIBE `".$tab."`";
-	if(!$arr = query_array($sql))
-		return array();
-
-	$send = array();
-	$n = 1;
-	foreach($arr as $r) {
-		if($r['Field'] == 'id')
-			continue;
-		if(!preg_match('/^int+/', $r['Type']))//только INT
-			continue;
-		$send[$n++] = $r['Field'];
-	}
-
-	return $send;
-}
-function _dialogSetupRule($dialog_id) {
+function _dialogSetupRule($dialog_id) {//Правила для элемета
 	$sql = "SELECT `rule_id`,1
 			FROM `_element_rule_use`
 			WHERE `dialog_id`=".$dialog_id;
