@@ -498,10 +498,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				element_type:DLG('#element_type').val(),
 				element_afics:DLG('#element_afics').val(),
 				element_hidden:DLG('#element_hidden').val(),
-
-				element_url_access:DLG('#element_url_access').val(),
-				element_hint_access:DLG('#element_hint_access').val(),
-				element_dialog_func:DLG('#element_dialog_func').val(),
+				element_action_dialog_id:DLG('#element_action_dialog_id').val(),
 
 				menu_edit_last:DLG('#dialog-menu').val()
 			}, o.send || {});
