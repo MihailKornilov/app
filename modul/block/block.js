@@ -204,54 +204,52 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 			div += '<div class="dib center w25 h25 bor-e8 curP fs17 grey ' + sp + ml3 + sel + '" val="' + sp + '">&#10004;</div>';
 		});
 
-
-		if(BL.bg70) {
-			$(document)
-				.off('click', '#block-set-bg .bg70')
-				.on('click', '#block-set-bg .bg70', function() {
-					var t = $(this),
-						galka = t.find('.galka');
-
-					if(!galka.hasClass('dn')) {
-						galka._dn();
-						BL.bg = '';
-						BL.save = 1;
-						return;
-					}
-
-					_dialogLoad({
-						dialog_id:11,
-						dialog_source:BL.bg70,
-						block_id:BL.id,
-						prm:{
-							nest:1,
-							bg70_choose:1
-						},
-						busy_obj:$(this),
-						busy_cls:'busy',
-						func_save:function(res) {
-							BL.bg = res.bg;
-							BL.save = 1;
-							_attr_bl(BL.id).removeClass(BGS);
-							_blockUnitSave(BL);
-						}
-					});
-				});
-			div += '<div class="bg70 prel dib center w25 bor-e8 grey ml3' +
-							_tooltip('Окраска блока согласно<br>цвету фона единицы списка', -83, '', 1) +
-						'<div class="galka pabs fs17 pl5' + _dn(_ids(BL.bg)) + '">&#10004;</div>' +
-						'<div class="pabs icon spin"></div>' +
-						'<table class="w100p curP">' +
-							'<tr><td class="bg-efe" style="width:24px;height:8px">' +
-							'<tr><td class="bg-ffe" style="width:24px;height:9px">' +
-							'<tr><td class="bg-fee" style="height:8px">' +
-						'</table>' +
-				   '</div>';
-		}
-
-
 		return '<div class="color-555 fs14 mt5">Заливка:</div>' +
-			   '<div id="block-set-bg" class="mt3">' + div + '</div>';
+			   '<div id="block-set-bg" class="mt3">' + div + _blockUnitBg70(BL, BGS) + '</div>';
+	},
+	_blockUnitBg70 = function(BL, BGS) {//динабическая заливка блока
+		$(document)
+			.off('click', '#block-set-bg .bg70')
+			.on('click', '#block-set-bg .bg70', function() {
+				var t = $(this),
+					galka = t.find('.galka');
+
+				if(!galka.hasClass('dn')) {
+					galka._dn();
+					BL.bg = '';
+					BL.save = 1;
+					return;
+				}
+
+				_dialogLoad({
+					dialog_id:11,
+					block_id:BL.id,
+					dop:{
+						nest:1,
+						mysave:1,
+						allow:'29,59,70'
+					},
+					busy_obj:$(this),
+					busy_cls:'busy',
+					func_save:function(res) {
+						BL.bg = res.v;
+						BL.save = 1;
+						_attr_bl(BL.id).removeClass(BGS);
+						_blockUnitSave(BL);
+					}
+				});
+			});
+
+		return '<div class="bg70 prel dib center w25 bor-e8 grey ml3' +
+						_tooltip('Окраска блока согласно<br>цвету фона записи', -70, '', 1) +
+					'<div class="galka pabs fs17 pl5' + _dn(_ids(BL.bg)) + '">&#10004;</div>' +
+					'<div class="pabs icon spin"></div>' +
+					'<table class="w100p curP">' +
+						'<tr><td class="bg-efe" style="width:24px;height:8px">' +
+						'<tr><td class="bg-ffe" style="width:24px;height:9px">' +
+						'<tr><td class="bg-fee" style="height:8px">' +
+					'</table>' +
+			   '</div>';
 	},
 	_blockUnitBor = function(BL) {//границы блока
 		var bor = BL.bor.split(' ');

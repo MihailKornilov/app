@@ -2405,7 +2405,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					dop:{
 						mysave:1,
 						sel:v.txt_1,
-						nest:0//obj.srce.dop.nest
+						nest:0
 					},
 					busy_obj:$(this),
 					busy_cls:'hold',

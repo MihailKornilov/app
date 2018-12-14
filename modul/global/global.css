@@ -359,7 +359,7 @@ body:not(.site){position:relative}
 	opacity:.35;
 }
 
-/* цвета блока в настройках */
+/* цвета заливки блока в настройках */
 #block-set-bg div.curP{vertical-align:top}
 #block-set-bg div.curP:not(.sel):hover{border:#aaa solid 1px;}
 #block-set-bg div.curP:not(.sel){color:transparent}

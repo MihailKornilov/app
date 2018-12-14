@@ -1809,7 +1809,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		if(!isset($G_BLOCK[$i1]))
 			return array();
 
-		$send = _beBlockBg($G_BLOCK[$i1]);
+		$send = $G_BLOCK[$i1];
 		$send['elem'] = $send['elem_id'] ? $G_ELEM[$send['elem_id']] : array();
 
 		return _arrNum($send);
@@ -1828,7 +1828,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			if($r['obj_id'] != $obj_id)
 				continue;
 
-			$send[$id] = _beBlockBg($r);
+			$send[$id] = $r;
 		}
 
 		return $send;
@@ -1876,7 +1876,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 				$r['elem'] = _beElemVvv($el);
 			}
 
-			$blk[$id] = _beBlockBg($r);
+			$blk[$id] = $r;
 		}
 
 		$child = array();
@@ -2291,7 +2291,7 @@ function _beBlockForming($arr) {//формирование массива бло
 			'obj_id' => _num($r['obj_id']),
 			'x' => _num($r['x']),
 			'xx' => _num($r['xx']),
-			'xx_ids' => $r['xx_ids'],
+			'xx_ids' => _idsAss($r['xx_ids']),
 			'y' => _num($r['y']),
 			'w' => _num($r['w']),
 			'h' => _num($r['h']),
@@ -2335,34 +2335,6 @@ function _beBlockAction($blk, $app_id=0) {//вставка действий дл
 	}
 
 	return $blk;
-}
-function _beBlockBg($r) {
-	global $G_ELEM;
-
-	$r['xx_ids'] = _idsAss($r['xx_ids']);
-
-	//Отображение варианта цвета для динамической окраски блоков
-	//Будет открываться диалог, который вносит данные списка, чтобы указать, откуда брать цвет для окраски
-	//Иконка показывается, если:
-	//      1. spisok-блоки. id диалога, который вносит значения списка
-	//      2. dialog-блоки. id этого диалога
-	//      3. page-блоки.   id диалога, который вносит значения списка, страница которой получает значения списка
-	$bg70 = 0;
-	if($r['obj_name'] == 'spisok')
-//		if($bl = $G_BLOCK[$r['obj_id']])
-//			if($el = $G_ELEM[$bl['elem_id']])
-			if($el = $G_ELEM[$r['obj_id']])
-				if($el['dialog_id'] == 14)// || $el['dialog_id'] == 59
-					$bg70 = _num($el['num_1']);
-	if($r['obj_name'] == 'dialog')
-		$bg70 = $r['obj_id'];
-	if($r['obj_name'] == 'page')
-		if($page = _page($r['obj_id']))
-			$bg70 = $page['dialog_id_unit_get'];
-
-	$r['bg70'] = $bg70;
-
-	return $r;
 }
 function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в блоках
 	global $G_ELEM, $G_DLG;
