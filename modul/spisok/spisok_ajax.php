@@ -742,6 +742,26 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 			query($sql);
 		}
 
+	//удаление предыдущего действия (когда разрешено назначать только оно действие)
+	if($table_1 == '_action')
+		switch($DLG['id']) {
+			case 221:
+			case 222:
+				$sql = "SELECT *
+						FROM `_action`
+						WHERE `id`=".$uid[$table_1];
+				if(!$r = query_assoc($sql))
+					break;
+
+				$sql = "DELETE
+						FROM `_action`
+						WHERE `block_id`=".$r['block_id']."
+						  AND `element_id`=".$r['element_id']."
+						  AND `id`!=".$uid[$table_1];
+				query($sql);
+		}
+
+
 	_historyInsert(1, $DLG, $uid[$table_1]);
 
 	return $uid[$table_1];

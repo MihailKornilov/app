@@ -634,6 +634,9 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 	return $SUQ[$key];
 }
 function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в ссылку
+//	if(empty($el['func']))
+//		return _pr($el['func']);
+return $txt;
 	//оборачивать не нужно
 	if(!$el['url'])
 		return $txt;

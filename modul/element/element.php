@@ -3435,6 +3435,8 @@ function PHP12_action_list($prm) {
 							PHP12_action_214($r).
 							PHP12_action_215($r).
 							PHP12_action_216($r).
+							PHP12_action_221($r).
+							PHP12_action_222($r).
 						'</div>'.
 					'<td class="w50 r top">'.
 						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
