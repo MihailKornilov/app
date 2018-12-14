@@ -128,7 +128,7 @@
 	padding:10px;
 }
 .elem-img{
-	background:no-repeat 0 200px url(../../img/elem.png?49);
+	background:no-repeat 0 200px url(../../img/elem.png?51);
 	height:0;
 	margin-left:29px;
 }
@@ -140,7 +140,7 @@
 .eli6{background-position-y:-1500px;height:30px}/* select - выбор страницы */
 .eli7{background-position-y:-400px;height:30px}/* фильтр: поиск */
 .eli8{background-position-y:-100px;height:30px}/* однострочное поле */
-.eli9{background-position-y:-800px;height:20px}/* ссылка на страницу */
+.eli9{background-position-y:-800px;height:30px}/* поле-пароль */
 .eli10{background-position-y:-900px;height:30px}/* текст */
 .eli14{background-position-y:-2500px;height:95px}/* список - ШАБЛОН */
 .eli15{background-position-y:-2200px;height:15px}/* количество строк списка */
@@ -174,6 +174,7 @@
 .eli71{background-position-y:-4200px;height:15px} /* список - иконка сортировки */
 .eli102{background-position-y:-4300px;height:30px}/* фильтр - выбор групп значений */
 .eli49{background-position-y:-4400px;height:30px} /* выбор блоков */
+.eli300{background-position-y:-4500px;height:120px}/* поле ВК */
 
 
 
