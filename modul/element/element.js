@@ -1822,9 +1822,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					   .off('click', ATTR_EL(el.id) + ' .icon-del-red')
 						.on('click', ATTR_EL(el.id) + ' .icon-del-red', function() {
 							VK_RES.html('');
-							INP.val('')._dn(1);
 							VK_ICON._dn(1);
 							ATR_CMP.val(0);
+							INP.val('')._dn(1).focus();
 						});
 					return;
 			}

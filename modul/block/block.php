@@ -803,6 +803,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		//Поле-пароль
 		case 9:
 			/*
+				txt_1 - текст для placeholder
 				num_1 - минимальное количество знаков
 			*/
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
