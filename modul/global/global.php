@@ -773,8 +773,8 @@ function _jsCacheElemOne($elem_id) {
 		$val['issp'] = 1;
 
 	//разрешать настройку стилей
-	if(_elemRule($r['dialog_id'], 11))
-		$val['rule11'] = 1;
+	if(_elemRule($r['dialog_id'], 12))
+		$val['stl'] = 1;
 
 	if($dlg = _BE('dialog', $r['dialog_id'])) {
 		if($dlg['element_afics'])
@@ -785,16 +785,25 @@ function _jsCacheElemOne($elem_id) {
 			$val['hint_access'] = 1;
 	}
 
-	if($r['is_img'])
-		$val['is_img'] = 1;
-
 	//исходный диалог (dialog source)
 	if($r['block']['obj_name'] == 'dialog')
 		$val['ds'] = $r['block']['obj_id'];
 
-	//элемент-меню переключения блоков
+	//установка пунтка по умолчанию для элемента [57] "Меню переключения блоков"
 	if($r['dialog_id'] == 57)
 		$val['def'] = $r['def'];
+
+	//настройки элементов, вставленных через [11]
+	if($r['dialog_id'] == 11)
+		if($last_id = _idsLast($r['txt_2']))
+			if($el11 = _elemOne($last_id)) {
+				//является изображением
+				if($el11['dialog_id'] == 60)
+					$val['immg'] = 1;
+				//разрешать настройку стилей
+				if(_elemRule($el11['dialog_id'], 11))
+					$val['stl'] = 1;
+			}
 
 	for($n = 1; $n <= 8; $n++) {
 		$num = 'num_'.$n;

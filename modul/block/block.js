@@ -417,7 +417,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 				'<div val="r" class="icon-wiki iw5' + _dn(BL.pos == 'r','on') + _tooltip('Вправо', -34, 'r') + '</div>';
 	},
 	_elemUnitStyle = function(EL) {
-		if(!EL.style_access)
+		if(!EL.stl)
 			return '';
 
 		return '<table class="w100p mt10">' +
@@ -489,7 +489,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 		return _color(EL.color, func);
 	},
 	_elemUnitImg = function(EL) {
-		if(!EL.is_img)
+		if(!EL.immg)
 			return '';
 
 		return '<table class="bs5">' +

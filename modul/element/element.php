@@ -936,35 +936,37 @@ function PHP12_spisok23_app() {//списки-таблицы для текуще
 }
 
 function _elemRule($i='all', $v=0) {//кеш правил для элементов
-	global $DLG_RULE,//элемент содержит правило
-		   $RULE_DLG;//правило содержит элемен
+	global  $RULE_USE,//массив всех правил
+			$DLG_ASS, //элемент содержит правило
+		    $RULE_ASS;//правило содержит элемен
 
-	$key = 'ELM_RULE';
-	if(!$arr = _cache_get($key, 1)) {
-		$sql = "SELECT *
-				FROM `_element_rule_use`
-				ORDER BY `dialog_id`,`rule_id`";
-		$arr = query_arr($sql);
-		_cache_set($key, $arr, 1);
-	}
+	if(!defined('RULE_USE')) {
+		$key = 'RULE_USE';
+		if(!$RULE_USE = _cache_get($key, 1)) {
+			$sql = "SELECT *
+					FROM `_element_rule_use`
+					ORDER BY `dialog_id`,`rule_id`";
+			$RULE_USE = query_arr($sql);
+			_cache_set($key, $RULE_USE, 1);
+		}
 
-	if(!defined('ELM_RULE')) {
-		$DLG_RULE = array();
-		$RULE_DLG = array();
-		foreach($arr as $r) {
+		$DLG_ASS = array();
+		$RULE_ASS = array();
+		foreach($RULE_USE as $r) {
 			$did = _num($r['dialog_id']);
 			$rid = _num($r['rule_id']);
-			$DLG_RULE[$did][$rid] = 1;
-			$RULE_DLG[$rid][$did] = 1;
+			$DLG_ASS[$did][$rid] = 1;
+			$RULE_ASS[$rid][$did] = 1;
 		}
-	}
 
+		define('RULE_USE', 1);
+	}
 
 	//содержит ли элемент правило
 	if($dlg_id = _num($i))
-		return isset($DLG_RULE[$dlg_id][$v]);
+		return isset($DLG_ASS[$dlg_id][$v]);
 
-	return $arr;
+	return $RULE_USE;
 }
 
 function _elemOne($elem_id) {//запрос одного элемента

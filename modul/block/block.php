@@ -2377,7 +2377,6 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 			$el['attr_el'] = '#el_'.$elem_id;
 			$el['attr_cmp'] = '#cmp_'.$elem_id;
 			$el['size'] = $el['size'] ? _num($el['size']) : 13;
-			$el['is_img'] = 0;
 			$el['is_func'] = _num(@$isFunc[$elem_id]);
 			$el['url_access'] = _num($dlg['element_url_access']);
 			$el['hint_access'] = _num($dlg['element_hint_access']);
