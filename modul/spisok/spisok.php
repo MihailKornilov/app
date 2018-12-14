@@ -637,40 +637,22 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 	if(empty($el['func']))
 		return $txt;
 
-	//отсутствует запись
-//	if(!$u = $prm['unit_get'])
-//		return $txt;
+	//данные записи
+	$u = $prm['unit_get'];
 
 	$func = $el['func'][0];
 	switch($func['dialog_id']) {
 		//переход на страницу
 		case 221:
-			return '<a href="'.URL.'&p='.$func['target_ids'].'" class="inhr">'.$txt.'</a>';
+			$page_id = $func['target_ids'];
+			$id = _spisokUnitUrlId($el, $page_id, $u);
+			return '<a href="'.URL.'&p='.$page_id.($id ? '&id='.$id : '').'" class="inhr">'.$txt.'</a>';
 
 		//открытие диалога
 		case 222:
 	}
 
 	return $txt;
-	//оборачивать не нужно
-	if(!$el['url'])
-		return $txt;
-
-	//указана конкретная страница
-	if($el['url'] != 3) {
-		$page = _page($el['url']);
-		$uid = $u['id'];
-
-		if($page['dialog_id_unit_get'] != @$u['dialog_id_use'])
-			if($el['dialog_id'] == 11) {
-				if(!$ids = _ids($el['txt_2'], 'arr'))
-					return $txt;
-				if(!$col = _elemCol($ids[0]))
-					return $txt;
-				$uid = is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
-			}
-		return '<a href="'.URL.'&p='.$el['url'].'&id='.$uid.'" class="inhr">'.$txt.'</a>';
-	}
 
 	if(!$dlg = _elem_11_dialog($el))
 		return $txt;
@@ -684,6 +666,23 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 	return '<a href="'.URL.'&p='.$page_id.'&id='.$u['id'].'" class="inhr">'.$txt.'</a>';
 }
+function _spisokUnitUrlId($el, $page_id, $u) {//получение id записи согласно странице
+	if(empty($u))
+		return 0;
+	if(!$page = _page($page_id))
+		return $u['id'];
+
+	if($page['dialog_id_unit_get'] != @$u['dialog_id_use'])
+		if($el['dialog_id'] == 11) {
+			if(!$ids = _ids($el['txt_2'], 'arr'))
+				return $u['id'];
+			if(!$col = _elemCol($ids[0]))
+				return $u['id'];
+			return is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
+		}
+	return $u['id'];
+}
+
 function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстовом (быстром) поиске
 	$element_id_spisok = 0;
 
