@@ -3051,6 +3051,12 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 	if(!$parent_id = _num($unit['id']))
 		return;
 
+	//получение id приложения у родительского элемента
+	$sql = "SELECT `app_id`
+			FROM `_element`
+			WHERE `id`=".$parent_id;
+	$app_id = query_value($sql);
+
 	$ids = '0';
 	$update = array();
 
@@ -3066,7 +3072,7 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 				continue;
 			$update[] = "(
 				".$id.",
-				".$unit['app_id'].",
+				".$app_id.",
 				".$parent_id.",
 				'".addslashes($title)."',
 				"._num($r['num_1']).",

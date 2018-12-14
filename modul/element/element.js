@@ -2027,6 +2027,22 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								break;
 						}
 					});
+				//открытие диалога
+				case 205:
+					if(is_open)
+						break;
+					if(v != sp.initial_id)
+						break;
+					var dlg_id = _num(sp.target_ids);
+					if(!dlg_id)
+						break;
+					var send = {
+						dialog_id:dlg_id,
+						busy_obj:_attr_bl(ELMM[el.id].block_id)
+					};
+
+					_dialogLoad(send);
+					break;
 				//установка фокуса
 				case 206:
 					var is_set = 0;//по умолчанию: сбросить значение
