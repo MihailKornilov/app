@@ -781,11 +781,9 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_2 - количество знаков после запятой
 				num_3 - разрешать отрицательные значения
 				num_4 - разрешать вносить 0
-				num_5 - поле-пароль
 			*/
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$disabled = $prm['blk_setup'] ? ' disabled' : '';
-			$type = $el['num_5'] ? 'password' : 'text';
 
 			$v = _elemPrintV($el, $prm, $el['txt_2']);
 
@@ -800,25 +798,17 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					break;
 			}
 
-			//поле пароля не выводится при редактировании
-			if($el['num_5'])
-				$v = '';
+			return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
 
-			return '<input type="'.$type.'" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
-
-		//Ссылка на страницу
+		//Поле-пароль
 		case 9:
 			/*
-                txt_1 - текст ссылки
-				num_1 - id страницы
+				num_1 - минимальное количество знаков
 			*/
-			if(!$txt = $el['txt_1']) {
-				$page = _page($el['num_1']);
-				$txt = $page['name'];
-			}
-			return '<a class="inhr" href="'.URL.'&p='.$el['num_1'].'">'.
-						$txt.
-				   '</a>';
+			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+			return '<input type="password" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' />';
 
 		//произвольный текст
 		case 10:

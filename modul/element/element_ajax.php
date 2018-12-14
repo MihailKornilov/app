@@ -279,7 +279,7 @@ switch(@$_POST['op']) {
 							'<td><input type="hidden" id="element_action_dialog_id" value="'.$dialog['element_action_dialog_id'].'" />'.
 
 						'<tr><td>'.
-							'<td class="pt20">'.
+							'<td class="pt10">'.
 			                       _check(array(
 										'attr_id' => 'element_hidden',
 										'title' => 'скрытый элемент',

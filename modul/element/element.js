@@ -400,7 +400,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			width:100,
 			spisok:o.col_type
 		});
-		DLG('#element_dialog_func')._select({
+		DLG('#element_action_dialog_id')._select({
 			width:280,
 			title0:'не указан',
 			spisok:o.dlg_func
