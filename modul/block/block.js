@@ -378,9 +378,9 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 			   '</div>';
 	},
 	_elemUnitAction = function(EL) {//иконка для настройки действий
-		if(!EL.dialog_func)
+		if(!EL.eadi)
 			return '';
-		return '<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>';
+		return '<div val="dialog_id:' + EL.eadi + ',block_id:' + EL.block_id + '" class="icon icon-usd ml3 dialog-open' + _tooltip('Настроить действия', -62) + '</div>';
 	},
 	_elemUnitMar = function(EL) {
 		var mar = EL.mar.split(' ');

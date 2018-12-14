@@ -784,8 +784,8 @@ function _jsCacheElemOne($elem_id) {
 	if($dlg = _BE('dialog', $r['dialog_id'])) {
 		if($dlg['element_afics'])
 			$val['afics'] = $dlg['element_afics'];
-		if($dlg['element_dialog_func'])
-			$val['dialog_func'] = $dlg['element_dialog_func'];
+		if($dlg['element_action_dialog_id'])
+			$val['eadi'] = $dlg['element_action_dialog_id'];
 	}
 
 	//исходный диалог (dialog source)
@@ -806,6 +806,9 @@ function _jsCacheElemOne($elem_id) {
 				//разрешать настройку стилей
 				if(_elemRule($el11['dialog_id'], 11))
 					$val['stl'] = 1;
+				//разрешать настройку перехода на страницу или открытие диалога
+				if(_elemRule($el11['dialog_id'], 16))
+					$val['url_use'] = 1;
 			}
 
 	for($n = 1; $n <= 8; $n++) {

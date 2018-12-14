@@ -2349,13 +2349,6 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 
 		$ELM = array();
 
-		//наличие функций в элементах
-		$sql = "SELECT `element_id`,1
-				FROM `_action`
-				WHERE `element_id`
-				GROUP BY `element_id`";
-		$isFunc = query_ass($sql);
-
 		//переменная для сбора ID элементов-таблиц
 		$elem23 = array();
 
@@ -2377,8 +2370,6 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 			$el['attr_el'] = '#el_'.$elem_id;
 			$el['attr_cmp'] = '#cmp_'.$elem_id;
 			$el['size'] = $el['size'] ? _num($el['size']) : 13;
-			$el['is_func'] = _num(@$isFunc[$elem_id]);
-			$el['dialog_func'] = _num($dlg['element_dialog_func']);
 			$el['afics'] = $dlg['element_afics'];
 			$el['hidden'] = _num($dlg['element_hidden']);
 

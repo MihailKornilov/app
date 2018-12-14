@@ -276,9 +276,9 @@ switch(@$_POST['op']) {
 						'<tr><td class="red r">CMP-аффикс:'.
 							'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
 						'<tr><td class="red r">Диалог для функций:'.
-							'<td><input type="hidden" id="element_dialog_func" value="'.$dialog['element_dialog_func'].'" />'.
+							'<td><input type="hidden" id="element_action_dialog_id" value="'.$dialog['element_action_dialog_id'].'" />'.
 
-						'<tr><td class="red r pt20">Дополнительно:'.
+						'<tr><td>'.
 							'<td class="pt20">'.
 			                       _check(array(
 										'attr_id' => 'element_hidden',
@@ -889,7 +889,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 	$element_type = _num($_POST['element_type']);
 	$element_afics = _txt($_POST['element_afics']);
 	$element_hidden = _num($_POST['element_hidden']);
-	$element_dialog_func = _num($_POST['element_dialog_func']);
+	$element_action_dialog_id = _num($_POST['element_action_dialog_id']);
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
@@ -906,7 +906,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 				`element_type`=".$element_type.",
 				`element_afics`='".addslashes($element_afics)."',
 				`element_hidden`=".$element_hidden.",
-				`element_dialog_func`=".$element_dialog_func."
+				`element_action_dialog_id`=".$element_action_dialog_id."
 			WHERE `id`=".$dialog_id;
 	query($sql);
 
