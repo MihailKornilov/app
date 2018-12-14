@@ -752,7 +752,6 @@ function _jsCacheElemOne($elem_id) {
 	$val['font'] = $r['font'];
 	$val['color'] = $r['color'];
 	$val['size'] = $r['size'];
-	$val['url'] = $r['url'];
 	$val['width'] = $r['width'];
 
 	if($r['focus'])
@@ -764,10 +763,6 @@ function _jsCacheElemOne($elem_id) {
 	if($r['func'])
 		$val['func'] = $r['func'];
 
-	if(!empty($r['format']))
-		$val['format'] = $r['format']['id'];
-
-
 	//элемент является подключаемым списком
 	if(_elemIsConnect($r))
 		$val['issp'] = 1;
@@ -776,13 +771,17 @@ function _jsCacheElemOne($elem_id) {
 	if(_elemRule($r['dialog_id'], 12))
 		$val['stl'] = 1;
 
+	//разрешать условий отображения
+	if(_elemRule($r['dialog_id'], 14)) {
+		$val['rule14'] = 1;
+		$val['format_id'] = empty($r['format']) ? 0 : $r['format']['id'];
+	}
+
 	if($dlg = _BE('dialog', $r['dialog_id'])) {
 		if($dlg['element_afics'])
 			$val['afics'] = $dlg['element_afics'];
 		if($dlg['element_dialog_func'])
 			$val['dialog_func'] = $dlg['element_dialog_func'];
-		if($dlg['element_hint_access'])
-			$val['hint_access'] = 1;
 	}
 
 	//исходный диалог (dialog source)
@@ -793,7 +792,7 @@ function _jsCacheElemOne($elem_id) {
 	if($r['dialog_id'] == 57)
 		$val['def'] = $r['def'];
 
-	//настройки элементов, вставленных через [11]
+	//правила для элементов, вставленных через [11]
 	if($r['dialog_id'] == 11)
 		if($last_id = _idsLast($r['txt_2']))
 			if($el11 = _elemOne($last_id)) {

@@ -340,9 +340,10 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 			'<div class="line-b">' +
 				'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + EL.id, 5)  : '">') + 'Элемент</span>' +
 				'<div class="fr mtm3">' +
+					_elemUnitUrl(EL) +
 					_elemUnitFormat(EL) +
-					'<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(EL.dialog_func) + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>' +
 					_elemUnitHint(EL) +
+					_elemUnitAction(EL) +
 					'<div val="dialog_id:' + EL.dialog_id + ',edit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
 					'<div val="dialog_id:' + EL.dialog_id + ',del_id:' + EL.id + '" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
 				'</div>' +
@@ -357,8 +358,13 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 			_elemUnitImg(EL) +
 		'</div>';
 	},
+	_elemUnitUrl = function(EL) {//иконка с для настройки ссылки
+		return '<div val="dialog_id:79,edit_id:' + EL.id + '" class="icon icon-out ml3 pl dialog-open' + _dn(EL.url, 'on') + _tooltip('Настроить ссылку', -56) + '</div>'
+	},
 	_elemUnitFormat = function(EL) {//иконка с дополнительными условиями отображения
-		return '<div val="dialog_id:64,block_id:' + EL.block_id + ',edit_id:' + _num(EL.format) + '" class="icon icon-eye ml3 dialog-open' + _dn(!EL.format, 'pl') + _tooltip('Условия отображения', -67) + '</div>';
+		if(!EL.rule14)
+			return '';
+		return '<div val="dialog_id:64,block_id:' + EL.block_id + ',edit_id:' + EL.format_id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
 	},
 	_elemUnitHint = function(EL) {//иконка для настройки выплывающей подсказки
 		if(!EL.hint_access)
@@ -368,6 +374,11 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 		return '<div val="dialog_id:43,block_id:' + EL.block_id + ',edit_id:' + hint_id + '"' +
 				   ' class="icon icon-hint ml3 curP dialog-open' + _dn(!pl, 'pl') + _tooltip('Настроить подсказку', -65) +
 			   '</div>';
+	},
+	_elemUnitAction = function(EL) {//иконка для настройки действий
+		if(!EL.dialog_func)
+			return '';
+		return '<div val="dialog_id:' + EL.dialog_func + ',block_id:' + BL.id + '" class="icon icon-usd ml3 dialog-open' + _dn(!EL.is_func, 'pl') + _tooltip('Настроить действия', -62) + '</div>';
 	},
 	_elemUnitMar = function(EL) {
 		var mar = EL.mar.split(' ');
@@ -466,10 +477,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 			'<div val="b" class="icon-wiki ml3' + font.b + _tooltip('Жирный', -23) + '</div>' +
 			'<div val="i" class="icon-wiki iw1 ml3' + font.i + _tooltip('Наклонный', -31) + '</div>' +
 			'<div val="u" class="icon-wiki iw2 ml3' + font.u + _tooltip('Подчёкнутый', -39) + '</div>' +
-		'</div>' +
-		(true || EL.url_access ?
-			'<div val="dialog_id:79,edit_id:' + EL.id + '" class="icon-wiki iw12 ml3 dialog-open' + _dn(EL.url, 'on') + _tooltip('Настроить ссылку', -53) + '</div>'
-		: '');
+		'</div>';
 	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста
 		var func = function(v) {

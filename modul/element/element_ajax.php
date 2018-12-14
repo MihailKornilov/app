@@ -285,19 +285,6 @@ switch(@$_POST['op']) {
 										'title' => 'скрытый элемент',
 										'value' => $dialog['element_hidden']
 								   )).
-
-						'<tr><td>'.
-							'<td>'._check(array(
-										'attr_id' => 'element_url_access',
-										'title' => 'разрешать делать ссылкой',
-										'value' => $dialog['element_url_access']
-								   )).
-						'<tr><td>'.
-							'<td>'._check(array(
-										'attr_id' => 'element_hint_access',
-										'title' => 'разрешать прикрепление подсказки',
-										'value' => $dialog['element_hint_access']
-								   )).
 					'</table>'.
 		            _dialogSetupRule($dialog_id).
 					'</div>'.
@@ -901,8 +888,6 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 	$element_type = _num($_POST['element_type']);
 	$element_afics = _txt($_POST['element_afics']);
 	$element_hidden = _num($_POST['element_hidden']);
-	$element_url_access = _num($_POST['element_url_access']);
-	$element_hint_access = _num($_POST['element_hint_access']);
 	$element_dialog_func = _num($_POST['element_dialog_func']);
 
 	$sql = "UPDATE `_dialog`
@@ -920,8 +905,6 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 				`element_type`=".$element_type.",
 				`element_afics`='".addslashes($element_afics)."',
 				`element_hidden`=".$element_hidden.",
-				`element_url_access`=".$element_url_access.",
-				`element_hint_access`=".$element_hint_access.",
 				`element_dialog_func`=".$element_dialog_func."
 			WHERE `id`=".$dialog_id;
 	query($sql);
