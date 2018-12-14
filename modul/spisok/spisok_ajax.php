@@ -496,14 +496,22 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 						$err_msg = 'Значение не может быть отрицательным';
 					}
 				}
-				//поле-пароль
-				if($cmp['num_5'])
-					if($v)
-						$v = _authPassMD5($v);
-					else
-						break;//если поле пароля пустое, то значение не вносится
-
 				$send[$cmp_id] = $v;
+				break;
+			case 9://поле-пароль
+				if($cmp['req'] && !strlen($v)) {
+					$is_err = 1;
+					break;
+				}
+
+				if($v && strlen($v) < $cmp['num_1']) {
+					$is_err = 1;
+					$err_msg = 'Минимальная длина пароля '.$cmp['num_1'].' символ'._end($cmp['num_1'], '', 'а', 'ов');
+					break;
+				}
+
+				if($v)
+					$send[$cmp_id] = _authPassMD5($v);
 				break;
 			case 300://страница ВК
 				if(_elem300VkIdTest($DLG, $v, $unit_id)) {

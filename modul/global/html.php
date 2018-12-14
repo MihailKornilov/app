@@ -191,19 +191,31 @@ function _authLogout() {//выход из приложения, если тре�
 function _authPassMD5($pass) {
 	return md5('655005005xX'.$pass);
 }
+function _authCmp($dialog, $cmp, $name) {//получение значения по имени колонки
+	foreach($dialog['cmp'] as $cmp_id => $r)
+		if($r['col'] == $name)
+			return $cmp[$cmp_id];
+	return '';
+}
 function _auth98($dialog, $cmp) {//регистрация нового пользователя
 	if($dialog['id'] != 98)
 		return;
 
-	$f = $cmp[2065];
-	$i = $cmp[2066];
+	if(!$f = _authCmp($dialog, $cmp, 'f'))
+		jsonError('Не найдена фамилия');
+	if(!$i = _authCmp($dialog, $cmp, 'i'))
+		jsonError('Не найдено имя');
+
 	$pol = array(
 		0 => 0,
 		2073 => 1749,//мужской
 		2074 => 1750 //женский
 	);
-	$login = $cmp[2069];
-	$pass = $cmp[2070];
+
+	if(!$login = _authCmp($dialog, $cmp, 'login'))
+		jsonError('Не найден логин');
+	if(!$pass = _authCmp($dialog, $cmp, 'pass'))
+		jsonError('Не найден пароль');
 
 	$sql = "INSERT INTO `_user` (
 				`f`,
@@ -229,13 +241,12 @@ function _auth98($dialog, $cmp) {//регистрация нового поль�
 function _auth99($dialog, $cmp) {//авторизация по логину и паролю
 	if($dialog['id'] != 99)
 		return;
-	if(empty($cmp[2058]))
-		jsonError('Не указан логин');
-	if(empty($cmp[2059]))
-		jsonError('Не указан пароль');
 
-	$login = $cmp[2058];
-	$pass = $cmp[2059];
+	if(!$login = _authCmp($dialog, $cmp, 'login'))
+		jsonError('Не найден логин');
+	if(!$pass = _authCmp($dialog, $cmp, 'pass'))
+		jsonError('Не найден пароль');
+
 
 	$sql = "SELECT `id`
 			FROM `_user`
