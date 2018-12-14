@@ -768,8 +768,6 @@ function _jsCacheElemOne($elem_id) {
 		$val['focus'] = 1;
 
 	if($dlg = _BE('dialog', $r['dialog_id'])) {
-		if($dlg['element_style_access'])
-			$val['style_access'] = $dlg['element_style_access'];
 		if($dlg['element_afics'])
 			$val['afics'] = $dlg['element_afics'];
 		if($dlg['element_dialog_func'])
@@ -780,7 +778,7 @@ function _jsCacheElemOne($elem_id) {
 
 	$val['width'] = $r['width'];
 
-//	if($r['is_img'])
+	if($r['is_img'])
 		$val['is_img'] = 1;
 
 	//исходный диалог (dialog source)

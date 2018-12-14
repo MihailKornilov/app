@@ -499,7 +499,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				element_afics:DLG('#element_afics').val(),
 				element_hidden:DLG('#element_hidden').val(),
 
-				element_style_access:DLG('#element_style_access').val(),
 				element_url_access:DLG('#element_url_access').val(),
 				element_hint_access:DLG('#element_hint_access').val(),
 				element_dialog_func:DLG('#element_dialog_func').val(),

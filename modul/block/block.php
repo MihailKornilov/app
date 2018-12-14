@@ -1873,7 +1873,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			if($r['elem_id'] && isset($G_ELEM[$r['elem_id']])) {
 				$el = $G_ELEM[$r['elem_id']];
 				$el['block'] = $G_BLOCK[$id];//предварительно прикрепление данных блока к элементу
-				$r['elem'] = _beElemVvv($el);
+				$r['elem'] = $el;
 			}
 
 			$blk[$id] = $r;
@@ -2003,7 +2003,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			if(!$elem_id = $bl['elem_id'])
 				continue;
 
-			$send[$elem_id] = _beElemVvv($G_ELEM[$elem_id]);
+			$send[$elem_id] = $G_ELEM[$elem_id];
 		}
 
 		return $send;
@@ -2074,7 +2074,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			if(!$elem_id = $r['elem_id'])
 				continue;
 
-			$send[$elem_id] = _beElemVvv($G_ELEM[$elem_id]);
+			$send[$elem_id] = $G_ELEM[$elem_id];
 		}
 
 		return _json($send);
@@ -2379,7 +2379,6 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 			$el['size'] = $el['size'] ? _num($el['size']) : 13;
 			$el['is_img'] = 0;
 			$el['is_func'] = _num(@$isFunc[$elem_id]);
-			$el['style_access'] = _num($dlg['element_style_access']);
 			$el['url_access'] = _num($dlg['element_url_access']);
 			$el['hint_access'] = _num($dlg['element_hint_access']);
 			$el['dialog_func'] = _num($dlg['element_dialog_func']);
@@ -2483,37 +2482,6 @@ function _beElemIdSet($arr) {//добавление id элемента к бл�
 	}
 
 	return $arr;
-}
-function _beElemVvv($el) {//вставка дополнительных значений в элемент
-	global $G_ELEM, $G_DLG;
-
-	switch($el['dialog_id']) {
-		//значение, выбранное из диалога - переустановка некоторых настроек
-		case 11:
-			if(!$ids = _ids($el['txt_2'], 1))
-				break;
-			$c = count($ids) - 1;
-			$last_id = $ids[$c];
-			if(empty($G_ELEM[$last_id]))
-				break;
-			$el11 = $G_ELEM[$last_id];
-			if(!$dlg11 = $G_DLG[$el11['dialog_id']])
-				break;
-
-			switch($el11['dialog_id']) {
-				case 60://image
-					$el['style_access'] = _num($dlg11['element_style_access']);
-					$el['url_access'] = _num($dlg11['element_url_access']);
-					$el['hint_access'] = _num($dlg11['element_hint_access']);
-					$el['dialog_func'] = _num($dlg11['element_dialog_func']);
-					$el['afics'] = $dlg11['element_afics'];
-					$el['is_img'] = 1;
-					break;
-			}
-			break;
-	}
-
-	return $el;
 }
 function _beElemHistory() {//элементы истории действий
 	global $G_DLG, $G_ELEM;

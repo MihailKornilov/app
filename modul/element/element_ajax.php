@@ -286,13 +286,6 @@ switch(@$_POST['op']) {
 										'value' => $dialog['element_hidden']
 								   )).
 
-						'<tr><td class="red r pt20">Разрешения:'.
-							'<td class="pt20">'.
-			                        _check(array(
-										'attr_id' => 'element_style_access',
-										'title' => 'разрешать настройку стилей',
-										'value' => $dialog['element_style_access']
-								   )).
 						'<tr><td>'.
 							'<td>'._check(array(
 										'attr_id' => 'element_url_access',
@@ -926,7 +919,6 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
 	$element_type = _num($_POST['element_type']);
-	$element_style_access = _num($_POST['element_style_access']);
 	$element_afics = _txt($_POST['element_afics']);
 	$element_hidden = _num($_POST['element_hidden']);
 	$element_url_access = _num($_POST['element_url_access']);
@@ -948,7 +940,6 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 				`element_type`=".$element_type.",
 				`element_afics`='".addslashes($element_afics)."',
 				`element_hidden`=".$element_hidden.",
-				`element_style_access`=".$element_style_access.",
 				`element_url_access`=".$element_url_access.",
 				`element_hint_access`=".$element_hint_access.",
 				`element_dialog_func`=".$element_dialog_func."
