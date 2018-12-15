@@ -43,7 +43,8 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 			msg:'<div class="pad5">' +
 					'<div class="line-b">' +
 						'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Блок</span>' +
-						'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl fr dialog-open' + _tooltip('Настроить действия', -62) + '</div>' +
+						'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl fr dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
+						'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl fr dialog-open' + _tooltip('Условия отображения', -67) + '</div>' +
 					'</div>' +
 					_blockUnitBg(BL) +
 					_blockUnitBor(BL) +

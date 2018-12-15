@@ -805,9 +805,9 @@ function _jsCacheElemOne($elem_id) {
 				if(_elemRule($el11['dialog_id'], 11))
 					$val['stl'] = 1;
 				//разрешать настройку условий отображения
-				if(_elemRule($r['dialog_id'], 14)) {
+				if(_elemRule($el11['dialog_id'], 14)) {
 					$val['rule14'] = 1;
-					$val['format_id'] = empty($r['format']) ? 0 : $r['format']['id'];
+					$val['format_id'] = empty($el11['format']) ? 0 : $el11['format']['id'];
 				}
 				//разрешать настройку перехода на страницу или открытие диалога
 				if(_elemRule($el11['dialog_id'], 16))
