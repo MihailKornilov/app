@@ -3957,7 +3957,7 @@ function _historySpisok($el) {//список истории действий [68
 						$cls = implode(' ', $cls);
 						$txt = _elemFormatHide($el, $txt);
 						$txt = _elemFormatDigital($el, $txt);
-						$txt = _spisokUnitUrl($el, $prm, $txt);
+						$txt = _spisokUnitUrl($el, $prm, $txt);//история действий
 						$txt = '<span class="'.$cls.'">'.$txt.'</span>';
 						$msg .= $el['txt_7'].$txt.$el['txt_8'];
 					}

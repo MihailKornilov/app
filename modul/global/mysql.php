@@ -258,6 +258,7 @@ function _queryWhere($DLG) {//составление условий для за�
 		switch($DLG['table_name_1']) {
 			case '_element': break;
 			case '_action':  break;
+			case '_page':  break;
 			default: $send[] = "`".$tn."`.`app_id`=".APP_ID;
 		}
 

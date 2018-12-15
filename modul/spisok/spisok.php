@@ -457,7 +457,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 			width:      ширина колонки
 			font:       выделение: b, i, u
 			color:      цвет текста
-			url_access: отображение иконки для настройки ссылки
+			url_use:    отображение иконки для настройки ссылки
 			url:        текст в колонке является ссылкой
 			txt_7:      TH-заголовок колонки
 			pos:        txt_8: позиция по горизонтали (l, center, r)
@@ -531,7 +531,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 
 			$txt = _elemFormatHide($td, $txt);
 			$txt = _elemFormatDigital($td, $txt);
-			$txt = _spisokUnitUrl($td, $prm, $txt);
+			$txt = _spisokUnitUrl($td, $prm, $txt);//таблица
 
 			$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
 		}

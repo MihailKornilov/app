@@ -556,7 +556,7 @@ function _elemDiv($el, $prm=array()) {//формирование div элеме�
 
 	$txt = _elemFormatHide($el, $txt);
 	$txt = _elemFormatDigital($el, $txt);
-	$txt = _spisokUnitUrl($el, $prm, $txt);
+	$txt = _spisokUnitUrl($el, $prm, $txt);// шаблон
 
 	return '<div'._elemDivAttrId($el, $prm).$cls._elemStyle($el, $prm).'>'.$txt.'</div>';
 }

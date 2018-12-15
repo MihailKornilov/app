@@ -2840,7 +2840,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				width:150,      //ширина колонки
 				font:'',        //выделение: b, i, u
 				color:'',       //цвет текста
-				url_access:1,   //отображение иконки для настройки ссылки
+				url_use:1,      //отображение иконки для настройки ссылки
 				url:0,          //текст в колонке является ссылкой
 				txt_7:'',       //TH-заголовок колонки
 				pos:''          //txt_8: позиция по горизонтали (l, center, r)
@@ -2907,7 +2907,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					msg:'<table class="bs5">' +
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
-								'<td class="pt3">' + _elemUnitFormat(v) +
+								'<td class="pt3">' +
+									'<div class="icon-wiki iw12 ml3' + _tooltip('Ссылка', -20) + '</div>' +
 								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
 						'</table>' +
 						'',
