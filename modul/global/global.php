@@ -775,11 +775,9 @@ function _jsCacheElemOne($elem_id) {
 	if(_elemRule($r['dialog_id'], 13))
 		$val['url_use'] = 1;
 
-	//разрешать условий отображения
-	if(_elemRule($r['dialog_id'], 14)) {
-		$val['rule14'] = 1;
-		$val['format_id'] = empty($r['format']) ? 0 : $r['format']['id'];
-	}
+	//разрешать прикрепление подсказки
+	if(_elemRule($r['dialog_id'], 15))
+		$val['rule15'] = 1;
 
 	if($dlg = _BE('dialog', $r['dialog_id'])) {
 		if($dlg['element_afics'])
@@ -806,6 +804,11 @@ function _jsCacheElemOne($elem_id) {
 				//разрешать настройку стилей
 				if(_elemRule($el11['dialog_id'], 11))
 					$val['stl'] = 1;
+				//разрешать настройку условий отображения
+				if(_elemRule($r['dialog_id'], 14)) {
+					$val['rule14'] = 1;
+					$val['format_id'] = empty($r['format']) ? 0 : $r['format']['id'];
+				}
 				//разрешать настройку перехода на страницу или открытие диалога
 				if(_elemRule($el11['dialog_id'], 16))
 					$val['url_use'] = 1;
