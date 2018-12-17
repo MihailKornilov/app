@@ -2806,7 +2806,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ ===--- */
-	PHP12_spisok_td_setting = function(el, vvv, obj) {//настройка ячеек таблицы
+	PHP12_td_setup = function(el, vvv, obj) {//настройка ячеек таблицы
 		if(!obj.unit.id)
 			return;
 
@@ -2948,7 +2948,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 		}
 	},
-	PHP12_spisok_td_setting_get = function(el) {//сохранение ячеек таблицы
+	PHP12_td_setup_get = function(el) {//сохранение ячеек таблицы
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			var v = {},

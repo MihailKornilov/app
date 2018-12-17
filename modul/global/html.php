@@ -16,6 +16,7 @@ function _face() {//определение, как загружена стран
 function _sa($user_id=USER_ID) {
 	//Список пользователей - SA
 	$SA[1] = true;  //Михаил Корнилов
+//	$SA[57] = true; //Лена Навроцкая
 
 
 	$issa = isset($SA[$user_id]) ? 1 : 0;
@@ -448,17 +449,17 @@ function _hat_but_page() {//отображение кнопки списка с�
 	return '<button class="vk small ml10" onclick="location.href=\''.URL.'&p=12\'">Cтраницы</button>';
 }
 function _hat_but_pas() {//отображение кнопки настройки страницы
-	if(!APP_ID)
+	if(!SA && !APP_ID)
 		return '';
-	if(!USER_CREATOR)
+	if(!SA && !USER_CREATOR)
 		return '';
 	if(!$page_id = _page('cur'))
 		return '';
 	if(!$page = _page($page_id))
 		return '';
-	if($page['sa'] && !SA)
+	if(!SA && $page['sa'])
 		return '';
-	if(!$page['app_id'] && !SA)
+	if(!SA && !$page['app_id'])
 		return '';
 
 	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';

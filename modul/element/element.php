@@ -2715,7 +2715,7 @@ function PHP12_spisok14_setup($prm) {//настройка шаблона
 
 
 /* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ [23] ===--- */
-function PHP12_spisok_td_setting($prm) {//используется в диалоге [23]
+function PHP12_td_setup($prm) {//используется в диалоге [23]
 	/*
 		все действия через JS
 	*/
@@ -2725,7 +2725,7 @@ function PHP12_spisok_td_setting($prm) {//используется в диало
 
 	return '';
 }
-function PHP12_spisok_td_setting_save($cmp, $val, $unit) {//сохранение данных ячеек таблицы
+function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данных ячеек таблицы
 	/*
 		$cmp  - компонент из диалога, отвечающий за настройку ячеек таблицы
 		$val  - значения, полученные для сохранения
@@ -2772,7 +2772,7 @@ function PHP12_spisok_td_setting_save($cmp, $val, $unit) {//сохранение
 			  AND !`num_8`";
 	query($sql);
 }
-function PHP12_spisok_td_setting_vvv($prm) {//получение данных ячеек таблицы
+function PHP12_td_setup_vvv($prm) {//получение данных ячеек таблицы
 	if(!$u = $prm['unit_edit'])
 		return array();
 
