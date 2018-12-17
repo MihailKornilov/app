@@ -2421,8 +2421,8 @@ function PHP12_v_choose_dialog($BL, $dialog_id) {//блок из диалога
 		return false;
 	if(!$DLG = _dialogQuery($BL['obj_id']))
 		return 'Диалога '.$BL['obj_id'].' не существует.';
-	if(!$dialog_id = $DLG['dialog_id_unit_get'])
-		return 'Диалог не принимает данные записи';
+//	if(!$dialog_id = $DLG['dialog_id_unit_get'])
+//		return 'Диалог не принимает данные записи';
 
 	return $dialog_id;
 }
@@ -3350,7 +3350,7 @@ function PHP12_balans_setup_save($cmp, $val, $unit) {//сохранение со
 	if(!$parent_id = _num($unit['id']))
 		return;
 
-	$ids = array();
+	$ids = '0';
 	$update = array();
 
 	if(!empty($val)) {
@@ -3360,7 +3360,7 @@ function PHP12_balans_setup_save($cmp, $val, $unit) {//сохранение со
 		foreach($val as $r) {
 			if(!$id = _num($r['id']))
 				continue;
-			$ids[] = $id;
+			$ids .= ','.$id;
 			$spc = _num($r['minus']);
 			$update[] = array(
 				'id' => $id,
@@ -3369,18 +3369,10 @@ function PHP12_balans_setup_save($cmp, $val, $unit) {//сохранение со
 		}
 	}
 
-	$ids = implode(',', $ids);
-
 	//удаление значений, которые были удалены при настройке
 	$sql = "DELETE FROM `_element`
 			WHERE `parent_id`=".$parent_id."
-			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
-	query($sql);
-
-	//ID элементов-значений, составляющих сборный текст
-	$sql = "UPDATE `_element`
-			SET `txt_2`='".$ids."'
-			WHERE `id`=".$parent_id;
+			  AND `id` NOT IN (".$ids.")";
 	query($sql);
 
 	if(empty($update))

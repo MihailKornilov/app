@@ -3369,7 +3369,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					dialog_id:11,
 					block_id:obj.srce.block_id,
 					edit_id:v.id,      //id выбранного элемента (при редактировании)
-					dop:{nest:0},
+					dop:{
+						nest:0,
+						allow:'54,55'
+					},
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {

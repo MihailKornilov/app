@@ -350,11 +350,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	_SUN_CMP_UPDATE($dialog, $POST_CMP, $unit_id);
 	_spisokUnitDelSetup($dialog, $unit_id);
-	_spisokUnitBalansUpd($dialog, $POST_CMP);
+//	_spisokUnitBalansUpd($dialog, $POST_CMP);
 
 	//получение обновлённых данных единицы списка
 	$unit = _spisokUnitQuery($dialog, $unit_id);
-
 	_historyInsertEdit($dialog, $unitOld, $unit);
 
 	if(IS_ELEM) {
@@ -391,7 +390,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	_spisokUnitAfter($dialog, $unit_id, $unitOld);
 
-	if(_table($dialog['table_1']) == '_page') {
+	if($dialog['table_name_1'] == '_page') {
 		_cache_clear('page');
 		_jsCache();
 	}
@@ -1036,29 +1035,31 @@ function _spisokUnitUpd27($unit) {//обновление сумм значени
 			WHERE "._queryWhere($DSrc);
 	query($sql);
 
-	if(!$ids = _ids($unit['txt_2']))
-		return;
-
-	//получение данных значений для подсчёта
-	$sql = "SELECT `txt_2`,`num_8`
+	//получение всех слагаемых баланса
+	$sql = "SELECT
+				`id`,
+				`txt_2`,
+				`num_8`
 			FROM `_element`
-			WHERE `id` IN (".$ids.")";
-	if(!$elData = query_ass($sql))
+			WHERE `parent_id`=".$unit['id'];
+	if(!$item = query_arr($sql))
 		return;
 
 	//получение самих значений для подсчёта
 	$sql = "SELECT `id`,`col`
 			FROM `_element`
 			WHERE LENGTH(`col`)
-			  AND `id` IN ("._idsGet($elData, 'key').")";
-	if(!$elCol = query_ass($sql))
+			  AND `id` IN ("._idsGet($item, 'txt_2').")";
+	if(!$colAss = query_ass($sql))
 		return;
 
-
+	//составление суммы из слагаемых
 	$upd = '';
-	foreach($elCol as $id => $col) {
-		$znak = $elData[$id] ? '-' : '+';
-		$upd .= $znak.'`'.$col.'`';
+	foreach($item as $r) {
+		if(empty($colAss[$r['txt_2']]))
+			continue;
+		$znak = $r['num_8'] ? '-' : '+';
+		$upd .= $znak.'`'.$colAss[$r['txt_2']].'`';
 	}
 
 	//процесс обновления
