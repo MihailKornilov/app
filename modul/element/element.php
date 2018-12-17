@@ -813,7 +813,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 					'<td class="w35 r grey">'.$dialog_id.
 					'<td class="over1 curP dialog-open" val="dialog_id:'.$dialog_id.'">'.$r['name'].
 					'<td class="center">'.
-						'<div val="dialog_id:'.$dialog_id.'" class="icon icon-edit dialog-setup"></div>'.
+						'<div val="dialog_id:'.$dialog_id.'" class="icon icon-edit dialog-setup'._tooltip('Редактировать диалог', -66).'</div>'.
 					'<td class="center'.($r['spisok_on'] ? ' bg-dfd' : '').'">'.($r['spisok_on'] ? 'да' : '').
 					'<td class="color-sal'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
 					'<td class="grey">'.PHP12_dialog_col($dialog_id).

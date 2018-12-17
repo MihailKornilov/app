@@ -1022,7 +1022,7 @@ function _dialogOpenLoad($dialog_id) {
 	_dialogOpenPreLoad($dialog_id);
 
 	/* --- Редактирование записи --- */
-	if($edit_id = _num($_POST['edit_id'])) {
+	if($edit_id = _num(@$_POST['edit_id'])) {
 		$send['head'] = $dialog['edit_head'];
 
 		if(!$dialog['edit_on'])
