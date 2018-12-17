@@ -220,21 +220,6 @@ var ZINDEX = 1000,
 			'<div class="ttug' + ugolSide + '"></div>' +
 		'</div>';
 	},
-	_parent = function(t, tag) {//поиск нужного тега методом parent()
-		tag = tag || 'TR';
-		var max = 10,
-			cls = tag[0] == '.';
-		if(cls)
-			tag = tag.substr(1);
-		while(!(cls ? t.hasClass(tag) : t[0].tagName == tag)) {
-			if(!t.length)
-				break;
-			t = t.parent();
-			if(!--max)
-				break;
-		}
-		return t;
-	},
 	_forEq = function(arr, func) {//перечисление последовательного массива jQuery $(...)
 
 		//перебор будет осуществляться до тех пор, пока не будет встречено значение false в функции

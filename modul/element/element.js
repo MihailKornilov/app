@@ -1127,7 +1127,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									busy_obj:comm
 								};
 								_post(send, function(res) {
-									_parent(t, 'TABLE').before(res.html);
+									t.closest('TABLE').before(res.html);
 									area.val('');
 									area.trigger('_autosize');
 								});
@@ -1598,7 +1598,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					ATR_EL.find('.fm-plus').click(function() {
 						var t = $(this),
 							plus = t.html() == '+',
-							div = _parent(t, 'TABLE').next();
+							div = t.closest('TABLE').next();
 						div['slide' + (plus ? 'Down' : 'Up')](200);
 						t.html(plus ? '-' : '+');
 					});
@@ -2085,7 +2085,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			if(BL.xx == 1) {//если блок в ряду один, фукнция применится ко всей таблице
 				arr.push({
-					obj:_parent(ATR_BL, '.bl-div'),
+					obj:ATR_BL.closest('.bl-div'),
 					slide:1
 				});
 				return;
@@ -2105,7 +2105,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					TRG[id] = 0;//блоки в том же ряду отмечаются, чтобы к ним функция не применялась
 				});
 				arr.push({
-					obj:_parent(ATR_BL, '.bl-div'),
+					obj:ATR_BL.closest('.bl-div'),
 					slide:1
 				});
 				return;
@@ -2452,9 +2452,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				spisok:v.spisok
 			});
 			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
+				$(this).closest('DD').remove();
 			});
 		}
 	},
@@ -2788,9 +2786,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			//удаление пункта меню
 			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
+				$(this).closest('DD').remove();
 			});
 		}
 	},
@@ -2951,7 +2947,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			//удаление элемента
 			DL.find('.icon-del:last').click(function() {
-				_parent($(this), 'DD').remove();
+				$(this).closest('DD').remove();
 			});
 
 			NUM++;
@@ -3084,9 +3080,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				}
 			});
 			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
+				$(this).closest('DD').remove();
 			});
 			if(!v.id)
 				DD.find('.title').select();
@@ -3221,9 +3215,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			//удаление значения radio вместе с условиями
 			DD.find('.icon-del-red').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
+				$(this).closest('DD').remove();
 			});
 		}
 	},
@@ -3310,9 +3302,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				handle:'.icon-move-y'
 			});
 			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
+				$(this).closest('DD').remove();
 				v.id = 0;
 			});
 		}
@@ -3404,9 +3394,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					t._tooltip(plus ? 'Вычитание' : 'Прибавление', plus ? -26 : -33);
 				});
 			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
+				$(this).closest('DD').remove();
 				v.id = 0;
 			});
 		}
@@ -3537,11 +3525,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				});
 			});
 
-
 			DD.find('.icon-del').click(function() {
-				var t = $(this),
-					p = _parent(t, 'DD');
-				p.remove();
+				$(this).closest('DD').remove();
 			});
 			DD.find('.txt_7').focus();
 		}

@@ -35,8 +35,7 @@ var _spisokUpdate = function(elem_spisok, func) {
 			busy_obj:t
 		};
 		_post(send, function(res) {
-			var obj = _parent(t, '._stab');
-			obj.append(res.spisok);
+			t.closest('._stab').append(res.spisok);
 			t.remove();
 		});
 	},

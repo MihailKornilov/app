@@ -470,7 +470,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 			valueSet(tagret.attr('val'));
 			o.func(VALUE);
 		} else {
-			var p = _parent(tagret, '.select-unit');
+			var p = tagret.closest('.select-unit');
 			if(p.hasClass('select-unit')) {
 				valueSet(p.attr('val'));
 				o.func(VALUE);
@@ -2050,7 +2050,7 @@ $.fn._search = function(o, v) {//поисковая строка
 	}, o);
 
 	//вывод поиска, если не был вставлен через PHP. Иначе только применение функций
-	if(!_parent(t, '._search').hasClass('_search')) {
+	if(!t.closest('._search').length) {
 		var width = ' style="width:' + (o.width ? o.width + 'px' : '100%') + '"',
 			placeholder = o.placeholder ? ' placeholder="' + o.placeholder + '"' : '',
 			html = '<div class="_search" id="' + attr_id + '_search"' + width + '>' +
