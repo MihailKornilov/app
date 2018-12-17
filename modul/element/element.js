@@ -2909,7 +2909,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
 								'<td class="pt3">' +
-									'<div class="icon-wiki iw12 ml3' + _dn(v.url_action_id, 'on') + _tooltip('Ссылка', -20) + '</div>' +
+									'<div class="icon-wiki iw12 ml3' + _dn(v.url_action_id, 'on') + _tooltip('Ссылка', -22) + '</div>' +
 								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
 						'</table>' +
 						'',
@@ -2925,7 +2925,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							if(url.hasClass('on')) {
 								url.removeClass('on');
 								DD.attr('data-url', 0);
-								v.url_action_id = 0;
 								return false;
 							}
 

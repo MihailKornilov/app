@@ -416,7 +416,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 				var unit = $(this),
 					v = unit.attr('val');
 
-				_parent(unit, 'TABLE').find('.on').removeClass('on');
+				unit.parents('#elem-pos').find('.on').removeClass('on');
 				unit.addClass('on');
 
 				$(BL.attr_bl).removeClass('top r center bottom');
