@@ -270,7 +270,7 @@ function _spisokInclude($spisok) {//вложенные списки
 		if($dialog_id = _num(@$r['dialog_id']))
 			$DLG_IDS[$dialog_id] = 1;
 	
-	if(empty($DLG_IDS))
+//	if(empty($DLG_IDS))
 		return $spisok;
 
 	foreach($DLG_IDS as $dlg_id => $i) {

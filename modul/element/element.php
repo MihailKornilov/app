@@ -514,11 +514,11 @@ function _dialogSpisokCmp($cmp) {//список колонок, использу
 
 function _dialogContentDelSetup($dialog_id) {//иконка настройки содежания удаления записи (единицы списка)
 	$isSetup = _BE('block_obj', 'dialog_del', $dialog_id);
-	$tooltip = _tooltip(($isSetup ? 'Изменить' : 'Настроить').' содержание', -67);
+	$tooltip = _tooltip(($isSetup ? 'Изменить' : 'Настроить').' содержание', -70);
 	return
 	($isSetup ?'<span class="color-pay b">Настроено.</span> ' : '').
 	'<div val="dialog_id:56,dss:'.$dialog_id.'"'.
-		' class="icon icon-edit pl dialog-open'.$tooltip.
+		' class="icon icon-set pl dialog-open'.$tooltip.
 	'</div>';
 }
 
@@ -797,6 +797,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 				'<tr>'.
 					'<th>ID'.
 					'<th>Имя диалога'.
+					'<th>'.
 					'<th>Список'.
 					'<th>Родитель'.
 					'<th>Колонки'.
@@ -810,10 +811,12 @@ function PHP12_dialog_app() {//список диалоговых окон для
 			$parent = _dialogParam($parent_id, 'name');
 		$send .= '<tr>'.
 					'<td class="w35 r grey">'.$dialog_id.
-					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
+					'<td class="over1 curP dialog-open" val="dialog_id:'.$dialog_id.'">'.$r['name'].
+					'<td class="center">'.
+						'<div val="dialog_id:'.$dialog_id.'" class="icon icon-edit dialog-setup"></div>'.
 					'<td class="center'.($r['spisok_on'] ? ' bg-dfd' : '').'">'.($r['spisok_on'] ? 'да' : '').
 					'<td class="color-sal'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
-					'<td class="grey">'.PHP12_dialog_col($r['id']).
+					'<td class="grey">'.PHP12_dialog_col($dialog_id).
 					'<td>'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 					'<td>'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 					'<td>'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').

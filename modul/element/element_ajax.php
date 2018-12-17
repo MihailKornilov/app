@@ -145,7 +145,7 @@ switch(@$_POST['op']) {
 							'<tr><td class="grey r">Условия удаления:'.
 								'<td class="pale">'.
 									($del58 ? '' : 'условий нет. ').
-									'<div val="dialog_id:58,dss:'.$dialog_id.',edit_id:'.$del58.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить условия', -59).'</div>'.
+									'<div val="dialog_id:58,dss:'.$dialog_id.',edit_id:'.$del58.'" class="icon icon-set pl dialog-open'._tooltip('Настроить условия', -59).'</div>'.
 							'<tr><td class="blue r">Дальнейшее действие:'.
 								'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
 							'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
