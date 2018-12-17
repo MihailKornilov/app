@@ -563,6 +563,7 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 
 	//если производится вставка в блок: проверка, чтобы в блок не попало 2 элемента
 	$block_id = _num($_POST['block_id']);
+	$element_id = _num($_POST['element_id']);
 	if(IS_ELEM && $block_id) {
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока не сущетвует');
@@ -581,7 +582,7 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 	}
 
 	if($DLG['table_name_1'] == '_action')
-		if(!$block_id)
+		if(!$block_id && !$element_id)
 			jsonError('Отсутствует исходный блок или элемент<br>для назначения действия');
 
 	/*
@@ -733,22 +734,34 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 										WHERE `id`=".$uid[$table_1];
 								query($sql);
 							}
-
+					if($element_id) {
+						$sql = "UPDATE `_action`
+								SET `element_id`=".$element_id."
+								WHERE `id`=".$uid[$tab];
+						query($sql);
+					}
 			}
 
 	//установка `app_id` для `_action`
-	if($table_1 == '_action')
+	if($table_1 == '_action') {
+		$app_id = 0;
 		if($block_id) {
 			$sql = "SELECT `app_id`
 					FROM `_block`
 					WHERE `id`=".$block_id;
 			$app_id = query_value($sql);
-
-			$sql = "UPDATE `_action`
-					SET `app_id`=".$app_id."
-					WHERE `id`=".$uid[$tab];
-			query($sql);
 		}
+		if($element_id) {
+			$sql = "SELECT `app_id`
+					FROM `_element`
+					WHERE `id`=".$element_id;
+			$app_id = query_value($sql);
+		}
+		$sql = "UPDATE `_action`
+				SET `app_id`=".$app_id."
+				WHERE `id`=".$uid[$tab];
+		query($sql);
+	}
 
 	//удаление предыдущего действия (когда разрешено назначать только оно действие)
 	if($table_1 == '_action')

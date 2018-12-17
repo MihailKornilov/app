@@ -957,6 +957,7 @@ function _dialogOpenLoad($dialog_id) {
 	$prm['srce']['dialog_id'] = $dialog_id;
 	$prm['srce']['page_id'] = $page_id;
 	$prm['srce']['block_id'] = _num(@$_POST['block_id']);
+	$prm['srce']['element_id'] = _num(@$_POST['element_id']);
 
 	/* --- Удаление записи --- */
 	if($del_id = _num(@$_POST['del_id'])) {

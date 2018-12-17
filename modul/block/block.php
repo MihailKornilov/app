@@ -121,7 +121,8 @@ function _blockParam($PARAM, $obj_name='') {//значения-параметр�
 		'dialog_id' => 0,
 		'dss' => 0,
 		'page_id' => 0,
-		'block_id' => 0
+		'block_id' => 0,
+		'element_id' => 0
 	);
 
 	return $PARAM + $setup;

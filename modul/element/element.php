@@ -2721,7 +2721,7 @@ function PHP12_td_setup($prm) {//используется в диалоге [23]
 	*/
 
 	if(!$prm['unit_edit'])
-		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
+		return _emptyMin('Настройка таблицы будет доступна после вставки списка в блок.');
 
 	return '';
 }
@@ -2750,9 +2750,7 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 		foreach($val as $sort => $r) {
 			if(!$id = _num($r['id']))
 				continue;
-/*
-					`url`="._num($r['url']).",
-*/
+
 			$sql = "UPDATE `_element`
 					SET `num_8`=1,
 						`width`="._num($r['width']).",
@@ -2764,13 +2762,31 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 					WHERE `parent_id`=".$unit['id']."
 					  AND `id`=".$id;
 			query($sql);
+
+			//удаление ссылки, если не нужна
+			if(!_num($r['url'])) {
+				$sql = "DELETE FROM `_action`
+						WHERE `element_id`=".$id."
+						  AND `dialog_id`=221";
+				query($sql);
+			}
 		}
 
 	//удаление значений, которые были удалены при настройке
-	$sql = "DELETE FROM `_element`
+	$sql = "SELECT `id`
+			FROM `_element`
 			WHERE `parent_id`=".$unit['id']."
 			  AND !`num_8`";
-	query($sql);
+	if($ids = query_ids($sql)) {
+		$sql = "DELETE FROM `_element`
+				WHERE `id` IN (".$ids.")";
+		query($sql);
+
+		$sql = "DELETE FROM `_action`
+				WHERE `element_id` IN (".$ids.")
+				  AND `dialog_id`=221";
+		query($sql);
+	}
 }
 function PHP12_td_setup_vvv($prm) {//получение данных ячеек таблицы
 	if(!$u = $prm['unit_edit'])
@@ -2784,16 +2800,24 @@ function PHP12_td_setup_vvv($prm) {//получение данных ячеек 
 	if(!$arr = query_arr($sql))
 		return array();
 
+	//получение действий (переход по ссылке), настроенных для ячеек
+	$sql = "SELECT `element_id`,`id`
+			FROM `_action`
+			WHERE `element_id` IN ("._idsGet($arr).")
+			  AND `dialog_id`=221";
+	$ass = query_ass($sql);
+
+
 	$send = array();
-	foreach($arr as $r) {
+	foreach($arr as $id => $r) {
 		$send[] = array(
-			'id' => _num($r['id']),
+			'id' => _num($id),
 			'dialog_id' => _num($r['dialog_id']),
 			'name' => _elemTitle($r['id']),
 			'width' => _num($r['width']),
 			'font' => $r['font'],
 			'color' => $r['color'],
-			'url' => _num($r['url']),
+			'url_action_id' => _num(@$ass[$id]),
 			'txt_7' => $r['txt_7'],
 			'pos' => $r['txt_8']
 		);

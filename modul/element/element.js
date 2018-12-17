@@ -536,7 +536,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			dialog_id:0,     //диалог, который вносит элемент
 			dss:0,           //id исходного диалога, либо настраиваемого
-			block_id:0,      //блок в который вставляется элемент
+			block_id:0,      //id блока в который вставляется элемент
+			element_id:0,    //id элемента
 
 			get_id:0,        //id записи, содержание которой будет размещаться в диалоге
 			edit_id:0,       //id записи при редактировании
@@ -592,6 +593,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				dialog_id:o.dialog_id,
 				dss:o.srce.dss,
 				block_id:o.srce.block_id,
+				element_id:o.srce.element_id,
 				unit_id:o.edit_id,
 				cmp:{},
 				vvv:{}
@@ -2840,14 +2842,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				width:150,      //ширина колонки
 				font:'',        //выделение: b, i, u
 				color:'',       //цвет текста
-				url_use:1,      //отображение иконки для настройки ссылки
-				url:0,          //текст в колонке является ссылкой
+				url_action_id:0,//текст в колонке является ссылкой
 				txt_7:'',       //TH-заголовок колонки
 				pos:''          //txt_8: позиция по горизонтали (l, center, r)
 			}, v.id ? v : {});
 
 			DL.append(
-				'<dd class="over3" val="' + v.id + '">' +
+				'<dd class="over3" val="' + v.id + '" data-url="' + v.url_action_id + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w80 grey r topi">Колонка ' + NUM + ':' +
@@ -2908,14 +2909,38 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
 								'<td class="pt3">' +
-									'<div class="icon-wiki iw12 ml3' + _tooltip('Ссылка', -20) + '</div>' +
+									'<div class="icon-wiki iw12 ml3' + _dn(v.url_action_id, 'on') + _tooltip('Ссылка', -20) + '</div>' +
 								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
 						'</table>' +
 						'',
 					side:'right',
 					show:1,
 					delayShow:700,
-					delayHide:300
+					delayHide:300,
+					func:function(o) {
+						o.find('.iw12').click(function() {
+							var url = $(this);
+
+							//снятие ссылки
+							if(url.hasClass('on')) {
+								url.removeClass('on');
+								DD.attr('data-url', 0);
+								v.url_action_id = 0;
+								return false;
+							}
+
+							_dialogLoad({
+								dialog_id:221,
+								element_id:v.id,
+								edit_id:v.url_action_id,
+								busy_obj:$(this),
+								func_save:function(res) {
+									DD.attr('data-url', res.unit.id);
+									v.url_action_id = res.unit.id;
+								}
+							});
+						});
+					}
 				});
 			});
 
@@ -2986,9 +3011,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				if(inp.hasClass(k))
 					v.color = k;
 
-			/*
-				url:sp.url
-			*/
+			//ссылка (действие [221])
+			v.url = _num(sp.attr('data-url'));
+
 			send.push(v);
 		});
 
