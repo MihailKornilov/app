@@ -3371,7 +3371,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					edit_id:v.id,      //id выбранного элемента (при редактировании)
 					dop:{
 						nest:0,
-						allow:'54,55'
+						allow:'8,27,54,55'
 					},
 					busy_obj:INP,
 					busy_cls:'hold',

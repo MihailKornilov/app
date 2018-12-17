@@ -1,10 +1,10 @@
 <?php
 switch(@$_POST['op']) {
-	case 'spisok_add'://внесение единицы списка из диалога
+	case 'spisok_add'://внесение новой записи
 		$send = _spisokUnitUpdate();
 		jsonSuccess($send);
 		break;
-	case 'spisok_save'://сохранение данных единицы списка для диалога
+	case 'spisok_save'://сохранение данных записи
 		if(!$unit_id = _num($_POST['unit_id'], 1))
 			jsonError('Некорректный id единицы списка');
 
@@ -12,9 +12,9 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'spisok_del'://удаление единицы списка
+	case 'spisok_del'://удаление записи
 		if(!$unit_id = _num($_POST['unit_id']))
-			jsonError('Некорректный id единицы списка');
+			jsonError('Некорректный id записи');
 
 		$dialog = _spisokUnitDialog($unit_id);
 
@@ -23,14 +23,17 @@ switch(@$_POST['op']) {
 		$send = _spisokAction3($dialog, $unit_id, $send);
 
 		if(isset($dialog['field1']['deleted'])) {
-			$sql = "UPDATE `"._table($dialog['table_1'])."`
+			$unit = _spisokUnitQuery($dialog, $unit_id);
+
+			$sql = "UPDATE "._queryFrom($dialog)."
 					SET `deleted`=1,
 						`user_id_del`=".USER_ID.",
 						`dtime_del`=CURRENT_TIMESTAMP
-					WHERE `id`=".$unit_id;
+					WHERE "._queryWhere($dialog)."
+					  AND `t1`.`id`=".$unit_id;
 			query($sql);
 			_historyInsert(3, $dialog, $unit_id);
-			_spisokUnitAfter($dialog, $unit_id);
+			_SUN_AFTER($dialog, $unit);
 		} else {
 			$elem = array();
 			if(_table($dialog['table_1']) == '_element') {//если это элемент
@@ -388,7 +391,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_spisokUnitUpd54($unit);
 	_spisokUnitUpd55($unit);
 
-	_spisokUnitAfter($dialog, $unit_id, $unitOld);
+	_SUN_AFTER($dialog, $unit, $unitOld);
 
 	if($dialog['table_name_1'] == '_page') {
 		_cache_clear('page');
@@ -987,6 +990,77 @@ function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id ди�
 	query($sql);
 }
 
+function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значения из диалога через [11]
+	if(!IS_ELEM)
+		return;
+	//сохранение данных (выбор значения) должно происходить через [11]
+	if($dialog['id'] != 11)
+		return;
+	//получение элемента-функции [12], отображающего диалог для выбора
+	if(empty($dialog['cmp']))
+		jsonError('Пустой диалог 11');
+
+	$elem_func_id = key($dialog['cmp']);
+
+	if(empty($_POST['vvv'][$elem_func_id]['mysave']))
+		return;
+
+	if(!$v = $POST_CMP[$elem_func_id])
+		jsonError('Значение не выбрано');
+
+	$send = array(
+		'v' => $v,
+		'title' => _elemIdsTitle($v),
+		'issp' => 0,
+		'spisok' => array()
+	);
+
+	//получение значений привязанного списка
+	if($elem_id = _num($v))
+		if(_elemIsConnect($elem_id)) {
+			$send['issp'] = 1;
+			$send['spisok'] = _29cnn($elem_id);
+		}
+
+	//определение, смотрит ли на изменения данного элемента элемент [85]
+	if($el13_id = _num(@$_POST['vvv'][$elem_func_id]['is13'])) {
+		$sql = "SELECT `id`
+				FROM `_element`
+				WHERE `dialog_id`=85
+				  AND `num_1`=".$el13_id."
+				LIMIT 1";
+		if($el_id = query_value($sql))
+			$send['spisok'] = _elem212ActionFormat($el_id, $v, $send['spisok']);
+
+	}
+
+	jsonSuccess($send);
+}
+function _elem19_block_choose($dialog) {//выбор блоков через [11]
+	//выбор блоков должен происходить через [19]
+	if($dialog['id'] != 19)
+		return;
+
+	//получение элемента-функции [12], отображающего диалог для выбора
+	if(empty($dialog['cmp']))
+		jsonError('Пустой диалог 19');
+
+	$vvv = @$_POST['vvv'];
+	$elem_func_id = key($dialog['cmp']);
+
+	$ids = _ids($vvv[$elem_func_id]);
+	$count = _ids($ids, 'count');
+
+	$send['ids'] = $ids;
+	$send['title'] = $count ? $count.' блок'._end($count, '', 'а', 'ов') : '';
+
+	jsonSuccess($send);
+}
+
+
+
+
+/* ---=== CЧЁТЧИКИ: НАСТРОЙКА ===--- */
 function _spisokUnitBalansUpd($dialog, $POST_CMP) {//обновление значения стартовой суммы (для правильного подсчёта баланса)
 	/*
 		Стартовая сумма нужна для корректного отображения баланса (например, расчётного счёта)
@@ -1013,7 +1087,11 @@ function _spisokUnitBalansUpd($dialog, $POST_CMP) {//обновление зна
 		}
 	}
 }
-function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс)
+function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс).
+/*
+	Выполняется:
+		1. При настройке баланса (через диалог [27])
+*/
 	if(!isset($unit['dialog_id']))
 		return;
 	if($unit['dialog_id'] != 27)
@@ -1068,7 +1146,7 @@ function _spisokUnitUpd27($unit) {//обновление сумм значени
 			WHERE "._queryWhere($DSrc);
 	query($sql);
 }
-function _spisokUnitUpd54($unit) {//обновление количеств привязанного списка (при создании элемента)
+function _spisokUnitUpd54($unit) {//обновление количеств
 	if(!isset($unit['dialog_id']))
 		return;
 	if($unit['dialog_id'] != 54)
@@ -1161,7 +1239,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств пр
 		query($sql);
 	}
 }
-function _spisokUnitUpd55($unit) {//обновление сумм привязанного списка
+function _spisokUnitUpd55($unit) {//обновление сумм
 	if(!isset($unit['dialog_id']))
 		return;
 	if($unit['dialog_id'] != 55)
@@ -1232,135 +1310,62 @@ function _spisokUnitUpd55($unit) {//обновление сумм привяза
 	}
 }
 
-function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значения из диалога через [11]
-	if(!IS_ELEM)
-		return;
-	//сохранение данных (выбор значения) должно происходить через [11]
-	if($dialog['id'] != 11)
-		return;
-	//получение элемента-функции [12], отображающего диалог для выбора
-	if(empty($dialog['cmp']))
-		jsonError('Пустой диалог 11');
 
-	$elem_func_id = key($dialog['cmp']);
 
-	if(empty($_POST['vvv'][$elem_func_id]['mysave']))
-		return;
-
-	if(!$v = $POST_CMP[$elem_func_id])
-		jsonError('Значение не выбрано');
-
-	$send = array(
-		'v' => $v,
-		'title' => _elemIdsTitle($v),
-		'issp' => 0,
-		'spisok' => array()
-	);
-
-	//получение значений привязанного списка
-	if($elem_id = _num($v))
-		if(_elemIsConnect($elem_id)) {
-			$send['issp'] = 1;
-			$send['spisok'] = _29cnn($elem_id);
-		}
-
-	//определение, смотрит ли на изменения данного элемента элемент [85]
-	if($el13_id = _num(@$_POST['vvv'][$elem_func_id]['is13'])) {
-		$sql = "SELECT `id`
-				FROM `_element`
-				WHERE `dialog_id`=85
-				  AND `num_1`=".$el13_id."
-				LIMIT 1";
-		if($el_id = query_value($sql))
-			$send['spisok'] = _elem212ActionFormat($el_id, $v, $send['spisok']);
-
-	}
-
-	jsonSuccess($send);
-}
-function _elem19_block_choose($dialog) {//выбор блоков через [11]
-	//выбор блоков должен происходить через [19]
-	if($dialog['id'] != 19)
-		return;
-
-	//получение элемента-функции [12], отображающего диалог для выбора
-	if(empty($dialog['cmp']))
-		jsonError('Пустой диалог 19');
-
-	$vvv = @$_POST['vvv'];
-	$elem_func_id = key($dialog['cmp']);
-
-	$ids = _ids($vvv[$elem_func_id]);
-	$count = _ids($ids, 'count');
-
-	$send['ids'] = $ids;
-	$send['title'] = $count ? $count.' блок'._end($count, '', 'а', 'ов') : '';
-
-	jsonSuccess($send);
-}
-
-function _spisokUnitAfter($dialog, $unit_id, $unitOld=array()) {//выполнение действий после обновления записи
+/* ---=== CЧЁТЧИКИ: В РАБОТЕ ===--- */
+function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение действий после обновления или удаления записи
 	if(!$dialog['table_1'])
 		return;
-	$sql = "SELECT *
-			FROM `"._table($dialog['table_1'])."`
-			WHERE `id`=".$unit_id;
-	if(!$unit = query_assoc($sql))
-		return;
 
-	//получение компонентов диалога, которые отвечают за внесение данных
-	//будет проверка, есть ли какой-то компонент, который участвует в подсчёте баланса
-	$cmpInsertIds = array();
-	foreach($dialog['cmp'] as $cmp) {
-		if(!$cmp['col'])
-			continue;
-		if($cmp['dialog_id'] == 27)
-			continue;
-		if($cmp['dialog_id'] == 54)
-			continue;
-		if($cmp['dialog_id'] == 55)
-			continue;
-		$cmpInsertIds[] = $cmp['id'];
-	}
-
-	foreach($dialog['cmp'] as $cmp)
+	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
 			//обновление суммы, если какой-то элемент самого диалога участвует в подсчёте (для стартовых сумм)
 			case 27:
-				if(empty($cmpInsertIds))
+				//получение компонентов диалога, которые отвечают за внесение данных (для поиска компонента, который участвует в подсчёте баланса)
+				$ids = array();
+				foreach($dialog['cmp'] as $id => $r) {
+					if(!$r['col'])
+						continue;
+					if($r['dialog_id'] == 27)
+						continue;
+					if($r['dialog_id'] == 54)
+						continue;
+					if($r['dialog_id'] == 55)
+						continue;
+					$ids[] = $id;
+				}
+
+				if(!$ids = implode(',', $ids))
 					break;
-				if(empty($cmp['txt_2']))
+
+				//получение id элементов-слагаемых баланса
+				$sql = "SELECT `txt_2`
+						FROM `_element`
+						WHERE `parent_id`=".$cmp['id'];
+				if(!$item_ids = query_ids($sql))
 					break;
 
 				$sql = "SELECT *
 						FROM `_element`
-						WHERE `num_1` IN (".implode(',', $cmpInsertIds).")
-						  AND `id` IN (".$cmp['txt_2'].")
+						WHERE `id` IN (".$ids.")
+						  AND `id` IN (".$item_ids.")
 						ORDER BY `id` DESC";
 				if(!$arr = query_arr($sql))
 					break;
 
 				$send = array();
-				foreach($arr as $r) {
-					$el = $dialog['cmp'][$r['num_1']];
-					$send[] = array(
-						'id' => $el['id'],
-						'block_id' => $el['block_id'],
-						'connect_id' => $unit_id     //id единицы списка, баланс которой будет пересчитан
-					);
-				}
+				foreach($arr as $id => $r)
+					$send[$id] = $unit['id'];     //id записи, баланс которой будет пересчитан
 
 				_spisokUnitAfter27($send);
 				break;
 			//привязанные списки
 			case 29:
 				_spisokUnitAfter54($cmp, $dialog, $unit, $unitOld); //пересчёт количеств привязаного списка [54]
-				$elUpd = _spisokUnitAfter55($cmp, $dialog, $unit);  //пересчёт cумм привязаного списка [55]
-				_spisokUnitAfter27($elUpd);                         //подсчёт балансов после обновления сумм [27]
+				$upd = _spisokUnitAfter55($cmp, $dialog, $unit);    //пересчёт cумм привязаного списка [55]
+				_spisokUnitAfter27($upd);                           //подсчёт балансов после обновления сумм [27]
 				break;
 		}
-
-
 }
 function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количеств привязаного списка
 	$sql = "SELECT *
@@ -1371,7 +1376,7 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 		return;
 	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
 		return;
-	if(!$connect_id = _num($unit[$col]))//значение, id единицы привязанного списка.
+	if(!$connect_id = _num($unit[$col]['id']))//значение, id единицы привязанного списка.
 		return;
 
 	$connect_old = 0;
@@ -1425,7 +1430,7 @@ function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм �
 		return array();
 	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
 		return array();
-	if(!$connect_id = _num($unit[$col]))//значение, id единицы привязанного списка.
+	if(!$connect_id = _num($unit[$col]['id']))//значение, id записи привязанного списка.
 		return array();
 
 	$send = array();//значения, которые были пересчитаны. По ним будет потом посчитан баланс, если потребуется.
@@ -1445,30 +1450,28 @@ function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм �
 		$sql = "SELECT IFNULL(SUM(`".$colSum."`),0)
 				FROM "._queryFrom($dialog)."
 				WHERE `".$col."`=".$connect_id."
-				  AND "._queryWhere($dialog['id']);
+				  AND "._queryWhere($dialog);
 		$sum = query_value($sql);
 
 		$sql = "UPDATE "._queryFrom($dlg)."
 				SET `".$colSumSet."`=".$sum."
 				WHERE `t1`.`id`=".$connect_id."
-				  AND "._queryWhere($dlg['id']);
+				  AND "._queryWhere($dlg);
 		query($sql);
 
-		$send[] = array(
-			'id' => $elem_id,
-			'block_id' => $r['block_id'],
-			'connect_id' => $connect_id     //id единицы списка, баланс которой будет пересчитан
-		);
+		$send[$elem_id] = $connect_id;     //id записи, баланс которой будет пересчитан
 	}
 
 	return $send;
 }
-function _spisokUnitAfter27($elUpd) {
-	if(empty($elUpd))
+function _spisokUnitAfter27($ass) {
+	if(empty($ass))
 		return;
 
-	foreach($elUpd as $el) {
-		if(!$bl = _blockOne($el['block_id']))
+	foreach($ass as $elem_id => $unit_id) {
+		if(!$el = _elemOne($elem_id))
+			continue;
+		if(!$bl = $el['block'])
 			continue;
 		if($bl['obj_name'] != 'dialog')
 			continue;
@@ -1478,20 +1481,20 @@ function _spisokUnitAfter27($elUpd) {
 		foreach($dialog['cmp'] as $cmp) {
 			if($cmp['dialog_id'] != 27)
 				continue;
-			if(empty($cmp['col']))//имя колонки, являющаяся балансом
-				continue;
-			if(empty($cmp['txt_2']))//список id элементов, составляющих сумму
+			if(empty($cmp['col']))//имя колонки, являющейся балансом
 				continue;
 
+			//получение id элементов-слагаемых баланса
 			$sql = "SELECT *
 					FROM `_element`
-					WHERE `id` IN (".$cmp['txt_2'].")";
+					WHERE `parent_id`=".$cmp['id'];
 			if(!$arr = query_arr($sql))
 				continue;
 
-			$upd_flag = 0;//флаг обновления баланса. Будет установлен, если присутствует элемент, участвующий в обновлении.
+			//флаг обновления баланса. Будет установлен, если присутствует элемент, участвующий в обновлении.
+			$upd_flag = 0;
 			foreach($arr as $r)
-				if($r['txt_2'] == $el['id']) {
+				if($r['txt_2'] == $elem_id) {
 					$upd_flag = 1;
 					break;
 				}
@@ -1518,8 +1521,8 @@ function _spisokUnitAfter27($elUpd) {
 			//процесс обновления
 			$sql = "UPDATE "._queryFrom($dialog)."
 					SET `".$cmp['col']."`=".$upd."
-					WHERE `t1`.`id`=".$el['connect_id']."
-					  AND "._queryWhere($dialog['id']);
+					WHERE `t1`.`id`=".$unit_id."
+					  AND "._queryWhere($dialog);
 			query($sql);
 		}
 	}
