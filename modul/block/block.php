@@ -1557,21 +1557,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
                 txt_2 - привязанный список
 			*/
 
-			$v = _spisokFilter('v', $el['id']);
-			if($v === false) {
-				$v = 0;
-				_spisokFilter('insert', array(
-					'spisok' => $el['num_1'],
-					'filter' => $el['id'],
-					'v' => $v
-				));
-			}
-
 			return _select(array(
 						'attr_id' => _elemAttrId($el, $prm),
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'value' => $v
+						'value' => _spisokFilter('vv', $el, 0)
 				   ));
 
 		//Select - выбор значения списка по умолчанию

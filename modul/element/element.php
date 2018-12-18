@@ -1690,6 +1690,8 @@ function _elemTitle($elem_id) {//имя элемента или его текс�
 		case 2:  return $el['txt_1']; //кнопка
 		case 10: return $el['txt_1']; //произвольный текст
 		case 11: return _elem11title($el);
+		case 14://списки
+		case 23: return _dialogParam($el['num_1'], 'name');
 		case 32: return 'номер';
 		case 33: return 'дата';
 		case 30: return 'del';
@@ -4465,15 +4467,7 @@ function _imageWebcam($el) {//Веб-камера (вставляется в б�
 
 
 function _filterCalendar($el) {//Фильтр-календарь
-	if(!$v = _spisokFilter('v', $el['id'])) {
-		$v = $el['num_2'];
-		_spisokFilter('insert', array(
-			'spisok' => $el['num_1'],
-			'filter' => $el['id'],
-			'v' => $v
-		));
-	}
-
+	$v = _spisokFilter('vv', $el, $el['num_2']);
 	$v = _filterCalendarDef($v);
 	$mon = substr($v, 0, 7);
 
@@ -4773,15 +4767,7 @@ function _filterMenu($el) {//фильтр-меню []
 		return _emptyMin10('Фильтр-меню: пустое меню.');
 
 	$send = '';
-	$v = _spisokFilter('v', $el['id']);
-	if($v === false) {
-		$v = 0;
-		_spisokFilter('insert', array(
-			'spisok' => $el['num_1'],
-			'filter' => $el['id'],
-			'v' => $v
-		));
-	}
+	$v = _spisokFilter('vv', $el, 0);
 
 	$spisok = array();
 	foreach($arr as $r)
