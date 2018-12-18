@@ -2040,7 +2040,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							//фильтр-галочка
 							case 62:
 								_attr_cmp(id)._check(is_set);
-								FILTER[el.num_2][id] = is_set;
+								FILTER[el.num_1][id] = is_set;
 								break;
 						}
 					});

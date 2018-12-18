@@ -338,6 +338,8 @@ function _dialogSel24($elem_id, $dlg_id) {//получение id диалога
 			return 0;
 		if(_elemIsConnect($ell))
 			return $ell['num_1'];
+		if($ell['dialog_id'] == 14 || $ell['dialog_id'] == 23)
+			return $ell['num_1'];
 	}
 
 	return 0;
