@@ -761,6 +761,30 @@ button.vk._busy{color:transparent}
 
 
 
+/* Перелистывание годов */
+._yearleaf{
+	background-color:#E8E8E8;
+	height:35px;
+}
+._yearleaf table{height:100%;width:100%}
+._yearleaf .but{
+	width:38px;
+	color:#ccc;
+	font:bold 20px Arial;
+	text-align:center;
+	cursor:pointer;
+}
+._yearleaf .but:hover{background-color:#ddd;color:#aaa}
+._yearleaf .ylc{
+	text-align:center;
+	overflow:hidden;
+	cursor:default;
+}
+._yearleaf .ylc span{
+	font:bold 14px Verdana;
+	color:#555;
+	position:relative;
+}
 
 
 

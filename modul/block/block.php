@@ -1467,6 +1467,20 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		//Значение записи: иконка сортировки
 		case 71: return '<div class="icon icon-move '.($prm['unit_get'] ? 'pl' : 'curD').'"></div>';
 
+		//Фильтр: год и месяц
+		case 72:
+			$v = _elemPrintV($el, $prm, YEAR_CUR);
+			$attr_id = _elemAttrId($el, $prm);
+
+			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+				   '<div class="_yearleaf php" id="'.$attr_id.'_yearleaf">'.
+						'<table>'.
+							'<tr><td class="but">&laquo;'.
+								'<td class="ylc"><span>'.$v.'</span>'.
+								'<td class="but">&raquo;'.
+						'</table>'.
+				   '</div>';
+
 		//Фильтр - Radio
 		case 74:
 			/*

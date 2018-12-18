@@ -1547,6 +1547,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						}
 					});
 					return;
+				//Фильтр: год и месяц
+				case 72:
+					ATR_CMP._yearleaf();
+					return;
 				//Фильтр-галочка
 				case 74:
 					ATR_CMP._radio({

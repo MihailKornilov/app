@@ -40,8 +40,7 @@ $.fn._check = function(o) {
 		t.attr('id', attr_id);
 	}
 
-	var div_id = attr_id + '_check',
-		win = attr_id + '_check_win',
+	var win = attr_id + '_check',
 		S = window[win];
 
 	switch(typeof o) {
@@ -60,7 +59,7 @@ $.fn._check = function(o) {
 
 	checkPrint();
 
-	var CHECK = $('#' + div_id);
+	var CHECK = $('#' + win);
 
 	CHECK.click(function() {
 		if(CHECK.hasClass('disabled'))
@@ -105,7 +104,7 @@ $.fn._check = function(o) {
 			block = o.block ? ' block' : '',
 			dis = o.disabled ? ' disabled' : '',
 			html =
-				'<div id="' + div_id + '" class="_check' + on + title + light + block + dis + cls + '">' +
+				'<div id="' + win + '" class="_check' + on + title + light + block + dis + cls + '">' +
 					(o.title ? o.title : '&nbsp;') +
 				'</div>';
 
@@ -2386,6 +2385,112 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 
 	window[win] = t;
 	return t;
+};
+$.fn._yearleaf = function(o) {//перелистывание годов
+	var t = $(this);
+
+	if(!t.length)
+		return;
+
+	var attr_id = t.attr('id');
+	if(!attr_id) {
+		attr_id = 'check' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
+	}
+
+	var win = attr_id + '_yearleaf',
+		S = window[win],
+		VAL = _num(t.val()),
+		YEAR_CUR = (new Date()).getFullYear(),
+		YL = t.next();
+
+/*
+	if(typeof o == 'string') {
+		if(o == 'cur')
+			S.cur();
+		return t;
+	}
+*/
+
+	if(!YL.hasClass('_yearleaf'))
+		return t;
+	if(!YL.hasClass('php'))
+		return S;
+
+	YL.removeClass('php');
+
+	o = $.extend({
+		func:function() {}
+	}, o);
+
+/*
+	if(!VAL) {
+		VAL = YEAR_CUR;
+		t.val(VAL);
+	}
+*/
+
+	var YW = Math.round(YL.find('.ylc').width() / 2),//ширина центральной части, где год
+		SPN = YL.find('span'),  //текст с годом
+		MAL = YW + Math.floor(SPN.width() / 2), //расстояние, на которое разрешено продвинуться
+		IS_MOVE = 0,            //происходит ли процесс изменения года
+		timer;
+
+	YL.find('.but').mousedown(function() {//перемещение года
+		if(IS_MOVE)
+			return;
+
+		IS_MOVE = 1;
+
+		var side = $(this).html() == '«' ? 1 : -1,
+			mv = 0,
+			speed = 1,  //ускорение
+			half = 0;   //пройдена ли половина пути
+
+		timer = setInterval(function() {
+			mv += (speed += 3);
+
+			if(half && (mv * -1 < 0)) {
+				clearInterval(timer);
+				mv = 0;
+				IS_MOVE = 0;
+			}
+
+			SPN.css({left:mv * side});
+
+			//первая половина пути
+			if(!half && mv > MAL) {
+				half = 1;
+				mv *= -1;
+				VAL -= side;
+				SPN.html(VAL);
+			}
+		}, 25);
+	});
+
+
+
+	window[win] = t;
+	return t;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	t.cur = function() {
+		t.val(curYear);
+		years.span.html(curYear);
+	};
+
 };
 
 
