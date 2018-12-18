@@ -238,6 +238,21 @@ function _dropdown($v=array()) {//выпадающее поле - ссылка
 		'<a class="dd-head grey">'.$v['placeholder'].'</a>'.
 	'</div>';
 }
+function _yearleaf($v=array()) {//перелистывание годов
+	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
+
+	$value = empty($v['value']) ? YEAR_CUR : $v['value'];
+
+	return
+	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
+	'<div class="_yearleaf php" id="'.$attr_id.'_yearleaf">'.
+		'<table>'.
+			'<tr><td class="but">&laquo;'.
+				'<td class="ylc"><span>'.$value.'</span>'.
+				'<td class="but">&raquo;'.
+		'</table>'.
+	'</div>';
+}
 
 function _button($v=array()) {//кнопка из контакта
 	$attr_id = empty($v['attr_id']) ? '' : ' id="'.$v['attr_id'].'"';

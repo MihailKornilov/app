@@ -2464,6 +2464,8 @@ $.fn._yearleaf = function(o) {//перелистывание годов
 				mv *= -1;
 				VAL -= side;
 				SPN.html(VAL);
+				t.val(VAL);
+				o.func(VAL);
 			}
 		}, 25);
 	});

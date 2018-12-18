@@ -1513,8 +1513,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					ATR_CMP._check({
 						func:function(v) {
 							_elemAction(el, v);
-							FILTER[el.num_2][elm_id] = v;
-							_spisokUpdate(el.num_2);
+							FILTER[el.num_1][elm_id] = v;
+							_spisokUpdate(el.num_1);
 						}
 					});
 					return;
@@ -1549,7 +1549,22 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//Фильтр: год и месяц
 				case 72:
-					ATR_CMP._yearleaf();
+					var YL = $(ATTR_CMP(elm_id) + 'yl'),
+						RD = $(ATTR_CMP(elm_id) + 'rd'),
+						YEAR_CUR = YL.val();
+						CMP_SET = function() {
+							ATR_CMP.val(YL.val() + '-' + RD.val());
+						};
+					YL._yearleaf({
+						func:function(v) {
+							CMP_SET();
+							RD._radio(YEAR_CUR < v ? 1 : 12);
+							YEAR_CUR = v;
+						}
+					});
+					RD._radio({
+						func:CMP_SET
+					});
 					return;
 				//Фильтр-галочка
 				case 74:

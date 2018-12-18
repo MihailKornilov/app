@@ -753,21 +753,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				txt_2 - по каким полям производить поиск (id элементов через запятую диалога списка)
 			*/
 
-			$v = _spisokFilter('v', $el['id']);
-			if($v === false) {
-				$v = '';
-				_spisokFilter('insert', array(
-					'spisok' => $el['num_1'],
-					'filter' => $el['id'],
-					'v' => $v
-				));
-			}
-
 			return _search(array(
 						'attr_id' => _elemAttrId($el, $prm),
 						'placeholder' => $el['txt_1'],
 						'width' => $el['width'],
-						'v' => $v,
+						'v' => _spisokFilter('vv', $el),
 						'disabled' => $prm['blk_setup']
 					));
 
@@ -1405,29 +1395,20 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		case 62:
 			/*
 				txt_1 - текст для галочки
-				num_1 - условие применяется:
+				num_1 - id элемента, размещающего список
+				num_2 - условие применяется:
 						1439 - галочка установлена
 						1440 - галочка НЕ установлена
-				num_2 - id элемента, размещающего список
 				num_3 - значение по умолчанию
 				значения: элемент [22]
 			*/
 
-			$v = _spisokFilter('v', $el['id']);
-			if($v === false) {
-				$v = 0;
-				_spisokFilter('insert', array(
-					'spisok' => $el['num_2'],
-					'filter' => $el['id'],
-					'v' => $el['num_3']
-				));
-			}
-
-			return _check(array(
+			return
+			_check(array(
 				'attr_id' => _elemAttrId($el, $prm),
 				'title' => $el['txt_1'],
 				'disabled' => $prm['blk_setup'],
-				'value' => $v
+				'value' => _spisokFilter('vv', $el, $el['num_3'])
 			));
 
 		//Выбор цвета текста
@@ -1469,17 +1450,31 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 		//Фильтр: год и месяц
 		case 72:
-			$v = _elemPrintV($el, $prm, YEAR_CUR);
+			$v = _spisokFilter('vv', $el, strftime('%Y-%m'));
+
+			$ex = explode('-', $v);
+			$year = $ex[0];
+			$mon  = $ex[1];
+
 			$attr_id = _elemAttrId($el, $prm);
 
-			return '<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-				   '<div class="_yearleaf php" id="'.$attr_id.'_yearleaf">'.
-						'<table>'.
-							'<tr><td class="but">&laquo;'.
-								'<td class="ylc"><span>'.$v.'</span>'.
-								'<td class="but">&raquo;'.
-						'</table>'.
-				   '</div>';
+			return
+			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+			_yearleaf(array(
+				'attr_id' => $attr_id.'yl',
+				'value' => $year
+			)).
+			'<div class="mt5">'.
+				_radio(array(
+					'attr_id' => $attr_id.'rd',
+					'block' => 1,
+					'light' => 1,
+					'interval' => 5,
+					'value' => $mon,
+					'spisok' => _monthDef(),
+					'disabled' => $prm['blk_setup']
+				)).
+			'</div>';
 
 		//Фильтр - Radio
 		case 74:
@@ -1487,16 +1482,6 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_1 - список, к которому применяется фильтр
 				значения: PHP12_filter_radio_setup
 			*/
-
-			$v = _spisokFilter('v', $el['id']);
-			if($v === false) {
-				$v = $el['def'];
-				_spisokFilter('insert', array(
-					'spisok' => $el['num_1'],
-					'filter' => $el['id'],
-					'v' => $v
-				));
-			}
 
 			//получение количества значений по каждому пункту
 			$EL = _elemOne($el['num_1']);
@@ -1522,7 +1507,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'width' => '100%',
 				'interval' => 6,
 				'light' => 1,
-				'value' => $v,
+				'value' => _spisokFilter('vv', $el, $el['def']),
 				'spisok' => $spisok,
 				'disabled' => $prm['blk_setup']
 			));

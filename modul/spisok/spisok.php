@@ -35,7 +35,7 @@ function _spisokFilterCache() {//кеширование фильтров спи�
 
 	return _cache_set($key, $send);
 }
-function _spisokFilter($i='all', $v=0) {//получение значений фильтров списка
+function _spisokFilter($i='all', $v=0, $vv='') {//получение значений фильтров списка
 	if($i == 'cache_clear')
 		return _cache_clear('filter_user'.USER_ID);
 
@@ -48,6 +48,20 @@ function _spisokFilter($i='all', $v=0) {//получение значений ф
 		if(!isset($F['filter'][$v]))
 			return false;
 		return $F['filter'][$v]['v'];
+	}
+
+	//значение конкретного элемента-фильтра
+	if($i == 'vv') {
+		$el = $v;
+		if(empty($el))
+			return $vv;
+		if(!is_array($el))
+			return $vv;
+		if(!$elem_id = _num($el['id']))
+			return $vv;
+		if(!isset($F['filter'][$elem_id]))
+			return _spisokFilterInsert($el['num_1'], $el['id'], $vv);
+		return $F['filter'][$elem_id]['v'];
 	}
 
 	//список элементов-фильтров для конкретного списка
@@ -122,6 +136,43 @@ function _spisokFilter($i='all', $v=0) {//получение значений ф
 	}
 
 	return $F;
+}
+function _spisokFilterInsert($spisok, $filter, $v) {//внесение нового значения фильтра
+	if(!$spisok = _num($spisok))
+		return $v;
+	if(!$filter = _num($filter))
+		return $v;
+
+	$sql = "SELECT *
+			FROM `_user_spisok_filter`
+			WHERE `user_id`=".USER_ID."
+			  AND `element_id_spisok`=".$spisok."
+			  AND `element_id_filter`=".$filter;
+	$id = _num(query_value($sql));
+
+	$sql = "INSERT INTO `_user_spisok_filter` (
+				`id`,
+				`app_id`,
+				`user_id`,
+				`element_id_spisok`,
+				`element_id_filter`,
+				`v`,
+				`def`
+			) VALUES (
+				".$id.",
+				".APP_ID.",
+				".USER_ID.",
+				".$spisok.",
+				".$filter.",
+				'".addslashes(_txt($v))."',
+				'".addslashes(_txt($v))."'
+			) ON DUPLICATE KEY UPDATE
+				`v`=VALUES(`v`)";
+	query($sql);
+
+	_spisokFilter('cache_clear');
+
+	return $v;
 }
 
 function _spisokIsSort($elem_id) {//определение, нужно ли производить сортировку этого списка (поиск элемента 71)
@@ -890,9 +941,9 @@ function _spisokCond62($el) {//фильтр-галочка
 		$v = $F['v'];
 
 		//условие срабатывает, если 1439: установлена, 1440 - НЕ установлена
-		if($filter['num_1'] == 1439 && !$v)
+		if($filter['num_2'] == 1439 && !$v)
 			continue;
-		if($filter['num_1'] == 1440 && $v)
+		if($filter['num_2'] == 1440 && $v)
 			continue;
 
 		$send .= _22cond($filter['id']);
