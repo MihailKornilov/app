@@ -2422,7 +2422,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					dop:{
 						mysave:1,
 						sel:v.txt_1,
-						nest:0
+						nest:1
 					},
 					busy_obj:$(this),
 					busy_cls:'hold',
