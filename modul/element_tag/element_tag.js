@@ -2450,7 +2450,7 @@ $.fn._yearleaf = function(o) {//перелистывание годов
 		timer = setInterval(function() {
 			mv += (speed += 3);
 
-			if(half && (mv * -1 < 0)) {
+			if(half && (mv * -1 <= 0)) {
 				clearInterval(timer);
 				mv = 0;
 				IS_MOVE = 0;
@@ -2459,7 +2459,7 @@ $.fn._yearleaf = function(o) {//перелистывание годов
 			SPN.css({left:mv * side});
 
 			//первая половина пути
-			if(!half && mv > MAL) {
+			if(!half && mv >= MAL) {
 				half = 1;
 				mv *= -1;
 				VAL -= side;
