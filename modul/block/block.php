@@ -1450,31 +1450,21 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 		//Фильтр: год и месяц
 		case 72:
+			/*
+				num_1 - список, на который происходит воздействие
+				num_2 - путь к сумме для подсчёта по каждому месяцу
+			*/
+
 			$v = _spisokFilter('vv', $el, strftime('%Y-%m'));
-
 			$ex = explode('-', $v);
-			$year = $ex[0];
-			$mon  = $ex[1];
-
-			$attr_id = _elemAttrId($el, $prm);
 
 			return
 			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 			_yearleaf(array(
-				'attr_id' => $attr_id.'yl',
-				'value' => $year
+				'attr_id' => _elemAttrId($el, $prm).'yl',
+				'value' => $ex[0]
 			)).
-			'<div class="mt5">'.
-				_radio(array(
-					'attr_id' => $attr_id.'rd',
-					'block' => 1,
-					'light' => 1,
-					'interval' => 5,
-					'value' => $mon,
-					'spisok' => _monthDef(),
-					'disabled' => $prm['blk_setup']
-				)).
-			'</div>';
+			'<div class="mt5">'._elem72Radio($el, $prm).'</div>';
 
 		//Фильтр - Radio
 		case 74:

@@ -290,6 +290,17 @@ switch(@$_POST['op']) {
 		$send['html'] = _spisok59unit($cmp_id, $unit_id);
 		jsonSuccess($send);
 		break;
+	case 'spisok_72_sum'://получение сумм для фильтра [72]
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента-фильтра');
+		if(!$el = _elemOne($elem_id))
+			jsonError('Элемента '.$elem_id.' не существует');
+		if(!$year = _num($_POST['year']))
+			jsonError('Некорректный год');
+
+		$send['spisok'] = _elem72Sum($el, $year);
+		jsonSuccess($send);
+		break;
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка

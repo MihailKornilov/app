@@ -98,14 +98,14 @@ var ZINDEX = 1000,
 	},
 	_toSpisok = function(s) {
 		var a=[];
-		for(k in s)
-			a.push({uid:k,title:s[k]});
+		for(var k in s)
+			a.push({id:k,title:s[k]});
 		return a
 	},
 	_toAss = function(s) {
 		var a=[];
 		for(var n = 0; n < s.length; n++)
-			a[s[n].uid] = s[n].title;
+			a[s[n].id] = s[n].title;
 		return a
 	},
 	_yearSpisok = function(yearFirst) {//года для выпадающего списка

@@ -1551,7 +1551,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 72:
 					var YL = $(ATTR_CMP(elm_id) + 'yl'),
 						RD = $(ATTR_CMP(elm_id) + 'rd'),
-						YEAR_CUR = YL.val();
+						YEAR_CUR = YL.val(),
 						CMP_SET = function() {
 							ATR_CMP.val(YL.val() + '-' + RD.val());
 						};
@@ -1560,6 +1560,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							CMP_SET();
 							RD._radio(YEAR_CUR < v ? 1 : 12);
 							YEAR_CUR = v;
+							var send = {
+								op:'spisok_72_sum',
+								elem_id:elm_id,
+								year:v
+							};
+							_post(send, function(res) {
+								RD._radio('spisok', res.spisok);
+							});
 						}
 					});
 					RD._radio({

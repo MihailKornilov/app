@@ -128,7 +128,7 @@ $.fn._check = function(o) {
 	window[win] = t;
 	return t;
 };
-$.fn._radio = function(o) {
+$.fn._radio = function(o, oo) {
 	var t = $(this),
 		n,
 		s;
@@ -137,7 +137,6 @@ $.fn._radio = function(o) {
 		return;
 
 	var attr_id = t.attr('id');
-
 	if(!attr_id) {
 		attr_id = 'radio' + Math.round(Math.random() * 100000);
 		t.attr('id', attr_id);
@@ -156,6 +155,8 @@ $.fn._radio = function(o) {
 				s.dis();
 			if(o == 'enable')
 				s.enab();
+			if(o == 'spisok')
+				s.spisok(oo);
 			if(o == 'func')
 				s.funcGo();
 			return t;
@@ -198,28 +199,33 @@ $.fn._radio = function(o) {
 	function _print() {
 		if(t.next().hasClass('_radio'))
 			return;
-		var spisok = _copySel(o.spisok),
-			val = _num(t.val(), 1),
-			block = o.block ? ' block' : '',
+
+		var block = o.block ? ' block' : '',
 			light = o.light ? ' light' : '',
 			dis = o.disabled ? ' disabled' : '',
-			html = '<div class="_radio' + block + dis + light + '" id="' + win + '">';
+			html =  '<div class="_radio' + block + dis + light + '" id="' + win + '">'   +
+						_spisok() +
+					'</div>';
+
+		t.after(html);
+	}
+	function _spisok() {
+		var spisok = _copySel(o.spisok),
+			val = _num(t.val(), 1),
+			html = '';
 
 		if(o.title0)
-			spisok.unshift({uid:0,title:o.title0});
+			spisok.unshift({id:0,title:o.title0});
 
 		_forN(spisok, function(sp) {
-			var on = val == sp.uid ? 'on' : '';
-			html += '<div class="' + on + '" val="' + sp.uid + '" style="margin-bottom:' + o.interval + 'px">' +
+			var on = val == sp.id ? 'on' : '';
+			html += '<div class="' + on + '" val="' + sp.id + '" style="margin-bottom:' + o.interval + 'px">' +
 						sp.title +
 					'</div>';
 		});
 
-		html += '</div>';
-
-		t.after(html);
+		return html;
 	}
-
 	function setVal(v) {
 		RADIO.find('div.on').removeClass('on');
 		for(n = 0; n < RDIV.length; n++) {
@@ -243,6 +249,10 @@ $.fn._radio = function(o) {
 	};
 	t.enab = function() {//перевод галочки в активное состояние
 		RADIO.removeClass('disabled');
+	};
+	t.spisok = function(spisok) {//вставка нового списка
+		o.spisok = _toSpisok(spisok);
+		t.next().html(_spisok());
 	};
 	window[win] = t;
 	return t;

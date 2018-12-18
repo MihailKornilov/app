@@ -1881,6 +1881,62 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 	return $send;
 }
 
+
+function _elem72Radio($el, $prm) {//получение сумм для фильтра [72]
+	$v = _spisokFilter('vv', $el, strftime('%Y-%m'));
+
+	$ex = explode('-', $v);
+	$year = $ex[0];
+	$mon  = $ex[1];
+
+	return
+	_radio(array(
+		'attr_id' => _elemAttrId($el, $prm).'rd',
+		'width' => 0,
+		'block' => 1,
+		'light' => 1,
+		'interval' => 5,
+		'value' => $mon,
+		'spisok' => _elem72Sum($el, $year),
+		'disabled' => $prm['blk_setup']
+	));
+}
+function _elem72Sum($el, $year) {//получение сумм для фильтра [72]
+	$spisok = _monthDef();
+
+	if(!$el = _elemOne($el['num_2']))
+		return $spisok;
+	if(!$col = $el['col'])
+		return $spisok;
+	if(!$bl = $el['block'])
+		return $spisok;
+	if($bl['obj_name'] != 'dialog')
+		return $spisok;
+	if(!$DLG = _dialogQuery($bl['obj_id']))
+		return $spisok;
+
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Суммы для фильтра [72] */
+			SELECT
+				DISTINCT(DATE_FORMAT(`dtime_add`,'%m')) AS `mon`,
+				SUM(`".$col."`) `sum`
+			FROM   "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG)."
+			  AND `dtime_add` LIKE '".$year."-%'
+			GROUP BY DATE_FORMAT(`dtime_add`,'%m')";
+	if(!$arr = query_array($sql))
+		return $spisok;
+
+	foreach($arr as $r) {
+		$mon = _num($r['mon']);
+		$txt = $spisok[$mon];
+		$spisok[$mon] = $txt.
+						'<span class="fr">'._sumSpace(round($r['sum'])).'</span>';
+	}
+
+	return $spisok;
+}
+
+
 function _elem300Place($res) {//страна и город пользователя ВК
 	$place = array();
 	if(!empty($res['country']))
