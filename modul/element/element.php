@@ -1889,17 +1889,25 @@ function _elem72Radio($el, $prm) {//получение сумм для филь�
 	$year = $ex[0];
 	$mon  = $ex[1];
 
+
 	return
-	_radio(array(
-		'attr_id' => _elemAttrId($el, $prm).'rd',
-		'width' => 0,
-		'block' => 1,
-		'light' => 1,
-		'interval' => 5,
-		'value' => $mon,
-		'spisok' => _elem72Sum($el, $year),
-		'disabled' => $prm['blk_setup']
-	));
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+	_yearleaf(array(
+		'attr_id' => _elemAttrId($el, $prm).'yl',
+		'value' => $ex[0]
+	)).
+	'<div class="mt5">'.
+		_radio(array(
+			'attr_id' => _elemAttrId($el, $prm).'rd',
+			'width' => 0,
+			'block' => 1,
+			'light' => 1,
+			'interval' => 5,
+			'value' => $mon,
+			'spisok' => _elem72Sum($el, $year),
+			'disabled' => $prm['blk_setup']
+		)).
+	'</div>';
 }
 function _elem72Sum($el, $year) {//получение сумм для фильтра [72]
 	$spisok = _monthDef();

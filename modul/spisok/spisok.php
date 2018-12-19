@@ -806,6 +806,7 @@ function _spisokWhere($el) {//формирование строки с усло�
 	$cond .= _spisokCondBind($el);
 	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond62($el);
+	$cond .= _spisokCond72($el);
 	$cond .= _spisokCond74($el);
 	$cond .= _spisokCond77($el);
 	$cond .= _spisokCond78($el);
@@ -950,6 +951,22 @@ function _spisokCond62($el) {//фильтр-галочка
 	}
 
 	return $send;
+}
+function _spisokCond72($el) {//фильтр: год и месяц
+	$search = false;
+
+	//поиск элемента-фильтра-галочки
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 72) {
+			$search = $r['elem'];
+			$v = $r['v'];
+			break;
+		}
+
+	if(!$search)
+		return '';
+
+	return " AND `t1`.`dtime_add` LIKE '".$v."-%'";
 }
 function _spisokCond74($el) {//фильтр-радио
 	$filter = false;

@@ -1553,7 +1553,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						RD = $(ATTR_CMP(elm_id) + 'rd'),
 						YEAR_CUR = YL.val(),
 						CMP_SET = function() {
-							ATR_CMP.val(YL.val() + '-' + RD.val());
+							var mon = _num(RD.val()),
+								data = YL.val() + '-' + (mon > 9 ? '' : '0') + mon;
+							ATR_CMP.val(data);
+							FILTER[el.num_1][elm_id] = data;
+							_spisokUpdate(el.num_1);
 						};
 					YL._yearleaf({
 						func:function(v) {

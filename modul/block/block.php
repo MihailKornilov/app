@@ -1454,17 +1454,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_1 - список, на который происходит воздействие
 				num_2 - путь к сумме для подсчёта по каждому месяцу
 			*/
-
-			$v = _spisokFilter('vv', $el, strftime('%Y-%m'));
-			$ex = explode('-', $v);
-
-			return
-			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-			_yearleaf(array(
-				'attr_id' => _elemAttrId($el, $prm).'yl',
-				'value' => $ex[0]
-			)).
-			'<div class="mt5">'._elem72Radio($el, $prm).'</div>';
+			return _elem72Radio($el, $prm);
 
 		//Фильтр - Radio
 		case 74:
