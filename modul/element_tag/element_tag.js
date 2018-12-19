@@ -1,4 +1,16 @@
 /* Элементы-теги */
+
+var _attrId = function(t) {//формирование аттрибута id
+		var attr_id = t.attr('id');
+
+		if(attr_id)
+			return attr_id;
+
+		attr_id = 'afics' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
+		return attr_id;
+	};
+
 $(document)
 	.on('click', '._check', function() {//установка/снятие галочки, если была выведена через PHP
 		var t = $(this);
@@ -129,87 +141,87 @@ $.fn._check = function(o) {
 	return t;
 };
 $.fn._radio = function(o, oo) {
-	var t = $(this),
-		n,
-		s;
+	var t = $(this);
 
 	if(!t.length)
 		return;
 
-	var attr_id = t.attr('id');
-	if(!attr_id) {
-		attr_id = 'radio' + Math.round(Math.random() * 100000);
-		t.attr('id', attr_id);
+	var attr_id = _attrId(t),
+		win = attr_id + 'win',
+		S = window[win];
+
+	if(S) {
+		switch(typeof o) {
+			case 'number':
+				S.valSet(o);
+				break;
+			case 'string':
+				if(o == 'spisok')
+					S.spisok(oo);
+				break;
+			case 'function':
+				S.func(o);
+				break;
+		}
+		return S;
 	}
 
-	var win = attr_id + '_radio';
 
-	switch(typeof o) {
-		case 'number':
-			s = window[win];
-			s.value(o);
-			return t;
-		case 'string':
-			s = window[win];
-			if(o == 'disable')
-				s.dis();
-			if(o == 'enable')
-				s.enab();
-			if(o == 'spisok')
-				s.spisok(oo);
-			if(o == 'func')
-				s.funcGo();
-			return t;
+
+
+
+	// ---=== АКТИВАЦИЯ RADIO ===---
+
+
+	//если элемент был выведен через PHP, переключение его на JS
+	var PHP = t.next('._radio.php'),
+		PHP_O = o;  //сохранение для повторного вывода
+	if(PHP.length) {
+		if(typeof o != 'object')
+			o = {};
+
+		o.php = 1;  //флаг, чтобы не перерисовывать заново содержание, а только применить функции
+		o.title0   = PHP.find('.title0').html();
+		o.block    = PHP.hasClass('block');
+		o.dis      = PHP.hasClass('disabled');
+		o.light    = PHP.hasClass('light');
+		o.interval = PHP.find('div:first').css('margin-bottom').split('px')[0] * 1;
+		if(!o.interval)
+			delete o.interval;
+
+		PHP.removeClass('php');
 	}
 
-	var cnt = t.next();
-	if(cnt.hasClass('_radio'))
-		if(cnt.hasClass('php')) {
-			cnt.removeClass('php')
-			   .attr('id', win);
-		} else
-			cnt.remove();
 
 	o = $.extend({
-		title0:'',
-		spisok:[],
-		disabled:0,
-		light:0,
-		block:1,
+		title0:'',  //текст нулевого значения
+		spisok:[],  //список значений в виде id => title
+		dis:0,      //выбор значений заблокирован
+		light:0,    //невыбранные значения показываются бледным цветом
+		block:1,    //вертикальное, либо горизонтальное отображение значений
 		interval:7, //интервал между значениями
 		func:function() {}
 	}, o);
 
-	_print();
-
-	var RADIO = $('#' + win),
-		RDIV = RADIO.find('div');
-
-
-	RDIV.click(function() {
-		if(RADIO.hasClass('disabled'))
-			return;
-
-		var div = $(this),
-			v = _num(div.attr('val'));
-		setVal(v);
-		o.func(v, attr_id);
-	});
-
-	function _print() {
-		if(t.next().hasClass('_radio'))
-			return;
-
-		var block = o.block ? ' block' : '',
-			light = o.light ? ' light' : '',
-			dis = o.disabled ? ' disabled' : '',
-			html =  '<div class="_radio' + block + dis + light + '" id="' + win + '">'   +
-						_spisok() +
-					'</div>';
-
+	
+	//печать списка, если отсутствует
+	var RD = t.next('._radio');
+	if(!RD.length) {
+		var html =
+			'<div class="_radio' + 
+						_dn(o.block, 'block') + 
+						_dn(o.dis, 'disabled') + 
+						_dn(o.light, 'light') + '"' +
+				' id="' + attr_id + '_radio">'   +
+			'</div>';
 		t.after(html);
+		RD = t.next();
+		_spisok();
 	}
-	function _spisok() {
+
+	_active();
+
+	function _spisok() {//печать списка
 		var spisok = _copySel(o.spisok),
 			val = _num(t.val(), 1),
 			html = '';
@@ -218,56 +230,71 @@ $.fn._radio = function(o, oo) {
 			spisok.unshift({id:0,title:o.title0});
 
 		_forN(spisok, function(sp) {
-			var on = val == sp.id ? 'on' : '';
-			html += '<div class="' + on + '" val="' + sp.id + '" style="margin-bottom:' + o.interval + 'px">' +
+			html += '<div class="' + _dn(val == sp.id, 'on') + '"' +
+						' val="' + sp.id + '"' +
+						' style="margin-bottom:' + o.interval + 'px">' +
 						sp.title +
 					'</div>';
 		});
 
-		return html;
+		RD.html(html);
 	}
-	function setVal(v) {
-		RADIO.find('div.on').removeClass('on');
-		for(n = 0; n < RDIV.length; n++) {
-			var sp = RDIV.eq(n),
-				vv = _num(sp.attr('val'));
-			if(vv == v) {
+	function _active() {//активирование нажания
+		RD.find('div').click(function() {
+			if(RD.hasClass('disabled'))
+				return;
+
+			var v = _num($(this).attr('val'));
+			_val(v);
+			o.func(v, attr_id);
+		});
+	}
+	function _val(v) {//установка значения
+		RD.find('div.on').removeClass('on');
+		_forEq(RD.find('div'), function(sp) {
+			if(v == _num(sp.attr('val'))) {
 				sp.addClass('on');
-				break;
+				return false;
 			}
-		}
+		});
 		t.val(v);
 	}
 
 
-	t.value = setVal;
-	t.funcGo = function() {//применение фукнции
-		o.func(_num(t.val()), attr_id);
+
+
+
+
+
+
+	t.func = function(func) {//установка новой функции
+		o.func = func;
 	};
-	t.dis = function() {//перевод галочки в неактивное состояние
-		RADIO.addClass('disabled');
-	};
-	t.enab = function() {//перевод галочки в активное состояние
-		RADIO.removeClass('disabled');
-	};
+	t.valSet = _val;
 	t.spisok = function(spisok) {//вставка нового списка
-		o.spisok = _toSpisok(spisok);
-		t.next().html(_spisok());
+		o.spisok = spisok;
+		_spisok();
+		_active();
 	};
+
 	window[win] = t;
+
+	if(o.php) {
+		o.php = 0;
+		return t._radio(PHP_O, oo);
+	}
+
 	return t;
 };
 $.fn._count = function(o) {//input с количеством
 	var t = $(this),
-		attr_id = t.attr('id'),
 		S;
 
-	if(!attr_id) {
-		attr_id = 'count' + Math.round(Math.random() * 100000);
-		t.attr('id', attr_id);
-	}
+	if(!t.length)
+		return;
 
-	var win = attr_id + '_count';
+	var attr_id = _attrId(t),
+		win = attr_id + 'win';
 
 	o = $.extend({
 		width:50,   //если 0 = 100%
@@ -379,15 +406,9 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 	if(!t.length)
 		return;
 
-	var attr_id = t.attr('id'),
-		VALUE = t.val();
-
-	if(!attr_id) {
-		attr_id = 'select' + Math.round(Math.random() * 100000);
-		t.attr('id', attr_id);
-	}
-
-	var win = attr_id + '_select',
+	var attr_id = _attrId(t),
+		VALUE = t.val(),
+		win = attr_id + 'win',
 		s = window[win];
 
 	switch(typeof o) {
@@ -2402,13 +2423,8 @@ $.fn._yearleaf = function(o) {//перелистывание годов
 	if(!t.length)
 		return;
 
-	var attr_id = t.attr('id');
-	if(!attr_id) {
-		attr_id = 'check' + Math.round(Math.random() * 100000);
-		t.attr('id', attr_id);
-	}
-
-	var win = attr_id + '_yearleaf',
+	var attr_id = _attrId(t),
+		win = attr_id + 'win',
 		S = window[win],
 		VAL = _num(t.val()),
 		YEAR_CUR = (new Date()).getFullYear(),

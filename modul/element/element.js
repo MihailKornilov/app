@@ -1557,8 +1557,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						};
 					YL._yearleaf({
 						func:function(v) {
-							CMP_SET();
 							RD._radio(YEAR_CUR < v ? 1 : 12);
+							CMP_SET();
 							YEAR_CUR = v;
 							var send = {
 								op:'spisok_72_sum',
@@ -1566,13 +1566,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								year:v
 							};
 							_post(send, function(res) {
-								RD._radio('spisok', res.spisok);
+								RD._radio('spisok', _toSpisok(res.spisok));
 							});
 						}
 					});
-					RD._radio({
-						func:CMP_SET
-					});
+					RD._radio(CMP_SET);
 					return;
 				//Фильтр-галочка
 				case 74:
