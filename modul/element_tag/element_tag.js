@@ -443,7 +443,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 		placeholder = o.title0 ? ' placeholder="' + o.title0 + '"' : '',
 		iconAddFlag = o.funcAdd && !dis && !blocked,
 		html =
-		'<div class="_select' + dis + blocked + dib + '" id="' + win + '" style="' + width + '">' +
+		'<div class="_select' + dis + blocked + dib + '" id="' + attr_id + '_select" style="' + width + '">' +
 			'<table class="w100p">' +
 				'<tr><td>' +
 			 (o.multi ? '<dl>' : '') +
