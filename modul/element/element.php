@@ -2906,6 +2906,12 @@ function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение 
 	if(!$parent_id = _num($unit['id']))
 		return;
 
+	//получение id приложения у родительского элемента
+	$sql = "SELECT `app_id`
+			FROM `_element`
+			WHERE `id`=".$parent_id;
+	$app_id = query_value($sql);
+
 	$ids = array();
 	$update = array();
 
@@ -2921,7 +2927,7 @@ function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение 
 			$blk = _ids($r['blk']);
 			$update[] = "(
 				".$id.",
-				".$unit['app_id'].",
+				".$app_id.",
 				".$parent_id.",
 				'".addslashes($title)."',
 				'".($blk ? $blk : '')."',
