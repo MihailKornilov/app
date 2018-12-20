@@ -3450,6 +3450,81 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		_attr_el(el.id).find('DL')._sort({table:'_action'});
 	},
 
+	/* ---=== НАСТРОЙКА ПАРАМЕТРОВ ШАБЛОНА ДЛЯ ДОКУМЕНТОВ [114] ===--- */
+	PHP12_template_param = function(el, vvv, obj) {
+		if(!obj.unit.id)
+			return;
+
+		var ATR_EL = _attr_el(el.id),
+			html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить значение</div>',
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last');
+
+		BUT_ADD.click(valueAdd);
+
+		//показ одного значения, если начало настройки
+		if(!vvv.length) {
+			valueAdd();
+		} else
+			_forIn(vvv, valueAdd);
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,           //id значения
+				dialog_id:50,   //id диалога, через который был вставлен этот элемент
+				title:''        //имя элемента
+			}, v || {});
+
+			DL.append(
+				'<dd class="over5" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td><input type="text"' +
+									  ' class="w200 b code"' +
+									  ' placeholder="код значения"' +
+									  ' maxlength="20"' +
+								' />' +
+							'<td class="w100p">' +
+								'<input type="text"' +
+									  ' class="inp w250 curP color-pay"' +
+									  ' readonly' +
+									  ' placeholder="элемент не выбран"' +
+									  ' value="' + (v.title || v.id || '') + '"' +
+								' />' +
+							'<td class="w50 r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				INP = DD.find('.inp');
+			INP.click(function() {
+				_dialogLoad({
+					dialog_id:v.dialog_id,
+					block_id:obj.srce.block_id,
+					edit_id:v.id,           //id выбранного элемента (при редактировании)
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_save:function(ia) {
+						DD.attr('val', ia.unit.id);
+						v.id = ia.unit.id;
+						v.dialog_id = ia.unit.dialog_id;
+						INP.val(ia.unit.title);
+					}
+				});
+			});
+			DL.sortable({handle:'.icon-move-y'});
+			DD.find('.icon-del').click(function() {
+				$(this).closest('DD').remove();
+				v.id = 0;
+			});
+			DD.find('.code').focus();
+		}
+	},
+
 	/* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
 	PHP12_history_setup = function(el, vvv, obj) {
 		var html = '<dl></dl>' +
