@@ -3151,7 +3151,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				return '<div class="icon icon-hint ml15"></div>';
 			};
 
-		ATR_SP._select('disable');
+		_attr_cmp(2585)._select('disable');
 		BUT_ADD.click(valueAdd);
 
 		if(!vvv.length)
@@ -3461,6 +3461,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last');
 
+		_attr_cmp(3528)._select('disabled');
 		BUT_ADD.click(valueAdd);
 
 		//показ одного значения, если начало настройки
