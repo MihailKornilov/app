@@ -1,6 +1,6 @@
 <?php
 function _pageCache() {//получение массива страниц из кеша
-	$key = 'PAGE';
+	$key = 'page';
 	if($arr = _cache_get($key))
 		return $arr;
 
@@ -24,6 +24,9 @@ function _pageCache() {//получение массива страниц из �
 	$block = query_ass($sql);
 
 	foreach($page as $id => $r) {
+		unset($page[$id]['about']);
+		unset($page[$id]['user_id_add']);
+		unset($page[$id]['dtime_add']);
 		$block_count = _num(@$block[$id]);
 		$page[$id]['del_allow'] = $block_count || $r['common_id'] ? 0 : 1;
 	}
@@ -42,14 +45,15 @@ function _pageAccess($page_id) {//доступ к странице для кон
 				WHERE `app_id`=".APP_ID."
 				  AND `user_id`=".USER_ID;
 		$ass = query_ass($sql);
+
+		//разрешение страниц, видимых всем пользователям
+		foreach(_page() as $id => $p)
+			if($p['dialog_id'] == 101)
+				if(!$p['sa'])
+					$ass[$id] = 1;
+
 		_cache_set($key, $ass);
 	}
-
-	//разрешение страниц, видимых всем пользователям
-	foreach(_page() as $id => $p)
-		if($p['dialog_id'] == 101)
-			if(!$p['sa'])
-				$ass[$id] = 1;
 
 	return !empty($ass[$page_id]);
 }
@@ -98,14 +102,24 @@ function _page($i='all', $i1=0) {//получение данных страни�
 			return 98;
 
 		//сначала поиск страницы приложения
-		foreach($page as $p)
-			if(!$p['sa'] && $p['def'] && _pageAccess($p['id']))
-				return $p['id'];
+		foreach($page as $id => $p) {
+			if($p['sa'])
+				continue;
+			if($p['dialog_id'] != 20)
+				continue;
+			if(!_pageAccess($id))
+				continue;
+			if(!$p['def'])
+				continue;
+			if($p['common_id'])
+				return $p['common_id'];
+			return $id;
+		}
 
 		//затем первую доступную страницу
-		foreach($page as $p)
-			if(!$p['sa'] && _pageAccess($p['id']))
-				return $p['id'];
+		foreach($page as $id => $p)
+			if(!$p['sa'] && _pageAccess($id))
+				return $id;
 
 		//затем страницы SA
 		if(SA)
