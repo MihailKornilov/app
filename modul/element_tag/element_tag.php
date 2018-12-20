@@ -172,13 +172,15 @@ function _search($v=array()) {//поле ПОИСК
 }
 function _menu($el, $is_edit) {//Меню страниц [3]
 	$menu = array();
+//	return _pr(_page());
 	foreach(_page() as $id => $r) {
 		if(!$r['app_id'])
 			continue;
 		if($r['sa'])
 			continue;
-		if(!$r['access'])
+		if(!_pageAccess($id))
 			continue;
+		//раздел
 		if($el['num_1'] != $r['parent_id'])
 			continue;
 		$menu[$id] = $r;
@@ -188,16 +190,16 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 		return 'Разделов нет.';
 
 	$razdel = '';
-	foreach($menu as $r) {
+	foreach($menu as $page_id => $r) {
 		$sel = _page('is_cur_parent', $r['id']) ? ' sel' : '';
-		$page_id = $r['id'];
-		if($r['common_id']) {//если страница является ссылкой на другую страницу, при этом она недоступна, поиск первой вложенной доступной
+
+		//если страница является ссылкой на другую страницу, при этом она недоступна, поиск первой вложенной доступной
+		if($r['common_id']) {
 			$page_id = $r['common_id'];
-			$p = _page($page_id);
-			if(!$p['access']) {
+			if(!_pageAccess($page_id)) {
 				$page_id = 0;
 				foreach(_page('child', $r['id']) as $p)
-					if($p['access']) {
+					if(_pageAccess($page_id)) {
 						$page_id = $p['id'];
 						break;
 					}

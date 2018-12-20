@@ -1,18 +1,14 @@
 <?php
 function _pageCache() {//получение массива страниц из кеша
-	$key = 'page';
+	$key = 'PAGE';
 	if($arr = _cache_get($key))
 		return $arr;
 
 	$sql = "SELECT
 				*,
-				0 `block_count`,
-				0 `elem_count`,
-				1 `del_access`,
-				0 `access`
+				1 `del_allow`
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_ID.")
-			  AND `sa` IN (0,".SA.")
 			ORDER BY `sort`";
 	if(!$page = query_arr($sql))
 		return array();
@@ -29,20 +25,33 @@ function _pageCache() {//получение массива страниц из �
 
 	foreach($page as $id => $r) {
 		$block_count = _num(@$block[$id]);
-		$page[$id]['del_access'] = $block_count || $r['common_id'] ? 0 : 1;
-		//страница доступна создателю приложения, а также всем, если не SA и для всех приложений
-		$page[$id]['access'] = USER_ID && USER_CREATOR || !$r['sa'] && !$r['app_id'];
+		$page[$id]['del_allow'] = $block_count || $r['common_id'] ? 0 : 1;
 	}
 
-	$sql = "SELECT *
-			FROM `_user_page_access`
-			WHERE `app_id`=".APP_ID."
-			  AND `user_id`=".USER_ID;
-	foreach(query_arr($sql) as $r)
-		if(!empty($page[$r['page_id']]))
-			$page[$r['page_id']]['access'] = 1;
-
 	return _cache_set($key, $page);
+}
+function _pageAccess($page_id) {//доступ к странице для конкретного пользователя
+	if(SA)
+		return 1;
+
+	$key = 'UserPageAccess'.USER_ID;
+
+	if(!$ass = _cache_get($key)) {
+		$sql = "SELECT `page_id`,1
+				FROM `_user_page_access`
+				WHERE `app_id`=".APP_ID."
+				  AND `user_id`=".USER_ID;
+		$ass = query_ass($sql);
+		_cache_set($key, $ass);
+	}
+
+	//разрешение страниц, видимых всем пользователям
+	foreach(_page() as $id => $p)
+		if($p['dialog_id'] == 101)
+			if(!$p['sa'])
+				$ass[$id] = 1;
+
+	return !empty($ass[$page_id]);
 }
 function _page($i='all', $i1=0) {//получение данных страницы
 	if(!$i)
@@ -52,6 +61,10 @@ function _page($i='all', $i1=0) {//получение данных страни�
 
 	if($i === 'all')
 		return $page;
+
+	
+		//страница доступна создателю приложения, а также всем, если не SA и для всех приложений
+//		$page[$id]['access'] = USER_ID && USER_CREATOR || !$r['sa'] && !$r['app_id'];
 
 	//страницы приложения
 	if($i == 'app') {
@@ -86,12 +99,12 @@ function _page($i='all', $i1=0) {//получение данных страни�
 
 		//сначала поиск страницы приложения
 		foreach($page as $p)
-			if(!$p['sa'] && $p['def'] && $p['access'])
+			if(!$p['sa'] && $p['def'] && _pageAccess($p['id']))
 				return $p['id'];
 
 		//затем первую доступную страницу
 		foreach($page as $p)
-			if(!$p['sa'] && $p['access'])
+			if(!$p['sa'] && _pageAccess($p['id']))
 				return $p['id'];
 
 		//затем страницы SA
@@ -100,8 +113,8 @@ function _page($i='all', $i1=0) {//получение данных страни�
 				if($p['sa'] && $p['def'])
 					return $p['id'];
 
-		//иначе на список страниц
-		return 12;
+		//иначе Администрирование
+		return 7;
 	}
 
 	//является ли страница родительской относительно текущей
@@ -485,7 +498,7 @@ function _pageShow($page_id) {
 		return _empty20('Несуществующая страница.'.PAGE_MSG_ERR);
 	if(!SA && $page['sa'])
 		return _empty20('Нет доступа.'.PAGE_MSG_ERR);
-	if(!SA && !$page['access'])
+	if(!SA && !_pageAccess($page_id))
 		return _empty20('Страница недоступна или не существует.'.PAGE_MSG_ERR);
 
 	$prm = array();
@@ -585,7 +598,7 @@ function PHP12_page_list_li($r, $level=0) {//данные одной стран�
 		   ($r['def'] ? '<div class="icon icon-ok curD ml10'._tooltip('Стартовая страница', -61).'</div>' : '').
 					'<td class="w50">'.
 						'<div val="dialog_id:20,edit_id:'.$r['id'].'" class="icon icon-edit pl dialog-open'._tooltip('Настроить страницу', -60).'</div>'.
-	($r['del_access'] ? '<div val="dialog_id:20,del_id:'.$r['id'].'" class="icon icon-del-red pl dialog-open'._tooltip('Удалить страницу', -54).'</div>' : '').
+	($r['del_allow'] ? '<div val="dialog_id:20,del_id:'.$r['id'].'" class="icon icon-del-red pl dialog-open'._tooltip('Удалить страницу', -54).'</div>' : '').
 			'</table>';
 }
 
