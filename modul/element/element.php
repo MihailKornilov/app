@@ -1777,6 +1777,12 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 	$txt = $unit[$col];
 
 	switch($ell['dialog_id']) {
+		//галочка
+		case 1:
+			if(!$txt)
+				return '';
+			return '<div class="icon icon-ok curD"></div>';
+
 		//textarea (многострочное текстовое поле)
 		case 5:
 
