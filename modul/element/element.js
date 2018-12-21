@@ -2107,7 +2107,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(!doc_id)
 						break;
 
-					alert(doc_id);
+					location.href = URL + '&p=9&doc_id=' + doc_id;
 					break;
 			}
 		});

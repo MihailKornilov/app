@@ -504,6 +504,10 @@ function _pageShow($page_id) {
 	if(!SA && APP_ID && !APP_ACCESS)
 		$page_id = 105;
 
+	//вывод документа на печать
+	if($page_id == 9)
+		return _document();
+
 	//если доступ в приложение есть, но попали на страницу о недоступности, то переход на стартовую страницу
 	if($page_id == 105 && APP_ID && APP_ACCESS)
 		$page_id = _page('def');
@@ -565,6 +569,47 @@ function _pageUnitGet($obj_name, $obj_id) {//получение данных з�
 		return array();
 
 	return _spisokUnitQuery($dialog, $get_id);
+}
+
+
+function _document() {//формирование документа для вывода на печать
+	if(!APP_ID)
+		return _empty20('Не выполнен вход в приложение');
+	if(!$doc_id = _num(@$_GET['doc_id']))
+		return _empty20('Некорректный id шаблона документа');
+
+	$sql = "SELECT *
+			FROM `_template`
+			WHERE `app_id`=".APP_ID."
+			  AND `id`=".$doc_id;
+	if(!$doc = query_assoc($sql))
+		return _empty20('Шаблона документа '.$doc_id.' не существует');
+
+	$tmp_file = GLOBAL_DIR.'/tmp.docx';
+	if(!file_exists($tmp_file))
+		return _empty20('Файла-шаблона не существует');
+
+	//подстановка данных
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id` IN ("._ids($doc['param_ids']).")";
+	if($arr = query_arr($sql)) {
+
+	}
+
+
+
+
+	require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
+	$document = new \PhpOffice\PhpWord\TemplateProcessor($tmp_file);
+
+	$document->setValue('{PPPPP}', 'Пробная строка');
+
+	header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+	header('Content-Disposition: attachment; filename="111.docx"');
+	$document->saveAs('php://output');
+
+	exit;
 }
 
 

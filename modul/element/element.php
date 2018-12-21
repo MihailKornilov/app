@@ -1047,7 +1047,7 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 			$sql = "SELECT `id`,`name`
 					FROM `_template`
 					WHERE `app_id`=".APP_ID."
-					ORDER BY `id`";
+					ORDER BY `id` DESC";
 			return query_ass($sql);
 
 		//Select - выбор записи из другого списка (для связки)
