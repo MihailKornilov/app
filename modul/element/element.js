@@ -975,6 +975,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						}
 					});
 					return;
+				//SA: Select - выбор документа
+				case 26:
+					ATR_CMP._select({
+						width:el.width,
+						title0:el.txt_1,
+						spisok:vvv
+					});
+					return;
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
 					_elemAction(el, _num(ATR_CMP.val()), 1);
@@ -2089,6 +2097,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(!elem_id)
 						return;
 					_attr_cmp(elem_id).focus();
+				//открытие документа
+				case 207:
+					if(is_open)
+						break;
+					if(v != sp.initial_id)
+						break;
+					var doc_id = _num(sp.target_ids);
+					if(!doc_id)
+						break;
+
+					alert(doc_id);
+					break;
 			}
 		});
 	},
@@ -3457,7 +3477,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		var ATR_EL = _attr_el(el.id),
 			html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить значение</div>',
+				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить параметр</div>',
 			DL = ATR_EL.append(html).find('dl'),
 			ATR_SP = _attr_cmp(3528),
 			DLG_ID = _num(ATR_SP.val()),//список, из которого будут выбираться значения
@@ -3496,11 +3516,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<input type="text"' +
 									  ' class="inp w250 curP color-pay"' +
 									  ' readonly' +
-									  ' placeholder="элемент не выбран"' +
+									  ' placeholder="значение не выбрано"' +
 									  ' value="' + (v.title || v.id || '') + '"' +
 								' />' +
 							'<td class="w50 r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить параметр', -55) + '</div>' +
 					'</table>' +
 				'</dd>'
 			);

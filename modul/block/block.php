@@ -980,6 +980,18 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'value' => _elemPrintV($el, $prm, 0)
 				   ));
 
+		//SA: Select - выбор документа
+		case 26:
+			/*
+                txt_1 - нулевое значение
+			*/
+			return _select(array(
+						'attr_id' => _elemAttrId($el, $prm),
+						'placeholder' => $el['txt_1'],
+						'width' => $el['width'],
+						'value' => _elemPrintV($el, $prm, 0)
+				   ));
+
 		//Настройка суммы значений единицы списка
 		case 27: return $el['name'];
 

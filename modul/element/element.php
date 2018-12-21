@@ -1042,6 +1042,14 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 			}
 			return _dialogSpisokOn($dialog_id, $block_id, $elem_id);//все списки приложения
 
+		//SA: Select - выбор диалогового окна
+		case 26:
+			$sql = "SELECT `id`,`name`
+					FROM `_template`
+					WHERE `app_id`=".APP_ID."
+					ORDER BY `id`";
+			return query_ass($sql);
+
 		//Select - выбор записи из другого списка (для связки)
 		case 29:
 			$sel_id = _elemPrintV($el, $prm, $el['num_6']);
@@ -3803,7 +3811,6 @@ function PHP12_template_param_save($cmp, $val, $unit) {
 function PHP12_template_param_vvv($prm) {//получение значений для настройки истории действий
 	if(!$u = $prm['unit_edit'])
 		return array();
-
 	if(!$ids = _ids($u['param_ids']))
 		return array();
 

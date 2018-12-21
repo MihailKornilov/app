@@ -736,6 +736,7 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 				case 204:
 				case 205:
 				case 206:
+				case 207:
 				case 221:
 				case 222:
 					if($block_id)
