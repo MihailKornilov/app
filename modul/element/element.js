@@ -3459,9 +3459,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить значение</div>',
 			DL = ATR_EL.append(html).find('dl'),
+			ATR_SP = _attr_cmp(3528),
+			DLG_ID = _num(ATR_SP.val()),//список, из которого будут выбираться значения
 			BUT_ADD = ATR_EL.find('div:last');
 
-		_attr_cmp(3528)._select('disabled');
+		ATR_SP._select('disable');
 		BUT_ADD.click(valueAdd);
 
 		//показ одного значения, если начало настройки
@@ -3505,8 +3507,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			INP.click(function() {
 				_dialogLoad({
 					dialog_id:v.dialog_id,
-					block_id:obj.srce.block_id,
+					dss:DLG_ID,
 					edit_id:v.id,           //id выбранного элемента (при редактировании)
+					dop:{
+						nest:1,
+						rule_id:6
+					},
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
