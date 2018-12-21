@@ -325,8 +325,8 @@ $.fn._flash = function(o) {//вспышка и затухание элемент
 	 .css('width', w)
 	 .css('height', h)
 	 .css('top', mt)
-	 .animate({opacity:.7}, 100)
-	 .animate({opacity:0}, 600, function() {
+	 .css('opacity', .9)
+	 .animate({opacity:0}, 800, function() {
 		$(this).parent().remove();
 	 });
 

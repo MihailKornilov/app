@@ -247,6 +247,8 @@ function _ids($ids, $return='ids') {//проверка корректности 
 	foreach(explode(',', $ids) as $i => $id) {
 		if(!preg_match(REGEXP_NUMERIC, $id))
 			return _idsReturn(0, $return);
+		if(!_num($id))
+			continue;
 		$arr[$i] = _num($id);
 	}
 
@@ -258,7 +260,7 @@ function _idsReturn($v, $return) {//для _ids - формат возвраща�
 		case 'first'://первое значение
 			$v = explode(',', $v);
 			return _num($v[0]);
-		case 'ids': return $v;
+		case 'ids': return $v ? $v : 0;
 		case 1:
 		case 'arr': return $v ? explode(',', $v) : array();
 		case 'count':return $v ? count(explode(',', $v)) : 0;

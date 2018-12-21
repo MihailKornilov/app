@@ -3461,7 +3461,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL = ATR_EL.append(html).find('dl'),
 			ATR_SP = _attr_cmp(3528),
 			DLG_ID = _num(ATR_SP.val()),//список, из которого будут выбираться значения
-			BUT_ADD = ATR_EL.find('div:last');
+			BUT_ADD = ATR_EL.find('div:last'),
+			NUM = 1;
 
 		ATR_SP._select('disable');
 		BUT_ADD.click(valueAdd);
@@ -3475,19 +3476,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,           //id значения
+				txt_10:'{00000' + NUM++ + '}',//код, по которому будет производиться подмена данных в шаблоне
 				dialog_id:50,   //id диалога, через который был вставлен этот элемент
 				title:''        //имя элемента
 			}, v || {});
 
 			DL.append(
-				'<dd class="over5" val="' + v.id + '">' +
+				'<dd id="dd' + v.id + '" class="over5">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td><input type="text"' +
-									  ' class="w200 b code"' +
+									  ' class="w200 b txt_10"' +
 									  ' placeholder="код значения"' +
 									  ' maxlength="20"' +
+									  ' value="' + v.txt_10 + '"' +
 								' />' +
 							'<td class="w100p">' +
 								'<input type="text"' +
@@ -3516,10 +3519,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
-						DD.attr('val', ia.unit.id);
+						DD.attr('id', 'dd' + ia.unit.id);
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
-						INP.val(ia.unit.title);
+						INP.val(ia.unit.title || ia.unit.id);
 					}
 				});
 			});
@@ -3530,6 +3533,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 			DD.find('.code').focus();
 		}
+	},
+	PHP12_template_param_get = function(el, obj) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			send.push({
+				elem_id:_num(sp.attr('id').split('dd')[1]),
+				txt_10:sp.find('.txt_10').val()
+			});
+		});
+		return send;
 	},
 
 	/* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
@@ -3605,11 +3618,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					dss:obj.srce.dss,
 					edit_id:v.id,
 					dop:{rule_id:6},
-					busy_obj:$(this),
+					busy_obj:TITLE,
 					busy_cls:'hold',
 					func_save:function(res) {
 						v.id = res.unit.id;
-						v.dialog_id = res.unit.dialog_id
+						v.dialog_id = res.unit.dialog_id;
 						DD.attr('val', v.id);
 						TITLE.val(res.unit.title);
 						DD.find('.txt_8').focus();

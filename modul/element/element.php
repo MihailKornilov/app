@@ -3740,6 +3740,88 @@ function PHP12_template_param($prm) {
 
 	return '';
 }
+function PHP12_template_param_save($cmp, $val, $unit) {
+	if(!$template_id = _num($unit['id']))
+		return;
+
+	//получение id приложения у шаблона
+	$sql = "SELECT `app_id`
+			FROM `_template`
+			WHERE `id`=".$template_id;
+	$app_id = query_value($sql);
+
+	$ids = '0';         //сбор id элементов, которые не будут удалены
+	$update = array();
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		foreach($val as $r) {
+			if(!$id = _num($r['elem_id']))
+				continue;
+
+			$ids .= ','.$id;
+
+			if(!$txt_10 = _txt($r['txt_10']))
+				jsonError(array(
+					'attr_cmp' => '#dd'.$id.' .txt_10',
+					'text' => 'Не указан код значения'
+				));
+
+			$update[] = array(
+				'id' => $id,
+				'txt_10' => $txt_10
+			);
+		}
+	}
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `id` IN ("._ids($unit['param_ids']).")
+			  AND `id` NOT IN (".$ids.")";
+	query($sql);
+
+	//ID элементов-значений, применяемых в шаблоне
+	$sql = "UPDATE `_template`
+			SET `param_ids`='"._ids($ids)."'
+			WHERE `id`=".$template_id;
+	query($sql);
+
+	if(empty($update))
+		return;
+
+	foreach($update as $sort => $r) {
+		$sql = "UPDATE `_element`
+				SET `app_id`=".$app_id.",
+					`txt_10`='".$r['txt_10']."',
+					`sort`=".$sort."
+				WHERE `id`=".$r['id'];
+		query($sql);
+	}
+}
+function PHP12_template_param_vvv($prm) {//получение значений для настройки истории действий
+	if(!$u = $prm['unit_edit'])
+		return array();
+
+	if(!$ids = _ids($u['param_ids']))
+		return array();
+
+	$send = array();
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id` IN (".$ids.")
+			ORDER BY `sort`";
+	foreach(query_arr($sql) as $r)
+		$send[] = array(
+			'id' => _num($r['id']),
+			'txt_10' => _txt($r['txt_10']),
+			'dialog_id' => _num($r['dialog_id']),
+			'title' => _elemTitle($r['id'])
+		);
+
+	return $send;
+}
 
 
 
