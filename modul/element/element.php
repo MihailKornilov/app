@@ -1895,6 +1895,42 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 	return $send;
 }
 
+function _elem33Data($el, $u) {//Значение записи: дата [33]
+	if(empty($u['dtime_add']))
+		return '';
+	if(!preg_match(REGEXP_DATE, $u['dtime_add']))
+		return 'некорректный формат даты';
+
+	$ex = explode(' ', $u['dtime_add']);
+	$d = explode('-', $ex[0]);
+
+	//время
+	$hh = '';
+	if($el['num_4'] && !empty($ex[1])) {
+		$h = explode(':', $ex[1]);
+		$hh .= ' '.$h[0].':'.$h[1];
+	}
+
+	if($el['num_1'] == 31)
+		return $d[2].'/'.$d[1].'/'.$d[0].$hh;
+
+	$hh = $hh ? ' в'.$hh : '';
+
+	if($el['num_3']) {
+		$dCount = floor((strtotime($ex[0]) - TODAY_UNIXTIME) / 3600 / 24);
+		switch($dCount) {
+			case -1: return 'вчера'.$hh;
+			case 0: return 'сегодня'.$hh;
+			case 1: return 'завтра'.$hh;
+		}
+	}
+
+	return
+		_num($d[2]).                                                     //день
+		' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //месяц
+		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
+		$hh;                                                             //время
+}
 
 function _elem72Radio($el, $prm) {//получение сумм для фильтра [72]
 	$v = _spisokFilter('vv', $el, strftime('%Y-%m'));

@@ -589,21 +589,37 @@ function _document() {//формирование документа для вы�
 	if(!file_exists($tmp_file))
 		return _empty20('Файла-шаблона не существует');
 
-	//подстановка данных
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id` IN ("._ids($doc['param_ids']).")";
-	if($arr = query_arr($sql)) {
-
-	}
-
-
+	if(!$dlg_id = $doc['spisok_id'])
+		return _empty20('Не указан список, из которого берутся данные');
+	if(!$DLG = _dialogQuery($dlg_id))
+		return _empty20('Диалога '.$dlg_id.' не существует');
+	if(!$unit_id = _num(@$_GET['id']))
+		return _empty20('Отсутствует id записи');
+	if(!$unit = _spisokUnitQuery($DLG, $unit_id))
+		return _empty20('Записи '.$unit_id.' не существует');
 
 
 	require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
 	$document = new \PhpOffice\PhpWord\TemplateProcessor($tmp_file);
 
-	$document->setValue('{PPPPP}', 'Пробная строка');
+	//подстановка данных
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id` IN ("._ids($doc['param_ids']).")";
+	foreach(query_arr($sql) as $el) {
+		$txt = '';
+		switch($el['dialog_id']) {
+			//порядковый номер
+			case 32:
+				$txt = empty($unit['num']) ? $unit['id'] : $unit['num'];
+				break;
+			//дата и время
+			case 33:
+				$txt = _elem33Data($el, $unit);
+				break;
+		}
+		$document->setValue($el['txt_10'], $txt);
+	}
 
 	header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 	header('Content-Disposition: attachment; filename="111.docx"');

@@ -332,7 +332,8 @@ function _html_script() {//скрипты и стили
 			'AJAX="'.AJAX.$GET_ARR.'",'.
 			'SA='.SA.','.
 			'USER_ID='.USER_ID.','.
-			'PAGE_ID='._page('cur').';'.
+			'PAGE_ID='._page('cur').','.
+			'GET_ID='._num(@$_GET['id']).';'.
 	'</script>'.
 
 	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
