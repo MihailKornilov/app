@@ -995,6 +995,26 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		//Настройка суммы значений единицы списка
 		case 27: return $el['name'];
 
+		//Загрузка файла
+		case 28:
+			/*
+                txt_1 - нулевое значение
+			*/
+			return
+			'<div class="_attach">'.
+				'<div class="_attach-but bg-ffc"'._elemStyleWidth($el).'>'.
+					'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="_attach-frame"'._elemStyleWidth($el).'>'.
+						'<input type="hidden" name="op" value="attach_upload" />'.
+//						'<input type="hidden" name="noapp" value="' + o.noapp + '" />' +
+						'<input type="file" name="f1" '._elemStyleWidth($el).' />'.// accept="' + acceptMime() + '"
+					'</form>'.
+					'<button class="vk small grey w100p">'.$el['txt_1'].'</button>'.
+				'</div>'.
+				'<br>'.
+				'<br>'.
+				'<iframe name="_attach-frame"></iframe>'.
+			'</div>';
+
 		//Select - выбор единицы из другого списка
 		case 29:
 			/*

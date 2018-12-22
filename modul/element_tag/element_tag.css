@@ -761,6 +761,9 @@ button.vk._busy{color:transparent}
 
 
 
+
+
+
 /* Перелистывание годов */
 ._yearleaf{
 	background-color:#E8E8E8;
@@ -785,6 +788,55 @@ button.vk._busy{color:transparent}
 	color:#555;
 	position:relative;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/* Загрузка файлов */
+._attach{
+	position:relative;
+}
+._attach-but{overflow:hidden;height:21px;}
+._attach form{
+	display:inline-block;
+	position:absolute;
+	overflow:hidden;
+	height:21px;
+	cursor:pointer;
+	opacity:0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
