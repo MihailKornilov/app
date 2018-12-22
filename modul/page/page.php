@@ -606,20 +606,8 @@ function _document() {//формирование документа для вы�
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id` IN ("._ids($doc['param_ids']).")";
-	foreach(query_arr($sql) as $el) {
-		$txt = '';
-		switch($el['dialog_id']) {
-			//порядковый номер
-			case 32:
-				$txt = empty($unit['num']) ? $unit['id'] : $unit['num'];
-				break;
-			//дата и время
-			case 33:
-				$txt = _elem33Data($el, $unit);
-				break;
-		}
-		$document->setValue($el['txt_10'], $txt);
-	}
+	foreach(query_arr($sql) as $el)
+		$document->setValue($el['txt_10'], _docTxt($el, $unit));
 
 	header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 	header('Content-Disposition: attachment; filename="111.docx"');
@@ -627,7 +615,35 @@ function _document() {//формирование документа для вы�
 
 	exit;
 }
-
+function _doctxt($el, $unit) {
+	$col = $el['col'];
+	switch($el['dialog_id']) {
+		//однострочное поле
+		case 8: return $unit[$col];
+		//значение записи
+		case 11: return _doc11txt($el, $unit);
+		//порядковый номер
+		case 32: return empty($unit['num']) ? $unit['id'] : $unit['num'];
+		//дата и время
+		case 33: return _elem33Data($el, $unit);
+	}
+	return DEBUG ? '[DLG'.$el['dialog_id'].']' : '';
+}
+function _doc11txt($el, $unit) {//значение элемента [11]
+	foreach(_ids($el['txt_2'], 'arr') as $id) {
+		if(!$ell = _elemOne($id))
+			return '';
+		//вложенное значение становится записью
+		if(_elemIsConnect($ell)) {
+			if(!$col = $ell['col'])
+				return '';
+			$unit = $unit[$col];
+			continue;
+		}
+		return _doctxt($ell, $unit);
+	}
+	return '';
+}
 
 /* ----==== СПИСОК СТРАНИЦ (page12) ====---- */
 function PHP12_page_list() {
