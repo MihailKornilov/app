@@ -2073,6 +2073,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						break;
 					var send = {
 						dialog_id:dlg_id,
+						get_id:GET_ID,
+						edit_id:GET_ID,
 						busy_obj:_attr_bl(ELMM[el.id].block_id)
 					};
 

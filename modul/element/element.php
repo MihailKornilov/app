@@ -1816,25 +1816,7 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 		case 55: return $txt;
 
 		//Выбор нескольких значений галочками
-		case 31:
-			if(!$sel = _idsAss($txt))
-				return '';
-
-			//получение данных списка
-			$DLG = _dialogQuery($ell['num_1']);
-			$sql = "SELECT "._queryCol($DLG)."
-					FROM   "._queryFrom($DLG)."
-					WHERE  "._queryWhere($DLG)."
-					ORDER BY `sort`";
-			$spisok = query_arr($sql);
-
-			$send = array();
-
-			foreach($spisok as $r)
-				if(!empty($sel[$r['num']]))
-					$send[] = $r['txt_1'];
-
-			return implode(', ', $send);
+		case 31: return _val31($ell, $txt);
 
 		//Календарь
 		case 51:
@@ -1893,6 +1875,30 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 		$send .= ($n ? $znak : '') . _elemTitle($id);
 
 	return $send;
+}
+
+function _val31($el, $txt) {//Выбор нескольких значений галочками [31] - вывод значения
+	if(!$sel = _idsAss($txt))
+		return '';
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return '';
+
+	//получение данных списка
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			ORDER BY `sort`";
+	if(!$spisok = query_arr($sql))
+		return '';
+
+
+	$send = array();
+
+	foreach($spisok as $r)
+		if(!empty($sel[$r['num']]))
+			$send[] = $r['txt_1'];
+
+	return implode(', ', $send);
 }
 
 function _elem33Data($el, $u) {//Значение записи: дата [33]
@@ -1993,6 +1999,7 @@ function _elem72Sum($el, $year) {//получение сумм для фильт
 
 	return $spisok;
 }
+
 
 
 function _elem300Place($res) {//страна и город пользователя ВК

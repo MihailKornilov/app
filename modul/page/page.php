@@ -618,10 +618,14 @@ function _document() {//формирование документа для вы�
 function _doctxt($el, $unit) {
 	$col = $el['col'];
 	switch($el['dialog_id']) {
+		//многострочное поле
+		case 5: return _br($unit[$col], "<w:br/>");
 		//однострочное поле
 		case 8: return $unit[$col];
 		//значение записи
 		case 11: return _doc11txt($el, $unit);
+		//Выбор нескольких значений галочками
+		case 31: return _val31($el, $unit[$col]);
 		//порядковый номер
 		case 32: return empty($unit['num']) ? $unit['id'] : $unit['num'];
 		//дата и время
