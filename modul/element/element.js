@@ -983,6 +983,34 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						spisok:vvv
 					});
 					return;
+				//Загрузка файла
+				case 28:
+					var AT = ATR_EL.find('._attach'),
+						BUT = AT.find('.vk'),
+						FORM = AT.find('form'),
+						FILE = AT.find('.at-file'),
+						atmr;
+
+					FILE.change(function() {
+						FILE._vh();
+						BUT.addClass('_busy');
+						_cookie('_attached', 0);
+						_cookie('_attached_id', 0);
+						atmr = setInterval(upload_start, 500);
+						FORM.submit();
+					});
+					function upload_start() {
+						switch(_num(_cookie('_attached'))) {
+							case 1:
+							case 2:
+							case 3:
+								alert(_num(_cookie('_attached')))
+								FILE._vh(1);
+								BUT.removeClass('_busy');
+								clearInterval(atmr);
+						}
+					}
+					return;
 				//select - выбор единицы из другого списка (для связки)
 				case 29:
 					_elemAction(el, _num(ATR_CMP.val()), 1);

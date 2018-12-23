@@ -683,6 +683,66 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+
+	case 'attach_upload'://загрузка файла [28]
+		/*
+			Прикрепление файлов
+			1 - успешно
+			2 - неверный формат
+			3 - загрузить не удалось
+		*/
+
+		$f = $_FILES['f1'];
+		switch($f['type']) {
+			case 'application/vnd.ms-excel':    //xls
+			case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':       //xlsx
+			case 'application/msword':          //doc
+			case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': //docx
+			case 'application/rtf':             //rtf
+			case 'application/pdf':             //pdf
+			case 'image/jpeg':
+			case 'image/png':
+			case 'application/octet-stream':    //pro100    .sto
+				break;
+			default:
+				//неверный формат
+				setcookie('_attached', 2, time() + 3600, '/');
+				exit;
+		}
+
+		$ATTACH_PATH = APP_PATH.'/.attach/'.APP_ID;
+
+
+		if(!is_dir($ATTACH_PATH))
+			mkdir($ATTACH_PATH, 0777, true);
+
+		$fname = time().'_'.translit(trim($f['name'])); //имя файла, сохраняемое на диск
+
+		if(move_uploaded_file($f['tmp_name'], $ATTACH_PATH.'/'.$fname)) {
+			$sql = "INSERT INTO `_attach` (
+						`app_id`,
+						`name`,
+						`size`,
+						`link`,
+						`user_id_add`
+					) VALUES (
+						".APP_ID.",
+						'".addslashes(trim($f['name']))."',
+						".$f['size'].",
+						'".addslashes($ATTACH_PATH.'/'.$fname)."',
+						".USER_ID."
+					)";
+			$id = query_id($sql);
+
+			//успешно
+			setcookie('_attached', 1, time() + 3600, '/');
+			setcookie('_attached_id', $id, time() + 3600, '/');
+			exit;
+		}
+
+		//загрузить не удалось
+		setcookie('_attached', 3, time() + 3600, '/');
+		exit;
 }
 
 

@@ -1006,7 +1006,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="_attach-frame"'._elemStyleWidth($el).'>'.
 						'<input type="hidden" name="op" value="attach_upload" />'.
 //						'<input type="hidden" name="noapp" value="' + o.noapp + '" />' +
-						'<input type="file" name="f1" '._elemStyleWidth($el).' />'.// accept="' + acceptMime() + '"
+						'<input type="file" name="f1" class="at-file"'._elemStyleWidth($el).' />'.// accept="' + acceptMime() + '"
 					'</form>'.
 					'<button class="vk small grey w100p">'.$el['txt_1'].'</button>'.
 				'</div>'.
