@@ -1006,8 +1006,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							case 1:
 								var attach_id = _cookie('_attached_id');
 								ATUP._dn();
-								ATV._dn(1).html(attach_id);
+								ATV._dn(1).html('&nbsp;');
 								ATR_CMP.val(attach_id);
+								var send = {
+									op:'attach_get',
+									id:attach_id,
+									busy_obj:ATV
+								};
+								_post(send, function(res) {
+									ATV.html(res.name);
+								});
 							case 2:
 							case 3:
 								FILE._vh(1);

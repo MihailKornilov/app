@@ -743,6 +743,18 @@ switch(@$_POST['op']) {
 		//загрузить не удалось
 		setcookie('_attached', 3, time() + 3600, '/');
 		exit;
+	case 'attach_get'://получение данных файла
+		if(!$id = _num($_POST['id']))
+			jsonError('Не получен id файла');
+
+		$sql = "SELECT *
+				FROM `_attach`
+				WHERE `id`=".$id;
+		if(!$r = query_assoc($sql))
+			jsonError('Файла '.$id.' не существует');
+
+		jsonSuccess($r);
+		break;
 }
 
 

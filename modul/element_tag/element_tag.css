@@ -814,6 +814,11 @@ button.vk._busy{color:transparent}
 	opacity:0;
 }
 ._attach iframe{display:none}
+._attach .atv:not(.dn){
+	display:inline-block;
+	min-width:50px;
+	min-height:21px;
+}
 
 
 
