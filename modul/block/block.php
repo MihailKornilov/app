@@ -1000,19 +1000,28 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			/*
                 txt_1 - нулевое значение
 			*/
+
+			$fname = '';
+			if($v = _elemPrintV($el, $prm, 0)) {
+				$sql = "SELECT *
+						FROM `_attach`
+						WHERE `id`=".$v;
+				if($r = query_assoc($sql))
+					$fname = $r['name'];
+			}
+
 			return
+			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 			'<div class="_attach">'.
-				'<div class="_attach-but bg-ffc"'._elemStyleWidth($el).'>'.
-					'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="_attach-frame"'._elemStyleWidth($el).'>'.
+				'<div class="atup'._dn(!$v).'"'._elemStyleWidth($el).'>'.
+					'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="at-frame">'.
 						'<input type="hidden" name="op" value="attach_upload" />'.
-//						'<input type="hidden" name="noapp" value="' + o.noapp + '" />' +
 						'<input type="file" name="f1" class="at-file"'._elemStyleWidth($el).' />'.// accept="' + acceptMime() + '"
 					'</form>'.
 					'<button class="vk small grey w100p">'.$el['txt_1'].'</button>'.
+					'<iframe name="at-frame"></iframe>'.
 				'</div>'.
-				'<br>'.
-				'<br>'.
-				'<iframe name="_attach-frame"></iframe>'.
+				'<div class="atv'._dn($v).'">'.$fname.'</div>'.
 			'</div>';
 
 		//Select - выбор единицы из другого списка

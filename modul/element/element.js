@@ -986,9 +986,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//Загрузка файла
 				case 28:
 					var AT = ATR_EL.find('._attach'),
+						ATUP = AT.find('.atup'),    //div для загрузки
 						BUT = AT.find('.vk'),
 						FORM = AT.find('form'),
-						FILE = AT.find('.at-file'),
+						FILE = AT.find('.at-file'), //input file
+						ATV = AT.find('.atv'),      //загруженный файл
 						atmr;
 
 					FILE.change(function() {
@@ -1002,9 +1004,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					function upload_start() {
 						switch(_num(_cookie('_attached'))) {
 							case 1:
+								var attach_id = _cookie('_attached_id');
+								ATUP._dn();
+								ATV._dn(1).html(attach_id);
+								ATR_CMP.val(attach_id);
 							case 2:
 							case 3:
-								alert(_num(_cookie('_attached')))
 								FILE._vh(1);
 								BUT.removeClass('_busy');
 								clearInterval(atmr);

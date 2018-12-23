@@ -804,7 +804,7 @@ button.vk._busy{color:transparent}
 ._attach{
 	position:relative;
 }
-._attach-but{overflow:hidden;height:21px;}
+._attach .atup{overflow:hidden;height:21px;}
 ._attach form{
 	display:inline-block;
 	position:absolute;
@@ -813,6 +813,7 @@ button.vk._busy{color:transparent}
 	cursor:pointer;
 	opacity:0;
 }
+._attach iframe{display:none}
 
 
 
