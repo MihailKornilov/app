@@ -1021,7 +1021,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					'<button class="vk small grey w100p">'.$el['txt_1'].'</button>'.
 					'<iframe name="at-frame"></iframe>'.
 				'</div>'.
-				'<div class="atv'._dn($v).'">'.$fname.'</div>'.
+				'<table class="atv'._dn($v).'">'.
+					'<tr><td>'.$fname.
+						'<th class="top">'.
+							'<div class="icon icon-del-red mtm1 ml5 pl"></div>'.
+				'</table>'.
 			'</div>';
 
 		//Select - выбор единицы из другого списка

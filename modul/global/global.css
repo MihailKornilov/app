@@ -627,7 +627,7 @@ textarea.hold::-moz-placeholder{color:transparent}
 .top5{top:5px}
 .pabs{position:absolute}
 
-td.top{vertical-align:top}
+td.top,th.top{vertical-align:top}
 td.topi{vertical-align:top;padding-top:7px}
 td.bottom{vertical-align:bottom}
 .center{text-align:center}

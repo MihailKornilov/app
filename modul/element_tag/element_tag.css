@@ -819,6 +819,7 @@ button.vk._busy{color:transparent}
 	min-width:50px;
 	min-height:21px;
 }
+._attach .atv._busy .icon{display:none}
 
 
 

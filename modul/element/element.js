@@ -993,6 +993,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						ATV = AT.find('.atv'),      //загруженный файл
 						atmr;
 
+					AT.find('.icon-del-red').click(function() {
+						ATUP._dn(1);
+						ATV._dn();
+						ATR_CMP.val(0);
+					});
 					FILE.change(function() {
 						FILE._vh();
 						BUT.addClass('_busy');
@@ -1006,7 +1011,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							case 1:
 								var attach_id = _cookie('_attached_id');
 								ATUP._dn();
-								ATV._dn(1).html('&nbsp;');
+								ATV._dn(1).find('td').html('&nbsp;');
 								ATR_CMP.val(attach_id);
 								var send = {
 									op:'attach_get',
@@ -1014,7 +1019,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									busy_obj:ATV
 								};
 								_post(send, function(res) {
-									ATV.html(res.name);
+									ATV.find('td').html(res.name);
 								});
 							case 2:
 							case 3:
