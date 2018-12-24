@@ -423,7 +423,10 @@ function _hat_but_sa() {//отображение кнопки списка ст�
 	if(PAS)
 		return '';
 
-	return '<button class="vk small cancel b ml10" onclick="location.href=\''.URL.'&p=1\'">SA</button>';
+	return
+	'<button class="vk small cancel ml10" onclick="location.href=\''.URL.'&p=1\'">'.
+		'<b class="color-ref">SA</b>'.
+	'</button>';
 }
 function _hat_but_admin() {//кнопки Администрирование
 	if(PAS)

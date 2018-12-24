@@ -578,6 +578,7 @@ function _document() {//формирование документа для вы�
 	if(!$doc_id = _num(@$_GET['doc_id']))
 		return _empty20('Некорректный id шаблона документа');
 
+	//получени данных шаблона
 	$sql = "SELECT *
 			FROM `_template`
 			WHERE `app_id`=".APP_ID."
@@ -585,10 +586,27 @@ function _document() {//формирование документа для вы�
 	if(!$doc = query_assoc($sql))
 		return _empty20('Шаблона документа '.$doc_id.' не существует');
 
-	$tmp_file = GLOBAL_DIR.'/tmp.docx';
-	if(!file_exists($tmp_file))
-		return _empty20('Файла-шаблона не существует');
+	//получение данных файла-шаблона
+	if(!$attach_id = $doc['attach_id'])
+		return _empty20('Отсутствует id файла-шаблона');
 
+	$sql = "SELECT *
+			FROM `_attach`
+			WHERE `app_id`=".APP_ID."
+			  AND `id`=".$attach_id;
+	if(!$att = query_assoc($sql))
+		return _empty20('Файла-шаблона '.$attach_id.' не существует');
+
+	if(!file_exists($att['link']))
+		return _empty20('Файл-шаблон отсутствует на сервере');
+
+	//проверка корректности расширения файла-шаблона
+	$ex = explode('.', $att['link']);
+	$c = count($ex) - 1;
+	if($ex[$c] != 'docx')
+		return _empty20('Некорректный файл-шаблон');
+
+	//получение данных записи
 	if(!$dlg_id = $doc['spisok_id'])
 		return _empty20('Не указан список, из которого берутся данные');
 	if(!$DLG = _dialogQuery($dlg_id))
@@ -600,7 +618,7 @@ function _document() {//формирование документа для вы�
 
 
 	require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
-	$document = new \PhpOffice\PhpWord\TemplateProcessor($tmp_file);
+	$document = new \PhpOffice\PhpWord\TemplateProcessor($att['link']);
 
 	//подстановка данных
 	$sql = "SELECT *

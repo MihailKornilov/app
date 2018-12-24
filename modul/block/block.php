@@ -1013,7 +1013,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			return
 			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 			'<div class="_attach">'.
-				'<div class="atup'._dn(!$v).'"'._elemStyleWidth($el).'>'.
+				'<div id="'._elemAttrId($el, $prm).'_atup" class="atup'._dn(!$v).'"'._elemStyleWidth($el).'>'.
 					'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="at-frame">'.
 						'<input type="hidden" name="op" value="attach_upload" />'.
 						'<input type="file" name="f1" class="at-file"'._elemStyleWidth($el).' />'.// accept="' + acceptMime() + '"
