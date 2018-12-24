@@ -800,7 +800,7 @@ button.vk._busy{color:transparent}
 
 
 
-/* Загрузка файлов */
+/* Загрузка файлов [28] */
 ._attach{
 	position:relative;
 }
@@ -847,6 +847,22 @@ button.vk._busy{color:transparent}
 
 
 
+
+/* Выбор иконки [36] */
+._icon-choose .icu{
+	display:inline-block;
+	border:transparent solid 2px;
+	width:28px;
+	height:22px;
+	padding-top:4px;
+	text-align:center;
+	cursor:pointer;
+}
+._icon-choose .icu:not(.sel) .icon{opacity:.5}
+._icon-choose .icu.sel{
+	border:#93A3BB solid 2px;
+	background-color:#F2F6F9;
+}
 
 
 

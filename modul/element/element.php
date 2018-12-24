@@ -3541,6 +3541,47 @@ function PHP12_balans_setup_vvv($prm) {
 }
 
 
+
+
+/* ---=== ВЫБОР ИКОНКИ [36] ===--- */
+function PHP12_icon18_list($prm) {
+
+
+	$sel = 0;
+	if($col = $prm['el12']['col'])
+		if($u = $prm['unit_edit'])
+			$sel = $u[$col];
+
+	$send = '';
+	foreach(PHP12_icon18_type() as $id => $name) {
+		$send .=
+			'<div class="icu over1'._dn($id!=$sel, 'sel').'" val="'.$id.'">'.
+				'<div class="icon icon-'.$name.' curP"></div>'.
+			'</div>';
+	}
+
+	return
+	'<div class="_icon-choose mt3">'.
+		$send.
+	'</div>';
+}
+function PHP12_icon18_type($id=0) {//доступные варианты иконок
+	$icon = array(
+		1 => 'hint',
+		2 => 'print',
+		3 => 'ok',
+		4 => 'set',
+		5 => 'set-b'
+	);
+
+	if($id)
+		return isset($icon[$id]) ? $icon[$id] : 'empty';
+
+	return $icon;
+}
+
+
+
 /* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ИЛИ БЛОКУ ===--- */
 function PHP12_action_list($prm) {
 	if(!$bs_id = _num($prm['srce']['block_id']))

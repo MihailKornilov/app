@@ -837,8 +837,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			$prm['el12'] = $el;
 
-			return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm).'" />'.
-				   $el['txt_1']($prm);
+			return
+			($el['col'] ?
+				'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm).'" />'
+			: '').
+				$el['txt_1']($prm);
 
 		//Выбор элемента из диалога или страницы
 		case 13:
@@ -1189,6 +1192,19 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'width' => $el['width'],
 						'value' => _elemPrintV($el, $prm, 0)
 				   ));
+
+		//Иконка
+		case 36:
+			/*
+                num_1 - id иконки
+                num_2 - изменять яркость при наведении мышкой
+			*/
+
+			$type = PHP12_icon18_type($el['num_1']);
+			$pl = _dn(!$el['num_2'], 'pl');
+			$cur = $el['num_3'] ? ' curP' : ' curD';
+
+			return '<div class="icon icon-'.$type.$pl.$cur.'"></div>';
 
 		//SA: Select - выбор колонки таблицы
 		case 37:

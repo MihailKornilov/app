@@ -3517,6 +3517,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
+
+	/* ---=== ВЫБОР ИКОНКИ [36] ===--- */
+	PHP12_icon18_list = function(el) {
+		var ICU = _attr_el(el.id).find('.icu');
+		ICU.click(function() {
+			var t = $(this),
+				id = _num(t.attr('val'));
+
+			ICU.removeClass('sel');
+			t.addClass('sel');
+
+			_attr_cmp(el.id).val(id);
+		});
+	},
+
 	/* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ИЛИ БЛОКУ ===--- */
 	PHP12_action_list = function(el) {
 		_attr_el(el.id).find('DL')._sort({table:'_action'});
