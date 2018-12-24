@@ -2101,6 +2101,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							case 1:
 								_attr_cmp(id)._check(is_set);
 								break;
+							//select - привязанный список
+							case 29:
+								_attr_cmp(id)._select(0);
+								break;
 							//фильтр-галочка
 							case 62:
 								_attr_cmp(id)._check(is_set);
