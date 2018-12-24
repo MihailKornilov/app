@@ -190,6 +190,8 @@ var ZINDEX = 1000,
 			});
 	},
 	_br = function(v, back) {
+		if(!v)
+			return '';
 		if(back)
 			return v.replace(new RegExp("\n",'g'), '<br>');
 		return v.replace(new RegExp('<br>','g'), "\n");
