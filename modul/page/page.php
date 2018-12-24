@@ -597,11 +597,11 @@ function _document() {//формирование документа для вы�
 	if(!$att = query_assoc($sql))
 		return _empty20('Файла-шаблона '.$attach_id.' не существует');
 
-	if(!file_exists($att['link']))
+	if(!file_exists($att['path'].$att['fname']))
 		return _empty20('Файл-шаблон отсутствует на сервере');
 
 	//проверка корректности расширения файла-шаблона
-	$ex = explode('.', $att['link']);
+	$ex = explode('.', $att['fname']);
 	$c = count($ex) - 1;
 	if($ex[$c] != 'docx')
 		return _empty20('Некорректный файл-шаблон');
@@ -618,7 +618,7 @@ function _document() {//формирование документа для вы�
 
 
 	require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
-	$document = new \PhpOffice\PhpWord\TemplateProcessor($att['link']);
+	$document = new \PhpOffice\PhpWord\TemplateProcessor($att['path'].$att['fname']);
 
 	//подстановка данных
 	$sql = "SELECT *

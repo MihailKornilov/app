@@ -4689,6 +4689,39 @@ function _imageWebcam($el) {//Веб-камера (вставляется в б�
 
 
 
+function _attachLink($attach_id) {//формирование ссылки на файл
+	$sql = "SELECT *
+			FROM `_attach`
+			WHERE `id`=".$attach_id;
+	if(!$r = query_assoc($sql))
+		return 'Файл не найден';
+
+	return
+	'<div class="_attach-link">'.
+		'<a href="'.$r['link'].$r['fname'].'">'.
+			$r['oname'].
+		'</a>'.
+		'<span>'._attachSize($r['size']).'</span>'.
+	'</div>';
+}
+function _attachSize($v) {//оформление размера файла в байтах, Кб, Мб
+	if($v < 1000)
+		return $v.'b';
+
+	$v = round($v / 1024);
+	if($v < 1000)
+		return $v.'K';
+
+	$v = round($v / 1024);
+	if($v < 1000)
+		return $v.'M';
+
+	$v = round($v / 1024);
+	return $v.'G';
+}
+
+
+
 
 
 function _filterCalendar($el) {//Фильтр-календарь

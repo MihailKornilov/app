@@ -710,7 +710,8 @@ switch(@$_POST['op']) {
 				exit;
 		}
 
-		$ATTACH_PATH = APP_PATH.'/.attach/'.APP_ID;
+		$ATTACH_PATH = APP_PATH.'/.attach/'.APP_ID.'/';
+		$ATTACH_LINK = '//'.DOMAIN.APP_HTML.'/.attach/'.APP_ID.'/';
 
 
 		if(!is_dir($ATTACH_PATH))
@@ -721,15 +722,19 @@ switch(@$_POST['op']) {
 		if(move_uploaded_file($f['tmp_name'], $ATTACH_PATH.'/'.$fname)) {
 			$sql = "INSERT INTO `_attach` (
 						`app_id`,
-						`name`,
-						`size`,
+						`path`,
 						`link`,
+						`oname`,
+						`fname`,
+						`size`,
 						`user_id_add`
 					) VALUES (
 						".APP_ID.",
+						'".addslashes($ATTACH_PATH)."',
+						'".addslashes($ATTACH_LINK)."',
 						'".addslashes(trim($f['name']))."',
+						'".addslashes($fname)."',
 						".$f['size'].",
-						'".addslashes($ATTACH_PATH.'/'.$fname)."',
 						".USER_ID."
 					)";
 			$id = query_id($sql);
@@ -747,13 +752,9 @@ switch(@$_POST['op']) {
 		if(!$id = _num($_POST['id']))
 			jsonError('Не получен id файла');
 
-		$sql = "SELECT *
-				FROM `_attach`
-				WHERE `id`=".$id;
-		if(!$r = query_assoc($sql))
-			jsonError('Файла '.$id.' не существует');
+		$send['html'] = _attachLink($id);
 
-		jsonSuccess($r);
+		jsonSuccess($send);
 		break;
 }
 

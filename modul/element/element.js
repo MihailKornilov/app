@@ -1019,7 +1019,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									busy_obj:ATV
 								};
 								_post(send, function(res) {
-									ATV.find('td').html(res.name);
+									ATV.find('td').html(res.html);
 								});
 							case 2:
 							case 3:

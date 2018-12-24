@@ -1001,14 +1001,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
                 txt_1 - нулевое значение
 			*/
 
-			$fname = '';
-			if($v = _elemPrintV($el, $prm, 0)) {
-				$sql = "SELECT *
-						FROM `_attach`
-						WHERE `id`=".$v;
-				if($r = query_assoc($sql))
-					$fname = $r['name'];
-			}
+			$v = _elemPrintV($el, $prm, 0);
 
 			return
 			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
@@ -1022,9 +1015,10 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					'<iframe name="at-frame"></iframe>'.
 				'</div>'.
 				'<table class="atv'._dn($v).'">'.
-					'<tr><td>'.$fname.
-						'<th class="top">'.
-							'<div class="icon icon-del-red mtm1 ml5 pl"></div>'.
+					'<tr><td class="top">'._attachLink($v).
+						'<th class="top wsnw">'.
+//							'<div class="icon icon-set mtm2 ml5 pl'._tooltip('Параметры файла', -56).'</div>'.
+							'<div class="icon icon-del-red ml5 mtm2 pl'._tooltip('Отменить', -30).'</div>'.
 				'</table>'.
 			'</div>';
 
