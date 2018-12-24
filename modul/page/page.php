@@ -617,6 +617,7 @@ function _document() {//формирование документа для вы�
 		return _empty20('Записи '.$unit_id.' не существует');
 
 
+
 	require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
 	$document = new \PhpOffice\PhpWord\TemplateProcessor($att['path'].$att['fname']);
 
@@ -627,8 +628,18 @@ function _document() {//формирование документа для вы�
 	foreach(query_arr($sql) as $el)
 		$document->setValue($el['txt_10'], _docTxt($el, $unit));
 
+	//формирование имени файла-шаблона для загрузки
+	$fname = $att['fname'];
+	if($doc['fname']) {
+		$fname = $doc['fname'];
+		$ex = explode('.', $fname);
+		$c = count($ex) - 1;
+		if($ex[$c] != 'docx')
+			$fname .='.docx';
+	}
+
 	header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-	header('Content-Disposition: attachment; filename="111.docx"');
+	header('Content-Disposition: attachment; filename="'.$fname.'"');
 	$document->saveAs('php://output');
 
 	exit;
