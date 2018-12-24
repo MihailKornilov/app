@@ -2119,8 +2119,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						break;
 					var send = {
 						dialog_id:dlg_id,
-						get_id:GET_ID,
-						edit_id:GET_ID,
+						get_id:sp.apply_id ? GET_ID : 0,
+						edit_id:sp.effect_id ? GET_ID : 0,
 						busy_obj:_attr_bl(ELMM[el.id].block_id)
 					};
 

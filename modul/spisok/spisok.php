@@ -500,6 +500,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		num_6 - возможность сортировки строк таблицы (если установлена, длина списка становится 1000)
 		num_7 - уровни сортировки (1,2,3)
 		num_8 - показывать только те значения, которые связаны с выбранным списком
+		num_9 - включение отображения сообщения пустого запроса
 
 		настройка шаблона через функцию PHP12_td_setup
 
@@ -526,7 +527,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		$limit = 1000;
 
 	if(!$all = _spisokCountAll($ELEM))
-		return _emptyMin(_br($ELEM['txt_1']));
+		return $ELEM['num_9'] ? _emptyMin(_br($ELEM['txt_1'])) : '';
 
 	$order = "`t1`.`id` DESC";
 	if($ELEM['num_6'] || _spisokIsSort($ELEM['block_id']))

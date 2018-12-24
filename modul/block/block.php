@@ -694,7 +694,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'attr_id' => _elemAttrId($el, $prm),
 				'title' => $el['txt_1'],
 				'disabled' => $prm['blk_setup'],
-				'value' => _elemPrintV($el, $prm, 0)
+				'value' => _elemPrintV($el, $prm, $el['def'])
 			));
 
 		//button
@@ -877,7 +877,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			if(!$DLG = _dialogQuery($dialog_id))
 				return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
 			if($prm['blk_setup'])
-				return _empty('Список-шаблон <b>'.$DLG['name'].'</b>');
+				return _emptyMin('Список-шаблон <b>'.$DLG['name'].'</b>');
 
 			return _spisok14($el);
 
@@ -955,7 +955,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		//Содержание единицы списка - таблица
 		case 23:
 			if($prm['blk_setup'])
-				return _empty('Список-таблица <b>'._dialogParam($el['num_1'], 'name').'</b>');
+				return _emptyMin('Список-таблица <b>'._dialogParam($el['num_1'], 'name').'</b>');
 
 			return _spisok23($el);
 
