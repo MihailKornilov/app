@@ -3565,7 +3565,7 @@ function PHP12_icon18_list($prm) {
 		$send.
 	'</div>';
 }
-function PHP12_icon18_type($id=0) {//доступные варианты иконок
+function PHP12_icon18_type($id='all') {//доступные варианты иконок
 	$icon = array(
 		1 => 'hint',
 		2 => 'print',
@@ -3574,10 +3574,10 @@ function PHP12_icon18_type($id=0) {//доступные варианты ико�
 		5 => 'set-b'
 	);
 
-	if($id)
-		return isset($icon[$id]) ? $icon[$id] : 'empty';
+	if($id == 'all')
+		return $icon;
 
-	return $icon;
+	return isset($icon[$id]) ? $icon[$id] : 'empty';
 }
 
 

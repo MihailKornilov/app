@@ -726,7 +726,7 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 
 	//пока только для `_action`
 	//также есть `_element_format` и `_element_hint`
-	if($tab = _queryTN($DLG, 'element_id', 1))
+	if($tab = _queryTN($DLG, 'element_id', 1)) {
 		if($tab == '_action')
 			//только для диалогов, предназначенных для элементов
 			switch($DLG['id']) {
@@ -742,7 +742,7 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 					if($block_id)
 						if($BL = _blockOne($block_id))
 							if($elem_id = $BL['elem_id']) {
-								$sql = "UPDATE `".$tab."`
+								$sql = "UPDATE `_action`
 										SET `block_id`=0,       /* удаление id блока, потому что действие для элемента */
 											`element_id`=".$elem_id."
 										WHERE `id`=".$uid[$table_1];
@@ -755,6 +755,17 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 						query($sql);
 					}
 			}
+		if($tab == '_element_hint')
+			if($block_id)
+				if($BL = _blockOne($block_id))
+					if($elem_id = $BL['elem_id']) {
+						$sql = "UPDATE `_element_hint`
+								SET `element_id`=".$elem_id."
+								WHERE `id`=".$uid[$table_1];
+						query($sql);
+					}
+
+	}
 
 	//установка `app_id` для `_action`
 	if($table_1 == '_action') {
