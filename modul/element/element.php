@@ -1013,6 +1013,8 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 			if(!function_exists($func))
 				return array();
 
+			$prm['el12'] = $el;
+
 			return $func($prm);
 
 		//Radio
@@ -1056,6 +1058,13 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 			$sel_id = _elem29PageSel($el['num_1'], $sel_id);
 			$sel_id = _elem29DialogSel($prm, $sel_id);
 			return _29cnn($elem_id, '', $sel_id);
+
+		//Количество
+		case 35:
+			if($el['num_1'] != 3682)
+				break;
+
+			return json_decode($el['txt_1']);
 
 		//SA: select - выбор имени колонки
 		case 37: return _elemVvv37($prm);
@@ -3223,6 +3232,70 @@ function PHP12_radio_setup_vvv_use($send, $parent_id) {//использован�
 				continue;
 			$send[$n]['use'] = $ass[$r['id']];
 		}
+
+	return $send;
+}
+
+
+
+/* ---=== НАСТРОЙКА КОНКРЕТНЫХ ЗНАЧЕНИЙ ЭЛЕМЕНТА COUNT [35] ===--- */
+function PHP12_count_value($prm) {
+	return '';
+}
+function PHP12_count_value_save($cmp, $val, $unit) {
+	if(!$unit_id = _num($unit['id']))
+		return;
+	if(!$col = $cmp['col'])
+		return;
+
+	$txt = '';
+	$def = 0;
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		$ids = array();
+		$title = array();
+		foreach($val as $r) {
+			$id = _num($r['id'], 1);
+			$ids[] = $id;
+			$title[] = _txt($r['title']);
+			if($r['def'])
+				$def = $id;
+		}
+		$txt = json_encode(array(
+			'ids' => $ids,
+			'title' => $title
+		));
+	}
+
+	$sql = "UPDATE `_element`
+			SET `".$col."`='".addslashes($txt)."',
+				`def`=".$def."
+			WHERE `id`=".$unit_id;
+	query($sql);
+}
+function PHP12_count_value_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+	if(!$col = $prm['el12']['col'])
+		return array();
+	if(!$arr = $u[$col])
+		return array();
+
+	$arr = (array)json_decode($arr);
+	$ids = $arr['ids'];
+	$title = $arr['title'];
+
+	$send = array();
+	foreach($ids as $n => $id) {
+		$send[] = array(
+			'id' => _num($id),
+			'title' => $title[$n],
+			'def' => $u['def'] == $id ? 1 : 0
+		);
+	}
 
 	return $send;
 }

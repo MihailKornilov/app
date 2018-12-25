@@ -1083,14 +1083,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//count - количество
 				case 35:
-					ATR_CMP._count({
+					var obj = {
 						width:el.width,
-						min:el.num_2 ? el.num_3 : false,
-						max:el.num_5 ? el.num_6 : false,
-						step:el.num_7,
-						minus:el.num_4,
 						again:el.num_8
-					});
+					};
+					if(el.num_1 == 3681) {
+						obj.min = el.num_2 ? el.num_3 : false;
+						obj.max = el.num_5 ? el.num_6 : false;
+						obj.step = el.num_7;
+						obj.minus = el.num_4;
+					}
+					if(el.num_1 == 3682 && vvv) {
+						obj.step = vvv.ids;
+						obj.title = vvv.title;
+					}
+					ATR_CMP._count(obj);
 					return;
 				//SA: Select - выбор имени колонки
 				case 37:
@@ -3158,7 +3165,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<td class="w50 r top pt5">' +
 					   (v.use ? '<div class="dib fs11 color-ccc mr3 curD' + _tooltip('Использование', -53) + v.use + '</div>'
 								:
-								'<div val="' + NUM + '" class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
+								'<div class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
 					   ) +
 					'</table>' +
 				'</dd>'
@@ -3183,6 +3190,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DD.find('.icon-del').click(function() {
 				$(this).closest('DD').remove();
 			});
+			//выделение текста новодобавленного значения
 			if(!v.id)
 				DD.find('.title').select();
 			NUM++;
@@ -3328,6 +3336,75 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				title:sp.find('.title').val(),
 				def:sp.find('.def').val(),
 				num_1:sp.find('.icon-eye').hasClass('pl') ? 0 : 1
+			});
+		});
+		return send;
+	},
+
+	/* ---=== НАСТРОЙКА КОНКРЕТНЫХ ЗНАЧЕНИЙ ЭЛЕМЕНТА COUNT [35] ===--- */
+	PHP12_count_value = function(el, vvv, obj) {
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			ATTR_EL = _attr_el(el.id),
+			DL = ATTR_EL.append(html).find('dl'),
+			BUT_ADD = ATTR_EL.find('div:last'),
+			NUM = 1;
+
+		BUT_ADD.click(valueAdd);
+
+		if(obj.unit.id)
+			_forIn(vvv, valueAdd);
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:NUM++,
+				title:'',
+				def:0
+			}, v);
+
+			DL.append(
+				'<dd class="over1">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center top pt5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w35 center">' +
+								'<input type="hidden" class="def" value="' + v.def + '" />' +
+							'<td class="w50">' +
+								'<input type="text" class="vid w50 r" value="' + v.id + '" />' +
+							'<td><input type="text" class="title w100p" placeholder="имя значения не обязательно" value="' + v.title + '" />' +
+							'<td class="w50 r top pt5">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			DL.sortable({handle:'.icon-move-y'});
+			var DD = DL.find('dd:last');
+			DD.find('.def')._check({
+				tooltip:'Начальное значение',
+				func:function(v, ch) {
+					if(!v)
+						return;
+					//снятие галочек с остальных значений
+					_forEq(DL.find('.def'), function(sp) {
+						if(sp.attr('id') == ch.attr('id'))
+							return;
+						sp._check(0);
+					});
+				}
+			});
+			DD.find('.icon-del').click(function() {
+				$(this).closest('DD').remove();
+			});
+		}
+	},
+	PHP12_count_value_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			send.push({
+				id:_num(sp.find('.vid').val(), 1),
+				title:sp.find('.title').val(),
+				def:_num(sp.find('.def').val())
 			});
 		});
 		return send;
