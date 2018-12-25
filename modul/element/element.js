@@ -1088,7 +1088,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						min:el.num_2 ? el.num_3 : false,
 						max:el.num_5 ? el.num_6 : false,
 						step:el.num_7,
-						minus:el.num_4
+						minus:el.num_4,
+						again:el.num_8
 					});
 					return;
 				//SA: Select - выбор имени колонки

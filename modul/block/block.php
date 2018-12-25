@@ -1191,6 +1191,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_5 - разрешать максимум
 				num_6 - максимум
                 num_7 - шаг
+                num_8 - разрешать переключение значений по кругу
+                txt_1 - конкретные значения, настраиваются через PHP12_count_value
 			*/
 			return _count(array(
 						'attr_id' => _elemAttrId($el, $prm),
