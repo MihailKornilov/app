@@ -84,10 +84,11 @@ function _count($v=array()) {//поле количество
 			$width .= 'px';
 	$width = ' style="width:'.$width.'"';
 
-	$value = _num(@$v['value']);
+	$value = _num(@$v['value'], 1);
 	return
-	'<div class="_count disabled" id="'.$attr_id.'_count"'.$width.'>'.
-		'<input type="text" readonly id="'.$attr_id.'" value="'.$value.'" />'.
+	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
+	'<div class="_count disabled php" id="'.$attr_id.'_count"'.$width.'>'.
+		'<input type="text" readonly value="'.$value.'" />'.
 		'<div class="but"></div>'.
 		'<div class="but but-b"></div>'.
 	'</div>';
@@ -172,7 +173,6 @@ function _search($v=array()) {//поле ПОИСК
 }
 function _menu($el, $is_edit) {//Меню страниц [3]
 	$menu = array();
-//	return _pr(_page());
 	foreach(_page() as $id => $r) {
 		if(!$r['app_id'])
 			continue;

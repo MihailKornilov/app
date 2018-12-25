@@ -609,8 +609,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						var func = sp.txt_1 + '_get';
 						if(window[func])
 							send.vvv[id] = window[func](sp, o);
-						send.cmp[id] = ATR_CMP.val();
-						return;
+						break;
 					case 22://Дополнительные условия к фильтру
 						send.vvv[id] = PHP12_elem22_get(sp);
 						return;
@@ -1086,9 +1085,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 35:
 					ATR_CMP._count({
 						width:el.width,
-						min:el.num_1,
-						max:el.num_2,
-						step:el.num_3,
+						min:el.num_2 ? el.num_3 : false,
+						max:el.num_5 ? el.num_6 : false,
+						step:el.num_7,
 						minus:el.num_4
 					});
 					return;
@@ -2773,11 +2772,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send.join();
 	},
 
-	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ ===--- */
+	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ [57] ===--- */
 	PHP12_menu_block_setup = function(el, vvv, obj) {//используется в диалоге [57]
 		var ATR_EL = _attr_el(el.id),
 			html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Новый пункт меню</div>',
+				   '<div class="fs15 color-555 pad10 center over5 curP">Новый пункт меню</div>',
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
 			NUM = 1,
@@ -2808,7 +2807,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			}, v);
 
 			DL.append(
-				'<dd class="over3" val="' + v.id + '" data-num="' + v.num + '">' +
+				'<dd class="over5" val="' + v.id + '" data-num="' + v.num + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w35 pl5">' +
 								'<div class="icon icon-move-y pl curM"></div>' +

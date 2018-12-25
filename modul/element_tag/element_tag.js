@@ -299,27 +299,30 @@ $.fn._count = function(o) {//input с количеством
 	o = $.extend({
 		width:50,   //если 0 = 100%
 		bold:0,
+		disabled:0,
+		tooltip:'',
+
 		min:false,  //минимальное значение
 		max:false,  //максимальное значение
 		minus:0,    //может уходить в минус
 		step:1,     //шаг. Либо массив вариантов: [1,5,10,20]
-		again:0,    //если переключение доходит до крайнего значения, продолжение с начала
 		time:0,     //значение является временем (добавление нуля спереди, если меньше 10)
-		tooltip:'',
-		disabled:0,
+		again:0,    //если переключение доходит до крайнего значения, продолжение с начала
+
+		title:[],   //имена значений в виде текста. Перечислены через запятую согласно step
+
 		func:function() {}
 	}, o);
 
 	if(o.min < 0)
 		o.minus = 1;
 
-	var val = _num(t.val());
+	var val = _num(t.val(), 1);
 	val = valCorrect();
-	t.val((o.time && val < 10 ? '0' : '') + val)
-	 .attr('type', 'text')
-	 .attr('readonly', true);
+	t.val(val);
 
-	var width = 'width:' + (o.width ? o.width + 'px' : '100%'),
+	var PHP = t.next('._count.php'),
+		width = 'width:' + (o.width ? o.width + 'px' : '100%'),
 		dis = o.disabled ? ' disabled' : '',
 		STEP_COUNT = o.step.length || 0,//количество значений, если шаг-массив
 		STEP_N = 0;//номер шага, если шаг-массив
@@ -335,30 +338,32 @@ $.fn._count = function(o) {//input с количеством
 		});
 	}
 
-	if(t.parent().hasClass('_count')) {
-		t.parent()
-			._dn(dis == '', 'disabled')
-			.attr('id', win)
-			.width(o.width || '100%')
-			.find('.but').remove();
+	if(PHP.length) {
+		 PHP.removeClass('php')
+			._dn(!dis, 'disabled')
+			.attr('id', attr_id + '_count')
+			.width(o.width || '100%');
 	} else {
-		t.wrap('<div class="_count' + dis + '" id="' + win + '" style="' + width + '">');
+		t.after('<div class="_count' + dis + '" id="' + attr_id + '_count" style="' + width + '">' +
+					'<input type="text" readonly value="' + val + '" />' +
+					'<div class="but"></div>' +
+					'<div class="but but-b"></div>' +
+				'</div>');
+		PHP = t.next();
 	}
 
-	var el = $('#' + win);
-	el._dn(val || o.time, 'nol');
-	el.append(
-		'<div class="but"></div>' +
-		'<div class="but but-b"></div>'
-	);
+	var INP = PHP.find('input');
+	INP.val(val);
+
+	PHP._dn(val || o.time, 'nol');
 
 	if(o.bold)
-		t.addClass('b');
+		INP.addClass('b');
 
 	if(o.tooltip)
-		el._tooltip(o.tooltip, -15);
+		PHP._tooltip(o.tooltip, -15);
 
-	el.find('.but').click(function() {
+	PHP.find('.but').click(function() {
 		if(dis)
 			return;
 		var znak = $(this).hasClass('but-b') ? -1 : 1;
@@ -374,16 +379,28 @@ $.fn._count = function(o) {//input с количеством
 			val += o.step * znak;
 
 		val = valCorrect();
-		el._dn(val || o.time, 'nol');
-		t.val((o.time && val < 10 ? '0' : '') + val);
+		PHP._dn(val || o.time, 'nol');
+
+		t.val(val);
+
+		//установка текстового значения, если требуется
+		var title = (o.time && val < 10 ? '0' : '') + val;
+		if(o.title[STEP_N])
+			title = o.title[STEP_N];
+		INP.val(title);
+
 		o.func(val, attr_id);
 	});
 	function valCorrect() {
-		if(o.min !== false && val < o.min && o.again && o.max !== false)
-			return o.max;
+		if(o.again)
+			if(o.min !== false)
+				if(o.max !== false) {
+					if(val < o.min)
+						return o.max;
 
-		if(o.max !== false && val > o.max && o.again && o.min !== false)
-			return o.min;
+					if(val > o.max)
+						return o.min;
+				}
 
 		if(!o.minus && val < 0)
 			return 0;
