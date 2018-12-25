@@ -1265,7 +1265,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								});
 							});
 						};
-					toggle(el.def);
+					toggle(_num(ATR_CMP.val()));
 					ATR_CMP._menu({
 						type:type[el.num_1],
 						spisok:vvv,

@@ -1303,6 +1303,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				для настройки блоков используется функция PHP12_menu_block_setup
 			*/
 
+			$v = _elemPrintV($el, $prm, $el['def']);
+
 			$type = array(
 				1158 => 2,
 				1159 => 1
@@ -1310,11 +1312,12 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			$razdel = '';
 			foreach(PHP12_menu_block_arr($el['id']) as $r) {
-				$sel = _dn($el['def'] != $r['id'], 'sel');
-				$razdel .= '<a class="link'.$sel._dn(!$prm['blk_setup'], 'curD').'">'.$r['title'].'</a>';
+				$sel = _dn($v != $r['id'], 'sel');
+				$curd = _dn(!$prm['blk_setup'], 'curD');
+				$razdel .= '<a class="link'.$sel.$curd.'">'.$r['title'].'</a>';
 			}
 
-			return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$el['def'].'" />'.
+			return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 				   '<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
 
 		//Связка списка при помощи кнопки
