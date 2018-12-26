@@ -1088,10 +1088,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						again:el.num_8
 					};
 					if(el.num_1 == 3681) {
-						obj.min = el.num_2 ? el.num_3 : false;
-						obj.max = el.num_5 ? el.num_6 : false;
-						obj.step = el.num_7;
-						obj.minus = el.num_4;
+						obj.min = el.num_2 ? _num(el.num_3) : false;
+						obj.max = el.num_5 ? _num(el.num_6) : false;
+						obj.step = _num(el.num_7);
+						obj.minus = _num(el.num_4);
 					}
 					if(el.num_1 == 3682 && vvv) {
 						obj.step = vvv.ids;

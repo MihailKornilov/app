@@ -298,7 +298,6 @@ $.fn._count = function(o) {//input с количеством
 
 	o = $.extend({
 		width:50,   //если 0 = 100%
-		bold:0,
 		disabled:0,
 		tooltip:'',
 
@@ -314,104 +313,101 @@ $.fn._count = function(o) {//input с количеством
 		func:function() {}
 	}, o);
 
-	if(o.min < 0)
-		o.minus = 1;
-
-	var val = _num(t.val(), 1);
-	val = valCorrect();
-	t.val(val);
-
-	var PHP = t.next('._count.php'),
-		width = 'width:' + (o.width ? o.width + 'px' : '100%'),
-		dis = o.disabled ? ' disabled' : '',
+	var V = _num(t.val(), 1),
+		PHP = _print(),
+		INP = PHP.find('input'),
 		STEP_COUNT = o.step.length || 0,//количество значений, если шаг-массив
 		STEP_N = 0;//номер шага, если шаг-массив
 
 	if(STEP_COUNT) {
-		o.min = o.step[0];
-		o.max = o.step[STEP_COUNT - 1];
+		o.min = 0;
+		o.max = STEP_COUNT - 1;
 		_forN(o.step, function(sp, n) {
-			if(sp == val) {
+			if(sp == V) {
 				STEP_N = n;
 				return false;
 			}
 		});
-	}
+	} else
+		if(o.min < 0)
+			o.minus = 1;
 
-	if(PHP.length) {
-		 PHP.removeClass('php')
-			._dn(!dis, 'disabled')
-			.attr('id', attr_id + '_count')
-			.width(o.width || '100%');
-	} else {
-		t.after('<div class="_count' + dis + '" id="' + attr_id + '_count" style="' + width + '">' +
-					'<input type="text" readonly value="' + val + '" />' +
-					'<div class="but"></div>' +
-					'<div class="but but-b"></div>' +
-				'</div>');
-		PHP = t.next();
-	}
-
-	var INP = PHP.find('input');
-	INP.val(val);
-
-	PHP._dn(val || o.time, 'nol');
-
-	if(o.bold)
-		INP.addClass('b');
+	INP.val(valTitle());
 
 	if(o.tooltip)
 		PHP._tooltip(o.tooltip, -15);
 
 	PHP.find('.but').click(function() {
-		if(dis)
+		if(PHP.hasClass('disabled'))
 			return;
+
 		var znak = $(this).hasClass('but-b') ? -1 : 1;
 
 		if(STEP_COUNT) {
 			STEP_N += znak;
-			if(znak > 0 && STEP_N > STEP_COUNT - 1)
-				STEP_N = STEP_COUNT - 1;
+			if(znak > 0 && STEP_N > o.max)
+				STEP_N = o.again ? 0 : o.max;
 			if(znak < 0 && STEP_N < 0)
-				STEP_N = 0;
-			val = o.step[STEP_N];
-		} else
-			val += o.step * znak;
+				STEP_N = o.again ? o.max : 0;
+			V = o.step[STEP_N];
+			INP.val(valTitle());
+		} else {
+			V += o.step * znak;
+			V = valCorrect();
+			INP.val(V);
+		}
 
-		val = valCorrect();
-		PHP._dn(val || o.time, 'nol');
-
-		t.val(val);
-
-		//установка текстового значения, если требуется
-		var title = (o.time && val < 10 ? '0' : '') + val;
-		if(o.title[STEP_N])
-			title = o.title[STEP_N];
-		INP.val(title);
-
-		o.func(val, attr_id);
+		t.val(V);
+		o.func(V, attr_id);
 	});
+
+	function _print() {//вывод счётчика, либо активация
+		var div = t.next('._count.php'),
+			width = 'width:' + (o.width ? o.width + 'px' : '100%'),
+			dis = o.disabled ? ' disabled' : '';
+
+		if(div.length) {
+			 div.removeClass('php')
+				._dn(!dis, 'disabled')
+				.attr('id', attr_id + '_count')
+				.width(o.width || '100%');
+			 return div
+		}
+
+		t.after('<div class="_count' + dis + '" id="' + attr_id + '_count" style="' + width + '">' +
+					'<input type="text" readonly />' +
+					'<div class="but"></div>' +
+					'<div class="but but-b"></div>' +
+				'</div>');
+		return t.next();
+	}
 	function valCorrect() {
 		if(o.again)
 			if(o.min !== false)
 				if(o.max !== false) {
-					if(val < o.min)
+					if(V < o.min)
 						return o.max;
 
-					if(val > o.max)
+					if(V > o.max)
 						return o.min;
 				}
 
-		if(!o.minus && val < 0)
+		if(!STEP_COUNT && !o.minus && V < 0)
 			return 0;
 
-		if(o.min !== false && val < o.min)
+		if(o.min !== false && V < o.min)
 			return o.min;
 
-		if(o.max !== false && val > o.max)
+		if(o.max !== false && V > o.max)
 			return o.max;
 
-		return val;
+		return V;
+	}
+	function valTitle() {//установка текстового значения
+		var title = (o.time && V < 10 ? '0' : '') + V;
+		if(o.title[STEP_N])
+			title = o.title[STEP_N];
+		return title;
 	}
 
 	window[win] = t;
