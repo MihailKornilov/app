@@ -2391,6 +2391,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						break;
 					_attr_cmp(elem_id).focus();
 					break;
+				//открытие документа
+				case 217:
+					var doc_id = _num(sp.target_ids);
+					if(!doc_id)
+						break;
+
+					location.href = URL + '&p=9&doc_id=' + doc_id + (unit_id ? '&id=' + unit_id : '');
+					break;
 			}
 		});
 	},

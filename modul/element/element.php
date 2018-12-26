@@ -1810,6 +1810,7 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 
 		//Radio - произвольные значения
 		case 16:
+		case 17:
 			if(!$id = _num($txt))
 				return _msgRed('11.radio.empty');
 			if(!$dop = _elemOne($id))
@@ -1826,6 +1827,9 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 
 		//Выбор нескольких значений галочками
 		case 31: return _val31($ell, $txt);
+
+		//Количество
+		case 35: return $txt;
 
 		//Календарь
 		case 51:
