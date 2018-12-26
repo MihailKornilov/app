@@ -1234,6 +1234,33 @@ function _elemPrint($el, $prm) {//формирование и отображен
 						'value' => _elemPrintV($el, $prm, 0)
 				   ));
 
+		//Месяц и год
+		case 39:
+			/*
+			*/
+
+			$def = strftime('%Y-%m');
+			if(!$v = _elemPrintV($el, $prm, $def))
+				$v = $def;
+
+			$ex = explode('-', $v);
+
+			$attr_id = _elemAttrId($el, $prm);
+
+			return
+			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+			_count(array(
+				'attr_id' => $attr_id.'_mon',
+				'width' => 100,
+				'class' => 'mr5',
+				'value' => _num($ex[1])
+			)).
+			_count(array(
+				'attr_id' => $attr_id.'_year',
+				'width' => 70,
+				'value' => $ex[0]
+			));
+
 		//Сборный текст
 		case 44: return PHP12_44_print($el, $prm['unit_get']);
 

@@ -1117,6 +1117,28 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						spisok:vvv
 					});
 					return;
+				//Месяц и год
+				case 39:
+					var ATR_MON  = $(ATTR_CMP(elm_id) + '_mon'),
+						ATR_YEAR = $(ATTR_CMP(elm_id) + '_year'),
+						CMP_SET = function() {
+							var mon = _num(ATR_MON.val());
+							ATR_CMP.val(ATR_YEAR.val() + '-' + (mon > 9 ? '' : '0') + mon);
+						};
+					ATR_MON._count({
+						width:100,
+						step:[1,2,3,4,5,6,7,8,9,10,11,12],
+						title:['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'],
+						again:1,
+						func:CMP_SET
+					});
+					ATR_YEAR._count({
+						width:70,
+						min:1970,
+						max:2100,
+						func:CMP_SET
+					});
+					return;
 				//Выбор блоков из диалога или страницы
 				case 49:
 					var P = ATR_CMP.next(),

@@ -84,10 +84,13 @@ function _count($v=array()) {//поле количество
 			$width .= 'px';
 	$width = ' style="width:'.$width.'"';
 
+	$cls = empty($v['class']) ?    '' : ' '.$v['class'];//дополнительные классы
+
+
 	$value = _num(@$v['value'], 1);
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
-	'<div class="_count disabled php" id="'.$attr_id.'_count"'.$width.'>'.
+	'<div class="_count disabled php'.$cls.'" id="'.$attr_id.'_count"'.$width.'>'.
 		'<input type="text" readonly value="'.$value.'" />'.
 		'<div class="but"></div>'.
 		'<div class="but but-b"></div>'.
