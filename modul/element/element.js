@@ -3396,6 +3396,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DD.find('.icon-del').click(function() {
 				$(this).closest('DD').remove();
 			});
+			DD.find('.vid').select();
 		}
 	},
 	PHP12_count_value_get = function(el) {
