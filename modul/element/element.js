@@ -1139,6 +1139,58 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						func:CMP_SET
 					});
 					return;
+				//Фильтрование списка
+				case 40:
+					var P = ATR_CMP.next(),
+						INP = P.find('.inp'),
+						DEL = P.find('.icon-del');
+
+					if(INP.attr('disabled'))
+						return;
+
+					P.click(function() {
+						var dlg24 = 0;
+						if(el.num_1) {
+							dlg24 = _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
+							if(!dlg24) {
+								_attr_cmp(el.num_1, 1)
+									._flash({color:'red'})
+									._hint({
+										msg:'Не выбрано значение',
+										color:'red',
+										pad:10,
+										side:'left',
+										show:1
+									});
+								return;
+							}
+						}
+
+						_dialogLoad({
+							dialog_id:41,
+							block_id:OBJ.srce.block_id,
+							dss:dlg24,
+
+							dop:{
+								mysave:1
+							},
+
+							busy_obj:INP,
+							busy_cls:'hold',
+							func_save:function(res) {
+								ATR_CMP.val(res.v);
+								INP.val(res.title);
+								DEL._dn(1);
+							}
+						});
+					});
+					DEL.click(function(e) {
+						e.stopPropagation();
+						ATR_CMP.val('');
+						INP.val('');
+						DEL._dn();
+					});
+					return;
 				//Выбор блоков из диалога или страницы
 				case 49:
 					var P = ATR_CMP.next(),

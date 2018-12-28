@@ -847,7 +847,6 @@ button.vk._busy{color:transparent}
 
 
 
-
 /* Выбор иконки [36] */
 ._icon-choose .icu{
 	display:inline-block;
@@ -873,5 +872,7 @@ button.vk._busy{color:transparent}
 
 
 
+/* Фильтрование списка */
+._spfl{
 
-
+}

@@ -1261,6 +1261,27 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'value' => $ex[0]
 			));
 
+		//Фильтрование списка
+		case 40:
+			/*
+				num_1 - путь к списку
+				txt_1 - текст нулевого значения
+			*/
+
+			$attr_id = _elemAttrId($el, $prm);
+			$placeholder = ' placeholder="'.$el['txt_1'].'"';
+			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+			$v = _elemPrintV($el, $prm);
+
+			return
+			'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+			'<div class="_spfl dib w125 prel" id="'.$attr_id.'_spfl">'.
+//				'<div class="icon icon-star pabs"></div>'.
+				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+				'<input type="text" readonly class="inp curP w100p over3"'.$placeholder.$disabled.' value="" />'.
+			'</div>';
+
 		//Сборный текст
 		case 44: return PHP12_44_print($el, $prm['unit_get']);
 
