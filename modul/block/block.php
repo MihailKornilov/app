@@ -1276,8 +1276,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			$title = '';
 			if($v = _elemPrintV($el, $prm)) {
-				$v = stripslashes(html_entity_decode($v));
-				$arr = json_decode($v, true);
+				$vv = htmlspecialchars_decode($v);
+				$arr = json_decode($vv, true);
 				$c = count($arr);
 				$title = $c.' услови'._end($c, 'е', 'я', 'й');
 			}

@@ -2847,7 +2847,7 @@ function PHP12_spfl_save($DLG) {
 				$vvv_id = $cmp['id'];
 
 	if(!$vvv_id)
-		jsonError('Не найдена подключаемая фунция');
+		jsonError('Не найдена подключаемая функция');
 
 	$send['v'] = '';
 	$send['title'] = '';
@@ -2855,14 +2855,37 @@ function PHP12_spfl_save($DLG) {
 	if($arr = $_POST['vvv'][$vvv_id])
 		if(is_array($arr))
 			if(!empty($arr)) {
-				//$send['v'] = _json($arr, 1);
-				$send['v'] = json_encode($arr);
-				$c = count($arr);
+				$v = array();
+				foreach($arr as $r) {
+					if(!$r['elem_id'] = _num($r['elem_id']))
+						continue;
+					if(!$r['cond_id'] = _num($r['cond_id']))
+						continue;
+					$r['unit_id'] = _num($r['unit_id']);
+					$v[] = $r;
+				}
+				$send['v'] = json_encode($v);
+				$c = count($v);
 				$send['title'] = $c.' услови'._end($c, 'е', 'я', 'й');
 			}
 
-
 	jsonSuccess($send);
+}
+function PHP12_spfl_vvv($prm) {//получение настроек для редактирования
+	if(!$arr = $prm['srce']['dop'])
+		return array();
+
+	$arr = htmlspecialchars_decode($arr);
+	if(!$arr = json_decode($arr, true))
+		return array();
+
+	foreach($arr as $n => $r) {
+		$arr[$n]['elem_title'] = _elemTitle($r['elem_id']);
+		$arr[$n]['elem_issp'] = _elemIsConnect($r['elem_id']);
+		$arr[$n]['spisok'] = _29cnn($r['elem_id']);
+	}
+
+	return $arr;
 }
 
 

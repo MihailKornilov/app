@@ -1169,11 +1169,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						_dialogLoad({
 							dialog_id:41,
 							dss:dlg24,
-
-							dop:{
-								mysave:1
-							},
-
+							dop:ATR_CMP.val(),
 							busy_obj:INP,
 							busy_cls:'hold',
 							func_save:function(res) {
@@ -2787,23 +2783,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	PHP12_spfl_get = function(el) {//получение данных для сохранения
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			var elem_id = _num(sp.find('.title').attr('val')),
-				cond_id = _num(sp.find('.cond-id').val()),
-				unit_id = _num(sp.find('.cond-sel').val());
-			send.push([
-				elem_id,
-				cond_id,
-				sp.find('.cond-val').val(),
-				unit_id
-			]);
-/*
 			send.push({
-				elem_id:elem_id,
-				cond_id:cond_id,
+				elem_id:_num(sp.find('.title').attr('val')),
+				cond_id:_num(sp.find('.cond-id').val()),
 				txt:sp.find('.cond-val').val(),
-				unit_id:unit_id
+				unit_id:_num(sp.find('.cond-sel').val())
 			});
-*/
 		});
 		return send;
 	},
