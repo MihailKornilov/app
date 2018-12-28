@@ -1168,7 +1168,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 						_dialogLoad({
 							dialog_id:41,
-							block_id:OBJ.srce.block_id,
 							dss:dlg24,
 
 							dop:{
@@ -2658,6 +2657,133 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 		});
 		return send;
+	},
+
+	/* ---=== НАСТРОЙКА УСЛОВИЙ ДЛЯ СПИСКА [41] ===--- */
+	PHP12_spfl = function(el, vvv, obj) {
+		if(!obj.srce.dss)
+			return;
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить условие</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last');
+
+		BUT_ADD.click(valueAdd);
+
+		if(!vvv.length)
+			valueAdd();
+		else
+			_forIn(vvv, valueAdd);
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,     //id элемента, хранящего настройки
+				title:'', //имя выбранного элемента
+				txt_1:0,  //id выбранного элемента из диалога, по которому будет выполняться условие фильтра
+				num_2:0,  //id условия из выпадающего списка
+				txt_2:'', //текстовое значение
+				issp:0,   //можно выбирать значения из списка. Только при условиях: [3:равно], [4:не равно]
+				spisok:[],//содержание выпадающего списка
+				num_3:''  //значение выпадающего списка
+			}, v);
+
+			var issp34 = v.issp && (v.num_2 == 3 || v.num_2 == 4);
+
+			DL.append(
+				'<dd class="over5" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w50 r color-sal">Если:' +
+							'<td><input type="text"' +
+									  ' readonly' +
+									  ' class="title w175 curP color-pay"' +
+									  ' placeholder="выберите значение..."' +
+									  ' value="' + v.title + '"' +
+									  ' val="' + v.txt_1 + '"' +
+								' />' +
+							'<td class="cond-td' + _dn(v.txt_1) + '">' +
+								'<input type="hidden" class="cond-id" value="' + v.num_2 + '" />' +
+							'<td class="w100p pr20">' +
+								'<input type="text"' +
+									  ' class="cond-val w100' + _dn(!issp34 && v.num_2 > 2) + '"' +
+									  ' value="' + v.txt_2 + '"' +
+								' />' +
+								'<div class="div-cond-sel' + _dn(issp34) + '">' +
+									'<input type="hidden"' +
+										  ' class="cond-sel"' +
+										  ' value="' + v.num_3 + '"' +
+									' />' +
+								'</div>' +
+							'<td class="w35 r">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				TITLE = DD.find('.title'),
+				COND_ID = DD.find('.cond-id');
+			TITLE.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					dss:obj.srce.dss,
+					dop:{
+						mysave:1,
+						sel:v.txt_1,
+						nest:0,
+						sev:0
+					},
+					busy_obj:$(this),
+					busy_cls:'hold',
+					func_save:function(res) {
+						DD.find('.cond-td')._dn(1);
+						COND_ID._select(2);
+						v.txt_1 = res.v;
+						TITLE.attr('val', v.txt_1);
+						TITLE.val(res.title);
+						DD.find('.cond-val')._dn().val('');
+
+						//если выбран подключаемый список, то выбор значений этого списка
+						v.issp = res.issp;
+						DD.find('.div-cond-sel')._dn();
+						DD.find('.cond-sel')
+							._select('spisok', res.spisok)
+							._select(0);
+					}
+				});
+			});
+			COND_ID._select({//условие
+				width:150,
+				spisok:[
+					{id:1,title:'отсутствует'},
+					{id:2,title:'присутствует'},
+					{id:3,title:'равно'},
+					{id:4,title:'не равно'},
+					{id:5,title:'больше'},
+					{id:6,title:'больше или равно'},
+					{id:7,title:'меньше'},
+					{id:8,title:'меньше или равно'},
+					{id:9,title:'содержит'},
+					{id:10,title:'не содержит'}
+				],
+				func:function(vv) {
+					var issp = v.issp && (vv == 3 || vv == 4);
+					DD.find('.cond-val')
+						._dn(!issp && vv > 2)
+						.focus();
+					DD.find('.div-cond-sel')._dn(issp);
+				}
+			});
+			DD.find('.cond-sel')._select({
+				width:0,
+				title0:'не выбрано',
+				spisok:v.spisok
+			});
+			DD.find('.icon-del').click(function() {
+				$(this).closest('DD').remove();
+			});
+		}
 	},
 
 	/* ----==== СПИСОК СТРАНИЦ (page12) ====---- */
