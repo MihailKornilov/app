@@ -2829,9 +2829,41 @@ function PHP12_elem22_vvv($prm) {//Дополнительные условия �
 
 /* ---=== НАСТРОЙКА УСЛОВИЙ ДЛЯ СПИСКА [41] ===--- */
 function PHP12_spfl($prm) {
+	if(!$DS = $prm['srce']['dss'])
+		return _emptyMin('Отсутствует id исходного диалога');
+
 	return '';
 }
+function PHP12_spfl_save($DLG) {
+	if($DLG['id'] != 41)
+		return;
 
+	//поиск id элемента, который является подключаемой PHP функцией
+	$vvv_id = 0;
+
+	foreach($DLG['cmp'] as $cmp)
+		if($cmp['dialog_id'] == 12)
+			if($cmp['txt_1'] == 'PHP12_spfl')
+				$vvv_id = $cmp['id'];
+
+	if(!$vvv_id)
+		jsonError('Не найдена подключаемая фунция');
+
+	$send['v'] = '';
+	$send['title'] = '';
+
+	if($arr = $_POST['vvv'][$vvv_id])
+		if(is_array($arr))
+			if(!empty($arr)) {
+				//$send['v'] = _json($arr, 1);
+				$send['v'] = json_encode($arr);
+				$c = count($arr);
+				$send['title'] = $c.' услови'._end($c, 'е', 'я', 'й');
+			}
+
+
+	jsonSuccess($send);
+}
 
 
 /* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
@@ -3298,7 +3330,7 @@ function PHP12_count_value_vvv($prm) {
 	if(!$arr = $u[$col])
 		return array();
 
-	$arr = (array)json_decode($arr);
+	$arr = json_decode($arr, true);
 	$ids = $arr['ids'];
 	$title = $arr['title'];
 

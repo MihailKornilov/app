@@ -2679,40 +2679,39 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		function valueAdd(v) {
 			v = $.extend({
-				id:0,     //id элемента, хранящего настройки
-				title:'', //имя выбранного элемента
-				txt_1:0,  //id выбранного элемента из диалога, по которому будет выполняться условие фильтра
-				num_2:0,  //id условия из выпадающего списка
-				txt_2:'', //текстовое значение
-				issp:0,   //можно выбирать значения из списка. Только при условиях: [3:равно], [4:не равно]
-				spisok:[],//содержание выпадающего списка
-				num_3:''  //значение выпадающего списка
+				elem_id:0,      //id выбранного элемента из диалога, по которому будет выполняться условие фильтра
+				elem_title:'',  //имя выбранного элемента
+				cond_id:0,      //id условия из выпадающего списка
+				txt:'',         //текстовое значение
+				elem_issp:0,    //можно выбирать значения из списка. Только при условиях: [3:равно], [4:не равно]
+				spisok:[],      //содержание выпадающего списка
+				unit_id:''      //значение выпадающего списка
 			}, v);
 
-			var issp34 = v.issp && (v.num_2 == 3 || v.num_2 == 4);
+			var issp34 = v.elem_issp && (v.cond_id == 3 || v.cond_id == 4);
 
 			DL.append(
-				'<dd class="over5" val="' + v.id + '">' +
+				'<dd class="over5">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w50 r color-sal">Если:' +
 							'<td><input type="text"' +
 									  ' readonly' +
 									  ' class="title w175 curP color-pay"' +
 									  ' placeholder="выберите значение..."' +
-									  ' value="' + v.title + '"' +
-									  ' val="' + v.txt_1 + '"' +
+									  ' value="' + v.elem_title + '"' +
+									  ' val="' + v.elem_id + '"' +
 								' />' +
-							'<td class="cond-td' + _dn(v.txt_1) + '">' +
-								'<input type="hidden" class="cond-id" value="' + v.num_2 + '" />' +
+							'<td class="cond-td' + _dn(v.elem_id) + '">' +
+								'<input type="hidden" class="cond-id" value="' + v.cond_id + '" />' +
 							'<td class="w100p pr20">' +
 								'<input type="text"' +
-									  ' class="cond-val w100' + _dn(!issp34 && v.num_2 > 2) + '"' +
-									  ' value="' + v.txt_2 + '"' +
+									  ' class="cond-val w100' + _dn(!issp34 && v.cond_id > 2) + '"' +
+									  ' value="' + v.txt + '"' +
 								' />' +
 								'<div class="div-cond-sel' + _dn(issp34) + '">' +
 									'<input type="hidden"' +
 										  ' class="cond-sel"' +
-										  ' value="' + v.num_3 + '"' +
+										  ' value="' + v.unit_id + '"' +
 									' />' +
 								'</div>' +
 							'<td class="w35 r">' +
@@ -2730,7 +2729,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					dss:obj.srce.dss,
 					dop:{
 						mysave:1,
-						sel:v.txt_1,
+						sel:v.elem_id,
 						nest:0,
 						sev:0
 					},
@@ -2739,13 +2738,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					func_save:function(res) {
 						DD.find('.cond-td')._dn(1);
 						COND_ID._select(2);
-						v.txt_1 = res.v;
-						TITLE.attr('val', v.txt_1);
+						v.elem_id = res.v;
+						TITLE.attr('val', v.elem_id);
 						TITLE.val(res.title);
 						DD.find('.cond-val')._dn().val('');
 
 						//если выбран подключаемый список, то выбор значений этого списка
-						v.issp = res.issp;
+						v.elem_issp = res.issp;
 						DD.find('.div-cond-sel')._dn();
 						DD.find('.cond-sel')
 							._select('spisok', res.spisok)
@@ -2768,7 +2767,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					{id:10,title:'не содержит'}
 				],
 				func:function(vv) {
-					var issp = v.issp && (vv == 3 || vv == 4);
+					var issp = v.elem_issp && (vv == 3 || vv == 4);
 					DD.find('.cond-val')
 						._dn(!issp && vv > 2)
 						.focus();
@@ -2784,6 +2783,29 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				$(this).closest('DD').remove();
 			});
 		}
+	},
+	PHP12_spfl_get = function(el) {//получение данных для сохранения
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var elem_id = _num(sp.find('.title').attr('val')),
+				cond_id = _num(sp.find('.cond-id').val()),
+				unit_id = _num(sp.find('.cond-sel').val());
+			send.push([
+				elem_id,
+				cond_id,
+				sp.find('.cond-val').val(),
+				unit_id
+			]);
+/*
+			send.push({
+				elem_id:elem_id,
+				cond_id:cond_id,
+				txt:sp.find('.cond-val').val(),
+				unit_id:unit_id
+			});
+*/
+		});
+		return send;
 	},
 
 	/* ----==== СПИСОК СТРАНИЦ (page12) ====---- */

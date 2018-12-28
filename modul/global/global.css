@@ -115,7 +115,7 @@ body:not(.site){position:relative}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:-9999px 0 no-repeat url(../../img/icon18.png?37);
+	background:-9999px 0 no-repeat url(../../img/icon18.png?39);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -159,6 +159,7 @@ body:not(.site){position:relative}
 .icon-star   {background-position-x:-640px}/* звезда */
 .icon-comment{background-position-x:-660px}/* комментарий */
 .icon-cube   {background-position-x:-680px}/* блоки: три кубика */
+.icon-filter {background-position-x:-800px}/* фильтр: воронка */
 
 /* настройка ширины блоков */
 .icon-width  {
@@ -519,6 +520,7 @@ textarea.hold::-moz-placeholder{color:transparent}
 .pl10{padding-left:10px}
 .pl15{padding-left:15px}
 .pl20{padding-left:20px}
+.pl25{padding-left:25px}
 
 .mara{margin:auto}
 .mar5{margin:5px}

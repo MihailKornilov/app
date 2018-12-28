@@ -873,6 +873,5 @@ button.vk._busy{color:transparent}
 
 
 /* Фильтрование списка */
-._spfl{
-
-}
+._spfl .icon-filter{left:5px;top:5px}
+._spfl .icon-del{right:5px;top:5px}
