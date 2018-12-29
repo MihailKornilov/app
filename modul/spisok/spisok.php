@@ -805,7 +805,6 @@ function _spisokWhere($el) {//формирование строки с усло�
 	$dlg = _dialogQuery($el['num_1']);
 
 	$cond = _queryWhere($dlg);
-	$cond .= _spisokCondBind($el);
 	$cond .= _spisokCond40($el);
 	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond62($el);
@@ -815,9 +814,6 @@ function _spisokWhere($el) {//формирование строки с усло�
 	$cond .= _spisokCond78($el);
 	$cond .= _spisokCond83($el);
 	$cond .= _spisokCond102($el);
-
-	if($el['dialog_id'] == 14)
-		$cond .= _22cond($el['id']);
 
 	return $cond;
 }
@@ -837,99 +833,101 @@ function _spisokCond40($el) {//изначальные условия отобр�
 			return " AND !`t1`.`id` /* [40] отсутствует имя колонки */";
 
 		$val = $r['txt'];
+		$in = false;
 
 		if(_elemIsConnect($r['elem_id']))
 			if($r['cond_id'] == 3 || $r['cond_id'] == 4)
 				if($unit_id = _num($r['unit_id'], 1)) {
+
+					//указан вариант, когда страница принимает данные записи
 					if($unit_id == -1)
 						if(!$unit_id = _num(@$_GET['id']))
 							return " AND !`t1`.`id` /* [40] страница не принимает данные записи */";
+
+					//проверка, чтобы диалог совпадал с записью, которую принимает страница
+					if(!$DLG_ID_CONN = $ell['num_1'])
+						return " AND !`t1`.`id` /* [40] отсутствует id диалога, размещающего список */";
+
+					//проверка, чтобы список был размещён на странице или в диалоге
+					switch($el['block']['obj_name']) {
+						case 'page':
+							if(!$page_id = $el['block']['obj_id'])
+								return ' AND !`t1`.`id` /* [40] отсутствует id страницы */';
+							//страница, на которой размещён список
+							if(!$page = _page($page_id))
+								return ' AND !`t1`.`id` /* [40] страницы '.$page_id.' не существует */';
+							//id диалога, данные единицы списка которого выводится на странице
+							if(!$dlg_id = $page['dialog_id_unit_get'])
+								return ' AND !`t1`.`id` /* [40] страница не принимает данные записи */';
+							break;
+						case 'dialog':
+							$dlg_id = $DLG_ID_CONN;
+//							if(!$dlg_id = $el['block']['obj_id'])
+//								return ' AND !`t1`.`id` /* [40] отсутствует id диалога */';
+//							if(!$DLG = _dialogQuery($dlg_id))
+//								return ' AND !`t1`.`id` /* [40] диалога '.$dlg_id.' не существует */';
+//							if(!$dlg_id = $DLG['dialog_id_unit_get'])
+//								return ' AND !`t1`.`id` /* [40] диалог не принимает данные записи */';
+//							if(!$unit_id = _num(@$_GET['id']))
+//								return ' AND !`t1`.`id` /* no dialog unit_id */';
+							break;
+						default: return ' AND !`t1`.`id` /* [40] !is_page && !is_dialog */';
+					}
+
 					$val = $unit_id;
+
+					//выбранный привязанный список совпадает с принимаемым страницей
+					if($DLG_ID_CONN != $dlg_id) {
+						if(!$DLG = _dialogQuery($dlg_id))
+							return ' AND !`t1`.`id` /* [40] no dialog='.$dlg_id.' */';
+						//получение данных записи, которую принимает страница
+						if(!$unit = _spisokUnitQuery($DLG, $unit_id))
+							return " AND !`t1`.`id` [40] не получены данные записи";
+						//поиск первого элемента, который содержит привязанный список выбранного значения для отображения
+						$cmp = false;
+						foreach($DLG['cmp'] as $c)
+							if(_elemIsConnect($c))
+								if($c['num_1'] == $DLG_ID_CONN) {
+								$cmp = $c;
+								break;
+							}
+
+					/*
+						echo 'указатель на связку='.$DLG_ID_CONN.' ('._dialogParam($DLG_ID_CONN, 'name').') col='.$col.'<br>';
+						echo 'страница принимает='.$dlg_id.' ('._dialogParam($dlg_id, 'name').') единицу списка '.$unit_id.'<br>';
+						echo 'найденная колонка из связки '.$cmp['col'].'<br>';
+						echo 'получен id от указателя '.$unit[$cmp['col']]['id'].'<br>';
+						echo 'выводится список='.$el['num_1'].' ('._dialogParam($el['num_1'], 'name').')<br>';
+						echo '<br>';
+					*/
+
+						if(!$cmp)
+							return ' AND !`t1`.`id` /* [40] no cmp */';
+
+						$val = is_array($unit[$cmp['col']]) ? $unit[$cmp['col']]['id'] : $unit[$cmp['col']];
+
+					}
+
+					//проверяются дочерние значения
+					$sql = "/* [40] проверка дочерних значений */
+							SELECT `id`
+							FROM `_spisok`
+							WHERE `parent_id`=".$val;
+					if($ids = query_ids($sql)) {
+						$val .= ','.$ids;
+						$in = true;
+					}
 				}
 
 		$send .= _22condV(
 					$r['cond_id'],
 					$col,
 					$val,
-					false
+					$in
 				 );
 	}
 
 	return $send;
-}
-function _spisokCondBind($el) {//отображения значений записи привязанного списка
-	//элемент, который указывает на привязанный список
-	if(!$el_id_conn = $el['num_8'])
-		return '';
-	if(!$EL = _elemOne($el_id_conn))
-		return '';
-	//должен быть указан именно привязанный список
-	if(!_elemIsConnect($EL))
-		return '';
-	//id диалога, единицу списка которого нужно будет отображать
-	if(!$DLG_ID_CONN = $EL['num_1'])
-		return '';
-	if(!$col = $EL['col'])
-		return ' AND !`t1`.`id` /* no el.col */';
-	//проверка, чтобы список был размещён на странице или в диалоге
-	switch($el['block']['obj_name']) {
-		case 'page':
-			if(!$page_id = $el['block']['obj_id'])
-				return ' AND !`t1`.`id` /* no page_id */';
-			//страница, на которой размещён список
-			if(!$page = _page($page_id))
-				return ' AND !`t1`.`id` /* no page */';
-			//id диалога, данные единицы списка которого выводится на странице
-			if(!$dlg_id = $page['dialog_id_unit_get'])
-				return ' AND !`t1`.`id` /* no page unit_get */';
-			if(!$unit_id = _num(@$_GET['id']))
-				return ' AND !`t1`.`id` /* no page unit_id */';
-			break;
-		case 'dialog':
-			if(!$dlg_id = $el['block']['obj_id'])
-				return ' AND !`t1`.`id` /* no dialog_id */';
-			if(!$DLG = _dialogQuery($dlg_id))
-				return ' AND !`t1`.`id` /* no dialog */';
-			if(!$dlg_id = $DLG['dialog_id_unit_get'])
-				return ' AND !`t1`.`id` /* no dialog_unit_get */';
-			if(!$unit_id = _num(@$_GET['id']))
-				return ' AND !`t1`.`id` /* no dialog unit_id */';
-			break;
-		default: return ' AND !`t1`.`id` /* !is_page && !is_dialog */';
-	}
-	if(!$DLG = _dialogQuery($dlg_id))
-		return ' AND !`t1`.`id` /* no dialog='.$dlg_id.' */';
-	//получение данных единицы списка, которое принимает страница
-	if(!$unit = _spisokUnitQuery($DLG, $unit_id))
-		return ' AND !`t1`.`id`';
-	//выбранный привязанный список совпадает с принимаемым страницей
-	if($DLG_ID_CONN == $dlg_id)
-		return " AND `t1`.`".$col."`=".$unit_id;
-
-	//поиск первого элемента, который содержит привязанный список выбранного значения для отображения
-	$cmp = false;
-	foreach($DLG['cmp'] as $r)
-		if(_elemIsConnect($r))
-			if($r['num_1'] == $DLG_ID_CONN) {
-			$cmp = $r;
-			break;
-		}
-
-/*
-	echo 'указатель на связку='.$DLG_ID_CONN.' ('._dialogParam($DLG_ID_CONN, 'name').') col='.$col.'<br>';
-	echo 'страница принимает='.$dlg_id.' ('._dialogParam($dlg_id, 'name').') единицу списка '.$unit_id.'<br>';
-	echo 'найденная колонка из связки '.$cmp['col'].'<br>';
-	echo 'получен id от указателя '.$unit[$cmp['col']]['id'].'<br>';
-	echo 'выводится список='.$el['num_1'].' ('._dialogParam($el['num_1'], 'name').')<br>';
-	echo '<br>';
-*/
-
-	if(!$cmp)
-		return ' AND !`t1`.`id` /* no cmp */';
-
-	$v = is_array($unit[$cmp['col']]) ? $unit[$cmp['col']]['id'] : $unit[$cmp['col']];
-
-	return " AND `t1`.`".$col."`="._num($v)." /* <-bind */";
 }
 function _spisokCond7($el) {//значения фильтра-поиска для списка
 	$search = false;
@@ -1192,7 +1190,7 @@ function _22cond($parent_id) {//получение условий запроса
 									$elCol[_idsLast($r['txt_1'])],
 									$r['txt_2']
 								 )."
-						)";
+						) /* _22cond: одно вложение */";
 			continue;
 		}
 
