@@ -3438,19 +3438,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
-			ATR_SP = $('#cmp_2585'),
+			ATR_SP = _attr_cmp(2585),
 			NUM = 1,
-			_CS = function(id, count) {//отобажение иконки настройки условий
+			_CS = function(count) {//отобажение иконки настройки условий
 				if(count)
-					return '<span class="cond-setup ml20 curP' + _tooltip('Настроить', -10) + count + ' услови' + _end(count, ['е', 'я', 'ий']) + '<span>';
+					return '<span class="cond-setup ml20 curP' + _tooltip('Настроить', -10) + count  + ' услови' + _end(count, ['е', 'я', 'й']) + '</span>';
 
-				if(id)
-					return '<div class="icon icon-add cond-setup pl ml15' + _tooltip('Добавить условия', -57) + '</div>';
-
-				return '<div class="icon icon-hint ml15"></div>';
+				return '<div class="icon icon-add cond-setup pl ml15' + _tooltip('Добавить условия', -57) + '</div>';
 			};
 
-		_attr_cmp(2585)._select('disable');
+		ATR_SP._select('disable');
 		BUT_ADD.click(valueAdd);
 
 		if(!vvv.length)
@@ -3461,9 +3458,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
-				title:'Значение ' + NUM++,
+				txt_1:'Значение ' + NUM++,
 				def:0,
-				c:0,        //количество настроек условий фильтра
+				c:0,       //количество условий в пункте
+				txt_2:'',   //сами условия
 				num_1:1     //отображть количество для пункта фильтра
 			}, v);
 
@@ -3475,10 +3473,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<td><input type="text"' +
 									  ' class="title w200 mr10"' +
 									  ' placeholder="имя значения"' +
-									  ' value="' + v.title + '"' +
+									  ' value="' + v.txt_1 + '"' +
 								' />' +
 								'<input type="hidden" class="def" value="' + v.def + '" />' +
-								'<span class="span-cs grey">' + _CS(v.id, v.c) + '</span>' +
+								'<span class="span-cs grey">' + _CS(v.c) + '</span>' +
+								'<input type="hidden" class="txt_2" value="' + v.txt_2 + '" />' +
 							'<td class="w100">' +
 								'<div class="icon icon-eye' + _dn(!v.num_1, 'over3-show pl') + _tooltip('Отображать<br>количество', -38, '', 1) + '</div>' +
 							'<td class="w35 r">' +
@@ -3487,7 +3486,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				'</dd>'
 			);
 
-			DL.sortable({axis:'y',handle:'.icon-move-y'});
+			DL.sortable({handle:'.icon-move-y'});
 
 			var DD = DL.find('dd:last');
 
@@ -3506,30 +3505,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				}
 			});
 
-			if(!v.id)
-				DD.find('.icon-hint').mouseenter(function() {
-					$(this)._hint({
-						width:200,
-						pad:10,
-						msg:'Для настройки условий этого значения сохраните фильтр и откройте его снова.',
-						show:1
-					})
-				});
-
 			//добавление условия к значению
 			DD.find('.span-cs').click(function() {
-				var cs = $(this).find('.cond-setup');
-				if(!cs.length)
-					return;
 				_dialogLoad({
-					dialog_id:25,
-					dss:ELMM[ATR_SP.val()].num_1,
-					block_id:obj.srce.block_id,
-					edit_id:v.id,
-					busy_obj:cs,
+					dialog_id:41,
+					dss:ATR_SP.val(),
+					element_id:2585,
+					dop:v.txt_2,
+					busy_obj:$(this).find('.cond-setup'),
 					busy_cls:v.c ? '_busy' : 'spin',
-					func_save:function(ia) {
-						DD.find('.span-cs').html(_CS(1, ia.unit.func12));
+					func_save:function(res) {
+						v.txt_2 = res.v;
+						DD.find('.txt_2').val(res.v);
+						v.c = res.c;
+						DD.find('.span-cs').html(_CS(res.c));
 					}
 				});
 			});
@@ -3552,7 +3541,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
 				id:_num(sp.attr('val')),
-				title:sp.find('.title').val(),
+				txt_1:sp.find('.title').val(),
+				txt_2:sp.find('.txt_2').val(),
 				def:sp.find('.def').val(),
 				num_1:sp.find('.icon-eye').hasClass('pl') ? 0 : 1
 			});

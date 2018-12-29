@@ -1566,7 +1566,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				$sql = "SELECT COUNT(*)
 						FROM  "._queryFrom($DLG)."
 						WHERE "._queryWhere($DLG)."
-							"._22cond($id);
+							"._spisokCond40($EL, $r['txt_2']);
 				if($c = query_value($sql))
 					$spisok[$id] .= '<span class="fr inhr">'.$c.'</span>';
 			}
@@ -1713,11 +1713,12 @@ function _elemPrint($el, $prm) {//формирование и отображен
                 txt_2 - привязанный список (зависит от num_1)
                 txt_3 - счётчик количеств  (зависит от num_1)
                 txt_4 - путь к цветам (зависит от num_1)
+				txt_5 - значение по умолчанию: настраивается через [40]
 			*/
 
 			$v = _spisokFilter('v', $el['id']);
 			if($v === false) {
-				$cond = _22cond($el['id']);
+				$cond = _spisokCond40($el, $el['txt_5']);
 				$v = _elem102CnnList($el['txt_2'], 'ids', $cond);
 				_spisokFilter('insert', array(
 					'spisok' => $el['num_1'],

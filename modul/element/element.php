@@ -2852,22 +2852,24 @@ function PHP12_spfl_save($DLG) {
 	$send['v'] = '';
 	$send['title'] = '';
 
-	if($arr = $_POST['vvv'][$vvv_id])
-		if(is_array($arr))
-			if(!empty($arr)) {
-				$v = array();
-				foreach($arr as $r) {
-					if(!$r['elem_id'] = _num($r['elem_id']))
-						continue;
-					if(!$r['cond_id'] = _num($r['cond_id']))
-						continue;
-					$r['unit_id'] = _num($r['unit_id'], 1);
-					$v[] = $r;
+	if(!empty($_POST['vvv']))
+		if($arr = $_POST['vvv'][$vvv_id])
+			if(is_array($arr))
+				if(!empty($arr)) {
+					$v = array();
+					foreach($arr as $r) {
+						if(!$r['elem_id'] = _num($r['elem_id']))
+							continue;
+						if(!$r['cond_id'] = _num($r['cond_id']))
+							continue;
+						$r['unit_id'] = _num($r['unit_id'], 1);
+						$v[] = $r;
+					}
+					$send['v'] = json_encode($v);
+					$c = count($v);
+					$send['c'] = $c;
+					$send['title'] = $c.' услови'._end($c, 'е', 'я', 'й');
 				}
-				$send['v'] = json_encode($v);
-				$c = count($v);
-				$send['title'] = $c.' услови'._end($c, 'е', 'я', 'й');
-			}
 
 	jsonSuccess($send);
 }
@@ -3428,13 +3430,14 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 		foreach($val as $r) {
 			if($id = _num($r['id']))
 				$ids .= ','.$id;
-			if(!$title = _txt($r['title']))
+			if(!$txt_1 = _txt($r['txt_1']))
 				continue;
 			$update[] = "(
 				".$id.",
 				".$app_id.",
 				".$parent_id.",
-				'".addslashes($title)."',
+				'".addslashes($txt_1)."',
+				'"._txt($r['txt_2'])."',
 				"._num($r['num_1']).",
 				"._num($r['def']).",
 				".$sort++."
@@ -3462,6 +3465,7 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 				`app_id`,
 				`parent_id`,
 				`txt_1`,
+				`txt_2`,
 				`num_1`,
 				`def`,
 				`sort`
@@ -3469,6 +3473,7 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 			VALUES ".implode(',', $update)."
 			ON DUPLICATE KEY UPDATE
 				`txt_1`=VALUES(`txt_1`),
+				`txt_2`=VALUES(`txt_2`),
 				`num_1`=VALUES(`num_1`),
 				`def`=VALUES(`def`),
 				`sort`=VALUES(`sort`)";
@@ -3498,24 +3503,24 @@ function PHP12_filter_radio_setup_vvv($prm) {
 	if(!$arr = query_arr($sql))
 		return array();
 
-	//количество настроек условий фильтра по каждому значению
-	$sql = "SELECT
-				`parent_id`,
-				COUNT(*)
-			FROM `_element`
-			WHERE `parent_id` IN ("._idsGet($arr).")
-			GROUP BY `parent_id`";
-	$ass = query_ass($sql);
-
 	$send = array();
-	foreach($arr as $r)
+	foreach($arr as $r) {
+		$c = '';
+		if($r['txt_2']) {
+			$vv = htmlspecialchars_decode($r['txt_2']);
+			$arr = json_decode($vv, true);
+			$c = count($arr);
+		}
+
 		$send[] = array(
 			'id' => _num($r['id']),
-			'title' => $r['txt_1'],
+			'txt_1' => $r['txt_1'],
 			'def' => _num($r['def']),
-			'c' => _num(@$ass[$r['id']]),
+			'c' => $c,
+			'txt_2' => $r['txt_2'],
 			'num_1' => _num($r['num_1'])
 		);
+	}
 
 	return $send;
 }
