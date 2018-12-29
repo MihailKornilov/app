@@ -2861,7 +2861,7 @@ function PHP12_spfl_save($DLG) {
 						continue;
 					if(!$r['cond_id'] = _num($r['cond_id']))
 						continue;
-					$r['unit_id'] = _num($r['unit_id']);
+					$r['unit_id'] = _num($r['unit_id'], 1);
 					$v[] = $r;
 				}
 				$send['v'] = json_encode($v);
@@ -2883,6 +2883,16 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 		$arr[$n]['elem_title'] = _elemTitle($r['elem_id']);
 		$arr[$n]['elem_issp'] = _elemIsConnect($r['elem_id']);
 		$arr[$n]['spisok'] = _29cnn($r['elem_id']);
+		array_unshift(
+			$arr[$n]['spisok'],
+			array(
+				'id' => -1,
+				'title' => 'Совпадает с текущей страницей',
+				'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
+							 '<div class="fs12 grey ml10 mt3 i">Будет выбрана запись, которую принимает текущая страница</div>'
+			)
+		);
+
 	}
 
 	return $arr;

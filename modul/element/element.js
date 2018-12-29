@@ -2787,7 +2787,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				elem_id:_num(sp.find('.title').attr('val')),
 				cond_id:_num(sp.find('.cond-id').val()),
 				txt:sp.find('.cond-val').val(),
-				unit_id:_num(sp.find('.cond-sel').val())
+				unit_id:_num(sp.find('.cond-sel').val(), 1)
 			});
 		});
 		return send;
