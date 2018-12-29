@@ -1168,6 +1168,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 						_dialogLoad({
 							dialog_id:41,
+							element_id:el.num_1,//id элемента, к которому привязан фильтр (по нему будет определяться id диалога)
 							dss:dlg24,
 							dop:ATR_CMP.val(),
 							busy_obj:INP,
@@ -2656,9 +2657,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	/* ---=== НАСТРОЙКА УСЛОВИЙ ДЛЯ СПИСКА [41] ===--- */
-	PHP12_spfl = function(el, vvv, obj) {
-		if(!obj.srce.dss)
+	PHP12_spfl = function(el, vvv) {
+		var DS = vvv.dss;
+		if(!DS)
 			return;
+
+		vvv = vvv.vvv;
 
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить условие</div>',
@@ -2722,7 +2726,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			TITLE.click(function() {
 				_dialogLoad({
 					dialog_id:11,
-					dss:obj.srce.dss,
+					dss:DS,
 					dop:{
 						mysave:1,
 						sel:v.elem_id,

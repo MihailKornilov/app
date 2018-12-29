@@ -805,7 +805,7 @@ function _spisokWhere($el) {//формирование строки с усло�
 	$dlg = _dialogQuery($el['num_1']);
 
 	$cond = _queryWhere($dlg);
-	$cond .= _spisokCond40($el);
+	$cond .= _spisokCond40($el, $el['txt_2']);
 	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond62($el);
 	$cond .= _spisokCond72($el);
@@ -817,11 +817,11 @@ function _spisokWhere($el) {//формирование строки с усло�
 
 	return $cond;
 }
-function _spisokCond40($el) {//изначальные условия отображения
-	if(empty($el['txt_2']))
+function _spisokCond40($el, $cond) {//изначальные условия отображения
+	if(empty($cond))
 		return '';
 
-	$arr = htmlspecialchars_decode($el['txt_2']);
+	$arr = htmlspecialchars_decode($cond);
 	if(!$arr = json_decode($arr, true))
 		return " AND !`t1`.`id` /* [40] не получен массив условий */";
 
@@ -984,7 +984,7 @@ function _spisokCond62($el) {//фильтр-галочка
 		if($filter['num_2'] == 1440 && $v)
 			continue;
 
-		$send .= _22cond($filter['id']);
+		$send .= _spisokCond40($el, $filter['txt_2']);
 	}
 
 	return $send;
@@ -1146,6 +1146,12 @@ function _spisokCond102($el) {//Фильтр - Выбор нескольких �
 
 	return " AND `".$col."` IN (".$v.")";
 }
+
+
+function _40cond() {
+
+}
+
 
 function _22cond($parent_id) {//получение условий запроса из базы при помощи: Дополнительные условия к фильтру (вспомогательный элемент)
 	//условия, формирующие фильтр

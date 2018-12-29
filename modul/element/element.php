@@ -2872,12 +2872,22 @@ function PHP12_spfl_save($DLG) {
 	jsonSuccess($send);
 }
 function PHP12_spfl_vvv($prm) {//получение настроек для редактирования
+	$send = array(
+		'dss' => 0,     //получение id диалога по элементу, через который был выбор
+		'vvv' => array()
+	);
+
+	if(!$elem_id = $prm['srce']['element_id'])
+		return $send;
+
+	$send['dss'] = _dialogSel24($elem_id, $prm['srce']['dss']);
+
 	if(!$arr = $prm['srce']['dop'])
-		return array();
+		return $send;
 
 	$arr = htmlspecialchars_decode($arr);
 	if(!$arr = json_decode($arr, true))
-		return array();
+		return $send;
 
 	foreach($arr as $n => $r) {
 		$arr[$n]['elem_title'] = _elemTitle($r['elem_id']);
@@ -2886,7 +2896,9 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 		$arr[$n]['spisok'] = PHP12_spfl_vvv_unshift($spisok);
 	}
 
-	return $arr;
+	$send['vvv'] = $arr;
+
+	return $send;
 }
 function PHP12_spfl_vvv_unshift($spisok) {//общие дополнительные значения
 	array_unshift(
