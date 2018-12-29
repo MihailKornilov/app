@@ -1149,21 +1149,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						return;
 
 					P.click(function() {
-						var dlg24 = 0;
-						if(el.num_1) {
-							dlg24 = _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
-							if(!dlg24) {
-								_attr_cmp(el.num_1, 1)
-									._flash({color:'red'})
-									._hint({
-										msg:'Не выбрано значение',
-										color:'red',
-										pad:10,
-										side:'left',
-										show:1
-									});
-								return;
-							}
+						if(!el.num_1)
+							return;
+
+						var dlg24 = _idsFirst(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
+						if(!dlg24) {
+							_attr_cmp(el.num_1, 1)
+								._flash({color:'red'})
+								._hint({
+									msg:'Не выбрано значение',
+									color:'red',
+									pad:10,
+									side:'left',
+									show:1
+								});
+							return;
 						}
 
 						_dialogLoad({

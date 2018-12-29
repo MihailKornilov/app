@@ -268,6 +268,15 @@ var ZINDEX = 1000,
 		});
 		return send;
 	},
+	_idsFirst = function(ids) {//первый id в списке
+		if(!ids)
+			return 0;
+
+		if(typeof ids == 'number')
+			return ids;
+
+		return _num(ids.split(',')[0]);
+	},
 	_pr = function(v) {//представление массива в виде таблицы
 		if(v instanceof jQuery)
 			return '<div class="fs11 red">jQuery</div>';
