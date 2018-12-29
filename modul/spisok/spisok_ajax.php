@@ -1044,7 +1044,8 @@ function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значени�
 	if($elem_id = _num($v))
 		if(_elemIsConnect($elem_id)) {
 			$send['issp'] = 1;
-			$send['spisok'] = _29cnn($elem_id);
+			$spisok = _29cnn($elem_id);
+			$send['spisok'] = PHP12_spfl_vvv_unshift($spisok);
 		}
 
 	//определение, смотрит ли на изменения данного элемента элемент [85]

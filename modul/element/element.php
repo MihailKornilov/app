@@ -2882,22 +2882,25 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 	foreach($arr as $n => $r) {
 		$arr[$n]['elem_title'] = _elemTitle($r['elem_id']);
 		$arr[$n]['elem_issp'] = _elemIsConnect($r['elem_id']);
-		$arr[$n]['spisok'] = _29cnn($r['elem_id']);
-		array_unshift(
-			$arr[$n]['spisok'],
-			array(
-				'id' => -1,
-				'title' => 'Совпадает с текущей страницей',
-				'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
-							 '<div class="fs12 grey ml10 mt3 i">Будет выбрана запись, которую принимает текущая страница</div>'
-			)
-		);
-
+		$spisok = _29cnn($r['elem_id']);
+		$arr[$n]['spisok'] = PHP12_spfl_vvv_unshift($spisok);
 	}
 
 	return $arr;
 }
+function PHP12_spfl_vvv_unshift($spisok) {//общие дополнительные значения
+	array_unshift(
+		$spisok,
+		array(
+			'id' => -1,
+			'title' => 'Совпадает с текущей страницей',
+			'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
+						 '<div class="fs12 grey ml10 mt3 i">Будет выбрана запись, которую принимает текущая страница</div>'
+		)
+	);
 
+	return $spisok;
+}
 
 /* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
 function PHP12_spisok14_setup($prm) {//настройка шаблона
