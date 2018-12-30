@@ -2520,20 +2520,19 @@ function _beBlockElem($type, $BLK, $global=0) {//элементы, которы�
 
 	$G_ELEM += $ELM;
 }
-function _beElemIdSet($arr) {//добавление id элемента к блоку
-	if(empty($arr))
+function _beElemIdSet($BLK) {//добавление id элемента к блоку
+	if(empty($BLK))
 		return array();
 
 	$sql = "SELECT *
 			FROM `_element`
-			WHERE `block_id` IN ("._idsGet($arr).")";
+			WHERE `block_id` IN ("._idsGet($BLK).")";
 	$elem = query_arr($sql);
 
-	foreach($elem as $r) {
-		$arr[$r['block_id']]['elem_id'] = _num($r['id']);
-	}
+	foreach($elem as $r)
+		$BLK[$r['block_id']]['elem_id'] = _num($r['id']);
 
-	return $arr;
+	return $BLK;
 }
 function _beElemHistory() {//элементы истории действий
 	global $G_DLG, $G_ELEM;
