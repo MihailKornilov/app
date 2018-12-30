@@ -838,39 +838,42 @@ function _spisokCond40($el, $cond) {//изначальные условия от
 			if($r['cond_id'] == 3 || $r['cond_id'] == 4)
 				if($unit_id = _num($r['unit_id'], 1)) {
 
-					//указан вариант, когда страница принимает данные записи
-					if($unit_id == -1)
-						if(!$unit_id = _num(@$_GET['id']))
-							return " AND !`t1`.`id` /* [40] страница не принимает данные записи */";
-
-					//проверка, чтобы диалог совпадал с записью, которую принимает страница
+					//диалог, который размещает данные списка
 					if(!$DLG_ID_CONN = $ell['num_1'])
 						return " AND !`t1`.`id` /* [40] отсутствует id диалога, размещающего список */";
 
-					//проверка, чтобы список был размещён на странице или в диалоге
-					switch($el['block']['obj_name']) {
-						case 'page':
-							if(!$page_id = $el['block']['obj_id'])
-								return ' AND !`t1`.`id` /* [40] отсутствует id страницы */';
-							//страница, на которой размещён список
-							if(!$page = _page($page_id))
-								return ' AND !`t1`.`id` /* [40] страницы '.$page_id.' не существует */';
-							//id диалога, данные единицы списка которого выводится на странице
-							if(!$dlg_id = $page['dialog_id_unit_get'])
-								return ' AND !`t1`.`id` /* [40] страница не принимает данные записи */';
-							break;
-						case 'dialog':
-							$dlg_id = $DLG_ID_CONN;
-//							if(!$dlg_id = $el['block']['obj_id'])
-//								return ' AND !`t1`.`id` /* [40] отсутствует id диалога */';
-//							if(!$DLG = _dialogQuery($dlg_id))
-//								return ' AND !`t1`.`id` /* [40] диалога '.$dlg_id.' не существует */';
-//							if(!$dlg_id = $DLG['dialog_id_unit_get'])
-//								return ' AND !`t1`.`id` /* [40] диалог не принимает данные записи */';
-//							if(!$unit_id = _num(@$_GET['id']))
-//								return ' AND !`t1`.`id` /* no dialog unit_id */';
-							break;
-						default: return ' AND !`t1`.`id` /* [40] !is_page && !is_dialog */';
+					$dlg_id = $DLG_ID_CONN;
+
+					//указан вариант, когда страница принимает данные записи
+					if($unit_id == -1) {
+						if(!$unit_id = _num(@$_GET['id']))
+							return " AND !`t1`.`id` /* [40] страница не принимает данные записи */";
+
+						//проверка, чтобы список был размещён на странице или в диалоге
+						switch($el['block']['obj_name']) {
+							case 'page':
+								if(!$page_id = $el['block']['obj_id'])
+									return ' AND !`t1`.`id` /* [40] отсутствует id страницы */';
+								//страница, на которой размещён список
+								if(!$page = _page($page_id))
+									return ' AND !`t1`.`id` /* [40] страницы '.$page_id.' не существует */';
+								//id диалога, данные единицы списка которого выводится на странице
+								if(!$dlg_id = $page['dialog_id_unit_get'])
+									return ' AND !`t1`.`id` /* [40] странице не присвоен диалог, который принимает данные записи */';
+								break;
+							case 'dialog':
+	//							if(!$dlg_id = $el['block']['obj_id'])
+	//								return ' AND !`t1`.`id` /* [40] отсутствует id диалога */';
+	//							if(!$DLG = _dialogQuery($dlg_id))
+	//								return ' AND !`t1`.`id` /* [40] диалога '.$dlg_id.' не существует */';
+	//							if(!$dlg_id = $DLG['dialog_id_unit_get'])
+	//								return ' AND !`t1`.`id` /* [40] диалог не принимает данные записи */';
+	//							if(!$unit_id = _num(@$_GET['id']))
+	//								return ' AND !`t1`.`id` /* no dialog unit_id */';
+								break;
+							default: return ' AND !`t1`.`id` /* [40] !is_page && !is_dialog */';
+						}
+
 					}
 
 					$val = $unit_id;
@@ -1024,14 +1027,20 @@ function _spisokCond74($el) {//фильтр-радио
 		if($r['elem']['dialog_id'] == 74) {
 			$filter = true;
 			if(!$v = _num($r['v']))
-				return ' AND !`id` /* некорректное значение фильтра */';
+				return ' AND !`t1`.`id` /* некорректное значение фильтра */';
 			break;
 		}
 
 	if(!$filter)
 		return '';
 
-	return _22cond($v);
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id`=".$v;
+	if(!$ell = query_assoc($sql))
+		return ' AND !`t1`.`id` /* [74] отсутствует элемент '.$v.' пункта Радио */';
+
+	return _spisokCond40($el, $ell['txt_2']);
 }
 function _spisokCond77($el) {//фильтр-календарь
 	$filter = false;
