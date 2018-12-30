@@ -661,7 +661,7 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 
 	$key = $dialog['id'].'_'.$unit_id;
 
-	if(isset($SUQ[$key]))
+	if(!isset($dialog['nosuq']) && isset($SUQ[$key]))
 		return $SUQ[$key];
 	if(!$unit_id)
 		return array();

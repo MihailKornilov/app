@@ -1030,9 +1030,6 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		//dropdown
 		case 18: return _elemVvv17($elem_id);
 
-		//Дополнительные условия к фильтру
-		case 22: return PHP12_elem22_vvv($prm);
-
 		//select - выбор списка
 		case 24:
 			$dialog_id = $prm['srce']['dialog_id'];
@@ -3203,6 +3200,8 @@ function PHP12_count_value($prm) {
 }
 function PHP12_count_value_save($cmp, $val, $unit) {
 	if(!$unit_id = _num($unit['id']))
+		return;
+	if($unit['num_1'] != 3682)//изменения возможны если выбран пункт "конкретные значения"
 		return;
 	if(!$col = $cmp['col'])
 		return;

@@ -369,6 +369,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 //	_spisokUnitBalansUpd($dialog, $POST_CMP);
 
 	//получение обновлённых данных единицы списка
+	$dialog['nosuq'] = 1;//получение данных записи не из кеша
 	$unit = _spisokUnitQuery($dialog, $unit_id);
 	_historyInsertEdit($dialog, $unitOld, $unit);
 
@@ -394,8 +395,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 					break;
 				$unit['func12'] = $func($cmp, $vvv[$cmp_id], $unit);
 				break;
-			//Дополнительные условия к фильтру
-			case 22: PHP12_elem22_save($cmp, $vvv[$cmp_id], $unit); break;
 			//Применение загруженных изображений
 			case 60: _cmpV60($cmp, $unit); break;
 		}

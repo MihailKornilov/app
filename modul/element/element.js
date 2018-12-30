@@ -610,9 +610,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						if(window[func])
 							send.vvv[id] = window[func](sp, o);
 						break;
-					case 22://Дополнительные условия к фильтру
-						send.vvv[id] = PHP12_elem22_get(sp);
-						return;
 				}
 
 				if(ATR_CMP)
