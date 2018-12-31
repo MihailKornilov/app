@@ -688,13 +688,13 @@ function _spisokUnitQuery($dialog, $unit_id) {//получение данных 
 	return $SUQ[$key];
 }
 function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в ссылку
-	if(empty($el['func']))
+	if(empty($el['action']))
 		return $txt;
 
 	//данные записи
 	$u = $prm['unit_get'];
 
-	$func = $el['func'][0];
+	$func = $el['action'][0];
 	switch($func['dialog_id']) {
 		//переход на страницу
 		case 221:

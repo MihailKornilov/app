@@ -764,8 +764,8 @@ function _jsCacheElemOne($elem_id) {
 	if($r['hint'])
 		$val['hint'] = $r['hint'];
 
-	if($r['func'])
-		$val['func'] = $r['func'];
+	if($r['action'])
+		$val['action'] = $r['action'];
 
 	//элемент является подключаемым списком
 	if(_elemIsConnect($r))

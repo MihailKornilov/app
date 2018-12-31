@@ -771,7 +771,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			switch(el.dialog_id) {
 				case 1://галочка
-					if(el.func) {
+					if(el.action) {
 						_elemAction(el, _num(ATR_CMP.val()), 1);
 						ATR_CMP._check({
 							func:function(v) {
@@ -2041,10 +2041,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			is_open - окно открылось - применение функций без эффектов
 		*/
 
-		if(!el.func)
+		if(!el.action)
 			return;
 
-		_forN(el.func, function(sp) {
+		_forN(el.action, function(sp) {
 			switch(sp.dialog_id) {
 				//показ/скрытие блоков
 				case 201:
