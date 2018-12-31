@@ -1338,10 +1338,16 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 			'title' => $title,
 			'content' => $title
 		);
-		if($content = _29cnnTitle($EL['txt_4'], $sp, 1))
-			$u['content'] = $title.'<div class="grey fs12">'.$content.'</div>';
+
 		if($v)
 			$u['content'] = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $u['content'], 1);
+
+		if($content = _29cnnTitle($EL['txt_4'], $sp, 1)) {
+			if($v)
+				$content = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $content, 1);
+			$u['content'] = $u['content'].'<div class="grey fs12">'.$content.'</div>';
+		}
+
 
 		$send[] = $u;
 	}

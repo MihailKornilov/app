@@ -318,7 +318,7 @@ function _blockLevelChange($obj_name, $obj_id) {//кнопки изменени�
 	'</div>';
 }
 function _blockLevelButArr($obj_name, $obj_id) {//кнопки для изменения уровня редактирования блоков в виде массива
-	if(!$arr = _BE('block_arr1', $obj_name, $obj_id))
+	if(!$arr = _BE('block_arr', $obj_name, $obj_id))
 		return array();
 
 	$max = 1;
@@ -352,7 +352,7 @@ function _blockLevelButArr($obj_name, $obj_id) {//кнопки для измен
 	return $send;
 }
 function _blockWidthChange($obj_name, $obj_id) {//кнопка изменения ширины элементов
-	if(!$arr = _BE('elem_arr1', $obj_name, $obj_id))
+	if(!$arr = _BE('elem_arr', $obj_name, $obj_id))
 		return '';
 
 	foreach($arr as $r)
@@ -362,7 +362,7 @@ function _blockWidthChange($obj_name, $obj_id) {//кнопка изменени�
 	return '';
 }
 function _blockChooseBut($obj_name, $obj_id) {//кнопка включения выбора блоков
-	if(!$arr = _BE('block_arr1', $obj_name, $obj_id))
+	if(!$arr = _BE('block_arr', $obj_name, $obj_id))
 		return '';
 
 	return
@@ -1852,10 +1852,6 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 
 	_beDefine();
 
-	//получение данных всех блоков
-	if($i == 'block_all')
-		return $G_BLOCK;
-
 	//получение данных одного блока
 	if($i == 'block_one') {
 		//ID блока
@@ -1884,25 +1880,6 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 				continue;
 
 			$send[$id] = $r;
-		}
-
-		return $send;
-	}
-
-	//получение блоков для конкретного объекта (новая схема)
-	if($i == 'block_arr1') {
-		$obj_name = $i1;
-		if(!$obj_id = _num($i2))
-			return array();
-
-		$send = array();
-		foreach($G_BLOCK as $id => $r) {
-			if($r['obj_name'] != $obj_name)
-				continue;
-			if($r['obj_id'] != $obj_id)
-				continue;
-
-			$send[$id] = _jsCacheBlkOne($id);
 		}
 
 		return $send;
@@ -1995,14 +1972,8 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 
 	//очистка кеша блоков
 	if($i == 'block_clear') {
-		_cache_clear('BLK_page');
-		_cache_clear('BLK_page', 1);
-		_cache_clear('BLK_dialog');
-		_cache_clear('BLK_dialog', 1);
-		_cache_clear('BLK_SPISOK_page');
-		_cache_clear('BLK_SPISOK_page', 1);
-		_cache_clear('BLK_SPISOK_dialog');
-		_cache_clear('BLK_SPISOK_dialog', 1);
+		_cache_clear('BLKK');
+		_cache_clear('BLKK', 1);
 		$BE_FLAG = 0;
 	}
 
@@ -2059,56 +2030,6 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 				continue;
 
 			$send[$elem_id] = $G_ELEM[$elem_id];
-		}
-
-		return $send;
-	}
-
-	//получение элементов для конкретного объекта
-	if($i == 'elem_arrr') {
-		$obj_name = $i1;
-		if(!$obj_id = _num($i2))
-			return array();
-
-		$blk = array();
-		foreach($G_BLOCK as $id => $r) {
-			if($r['obj_name'] != $obj_name)
-				continue;
-			if($r['obj_id'] != $obj_id)
-				continue;
-			$blk[$id] = array(
-				'id' => $id,
-				'parent_id' => $r['parent_id'],
-				'x' => $r['x'],
-				'y' => $r['y']
-			);
-		}
-
-		$child = array();
-		foreach($blk as $id => $r)
-			$child[$r['parent_id']][$id] = $r;
-
-		$blk = _blockArrChild($child);
-
-		return _beBlockSort($blk);
-	}
-
-	//получение элементов для конкретного объекта (новая схема)
-	if($i == 'elem_arr1') {
-		$obj_name = $i1;
-		if(!$obj_id = _num($i2))
-			return array();
-
-		$send = array();
-		foreach($G_BLOCK as $id => $r) {
-			if($r['obj_name'] != $obj_name)
-				continue;
-			if($r['obj_id'] != $obj_id)
-				continue;
-			if(!$elem_id = $r['elem_id'])
-				continue;
-
-			$send[$elem_id] = _jsCacheElemOne($elem_id);
 		}
 
 		return $send;
@@ -2197,15 +2118,8 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 
 	//очистка кеша элементов
 	if($i == 'elem_clear') {
-		_cache_clear('ELM_page');
-		_cache_clear('ELM_page', 1);
-		_cache_clear('ELM_dialog');
-		_cache_clear('ELM_dialog', 1);
-		_cache_clear('ELM_SPISOK_page');
-		_cache_clear('ELM_SPISOK_page', 1);
-		_cache_clear('ELM_SPISOK_dialog');
-		_cache_clear('ELM_SPISOK_dialog', 1);
-		_cache_clear('ELM_HISTORY', 1);
+		_cache_clear('ELMM');
+		_cache_clear('ELMM', 1);
 		$BE_FLAG = 0;
 	}
 
@@ -2226,7 +2140,6 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 	if($i == 'dialog_clear') {
 		_cache_clear('dialog');
 		_cache_clear('dialog', 1);
-		_cache_clear('ELM_HISTORY', 1);
 		_cache_clear('dialog_del_cond');
 		_cache_clear('dialog_del_cond', 1);
 		$_DQ = array();
@@ -2511,6 +2424,9 @@ function _beElemForming($ELM) {
 			'mar' => $el['mar'],
 			'size' => $el['size'] ? _num($el['size']) : 13,
 			'def' => _num($el['def'], 1),
+
+			'attr_cmp' => '#cmp_'.$elem_id,
+
 			'afics' => '',
 			'hidden' => 0,
 			'format' => array(),
@@ -2561,12 +2477,14 @@ function _beElemFormat($ELM, $app_id) {//дополнительное форма
 			FROM `_element_format`
 			WHERE `app_id`=".$app_id;
 	foreach(query_arr($sql) as $r) {
-		$format = _arrNum($r);
-		unset($format['app_id']);
-		unset($format['element_id']);
-		unset($format['user_id_add']);
-		unset($format['dtime_add']);
-		$ELM[$r['element_id']]['format'] = $format;
+		$elem_id = $r['element_id'];
+		if(!isset($ELM[$elem_id]))
+			continue;
+		unset($r['app_id']);
+		unset($r['element_id']);
+		unset($r['user_id_add']);
+		unset($r['dtime_add']);
+		$ELM[$elem_id]['format'] = _arrNum($r);
 	}
 
 	return $ELM;
@@ -2578,12 +2496,14 @@ function _beElemHint($ELM, $app_id) {//подсказки, назначенны�
 			  AND `on`
 			  AND LENGTH(`msg`)";
 	foreach(query_arr($sql) as $r) {
-		$hint = _arrNum($r);
-		unset($hint['app_id']);
-		unset($hint['element_id']);
-		unset($hint['user_id_add']);
-		unset($hint['dtime_add']);
-		$ELM[$r['element_id']]['hint'] = $hint;
+		$elem_id = $r['element_id'];
+		if(!isset($ELM[$elem_id]))
+			continue;
+		unset($r['app_id']);
+		unset($r['element_id']);
+		unset($r['user_id_add']);
+		unset($r['dtime_add']);
+		$ELM[$elem_id]['hint'] = _arrNum($r);
 	}
 
 	return $ELM;
@@ -2595,6 +2515,8 @@ function _beElemAction($ELM, $app_id) {//действия, назначенны�
 			  AND `element_id`";
 	foreach(query_arr($sql) as $r) {
 		$elem_id = $r['element_id'];
+		if(!isset($ELM[$elem_id]))
+			continue;
 		unset($r['id']);
 		unset($r['app_id']);
 		unset($r['block_id']);
