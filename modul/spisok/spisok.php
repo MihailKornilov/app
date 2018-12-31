@@ -656,15 +656,16 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 		'<ol>'.$send.'</ol>';
 }
 
-function _spisokUnitQuery($dialog, $unit_id) {//получение данных записи
+function _spisokUnitQuery($dialog, $unit_id, $nosuq=false) {//получение данных записи
 	global $SUQ;
+
+	if(!$unit_id)
+		return array();
 
 	$key = $dialog['id'].'_'.$unit_id;
 
-	if(!isset($dialog['nosuq']) && isset($SUQ[$key]))
+	if(!$nosuq && isset($SUQ[$key]))
 		return $SUQ[$key];
-	if(!$unit_id)
-		return array();
 
 	//поиск диалога, который вносит данные именно для этой записи
 	$dialog = _dialogParent($dialog);

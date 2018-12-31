@@ -330,10 +330,11 @@ function _spisokUnitDialog($unit_id) {//получение данных о ди�
 }
 function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
 	$dialog = _spisokUnitDialog($unit_id);
-	$unitOld = _spisokUnitQuery($dialog, $unit_id);
 
-	define('IS_ELEM', $dialog['table_1'] == 5);// '_element'
 	define('ACT', $unit_id ? 'edit' : 'insert');
+	define('IS_ELEM', $dialog['table_1'] == 5);// '_element'
+
+	$unitOld = IS_ELEM ? _elemOne($unit_id) : _spisokUnitQuery($dialog, $unit_id);
 
 	$POST_CMP = _SUN_CMP_TEST($dialog, $unit_id);
 
@@ -355,9 +356,6 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	$unit_id = _SUN_INSERT($dialog, $unit_id);
 
-	if(IS_ELEM)
-		_BE('elem_clear');
-
 	// ---=== СЕКЦИЯ ОБНОВЛЕНИЯ ДАННЫХ ===---
 
 	_elementFocusClear($dialog, $POST_CMP, $unit_id);
@@ -368,23 +366,16 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_spisokUnitDelSetup($dialog, $unit_id);
 //	_spisokUnitBalansUpd($dialog, $POST_CMP);
 
-	//получение обновлённых данных единицы списка
-	$dialog['nosuq'] = 1;//получение данных записи не из кеша
-	$unit = _spisokUnitQuery($dialog, $unit_id);
+	//получение обновлённых данных записи
+	$unit = IS_ELEM ? _elemOne($unit_id) : _spisokUnitQuery($dialog, $unit_id, true);
 	_historyInsertEdit($dialog, $unitOld, $unit);
 
 	if(IS_ELEM) {
+//		query("/* ************* */SELECT * FROM `_element` WHERE `id`=".$unit_id);
 		_BE('block_clear');
 		_BE('elem_clear');
-		if($bl = _blockOne($unit['block_id']))
-			if($bl['obj_name'] == 'dialog') {
-				_BE('dialog_clear');
-				$dlg = _dialogQuery($bl['obj_id']);
-				$unit = $dlg['cmp'][$unit_id];
-			}
 	}
 
-	$vvv = @$_POST['vvv'];
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
 			//---=== ДЕЙСТВИЯ ПРИ НАСТРОЙКИ ЭЛЕМЕНТОВ ===---
@@ -393,7 +384,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 				$func = $cmp['txt_1'].'_save';
 				if(!function_exists($func))
 					break;
-				$unit['func12'] = $func($cmp, $vvv[$cmp_id], $unit);
+				$unit['func12'] = $func($cmp, @$_POST['vvv'][$cmp_id], $unit);
 				break;
 			//Применение загруженных изображений
 			case 60: _cmpV60($cmp, $unit); break;
@@ -419,10 +410,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	}
 
 	if(IS_ELEM) {
-		_BE('elem_clear');
-		$elem = _elemOne($unit_id);
-		if(!empty($elem['block']))
-			_BE('block_clear');
+//		query("/* ************* */SELECT * FROM `_element` WHERE `id`=".$unit_id);
 		$unit['title'] = _elemTitle($unit_id);
 		_jsCache();
 	}
@@ -826,29 +814,16 @@ function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//предварит�
 			continue;
 		if(!$v)
 			return;
-
-		$sql = "SELECT `block_id`
-				FROM `_element`
-				WHERE `id`=".$unit_id;
-		if(!$block_id = query_value($sql))
+		if(!$el = _elemOne($unit_id))
 			return;
-
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$block_id;
-		if(!$block = query_assoc($sql))
+		if(!$bl = $el['block'])
 			return;
-
-		$sql = "SELECT `id`
-				FROM `_block`
-				WHERE `obj_name`='".$block['obj_name']."'
-				  AND `obj_id`=".$block['obj_id'];
-		if(!$block_ids = query_ids($sql))
+		if(!$ids = _BE('elem_ids_arr', $bl['obj_name'], $bl['obj_id']))
 			return;
 
 		$sql = "UPDATE `_element`
 				SET `focus`=0
-				WHERE `block_id` IN (".$block_ids.")";
+				WHERE `id` IN (".implode(',', $ids).")";
 		query($sql);
 
 		return;
@@ -869,8 +844,8 @@ function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: оч�
 		//снятие флага 'страница по умолчанию' со всех страниц приложения
 		$sql = "UPDATE `_page`
 				SET `def`=0
-				WHERE `app_id`=".APP_ID."
-				  AND !`sa`";
+				WHERE `dialog_id`=".$dialog['id'].
+			($dialog['id'] == 20 ? " AND `app_id`=".APP_ID : '');
 		query($sql);
 
 		return;

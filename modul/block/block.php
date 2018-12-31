@@ -2138,8 +2138,8 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 
 	//очистка кеша диалогов
 	if($i == 'dialog_clear') {
-		_cache_clear('dialog');
-		_cache_clear('dialog', 1);
+		_cache_clear('DIALOG');
+		_cache_clear('DIALOG', 1);
 		_cache_clear('dialog_del_cond');
 		_cache_clear('dialog_del_cond', 1);
 		$_DQ = array();
@@ -2158,11 +2158,15 @@ function _beDefine() {//получение блоков и элементов и
 
 	//диалоги
 	$G_DLG = _beDlg();
+	if(APP_ID)
+		$G_DLG += _beDlg(APP_ID);
 
+	//блоки
 	$G_BLOCK = _beBlock();
 	if(APP_ID)
 		$G_BLOCK += _beBlock(APP_ID);
 
+	//элементы
 	$G_ELEM = _beElem();
 	if(APP_ID)
 		$G_ELEM += _beElem(APP_ID);
@@ -2170,38 +2174,27 @@ function _beDefine() {//получение блоков и элементов и
 	$BE_FLAG = 1;
 }
 
-function _beDlg() {//получение данных диалогов из кеша
-	$key = 'dialog';
+function _beDlg($app_id=0) {//получение данных диалогов из кеша
+	$key = 'DIALOG';
+
+	$global = $app_id ? 0 : 1;
+
 	//глобальные диалоги
-	if(!$global = _cache_get($key, 1)) {
-		$sql = "SELECT *
+	if(!$DLG = _cache_get($key, $global)) {
+		$sql = "/* CACHE DIALOG APP".$app_id." */
+				SELECT *
 				FROM `_dialog`
-				WHERE !`app_id`";
-		$global = query_arr($sql);
+				WHERE `app_id`=".$app_id;
+		if(!$DLG = query_arr($sql))
+			return array();
 
-		_cache_set($key, $global, 1);
+		_cache_set($key, $DLG, $global);
 	}
 
-	$global = _beDlgField($global);
-	$global = _beDlgDelCond($global, 1);
+	$DLG = _beDlgField($DLG);
+	$DLG = _beDlgDelCond($DLG, $global);
 
-	if(!APP_ID)
-		return $global;
-
-	//диалоги конкретного приложения
-	if(!$local = _cache_get($key)) {
-		$sql = "SELECT *
-				FROM `_dialog`
-				WHERE `app_id`=".APP_ID;
-		$local = query_arr($sql);
-
-		_cache_set($key, $local);
-	}
-
-	$local = _beDlgField($local);
-	$local = _beDlgDelCond($local);
-
-	return $global + $local;
+	return $DLG;
 }
 function _beDlgField($dialog) {//вставка колонок таблиц в диалоги
 	//колонки по каждой таблице, используемые в диалогах
@@ -2231,7 +2224,7 @@ function _beDlgField($dialog) {//вставка колонок таблиц в �
 
 	return $dialog;
 }
-function _beDlgDelCond($dlg, $global=0) {//дополнительные условия удаления записи
+function _beDlgDelCond($dlg, $global) {//дополнительные условия удаления записи
 	if(empty($dlg))
 		return array();
 
@@ -2266,7 +2259,8 @@ function _beBlock($app_id=0) {//кеш блоков
 	$global = $app_id ? 0 : 1;
 
 	if(!$BLK = _cache_get($key, $global)) {
-		$sql = "SELECT
+		$sql = "/* CACHE BLKK APP".$app_id." */
+				SELECT
 					IFNULL(`el`.`id`,0) `elem_id`,
 					`bl`.*
 				FROM `_block` `bl`
@@ -2480,6 +2474,7 @@ function _beElemFormat($ELM, $app_id) {//дополнительное форма
 		$elem_id = $r['element_id'];
 		if(!isset($ELM[$elem_id]))
 			continue;
+		unset($r['id']);
 		unset($r['app_id']);
 		unset($r['element_id']);
 		unset($r['user_id_add']);
@@ -2499,6 +2494,7 @@ function _beElemHint($ELM, $app_id) {//подсказки, назначенны�
 		$elem_id = $r['element_id'];
 		if(!isset($ELM[$elem_id]))
 			continue;
+		unset($r['id']);
 		unset($r['app_id']);
 		unset($r['element_id']);
 		unset($r['user_id_add']);
