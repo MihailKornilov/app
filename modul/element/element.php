@@ -2758,7 +2758,8 @@ function PHP12_spfl_save($DLG) {
 function PHP12_spfl_vvv($prm) {//получение настроек для редактирования
 	$send = array(
 		'dss' => 0,     //получение id диалога по элементу, через который был выбор
-		'vvv' => array()
+		'vvv' => array(),
+		'drop' => PHP12_spfl_drop()//стандартные значения выпадающего списка
 	);
 
 	if(!$elem_id = $prm['srce']['element_id'])
@@ -2791,6 +2792,14 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 	$send['vvv'] = $arr;
 
 	return $send;
+}
+function PHP12_spfl_drop() {
+	return array(
+		-11 => 'число текущего дня',
+		-12 => 'число текущей недели',
+		-13 => 'число текущего месяца',
+		-14 => 'число текущего года'
+	);
 }
 function PHP12_spfl_vvv_unshift($spisok) {//общие дополнительные значения
 	array_unshift(

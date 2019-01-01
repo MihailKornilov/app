@@ -2513,15 +2513,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!DS)
 			return;
 
-		vvv = vvv.vvv;
-
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить условие</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
-			BUT_ADD = ATR_EL.find('div:last');
+			BUT_ADD = ATR_EL.find('div:last'),
+			DROP = vvv.drop;
 
 		BUT_ADD.click(valueAdd);
+
+		vvv = vvv.vvv;
 
 		if(!vvv.length)
 			valueAdd();
@@ -2552,11 +2553,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									  ' value="' + v.elem_title + '"' +
 									  ' val="' + v.elem_id + '"' +
 								' />' +
-							'<td class="cond-td' + _dn(v.elem_id) + '">' +
+							'<td class="td-cond' + _dn(v.elem_id) + '">' +
 								'<input type="hidden" class="cond-id" value="' + v.cond_id + '" />' +
-							'<td class="w100p pr20">' +
+							'<td class="w100p">' +
 								'<input type="text"' +
 									  ' class="cond-val w100p' + _dn(!issp34 && v.cond_id > 2) + '"' +
+					 (v.unit_id < 0 ? ' readonly' : '') +
 									  ' value="' + v.txt + '"' +
 								' />' +
 								'<div class="div-cond-sel' + _dn(issp34) + '">' +
@@ -2565,12 +2567,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 										  ' value="' + v.unit_id + '"' +
 									' />' +
 								'</div>' +
-							'<td class="w35">' +
-								'<input type="hidden"' +
-									  ' class="cond-prm"' +
-									  ' value="' + v.unit_id + '"' +
-								' />' +
-							'<td class="w35 r">' +
+							'<td class="td-drop' + _dn(!issp34 && v.cond_id > 2) + '">' +
+								'<input type="hidden" class="cond-drop" />' +
+							'<td class="pl15">' +
 								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
 					'</table>' +
 				'</dd>'
@@ -2592,7 +2591,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					busy_obj:$(this),
 					busy_cls:'hold',
 					func_save:function(res) {
-						DD.find('.cond-td')._dn(1);
+						DD.find('.td-cond')._dn(1);
 						COND_ID._select(2);
 						v.elem_id = res.v;
 						TITLE.attr('val', v.elem_id);
@@ -2625,8 +2624,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var issp = v.elem_issp && (vv == 3 || vv == 4);
 					DD.find('.cond-val')
 						._dn(!issp && vv > 2)
+						.val('')
+						.attr('readonly', false)
 						.focus();
+					DD.find('.cond-sel')._select(0);
 					DD.find('.div-cond-sel')._dn(issp);
+					DD.find('.td-drop')._dn(!issp && vv > 2);
 				}
 			});
 			DD.find('.cond-sel')._select({
@@ -2634,12 +2637,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				title0:'не выбрано',
 				spisok:v.spisok
 			});
-			DD.find('.cond-prm')._dropdown({
+			DD.find('.cond-drop')._dropdown({
 				width:30,
-				title0:'...',
+				title0:'<div class="icon icon-set-dot"></div>',
 				title0_hide:1,
 				nosel:1,
-				spisok:[{id:-11,title:'номеру текущего дня'}]
+				spisok:DROP,
+				func:function(id, oo) {
+					DD.find('.cond-sel').val(id);
+					DD.find('.cond-val')
+					  .val(oo.ass[id])
+					  .attr('readonly', true);
+				}
 			});
 			DD.find('.icon-del').click(function() {
 				$(this).closest('DD').remove();

@@ -2330,7 +2330,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		var tt = $(this),
 			v = _num(tt.attr('val'), 1);
 		valueSet(v);
-		o.func(v);
+		o.func(v, t);
 	});
 	DDU.mouseenter(function() {
 		DDU.removeClass('on');
@@ -2426,6 +2426,8 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		clearTimeout(timer);
 		timer = 0;
 	}
+
+	t.ass = MASS_ASS;
 
 	window[win] = t;
 	return t;
