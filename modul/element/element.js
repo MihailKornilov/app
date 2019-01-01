@@ -2556,7 +2556,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<input type="hidden" class="cond-id" value="' + v.cond_id + '" />' +
 							'<td class="w100p pr20">' +
 								'<input type="text"' +
-									  ' class="cond-val w100' + _dn(!issp34 && v.cond_id > 2) + '"' +
+									  ' class="cond-val w100p' + _dn(!issp34 && v.cond_id > 2) + '"' +
 									  ' value="' + v.txt + '"' +
 								' />' +
 								'<div class="div-cond-sel' + _dn(issp34) + '">' +
@@ -2565,6 +2565,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 										  ' value="' + v.unit_id + '"' +
 									' />' +
 								'</div>' +
+							'<td class="w35">' +
+								'<input type="hidden"' +
+									  ' class="cond-prm"' +
+									  ' value="' + v.unit_id + '"' +
+								' />' +
 							'<td class="w35 r">' +
 								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
 					'</table>' +
@@ -2604,7 +2609,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				});
 			});
 			COND_ID._select({//условие
-				width:150,
 				spisok:[
 					{id:1,title:'отсутствует'},
 					{id:2,title:'присутствует'},
@@ -2629,6 +2633,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				width:0,
 				title0:'не выбрано',
 				spisok:v.spisok
+			});
+			DD.find('.cond-prm')._dropdown({
+				width:30,
+				title0:'...',
+				title0_hide:1,
+				nosel:1,
+				spisok:[{id:-11,title:'номеру текущего дня'}]
 			});
 			DD.find('.icon-del').click(function() {
 				$(this).closest('DD').remove();
@@ -3654,7 +3665,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 		return send;
 	},
-
 
 	/* ---=== ВЫБОР ИКОНКИ [36] ===--- */
 	PHP12_icon18_list = function(el) {

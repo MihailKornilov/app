@@ -2328,7 +2328,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		timerClear();
 		LIST.hide();
 		var tt = $(this),
-			v = _num(tt.attr('val'));
+			v = _num(tt.attr('val'), 1);
 		valueSet(v);
 		o.func(v);
 	});
@@ -2353,7 +2353,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		//исходный список является ассоциативным объектом
 		if(!o.spisok.length) {
 			_forIn(o.spisok, function(sp, id) {
-				id = _num(id);
+				id = _num(id, 1);
 				if(!id)
 					return;
 				MASS_ASS[id] = sp;
@@ -2381,7 +2381,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 					id = sp.id;
 				if(id === undefined)
 					return;
-				id = _num(id);
+				id = _num(id, 1);
 				if(!id)
 					return;
 				title = sp.title;
