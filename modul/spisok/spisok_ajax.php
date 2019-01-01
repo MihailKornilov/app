@@ -1007,12 +1007,19 @@ function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значени�
 	);
 
 	//получение значений привязанного списка
-	if($elem_id = _num($v))
+	if($elem_id = _num($v)) {
 		if(_elemIsConnect($elem_id)) {
 			$send['issp'] = 1;
 			$spisok = _29cnn($elem_id);
 			$send['spisok'] = PHP12_spfl_vvv_unshift($spisok);
+		} else {
+			$el = _elemOne($elem_id);
+			if($el['dialog_id'] == 17) {
+				$send['issp'] = 1;
+				$send['spisok'] = _elemVvv17($elem_id);
+			}
 		}
+	}
 
 	//определение, смотрит ли на изменения данного элемента элемент [85]
 	if($el13_id = _num(@$_POST['vvv'][$elem_func_id]['is13'])) {

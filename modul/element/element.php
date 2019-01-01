@@ -2775,9 +2775,17 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 
 	foreach($arr as $n => $r) {
 		$arr[$n]['elem_title'] = _elemTitle($r['elem_id']);
-		$arr[$n]['elem_issp'] = _elemIsConnect($r['elem_id']);
-		$spisok = _29cnn($r['elem_id']);
-		$arr[$n]['spisok'] = PHP12_spfl_vvv_unshift($spisok);
+		$arr[$n]['spisok'] = array();
+		if($arr[$n]['elem_issp'] = _elemIsConnect($r['elem_id'])) {
+			$spisok = _29cnn($r['elem_id']);
+			$arr[$n]['spisok'] = PHP12_spfl_vvv_unshift($spisok);
+		} else {
+			$el = _elemOne($r['elem_id']);
+			if($el['dialog_id'] == 17) {
+				$arr[$n]['elem_issp'] = 1;
+				$arr[$n]['spisok'] = _elemVvv17($r['elem_id']);
+			}
+		}
 	}
 
 	$send['vvv'] = $arr;
