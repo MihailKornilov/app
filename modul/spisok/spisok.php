@@ -924,7 +924,7 @@ function _spisokCond40($el, $cond) {//изначальные условия от
 
 
 		//если элемент является датой, преобразование значения в дату, если это число.
-		if(_elemIsDate($r['elem_id']))
+		if(_elemIsDate($ell))
 			if(preg_match(REGEXP_INTEGER, $val)) {
 				//число - это количество дней
 				//нулевое значение = сегодня
@@ -933,6 +933,10 @@ function _spisokCond40($el, $cond) {//изначальные условия от
 				$val = TODAY_UNIXTIME + $val * 86400;
 				$val = strftime('%Y-%m-%d', $val);
 			}
+
+		if($ell['dialog_id'] == 17) {
+			$val = _num($r['unit_id']);
+		}
 
 		$send .= _22condV(
 					$r['cond_id'],
