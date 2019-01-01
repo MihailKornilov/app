@@ -1977,6 +1977,10 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		$BE_FLAG = 0;
 	}
 
+
+
+
+
 	//получение данных всех элементов
 	if($i == 'elem_all')
 		return $G_ELEM;
@@ -2380,11 +2384,18 @@ function _beElem($app_id=0) {
 				FROM `_element`
 				WHERE `app_id`=".$app_id."
 				ORDER BY `id`";
-		if(!$ELM = query_arr($sql))
+		if(!$arr = query_arr($sql))
 			return array();
 
-		$ELM = _beElemForming($ELM);
-		$ELM = _beElemDlg($ELM);
+		$ELM = array();
+		foreach($arr as $el) {
+			$elem_id = _num($el['id']);
+			$el = _beElemStructure($el);
+			$el = _beElemDlg($el);
+
+			$ELM[$elem_id] = $el;
+		}
+
 		$ELM = _beElemFormat($ELM, $app_id);
 		$ELM = _beElemHint($ELM, $app_id);
 		$ELM = _beElemAction($ELM, $app_id);
@@ -2394,77 +2405,68 @@ function _beElem($app_id=0) {
 
 	return $ELM;
 }
-function _beElemForming($ELM) {
-	$send = array();
+function _beElemStructure($el) {//основная структура элемента
+	$elem_id = _num($el['id']);
 
-	foreach($ELM as $el) {
-		$elem_id = _num($el['id']);
+	$send = array(
+		'id' => $elem_id,
+		'dialog_id' => _num($el['dialog_id']),
+		'block_id' => _num($el['block_id']),
+		'parent_id' => _num($el['parent_id']),
+		'col' => $el['col'],
+		'name' => $el['name'],
+		'req' => _num($el['req']),
+		'req_msg' => $el['req_msg'],
+		'nosel' => _num($el['nosel']),
+		'focus' => _num($el['focus']),
+		'width' => _num($el['width']),
+		'width_max' => 0,
+		'color' => $el['color'],
+		'font' => $el['font'],
+		'mar' => $el['mar'],
+		'size' => $el['size'] ? _num($el['size']) : 13,
+		'def' => _num($el['def'], 1),
 
-		$send[$elem_id] = array(
-			'id' => $elem_id,
-			'dialog_id' => _num($el['dialog_id']),
-			'block_id' => _num($el['block_id']),
-			'parent_id' => _num($el['parent_id']),
-			'col' => $el['col'],
-			'name' => $el['name'],
-			'req' => _num($el['req']),
-			'req_msg' => $el['req_msg'],
-			'nosel' => _num($el['nosel']),
-			'focus' => _num($el['focus']),
-			'width' => _num($el['width']),
-			'width_max' => 0,
-			'color' => $el['color'],
-			'font' => $el['font'],
-			'mar' => $el['mar'],
-			'size' => $el['size'] ? _num($el['size']) : 13,
-			'def' => _num($el['def'], 1),
+		'attr_cmp' => '#cmp_'.$elem_id,
 
-			'attr_cmp' => '#cmp_'.$elem_id,
+		'afics' => '',
+		'hidden' => 0,
+		'format' => array(),
+		'action' => array(),
+		'hint' => array()
+	);
 
-			'afics' => '',
-			'hidden' => 0,
-			'format' => array(),
-			'action' => array(),
-			'hint' => array()
-		);
+	for($n = 1; $n <= 10; $n++) {
+		$num = 'num_'.$n;
+		$send[$num] = _num($el[$num], 1);
 
-		for($n = 1; $n <= 10; $n++) {
-			$num = 'num_'.$n;
-			$send[$elem_id][$num] = _num($el[$num], 1);
-
-			$txt = 'txt_'.$n;
-			$send[$elem_id][$txt] = $el[$txt];
-		}
+		$txt = 'txt_'.$n;
+		$send[$txt] = $el[$txt];
 	}
 
 	return $send;
 }
-function _beElemDlg($ELM) {//настройки элемента из диалогов
+function _beElemDlg($el) {//настройки элемента из диалогов
 	global $G_DLG, $G_BLOCK;
 
-	foreach($ELM as $el) {
-		if(!$dialog_id = _num($el['dialog_id']))
-			continue;
-		if(!$DLG = @$G_DLG[$dialog_id])
-			continue;
+	if(!$dialog_id = _num($el['dialog_id']))
+		return $el;
+	if(!$DLG = @$G_DLG[$dialog_id])
+		return $el;
 
-		$elem_id = _num($el['id']);
+	$el['hidden'] = _num($DLG['element_hidden']);
+	$el['afics'] = $DLG['element_afics'];
 
-		$ELM[$elem_id]['hidden'] = _num($DLG['element_hidden']);
-		$ELM[$elem_id]['afics'] = $DLG['element_afics'];
+	//определение максимальной ширины, на которую может растягиваться элемент
+	if($el['width_min'] = _num($DLG['element_width_min']))
+		if($block_id = _num($el['block_id']))
+			if($bl = @$G_BLOCK[$block_id]) {
+				$ex = explode(' ', $el['mar']);
+				$width_max = $bl['width'] - $ex[1] - $ex[3];
+				$el['width_max'] = floor($width_max / 10) * 10;
+			}
 
-		//определение максимальной ширины, на которую может растягиваться элемент
-		if($el['width_min'] = _num($DLG['element_width_min']))
-			if($block_id = _num($el['block_id']))
-				if($bl = @$G_BLOCK[$block_id]) {
-					$ex = explode(' ', $el['mar']);
-					$width_max = $bl['width'] - $ex[1] - $ex[3];
-					$ELM[$elem_id]['width_max'] = floor($width_max / 10) * 10;
-				}
-
-	}
-
-	return $ELM;
+	return $el;
 }
 function _beElemFormat($ELM, $app_id) {//дополнительное форматирование элемента
 	$sql = "SELECT *

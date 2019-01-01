@@ -367,14 +367,11 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 //	_spisokUnitBalansUpd($dialog, $POST_CMP);
 
 	//получение обновлённых данных записи
-	$unit = IS_ELEM ? _elemOne($unit_id) : _spisokUnitQuery($dialog, $unit_id, true);
+	$unit = IS_ELEM ? _elemOne($unit_id, true) : _spisokUnitQuery($dialog, $unit_id, true);
 	_historyInsertEdit($dialog, $unitOld, $unit);
 
-	if(IS_ELEM) {
-//		query("/* ************* */SELECT * FROM `_element` WHERE `id`=".$unit_id);
-		_BE('block_clear');
-		_BE('elem_clear');
-	}
+	if(IS_ELEM)
+		$unit['title'] = _elemTitle($unit_id);
 
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
@@ -401,6 +398,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 		_jsCache();
 	}
 
+	//было назначено действие
 	if($dialog['table_name_1'] == '_action') {
 		if($unit['block_id'])
 			_BE('block_clear');
@@ -409,20 +407,14 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 		_jsCache();
 	}
 
-	if(IS_ELEM) {
-//		query("/* ************* */SELECT * FROM `_element` WHERE `id`=".$unit_id);
-		$unit['title'] = _elemTitle($unit_id);
-		_jsCache();
-	}
-
 	//изменено дополнительное форматирование
-	if($dialog['id'] == 64) {
+	if($dialog['table_name_1'] == '_element_format') {
 		_BE('elem_clear');
 		_jsCache();
 	}
 
 	//изменена выплывающая подсказка
-	if($dialog['id'] == 43) {
+	if($dialog['table_name_1'] == '_element_hint') {
 		_BE('elem_clear');
 		_jsCache();
 	}

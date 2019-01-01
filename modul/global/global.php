@@ -818,7 +818,7 @@ function _jsCacheElemOne($elem_id) {
 					$val['url_use'] = 1;
 			}
 
-	for($n = 1; $n <= 8; $n++) {
+	for($n = 1; $n <= 10; $n++) {
 		$num = 'num_'.$n;
 		if($r[$num])
 			$val[$num] = $r[$num];

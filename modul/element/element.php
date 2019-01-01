@@ -974,7 +974,29 @@ function _elemRule($i='all', $v=0) {//кеш правил для элемент�
 	return $RULE_USE;
 }
 
-function _elemOne($elem_id) {//запрос одного элемента
+function _elemOne($elem_id, $upd=false) {//запрос одного элемента
+	global $BE_FLAG;
+
+	//обновление данных элемента в кеше
+	if($upd) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id`=".$elem_id;
+		if(!$el = query_assoc($sql))
+			return array();
+
+		$key = 'ELMM';
+		$global = $el['app_id'] ? 0 : 1;
+		if(_cache_isset($key, $global)) {
+			$ELM = _cache_get($key, $global);
+			$el = _beElemStructure($el);
+			$el = _beElemDlg($el);
+			$ELM[$elem_id] = $el;
+			_cache_set($key, $ELM, $global);
+			$BE_FLAG = 0;
+		}
+	}
+
 	return _BE('elem_one', $elem_id);
 }
 function _blockOne($block_id) {//запрос одного блока
@@ -4161,6 +4183,10 @@ function _historyInsert($type_id, $dialog, $unit_id) {//внесение ист�
 function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение истории действий при редактировании
 	if(empty($unitOld))
 		return;
+	if(!isset($dialog['field1']['deleted']))
+		return;
+
+
 
 	$edited = array();
 	foreach($unitOld as $i => $v) {
