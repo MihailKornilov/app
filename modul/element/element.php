@@ -999,7 +999,34 @@ function _elemOne($elem_id, $upd=false) {//запрос одного элеме�
 
 	return _BE('elem_one', $elem_id);
 }
-function _blockOne($block_id) {//запрос одного блока
+function _blockOne($block_id, $upd=false) {//запрос одного блока
+	global $BE_FLAG;
+
+	//обновление данных блока в кеше
+	if($upd) {
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id`=".$block_id;
+		if(!$bl = query_assoc($sql))
+			return array();
+
+		$sql = "SELECT `id`
+				FROM `_element`
+				WHERE `block_id`=".$block_id."
+				LIMIT 1";
+		$bl['elem_id'] = _num(query_value($sql));
+
+		$key = 'BLKK';
+		$global = $bl['app_id'] ? 0 : 1;
+		if(_cache_isset($key, $global)) {
+			$BLK = _cache_get($key, $global);
+			$bl = _beBlockStructure($bl);
+			$BLK[$block_id] = $bl;
+			_cache_set($key, $BLK, $global);
+			$BE_FLAG = 0;
+		}
+	}
+
 	return _BE('block_one', $block_id);
 }
 

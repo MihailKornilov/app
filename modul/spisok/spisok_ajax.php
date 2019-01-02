@@ -370,8 +370,12 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	$unit = IS_ELEM ? _elemOne($unit_id, true) : _spisokUnitQuery($dialog, $unit_id, true);
 	_historyInsertEdit($dialog, $unitOld, $unit);
 
-	if(IS_ELEM)
+	if(IS_ELEM) {
 		$unit['title'] = _elemTitle($unit_id);
+		//обновление данных блока в кеше
+		if($block_id = $unit['block_id'])
+			_blockOne($block_id, true);
+	}
 
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {

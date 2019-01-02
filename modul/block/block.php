@@ -2263,6 +2263,10 @@ function _beBlock($app_id=0) {//кеш блоков
 	$global = $app_id ? 0 : 1;
 
 	if(!$BLK = _cache_get($key, $global)) {
+
+		if(_cache_isset($key, $global))
+			return array();
+
 		$sql = "/* CACHE BLKK APP".$app_id." */
 				SELECT
 					IFNULL(`el`.`id`,0) `elem_id`,
@@ -2275,10 +2279,16 @@ function _beBlock($app_id=0) {//кеш блоков
 					
 				WHERE `bl`.`app_id`=".$app_id."
 				ORDER BY `bl`.`parent_id`,`y`,`x`";
-		if(!$BLK = query_arr($sql))
+		if(!$arr = query_arr($sql))
 			return array();
 
-		$BLK = _beBlockForming($BLK);
+		$BLK = array();
+		foreach($arr as $bl) {
+			$block_id = _num($bl['id']);
+			$bl = _beBlockStructure($bl);
+			$BLK[$block_id] = $bl;
+		}
+
 		$BLK = _beBlockAction($BLK, $app_id);
 
 		_cache_set($key, $BLK, $global);
@@ -2286,37 +2296,31 @@ function _beBlock($app_id=0) {//кеш блоков
 
 	return $BLK;
 }
-function _beBlockForming($BLK) {//формирование массива блоков для кеша
-	$send = array();
-	foreach($BLK as $r) {
-		$id = _num($r['id']);
-		$send[$id] = array(
-			'id' => $id,
-			'parent_id' => _num($r['parent_id']),
-			'child_count' => _num($r['child_count']),
-			'sa' => _num($r['sa']),
-			'obj_name' => $r['obj_name'],
-			'obj_id' => _num($r['obj_id']),
-			'x' => _num($r['x']),
-			'xx' => _num($r['xx']),
-			'xx_ids' => _idsAss($r['xx_ids']),
-			'y' => _num($r['y']),
-			'w' => _num($r['w']),
-			'h' => _num($r['h']),
-			'width' => _num($r['width']),
-			'width_auto' => _num($r['width_auto']),
-			'height' => _num($r['height']),
-			'pos' => $r['pos'],
-			'bg' => $r['bg'],
-			'bor' => $r['bor'],
-			'hidden' => _num($r['hidden']),
-			'action' => array(),
-			'elem_id' => _num($r['elem_id']),
-			'elem' => array()
-		);
-	}
-
-	return $send;
+function _beBlockStructure($bl) {//формирование массива блоков для кеша
+	return array(
+		'id' => _num($bl['id']),
+		'parent_id' => _num($bl['parent_id']),
+		'child_count' => _num($bl['child_count']),
+		'sa' => _num($bl['sa']),
+		'obj_name' => $bl['obj_name'],
+		'obj_id' => _num($bl['obj_id']),
+		'x' => _num($bl['x']),
+		'xx' => _num($bl['xx']),
+		'xx_ids' => _idsAss($bl['xx_ids']),
+		'y' => _num($bl['y']),
+		'w' => _num($bl['w']),
+		'h' => _num($bl['h']),
+		'width' => _num($bl['width']),
+		'width_auto' => _num($bl['width_auto']),
+		'height' => _num($bl['height']),
+		'pos' => $bl['pos'],
+		'bg' => $bl['bg'],
+		'bor' => $bl['bor'],
+		'hidden' => _num($bl['hidden']),
+		'action' => array(),
+		'elem_id' => _num($bl['elem_id']),
+		'elem' => array()
+	);
 }
 function _beBlockAction($blk, $app_id) {//вставка действий для блоков
 	$sql = "SELECT *
