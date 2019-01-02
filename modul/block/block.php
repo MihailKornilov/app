@@ -1559,7 +1559,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				$sql = "SELECT COUNT(*)
 						FROM  "._queryFrom($DLG)."
 						WHERE "._queryWhere($DLG)."
-							"._spisokCond40($EL, $r['txt_2']);
+							"._40cond($EL, $r['txt_2']);
 				if($c = query_value($sql))
 					$spisok[$id] .= '<span class="fr inhr">'.$c.'</span>';
 			}
@@ -1711,7 +1711,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			$v = _spisokFilter('v', $el['id']);
 			if($v === false) {
-				$cond = _spisokCond40($el, $el['txt_5']);
+				$cond = _40cond($el, $el['txt_5']);
 				$v = _elem102CnnList($el['txt_2'], 'ids', $cond);
 				_spisokFilter('insert', array(
 					'spisok' => $el['num_1'],
