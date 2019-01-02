@@ -2431,6 +2431,7 @@ function _beElemStructure($el) {//основная структура элеме
 		'size' => $el['size'] ? _num($el['size']) : 13,
 		'def' => _num($el['def'], 1),
 
+		'attr_el' => '#el_'.$elem_id,
 		'attr_cmp' => '#cmp_'.$elem_id,
 
 		'afics' => '',
