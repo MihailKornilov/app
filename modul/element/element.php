@@ -3990,6 +3990,51 @@ function PHP12_template_param_vvv($prm) {//получение значений �
 
 
 
+/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ДЛЯ ПЛАНИРОВЩИКА [115] ===--- */
+function PHP12_cron_dst_prm($prm) {
+	if(!$u = $prm['unit_edit'])
+		return _emptyMin('Настройка данных будет доступна<br>после выбора списка для внесения данных.');
+	if(!$u['dst_spisok'])
+		return _emptyMin('Выберите список для внесения данных,<br>сохраните окно и откройте снова.');
+
+	return '';
+}
+function PHP12_cron_dst_prm_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+	if(!$dlg_id = $u['dst_spisok'])
+		return array();
+	if(!$dlg = _dialogQuery($dlg_id))
+		return array();
+
+	$ass = array();
+	if($dst = $u['dst_prm'])
+		foreach(explode(',', $dst) as $r) {
+			$ex = explode(':', $r);
+			if(!$dst_id = _num(@$ex[0]))
+				continue;
+			$ass[$dst_id] = _num(@$ex[1]);
+		}
+
+
+	$send = array();
+	foreach($dlg['cmp'] as $id => $r) {
+		if(!$r['col'])
+			continue;
+		if($r['hidden'])
+			continue;
+		$src_id = _num(@$ass[$id]);
+		$send[] = array(
+			'dst_id' => $id,
+			'dst_title' => _elemTitle($id),
+			'src_id' => $src_id,
+			'src_title' => _elemTitle($src_id)
+		);
+	}
+
+	return $send;
+}
+
 
 
 /* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
