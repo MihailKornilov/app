@@ -4034,15 +4034,7 @@ function PHP12_cron_dst_prm_vvv($prm) {
 	if(!$dlg = _dialogQuery($dlg_id))
 		return array();
 
-	$ass = array();
-	if($dst = $u['dst_prm'])
-		foreach(explode(',', $dst) as $r) {
-			$ex = explode(':', $r);
-			if(!$dst_id = _num(@$ex[0]))
-				continue;
-			$ass[$dst_id] = _num(@$ex[1]);
-		}
-
+	$ass = PHP12_cron_dst_prm_ass($u['dst_prm']);
 
 	$send = array();
 	foreach($dlg['cmp'] as $id => $r) {
@@ -4060,6 +4052,20 @@ function PHP12_cron_dst_prm_vvv($prm) {
 	}
 
 	return $send;
+}
+function PHP12_cron_dst_prm_ass($dst) {//ассоциативный массив id элементов: получатель <- исходный
+	if(!$dst)
+		return array();
+
+	$ass = array();
+	foreach(explode(',', $dst) as $r) {
+		$ex = explode(':', $r);
+		if(!$dst_id = _num(@$ex[0]))
+			continue;
+		$ass[$dst_id] = _num(@$ex[1]);
+	}
+
+	return $ass;
 }
 
 

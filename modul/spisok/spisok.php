@@ -1154,7 +1154,6 @@ function _40cond_cnn($EL, $r, $ell, $v) {//значение подключаем
 				return ' AND !`t1`.`id` /* [40] no cmp */';
 
 			$unit_id = is_array($unit[$cmp['col']]) ? $unit[$cmp['col']]['id'] : $unit[$cmp['col']];
-
 		}
 
 		return $unit_id;
@@ -1434,6 +1433,225 @@ function _spisok59unit($elem_id, $unit_id) {//выбранное значени�
 }
 
 
+
+
+
+
+/* ---=== CЧЁТЧИКИ: В РАБОТЕ ===--- */
+function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение действий после обновления или удаления записи
+	if(!$dialog['table_1'])
+		return;
+
+	foreach($dialog['cmp'] as $cmp_id => $cmp)
+		switch($cmp['dialog_id']) {
+			//обновление суммы, если какой-то элемент самого диалога участвует в подсчёте (для стартовых сумм)
+			case 27:
+				//получение компонентов диалога, которые отвечают за внесение данных (для поиска компонента, который участвует в подсчёте баланса)
+				$ids = array();
+				foreach($dialog['cmp'] as $id => $r) {
+					if(!$r['col'])
+						continue;
+					if($r['dialog_id'] == 27)
+						continue;
+					if($r['dialog_id'] == 54)
+						continue;
+					if($r['dialog_id'] == 55)
+						continue;
+					$ids[] = $id;
+				}
+
+				if(!$ids = implode(',', $ids))
+					break;
+
+				//получение id элементов-слагаемых баланса
+				$sql = "SELECT `txt_2`
+						FROM `_element`
+						WHERE `parent_id`=".$cmp['id'];
+				if(!$item_ids = query_ids($sql))
+					break;
+
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `id` IN (".$ids.")
+						  AND `id` IN (".$item_ids.")
+						ORDER BY `id` DESC";
+				if(!$arr = query_arr($sql))
+					break;
+
+				$send = array();
+				foreach($arr as $id => $r)
+					$send[$id] = $unit['id'];     //id записи, баланс которой будет пересчитан
+
+				_spisokUnitAfter27($send);
+				break;
+			//привязанные списки
+			case 29:
+				_spisokUnitAfter54($cmp, $dialog, $unit, $unitOld); //пересчёт количеств привязаного списка [54]
+				$upd = _spisokUnitAfter55($cmp, $dialog, $unit);    //пересчёт cумм привязаного списка [55]
+				_spisokUnitAfter27($upd);                           //подсчёт балансов после обновления сумм [27]
+				break;
+		}
+}
+function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количеств привязаного списка
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=54
+			  AND `num_1`=".$cmp['id'];
+	if(!$arr = query_arr($sql))
+		return;
+	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
+		return;
+	if(!$connect_id = _num($unit[$col]['id']))//значение, id единицы привязанного списка.
+		return;
+
+	$connect_old = 0;
+	$count_old = 0;
+	if(!empty($unitOld))
+		if($connect_old = _num($unitOld[$col])) {
+			//получение старого количества для обновления
+			$sql = "SELECT COUNT(*)
+					FROM "._queryFrom($dialog)."
+					WHERE `".$col."`=".$connect_old."
+					  AND "._queryWhere($dialog);
+			$count_old = _num(query_value($sql));
+		}
+
+
+	//получение нового количества для обновления
+	$sql = "SELECT COUNT(*)
+			FROM "._queryFrom($dialog)."
+			WHERE `".$col."`=".$connect_id."
+			  AND "._queryWhere($dialog);
+	$count = _num(query_value($sql));
+
+	foreach($arr as $r) {
+		if(!$col = $r['col'])
+			continue;
+
+		$bl = _blockOne($r['block_id']);
+		$dlg = _dialogQuery($bl['obj_id']);
+
+		if($connect_old) {
+			$sql = "UPDATE "._queryFrom($dlg)."
+					SET `".$col."`=".$count_old."
+					WHERE `t1`.`id`=".$connect_old."
+					  AND "._queryWhere($dlg);
+			query($sql);
+		}
+
+		$sql = "UPDATE "._queryFrom($dlg)."
+				SET `".$col."`=".$count."
+				WHERE `t1`.`id`=".$connect_id."
+				  AND "._queryWhere($dlg);
+		query($sql);
+	}
+}
+function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм привязаного списка после внесения/удаления данных
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=55
+			  AND `num_1`=".$cmp['id'];
+	if(!$arr = query_arr($sql))
+		return array();
+	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
+		return array();
+	if(!$connect_id = _num($unit[$col]['id']))//значение, id записи привязанного списка.
+		return array();
+
+	$send = array();//значения, которые были пересчитаны. По ним будет потом посчитан баланс, если потребуется.
+	foreach($arr as $elem_id => $r) {
+		if(!$colSumSet = $r['col'])
+			continue;
+		//поиск колонки, по которой будет производиться подсчёт суммы
+		if(!$el = _elemOne($r['num_2']))
+			continue;
+		if(!$colSum = $el['col'])
+			continue;
+
+		$bl = _blockOne($r['block_id']);
+		$dlg = _dialogQuery($bl['obj_id']);
+
+		//получение нового количества для обновления
+		$sql = "SELECT IFNULL(SUM(`".$colSum."`),0)
+				FROM "._queryFrom($dialog)."
+				WHERE `".$col."`=".$connect_id."
+				  AND "._queryWhere($dialog);
+		$sum = query_value($sql);
+
+		$sql = "UPDATE "._queryFrom($dlg)."
+				SET `".$colSumSet."`=".$sum."
+				WHERE `t1`.`id`=".$connect_id."
+				  AND "._queryWhere($dlg);
+		query($sql);
+
+		$send[$elem_id] = $connect_id;     //id записи, баланс которой будет пересчитан
+	}
+
+	return $send;
+}
+function _spisokUnitAfter27($ass) {
+	if(empty($ass))
+		return;
+
+	foreach($ass as $elem_id => $unit_id) {
+		if(!$el = _elemOne($elem_id))
+			continue;
+		if(!$bl = $el['block'])
+			continue;
+		if($bl['obj_name'] != 'dialog')
+			continue;
+		if(!$dialog = _dialogQuery($bl['obj_id']))
+			continue;
+
+		foreach($dialog['cmp'] as $cmp) {
+			if($cmp['dialog_id'] != 27)
+				continue;
+			if(empty($cmp['col']))//имя колонки, являющейся балансом
+				continue;
+
+			//получение id элементов-слагаемых баланса
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `parent_id`=".$cmp['id'];
+			if(!$arr = query_arr($sql))
+				continue;
+
+			//флаг обновления баланса. Будет установлен, если присутствует элемент, участвующий в обновлении.
+			$upd_flag = 0;
+			foreach($arr as $r)
+				if($r['txt_2'] == $elem_id) {
+					$upd_flag = 1;
+					break;
+				}
+			if(!$upd_flag)
+				continue;
+
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id` IN ("._idsGet($arr, 'txt_2').")";
+			if(!$dlgElUpd = query_arr($sql))
+				continue;
+
+			$upd = '';
+			foreach($arr as $r) {
+				if(!$elUpd = $dlgElUpd[$r['txt_2']])
+					continue;
+				if(!$col = $elUpd['col'])
+					continue;
+
+				$znak = $r['num_8'] ? '-' : '+';
+				$upd .= $znak."`".$col."`";
+			}
+
+			//процесс обновления
+			$sql = "UPDATE "._queryFrom($dialog)."
+					SET `".$cmp['col']."`=".$upd."
+					WHERE `t1`.`id`=".$unit_id."
+					  AND "._queryWhere($dialog);
+			query($sql);
+		}
+	}
+}
 
 
 
