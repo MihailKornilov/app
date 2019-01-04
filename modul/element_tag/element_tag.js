@@ -2161,7 +2161,7 @@ $.fn._search = function(o, v) {//поисковая строка
 
 	return t;
 };
-$.fn._menu = function(o) {//меню
+$.fn._menu = function(o) {//меню переключения
 	var tMain = $(this),
 		attr_id = tMain.attr('id'),
 		val = _num(tMain.val()),
@@ -2186,7 +2186,7 @@ $.fn._menu = function(o) {//меню
 	tMain.val(val);
 	
 	o = $.extend({
-		type:1,
+		type:2,
 		spisok:[],
 		func:function() {}
 	}, o);

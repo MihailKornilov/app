@@ -310,14 +310,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DLG = dialog.D;
 
 		DLG('#dialog-menu')._menu({
-			type:2,
+			type:3,
 			spisok:o.menu,
 			func:function() {
 				_dialogHeightCorrect(DLG);
 			}
 		});
 		DLG('#menu_sa')._menu({
-			type:1,
 			spisok:o.menu_sa
 		});
 		DLG('#width_auto')._check({
@@ -2818,6 +2817,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	/* ---=== ВЫБОР ЦВЕТА КНОПКИ [2] ===--- */
 	PHP12_button_color = function(el) {
+		var DIV = _attr_el(el.id).find('div');
+		DIV.click(function() {
+			var t = $(this),
+				id = _num(t.attr('val'));
+
+			DIV.removeClass('sel');
+			t.addClass('sel');
+
+			_attr_cmp(el.id).val(id);
+		});
+	},
+
+	/* ---=== ВЫБОР ВНЕШНЕГО ВИДА МЕНЮ СТРАНИЦ [3] ===--- */
+	PHP12_page_menu_type = function(el) {
 		var DIV = _attr_el(el.id).find('div');
 		DIV.click(function() {
 			var t = $(this),

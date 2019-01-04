@@ -2671,6 +2671,26 @@ function PHP12_button_color($prm) {
 
 
 
+
+/* ---=== ВЫБОР ВНЕШНЕГО ВИДА МЕНЮ СТРАНИЦ [3] ===--- */
+function PHP12_page_menu_type($prm) {
+	$sel = _num($prm['el12']['txt_2']);
+	if($col = $prm['el12']['col'])
+		if($u = $prm['unit_edit'])
+			$sel = $u[$col];
+
+
+	$send = '';
+	for($n = 1; $n <= 4; $n++) {
+		$sel = $n == $sel ? ' sel' : '';
+		$send .= '<div class="page-menu type'.$n.$sel.'" val="'.$n.'"></div>';
+	}
+
+	return $send;
+}
+
+
+
 /* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 function PHP12_block_choose($prm) {
 	if(!$block_id = _num($prm['srce']['block_id']))

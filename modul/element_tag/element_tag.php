@@ -221,16 +221,7 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 			'</a>';
 	}
 
-	//Внешний вид меню
-	$type = array(
-		0 => 0,
-		10 => 0,//Основной вид - горизонтальное меню
-		11 => 1,//С подчёркиванием (гориз.)
-		12 => 2,//Синие маленькие кнопки (гориз.)
-		13 => 3 //Боковое вертикальное меню
-	);
-
-	return '<div class="_menu'.$type[$el['num_2']].'">'.$razdel.'</div>';
+	return '<div class="_menu'.$el['num_2'].'">'.$razdel.'</div>';
 }
 function _dropdown($v=array()) {//выпадающее поле - ссылка
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
