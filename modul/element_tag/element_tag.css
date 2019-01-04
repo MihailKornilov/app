@@ -745,9 +745,9 @@ button.vk._busy{color:transparent}
 .vk-but-color{
 	display:inline-block;
 	padding:6px;
-	border:transparent solid 2px;
+	border:transparent solid 3px;
 	cursor:pointer;
-	border-radius:3px;
+	border-radius:2px;
 	opacity:.4;
 }
 .vk-but-color .vk.curD{cursor:pointer}
