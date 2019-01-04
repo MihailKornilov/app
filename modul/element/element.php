@@ -2641,6 +2641,36 @@ function PHP12_v_choose_27balans($BL, $dialog_id) {//ячейка таблицы
 
 
 
+
+/* ---=== ВЫБОР ЦВЕТА КНОПКИ [2] ===--- */
+function PHP12_button_color($prm) {
+	$sel = _num($prm['el12']['txt_2']);
+	if($col = $prm['el12']['col'])
+		if($u = $prm['unit_edit'])
+			$sel = $u[$col];
+
+	$BUT[1] = array('Синий',        '');
+	$BUT[2] = array('Зелёный',      'green');
+	$BUT[3] = array('Красный',      'red');
+	$BUT[4] = array('Серый',        'grey');
+	$BUT[5] = array('Прозрачный',   'cancel');
+	$BUT[6] = array('Розовый',      'pink');
+	$BUT[7] = array('Оранжевый',    'orange');
+
+	$send = '';
+	foreach($BUT as $id => $r) {
+		$send .=
+		'<div class="vk-but-color over1'._dn($id != $sel, 'sel').'" val="'.$id.'">'.
+			'<button class="vk w125 curD '.$r[1].'">'.$r[0].'</button>'.
+		'</div>';
+	}
+
+	return $send;
+}
+
+
+
+
 /* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 function PHP12_block_choose($prm) {
 	if(!$block_id = _num($prm['srce']['block_id']))

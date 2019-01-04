@@ -741,6 +741,28 @@ button.vk._busy{color:transparent}
 
 
 
+/* ---=== ВЫБОР ЦВЕТА КНОПКИ [2] PHP12_button_color ===--- */
+.vk-but-color{
+	display:inline-block;
+	padding:6px;
+	border:transparent solid 2px;
+	cursor:pointer;
+	border-radius:3px;
+	opacity:.4;
+}
+.vk-but-color .vk.curD{cursor:pointer}
+.vk-but-color:not(.sel):hover{opacity:.7}
+.vk-but-color.sel{
+	border-color:#93A3BB;
+	background-color:#F2F6F9;
+	opacity:1;
+}
+
+
+
+
+
+
 
 
 

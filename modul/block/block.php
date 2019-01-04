@@ -826,6 +826,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				После размещения данных PHP-функции будет выполняться JS-функция с таким же именем, если существует.
 
                 txt_1 - имя функции (начинается с PHP12)
+				txt_2 - начальное значение
+				num_1 - условие 1
 			*/
 
 			if(!$el['txt_1'])
@@ -839,7 +841,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			return
 			($el['col'] ?
-				'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm).'" />'
+				'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm, $el['txt_2']).'" />'
 			: '').
 				$el['txt_1']($prm);
 

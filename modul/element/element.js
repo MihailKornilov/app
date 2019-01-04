@@ -2816,6 +2816,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return obj.vvv[el.id];
 	},
 
+	/* ---=== ВЫБОР ЦВЕТА КНОПКИ [2] ===--- */
+	PHP12_button_color = function(el) {
+		var DIV = _attr_el(el.id).find('div');
+		DIV.click(function() {
+			var t = $(this),
+				id = _num(t.attr('val'));
+
+			DIV.removeClass('sel');
+			t.addClass('sel');
+
+			_attr_cmp(el.id).val(id);
+		});
+	},
+
 	/* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 	PHP12_block_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
