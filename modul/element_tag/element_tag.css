@@ -535,20 +535,8 @@
 ._menu1 .link:not(.sel):hover{background-color:#DEE3EF}
 ._menu1 .link.sel{color:#FFF;background-color:#31618C}
 
-/* type 2: С подчёркиванием (гориз.) */
-._menu2{border-bottom:#E7E8EC solid 1px}
+/* type 2: Синие маленькие кнопки (гориз.) */
 ._menu2 .link{
-	display:inline-block;
-	color:#777;
-	padding:10px 6px 7px;
-	margin:0 8px -1px;
-}
-._menu2 .sel{color:#000;border-bottom:#6387AC solid 2px}
-._menu2 .link:hover{text-decoration:none}
-._menu2 .link:not(.sel):hover{border-bottom:#CAD2DB solid 2px}
-
-/* type 3: Синие маленькие кнопки (гориз.) */
-._menu3 .link{
 	display:inline-block;
 	color:#45688e;
 	font-weight:bold;
@@ -556,9 +544,21 @@
 	padding:4px 8px;
 	border-radius:2px;
 }
-._menu3 .sel{background-color:#597da3;color:#fff}
+._menu2 .sel{background-color:#597da3;color:#fff}
+._menu2 .link:hover{text-decoration:none}
+._menu2 .link:not(.sel):hover{background-color:#e9edf1}
+
+/* type 3: С подчёркиванием (гориз.) */
+._menu3{border-bottom:#E7E8EC solid 1px}
+._menu3 .link{
+	display:inline-block;
+	color:#777;
+	padding:10px 6px 7px;
+	margin:0 8px -1px;
+}
+._menu3 .sel{color:#000;border-bottom:#6387AC solid 2px}
 ._menu3 .link:hover{text-decoration:none}
-._menu3 .link:not(.sel):hover{background-color:#e9edf1}
+._menu3 .link:not(.sel):hover{border-bottom:#CAD2DB solid 2px}
 
 /* type 4: Боковое вертикальное меню */
 ._menu4 .link{display:block;padding:10px 12px}

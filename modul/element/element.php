@@ -2681,10 +2681,8 @@ function PHP12_page_menu_type($prm) {
 
 
 	$send = '';
-	for($n = 1; $n <= 4; $n++) {
-		$sel = $n == $sel ? ' sel' : '';
-		$send .= '<div class="page-menu type'.$n.$sel.'" val="'.$n.'"></div>';
-	}
+	for($n = 1; $n <= 4; $n++)
+		$send .= '<div class="page-menu type'.$n._dn($n != $sel, 'sel').'" val="'.$n.'"></div>';
 
 	return $send;
 }

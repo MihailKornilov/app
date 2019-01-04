@@ -1359,8 +1359,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$v = _elemPrintV($el, $prm, $el['def']);
 
 			$type = array(
-				1158 => 2,
-				1159 => 1
+				1158 => 3,
+				1159 => 2
 			);
 
 			$razdel = '';
