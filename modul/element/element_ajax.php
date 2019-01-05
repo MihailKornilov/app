@@ -389,10 +389,6 @@ switch(@$_POST['op']) {
 	case 'image_link'://загрузка изображения по ссылке
 		if(!$url = _txt(@$_POST['url']))
 			jsonError('Отсутствует ссылка');
-		if(!$obj_name = _txt(@$_POST['obj_name']))
-			jsonError('Отсутствует имя объекта');
-
-		$obj_id = _num(@$_POST['obj_id']);
 
 		$ch = curl_init($url);
 		curl_setopt_array($ch, array(
@@ -428,7 +424,7 @@ switch(@$_POST['op']) {
 		fwrite($file, $raw);
 		fclose($file);
 
-		$img = _imageSave($obj_name, $obj_id, $info['content_type'], $file_tmp_name);
+		$img = _imageSave($info['content_type'], $file_tmp_name);
 		unlink($file_tmp_name);
 
 		$send['html'] = _imageDD($img);

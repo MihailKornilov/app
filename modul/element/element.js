@@ -4111,7 +4111,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return send.join(',');
 	},
 
-	//просмотр изображений
+	//просмотр изображений [65]
 	PHP12_image_show = function() {
 		var IMS = $('#_image-show'),
 			IU = IMS.find('.iu'),
@@ -4134,6 +4134,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					}
 				});
 			};
+		IMAIN.height(IMAIN_H);
 		IMAIN.click(function() {//нажатие на основное изображение
 			if(!IMG_IDS.length) {//если изображение всего одно, то закрытие диалога
 				DIALOG[65].close();

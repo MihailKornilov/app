@@ -2681,7 +2681,7 @@ function PHP12_page_menu_type($prm) {
 
 
 	$send = '';
-	for($n = 1; $n <= 4; $n++)
+	for($n = 1; $n <= 5; $n++)
 		$send .= '<div class="page-menu type'.$n._dn($n != $sel, 'sel').'" val="'.$n.'"></div>';
 
 	return $send;
@@ -4623,7 +4623,7 @@ function _imageServer($v) {//получение сервера (пути) для
 function _imageNo($width=80) {//картинка, если изображнеия нет
 	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="'.$width.'" />';
 }
-function _imageHtml($r, $width=80, $h=0) {//получение картинки в html-формате
+function _imageHtml($r, $width=80, $h=0, $click=true) {//получение картинки в html-формате
 	if(empty($r))
 		return _imageNo($width);
 	if(!is_array($r))
@@ -4645,8 +4645,11 @@ function _imageHtml($r, $width=80, $h=0) {//получение картинки 
 		'<img src="'._imageServer($r['server_id']).$r[$st.'_name'].'"'.
 			' width="'.$width.'"'.
 	  ($h ? ' height= "'.$h.'"' : '').
-			' class="image-open"'.
-			' val="'.(empty($r['ids']) ? $r['id'] : $r['ids']).'"'.
+
+  ($click ? ' class="image-open"'.
+			' val="'.(empty($r['ids']) ? $r['id'] : $r['ids']).'"'
+  : '').
+
 		' />';
 }
 function _imageNameCreate() {//формирование имени файла из случайных символов
@@ -4656,12 +4659,18 @@ function _imageNameCreate() {//формирование имени файла и
 		$name .= $arr[rand(0,35)];
 	return $name;
 }
-function _imageImCreate($im, $x_cur, $y_cur, $x_new, $y_new, $name) {//сжатие изображения
+function _imageImCreate($im, $x_cur, $y_cur, $x_new, $y_new, $name, $exp) {//сжатие изображения
 	$send = _imageResize($x_cur, $y_cur, $x_new, $y_new);
 
 	$im_new = imagecreatetruecolor($send['x'], $send['y']);
+	imagealphablending($im_new, false);//устанавливает режим смешивания
+	imagesavealpha($im_new, true);//сохранять информацию о прозрачности
 	imagecopyresampled($im_new, $im, 0, 0, 0, 0, $send['x'], $send['y'], $x_cur, $y_cur);
-	imagejpeg($im_new, $name, 80);
+	switch($exp) {
+		case 'png': imagepng($im_new, $name); break;
+		case 'gif': imagegif($im_new, $name); break;
+		default: imagejpeg($im_new, $name, 79);
+	}
 	imagedestroy($im_new);
 
 	$send['size'] = filesize($name);
@@ -4706,10 +4715,11 @@ function _imageSave($file_type, $file_tmp_name) {
 	if(!is_dir($IMAGE_PATH))
 		mkdir($IMAGE_PATH, 0777, true);
 
+	$exp = 'jpg';
 	switch($file_type) {
 		case 'image/jpeg': $im = @imagecreatefromjpeg($file_tmp_name); break;
-		case 'image/png': $im = @imagecreatefrompng($file_tmp_name); break;
-		case 'image/gif': $im = @imagecreatefromgif($file_tmp_name); break;
+		case 'image/png': $im = @imagecreatefrompng($file_tmp_name); $exp = 'png'; break;
+		case 'image/gif': $im = @imagecreatefromgif($file_tmp_name); $exp = 'gif'; break;
 		case 'image/tiff':
 			$tmp = $IMAGE_PATH.'/'.USER_ID.'.jpg';
 			$image = NewMagickWand(); // magickwand.org
@@ -4729,15 +4739,15 @@ function _imageSave($file_type, $file_tmp_name) {
 
 	$x = imagesx($im);
 	$y = imagesy($im);
-	if($x < 100 || $y < 100)
-		jsonError('Изображение слишком маленькое.<br>Используйте размер не менее 100х100 px.');
+	if($x < 10 || $y < 10)
+		jsonError('Изображение слишком маленькое.<br>Используйте размер не менее 10x10 px.');
 
 	$fileName = time().'-'._imageNameCreate();
-	$NAME_MAX = $fileName.'-900.jpg';
-	$NAME_80 = $fileName.'-80.jpg';
+	$NAME_MAX = $fileName.'-900.'.$exp;
+	$NAME_80 = $fileName.'-80.'.$exp;
 
-	$max = _imageImCreate($im, $x, $y, 900, 900, $IMAGE_PATH.'/'.$NAME_MAX);
-	$_80 = _imageImCreate($im, $x, $y, 80, 80, $IMAGE_PATH.'/'.$NAME_80);
+	$max = _imageImCreate($im, $x, $y, 900, 900, $IMAGE_PATH.'/'.$NAME_MAX, $exp);
+	$_80 = _imageImCreate($im, $x, $y, 80, 80, $IMAGE_PATH.'/'.$NAME_80, $exp);
 
 	$sql = "SELECT IFNULL(MAX(`sort`)+1,0)
 			FROM `_image`

@@ -192,6 +192,8 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 	if(!$menu)
 		return 'Разделов нет.';
 
+	$menu = _spisokImage($menu);
+
 	$razdel = '';
 	foreach($menu as $page_id => $r) {
 		$sel = _page('is_cur_parent', $r['id']) ? ' sel' : '';
@@ -215,9 +217,11 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 		$href = $is_edit ? '' : ' href="'.URL.'&p='.$page_id.'"';
 		$curd = _dn(!$is_edit, 'curD');
 
+
+
 		$razdel .=
 			'<a class="link'.$sel.$curd.'"'.$href.'>'.
-				$r['name'].
+				_imageHtml($r['image_ids'], 24, 24, false).
 			'</a>';
 	}
 

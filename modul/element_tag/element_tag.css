@@ -566,6 +566,12 @@
 ._menu4 .link:hover{text-decoration:none}
 ._menu4 .link:not(.sel):hover{background-color:#e9edf1}
 
+/* type 5: с использованием иконок */
+._menu5 .link{display:block;padding:10px 5px}
+._menu5 .link.sel{background-color:#D2DDE7;color:#fff}
+._menu5 .link:hover{text-decoration:none}
+._menu5 .link:not(.sel):hover{background-color:#e9edf1}
+
 
 
 
@@ -585,9 +591,17 @@
 .page-menu.type2{background-position-y:-88px}
 .page-menu.type3{background-position-y:-170px}
 .page-menu.type4{
+	display:inline-block;
 	background-position: 0 -266px;
 	width:152px;
 	height:120px;
+}
+.page-menu.type5{
+	display:inline-block;
+	background-position: 0 -400px;
+	width:152px;
+	height:120px;
+	margin-left:5px;
 }
 .page-menu:not(.sel):hover{border-color:#CBD7E9;opacity:.7}
 .page-menu.sel{
