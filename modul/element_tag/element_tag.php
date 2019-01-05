@@ -217,12 +217,10 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 		$href = $is_edit ? '' : ' href="'.URL.'&p='.$page_id.'"';
 		$curd = _dn(!$is_edit, 'curD');
 
+		if($el['num_2'] == 5)
+			$r['name'] = _imageHtml($r['image_ids'], 24, 24, false);
 
-
-		$razdel .=
-			'<a class="link'.$sel.$curd.'"'.$href.'>'.
-				_imageHtml($r['image_ids'], 24, 24, false).
-			'</a>';
+		$razdel .= '<a class="link'.$sel.$curd.'"'.$href.'>'.$r['name'].'</a>';
 	}
 
 	return '<div class="_menu'.$el['num_2'].'">'.$razdel.'</div>';
