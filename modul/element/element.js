@@ -1325,8 +1325,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//Меню переключения блоков
 				case 57:
 					var type = {
-							1158:3,
-							1159:2
+							1158:2,
+							1159:3
 						},
 						toggle = function(id) {
 							_forN(vvv, function(sp) {
