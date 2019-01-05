@@ -1398,19 +1398,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//Загрузка изображений
 				case 60:
-					var AEL = ATR_EL,
-						load = AEL.find('._image-load'),
-						prc = AEL.find('._image-prc'), //div для отображения процентов
+					var load = ATR_EL.find('._image-load'),
+						prc = ATR_EL.find('._image-prc'), //div для отображения процентов
 						ids_upd = function() {//обновление id загруженных изображений
 							var ids = [];
-							_forEq(AEL.find('dd.curM'), function(sp) {
+							_forEq(ATR_EL.find('dd.curM'), function(sp) {
 								ids.push(sp.attr('val'));
 							});
 							ATR_CMP.val(ids.join(','));
 
 							//установка действия для удаления изображения
-							AEL.find('.icon-off').off('click');
-							AEL.find('.icon-off').on('click', function(e) {
+							ATR_EL.find('.icon-off').off('click');
+							ATR_EL.find('.icon-off').on('click', function(e) {
 								e.stopPropagation();
 								var dd = $(this).parent();
 								$(this).remove();
@@ -1448,6 +1447,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									});
 									return;
 								}
+								_cons(res);
 								load.parent().before(res.html);
 								ids_upd();
 						    });
@@ -1456,19 +1456,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						    var data = new FormData;
 						    data.append('f1', file);
 						    data.append('op', 'image_upload');
-						    data.append('obj_name', 'elem_' + elm_id + '_' + USER_ID);
-						    data.append('obj_id', _num(unit.id));
 						    xhr.send(data);
 						};
 
 					//Загрузка изображения из файла
 					ids_upd();
-					AEL.find('dl').sortable({
+					ATR_EL.find('dl').sortable({
 						items:'.curM',
 						placeholder:'ui-hold',
 						update:ids_upd
 					});
-					AEL.find('.tab-load td').mouseenter(function() {
+					ATR_EL.find('.tab-load td').mouseenter(function() {
 						var t = $(this),
 							msg = 'Выбрать картинку из файлов.' +
 								  '<br>' +
@@ -1496,13 +1494,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							delayShow:1000
 						});
 					});
-					AEL.find('form input').change(function() {
+					ATR_EL.find('form input').change(function() {
 						load.addClass('busy');
 						xhr_upload(this.files[0]);
 					});
 
 					//Загрузка изображения по ссылке
-					var linkDiv = AEL.find('._image-link'), //поле с ссылкой на изображение
+					var linkDiv = ATR_EL.find('._image-link'), //поле с ссылкой на изображение
 						linkInp = linkDiv.find('input'),
 						iconOk = linkDiv.find('.icon-ok'),
 						linkOkFunc = function() {
@@ -1525,7 +1523,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								linkInp.focus();
 							});
 						};
-					AEL.find('.ii2').click(function() {
+					ATR_EL.find('.ii2').click(function() {
 						load.addClass('dis');
 						linkDiv.slideDown(200);
 						linkInp.val('').focus();
@@ -1584,7 +1582,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							}
 							return taBytes;
 						};
-					AEL.find('.ii3').click(function() {
+					ATR_EL.find('.ii3').click(function() {
 						_dialogLoad({
 							dialog_id:61,
 							busy_obj:load,
@@ -1603,7 +1601,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 
 					//Удалённые изображения
-					AEL.find('.ii4').click(function() {
+					ATR_EL.find('.ii4').click(function() {
 						var t = $(this);
 						if(t.hasClass('empty'))
 							return;
@@ -4113,15 +4111,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return send.join(',');
 	},
 
-	_imageShow = function() {//просмотр изображений. Подключается функцией [12]
+	//просмотр изображений
+	PHP12_image_show = function() {
 		var IMS = $('#_image-show'),
 			IU = IMS.find('.iu'),
 			IMAIN = $('#_image-main'),
+			IMAIN_H = IMAIN.height(),
 			imNext = function(next_id) {//установка следующего изображения
 				var im = IMG_ASS[next_id];
 				IU.removeClass('sel');
 				IMAIN.html('<img src="' + im.src + '" width="' + im.x + '" height="' + im.y + '" />');
 				IMAIN.attr('val', next_id);
+				if(IMAIN_H < IMAIN.height()) {
+					IMAIN_H = IMAIN.height();
+					IMAIN.height(IMAIN_H);
+				}
 				_forEq(IU, function(sp) {
 					var id = _num(sp.attr('val'));
 					if(id == next_id) {
@@ -4194,7 +4198,7 @@ $(document)
 			id = t.attr('val');
 		_dialogLoad({
 			dialog_id:65,
-			get_id:id,
+			dop:id,
 			busy_obj:t.parent()
 		});
 	});

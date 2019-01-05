@@ -940,31 +940,14 @@ function _cmpV60($cmp, $unit) {//Применение загруженных и�
 	//поле, хранящее список id изображений
 	if(!$col = $cmp['col'])
 		return;
+	if(!$img = $unit[$col])
+		return;
+	if(!$ids = @$img['ids'])
+		return;
 
-	//прикрепление изображений к единице списка
-	$sql = "UPDATE `_image`
-			SET `obj_name`='elem_".$cmp['id']."',
-				`obj_id`=".$unit['id']."
-			WHERE `obj_name`='elem_".$cmp['id']."_".USER_ID."'";
-	query($sql);
-
-	$sql = "UPDATE `_image`
-			SET `deleted`=1,
-				`user_id_del`=".USER_ID.",
-				`dtime_del`=CURRENT_TIMESTAMP
-			WHERE `obj_name`='elem_".$cmp['id']."'
-			  AND `obj_id`=".$unit['id']."
-			  AND `id` NOT IN ("._ids($unit[$col]).")";
-	query($sql);
-
-	//обновление сортировки
-	$sort = 0;
-	foreach(_ids($unit[$col], 1) as $id) {
+	foreach(explode(',', $ids) as $n => $id) {
 		$sql = "UPDATE `_image`
-				SET `sort`=".$sort++.",
-					`deleted`=0,
-					`user_id_del`=0,
-					`dtime_del`='0000-00-00 00:00:00'
+				SET `sort`=".$n."
 				WHERE `id`=".$id;
 		query($sql);
 	}

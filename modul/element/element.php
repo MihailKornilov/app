@@ -4340,6 +4340,11 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 		$name = '';
 		foreach($dialog['cmp'] as $cmp_id => $cmp)
 			if($i == $cmp['col']) {
+				//картирки в историю не попадают
+				if($cmp['dialog_id'] == 60) {
+					$hidden = true;
+					break;
+				}
 				if($cmp['hidden']) {
 					$hidden = true;
 					break;
@@ -4619,6 +4624,13 @@ function _imageNo($width=80) {//картинка, если изображнеи�
 	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="'.$width.'" />';
 }
 function _imageHtml($r, $width=80, $h=0) {//получение картинки в html-формате
+	if(empty($r))
+		return _imageNo($width);
+	if(!is_array($r))
+		return _imageNo($width);
+	if(empty($r['id']))
+		return _imageNo($width);
+
 	$width = $width ? $width : 80;
 
 	$st = $width > 80 ? 'max' : 80;
@@ -4634,7 +4646,7 @@ function _imageHtml($r, $width=80, $h=0) {//получение картинки 
 			' width="'.$width.'"'.
 	  ($h ? ' height= "'.$h.'"' : '').
 			' class="image-open"'.
-			' val="'.$r['id'].'"'.
+			' val="'.(empty($r['ids']) ? $r['id'] : $r['ids']).'"'.
 		' />';
 }
 function _imageNameCreate() {//формирование имени файла из случайных символов
@@ -4685,7 +4697,7 @@ function _imageResize($x_cur, $y_cur, $x_new, $y_new) {//изменение ра
 	);
 }
 
-function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
+function _imageSave($file_type, $file_tmp_name) {
 	$im = null;
 	$IMAGE_PATH = APP_PATH.'/.image/'.APP_ID;
 	$server_id = _imageServer('//'.DOMAIN.APP_HTML.'/.image/'.APP_ID.'/');
@@ -4729,9 +4741,7 @@ function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
 
 	$sql = "SELECT IFNULL(MAX(`sort`)+1,0)
 			FROM `_image`
-			WHERE !`deleted`
-			  AND `obj_name`='".$obj_name."'
-			  AND `obj_id`=".$obj_id;
+			WHERE !`deleted`";
 	$sort = query_value($sql);
 
 	$sql = "INSERT INTO `_image` (
@@ -4747,9 +4757,6 @@ function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
 				`80_y`,
 				`80_size`,
 
-				`obj_name`,
-				`obj_id`,
-
 				`sort`,
 				`user_id_add`
 			) VALUES (
@@ -4764,9 +4771,6 @@ function _imageSave($obj_name, $obj_id, $file_type, $file_tmp_name) {
 				".$_80['x'].",
 				".$_80['y'].",
 				".$_80['size'].",
-
-				'".$obj_name."',
-				".$obj_id.",
 
 				".$sort.",
 				".USER_ID."
@@ -4789,16 +4793,19 @@ function _imageDD($img) {//единица изображения для наст
 	'</dd>';
 }
 
-function _imageShow($prm) {//просмотр изображений (вставляется в блок через [12])
+function PHP12_image_show($prm) {//просмотр изображений
 	$image = 'Изображение отсутствует.';//основная картинка, на которую нажали. Выводится первой
 	$spisok = '';//html-список дополнительных изображений
 	$spisokJs = array();//js-список всех изображений
 	$spisokIds = array();//id картинок по порядку
-	if($image_id = $prm['unit_get_id']) {
+	$image_id = 0;
+
+	if($ids = $prm['dop']) {
 		$sql = "SELECT *
 				FROM `_image`
-				WHERE `id`=".$image_id;
+				WHERE `id`="._idsFirst($ids);
 		if($im = query_assoc($sql)) {
+			$image_id = $im['id'];
 			$image = '<img src="'._imageServer($im['server_id']).$im['max_name'].'"'.
 						 ' width="'.$im['max_x'].'"'.
 						 ' height="'.$im['max_y'].'"'.
@@ -4806,8 +4813,7 @@ function _imageShow($prm) {//просмотр изображений (встав
 
 			$sql = "SELECT *
 					FROM `_image`
-					WHERE `obj_name`='".$im['obj_name']."'
-					  AND `obj_id`=".$im['obj_id']."
+					WHERE `id` IN (".$ids.")
 					  AND `deleted`=".$im['deleted']."
 					ORDER BY `".($im['deleted'] ? 'dtime_del' : 'sort')."`";
 			$arr = query_arr($sql);

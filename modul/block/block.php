@@ -1407,38 +1407,23 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			if($prm['blk_setup'])
 				return _emptyMin('Изображения');
 
-			//отметка загруженных изображений как неиспользуемые, которые были не сохранены в предыдущий раз
-			$sql = "UPDATE `_image`
-					SET `obj_name`='elem_".$el['id']."',
-						`deleted`=1,
-						`user_id_del`=".USER_ID.",
-						`dtime_del`=CURRENT_TIMESTAMP
-					WHERE `obj_name`='elem_".$el['id']."_".USER_ID."'";
-			query($sql);
-
-			$v = 0;
 			$html = '';
 			$del_count = 0;
-			if($u = $prm['unit_edit']) {
+			if($v = _elemPrintV($el, $prm)) {
 				$sql = "SELECT *
 						FROM `_image`
-						WHERE `obj_name`='elem_".$el['id']."'
-						  AND `obj_id`=".$u['id']."
-						  AND !`deleted`
+						WHERE !`deleted`
+						  AND `id` IN (".$v.")
 						ORDER BY `sort`";
-				if($spisok = query_arr($sql))
-					foreach($spisok as $r)
-						$html .= _imageDD($r);
+				foreach(query_arr($sql) as $r)
+					$html .= _imageDD($r);
 
+/*
 				$sql = "SELECT COUNT(*)
 						FROM `_image`
-						WHERE `obj_name`='elem_".$el['id']."'
-						  AND `obj_id`=".$u['id']."
-						  AND `deleted`";
+						WHERE `deleted`";
 				$del_count = query_value($sql);
-
-				$col = $el['col'];
-				$v = _num($u[$col]);
+*/
 			}
 			return
 			'<div class="_image">'.
@@ -1831,8 +1816,14 @@ function _elemPrintV($el, $prm, $def='') {//значение записи при
 
 	$v = $u[$col];
 
-	if(is_array($v))
-		return _num($v['id']);
+	if(is_array($v)) {
+		//идентификаторы изображений
+		if($ids = @$v['ids'])
+			return $ids;
+		if($id = _num(@$v['id']))
+			return $id;
+		return $def;
+	}
 	if(is_string($v) && preg_match(REGEXP_INTEGER, $v))
 		return $v * 1;
 

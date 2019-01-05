@@ -298,6 +298,15 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1;
 
 	return $send;
 }
+function _idsFirst($v) {//первое значение последовательного массива (или идентификаторов через запятую)
+	if(empty($v))
+		return 0;
+
+	if(!is_array($v))
+		$v = _ids($v, 1);
+
+	return _num($v[0]);
+}
 function _idsLast($v) {//последнее значение последовательного массива (или идентификаторов через запятую)
 	if(empty($v))
 		return 0;

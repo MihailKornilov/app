@@ -375,16 +375,12 @@ switch(@$_POST['op']) {
 		break;
 
 	case 'image_upload'://добавление изображения
-		if(!$obj_name = _txt(@$_POST['obj_name']))
-			jsonError('Отсутствует имя объекта');
 		if(!$f = @$_FILES['f1'])
 			jsonError('Файл отсутствует');
 		if($f['size'] > 15728640)
 			jsonError('Размер изображения не должен быть более 15 Мб');
 
-		$obj_id = _num(@$_POST['obj_id']);
-
-		$img = _imageSave($obj_name, $obj_id, $f['type'], $f['tmp_name']);
+		$img = _imageSave($f['type'], $f['tmp_name']);
 
 		$send['html'] = _imageDD($img);
 

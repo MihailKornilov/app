@@ -399,19 +399,27 @@ function _spisokImage($spisok) {//вставка картинок
 		if(!$col = $cmp['col'])
 			continue;
 
-		foreach($spisok as $id => $r)
-			$spisok[$id][$col] = array();
+		//подготовка массива для вставки изображения
+		$image_ids = array();
+		foreach($spisok as $id => $r) {
+			$ids = $r[$col];
+			if($iid = _idsFirst($ids))
+				$image_ids[$id] = $iid;
+			$spisok[$id][$col] = array('ids'=>$ids);
+		}
 
-		$sql = "/* ".__FUNCTION__.":".__LINE__." Картинки для списка ".$DLG['name']." */
-				SELECT *
-				FROM `_image`
-				WHERE `obj_name`='elem_".$cmp_id."'
-				  AND `obj_id` IN ("._idsGet($spisok).")
-				  AND !`deleted`
-				  AND !`sort`";
-		if($arr = query_arr($sql))
-			foreach($arr as$r)
-				$spisok[$r['obj_id']][$col] = $r;
+		if($image_ids) {
+			$sql = "/* ".__FUNCTION__.":".__LINE__." Картинки для списка ".$DLG['name']." */
+					SELECT *
+					FROM `_image`
+					WHERE `id` IN (".implode(',', $image_ids).")
+					  AND !`deleted`";
+			if($img = query_arr($sql))
+				foreach($spisok as $id => $r)
+					if($image_id = _num(@$image_ids[$id]))
+						if(!empty($img[$image_id]))
+							$spisok[$id][$col] += $img[$image_id];
+		}
 	}
 
 	return $spisok;
