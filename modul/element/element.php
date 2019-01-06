@@ -4575,7 +4575,83 @@ function _historyCondPageUnit($el) {//отображение истории дл
 
 
 
+function _image($el, $prm) {//элемент - загрузка изображений [60]
+/*
+	Загрузка изображений производится тремя способами:
+		1. Выбор файла
+		2. Вставка прямой ссылки, либо скриншок
+		3. Вебкамера
 
+	Данные об изображениях хранятся в таблице `_image`.
+	В объекте указываются id прикреплённых изображений в текстовой колонке.
+	Если id изображения со знаком минус - это изображение было удалено и находится с корзине объекта.
+
+	Просмотр изображения производится диалогом [65].
+	Класс '.image-open' отвечает за открытие изображения.
+	Диалогу [65] передаются все идентифитаторы изображений, прикреплённые объекту.
+
+	Функция _spisokImage переводит ПЕРВЫЙ id изображения в данные для каждого объекта.
+	Идентификаторы помещаются в переменную 'ids'.
+	Если изображений нет в объекте, создаётся пустой массив array('ids'=>'').
+*/
+
+	if($prm['blk_setup'])
+		return _emptyMin('Изображения');
+
+	$html = '';
+	$del_count = 0;
+	if($v = _elemPrintV($el, $prm)) {
+		$sql = "SELECT *
+				FROM `_image`
+				WHERE !`deleted`
+				  AND `id` IN (".$v.")
+				ORDER BY `sort`";
+		foreach(query_arr($sql) as $r)
+			$html .= _imageDD($r);
+
+/*
+		$sql = "SELECT COUNT(*)
+				FROM `_image`
+				WHERE `deleted`";
+		$del_count = query_value($sql);
+*/
+	}
+	return
+	'<div class="_image">'.
+		'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+		'<dl>'.
+			$html.
+			'<dd class="dib">'.
+				'<table class="_image-load">'.
+					'<tr><td>'.
+							'<div class="_image-add icon-image"></div>'.
+							'<div class="icon-image spin"></div>'.
+							'<div class="_image-prc"></div>'.
+							'<div class="_image-dis"></div>'.
+							'<table class="tab-load">'.
+								'<tr><td class="icon-image ii1">'.//Выбрать из файлов
+										'<form>'.
+											'<input type="file" accept="image/jpeg,image/png,image/gif,image/tiff" />'.
+										'</form>'.
+									'<td class="icon-image ii2">'.//Указать ссылку на изображение
+								'<tr><td class="icon-image ii3">'.//Фото с вебкамеры
+									'<td class="icon-image ii4'._dn($del_count, 'empty').'" val="'.$del_count.'">'.//Достать из корзины
+							'</table>'.
+
+				'</table>'.
+			'</dd>'.
+		'</dl>'.
+		'<div class="_image-link dn mt5">'.
+			'<table class="w100p">'.
+				'<tr><td>'.
+						'<input type="text" class="w100p" placeholder="вставьте ссылку или скриншот и нажмите Enter" />'.
+					'<td class="w50 center">'.
+						'<div class="icon icon-ok"></div>'.
+						'<div class="icon icon-del pl ml5"></div>'.
+			'</table>'.
+		'</div>'.
+	'</div>';
+}
 function _imageServerCache() {//кеширование серверов изображений
 	$key = 'IMG_SERVER';
 	if($arr = _cache_get($key, 1))

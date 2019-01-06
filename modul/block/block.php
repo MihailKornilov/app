@@ -1404,62 +1404,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				num_1 - максимальное количество изображений, которое разрешено загрузить
 				num_7 - ограничение высоты (настройка стилей)
 			*/
-			if($prm['blk_setup'])
-				return _emptyMin('Изображения');
-
-			$html = '';
-			$del_count = 0;
-			if($v = _elemPrintV($el, $prm)) {
-				$sql = "SELECT *
-						FROM `_image`
-						WHERE !`deleted`
-						  AND `id` IN (".$v.")
-						ORDER BY `sort`";
-				foreach(query_arr($sql) as $r)
-					$html .= _imageDD($r);
-
-/*
-				$sql = "SELECT COUNT(*)
-						FROM `_image`
-						WHERE `deleted`";
-				$del_count = query_value($sql);
-*/
-			}
-			return
-			'<div class="_image">'.
-				'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-				'<dl>'.
-					$html.
-					'<dd class="dib">'.
-						'<table class="_image-load">'.
-							'<tr><td>'.
-									'<div class="_image-add icon-image"></div>'.
-									'<div class="icon-image spin"></div>'.
-									'<div class="_image-prc"></div>'.
-									'<div class="_image-dis"></div>'.
-									'<table class="tab-load">'.
-										'<tr><td class="icon-image ii1">'.//Выбрать из файлов
-												'<form>'.
-													'<input type="file" accept="image/jpeg,image/png,image/gif,image/tiff" />'.
-												'</form>'.
-											'<td class="icon-image ii2">'.      //Указать ссылку на изображение
-										'<tr><td class="icon-image ii3">'.      //Фото с вебкамеры
-											'<td class="icon-image ii4'._dn($del_count, 'empty').'" val="'.$del_count.'">'.//Достать из корзины
-									'</table>'.
-
-						'</table>'.
-					'</dd>'.
-				'</dl>'.
-				'<div class="_image-link dn mt5">'.
-					'<table class="w100p">'.
-						'<tr><td>'.
-								'<input type="text" class="w100p" placeholder="вставьте ссылку или скриншот и нажмите Enter" />'.
-							'<td class="w50 center">'.
-								'<div class="icon icon-ok"></div>'.
-								'<div class="icon icon-del pl ml5"></div>'.
-					'</table>'.
-				'</div>'.
-			'</div>';
+			return _image($el, $prm);
 
 		//Фильтр: галочка
 		case 62:
