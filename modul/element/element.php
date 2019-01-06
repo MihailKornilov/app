@@ -4375,6 +4375,7 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 	$insert = array();
 	foreach($edited as $r)
 		$insert[] = "(
+			".APP_ID.",
 			".$history_id.",
 			'".$r['name']."',
 			'".addslashes($r['old'])."',
@@ -4382,6 +4383,7 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 		)";
 
 	$sql = "INSERT INTO `_history_edited` (
+				`app_id`,
 				`history_id`,
 				`name`,
 				`old`,
@@ -4831,6 +4833,7 @@ function _imageSave($file_type, $file_tmp_name) {
 	$sort = query_value($sql);
 
 	$sql = "INSERT INTO `_image` (
+				`app_id`,
 				`server_id`,
 
 				`max_name`,
@@ -4846,6 +4849,7 @@ function _imageSave($file_type, $file_tmp_name) {
 				`sort`,
 				`user_id_add`
 			) VALUES (
+				".APP_ID.",
 				".$server_id.",
 
 				'".$NAME_MAX."',

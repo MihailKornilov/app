@@ -40,9 +40,8 @@ function _userCache($user_id) {
 	$u['src'] = 'https://vk.com/images/camera_50.png';
 	$sql = "SELECT *
 			FROM `_image`
-			WHERE `obj_name`='elem_1778'
-			  AND `obj_id`=".$user_id."
-			  AND !`sort`
+			WHERE !`sort`
+			  AND !`id`
 			LIMIT 1";
 	if($img = query_assoc($sql))
 		$u['src'] = _imageServer($img['server_id']).$img['80_name'];
@@ -151,6 +150,7 @@ function _userImageMove() {//перенос аватарок пользоват�
 		$name = $ex[$c];
 
 		$sql = "INSERT INTO `_image` (
+					`app_id`,
 					`server_id`,
 	
 					`max_name`,
@@ -166,6 +166,7 @@ function _userImageMove() {//перенос аватарок пользоват�
 	
 					`user_id_add`
 				) VALUES (
+					".APP_ID.",
 					"._imageServer($server).",
 	
 					'".$name."',
