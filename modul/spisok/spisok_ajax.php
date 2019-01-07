@@ -388,7 +388,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 				$unit['func12'] = $func($cmp, @$_POST['vvv'][$cmp_id], $unit);
 				break;
 			//Применение загруженных изображений
-			case 60: _cmpV60($cmp, $unit); break;
+			case 60: _image60_save($cmp, $unit); break;
 		}
 
 	_spisokUnitUpd27($unit);
@@ -935,22 +935,6 @@ function _spisokAction4($send) {//действие 4 - обновление ис
 	$send['dss4'] = $dialog_id;
 
 	return $send;
-}
-function _cmpV60($cmp, $unit) {//Применение загруженных изображений
-	//поле, хранящее список id изображений
-	if(!$col = $cmp['col'])
-		return;
-	if(!$img = $unit[$col])
-		return;
-	if(!$ids = @$img['ids'])
-		return;
-
-	foreach(explode(',', $ids) as $n => $id) {
-		$sql = "UPDATE `_image`
-				SET `sort`=".$n."
-				WHERE `id`=".$id;
-		query($sql);
-	}
 }
 
 function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id диалога при создании условий удаления записи

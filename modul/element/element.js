@@ -1400,11 +1400,40 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 60:
 					var load = ATR_EL.find('._image-load'),
 						prc = ATR_EL.find('._image-prc'), //div для отображения процентов
+						II4 = ATR_EL.find('.ii4'),//корзина
 						ids_upd = function() {//обновление id загруженных изображений
-							var ids = [];
-							_forEq(ATR_EL.find('dd.curM'), function(sp) {
-								ids.push(sp.attr('val'));
+							var idsSave = ATR_CMP.val().split(','),//предварительное сохранение всех идентификаторов
+								ids = [],
+								ii4Empty = true;//статус для корзины
+
+							//приведение всех id в статус: удалён
+							_forN(idsSave, function(id, n) {
+								if(id > 0)
+									idsSave[n] = id * -1;
 							});
+
+							_forEq(ATR_EL.find('dd.curM'), function(sp) {
+								var idd = _num(sp.attr('val'));
+								ids.push(idd);
+								//если картинка существует, то убираем из удалённых
+								_forN(idsSave, function(id, n) {
+									if(idd == Math.abs(id)) {
+										delete idsSave[n];
+										return false;
+									}
+								});
+							});
+
+							//дополнение идентификаторов удалёнными
+							_forN(idsSave, function(id) {
+								if(id) {
+									ids.push(id);
+									ii4Empty = false;
+								}
+							});
+							//изменение статуса корзины, если есть удалённые изображения
+							II4._dn(!ii4Empty, 'empty');
+
 							ATR_CMP.val(ids.join(','));
 
 							//установка действия для удаления изображения
@@ -1447,7 +1476,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									});
 									return;
 								}
-								_cons(res);
 								load.parent().before(res.html);
 								ids_upd();
 						    });
@@ -1459,13 +1487,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						    xhr.send(data);
 						};
 
-					//Загрузка изображения из файла
 					ids_upd();
 					ATR_EL.find('dl').sortable({
 						items:'.curM',
 						placeholder:'ui-hold',
 						update:ids_upd
 					});
+
+					//Выбор способа загрузки
 					ATR_EL.find('.tab-load td').mouseenter(function() {
 						var t = $(this),
 							msg = 'Выбрать картинку из файлов.' +
@@ -1494,6 +1523,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							delayShow:1000
 						});
 					});
+
+					//Загрузка изображения из файла
 					ATR_EL.find('form input').change(function() {
 						load.addClass('busy');
 						xhr_upload(this.files[0]);
@@ -1601,28 +1632,26 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 
 					//Удалённые изображения
-					ATR_EL.find('.ii4').click(function() {
-						var t = $(this);
-						if(t.hasClass('empty'))
+					II4.click(function() {
+						if($(this).hasClass('empty'))
 							return;
 
 						_dialogLoad({
 							dialog_id:63,
-							get_id:_num(unit.id),
-							prm:{elem_id:elm_id},
+							dop:ATR_CMP.val(),
 							busy_obj:load,
 							busy_cls:'busy',
 							func_open:function(res, dlg) {
 								dlg.content.find('.icon-recover').click(function() {
-									var t = $(this),
+									var tt = $(this),
 										send = {
 											op:'image_recover',
-											id:t.attr('val'),
-											busy_obj:t,
+											id:tt.attr('val'),
+											busy_obj:tt,
 											busy_cls:'spin'
 										};
 									_post(send, function(res) {
-										t.parent().remove();
+										tt.parent().remove();
 										load.parent().before(res.html);
 										ids_upd();
 									});

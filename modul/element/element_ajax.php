@@ -441,9 +441,6 @@ switch(@$_POST['op']) {
 		if(!$img = query_assoc($sql))
 			jsonError('Изображения не существует');
 
-		if(!$img['deleted'])
-			jsonError('Изображение не было удалено');
-
 		$send['html'] = _imageDD($img);
 		jsonSuccess($send);
 		break;

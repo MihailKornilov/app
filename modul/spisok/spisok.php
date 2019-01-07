@@ -412,8 +412,7 @@ function _spisokImage($spisok) {//вставка картинок
 			$sql = "/* ".__FUNCTION__.":".__LINE__." Картинки для списка ".$DLG['name']." */
 					SELECT *
 					FROM `_image`
-					WHERE `id` IN (".implode(',', $image_ids).")
-					  AND !`deleted`";
+					WHERE `id` IN (".implode(',', $image_ids).")";
 			if($img = query_arr($sql))
 				foreach($spisok as $id => $r)
 					if($image_id = _num(@$image_ids[$id]))

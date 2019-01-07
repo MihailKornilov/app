@@ -4601,26 +4601,18 @@ function _image($el, $prm) {//элемент - загрузка изображе
 		return _emptyMin('Изображения');
 
 	$html = '';
-	$del_count = 0;
 	if($v = _elemPrintV($el, $prm)) {
 		$sql = "SELECT *
 				FROM `_image`
-				WHERE !`deleted`
-				  AND `id` IN (".$v.")
+				WHERE `id` IN ("._ids($v).")
 				ORDER BY `sort`";
 		foreach(query_arr($sql) as $r)
 			$html .= _imageDD($r);
-
-/*
-		$sql = "SELECT COUNT(*)
-				FROM `_image`
-				WHERE `deleted`";
-		$del_count = query_value($sql);
-*/
 	}
+
 	return
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 	'<div class="_image">'.
-		'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 		'<dl>'.
 			$html.
 			'<dd class="dib">'.
@@ -4637,7 +4629,7 @@ function _image($el, $prm) {//элемент - загрузка изображе
 										'</form>'.
 									'<td class="icon-image ii2">'.//Указать ссылку на изображение
 								'<tr><td class="icon-image ii3">'.//Фото с вебкамеры
-									'<td class="icon-image ii4'._dn($del_count, 'empty').'" val="'.$del_count.'">'.//Достать из корзины
+									'<td class="icon-image ii4 empty">'.//Достать из корзины
 							'</table>'.
 
 				'</table>'.
@@ -4827,9 +4819,7 @@ function _imageSave($file_type, $file_tmp_name) {
 	$max = _imageImCreate($im, $x, $y, 900, 900, $IMAGE_PATH.'/'.$NAME_MAX, $exp);
 	$_80 = _imageImCreate($im, $x, $y, 80, 80, $IMAGE_PATH.'/'.$NAME_80, $exp);
 
-	$sql = "SELECT IFNULL(MAX(`sort`)+1,0)
-			FROM `_image`
-			WHERE !`deleted`";
+	$sql = "SELECT IFNULL(MAX(`sort`)+1,0) FROM `_image`";
 	$sort = query_value($sql);
 
 	$sql = "INSERT INTO `_image` (
@@ -4883,6 +4873,24 @@ function _imageDD($img) {//единица изображения для наст
 	'</dd>';
 }
 
+function _image60_save($cmp, $unit) {//Применение загруженных изображений после сохранения
+	//поле, хранящее список id изображений
+	if(!$col = $cmp['col'])
+		return;
+	if(!$img = $unit[$col])
+		return;
+	if(!$ids = @$img['ids'])
+		return;
+
+	foreach(explode(',', $ids) as $n => $id) {
+		$sql = "UPDATE `_image`
+				SET `sort`=".$n."
+				WHERE `id`=".$id;
+		query($sql);
+	}
+}
+
+
 function PHP12_image_show($prm) {//просмотр изображений
 	$image = 'Изображение отсутствует.';//основная картинка, на которую нажали. Выводится первой
 	$spisok = '';//html-список дополнительных изображений
@@ -4904,8 +4912,7 @@ function PHP12_image_show($prm) {//просмотр изображений
 			$sql = "SELECT *
 					FROM `_image`
 					WHERE `id` IN (".$ids.")
-					  AND `deleted`=".$im['deleted']."
-					ORDER BY `".($im['deleted'] ? 'dtime_del' : 'sort')."`";
+					ORDER BY `sort`";
 			$arr = query_arr($sql);
 			if(count($arr) > 1) {
 				$spisok = '<div class="line-t pad10 center bg-gr2">';
@@ -4945,21 +4952,28 @@ function PHP12_image_show($prm) {//просмотр изображений
 			'IMG_IDS=['.implode(',', $spisokIds).'];'.
 	'</script>';
 }
-function _imageDeleted($prm) {//удалённые изображения (вставляется в блок через [12])
-	return 'Требуется переделать функцию.';
-	if(!$obj_id = $prm['unit_get_id'])
-		return _emptyMin('Отсутствует запись, к которой прикрепляются изображения.');
-	if(!$elem_id = _num($SRC['prm']['elem_id']))
-		return _emptyMin('Отсутствует id элемента.');
+function PHP12_image_deleted($prm) {//удалённые изображения (вставляется в блок через [12])
+	if(!$dop = $prm['dop'])
+		return '<div class="_empty min">Удалённых изображений нет</div>';
+
+	$ids = array();
+	foreach(explode(',', $dop) as $r) {
+		if(!$id = _num($r, 1))
+			continue;
+		if($id > 0)
+			continue;
+		$ids[] = abs($id);
+	}
+
+	if(empty($ids))
+		return '<div class="_empty min">Удалённые изображения отсутствуют</div>';
 
 	$sql = "SELECT *
 			FROM `_image`
-			WHERE `obj_name`='elem_".$elem_id."'
-			  AND `obj_id`=".$obj_id."
-			  AND `deleted`
-			ORDER BY `dtime_del`";
+			WHERE `id` IN (".implode(',', $ids).")
+			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
-		return '<div class="_empty min">Удалённых изображений нет.</div>';
+		return '<div class="_empty min">Удалённые изображения не найдены</div>';
 
 	$html = '';
 	foreach($arr as $r) {

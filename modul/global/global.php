@@ -245,7 +245,7 @@ function _ids($ids, $return='ids') {//проверка корректности 
 	$arr = array();
 
 	foreach(explode(',', $ids) as $i => $id) {
-		if(!preg_match(REGEXP_NUMERIC, $id))
+		if(!preg_match(REGEXP_INTEGER, $id))
 			return _idsReturn(0, $return);
 		if(!_num($id))
 			continue;
@@ -301,9 +301,10 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1;
 function _idsFirst($v) {//первое значение последовательного массива (или идентификаторов через запятую)
 	if(empty($v))
 		return 0;
-
 	if(!is_array($v))
 		$v = _ids($v, 1);
+	if(!isset($v[0]))
+		return 0;
 
 	return _num($v[0]);
 }
