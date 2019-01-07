@@ -770,14 +770,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			switch(el.dialog_id) {
 				case 1://галочка
-					if(el.action) {
-						_elemAction(el, _num(ATR_CMP.val()), 1);
-						ATR_CMP._check({
-							func:function(v) {
-								_elemAction(el, v);
-							}
-						});
-					}
+					if(!el.action)
+						return;
+					_elemAction(el, _num(ATR_CMP.val()), 1);
+					ATR_CMP._check({
+						func:function(v) {
+							_elemAction(el, v);
+						}
+					});
 					return;
 				//textarea
 				case 5:	ATR_CMP._autosize(); return;
@@ -890,6 +890,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						INP.val('');
 						DEL._dn();
 						_elemReload(el);
+					});
+					return;
+				//Радио
+				case 16:
+					if(!el.action)
+						return;
+					_elemAction(el, _num(ATR_CMP.val()), 1);
+					ATR_CMP._radio({
+						func:function(v) {
+							_elemAction(el, v);
+						}
 					});
 					return;
 				//select - произвольные значения
@@ -1728,7 +1739,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 					RD._radio(CMP_SET);
 					return;
-				//Фильтр-галочка
+				//Фильтр-радио
 				case 74:
 					ATR_CMP._radio({
 						func:function(v) {

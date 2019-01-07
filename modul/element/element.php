@@ -1632,6 +1632,10 @@ function _elem201init($el85, $prm, $send) {//получение данных э�
 			break;
 		case 6: return _elem201initCnn($send, _jsCachePage());
 
+		case 16:
+			$vvv = _elemVvv($EL['id'], array());
+			return _elem201initCnn($send, _sel($vvv));
+
 		case 17:
 		case 18: return _elem201initCnn($send, _elemVvv17($EL['id']));
 
