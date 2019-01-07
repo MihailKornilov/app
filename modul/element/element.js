@@ -310,13 +310,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DLG = dialog.D;
 
 		DLG('#dialog-menu')._menu({
-			type:3,
 			spisok:o.menu,
 			func:function() {
 				_dialogHeightCorrect(DLG);
 			}
 		});
 		DLG('#menu_sa')._menu({
+			type:3,
 			spisok:o.menu_sa
 		});
 		DLG('#width_auto')._check({
