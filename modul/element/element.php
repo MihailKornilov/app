@@ -5042,6 +5042,33 @@ function PHP12_image_webcam($prm) {//Веб-камера [61]
 
 
 
+function _attachLinkRepair() {//временная фукнция для переделки ссылок на файлы todo на удаление
+	$sql = "SELECT *
+			FROM `_attach`
+			WHERE LENGTH(`link_old`)
+			LIMIT 1000";
+	if(!$arr = query_arr($sql))
+		return;
+
+	foreach($arr as $id => $r) {
+		$ex = explode('/', $r['link_old']);
+
+		$c = count($ex) - 1;
+		$fname = $ex[$c];
+		unset($ex[$c]);
+
+		$path = '/home/httpd/vhosts/nyandoma.ru/httpdocs'.implode('/', $ex).'/';
+		$link = '//nyandoma.ru'.implode('/', $ex).'/';
+
+		$sql = "UPDATE `_attach`
+				SET `fname`='".addslashes($fname)."',
+					`path`='".addslashes($path)."',
+					`link`='".addslashes($link)."',
+					`link_old`=''
+				WHERE `id`=".$id;
+		query($sql);
+	}
+}
 
 
 function _attachLink($attach_id) {//формирование ссылки на файл

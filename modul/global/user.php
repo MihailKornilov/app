@@ -133,6 +133,8 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 	return $user_id;
 }
 function _userImageMove() {//перенос аватарок пользователей в изображения
+	return;//требуется переделать
+
 	_cache_clear('IMG_SERVER');
 
 	$sql = "SELECT *

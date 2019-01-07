@@ -153,6 +153,7 @@ function _debug_cache_clear() {//очистка кеша
 
 	_cache_clear('all');
 
+	_attachLinkRepair();
 	_userImageMove();
 	_jsCache();
 }
