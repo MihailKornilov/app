@@ -4952,7 +4952,7 @@ function PHP12_image_show($prm) {//просмотр изображений
 			'IMG_IDS=['.implode(',', $spisokIds).'];'.
 	'</script>';
 }
-function PHP12_image_deleted($prm) {//удалённые изображения (вставляется в блок через [12])
+function PHP12_image_deleted($prm) {//удалённые изображения [63]
 	if(!$dop = $prm['dop'])
 		return '<div class="_empty min">Удалённых изображений нет</div>';
 
@@ -4989,7 +4989,8 @@ function PHP12_image_deleted($prm) {//удалённые изображения 
 
 	return '<div class="_image">'.$html.'</div>';
 }
-function _imageWebcam($el) {//Веб-камера (вставляется в блок через [12])
+function PHP12_image_webcam($prm) {//Веб-камера [61]
+	$el = $prm['el12'];
 	$width = $el['block']['width'];
 	$mar = explode(' ', $el['mar']);
 	$width = round($width - $mar[1] - $mar[3]);
