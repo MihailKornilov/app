@@ -5080,7 +5080,7 @@ function _attachLink($attach_id) {//формирование ссылки на �
 
 	return
 	'<div class="_attach-link">'.
-		'<a href="'.$r['link'].$r['fname'].'">'.
+		'<a href="'.$r['link'].$r['fname'].'" target="_blank">'.
 			$r['oname'].
 		'</a>'.
 		'<span>'._attachSize($r['size']).'</span>'.
