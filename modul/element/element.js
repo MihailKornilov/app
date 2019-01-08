@@ -3203,10 +3203,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 
 			//сортировка колонок
-			DL.sortable({
-				axis:'y',
-				handle:'.icon-move-y'
-			});
+			DL.sortable({handle:'.icon-move-y'});
 
 			//удаление элемента
 			DL.find('.icon-del:last').click(function() {
@@ -3941,10 +3938,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		else
 			_forIn(vvv, valueAdd);
 
-		DL.sortable({
-			axis:'y',
-			handle:'.icon-move-y'
-		});
+		DL.sortable({handle:'.icon-move-y'});
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -3956,11 +3950,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 				attr_el:'#inp_' + NUM,//требуется для настройки стилей в выплывающем окне
 				font:'',  //выделение: b, i, u
-				color:''  //цвет текста
+				color:'', //цвет текста
+				url_action_id:0//значение элемента является ссылкой
 			}, v || {});
 
 			DL.append(
-				'<dd class="over3" val="' + v.id + '">' +
+				'<dd class="over3" val="' + v.id + '" data-url="' + v.url_action_id + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w35 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
@@ -4021,14 +4016,38 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
 								'<td class="pt3">' + _elemUnitFormat(v) +
-						'</table>' +
-						'',
+								'<td class="pt3">' +
+									'<div class="icon-wiki iw12 ml3' + _dn(v.url_action_id, 'on') + _tooltip('Ссылка', -22) + '</div>' +
+						'</table>',
 					side:'top',
 					ugPos:'left',
 					objPos:20,
 					show:1,
 					delayShow:500,
-					delayHide:300
+					delayHide:300,
+					func:function(o) {
+						o.find('.iw12').click(function() {
+							var url = $(this);
+
+							//снятие ссылки
+							if(url.hasClass('on')) {
+								url.removeClass('on');
+								DD.attr('data-url', 0);
+								return false;
+							}
+
+							_dialogLoad({
+								dialog_id:221,
+								element_id:v.id,
+								edit_id:v.url_action_id,
+								busy_obj:$(this),
+								func_save:function(res) {
+									DD.attr('data-url', res.unit.id);
+									v.url_action_id = res.unit.id;
+								}
+							});
+						});
+					}
 				});
 			});
 
@@ -4063,6 +4082,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					u.color = k;
 					break;
 				}
+
+			//ссылка (действие [221])
+			u.url = _num(sp.attr('data-url'));
 
 			send.push(u);
 		});

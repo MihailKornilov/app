@@ -347,7 +347,7 @@ function _spisokInclude($spisok) {//вложенные списки
 					SELECT "._queryCol($incDialog)."
 					FROM   "._queryFrom($incDialog)."
 					WHERE `t1`.`id` IN (".$ids.")
-					  AND "._queryWhere($incDialog);
+					  AND "._queryWhere($incDialog, true);
 			$key = md5($sql);
 			if(!isset($_SI[$key])) {
 				if($arr = query_arr($sql)) {
@@ -702,6 +702,9 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 	//данные записи
 	$u = $prm['unit_get'];
 
+	if(@$u['deleted'])
+		return $txt;
+
 	$func = $el['action'][0];
 	switch($func['dialog_id']) {
 		//переход на страницу
@@ -711,7 +714,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 			return '<a href="'.URL.'&p='.$page_id.($id ? '&id='.$id : '').'" class="inhr">'.$txt.'</a>';
 
 		//открытие диалога
-		case 222:
+		case 222: return $txt;
 	}
 
 	return $txt;
@@ -734,13 +737,13 @@ function _spisokUnitUrlId($el, $page_id, $u) {//получение id запис
 	if(!$page = _page($page_id))
 		return $u['id'];
 
-	if($page['dialog_id_unit_get'] != @$u['dialog_id_use'])
+	if(@$u['dialog_id_use'] != $page['dialog_id_unit_get'])
 		if($el['dialog_id'] == 11) {
 			if(!$ids = _ids($el['txt_2'], 'arr'))
 				return $u['id'];
 			if(!$col = _elemCol($ids[0]))
 				return $u['id'];
-			return is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
+			return is_array($u[$col]) ? $u[$col]['id'] : $u['id'];
 		}
 	return $u['id'];
 }

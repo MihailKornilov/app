@@ -3016,8 +3016,7 @@ function PHP12_td_setup_vvv($prm) {//получение данных ячеек 
 			FROM `_action`
 			WHERE `element_id` IN ("._idsGet($arr).")
 			  AND `dialog_id`=221";
-	$ass = query_ass($sql);
-
+	$url = query_ass($sql);
 
 	$send = array();
 	foreach($arr as $id => $r) {
@@ -3028,7 +3027,7 @@ function PHP12_td_setup_vvv($prm) {//получение данных ячеек 
 			'width' => _num($r['width']),
 			'font' => $r['font'],
 			'color' => $r['color'],
-			'url_action_id' => _num(@$ass[$id]),
+			'url_action_id' => _num(@$url[$id]),
 			'txt_7' => $r['txt_7'],
 			'pos' => $r['txt_8']
 		);
@@ -4177,8 +4176,16 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 		$txt_8 = _txt($r['txt_8'], 1);
 		if(!$txt_7 && !$txt_8)
 			continue;
-		if($id = _num($r['id']))
+		if($id = _num($r['id'])) {
 			$ids[] = $id;
+			//удаление ссылки, если не нужна
+			if(!_num($r['url'])) {
+				$sql = "DELETE FROM `_action`
+						WHERE `element_id`=".$id."
+						  AND `dialog_id`=221";
+				query($sql);
+			}
+		}
 		$update[] = "(
 			".$id.",
 			".$dialog['app_id'].",
@@ -4273,16 +4280,24 @@ function PHP12_history_setup_vvv($prm) {//получение значений д
 	if(!$arr = query_arr($sql))
 		return array();
 
+	//получение действий (переход по ссылке), настроенных для ячеек
+	$sql = "SELECT `element_id`,`id`
+			FROM `_action`
+			WHERE `element_id` IN ("._idsGet($arr).")
+			  AND `dialog_id`=221";
+	$url = query_ass($sql);
+
 	$send = array();
-	foreach($arr as $r) {
+	foreach($arr as $id => $r) {
 		$send[] = array(
-			'id' => $r['id'],
+			'id' => $id,
 			'dialog_id' => $r['dialog_id'],
 			'font' => $r['font'],
 			'color' => $r['color'],
-			'title' => _elemTitle($r['id']),
+			'title' => _elemTitle($id),
 			'txt_7' => $r['txt_7'],
-			'txt_8' => $r['txt_8']
+			'txt_8' => $r['txt_8'],
+			'url_action_id' => _num(@$url[$id])
 		);
 	}
 	return _arrNum($send);

@@ -174,6 +174,7 @@ function _queryCol($DLG) {//получение колонок, для котор
 	$field[] = _queryColReq($DLG, 'num');
 	$field[] = _queryColReq($DLG, 'dtime_add');
 	$field[] = _queryColReq($DLG, 'user_id_add');
+	$field[] = _queryColReq($DLG, 'deleted');
 
 	//id диалога, который использовался при создании записи
 	$field[] = $DLG['id'].' `dialog_id_use`';
@@ -234,7 +235,7 @@ function _queryFrom($DLG) {//составление таблиц для запр
 
 	return $send;
 }
-function _queryWhere($DLG) {//составление условий для запроса
+function _queryWhere($DLG, $withDel=false) {//составление условий для запроса
 	$key = 'QUERY_WHERE_'.$DLG['id'];
 
 	if(defined($key))
@@ -253,7 +254,8 @@ function _queryWhere($DLG) {//составление условий для за�
 	}
 
 	if($tn = _queryTN($DLG, 'deleted'))
-		$send[] = "!`".$tn."`.`deleted`";
+		if(!$withDel)
+			$send[] = "!`".$tn."`.`deleted`";
 	if($tn = _queryTN($DLG, 'app_id'))
 		switch($DLG['table_name_1']) {
 			case '_element': break;
