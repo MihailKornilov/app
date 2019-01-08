@@ -4377,14 +4377,23 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 	$history_id = _historyInsert(2, $dialog, $unit['id']);
 
 	$insert = array();
-	foreach($edited as $r)
+	foreach($edited as $r) {
+		$old = $r['old'];
+		if(is_array($old))
+			$old = $old['txt_1'];
+
+		$new = $r['new'];
+		if(is_array($new))
+			$new = $new['txt_1'];
+
 		$insert[] = "(
 			".APP_ID.",
 			".$history_id.",
 			'".$r['name']."',
-			'".addslashes($r['old'])."',
-			'".addslashes($r['new'])."'
+			'".addslashes($old)."',
+			'".addslashes($new)."'
 		)";
+	}
 
 	$sql = "INSERT INTO `_history_edited` (
 				`app_id`,

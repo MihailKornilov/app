@@ -1446,6 +1446,8 @@ function _spisok59unit($elem_id, $unit_id) {//выбранное значени�
 
 /* ---=== CЧЁТЧИКИ: В РАБОТЕ ===--- */
 function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение действий после обновления или удаления записи
+	if($dialog['dialog_id_parent'])
+		$dialog = _dialogQuery($dialog['dialog_id_parent']);
 	if(!$dialog['table_1'])
 		return;
 
@@ -1669,6 +1671,9 @@ function _spisokCounter($dialog_id) {
 		_debugLog('ОШИБКА: диалога '.$dialog_id.' не существует');
 		return;
 	}
+
+	if($DLG['dialog_id_parent'])
+		$dialog_id = $DLG['dialog_id_parent'];
 
 	$sql = "SELECT *
 			FROM `_counter`

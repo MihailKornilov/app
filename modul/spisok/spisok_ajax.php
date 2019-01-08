@@ -401,6 +401,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 
 	_SUN_AFTER($dialog, $unit, $unitOld);
 
+	//установка первого значения для счётчика при его создании. Либо обновление.
+	if($dialog['table_name_1'] == '_counter')
+		_spisokCounter($unit['spisok_id']);
+
 	if($dialog['table_name_1'] == '_page') {
 		_cache_clear('page');
 		_jsCache();
