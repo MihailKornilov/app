@@ -1672,8 +1672,8 @@ function _spisokCounter($dialog_id) {
 		return;
 	}
 
-	if($DLG['dialog_id_parent'])
-		$dialog_id = $DLG['dialog_id_parent'];
+	if($parent_id = $DLG['dialog_id_parent'])
+		$dialog_id = $parent_id;
 
 	$sql = "SELECT *
 			FROM `_counter`
@@ -1683,32 +1683,68 @@ function _spisokCounter($dialog_id) {
 		return;
 	}
 
-	foreach($arr as $counter_id => $r) {
+	foreach($arr as $counter_id => $r)
+		switch($r['type_id']) {
+			//количество
+			case 3851:
+				$sql = "SELECT COUNT(*)
+						FROM  "._queryFrom($DLG)."
+						WHERE "._queryWhere($DLG).
+							_40cond(array(), $r['filter']);
+				$count = _num(query_value($sql));
 
-		//Подсчёт количества
-		$sql = "SELECT COUNT(*)
-				FROM  "._queryFrom($DLG)."
-				WHERE "._queryWhere($DLG).
-					_40cond(array(), $r['filter']);
-		$count = _num(query_value($sql));
+				_debugLog('Получено количество '.$count.' в счётчике '.$counter_id);
 
-		_debugLog('Диалог '.$dialog_id.', счётчик '.$counter_id.': баланс '.$count);
+				if(!_spisokCounterInsertAccess($counter_id, $count))
+					break;
 
-		if(_spisokCounterInsertAccess($counter_id, $count)) {
-			$sql = "INSERT INTO `_counter_v` (
-						`app_id`,
-						`counter_id`,
-						`balans`,
-						`user_id_add`
-					) VALUES (
-						".APP_ID.",
-						".$counter_id.",
-						".$count.",
-						".USER_ID."
-					)";
-			query($sql);
+				$sql = "INSERT INTO `_counter_v` (
+							`app_id`,
+							`counter_id`,
+							`balans`,
+							`user_id_add`
+						) VALUES (
+							".APP_ID.",
+							".$counter_id.",
+							".$count.",
+							".USER_ID."
+						)";
+				query($sql);
+				break;
+			//сумма
+			case 3852:
+				//элемент, по которому будет расчитываться сумма
+				if(!$el = _elemOne($r['sum_elem_id']))
+					break;
+				if(!$col = $el['col'])
+					break;
+
+				$sql = "SELECT SUM(`".$col."`)
+						FROM  "._queryFrom($DLG)."
+						WHERE "._queryWhere($DLG).
+							_40cond(array(), $r['filter']);
+				$sum = query_value($sql);
+
+				_debugLog('Получена сумма '.$sum.' в счётчике '.$counter_id);
+
+				if(!_spisokCounterInsertAccess($counter_id, $sum))
+					break;
+
+				$sql = "INSERT INTO `_counter_v` (
+							`app_id`,
+							`counter_id`,
+							`balans`,
+							`user_id_add`
+						) VALUES (
+							".APP_ID.",
+							".$counter_id.",
+							".$sum.",
+							".USER_ID."
+						)";
+				query($sql);
+				break;
+			default: _debugLog('Неизвестный тип счётчика: '.$r['type_id']);
 		}
-	}
 }
 function _spisokCounterInsertAccess($counter_id, $v) {//разрешение на внесение записи о балансе
 	$sql = "SELECT *

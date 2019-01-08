@@ -90,6 +90,12 @@ switch(@$_POST['op']) {
 					_BE('elem_clear');
 					_jsCache();
 				}
+
+			//удаление данных счётчика
+			if($dialog['table_name_1'] == '_counter') {
+				$sql = "DELETE FROM `_counter_v` WHERE `counter_id`=".$unit_id;
+				query($sql);
+			}
 		}
 
 		$send = _spisokAction4($send);
