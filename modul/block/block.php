@@ -865,7 +865,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					if($BL['obj_name'] == 'dialog' && $BL['obj_id'] == 13)
 						$disabled = ' disabled';
 
-			$v = _elemPrintV($el, $prm);
+			$v = _elemPrintV($el, $prm, !$el['num_5'] && !$el['num_6'] ? 0 : '');
 
 			return
 			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.

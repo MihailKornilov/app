@@ -201,6 +201,30 @@ function _debug_cookie() {
 	return $cookie;
 }
 
+function _debugLog($txt) {//запись лога в файл
+	if(!DEBUG)
+		return;
+
+	$save = '';
+
+	//Вставка даты и времени при первом запуске лога в одном выполнении скрипта
+	if(!defined('DEBUG_LOG')) {
+		$save .= "\n".strftime('%Y-%m-%d %H:%M-%S')."\n";
+		define('DEBUG_LOG', true);
+	}
+
+	$db = debug_backtrace();
+	$ex = explode('\\', $db[1]['file']);
+	$file = $ex[count($ex) - 1];
+	$save .= $file.':'.$db[1]['line'].'		'.$db[1]['function'];
+
+	$save .= '		'.$txt."\n";
+
+	$fp = fopen(APP_PATH.'/!/log.txt', 'a+');
+	fwrite($fp, $save);
+	fclose($fp);
+}
+
 
 function jsonDebugParam() {//возвращение дополнительных параметров json, если включен debug
 	if(!@DEBUG)
@@ -215,3 +239,4 @@ function jsonDebugParam() {//возвращение дополнительных
 		'sql' => _debug_sql(),
 	);
 }
+

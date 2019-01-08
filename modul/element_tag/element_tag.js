@@ -590,7 +590,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 		if(o.title0)
 			MASS_ASS[0] = '';
 
-		//исходный список является ассоциативным объектом
+		//исходный список является ассоциативным объектом {1:'title1',2:'title2'}
 		if(!o.spisok.length) {
 			_forIn(o.spisok, function(sp, id) {
 				if(!id)
@@ -607,7 +607,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 			return;
 		}
 
-		//исходный список является последовательным массивом
+		//исходный список является последовательным массивом [{id:1,title:'name1'},{id:2,title:'name2'}]
 		_forN(o.spisok, function(sp, n) {
 			var id,
 				title,
@@ -712,7 +712,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 			v = _num(v, 1);
 		VALUE = v;
 		t.val(v);
-		INP.val(MASS_ASS[v] ? MASS_ASS[v].replace(/&quot;/g,'"') : '');
+		INP.val(MASS_ASS[v] ? String(MASS_ASS[v]).replace(/&quot;/g,'"') : '');
 		ICON_DEL._dn(v && o.write);
 		if(BG_ASS[v]) {
 			SEL.css('background-color', BG_ASS[v]);

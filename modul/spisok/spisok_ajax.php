@@ -33,6 +33,7 @@ switch(@$_POST['op']) {
 					  AND `t1`.`id`=".$unit_id;
 			query($sql);
 			_historyInsert(3, $dialog, $unit_id);
+			_spisokCounter($dialog['id']);
 			_SUN_AFTER($dialog, $unit);
 		} else {
 			$elem = array();
@@ -377,7 +378,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 			_blockOne($block_id, true);
 	}
 
-	foreach($dialog['cmp'] as $cmp_id => $cmp)
+	foreach($dialog['cmp'] as $cmp_id => $cmp) {
 		switch($cmp['dialog_id']) {
 			//---=== ДЕЙСТВИЯ ПРИ НАСТРОЙКИ ЭЛЕМЕНТОВ ===---
 			//конкретная функция
@@ -390,10 +391,13 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 			//Применение загруженных изображений
 			case 60: _image60_save($cmp, $unit); break;
 		}
+	}
 
 	_spisokUnitUpd27($unit);
 	_spisokUnitUpd54($unit);
 	_spisokUnitUpd55($unit);
+
+	_spisokCounter($dialog['id']);
 
 	_SUN_AFTER($dialog, $unit, $unitOld);
 

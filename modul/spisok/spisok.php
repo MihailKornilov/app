@@ -1496,6 +1496,7 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 				_spisokUnitAfter54($cmp, $dialog, $unit, $unitOld); //пересчёт количеств привязаного списка [54]
 				$upd = _spisokUnitAfter55($cmp, $dialog, $unit);    //пересчёт cумм привязаного списка [55]
 				_spisokUnitAfter27($upd);                           //подсчёт балансов после обновления сумм [27]
+				_spisokCounter($cmp['num_1']);
 				break;
 		}
 }
@@ -1658,6 +1659,65 @@ function _spisokUnitAfter27($ass) {
 			query($sql);
 		}
 	}
+}
+
+
+
+/* Глобальные счётчики */
+function _spisokCounter($dialog_id) {
+	if(!$DLG = _dialogQuery($dialog_id)) {
+		_debugLog('ОШИБКА: диалога '.$dialog_id.' не существует');
+		return;
+	}
+
+	$sql = "SELECT *
+			FROM `_counter`
+			WHERE `spisok_id`=".$dialog_id;
+	if(!$arr = query_arr($sql)) {
+		_debugLog('Выход: для диалога '.$dialog_id.' счётчики не были созданы');
+		return;
+	}
+
+	foreach($arr as $counter_id => $r) {
+
+		//Подсчёт количества
+		$sql = "SELECT COUNT(*)
+				FROM  "._queryFrom($DLG)."
+				WHERE "._queryWhere($DLG).
+					_40cond(array(), $r['filter']);
+		$count = _num(query_value($sql));
+
+		_debugLog('Диалог '.$dialog_id.', счётчик '.$counter_id.': баланс '.$count);
+
+		if(_spisokCounterInsertAccess($counter_id, $count)) {
+			$sql = "INSERT INTO `_counter_v` (
+						`app_id`,
+						`counter_id`,
+						`balans`,
+						`user_id_add`
+					) VALUES (
+						".APP_ID.",
+						".$counter_id.",
+						".$count.",
+						".USER_ID."
+					)";
+			query($sql);
+		}
+	}
+}
+function _spisokCounterInsertAccess($counter_id, $v) {//разрешение на внесение записи о балансе
+	$sql = "SELECT *
+		FROM `_counter_v`
+		WHERE `counter_id`=".$counter_id."
+		ORDER BY `id` DESC
+		LIMIT 1";
+	if(!$cv = query_assoc($sql))
+		return true;
+
+	if($v != $cv['balans'])
+		return true;
+
+	return false;
 }
 
 
