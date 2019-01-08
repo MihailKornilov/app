@@ -578,7 +578,7 @@
 
 /* ---=== ВЫБОР ВНЕШНЕГО ВИДА МЕНЮ СТРАНИЦ [3] PHP12_page_menu_type ===--- */
 .page-menu{
-	background:transparent 10px 5px no-repeat url(../../img/page-menu.png?2);
+	background:transparent 10px 5px no-repeat url(../../img/page-menu.png?3);
 	width:330px;
 	height:50px;
 	padding:5px;
@@ -592,15 +592,15 @@
 .page-menu.type3{background-position-y:-170px}
 .page-menu.type4{
 	display:inline-block;
-	background-position: 0 -266px;
+	background-position: 0 -260px;
 	width:152px;
-	height:120px;
+	height:148px;
 }
 .page-menu.type5{
 	display:inline-block;
-	background-position: 0 -400px;
-	width:152px;
-	height:120px;
+	background-position: -175px -245px;
+	width:73px;
+	height:148px;
 	margin-left:5px;
 }
 .page-menu:not(.sel):hover{border-color:#CBD7E9;opacity:.7}
