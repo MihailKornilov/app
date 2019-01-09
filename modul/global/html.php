@@ -434,7 +434,7 @@ function _hat_but_admin() {//кнопки Администрирование
 	if(!SA && !USER_CREATOR)
 		return '';
 
-	return '<button class="vk small red ml10" onclick="location.href=\''.URL.'&p=7\'">Manage</button>';
+	return '<button class="vk small red ml10" onclick="location.href=\''.URL.'&p=7\'">Admin</button>';
 }
 function _hat_but_pas() {//отображение кнопки настройки страницы
 	if(!SA && !APP_ID)
