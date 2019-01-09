@@ -438,7 +438,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 					'<tr><td>' + _elemUnitFont(EL) +
 						'<td>' + _elemUnitColor(EL) +
 						'<td class="r w75">' +
-							'<input id="elem-size" class="w15" value="' + EL.size + '" />' +
+							'<input type="hidden" id="elem-size" class="w15" value="' + EL.size + '" />' +
 				'</table>'
 	},
 	_elemUnitFont = function(EL) {//стили элемента: жирность, наклон, подчёркивание
@@ -505,7 +505,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 
 		return '<table class="bs5">' +
 			'<tr><td class="color-555 fs14">Ширина фото:' +
-				'<td><input id="elem-img-width" class="w15" value="' + EL.width + '" />' +
+				'<td><input type="hidden" id="elem-img-width" class="w15" value="' + EL.width + '" />' +
 				'<td class="pl5">' +
 					'<input type="hidden" id="elem-img-height" value="' + EL.num_7 + '" />' +
 		'</table>'
