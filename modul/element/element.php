@@ -1541,9 +1541,11 @@ function _elemButtonVal($el, $prm) {//значения аттрибута val д
 	//а также вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
 	//Нужно для назначения функций (пока)
 	if(!empty($el['block']))
-		if($el['block']['obj_name'] == 'dialog')
-			$val .= ',dss:'.$el['block']['obj_id'].
-					',block_id:'.$prm['srce']['block_id'];
+		if($el['block']['obj_name'] == 'dialog') {
+			$val .= ',dss:'.$el['block']['obj_id'];
+			if($prm['srce']['block_id'])
+				$val .= ',block_id:'.$prm['srce']['block_id'];
+		}
 
 	if($dialog_id = $el['num_4'])
 		$val .= _dialogOpenVal($dialog_id, $prm, $el['num_3']);
