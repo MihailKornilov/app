@@ -1514,6 +1514,8 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 		return;
 	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
 		return;
+	if(empty($unit[$col]))
+		return;
 	if(!$connect_id = _num($unit[$col]['id']))//значение, id единицы привязанного списка.
 		return;
 

@@ -612,8 +612,8 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 		if($PAR['table_1'] != $DLG['table_1']) {
 			$table_1 = _table($PAR['table_1']);
 			$table_2 = _table($DLG['table_1']);
-			$dialog_id = $dip;
 		}
+		$dialog_id = $dip;
 	}
 
 	$sql = "INSERT INTO `".$table_1."` (`id`) VALUES (0)";
