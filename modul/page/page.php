@@ -35,7 +35,9 @@ function _pageCache() {//получение массива страниц из �
 }
 function _pageAccess($page_id) {//доступ к странице для конкретного пользователя
 	if(SA)
-		return 1;
+		return true;
+	if(USER_CREATOR)
+		return true;
 
 	$key = 'UserPageAccess'.USER_ID;
 
@@ -516,7 +518,7 @@ function _pageShow($page_id) {
 		return _empty20('Несуществующая страница.'.PAGE_MSG_ERR);
 	if(!SA && $page['sa'])
 		return _empty20('Нет доступа.'.PAGE_MSG_ERR);
-	if(!SA && !_pageAccess($page_id))
+	if(!_pageAccess($page_id))
 		return _empty20('Страница недоступна или не существует.'.PAGE_MSG_ERR);
 
 	$prm = array();
