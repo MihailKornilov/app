@@ -2636,10 +2636,9 @@ function PHP12_v_choose_dialog($BL, $dialog_id) {//блок из диалога
 		return false;
 	if(!$DLG = _dialogQuery($BL['obj_id']))
 		return 'Диалога '.$BL['obj_id'].' не существует.';
-//	if(!$dialog_id = $DLG['dialog_id_unit_get'])
-//		return 'Диалог не принимает данные записи';
-
-	return $dialog_id;
+	if($parent_id = $DLG['dialog_id_parent'])
+		return $parent_id;
+	return $BL['obj_id'];
 }
 function PHP12_v_choose_spisok($BL, $obj_id) {//элемент из записи
 	if($obj_id)

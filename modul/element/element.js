@@ -772,12 +772,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 1://галочка
 					if(!el.action)
 						return;
-					_elemAction(el, _num(ATR_CMP.val()), 1);
 					ATR_CMP._check({
 						func:function(v) {
 							_elemAction(el, v);
 						}
 					});
+					_elemAction(el, _num(ATR_CMP.val()), 1);
 					return;
 				//textarea
 				case 5:	ATR_CMP._autosize(); return;
@@ -896,12 +896,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 16:
 					if(!el.action)
 						return;
-					_elemAction(el, _num(ATR_CMP.val()), 1);
 					ATR_CMP._radio({
 						func:function(v) {
 							_elemAction(el, v);
 						}
 					});
+					_elemAction(el, _num(ATR_CMP.val()), 1);
 					return;
 				//select - произвольные значения
 				case 17:

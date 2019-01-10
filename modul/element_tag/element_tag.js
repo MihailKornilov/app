@@ -46,32 +46,28 @@ $.fn._check = function(o) {
 	if(!t.length)
 		return;
 
-	var attr_id = t.attr('id');
-	if(!attr_id) {
-		attr_id = 'check' + Math.round(Math.random() * 100000);
-		t.attr('id', attr_id);
-	}
-
-	var win = attr_id + '_check',
+	var attr_id = _attrId(t),
+		win = attr_id + 'win',
 		S = window[win];
 
-	switch(typeof o) {
-		case 'number':
-			S.value(o ? 1 : 0);
-			return t;
-		case 'string':
-			if(o == 'disable')
-				S.dis();
-			if(o == 'enable')
-				S.enab();
-			if(o == 'func')
-				S.funcGo();
-			return t;
+	if(S) {
+		switch(typeof o) {
+			case 'number': S.setV(o ? 1 : 0); break;
+			case 'string':
+				if(o == 'disable')
+					S.dis();
+				if(o == 'enable')
+					S.enab();
+				if(o == 'func')
+					S.funcGo();
+				break;
+		}
+		return S;
 	}
 
 	checkPrint();
 
-	var CHECK = $('#' + win);
+	var CHECK = $('#' + attr_id + '_check');
 
 	CHECK.click(function() {
 		if(CHECK.hasClass('disabled'))
@@ -116,7 +112,7 @@ $.fn._check = function(o) {
 			block = o.block ? ' block' : '',
 			dis = o.disabled ? ' disabled' : '',
 			html =
-				'<div id="' + win + '" class="_check' + on + title + light + block + dis + cls + '">' +
+				'<div id="' + attr_id + '_check" class="_check' + on + title + light + block + dis + cls + '">' +
 					(o.title ? o.title : '&nbsp;') +
 				'</div>';
 
@@ -127,7 +123,7 @@ $.fn._check = function(o) {
 		t.val(v);
 	}
 
-	t.value = setVal;
+	t.setV = setVal;
 	t.funcGo = function() {//применение фукнции
 		o.func(_num(t.val()), t);
 	};
@@ -152,16 +148,12 @@ $.fn._radio = function(o, oo) {
 
 	if(S) {
 		switch(typeof o) {
-			case 'number':
-				S.valSet(o);
-				break;
+			case 'number': S.valSet(o);	break;
 			case 'string':
 				if(o == 'spisok')
 					S.spisok(oo);
 				break;
-			case 'function':
-				S.func(o);
-				break;
+			case 'function': S.func(o);	break;
 		}
 		return S;
 	}
