@@ -718,7 +718,17 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 		//открытие диалога
 		case 222:
-			return '<a class="dialog-open inhr" val="dialog_id:'.$func['target_ids'].',edit_id:'.$u['id'].'">'.$txt.'</a>';
+			$val = 'dialog_id:'.$func['target_ids'];
+
+			//элемент передаёт id записи для отображения
+			if($func['apply_id'])
+				$val .= ',get_id:'.$u['id'];
+
+			//блок передаёт id записи для редактирования
+			if($func['effect_id'])
+				$val .= ',edit_id:'.$u['id'];
+
+			return '<a class="dialog-open inhr" val="'.$val.'">'.$txt.'</a>';
 	}
 
 	return $txt;

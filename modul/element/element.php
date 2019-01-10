@@ -1079,6 +1079,11 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 
 		//Radio
 		case 16:
+			//значения из существующего (другого) элемента
+			if($el['num_2'] == 3877)
+				if(!$elem_id = $el['num_3'])
+					return array();
+
 			$sql = "SELECT `id`,`txt_1`
 					FROM `_element`
 					WHERE `parent_id`=".$elem_id."
@@ -2576,7 +2581,16 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 	if($BL['obj_name'] == 'page')
 		define('OBJ_NAME_CHOOSE', 'page');
 
-	return $BL['obj_id'];
+	//если указан диалог, проверка, чтобы был отправлен id родительского диалога
+	if($BL['obj_name'] == 'dialog') {
+		if(!$DLG = _dialogQuery($BL['obj_id']))
+			return 'Диалога '.$BL['obj_id'].' не существует.';
+		if($parent_id = $DLG['dialog_id_parent'])
+			return $parent_id;
+		return $BL['obj_id'];
+	}
+
+	return '[13] неизвестно, где искать диалог';
 }
 function PHP12_v_choose_23($BL, $dialog_id) {//ячейка таблицы
 	if($dialog_id)
