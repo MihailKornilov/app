@@ -20,48 +20,52 @@ function _colorJS() {//массив цветов для текста в форм
 
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
 	//если dialog_id получен - отправка его
-	if($dialog_id = _num(@$_POST['dialog_id']))
+	$dialog_id = _num(@$_POST['dialog_id'], true);
+	if($dialog_id > 0)
 		return $dialog_id;
 	if(!$block_id = _num(@$_POST['block_id']))
 		return false;
 
-	//получение элемента-кнопки для присвоения нового диалога
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `block_id`=".$block_id."
-			  AND `dialog_id` IN (2,59)
-			LIMIT 1";
-	if(!$elem = query_assoc($sql))
-		return false;
+	//проверка, нужно ли по кнопке всегда создавать новый диалог
+	if(!$newAlways = ($dialog_id == -1)) {
+		//получение элемента-кнопки для присвоения нового диалога
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `block_id`=".$block_id."
+				  AND `dialog_id` IN (2,59)
+				LIMIT 1";
+		if(!$elem = query_assoc($sql))
+			return false;
 
-	//новый диалог кнопке уже был присвоен
-	if($elem['num_4'])
-		return $elem['num_4'];
-
-	$sql = "INSERT INTO `_dialog` (
-				`app_id`,
-				`user_id_add`
-			) VALUES (
-				".APP_ID.",
-				".USER_ID."
-			)";
-	$dialog_id = query_id($sql);
+		//новый диалог кнопке уже был присвоен
+		if($elem['num_4'])
+			return $elem['num_4'];
+	}
 
 	$sql = "SELECT IFNULL(MAX(`num`),0)+1
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID;
 	$num = query_value($sql);
 
-	$sql = "UPDATE `_dialog`
-			SET `num`=".$num.",
-				`name`='Диалог ".$num."'
-			WHERE `id`=".$dialog_id;
-	query($sql);
+	$sql = "INSERT INTO `_dialog` (
+				`app_id`,
+				`num`,
+				`name`,
+				`user_id_add`
+			) VALUES (
+				".APP_ID.",
+				".$num.",
+				'Диалог ".$num."',
+				".USER_ID."
+			)";
+	$dialog_id = query_id($sql);
 
-	$sql = "UPDATE `_element`
-			SET `num_4`=".$dialog_id."
-			WHERE `id`=".$elem['id'];
-	query($sql);
+	if(!$newAlways) {
+		$sql = "UPDATE `_element`
+				SET `num_4`=".$dialog_id."
+				WHERE `id`=".$elem['id'];
+		query($sql);
+	}
 
 	_BE('block_clear');
 	_BE('elem_clear');
@@ -475,8 +479,15 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 	if($v == 'unit_get')
 		return array_merge($dlg_app_spisok);
 
-	if(SA)
+	if(SA) {
+		$title = 'SA: всегда создавать новый диалог';
+		array_unshift($dlg_base, array(
+			'id' => -1,
+			'title' => $title,
+			'content' => '<div class="color-pay">'.$title.'</div>'
+		));
 		return array_merge($dlg_base, $dlg_app_spisok, $dlg_app, $dlg_elem, $dlg_sa);
+	}
 
 	return array_merge($dlg_app_spisok, $dlg_app);
 }

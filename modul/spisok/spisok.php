@@ -705,6 +705,9 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 	if(@$u['deleted'])
 		return $txt;
 
+	if($prm['blk_setup'])
+		return '<a class="inhr">'.$txt.'</a>';
+
 	$func = $el['action'][0];
 	switch($func['dialog_id']) {
 		//переход на страницу
@@ -715,7 +718,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 		//открытие диалога
 		case 222:
-			return '<a class="dialog-open" val="dialog_id:'.$func['target_ids'].',edit_id:'.$u['id'].'">'.$txt.'</a>';
+			return '<a class="dialog-open inhr" val="dialog_id:'.$func['target_ids'].',edit_id:'.$u['id'].'">'.$txt.'</a>';
 	}
 
 	return $txt;

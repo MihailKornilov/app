@@ -681,10 +681,10 @@ td.bottom{vertical-align:bottom}
 }
 /* Принимает все стили родителя */
 .inhr{
-	color:inherit;
 	font-size:inherit;
 	font-weight:inherit;
 	font-style:inherit;
 	text-decoration:inherit;
 }
+.inhr:not(._busy){color:inherit}
 
