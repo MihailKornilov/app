@@ -714,7 +714,8 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 			return '<a href="'.URL.'&p='.$page_id.($id ? '&id='.$id : '').'" class="inhr">'.$txt.'</a>';
 
 		//открытие диалога
-		case 222: return $txt;
+		case 222:
+			return '<a class="dialog-open" val="dialog_id:'.$func['target_ids'].',edit_id:'.$u['id'].'">'.$txt.'</a>';
 	}
 
 	return $txt;
