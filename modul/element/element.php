@@ -4347,6 +4347,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 	query($sql);
 
 	_BE('dialog_clear');
+	_BE('elem_clear');
 	$dialog = _dialogQuery($dialog_id);
 
 	$send['tmp'] = $dialog[HISTORY_ACT.'_history_tmp'];
@@ -4600,10 +4601,40 @@ function _historySpisok($EL, $prm) {//список истории действи
 	return $send;
 }
 function _historyKit($el, $prm) {//составление одной сборки
+	if(!$u = $prm['unit_get'])
+		return _msgRed('отсутствует запись');
+
+	//показ сборки по условиям, если есть
+	if($cond = $el['txt_9']) {
+		$arr = htmlspecialchars_decode($cond);
+		if(!$arr = json_decode($arr, true))
+			return _msgRed('не получен массив условий');
+
+		foreach($arr as $r) {
+			if(!$ell = _elemOne($r['elem_id']))
+				return _msgRed('отсутствует элемент '.$r['elem_id']);
+			if(!$col = $ell['col'])
+				return _msgRed('отсутствует имя колонки');
+
+
+			$connect_id = $u[$col];
+			if(is_array($connect_id))
+				$connect_id = $u[$col]['id'];
+
+			switch($r['cond_id']) {
+				//равно
+				case 3:
+					if($r['unit_id'] != $connect_id)
+						return '';
+					break;
+				default: return _msgRed('условие '.$r['cond_id'].' не доделано');
+			}
+		}
+	}
+
+
 	if(!$el['dialog_id'])
 		return $el['txt_7'].$el['txt_8'];
-	if(!$u = $prm['unit_get'])
-		return '';
 
 	switch($el['dialog_id']) {
 		case 11:
