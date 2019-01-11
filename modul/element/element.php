@@ -4502,12 +4502,12 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 			) VALUES ".implode(',', $insert);
 	query($sql);
 }
-function _historySpisok($el) {//список истории действий [68]
+function _historySpisok($EL, $prm) {//список истории действий [68]
 	$sql = "SELECT *
 			FROM `_history`
 			WHERE `app_id`=".APP_ID."
 			  AND `active`
-			  "._historyCondPageUnit($el)."
+			  "._historyUnitCond($EL, $prm)."
 			  AND `user_id_add`
 			  AND `dtime_add`
 			ORDER BY `dtime_add` DESC
@@ -4556,24 +4556,8 @@ function _historySpisok($el) {//список истории действий [68
 			$msg = '';
 			$prm['unit_get'] = $unitArr[$r['unit_id']];
 			$prm = _blockParam($prm);
-			foreach($dlg[$r['type_id'].'_history_elm'] as $el) {
-				if($el['dialog_id']) {
-					if($txt = _elemPrint($el, $prm)) {
-						$cls = array('wsnw');
-						if($el['font'])
-							$cls[] = $el['font'];
-						if($el['color'])
-							$cls[] = $el['color'];
-						$cls = implode(' ', $cls);
-						$txt = _elemFormatHide($el, $txt);
-						$txt = _elemFormatDigital($el, $txt);
-						$txt = _spisokUnitUrl($el, $prm, $txt);//история действий
-						$txt = '<span class="'.$cls.'">'.$txt.'</span>';
-						$msg .= $el['txt_7'].$txt.$el['txt_8'];
-					}
-				} else
-					$msg .= $el['txt_7'].$el['txt_8'];
-			}
+			foreach($dlg[$r['type_id'].'_history_elm'] as $hel)
+				$msg .= _historyKit($hel, $prm);
 
 			$is_last = $n == $last;//последняя запись
 
@@ -4602,6 +4586,39 @@ function _historySpisok($el) {//список истории действий [68
 	}
 
 	return $send;
+}
+function _historyKit($el, $prm) {//составление одной сборки
+	if(!$el['dialog_id'])
+		return $el['txt_7'].$el['txt_8'];
+	if(!$u = $prm['unit_get'])
+		return '';
+
+	switch($el['dialog_id']) {
+		case 11:
+			$first = _idsFirst($el['txt_2']);
+			if(!$ell = _elemOne($first))
+				return '';
+			if(!$col = $ell['col'])
+				return '';
+			if(empty($u[$col]))
+				return '';
+			break;
+	}
+
+	if(!$txt = _elemPrint($el, $prm))
+		return '';
+
+	$cls = array('wsnw');
+	if($el['font'])
+		$cls[] = $el['font'];
+	if($el['color'])
+		$cls[] = $el['color'];
+	$cls = implode(' ', $cls);
+	$txt = _elemFormatHide($el, $txt);
+	$txt = _elemFormatDigital($el, $txt);
+	$txt = _spisokUnitUrl($el, $prm, $txt);
+	$txt = '<span class="'.$cls.'">'.$txt.'</span>';
+	return $el['txt_7'].$txt.$el['txt_8'];
 }
 function _historySpisokU($user_id, $un) {//вывод пользователя для отдельной группы истории
 	return
@@ -4635,24 +4652,32 @@ function _historySpisokEdited($hist) {//история при редактиро
 
 	return $send;
 }
-function _historyCondPageUnit($el) {//отображение истории для конкретной единицы списка, которую принимает страница (связка)
+function _historyUnitCond($el, $prm) {//отображение истории для конкретной записи, которую принимает страница
 	if(!$el['num_8'])
 		return '';
 
-	//проверка, чтобы список был размещён именно на странице
-	if($el['block']['obj_name'] != 'page')
-		return ' AND !`id`';
-
-	//страница, на которой размещён список
-	if(!$page = _page($el['block']['obj_id']))
-		return ' AND !`id`';
-
-	//id диалога, единица списка которого размещается на странице
-	if(!$dialog_id_unit_get = $page['dialog_id_unit_get'])
-		return ' AND !`id`';
-
-	if(!$unit_id = _num(@$_GET['id']))
-		return ' AND !`id`';
+	//история может быть размещёна либо на странице, либо в диалоге
+	switch($el['block']['obj_name']) {
+		case 'page':
+			$page_id = $el['block']['obj_id'];
+			if(!$page = _page($page_id))
+				return " AND !`id` /* страницы ".$page_id." не существует */";
+			if(!$dialog_id = $page['dialog_id_unit_get'])
+				return " AND !`id` /* страница не принимает данные записи */";
+			if(!$unit_id = _num(@$_GET['id']))
+				return " AND !`id` /* идентификатор записи не получен */";
+			break;
+		case 'dialog':
+			$dlg_id = $el['block']['obj_id'];
+			if(!$DLG = _dialogQuery($dlg_id))
+				return " AND !`id` /* диалога ".$dlg_id." не существует */";
+			if(!$dialog_id = $DLG['dialog_id_unit_get'])
+				return " AND !`id` /* диалог не принимает данные записи */";
+			if(!$unit_id = $prm['unit_get_id'])
+				return " AND !`id` /* id записи не получен */";
+			break;
+		default: return " AND !`id` /* не страница и не диалог */";
+	}
 
 	$ids = 0;
 
@@ -4660,7 +4685,7 @@ function _historyCondPageUnit($el) {//отображение истории дл
 	$sql = "SELECT `block_id`,`col`
 			FROM `_element`
 			WHERE `dialog_id`=29
-			  AND `num_1`=".$dialog_id_unit_get."
+			  AND `num_1`=".$dialog_id."
 			  AND LENGTH(`col`)";
 	if($cols = query_ass($sql)) {
 		$cond = array();

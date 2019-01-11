@@ -532,6 +532,8 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 
 				if($cmp['req'] && !$v)
 					$is_err = 1;
+
+				$send[$cmp_id] = $v;
 				break;
 			case 300://страница ВК
 				if(_elem300VkIdTest($DLG, $v, $unit_id)) {
