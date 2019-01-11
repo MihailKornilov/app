@@ -2919,15 +2919,14 @@ function PHP12_spfl_save($DLG) {
 }
 function PHP12_spfl_vvv($prm) {//получение настроек для редактирования
 	$send = array(
-		'dss' => 0,     //получение id диалога по элементу, через который был выбор
+		'dss' => $prm['srce']['dss'],
 		'vvv' => array(),
 		'drop' => PHP12_spfl_drop()//стандартные значения выпадающего списка
 	);
 
-	if(!$elem_id = $prm['srce']['element_id'])
-		return $send;
-
-	$send['dss'] = _dialogSel24($elem_id, $prm['srce']['dss']);
+	//получение id диалога по элементу, через который был выбор
+	if($elem_id = $prm['srce']['element_id'])
+		$send['dss'] = _dialogSel24($elem_id, $prm['srce']['dss']);
 
 	if(!$arr = $prm['srce']['dop'])
 		return $send;
@@ -4216,6 +4215,7 @@ function PHP12_history_setup() {
 			txt_7 - текст слева от значения
 			num_8 - значение из диалога
 			txt_8 - текст справа от значения
+			txt_9 - условия отображения сборки
 	*/
 	return '';
 }
@@ -4257,6 +4257,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 		$color = _txt($r['color']);
 		$txt_7 = _txt($r['txt_7'], 1);
 		$txt_8 = _txt($r['txt_8'], 1);
+		$txt_9 = _txt($r['txt_9']);
 		if(!$txt_7 && !$txt_8)
 			continue;
 		if($id = _num($r['id'])) {
@@ -4277,6 +4278,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 			'".$color."',
 			'".addslashes($txt_7)."',
 			'".addslashes($txt_8)."',
+			'".$txt_9."',
 			".$sort.",
 			".USER_ID."
 		)";
@@ -4299,6 +4301,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 					`color`,
 					`txt_7`,
 					`txt_8`,
+					`txt_9`,
 					`sort`,
 					`user_id_add`
 				)
@@ -4310,6 +4313,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 					`color`=VALUES(`color`),
 					`txt_7`=VALUES(`txt_7`),
 					`txt_8`=VALUES(`txt_8`),
+					`txt_9`=VALUES(`txt_9`),
 					`sort`=VALUES(`sort`)";
 		query($sql);
 	}
@@ -4372,6 +4376,12 @@ function PHP12_history_setup_vvv($prm) {//получение значений д
 
 	$send = array();
 	foreach($arr as $id => $r) {
+		$c = 0;
+		if($r['txt_9']) {
+			$vv = htmlspecialchars_decode($r['txt_9']);
+			$arr = json_decode($vv, true);
+			$c = count($arr);
+		}
 		$send[] = array(
 			'id' => $id,
 			'dialog_id' => $r['dialog_id'],
@@ -4380,6 +4390,8 @@ function PHP12_history_setup_vvv($prm) {//получение значений д
 			'title' => _elemTitle($id),
 			'txt_7' => $r['txt_7'],
 			'txt_8' => $r['txt_8'],
+			'c' => $c,//количество условий
+			'txt_9' => $r['txt_9'],
 			'url_action_id' => _num(@$url[$id])
 		);
 	}

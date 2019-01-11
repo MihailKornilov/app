@@ -3955,6 +3955,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		DL.sortable({handle:'.icon-move-y'});
 
+		function _cc(count) {//количество условий в текстовом виде
+			if(!count)
+				return 'без условий';
+			return count  + ' услови' + _end(count, ['е', 'я', 'й']);
+		}
 		function valueAdd(v) {
 			v = $.extend({
 				id:0,     //id элемента-сборки
@@ -3962,6 +3967,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				title:'', //имя элемента-значения
 				txt_7:'', //текст слева
 				txt_8:'', //текст справа
+				c:0,      //количество условий
+				txt_9:'', //условия отображения сборки
 
 				attr_el:'#inp_' + NUM,//требуется для настройки стилей в выплывающем окне
 				font:'',  //выделение: b, i, u
@@ -3972,15 +3979,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL.append(
 				'<dd class="over3" val="' + v.id + '" data-url="' + v.url_action_id + '">' +
 					'<table class="bs5 w100p">' +
-						'<tr><td class="w35 center">' +
+						'<tr><td class="w25 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w100 center">' +
+								'<a class="cs ' + (v.c ? 'color-ref b' : 'pale') + _tooltip('Настроить условия<br>показа сборки', -40, false, true) + _cc(v.c) + '</a>' +
+								'<input type="hidden" class="txt_9" value="' + v.txt_9 + '" />' +
 							'<td class="w250">' +
 								'<input type="text"' +
 									  ' class="txt_7 w100p"' +
 									  ' placeholder="текст слева"' +
 									  ' value="' + v.txt_7 + '"' +
 								' />' +
-							'<td class="w200">' +
+							'<td class="w250">' +
 								'<input type="text"' +
 									  ' readonly' +
 									  ' id="inp_' + NUM++ + '"' +
@@ -4002,6 +4012,24 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			var DD = DL.find('dd:last'),
 				TITLE = DD.find('.title');
+
+			//настройка условий для отображения сборки
+			DD.find('.cs').click(function() {
+				_dialogLoad({
+					dialog_id:41,
+					dss:obj.srce.dss,
+					dop:DD.find('.txt_9').val(),
+					busy_obj:$(this),
+					func_save:function(res) {
+						DD.find('.txt_9').val(res.v);
+						DD.find('.cs')
+							.html(_cc(res.c))
+							._dn(res.c, 'pale')
+							._dn(!res.c, 'color-ref b');
+					}
+				});
+			});
+
 			TITLE.click(function() {
 				_dialogLoad({
 					dialog_id:v.dialog_id || 50,
@@ -4083,6 +4111,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					id:_num(sp.attr('val')),
 					txt_7:sp.find('.txt_7').val(),
 					txt_8:sp.find('.txt_8').val(),
+					txt_9:sp.find('.txt_9').val(),
 					color:''
 				};
 
