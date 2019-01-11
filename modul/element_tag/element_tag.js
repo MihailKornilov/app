@@ -484,6 +484,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 	valueSet(o.multi ? '' : VALUE);
 
 	INP.keydown(function() {
+		SEL.addClass('rs');
 		setTimeout(function() {
 			VALUE = 0;
 			t.val(0);
@@ -770,6 +771,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 			case 'spisok': s.spisok(o1); break;
 			case 'process': s.process(); break;
 			case 'cancel': s.cancel(); break;
+			case 'focus': s.focus(); break;
 		}
 
 		return s;
@@ -816,6 +818,11 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 		massCreate();
 		spisokPrint();
 	};
+	t.focus = function() {//установка фокуса на input
+		if(o.write)
+			INP.focus();
+	};
+
 
 	window[win] = t;
 	return t;
@@ -943,7 +950,7 @@ $.fn._select1 = function(o, o1, o2) {
 		'</div>';
 	t.next().remove('._select');
 	t.after(html);
-//return t;
+
 	var select = t.next(),
 		inp = select.find('.selinp'),
 		inpClear = select.find('.icon-del'),

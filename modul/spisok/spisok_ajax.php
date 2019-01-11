@@ -485,8 +485,6 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 			continue;
 		if(!$col = $cmp['col'])
 			continue;
-//		if(!isset($dlgParent['field1'][$col]) && !isset($dlgParent['field2'][$col]))
-//			jsonError('В таблице отсутствует колонка с именем "'.$col.'"');
 
 		$v = _txt($CMP[$cmp_id]);
 
