@@ -604,11 +604,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					ATR_CMP = _attr_cmp(id);
 
 				switch(sp.dialog_id) {
-					case 12://подключаемая функция
+					//подключаемая функция
+					case 12:
 						var func = sp.txt_1 + '_get';
 						if(window[func])
 							send.vvv[id] = window[func](sp, o);
 						break;
+					//Select: выбор записи из другого списка (передача текста условии флага num_7)
+					case 29:
+						if(!sp.num_7)
+							break;
+						send.vvv[id] = ATR_CMP._select('inp');
 				}
 
 				if(ATR_CMP)
@@ -1033,7 +1039,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						}
 					}
 					return;
-				//select - выбор единицы из другого списка (для связки)
+				//select: выбор единицы из другого списка (для связки)
 				case 29:
 					_elemAction(el, _num(ATR_CMP.val()), 1);
 					var o = {
@@ -1059,6 +1065,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							});
 						}
 					};
+					//добавление записи через диалог
 					if(el.num_2)
 						o.funcAdd = function(t) {
 							_dialogLoad({
@@ -2493,10 +2500,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(!elem_id)
 						break;
 
-					if(ELMM[elem_id].dialog_id == 29) {
-						_attr_cmp(elem_id)._select('focus');
-						return;
-					}
+					if(ELMM[elem_id].dialog_id == 29)
+						return _attr_cmp(elem_id)._select('focus');
 
 					_attr_cmp(elem_id).focus();
 					break;

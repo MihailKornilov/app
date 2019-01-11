@@ -523,6 +523,16 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				if($v)
 					$send[$cmp_id] = _authPassMD5($v);
 				break;
+			//Select: выбор записи из другого списка
+			case 29:
+				$v = _num($v);
+
+				if($cmp['num_7'] && !$v)
+					$v = _elem29ValAuto($cmp, $_POST['vvv'][$cmp_id]);
+
+				if($cmp['req'] && !$v)
+					$is_err = 1;
+				break;
 			case 300://страница ВК
 				if(_elem300VkIdTest($DLG, $v, $unit_id)) {
 					$is_err = 1;

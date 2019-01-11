@@ -1435,6 +1435,62 @@ function _elem29DialogSel($prm, $sel_id) {//подстановка id запис
 
 	return $get_id;
 }
+function _elem29ValAuto($el, $txt) {//автоматическое внесение текста, введённого в выпадающем списке [29]
+	if(!$txt = _txt($txt))
+		return 0;
+	//подключенный список, в который будет производиться внесение записи
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return 0;
+	//вносить можно пока только в "_spisok"
+	if($DLG['table_name_1'] != '_spisok')
+		return 0;
+	//вносить можно пока только в родительский диалог
+	if($DLG['dialog_id_parent'])
+		return 0;
+	if(!$last = _idsLast($el['txt_3']))
+		return 0;
+	if(!$ell = _elemOne($last))
+		return 0;
+	if(!$col = $ell['col'])
+		return 0;
+
+	//получение id записи, если такой текст уже был внесён ранее
+	$sql = "SELECT `id`
+			FROM `_spisok`
+			WHERE `dialog_id`=".$DLG['id']."
+			  AND !`deleted`
+			  AND `".$col."`='".addslashes($txt)."'
+			LIMIT 1";
+	if($id = query_value($sql))
+		return $id;
+
+	$sql = "SELECT IFNULL(MAX(`num`),0)+1
+			FROM `_spisok`
+			WHERE `dialog_id`=".$DLG['id'];
+	$num = query_value($sql);
+
+	$sql = "SELECT IFNULL(MAX(`sort`)+1,1)
+			FROM `_spisok`
+			WHERE `dialog_id`=".$DLG['id'];
+	$sort = query_value($sql);
+
+	$sql = "INSERT INTO `_spisok` (
+				`app_id`,
+				`dialog_id`,
+				`num`,
+				`".$col."`,
+				`sort`,
+				`user_id_add`
+			) VALUES (
+				".APP_ID.",
+				".$DLG['id'].",
+				".$num.",
+				'".addslashes($txt)."',
+				".$sort.",
+				".USER_ID."
+			)";
+	return query_id($sql);
+}
 
 function _elemIsConnect($el) {//определение, является ли элемент подключаемым списком
 	if(empty($el))
@@ -1981,6 +2037,8 @@ function _val31($el, $txt) {//Выбор нескольких значений �
 
 	return implode(', ', $send);
 }
+
+
 
 function _elem33Data($el, $u) {//Значение записи: дата [33]
 	if(empty($u['dtime_add']))
