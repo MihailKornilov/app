@@ -1456,9 +1456,8 @@ function _elem29ValAuto($el, $txt) {//автоматическое внесен�
 
 	//получение id записи, если такой текст уже был внесён ранее
 	$sql = "SELECT `id`
-			FROM `_spisok`
-			WHERE `dialog_id`=".$DLG['id']."
-			  AND !`deleted`
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
 			  AND `".$col."`='".addslashes($txt)."'
 			LIMIT 1";
 	if($id = query_value($sql))

@@ -2265,6 +2265,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(!elem_id)
 						return;
 
+					if(ELMM[elem_id].dialog_id == 29)
+						return _attr_cmp(elem_id)._select('focus');
+
 					_attr_cmp(elem_id).focus();
 				//открытие документа
 				case 207:
