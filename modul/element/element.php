@@ -1836,6 +1836,7 @@ function _elemTitle($elem_id) {//имя элемента или его текс�
 		case 33: return 'дата';
 		case 30: return 'del';
 		case 34: return 'edit';
+		case 36: return 'icon';
 		case 60: return _imageNo($el['width']);
 		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
@@ -3778,8 +3779,6 @@ function PHP12_balans_setup_vvv($prm) {
 
 /* ---=== ВЫБОР ИКОНКИ [36] ===--- */
 function PHP12_icon18_list($prm) {
-
-
 	$sel = 0;
 	if($col = $prm['el12']['col'])
 		if($u = $prm['unit_edit'])
@@ -3804,7 +3803,18 @@ function PHP12_icon18_type($id='all') {//доступные варианты и�
 		2 => 'print',
 		3 => 'ok',
 		4 => 'set',
-		5 => 'set-b'
+		5 => 'set-b',
+		6 => 'client',
+		7 => 'worker',
+		8 => 'vk',
+		9 => 'rub',
+		10 => 'usd',
+		11 => 'stat',
+		12 => 'set-dot',
+		13 => 'info',
+		14 => 'search',
+		15 => 'star',
+		16 => 'comment'
 	);
 
 	if($id == 'all')
