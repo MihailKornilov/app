@@ -708,22 +708,6 @@ function _jsCacheBlk($app_id=0) {
 
 	return _json($BLK);
 }
-function _jsCacheElm($app_id=0) {
-	$ELM = array();
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `app_id`=".$app_id."
-			ORDER BY `id`";
-	$arr = query_arr($sql);
-	foreach($arr as $elem_id => $r) {
-		if(!$el = _jsCacheElemOne($elem_id))
-			continue;
-		$ELM[$elem_id] = $el;
-	}
-
-	return _json($ELM);
-}
 function _jsCacheBlkOne($block_id) {
 	if(!$r = _blockOne($block_id))
 		return array();
@@ -749,6 +733,22 @@ function _jsCacheBlkOne($block_id) {
 		$val['action'] = $r['action'];
 
 	return $val;
+}
+function _jsCacheElm($app_id=0) {
+	$ELM = array();
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".$app_id."
+			ORDER BY `id`";
+	$arr = query_arr($sql);
+	foreach($arr as $elem_id => $r) {
+		if(!$el = _jsCacheElemOne($elem_id))
+			continue;
+		$ELM[$elem_id] = $el;
+	}
+
+	return _json($ELM);
 }
 function _jsCacheElemOne($elem_id) {
 	if(!$r = _elemOne($elem_id))

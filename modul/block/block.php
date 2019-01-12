@@ -2443,7 +2443,6 @@ function _beElemHint($ELM, $app_id) {//подсказки, назначенны�
 		$elem_id = $r['element_id'];
 		if(!isset($ELM[$elem_id]))
 			continue;
-		unset($r['id']);
 		unset($r['app_id']);
 		unset($r['element_id']);
 		unset($r['user_id_add']);

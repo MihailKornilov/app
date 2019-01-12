@@ -437,10 +437,11 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		настройка шаблона через функцию PHP12_spisok14_setup
 	*/
 
-	if(!_BE('block_arr', 'spisok', $ELEM['id']))
-		return _emptyRed('Шаблон единицы списка не настроен.');
-
 	$DLG = _dialogQuery($ELEM['num_1']);
+
+	if(!_BE('block_arr', 'spisok', $ELEM['id']))
+		return _emptyRed('Шаблон <b>'.$DLG['name'].'</b> не настроен.');
+
 
 	$limit = $ELEM['num_2'];
 
