@@ -762,6 +762,9 @@ $(document)
 				'<tr><td class="line-b pb3"><button class="vk small w100 fl mr3 orange">переместить</button>'+
 						'<div class="grey fs11">После нажатия этой кнопки укажите блок, в который нужно вставить выбранные блоки. Элементы и дочерние блоки будут перенесены.<div>' +
 
+				'<tr><td class="line-b pb3"><button class="vk small w175 fl mr3 orange">переместить на страницу</button>'+
+						'<div class="grey fs11">Укажите страницу,<br>на которую нужно будет переместить блоки и элементы.<div>' +
+
 				'<tr><td><button class="vk small w100 fl mr3 red">удалить</button>'+
 						'<div class="grey fs11">Блоки будут удалены вместе с элементами и дочерними блоками.<div>' +
 			'</table>' +
@@ -801,6 +804,17 @@ $(document)
 					$('#blk-cho-but')._dn();
 					$('#blk-cho-cut-info')._dn(1);
 					$('.blk-choose.sel').removeClass('sel');
+				});
+				//перемещение на другую страницу
+				o.find('button').eq(2).click(function() {
+					_dialogLoad({
+						dialog_id:97,
+						dop:ids,
+						busy_obj:$(this),
+						func_save:function() {
+							location.reload();
+						}
+					});
 				});
 				//удаление
 				o.find('button:last').click(function() {

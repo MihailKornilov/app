@@ -559,6 +559,9 @@ function _emptyMin10($msg) {
 function _emptyRed($msg) {
 	return '<div class="_empty red">'.$msg.'</div>';
 }
+function _emptyMinRed($msg) {
+	return '<div class="_empty min red">'.$msg.'</div>';
+}
 function _emptyRed10($msg) {
 	return '<div class="_empty red mar10">'.$msg.'</div>';
 }

@@ -833,7 +833,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			if(!$el['txt_1'])
 				return _emptyMin('Отсутствует имя функции.');
 			if(!function_exists($el['txt_1']))
-				return _emptyRed('Фукнции <b>'.$el['txt_1'].'</b> не существует.');
+				return _emptyMinRed('Фукнции <b>'.$el['txt_1'].'</b> не существует.');
 			if($prm['blk_setup'])
 				return _emptyMin('Функция '.$el['txt_1']);
 
