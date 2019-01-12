@@ -1604,19 +1604,29 @@ function _elemButton($el, $prm) {//кнопка [2]
 			));
 }
 function _elemButtonVal($el, $prm) {//значения аттрибута val для кнопки
-	$val = 'dialog_id:'.$el['num_4'].
-			//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
-		  ',block_id:'.$el['block_id'];
+	$ass['dialog_id'] = $el['num_4'];
+
+	//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
+	if(!$el['num_4'])
+		$ass['block_id'] = $el['block_id'];
 
 	//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
 	//а также вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
 	//Нужно для назначения функций (пока)
 	if(!empty($el['block']))
 		if($el['block']['obj_name'] == 'dialog') {
-			$val .= ',dss:'.$el['block']['obj_id'];
+			$ass['dss'] = $el['block']['obj_id'];
 			if($prm['srce']['block_id'])
-				$val .= ',block_id:'.$prm['srce']['block_id'];
+				$ass['block_id'] = $prm['srce']['block_id'];
+			if($prm['srce']['element_id'])
+				$ass['element_id'] = $prm['srce']['element_id'];
 		}
+
+	$val = array();
+	foreach($ass as $k => $v)
+		$val[] = $k.':'.$v;
+
+	$val = implode(',', $val);
 
 	if($dialog_id = $el['num_4'])
 		$val .= _dialogOpenVal($dialog_id, $prm, $el['num_3']);
@@ -3056,14 +3066,6 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 					WHERE `parent_id`=".$unit['id']."
 					  AND `id`=".$id;
 			query($sql);
-
-			//удаление ссылки, если не нужна
-			if(!_num($r['url'])) {
-				$sql = "DELETE FROM `_action`
-						WHERE `element_id`=".$id."
-						  AND `dialog_id`=221";
-				query($sql);
-			}
 		}
 
 	//удаление значений, которые были удалены при настройке
@@ -3072,13 +3074,10 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 			WHERE `parent_id`=".$unit['id']."
 			  AND !`num_8`";
 	if($ids = query_ids($sql)) {
-		$sql = "DELETE FROM `_element`
-				WHERE `id` IN (".$ids.")";
+		$sql = "DELETE FROM `_element` WHERE `id` IN (".$ids.")";
 		query($sql);
 
-		$sql = "DELETE FROM `_action`
-				WHERE `element_id` IN (".$ids.")
-				  AND `dialog_id`=221";
+		$sql = "DELETE FROM `_action` WHERE `element_id` IN (".$ids.")";
 		query($sql);
 	}
 }
@@ -3094,13 +3093,6 @@ function PHP12_td_setup_vvv($prm) {//получение данных ячеек 
 	if(!$arr = query_arr($sql))
 		return array();
 
-	//получение действий (переход по ссылке), настроенных для ячеек
-	$sql = "SELECT `element_id`,`id`
-			FROM `_action`
-			WHERE `element_id` IN ("._idsGet($arr).")
-			  AND `dialog_id`=221";
-	$url = query_ass($sql);
-
 	$send = array();
 	foreach($arr as $id => $r) {
 		$send[] = array(
@@ -3110,7 +3102,6 @@ function PHP12_td_setup_vvv($prm) {//получение данных ячеек 
 			'width' => _num($r['width']),
 			'font' => $r['font'],
 			'color' => $r['color'],
-			'url_action_id' => _num(@$url[$id]),
 			'txt_7' => $r['txt_7'],
 			'pos' => $r['txt_8']
 		);
@@ -3827,11 +3818,6 @@ function PHP12_icon18_type($id='all') {//доступные варианты и�
 
 /* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ИЛИ БЛОКУ ===--- */
 function PHP12_action_list($prm) {
-	if(!$bs_id = _num($prm['srce']['block_id']))
-		return _emptyMin('Отсутствует ID исходного блока.');
-	if(!$BL = _blockOne($bs_id))
-		return _emptyMin('Исходного блока id'.$bs_id.' не существует.');
-
 	//текущий диалог для обновления списка действий после редактирования
 	$dss = $prm['el12']['block']['obj_id'];
 
@@ -3839,9 +3825,22 @@ function PHP12_action_list($prm) {
 		//действия для элемента
 		case 200:
 		case 220:
-			$where = "`element_id`=".$BL['elem_id']; break;
+			if($block_id = _num($prm['srce']['block_id'])) {
+				if(!$BL = _blockOne($block_id))
+					return _emptyMin('Блока id'.$block_id.' не существует.');
+				$elem_id = $BL['elem_id'];
+			} elseif(!$elem_id = _num($prm['srce']['element_id']))
+				return _emptyMin('Отсутствует ID элемента.');
+			$where = "`element_id`=".$elem_id;
+			break;
 		//действия для блока
-		case 210: $where = "`block_id`=".$bs_id; break;
+		case 210:
+			if(!$block_id = _num($prm['srce']['block_id']))
+				return _emptyMin('Отсутствует ID исходного блока.');
+			if(!$BL = _blockOne($block_id))
+				return _emptyMin('Блока id'.$block_id.' не существует.');
+			$where = "`block_id`=".$block_id;
+			break;
 		default: return _emptyMin('Неизвестный диалог для настройки действий.');
 	}
 

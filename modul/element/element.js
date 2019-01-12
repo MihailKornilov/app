@@ -3116,13 +3116,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				width:150,      //ширина колонки
 				font:'',        //выделение: b, i, u
 				color:'',       //цвет текста
-				url_action_id:0,//текст в колонке является ссылкой
 				txt_7:'',       //TH-заголовок колонки
 				pos:''          //txt_8: позиция по горизонтали (l, center, r)
 			}, v.id ? v : {});
 
 			DL.append(
-				'<dd class="over3" val="' + v.id + '" data-url="' + v.url_action_id + '">' +
+				'<dd class="over3" val="' + v.id + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w80 grey r topi">Колонка ' + NUM + ':' +
@@ -3182,8 +3181,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					msg:'<table class="bs5">' +
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
-								'<td class="pt3">' +
-									'<div class="icon-wiki iw12 ml3' + _dn(v.url_action_id, 'on') + _tooltip('Ссылка', -22) + '</div>' +
+								'<td class="pl10">' +
+									'<div class="icon icon-link pl' + _tooltip('Настроить ссылку', -57) + '</div>' +
 								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
 						'</table>' +
 						'',
@@ -3192,25 +3191,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					delayShow:700,
 					delayHide:300,
 					func:function(o) {
-						o.find('.iw12').click(function() {
-							var url = $(this);
-
-							//снятие ссылки
-							if(url.hasClass('on')) {
-								url.removeClass('on');
-								DD.attr('data-url', 0);
-								return false;
-							}
-
+						o.find('.icon-link').click(function() {
 							_dialogLoad({
-								dialog_id:221,
+								dialog_id:220,
 								element_id:v.id,
-								edit_id:v.url_action_id,
 								busy_obj:$(this),
-								func_save:function(res) {
-									DD.attr('data-url', res.unit.id);
-									v.url_action_id = res.unit.id;
-								}
+								busy_cls:'spin'
 							});
 						});
 					}
@@ -3280,9 +3266,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			for(k in ELEM_COLOR)
 				if(inp.hasClass(k))
 					v.color = k;
-
-			//ссылка (действие [221])
-			v.url = _num(sp.attr('data-url'));
 
 			send.push(v);
 		});
