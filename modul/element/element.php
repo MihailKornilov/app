@@ -1607,7 +1607,7 @@ function _elemButtonVal($el, $prm) {//значения аттрибута val д
 	$ass['dialog_id'] = $el['num_4'];
 
 	//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
-	if(!$el['num_4'])
+	if($el['num_4'] <= 0)
 		$ass['block_id'] = $el['block_id'];
 
 	//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
@@ -2704,8 +2704,10 @@ function PHP12_v_choose_dialog($BL, $dialog_id) {//блок из диалога
 		return false;
 	if(!$DLG = _dialogQuery($BL['obj_id']))
 		return 'Диалога '.$BL['obj_id'].' не существует.';
-	if($parent_id = $DLG['dialog_id_parent'])
-		return $parent_id;
+//	if($parent_id = $DLG['dialog_id_parent'])
+//		return $parent_id;
+	if($get_id = $DLG['dialog_id_unit_get'])
+		return $get_id;
 	return $BL['obj_id'];
 }
 function PHP12_v_choose_spisok($BL, $obj_id) {//элемент из записи
