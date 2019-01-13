@@ -4795,7 +4795,7 @@ function _historyUnitCond($el, $prm) {//отображение истории д
 
 	$ids = 0;
 
-	//получение id единиц списка, которые были связаны с текущей единицей
+	//получение id записей, которые были связаны с текущей записью
 	$sql = "SELECT `block_id`,`col`
 			FROM `_element`
 			WHERE `dialog_id`=29
@@ -4807,8 +4807,12 @@ function _historyUnitCond($el, $prm) {//отображение истории д
 				FROM `_block`
 				WHERE `obj_name`='dialog'
 				  AND `id` IN ("._idsGet($cols, 'key').")";
-		foreach(query_arr($sql) as $r)
-			$cond[] = "`dialog_id`=".$r['obj_id']." AND `".$cols[$r['id']]."`=".$unit_id;
+		foreach(query_arr($sql) as $r) {
+			$col = $cols[$r['id']];
+			if(_num($col))
+				$col = _elemCol($col);
+			$cond[] = "`dialog_id`=".$r['obj_id']." AND `".$col."`=".$unit_id;
+		}
 
 		if(!empty($cond)) {
 			$sql = "SELECT `id`
