@@ -1091,6 +1091,14 @@ function _40cond($EL, $cond) {//изначальные условия отобр
 			return " AND !`t1`.`id` /* [40] отсутствует элемент ".$r['elem_id']." */";
 		if(!$col = $ell['col'])
 			return " AND !`t1`.`id` /* [40] отсутствует имя колонки */";
+		if(!$BL = $ell['block'])
+			return " AND !`t1`.`id` /* [40] элемент не содержится блок */";
+		if($BL['obj_name'] != 'dialog')
+			return " AND !`t1`.`id` /* [40] элемент не из диалога */";
+		if(!$DLG = _dialogQuery($BL['obj_id']))
+			return " AND !`t1`.`id` /* [40] диалога не существует */";
+
+		$col = '`'._queryTN($DLG, $col).'`.`'.$col.'`';
 
 		$val = _40cond_cnn($EL, $r, $ell, $r['txt']);
 		$val = _40cond_17($r, $ell, $val);
@@ -1268,22 +1276,22 @@ function _40condV($act, $col, $val) {//значение запроса по ко
 
 	$val = addslashes($val);
 	switch($act) {
-		case 1: return " AND `t1`.`".$col."`=DEFAULT(`t1`.`".$col."`)";
-		case 2: return " AND `t1`.`".$col."`!=DEFAULT(`t1`.`".$col."`)";
+		case 1: return " AND ".$col."=DEFAULT(".$col.")";
+		case 2: return " AND ".$col."!=DEFAULT(".$col.")";
 		case 3:
 			if(!_num($val) && _ids($val))
-				return " AND `t1`.`".$col."` IN (".$val.")";
-			return " AND `t1`.`".$col."`='".$val."'";
+				return " AND ".$col." IN (".$val.")";
+			return " AND ".$col."='".$val."'";
 		case 4:
 			if(!_num($val) && _ids($val))
-				return " AND `t1`.`".$col."` NOT IN (".$val.")";
-			return " AND `t1`.`".$col."`!='".$val."'";
-		case 5: return " AND `t1`.`".$col."`>'".$val."'";
-		case 6: return " AND `t1`.`".$col."`>='".$val."'";
-		case 7: return " AND `t1`.`".$col."`<'".$val."'";
-		case 8: return " AND `t1`.`".$col."`<='".$val."'";
-		case 9: return " AND `t1`.`".$col."` LIKE '%".$val."%'";
-		case 10:return " AND `t1`.`".$col."` NOT LIKE '%".$val."%'";
+				return " AND ".$col." NOT IN (".$val.")";
+			return " AND ".$col."!='".$val."'";
+		case 5: return " AND ".$col.">'".$val."'";
+		case 6: return " AND ".$col.">='".$val."'";
+		case 7: return " AND ".$col."<'".$val."'";
+		case 8: return " AND ".$col."<='".$val."'";
+		case 9: return " AND ".$col." LIKE '%".$val."%'";
+		case 10:return " AND ".$col." NOT LIKE '%".$val."%'";
 	}
 
 	return " AND !`t1`.`id` /* _40condV: не найдено условие */";
