@@ -1095,6 +1095,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		case 31:
 			/*
 				num_1 - список, из которого будут выбираться галочки
+				num_2 - элемент-содержание
 			*/
 
 			$v = _elemPrintV($el, $prm);
@@ -1112,12 +1113,30 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$n = 0;
 			$sel = _idsAss($v);
 			foreach($spisok as $r) {
+				$title = '<div class="fs10 red">содержание не настроено</div>';
+
+				if($elem_id = $el['num_2']) {
+					if($ell = _elemOne($elem_id)) {
+						switch($ell['dialog_id']) {
+							//сборный текст
+							case 44:
+								$title = PHP12_44_print($ell, $r);
+								break;
+							default:
+								if($col = $ell['col'])
+									if(isset($r[$col]))
+										$title = $r[$col];
+						}
+					}
+				} elseif($col = _elemCol($DLG['spisok_elem_id']))
+						$title = $r[$col];
+
 				$chk .=
 					'<div class="'._dn(!$n++, 'mt5').'">'.
 						_check(array(
 							'attr_id' => 'chk31_'.$r['num'],
 							'light' => 1,
-							'title' => $r['txt_1'],
+							'title' => $title,
 							'value' => _num(@$sel[$r['num']])
 						)).
 					'</div>';
