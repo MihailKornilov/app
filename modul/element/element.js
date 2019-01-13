@@ -1090,6 +1090,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						_forEq(ATR_EL.find('._check.on'), function(sp) {
 							cmpv.push(sp.prev().attr('id').split('_')[1]);
 						});
+						if(cmpv.length) {
+							cmpv.unshift(0);
+							cmpv.push(0);
+						}
 						ATR_CMP.val(cmpv.join())
 					});
 					return;
