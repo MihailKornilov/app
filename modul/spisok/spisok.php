@@ -1530,79 +1530,101 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 				break;
 			//привязанные списки
 			case 29:
-				_spisokUnitAfter54($cmp, $dialog, $unit, $unitOld); //пересчёт количеств привязаного списка [54]
-				$upd = _spisokUnitAfter55($cmp, $dialog, $unit);    //пересчёт cумм привязаного списка [55]
-				_spisokUnitAfter27($upd);                           //подсчёт балансов после обновления сумм [27]
-				_spisokCounter($cmp['num_1']);
+				_spisokUnitAfter54($cmp, $dialog, $unit);         //пересчёт количеств привязаного списка [54]
+				$upd = _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld);  //пересчёт cумм привязаного списка [55]
+				_spisokUnitAfter27($upd);                         //подсчёт балансов после обновления сумм [27]
+
+				_counterGlobal($cmp['num_1']);
 				break;
 		}
 }
-function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количеств привязаного списка
+function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт количеств привязаного списка
+	if(!$UCOL = $cmp['col'])//имя колонки, по которой привязан список
+		return;
+	if(empty($unit[$UCOL]))
+		return;
+	if(!$connect_id = _num($unit[$UCOL]['id']))//значение, id записи привязанного списка.
+		return;
+
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=54
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
 		return;
-	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
-		return;
-	if(empty($unit[$col]))
-		return;
-	if(!$connect_id = _num($unit[$col]['id']))//значение, id единицы привязанного списка.
-		return;
-
-	$connect_old = 0;
-	$count_old = 0;
-	if(!empty($unitOld))
-		if($connect_old = _num($unitOld[$col])) {
-			//получение старого количества для обновления
-			$sql = "SELECT COUNT(*)
-					FROM "._queryFrom($dialog)."
-					WHERE `".$col."`=".$connect_old."
-					  AND "._queryWhere($dialog);
-			$count_old = _num(query_value($sql));
-		}
-
-
-	//получение нового количества для обновления
-	$sql = "SELECT COUNT(*)
-			FROM "._queryFrom($dialog)."
-			WHERE `".$col."`=".$connect_id."
-			  AND "._queryWhere($dialog);
-	$count = _num(query_value($sql));
 
 	foreach($arr as $r) {
+		//колонка элемента-количества
 		if(!$col = $r['col'])
 			continue;
+		//блок, в котором расположен элемент-количество
+		if(!$bl = _blockOne($r['block_id']))
+			continue;
+		//элемент-количество обязательно должен располагаться в диалоге
+		if($bl['obj_name'] != 'dialog')
+			continue;
+		//диалог, в котором расположен элемент-количество
+		if(!$dlg = _dialogQuery($bl['obj_id']))
+			continue;
 
-		$bl = _blockOne($r['block_id']);
-		$dlg = _dialogQuery($bl['obj_id']);
-
-		if($connect_old) {
-			$sql = "UPDATE "._queryFrom($dlg)."
-					SET `".$col."`=".$count_old."
-					WHERE `t1`.`id`=".$connect_old."
-					  AND "._queryWhere($dlg);
-			query($sql);
-		}
+		//получение количества для обновления
+		$sql = "SELECT COUNT(*)
+				FROM "._queryFrom($dialog)."
+				WHERE `".$UCOL."`=".$connect_id."
+				  AND "._queryWhere($dialog);
+		$count = _num(query_value($sql));
 
 		$sql = "UPDATE "._queryFrom($dlg)."
 				SET `".$col."`=".$count."
 				WHERE `t1`.`id`=".$connect_id."
 				  AND "._queryWhere($dlg);
 		query($sql);
+
+		//флаг включенного счётчика-истории
+		if(!$r['num_3'])
+			continue;
+
+		//получение последней записи
+		$sql = "SELECT *
+				FROM `_counter_v`
+				WHERE `element_id`=".$r['id']."
+				  AND `unit_id`=".$connect_id."
+				ORDER BY `id` DESC
+				LIMIT 1";
+		if($cv = query_assoc($sql))
+			//если количество совпадает, запись не вносится
+			if($count == _num($cv['balans']))
+				continue;
+
+		$sql = "INSERT INTO `_counter_v` (
+					`app_id`,
+					`element_id`,
+					`unit_id`,
+					`balans`,
+					`user_id_add`
+				) VALUES (
+					".APP_ID.",
+					".$r['id'].",
+					".$connect_id.",
+					".$count.",
+					".USER_ID."
+				)";
+		query($sql);
 	}
 }
-function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм привязаного списка после внесения/удаления данных
+function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт сумм привязаного списка после внесения/удаления данных
+	//имя колонки, по которой привязан список
+	if(!$col = $cmp['col'])
+		return array();
+	//значение, id записи привязанного списка
+	if(!$connect_id = _num($unit[$col]['id']))
+		return array();
+
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=55
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
-		return array();
-	if(!$col = $cmp['col'])//имя колонки, по которой привязан список
-		return array();
-	if(!$connect_id = _num($unit[$col]['id']))//значение, id записи привязанного списка.
 		return array();
 
 	$send = array();//значения, которые были пересчитаны. По ним будет потом посчитан баланс, если потребуется.
@@ -1614,11 +1636,12 @@ function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм �
 			continue;
 		if(!$colSum = $el['col'])
 			continue;
+		if(!$bl = _blockOne($r['block_id']))
+			continue;
+		if(!$dlg = _dialogQuery($bl['obj_id']))
+			continue;
 
-		$bl = _blockOne($r['block_id']);
-		$dlg = _dialogQuery($bl['obj_id']);
-
-		//получение нового количества для обновления
+		//получение суммы для обновления
 		$sql = "SELECT IFNULL(SUM(`".$colSum."`),0)
 				FROM "._queryFrom($dialog)."
 				WHERE `".$col."`=".$connect_id."
@@ -1632,6 +1655,49 @@ function _spisokUnitAfter55($cmp, $dialog, $unit) {//пересчёт сумм �
 		query($sql);
 
 		$send[$elem_id] = $connect_id;     //id записи, баланс которой будет пересчитан
+
+
+
+
+		//флаг включенного счётчика-истории
+		if(!$r['num_3'])
+			continue;
+
+		//получение последней записи
+		$sql = "SELECT *
+				FROM `_counter_v`
+				WHERE `element_id`=".$elem_id."
+				  AND `unit_id`=".$connect_id."
+				ORDER BY `id` DESC
+				LIMIT 1";
+		if($cv = query_assoc($sql))
+			//если сумма совпадает, запись не вносится
+			if($sum == $cv['balans'])
+				continue;
+
+		$sumOld = 0;
+		if(isset($unitOld[$colSum]))
+			if($unitOld[$colSum] != $unit[$colSum])
+				$sumOld = $unitOld[$colSum];
+
+		$sql = "INSERT INTO `_counter_v` (
+					`app_id`,
+					`element_id`,
+					`unit_id`,
+					`sum_old`,
+					`sum`,
+					`balans`,
+					`user_id_add`
+				) VALUES (
+					".APP_ID.",
+					".$elem_id.",
+					".$connect_id.",
+					".$sumOld.",
+					".$unit[$colSum].",
+					".$sum.",
+					".USER_ID."
+				)";
+		query($sql);
 	}
 
 	return $send;
@@ -1703,7 +1769,7 @@ function _spisokUnitAfter27($ass) {
 
 
 /* Глобальные счётчики */
-function _spisokCounter($dialog_id) {
+function _counterGlobal($dialog_id) {
 	if(!$DLG = _dialogQuery($dialog_id)) {
 		_debugLog('ОШИБКА: диалога '.$dialog_id.' не существует');
 		return;
@@ -1732,21 +1798,10 @@ function _spisokCounter($dialog_id) {
 
 				_debugLog('Получено количество '.$count.' в счётчике '.$counter_id);
 
-				if(!_spisokCounterInsertAccess($counter_id, $count))
+				if(!_counterGlobalInsertAccess($counter_id, $count))
 					break;
 
-				$sql = "INSERT INTO `_counter_v` (
-							`app_id`,
-							`counter_id`,
-							`balans`,
-							`user_id_add`
-						) VALUES (
-							".APP_ID.",
-							".$counter_id.",
-							".$count.",
-							".USER_ID."
-						)";
-				query($sql);
+				_counterGlobalInsert($counter_id, $count);
 				break;
 			//сумма
 			case 3852:
@@ -1764,26 +1819,15 @@ function _spisokCounter($dialog_id) {
 
 				_debugLog('Получена сумма '.$sum.' в счётчике '.$counter_id);
 
-				if(!_spisokCounterInsertAccess($counter_id, $sum))
+				if(!_counterGlobalInsertAccess($counter_id, $sum))
 					break;
 
-				$sql = "INSERT INTO `_counter_v` (
-							`app_id`,
-							`counter_id`,
-							`balans`,
-							`user_id_add`
-						) VALUES (
-							".APP_ID.",
-							".$counter_id.",
-							".$sum.",
-							".USER_ID."
-						)";
-				query($sql);
+				_counterGlobalInsert($counter_id, $sum);
 				break;
 			default: _debugLog('Неизвестный тип счётчика: '.$r['type_id']);
 		}
 }
-function _spisokCounterInsertAccess($counter_id, $v) {//разрешение на внесение записи о балансе
+function _counterGlobalInsertAccess($counter_id, $v) {//разрешение на внесение записи о балансе
 	$sql = "SELECT *
 		FROM `_counter_v`
 		WHERE `counter_id`=".$counter_id."
@@ -1797,7 +1841,20 @@ function _spisokCounterInsertAccess($counter_id, $v) {//разрешение н�
 
 	return false;
 }
-
+function _counterGlobalInsert($counter_id, $balans) {//внесение записи счётчика
+	$sql = "INSERT INTO `_counter_v` (
+				`app_id`,
+				`counter_id`,
+				`balans`,
+				`user_id_add`
+			) VALUES (
+				".APP_ID.",
+				".$counter_id.",
+				".$balans.",
+				".USER_ID."
+			)";
+	query($sql);
+}
 
 
 
