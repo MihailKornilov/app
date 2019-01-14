@@ -50,7 +50,7 @@ $.fn._check = function(o) {
 		win = attr_id + 'win',
 		S = window[win];
 
-	if(S && t.next('._check').length) {
+	if(S && t.next('._check:not(.php)').length) {
 		switch(typeof o) {
 			case 'number': S.setV(o ? 1 : 0); break;
 			case 'string':

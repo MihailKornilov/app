@@ -771,7 +771,8 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 				if($BL = _blockOne($block_id))
 					if($elem_id = $BL['elem_id']) {
 						$sql = "UPDATE `_element_hint`
-								SET `element_id`=".$elem_id."
+								SET `app_id`=".$BL['app_id'].",
+									`element_id`=".$elem_id."
 								WHERE `id`=".$uid[$table_1];
 						query($sql);
 					}

@@ -259,6 +259,7 @@ function _queryWhere($DLG, $withDel=false) {//составление услов�
 	if($tn = _queryTN($DLG, 'app_id'))
 		switch($DLG['table_name_1']) {
 			case '_element': break;
+			case '_element_hint': break;
 			case '_action':  break;
 			case '_page':  break;
 			default: $send[] = "`".$tn."`.`app_id`=".APP_ID;

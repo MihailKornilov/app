@@ -994,7 +994,11 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				   ));
 
 		//Настройка суммы значений единицы списка
-		case 27: return $el['name'];
+		case 27:
+			/*
+				num_3 - включение счётчика
+			*/
+			return $el['name'];
 
 		//Загрузка файла
 		case 28:
@@ -1357,6 +1361,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		case 54:
 			/*
 				num_1 - привязанный список
+				num_3 - включение счётчика
 			*/
 			return $el['name'];
 
@@ -1367,6 +1372,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 				num_1 - привязанный список
 				num_2 - id элемента значения (колонки) привязанного списка
+				num_3 - включение счётчика
 			*/
 			return $el['name'];
 
@@ -2262,6 +2268,7 @@ function _beBlock($app_id=0) {//кеш блоков
 function _beBlockStructure($bl) {//формирование массива блоков для кеша
 	return array(
 		'id' => _num($bl['id']),
+		'app_id' => _num($bl['app_id']),
 		'parent_id' => _num($bl['parent_id']),
 		'child_count' => _num($bl['child_count']),
 		'sa' => _num($bl['sa']),
@@ -2377,6 +2384,7 @@ function _beElemStructure($el) {//основная структура элеме
 
 	$send = array(
 		'id' => $elem_id,
+		'app_id' => _num($el['app_id']),
 		'dialog_id' => _num($el['dialog_id']),
 		'block_id' => _num($el['block_id']),
 		'parent_id' => _num($el['parent_id']),

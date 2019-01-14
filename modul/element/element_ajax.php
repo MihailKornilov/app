@@ -331,6 +331,15 @@ switch(@$_POST['op']) {
 
 		$send = _dialogOpenLoad($dialog_id);
 
+		//получение обновлённых подсказок действий
+		$DLG = _dialogQuery($dialog_id);
+		$ELM = array();
+		foreach(_BE('elem_ids_arr', 'dialog', $dialog_id) as $id)
+			$ELM[$id] = array();
+
+		$ELM = _beElemHint($ELM, $DLG['app_id']);
+		$send['elm_js'] = _beElemAction($ELM, $DLG['app_id']);
+
 		jsonSuccess($send);
 		break;
 	case 'dialog_open_load'://получение данных диалога

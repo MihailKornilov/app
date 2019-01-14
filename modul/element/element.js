@@ -518,6 +518,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			dialog.post(send, function(res) {
 				if(!o.send)
 					return;
+
+				//обновление подсказок действий в JS
+				_forIn(res.elm_js, function(sp, id) {
+					ELMM[id].hint = sp.hint;
+					ELMM[id].action = sp.action;
+				});
+
+				delete res.elm_js;
+
 				res.send = o.send;
 				_dialogOpen(res);
 			});
