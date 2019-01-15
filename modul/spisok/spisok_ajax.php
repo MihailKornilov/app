@@ -34,7 +34,7 @@ switch(@$_POST['op']) {
 					  AND `t1`.`id`=".$unit_id;
 			query($sql);
 			_historyInsert(3, $dialog, $unit_id);
-			_counterGlobal($dialog['id']);
+			_counterGlobal($dialog['id'], $dialog);
 			_SUN_AFTER($dialog, $unit);
 		} else {
 			$elem = array();
@@ -407,13 +407,13 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_spisokUnitUpd54($unit);
 	_spisokUnitUpd55($unit);
 
-	_counterGlobal($dialog['id']);
+	_counterGlobal($dialog['id'], $dialog);
 
 	_SUN_AFTER($dialog, $unit, $unitOld);
 
 	//установка первого значения для счётчика при его создании. Либо обновление.
 	if($dialog['table_name_1'] == '_counter')
-		_counterGlobal($unit['spisok_id']);
+		_counterGlobal($unit['spisok_id'], $dialog);
 
 	if($dialog['table_name_1'] == '_page') {
 		_cache_clear('page');

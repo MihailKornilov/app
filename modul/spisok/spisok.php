@@ -1524,7 +1524,11 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 
 				$send = array();
 				foreach($arr as $id => $r)
-					$send[$id] = $unit['id'];     //id записи, баланс которой будет пересчитан
+					$send[$id] = array(
+						'sum_old' => 0,
+						'sum' => 0,
+						'unit_id' => $unit['id']     //id записи, баланс которой будет пересчитан
+					);
 
 				_spisokUnitAfter27($dialog, $send);
 				break;
@@ -1534,7 +1538,7 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 				$upd = _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld); //пересчёт cумм привязаного списка [55]
 				_spisokUnitAfter27($dialog, $upd);                         //подсчёт балансов после обновления сумм [27]
 
-				_counterGlobal($cmp['num_1']);
+				_counterGlobal($cmp['num_1'], $dialog);
 				break;
 		}
 }
@@ -1836,7 +1840,7 @@ function _spisokUnitAfter27($DLG, $ass) {
 
 
 /* Глобальные счётчики */
-function _counterGlobal($dialog_id) {
+function _counterGlobal($dialog_id, $dlgAct) {
 	if(!$DLG = _dialogQuery($dialog_id))
 		return;
 
@@ -1862,7 +1866,7 @@ function _counterGlobal($dialog_id) {
 				if(!_counterGlobalInsertAccess($counter_id, $count))
 					break;
 
-				_counterGlobalInsert($counter_id, $count);
+				_counterGlobalInsert($counter_id, $count, $dlgAct);
 				break;
 			//сумма
 			case 3852:
@@ -1881,7 +1885,7 @@ function _counterGlobal($dialog_id) {
 				if(!_counterGlobalInsertAccess($counter_id, $sum))
 					break;
 
-				_counterGlobalInsert($counter_id, $sum);
+				_counterGlobalInsert($counter_id, $sum, $dlgAct);
 				break;
 			default: _debugLog('Неизвестный тип счётчика: '.$r['type_id']);
 		}
@@ -1900,15 +1904,19 @@ function _counterGlobalInsertAccess($counter_id, $v) {//разрешение н�
 
 	return false;
 }
-function _counterGlobalInsert($counter_id, $balans) {//внесение записи счётчика
+function _counterGlobalInsert($counter_id, $balans, $dlgAct) {//внесение записи счётчика
 	$sql = "INSERT INTO `_counter_v` (
 				`app_id`,
 				`counter_id`,
+				`action_type_id`,
+				`action_dialog_id`,
 				`balans`,
 				`user_id_add`
 			) VALUES (
 				".APP_ID.",
 				".$counter_id.",
+				".$dlgAct['act'].",
+				".$dlgAct['id'].",
 				".$balans.",
 				".USER_ID."
 			)";
