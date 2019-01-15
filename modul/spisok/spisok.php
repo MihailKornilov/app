@@ -1526,13 +1526,13 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 				foreach($arr as $id => $r)
 					$send[$id] = $unit['id'];     //id записи, баланс которой будет пересчитан
 
-				_spisokUnitAfter27($send);
+				_spisokUnitAfter27($dialog, $send);
 				break;
 			//привязанные списки
 			case 29:
 				_spisokUnitAfter54($cmp, $dialog, $unit);         //пересчёт количеств привязаного списка [54]
-				$upd = _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld);  //пересчёт cумм привязаного списка [55]
-				_spisokUnitAfter27($upd);                         //подсчёт балансов после обновления сумм [27]
+				$upd = _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld); //пересчёт cумм привязаного списка [55]
+				_spisokUnitAfter27($dialog, $upd);                         //подсчёт балансов после обновления сумм [27]
 
 				_counterGlobal($cmp['num_1']);
 				break;
@@ -1553,7 +1553,7 @@ function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт колич
 	if(!$arr = query_arr($sql))
 		return;
 
-	foreach($arr as $r) {
+	foreach($arr as $elem_id => $r) {
 		//колонка элемента-количества
 		if(!$col = $r['col'])
 			continue;
@@ -1587,7 +1587,7 @@ function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт колич
 		//получение последней записи
 		$sql = "SELECT *
 				FROM `_counter_v`
-				WHERE `element_id`=".$r['id']."
+				WHERE `element_id`=".$elem_id."
 				  AND `unit_id`=".$connect_id."
 				ORDER BY `id` DESC
 				LIMIT 1";
@@ -1599,12 +1599,16 @@ function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт колич
 		$sql = "INSERT INTO `_counter_v` (
 					`app_id`,
 					`element_id`,
+					`action_type_id`,
+					`action_dialog_id`,
 					`unit_id`,
 					`balans`,
 					`user_id_add`
 				) VALUES (
 					".APP_ID.",
-					".$r['id'].",
+					".$elem_id.",
+					".$dialog['act'].",
+					".$dialog['id'].",
 					".$connect_id.",
 					".$count.",
 					".USER_ID."
@@ -1654,7 +1658,19 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 				  AND "._queryWhere($dlg);
 		query($sql);
 
-		$send[$elem_id] = $connect_id;     //id записи, баланс которой будет пересчитан
+
+		$sumOld = 0;
+		if(isset($unitOld[$colSum]))
+			if($unitOld[$colSum] != $unit[$colSum])
+				$sumOld = $unitOld[$colSum];
+
+		$send[$elem_id] = array(
+			'sum_old' => $sumOld,
+			'sum' => $unit[$colSum],
+			'unit_id' => $connect_id     //id записи, баланс которой будет пересчитан
+		);
+
+
 
 
 
@@ -1675,14 +1691,11 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 			if($sum == $cv['balans'])
 				continue;
 
-		$sumOld = 0;
-		if(isset($unitOld[$colSum]))
-			if($unitOld[$colSum] != $unit[$colSum])
-				$sumOld = $unitOld[$colSum];
-
 		$sql = "INSERT INTO `_counter_v` (
 					`app_id`,
 					`element_id`,
+					`action_type_id`,
+					`action_dialog_id`,
 					`unit_id`,
 					`sum_old`,
 					`sum`,
@@ -1691,6 +1704,8 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 				) VALUES (
 					".APP_ID.",
 					".$elem_id.",
+					".$dialog['act'].",
+					".$dialog['id'].",
 					".$connect_id.",
 					".$sumOld.",
 					".$unit[$colSum].",
@@ -1702,11 +1717,11 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 
 	return $send;
 }
-function _spisokUnitAfter27($ass) {
+function _spisokUnitAfter27($DLG, $ass) {
 	if(empty($ass))
 		return;
 
-	foreach($ass as $elem_id => $unit_id) {
+	foreach($ass as $elem_id => $as) {
 		if(!$el = _elemOne($elem_id))
 			continue;
 		if(!$bl = $el['block'])
@@ -1719,7 +1734,7 @@ function _spisokUnitAfter27($ass) {
 		foreach($dialog['cmp'] as $cmp) {
 			if($cmp['dialog_id'] != 27)
 				continue;
-			if(empty($cmp['col']))//имя колонки, являющейся балансом
+			if(!$balansCol = $cmp['col'])//имя колонки, являющейся балансом
 				continue;
 
 			//получение id элементов-слагаемых баланса
@@ -1756,11 +1771,63 @@ function _spisokUnitAfter27($ass) {
 				$upd .= $znak."`".$col."`";
 			}
 
+
+
+			//получение баланса для обновления
+			$sql = "SELECT IFNULL(".$upd.",0)
+					FROM "._queryFrom($dialog)."
+					WHERE `t1`.`id`=".$as['unit_id']."
+					  AND "._queryWhere($dialog);
+			$balans = query_value($sql);
+
 			//процесс обновления
 			$sql = "UPDATE "._queryFrom($dialog)."
-					SET `".$cmp['col']."`=".$upd."
-					WHERE `t1`.`id`=".$unit_id."
+					SET `".$balansCol."`=".$balans."
+					WHERE `t1`.`id`=".$as['unit_id']."
 					  AND "._queryWhere($dialog);
+			query($sql);
+
+
+
+
+
+			//флаг включенного счётчика-истории
+			if(!$cmp['num_3'])
+				continue;
+
+			//получение последней записи
+			$sql = "SELECT *
+					FROM `_counter_v`
+					WHERE `element_id`=".$cmp['id']."
+					  AND `unit_id`=".$as['unit_id']."
+					ORDER BY `id` DESC
+					LIMIT 1";
+			if($cv = query_assoc($sql))
+				//если сумма совпадает, запись не вносится
+				if($balans == $cv['balans'])
+					continue;
+
+			$sql = "INSERT INTO `_counter_v` (
+						`app_id`,
+						`element_id`,
+						`action_type_id`,
+						`action_dialog_id`,
+						`unit_id`,
+						`sum_old`,
+						`sum`,
+						`balans`,
+						`user_id_add`
+					) VALUES (
+						".APP_ID.",
+						".$elem_id.",
+						".$DLG['act'].",
+						".$DLG['id'].",
+						".$as['unit_id'].",
+						".$as['sum_old'].",
+						".$as['sum'].",
+						".$balans.",
+						".USER_ID."
+					)";
 			query($sql);
 		}
 	}
@@ -1770,10 +1837,8 @@ function _spisokUnitAfter27($ass) {
 
 /* Глобальные счётчики */
 function _counterGlobal($dialog_id) {
-	if(!$DLG = _dialogQuery($dialog_id)) {
-		_debugLog('ОШИБКА: диалога '.$dialog_id.' не существует');
+	if(!$DLG = _dialogQuery($dialog_id))
 		return;
-	}
 
 	if($parent_id = $DLG['dialog_id_parent'])
 		$dialog_id = $parent_id;
@@ -1781,10 +1846,8 @@ function _counterGlobal($dialog_id) {
 	$sql = "SELECT *
 			FROM `_counter`
 			WHERE `spisok_id`=".$dialog_id;
-	if(!$arr = query_arr($sql)) {
-		_debugLog('Выход: для диалога '.$dialog_id.' счётчики не были созданы');
+	if(!$arr = query_arr($sql))
 		return;
-	}
 
 	foreach($arr as $counter_id => $r)
 		switch($r['type_id']) {
@@ -1795,8 +1858,6 @@ function _counterGlobal($dialog_id) {
 						WHERE "._queryWhere($DLG).
 							_40cond(array(), $r['filter']);
 				$count = _num(query_value($sql));
-
-				_debugLog('Получено количество '.$count.' в счётчике '.$counter_id);
 
 				if(!_counterGlobalInsertAccess($counter_id, $count))
 					break;
@@ -1816,8 +1877,6 @@ function _counterGlobal($dialog_id) {
 						WHERE "._queryWhere($DLG).
 							_40cond(array(), $r['filter']);
 				$sum = query_value($sql);
-
-				_debugLog('Получена сумма '.$sum.' в счётчике '.$counter_id);
 
 				if(!_counterGlobalInsertAccess($counter_id, $sum))
 					break;

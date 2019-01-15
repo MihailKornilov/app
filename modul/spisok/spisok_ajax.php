@@ -17,6 +17,7 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный id записи');
 
 		$dialog = _spisokUnitDialog($unit_id);
+		$dialog['act'] = 3;
 
 		$send['action_id'] = _num($dialog['del_action_id']);
 		$send['action_page_id'] = _num($dialog['del_action_page_id']);
@@ -339,6 +340,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	$dialog = _spisokUnitDialog($unit_id);
 
 	define('ACT', $unit_id ? 'edit' : 'insert');
+	$dialog['act'] = ACT == 'insert' ? 1 : 2;//для счётчиков
 	define('IS_ELEM', $dialog['table_1'] == 5);// '_element'
 
 	$unitOld = IS_ELEM ? _elemOne($unit_id) : _spisokUnitQuery($dialog, $unit_id);

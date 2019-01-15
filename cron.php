@@ -147,6 +147,7 @@ function _cronTask() {//выполнение конкретной задачи
 		$unit = _spisokUnitQuery($DST, $unit_id);
 
 		//обновление счётчиков
+		$DST['act'] = 1;
 		_SUN_AFTER($DST, $unit);
 	}
 	
