@@ -46,28 +46,6 @@ function _userCache($user_id) {
 	if($img = query_assoc($sql))
 		$u['src'] = _imageServer($img['server_id']).$img['80_name'];
 
-
-	$u = _userVkUpdate($user_id);
-
-/*
-	//количество приложений, в которых участвует пользователь
-	$sql = "SELECT COUNT(*)
-			FROM `_vkuser_app`
-			WHERE `viewer_id`=".$user_id."
-			  AND `worker`";
-	$u['app_count'] = _num(query_value($sql));
-
-	if(!defined('APP_ID'))
-	$sql = "SELECT *
-			FROM `_vkuser_app`
-			WHERE `viewer_id`=".$user_id."
-			  AND `app_id`=".APP_ID;
-	return query_assoc($sql);
-*/
-
-
-	$u['worker'] = 0;//_bool(@$app['worker']);
-
 	return _cache_set($key, $u);
 }
 function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта

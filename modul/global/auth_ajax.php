@@ -24,7 +24,7 @@ switch(@$_POST['op']) {
 		if(!$user_id = _num(query_value($sql))) {
 			$user_id = _userVkUpdate($vkUser_id);//если нет - получение данных из VK
 			define('USER_ID', $user_id);
-			_userImageMove();
+//			_userImageMove();
 		}
 
 		$sql = "SELECT `app_id_last`
