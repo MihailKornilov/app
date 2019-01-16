@@ -53,6 +53,7 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 	$res = _vkapi('users.get', array(
 		'user_ids' => $vk_id,
 		'fields' => 'photo_400_orig,'.
+					'photo_max,'.
 					'sex'
 	));
 
@@ -61,7 +62,17 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 
 	$res = $res['response'][0];
 
-	$image_id = _imageLink($res['photo_400_orig'], 'id');
+	$photo = '';
+	if(!empty($res['photo_400_orig']))
+		$photo = $res['photo_400_orig'];
+	if(!$photo && !empty($res['photo_max']))
+		$photo = $res['photo_max'];
+	if(preg_match('/deactivated/', $photo))
+		$photo = '';
+	if(preg_match('/camera/', $photo))
+		$photo = '';
+
+	$image_id = $photo ? _imageLink($photo, 'id') : '';
 
 	$sql = "SELECT `id`
 			FROM `_user`
@@ -96,10 +107,14 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 	return $user_id;
 }
 function _userImageRepair() {//восстановление аватарок пользователей
+	if(LOCAL)
+		return;
+
 	$sql = "SELECT *
 			FROM `_user`
 			WHERE `vk_id`
-			  AND !LENGTH(`ava`)";
+			  AND !LENGTH(`ava`)
+			ORDER BY `id`";
 	foreach(query_arr($sql) as $r)
 		_userVkUpdate($r['vk_id']);
 }

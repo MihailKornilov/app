@@ -292,13 +292,15 @@ switch(@$_POST['op']) {
 					$size = 0;
 				$width = _num($EL['width']);
 				$num_7 = _num($EL['num_7']);//ограничение высоты фото [60]
+				$num_8 = _num($EL['num_8']);//закруглённые углы [60]
 				$sql = "UPDATE `_element`
 						SET `mar`='".$mar."',
 							`font`='".$font."',
 							`color`='".$color."',
 							`size`=".$size.",
 							`width`=".$width.",
-							`num_7`=".$num_7."
+							`num_7`=".$num_7.",
+							`num_8`=".$num_8."
 						WHERE `id`=".$elem_id;
 				query($sql);
 

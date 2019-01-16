@@ -1847,7 +1847,7 @@ function _elemTitle($elem_id) {//имя элемента или его текс�
 		case 30: return 'del';
 		case 34: return 'edit';
 		case 36: return 'icon';
-		case 60: return _imageNo($el['width']);
+		case 60: return _imageNo($el['width'], $el['num_8']);
 		case 62: return 'Фильтр-галочка';
 		case 67://шаблон истории действий
 			$dlg = _dialogQuery($el['num_2']);
@@ -1975,9 +1975,9 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 		//Изображение
 		case 60:
 			if(empty($txt))
-				return _imageNo($EL['width']);
+				return _imageNo($EL['width'], $EL['num_8']);
 
-			return _imageHtml($txt, $EL['width'], $EL['num_7']);
+			return _imageHtml($txt, $EL['width'], $EL['num_7'], $EL['num_8']);
 	}
 
 
@@ -2002,7 +2002,7 @@ function _elem11title($EL) {//имя элемента, если нет запи�
 			//произвольный текст
 			case 10: return $ell['txt_1'];
 			//Изображение
-			case 60: return _imageNo($EL['width']);
+			case 60: return _imageNo($EL['width'], $EL['num_8']);
 		}
 	}
 
@@ -4947,16 +4947,20 @@ function _imageServer($v) {//получение сервера (пути) для
 
 	return $insert_id;
 }
-function _imageNo($width=80) {//картинка, если изображнеия нет
-	return '<img src="'.APP_HTML.'/img/nofoto-s.gif" width="'.$width.'" />';
+function _imageNo($width=80, $cr=false) {//картинка, если изображнеия нет
+	return
+	'<img src="'.APP_HTML.'/img/nofoto-s.gif"'.
+		' width="'.$width.'"'.
+ ($cr ? ' class="br1000"' : '').//круглое фото
+	' />';
 }
-function _imageHtml($r, $width=80, $h=0, $click=true) {//получение картинки в html-формате
+function _imageHtml($r, $width=80, $h=0, $cr=false, $click=true) {//получение картинки в html-формате
 	if(empty($r))
-		return _imageNo($width);
+		return _imageNo($width, $cr);
 	if(!is_array($r))
-		return _imageNo($width);
+		return _imageNo($width, $cr);
 	if(empty($r['id']))
-		return _imageNo($width);
+		return _imageNo($width, $cr);
 
 	$width = $width ? $width : 80;
 
@@ -4968,12 +4972,17 @@ function _imageHtml($r, $width=80, $h=0, $click=true) {//получение ка
 		$h = $s['y'];
 	}
 
+	$cls = array();
+	if($click)
+		$cls[] = 'image-open';
+	if($cr)
+		$cls[] = 'br1000';
+
 	return
 		'<img src="'._imageServer($r['server_id']).$r[$st.'_name'].'"'.
 			' width="'.$width.'"'.
 	  ($h ? ' height= "'.$h.'"' : '').
-
-  ($click ? ' class="image-open"'.
+	($cls ? ' class="'.implode(' ', $cls).'"'.
 			' val="'.(empty($r['ids']) ? $r['id'] : $r['ids']).'"'
   : '').
 

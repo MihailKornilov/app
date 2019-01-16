@@ -218,7 +218,7 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 		$curd = _dn(!$is_edit, 'curD');
 
 		if($el['num_2'] == 5)
-			$r['name'] = _imageHtml($r['image_ids'], 24, 24, false);
+			$r['name'] = _imageHtml($r['image_ids'], 24, 24, false, false);
 
 		$razdel .= '<a class="link'.$sel.$curd.'"'.$href.'>'.$r['name'].'</a>';
 	}

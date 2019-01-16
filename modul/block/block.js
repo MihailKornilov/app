@@ -168,6 +168,12 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 							BL.save = 1;
 						}
 					});
+					$('#elem-img-circle')._check({
+						func:function(v) {
+							EL.num_8 = v;
+							BL.save = 1;
+						}
+					});
 				}
 			},
 			funcBeforeHide:function() {
@@ -316,7 +322,8 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 				color:'',
 				size:13,
 				width:0,
-				num_7:0//ограничение высоты фото [60]
+				num_7:0,//ограничение высоты фото [60]
+				num_8:0 //закруглённые углы фото [60]
 			}, ELMM[BL.elem_id]);
 
 		BL.busy_obj = _attr_bl(BL.id);
@@ -507,6 +514,9 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 				'<td><input type="hidden" id="elem-img-width" class="w15" value="' + EL.width + '" />' +
 				'<td class="pl5">' +
 					'<input type="hidden" id="elem-img-height" value="' + EL.num_7 + '" />' +
+			'<tr><td class="color-555 r" colspan="3">' +
+					'Закруглённые углы: ' +
+					'<input type="hidden" id="elem-img-circle" value="' + EL.num_8 + '" />' +
 		'</table>'
 	};
 
