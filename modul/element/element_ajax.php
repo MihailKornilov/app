@@ -399,43 +399,7 @@ switch(@$_POST['op']) {
 		if(!$url = _txt(@$_POST['url']))
 			jsonError('Отсутствует ссылка');
 
-		$ch = curl_init($url);
-		curl_setopt_array($ch, array(
-		    CURLOPT_TIMEOUT => 60,//максимальное время работы cURL
-		    CURLOPT_FOLLOWLOCATION => 1,//следовать перенаправлениям
-		    CURLOPT_RETURNTRANSFER => 1,//результат писать в переменную
-		    CURLOPT_NOPROGRESS => 0,//индикатор загрузки данных
-		    CURLOPT_BUFFERSIZE => 1024,//размер буфера 1 Кбайт
-		    //функцию для подсчёта скачанных данных. Подробнее: http://stackoverflow.com/a/17642638
-		    CURLOPT_PROGRESSFUNCTION => function ($ch, $dwnldSize, $dwnld, $upldSize) {
-		        if($dwnld > 1024 * 1024 * 15)//Когда будет скачано больше 15 Мбайт, cURL прервёт работу
-		            return 1;
-		        return 0;
-		    },
-		    CURLOPT_SSL_VERIFYPEER => 0//проверка сертификата
-	//	    CURLOPT_SSL_VERIFYHOST => 2,//имя сертификата и его совпадение с указанным хостом
-	//	    CURLOPT_CAINFO => __DIR__ . '/cacert.pem'//сертификат проверки. Скачать: https://curl.haxx.se/docs/caextract.html
-		));
-
-		//код последней ошибки
-		if(curl_errno($ch))
-			jsonError('При загрузке произошла ошибка');
-
-		$raw   = curl_exec($ch);    //данные в переменную
-		$info  = curl_getinfo($ch); //информация об операции
-		curl_close($ch);//завершение сеанса cURL
-
-		if(!is_dir(APP_PATH.'/.tmp'))
-			mkdir(APP_PATH.'/.tmp', 0777, true);
-
-		$file_tmp_name = APP_PATH.'/.tmp/'.USER_ID.'.tmp';
-		$file = fopen($file_tmp_name,'w');
-		fwrite($file, $raw);
-		fclose($file);
-
-		$img = _imageSave($info['content_type'], $file_tmp_name);
-		unlink($file_tmp_name);
-
+		$img = _imageLink($url);
 		$send['html'] = _imageDD($img);
 
 		jsonSuccess($send);

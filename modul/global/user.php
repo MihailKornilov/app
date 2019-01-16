@@ -47,10 +47,10 @@ function _userCache($user_id) {
 		$u['src'] = _imageServer($img['server_id']).$img['80_name'];
 
 
-//		$u = _userVkUpdate($user_id);
+	$u = _userVkUpdate($user_id);
 
 /*
-	//количества приложений, в которых участвует пользователь
+	//количество приложений, в которых участвует пользователь
 	$sql = "SELECT COUNT(*)
 			FROM `_vkuser_app`
 			WHERE `viewer_id`=".$user_id."
@@ -76,35 +76,21 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 
 	$res = _vkapi('users.get', array(
 		'user_ids' => $vk_id,
-		'fields' => 'photo,'.
-					'sex,'.
-					'country,'.
-					'city'
+		'fields' => 'photo_400_orig,'.
+					'sex'
 	));
 
 	if(empty($res['response']))
 		die('Do not get user from VK: '.$vk_id);
 
 	$res = $res['response'][0];
-	$u = array(
-		'user_id' => $vk_id,
-		'first_name' => $res['first_name'],
-		'last_name' => $res['last_name'],
-		'sex' => $res['sex'],
-		'photo' => $res['photo']
-	);
+	$image_id = _imageLink($res['photo_400_orig'], 'id');
 
 	$sql = "SELECT `id`
 			FROM `_user`
 			WHERE `vk_id`=".$vk_id."
 			LIMIT 1";
 	$user_id = _num(query_value($sql));
-
-	$pol = array(
-		0 => 0,
-		1 => 1750,//женский
-		2 => 1749 //мужской
-	);
 
 	$sql = "INSERT INTO `_user` (
 				`id`,
@@ -116,10 +102,10 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 			) VALUES (
 				".$user_id.",
 				".$vk_id.",
-				'".addslashes($u['last_name'])."',
-				'".addslashes($u['first_name'])."',
-				"._num(@$pol[$u['sex']]).",
-				'".addslashes($u['photo'])."'
+				'".addslashes($res['last_name'])."',
+				'".addslashes($res['first_name'])."',
+				"._num($res['sex']).",
+				'".$image_id."'
 			) ON DUPLICATE KEY UPDATE
 				`f`=VALUES(`f`),
 				`i`=VALUES(`i`),

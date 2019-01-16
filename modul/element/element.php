@@ -5030,7 +5030,50 @@ function _imageResize($x_cur, $y_cur, $x_new, $y_new) {//изменение ра
 	);
 }
 
-function _imageSave($file_type, $file_tmp_name) {
+function _imageLink($url, $return='arr') {//сохранение изображения по прямой ссылке
+	$ch = curl_init($url);
+	curl_setopt_array($ch, array(
+	    CURLOPT_TIMEOUT => 60,//максимальное время работы cURL
+	    CURLOPT_FOLLOWLOCATION => 1,//следовать перенаправлениям
+	    CURLOPT_RETURNTRANSFER => 1,//результат писать в переменную
+	    CURLOPT_NOPROGRESS => 0,//индикатор загрузки данных
+	    CURLOPT_BUFFERSIZE => 1024,//размер буфера 1 Кбайт
+	    //функцию для подсчёта скачанных данных. Подробнее: http://stackoverflow.com/a/17642638
+	    CURLOPT_PROGRESSFUNCTION => function ($ch, $dwnldSize, $dwnld, $upldSize) {
+	        if($dwnld > 1024 * 1024 * 15)//Когда будет скачано больше 15 Мбайт, cURL прервёт работу
+	            return 1;
+	        return 0;
+	    },
+	    CURLOPT_SSL_VERIFYPEER => 0//проверка сертификата
+//	    CURLOPT_SSL_VERIFYHOST => 2,//имя сертификата и его совпадение с указанным хостом
+//	    CURLOPT_CAINFO => __DIR__ . '/cacert.pem'//сертификат проверки. Скачать: https://curl.haxx.se/docs/caextract.html
+	));
+
+	//код последней ошибки
+	if(curl_errno($ch))
+		if($return == 'id')
+			return 0;
+		else
+			jsonError('При загрузке произошла ошибка');
+
+	$raw   = curl_exec($ch);    //данные в переменную
+	$info  = curl_getinfo($ch); //информация об операции
+	curl_close($ch);//завершение сеанса cURL
+
+	if(!is_dir(APP_PATH.'/.tmp'))
+		mkdir(APP_PATH.'/.tmp', 0777, true);
+
+	$file_tmp_name = APP_PATH.'/.tmp/'.USER_ID.'.tmp';
+	$file = fopen($file_tmp_name,'w');
+	fwrite($file, $raw);
+	fclose($file);
+
+	$send = _imageSave($info['content_type'], $file_tmp_name, $return);
+	unlink($file_tmp_name);
+
+	return $send;
+}
+function _imageSave($file_type, $file_tmp_name, $return='arr') {//сохранение полученного изображения
 	$im = null;
 	$IMAGE_PATH = APP_PATH.'/.image/'.APP_ID;
 	$server_id = _imageServer('//'.DOMAIN.APP_HTML.'/.image/'.APP_ID.'/');
@@ -5110,6 +5153,9 @@ function _imageSave($file_type, $file_tmp_name) {
 				".USER_ID."
 		)";
 	$image_id = query_id($sql);
+
+	if($return == 'id')
+		return $image_id;
 
 	$sql = "SELECT *
 			FROM `_image`
