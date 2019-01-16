@@ -25,28 +25,33 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
-	case 'sort':
-		if(!preg_match(REGEXP_MYSQLTABLE, $_POST['table']))
-			jsonError();
-
-		$table = htmlspecialchars(trim($_POST['table']));
-		$conn = 0;
-
-		$sql = "SHOW TABLES LIKE '".$table."'";
-		if(!mysqli_num_rows(query($sql)))
-			jsonError('Таблицы не существует');
-
-		$sort = explode(',', $_POST['ids']);
-		if(empty($sort))
+	case 'sort'://сортировка значений по элементу $.fn._sort
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Не получен id элемента');
+		if(!$el = _elemOne($elem_id))
+			jsonError('Элемента '.$elem_id.' не существует');
+		if(!$sortIds = _ids($_POST['ids'], 'arr'))
 			jsonError('Отсутствуют элементы для сортировки');
 
-		for($n = 0; $n < count($sort); $n++)
-			if(!preg_match(REGEXP_NUMERIC, $sort[$n]))
-				jsonError('Некорректный идентификатор одного из элементов');
+		$dialog_id = 0;
+		switch($el['dialog_id']) {
+			case 14: $dialog_id = $el['num_1']; break;
+			default: jsonError('Не найден диалог');
+		}
 
-		for($n = 0; $n < count($sort); $n++) {
-			$sql = "UPDATE `".$table."` SET `sort`=".$n." WHERE `id`=".intval($sort[$n]);
-			query($sql, $conn);
+		if(!$DLG = _dialogQuery($dialog_id))
+			jsonError('Диалога '.$dialog_id.' не существует');
+		if(!$DLG['table_1'])
+			jsonError('Диалогу не присвоена таблица');
+		if(!$sortCol = _queryColReq($DLG, 'sort'))
+			jsonError('Отсутствует колонка сортировки');
+
+		foreach($sortIds as $n => $id) {
+			$sql = "UPDATE "._queryFrom($DLG)."
+					SET ".$sortCol."=".$n."
+					WHERE "._queryWhere($DLG)."
+					  AND `t1`.`id`=".$id;
+			query($sql);
 		}
 
 		jsonSuccess();

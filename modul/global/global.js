@@ -374,15 +374,15 @@ $.fn._sort = function(o) {//сортировка
 	o = $.extend({
 		items:'dd',
 		axis:'',
-		handle:'.icon-move-y',
-		table:''
+		handle:'.icon-move,.icon-move-y',
+		elem_id:0
 	}, o);
 
 	t.sortable({
 		axis:o.axis,
 		handle:o.handle,
 		update:function() {
-			if(!o.table)
+			if(!o.elem_id)
 				return;
 			var dds = $(this).find(o.items),
 				arr = [];
@@ -393,13 +393,13 @@ $.fn._sort = function(o) {//сортировка
 			}
 			var send = {
 				op:'sort',
-				table:o.table,
+				elem_id:o.elem_id,
 				ids:arr.join()
 			};
 			t.addClass('prel');
-			t.append('<div class="pabs _busy" style="top:0;bottom:0;left:0;right:0;opacity:.8;background-color:#fff"></div>');
+			t.append('<div class="elm-sort-hold _busy"></div>');
 			_post(send, function() {
-				t.find('.pabs').remove();
+				t.find('.elm-sort-hold').remove();
 			});
 		}
 	});

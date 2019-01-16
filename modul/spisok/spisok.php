@@ -437,8 +437,8 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		настройка шаблона через функцию PHP12_spisok14_setup
 	*/
 
-	$DLG = _dialogQuery($ELEM['num_1']);
-
+	if(!$DLG = _dialogQuery($ELEM['num_1']))
+		return _emptyRed('Диалога '.$ELEM['num_1'].' не существует.');
 	if(!_BE('block_arr', 'spisok', $ELEM['id']))
 		return _emptyRed('Шаблон <b>'.$DLG['name'].'</b> не настроен.');
 
@@ -493,7 +493,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	}
 
 	if($IS_SORT)
-		$send .= '<script>_spisokSort("'.$ELEM['attr_el'].'")</script>';
+		$send .= '<script>_spisokSort("'.$ELEM['id'].'")</script>';
 
 	return $send;
 }

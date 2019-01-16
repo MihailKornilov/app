@@ -39,11 +39,10 @@ var _spisokUpdate = function(elem_spisok, func) {
 			t.remove();
 		});
 	},
-	_spisokSort = function(attr_el) {
-		$(attr_el)._sort({
+	_spisokSort = function(elem_id) {
+		_attr_el(elem_id)._sort({
 			items:'.sp-unit',
-			handle:'.icon-move',
-			table:'_spisok'
+			elem_id:elem_id
 		});
 	};
 
