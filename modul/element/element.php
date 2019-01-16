@@ -1319,7 +1319,8 @@ function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки п�
 		'user_id_del' => 1,
 		'dtime_add' => 1,
 		'dtime_del' => 1,
-		'dtime_last' => 1
+		'dtime_create' => 1,
+		'app_id_last' => 1
 	);
 
 	foreach($dlg['field'.$num] as $col => $k) {

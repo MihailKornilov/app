@@ -179,16 +179,27 @@ function _queryCol($DLG) {//получение колонок, для котор
 	//id диалога, который использовался при создании записи
 	$field[] = $DLG['id'].' `dialog_id_use`';
 
-	foreach($DLG['cmp'] as $cmp)
-		$field[] = _queryColReq($DLG, _elemCol($cmp));
+	foreach($DLG['cmp'] as $cmp) {
+		$col = _elemCol($cmp);
+		if($cmp['dialog_id'] == 9)
+			$field[] = "'' ".$col;
+		else
+			$field[] = _queryColReq($DLG, $col);
+	}
 
 	if($parent_id = $DLG['dialog_id_parent']) {
 		$PAR = _dialogQuery($parent_id);
-		foreach($PAR['cmp'] as $cmp)
-			$field[] = _queryColReq($DLG, _elemCol($cmp));
+		foreach($PAR['cmp'] as $cmp) {
+			$col = _elemCol($cmp);
+			if($cmp['dialog_id'] == 9)
+				$field[] = "'' ".$col;
+			else
+				$field[] = _queryColReq($DLG, $col);
+		}
 	}
 
 	$field = array_diff($field, array(''));
+	$field = array_unique($field);
 
 	define($key, implode(',', $field));
 
