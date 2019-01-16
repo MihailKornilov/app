@@ -8,8 +8,6 @@ function _user($user_id=USER_ID, $i='') {//получение данных о п
 
 	if(!defined('USER_NAME')) {
 		define('USER_CREATOR', APP_ID && _app(APP_ID, 'user_id_add') == USER_ID);//создатель приложения
-		define('USER_WORKER', $u['worker']);
-//		define('USER_APP_ONE', $u['app_count'] < 2);
 		define('USER_NAME', $u['i'].' '.$u['f']);//Имя Фамилия
 	}
 
@@ -62,6 +60,7 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 		die('Do not get user from VK: '.$vk_id);
 
 	$res = $res['response'][0];
+
 	$image_id = _imageLink($res['photo_400_orig'], 'id');
 
 	$sql = "SELECT `id`

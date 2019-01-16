@@ -22,7 +22,11 @@ switch(@$_POST['op']) {
 				WHERE `vk_id`=".$vkUser_id."
 				LIMIT 1";
 		if(!$user_id = _num(query_value($sql))) {
-			$user_id = _userVkUpdate($vkUser_id);//если нет - получение данных из VK
+
+			//если пользователя в базе нет - получение данных из VK
+			if(!$user_id = _userVkUpdate($vkUser_id))
+				jsonError('Не удалось получить данные пользователя из ВК');
+
 			define('USER_ID', $user_id);
 //			_userImageMove();
 		}

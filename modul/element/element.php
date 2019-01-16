@@ -4936,7 +4936,7 @@ function _imageServer($v) {//получение сервера (пути) для
 				`user_id_add`
 			) VALUES (
 				'".addslashes($v)."',
-				".USER_ID."
+				"._num(@USER_ID)."
 			)";
 	$insert_id = query_id($sql);
 
@@ -5050,11 +5050,13 @@ function _imageLink($url, $return='arr') {//сохранение изображ�
 	));
 
 	//код последней ошибки
-	if(curl_errno($ch))
+	if(curl_errno($ch)) {
+		_debugLog('Ошибка при загрузке изображения: '.$url);
 		if($return == 'id')
 			return 0;
 		else
 			jsonError('При загрузке произошла ошибка');
+	}
 
 	$raw   = curl_exec($ch);    //данные в переменную
 	$info  = curl_getinfo($ch); //информация об операции
@@ -5063,7 +5065,7 @@ function _imageLink($url, $return='arr') {//сохранение изображ�
 	if(!is_dir(APP_PATH.'/.tmp'))
 		mkdir(APP_PATH.'/.tmp', 0777, true);
 
-	$file_tmp_name = APP_PATH.'/.tmp/'.USER_ID.'.tmp';
+	$file_tmp_name = APP_PATH.'/.tmp/'.rand(0, 99999999).'_'.TODAY_UNIXTIME.'.tmp';
 	$file = fopen($file_tmp_name,'w');
 	fwrite($file, $raw);
 	fclose($file);
@@ -5075,6 +5077,8 @@ function _imageLink($url, $return='arr') {//сохранение изображ�
 }
 function _imageSave($file_type, $file_tmp_name, $return='arr') {//сохранение полученного изображения
 	$im = null;
+	if(!defined('APP_ID'))
+		define('APP_ID', 0);
 	$IMAGE_PATH = APP_PATH.'/.image/'.APP_ID;
 	$server_id = _imageServer('//'.DOMAIN.APP_HTML.'/.image/'.APP_ID.'/');
 
@@ -5150,7 +5154,7 @@ function _imageSave($file_type, $file_tmp_name, $return='arr') {//сохране
 				".$_80['size'].",
 
 				".$sort.",
-				".USER_ID."
+				"._num(@USER_ID)."
 		)";
 	$image_id = query_id($sql);
 
