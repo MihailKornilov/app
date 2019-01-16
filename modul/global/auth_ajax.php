@@ -28,7 +28,6 @@ switch(@$_POST['op']) {
 				jsonError('Не удалось получить данные пользователя из ВК');
 
 			define('USER_ID', $user_id);
-//			_userImageMove();
 		}
 
 		$sql = "SELECT `app_id_last`

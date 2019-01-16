@@ -95,72 +95,13 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 
 	return $user_id;
 }
-function _userImageMove() {//перенос аватарок пользователей в изображения
-	return;//требуется переделать
-
-	_cache_clear('IMG_SERVER');
-
+function _userImageRepair() {//восстановление аватарок пользователей
 	$sql = "SELECT *
 			FROM `_user`
-			WHERE LENGTH(`ava`)";
-	foreach(query_arr($sql) as $r) {
-		$ex = explode('/', $r['ava']);
-		$c = count($ex) - 1;
-		$server = '';
-		foreach($ex as $n => $v) {
-			if($n == $c)
-				continue;
-			$server .= $v.'/';
-		}
-		$name = $ex[$c];
-
-		$sql = "INSERT INTO `_image` (
-					`app_id`,
-					`server_id`,
-	
-					`max_name`,
-					`max_x`,
-					`max_y`,
-	
-					`80_name`,
-					`80_x`,
-					`80_y`,
-	
-					`obj_name`,
-					`obj_id`,
-	
-					`user_id_add`
-				) VALUES (
-					".APP_ID.",
-					"._imageServer($server).",
-	
-					'".$name."',
-					50,
-					50,
-	
-					'".$name."',
-					50,
-					50,
-	
-					'elem_1778',
-					".$r['id'].",
-	
-					".USER_ID."
-			)";
-		$image_id = query_id($sql);
-
-		$sql = "UPDATE `_user`
-				SET `ava`=''
-				WHERE `id`=".$r['id'];
-		query($sql);
-
-		if($u = _userApp(APP_ID, $r['id'])) {
-			$sql = "UPDATE `_spisok`
-					SET `image_1`=".$image_id."
-					WHERE `id`=".$u['id'];
-			query($sql);
-		}
-	}
+			WHERE `vk_id`
+			  AND !LENGTH(`ava`)";
+	foreach(query_arr($sql) as $r)
+		_userVkUpdate($r['vk_id']);
 }
 
 

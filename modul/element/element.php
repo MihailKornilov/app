@@ -4514,6 +4514,9 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 		return;
 	if(!isset($dialog['field1']['deleted']))
 		return;
+	//todo проверить правильность внесения истории для пользователей
+	if($dialog['dialog_id_parent'])
+		return;
 
 
 
@@ -5179,7 +5182,7 @@ function _imageDD($img) {//единица изображения для наст
 
 function _image60_save($cmp, $unit) {//Применение загруженных изображений после сохранения
 	//поле, хранящее список id изображений
-	if(!$col = $cmp['col'])
+	if(!$col = _elemCol($cmp))
 		return;
 	if(!$img = $unit[$col])
 		return;
@@ -5187,6 +5190,8 @@ function _image60_save($cmp, $unit) {//Применение загруженны
 		return;
 
 	foreach(explode(',', $ids) as $n => $id) {
+		if($id < 0)
+			continue;
 		$sql = "UPDATE `_image`
 				SET `sort`=".$n."
 				WHERE `id`=".$id;
