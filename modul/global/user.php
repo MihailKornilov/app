@@ -36,13 +36,11 @@ function _userCache($user_id) {
 		return array();
 
 	$u['src'] = 'https://vk.com/images/camera_50.png';
-	$sql = "SELECT *
-			FROM `_image`
-			WHERE !`sort`
-			  AND !`id`
-			LIMIT 1";
-	if($img = query_assoc($sql))
-		$u['src'] = _imageServer($img['server_id']).$img['80_name'];
+	if($image_id = _idsFirst($u['ava'])) {
+		$sql = "SELECT * FROM `_image` WHERE `id`=".$image_id;
+		if($img = query_assoc($sql))
+			$u['src'] = _imageServer($img['server_id']).$img['80_name'];
+	}
 
 	return _cache_set($key, $u);
 }
@@ -52,7 +50,7 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 
 	$res = _vkapi('users.get', array(
 		'user_ids' => $vk_id,
-		'fields' => 'photo_400_orig,'.
+		'fields' => 'photo_200,'.
 					'photo_max,'.
 					'sex'
 	));
@@ -63,8 +61,8 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 	$res = $res['response'][0];
 
 	$photo = '';
-	if(!empty($res['photo_400_orig']))
-		$photo = $res['photo_400_orig'];
+	if(!empty($res['photo_200']))
+		$photo = $res['photo_200'];
 	if(!$photo && !empty($res['photo_max']))
 		$photo = $res['photo_max'];
 	if(preg_match('/deactivated/', $photo))
