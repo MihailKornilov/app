@@ -1,5 +1,5 @@
 <?php
-function _user($user_id=USER_ID, $i='ass') {//получение данных о пользовате из контакта
+function _user($user_id=USER_ID, $i='ass') {//получение данных о пользователя
 	if(!_num($user_id))
 		return array();
 
@@ -9,6 +9,12 @@ function _user($user_id=USER_ID, $i='ass') {//получение данных о
 	if(!defined('USER_NAME')) {
 		define('USER_CREATOR', APP_ID && _app(APP_ID, 'user_id_add') == USER_ID);//создатель приложения
 		define('USER_NAME', $u['i'].' '.$u['f']);//Имя Фамилия
+
+		define('PIN', !empty($u['pin']));       //установлен ли у пользователя пин-код
+		define('PIN_KEY', USER_ID.'-pin-key');  //ключ для сессии
+		define('PIN_DURATION', 3600);           //интервал действия пин-кода в секундах
+		define('PIN_TIME', empty($_SESSION[PIN_KEY]) ? 0 : $_SESSION[PIN_KEY]);
+		define('PIN_ENTER', PIN && (PIN_TIME - time() < 0));//требуется ли ввод пин-кода
 	}
 
 

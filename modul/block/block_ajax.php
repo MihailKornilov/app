@@ -230,8 +230,8 @@ switch(@$_POST['op']) {
 		_blockChildCountSet($obj_name, $obj_id);
 		_blockAppIdUpdate($obj_name, $obj_id);
 
-		_BE( 'block_clear');
-		_BE( 'elem_clear');
+		_BE('block_clear');
+		_BE('elem_clear');
 		_jsCache();
 
 		$prm = array(
@@ -276,7 +276,7 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$block_id;
 		query($sql);
 
-		_BE( 'block_clear');
+		_BE('block_clear');
 
 		$send = array();
 
@@ -304,7 +304,7 @@ switch(@$_POST['op']) {
 						WHERE `id`=".$elem_id;
 				query($sql);
 
-				_BE( 'elem_clear');
+				_BE('elem_clear');
 
 				$send['elem_js'] = _jsCacheElemOne($elem_id);
 			}
@@ -438,7 +438,7 @@ switch(@$_POST['op']) {
 			_blockChildClone($id_old, $id_new);
 
 		_blockChildCountSet($obj_name, $obj_id);
-		_BE( 'block_clear');
+		_BE('block_clear');
 		_jsCache();
 
 		jsonSuccess();
@@ -474,7 +474,7 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		_blockChildCountSet($BL['obj_name'], $BL['obj_id']);
-		_BE( 'block_clear');
+		_BE('block_clear');
 		_jsCache();
 
 		jsonSuccess();
@@ -553,8 +553,8 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		_blockChildCountSet($obj_name, $obj_id);
-		_BE( 'elem_clear');
-		_BE( 'block_clear');
+		_BE('elem_clear');
+		_BE('block_clear');
 		_jsCache();
 
 		jsonSuccess();

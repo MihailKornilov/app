@@ -4270,8 +4270,8 @@ function PHP12_block_ids_page_move($dlg) {
 			WHERE `id` IN ("._idsGet($ass, 'key').")";
 	query($sql);
 
-	_cache_clear( 'page');
-	_BE( 'block_clear');
+	_cache_clear('page');
+	_BE('block_clear');
 	_jsCache();
 
 	jsonSuccess();
@@ -4951,7 +4951,7 @@ function _imageServer($v) {//получение сервера (пути) для
 			)";
 	$insert_id = query_id($sql);
 
-	_cache_clear( 'IMG_SERVER', 1);
+	_cache_clear('IMG_SERVER', 1);
 
 	return $insert_id;
 }

@@ -377,7 +377,7 @@ switch(@$_POST['op']) {
 					`sort`=VALUES(`sort`)";
 		query($sql);
 
-		_cache_clear( 'page');
+		_cache_clear('page');
 		_jsCache();
 
 		jsonSuccess();

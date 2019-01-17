@@ -36,8 +36,8 @@ define('MIN', DEBUG ? '' : '.min');
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);
 
-//session_name('apppp');
-//session_start();
+session_name('apppp');
+session_start();
 
 //авторизация для xCache
 //$_SERVER["PHP_AUTH_USER"] = "admin";

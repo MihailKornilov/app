@@ -372,9 +372,9 @@ function PHP12_page_access_for_user_setup_save($cmp, $val, $unit) {//сохра�
 		query($sql);
 	}
 
-	_cache_clear( 'AUTH_'.CODE, 1);
-	_cache_clear( 'page');
-	_cache_clear( 'user'.$user_id);
+	_cache_clear('AUTH_'.CODE, 1);
+	_cache_clear('page');
+	_cache_clear('user'.$user_id);
 }
 
 function PHP12_page_access_for_user_view($prm) {//отображение страниц, доступных пользователю
@@ -485,8 +485,8 @@ function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохране�
 			  AND `user_id` NOT IN (".$ids.")";
 	query($sql);
 
-	_cache_clear( 'AUTH _'.CODE, 1);
-	_cache_clear( 'page');
+	_cache_clear('AUTH _'.CODE, 1);
+	_cache_clear('page');
 
 	$sql = "SELECT *
 			FROM `_spisok`
@@ -505,6 +505,14 @@ function _pageShow($page_id) {
 	//нет доступа в приложение
 	if(!SA && APP_ID && !APP_ACCESS)
 		$page_id = 105;
+
+	//требуется ввод пин-кода
+	if(PIN_ENTER && $page_id != 98)
+		$page_id = 13;
+	else
+		//если не требуется ввода пин-кода, обновление времени действия
+		$_SESSION[PIN_KEY] = time() + PIN_DURATION;
+
 
 	//вывод документа на печать
 	if($page_id == 9)
@@ -745,7 +753,7 @@ function PHP12_page_list_li($r, $level=0) {//данные одной стран�
 
 function _page_div() {//todo тест
 
-	return _pr(_user());
+	return '';
 
 	return
 	'<div>'.

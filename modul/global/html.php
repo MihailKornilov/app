@@ -25,7 +25,7 @@ function _sa($user_id=USER_ID) {
 		return $issa;
 
 	//установка флага суперпользователя SA при первом запуске
-	define('SA', $issa);
+	define('SA', 1);//$issa);
 
 	if(SA) {
 		error_reporting(E_ALL);
@@ -148,9 +148,9 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение запис
 
 	setcookie('code', $code, time() + 2592000, '/');
 
-	_cache_clear( 'AUTH_'.$code, 1);
-	_cache_clear( 'page');
-	_cache_clear( 'user'.$user_id);
+	_cache_clear('AUTH_'.$code, 1);
+	_cache_clear('page');
+	_cache_clear('user'.$user_id);
 
 	if(LOCAL)
 		setcookie('local', 1, time() + 2592000, '/');
@@ -161,9 +161,9 @@ function _authLogout() {//выход из приложения, если тре�
 	if(!CODE)
 		return;
 
-	_cache_clear( 'AUTH_'.CODE, 1);
-	_cache_clear( 'page');
-	_cache_clear( 'user'.USER_ID);
+	_cache_clear('AUTH_'.CODE, 1);
+	_cache_clear('page');
+	_cache_clear('user'.USER_ID);
 	setcookie('page_setup', '', time() - 1, '/');
 
 	//выход только из приложения и попадание в список приложений
@@ -189,7 +189,8 @@ function _authPassMD5($pass) {
 function _authCmp($dialog, $cmp, $name) {//получение значения по имени колонки
 	foreach($dialog['cmp'] as $cmp_id => $r)
 		if($r['col'] == $name)
-			return $cmp[$cmp_id];
+			if(isset($cmp[$cmp_id]))
+				return $cmp[$cmp_id];
 	return '';
 }
 function _auth98($dialog, $cmp) {//регистрация нового пользователя
@@ -280,7 +281,7 @@ function _pin131($dialog, $cmp) {//пользователь устанавлив
 			WHERE `id`=".USER_ID;
 	query($sql);
 
-	_cache_clear( 'user'.USER_ID);
+	_cache_clear('user'.USER_ID);
 	$send['action_id'] = 1;
 	jsonSuccess($send);
 }
@@ -297,14 +298,29 @@ function _pin132($dialog, $cmp) {//пользователь изменяет и�
 	$new = '';
 	if(!_authCmp($dialog, $cmp, 'num_1'))
 		if(!$new = _authCmp($dialog, $cmp, 'txt_2'))
-			jsonError('Не найден новый пин');
+			jsonError('Укажите новый пин-код');
 
 	$sql = "UPDATE `_user`
 			SET `pin`='".$new."'
 			WHERE `id`=".USER_ID;
 	query($sql);
 
-	_cache_clear( 'user'.USER_ID);
+	_cache_clear('user'.USER_ID);
+	$send['action_id'] = 1;
+	jsonSuccess($send);
+}
+function _pin133($dialog, $cmp) {//пользователь вводит пин-код для входа в приложение
+	if($dialog['id'] != 133)
+		return;
+	if(!$cur = _user(USER_ID, 'pin'))
+		jsonError('Пин-код не был установлен');
+	if(!$pin = _authCmp($dialog, $cmp, 'txt_1'))
+		jsonError('Не найден пин');
+	if($cur != $pin)
+		jsonError('Неверный пин-код');
+
+	$_SESSION[PIN_KEY] = time() + PIN_DURATION;
+
 	$send['action_id'] = 1;
 	jsonSuccess($send);
 }
@@ -515,9 +531,9 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 			WHERE `code`='".CODE."'";
 	query($sql);
 
-	_cache_clear( 'AUTH_'.CODE, 1);
-	_cache_clear( 'page');
-	_cache_clear( 'user'.USER_ID);
+	_cache_clear('AUTH_'.CODE, 1);
+	_cache_clear('page');
+	_cache_clear('user'.USER_ID);
 
 	_auth();
 }
@@ -526,6 +542,8 @@ function _app_list() {//список приложений, которые дос
 		return '';
 	if(APP_ID)
 		return 'Здесь будет размещён список приложений.';
+
+	unset($_SESSION[PIN_KEY]);
 
 	$sql = "SELECT *
 			FROM `_spisok`
