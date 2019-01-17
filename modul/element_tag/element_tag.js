@@ -1918,6 +1918,12 @@ $.fn._calendar = function(o) {
 			VAL_M = _num(tm[1]);
 		}
 
+		if(!_num(day[0]) || !_num(day[1]) || !_num(day[2])) {
+			VALUE = cur;
+			valTest();
+			return;
+		}
+
 		VAL_YEAR = _num(day[0]);
 		VAL_MON =  _num(day[1]);
 		VAL_DAY =  _num(day[2]);
@@ -1961,7 +1967,7 @@ $.fn._calendar = function(o) {
 			}
 		}
 		TAB_DAY
-			.html('<tbody class="cal-tb" val="' + win + '">' + html + '</tbody>')
+			.html('<tbody class="cal-tb" val="' + attr_id + '_calendar">' + html + '</tbody>')
 			.find('.sel').click(daySel);
 	}
 	function dayFirst() {//номер первой недели в месяце
@@ -2015,7 +2021,7 @@ $.fn._calendar = function(o) {
 			html += '<td class="sel' + b + set + '" val="' + n + '">' + monn[n];
 		}
 		TAB_DAY
-			.html('<tbody class="cal-tb" val="' + win + '">' + html + '</tbody>')
+			.html('<tbody class="cal-tb" val="' + attr_id + '_calendar">' + html + '</tbody>')
 			.find('.sel').click(function() {
 				TAB_MON = _num($(this).attr('val'));
 				TAB_DAY._dn(1, 'mon');

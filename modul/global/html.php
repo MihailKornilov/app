@@ -146,12 +146,6 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение запис
 			)";
 	query($sql);
 
-	//отметка даты последнего посещения пользователя
-	$sql = "UPDATE `_user`
-			SET `dtime_last`=CURRENT_TIMESTAMP
-			WHERE `id`=".$user_id;
-	query($sql);
-
 	setcookie('code', $code, time() + 2592000, '/');
 
 	_cache_clear( 'AUTH_'.$code, 1);

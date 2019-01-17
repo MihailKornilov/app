@@ -42,6 +42,15 @@ function _userCache($user_id) {
 			$u['src'] = _imageServer($img['server_id']).$img['80_name'];
 	}
 
+	//обновление активности в приложении
+	if($user_id == USER_ID) {
+		$sql = "UPDATE `_user`
+				SET `dtime_last`=CURRENT_TIMESTAMP
+				WHERE `id`=".USER_ID;
+		query($sql);
+		$u['dtime_last'] = TODAY.strftime(' %H:%M:%S');
+	}
+
 	return _cache_set($key, $u);
 }
 function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
