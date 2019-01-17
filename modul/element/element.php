@@ -1970,8 +1970,15 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 		case 51:
 			if($txt == '0000-00-00')
 				return '-';
+			if($ell['num_2'] && $txt == '0000-00-00 00:00:00')
+				return '';
 
-			return FullData($txt);
+			$v = FullData($txt);
+			if($ell['num_2'])
+				$v .= ' в '._num(substr($txt, 11, 2)).
+						':'.substr($txt, 14, 2);
+
+			return $v;
 
 		//Изображение
 		case 60:
