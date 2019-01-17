@@ -6,7 +6,7 @@ var ZINDEX = 1000,
 	REGEXP_CENA_MINUS =    /^-?[\d]+(.[\d]{1,2})?(,[\d]{1,2})?$/,
 	REGEXP_SIZE =          /^[\d]+(.[\d]{1})?(,[\d]{1})?$/,
 	REGEXP_MS =            /^[\d]+(.[\d]{1,3})?(,[\d]{1,3})?$/,
-	REGEXP_DATE =          /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
+	REGEXP_DATE =          /^(\d{4})-(\d{1,2})-(\d{1,2})( [0-9]{2}:[0-9]{2}:[0-9]{2})?$/,
 
 	POST_SEND,              //отправленные данные в _post
 	POST_BUSY_OBJ = null,   //объект, к которому применяется класс ожидания. Будет сброшен при условии возникновения ошибки
@@ -102,28 +102,6 @@ var ZINDEX = 1000,
 			a.push({id:k,title:s[k]});
 		return a
 	},
-	_toAss = function(s) {
-		var a=[];
-		for(var n = 0; n < s.length; n++)
-			a[s[n].id] = s[n].title;
-		return a
-	},
-	_yearSpisok = function(yearFirst) {//года для выпадающего списка
-		//установка начального года
-		yearFirst = _num(yearFirst);
-		if(!yearFirst)
-			yearFirst = 2010;
-
-		//определение текущего года
-		var d = new Date(),
-			cur = d.getFullYear(),
-			arr = [];
-
-		for(var y = yearFirst; y <= cur; y++)
-			arr.push({uid:y,title:y + ''});
-
-		return arr
-	},
 	_end = function(count, arr) {
 		if(arr.length == 2)
 			arr.push(arr[1]);
@@ -137,42 +115,13 @@ var ZINDEX = 1000,
 			}
 		return send;
 	},
-	_bool = function(v) {
-		return v == 1 ? 1 : 0;
-	},
 	_num = function(v, minus) {
 		var val = minus ? REGEXP_NUMERIC_MINUS.test(v) : REGEXP_NUMERIC.test(v);
 		return val ? v * 1 : 0;
 	},
-	_cena = function(v, minus) {//цена в виде: 100    16,34     0.5
-		//Может быть отрицательным значением
-		if(typeof v == 'string')
-			v = v.replace(',', '.');
-		if(v == 0)
-			return 0;
-		if(minus && REGEXP_CENA_MINUS.test(v))
-			return v * 1;
-		if(!REGEXP_DROB.test(v))
-			return 0;
-		return Math.round(v * 100) / 100;
-	},
-	_size = function(v) {//размер в виде: 100    16,3    (только десятичные дроби, не может быть отрицательным)
-		if(typeof v == 'string')
-			v = v.replace(',', '.');
-		if(v == 0)
-			return 0;
-		if(!REGEXP_SIZE.test(v))
-			return 0;
-		return v * 1;
-	},
-	_ms = function(v) {//единица измерения с дробями 0.000
-		if(typeof v == 'string')
-			v = v.replace(',', '.');
-		if(v == 0)
-			return 0;
-		if(!REGEXP_MS.test(v))
-			return 0;
-		return v * 1;
+	_nol = function(v) {//вставка нуля перед цифрой - для времени
+		v = _num(v);
+		return (v > 9 ? '' : '0') + v;
 	},
 	_msg = function(txt, func) {//Сообщение о результате выполненных действий
 		if(!txt)

@@ -131,20 +131,32 @@ function _tooltip($msg, $left=0, $ugolSide='', $x2=0) {//подсказка на
 }
 function _calendar($v=array()) {//поле Календарь
 	$attr_id = empty($v['attr_id']) ? 'calendar'.rand(1, 100000) : $v['attr_id'];
+	$time = _num($v['time']); //показывать время
 
-	$value = TODAY;
-	if(!empty($v['value'])) {
-		$ex = explode('-', $v['value']);
-		if(count($ex) == 3)
-			if(_num($ex[0]) && _num($ex[1]) && _num($ex[2]))
-				$value = $v['value'];
-	}
+	if(!preg_match(REGEXP_DATE, @$v['value']))
+		$v['value'] = TODAY.($time ? strftime(' %H:%M:00') : '');
+
 
 	return
-	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
+	'<input type="hidden" id="'.$attr_id.'" value="'.$v['value'].'" />'.
 	'<div class="_calendar disabled" id="'.$attr_id.'_calendar">'.
 		'<div class="icon icon-calendar"></div>'.
-		'<input type="text" class="cal-inp" readonly value="'.FullData($value).'" />'.
+		'<input type="text" class="cal-inp" readonly value="'.FullData($v['value']).'" />'.
+
+	($time ?
+		'<div class="dib ml8">'.
+			_count(array(
+				'attr_id' => $attr_id.'_hour',
+				'value' => substr($v['value'], 11, 2)
+			)).
+		'</div>'.
+		'<div class="dib b ml3 mr3">:</div>'.
+			_count(array(
+				'attr_id' => $attr_id.'_min',
+				'value' => substr($v['value'], 14, 2)
+			))
+	: '').
+
 	'</div>';
 }
 function _search($v=array()) {//поле ПОИСК

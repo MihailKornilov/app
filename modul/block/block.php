@@ -1348,6 +1348,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			*/
 			return _calendar(array(
 				'attr_id' => _elemAttrId($el, $prm),
+				'time' => $el['num_2'],
 				'value' => _elemPrintV($el, $prm)
 			));
 

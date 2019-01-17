@@ -346,7 +346,7 @@ $.fn._count = function(o) {//input с количеством
 		} else {
 			V += o.step * znak;
 			V = valCorrect();
-			INP.val(V);
+			INP.val(o.time ? _nol(V) : V);
 		}
 
 		t.val(V);
@@ -396,7 +396,7 @@ $.fn._count = function(o) {//input с количеством
 		return V;
 	}
 	function valTitle() {//установка текстового значения
-		var title = (o.time && V < 10 ? '0' : '') + V;
+		var title = o.time ? _nol(V) : V;
 		if(o.title[STEP_N])
 			title = o.title[STEP_N];
 		return title;
@@ -1765,16 +1765,10 @@ $.fn._calendar = function(o) {
 	if(!t.length)
 		return;
 
-	var attr_id = t.attr('id'),
-		VALUE = t.val();
-
-	if(!attr_id) {
-		attr_id = 'calendar' + Math.round(Math.random() * 100000);
-		t.attr('id', attr_id);
-	}
-
-	var win = attr_id + '_calendar',
+	var attr_id = _attrId(t),
+		win = attr_id + 'win',
 		S = window[win],
+		VALUE = t.val(),
 		n;
 
 	o = $.extend({
@@ -1784,20 +1778,37 @@ $.fn._calendar = function(o) {
 		func:function () {}    //исполняемая функция при выборе дня
 	}, o);
 
+	var D = new Date(),
+		CUR_YEAR = D.getFullYear(), //текущий год
+		CUR_MON =  D.getMonth() + 1,//текущий месяц
+		CUR_DAY =  D.getDate(),     //текущий день
+		CUR_H =    D.getHours(),    //текущий час
+		CUR_M =    D.getMinutes(),  //текущая минута
+
+		TAB_YEAR = CUR_YEAR,        //год, отображаемый в календаре
+		TAB_MON =  CUR_MON,         //месяц, отображаемый в календаре
+
+		VAL_YEAR = CUR_YEAR,  //выбранный год
+		VAL_MON =  CUR_MON,   //выбранный месяц
+		VAL_DAY =  CUR_DAY,   //выбранный день
+		VAL_H =    CUR_H,     //выбранный час
+		VAL_M =    CUR_M;     //выбранная минута
+
+	valTest();
 
 	//удаление такого же календаря при повторном вызове
 	t.next().remove('._calendar');
 	t.after(
-		'<div class="_calendar" id="' + win + '">' +
+		'<div class="_calendar" id="' + attr_id + '_calendar">' +
 			'<div class="icon icon-calendar"></div>' +
 			'<input type="text" class="cal-inp" readonly />' +
 
 		(o.time ?
 			'<div class="dib ml8">' +
-				'<input type="hidden" id="' + attr_id + '_hour"/>' +
+				'<input type="hidden" id="' + attr_id + '_hour" value="' + VAL_H + '" />' +
 			'</div>' +
 			'<div class="dib b ml3 mr3">:</div>' +
-			'<input type="hidden" id="' + attr_id + '_min"/>'
+			'<input type="hidden" id="' + attr_id + '_min" value="' + VAL_M + '" />'
 		: '') +
 
 			'<div class="cal-abs dn">' +
@@ -1812,42 +1823,40 @@ $.fn._calendar = function(o) {
 		'</div>'
 	);
 
+	//отображение часов и минут
 	if(o.time) {
 		$('#' + attr_id + '_hour')._count({
 			min:0,
 			max:23,
 			again:1,
-			time:1
+			time:1,
+			func:function(v) {
+				VAL_H = v;
+				valUpd();
+			}
 		});
 		$('#' + attr_id + '_min')._count({
 			step:10,
 			min:0,
 			max:50,
 			again:1,
-			time:1
+			time:1,
+			func:function(v) {
+				VAL_M = v;
+				valUpd();
+			}
 		});
 	}
 
-	var D = new Date(),
-		CUR_YEAR = D.getFullYear(), //текущий год
-		CUR_MON =  D.getMonth() + 1,//текущий месяц
-		CUR_DAY =  D.getDate(),     //текущий день
-
-		TAB_YEAR = CUR_YEAR,        //год, отображаемый в календаре
-		TAB_MON =  CUR_MON,         //месяц, отображаемый в календаре
-
-		VAL_YEAR = CUR_YEAR,    //выбранный год
-		VAL_MON =  CUR_MON,     //выбранный месяц
-		VAL_DAY =  CUR_DAY,     //выбранный день
-
-		CAL = t.next(),
-		INP = CAL.find('.cal-inp'),        //текстовое отображение выбранного дня
+	var	CAL = t.next(),
+		INP = CAL.find('.cal-inp'),     //текстовое отображение выбранного дня
 		CAL_ABS = CAL.find('.cal-abs'), //содержание календаря
 		TD_MON = CAL.find('.cal-mon'),  //строка td с месяцем и годом
 		TD_WEEK = CAL.find('.cal-week'),//таблица с названиями недель
 		TAB_DAY = CAL.find('.cal-day'); //таблица с днями
 
-	valTest();
+
+	valUpd();
 	tdMonUpd();
 	dayPrint();
 
@@ -1891,24 +1900,34 @@ $.fn._calendar = function(o) {
 		});
 
 	function valTest() {//проверка текущего значения, установка, если некорректное
+		var cur = CUR_YEAR + '-' + _nol(CUR_MON) + '-' + _nol(CUR_DAY);
+		if(o.time)
+			cur += ' ' + _nol(CUR_H) + ':' + _nol(CUR_M) + ':00';
+
 		if(!VALUE.length)
-			return valUpd();
+			VALUE = cur;
 		if(!REGEXP_DATE.test(VALUE))
-			return valUpd();
+			VALUE = cur;
 
-		var ex = VALUE.split('-');
-		if(!_num(ex[0]) || !_num(ex[1]) || !_num(ex[2]))
-			return valUpd();
+		var day = VALUE.split('-');
+		if(o.time) {
+			day = VALUE.split(' ');
+			var tm = day[1].split(':');
+			day = day[0].split('-');
+			VAL_H = _num(tm[0]);
+			VAL_M = _num(tm[1]);
+		}
 
-		VAL_YEAR = _num(ex[0]);
-		VAL_MON =  _num(ex[1]);
-		VAL_DAY =  _num(ex[2]);
+		VAL_YEAR = _num(day[0]);
+		VAL_MON =  _num(day[1]);
+		VAL_DAY =  _num(day[2]);
 		TAB_YEAR = VAL_YEAR;
 		TAB_MON = VAL_MON;
-		valUpd();
 	}
 	function valUpd() {//обновление значения
-		VALUE = TAB_YEAR + '-' + (TAB_MON < 10 ? '0' : '') + TAB_MON + '-' + (VAL_DAY < 10 ? '0' : '') + VAL_DAY;
+		VALUE = TAB_YEAR + '-' + _nol(TAB_MON) + '-' + _nol(VAL_DAY);
+		if(o.time)
+			VALUE += ' ' + _nol(VAL_H) + ':' + _nol(VAL_M) + ':00';
 		t.val(VALUE);
 		INP.val(VAL_DAY + ' ' + MONTH_DAT[VAL_MON] + ' ' + VAL_YEAR);
 	}
@@ -2034,7 +2053,7 @@ $.fn._calendar = function(o) {
 		dayPrint();
 	}
 
-
+	return t;
 };
 $.fn._search = function(o, v) {//поисковая строка
 	/*
