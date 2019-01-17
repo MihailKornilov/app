@@ -281,6 +281,7 @@ function _pin131($dialog, $cmp) {//пользователь устанавлив
 			WHERE `id`=".USER_ID;
 	query($sql);
 
+	unset($_SESSION[PIN_KEY]);
 	_cache_clear('user'.USER_ID);
 	$send['action_id'] = 1;
 	jsonSuccess($send);
@@ -305,6 +306,7 @@ function _pin132($dialog, $cmp) {//пользователь изменяет и�
 			WHERE `id`=".USER_ID;
 	query($sql);
 
+	unset($_SESSION[PIN_KEY]);
 	_cache_clear('user'.USER_ID);
 	$send['action_id'] = 1;
 	jsonSuccess($send);
