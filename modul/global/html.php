@@ -267,6 +267,47 @@ function _authIframeError($msg='Вход в приложение недосту�
 	'</div>';
 }
 
+function _pin131($dialog, $cmp) {//пользователь устанавливает свой пин-код
+	if($dialog['id'] != 131)
+		return;
+	if(_user(USER_ID, 'pin'))
+		jsonError('Пин-код уже установлен');
+	if(!$pin = _authCmp($dialog, $cmp, 'pin'))
+		jsonError('Не найден пин');
+
+	$sql = "UPDATE `_user`
+			SET `pin`='".$pin."'
+			WHERE `id`=".USER_ID;
+	query($sql);
+
+	_cache_clear( 'user'.USER_ID);
+	$send['action_id'] = 1;
+	jsonSuccess($send);
+}
+function _pin132($dialog, $cmp) {//пользователь изменяет или удаляет свой пин-код
+	if($dialog['id'] != 132)
+		return;
+	if(!$cur = _user(USER_ID, 'pin'))
+		jsonError('Пин-код не был установлен');
+	if(!$pin = _authCmp($dialog, $cmp, 'txt_1'))
+		jsonError('Не найден старый пин');
+	if($cur != $pin)
+		jsonError('Неверный текущий пин-код');
+
+	$new = '';
+	if(!_authCmp($dialog, $cmp, 'num_1'))
+		if(!$new = _authCmp($dialog, $cmp, 'txt_2'))
+			jsonError('Не найден новый пин');
+
+	$sql = "UPDATE `_user`
+			SET `pin`='".$new."'
+			WHERE `id`=".USER_ID;
+	query($sql);
+
+	_cache_clear( 'user'.USER_ID);
+	$send['action_id'] = 1;
+	jsonSuccess($send);
+}
 
 
 /* ---=== СОДЕРЖАНИЕ ===--- */

@@ -1,5 +1,5 @@
 <?php
-function _user($user_id=USER_ID, $i='') {//получение данных о пользовате из контакта
+function _user($user_id=USER_ID, $i='ass') {//получение данных о пользовате из контакта
 	if(!_num($user_id))
 		return array();
 
@@ -11,19 +11,18 @@ function _user($user_id=USER_ID, $i='') {//получение данных о п
 		define('USER_NAME', $u['i'].' '.$u['f']);//Имя Фамилия
 	}
 
-	if($i == 'name')
-		return $u['i'].' '.$u['f'];
 
-	if($i == 'ava')
-		return '<img src="'.$u['src'].'" />';
+	switch($i) {
+		case 'ass': return $u;
+		case 'name': return $u['i'].' '.$u['f'];
+		case 'ava': return '<img src="'.$u['src'].'" />';
+		case 'ava30': return '<img class="ava30" src="'.$u['src'].'" />';
+	}
 
-	if($i == 'ava30')
-		return '<img class="ava30" src="'.$u['src'].'" />';
+	if(isset($u[$i]))
+		return $u[$i];
 
-	if($i == 'src')
-		return $u['src'];
-
-	return $u;
+	return '';
 }
 function _userCache($user_id) {
 	$key = 'user'.$user_id;

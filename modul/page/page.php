@@ -745,7 +745,7 @@ function PHP12_page_list_li($r, $level=0) {//данные одной стран�
 
 function _page_div() {//todo тест
 
-	return '';
+	return _pr(_user());
 
 	return
 	'<div>'.

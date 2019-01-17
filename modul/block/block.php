@@ -1744,6 +1744,23 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					'EL'.$el['id'].'_F102_BG='._json($bgAss).';'.
 			'</script>';
 
+		//Пин-код
+		case 130:
+			$txt = 'Установить';
+			$color = 'grey';
+			$dlg_id = 131;
+			if(_user(USER_ID, 'pin')) {
+				$txt = 'Изменить';
+				$color = '';
+				$dlg_id = 132;
+			}
+			return _button(array(
+						'name' => $txt.' пин-код',
+						'color' => $color,
+						'class' => $prm['blk_setup'] ? 'curD' : 'dialog-open',
+						'val' => 'dialog_id:'.$dlg_id
+					));
+
 		//Привязка пользователя к странице ВК
 		case 300:
 			$vkRes = '';
