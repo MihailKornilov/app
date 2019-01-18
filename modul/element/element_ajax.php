@@ -101,6 +101,10 @@ switch(@$_POST['op']) {
 							'<tr class="td-insert-action-page'._dn($dialog['insert_action_id'] == 2).'">'.
 								'<td class="grey r">Страница:'.
 								'<td><input type="hidden" id="insert_action_page_id" value="'.$dialog['insert_action_page_id'].'" />'.
+
+							'<tr><td class="color-ref r h35">Воздействие на запись:'.
+								'<td><a id="insert_unit_change">не настроено</a>'.
+
 						'</table>'.
 					'</div>'.
 				'</div>'.

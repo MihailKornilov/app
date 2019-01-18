@@ -2867,6 +2867,66 @@ function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уро
 
 
 
+/* ---=== НАСТРОЙКА ВОЗДЕЙСТВИЯ НА ЗАПИСЬ ПОСЛЕ ВНЕСЕНИЯ ДАННЫХ [42] ===--- */
+function PHP12_insert_unit_change($prm) {
+	if(!$u = $prm['unit_edit'])
+		return _emptyMin10('Не получены данные для настройки.');
+	if(!$elem_id = $u['insert_unit_change_elem_id'])
+		return _emptyMin10('Для настройки значений укажите путь к записи,<br>сохраните настройки и откройте снова.');
+	if(!$el = _elemOne($elem_id))
+		return _emptyMin10('Элемента '.$elem_id.' не существует.');
+	if(!_elemIsConnect($el))
+		return _emptyMin10('Элемент не является подключаемым списком.');
+
+	return '';
+}
+function PHP12_insert_unit_change_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+	if(!$elem_id = $u['insert_unit_change_elem_id'])
+		return array();
+	if(!$el = _elemOne($elem_id))
+		return array();
+	if(!_elemIsConnect($el))
+		return array();
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return array();
+
+	$ass = PHP12_insert_unit_change_ass($u['insert_unit_change_v']);
+
+	$send = array();
+	foreach($DLG['cmp'] as $id => $r) {
+		if(!$r['col'])
+			continue;
+		if($r['hidden'])
+			continue;
+		$src_id = _num(@$ass[$id]);
+		$send[] = array(
+			'dst_id' => $id,
+			'dst_title' => _elemTitle($id),
+			'src_id' => $src_id,
+			'src_title' => _elemTitle($src_id)
+		);
+	}
+
+	return $send;
+}
+function PHP12_insert_unit_change_ass($dst) {//ассоциативный массив id элементов: получатель <- исходный
+	if(!$dst)
+		return array();
+
+	$ass = array();
+	foreach(explode(',', $dst) as $r) {
+		$ex = explode(':', $r);
+		if(!$dst_id = _num(@$ex[0]))
+			continue;
+		$ass[$dst_id] = _num(@$ex[1]);
+	}
+
+	return $ass;
+}
+
+
 /* ---=== НАСТРОЙКА СОДЕРЖАНИЯ УДАЛЕНИЯ ЗАПИСИ [56] ===--- */
 function PHP12_dialog_del_setup($prm) {
 	if(!$dialog_id = $prm['srce']['dss'])

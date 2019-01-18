@@ -379,6 +379,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 		});
 
+		DLG('#insert_unit_change').click(function() {
+			_dialogLoad({
+				dialog_id:42,
+				dss:o.dialog_id,
+				edit_id:o.dialog_id,
+				busy_obj:$(this)
+			});
+		});
+
 		DLG('#table_1')._select({
 			width:170,
 			title0:'не выбрана',
@@ -878,6 +887,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						_dialogLoad({
 							dialog_id:11,
 							block_id:OBJ.srce.block_id,
+							dss:OBJ.srce.dss,
 
 							dop:{
 								mysave:1,
@@ -2996,6 +3006,77 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				send.push(sp.attr('val'));
 		});
 		return send.join();
+	},
+
+	/* ---=== НАСТРОЙКА ВОЗДЕЙСТВИЯ НА ЗАПИСЬ ПОСЛЕ ВНЕСЕНИЯ ДАННЫХ [42] ===--- */
+	PHP12_insert_unit_change = function(el, vvv, obj) {
+		var ATR_EL = _attr_el(el.id),
+			html = '<dl></dl>',
+			DL = ATR_EL.append(html).find('dl');
+
+		_forN(vvv, function(sp) {
+			DL.append(
+				'<dd class="mt5">' +
+					'<table>' +
+						'<tr><td><input type="text"' +
+									  ' class="inp-dst w200 color-ref curD"' +
+									  ' readonly' +
+									  ' val="' + sp.dst_id + '"' +
+									  ' value="' + sp.dst_title + '"' +
+								' />' +
+							'<td class="w25 center fs17 grey"> &laquo; ' +
+							'<td><input type="text"' +
+									  ' class="inp-src w200 color-pay curP over1"' +
+									  ' readonly' +
+									  ' val="' + sp.src_id + '"' +
+									  ' value="' + sp.src_title + '"' +
+									  ' placeholder="не изменять"' +
+								' />' +
+							'<td><div class="icon icon-del pl' + _dn(sp.src_id) + _tooltip('Отменить выбор', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+			var DD = DL.find('dd:last'),
+				SRC = DD.find('.inp-src'),
+				DEL = DD.find('.icon-del');
+			SRC.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					dss:obj.unit.id,
+					dop:{
+						mysave:1,
+						sel:_num($(this).attr('val')),
+						nest:0
+					},
+					busy_obj:$(this),
+					busy_cls:'hold',
+					func_save:function(res) {
+						SRC.attr('val', res.v);
+						SRC.val(res.title);
+						DEL._dn(1);
+					}
+				});
+			});
+			DEL.click(function() {
+				SRC.attr('val', 0);
+				SRC.val('');
+				DEL._dn();
+			});
+		});
+	},
+	PHP12_insert_unit_change_get = function(el) {//получение данных для сохранения
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var src_id = _num(sp.find('.inp-src').attr('val'));
+			if(!src_id)
+				return;
+			send.push(
+				_num(sp.find('.inp-dst').attr('val')) +
+				':' +
+				src_id
+			);
+		});
+		_attr_cmp(el.id).val(send.join());
 	},
 
 	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ [57] ===--- */
