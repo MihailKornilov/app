@@ -506,9 +506,9 @@ function _arrJson($arr, $i=false) {//Последовательный масси
 	}
 	return '['.implode(',', $send).']';
 }
-function _json($arr, $n=0) {//перевод массива в JS
+function _json($arr, $n=0, $ass_empty=false) {//перевод массива в JS
 	if(empty($arr))
-		return '[]';
+		return $ass_empty ? '{}' : '[]';
 
 	//определение, ассоциативный массив или последовательный
 	$is_ass = range(0,count($arr) - 1) !== array_keys($arr);
@@ -729,8 +729,13 @@ function _jsCacheBlkOne($block_id) {
 	$val['xx'] = $r['xx'];
 	$val['xx_ids'] = $r['xx_ids'];
 
-	if(!empty($r['action']))
-		$val['action'] = $r['action'];
+	if(!empty($r['action'])) {
+		//удаление фильтров, ибо в JS они не требуются
+		foreach($r['action'] as $act) {
+			unset($act['filter']);
+			$val['action'][] = $act;
+		}
+	}
 
 	return $val;
 }

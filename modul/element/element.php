@@ -1890,7 +1890,7 @@ function _elem11($el, $prm) {//отображение элемента, вста
 			$unit = $unit[$col];
 			if(!is_array($unit)) {
 				if($ell['dialog_id'] == 29)
-					return $ell['txt_1'];
+					return '';//$ell['txt_1'];
 				return _msgRed('значение отсутствует');
 			}
 			continue;

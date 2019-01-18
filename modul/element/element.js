@@ -1168,33 +1168,62 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 40:
 					var P = ATR_CMP.next(),
 						INP = P.find('.inp'),
-						DEL = P.find('.icon-del');
+						DEL = P.find('.icon-del'),
+						_dlg24 = function(id) {//получение id диалога через указанный элемент
+							if(!id)
+								return 0;
+							var dlg24 = _idsFirst(OBJ.dlg.D(ATTR_CMP(id)).val());
+							if(!dlg24) {
+								_attr_cmp(id, 1)
+									._flash({color:'red'})
+									._hint({
+										msg:'Не выбрано значение',
+										color:'red',
+										pad:10,
+										side:'left',
+										show:1
+									});
+								return 0;
+							}
+							return dlg24;
+						},
+						_blkSrce = function(dss) {//получение id диалога через исходный блок
+							if(dss)
+								return dss;
+
+							var block_id = OBJ.srce.block_id;
+							if(!block_id)
+								return 0;
+
+							var BL = BLKK[block_id];
+							if(!BL)
+								return 0;
+
+							if(BL.obj_name == 'spisok') {
+								var EL = ELMM[BL.obj_id];
+								if(!EL)
+									return 0;
+								if(EL.dialog_id != 14)
+									return 0;
+								return EL.num_1;
+							}
+
+							return 0;
+						};
 
 					if(INP.attr('disabled'))
 						return;
 
 					P.click(function() {
-						if(!el.num_1)
+						var dss = _dlg24(el.num_1);
+						dss = _blkSrce(dss);
+						if(!dss)
 							return;
-
-						var dlg24 = _idsFirst(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
-						if(!dlg24) {
-							_attr_cmp(el.num_1, 1)
-								._flash({color:'red'})
-								._hint({
-									msg:'Не выбрано значение',
-									color:'red',
-									pad:10,
-									side:'left',
-									show:1
-								});
-							return;
-						}
 
 						_dialogLoad({
 							dialog_id:41,
 							element_id:el.num_1,//id элемента, к которому привязан фильтр (по нему будет определяться id диалога)
-							dss:dlg24,
+							dss:dss,
 							dop:ATR_CMP.val(),
 							busy_obj:INP,
 							busy_cls:'hold',
@@ -2370,7 +2399,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			._select('spisok', res ? res.spisok : []);
 	},
 
-	_blockActionJS = function(bo, block_id, unit_id) {//выполнение действия при нажатии на блок
+	_blockActionJS = function(bo, block_id, unit_id, skip) {//выполнение действия при нажатии на блок
 		if(!BLKK[block_id])
 			return;
 
@@ -2380,6 +2409,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		_forN(BL.action, function(sp) {
+			//пропуск действий, которые были отмечены через PHP фильтрами
+			if(skip[sp.id])
+				return;
+
 			switch(sp.dialog_id) {
 				//показ/скрытие блоков
 				case 211://По умолчанию - для остальных элементов

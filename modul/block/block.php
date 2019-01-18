@@ -296,11 +296,47 @@ function _blockAction($r, $prm) {//действие при нажатии на �
 	if(empty($r['action']))
 		return '';
 
+	$skip = array();//номера действия, которые нужно пропустить, если они не будут соответствовать условиям
 	$uid = 0;
-	if($prm['unit_get'])
-		$uid = $prm['unit_get']['id'];
+	if($u = $prm['unit_get']) {
+		$uid = $u['id'];
+		foreach($r['action'] as $n => $act)
+			if($v = _blockActionFilter($u, $act['filter']))
+				$skip[$act['id']] = 1;
+	}
 
-	return ' onclick="_blockActionJS(this,'.$r['id'].','.$uid.')"';
+	return ' onclick="_blockActionJS(this,'.$r['id'].','.$uid.','._json($skip, 0, true).')"';
+}
+function _blockActionFilter($u, $filter) {//дополнительные условия для действий
+	if(!$filter)
+		return 0;
+
+	$filter = htmlspecialchars_decode($filter);
+	//не получен массив условий (ошибка 2)
+	if(!$arr = json_decode($filter, true))
+		return 2;
+
+	foreach($arr as $r) {
+		if(!$ell = _elemOne($r['elem_id']))
+			return 3;//отсутствует элемент (ошибка 3)
+		if(!$col = $ell['col'])
+			return 4;//отсутствует имя колонки (ошибка 4)
+
+		$connect_id = $u[$col];
+		if(is_array($connect_id))
+			$connect_id = $u[$col]['id'];
+
+		switch($r['cond_id']) {
+			//равно
+			case 3:
+				if($r['unit_id'] != $connect_id)
+					return 1;
+				break;
+			default: return 5;//условие $r['cond_id'] не доделано  (ошибка 5)
+		}
+	}
+
+	return 0;
 }
 function _blockLevelChange($obj_name, $obj_id) {//кнопки изменения уровня редактирования блоков
 	$html = '';
@@ -2326,7 +2362,6 @@ function _beBlockAction($blk, $app_id) {//вставка действий для
 		if(!isset($blk[$block_id]))
 			continue;
 
-		unset($r['id']);
 		unset($r['app_id']);
 		unset($r['block_id']);
 		unset($r['element_id']);
