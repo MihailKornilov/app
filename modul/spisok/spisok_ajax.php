@@ -977,8 +977,8 @@ function _spisokUnitUpd42($DLG, $cmp) {//обновление некоторых
 
 	$sql = "UPDATE "._queryFrom($DST)."
 			SET ".implode(',', $upd)."
-			WHERE `t1`.`id`=".$unit_id."
-			  AND "._queryWhere($DST);
+			WHERE "._queryWhere($DST)."
+			  AND `t1`.`id`=".$unit_id;
 	query($sql);
 }
 function _spisokAction3($dialog, $unit_id, $send) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
