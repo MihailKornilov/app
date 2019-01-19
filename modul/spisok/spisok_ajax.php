@@ -380,6 +380,7 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_filterDefSet($dialog, $unit_id);
 
 	_SUN_CMP_UPDATE($dialog, $POST_CMP, $unit_id);
+	_spisokUnitUpd42($dialog, $POST_CMP);
 	_spisokUnitDelSetup($dialog, $unit_id);
 //	_spisokUnitBalansUpd($dialog, $POST_CMP);
 
@@ -941,6 +942,44 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 				  AND `user_id_add`=-".USER_ID;
 		query($sql);
 	}
+}
+function _spisokUnitUpd42($DLG, $cmp) {//обновление некоторых данных другой записи [42]
+	if(!$elem_id = $DLG['insert_unit_change_elem_id'])
+		return;
+	if(!$ass = PHP12_insert_unit_change_ass($DLG['insert_unit_change_v']))
+		return;
+	if(!$el = _elemOne($elem_id))
+		return;
+	if(!_elemIsConnect($el))
+		return;
+	//диалог записи, которую нужно обновлять
+	if(!$DST = _dialogQuery($el['num_1']))
+		return;
+	//id записи, данные которой будут изменены
+	if(!$unit_id = _num($cmp[$elem_id]))
+		return;
+	if(!$unit = _spisokUnitQuery($DST, $unit_id))
+		return;
+
+	$upd = array();
+	foreach($ass as $dst_id => $src_id) {
+		if(!$el = _elemOne($dst_id))
+			continue;
+		if(!$col = $el['col'])
+			continue;
+		if(!isset($cmp[$src_id]))
+			continue;
+		$upd[] = "`".$col."`='".addslashes($cmp[$src_id])."'";
+	}
+
+	if(empty($upd))
+		return;
+
+	$sql = "UPDATE "._queryFrom($DST)."
+			SET ".implode(',', $upd)."
+			WHERE `t1`.`id`=".$unit_id."
+			  AND "._queryWhere($DST);
+	query($sql);
 }
 function _spisokAction3($dialog, $unit_id, $send) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
 	//должено быть действие над элементом
