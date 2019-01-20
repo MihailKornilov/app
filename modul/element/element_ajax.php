@@ -24,8 +24,14 @@ switch(@$_POST['op']) {
 			unset($menu[9]);
 			unset($action[4]);
 		}
+
+		//история вносится, если запись не удаляется физически
 		if(!isset($dialog['field1']['deleted']))
 			unset($menu[2]);
+		//история вносится только у родительских диалогов
+		if($dialog['dialog_id_parent'])
+			unset($menu[2]);
+
 		if(!isset($menu[$dialog['menu_edit_last']]))
 			$dialog['menu_edit_last'] = 1;
 		//установка раздела меню по запросу

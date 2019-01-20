@@ -4580,12 +4580,11 @@ function _historyInsert($type_id, $dialog, $unit_id) {//внесение ист�
 function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение истории действий при редактировании
 	if(empty($unitOld))
 		return;
+	if($parent_id = $dialog['dialog_id_parent'])
+		if(!$dialog = _dialogQuery($parent_id))
+			return;
 	if(!isset($dialog['field1']['deleted']))
 		return;
-	//todo проверить правильность внесения истории для пользователей
-	if($dialog['dialog_id_parent'])
-		return;
-
 
 
 	$edited = array();
