@@ -133,7 +133,7 @@ function _calendar($v=array()) {//поле Календарь
 	$attr_id = empty($v['attr_id']) ? 'calendar'.rand(1, 100000) : $v['attr_id'];
 	$time = _num($v['time']); //показывать время
 
-	if(!preg_match(REGEXP_DATE, @$v['value']))
+	if(!preg_match(REGEXP_DATE, @$v['value']) || $v['value'] == '0000-00-00' || $v['value'] == '0000-00-00 00:00:00')
 		$v['value'] = TODAY.($time ? strftime(' %H:%M:00') : '');
 
 
