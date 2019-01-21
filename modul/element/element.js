@@ -106,6 +106,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			html =
 			'<div class="_dialog-back"></div>' +
 			'<div class="_dialog">' +
+				'<iframe class="frameD" name="frameD"></iframe>' +
 				'<div class="head ' + o.color + '">' +
 					'<div class="close fr curP"><a class="icon icon-del wh pl"></a></div>' +
 		            '<div class="edit fr curP' + editShow + '"><a class="icon icon-edit wh pl"></a></div>' +
@@ -122,6 +123,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			dialog = $('body').append(html).find('._dialog:last'),
 			DBACK = dialog.prev(),
+			frameD = dialog.find('.frameD'),
 			iconEdit = dialog.find('.head .edit'),
 			content = dialog.find('.content'),
 			width = o.width || Math.round(content.width()),
@@ -180,6 +182,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		ZINDEX += 10;
 
 		_fbhs();
+		frameD[0].onresize = _fbhs;
 
 		function dialogClose() {
 			DBACK.remove();

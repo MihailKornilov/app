@@ -31,7 +31,8 @@ var VK_BODY,       //фрейм VK для изменения высоты $('bod
 			VK_BODY = $('body');
 			window.frame0.onresize = _fbhs;
 
-//			VK.callMethod('scrollWindow', _scroll());
+			//установка прокрутки окна в верхнее положение
+			VK.callMethod('scrollWindow', 0);
 
 			VK.callMethod('scrollSubscribe');
 			VK.addCallback('onScroll', function(top) {
