@@ -106,7 +106,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			html =
 			'<div class="_dialog-back"></div>' +
 			'<div class="_dialog">' +
-				'<iframe class="frameD" name="frameD"></iframe>' +
+				'<iframe class="frameD" name="frameD' + DIALOG_NUM + '"></iframe>' +
 				'<div class="head ' + o.color + '">' +
 					'<div class="close fr curP"><a class="icon icon-del wh pl"></a></div>' +
 		            '<div class="edit fr curP' + editShow + '"><a class="icon icon-edit wh pl"></a></div>' +
@@ -171,7 +171,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				'z-index':ZINDEX + 3,
 				height:$(document).height()
 			 });
-//			 .click(dialogClose);
+//			 .click(dialogClose);//отменила Лена Навроцкая
 
 		dialog.css({
 			width:width + 'px',
@@ -179,10 +179,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			left:$(document).width() / 2 - w2 + 'px',
 			'z-index':ZINDEX + 5
 		});
+
 		ZINDEX += 10;
 
 		_fbhs();
-		frameD[0].onresize = _fbhs;
+		window['frameD' + DIALOG_NUM].onresize = _fbhs;
 
 		function dialogClose() {
 			DBACK.remove();
