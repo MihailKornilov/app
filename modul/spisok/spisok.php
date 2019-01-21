@@ -692,7 +692,7 @@ function _spisokUnitQuery($dialog, $unit_id, $nosuq=false) {//получение
 	$spisok = _spisokInclude($spisok);
 	$spisok = _spisokImage($spisok);
 
-	$SUQ[$key] = _arrNum($spisok[$unit_id]);
+	$SUQ[$key] = $spisok[$unit_id];//пока без _arrNum
 	
 	return $SUQ[$key];
 }

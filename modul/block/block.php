@@ -1392,6 +1392,9 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		case 52:
 			/*
 			*/
+			if($prm['blk_setup'])
+				return _emptyMin('Заметки');
+
 			return _note($el);
 
 		//количество значений привязанного списка
@@ -1855,7 +1858,7 @@ function _elemPrintV($el, $prm, $def='') {//значение записи при
 			return $id;
 		return $def;
 	}
-	if(is_string($v) && preg_match(REGEXP_INTEGER, $v))
+	if(is_string($v) && preg_match(REGEXP_INTEGER, $v) && preg_match(REGEXP_INTEGER, $def))
 		return $v * 1;
 
 	return $v;
