@@ -455,8 +455,8 @@ function _html_hat() {//верхняя строка приложения для 
 
 			'<div class="fr w350 mt8 r mr20">'.
 				_hat_but_sa().
-				_hat_but_app().
 				_hat_but_admin().
+				_hat_but_app().
 				_hat_but_pas().
 			'</div>'.
 		'</div>'.

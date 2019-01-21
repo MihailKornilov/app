@@ -796,7 +796,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID."
-			ORDER BY `id`";
+			ORDER BY `sort`";
 	if(!$arr = query_arr($sql))
 		return 'Диалоговых окон нет.';
 
@@ -808,35 +808,46 @@ function PHP12_dialog_app() {//список диалоговых окон для
 
 	$send = '<table class="_stab small">'.
 				'<tr>'.
-					'<th>ID'.
-					'<th>Имя диалога'.
-					'<th>'.
-					'<th>Список'.
-					'<th>Родитель'.
-					'<th>Колонки'.
-					'<th>h1'.
-					'<th>h2'.
-					'<th>h3'.
-					'<th>content<br>del';
+					'<th class="w30">'.
+					'<th class="w35">num'.
+			  (SA ? '<th class="w50">ID' : '').
+					'<th class="w200">Имя диалога'.
+					'<th class="w30">'.
+					'<th class="w70">Список'.
+					'<th class="w100">Родитель'.
+					'<th class="w70">Колонки'.
+					'<th class="w30">h1'.
+					'<th class="w30">h2'.
+					'<th class="w30">h3'.
+					'<th class="w100">content<br>del'.
+			'</table>'.
+			'<dl>';
 	foreach($arr as $dialog_id => $r) {
 		$parent = '';
 		if($parent_id = $r['dialog_id_parent'])
 			$parent = _dialogParam($parent_id, 'name');
-		$send .= '<tr>'.
-					'<td class="w35 r grey">'.$dialog_id.
-					'<td class="over1 curP dialog-open" val="dialog_id:'.$dialog_id.'">'.$r['name'].
-					'<td class="center">'.
+		$send .= '<dd val="'.$dialog_id.'">'.
+			'<table class="_stab small mt1">'.
+				'<tr>'.
+					'<td class="w30 r">'.
+						'<div class="icon icon-move pl"></div>'.
+					'<td class="w35 r grey">'.$r['num'].
+			  (SA ? '<td class="w50 pale r">'.$dialog_id : '').
+					'<td class="w200 over1 curP dialog-open" val="dialog_id:'.$dialog_id.'">'.$r['name'].
+					'<td class="w30 r">'.
 						'<div val="dialog_id:'.$dialog_id.'" class="icon icon-edit dialog-setup'._tooltip('Редактировать диалог', -66).'</div>'.
-					'<td class="center'.($r['spisok_on'] ? ' bg-dfd' : '').'">'.($r['spisok_on'] ? 'да' : '').
-					'<td class="color-sal'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
-					'<td class="grey">'.PHP12_dialog_col($dialog_id).
-					'<td>'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-					'<td>'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-					'<td>'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-					'<td class="center'.(!empty($contentDelAss[$dialog_id]) ? ' bg-dfd' : '').'">'.
-						_dialogContentDelSetup($dialog_id);
+					'<td class="w70 center'.($r['spisok_on'] ? ' bg-dfd' : '').'">'.($r['spisok_on'] ? 'да' : '').
+					'<td class="w100 color-sal'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
+					'<td class="w70 grey">'.PHP12_dialog_col($dialog_id).
+					'<td class="w30">'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+					'<td class="w30">'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+					'<td class="w30">'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+					'<td class="w100 center'.(!empty($contentDelAss[$dialog_id]) ? ' bg-dfd' : '').'">'.
+						_dialogContentDelSetup($dialog_id).
+			'</table>';
 	}
-	$send .= '</table>';
+
+	$send .= '</dl>';
 
 	return $send;
 }

@@ -4373,6 +4373,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				id = _num(t.attr('val'));
 			imNext(id);
 		});
+	},
+
+	//список диалоговых окон для конкретного приложения
+	PHP12_dialog_app = function(el) {
+		_attr_el(el.id).find('DL')._sort({
+			elem_id:el.id
+		});
 	};
 
 $(document)

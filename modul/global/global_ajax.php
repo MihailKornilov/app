@@ -36,6 +36,18 @@ switch(@$_POST['op']) {
 		$dialog_id = 0;
 		switch($el['dialog_id']) {
 			case 14: $dialog_id = $el['num_1']; break;
+			case 12:
+				switch($el['txt_1']) {
+					case 'PHP12_dialog_app':
+						foreach($sortIds as $n => $id) {
+							$sql = "UPDATE `_dialog` SET `sort`=".$n." WHERE `id`=".$id;
+							query($sql);
+						}
+						jsonSuccess();
+						break;
+				}
+				jsonError('Не найдена функция [12]');
+				break;
 			default: jsonError('Не найден диалог');
 		}
 
