@@ -542,7 +542,6 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 				}
 			});
 		}
-		_fbsh_new();
 	});
 	ICON_DEL.click(function() {
 		valueSet(0);
@@ -567,7 +566,6 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 				attr = ':not(#' + cur.attr('id') + ')';
 
 			$('._select' + attr).removeClass('rs');
-			_fbsh_new();
 		});
 
 	function massCreate() {//создание массива для корректного вывода списка
@@ -1869,7 +1867,6 @@ $.fn._calendar = function(o) {
 		TD_WEEK._dn(1);
 		TAB_DAY._dn(1, 'mon');
 		CAL_ABS._dn(on);
-		_fbsh_new();
 	});
 	CAL.find('.cal-back').click(back);
 	CAL.find('.cal-next').click(next);
@@ -2278,13 +2275,8 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 	if(!t.length)
 		return;
 
-	var attr_id = t.attr('id');
-	if(!attr_id) {
-		attr_id = 'dropdown' + Math.round(Math.random() * 100000);
-		t.attr('id', attr_id);
-	}
-
-	var win = attr_id + '_dropdown',
+	var attr_id = _attrId(t),
+		win = attr_id + 'win',
 		S = window[win],
 		VALUE = _num(t.val());
 
@@ -2305,7 +2297,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 	t.next().remove('._dropdown');
 
 	var dis = o.disabled ? ' disabled' : '',
-		html =  '<div class="_dropdown' + dis + '" id="' + win + '">' +
+		html =  '<div class="_dropdown' + dis + '" id="' + attr_id + '_dropdown">' +
 					'<a class="dd-head">' + o.head + '</a>' +
 					'<div class="dd-list"></div>' +
 				'</div>';
@@ -2334,7 +2326,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 			if(cur.hasClass('_dropdown'))
 				attr = ':not(#' + cur.attr('id') + ')';
 
-			$('._dropdown' + attr + ' .dd-list').hide();
+			$('._dropdown' + attr).removeClass('rs');
 		});
 
 	HEAD.on('click mouseenter', function() {
@@ -2345,11 +2337,12 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 				return false;
 			}
 		});
-		LIST.show();
+		DDN.addClass('rs');
+		LIST.css('opacity', 1);
 	});
 	DDU.click(function() {
 		timerClear();
-		LIST.hide();
+		DDN.removeClass('rs');
 		var tt = $(this),
 			v = _num(tt.attr('val'), 1);
 		valueSet(v);
@@ -2361,7 +2354,11 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 	LIST.on({
 		mouseleave:function () {
 			timer = setTimeout(function() {
-				LIST.fadeOut(200);
+
+				LIST.animate({opacity:0}, 200, function() {
+					DDN.removeClass('rs');
+				});
+
 			}, 500);
 		},
 		mouseenter:timerClear
@@ -2448,6 +2445,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 			return;
 		clearTimeout(timer);
 		timer = 0;
+		LIST.stop().css('opacity', 1);
 	}
 
 	t.ass = MASS_ASS;

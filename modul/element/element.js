@@ -171,7 +171,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				'z-index':ZINDEX + 3,
 				height:$(document).height()
 			 });
-//			 .click(dialogClose);//отменила Лена Навроцкая
 
 		dialog.css({
 			width:width + 'px',
@@ -182,8 +181,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		ZINDEX += 10;
 
-		_fbsh_new();
-		window['frameD' + DIALOG_NUM].onresize = _fbsh_new;
+		_fbhs();
+		window['frameD' + DIALOG_NUM].onresize = _fbhs;
 
 		function dialogClose() {
 			DBACK.remove();
@@ -192,7 +191,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(o.dialog_id)
 				delete DIALOG[o.dialog_id];
 			closeFunc();
-			_fbsh_new();
 		}
 		function dialogErr(msg) {
 			butSubmit._hint({

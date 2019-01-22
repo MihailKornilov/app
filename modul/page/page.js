@@ -1,8 +1,5 @@
 var FB,          //фрейм VK для изменения высоты $('body')
 	FBH_CUR = 0, //текущая высота врейма, установленная в последний раз
-
-	VK_BODY,       //фрейм VK для изменения высоты $('body')
-	VK_BODY_H = 0, //текущая высота фрейма VK
 	VK_SCROLL = 0,
 
 	_faceTest = function() {//определение, как загружена страница: iframe или сайт
@@ -24,7 +21,7 @@ var FB,          //фрейм VK для изменения высоты $('body'
 		//инициализация фрейма
 		FB = $('body');
 
-		window.frame0.onresize = _fbsh_new;
+		window.frame0.onresize = _fbhs;
 
 		//установка прокрутки окна в верхнее положение
 		VK.callMethod('scrollWindow', 0);
@@ -34,14 +31,19 @@ var FB,          //фрейм VK для изменения высоты $('body'
 			VK_SCROLL = top;
 		});
 
-		_fbsh_new();
+		_fbhs();
+
+		//обновление высоты фрейма происходит всегда в конце каждого скрипта
+		$(window).on('click', function() {
+			setTimeout(_fbhs, 0)
+		});
 	},
 	_faceGo = function(face) {
 		_cookie('face', face);
 		location.reload();
 	},
 
-	_fbsh_new = function() {
+	_fbhs = function() {//FrameBodyHeightSet - установка высоты фрейма в ВК
 		if(_cookie('local'))
 			return;
 		if(_cookie('face') != 'iframe')
@@ -51,8 +53,8 @@ var FB,          //фрейм VK для изменения высоты $('body'
 
 		//проверка, чтобы диалоговое окно не уходило за фрейм
 		_forEq($('._dialog'), function(sp) {
-			var top = _num(sp.css('top').split('px')[0]),
-				dH = sp.height() + top + 50;
+			var top = sp.offset().top,
+				dH = top + Math.round(sp.height()) + 50;
 			if(h < dH)
 				h = dH;
 		});
@@ -64,9 +66,23 @@ var FB,          //фрейм VK для изменения высоты $('body'
 				h = dH;
 		});
 
+		//проверка, чтобы содержание _dropdown не выходило за фрейм
+		_forEq($('._dropdown.rs .dd-list'), function(sp) {
+			var dH = sp.offset().top + Math.round(sp.height()) + 50;
+			if(h < dH)
+				h = dH;
+		});
+
 		//проверка, чтобы календарь не выходил за фрейм
 		_forEq($('.cal-abs'), function(sp) {
 			var dH = sp.offset().top + 235 + 50;
+			if(h < dH)
+				h = dH;
+		});
+
+		//проверка, чтобы Фильтр102 не выходил за фрейм
+		_forEq($('._filter102.rs .list'), function(sp) {
+			var dH = sp.offset().top + Math.round(sp.height()) + 50;
 			if(h < dH)
 				h = dH;
 		});
@@ -75,46 +91,6 @@ var FB,          //фрейм VK для изменения высоты $('body'
 			return;
 
 		FBH_CUR = h;
-		VK.callMethod('resizeWindow', 1000, h);
-	},
-
-	_fbhs = function(h) {//коррекция высоты окна в VK
-		return;
-		if(_cookie('local'))
-			return;
-		if(_cookie('face') != 'iframe')
-			return;
-
-		if(!VK_BODY) {
-			VK_BODY = $('body');
-			window.frame0.onresize = _fbhs;
-
-			//установка прокрутки окна в верхнее положение
-			VK.callMethod('scrollWindow', 0);
-
-			VK.callMethod('scrollSubscribe');
-			VK.addCallback('onScroll', function(top) {
-				VK_SCROLL = top;
-			});
-		}
-
-		if(typeof h != 'number') {
-			VK_BODY.height('auto');
-			h = VK_BODY.height();
-		}
-
-		_forEq($('._dialog'), function(sp) {
-			var top = _num(sp.css('top').split('px')[0]),
-				dH = sp.height() + top + 20;
-			if(h < dH)
-				h = dH;
-		});
-
-		if(VK_BODY_H >= h)
-			return;
-
-		VK_BODY_H = h;
-
 		VK.callMethod('resizeWindow', 1000, h);
 	},
 

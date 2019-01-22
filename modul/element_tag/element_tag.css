@@ -627,7 +627,6 @@
 ._dropdown .dd-head{white-space:nowrap}
 ._dropdown .dd-head.grey{color:#999}
 ._dropdown .dd-list{
-	display:none;
 	position:absolute;
 	top:-7px;
 	left:-13px;
@@ -638,6 +637,7 @@
 	box-shadow:0 1px 3px rgba(0,0,0,.1);
 	z-index:1;
 }
+._dropdown:not(.rs) .dd-list{display:none}
 ._dropdown .dd-sel{
 	color:#5C6C7F;
 	background:#DBE0E5 no-repeat right center url("data:image/gif;base64,R0lGODlhEQAEAKIAAAAAAP///11xhXOLo+7y9v///wAAAAAAACH5BAEAAAUALAAAAAARAAQAAAMOKLpS/rCMOaN19OqhYwIAOw==");
