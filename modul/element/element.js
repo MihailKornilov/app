@@ -182,8 +182,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		ZINDEX += 10;
 
-		_fbhs();
-		window['frameD' + DIALOG_NUM].onresize = _fbhs;
+		_fbsh_new();
+		window['frameD' + DIALOG_NUM].onresize = _fbsh_new;
 
 		function dialogClose() {
 			DBACK.remove();
@@ -192,7 +192,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(o.dialog_id)
 				delete DIALOG[o.dialog_id];
 			closeFunc();
-			_fbhs();
+			_fbsh_new();
 		}
 		function dialogErr(msg) {
 			butSubmit._hint({

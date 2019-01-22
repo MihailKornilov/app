@@ -1,4 +1,7 @@
-var VK_BODY,       //фрейм VK для изменения высоты $('body')
+var FB,          //фрейм VK для изменения высоты $('body')
+	FBH_CUR = 0, //текущая высота врейма, установленная в последний раз
+
+	VK_BODY,       //фрейм VK для изменения высоты $('body')
 	VK_BODY_H = 0, //текущая высота фрейма VK
 	VK_SCROLL = 0,
 
@@ -14,14 +17,69 @@ var VK_BODY,       //фрейм VK для изменения высоты $('bod
 			location.reload();
 			return;
 		}
-		_fbhs();
+
+		if(face != 'iframe')
+			return;
+
+		//инициализация фрейма
+		FB = $('body');
+
+		window.frame0.onresize = _fbsh_new;
+
+		//установка прокрутки окна в верхнее положение
+		VK.callMethod('scrollWindow', 0);
+
+		VK.callMethod('scrollSubscribe');
+		VK.addCallback('onScroll', function(top) {
+			VK_SCROLL = top;
+		});
+
+		_fbsh_new();
 	},
 	_faceGo = function(face) {
 		_cookie('face', face);
 		location.reload();
 	},
 
+	_fbsh_new = function() {
+		if(_cookie('local'))
+			return;
+		if(_cookie('face') != 'iframe')
+			return;
+
+		var h = FB.height();
+
+		//проверка, чтобы диалоговое окно не уходило за фрейм
+		_forEq($('._dialog'), function(sp) {
+			var top = _num(sp.css('top').split('px')[0]),
+				dH = sp.height() + top + 50;
+			if(h < dH)
+				h = dH;
+		});
+
+		//проверка, чтобы содержание выпадающего списка не выходило за фрейм
+		_forEq($('._select.rs .select-res'), function(sp) {
+			var dH = sp.offset().top + 250 + 50;
+			if(h < dH)
+				h = dH;
+		});
+
+		//проверка, чтобы календарь не выходил за фрейм
+		_forEq($('.cal-abs'), function(sp) {
+			var dH = sp.offset().top + 235 + 50;
+			if(h < dH)
+				h = dH;
+		});
+
+		if(FBH_CUR == h)
+			return;
+
+		FBH_CUR = h;
+		VK.callMethod('resizeWindow', 1000, h);
+	},
+
 	_fbhs = function(h) {//коррекция высоты окна в VK
+		return;
 		if(_cookie('local'))
 			return;
 		if(_cookie('face') != 'iframe')
@@ -52,7 +110,7 @@ var VK_BODY,       //фрейм VK для изменения высоты $('bod
 				h = dH;
 		});
 
-		if(VK_BODY_H == h)
+		if(VK_BODY_H >= h)
 			return;
 
 		VK_BODY_H = h;

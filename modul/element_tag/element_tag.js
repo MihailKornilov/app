@@ -541,11 +541,8 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 					return false;
 				}
 			});
-
-			//корректировка высоты фрейма VK, чтобы список не уходил за экран
-			_fbhs(RES.offset().top + RES.height() + 20)
-		} else
-			_fbhs();
+		}
+		_fbsh_new();
 	});
 	ICON_DEL.click(function() {
 		valueSet(0);
@@ -570,6 +567,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 				attr = ':not(#' + cur.attr('id') + ')';
 
 			$('._select' + attr).removeClass('rs');
+			_fbsh_new();
 		});
 
 	function massCreate() {//создание массива для корректного вывода списка
@@ -1871,6 +1869,7 @@ $.fn._calendar = function(o) {
 		TD_WEEK._dn(1);
 		TAB_DAY._dn(1, 'mon');
 		CAL_ABS._dn(on);
+		_fbsh_new();
 	});
 	CAL.find('.cal-back').click(back);
 	CAL.find('.cal-next').click(next);
