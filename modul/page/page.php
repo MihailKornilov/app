@@ -375,6 +375,7 @@ function PHP12_page_access_for_user_setup_save($cmp, $val, $unit) {//сохра�
 	_cache_clear('AUTH_'.CODE, 1);
 	_cache_clear('page');
 	_cache_clear('user'.$user_id);
+	_cache_clear('UserPageAccess'.$user_id);
 }
 
 function PHP12_page_access_for_user_view($prm) {//отображение страниц, доступных пользователю
