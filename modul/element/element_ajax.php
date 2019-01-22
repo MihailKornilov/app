@@ -994,6 +994,8 @@ function _dialogOpenParam($dlg) {//все возможные параметны 
 function _dialogOpenLoad($dialog_id) {
 	if(!$dialog = _dialogQuery($dialog_id))
 		jsonError('Диалога не существует');
+	if($dialog['sa'] && !SA)
+		jsonError('Нет прав');
 
 	$send = _dialogOpenParam($dialog);
 
