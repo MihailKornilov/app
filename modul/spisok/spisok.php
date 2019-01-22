@@ -1534,9 +1534,10 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 				break;
 			//привязанные списки
 			case 29:
-				_spisokUnitAfter54($cmp, $dialog, $unit);         //пересчёт количеств привязаного списка [54]
-				$upd = _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld); //пересчёт cумм привязаного списка [55]
-				_spisokUnitAfter27($dialog, $upd);                         //подсчёт балансов после обновления сумм [27]
+			case 59:
+				$upd = _spisokUnitAfter54($cmp, $dialog, $unit);            //пересчёт количеств привязаного списка [54]
+				$upd += _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld); //пересчёт cумм привязаного списка [55]
+				_spisokUnitAfter27($dialog, $upd);                          //подсчёт балансов после обновления сумм [27]
 
 				_counterGlobal($cmp['num_1'], $dialog);
 				break;
@@ -1544,19 +1545,20 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 }
 function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт количеств привязаного списка
 	if(!$UCOL = $cmp['col'])//имя колонки, по которой привязан список
-		return;
+		return array();
 	if(empty($unit[$UCOL]))
-		return;
+		return array();
 	if(!$connect_id = _num($unit[$UCOL]['id']))//значение, id записи привязанного списка.
-		return;
+		return array();
 
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=54
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
-		return;
+		return array();
 
+	$send = array();
 	foreach($arr as $elem_id => $r) {
 		//колонка элемента-количества
 		if(!$col = $r['col'])
@@ -1583,6 +1585,12 @@ function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт колич
 				WHERE `t1`.`id`=".$connect_id."
 				  AND "._queryWhere($dlg);
 		query($sql);
+
+		$send[$elem_id] = array(
+			'sum_old' => 0,
+			'sum' => $count,
+			'unit_id' => $connect_id     //id записи, баланс которой будет пересчитан
+		);
 
 		//флаг включенного счётчика-истории
 		if(!$r['num_3'])
@@ -1619,6 +1627,8 @@ function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт колич
 				)";
 		query($sql);
 	}
+
+	return $send;
 }
 function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт сумм привязаного списка после внесения/удаления данных
 	//имя колонки, по которой привязан список
@@ -1924,91 +1934,3 @@ function _counterGlobalInsert($counter_id, $balans, $dlgAct) {//внесение
 }
 
 
-
-
-//todo на удаление
-function _22cond($parent_id) {//получение условий запроса из базы при помощи: Дополнительные условия к фильтру (вспомогательный элемент)
-	//условия, формирующие фильтр
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Доп.условия 22 для <u>".$parent_id."</u> */
-			SELECT *
-			FROM `_element`
-			WHERE `parent_id`=".$parent_id;
-	if(!$cond = query_arr($sql))
-		return '';
-
-	//колонки, по которым будет производиться фильтр
-	$elCol = array();
-	foreach($cond as $r)
-		if($id = _idsLast($r['txt_1']))
-			if($el = _elemOne($id))
-				if($col = $el['col'])
-					$elCol[$id] = $col;
-
-	if(empty($elCol))
-		return '';
-
-	$send = '';
-	foreach($cond as $r) {
-		//если вложение более чем одно - пока такое не отработано
-		if(_ids($r['txt_1'], 'count') > 2)
-			return " AND !(`t1`.`id`)";
-
-		//если присутствует одно вложенное значение
-		if(_ids($r['txt_1'], 'count') == 2) {
-			if(!$EL = _elemOne(_ids($r['txt_1'], 'first')))
-				return " AND !((`t1`.`id`))";
-			if(!$col = $EL['col'])
-				return " AND !(((`t1`.`id`)))";
-
-			$dialog = _dialogQuery($EL['num_1']);
-			$send .= " AND `".$col."` IN (
-						SELECT `t1`.`id`
-						FROM "._queryFrom($dialog)."
-						WHERE "._queryWhere($dialog).
-							_40condV(
-									$r['num_2'],
-									$elCol[_idsLast($r['txt_1'])],
-									$r['txt_2']
-								 )."
-						) /* _22cond: одно вложение */";
-			continue;
-		}
-
-		//произвольное текстовое значение
-		$val = $r['txt_2'];
-
-		//значение из подключаемого списка
-		$in = 0;
-		if(_elemIsConnect($r['txt_1']) && $r['num_3']) {
-			$val = $r['num_3'];
-			//также проверяются дочерние значения
-			$sql = "SELECT `id`
-					FROM `_spisok`
-					WHERE `parent_id`=".$val;
-			if($ids = query_ids($sql)) {
-				$val .= ','.$ids;
-				$in = 1;
-			}
-		}
-
-		//если элемент является датой, преобразование значения в дату, если это число.
-		if(_elemIsDate($r['txt_1']))
-			if(preg_match(REGEXP_INTEGER, $val)) {
-				//число - это количество дней
-				//нулевое значение = сегодня
-				//положительное = дни в будущем
-				//отрицательное = дни в прошлом
-				$val = TODAY_UNIXTIME + $val * 86400;
-				$val = strftime('%Y-%m-%d', $val);
-			}
-
-		$send .= _40condV(
-					$r['num_2'],
-					$elCol[$r['txt_1']],
-					$val,
-					$in
-				 );
-	}
-
-	return 	$send;
-}
