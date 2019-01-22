@@ -2339,6 +2339,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		});
 		DDN.addClass('rs');
 		LIST.css('opacity', 1);
+		_fbhs();
 	});
 	DDU.click(function() {
 		timerClear();
@@ -2357,6 +2358,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 
 				LIST.animate({opacity:0}, 200, function() {
 					DDN.removeClass('rs');
+					_fbhs();
 				});
 
 			}, 500);
