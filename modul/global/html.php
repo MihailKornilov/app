@@ -25,7 +25,7 @@ function _sa($user_id=USER_ID) {
 		return $issa;
 
 	//установка флага суперпользователя SA при первом запуске
-	define('SA', 1);//$issa);
+	define('SA', $issa);
 
 	if(SA) {
 		error_reporting(E_ALL);
@@ -558,7 +558,7 @@ function _app_list() {//список приложений, которые дос
 				'Доступных приложений нет.'.
 				'<br>'.
 				'<br>'.
-				'<button class="vk green dialog-open" val="dialog_id:100">Создать приложение</div>'.
+		 (SA ? '<button class="vk green dialog-open" val="dialog_id:100">Создать приложение</div>' : '').
 			'</div>';
 
 	$send = '';
