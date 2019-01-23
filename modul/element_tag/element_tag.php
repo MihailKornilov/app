@@ -216,12 +216,12 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 		//если страница является ссылкой на другую страницу, при этом она недоступна, поиск первой вложенной доступной
 		if($r['common_id'])
 			foreach(_page('child', $r['id']) as $p) {
-				if($r['common_id'] == $p['id'])
-					continue;
 				if(_pageAccess($p['id'])) {
 					$pid = $p['id'];
 					break;
 				}
+				if($r['common_id'] == $p['id'])
+					continue;
 			}
 
 		$href = $is_edit ? '' : ' href="'.URL.'&p='.$pid.'"';
