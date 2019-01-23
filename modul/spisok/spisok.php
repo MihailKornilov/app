@@ -1311,14 +1311,17 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 	//диалог привязанного списка
 	if(!$DLG = _dialogQuery($EL['num_1']))
 		return array();
+
 	//значения списка, которые будут выводится
-	if(!$spisok = _29cnnSpisok($EL, $v))
-		return array();
+	$spisok = _29cnnSpisok($EL, $v);
 
 	//добавление единицы списка, которая была выбрана ранее
 	if($sel_id && empty($spisok[$sel_id]))
 		if($sel = _spisokUnitQuery($DLG, $sel_id))
 			$spisok[$sel_id] = $sel;
+
+	if(empty($spisok))
+		return array();
 
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);
