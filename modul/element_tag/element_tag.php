@@ -210,23 +210,21 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 	foreach($menu as $page_id => $r) {
 		$sel = _page('is_cur_parent', $r['id']) ? ' sel' : '';
 
+		//фактическая страница, на которую будет переход
+		$pid = $page_id;
+
 		//если страница является ссылкой на другую страницу, при этом она недоступна, поиск первой вложенной доступной
-		if($r['common_id']) {
-			$page_id = $r['common_id'];
-			if(!_pageAccess($page_id)) {
-				$page_id = 0;
-				foreach(_page('child', $r['id']) as $p)
-					if(_pageAccess($page_id)) {
-						$page_id = $p['id'];
-						break;
-					}
+		if($r['common_id'])
+			foreach(_page('child', $r['id']) as $p) {
+				if($r['common_id'] == $p['id'])
+					continue;
+				if(_pageAccess($p['id'])) {
+					$pid = $p['id'];
+					break;
+				}
 			}
-		}
 
-		if(!$page_id)
-			continue;
-
-		$href = $is_edit ? '' : ' href="'.URL.'&p='.$page_id.'"';
+		$href = $is_edit ? '' : ' href="'.URL.'&p='.$pid.'"';
 		$curd = _dn(!$is_edit, 'curD');
 
 		if($el['num_2'] == 5)

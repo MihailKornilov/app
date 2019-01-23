@@ -123,8 +123,14 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		}
 
 		//затем доступные из оставшихся
-		foreach($pageLost as $p)
-			return $p['common_id'] ? $p['common_id'] : $p['id'];
+		foreach($pageLost as $r)
+			if($r['common_id'])
+				foreach(_page('child', $r['id']) as $p) {
+					if($r['common_id'] == $p['id'])
+						continue;
+					if(_pageAccess($p['id']))
+						return $p['id'];
+				}
 
 		//затем страницы SA
 		if(SA)
