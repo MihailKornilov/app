@@ -1957,6 +1957,7 @@ function _elem11one($EL, $ell, $unit) {//прямая ссылка на элем
 		//Radio - произвольные значения
 		case 16:
 		case 17:
+		case 18:
 			if(!$id = _num($txt))
 				return _msgRed('11.radio.empty');
 			if(!$dop = _elemOne($id))

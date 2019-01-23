@@ -100,29 +100,31 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		if(!APP_ID)
 			return 98;
 
-		//сначала поиск страницы приложения
+		//сначала поиск стартовой страницы приложения
+		$pageLost = array();
 		foreach($page as $id => $p) {
 			if($p['sa'])
+				continue;
+			if($p['creator'])
+				continue;
+			if($id == 9)//печать шаблона
+				continue;
+			if($id == 98)//список приложений
+				continue;
+			if($id == 13)//ввод пин-кода
 				continue;
 			if($p['dialog_id'] != 20)
 				continue;
 			if(!_pageAccess($id))
 				continue;
-			if(!$p['def'])
-				continue;
-			if($p['common_id'])
-				return $p['common_id'];
-			return $id;
+			if($p['def'])
+				return $id;
+			$pageLost[] = $p;
 		}
 
-		//затем первую доступную страницу
-		foreach($page as $id => $p) {
-			if($p['sa'])
-				continue;
-			if(!_pageAccess($id))
-				continue;
-			return $id;
-		}
+		//затем доступные из оставшихся
+		foreach($pageLost as $p)
+			return $p['common_id'] ? $p['common_id'] : $p['id'];
 
 		//затем страницы SA
 		if(SA)
@@ -134,7 +136,7 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		if(USER_CREATOR)
 			return 7;
 
-		return 222;
+		return 105;
 	}
 
 	//является ли страница родительской относительно текущей
@@ -774,7 +776,7 @@ function PHP12_pin_dialog_open($prm) {
 
 function _page_div() {//todo тест
 
-	return _pr(_page());
+	return '';
 
 	return
 	'<div>'.
