@@ -4,9 +4,7 @@ function _pageCache() {//получение массива страниц из �
 	if($arr = _cache_get($key))
 		return $arr;
 
-	$sql = "SELECT
-				*,
-				1 `del_allow`
+	$sql = "SELECT *
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_ID.")
 			ORDER BY `sort`";
@@ -27,8 +25,11 @@ function _pageCache() {//получение массива страниц из �
 		unset($page[$id]['about']);
 		unset($page[$id]['user_id_add']);
 		unset($page[$id]['dtime_add']);
+		unset($page[$id]['acs']);
 		$block_count = _num(@$block[$id]);
 		$page[$id]['del_allow'] = $block_count || $r['common_id'] ? 0 : 1;
+		$page[$id]['sa'] = $r['acs'] == 2 ? 1 : 0;
+		$page[$id]['creator'] = $r['acs'] == 1 ? 1 : 0;
 	}
 
 	return _cache_set($key, $page);
@@ -51,7 +52,7 @@ function _pageAccess($page_id) {//доступ к странице для кон
 		//разрешение страниц, видимых всем пользователям
 		foreach(_page() as $id => $p)
 			if($p['dialog_id'] == 101)
-				if(!$p['sa'])
+				if(!$p['sa'] && !$p['creator'])
 					$ass[$id] = 1;
 
 		_cache_set($key, $ass);
@@ -67,10 +68,6 @@ function _page($i='all', $i1=0) {//получение данных страни�
 
 	if($i === 'all')
 		return $page;
-
-	
-		//страница доступна создателю приложения, а также всем, если не SA и для всех приложений
-//		$page[$id]['access'] = USER_ID && USER_CREATOR || !$r['sa'] && !$r['app_id'];
 
 	//страницы приложения
 	if($i == 'app') {
@@ -119,9 +116,13 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		}
 
 		//затем первую доступную страницу
-		foreach($page as $id => $p)
-			if(!$p['sa'] && _pageAccess($id))
-				return $id;
+		foreach($page as $id => $p) {
+			if($p['sa'])
+				continue;
+			if(!_pageAccess($id))
+				continue;
+			return $id;
+		}
 
 		//затем страницы SA
 		if(SA)
@@ -130,7 +131,10 @@ function _page($i='all', $i1=0) {//получение данных страни�
 					return $p['id'];
 
 		//иначе Администрирование
-		return 7;
+		if(USER_CREATOR)
+			return 7;
+
+		return 222;
 	}
 
 	//является ли страница родительской относительно текущей
@@ -528,14 +532,16 @@ function _pageShow($page_id) {
 
 	if(!$page = _page($page_id))
 		return _empty20('Несуществующая страница.'.PAGE_MSG_ERR);
-	if(!SA && $page['sa'])
+	if($page['sa'] && !SA)
 		return _empty20('Нет доступа.'.PAGE_MSG_ERR);
+	if($page['creator'] && !USER_CREATOR)
+		return _empty20('Страница недоступна.'.PAGE_MSG_ERR);
 	if(!_pageAccess($page_id))
 		return _empty20('Страница недоступна или не существует.'.PAGE_MSG_ERR);
 
 	$prm = array();
 
-	//страница принимает значения записи
+	//страница принимает данные записи
 	if($dialog_id = $page['dialog_id_unit_get']) {
 		if(!$id = _num(@$_GET['id']))
 			return _empty20('Некорректный идентификатор записи.'.PAGE_MSG_ERR);
@@ -768,7 +774,7 @@ function PHP12_pin_dialog_open($prm) {
 
 function _page_div() {//todo тест
 
-	return '';
+	return _pr(_page());
 
 	return
 	'<div>'.

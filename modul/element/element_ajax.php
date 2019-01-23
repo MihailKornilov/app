@@ -5,6 +5,8 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID диалогового окна');
 		if(!$dialog = _dialogQuery($dialog_id))
 			jsonError('Диалога не существует');
+		if(!SA && !USER_CREATOR)
+			jsonError('Нет доступа');
 
 		$menu = array(
 			1 => 'Диалог',
@@ -336,6 +338,8 @@ switch(@$_POST['op']) {
 	case 'dialog_setup_save'://сохранение диалогового окна
 		if(!$dialog_id = _num($_POST['dialog_id']))
 			jsonError('Некорректный ID диалогового окна');
+		if(!SA && !USER_CREATOR)
+			jsonError('Нет доступа');
 
 		_dialogSave($dialog_id);
 
@@ -1231,11 +1235,11 @@ function _dialogWidthMin($blk) {//получение минимальной ши
 	return $width;
 }
 function _dialogSetupAccess($dlg) {//права для настройки диалога
-	if(_num(@SA))
+	if(SA)
 		return 1;
 	if(!$dlg['app_id'])
 		return 0;
-	if($dlg['app_id'] == APP_ID)
+	if($dlg['app_id'] == APP_ID && USER_CREATOR)
 		return 1;
 	return 0;
 }
