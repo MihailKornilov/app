@@ -433,9 +433,6 @@ $(document)
 		});
 	})
 	.ajaxError(function(event, request) {
-		if(!$('#_debug').length)
-			return;
-
 		var txt = request.responseText;
 
 		if(!txt)
@@ -446,14 +443,38 @@ $(document)
 		txt = txt.replace(new RegExp('<br />', 'g'), '');
 		txt = txt.replace(new RegExp('<b>', 'g'), '');
 		txt = txt.replace(new RegExp('</b>', 'g'), '');
+		txt = '<textarea class="w100p bg-fcc">' + txt + '</textarea>';
 
 		if(POST_BUSY_OBJ) {
 			$(POST_BUSY_OBJ).removeClass(POST_BUSY_CLS);
 			POST_BUSY_OBJ = null;
 		}
 
+		//открытие диалога для показа ошибки, если не включен DEBUG (для обычных пользователей)
+		if(!$('#_debug').length) {
+			txt = '<div class="fs18 b center pad10">' +
+					  'Обязательно отправьте мне скрин с этой ошибкой!' +
+					  '<br>' +
+				      '<a href="//vk.com/im?sel=982006" target="_blank">vk.com/mihan_k</a>' +
+				  '</div>'+ txt;
+			var dlg = _dialog({
+				top:20,
+				color:'red',
+				width:800,
+				head:'Ошибка',
+				content:txt,
+				butSubmit:'',
+				butCancel:'Закрыть'
+			});
+			dlg.content.find('textarea')
+				.css('max-height', 500)
+				.css('border', 0)
+				._autosize();
+			return;
+		}
+
 		$('#_debug').addClass('show');
-		$('#_debug .ajax').html('<textarea class="w100p bg-fcc">' + txt + '</textarea>');
+		$('#_debug .ajax').html(txt);
 		$('#_debug .ajax textarea')._autosize().before(_pr(POST_SEND));
 		$('#_debug .dmenu a:last').trigger('click');
 	})
