@@ -373,15 +373,37 @@ function PHP12_page_access_for_user_setup_save($cmp, $val, $unit) {//сохра�
 			  AND `user_id`=".$user_id;
 	query($sql);
 
+	$ass = _idsAss($val);
+	$page = _page();
+
 	if($ids = _ids($val, 'arr')) {
 		$upd = array();
-		foreach($ids as $page_id)
-			$upd[] = "(".APP_ID.",".$user_id.",".$page_id.")";
+		foreach($ids as $page_id) {
+			if(empty($page[$page_id]))
+				continue;
 
-		$sql = "INSERT INTO `_user_page_access`
-					(`app_id`,`user_id`,`page_id`)
-				VALUES ".implode(',', $upd);
-		query($sql);
+			$p = $page[$page_id];
+			//если родительская страница недоступна, дочерняя пропускается
+			if($parent_id = $p['parent_id']) {
+				if(empty($ass[$parent_id]))
+					continue;
+
+				//то же самое для третьего уровня
+				$p = $page[$parent_id];
+				if($parent_id = $p['parent_id'])
+					if(empty($ass[$parent_id]))
+						continue;
+			}
+
+			$upd[] = "(".APP_ID.",".$user_id.",".$page_id.")";
+		}
+
+		if(!empty($upd)) {
+			$sql = "INSERT INTO `_user_page_access`
+						(`app_id`,`user_id`,`page_id`)
+					VALUES ".implode(',', $upd);
+			query($sql);
+		}
 	}
 
 	_cache_clear('AUTH_'.CODE, 1);
