@@ -1548,8 +1548,9 @@ function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт колич
 		return array();
 	if(empty($unit[$UCOL]))
 		return array();
-	if(!$connect_id = _num($unit[$UCOL]['id']))//значение, id записи привязанного списка.
-		return array();
+
+	//значение, id записи привязанного списка
+	$connect_id = is_array($unit[$UCOL]) ? $unit[$UCOL]['id'] : $unit[$UCOL];
 
 	$sql = "SELECT *
 			FROM `_element`
@@ -1634,9 +1635,11 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 	//имя колонки, по которой привязан список
 	if(!$col = $cmp['col'])
 		return array();
-	//значение, id записи привязанного списка
-	if(!$connect_id = _num($unit[$col]['id']))
+	if(empty($unit[$col]))
 		return array();
+
+	//значение, id записи привязанного списка
+	$connect_id = is_array($unit[$col]) ? $unit[$col]['id'] : $unit[$col];
 
 	$sql = "SELECT *
 			FROM `_element`
