@@ -1,5 +1,6 @@
 <?php
 define('TIME', microtime(true));
+define('CRON_MAIL', 'mihan_k@mail.ru');
 
 //setlocale(LC_ALL, 'ru_RU.CP1251');
 setlocale(LC_ALL, 'ru_RU.UTF-8');

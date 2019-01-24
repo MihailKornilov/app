@@ -14,7 +14,6 @@ require_once 'modul/global/global.php';
 define('BR', '<br>');
 //define('BR', "\n");
 define('USER_ID', 0);
-define('CRON_MAIL', 'mihan_k@mail.ru');
 define('CRON_TIME_CUR', strftime('%Y-%m-%d %H:%M'));
 
 
