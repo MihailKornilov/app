@@ -423,6 +423,50 @@ function _spisokImage($spisok) {//вставка картинок
 
 	return $spisok;
 }
+function _spisok96inc($EL, $spisok) {//получение значений, если в блок присутствует элемент [96]
+	foreach(_BE('elem_arr', 'spisok', $EL['id']) as $cmp_id => $cmp) {
+		if($cmp['dialog_id'] != 96)
+			continue;
+
+		//вставка пустых значений
+		foreach($spisok as $id => $sp)
+			$spisok[$id]['el96'][$cmp_id] = array();
+
+		//элемент в привязанном диалоге, отвечающий за размещение
+		if(!$el = _elemOne($cmp['num_1']))
+			continue;
+		//колонка, по которой будет производиться выборка
+		if(!$col = $el['col'])
+			continue;
+		if($el['block']['obj_name'] != 'dialog')
+			continue;
+		if(!$dlg = _dialogQuery($el['block']['obj_id']))
+			continue;
+
+		//получение данных привязанного списка
+		$sql = "SELECT "._queryCol($dlg)."
+				FROM   "._queryFrom($dlg)."
+				WHERE  "._queryWhere($dlg)."
+				  AND `".$col."` IN ("._idsGet($spisok).")";
+		if(!$inc = query_arr($sql))
+			continue;
+		$inc = _spisokInclude($inc);
+
+/*
+		array(
+				'count' => 0,
+				'txt' => '',
+				'color' => ''
+		)
+*/
+		foreach($inc as $sp) {
+			$id = $sp[$col]['id'];
+			$spisok[$id]['el96'][$cmp_id][] = $sp[$col];
+		}
+	}
+
+	return $spisok;
+}
 function _spisok14($ELEM, $next=0) {//список-шаблон
 	/*
         num_1 - id диалога, который вносит данные списка (шаблон которого будет настраиваться)
@@ -472,6 +516,9 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 
 	//вставка картинок
 	$spisok = _spisokImage($spisok);
+
+	//вставка значений для элемента [96]
+	$spisok = _spisok96inc($ELEM, $spisok);
 
 	$send = '';
 	foreach($spisok as $id => $sp) {

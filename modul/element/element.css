@@ -765,3 +765,23 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
+
+
+
+
+/* Квадратики элемента [96] */
+.el96-u{
+	display:inline-block;
+	padding:4px 8px;
+	border:#eee solid 1px;
+	border-radius:3px;
+	font-weight:bold;
+}
+
+
+
+
+
+
+
+

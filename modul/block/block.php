@@ -1702,6 +1702,21 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			return $day_txt;
 
+		//Количество значений связанного списка с учётом категорий
+		case 96:
+			/*
+				num_1 - привязанный список
+				txt_1 - путь к категориям
+				txt_2 - путь к цветам
+			*/
+			if($prm['blk_setup'])
+				return '<div class="el96-u bg-ffc">8</div>'.
+					   '<div class="el96-u bg-fcc ml3">3</div>';
+
+			$u = $prm['unit_get'];
+
+			return '<div class="el96-u">'._pr($u).'</div>';
+
 		//Фильтр - Выбор нескольких групп значений
 		case 102:
 			/*
