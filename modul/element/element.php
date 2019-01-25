@@ -261,21 +261,24 @@ function _dialogSpisokOnConnect($block_id) {//получение диалого�
 	Привязка происходит через элементы [29],[59], по нему будет производиться происк
 	Идентификаторами результата являются id элементов (а не диалогов)
 */
-/*
-	//получение исходного блока, если редактирование значения
-	if($elem_id) {
-		if(!$EL = _elemOne($elem_id))
-			return array();
-		$block_id = $EL['block_id'];
-	}
-*/
+
 	if(!$BL = _blockOne($block_id))
 		return array();
 
-	if($BL['obj_name'] != 'dialog')
-		return array();
+	$dialog_id = 0;
+	switch($BL['obj_name']) {
+		case 'dialog': $dialog_id = $BL['obj_id']; break;
+		case 'spisok':
+			if(!$el = _elemOne($BL['obj_id']))
+				break;
+			if($el['dialog_id'] != 14)
+				break;
+			$dialog_id = $el['num_1'];
+			break;
+	}
 
-	$dialog_id = $BL['obj_id'];
+	if(!$dialog_id)
+		return array();
 
 	$sql = "SELECT *
 			FROM `_element`
@@ -1113,9 +1116,12 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 			switch($el['num_1']) {
 				//диалоги, которые могут быть списками: spisok_on=1 и размещены на текущей странице
 				case 960: return _dialogSpisokOnPage($block_id);
+				//диалоги, которые привязаны к выбранному диалогу
 				case 961: return _dialogSpisokOnConnect($block_id);
 			}
-			return _dialogSpisokOn($dialog_id, $block_id, $elem_id);//все списки приложения
+
+			//все списки приложения
+			return _dialogSpisokOn($dialog_id, $block_id, $elem_id);
 
 		//SA: Select - выбор диалогового окна
 		case 26:
