@@ -1485,7 +1485,7 @@ function _spisok59unit($elem_id, $unit_id) {//выбранное значени�
 /* ---=== CЧЁТЧИКИ: В РАБОТЕ ===--- */
 function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение действий после обновления или удаления записи
 	if($dialog['dialog_id_parent'])
-		$dialog = _dialogQuery($dialog['dialog_id_parent']);
+		$dialog = _dialogQuery($dialog['dialog_id_parent']) + $dialog;
 	if(!$dialog['table_1'])
 		return;
 
