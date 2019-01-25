@@ -1950,7 +1950,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						un = function(id, tl) {//формирование значения для вставки
 							var bg = BG[id] ? ' style="background-color:' + BG[id] + '"' : '',
 								title = tl ? TITLE[id] : _num(COUNT[id]);
-							return '<div class="un"' + bg + '>' + title +'</div>';
+							if(!title)
+								return '';
+							//отображение подсказки, если значение в виде цифры
+							tl = tl ? '">' : _tooltip(TITLE[id], -6, 'l');
+							return '<div' + bg + ' class="un' + tl + title +'</div>';
 						},
 						sevSet = function() {//обновление выбранных значений
 							var sel = '',
@@ -1960,10 +1964,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									v = _num(p.val()),
 									id = p.parent().parent().attr('val');
 
-								if(v) {
-									sel += un(id);
-									ids.push(id);
-								}
+								if(!v)
+									return;
+
+								sel += un(id);
+								ids.push(id);
 							});
 
 							if(ids.length == 1)

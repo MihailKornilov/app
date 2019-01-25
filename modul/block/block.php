@@ -1755,7 +1755,8 @@ function _elemPrint($el, $prm) {//формирование и отображен
 					$title[$id] = $r['title'];
 
 					if(isset($vAss[$id])) {
-						$sel .= '<div class="un"'.$bg.'>'._num($c).'</div>';
+						$c = _num($c);
+						$sel .= $c ? '<div'.$bg.' class="un'._tooltip($r['title'], -6, 'l').$c.'</div>' : '';
 						$selOne = '<div class="un"'.$bg.'>'.$r['title'].'</div>';
 						$n++;
 					}
