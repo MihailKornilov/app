@@ -1620,7 +1620,7 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 			//привязанные списки
 			case 29:
 			case 59:
-				$upd = _spisokUnitAfter54($cmp, $dialog, $unit);            //пересчёт количеств привязаного списка [54]
+				$upd = _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld);  //пересчёт количеств привязаного списка [54]
 				$upd += _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld); //пересчёт cумм привязаного списка [55]
 				_spisokUnitAfter27($dialog, $upd);                          //подсчёт балансов после обновления сумм [27]
 
@@ -1628,14 +1628,11 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 				break;
 		}
 }
-function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт количеств привязаного списка
+function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количеств привязаного списка
 	if(!$UCOL = $cmp['col'])//имя колонки, по которой привязан список
 		return array();
 	if(empty($unit[$UCOL]))
 		return array();
-
-	//значение, id записи привязанного списка
-	$connect_id = is_array($unit[$UCOL]) ? $unit[$UCOL]['id'] : $unit[$UCOL];
 
 	$sql = "SELECT *
 			FROM `_element`
@@ -1643,6 +1640,14 @@ function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт колич
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
 		return array();
+
+	//значение, id записи привязанного списка
+	$connect_id = is_array($unit[$UCOL]) ? $unit[$UCOL]['id'] : $unit[$UCOL];
+
+	//значение, если производилось редактирование
+	$connect_old = 0;
+	if(!empty($unitOld))
+		$connect_old = is_array($unitOld[$UCOL]) ? $unitOld[$UCOL]['id'] : $unitOld[$UCOL];
 
 	$send = array();
 	foreach($arr as $elem_id => $r) {
@@ -1672,10 +1677,28 @@ function _spisokUnitAfter54($cmp, $dialog, $unit) {//пересчёт колич
 				  AND "._queryWhere($dlg);
 		query($sql);
 
+		//пересчёт количества у изменённого значения (при редактировании)
+		if($connect_old)
+			if($connect_old != $connect_id) {
+				$sql = "SELECT COUNT(*)
+						FROM "._queryFrom($dialog)."
+						WHERE `".$UCOL."`=".$connect_old."
+						  AND "._queryWhere($dialog);
+				$count_old = _num(query_value($sql));
+
+				$sql = "UPDATE "._queryFrom($dlg)."
+						SET `".$col."`=".$count_old."
+						WHERE `t1`.`id`=".$connect_old."
+						  AND "._queryWhere($dlg);
+				query($sql);
+			}
+
+
 		$send[$elem_id] = array(
 			'sum_old' => 0,
 			'sum' => $count,
-			'unit_id' => $connect_id     //id записи, баланс которой будет пересчитан
+			'unit_id' => $connect_id,     //id записи, баланс которой будет пересчитан
+			'unit_old' => $connect_old    //id отредактированной записи, баланс которой будет пересчитан
 		);
 
 		//флаг включенного счётчика-истории
@@ -1723,15 +1746,20 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 	if(empty($unit[$col]))
 		return array();
 
-	//значение, id записи привязанного списка
-	$connect_id = is_array($unit[$col]) ? $unit[$col]['id'] : $unit[$col];
-
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=55
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
 		return array();
+
+	//значение, id записи привязанного списка
+	$connect_id = is_array($unit[$col]) ? $unit[$col]['id'] : $unit[$col];
+
+	//значение, если производилось редактирование
+	$connect_old = 0;
+	if(!empty($unitOld))
+		$connect_old = is_array($unitOld[$col]) ? $unitOld[$col]['id'] : $unitOld[$col];
 
 	$send = array();//значения, которые были пересчитаны. По ним будет потом посчитан баланс, если потребуется.
 	foreach($arr as $elem_id => $r) {
@@ -1760,6 +1788,26 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 				  AND "._queryWhere($dlg);
 		query($sql);
 
+//echo $dlg['name']."\n";
+//echo 'sum='.$sum."\n";
+
+		//пересчёт суммы у изменённого значения (при редактировании)
+		if($connect_old)
+			if($connect_old != $connect_id) {
+				$sql = "SELECT IFNULL(SUM(`".$colSum."`),0)
+						FROM "._queryFrom($dialog)."
+						WHERE `".$col."`=".$connect_old."
+						  AND "._queryWhere($dialog);
+				$sum_old = query_value($sql);
+
+				$sql = "UPDATE "._queryFrom($dlg)."
+						SET `".$colSumSet."`=".$sum_old."
+						WHERE `t1`.`id`=".$connect_old."
+						  AND "._queryWhere($dlg);
+				query($sql);
+
+//echo 'sum_old='.$sum_old."\n";
+			}
 
 		$sumOld = 0;
 		if(isset($unitOld[$colSum]))
@@ -1769,7 +1817,8 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 		$send[$elem_id] = array(
 			'sum_old' => $sumOld,
 			'sum' => $unit[$colSum],
-			'unit_id' => $connect_id     //id записи, баланс которой будет пересчитан
+			'unit_id' => $connect_id,     //id записи, баланс которой будет пересчитан
+			'unit_old' => $connect_old    //id отредактированной записи, баланс которой будет пересчитан
 		);
 
 
@@ -1890,6 +1939,20 @@ function _spisokUnitAfter27($DLG, $ass) {
 			query($sql);
 
 
+			//пересчёт баланса отредактированной записи
+			if($as['unit_old'] != $as['unit_id']) {
+				$sql = "SELECT IFNULL(".$upd.",0)
+						FROM "._queryFrom($dialog)."
+						WHERE `t1`.`id`=".$as['unit_old']."
+						  AND "._queryWhere($dialog);
+				$balans_old = query_value($sql);
+
+				$sql = "UPDATE "._queryFrom($dialog)."
+						SET `".$balansCol."`=".$balans_old."
+						WHERE `t1`.`id`=".$as['unit_old']."
+						  AND "._queryWhere($dialog);
+				query($sql);
+			}
 
 
 
