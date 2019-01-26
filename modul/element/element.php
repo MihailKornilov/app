@@ -4614,7 +4614,7 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 		$name = '';
 		foreach($dialog['cmp'] as $cmp_id => $cmp)
 			if($i == $cmp['col']) {
-				//картирки в историю не попадают
+				//картинки в историю не попадают
 				if($cmp['dialog_id'] == 60) {
 					$hidden = true;
 					break;
