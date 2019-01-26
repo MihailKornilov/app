@@ -423,14 +423,16 @@ function _spisokImage($spisok) {//вставка картинок
 
 	return $spisok;
 }
-function _spisok96inc($EL, $spisok) {//получение значений, если в блок присутствует элемент [96]
+function _spisok96inc($EL, $spisok) {//получение значений, если в блоке присутствует элемент [96]
 	foreach(_BE('elem_arr', 'spisok', $EL['id']) as $cmp_id => $cmp) {
 		if($cmp['dialog_id'] != 96)
 			continue;
 
+		$key = 'el96_'.$cmp_id;
+
 		//вставка пустых значений
 		foreach($spisok as $id => $sp)
-			$spisok[$id]['el96'][$cmp_id] = array();
+			$spisok[$id][$key] = array();
 
 		//элемент в привязанном диалоге, отвечающий за размещение
 		if(!$el = _elemOne($cmp['num_1']))
@@ -452,16 +454,49 @@ function _spisok96inc($EL, $spisok) {//получение значений, ес
 			continue;
 		$inc = _spisokInclude($inc);
 
-/*
-		array(
-				'count' => 0,
-				'txt' => '',
-				'color' => ''
-		)
-*/
+		//колонки для получения названия
+		$txt = array();
+		foreach(_ids($cmp['txt_1'], 'arr') as $elem_id) {
+			$ell = _elemOne($elem_id);
+			$txt[] = $ell['col'];
+		}
+
+		//колонки для получения цвета
+		$color = array();
+		foreach(_ids($cmp['txt_2'], 'arr') as $elem_id) {
+			$ell = _elemOne($elem_id);
+			$color[] = $ell['col'];
+		}
+
 		foreach($inc as $sp) {
-			$id = $sp[$col]['id'];
-			$spisok[$id]['el96'][$cmp_id][] = $sp[$col];
+			//id записи, которая дополняется
+			$spisok_id = $sp[$col]['id'];
+
+			//id записи, которая подсчитывается - получение названия
+			$txt_id = 0;
+			$txt_name = '';
+			if(!empty($txt)) {
+				$txt_id = $sp[$txt[0]]['id'];
+				$txt_name = $sp[$txt[0]][$txt[1]];
+			}
+
+			//получение цвета
+			$color_name = '';
+			if(!empty($color))
+				//название и цвет должны быть получены из одного диалога
+				if($txt_id == $sp[$color[0]]['id'])
+					$color_name = $sp[$color[0]][$color[1]];
+
+			if(empty($spisok[$spisok_id][$key][$txt_id])) {
+				$spisok[$spisok_id][$key][$txt_id] = array(
+					'count' => 1,
+					'name' => $txt_name,
+					'bg' => $color_name
+				);
+				continue;
+			}
+
+			$spisok[$spisok_id][$key][$txt_id]['count']++;
 		}
 	}
 

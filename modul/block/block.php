@@ -1710,12 +1710,29 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				txt_2 - путь к цветам
 			*/
 			if($prm['blk_setup'])
-				return '<div class="el96-u bg-ffc">8</div>'.
-					   '<div class="el96-u bg-fcc ml3">3</div>';
+				return '<div class="el96-u bg-ffc mr3">8</div>'.
+					   '<div class="el96-u bg-fcc">3</div>';
 
-			$u = $prm['unit_get'];
+			if(!$u = $prm['unit_get'])
+				return '';
 
-			return '<div class="el96-u">'._pr($u).'</div>';
+			//ключ для конкретного элемента, по которому расположены данные в записи
+			$key = 'el96_'.$el['id'];
+			if(empty($u[$key]))
+				return '';
+
+			end($u[$key]);
+			$end = key($u[$key]);
+
+			$send = '';
+			foreach($u[$key] as $id => $r) {
+				$bg = $r['bg'] ? ' style="background-color:'.$r['bg'].'"' : '';
+				$name = $r['name'] ? _tooltip($r['name'], -6, 'l') : '">';
+				$mr = $id != $end ? ' mr3' : '';
+				$send .= '<div'.$bg.' class="el96-u'.$mr.$name.$r['count'].'</div>';
+			}
+
+			return $send;
 
 		//Фильтр - Выбор нескольких групп значений
 		case 102:

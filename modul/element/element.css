@@ -776,6 +776,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	border:#eee solid 1px;
 	border-radius:3px;
 	font-weight:bold;
+	cursor:default;
 }
 
 
