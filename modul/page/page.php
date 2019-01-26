@@ -722,7 +722,8 @@ function _doc11txt($el, $unit) {//значение элемента [11]
 		if(_elemIsConnect($ell)) {
 			if(!$col = $ell['col'])
 				return '';
-			$unit = $unit[$col];
+			if(!$unit = $unit[$col])
+				return '';
 			continue;
 		}
 		return _doctxt($ell, $unit);

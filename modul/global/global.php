@@ -245,12 +245,12 @@ function _ids($ids, $return='ids') {//проверка корректности 
 
 	$arr = array();
 
-	foreach(explode(',', $ids) as $i => $id) {
+	foreach(explode(',', $ids) as $id) {
 		if(!preg_match(REGEXP_INTEGER, $id))
 			return _idsReturn(0, $return);
 		if(!_num($id))
 			continue;
-		$arr[$i] = _num($id);
+		$arr[] = _num($id);
 	}
 
 	return _idsReturn(implode(',', $arr), $return);
@@ -292,7 +292,7 @@ function _idsAss($v) {//получение списка id вида: $v[25] = 1;
 	if(empty($v))
 		return $send;
 
-	$arr = is_array($v) ? $v : _ids($v, 1);
+	$arr = is_array($v) ? $v : _ids($v, 'arr');
 
 	foreach($arr as $id)
 		$send[$id] = 1;

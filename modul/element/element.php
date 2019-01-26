@@ -2068,7 +2068,7 @@ function _val31($el, $txt) {//Выбор нескольких значений �
 	$send = array();
 
 	foreach($spisok as $r)
-		if(!empty($sel[$r['num']]))
+		if(!empty($sel[$r['id']]))
 			$send[] = $r['txt_1'];
 
 	return implode(', ', $send);
