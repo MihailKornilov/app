@@ -205,6 +205,7 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 		return 'Разделов нет.';
 
 	$menu = _spisokImage($menu);
+	$menu = _menuCount($menu);
 
 	$razdel = '';
 	foreach($menu as $page_id => $r) {
@@ -234,6 +235,46 @@ function _menu($el, $is_edit) {//Меню страниц [3]
 	}
 
 	return '<div class="_menu'.$el['num_2'].'">'.$razdel.'</div>';
+}
+function _menuCount($menu) {//получение элемента-циферки, размещённого на выводимых страницах
+	$sql = "SELECT
+				`el`.`id`,
+				`el`.`num_1`,
+				`el`.`txt_1`,
+				`bl`.`obj_id` `page_id`
+			FROM `_element` `el`,
+				 `_block` `bl`
+			WHERE `el`.`block_id`=`bl`.`id`
+			  AND `el`.`app_id`=".APP_ID."
+			  AND `dialog_id`=87
+			  AND `bl`.`obj_name`='page'";
+	if(!$arr = query_arr($sql))
+		return $menu;
+
+	foreach($arr as $r) {
+		$page = _page($r['page_id']);
+
+		//страница, к которой будет добавлена циферка
+		$pid = 0;
+		if(isset($menu[$r['page_id']]))
+			$pid = $r['page_id'];
+		if($page['parent_id'] && isset($menu[$page['parent_id']]))
+			$pid = $page['parent_id'];
+		if(!$pid)
+			continue;
+
+		$DLG = _dialogQuery($r['num_1']);
+		$sql = "SELECT COUNT(*)
+				FROM  "._queryFrom($DLG)."
+				WHERE "._queryWhere($DLG).
+					_40cond(array(), $r['txt_1']);
+		if(!$count = query_value($sql))
+			continue;
+
+		$menu[$pid]['name'] .= '<b class="fr ml3">+'.$count.'</b>';
+	}
+
+	return $menu;
 }
 function _dropdown($v=array()) {//выпадающее поле - ссылка
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];

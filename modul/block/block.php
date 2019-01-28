@@ -1702,6 +1702,26 @@ function _elemPrint($el, $prm) {//формирование и отображен
 
 			return $day_txt;
 
+		//Циферка в меню страниц
+		case 87:
+			/*
+				num_1 - список
+				txt_1 - условия
+			*/
+
+			if(!$prm['blk_setup'])
+				return '';
+			if(!$DLG = _dialogQuery($el['num_1']))
+				return _msgRed('Не получены данные диалога '.$el['num_1']);
+
+			$sql = "SELECT COUNT(*)
+					FROM  "._queryFrom($DLG)."
+					WHERE "._queryWhere($DLG).
+						_40cond(array(), $el['txt_1']);
+			$count = query_value($sql);
+
+			return 'Кол-во "'.$DLG['name'].'" '.($count ? '+'.$count : '0');
+
 		//Количество значений связанного списка с учётом категорий
 		case 96:
 			/*
