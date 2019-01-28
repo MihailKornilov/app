@@ -542,7 +542,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
-	//добавление единицы списка, если был быстрый поиск по номеру
+	//добавление записи, если был быстрый поиск по номеру
 	if(!$next)
 		$spisok = _spisok7num($spisok, $ELEM);
 
@@ -834,21 +834,6 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 	return '<a href="'.URL.'&p='.$page_id.'&id='.$u['id'].'" class="inhr">'.$txt.'</a>';
 }
-function _spisokUnitTT($el, $u, $txt='">') {//действие: подсказка [223]
-	if(empty($el['action']))
-		return $txt;
-
-	foreach($el['action'] as $func)
-		if($func['dialog_id'] == 223) {
-			if(!$tt = _elemUids($func['target_ids'], $u))
-				return $txt;
-			if($txt == '">')
-				return _tooltip($tt, 0, 'l');
-			return '<span class="inhr'._tooltip($tt, 0, 'l').$txt.'</a>';
-		}
-
-	return $txt;
-}
 function _spisokUnitUrlId($el, $page_id, $u) {//получение id записи согласно странице
 	if(empty($u))
 		return 0;
@@ -864,6 +849,21 @@ function _spisokUnitUrlId($el, $page_id, $u) {//получение id запис
 			return is_array($u[$col]) ? $u[$col]['id'] : $u['id'];
 		}
 	return $u['id'];
+}
+function _spisokUnitTT($el, $u, $txt='">') {//действие: подсказка [223]
+	if(empty($el['action']))
+		return $txt;
+
+	foreach($el['action'] as $func)
+		if($func['dialog_id'] == 223) {
+			if(!$tt = _elemUids($func['target_ids'], $u))
+				return $txt;
+			if($txt == '">')
+				return _tooltip($tt, 0, 'l');
+			return '<span class="inhr'._tooltip($tt, 0, 'l').$txt.'</a>';
+		}
+
+	return $txt;
 }
 
 function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстовом (быстром) поиске
@@ -909,18 +909,20 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения к
 		if($num == $txt)
 			return '<em class="fndd">'.$txt.'</em>';
 
-	if(!$cmp_id = _num($el['txt_2']))
+	//выделение найденного значения возможно только если элемент был вставлен через [11]
+	if($el['dialog_id'] != 11)
+		return $txt;
+	if(!$ids = _ids($el['txt_2'], 'arr'))
 		return $txt;
 
 	//ассоциативный массив колонок, по которым производится поиск
 	$colIds = _idsAss($search['txt_2']);
+
 	//если по данной колонке поиск разрешён, то выделение цветом найденные символы
-	if(!isset($colIds[$cmp_id]))
+	if(!isset($colIds[$ids[0]]))
 		return $txt;
 
-	$txt = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $txt, 1);
-
-	return $txt;
+	return preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $txt, 1);
 }
 
 function _spisokWhere($el) {//формирование строки с условиями поиска
@@ -974,7 +976,23 @@ function _spisokCond7($el) {//значения фильтра-поиска дл�
 	foreach($colIds as $cmp_id) {
 		if(empty($cmp[$cmp_id]))
 			continue;
-		$arr[] = "`t1`.`".$cmp[$cmp_id]['col']."` LIKE '%".addslashes($v)."%'";
+		if(!$col = $cmp[$cmp_id]['col'])
+			continue;
+
+		if(_elemIsConnect($cmp[$cmp_id])) {
+			if(!$DLG = _dialogQuery($cmp[$cmp_id]['num_1']))
+				continue;
+			if(!$colDef = _elemCol($DLG['spisok_elem_id']))
+				continue;
+			$sql = "SELECT `id`
+					FROM  "._queryFrom($DLG)."
+					WHERE "._queryWhere($DLG)."
+					  AND `".$colDef."` LIKE '%".addslashes($v)."%'";
+			$arr[] = "`t1`.`".$col."` IN (".$sql.")";
+			continue;
+		}
+
+		$arr[] = "`t1`.`".$col."` LIKE '%".addslashes($v)."%'";
 	}
 
 	if(!$arr)
