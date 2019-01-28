@@ -2050,6 +2050,27 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 	return $send;
 }
 
+function _elemUids($ids, $u) {//получение значения записи по идентификаторам элементов (в основном для [11])
+	if(empty($u))
+		return '';
+	if(!$ids = _ids($ids, 'arr'))
+		return '';
+
+	foreach($ids as $k => $id) {
+		if(!$el = _elemOne($id))
+			return '';
+		if(!$col = $el['col'])
+			return '';
+		if(!isset($u[$col]))
+			return '';
+		if(!is_array($u[$col]))
+			return $u[$col];
+		$u = $u[$col];
+	}
+
+	return '';
+}
+
 function _val31($el, $txt) {//Выбор нескольких значений галочками [31] - вывод значения
 	if(!$sel = _idsAss($txt))
 		return '';
@@ -2632,6 +2653,12 @@ function PHP12_v_choose_vvv($prm) {
 function PHP12_v_choose_dss($prm) {//ID диалога из dss
 	if(!$dss = _num($prm['srce']['dss']))
 		return false;
+	if($dss == 200)
+		return false;
+	if($dss == 210)
+		return false;
+	if($dss == 220)
+		return false;
 	return $dss;
 }
 function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элементу [13]
@@ -2658,12 +2685,6 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 		if($el13['block']['obj_name'] == 'dialog') {
 			if(!$DLG = _dialogQuery($el13['block']['obj_id']))
 				return 'Диалога '.$el13['block']['obj_id'].' не существует, содержащего элемент [13].';
-			if($DLG['table_name_1'] == '_action')
-				return 'Выбор элементов для назначения действий'.
-					   '<br>'.
-					   'возможен только для страниц и диалоговых окон.'.
-					   '<br>'.
-					   'Вы пытаетесь назначить действие для <b>записи</b>.';
 		}
 		if(!$ell = _elemOne($BL['obj_id']))
 			return 'Элемента, размещающего список, не существует.';
@@ -2672,8 +2693,13 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 	}
 
 	//также может происходить выбор со страницы
-	if($BL['obj_name'] == 'page')
+	if($BL['obj_name'] == 'page') {
+		if(!$page = _page($BL['obj_id']))
+			return 'Страницы '.$BL['obj_id'].' не существует.';
+		if($page['dialog_id_unit_get'])
+			return $page['dialog_id_unit_get'];
 		define('OBJ_NAME_CHOOSE', 'page');
+	}
 
 	//если указан диалог, проверка, чтобы был отправлен id родительского диалога
 	if($BL['obj_name'] == 'dialog') {
@@ -3960,6 +3986,7 @@ function PHP12_action_list($prm) {
 							PHP12_action_216($r).
 							PHP12_action_221($r).
 							PHP12_action_222($r).
+							PHP12_action_223($r).
 						'</div>'.
 					'<td class="w50 r top">'.
 						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
@@ -3969,7 +3996,6 @@ function PHP12_action_list($prm) {
 						)).
 			'</table>'.
 			'</dd>';
-
 	}
 
 	return '<dl>'.$spisok.'</dl>';
@@ -4151,6 +4177,16 @@ function PHP12_action_222($r) {//ЭЛЕМЕНТ: открытие диалога
 	return
 	'<span class="grey">Диалог:</span> '.
 	'<b>'.$DLG['name'].'</b>';
+}
+function PHP12_action_223($r) {//ЭЛЕМЕНТ: тёмная подсказка
+	if($r['dialog_id'] != 223)
+		return '';
+	if(!$v = _ids($r['target_ids']))
+		return '<div class="red">Отсутствует значение для подсказки</div>';
+
+	return
+	'<span class="grey">Значение:</span> '.
+	'<span class="color-pay">'._elemIdsTitle($v).'</span>';
 }
 
 

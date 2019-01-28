@@ -759,6 +759,7 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 				case 207:
 				case 221:
 				case 222:
+				case 223:
 					if($block_id)
 						if($BL = _blockOne($block_id))
 							if($elem_id = $BL['elem_id']) {
@@ -824,6 +825,7 @@ function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи
 						FROM `_action`
 						WHERE `block_id`=".$r['block_id']."
 						  AND `element_id`=".$r['element_id']."
+						  AND `dialog_id` IN (221,222)
 						  AND `id`!=".$uid[$table_1];
 				query($sql);
 		}

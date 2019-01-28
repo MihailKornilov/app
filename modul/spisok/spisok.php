@@ -797,7 +797,10 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 		case 221:
 			$page_id = $func['target_ids'];
 			$id = _spisokUnitUrlId($el, $page_id, $u);
-			return '<a href="'.URL.'&p='.$page_id.($id ? '&id='.$id : '').'" class="inhr">'.$txt.'</a>';
+			return '<a href="'.URL.'&p='.$page_id.($id ? '&id='.$id : '').'" class="inhr'.
+						_spisokUnitTT($el, $u).
+						$txt.
+				   '</a>';
 
 		//открытие диалога
 		case 222:
@@ -811,10 +814,13 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 			if($func['effect_id'])
 				$val .= ',edit_id:'.$u['id'];
 
-			return '<a class="dialog-open inhr" val="'.$val.'">'.$txt.'</a>';
+			return '<a val="'.$val.'" class="dialog-open inhr'.
+						_spisokUnitTT($el, $u).
+						$txt.
+				   '</a>';
 	}
 
-	return $txt;
+	return _spisokUnitTT($el, $u, $txt);
 
 	if(!$dlg = _elem_11_dialog($el))
 		return $txt;
@@ -827,6 +833,21 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 		return $txt;
 
 	return '<a href="'.URL.'&p='.$page_id.'&id='.$u['id'].'" class="inhr">'.$txt.'</a>';
+}
+function _spisokUnitTT($el, $u, $txt='">') {//действие: подсказка [223]
+	if(empty($el['action']))
+		return $txt;
+
+	foreach($el['action'] as $func)
+		if($func['dialog_id'] == 223) {
+			if(!$tt = _elemUids($func['target_ids'], $u))
+				return $txt;
+			if($txt == '">')
+				return _tooltip($tt, 0, 'l');
+			return '<span class="inhr'._tooltip($tt, 0, 'l').$txt.'</a>';
+		}
+
+	return $txt;
 }
 function _spisokUnitUrlId($el, $page_id, $u) {//получение id записи согласно странице
 	if(empty($u))
