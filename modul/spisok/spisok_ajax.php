@@ -460,8 +460,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	$send = _spisokAction3($dialog, $unit_id, $send);
 	$send = _spisokAction4($send);
 
-	if(IS_ELEM)
+	if(IS_ELEM) {
 		$send['elem_js'] = _jsCacheElemOne($unit_id);
+		_jsCache();
+	}
 
 	return $send;
 }
