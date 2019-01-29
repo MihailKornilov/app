@@ -504,7 +504,8 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 		$err_msg = $cmp['req_msg'] ? $cmp['req_msg'] : 'Необходимо заполнить поле,<br>либо выбрать значение';
 
 		switch($cmp['dialog_id']) {
-			case 8://текстовое поле
+			//текстовое поле
+			case 8:
 				if($cmp['req'] && !strlen($v))
 					$is_err = 1;
 				//цифры и числа
@@ -517,9 +518,24 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 						$err_msg = 'Значение не может быть отрицательным';
 					}
 				}
+				//проверка, чтобы артикул не совпадал с другими артикулами
+				if($v)
+					if($cmp['num_1'] == 34) {
+						$sql = "SELECT COUNT(*)
+								FROM  "._queryFrom($DLG)."
+								WHERE "._queryWhere($DLG)."
+								  AND `t1`.`id`!=".$unit_id."
+								  AND `t1`.`".$col."`='".addslashes($v)."'";
+						if(query_value($sql)) {
+							$is_err = 1;
+							$err_msg = 'Данное значение содержится в другой записи<br>и не может повторяться';
+						}
+					}
+
 				$send[$cmp_id] = $v;
 				break;
-			case 9://поле-пароль
+			//поле-пароль
+			case 9:
 				if($cmp['req'] && !strlen($v)) {
 					$is_err = 1;
 					break;
@@ -546,7 +562,8 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 
 				$send[$cmp_id] = $v;
 				break;
-			case 300://страница ВК
+			//страница ВК
+			case 300:
 				if(_elem300VkIdTest($DLG, $v, $unit_id)) {
 					$is_err = 1;
 					$err_msg = 'Учётная запись vk.com: '.$v.' закреплена'.

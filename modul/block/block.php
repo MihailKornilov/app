@@ -803,25 +803,49 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				txt_1 - текст для placeholder
 				txt_2 - текст по умолчанию
 				num_1 - формат:
-					32 - любой текст
+					32 - произвольный текст
 					33 - цифры и числа
-				num_2 - количество знаков после запятой
-				num_3 - разрешать отрицательные значения
-				num_4 - разрешать вносить 0
+					34 - артикул
+				num_2 - количество знаков после запятой (для 33)
+				num_3 - разрешать отрицательные значения (для 33)
+				num_4 - разрешать вносить 0 (для 33)
+				txt_3 - шаблон артикула (для 34)
 			*/
 			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
 			$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
 
 			$v = _elemPrintV($el, $prm, $el['txt_2']);
 
 			switch($el['num_1']) {
 				default:
-				//любой текст
+				//произвольный текст
 				case 32: break;
 				//цифры и числа
 				case 33:
 					$v = round($v, $el['num_2']);
 					$v = $v || $el['num_4'] ? $v : '';
+					break;
+				//артикул
+				case 34:
+					if($v)
+						break;
+					if(!$col = _elemCol($el))
+						break;
+					if(!$BL = $el['block'])
+						break;
+					if($BL['obj_name'] != 'dialog')
+						break;
+					if(!$DLG = _dialogQuery($BL['obj_id']))
+						break;
+					$sql = "SELECT MAX(`t1`.`".$col."`)+1
+							FROM  "._queryFrom($DLG)."
+							WHERE "._queryWhere($DLG)."
+							  AND LENGTH(`t1`.`".$col."`)=".strlen($el['txt_3']);
+					$v = query_value($sql);
+					if(($diff = strlen($el['txt_3']) - strlen($v)) > 0)
+						for($n = 0; $n < $diff; $n++)
+							$v = '0'.$v;
 					break;
 			}
 
@@ -1911,6 +1935,11 @@ function _elemPrintV($el, $prm, $def='') {//значение записи при
 			return $id;
 		return $def;
 	}
+
+	//если текстовое поле и не число, возврат просто значения
+	if($el['dialog_id'] == 8 && $el['num_1'] != 33)
+		return  $v;
+
 	if(is_string($v) && preg_match(REGEXP_INTEGER, $v) && preg_match(REGEXP_INTEGER, $def))
 		return $v * 1;
 
