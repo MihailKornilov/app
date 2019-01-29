@@ -271,7 +271,7 @@ function _menuCount($menu) {//получение элемента-циферки
 		if(!$count = query_value($sql))
 			continue;
 
-		$menu[$pid]['name'] .= '<b class="fr ml3">+'.$count.'</b>';
+		$menu[$pid]['name'] .= '<b class="ml5">+'.$count.'</b>';
 	}
 
 	return $menu;
