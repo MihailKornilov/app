@@ -1762,8 +1762,6 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				if($el['num_1'] > $el['num_3'])
 					$w = $el['num_3'];
 
-			if($prm['blk_setup'])
-				return _imageNo($w);
 			if(!$image_id = _idsFirst($el['txt_1']))
 				return _imageNo($w);
 
