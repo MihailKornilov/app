@@ -246,7 +246,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
 			$cls[] = _dn(!(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden']));
-			$cls[] = !$PARAM['blk_setup'] && !empty($r['action']) ? 'curP' : '';
+			$cls[] = !$PARAM['blk_setup'] && _blockActionIsClick($r, $PARAM) ? 'curP' : '';
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
@@ -290,10 +290,32 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 
 	return $send;
 }
+function _blockActionIsClick($r, $prm) {//проверка действий блока, если блок кликабельный - показ руки
+	if($prm['blk_setup'])
+		return false;
+	if(empty($r['action']))
+		return false;
+
+	foreach($r['action'] as $act)
+		switch($act['dialog_id']) {
+			case 211:
+			case 212:
+			case 213:
+			case 214:
+			case 215:
+			case 216:
+			case 217:
+				return true;
+		}
+
+	return false;
+}
 function _blockAction($r, $prm) {//действие при нажатии на блок
 	if($prm['blk_setup'])
 		return '';
 	if(empty($r['action']))
+		return '';
+	if(!_blockActionIsClick($r, $prm))
 		return '';
 
 	$skip = array();//номера действия, которые нужно пропустить, если они не будут соответствовать условиям
@@ -517,11 +539,23 @@ function _blockStyle($bl, $prm, $width) {//стили css для блока
 
 	return ' style="'.implode(';', $send).'"';
 }
-function _blockChildHtml($block, $unit, $grid_id, $level, $width) {//деление блока на части
-	if($block['id'] != $grid_id)
-		return _blockLevel($block['child'], $unit, $grid_id, $level, $width);
+function _blockChildHtml($block, $prm, $grid_id, $level, $width) {//деление блока на части
+	if($block['id'] == $grid_id)
+		return _blockGrid($block['child'], $width);
 
-	return _blockGrid($block['child'], $width);
+	if(!empty($block['action']))
+		foreach($block['action'] as $act)
+			switch($act['dialog_id']) {
+				case 218:
+					if(!$id = _num(@$_GET['id']))
+						return _emptyMin($act['filter']);
+					if(!$dialog = _dialogQuery($act['initial_id']))
+						return _emptyMin('Отсутствует диалог, который вносит данные записи.');
+					if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $id))
+						return _emptyMin('Записи '.$id.' не существует.');
+			}
+
+	return _blockLevel($block['child'], $prm, $grid_id, $level, $width);
 }
 function _blockGrid($arr, $width) {//режим деления на подблоки
 	$spisok = '';
