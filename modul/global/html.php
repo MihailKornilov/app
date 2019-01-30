@@ -575,7 +575,7 @@ function _app_list() {//список приложений, которые дос
 			'<div class="pad10 bg-gr2 mb10 over2 curP" onclick="_appEnter('.$r['app_id'].')">'.
 		  (SA ? '<span class="grey">'.$r['app_id'].'.</span> ' : '').
 				_app($r['app_id'], 'name').
-				'<div class="fr grey">'.FullData($r['dtime_add']).'</div>'.
+				'<div class="fr grey">'.FullData(_app($r['app_id'], 'dtime_add')).'</div>'.
 			'</div>';
 	}
 
