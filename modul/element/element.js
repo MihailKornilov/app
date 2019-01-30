@@ -792,6 +792,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				ATR_CMP_AFICS = _attr_cmp(elm_id, 1),
 				ATR_EL =  _attr_el(elm_id);
 
+			if(!ATR_EL.length)
+				return;
+
 			_elemHint(el);
 
 			switch(el.dialog_id) {
