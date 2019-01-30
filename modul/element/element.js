@@ -3166,7 +3166,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					dialog_id:19,
 					block_id:obj.srce.block_id,
 					dop:{
-						level_deny:1,
+						level_deny:0,
 						blk_deny:deny.join(),
 						sel:BLOCK.attr('val')
 					},

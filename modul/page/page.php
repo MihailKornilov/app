@@ -566,7 +566,7 @@ function _pageShow($page_id) {
 		return _empty20('Несуществующая страница.'.PAGE_MSG_ERR);
 	if($page['sa'] && !SA)
 		return _empty20('Нет доступа.'.PAGE_MSG_ERR);
-	if($page['creator'] && !USER_CREATOR)
+	if(!SA && $page['creator'] && !USER_CREATOR)
 		return _empty20('Страница недоступна.'.PAGE_MSG_ERR);
 	if(!_pageAccess($page_id))
 		return _empty20('Страница недоступна или не существует.'.PAGE_MSG_ERR);
