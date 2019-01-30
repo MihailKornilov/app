@@ -496,7 +496,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 	foreach($dialog['cmp'] as $cmp_id => $cmp) {
 		if(!isset($CMP[$cmp_id]))
 			continue;
-		if(!$col = $cmp['col'])
+		if(!$col = _elemCol($cmp))
 			continue;
 
 		$v = _txt($CMP[$cmp_id]);
