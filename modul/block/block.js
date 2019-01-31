@@ -345,7 +345,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 
 		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.id + '">' +
 			'<div class="line-b">' +
-				'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + EL.id, 5)  : '">') + 'Элемент</span>' +
+				'<a val="dialog_id:118,get_id:' + EL.id + '" class="fs16 blue dialog-open' + _tooltip('Info #' + EL.id, -5) + 'Элемент</a>' +
 				'<div class="fr mtm3">' +
 					_elemUnitUrl(EL) +
 					_elemUnitFormat(EL) +

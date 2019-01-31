@@ -1,4 +1,220 @@
 <?php
+function PHP12_elem_info($prm) {//информация об элементе [118]
+	if(!$elem_id = $prm['unit_get_id'])
+		return _emptyRed('Не получен id элемента.');
+
+	$el = _elemOne($elem_id, true);
+
+	$send = '<tr><td class="r w250">Элемент ID:<td class="b">'.$elem_id.
+			'<tr><td class="r color-ref b">app_id:'.
+				'<td>'.($el['app_id'] ? '<span class="b">'.$el['app_id'].'</span>' : '-');
+
+
+	//Создан через диалог
+	$dlgPaste = '-';
+	if($dialog_id = $el['dialog_id']) {
+		$dlgPaste = '['.$dialog_id.'] ';
+		if(!$DLG = _dialogQuery($dialog_id))
+			$dlgPaste .= '<span class="red">- диалога не существует</span>';
+		else
+			$dlgPaste .= ' '.$DLG['name'];
+	}
+	$send .='<tr><td class="r grey">Создан через диалог:<td>'.$dlgPaste;
+
+	$send .='<tr><td class="r grey">Расположен в блоке:'.
+				'<td>'.($el['block_id'] ? '<a class="dialog-open color-sal" val="dialog_id:117,get_id:'.$el['block_id'].'">'.$el['block_id'].'</a>' : '-').
+			'<tr><td class="r grey">Элемент-родитель:<td>'.PHP12_elem_info_elemLink($el['parent_id']);
+
+	//Дочерние элементы
+	$td = '-';
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$elem_id."
+			ORDER BY `id`";
+	if($arr = query_arr($sql)) {
+		$ids = array();
+		foreach($arr as $id => $r)
+			$ids[] = PHP12_elem_info_elemLink($id);
+		$td = implode(', ', $ids);
+	}
+	$send .='<tr><td class="r grey top">Дочерние элементы:<td>'.$td;
+
+
+	//Использование в элементе [11]
+	$td = '-';
+	$sql = "SELECT `id`,`txt_2`
+			FROM `_element`
+			WHERE `dialog_id`=11
+			  AND `app_id` IN (0,".APP_ID.")
+			  AND LENGTH(`txt_2`)";
+	if($arr = query_arr($sql)) {
+		$ids = array();
+		foreach($arr as $id => $r) {
+			$ass = _idsAss($r['txt_2']);
+			if(isset($ass[$elem_id]))
+				$ids[] = PHP12_elem_info_elemLink($id);
+		}
+		if(!empty($ids))
+			$td = implode(', ', $ids);
+	}
+	$send .='<tr><td class="r grey top">Используется в элементе [11]:<td>'.$td;
+
+	//Прикреплены функции
+	$td = '-';
+	$sql = "SELECT `id`
+			FROM `_action`
+			WHERE `element_id`=".$elem_id."
+			ORDER BY `id`";
+	if($ids = query_ids($sql))
+		$td = $ids;
+	$send .='<tr><td class="r grey">IDs прикрепленых функций:<td>'.$td;
+
+
+	//Функции, которые воздействуют на этот элемент
+	$td = '-';
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `dialog_id` IN (202,203,206,212,213,216,223)
+			ORDER BY `id`";
+	if($arr = query_arr($sql)) {
+		$ids = array();
+		foreach($arr as $id => $r) {
+			$ass = _idsAss($r['target_ids']);
+			if(isset($ass[$elem_id]))
+				$ids[] = $id;
+		}
+		if(!empty($ids))
+			$td = implode(', ', $ids);
+	}
+	$send .='<tr><td class="r grey">Воздействующие функции:<td>'.$td;
+
+
+	//Использование в содержании фильтра [40]
+	$td = '-';
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=40
+			  AND `app_id` IN (0,".APP_ID.")
+			ORDER BY `id`";
+	if($arr = query_arr($sql)) {
+		$mass = array();
+		foreach($arr as $r) {
+			if(!$col = $r['col'])
+				continue;
+			if(!$BL = _blockOne($r['block_id']))
+				continue;
+			if($BL['obj_name'] != 'dialog')
+				continue;
+			if(!$DLG = _dialogQuery($BL['obj_id']))
+				continue;
+
+			$sql = "SELECT *
+					FROM  "._queryFrom($DLG)."
+					WHERE "._queryWhere($DLG)."
+					  AND LENGTH(`".$col."`)".
+						($DLG['table_name_1'] == '_element' ? " AND `dialog_id`=".$DLG['id'] : '');
+			if(!$spisok = query_arr($sql))
+				continue;
+
+			foreach($spisok as $sp) {
+				$filter = htmlspecialchars_decode($sp[$col]);
+				if(!$filter = json_decode($filter, true))
+					continue;
+
+				foreach($filter as $f) {
+					$ass = _idsAss($f['elem_id']);
+					if(isset($ass[$elem_id]))
+						$mass[] = '<a class="dialog-open" val="dialog_id:'.$DLG['id'].',edit_id:'.$sp['id'].'">'.
+									'<span class="color-pay">`'.$DLG['table_name_1'].'`</span> '.
+									'['.$DLG['id'].'] '.$DLG['name'].
+									' - <b>id'.$sp['id'].'<b>'.
+								  '</a>';
+				}
+			}
+		}
+		if(!empty($mass))
+			$td = implode('<br>', $mass);
+	}
+	$send .='<tr><td class="r grey top">Используется в фильтре [40]:<td>'.$td;
+
+	//Использование в фильтрах шаблона истории действий (а также в самой истории действий)
+	$td = '-';
+	$mass = array();
+	$hist = array();
+	$colDef = '-';
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id` IN (0,".APP_ID.")";
+	foreach(query_arr($sql) as $r) {
+		if(!$DLG = _dialogQuery($r['id']))
+			continue;
+
+		foreach(array('insert', 'edit', 'del') as $i)
+			if($ids = $r[$i.'_history_elem']) {
+				$mass[] = $ids;
+				$ass = _idsAss($ids);
+				if(isset($ass[$elem_id]))
+					$hist[] = '['.$DLG['id'].'] '.$DLG['name'];
+			}
+		if($elem_id == $r['spisok_elem_id'])
+			$colDef = '['.$DLG['id'].'] '.$DLG['name'];
+	}
+
+	if($mass) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id` IN (".implode(',', $mass).")
+				  AND LENGTH(`txt_9`)
+				ORDER BY `id`";
+		if($arr = query_arr($sql)) {
+			$mass = array();
+			foreach($arr as $r) {
+				$filter = htmlspecialchars_decode($r['txt_9']);
+				if(!$filter = json_decode($filter, true))
+					continue;
+
+				foreach($filter as $f) {
+					$ass = _idsAss($f['elem_id']);
+					if(isset($ass[$elem_id]))
+						$mass[] = PHP12_elem_info_elemLink($r['id']);
+				}
+			}
+			if($mass)
+				$td = implode(', ', $mass);
+		}
+	}
+	$send .='<tr><td class="r grey top">В истории действий диалогов:<td>'.($hist ? implode('<br>', $hist) : '-');
+	$send .='<tr><td class="r grey top">IDs элементов шаблонов истории действий, в фильтрах которых используется данный элемент:<td>'.$td;
+	$send .='<tr><td class="r grey">Является колонкой по умолчанию в диалоге:<td>'.$colDef;
+
+
+	//Является указателем на список в исходном диалоге в элементе [13]
+	$td = '-';
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=13
+			  AND `num_1`=".$elem_id."
+			ORDER BY `id`";
+	if($arr = query_arr($sql)) {
+		foreach($arr as $r)
+			$mass[] = PHP12_elem_info_elemLink($r['id']);
+		$td = implode(', ', $mass);
+	}
+	$send .='<tr><td class="r grey">Является указателем на список в исходном диалоге в элементе [13]:<td>'.$td;
+
+	$send .='<tr><td class="r grey">Используется в фильтре элемента [74]:<td>---';
+	$send .='<tr><td class="r grey">Был выбран в элементе [13]:<td>---';
+	$send .='<tr><td class="r grey">Является указателем на колонку родительского диалога:<td>---';
+
+	return '<table class="bs10">'.$send.'</table>';
+}
+function PHP12_elem_info_elemLink($elem_id, $empty='-') {//формирование ссылки на элемент
+	if(!$elem_id)
+		return $empty;
+
+	return '<a class="dialog-open" val="dialog_id:118,get_id:'.$elem_id.'">'.$elem_id.'</a>';
+}
+
 function _colorJS() {//массив цветов для текста в формате JS, доступных элементам
 	return '{'.
 		'"":["#000","Чёрный"],'.
