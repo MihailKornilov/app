@@ -1367,6 +1367,20 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 		//SA: Select - выбор диалогового окна
 		case 38: return _dialogSelArray();
 
+		case 40:
+			if($el['num_1'])
+				return 0;
+			if(!$block_id = $prm['srce']['block_id'])
+				return 0;
+			if(!$BL = _blockOne($block_id))
+				return 0;
+			if(!$EL = $BL['elem'])
+				return 0;
+			if(!_elemIsConnect($EL))
+				return 0;
+
+			return _num($EL['num_1']);
+
 		//Меню переключения блоков - список пунктов для управления в рабочей версии
 		case 57: return PHP12_menu_block_arr($elem_id);
 
@@ -1511,13 +1525,13 @@ function _elemVvv37($prm) {//select - выбор имени колонки [37]
 	if($u = $prm['unit_edit'])
 		$uCol = $u['col'];
 
-	$field = _elemVvv37field($dlg, 1, $uCol, $field);
-//	$field = _elemVvv37field($dlg, 2, $uCol, $field);
+	$field = _elemVvv37field($dlg, $uCol, $field);
+	$field = _elemVvv37fieldDop($dlg, $uCol, $field);
 
 	return $field;
 }
-function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки по каждой таблице
-	if(!$dlg['table_'.$num])
+function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по каждой таблице
+	if(!$dlg['table_1'])
 		return $send;
 
 	//получение используемых колонок
@@ -1556,7 +1570,7 @@ function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки п�
 		'app_id_last' => 1
 	);
 
-	foreach($dlg['field'.$num] as $col => $k) {
+	foreach($dlg['field1'] as $col => $k) {
 		if(isset($fieldNo[$col]))
 			continue;
 
@@ -1582,6 +1596,24 @@ function _elemVvv37field($dlg, $num, $uCol, $send=array()) {//колонки п�
 		);
 		$send[] = $u;
 	}
+
+	return $send;
+}
+function _elemVvv37fieldDop($dlg, $uCol, $send=array()) {
+	if(!$col_id = _num($uCol))
+		return $send;
+	if(!$el = _elemOne($col_id))
+		return $send;
+	if(!$col = $el['col'])
+		return $send;
+	if(!$DLG = _dialogQuery($el['block']['obj_id']))
+		return $send;
+
+	$send[] = array(
+		'id' => $col_id,
+		'title' => $DLG['name'].': '.$el['name'],
+		'content' => $DLG['name'].': '.$el['name'].' <b class="pale">'.$col.'</b>'
+	);
 
 	return $send;
 }
@@ -1611,7 +1643,7 @@ function _elemVvv37parent($dlg_id) {//колонки родительского 
 		$send[] = array(
 			'id' => $id,
 			'title' => $dlg['name'].': '.$cmp['name'],
-			'content' => $dlg['name'].': '.$cmp['name'].' <b class="pale">'.$col.'</b>',
+			'content' => $dlg['name'].': '.$cmp['name'].' <b class="pale">'.$col.'</b>'
 		);
 	}
 

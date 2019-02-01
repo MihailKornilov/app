@@ -361,6 +361,8 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_elem11_choose_mysave($dialog, $POST_CMP);
 	//элемент выбирает блоки из диалога - через [19] - перехват внесения данных
 	_elem19_block_choose($dialog);
+	//выбор дополнительной колонки - через [22] - перехват внесения данных
+	_elem22_col_dop($dialog);
 	//сохранение условий для фильтра - через [41] - перехват внесения данных
 	PHP12_spfl_save($dialog);
 	//сохранение настройки истории действий - через [67] - перехват внесения данных
@@ -944,6 +946,17 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 	}
 
 	foreach($POST_CMP as $cmp_id => $v) {
+/*
+		if(!$cmp = _elemOne($cmp_id))
+			continue;
+		//пропуск дополнительных колонок из других диалогов
+		if($col_id = _num($cmp['col'])) {
+			if(!$el = _elemOne($col_id))
+				continue;
+			if($el['block']['obj_id'] != $DLG['id'])
+				continue;
+		}
+*/
 		if(!$col = _elemCol($cmp_id))
 			continue;
 		if(!$tab = _queryTN($DLG, $col, 1))
@@ -954,6 +967,8 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 				WHERE `id`=".$uid[$tab];
 		query($sql);
 	}
+
+	return;
 
 	//изменение элемента из временного в постоянный после использования предварительной вставки (функция _dialogOpenPreLoad)
 	if(IS_ELEM) {
@@ -1121,7 +1136,41 @@ function _elem19_block_choose($dialog) {//выбор блоков через [11
 
 	jsonSuccess($send);
 }
+function _elem22_col_dop($DLG) {
+	if($DLG['id'] != 22)
+		return;
+	if(!$CMP = @$_POST['cmp'])
+		jsonError('Нет данных');
+	if(!is_array($CMP))
+		jsonError('Данные не являются массивом');
 
+
+	$col_id = 0;
+	foreach($CMP as $elem_id => $v) {
+		if(!$el = _elemOne($elem_id))
+			continue;
+		if($el['dialog_id'] != 13)
+			continue;
+		$col_id = $v;
+	}
+
+	if(!$col_id)
+		jsonError('Колонка не выбрана');
+	if(!$el = _elemOne($col_id))
+		jsonError('Элемента '.$col_id.' не существует');
+	if(!$col = $el['col'])
+		jsonError('Выбранный элемент не содержит колонку');
+	if(!$dlg = _dialogQuery($el['block']['obj_id']))
+		jsonError('Диалога '.$el['block']['obj_id'].' не существует');
+
+	$u = array(
+		'id' => $col_id,
+		'title' => $dlg['name'].': '.$el['name'],
+		'content' => $dlg['name'].': '.$el['name'].' <b class="pale">'.$col.'</b>'
+	);
+
+	jsonSuccess($u);
+}
 
 
 

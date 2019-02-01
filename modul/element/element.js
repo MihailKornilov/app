@@ -1145,7 +1145,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						width:el.width,
 						title0:'не выбрано',
 						msg_empty:'колонок нет',
-						spisok:vvv
+						spisok:vvv,
+						funcAdd:function(t) {
+							_dialogLoad({
+								dialog_id:22,
+								block_id:el.block_id,
+								busy_obj:t.icon_add,
+								busy_cls:'spin',
+								func_save:function(res) {
+									t.unitUnshift(res);
+									t.value(res.id);
+								}
+							});
+						}
 					});
 					return;
 				//SA: Select - выбор диалогового окна
@@ -1184,7 +1196,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var P = ATR_CMP.next(),
 						INP = P.find('.inp'),
 						DEL = P.find('.icon-del'),
-						_dlg24 = function(id) {//получение id диалога через указанный элемент
+						_dlg24 = function(id, dss) {//получение id диалога через указанный элемент
+							if(dss)
+								return dss;
 							if(!id)
 								return 0;
 							var dlg24 = _idsFirst(OBJ.dlg.D(ATTR_CMP(id)).val());
@@ -1230,7 +1244,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						return;
 
 					P.click(function() {
-						var dss = _dlg24(el.num_1);
+						var dss = _dlg24(el.num_1, vvv);
 						dss = _blkSrce(dss);
 						if(!dss)
 							return;
