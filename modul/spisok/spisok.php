@@ -1651,7 +1651,8 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 					$send[$id] = array(
 						'sum_old' => 0,
 						'sum' => 0,
-						'unit_id' => $unit['id']     //id записи, баланс которой будет пересчитан
+						'unit_id' => $unit['id'],     //id записи, баланс которой будет пересчитан
+						'unit_old' => $unit['id']
 					);
 
 				_spisokUnitAfter27($dialog, $send);
@@ -1826,9 +1827,6 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 				WHERE `t1`.`id`=".$connect_id."
 				  AND "._queryWhere($dlg);
 		query($sql);
-
-//echo $dlg['name']."\n";
-//echo 'sum='.$sum."\n";
 
 		//пересчёт суммы у изменённого значения (при редактировании)
 		if($connect_old)
