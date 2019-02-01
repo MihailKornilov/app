@@ -4863,6 +4863,7 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 			continue;
 
 		$hidden = false;//скрытые элементы в историю не попадают
+		$dlg_id = 0;
 		$name = '';
 		foreach($dialog['cmp'] as $cmp_id => $cmp)
 			if($i == $cmp['col']) {
@@ -4879,6 +4880,7 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 					$name = $cmp['name'];
 					break;
 				}
+				$dlg_id = $cmp['dialog_id'];
 				$name = _elemTitle($cmp_id);
 				break;
 			}
@@ -4886,10 +4888,23 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 		if($hidden)
 			continue;
 
+		$old = $v;
+		$new = $unit[$i];
+
+		//подмена значений в соответствии с диалогом
+		switch($dlg_id) {
+			//галочка
+			case 1:
+				$old = _daNet($old);
+				$new = _daNet($new);
+				break;
+		}
+
+
 		$edited[] = array(
 			'name' => $name,
-			'old' => $v,
-			'new' => $unit[$i]
+			'old' => $old,
+			'new' => $new
 		);
 	}
 
