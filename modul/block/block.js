@@ -1,9 +1,8 @@
-var BLOCK_CUT_IDS = 0,//id блоков, выбранные для переноса
-	_ids = function(v) {
+var _ids = function(v, count) {
 		if(!v)
 			return 0;
 		if(typeof v == 'number')
-			return v;
+			return count ? 1 : v;
 		if(typeof v == 'string') {
 			var send = [];
 			_forN(v.split(','), function(id) {
@@ -12,7 +11,7 @@ var BLOCK_CUT_IDS = 0,//id блоков, выбранные для перено�
 					return;
 				send.push(id);
 			});
-			return send.join();
+			return count ? send.length : send.join();
 		}
 		return 0;
 	},
@@ -534,7 +533,8 @@ $(document)
 				obj_name:spl[0],
 				obj_id:spl[1],
 				blk_choose:BCO_on,
-				level:p.find('.block-level-change.orange').html(),
+				blk_sel:_cookie('block_ids_copy'),
+				level:p.find('.block-level-change.orange').html() || 1,
 				busy_obj:t
 			};
 
@@ -545,11 +545,6 @@ $(document)
 			p.find('.block-level-change')._dn(!v);
 			p.find('.elem-width-change')._dn(!v);
 			BCO._dn(!v).removeClass('_busy');
-
-			if(!BLOCK_CUT_IDS) {
-				BCO.find('b').html(0);
-				BCO.attr('val', '');
-			}
 
 			CONTENT.html(res.html);
 
@@ -564,7 +559,37 @@ $(document)
 				for(var i in res.blk)
 					BLKK[i] = res.blk[i];
 
+
+
+			var ids = _cookie('block_ids_copy');
+
+			BCO.find('b').html(_ids(ids, 1));
+			BCO.attr('val', ids);
+
+			if(ids)
+				return;
+
 			//включен выбор блоков
+			var bc = CONTENT.find('.blk-choose');
+
+			//подсветка блока при выборе
+			bc.click(function() {
+				var tt = $(this),
+					v = tt.attr('val'),
+					sel = tt.hasClass('sel');
+
+				tt[(sel ? 'remove' : 'add') + 'Class']('sel');
+
+				var seld = [];
+				_forEq(bc, function(sp) {
+					if(sp.hasClass('sel'))
+						seld.push(sp.attr('val'));
+				});
+				BCO.find('b').html(seld.length);
+				BCO.attr('val', seld.join());
+			});
+
+/*
 			if(BCO_on) {
 				var bc = CONTENT.find('.blk-choose');
 
@@ -607,6 +632,7 @@ $(document)
 					BCO.attr('val', seld.join());
 				});
 			}
+*/
 		});
 	})
 	.on('click', '.elem-width-change', function() {//включение/выключение изменения ширины элементов
@@ -746,14 +772,35 @@ $(document)
 
 		but.removeClass('grey').trigger('click');
 		but.removeClass('_busy');
-		BLOCK_CUT_IDS = 0;
 	})
 	.on('mouseenter', '.block-choose-on', function() {//выплывающая подсказка для действий с выбранными блоками
 		var t = $(this),
-			p = t.parent(),
 			c = _num(t.find('b').html()),
 			ids = t.attr('val'),
-			GRID_ON = p.find('.block-grid-on');
+			p = t.parent(),
+			GRID_ON = p.find('.block-grid-on'),
+			bcoMsg = function() {
+				if(_cookie('block_ids_copy'))
+					return bcoCopy();
+
+				return '<table class="bs5">' +
+					'<tr><td class="line-b pb3">' +
+							'<button class="vk small w90 fl mr3 bco-copy">копировать</button>'+
+							'<div class="grey fs11"><b class="fs11 color-555">Продублировать</b> выделенные блоки в указанном месте.<div>' +
+
+					'<tr><td class="line-b pb3">' +
+							'<button class="vk small w90 fl mr3 red bco-move">вырезать</button>'+
+							'<div class="grey fs11">Выделенные блоки будут <b class="fs11 color-555">перенесены</b> в указанное место.<div>' +
+				'</table>';
+			},
+			bcoCopy = function() {//сообщение когда блоки выбраны для копирования
+				return '<div class="b color-555 mar10">Выбран' + _end(c, ['', 'о']) + ' ' + c + ' блок' + _end(c, ['', 'а', 'ов']) + ' для копирования</div>' +
+					'<div class="_info ml10 mr10">' +
+						'Укажите <b>пустой блок</b> для вставки выбранных блоков.' +
+						'<div class="mt10">Либо <a class="b bco-paste-0">вставьте блоки</a> в нулевой уровень.</div>' +
+					'</div>' +
+					'<div class="mar10 center"><button class="vk small cancel bco-cancel">отменить выбор блоков</button></div>';
+			};
 
 		if(!c)
 			return;
@@ -761,24 +808,15 @@ $(document)
 			return;
 
 		var msg =
-			'<div class="b color-555 mt5 ml5">Выбран' + _end(c, ['', 'о']) + ' ' + c + ' блок' + _end(c, ['', 'а', 'ов']) + '</div>' +
 
-			'<table class="bs5' + _dn(!BLOCK_CUT_IDS) + '" id="blk-cho-but">' +
+			'<table class="bs5" id="blk-cho-but">' +
+
 				'<tr><td class="line-b pb3">' +
-						'<button class="vk small w100 fl mr3">клонировать</button>'+
-						'<div class="grey fs11">Блоки будут скопированы и добавлены снизу, включая дочерние блоки. Размеры и уровни будут сохранены. Без элементов.<div>' +
-
-				'<tr><td class="line-b pb3"><button class="vk small w100 fl mr3 orange">переместить</button>'+
-						'<div class="grey fs11">После нажатия этой кнопки укажите блок, в который нужно вставить выбранные блоки. Элементы и дочерние блоки будут перенесены.<div>' +
-
-				'<tr><td class="line-b pb3"><button class="vk small w175 fl mr3 orange">переместить на страницу</button>'+
+						'<button class="vk small w175 fl mr3 orange">переместить на страницу</button>'+
 						'<div class="grey fs11">Укажите страницу,<br>на которую нужно будет переместить блоки и элементы.<div>' +
-
-				'<tr><td><button class="vk small w100 fl mr3 red">удалить</button>'+
-						'<div class="grey fs11">Блоки будут удалены вместе с элементами и дочерними блоками.<div>' +
 			'</table>' +
 
-			'<div class="mar5' + _dn(BLOCK_CUT_IDS) + '" id="blk-cho-cut-info">' +
+			'<div class="mar5" id="blk-cho-cut-info">' +
 				'<div class="_info">' +
 					'Укажите блок, в который будут <b>перенесены</b> выбранные блоки. ' +
 					'<br>' +
@@ -787,13 +825,51 @@ $(document)
 			'</div>';
 
 		t._hint({
-			width:260,
-			msg:msg,
+			width:250,
+			msg:bcoMsg(),
 			side:'right',
 			ugPos:40,
 			show:1,
 			delayHide:300,
 			func:function(o) {
+				$(document)
+					//блоки выбраны для копирования
+					.off('click', '.bco-copy')
+					 .on('click', '.bco-copy', function() {
+						_cookie('block_ids_copy', ids);
+						o.html(bcoCopy());
+					})
+
+					//отмена выбранных блоков
+					.off('click', '.bco-cancel')
+					 .on('click', '.bco-cancel', function() {
+						_cookie('block_ids_copy', '');
+						o.html(bcoMsg());
+						GRID_ON.removeClass('grey').trigger('click');
+						GRID_ON.removeClass('_busy');
+					})
+
+					//вставка на нулевой уровень
+					.off('click', '.bco-paste-0')
+					 .on('click', '.bco-paste-0', function() {
+					 	var tt = $(this),
+							send = {
+								op:'block_choose_paste_0',
+								obj_name:p.attr('val').split(':')[0],
+								obj_id:p.attr('val').split(':')[1],
+								ids:_cookie('block_ids_copy'),
+								busy_obj:tt
+							};
+						_post(send, function(res) {
+							GRID_ON.removeClass('grey').trigger('click');
+							GRID_ON.removeClass('_busy');
+							for(var i in res.blk)
+								BLKK[i] = res.blk[i];
+							for(var i in res.elm)
+								ELMM[i] = res.elm[i];
+						});
+					});
+				return;
 				//клонирование
 				o.find('button:first').click(function() {
 					var but = $(this),
@@ -808,14 +884,13 @@ $(document)
 					});
 				});
 				//вырезка и перенос
-				o.find('button').eq(1).click(function() {
-					BLOCK_CUT_IDS = ids;
+				o.find('button').eq(2).click(function() {
 					$('#blk-cho-but')._dn();
 					$('#blk-cho-cut-info')._dn(1);
 					$('.blk-choose.sel').removeClass('sel');
 				});
 				//перемещение на другую страницу
-				o.find('button').eq(2).click(function() {
+				o.find('button').eq(3).click(function() {
 					_dialogLoad({
 						dialog_id:97,
 						dop:ids,
@@ -823,19 +898,6 @@ $(document)
 						func_save:function() {
 							location.reload();
 						}
-					});
-				});
-				//удаление
-				o.find('button:last').click(function() {
-					var but = $(this),
-						send = {
-							op:'block_choose_del',
-							ids:ids,
-							busy_obj:but
-						};
-					_post(send, function() {
-						GRID_ON.removeClass('grey').trigger('click');
-						GRID_ON.removeClass('_busy');
 					});
 				});
 			}

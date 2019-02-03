@@ -420,8 +420,8 @@ function _blockWidthChange($obj_name, $obj_id) {//кнопка изменени�
 	return '';
 }
 function _blockChooseBut($obj_name, $obj_id) {//кнопка включения выбора блоков
-	if(!$arr = _BE('block_arr', $obj_name, $obj_id))
-		return '';
+//	if(!$arr = _BE('block_arr', $obj_name, $obj_id))
+//		return '';
 
 	return
 	'<button class="vk small grey ml30 block-choose-on">'.

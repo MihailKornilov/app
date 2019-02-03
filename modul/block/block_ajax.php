@@ -35,6 +35,7 @@ switch(@$_POST['op']) {
 		$prm = array(
 			'blk_setup' => 1,
 			'blk_choose' => $blk_choose,
+			'blk_sel' => _ids(@$_POST['blk_sel']),
 			'blk_level' => $level,
 			'unit_get' => _pageUnitGet($obj_name, $obj_id)
 		);
@@ -337,7 +338,8 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'block_choose_level_change':
+
+	case 'block_choose_level_change'://переключение уровней во время выбора блоков
 		if(!$block_id = _num($_POST['block_id']))
 			jsonError('Некорректный ID блока');
 		if(!$level = _num($_POST['level']))
@@ -355,6 +357,266 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'block_choose_paste_0'://вставка выбранных блоков на нулевой уровень
+		if(!$obj_name = _blockName($_POST['obj_name']))
+			jsonError('Несуществующее имя объекта');
+		if(!$obj_id = _num($_POST['obj_id']))
+			jsonError('Некорректный ID объекта');
+		if(!$ids = _ids($_POST['ids']))
+			jsonError('Блоки не выбраны');
+
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id` IN (".$ids.")
+				ORDER BY `parent_id`,`y`,`x`";
+		if(!$BLK = query_arr($sql))
+			jsonError('Выбранные блоки не существуют');
+
+
+		//определение координаты Y текущего объекта, с которой нужно начинать вставку блоков
+		$Y_START = 0;
+		foreach(_BE('block_arr', $obj_name, $obj_id) as $r) {
+			if($r['parent_id'])
+				continue;
+			if($Y_START < ($r['y'] + $r['h']))
+				$Y_START = $r['y'] + $r['h'];
+		}
+
+
+		//определение сдвига у переносимых блоков
+		$cX = 1000;
+		$cY = 1000;
+		foreach($BLK as $id => $r) {
+			if($cX > $r['x'])
+				$cX = $r['x'];
+			if($cY > $r['y'])
+				$cY = $r['y'];
+		}
+
+
+		//получение всех дочерних блоков
+		$PASTE = _blockChildGet($BLK);
+
+
+		$pasteIds = array();
+		foreach($PASTE as $id => $r) {
+			//коррекция координат, если это верхний уровень
+			if(isset($BLK[$id])) {
+				$r['x'] -= $cX;
+				$r['y'] = $r['y'] - $cY + $Y_START;
+			}
+			$sql = "INSERT INTO `_block` (
+						`obj_name`,
+						`obj_id`,
+						`x`,
+						`y`,
+						`w`,
+						`h`,
+						`width`,
+						`width_auto`,
+						`height`,
+						`pos`,
+						`bg`,
+						`bor`,
+						`hidden`,
+						`user_id_add`
+					) VALUES (
+						'".$obj_name."',
+						".$obj_id.",
+						".$r['x'].",
+						".$r['y'].",
+						".$r['w'].",
+						".$r['h'].",
+						".$r['width'].",
+						".$r['width_auto'].",
+						".$r['height'].",
+						'".$r['pos']."',
+						'".$r['bg']."',
+						'".$r['bor']."',
+						'".$r['hidden']."',
+						".USER_ID."
+					)";
+			$pasteIds[$id] = query_id($sql);
+		}
+
+		//восстановление id родителей
+		foreach($PASTE as $id => $r) {
+			if(isset($BLK[$id]))
+				continue;
+
+			$sql = "UPDATE `_block`
+					SET `parent_id`=".$pasteIds[$r['parent_id']]."
+					WHERE `id`=".$pasteIds[$id];
+			query($sql);
+		}
+
+
+		//копирование элементов
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `block_id` IN ("._idsGet($PASTE).")";
+		foreach(query_arr($sql) as $r) {
+			$block_id = $pasteIds[$r['block_id']];
+
+			//копировать можно пока не все элементы
+			switch($r['dialog_id']) {
+				case 1:
+				case 3:
+				case 5:
+				case 8:
+				case 9:
+				case 10:
+				case 21:
+				case 35:
+				case 57://меню переключения блоков
+				case 60:
+				case 300:
+					$sql = "INSERT INTO `_element` (
+								`app_id`,
+								`block_id`,
+								`dialog_id`,
+								`col`,
+								`name`,
+								`req`,
+								`req_msg`,
+								`nosel`,
+								`focus`,
+								`width`,
+								`color`,
+								`font`,
+								`size`,
+								`mar`,
+								`txt_1`,
+								`txt_2`,
+								`txt_3`,
+								`txt_4`,
+								`txt_5`,
+								`txt_6`,
+								`txt_7`,
+								`txt_8`,
+								`txt_9`,
+								`txt_10`,
+								`num_1`,
+								`num_2`,
+								`num_3`,
+								`num_4`,
+								`num_5`,
+								`num_6`,
+								`num_7`,
+								`num_8`,
+								`num_9`,
+								`num_10`,
+								`def`,
+								`sort`,
+								`user_id_add`
+							) VALUES (
+								(SELECT `app_id` FROM `_block` WHERE `id`=".$block_id."),
+								".$block_id.",
+								".$r['dialog_id'].",
+								'".$r['col']."',
+								'".$r['name']."',
+								".$r['req'].",
+								'".$r['req_msg']."',
+								".$r['nosel'].",
+								".$r['focus'].",
+								".$r['width'].",
+								'".$r['color']."',
+								'".$r['font']."',
+								".$r['size'].",
+								'".$r['mar']."',
+								'".addslashes($r['txt_1'])."',
+								'".addslashes($r['txt_2'])."',
+								'".addslashes($r['txt_3'])."',
+								'".addslashes($r['txt_4'])."',
+								'".addslashes($r['txt_5'])."',
+								'".addslashes($r['txt_6'])."',
+								'".addslashes($r['txt_7'])."',
+								'".addslashes($r['txt_8'])."',
+								'".addslashes($r['txt_9'])."',
+								'".addslashes($r['txt_10'])."',
+								".$r['num_1'].",
+								".$r['num_2'].",
+								".$r['num_3'].",
+								".$r['num_4'].",
+								".$r['num_5'].",
+								".$r['num_6'].",
+								".$r['num_7'].",
+								".$r['num_8'].",
+								".$r['num_9'].",
+								".$r['num_10'].",
+								".$r['def'].",
+								".$r['sort'].",
+								".USER_ID."
+							)";
+					$parent_id = query_id($sql);
+			}
+
+			//копирование дочерних элементов
+			switch($r['dialog_id']) {
+				case 57://меню переключения блоков
+					$sql = "SELECT *
+							FROM `_element`
+							WHERE `parent_id`=".$r['id']."
+							ORDER BY `sort`";
+					foreach(query_arr($sql) as $el) {
+						$blk = array();
+						foreach(_ids($el['txt_2'], 'arr') as $bid) {
+							if(empty($pasteIds[$bid]))
+								continue;
+							$blk[] = $pasteIds[$bid];
+						}
+						$sql = "INSERT INTO `_element` (
+									`app_id`,
+									`parent_id`,
+									`txt_1`,
+									`txt_2`,
+									`def`,
+									`sort`,
+									`user_id_add`
+								) VALUES (
+									(SELECT `app_id` FROM `_block` WHERE `id`=".$block_id."),
+									".$parent_id.",
+									'".addslashes($el['txt_1'])."',
+									'".implode(',', $blk)."',
+									".$el['def'].",
+									".$el['sort'].",
+									".USER_ID."
+								)";
+						query($sql);
+					}
+					//установка нового значения по умолчанию
+					$sql = "SELECT `id`
+							FROM `_element`
+							WHERE `parent_id`=".$parent_id."
+							  AND `def`
+							LIMIT 1";
+					$def = _num(query_value($sql));
+
+					$sql = "UPDATE `_element`
+							SET `def`=".$def."
+							WHERE `id`=".$parent_id;
+					query($sql);
+					break;
+			}
+
+		}
+
+
+
+		_blockChildCountSet($obj_name, $obj_id);
+		_blockAppIdUpdate($obj_name, $obj_id);
+		_BE('elem_clear');
+		_BE('block_clear');
+		_BE('dialog_clear');
+		_jsCache();
+
+		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
+		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
+
+		jsonSuccess($send);
+		break;
+
+/*
 	case 'block_choose_clone'://клонирование блоков
 		if(!$ids = _ids($_POST['ids']))
 			jsonError('Блоки не выбраны');
@@ -370,18 +632,8 @@ switch(@$_POST['op']) {
 		$obj_name = $arr[$key0]['obj_name'];
 		$obj_id = $arr[$key0]['obj_id'];
 
-		//получение конечной высоты для каждого parent_id
-		$blk = _BE('block_arr', $obj_name, $obj_id);
-		$hMax = array();
-		foreach($blk as $r) {
-			$pid = $r['parent_id'];
-			if(empty($hMax[$pid]))
-				$hMax[$pid] = 0;
 
-			$h = $r['y'] + $r['h'];
-			if($hMax[$pid] < $h)
-				$hMax[$pid] = $h;
-		}
+
 
 		$yCur = array();
 		$hCur = array();//текущая высота во время вставки блоков. Высота изменяется, если появляется блок из новой строки
@@ -443,6 +695,8 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+*/
+
 	case 'block_choose_move'://перенос блоков
 		if(!$parent_id = _num($_POST['parent_id']))
 			jsonError('Не корректный ID блока, в который нужно делать перенос');
@@ -479,6 +733,8 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+
+/*
 	case 'block_choose_del'://удаление выбранных блоков
 		if(!$ids = _ids($_POST['ids']))
 			jsonError('Блоки не выбраны');
@@ -559,8 +815,8 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+*/
 }
-
 
 function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерних блоков
 	$sql = "SELECT *
@@ -631,6 +887,48 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление кол�
 		query($sql);
 	}
 }
+
+function _blockChildGet($BLK) {//получение всех дочерних блоков в выбранных блоках
+	if(empty($BLK))
+		return array();
+
+	foreach($BLK as $bl) {
+		if(!$bl['child_count'])
+			continue;
+
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `parent_id`=".$bl['id'];
+		if(!$arr = query_arr($sql))
+			continue;
+
+		$arr = _blockChildGet($arr);
+
+		$BLK += $arr;
+	}
+
+	return $BLK;
+}
+function _blockLevelGet($BLK, $level=0) {//определение верхнего уровня todo пока не пригодилась
+	$ids = array();
+	foreach($BLK as $id => $bl) {
+		if(!$bl['parent_id'])
+			return $level;
+		$ids[] = $bl['parent_id'];
+	}
+
+	$ids = array_unique($ids);
+
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `id` IN (".implode(',', $ids).")";
+	if(!$arr = query_arr($sql))
+		return $level;
+
+	return _blockLevelGet($arr, $level+1);
+}
+
+/*
 function _blockChildCountAllUpdate() {//обновление количества дочерних блоков у всех объектов (разовая функция)
 	$sql = " SELECT DISTINCT `obj_name` FROM `_block`";
 	foreach(query_array($sql) as $arr)
@@ -642,6 +940,7 @@ function _blockChildCountAllUpdate() {//обновление количеств�
 				_blockChildCountSet($name, $id);
 		}
 }
+*/
 function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id приложения в блоках конкретного объекта
 	$app_id = 0;
 	switch($obj_name) {
