@@ -1208,8 +1208,15 @@ function _40cond($EL, $cond) {//изначальные условия отобр
 
 	$send = '';
 	foreach($arr as $r) {
-		if(!$ell = _elemOne($r['elem_id']))
-			return " AND !`t1`.`id` /* [40] отсутствует элемент ".$r['elem_id']." */";
+		if(!$ids = _ids($r['elem_id']))
+			return " AND !`t1`.`id` /* [40] элемент не получен */";
+		if(_ids($r['elem_id'], 'count') > 2)
+			return " AND !`t1`.`id` /* [40] уровень вложения > 2 не отработан */";
+
+		$elem_id = _idsLast($r['elem_id']);
+
+		if(!$ell = _elemOne($elem_id))
+			return " AND !`t1`.`id` /* [40] элемента ".$elem_id." не существует */";
 		if(!$col = $ell['col'])
 			return " AND !`t1`.`id` /* [40] отсутствует имя колонки */";
 		if(!$BL = $ell['block'])
@@ -1233,12 +1240,36 @@ function _40cond($EL, $cond) {//изначальные условия отобр
 		if($err = _40cond_err($val))
 			return $err;
 
-		$send .= "\n"._40condV(
+		$condV = "\n"._40condV(
 					$r['cond_id'],
 					$col,
 					$val
 				 ).
 			(DEBUG ? " /* [el:".$r['elem_id'].",cond:".$r['cond_id'].",txt:\"".$r['txt']."\",id:".$r['unit_id']."] */ " : '');
+
+
+
+		//если вложение - формирование запроса по идентификаторам
+		if(_ids($r['elem_id'], 'count') == 2) {
+			if(!$elem_id = _idsFirst($r['elem_id']))
+				return " AND !`t1`.`id` /* [40] не получен элемент-список */";
+			if(!$elsp = _elemOne($elem_id))
+				return " AND !`t1`.`id` /* [40] элемента-списка ".$elem_id." не существует */";
+			if(!_elemIsConnect($elsp))
+				return " AND !`t1`.`id` /* [40] элемент ".$elem_id." не является списком */";
+			if(!$DLG = _dialogQuery($elsp['num_1']))
+				return " AND !`t1`.`id` /* [40] диалога ".$elsp['num_1']." не существует */";
+			if(!$col = $elsp['col'])
+				return " AND !`t1`.`id` /* [40] не получено имя колонки */";
+			$send .= " AND `t1`.`".$col."` IN (
+						SELECT `id`
+						FROM  "._queryFrom($DLG)."
+						WHERE "._queryWhere($DLG).$condV."
+					   )";
+			continue;
+		}
+
+		$send .= $condV;
 	}
 
 	return $send;
@@ -1662,7 +1693,9 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 			case 59:
 				$upd = _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld);  //пересчёт количеств привязаного списка [54]
 				$upd += _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld); //пересчёт cумм привязаного списка [55]
-				_spisokUnitAfter27($dialog, $upd);                          //подсчёт балансов после обновления сумм [27]
+				$ids27 = _spisokUnitAfter27($dialog, $upd);                 //подсчёт балансов после обновления сумм [27]
+
+				_sum27filter($ids27);
 
 				_counterGlobal($cmp['num_1'], $dialog);
 				break;
@@ -1789,6 +1822,7 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=55
+			  AND `app_id`=".APP_ID."
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
 		return array();
@@ -1819,7 +1853,8 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 		$sql = "SELECT IFNULL(SUM(`".$colSum."`),0)
 				FROM "._queryFrom($dialog)."
 				WHERE `".$col."`=".$connect_id."
-				  AND "._queryWhere($dialog);
+				  AND "._queryWhere($dialog).
+					_40cond(array(), $r['txt_1']);
 		$sum = query_value($sql);
 
 		$sql = "UPDATE "._queryFrom($dlg)."
@@ -1907,7 +1942,9 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 }
 function _spisokUnitAfter27($DLG, $ass) {
 	if(empty($ass))
-		return;
+		return array();
+
+	$send = array();
 
 	foreach($ass as $elem_id => $as) {
 		if(!$el = _elemOne($elem_id))
@@ -1991,7 +2028,7 @@ function _spisokUnitAfter27($DLG, $ass) {
 				query($sql);
 			}
 
-
+			$send[$cmp['id']] = 1;
 
 			//флаг включенного счётчика-истории
 			if(!$cmp['num_3'])
@@ -2033,8 +2070,62 @@ function _spisokUnitAfter27($DLG, $ass) {
 			query($sql);
 		}
 	}
-}
 
+	return $send;
+}
+function _sum27filter($ids27) {//пересчёт значений, если баланс использовался в фильтре другого счётчика
+	if(empty($ids27))
+		return;
+
+	//поиск элемента баланса во всех суммах приложения
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=55
+			  AND `app_id`=".APP_ID."
+			  AND LENGTH(`txt_1`)";
+	if(!$arr = query_arr($sql))
+		return;
+
+	foreach($arr as $r) {
+		$vvv = htmlspecialchars_decode($r['txt_1']);
+		if(!$vvv = json_decode($vvv, true))
+			continue;
+
+		foreach($vvv as $v) {
+			if(!$elem_id = _idsLast($v['elem_id']))
+				continue;
+			if(!isset($ids27[$elem_id]))
+				continue;
+
+			//пересчёт суммы, использующую баланс в фильтре
+			_spisokUnitUpd55($r);
+
+			if(!$ell = _elemOne($r['id']))
+				continue;
+			if(!$BL = $ell['block'])
+				continue;
+			if($BL['obj_name'] != 'dialog')
+				continue;
+			if(!$DLG = _dialogQuery($BL['obj_id']))
+				continue;
+
+			foreach($DLG['cmp'] as $cmp) {
+				if($cmp['dialog_id'] != 27)
+					continue;
+
+				//получение баланса для обновления, если в нём использовалась изменённая сумма [55]
+				$sql = "SELECT COUNT(*)
+						FROM `_element`
+						WHERE `parent_id`=".$cmp['id']."
+						  AND `txt_2`=".$r['id'];
+				if(!query_value($sql))
+					continue;
+
+				_spisokUnitUpd27($cmp);
+			}
+		}
+	}
+}
 
 
 /* Глобальные счётчики */

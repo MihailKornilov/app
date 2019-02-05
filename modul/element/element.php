@@ -3275,7 +3275,7 @@ function PHP12_spfl_save($DLG) {
 				if(!empty($arr)) {
 					$v = array();
 					foreach($arr as $r) {
-						if(!$r['elem_id'] = _num($r['elem_id']))
+						if(!$r['elem_id'] = _ids($r['elem_id']))
 							continue;
 						if(!$r['cond_id'] = _num($r['cond_id']))
 							continue;
@@ -3309,13 +3309,14 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 		return $send;
 
 	foreach($arr as $n => $r) {
-		$arr[$n]['elem_title'] = _elemTitle($r['elem_id']);
+		$arr[$n]['elem_title'] = _elemIdsTitle($r['elem_id']);
 		$arr[$n]['spisok'] = array();
 		if($arr[$n]['elem_issp'] = _elemIsConnect($r['elem_id'])) {
 			$spisok = _29cnn($r['elem_id']);
 			$arr[$n]['spisok'] = PHP12_spfl_vvv_unshift($spisok);
 		} else {
-			$el = _elemOne($r['elem_id']);
+			$last = _idsLast($r['elem_id']);
+			$el = _elemOne($last);
 			if($el['dialog_id'] == 17) {
 				$arr[$n]['elem_issp'] = 1;
 				$arr[$n]['spisok'] = _elemVvv17($r['elem_id']);

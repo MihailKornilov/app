@@ -303,7 +303,7 @@ function _idsFirst($v) {//первое значение последовател
 	if(empty($v))
 		return 0;
 	if(!is_array($v))
-		$v = _ids($v, 1);
+		$v = _ids($v, 'arr');
 	if(!isset($v[0]))
 		return 0;
 

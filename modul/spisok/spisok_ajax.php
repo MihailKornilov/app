@@ -1390,37 +1390,20 @@ function _spisokUnitUpd55($unit) {//обновление сумм
 	$sql = "SELECT
 				`".$cmp['col']."`,
 				SUM(`".$sum_col."`)
-			FROM `"._table($DConn['table_1'])."`
-			WHERE `dialog_id`=".$dialog_id."
-			  AND `app_id`=".APP_ID."
+			FROM "._queryFrom($DConn)."
+			WHERE "._queryWhere($DConn)."
 			  AND `".$cmp['col']."`
-			  AND !`deleted`
+			  "._40cond(array(), $unit['txt_1'])."
 			GROUP BY `".$cmp['col']."`";
 	if(!$ass = query_ass($sql))//выход, если нечего обновлять
 		return;
 
-	$n = 1000;
-	$upd = array();
-	$cAss = count($ass);
 	foreach($ass as $id => $c) {
 		$sql = "UPDATE "._queryFrom($DSrc)."
 				SET `".$unit['col']."`=".$c."
 				WHERE `t1`.`id`=".$id."
 				  AND "._queryWhere($DSrc);
 		query($sql);
-/*
-		$upd[] = "(".$id.",".$c.")";
-		if(!--$cAss || !--$n) {
-			$sql = "INSERT INTO `"._table($DSrc['table_1'])."`
-						(`id`,`".$unit['col']."`)
-						VALUES ".implode(',', $upd)."
-					ON DUPLICATE KEY UPDATE
-						`".$unit['col']."`=VALUES(`".$unit['col']."`)";
-			query($sql);
-			$n = 1000;
-			$upd = array();
-		}
-*/
 	}
 }
 

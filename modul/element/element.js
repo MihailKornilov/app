@@ -2793,7 +2793,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
-				elem_id:_num(sp.find('.title').attr('val')),
+				elem_id:_ids(sp.find('.title').attr('val')),
 				cond_id:_num(sp.find('.cond-id').val()),
 				txt:sp.find('.cond-val').val(),
 				unit_id:_num(sp.find('.cond-sel').val(), 1)
@@ -2861,7 +2861,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 	PHP12_v_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
-			VC = D(ATTR_EL(el.id)).find('.elm-choose');//элементы в открытом диалоге для выбора
+			VC = D(ATTR_EL(el.id)).find('.elm-choose'),//элементы в открытом диалоге для выбора
+			_nest = function(v, dbl) {//разрешение прохода по списку (открытие второго диалога)
+				if(vvv.sev)
+					return false;
+				if(!ELMM[v].issp)
+					return false;
+				if(vvv.nest)
+					return true;
+				if(!dbl)
+					return false;
+				return true;
+			};
 
 		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
 		if(vvv.first) {
@@ -2877,7 +2888,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		}
 
 		//выбор одного из элеметов
-		VC.click(function() {
+		VC.on('click dblclick', function(e) {
 			var t = $(this),
 				v = _num(t.attr('val'));
 
@@ -2905,7 +2916,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			}
 
 			//нажатие по обычному элементу (не список)
-			if(vvv.sev || !vvv.nest || !ELMM[v].issp)
+			if(!_nest(v, e.type == 'dblclick'))
 				return;
 
 			V11_COUNT++;

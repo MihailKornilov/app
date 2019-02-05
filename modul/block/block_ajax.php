@@ -450,6 +450,8 @@ switch(@$_POST['op']) {
 			query($sql);
 		}
 
+		_blockChildCountSet($obj_name, $obj_id);
+		_blockAppIdUpdate($obj_name, $obj_id);
 
 		//копирование элементов
 		$sql = "SELECT *
@@ -602,9 +604,6 @@ switch(@$_POST['op']) {
 		}
 
 
-
-		_blockChildCountSet($obj_name, $obj_id);
-		_blockAppIdUpdate($obj_name, $obj_id);
 		_BE('elem_clear');
 		_BE('block_clear');
 		_BE('dialog_clear');
