@@ -2944,9 +2944,10 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 	if($BL['obj_name'] == 'page') {
 		if(!$page = _page($BL['obj_id']))
 			return 'Страницы '.$BL['obj_id'].' не существует.';
-		if($page['dialog_id_unit_get'])
-			return $page['dialog_id_unit_get'];
+//		if($page['dialog_id_unit_get'])
+//			return $page['dialog_id_unit_get'];
 		define('OBJ_NAME_CHOOSE', 'page');
+		return $BL['obj_id'];
 	}
 
 	//если указан диалог, проверка, чтобы был отправлен id родительского диалога
