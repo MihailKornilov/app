@@ -4298,6 +4298,19 @@ function PHP12_action_201($r) {//ЭЛЕМЕНТ: скрытие/показ бл�
 	if($r['dialog_id'] != 201)
 		return '';
 
+/*
+	apply_id: Действие с блоками: скрыть|показать
+	filter: Фильтр
+	initial_id: Значение, при котором происходит действие
+					-1: значение сброшено
+					-2: выбрано любое значение
+	revers: Обратное действие
+	target_ids: Блоки, на которые происходит воздействие
+	effect_id: Эффект
+
+*/
+
+
 	//Названия действия
 	$sql = "SELECT `txt_1`
 			FROM `_element`
@@ -4307,6 +4320,26 @@ function PHP12_action_201($r) {//ЭЛЕМЕНТ: скрытие/показ бл�
 
 	$c = count(_ids($r['target_ids'], 1));
 	$target = $c.' блок'._end($c, '', 'а', 'ов');
+
+	$initial = '-';
+	switch($r['initial_id']) {
+		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		default:
+			if(!$el = _elemOne($r['element_id']))
+				break;
+
+			switch($el['dialog_id']) {
+				case 29:
+				case 59:
+					if(!$DLG = _dialogQuery($el['num_1']))
+						break;
+					if(!$u = _spisokUnitQuery($DLG, $r['initial_id']))
+						break;
+					$initial = 'выбрано <b class="color-pay">'.$u['txt_1'].'</b>';
+			}
+
+	}
 
 
 	$effect = '';
@@ -4318,7 +4351,7 @@ function PHP12_action_201($r) {//ЭЛЕМЕНТ: скрытие/показ бл�
 		$name = query_value($sql);
 		$effect =   '<div class="fs12 grey mt2">'.
 						'Эффект: '.
-						'<span class="fs12 color-pay">'.$name.'</span>'.
+						'<span class="fs12 color-sal">'.$name.'</span>'.
 					'</div>';
 
 	}
@@ -4327,6 +4360,7 @@ function PHP12_action_201($r) {//ЭЛЕМЕНТ: скрытие/показ бл�
 
 	return
 	'<div class="b">'.$apply.' '.$target.'</div>'.
+	'<span class="grey">если</span> '.$initial.
 	$effect.
 	$revers;
 }
@@ -4354,7 +4388,7 @@ function PHP12_action_211($r) {//БЛОК: скрытие/показ блоко�
 		$name = query_value($sql);
 		$effect =   '<div class="fs12 grey mt2">'.
 						'Эффект: '.
-						'<span class="fs12 color-pay">'.$name.'</span>'.
+						'<span class="fs12 color-sal">'.$name.'</span>'.
 					'</div>';
 
 	}

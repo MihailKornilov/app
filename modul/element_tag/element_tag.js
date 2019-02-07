@@ -484,6 +484,8 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 	valueSet(o.multi ? '' : VALUE);
 
 	INP.keydown(function() {
+		if(dis)
+			return;
 		SEL.addClass('rs');
 		setTimeout(function() {
 			VALUE = 0;
