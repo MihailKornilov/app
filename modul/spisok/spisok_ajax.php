@@ -350,11 +350,6 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	unset($CMP_ARR[$dialog['id']]);
 
 
-//_SUN_OTHER($CMP_ARR);
-//print_r($CMP_ARR);
-//jsonError('Ok');
-
-
 
 	//регистрация нового пользователя [98] - перехват внесения данных
 	_auth98($dialog, $POST_CMP);
@@ -1003,6 +998,7 @@ function _SUN_OTHER($arr) {//внесение данных из других д�
 			continue;
 
 		$dialog = _dialogQuery($dlg_id);
+		$dialog['act'] = 1;
 		$unit_id = _SUN_INSERT($dialog);
 		_SUN_CMP_UPDATE($dialog, $val, $unit_id);
 		$unit = _spisokUnitQuery($dialog, $unit_id, true);
