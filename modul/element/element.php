@@ -1349,6 +1349,10 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 
 		//Select - выбор записи из другого списка (для связки)
 		case 29:
+			if($prm['unit_edit'])
+				if(_elemColDlgId($el['id'], true))
+					$prm['unit_edit'] = array();
+
 			$sel_id = _elemPrintV($el, $prm, $el['num_6']);
 			$sel_id = _elem29PageSel($el['num_1'], $sel_id);
 			$sel_id = _elem29DialogSel($prm, $sel_id);
@@ -1503,30 +1507,29 @@ function _elemVvv17($elem_id) {
 function _elemVvv37($prm) {//select - выбор имени колонки [37]
 	if(!$block = _blockOne($prm['srce']['block_id']))
 		return array();
-	//может производиться, только если элемент размещается в диалоге
+	//список колонок может быть получен при условии, если элемент размещается в диалоге
 	if($block['obj_name'] != 'dialog')
 		return array();
 	if(!$dlg = _dialogQuery($block['obj_id']))
 		return array();
-
-	$field = array();
-
-	//если диалог родительский, получение колонок родителя
-	if($parent_id = $dlg['dialog_id_parent']) {
-		$field = _elemVvv37parent($parent_id);
-		$PAR = _dialogQuery($parent_id);
-		//если таблицы одинаковые, отправка только родительских колонок
-		if(!$dlg['table_1'] || $dlg['table_1'] == $PAR['table_1'])
-			return $field;
-	}
 
 	//выбранная колонка, если редактирование записи
 	$uCol = '';
 	if($u = $prm['unit_edit'])
 		$uCol = $u['col'];
 
+	$field = _elemVvv37fieldDop($uCol);
+
+	//если диалог родительский, получение колонок родителя
+	if($parent_id = $dlg['dialog_id_parent']) {
+		$field = _elemVvv37parent($parent_id, $field);
+		$PAR = _dialogQuery($parent_id);
+		//если таблицы одинаковые, отправка только родительских колонок
+		if(!$dlg['table_1'] || $dlg['table_1'] == $PAR['table_1'])
+			return $field;
+	}
+
 	$field = _elemVvv37field($dlg, $uCol, $field);
-	$field = _elemVvv37fieldDop($dlg, $uCol, $field);
 
 	return $field;
 }
@@ -1599,7 +1602,9 @@ function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по ка
 
 	return $send;
 }
-function _elemVvv37fieldDop($dlg, $uCol, $send=array()) {
+function _elemVvv37fieldDop($uCol) {//дополнительная колонка - из другого списка
+	$send=array();
+
 	if(!$col_id = _num($uCol))
 		return $send;
 	if(!$el = _elemOne($col_id))
@@ -1617,11 +1622,10 @@ function _elemVvv37fieldDop($dlg, $uCol, $send=array()) {
 
 	return $send;
 }
-function _elemVvv37parent($dlg_id) {//колонки родительского диалога
+function _elemVvv37parent($dlg_id, $send) {//колонки родительского диалога
 	if(!$dlg = _dialogQuery($dlg_id))
-		return array();
+		return $send;
 
-	$send = array();
 	foreach($dlg['cmp'] as $id => $cmp) {
 		if(!$col = $cmp['col'])
 			continue;
@@ -2094,6 +2098,46 @@ function _elemCol($el) {//получение имени колонки
 		return '';
 
 	return $ell['col'];
+}
+function _elemColDlgId($elem_id, $oo=false) {//получение id диалога по имени колонки (для определения, вносит ли элемент данные из другого диалога)
+/*
+	$oo - OtherOnly: отправлять только флаг: елемент из своего диалога или нет
+*/
+
+	if(!$elem_id = _num($elem_id))
+		return 0;
+	if(!$el = _elemOne($elem_id))
+		return 0;
+
+	//определение диалога, в котором расположен элемент
+	if(!$BL = $el['block'])
+		return 0;
+	if($BL['obj_name'] != 'dialog')
+		return 0;
+	if(!$DLG = _dialogQuery($BL['obj_id']))
+		return 0;
+	if(empty($el['col']))
+		return $oo ? 0 : $DLG['id'];
+
+	//если текстовое название колонки, значит она принадлежит текущему диалогу
+	if(!$id = _num($el['col']))
+		return $oo ? 0 : $DLG['id'];
+
+	if(!$ell = _elemOne($id))
+		return 0;
+	if(!$BL = $ell['block'])
+		return 0;
+	if($BL['obj_name'] != 'dialog')
+		return 0;
+	//если текущий диалог не является дочерним - возврат диалога, в котором расположен элемент
+	if(!$parent_id = $DLG['dialog_id_parent'])
+		return $oo ? 0 : $BL['obj_id'];
+	//если родитель является владельцем элемента - возврат текущего диалога
+	if($parent_id == $BL['obj_id'])
+		return $oo ? 0 : $DLG['id'];
+
+	//сторонний диалог, от которого подключен элемент
+	return $BL['obj_id'];
 }
 
 function _elemTitle($elem_id) {//имя элемента или его текст

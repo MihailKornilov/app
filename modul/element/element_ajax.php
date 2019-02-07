@@ -110,8 +110,8 @@ switch(@$_POST['op']) {
 								'<td class="grey r">Страница:'.
 								'<td><input type="hidden" id="insert_action_page_id" value="'.$dialog['insert_action_page_id'].'" />'.
 
-							'<tr><td class="color-ref r h35">Воздействие на запись:'.
-								'<td><a id="insert_unit_change">не настроено</a>'.
+							'<tr><td class="blue r h35">Воздействие на запись:'.
+								'<td><a id="insert_unit_change" class="'.($dialog['insert_unit_change_elem_id'] ? 'color-pay b">' : 'grey">не ').'настроено</a>'.
 
 						'</table>'.
 					'</div>'.

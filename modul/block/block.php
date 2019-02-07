@@ -754,6 +754,11 @@ function _elemStyleWidth($el) {//ширина элемента
 	return ' style="width:'.$width.'px"';
 }
 function _elemPrint($el, $prm) {//формирование и отображение элемента
+	//если элемент вносит данные из другого диалога - удаление данных записи, чтобы не было подстановки данных
+	if($prm['unit_edit'])
+		if(_elemColDlgId($el['id'], true))
+			$prm['unit_edit'] = array();
+
 	switch($el['dialog_id']) {
 		//галочка
 		case 1:

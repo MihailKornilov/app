@@ -1,14 +1,14 @@
 <?php
 switch(@$_POST['op']) {
 	case 'spisok_add'://внесение новой записи
-		$send = _spisokUnitUpdate();
+		$send = _SUN();
 		jsonSuccess($send);
 		break;
 	case 'spisok_save'://сохранение данных записи
 		if(!$unit_id = _num($_POST['unit_id'], 1))
 			jsonError('Некорректный id единицы списка');
 
-		$send = _spisokUnitUpdate($unit_id);
+		$send = _SUN($unit_id);
 
 		jsonSuccess($send);
 		break;
@@ -336,16 +336,25 @@ function _spisokUnitDialog($unit_id) {//получение данных о ди�
 
 	return $dialog;
 }
-function _spisokUnitUpdate($unit_id=0) {//внесение/редактирование единицы списка
+function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактирование записи
 	$dialog = _spisokUnitDialog($unit_id);
 
 	define('ACT', $unit_id ? 'edit' : 'insert');
-	$dialog['act'] = ACT == 'insert' ? 1 : 2;//для счётчиков
-	define('IS_ELEM', $dialog['table_1'] == 5);// '_element'
+	$dialog['act'] = ACT == 'insert' ? 1 : 2;  //для счётчиков
+	define('IS_ELEM', $dialog['table_name_1'] == '_element');
 
 	$unitOld = IS_ELEM ? _elemOne($unit_id) : _spisokUnitQuery($dialog, $unit_id);
 
-	$POST_CMP = _SUN_CMP_TEST($dialog, $unit_id);
+	$CMP_ARR = _SUN_CMP_TEST($dialog, $unit_id);
+	$POST_CMP = !empty($CMP_ARR[$dialog['id']]) ? $CMP_ARR[$dialog['id']] : array();
+	unset($CMP_ARR[$dialog['id']]);
+
+
+//_SUN_OTHER($CMP_ARR);
+//print_r($CMP_ARR);
+//jsonError('Ok');
+
+
 
 	//регистрация нового пользователя [98] - перехват внесения данных
 	_auth98($dialog, $POST_CMP);
@@ -385,6 +394,10 @@ function _spisokUnitUpdate($unit_id=0) {//внесение/редактиров�
 	_spisokUnitUpd42($dialog, $POST_CMP);
 	_spisokUnitDelSetup($dialog, $unit_id);
 //	_spisokUnitBalansUpd($dialog, $POST_CMP);
+
+
+	//внесение данных из других диалогов (если есть)
+	_SUN_OTHER($CMP_ARR);
 
 	//получение обновлённых данных записи
 	$unit = IS_ELEM ? _elemOne($unit_id, true) : _spisokUnitQuery($dialog, $unit_id, true);
@@ -500,6 +513,12 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 			continue;
 		if(!$col = _elemCol($cmp))
 			continue;
+		//диалог, которому принадлежит колонка
+		if(!$COL_DLG_ID = _elemColDlgId($cmp_id))
+			continue;
+
+		//является ли колонка элемент из текущего диалога
+		$cur = $dialog['id'] == $COL_DLG_ID;
 
 		$v = _txt($CMP[$cmp_id]);
 
@@ -510,12 +529,13 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 		switch($cmp['dialog_id']) {
 			//текстовое поле
 			case 8:
-				if($cmp['req'] && !strlen($v))
+				if($cur && $cmp['req'] && !strlen($v))
 					$is_err = 1;
 				//цифры и числа
 				if($cmp['num_1'] == 33) {
 					$v = round($v, $cmp['num_2']);
-					if($cmp['req'] && !$v && !$cmp['num_4'])
+					//разрешение вностиь Ноль
+					if($cur && $cmp['req'] && !$v && !$cmp['num_4'])
 						$is_err = 1;
 					if($v < 0 && !$cmp['num_3']) {
 						$is_err = 1;
@@ -536,11 +556,11 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 						}
 					}
 
-				$send[$cmp_id] = $v;
+				$send[$COL_DLG_ID][$cmp_id] = $v;
 				break;
 			//поле-пароль
 			case 9:
-				if($cmp['req'] && !strlen($v)) {
+				if($cur && $cmp['req'] && !strlen($v)) {
 					$is_err = 1;
 					break;
 				}
@@ -552,7 +572,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				}
 
 				if($v)
-					$send[$cmp_id] = _authPassMD5($v);
+					$send[$COL_DLG_ID][$cmp_id] = _authPassMD5($v);
 				break;
 			//Select: выбор записи из другого списка
 			case 29:
@@ -561,10 +581,10 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				if($cmp['num_7'] && !$v)
 					$v = _elem29ValAuto($cmp, $_POST['vvv'][$cmp_id]);
 
-				if($cmp['req'] && !$v)
+				if($cur && $cmp['req'] && !$v)
 					$is_err = 1;
 
-				$send[$cmp_id] = $v;
+				$send[$COL_DLG_ID][$cmp_id] = $v;
 				break;
 			//страница ВК
 			case 300:
@@ -572,12 +592,12 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 					$is_err = 1;
 					$err_msg = 'Учётная запись vk.com: '.$v.' закреплена'.
 							   '<br>'.
-							   'за другим пользователем в приложении';
+							   'за другим пользователем в системе';
 				}
-				$send[$cmp_id] = $v;
+				$send[$COL_DLG_ID][$cmp_id] = $v;
 				break;
 			default:
-				if($cmp['req'] && !$v)
+				if($cur && $cmp['req'] && !$v)
 					$is_err = 1;
 
 				$ex = explode('_', $col);
@@ -588,7 +608,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				if($ex[0] == 'cena')
 					$v = _cena($v, 1);
 
-				$send[$cmp_id] = $v;
+				$send[$COL_DLG_ID][$cmp_id] = $v;
 		}
 
 		if($is_err)
@@ -599,14 +619,14 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 	}
 
 	if($dialog['cmp_no_req'] && !$send)
-		return array();
+		return array($dialog['id']=>array());
 
 	if(!$send)
 		jsonError('Нет данных для внесения');
 
 	return $send;
 }
-function _SUN_INSERT($DLG, $unit_id) {//внесение новой записи, если отсутствует
+function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой записи, если отсутствует
 	if($unit_id)
 		return $unit_id;
 	if(!$DLG['table_1'])
@@ -946,17 +966,6 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 	}
 
 	foreach($POST_CMP as $cmp_id => $v) {
-/*
-		if(!$cmp = _elemOne($cmp_id))
-			continue;
-		//пропуск дополнительных колонок из других диалогов
-		if($col_id = _num($cmp['col'])) {
-			if(!$el = _elemOne($col_id))
-				continue;
-			if($el['block']['obj_id'] != $DLG['id'])
-				continue;
-		}
-*/
 		if(!$col = _elemCol($cmp_id))
 			continue;
 		if(!$tab = _queryTN($DLG, $col, 1))
@@ -977,6 +986,27 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 				WHERE `id`=".$unit_id."
 				  AND `user_id_add`=-".USER_ID;
 		query($sql);
+	}
+}
+function _SUN_OTHER($arr) {//внесение данных из других диалогов
+	if(empty($arr))
+		return;
+
+	foreach($arr as $dlg_id => $val) {
+		$insert = true;
+		foreach($val as $cmp_id => $v) {
+			$cmp = _elemOne($cmp_id);
+			if($cmp['req'] && !$v)
+				$insert = false;
+		}
+		if(!$insert)
+			continue;
+
+		$dialog = _dialogQuery($dlg_id);
+		$unit_id = _SUN_INSERT($dialog);
+		_SUN_CMP_UPDATE($dialog, $val, $unit_id);
+		$unit = _spisokUnitQuery($dialog, $unit_id, true);
+		_SUN_AFTER($dialog, $unit);
 	}
 }
 function _spisokUnitUpd42($DLG, $cmp) {//обновление некоторых данных другой записи [42]
