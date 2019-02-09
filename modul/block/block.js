@@ -533,13 +533,16 @@ $(document)
 				obj_name:spl[0],
 				obj_id:spl[1],
 				blk_choose:BCO_on,
-				blk_sel:_cookie('block_ids_copy'),
+				blk_sel:_cookie('block_ids_motion'),
 				level:p.find('.block-level-change.orange').html() || 1,
 				busy_obj:t
 			};
 
 		_post(send, function(res) {
-			$('._hint').remove();
+			var BIM = _cookie('block_ids_motion');
+			//удаление подсказки по переносу блоков, если блоки не были выбраны
+			if(!BCO_on)
+				$('._hint').remove();
 			t._dn(v, 'grey');
 			t._dn(!v, 'orange');
 			p.find('.block-level-change')._dn(!v);
@@ -560,13 +563,10 @@ $(document)
 					BLKK[i] = res.blk[i];
 
 
+			BCO.find('b').html(_ids(BIM, 1));
+			BCO.attr('val', BIM);
 
-			var ids = _cookie('block_ids_copy');
-
-			BCO.find('b').html(_ids(ids, 1));
-			BCO.attr('val', ids);
-
-			if(ids)
+			if(BIM)
 				return;
 
 			//включен выбор блоков
@@ -774,30 +774,40 @@ $(document)
 		but.removeClass('_busy');
 	})
 	.on('mouseenter', '.block-choose-on', function() {//выплывающая подсказка для действий с выбранными блоками
+		/*
+			используются cookie:
+				block_ids_motion - IDS блоков, которые копируются или переносятся
+				block_is_move - флаг переноса блоков, иначе копирование
+		*/
 		var t = $(this),
 			c = _num(t.find('b').html()),
 			ids = t.attr('val'),
 			p = t.parent(),
 			GRID_ON = p.find('.block-grid-on'),
 			bcoMsg = function() {
-				if(_cookie('block_ids_copy'))
-					return bcoCopy();
+				if(_cookie('block_ids_motion'))
+					return bcoMotion();
 
 				return '<table class="bs5">' +
 					'<tr><td class="line-b pb3">' +
 							'<button class="vk small w90 fl mr3 bco-copy">копировать</button>'+
 							'<div class="grey fs11"><b class="fs11 color-555">Продублировать</b> выделенные блоки в указанном месте.<div>' +
 
-					'<tr><td class="line-b pb3">' +
+					'<tr><td class="pb3">' +
 							'<button class="vk small w90 fl mr3 red bco-move">вырезать</button>'+
 							'<div class="grey fs11">Выделенные блоки будут <b class="fs11 color-555">перенесены</b> в указанное место.<div>' +
 				'</table>';
 			},
-			bcoCopy = function() {//сообщение когда блоки выбраны для копирования
-				return '<div class="b color-555 mar10">Выбран' + _end(c, ['', 'о']) + ' ' + c + ' блок' + _end(c, ['', 'а', 'ов']) + ' для копирования</div>' +
+			bcoMotion = function() {//сообщение когда блоки выбраны для копирования
+				var isMove = _num(_cookie('block_is_move'));
+				return '<div class="b color-555 mar10 center">' +
+							'Выбран' + _end(c, ['', 'о']) + ' ' + c + ' блок' + _end(c, ['', 'а', 'ов']) +
+							'<br>' +
+							'для ' + (isMove ? '<b class="red">переноса</b>' : 'копирования') +
+					   '</div>' +
 					'<div class="_info ml10 mr10">' +
-						'Укажите <b>пустой блок</b> для вставки выбранных блоков.' +
-						'<div class="mt10">Либо <a class="b bco-paste-0">вставьте блоки</a> в нулевой уровень.</div>' +
+						'Укажите <b>пустой блок</b> для вставки.' +
+						'<div class="mt10">Либо <button class="vk small bco-paste-0 mtm3">вставьте блоки</button><br>в начальный уровень.</div>' +
 					'</div>' +
 					'<div class="mar10 center"><button class="vk small cancel bco-cancel">отменить выбор блоков</button></div>';
 			};
@@ -807,25 +817,8 @@ $(document)
 		if(t.hasClass('grey'))
 			return;
 
-		var msg =
-
-			'<table class="bs5" id="blk-cho-but">' +
-
-				'<tr><td class="line-b pb3">' +
-						'<button class="vk small w175 fl mr3 orange">переместить на страницу</button>'+
-						'<div class="grey fs11">Укажите страницу,<br>на которую нужно будет переместить блоки и элементы.<div>' +
-			'</table>' +
-
-			'<div class="mar5" id="blk-cho-cut-info">' +
-				'<div class="_info">' +
-					'Укажите блок, в который будут <b>перенесены</b> выбранные блоки. ' +
-					'<br>' +
-					'Указанный блок не должен содержать элемент, а также его <b>ширина</b> должна быть <b>больше или равна</b> максимальной ширине вставляемых блоков.' +
-				'</div>' +
-			'</div>';
-
 		t._hint({
-			width:250,
+			width:210,
 			msg:bcoMsg(),
 			side:'right',
 			ugPos:40,
@@ -836,15 +829,29 @@ $(document)
 					//блоки выбраны для копирования
 					.off('click', '.bco-copy')
 					 .on('click', '.bco-copy', function() {
-						_cookie('block_ids_copy', ids);
-						o.html(bcoCopy());
+						_cookie('block_ids_motion', ids);
+						_cookie('block_is_move', 0);
+						o.html(bcoMotion());
+						GRID_ON.removeClass('grey').trigger('click');
+						GRID_ON.removeClass('_busy');
+					})
+
+					//блоки выбраны для переноса
+					.off('click', '.bco-move')
+					 .on('click', '.bco-move', function() {
+						_cookie('block_ids_motion', ids);
+						_cookie('block_is_move', 1);
+						o.html(bcoMotion());
+						GRID_ON.removeClass('grey').trigger('click');
+						GRID_ON.removeClass('_busy');
 					})
 
 					//отмена выбранных блоков
 					.off('click', '.bco-cancel')
 					 .on('click', '.bco-cancel', function() {
-						_cookie('block_ids_copy', '');
+						_cookie('block_ids_motion', '');
 						o.html(bcoMsg());
+						$('._hint').remove();
 						GRID_ON.removeClass('grey').trigger('click');
 						GRID_ON.removeClass('_busy');
 					})
@@ -857,7 +864,8 @@ $(document)
 								op:'block_choose_paste_0',
 								obj_name:p.attr('val').split(':')[0],
 								obj_id:p.attr('val').split(':')[1],
-								ids:_cookie('block_ids_copy'),
+								ids:_cookie('block_ids_motion'),
+								move:_cookie('block_is_move'),
 								busy_obj:tt
 							};
 						_post(send, function(res) {
@@ -869,37 +877,6 @@ $(document)
 								ELMM[i] = res.elm[i];
 						});
 					});
-				return;
-				//клонирование
-				o.find('button:first').click(function() {
-					var but = $(this),
-						send = {
-							op:'block_choose_clone',
-							ids:ids,
-							busy_obj:but
-						};
-					_post(send, function() {
-						GRID_ON.removeClass('grey').trigger('click');
-						GRID_ON.removeClass('_busy');
-					});
-				});
-				//вырезка и перенос
-				o.find('button').eq(2).click(function() {
-					$('#blk-cho-but')._dn();
-					$('#blk-cho-cut-info')._dn(1);
-					$('.blk-choose.sel').removeClass('sel');
-				});
-				//перемещение на другую страницу
-				o.find('button').eq(3).click(function() {
-					_dialogLoad({
-						dialog_id:97,
-						dop:ids,
-						busy_obj:$(this),
-						func_save:function() {
-							location.reload();
-						}
-					});
-				});
 			}
 		});
 	})

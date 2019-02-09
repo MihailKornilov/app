@@ -4668,60 +4668,6 @@ function PHP12_cron_dst_prm_ass($dst) {//ассоциативный массив
 
 
 
-/* ---=== ПОДСТАНОВКА ID ВЫБРАННЫХ БЛОКОВ ДЛЯ ПЕРЕМЕЩЕНИЯ НА СТРАНИЦУ [97] ===--- */
-function PHP12_block_ids_page($prm) {
-	$el12 = $prm['el12'];
-	$msg = '';
-	if($ids = _ids($prm['srce']['dop'])) {
-		$c = _ids($ids, 'count');
-		$msg = 'выбран'._end($c, '', 'о').' '.$c.' блок'._end($c, '', 'а', 'ов');
-	}
-	return
-	'<input type="hidden" id="'._elemAttrId($el12, $prm).'" value="'.$ids.'" />'.
-	'<input type="text" class="w200 curD'._dn(!$msg, 'b color-ref').'" readonly placeholder="блоки не были выбраны" value="'.$msg.'" />';
-}
-function PHP12_block_ids_page_move($dlg) {
-	if($dlg['id'] != 97)
-		return;
-
-	$page_id = 0;
-	$ids = '';
-
-	foreach($dlg['cmp'] as $cmp_id => $cmp)
-		switch($cmp['dialog_id']) {
-			case 6: $page_id = _num(@$_POST['cmp'][$cmp_id]); break;
-			case 12: $ids = _ids(@$_POST['cmp'][$cmp_id]); break;
-		}
-
-	if(!$page_id)
-		jsonError('Не выбрана страница');
-	if(!$ids)
-		jsonError('Не выбраны блоки');
-	if($page_id == _num(@$_POST['page_id']))
-		jsonError('Выберите другую страницу');
-
-
-	$ass = array();
-	foreach(_ids($ids, 'arr') as $block_id) {
-		$ass[$block_id] = 1;
-		$ass += _BE('block_child_ids', $block_id);
-	}
-
-	$sql = "UPDATE `_block`
-			SET `obj_id`=".$page_id."
-			WHERE `id` IN ("._idsGet($ass, 'key').")";
-	query($sql);
-
-	_cache_clear('page');
-	_BE('block_clear');
-	_jsCache();
-
-	jsonSuccess();
-}
-
-
-
-
 
 
 /* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
