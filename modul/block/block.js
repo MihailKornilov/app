@@ -540,9 +540,11 @@ $(document)
 
 		_post(send, function(res) {
 			var BIM = _cookie('block_ids_motion');
+
 			//удаление подсказки по переносу блоков, если блоки не были выбраны
 			if(!BCO_on)
 				$('._hint').remove();
+
 			t._dn(v, 'grey');
 			t._dn(!v, 'orange');
 			p.find('.block-level-change')._dn(!v);
@@ -566,7 +568,8 @@ $(document)
 			BCO.find('b').html(_ids(BIM, 1));
 			BCO.attr('val', BIM);
 
-			if(BIM)
+			//если выбор блоков не включен, выход
+			if(!BCO_on)
 				return;
 
 			//включен выбор блоков
@@ -578,6 +581,29 @@ $(document)
 					v = tt.attr('val'),
 					sel = tt.hasClass('sel');
 
+
+				//процесс переноса блоков
+				if(BIM) {
+					if(bc.hasClass('_busy'))
+						return;
+
+					var send = {
+						op:'block_choose_move',
+						parent_id:v,
+						ids:BIM,
+						busy_obj:tt
+					};
+					_post(send, function() {
+						_cookie('block_ids_motion', '');
+						t.removeClass('grey').trigger('click');
+						t.removeClass('_busy');
+						_msg();
+					});
+					return;
+				}
+
+
+
 				tt[(sel ? 'remove' : 'add') + 'Class']('sel');
 
 				var seld = [];
@@ -588,51 +614,6 @@ $(document)
 				BCO.find('b').html(seld.length);
 				BCO.attr('val', seld.join());
 			});
-
-/*
-			if(BCO_on) {
-				var bc = CONTENT.find('.blk-choose');
-
-				//подсветка блока при выборе
-				bc.click(function() {
-					var tt = $(this),
-						v = tt.attr('val'),
-						sel = tt.hasClass('sel');
-
-					//процесс переноса блоков
-					if(BLOCK_CUT_IDS) {
-						if(bc.hasClass('_busy'))
-							return;
-
-						var send = {
-								op:'block_choose_move',
-								parent_id:v,
-								ids:BLOCK_CUT_IDS,
-								busy_obj:tt
-							};
-						_post(send, function() {
-							BLOCK_CUT_IDS = 0;
-							t.removeClass('grey').trigger('click');
-							t.removeClass('_busy');
-							_msg();
-						});
-
-						return;
-
-					}
-
-					tt[(sel ? 'remove' : 'add') + 'Class']('sel');
-
-					var seld = [];
-					_forEq(bc, function(sp) {
-						if(sp.hasClass('sel'))
-							seld.push(sp.attr('val'));
-					});
-					BCO.find('b').html(seld.length);
-					BCO.attr('val', seld.join());
-				});
-			}
-*/
 		});
 	})
 	.on('click', '.elem-width-change', function() {//включение/выключение изменения ширины элементов
@@ -859,18 +840,21 @@ $(document)
 					//вставка на нулевой уровень
 					.off('click', '.bco-paste-0')
 					 .on('click', '.bco-paste-0', function() {
+					 	var op = 'block_choose_paste_0_copy';
+					 	if(_num(_cookie('block_is_move')))
+					 		op = 'block_choose_paste_0_move';
 					 	var tt = $(this),
 							send = {
-								op:'block_choose_paste_0',
+								op:op,
 								obj_name:p.attr('val').split(':')[0],
 								obj_id:p.attr('val').split(':')[1],
 								ids:_cookie('block_ids_motion'),
-								move:_cookie('block_is_move'),
 								busy_obj:tt
 							};
 						_post(send, function(res) {
 							GRID_ON.removeClass('grey').trigger('click');
 							GRID_ON.removeClass('_busy');
+							_cookie('block_ids_motion', '');
 							for(var i in res.blk)
 								BLKK[i] = res.blk[i];
 							for(var i in res.elm)

@@ -373,8 +373,6 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	PHP12_history_setup_save($dialog);
 	//сохранение выбранных элементов для правила - через [1000] - перехват внесения данных
 	PHP12_elem_all_rule_setup_save($dialog);
-	//перемещение блоков на выбранную страницу - через [97] - перехват внесения данных
-	PHP12_block_ids_page_move($dialog);
 
 
 	$unit_id = _SUN_INSERT($dialog, $unit_id);

@@ -357,7 +357,7 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
-	case 'block_choose_paste_0'://вставка выбранных блоков на нулевой уровень
+	case 'block_choose_paste_0_copy'://вставка выбранных блоков на нулевой уровень - копирование
 		if(!$obj_name = _blockName($_POST['obj_name']))
 			jsonError('Несуществующее имя объекта');
 		if(!$obj_id = _num($_POST['obj_id']))
@@ -383,7 +383,7 @@ switch(@$_POST['op']) {
 		}
 
 
-		//определение сдвига у переносимых блоков
+		//определение сдвига у переносимых блоков по X
 		$cX = 1000;
 		$cY = 1000;
 		foreach($BLK as $id => $r) {
@@ -602,6 +602,91 @@ switch(@$_POST['op']) {
 			}
 
 		}
+
+
+		_BE('elem_clear');
+		_BE('block_clear');
+		_BE('dialog_clear');
+		_jsCache();
+
+		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
+		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
+
+		jsonSuccess($send);
+		break;
+	case 'block_choose_paste_0_move'://вставка выбранных блоков на нулевой уровень - перенос
+		if(!$obj_name = _blockName($_POST['obj_name']))
+			jsonError('Несуществующее имя объекта');
+		if(!$obj_id = _num($_POST['obj_id']))
+			jsonError('Некорректный ID объекта');
+		if(!$ids = _ids($_POST['ids']))
+			jsonError('Блоки не выбраны');
+
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id` IN (".$ids.")
+				ORDER BY `parent_id`,`y`,`x`";
+		if(!$BLK = query_arr($sql))
+			jsonError('Выбранные блоки не существуют');
+
+
+		//определение координаты Y текущего объекта, с которой нужно начинать вставку блоков
+		$Y_START = 0;
+		foreach(_BE('block_arr', $obj_name, $obj_id) as $r) {
+			if($r['parent_id'])
+				continue;
+			if($Y_START < ($r['y'] + $r['h']))
+				$Y_START = $r['y'] + $r['h'];
+		}
+
+
+		//определение сдвига у переносимых блоков по X
+		$cX = 1000;
+		$cY = 1000;
+		foreach($BLK as $id => $r) {
+			if($cX > $r['x'])
+				$cX = $r['x'];
+			if($cY > $r['y'])
+				$cY = $r['y'];
+		}
+
+
+		//получение всех дочерних блоков
+		$PASTE = _blockChildGet($BLK);
+
+
+		foreach($BLK as $id => $r) {
+			//коррекция координат
+			$r['x'] -= $cX;
+			$r['y'] = $r['y'] - $cY + $Y_START;
+			$sql = "UPDATE `_block`
+					SET `x`=".$r['x'].",
+						`y`=".$r['y']."
+					WHERE `id`=".$id;
+			query($sql);
+		}
+
+
+		//изменение объекта у всех перенесённых блоков
+		$sql = "UPDATE `_block`
+				SET `obj_name`='".$obj_name."',
+					`obj_id`=".$obj_id."
+				WHERE `id` IN ("._idsGet($PASTE).")";
+		query($sql);
+
+
+		_blockChildCountSet($obj_name, $obj_id);
+		_blockAppIdUpdate($obj_name, $obj_id);
+
+		//изменение приложения у всех перенесённых элементов
+		$sql = "UPDATE `_element` `el`
+				SET `app_id`=(
+					SELECT `app_id`
+					FROM `_block`
+					WHERE `id`=`el`.`block_id`
+				)
+				WHERE `block_id` IN ("._idsGet($PASTE).")";
+		query($sql);
 
 
 		_BE('elem_clear');
