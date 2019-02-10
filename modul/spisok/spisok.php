@@ -821,10 +821,8 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 		//внешняя ссылка
 		case 224:
-			if(!$func['target_ids'])
-				return $txt;
 			$link = $func['target_ids'] ? $func['target_ids'] : $txt;
-			return '<a href="'.$link.'" class="inhr" target="_blank">'.$txt.'</a>';
+			return '<a href="//'.$link.'" class="inhr" target="_blank">'.$txt.'</a>';
 	}
 
 	return _spisokUnitTT($el, $u, $txt);
