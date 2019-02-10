@@ -4281,6 +4281,7 @@ function PHP12_action_list($prm) {
 							PHP12_action_221($r).
 							PHP12_action_222($r).
 							PHP12_action_223($r).
+							PHP12_action_224($r).
 						'</div>'.
 					'<td class="w50 r top">'.
 						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
@@ -4517,14 +4518,14 @@ function PHP12_action_223($r) {//ЭЛЕМЕНТ: тёмная подсказка
 	'<span class="color-pay">'._elemIdsTitle($v).'</span>';
 }
 function PHP12_action_224($r) {//ЭЛЕМЕНТ: внешняя ссылка
-	if($r['dialog_id'] != 223)
+	if($r['dialog_id'] != 224)
 		return '';
-	if(!$r['target_ids'])
-		return '<div class="red">Ссылка не указана</div>';
 
 	return
 	'<span class="grey">Ссылка:</span> '.
-	'<span class="blue">'.$r['target_ids'].'</span>';
+	($r['target_ids'] ?
+		'<span class="blue">'.$r['target_ids'].'</span>'
+	: '<span class="grey">совпадает с содержанием элемента</span>');
 }
 
 
