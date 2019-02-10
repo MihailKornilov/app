@@ -955,6 +955,7 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 			$sql = "SELECT `id`
 					FROM `".$DLG['table_name_1']."`
 					WHERE `cnn_id`=".$unit_id."
+					  AND `app_id`=".APP_ID."
 					LIMIT 1";
 			$id2 = query_value($sql);
 			$uid[$PAR['table_name_1']] = $unit_id;
