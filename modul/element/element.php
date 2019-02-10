@@ -4516,6 +4516,16 @@ function PHP12_action_223($r) {//ЭЛЕМЕНТ: тёмная подсказка
 	'<span class="grey">Значение:</span> '.
 	'<span class="color-pay">'._elemIdsTitle($v).'</span>';
 }
+function PHP12_action_224($r) {//ЭЛЕМЕНТ: внешняя ссылка
+	if($r['dialog_id'] != 223)
+		return '';
+	if(!$r['target_ids'])
+		return '<div class="red">Ссылка не указана</div>';
+
+	return
+	'<span class="grey">Ссылка:</span> '.
+	'<span class="blue">'.$r['target_ids'].'</span>';
+}
 
 
 

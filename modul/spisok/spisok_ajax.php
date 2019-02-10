@@ -849,6 +849,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 		switch($DLG['id']) {
 			case 221:
 			case 222:
+			case 224:
 				$sql = "SELECT *
 						FROM `_action`
 						WHERE `id`=".$uid[$table_1];

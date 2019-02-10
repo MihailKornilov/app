@@ -818,6 +818,12 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 						_spisokUnitTT($el, $u).
 						$txt.
 				   '</a>';
+
+		//внешняя ссылка
+		case 224:
+			if(!$func['target_ids'])
+				return $txt;
+			return '<a href="'.$func['target_ids'].'" class="inhr" target="_blank">'.$txt.'</a>';
 	}
 
 	return _spisokUnitTT($el, $u, $txt);
