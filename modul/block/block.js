@@ -587,8 +587,12 @@ $(document)
 					if(bc.hasClass('_busy'))
 						return;
 
+				    var op = 'block_choose_copy';
+				    if(_num(_cookie('block_is_move')))
+				        op = 'block_choose_move';
+
 					var send = {
-						op:'block_choose_move',
+						op:op,
 						parent_id:v,
 						ids:BIM,
 						busy_obj:tt
