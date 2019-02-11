@@ -834,27 +834,28 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//search
 				case 7:
-					var timer,
-						started = 0,
-						v_last;
+					var process = 0,
+						v_last,
+						upd = function(v) {
+							process = 1;
+							FILTER[el.num_1][elm_id] = v;
+							_spisokUpdate(el.num_1, function() {
+								process = 0;
+								if(v_last != v)
+									upd(v_last);
+							});
+						};
 					ATR_CMP._search({
 						func:function(v) {
-							if(started)
-								return;
-							if(timer)
-								clearInterval(timer);
 							if(v_last == v)
 								return;
-							timer = setInterval(function() {
-								started = 1;
-								v_last = v;
-								FILTER[el.num_1][elm_id] = v;
-								_spisokUpdate(el.num_1, function() {
-									started = 0;
-									clearInterval(timer);
-									timer = 0;
-								});
-							}, 700);
+
+							v_last = v;
+
+							if(process)
+								return;
+
+							upd(v);
 						}
 					});
 					return;
