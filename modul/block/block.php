@@ -281,7 +281,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 				}
 
 			//пустота в конце
-			if(!$next && $widthMax)
+			if(!$next && $widthMax && empty($PARAM['td_no_end']))
 				$send .= '<td class="'.$bt.$bb.'" style="width:'.$widthMax.'px">';
 		}
 		$send .= '</table>'.

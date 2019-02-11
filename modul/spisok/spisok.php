@@ -512,6 +512,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 					0 - автоматически
 					2318 - по дате добавления
 					2319 - сотрировка (на основании поля sort)
+		num_4 - горизонтальное расположение списка
 
 		настройка шаблона через функцию PHP12_spisok14_setup
 	*/
@@ -558,8 +559,11 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	$send = '';
 	foreach($spisok as $id => $sp) {
 		$block = _BE('block_obj', 'spisok', $ELEM['id']);
-		$prm = array('unit_get'=>$sp);
-		$send .= '<div class="sp-unit" val="'.$id.'">'.
+		$prm = array(
+			'unit_get' => $sp,
+			'td_no_end' => $ELEM['num_4']
+		);
+		$send .= '<div class="sp-unit'._dn(!$ELEM['num_4'], 'dib').'" val="'.$id.'">'.
 					_blockLevel($block, $prm).
 				 '</div>';
 	}
