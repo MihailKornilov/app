@@ -776,7 +776,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(OBJ.dlgerr)
 			return;
 
-		var unit = OBJ.unit;
+		var unit = OBJ.unit,
+			focus7; //если фокус не будет установлен ни на один элемент, а также на объекте присутствует быстрый поиск, установка фокуса на него
 
 		_forIn(OBJ.vvv, function(vvv, elm_id) {
 			var el = ELMM[elm_id];
@@ -834,8 +835,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//search
 				case 7:
+					focus7 = ATR_CMP;
 					var process = 0,
-						v_last,
+						v_last = FILTER[el.num_1][elm_id],
 						upd = function(v) {
 							process = 1;
 							FILTER[el.num_1][elm_id] = v;
@@ -2109,12 +2111,23 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 
 		//установка фокуса на первый указанный элемент
+		var focus_set = false,
+			l;
 		_forIn(OBJ.vvv, function(vvv, id) {
 			if(ELMM[id].focus) {
+				l = _attr_cmp(id).val().length;
 				_attr_cmp(id).focus();
+				_attr_cmp(id)[0].setSelectionRange(l, l);
+				focus_set = true;
 				return false;
 			}
 		});
+		if(!focus_set && focus7) {
+			l = focus7.val().length;
+			focus7.focus();
+			focus7[0].setSelectionRange(l, l);//установка фокуса в конец строки
+		}
+
 	},
 	_elemHint = function(el) {//подключение подсказки к элементу
 		if(!el.hint)
