@@ -6248,7 +6248,10 @@ function _noteList($page_id, $obj_id) {
 								'<a class="b">'._user($r['user_id_add'], 'name').'</a>'.
 								'<div class="pale mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
 						'<tr>'.
-							'<td colspan="2" class="fs14">'._br($r['txt']).
+							'<td colspan="2" class="fs14">'.
+								'<div style="word-wrap:break-word;width:650px;">'.
+									_br($r['txt']).
+								'</div>'.
 					'</table>'.
 					'<div class="_note-to-cmnt dib b over1'._dn($n).'">'.
 						'<div class="icon icon-comment"></div>'.
@@ -6290,7 +6293,10 @@ function _noteCommentUnit($c) {//html одного комментария
 					'<a class="fs12">'._user($c['user_id_add'], 'name').'</a>'.
 					'<div class="fs12 pale mt2">'.FullDataTime($c['dtime_add'], 1).'</div>'.
 			'<tr>'.
-				'<td colspan="2">'._br($c['txt']).
+				'<td colspan="2">'.
+					'<div style="word-wrap:break-word;width:600px;">'.
+						_br($c['txt']).
+					'</div>'.
 		'</table>'.
 		'<div class="_comment-is-del">'.
 			'Комментарий удалён.'.
