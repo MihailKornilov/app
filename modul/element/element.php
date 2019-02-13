@@ -3490,6 +3490,8 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 		$sql = "DELETE FROM `_action` WHERE `element_id` IN (".$ids.")";
 		query($sql);
 	}
+
+	_BE('elem_clear');
 }
 function PHP12_td_setup_vvv($prm) {//получение данных ячеек таблицы
 	if(!$u = $prm['unit_edit'])

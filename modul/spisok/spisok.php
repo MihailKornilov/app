@@ -531,6 +531,8 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 	$IS_SORT = _spisokIsSort($ELEM['id']);
 
 	$order = "`t1`.`id` DESC";
+	if($tab = _queryTN($DLG, 'dtime_add'))
+		$order = "`".$tab."`.`dtime_add` DESC";
 	if($IS_SORT || $ELEM['num_3'] == 2319)
 		$order = "`sort`";
 
@@ -624,6 +626,8 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		return $ELEM['num_9'] ? _emptyMin(_br($ELEM['txt_1'])) : '';
 
 	$order = "`t1`.`id` DESC";
+	if($tab = _queryTN($DLG, 'dtime_add'))
+		$order = "`".$tab."`.`dtime_add` DESC";
 	if($ELEM['num_6'] || _spisokIsSort($ELEM['block_id']))
 		$order = "`sort`";
 
