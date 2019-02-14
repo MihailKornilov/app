@@ -6250,7 +6250,7 @@ function _noteList($page_id, $obj_id) {
 						'<tr>'.
 							'<td colspan="2" class="fs14">'.
 								'<div style="word-wrap:break-word;width:650px;">'.
-									_br($r['txt']).
+									_noteLink($r['txt']).
 								'</div>'.
 					'</table>'.
 					'<div class="_note-to-cmnt dib b over1'._dn($n).'">'.
@@ -6295,7 +6295,7 @@ function _noteCommentUnit($c) {//html одного комментария
 			'<tr>'.
 				'<td colspan="2">'.
 					'<div style="word-wrap:break-word;width:600px;">'.
-						_br($c['txt']).
+						_noteLink($c['txt']).
 					'</div>'.
 		'</table>'.
 		'<div class="_comment-is-del">'.
@@ -6304,7 +6304,23 @@ function _noteCommentUnit($c) {//html одного комментария
 		'</div>'.
 	'</div>';
 }
+function _noteLink($txt) {//поиск в тексте ссылок и обёртка
+	$preg_autolinks = array(
+	    'pattern' => array(
+	        "'[\w\+]+://[A-z0-9\.\?\+\-/_=&%#:;,]+[\w/=]+'si",
+	        "'([^/])(www\.[A-z0-9\.\?\+\-/_=&%#:;,]+[\w/=]+)'si",
+	    ),
+	    'replacement' => array(
+	        '<a href="$0" target="_blank" rel="nofollow">$0</a>',
+	        '$1<a href="http://$2" target="_blank" rel="nofollow">$2</a>',
+	    ));
+	$search = $preg_autolinks['pattern'];
+	$replace = $preg_autolinks['replacement'];
 
+	$txt = preg_replace($search, $replace, $txt);
+	return _br($txt);
+
+}
 
 
 
