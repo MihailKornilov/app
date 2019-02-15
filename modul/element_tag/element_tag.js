@@ -1858,18 +1858,8 @@ $.fn._calendar = function(o) {
 	tdMonUpd();
 	dayPrint();
 
-	INP.click(function() {
-		if(CAL.hasClass('disabled'))
-			return;
-		var on = CAL_ABS.hasClass('dn');
-		TAB_YEAR = VAL_YEAR;
-		TAB_MON = VAL_MON;
-		tdMonUpd();
-		dayPrint();
-		TD_WEEK._dn(1);
-		TAB_DAY._dn(1, 'mon');
-		CAL_ABS._dn(on);
-	});
+	INP.click(calShow);
+	CAL.find('.icon-calendar').click(calShow);
 	CAL.find('.cal-back').click(back);
 	CAL.find('.cal-next').click(next);
 	TD_MON.click(function() {
@@ -1897,6 +1887,19 @@ $.fn._calendar = function(o) {
 			$('._calendar' + attr + ' .cal-abs')._dn();
 		});
 
+
+	function calShow() {
+		if(CAL.hasClass('disabled'))
+			return;
+		var on = CAL_ABS.hasClass('dn');
+		TAB_YEAR = VAL_YEAR;
+		TAB_MON = VAL_MON;
+		tdMonUpd();
+		dayPrint();
+		TD_WEEK._dn(1);
+		TAB_DAY._dn(1, 'mon');
+		CAL_ABS._dn(on);
+	}
 	function valTest() {//проверка текущего значения, установка, если некорректное
 		var cur = CUR_YEAR + '-' + _nol(CUR_MON) + '-' + _nol(CUR_DAY);
 		if(o.time)
