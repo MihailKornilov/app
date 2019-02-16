@@ -782,10 +782,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		_forIn(OBJ.vvv, function(vvv, elm_id) {
 			var el = ELMM[elm_id];
 
-			if(!el) {
-				alert('несуществующий элемент ' + elm_id);
-				return;
-			}
+			if(!el)
+				throw('несуществующий элемент ' + elm_id);
 
 			el.id = elm_id;
 

@@ -908,7 +908,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			*/
 			return _br($el['txt_1']);
 
-		//Выбор элемента из диалога (выводится окно для выбора)
+		//Вставка значения записи
 		case 11:
 			/*
 				Вставка элемента через функцию PHP12_v_choose
@@ -974,7 +974,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
 			'</div>';
 
-		//Содержание единицы списка - шаблон
+		//Список-шаблон
 		case 14:
 			if(!$dialog_id = $el['num_1'])
 				return _emptyRed('Не указан список для вывода данных.');

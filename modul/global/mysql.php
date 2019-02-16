@@ -147,8 +147,15 @@ function _table($id=false) {//таблицы в базе с соответств
 
 	if($id === false)
 		return $tab;
-	if(!$id = _num($id))
-		return '';
+	//получение ID по имени таблицы
+	if(!_num($id)) {
+		if(empty($id))
+			return '';
+		foreach($tab as $tid => $name)
+			if($id == $name)
+				return $tid;
+		return 0;
+	}
 	if(empty($tab[$id]))
 		return '';
 

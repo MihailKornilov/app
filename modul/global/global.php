@@ -18,6 +18,7 @@ require_once GLOBAL_DIR.'/modul/global/date.php';
 require_once GLOBAL_DIR.'/modul/global/bug_func.php';
 require_once GLOBAL_DIR.'/modul/debug/debug.php';
 require_once GLOBAL_DIR.'/modul/db/db.php';
+require_once GLOBAL_DIR.'/modul/global/clone.php';
 require_once GLOBAL_DIR.'/modul/global/html.php';
 require_once GLOBAL_DIR.'/modul/global/user.php';
 require_once GLOBAL_DIR.'/modul/page/page.php';
