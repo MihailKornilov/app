@@ -669,6 +669,7 @@ function _jsCacheAppControl() {//проверка наличия файла JS �
 	if(file_exists(APP_PATH.'/js_cache/app'.APP_ID.'.js'))
 		return;
 	_jsCache();
+	_count_update();//обновление счётчиков, если приложение клонировано
 }
 function _jsCachePageSa() {//страницы SA для select
 	$page = _pageCache();

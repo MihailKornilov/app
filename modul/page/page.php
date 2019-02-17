@@ -807,8 +807,7 @@ function PHP12_pin_dialog_open($prm) {
 
 function _page_div() {//todo тест
 
-//	_clone();
-	return ;
+	return '';
 
 	return
 	'<div>'.

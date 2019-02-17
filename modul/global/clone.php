@@ -1,7 +1,70 @@
 <?php
-function _clone() {//клонирование приложения
-	define('CLONE_ID_SRC', 1); //id приложения-источника
-	define('CLONE_ID_DST', 9); //id приложения-получателя
+function PHP12_clone_on() {//получение диалогов, данные которых разрешены для переноса
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `clone_on`
+			  AND `table_1`=11
+			ORDER BY `name`";
+	if(!$arr = query_arr($sql))
+		return _emptyMin('Данные переноситься не будут. Только структура приложения.');
+
+	$sql = "SELECT
+				`dialog_id`,
+				COUNT(*)
+			FROM `_spisok`
+			WHERE `dialog_id` IN ("._idsGet($arr).")
+			GROUP BY `dialog_id`";
+	$ass = query_ass($sql);
+
+	$send = '';
+	foreach($arr as $id => $r)
+		$send .= '<div>'.
+					$r['name'].
+					'<span class="pale ml10">'.
+						'(<b>'._num(@$ass[$id]).'</b>)'.
+					'</span>'.
+				 '</div>';
+
+	return '<div class="ml20">'.$send.'</div>';
+}
+
+function _clone_go($DLG, $CMP) {
+	if($DLG['id'] != 120)
+		return;
+
+	$name = '';
+	foreach($DLG['cmp'] as $cmp_id => $r)
+		if($r['dialog_id'] == 8)
+			if(isset($CMP[$cmp_id]))
+				$name = $CMP[$cmp_id];
+
+	if(!$name)
+		jsonError('Не указано имя приложения');
+
+	//внесение приложения
+	$sql = "INSERT INTO `_app` (
+				`name`,
+				`user_id_add`
+			) VALUES (
+				'".addslashes($name)."',
+				".USER_ID."
+			)";
+	$app_id = query_id($sql);
+
+	_clone($app_id);
+	_app_user_access($app_id);
+
+	$send = array(
+		'action_id' => 2,
+		'action_page_id' => 0
+	);
+
+	jsonSuccess($send);
+}
+function _clone($appDst) {//клонирование приложения
+	define('CLONE_ID_SRC', APP_ID); //id приложения-источника
+	define('CLONE_ID_DST', $appDst);//id приложения-получателя
 
 	_clone_clear();
 	_clone_base();
@@ -19,6 +82,8 @@ function _clone() {//клонирование приложения
 	_clone_counter();
 	_clone_cron();
 	_clone_element_format();
+	_clone_element_hint();
+	_clone_spisok();
 
 	_debug_cache_clear();
 }
@@ -598,8 +663,13 @@ function _clone_blk_upd() {//обновление объектов для диа
 				break;
 		}
 
+		//замена элементов-указателей цвета
+		if($ids = _ids($r['bg']))
+			$r['bg'] = _clone_ids($ids, $assEL);
+
 		$sql = "UPDATE `_block`
-				SET `obj_id`=".$r['obj_id']."
+				SET `obj_id`=".$r['obj_id'].",
+					`bg`='".$r['bg']."'
 				WHERE `id`=".$block_id;
 		query($sql);
 	}
@@ -1258,6 +1328,72 @@ function _clone_element_hint() {
 
 					".USER_ID."
 				)";
+		query($sql);
+	}
+}
+function _clone_spisok() {
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".CLONE_ID_SRC."
+			  AND `clone_on`
+			  AND `table_1`=11
+			ORDER BY `name`";
+	if(!$dlg = query_arr($sql))
+		return;
+
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `dialog_id` IN ("._idsGet($dlg).")
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$ass = _clone_ass();
+	$assDLG = $ass[_table('_dialog')];
+
+	foreach($arr as $id => $r) {
+		$sql = "INSERT INTO `_spisok` (
+					`cnn_id`,
+					`app_id`,
+					`dialog_id`,
+					`num`,
+					`txt_1`,`txt_2`,`txt_3`,`txt_4`,`txt_5`,`txt_6`,`txt_7`,`txt_8`,`txt_9`,`txt_10`,
+					`num_1`,`num_2`,`num_3`,`num_4`,`num_5`,`num_6`,`num_7`,`num_8`,`num_9`,`num_10`,
+					`connect_1`,`connect_2`,`connect_3`,`connect_4`,`connect_5`,
+					`count_1`,`count_2`,`count_3`,`count_4`,`count_5`,
+					`cena_1`,`cena_2`,`cena_3`,`cena_4`,`cena_5`,
+					`sum_1`,`sum_2`,`sum_3`,`sum_4`,`sum_5`,`sum_6`,`sum_7`,`sum_8`,`sum_9`,`sum_10`,
+					`date_1`,`date_2`,`date_3`,`date_4`,`date_5`,
+					`image_1`,`image_2`,
+					`sort`,
+					`user_id_add`
+				) SELECT
+					`cnn_id`,
+					".CLONE_ID_DST.",
+					"._num(@$assDLG[$r['dialog_id']]).",
+					`num`,
+					`txt_1`,`txt_2`,`txt_3`,`txt_4`,`txt_5`,`txt_6`,`txt_7`,`txt_8`,`txt_9`,`txt_10`,
+					`num_1`,`num_2`,`num_3`,`num_4`,`num_5`,`num_6`,`num_7`,`num_8`,`num_9`,`num_10`,
+					`connect_1`,`connect_2`,`connect_3`,`connect_4`,`connect_5`,
+					`count_1`,`count_2`,`count_3`,`count_4`,`count_5`,
+					`cena_1`,`cena_2`,`cena_3`,`cena_4`,`cena_5`,
+					`sum_1`,`sum_2`,`sum_3`,`sum_4`,`sum_5`,`sum_6`,`sum_7`,`sum_8`,`sum_9`,`sum_10`,
+					`date_1`,`date_2`,`date_3`,`date_4`,`date_5`,
+					`image_1`,`image_2`,
+					`sort`,
+					".USER_ID."
+				  FROM `_spisok`
+				  WHERE `id`=".$id;
+		_clone_ass_save('_spisok', $id, query_id($sql));
+	}
+
+	$ass = _clone_ass();
+	$assSP = $ass[_table('_spisok')];
+
+	foreach($arr as $id => $r) {
+		$sql = "UPDATE `_spisok`
+				SET `parent_id`="._num(@$assSP[$r['parent_id']])."
+				WHERE `id`="._num($assSP[$id]);
 		query($sql);
 	}
 }

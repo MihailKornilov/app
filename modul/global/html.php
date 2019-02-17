@@ -204,8 +204,8 @@ function _auth98($dialog, $cmp) {//регистрация нового поль�
 
 	$pol = array(
 		0 => 0,
-		2073 => 1749,//мужской
-		2074 => 1750 //женский
+		2073 => 2,//мужской
+		2074 => 1 //женский
 	);
 
 	if(!$login = _authCmp($dialog, $cmp, 'login'))
@@ -523,6 +523,15 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 	if(_userApp($app_id))
 		return;
 
+	_app_user_access($app_id);
+
+	_cache_clear('AUTH_'.CODE, 1);
+	_cache_clear('page');
+	_cache_clear('user'.USER_ID);
+
+	_auth();
+}
+function _app_user_access($app_id) {//внесение доступа для пользователя после создания нового приложения
 	$sql = "INSERT INTO `_spisok` (
 				`app_id`,
 				`dialog_id`,
@@ -536,16 +545,11 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 			)";
 	query($sql);
 
+	//изменение текущего приложения на новое
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=".$app_id."
 			WHERE `code`='".CODE."'";
 	query($sql);
-
-	_cache_clear('AUTH_'.CODE, 1);
-	_cache_clear('page');
-	_cache_clear('user'.USER_ID);
-
-	_auth();
 }
 function _app_list() {//список приложений, которые доступны пользователю
 	if(!USER_ID)

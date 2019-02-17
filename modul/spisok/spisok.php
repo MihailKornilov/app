@@ -1645,6 +1645,266 @@ function _spisok59unit($elem_id, $unit_id) {//выбранное значени�
 
 
 
+/* ---=== CЧЁТЧИКИ: НАСТРОЙКА ===--- */
+function _spisokUnitBalansUpd($dialog, $POST_CMP) {//обновление значения стартовой суммы (для правильного подсчёта баланса)
+	/*
+		Стартовая сумма нужна для корректного отображения баланса (например, расчётного счёта)
+		Если при расчёте баланса содержится значение, которое было изменено, этот баланс должен будет пересчитан
+	*/
+	foreach($dialog['cmp'] as $cmp_id => $cmp) {
+		//только для элементов-балансов
+		if($cmp['dialog_id'] != 27)
+			continue;
+
+		//получение всех слагаемых баланса
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `parent_id`=".$cmp_id;
+		if(!$arr = query_arr($sql))
+			continue;
+
+		//поиск значения сохраняемого диалога, которое содержится в балансе
+		foreach($arr as $id => $r) {
+			if(!$elm_id = _num($r['txt_2']))
+				continue;
+			if(isset($POST_CMP[$elm_id]))
+				_spisokUnitUpd27($cmp);
+		}
+	}
+}
+function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс).
+/*
+	Выполняется:
+		1. При настройке баланса (через диалог [27])
+*/
+	if(!isset($unit['dialog_id']))
+		return;
+	if($unit['dialog_id'] != 27)
+		return;
+	//блок, в котором размещается "баланс"
+	if(!$block_id = _num($unit['block_id']))
+		return;
+	if(!$BL = _blockOne($block_id))
+		return;
+	if($BL['obj_name'] != 'dialog')
+		return;
+	//диалог, в котором размещаются значения (данные этого списка будут обновляться)
+	if(!$DSrc = _dialogQuery($BL['obj_id']))
+		return;
+
+	//предварительное обнуление значений перед обновлением
+	$sql = "UPDATE "._queryFrom($DSrc)."
+			SET `".$unit['col']."`=0
+			WHERE "._queryWhere($DSrc);
+	query($sql);
+
+	//получение всех слагаемых баланса
+	$sql = "SELECT
+				`id`,
+				`txt_2`,
+				`num_8`
+			FROM `_element`
+			WHERE `parent_id`=".$unit['id'];
+	if(!$item = query_arr($sql))
+		return;
+
+	//получение самих значений для подсчёта
+	$sql = "SELECT `id`,`col`
+			FROM `_element`
+			WHERE LENGTH(`col`)
+			  AND `id` IN ("._idsGet($item, 'txt_2').")";
+	if(!$colAss = query_ass($sql))
+		return;
+
+	//составление суммы из слагаемых
+	$upd = '';
+	foreach($item as $r) {
+		if(empty($colAss[$r['txt_2']]))
+			continue;
+		$znak = $r['num_8'] ? '-' : '+';
+		$upd .= $znak.'`'.$colAss[$r['txt_2']].'`';
+	}
+
+	//процесс обновления
+	$sql = "UPDATE "._queryFrom($DSrc)."
+			SET `".$unit['col']."`=".$upd."
+			WHERE "._queryWhere($DSrc);
+	query($sql);
+}
+function _spisokUnitUpd54($unit) {//обновление количеств
+	if(!isset($unit['dialog_id']))
+		return;
+	if($unit['dialog_id'] != 54)
+		return;
+
+	//id компонента в диалоге, в котором размещается привязка (количество этих значений будет считаться)
+	if(!$cmp_id = _num($unit['num_1']))
+		return;
+	if(!$cmp = _elemOne($cmp_id))
+		return;
+
+	//id диалога, в котором размещается привязка
+	if(!$dialog_id = $cmp['block']['obj_id'])
+		return;
+	if(!$DConn = _dialogQuery($dialog_id))
+		return;
+
+	//блок, в котором размещается "количество"
+	if(!$block_id = _num($unit['block_id']))
+		return;
+	if(!$BL = _blockOne($block_id))
+		return;
+	if($BL['obj_name'] != 'dialog')
+		return;
+	if(!$DSrc = _dialogQuery($BL['obj_id']))//диалог, к которому привязан список (данные этого списка будут обновляться)
+		return;
+
+	//предварительное обнуление значений перед обновлением
+	$sql = "UPDATE "._queryFrom($DSrc)."
+			SET `".$unit['col']."`=0
+			WHERE "._queryWhere($DSrc);
+	query($sql);
+
+	$sql = "SELECT
+				`".$cmp['col']."`,
+				COUNT(`id`)
+			FROM `"._table($DConn['table_1'])."`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND `".$cmp['col']."`
+			  AND !`deleted`
+			GROUP BY `".$cmp['col']."`";
+	if(!$ass = query_ass($sql))//выход, если нечего обновлять
+		return;
+
+	$n = 1000;
+	$upd = array();
+	$cAss = count($ass);
+	foreach($ass as $id => $c) {
+		$sql = "UPDATE "._queryFrom($DSrc)."
+				SET `".$unit['col']."`=".$c."
+				WHERE `t1`.`id`=".$id."
+				  AND "._queryWhere($DSrc);
+		query($sql);
+/*
+		$upd[] = "(".$id.",".$c.")";
+		if(!--$cAss || !--$n) {
+			$sql = "INSERT INTO `"._table($DSrc['table_1'])."`
+						(`id`,`".$unit['col']."`)
+						VALUES ".implode(',', $upd)."
+					ON DUPLICATE KEY UPDATE
+						`".$unit['col']."`=VALUES(`".$unit['col']."`)";
+			query($sql);
+			$n = 1000;
+			$upd = array();
+		}
+*/
+	}
+
+	//обновление сумм родительских значений, если есть дочерние
+	if(!isset($DSrc['field1']['parent_id']))
+		return;
+
+	$sql = "SELECT DISTINCT `parent_id`
+			FROM `"._table($DSrc['table_1'])."`
+			WHERE `dialog_id`=".$BL['obj_id']."
+			  AND `parent_id`";
+	if(!$ids = query_ids($sql))
+		return;
+
+	foreach(_ids($ids, 1) as $id) {
+		$sql = "SELECT SUM(`".$unit['col']."`)
+				FROM `"._table($DSrc['table_1'])."`
+				WHERE `parent_id`=".$id;
+		$count = query_value($sql);
+		$count += empty($ass[$id]) ? 0 : $ass[$id];
+
+		$sql = "UPDATE `"._table($DSrc['table_1'])."`
+				SET `".$unit['col']."`=".$count."
+				WHERE `id`=".$id;
+		query($sql);
+	}
+}
+function _spisokUnitUpd55($unit) {//обновление сумм
+	if(!isset($unit['dialog_id']))
+		return;
+	if($unit['dialog_id'] != 55)
+		return;
+	if(!$cmp_id = _num($unit['num_1']))//id компонента в диалоге, в котором размещается привязка (сумма этих значений будет считаться)
+		return;
+	if(!$cmp = _elemOne($cmp_id))
+		return;
+	if(!$dialog_id = $cmp['block']['obj_id'])//id диалога, в котором размещается привязка
+		return;
+	if(!$DConn = _dialogQuery($dialog_id))
+		return;
+
+	//диалог, к которому привязан список (данные этого списка будут обновляться)
+	if(!$DSrc_id = _num($cmp['num_1']))
+		return;
+	if(!$DSrc = _dialogQuery($DSrc_id))
+		return;
+
+	//предварительное обнуление значений перед обновлением
+	$sql = "UPDATE "._queryFrom($DSrc)."
+			SET `".$unit['col']."`=0
+			WHERE "._queryWhere($DSrc);
+	query($sql);
+
+	//получение элемента, который указывает на элемент, сумму значения которого нужно будет считать
+	if(!$elem_id = _num($unit['num_2']))
+		return;
+	if(!$elForSum = _elemOne($elem_id))
+		return;
+	if(!$sum_col = $elForSum['col'])
+		return;
+
+	$sql = "SELECT
+				`".$cmp['col']."`,
+				SUM(`".$sum_col."`)
+			FROM "._queryFrom($DConn)."
+			WHERE "._queryWhere($DConn)."
+			  AND `".$cmp['col']."`
+			  "._40cond(array(), $unit['txt_1'])."
+			GROUP BY `".$cmp['col']."`";
+	if(!$ass = query_ass($sql))//выход, если нечего обновлять
+		return;
+
+	foreach($ass as $id => $c) {
+		$sql = "UPDATE "._queryFrom($DSrc)."
+				SET `".$unit['col']."`=".$c."
+				WHERE `t1`.`id`=".$id."
+				  AND "._queryWhere($DSrc);
+		query($sql);
+	}
+}
+
+function _count_update($app_id=APP_ID) {//обновление счётчиков
+	//пересчёт количеств [54]
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".$app_id."
+			  AND `dialog_id`=54";
+	foreach(query_arr($sql) as $r)
+		_spisokUnitUpd54($r);
+
+	//пересчёт сумм [55]
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".$app_id."
+			  AND `dialog_id`=55";
+	foreach(query_arr($sql) as $r)
+		_spisokUnitUpd55($r);
+
+	//пересчёт сумм [27]
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".$app_id."
+			  AND `dialog_id`=27";
+	foreach(query_arr($sql) as $r)
+		_spisokUnitUpd27($r);
+}
+
+
 
 
 /* ---=== CЧЁТЧИКИ: В РАБОТЕ ===--- */
