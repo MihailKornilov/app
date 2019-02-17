@@ -501,6 +501,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				app_any:DLG('#app_any').val(),
 				sa:DLG('#sa').val(),
 				parent_any:DLG('#parent_any').val(),
+				clone_on:DLG('#clone_on').val(),
 
 				element_group_id:DLG('#element_group_id').val(),
 				element_width:DLG('#element_width').val(),

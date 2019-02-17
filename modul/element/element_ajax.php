@@ -269,6 +269,12 @@ switch(@$_POST['op']) {
 									'title' => 'может быть выбран родительским во всех приложениях',
 									'value' => $dialog['parent_any']
 							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'clone_on',
+									'title' => 'данные диалога участвуют в клонировании',
+									'value' => $dialog['clone_on']
+							   )).
 				'</table>'.
 
 
@@ -923,6 +929,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 	$width_auto = _num($_POST['width_auto']);
 	$cmp_no_req = _num($_POST['cmp_no_req']);
 	$app_any = _num($_POST['app_any']);
+	$clone_on = _num($_POST['clone_on']);
 
 	if($table_1 = _num($_POST['table_1'])) {
 		if(!$table = _table($table_1))
@@ -948,6 +955,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 				`cmp_no_req`=".$cmp_no_req.",
 
 				`table_1`=".$table_1.",
+				`clone_on`=".$clone_on.",
 
 				`element_group_id`=".$element_group_id.",
 				`element_width`=".$element_width.",
