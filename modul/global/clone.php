@@ -4,6 +4,7 @@ function _clone() {//клонирование приложения
 	define('CLONE_ID_DST', 9); //id приложения-получателя
 
 	_clone_clear();
+	_clone_base();
 
 	if(_clone_page() === false)
 		return;
@@ -13,6 +14,11 @@ function _clone() {//клонирование приложения
 	_clone_dialog();
 	_clone_blk_upd();
 	_clone_elm_upd();
+	_clone_template();
+	_clone_action();
+	_clone_counter();
+	_clone_cron();
+	_clone_element_format();
 
 	_debug_cache_clear();
 }
@@ -22,6 +28,26 @@ function _clone_clear() {
 			WHERE `app_id_src`=".CLONE_ID_SRC."
 			  AND `app_id_dst`=".CLONE_ID_DST;
 	query($sql);
+
+	//удаление данных
+	$sql = "DELETE FROM `_spisok`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+
+	//удаление значений фильтров пользователей
+	$sql = "DELETE FROM `_user_spisok_filter`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+
+	//удаление истории действий
+	$sql = "DELETE FROM `_history`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+	$sql = "DELETE FROM `_history_edited`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+
+
 
 	//удаление страниц
 	$sql = "DELETE FROM `_page`
@@ -40,6 +66,36 @@ function _clone_clear() {
 
 	//удаление диалогов
 	$sql = "DELETE FROM `_dialog`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+
+	//удаление действий
+	$sql = "DELETE FROM `_action`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+
+	//удаление счётчиков
+	$sql = "DELETE FROM `_counter`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+
+	//удаление планировщиков
+	$sql = "DELETE FROM `_cron`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+
+	//удаление форматирования
+	$sql = "DELETE FROM `_element_format`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+
+	//удаление подсказок
+	$sql = "DELETE FROM `_element_hint`
+			WHERE `app_id`=".CLONE_ID_DST;
+	query($sql);
+
+	//удаление шаблонов документов
+	$sql = "DELETE FROM `_template`
 			WHERE `app_id`=".CLONE_ID_DST;
 	query($sql);
 }
@@ -106,7 +162,40 @@ function _clone_json($vv, $assEL) {//замена элементов в json
 		$json[$n]['elem_id'] = _num(@$assEL[$js['elem_id']]);
 	}
 
-	return json_encode($json);
+	$json = json_encode($json);
+
+	return htmlspecialchars($json);
+}
+function _clone_base() {//сохранение соответствий базовых диалогов
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE !`app_id`
+			  AND `parent_any`
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	foreach($arr as $id => $r)
+		_clone_ass_save('_dialog', $id, $id);
+
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='dialog'
+			  AND `obj_id` IN ("._idsGet($arr).")";
+	if(!$BLK = query_arr($sql))
+		return;
+
+	foreach($BLK as $id => $r)
+		_clone_ass_save('_block', $id, $id);
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `block_id` IN ("._idsGet($BLK).")";
+	if(!$ELM = query_arr($sql))
+		return;
+
+	foreach($ELM as $id => $r)
+		_clone_ass_save('_element', $id, $id);
 }
 
 function _clone_page() {//клонирование: страницы
@@ -121,13 +210,13 @@ function _clone_page() {//клонирование: страницы
 		/* прописываются позже:
 			`parent_id`
 			`common_id`
-			`dialog_id_unit_get`
 		*/
 
 		$sql = "INSERT INTO `_page` (
 					`app_id`,
 					`acs`,
 					`dialog_id`,
+					`dialog_id_unit_get`,
 					`name`,
 					`about`,
 					`image_ids`,
@@ -138,6 +227,7 @@ function _clone_page() {//клонирование: страницы
 					".CLONE_ID_DST.",
 					".$r['acs'].",
 					".$r['dialog_id'].",
+					".$r['dialog_id_unit_get'].",
 					'".addslashes($r['name'])."',
 					'".addslashes($r['about'])."',
 					'".addslashes($r['image_ids'])."',
@@ -466,6 +556,19 @@ function _clone_dialog() {//клонирование: диалоги
 				WHERE `id`=".$assDLG[$id];
 		query($sql);
 	}
+
+	//страницы, принимающие значения записи
+	$sql = "SELECT *
+			FROM `_page`
+			WHERE `app_id`=".CLONE_ID_DST."
+			  AND `dialog_id_unit_get`
+			ORDER BY `id`";
+	foreach(query_arr($sql) as $r) {
+		$sql = "UPDATE `_page`
+				SET `dialog_id_unit_get`="._num(@$assDLG[$r['dialog_id_unit_get']])."
+				WHERE `id`=".$r['id'];
+		query($sql);
+	}
 }
 
 function _clone_blk_upd() {//обновление объектов для диалогов и списков
@@ -513,6 +616,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 	$ass = _clone_ass();
 	$assPG = $ass[_table('_page')];
 	$assEL = $ass[_table('_element')];
+	$assBL = $ass[_table('_block')];
 	$assDLG = $ass[_table('_dialog')];
 
 	foreach($arr as $elem_id => $r)
@@ -622,6 +726,14 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				query($sql);
 				break;
 
+			//Сборный текст
+			case 44:
+				$sql = "UPDATE `_element`
+						SET `txt_2`='"._clone_ids($r['txt_2'], $assEL)."'
+						WHERE `id`=".$elem_id;
+				query($sql);
+				break;
+
 			//количество значений привязанного списка
 			case 54:
 				$sql = "UPDATE `_element`
@@ -641,8 +753,27 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				query($sql);
 				break;
 
+			//Меню переключения блоков
+			case 57:
+				$sql = "UPDATE `_element`
+						SET `txt_2`='"._clone_ids($r['txt_2'], $assEL)."',
+							`def`="._num(@$assEL[$r['def']])."
+						WHERE `id`=".$elem_id;
+				query($sql);
+
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `parent_id`=".$elem_id;
+				foreach(query_arr($sql) as $ell) {
+					$sql = "UPDATE `_element`
+							SET `txt_2`='"._clone_ids($ell['txt_2'], $assBL)."'
+							WHERE `id`=".$ell['id'];
+					query($sql);
+				}
+				break;
+
 			//Связка списка при помощи кнопки
-			case 56:
+			case 59:
 				$sql = "UPDATE `_element`
 						SET `num_1`="._num(@$assDLG[$r['num_1']]).",
 							`num_4`="._num(@$assDLG[$r['num_4']])."
@@ -671,9 +802,20 @@ function _clone_elm_upd() {//клонирование: обновление зн
 			//Фильтр - Radio
 			case 74:
 				$sql = "UPDATE `_element`
-						SET `num_1`="._num(@$assEL[$r['num_1']])."
+						SET `num_1`="._num(@$assEL[$r['num_1']]).",
+							`def`="._num(@$assEL[$r['def']])."
 						WHERE `id`=".$elem_id;
 				query($sql);
+
+				$sql = "SELECT *
+						FROM `_element`
+						WHERE `parent_id`=".$elem_id;
+				foreach(query_arr($sql) as $ell) {
+					$sql = "UPDATE `_element`
+							SET `txt_2`='".addslashes(_clone_json($ell['txt_2'], $assEL))."'
+							WHERE `id`=".$ell['id'];
+					query($sql);
+				}
 				break;
 
 			//Фильтр: календарь
@@ -730,7 +872,8 @@ function _clone_elm_upd() {//клонирование: обновление зн
 			//Циферка в меню страниц
 			case 87:
 				$sql = "UPDATE `_element`
-						SET `num_1`="._num(@$assDLG[$r['num_1']])."
+						SET `num_1`="._num(@$assDLG[$r['num_1']]).",
+							`txt_1`='".addslashes(_clone_json($r['txt_1'], $assEL))."'
 						WHERE `id`=".$elem_id;
 				query($sql);
 				break;
@@ -759,6 +902,363 @@ function _clone_elm_upd() {//клонирование: обновление зн
 		}
 }
 
+function _clone_template() {
+	$sql = "SELECT *
+			FROM `_template`
+			WHERE `app_id`=".CLONE_ID_SRC."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
 
+	$ass = _clone_ass();
+	$assEL = $ass[_table('_element')];
+	$assDLG = $ass[_table('_dialog')];
 
+	foreach($arr as $r) {
+		$sql = "INSERT INTO `_template` (
+					`app_id`,
+
+					`name`,
+					`spisok_id`,
+					`attach_id`,
+					`param_ids`,
+					`fname`,
+
+					`user_id_add`
+				) VALUES (
+					".CLONE_ID_DST.",
+
+					'".addslashes($r['name'])."',
+					"._num(@$assDLG[$r['spisok_id']]).",
+					".$r['attach_id'].",
+					'"._clone_ids($r['param_ids'], $assEL)."',
+					'".$r['fname']."',
+
+					".USER_ID."
+				)";
+		_clone_ass_save('_template', $r['id'], query_id($sql));
+	}
+}
+function _clone_action() {
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `app_id`=".CLONE_ID_SRC."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$ass = _clone_ass();
+	$assPG = $ass[_table('_page')];
+	$assEL = $ass[_table('_element')];
+	$assBL = $ass[_table('_block')];
+	$assDLG = $ass[_table('_dialog')];
+	$assTMP = $ass[_table('_template')];
+
+	foreach($arr as $r) {
+		$filter = $r['filter'];
+		$initial_id = $r['initial_id'];
+		$target_ids = $r['target_ids'];
+		$apply_id = $r['apply_id'];
+		$effect_id = $r['effect_id'];
+		$revers = $r['revers'];
+
+		switch($r['dialog_id']) {
+			//действие для элемента: скрытие/показ блоков
+			case 201:
+				$filter = _clone_json($filter, $assEL);
+				if($initial_id > 0) {
+
+				}
+				$target_ids = _clone_ids($target_ids, $assBL);
+				break;
+
+			//действие для элемента: Установка значения элементу
+			case 202:
+				$target_ids = _clone_ids($target_ids, $assEL);
+				break;
+
+			//действие для элемента: Открытие диалога
+			case 205:
+				$initial_id = _clone_ids($initial_id, $assEL);
+				$target_ids = _clone_ids($target_ids, $assDLG);
+				break;
+
+			//действие для элемента: Установка фокуса
+			case 206:
+				$target_ids = _clone_ids($target_ids, $assEL);
+				break;
+
+			//действие для элемента: Открытие документа на печать
+			case 207:
+				$initial_id = _clone_ids($initial_id, $assEL);
+				$target_ids = _clone_ids($target_ids, $assTMP);
+				break;
+
+			//действие для блока: скрытие/показ блоков
+			case 211:
+				$target_ids = _clone_ids($target_ids, $assBL);
+				break;
+
+			//действие для блока: изменение значения у элемента
+			case 212:
+				$target_ids = _clone_ids($target_ids, $assEL);
+				//$apply_id
+				break;
+
+			//действие для блока: переход на страницу
+			case 214:
+				$target_ids = _clone_ids($target_ids, $assPG);
+				//$apply_id
+				break;
+
+			//действие для блока: открытие диалога
+			case 215:
+				$filter = _clone_json($filter, $assEL);
+				$target_ids = _clone_ids($target_ids, $assDLG);
+				break;
+
+			//действие для блока: установка фокуса на элемент
+			case 216:
+				$target_ids = _clone_ids($target_ids, $assEL);
+				break;
+
+			//действие для блока: открытие документа на печать
+			case 217:
+				$target_ids = _clone_ids($target_ids, $assTMP);
+				break;
+
+			//действие для элемента: переход на страницу
+			case 221:
+				$target_ids = _clone_ids($target_ids, $assPG);
+				break;
+
+			//действие для элемента: открытие диалога
+			case 222:
+				$target_ids = _clone_ids($target_ids, $assDLG);
+				break;
+
+			//действие для элемента: тёмная подсказка при наведении
+			case 223:
+				$target_ids = _clone_ids($target_ids, $assEL);
+				break;
+
+			//действие для элемента: внешняя ссылка
+			case 224: break;
+		}
+
+		$sql = "INSERT INTO `_action` (
+					`app_id`,
+
+					`dialog_id`,
+					`block_id`,
+					`element_id`,
+
+					`filter`,
+					`initial_id`,
+					`target_ids`,
+					`apply_id`,
+					`effect_id`,
+					`revers`,
+
+					`sort`,
+					`user_id_add`
+				) VALUES (
+					".CLONE_ID_DST.",
+
+					".$r['dialog_id'].",
+					"._num(@$assBL[$r['block_id']]).",
+					"._num(@$assEL[$r['element_id']]).",
+
+					'".addslashes($filter)."',
+					".$initial_id.",
+					'".$target_ids."',
+					".$apply_id.",
+					".$effect_id.",
+					".$revers.",
+
+					".$r['sort'].",
+					".USER_ID."
+				)";
+		query($sql);
+	}
+}
+function _clone_counter() {
+	$sql = "SELECT *
+			FROM `_counter`
+			WHERE `app_id`=".CLONE_ID_SRC."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$ass = _clone_ass();
+	$assEL = $ass[_table('_element')];
+	$assDLG = $ass[_table('_dialog')];
+
+	foreach($arr as $r) {
+		$sql = "INSERT INTO `_counter` (
+					`app_id`,
+
+					`name`,
+					`about`,
+					`spisok_id`,
+					`filter`,
+					`type_id`,
+					`sum_elem_id`,
+
+					`user_id_add`
+				) VALUES (
+					".CLONE_ID_DST.",
+
+					'".$r['name']."',
+					'".$r['about']."',
+					"._num(@$assDLG[$r['spisok_id']]).",
+					'".addslashes( _clone_json($r['filter'], $assEL))."',
+					".$r['type_id'].",
+					"._num(@$assEL[$r['sum_elem_id']]).",
+
+					".USER_ID."
+				)";
+		query($sql);
+	}
+}
+function _clone_cron() {
+	$sql = "SELECT *
+			FROM `_cron`
+			WHERE `app_id`=".CLONE_ID_SRC."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$ass = _clone_ass();
+	$assEL = $ass[_table('_element')];
+	$assDLG = $ass[_table('_dialog')];
+
+	foreach($arr as $r) {
+		if($r['dst_prm']) {
+			$dst_prm = array();
+			foreach(explode(',', $r['dst_prm']) as $ex) {
+				$exx = explode(':', $ex);
+				$e1 = _num(@$assEL[$exx[0]]);
+				$e2 = _num(@$assEL[$exx[1]]);
+				$dst_prm[] = $e1.':'.$e2;
+			}
+			$r['dst_prm'] = implode(',', $dst_prm);
+		}
+
+		$sql = "INSERT INTO `_cron` (
+					`app_id`,
+
+					`name`,
+					`time_min`,
+					`time_hour`,
+					`time_day`,
+					`time_week`,
+					`time_mon`,
+					`src_spisok`,
+					`src_prm`,
+					`dst_spisok`,
+					`dst_prm`,
+
+					`user_id_add`
+				) VALUES (
+					".CLONE_ID_DST.",
+
+					'".$r['name']."',
+					".$r['time_min'].",
+					".$r['time_hour'].",
+					".$r['time_day'].",
+					".$r['time_week'].",
+					".$r['time_mon'].",
+					"._num(@$assDLG[$r['src_spisok']]).",
+					'".addslashes( _clone_json($r['src_prm'], $assEL))."',
+					"._num(@$assDLG[$r['dst_spisok']]).",
+					'".$r['dst_prm']."',
+
+					".USER_ID."
+				)";
+		query($sql);
+	}
+}
+function _clone_element_format() {
+	$sql = "SELECT *
+			FROM `_element_format`
+			WHERE `app_id`=".CLONE_ID_SRC."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$ass = _clone_ass();
+	$assEL = $ass[_table('_element')];
+
+	foreach($arr as $r) {
+		$sql = "INSERT INTO `_element_format` (
+					`app_id`,
+
+					`element_id`,
+					`hide`,
+					`color_cond`,
+					`color_alt`,
+					`space`,
+					`fract_0_show`,
+					`fract_char`,
+
+					`user_id_add`
+				) VALUES (
+					".CLONE_ID_DST.",
+
+					"._num(@$assEL[$r['element_id']]).",
+					".$r['hide'].",
+					".$r['color_cond'].",
+					'".$r['color_alt']."',
+					".$r['space'].",
+					".$r['fract_0_show'].",
+					'".$r['fract_char']."',
+
+					".USER_ID."
+				)";
+		query($sql);
+	}
+}
+function _clone_element_hint() {
+	$sql = "SELECT *
+			FROM `_element_hint`
+			WHERE `app_id`=".CLONE_ID_SRC."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$ass = _clone_ass();
+	$assEL = $ass[_table('_element')];
+
+	foreach($arr as $r) {
+		$sql = "INSERT INTO `_element_hint` (
+					`app_id`,
+
+					`element_id`,
+					`on`,
+					`msg`,
+					`side`,
+					`pos_h`,
+					`pos_v`,
+					`delay_show`,
+					`delay_hide`,
+
+					`user_id_add`
+				) VALUES (
+					".CLONE_ID_DST.",
+
+					"._num(@$assEL[$r['element_id']]).",
+					".$r['on'].",
+					'".addslashes($r['msg'])."',
+					".$r['side'].",
+					".$r['pos_h'].",
+					".$r['pos_v'].",
+					".$r['delay_show'].",
+					".$r['delay_hide'].",
+
+					".USER_ID."
+				)";
+		query($sql);
+	}
+}
 
