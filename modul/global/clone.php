@@ -19,8 +19,8 @@ function PHP12_clone_on() {//получение диалогов, данные �
 
 	$send = '';
 	foreach($arr as $id => $r)
-		$send .= '<div>'.
-					$r['name'].
+		$send .= '<div class="mt3">'.
+					'&bull; '.$r['name'].
 					'<span class="pale ml10">'.
 						'(<b>'._num(@$ass[$id]).'</b>)'.
 					'</span>'.
@@ -32,6 +32,9 @@ function PHP12_clone_on() {//получение диалогов, данные �
 function _clone_go($DLG, $CMP) {
 	if($DLG['id'] != 120)
 		return;
+	if(!SA)
+		jsonError('Нет прав');
+
 
 	$name = '';
 	foreach($DLG['cmp'] as $cmp_id => $r)
