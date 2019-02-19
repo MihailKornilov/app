@@ -518,19 +518,7 @@ function _blockStyle($bl, $prm, $width) {//стили css для блока
 	}
 
 	$send[] = ($bl['width_auto'] ? 'min-' : '').'width:'.$width.'px';
-
-	//цвет фона из записи
-	if(!$prm['blk_setup'])
-		if($u = $prm['unit_get'])
-			if($ids = _ids($bl['bg'], 'arr')) {
-				$bg = $u;
-				foreach($ids as $id) {
-					if($el = _elemOne($id))
-						if($col = $el['col'])
-							$bg = $bg[$col];
-				}
-				$send[] = 'background-color:'.$bg;
-			}
+	$send[] = _blockStyleBG($bl, $prm);
 
 	$send = array_diff($send, array(''));
 
@@ -538,6 +526,28 @@ function _blockStyle($bl, $prm, $width) {//стили css для блока
 		return '';
 
 	return ' style="'.implode(';', $send).'"';
+}
+function _blockStyleBG($bl, $prm) {//цвет фона из записи
+	if($prm['blk_setup'])
+		return '';
+	if(!$u = $prm['unit_get'])
+		return '';
+	if(!$ids = _ids($bl['bg'], 'arr'))
+		return '';
+
+	$bg = $u;
+	foreach($ids as $id) {
+		if(!$el = _elemOne($id))
+			return '';
+		if(!$col = $el['col'])
+			return '';
+		if(!isset($bg[$col]))
+			return '';
+
+		$bg = $bg[$col];
+	}
+
+	return 'background-color:'.$bg;
 }
 function _blockChildHtml($block, $prm, $grid_id, $level, $width) {//деление блока на части
 	if($block['id'] == $grid_id)
