@@ -23,15 +23,12 @@ function PHP12_bug_page() {//страницы
 				$commonC++;
 	}
 
-
-
 	return
 	'<table class="_stab w100p">'.
 		'<tr><td class="grey b">Всего страниц:<td class="w50 r b color-pay">'.count($PG).
 		'<tr><td class="color-del">Некорректный ID родителя `parent_id`:<td class="r b red">'._hide0($parentC).
 		'<tr><td class="color-del">Некорректный ID связки `common_id`:<td class="r b red">'._hide0($commonC).
 		'<tr><td class="color-del">Блоки от потерянных или удалённых страниц:<td class="r b red">'.PHP12_bug_page_blk($PG).
-		'<tr><td class="color-del">[3] Меню страниц - некорректное указание страницы:<td class="r b red">'.PHP12_bug_page_3menu($PG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
@@ -39,6 +36,11 @@ function PHP12_bug_page() {//страницы
 		'<tr><td class="color-del">Переход на страницу после внесения:<td class="w50 r b red">'.PHP12_bug_page_dlg_insert($PG).
 		'<tr><td class="color-del">Переход на страницу после редактирования:<td class="r b red">'.PHP12_bug_page_dlg_edit($PG).
 		'<tr><td class="color-del">Переход на страницу после удаления:<td class="r b red">'.PHP12_bug_page_dlg_del($PG).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Элементы:'.
+		'<tr><td class="color-del">[3] Меню страниц - некорректное указание страницы:<td class="w50 r b red">'.PHP12_bug_page_3menu($PG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
@@ -151,6 +153,109 @@ function PHP12_bug_page_user_access($PG) {//Доступ к страницам �
 			  AND `page_id` NOT IN ("._idsGet($PG).")";
 	return _hide0(query_value($sql));
 }
+
+
+
+
+function PHP12_bug_dialog() {//Диалоги
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  OR `parent_any`";
+	$DLG = query_arr($sql);
+
+	$parentC = 0;
+	$uGetC = 0;
+	$actC = 0;
+	foreach($DLG as $r) {
+		if($pid = $r['dialog_id_parent'])
+			if(!isset($DLG[$pid]))
+				$parentC++;
+
+		if($uid = $r['dialog_id_unit_get'])
+			if($uid > 0)
+				if(!isset($DLG[$uid]))
+					$uGetC++;
+
+		if($actId = $r['element_action_dialog_id'])
+			if(!isset($DLG[$actId]))
+				$actC++;
+	}
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего диалогов:<td class="w50 r b color-pay">'.count($DLG).
+		'<tr><td class="color-del">Некорректный ID родителя `dialog_id_parent`:<td class="r b red">'._hide0($parentC).
+		'<tr><td class="color-del">Некорректный `dialog_id_unit_get` (принимает данные записи):<td class="r b red">'._hide0($uGetC).
+//		'<tr><td class="color-del">Некорректный `element_action_dialog_id` (действие для элемента):<td class="r b red">'._hide0($actC).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-del">Страница принимает данные записи:<td class="w50 r b red">'.PHP12_bug_dialog_page_get($DLG).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Действия:'.
+		'<tr><td class="color-del">205 - открытие диалога (элемент):<td class="w50 r b red">'.PHP12_bug_dialog_205act($DLG).
+		'<tr><td class="color-del">215 - открытие диалога (блок):<td class="r b red">'.PHP12_bug_dialog_215act($DLG).
+		'<tr><td class="color-del">222 - открытие диалога (клик по элементу):<td class="r b red">'.PHP12_bug_dialog_222act($DLG).
+	'</table>';
+}
+function PHP12_bug_dialog_page_get($DLG) {//ID диалога, которого страница принимает данные
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_page`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id_unit_get`
+			  AND `dialog_id_unit_get` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_dialog_205act($DLG) {//действие 205 - открытие диалога (элемент)
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=205
+			  AND `target_ids` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_dialog_215act($DLG) {//действие 215 - открытие диалога (блок)
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=215
+			  AND `target_ids` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_dialog_222act($DLG) {//действие 215 - открытие диалога (блок)
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=222
+			  AND `target_ids` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
