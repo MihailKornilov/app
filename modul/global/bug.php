@@ -5,6 +5,155 @@
 */
 
 
+function PHP12_bug_page() {//страницы
+	$sql = "SELECT *
+			FROM `_page`
+			WHERE `app_id`=".APP_ID;
+	$PG = query_arr($sql);
+
+	$parentC = 0;
+	$commonC = 0;
+	foreach($PG as $r) {
+		if($pid = $r['parent_id'])
+			if(!isset($PG[$pid]))
+				$parentC++;
+
+		if($cid = $r['common_id'])
+			if(!isset($PG[$cid]))
+				$commonC++;
+	}
+
+
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего страниц:<td class="w50 r b color-pay">'.count($PG).
+		'<tr><td class="color-del">Некорректный ID родителя `parent_id`:<td class="r b red">'._hide0($parentC).
+		'<tr><td class="color-del">Некорректный ID связки `common_id`:<td class="r b red">'._hide0($commonC).
+		'<tr><td class="color-del">Блоки от потерянных или удалённых страниц:<td class="r b red">'.PHP12_bug_page_blk($PG).
+		'<tr><td class="color-del">[3] Меню страниц - некорректное указание страницы:<td class="r b red">'.PHP12_bug_page_3menu($PG).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Диалоги:'.
+		'<tr><td class="color-del">Переход на страницу после внесения:<td class="w50 r b red">'.PHP12_bug_page_dlg_insert($PG).
+		'<tr><td class="color-del">Переход на страницу после редактирования:<td class="r b red">'.PHP12_bug_page_dlg_edit($PG).
+		'<tr><td class="color-del">Переход на страницу после удаления:<td class="r b red">'.PHP12_bug_page_dlg_del($PG).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Действия:'.
+		'<tr><td class="color-del">204 - переход на страницу (элемент):<td class="w50 r b red">'.PHP12_bug_page_204act($PG).
+		'<tr><td class="color-del">214 - переход на страницу (блок):<td class="r b red">'.PHP12_bug_page_214act($PG).
+		'<tr><td class="color-del">221 - переход на страницу (клик по элементу):<td class="r b red">'.PHP12_bug_page_221act($PG).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-del">Доступ к страницам для пользователей:<td class="w50 r b red">'.PHP12_bug_page_user_access($PG).
+	'</table>';
+}
+function PHP12_bug_page_blk($PG) {//Блоки от потерянных страниц
+	if(empty($PG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_block`
+			WHERE `app_id`=".APP_ID."
+			  AND `obj_name`='page'
+			  AND `obj_id` NOT IN ("._idsGet($PG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_page_3menu($PG) {//[3] Меню страниц
+	if(empty($PG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=3
+			  AND `num_1`
+			  AND `num_1` NOT IN ("._idsGet($PG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_page_dlg_insert($PG) {//Переход на страницу после внесения
+	if(empty($PG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `insert_action_page_id`
+			  AND `insert_action_page_id` NOT IN ("._idsGet($PG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_page_dlg_edit($PG) {//Переход на страницу после редактирования
+	if(empty($PG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `edit_action_page_id`
+			  AND `edit_action_page_id` NOT IN ("._idsGet($PG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_page_dlg_del($PG) {//Переход на страницу после удаления
+	if(empty($PG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `del_action_page_id`
+			  AND `del_action_page_id` NOT IN ("._idsGet($PG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_page_204act($PG) {//204 - переход на страницу (элемент)
+	if(empty($PG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=204
+			  AND `target_ids` NOT IN ("._idsGet($PG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_page_214act($PG) {//214 - переход на страницу (блок)
+	if(empty($PG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=214
+			  AND `target_ids` NOT IN ("._idsGet($PG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_page_221act($PG) {//221 - переход на страницу (клик по элементу)
+	if(empty($PG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=221
+			  AND `target_ids` NOT IN ("._idsGet($PG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_page_user_access($PG) {//Доступ к страницам для пользователей
+	if(empty($PG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_user_page_access`
+			WHERE `app_id`=".APP_ID."
+			  AND `page_id` NOT IN ("._idsGet($PG).")";
+	return _hide0(query_value($sql));
+}
+
+
+
 function PHP12_BUG_block_page_lost() {//потерянные блоки от несуществующих (удалённых) страниц
 	$getv = 'page-block-lost-del';//переменная для GET
 

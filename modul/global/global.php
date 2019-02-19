@@ -15,7 +15,7 @@ require_once GLOBAL_DIR.'/syncro.php';
 require_once GLOBAL_DIR.'/modul/global/regexp.php';
 require_once GLOBAL_DIR.'/modul/global/mysql.php';
 require_once GLOBAL_DIR.'/modul/global/date.php';
-require_once GLOBAL_DIR.'/modul/global/bug_func.php';
+require_once GLOBAL_DIR.'/modul/global/bug.php';
 require_once GLOBAL_DIR.'/modul/debug/debug.php';
 require_once GLOBAL_DIR.'/modul/db/db.php';
 require_once GLOBAL_DIR.'/modul/global/clone.php';
