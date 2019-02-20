@@ -160,14 +160,17 @@ function PHP12_bug_page_user_access($PG) {//Доступ к страницам �
 function PHP12_bug_dialog() {//Диалоги
 	$sql = "SELECT *
 			FROM `_dialog`
-			WHERE `app_id`=".APP_ID."
-			  OR `parent_any`";
+			WHERE `app_id` IN (".APP_ID.",0)";
 	$DLG = query_arr($sql);
 
+	$c = 0;
 	$parentC = 0;
 	$uGetC = 0;
 	$actC = 0;
 	foreach($DLG as $r) {
+		if($r['app_id'])
+			$c++;
+
 		if($pid = $r['dialog_id_parent'])
 			if(!isset($DLG[$pid]))
 				$parentC++;
@@ -184,7 +187,7 @@ function PHP12_bug_dialog() {//Диалоги
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего диалогов:<td class="w50 r b color-pay">'.count($DLG).
+		'<tr><td class="grey b">Всего диалогов:<td class="w50 r b color-pay">'._hide0($c).
 		'<tr><td class="color-del">Некорректный ID родителя `dialog_id_parent`:<td class="r b red">'._hide0($parentC).
 		'<tr><td class="color-del">Некорректный `dialog_id_unit_get` (принимает данные записи):<td class="r b red">'._hide0($uGetC).
 //		'<tr><td class="color-del">Некорректный `element_action_dialog_id` (действие для элемента):<td class="r b red">'._hide0($actC).
@@ -192,6 +195,18 @@ function PHP12_bug_dialog() {//Диалоги
 
 	'<table class="_stab w100p mt10">'.
 		'<tr><td class="color-del">Страница принимает данные записи:<td class="w50 r b red">'.PHP12_bug_dialog_page_get($DLG).
+		'<tr><td class="color-del">Блоки потерянных диалогов:<td class="r b red">'.PHP12_bug_dilaog_blk($DLG).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Элементы:'.
+		'<tr><td class="color-del">[2] Кнопка:<td class="w50 r b red">'.PHP12_bug_dialog_elem2($DLG).
+		'<tr><td class="color-del">[14] Список-шаблон:<td class="r b red">'.PHP12_bug_dialog_elem14($DLG).
+		'<tr><td class="color-del">[23] Список-таблица:<td class="r b red">'.PHP12_bug_dialog_elem23($DLG).
+		'<tr><td class="color-del">[29] Select-связка:<td class="r b red">'.PHP12_bug_dialog_elem29($DLG).
+		'<tr><td class="color-del">[31] Выбор галочками:<td class="r b red">'.PHP12_bug_dialog_elem31($DLG).
+		'<tr><td class="color-del">[59] Кнопка-связка:<td class="r b red">'.PHP12_bug_dialog_elem59($DLG).
+		'<tr><td class="color-del">[87] Циферка в меню:<td class="r b red">'.PHP12_bug_dialog_elem87($DLG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
@@ -212,6 +227,98 @@ function PHP12_bug_dialog_page_get($DLG) {//ID диалога, которого 
 			  AND `dialog_id_unit_get` NOT IN ("._idsGet($DLG).")";
 	return _hide0(query_value($sql));
 }
+function PHP12_bug_dilaog_blk($DLG) {//Блоки от потерянных диалогов
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_block`
+			WHERE `app_id`=".APP_ID."
+			  AND `obj_name` IN ('dialog','dialog_del')
+			  AND `obj_id` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+
+function PHP12_bug_dialog_elem2($DLG) {
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=2
+			  AND `num_4` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_dialog_elem14($DLG) {
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=14
+			  AND `num_1` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_dialog_elem23($DLG) {
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=23
+			  AND `num_1` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_dialog_elem29($DLG) {
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=29
+			  AND `num_1` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_dialog_elem31($DLG) {
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=31
+			  AND `num_1` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_dialog_elem59($DLG) {
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=59
+			  AND (`num_1` NOT IN ("._idsGet($DLG).")
+			    OR `num_4` NOT IN ("._idsGet($DLG).")
+			   )";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_dialog_elem87($DLG) {
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=87
+			  AND `num_1` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
+
 function PHP12_bug_dialog_205act($DLG) {//действие 205 - открытие диалога (элемент)
 	if(empty($DLG))
 		return '';
