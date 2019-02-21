@@ -290,6 +290,7 @@ function PHP12_bug_dialog() {//Диалоги
 		'<tr><td class="color-555 b" colspan="2">Действия:'.
 		'<tr><td class="color-del">205 - открытие диалога (элемент):<td class="w50 r b red">'.PHP12_bug_dialog_205act($DLG).
 		'<tr><td class="color-del">215 - открытие диалога (блок):<td class="r b red">'.PHP12_bug_dialog_215act($DLG).
+		'<tr><td class="color-del">218 - Блок принимает данные записи:<td class="r b red">'.PHP12_bug_dialog_218act($DLG).
 		'<tr><td class="color-del">222 - открытие диалога (клик по элементу):<td class="r b red">'.PHP12_bug_dialog_222act($DLG).
 	'</table>';
 }
@@ -480,6 +481,17 @@ function PHP12_bug_dialog_215act($DLG) {//действие 215 - открыти�
 			  AND `target_ids` NOT IN ("._idsGet($DLG).")";
 	return _hide0(query_value($sql));
 }
+function PHP12_bug_dialog_218act($DLG) {//действие 218 - Блок принимает данные записи
+	if(empty($DLG))
+		return '';
+
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=218
+			  AND `initial_id` NOT IN ("._idsGet($DLG).")";
+	return _hide0(query_value($sql));
+}
 function PHP12_bug_dialog_222act($DLG) {//действие 215 - открытие диалога (блок)
 	if(empty($DLG))
 		return '';
@@ -530,9 +542,8 @@ function PHP12_bug_block() {
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Действия:'.
-		'<tr><td class="color-del">Действия для блоков:<td class="w50 r b red">'.PHP12_bug_block_action().
-		'<tr><td class="color-del">201 - скрытие/показ блоков (для элемента):<td class="r b red">'.PHP12_bug_block_act201($BLK).
+		'<tr><td class="color-555 b" colspan="2">Действия - потерянные блоки:'.
+		'<tr><td class="color-del">201 - скрытие/показ блоков (для элемента):<td class="w50 r b red">'.PHP12_bug_block_act201($BLK).
 		'<tr><td class="color-del">211 - скрытие/показ блоков (для блоков):<td class="r b red">'.PHP12_bug_block_act211($BLK).
 	'</table>';
 }
@@ -566,18 +577,6 @@ function PHP12_bug_block_elem57($BLK) {//Меню переключения бл�
 		return '';
 
 	return _bug_ids_count($arr, $BLK, 'txt_2');
-}
-function PHP12_bug_block_action() {
-	$sql = "SELECT COUNT(*)
-			FROM `_action`
-			WHERE `app_id`=".APP_ID."
-			  AND `block_id`
-			  AND `block_id` NOT IN (
-				SELECT `id`
-				FROM `_block`
-				WHERE `app_id`=".APP_ID."
-			  )";
-	return _hide0(query_value($sql));
 }
 function PHP12_bug_block_act201($BLK) {//201 - скрытие/показ блоков
 	if(empty($BLK))
@@ -651,7 +650,7 @@ function PHP12_bug_element() {
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-del">Динамическая заливка в блоке:<td class="r b red">'.PHP12_bug_element_block_bg($ELM).
+		'<tr><td class="color-del">Динамическая заливка в блоке:<td class="w50 r b red">'.PHP12_bug_element_block_bg($ELM).
 		'<tr><td class="color-del">Параметры в шаблонах документов:<td class="r b red">'.PHP12_bug_element_template_prm($ELM).
 		'<tr><td class="color-del">Данные фильтров:<td class="r b red">'.PHP12_bug_element_filter($ELM).
 	'</table>'.
@@ -660,7 +659,18 @@ function PHP12_bug_element() {
 		'<tr><td class="color-555 b" colspan="2">Диалоги:'.
 		'<tr><td class="color-del">История действий:<td class="w50 r b red">'.PHP12_bug_element_dlg_history($ELM).
 		'<tr><td class="color-del">Подмена значений через [42]:<td class="r b red">'.PHP12_bug_element_dlg_42($ELM).
-		'<tr><td class="color-del">Колонка по умолчанию:<td class="r b red">'.PHP12_bug_element_col_def($ELM).
+		'<tr><td class="color-del">Колонка по умолчанию:<td class="r b red">'.PHP12_bug_element_dlg_col_def($ELM).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Действия:'.
+		'<tr><td class="color-del">202 - Установка значения элементу (для элемента):<td class="w50 r b red">'.PHP12_bug_element_act202($ELM).
+		'<tr><td class="color-del">203 - Блокировка элементов (для элемента):<td class="r b red">'.PHP12_bug_element_act203($ELM).
+		'<tr><td class="color-del">206 - Установка фокуса (для элемента):<td class="r b red">'.PHP12_bug_element_act206($ELM).
+		'<tr><td class="color-del">212 - Установка значения элементу (для блока):<td class="r b red">'.PHP12_bug_element_act212($ELM).
+		'<tr><td class="color-del">213 - Блокировка элементов (для блока):<td class="r b red">'.PHP12_bug_element_act213($ELM).
+		'<tr><td class="color-del">216 - Установка фокуса (для блока):<td class="r b red">'.PHP12_bug_element_act216($ELM).
+		'<tr><td class="color-del">223 - Тёмная подсказка при наведении (для элемента):<td class="r b red">'.PHP12_bug_element_act223($ELM).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
@@ -779,7 +789,7 @@ function PHP12_bug_element_dlg_42($ELM) {//Диалоги - Подмена зн�
 
 	return _hide0($c);
 }
-function PHP12_bug_element_col_def($ELM) {//Диалоги - Колонка по умолчанию
+function PHP12_bug_element_dlg_col_def($ELM) {//Диалоги - Колонка по умолчанию
 	if(empty($ELM))
 		return '';
 
@@ -791,6 +801,98 @@ function PHP12_bug_element_col_def($ELM) {//Диалоги - Колонка по
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'spisok_elem_id');
+}
+
+function PHP12_bug_element_act202($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=202";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'target_ids');
+}
+function PHP12_bug_element_act203($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=203";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'target_ids');
+}
+function PHP12_bug_element_act206($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=206";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'target_ids');
+}
+function PHP12_bug_element_act212($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=212";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'target_ids');
+}
+function PHP12_bug_element_act213($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=213";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'target_ids');
+}
+function PHP12_bug_element_act216($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=216";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'target_ids');
+}
+function PHP12_bug_element_act223($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=223";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'target_ids');
 }
 
 function PHP12_bug_element_counter($ELM) {
@@ -1260,6 +1362,207 @@ function PHP12_bug_element_format() {
 		'<tr><td class="color-del">Форматирование у потерянных элементов:<td class="w50 r b red">'._hide0($lost).
 	'</table>';
 }
+
+
+
+
+
+/* ---=== ДЕЙСТВИЯ ===--- */
+function PHP12_bug_action() {
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `app_id`=".APP_ID;
+	$ACT = query_arr($sql);
+
+	$cnnC = 0;
+	foreach($ACT as $r)
+		if(!$r['block_id'] && !$r['element_id'])
+			$cnnC++;
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего действий:<td class="w50 r b color-pay">'.count($ACT).
+		'<tr><td class="color-del">Нет привязки к элементу или блоку:<td class="r b red">'._hide0($cnnC).
+		'<tr><td class="color-del">Привязка к потерянным блокам:<td class="r b red">'.PHP12_bug_action_blk().
+		'<tr><td class="color-del">Привязка к потерянным элементам:<td class="r b red">'.PHP12_bug_action_elm().
+	'</table>';
+}
+function PHP12_bug_action_blk() {
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `block_id`
+			  AND `block_id` NOT IN (
+				SELECT `id`
+				FROM `_block`
+				WHERE `app_id`=".APP_ID."
+			  )";
+	return _hide0(query_value($sql));
+}
+function PHP12_bug_action_elm() {
+	$sql = "SELECT COUNT(*)
+			FROM `_action`
+			WHERE `app_id`=".APP_ID."
+			  AND `element_id`
+			  AND `element_id` NOT IN (
+				SELECT `id`
+				FROM `_element`
+				WHERE `app_id`=".APP_ID."
+			  )";
+	return _hide0(query_value($sql));
+}
+
+
+
+
+
+/* ---=== ГЛОБАЛЬНЫЕ СЧЁТЧИКИ ===--- */
+function PHP12_bug_counter() {
+	$sql = "SELECT *
+			FROM `_counter`
+			WHERE `app_id`=".APP_ID;
+	$COUNTER = query_arr($sql);
+
+	$sql = "SELECT COUNT(*)
+			FROM `_counter_v`
+			WHERE `app_id`=".APP_ID;
+	$COUNTER_V = query_value($sql);
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего счётчиков:<td class="w50 r b color-pay">'.count($COUNTER).
+		'<tr><td class="grey">Кол-во записей по счётчикам:<td class="r pale">'._hide0($COUNTER_V).
+		'<tr><td class="color-del">Кол-во записей от удалённых счётчиков:<td class="r b red">'.PHP12_bug_counter_v_lost().
+	'</table>';
+}
+function PHP12_bug_counter_v_lost() {
+	$sql = "SELECT COUNT(*)
+			FROM `_counter_v`
+			WHERE `app_id`=".APP_ID."
+			  AND `counter_id`
+			  AND `counter_id` NOT IN (
+				SELECT `id`
+				FROM `_counter`
+				WHERE `app_id`=".APP_ID."
+			  )";
+	return _hide0(query_value($sql));
+}
+
+
+
+
+
+/* ---=== ПЛАНИРОВЩИК ===--- */
+function PHP12_bug_cron() {
+	$sql = "SELECT *
+			FROM `_cron`
+			WHERE `app_id`=".APP_ID;
+	$CRON = query_arr($sql);
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего заданий:<td class="w50 r b color-pay">'.count($CRON).
+	'</table>';
+}
+
+
+
+
+
+/* ---=== ИЗОБРАЖЕНИЯ ===--- */
+function PHP12_bug_image() {
+	$sql = "SELECT COUNT(*)
+			FROM `_image`
+			WHERE `app_id`=".APP_ID;
+	$IMG = query_value($sql);
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего изображений:<td class="w70 r b color-pay">'.$IMG.
+	'</table>';
+}
+
+
+
+
+
+/* ---=== ФАЙЛЫ ===--- */
+function PHP12_bug_attach() {
+	$sql = "SELECT *
+			FROM `_attach`
+			WHERE `app_id`=".APP_ID;
+	$ATTACH = query_arr($sql);
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего файлов:<td class="w50 r b color-pay">'.count($ATTACH).
+	'</table>';
+}
+
+
+
+
+
+/* ---=== ШАБЛОНЫ ДОКУМЕНТОВ ===--- */
+function PHP12_bug_template() {
+	$sql = "SELECT *
+			FROM `_template`
+			WHERE `app_id`=".APP_ID;
+	$TMP = query_arr($sql);
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего шаблонов:<td class="w50 r b color-pay">'.count($TMP).
+	'</table>';
+}
+
+
+
+
+
+/* ---=== ЗАМЕТКИ ===--- */
+function PHP12_bug_note() {
+	$sql = "SELECT COUNT(*)
+			FROM `_note`
+			WHERE `app_id`=".APP_ID."
+			  AND !`parent_id`";
+	$NOTE = query_value($sql);
+
+	$sql = "SELECT COUNT(*)
+			FROM `_note`
+			WHERE `app_id`=".APP_ID."
+			  AND `parent_id`";
+	$COMM = query_value($sql);
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего заметок:<td class="w70 r b color-pay">'.$NOTE.
+		'<tr><td class="grey b">Комментарии к заметкам:<td class="w70 r b color-pay">'.$COMM.
+	'</table>';
+}
+
+
+
+
+
+/* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
+function PHP12_bug_history() {
+	$sql = "SELECT COUNT(*)
+			FROM `_history`
+			WHERE `app_id`=".APP_ID;
+	$HIST = query_value($sql);
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего записей истории:<td class="w70 r b color-pay">'.$HIST.
+	'</table>';
+}
+
+
+
+
+
+
 
 
 
