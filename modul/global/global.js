@@ -257,6 +257,19 @@ var ZINDEX = 1000,
 		cons.find('.cons-div').prepend(log);
 		if(!cons.hasClass('dn'))
 			cons._flash();
+	},
+	_bug = function(block_id) {//вставка количества ошибок по каждому виду структуры приложения (страница 132)
+		var BL = _attr_bl(block_id),
+			c = 0;
+
+		_forEq(BL.find('.red'), function(sp) {
+			c += _num(sp.html());
+		});
+
+		BL.closest('.bl-div')
+		  .prev()
+		  .find('.bg-fee')
+		  .html(c ? c : '');
 	};
 
 $.fn._enter = function(func) {

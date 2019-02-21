@@ -48,13 +48,36 @@ function _bug_elm_ass($arr, $OBJ, $col, $isNum=false) {//ассоциативн�
 
 	return $isNum ? $c : _hide0($c);
 }
+function _bug_script($prm) {
+	return '<script>_bug('.$prm['el12']['block_id'].')</script>';
+}
+
+
+
+
+
+/* ---=== ПОЛЬЗОВАТЕЛИ ===--- */
+function PHP12_bug_user($prm) {
+	$sql = "SELECT COUNT(*)
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=111";
+	$USER = query_value($sql);
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего зарегистрировано пользователей:<td class="w50 r b color-pay">'.$USER.
+	'</table>'.
+	_bug_script($prm);
+}
 
 
 
 
 
 
-function PHP12_bug_page() {//страницы
+/* ---=== СТРАНИЦЫ ===--- */
+function PHP12_bug_page($prm) {//страницы
 	$sql = "SELECT *
 			FROM `_page`
 			WHERE `app_id`=".APP_ID;
@@ -102,7 +125,8 @@ function PHP12_bug_page() {//страницы
 
 	'<table class="_stab w100p mt10">'.
 		'<tr><td class="color-del">Доступ к страницам для пользователей:<td class="w50 r b red">'.PHP12_bug_page_user_access($PG).
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 function PHP12_bug_page_blk($PG) {//Блоки от потерянных страниц
 	if(empty($PG))
@@ -220,7 +244,8 @@ function PHP12_bug_page_user_access($PG) {//Доступ к страницам �
 
 
 
-function PHP12_bug_dialog() {//Диалоги
+/* ---=== ДИАЛОГИ ===--- */
+function PHP12_bug_dialog($prm) {
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id` IN (".APP_ID.",0)";
@@ -292,7 +317,8 @@ function PHP12_bug_dialog() {//Диалоги
 		'<tr><td class="color-del">215 - открытие диалога (блок):<td class="r b red">'.PHP12_bug_dialog_215act($DLG).
 		'<tr><td class="color-del">218 - Блок принимает данные записи:<td class="r b red">'.PHP12_bug_dialog_218act($DLG).
 		'<tr><td class="color-del">222 - открытие диалога (клик по элементу):<td class="r b red">'.PHP12_bug_dialog_222act($DLG).
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 function PHP12_bug_dialog_page_get($DLG) {//ID диалога, которого страница принимает данные
 	if(empty($DLG))
@@ -509,7 +535,8 @@ function PHP12_bug_dialog_222act($DLG) {//действие 215 - открыти�
 
 
 
-function PHP12_bug_block() {
+/* ---=== БЛОКИ ===--- */
+function PHP12_bug_block($prm) {
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `app_id`=".APP_ID;
@@ -545,7 +572,8 @@ function PHP12_bug_block() {
 		'<tr><td class="color-555 b" colspan="2">Действия - потерянные блоки:'.
 		'<tr><td class="color-del">201 - скрытие/показ блоков (для элемента):<td class="w50 r b red">'.PHP12_bug_block_act201($BLK).
 		'<tr><td class="color-del">211 - скрытие/показ блоков (для блоков):<td class="r b red">'.PHP12_bug_block_act211($BLK).
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 function PHP12_bug_block_elem_parent() {
 	$sql = "SELECT COUNT(*)
@@ -610,7 +638,8 @@ function PHP12_bug_block_act211($BLK) {//211 - скрытие/показ бло�
 
 
 
-function PHP12_bug_element() {
+/* ---=== ЭЛЕМЕНТЫ ===--- */
+function PHP12_bug_element($prm) {
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `app_id`=".APP_ID;
@@ -712,7 +741,8 @@ function PHP12_bug_element() {
 		'<tr><td class="color-del">[87] Циферка в меню страниц:                 <td class="r b red">'.PHP12_bug_element_elem87($ELM).
 		'<tr><td class="color-del">[96] Количество значений связанного списка с учётом категорий:<td class="r b red">'.PHP12_bug_element_elem96($ELM).
 		'<tr><td class="color-del">[102] Фильтр: Выбор нескольких групп значений:<td class="r b red">'.PHP12_bug_element_elem102($ELM).
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 
 function PHP12_bug_element_block_bg($ELM) {
@@ -1368,7 +1398,7 @@ function PHP12_bug_element_format() {
 
 
 /* ---=== ДЕЙСТВИЯ ===--- */
-function PHP12_bug_action() {
+function PHP12_bug_action($prm) {
 	$sql = "SELECT *
 			FROM `_action`
 			WHERE `app_id`=".APP_ID;
@@ -1385,7 +1415,8 @@ function PHP12_bug_action() {
 		'<tr><td class="color-del">Нет привязки к элементу или блоку:<td class="r b red">'._hide0($cnnC).
 		'<tr><td class="color-del">Привязка к потерянным блокам:<td class="r b red">'.PHP12_bug_action_blk().
 		'<tr><td class="color-del">Привязка к потерянным элементам:<td class="r b red">'.PHP12_bug_action_elm().
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 function PHP12_bug_action_blk() {
 	$sql = "SELECT COUNT(*)
@@ -1417,7 +1448,7 @@ function PHP12_bug_action_elm() {
 
 
 /* ---=== ГЛОБАЛЬНЫЕ СЧЁТЧИКИ ===--- */
-function PHP12_bug_counter() {
+function PHP12_bug_counter($prm) {
 	$sql = "SELECT *
 			FROM `_counter`
 			WHERE `app_id`=".APP_ID;
@@ -1433,7 +1464,8 @@ function PHP12_bug_counter() {
 		'<tr><td class="grey b">Всего счётчиков:<td class="w50 r b color-pay">'.count($COUNTER).
 		'<tr><td class="grey">Кол-во записей по счётчикам:<td class="r pale">'._hide0($COUNTER_V).
 		'<tr><td class="color-del">Кол-во записей от удалённых счётчиков:<td class="r b red">'.PHP12_bug_counter_v_lost().
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 function PHP12_bug_counter_v_lost() {
 	$sql = "SELECT COUNT(*)
@@ -1453,7 +1485,7 @@ function PHP12_bug_counter_v_lost() {
 
 
 /* ---=== ПЛАНИРОВЩИК ===--- */
-function PHP12_bug_cron() {
+function PHP12_bug_cron($prm) {
 	$sql = "SELECT *
 			FROM `_cron`
 			WHERE `app_id`=".APP_ID;
@@ -1462,7 +1494,8 @@ function PHP12_bug_cron() {
 	return
 	'<table class="_stab w100p">'.
 		'<tr><td class="grey b">Всего заданий:<td class="w50 r b color-pay">'.count($CRON).
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 
 
@@ -1470,7 +1503,7 @@ function PHP12_bug_cron() {
 
 
 /* ---=== ИЗОБРАЖЕНИЯ ===--- */
-function PHP12_bug_image() {
+function PHP12_bug_image($prm) {
 	$sql = "SELECT COUNT(*)
 			FROM `_image`
 			WHERE `app_id`=".APP_ID;
@@ -1479,7 +1512,8 @@ function PHP12_bug_image() {
 	return
 	'<table class="_stab w100p">'.
 		'<tr><td class="grey b">Всего изображений:<td class="w70 r b color-pay">'.$IMG.
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 
 
@@ -1487,7 +1521,7 @@ function PHP12_bug_image() {
 
 
 /* ---=== ФАЙЛЫ ===--- */
-function PHP12_bug_attach() {
+function PHP12_bug_attach($prm) {
 	$sql = "SELECT *
 			FROM `_attach`
 			WHERE `app_id`=".APP_ID;
@@ -1496,7 +1530,8 @@ function PHP12_bug_attach() {
 	return
 	'<table class="_stab w100p">'.
 		'<tr><td class="grey b">Всего файлов:<td class="w50 r b color-pay">'.count($ATTACH).
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 
 
@@ -1504,7 +1539,7 @@ function PHP12_bug_attach() {
 
 
 /* ---=== ШАБЛОНЫ ДОКУМЕНТОВ ===--- */
-function PHP12_bug_template() {
+function PHP12_bug_template($prm) {
 	$sql = "SELECT *
 			FROM `_template`
 			WHERE `app_id`=".APP_ID;
@@ -1513,7 +1548,8 @@ function PHP12_bug_template() {
 	return
 	'<table class="_stab w100p">'.
 		'<tr><td class="grey b">Всего шаблонов:<td class="w50 r b color-pay">'.count($TMP).
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 
 
@@ -1521,7 +1557,7 @@ function PHP12_bug_template() {
 
 
 /* ---=== ЗАМЕТКИ ===--- */
-function PHP12_bug_note() {
+function PHP12_bug_note($prm) {
 	$sql = "SELECT COUNT(*)
 			FROM `_note`
 			WHERE `app_id`=".APP_ID."
@@ -1538,7 +1574,8 @@ function PHP12_bug_note() {
 	'<table class="_stab w100p">'.
 		'<tr><td class="grey b">Всего заметок:<td class="w70 r b color-pay">'.$NOTE.
 		'<tr><td class="grey b">Комментарии к заметкам:<td class="w70 r b color-pay">'.$COMM.
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
 
 
@@ -1546,7 +1583,7 @@ function PHP12_bug_note() {
 
 
 /* ---=== ИСТОРИЯ ДЕЙСТВИЙ ===--- */
-function PHP12_bug_history() {
+function PHP12_bug_history($prm) {
 	$sql = "SELECT COUNT(*)
 			FROM `_history`
 			WHERE `app_id`=".APP_ID;
@@ -1555,8 +1592,32 @@ function PHP12_bug_history() {
 	return
 	'<table class="_stab w100p">'.
 		'<tr><td class="grey b">Всего записей истории:<td class="w70 r b color-pay">'.$HIST.
-	'</table>';
+	'</table>'.
+	_bug_script($prm);
 }
+
+
+
+
+
+/* ---=== ДАННЫЕ ===--- */
+function PHP12_bug_spisok($prm) {
+	$sql = "SELECT COUNT(*)
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID;
+	$SPISOK = query_value($sql);
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего записей:<td class="w70 r b color-pay">'._sumSpace($SPISOK).
+	'</table>'.
+	_bug_script($prm);
+}
+
+
+
+
+
 
 
 
