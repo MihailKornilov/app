@@ -272,7 +272,7 @@ var ZINDEX = 1000,
 		BL.closest('.bl-div')
 		  .prev()
 		  .find('.bg-fee')
-		  .addClass('red b center')
+		  .addClass('red b center fs16')
 		  .css('vertical-align', 'middle')
 		  .html(c ? c : '');
 	};
