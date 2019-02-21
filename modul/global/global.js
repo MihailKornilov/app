@@ -266,9 +266,14 @@ var ZINDEX = 1000,
 			c += _num(sp.html());
 		});
 
+		if(!c)
+			return;
+
 		BL.closest('.bl-div')
 		  .prev()
 		  .find('.bg-fee')
+		  .addClass('red b center')
+		  .css('vertical-align', 'middle')
 		  .html(c ? c : '');
 	};
 
