@@ -651,8 +651,6 @@ function PHP12_bug_element() {
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-del">Подсказки:<td class="w50 r b red">'.PHP12_bug_element_hint($ELM).
-		'<tr><td class="color-del">Формат данных:<td class="r b red">'.PHP12_bug_element_format($ELM).
 		'<tr><td class="color-del">Динамическая заливка в блоке:<td class="r b red">'.PHP12_bug_element_block_bg($ELM).
 		'<tr><td class="color-del">Параметры в шаблонах документов:<td class="r b red">'.PHP12_bug_element_template_prm($ELM).
 		'<tr><td class="color-del">Данные фильтров:<td class="r b red">'.PHP12_bug_element_filter($ELM).
@@ -707,30 +705,6 @@ function PHP12_bug_element() {
 	'</table>';
 }
 
-function PHP12_bug_element_hint($ELM) {
-	if(empty($ELM))
-		return '';
-
-	$sql = "SELECT *
-			FROM `_element_hint`
-			WHERE `app_id`=".APP_ID;
-	if(!$arr = query_arr($sql))
-		return '';
-
-	return _bug_ids_count($arr, $ELM, 'element_id');
-}
-function PHP12_bug_element_format($ELM) {
-	if(empty($ELM))
-		return '';
-
-	$sql = "SELECT *
-			FROM `_element_format`
-			WHERE `app_id`=".APP_ID;
-	if(!$arr = query_arr($sql))
-		return '';
-
-	return _bug_ids_count($arr, $ELM, 'element_id');
-}
 function PHP12_bug_element_block_bg($ELM) {
 	if(empty($ELM))
 		return '';
@@ -1242,7 +1216,50 @@ function PHP12_bug_element_elem102($ELM) {//Фильтр: Выбор неско�
 	return _hide0($c);
 }
 
+function PHP12_bug_element_hint() {
+	$sql = "SELECT *
+			FROM `_element_hint`
+			WHERE `app_id`=".APP_ID;
+	$HINT = query_arr($sql);
 
+	$sql = "SELECT `id`,1
+			FROM `_element`
+			WHERE `app_id`=".APP_ID;
+	$ass = query_arr($sql);
+
+	$lost = 0;
+	foreach($HINT as $r)
+		if(empty($ass[$r['element_id']]))
+			$lost++;
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего подсказок:<td class="w50 r b color-pay">'._hide0(count($HINT)).
+		'<tr><td class="color-del">Подсказки от потерянных элементов:<td class="w50 r b red">'._hide0($lost).
+	'</table>';
+}
+function PHP12_bug_element_format() {
+	$sql = "SELECT *
+			FROM `_element_format`
+			WHERE `app_id`=".APP_ID;
+	$F = query_arr($sql);
+
+	$sql = "SELECT `id`,1
+			FROM `_element`
+			WHERE `app_id`=".APP_ID;
+	$ass = query_arr($sql);
+
+	$lost = 0;
+	foreach($F as $r)
+		if(empty($ass[$r['element_id']]))
+			$lost++;
+
+	return
+	'<table class="_stab w100p">'.
+		'<tr><td class="grey b">Всего форматирований:<td class="w50 r b color-pay">'._hide0(count($F)).
+		'<tr><td class="color-del">Форматирование у потерянных элементов:<td class="w50 r b red">'._hide0($lost).
+	'</table>';
+}
 
 
 
