@@ -4,15 +4,55 @@
 	Страница 132
 */
 
-function _bug_ids_count($arr, $OBJ, $col) {//количество отсутствующих идентификаторов
+function _bug_ids_count($arr, $OBJ, $col, $isNum=false) {//количество отсутствующих идентификаторов
 	$c = 0;
 	foreach($arr as $r)
 		if($ids = _ids($r[$col], 'arr'))
 			foreach($ids as $id)
 				if(!isset($OBJ[$id]))
 					$c++;
-	return _hide0($c);
+
+	return $isNum ? $c : _hide0($c);
 }
+function _bug_json_elm($arr, $OBJ, $col, $isNum=false) {//количество несуществующих идентификаторов в фильтре [40]
+	$c = 0;
+	foreach($arr as $r) {
+		$json = htmlspecialchars_decode($r[$col]);
+		if(!$json = json_decode($json, true))
+			continue;
+
+		foreach($json as $n => $js)
+			if($ids = _ids($js['elem_id'], 'arr'))
+				foreach($ids as $id)
+					if(!isset($OBJ[$id]))
+						$c++;
+	}
+
+	return $isNum ? $c : _hide0($c);
+}
+function _bug_elm_ass($arr, $OBJ, $col, $isNum=false) {//ассоциативных массив элементов в виде 1234:6789,4433:120
+	$c = 0;
+	foreach($arr as $r)
+		if($r[$col]) {
+			$ex = explode(',', $r[$col]);
+			foreach($ex as $vv) {
+				$iex = explode(':', $vv);
+				if($id = _num($iex[0]))
+					if(!isset($OBJ[$id]))
+						$c++;
+				if($id = _num($iex[0]))
+					if(!isset($OBJ[$id]))
+						$c++;
+			}
+		}
+
+	return $isNum ? $c : _hide0($c);
+}
+
+
+
+
+
 
 function PHP12_bug_page() {//страницы
 	$sql = "SELECT *
@@ -611,8 +651,85 @@ function PHP12_bug_element() {
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-del">Динамическая заливка в блоке:<td class="w50 r b red">'.PHP12_bug_element_block_bg($ELM).
+		'<tr><td class="color-del">Подсказки:<td class="w50 r b red">'.PHP12_bug_element_hint($ELM).
+		'<tr><td class="color-del">Формат данных:<td class="r b red">'.PHP12_bug_element_format($ELM).
+		'<tr><td class="color-del">Динамическая заливка в блоке:<td class="r b red">'.PHP12_bug_element_block_bg($ELM).
+		'<tr><td class="color-del">Параметры в шаблонах документов:<td class="r b red">'.PHP12_bug_element_template_prm($ELM).
+		'<tr><td class="color-del">Данные фильтров:<td class="r b red">'.PHP12_bug_element_filter($ELM).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Диалоги:'.
+		'<tr><td class="color-del">История действий:<td class="w50 r b red">'.PHP12_bug_element_dlg_history($ELM).
+		'<tr><td class="color-del">Подмена значений через [42]:<td class="r b red">'.PHP12_bug_element_dlg_42($ELM).
+		'<tr><td class="color-del">Колонка по умолчанию:<td class="r b red">'.PHP12_bug_element_col_def($ELM).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Глобальные счётчики:'.
+		'<tr><td class="color-del">Настройка счётчика:<td class="w50 r b red">'.PHP12_bug_element_counter($ELM).
+		'<tr><td class="color-del">Данные счётчика:<td class="r b red">'.PHP12_bug_element_counter_v($ELM).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Планировщик:'.
+		'<tr><td class="color-del">Условия [40]:<td class="w50 r b red">'.PHP12_bug_element_cron_src($ELM).
+		'<tr><td class="color-del">Значения для внесения:<td class="r b red">'.PHP12_bug_element_cron_dst($ELM).
+	'</table>'.
+
+	'<table class="_stab w100p mt10">'.
+		'<tr><td class="color-555 b" colspan="2">Элементы в элементах:'.
+		'<tr><td class="color-del">[7] Фильтр-поиск:                            <td class="w50 r b red">'.PHP12_bug_element_elem7($ELM).
+		'<tr><td class="color-del">[11] Вставка значения:                       <td class="r b red">'.PHP12_bug_element_elem11($ELM).
+		'<tr><td class="color-del">[14] Список-шаблон:                          <td class="r b red">'.PHP12_bug_element_elem14($ELM).
+		'<tr><td class="color-del">[15] Количество строк списка:                <td class="r b red">'.PHP12_bug_element_elem15($ELM).
+		'<tr><td class="color-del">[16] Radio - произвольные значения:          <td class="r b red">'.PHP12_bug_element_elem16($ELM).
+		'<tr><td class="color-del">[23] Список-таблица:                         <td class="r b red">'.PHP12_bug_element_elem23($ELM).
+		'<tr><td class="color-del">[29] Select: выбор записи из другого списка: <td class="r b red">'.PHP12_bug_element_elem29($ELM).
+		'<tr><td class="color-del">[31] Выбор нескольких значений галочками:    <td class="r b red">'.PHP12_bug_element_elem31($ELM).
+		'<tr><td class="color-del">[40] Фильтрование списка:                    <td class="r b red">'.PHP12_bug_element_elem40($ELM).
+		'<tr><td class="color-del">[44] Сборный текст:                          <td class="r b red">'.PHP12_bug_element_elem44($ELM).
+		'<tr><td class="color-del">[54] Количество значений привязанного списка:<td class="r b red">'.PHP12_bug_element_elem54($ELM).
+		'<tr><td class="color-del">[55] Сумма значений привязанного списка:     <td class="r b red">'.PHP12_bug_element_elem55($ELM).
+		'<tr><td class="color-del">[57] Меню переключения блоков:               <td class="r b red">'.PHP12_bug_element_elem57($ELM).
+		'<tr><td class="color-del">[62] Фильтр: галочка:                        <td class="r b red">'.PHP12_bug_element_elem62($ELM).
+		'<tr><td class="color-del">[72] Фильтр: год и месяц:                    <td class="r b red">'.PHP12_bug_element_elem72($ELM).
+		'<tr><td class="color-del">[74] Фильтр: Radio:                          <td class="r b red">'.PHP12_bug_element_elem74($ELM).
+		'<tr><td class="color-del">[77] Фильтр: календарь:                      <td class="r b red">'.PHP12_bug_element_elem77($ELM).
+		'<tr><td class="color-del">[78] Фильтр: меню:                           <td class="r b red">'.PHP12_bug_element_elem78($ELM).
+		'<tr><td class="color-del">[80] Очистка фильтра:                        <td class="r b red">'.PHP12_bug_element_elem80($ELM).
+		'<tr><td class="color-del">[83] Фильтр: Select - привязанный список:    <td class="r b red">'.PHP12_bug_element_elem83($ELM).
+		'<tr><td class="color-del">[85] Select - выбор значения списка по умолчанию:<td class="r b red">'.PHP12_bug_element_elem85($ELM).
+		'<tr><td class="color-del">[86] Значение записи: количество дней:       <td class="r b red">'.PHP12_bug_element_elem86($ELM).
+		'<tr><td class="color-del">[87] Циферка в меню страниц:                 <td class="r b red">'.PHP12_bug_element_elem87($ELM).
+		'<tr><td class="color-del">[96] Количество значений связанного списка с учётом категорий:<td class="r b red">'.PHP12_bug_element_elem96($ELM).
+		'<tr><td class="color-del">[102] Фильтр: Выбор нескольких групп значений:<td class="r b red">'.PHP12_bug_element_elem102($ELM).
 	'</table>';
+}
+
+function PHP12_bug_element_hint($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element_hint`
+			WHERE `app_id`=".APP_ID;
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'element_id');
+}
+function PHP12_bug_element_format($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element_format`
+			WHERE `app_id`=".APP_ID;
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'element_id');
 }
 function PHP12_bug_element_block_bg($ELM) {
 	if(empty($ELM))
@@ -627,7 +744,503 @@ function PHP12_bug_element_block_bg($ELM) {
 
 	return _bug_ids_count($arr, $ELM, 'bg');
 }
+function PHP12_bug_element_template_prm($ELM) {
+	if(empty($ELM))
+		return '';
 
+	$sql = "SELECT `id`,`param_ids`
+			FROM `_template`
+			WHERE `app_id`=".APP_ID."
+			  AND `param_ids`";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'param_ids');
+}
+function PHP12_bug_element_filter($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_user_spisok_filter`
+			WHERE `app_id`=".APP_ID;
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'element_id_spisok', true);
+	$c += _bug_ids_count($arr, $ELM, 'element_id_filter', true);
+
+	return _hide0($c);
+}
+
+function PHP12_bug_element_dlg_history($ELM) {//Диалоги - история действий
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID;
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'insert_history_elem', true);
+	$c += _bug_ids_count($arr, $ELM, 'edit_history_elem', true);
+	$c += _bug_ids_count($arr, $ELM, 'del_history_elem', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_dlg_42($ELM) {//Диалоги - Подмена значений через [42]
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `insert_unit_change_elem_id`";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'insert_unit_change_elem_id', true);
+	$c += _bug_elm_ass($arr, $ELM, 'insert_unit_change_v', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_col_def($ELM) {//Диалоги - Колонка по умолчанию
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `spisok_elem_id`";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'spisok_elem_id');
+}
+
+function PHP12_bug_element_counter($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_counter`
+			WHERE `app_id`=".APP_ID;
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'sum_elem_id', true);
+	$c += _bug_json_elm($arr, $ELM, 'filter', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_counter_v($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_counter_v`
+			WHERE `app_id`=".APP_ID;
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'element_id');
+}
+
+function PHP12_bug_element_cron_src($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_cron`
+			WHERE `app_id`=".APP_ID;
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_json_elm($arr, $ELM, 'src_prm');
+}
+function PHP12_bug_element_cron_dst($ELM) {
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_cron`
+			WHERE `app_id`=".APP_ID;
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_elm_ass($arr, $ELM, 'dst_prm');
+}
+
+function PHP12_bug_element_elem7($ELM) {//Фильтр-поиск
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=7";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_2', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_elem11($ELM) {//Вставка значения
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=11";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'txt_2');
+}
+function PHP12_bug_element_elem14($ELM) {//Список-шаблон
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=14
+			  AND LENGTH(`txt_2`)";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_json_elm($arr, $ELM, 'txt_2');
+}
+function PHP12_bug_element_elem15($ELM) {//Количество строк списка
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=15";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'num_1');
+}
+function PHP12_bug_element_elem16($ELM) {//Radio - произвольные значения
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=16
+			  AND `num_3`";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'num_3');
+}
+function PHP12_bug_element_elem23($ELM) {//Список-таблица
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=23
+			  AND LENGTH(`txt_2`)";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_json_elm($arr, $ELM, 'txt_2');
+}
+function PHP12_bug_element_elem29($ELM) {//Select: выбор записи из другого списка
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=29";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c = _bug_ids_count($arr, $ELM, 'txt_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_2', true);
+	$c += _bug_json_elm($arr, $ELM, 'txt_5', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_elem31($ELM) {//Выбор нескольких значений галочками
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=31
+			  AND `num_2`";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'num_2');
+}
+function PHP12_bug_element_elem40($ELM) {//Фильтрование списка
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=40
+			  AND `num_1`";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'num_1');
+}
+function PHP12_bug_element_elem44($ELM) {//Сборный текст
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=44
+			  AND LENGTH(`txt_2`)";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'txt_2');
+}
+function PHP12_bug_element_elem54($ELM) {//количество значений привязанного списка
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=54";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c += _bug_json_elm($arr, $ELM, 'txt_1', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_elem55($ELM) {//Сумма значений привязанного списка
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=55";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'num_2', true);
+	$c += _bug_json_elm($arr, $ELM, 'txt_1', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_elem57($ELM) {//Меню переключения блоков
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=57
+			  AND LENGTH(`txt_2`)";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'txt_2');
+}
+function PHP12_bug_element_elem62($ELM) {//Фильтр: галочка
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=62";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c += _bug_json_elm($arr, $ELM, 'txt_2', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_elem72($ELM) {//Фильтр: год и месяц
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=72";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'num_2', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_elem74($ELM) {//Фильтр: Radio
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=74";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'num_1');
+}
+function PHP12_bug_element_elem77($ELM) {//Фильтр: календарь
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=77";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'num_1');
+}
+function PHP12_bug_element_elem78($ELM) {//Фильтр: меню
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=78";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_2', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_elem80($ELM) {//Очистка фильтра
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=80";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'num_1');
+}
+function PHP12_bug_element_elem83($ELM) {//Фильтр: Select - привязанный список
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=83";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_2', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_elem85($ELM) {//Select - выбор значения списка по умолчанию
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=85";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'num_1');
+}
+function PHP12_bug_element_elem86($ELM) {//Значение записи: количество дней
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=86";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_ids_count($arr, $ELM, 'num_1');
+}
+function PHP12_bug_element_elem87($ELM) {//Циферка в меню страниц
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=87";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	return _bug_json_elm($arr, $ELM, 'txt_1');
+}
+function PHP12_bug_element_elem96($ELM) {//Количество значений связанного списка с учётом категорий
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=96";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_2', true);
+
+	return _hide0($c);
+}
+function PHP12_bug_element_elem102($ELM) {//Фильтр: Выбор нескольких групп значений
+	if(empty($ELM))
+		return '';
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=102";
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_2', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_3', true);
+	$c += _bug_ids_count($arr, $ELM, 'txt_4', true);
+	$c += _bug_json_elm($arr, $ELM, 'txt_5', true);
+
+	return _hide0($c);
+}
 
 
 
