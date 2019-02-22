@@ -3994,7 +3994,15 @@ function PHP12_icon18_type($id='all') {//доступные варианты и�
 		13 => 'info',
 		14 => 'search',
 		15 => 'star',
-		16 => 'comment'
+		16 => 'comment',
+		17 => 'add',
+		18 => 'edit',
+		19 => 'del',
+		20 => 'del-red',
+		21 => 'doc-add',
+		22 => 'order',
+		23 => 'calendar',
+		24 => 'eye',
 	);
 
 	if($id == 'all')

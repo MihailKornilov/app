@@ -822,6 +822,9 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 			if($func['effect_id'])
 				$val .= ',edit_id:'.$u['id'];
 
+			if(preg_match('/"icon/', $txt))
+				return str_replace('class="', 'val="'.$val.'" class="dialog-open ', $txt);
+
 			return '<a val="'.$val.'" class="dialog-open inhr'.
 						_spisokUnitTT($el, $u).
 						$txt.
