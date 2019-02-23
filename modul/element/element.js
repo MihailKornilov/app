@@ -3258,8 +3258,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
-	/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ ===--- */
-	PHP12_td_setup = function(el, vvv, obj) {//настройка ячеек таблицы
+	/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ [23] ===--- */
+	PHP12_td_setup = function(el, vvv, obj) {
 		if(!obj.unit.id)
 			return;
 
@@ -3303,7 +3303,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w80 grey r topi">Колонка ' + NUM + ':' +
 							'<td><div style="width:' + v.width + 'px">' +
-									'<div class="div-th-name' + _dn(obj.unit.num_5) + '">' +
+									'<div class="div-th-name' + _dn(_num(obj.unit.num_5)) + '">' +
 										'<input type="text"' +
 											  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
 											  ' placeholder="имя колонки"' +
