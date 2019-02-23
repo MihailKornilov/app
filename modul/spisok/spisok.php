@@ -812,8 +812,8 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 		return $txt;
 
 	//данные записи
-	$u = $prm['unit_get'];
-
+	if(!$u = $prm['unit_get'])
+		$u['id'] = 0;
 	if(@$u['deleted'])
 		return $txt;
 

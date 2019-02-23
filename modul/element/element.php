@@ -2918,12 +2918,12 @@ function PHP12_block_choose($prm) {
 	if(!$BL = _blockOne($block_id))
 		return _emptyMin10('Блока '.$block_id.' не существует.');
 
+	$title = 'Страница';
 	$obj_name = $BL['obj_name'];
 	$obj_id = $BL['obj_id'];
 
 	switch($obj_name) {
 		case 'page':
-			$title = 'Страница';
 			if(!$page = _page($obj_id))
 				return _emptyMin10('Страницы '.$obj_id.' не существует.');
 			$name = $page['name'];
@@ -2933,6 +2933,23 @@ function PHP12_block_choose($prm) {
 			if(!$dlg = _dialogQuery($obj_id))
 				return _emptyMin10('Диалога '.$obj_id.' не существует.');
 			$name = $dlg['name'];
+			break;
+		case 'spisok':
+			if(!$el = _elemOne($obj_id))
+				return _emptyMin10('Элемента '.$obj_id.' не существует.');
+
+			$obj_name = $el['block']['obj_name'];
+			$obj_id = $el['block']['obj_id'];
+			if($obj_name == 'dialog') {
+				$title = 'Диалог';
+				if(!$dlg = _dialogQuery($el['num_1']))
+					return _emptyMin10('Диалога-списка '.$obj_id.' не существует.');
+				$name = $dlg['name'];
+			} else {
+				if(!$page = _page($obj_id))
+					return _emptyMin10('Страницы '.$obj_id.' не существует.');
+				$name = $page['name'];
+			}
 			break;
 		default:
 			return _emptyMin10('Выбор блоков возможен только на страницах и в диалоговых окнах.');
@@ -3161,6 +3178,15 @@ function PHP12_spfl_drop() {
 	);
 }
 function PHP12_spfl_vvv_unshift($spisok) {//общие дополнительные значения
+	array_unshift(
+		$spisok,
+		array(
+			'id' => -3,
+			'title' => 'Совпадает с данными, которые принимает блок',
+			'content' => '<div class="b color-pay">Совпадает с данными, которые принимает блок</div>'.
+						 '<div class="fs12 grey ml10 mt3 i">Будет выбрана запись, которую принимает блок</div>'
+		)
+	);
 	array_unshift(
 		$spisok,
 		array(

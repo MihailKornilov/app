@@ -266,7 +266,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 							_blockChoose($r, $PARAM, $level).
 							_blockElemChoose($r, $PARAM).
 							_blockChildHtml($r, $PARAM, $grid_id, $level + 1, $width).
-	    					_elemDiv($r['elem'], $PARAM).
+	    					_elemDiv($r, $PARAM).
 					'';
 
 			$widthMax -= $r['width'];
@@ -305,6 +305,7 @@ function _blockActionIsClick($r, $prm) {//проверка действий бл
 			case 215:
 			case 216:
 			case 217:
+			case 219:
 				return true;
 		}
 
@@ -553,19 +554,29 @@ function _blockChildHtml($block, $prm, $grid_id, $level, $width) {//делени
 	if($block['id'] == $grid_id)
 		return _blockGrid($block['child'], $width);
 
-	if(!empty($block['action']))
-		foreach($block['action'] as $act)
-			switch($act['dialog_id']) {
-				case 218:
-					if(!$id = _num(@$_GET['id']))
-						return _emptyMin($act['filter']);
-					if(!$dialog = _dialogQuery($act['initial_id']))
-						return _emptyMin('Отсутствует диалог, который вносит данные записи.');
-					if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $id))
-						return _emptyMin('Записи '.$id.' не существует.');
-			}
+	if(!is_array($prm = _blockUnitGet($block, $prm)))
+		return $prm;
 
 	return _blockLevel($block['child'], $prm, $grid_id, $level, $width);
+}
+function _blockUnitGet($bl, $prm, $is_elem=false) {
+	if($bl['elem'] && !$is_elem)
+		return $prm;
+	if(!$bl['action'])
+		return $prm;
+
+	foreach($bl['action'] as $act)
+		switch($act['dialog_id']) {
+			case 218:
+				if(!$id = _num(@$_GET['id']))
+					return _emptyMin($act['filter']);
+				if(!$dialog = _dialogQuery($act['initial_id']))
+					return _emptyMin('Не существует диалога, который вносит данные записи.');
+				if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $id))
+					return _emptyMin('Записи '.$id.' не существует.');
+		}
+
+	return $prm;
 }
 function _blockGrid($arr, $width) {//режим деления на подблоки
 	$spisok = '';
@@ -622,9 +633,15 @@ function _elemDivSize($el) {//класс - размер шрифта
 		return '';
 	return 'fs'.$el['size'];
 }
-function _elemDiv($el, $prm=array()) {//формирование div элемента
-	if(!$el)
+function _elemDiv($bl, $prm=array()) {//формирование div элемента
+	if(!$el = $bl['elem'])
 		return '';
+
+	$attr_id = _elemDivAttrId($el, $prm);
+	$style = _elemStyle($el, $prm);
+
+	if(!is_array($prm = _blockUnitGet($bl, $prm, true)))
+		return '<div'.$attr_id.$style.'>'.$prm.'</div>';
 
 	$txt = _elemPrint($el, $prm);
 
@@ -637,9 +654,9 @@ function _elemDiv($el, $prm=array()) {//формирование div элеме�
 
 	$txt = _elemFormatHide($el, $txt);
 	$txt = _elemFormatDigital($el, $txt);
-	$txt = _spisokUnitUrl($el, $prm, $txt);// шаблон
+	$txt = _spisokUnitUrl($el, $prm, $txt);
 
-	return '<div'._elemDivAttrId($el, $prm).$cls._elemStyle($el, $prm).'>'.$txt.'</div>';
+	return '<div'.$attr_id.$cls.$style.'>'.$txt.'</div>';
 }
 function _elemFormatHide($el, $txt) {//Дополнительное форматирование: скрытие при нулевом значении
 	if(empty($el['format']))

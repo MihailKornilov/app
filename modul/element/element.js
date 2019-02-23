@@ -2611,6 +2611,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 					location.href = URL + '&p=9&doc_id=' + doc_id + (unit_id ? '&id=' + unit_id : '');
 					break;
+				//обновление содержимого блоков
+				case 219:
+					alert(unit_id)
+					break;
 			}
 		});
 	},
