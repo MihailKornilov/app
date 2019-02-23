@@ -339,6 +339,20 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
+	case 'block_upd'://обновление содержания блоков
+		if(!$block_id = _num($_POST['ids']))
+			jsonError('Функция работает пока только для одного блока');
+		if(!$bl = _blockOne($block_id))
+			jsonError('Блока id'.$block_id.' не существует');
+
+		$BLK = _BE('block_obj', $bl['obj_name'], $bl['obj_id']);
+		$bll[$block_id] = _blockChild($BLK, $block_id);
+
+		$send['blk'][$block_id] = _blockLevel($bll);
+
+		jsonSuccess($send);
+		break;
+
 	case 'block_choose_level_change'://переключение уровней во время выбора блоков
 		if(!$block_id = _num($_POST['block_id']))
 			jsonError('Некорректный ID блока');
@@ -849,6 +863,21 @@ switch(@$_POST['op']) {
 */
 }
 
+function _blockChild($BLK, $block_id) {
+	if(empty($BLK))
+		return array();
+	if(isset($BLK[$block_id]))
+		return $BLK[$block_id];
+
+	foreach($BLK as $id => $bl)
+		if($cc = _blockChild($bl['child'], $block_id))
+			return $cc;
+
+	return array();
+}
+
+
+
 function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерних блоков
 	$sql = "SELECT *
 			FROM `_block`
@@ -918,7 +947,6 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление кол�
 		query($sql);
 	}
 }
-
 function _blockChildGet($BLK) {//получение всех дочерних блоков в выбранных блоках
 	if(empty($BLK))
 		return array();
@@ -939,24 +967,6 @@ function _blockChildGet($BLK) {//получение всех дочерних б
 	}
 
 	return $BLK;
-}
-function _blockLevelGet($BLK, $level=0) {//определение верхнего уровня todo пока не пригодилась
-	$ids = array();
-	foreach($BLK as $id => $bl) {
-		if(!$bl['parent_id'])
-			return $level;
-		$ids[] = $bl['parent_id'];
-	}
-
-	$ids = array_unique($ids);
-
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `id` IN (".implode(',', $ids).")";
-	if(!$arr = query_arr($sql))
-		return $level;
-
-	return _blockLevelGet($arr, $level+1);
 }
 
 /*

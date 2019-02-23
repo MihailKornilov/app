@@ -2613,7 +2613,24 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					break;
 				//обновление содержимого блоков
 				case 219:
-					alert(unit_id)
+					var ids = _ids(sp.target_ids);
+					if(!ids)
+						return;
+
+					var send = {
+						op:'block_upd',
+						ids:ids,
+						unit_id:unit_id,
+						busy_obj:bo
+					};
+					_post(send, function(res) {
+						_forIn(res.blk, function(sp, id) {
+							_attr_bl(id)._flash().html(sp);
+						});
+
+
+					});
+
 					break;
 			}
 		});

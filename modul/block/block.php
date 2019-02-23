@@ -1,29 +1,4 @@
 <?php
-function _blockChildClear($arr) {//изъятие дочерних блоков, если отсутствует родитель
-	$idsForDel = array();
-	foreach($arr as $id => $r) {
-		if(!$parent_id = $r['parent_id'])
-			continue;
-		$ids = array();
-		$ids[$id] = $id;
-		$DEL_FLAG = true;
-		while(true) {
-			if(!$p = @$arr[$parent_id])
-				break;
-			$ids[$p['id']] = $p['id'];
-			if(!$parent_id = $p['parent_id']) {
-				$DEL_FLAG = false;
-				break;
-			}
-		}
-		if($DEL_FLAG)
-			$idsForDel += $ids;
-	}
-	foreach($idsForDel as $id)
-		unset($arr[$id]);
-
-	return $arr;
-}
 function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
 	if(!$send = @$child[$parent_id])
 		return array();
@@ -139,8 +114,8 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		return '';
 
 	//данные первого блока в массиве
-	$firt_id = key($BLK);
-	$FIRST = $BLK[$firt_id];
+	$first_id = key($BLK);
+	$FIRST = $BLK[$first_id];
 
 	$PARAM = _blockParam($PARAM, $FIRST['obj_name']);
 
@@ -559,7 +534,7 @@ function _blockChildHtml($block, $prm, $grid_id, $level, $width) {//делени
 
 	return _blockLevel($block['child'], $prm, $grid_id, $level, $width);
 }
-function _blockUnitGet($bl, $prm, $is_elem=false) {
+function _blockUnitGet($bl, $prm, $is_elem=false) {//блок принимает данные записи
 	if($bl['elem'] && !$is_elem)
 		return $prm;
 	if(!$bl['action'])
