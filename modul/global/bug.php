@@ -1060,7 +1060,10 @@ function PHP12_bug_element_elem23($ELM) {//Список-таблица
 	if(!$arr = query_arr($sql))
 		return '';
 
-	return _bug_json_elm($arr, $ELM, 'txt_2');
+	$c  = _bug_ids_count($arr, $ELM, 'num_10', true);
+	$c += _bug_json_elm($arr, $ELM, 'txt_2', true);
+
+	return _hide0($c);
 }
 function PHP12_bug_element_elem29($ELM) {//Select: выбор записи из другого списка
 	if(empty($ELM))

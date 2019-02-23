@@ -628,6 +628,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	$order = "`t1`.`id` DESC";
 	if($tab = _queryTN($DLG, 'dtime_add'))
 		$order = "`".$tab."`.`dtime_add`";
+	$IS_SORT = false;
 
 	switch($ELEM['num_8']) {
 		//по дате внесения
@@ -644,6 +645,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 			break;
 		//ручная сортировка
 		case 6161:
+			$IS_SORT = true;
 			$order = "`sort`";
 			$limit = 1000;  //если включена сортировка, количество максимальное
 			$SC = 'ASC';
@@ -710,7 +712,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	}
 
 	//tr догрузки списка
-	if(!$ELEM['num_6'] && $limit * ($next + 1) < $all) {
+	if(!$IS_SORT && $limit * ($next + 1) < $all) {
 		$count_next = $all - $limit * ($next + 1);
 		if($count_next > $limit)
 			$count_next = $limit;
@@ -726,11 +728,11 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	$TABLE_BEGIN = '<table class="_stab'._dn(!$ELEM['num_3'], 'small').'">';
 	$TABLE_END = '</table>';
 
-	$BEGIN = !$next && !$ELEM['num_6'] ? $TABLE_BEGIN : '';
-	$END = !$next && !$ELEM['num_6'] ? $TABLE_END : '';
+	$BEGIN = !$next && !$IS_SORT ? $TABLE_BEGIN : '';
+	$END = !$next && !$IS_SORT ? $TABLE_END : '';
 
 	//включено условие сортировки
-	if($ELEM['num_6']) {
+	if($IS_SORT) {
 		if($ELEM['num_7'] > 1) {
 			$child = array();
 			foreach($spisok as $id => $r)
