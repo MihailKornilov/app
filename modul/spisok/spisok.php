@@ -594,9 +594,14 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		num_3 - узкие строки таблицы
 		num_4 - подсвечивать строку при наведении мыши
 		num_5 - показывать имена колонок
-		num_6 - возможность сортировки строк таблицы (если установлена, длина списка становится 1000)
-		num_7 - уровни сортировки (1,2,3)
+		num_6 - обратный порядок
+		num_7 - уровни сортировки: 1,2,3 (при num_8=6161)
+		num_8 - порядок вывода данных [18]
+					6159 - по дате внесения
+					6160 - по значению из диалога
+					6161 - ручная сортировка (если выбрано, длина списка становится 1000)
 		num_9 - включение отображения сообщения пустого запроса
+		num_10 - выбранное значение для порядка (при num_8=6160)
 
 		настройка шаблона через функцию PHP12_td_setup
 
@@ -615,28 +620,42 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		return _emptyRed('Не указан список для вывода данных.');
 	if(!$DLG = _dialogQuery($dialog_id))
 		return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
-
-	$limit = $ELEM['num_2'];
-
-	//если включена сортировка, количество максимальное
-	if($ELEM['num_6'])
-		$limit = 1000;
-
 	if(!$all = _spisokCountAll($ELEM))
 		return $ELEM['num_9'] ? _emptyMin(_br($ELEM['txt_1'])) : '';
 
+	$limit = $ELEM['num_2'];
+	$SC = $ELEM['num_6'] ? 'DESC' : 'ASC';
 	$order = "`t1`.`id` DESC";
 	if($tab = _queryTN($DLG, 'dtime_add'))
-		$order = "`".$tab."`.`dtime_add` DESC";
-	if($ELEM['num_6'] || _spisokIsSort($ELEM['block_id']))
-		$order = "`sort`";
+		$order = "`".$tab."`.`dtime_add`";
+
+	switch($ELEM['num_8']) {
+		//по дате внесения
+		default:
+		case 6159: break;
+		//по значению из диалога
+		case 6160:
+			if(!$el = _elemOne($ELEM['num_10']))
+				break;
+			if(!$col = $el['col'])
+				break;
+			if($tab = _queryTN($DLG, $col))
+				$order = "`".$tab."`.`".$col."`";
+			break;
+		//ручная сортировка
+		case 6161:
+			$order = "`sort`";
+			$limit = 1000;  //если включена сортировка, количество максимальное
+			$SC = 'ASC';
+			break;
+	}
 
 	//получение данных списка
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Список-таблица <u>".$DLG['name']."</u> */
 			SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._spisokWhere($ELEM)."
-			ORDER BY ".$order."
+			ORDER BY ".$order." ".$SC."
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
