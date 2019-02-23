@@ -635,7 +635,7 @@
 	cursor:pointer;
 	border-radius:2px;
 	box-shadow:0 1px 3px rgba(0,0,0,.1);
-	z-index:1;
+	z-index:91;
 }
 ._dropdown:not(.rs) .dd-list{display:none}
 ._dropdown .dd-sel{
