@@ -186,7 +186,7 @@ function _spisokIsSort($elem_id) {//определение, нужно ли пр
 	return 0;
 }
 
-function _spisokCountAll($el, $next=0) {//получение общего количества строк списка
+function _spisokCountAll($el, $prm, $next=0) {//получение общего количества строк списка
 	$key = 'SPISOK_COUNT_ALL'.$el['id'];
 
 	if(defined($key))
@@ -201,7 +201,7 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Кол-во списка ".$dialog['name']." */
 			SELECT COUNT(*)
 			FROM  "._queryFrom($dialog)."
-			WHERE "._spisokWhere($el);
+			WHERE "._spisokWhere($el, $prm);
 	$all = _num(query_value($sql));
 
 	//проверка, есть ли единица списка, которую нашли по номеру (num)
@@ -213,14 +213,14 @@ function _spisokCountAll($el, $next=0) {//получение общего кол
 	return $all;
 }
 
-function _spisokElemCount($el) {//формирование элемента с содержанием количества списка для вывода на страницу
+function _spisokElemCount($el, $prm=array()) {//формирование элемента с содержанием количества списка для вывода на страницу
 	if(!$elem_id = $el['num_1'])
 		return 'Список не указан.';
 	if(!$ELEM = _elemOne($elem_id))
 		return 'Элемента, содержащего список, не существует.';
 
 	//если результат нулевой, выводится сообщение из элемента, который размещает список
-	if(!$all = _spisokCountAll($ELEM))
+	if(!$all = _spisokCountAll($ELEM, $prm))
 		return $el['txt_7'];
 
 	return
@@ -525,7 +525,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 
 	$limit = $ELEM['num_2'];
 
-	if(!$all = _spisokCountAll($ELEM, $next))
+	if(!$all = _spisokCountAll($ELEM, array(), $next))
 		return _emptyMin(_br($ELEM['txt_1']));
 
 	$IS_SORT = _spisokIsSort($ELEM['id']);
@@ -585,7 +585,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 
 	return $send;
 }
-function _spisok23($ELEM, $next=0) {//вывод списка в виде таблицы
+function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в виде таблицы
 	/*
         num_1 - id диалога, который вносит данные списка (шаблон которого будет настраиваться)
 		num_2 - длина (количество строк, выводимых за один раз)
@@ -620,7 +620,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 		return _emptyRed('Не указан список для вывода данных.');
 	if(!$DLG = _dialogQuery($dialog_id))
 		return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
-	if(!$all = _spisokCountAll($ELEM))
+	if(!$all = _spisokCountAll($ELEM, $prm))
 		return $ELEM['num_9'] ? _emptyMin(_br($ELEM['txt_1'])) : '';
 
 	$limit = $ELEM['num_2'];
@@ -656,7 +656,7 @@ function _spisok23($ELEM, $next=0) {//вывод списка в виде таб
 	$sql = "/* ".__FUNCTION__.":".__LINE__." Список-таблица <u>".$DLG['name']."</u> */
 			SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
-			WHERE  "._spisokWhere($ELEM)."
+			WHERE  "._spisokWhere($ELEM, $prm)."
 			ORDER BY ".$order." ".$SC."
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
@@ -962,7 +962,7 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения к
 	return preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $txt, 1);
 }
 
-function _spisokWhere($el) {//формирование строки с условиями поиска
+function _spisokWhere($el, $prm=array()) {//формирование строки с условиями поиска
 	//$el - элемент, который размещает список 14 или 23.
 
 	if($el['dialog_id'] != 14 && $el['dialog_id'] != 23)
@@ -972,7 +972,7 @@ function _spisokWhere($el) {//формирование строки с усло�
 	$dlg = _dialogQuery($el['num_1']);
 
 	$cond = _queryWhere($dlg);
-	$cond .= _40cond($el, $el['txt_2']);
+	$cond .= _40cond($el, $el['txt_2'], $prm);
 	$cond .= _spisokCond7($el);
 	$cond .= _spisokCond62($el);
 	$cond .= _spisokCond72($el);
@@ -1225,7 +1225,7 @@ function _spisokCond102($el) {//Фильтр - Выбор нескольких �
 }
 
 
-function _40cond($EL, $cond) {//изначальные условия отображения списка
+function _40cond($EL, $cond, $prm=array()) {//изначальные условия отображения списка
 /*
 	значения, которые может принимать unit_id:
 		 -1 => 'Совпадает с текущей страницей'
@@ -1265,7 +1265,7 @@ function _40cond($EL, $cond) {//изначальные условия отобр
 
 		$col = '`'._queryTN($DLG, $col).'`.`'.$col.'`';
 
-		$val = _40cond_cnn($EL, $r, $ell, $r['txt']);
+		$val = _40cond_cnn($EL, $r, $ell, $r['txt'], $prm);
 		$val = _40cond_17($r, $ell, $val);
 		$val = _40cond_date($ell, $val);
 		$val = _40cond_dop($r, $ell, $val);
@@ -1311,7 +1311,7 @@ function _40cond($EL, $cond) {//изначальные условия отобр
 
 	return $send;
 }
-function _40cond_cnn($EL, $r, $ell, $v) {//значение подключаемого списка
+function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключаемого списка
 	if(!_elemIsConnect($r['elem_id']))
 		return $v;
 	if(!$DLG_ID_CONN = $ell['num_1'])
@@ -1385,6 +1385,10 @@ function _40cond_cnn($EL, $r, $ell, $v) {//значение подключаем
 
 		return $unit_id;
 	}
+
+	//указан вариант, когда блок принимает данные записи
+	if($unit_id == -3)
+		return _num(@$prm['unit_get_id']);
 
 	//проверяются дочерние значения
 	$sql = "/* [40] проверка дочерних значений */

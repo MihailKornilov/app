@@ -2625,7 +2625,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					};
 					_post(send, function(res) {
 						_forIn(res.blk, function(sp, id) {
-							_attr_bl(id)._flash().html(sp);
+							_attr_bl(id).html(sp);
 						});
 
 

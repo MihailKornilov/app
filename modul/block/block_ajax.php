@@ -342,13 +342,19 @@ switch(@$_POST['op']) {
 	case 'block_upd'://обновление содержания блоков
 		if(!$block_id = _num($_POST['ids']))
 			jsonError('Функция работает пока только для одного блока');
+		if(!$unit_id = _num($_POST['unit_id']))
+			jsonError('Не получен id записи');
 		if(!$bl = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
 
 		$BLK = _BE('block_obj', $bl['obj_name'], $bl['obj_id']);
 		$bll[$block_id] = _blockChild($BLK, $block_id);
 
-		$send['blk'][$block_id] = _blockLevel($bll);
+		$el = _blockChild($BLK, $block_id);
+		$prm = _blockParam(array(), $bl['obj_name']);
+		$prm['unit_get_id'] = $unit_id;
+
+		$send['blk'][$block_id] = _elemDiv($el, $prm);
 
 		jsonSuccess($send);
 		break;

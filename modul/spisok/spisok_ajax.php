@@ -233,7 +233,7 @@ switch(@$_POST['op']) {
 		if(!$next = _num($_POST['next']))
 			jsonError('Некорректное значение очередного блока списка');
 
-		$send['spisok'] = _spisok23($el, $next);
+		$send['spisok'] = _spisok23($el, array(), $next);
 		jsonSuccess($send);
 		break;
 	case 'spisok_23_sort':

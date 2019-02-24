@@ -544,7 +544,8 @@ function _blockUnitGet($bl, $prm, $is_elem=false) {//блок принимает
 		switch($act['dialog_id']) {
 			case 218:
 				if(!$id = _num(@$_GET['id']))
-					return _emptyMin($act['filter']);
+					if(!$id = _num($prm['unit_get_id']))
+						return _emptyMin($act['filter']);
 				if(!$dialog = _dialogQuery($act['initial_id']))
 					return _emptyMin('Не существует диалога, который вносит данные записи.');
 				if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $id))
@@ -996,7 +997,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				txt_5 "5" txt_6 - показано "5" записей
 				txt_7 - сообщение об отсутствии записей
 			*/
-			return _spisokElemCount($el);
+			return _spisokElemCount($el, $prm);
 
 		//Radio - произвольные значения
 		case 16:
@@ -1059,7 +1060,7 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			if($prm['blk_setup'])
 				return _emptyMin('Список-таблица <b>'._dialogParam($el['num_1'], 'name').'</b>');
 
-			return _spisok23($el);
+			return _spisok23($el, $prm);
 
 		//Select - выбор списка приложения
 		case 24:
