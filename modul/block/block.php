@@ -1991,6 +1991,13 @@ function _elemPrint($el, $prm) {//формирование и отображен
 				'<input type="text" class="w100p'._dn(!$user_id).'"'.$disabled.' />'.
 				'<div class="vk-res">'.$vkRes.'</div>'.
 			'</div>';
+
+		//График: столбики
+		case 400:
+			/*
+				num_1 - список (id диалога) [24]
+			*/
+			return _elem400($el, $prm);
 	}
 
 	return _msgRed('dlg-'.$el['dialog_id']);

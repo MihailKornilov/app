@@ -2106,6 +2106,48 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							INP.val('')._dn(1).focus();
 						});
 					return;
+				//График-столбики
+				case 400:
+					$('#chart_' + elm_id)
+						.height(300)
+						.highcharts({
+							chart:{
+								type:'column'
+							},
+							title:{
+								text:'Новые заявки за последние 30 дней'
+							},
+							xAxis:{
+								categories:window['CAT_' + elm_id],
+								labels:{
+									style:{
+										color:'#333'
+									}
+								}
+							},
+							yAxis:{
+								title:{
+									text:'Количество'
+								},
+						        stackLabels:{
+							        enabled:true,
+							        style:{
+								        fontWeight:'bold',
+								        color:'black'
+							        }
+						        }
+							},
+							plotOptions:{
+								column:{
+									stacking:'normal',
+									dataLabels:{
+										enabled:false
+									}
+								}
+							},
+							series:window['SERIES_' + elm_id]
+						});
+					return;
 			}
 		});
 
