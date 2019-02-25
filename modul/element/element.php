@@ -4959,7 +4959,8 @@ function _historyKit($el, $prm) {//составление одной сборк�
 	if(!$txt = _elemPrint($el, $prm))
 		return '';
 
-	$cls = array('wsnw');
+	$cls = array('');
+//	$cls = array('wsnw');
 	if($el['font'])
 		$cls[] = $el['font'];
 	if($el['color'])

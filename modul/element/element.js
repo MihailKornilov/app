@@ -2110,6 +2110,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 400:
 					$('#chart_' + elm_id)
 						.height(300)
+						.width(980)
 						.highcharts({
 							chart:{
 								type:'column'
