@@ -2116,7 +2116,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								type:'column'
 							},
 							title:{
-								text:'Новые заявки за последние 30 дней'
+								text:el.txt_1
 							},
 							xAxis:{
 								categories:window['CAT_' + elm_id],
