@@ -884,19 +884,19 @@ function _cache($v=array()) {
 	$key = '__'.($global || !_num(@APP_ID) ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
 
 	switch($action) {
-		case 'get': return CACHE_USE ? xcache_get($key) : false;
+		case 'get': return CACHE_USE ? apcu_fetch($key) : false;
 		case 'set':
 //			if(!isset($v['data']))
 //				die('Отсутствуют данные для внесения в кеш. Key: '.$key);
 
 			if(CACHE_USE)
-				xcache_set($key, $v['data'], CACHE_TTL);
+				apcu_store($key, $v['data'], CACHE_TTL);
 
 			return $v['data'];
-		case 'isset': return CACHE_USE ? xcache_isset($key) : false;
+		case 'isset': return CACHE_USE ? apcu_exists($key) : false;
 		case 'clear':
 			if(CACHE_USE)
-				xcache_unset($key);
+				apcu_delete($key);
 			return true;
 		default: die('Неизвестное действие кеша.');
 	}
@@ -926,7 +926,7 @@ function _cache_isset($key, $global=0) {//проверка, производил
 function _cache_clear($key, $global=0) {//очистка кеша
 	if($key == 'all') {
 		if(CACHE_USE)
-			xcache_clear_cache(1);
+			apcu_clear_cache();
 		return true;
 	}
 

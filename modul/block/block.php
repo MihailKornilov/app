@@ -1995,10 +1995,13 @@ function _elemPrint($el, $prm) {//формирование и отображен
 		//График: столбики
 		case 400:
 			/*
+				txt_1 - заголовок
 				num_1 - список (id диалога) [24]
 			*/
 			return _elem400($el, $prm);
 	}
+
+//	return _element('print', $el, $prm);
 
 	return _msgRed('dlg-'.$el['dialog_id']);
 }

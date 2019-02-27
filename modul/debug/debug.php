@@ -63,6 +63,7 @@ function _debug($i='') {
 }
 
 function _debug_cache() {//результат использования кеша
+	return '';
 	$xi = xcache_info(XC_TYPE_VAR, 0);
 
 	$size = round($xi['size'] / 1024 / 1024, 2);

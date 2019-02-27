@@ -1,4 +1,19 @@
 <?php
+
+function _element($type, $el, $prm=array()) {//все манипуляции, связанные с элементом
+	/*
+		$type:
+			print - вывод элемента на экран
+
+	*/
+
+
+
+
+}
+
+
+
 function PHP12_elem_info($prm) {//информация об элементе [118]
 	if(!$elem_id = $prm['unit_get_id'])
 		return _emptyRed('Не получен id элемента.');

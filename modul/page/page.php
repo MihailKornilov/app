@@ -808,6 +808,21 @@ function PHP12_pin_dialog_open($prm) {
 function _page_div() {//todo тест
 
 	return '';
+	$key = 'APCU_KEY7';
+
+		$arr = array();
+		for($n = 0; $n < 100; $n++)
+			$arr[$n] = array(
+				'txt_1' => $n*231,
+				'txt_2' => $n*105
+			);
+		apcu_store($key, $arr);
+
+
+	if(apcu_exists($key)) {
+		return $key.' = '._pr(apcu_fetch($key));
+	}
+	return '';
 
 	return
 	'<div>'.
