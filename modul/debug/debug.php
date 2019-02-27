@@ -63,15 +63,18 @@ function _debug($i='') {
 }
 
 function _debug_cache() {//результат использования кеша
-	return '';
-	$xi = xcache_info(XC_TYPE_VAR, 0);
+	if(!CACHE_USE)
+		return '';
 
-	$size = round($xi['size'] / 1024 / 1024, 2);
-	$avail = round($xi['avail'] / 1024 / 1024, 2);
+	$asi = apcu_sma_info();//информация о выделямой памяти
+	$aci = apcu_cache_info();//информация о данных, сохранённых в кеше
+
+	$size = round($asi['seg_size'] / 1024 / 1024, 2);
+	$avail = round($asi['avail_mem'] / 1024 / 1024, 2);
 	$busy = round($size - $avail, 2);
 
-	$list = xcache_list(XC_TYPE_VAR, 0);
-	$cc = count($list['cache_list']);
+	$list = $aci['cache_list'];
+	$cc = count($list);
 
 	$send =
 		'<table class="_stab small mar10">'.
@@ -84,20 +87,22 @@ function _debug_cache() {//результат использования кеш�
 				'<td class="color-pay r"><b>'.$avail.'</b> mb'.
 		'</table>';
 
+
+
 	if(!$cc)
 		return $send;
 
 	$ccGlobal = array();//глобальный кеш
 	$ccApp = array();   //кеш по приложениям
 	$ccOther = array();  //кеш из других приложений
-	foreach($list['cache_list'] as $n => $r) {
-		if(preg_match('/^__GLOBAL[a-z0-9_]{1,50}$/i', $r['name'])) {
+	foreach($list as $n => $r) {
+		if(preg_match('/^__GLOBAL[a-z0-9_]{1,50}$/i', $r['info'])) {
 			$ccGlobal[] = $r;
 			continue;
 		}
 
-		if(preg_match('/^__APP[a-z0-9_]{1,50}$/i', $r['name'])) {
-			$ex = explode('__APP', $r['name']);
+		if(preg_match('/^__APP[a-z0-9_]{1,50}$/i', $r['info'])) {
+			$ex = explode('__APP', $r['info']);
 			$ex = explode('_', $ex[1]);
 			$ccApp[$ex[0]][] = $r;
 			continue;
@@ -134,15 +139,15 @@ function _debug_cache() {//результат использования кеш�
 	return $send;
 }
 function _debug_cache_tr($r, $n) {
-	$t = time() - $r['ctime'];
+	$t = time() - $r['creation_time'];
 	if($t < 60)
 		$t .= ' s';
 	else
 		$t = '<b class="grey">'.floor($t / 60).'</b> m';
 	return '<tr>'.
 		'<td class="r grey">'.($n + 1).
-		'<td><a class="fs12" onclick=_cacheContentOpen("'.$r['name'].'")>'.$r['name'].'</a>'.
-		'<td class="r">'._sumSpace($r['size']).
+		'<td><a class="fs12" onclick=_cacheContentOpen("'.$r['info'].'")>'.$r['info'].'</a>'.
+		'<td class="r">'._sumSpace($r['mem_size']).
 		'<td class="r pale">'.$t;
 
 }

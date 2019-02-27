@@ -942,10 +942,10 @@ function _cache_content() {//содержание кеша в диалоге [84
 	elseif(!$name = @$_COOKIE['cache_content_name'])
 			$send = 'Отсутствует имя кеша.';
 		else {
-			if(!xcache_isset($name))
+			if(!apcu_exists($name))
 				$send = '<b>'.$name.'</b>: кеш не сохранён.';
 			else {
-				if(!$arr = xcache_get($name))
+				if(!$arr = apcu_fetch($name))
 					$send = '<b>'.$name.'</b>: кеш пуст.';
 				else
 					$send =
