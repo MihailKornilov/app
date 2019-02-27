@@ -24,7 +24,6 @@ function _elem400($el, $prm) {//График: столбики
 			$w = 0;
 	}
 
-
 	$sql = "SELECT
 				DATE_FORMAT(`dtime_add`,'%Y-%m-%d') AS `day`,
 				COUNT(`id`) `count`
@@ -34,7 +33,8 @@ function _elem400($el, $prm) {//График: столбики
 			GROUP BY `day`
 			ORDER BY `day`";
 	foreach(query_ass($sql) as $d => $c)
-		$data[$d] = $c;
+		if(isset($data[$d]))
+			$data[$d] = $c;
 
 	return
 	'<div id="chart_'.$el['id'].'"></div>'.
