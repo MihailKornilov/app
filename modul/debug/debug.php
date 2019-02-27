@@ -130,9 +130,11 @@ function _debug_cache() {//результат использования кеш�
 			$send .= _debug_cache_tr($r, $n);
 	}
 
-	$send .= $TR_E.'Другие приложения:';
-	foreach($ccOther as $n => $r)
-		$send .= _debug_cache_tr($r, $n);
+	if($ccOther) {
+		$send .= $TR_E.'Другие приложения:';
+		foreach($ccOther as $n => $r)
+			$send .= _debug_cache_tr($r, $n);
+	}
 
 	$send .= '</table>';
 
