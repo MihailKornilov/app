@@ -608,7 +608,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 
 		if($is_err)
 			jsonError(array(
-				'attr_cmp' => $cmp['attr_cmp']._dialogParam($cmp['dialog_id'], 'element_afics'),
+				'attr_cmp' => _elemAttrCmp($cmp)._dialogParam($cmp['dialog_id'], 'element_afics'),
 				'text' => $err_msg
 			));
 	}

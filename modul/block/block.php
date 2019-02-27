@@ -603,7 +603,7 @@ function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элеме�
 	return ' id="el_'.$el['id'].'"';
 }
 function _elemDivSize($el) {//класс - размер шрифта
-	if(!$el['size'])
+	if(empty($el['size']))
 		return '';
 	if($el['size'] == 13)
 		return '';
@@ -623,7 +623,7 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 
 	$cls = array();
 	$cls[] = _elemFormatColorDate($el, $prm, $txt);
-	$cls[] = $el['font'];
+	$cls[] = @$el['font'];
 	$cls[] = _elemDivSize($el);
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
@@ -665,6 +665,8 @@ function _elemFormatDigital($el, $txt) {//Дополнительное форм�
 	return $txt;
 }
 function _elemFormatColor($el, $txt) {//подмена цвета при дополнительном форматировании для чисел
+	$el['color'] = empty($el['color']) ? '' : $el['color'];
+
 	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
 		return $el['color'];
 	if(empty($el['format']))
@@ -763,263 +765,6 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			$prm['unit_edit'] = array();
 
 	switch($el['dialog_id']) {
-		//галочка
-		case 1:
-			/*
-				txt_1 - текст для галочки
-			*/
-			return _check(array(
-				'attr_id' => _elemAttrId($el, $prm),
-				'title' => $el['txt_1'],
-				'disabled' => $prm['blk_setup'],
-				'value' => _elemPrintV($el, $prm, $el['def'])
-			));
-
-		//button
-		case 2: return _elemButton($el, $prm);
-
-		//Меню страниц
-		case 3:
-			/*
-				num_1 - раздел (страница-родитель). В меню будут дочерние страницы
-				num_2 - внешний вид:
-						1 - Основной вид - горизонтальное меню
-						2 - С подчёркиванием (гориз.)
-						3 - Синие маленькие кнопки (гориз.)
-						4 - Боковое вертикальное меню
-			*/
-			return _menu($el, $prm['blk_setup']);
-
-		//Заголовок
-		case 4:
-			/*
-                txt_1 - текст заголовка
-			*/
-			return '<div class="hd2">'.$el['txt_1'].'</div>';
-
-		//textarea (многострочное текстовое поле)
-		case 5:
-			/*
-				txt_1 - текст для placeholder
-			*/
-			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$disabled = $prm['blk_setup'] ? ' disabled' : '';
-
-			return
-			'<textarea id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.'>'.
-				_elemPrintV($el, $prm).
-			'</textarea>';
-
-		//Select - выбор страницы
-		case 6:
-			/*
-                txt_1 - текст, когда страница не выбрана
-				содержание: PAGE_LIST
-			*/
-			return _select(array(
-						'attr_id' => _elemAttrId($el, $prm),
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'value' => _elemPrintV($el, $prm, 0)
-				   ));
-
-		//Фильтр: быстрый поиск
-		case 7:
-			/*
-                txt_1 - текст поиска
-				num_1 - id элемента, содержащего список, по которому происходит поиск
-				txt_2 - по каким полям производить поиск (id элементов через запятую диалога списка)
-			*/
-
-			return _search(array(
-						'attr_id' => _elemAttrId($el, $prm),
-						'placeholder' => $el['txt_1'],
-						'width' => $el['width'],
-						'v' => _spisokFilter('vv', $el),
-						'disabled' => $prm['blk_setup']
-					));
-
-		//input:text (однострочное текстовое поле)
-		case 8:
-			/*
-				txt_1 - текст для placeholder
-				txt_2 - текст по умолчанию
-				num_1 - формат:
-					32 - произвольный текст
-					33 - цифры и числа
-					34 - артикул
-				num_2 - количество знаков после запятой (для 33)
-				num_3 - разрешать отрицательные значения (для 33)
-				num_4 - разрешать вносить 0 (для 33)
-				txt_3 - шаблон артикула (для 34)
-			*/
-			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$disabled = $prm['blk_setup'] ? ' disabled' : '';
-
-
-			$v = _elemPrintV($el, $prm, $el['txt_2']);
-
-			switch($el['num_1']) {
-				default:
-				//произвольный текст
-				case 32: break;
-				//цифры и числа
-				case 33:
-					$v = round($v, $el['num_2']);
-					$v = $v || $el['num_4'] ? $v : '';
-					break;
-				//артикул
-				case 34:
-					if($v)
-						break;
-					if(!$col = _elemCol($el))
-						break;
-					if(!$BL = $el['block'])
-						break;
-					if($BL['obj_name'] != 'dialog')
-						break;
-					if(!$DLG = _dialogQuery($BL['obj_id']))
-						break;
-					$sql = "SELECT MAX(`t1`.`".$col."`)+1
-							FROM  "._queryFrom($DLG)."
-							WHERE "._queryWhere($DLG)."
-							  AND LENGTH(`t1`.`".$col."`)=".strlen($el['txt_3']);
-					$v = query_value($sql);
-					if(($diff = strlen($el['txt_3']) - strlen($v)) > 0)
-						for($n = 0; $n < $diff; $n++)
-							$v = '0'.$v;
-					break;
-			}
-
-			return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
-
-		//Поле-пароль
-		case 9:
-			/*
-				txt_1 - текст для placeholder
-				num_1 - минимальное количество знаков
-			*/
-			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$disabled = $prm['blk_setup'] ? ' disabled' : '';
-
-			return '<input type="password" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' />';
-
-		//произвольный текст
-		case 10:
-			/*
-                txt_1 - текст
-			*/
-			return _br($el['txt_1']);
-
-		//Вставка значения записи
-		case 11:
-			/*
-				Вставка элемента через функцию PHP12_v_choose
-
-				txt_2 - id элемента, выбранного из диалога, который вносит данные списка
-						возможна иерархия элементов через запятую 256,1312,560
-			*/
-
-			return _elem11($el, $prm);
-
-		//SA: Функция PHP
-		case 12:
-			/*
-				После размещения данных PHP-функции будет выполняться JS-функция с таким же именем, если существует.
-
-                txt_1 - имя функции (начинается с PHP12)
-				txt_2 - начальное значение
-				num_1 - условие 1
-			*/
-
-			if(!$el['txt_1'])
-				return _emptyMin('Отсутствует имя функции.');
-			if(!function_exists($el['txt_1']))
-				return _emptyMinRed('Фукнции <b>'.$el['txt_1'].'</b> не существует.');
-			if($prm['blk_setup'])
-				return _emptyMin('Функция '.$el['txt_1']);
-
-			$prm['el12'] = $el;
-
-			return
-			($el['col'] ?
-				'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm, $el['txt_2']).'" />'
-			: '').
-				$el['txt_1']($prm);
-
-		//Выбор элемента из диалога или страницы
-		case 13:
-			/*
-				txt_1 - текст для placeholder
-				num_1 - ID диалога (список всех диалогов)
-				num_2 - разрешать выбирать только некоторые типы элементов (иначе любые)
-				txt_2 - ids диалогов разрешённых элементов
-				num_5 - выбор значений во вложенных списках
-				num_6 - выбор нескольких значений
-			*/
-
-			$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-			$disabled = $prm['blk_setup'] ? ' disabled' : '';
-
-			//в самом себе выбор элемента невозможен
-			if($block_id = $prm['srce']['block_id'])//должен быть блок 2214
-				if($BL = _blockOne($block_id))
-					if($BL['obj_name'] == 'dialog' && $BL['obj_id'] == 13)
-						$disabled = ' disabled';
-
-			$v = _elemPrintV($el, $prm, !$el['num_5'] && !$el['num_6'] ? 0 : '');
-
-			return
-			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-			'<div class="_selem dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
-				'<div class="icon icon-star pabs"></div>'.
-				'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-				'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
-			'</div>';
-
-		//Список-шаблон
-		case 14:
-			if(!$dialog_id = $el['num_1'])
-				return _emptyRed('Не указан список для вывода данных.');
-			if(!$DLG = _dialogQuery($dialog_id))
-				return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
-			if($prm['blk_setup'])
-				return _emptyMin('Список-шаблон <b>'.$DLG['name'].'</b>');
-
-			return _spisok14($el);
-
-		//Количество строк списка
-		case 15:
-			/*
-                num_1 - id элемента, содержащего список, количество строк которого нужно выводить
-				txt_1 "1" txt_2 - показана "1" запись
-				txt_3 "2" txt_4 - показано "2" записи
-				txt_5 "5" txt_6 - показано "5" записей
-				txt_7 - сообщение об отсутствии записей
-			*/
-			return _spisokElemCount($el, $prm);
-
-		//Radio - произвольные значения
-		case 16:
-			/*
-				txt_1 - текст нулевого значения
-				num_1 - горизонтальное положение
-				num_2 - значения:
-					3876 - произвольные значения (настраиваются через PHP12_radio_setup)
-					3877 - значения существующего элемента
-				num_3 - элемент, если выбрано num_2:3877
-			*/
-			return _radio(array(
-				'attr_id' => _elemAttrId($el, $prm),
-				'light' => 1,
-				'block' => !$el['num_1'],
-				'interval' => 5,
-				'value' => _elemPrintV($el, $prm, $el['def']),
-				'title0' => $el['txt_1'],
-				'spisok' => _elemVvv($el['id'], $prm),
-				'disabled' => $prm['blk_setup']
-			));
-
 		//Select - произвольные значения
 		case 17:
 			/*
@@ -2001,15 +1746,13 @@ function _elemPrint($el, $prm) {//формирование и отображен
 			return _elem400($el, $prm);
 	}
 
-//	return _element('print', $el, $prm);
-
-	return _msgRed('dlg-'.$el['dialog_id']);
+	return _element('print', $el, $prm);
 }
 function _elemPrintV($el, $prm, $def='') {//значение записи при редактировании
 	if(!$u = $prm['unit_edit'])
 		return $def;
 	//установлен флаг "Всегда по умолчанию"
-	if($el['nosel'])
+	if(!empty($el['nosel']))
 		return $def;
 	if(!$col = $el['col'])
 		return $def;
@@ -2600,7 +2343,7 @@ function _beElem($app_id=0) {
 		$ELM = array();
 		foreach($arr as $el) {
 			$elem_id = _num($el['id']);
-			$el = _beElemStructure($el);
+			$el = _element('struct', $el);
 			$el = _beElemDlg($el);
 
 			$ELM[$elem_id] = $el;
@@ -2614,49 +2357,6 @@ function _beElem($app_id=0) {
 	}
 
 	return $ELM;
-}
-function _beElemStructure($el) {//основная структура элемента
-	$elem_id = _num($el['id']);
-
-	$send = array(
-		'id' => $elem_id,
-		'app_id' => _num($el['app_id']),
-		'dialog_id' => _num($el['dialog_id']),
-		'block_id' => _num($el['block_id']),
-		'parent_id' => _num($el['parent_id']),
-		'col' => $el['col'],
-		'name' => $el['name'],
-		'req' => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-		'nosel' => _num($el['nosel']),
-		'focus' => _num($el['focus']),
-		'width' => _num($el['width']),
-		'width_max' => 0,
-		'color' => $el['color'],
-		'font' => $el['font'],
-		'mar' => $el['mar'],
-		'size' => $el['size'] ? _num($el['size']) : 13,
-		'def' => _num($el['def'], 1),
-
-		'attr_el' => '#el_'.$elem_id,
-		'attr_cmp' => '#cmp_'.$elem_id,
-
-		'afics' => '',
-		'hidden' => 0,
-		'format' => array(),
-		'action' => array(),
-		'hint' => array()
-	);
-
-	for($n = 1; $n <= 10; $n++) {
-		$num = 'num_'.$n;
-		$send[$num] = _num($el[$num], 1);
-
-		$txt = 'txt_'.$n;
-		$send[$txt] = $el[$txt];
-	}
-
-	return $send;
 }
 function _beElemDlg($el) {//настройки элемента из диалогов
 	global $G_DLG, $G_BLOCK;

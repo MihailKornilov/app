@@ -1,16 +1,704 @@
 <?php
+/*
+	Каждый элемент должен пройти проверку:
+		1. Корректное визуальное отображение в блоке
+		2. Настройка ширины (в PageSetup) ['width']
+		3. Наличие флага обязательного заполнения ['req']
+		4. Установка фокуса ['focus']
+*/
 
-function _element($type, $el, $prm=array()) {//все манипуляции, связанные с элементом
-	/*
-		$type:
-			print - вывод элемента на экран
+function _elementType($type, $el=array()) {//все возможные варианты манипуляций
+	switch($type) {
+		//вывод элемента на экран
+		case 'print': return '';
 
-	*/
+		//структура элемента: колонки, поля, подсказки, действия, форматирование
+		case 'struct':
+			$send =  array(
+				'id'        => _num(@$el['id']),
+				'app_id'    => _num(@$el['app_id']),
+				'dialog_id' => _num(@$el['dialog_id']),
+				'block_id'  => _num(@$el['block_id']),
+				'parent_id' => _num(@$el['parent_id']),
+				'col'       => @$el['col'],
+				'name'      => @$el['name'],
+				'req'       => _num(@$el['req']),
+				'req_msg'   => @$el['req_msg'],
+				'nosel'     => _num(@$el['nosel']),
+				'focus'     => _num(@$el['focus']),
+				'width'     => _num(@$el['width']),
+				'width_max' => 0,
+				'color'     => @$el['color'],
+				'font'      => @$el['font'],
+				'mar'       => @$el['mar'],
+				'size'      => @$el['size'] ? _num($el['size']) : 13,
+				'def'       => _num(@$el['def'], 1),
 
+				'afics' => '',
+				'hidden' => 0,
+				'format' => array(),
+				'action' => array(),
+				'hint' => array()
+			);
+			for($n = 1; $n <= 10; $n++) {
+				$num = 'num_'.$n;
+				$send[$num] = _num(@$el[$num], 1);
 
+				$txt = 'txt_'.$n;
+				$send[$txt] = @$el[$txt];
+			}
+			return $send;
 
+		//структура элемента для JS
+		case 'js':
+			if(empty($el))
+				return array();
+			return _elementJs($el);
+	}
 
+	return '';
 }
+function _elementStruct($el) {//структура элемента - базовые компоненты
+	$send = array(
+		'id' =>         _num($el['id']),
+		'app_id' =>     _num($el['app_id']),
+		'block_id' =>   _num($el['block_id']),
+		'dialog_id' =>  _num($el['dialog_id']),
+		'col' =>             $el['col'],
+		'name' =>            $el['name'],
+		'mar' =>             $el['mar'],
+		'def' =>        _num($el['def'], 1)
+	);
+
+	if($el['width'])
+		$send['width'] = _num($el['width']);
+
+	return $send;
+}
+function _elementJs($el) {//структура элемента для JS
+	$send = array(
+		'dialog_id' => $el['dialog_id'],
+		'block_id'  => $el['block_id'],
+		'mar'       => $el['mar']
+	);
+
+	if($el['width'])
+		$send['width'] = $el['width'];
+
+	if($el['focus'])
+		$send['focus'] = 1;
+
+	return $send;
+}
+function _element($type, $el, $prm=array()) {//все манипуляции, связанные с элементом
+	if(!$dlg_id = _num($el['dialog_id']))
+		return _elementType($type);
+
+	$fname = '_element'.$dlg_id;
+	if(!function_exists($fname))
+		return _elementType($type, $el);
+
+	return $fname($type, $el, $prm);
+}
+
+/* [1] Галочка */
+function _element1($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'txt_1' => $el['txt_1'] //текст для галочки
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return _check(array(
+			'attr_id' => _elemAttrId($el, $prm),
+			'title' => $el['txt_1'],
+			'disabled' => $prm['blk_setup'],
+			'value' => _elemPrintV($el, $prm, $el['def'])
+		));
+
+	return _elementType($type, $el);
+}
+
+/* [2] Кнопка */
+function _element2($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'parent_id' => _num($el['parent_id']),
+
+			'txt_1' => $el['txt_1'],        //текст кнопки
+			'num_1' => _num($el['num_1']),  //цвет
+			'num_2' => _num($el['num_2']),  //маленькая кнопка
+			'num_3' => _num($el['num_3']),  //передаёт данные записи
+			'num_4' => _num($el['num_4'])   //dialog_id, который назначен на эту кнопку
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return _element2print($el, $prm);
+
+	return _elementType($type, $el);
+}
+function _element2print($el, $prm) {//кнопка [2]
+	$color = array(
+		0 => '',      //Синий - по умолчанию
+		1 => '',      //Синий
+		2 => 'green', //Зелёный
+		3 => 'red',   //Красный
+		4 => 'grey',  //Серый
+		5 => 'cancel',//Прозрачный
+		6 => 'pink',  //Розовый
+		7 => 'orange' //Оранжевый
+	);
+
+	//если кнопка расположена в ячейке таблицы, установка ширины = 100%. Ширина будет подстраиваться под ячейку.
+	if($parent_id = $el['parent_id'])
+		if($elp = _elemOne($parent_id))
+			if($elp['dialog_id'] == 23)
+				$el['width'] = 0;
+
+	return _button(array(
+				'attr_id' => _elemAttrId($el, $prm),
+				'name' => _br($el['txt_1']),
+				'color' => $color[$el['num_1']],
+				'width' => _num(@$el['width']),
+				'small' => $el['num_2'],
+				'class' => $prm['blk_setup'] ? 'curD' : 'dialog-open',
+				'val' => _element2printVal($el, $prm)
+			));
+}
+function _element2printVal($el, $prm) {//значения аттрибута val для кнопки
+	$ass['dialog_id'] = $el['num_4'];
+
+	//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
+	if($el['num_4'] <= 0)
+		$ass['block_id'] = $el['block_id'];
+
+	//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
+	//а также вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
+	//Нужно для назначения функций (пока)
+	if(!empty($el['block']))
+		if($el['block']['obj_name'] == 'dialog') {
+			$ass['dss'] = $el['block']['obj_id'];
+			if($prm['srce']['block_id'])
+				$ass['block_id'] = $prm['srce']['block_id'];
+			if($prm['srce']['element_id'])
+				$ass['element_id'] = $prm['srce']['element_id'];
+		}
+
+	$val = array();
+	foreach($ass as $k => $v)
+		$val[] = $k.':'.$v;
+
+	$val = implode(',', $val);
+
+	if($dialog_id = $el['num_4'])
+		$val .= _dialogOpenVal($dialog_id, $prm, $el['num_3']);
+
+	return $val;
+}
+
+/* [3] Меню страниц */
+function _element3($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'num_1' => _num($el['num_1']),// раздел (страница-родитель). В меню будут дочерние страницы
+			'num_2' => _num($el['num_2']) /* внешний вид:
+												1 - Основной вид - горизонтальное меню
+												2 - С подчёркиванием (гориз.)
+												3 - Синие маленькие кнопки (гориз.)
+												4 - Боковое вертикальное меню
+												5 - Боковое с иконками
+										  */
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return _menu($el, $prm['blk_setup']);
+
+	return _elementType($type, $el);
+}
+function _menu($el, $is_edit) {//Меню страниц [3]
+	$menu = array();
+	foreach(_page() as $id => $r) {
+		if(!$r['app_id'])
+			continue;
+		if($r['sa'])
+			continue;
+		if(!_pageAccess($id))
+			continue;
+		//раздел
+		if($el['num_1'] != $r['parent_id'])
+			continue;
+		$menu[$id] = $r;
+	}
+
+	if(!$menu)
+		return 'Разделов нет.';
+
+	$menu = _spisokImage($menu);
+	$menu = _menuCount($menu);
+
+	$razdel = '';
+	foreach($menu as $page_id => $r) {
+		$sel = _page('is_cur_parent', $r['id']) ? ' sel' : '';
+
+		//фактическая страница, на которую будет переход
+		$pid = $page_id;
+
+		//если страница является ссылкой на другую страницу, при этом она недоступна, поиск первой вложенной доступной
+		if($r['common_id'])
+			foreach(_page('child', $r['id']) as $p) {
+				if(_pageAccess($p['id'])) {
+					$pid = $p['id'];
+					break;
+				}
+				if($r['common_id'] == $p['id'])
+					continue;
+			}
+
+		$href = $is_edit ? '' : ' href="'.URL.'&p='.$pid.'"';
+		$curd = _dn(!$is_edit, 'curD');
+
+		if($el['num_2'] == 5)
+			$r['name'] = _imageHtml($r['image_ids'], $r['image_width'], 0, false, false);
+
+		$razdel .= '<a class="link'.$sel.$curd.'"'.$href.'>'.$r['name'].'</a>';
+	}
+
+	return '<div class="_menu'.$el['num_2'].'">'.$razdel.'</div>';
+}
+function _menuCount($menu) {//получение элемента-циферки, размещённого на выводимых страницах
+	$sql = "SELECT
+				`el`.`id`,
+				`el`.`num_1`,
+				`el`.`txt_1`,
+				`bl`.`obj_id` `page_id`
+			FROM `_element` `el`,
+				 `_block` `bl`
+			WHERE `el`.`block_id`=`bl`.`id`
+			  AND `el`.`app_id`=".APP_ID."
+			  AND `dialog_id`=87
+			  AND `bl`.`obj_name`='page'";
+	if(!$arr = query_arr($sql))
+		return $menu;
+
+	foreach($arr as $r) {
+		$page = _page($r['page_id']);
+
+		//страница, к которой будет добавлена циферка
+		$pid = 0;
+		if(isset($menu[$r['page_id']]))
+			$pid = $r['page_id'];
+		if($page['parent_id'] && isset($menu[$page['parent_id']]))
+			$pid = $page['parent_id'];
+		if(!$pid)
+			continue;
+
+		$DLG = _dialogQuery($r['num_1']);
+		$sql = "SELECT COUNT(*)
+				FROM  "._queryFrom($DLG)."
+				WHERE "._queryWhere($DLG).
+					_40cond(array(), $r['txt_1']);
+		if(!$count = query_value($sql))
+			continue;
+
+		$menu[$pid]['name'] .= '<b class="ml5">+'.$count.'</b>';
+	}
+
+	return $menu;
+}
+
+/* [4] Заголовок */
+function _element4($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'txt_1' => $el['txt_1'] //текст заголовка
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return '<div class="hd2">'.$el['txt_1'].'</div>';
+
+	return _elementType($type, $el);
+}
+
+/* [5] textarea (многострочное текстовое поле) */
+function _element5($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'width' => _num($el['width']),
+			'req'       => _num($el['req']),
+			'req_msg'   => $el['req_msg'],
+
+			'txt_1' => $el['txt_1'] //текст для placeholder
+		) + _elementStruct($el);
+
+	if($type == 'print') {
+		$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+		$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+		return
+		'<textarea id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.'>'.
+			_elemPrintV($el, $prm).
+		'</textarea>';
+	}
+
+	return _elementType($type, $el);
+}
+
+/* [6] Select: выбор страницы */
+function _element6($type, $el, $prm) {
+	/*
+		содержание: PAGE_LIST
+	*/
+	if($type == 'struct')
+		return array(
+			'req'       => _num($el['req']),
+			'req_msg'   => $el['req_msg'],
+
+			'txt_1' => $el['txt_1'] //текст, когда страница не выбрана
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return _select(array(
+			'attr_id' => _elemAttrId($el, $prm),
+			'placeholder' => $el['txt_1'],
+			'width' => $el['width'],
+			'value' => _elemPrintV($el, $prm, 0)
+	   ));
+
+	if($type == 'js')
+		return array(
+			'txt_1' => $el['txt_1']
+		) +_elementJs($el);
+
+	return _elementType($type, $el);
+}
+
+/* [7] Фильтр: быстрый поиск */
+function _element7($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'txt_1' => $el['txt_1'],      //текст поиска
+			'num_1' => _num($el['num_1']),//id элемента, содержащего список, по которому происходит поиск
+			'txt_2' => $el['txt_2']       //по каким полям производить поиск (id элементов через запятую диалога списка)
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return _search(array(
+			'attr_id' => _elemAttrId($el, $prm),
+			'placeholder' => $el['txt_1'],
+			'width' => $el['width'],
+			'v' => _spisokFilter('vv', $el),
+			'disabled' => $prm['blk_setup']
+		));
+
+	if($type == 'js')
+		return array(
+			'num_1' => $el['num_1']
+		) +_elementJs($el);
+
+	return _elementType($type, $el);
+}
+
+/* [8] input:text (однострочное текстовое поле) */
+function _element8($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'req'       => _num($el['req']),
+			'req_msg'   => $el['req_msg'],
+
+			'txt_1' => $el['txt_1'],      //текст для placeholder
+			'txt_2' => $el['txt_2'],      //текст по умолчанию
+			'num_1' => _num($el['num_1']),/* формат:
+												32 - произвольный текст
+												33 - цифры и числа
+												34 - артикул
+										  */
+			'num_2' => _num($el['num_2']),//количество знаков после запятой (для 33)
+			'num_3' => _num($el['num_3']),//разрешать отрицательные значения (для 33)
+			'num_4' => _num($el['num_4']),//разрешать вносить 0 (для 33)
+
+			'txt_3' => $el['txt_3']       //шаблон артикула (для 34)
+		) + _elementStruct($el);
+
+	if($type == 'print') {
+		$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+		$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+
+		$v = _elemPrintV($el, $prm, $el['txt_2']);
+
+		switch($el['num_1']) {
+			default:
+			//произвольный текст
+			case 32: break;
+			//цифры и числа
+			case 33:
+				$v = round($v, $el['num_2']);
+				$v = $v || $el['num_4'] ? $v : '';
+				break;
+			//артикул
+			case 34:
+				if($v)
+					break;
+				if(!$col = _elemCol($el))
+					break;
+				if(!$BL = $el['block'])
+					break;
+				if($BL['obj_name'] != 'dialog')
+					break;
+				if(!$DLG = _dialogQuery($BL['obj_id']))
+					break;
+				$sql = "SELECT MAX(`t1`.`".$col."`)+1
+						FROM  "._queryFrom($DLG)."
+						WHERE "._queryWhere($DLG)."
+						  AND LENGTH(`t1`.`".$col."`)=".strlen($el['txt_3']);
+				$v = query_value($sql);
+				if(($diff = strlen($el['txt_3']) - strlen($v)) > 0)
+					for($n = 0; $n < $diff; $n++)
+						$v = '0'.$v;
+				break;
+		}
+
+		return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
+	}
+
+	return _elementType($type, $el);
+}
+
+/* [9] Поле-пароль */
+function _element9($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'req'       => _num($el['req']),
+			'req_msg'   => $el['req_msg'],
+
+			'txt_1' => $el['txt_1'],     //текст для placeholder
+			'num_1' => _num($el['num_1'])//минимальное количество знаков
+		) + _elementStruct($el);
+
+
+	if($type == 'print') {
+		$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+		$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+		return '<input type="password" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' />';
+	}
+
+	return _elementType($type, $el);
+}
+
+/* [10] Произвольный текст */
+function _element10($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'color'     => $el['color'],
+			'font'      => $el['font'],
+			'size'      => _num($el['size']),
+
+			'txt_1' => $el['txt_1']     //текст
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return _br($el['txt_1']);
+
+	return _elementType($type, $el);
+}
+
+/* [11] Вставка значения записи */
+function _element11($type, $el, $prm) {
+	/*
+		Вставка элемента через функцию PHP12_v_choose
+	*/
+	if($type == 'struct')
+		return array(
+			'parent_id' => _num($el['parent_id']),
+			'color'     => $el['color'],
+			'font'      => $el['font'],
+			'size'      => _num($el['size']),
+
+			'txt_2' => $el['txt_2'], //txt_2 - id элемента, выбранного из диалога, который вносит данные списка
+									 //возможна иерархия элементов через запятую 256,1312,560
+			'txt_7' => $el['txt_7'], //текст слева (для истории действий)
+			'txt_8' => $el['txt_8']  //текст справа (для истории действий)
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return _elem11($el, $prm);
+
+	return _elementType($type, $el);
+}
+
+/* [12] Функция PHP (SA) */
+function _element12($type, $el, $prm) {
+	/*
+		После размещения данных PHP-функции будет выполняться JS-функция с таким же именем, если существует.
+	*/
+	if($type == 'struct')
+		return array(
+			'req'       => _num($el['req']),
+			'req_msg'   => $el['req_msg'],
+
+			'txt_1' => $el['txt_1'],     //имя функции (начинается с PHP12)
+			'txt_2' => $el['txt_2'],     //начальное значение
+			'num_1' => _num($el['num_1'])//условие 1
+		) + _elementStruct($el);
+
+	if($type == 'print') {
+		if(!$el['txt_1'])
+			return _emptyMin('Отсутствует имя функции.');
+		if(!function_exists($el['txt_1']))
+			return _emptyMinRed('Фукнции <b>'.$el['txt_1'].'</b> не существует.');
+		if($prm['blk_setup'])
+			return _emptyMin('Функция '.$el['txt_1']);
+
+		$prm['el12'] = $el;
+
+		return
+		($el['col'] ?
+			'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm, $el['txt_2']).'" />'
+		: '').
+			$el['txt_1']($prm);
+	}
+
+	return _elementType($type, $el);
+}
+
+/* [13] Выбор элемента из диалога или страницы */
+function _element13($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'req'     => _num($el['req']),
+			'req_msg' => $el['req_msg'],
+
+			'txt_1'   => $el['txt_1'],      //текст для placeholder
+			'num_1'   => _num($el['num_1']),//ID диалога (список всех диалогов)
+			'txt_2'   => $el['txt_2'],      //разрешать выбирать только некоторые типы элементов (иначе любые)
+			'num_2'   => _num($el['num_2']),//ids диалогов разрешённых элементов
+			'num_5'   => _num($el['num_5']),//выбор значений во вложенных списках
+			'num_6'   => _num($el['num_6']) //выбор нескольких значений
+		) + _elementStruct($el);
+
+	if($type == 'print') {
+		$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+		$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+		//в самом себе выбор элемента невозможен
+		if($block_id = $prm['srce']['block_id'])//должен быть блок 2214
+			if($BL = _blockOne($block_id))
+				if($BL['obj_name'] == 'dialog' && $BL['obj_id'] == 13)
+					$disabled = ' disabled';
+
+		$v = _elemPrintV($el, $prm, !$el['num_5'] && !$el['num_6'] ? 0 : '');
+
+		return
+		'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+		'<div class="_selem dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
+			'<div class="icon icon-star pabs"></div>'.
+			'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+			'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
+		'</div>';
+	}
+
+	return _elementType($type, $el);
+}
+
+/* [14] Список-шаблон */
+function _element14($type, $el, $prm) {
+	/*
+		настройка шаблона через функцию PHP12_spisok14_setup
+	*/
+	if($type == 'struct')
+		return array(
+			'num_1' => _num($el['num_1']),//id диалога, который вносит данные списка (шаблон которого будет настраиваться)
+			'num_2' => _num($el['num_2']),//длина (количество строк, выводимых за один раз)
+
+			'txt_1' => $el['txt_1'],      //сообщение пустого запроса
+			'txt_2' => $el['txt_2'],      //условия отображения, настраиваемые через [40]
+			'num_3' => _num($el['num_3']),/* порядок:
+												0 - автоматически
+												2318 - по дате добавления
+												2319 - сотрировка (на основании поля sort)
+										  */
+			'num_4' => _num($el['num_4']) //горизонтальное расположение списка
+		) + _elementStruct($el);
+
+	if($type == 'print') {
+		if(!$dialog_id = $el['num_1'])
+			return _emptyRed('Не указан список для вывода данных.');
+		if(!$DLG = _dialogQuery($dialog_id))
+			return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
+		if($prm['blk_setup'])
+			return _emptyMin('Список-шаблон <b>'.$DLG['name'].'</b>');
+
+		return _spisok14($el);
+	}
+
+	return _elementType($type, $el);
+}
+
+/* [15] Количество строк списка */
+function _element15($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'color'     => $el['color'],
+			'font'      => $el['font'],
+			'size'      => _num($el['size']),
+
+			'num_1' => _num($el['num_1']),//id элемента, содержащего список, количество строк которого нужно выводить
+			'txt_1' => $el['txt_1'],      //показана "1"
+			'txt_2' => $el['txt_2'],      //запись   "1"
+			'txt_3' => $el['txt_3'],      //показано "2"
+			'txt_4' => $el['txt_4'],      //записи   "2"
+			'txt_5' => $el['txt_5'],      //показано "5"
+			'txt_6' => $el['txt_6'],      //записей  "5"
+			'txt_7' => $el['txt_7']       //сообщение об отсутствии записей
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return _spisokElemCount($el, $prm);
+
+	return _elementType($type, $el);
+}
+
+/* [16] Radio - произвольные значения */
+function _element16($type, $el, $prm) {
+	if($type == 'struct')
+		return array(
+			'req'     => _num($el['req']),
+			'req_msg' => $el['req_msg'],
+
+			'txt_1'   => $el['txt_1'],      //текст нулевого значения
+			'num_1'   => _num($el['num_1']),//горизонтальное положение
+			'num_2'   => _num($el['num_2']),/* значения:
+												3876 - произвольные значения (настраиваются через PHP12_radio_setup)
+												3877 - значения существующего элемента
+											*/
+			'num_3'   => _num($el['num_3']) //элемент, если выбрано num_2:3877
+		) + _elementStruct($el);
+
+	if($type == 'print')
+		return _radio(array(
+			'attr_id' => _elemAttrId($el, $prm),
+			'light' => 1,
+			'block' => !$el['num_1'],
+			'interval' => 5,
+			'value' => _elemPrintV($el, $prm, $el['def']),
+			'title0' => $el['txt_1'],
+			'spisok' => _elemVvv($el['id'], $prm),
+			'disabled' => $prm['blk_setup']
+		));
+
+	return _elementType($type, $el);
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1022,7 +1710,7 @@ function _elemOne($elem_id, $upd=false) {//запрос одного элеме�
 		$global = $el['app_id'] ? 0 : 1;
 		if(_cache_isset($key, $global)) {
 			$ELM = _cache_get($key, $global);
-			$el = _beElemStructure($el);
+			$el = _element('struct', $el);
 			$el = _beElemDlg($el);
 			$ELM[$elem_id] = $el;
 			_cache_set($key, $ELM, $global);
@@ -1061,6 +1749,10 @@ function _blockOne($block_id, $upd=false) {//запрос одного блок�
 	}
 
 	return _BE('block_one', $block_id);
+}
+
+function _elemAttrCmp($el) {
+	return '#cmp_'.$el['id'];
 }
 
 function _elemColType($id='all') {//тип данных, используемый элементом
@@ -1628,72 +2320,6 @@ function _elem102CnnList($ids, $return='select', $cond='') {//значения �
 		return _idsGet($select);
 
 	return $select;
-}
-
-function _elemButton($el, $prm) {//кнопка [2]
-	/*
-		txt_1 - текст кнопки
-		num_1 - цвет
-		num_2 - маленькая кнопка
-		num_3 - передаёт данные записи
-		num_4 - dialog_id, который назначен на эту кнопку
-	*/
-	$color = array(
-		0 => '',      //Синий - по умолчанию
-		1 => '',      //Синий
-		2 => 'green', //Зелёный
-		3 => 'red',   //Красный
-		4 => 'grey',  //Серый
-		5 => 'cancel',//Прозрачный
-		6 => 'pink',  //Розовый
-		7 => 'orange' //Оранжевый
-	);
-
-	//если кнопка расположена в ячейке таблицы, установка ширины = 100%. Ширина будет подстраиваться под ячейку.
-	if($parent_id = $el['parent_id'])
-		if($elp = _elemOne($parent_id))
-			if($elp['dialog_id'] == 23)
-				$el['width'] = 0;
-
-	return _button(array(
-				'attr_id' => _elemAttrId($el, $prm),
-				'name' => _br($el['txt_1']),
-				'color' => $color[$el['num_1']],
-				'width' => $el['width'],
-				'small' => $el['num_2'],
-				'class' => $prm['blk_setup'] ? 'curD' : 'dialog-open',
-				'val' => _elemButtonVal($el, $prm)
-			));
-}
-function _elemButtonVal($el, $prm) {//значения аттрибута val для кнопки
-	$ass['dialog_id'] = $el['num_4'];
-
-	//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.
-	if($el['num_4'] <= 0)
-		$ass['block_id'] = $el['block_id'];
-
-	//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
-	//а также вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
-	//Нужно для назначения функций (пока)
-	if(!empty($el['block']))
-		if($el['block']['obj_name'] == 'dialog') {
-			$ass['dss'] = $el['block']['obj_id'];
-			if($prm['srce']['block_id'])
-				$ass['block_id'] = $prm['srce']['block_id'];
-			if($prm['srce']['element_id'])
-				$ass['element_id'] = $prm['srce']['element_id'];
-		}
-
-	$val = array();
-	foreach($ass as $k => $v)
-		$val[] = $k.':'.$v;
-
-	$val = implode(',', $val);
-
-	if($dialog_id = $el['num_4'])
-		$val .= _dialogOpenVal($dialog_id, $prm, $el['num_3']);
-
-	return $val;
 }
 
 function _elem85mass($ell_id, $v, $send) {//получение значений для элемента [85]

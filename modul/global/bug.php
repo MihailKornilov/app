@@ -989,7 +989,7 @@ function PHP12_bug_element_elem7($ELM) {//Фильтр-поиск
 	if(!$arr = query_arr($sql))
 		return '';
 
-	$c = _bug_ids_count($arr, $ELM, 'num_1', true);
+	$c =  _bug_ids_count($arr, $ELM, 'num_1', true);
 	$c += _bug_ids_count($arr, $ELM, 'txt_2', true);
 
 	return _hide0($c);

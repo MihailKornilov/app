@@ -643,8 +643,8 @@ $(document)
 			_forIn(res.elm, function(sp, k) {
 				if(!on || !sp.width_min)
 					return;
-				$(sp.attr_cmp + '_edit' + sp.afics).css('width', '100%');
-				$(sp.attr_el)
+				$(ATTR_CMP(k) + '_edit' + sp.afics).css('width', '100%');
+				_attr_el(k)
 					.addClass('ewc')
 					.css('width', sp.width ? sp.width + 'px' : 'auto')
 					.resizable({

@@ -752,8 +752,9 @@ function _jsCacheElm($app_id=0) {
 			ORDER BY `id`";
 	$arr = query_arr($sql);
 	foreach($arr as $elem_id => $r) {
-		if(!$el = _jsCacheElemOne($elem_id))
-			continue;
+		if(!$el = _element('js', $r))
+			if(!$el = _jsCacheElemOne($elem_id))
+				continue;
 		$ELM[$elem_id] = $el;
 	}
 
