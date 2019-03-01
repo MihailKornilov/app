@@ -643,7 +643,7 @@ $(document)
 			_forIn(res.elm, function(sp, k) {
 				if(!on || !sp.width_min)
 					return;
-				$(ATTR_CMP(k) + '_edit' + sp.afics).css('width', '100%');
+				$(ATTR_CMP(k) + '_edit' + (sp.afics ? sp.afics : '')).css('width', '100%');
 				_attr_el(k)
 					.addClass('ewc')
 					.css('width', sp.width ? sp.width + 'px' : 'auto')

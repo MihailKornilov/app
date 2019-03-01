@@ -746,15 +746,11 @@ function _jsCacheBlkOne($block_id) {
 function _jsCacheElm($app_id=0) {
 	$ELM = array();
 
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `app_id`=".$app_id."
-			ORDER BY `id`";
-	$arr = query_arr($sql);
-	foreach($arr as $elem_id => $r) {
+	foreach(_BE('elem_all') as $elem_id => $r) {
+		if($r['app_id'] != $app_id)
+			continue;
 		if(!$el = _element('js', $r))
-			if(!$el = _jsCacheElemOne($elem_id))
-				continue;
+			continue;
 		$ELM[$elem_id] = $el;
 	}
 

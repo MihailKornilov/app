@@ -141,7 +141,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 	foreach($BLK as $r) {
 		if(!$PARAM['blk_setup']
 		&& $r['elem_id']
-		&& $r['elem']['hidden']
+		&& !empty($r['elem']['hidden'])
 		) continue;
 
 		$block[$r['y']][$r['x']] = $r;
@@ -1441,10 +1441,8 @@ function _beElem($app_id=0) {
 
 		$ELM = array();
 		foreach($arr as $elem_id => $el) {
-			if(!$el = _element('struct', $el))
-				continue;
 			$el = _beElemDlg($el);
-
+			$el = _element('struct', $el);
 			$ELM[$elem_id] = $el;
 		}
 
