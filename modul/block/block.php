@@ -1159,6 +1159,7 @@ function _beDlg($app_id=0) {//получение данных диалогов �
 		if(!$DLG = query_arr($sql))
 			return array();
 
+		$DLG = _beDlgHistory($DLG, $global);
 		_cache_set($key, $DLG, $global);
 	}
 
@@ -1167,9 +1168,66 @@ function _beDlg($app_id=0) {//получение данных диалогов �
 
 	return $DLG;
 }
-function _beDlgField($dialog) {//вставка колонок таблиц в диалоги
+function _beDlgHistory($DLG, $global) {//вставка шаблонов истории действий в диалоги
+	$elemIds = array();
+	foreach($DLG as $r)
+		foreach(_historyAct() as $name => $id)
+			$elemIds[] = $r[$name.'_history_elem'];
+
+	//сохранение всех ID элементов истории, чтобы их не использовать в кеше элементов
+	$key = 'DIALOG_HISTORY_IDS';
+	$elemIds = array_diff($elemIds, array(''));
+
+	if(empty($elemIds))
+		return $DLG;
+
+	$elemIds = array_unique($elemIds);
+	$elemIds = implode(',', $elemIds);
+	_cache_set($key, $elemIds, $global);
+
+
+	//процесс подмены идентификаторов на данные шаблона
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id` IN (".$elemIds.")";
+	$arr = query_arr($sql);
+	foreach($DLG as $id => $r)
+		foreach(_historyAct() as $name => $i) {
+			$nm = $name.'_history_elem';
+			$DLG[$id][$nm] = _beDlgHistoryUpd($r[$nm], $arr);
+		}
+
+	return $DLG;
+}
+function _beDlgHistoryUpd($ids, $arr) {//получение массива из элементов для истории
+	if(!$ids)
+		return array();
+
+	//формировании сборки
+	$send = array();
+	foreach(_ids($ids, 'arr') as $id) {
+		if(!isset($arr[$id]))
+			continue;
+
+		//один элемент истории
+		$el = $arr[$id];
+		$send[] = array(
+			'id' => _num($el['id']),
+			'dialog_id' => _num($el['dialog_id']),
+			'font' => $el['font'],
+			'color' => $el['color'],
+			'txt_2' => $el['txt_2'],//ids из [11]
+			'txt_7' => $el['txt_7'],//текст слева
+			'txt_8' => $el['txt_8'],//текст справа
+			'txt_9' => $el['txt_9'] //условия [40]
+		);
+	}
+
+	return $send;
+}
+function _beDlgField($DLG) {//вставка колонок таблиц в диалоги
 	//колонки по каждой таблице, используемые в диалогах
-	$key = 'field';
+	$key = 'DIALOG_FIELD';
 	if(!$field = _cache_get($key, 1)) {
 		$sql = "SELECT DISTINCT(`table_1`)
 				FROM `_dialog`
@@ -1184,16 +1242,15 @@ function _beDlgField($dialog) {//вставка колонок таблиц в �
 		_cache_set($key, $field, 1);
 	}
 
-	//список колонок, присутствующих в таблицах 1 и 2
-	foreach($dialog as $dlg_id => $r)
-		foreach(array(1) as $id) {
-			$dialog[$dlg_id]['field'.$id] = array();
-			$table_id = $r['table_'.$id];
-			if($dialog[$dlg_id]['table_name_'.$id] = _table($table_id))
-				$dialog[$dlg_id]['field'.$id] = $field[$table_id];
-		}
+	//список колонок, присутствующих в таблицах
+	foreach($DLG as $id => $r) {
+		$DLG[$id]['field1'] = array();
+		$table_id = $r['table_1'];
+		if($DLG[$id]['table_name_1'] = _table($table_id))
+			$DLG[$id]['field1'] = $field[$table_id];
+	}
 
-	return $dialog;
+	return $DLG;
 }
 function _beDlgDelCond($dlg, $global) {//дополнительные условия удаления записи
 	if(empty($dlg))
@@ -1203,23 +1260,28 @@ function _beDlgDelCond($dlg, $global) {//дополнительные услов
 		$dlg[$id]['del_cond']['num_2'] = 0;
 
 	$key = 'dialog_del_cond';
-	if(!_cache_isset($key, $global)) {
+
+	if(!$arr = _cache_get($key, $global)) {
+
+		if(_cache_isset($key, $global))
+			return $dlg;
+
 		$sql = "/* ".__FUNCTION__.":".__LINE__." */
 				SELECT *
 				FROM `_element`
 				WHERE `dialog_id`=58
 				  AND `num_1` IN ("._idsGet($dlg).")
 				  AND `num_2`";
-		$arr = query_arr($sql);
+		$arr = array();
+		foreach(query_arr($sql) as $id => $el)
+			$arr[$id] = _element('struct', $el);
 		_cache_set($key, $arr, $global);
-	} else
-		$arr = _cache_get($key, $global);
+	}
 
 	foreach($arr as $r) {
 		$dlg_id = $r['num_1'];
 		$dlg[$dlg_id]['del_cond']['num_2'] = _num($r['num_2']);
 	}
-
 
 	return $dlg;
 }
@@ -1354,7 +1416,7 @@ function _beElem($app_id=0) {
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `app_id`=".$app_id."
-				ORDER BY `id`";
+				ORDER BY `parent_id`";
 		if(!$arr = query_arr($sql))
 			return array();
 
@@ -1458,157 +1520,6 @@ function _beElemAction($ELM, $app_id) {//действия, назначенны�
 }
 
 
-/*
-function _beBlockElem($type, $BLK, $global=0) {//элементы, которые расположены в блоках
-	global $G_ELEM, $G_DLG;
-
-	if(empty($BLK))
-		return;
-
-	$key = 'ELM_'.$type;
-	if(!$ELM = _cache_get($key, $global)) {
-		if(_cache_isset($key, $global))
-			return;
-
-		$ELM = array();
-
-		//переменная для сбора ID элементов-таблиц
-		$elem23 = array();
-
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `block_id` IN ("._idsGet($BLK).")";
-		foreach(query_arr($sql) as $elem_id => $el) {
-			if($el['dialog_id'] == 16//значения radio
-			|| $el['dialog_id'] == 17//значения select
-			|| $el['dialog_id'] == 18//значения dropdown
-			|| $el['dialog_id'] == 23//ячейки таблиц
-			|| $el['dialog_id'] == 27//значения баланса
-			|| $el['dialog_id'] == 44//ячейки сборного текста
-			|| $el['dialog_id'] == 57//пункты меню переключения блоков
-			) $elem23[] = $elem_id;
-
-			$dlg = $G_DLG[$el['dialog_id']];
-
-			$ELM[$elem_id] = _arrNum($el);
-		}
-
-		//элементы-ячейки таблиц
-		if(!empty($elem23)) {
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE !`block_id`
-					  AND `parent_id` IN (".implode(',', array_unique($elem23)).")";
-			foreach(query_arr($sql) as $elem_id => $el) {
-				unset($el['app_id']);
-				unset($el['sort']);
-				unset($el['user_id_add']);
-				unset($el['dtime_add']);
-				$ELM[$elem_id] = _arrNum($el);
-			}
-		}
-
-
-		_cache_set($key, $ELM, $global);
-	}
-
-	$G_ELEM += $ELM;
-}
-function _beBlockType($type) {//получение данных о блоках по типу
-	global $G_BLOCK;
-
-	$key = 'BLK_'.$type;
-
-	//глобальные
-	if(!$block_global = _cache_get($key, 1)) {
-		$sql = "SELECT `id`
-				FROM `_".$type."`
-				WHERE !`app_id`";
-		$obj_ids = query_ids($sql);
-
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `obj_name`='".$type."'
-				  AND `obj_id` IN (".$obj_ids.")
-				ORDER BY `parent_id`,`y`,`x`";
-		$block_global = query_arr($sql);
-		$block_global += _beBlockDialogDel($type, $obj_ids);
-		$block_global = _beBlockForming($block_global);
-		$block_global = _beBlockAction($block_global);
-		$block_global = _beElemIdSet($block_global);
-
-		_cache_set($key, $block_global, 1);
-	}
-
-	$G_BLOCK += $block_global;
-	_beBlockSpisok($type, $block_global, 1);
-	_beBlockElem($type, $block_global, 1);
-
-	if(!APP_ID)
-		return;
-
-	//для конкретного приложения
-	if(!$block_app = _cache_get($key)) {
-		$sql = "SELECT `id`
-				FROM `_".$type."`
-				WHERE `app_id`=".APP_ID;
-		$obj_ids = query_ids($sql);
-
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `obj_name`='".$type."'
-				  AND `obj_id` IN (".$obj_ids.")";
-		$block_app = query_arr($sql);
-		$block_app += _beBlockDialogDel($type, $obj_ids);
-		$block_app = _beBlockForming($block_app);
-		$block_app = _beBlockAction($block_app, APP_ID);
-		$block_app = _beElemIdSet($block_app);
-
-		_cache_set($key, $block_app);
-	}
-
-	$G_BLOCK += $block_app;
-	_beBlockSpisok($type, $block_app);
-	_beBlockElem($type, $block_app);
-}
-function _beBlockDialogDel($type, $obj_ids) {//добавление блоков содержания удаления
-	if($type != 'dialog')
-		return array();
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `obj_name`='dialog_del'
-			  AND `obj_id` IN (".$obj_ids.")
-			ORDER BY `parent_id`,`y`,`x`";
-	return query_arr($sql);
-}
-function _beBlockSpisok($type, $block, $global=0) {//получение данных о блоках-списках
-	global $G_BLOCK;
-
-	if(empty($block))
-		return;
-
-	$key = 'BLK_SPISOK_'.$type;
-	if(!$arr = _cache_get($key, $global)) {
-		//если получен пустой массив и при этом запись в кеше была, запрос из базы не производится
-		if(_cache_isset($key, $global))
-			return;
-
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `obj_name`='spisok'
-				  AND `obj_id` IN ("._idsGet($block, 'elem_id').")";
-		$arr = query_arr($sql);
-		$arr = _beBlockForming($arr);
-		$arr = _beBlockAction($arr, $global ? 0 : APP_ID);
-		$arr = _beElemIdSet($arr);
-
-		_cache_set($key, $arr, $global);
-	}
-
-	$G_BLOCK += $arr;
-	_beBlockElem('SPISOK_'.$type, $arr, $global);
-}
-*/
 
 
 

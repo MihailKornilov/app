@@ -869,7 +869,7 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения к
 			$element_id_spisok = $el['block']['obj_id'];
 
 	//список-таблица
-	if($el['parent_id']) {
+	if(!empty($el['parent_id'])) {
 		if(!$ell = _elemOne($el['parent_id']))
 			return $txt;
 		if($ell['dialog_id'] == 23)

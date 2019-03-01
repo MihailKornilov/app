@@ -5,6 +5,8 @@
 		2. Настройка ширины (в PageSetup) ['width']
 		3. Наличие флага обязательного заполнения ['req']
 		4. Установка фокуса ['focus']
+		5. Title элемента
+		6. Вывод через элемент [11]
 */
 
 function _elementType($type, $el=array()) {//все возможные варианты манипуляций
@@ -1425,6 +1427,20 @@ function _element57($type, $el, $prm) {
 	return _elementType($type, $el);
 }
 
+/* [58] Условия удаления записи */
+function _element58($type, $el, $prm) {
+	/*
+		применяется при настройке диалога в удалении
+	*/
+	if($type == 'struct')
+		return array(
+			'num_1'   => _num($el['num_1']),//id диалога
+			'num_2'   => _num($el['num_2']),//запрещать удаление, если наступили новые сутки [1]
+		) + _elementStruct($el);
+
+	return _elementType($type, $el);
+}
+
 /* [59] Связка списка при помощи кнопки */
 function _element59($type, $el, $prm) {
 	if($type == 'struct')
@@ -2374,6 +2390,8 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 	if(!$dialog = _BE('dialog', $dialog_id))
 		return array();
 
+
+/*
 	//история действий - сбор id элементов-шаблонов
 	foreach(_historyAct() as $act => $act_id) {
 		$dialog[$act.'_history_tmp'] = '';          //текст шаблона для отображения в настройках
@@ -2388,9 +2406,9 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 			if($el['dialog_id']) {
 				$title = _elemTitle($el['id']);
 				$cls = array('wsnw');
-				if($el['font'])
+				if(!empty($el['font']))
 					$cls[] = $el['font'];
-				if($el['color'])
+				if(!empty($el['color']))
 					$cls[] = $el['color'];
 				$cls = implode(' ', $cls);
 				$title = '<span class="'.$cls.'">'.$title.'</span>';
@@ -2398,9 +2416,10 @@ function _dialogQuery($dialog_id) {//данные конкретного диа�
 			}
 
 			$dialog[$act.'_history_tmp'] .= $el['txt_7'].$title.$el['txt_8'];
-			$dialog[$act_id.'_history_elm'][] = $el;
 		}
 	}
+*/
+
 
 	$dialog['blk'] = _BE('block_arr', 'dialog', $dialog_id);
 	$dialog['cmp'] = _BE('elem_arr', 'dialog', $dialog_id);
@@ -6711,8 +6730,22 @@ function _historyAct($i='all') {//действия истории - ассоци
 		'del' => 3
 	);
 
+	$idName =  array(
+		1 => 'insert',
+		2 => 'edit',
+		3 => 'del'
+	);
+
 	if($i == 'all')
 		return $action;
+
+	if($id = _num($i)) {
+		if(isset($idName[$id]))
+			return $idName[$id];
+		return '';
+	}
+
+
 
 	if(!isset($action[$i]))
 		return false;
@@ -6724,7 +6757,7 @@ function _historyInsert($type_id, $dialog, $unit_id) {//внесение ист�
 	if(!isset($dialog['field1']['deleted']))
 		return 0;
 
-	$active = empty($dialog[$type_id.'_history_elm']) ? 0 : 1;
+	$active = empty($dialog[_historyAct($type_id).'_history_elem']) ? 0 : 1;
 
 	$sql = "INSERT INTO `_history` (
 				`app_id`,
@@ -6891,7 +6924,7 @@ function _historySpisok($EL, $prm) {//список истории действи
 			$msg = '';
 			$prm['unit_get'] = $unitArr[$r['unit_id']];
 			$prm = _blockParam($prm);
-			foreach($dlg[$r['type_id'].'_history_elm'] as $hel)
+			foreach($dlg[_historyAct($r['type_id']).'_history_elem'] as $hel)
 				$msg .= _historyKit($hel, $prm);
 
 			$is_last = $n == $last;//последняя запись

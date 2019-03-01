@@ -421,7 +421,7 @@ function _pr($arr) {//аналог функции print_r
 		return _prMsg('массив пуст');
 
 	if(!is_array($arr))
-		return _prMsg('не является массивом');
+		return $arr;
 
 	return
 	'<div class="dib pad5 bor-e8">'.
@@ -955,7 +955,7 @@ function _cache_content() {//содержание кеша в диалоге [84
 			}
 		}
 	return
-	'<div style="height:700px;overflow-y:scroll" class="bg-fff bor-e8 pad10">'.
+	'<div style="height:700px;width:560px;overflow-y:scroll;word-wrap:break-word" class="bg-fff bor-e8 pad10">'.
 		$send.
 	'</div>';
 }

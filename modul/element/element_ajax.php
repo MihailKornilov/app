@@ -169,29 +169,7 @@ switch(@$_POST['op']) {
 			'</div>'.
 
 			//История действий
-			'<div class="dialog-menu-2'._dn($dialog['menu_edit_last'] == 2).'">'.
-				'<div class="pad10 pb20 bg-dfd">'.
-					'<div class="hd2 mt5">Внесение новой записи</div>'.
-					'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_insert">'.
-						'<div class="mar10 pale'._dn(!$dialog['insert_history_tmp']).'">шаблон истории действий для внесения новой записи</div>'.
-						'<div class="mar10 msg">'.$dialog['insert_history_tmp'].'</div>'.
-					'</div>'.
-				'</div>'.
-				'<div class="pad10 pb20 bg-ffd line-t1">'.
-					'<div class="hd2 mt5">Редактирование записи</div>'.
-					'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_edit">'.
-						'<div class="mar10 pale'._dn(!$dialog['edit_history_tmp']).'">шаблон истории действий для редактирования записи</div>'.
-						'<div class="mar10 msg">'.$dialog['edit_history_tmp'].'</div>'.
-					'</div>'.
-				'</div>'.
-				'<div class="pad10 pb20 bg-fee line-t1">'.
-					'<div class="hd2 mt5">Удаление записи</div>'.
-					'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_del">'.
-						'<div class="mar10 pale'._dn(!$dialog['del_history_tmp']).'">шаблон истории действий для удаления записи</div>'.
-						'<div class="mar10 msg">'.$dialog['del_history_tmp'].'</div>'.
-					'</div>'.
-				'</div>'.
-			'</div>'.
+			_dialogSetupHistory($dialog).
 
 			//Содержание
 			'<div class="dialog-menu-3'._dn($dialog['menu_edit_last'] == 3).'">'.
@@ -740,7 +718,56 @@ switch(@$_POST['op']) {
 		break;
 }
 
+function _dialogSetupHistory($DLG) {//раздел История действий
+	if(!isset($DLG['field1']['deleted']))
+		return '';
 
+	return
+	'<div class="dialog-menu-2'._dn($DLG['menu_edit_last'] == 2).'">'.
+		'<div class="pad10 pb20 bg-dfd">'.
+			'<div class="hd2 mt5">Внесение новой записи</div>'.
+			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_insert">'.
+				'<div class="mar10 pale'._dn(!$DLG['insert_history_elem']).'">шаблон истории действий для внесения новой записи</div>'.
+				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['insert_history_elem']).'</div>'.
+			'</div>'.
+		'</div>'.
+		'<div class="pad10 pb20 bg-ffd line-t1">'.
+			'<div class="hd2 mt5">Редактирование записи</div>'.
+			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_edit">'.
+				'<div class="mar10 pale'._dn(!$DLG['edit_history_elem']).'">шаблон истории действий для редактирования записи</div>'.
+				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['edit_history_elem']).'</div>'.
+			'</div>'.
+		'</div>'.
+		'<div class="pad10 pb20 bg-fee line-t1">'.
+			'<div class="hd2 mt5">Удаление записи</div>'.
+			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_del">'.
+				'<div class="mar10 pale'._dn(!$DLG['del_history_elem']).'">шаблон истории действий для удаления записи</div>'.
+				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['del_history_elem']).'</div>'.
+			'</div>'.
+		'</div>'.
+	'</div>';
+}
+function _dialogSetupHistoryTmp($arr) {
+	if(empty($arr))
+		return '';
+
+	$send = '';
+	foreach($arr as $el) {
+		$title = '';
+		if($el['dialog_id']) {
+			$title = _elemTitle($el['id']);
+			$cls = array('wsnw');
+			$cls[] = $el['font'];
+			$cls[] = $el['color'];
+			$cls = implode(' ', $cls);
+			$title = '<span class="'.$cls.'">'.$title.'</span>';
+			$title = '['.$title.']';
+		}
+		$send .= $el['txt_7'].$title.$el['txt_8'];
+	}
+
+	return $send;
+}
 function _dialogSetupRule($dialog_id) {//Правила для элемета
 	$sql = "SELECT `rule_id`,1
 			FROM `_element_rule_use`
