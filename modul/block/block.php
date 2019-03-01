@@ -1169,10 +1169,25 @@ function _beDlg($app_id=0) {//получение данных диалогов �
 	return $DLG;
 }
 function _beDlgHistory($DLG, $global) {//вставка шаблонов истории действий в диалоги
+	//сбор ID элементов со всех диалогов, составляющих шаблоны истории
 	$elemIds = array();
-	foreach($DLG as $r)
-		foreach(_historyAct() as $name => $id)
+	foreach($DLG as $id => $r) {
+		foreach(_historyAct() as $name => $i)
 			$elemIds[] = $r[$name.'_history_elem'];
+
+		//параллельно удаление лишних колонок
+		unset($DLG[$id]['user_id_add']);
+		unset($DLG[$id]['dtime_add']);
+		if(!$global || !$r['element_group_id']) {
+			unset($DLG[$id]['element_group_id']);
+			unset($DLG[$id]['element_width']);
+			unset($DLG[$id]['element_width_min']);
+			unset($DLG[$id]['element_type']);
+			unset($DLG[$id]['element_afics']);
+			unset($DLG[$id]['element_action_dialog_id']);
+			unset($DLG[$id]['element_hidden']);
+		}
+	}
 
 	//сохранение всех ID элементов истории, чтобы их не использовать в кеше элементов
 	$key = 'DIALOG_HISTORY_IDS';
@@ -1379,7 +1394,6 @@ function _beBlockAction($blk, $app_id) {//вставка действий для
 
 	return $blk;
 }
-
 function _beBlockSort($BLK, $RES=array()) {//выстраивание блоков по порядку
 	//составление структуры блоков по строкам
 	$block = array();
@@ -1413,25 +1427,45 @@ function _beElem($app_id=0) {
 		if(_cache_isset($key, $global))
 			return array();
 
+		//получение всех элементов за исключением истории действий
+		$keyHist = 'DIALOG_HISTORY_IDS';
+		$idsHist = _ids(_cache_get($keyHist, $global));
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `app_id`=".$app_id."
-				ORDER BY `parent_id`";
+				  AND !`parent_id`
+				  AND `id` NOT IN (".$idsHist.")
+				ORDER BY `id`";
 		if(!$arr = query_arr($sql))
 			return array();
 
 		$ELM = array();
-		foreach($arr as $el) {
-			$elem_id = _num($el['id']);
-			$el = _element('struct', $el);
+		foreach($arr as $elem_id => $el) {
+			if(!$el = _element('struct', $el))
+				continue;
 			$el = _beElemDlg($el);
 
 			$ELM[$elem_id] = $el;
 		}
 
-		$ELM = _beElemFormat($ELM, $app_id);
-		$ELM = _beElemHint($ELM, $app_id);
-		$ELM = _beElemAction($ELM, $app_id);
+//		$ELM = _beElemFormat($ELM, $app_id);
+//		$ELM = _beElemHint($ELM, $app_id);
+//		$ELM = _beElemAction($ELM, $app_id);
+
+		//вставка дочерних элементов к родителям
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `app_id`=".$app_id."
+				  AND `parent_id`
+				ORDER BY `parent_id`,`sort`";
+		foreach(query_arr($sql) as $r) {
+			$pid = $r['parent_id'];
+			if(empty($ELM[$pid]))
+				continue;
+			if(!isset($ELM[$pid]['vvv']))
+				$ELM[$pid]['vvv'] = array();
+			$ELM[$pid]['vvv'][] = _element('vvv', $ELM[$pid], $r);
+		}
 
 		_cache_set($key, $ELM, $global);
 	}
@@ -1445,12 +1479,14 @@ function _beElemDlg($el) {//настройки элемента из диало�
 		return $el;
 	if(!$DLG = @$G_DLG[$dialog_id])
 		return $el;
+	if(empty($DLG['element_group_id']))
+		return $el;
 
 	$el['hidden'] = _num($DLG['element_hidden']);
 	$el['afics'] = $DLG['element_afics'];
 
 	//определение максимальной ширины, на которую может растягиваться элемент
-	if($el['width_min'] = _num($DLG['element_width_min']))
+	if($el['width_min'] = _num(@$DLG['element_width_min']))
 		if($block_id = _num($el['block_id']))
 			if($bl = @$G_BLOCK[$block_id]) {
 				$ex = explode(' ', $el['mar']);

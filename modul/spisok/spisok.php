@@ -623,24 +623,14 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 	//вставка картинок
 	$spisok = _spisokImage($spisok);
 
-	//получение настроек колонок таблицы
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE !`block_id`
-			  AND `parent_id`=".$ELEM['id']."
-			  AND `num_8`
-			ORDER BY `sort`";
-	if(!$tabCol = query_arr($sql))
+	if(empty($ELEM['vvv']))
 		return _emptyRed('Таблица не настроена.');
-
-	foreach($tabCol as $id => $td)
-		$tabCol[$id] = _elemOne($id);
 
 	$MASS = array();
 	foreach($spisok as $uid => $u) {
 		$TR = '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
 		$prm = _blockParam(array('unit_get'=>$u));
-		foreach($tabCol as $td) {
+		foreach($ELEM['vvv'] as $td) {
 			$txt = _elemPrint($td, $prm);
 
 			$cls = array();
@@ -709,7 +699,7 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 		$TH = '';
 		if(!$next && $ELEM['num_5']) {
 			$TH .= '<tr>';
-			foreach($tabCol as $tr)
+			foreach($ELEM['vvv'] as $tr)
 				$TH .= '<th>'.$tr['txt_7'];
 		}
 		$TR = $TH.implode('', $MASS);
@@ -1606,7 +1596,10 @@ function _29cnnTitle($ids, $sp, $content=false) {//формирование со
 			}
 			return $title;
 		//сборный текст
-		case 44: return PHP12_44_print($el, $sp);
+		case 44:
+			$prm = _blockParam(array());
+			$prm['unit_get'] = $sp;
+			return _element44_print($el, $prm);
 	}
 
 	return $content ? '' : '- незвестный тип: '.$el['dialog_id'].' -';

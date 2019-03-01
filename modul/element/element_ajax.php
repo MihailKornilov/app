@@ -60,7 +60,7 @@ switch(@$_POST['op']) {
 				2 => 'Элемент',
 				3 => 'Использование'
 			);
-			if(!$dialog['element_group_id'])
+			if(empty($dialog['element_group_id']))
 				unset($menu_sa[3]);
 		}
 
@@ -255,38 +255,8 @@ switch(@$_POST['op']) {
 							   )).
 				'</table>'.
 
-
-				'<div class="menu_sa-2">'.
-					'<table class="bs5">'.
-						'<tr><td class="red r w150">Группа элемента:'.
-			                '<td><input type="hidden" id="element_group_id" value="'.$dialog['element_group_id'].'" />'.
-					'</table>'.
-					'<div class="elememt-setup'._dn($dialog['element_group_id']).'">'.
-					'<table class="bs5">'.
-						'<tr><td class="red r w150">Начальная ширина:'.
-							'<td><input type="hidden" id="element_width" value="'.$dialog['element_width'].'" />'.
-						'<tr><td class="red r">Минимальная ширина:'.
-							'<td><input type="hidden" id="element_width_min" value="'.$dialog['element_width_min'].'" />'.
-						'<tr><td class="red r">Тип данных:'.
-							'<td><input type="hidden" id="element_type" value="'.$dialog['element_type'].'" />'.
-						'<tr><td class="red r">CMP-аффикс:'.
-							'<td><input type="text" id="element_afics" class="w150" value="'.$dialog['element_afics'].'" />'.
-						'<tr><td class="red r">Диалог для функций:'.
-							'<td><input type="hidden" id="element_action_dialog_id" value="'.$dialog['element_action_dialog_id'].'" />'.
-
-						'<tr><td>'.
-							'<td class="pt10">'.
-			                       _check(array(
-										'attr_id' => 'element_hidden',
-										'title' => 'скрытый элемент',
-										'value' => $dialog['element_hidden']
-								   )).
-					'</table>'.
-		            _dialogSetupRule($dialog_id).
-					'</div>'.
-				'</div>'.
-
-				_dialogEditLoadUse($dialog).
+				_dialogSetupSa2($dialog).
+				_dialogSetupLoadUse($dialog).
 
 			'</div>'
 	  : '');
@@ -793,9 +763,41 @@ function _dialogSetupRule($dialog_id) {//Правила для элемета
 	'<table id="element-rule" class="bs5">'.$send.'</table>';
 }
 
+function _dialogSetupSa2($dialog) {//пункт меню настройки как элемента
+	$group_id = _num(@$dialog['element_group_id']);
+	return
+	'<div class="menu_sa-2">'.
+		'<table class="bs5">'.
+			'<tr><td class="red r w150">Группа элемента:'.
+                '<td><input type="hidden" id="element_group_id" value="'.$group_id.'" />'.
+		'</table>'.
+		'<div class="elememt-setup'._dn($group_id).'">'.
+		'<table class="bs5">'.
+			'<tr><td class="red r w150">Начальная ширина:'.
+				'<td><input type="hidden" id="element_width" value="'._num(@$dialog['element_width']).'" />'.
+			'<tr><td class="red r">Минимальная ширина:'.
+				'<td><input type="hidden" id="element_width_min" value="'._num(@$dialog['element_width_min']).'" />'.
+			'<tr><td class="red r">Тип данных:'.
+				'<td><input type="hidden" id="element_type" value="'._num(@$dialog['element_type']).'" />'.
+			'<tr><td class="red r">CMP-аффикс:'.
+				'<td><input type="text" id="element_afics" class="w150" value="'.@$dialog['element_afics'].'" />'.
+			'<tr><td class="red r">Диалог для функций:'.
+				'<td><input type="hidden" id="element_action_dialog_id" value="'._num(@$dialog['element_action_dialog_id']).'" />'.
 
-function _dialogEditLoadUse($dialog) {//использование как элемента в других диалогах
-	if(!$dialog['element_group_id'])
+			'<tr><td>'.
+				'<td class="pt10">'.
+                       _check(array(
+							'attr_id' => 'element_hidden',
+							'title' => 'скрытый элемент',
+							'value' => _num(@$dialog['element_hidden'])
+					   )).
+		'</table>'.
+        _dialogSetupRule($dialog['id']).
+		'</div>'.
+	'</div>';
+}
+function _dialogSetupLoadUse($dialog) {//использование как элемента в других диалогах
+	if(empty($dialog['element_group_id']))
 		return '';
 
 	$use_dialog = '';

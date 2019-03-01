@@ -519,7 +519,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 
 		//данные для формирования и отправки ошибки
 		$is_err = 0;
-		$err_msg = $cmp['req_msg'] ? $cmp['req_msg'] : 'Необходимо заполнить поле,<br>либо выбрать значение';
+		$err_msg = !empty($cmp['req_msg']) ? $cmp['req_msg'] : 'Необходимо заполнить поле,<br>либо выбрать значение';
 
 		switch($cmp['dialog_id']) {
 			//текстовое поле
@@ -592,7 +592,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				$send[$COL_DLG_ID][$cmp_id] = $v;
 				break;
 			default:
-				if($cur && $cmp['req'] && !$v)
+				if($cur && !empty($cmp['req']) && !$v)
 					$is_err = 1;
 
 				$ex = explode('_', $col);
@@ -1057,7 +1057,7 @@ function _spisokAction3($dialog, $unit_id, $send) {//добавление зна
 	if(!$elem = _elemOne($unit_id))
 		return $send;
 	//была вставка доп-значения для элемета
-	if($elem['parent_id'])
+	if(!empty($elem['parent_id']))
 		return $send;
 	if(!$elem['block_id'])
 		return $send;

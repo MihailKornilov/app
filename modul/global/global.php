@@ -775,19 +775,19 @@ function _jsCacheElemOne($elem_id) {
 	$val['name'] = $r['name'];
 	$val['block_id'] = $block_id;
 
-	$val['mar'] = $r['mar'];
-	$val['font'] = $r['font'];
-	$val['color'] = $r['color'];
-	$val['size'] = $r['size'];
-	$val['width'] = $r['width'];
+	$val['mar'] = @$r['mar'];
+	$val['font'] = @$r['font'];
+	$val['color'] = @$r['color'];
+	$val['size'] = @$r['size'];
+	$val['width'] = @$r['width'];
 
-	if($r['focus'])
+	if(@$r['focus'])
 		$val['focus'] = 1;
 
-	if($r['hint'])
+	if(@$r['hint'])
 		$val['hint'] = $r['hint'];
 
-	if($r['action'])
+	if(@$r['action'])
 		$val['action'] = $r['action'];
 
 	//элемент является подключаемым списком

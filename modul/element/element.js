@@ -3358,7 +3358,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				font:'',        //выделение: b, i, u
 				color:'',       //цвет текста
 				txt_7:'',       //TH-заголовок колонки
-				pos:''          //txt_8: позиция по горизонтали (l, center, r)
+				txt_8:''        //позиция по горизонтали (l, center, r)
 			}, v.id ? v : {});
 
 			DL.append(
@@ -3376,7 +3376,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									'</div>' +
 									'<input type="text"' +
 										  ' id="inp_' + NUM + '"' +
-										  ' class="inp w100p curP ' + v.font + ' ' + v.color + ' ' + v.pos + '"' +
+										  ' class="inp w100p curP ' + v.font + ' ' + v.color + ' ' + v.txt_8 + '"' +
 										  ' readonly' +
 										  ' placeholder="значение не выбрано"' +
 										  ' value="' + v.name + '"' +
@@ -3495,12 +3495,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					font.push(arr[k]);
 			v.font = font.join(' ');
 
-			//позиция txt_8
+			//позиция
 			arr = ['center', 'r'];
-			v.pos = '';
+			v.txt_8 = '';
 			for(k in arr)
 				if(inp.hasClass(arr[k]))
-					v.pos = arr[k];
+					v.txt_8 = arr[k];
 
 			//цвет текста
 			v.color = '';
