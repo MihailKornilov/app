@@ -34,6 +34,14 @@ function _elementType($type, $el=array()) {//все возможные вари�
 			if(empty($el))
 				return array();
 			return _elementJs($el);
+
+		//имя (описание) элемента
+		case 'title':
+			if(!empty($el['title']))
+				return $el['title'];
+			if(!empty($el['name']))
+				return $el['name'];
+			return '';
 	}
 
 	return '';
@@ -171,6 +179,7 @@ function _element2($type, $el, $prm) {
 	if($type == 'struct')
 		return array(
 			'parent_id' => _num($el['parent_id']),
+			'title' => $el['txt_1'],
 
 			'txt_1' => $el['txt_1'],        //текст кнопки
 			'num_1' => _num($el['num_1']),  //цвет
@@ -525,6 +534,7 @@ function _element9($type, $el, $prm) {
 /* [10] Произвольный текст */
 function _element10_struct($el) {
 	return array(
+		'title' => $el['txt_1'],
 		'txt_1' => $el['txt_1']     //текст
 	) + _elementStruct($el);
 }
@@ -533,6 +543,26 @@ function _element10_print($el) {
 }
 
 /* [11] Вставка значения записи */
+function _element11Title($ids, $ELM) {
+	$title = '';
+	foreach(_ids($ids, 'arr') as $id) {
+		if(!isset($ELM[$id]))
+			return '';
+
+		$ell = $ELM[$id];
+
+		//вложенное значение
+		if(_elemIsConnect($ell)) {
+			$dlg = _dialogQuery($ell['num_1']);
+			$title .= $dlg['name'].' » ';
+			continue;
+		}
+
+		$title .= _element('title', $ell);
+	}
+
+	return $title;
+}
 function _element11_struct($el, $ELM=array()) {
 	/*
 		Вставка элемента через функцию PHP12_v_choose
@@ -540,6 +570,7 @@ function _element11_struct($el, $ELM=array()) {
 
 	$send = array(
 		'parent_id' => _num($el['parent_id']),
+//		'title'     => _element11Title($el['txt_2'], $ELM),
 
 		'txt_2'     => $el['txt_2'],    //id элемента, выбранного из диалога, который вносит данные списка
 								        //возможна иерархия элементов через запятую: 256,1312,560
@@ -652,37 +683,35 @@ function _element13($type, $el, $prm) {
 }
 
 /* [14] Список-шаблон */
-function _element14($type, $el, $prm) {
+function _element14_struct($el) {
 	/*
 		настройка шаблона через функцию PHP12_spisok14_setup
 	*/
-	if($type == 'struct')
-		return array(
-			'num_1' => _num($el['num_1']),//id диалога, который вносит данные списка (шаблон которого будет настраиваться)
-			'num_2' => _num($el['num_2']),//длина (количество строк, выводимых за один раз)
+	return array(
+//		'title' => _dialogParam($el['num_1'], 'name'),
 
-			'txt_1' => $el['txt_1'],      //сообщение пустого запроса
-			'txt_2' => $el['txt_2'],      //условия отображения, настраиваемые через [40]
-			'num_3' => _num($el['num_3']),/* порядок:
-												0 - автоматически
-												2318 - по дате добавления
-												2319 - сотрировка (на основании поля sort)
-										  */
-			'num_4' => _num($el['num_4']) //горизонтальное расположение списка
-		) + _elementStruct($el);
+		'num_1' => _num($el['num_1']),//id диалога, который вносит данные списка (шаблон которого будет настраиваться)
+		'num_2' => _num($el['num_2']),//длина (количество строк, выводимых за один раз)
 
-	if($type == 'print') {
-		if(!$dialog_id = $el['num_1'])
-			return _emptyRed('Не указан список для вывода данных.');
-		if(!$DLG = _dialogQuery($dialog_id))
-			return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
-		if($prm['blk_setup'])
-			return _emptyMin('Список-шаблон <b>'.$DLG['name'].'</b>');
+		'txt_1' => $el['txt_1'],      //сообщение пустого запроса
+		'txt_2' => $el['txt_2'],      //условия отображения, настраиваемые через [40]
+		'num_3' => _num($el['num_3']),/* порядок:
+											0 - автоматически
+											2318 - по дате добавления
+											2319 - сотрировка (на основании поля sort)
+									  */
+		'num_4' => _num($el['num_4']) //горизонтальное расположение списка
+	) + _elementStruct($el);
+}
+function _element14_print($el, $prm) {
+	if(!$dialog_id = $el['num_1'])
+		return _emptyRed('Не указан список для вывода данных.');
+	if(!$DLG = _dialogQuery($dialog_id))
+		return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
+	if($prm['blk_setup'])
+		return _emptyMin('Список-шаблон <b>'.$DLG['name'].'</b>');
 
-		return _spisok14($el);
-	}
-
-	return _elementType($type, $el);
+	return _spisok14($el);
 }
 
 /* [15] Количество строк списка */
@@ -803,7 +832,7 @@ function _element21_print($el) {
 }
 
 /* [23] Список-таблица */
-function _element23_struct($el, $prm) {
+function _element23_struct($el) {
 	/*
 		настройка шаблона через функцию PHP12_td_setup
 
@@ -818,6 +847,8 @@ function _element23_struct($el, $prm) {
 	*/
 
 	return array(
+//		'title'   => _dialogParam($el['num_1'], 'name'),
+
 		'num_1'   => _num($el['num_1']),//id диалога, который вносит данные списка (шаблон которого будет настраиваться)
 		'num_2'   => _num($el['num_2']),//длина (количество строк, выводимых за один раз)
 		'txt_1'   => $el['txt_1'],      //сообщение пустого запроса
@@ -847,7 +878,7 @@ function _element23_vvv($el, $cl) {
 	return array(
 		'id'        => _num($cl['id']),
 		'dialog_id' => _num($cl['dialog_id']),
-		'name'      => 'tit',//_elemTitle($cl['id']),
+		'name'      => '12ee',//_element('title', $cl['id']),
 		'width'     => _num($cl['width']),
 		'font'      => $cl['font'],
 		'color'     => $cl['color'],
@@ -1008,47 +1039,45 @@ function _element29_print($el, $prm) {
 }
 
 /* [30] Иконка удаления записи */
-function _element30($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1'])//иконка красного цвета
-		) + _elementStruct($el);
+function _element30_struct($el, $prm) {
+	return array(
+		'title' => 'DEL',
 
-	if($type == 'print') {
-		if($prm['blk_setup'])
-			return _iconDel(array(
-				'red' => $el['num_1'],
-				'class'=>'curD'
-			));
-		if(!$u = $prm['unit_get'])
-			return _iconDel(array(
-				'red' => $el['num_1'],
-				'class'=>'curD'
-			));
-
-		if(!$dlg_id = _num(@$u['dialog_id_use']))
-			return _msgRed('-dlg-id-yok-');
-		if(!$dlg = _dialogQuery($dlg_id))
-			return _msgRed('-dlg-yok-');
-		//иконка не выводится, если удаление запрещено
-		if(!$dlg['del_on'])
-			return '';
-		//иконка не выводится, если наступили другие сутки
-		if($dlg['del_cond']['num_2']) {
-			$day = explode(' ', $u['dtime_add']);
-			if(TODAY != $day[0])
-				return '';
-		}
-
-		return
-		_iconDel(array(
+		'num_1'   => _num($el['num_1'])//иконка красного цвета
+	) + _elementStruct($el);
+}
+function _element30_print($el, $prm) {
+	if($prm['blk_setup'])
+		return _iconDel(array(
 			'red' => $el['num_1'],
-			'class' => 'dialog-open pl',
-			'val' => 'dialog_id:'.$dlg_id.',del_id:'.$u['id']
+			'class'=>'curD'
 		));
+	if(!$u = $prm['unit_get'])
+		return _iconDel(array(
+			'red' => $el['num_1'],
+			'class'=>'curD'
+		));
+
+	if(!$dlg_id = _num(@$u['dialog_id_use']))
+		return _msgRed('-dlg-id-yok-');
+	if(!$dlg = _dialogQuery($dlg_id))
+		return _msgRed('-dlg-yok-');
+	//иконка не выводится, если удаление запрещено
+	if(!$dlg['del_on'])
+		return '';
+	//иконка не выводится, если наступили другие сутки
+	if($dlg['del_cond']['num_2']) {
+		$day = explode(' ', $u['dtime_add']);
+		if(TODAY != $day[0])
+			return '';
 	}
 
-	return _elementType($type, $el);
+	return
+	_iconDel(array(
+		'red' => $el['num_1'],
+		'class' => 'dialog-open pl',
+		'val' => 'dialog_id:'.$dlg_id.',del_id:'.$u['id']
+	));
 }
 
 /* [31] Выбор нескольких значений галочками */
@@ -1113,25 +1142,25 @@ function _element31($type, $el, $prm) {
 }
 
 /* [32] Значение списка: порядковый номер */
-function _element32($type, $el, $prm) {
-	if($type == 'struct')
-		return array() + _elementStruct($el);
+function _element32_struct($el) {
+	return array(
+		'title' => 'NUM'
+	) + _elementStruct($el);
+}
+function _element32_print($el, $prm) {
+	if(!$u = $prm['unit_get'])
+		return $el['title'];
 
-	if($type == 'print') {
-		if(!$u = $prm['unit_get'])
-			return 'num';
-
-		$num = empty($u['num']) ? $u['id'] : $u['num'];
-		$num = _spisokColSearchBg($el, $num);
-		return $num;
-	}
-
-	return _elementType($type, $el);
+	$num = empty($u['num']) ? $u['id'] : $u['num'];
+	$num = _spisokColSearchBg($el, $num);
+	return $num;
 }
 
 /* [33] Значение записи: дата */
-function _element33_struct($el, $prm) {
+function _element33_struct($el) {
 	return array(
+		'title' => 'Дата',
+
 		'num_1'   => _num($el['num_1']),/* формат:
 											29: 5 августа 2017
 											30: 5 авг 2017
@@ -1156,32 +1185,30 @@ function _element33_print($el, $prm) {
 }
 
 /* [34] Иконка редактирования записи */
-function _element34($type, $el, $prm) {
-	if($type == 'struct')
-		return array() + _elementStruct($el);
+function _element34_struct($el) {
+	return array(
+		'title' => 'EDIT'
+	) + _elementStruct($el);
+}
+function _element34_print($el, $prm) {
+	if($prm['blk_setup'])
+		return _iconEdit(array('class'=>'curD'));
+	if(!$u = $prm['unit_get'])
+		return _iconEdit(array('class'=>'curD'));
+	if(!$dlg_id = _num(@$u['dialog_id_use']))
+		return _msgRed('-dlg-id-yok-');
+	if(!$dlg = _dialogQuery($dlg_id))
+		return _msgRed('-dlg-yok-');
 
-	if($type == 'print') {
-		if($prm['blk_setup'])
-			return _iconEdit(array('class'=>'curD'));
-		if(!$u = $prm['unit_get'])
-			return _iconEdit(array('class'=>'curD'));
-		if(!$dlg_id = _num(@$u['dialog_id_use']))
-			return _msgRed('-dlg-id-yok-');
-		if(!$dlg = _dialogQuery($dlg_id))
-			return _msgRed('-dlg-yok-');
+	//иконка не выводится, если редактирование запрещено
+	if(!$dlg['edit_on'])
+		return '';
 
-		//иконка не выводится, если редактирование запрещено
-		if(!$dlg['edit_on'])
-			return '';
-
-		return
-		_iconEdit(array(
-			'class' => 'dialog-open pl',
-			'val' => 'dialog_id:'.$dlg_id.',edit_id:'.$u['id']
-		));
-	}
-
-	return _elementType($type, $el);
+	return
+	_iconEdit(array(
+		'class' => 'dialog-open pl',
+		'val' => 'dialog_id:'.$dlg_id.',edit_id:'.$u['id']
+	));
 }
 
 /* [35] Count: количество */
@@ -1212,23 +1239,21 @@ function _element35_print($el, $prm) {
 }
 
 /* [36] Иконка */
-function _element36($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id иконки
-			'num_2'   => _num($el['num_2']),//изменять яркость при наведении мышкой
-			'num_3'   => _num($el['num_3']) //курсор рука при наведении, иначе стрелочка
-		) + _elementStruct($el);
+function _element36_struct($el, $prm) {
+	return array(
+		'title' => 'ICON',
 
-	if($type == 'print') {
-		$type = PHP12_icon18_type($el['num_1']);
-		$pl = _dn(!$el['num_2'], 'pl');
-		$cur = $el['num_3'] ? ' curP' : ' curD';
+		'num_1'   => _num($el['num_1']),//id иконки
+		'num_2'   => _num($el['num_2']),//изменять яркость при наведении мышкой
+		'num_3'   => _num($el['num_3']) //курсор рука при наведении, иначе стрелочка
+	) + _elementStruct($el);
+}
+function _element36_print($el) {
+	$type = PHP12_icon18_type($el['num_1']);
+	$pl = _dn(!$el['num_2'], 'pl');
+	$cur = $el['num_3'] ? ' curP' : ' curD';
 
-		return '<div class="icon icon-'.$type.$pl.$cur.'"></div>';
-	}
-
-	return _elementType($type, $el);
+	return '<div class="icon icon-'.$type.$pl.$cur.'"></div>';
 }
 
 /* [37] Select: выбор колонки таблицы (SA) */
@@ -1557,9 +1582,11 @@ function _element59($type, $el, $prm) {
 /* [60] Загрузка изображений */
 function _element60_struct($el) {
 	return array(
-		'num_1'   => _num($el['num_1']),//максимальное количество изображений, которое разрешено загрузить
-		'num_7'   => _num($el['num_7']),//ограничение высоты (настройка стилей)
-		'num_8'   => _num($el['num_8']) //закруглённые углы (настройка стилей)
+		'title' => _imageNo($el['width'], $el['num_8']),
+
+		'num_1' => _num($el['num_1']),//максимальное количество изображений, которое разрешено загрузить
+		'num_7' => _num($el['num_7']),//ограничение высоты (настройка стилей)
+		'num_8' => _num($el['num_8']) //закруглённые углы (настройка стилей)
 	) + _elementStruct($el);
 }
 function _element60_print($el, $prm) {
@@ -1654,14 +1681,13 @@ function _element70($type, $el, $prm) {
 }
 
 /* [71] Значение записи: иконка сортировки */
-function _element71($type, $el, $prm) {
-	if($type == 'struct')
-		return array() + _elementStruct($el);
-
-	if($type == 'print')
-		return '<div class="icon icon-move '.($prm['unit_get'] ? 'pl' : 'curD').'"></div>';
-
-	return _elementType($type, $el);
+function _element71_struct($el) {
+	return array(
+		'title' => 'SORT'
+	) + _elementStruct($el);
+}
+function _element71_print($el, $prm) {
+	return '<div class="icon icon-move '.($prm['unit_get'] ? 'pl' : 'curD').'"></div>';
 }
 
 /* [72] Фильтр: год и месяц */
@@ -2151,6 +2177,19 @@ function _element400($type, $el, $prm) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+function _elemTitle($elem_id) {//имя элемента или его текст
+	return 'title-old';
+}
 
 
 
@@ -3996,36 +4035,6 @@ function _elemColDlgId($elem_id, $oo=false) {//получение id диало�
 	return $BL['obj_id'];
 }
 
-function _elemTitle($elem_id) {//имя элемента или его текст
-	if(!$elem_id = _num($elem_id))
-		return '';
-	if(!$el = _elemOne($elem_id))
-		return '';
-
-	switch($el['dialog_id']) {
-		case 2:  return $el['txt_1']; //кнопка
-		case 10: return $el['txt_1']; //произвольный текст
-		case 11: return _elem11title($el);
-		case 14://списки
-		case 23: return _dialogParam($el['num_1'], 'name');
-		case 32: return 'номер';
-		case 33: return 'дата';
-		case 30: return 'del';
-		case 34: return 'edit';
-		case 36: return 'icon';
-		case 60: return _imageNo($el['width'], $el['num_8']);
-		case 62: return 'Фильтр-галочка';
-		case 67://шаблон истории действий
-			$dlg = _dialogQuery($el['num_2']);
-			return $dlg['history'][$el['num_1']]['tmp'];
-		case 71: return 'sort';
-	}
-
-	if(_elemIsConnect($el))
-		return _dialogParam($el['num_1'], 'name');
-
-	return $el['name'];
-}
 function _elem_11_dialog($el) {//получение данных диалога по элементу 11
 	if($el['dialog_id'] != 11)
 		return 0;
