@@ -2174,8 +2174,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	_elemHint = function(el) {//подключение подсказки к элементу
 		if(!el.hint)
 			return;
-		if(!el.hint.on)
-			return;
 
 		var hint = el.hint,
 			side = {

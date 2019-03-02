@@ -471,7 +471,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	$send = _spisokAction4($send);
 
 	if(IS_ELEM) {
-		$send['elem_js'] = _jsCacheElemOne($unit_id);
+		$send['elem_js'] = _element('js', $unit);
 		_jsCache();
 	}
 

@@ -1441,14 +1441,25 @@ function _beElem($app_id=0) {
 
 		$ELM = array();
 		foreach($arr as $elem_id => $el) {
+			//изначально элементы, вставленные через [11], пропускаются
+			if($el['dialog_id'] == 11)
+				continue;
 			$el = _beElemDlg($el);
 			$el = _element('struct', $el);
 			$ELM[$elem_id] = $el;
 		}
 
-//		$ELM = _beElemFormat($ELM, $app_id);
-//		$ELM = _beElemHint($ELM, $app_id);
-//		$ELM = _beElemAction($ELM, $app_id);
+		//формирование элементов, вставленных через [11]
+		foreach($arr as $elem_id => $el) {
+			if($el['dialog_id'] != 11)
+				continue;
+			$el = _element11_struct($el, $ELM);
+			$ELM[$elem_id] = $el;
+		}
+
+		$ELM = _beElemFormat($ELM, $app_id);
+		$ELM = _beElemHint($ELM, $app_id);
+		$ELM = _beElemAction($ELM, $app_id);
 
 		//вставка дочерних элементов к родителям
 		$sql = "SELECT *
@@ -1482,6 +1493,7 @@ function _beElemDlg($el) {//настройки элемента из диало�
 
 	$el['hidden'] = _num($DLG['element_hidden']);
 	$el['afics'] = $DLG['element_afics'];
+	$el['eadi'] = $DLG['element_action_dialog_id'];
 
 	//определение максимальной ширины, на которую может растягиваться элемент
 	if($el['width_min'] = _num(@$DLG['element_width_min']))
@@ -1523,6 +1535,7 @@ function _beElemHint($ELM, $app_id) {//подсказки, назначенны�
 		if(!isset($ELM[$elem_id]))
 			continue;
 		unset($r['app_id']);
+		unset($r['on']);
 		unset($r['element_id']);
 		unset($r['user_id_add']);
 		unset($r['dtime_add']);

@@ -307,7 +307,8 @@ switch(@$_POST['op']) {
 
 				_BE('elem_clear');
 
-				$send['elem_js'] = _jsCacheElemOne($elem_id);
+				$el = _elemOne($elem_id);
+				$send['elem_js'] = _element('js', $el);
 			}
 
 		_jsCache();

@@ -766,89 +766,23 @@ function _jsCacheElemOne($elem_id) {
 
 	$val = array();
 
-	$val['dialog_id'] = $r['dialog_id'];
-	$val['col'] = _elemCol($r);
-	$val['name'] = $r['name'];
-	$val['block_id'] = $block_id;
 
-	$val['mar'] = @$r['mar'];
-	$val['font'] = @$r['font'];
-	$val['color'] = @$r['color'];
-	$val['size'] = @$r['size'];
-	$val['width'] = @$r['width'];
 
-	if(@$r['focus'])
-		$val['focus'] = 1;
-
-	if(@$r['hint'])
-		$val['hint'] = $r['hint'];
-
-	if(@$r['action'])
-		$val['action'] = $r['action'];
-
-	//элемент является подключаемым списком
-	if(_elemIsConnect($r))
-		$val['issp'] = 1;
-
-	//разрешать настройку стилей
-	if(_elemRule($r['dialog_id'], 12))
-		$val['stl'] = 1;
-
-	//разрешать настройку перехода на страницу или открытие диалога
-	if(_elemRule($r['dialog_id'], 13))
-		$val['url_use'] = 1;
-
-	//разрешать прикрепление подсказки
-	if(_elemRule($r['dialog_id'], 15))
-		$val['rule15'] = 1;
-
-	if($dlg = _BE('dialog', $r['dialog_id'])) {
-		if($dlg['element_afics'])
-			$val['afics'] = $dlg['element_afics'];
-		if($dlg['element_action_dialog_id'])
-			$val['eadi'] = $dlg['element_action_dialog_id'];
-	}
 
 	//исходный диалог (dialog source)
 	if($r['block']['obj_name'] == 'dialog')
 		$val['ds'] = $r['block']['obj_id'];
 
-	//установка пунтка по умолчанию для элемента [57] "Меню переключения блоков"
-	if($r['dialog_id'] == 57)
-		$val['def'] = $r['def'];
-
 	//правила для элементов, вставленных через [11]
 	if($r['dialog_id'] == 11)
 		if($last_id = _idsLast($r['txt_2']))
 			if($el11 = _elemOne($last_id)) {
-				//является изображением
-				if($el11['dialog_id'] == 60)
-					$val['immg'] = 1;
-				//разрешать настройку стилей
-				if(_elemRule($el11['dialog_id'], 11))
-					$val['stl'] = 1;
-				//разрешать настройку условий отображения
+				//разрешать настройку условий отображения (форматирование)
 				if(_elemRule($el11['dialog_id'], 14)) {
 					$val['rule14'] = 1;
 					$val['format_id'] = empty($el11['format']) ? 0 : $el11['format']['id'];
 				}
-				//разрешать настройку перехода на страницу или открытие диалога
-				if(_elemRule($el11['dialog_id'], 16))
-					$val['url_use'] = 1;
 			}
-
-	for($n = 1; $n <= 10; $n++) {
-		$num = 'num_'.$n;
-		if($r[$num])
-			$val[$num] = $r[$num];
-		elseif($r['dialog_id'] == 60 && $n == 7)//ограничение высоты фото [60] - обязательный num_7
-			$val[$num] = 0;
-
-
-		$txt = 'txt_'.$n;
-		if(!empty($r[$txt]))
-			$val[$txt] = $r[$txt];
-	}
 
 	return $val;
 }
