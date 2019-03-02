@@ -1418,6 +1418,7 @@ function _beBlockSort($BLK, $RES=array()) {//выстраивание блоко
 }
 
 function _beElem($app_id=0) {
+	global $G_DLG;
 	$key = 'ELMM';
 
 	$global = $app_id ? 0 : 1;
@@ -1429,12 +1430,12 @@ function _beElem($app_id=0) {
 
 		//получение всех элементов за исключением истории действий
 		$keyHist = 'DIALOG_HISTORY_IDS';
-		$idsHist = _ids(_cache_get($keyHist, $global));
+		$IDS_HIST = _ids(_cache_get($keyHist, $global));
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `app_id`=".$app_id."
 				  AND !`parent_id`
-				  AND `id` NOT IN (".$idsHist.")
+				  AND `id` NOT IN (".$IDS_HIST.")
 				ORDER BY `id`";
 		if(!$arr = query_arr($sql))
 			return array();
@@ -1446,6 +1447,7 @@ function _beElem($app_id=0) {
 				continue;
 			$el = _beElemDlg($el);
 			$el = _element('struct', $el);
+			$el = _element('struct_title', $el, $G_DLG);
 			$ELM[$elem_id] = $el;
 		}
 
@@ -1454,6 +1456,7 @@ function _beElem($app_id=0) {
 			if($el['dialog_id'] != 11)
 				continue;
 			$el = _element11_struct($el, $ELM);
+			$el = _element11_struct_title($el, $ELM, $G_DLG);
 			$ELM[$elem_id] = $el;
 		}
 
@@ -1466,14 +1469,24 @@ function _beElem($app_id=0) {
 				FROM `_element`
 				WHERE `app_id`=".$app_id."
 				  AND `parent_id`
+				  AND `id` NOT IN (".$IDS_HIST.")
 				ORDER BY `parent_id`,`sort`";
-		foreach(query_arr($sql) as $r) {
-			$pid = $r['parent_id'];
+		foreach(query_arr($sql) as $el) {
+			$pid = $el['parent_id'];
 			if(empty($ELM[$pid]))
 				continue;
 			if(!isset($ELM[$pid]['vvv']))
 				$ELM[$pid]['vvv'] = array();
-			$ELM[$pid]['vvv'][] = _element('vvv', $ELM[$pid], $r);
+
+			if(!empty($el['dialog_id']))
+				if($el['dialog_id'] == 11)
+					$el = _element11_struct_title($el, $ELM, $G_DLG);
+				else
+					$el = _element('struct_title', $el, $G_DLG);
+
+			$el = _element('struct_vvv', $ELM[$pid], $el);
+
+			$ELM[$pid]['vvv'][] = $el;
 		}
 
 		_cache_set($key, $ELM, $global);

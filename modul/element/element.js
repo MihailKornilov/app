@@ -3351,7 +3351,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 				id:0,           //id элемента
 				dialog_id:50,   //id диалога, через который был вставлен этот элемент
-				name:'',        //имя значения
+				title:'',       //имя значения
 				width:150,      //ширина колонки
 				font:'',        //выделение: b, i, u
 				color:'',       //цвет текста
@@ -3377,7 +3377,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 										  ' class="inp w100p curP ' + v.font + ' ' + v.color + ' ' + v.txt_8 + '"' +
 										  ' readonly' +
 										  ' placeholder="значение не выбрано"' +
-										  ' value="' + v.name + '"' +
+										  ' value="' + v.title + '"' +
 									' />' +
 								'</div>' +
 							'<td class="w50 r top pt5">' +
@@ -3827,7 +3827,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									  ' class="inp w100p curP"' +
 									  ' readonly' +
 									  ' placeholder="элемент не выбран"' +
-									  ' value="' + (v.title || v.id || '') + '"' +
+									  ' value="' + v.title + '"' +
 								' />' +
 							'<td class="w25">' +
 								'<input type="hidden" class="spc" value="' + v.spc + '" />' +
