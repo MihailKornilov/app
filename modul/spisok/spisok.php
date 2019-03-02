@@ -1899,7 +1899,7 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 				//получение компонентов диалога, которые отвечают за внесение данных (для поиска компонента, который участвует в подсчёте баланса)
 				$ids = array();
 				foreach($dialog['cmp'] as $id => $r) {
-					if(!$r['col'])
+					if(empty($r['col']))
 						continue;
 					if($r['dialog_id'] == 27)
 						continue;

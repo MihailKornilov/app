@@ -147,7 +147,8 @@ function _elementJs($el) {//структура элемента для JS
 	return $send;
 }
 function _element($type, $el, $prm=array()) {//все манипуляции, связанные с элементом
-if(empty($el)) die('elem empty'); //todo пока тест
+	if(empty($el))
+		return _elementType($type, $el);
 
 	if(!is_array($el))
 		$el = _elemOne($el);
@@ -6492,16 +6493,16 @@ function PHP12_cron_dst_prm_vvv($prm) {
 
 	$send = array();
 	foreach($dlg['cmp'] as $id => $r) {
-		if(!$r['col'])
+		if(empty($r['col']))
 			continue;
-		if($r['hidden'])
+		if(!empty($r['hidden']))
 			continue;
 		$src_id = _num(@$ass[$id]);
 		$send[] = array(
 			'dst_id' => $id,
-			'dst_title' => _elemTitle($id),
+			'dst_title' => _element('title', $r),
 			'src_id' => $src_id,
-			'src_title' => _elemTitle($src_id)
+			'src_title' => _element('title', $src_id)
 		);
 	}
 
@@ -6795,25 +6796,29 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 		$hidden = false;//скрытые элементы в историю не попадают
 		$dlg_id = 0;
 		$name = '';
-		foreach($dialog['cmp'] as $cmp_id => $cmp)
-			if($i == $cmp['col']) {
-				//картинки в историю не попадают
-				if($cmp['dialog_id'] == 60) {
-					$hidden = true;
-					break;
-				}
-				if($cmp['hidden']) {
-					$hidden = true;
-					break;
-				}
-				if(_elemIsConnect($cmp)) {
-					$name = $cmp['name'];
-					break;
-				}
-				$dlg_id = $cmp['dialog_id'];
-				$name = _elemTitle($cmp_id);
+		foreach($dialog['cmp'] as $cmp_id => $cmp) {
+			if(empty($cmp['col']))
+				continue;
+			if($i != $cmp['col'])
+				continue;
+
+			//картинки в историю не попадают
+			if($cmp['dialog_id'] == 60) {
+				$hidden = true;
 				break;
 			}
+			if(!empty($cmp['hidden'])) {
+				$hidden = true;
+				break;
+			}
+			if(_elemIsConnect($cmp)) {
+				$name = $cmp['name'];
+				break;
+			}
+			$dlg_id = $cmp['dialog_id'];
+			$name = _element('title', $cmp);
+			break;
+		}
 
 		if($hidden)
 			continue;
