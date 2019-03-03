@@ -377,55 +377,48 @@ function _element4_print($el) {
 }
 
 /* [5] textarea (многострочное текстовое поле) */
-function _element5($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'req'       => _num($el['req']),
-			'req_msg'   => $el['req_msg'],
+function _element5_struct($el) {
+	return array(
+		'req'       => _num($el['req']),
+		'req_msg'   => $el['req_msg'],
 
-			'txt_1' => $el['txt_1'] //текст для placeholder
-		) + _elementStruct($el);
+		'txt_1' => $el['txt_1'] //текст для placeholder
+	) + _elementStruct($el);
+}
+function _element5_print($el, $prm) {
+	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
-	if($type == 'print') {
-		$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-		$disabled = $prm['blk_setup'] ? ' disabled' : '';
-
-		return
-		'<textarea id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.'>'.
-			_elemPrintV($el, $prm).
-		'</textarea>';
-	}
-
-	return _elementType($type, $el);
+	return
+	'<textarea id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.'>'.
+		_elemPrintV($el, $prm).
+	'</textarea>';
 }
 
 /* [6] Select: выбор страницы */
-function _element6($type, $el, $prm) {
+function _element6_struct($el) {
 	/*
 		содержание: PAGE_LIST
 	*/
-	if($type == 'struct')
-		return array(
-			'req'       => _num($el['req']),
-			'req_msg'   => $el['req_msg'],
+	return array(
+		'req'       => _num($el['req']),
+		'req_msg'   => $el['req_msg'],
 
-			'txt_1' => $el['txt_1'] //текст, когда страница не выбрана
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _select(array(
-			'attr_id' => _elemAttrId($el, $prm),
-			'placeholder' => $el['txt_1'],
-			'width' => $el['width'],
-			'value' => _elemPrintV($el, $prm, 0)
-	   ));
-
-	if($type == 'js')
-		return array(
-			'txt_1' => $el['txt_1']
-		) + _elementJs($el);
-
-	return _elementType($type, $el);
+		'txt_1' => $el['txt_1'] //текст, когда страница не выбрана
+	) + _elementStruct($el);
+}
+function _element6_js($el) {
+	return array(
+		'txt_1' => $el['txt_1']
+	) + _elementJs($el);
+}
+function _element6_print($el, $prm) {
+	return _select(array(
+		'attr_id' => _elemAttrId($el, $prm),
+		'placeholder' => $el['txt_1'],
+		'width' => $el['width'],
+		'value' => _elemPrintV($el, $prm, 0)
+	));
 }
 
 /* [7] Фильтр: быстрый поиск */
@@ -454,91 +447,82 @@ function _element7_js($el) {
 }
 
 /* [8] input:text (однострочное текстовое поле) */
-function _element8($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'req'       => _num($el['req']),
-			'req_msg'   => $el['req_msg'],
+function _element8_struct($el) {
+	return array(
+		'req'       => _num($el['req']),
+		'req_msg'   => $el['req_msg'],
 
-			'txt_1' => $el['txt_1'],      //текст для placeholder
-			'txt_2' => $el['txt_2'],      //текст по умолчанию
-			'num_1' => _num($el['num_1']),/* формат:
-												32 - произвольный текст
-												33 - цифры и числа
-												34 - артикул
-										  */
-			'num_2' => _num($el['num_2']),//количество знаков после запятой (для 33)
-			'num_3' => _num($el['num_3']),//разрешать отрицательные значения (для 33)
-			'num_4' => _num($el['num_4']),//разрешать вносить 0 (для 33)
+		'txt_1' => $el['txt_1'],      //текст для placeholder
+		'txt_2' => $el['txt_2'],      //текст по умолчанию
+		'num_1' => _num($el['num_1']),/* формат:
+											32 - произвольный текст
+											33 - цифры и числа
+											34 - артикул
+									  */
+		'num_2' => _num($el['num_2']),//количество знаков после запятой (для 33)
+		'num_3' => _num($el['num_3']),//разрешать отрицательные значения (для 33)
+		'num_4' => _num($el['num_4']),//разрешать вносить 0 (для 33)
 
-			'txt_3' => $el['txt_3']       //шаблон артикула (для 34)
-		) + _elementStruct($el);
+		'txt_3' => $el['txt_3']       //шаблон артикула (для 34)
+	) + _elementStruct($el);
+}
+function _element8_print($el, $prm) {
+	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
-	if($type == 'print') {
-		$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-		$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
+	$v = _elemPrintV($el, $prm, $el['txt_2']);
 
-		$v = _elemPrintV($el, $prm, $el['txt_2']);
-
-		switch($el['num_1']) {
-			default:
-			//произвольный текст
-			case 32: break;
-			//цифры и числа
-			case 33:
-				$v = round($v, $el['num_2']);
-				$v = $v || $el['num_4'] ? $v : '';
+	switch($el['num_1']) {
+		default:
+		//произвольный текст
+		case 32: break;
+		//цифры и числа
+		case 33:
+			$v = round($v, $el['num_2']);
+			$v = $v || $el['num_4'] ? $v : '';
+			break;
+		//артикул
+		case 34:
+			if($v)
 				break;
-			//артикул
-			case 34:
-				if($v)
-					break;
-				if(!$col = _elemCol($el))
-					break;
-				if(!$BL = $el['block'])
-					break;
-				if($BL['obj_name'] != 'dialog')
-					break;
-				if(!$DLG = _dialogQuery($BL['obj_id']))
-					break;
-				$sql = "SELECT MAX(`t1`.`".$col."`)+1
-						FROM  "._queryFrom($DLG)."
-						WHERE "._queryWhere($DLG)."
-						  AND LENGTH(`t1`.`".$col."`)=".strlen($el['txt_3']);
-				$v = query_value($sql);
-				if(($diff = strlen($el['txt_3']) - strlen($v)) > 0)
-					for($n = 0; $n < $diff; $n++)
-						$v = '0'.$v;
+			if(!$col = _elemCol($el))
 				break;
-		}
-
-		return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
+			if(!$BL = $el['block'])
+				break;
+			if($BL['obj_name'] != 'dialog')
+				break;
+			if(!$DLG = _dialogQuery($BL['obj_id']))
+				break;
+			$sql = "SELECT MAX(`t1`.`".$col."`)+1
+					FROM  "._queryFrom($DLG)."
+					WHERE "._queryWhere($DLG)."
+					  AND LENGTH(`t1`.`".$col."`)=".strlen($el['txt_3']);
+			$v = query_value($sql);
+			if(($diff = strlen($el['txt_3']) - strlen($v)) > 0)
+				for($n = 0; $n < $diff; $n++)
+					$v = '0'.$v;
+			break;
 	}
 
-	return _elementType($type, $el);
+	return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
 }
 
 /* [9] Поле-пароль */
-function _element9($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'req'       => _num($el['req']),
-			'req_msg'   => $el['req_msg'],
+function _element9_struct($el) {
+	return array(
+		'req'       => _num($el['req']),
+		'req_msg'   => $el['req_msg'],
 
-			'txt_1' => $el['txt_1'],     //текст для placeholder
-			'num_1' => _num($el['num_1'])//минимальное количество знаков
-		) + _elementStruct($el);
+		'txt_1' => $el['txt_1'],     //текст для placeholder
+		'num_1' => _num($el['num_1'])//минимальное количество знаков
+	) + _elementStruct($el);
+}
+function _element9_print($el, $prm) {
+	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
-
-	if($type == 'print') {
-		$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-		$disabled = $prm['blk_setup'] ? ' disabled' : '';
-
-		return '<input type="password" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' />';
-	}
-
-	return _elementType($type, $el);
+	return '<input type="password" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' />';
 }
 
 /* [10] Произвольный текст */
@@ -656,42 +640,38 @@ function _element12_js($el) {
 }
 
 /* [13] Выбор элемента из диалога или страницы */
-function _element13($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'req'     => _num($el['req']),
-			'req_msg' => $el['req_msg'],
+function _element13_struct($el) {
+	return array(
+		'req'     => _num($el['req']),
+		'req_msg' => $el['req_msg'],
 
-			'txt_1'   => $el['txt_1'],      //текст для placeholder
-			'num_1'   => _num($el['num_1']),//ID диалога (список всех диалогов)
-			'txt_2'   => $el['txt_2'],      //разрешать выбирать только некоторые типы элементов (иначе любые)
-			'num_2'   => _num($el['num_2']),//ids диалогов разрешённых элементов
-			'num_5'   => _num($el['num_5']),//выбор значений во вложенных списках
-			'num_6'   => _num($el['num_6']) //выбор нескольких значений
-		) + _elementStruct($el);
+		'txt_1'   => $el['txt_1'],      //текст для placeholder
+		'num_1'   => _num($el['num_1']),//ID диалога (список всех диалогов)
+		'txt_2'   => $el['txt_2'],      //разрешать выбирать только некоторые типы элементов (иначе любые)
+		'num_2'   => _num($el['num_2']),//ids диалогов разрешённых элементов
+		'num_5'   => _num($el['num_5']),//выбор значений во вложенных списках
+		'num_6'   => _num($el['num_6']) //выбор нескольких значений
+	) + _elementStruct($el);
+}
+function _element13_print($el, $prm) {
+	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
-	if($type == 'print') {
-		$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-		$disabled = $prm['blk_setup'] ? ' disabled' : '';
+	//в самом себе выбор элемента невозможен
+	if($block_id = $prm['srce']['block_id'])//должен быть блок 2214
+		if($BL = _blockOne($block_id))
+			if($BL['obj_name'] == 'dialog' && $BL['obj_id'] == 13)
+				$disabled = ' disabled';
 
-		//в самом себе выбор элемента невозможен
-		if($block_id = $prm['srce']['block_id'])//должен быть блок 2214
-			if($BL = _blockOne($block_id))
-				if($BL['obj_name'] == 'dialog' && $BL['obj_id'] == 13)
-					$disabled = ' disabled';
+	$v = _elemPrintV($el, $prm, !$el['num_5'] && !$el['num_6'] ? 0 : '');
 
-		$v = _elemPrintV($el, $prm, !$el['num_5'] && !$el['num_6'] ? 0 : '');
-
-		return
-		'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-		'<div class="_selem dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
-			'<div class="icon icon-star pabs"></div>'.
-			'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-			'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
-		'</div>';
-	}
-
-	return _elementType($type, $el);
+	return
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+	'<div class="_selem dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
+		'<div class="icon icon-star pabs"></div>'.
+		'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+		'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
+	'</div>';
 }
 
 /* [14] Список-шаблон */
@@ -733,23 +713,20 @@ function _element14_print($el, $prm) {
 }
 
 /* [15] Количество строк списка */
-function _element15($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1' => _num($el['num_1']),//id элемента, содержащего список, количество строк которого нужно выводить
-			'txt_1' => $el['txt_1'],      //показана "1"
-			'txt_2' => $el['txt_2'],      //запись   "1"
-			'txt_3' => $el['txt_3'],      //показано "2"
-			'txt_4' => $el['txt_4'],      //записи   "2"
-			'txt_5' => $el['txt_5'],      //показано "5"
-			'txt_6' => $el['txt_6'],      //записей  "5"
-			'txt_7' => $el['txt_7']       //сообщение об отсутствии записей
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _spisokElemCount($el, $prm);
-
-	return _elementType($type, $el);
+function _element15_struct($el) {
+	return array(
+		'num_1' => _num($el['num_1']),//id элемента, содержащего список, количество строк которого нужно выводить
+		'txt_1' => $el['txt_1'],      //показана "1"
+		'txt_2' => $el['txt_2'],      //запись   "1"
+		'txt_3' => $el['txt_3'],      //показано "2"
+		'txt_4' => $el['txt_4'],      //записи   "2"
+		'txt_5' => $el['txt_5'],      //показано "5"
+		'txt_6' => $el['txt_6'],      //записей  "5"
+		'txt_7' => $el['txt_7']       //сообщение об отсутствии записей
+	) + _elementStruct($el);
+}
+function _element15_print($el, $prm) {
+	return _spisokElemCount($el, $prm);
 }
 
 /* [16] Radio: произвольные значения */
@@ -950,24 +927,21 @@ function _element24_print($el, $prm) {
 }
 
 /* [26] Select: выбор документа (SA) */
-function _element26($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'req'     => _num($el['req']),
-			'req_msg' => $el['req_msg'],
+function _element26_struct($el) {
+	return array(
+		'req'     => _num($el['req']),
+		'req_msg' => $el['req_msg'],
 
-			'txt_1'   => $el['txt_1']  //нулевое значение
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _select(array(
-			'attr_id' => _elemAttrId($el, $prm),
-			'placeholder' => $el['txt_1'],
-			'width' => $el['width'],
-			'value' => _elemPrintV($el, $prm, 0)
-		));
-
-	return _elementType($type, $el);
+		'txt_1'   => $el['txt_1']  //нулевое значение
+	) + _elementStruct($el);
+}
+function _element26_print($el, $prm) {
+	return _select(array(
+		'attr_id' => _elemAttrId($el, $prm),
+		'placeholder' => $el['txt_1'],
+		'width' => $el['width'],
+		'value' => _elemPrintV($el, $prm, 0)
+	));
 }
 
 /* [27] Cумма значений записи */
@@ -991,40 +965,35 @@ function _element27_struct_vvv($el, $cl) {
 }
 
 /* [28] Загрузка файла */
-function _element28($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'req'     => _num($el['req']),
-			'req_msg' => $el['req_msg'],
+function _element28_struct($el) {
+	return array(
+		'req'     => _num($el['req']),
+		'req_msg' => $el['req_msg'],
 
-			'txt_1'   => $el['txt_1']  //нулевое значение
-		) + _elementStruct($el);
+		'txt_1'   => $el['txt_1']  //нулевое значение
+	) + _elementStruct($el);
+}
+function _element28_print($el, $prm) {
+	$v = _elemPrintV($el, $prm, 0);
 
-
-	if($type == 'print') {
-		$v = _elemPrintV($el, $prm, 0);
-
-		return
-		'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-		'<div class="_attach">'.
-			'<div id="'._elemAttrId($el, $prm).'_atup" class="atup'._dn(!$v).'"'._elemStyleWidth($el).'>'.
-				'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="at-frame">'.
-					'<input type="hidden" name="op" value="attach_upload" />'.
-					'<input type="file" name="f1" class="at-file"'._elemStyleWidth($el).' />'.// accept="' + acceptMime() + '"
-				'</form>'.
-				'<button class="vk small grey w100p">'.$el['txt_1'].'</button>'.
-				'<iframe name="at-frame"></iframe>'.
-			'</div>'.
-			'<table class="atv'._dn($v).'">'.
-				'<tr><td class="top">'._attachLink($v).
-					'<th class="top wsnw">'.
-//							'<div class="icon icon-set mtm2 ml5 pl'._tooltip('Параметры файла', -56).'</div>'.
-						'<div class="icon icon-del-red ml5 mtm2 pl'._tooltip('Отменить', -30).'</div>'.
-			'</table>'.
-		'</div>';
-	}
-
-	return _elementType($type, $el);
+	return
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+	'<div class="_attach">'.
+		'<div id="'._elemAttrId($el, $prm).'_atup" class="atup'._dn(!$v).'"'._elemStyleWidth($el).'>'.
+			'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="at-frame">'.
+				'<input type="hidden" name="op" value="attach_upload" />'.
+				'<input type="file" name="f1" class="at-file"'._elemStyleWidth($el).' />'.// accept="' + acceptMime() + '"
+			'</form>'.
+			'<button class="vk small grey w100p">'.$el['txt_1'].'</button>'.
+			'<iframe name="at-frame"></iframe>'.
+		'</div>'.
+		'<table class="atv'._dn($v).'">'.
+			'<tr><td class="top">'._attachLink($v).
+				'<th class="top wsnw">'.
+//					'<div class="icon icon-set mtm2 ml5 pl'._tooltip('Параметры файла', -56).'</div>'.
+					'<div class="icon icon-del-red ml5 mtm2 pl'._tooltip('Отменить', -30).'</div>'.
+		'</table>'.
+	'</div>';
 }
 
 /* [29] Select: выбор записи из другого списка */
@@ -1110,64 +1079,60 @@ function _element30_print($el, $prm) {
 }
 
 /* [31] Выбор нескольких значений галочками */
-function _element31($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id диалога - список, из которого будут выбираться галочки
-			'num_2'   => _num($el['num_2']) //id элемента - содержание
-		) + _elementStruct($el);
+function _element31_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//id диалога - список, из которого будут выбираться галочки
+		'num_2'   => _num($el['num_2']) //id элемента - содержание
+	) + _elementStruct($el);
+}
+function _element31_print($el, $prm) {
+	$v = _elemPrintV($el, $prm);
 
-	if($type == 'print') {
-		$v = _elemPrintV($el, $prm);
+	//получение данных списка
+	$DLG = _dialogQuery($el['num_1']);
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Выбор галочками из ".$DLG['name']." */
+			SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			ORDER BY `sort`";
+	$spisok = query_arr($sql);
 
-		//получение данных списка
-		$DLG = _dialogQuery($el['num_1']);
-		$sql = "/* ".__FUNCTION__.":".__LINE__." Выбор галочками из ".$DLG['name']." */
-				SELECT "._queryCol($DLG)."
-				FROM   "._queryFrom($DLG)."
-				WHERE  "._queryWhere($DLG)."
-				ORDER BY `sort`";
-		$spisok = query_arr($sql);
+	$chk = '';
+	$n = 0;
+	$sel = _idsAss($v);
+	foreach($spisok as $r) {
+		$title = '<div class="fs10 red">содержание не настроено</div>';
 
-		$chk = '';
-		$n = 0;
-		$sel = _idsAss($v);
-		foreach($spisok as $r) {
-			$title = '<div class="fs10 red">содержание не настроено</div>';
-
-			if($elem_id = $el['num_2']) {
-				if($ell = _elemOne($elem_id)) {
-					switch($ell['dialog_id']) {
-						//сборный текст
-						case 44:
-							$title = _element44_print($ell, $prm);
-							break;
-						default:
-							if($col = $ell['col'])
-								if(isset($r[$col]))
-									$title = $r[$col];
-					}
+		if($elem_id = $el['num_2']) {
+			if($ell = _elemOne($elem_id)) {
+				switch($ell['dialog_id']) {
+					//сборный текст
+					case 44:
+						$title = _element44_print($ell, $prm);
+						break;
+					default:
+						if($col = $ell['col'])
+							if(isset($r[$col]))
+								$title = $r[$col];
 				}
-			} elseif($col = _elemCol($DLG['spisok_elem_id']))
-					$title = $r[$col];
+			}
+		} elseif($col = _elemCol($DLG['spisok_elem_id']))
+				$title = $r[$col];
 
-			$chk .=
-				'<div class="'._dn(!$n++, 'mt5').'">'.
-					_check(array(
-						'attr_id' => 'chk31_'.$r['id'],
-						'light' => 1,
-						'title' => $title,
-						'value' => _num(@$sel[$r['id']])
-					)).
-				'</div>';
-		}
-
-		return
-		'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-		$chk;
+		$chk .=
+			'<div class="'._dn(!$n++, 'mt5').'">'.
+				_check(array(
+					'attr_id' => 'chk31_'.$r['id'],
+					'light' => 1,
+					'title' => $title,
+					'value' => _num(@$sel[$r['id']])
+				)).
+			'</div>';
 	}
 
-	return _elementType($type, $el);
+	return
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+	$chk;
 }
 
 /* [32] Значение списка: порядковый номер */
@@ -1247,7 +1212,7 @@ function _element34_print($el, $prm) {
 }
 
 /* [35] Count: количество */
-function _element35_struct($el, $prm) {
+function _element35_struct($el) {
 	return array(
 		'def'   => _num($el['def']),
 
@@ -1274,7 +1239,7 @@ function _element35_print($el, $prm) {
 }
 
 /* [36] Иконка */
-function _element36_struct($el, $prm) {
+function _element36_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//id иконки
 		'num_2'   => _num($el['num_2']),//изменять яркость при наведении мышкой
@@ -1294,111 +1259,99 @@ function _element36_print($el) {
 }
 
 /* [37] Select: выбор колонки таблицы (SA) */
-function _element37($type, $el, $prm) {
-	if($type == 'struct')
-		return array() + _elementStruct($el);
-
-	if($type == 'print')
-		return _select(array(
-					'attr_id' => _elemAttrId($el, $prm),
-					'width' => $el['width'],
-					'value' => _elemPrintV($el, $prm)
-			   ));
-
-	return _elementType($type, $el);
+function _element37_struct($el) {
+	return _elementStruct($el);
+}
+function _element37_print($el, $prm) {
+	return
+	_select(array(
+		'attr_id' => _elemAttrId($el, $prm),
+		'width' => $el['width'],
+		'value' => _elemPrintV($el, $prm)
+	));
 }
 
 /* [38] Select: выбор диалогового окна (SA) */
-function _element38($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'req'     => _num($el['req']),
-			'req_msg' => $el['req_msg'],
+function _element38_struct($el) {
+	return array(
+		'req'     => _num($el['req']),
+		'req_msg' => $el['req_msg'],
 
-			'txt_1'   => $el['txt_1']//нулевое значение
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _select(array(
-					'attr_id' => _elemAttrId($el, $prm),
-					'placeholder' => $el['txt_1'],
-					'width' => $el['width'],
-					'value' => _elemPrintV($el, $prm, 0)
-			   ));
-
-	return _elementType($type, $el);
+		'txt_1'   => $el['txt_1']//нулевое значение
+	) + _elementStruct($el);
+}
+function _element38_print($el, $prm) {
+	return
+	_select(array(
+		'attr_id' => _elemAttrId($el, $prm),
+		'placeholder' => $el['txt_1'],
+		'width' => $el['width'],
+		'value' => _elemPrintV($el, $prm, 0)
+	));
 }
 
 /* [39] Месяц и год */
-function _element39($type, $el, $prm) {
-	if($type == 'struct')
-		return array() + _elementStruct($el);
+function _element39_struct($el) {
+	return _elementStruct($el);
+}
+function _element39_print($el, $prm) {
+	$def = strftime('%Y-%m');
+	if(!$v = _elemPrintV($el, $prm, $def))
+		$v = $def;
 
-	if($type == 'print') {
-		$def = strftime('%Y-%m');
-		if(!$v = _elemPrintV($el, $prm, $def))
-			$v = $def;
+	$ex = explode('-', $v);
 
-		$ex = explode('-', $v);
+	$attr_id = _elemAttrId($el, $prm);
 
-		$attr_id = _elemAttrId($el, $prm);
-
-		return
-		'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-		_count(array(
-			'attr_id' => $attr_id.'_mon',
-			'width' => 100,
-			'class' => 'mr5',
-			'value' => _num($ex[1])
-		)).
-		_count(array(
-			'attr_id' => $attr_id.'_year',
-			'width' => 70,
-			'value' => $ex[0]
-		));
-	}
-
-	return _elementType($type, $el);
+	return
+	'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+	_count(array(
+		'attr_id' => $attr_id.'_mon',
+		'width' => 100,
+		'class' => 'mr5',
+		'value' => _num($ex[1])
+	)).
+	_count(array(
+		'attr_id' => $attr_id.'_year',
+		'width' => 70,
+		'value' => $ex[0]
+	));
 }
 
 /* [40] Фильтрование списка */
-function _element40($type, $el, $prm) {
+function _element40_struct($el) {
 	/*
 		Работает совместно с PHP12_spfl [41] - настройка значений
 	*/
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id элемента - путь к списку [13]
-			'txt_1'   => $el['txt_1']       //текст нулевого значения
-		) + _elementStruct($el);
+	return array(
+		'num_1'   => _num($el['num_1']),//id элемента - путь к списку [13]
+		'txt_1'   => $el['txt_1']       //текст нулевого значения
+	) + _elementStruct($el);
+}
+function _element40_print($el, $prm) {
+	$attr_id = _elemAttrId($el, $prm);
+	$placeholder = ' placeholder="'.$el['txt_1'].'"';
+	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
-	if($type == 'print') {
-		$attr_id = _elemAttrId($el, $prm);
-		$placeholder = ' placeholder="'.$el['txt_1'].'"';
-		$disabled = $prm['blk_setup'] ? ' disabled' : '';
-
-		$title = '';
-		if($v = _elemPrintV($el, $prm)) {
-			$vv = htmlspecialchars_decode($v);
-			$arr = json_decode($vv, true);
-			$c = count($arr);
-			$title = $c.' услови'._end($c, 'е', 'я', 'й');
-		}
-
-		return
-		'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
-		'<div class="_spfl dib w125 prel" id="'.$attr_id.'_spfl">'.
-			'<div class="icon icon-filter pabs"></div>'.
-			'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-			'<input type="text" readonly class="inp color-del b pl25 curP w100p over3"'.$placeholder.$disabled.' value="'.$title.'" />'.
-		'</div>';
+	$title = '';
+	if($v = _elemPrintV($el, $prm)) {
+		$vv = htmlspecialchars_decode($v);
+		$arr = json_decode($vv, true);
+		$c = count($arr);
+		$title = $c.' услови'._end($c, 'е', 'я', 'й');
 	}
 
-	return _elementType($type, $el);
+	return
+	'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
+	'<div class="_spfl dib w125 prel" id="'.$attr_id.'_spfl">'.
+		'<div class="icon icon-filter pabs"></div>'.
+		'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+		'<input type="text" readonly class="inp color-del b pl25 curP w100p over3"'.$placeholder.$disabled.' value="'.$title.'" />'.
+	'</div>';
 }
 
 /* [44] Сборный текст */
-function _element44_struct($el, $prm) {
+function _element44_struct($el) {
 	/*
 		настройка значений через PHP12_44_setup
 	*/
@@ -1433,66 +1386,56 @@ function _element44_print($el, $prm) {
 }
 
 /* [49] Выбор блоков из диалога или страницы */
-function _element49($type, $el, $prm) {
+function _element49_struct($el) {
 	/*
 		работает в паре с [19] - окно выбора блоков
 	*/
-	if($type == 'struct')
-		return array(
-			'txt_1'   => $el['txt_1']//текст для placeholder
-		) + _elementStruct($el);
+	return array(
+		'txt_1'   => $el['txt_1']//текст для placeholder
+	) + _elementStruct($el);
+}
+function _element49_print($el, $prm) {
+	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
-	if($type == 'print') {
-		$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-		$disabled = $prm['blk_setup'] ? ' disabled' : '';
+	$v = _elemPrintV($el, $prm);
+	$ids = _ids($v);
+	$count = _ids($ids, 'count');
+	$title = $count ? $count.' блок'._end($count, '', 'а', 'ов') : '';
 
-		$v = _elemPrintV($el, $prm);
-		$ids = _ids($v);
-		$count = _ids($ids, 'count');
-		$title = $count ? $count.' блок'._end($count, '', 'а', 'ов') : '';
-
-		return
-		'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-		'<div class="_sebl dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_sebl"'._elemStyleWidth($el).'>'.
-			'<div class="icon icon-cube pabs"></div>'.
-			'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-			'<input type="text" readonly class="inp curP w100p color-ref"'.$placeholder.$disabled.' value="'.$title.'" />'.
-		'</div>';
-	}
-
-	return _elementType($type, $el);
+	return
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+	'<div class="_sebl dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_sebl"'._elemStyleWidth($el).'>'.
+		'<div class="icon icon-cube pabs"></div>'.
+		'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
+		'<input type="text" readonly class="inp curP w100p color-ref"'.$placeholder.$disabled.' value="'.$title.'" />'.
+	'</div>';
 }
 
 /* [51] Календарь */
-function _element51($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//разрешать выбор прошедших дней
-			'num_2'   => _num($el['num_2']) //показывать время
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _calendar(array(
-			'attr_id' => _elemAttrId($el, $prm),
-			'time' => $el['num_2'],
-			'value' => _elemPrintV($el, $prm)
-		));
-
-	return _elementType($type, $el);
+function _element51_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//разрешать выбор прошедших дней
+		'num_2'   => _num($el['num_2']) //показывать время
+	) + _elementStruct($el);
+}
+function _element51_print($el, $prm) {
+	return
+	_calendar(array(
+		'attr_id' => _elemAttrId($el, $prm),
+		'time' => $el['num_2'],
+		'value' => _elemPrintV($el, $prm)
+	));
 }
 
 /* [52] Заметки */
-function _element52($type, $el, $prm) {
-	if($type == 'struct')
-		return array() + _elementStruct($el);
-
-	if($type == 'print') {
-		if($prm['blk_setup'])
-			return _emptyMin('Заметки');
-		return _note($el);
-	}
-
-	return _elementType($type, $el);
+function _element52_struct($el) {
+	return _elementStruct($el);
+}
+function _element52_print($el, $prm) {
+	if($prm['blk_setup'])
+		return _emptyMin('Заметки');
+	return _note($el);
 }
 
 /* [54] Количество значений привязанного списка */
@@ -1709,17 +1652,14 @@ function _element71_print($el, $prm) {
 }
 
 /* [72] Фильтр: год и месяц */
-function _element72($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id элемента - список, на который происходит воздействие
-			'num_2'   => _num($el['num_2']) //id элемента - путь к сумме для подсчёта по каждому месяцу
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _elem72Radio($el, $prm);
-
-	return _elementType($type, $el);
+function _element72_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//id элемента - список, на который происходит воздействие
+		'num_2'   => _num($el['num_2']) //id элемента - путь к сумме для подсчёта по каждому месяцу
+	) + _elementStruct($el);
+}
+function _element72_print($el, $prm) {
+	return _elem72Radio($el, $prm);
 }
 
 /* [74] Фильтр: Radio */
@@ -1765,433 +1705,461 @@ function _element74_print($el, $prm) {
 }
 
 /* [77] Фильтр: календарь */
-function _element77($type, $el) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id элемента, размещающего список
-			'num_2'   => _num($el['num_2']) /* значение по умолчанию:
-												2819 - текущий день
-												2820 - текущая неделя
-												2821 - текущий месяц
-											*/
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _filterCalendar($el);
-
-	return _elementType($type, $el);
+function _element77_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//id элемента, размещающего список
+		'num_2'   => _num($el['num_2']) /* значение по умолчанию:
+											2819 - текущий день
+											2820 - текущая неделя
+											2821 - текущий месяц
+										*/
+	) + _elementStruct($el);
+}
+function _element77_print($el) {
+	return _filterCalendar($el);
 }
 
 /* [78] Фильтр: меню */
-function _element78($type, $el) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id элемента, размещающего список
-			'txt_1'   => $el['txt_1'],      //id элемента (с учётом вложений), содержащего значения (названия), составляющие меню
-			'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений), содержащего количество записей по каждому пункту
-		) + _elementStruct($el);
+function _element78_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//id элемента, размещающего список
+		'txt_1'   => $el['txt_1'],      //id элемента (с учётом вложений), содержащего значения (названия), составляющие меню
+		'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений), содержащего количество записей по каждому пункту
+	) + _elementStruct($el);
+}
+function _element78_print($el) {
+	if(!$ids = _ids($el['txt_1'], 1))
+		return _emptyMin10('Фильтр-меню: отсутствуют ID значений.');
 
-	if($type == 'print')
-		return _filterMenu($el);
+	$c = count($ids) - 1;
+	$elem_id = $ids[$c];
 
-	return _elementType($type, $el);
+	if(!$EL = _elemOne($elem_id))
+		return _emptyMin10('Фильтр-меню: значение отсутствует.');
+	if(!$BL = $EL['block'])
+		return _emptyMin10('Фильтр-меню: нет блока.');
+	if($BL['obj_name'] != 'dialog')
+		return _emptyMin10('Фильтр-меню: блок не из диалога.');
+	if(!$dialog_id = $BL['obj_id'])
+		return _emptyMin10('Фильтр-меню: нет ID диалога.');
+	if(!$dialog = _dialogQuery($dialog_id))
+		return _emptyMin10('Фильтр-меню: нет диалога.');
+
+	$col = $EL['col'];//колонка текстового значения
+	$colCount = '';//колонка значения количества
+	if($ids = _ids($el['txt_2'], 1)) {
+		$c = count($ids) - 1;
+		$elem_id = $ids[$c];
+		if($EL3 = _elemOne($elem_id))
+			$colCount = $EL3['col'];
+	}
+
+	$cond = " `id`";
+	if(isset($dialog['field1']['deleted']))
+		$cond .= " AND !`deleted`";
+	if(isset($dialog['field1']['dialog_id']))
+		$cond .= " AND `dialog_id`=".$dialog_id;
+	$sql = "SELECT *
+			FROM `"._table($dialog['table_1'])."`
+			WHERE ".$cond."
+			ORDER BY `sort`,`id`";
+	if(!$arr = query_arr($sql))
+		return _emptyMin10('Фильтр-меню: пустое меню.');
+
+	$send = '';
+	$v = _spisokFilter('vv', $el, 0);
+
+	$spisok = array();
+	foreach($arr as $r)
+		$spisok[$r['parent_id']][] = $r;
+
+	foreach($spisok[0] as $r) {
+		$child = '';
+		$child_sel = false;//список будет раскрыт, если в нём был выбранное значение
+		if(!empty($spisok[$r['id']]))
+			foreach($spisok[$r['id']] as $c) {
+				$sel = $v == $c['id'] ? ' sel' : '';
+				if($sel)
+					$child_sel = true;
+				$child .= '<div class="fm-unit'.$sel.'" val="'.$c['id'].'">'.
+							$c[$col].
+							($colCount ? '<span class="ml10 pale b">'.$c[$colCount].'</span>' : '').
+						'</div>';
+			}
+
+		$sel = $v == $r['id'] ? ' sel' : '';
+		$send .=
+			'<table class="w100p">'.
+				'<tr>'.
+		  ($child ? '<td class="fm-plus">'.($child_sel ? '-' : '+') : '<td class="w25">').//—
+					'<td><div class="fm-unit b fs14'.$sel.'" val="'.$r['id'].'">'.
+							$r[$col].
+							($colCount ? '<span class="ml10 pale b">'.$r[$colCount].'</span>' : '').
+						'</div>'.
+			'</table>'.
+			($child ? '<div class="ml40'._dn($child_sel).'">'.$child.'</div>' : '');
+	}
+
+	return $send;
 }
 
 /* [80] Очистка фильтров */
-function _element80($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'txt_1'   => $el['txt_1'],     //имя кнопки
-			'num_1'   => _num($el['num_1'])//id элемента, размещающего список
-		) + _elementStruct($el);
-
-	if($type == 'print') {
-		$diff = _spisokFilter('diff', $el['num_1']);
-		return _button(array(
-			'attr_id' => _elemAttrId($el, $prm),
-			'name' => _br($el['txt_1']),
-			'color' => 'red',
-			'width' => $el['width'],
-			'small' => 1,
-			'class' => _dn($prm['blk_setup'] || $diff)._dn(!$prm['blk_setup'], 'curD')
-		));
-	}
-
-	return _elementType($type, $el);
+function _element80_struct($el) {
+	return array(
+		'txt_1'   => $el['txt_1'],     //имя кнопки
+		'num_1'   => _num($el['num_1'])//id элемента, размещающего список
+	) + _elementStruct($el);
+}
+function _element80_print($el, $prm) {
+	$diff = _spisokFilter('diff', $el['num_1']);
+	return _button(array(
+		'attr_id' => _elemAttrId($el, $prm),
+		'name' => _br($el['txt_1']),
+		'color' => 'red',
+		'width' => $el['width'],
+		'small' => 1,
+		'class' => _dn($prm['blk_setup'] || $diff)._dn(!$prm['blk_setup'], 'curD')
+	));
 }
 
 /* [83] Фильтр: Select - привязанный список */
-function _element83($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id элемента-списка, на который воздействует фильтр
-			'txt_1'   => $el['txt_1'],      //нулевое значение
-			'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений) - привязанный список (через [13])
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _select(array(
-					'attr_id' => _elemAttrId($el, $prm),
-					'placeholder' => $el['txt_1'],
-					'width' => $el['width'],
-					'value' => _spisokFilter('vv', $el, 0)
-			   ));
-
-	return _elementType($type, $el);
+function _element83_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//id элемента-списка, на который воздействует фильтр
+		'txt_1'   => $el['txt_1'],      //нулевое значение
+		'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений) - привязанный список (через [13])
+	) + _elementStruct($el);
+}
+function _element83_print($el, $prm) {
+	return
+	_select(array(
+		'attr_id' => _elemAttrId($el, $prm),
+		'placeholder' => $el['txt_1'],
+		'width' => $el['width'],
+		'value' => _spisokFilter('vv', $el, 0)
+	));
 }
 
 /* [85] Select: выбор значения списка по умолчанию */
-function _element85($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//ID элемента select, который содержит списки
-			'txt_1'   => $el['txt_1'],      //текст нулевого значения
-			'num_2'   => _num($el['num_2']),//разрешать выбор записи, данные которой принимает страница
-			'num_3'   => _num($el['num_3']) //разрешать выбор записи, данные которой принимает диалог
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _select(array(
-					'attr_id' => _elemAttrId($el, $prm),
-					'placeholder' => $el['txt_1'],
-					'width' => $el['width'],
-					'value' => _elemPrintV($el, $prm, 0)
-			   ));
-
-	return _elementType($type, $el);
+function _element85_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//ID элемента select, который содержит списки
+		'txt_1'   => $el['txt_1'],      //текст нулевого значения
+		'num_2'   => _num($el['num_2']),//разрешать выбор записи, данные которой принимает страница
+		'num_3'   => _num($el['num_3']) //разрешать выбор записи, данные которой принимает диалог
+	) + _elementStruct($el);
+}
+function _element85_print($el, $prm) {
+	return
+	_select(array(
+		'attr_id' => _elemAttrId($el, $prm),
+		'placeholder' => $el['txt_1'],
+		'width' => $el['width'],
+		'value' => _elemPrintV($el, $prm, 0)
+	));
 }
 
 /* [86] Значение записи: количество дней */
-function _element86($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//ID элемента, который указывает на дату
-			'txt_1'   => $el['txt_1'],      //текст "Прошёл" 1
-			'txt_2'   => $el['txt_2'],      //текст "Остался" 1
-			'txt_3'   => $el['txt_3'],      //текст "День" 1
-			'txt_4'   => $el['txt_4'],      //текст "Прошло" 2
-			'txt_5'   => $el['txt_5'],      //текст "Осталось" 2
-			'txt_6'   => $el['txt_6'],      //текст "Дня" 2
-			'txt_7'   => $el['txt_7'],      //текст "Прошло" 5
-			'txt_8'   => $el['txt_8'],      //текст "Осталось" 5
-			'txt_9'   => $el['txt_9'],      //текст "Дней" 5
-			'txt_10'  => $el['txt_10'],     //текст для "сегодня"
+function _element86_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//ID элемента, который указывает на дату
+		'txt_1'   => $el['txt_1'],      //текст "Прошёл" 1
+		'txt_2'   => $el['txt_2'],      //текст "Остался" 1
+		'txt_3'   => $el['txt_3'],      //текст "День" 1
+		'txt_4'   => $el['txt_4'],      //текст "Прошло" 2
+		'txt_5'   => $el['txt_5'],      //текст "Осталось" 2
+		'txt_6'   => $el['txt_6'],      //текст "Дня" 2
+		'txt_7'   => $el['txt_7'],      //текст "Прошло" 5
+		'txt_8'   => $el['txt_8'],      //текст "Осталось" 5
+		'txt_9'   => $el['txt_9'],      //текст "Дней" 5
+		'txt_10'  => $el['txt_10'],     //текст для "сегодня"
 
-			'num_2'   => _num($el['num_2']),//показывать "вчера"
-			'num_3'   => _num($el['num_3']) //показывать "завтра"
-		) + _elementStruct($el);
+		'num_2'   => _num($el['num_2']),//показывать "вчера"
+		'num_3'   => _num($el['num_3']) //показывать "завтра"
+	) + _elementStruct($el);
+}
+function _element86_print($el, $prm) {
+	if(!$u = $prm['unit_get'])
+		return 'Кол-во дней';
+	if(!$elem_id = $el['num_1'])
+		return _msgRed('-no-elem-date');
+	if(!$EL = _elemOne($elem_id))
+		return _msgRed('-no-elem-'.$elem_id);
+	if(!$col = $EL['col'])
+		return _msgRed('-no-elem-col');
+	if(!isset($u[$col]))
+		return _msgRed('-no-unit-col');
 
-	if($type == 'print') {
-		if(!$u = $prm['unit_get'])
-			return 'Кол-во дней';
-		if(!$elem_id = $el['num_1'])
-			return _msgRed('-no-elem-date');
-		if(!$EL = _elemOne($elem_id))
-			return _msgRed('-no-elem-'.$elem_id);
-		if(!$col = $EL['col'])
-			return _msgRed('-no-elem-col');
-		if(!isset($u[$col]))
-			return _msgRed('-no-unit-col');
+	$date = substr($u[$col], 0, 10);
 
-		$date = substr($u[$col], 0, 10);
+	if(!preg_match(REGEXP_DATE, $date))
+		return _msgRed('-no-date-format');
+	if($date == '0000-00-00')
+		return '';
 
-		if(!preg_match(REGEXP_DATE, $date))
-			return _msgRed('-no-date-format');
-		if($date == '0000-00-00')
-			return '';
+	$day = (strtotime($date) - TODAY_UNIXTIME) / 86400;
 
-		$day = (strtotime($date) - TODAY_UNIXTIME) / 86400;
+	$day_txt =
+		($day > 0 ?
+		_end($day, $el['txt_2'], $el['txt_5'], $el['txt_8'])
+		:
+		_end($day, $el['txt_1'], $el['txt_4'], $el['txt_7'])
+		).
+		' '.abs($day).' '.
+		_end($day, $el['txt_3'], $el['txt_6'], $el['txt_9']);
 
-		$day_txt =
-			($day > 0 ?
-			_end($day, $el['txt_2'], $el['txt_5'], $el['txt_8'])
-			:
-			_end($day, $el['txt_1'], $el['txt_4'], $el['txt_7'])
-			).
-			' '.abs($day).' '.
-			_end($day, $el['txt_3'], $el['txt_6'], $el['txt_9']);
+	if($day == -1 && $el['num_2'])
+		$day_txt = $el['txt_10'].' вчера';
+	if(!$day)
+		$day_txt = $el['txt_10'].' сегодня';
+	if($day == 1 && $el['num_3'])
+		$day_txt = $el['txt_10'].' завтра';
 
-		if($day == -1 && $el['num_2'])
-			$day_txt = $el['txt_10'].' вчера';
-		if(!$day)
-			$day_txt = $el['txt_10'].' сегодня';
-		if($day == 1 && $el['num_3'])
-			$day_txt = $el['txt_10'].' завтра';
-
-		return $day_txt;
-	}
-
-	return _elementType($type, $el);
+	return $day_txt;
 }
 
 /* [87] Циферка в меню страниц */
-function _element87($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id диалога: список
-			'txt_1'   => $el['txt_1']       //условия [40]
-		) + _elementStruct($el);
+function _element87_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//id диалога: список
+		'txt_1'   => $el['txt_1']       //условия [40]
+	) + _elementStruct($el);
+}
+function _element87_print($el, $prm) {
+	if(!$prm['blk_setup'])
+		return '';
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return _msgRed('Не получены данные диалога '.$el['num_1']);
 
-	if($type == 'print') {
-		if(!$prm['blk_setup'])
-			return '';
-		if(!$DLG = _dialogQuery($el['num_1']))
-			return _msgRed('Не получены данные диалога '.$el['num_1']);
+	$sql = "SELECT COUNT(*)
+			FROM  "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG).
+				_40cond(array(), $el['txt_1']);
+	$count = query_value($sql);
 
-		$sql = "SELECT COUNT(*)
-				FROM  "._queryFrom($DLG)."
-				WHERE "._queryWhere($DLG).
-					_40cond(array(), $el['txt_1']);
-		$count = query_value($sql);
-
-		return 'Кол-во "'.$DLG['name'].'" '.($count ? '+'.$count : '0');
-	}
-
-	return _elementType($type, $el);
+	return 'Кол-во "'.$DLG['name'].'" '.($count ? '+'.$count : '0');
 }
 
 /* [90] Изображение */
-function _element90($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'txt_1'   => $el['txt_1'],      //ids изображений
-			'num_1'   => _num($el['num_1']),//ширина
-			'num_2'   => _num($el['num_2']),//разрешать высоту
-			'num_3'   => _num($el['num_3']),//высота
-			'num_4'   => _num($el['num_4']) //разрешать клик для увеличения
-		) + _elementStruct($el);
+function _element90_struct($el) {
+	return array(
+		'txt_1'   => $el['txt_1'],      //ids изображений
+		'num_1'   => _num($el['num_1']),//ширина
+		'num_2'   => _num($el['num_2']),//разрешать высоту
+		'num_3'   => _num($el['num_3']),//высота
+		'num_4'   => _num($el['num_4']) //разрешать клик для увеличения
+	) + _elementStruct($el);
+}
+function _element90_print($el) {
+	//формирование ширины, если изображение отсутствует
+	$w = $el['num_1'];
+	if($el['num_2'])
+		if($el['num_1'] > $el['num_3'])
+			$w = $el['num_3'];
 
-	if($type == 'print') {
-		//формирование ширины, если изображение отсутствует
-		$w = $el['num_1'];
-		if($el['num_2'])
-			if($el['num_1'] > $el['num_3'])
-				$w = $el['num_3'];
+	if(!$image_id = _idsFirst($el['txt_1']))
+		return _imageNo($w);
 
-		if(!$image_id = _idsFirst($el['txt_1']))
-			return _imageNo($w);
+	$sql = "SELECT *
+			FROM `_image`
+			WHERE `id`=".$image_id;
+	if(!$img = query_assoc($sql))
+		return _imageNo($w);
 
-		$sql = "SELECT *
-				FROM `_image`
-				WHERE `id`=".$image_id;
-		if(!$img = query_assoc($sql))
-			return _imageNo($w);
-
-		//если присутствует высота - подгонка картинки под размеры
-		$w = $el['num_1'];
-		$h = 0;
-		if($el['num_2']) {
-			$s = _imageResize($img['max_x'], $img['max_y'], $w, $el['num_3']);
-			$w = $s['x'];
-			$h = $s['y'];
-		}
-
-		return _imageHtml($img, $w, $h, false, $el['num_4']);
+	//если присутствует высота - подгонка картинки под размеры
+	$w = $el['num_1'];
+	$h = 0;
+	if($el['num_2']) {
+		$s = _imageResize($img['max_x'], $img['max_y'], $w, $el['num_3']);
+		$w = $s['x'];
+		$h = $s['y'];
 	}
 
-	return _elementType($type, $el);
+	return _imageHtml($img, $w, $h, false, $el['num_4']);
 }
 
 /* [96] Количество значений связанного списка с учётом категорий */
-function _element96($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id элемента: привязанный список
-			'txt_1'   => $el['txt_1'],      //id элемента (с учётом вложений): путь к категориям
-			'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений): путь к цветам
-		) + _elementStruct($el);
+function _element96_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//id элемента: привязанный список
+		'txt_1'   => $el['txt_1'],      //id элемента (с учётом вложений): путь к категориям
+		'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений): путь к цветам
+	) + _elementStruct($el);
+}
+function _element96_print($el, $prm) {
+	if($prm['blk_setup'])
+		return '<div class="el96-u bg-ffc mr3">8</div>'.
+			   '<div class="el96-u bg-fcc">3</div>';
 
-	if($type == 'print') {
-		if($prm['blk_setup'])
-			return '<div class="el96-u bg-ffc mr3">8</div>'.
-				   '<div class="el96-u bg-fcc">3</div>';
+	if(!$u = $prm['unit_get'])
+		return '';
 
-		if(!$u = $prm['unit_get'])
-			return '';
+	//ключ для конкретного элемента, по которому расположены данные в записи
+	$key = 'el96_'.$el['id'];
+	if(empty($u[$key]))
+		return '';
 
-		//ключ для конкретного элемента, по которому расположены данные в записи
-		$key = 'el96_'.$el['id'];
-		if(empty($u[$key]))
-			return '';
+	end($u[$key]);
+	$end = key($u[$key]);
 
-		end($u[$key]);
-		$end = key($u[$key]);
-
-		$send = '';
-		foreach($u[$key] as $id => $r) {
-			$bg = $r['bg'] ? ' style="background-color:'.$r['bg'].'"' : '';
-			$name = $r['name'] ? _tooltip($r['name'], -6, 'l') : '">';
-			$mr = $id != $end ? ' mr3' : '';
-			$send .= '<div'.$bg.' class="el96-u'.$mr.$name.$r['count'].'</div>';
-		}
-
-		return $send;
+	$send = '';
+	foreach($u[$key] as $id => $r) {
+		$bg = $r['bg'] ? ' style="background-color:'.$r['bg'].'"' : '';
+		$name = $r['name'] ? _tooltip($r['name'], -6, 'l') : '">';
+		$mr = $id != $end ? ' mr3' : '';
+		$send .= '<div'.$bg.' class="el96-u'.$mr.$name.$r['count'].'</div>';
 	}
 
-	return _elementType($type, $el);
+	return $send;
 }
 
 /* [102] Фильтр: Выбор нескольких групп значений */
-function _element102($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'num_1'   => _num($el['num_1']),//id элемента: список, на который воздействует фильтр [24]
-			'txt_1'   => $el['txt_1'],      //нулевое значение
-			'txt_2'   => $el['txt_2'],      //ids элементов: привязанный список (зависит от num_1) [13]
-			'txt_3'   => $el['txt_3'],      //ids элементов: счётчик количеств  (зависит от num_1) [13]
-			'txt_4'   => $el['txt_4'],      //ids элементов: путь к цветам (зависит от num_1) [13]
-			'txt_5'   => $el['txt_5']       //значение по умолчанию: настраивается через [40]
-		) + _elementStruct($el);
-
-	if($type == 'print') {
-		$v = _spisokFilter('v', $el['id']);
-		if($v === false) {
-			$cond = _40cond($el, $el['txt_5']);
-			$v = _elem102CnnList($el['txt_2'], 'ids', $cond);
-			_spisokFilter('insert', array(
-				'spisok' => $el['num_1'],
-				'filter' => $el['id'],
-				'v' => $v
-			));
-		}
-
-		$vAss = _idsAss($v);
-
-		//ассоциативный массив с количествами
-		$countAss = _elem102CnnList($el['txt_3'], 'ass');
-
-		//ассоциативный массив с цветами
-		$bgAss = _elem102CnnList($el['txt_4'], 'ass');
-
-		$title = array();//ассоциативный массив с именами значений фильтра для JS
-		$spisok = '';
-		$sel = '';//выбранные значения
-		if($arr = _elem102CnnList($el['txt_2'])) {
-			$n = 0;
-			$selOne = '';
-			foreach($arr as $r) {
-				$id = $r['id'];
-				$bg = isset($bgAss[$id]) ? ' style="background-color:'.$bgAss[$id].'"' : '';
-				$c = _hide0(@$countAss[$id]);
-				$spisok .=
-					'<tr class="over1" val="'.$r['id'].'">'.
-						'<th class="w35 pad8 center"'.$bg.'>'.
-							_check(array(
-								'attr_id' => 'chk'.$id,
-								'value' => isset($vAss[$id])
-							)).
-						'<td class="wsnw">'.$r['title'].
-						'<td class="r fs12 grey b">'.$c;
-
-				$title[$id] = $r['title'];
-
-				if(isset($vAss[$id])) {
-					$c = _num($c);
-					$sel .= $c ? '<div'.$bg.' class="un'._tooltip($r['title'], -6, 'l').$c.'</div>' : '';
-					$selOne = '<div class="un"'.$bg.'>'.$r['title'].'</div>';
-					$n++;
-				}
-			}
-			if($n == 1)
-				$sel = $selOne;
-		}
-
-
-		return
-		'<div class="_filter102"'._elemStyleWidth($el).' id="'._elemAttrId($el, $prm).'_filter102">'.
-			'<div class="holder'._dn(!$sel).'">'.$el['txt_1'].'</div>'.
-			'<table class="w100p">'.
-				'<tr><td class="td-un">'.($sel ? $sel : '<div class="icon icon-empty"></div>').
-					'<td class="w25 top r">'.
-						'<div class="icon icon-del pl'._dn($sel, 'vh')._tooltip('Очистить фильтр', -53).'</div>'.
-			'</table>'.
-			'<div class="list">'.
-				'<table>'.$spisok.'</table>'.
-			'</div>'.
-		'</div>'.
-		'<script>'.
-			'var EL'.$el['id'].'_F102_TITLE='._json($title).','.
-				'EL'.$el['id'].'_F102_C='._json($countAss).','.
-				'EL'.$el['id'].'_F102_BG='._json($bgAss).';'.
-		'</script>';
+function _element102_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//id элемента: список, на который воздействует фильтр [24]
+		'txt_1'   => $el['txt_1'],      //нулевое значение
+		'txt_2'   => $el['txt_2'],      //ids элементов: привязанный список (зависит от num_1) [13]
+		'txt_3'   => $el['txt_3'],      //ids элементов: счётчик количеств  (зависит от num_1) [13]
+		'txt_4'   => $el['txt_4'],      //ids элементов: путь к цветам (зависит от num_1) [13]
+		'txt_5'   => $el['txt_5']       //значение по умолчанию: настраивается через [40]
+	) + _elementStruct($el);
+}
+function _element102_print($el, $prm) {
+	$v = _spisokFilter('v', $el['id']);
+	if($v === false) {
+		$cond = _40cond($el, $el['txt_5']);
+		$v = _elem102CnnList($el['txt_2'], 'ids', $cond);
+		_spisokFilter('insert', array(
+			'spisok' => $el['num_1'],
+			'filter' => $el['id'],
+			'v' => $v
+		));
 	}
 
-	return _elementType($type, $el);
+	$vAss = _idsAss($v);
+
+	//ассоциативный массив с количествами
+	$countAss = _elem102CnnList($el['txt_3'], 'ass');
+
+	//ассоциативный массив с цветами
+	$bgAss = _elem102CnnList($el['txt_4'], 'ass');
+
+	$title = array();//ассоциативный массив с именами значений фильтра для JS
+	$spisok = '';
+	$sel = '';//выбранные значения
+	if($arr = _elem102CnnList($el['txt_2'])) {
+		$n = 0;
+		$selOne = '';
+		foreach($arr as $r) {
+			$id = $r['id'];
+			$bg = isset($bgAss[$id]) ? ' style="background-color:'.$bgAss[$id].'"' : '';
+			$c = _hide0(@$countAss[$id]);
+			$spisok .=
+				'<tr class="over1" val="'.$r['id'].'">'.
+					'<th class="w35 pad8 center"'.$bg.'>'.
+						_check(array(
+							'attr_id' => 'chk'.$id,
+							'value' => isset($vAss[$id])
+						)).
+					'<td class="wsnw">'.$r['title'].
+					'<td class="r fs12 grey b">'.$c;
+
+			$title[$id] = $r['title'];
+
+			if(isset($vAss[$id])) {
+				$c = _num($c);
+				$sel .= $c ? '<div'.$bg.' class="un'._tooltip($r['title'], -6, 'l').$c.'</div>' : '';
+				$selOne = '<div class="un"'.$bg.'>'.$r['title'].'</div>';
+				$n++;
+			}
+		}
+		if($n == 1)
+			$sel = $selOne;
+	}
+
+
+	return
+	'<div class="_filter102"'._elemStyleWidth($el).' id="'._elemAttrId($el, $prm).'_filter102">'.
+		'<div class="holder'._dn(!$sel).'">'.$el['txt_1'].'</div>'.
+		'<table class="w100p">'.
+			'<tr><td class="td-un">'.($sel ? $sel : '<div class="icon icon-empty"></div>').
+				'<td class="w25 top r">'.
+					'<div class="icon icon-del pl'._dn($sel, 'vh')._tooltip('Очистить фильтр', -53).'</div>'.
+		'</table>'.
+		'<div class="list">'.
+			'<table>'.$spisok.'</table>'.
+		'</div>'.
+	'</div>'.
+	'<script>'.
+		'var EL'.$el['id'].'_F102_TITLE='._json($title).','.
+			'EL'.$el['id'].'_F102_C='._json($countAss).','.
+			'EL'.$el['id'].'_F102_BG='._json($bgAss).';'.
+	'</script>';
 }
 
 /* [130] Пин-код */
-function _element130($type, $el, $prm) {
-	if($type == 'struct')
-		return array() + _elementStruct($el);
-
-	if($type == 'print') {
-		$txt = 'Установить';
-		$color = 'grey';
-		$dlg_id = 131;
-		if(_user(USER_ID, 'pin')) {
-			$txt = 'Изменить';
-			$color = '';
-			$dlg_id = 132;
-		}
-		return _button(array(
-					'name' => $txt.' пин-код',
-					'color' => $color,
-					'class' => $prm['blk_setup'] ? 'curD' : 'dialog-open',
-					'val' => 'dialog_id:'.$dlg_id
-				));
+function _element130_struct($el) {
+	return _elementStruct($el);
+}
+function _element130_print($el, $prm) {
+	$txt = 'Установить';
+	$color = 'grey';
+	$dlg_id = 131;
+	if(_user(USER_ID, 'pin')) {
+		$txt = 'Изменить';
+		$color = '';
+		$dlg_id = 132;
 	}
-
-	return _elementType($type, $el);
+	return
+	_button(array(
+		'name' => $txt.' пин-код',
+		'color' => $color,
+		'class' => $prm['blk_setup'] ? 'curD' : 'dialog-open',
+		'val' => 'dialog_id:'.$dlg_id
+	));
 }
 
 /* [300] Привязка пользователя к странице ВК */
-function _element300($type, $el, $prm) {
-	if($type == 'struct')
-		return array() + _elementStruct($el);
+function _element300_struct($el) {
+	return _elementStruct($el);
+}
+function _element300_print($el, $prm) {
+	$vkRes = '';
+	if($user_id = _elemPrintV($el, $prm, 0)) {
+		$res = _vkapi('users.get', array(
+			'user_ids' => $user_id,
+			'fields' => 'photo,'.
+						'sex,'.
+						'country,'.
+						'city'
+		));
 
-	if($type == 'print') {
-		$vkRes = '';
-		if($user_id = _elemPrintV($el, $prm, 0)) {
-			$res = _vkapi('users.get', array(
-				'user_ids' => $user_id,
-				'fields' => 'photo,'.
-							'sex,'.
-							'country,'.
-							'city'
-			));
-
-			if(empty($res['response']))
-				$vkRes = '<div class="red">Данные из VK не получены';
-			else
-				$vkRes = _elem300Sel($res['response'][0]);
-		}
-
-		$disabled = $prm['blk_setup'] ? ' disabled' : '';
-
-		return
-		'<input type="hidden" id="'._elemAttrId($el, $prm).'"'.$disabled.' value="'.$user_id.'" />'.
-		'<div id="'._elemAttrId($el, $prm).'_vk300" class="_vk300"'._elemStyleWidth($el).'>'.
-			'<div class="icon icon-vk curD'._dn(!$user_id).'"></div>'.
-			'<input type="text" class="w100p'._dn(!$user_id).'"'.$disabled.' />'.
-			'<div class="vk-res">'.$vkRes.'</div>'.
-		'</div>';
+		if(empty($res['response']))
+			$vkRes = '<div class="red">Данные из VK не получены';
+		else
+			$vkRes = _elem300Sel($res['response'][0]);
 	}
 
-	return _elementType($type, $el);
+	$disabled = $prm['blk_setup'] ? ' disabled' : '';
+
+	return
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'"'.$disabled.' value="'.$user_id.'" />'.
+	'<div id="'._elemAttrId($el, $prm).'_vk300" class="_vk300"'._elemStyleWidth($el).'>'.
+		'<div class="icon icon-vk curD'._dn(!$user_id).'"></div>'.
+		'<input type="text" class="w100p'._dn(!$user_id).'"'.$disabled.' />'.
+		'<div class="vk-res">'.$vkRes.'</div>'.
+	'</div>';
 }
 
 /* [400] График: столбики */
-function _element400($type, $el, $prm) {
-	if($type == 'struct')
-		return array(
-			'txt_1'   => $el['txt_1'],     //заголовок
-			'num_1'   => _num($el['num_1'])//список (id диалога) [24]
-		) + _elementStruct($el);
-
-	if($type == 'print')
-		return _elem400($el, $prm);
-
-	return _elementType($type, $el);
+function _element400_struct($el) {
+	return array(
+		'txt_1'   => $el['txt_1'],     //заголовок
+		'num_1'   => _num($el['num_1'])//список (id диалога) [24]
+	) + _elementStruct($el);
+}
+function _element400_print($el, $prm) {
+	return _elem400($el, $prm);
 }
 
 
@@ -7972,82 +7940,6 @@ function _period($v=0, $action='get') {// Формирование период�
 
 
 
-
-function _filterMenu($el) {//фильтр-меню []
-	if(!$ids = _ids($el['txt_1'], 1))
-		return _emptyMin10('Фильтр-меню: отсутствуют ID значений.');
-
-	$c = count($ids) - 1;
-	$elem_id = $ids[$c];
-
-	if(!$EL = _elemOne($elem_id))
-		return _emptyMin10('Фильтр-меню: значение отсутствует.');
-	if(!$BL = $EL['block'])
-		return _emptyMin10('Фильтр-меню: нет блока.');
-	if($BL['obj_name'] != 'dialog')
-		return _emptyMin10('Фильтр-меню: блок не из диалога.');
-	if(!$dialog_id = $BL['obj_id'])
-		return _emptyMin10('Фильтр-меню: нет ID диалога.');
-	if(!$dialog = _dialogQuery($dialog_id))
-		return _emptyMin10('Фильтр-меню: нет диалога.');
-
-	$col = $EL['col'];//колонка текстового значения
-	$colCount = '';//колонка значения количества
-	if($ids = _ids($el['txt_2'], 1)) {
-		$c = count($ids) - 1;
-		$elem_id = $ids[$c];
-		if($EL3 = _elemOne($elem_id))
-			$colCount = $EL3['col'];
-	}
-
-	$cond = " `id`";
-	if(isset($dialog['field1']['deleted']))
-		$cond .= " AND !`deleted`";
-	if(isset($dialog['field1']['dialog_id']))
-		$cond .= " AND `dialog_id`=".$dialog_id;
-	$sql = "SELECT *
-			FROM `"._table($dialog['table_1'])."`
-			WHERE ".$cond."
-			ORDER BY `sort`,`id`";
-	if(!$arr = query_arr($sql))
-		return _emptyMin10('Фильтр-меню: пустое меню.');
-
-	$send = '';
-	$v = _spisokFilter('vv', $el, 0);
-
-	$spisok = array();
-	foreach($arr as $r)
-		$spisok[$r['parent_id']][] = $r;
-
-	foreach($spisok[0] as $r) {
-		$child = '';
-		$child_sel = false;//список будет раскрыт, если в нём был выбранное значение
-		if(!empty($spisok[$r['id']]))
-			foreach($spisok[$r['id']] as $c) {
-				$sel = $v == $c['id'] ? ' sel' : '';
-				if($sel)
-					$child_sel = true;
-				$child .= '<div class="fm-unit'.$sel.'" val="'.$c['id'].'">'.
-							$c[$col].
-							($colCount ? '<span class="ml10 pale b">'.$c[$colCount].'</span>' : '').
-						'</div>';
-			}
-
-		$sel = $v == $r['id'] ? ' sel' : '';
-		$send .=
-			'<table class="w100p">'.
-				'<tr>'.
-		  ($child ? '<td class="fm-plus">'.($child_sel ? '-' : '+') : '<td class="w25">').//—
-					'<td><div class="fm-unit b fs14'.$sel.'" val="'.$r['id'].'">'.
-							$r[$col].
-							($colCount ? '<span class="ml10 pale b">'.$r[$colCount].'</span>' : '').
-						'</div>'.
-			'</table>'.
-			($child ? '<div class="ml40'._dn($child_sel).'">'.$child.'</div>' : '');
-	}
-
-	return $send;
-}
 
 
 
