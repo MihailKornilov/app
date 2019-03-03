@@ -161,11 +161,6 @@ function _element($type, $el, $prm=array()) {//все манипуляции, с
 	if(function_exists($fname))
 		return $fname($el, $prm);
 
-	//тип манипуляции находится в нутри настройки элемента todo на удаление
-	$fname = '_element'.$dlg_id;
-	if(function_exists($fname))
-		return $fname($type, $el, $prm);
-
 	return _elementType($type, $el);
 }
 
