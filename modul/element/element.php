@@ -873,6 +873,12 @@ function _element18_struct($el) {
 		'num_2'   => _num($el['num_2']) //не изменять имя нулевого значения после выбора
 	) + _elementStruct($el);
 }
+function _element18_struct_vvv($el, $cl) {
+	return array(
+		'id' => _num($cl['id']),
+		'title' => $cl['txt_1']
+	);
+}
 function _element18_js($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),
