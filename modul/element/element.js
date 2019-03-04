@@ -824,7 +824,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						});
 
 					ATR_CMP._select({
-						width:el.width,
+						width:_num(el.width),
 						title0:el.txt_1,
 						spisok:spisok,
 						func:function(v) {
@@ -939,7 +939,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 17:
 					_elemAction(el, _num(ATR_CMP.val()), 1);
 					ATR_CMP._select({
-						width:el.width,
+						width:_num(el.width),
 						title0:el.txt_1,
 						spisok:vvv,
 						func:function(v) {
@@ -1014,7 +1014,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//SA: Select - выбор документа
 				case 26:
 					ATR_CMP._select({
-						width:el.width,
+						width:_num(el.width),
 						title0:el.txt_1,
 						spisok:vvv
 					});
@@ -1069,7 +1069,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 29:
 					_elemAction(el, _num(ATR_CMP.val()), 1);
 					var o = {
-						width:el.width,
+						width:_num(el.width),
 						title0:el.txt_1,
 						write:el.num_1 && el.num_3,
 						msg_empty:'Не найдено',
@@ -1935,7 +1935,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//Select - фильтр
 				case 83:
 					ATR_CMP._select({
-						width:el.width,
+						width:_num(el.width),
 						title0:el.txt_1,
 						spisok:vvv,
 						func:function(v) {
@@ -1947,7 +1947,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//Select - выбор значения списка
 				case 85:
 					ATR_CMP._select({
-						width:el.width,
+						width:_num(el.width),
 						title0:el.txt_1,
 						spisok:vvv,
 						msg_empty:el.num_1 ? 'Список пуст' : 'Не указан список',

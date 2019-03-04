@@ -90,6 +90,9 @@ function _elementStruct($el) {//структура элемента - базов
 	if($el['width'] || !empty($el['width_min']))
 		$send['width'] = _num($el['width']);
 
+	if(!empty($el['focus']))
+		$send['focus'] = 1;
+
 	if(!empty($el['hidden']))
 		$send['hidden'] = 1;
 	if(!empty($el['afics']))
@@ -1123,7 +1126,7 @@ function _element29_struct($el) {
 		'num_3'   => _num($el['num_3']),//поиск значений вручную
 		'num_4'   => _num($el['num_4']),//блокировать выбор
 		'num_5'   => _num($el['num_5']),//учитывать уровни
-		'num_6'   => _num($el['num_6']),//значение по умолчанию
+		'num_6'   => _num($el['num_6'], 1),//значение по умолчанию
 		'num_7'   => _num($el['num_7']) //автоматическое внесение записи, если отсутствует подобное текстовое значение
 	) + _elementStruct($el);
 }
@@ -1141,7 +1144,8 @@ function _element29_print($el, $prm) {
 	$v = _elem29PageSel($el['num_1'], $v);
 	$v = _elem29DialogSel($prm, $v);
 
-	return _select(array(
+	return
+	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
 		'width' => $el['width'],
@@ -1365,6 +1369,29 @@ function _element31_print($el, $prm) {
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 	$chk;
 }
+function _val31($el, $txt) {//Выбор нескольких значений галочками [31] - вывод значения
+	if(!$sel = _idsAss($txt))
+		return '';
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return '';
+
+	//получение данных списка
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			ORDER BY `sort`";
+	if(!$spisok = query_arr($sql))
+		return '';
+
+
+	$send = array();
+
+	foreach($spisok as $r)
+		if(!empty($sel[$r['id']]))
+			$send[] = $r['txt_1'];
+
+	return implode(', ', $send);
+}
 
 /* [32] Значение списка: порядковый номер */
 function _element32_struct($el) {
@@ -1411,6 +1438,42 @@ function _element33_print($el, $prm) {
 		return 'дата';
 
 	return _elem33Data($el, $u);
+}
+function _elem33Data($el, $u) {//Значение записи: дата [33]
+	if(empty($u['dtime_add']))
+		return '';
+	if(!preg_match(REGEXP_DATE, $u['dtime_add']))
+		return 'некорректный формат даты';
+
+	$ex = explode(' ', $u['dtime_add']);
+	$d = explode('-', $ex[0]);
+
+	//время
+	$hh = '';
+	if($el['num_4'] && !empty($ex[1])) {
+		$h = explode(':', $ex[1]);
+		$hh .= ' '.$h[0].':'.$h[1];
+	}
+
+	if($el['num_1'] == 31)
+		return $d[2].'/'.$d[1].'/'.$d[0].$hh;
+
+	$hh = $hh ? ' в'.$hh : '';
+
+	if($el['num_3']) {
+		$dCount = floor((strtotime($ex[0]) - TODAY_UNIXTIME) / 3600 / 24);
+		switch($dCount) {
+			case -1: return 'вчера'.$hh;
+			case 0: return 'сегодня'.$hh;
+			case 1: return 'завтра'.$hh;
+		}
+	}
+
+	return
+		_num($d[2]).                                                     //день
+		' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //месяц
+		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
+		$hh;                                                             //время
 }
 
 /* [34] Иконка редактирования записи */
@@ -2529,6 +2592,53 @@ function _element85_vvv($el, $prm) {
 
 	return $send;
 }
+function _elem85mass($ell_id, $v, $send) {//получение значений для элемента [85]
+	if(!$dlg_id = _dialogSel24($ell_id, $v))
+		return $send;
+	if(!$dlg = _dialogQuery($dlg_id))
+		return $send;
+
+	//получение данных списка
+	$sql = "SELECT "._queryCol($dlg)."
+			FROM   "._queryFrom($dlg)."
+			WHERE  "._queryWhere($dlg)."
+			ORDER BY `id`
+			LIMIT 200";
+	if(!$spisok = query_arr($sql))
+		return $send;
+
+	$spisok = _spisokInclude($spisok);
+
+	//содержание выпадающего списка будет взято из настроек диалога
+	$cols = array();
+	while(true) {
+		if(!$elem_id = $dlg['spisok_elem_id'])
+			break;
+		$ell = _elemOne($elem_id);
+		$cols[] = $ell['col'];
+		if(_elemIsConnect($elem_id)) {
+			$dlg = _dialogQuery($ell['num_1']);
+			continue;
+		}
+		break;
+	}
+
+	foreach($spisok as $id => $sp) {
+		foreach($cols as $col) {
+			if(empty($sp[$col])) {
+				$sp = '- значение отсутствует -';
+				break;
+			}
+			$sp = $sp[$col];
+		}
+		$send[] = array(
+			'id' => $id,
+			'title' => $sp
+		);
+	}
+
+	return $send;
+}
 
 /* [86] Значение записи: количество дней */
 function _element86_struct($el) {
@@ -2825,6 +2935,48 @@ function _element300_print($el, $prm) {
 		'<input type="text" class="w100p'._dn(!$user_id).'"'.$disabled.' />'.
 		'<div class="vk-res">'.$vkRes.'</div>'.
 	'</div>';
+}
+function _elem300Place($res) {//страна и город пользователя ВК
+	$place = array();
+	if(!empty($res['country']))
+		$place[] = $res['country']['title'];
+	if(!empty($res['city']))
+		$place[] = $res['city']['title'];
+
+	return implode(', ', $place);
+}
+function _elem300Sel($res) {//выбранный пользователь ВК
+	return
+	'<table>'.
+		'<tr><td class="pr5"><img src="'.$res['photo'].'" class="ava35">'.
+			'<td><div class="icon icon-del-red pl fr ml20 mtm2'._tooltip('Отменить', -31).'</div>'.
+				'<a href="//vk.com/id'.$res['id'].'" target="_blank">'.
+					$res['first_name'].' '.$res['last_name'].
+				'</a>'.
+				'<div class="grey mt3">'._elem300Place($res).'</div>'.
+	'</table>';
+}
+function _elem300VkIdTest($DLG, $v, $user_id) {//проверка, чтобы два одинаковый `vk_id` не попали в таблицу `_user`
+	if(!$vk_id = _num($v))
+		return false;
+
+	//поиск таблицы `_user`
+	$tab = $DLG['table_name_1'];
+
+	if($parent_id = $DLG['dialog_id_parent']) {
+		$PAR = _dialogQuery($parent_id);
+		$tab = $PAR['table_name_1'];
+	}
+
+	if($tab == '_user') {
+		$sql = "SELECT COUNT(*)
+				FROM `_user`
+				WHERE `vk_id`=".$vk_id.
+	($user_id ? " AND `id`!=".$user_id : '');
+		return query_value($sql);
+	}
+
+	return false;
 }
 
 /* [400] График: столбики */
@@ -3905,12 +4057,6 @@ function _elemColType($id='all') {//тип данных, используемы�
 	return $col_type[$id];
 }
 
-function _elemVvv($elem_id, $prm) {//дополнительные значения, привязанные к элементу. Для рабочей версии.
-	if(!$el = _elemOne($elem_id))
-		return array();
-	return _element('vvv', $el, $prm);
-}
-
 function _elemIsConnect($el) {//определение, является ли элемент подключаемым списком
 	if(empty($el))
 		return false;
@@ -3945,53 +4091,6 @@ function _elemIsDate($el) {//определение, является ли эл�
 	return false;
 }
 
-function _elem85mass($ell_id, $v, $send) {//получение значений для элемента [85]
-	if(!$dlg_id = _dialogSel24($ell_id, $v))
-		return $send;
-	if(!$dlg = _dialogQuery($dlg_id))
-		return $send;
-
-	//получение данных списка
-	$sql = "SELECT "._queryCol($dlg)."
-			FROM   "._queryFrom($dlg)."
-			WHERE  "._queryWhere($dlg)."
-			ORDER BY `id`
-			LIMIT 200";
-	if(!$spisok = query_arr($sql))
-		return $send;
-
-	$spisok = _spisokInclude($spisok);
-
-	//содержание выпадающего списка будет взято из настроек диалога
-	$cols = array();
-	while(true) {
-		if(!$elem_id = $dlg['spisok_elem_id'])
-			break;
-		$ell = _elemOne($elem_id);
-		$cols[] = $ell['col'];
-		if(_elemIsConnect($elem_id)) {
-			$dlg = _dialogQuery($ell['num_1']);
-			continue;
-		}
-		break;
-	}
-
-	foreach($spisok as $id => $sp) {
-		foreach($cols as $col) {
-			if(empty($sp[$col])) {
-				$sp = '- значение отсутствует -';
-				break;
-			}
-			$sp = $sp[$col];
-		}
-		$send[] = array(
-			'id' => $id,
-			'title' => $sp
-		);
-	}
-
-	return $send;
-}
 function _elem201init($el85, $prm, $send) {//получение данных элемента для настройки действия [201]
 	$srce = $prm['srce'];
 
@@ -4377,114 +4476,13 @@ function _elemUids($ids, $u) {//получение значения записи
 	return '';
 }
 
-function _val31($el, $txt) {//Выбор нескольких значений галочками [31] - вывод значения
-	if(!$sel = _idsAss($txt))
-		return '';
-	if(!$DLG = _dialogQuery($el['num_1']))
-		return '';
-
-	//получение данных списка
-	$sql = "SELECT "._queryCol($DLG)."
-			FROM   "._queryFrom($DLG)."
-			WHERE  "._queryWhere($DLG)."
-			ORDER BY `sort`";
-	if(!$spisok = query_arr($sql))
-		return '';
-
-
-	$send = array();
-
-	foreach($spisok as $r)
-		if(!empty($sel[$r['id']]))
-			$send[] = $r['txt_1'];
-
-	return implode(', ', $send);
-}
-
-
-
-function _elem33Data($el, $u) {//Значение записи: дата [33]
-	if(empty($u['dtime_add']))
-		return '';
-	if(!preg_match(REGEXP_DATE, $u['dtime_add']))
-		return 'некорректный формат даты';
-
-	$ex = explode(' ', $u['dtime_add']);
-	$d = explode('-', $ex[0]);
-
-	//время
-	$hh = '';
-	if($el['num_4'] && !empty($ex[1])) {
-		$h = explode(':', $ex[1]);
-		$hh .= ' '.$h[0].':'.$h[1];
-	}
-
-	if($el['num_1'] == 31)
-		return $d[2].'/'.$d[1].'/'.$d[0].$hh;
-
-	$hh = $hh ? ' в'.$hh : '';
-
-	if($el['num_3']) {
-		$dCount = floor((strtotime($ex[0]) - TODAY_UNIXTIME) / 3600 / 24);
-		switch($dCount) {
-			case -1: return 'вчера'.$hh;
-			case 0: return 'сегодня'.$hh;
-			case 1: return 'завтра'.$hh;
-		}
-	}
-
-	return
-		_num($d[2]).                                                     //день
-		' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //месяц
-		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
-		$hh;                                                             //время
-}
 
 
 
 
-function _elem300Place($res) {//страна и город пользователя ВК
-	$place = array();
-	if(!empty($res['country']))
-		$place[] = $res['country']['title'];
-	if(!empty($res['city']))
-		$place[] = $res['city']['title'];
 
-	return implode(', ', $place);
-}
-function _elem300Sel($res) {//выбранный пользователь ВК
-	return
-	'<table>'.
-		'<tr><td class="pr5"><img src="'.$res['photo'].'" class="ava35">'.
-			'<td><div class="icon icon-del-red pl fr ml20 mtm2'._tooltip('Отменить', -31).'</div>'.
-				'<a href="//vk.com/id'.$res['id'].'" target="_blank">'.
-					$res['first_name'].' '.$res['last_name'].
-				'</a>'.
-				'<div class="grey mt3">'._elem300Place($res).'</div>'.
-	'</table>';
-}
-function _elem300VkIdTest($DLG, $v, $user_id) {//проверка, чтобы два одинаковый `vk_id` не попали в таблицу `_user`
-	if(!$vk_id = _num($v))
-		return false;
 
-	//поиск таблицы `_user`
-	$tab = $DLG['table_name_1'];
 
-	if($parent_id = $DLG['dialog_id_parent']) {
-		$PAR = _dialogQuery($parent_id);
-		$tab = $PAR['table_name_1'];
-	}
-
-	if($tab == '_user') {
-		$sql = "SELECT COUNT(*)
-				FROM `_user`
-				WHERE `vk_id`=".$vk_id.
-	($user_id ? " AND `id`!=".$user_id : '');
-		return query_value($sql);
-	}
-
-	return false;
-}
 
 /* ---=== УКАЗАНИЕ ЭЛЕМЕНТОВ ПОД КОНКРЕТНОЕ ПРАВИЛО [1000] ===--- */
 function PHP12_elem_all_rule_setup($prm) {

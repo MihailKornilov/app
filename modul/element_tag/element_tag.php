@@ -46,6 +46,10 @@ function _radio($v=array()) {//элемент RADIO
 	if(is_array($spisok) && !empty($spisok)) {
 		end($spisok);
 		$idEnd = key($spisok);
+
+		if(!is_array($spisok[$idEnd]))
+			$spisok = _sel($spisok);
+
 		foreach($spisok as $r) {
 			//отступ снизу после последнего значения не делается
 			$int = $idEnd == $r['id'] ? 0 : $interval;
