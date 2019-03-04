@@ -916,7 +916,8 @@ function _element23_struct_vvv($el, $cl) {
 }
 function _element23_js($el) {
 	return array(
-		'num_6'   => _num($el['num_6'])
+		'num_6'   => _num($el['num_6']),
+		'num_7'   => _num($el['num_7'])
 	) + _elementJs($el);
 }
 function _element23_print($el, $prm) {
