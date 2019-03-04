@@ -598,14 +598,14 @@ function _pageShowScript($page_id, $prm) {
 	//значения элементов страницы
 	$vvv = array();
 	foreach(_BE('elem_ids_arr', 'page', $page_id) as $elem_id)
-		$vvv[$elem_id] = _elemVvv($elem_id, $prm);
+		$vvv[$elem_id] = _element('vvv', $elem_id, $prm);
 
 	return
 	'<script>'.
 	(APP_ID && USER_ID ?
 		'var FILTER='._json(_spisokFilter('page_js'), 1).';'
 	: '').
-		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.//'._json($prm['unit_get']).'
+		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.
 	'</script>';
 }
 function _pageUnitGet($obj_name, $obj_id) {//получение данных записи, которые принимает страница (для отображения в настройке страницы)

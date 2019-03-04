@@ -1123,7 +1123,7 @@ function _dialogOpenLoad($dialog_id) {
 		$prm['srce']['block_id'] = _dialogOpenBlockIdUpd($dialog, $prm);
 
 		foreach($ELM_IDS as $elem_id)
-			$send['vvv'][$elem_id] = _elemVvv($elem_id, $prm);
+			$send['vvv'][$elem_id] = _element('vvv', $elem_id, $prm);
 
 		$send['html'] = _blockHtml('dialog', $dialog['id'], $prm);
 		$send['button_submit'] = $dialog['edit_button_submit'];
@@ -1146,7 +1146,7 @@ function _dialogOpenLoad($dialog_id) {
 		return _dialogOpenErr($send, 'Внесение новой записи запрещено.');
 
 	foreach($ELM_IDS as $elem_id)
-		$send['vvv'][$elem_id] = _elemVvv($elem_id, _blockParam($prm));
+		$send['vvv'][$elem_id] = _element('vvv', $elem_id, _blockParam($prm));
 
 
 

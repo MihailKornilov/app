@@ -1127,7 +1127,7 @@ function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значени�
 			$el = _elemOne($elem_id);
 			if($el['dialog_id'] == 17) {
 				$send['issp'] = 1;
-				$send['spisok'] = _elemVvv17($elem_id);
+				$send['spisok'] = _element('vvv', $el);
 			}
 		}
 	}

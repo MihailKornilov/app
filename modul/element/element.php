@@ -3,19 +3,20 @@
 	Каждый элемент должен пройти проверку:
 		1. Визуальное отображение в блоке {print}
 		2. Структура элемента {struct}
-		3. Дочерние элементы или значения {vvv}
-		4. Настройка ширины (в PageSetup) ['width']
-		5. Наличие флага обязательного заполнения ['req']
-		6. Установка фокуса ['focus']
-		7. Title элемента
-		8. Значения для JS
-		9. Действия
-	   10. Подсказки
-	   11. Элемент [11]:
+		3. Title элемента {struct_title}
+		4. Дочерние элементы или значения {struct_vvv} - статическое формирование (сохранение в кеш)
+		5. Дочерние элементы или значения {vvv} - динамическое формирование
+		6. Настройка ширины (в PageSetup) ['width']
+		7. Наличие флага обязательного заполнения ['req']
+		8. Установка фокуса ['focus']
+		9. Значения для JS
+	   10. Действия
+	   11. Подсказки
+	   12. Элемент [11]:
 			a) Является ли изображением
 			б)
-	   12. Форматирование
-	   13. Правила
+	   13. Форматирование
+	   14. Правила
 */
 
 function _elementType($type, $el=array()) {//все возможные варианты манипуляций
@@ -35,9 +36,9 @@ function _elementType($type, $el=array()) {//все возможные вари�
 
 		//содержание элемента (ячейки таблицы, значения выпадающего списка, ...)
 		case 'vvv':
-			if(empty($el['vvv']))
-				return array();
-			return $el['vvv'];
+			if(!empty($el['vvv']))
+				return $el['vvv'];
+			return array();
 
 		//структура элемента для JS
 		case 'js':
@@ -643,6 +644,16 @@ function _element12_print($el, $prm) {
 	: '').
 		$el['txt_1']($prm);
 }
+function _element12_vvv($el, $prm) {
+	$func = $el['txt_1'].'_vvv';
+
+	if(!function_exists($func))
+		return array();
+
+	$prm['el12'] = $el;
+
+	return $func($prm);
+}
 
 /* [13] Выбор элемента из диалога или страницы */
 function _element13_struct($el) {
@@ -769,16 +780,38 @@ function _element16_struct_vvv($el, $cl) {
 	);
 }
 function _element16_print($el, $prm) {
-	return _radio(array(
+	return
+	_radio(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'light' => 1,
 		'block' => !$el['num_1'],
 		'interval' => 5,
 		'value' => _elemPrintV($el, $prm, $el['def']),
 		'title0' => $el['txt_1'],
-		'spisok' => $el['vvv'],
+		'spisok' => _element('vvv', $el),
 		'disabled' => $prm['blk_setup']
 	));
+}
+function _element16_vvv($el) {
+	//значения из существующего (другого) элемента
+	if($el['num_2'] == 3877) {
+		if($elem_id = $el['num_3']) {
+			$sql = "SELECT
+			            `id`,
+			            `txt_1` `title`
+					FROM `_element`
+					WHERE `parent_id`=".$elem_id."
+					ORDER BY `sort`";
+			return query_arr($sql);
+		}
+		return array();
+	}
+
+	if(!empty($el['vvv']))
+		return $el['vvv'];
+
+	return array();
+
 }
 
 /* [17] Select: произвольные значения */
@@ -794,6 +827,17 @@ function _element17_struct($el) {
 
 		'txt_1'   => $el['txt_1']      //текст нулевого значения
 	) + _elementStruct($el);
+}
+function _element17_struct_vvv($el, $cl) {
+	$send = array(
+		'id' => _num($cl['id']),
+		'title' => $cl['txt_1']
+	);
+
+	if($cl['txt_2'])
+		$send['content'] = $cl['txt_1'].'<div class="fs12 grey ml10 mt3">'.$cl['txt_2'].'</div>';
+
+	return $send;
 }
 function _element17_js($el) {
 	return array(
@@ -962,6 +1006,19 @@ function _element24_print($el, $prm) {
 		'value' => _elemPrintV($el, $prm, 0)
    ));
 }
+function _element24_vvv($el, $prm) {
+	$dialog_id = $prm['srce']['dialog_id'];
+	$block_id = $prm['srce']['block_id'];
+	switch($el['num_1']) {
+		//диалоги, которые могут быть списками: spisok_on=1 и размещены на текущей странице
+		case 960: return _dialogSpisokOnPage($block_id);
+		//диалоги, которые привязаны к выбранному диалогу
+		case 961: return _dialogSpisokOnConnect($block_id);
+	}
+
+	//все списки приложения
+	return _dialogSpisokOn($dialog_id, $block_id, $el['id']);
+}
 
 /* [26] Select: выбор документа (SA) */
 function _element26_struct($el) {
@@ -984,6 +1041,13 @@ function _element26_print($el, $prm) {
 		'width' => $el['width'],
 		'value' => _elemPrintV($el, $prm, 0)
 	));
+}
+function _element26_vvv() {
+	$sql = "SELECT `id`,`name`
+			FROM `_template`
+			WHERE `app_id`=".APP_ID."
+			ORDER BY `id` DESC";
+	return query_ass($sql);
 }
 
 /* [27] Cумма значений записи */
@@ -1083,6 +1147,122 @@ function _element29_print($el, $prm) {
 		'width' => $el['width'],
 		'value' => $v
 	));
+}
+function _element29_vvv($el, $prm) {
+	if($prm['unit_edit'])
+		if(_elemColDlgId($el['id'], true))
+			$prm['unit_edit'] = array();
+
+	$sel_id = _elemPrintV($el, $prm, $el['num_6']);
+	$sel_id = _elem29PageSel($el['num_1'], $sel_id);
+	$sel_id = _elem29DialogSel($prm, $sel_id);
+	return _29cnn($el['id'], '', $sel_id);
+}
+function _elem29PageSel($dlg_cur, $sel_id) {//подмена id записи, если не совпадает со списком текущей страницы
+	//id записи берётся с текущей страницы
+	if($sel_id != -1)
+		return $sel_id;
+	if(!$sel_id = _num(@$_GET['id']))
+		return 0;
+
+	$page_id = _page('cur');
+	$page = _page($page_id);
+	if(!$dlg_id = $page['dialog_id_unit_get'])
+		return $sel_id;
+
+	//если страница принимает значения другого списка, нужно поменять id записи
+	if($dlg_id == $dlg_cur)
+		return $sel_id;
+	if(!$DLG = _dialogQuery($dlg_id))
+		return 0;
+	if(!$u = _spisokUnitQuery($DLG, $sel_id))
+		return 0;
+
+	foreach($DLG['cmp'] as $cmp)
+		if(_elemIsConnect($cmp))
+			if($dlg_cur == $cmp['num_1'])
+				if(!empty($u[$cmp['col']]))
+					return $u[$cmp['col']]['id'];
+
+	return 0;
+}
+function _elem29DialogSel($prm, $sel_id) {//подстановка id записи, которая приходит на диалоговое окно
+	//id записи берётся с текущей страницы
+	if($sel_id != -2)
+		return $sel_id;
+	//должен передаваться id записи
+	if(!$get_id = $prm['unit_get_id'])
+		return 0;
+	if(!$block_id = $prm['srce']['block_id'])
+		return 0;
+	if(!$blk = _blockOne($block_id))
+		return 0;
+	//поиск id диалога: пока только получение из данных списка
+	if($blk['obj_name'] != 'spisok')
+		return 0;
+	if(!$el = _elemOne($blk['obj_id']))
+		return 0;
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return 0;
+	if(!$u = _spisokUnitQuery($DLG, $get_id))
+		return 0;
+
+	return $get_id;
+}
+function _elem29ValAuto($el, $txt) {//автоматическое внесение текста, введённого в выпадающем списке [29]
+	if(!$txt = _txt($txt))
+		return 0;
+	//подключенный список, в который будет производиться внесение записи
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return 0;
+	//вносить можно пока только в "_spisok"
+	if($DLG['table_name_1'] != '_spisok')
+		return 0;
+	//вносить можно пока только в родительский диалог
+	if($DLG['dialog_id_parent'])
+		return 0;
+	if(!$last = _idsLast($el['txt_3']))
+		return 0;
+	if(!$ell = _elemOne($last))
+		return 0;
+	if(!$col = $ell['col'])
+		return 0;
+
+	//получение id записи, если такой текст уже был внесён ранее
+	$sql = "SELECT `id`
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			  AND `".$col."`='".addslashes($txt)."'
+			LIMIT 1";
+	if($id = query_value($sql))
+		return $id;
+
+	$sql = "SELECT IFNULL(MAX(`num`),0)+1
+			FROM `_spisok`
+			WHERE `dialog_id`=".$DLG['id'];
+	$num = query_value($sql);
+
+	$sql = "SELECT IFNULL(MAX(`sort`)+1,1)
+			FROM `_spisok`
+			WHERE `dialog_id`=".$DLG['id'];
+	$sort = query_value($sql);
+
+	$sql = "INSERT INTO `_spisok` (
+				`app_id`,
+				`dialog_id`,
+				`num`,
+				`".$col."`,
+				`sort`,
+				`user_id_add`
+			) VALUES (
+				".APP_ID.",
+				".$DLG['id'].",
+				".$num.",
+				'".addslashes($txt)."',
+				".$sort.",
+				".USER_ID."
+			)";
+	return query_id($sql);
 }
 
 /* [30] Иконка удаления записи */
@@ -1300,6 +1480,12 @@ function _element35_print($el, $prm) {
 				'value' => _elemPrintV($el, $prm, $el['def'])
 		   ));
 }
+function _element35_vvv($el) {
+	if($el['num_1'] != 3682)
+		return array();
+
+	return json_decode($el['txt_1']);
+}
 
 /* [36] Иконка */
 function _element36_struct($el) {
@@ -1325,11 +1511,6 @@ function _element36_print($el) {
 function _element37_struct($el) {
 	return _elementStruct($el);
 }
-function _element38_js($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	) + _elementJs($el);
-}
 function _element37_print($el, $prm) {
 	return
 	_select(array(
@@ -1337,6 +1518,141 @@ function _element37_print($el, $prm) {
 		'width' => $el['width'],
 		'value' => _elemPrintV($el, $prm)
 	));
+}
+function _element37_vvv($el, $prm) {
+	if(!$block = _blockOne($prm['srce']['block_id']))
+		return array();
+	//список колонок может быть получен при условии, если элемент размещается в диалоге
+	if($block['obj_name'] != 'dialog')
+		return array();
+	if(!$dlg = _dialogQuery($block['obj_id']))
+		return array();
+
+	//выбранная колонка, если редактирование записи
+	$uCol = '';
+	if($u = $prm['unit_edit'])
+		$uCol = $u['col'];
+
+	$field = _elemVvv37fieldDop($uCol);
+
+	//если диалог родительский, получение колонок родителя
+	if($parent_id = $dlg['dialog_id_parent']) {
+		$field = _elemVvv37parent($parent_id, $field);
+		$PAR = _dialogQuery($parent_id);
+		//если таблицы одинаковые, отправка только родительских колонок
+		if(!$dlg['table_1'] || $dlg['table_1'] == $PAR['table_1'])
+			return $field;
+	}
+
+	$field = _elemVvv37field($dlg, $uCol, $field);
+
+	return $field;
+}
+function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по каждой таблице
+	if(!$dlg['table_1'])
+		return $send;
+
+	//получение используемых колонок
+	$colUse = array();
+	foreach($dlg['cmp'] as $r) {
+		if(empty($r['col']))
+			continue;
+		$colUse[$r['col']] = !empty($r['name']) ? '<i class="color-555 ml10">('.$r['name'].')</i>' : '';
+	}
+
+	//колонки, которые не должны выбираться
+	$fieldNo = array(
+		'id' => 1,
+		'id_old' => 1,
+		'num' => 1,
+		'app_id' => 1,
+		'cnn_id' => 1,
+		'parent_id' => 1,
+		'user_id' => 1,
+		'page_id' => 1,
+		'block_id' => 1,
+		'element_id' => 1,
+		'dialog_id' => 1,
+		'width' => 1,
+		'color' => 1,
+		'font' => 1,
+		'size' => 1,
+		'mar' => 1,
+		'sort' => 1,
+		'deleted' => 1,
+		'user_id_add' => 1,
+		'user_id_del' => 1,
+		'dtime_add' => 1,
+		'dtime_del' => 1,
+		'dtime_create' => 1,
+		'app_id_last' => 1
+	);
+
+	foreach($dlg['field1'] as $col => $k) {
+		if(isset($fieldNo[$col]))
+			continue;
+
+		$color = '';
+		$busy = 0;//занята ли колонка
+		$name = '';
+		if(isset($colUse[$col])) {
+			$color = $uCol == $col ? 'b color-pay' : 'b red';
+			$busy = 1;
+			$name = $colUse[$col];
+		}
+		$u = array(
+			'id' => $col,
+			'title' => $col,
+			'busy' => $busy,
+			'content' =>
+				'<div class="'.$color.'">'.
+					'<span class="pale">'.$dlg['name'].'.</span>'.
+					$col.
+					$name.
+				'</div>'
+
+		);
+		$send[] = $u;
+	}
+
+	return $send;
+}
+function _elemVvv37fieldDop($uCol) {//дополнительная колонка - из другого списка
+	$send=array();
+
+	if(!$col_id = _num($uCol))
+		return $send;
+	if(!$el = _elemOne($col_id))
+		return $send;
+	if(!$col = $el['col'])
+		return $send;
+	if(!$DLG = _dialogQuery($el['block']['obj_id']))
+		return $send;
+
+	$send[] = array(
+		'id' => $col_id,
+		'title' => $DLG['name'].': '.$el['name'],
+		'content' => $DLG['name'].': '.$el['name'].' <b class="pale">'.$col.'</b>'
+	);
+
+	return $send;
+}
+function _elemVvv37parent($dlg_id, $send) {//колонки родительского диалога
+	if(!$dlg = _dialogQuery($dlg_id))
+		return $send;
+
+	foreach($dlg['cmp'] as $id => $cmp) {
+		if(empty($cmp['col']))
+			continue;
+
+		$send[] = array(
+			'id' => $id,
+			'title' => $dlg['name'].': '.$cmp['name'],
+			'content' => $dlg['name'].': '.$cmp['name'].' <b class="pale">'.$cmp['col'].'</b>'
+		);
+	}
+
+	return $send;
 }
 
 /* [38] Select: выбор диалогового окна (SA) */
@@ -1348,6 +1664,11 @@ function _element38_struct($el) {
 		'txt_1'   => $el['txt_1']//нулевое значение
 	) + _elementStruct($el);
 }
+function _element38_js($el) {
+	return array(
+		'txt_1' => $el['txt_1']
+	) + _elementJs($el);
+}
 function _element38_print($el, $prm) {
 	return
 	_select(array(
@@ -1356,6 +1677,9 @@ function _element38_print($el, $prm) {
 		'width' => $el['width'],
 		'value' => _elemPrintV($el, $prm, 0)
 	));
+}
+function _element38_vvv() {
+	return _dialogSelArray();
 }
 
 /* [39] Месяц и год */
@@ -1416,6 +1740,25 @@ function _element40_print($el, $prm) {
 		'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
 		'<input type="text" readonly class="inp color-del b pl25 curP w100p over3"'.$placeholder.$disabled.' value="'.$title.'" />'.
 	'</div>';
+}
+function _element40_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
+function _element40_vvv($el, $prm) {
+	if($el['num_1'])
+		return 0;
+	if(!$block_id = $prm['srce']['block_id'])
+		return 0;
+	if(!$BL = _blockOne($block_id))
+		return 0;
+	if(!$EL = $BL['elem'])
+		return 0;
+	if(!_elemIsConnect($EL))
+		return 0;
+
+	return _num($EL['num_1']);
 }
 
 /* [44] Сборный текст */
@@ -1713,7 +2056,7 @@ function _element69_print($el, $prm) {
 }
 
 /* [70] Выбор цвета фона */
-function _element70_struct($el, $prm) {
+function _element70_struct($el) {
 	return _elementStruct($el);
 }
 function _element70_print($el, $prm) {
@@ -1721,6 +2064,48 @@ function _element70_print($el, $prm) {
 
 	return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 		   '<div class="_color-bg" style="background-color:'.$v.'"></div>';
+}
+function _element70_vvv($el, $prm) {
+	$color = array(
+		'#fff',
+		'#ffffe4',
+		'#e4ffe4',
+		'#dff',
+		'#ffe8ff',
+
+		'#f9f9f9',
+		'#ffb',
+		'#cfc',
+		'#aff',
+		'#fcf',
+
+		'#f3f3f3',
+		'#fec',
+		'#F2F2B6',
+		'#D7EBFF',
+		'#ffe4e4',
+
+		'#ededed',
+		'#FFDA8F',
+		'#E3E3AA',
+		'#B2D9FF',
+		'#fcc'
+	);
+
+	$sel = '#fff';//выбранное значение
+	if($u = $prm['unit_edit']) {
+		$col = $el['col'];
+		$sel = $u[$col];
+	}
+
+	$spisok = '';
+	for($n = 0; $n < count($color); $n++) {
+		$cls = $sel == $color[$n] ? ' class="sel"' : '';
+		$spisok .= '<div'.$cls.' style="background-color:'.$color[$n].'" val="'.$color[$n].'">'.
+						'&#10004;'.
+				   '</div>';
+	}
+	return '<div class="_color-bg-choose">'.$spisok.'</div>';
 }
 
 /* [71] Значение записи: иконка сортировки */
@@ -2033,6 +2418,52 @@ function _element83_print($el, $prm) {
 		'value' => _spisokFilter('vv', $el, 0)
 	));
 }
+function _element83_vvv($el) {
+	return _elem102CnnList($el['txt_2']);
+}
+function _elem102CnnList($ids, $return='select', $cond='') {//значения привязанного списка (пока для фильтра 102)
+	if(!$last_id = _idsLast($ids))
+		return array();
+	if(!$el = _elemOne($last_id))
+		return array();
+	if(!$bl = $el['block'])
+		return array();
+	if($bl['obj_name'] != 'dialog')
+		return array();
+	if(!$dlg_id = _num($bl['obj_id']))
+		return array();
+	if(!$dlg = _dialogQuery($dlg_id))
+		return array();
+	if(!$col = @$el['col'])
+		return array();
+
+	//получение данных списка
+	$sql = "SELECT "._queryCol($dlg)."
+			FROM   "._queryFrom($dlg)."
+			WHERE  "._queryWhere($dlg)."
+				   ".$cond."
+			ORDER BY `sort`,`id`
+			LIMIT 200";
+	if(!$spisok = query_arr($sql))
+		return array();
+
+	$select = array();
+	$ass = array();
+	foreach($spisok as $id => $r) {
+		$select[] = array(
+			'id' => $id,
+			'title' => $r[$col]
+		);
+		$ass[$id] = $r[$col];
+	}
+
+	if($return == 'ass')
+		return $ass;
+	if($return == 'ids')
+		return _idsGet($select);
+
+	return $select;
+}
 
 /* [85] Select: выбор значения списка по умолчанию */
 function _element85_struct($el) {
@@ -2057,6 +2488,46 @@ function _element85_print($el, $prm) {
 		'width' => $el['width'],
 		'value' => _elemPrintV($el, $prm, 0)
 	));
+}
+function _element85_vvv($el, $prm) {
+	$send = array();
+
+	if($el['num_2'])
+		$send[] = array(
+			'id' => -1,
+			'title' => 'Совпадает с текущей страницей',
+			'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
+						 '<div class="fs12 grey ml10 mt3 i">Будет установлено значение записи, которую принимает текущая страница</div>'
+		);
+
+	if($el['num_3'])
+		$send[] = array(
+			'id' => -2,
+			'title' => 'Совпадает с данными, приходящими на диалог',
+			'content' => '<div class="b color-pay">Совпадает с данными, приходящими на диалог</div>'.
+						 '<div class="fs12 grey ml10 mt3 i">Будет установлено значение записи, которая приходит на открываемое диалоговое окно</div>'
+		);
+
+	$send = _elem201init($el, $prm, $send);
+
+	if(!$u = $prm['unit_edit'])
+		return $send;
+
+	//ID элемента, содержащее значение
+	if(!$ell_id = _num($el['num_1']))
+		return $send;
+	if(!$ell = _elemOne($ell_id))
+		return $send;
+	//колонка, по которой будет получено ID диалога-списка
+	if(!$col = $ell['col'])
+		return $send;
+	if(!$v = _num($u[$col]))
+		return $send;
+
+	$send = _elem85mass($ell_id, $v, $send);
+	$send = _elem212ActionFormat($el['id'], $v, $send);
+
+	return $send;
 }
 
 /* [86] Значение записи: количество дней */
@@ -3437,463 +3908,7 @@ function _elemColType($id='all') {//тип данных, используемы�
 function _elemVvv($elem_id, $prm) {//дополнительные значения, привязанные к элементу. Для рабочей версии.
 	if(!$el = _elemOne($elem_id))
 		return array();
-
-	switch($el['dialog_id']) {
-		//подключаемая функция
-		case 12:
-			$func = $el['txt_1'].'_vvv';
-
-			if(!function_exists($func))
-				return array();
-
-			$prm['el12'] = $el;
-
-			return $func($prm);
-
-		//Radio
-		case 16:
-			break;
-			//значения из существующего (другого) элемента
-			if($el['num_2'] == 3877)
-				if(!$elem_id = $el['num_3'])
-					return array();
-
-			$sql = "SELECT `id`,`txt_1`
-					FROM `_element`
-					WHERE `parent_id`=".$elem_id."
-					ORDER BY `sort`";
-			return query_ass($sql);
-
-		//Select - произвольные значения
-		case 17:
-		//dropdown
-		case 18: return _elemVvv17($elem_id);
-
-		//select - выбор списка
-		case 24:
-			$dialog_id = $prm['srce']['dialog_id'];
-			$block_id = $prm['srce']['block_id'];
-			switch($el['num_1']) {
-				//диалоги, которые могут быть списками: spisok_on=1 и размещены на текущей странице
-				case 960: return _dialogSpisokOnPage($block_id);
-				//диалоги, которые привязаны к выбранному диалогу
-				case 961: return _dialogSpisokOnConnect($block_id);
-			}
-
-			//все списки приложения
-			return _dialogSpisokOn($dialog_id, $block_id, $elem_id);
-
-		//SA: Select - выбор диалогового окна
-		case 26:
-			$sql = "SELECT `id`,`name`
-					FROM `_template`
-					WHERE `app_id`=".APP_ID."
-					ORDER BY `id` DESC";
-			return query_ass($sql);
-
-		//Select - выбор записи из другого списка (для связки)
-		case 29:
-			if($prm['unit_edit'])
-				if(_elemColDlgId($el['id'], true))
-					$prm['unit_edit'] = array();
-
-			$sel_id = _elemPrintV($el, $prm, $el['num_6']);
-			$sel_id = _elem29PageSel($el['num_1'], $sel_id);
-			$sel_id = _elem29DialogSel($prm, $sel_id);
-			return _29cnn($elem_id, '', $sel_id);
-
-		//Количество
-		case 35:
-			if($el['num_1'] != 3682)
-				break;
-
-			return json_decode($el['txt_1']);
-
-		//SA: select - выбор имени колонки
-		case 37: return _elemVvv37($prm);
-
-		//SA: Select - выбор диалогового окна
-		case 38: return _dialogSelArray();
-
-		case 40:
-			if($el['num_1'])
-				return 0;
-			if(!$block_id = $prm['srce']['block_id'])
-				return 0;
-			if(!$BL = _blockOne($block_id))
-				return 0;
-			if(!$EL = $BL['elem'])
-				return 0;
-			if(!_elemIsConnect($EL))
-				return 0;
-
-			return _num($EL['num_1']);
-
-		//Цвета для фона
-		case 70:
-			$color = array(
-				'#fff',
-				'#ffffe4',
-				'#e4ffe4',
-				'#dff',
-				'#ffe8ff',
-
-				'#f9f9f9',
-				'#ffb',
-				'#cfc',
-				'#aff',
-				'#fcf',
-
-				'#f3f3f3',
-				'#fec',
-				'#F2F2B6',
-				'#D7EBFF',
-				'#ffe4e4',
-
-				'#ededed',
-				'#FFDA8F',
-				'#E3E3AA',
-				'#B2D9FF',
-				'#fcc'
-			);
-
-			$sel = '#fff';//выбранное значение
-			if($u = $prm['unit_edit']) {
-				$col = $el['col'];
-				$sel = $u[$col];
-			}
-
-			$spisok = '';
-			for($n = 0; $n < count($color); $n++) {
-				$cls = $sel == $color[$n] ? ' class="sel"' : '';
-				$spisok .= '<div'.$cls.' style="background-color:'.$color[$n].'" val="'.$color[$n].'">'.
-								'&#10004;'.
-						   '</div>';
-			}
-			return '<div class="_color-bg-choose">'.$spisok.'</div>';
-
-		//Фильтр: Select - привязанный список
-		case 83: return _elem102CnnList($el['txt_2']);
-
-		//Select - выбор значения списка. Для значений по умолчанию.
-		case 85:
-			$send = array();
-
-			if($el['num_2'])
-				$send[] = array(
-					'id' => -1,
-					'title' => 'Совпадает с текущей страницей',
-					'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
-								 '<div class="fs12 grey ml10 mt3 i">Будет установлено значение записи, которую принимает текущая страница</div>'
-				);
-
-			if($el['num_3'])
-				$send[] = array(
-					'id' => -2,
-					'title' => 'Совпадает с данными, приходящими на диалог',
-					'content' => '<div class="b color-pay">Совпадает с данными, приходящими на диалог</div>'.
-								 '<div class="fs12 grey ml10 mt3 i">Будет установлено значение записи, которая приходит на открываемое диалоговое окно</div>'
-				);
-
-			$send = _elem201init($el, $prm, $send);
-
-			if(!$u = $prm['unit_edit'])
-				return $send;
-
-			//ID элемента, содержащее значение
-			if(!$ell_id = _num($el['num_1']))
-				return $send;
-			if(!$ell = _elemOne($ell_id))
-				return $send;
-			//колонка, по которой будет получено ID диалога-списка
-			if(!$col = $ell['col'])
-				return $send;
-			if(!$v = _num($u[$col]))
-				return $send;
-
-			$send = _elem85mass($ell_id, $v, $send);
-			$send = _elem212ActionFormat($elem_id, $v, $send);
-
-			return $send;
-	}
-
-	if(!empty($el['vvv']))
-		return $el['vvv'];
-
-	return array();
-}
-function _elemVvv17($elem_id) {
-	$send = array();
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `parent_id`=".$elem_id."
-			ORDER BY `sort`";
-	foreach(query_arr($sql) as $r) {
-		$u = array(
-			'id' => _num($r['id']),
-			'title' => $r['txt_1']
-		);
-		if($r['txt_2'])
-			$u['content'] = $r['txt_1'].'<div class="fs12 grey ml10 mt3">'.$r['txt_2'].'</div>';
-		$send[] = $u;
-	}
-	return $send;
-}
-function _elemVvv37($prm) {//select - выбор имени колонки [37]
-	if(!$block = _blockOne($prm['srce']['block_id']))
-		return array();
-	//список колонок может быть получен при условии, если элемент размещается в диалоге
-	if($block['obj_name'] != 'dialog')
-		return array();
-	if(!$dlg = _dialogQuery($block['obj_id']))
-		return array();
-
-	//выбранная колонка, если редактирование записи
-	$uCol = '';
-	if($u = $prm['unit_edit'])
-		$uCol = $u['col'];
-
-	$field = _elemVvv37fieldDop($uCol);
-
-	//если диалог родительский, получение колонок родителя
-	if($parent_id = $dlg['dialog_id_parent']) {
-		$field = _elemVvv37parent($parent_id, $field);
-		$PAR = _dialogQuery($parent_id);
-		//если таблицы одинаковые, отправка только родительских колонок
-		if(!$dlg['table_1'] || $dlg['table_1'] == $PAR['table_1'])
-			return $field;
-	}
-
-	$field = _elemVvv37field($dlg, $uCol, $field);
-
-	return $field;
-}
-function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по каждой таблице
-	if(!$dlg['table_1'])
-		return $send;
-
-	//получение используемых колонок
-	$colUse = array();
-	foreach($dlg['cmp'] as $r) {
-		if(empty($r['col']))
-			continue;
-		$colUse[$r['col']] = !empty($r['name']) ? '<i class="color-555 ml10">('.$r['name'].')</i>' : '';
-	}
-
-	//колонки, которые не должны выбираться
-	$fieldNo = array(
-		'id' => 1,
-		'id_old' => 1,
-		'num' => 1,
-		'app_id' => 1,
-		'cnn_id' => 1,
-		'parent_id' => 1,
-		'user_id' => 1,
-		'page_id' => 1,
-		'block_id' => 1,
-		'element_id' => 1,
-		'dialog_id' => 1,
-		'width' => 1,
-		'color' => 1,
-		'font' => 1,
-		'size' => 1,
-		'mar' => 1,
-		'sort' => 1,
-		'deleted' => 1,
-		'user_id_add' => 1,
-		'user_id_del' => 1,
-		'dtime_add' => 1,
-		'dtime_del' => 1,
-		'dtime_create' => 1,
-		'app_id_last' => 1
-	);
-
-	foreach($dlg['field1'] as $col => $k) {
-		if(isset($fieldNo[$col]))
-			continue;
-
-		$color = '';
-		$busy = 0;//занята ли колонка
-		$name = '';
-		if(isset($colUse[$col])) {
-			$color = $uCol == $col ? 'b color-pay' : 'b red';
-			$busy = 1;
-			$name = $colUse[$col];
-		}
-		$u = array(
-			'id' => $col,
-			'title' => $col,
-			'busy' => $busy,
-			'content' =>
-				'<div class="'.$color.'">'.
-					'<span class="pale">'.$dlg['name'].'.</span>'.
-					$col.
-					$name.
-				'</div>'
-
-		);
-		$send[] = $u;
-	}
-
-	return $send;
-}
-function _elemVvv37fieldDop($uCol) {//дополнительная колонка - из другого списка
-	$send=array();
-
-	if(!$col_id = _num($uCol))
-		return $send;
-	if(!$el = _elemOne($col_id))
-		return $send;
-	if(!$col = $el['col'])
-		return $send;
-	if(!$DLG = _dialogQuery($el['block']['obj_id']))
-		return $send;
-
-	$send[] = array(
-		'id' => $col_id,
-		'title' => $DLG['name'].': '.$el['name'],
-		'content' => $DLG['name'].': '.$el['name'].' <b class="pale">'.$col.'</b>'
-	);
-
-	return $send;
-}
-function _elemVvv37parent($dlg_id, $send) {//колонки родительского диалога
-	if(!$dlg = _dialogQuery($dlg_id))
-		return $send;
-
-	foreach($dlg['cmp'] as $id => $cmp) {
-		if(empty($cmp['col']))
-			continue;
-
-/*
-		//выбирать можно только колонки элементов, которые вносят данные
-		if($cmp['dialog_id'] != 1
-		&& $cmp['dialog_id'] != 8
-		&& $cmp['dialog_id'] != 10
-		&& $cmp['dialog_id'] != 16
-		&& $cmp['dialog_id'] != 17
-		&& $cmp['dialog_id'] != 29
-		&& $cmp['dialog_id'] != 59
-		&& $cmp['dialog_id'] != 31
-		&& $cmp['dialog_id'] != 51
-		&& $cmp['dialog_id'] != 300
-		) continue;
-*/
-		$send[] = array(
-			'id' => $id,
-			'title' => $dlg['name'].': '.$cmp['name'],
-			'content' => $dlg['name'].': '.$cmp['name'].' <b class="pale">'.$cmp['col'].'</b>'
-		);
-	}
-
-	return $send;
-}
-
-function _elem29PageSel($dlg_cur, $sel_id) {//подмена id записи, если не совпадает со списком текущей страницы
-	//id записи берётся с текущей страницы
-	if($sel_id != -1)
-		return $sel_id;
-	if(!$sel_id = _num(@$_GET['id']))
-		return 0;
-
-	$page_id = _page('cur');
-	$page = _page($page_id);
-	if(!$dlg_id = $page['dialog_id_unit_get'])
-		return $sel_id;
-
-	//если страница принимает значения другого списка, нужно поменять id записи
-	if($dlg_id == $dlg_cur)
-		return $sel_id;
-	if(!$DLG = _dialogQuery($dlg_id))
-		return 0;
-	if(!$u = _spisokUnitQuery($DLG, $sel_id))
-		return 0;
-
-	foreach($DLG['cmp'] as $cmp)
-		if(_elemIsConnect($cmp))
-			if($dlg_cur == $cmp['num_1'])
-				if(!empty($u[$cmp['col']]))
-					return $u[$cmp['col']]['id'];
-
-	return 0;
-}
-function _elem29DialogSel($prm, $sel_id) {//подстановка id записи, которая приходит на диалоговое окно
-	//id записи берётся с текущей страницы
-	if($sel_id != -2)
-		return $sel_id;
-	//должен передаваться id записи
-	if(!$get_id = $prm['unit_get_id'])
-		return 0;
-	if(!$block_id = $prm['srce']['block_id'])
-		return 0;
-	if(!$blk = _blockOne($block_id))
-		return 0;
-	//поиск id диалога: пока только получение из данных списка
-	if($blk['obj_name'] != 'spisok')
-		return 0;
-	if(!$el = _elemOne($blk['obj_id']))
-		return 0;
-	if(!$DLG = _dialogQuery($el['num_1']))
-		return 0;
-	if(!$u = _spisokUnitQuery($DLG, $get_id))
-		return 0;
-
-	return $get_id;
-}
-function _elem29ValAuto($el, $txt) {//автоматическое внесение текста, введённого в выпадающем списке [29]
-	if(!$txt = _txt($txt))
-		return 0;
-	//подключенный список, в который будет производиться внесение записи
-	if(!$DLG = _dialogQuery($el['num_1']))
-		return 0;
-	//вносить можно пока только в "_spisok"
-	if($DLG['table_name_1'] != '_spisok')
-		return 0;
-	//вносить можно пока только в родительский диалог
-	if($DLG['dialog_id_parent'])
-		return 0;
-	if(!$last = _idsLast($el['txt_3']))
-		return 0;
-	if(!$ell = _elemOne($last))
-		return 0;
-	if(!$col = $ell['col'])
-		return 0;
-
-	//получение id записи, если такой текст уже был внесён ранее
-	$sql = "SELECT `id`
-			FROM   "._queryFrom($DLG)."
-			WHERE  "._queryWhere($DLG)."
-			  AND `".$col."`='".addslashes($txt)."'
-			LIMIT 1";
-	if($id = query_value($sql))
-		return $id;
-
-	$sql = "SELECT IFNULL(MAX(`num`),0)+1
-			FROM `_spisok`
-			WHERE `dialog_id`=".$DLG['id'];
-	$num = query_value($sql);
-
-	$sql = "SELECT IFNULL(MAX(`sort`)+1,1)
-			FROM `_spisok`
-			WHERE `dialog_id`=".$DLG['id'];
-	$sort = query_value($sql);
-
-	$sql = "INSERT INTO `_spisok` (
-				`app_id`,
-				`dialog_id`,
-				`num`,
-				`".$col."`,
-				`sort`,
-				`user_id_add`
-			) VALUES (
-				".APP_ID.",
-				".$DLG['id'].",
-				".$num.",
-				'".addslashes($txt)."',
-				".$sort.",
-				".USER_ID."
-			)";
-	return query_id($sql);
+	return _element('vvv', $el, $prm);
 }
 
 function _elemIsConnect($el) {//определение, является ли элемент подключаемым списком
@@ -3928,49 +3943,6 @@ function _elemIsDate($el) {//определение, является ли эл�
 		case 51: return true;
 	}
 	return false;
-}
-function _elem102CnnList($ids, $return='select', $cond='') {//значения привязанного списка (пока для фильтра 102)
-	if(!$last_id = _idsLast($ids))
-		return array();
-	if(!$el = _elemOne($last_id))
-		return array();
-	if(!$bl = $el['block'])
-		return array();
-	if($bl['obj_name'] != 'dialog')
-		return array();
-	if(!$dlg_id = _num($bl['obj_id']))
-		return array();
-	if(!$dlg = _dialogQuery($dlg_id))
-		return array();
-	if(!$col = @$el['col'])
-		return array();
-
-	//получение данных списка
-	$sql = "SELECT "._queryCol($dlg)."
-			FROM   "._queryFrom($dlg)."
-			WHERE  "._queryWhere($dlg)."
-				   ".$cond."
-			ORDER BY `sort`,`id`
-			LIMIT 200";
-	if(!$spisok = query_arr($sql))
-		return array();
-
-	$select = array();
-	$ass = array();
-	foreach($spisok as $id => $r) {
-		$select[] = array(
-			'id' => $id,
-			'title' => $r[$col]
-		);
-		$ass[$id] = $r[$col];
-	}
-
-	if($return == 'ass')
-		return $ass;
-	if($return == 'ids')
-		return _idsGet($select);
-
-	return $select;
 }
 
 function _elem85mass($ell_id, $v, $send) {//получение значений для элемента [85]
@@ -4055,11 +4027,11 @@ function _elem201init($el85, $prm, $send) {//получение данных э�
 		case 6: return _elem201initCnn($send, _jsCachePage());
 
 		case 16:
-			$vvv = _elemVvv($EL['id'], array());
+			$vvv = _element('vvv', $EL);
 			return _elem201initCnn($send, _sel($vvv));
 
 		case 17:
-		case 18: return _elem201initCnn($send, _elemVvv17($EL['id']));
+		case 18: return _elem201initCnn($send, _element('vvv', $EL));
 
 		case 24: return _elem201initCnn($send);
 
@@ -5362,7 +5334,7 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 			$el = _elemOne($last);
 			if($el['dialog_id'] == 17) {
 				$arr[$n]['elem_issp'] = 1;
-				$arr[$n]['spisok'] = _elemVvv17($r['elem_id']);
+				$arr[$n]['spisok'] = _element('vvv', $r);
 			}
 		}
 	}
@@ -5613,7 +5585,7 @@ function PHP12_menu_block_setup_vvv($prm) {
 
 
 
-/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO для [16] ===--- */
+/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO для [16][17] ===--- */
 function PHP12_radio_setup() {
 	return '';
 }
