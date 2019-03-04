@@ -457,9 +457,9 @@ function _arr($arr, $i=false) {//Последовательный массив
 }
 function _sel($arr) {
 	$send = array();
-	foreach($arr as $uid => $title) {
+	foreach($arr as $id => $title) {
 		$send[] = array(
-			'uid' => $uid,
+			'id' => $id,
 			'title' => trim($title)
 		);
 	}
@@ -484,9 +484,9 @@ function _selJson($arr) {
 }
 function _selArray($arr) {//список для _select при отправке через ajax
 	$send = array();
-	foreach($arr as $uid => $title) {
+	foreach($arr as $id => $title) {
 		$send[] = array(
-			'id' => _num($uid),
+			'id' => _num($id),
 			'title' => addslashes(htmlspecialchars_decode(trim($title)))
 		);
 	}

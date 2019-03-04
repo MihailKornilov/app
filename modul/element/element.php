@@ -8,7 +8,7 @@
 		5. Наличие флага обязательного заполнения ['req']
 		6. Установка фокуса ['focus']
 		7. Title элемента
-		8.
+		8. Значения для JS
 		9. Действия
 	   10. Подсказки
 	   11. Элемент [11]:
@@ -51,7 +51,17 @@ function _elementType($type, $el=array()) {//все возможные вари�
 				return $el['title'];
 			if(!empty($el['name']))
 				return $el['name'];
-			return '';
+			if(empty($el['dialog_id']))
+				return '';
+
+			global $G_DLG, $G_ELEM;
+
+			if($el['dialog_id'] == 11)
+				$el = _element11_struct_title($el, $G_ELEM, $G_DLG);
+			else
+				$el = _element('struct_title', $el, $G_DLG);
+
+			return $el['title'];
 	}
 
 	return '';
@@ -426,6 +436,11 @@ function _element7_struct($el) {
 		'txt_2' => $el['txt_2']       //по каким полям производить поиск (id элементов через запятую диалога списка)
 	) + _elementStruct($el);
 }
+function _element7_js($el) {
+	return array(
+		'num_1' => $el['num_1']
+	) + _elementJs($el);
+}
 function _element7_print($el, $prm) {
 	return _search(array(
 		'attr_id' => _elemAttrId($el, $prm),
@@ -434,11 +449,6 @@ function _element7_print($el, $prm) {
 		'v' => _spisokFilter('vv', $el),
 		'disabled' => $prm['blk_setup']
 	));
-}
-function _element7_js($el) {
-	return array(
-		'num_1' => $el['num_1']
-	) + _elementJs($el);
 }
 
 /* [8] input:text (однострочное текстовое поле) */
@@ -612,6 +622,11 @@ function _element12_struct($el) {
 		'num_1' => _num($el['num_1'])//условие 1
 	) + _elementStruct($el);
 }
+function _element12_js($el) {
+	return array(
+		'txt_1' => $el['txt_1']
+	) + _elementJs($el);
+}
 function _element12_print($el, $prm) {
 	if(!$el['txt_1'])
 		return _emptyMin('Отсутствует имя функции.');
@@ -628,11 +643,6 @@ function _element12_print($el, $prm) {
 	: '').
 		$el['txt_1']($prm);
 }
-function _element12_js($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	) +_elementJs($el);
-}
 
 /* [13] Выбор элемента из диалога или страницы */
 function _element13_struct($el) {
@@ -647,6 +657,15 @@ function _element13_struct($el) {
 		'num_5'   => _num($el['num_5']),//выбор значений во вложенных списках
 		'num_6'   => _num($el['num_6']) //выбор нескольких значений
 	) + _elementStruct($el);
+}
+function _element13_js($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),
+		'num_2'   => _num($el['num_2']),
+		'num_5'   => _num($el['num_5']),
+		'num_6'   => _num($el['num_6']),
+		'txt_2'   => $el['txt_2']
+	) + _elementJs($el);
 }
 function _element13_print($el, $prm) {
 	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
@@ -776,6 +795,11 @@ function _element17_struct($el) {
 		'txt_1'   => $el['txt_1']      //текст нулевого значения
 	) + _elementStruct($el);
 }
+function _element17_js($el) {
+	return array(
+		'txt_1' => $el['txt_1']
+	) + _elementJs($el);
+}
 function _element17_print($el, $prm) {
 	return
 	_select(array(
@@ -801,6 +825,13 @@ function _element18_struct($el) {
 		'num_1'   => _num($el['num_1']),//скрывать нулевое значение в меню выбора
 		'num_2'   => _num($el['num_2']) //не изменять имя нулевого значения после выбора
 	) + _elementStruct($el);
+}
+function _element18_js($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),
+		'num_2'   => _num($el['num_2']),
+		'txt_1'   => $el['txt_1']
+	) + _elementJs($el);
 }
 function _element18_print($el, $prm) {
 	return
@@ -883,6 +914,11 @@ function _element23_struct_vvv($el, $cl) {
 		'txt_2'     => $cl['txt_2'],//для [11]
 	);
 }
+function _element23_js($el) {
+	return array(
+		'num_6'   => _num($el['num_6'])
+	) + _elementJs($el);
+}
 function _element23_print($el, $prm) {
 	if($prm['blk_setup'])
 		return _emptyMin('Список-таблица <b>'._dialogParam($el['num_1'], 'name').'</b>');
@@ -911,6 +947,11 @@ function _element24_struct($el) {
 									   */
 	) + _elementStruct($el);
 }
+function _element24_js($el) {
+	return array(
+		'txt_1' => $el['txt_1']
+	) + _elementJs($el);
+}
 function _element24_print($el, $prm) {
 	return
 	_select(array(
@@ -929,6 +970,11 @@ function _element26_struct($el) {
 
 		'txt_1'   => $el['txt_1']  //нулевое значение
 	) + _elementStruct($el);
+}
+function _element26_js($el) {
+	return array(
+		'txt_1' => $el['txt_1']
+	) + _elementJs($el);
 }
 function _element26_print($el, $prm) {
 	return _select(array(
@@ -1015,6 +1061,15 @@ function _element29_struct($el) {
 		'num_6'   => _num($el['num_6']),//значение по умолчанию
 		'num_7'   => _num($el['num_7']) //автоматическое внесение записи, если отсутствует подобное текстовое значение
 	) + _elementStruct($el);
+}
+function _element29_js($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),
+		'num_2'   => _num($el['num_2']),
+		'num_3'   => _num($el['num_3']),
+		'num_4'   => _num($el['num_4']),
+		'txt_1'   => $el['txt_1']
+	) + _elementJs($el);
 }
 function _element29_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, $el['num_6']);
@@ -1225,6 +1280,18 @@ function _element35_struct($el) {
 		'txt_1' => $el['txt_1']       //конкретные значения, настраиваются через PHP12_count_value
 	) + _elementStruct($el);
 }
+function _element35_js($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),
+		'num_2'   => _num($el['num_2']),
+		'num_3'   => _num($el['num_3']),
+		'num_4'   => _num($el['num_4']),
+		'num_5'   => _num($el['num_5']),
+		'num_6'   => _num($el['num_6']),
+		'num_7'   => _num($el['num_7']),
+		'num_8'   => _num($el['num_8'])
+	) + _elementJs($el);
+}
 function _element35_print($el, $prm) {
 	return _count(array(
 				'attr_id' => _elemAttrId($el, $prm),
@@ -1256,6 +1323,11 @@ function _element36_print($el) {
 /* [37] Select: выбор колонки таблицы (SA) */
 function _element37_struct($el) {
 	return _elementStruct($el);
+}
+function _element38_js($el) {
+	return array(
+		'txt_1' => $el['txt_1']
+	) + _elementJs($el);
 }
 function _element37_print($el, $prm) {
 	return
@@ -1414,6 +1486,12 @@ function _element51_struct($el) {
 		'num_2'   => _num($el['num_2']) //показывать время
 	) + _elementStruct($el);
 }
+function _element51_js($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),
+		'num_2'   => _num($el['num_2'])
+	) + _elementJs($el);
+}
 function _element51_print($el, $prm) {
 	return
 	_calendar(array(
@@ -1484,6 +1562,11 @@ function _element57_struct_vvv($el, $cl) {//пункты меню
 		'def'   => _num($cl['def'])//по умолчанию
 	);
 }
+function _element57_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
 function _element57_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, $el['def']);
 
@@ -1501,11 +1584,6 @@ function _element57_print($el, $prm) {
 
 	return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 		   '<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
-}
-function _element57_js($el) {
-	return array(
-		'num_1' => $el['num_1']
-	) + _elementJs($el);
 }
 
 /* [58] Условия удаления записи */
@@ -1527,6 +1605,11 @@ function _element59_struct($el) {
 		'num_1'   => _num($el['num_1']),//id диалога, через который вносятся данные выбираемого списка
 		'num_4'   => _num($el['num_4']) //id диалога, которое открывается при нажатии на кнопку
 	) + _elementStruct($el);
+}
+function _element59_js($el) {
+	return array(
+		'num_4' => _num($el['num_4'])
+	) + _elementJs($el);
 }
 function _element59_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, 0);
@@ -1550,7 +1633,7 @@ function _element59_print($el, $prm) {
 /* [60] Загрузка изображений */
 function _element60_struct($el) {
 	return array(
-		'width' => _num($el['width']),
+		'width' => _num($el['width']),//нужно для 'struct_title'
 
 		'num_1' => _num($el['num_1']),//максимальное количество изображений, которое разрешено загрузить
 		'num_7' => _num($el['num_7']),//ограничение высоты (настройка стилей)
@@ -1577,6 +1660,11 @@ function _element62_struct($el) {
 										*/
 		'num_3'   => _num($el['num_3']) //начальное значение для галочки
 	) + _elementStruct($el);
+}
+function _element62_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
 }
 function _element62_print($el, $prm) {
 	return
@@ -1653,8 +1741,71 @@ function _element72_struct($el) {
 		'num_2'   => _num($el['num_2']) //id элемента - путь к сумме для подсчёта по каждому месяцу
 	) + _elementStruct($el);
 }
+function _element72_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
 function _element72_print($el, $prm) {
-	return _elem72Radio($el, $prm);
+	$v = _spisokFilter('vv', $el, strftime('%Y-%m'));
+
+	$ex = explode('-', $v);
+	$year = $ex[0];
+	$mon  = $ex[1];
+
+
+	return
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+	_yearleaf(array(
+		'attr_id' => _elemAttrId($el, $prm).'yl',
+		'value' => $ex[0]
+	)).
+	'<div class="mt5">'.
+		_radio(array(
+			'attr_id' => _elemAttrId($el, $prm).'rd',
+			'width' => 0,
+			'block' => 1,
+			'light' => 1,
+			'interval' => 5,
+			'value' => $mon,
+			'spisok' => _elem72Sum($el, $year),
+			'disabled' => $prm['blk_setup']
+		)).
+	'</div>';
+}
+function _elem72Sum($el, $year) {//получение сумм для фильтра [72]
+	$spisok = _monthDef();
+
+	if(!$el = _elemOne($el['num_2']))
+		return $spisok;
+	if(!$col = $el['col'])
+		return $spisok;
+	if(!$bl = $el['block'])
+		return $spisok;
+	if($bl['obj_name'] != 'dialog')
+		return $spisok;
+	if(!$DLG = _dialogQuery($bl['obj_id']))
+		return $spisok;
+
+	$sql = "/* ".__FUNCTION__.":".__LINE__." Суммы для фильтра [72] */
+			SELECT
+				DISTINCT(DATE_FORMAT(`dtime_add`,'%m')) AS `mon`,
+				SUM(`".$col."`) `sum`
+			FROM   "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG)."
+			  AND `dtime_add` LIKE '".$year."-%'
+			GROUP BY DATE_FORMAT(`dtime_add`,'%m')";
+	if(!$arr = query_array($sql))
+		return $spisok;
+
+	foreach($arr as $r) {
+		$mon = _num($r['mon']);
+		$txt = $spisok[$mon];
+		$spisok[$mon] = $txt.
+						'<span class="fr">'._sumSpace(round($r['sum'])).'</span>';
+	}
+
+	return $spisok;
 }
 
 /* [74] Фильтр: Radio */
@@ -1668,13 +1819,38 @@ function _element74_struct($el) {
 		'num_1' => _num($el['num_1'])//id элемента-список, к которому применяется фильтр
 	) + _elementStruct($el);
 }
+function _element74_struct_vvv($el, $cl) {
+	$c = '';
+	if($cl['txt_2']) {
+		$vv = htmlspecialchars_decode($cl['txt_2']);
+		$arr = json_decode($vv, true);
+		$c = count($arr);
+	}
+
+	return array(
+		'id'    => _num($cl['id']),
+		'txt_1' => $cl['txt_1'],        //имя пунтка
+		'def'   => _num($cl['def']),
+		'c'     => $c,                  //количество условий в пункте
+		'txt_2' => $cl['txt_2'],        //условия
+		'num_1' => _num($cl['num_1'])   //отображать количество значений в пункте
+	);
+}
+function _element74_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
 function _element74_print($el, $prm) {
 	//получение количества значений по каждому пункту
 	$EL = _elemOne($el['num_1']);
 	$DLG = _dialogQuery($EL['num_1']);
 	$spisok = array();
-	foreach(_elemVvv($el['id'], $prm) as $id => $r) {
-		$spisok[$id] = $r['txt_1'];
+	foreach($el['vvv'] as $n => $r) {
+		$spisok[$n] = array(
+			'id' => $r['id'],
+			'title' => $r['txt_1']
+		);
 
 		if(!$r['num_1'])
 			continue;
@@ -1684,10 +1860,11 @@ function _element74_print($el, $prm) {
 				WHERE "._queryWhere($DLG)."
 					"._40cond($EL, $r['txt_2']);
 		if($c = query_value($sql))
-			$spisok[$id] .= '<span class="fr inhr">'.$c.'</span>';
+			$spisok[$n]['title'] .= '<span class="fr inhr">'.$c.'</span>';
 	}
 
-	return _radio(array(
+	return
+	_radio(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'block' => 1,
 		'width' => '100%',
@@ -1710,6 +1887,11 @@ function _element77_struct($el) {
 										*/
 	) + _elementStruct($el);
 }
+function _element77_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
 function _element77_print($el) {
 	return _filterCalendar($el);
 }
@@ -1721,6 +1903,11 @@ function _element78_struct($el) {
 		'txt_1'   => $el['txt_1'],      //id элемента (с учётом вложений), содержащего значения (названия), составляющие меню
 		'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений), содержащего количество записей по каждому пункту
 	) + _elementStruct($el);
+}
+function _element78_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
 }
 function _element78_print($el) {
 	if(!$ids = _ids($el['txt_1'], 1))
@@ -1805,6 +1992,11 @@ function _element80_struct($el) {
 		'num_1'   => _num($el['num_1'])//id элемента, размещающего список
 	) + _elementStruct($el);
 }
+function _element80_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
 function _element80_print($el, $prm) {
 	$diff = _spisokFilter('diff', $el['num_1']);
 	return _button(array(
@@ -1825,6 +2017,12 @@ function _element83_struct($el) {
 		'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений) - привязанный список (через [13])
 	) + _elementStruct($el);
 }
+function _element83_js($el) {
+	return array(
+		'txt_1' => $el['txt_1'],
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
 function _element83_print($el, $prm) {
 	return
 	_select(array(
@@ -1843,6 +2041,12 @@ function _element85_struct($el) {
 		'num_2'   => _num($el['num_2']),//разрешать выбор записи, данные которой принимает страница
 		'num_3'   => _num($el['num_3']) //разрешать выбор записи, данные которой принимает диалог
 	) + _elementStruct($el);
+}
+function _element85_js($el) {
+	return array(
+		'txt_1' => $el['txt_1'],
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
 }
 function _element85_print($el, $prm) {
 	return
@@ -2019,6 +2223,11 @@ function _element102_struct($el) {
 		'txt_5'   => $el['txt_5']       //значение по умолчанию: настраивается через [40]
 	) + _elementStruct($el);
 }
+function _element102_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
 function _element102_print($el, $prm) {
 	$v = _spisokFilter('v', $el['id']);
 	if($v === false) {
@@ -2164,13 +2373,6 @@ function _element400_print($el, $prm) {
 
 
 
-
-
-
-
-function _elemTitle($elem_id) {//имя элемента или его текст
-	return 'title-old';
-}
 
 
 
@@ -3369,15 +3571,6 @@ function _elemVvv($elem_id, $prm) {//дополнительные значени
 			}
 			return '<div class="_color-bg-choose">'.$spisok.'</div>';
 
-		//Фильтр radio
-		case 74:
-			$sql = "/* ".__FUNCTION__.":".__LINE__." VVV ".$el['dialog_id']." */
-					SELECT *
-					FROM `_element`
-					WHERE `parent_id`=".$elem_id."
-					ORDER BY `sort`";
-			return query_arr($sql);
-
 		//Фильтр: Select - привязанный список
 		case 83: return _elem102CnnList($el['txt_2']);
 
@@ -4274,67 +4467,6 @@ function _elem33Data($el, $u) {//Значение записи: дата [33]
 		$hh;                                                             //время
 }
 
-function _elem72Radio($el, $prm) {//получение сумм для фильтра [72]
-	$v = _spisokFilter('vv', $el, strftime('%Y-%m'));
-
-	$ex = explode('-', $v);
-	$year = $ex[0];
-	$mon  = $ex[1];
-
-
-	return
-	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-	_yearleaf(array(
-		'attr_id' => _elemAttrId($el, $prm).'yl',
-		'value' => $ex[0]
-	)).
-	'<div class="mt5">'.
-		_radio(array(
-			'attr_id' => _elemAttrId($el, $prm).'rd',
-			'width' => 0,
-			'block' => 1,
-			'light' => 1,
-			'interval' => 5,
-			'value' => $mon,
-			'spisok' => _elem72Sum($el, $year),
-			'disabled' => $prm['blk_setup']
-		)).
-	'</div>';
-}
-function _elem72Sum($el, $year) {//получение сумм для фильтра [72]
-	$spisok = _monthDef();
-
-	if(!$el = _elemOne($el['num_2']))
-		return $spisok;
-	if(!$col = $el['col'])
-		return $spisok;
-	if(!$bl = $el['block'])
-		return $spisok;
-	if($bl['obj_name'] != 'dialog')
-		return $spisok;
-	if(!$DLG = _dialogQuery($bl['obj_id']))
-		return $spisok;
-
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Суммы для фильтра [72] */
-			SELECT
-				DISTINCT(DATE_FORMAT(`dtime_add`,'%m')) AS `mon`,
-				SUM(`".$col."`) `sum`
-			FROM   "._queryFrom($DLG)."
-			WHERE "._queryWhere($DLG)."
-			  AND `dtime_add` LIKE '".$year."-%'
-			GROUP BY DATE_FORMAT(`dtime_add`,'%m')";
-	if(!$arr = query_array($sql))
-		return $spisok;
-
-	foreach($arr as $r) {
-		$mon = _num($r['mon']);
-		$txt = $spisok[$mon];
-		$spisok[$mon] = $txt.
-						'<span class="fr">'._sumSpace(round($r['sum'])).'</span>';
-	}
-
-	return $spisok;
-}
 
 
 
@@ -6647,14 +6779,9 @@ function PHP12_history_setup_vvv($prm) {//получение значений д
 		return array();
 	if(!$DLG = _dialogQuery($dialog_id))
 		return array();
-	if(!$ids = $DLG[$prm['dop']['act'].'_history_elem'])
-		return array();
 
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id` IN (".$ids.")
-			ORDER BY `sort`";
-	if(!$arr = query_arr($sql))
+	$act = $prm['dop']['act'];
+	if(!$arr = $DLG[$act.'_history_elem'])
 		return array();
 
 	//получение действий (переход по ссылке), настроенных для ячеек
@@ -6677,12 +6804,12 @@ function PHP12_history_setup_vvv($prm) {//получение значений д
 			'dialog_id' => $r['dialog_id'],
 			'font' => $r['font'],
 			'color' => $r['color'],
-			'title' => _elemTitle($id),
+			'title' => _element('title', $r),
 			'txt_7' => $r['txt_7'],
 			'txt_8' => $r['txt_8'],
 			'c' => $c,//количество условий
 			'txt_9' => $r['txt_9'],
-			'url_action_id' => _num(@$url[$id])
+			'url_action_id' => 0//_num(@$url[$id])
 		);
 	}
 	return _arrNum($send);

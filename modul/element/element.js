@@ -1003,7 +1003,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 24:
 					_elemAction(el, _num(ATR_CMP.val()), 1);
 					ATR_CMP._select({
-						width:el.width,
+						width:_num(el.width),
 						title0:el.txt_1,
 						spisok:vvv,
 						func:function(v) {
@@ -1126,7 +1126,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//count - количество
 				case 35:
 					var obj = {
-						width:el.width,
+						width:_num(el.width),
 						again:el.num_8
 					};
 					if(el.num_1 == 3681) {
@@ -1144,7 +1144,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//SA: Select - выбор имени колонки
 				case 37:
 					ATR_CMP._select({
-						width:el.width,
+						width:_num(el.width),
 						title0:'не выбрано',
 						msg_empty:'колонок нет',
 						spisok:vvv,
@@ -1165,7 +1165,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//SA: Select - выбор диалогового окна
 				case 38:
 					ATR_CMP._select({
-						width:el.width,
+						width:_num(el.width),
 						title0:el.txt_1,
 						msg_empty:'диалоги ещё не были созданы',
 						spisok:vvv
@@ -1304,7 +1304,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//Календарь
 				case 51:
 					ATR_CMP._calendar({
-						lost:_num(el.num_1),
+						lost:el.num_1,
 						time:el.num_2,
 						func:function() {
 							_elemAction(el, 1);

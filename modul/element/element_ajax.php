@@ -725,7 +725,7 @@ function _dialogSetupHistoryTmp($arr) {
 	foreach($arr as $el) {
 		$title = '';
 		if($el['dialog_id']) {
-			$title = ''; //?? _element('title', $el);
+			$title = _element('title', $el);
 			$cls = array('wsnw');
 			$cls[] = $el['font'];
 			$cls[] = $el['color'];
