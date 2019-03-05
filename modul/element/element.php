@@ -2992,6 +2992,11 @@ function _element400_struct($el) {
 		'num_1'   => _num($el['num_1'])//список (id диалога) [24]
 	) + _elementStruct($el);
 }
+function _element400_js($el) {
+	return array(
+		'txt_1' => $el['txt_1']
+	) + _elementJs($el);
+}
 function _element400_print($el, $prm) {
 	return _elem400($el, $prm);
 }

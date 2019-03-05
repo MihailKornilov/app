@@ -272,10 +272,9 @@ function _spisok7num($spisok, $el) {//добавление записи, есл�
 
 		//сборный текст
 		if($r['dialog_id'] == 44)
-			if($ids = _ids($r['txt_2'], 'arr'))
-				foreach($ids as $id)
-					if($ell = _elemOne($id))
-						if($ell['dialog_id'] == 32) {
+			if(!empty($r['vvv']))
+				foreach($r['vvv'] as $ell)
+					if($ell['dialog_id'] == 32) {
 							$is_num = true;
 							break;
 						}
