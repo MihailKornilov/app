@@ -179,7 +179,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		//скрытие всей строки, если все блоки в строке являются скрытыми
 		if($strHide = (!$PARAM['blk_setup'] && !$PARAM['elm_choose']))
 			foreach($xStr as $n => $rr) {
-				$rr = _blockActionView($rr, $PARAM);
+				$xStr[$n] = _blockActionView($rr, $PARAM);
 				if(!$rr['hidden'])//если хотя бы один блок не скрыт, вся строка не будет скрыта
 					$strHide = 0;
 			}

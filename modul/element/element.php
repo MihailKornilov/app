@@ -2117,7 +2117,7 @@ function _element69_struct($el) {
 }
 function _element69_print($el, $prm) {
 	if(!$u = $prm['unit_get'])
-		return $el['name'];
+		return $el['title'];
 	if(empty($u['user_id_add']))
 		return 'no user';
 
@@ -4816,7 +4816,6 @@ function PHP12_v_choose($prm) {
 		if(!$BL = _blockOne($block_id))
 			return _emptyMin10('Блока '.$block_id.' не существует.');
 
-
 		//выбор элемента-значения через [13]
 		$obj_id = PHP12_v_choose_13($BL, $prm, $obj_id);
 
@@ -4947,8 +4946,8 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 	if($BL['obj_name'] == 'page') {
 		if(!$page = _page($BL['obj_id']))
 			return 'Страницы '.$BL['obj_id'].' не существует.';
-//		if($page['dialog_id_unit_get'])
-//			return $page['dialog_id_unit_get'];
+		if($page['dialog_id_unit_get'])
+			return $page['dialog_id_unit_get'];
 		define('OBJ_NAME_CHOOSE', 'page');
 		return $BL['obj_id'];
 	}
