@@ -177,13 +177,12 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		$bb = $y == $yEnd && $hMax > $hSum ? $BB : '';
 
 		//скрытие всей строки, если все блоки в строке являются скрытыми
-		$strHide = !$PARAM['blk_setup'] && !$PARAM['elm_choose'];
-		if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'])
-			foreach($xStr as $n => $rr)
-				if(!$rr['hidden']) {//если хотя бы один блок не скрыт, вся строка не будет скрыта
+		if($strHide = (!$PARAM['blk_setup'] && !$PARAM['elm_choose']))
+			foreach($xStr as $n => $rr) {
+				$rr = _blockActionView($rr, $PARAM);
+				if(!$rr['hidden'])//если хотя бы один блок не скрыт, вся строка не будет скрыта
 					$strHide = 0;
-					break;
-				}
+			}
 
 		//если блок в строке один и для него выбрана автоматическая ширина - таблица будет максимальной ширины
 		$table_w100p = count($xStr) == 1 && $r['width_auto'] ? 'w100p' : '';
@@ -335,6 +334,29 @@ function _blockActionFilter($u, $filter) {//дополнительные усл�
 	}
 
 	return 0;
+}
+function _blockActionView($bl, $prm) {//условия отображения блока
+	if(empty($bl['action']))
+		return $bl;
+	if(!$u = $prm['unit_get'])
+		return $bl;
+
+	foreach($bl['action'] as $act)
+		switch($act['dialog_id']) {
+			//скрытие блока, если нулевое значение элемента
+			case 231:
+				if(!$el = _elemOne($act['initial_id']))
+					break;
+				if(empty($el['col']))
+					break;
+				if(!empty($u[$el['col']]))
+					break;
+
+				$bl['hidden'] = 1;
+				break;
+		}
+
+	return $bl;
 }
 function _blockLevelChange($obj_name, $obj_id) {//кнопки изменения уровня редактирования блоков
 	$html = '';

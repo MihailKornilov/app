@@ -333,8 +333,10 @@ function _spisokInclude($spisok) {//вложенные списки
 				continue;
 
 			//должно быть присвоено имя колонки
-			if(!$col = $cmp['col'])
+			if(empty($cmp['col']))
 				continue;
+
+			$col = $cmp['col'];
 
 			//выборка будет производиться только по нужным строкам списка
 			if(!$ids = _idsGet($spisok, $col))

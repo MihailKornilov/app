@@ -167,7 +167,7 @@ function _element($type, $el, $prm=array()) {//все манипуляции, с
 	if(!is_array($el))
 		$el = _elemOne($el);
 
-	if(!$dlg_id = _num($el['dialog_id']))
+	if(!$dlg_id = _num(@$el['dialog_id']))
 		return _elementType($type);
 
 	//тип манипуляции добавляется в конце функции. Например: _element1_struct
@@ -4908,6 +4908,8 @@ function PHP12_v_choose_dss($prm) {//ID диалога из dss
 		return false;
 	if($dss == 220)
 		return false;
+	if($dss == 230)
+		return false;
 	return $dss;
 }
 function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элементу [13]
@@ -6166,6 +6168,7 @@ function PHP12_action_list($prm) {
 			break;
 		//действия для блока
 		case 210:
+		case 230:
 			if(!$block_id = _num($prm['srce']['block_id']))
 				return _emptyMin('Отсутствует ID исходного блока.');
 			if(!$BL = _blockOne($block_id))
