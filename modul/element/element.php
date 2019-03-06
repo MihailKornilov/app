@@ -6923,7 +6923,6 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 			}
 			if(_elemIsConnect($cmp)) {
 				$hidden = true;
-//				$name = $cmp['name'];
 				break;
 			}
 			$el = $cmp;
@@ -6947,23 +6946,14 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 	$history_id = _historyInsert(2, $dialog, $unit['id']);
 
 	$insert = array();
-	foreach($edited as $r) {
-		$old = $r['old'];
-//		if(is_array($old))
-//			$old = $old['txt_1'];
-
-		$new = $r['new'];
-//		if(is_array($new))
-//			$new = $new['txt_1'];
-
+	foreach($edited as $r)
 		$insert[] = "(
 			".APP_ID.",
 			".$history_id.",
 			'".$r['name']."',
-			'".addslashes($old)."',
-			'".addslashes($new)."'
+			'".addslashes($r['old'])."',
+			'".addslashes($r['new'])."'
 		)";
-	}
 
 	$sql = "INSERT INTO `_history_edited` (
 				`app_id`,
