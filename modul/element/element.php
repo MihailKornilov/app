@@ -67,6 +67,15 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 				$el = _element('struct_title', $el, $G_DLG);
 
 			return $el['title'];
+
+		//скрытие блока при нулевом значении
+		case 'action231':
+			//здесь $prm - сама запись
+			if(empty($el['col']))
+				return false;
+			if(!empty($prm[$el['col']]))
+				return false;
+			return true;
 	}
 
 	return '';
@@ -1513,6 +1522,14 @@ function _element31_print11($el, $u) {
 		return '';
 
 	return _val31($el, $txt);
+}
+function _element31_action231($el, $u) {
+	if(!$col = @$el['col'])
+		return false;
+	if(!_idsAss(@$u[$col]))
+		return false;
+
+	return true;
 }
 function _val31($el, $txt) {//Выбор нескольких значений галочками [31] - вывод значения
 	if(!$sel = _idsAss($txt))

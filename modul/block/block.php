@@ -347,9 +347,7 @@ function _blockActionView($bl, $prm) {//условия отображения б
 			case 231:
 				if(!$el = _elemOne($act['initial_id']))
 					break;
-				if(empty($el['col']))
-					break;
-				if(!empty($u[$el['col']]))
+				if(!_element('action231', $el, $u))
 					break;
 
 				$bl['hidden'] = 1;
