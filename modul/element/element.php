@@ -23,7 +23,10 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 		case 'print': return '';
 
 		//вывод значения на экран через [11]
-		case 'print11': return _element('print', $el, $prm);
+		case 'print11':
+			$PARAM = _blockParam();
+			$PARAM['unit_get'] = $prm;
+			return _element('print', $el, $PARAM);
 
 		//структура элемента: колонки, поля, подсказки, действия, форматирование
 		case 'struct':       return _elementStruct($el);

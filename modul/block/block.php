@@ -55,7 +55,7 @@ function _blockHtml($obj_name, $obj_id, $PARAM=array(), $grid_id=0) {//выво�
 
 	return _blockLevel($block, $PARAM, $grid_id);
 }
-function _blockParam($PARAM, $obj_name='') {//значения-параметры, формирующие настройки блоков
+function _blockParam($PARAM=array(), $obj_name='') {//значения-параметры, формирующие настройки блоков
 	//если параметры получены, настройка не нужна
 	if(isset($arr['param_flag']))
 		return $PARAM;
@@ -180,7 +180,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		if($strHide = (!$PARAM['blk_setup'] && !$PARAM['elm_choose']))
 			foreach($xStr as $n => $rr) {
 				$xStr[$n] = _blockActionView($rr, $PARAM);
-				if(!$rr['hidden'])//если хотя бы один блок не скрыт, вся строка не будет скрыта
+				if(!$xStr[$n]['hidden'])//если хотя бы один блок не скрыт, вся строка не будет скрыта
 					$strHide = 0;
 			}
 

@@ -1598,7 +1598,7 @@ function _29cnnTitle($ids, $sp, $content=false) {//формирование со
 			return $title;
 		//сборный текст
 		case 44:
-			$prm = _blockParam(array());
+			$prm = _blockParam();
 			$prm['unit_get'] = $sp;
 			return _element44_print($el, $prm);
 	}
