@@ -762,7 +762,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 	//данные записи
 	if(!$u = $prm['unit_get'])
 		$u['id'] = 0;
-	if(@$u['deleted'])
+	if(!empty($u['deleted']))
 		return $txt;
 
 	if($prm['blk_setup'])
@@ -824,16 +824,18 @@ function _spisokUnitUrlId($el, $page_id, $u) {//получение id запис
 		return 0;
 	if(!$page = _page($page_id))
 		return $u['id'];
+	if(empty($page['dialog_id_unit_get']))
+		return $u['id'];
+	if(!empty($u['dialog_id_use']) && $u['dialog_id_use'] == $page['dialog_id_unit_get'])
+		return $u['id'];
+	if($el['dialog_id'] != 11)
+		return $u['id'];
+	if(!$elem_id = _idsFirst($el['txt_2']))
+		return $u['id'];
+	if(!$col = _elemCol($elem_id))
+		return $u['id'];
 
-	if(@$u['dialog_id_use'] != $page['dialog_id_unit_get'])
-		if($el['dialog_id'] == 11) {
-			if(!$ids = _ids($el['txt_2'], 'arr'))
-				return $u['id'];
-			if(!$col = _elemCol($ids[0]))
-				return $u['id'];
-			return is_array($u[$col]) ? $u[$col]['id'] : $u['id'];
-		}
-	return $u['id'];
+	return is_array($u[$col]) ? $u[$col]['id'] : $u['id'];
 }
 function _spisokUnitTT($el, $u, $txt='">') {//действие: подсказка [223]
 	if(empty($el['action']))

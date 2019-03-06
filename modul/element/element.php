@@ -1040,19 +1040,6 @@ function _element21_print($el) {
 
 /* [23] Список-таблица */
 function _element23_struct($el) {
-	/*
-		настройка шаблона через функцию PHP12_td_setup
-
-		Свойства ячеек:
-			num_8:          ячейка активна
-			width:          ширина колонки
-			font:           выделение: b, i, u
-			color:          цвет текста
-			url_action_id:  текст в колонке является ссылкой (действие [221])
-			txt_7:          TH-заголовок колонки
-			pos:            txt_8: позиция по горизонтали (l, center, r)
-	*/
-
 	return array(
 		'num_1'   => _num($el['num_1']),//id диалога, который вносит данные списка (шаблон которого будет настраиваться)
 		'num_2'   => _num($el['num_2']),//длина (количество строк, выводимых за один раз)
@@ -2190,7 +2177,7 @@ function _element57_print($el, $prm) {
 		   '<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
 }
 
-/* [58] Условия удаления записи */
+/* [58] Условия удаления записи (пока не используется) */
 function _element58_struct($el) {
 	/*
 		применяется при настройке диалога в удалении
@@ -6702,7 +6689,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 	if(!is_array($vvv))
 		jsonError('Данные не являются массивом');
 	if(!$type_id = _historyAct($v['act']))
-			jsonError('Неизвестное действие');
+		jsonError('Неизвестное действие');
 
 	define('HISTORY_ACT', $v['act']);
 	define('HISTORY_KEY', '67_'.$dialog_id.'_'.HISTORY_ACT);
@@ -6719,16 +6706,8 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 		$txt_9 = _txt($r['txt_9']);
 		if(!$txt_7 && !$txt_8)
 			continue;
-		if($id = _num($r['id'])) {
+		if($id = _num($r['id']))
 			$ids[] = $id;
-			//удаление ссылки, если не нужна
-			if(!_num($r['url'])) {
-				$sql = "DELETE FROM `_action`
-						WHERE `element_id`=".$id."
-						  AND `dialog_id`=221";
-				query($sql);
-			}
-		}
 		$update[] = "(
 			".$id.",
 			".$dialog['app_id'].",
@@ -6747,7 +6726,7 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 
 	//удаление элементов, которые были удалены
 	$sql = "DELETE FROM `_element`
-			WHERE `id` IN ("._ids($dialog[HISTORY_ACT.'_history_elem']).")
+			WHERE `id` IN ("._idsGet($dialog[HISTORY_ACT.'_history_elem']).")
 			  AND `id` NOT IN ("._ids($ids).")";
 	query($sql);
 
@@ -6807,9 +6786,10 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 
 	_BE('dialog_clear');
 	_BE('elem_clear');
-	$dialog = _dialogQuery($dialog_id);
 
-	$send['tmp'] = $dialog[HISTORY_ACT.'_history_tmp'];
+	$dialog = _dialogQuery($dialog_id);
+	$send['tmp'] = _dialogSetupHistoryTmp($dialog[HISTORY_ACT.'_history_elem']);
+
 	jsonSuccess($send);
 }
 function PHP12_history_setup_vvv($prm) {//получение значений для настройки истории действий
@@ -6822,35 +6802,18 @@ function PHP12_history_setup_vvv($prm) {//получение значений д
 	if(!$arr = $DLG[$act.'_history_elem'])
 		return array();
 
-	//получение действий (переход по ссылке), настроенных для ячеек
-	$sql = "SELECT `element_id`,`id`
-			FROM `_action`
-			WHERE `element_id` IN ("._idsGet($arr).")
-			  AND `dialog_id`=221";
-	$url = query_ass($sql);
-
-	$send = array();
 	foreach($arr as $id => $r) {
 		$c = 0;
 		if($r['txt_9']) {
 			$vv = htmlspecialchars_decode($r['txt_9']);
-			$arr = json_decode($vv, true);
-			$c = count($arr);
+			$vv = json_decode($vv, true);
+			$c = count($vv);
 		}
-		$send[] = array(
-			'id' => $id,
-			'dialog_id' => $r['dialog_id'],
-			'font' => $r['font'],
-			'color' => $r['color'],
-			'title' => _element('title', $r),
-			'txt_7' => $r['txt_7'],
-			'txt_8' => $r['txt_8'],
-			'c' => $c,//количество условий
-			'txt_9' => $r['txt_9'],
-			'url_action_id' => 0//_num(@$url[$id])
-		);
+		$arr[$id]['c'] = $c;
+		$arr[$id]['title'] = _element('title', $r);
+		unset($arr[$id]['action']);
 	}
-	return _arrNum($send);
+	return ($arr);
 }
 
 function _historyAct($i='all') {//действия истории - ассоциативный массив
@@ -7121,31 +7084,15 @@ function _historyKit($el, $prm) {//составление одной сборк�
 		}
 	}
 
-
 	if(!$el['dialog_id'])
 		return $el['txt_7'].$el['txt_8'];
-
-	switch($el['dialog_id']) {
-		case 11:
-			$first = _idsFirst($el['txt_2']);
-			if(!$ell = _elemOne($first))
-				return '';
-			if(!$col = $ell['col'])
-				return '';
-			if(empty($u[$col]))
-				return '';
-			break;
-	}
-
 	if(!$txt = _elemPrint($el, $prm))
 		return '';
 
-	$cls = array('');
-//	$cls = array('wsnw');
-	if($el['font'])
-		$cls[] = $el['font'];
-	if($el['color'])
-		$cls[] = $el['color'];
+	$cls = array();
+	$cls[] = $el['font'];
+	$cls[] = $el['color'];
+	$cls = array_diff($cls, array(''));
 	$cls = implode(' ', $cls);
 	$txt = _elemFormatHide($el, $txt);
 	$txt = _elemFormatDigital($el, $txt);

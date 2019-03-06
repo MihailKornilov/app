@@ -1131,8 +1131,6 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 	if($i == 'dialog_clear') {
 		_cache_clear('DIALOG');
 		_cache_clear('DIALOG', 1);
-		_cache_clear('dialog_del_cond');
-		_cache_clear('dialog_del_cond', 1);
 		$_DQ = array();
 		$BE_FLAG = 0;
 	}
@@ -1179,16 +1177,18 @@ function _beDlg($app_id=0) {//получение данных диалогов �
 		if(!$DLG = query_arr($sql))
 			return array();
 
-		$DLG = _beDlgHistory($DLG, $global);
+		$DLG = _beDlgHistory($DLG, $app_id);
+		$DLG = _beDlgDelCond($DLG);
 		_cache_set($key, $DLG, $global);
 	}
 
 	$DLG = _beDlgField($DLG);
-	$DLG = _beDlgDelCond($DLG, $global);
 
 	return $DLG;
 }
-function _beDlgHistory($DLG, $global) {//вставка шаблонов истории действий в диалоги
+function _beDlgHistory($DLG, $app_id) {//вставка шаблонов истории действий в диалоги
+	$global = $app_id ? 0 : 1;
+
 	//сбор ID элементов со всех диалогов, составляющих шаблоны истории
 	$elemIds = array();
 	foreach($DLG as $id => $r) {
@@ -1225,16 +1225,18 @@ function _beDlgHistory($DLG, $global) {//вставка шаблонов ист�
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id` IN (".$elemIds.")";
-	$arr = query_arr($sql);
+	if($arr = query_arr($sql))
+		$arr = _beElemAction($arr, $app_id);
+
 	foreach($DLG as $id => $r)
 		foreach(_historyAct() as $name => $i) {
 			$nm = $name.'_history_elem';
-			$DLG[$id][$nm] = _beDlgHistoryUpd($r[$nm], $arr);
+			$DLG[$id][$nm] = _beDlgHistoryEl($r[$nm], $arr);
 		}
 
 	return $DLG;
 }
-function _beDlgHistoryUpd($ids, $arr) {//получение массива из элементов для истории
+function _beDlgHistoryEl($ids, $arr) {//получение массива из элементов для истории
 	if(!$ids)
 		return array();
 
@@ -1246,7 +1248,8 @@ function _beDlgHistoryUpd($ids, $arr) {//получение массива из 
 
 		//один элемент истории
 		$el = $arr[$id];
-		$send[] = array(
+
+		$u = array(
 			'id' => _num($el['id']),
 			'dialog_id' => _num($el['dialog_id']),
 			'font' => $el['font'],
@@ -1256,6 +1259,10 @@ function _beDlgHistoryUpd($ids, $arr) {//получение массива из 
 			'txt_8' => $el['txt_8'],//текст справа
 			'txt_9' => $el['txt_9'] //условия [40]
 		);
+		if(!empty($el['action']))
+			$u['action'] = $el['action'];
+
+		$send[] = $u;
 	}
 
 	return $send;
@@ -1287,38 +1294,31 @@ function _beDlgField($DLG) {//вставка колонок таблиц в ди
 
 	return $DLG;
 }
-function _beDlgDelCond($dlg, $global) {//дополнительные условия удаления записи
-	if(empty($dlg))
+function _beDlgDelCond($DLG) {//дополнительные условия удаления записи
+	if(empty($DLG))
 		return array();
 
-	foreach($dlg as $id => $r)
-		$dlg[$id]['del_cond']['num_2'] = 0;
+	foreach($DLG as $id => $r)
+		$DLG[$id]['del_cond']['num_2'] = 0;
 
-	$key = 'dialog_del_cond';
-
-	if(!$arr = _cache_get($key, $global)) {
-
-		if(_cache_isset($key, $global))
-			return $dlg;
-
-		$sql = "/* ".__FUNCTION__.":".__LINE__." */
-				SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=58
-				  AND `num_1` IN ("._idsGet($dlg).")
-				  AND `num_2`";
-		$arr = array();
-		foreach(query_arr($sql) as $id => $el)
-			$arr[$id] = _element('struct', $el);
-		_cache_set($key, $arr, $global);
-	}
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=58
+			  AND `num_1` IN ("._idsGet($DLG).")
+			  AND `num_2`";
+	if(!$arr = query_arr($sql))
+		return $DLG;
 
 	foreach($arr as $r) {
-		$dlg_id = $r['num_1'];
-		$dlg[$dlg_id]['del_cond']['num_2'] = _num($r['num_2']);
+		if(!$dlg_id = $r['num_1'])
+			continue;
+		if(empty($DLG[$dlg_id]))
+			continue;
+
+		$DLG[$dlg_id]['del_cond']['num_2'] = 1;
 	}
 
-	return $dlg;
+	return $DLG;
 }
 
 function _beBlock($app_id=0) {//кеш блоков
@@ -1454,6 +1454,7 @@ function _beElem($app_id=0) {
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `app_id`=".$app_id."
+				  AND `dialog_id`!=58
 				  AND !`parent_id`
 				  AND `id` NOT IN (".$IDS_HIST.")
 				ORDER BY `id`";
@@ -1488,25 +1489,32 @@ function _beElem($app_id=0) {
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `app_id`=".$app_id."
+				  AND `dialog_id`!=58
 				  AND `parent_id`
 				  AND `id` NOT IN (".$IDS_HIST.")
 				ORDER BY `parent_id`,`sort`";
-		foreach(query_arr($sql) as $el) {
-			$pid = $el['parent_id'];
-			if(empty($ELM[$pid]))
-				continue;
-			if(!isset($ELM[$pid]['vvv']))
-				$ELM[$pid]['vvv'] = array();
+		if($ELMCH = query_arr($sql)) {
+			$ELMCH = _beElemAction($ELMCH, $app_id);
+			foreach($ELMCH as $id => $el) {
+				$pid = $el['parent_id'];
+				if(empty($ELM[$pid]))
+					continue;
+				if(!isset($ELM[$pid]['vvv']))
+					$ELM[$pid]['vvv'] = array();
+	
+				if(!empty($el['dialog_id']))
+					if($el['dialog_id'] == 11)
+						$el = _element11_struct_title($el, $ELM, $G_DLG);
+					else
+						$el = _element('struct_title', $el, $G_DLG);
+	
+				$el = _element('struct_vvv', $ELM[$pid], $el);
 
-			if(!empty($el['dialog_id']))
-				if($el['dialog_id'] == 11)
-					$el = _element11_struct_title($el, $ELM, $G_DLG);
-				else
-					$el = _element('struct_title', $el, $G_DLG);
+				if(!empty($ELMCH[$id]['action']))
+					$el['action'] = $ELMCH[$id]['action'];
 
-			$el = _element('struct_vvv', $ELM[$pid], $el);
-
-			$ELM[$pid]['vvv'][] = $el;
+				$ELM[$pid]['vvv'][] = $el;
+			}
 		}
 
 		_cache_set($key, $ELM, $global);

@@ -4194,12 +4194,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 				attr_el:'#inp_' + NUM,//требуется для настройки стилей в выплывающем окне
 				font:'',  //выделение: b, i, u
-				color:'', //цвет текста
-				url_action_id:0//значение элемента является ссылкой
+				color:''  //цвет текста
 			}, v || {});
 
 			DL.append(
-				'<dd class="over3" val="' + v.id + '" data-url="' + v.url_action_id + '">' +
+				'<dd class="over3" val="' + v.id + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
@@ -4272,7 +4271,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			//отображение выплывающего окна настройки стилей
 			TITLE.mouseenter(function() {
-				if(!v.id)
+				if(!v.dialog_id)
 					return;
 				if(TITLE.hasClass('hold'))
 					return;
@@ -4282,7 +4281,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<td class="pt3">' + _elemUnitColor(v) +
 								'<td class="pt3">' + _elemUnitFormat(v) +
 								'<td class="pt3">' +
-									'<div class="icon-wiki iw12 ml3' + _dn(v.url_action_id, 'on') + _tooltip('Ссылка', -22) + '</div>' +
+									'<div class="icon-wiki iw12 ml3' + _tooltip('Ссылка', -22) + '</div>' +
 						'</table>',
 					side:'top',
 					ugPos:'left',
@@ -4302,13 +4301,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							}
 
 							_dialogLoad({
-								dialog_id:221,
+								dialog_id:220,
 								element_id:v.id,
-								edit_id:v.url_action_id,
 								busy_obj:$(this),
 								func_save:function(res) {
-									DD.attr('data-url', res.unit.id);
-									v.url_action_id = res.unit.id;
 								}
 							});
 						});
@@ -4348,9 +4344,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					u.color = k;
 					break;
 				}
-
-			//ссылка (действие [221])
-			u.url = _num(sp.attr('data-url'));
 
 			send.push(u);
 		});
