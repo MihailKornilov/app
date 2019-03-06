@@ -654,7 +654,7 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 			$txt = _elemFormatDigital($td, $txt);
 			$txt = _spisokUnitUrl($td, $prm, $txt);//таблица
 
-			$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;//$txt;
+			$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
 		}
 		$MASS[$uid] = $TR;
 	}

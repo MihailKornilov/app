@@ -12,17 +12,18 @@
 		9. Значения для JS
 	   10. Действия
 	   11. Подсказки
-	   12. Элемент [11]:
-			a) Является ли изображением
-			б)
+	   12. Элемент [11]: вывод значения {print11}
 	   13. Форматирование
 	   14. Правила
 */
 
-function _elementType($type, $el=array()) {//все возможные варианты манипуляций
+function _elementType($type, $el=array(), $prm=array()) {//все возможные варианты манипуляций
 	switch($type) {
 		//вывод элемента на экран
 		case 'print': return '';
+
+		//вывод значения на экран через [11]
+		case 'print11': return _element('print', $el, $prm);
 
 		//структура элемента: колонки, поля, подсказки, действия, форматирование
 		case 'struct':       return _elementStruct($el);
@@ -175,7 +176,7 @@ function _element($type, $el, $prm=array()) {//все манипуляции, с
 	if(function_exists($fname))
 		return $fname($el, $prm);
 
-	return _elementType($type, $el);
+	return _elementType($type, $el, $prm);
 }
 
 /* [1] Галочка */
@@ -186,6 +187,10 @@ function _element1_struct($el) {
 		'txt_1' => $el['txt_1'] //текст для галочки
 	) + _elementStruct($el);
 }
+function _element1_struct_title($el) {
+	$el['title'] = '<div class="icon icon-ok curD"></div>';
+	return $el;
+}
 function _element1_print($el, $prm) {
 	return _check(array(
 		'attr_id' => _elemAttrId($el, $prm),
@@ -193,6 +198,17 @@ function _element1_print($el, $prm) {
 		'disabled' => $prm['blk_setup'],
 		'value' => _elemPrintV($el, $prm, $el['def'])
 	));
+}
+function _element1_print11($el, $u) {
+	if(empty($el['col']))
+		return '';
+
+	$col = $el['col'];
+
+	if(empty($u[$col]))
+		return '';
+
+	return $el['title'];
 }
 
 /* [2] Кнопка */
@@ -403,6 +419,18 @@ function _element5_print($el, $prm) {
 		_elemPrintV($el, $prm).
 	'</textarea>';
 }
+function _element5_print11($el, $u) {
+	if(empty($el['col']))
+		return '';
+
+	$col = $el['col'];
+
+	if(!$txt = @$u[$col])
+		return '';
+
+	$txt = _spisokColSearchBg($el['elp'], $txt);
+	return _br($txt);
+}
 
 /* [6] Select: выбор страницы */
 function _element6_struct($el) {
@@ -516,6 +544,18 @@ function _element8_print($el, $prm) {
 
 	return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
 }
+function _element8_print11($el, $u) {
+	if(empty($el['col']))
+		return '';
+
+	$col = $el['col'];
+
+	if(!$txt = @$u[$col])
+		return '';
+
+	$txt = _spisokColSearchBg($el['elp'], $txt);
+	return _br($txt);
+}
 
 /* [9] Поле-пароль */
 function _element9_struct($el) {
@@ -589,13 +629,19 @@ function _element11_struct($el, $ELM=array()) {
 
 	return $send;
 }
-function _element11_struct_title($el, $ELM, $DLGS) {
+function _element11_struct_title($el, $ELM, $DLGS=array()) {
 	$el['title'] = '';
 	foreach(_ids($el['txt_2'], 'arr') as $id) {
 		if(!isset($ELM[$id]))
 			return $el;
 
 		$ell = $ELM[$id];
+
+		//для изображения путь не пишется
+		if($ell['dialog_id'] == 60) {
+			$el['title'] = _imageNo($el['width'], $el['num_8']);
+			return $el;
+		}
 
 		//вложенное значение
 		if(_elemIsConnect($ell)) {
@@ -608,8 +654,41 @@ function _element11_struct_title($el, $ELM, $DLGS) {
 	}
 	return $el;
 }
+function _element11_js($el) {
+	return array(
+		'num_7' => $el['num_7'],//[60] ограничение высоты
+		'num_8' => $el['num_8'] //[60] закруглённые углы
+	) + _elementJs($el);
+}
 function _element11_print($el, $prm) {
-	return _elem11($el, $prm);
+	if(!$u = @$prm['unit_get'])
+		return $el['title'];
+
+	foreach(_ids($el['txt_2'], 'arr') as $id) {
+		if(!$ell = _elemOne($id))
+			return _msgRed('-ell-yok-');
+
+		if(!_elemIsConnect($ell)) {
+			$ell['elp'] = $el;//вставка родительского элемента (для подсветки при быстром поиске)
+			return _element('print11', $ell, $u);
+		}
+
+		if(empty($ell['col']))
+			return _msgRed('-cnn-col-yok-');
+
+		$col = $ell['col'];
+		$u = $u[$col];
+
+		if(is_array($u))
+			continue;
+
+		if($ell['dialog_id'] == 29)
+			return '';
+
+		return _msgRed('значение отсутствует');
+	}
+
+	return _msgRed('-11-yok-');
 }
 
 /* [12] Функция PHP (SA) */
@@ -795,6 +874,20 @@ function _element16_print($el, $prm) {
 		'disabled' => $prm['blk_setup']
 	));
 }
+function _element16_print11($el, $u) {
+	if(!$col = @$el['col'])
+		return '';
+	if(!$id = _num($u[$col]))
+		return '';
+	if(empty($el['vvv']))
+		return '';
+
+	foreach($el['vvv'] as $vv)
+		if($vv['id'] == $id)
+			return $vv['title'];
+
+	return '';
+}
 function _element16_vvv($el) {
 	//значения из существующего (другого) элемента
 	if($el['num_2'] == 3877) {
@@ -856,6 +949,20 @@ function _element17_print($el, $prm) {
 		'value' => _elemPrintV($el, $prm, $el['def'])
 	));
 }
+function _element17_print11($el, $u) {
+	if(!$col = @$el['col'])
+		return '';
+	if(!$id = _num($u[$col]))
+		return '';
+	if(empty($el['vvv']))
+		return '';
+
+	foreach($el['vvv'] as $vv)
+		if($vv['id'] == $id)
+			return $vv['title'];
+
+	return '';
+}
 
 /* [18] Dropdown */
 function _element18_struct($el) {
@@ -893,6 +1000,20 @@ function _element18_print($el, $prm) {
 		'placeholder' => $el['txt_1'],
 		'value' => _elemPrintV($el, $prm, $el['def'])
 	));
+}
+function _element18_print11($el, $u) {
+	if(!$col = @$el['col'])
+		return '';
+	if(!$id = _num($u[$col]))
+		return '';
+	if(empty($el['vvv']))
+		return '';
+
+	foreach($el['vvv'] as $vv)
+		if($vv['id'] == $id)
+			return $vv['title'];
+
+	return '';
 }
 
 /* [21] Информационный блок */
@@ -952,6 +1073,7 @@ function _element23_struct_vvv($el, $cl) {
 	return array(
 		'id'        => _num($cl['id']),
 		'title'     => $cl['title'],
+		'parent_id' => _num($cl['parent_id']),
 		'dialog_id' => _num($cl['dialog_id']),
 		'width'     => _num($cl['width']),
 		'font'      => $cl['font'],
@@ -1065,11 +1187,17 @@ function _element27_struct($el) {
 		настройка значений через PHP12_balans_setup
 	*/
 	return array(
-		'num_1'   => _num($el['num_1'])//включение счётчика
+		'num_3'   => _num($el['num_3'])//включение счётчика
 	) + _elementStruct($el);
 }
 function _element27_print($el) {
 	return $el['name'];
+}
+function _element27_print11($el, $u) {
+	if(!$col = @$el['col'])
+		return '';
+
+	return @$u[$col];
 }
 function _element27_struct_vvv($el, $cl) {
 	return array(
@@ -1375,6 +1503,14 @@ function _element31_print($el, $prm) {
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 	$chk;
 }
+function _element31_print11($el, $u) {
+	if(!$col = @$el['col'])
+		return '';
+	if(!$txt = @$u[$col])
+		return '';
+
+	return _val31($el, $txt);
+}
 function _val31($el, $txt) {//Выбор нескольких значений галочками [31] - вывод значения
 	if(!$sel = _idsAss($txt))
 		return '';
@@ -1408,7 +1544,7 @@ function _element32_struct_title($el) {
 	return $el;
 }
 function _element32_print($el, $prm) {
-	if(!$u = $prm['unit_get'])
+	if(!$u = @$prm['unit_get'])
 		return $el['title'];
 
 	$num = empty($u['num']) ? $u['id'] : $u['num'];
@@ -1548,6 +1684,12 @@ function _element35_print($el, $prm) {
 				'width' => $el['width'],
 				'value' => _elemPrintV($el, $prm, $el['def'])
 		   ));
+}
+function _element35_print11($el, $u) {
+	if(!$col = @$el['col'])
+		return '';
+
+	return @$u[$col];
 }
 function _element35_vvv($el) {
 	if($el['num_1'] != 3682)
@@ -1857,7 +1999,7 @@ function _element44_print($el, $prm) {
 
 	$send = '';
 	foreach($el['vvv'] as $ell) {
-		$send .= _elemPrint($ell, $prm);
+		$send .= _element('print', $ell, $prm);
 		if($ell['num_8'])
 			$send .= ' ';
 	}
@@ -1913,6 +2055,23 @@ function _element51_print($el, $prm) {
 		'value' => _elemPrintV($el, $prm)
 	));
 }
+function _element51_print11($el, $u) {
+	if(!$col = @$el['col'])
+		return '';
+	if(!$txt = @$u[$col])
+		return '';
+	if($txt == '0000-00-00')
+		return '-';
+	if($el['num_2'] && $txt == '0000-00-00 00:00:00')
+		return '';
+
+	$v = FullData($txt);
+	if($el['num_2'])
+		$v .= ' в '._num(substr($txt, 11, 2)).
+				':'.substr($txt, 14, 2);
+
+	return $v;
+}
 
 /* [52] Заметки */
 function _element52_struct($el) {
@@ -1935,6 +2094,12 @@ function _element54_struct($el) {
 function _element54_print($el) {
 	return $el['name'];
 }
+function _element54_print11($el, $u) {
+	if(!$col = @$el['col'])
+		return '';
+
+	return @$u[$col];
+}
 
 /* [55] Сумма значений привязанного списка */
 function _element55_struct($el) {
@@ -1950,6 +2115,12 @@ function _element55_struct($el) {
 }
 function _element55_print($el) {
 	return $el['name'];
+}
+function _element55_print11($el, $u) {
+	if(!$col = @$el['col'])
+		return '';
+
+	return @$u[$col];
 }
 
 /* [57] Меню переключения блоков */
@@ -2021,6 +2192,7 @@ function _element59_struct($el) {
 }
 function _element59_js($el) {
 	return array(
+		'num_1' => _num($el['num_1']),
 		'num_4' => _num($el['num_4'])
 	) + _elementJs($el);
 }
@@ -2059,6 +2231,16 @@ function _element60_struct_title($el) {
 }
 function _element60_print($el, $prm) {
 	return _image($el, $prm);
+}
+function _element60_print11($el, $u) {
+	$EL = $el['elp'];
+
+	if(!$col = @$el['col'])
+		return _imageNo($EL['width'], $EL['num_8']);
+	if(empty($u[$col]['id']))
+		return _imageNo($EL['width'], $EL['num_8']);
+
+	return _imageHtml($u[$col], $EL['width'], $EL['num_7'], $EL['num_8']);
 }
 
 /* [62] Фильтр: галочка */
@@ -3989,7 +4171,7 @@ function _elemRule($i='all', $v=0) {//кеш правил для элемент�
 }
 
 function _elemOne($elem_id, $upd=false) {//запрос одного элемента
-	global $BE_FLAG;
+	global $BE_FLAG, $G_DLG;
 
 	//обновление данных элемента в кеше
 	if($upd) {
@@ -4004,6 +4186,7 @@ function _elemOne($elem_id, $upd=false) {//запрос одного элеме�
 		if(_cache_isset($key, $global)) {
 			$ELM = _cache_get($key, $global);
 			$el = _element('struct', $el);
+			$el = _element('struct_title', $el, $G_DLG);
 			$el = _beElemDlg($el);
 			$ELM[$elem_id] = $el;
 			_cache_set($key, $ELM, $global);
@@ -4306,154 +4489,6 @@ function _elem_11_dialog($el) {//получение данных диалога 
 	return $dlg;
 }
 
-function _elem11($el, $prm) {//отображение элемента, вставленного через диалог [11]
-	if(!$unit = $prm['unit_get'])
-		return _elem11title($el);
-
-	foreach(_ids($el['txt_2'], 'arr') as $id) {
-		if(!$ell = _elemOne($id))
-			return _msgRed('-ell-yok-');
-		//вложенное значение становится записью
-		if(_elemIsConnect($ell)) {
-			if(!$col = $ell['col'])
-				return _msgRed('-cnn-col-yok-');
-			$unit = $unit[$col];
-			if(!is_array($unit)) {
-				if($ell['dialog_id'] == 29)
-					return '';//$ell['txt_1'];
-				return _msgRed('значение отсутствует');
-			}
-			continue;
-		}
-		return _elem11one($el, $ell, $unit);
-	}
-
-	return _msgRed('-11-yok-');
-}
-function _elem11one($EL, $ell, $unit) {//прямая ссылка на элемент через [11]
-	switch($ell['dialog_id']) {
-		//произвольный текст
-		case 10: return _br($ell['txt_1']);
-		//сборный текст
-		case 44:
-			$prm = _blockParam(array());
-			$prm['unit_get'] = $unit;
-			return _element44_print($ell, $prm);
-	}
-
-	/* --- Вывод из данных записи по колонке --- */
-
-	//не присвоена колонка элементу 11
-	if(!$col = $ell['col'])
-		return _msgRed('no-11-col.'.$ell['dialog_id']);
-
-	//получение имени колонки из элемента родительского диалога
-	if($elem_id = _num($col)) {
-		if(!$el = _elemOne($elem_id))
-			return _msgRed('no-elp.'.$elem_id);
-		if(!$col = $el['col'])
-			return _msgRed('no-elp-col.'.$ell['dialog_id']);
-	}
-
-	//колонки в записи не существует
-	if(!isset($unit[$col]))
-		return _msgRed('no-u-val.'.$ell['dialog_id']);
-
-	$txt = $unit[$col];
-
-	switch($ell['dialog_id']) {
-		//галочка
-		case 1:
-			if(!$txt)
-				return '';
-			return '<div class="icon icon-ok curD"></div>';
-
-		//textarea (многострочное текстовое поле)
-		case 5:
-
-		//input:text (однострочное текстовое поле)
-		case 8:
-			$txt = _spisokColSearchBg($EL, $txt);
-			return _br($txt);
-
-		//Radio - произвольные значения
-		case 16:
-		case 17:
-		case 18:
-			if(!$id = _num($txt))
-				return _msgRed('11.radio.empty');
-			if(!$dop = _elemOne($id))
-				return _msgRed('no-16-dop');
-
-			return $dop['txt_1'];
-
-		//сумма значений единицы списка (баланс)
-		case 27:
-		//количество связанного списка
-		case 54:
-		//сумма связанного списка
-		case 55: return $txt;
-
-		//Выбор нескольких значений галочками
-		case 31: return _val31($ell, $txt);
-
-		//Количество
-		case 35: return $txt;
-
-		//Календарь
-		case 51:
-			if($txt == '0000-00-00')
-				return '-';
-			if($ell['num_2'] && $txt == '0000-00-00 00:00:00')
-				return '';
-
-			$v = FullData($txt);
-			if($ell['num_2'])
-				$v .= ' в '._num(substr($txt, 11, 2)).
-						':'.substr($txt, 14, 2);
-
-			return $v;
-
-		//Изображение
-		case 60:
-			if(empty($txt))
-				return _imageNo($EL['width'], $EL['num_8']);
-
-			return _imageHtml($txt, $EL['width'], $EL['num_7'], $EL['num_8']);
-	}
-
-
-	return '11.'.$ell['dialog_id'].'.one';
-}
-function _elem11title($EL) {//имя элемента, если нет записи
-	$title = '';
-	foreach(_ids($EL['txt_2'], 'arr') as $id) {
-		if(!$ell = _elemOne($id))
-			return _msgRed('-ell-yok-');
-
-		//вложенное значение
-		if(_elemIsConnect($ell)) {
-			$dlg = _dialogQuery($ell['num_1']);
-			$title .= $dlg['name'].' » ';
-			continue;
-		}
-
-		$title .= @$ell['name'];
-
-		switch($ell['dialog_id']) {
-			//произвольный текст
-			case 10: return $ell['txt_1'];
-			//Изображение
-			case 60: return _imageNo($EL['width'], $EL['num_8']);
-		}
-	}
-
-	if(!$title)
-		return '11.title';
-
-	return $title;
-}
-
 function _elemIdsTitle($v) {//получение имён по id элементов
 	if(!$ids = _ids($v, 'arr'))
 		return '';
@@ -4465,7 +4500,6 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 
 	return $send;
 }
-
 function _elemUids($ids, $u) {//получение значения записи по идентификаторам элементов (в основном для [11])
 	if(empty($u))
 		return '';
