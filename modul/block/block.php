@@ -1254,6 +1254,7 @@ function _beDlgHistoryEl($ids, $arr) {//получение массива из �
 			'dialog_id' => _num($el['dialog_id']),
 			'font' => $el['font'],
 			'color' => $el['color'],
+			'txt_1' => $el['txt_1'],//для [10]
 			'txt_2' => $el['txt_2'],//ids из [11]
 			'txt_7' => $el['txt_7'],//текст слева
 			'txt_8' => $el['txt_8'],//текст справа

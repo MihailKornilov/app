@@ -28,6 +28,9 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 			$PARAM['unit_get'] = $prm;
 			return _element('print', $el, $PARAM);
 
+		//печать значения истории действий
+		case 'history': return $prm;
+
 		//структура элемента: колонки, поля, подсказки, действия, форматирование
 		case 'struct':       return _elementStruct($el);
 		case 'struct_title':
@@ -50,7 +53,7 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 				return array();
 			return _elementJs($el);
 
-		//получение имени (описания) элемента
+		//получение названия элемента
 		case 'title':
 			if(!empty($el['title']))
 				return $el['title'];
@@ -221,6 +224,9 @@ function _element1_print11($el, $u) {
 		return '';
 
 	return $el['title'];
+}
+function _element1_history($el, $v) {
+	return _daNet($v);
 }
 
 /* [2] Кнопка */
@@ -921,6 +927,13 @@ function _element16_vvv($el) {
 	return array();
 
 }
+function _element16_history($el, $v) {
+	foreach($el['vvv'] as $vv)
+		if($vv['id'] == $v)
+			return $vv['title'];
+
+	return '';
+}
 
 /* [17] Select: произвольные значения */
 function _element17_struct($el) {
@@ -1510,13 +1523,16 @@ function _element31_print11($el, $u) {
 
 	return _val31($el, $txt);
 }
+function _element31_history($el, $v) {
+	return _val31($el, $v);
+}
 function _element31_action231($el, $u) {
 	if(!$col = @$el['col'])
-		return false;
+		return true;
 	if(!_idsAss(@$u[$col]))
-		return false;
+		return true;
 
-	return true;
+	return false;
 }
 function _val31($el, $txt) {//Выбор нескольких значений галочками [31] - вывод значения
 	if(!$sel = _idsAss($txt))
@@ -2078,6 +2094,9 @@ function _element51_print11($el, $u) {
 				':'.substr($txt, 14, 2);
 
 	return $v;
+}
+function _element51_history($el, $v) {
+	return FullData($v);
 }
 
 /* [52] Заметки */
@@ -6885,7 +6904,7 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 			continue;
 
 		$hidden = false;//скрытые элементы в историю не попадают
-		$dlg_id = 0;
+		$el = array();
 		$name = '';
 		foreach($dialog['cmp'] as $cmp_id => $cmp) {
 			if(empty($cmp['col']))
@@ -6903,34 +6922,22 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 				break;
 			}
 			if(_elemIsConnect($cmp)) {
-				$name = $cmp['name'];
+				$hidden = true;
+//				$name = $cmp['name'];
 				break;
 			}
-			$dlg_id = $cmp['dialog_id'];
-			$name = _element('title', $cmp);
+			$el = $cmp;
+			$name = $cmp['name'];
 			break;
 		}
 
 		if($hidden)
 			continue;
 
-		$old = $v;
-		$new = $unit[$i];
-
-		//подмена значений в соответствии с диалогом
-		switch($dlg_id) {
-			//галочка
-			case 1:
-				$old = _daNet($old);
-				$new = _daNet($new);
-				break;
-		}
-
-
 		$edited[] = array(
 			'name' => $name,
-			'old' => $old,
-			'new' => $new
+			'old' => _element('history', $el, $v),
+			'new' => _element('history', $el, $unit[$i])
 		);
 	}
 
@@ -6942,12 +6949,12 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 	$insert = array();
 	foreach($edited as $r) {
 		$old = $r['old'];
-		if(is_array($old))
-			$old = $old['txt_1'];
+//		if(is_array($old))
+//			$old = $old['txt_1'];
 
 		$new = $r['new'];
-		if(is_array($new))
-			$new = $new['txt_1'];
+//		if(is_array($new))
+//			$new = $new['txt_1'];
 
 		$insert[] = "(
 			".APP_ID.",
@@ -7086,7 +7093,7 @@ function _historyKit($el, $prm) {//составление одной сборк�
 
 	if(!$el['dialog_id'])
 		return $el['txt_7'].$el['txt_8'];
-	if(!$txt = _elemPrint($el, $prm))
+	if(!$txt = _element('print', $el, $prm))
 		return '';
 
 	$cls = array();
