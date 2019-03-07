@@ -65,12 +65,7 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 			if(empty($el['dialog_id']))
 				return '';
 
-			global $G_DLG, $G_ELEM;
-
-			if($el['dialog_id'] == 11)
-				$el = _element11_struct_title($el, $G_ELEM, $G_DLG);
-			else
-				$el = _element('struct_title', $el, $G_DLG);
+			$el = _elementTitle($el);
 
 			return $el['title'];
 
@@ -130,6 +125,16 @@ function _elementStruct($el) {//структура элемента - базов
 		$send['eadi'] = _num($el['eadi']);
 
 	return $send;
+}
+function _elementTitle($el) {//вставка title элемента (после сформированного кеша)
+	global $G_DLG, $G_ELEM;
+
+	if($el['dialog_id'] == 11)
+		$el = _element11_struct_title($el, $G_ELEM, $G_DLG);
+	else
+		$el = _element('struct_title', $el, $G_DLG);
+
+	return $el;
 }
 function _elementJs($el) {//структура элемента для JS
 	$send = array(
@@ -218,11 +223,8 @@ function _element1_print($el, $prm) {
 	));
 }
 function _element1_print11($el, $u) {
-	if(empty($el['col']))
+	if(!$col = _elemCol($el))
 		return '';
-
-	$col = $el['col'];
-
 	if(empty($u[$col]))
 		return '';
 
@@ -441,11 +443,8 @@ function _element5_print($el, $prm) {
 	'</textarea>';
 }
 function _element5_print11($el, $u) {
-	if(empty($el['col']))
+	if(!$col = _elemCol($el))
 		return '';
-
-	$col = $el['col'];
-
 	if(!$txt = @$u[$col])
 		return '';
 
@@ -566,15 +565,13 @@ function _element8_print($el, $prm) {
 	return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
 }
 function _element8_print11($el, $u) {
-	if(empty($el['col']))
+	if(!$col = _elemCol($el))
 		return '';
-
-	$col = $el['col'];
-
 	if(!$txt = @$u[$col])
 		return '';
 
 	$txt = _spisokColSearchBg($el['elp'], $txt);
+
 	return _br($txt);
 }
 
@@ -896,7 +893,7 @@ function _element16_print($el, $prm) {
 	));
 }
 function _element16_print11($el, $u) {
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return '';
 	if(!$id = _num($u[$col]))
 		return '';
@@ -978,7 +975,7 @@ function _element17_print($el, $prm) {
 	));
 }
 function _element17_print11($el, $u) {
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return '';
 	if(!$id = _num($u[$col]))
 		return '';
@@ -1030,7 +1027,7 @@ function _element18_print($el, $prm) {
 	));
 }
 function _element18_print11($el, $u) {
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return '';
 	if(!$id = _num($u[$col]))
 		return '';
@@ -1234,7 +1231,7 @@ function _element27_print($el) {
 	return $el['name'];
 }
 function _element27_print11($el, $u) {
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return '';
 
 	return @$u[$col];
@@ -1564,7 +1561,7 @@ function _element31_print($el, $prm) {
 	$chk;
 }
 function _element31_print11($el, $u) {
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return '';
 	if(!$txt = @$u[$col])
 		return '';
@@ -1757,7 +1754,7 @@ function _element35_print($el, $prm) {
 		   ));
 }
 function _element35_print11($el, $u) {
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return '';
 
 	return @$u[$col];
@@ -2127,7 +2124,7 @@ function _element51_print($el, $prm) {
 	));
 }
 function _element51_print11($el, $u) {
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return '';
 	if(!$txt = @$u[$col])
 		return '';
@@ -2169,7 +2166,7 @@ function _element54_print($el) {
 	return $el['name'];
 }
 function _element54_print11($el, $u) {
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return '';
 
 	return @$u[$col];
@@ -2191,7 +2188,7 @@ function _element55_print($el) {
 	return $el['name'];
 }
 function _element55_print11($el, $u) {
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return '';
 
 	return @$u[$col];
@@ -2328,7 +2325,7 @@ function _element60_print($el, $prm) {
 function _element60_print11($el, $u) {
 	$EL = $el['elp'];
 
-	if(!$col = @$el['col'])
+	if(!$col = _elemCol($el))
 		return _imageNo($EL['width'], $EL['num_8']);
 	if(empty($u[$col]['id']))
 		return _imageNo($EL['width'], $EL['num_8']);
@@ -4261,7 +4258,7 @@ function _elemRule($i='all', $v=0) {//кеш правил для элемент�
 }
 
 function _elemOne($elem_id, $upd=false) {//запрос одного элемента
-	global $BE_FLAG, $G_DLG;
+	global $BE_FLAG;
 
 	//обновление данных элемента в кеше
 	if($upd) {
@@ -4276,7 +4273,7 @@ function _elemOne($elem_id, $upd=false) {//запрос одного элеме�
 		if(_cache_isset($key, $global)) {
 			$ELM = _cache_get($key, $global);
 			$el = _element('struct', $el);
-			$el = _element('struct_title', $el, $G_DLG);
+			$el = _elementTitle($el);
 			$el = _beElemDlg($el);
 			$ELM[$elem_id] = $el;
 			_cache_set($key, $ELM, $global);
@@ -4317,9 +4314,6 @@ function _blockOne($block_id, $upd=false) {//запрос одного блок�
 	return _BE('block_one', $block_id);
 }
 
-function _elemAttrCmp($el) {
-	return '#cmp_'.$el['id'];
-}
 
 function _elemColType($id='all') {//тип данных, используемый элементом
 	$col_type = array(
@@ -4520,6 +4514,8 @@ function _elemCol($el) {//получение имени колонки
 		return $col;
 	if(!$ell = _elemOne($id))
 		return '';
+	if(empty($ell['col']))
+		return '';
 
 	return $ell['col'];
 }
@@ -4564,21 +4560,9 @@ function _elemColDlgId($elem_id, $oo=false) {//получение id диало�
 	return $BL['obj_id'];
 }
 
-function _elem_11_dialog($el) {//получение данных диалога по элементу 11
-	if($el['dialog_id'] != 11)
-		return 0;
-	if(!$ell = _elemOne($el['txt_2']))
-		return 0;
-	if($ell['block']['obj_name'] != 'dialog')
-		return 0;
-	if(!$dialog_id = _num($ell['block']['obj_id']))
-		return 0;
-	if(!$dlg = _dialogQuery($dialog_id))
-		return 0;
-
-	return $dlg;
+function _elemAttrCmp($el) {
+	return '#cmp_'.$el['id'];
 }
-
 function _elemIdsTitle($v) {//получение имён по id элементов
 	if(!$ids = _ids($v, 'arr'))
 		return '';
@@ -4617,6 +4601,20 @@ function _elemUids($ids, $u) {//получение значения записи
 
 
 
+function _elem_11_dialog($el) {//получение данных диалога по элементу 11
+	if($el['dialog_id'] != 11)
+		return 0;
+	if(!$ell = _elemOne($el['txt_2']))
+		return 0;
+	if($ell['block']['obj_name'] != 'dialog')
+		return 0;
+	if(!$dialog_id = _num($ell['block']['obj_id']))
+		return 0;
+	if(!$dlg = _dialogQuery($dialog_id))
+		return 0;
+
+	return $dlg;
+}
 
 
 
