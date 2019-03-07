@@ -962,7 +962,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//Список - ТАБЛИЦА
 				case 23:
-					if(!el.num_6)
+					if(el.num_8 != 6161)
 						return;
 
 					ATR_EL.find('ol:first').nestedSortable({
