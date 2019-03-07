@@ -1308,6 +1308,26 @@ function _element29_vvv($el, $prm) {
 	$sel_id = _elem29DialogSel($prm, $sel_id);
 	return _29cnn($el['id'], '', $sel_id);
 }
+function _element29_history($el, $u) {
+	foreach(_ids($el['txt_3'], 'arr') as $id) {
+		if(!$ell = _elemOne($id))
+			return '';
+		if(empty($ell['col']))
+			return '';
+
+		$col = $ell['col'];
+
+		if(empty($u[$col]))
+			return '';
+
+		$u = $u[$col];
+	}
+
+	if(is_array($u))
+		return '';
+
+	return $u;
+}
 function _elem29PageSel($dlg_cur, $sel_id) {//подмена id записи, если не совпадает со списком текущей страницы
 	//id записи берётся с текущей страницы
 	if($sel_id != -1)
@@ -2239,6 +2259,25 @@ function _element59_print($el, $prm) {
 		'<div style="position:absolute;top:2px;right:3px;z-index:100" class="icon icon-del-red pl'._tooltip('Отменить выбор', -52).'</div>'.
 		'<div class="un-html">'._spisok59unit($el['id'], $v).'</div>'.
 	'</div>';
+}
+function _element59_history($el, $u) {
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return '';
+	if(!$elem_id = $DLG['spisok_elem_id'])
+		return '';
+	if(!$ell = _elemOne($elem_id))
+		return '';
+	if(empty($ell['col']))
+		return '';
+
+	$col = $ell['col'];
+
+	if(empty($u[$col]))
+		return '';
+	if(is_array($u[$col]))
+		return '';
+
+	return $u[$col];
 }
 
 /* [60] Загрузка изображений */
@@ -6918,10 +6957,6 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 				break;
 			}
 			if(!empty($cmp['hidden'])) {
-				$hidden = true;
-				break;
-			}
-			if(_elemIsConnect($cmp)) {
 				$hidden = true;
 				break;
 			}
