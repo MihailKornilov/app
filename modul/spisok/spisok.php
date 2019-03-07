@@ -1956,8 +1956,11 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 		}
 }
 function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количеств привязаного списка
-	if(!$UCOL = $cmp['col'])//имя колонки, по которой привязан список
+	if(empty($cmp['col']))//имя колонки, по которой привязан список
 		return array();
+
+	$UCOL = $cmp['col'];
+
 	if(empty($unit[$UCOL]))
 		return array();
 
@@ -2068,8 +2071,11 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 }
 function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт сумм привязаного списка после внесения/удаления данных
 	//имя колонки, по которой привязан список
-	if(!$col = $cmp['col'])
+	if(empty($cmp['col']))
 		return array();
+
+	$col = $cmp['col'];
+
 	if(empty($unit[$col]))
 		return array();
 

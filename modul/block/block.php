@@ -792,8 +792,10 @@ function _elemPrintV($el, $prm, $def='') {//значение записи при
 	//установлен флаг "Всегда по умолчанию"
 	if(!empty($el['nosel']))
 		return $def;
-	if(!$col = $el['col'])
+	if(empty($el['col']))
 		return $def;
+
+	$col = $el['col'];
 
 	//имя колонки является id элемента из родительского диалога
 	if($id = _num($col)) {

@@ -20,7 +20,10 @@
 function _elementType($type, $el=array(), $prm=array()) {//все возможные варианты манипуляций
 	switch($type) {
 		//вывод элемента на экран
-		case 'print': return '';
+		case 'print':
+			if(empty($el['dialog_id']))
+				return '';
+			return DEBUG ? '<span class="fs11 red">['.$el['dialog_id'].']</span>' : '';
 
 		//вывод значения на экран через [11]
 		case 'print11':
@@ -1161,6 +1164,31 @@ function _element24_vvv($el, $prm) {
 
 	//все списки приложения
 	return _dialogSpisokOn($dialog_id, $block_id, $el['id']);
+}
+
+/* [25] Кружок с цветом статуса */
+function _element25_struct($el) {
+	return array(
+		'txt_1' => $el['txt_1'],     //путь к заливке
+		'num_1' => _num($el['num_1'])//диаметр
+	) + _elementStruct($el);
+}
+function _element25_struct_title($el) {
+	$el['title'] = 'O';
+	return $el;
+}
+function _element25_print($el, $prm) {
+	$bg = $prm['blk_setup'] ? '#eee' : _elemUids($el['txt_1'], $prm['unit_get']);
+
+	$css = 'width:'.$el['num_1'].'px;'.
+		   'height:'.$el['num_1'].'px;'.
+		   'border:#EAEBEC solid 1px;'.
+		   'vertical-align:top;';
+
+	if(!empty($bg))
+		$css .= 'background-color:'.$bg.';';
+
+	return '<div class="dib br1000" style="'.$css.'"></div>';
 }
 
 /* [26] Select: выбор документа (SA) */
@@ -3545,7 +3573,7 @@ function _dialogTest() {//проверка id диалога, создание �
 	$dialog_id = query_id($sql);
 
 	//проверка, нужно ли по кнопке всегда создавать новый диалог
-	if(!$elem['num_4'] != -1) {
+	if($elem['num_4'] != -1) {
 		$sql = "UPDATE `_element`
 				SET `num_4`=".$dialog_id."
 				WHERE `id`=".$elem['id'];
@@ -4571,8 +4599,11 @@ function _elemUids($ids, $u) {//получение значения записи
 	foreach($ids as $k => $id) {
 		if(!$el = _elemOne($id))
 			return '';
-		if(!$col = $el['col'])
+		if(empty($el['col']))
 			return '';
+
+		$col = $el['col'];
+
 		if(!isset($u[$col]))
 			return '';
 		if(!is_array($u[$col]))
@@ -5059,6 +5090,14 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 			return 'Диалога '.$BL['obj_id'].' не существует.';
 		if($parent_id = $DLG['dialog_id_parent'])
 			return $parent_id;
+
+		//выбор для ячейки диалога
+		if(!empty($BL['elem'])) {
+			$ell = $BL['elem'];
+			if($ell['dialog_id'] == 23)
+				return $ell['num_1'];
+		}
+
 		return $BL['obj_id'];
 	}
 
