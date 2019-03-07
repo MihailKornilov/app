@@ -3508,27 +3508,23 @@ function _colorJS() {//массив цветов для текста в форм
 
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
 	//если dialog_id получен - отправка его
-	$dialog_id = _num(@$_POST['dialog_id'], true);
-	if($dialog_id > 0)
+	if($dialog_id = _num(@$_POST['dialog_id']))
 		return $dialog_id;
 	if(!$block_id = _num(@$_POST['block_id']))
+		return 0;
+
+	//получение элемента-кнопки для присвоения нового диалога
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `block_id`=".$block_id."
+			  AND `dialog_id` IN (2,59)
+			LIMIT 1";
+	if(!$elem = query_assoc($sql))
 		return false;
 
-	//проверка, нужно ли по кнопке всегда создавать новый диалог
-	if(!$newAlways = ($dialog_id == -1)) {
-		//получение элемента-кнопки для присвоения нового диалога
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `block_id`=".$block_id."
-				  AND `dialog_id` IN (2,59)
-				LIMIT 1";
-		if(!$elem = query_assoc($sql))
-			return false;
-
-		//новый диалог кнопке уже был присвоен
-		if($elem['num_4'])
-			return $elem['num_4'];
-	}
+	//новый диалог кнопке уже был присвоен
+	if($elem['num_4'] > 0)
+		return $elem['num_4'];
 
 	$sql = "SELECT IFNULL(MAX(`num`),0)+1
 			FROM `_dialog`
@@ -3548,7 +3544,8 @@ function _dialogTest() {//проверка id диалога, создание �
 			)";
 	$dialog_id = query_id($sql);
 
-	if(!$newAlways) {
+	//проверка, нужно ли по кнопке всегда создавать новый диалог
+	if(!$elem['num_4'] != -1) {
 		$sql = "UPDATE `_element`
 				SET `num_4`=".$dialog_id."
 				WHERE `id`=".$elem['id'];
