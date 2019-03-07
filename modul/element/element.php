@@ -701,7 +701,7 @@ function _element11_print($el, $prm) {
 			continue;
 
 		if($ell['dialog_id'] == 29)
-			return '';
+			return $ell['txt_1'];
 
 		return _msgRed('значение отсутствует');
 	}
@@ -1334,14 +1334,21 @@ function _element29_vvv($el, $prm) {
 	return _29cnn($el['id'], '', $sel_id);
 }
 function _element29_history($el, $u) {
+	if(empty($u))
+		return '';
+
 	foreach(_ids($el['txt_3'], 'arr') as $id) {
 		if(!$ell = _elemOne($id))
 			return '';
-		if(empty($ell['col']))
+
+		if($ell['dialog_id'] == 44) {
+			$prm = _blockParam();
+			$prm['unit_get'] = $u;
+			return _element44_print($ell, $prm);
+		}
+
+		if(!$col = _elemCol($id))
 			return '';
-
-		$col = $ell['col'];
-
 		if(empty($u[$col]))
 			return '';
 
