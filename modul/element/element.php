@@ -6309,6 +6309,7 @@ function PHP12_icon18_type($id='all') {//доступные варианты и�
 		22 => 'order',
 		23 => 'calendar',
 		24 => 'eye',
+		25 => 'clock'
 	);
 
 	if($id == 'all')
