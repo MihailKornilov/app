@@ -2243,11 +2243,12 @@ function _element57_print($el, $prm) {
 	);
 
 	$razdel = '';
-	foreach($el['vvv'] as $r) {
-		$sel = _dn($v != $r['id'], 'sel');
-		$curd = _dn(!$prm['blk_setup'], 'curD');
-		$razdel .= '<a class="link'.$sel.$curd.'">'.$r['title'].'</a>';
-	}
+	if(!empty($el['vvv']))
+		foreach($el['vvv'] as $r) {
+			$sel = _dn($v != $r['id'], 'sel');
+			$curd = _dn(!$prm['blk_setup'], 'curD');
+			$razdel .= '<a class="link'.$sel.$curd.'">'.$r['title'].'</a>';
+		}
 
 	return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 		   '<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
