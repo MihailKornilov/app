@@ -127,6 +127,9 @@ function _elementStruct($el) {//структура элемента - базов
 	return $send;
 }
 function _elementTitle($el) {//вставка title элемента (после сформированного кеша)
+	if(empty($el['dialog_id']))
+		return $el;
+
 	global $G_DLG, $G_ELEM;
 
 	if($el['dialog_id'] == 11)
@@ -4284,6 +4287,26 @@ function _elemOne($elem_id, $upd=false) {//запрос одного элеме�
 			$el = _element('struct', $el);
 			$el = _elementTitle($el);
 			$el = _beElemDlg($el);
+
+			//дочерние элементы
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `parent_id`=".$elem_id."
+					ORDER BY `sort`";
+			if($ELMCH = query_arr($sql)) {
+				$ELMCH = _beElemAction($ELMCH);
+				$el['vvv'] = array();
+				foreach($ELMCH as $id => $ell) {
+					$ell = _elementTitle($ell);
+					$ell = _element('struct_vvv', $el, $ell);
+
+					if(!empty($ELMCH[$id]['action']))
+						$ell['action'] = $ELMCH[$id]['action'];
+
+					$el['vvv'][] = $ell;
+				}
+			}
+
 			$ELM[$elem_id] = $el;
 			_cache_set($key, $ELM, $global);
 			$BE_FLAG = 0;

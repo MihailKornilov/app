@@ -1588,7 +1588,7 @@ function _beElemHint($ELM, $app_id) {//подсказки, назначенны�
 
 	return $ELM;
 }
-function _beElemAction($ELM, $app_id) {//действия, назначенные элементам
+function _beElemAction($ELM, $app_id=APP_ID) {//действия, назначенные элементам
 	$sql = "SELECT *
 			FROM `_action`
 			WHERE `app_id`=".$app_id."
