@@ -1541,7 +1541,9 @@ function _element31_print($el, $prm) {
 				switch($ell['dialog_id']) {
 					//сборный текст
 					case 44:
-						$title = _element44_print($ell, $prm);
+						$prm44 = _blockParam();
+						$prm44['unit_get'] = $r;
+						$title = _element44_print($ell, $prm44);
 						break;
 					default:
 						if($col = $ell['col'])
