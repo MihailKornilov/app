@@ -2654,12 +2654,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					break;
 				//обновление содержимого блоков
 				case 219:
+					//сохранение исходных заливок блоков, чтобы потом их восстанавливать
+					var actName = 'ACT_' + sp.id;
+					if(!window[actName])
+						window[actName] = {};
+
+					if(!window[actName][unit_id])
+						window[actName][unit_id] = {
+							bo:bo,
+							bg:$(bo).css('background-color')
+						};
+
 					var ids = _ids(sp.target_ids);
 					if(!ids)
 						return;
 
 					var send = {
 						op:'block_upd',
+						src_id:block_id,
+						action_id:sp.id,
 						ids:ids,
 						unit_id:unit_id,
 						busy_obj:bo
@@ -2668,8 +2681,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						_forIn(res.blk, function(sp, id) {
 							_attr_bl(id).html(sp);
 						});
-
-
+						//восстановление окраски других блоков
+						_forIn(window[actName], function(sp, uid) {
+							if(unit_id != uid)
+								$(sp.bo).css('background-color', sp.bg);
+						});
+						if(res.bg)
+							$(bo).css('background-color', res.bg);
 					});
 
 					break;

@@ -341,12 +341,27 @@ switch(@$_POST['op']) {
 		break;
 
 	case 'block_upd'://обновление содержания блоков
+		if(!$action_id = _num($_POST['action_id']))
+			jsonError('Не получен id действия');
+		if(!$src_id = _num($_POST['src_id']))
+			jsonError('Не получен исходный блок');
+		if(!$SRC = _blockOne($src_id))
+			jsonError('Исходного блока id'.$src_id.' не существует');
 		if(!$block_id = _num($_POST['ids']))
 			jsonError('Функция работает пока только для одного блока');
 		if(!$unit_id = _num($_POST['unit_id']))
 			jsonError('Не получен id записи');
 		if(!$bl = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
+
+		if(empty($SRC['action']))
+			jsonError('Исходному блоку не назначены действия');
+
+		//заливка, в которую будет окрашен выбранный блок
+		$send['bg'] = '';
+		foreach($SRC['action'] as $r)
+			if($r['id'] == $action_id)
+				$send['bg'] = $r['v1'];
 
 		$BLK = _BE('block_obj', $bl['obj_name'], $bl['obj_id']);
 		$bll[$block_id] = _blockChild($BLK, $block_id);
