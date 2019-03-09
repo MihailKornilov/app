@@ -368,13 +368,25 @@ switch(@$_POST['op']) {
 		if(!$BL = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
 
+		$obj_name = $BL['obj_name'];
+		$obj_id = $BL['obj_id'];
+
+		//подмена данных объекта для списка, в котором он размещён
+		if($obj_name == 'spisok') {
+			if(!$el = _elemOne($obj_id))
+				jsonError('Элемента '.$obj_id.' не существует.');
+
+			$obj_name = $el['block']['obj_name'];
+			$obj_id = $el['block']['obj_id'];
+		}
+
 		$prm = array(
 			'blk_choose' => 1,
 			'blk_level' => $level,
-			'unit_get' => _pageUnitGet($BL['obj_name'], $BL['obj_id'])
+			'unit_get' => _pageUnitGet($obj_name, $obj_id)
 		);
 
-		$send['html'] = _blockHtml($BL['obj_name'], $BL['obj_id'], $prm);
+		$send['html'] = _blockHtml($obj_name, $obj_id, $prm);
 
 		jsonSuccess($send);
 		break;

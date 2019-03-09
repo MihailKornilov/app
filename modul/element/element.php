@@ -2093,6 +2093,9 @@ function _element49_struct($el) {
 		работает в паре с [19] - окно выбора блоков
 	*/
 	return array(
+		'req'     => _num($el['req']),
+		'req_msg' => $el['req_msg'],
+
 		'txt_1'   => $el['txt_1']//текст для placeholder
 	) + _elementStruct($el);
 }
