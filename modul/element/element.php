@@ -4829,9 +4829,7 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 		$group[$id]['elem'] = array();
 
 	//получение всех элементов
-	$sql = "SELECT
-				*,
-				'' `rule`
+	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `element_group_id` IN ("._idsGet($group).")
 			  AND `sa` IN (0,".SA.")
@@ -4846,6 +4844,8 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 	foreach(query_arr($sql) as $r) {
 		$dlg_id = _num($r['dialog_id']);
 		$rid = _num($r['rule_id']);
+		if(!isset($elem[$dlg_id]['rule']))
+			$elem[$dlg_id]['rule'] = array();
 		$elem[$dlg_id]['rule'][$rid] = 1;
 	}
 
