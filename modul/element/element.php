@@ -214,7 +214,7 @@ function _element1_struct($el) {
 	) + _elementStruct($el);
 }
 function _element1_struct_title($el) {
-	$el['title'] = '<div class="icon icon-ok curD"></div>';
+	$el['title'] = '✓';
 	return $el;
 }
 function _element1_print($el, $prm) {
@@ -231,7 +231,7 @@ function _element1_print11($el, $u) {
 	if(empty($u[$col]))
 		return '';
 
-	return $el['title'];
+	return '<div class="icon icon-ok curD"></div>';
 }
 function _element1_history($el, $v) {
 	return _daNet($v);
