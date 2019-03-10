@@ -1011,7 +1011,8 @@ function _element18_struct($el) {
 function _element18_struct_vvv($el, $cl) {
 	return array(
 		'id' => _num($cl['id']),
-		'title' => $cl['txt_1']
+		'title' => $cl['txt_1'],
+		'def' => _num($cl['def'])
 	);
 }
 function _element18_js($el) {
@@ -2623,11 +2624,16 @@ function _element74_print($el, $prm) {
 function _element77_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//id элемента, размещающего список
-		'num_2'   => _num($el['num_2']) /* значение по умолчанию:
+		'num_2'   => _num($el['num_2']),/* значение по умолчанию:
 											2819 - текущий день
 											2820 - текущая неделя
 											2821 - текущий месяц
 										*/
+		'num_3'   => _num($el['num_3']),/* фильтрация - по какой колонке производить фильтр
+											6509 - по дате внесения
+											6510 - по значению даты
+                                        */
+		'num_4'   => _num($el['num_4']),//значение даты (если выбрано 6510)
 	) + _elementStruct($el);
 }
 function _element77_js($el) {
@@ -7895,6 +7901,9 @@ function _filterCalendar($el) {//Фильтр-календарь
 	$v = _filterCalendarDef($v);
 	$mon = substr($v, 0, 7);
 
+	if($el['num_3'] == 6510 && !$el['num_4'])
+		return _emptyMinRed('Не указано значение даты');
+
 	return
 	'<div class="_filter-calendar">'.
 		'<div class="_busy"></div>'.
@@ -7979,7 +7988,16 @@ function _filterCalendarDays($el, $mon) {//отметка дней в кален
 	if(!$dlg = _dialogQuery($elem['num_1']))
 		return array();
 
-	$cond = "`dtime_add` LIKE ('".$mon."%')";
+	$col = 'dtime_add';
+
+	if($el['num_3'] == 6510) {
+		if(!$ELD = _elemOne($el['num_4']))
+			return array();
+		if(!$col = _elemCol($ELD))
+			return array();
+	}
+
+	$cond = "`".$col."` LIKE ('".$mon."%')";
 	if(isset($dlg['field1']['app_id']))
 		$cond .= " AND `app_id`=".APP_ID;
 	if(isset($dlg['field1']['dialog_id']))
@@ -7987,10 +8005,10 @@ function _filterCalendarDays($el, $mon) {//отметка дней в кален
 	if(isset($dlg['field1']['deleted']))
 		$cond .= " AND !`deleted`";
 
-	$sql = "SELECT DATE_FORMAT(`dtime_add`,'%Y-%m-%d'),1
+	$sql = "SELECT DATE_FORMAT(`".$col."`,'%Y-%m-%d'),1
 			FROM `"._table($dlg['table_1'])."`
 			WHERE ".$cond."
-			GROUP BY DATE_FORMAT(`dtime_add`,'%d')";
+			GROUP BY DATE_FORMAT(`".$col."`,'%d')";
 	return query_ass($sql);
 }
 

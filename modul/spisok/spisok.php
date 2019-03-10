@@ -1032,7 +1032,7 @@ function _spisokCond77($el) {//фильтр-календарь
 	//поиск элемента-фильтра-календаря
 	foreach(_spisokFilter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 77) {
-			$filter = true;
+			$filter = $r['elem'];
 			$v = $r['v'];
 			break;
 		}
@@ -1045,10 +1045,19 @@ function _spisokCond77($el) {//фильтр-календарь
 	$v = _filterCalendarDef($v);
 	$ex = explode(':', $v);
 
-	if(empty($ex[1]))
-		return " AND `dtime_add` LIKE '".$v."%'";
+	$col = 'dtime_add';
 
-	return " AND `dtime_add`>='".$ex[0]." 00:00:00' AND `dtime_add`<='".$ex[1]." 23:59:59'";
+	if($filter['num_3'] == 6510) {
+		if(!$ELD = _elemOne($filter['num_4']))
+			return ' AND !`id`';
+		if(!$col = _elemCol($ELD))
+			return ' AND !`id`';
+	}
+
+	if(empty($ex[1]))
+		return " AND `".$col."` LIKE '".$v."%'";
+
+	return " AND `".$col."`>='".$ex[0]." 00:00:00' AND `".$col."`<='".$ex[1]." 23:59:59'";
 }
 function _spisokCond78($el) {//фильтр-меню
 	$filter = false;
