@@ -2679,7 +2679,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					};
 					_post(send, function(res) {
 						_forIn(res.blk, function(sp, id) {
-							_attr_bl(id).html(sp);
+							var PL = _attr_bl(id).closest('.bl-div');
+							PL.after(sp).remove();
 						});
 						//восстановление окраски других блоков
 						_forIn(window[actName], function(sp, uid) {

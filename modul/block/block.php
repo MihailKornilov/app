@@ -549,8 +549,9 @@ function _blockChildHtml($block, $prm, $grid_id, $level, $width) {//делени
 	if($block['id'] == $grid_id)
 		return _blockGrid($block['child'], $width);
 
-	if(!is_array($prm = _blockUnitGet($block, $prm)))
-		return $prm;
+	if(!$prm['blk_setup'])
+		if(!is_array($prm = _blockUnitGet($block, $prm)))
+			return $prm;
 
 	return _blockLevel($block['child'], $prm, $grid_id, $level, $width);
 }

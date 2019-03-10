@@ -357,20 +357,20 @@ switch(@$_POST['op']) {
 		if(empty($SRC['action']))
 			jsonError('Исходному блоку не назначены действия');
 
-		//заливка, в которую будет окрашен выбранный блок
+		//заливка, в которую будет окрашен выбранный (исходный) блок
 		$send['bg'] = '';
 		foreach($SRC['action'] as $r)
 			if($r['id'] == $action_id)
 				$send['bg'] = $r['v1'];
 
 		$BLK = _BE('block_obj', $bl['obj_name'], $bl['obj_id']);
+
 		$bll[$block_id] = _blockChild($BLK, $block_id);
 
-		$el = _blockChild($BLK, $block_id);
 		$prm = _blockParam(array(), $bl['obj_name']);
 		$prm['unit_get_id'] = $unit_id;
 
-		$send['blk'][$block_id] = _elemDiv($el, $prm);
+		$send['blk'][$block_id] = _blockLevel($bll, $prm, 0, 2, $bl['width']);
 
 		jsonSuccess($send);
 		break;
