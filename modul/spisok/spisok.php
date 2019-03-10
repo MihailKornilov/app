@@ -24,7 +24,7 @@ function _spisokFilterCache() {//кеширование фильтров спи�
 			if(empty($elFilter[$filter_id]))
 				continue;
 			$v = array(
-				'elem' => $elFilter[$filter_id],
+				'elem' => _element('struct', $elFilter[$filter_id]),
 				'v' => $r['v'],
 				'def' => $r['def']
 			);
