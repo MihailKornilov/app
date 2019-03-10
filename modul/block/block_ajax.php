@@ -340,7 +340,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
-	case 'block_upd'://обновление содержания блоков
+	case 'block_upd'://обновление содержимого блока
 		if(!$action_id = _num($_POST['action_id']))
 			jsonError('Не получен id действия');
 		if(!$src_id = _num($_POST['src_id']))

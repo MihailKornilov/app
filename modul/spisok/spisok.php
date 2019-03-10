@@ -11,7 +11,7 @@ function _spisokFilterCache() {//кеширование фильтров спи�
 
 	$sql = "SELECT *
 			FROM `_user_spisok_filter`
-			WHERE `app_id`=".APP_ID."
+			WHERE `app_id` IN (0,".APP_ID.")
 			  and `user_id`=".USER_ID;
 	if($arr = query_arr($sql)) {
 		$sql = "SELECT *
@@ -93,34 +93,7 @@ function _spisokFilter($i='all', $v=0, $vv='') {//получение значе�
 			return '';
 		$v = @$v['v'];
 
-		$sql = "SELECT *
-				FROM `_user_spisok_filter`
-				WHERE `user_id`=".USER_ID."
-				  AND `element_id_spisok`=".$spisok."
-				  AND `element_id_filter`=".$filter;
-		$id = _num(query_value($sql));
-
-		$sql = "INSERT INTO `_user_spisok_filter` (
-					`id`,
-					`app_id`,
-					`user_id`,
-					`element_id_spisok`,
-					`element_id_filter`,
-					`v`,
-					`def`
-				) VALUES (
-					".$id.",
-					".APP_ID.",
-					".USER_ID.",
-					".$spisok.",
-					".$filter.",
-					'".addslashes(_txt($v))."',
-					'".addslashes(_txt($v))."'
-				) ON DUPLICATE KEY UPDATE
-					`v`=VALUES(`v`)";
-		query($sql);
-
-		_spisokFilter('cache_clear');
+		_spisokFilterInsert($spisok, $filter, $v);
 	}
 
 	//определение отличия значений от условий по умолчанию
@@ -142,6 +115,8 @@ function _spisokFilterInsert($spisok, $filter, $v) {//внесение ново�
 		return $v;
 	if(!$filter = _num($filter))
 		return $v;
+	if(!$SP = _elemOne($spisok))
+		return $v;
 
 	$sql = "SELECT *
 			FROM `_user_spisok_filter`
@@ -160,7 +135,7 @@ function _spisokFilterInsert($spisok, $filter, $v) {//внесение ново�
 				`def`
 			) VALUES (
 				".$id.",
-				".APP_ID.",
+				".$SP['app_id'].",
 				".USER_ID.",
 				".$spisok.",
 				".$filter.",
