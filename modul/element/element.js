@@ -2655,15 +2655,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//обновление содержимого блоков
 				case 219:
 					//сохранение исходных заливок блоков, чтобы потом их восстанавливать
-					var actName = 'ACT_' + sp.id;
+					var actName = 'ACT_' + sp.id,
+						attrBgId = 'dbg' + unit_id,
+						bg;
 					if(!window[actName])
 						window[actName] = {};
 
-					if(!window[actName][unit_id])
-						window[actName][unit_id] = {
-							bo:bo,
-							bg:$(bo).css('background-color')
-						};
+					if(!$('#' + attrBgId).length) {
+						bg = $(bo).css('background-color');
+						$(bo)
+							.attr('id', attrBgId)
+							.attr('data-bg', bg);
+						window[actName][unit_id] = true;
+					}
+
+					$(bo).attr('data-bg', $(bo).css('background-color'));
 
 					var ids = _ids(sp.target_ids);
 					if(!ids)
@@ -2684,8 +2690,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						});
 						//восстановление окраски других блоков
 						_forIn(window[actName], function(sp, uid) {
-							if(unit_id != uid)
-								$(sp.bo).css('background-color', sp.bg);
+							if(unit_id == uid)
+								return;
+
+							bg = $('#dbg' + uid).attr('data-bg');
+							$('#dbg' + uid).css('background-color', bg);
 						});
 						if(res.bg)
 							$(bo).css('background-color', res.bg);
