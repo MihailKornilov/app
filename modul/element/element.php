@@ -615,16 +615,17 @@ function _element11_struct($el, $ELM=array()) {
 		Вставка элемента через функцию PHP12_v_choose
 	*/
 
+	global $G_ELEM;
+	if(empty($ELM))
+		$ELM = $G_ELEM;
+
 	$send = array(
 		'parent_id' => _num($el['parent_id']),
 
 		'txt_2'     => $el['txt_2'],    //id элемента, выбранного из диалога, который вносит данные списка
 								        //возможна иерархия элементов через запятую: 256,1312,560
 		'txt_7'     => $el['txt_7'],    //текст слева (для истории действий)
-		'txt_8'     => $el['txt_8'],    //текст справа (для истории действий)
-
-		'num_7'     => _num($el['num_7']),//для [60]
-		'num_8'     => _num($el['num_8']) //для [60]
+		'txt_8'     => $el['txt_8']     //текст справа (для истории действий)
 	) + _elementStruct($el);
 
 	if($last_id = _idsLast($el['txt_2']))
@@ -644,8 +645,12 @@ function _element11_struct($el, $ELM=array()) {
 				$send['url_use'] = 1;
 
 			//является изображением
-			if($el11['dialog_id'] == 60)
+			if($el11['dialog_id'] == 60) {
+				$send['width'] = empty($el['width']) ? 30 : _num($el['width']);
+				$send['num_7'] = _num($el['num_7']);
+				$send['num_8'] = _num($el['num_8']);
 				$send['immg'] = 1;
+			}
 	}
 
 	return $send;
@@ -676,10 +681,19 @@ function _element11_struct_title($el, $ELM, $DLGS=array()) {
 	return $el;
 }
 function _element11_js($el) {
-	return array(
-		'num_7' => $el['num_7'],//[60] ограничение высоты
-		'num_8' => $el['num_8'] //[60] закруглённые углы
-	) + _elementJs($el);
+	$send = _elementJs($el);
+
+	//дополнительные значения для изображений
+	if($last = _idsLast($el['txt_2']))
+		if($ell = _elemOne($last))
+			if($ell['dialog_id'] == 60) {
+				$send += array(
+					'num_7' => $el['num_7'],//[60] ограничение высоты
+					'num_8' => $el['num_8'] //[60] закруглённые углы
+				);
+			}
+
+	return $send;
 }
 function _element11_print($el, $prm) {
 	if(!$u = @$prm['unit_get'])

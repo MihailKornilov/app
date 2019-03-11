@@ -377,6 +377,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	_clone_go($dialog, $POST_CMP);
 
 
+
 	$unit_id = _SUN_INSERT($dialog, $unit_id);
 
 	// ---=== СЕКЦИЯ ОБНОВЛЕНИЯ ДАННЫХ ===---
