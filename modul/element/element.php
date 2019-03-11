@@ -1980,7 +1980,7 @@ function _element38_print($el, $prm) {
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'width' => $el['width'],
+		'width' => _num(@$el['width']),
 		'value' => _elemPrintV($el, $prm, 0)
 	));
 }
@@ -2100,6 +2100,34 @@ function _element44_print($el, $prm) {
 	}
 
 	return $send;
+}
+
+/* [45] Выбор нескольких значений привязанного списка */
+function _element45_struct($el) {
+	return array(
+		'req'     => _num($el['req']),
+		'req_msg' => $el['req_msg'],
+
+		'num_1'   => _num($el['num_1']),//список (из которого будут выбираться значения)
+		'txt_1'   => $el['txt_1'],      //имя кнопки
+		'num_2'   => _num($el['num_2']),//вспомогательный диалог
+		'txt_2'   => $el['txt_2'],      //путь к изображениям
+		'num_3'   => _num($el['num_3']) //указывать количество выбранных значений
+	) + _elementStruct($el);
+}
+function _element45_print($el, $prm) {
+	$v = _elemPrintV($el, $prm);
+
+	return
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+	_button(array(
+		'attr_id' => _elemAttrId($el, $prm).$el['afics'],
+		'name' => $el['txt_1'],
+		'color' => 'grey',
+		'width' => $el['width'],
+		'small' => 1,
+		'class' => _dn(!$v)._dn(!$prm['blk_setup'], 'curD')
+	));
 }
 
 /* [49] Выбор блоков из диалога или страницы */
