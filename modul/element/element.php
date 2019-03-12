@@ -2458,6 +2458,20 @@ function _element59_history($el, $u) {
 
 	return $u[$col];
 }
+function _spisok59unit($elem_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
+	if(!$unit_id)
+		return '';
+	if(!$el = _elemOne($elem_id))
+		return '';
+	if(!$dialog_id = _num($el['num_1']))
+		return '';
+	if(!$dlg = _dialogQuery($dialog_id))
+		return '';
+	if(!$prm['unit_get'] = _spisokUnitQuery($dlg, $unit_id))
+		return '';
+
+	return _blockHtml('spisok', $elem_id, $prm);
+}
 
 /* [60] Загрузка изображений */
 function _element60_struct($el) {
@@ -7348,9 +7362,9 @@ function _historyKit($el, $prm) {//составление одной сборк�
 	$cls[] = $el['color'];
 	$cls = array_diff($cls, array(''));
 	$cls = implode(' ', $cls);
-	$txt = _elemFormatHide($el, $txt);
-	$txt = _elemFormatDigital($el, $txt);
-	$txt = _spisokUnitUrl($el, $prm, $txt);
+
+	$txt = _elemFormat($el, $prm, $txt);//[67] форматирование для истории действий
+
 	$txt = '<span class="'.$cls.'">'.$txt.'</span>';
 	return $el['txt_7'].$txt.$el['txt_8'];
 }

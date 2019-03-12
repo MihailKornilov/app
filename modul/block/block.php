@@ -649,12 +649,16 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
-	$txt = _elemAction241($el, $prm, $txt);
+	$txt = _elemFormat($el, $prm, $txt);
+
+	return '<div'.$attr_id.$cls.$style.'>'.$txt.'</div>';
+}
+function _elemFormat($el, $prm, $txt) {//формат значения элемента
+	$txt = _elemAction241($el, $prm, $txt);//подмена текста
 	$txt = _elemFormatHide($el, $txt);
 	$txt = _elemFormatDigital($el, $txt);
 	$txt = _spisokUnitUrl($el, $prm, $txt);
-
-	return '<div'.$attr_id.$cls.$style.'>'.$txt.'</div>';
+	return $txt;
 }
 function _elemAction241($el, $prm, $txt) {//подмена текста
 	if(empty($el['action']))

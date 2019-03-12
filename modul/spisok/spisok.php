@@ -626,9 +626,7 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';
 
-			$txt = _elemFormatHide($td, $txt);
-			$txt = _elemFormatDigital($td, $txt);
-			$txt = _spisokUnitUrl($td, $prm, $txt);//таблица
+			$txt = _elemFormat($td, $prm, $txt);//[23] форматирование для ячеек таблицы
 
 			$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
 		}
@@ -1174,8 +1172,7 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 	if(empty($cond))
 		return '';
 
-	$arr = htmlspecialchars_decode($cond);
-	if(!$arr = json_decode($arr, true))
+	if(!$arr = _elem40json($cond))
 		return " AND !`t1`.`id` /* [40] не получен массив условий */";
 
 	$send = '';
@@ -1593,20 +1590,6 @@ function _29cnnTitle($ids, $sp, $content=false) {//формирование со
 	return $content ? '' : '- незвестный тип: '.$el['dialog_id'].' -';
 }
 
-function _spisok59unit($elem_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
-	if(!$unit_id)
-		return '';
-	if(!$el = _elemOne($elem_id))
-		return '';
-	if(!$dialog_id = _num($el['num_1']))
-		return '';
-	if(!$dlg = _dialogQuery($dialog_id))
-		return '';
-	if(!$prm['unit_get'] = _spisokUnitQuery($dlg, $unit_id))
-		return '';
-
-	return _blockHtml('spisok', $elem_id, $prm);
-}
 
 
 
