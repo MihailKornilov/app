@@ -289,6 +289,17 @@ switch(@$_POST['op']) {
 		$send['spisok'] = _29cnn($cmp_id, $v);
 		jsonSuccess($send);
 		break;
+	case 'spisok_45_uns':
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID компонента');
+		if(!$el = _elemOne($elem_id))
+			jsonError('Элемента '.$elem_id.' не существует');
+
+		$v = _txt($_POST['v']);
+
+		$send['html'] = _element45Uns($el, $v);
+		jsonSuccess($send);
+		break;
 	case 'spisok_59_unit':
 		if(!$cmp_id = _num($_POST['cmp_id']))
 			jsonError('Некорректный ID компонента');

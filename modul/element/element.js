@@ -1272,6 +1272,70 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						DEL._dn();
 					});
 					return;
+				//Выбор нескольких значений привязанного списка
+				case 45:
+					var UNS = ATR_CMP_AFICS.prev(),//размещение выбранных значений
+						CMP_UPD = function(id_new) {//сохранение значения
+							var vv = [];
+							_forEq(UNS.find('.uinp'), function(sp) {
+								var id = _num(sp.attr('val'));
+								if(!id)
+									return;
+								vv.push(id + ':' + _num(sp.val()));
+							});
+							if(_num(id_new))
+								vv.push(id_new + ':1');
+							ATR_CMP.val(vv.join());
+						},
+						UNS_DEL = function() {//удаление значения
+							UNS.find('.icon').click(function() {
+								$(this).closest('tr').remove();
+								if(!UNS.find('tr').length)
+									UNS.html('');
+								CMP_UPD();
+							});
+							UNS.find('.uinp').keyup(CMP_UPD);
+						};
+					UNS_DEL();
+					//нажатие на кнопку для открытыя диалога
+					ATR_CMP_AFICS.click(function() {
+						if(!el.num_2)
+							return;
+						_dialogLoad({
+							block_id:el.block_id,
+							dialog_id:el.num_2,
+							busy_obj:ATR_CMP_AFICS,
+							func_open:function(res, dlg) {
+								//выбор значения списка
+								dlg.content.click(function(e) {
+									var un = $(e.target).parents('.sp-unit');
+									if(!un.length)
+										return;
+
+									var id = _num(un.attr('val'));
+									if(!id)
+										return;
+
+									CMP_UPD(id);
+									dlg.close();
+
+									//действие после выбора значения
+									var send = {
+										op:'spisok_45_uns',
+										elem_id:elm_id,
+										v:ATR_CMP.val(),
+										busy_obj:ATR_CMP_AFICS
+									};
+									_post(send, function(res) {
+										UNS.html(res.html);
+										UNS_DEL();
+										UNS.find('.uinp:last').select();
+									});
+								});
+							}
+						});
+					});
+					return;
 				//Выбор блоков из диалога или страницы
 				case 49:
 					var P = ATR_CMP.next(),

@@ -2115,19 +2115,95 @@ function _element45_struct($el) {
 		'num_3'   => _num($el['num_3']) //указывать количество выбранных значений
 	) + _elementStruct($el);
 }
+function _element45_js($el) {
+	return array(
+		'num_2' => _num($el['num_2'])
+	) + _elementJs($el);
+}
 function _element45_print($el, $prm) {
 	$v = _elemPrintV($el, $prm);
 
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+	'<div class="uns-html">'._element45Uns($el, $v).'</div>'.
 	_button(array(
 		'attr_id' => _elemAttrId($el, $prm).$el['afics'],
 		'name' => $el['txt_1'],
 		'color' => 'grey',
 		'width' => $el['width'],
 		'small' => 1,
-		'class' => _dn(!$v)._dn(!$prm['blk_setup'], 'curD')
+		'class' => _dn(!$prm['blk_setup'], 'curD')
 	));
+}
+function _element45_print11($el, $u) {
+	if(!$col = _elemCol($el))
+		return '';
+
+	return _element45Uns($el, @$u[$col], true);
+}
+function _element45Uns($el, $v, $is_show=false) {//выбранные значения при редактировании
+	if(empty($v))
+		return '';
+
+	$UNS = array();
+	foreach(explode(',', $v) as $ex) {
+		$exx = explode(':', $ex);
+		$UNS[] = array(
+			'id' => $exx[0],
+			'c' => $exx[1]
+		);
+	}
+
+	if(empty($UNS))
+		return '';
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return '';
+
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE `t1`.`id` IN ("._idsGet($UNS).")
+			  AND "._queryWhere($DLG, true);
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$col = _elemCol($DLG['spisok_elem_id']);
+	$send = '';
+	$n = 1;
+	foreach($UNS as $r) {
+		if(!isset($arr[$r['id']]))
+			continue;
+
+		$name = '<span class="fs10 red">Отсутствует колонка для отображения названия</span>';
+
+		$u = $arr[$r['id']];
+		if($col)
+			if(isset($u[$col]))
+				$name = $u[$col];
+
+		//вариант вывода значений для редактирования
+		if(!$is_show) {
+			$send .=
+			'<tr><td class="w35">'.
+					'<div class="fs14 grey r">'.$n++.'</div>'.
+				'<td class="fs14">'.
+					'<div class="fs14">'.$name.'</div>'.
+				'<td class="w70 bg-ffd'._dn($el['num_3']).'">'.
+					'<input type="text" class="uinp w100p r b" val="'.$r['id'].'" value="'.$r['c'].'">'.
+				'<td class="pad0 w35 center">'.
+					'<div class="icon icon-del'._tooltip('Отменить выбор', -94, 'r').'</div>';
+			continue;
+		}
+
+		//вариант вывода значений для просмотра
+		$send .=
+		'<tr><td class="w35 grey r">'.$n++.
+			'<td>'.$name;
+		if($el['num_3'])
+			$send .='<td class="w50 r b">'.$r['c'];
+	}
+
+	return
+	'<table class="_stab w100p small '.($is_show ? '' : 'mb10').'">'.$send.'</table>';
 }
 
 /* [49] Выбор блоков из диалога или страницы */
