@@ -649,11 +649,42 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
+	$txt = _elemAction241($el, $prm, $txt);
 	$txt = _elemFormatHide($el, $txt);
 	$txt = _elemFormatDigital($el, $txt);
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 
 	return '<div'.$attr_id.$cls.$style.'>'.$txt.'</div>';
+}
+function _elemAction241($el, $prm, $txt) {//подмена текста
+	if(empty($el['action']))
+		return $txt;
+	if(!$u = $prm['unit_get'])
+		return $txt;
+
+	foreach($el['action'] as $act)
+		if($act['dialog_id'] == 241) {
+			if(!$F = _elem40json($act['filter']))
+				return $txt;
+
+			$F = $F[0];
+
+			switch($F['cond_id']) {
+				case 2:
+					if(!$ell = _elemOne($F['elem_id']))
+						return $txt;
+					if(!$col = _elemCol($ell))
+						return $txt;
+					if(empty($u[$col]))
+						return $txt;
+
+					return $act['v1'];
+			}
+
+			return $txt;
+		}
+
+	return $txt;
 }
 function _elemFormatHide($el, $txt) {//Дополнительное форматирование: скрытие при нулевом значении
 	if(empty($el['format']))

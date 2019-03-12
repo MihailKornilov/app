@@ -1228,6 +1228,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 							if(BL.obj_name == 'spisok') {
 								var EL = ELMM[BL.obj_id];
+								console.log(EL);
 								if(!EL)
 									return 0;
 								if(EL.dialog_id != 14)
@@ -3705,7 +3706,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				return '<div class="icon icon-add cond-setup pl ml15' + _tooltip('Добавить условия', -57) + '</div>';
 			};
 
-		ATR_SP._select('disable');
+//		ATR_SP._select('disable');
 		BUT_ADD.click(valueAdd);
 
 		if(!vvv.length)

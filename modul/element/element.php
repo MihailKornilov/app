@@ -850,6 +850,11 @@ function _element14_struct_title($el, $DLG) {
 	$el['title'] = $DLG[$dlg_id]['name'];
 	return $el;
 }
+function _element14_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
 function _element14_print($el, $prm) {
 	if(!$dialog_id = $el['num_1'])
 		return _emptyRed('Не указан список для вывода данных.');
@@ -2072,6 +2077,13 @@ function _element40_vvv($el, $prm) {
 		return 0;
 
 	return _num($EL['num_1']);
+}
+function _elem40json($cond) {//перевод данных фильтра из JSON в array
+	if(empty($cond))
+		return array();
+
+	$arr = htmlspecialchars_decode($cond);
+	return json_decode($arr, true);
 }
 
 /* [44] Сборный текст */
@@ -6463,6 +6475,7 @@ function PHP12_action_list($prm) {
 		//действия для элемента
 		case 200:
 		case 220:
+		case 240:
 			if($block_id = _num($prm['srce']['block_id'])) {
 				if(!$BL = _blockOne($block_id))
 					return _emptyMin('Блока id'.$block_id.' не существует.');
