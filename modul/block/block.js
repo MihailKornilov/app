@@ -372,7 +372,7 @@ var _ids = function(v, count) {
 	_elemUnitFormat = function(EL) {//иконка с дополнительными условиями отображения
 		if(!EL.rule14)
 			return '';
-		return '<div val="dialog_id:64,block_id:' + EL.block_id + ',edit_id:' + EL.format_id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
+		return '<div val="dialog_id:240,block_id:' + EL.block_id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
 	},
 	_elemUnitHint = function(EL) {//иконка для настройки выплывающей подсказки
 		if(!EL.rule15)

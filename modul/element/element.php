@@ -685,12 +685,15 @@ function _element11_js($el) {
 
 	//дополнительные значения для изображений
 	if($last = _idsLast($el['txt_2']))
-		if($ell = _elemOne($last))
-			if($ell['dialog_id'] == 60) {
+		if($ell = _elemOne($last)) {
+			if($ell['dialog_id'] == 60)
 				$send += array(
 					'num_7' => $el['num_7'],//[60] ограничение высоты
 					'num_8' => $el['num_8'] //[60] закруглённые углы
 				);
+			//разрешать настройку условий отображения
+			if(_elemRule($ell['dialog_id'], 14))
+				$send['rule14'] = 1;
 			}
 
 	return $send;

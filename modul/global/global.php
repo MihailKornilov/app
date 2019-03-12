@@ -756,36 +756,6 @@ function _jsCacheElm($app_id=0) {
 
 	return _json($ELM);
 }
-function _jsCacheElemOne($elem_id) {
-	if(!$r = _elemOne($elem_id))
-		return array();
-	if(!$block_id = $r['block_id'])
-		return array();
-	if(!$block_id)
-		return array();
-
-	$val = array();
-
-
-
-
-	//исходный диалог (dialog source)
-	if($r['block']['obj_name'] == 'dialog')
-		$val['ds'] = $r['block']['obj_id'];
-
-	//правила для элементов, вставленных через [11]
-	if($r['dialog_id'] == 11)
-		if($last_id = _idsLast($r['txt_2']))
-			if($el11 = _elemOne($last_id)) {
-				//разрешать настройку условий отображения (форматирование)
-				if(_elemRule($el11['dialog_id'], 14)) {
-					$val['rule14'] = 1;
-					$val['format_id'] = empty($el11['format']) ? 0 : $el11['format']['id'];
-				}
-			}
-
-	return $val;
-}
 
 function _cache($v=array()) {
 	if(!defined('CACHE_DEFINE')) {

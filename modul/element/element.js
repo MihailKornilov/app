@@ -657,11 +657,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						BLKK[res.unit.block_id].elem_id = res.unit.id;
 				}
 
-				//присвоение id дополнительного форматирования
-				if(o.dialog_id == 64)
-					ELMM[res.unit.element_id].format = res.unit.id;
-
-				//присвоение id выплвыающей подсказке
+				//присвоение id выплывающей подсказке
 				if(o.dialog_id == 43) {
 					ELMM[res.unit.element_id].hint = {
 						id:res.unit.id,
