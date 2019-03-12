@@ -2723,6 +2723,9 @@ function _element74_js($el) {
 	) + _elementJs($el);
 }
 function _element74_print($el, $prm) {
+	if(empty($el['vvv']))
+		return _emptyMinRed('Значения фильтра не настроены');
+
 	//получение количества значений по каждому пункту
 	$EL = _elemOne($el['num_1']);
 	$DLG = _dialogQuery($EL['num_1']);
@@ -6195,8 +6198,10 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 			WHERE `id`=".$parent_id;
 	query($sql);
 
-	if(empty($update))
+	if(empty($update)) {
+		_elemOne($unit['id'], true);
 		return;
+	}
 
 	$sql = "INSERT INTO `_element` (
 				`id`,
@@ -6229,6 +6234,8 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 			SET `def`=".$def."
 			WHERE `id`=".$parent_id;
 	query($sql);
+
+	_elemOne($unit['id'], true);
 }
 function PHP12_filter_radio_setup_vvv($prm) {
 	if(!$u = $prm['unit_edit'])

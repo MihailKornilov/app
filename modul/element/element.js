@@ -1882,6 +1882,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//Фильтр-радио
 				case 74:
+					if(!ATR_CMP)
+						return;
 					ATR_CMP._radio({
 						func:function(v) {
 							FILTER[el.num_1][elm_id] = v;
