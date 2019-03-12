@@ -370,7 +370,7 @@ var _ids = function(v, count) {
 		return '<div val="dialog_id:220,block_id:' + EL.block_id + '" class="icon icon-link ml3 pl dialog-open' + _tooltip('Настроить ссылку', -56) + '</div>'
 	},
 	_elemUnitFormat = function(EL) {//иконка с дополнительными условиями отображения
-		if(!EL.rule14)
+		if(!EL.eye)
 			return '';
 		return '<div val="dialog_id:240,block_id:' + EL.block_id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
 	},

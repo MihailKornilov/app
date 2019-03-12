@@ -179,6 +179,10 @@ function _elementJs($el) {//структура элемента для JS
 	if(_elemRule($el['dialog_id'], 13) || !empty($el['url_use']))
 		$send['url_use'] = 1;
 
+	//разрешать настройку условий отображения
+	if(_elemRule($el['dialog_id'], 17))
+		$send['eye'] = 1;
+
 	if(!empty($el['action']))
 		$send['action'] = $el['action'];
 
@@ -693,7 +697,7 @@ function _element11_js($el) {
 				);
 			//разрешать настройку условий отображения
 			if(_elemRule($ell['dialog_id'], 14))
-				$send['rule14'] = 1;
+				$send['eye'] = 1;
 			}
 
 	return $send;
