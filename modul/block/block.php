@@ -655,7 +655,7 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 }
 function _elemFormat($el, $prm, $txt) {//формат значения элемента
 	$txt = _elemAction241($el, $prm, $txt);//подмена текста
-	$txt = _elemAction243($el, $txt);
+	$txt = _elemAction243($el, $txt);//Формат для чисел
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 	return $txt;
 }
@@ -690,10 +690,10 @@ function _elemAction241($el, $prm, $txt) {//подмена текста
 	return $txt;
 }
 function _elemAction243($el, $txt) {//Формат для чисел
-	if(empty($el['action']))
-		return $txt;
 	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
+	if(empty($el['action']))
+		return round($txt, 10);
 
 	foreach($el['action'] as $act) {
 		if($act['dialog_id'] != 243)
@@ -712,9 +712,11 @@ function _elemAction243($el, $txt) {//Формат для чисел
 				$txt = round($txt, 10);
 			$txt = str_replace('.', $act['v1'], $txt);
 		}
+
+		return $txt;
 	}
 
-	return $txt;
+	return round($txt, 10);
 }
 function _elemAction242($el, $prm) {//подмена цвета
 	$color = empty($el['color']) ? '' : $el['color'];
