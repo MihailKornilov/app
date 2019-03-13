@@ -558,7 +558,7 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 
 	$limit = $ELEM['num_2'];
 	$SC = $ELEM['num_6'] ? 'DESC' : 'ASC';
-	$order = "`t1`.`id` DESC";
+	$order = "`t1`.`id`";
 	if($tab = _queryTN($DLG, 'dtime_add'))
 		$order = "`".$tab."`.`dtime_add`";
 	$IS_SORT = false;
@@ -619,9 +619,8 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 			}
 
 			$cls[] = $td['font'];
-			$cls[] = $td['color'];
 			$cls[] = $td['txt_8'];//pos - позиция
-			$cls[] = _elemFormatColorDate($td, $prm, $txt);
+			$cls[] = _elemAction242($td, $prm);//подмена цвета
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';

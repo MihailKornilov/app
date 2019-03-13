@@ -44,10 +44,6 @@ switch(@$_POST['op']) {
 				$sql = "DELETE FROM `_element` WHERE `parent_id`=".$unit_id;
 				query($sql);
 
-				//удаление дополнительного форматирования
-				$sql = "DELETE FROM `_element_format` WHERE `element_id`=".$unit_id;
-				query($sql);
-
 				//удаление функций
 				$sql = "DELETE FROM `_action` WHERE `element_id`=".$unit_id;
 				query($sql);
@@ -457,12 +453,6 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 		_jsCache();
 	}
 
-	//изменено дополнительное форматирование
-	if($dialog['table_name_1'] == '_element_format') {
-		_BE('elem_clear');
-		_jsCache();
-	}
-
 	//изменена выплывающая подсказка
 	if($dialog['table_name_1'] == '_element_hint') {
 		_BE('elem_clear');
@@ -791,8 +781,6 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 		query($sql);
 	}
 
-	//пока только для `_action`
-	//также есть `_element_format` и `_element_hint`
 	if($tab = _queryTN($DLG, 'element_id', 1)) {
 		if($tab == '_action')
 			//только для диалогов, предназначенных для элементов
@@ -809,6 +797,8 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 				case 223:
 				case 224:
 				case 241:
+				case 242:
+				case 243:
 					if($block_id)
 						if($BL = _blockOne($block_id))
 							if($elem_id = $BL['elem_id']) {

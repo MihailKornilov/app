@@ -84,7 +84,6 @@ function _clone($appDst) {//клонирование приложения
 	_clone_action();
 	_clone_counter();
 	_clone_cron();
-	_clone_element_format();
 	_clone_element_hint();
 	_clone_spisok();
 
@@ -149,11 +148,6 @@ function _clone_clear() {
 
 	//удаление планировщиков
 	$sql = "DELETE FROM `_cron`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление форматирования
-	$sql = "DELETE FROM `_element_format`
 			WHERE `app_id`=".CLONE_ID_DST;
 	query($sql);
 
@@ -1246,46 +1240,6 @@ function _clone_cron() {
 					'".addslashes( _clone_json($r['src_prm'], $assEL))."',
 					"._num(@$assDLG[$r['dst_spisok']]).",
 					'".$r['dst_prm']."',
-
-					".USER_ID."
-				)";
-		query($sql);
-	}
-}
-function _clone_element_format() {
-	$sql = "SELECT *
-			FROM `_element_format`
-			WHERE `app_id`=".CLONE_ID_SRC."
-			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
-		return;
-
-	$ass = _clone_ass();
-	$assEL = $ass[_table('_element')];
-
-	foreach($arr as $r) {
-		$sql = "INSERT INTO `_element_format` (
-					`app_id`,
-
-					`element_id`,
-					`hide`,
-					`color_cond`,
-					`color_alt`,
-					`space`,
-					`fract_0_show`,
-					`fract_char`,
-
-					`user_id_add`
-				) VALUES (
-					".CLONE_ID_DST.",
-
-					"._num(@$assEL[$r['element_id']]).",
-					".$r['hide'].",
-					".$r['color_cond'].",
-					'".$r['color_alt']."',
-					".$r['space'].",
-					".$r['fract_0_show'].",
-					'".$r['fract_char']."',
 
 					".USER_ID."
 				)";

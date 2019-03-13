@@ -1373,28 +1373,6 @@ function PHP12_bug_element_hint() {
 		'<tr><td class="color-del">Подсказки от потерянных элементов:<td class="w50 r b red">'._hide0($lost).
 	'</table>';
 }
-function PHP12_bug_element_format() {
-	$sql = "SELECT *
-			FROM `_element_format`
-			WHERE `app_id`=".APP_ID;
-	$F = query_arr($sql);
-
-	$sql = "SELECT `id`,1
-			FROM `_element`
-			WHERE `app_id`=".APP_ID;
-	$ass = query_arr($sql);
-
-	$lost = 0;
-	foreach($F as $r)
-		if(empty($ass[$r['element_id']]))
-			$lost++;
-
-	return
-	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего форматирований:<td class="w50 r b color-pay">'._hide0(count($F)).
-		'<tr><td class="color-del">Форматирование у потерянных элементов:<td class="w50 r b red">'._hide0($lost).
-	'</table>';
-}
 
 
 

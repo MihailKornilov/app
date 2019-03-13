@@ -643,7 +643,7 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 	$txt = _elemPrint($el, $prm);
 
 	$cls = array();
-	$cls[] = _elemFormatColorDate($el, $prm, $txt);
+	$cls[] = _elemAction242($el, $prm);
 	$cls[] = @$el['font'];
 	$cls[] = _elemDivSize($el);
 	$cls = array_diff($cls, array(''));
@@ -655,8 +655,7 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 }
 function _elemFormat($el, $prm, $txt) {//формат значения элемента
 	$txt = _elemAction241($el, $prm, $txt);//подмена текста
-	$txt = _elemFormatHide($el, $txt);
-	$txt = _elemFormatDigital($el, $txt);
+	$txt = _elemAction243($el, $txt);
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 	return $txt;
 }
@@ -690,87 +689,74 @@ function _elemAction241($el, $prm, $txt) {//подмена текста
 
 	return $txt;
 }
-function _elemFormatHide($el, $txt) {//Дополнительное форматирование: скрытие при нулевом значении
-	if(empty($el['format']))
+function _elemAction243($el, $txt) {//Формат для чисел
+	if(empty($el['action']))
 		return $txt;
-	if($el['format']['hide'] && empty($txt))
-		return '';
 	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
-	if($el['format']['hide'] && !_cena($txt, 1))
-		return '';
 
-	return $txt;
-}
-function _elemFormatDigital($el, $txt) {//Дополнительное форматирование для чисел
-	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
-		return $txt;
-	if(empty($el['format'])) {
-		if(is_string($txt))
-			return $txt;
-		return round($txt, 2);
-	}
-	if($el['format']['space'])
-		$txt = _sumSpace($txt, $el['format']['fract_0_show'], $el['format']['fract_char']);
-	else {
-		if(!$el['format']['fract_0_show'])
-			$txt = round($txt, 2);
-		$txt = str_replace('.', $el['format']['fract_char'], $txt);
+	foreach($el['action'] as $act) {
+		if($act['dialog_id'] != 243)
+			continue;
+
+		//не показывать при нуле
+		if($act['apply_id'] && !round($txt, 10))
+			return '';
+
+		//пробелы в больших числах
+		if($act['effect_id'])
+			$txt = _sumSpace($txt, $act['revers'], $act['v1']);
+		else {
+			//не показывать нули в дробной части
+			if(!$act['revers'])
+				$txt = round($txt, 10);
+			$txt = str_replace('.', $act['v1'], $txt);
+		}
 	}
 
 	return $txt;
 }
-function _elemFormatColor($el, $txt) {//подмена цвета при дополнительном форматировании для чисел
-	$el['color'] = empty($el['color']) ? '' : $el['color'];
+function _elemAction242($el, $prm) {//подмена цвета
+	$color = empty($el['color']) ? '' : $el['color'];
 
-	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
-		return $el['color'];
-	if(empty($el['format']))
-		return $el['color'];
-
-	switch($el['format']['color_cond']) {
-		case 1457:
-			if($txt == 0)
-				return $el['format']['color_alt'];
-			break;
-		case 1458:
-			if($txt < 0)
-				return $el['format']['color_alt'];
-			break;
-		case 1459:
-			if($txt > 0)
-				return $el['format']['color_alt'];
-			break;
-	}
-
-	return $el['color'];
-}
-function _elemFormatColorDate($el, $prm, $txt) {//подмена цвета для даты todo тестовая версия
-	if($prm['blk_setup'])
-		return _elemFormatColor($el, $txt);
-	if($el['dialog_id'] != 86)
-		return _elemFormatColor($el, $txt);
-	if(!$elem_id = $el['num_1'])
-		return '';
-	if(!$EL = _elemOne($elem_id))
-		return '';
-	if(!$col = $EL['col'])
-		return '';
+	if(empty($el['action']))
+		return $color;
 	if(!$u = $prm['unit_get'])
-		return '';
-	if(!isset($u[$col]))
-		return '';
+		return $color;
 
-	$date = substr($u[$col], 0, 10);
+	foreach($el['action'] as $act) {
+		if($act['dialog_id'] != 242)
+			continue;
 
-	if(!preg_match(REGEXP_DATE, $date))
-		return '';
-	if($date == '0000-00-00')
-		return '';
+		if(!$F = _elem40json($act['filter']))
+			return $color;
 
-	$day = (strtotime($date) - TODAY_UNIXTIME) / 86400;
+		$F = $F[0];
 
-	return _elemFormatColor($el, $day);
+		if(!$ell = _elemOne($F['elem_id']))
+			return $color;
+		if(!$col = _elemCol($ell))
+			return $color;
+		if(!isset($u[$col]))
+			return $color;
+
+		$v = $u[$col];
+
+		switch($F['cond_id']) {
+			//больше
+			case 5:
+				if($v > $F['txt'])
+					return $act['v1'];
+				break;
+			//меньше
+			case 7:
+				if($v < $F['txt'])
+					return $act['v1'];
+				break;
+		}
+	}
+
+	return $color;
 }
 function _elemStyle($el, $prm) {//стили css для элемента
 	$send = array();
@@ -1520,7 +1506,6 @@ function _beElem($app_id=0) {
 			$ELM[$elem_id] = $el;
 		}
 
-		$ELM = _beElemFormat($ELM, $app_id);
 		$ELM = _beElemHint($ELM, $app_id);
 		$ELM = _beElemAction($ELM, $app_id);
 
@@ -1585,24 +1570,6 @@ function _beElemDlg($el) {//настройки элемента из диало�
 			}
 
 	return $el;
-}
-function _beElemFormat($ELM, $app_id) {//дополнительное форматирование элемента
-	$sql = "SELECT *
-			FROM `_element_format`
-			WHERE `app_id`=".$app_id;
-	foreach(query_arr($sql) as $r) {
-		$elem_id = $r['element_id'];
-		if(!isset($ELM[$elem_id]))
-			continue;
-		unset($r['id']);
-		unset($r['app_id']);
-		unset($r['element_id']);
-		unset($r['user_id_add']);
-		unset($r['dtime_add']);
-		$ELM[$elem_id]['format'] = _arrNum($r);
-	}
-
-	return $ELM;
 }
 function _beElemHint($ELM, $app_id) {//подсказки, назначенные элементам
 	$sql = "SELECT *
