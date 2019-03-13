@@ -2074,12 +2074,10 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 		return 0;
 	if(!$BL = _blockOne($block_id))
 		return 0;
-	if(!$EL = $BL['elem'])
-		return 0;
 
-	//если является списком
-	if(_elemIsConnect($EL))
-		return _num($EL['num_1']);
+	if($EL = $BL['elem'])
+		if(_elemIsConnect($EL))//если является списком - отправка диалога списка
+			return _num($EL['num_1']);
 
 	if($BL['obj_name'] == 'page') {
 		if(!$page = _page($BL['obj_id']))
