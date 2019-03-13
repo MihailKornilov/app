@@ -345,12 +345,33 @@ function _blockActionView($bl, $prm) {//условия отображения б
 		switch($act['dialog_id']) {
 			//скрытие блока, если нулевое значение элемента
 			case 231:
-				if(!$el = _elemOne($act['initial_id']))
+				if($el = _elemOne($act['initial_id'])) {
+					if(_element('action231', $el, $u))
+						$bl['hidden'] = 1;
 					break;
-				if(!_element('action231', $el, $u))
+				}
+
+				if(!$F = _elem40json($act['filter']))
 					break;
 
-				$bl['hidden'] = 1;
+				$F = $F[0];
+
+				if(!$col = _elemCol($F['elem_id']))
+					break;
+
+				switch($F['cond_id']) {
+					//отсутствует
+					case 1:
+						if(empty($u[$col]))
+							$bl['hidden'] = 1;
+						break;
+					//присутствует
+					case 2:
+						if(!empty($u[$col]))
+							$bl['hidden'] = 1;
+						break;
+				}
+
 				break;
 		}
 

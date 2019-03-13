@@ -2067,8 +2067,8 @@ function _element40_js($el) {
 		'num_1' => _num($el['num_1'])
 	) + _elementJs($el);
 }
-function _element40_vvv($el, $prm) {
-	if($el['num_1'])
+function _element40_vvv($el, $prm) {//получение id диалога на основании исходного блока (если нет указания на диалог в настройке)
+	if($el['num_1'])//указание есть
 		return 0;
 	if(!$block_id = $prm['srce']['block_id'])
 		return 0;
@@ -2076,10 +2076,18 @@ function _element40_vvv($el, $prm) {
 		return 0;
 	if(!$EL = $BL['elem'])
 		return 0;
-	if(!_elemIsConnect($EL))
-		return 0;
 
-	return _num($EL['num_1']);
+	//если является списком
+	if(_elemIsConnect($EL))
+		return _num($EL['num_1']);
+
+	if($BL['obj_name'] == 'page') {
+		if(!$page = _page($BL['obj_id']))
+			return 0;
+		return $page['dialog_id_unit_get'];
+	}
+
+	return 0;
 }
 function _elem40json($cond) {//перевод данных фильтра из JSON в array
 	if(empty($cond))
