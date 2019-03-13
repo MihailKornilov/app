@@ -2034,6 +2034,9 @@ function _element40_struct($el) {
 		Работает совместно с PHP12_spfl [41] - настройка значений
 	*/
 	return array(
+		'req'     => _num($el['req']),
+		'req_msg' => $el['req_msg'],
+
 		'num_1'   => _num($el['num_1']),//id элемента - путь к списку [13]
 		'txt_1'   => $el['txt_1']       //текст нулевого значения
 	) + _elementStruct($el);
