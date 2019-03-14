@@ -1309,7 +1309,11 @@ function _element28_print11($el, $u) {
 	if(!$col = _elemCol($el))
 		return '';
 
-	return _attachLink(@$u[$col]);
+	$width = 0;
+	if($bl = @$el['elp']['block'])
+		$width = $bl['width'];
+
+	return _attachLink(@$u[$col], $width);
 }
 
 /* [29] Select: выбор записи из другого списка */
@@ -6492,7 +6496,8 @@ function PHP12_icon18_type($id='all') {//доступные варианты и�
 		23 => 'calendar',
 		24 => 'eye',
 		25 => 'clock',
-		26 => 'cancel'
+		26 => 'cancel',
+		27 => 'recover'
 	);
 
 	if($id == 'all')
@@ -8038,15 +8043,19 @@ function _attachLinkRepair() {//временная фукнция для пер�
 }
 
 
-function _attachLink($attach_id) {//формирование ссылки на файл
+function _attachLink($attach_id, $width=0) {//формирование ссылки на файл
 	$sql = "SELECT *
 			FROM `_attach`
 			WHERE `id`=".$attach_id;
 	if(!$r = query_assoc($sql))
 		return 'Файл не найден';
 
+	$sw = '';
+	if($width)
+		$sw = ' style="width:'.$width.'px"';
+
 	return
-	'<div class="_attach-link">'.
+	'<div class="_attach-link"'.$sw.'>'.
 		'<a href="'.$r['link'].$r['fname'].'" target="_blank">'.
 			$r['oname'].
 		'</a>'.

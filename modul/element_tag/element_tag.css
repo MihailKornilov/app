@@ -879,7 +879,11 @@ button.vk._busy{color:transparent}
 }
 ._attach .atv._busy .icon{display:none}
 
-._attach-link a{color:#088;border-bottom:#088 dotted 1px}
+._attach-link a{
+	color:#088;
+	border-bottom:#088 dotted 1px;
+	word-wrap:break-word;
+}
 ._attach-link a:hover{text-decoration:none}
 ._attach-link span{
 	display:inline-block;
