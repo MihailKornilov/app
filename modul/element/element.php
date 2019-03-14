@@ -1286,6 +1286,10 @@ function _element28_struct($el) {
 function _element28_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, 0);
 
+	$width = 0;
+	if($bl = @$el['block'])
+		$width = $bl['width'];
+
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 	'<div class="_attach">'.
@@ -1298,7 +1302,7 @@ function _element28_print($el, $prm) {
 			'<iframe name="at-frame"></iframe>'.
 		'</div>'.
 		'<table class="atv'._dn($v).'">'.
-			'<tr><td class="top">'._attachLink($v).
+			'<tr><td class="top">'._attachLink($v, $width).
 				'<th class="top wsnw">'.
 //					'<div class="icon icon-set mtm2 ml5 pl'._tooltip('Параметры файла', -56).'</div>'.
 					'<div class="icon icon-del-red ml5 mtm2 pl'._tooltip('Отменить', -30).'</div>'.
@@ -8052,7 +8056,7 @@ function _attachLink($attach_id, $width=0) {//формирование ссыл�
 
 	$sw = '';
 	if($width)
-		$sw = ' style="width:'.$width.'px"';
+		$sw = ' style="max-width:'.($width-25).'px"';
 
 	return
 	'<div class="_attach-link"'.$sw.'>'.
