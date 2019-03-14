@@ -640,7 +640,7 @@ function _document() {//формирование документа для вы�
 
 	//получение данных файла-шаблона
 	if(!$attach_id = $doc['attach_id'])
-		return _empty20('Отсутствует id файла-шаблона');
+		return _empty20('Не настроен файл-шаблон');
 
 	$sql = "SELECT *
 			FROM `_attach`
@@ -709,10 +709,19 @@ function _doctxt($el, $unit) {
 		case 31: return _val31($el, $unit[$col]);
 		//порядковый номер
 		case 32: return empty($unit['num']) ? $unit['id'] : $unit['num'];
-		//дата и время
+		//дата и время внесения записи
 		case 33: return _elem33Data($el, $unit);
+		//календарь
+		case 51:
+			$ex = explode('-', $unit[$col]);
+			return $ex[2].'/'.$ex[1].'/'.$ex[0];
+		//имя пользователя
+		case 69:
+			$prm = _blockParam();
+			$prm['unit_get'] = $unit;
+			return _element69_print($el, $prm);
 	}
-	return DEBUG ? '[DLG'.$el['dialog_id'].']' : '';
+	return DEBUG ? '[DLG-'.$el['dialog_id'].']' : '';
 }
 function _doc11txt($el, $unit) {//значение элемента [11]
 	foreach(_ids($el['txt_2'], 'arr') as $id) {

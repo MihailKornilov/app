@@ -1305,6 +1305,12 @@ function _element28_print($el, $prm) {
 		'</table>'.
 	'</div>';
 }
+function _element28_print11($el, $u) {
+	if(!$col = _elemCol($el))
+		return '';
+
+	return _attachLink(@$u[$col]);
+}
 
 /* [29] Select: выбор записи из другого списка */
 function _element29_struct($el) {
@@ -6870,6 +6876,8 @@ function PHP12_template_param_save($cmp, $val, $unit) {
 				WHERE `id`=".$r['id'];
 		query($sql);
 	}
+
+	_BE('elem_clear');
 }
 function PHP12_template_param_vvv($prm) {//получение значений для настройки истории действий
 	if(!$u = $prm['unit_edit'])
