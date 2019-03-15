@@ -3,13 +3,21 @@ var _spisokUpdate = function(elem_spisok, func) {
 			op:'spisok_filter_update',
 			elem_spisok:elem_spisok,            //id элемента-списка
 			elem_v:FILTER[elem_spisok],         //значения фильтра по каждому элементу
-			busy_obj:$('#el_' + elem_spisok),   //id элемента, размещающего список
+			busy_obj:_attr_el(elem_spisok),   //id элемента, размещающего список
 			busy_cls:'spisok-busy'
 		};
 		_post(send, function(res) {
-			$(res.clear_attr)._dn(res.clear_diff);
-			$(res.count_attr).html(res.count_html);
-			$(res.spisok_attr).html(res.spisok_html);
+			_attr_cmp(res.clear_id)._dn(res.clear_diff);
+
+			//обновление количества [15], если есть
+			if(res.count_id)
+				_attr_el(res.count_id).html(res.count_html);
+
+			//обновление группировки [79], если есть
+			if(res.group_id)
+				_attr_el(res.group_id).html(res.group_html);
+
+			_attr_el(res.spisok_id).html(res.spisok_html);
 			if(func)
 				func(res);
 		});
@@ -22,7 +30,7 @@ var _spisokUpdate = function(elem_spisok, func) {
 			busy_obj:t
 		};
 		_post(send, function(res) {
-			var obj = $('#el_' + elem_id);
+			var obj = _attr_el(elem_id);
 			obj.append(res.spisok);
 			t.remove();
 		});

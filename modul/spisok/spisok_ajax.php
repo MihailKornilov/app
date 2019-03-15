@@ -128,9 +128,20 @@ switch(@$_POST['op']) {
 				WHERE `dialog_id`=15
 				  AND `num_1`=".$elem_spisok."
 				LIMIT 1";
-		if($elCount = query_assoc($sql)) {
-			$send['count_attr'] = '#el_'.$elCount['id'];
-			$send['count_html'] = _spisokElemCount($elCount);
+		if($el15 = query_assoc($sql)) {
+			$send['count_id'] = $el15['id'];
+			$send['count_html'] = _spisokElemCount($el15);
+		}
+
+		//элемент группировки, привязанный к списку
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=79
+				  AND `num_1`=".$elem_spisok."
+				LIMIT 1";
+		if($el79 = query_assoc($sql)) {
+			$send['group_id'] = $el79['id'];
+			$send['group_html'] = _element79_print($el79);
 		}
 
 		//элемент "очистка фильтра", привязанный к списку
@@ -140,11 +151,11 @@ switch(@$_POST['op']) {
 				  AND `num_1`=".$elem_spisok."
 				LIMIT 1";
 		if($elClear = query_assoc($sql)) {
-			$send['clear_attr'] = '#cmp_'.$elClear['id'];
+			$send['clear_id'] = $elClear['id'];
 			$send['clear_diff'] = _spisokFilter('diff', $elem_spisok);
 		}
 
-		$send['spisok_attr'] = '#el_'.$elem_spisok;
+		$send['spisok_id'] = $elem_spisok;
 		$spFunc = '_spisok'.$elSpisok['dialog_id'];
 		$send['spisok_html'] = $spFunc($elSpisok);
 		jsonSuccess($send);
