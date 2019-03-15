@@ -1973,6 +1973,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									case 7:  _attr_cmp(sp.elem_id)._search('clear'); return;
 									//фильтр-галочка
 									case 62: _attr_cmp(sp.elem_id)._check(sp.v); return;
+									//фильтр-радио
+									case 74:  _attr_cmp(sp.elem_id)._radio(sp.v); return;
 									//фильтр-календарь
 									case 77:
 										var CAL = _attr_el(sp.elem_id).find('._filter-calendar');
