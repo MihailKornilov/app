@@ -2564,5 +2564,125 @@ $.fn._yearleaf = function(o) {//перелистывание годов
 
 };
 
+$.fn._filter102 = function() {//Фильтр - Выбор нескольких групп значений
+	var ATR_EL = $(this);
 
+	if(!ATR_EL.length)
+		return;
+
+	var elem_id = _num(ATR_EL.attr('id').split('_')[1]);
+	if(!elem_id)
+		return;
+
+	//проверка, активирован ли элемент
+	var actv = 'ACTIVE' + elem_id;
+	if(window[actv])
+		return;
+
+	var EL = ELMM[elem_id];
+	if(!EL)
+		return;
+
+	var ATR_CMP_AFICS = _attr_cmp(elem_id, 1),
+		HLD = ATR_EL.find('.holder'),//текст пустого значения
+		TDUN = ATR_EL.find('.td-un'),//выбранные значения
+		DEL = ATR_EL.find('.icon-del'),//иконка удаления
+		ICON_EMPTY = '<div class="icon icon-empty"></div>',
+		TITLE = window['EL' + elem_id + '_F102_TITLE'],
+		COUNT = window['EL' + elem_id + '_F102_C'],
+		BG = window['EL' + elem_id + '_F102_BG'],
+		un = function(id, tl) {//формирование значения для вставки
+			var bg = BG[id] ? ' style="background-color:' + BG[id] + '"' : '',
+				title = tl ? TITLE[id] : _num(COUNT[id]);
+			if(!title)
+				return '';
+			//отображение подсказки, если значение в виде цифры
+			tl = tl ? '">' : _tooltip(TITLE[id], -6, 'l');
+			return '<div' + bg + ' class="un' + tl + title +'</div>';
+		},
+		sevSet = function() {//обновление выбранных значений
+			var sel = '',
+				ids = [];
+			_forEq(ATR_EL.find('._check'), function(sp) {
+				var p = sp.prev(),
+					v = _num(p.val()),
+					id = p.parent().parent().attr('val');
+
+				if(!v)
+					return;
+
+				sel += un(id);
+				ids.push(id);
+			});
+
+			if(ids.length == 1)
+				sel = un(ids[0], 1);
+
+			HLD._dn(!sel);
+			TDUN.html(sel || ICON_EMPTY);
+			DEL._vh(sel);
+			FILTER[EL.num_1][elem_id] = ids.join();
+			_spisokUpdate(EL.num_1);
+		},
+		chkUpd = function(id) {//обновление галочек
+			_forEq(ATR_EL.find('._check'), function(sp) {
+				var p = sp.prev(),
+					chk_id = p.parent().parent().attr('val');
+				p._check(chk_id == id ? 1 : 0);
+			});
+		};
+
+	_forEq(ATR_EL.find('._check'), function(sp) {
+		sp.prev()._check({func:sevSet});
+	});
+
+	ATR_CMP_AFICS.click(function(e) {
+		var tar = $(e.target);
+
+		//очистка фильтра
+		if(tar.hasClass('icon-del')) {
+			HLD._dn(1);
+			TDUN.html(ICON_EMPTY);
+			DEL._vh();
+			ATR_CMP_AFICS.removeClass('rs');
+			chkUpd();
+			FILTER[EL.num_1][elem_id] = 0;
+			_spisokUpdate(EL.num_1);
+			return;
+		}
+
+		if(tar.parents('.list').hasClass('list')) {
+			//выбор одного значения
+			if(tar[0].tagName == 'TD') {
+				var id = tar.parent().attr('val');
+				HLD._dn();
+				TDUN.html(un(id, 1));
+				DEL._vh(1);
+				ATR_CMP_AFICS.removeClass('rs');
+				chkUpd(id);
+				FILTER[EL.num_1][elem_id] = id;
+				_spisokUpdate(EL.num_1);
+			}
+			return;
+		}
+
+		ATR_CMP_AFICS._dn(ATR_CMP_AFICS.hasClass('rs'), 'rs');
+	});
+
+	$(document)
+		.off('click._filter102')
+		 .on('click._filter102', function(e) {
+			var cur = $(e.target).parents('._filter102'),
+				attr = '';
+
+			//закрытие фильтров-102, когда нажатие было в стороне
+			if(cur.hasClass('_filter102'))
+				attr = ':not(#' + cur.attr('id') + ')';
+
+			$('._filter102' + attr).removeClass('rs');
+		});
+
+	window[actv] = true;
+	return ATR_EL;
+};
 

@@ -1988,6 +1988,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									case 83: _attr_cmp(sp.elem_id)._select(0); return;
 									//Фильтр - Выбор нескольких групп значений
 									case 102:
+//										_attr_el(sp.elem_id)._filter102();
 										_attr_el(sp.elem_id).find('.holder')._dn(1);
 										_attr_el(sp.elem_id).find('.td-un').html('<div class="icon icon-empty"></div>');
 										_attr_el(sp.elem_id).find('.icon-del')._vh();
@@ -2024,106 +2025,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					ELM_RELOAD[el.num_1] = el.id;
 					return;
 				//Фильтр - Выбор нескольких групп значений
-				case 102:
-					var HLD = ATR_EL.find('.holder'),//текст пустого значения
-						TDUN = ATR_EL.find('.td-un'),//выбранные значения
-						DEL = ATR_EL.find('.icon-del'),//иконка удаления
-						ICON_EMPTY = '<div class="icon icon-empty"></div>',
-						TITLE = window['EL' + el.id + '_F102_TITLE'],
-						COUNT = window['EL' + el.id + '_F102_C'],
-						BG = window['EL' + el.id + '_F102_BG'],
-						un = function(id, tl) {//формирование значения для вставки
-							var bg = BG[id] ? ' style="background-color:' + BG[id] + '"' : '',
-								title = tl ? TITLE[id] : _num(COUNT[id]);
-							if(!title)
-								return '';
-							//отображение подсказки, если значение в виде цифры
-							tl = tl ? '">' : _tooltip(TITLE[id], -6, 'l');
-							return '<div' + bg + ' class="un' + tl + title +'</div>';
-						},
-						sevSet = function() {//обновление выбранных значений
-							var sel = '',
-								ids = [];
-							_forEq(ATR_EL.find('._check'), function(sp) {
-								var p = sp.prev(),
-									v = _num(p.val()),
-									id = p.parent().parent().attr('val');
-
-								if(!v)
-									return;
-
-								sel += un(id);
-								ids.push(id);
-							});
-
-							if(ids.length == 1)
-								sel = un(ids[0], 1);
-
-							HLD._dn(!sel);
-							TDUN.html(sel || ICON_EMPTY);
-							DEL._vh(sel);
-							FILTER[el.num_1][elm_id] = ids.join();
-							_spisokUpdate(el.num_1);
-						},
-						chkUpd = function(id) {//обновление галочек
-							_forEq(ATR_EL.find('._check'), function(sp) {
-								var p = sp.prev(),
-									chk_id = p.parent().parent().attr('val');
-								p._check(chk_id == id ? 1 : 0);
-							});
-						};
-
-					_forEq(ATR_EL.find('._check'), function(sp) {
-						sp.prev()._check({func:sevSet});
-					});
-
-					ATR_CMP_AFICS.click(function(e) {
-						var tar = $(e.target);
-
-						//очистка фильтра
-						if(tar.hasClass('icon-del')) {
-							HLD._dn(1);
-							TDUN.html(ICON_EMPTY);
-							DEL._vh();
-							ATR_CMP_AFICS.removeClass('rs');
-							chkUpd();
-							FILTER[el.num_1][elm_id] = 0;
-							_spisokUpdate(el.num_1);
-							return;
-						}
-
-
-						if(tar.parents('.list').hasClass('list')) {
-							//выбор одного значения
-							if(tar[0].tagName == 'TD') {
-								var id = tar.parent().attr('val');
-								HLD._dn();
-								TDUN.html(un(id, 1));
-								DEL._vh(1);
-								ATR_CMP_AFICS.removeClass('rs');
-								chkUpd(id);
-								FILTER[el.num_1][elm_id] = id;
-								_spisokUpdate(el.num_1);
-							}
-							return;
-						}
-
-						ATR_CMP_AFICS._dn(ATR_CMP_AFICS.hasClass('rs'), 'rs');
-					});
-
-					$(document)
-						.off('click._filter102')
-						 .on('click._filter102', function(e) {
-							var cur = $(e.target).parents('._filter102'),
-								attr = '';
-
-							//закрытие фильтров-102, когда нажатие было в стороне
-							if(cur.hasClass('_filter102'))
-								attr = ':not(#' + cur.attr('id') + ')';
-
-							$('._filter102' + attr).removeClass('rs');
-						});
-					return;
+				case 102: ATR_EL._filter102(); return;
 				//Привязка пользователя к странице ВК
 				case 300:
 					var VK300 = ATR_CMP.next(),

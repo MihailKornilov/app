@@ -3274,7 +3274,7 @@ function _element96_print($el, $prm) {
 /* [102] Фильтр: Выбор нескольких групп значений */
 function _element102_struct($el) {
 	return array(
-		'num_1'   => _num($el['num_1']),//id элемента: список, на который воздействует фильтр [24]
+		'num_1'   => _num($el['num_1']),//id элемента: список, на который воздействует фильтр [13]
 		'txt_1'   => $el['txt_1'],      //нулевое значение
 		'txt_2'   => $el['txt_2'],      //ids элементов: привязанный список (зависит от num_1) [13]
 		'txt_3'   => $el['txt_3'],      //ids элементов: счётчик количеств  (зависит от num_1) [13]
@@ -3339,7 +3339,6 @@ function _element102_print($el, $prm) {
 		if($n == 1)
 			$sel = $selOne;
 	}
-
 
 	return
 	'<div class="_filter102"'._elemStyleWidth($el).' id="'._elemAttrId($el, $prm).'_filter102">'.
