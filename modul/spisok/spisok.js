@@ -1,13 +1,15 @@
 var _spisokUpdate = function(elem_spisok, func) {
 		var send = {
 			op:'spisok_filter_update',
-			elem_spisok:elem_spisok,            //id элемента-списка
-			elem_v:FILTER[elem_spisok],         //значения фильтра по каждому элементу
-			busy_obj:_attr_el(elem_spisok),   //id элемента, размещающего список
+			elem_spisok:elem_spisok,         //id элемента-списка
+			elem_v:FILTER[elem_spisok],      //значения фильтра по каждому элементу
+			busy_obj:_attr_el(elem_spisok),  //id элемента, размещающего список
 			busy_cls:'spisok-busy'
 		};
 		_post(send, function(res) {
-			_attr_cmp(res.clear_id)._dn(res.clear_diff);
+			//показ/скрытие кнопки очистки фильтра [80]
+			if(res.clear_id)
+				_attr_cmp(res.clear_id)._dn(res.clear_diff);
 
 			//обновление количества [15], если есть
 			if(res.count_id)

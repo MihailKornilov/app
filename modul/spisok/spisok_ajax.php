@@ -185,6 +185,17 @@ switch(@$_POST['op']) {
 			$send['count_html'] = _spisokElemCount($elCount);
 		}
 
+		//элемент группировки, привязанный к списку
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=79
+				  AND `num_1`=".$spisok_id."
+				LIMIT 1";
+		if($el79 = query_assoc($sql)) {
+			$send['group_id'] = $el79['id'];
+			$send['group_html'] = _element79_print($el79);
+		}
+
 		$send['spisok_id'] = $spisok_id;
 		$spFunc = '_spisok'.$elSpisok['dialog_id'];
 		$send['spisok_html'] = $spFunc($elSpisok);

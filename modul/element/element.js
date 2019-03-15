@@ -1961,9 +1961,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							//скрытие кнопки
 							t._dn();
 
-							//обновление количества
+							//обновление количества [15]
 							if(res.count_id)
 								_attr_el(res.count_id).html(res.count_html);
+
+							//обновление группировки [79]
+							if(res.group_id)
+								_attr_el(res.group_id).html(res.group_html);
 
 							_attr_el(res.spisok_id).html(res.spisok_html);
 
