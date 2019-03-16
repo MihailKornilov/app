@@ -297,9 +297,20 @@ function _blockAction($r, $prm) {//действие при нажатии на �
 	$uid = 0;
 	if($u = $prm['unit_get']) {
 		$uid = $u['id'];
-		foreach($r['action'] as $n => $act)
+		foreach($r['action'] as $n => $act) {
 			if($v = _blockActionFilter($u, $act['filter']))
 				$skip[$act['id']] = 1;
+
+			//открытие документа на печать - подмена ID, соответствующего диалогу
+			if($act['dialog_id'] == 217) {
+				$sql = "SELECT *
+						FROM `_template`
+						WHERE `app_id`=".APP_ID."
+						  AND `id`="._num($act['target_ids']);
+				if($doc = query_assoc($sql))
+					$uid = _spisokUnitUrlDlg($u, $doc['spisok_id']);
+			}
+		}
 	}
 
 	return ' onclick="_blockActionJS(this,'.$r['id'].','.$uid.','._json($skip, 0, true).')"';
