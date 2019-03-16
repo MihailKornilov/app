@@ -722,11 +722,19 @@ function _elemAction243($el, $txt) {//Формат для чисел
 		if($el['dialog_id'] == 11)
 			if(!$el = _elemOne(_idsLast($el['txt_2'])))
 				return $txt;
-		if($el['dialog_id'] != 8)
-			return $txt;
-		if($el['num_1'] != 33)//цифры и числа
-			return $txt;
-		return round($txt, 10);
+
+		switch($el['dialog_id']) {
+			case 8:
+				if($el['num_1'] == 33)//цифры и числа
+					return round($txt, 10);
+				break;
+			case 27:
+			case 54:
+			case 55:
+				return round($txt, 10);
+		}
+
+		return $txt;
 	}
 
 	foreach($el['action'] as $act) {
