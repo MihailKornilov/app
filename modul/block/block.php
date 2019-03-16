@@ -719,21 +719,14 @@ function _elemAction243($el, $txt) {//Формат для чисел
 	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
 	if(empty($el['action'])) {
-		switch($el['dialog_id']) {
-			case 8:
-				if($el['num_1'] != 33)//цифры и числа
-					return $txt;
-				return round($txt, 10);
-			case 11:
-				if(!$ell = _elemOne(_idsLast($el['txt_2'])))
-					return $txt;
-				if($ell['dialog_id'] != 8)
-					return $txt;
-				if($ell['num_1'] != 33)//цифры и числа
-					return $txt;
-				return round($txt, 10);
-		}
-		return $txt;
+		if($el['dialog_id'] == 11)
+			if(!$el = _elemOne(_idsLast($el['txt_2'])))
+				return $txt;
+		if($el['dialog_id'] != 8)
+			return $txt;
+		if($el['num_1'] != 33)//цифры и числа
+			return $txt;
+		return round($txt, 10);
 	}
 
 	foreach($el['action'] as $act) {
