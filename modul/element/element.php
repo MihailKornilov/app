@@ -2138,6 +2138,7 @@ function _element44_print($el, $prm) {
 	foreach($el['vvv'] as $ell) {
 		$txt = _element('print', $ell, $prm);
 		$txt = _elemFormat($ell, $prm, $txt);
+		$txt = _spisokColSearchBg($el, $txt);
 		$send .= $txt;
 		if($ell['num_8'])
 			$send .= ' ';
