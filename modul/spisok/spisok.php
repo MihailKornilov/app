@@ -225,13 +225,17 @@ function _spisok7num($spisok, $el) {//добавление записи, есл�
 	foreach(_spisokFilter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 7) {
 			$search = $r['elem'];
-			$num = _num($r['v']);
+			$num = $r['v'];
 			break;
 		}
 
 	if(!$search)
 		return $spisok;
-	if(!$num)
+	if(!_num($num))
+		return $spisok;
+	if(!strlen($num))
+		return $spisok;
+	if(!$num[0])
 		return $spisok;
 
 	//2. Определение, есть ли в шаблоне номер списка
@@ -886,9 +890,8 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения к
 		return $txt;
 
 	//совпадение с номером единицы списка
-	if($num = _num($v))
-		if($num == $txt)
-			return '<em class="fndd">'.$txt.'</em>';
+	if($v == $txt && strlen($v) == strlen($txt))
+		return '<em class="fndd">'.$txt.'</em>';
 
 	//выделение найденного значения возможно только если элемент был вставлен через [11]
 	if($el['dialog_id'] != 11)
