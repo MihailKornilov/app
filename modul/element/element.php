@@ -5640,9 +5640,9 @@ function PHP12_insert_unit_change_vvv($prm) {
 
 	$send = array();
 	foreach($DLG['cmp'] as $id => $r) {
-		if(!$r['col'])
+		if(empty($r['col']))
 			continue;
-		if($r['hidden'])
+		if(!empty($r['hidden']))
 			continue;
 		$src_id = _num(@$ass[$id]);
 		$send[] = array(
