@@ -436,6 +436,33 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			spisok:o.dlg_unit_get
 		});
 
+		DLG('#IUID_dlg_id')._select({
+			width:250,
+			title0:'диалог не выбран',
+			spisok:o.dlg_spisok_on,
+			func:function(v) {
+				DLG('.tr-iuid')._dn(v);
+				DLG('#insert_unit_id_set_elem_id')._select(0);
+
+				if(!v)
+					return
+
+				DLG('#insert_unit_id_set_elem_id')._select('process');
+				var send = {
+					op:'dialog_setup_cols',
+					dialog_id:v
+				};
+				_post(send, function(res) {
+					DLG('#insert_unit_id_set_elem_id')._select('spisok', res.spisok);
+				});
+			}
+		});
+		DLG('#insert_unit_id_set_elem_id')._select({
+			width:250,
+			title0:'колонка не выбрана',
+			spisok:o.iuid_cols
+		});
+
 		_dialogHeightCorrect(DLG);
 
 		//установка линии для настройки ширины диалога
@@ -479,6 +506,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				insert_button_cancel:DLG('#insert_button_cancel').val(),
 				insert_action_id:DLG('#insert_action_id').val(),
 				insert_action_page_id:DLG('#insert_action_page_id').val(),
+				insert_unit_id_set_elem_id:DLG('#insert_unit_id_set_elem_id').val(),
 
 				edit_on:DLG('#edit_on').val(),
 				edit_head:DLG('#edit_head').val(),

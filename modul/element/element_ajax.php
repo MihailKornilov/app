@@ -72,6 +72,17 @@ switch(@$_POST['op']) {
 				LIMIT 1";
 		$del58 = _num(query_value($sql));
 
+
+		//присвоение ID стороннего диалога
+		$IUID_dlg_id = 0;
+		$IUID_cols = array();
+		if($el = _elemOne($dialog['insert_unit_id_set_elem_id']))
+			if($BL = $el['block'])
+				if($BL['obj_name'] == 'dialog') {
+					$IUID_dlg_id = $BL['obj_id'];
+					$IUID_cols = _dialogSpisokCmp($BL['obj_id']);
+				}
+
 		$html =
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
 
@@ -112,6 +123,12 @@ switch(@$_POST['op']) {
 
 							'<tr><td class="blue r h35">Воздействие на запись:'.
 								'<td><a id="insert_unit_change" class="'.($dialog['insert_unit_change_elem_id'] ? 'color-pay b">' : 'grey">не ').'настроено</a>'.
+
+							'<tr><td class="blue r">Присвоение ID:'.
+								'<td><input type="hidden" id="IUID_dlg_id" value="'.$IUID_dlg_id.'" />'.
+							'<tr class="tr-iuid'._dn($dialog['insert_unit_id_set_elem_id']).'">'.
+								'<td>'.
+								'<td><input type="hidden" id="insert_unit_id_set_elem_id" value="'.$dialog['insert_unit_id_set_elem_id'].'" />'.
 
 						'</table>'.
 					'</div>'.
@@ -276,7 +293,8 @@ switch(@$_POST['op']) {
 		$send['group'] = $group;
 		$send['dlg_func'] = _dialogSelArray('dlg_func');
 		$send['dlg_spisok_on'] = _dialogSelArray('spisok_only', $dialog_id);
-		$send['spisok_cmp'] = _dialogSpisokCmp($dialog['cmp']);
+		$send['spisok_cmp'] = _dialogSpisokCmp($dialog_id);
+		$send['iuid_cols'] = $IUID_cols;
 
 		$dlgUnitGet = _dialogSelArray('unit_get', $dialog_id);
 		array_unshift($dlgUnitGet, array(
@@ -286,6 +304,14 @@ switch(@$_POST['op']) {
 						 '<div class="fs12 grey ml10 mt3 i">Диалог будет принимать данные списка, которые принимает страница</div>'
 		));
 		$send['dlg_unit_get'] = $dlgUnitGet;
+
+		jsonSuccess($send);
+		break;
+	case 'dialog_setup_cols'://получение колонок конктетного диалога
+		if(!$dialog_id = _num($_POST['dialog_id']))
+			jsonError('Некорректный ID диалогового окна');
+
+		$send['spisok'] = _dialogSpisokCmp($dialog_id);
 
 		jsonSuccess($send);
 		break;
@@ -860,6 +886,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 		jsonError('Не указан текст кнопки отмены для новой записи');
 	$insert_action_id = _num($_POST['insert_action_id']);
 	$insert_action_page_id = _num($_POST['insert_action_page_id']);
+	$insert_unit_id_set_elem_id = _num($_POST['insert_unit_id_set_elem_id']);
 
 
 	/* ---=== Настройки редактирования данных ===--- */
@@ -918,6 +945,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`insert_button_cancel`='".addslashes($insert_button_cancel)."',
 				`insert_action_id`=".$insert_action_id.",
 				`insert_action_page_id`=".$insert_action_page_id.",
+				`insert_unit_id_set_elem_id`=".$insert_unit_id_set_elem_id.",
 
 				`edit_on`=".$edit_on.",
 				`edit_head`='".addslashes($edit_head)."',

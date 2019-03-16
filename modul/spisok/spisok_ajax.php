@@ -893,6 +893,8 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 		}
 
 
+	_dialogIUID($DLG, $uid[$table_1]);
+
 	_historyInsert(1, $DLG, $uid[$table_1]);
 
 	return $uid[$table_1];

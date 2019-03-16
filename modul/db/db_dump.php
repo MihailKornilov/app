@@ -64,8 +64,8 @@ $body =
 	chunk_split(base64_encode($text))."\n".
 	'--'.$boundary ."--\n";
 
-if(mail(CRON_MAIL, $subject, $body, $headers))
-	unlink(DUMP_FILE);
+if(mail(CRON_MAIL, $subject, $body, $headers)) {}
+//	unlink(DUMP_FILE);
 
 
 

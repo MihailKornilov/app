@@ -4271,10 +4271,13 @@ function _dialogSelArrayUnit($r, $idShow=0) {//составление едини
 	return $u;
 }
 
-function _dialogSpisokCmp($cmp) {//список колонок, используемых в диалоге (для выбора колонки по умолчанию)
+function _dialogSpisokCmp($dialog_id) {//список колонок, используемых в диалоге (для выбора колонки по умолчанию)
+	if(!$DLG = _dialogQuery($dialog_id))
+		return array();
+
 	$send = array();
 
-	foreach($cmp as $id => $r) {
+	foreach($DLG['cmp'] as $id => $r) {
 		if(empty($r['col']))
 			continue;
 		$send[$id] = $r['col'].': '.@$r['name'];
@@ -4291,6 +4294,31 @@ function _dialogContentDelSetup($dialog_id) {//иконка настройки �
 	'<div val="dialog_id:56,dss:'.$dialog_id.'"'.
 		' class="icon icon-set pl dialog-open'.$tooltip.
 	'</div>';
+}
+
+function _dialogIUID($DLG, $unit_id) {//присвоение ID стороннего диалога (InsertUnitID)
+	if(!$el = _elemOne($DLG['insert_unit_id_set_elem_id']))
+		return;
+	if(!$BL = $el['block'])
+		return;
+	if($BL['obj_name'] != 'dialog')
+		return;
+	if(!$col = _elemCol($el))
+		return;
+	if(!$get_id = _num(@$_GET['id']))
+		return;
+	if(!$UDLG = _dialogQuery($BL['obj_id']))
+		return;
+	if(!$u = _spisokUnitQuery($UDLG, $get_id))
+		return;
+	if(!isset($u[$col]))
+		return;
+
+	$sql = "UPDATE "._queryFrom($UDLG)."
+			SET `t1`.`".$col."`=".$unit_id."
+			WHERE "._queryWhere($UDLG)."
+			  AND `t1`.`id`=".$get_id;
+	query($sql);
 }
 
 function PHP12_dialog_sa() {//список диалоговых окон [12]
