@@ -718,8 +718,13 @@ function _elemAction241($el, $prm, $txt) {//подмена текста
 function _elemAction243($el, $txt) {//Формат для чисел
 	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
-	if(empty($el['action']))
+	if(empty($el['action'])) {
+		if($el['dialog_id'] != 8)
+			return $txt;
+		if($el['num_1'] != 33)//цифры и числа
+			return $txt;
 		return round($txt, 10);
+	}
 
 	foreach($el['action'] as $act) {
 		if($act['dialog_id'] != 243)

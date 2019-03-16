@@ -2136,7 +2136,9 @@ function _element44_print($el, $prm) {
 
 	$send = '';
 	foreach($el['vvv'] as $ell) {
-		$send .= _element('print', $ell, $prm);
+		$txt = _element('print', $ell, $prm);
+		$txt = _elemFormat($ell, $prm, $txt);
+		$send .= $txt;
 		if($ell['num_8'])
 			$send .= ' ';
 	}
@@ -6473,6 +6475,8 @@ function PHP12_44_setup_save($cmp, $val, $unit) {//сохранение соде
 				WHERE `id`=".$r['id'];
 		query($sql);
 	}
+
+	_BE('elem_clear');
 }
 function PHP12_44_setup_vvv($prm) {
 	if(!$u = $prm['unit_edit'])
