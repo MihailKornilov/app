@@ -22,6 +22,7 @@ switch(@$_POST['op']) {
 		$send['action_id'] = _num($dialog['del_action_id']);
 		$send['action_page_id'] = _num($dialog['del_action_page_id']);
 		$send = _spisokAction3($dialog, $unit_id, $send);
+		_dialogIUID($dialog);
 
 		if(isset($dialog['field1']['deleted'])) {
 			$unit = _spisokUnitQuery($dialog, $unit_id);

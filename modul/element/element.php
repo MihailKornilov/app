@@ -4296,7 +4296,7 @@ function _dialogContentDelSetup($dialog_id) {//иконка настройки �
 	'</div>';
 }
 
-function _dialogIUID($DLG, $unit_id) {//присвоение ID стороннего диалога (InsertUnitID)
+function _dialogIUID($DLG, $unit_id=0) {//присвоение ID стороннего диалога (InsertUnitID)
 	if(!$el = _elemOne($DLG['insert_unit_id_set_elem_id']))
 		return;
 	if(!$BL = $el['block'])
