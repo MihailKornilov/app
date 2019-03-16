@@ -746,7 +746,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 		//переход на страницу
 		case 221:
 			$page_id = $func['target_ids'];
-			$id = _spisokUnitUrlId($el, $page_id, $u);
+			$id = _spisokUnitUrlPage($el, $page_id, $u);
 			return '<a href="'.URL.'&p='.$page_id.($id ? '&id='.$id : '').'" class="inhr'.
 						_spisokUnitTT($el, $u).
 						$txt.
@@ -762,7 +762,11 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 			//блок передаёт id записи для редактирования
 			if($func['effect_id'])
-				$val .= ',edit_id:'.$u['id'];
+				$val .= ',edit_id:'._spisokUnitUrlDlg($u, $func['target_ids']);
+
+			//блок передаёт id записи для удаления
+			if($func['revers'])
+				$val .= ',del_id:'._spisokUnitUrlDlg($u, $func['target_ids']);
 
 			if(preg_match('/"icon/', $txt))
 				return str_replace('class="', 'val="'.$val.'" class="dialog-open ', $txt);
@@ -792,7 +796,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 	return '<a href="'.URL.'&p='.$page_id.'&id='.$u['id'].'" class="inhr">'.$txt.'</a>';
 }
-function _spisokUnitUrlId($el, $page_id, $u) {//получение id записи согласно странице
+function _spisokUnitUrlPage($el, $page_id, $u) {//получение id записи согласно странице
 	if(empty($u))
 		return 0;
 	if(!$page = _page($page_id))
@@ -809,6 +813,23 @@ function _spisokUnitUrlId($el, $page_id, $u) {//получение id запис
 		return $u['id'];
 
 	return is_array($u[$col]) ? $u[$col]['id'] : $u['id'];
+}
+function _spisokUnitUrlDlg($u, $dlg_id) {//получение id записи согласно диалога
+	if(empty($u))
+		return 0;
+	if(!empty($u['dialog_id_use']) && $u['dialog_id_use'] == $dlg_id)
+		return $u['id'];
+	if(!$DLG = _dialogQuery($u['dialog_id_use']))
+		return 0;
+
+	foreach($DLG['cmp'] as $cmp)
+		if(_elemIsConnect($cmp))
+			if($cmp['num_1'] == $dlg_id)
+				if($col = _elemCol($cmp))
+					if(isset($u[$col]))
+						return is_array($u[$col]) ? _num($u[$col]['id']) : _num($u[$col]);
+
+	return 0;
 }
 function _spisokUnitTT($el, $u, $txt='">') {//действие: подсказка [223]
 	if(empty($el['action']))
