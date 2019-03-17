@@ -189,7 +189,7 @@ function _queryCol($DLG) {//получение колонок, для котор
 	foreach($DLG['cmp'] as $cmp) {
 		$col = _elemCol($cmp);
 		if($cmp['dialog_id'] == 9)
-			$field[] = "'' ".$col;
+			$field[] = "IF(`".$col."`,1,'') `".$col."`";
 		else
 			$field[] = _queryColReq($DLG, $col);
 	}
@@ -199,7 +199,7 @@ function _queryCol($DLG) {//получение колонок, для котор
 		foreach($PAR['cmp'] as $cmp) {
 			$col = _elemCol($cmp);
 			if($cmp['dialog_id'] == 9)
-				$field[] = "'' ".$col;
+				$field[] = "IF(`".$col."`,1,'') `".$col."`";
 			else
 				$field[] = _queryColReq($DLG, $col);
 		}

@@ -72,9 +72,9 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 		//скрытие блока при нулевом значении
 		case 'action231':
 			//здесь $prm - сама запись
-			if(empty($el['col']))
+			if(!$col = _elemCol($el))
 				return false;
-			if(!empty($prm[$el['col']]))
+			if(!empty($prm[$col]))
 				return false;
 			return true;
 	}
@@ -597,6 +597,14 @@ function _element9_print($el, $prm) {
 	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
 	return '<input type="password" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' />';
+}
+function _element9_print11($el, $u) {
+	if(!$col = _elemCol($el))
+		return '';
+	if(empty($u[$col]))
+		return '';
+
+	return $u[$col];
 }
 
 /* [10] Произвольный текст */
