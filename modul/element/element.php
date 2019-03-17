@@ -7381,7 +7381,7 @@ function _historySpisok($EL, $prm) {//список истории действи
 			ORDER BY `dtime_add` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
-		return _emptyMin10('Истории нет.');
+		return _emptyMin('Истории нет.');
 
 	foreach($arr as $id => $r)
 		$arr[$id]['edited'] = array();
