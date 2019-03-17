@@ -610,6 +610,13 @@ switch(@$_POST['op']) {
 		$obj_name = $BL['obj_name'];
 		$obj_id = $BL['obj_id'];
 
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id` IN (".$ids.")
+				ORDER BY `parent_id`,`y`,`x`";
+		if(!$BLK = query_arr($sql))
+			jsonError('Выбранные блоки не существуют');
+
 		foreach(_ids($ids, 'arr') as $id) {
 			if($id == $parent_id)
 				jsonError('Невозможно вставить блок в самого себя');
@@ -617,18 +624,12 @@ switch(@$_POST['op']) {
 			$ass = _BE('block_child_ids', $id);
 			if(isset($ass[$parent_id]))
 				jsonError('Невозможна вставка в дочерний блок одного из переносимых блоков');
-			if(!$bl = _blockOne($id))
-				jsonError('Переносимого блока '.$id.' не существует');
+			if(!isset($BLK[$id]))
+				jsonError('Копируемого блока '.$id.' не существует');
+			$bl = $BLK[$id];
 			if($bl['x'] + $bl['w'] > $BL['w'])
-				jsonError('Общая ширина переносимых блоков не может превышать ширину выбранного блока');
+				jsonError('Общая ширина копируемых блоков не может превышать ширину выбранного блока');
 		}
-
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id` IN (".$ids.")
-				ORDER BY `parent_id`,`y`,`x`";
-		if(!$BLK = query_arr($sql))
-			jsonError('Выбранные блоки не существуют');
 
 
 		//получение всех дочерних блоков
@@ -703,6 +704,13 @@ switch(@$_POST['op']) {
 		if($BL['elem_id'])
 			jsonError('Блок не должен содержать элемент');
 
+		$sql = "SELECT *
+				FROM `_block`
+				WHERE `id` IN (".$ids.")
+				ORDER BY `parent_id`,`y`,`x`";
+		if(!$BLK = query_arr($sql))
+			jsonError('Выбранные блоки не существуют');
+
 		foreach(_ids($ids, 'arr') as $id) {
 			if($id == $parent_id)
 				jsonError('Невозможно вставить блок в самого себя');
@@ -710,8 +718,11 @@ switch(@$_POST['op']) {
 			$ass = _BE('block_child_ids', $id);
 			if(isset($ass[$parent_id]))
 				jsonError('Невозможна вставка в дочерний блок одного из переносимых блоков');
-			if(!$bl = _blockOne($id))
+			if(!isset($BLK[$id]))
 				jsonError('Переносимого блока '.$id.' не существует');
+
+			$bl = $BLK[$id];
+
 			if($bl['x'] + $bl['w'] > $BL['w'])
 				jsonError('Ширина переносимого блока не может превышать ширину выбранного блока');
 		}
