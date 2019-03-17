@@ -790,13 +790,13 @@ function PHP12_page_list_li($r, $level=0) {//данные одной стран�
 
 
 /* Автоматическое открытие диалога для ввода Пин-кода, если был переход на страницу 13 */
-function PHP12_pin_dialog_open($prm) {
+function PHP12_pin_dialog_open() {
 	//поиск кнопки на странице
 	foreach(_BE('elem_arr', 'page', 13) as $cmp)
 		if($cmp['dialog_id'] == 2)
 			return
 			'<script>'.
-				'$("'.$cmp['attr_cmp'].'").trigger("click");'.
+				'$("'._elemAttrCmp($cmp).'").trigger("click");'.
 			'</script>';
 
 	return '';

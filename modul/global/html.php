@@ -188,9 +188,10 @@ function _authPassMD5($pass) {
 }
 function _authCmp($dialog, $cmp, $name) {//получение значения по имени колонки
 	foreach($dialog['cmp'] as $cmp_id => $r)
-		if($r['col'] == $name)
-			if(isset($cmp[$cmp_id]))
-				return $cmp[$cmp_id];
+		if(!empty($r['col']))
+			if($r['col'] == $name)
+				if(isset($cmp[$cmp_id]))
+					return $cmp[$cmp_id];
 	return '';
 }
 function _auth98($dialog, $cmp) {//регистрация нового пользователя
