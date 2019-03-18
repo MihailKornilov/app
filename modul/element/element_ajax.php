@@ -606,11 +606,16 @@ switch(@$_POST['op']) {
 		break;
 
 	case 'vk_user_get'://получение данных пользователя VK [300]
-		if(!$user_id = _num($_POST['val']))
-			jsonError('Не получен ID пользователя');
+		if(empty($val = $_POST['val']))
+			jsonError('Не получен ссылка на страницу пользователя');
+
+		if(preg_match('/vk.com\//', $val)) {
+			$ex = explode('vk.com/', $val);
+			$val = $ex[1];
+		}
 
 		$res = _vkapi('users.get', array(
-			'user_ids' => $user_id,
+			'user_ids' => $val,
 			'fields' => 'photo,'.
 						'sex,'.
 						'country,'.
@@ -622,12 +627,11 @@ switch(@$_POST['op']) {
 
 		$res = $res['response'][0];
 
-
 		$send['html'] =
 			'<table class="mt5">'.
 				'<tr><td class="top pr5"><img src="'.$res['photo'].'" class="ava50">'.
 					'<td class="top">'.
-						'<a href="//vk.com/id'.$user_id.'" class="b" target="_blank">'.
+						'<a href="//vk.com/id'.$res['id'].'" class="b" target="_blank">'.
 							$res['first_name'].' '.$res['last_name'].
 						'</a>'.
 						'<div class="grey mt3">'._elem300Place($res).'</div>'.
@@ -635,7 +639,7 @@ switch(@$_POST['op']) {
 			'</table>';
 
 		$send['sel'] = _elem300Sel($res);
-		$send['user_id'] = $user_id;
+		$send['user_id'] = $res['id'];
 
 		jsonSuccess($send);
 		break;
