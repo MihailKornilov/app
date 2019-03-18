@@ -718,6 +718,9 @@ function _element11_print($el, $prm) {
 		if(!$ell = _elemOne($id))
 			return _msgRed('-ell-yok-');
 
+		if(_elemIsConnect($ell))
+			return _element29_print11($el, $u);
+
 		if(!_elemIsConnect($ell)) {
 			$ell['elp'] = $el;//вставка родительского элемента (для подсветки при быстром поиске)
 			return _element('print11', $ell, $u);
@@ -1374,6 +1377,35 @@ function _element29_print($el, $prm) {
 		'width' => $el['width'],
 		'value' => $v
 	));
+}
+function _element29_print11($el, $u) {
+
+	$parent = '';
+
+	foreach(_ids($el['txt_2'], 'arr') as $id) {
+		if(!$ell = _elemOne($id))
+			return '';
+		if(!$col = _elemCol($ell))
+			return '';
+		if(empty($u[$col]))
+			return '';
+
+		if($ell['dialog_id'] == 60) {
+			$ell['elp'] = $el;
+			return _element('print11', $ell, $u);
+		}
+
+		if(!is_array($u[$col]))
+			if($pid = $u['parent_id'])
+				if($DLG = _dialogQuery($u['dialog_id']))
+					if($unit = _spisokUnitQuery($DLG, $pid))
+						if(!empty($unit[$col]))
+							$parent = $unit[$col].' » ';
+
+		$u = $u[$col];
+	}
+
+	return $parent.$u;
 }
 function _element29_vvv($el, $prm) {
 	if($prm['unit_edit'])
