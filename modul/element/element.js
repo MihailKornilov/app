@@ -2079,7 +2079,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							op:'vk_user_get',
 							val:val,
 							busy_obj:VK_ICON,
-							busy_cls:'spin'
+							busy_cls:'spin',
+							func_err:function(res) {
+								VK_RES.html('<div class="mt10 red">' + res.text + '</div>');
+							}
 						};
 						_post(send, function(res) {
 							VK_RES.html(res.html);
