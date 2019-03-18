@@ -2475,6 +2475,9 @@ function _element58_struct($el) {
 /* [59] Связка списка при помощи кнопки */
 function _element59_struct($el) {
 	return array(
+		'req'     => _num($el['req']),
+		'req_msg' => $el['req_msg'],
+
 		'txt_1'   => $el['txt_1'],        //текст кнопки
 		'txt_5'   => $el['txt_5'],        //НЕ ЗАНИМАТЬ (используется под фильтр в [29])
 		'num_1'   => _num($el['num_1']),  //id диалога, через который вносятся данные выбираемого списка
