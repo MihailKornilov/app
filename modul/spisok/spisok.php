@@ -1544,7 +1544,7 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 	$DLG = _dialogQuery($el['num_1']);
 
 	//если учитываются уровни, отключается лимит списка
-	$sort = $el['num_5'];
+	$SORT = @$el['num_5'] ? '' : "LIMIT 50";
 	$field = $DLG['field1'];
 
 	$cond = _queryWhere($DLG);
@@ -1562,7 +1562,7 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 			FROM   "._queryFrom($DLG)."
 			WHERE ".$cond."
 			ORDER BY ".(isset($field['sort']) ? "`sort`," : '')."`id` DESC
-			"._dn($sort, "LIMIT 50");
+			".$SORT;
 	return query_arr($sql);
 }
 function _29cnnCond($ids, $v) {//получение условия при быстром поиске
