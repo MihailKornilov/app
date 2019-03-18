@@ -2976,10 +2976,10 @@ function _element79_print($el) {
 	foreach($arr as $r) {
 		$spisok .=
 		'<tr><td>'.@$ass[$r['gid']].
-			'<td class="w50 center b color-555">'.$r['c'];
+			'<td class="w70 center b color-555">'.$r['c'];
 		$cAll += $r['c'];
 		if($ism) {
-			$spisok .= '<td class="w80 r color-555">'._sumSpace($r['sum']);
+			$spisok .= '<td class="w90 r color-555">'._sumSpace($r['sum']);
 			$sumAll += $r['sum'];
 		}
 	}
@@ -6617,7 +6617,9 @@ function PHP12_icon18_type($id='all') {//доступные варианты и�
 		24 => 'eye',
 		25 => 'clock',
 		26 => 'cancel',
-		27 => 'recover'
+		27 => 'recover',
+		28 => 'off',
+		29 => 'offf'
 	);
 
 	if($id == 'all')
