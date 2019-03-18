@@ -821,7 +821,9 @@ function _spisokUnitUrlPage($el, $page_id, $u) {//получение id запи
 function _spisokUnitUrlDlg($u, $dlg_id) {//получение id записи согласно диалога
 	if(empty($u))
 		return 0;
-	if(!empty($u['dialog_id_use']) && $u['dialog_id_use'] == $dlg_id)
+	if(empty($u['dialog_id_use']))
+		return $u['id'];
+	if($u['dialog_id_use'] == $dlg_id)
 		return $u['id'];
 	if(!$DLG = _dialogQuery($u['dialog_id_use']))
 		return 0;
@@ -833,7 +835,7 @@ function _spisokUnitUrlDlg($u, $dlg_id) {//получение id записи с
 					if(isset($u[$col]))
 						return is_array($u[$col]) ? _num($u[$col]['id']) : _num($u[$col]);
 
-	return 0;
+	return $u['id'];
 }
 function _spisokUnitTT($el, $u, $txt='">') {//действие: подсказка [223]
 	if(empty($el['action']))
