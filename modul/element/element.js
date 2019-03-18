@@ -2638,6 +2638,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					//блок передаёт id записи для редактирования
 					if(sp.effect_id)
 						send.edit_id = unit_id;
+					//блок передаёт id записи для удаления
+					if(sp.revers)
+						send.del_id = unit_id;
 
 					_dialogLoad(send);
 					break;
