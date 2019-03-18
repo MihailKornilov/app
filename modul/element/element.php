@@ -2486,11 +2486,13 @@ function _element59_struct($el) {
 function _element59_js($el) {
 	return array(
 		'num_1' => _num($el['num_1']),
+		'num_3' => _num($el['num_3']),
 		'num_4' => _num($el['num_4'])
 	) + _elementJs($el);
 }
 function _element59_print($el, $prm) {
-	$v = _elemPrintV($el, $prm, 0);
+	$v = _elemPrintV($el, $prm, $el['num_6']);
+	$v = _elem29PageSel($el['num_1'], $v);
 
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
@@ -2500,10 +2502,12 @@ function _element59_print($el, $prm) {
 		'color' => 'grey',
 		'width' => $el['width'],
 		'small' => 1,
-		'class' => _dn(!$v)._dn(!$prm['blk_setup'], 'curD')
+		'class' => _dn(!$v)._dn(!$prm['blk_setup'] && !$el['num_3'], 'curD')
 	)).
 	'<div class="prel'._dn($v).'">'.
-		'<div style="position:absolute;top:2px;right:3px;z-index:100" class="icon icon-del-red pl'._tooltip('Отменить выбор', -52).'</div>'.
+	(!$el['num_3'] ?
+		'<div style="position:absolute;top:2px;right:3px;z-index:100" class="icon icon-del-red pl'._tooltip('Отменить выбор', -52).'</div>'
+	: '').
 		'<div class="un-html">'._spisok59unit($el['id'], $v).'</div>'.
 	'</div>';
 }

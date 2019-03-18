@@ -1545,6 +1545,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								_elemAction(el, id);
 							});
 						};
+
+					//запрет перевыбора значения
+					if(el.num_3)
+						return;
+
 					//нажатие на кнопку для открытыя диалога
 					ATR_CMP_AFICS.click(function() {
 						_dialogLoad({
