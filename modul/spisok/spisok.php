@@ -1477,7 +1477,7 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 	$spisok = _spisokInclude($spisok);
 
 	//формирование списка по уровням
-	if($EL['num_5'])
+	if(!empty($EL['num_5']))
 		return _29cnnLevel($EL, $spisok);
 
 	//если значения не были настроены, берётся значение по умолчанию, настроенное в диалоге
@@ -1496,7 +1496,7 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 		if($v)
 			$u['content'] = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $u['content'], 1);
 
-		if($content = _29cnnTitle($EL['txt_4'], $sp, 1)) {
+		if($content = _29cnnTitle(@$EL['txt_4'], $sp, 1)) {
 			if($v)
 				$content = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $content, 1);
 			$u['content'] = $u['content'].'<div class="grey fs12">'.$content.'</div>';
@@ -1550,8 +1550,10 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 	$cond = _queryWhere($DLG);
 
 	$C = array();
-	$C[] = _29cnnCond($el['txt_3'], $v);
-	$C[] = _29cnnCond($el['txt_4'], $v);
+	if($el['dialog_id'] == 29) {
+		$C[] = _29cnnCond($el['txt_3'], $v);
+		$C[] = _29cnnCond($el['txt_4'], $v);
+	}
 	$C = array_diff($C, array(''));
 	if(!empty($C))
 		$cond .= " AND (".implode(' OR ', $C).")";
