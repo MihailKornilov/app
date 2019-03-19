@@ -43,7 +43,10 @@
 
 
 /* Один блок */
-.grid-item{min-width:10px;position: absolute}
+.grid-item{
+  min-width:10px;
+  position:absolute;
+}
 
 
 /* Линии-границы справа и слева во время настройки конкретного блока */
@@ -127,7 +130,7 @@
   right: 1px;
   bottom: 0;
   width: auto;
-  z-index: 0 !important;
+  z-index:10 !important;
   overflow: hidden;
 }
 .ui-draggable-dragging .grid-content,

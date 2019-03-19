@@ -1385,8 +1385,14 @@ function _element29_print11($el, $u) {
 	foreach(_ids($el['txt_2'], 'arr') as $id) {
 		if(!$ell = _elemOne($id))
 			return '';
+
+		if($ell['dialog_id'] == 44) {
+			$ell['elp'] = $el;
+			return _element('print11', $ell, $u);
+		}
+
 		if(!$col = _elemCol($ell))
-			return '';
+			return '---';
 		if(empty($u[$col]))
 			return '';
 
@@ -2185,6 +2191,12 @@ function _element44_print($el, $prm) {
 	}
 
 	return $send;
+}
+function _element44_print11($el, $u) {
+	$prm = _blockParam();
+	$prm['unit_get'] = $u;
+
+	return  _element44_print($el, $prm);
 }
 
 /* [45] Выбор нескольких значений привязанного списка */
@@ -6103,7 +6115,7 @@ function PHP12_menu_block_setup_vvv($prm) {
 
 
 
-/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO для [16][17] ===--- */
+/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ RADIO для [16][17][18] ===--- */
 function PHP12_radio_setup() {
 	return '';
 }
@@ -6161,8 +6173,10 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 			WHERE `id`=".$unit['id'];
 	query($sql);
 
-	if(empty($update))
+	if(empty($update)) {
+		_elemOne($unit['id'], true);
 		return;
+	}
 
 	$sql = "INSERT INTO `_element` (
 				`id`,
@@ -6193,6 +6207,8 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 			SET `def`=".$def."
 			WHERE `id`=".$unit['id'];
 	query($sql);
+
+	_elemOne($unit['id'], true);
 }
 function PHP12_radio_setup_vvv($prm) {
 	if(!$u = $prm['unit_edit'])
