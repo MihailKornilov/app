@@ -6661,7 +6661,17 @@ function PHP12_icon18_type($id='all') {//доступные варианты и�
 		26 => 'cancel',
 		27 => 'recover',
 		28 => 'off',
-		29 => 'offf'
+		29 => 'offf',
+		30 => 'out',
+		31 => 'chain',
+		32 => 'move',
+		33 => 'move-x',
+		34 => 'move-y',
+		35 => 'sub',
+		36 => 'join',
+		37 => 'cube',
+		38 => 'filter',
+		39 => 'link'
 	);
 
 	if($id == 'all')

@@ -1712,6 +1712,8 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 		return;
 	if($unit['dialog_id'] != 54)
 		return;
+	if(empty($unit['col']))
+		return;
 
 	//id компонента в диалоге, в котором размещается привязка (количество этих значений будет считаться)
 	if(!$cmp_id = _num($unit['num_1']))
@@ -1734,6 +1736,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 		return;
 	if(!$DSrc = _dialogQuery($BL['obj_id']))//диалог, к которому привязан список (данные этого списка будут обновляться)
 		return;
+
 
 	//предварительное обнуление значений перед обновлением
 	$sql = "UPDATE "._queryFrom($DSrc)."
