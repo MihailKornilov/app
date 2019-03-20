@@ -595,10 +595,35 @@ function _app_content() {//центральное содержание
 	if(!USER_ID)
 		return '';
 
+	$page_id = _app_page_get();
+
 	return
 	'<div id="_content" class="block-content-page '.SITE.'">'.
-		_pageShow(_page('cur')).
+		_pageShow($page_id).
 	'</div>';
+}
+function _app_page_get() {//обновление текущей страницы, которую посетил пользователь, либо её получение, если повторный вход в программу
+	if(!APP_ID)
+		return _page('cur');
+
+	if($pid = _num(@$_GET['p'])) {
+		$sql = "UPDATE `_spisok`
+				SET `num_8`=".$pid.",
+					`num_9`="._num(@$_GET['id'])."
+				WHERE `app_id`=".APP_ID."
+				  AND `cnn_id`=".USER_ID;
+		query($sql);
+		return _page('cur');
+	}
+
+	$u = _userApp();
+	if(!$u['num_8'])
+		return _page('cur');
+
+	$_GET['p'] = $u['num_8'];
+	$_GET['id'] = $u['num_9'];
+
+	return $u['num_8'];
 }
 
 function _contentMsg($msg='') {
