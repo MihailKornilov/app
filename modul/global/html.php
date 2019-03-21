@@ -595,7 +595,7 @@ function _app_content() {//центральное содержание
 	if(!USER_ID)
 		return '';
 
-	$page_id = _app_page_get();
+	$page_id = _page('cur');//_app_page_get();
 
 	return
 	'<div id="_content" class="block-content-page '.SITE.'">'.

@@ -4519,8 +4519,42 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//список диалоговых окон для конкретного приложения
 	PHP12_dialog_app = function(el) {
-		_attr_el(el.id).find('DL')._sort({
-			elem_id:el.id
+		_attr_el(el.id).find('ol.dialog-sort').nestedSortable({
+			forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
+			placeholder:'page-sort-hold', //класс, применяемый для подсветки места, откуда взялся элемент
+			listType:'ol',
+			items:'li',
+			handle:'.icon-move',
+			isTree:1,
+			maxLevels:3,
+			tabSize:20, //расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
+			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+
+			start:function(e, t) {//установка отступа снизу
+				if($(t.placeholder).prev().hasClass('mb5'))
+					$(t.placeholder).addClass('mb5');
+				if($(t.placeholder).prev().hasClass('mb1'))
+					$(t.placeholder).addClass('mb1');
+			},
+			update:function(e, t) {
+				var send = {
+					op:'dialog_sort',
+					arr:$(this).nestedSortable('toArray'),
+					busy_obj:_attr_el(el.id),
+					busy_cls:'spisok-busy'
+				};
+				_post(send, function() {
+					var item = $(t.item),
+						p = item.parent(),
+						prn = p.hasClass('dialog-sort');
+
+					item.removeClass(prn ? 'mb1' : 'mb5');
+					item.addClass(!prn ? 'mb1' : 'mb5');
+					item.find('.d-name:first')._dn(!prn, 'b');
+				});
+			},
+
+			errorClass:'bg-fcc'  //ошибка, если попытка переместить элемент на недоступный уровень
 		});
 	};
 

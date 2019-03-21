@@ -376,6 +376,36 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+	case 'dialog_sort'://сортировка диалогов
+		$arr = $_POST['arr'];
+		if(!is_array($arr))
+			jsonError('Не является массивом');
+
+		$update = array();
+		foreach($arr as $n => $r) {
+			if(!$id = _num($r['id']))
+				continue;
+			$parent_id = _num($r['parent_id']);
+			$update[] = "(".$id.",".$parent_id.",".$n.")";
+		}
+
+		if(empty($update))
+			jsonError('Нет данных для обновления');
+
+		$sql = "INSERT INTO `_dialog` (
+					`id`,
+					`pid`,
+					`sort`
+				) VALUES ".implode(',', $update)."
+				ON DUPLICATE KEY UPDATE
+					`pid`=VALUES(`pid`),
+					`sort`=VALUES(`sort`)";
+		query($sql);
+
+		_cache_clear('DIALOG');
+
+		jsonSuccess();
+		break;
 
 	case 'image_upload'://добавление изображения
 		if(!$f = @$_FILES['f1'])
