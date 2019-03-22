@@ -573,9 +573,7 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 		case 6159: break;
 		//по значению из диалога
 		case 6160:
-			if(!$el = _elemOne($ELEM['num_10']))
-				break;
-			if(!$col = $el['col'])
+			if(!$col = _elemCol($ELEM['num_10']))
 				break;
 			if($tab = _queryTN($DLG, $col))
 				$order = "`".$tab."`.`".$col."`";

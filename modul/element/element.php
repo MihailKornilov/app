@@ -7262,10 +7262,13 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 	$ids = implode(',', $ids);
 
 	//удаление элементов, которые были удалены
-	$sql = "DELETE FROM `_element`
-			WHERE `id` IN ("._idsGet($dialog[HISTORY_ACT.'_history_elem']).")
-			  AND `id` NOT IN ("._ids($ids).")";
-	query($sql);
+	$keyAct = HISTORY_ACT.'_history_elem';
+	if(!empty($dialog[$keyAct])) {
+		$sql = "DELETE FROM `_element`
+				WHERE `id` IN ("._idsGet($dialog[$keyAct]).")
+				  AND `id` NOT IN ("._ids($ids).")";
+		query($sql);
+	}
 
 	if(!empty($update)) {
 		$sql = "INSERT INTO `_element` (
@@ -7529,11 +7532,17 @@ function _historySpisok($EL, $prm) {//список истории действи
 		$un = '';
 		foreach($day_arr as $n => $r) {
 			$dlg = _dialogQuery($r['dialog_id']);
+			$type = _historyAct($r['type_id']).'_history_elem';
+
 			$msg = '';
-			$prm['unit_get'] = $unitArr[$r['unit_id']];
-			$prm = _blockParam($prm);
-			foreach($dlg[_historyAct($r['type_id']).'_history_elem'] as $hel)
-				$msg .= _historyKit($hel, $prm);
+			if(empty($dlg[$type])) {
+				$msg = '<span class="red">['.$dlg['id'].'] история не настроена</span>';
+			} else {
+				$prm['unit_get'] = $unitArr[$r['unit_id']];
+				$prm = _blockParam($prm);
+				foreach($dlg[$type] as $hel)
+					$msg .= _historyKit($hel, $prm);
+			}
 
 			$is_last = $n == $last;//последняя запись
 
