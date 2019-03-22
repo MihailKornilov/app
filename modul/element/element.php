@@ -1870,7 +1870,8 @@ function _element36_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//id иконки
 		'num_2'   => _num($el['num_2']),//изменять яркость при наведении мышкой
-		'num_3'   => _num($el['num_3']) //курсор рука при наведении, иначе стрелочка
+		'num_3'   => _num($el['num_3']),//курсор рука при наведении, иначе стрелочка
+		'txt_1' => $el['txt_1']         //подсказка
 	) + _elementStruct($el);
 }
 function _element36_struct_title($el) {
@@ -1882,7 +1883,13 @@ function _element36_print($el) {
 	$pl = _dn(!$el['num_2'], 'pl');
 	$cur = $el['num_3'] ? ' curP' : ' curD';
 
-	return '<div class="icon icon-'.$type.$pl.$cur.'"></div>';
+	return '<div class="icon icon-'.$type.$pl.$cur._element36TT($el).'</div>';
+}
+function _element36TT($el) {
+	if(empty($el['txt_1']))
+		return '">';
+
+	return _tooltip($el['txt_1'], -10, 'l');
 }
 
 /* [37] Select: выбор колонки таблицы (SA) */

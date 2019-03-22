@@ -960,7 +960,7 @@ function _spisokCond7($el) {//значения фильтра-поиска дл�
 	foreach($colIds as $cmp_id) {
 		if(empty($cmp[$cmp_id]))
 			continue;
-		if(!$col = $cmp[$cmp_id]['col'])
+		if(!$col = _elemCol($cmp_id))
 			continue;
 
 		if(_elemIsConnect($cmp[$cmp_id])) {
