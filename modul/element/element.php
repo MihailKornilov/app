@@ -1830,7 +1830,7 @@ function _element35_struct($el) {
 		'num_6' => _num($el['num_6']),//максимум
 		'num_7' => _num($el['num_7']),//шаг
 		'num_8' => _num($el['num_8']),//разрешать переключение значений по кругу
-		'txt_1' => $el['txt_1']       //конкретные значения, настраиваются через PHP12_count_value
+		'txt_1' => $el['txt_1']       //конкретные значения, если num_1=3682 (настраиваются через PHP12_count_value)
 	) + _elementStruct($el);
 }
 function _element35_js($el) {
@@ -1856,7 +1856,19 @@ function _element35_print11($el, $u) {
 	if(!$col = _elemCol($el))
 		return '';
 
-	return @$u[$col];
+	if($el['num_1'] == 3681)
+		return @$u[$col];
+
+	if(!$json = _elem40json($el['txt_1']))
+		return '';
+
+	$v = _num(@$u[$col]);
+
+	foreach($json['ids'] as $n => $id)
+		if($v == $id)
+			return $json['title'][$n];
+
+	return '';
 }
 function _element35_vvv($el) {
 	if($el['num_1'] != 3682)
