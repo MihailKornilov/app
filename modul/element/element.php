@@ -1856,13 +1856,13 @@ function _element35_print11($el, $u) {
 	if(!$col = _elemCol($el))
 		return '';
 
+	$v = _num(@$u[$col]);
+
 	if($el['num_1'] == 3681)
-		return @$u[$col];
+		return $v;
 
 	if(!$json = _elem40json($el['txt_1']))
 		return '';
-
-	$v = _num(@$u[$col]);
 
 	foreach($json['ids'] as $n => $id)
 		if($v == $id)
@@ -2149,6 +2149,18 @@ function _element40_js($el) {
 function _element40_vvv($el, $prm) {//получение id диалога на основании исходного блока (если нет указания на диалог в настройке)
 	if($el['num_1'])//указание есть
 		return 0;
+
+	//поиск элемента по ячейке таблицы
+	if($ell_id = $prm['srce']['element_id']) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `id`=".$ell_id;
+		if($ell = query_assoc($sql))
+			if($elp = _elemOne($ell['parent_id']))
+				if($elp['dialog_id'] == 23)
+					return $elp['num_1'];
+	}
+
 	if(!$block_id = $prm['srce']['block_id'])
 		return 0;
 	if(!$BL = _blockOne($block_id))

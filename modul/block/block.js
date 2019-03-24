@@ -32,10 +32,9 @@ var _ids = function(v, count) {
 				BL.save = 1;
 			};
 		BL.id = block_id;
-		BL.attr_bl = ATTR_BL(block_id);
 
 		//идёт процес сохранения
-		if(BL.save || $(BL.attr_bl).hasClass('_busy'))
+		if(BL.save || _attr_bl(BL.id).hasClass('_busy'))
 			return;
 
 		t._hint({
@@ -59,28 +58,28 @@ var _ids = function(v, count) {
 				$('#block-unit-bor0')._check({
 					tooltip:'сверху',
 					func:function(v) {
-						$(BL.attr_bl).css('border-top', v ? '#DEE3EF solid 1px' : '');
+						_attr_bl(BL.id).css('border-top', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
 				$('#block-unit-bor1')._check({
 					tooltip:'справа',
 					func:function(v) {
-						$(BL.attr_bl).css('border-right', v ? '#DEE3EF solid 1px' : '');
+						_attr_bl(BL.id).css('border-right', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
 				$('#block-unit-bor2')._check({
 					tooltip:'снизу',
 					func:function(v) {
-						$(BL.attr_bl).css('border-bottom', v ? '#DEE3EF solid 1px' : '');
+						_attr_bl(BL.id).css('border-bottom', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
 				$('#block-unit-bor3')._check({
 					tooltip:'слева',
 					func:function(v) {
-						$(BL.attr_bl).css('border-left', v ? '#DEE3EF solid 1px' : '');
+						_attr_bl(BL.id).css('border-left', v ? '#DEE3EF solid 1px' : '');
 						borSave();
 					}
 				});
@@ -340,7 +339,6 @@ var _ids = function(v, count) {
 
 		var EL = ELMM[BL.elem_id];
 		EL.id = BL.elem_id;
-		EL.attr_el = ATTR_EL(EL.id);
 
 		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.id + '">' +
 			'<div class="line-b">' +
@@ -414,7 +412,7 @@ var _ids = function(v, count) {
 					'<div val="bottom r" class="icon-wiki iw11' + _dn(BL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -65, 'r') + '</div>' +
 		'</table>';
 	},
-	_elemUnitPlaceMiddle = function(BL) {//центральная часть позиции
+	_elemUnitPlaceMiddle = function(BL, isTd) {//центральная часть позиции
 		$(document)
 			.off('click', '#elem-pos div')
 			.on('click', '#elem-pos div', function() {
@@ -424,9 +422,17 @@ var _ids = function(v, count) {
 				unit.parents('#elem-pos').find('.on').removeClass('on');
 				unit.addClass('on');
 
-				$(BL.attr_bl).removeClass('top r center bottom');
+				//ячейка таблицы - обращение как к элементу
+				if(isTd) {
+					_attr_el(BL.id).removeClass('top r center bottom');
+					if(v)
+						_attr_el(BL.id).addClass(v);
+					return;
+				}
+
+				_attr_bl(BL.id).removeClass('top r center bottom');
 				if(v)
-					$(BL.attr_bl).addClass(v);
+					_attr_bl(BL.id).addClass(v);
 
 				BL.pos = v;
 				BL.save = 1;
@@ -467,7 +473,7 @@ var _ids = function(v, count) {
 					font = [];
 				td._dn(cls, 'on');
 
-				$(EL.attr_el)._dn(cls, v);
+				_attr_el(EL.id)._dn(cls, v);
 
 				_forEq($('#elem-font .on'), function(eq) {
 					font.push(eq.attr('val'));
@@ -489,7 +495,7 @@ var _ids = function(v, count) {
 	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста
 		var func = function(v) {
-			$(EL.attr_el)
+			_attr_el(EL.id)
 				.removeClass(EL.color)
 				.addClass(v);
 

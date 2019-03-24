@@ -761,8 +761,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		}
 	},
 
-	ATTR_EL = function(id) {
-		return '#el_' + id;
+	ATTR_EL = function(id, nohash) {
+		return (nohash ? '' : '#') + 'el_' + id;
 	},
 	_attr_el = function(id) {//аттрибут элемента
 		var send = $(ATTR_EL(id));
@@ -3388,18 +3388,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//добавление новой колонки в таблицу
 		function tdAdd(v) {
 			v = $.extend({
-				attr_el:'#inp_' + NUM,//требуется для настройки стилей в выплывающем окне
-				attr_bl:'#inp_' + NUM,//требуется для настройки позиции в выплывающем окне
-
-				id:0,           //id элемента
-				dialog_id:50,   //id диалога, через который был вставлен этот элемент
-				title:'',       //имя значения
-				width:150,      //ширина колонки
-				font:'',        //выделение: b, i, u
-				color:'',       //цвет текста
-				txt_7:'',       //TH-заголовок колонки
-				txt_8:''        //позиция по горизонтали (l, center, r)
+				id:0,        //id элемента
+				dialog_id:50,//id диалога, через который был вставлен этот элемент
+				title:'',    //имя значения
+				width:150,   //ширина колонки
+				font:'',     //выделение: b, i, u
+				color:'',    //цвет текста
+				txt_7:'',    //TH-заголовок колонки
+				txt_8:'',    //позиция по горизонтали (l, center, r)
+				eye:1        //форматирование доступно для всех значений
 			}, v.id ? v : {});
+
+			v.pos = v.txt_8;
 
 			DL.append(
 				'<dd class="over3" val="' + v.id + '">' +
@@ -3416,7 +3416,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 										' />' +
 									'</div>' +
 									'<input type="text"' +
-										  ' id="inp_' + NUM + '"' +
+										  ' id="' + ATTR_EL(v.id, true) + '"' +
 										  ' class="inp w100p curP ' + v.font + ' ' + v.color + ' ' + v.txt_8 + '"' +
 										  ' readonly' +
 										  ' placeholder="значение не выбрано"' +
@@ -3464,9 +3464,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					msg:'<table class="bs5">' +
 							'<tr><td class="pt3">' + _elemUnitFont(v) +
 								'<td class="pt3">' + _elemUnitColor(v) +
-								'<td class="pl10">' +
+								'<td class="pt3 pl10">' +
+									'<div class="icon icon-eye pl' + _tooltip('Условия отображения', -67) + '</div>' +
+								'<td class="pl3">' +
 									'<div class="icon icon-link pl' + _tooltip('Настроить ссылку', -57) + '</div>' +
-								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v) +
+								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v, true) +
 						'</table>' +
 						'',
 					side:'right',
@@ -3477,6 +3479,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						o.find('.icon-link').click(function() {
 							_dialogLoad({
 								dialog_id:220,
+								element_id:v.id,
+								busy_obj:$(this),
+								busy_cls:'spin'
+							});
+						});
+						o.find('.icon-eye').click(function() {
+							_dialogLoad({
+								dialog_id:240,
 								element_id:v.id,
 								busy_obj:$(this),
 								busy_cls:'spin'
@@ -4284,8 +4294,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				txt_8:'', //текст справа
 				c:0,      //количество условий
 				txt_9:'', //условия отображения сборки
-
-				attr_el:'#inp_' + NUM,//требуется для настройки стилей в выплывающем окне
 				font:'',  //выделение: b, i, u
 				color:''  //цвет текста
 			}, v || {});
@@ -4307,7 +4315,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<td class="w250">' +
 								'<input type="text"' +
 									  ' readonly' +
-									  ' id="inp_' + NUM++ + '"' +
+									  ' id="' + ATTR_EL(v.id, true) + '"' +
 									  ' class="title w100p curP over4 ' + v.font + ' ' + v.color + '"' +
 									  ' placeholder="значение из диалога"' +
 									  ' value="' + v.title + '"' +
