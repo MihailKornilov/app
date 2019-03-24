@@ -3364,9 +3364,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!obj.unit.id)
 			return;
 
-		var html = '<dl></dl>' +
+		var html = '<dl class="mt10"></dl>' +
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
 			DL = _attr_el(el.id).append(html).find('dl'),
+			CALC_DIV = _attr_el(el.id).find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
+			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
 			NUM = 1;
 
 		//кнопка добавления новой ячейки
@@ -3381,6 +3383,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 
 		_forIn(vvv, tdAdd);
+		tdCalc();
 
 		//добавление новой колонки в таблицу
 		function tdAdd(v) {
@@ -3402,7 +3405,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				'<dd class="over3" val="' + v.id + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w80 grey r topi">Колонка ' + NUM + ':' +
+							'<td class="w25 r topi">' +
+								'<b class="bnum fs15 color-555">' + NUM + '</b>:' +
 							'<td><div style="width:' + v.width + 'px">' +
 									'<div class="div-th-name' + _dn(_num(obj.unit.num_5)) + '">' +
 										'<input type="text"' +
@@ -3419,7 +3423,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 										  ' value="' + v.title + '"' +
 									' />' +
 								'</div>' +
-							'<td class="w50 r top pt5">' +
+							'<td class="w25 r top pt5">' +
 								'<div class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
 					'</table>' +
 				'</dd>'
@@ -3443,6 +3447,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						v.dialog_id = ia.unit.dialog_id;
 						INP.val(ia.unit.title);
 						tdResize(DD);
+						tdCalc();
 					}
 				});
 			});
@@ -3482,11 +3487,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 
 			//сортировка колонок
-			DL.sortable({handle:'.icon-move-y'});
+			DL.sortable({
+				handle:'.icon-move-y',
+				update:tdCalc
+			});
 
 			//удаление элемента
 			DL.find('.icon-del:last').click(function() {
 				$(this).closest('DD').remove();
+				tdCalc();
 			});
 
 			NUM++;
@@ -3501,10 +3510,55 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				return;
 			res.resizable({
 				minWidth:30,
-				maxWidth:400,
+				maxWidth:500,
 				grid:10,
-				handles:'e'
+				handles:'e',
+				stop:tdCalc
 			});
+		}
+
+		//пересчёт визуального отображения ячеек по диагонали
+		function tdCalc() {
+			var html = '',
+				DIV_W = 600,
+				i = DIV_W / CALC_W,
+				FULL_W = 0,
+				TDS = [],//массив ширин по каждой ячейке
+				ALL_W = 0;//сумма ширины всех ячеек, кроме последней
+
+			_forEq(DL.find('DD'), function(sp) {
+				if(!_num(sp.attr('val')))
+					return;
+				var n = _num(sp.find('.bnum').html()),
+					w = sp.find('.div-th-name').parent().width();
+				TDS.push({
+					n:n,
+					w:Math.round(w*i)-1
+				});
+				FULL_W += w;
+			});
+
+			_forN(TDS, function(o, n) {
+				var bg = 'ffc',
+					line = ' line-r';
+				if(FULL_W > CALC_W) {
+					bg = 'fcc';
+					i = CALC_W / FULL_W;
+					o.w = Math.round(o.w*i);
+				}
+				if(FULL_W >= CALC_W) {
+					ALL_W += (o.w+1);
+					if(n == (TDS.length-1)) {
+						line = '';
+						o.w = DIV_W - ALL_W + o.w + 1;
+					}
+				}
+
+				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
+							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
+						'</div>';
+			});
+			CALC_DIV.html(html);
 		}
 	},
 	PHP12_td_setup_get = function(el) {//сохранение ячеек таблицы
