@@ -480,7 +480,7 @@ function _element6_print($el, $prm) {
 	return _select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'width' => $el['width'],
+		'width' => @$el['width'],
 		'value' => _elemPrintV($el, $prm, 0)
 	));
 }
@@ -1010,7 +1010,7 @@ function _element17_print($el, $prm) {
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'width' => $el['width'],
+		'width' => @$el['width'],
 		'value' => _elemPrintV($el, $prm, $el['def'])
 	));
 }
@@ -1186,7 +1186,7 @@ function _element24_print($el, $prm) {
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'width' => $el['width'],
+		'width' => @$el['width'],
 		'value' => _elemPrintV($el, $prm, 0)
    ));
 }
@@ -1247,7 +1247,7 @@ function _element26_print($el, $prm) {
 	return _select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'width' => $el['width'],
+		'width' => @$el['width'],
 		'value' => _elemPrintV($el, $prm, 0)
 	));
 }
@@ -1374,7 +1374,7 @@ function _element29_print($el, $prm) {
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'width' => $el['width'],
+		'width' => @$el['width'],
 		'value' => $v
 	));
 }
@@ -1912,7 +1912,7 @@ function _element37_print($el, $prm) {
 	return
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
-		'width' => $el['width'],
+		'width' => @$el['width'],
 		'value' => _elemPrintV($el, $prm)
 	));
 }
@@ -2071,7 +2071,7 @@ function _element38_print($el, $prm) {
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'width' => _num(@$el['width']),
+		'width' => @$el['width'],
 		'value' => _elemPrintV($el, $prm, 0)
 	));
 }
@@ -3125,7 +3125,7 @@ function _element83_print($el, $prm) {
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'width' => $el['width'],
+		'width' => @$el['width'],
 		'value' => _spisokFilter('vv', $el, 0)
 	));
 }
@@ -3196,7 +3196,7 @@ function _element85_print($el, $prm) {
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'width' => $el['width'],
+		'width' => @$el['width'],
 		'value' => _elemPrintV($el, $prm, 0)
 	));
 }
@@ -8310,6 +8310,9 @@ function _attachLinkRepair() {//временная фукнция для пер�
 
 
 function _attachLink($attach_id, $width=0) {//формирование ссылки на файл
+	if(!$attach_id)
+		return '';
+
 	$sql = "SELECT *
 			FROM `_attach`
 			WHERE `id`=".$attach_id;
