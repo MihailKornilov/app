@@ -3446,6 +3446,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
 						INP.val(ia.unit.title);
+						INP.attr('id', ATTR_EL(v.id, true));
 						tdResize(DD);
 						tdCalc();
 					}
