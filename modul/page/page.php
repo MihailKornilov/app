@@ -575,8 +575,9 @@ function _pageShow($page_id) {
 
 	//страница принимает данные записи
 	if($dialog_id = $page['dialog_id_unit_get']) {
-		if(!$id = _num(@$_GET['id']))
-			return _empty20('Некорректный идентификатор записи.'.PAGE_MSG_ERR);
+		if(!$id = $page['unit_id'])
+			if(!$id = _num(@$_GET['id']))
+				return _empty20('Некорректный идентификатор записи.'.PAGE_MSG_ERR);
 		if(!$dialog = _dialogQuery($dialog_id))
 			return _empty20('Отсутствует диалог, который вносит данные записи.'.PAGE_MSG_ERR);
 		if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $id))

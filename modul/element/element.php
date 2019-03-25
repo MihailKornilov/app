@@ -713,6 +713,8 @@ function _element11_js($el) {
 function _element11_print($el, $prm) {
 	if(!$u = @$prm['unit_get'])
 		return $el['title'];
+	if(empty($el['txt_2']))
+		return _msgRed('[11] нет ids элементов');
 
 	foreach(_ids($el['txt_2'], 'arr') as $id) {
 		if(!$ell = _elemOne($id))
@@ -2058,7 +2060,8 @@ function _element38_struct($el) {
 		'req'     => _num($el['req']),
 		'req_msg' => $el['req_msg'],
 
-		'txt_1'   => $el['txt_1']//нулевое значение
+		'txt_1'   => $el['txt_1'],      //нулевое значение
+		'num_1'   => _num($el['num_1']) //начальное значение
 	) + _elementStruct($el);
 }
 function _element38_js($el) {
@@ -2072,7 +2075,7 @@ function _element38_print($el, $prm) {
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
 		'width' => @$el['width'],
-		'value' => _elemPrintV($el, $prm, 0)
+		'value' => _elemPrintV($el, $prm, $el['num_1'])
 	));
 }
 function _element38_vvv() {
@@ -2332,6 +2335,27 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 
 	return
 	'<table class="_stab w100p small '.($is_show ? '' : 'mb10').'">'.$send.'</table>';
+}
+
+/* [46] Данные текущего пользователя */
+function _element46_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//диалог пользователей, на основании которого будет выбираться значение [38]
+		'txt_2'   => _num($el['txt_2']) //id значения [13]
+	) + _element11_struct($el);
+}
+function _element46_js($el) {
+	return _element11_js($el);
+}
+function _element46_print($el, $prm) {
+	if(!APP_ID)
+		return '';
+	if(!$u = _user())
+		return '';
+
+	$prm['unit_get'] = $u;
+
+	return _element11_print($el, $prm);
 }
 
 /* [49] Выбор блоков из диалога или страницы */
@@ -2601,10 +2625,12 @@ function _element60_struct($el) {
 		'num_8' => _num($el['num_8']) //закруглённые углы (настройка стилей)
 	) + _elementStruct($el);
 }
+/*
 function _element60_struct_title($el) {
-	$el['title'] = _imageNo($el['width'], $el['num_8']);
+	$el['title'] = 'image';//_imageNo($el['width'], $el['num_8']);
 	return $el;
 }
+*/
 function _element60_print($el, $prm) {
 	return _image($el, $prm);
 }
@@ -4173,6 +4199,9 @@ function _dialogSel24($elem_id, $dlg_id) {//получение id диалога
 		return 0;
 	if(!$dlg_id)
 		return 0;
+
+	if($el['dialog_id'] == 38)
+		return $dlg_id;
 
 	if($el['dialog_id'] == 24) {
 		//список, размещённый на странице
