@@ -2353,7 +2353,11 @@ function _element46_print($el, $prm) {
 	if(!$u = _user())
 		return '';
 
-	$prm['unit_get'] = $u;
+	$u['dialog_id'] = 111;
+	$spisok[USER_ID] = $u;
+	$spisok = _spisokImage($spisok);
+
+	$prm['unit_get'] = $spisok[USER_ID];
 
 	return _element11_print($el, $prm);
 }
