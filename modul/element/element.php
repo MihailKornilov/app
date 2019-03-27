@@ -1963,6 +1963,7 @@ function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по ка
 		'block_id' => 1,
 		'element_id' => 1,
 		'dialog_id' => 1,
+		'obj_id' => 1,
 		'width' => 1,
 		'color' => 1,
 		'font' => 1,
@@ -2427,7 +2428,14 @@ function _element51_history($el, $v) {
 
 /* [52] Заметки */
 function _element52_struct($el) {
-	return _elementStruct($el);
+	return array(
+		'num_1'   => _num($el['num_1'])//разрешать комментарии к заметкам
+	) + _elementStruct($el);
+}
+function _element52_js($el) {
+	return array(
+		'num_1'   => _num($el['num_1'])
+	) + _elementJs($el);
 }
 function _element52_print($el, $prm) {
 	if($prm['blk_setup'])
@@ -8721,10 +8729,10 @@ function _note($el) {//заметки
 				'<textarea placeholder="напишите заметку..." /></textarea>'.
 			'</div>'.
 		'</div>'.
-		'<div class="_note-list">'._noteList($page_id, $obj_id).'</div>'.
+		'<div class="_note-list">'._noteList($page_id, $obj_id, $el['num_1']).'</div>'.
 	'</div>';
 }
-function _noteList($page_id, $obj_id) {
+function _noteList($page_id, $obj_id, $commAccess) {
 	$sql = "SELECT *
 			FROM `_note`
 			WHERE `app_id`=".APP_ID."
@@ -8739,21 +8747,22 @@ function _noteList($page_id, $obj_id) {
 	foreach($arr as $id => $r)
 		$arr[$id]['comment'] = array();
 
+	$arr = _noteImgArr($arr);
+
 	$sql = "SELECT *
 			FROM `_note`
 			WHERE `parent_id` IN ("._idsGet($arr).")
 			  AND !`deleted`
 			ORDER BY `id`";
-	foreach(query_arr($sql) as $r)
-		$arr[$r['parent_id']]['comment'][] = $r;
+	if($comm = query_arr($sql)) {
+		$comm = _noteImgArr($comm);
+		foreach($comm as $r)
+			$arr[$r['parent_id']]['comment'][] = $r;
+	}
 
 	$send = '';
 	$n = 0;
 	foreach($arr as $r) {
-		$cmnt = $r['comment'] ? 'Комментарии '.count($r['comment']) : 'Комментировать';
-		$comment = '';
-		foreach($r['comment'] as $c)
-			$comment .= _noteCommentUnit($c);
 		$send .=
 			'<div class="_note-u'._dn(!$n, 'line-t').'" val="'.$r['id'].'">'.
 				'<div class="_note-is-show">'.
@@ -8766,27 +8775,14 @@ function _noteList($page_id, $obj_id) {
 								'<a class="b">'._user($r['user_id_add'], 'name').'</a>'.
 								'<div class="pale mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
 						'<tr>'.
-							'<td colspan="2" class="fs14">'.
-								'<div style="word-wrap:break-word;width:650px;">'.
-									_noteLink($r['txt']).
+							'<td colspan="2">'.
+								'<div style="word-wrap:break-word;width:650px;" class="fs14">'.
+									_noteLink($r['txt'], 1).
 								'</div>'.
+								_noteImg($r).
 					'</table>'.
-					'<div class="_note-to-cmnt dib b over1'._dn($n).'">'.
-						'<div class="icon icon-comment"></div>'.
-						$cmnt.
-					'</div>'.
-					'<div class="_note-comment'._dn(!$n).'">'.
-						$comment.
-						'<table class="w100p">'.
-							'<tr><td><div class="_comment-txt">'.
-										'<textarea placeholder="комментировать.." /></textarea>'.
-									'</div>'.
-								'<td class="w35 bottom">'.
-									'<div class="icon icon-empty spin ml5 mb5"></div>'.
-									'<div class="comment-ok"></div>'.
-						'</table>'.
-					'</div>'.
 				'</div>'.
+				($commAccess ? _noteComment($r, $n) : '').
 				'<div class="_note-is-del">'.
 					'Заметка удалена.'.
 					'<a class="note-rest ml10">Восстановить</a>'.
@@ -8796,6 +8792,28 @@ function _noteList($page_id, $obj_id) {
 	}
 
 	return $send;
+}
+function _noteComment($r, $n) {//отображение комментариев к заметке
+	$cmnt = $r['comment'] ? 'Комментарии '.count($r['comment']) : 'Комментировать';
+	$comment = '';
+	foreach($r['comment'] as $c)
+		$comment .= _noteCommentUnit($c);
+	return
+	'<div class="_note-to-cmnt dib b over1'._dn($n).'">'.
+		'<div class="icon icon-comment"></div>'.
+		$cmnt.
+	'</div>'.
+	'<div class="_note-comment'._dn(!$n).'">'.
+		$comment.
+		'<table class="w100p">'.
+			'<tr><td><div class="_comment-txt">'.
+						'<textarea placeholder="комментировать.." /></textarea>'.
+					'</div>'.
+				'<td class="w35 bottom">'.
+					'<div class="icon icon-empty spin ml5 mb5"></div>'.
+					'<div class="comment-ok"></div>'.
+		'</table>'.
+	'</div>';
 }
 function _noteCommentUnit($c) {//html одного комментария
 	return
@@ -8815,6 +8833,7 @@ function _noteCommentUnit($c) {//html одного комментария
 					'<div style="word-wrap:break-word;width:600px;">'.
 						_noteLink($c['txt']).
 					'</div>'.
+					_noteImg($c).
 		'</table>'.
 		'<div class="_comment-is-del">'.
 			'Комментарий удалён.'.
@@ -8822,7 +8841,8 @@ function _noteCommentUnit($c) {//html одного комментария
 		'</div>'.
 	'</div>';
 }
-function _noteLink($txt) {//поиск в тексте ссылок и обёртка
+function _noteLink($txt, $fs14=false) {//поиск в тексте ссылок и обёртка
+	$fs14 = $fs14 ? ' class="fs14"' : '';
 	$preg_autolinks = array(
 	    'pattern' => array(
 	        "'[\w\+]+://[A-z0-9\.\?\+\-/_=&%#:;,]+[\w/=]+'si",
@@ -8830,7 +8850,7 @@ function _noteLink($txt) {//поиск в тексте ссылок и обёр�
 	    ),
 	    'replacement' => array(
 	        '<a href="$0" target="_blank" rel="nofollow">$0</a>',
-	        '$1<a href="http://$2" target="_blank" rel="nofollow">$2</a>',
+	        '$1<a href="http://$2" target="_blank" rel="nofollow"'.$fs14.'>$2</a>',
 	    ));
 	$search = $preg_autolinks['pattern'];
 	$replace = $preg_autolinks['replacement'];
@@ -8839,7 +8859,43 @@ function _noteLink($txt) {//поиск в тексте ссылок и обёр�
 	return _br($txt);
 
 }
+function _noteImgArr($arr) {//подмена id изображений на данные
+	$imgIds = array();
+	foreach($arr as $id => $r) {
+		$imgIds[] = _ids($r['image_ids']);
+		$arr[$id]['img'] = array();
+	}
 
+	if(empty($imgIds))
+		return $arr;
+
+	$sql = "SELECT *
+			FROM `_image`
+			WHERE `id` IN (".implode(',', $imgIds).")";
+	if(!$img = query_arr($sql))
+		return $arr;
+
+	foreach($arr as $note_id => $r) {
+		if(!$ids = _ids($r['image_ids'], 'arr'))
+			continue;
+
+		foreach($ids as $img_id)
+			if(!empty($img[$img_id]))
+				$arr[$note_id]['img'][] = $img[$img_id];
+	}
+
+	return $arr;
+}
+function _noteImg($r) {//вставка изображений
+	if(empty($r['img']))
+		return '';
+
+	$send = '';
+	foreach($r['img'] as $img)
+		$send .= '<div class="dib mt10 mr10">'._imageHtml($img, 200, 200).'</div>';
+
+	return '<div>'.$send.'</div>';
+}
 
 
 

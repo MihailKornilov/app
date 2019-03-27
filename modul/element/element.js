@@ -1490,6 +1490,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							op:'note_add',
 							page_id:page_id,
 							obj_id:obj_id,
+							comm_on:el.num_1,
 							txt:txt,
 							busy_cls:'busy',
 							busy_obj:NOTE

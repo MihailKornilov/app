@@ -479,6 +479,7 @@ switch(@$_POST['op']) {
 			jsonError('Отсутствует текст заметки');
 
 		$obj_id = _num($_POST['obj_id']);
+		$comm_on = _num($_POST['comm_on']);
 
 		$sql = "INSERT INTO `_note` (
 					`app_id`,
@@ -495,7 +496,7 @@ switch(@$_POST['op']) {
 				)";
 		query($sql);
 
-		$send['html'] = _noteList($page_id, $obj_id);
+		$send['html'] = _noteList($page_id, $obj_id, $comm_on);
 
 		jsonSuccess($send);
 		break;
@@ -580,9 +581,7 @@ switch(@$_POST['op']) {
 				  AND `parent_id`=".$note_id."
 				ORDER BY `id` DESC
 				LIMIT 1";
-		$comm = _noteCommentUnit(query_assoc($sql));
-
-		$send['html'] = $comm;
+		$send['html'] = _noteCommentUnit(query_assoc($sql));
 
 		jsonSuccess($send);
 		break;
