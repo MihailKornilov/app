@@ -68,15 +68,6 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 			$el = _elementTitle($el);
 
 			return $el['title'];
-
-		//скрытие блока при нулевом значении
-		case 'action231':
-			//здесь $prm - сама запись
-			if(!$col = _elemCol($el))
-				return false;
-			if(!empty($prm[$col]))
-				return false;
-			return true;
 	}
 
 	return '';

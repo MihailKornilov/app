@@ -364,15 +364,31 @@ function _blockActionView($bl, $prm) {//условия отображения б
 				if(!$el = _elemOne($F['elem_id']))
 					break;
 
+				$v = 0;
+
+				if($col = _elemCol($el))
+					if(!empty($u[$col]))
+						$v = is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
+
 				switch($F['cond_id']) {
 					//отсутствует
 					case 1:
-						if(_element('action231', $el, $u))
+						if(!$v)
 							$bl['hidden'] = 1;
 						break;
 					//присутствует
 					case 2:
-						if(!_element('action231', $el, $u))
+						if($v)
+							$bl['hidden'] = 1;
+						break;
+					//равно
+					case 3:
+						if($v == $F['unit_id'])
+							$bl['hidden'] = 1;
+						break;
+					//не равно
+					case 4:
+						if($v != $F['unit_id'])
 							$bl['hidden'] = 1;
 						break;
 				}
