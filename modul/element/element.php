@@ -6837,6 +6837,7 @@ function PHP12_action_list($prm) {
 					'<td><div class="fs15 color-555">'._dialogParam($r['dialog_id'], 'name').'</div>'.
 						'<div class="mt3 ml10">'.
 							PHP12_action_201($r).
+							PHP12_action_205($r).
 							PHP12_action_211($r).
 							PHP12_action_212($r).
 							PHP12_action_213($r).
@@ -6929,6 +6930,59 @@ function PHP12_action_201($r) {//ЭЛЕМЕНТ: скрытие/показ бл�
 	'<span class="grey">если</span> '.$initial.
 	$effect.
 	$revers;
+}
+function PHP12_action_205($r) {//ЭЛЕМЕНТ: открытие диалога
+	if($r['dialog_id'] != 205)
+		return '';
+
+/*
+	initial_id: Значение, при котором происходит действие
+					-1: значение сброшено
+					-2: выбрано любое значение
+					id: конкретное значение
+	target_ids: id диалога
+	apply_id:  элемент передаёт данные записи для отображения
+	effect_id: элемент передаёт данные записи для редактирования
+
+*/
+
+	if(!$DLG = _dialogQuery($r['target_ids']))
+		return '<div class="red">не получены данные диалога ['.$r['target_ids'].']</div>';
+
+	$initial = '-';
+	switch($r['initial_id']) {
+		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		default:
+			if(!$el = _elemOne($r['element_id']))
+				break;
+
+			switch($el['dialog_id']) {
+				case 18:
+					foreach($el['vvv'] as $vv)
+						if($vv['id'] == $r['initial_id'])
+							$initial = 'выбрано <b class="color-sal">'.$vv['title'].'</b>';
+					break;
+				case 29:
+				case 59:
+					if(!$DLG = _dialogQuery($el['num_1']))
+						break;
+					if(!$u = _spisokUnitQuery($DLG, $r['initial_id']))
+						break;
+					$initial = 'выбрано <b class="color-pay">'.$u['txt_1'].'</b>';
+			}
+
+	}
+
+	$get  = $r['apply_id']  ? '<div class="fs11 i color-ref mt2">Элемент передаёт данные записи для отображения</div>' : '';
+	$edit = $r['effect_id'] ? '<div class="fs11 i color-ref mt2">Элемент передаёт данные записи для редактирования</div>' : '';
+
+	return
+	'<span class="grey">Диалог: </span> <b>'.$DLG['name'].'</b>'.
+	'<br>'.
+	'<span class="grey">если</span> '.$initial.
+	$get.
+	$edit;
 }
 function PHP12_action_211($r) {//БЛОК: скрытие/показ блоков
 	if($r['dialog_id'] != 211)
