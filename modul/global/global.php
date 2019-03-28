@@ -521,7 +521,7 @@ function _json($arr, $n=0, $ass_empty=false) {//перевод массива в
 		if(is_array($v))
 			$v = _json($v, 1);
 		else
-			$v = preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.addslashes(_br($v)).'"';
+			$v = preg_match(REGEXP_CENA_MINUS_POINT_ONLY, $v) ? $v : '"'.addslashes(_br($v)).'"';
 		if($is_ass)
 			$v = $k.':'.$v;
 		$send[] = $v;

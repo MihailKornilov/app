@@ -2316,21 +2316,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					break;
 				//установка/снятие значений
 				case 202:
-					var is_set = 0;//по умолчанию: сбросить значение
+					var is_set = sp.apply_id == -1 ? 0 : 1;//начальное действие, которое будет установлено элементу-получателю
 
 					//ТИП СОБЫТИЯ - что должно быть на исходном элементе
 					switch(sp.initial_id) {
 						//значение было сброшено
 						case -1:
-						default: break;
-						//установлено какое-то значение
-						case -2:
-							is_set = 1;
-							break;
-					}
-/*
-					switch(sp.cond_id) {
-						case 1715://галочка снята
+						default:
 							if(v && sp.revers) {
 								is_set = is_set ? 0 : 1;
 								break;
@@ -2338,7 +2330,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							if(v)
 								return;
 							break;
-						case 1716://галочка установлена
+						//установлено какое-то значение
+						case -2:
 							if(!v && sp.revers) {
 								is_set = is_set ? 0 : 1;
 								break;
@@ -2346,9 +2339,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							if(!v)
 								return;
 							break;
-						default: return;
 					}
-*/
 
 					_forIn(_idsAss(sp.target_ids), function(ex, id) {
 						var EL = ELMM[id];
@@ -2356,7 +2347,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						switch(EL.dialog_id) {
 							//галочка
 							case 1:
-								_attr_cmp(id)._check(is_set);
+								_attr_cmp(id)
+									._check(is_set)
+									._check(is_set);
 								break;
 							//select - привязанный список
 							case 29:
