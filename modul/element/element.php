@@ -209,7 +209,7 @@ function _element1_struct($el) {
 	) + _elementStruct($el);
 }
 function _element1_struct_title($el) {
-	$el['title'] = '✓';
+	$el['title'] = '✓ '.$el['txt_1'];
 	return $el;
 }
 function _element1_print($el, $prm) {

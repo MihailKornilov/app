@@ -675,7 +675,8 @@ function _elemDivSize($el) {//класс - размер шрифта
 function _elemDiv($bl, $prm=array()) {//формирование div элемента
 	if(!$el = $bl['elem'])
 		return '';
-
+	if(_elemAction244($el, $prm))
+		return '';
 	$attr_id = _elemDivAttrId($el, $prm);
 	$style = _elemStyle($el, $prm);
 
@@ -817,6 +818,34 @@ function _elemAction242($el, $prm) {//подмена цвета
 	}
 
 	return $color;
+}
+function _elemAction244($el, $prm) {//скрытие элемента
+	if(empty($el['action']))
+		return false;
+	if(!$u = $prm['unit_get'])
+		return false;
+
+	foreach($el['action'] as $act)
+		if($act['dialog_id'] == 244) {
+			if(!$F = _elem40json($act['filter']))
+				return false;
+
+			$F = $F[0];
+
+			switch($F['cond_id']) {
+				case 1:
+					if(!$col = _elemCol($F['elem_id']))
+						return false;
+					if(empty($u[$col]))
+						return true;
+
+					return false;
+			}
+
+			return false;
+		}
+
+	return false;
 }
 function _elemStyle($el, $prm) {//стили css для элемента
 	$send = array();

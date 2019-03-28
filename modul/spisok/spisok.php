@@ -609,25 +609,31 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 		$TR = '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
 		$prm = _blockParam(array('unit_get'=>$u));
 		foreach($ELEM['vvv'] as $td) {
-			$txt = _elemPrint($td, $prm);
-
 			$cls = array();
-			switch($td['dialog_id']) {
-				case 25: //кружок-статус
-				case 30: //иконка удаления
-				case 34: //иконка редактирования
-				case 71: //иконка сортировки
-					$cls[] = 'pad0';
+			$txt = '';
+
+			if(!_elemAction244($td, $prm)) {
+				$txt = _elemPrint($td, $prm);
+
+				switch($td['dialog_id']) {
+					case 25: //кружок-статус
+					case 30: //иконка удаления
+					case 34: //иконка редактирования
+					case 71: //иконка сортировки
+						$cls[] = 'pad0';
+				}
+
+				$cls[] = $td['font'];
+				$cls[] = $td['txt_8'];//pos - позиция
+				$cls[] = _elemAction242($td, $prm);//подмена цвета
+
+				$txt = _elemFormat($td, $prm, $txt);//[23] форматирование для ячеек таблицы
 			}
 
-			$cls[] = $td['font'];
-			$cls[] = $td['txt_8'];//pos - позиция
-			$cls[] = _elemAction242($td, $prm);//подмена цвета
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';
 
-			$txt = _elemFormat($td, $prm, $txt);//[23] форматирование для ячеек таблицы
 
 			$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
 		}
