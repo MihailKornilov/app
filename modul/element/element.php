@@ -6786,7 +6786,8 @@ function PHP12_icon18_type($id='all') {//доступные варианты и�
 		36 => 'join',
 		37 => 'cube',
 		38 => 'filter',
-		39 => 'link'
+		39 => 'link',
+		40 => 'hand'
 	);
 
 	if($id == 'all')

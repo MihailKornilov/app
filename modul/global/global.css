@@ -96,7 +96,7 @@ body:not(.site){position:relative}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:-9999px 0 no-repeat url(../../img/icon18.png?42);
+	background:-9999px 0 no-repeat url(../../img/icon18.png?43);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -144,6 +144,7 @@ body:not(.site){position:relative}
 .icon-link   {background-position-x:-820px}/* внешняя ссылка: загнутая стрелка */
 .icon-clock  {background-position-x:-840px}/* часы */
 .icon-cancel {background-position-x:-860px}/* отмена: перечёркнутый круг */
+.icon-hand   {background-position-x:-880px}/* рука: чёрный список */
 
 /* настройка ширины блоков */
 .icon-width  {
