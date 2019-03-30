@@ -134,6 +134,17 @@ switch(@$_POST['op']) {
 			$send['count_html'] = _elem15count($el15);
 		}
 
+		//элемент сумма, привязанный к списку
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=64
+				  AND `num_1`=".$elem_spisok."
+				LIMIT 1";
+		if($el64 = query_assoc($sql)) {
+			$send['sum_id'] = $el64['id'];
+			$send['sum_html'] = _elem64sum($el64);
+		}
+
 		//элемент группировки, привязанный к списку
 		$sql = "SELECT *
 				FROM `_element`
@@ -184,6 +195,17 @@ switch(@$_POST['op']) {
 		if($elCount = query_assoc($sql)) {
 			$send['count_id'] = $elCount['id'];
 			$send['count_html'] = _elem15count($elCount);
+		}
+
+		//элемент сумма, привязанный к списку
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=64
+				  AND `num_1`=".$spisok_id."
+				LIMIT 1";
+		if($el64 = query_assoc($sql)) {
+			$send['sum_id'] = $el64['id'];
+			$send['sum_html'] = _elem64sum($el64);
 		}
 
 		//элемент группировки, привязанный к списку

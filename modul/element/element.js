@@ -1279,6 +1279,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 						_dialogLoad({
 							dialog_id:41,
+							block_id:OBJ.srce.block_id,
 							element_id:el.num_1,//id элемента, к которому привязан фильтр (по нему будет определяться id диалога)
 							dss:dss,
 							dop:ATR_CMP.val(),
@@ -1998,6 +1999,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							//обновление количества [15]
 							if(res.count_id)
 								_attr_el(res.count_id).html(res.count_html);
+
+							//обновление суммы [64], если есть
+							if(res.sum_id)
+								_attr_el(res.sum_id).html(res.sum_html);
 
 							//обновление группировки [79]
 							if(res.group_id)

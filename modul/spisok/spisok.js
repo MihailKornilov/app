@@ -15,6 +15,10 @@ var _spisokUpdate = function(elem_spisok, func) {
 			if(res.count_id)
 				_attr_el(res.count_id).html(res.count_html);
 
+			//обновление суммы [64], если есть
+			if(res.sum_id)
+				_attr_el(res.sum_id).html(res.sum_html);
+
 			//обновление группировки [79], если есть
 			if(res.group_id)
 				_attr_el(res.group_id).html(res.group_html);

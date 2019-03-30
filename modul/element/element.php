@@ -2686,7 +2686,7 @@ function _element62_struct($el) {
 		'num_1'   => _num($el['num_1']),//id элемента, размещающего список
 		'num_2'   => _num($el['num_2']),/* условие применяется:
 											1439 - галочка установлена
-											1440 - галочка НЕ установлена
+											1440 - галочка снята
 										*/
 		'num_3'   => _num($el['num_3']) //начальное значение для галочки
 	) + _elementStruct($el);
@@ -2718,7 +2718,7 @@ function _element64_struct($el) {
 function _element64_print($el, $prm) {
 	return _elem64sum($el, $prm);
 }
-function _elem64sum($el, $prm) {
+function _elem64sum($el, $prm=array()) {
 	if(!$elem_id = $el['num_1'])
 		return '[64] Список не указан';
 	if(!$ELEM = _elemOne($elem_id))
@@ -2740,7 +2740,7 @@ function _elem64sum($el, $prm) {
 			WHERE "._spisokWhere($ELEM, $prm);
 	$sum = round(query_value($sql), 10);
 
-	return $el['txt_1'].' '.$sum.' '.$el['txt_2'];
+	return $el['txt_1'].' '._sumSpace($sum).' '.$el['txt_2'];
 }
 
 /* [66] Выбор цвета текста */
@@ -4952,8 +4952,8 @@ function _elem201init($el85, $prm, $send) {//получение данных э�
 			));
 			array_unshift($send, array(
 				'id' => -1,
-				'title' => 'галочка НЕ установлена',
-				'content' => '<div class="color-ref b">галочка НЕ установлена</div>'.
+				'title' => 'галочка снята',
+				'content' => '<div class="color-ref b">галочка снята</div>'.
 							 '<div class="grey i ml20">Действие будет совершено, если галочка снята</div>'
 			));
 			break;
