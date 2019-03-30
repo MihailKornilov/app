@@ -131,7 +131,7 @@ switch(@$_POST['op']) {
 				LIMIT 1";
 		if($el15 = query_assoc($sql)) {
 			$send['count_id'] = $el15['id'];
-			$send['count_html'] = _spisokElemCount($el15);
+			$send['count_html'] = _elem15count($el15);
 		}
 
 		//элемент группировки, привязанный к списку
@@ -183,7 +183,7 @@ switch(@$_POST['op']) {
 				LIMIT 1";
 		if($elCount = query_assoc($sql)) {
 			$send['count_id'] = $elCount['id'];
-			$send['count_html'] = _spisokElemCount($elCount);
+			$send['count_html'] = _elem15count($elCount);
 		}
 
 		//элемент группировки, привязанный к списку

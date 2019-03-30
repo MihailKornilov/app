@@ -188,23 +188,6 @@ function _spisokCountAll($el, $prm, $next=0) {//получение общего 
 	return $all;
 }
 
-function _spisokElemCount($el, $prm=array()) {//формирование элемента с содержанием количества списка для вывода на страницу
-	if(!$elem_id = $el['num_1'])
-		return 'Список не указан.';
-	if(!$ELEM = _elemOne($elem_id))
-		return 'Элемента, содержащего список, не существует.';
-
-	//если результат нулевой, выводится сообщение из элемента, который размещает список
-	if(!$all = _spisokCountAll($ELEM, $prm))
-		return $el['txt_7'];
-
-	return
-	_end($all, $el['txt_1'], $el['txt_3'], $el['txt_5']).
-	' '.
-	$all.
-	' '.
-	_end($all, $el['txt_2'], $el['txt_4'], $el['txt_6']);
-}
 function _spisok7num($spisok, $el) {//добавление записи, если был быстрый поиск по номеру
 	/*
 		Единица списка с найденным номером будет добавляться при двух условиях:

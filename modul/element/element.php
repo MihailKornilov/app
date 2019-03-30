@@ -884,7 +884,24 @@ function _element15_struct($el) {
 	) + _elementStruct($el);
 }
 function _element15_print($el, $prm) {
-	return _spisokElemCount($el, $prm);
+	return _elem15count($el, $prm);
+}
+function _elem15count($el, $prm=array()) {//формирование элемента с содержанием количества списка для вывода на страницу
+	if(!$elem_id = $el['num_1'])
+		return 'Список не указан.';
+	if(!$ELEM = _elemOne($elem_id))
+		return 'Элемента, содержащего список, не существует.';
+
+	//если результат нулевой, выводится сообщение из элемента, который размещает список
+	if(!$all = _spisokCountAll($ELEM, $prm))
+		return $el['txt_7'];
+
+	return
+	_end($all, $el['txt_1'], $el['txt_3'], $el['txt_5']).
+	' '.
+	$all.
+	' '.
+	_end($all, $el['txt_2'], $el['txt_4'], $el['txt_6']);
 }
 
 /* [16] Radio: произвольные значения */
@@ -2687,6 +2704,43 @@ function _element62_print($el, $prm) {
 		'disabled' => $prm['blk_setup'],
 		'value' => _spisokFilter('vv', $el, $el['num_3'])
 	));
+}
+
+/* [64] Сумма значений списка */
+function _element64_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//список [13]
+		'num_2'   => _num($el['num_2']),//значение суммы [13]
+		'txt_1'   => $el['txt_1'],      //текст перед суммой
+		'txt_2'   => $el['txt_2']       //текст после суммой
+	) + _elementStruct($el);
+}
+function _element64_print($el, $prm) {
+	return _elem64sum($el, $prm);
+}
+function _elem64sum($el, $prm) {
+	if(!$elem_id = $el['num_1'])
+		return '[64] Список не указан';
+	if(!$ELEM = _elemOne($elem_id))
+		return '[64] Элемента, содержащего список, не существует';
+
+	switch($ELEM['dialog_id']) {
+		case 14:
+		case 23: break;
+		default: return '[64] Элемент не является списком';
+	}
+
+	if(!$DLG = _dialogQuery($ELEM['num_1']))
+		return '[64] Диалога-списка не существует';
+	if(!$col = _elemCol($el['num_2']))
+		return '[64] Не найдена колонка значения суммы';
+
+	$sql = "SELECT SUM(`".$col."`)
+			FROM  "._queryFrom($DLG)."
+			WHERE "._spisokWhere($ELEM, $prm);
+	$sum = round(query_value($sql), 10);
+
+	return $el['txt_1'].' '.$sum.' '.$el['txt_2'];
 }
 
 /* [66] Выбор цвета текста */
