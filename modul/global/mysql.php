@@ -253,8 +253,8 @@ function _queryFrom($DLG) {//составление таблиц для запр
 
 	return $send;
 }
-function _queryWhere($DLG, $withDel=false) {//составление условий для запроса
-	$key = 'QUERY_WHERE_'.$DLG['id'];
+function _queryWhere($DLG, $withDel=0) {//составление условий для запроса
+	$key = 'QUERY_WHERE_'.$DLG['id'].$withDel;
 
 	if(defined($key))
 		return constant($key);
@@ -271,8 +271,8 @@ function _queryWhere($DLG, $withDel=false) {//составление услов�
 				$send[] = "`t2`.`cnn_id`=`t1`.`id`";
 	}
 
-	if($tn = _queryTN($DLG, 'deleted'))
-		if(!$withDel)
+	if(!$withDel)
+		if($tn = _queryTN($DLG, 'deleted'))
 			$send[] = "!`".$tn."`.`deleted`";
 	if($tn = _queryTN($DLG, 'app_id'))
 		switch($DLG['table_name_1']) {

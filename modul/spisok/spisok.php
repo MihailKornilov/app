@@ -271,8 +271,8 @@ function _spisokInclude($spisok) {//вложенные списки
 		return array();
 
 	//проверка наличия колонки dialog_id в содержании списка
-	$key = key($spisok);
-	$sp0 = $spisok[$key];
+	$spkey = key($spisok);
+	$sp0 = $spisok[$spkey];
 	if(!isset($sp0['dialog_id']))
 		return $spisok;
 	
@@ -310,7 +310,7 @@ function _spisokInclude($spisok) {//вложенные списки
 					SELECT "._queryCol($incDialog)."
 					FROM   "._queryFrom($incDialog)."
 					WHERE `t1`.`id` IN (".$ids.")
-					  AND "._queryWhere($incDialog, true);
+					  AND "._queryWhere($incDialog, 1);
 			$key = md5($sql);
 			if(!isset($_SI[$key])) {
 				if($arr = query_arr($sql)) {
