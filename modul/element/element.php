@@ -1362,7 +1362,7 @@ function _element29_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, $el['num_6']);
 	$v = _elem29PageSel($el['num_1'], $v);
 	$v = _elem29DialogSel($prm, $v);
-	$v = _elem29UserSel($v);
+	$v = _elem29UserSel($el, $prm, $v);
 
 	return
 	_select(array(
@@ -1495,10 +1495,17 @@ function _elem29DialogSel($prm, $sel_id) {//подстановка id запис
 
 	return $get_id;
 }
-function _elem29UserSel($v) {//возвращение ID текущего пользователя
+function _elem29UserSel($el, $prm, $v) {//возвращение ID текущего пользователя
 	if($v != -21)
 		return $v;
-	return USER_ID;
+	if(!$arr = _element29_vvv($el, $prm))
+		return 0;
+
+	foreach($arr as $r)
+		if($r['id'] == USER_ID)
+			return USER_ID;
+
+	return 0;
 }
 function _elem29ValAuto($el, $txt) {//автоматическое внесение текста, введённого в выпадающем списке [29]
 	if(!$txt = _txt($txt))
@@ -3082,11 +3089,11 @@ function _element79_print($el) {
 
 	//получение имён для групп
 	$sql = "SELECT
-				`id`,
+				`t1`.`id`,
 				`".$GROUP_COL_NAME."`
 			FROM   "._queryFrom($GROUP_DLG)."
 			WHERE  "._queryWhere($GROUP_DLG)."
-			  AND `id` IN ("._idsGet($arr, 'gid').")";
+			  AND `t1`.`id` IN ("._idsGet($arr, 'gid').")";
 	$ass = query_ass($sql);
 
 	$spisok = '';
