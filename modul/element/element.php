@@ -1362,6 +1362,7 @@ function _element29_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, $el['num_6']);
 	$v = _elem29PageSel($el['num_1'], $v);
 	$v = _elem29DialogSel($prm, $v);
+	$v = _elem29UserSel($v);
 
 	return
 	_select(array(
@@ -1493,6 +1494,11 @@ function _elem29DialogSel($prm, $sel_id) {//подстановка id запис
 		return 0;
 
 	return $get_id;
+}
+function _elem29UserSel($v) {//возвращение ID текущего пользователя
+	if($v != -21)
+		return $v;
+	return USER_ID;
 }
 function _elem29ValAuto($el, $txt) {//автоматическое внесение текста, введённого в выпадающем списке [29]
 	if(!$txt = _txt($txt))
@@ -3211,7 +3217,8 @@ function _element85_struct($el) {
 		'num_1'   => _num($el['num_1']),//ID элемента select, который содержит списки
 		'txt_1'   => $el['txt_1'],      //текст нулевого значения
 		'num_2'   => _num($el['num_2']),//разрешать выбор записи, данные которой принимает страница
-		'num_3'   => _num($el['num_3']) //разрешать выбор записи, данные которой принимает диалог
+		'num_3'   => _num($el['num_3']),//разрешать выбор записи, данные которой принимает диалог
+		'num_4'   => _num($el['num_4']) //разрешать выбор текущего пользователя
 	) + _elementStruct($el);
 }
 function _element85_js($el) {
@@ -3246,6 +3253,14 @@ function _element85_vvv($el, $prm) {
 			'title' => 'Совпадает с данными, приходящими на диалог',
 			'content' => '<div class="b color-pay">Совпадает с данными, приходящими на диалог</div>'.
 						 '<div class="fs12 grey ml10 mt3 i">Будет установлено значение записи, которая приходит на открываемое диалоговое окно</div>'
+		);
+
+	if($el['num_4'])
+		$send[] = array(
+			'id' => -21,
+			'title' => 'Текущий пользователь',
+			'content' => '<div class="b color-pay">Текущий пользователь</div>'.
+						 '<div class="fs12 grey ml10 mt3 i">Будет выбран текущий пользователь</div>'
 		);
 
 	$send = _elem201init($el, $prm, $send);
