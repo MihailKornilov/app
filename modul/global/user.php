@@ -125,6 +125,7 @@ function _userImageRepair() {//восстановление аватарок п�
 	$sql = "SELECT *
 			FROM `_user`
 			WHERE `vk_id`
+			  AND `vk_id`<2147000000
 			  AND !LENGTH(`ava`)
 			ORDER BY `id`";
 	foreach(query_arr($sql) as $r)
