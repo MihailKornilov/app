@@ -6945,6 +6945,8 @@ function PHP12_balans_setup_save($cmp, $val, $unit) {//сохранение со
 				WHERE `id`=".$r['id'];
 		query($sql);
 	}
+
+	_BE('elem_clear');
 }
 function PHP12_balans_setup_vvv($prm) {
 	if(!$u = $prm['unit_edit'])
