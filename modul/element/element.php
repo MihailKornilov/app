@@ -608,7 +608,7 @@ function _element8_print11($el, $u) {
 	return _br($txt);
 }
 function _element8vFromEl($el, $prm, $v) {//начальный текст из указанного значения
-	if($el['num_1'] != 8064)
+	if($el['num_5'] != 8064)
 		return $v;
 	//значение может быть подставлено только при внесении записи
 	if($u = $prm['unit_edit'])
@@ -626,7 +626,7 @@ function _element8vFromEl($el, $prm, $v) {//начальный текст из �
 	if(!$u = _spisokUnitQuery($dialog, $id))
 		return '';
 
-	return _elemUids($el['txt_3'], $u);
+	return _elemUids($el['txt_4'], $u);
 }
 
 /* [9] Поле-пароль */
