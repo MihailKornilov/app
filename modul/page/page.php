@@ -678,8 +678,13 @@ function _document() {//формирование документа для вы�
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id` IN ("._ids($doc['param_ids']).")";
-	foreach(query_arr($sql) as $el)
-		$document->setValue($el['txt_10'], _docTxt($el, $unit));
+	foreach(query_arr($sql) as $el) {
+		$v = _docTxt($el, $unit);
+		if(strpos($el['txt_10'], '_PROPIS}'))
+			if($sum = round($v))
+				$v = _numToWord($sum);
+		$document->setValue($el['txt_10'], $v);
+	}
 
 	//формирование имени файла-шаблона для загрузки
 	$fname = $att['fname'];
