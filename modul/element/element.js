@@ -2408,7 +2408,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						return _attr_cmp(elem_id)._select('focus');
 
 					_attr_cmp(elem_id).focus();
-				//открытие документа
+				//открытие документа (при определённом условии)
 				case 207:
 					if(is_open)
 						break;
