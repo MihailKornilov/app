@@ -711,7 +711,7 @@ function _doctxt($el, $unit) {
 		//порядковый номер
 		case 32: return empty($unit['num']) ? $unit['id'] : $unit['num'];
 		//дата и время внесения записи
-		case 33: return _elem33Data($el, $unit);
+		case 33: return _element33Data($el, $unit);
 		//календарь
 		case 51:
 			$ex = explode('-', $unit[$col]);

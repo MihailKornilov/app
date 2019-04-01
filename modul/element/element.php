@@ -1259,6 +1259,7 @@ function _element23_struct_vvv($el, $cl) {
 		'num_2'     => _num($cl['num_2']),
 		'num_3'     => _num($cl['num_3']),
 		'num_4'     => _num($cl['num_4']),
+		'num_5'     => _num($cl['num_5']),
 		'txt_1'     => $cl['txt_1'],//для [10]
 		'txt_2'     => $cl['txt_2'],//для [11]
 	);
@@ -1868,7 +1869,8 @@ function _element33_struct($el) {
 												сегодня
 												завтра
 										*/
-		'num_4'   => _num($el['num_4']) //показывать время в формате 12:45
+		'num_4'   => _num($el['num_4']),//показывать время в формате 12:45
+		'num_5'   => _num($el['num_5']) //показывать пользователя, внёсшего запись (при наведении на дату)
 	) + _elementStruct($el);
 }
 function _element33_struct_title($el) {
@@ -1881,9 +1883,12 @@ function _element33_print($el, $prm) {
 	if(!$u = $prm['unit_get'])
 		return 'дата';
 
-	return _elem33Data($el, $u);
+	$data = _element33Data($el, $u);
+	$data = _element33TT($el, $u, $data);
+
+	return $data;
 }
-function _elem33Data($el, $u) {//Значение записи: дата [33]
+function _element33Data($el, $u) {//Значение записи: дата [33]
 	if(empty($u['dtime_add']))
 		return '';
 	if(!preg_match(REGEXP_DATE, $u['dtime_add']))
@@ -1918,6 +1923,18 @@ function _elem33Data($el, $u) {//Значение записи: дата [33]
 		' '.($el['num_1'] == 29 ? _monthFull($d[1]) : _monthCut($d[1])). //месяц
 		($el['num_2'] && $d[0] == YEAR_CUR ? '' : ' '.$d[0]).            //год
 		$hh;                                                             //время
+}
+function _element33TT($el, $u, $data) {//подсказка кто внёс запись
+	if(!$el['num_5'])
+		return $data;
+	if(!$user_id = _num($u['user_id_add']))
+		return $data;
+	if(!$user = _user($user_id))
+		return $data;
+
+	$tt = 'Вн'.($user['pol'] == 1 ? 'есла' : 'ёс').' '.$user['i'].' '.$user['f'];
+
+	return '<span class="curD'._tooltip($tt, -40).$data.'<span>';
 }
 
 /* [34] Иконка редактирования записи */
