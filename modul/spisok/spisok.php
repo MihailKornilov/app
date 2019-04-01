@@ -774,7 +774,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 		//открытие документа
 		case 227:
 			$doc_id = $func['target_ids'];
-			return '<span class="inhr" href="'.URL.'&p=9&doc_id='.$doc_id.'&id='.$u['id'].'">'.$txt.'</span>';
+			return '<a class="inhr" href="'.URL.'&p=9&doc_id='.$doc_id.'&id='.$u['id'].'">'.$txt.'</a>';
 	}
 
 	return _spisokUnitTT($el, $u, $txt);
