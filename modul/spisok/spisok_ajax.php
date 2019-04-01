@@ -841,6 +841,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 				case 222:
 				case 223:
 				case 224:
+				case 227:
 				case 241:
 				case 242:
 				case 243:
@@ -901,6 +902,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 			case 221:
 			case 222:
 			case 224:
+			case 227:
 				$sql = "SELECT *
 						FROM `_action`
 						WHERE `id`=".$uid[$table_1];
@@ -911,7 +913,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 						FROM `_action`
 						WHERE `block_id`=".$r['block_id']."
 						  AND `element_id`=".$r['element_id']."
-						  AND `dialog_id` IN (221,222,224)
+						  AND `dialog_id` IN (221,222,224,227)
 						  AND `id`!=".$uid[$table_1];
 				query($sql);
 		}
