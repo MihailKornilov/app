@@ -1483,6 +1483,7 @@ function _element29_js($el) {
 		'num_2'   => _num($el['num_2']),
 		'num_3'   => _num($el['num_3']),
 		'num_4'   => _num($el['num_4']),
+		'num_7'   => _num($el['num_7']),
 		'txt_1'   => $el['txt_1']
 	) + _elementJs($el);
 }
