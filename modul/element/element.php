@@ -2427,6 +2427,7 @@ function _element44_struct_vvv($el, $cl) {
 		'num_2'     => _num($cl['num_2']),
 		'num_3'     => _num($cl['num_3']),
 		'num_4'     => _num($cl['num_4']),
+		'num_5'     => _num($cl['num_5']),
 		'num_8'     => _num($cl['num_8']) //пробел справа
 	);
 }
@@ -2965,15 +2966,39 @@ function _element68_print($el, $prm) {
 
 /* [69] Значение записи: имя пользователя */
 function _element69_struct($el) {
-	return _elementStruct($el);
+	return array(
+		'num_1'   => _num($el['num_1'])/* формат:
+									        8170: Имя Фамилия
+									        8171: Фамилия Имя
+									        8172: Фамилия Имя Отчество
+									        8173: Фамилия И.О.
+                                        */
+	) + _elementStruct($el);
 }
 function _element69_print($el, $prm) {
 	if(!$u = $prm['unit_get'])
 		return $el['title'];
 	if(empty($u['user_id_add']))
 		return 'no user';
+	if(!$us = _user($u['user_id_add']))
+		return '';
 
-	return _user($u['user_id_add'], 'name');
+	switch($el['num_1']) {
+		default:
+		case 8170: break;
+		case 8171: return $us['f'].' '.$us['i'];
+		case 8172: return $us['f'].' '.$us['i'].' '.$us['o'];
+		case 8173:
+			$send = $us['f'];
+			if($us['i']) {
+				$send .= ' '.mb_substr($us['i'], 0, 1).'.';
+				if($us['o'])
+					$send .= mb_substr($us['o'], 0, 1).'.';
+			}
+			return $send;
+	}
+
+	return $us['i'].' '.$us['f'];
 }
 
 /* [70] Выбор цвета фона */
