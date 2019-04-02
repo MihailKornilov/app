@@ -1738,10 +1738,10 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 	$sql = "SELECT
 				`".$cmp['col']."`,
 				COUNT(`id`)
-			FROM `"._table($DConn['table_1'])."`
-			WHERE `dialog_id`=".$dialog_id."
+			FROM "._queryFrom($DConn)."
+			WHERE "._queryWhere($DConn)." 
 			  AND `".$cmp['col']."`
-			  AND !`deleted`
+			  "._40cond($cmp, $unit['txt_1'])."
 			GROUP BY `".$cmp['col']."`";
 	if(!$ass = query_ass($sql))//выход, если нечего обновлять
 		return;
