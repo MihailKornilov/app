@@ -1934,7 +1934,7 @@ function _element33TT($el, $u, $data) {//подсказка кто внёс за
 
 	$tt = 'Вн'.($user['pol'] == 1 ? 'есла' : 'ёс').' '.$user['i'].' '.$user['f'];
 
-	return '<span class="curD'._tooltip($tt, -40).$data.'<span>';
+	return '<span class="inhr curD'._tooltip($tt, -40).$data.'<span>';
 }
 
 /* [34] Иконка редактирования записи */

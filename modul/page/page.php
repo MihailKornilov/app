@@ -708,7 +708,8 @@ function _doctxt($el, $unit) {
 		//многострочное поле
 		case 5: return _br($unit[$col], "<w:br/>");
 		//однострочное поле
-		case 8: return $unit[$col];
+		case 8:
+		case 27: return $unit[$col];
 		//значение записи
 		case 11: return _doc11txt($el, $unit);
 		//Выбор нескольких значений галочками
