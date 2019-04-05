@@ -574,6 +574,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 					$is_err = 1;
 				//цифры и числа
 				if($cmp['num_1'] == 33) {
+					$v = str_replace(',', '.', $v);
 					$v = round($v, $cmp['num_2']);
 					//разрешение вностиь Ноль
 					if($cur && $cmp['req'] && !$v && !$cmp['num_4'])
