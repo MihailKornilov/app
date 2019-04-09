@@ -8949,7 +8949,7 @@ function _noteList($page_id, $obj_id, $commAccess) {
 			  AND !`deleted`
 			  AND `page_id`=".$page_id."
 			  AND `obj_id`=".$obj_id."
-			ORDER BY `id` DESC";
+			ORDER BY `dtime_add` DESC";
 	if(!$arr = query_arr($sql))
 		return '';
 
@@ -8962,7 +8962,7 @@ function _noteList($page_id, $obj_id, $commAccess) {
 			FROM `_note`
 			WHERE `parent_id` IN ("._idsGet($arr).")
 			  AND !`deleted`
-			ORDER BY `id`";
+			ORDER BY `dtime_add`";
 	if($comm = query_arr($sql)) {
 		$comm = _noteImgArr($comm);
 		foreach($comm as $r)
