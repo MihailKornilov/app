@@ -664,11 +664,11 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 
 	return
 	$BEGIN.
-	_spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $MASS, $IS_SORT).
+	_spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT).
 	$TR.
 	$END;
 }
-function _spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $MASS, $IS_SORT) {//отображение названий колонок
+function _spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT) {//отображение названий колонок
 	if($next)
 		return '';
 	if(!$ELEM['num_5'])
@@ -1232,7 +1232,7 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 		$val = _40cond_cnn($EL, $r, $ell, $r['txt'], $prm);
 		$val = _40cond_17($r, $ell, $val);
 		$val = _40cond_date($ell, $val);
-		$val = _40cond_dop($r, $ell, $val);
+		$val = _40cond_dop($r, $val);
 
 		if($ell['dialog_id'] == 31)//Выбор нескольких значений галочками
 			if($r['cond_id'] == 9 || $r['cond_id'] == 10)//содержит / не содержит
@@ -1388,7 +1388,7 @@ function _40cond_date($ell, $val) {//если элемент является д
 	$val = TODAY_UNIXTIME + $val * 86400;
 	return strftime('%Y-%m-%d', $val);
 }
-function _40cond_dop($r, $ell, $val) {//дополнительные условия, когда unit_id < 0
+function _40cond_dop($r, $val) {//дополнительные условия, когда unit_id < 0
 	if(_40cond_err($val))
 		return $val;
 	if($r['cond_id'] < 3)
