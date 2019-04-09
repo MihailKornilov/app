@@ -659,18 +659,34 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 					'</li>';
 			$TR = '<ol>'.$TR.'</ol>';
 		}
-	} else {
-		//отображение названий колонок
-		$TH = '';
-		if(!$next && $ELEM['num_5']) {
-			$TH .= '<tr>';
-			foreach($ELEM['vvv'] as $tr)
-				$TH .= '<th>'.$tr['txt_7'];
-		}
-		$TR = $TH.implode('', $MASS);
-	}
+	} else
+		$TR = implode('', $MASS);
 
-	return $BEGIN.$TR.$END;
+	return
+	$BEGIN.
+	_spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $MASS, $IS_SORT).
+	$TR.
+	$END;
+}
+function _spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $MASS, $IS_SORT) {//отображение названий колонок
+	if($next)
+		return '';
+	if(!$ELEM['num_5'])
+		return '';
+
+	$send = '';
+
+	if($IS_SORT)
+		$send = $TABLE_BEGIN;
+
+	$send .= '<tr>';
+	foreach($ELEM['vvv'] as $tr)
+		$send .= '<th'._elemStyleWidth($tr).'>'.$tr['txt_7'];
+
+	if($IS_SORT)
+		$send .= $TABLE_END;
+
+	return $send;
 }
 function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {//формирование табличного списка по уровням
 	if(!$arr = @$child[$parent_id])
