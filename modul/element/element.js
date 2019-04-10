@@ -1857,6 +1857,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							_spisokUpdate(el.num_1);
 						}
 					});
+					if(el.action)
+						_elemAction(el, FILTER[el.num_1][elm_id], 1);
 					return;
 				//Выбор цвета текста
 				case 66:

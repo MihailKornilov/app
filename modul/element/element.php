@@ -5793,7 +5793,9 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 			return _dialogSel24($el13['num_1'], $dlg24);
 
 		//на текущей странице
-		case 8060: break;
+		case 8060:
+			define('OBJ_NAME_CHOOSE', 'page');
+			return _page('cur');
 
 		//из диалога, данные которого получает страница
 		case 8061:
