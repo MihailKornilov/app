@@ -1,4 +1,122 @@
 <?php
+function _d119_app_del($DLG) {//удаление приложения
+	if($DLG['id'] != 119)
+		return;
+	if(!SA)
+		jsonError('Нет прав');
+
+	_appDel();
+
+	_app_user_access(APP_ID);
+
+	_cache_clear('AUTH_'.CODE, 1);
+	_cache_clear('user'.USER_ID);
+	_cache_clear('page');
+	_BE('block_clear');
+	_BE('elem_clear');
+	_BE('dialog_clear');
+	_jsCache();
+
+	$send = array(
+		'action_id' => 2,
+		'action_page_id' => 7
+	);
+
+	jsonSuccess($send);
+}
+function _appDel($app_id=APP_ID) {
+	//удаление данных
+	$sql = "DELETE FROM `_spisok`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление значений фильтров пользователей
+	$sql = "DELETE FROM `_user_spisok_filter`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление истории действий
+	$sql = "DELETE FROM `_history`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+	$sql = "DELETE FROM `_history_edited`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+
+
+	//удаление страниц
+	$sql = "DELETE FROM `_page`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление доступа к страницам
+	$sql = "DELETE FROM `_user_page_access`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление блоков
+	$sql = "DELETE FROM `_block`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление элементов
+	$sql = "DELETE FROM `_element`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление диалогов
+	$sql = "DELETE FROM `_dialog`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление действий
+	$sql = "DELETE FROM `_action`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление счётчиков
+	$sql = "DELETE FROM `_counter`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление значений счётчиков
+	$sql = "DELETE FROM `_counter_v`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление планировщиков
+	$sql = "DELETE FROM `_cron`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление подсказок
+	$sql = "DELETE FROM `_element_hint`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление шаблонов документов
+	$sql = "DELETE FROM `_template`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление файлов
+	$sql = "DELETE FROM `_attach`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление изображений
+	$sql = "DELETE FROM `_image`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление заметок
+	$sql = "DELETE FROM `_note`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+}
+
+
 function PHP12_clone_on() {//получение диалогов, данные которых разрешены для переноса
 	$sql = "SELECT *
 			FROM `_dialog`
@@ -96,70 +214,7 @@ function _clone_clear() {
 			  AND `app_id_dst`=".CLONE_ID_DST;
 	query($sql);
 
-	//удаление данных
-	$sql = "DELETE FROM `_spisok`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление значений фильтров пользователей
-	$sql = "DELETE FROM `_user_spisok_filter`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление истории действий
-	$sql = "DELETE FROM `_history`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-	$sql = "DELETE FROM `_history_edited`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-
-
-	//удаление страниц
-	$sql = "DELETE FROM `_page`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление блоков
-	$sql = "DELETE FROM `_block`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление элементов
-	$sql = "DELETE FROM `_element`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление диалогов
-	$sql = "DELETE FROM `_dialog`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление действий
-	$sql = "DELETE FROM `_action`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление счётчиков
-	$sql = "DELETE FROM `_counter`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление планировщиков
-	$sql = "DELETE FROM `_cron`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление подсказок
-	$sql = "DELETE FROM `_element_hint`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
-
-	//удаление шаблонов документов
-	$sql = "DELETE FROM `_template`
-			WHERE `app_id`=".CLONE_ID_DST;
-	query($sql);
+	_appDel(CLONE_ID_DST);
 }
 
 function _clone_ass_save($tName, $src_id, $dst_id) {//сохранение соответствий идентификаторов
