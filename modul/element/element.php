@@ -3692,6 +3692,37 @@ function _element87_print($el, $prm) {
 	return 'Кол-во "'.$DLG['name'].'" '.($count ? '+'.$count : '0');
 }
 
+/* [88] Таблица из нескольких списков */
+function _element88_struct($el) {
+	return array(
+		'num_1'   => _num($el['num_1']),//Кол-во выводимых строк
+		'num_2'   => _num($el['num_2']),//Флаг текста, когда нет данных
+		'num_3'   => _num($el['num_3']),//узкие строки таблицы
+		'num_4'   => _num($el['num_4']),//подсвечивать строку при наведении мыши
+		'num_5'   => _num($el['num_5']),//показывать имена колонок
+		'num_6'   => _num($el['num_6']),//обратный порядок
+		'txt_1'   => $el['txt_1'],      //текст, если нет данных
+		'txt_2'   => $el['txt_2']       //содержание таблицы
+	) + _elementStruct($el);
+}
+function PHP12_elem88($prm) {//Настройка ячеек таблицы
+	if(!$prm['unit_edit'])
+		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
+	if(!$BL = _blockOne($prm['srce']['block_id']))
+		return _emptyMin10('Отсутствует исходный блок.');
+
+	$ex = explode(' ', $BL['elem']['mar']);
+	$w = $BL['width'] - $ex[1] - $ex[3];
+
+	return
+	'<div class="fs16 color-555 ml20">Списки:</div>'.
+	'<div id="sp88"></div>'.
+	'<div class="fs16 color-555 ml20 mt10">Колонки:</div>'.
+	'<div class="calc-div h25 line-t line-b bg-efe">'.$w.'</div>'.
+	'<dl class="mt5"></dl>'.
+	'<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>';
+}
+
 /* [90] Изображение */
 function _element90_struct($el) {
 	return array(

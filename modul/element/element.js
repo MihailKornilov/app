@@ -3617,6 +3617,135 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
+	/* [88] Таблица из нескольких списков */
+	PHP12_elem88 = function(el, vvv, obj) {
+		if(!obj.unit.id)
+			return;
+
+		PHP12_elem88_sp(el, vvv, obj);
+		PHP12_elem88_td(el, vvv);
+	},
+	PHP12_elem88_sp = function(el, vvv, obj) {//списки
+
+	},
+	PHP12_elem88_td = function(el, vvv) {//ячейки
+		var DL = _attr_el(el.id).find('dl'),
+			CALC_DIV = _attr_el(el.id).find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
+			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
+			NUM = 1;
+
+		//кнопка добавления новой ячейки
+		_attr_el(el.id).find('div:last').click(tdAdd);
+
+		_forIn(vvv, tdAdd);
+		tdCalc();
+
+		//добавление новой колонки в таблицу
+		function tdAdd(v) {
+			v = $.extend({
+				id:0,        //id элемента
+				dialog_id:50,//id диалога, через который был вставлен этот элемент
+				title:'',    //имя значения
+				width:150,   //ширина колонки
+				txt_2:''
+			}, v.id ? v : {});
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w25 r topi">' +
+								'<b class="bnum fs15 color-555">' + NUM + '</b>:' +
+							'<td><div style="width:' + v.width + 'px">' +
+									'<input type="text"' +
+										  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
+										  ' placeholder="имя колонки"' +
+										  ' value="' + v.txt_2 + '"' +
+									' />' +
+								'</div>' +
+							'<td class="w25 r top pt5">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last');
+			tdResize(DD);
+
+			//сортировка колонок
+			DL.sortable({
+				handle:'.icon-move-y',
+				update:tdCalc
+			});
+
+			//удаление элемента
+			DL.find('.icon-del:last').click(function() {
+				$(this).closest('DD').remove();
+				tdCalc();
+			});
+
+			DD.find('.th-name').focus();
+
+			NUM++;
+		}
+
+		//включение изменения ширины, если присутствует значение
+		function tdResize(dd) {
+			var res = dd.find('.th-name').parent();
+			if(res.hasClass('ui-resizable'))
+				return;
+			res.resizable({
+				minWidth:30,
+				maxWidth:500,
+				grid:10,
+				handles:'e',
+				stop:tdCalc
+			});
+		}
+
+		//пересчёт визуального отображения ячеек по диагонали
+		function tdCalc() {
+			var html = '',
+				DIV_W = 600,
+				i = DIV_W / CALC_W,
+				FULL_W = 0,
+				TDS = [],//массив ширин по каждой ячейке
+				ALL_W = 0;//сумма ширины всех ячеек, кроме последней
+
+			_forEq(DL.find('DD'), function(sp) {
+				var n = _num(sp.find('.bnum').html()),
+					w = sp.find('.th-name').parent().width();
+				TDS.push({
+					n:n,
+					w:Math.round(w*i)-1
+				});
+				FULL_W += w;
+			});
+
+			_forN(TDS, function(o, n) {
+				var bg = 'ffc',
+					line = ' line-r';
+				if(FULL_W > CALC_W) {
+					bg = 'fcc';
+					i = CALC_W / FULL_W;
+					o.w = Math.round(o.w*i);
+				}
+				if(FULL_W >= CALC_W) {
+					ALL_W += (o.w+1);
+					if(n == (TDS.length-1)) {
+						line = '';
+						o.w = DIV_W - ALL_W + o.w + 1;
+					}
+				}
+
+				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
+							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
+						'</div>';
+			});
+			CALC_DIV.html(html);
+		}
+	},
+
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ для [16][17][18] ===--- */
 	PHP12_radio_setup = function(el, vvv, obj) {
 		/*
