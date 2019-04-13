@@ -3715,12 +3715,19 @@ function PHP12_elem88($prm) {//Настройка ячеек таблицы
 	$w = $BL['width'] - $ex[1] - $ex[3];
 
 	return
-	'<div class="fs16 color-555 ml20">Списки:</div>'.
-	'<div id="sp88"></div>'.
-	'<div class="fs16 color-555 ml20 mt10">Колонки:</div>'.
+	'<div class="fs16 b color-555 bg-gr1 pl20 pt5 pb5 line-t line-b">Списки:</div>'.
+	'<dl id="sp88" class="mt5 ml40"></dl>'.
+	'<div class="fs15 color-555 pad10 center over1 curP">Добавить список</div>'.
+
+	'<div class="fs16 color-555 bg-gr1 pl20 pt5 pb5 mt10 line-t">Колонки:</div>'.
 	'<div class="calc-div h25 line-t line-b bg-efe">'.$w.'</div>'.
-	'<dl class="mt5"></dl>'.
+	'<dl id="col88" class="mt5"></dl>'.
 	'<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>';
+}
+function PHP12_elem88_vvv($prm) {//данные для настроек
+	$send['sp'] = _dialogSelArray('spisok_only');
+	$send['td'] = array();
+	return $send;
 }
 
 /* [90] Изображение */

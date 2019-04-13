@@ -3622,22 +3622,57 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!obj.unit.id)
 			return;
 
-		PHP12_elem88_sp(el, vvv, obj);
+		PHP12_elem88_sp(el, vvv);
 		PHP12_elem88_td(el, vvv);
 	},
-	PHP12_elem88_sp = function(el, vvv, obj) {//списки
+	PHP12_elem88_sp = function(el, vvv) {//списки
+		var DL = _attr_el(el.id).find('#sp88');
 
+		//кнопка добавления нового списка
+		DL.next().click(spAdd);
+
+		_forN([1030,1031], spAdd);
+
+		//добавление нового списка
+		function spAdd(v) {
+			v = _num(v);
+
+			DL.append(
+				'<dd>' +
+					'<table class="bs5 ml40">' +
+						'<tr><td><input type="hidden" class="spv" value="' + v + '" />' +
+							'<td class="w25">' +
+								'<div class="icon icon-set-b pl' + _tooltip('Настроить колонки', -58) + '</div>' +
+							'<td class="w25">' +
+								'<div class="icon icon-del-red pl' + _tooltip('Удалить список', -48) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last');
+
+			DD.find('.spv')._select({
+				width:390,
+				title0:'список не выбран',
+				spisok:vvv.sp
+			});
+
+			//удаление списка
+			DL.find('.icon-del-red:last').click(function() {
+				$(this).closest('DD').remove();
+			});
+		}
 	},
 	PHP12_elem88_td = function(el, vvv) {//ячейки
-		var DL = _attr_el(el.id).find('dl'),
+		var DL = _attr_el(el.id).find('#col88'),
 			CALC_DIV = _attr_el(el.id).find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
 			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
 			NUM = 1;
 
 		//кнопка добавления новой ячейки
-		_attr_el(el.id).find('div:last').click(tdAdd);
+		DL.next().click(tdAdd);
 
-		_forIn(vvv, tdAdd);
+		_forIn(vvv.td, tdAdd);
 		tdCalc();
 
 		//добавление новой колонки в таблицу
@@ -3658,7 +3693,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<b class="bnum fs15 color-555">' + NUM + '</b>:' +
 							'<td><div style="width:' + v.width + 'px">' +
 									'<input type="text"' +
-										  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
+										  ' class="th-name w100p bg-gr2 center fs14 blue"' +
 										  ' placeholder="имя колонки"' +
 										  ' value="' + v.txt_2 + '"' +
 									' />' +
@@ -3744,6 +3779,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 			CALC_DIV.html(html);
 		}
+	},
+	PHP12_elem88_get = function(el) {
+		var spv = [];
+		_forEq(_attr_el(el.id).find('.spv'), function(sp) {
+			var id = _num(sp.val());
+			if(id)
+				spv.push(id);
+		});
+		return {
+			sp:spv.join()
+		};
 	},
 
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ для [16][17][18] ===--- */
