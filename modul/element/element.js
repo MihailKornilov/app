@@ -3631,7 +3631,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//кнопка добавления нового списка
 		DL.next().click(spAdd);
 
-		_forN([1030,1031], spAdd);
+		_forN(vvv.txt_2, spAdd);
 
 		//добавление нового списка
 		function spAdd(v) {
@@ -3672,18 +3672,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//кнопка добавления новой ячейки
 		DL.next().click(tdAdd);
 
-		_forIn(vvv.td, tdAdd);
+		_forIn(vvv.txt_3, tdAdd);
 		tdCalc();
 
 		//добавление новой колонки в таблицу
 		function tdAdd(v) {
 			v = $.extend({
-				id:0,        //id элемента
-				dialog_id:50,//id диалога, через который был вставлен этот элемент
-				title:'',    //имя значения
 				width:150,   //ширина колонки
-				txt_2:''
-			}, v.id ? v : {});
+				title:''     //имя значения
+			}, v);
 
 			DL.append(
 				'<dd class="over3" val="' + v.id + '">' +
@@ -3695,7 +3692,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									'<input type="text"' +
 										  ' class="th-name w100p bg-gr2 center fs14 blue"' +
 										  ' placeholder="имя колонки"' +
-										  ' value="' + v.txt_2 + '"' +
+										  ' value="' + v.title + '"' +
 									' />' +
 								'</div>' +
 							'<td class="w25 r top pt5">' +

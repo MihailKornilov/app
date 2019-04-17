@@ -3695,17 +3695,21 @@ function _element87_print($el, $prm) {
 /* [88] Таблица из нескольких списков */
 function _element88_struct($el) {
 	return array(
-		'num_1'   => _num($el['num_1']),//Кол-во выводимых строк
-		'num_2'   => _num($el['num_2']),//Флаг текста, когда нет данных
-		'num_3'   => _num($el['num_3']),//узкие строки таблицы
-		'num_4'   => _num($el['num_4']),//подсвечивать строку при наведении мыши
-		'num_5'   => _num($el['num_5']),//показывать имена колонок
-		'num_6'   => _num($el['num_6']),//обратный порядок
-		'txt_1'   => $el['txt_1'],      //текст, если нет данных
-		'txt_2'   => $el['txt_2']       //содержание таблицы
+		'num_1' => _num($el['num_1']),//Кол-во выводимых строк
+		'num_2' => _num($el['num_2']),//Флаг текста, когда нет данных
+		'num_3' => _num($el['num_3']),//узкие строки таблицы
+		'num_4' => _num($el['num_4']),//подсвечивать строку при наведении мыши
+		'num_5' => _num($el['num_5']),//показывать имена колонок
+		'num_6' => _num($el['num_6']),//обратный порядок
+		'txt_1' => $el['txt_1'],      //текст, если нет данных
+		'txt_2' => $el['txt_2'],      //ids диалогов-списков
+		'txt_3' => $el['txt_3']       //общие ячейки
 	) + _elementStruct($el);
 }
 function PHP12_elem88($prm) {//Настройка ячеек таблицы
+/*
+
+*/
 	if(!$prm['unit_edit'])
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
 	if(!$BL = _blockOne($prm['srce']['block_id']))
@@ -3725,8 +3729,28 @@ function PHP12_elem88($prm) {//Настройка ячеек таблицы
 	'<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>';
 }
 function PHP12_elem88_vvv($prm) {//данные для настроек
+	//списки для выбора
 	$send['sp'] = _dialogSelArray('spisok_only');
-	$send['td'] = array();
+
+	//ids диалогов-списков
+	$send['txt_2'] = array(1192,1193,1192);
+
+	//общие ячейки
+	$send['txt_3'] = array(
+		0 => array(
+			'width' => 100,
+			'title' => 'Сумма'
+		),
+		1 => array(
+			'width' => 140,
+			'title' => 'Название'
+		),
+		2 => array(
+			'width' => 80,
+			'title' => 'Дата'
+		),
+	);
+
 	return $send;
 }
 
