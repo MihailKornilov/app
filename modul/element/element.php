@@ -3702,14 +3702,11 @@ function _element88_struct($el) {
 		'num_5' => _num($el['num_5']),//показывать имена колонок
 		'num_6' => _num($el['num_6']),//обратный порядок
 		'txt_1' => $el['txt_1'],      //текст, если нет данных
-		'txt_2' => $el['txt_2'],      //ids диалогов-списков
-		'txt_3' => $el['txt_3']       //общие ячейки
+		'txt_2' => $el['txt_2']       //содержание
 	) + _elementStruct($el);
 }
 function PHP12_elem88($prm) {//Настройка ячеек таблицы
-/*
-
-*/
+	//print_r($prm);
 	if(!$prm['unit_edit'])
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
 	if(!$BL = _blockOne($prm['srce']['block_id']))
@@ -3729,29 +3726,37 @@ function PHP12_elem88($prm) {//Настройка ячеек таблицы
 	'<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>';
 }
 function PHP12_elem88_vvv($prm) {//данные для настроек
+	if(!$u = $prm['unit_edit'])
+		return array();
+
 	//списки для выбора
 	$send['sp'] = _dialogSelArray('spisok_only');
 
-	//ids диалогов-списков
-	$send['txt_2'] = array(1192,1193,1192);
+	$val = json_decode($u['txt_2'], true);
 
-	//общие ячейки
-	$send['txt_3'] = array(
-		0 => array(
-			'width' => 100,
-			'title' => 'Сумма'
-		),
-		1 => array(
-			'width' => 140,
-			'title' => 'Название'
-		),
-		2 => array(
-			'width' => 80,
-			'title' => 'Дата'
-		),
-	);
+	$send['spv'] = _ids($val['spv'], 1);
+	$send['col'] = $val['col'];
 
 	return $send;
+}
+function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
+	if(!$elem_id = _num(@$unit['id']))
+		jsonError('Некорректный ID элемента');
+	if(empty($val))
+		jsonError('Отсутствует содержание');
+	if(!is_array($val))
+		jsonError('Содержание не является массивом');
+	if(!$val['spv'] = _ids($val['spv']))
+		jsonError('Не выбраны списки');
+
+	$val = json_encode($val);
+
+	$sql = "UPDATE `_element`
+			SET `txt_2`='".addslashes($val)."'
+			WHERE `id`=".$elem_id;
+	query($sql);
+
+	_elemOne($elem_id, true);
 }
 
 /* [90] Изображение */

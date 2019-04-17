@@ -3631,7 +3631,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//кнопка добавления нового списка
 		DL.next().click(spAdd);
 
-		_forN(vvv.txt_2, spAdd);
+		_forN(vvv.spv, spAdd);
 
 		//добавление нового списка
 		function spAdd(v) {
@@ -3657,6 +3657,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				spisok:vvv.sp
 			});
 
+			//настройка колонок
+			DL.find('.icon-set-b:last').click(function() {
+				_dialogLoad({
+					dialog_id:89,
+//					block_id:obj.srce.block_id,  //блок, в котором размещена таблица
+//					edit_id:v.id,                //id выбранного элемента (при редактировании)
+					busy_obj:$(this),
+					func_save:function(ia) {
+						DD.attr('val', ia.unit.id);
+						v.id = ia.unit.id;
+						v.dialog_id = ia.unit.dialog_id;
+						INP.val(ia.unit.title);
+						INP.attr('id', ATTR_EL(v.id, true));
+						tdResize(DD);
+						tdCalc();
+					}
+				});
+			});
+
 			//удаление списка
 			DL.find('.icon-del-red:last').click(function() {
 				$(this).closest('DD').remove();
@@ -3672,7 +3691,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//кнопка добавления новой ячейки
 		DL.next().click(tdAdd);
 
-		_forIn(vvv.txt_3, tdAdd);
+		_forIn(vvv.col, tdAdd);
 		tdCalc();
 
 		//добавление новой колонки в таблицу
@@ -3778,14 +3797,24 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		}
 	},
 	PHP12_elem88_get = function(el) {
-		var spv = [];
+		var spv = [];//списки
 		_forEq(_attr_el(el.id).find('.spv'), function(sp) {
 			var id = _num(sp.val());
 			if(id)
 				spv.push(id);
 		});
+
+		var col = [];//колонки
+		_forEq(_attr_el(el.id).find('.th-name'), function(sp) {
+			col.push({
+				width:sp.parent().width(),
+				title:sp.val()
+			});
+		});
+
 		return {
-			sp:spv.join()
+			spv:spv.join(),
+			col:col
 		};
 	},
 
