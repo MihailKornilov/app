@@ -452,6 +452,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	//получение обновлённых данных записи
 	$unit = IS_ELEM ? _elemOne($unit_id, true) : _spisokUnitQuery($dialog, $unit_id, true);
 	_historyInsertEdit($dialog, $unitOld, $unit);
+	_elem29defSet($dialog, $unit);
 
 	if(IS_ELEM) {
 		//обновление данных блока в кеше

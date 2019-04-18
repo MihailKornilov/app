@@ -1692,6 +1692,42 @@ function _elem29ValAuto($el, $txt) {//автоматическое внесен�
 			)";
 	return query_id($sql);
 }
+function _elem29defSet($dlg, $u) {//установка значения по умолчанию существующим значениям в списке
+/*
+	Значения будут изменены при трёх условиях:
+		1. Требуется обязательный выбор значения
+		2. Указано значение по умолчанию num_6
+		3. Значения были нулевые
+*/
+	if($dlg['id'] != 29)
+		return;
+	if(!$u['req'])
+		return;
+	if(!$u['num_6'])
+		return;
+	if(!$col = $u['col'])
+		return;
+
+	//диалог, в котором размещается элемент
+	if($u['block']['obj_name'] != 'dialog')
+		return;
+	$did = $u['block']['obj_id'];
+	if(!$DLG = _dialogQuery($did))
+		return;
+
+	$sql = "SELECT COUNT(*)
+			FROM "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG)."
+			  AND !`".$col."`";
+	if(!query_value($sql))
+		return;
+
+	$sql = "UPDATE "._queryFrom($DLG)."
+			SET `".$col."`=".$u['num_6']."
+			WHERE "._queryWhere($DLG)."
+			  AND !`".$col."`";
+	query($sql);
+}
 
 /* [30] Иконка удаления записи */
 function _element30_struct($el) {
