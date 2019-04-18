@@ -3766,7 +3766,6 @@ function PHP12_elem89($prm) {//настройка колонок для конк
 	if(!$DLG = _dialogQuery($dss))
 		return _emptyMin10('Диалога '.$dss.' не существует');
 
-print_r($prm);
 	return
 	'<div class="line-b bg-gr1 pad10 fs15">'.
 		'Колонки списка <b class="fs15">'.$DLG['name'].'</b>:'.

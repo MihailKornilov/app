@@ -3847,9 +3847,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				_dialogLoad({
 					dialog_id:50,
 					dss:vvv.dss,
+					block_id:vvv.block_id,
+					dop:{
+						rule_id:5,
+						mysave:1
+					},
 					busy_obj:t,
 					busy_cls:'hold',
 					func_save:function(ia) {
+						alert(123)
 					}
 				});
 			});
