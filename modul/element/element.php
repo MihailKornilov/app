@@ -3706,7 +3706,6 @@ function _element88_struct($el) {
 	) + _elementStruct($el);
 }
 function PHP12_elem88($prm) {//Настройка ячеек таблицы
-	//print_r($prm);
 	if(!$prm['unit_edit'])
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
 	if(!$BL = _blockOne($prm['srce']['block_id']))
@@ -3728,6 +3727,9 @@ function PHP12_elem88($prm) {//Настройка ячеек таблицы
 function PHP12_elem88_vvv($prm) {//данные для настроек
 	if(!$u = $prm['unit_edit'])
 		return array();
+
+	//передача блока при выборе элемента для конкретном списке
+	$send['block_id'] = $prm['srce']['block_id'];
 
 	//списки для выбора
 	$send['sp'] = _dialogSelArray('spisok_only');
@@ -3757,6 +3759,26 @@ function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
 	query($sql);
 
 	_elemOne($elem_id, true);
+}
+function PHP12_elem89($prm) {//настройка колонок для конкретной таблицы
+	if(!$dss = $prm['srce']['dss'])
+		return _emptyMin10('Не получен ID списка');
+	if(!$DLG = _dialogQuery($dss))
+		return _emptyMin10('Диалога '.$dss.' не существует');
+
+print_r($prm);
+	return
+	'<div class="line-b bg-gr1 pad10 fs15">'.
+		'Колонки списка <b class="fs15">'.$DLG['name'].'</b>:'.
+	'</div>'.
+	'<div id="col89" class="pad10"></div>';
+}
+function PHP12_elem89_vvv($prm) {//данные колонок для конкретной таблицы
+	$send['block_id'] = $prm['srce']['block_id'];
+	$send['dss'] = $prm['srce']['dss'];
+	$send['col'] = $prm['dop'];
+
+	return $send;
 }
 
 /* [90] Изображение */

@@ -594,7 +594,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			dop:'',          //дополнительные параметры для некоторых элементов
 
 			busy_obj:null,   //объект, к которому применяется процесс ожидания
-			busy_cls:'_busy',//класс, показвыающий процесс ожидания
+			busy_cls:'_busy',/* класс, показвыающий процесс ожидания
+							    _busy: для блоков
+							    hold:  для input
+							    spin:  для иконок
+							 */
 
 			func_open_before:function() {},//функция, выполняемая перед открытием диалога
 			func_open:function() {},//функция, выполняемая после открытия диалога
@@ -1257,7 +1261,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 							if(BL.obj_name == 'spisok') {
 								var EL = ELMM[BL.obj_id];
-								console.log(EL);
 								if(!EL)
 									return 0;
 								if(EL.dialog_id != 14)
@@ -3659,11 +3662,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			//настройка колонок
 			DL.find('.icon-set-b:last').click(function() {
+				var t = $(this),
+					dlg_id = _num(DD.find('.spv').val()),
+					arr = PHP12_elem88_get(el);
+				if(!dlg_id)
+					return;
+
 				_dialogLoad({
 					dialog_id:89,
-//					block_id:obj.srce.block_id,  //блок, в котором размещена таблица
-//					edit_id:v.id,                //id выбранного элемента (при редактировании)
-					busy_obj:$(this),
+					dss:dlg_id,
+					block_id:vvv.block_id,//передача блока для выбора элемента
+					dop:arr.col,
+					busy_obj:t,
+					busy_cls:'spin',
 					func_save:function(ia) {
 						DD.attr('val', ia.unit.id);
 						v.id = ia.unit.id;
@@ -3692,7 +3703,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		DL.next().click(tdAdd);
 
 		_forIn(vvv.col, tdAdd);
-		tdCalc();
 
 		//добавление новой колонки в таблицу
 		function tdAdd(v) {
@@ -3702,20 +3712,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			}, v);
 
 			DL.append(
-				'<dd class="over3" val="' + v.id + '">' +
+				'<dd class="over3">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w25 r topi">' +
 								'<b class="bnum fs15 color-555">' + NUM + '</b>:' +
 							'<td><div style="width:' + v.width + 'px">' +
 									'<input type="text"' +
-										  ' class="th-name w100p bg-gr2 center fs14 blue"' +
+										  ' class="th-name w100p bg-gr2 fs14 blue"' +
 										  ' placeholder="имя колонки"' +
 										  ' value="' + v.title + '"' +
 									' />' +
 								'</div>' +
 							'<td class="w25 r top pt5">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить колонку', -51) + '</div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -3738,6 +3748,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DD.find('.th-name').focus();
 
 			NUM++;
+			tdCalc();
 		}
 
 		//включение изменения ширины, если присутствует значение
@@ -3816,6 +3827,33 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			spv:spv.join(),
 			col:col
 		};
+	},
+	PHP12_elem89 = function(el, vvv, obj) {//настройка ячеек конкретной таблицы
+		var html = '';
+		_forIn(vvv.col, function(sp, n) {
+			html +=
+			'<div class="fs14 grey">' + sp.title + '</div>' +
+			'<input type="text"' +
+				  ' id="col89' + n + '"' +
+				  ' readonly' +
+				  ' class="curP over1 mb10"' +
+				  ' style="width:' + sp.width + 'px"' +
+				  ' placeholder="элемент не указан">';
+		});
+		$('#col89')
+			.html(html)
+			.find('input').click(function() {
+				var t = $(this);
+				_dialogLoad({
+					dialog_id:50,
+					dss:vvv.dss,
+					busy_obj:t,
+					busy_cls:'hold',
+					func_save:function(ia) {
+					}
+				});
+			});
+
 	},
 
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ для [16][17][18] ===--- */
