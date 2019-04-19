@@ -686,12 +686,14 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 	if(IS_ELEM && $block_id) {
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока не сущетвует');
+		//если происходит вставка дочернего элемента, подмена блока на родителя
 		if($elem = $block['elem']) {
 			if($elem['dialog_id'] == 23//таблица
 			|| $elem['dialog_id'] == 27//баланс
 			|| $elem['dialog_id'] == 44//сборный текст
 			|| $elem['dialog_id'] == 62//фильтр: галочка
 			|| $elem['dialog_id'] == 74//фильтр: радио
+			|| $elem['dialog_id'] == 88//таблица из нескольких списков
 			) {
 				$block_id = 0;
 				$parent_id = $elem['id'];

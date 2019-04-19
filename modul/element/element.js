@@ -3625,16 +3625,27 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!obj.unit.id)
 			return;
 
+		window.EL88 = _attr_el(el.id);
+
 		PHP12_elem88_sp(el, vvv);
 		PHP12_elem88_td(el, vvv);
 	},
 	PHP12_elem88_sp = function(el, vvv) {//списки
-		var DL = _attr_el(el.id).find('#sp88');
+		var DL = _attr_el(el.id).find('#sp88'),
+			NUM = 0;
 
 		//кнопка добавления нового списка
-		DL.next().click(spAdd);
+		DL.next().click(function() {
+			spAdd();
+			PHP12_elem88_upd(vvv.col, 'spadd');
+		});
 
-		_forN(vvv.spv, spAdd);
+		if(vvv.spv.length)
+			_forN(vvv.spv, spAdd);
+		else {
+			spAdd();
+			PHP12_elem88_upd(vvv.col, 'spadd');
+		}
 
 		//добавление нового списка
 		function spAdd(v) {
@@ -3647,7 +3658,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<td class="w25">' +
 								'<div class="icon icon-set-b pl' + _tooltip('Настроить колонки', -58) + '</div>' +
 							'<td class="w25">' +
-								'<div class="icon icon-del-red pl' + _tooltip('Удалить список', -48) + '</div>' +
+								'<div val="' + (NUM++) + '" class="icon icon-del-red pl' + _tooltip('Удалить список', -48) + '</div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -3676,20 +3687,23 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					busy_obj:t,
 					busy_cls:'spin',
 					func_save:function(ia) {
-						DD.attr('val', ia.unit.id);
-						v.id = ia.unit.id;
-						v.dialog_id = ia.unit.dialog_id;
-						INP.val(ia.unit.title);
-						INP.attr('id', ATTR_EL(v.id, true));
-						tdResize(DD);
-						tdCalc();
 					}
 				});
 			});
 
 			//удаление списка
 			DL.find('.icon-del-red:last').click(function() {
-				$(this).closest('DD').remove();
+				var t = $(this),
+					v = t.attr('val'),
+					vd;
+				_forEq(DL.find('.icon-del-red'), function(sp, n) {
+					if(v == sp.attr('val'))
+						vd = n;
+				});
+				if(vd === undefined)
+					return;
+				t.closest('DD').remove();
+				PHP12_elem88_upd(vvv.col, 'spdel', vd);
 			});
 		}
 	},
@@ -3700,9 +3714,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			NUM = 1;
 
 		//кнопка добавления новой ячейки
-		DL.next().click(tdAdd);
+		DL.next().click(function() {
+			tdAdd();
+			PHP12_elem88_upd(vvv.col, 'tdadd');
+		});
 
-		_forIn(vvv.col, tdAdd);
+		if(vvv.col)
+			_forIn(vvv.col, tdAdd);
+		else {
+			tdAdd();
+			PHP12_elem88_upd(vvv.col, 'tdadd');
+		}
 
 		//добавление новой колонки в таблицу
 		function tdAdd(v) {
@@ -3741,8 +3763,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			//удаление элемента
 			DL.find('.icon-del:last').click(function() {
-				$(this).closest('DD').remove();
+				var dd = $(this).closest('DD'),
+					v = _num(dd.find('.bnum').html()) - 1;
+				dd.remove();
 				tdCalc();
+				PHP12_elem88_upd(vvv.col, 'tddel', v);
 			});
 
 			DD.find('.th-name').focus();
@@ -3807,20 +3832,53 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			CALC_DIV.html(html);
 		}
 	},
-	PHP12_elem88_get = function(el) {
-		var spv = [];//списки
+	PHP12_elem88_upd = function(arr, cmd, i) {//обновление итоговых значений
+		/*
+			arr: массив данных
+			cmd: команда, на основании которой изменяется массив
+			i:   указатель удаления
+		*/
+		console.log(arr);
+		switch(cmd) {
+			//список добавлен: добавляются нулевой элемент к каждому списку
+			case 'spadd':
+				_forN(arr, function(sp, n) {
+					arr[n].elm.push(0);
+				});
+				break;
+			//список удалён: удаляется элемент у всех списков
+			case 'spdel':
+				_forN(arr, function(sp, n) {
+					arr[n].elm.splice(i, 1);
+				});
+				break;
+			//колонка добавлена
+			case 'tdadd':
+				var o = {
+					width:150,
+					title:'',
+					elm:[]
+				};
+				_forN(EL88.find('.spv'), function() {
+					o.elm.push(0);
+				});
+				arr.push(o);
+				break;
+			//колонка удалена
+			case 'tddel':
+				arr.splice(i, 1);
+				break;
+		}
+		console.log(arr);
+	},
+	PHP12_elem88_get = function(el, o) {
+		var spv = [],//списки
+			col = o.vvv[el.id].col;//колонки
+		console.log(col);
+
 		_forEq(_attr_el(el.id).find('.spv'), function(sp) {
 			var id = _num(sp.val());
-			if(id)
-				spv.push(id);
-		});
-
-		var col = [];//колонки
-		_forEq(_attr_el(el.id).find('.th-name'), function(sp) {
-			col.push({
-				width:sp.parent().width(),
-				title:sp.val()
-			});
+			spv.push(id);
 		});
 
 		return {

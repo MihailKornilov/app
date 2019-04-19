@@ -3741,6 +3741,12 @@ function _element88_struct($el) {
 		'txt_2' => $el['txt_2']       //содержание
 	) + _elementStruct($el);
 }
+function _element88_print($el, $prm) {
+	if($prm['blk_setup'])
+		return _emptyMin('Таблица из нескольких списков');
+
+	return _emptyRed('Таблица не настроена');
+}
 function PHP12_elem88($prm) {//Настройка ячеек таблицы
 	if(!$prm['unit_edit'])
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
@@ -3771,10 +3777,30 @@ function PHP12_elem88_vvv($prm) {//данные для настроек
 	$send['sp'] = _dialogSelArray('spisok_only');
 
 	$val = json_decode($u['txt_2'], true);
-
+//print_r($val);
 	$send['spv'] = _ids($val['spv'], 1);
-	$send['col'] = $val['col'];
+	$send['col'] = empty($val['col']) ? array() : $val['col'];
 
+/*
+	$send['spv'] = array(1192,1193);
+	$send['col'] = array(
+		array(
+			'width' => 200,
+			'title' => 'Название',
+			'elm' => array(0,0)
+		),
+		array(
+			'width' => 100,
+			'title' => 'Дата',
+			'elm' => array(0,0)
+		),
+		array(
+			'width' => 250,
+			'title' => 'Описание',
+			'elm' => array(0,0)
+		)
+	);
+*/
 	return $send;
 }
 function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
@@ -3784,8 +3810,8 @@ function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
 		jsonError('Отсутствует содержание');
 	if(!is_array($val))
 		jsonError('Содержание не является массивом');
-	if(!$val['spv'] = _ids($val['spv']))
-		jsonError('Не выбраны списки');
+//	if(!$val['spv'] = _ids($val['spv']))
+//		jsonError('Не выбраны списки');
 
 	$val = json_encode($val);
 
