@@ -3840,7 +3840,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		*/
 		console.log(arr);
 		switch(cmd) {
-			//список добавлен: добавляются нулевой элемент к каждому списку
+			//список добавлен: добавляется нулевой элемент к каждому списку
 			case 'spadd':
 				_forN(arr, function(sp, n) {
 					arr[n].elm.push(0);
@@ -3869,12 +3869,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				arr.splice(i, 1);
 				break;
 		}
+
+		_forEq(EL88.find('.th-name'), function(sp) {
+			var n = _num(sp.closest('DD').find('.bnum').html()) - 1;
+			arr[n].width = sp.parent().width();
+			arr[n].title = sp.val();
+		});
+
 		console.log(arr);
 	},
 	PHP12_elem88_get = function(el, o) {
 		var spv = [],//списки
 			col = o.vvv[el.id].col;//колонки
-		console.log(col);
+
+		PHP12_elem88_upd(col);
 
 		_forEq(_attr_el(el.id).find('.spv'), function(sp) {
 			var id = _num(sp.val());
