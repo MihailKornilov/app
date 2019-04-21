@@ -3837,7 +3837,7 @@ function PHP12_elem89($prm) {//настройка колонок для конк
 function PHP12_elem89_vvv($prm) {//данные колонок для конкретной таблицы
 	$send['block_id'] = $prm['srce']['block_id'];
 	$send['dss'] = $prm['srce']['dss'];
-	$send['col'] = $prm['dop'];
+	$send['i'] = $prm['dop'];
 
 	return $send;
 }

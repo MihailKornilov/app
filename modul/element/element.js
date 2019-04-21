@@ -3626,6 +3626,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		window.EL88 = _attr_el(el.id);
+		window.COL88 = vvv.col;
 
 		PHP12_elem88_sp(el, vvv);
 		PHP12_elem88_td(el, vvv);
@@ -3637,14 +3638,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//кнопка добавления нового списка
 		DL.next().click(function() {
 			spAdd();
-			PHP12_elem88_upd(vvv.col, 'spadd');
+			PHP12_elem88_upd('spadd');
 		});
 
 		if(vvv.spv.length)
 			_forN(vvv.spv, spAdd);
 		else {
 			spAdd();
-			PHP12_elem88_upd(vvv.col, 'spadd');
+			PHP12_elem88_upd('spadd');
 		}
 
 		//добавление нового списка
@@ -3675,15 +3676,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL.find('.icon-set-b:last').click(function() {
 				var t = $(this),
 					dlg_id = _num(DD.find('.spv').val()),
-					arr = PHP12_elem88_get(el);
+					i = spn(DD.find('.icon-del-red').attr('val'));
 				if(!dlg_id)
+					return;
+				if(i === undefined)
 					return;
 
 				_dialogLoad({
 					dialog_id:89,
 					dss:dlg_id,
 					block_id:vvv.block_id,//передача блока для выбора элемента
-					dop:arr.col,
+					dop:i,
 					busy_obj:t,
 					busy_cls:'spin',
 					func_save:function(ia) {
@@ -3694,17 +3697,23 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			//удаление списка
 			DL.find('.icon-del-red:last').click(function() {
 				var t = $(this),
-					v = t.attr('val'),
-					vd;
-				_forEq(DL.find('.icon-del-red'), function(sp, n) {
-					if(v == sp.attr('val'))
-						vd = n;
-				});
+					vd = spn(t.attr('val'));
+
 				if(vd === undefined)
 					return;
+
 				t.closest('DD').remove();
-				PHP12_elem88_upd(vvv.col, 'spdel', vd);
+				PHP12_elem88_upd('spdel', vd);
 			});
+
+			function spn(val) {//получение индекса списка по порядковому номеру
+				var vd;
+				_forEq(DL.find('.icon-del-red'), function(sp, n) {
+					if(val == sp.attr('val'))
+						vd = n;
+				});
+				return vd;
+			}
 		}
 	},
 	PHP12_elem88_td = function(el, vvv) {//ячейки
@@ -3716,14 +3725,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//кнопка добавления новой ячейки
 		DL.next().click(function() {
 			tdAdd();
-			PHP12_elem88_upd(vvv.col, 'tdadd');
+			PHP12_elem88_upd('tdadd');
 		});
 
 		if(vvv.col)
 			_forIn(vvv.col, tdAdd);
 		else {
 			tdAdd();
-			PHP12_elem88_upd(vvv.col, 'tdadd');
+			PHP12_elem88_upd('tdadd');
 		}
 
 		//добавление новой колонки в таблицу
@@ -3767,7 +3776,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					v = _num(dd.find('.bnum').html()) - 1;
 				dd.remove();
 				tdCalc();
-				PHP12_elem88_upd(vvv.col, 'tddel', v);
+				PHP12_elem88_upd('tddel', v);
 			});
 
 			DD.find('.th-name').focus();
@@ -3832,24 +3841,24 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			CALC_DIV.html(html);
 		}
 	},
-	PHP12_elem88_upd = function(arr, cmd, i) {//обновление итоговых значений
+	PHP12_elem88_upd = function(cmd, i, i1, id) {//обновление итоговых значений
 		/*
-			arr: массив данных
-			cmd: команда, на основании которой изменяется массив
-			i:   указатель удаления
+			COL88: массив данных
+			cmd:   команда, на основании которой изменяется массив
+			i:     указатель изменения/удаления
 		*/
-		console.log(arr);
+
 		switch(cmd) {
 			//список добавлен: добавляется нулевой элемент к каждому списку
 			case 'spadd':
-				_forN(arr, function(sp, n) {
-					arr[n].elm.push(0);
+				_forN(COL88, function(sp, n) {
+					COL88[n].elm.push(0);
 				});
 				break;
 			//список удалён: удаляется элемент у всех списков
 			case 'spdel':
-				_forN(arr, function(sp, n) {
-					arr[n].elm.splice(i, 1);
+				_forN(COL88, function(sp, n) {
+					COL88[n].elm.splice(i, 1);
 				});
 				break;
 			//колонка добавлена
@@ -3862,27 +3871,24 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				_forN(EL88.find('.spv'), function() {
 					o.elm.push(0);
 				});
-				arr.push(o);
+				COL88.push(o);
 				break;
 			//колонка удалена
 			case 'tddel':
-				arr.splice(i, 1);
+				COL88.splice(i, 1);
 				break;
 		}
 
 		_forEq(EL88.find('.th-name'), function(sp) {
 			var n = _num(sp.closest('DD').find('.bnum').html()) - 1;
-			arr[n].width = sp.parent().width();
-			arr[n].title = sp.val();
+			COL88[n].width = sp.parent().width();
+			COL88[n].title = sp.val();
 		});
-
-		console.log(arr);
 	},
 	PHP12_elem88_get = function(el, o) {
-		var spv = [],//списки
-			col = o.vvv[el.id].col;//колонки
+		var spv = [];//списки
 
-		PHP12_elem88_upd(col);
+		PHP12_elem88_upd();
 
 		_forEq(_attr_el(el.id).find('.spv'), function(sp) {
 			var id = _num(sp.val());
@@ -3891,29 +3897,33 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		return {
 			spv:spv.join(),
-			col:col
+			col:COL88
 		};
 	},
-	PHP12_elem89 = function(el, vvv, obj) {//настройка ячеек конкретной таблицы
+	PHP12_elem89 = function(el, vvv) {//настройка ячеек конкретной таблицы
 		var html = '';
-		_forIn(vvv.col, function(sp, n) {
+		_forIn(COL88, function(sp, n) {
 			html +=
 			'<div class="fs14 grey">' + sp.title + '</div>' +
 			'<input type="text"' +
-				  ' id="col89' + n + '"' +
 				  ' readonly' +
 				  ' class="curP over1 mb10"' +
 				  ' style="width:' + sp.width + 'px"' +
-				  ' placeholder="элемент не указан">';
+				  ' placeholder="элемент не указан"' +
+				  ' data-n="' + n + '"' +
+				  ' data-did="50"' +
+				  ' val="0"' +
+			'>';
 		});
 		$('#col89')
 			.html(html)
 			.find('input').click(function() {
 				var t = $(this);
 				_dialogLoad({
-					dialog_id:50,
+					dialog_id:_num(t.attr('data-did')),
 					dss:vvv.dss,
 					block_id:vvv.block_id,
+					edit_id:_num(t.attr('val')),
 					dop:{
 						rule_id:5,
 						mysave:1
@@ -3921,11 +3931,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					busy_obj:t,
 					busy_cls:'hold',
 					func_save:function(ia) {
-						alert(123)
+						t.val(ia.unit.title);
+						t.attr('data-did', ia.unit.dialog_id);
+						t.attr('val', ia.unit.id);
+						COL88[_num(t.attr('data-n'))].elm[vvv.i] = ia.unit.id;
+						console.log(COL88);
 					}
 				});
 			});
-
 	},
 
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ для [16][17][18] ===--- */
