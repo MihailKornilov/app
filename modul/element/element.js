@@ -3627,6 +3627,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		window.EL88 = _attr_el(el.id);
 		window.COL88 = vvv.col;
+		window.ELM88 = vvv.elm;
 
 		PHP12_elem88_sp(el, vvv);
 		PHP12_elem88_td(el, vvv);
@@ -3903,6 +3904,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	PHP12_elem89 = function(el, vvv) {//настройка ячеек конкретной таблицы
 		var html = '';
 		_forIn(COL88, function(sp, n) {
+			var elm_id = _num(sp.elm[vvv.i]),
+				elm = ELM88[elm_id];
 			html +=
 			'<div class="fs14 grey">' + sp.title + '</div>' +
 			'<input type="text"' +
@@ -3911,8 +3914,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				  ' style="width:' + sp.width + 'px"' +
 				  ' placeholder="элемент не указан"' +
 				  ' data-n="' + n + '"' +
-				  ' data-did="50"' +
-				  ' val="0"' +
+				  ' data-did="' + (elm ? elm.dialog_id : 50) + '"' +
+				  ' val="' + (elm ? elm.id : 0) + '"' +
+				  ' value="' + (elm ? elm.title : '') + '"' +
 			'>';
 		});
 		$('#col89')
@@ -3935,7 +3939,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						t.attr('data-did', ia.unit.dialog_id);
 						t.attr('val', ia.unit.id);
 						COL88[_num(t.attr('data-n'))].elm[vvv.i] = ia.unit.id;
-						console.log(COL88);
+						ELM88[ia.unit.id] = ia.unit;
 					}
 				});
 			});

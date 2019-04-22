@@ -2237,7 +2237,7 @@ function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по ка
 		'deleted' => 1,
 		'user_id_add' => 1,
 		'user_id_del' => 1,
-		'dtime_add' => 1,
+//		'dtime_add' => 1,
 		'dtime_del' => 1,
 		'dtime_create' => 1,
 		'app_id_last' => 1
@@ -3741,6 +3741,27 @@ function _element88_struct($el) {
 		'txt_2' => $el['txt_2']       //содержание
 	) + _elementStruct($el);
 }
+function _element88_struct_vvv($el, $cl) {
+	return array(
+		'id'        => _num($cl['id']),
+		'title'     => $cl['title'],
+		'parent_id' => _num($cl['parent_id']),
+		'dialog_id' => _num($cl['dialog_id']),
+		'width'     => _num($cl['width']),
+		'font'      => $cl['font'],
+		'color'     => $cl['color'],
+		'txt_7'     => $cl['txt_7'],//название колонки
+		'txt_8'     => $cl['txt_8'],//pos: позиция
+
+		'num_1'     => _num($cl['num_1']),
+		'num_2'     => _num($cl['num_2']),
+		'num_3'     => _num($cl['num_3']),
+		'num_4'     => _num($cl['num_4']),
+		'num_5'     => _num($cl['num_5']),
+		'txt_1'     => $cl['txt_1'],//для [10]
+		'txt_2'     => $cl['txt_2'],//для [11]
+	);
+}
 function _element88_print($el, $prm) {
 	if($prm['blk_setup'])
 		return _emptyMin('Таблица из нескольких списков');
@@ -3748,7 +3769,7 @@ function _element88_print($el, $prm) {
 	return _emptyRed('Таблица не настроена');
 }
 function PHP12_elem88($prm) {//Настройка ячеек таблицы
-	if(!$prm['unit_edit'])
+	if(!$u = $prm['unit_edit'])
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
 	if(!$BL = _blockOne($prm['srce']['block_id']))
 		return _emptyMin10('Отсутствует исходный блок.');
@@ -3769,6 +3790,8 @@ function PHP12_elem88($prm) {//Настройка ячеек таблицы
 function PHP12_elem88_vvv($prm) {//данные для настроек
 	if(!$u = $prm['unit_edit'])
 		return array();
+	if(!$EL = _elemOne($u['id']))
+		return array();
 
 	//передача блока при выборе элемента для конкретном списке
 	$send['block_id'] = $prm['srce']['block_id'];
@@ -3777,9 +3800,12 @@ function PHP12_elem88_vvv($prm) {//данные для настроек
 	$send['sp'] = _dialogSelArray('spisok_only');
 
 	$val = json_decode($u['txt_2'], true);
-//print_r($val);
+
 	$send['spv'] = _ids($val['spv'], 1);
 	$send['col'] = empty($val['col']) ? array() : $val['col'];
+	$send['elm'] = array();
+	foreach($EL['vvv'] as $el)
+		$send['elm'][$el['id']] = $el;
 
 /*
 	$send['spv'] = array(1192,1193);
@@ -3837,7 +3863,7 @@ function PHP12_elem89($prm) {//настройка колонок для конк
 function PHP12_elem89_vvv($prm) {//данные колонок для конкретной таблицы
 	$send['block_id'] = $prm['srce']['block_id'];
 	$send['dss'] = $prm['srce']['dss'];
-	$send['i'] = $prm['dop'];
+	$send['i'] = _num($prm['dop']);
 
 	return $send;
 }
