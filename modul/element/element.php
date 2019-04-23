@@ -3762,11 +3762,131 @@ function _element88_struct_vvv($el, $cl) {
 		'txt_2'     => $cl['txt_2'],//для [11]
 	);
 }
-function _element88_print($el, $prm) {
+function _element88_print($EL, $prm) {
 	if($prm['blk_setup'])
 		return _emptyMin('Таблица из нескольких списков');
 
+	$V = json_decode($EL['txt_2'], true);
+
+	if(!$spv = _ids($V['spv']))
+		return _emptyRed('Таблица из нескольких списков не настроена');
+	if(empty($V['col']))
+		return _emptyRed('Таблица из нескольких списков не настроена');
+
+	$ELM = array();
+	foreach($EL['vvv'] as $ell)
+		$ELM[$ell['id']] = $ell;
+
+	$LIMIT = $EL['num_1'];
+	$SC = $EL['num_6'] ? 'DESC' : 'ASC';
+
+
+	//составление колонок для запроса
+	$COL = array();
+	foreach(_ids($spv, 1) as $id) {
+		if(!$DLG = _dialogQuery($id))
+			return _emptyRed('Диалога '.$id.' не существует');
+		if($DLG['table_name_1'] != '_spisok')
+			return _emptyRed('Диалог '.$id.' использует неверную таблицу');
+
+		foreach(explode(',', _queryCol($DLG)) as $r)
+			$COL[$r] = 1;
+	}
+	$COLL = array();
+	foreach($COL as $c => $i)
+		$COLL[] = $c;
+
+
+	//получение данных списка
+	$sql = "SELECT ".implode(',', $COLL)."
+			FROM   `_spisok` `t1`
+			WHERE  !`deleted`
+			  AND  `dialog_id` in (".$spv.")
+			ORDER BY `dtime_add` ".$SC."
+			LIMIT ".$LIMIT;
+	if(!$spisok = query_arr($sql))
+		return _emptyMin($EL['txt_1']);
+
+//	return _pr($ELM);
+
+	$MASS = array();
+	$TR = '';
+	foreach($spisok as $uid => $u)
+		foreach(_ids($spv, 1) as $n => $dlg_id) {
+			if($u['dialog_id'] != $dlg_id)
+				continue;
+			$TR .= '<tr'.($EL['num_4'] ? ' class="over1"' : '').'>';
+			$prm = _blockParam(array('unit_get'=>$u));
+			foreach($V['col'] as $col) {
+				$TR .= '<td'._elemStyleWidth($col).'>';
+
+				if(!$elm_id = $col['elm'][$n])
+					continue;
+				if(!$ell = @$ELM[$elm_id])
+					continue;
+
+				$txt = _elemPrint($ell, $prm);
+
+				$TR .= $txt;
+
+				continue;
+
+				$cls = array();
+				$txt = '';
+
+				if(!_elemAction244($td, $prm)) {
+					$txt = _elemPrint($td, $prm);
+
+					switch($td['dialog_id']) {
+						case 25: //кружок-статус
+						case 30: //иконка удаления
+						case 34: //иконка редактирования
+						case 71: //иконка сортировки
+							$cls[] = 'pad0';
+					}
+
+					$cls[] = $td['font'];
+					$cls[] = $td['txt_8'];//pos - позиция
+					$cls[] = _elemAction242($td, $prm);//подмена цвета
+
+					$txt = _elemFormat($td, $prm, $txt);//[23] форматирование для ячеек таблицы
+				}
+
+				$cls = array_diff($cls, array(''));
+				$cls = implode(' ', $cls);
+				$cls = $cls ? ' class="'.$cls.'"' : '';
+
+
+				$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
+			}
+			$MASS[$uid] = $TR;
+		}
+
+	//открытие и закрытие таблицы
+	$TABLE_BEGIN = '<table class="_stab'._dn(!$EL['num_3'], 'small').'">';
+	$TABLE_END = '</table>';
+
+	return
+	$TABLE_BEGIN.
+	_element88_th($EL).
+	$TR.
+	$TABLE_END;
+
+
+
 	return _emptyRed('Таблица не настроена');
+}
+function _element88_th($el) {//показ имён колонок
+	if(!$el['num_5'])
+		return '';
+
+	$V = json_decode($el['txt_2'], true);
+
+	$send = '<tr>';
+	foreach($V['col'] as $r)
+		$send .= '<th>'.$r['title'];
+
+	return $send;
 }
 function PHP12_elem88($prm) {//Настройка ячеек таблицы
 	if(!$u = $prm['unit_edit'])

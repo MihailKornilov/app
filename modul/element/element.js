@@ -3908,16 +3908,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				elm = ELM88[elm_id];
 			html +=
 			'<div class="fs14 grey">' + sp.title + '</div>' +
-			'<input type="text"' +
-				  ' readonly' +
-				  ' class="curP over1 mb10"' +
-				  ' style="width:' + sp.width + 'px"' +
-				  ' placeholder="элемент не указан"' +
-				  ' data-n="' + n + '"' +
-				  ' data-did="' + (elm ? elm.dialog_id : 50) + '"' +
-				  ' val="' + (elm ? elm.id : 0) + '"' +
-				  ' value="' + (elm ? elm.title : '') + '"' +
-			'>';
+			'<div class="prel" style="width:' + sp.width + 'px">' +
+				'<div class="icon icon-del-red pabs r5 top5' + _dn(elm) + '"></div>' +
+				'<input type="text"' +
+					  ' readonly' +
+					  ' class="w100p curP over1 mb10"' +
+					  ' placeholder="элемент не указан"' +
+					  ' data-n="' + n + '"' +
+					  ' data-did="' + (elm ? elm.dialog_id : 50) + '"' +
+					  ' val="' + (elm ? elm.id : 0) + '"' +
+					  ' value="' + (elm ? elm.title : '') + '"' +
+				'>' +
+			'</div>';
 		});
 		$('#col89')
 			.html(html)
@@ -3938,10 +3940,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						t.val(ia.unit.title);
 						t.attr('data-did', ia.unit.dialog_id);
 						t.attr('val', ia.unit.id);
+						t.prev()._dn(1);
 						COL88[_num(t.attr('data-n'))].elm[vvv.i] = ia.unit.id;
 						ELM88[ia.unit.id] = ia.unit;
 					}
 				});
+			})
+			.end()
+			.find('.icon').click(function() {
+				var inp = $(this)._dn().next();
+				inp.val('')
+				   .attr('data-did', 50)
+				   .attr('val', 0);
+				COL88[_num(inp.attr('data-n'))].elm[vvv.i] = 0;
 			});
 	},
 
