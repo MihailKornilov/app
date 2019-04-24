@@ -2720,6 +2720,53 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
+	_tdCss = function() {//настройка стилей в выплывающем окошке для ячейки таблицы
+		var INP = $(this),
+			v = {
+				id:_num(INP.attr('val')),
+				font:'',
+				color:''
+			};
+
+		if(!v.id)
+			return;
+
+		INP._hint({
+			msg:'<table class="bs5">' +
+					'<tr><td class="pt3">' + _elemUnitFont(v) +
+						'<td class="pt3">' + _elemUnitColor(v) +
+						'<td class="pt3 pl10">' +
+							'<div class="icon icon-eye pl' + _tooltip('Условия отображения', -67) + '</div>' +
+						'<td class="pl3">' +
+							'<div class="icon icon-link pl' + _tooltip('Настроить ссылку', -57) + '</div>' +
+						'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v, true) +
+				'</table>' +
+				'',
+			side:'right',
+			show:1,
+			delayShow:700,
+			delayHide:300,
+			func:function(o) {
+				o.find('.icon-link').click(function() {
+					_dialogLoad({
+						dialog_id:220,
+						element_id:v.id,
+						busy_obj:$(this),
+						busy_cls:'spin'
+					});
+				});
+				o.find('.icon-eye').click(function() {
+					_dialogLoad({
+						dialog_id:240,
+						element_id:v.id,
+						busy_obj:$(this),
+						busy_cls:'spin'
+					});
+				});
+			}
+		});
+	},
+
 	/* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
 	PHP12_elem_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D;
@@ -3912,11 +3959,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			html +=
 			'<div class="fs14 grey">' + sp.title + '</div>' +
 			'<div class="prel" style="width:' + sp.width + 'px">' +
-				'<div class="icon icon-del-red pabs r5 top5' + _dn(elm) + '"></div>' +
+				'<div class="icon icon-del-red pl pabs r3 top5' + _dn(elm) + '"></div>' +
 				'<input type="text"' +
-					  ' readonly' +
-					  ' class="w100p curP over1 mb10"' +
+					  ' id="' + ATTR_EL(elm_id, 1) + '"' +
+					  ' class="w100p curP over1 mb10 pr20"' +
 					  ' placeholder="элемент не указан"' +
+					  ' readonly' +
 					  ' data-n="' + n + '"' +
 					  ' data-did="' + (elm ? elm.dialog_id : 50) + '"' +
 					  ' val="' + (elm ? elm.id : 0) + '"' +
@@ -3949,6 +3997,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					}
 				});
 			})
+			//отображение выплывающего окна настройки стилей
+			.mouseenter(_tdCss)
 			.end()
 			.find('.icon').click(function() {
 				var inp = $(this)._dn().next();
@@ -3956,6 +4006,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				   .attr('data-did', 50)
 				   .attr('val', 0);
 				COL88[_num(inp.attr('data-n'))].elm[vvv.i] = 0;
+				console.log(COL88);
 			});
 	},
 

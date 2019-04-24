@@ -453,6 +453,10 @@ var _ids = function(v, count) {
 				'</table>'
 	},
 	_elemUnitFont = function(EL) {//стили элемента: жирность, наклон, подчёркивание
+		/*
+			EL.id
+			EL.font
+		*/
 		var font = {
 			b:'',
 			i:'',
@@ -494,6 +498,10 @@ var _ids = function(v, count) {
 		'</div>';
 	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста
+		/*
+			EL.id
+			EL.color
+		*/
 		var func = function(v) {
 			_attr_el(EL.id)
 				.removeClass(EL.color)
