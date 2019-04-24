@@ -3729,7 +3729,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			PHP12_elem88_upd('tdadd');
 		});
 
-		if(vvv.col)
+		if(vvv.col.length)
 			_forIn(vvv.col, tdAdd);
 		else {
 			tdAdd();
@@ -3842,12 +3842,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			CALC_DIV.html(html);
 		}
 	},
-	PHP12_elem88_upd = function(cmd, i, i1, id) {//обновление итоговых значений
+	PHP12_elem88_upd = function(cmd, i) {//обновление итоговых значений
 		/*
 			COL88: массив данных
 			cmd:   команда, на основании которой изменяется массив
 			i:     указатель изменения/удаления
 		*/
+
+		if(!window.EL88)
+			return;
 
 		switch(cmd) {
 			//список добавлен: добавляется нулевой элемент к каждому списку
@@ -3886,7 +3889,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			COL88[n].title = sp.val();
 		});
 	},
-	PHP12_elem88_get = function(el, o) {
+	PHP12_elem88_get = function(el) {
 		var spv = [];//списки
 
 		PHP12_elem88_upd();
@@ -3898,7 +3901,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		return {
 			spv:spv.join(),
-			col:COL88
+			col:window.COL88 ? COL88 : {}
 		};
 	},
 	PHP12_elem89 = function(el, vvv) {//настройка ячеек конкретной таблицы

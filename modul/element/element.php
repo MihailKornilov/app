@@ -3769,7 +3769,7 @@ function _element88_print($EL, $prm) {
 	$V = json_decode($EL['txt_2'], true);
 
 	if(!$spv = _ids($V['spv']))
-		return _emptyRed('Таблица из нескольких списков не настроена');
+		return _emptyRed('Таблица из нескольких списков не настроена.');
 	if(empty($V['col']))
 		return _emptyRed('Таблица из нескольких списков не настроена');
 
@@ -3913,6 +3913,7 @@ function PHP12_elem88_vvv($prm) {//данные для настроек
 	if(!$EL = _elemOne($u['id']))
 		return array();
 
+
 	//передача блока при выборе элемента для конкретном списке
 	$send['block_id'] = $prm['srce']['block_id'];
 
@@ -3924,8 +3925,9 @@ function PHP12_elem88_vvv($prm) {//данные для настроек
 	$send['spv'] = _ids($val['spv'], 1);
 	$send['col'] = empty($val['col']) ? array() : $val['col'];
 	$send['elm'] = array();
-	foreach($EL['vvv'] as $el)
-		$send['elm'][$el['id']] = $el;
+	if(!empty($EL['vvv']))
+		foreach($EL['vvv'] as $el)
+			$send['elm'][$el['id']] = $el;
 
 /*
 	$send['spv'] = array(1192,1193);
