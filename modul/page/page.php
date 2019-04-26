@@ -823,7 +823,24 @@ function PHP12_pin_dialog_open() {
 
 function _page_div() {//todo тест
 
-	return '';
+	$send = '';
+
+	return $send;
+
+	for($n=0;$n<50;$n++) {
+		$a1 = rand(2,9);
+		$a2 = rand(2,9);
+		$a3 = rand(2,9);
+		$a4 = rand(2,50);
+		$a5 = rand(2,50);
+
+		$send .= ($a1*$a2).' : '.$a1.' + '.$a3.' = <br>';
+		if($a1*$a2 > $a4)
+			$send .= $a1.' * '.$a2.' - '.$a4.' = <br>';
+		$send .= ($a1*$a2).(rand(0,1) ? ' - ' : ' + ').$a2.(rand(0,1) ? ' - ' : ' + ').$a3.' = <br>';
+	}
+
+
 	$key = 'APCU_KEY7';
 
 		$arr = array();

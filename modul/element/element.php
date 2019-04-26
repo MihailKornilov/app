@@ -4026,9 +4026,9 @@ function PHP12_elem88_vvv($prm) {//данные для настроек
 	if(!$EL = _elemOne($u['id']))
 		return array();
 
-
 	//передача блока при выборе элемента для конкретном списке
 	$send['block_id'] = $prm['srce']['block_id'];
+	$send['element_id'] = $EL['id'];
 
 	//списки для выбора
 	$send['sp'] = _dialogSelArray('spisok_only');
@@ -4107,6 +4107,26 @@ function PHP12_elem89_vvv($prm) {//данные колонок для конкр
 	$send['elm'] = _arrKey($EL['vvv']);
 
 	return $send;
+}
+function PHP12_elem89_save($cmp, $val, $unit) {//сохранение
+	if(!$elem_id = _num(@$unit['id']))
+		jsonError('Некорректный ID элемента');
+	if(empty($val))
+		return;
+	if(!is_array($val))
+		return;
+
+	foreach($val as $r) {
+		if(!$id = _num($r['id']))
+			continue;
+
+		$sql = "UPDATE `_element`
+				SET `font`='".$r['font']."'
+				WHERE `id`=".$id;
+		query($sql);
+	}
+
+	_elemOne($elem_id, true);
 }
 
 /* [90] Изображение */

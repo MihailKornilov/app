@@ -3733,11 +3733,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					dialog_id:89,
 					dss:dlg_id,
 					block_id:vvv.block_id,//передача блока для выбора элемента
+					edit_id:vvv.element_id,//элемент-родитель для сохранения данных дочерних элементов
 					dop:i,
 					busy_obj:t,
-					busy_cls:'spin',
-					func_save:function(ia) {
-					}
+					busy_cls:'spin'
 				});
 			});
 
@@ -3954,20 +3953,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		var html = '';
 		_forIn(COL88, function(sp, n) {
 			var elm_id = _num(sp.elm[vvv.i]),
-				elm = vvv.elm[elm_id];
+				elm = $.extend({
+					id:0,
+					dialog_id:50,
+					title:'',
+					font:''
+				}, vvv.elm[elm_id]);
 			html +=
 			'<div class="fs14 grey">' + sp.title + '</div>' +
 			'<div class="prel" style="width:' + sp.width + 'px">' +
-				'<div class="icon icon-del-red pl pabs r3 top5' + _dn(elm) + '"></div>' +
+				'<div class="icon icon-del-red pl pabs r3 top5' + _dn(elm.id) + '"></div>' +
 				'<input type="text"' +
 					  ' id="' + ATTR_EL(elm_id, 1) + '"' +
-					  ' class="w100p curP over1 mb10 pr20"' +
+					  ' class="w100p curP over1 mb10 pr20 ' + elm.font + '"' +
 					  ' placeholder="элемент не указан"' +
 					  ' readonly' +
 					  ' data-n="' + n + '"' +
-					  ' data-did="' + (elm ? elm.dialog_id : 50) + '"' +
-					  ' val="' + (elm ? elm.id : 0) + '"' +
-					  ' value="' + (elm ? elm.title : '') + '"' +
+					  ' data-did="' + elm.dialog_id + '"' +
+					  ' val="' + elm.id + '"' +
+					  ' value="' + elm.title + '"' +
 				'>' +
 			'</div>';
 		});
@@ -4005,8 +4009,31 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				   .attr('data-did', 50)
 				   .attr('val', 0);
 				COL88[_num(inp.attr('data-n'))].elm[vvv.i] = 0;
-				console.log(COL88);
 			});
+	},
+	PHP12_elem89_get = function(el) {
+		var send = [];//списки
+
+		_forEq(_attr_el(el.id).find('input'), function(sp) {
+			var v = {};
+
+			v.id = _num(sp.attr('val'));
+
+			if(!v.id)
+				return;
+
+			//выделение: b, i, u
+			var arr = ['b', 'i', 'u'],
+				font = [];
+			for(var k in arr)
+				if(sp.hasClass(arr[k]))
+					font.push(arr[k]);
+			v.font = font.join(' ');
+
+			send.push(v);
+		});
+
+		return send;
 	},
 
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ для [16][17][18] ===--- */
