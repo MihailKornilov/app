@@ -3674,7 +3674,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		window.EL88 = _attr_el(el.id);
 		window.COL88 = vvv.col;
-		window.ELM88 = vvv.elm;
 
 		PHP12_elem88_sp(el, vvv);
 		PHP12_elem88_td(el, vvv);
@@ -3955,7 +3954,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		var html = '';
 		_forIn(COL88, function(sp, n) {
 			var elm_id = _num(sp.elm[vvv.i]),
-				elm = ELM88[elm_id];
+				elm = vvv.elm[elm_id];
 			html +=
 			'<div class="fs14 grey">' + sp.title + '</div>' +
 			'<div class="prel" style="width:' + sp.width + 'px">' +
@@ -3993,7 +3992,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						t.attr('val', ia.unit.id);
 						t.prev()._dn(1);
 						COL88[_num(t.attr('data-n'))].elm[vvv.i] = ia.unit.id;
-						ELM88[ia.unit.id] = ia.unit;
+						vvv.elm[ia.unit.id] = ia.unit;
 					}
 				});
 			})

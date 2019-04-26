@@ -536,6 +536,21 @@ function _arr($arr, $i=false) {//Последовательный массив
 	}
 	return $send;
 }
+function _arrKey($arr, $key='id') {//расстановка значений массива согласно ключу
+	if(empty($arr))
+		return array();
+	if(!is_array($arr))
+		return array();
+
+	$send = array();
+	foreach($arr as $r) {
+		if(!isset($r[$key]))
+			continue;
+		$send[$r[$key]] = $r;
+	}
+
+	return $send;
+}
 function _sel($arr) {
 	$send = array();
 	foreach($arr as $id => $title) {

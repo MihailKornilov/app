@@ -2365,6 +2365,16 @@ function _element39_print($el, $prm) {
 		'value' => $ex[0]
 	));
 }
+function _element39_print11($el, $u) {
+	if(!$col = _elemCol($el))
+		return '';
+	if(!$v = @$u[$col])
+		return '';
+
+	$ex = explode('-', $v);
+
+	return _monthDef($ex[1]).' '.$ex[0];
+}
 
 /* [40] Фильтрование списка */
 function _element40_struct($el) {
@@ -4027,10 +4037,6 @@ function PHP12_elem88_vvv($prm) {//данные для настроек
 
 	$send['spv'] = _ids($val['spv'], 1);
 	$send['col'] = empty($val['col']) ? array() : $val['col'];
-	$send['elm'] = array();
-	if(!empty($EL['vvv']))
-		foreach($EL['vvv'] as $el)
-			$send['elm'][$el['id']] = $el;
 
 /*
 	$send['spv'] = array(1192,1193);
@@ -4083,12 +4089,22 @@ function PHP12_elem89($prm) {//настройка колонок для конк
 	'<div class="line-b bg-gr1 pad10 fs15">'.
 		'Колонки списка <b class="fs15">'.$DLG['name'].'</b>:'.
 	'</div>'.
-	'<div id="col89" class="pad10"></div>';
+	'<div id="col89" class="pad10"></div>'.
+//	_pr($prm).
+	'';
 }
 function PHP12_elem89_vvv($prm) {//данные колонок для конкретной таблицы
 	$send['block_id'] = $prm['srce']['block_id'];
 	$send['dss'] = $prm['srce']['dss'];
-	$send['i'] = _num($prm['dop']);
+	$send['i'] = _num($prm['dop']);//порядковый номер списка
+	$send['elm'] = array();//все элементы всех списков, использующиеся в таблице
+
+	if(!$bl = _blockOne($send['block_id']))
+		return $send;
+	if(!$EL = _elemOne($bl['elem_id']))
+		return $send;
+
+	$send['elm'] = _arrKey($EL['vvv']);
 
 	return $send;
 }
