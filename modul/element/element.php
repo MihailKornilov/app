@@ -3920,9 +3920,6 @@ function _element88_print($EL, $prm) {
 	if(!$spisok = query_arr($sql))
 		return _emptyMin($EL['txt_1']);
 
-//	return _pr($ELM);
-
-	$MASS = array();
 	$TR = '';
 	foreach($spisok as $uid => $u)
 		foreach(_ids($spv, 1) as $n => $dlg_id) {
@@ -3931,21 +3928,25 @@ function _element88_print($EL, $prm) {
 			$TR .= '<tr'.($EL['num_4'] ? ' class="over1"' : '').'>';
 			$prm = _blockParam(array('unit_get'=>$u));
 			foreach($V['col'] as $col) {
-				$TR .= '<td'._elemStyleWidth($col).'>';
+				$cls = array();
+				$txt = '';
 
-				if(!$elm_id = $col['elm'][$n])
-					continue;
-				if(!$ell = @$ELM[$elm_id])
-					continue;
+				if($elm_id = $col['elm'][$n])
+					if($ell = @$ELM[$elm_id]) {
+						$cls[] = $ell['font'];
+						$cls[] = $ell['txt_8'];//pos - позиция
+						$cls[] = _elemAction242($ell, $prm);//подмена цвета
+						$txt = _elemPrint($ell, $prm);
+				}
 
-				$txt = _elemPrint($ell, $prm);
+				$cls = array_diff($cls, array(''));
+				$cls = implode(' ', $cls);
+				$cls = $cls ? ' class="'.$cls.'"' : '';
 
-				$TR .= $txt;
+				$TR .= '<td'.$cls._elemStyleWidth($col).'>'.$txt;
 
 				continue;
 
-				$cls = array();
-				$txt = '';
 
 				if(!_elemAction244($td, $prm)) {
 					$txt = _elemPrint($td, $prm);
@@ -3958,21 +3959,10 @@ function _element88_print($EL, $prm) {
 							$cls[] = 'pad0';
 					}
 
-					$cls[] = $td['font'];
-					$cls[] = $td['txt_8'];//pos - позиция
-					$cls[] = _elemAction242($td, $prm);//подмена цвета
-
 					$txt = _elemFormat($td, $prm, $txt);//[23] форматирование для ячеек таблицы
 				}
 
-				$cls = array_diff($cls, array(''));
-				$cls = implode(' ', $cls);
-				$cls = $cls ? ' class="'.$cls.'"' : '';
-
-
-				$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
 			}
-			$MASS[$uid] = $TR;
 		}
 
 	//открытие и закрытие таблицы
@@ -4121,7 +4111,9 @@ function PHP12_elem89_save($cmp, $val, $unit) {//сохранение
 			continue;
 
 		$sql = "UPDATE `_element`
-				SET `font`='".$r['font']."'
+				SET `font`='".$r['font']."',
+					`color`='".$r['color']."',
+					`txt_8`='".$r['txt_8']."'
 				WHERE `id`=".$id;
 		query($sql);
 	}

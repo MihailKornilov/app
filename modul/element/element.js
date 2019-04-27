@@ -3965,7 +3965,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				'<div class="icon icon-del-red pl pabs r3 top5' + _dn(elm.id) + '"></div>' +
 				'<input type="text"' +
 					  ' id="' + ATTR_EL(elm_id, 1) + '"' +
-					  ' class="w100p curP over1 mb10 pr20 ' + elm.font + '"' +
+					  ' class="w100p curP over1 mb10 pr20 ' + elm.font + ' ' + elm.color + ' ' + elm.txt_8 + '"' +
 					  ' placeholder="элемент не указан"' +
 					  ' readonly' +
 					  ' data-n="' + n + '"' +
@@ -4029,6 +4029,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				if(sp.hasClass(arr[k]))
 					font.push(arr[k]);
 			v.font = font.join(' ');
+
+			//позиция
+			arr = ['center', 'r'];
+			v.txt_8 = '';
+			for(k in arr)
+				if(sp.hasClass(arr[k]))
+					v.txt_8 = arr[k];
+
+			//цвет текста
+			v.color = '';
+			for(k in ELEM_COLOR)
+				if(sp.hasClass(k))
+					v.color = k;
 
 			send.push(v);
 		});
