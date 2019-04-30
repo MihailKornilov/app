@@ -824,8 +824,9 @@ function PHP12_pin_dialog_open() {
 function _page_div() {//todo тест
 
 	$send = '';
+//	$send = _app(APP_ID, 'user_page_access');
 
-	return $send;
+	return '';
 
 	for($n=0;$n<50;$n++) {
 		$a1 = rand(2,9);
