@@ -942,6 +942,21 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 					}
 				}
 
+	if(APP_ID)
+		if($table_1 == '_user')
+			if(_app(APP_ID, 'user_page_access')) {
+				$sql = "SELECT *
+						FROM `_page`
+						WHERE `app_id`=".APP_ID;
+				foreach(query_arr($sql) as $r) {
+					$sql = "INSERT INTO `_user_page_access`
+								(`app_id`,`user_id`,`page_id`)
+							VALUES (".APP_ID.",".$uid[$table_1].",".$r['id'].")";
+					query($sql);
+				}
+			}
+
+
 	_dialogIUID($DLG, $uid[$table_1]);
 
 	_historyInsert(1, $DLG, $uid[$table_1]);
