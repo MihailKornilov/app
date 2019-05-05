@@ -2072,6 +2072,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 					ELM_RELOAD[el.num_1] = el.id;
 					return;
+				//Select: приложения
+				case 97:
+					_elemAction(el, _num(ATR_CMP.val()), 1);
+					ATR_CMP._select({
+						width:_num(el.width),
+						title0:'не выбрано',
+						spisok:vvv,
+						func:function(v) {
+							_elemAction(el, v);
+						}
+					});
+					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102: ATR_EL._filter102(); return;
 				//Привязка пользователя к странице ВК

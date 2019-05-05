@@ -1,9 +1,47 @@
 <?php
-function _d119_app_del($DLG) {//удаление приложения
+function PHP12_app_clear_list() {//список данных, которые будут очищены
+	return
+	'<div class="pb10 fs17 b center">'.
+		_app(APP_ID, 'id').': '._app(APP_ID, 'name').
+	'</div>'.
+	'<table class="_stab">'.
+		_app_clear_td('_spisok').
+		_app_clear_td('_history').
+		_app_clear_td('_history_edited').
+		_app_clear_td('_user_spisok_filter').
+		_app_clear_td('_page').
+		_app_clear_td('_user_page_access').
+		_app_clear_td('_block').
+		_app_clear_td('_element').
+		_app_clear_td('_element_hint').
+		_app_clear_td('_dialog').
+		_app_clear_td('_action').
+		_app_clear_td('_counter').
+		_app_clear_td('_counter_v').
+		_app_clear_td('_cron').
+		_app_clear_td('_template').
+		_app_clear_td('_attach').
+		_app_clear_td('_image').
+		_app_clear_td('_note').
+	'</table>';
+}
+function _app_clear_td($tab) {//значение TD конкретной таблицы
+	$sql = "SELECT COUNT(*)
+			FROM `".$tab."`
+			WHERE `app_id`=".APP_ID;
+	$c = query_value($sql);
+
+	return
+	'<tr><td class="w100">'.$tab.
+		'<td class="center">'._hide0($c);
+}
+function _d119_app_clear($DLG) {//очистка приложения - удаление всех данных
 	if($DLG['id'] != 119)
 		return;
 	if(!SA)
 		jsonError('Нет прав');
+	if(APP_IS_PID)
+		jsonError('Невозможно очистить дочернее приложение');
 
 	_appDel();
 
@@ -30,16 +68,16 @@ function _appDel($app_id=APP_ID) {
 			WHERE `app_id`=".$app_id;
 	query($sql);
 
-	//удаление значений фильтров пользователей
-	$sql = "DELETE FROM `_user_spisok_filter`
-			WHERE `app_id`=".$app_id;
-	query($sql);
-
 	//удаление истории действий
 	$sql = "DELETE FROM `_history`
 			WHERE `app_id`=".$app_id;
 	query($sql);
 	$sql = "DELETE FROM `_history_edited`
+			WHERE `app_id`=".$app_id;
+	query($sql);
+
+	//удаление значений фильтров пользователей
+	$sql = "DELETE FROM `_user_spisok_filter`
 			WHERE `app_id`=".$app_id;
 	query($sql);
 

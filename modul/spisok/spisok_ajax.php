@@ -425,8 +425,8 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	PHP12_history_setup_save($dialog);
 	//сохранение выбранных элементов для правила [1000] - перехват внесения данных
 	PHP12_elem_all_rule_setup_save($dialog);
-	//удаление приложения [119] - перехват внесения данных
-	_d119_app_del($dialog);
+	//очистка приложения [119] - перехват внесения данных
+	_d119_app_clear($dialog);
 	//клонирование приложения [120] - перехват внесения данных
 	_clone_go($dialog, $POST_CMP);
 

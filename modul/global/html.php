@@ -474,8 +474,6 @@ function _html_hat() {//верхняя строка приложения для 
 function _hat_but_app() {//кнопка входа в приложение
 	if(PAS)
 		return '';
-	if(APP_IS_PID)
-		return '';
 	if(!APP_ID)
 		return '';
 	if(!SA && !USER_CREATOR)
@@ -485,8 +483,6 @@ function _hat_but_app() {//кнопка входа в приложение
 }
 function _hat_but_sa() {//отображение кнопки списка страниц
 	if(!SA)
-		return '';
-	if(APP_IS_PID)
 		return '';
 	if(PAS)
 		return '';
