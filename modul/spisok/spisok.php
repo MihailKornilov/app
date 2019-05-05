@@ -11,7 +11,7 @@ function _spisokFilterCache() {//кеширование фильтров спи�
 
 	$sql = "SELECT *
 			FROM `_user_spisok_filter`
-			WHERE `app_id` IN (0,".APP_ID.")
+			WHERE `app_id` IN (0,".APP_PARENT.")
 			  and `user_id`=".USER_ID;
 	if($arr = query_arr($sql)) {
 		$sql = "SELECT *
@@ -118,9 +118,12 @@ function _spisokFilterInsert($spisok, $filter, $v) {//внесение ново�
 	if(!$SP = _elemOne($spisok))
 		return $v;
 
+	$app_id = $SP['app_id'] ? APP_PARENT : 0;
+
 	$sql = "SELECT *
 			FROM `_user_spisok_filter`
-			WHERE `user_id`=".USER_ID."
+			WHERE `app_id`=".$app_id."
+			  AND `user_id`=".USER_ID."
 			  AND `element_id_spisok`=".$spisok."
 			  AND `element_id_filter`=".$filter;
 	$id = _num(query_value($sql));
@@ -135,7 +138,7 @@ function _spisokFilterInsert($spisok, $filter, $v) {//внесение ново�
 				`def`
 			) VALUES (
 				".$id.",
-				".$SP['app_id'].",
+				".$app_id.",
 				".USER_ID.",
 				".$spisok.",
 				".$filter.",

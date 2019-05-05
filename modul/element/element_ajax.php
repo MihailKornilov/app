@@ -1333,6 +1333,8 @@ function _dialogWidthMin($blk) {//получение минимальной ши
 	return $width;
 }
 function _dialogSetupAccess($dlg) {//права для настройки диалога
+	if(APP_IS_PID)
+		return 0;
 	if(SA)
 		return 1;
 	if(!$dlg['app_id'])

@@ -1260,18 +1260,18 @@ function _beDefine() {//получение блоков и элементов и
 
 	//диалоги
 	$G_DLG = _beDlg();
-	if(APP_ID)
-		$G_DLG += _beDlg(APP_ID);
+	if(APP_PARENT)
+		$G_DLG += _beDlg(APP_PARENT);
 
 	//блоки
 	$G_BLOCK = _beBlock();
-	if(APP_ID)
-		$G_BLOCK += _beBlock(APP_ID);
+	if(APP_PARENT)
+		$G_BLOCK += _beBlock(APP_PARENT);
 
 	//элементы
 	$G_ELEM = _beElem();
-	if(APP_ID)
-		$G_ELEM += _beElem(APP_ID);
+	if(APP_PARENT)
+		$G_ELEM += _beElem(APP_PARENT);
 
 	$BE_FLAG = 1;
 }
@@ -1680,7 +1680,7 @@ function _beElemHint($ELM, $app_id) {//подсказки, назначенны�
 
 	return $ELM;
 }
-function _beElemAction($ELM, $app_id=APP_ID) {//действия, назначенные элементам
+function _beElemAction($ELM, $app_id=APP_PARENT) {//действия, назначенные элементам
 	$sql = "SELECT *
 			FROM `_action`
 			WHERE `app_id`=".$app_id."

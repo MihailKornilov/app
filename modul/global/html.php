@@ -65,6 +65,13 @@ function _auth() {//получение данных об авторизации 
 
 	define('USER_ID', _num(@$r['user_id']));
 	define('APP_ID', _num(@$r['app_id']));
+
+	if($PID = APP_ID)
+		if($pid = _app(APP_ID, 'pid'))
+			$PID = $pid;
+
+	define('APP_PARENT', $PID);
+	define('APP_IS_PID', APP_ID && APP_ID != APP_PARENT);//приложение наследует родителя
 	define('APP_ACCESS', _num(@$r['access']));
 }
 function _authLoginIframe() {//проверка авторизации через iframe
@@ -467,6 +474,8 @@ function _html_hat() {//верхняя строка приложения для 
 function _hat_but_app() {//кнопка входа в приложение
 	if(PAS)
 		return '';
+	if(APP_IS_PID)
+		return '';
 	if(!APP_ID)
 		return '';
 	if(!SA && !USER_CREATOR)
@@ -476,6 +485,8 @@ function _hat_but_app() {//кнопка входа в приложение
 }
 function _hat_but_sa() {//отображение кнопки списка страниц
 	if(!SA)
+		return '';
+	if(APP_IS_PID)
 		return '';
 	if(PAS)
 		return '';
@@ -490,6 +501,8 @@ function _hat_but_sa() {//отображение кнопки списка ст�
 function _hat_but_admin() {//кнопки Администрирование
 	if(PAS)
 		return '';
+	if(APP_IS_PID)
+		return '';
 	if(!SA && !USER_CREATOR)
 		return '';
 	if(!APP_ID)
@@ -499,6 +512,8 @@ function _hat_but_admin() {//кнопки Администрирование
 }
 function _hat_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)
+		return '';
+	if(APP_IS_PID)
 		return '';
 	if(!SA && !APP_ID)
 		return '';

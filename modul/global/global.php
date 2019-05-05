@@ -79,7 +79,7 @@ function _setting() {//установка констант-настроек
 	define('JS_CACHE', _num(@$arr['JS_CACHE']));
 }
 
-function _app($app_id=APP_ID, $i='all') {//Получение данных о приложении
+function _app($app_id, $i='all') {//Получение данных о приложении
 	$key = 'app'.$app_id;
 	if(!$arr = _cache_get($key)) {
 		$sql = "SELECT *
@@ -743,9 +743,9 @@ function _jsCache() {//файл JS с блоками и элементами
 			'PAGE_LIST='._json(_jsCachePage()).';'.
 			"\n".'if(SA)for(i in PLSA)PAGE_LIST.push(PLSA[i]);'.
 			"\n\n".
-		'var TMP='._jsCacheBlk(APP_ID).';'."\n".'for(i in TMP)BLKK[i]=TMP[i];'.
+		'var TMP='._jsCacheBlk(APP_PARENT).';'."\n".'for(i in TMP)BLKK[i]=TMP[i];'.
 			"\n\n".
-			'TMP='._jsCacheElm(APP_ID).';'."\n".'for(i in TMP)ELMM[i]=TMP[i];'.
+			'TMP='._jsCacheElm(APP_PARENT).';'."\n".'for(i in TMP)ELMM[i]=TMP[i];'.
 			"\n\n";
 
 		$fp = fopen(APP_PATH.'/js_cache/app'.APP_ID.'.js', 'w+');

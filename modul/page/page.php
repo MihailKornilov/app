@@ -6,7 +6,7 @@ function _pageCache() {//получение массива страниц из �
 
 	$sql = "SELECT *
 			FROM `_page`
-			WHERE `app_id` IN (0,".APP_ID.")
+			WHERE `app_id` IN (0,".APP_PARENT.")
 			ORDER BY `sort`";
 	if(!$page = query_arr($sql))
 		return array();
