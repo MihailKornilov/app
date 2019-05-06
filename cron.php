@@ -14,7 +14,6 @@ require_once 'modul/global/global.php';
 define('BR', '<br>');
 //define('BR', "\n");
 define('USER_ID', 0);
-define('CRON_TIME_CUR', strftime('%Y-%m-%d %H:%M'));
 
 
 
@@ -59,7 +58,9 @@ function _cronStart() {//просмотр и выполнение всех за�
 
 	echo
 	$send.
-	'time='.round(microtime(true) - TIME, 3);
+	'curTime: '.strftime('%Y-%m-%d %H:%M:%S').
+	'<br>'.
+	'duration: '.round(microtime(true) - TIME, 3);
 }
 function _cronTask() {//выполнение конкретной задачи
 	if(!$task_id = _num(@$_GET['task_id']))
@@ -72,6 +73,7 @@ function _cronTask() {//выполнение конкретной задачи
 		die('task id'.$task_id.' not exists');
 
 	define('APP_ID', $task['app_id']);
+	define('APP_PARENT', APP_ID);
 
 	//id исходного списка, из которого будут браться данные
 	if(!$dlg_id = $task['src_spisok'])
@@ -149,12 +151,31 @@ function _cronTask() {//выполнение конкретной задачи
 		$DST['act'] = 1;
 		_SUN_AFTER($DST, $unit);
 	}
-	
-	
+
+	//дата и время последнего выполнения задачи
+	$sql = "UPDATE `_cron`
+			SET `exec_time_last`=CURRENT_TIMESTAMP
+			WHERE `id`=".$task_id;
+	query($sql);
+
+	$duration = round(microtime(true) - TIME, 3);
+
+	//внесение истории о выполненной задаче
+	$sql = "INSERT INTO `_cron_log` (
+				`app_id`,
+				`cron_id`,
+				`duration`
+			) VALUES (
+				".APP_ID.",
+				".$task_id.",
+				".$duration."
+			)";
+	query($sql);
+
 	echo
 	'all='.count($SRC_ARR).
 	BR.
-	'time='.round(microtime(true) - TIME, 3);
+	'duration='.$duration;
 }
 function _cronTime($r) {//время, установленное в задании. Будет разрешено выполнение, если время подходящее
 	//месяц
