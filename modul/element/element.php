@@ -3887,8 +3887,9 @@ function _element88_print($EL, $prm) {
 		return _emptyRed('Таблица из нескольких списков не настроена');
 
 	$ELM = array();
-	foreach($EL['vvv'] as $ell)
-		$ELM[$ell['id']] = $ell;
+	if(!empty($EL['vvv']))
+		foreach($EL['vvv'] as $ell)
+			$ELM[$ell['id']] = $ell;
 
 	$LIMIT = $EL['num_1'];
 	$SC = $EL['num_6'] ? 'DESC' : 'ASC';
@@ -4094,7 +4095,7 @@ function PHP12_elem89_vvv($prm) {//данные колонок для конкр
 	if(!$EL = _elemOne($bl['elem_id']))
 		return $send;
 
-	$send['elm'] = _arrKey($EL['vvv']);
+	$send['elm'] = empty($EL['vvv']) ? array() : _arrKey($EL['vvv']);
 
 	return $send;
 }

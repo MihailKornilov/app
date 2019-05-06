@@ -3825,7 +3825,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			//сортировка колонок
 			DL.sortable({
 				handle:'.icon-move-y',
-				update:tdCalc
+				update:function() {
+					PHP12_elem88_upd('tdsort');
+					tdCalc();
+				}
 			});
 
 			//удаление элемента
@@ -3938,6 +3941,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			case 'tddel':
 				COL88.splice(i, 1);
 				break;
+			//колонки отсортированы
+			case 'tdsort':
+				var col88save = [];
+				_forEq(EL88.find('.bnum'), function(sp, n) {
+					var num = _num(sp.html()) - 1;
+					col88save.push(COL88[num]);
+					sp.html(n+1);
+				});
+				COL88 = col88save;
+				break;
 		}
 
 		_forEq(EL88.find('.th-name'), function(sp) {
@@ -4006,6 +4019,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						t.val(ia.unit.title);
 						t.attr('data-did', ia.unit.dialog_id);
 						t.attr('val', ia.unit.id);
+						t.attr('id', ATTR_EL(ia.unit.id, 1));
 						t.prev()._dn(1);
 						COL88[_num(t.attr('data-n'))].elm[vvv.i] = ia.unit.id;
 						vvv.elm[ia.unit.id] = ia.unit;
