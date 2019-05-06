@@ -1883,10 +1883,18 @@ function _element32_struct_title($el) {
 	return $el;
 }
 function _element32_print($el, $prm) {
-	if(!$u = @$prm['unit_get'])
+	if(empty($prm['unit_get']))
 		return $el['title'];
 
-	$num = empty($u['num']) ? $u['id'] : $u['num'];
+	$u = $prm['unit_get'];
+
+	if(!$num = _num($u))
+		if(is_array($u))
+			$num = empty($u['num']) ? $u['id'] : $u['num'];
+
+	if(!$num)
+		return $el['title'];
+
 	$num = _spisokColSearchBg($el, $num);
 	return $num;
 }
