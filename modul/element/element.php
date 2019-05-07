@@ -4203,37 +4203,6 @@ function _element96_print($el, $prm) {
 	return $send;
 }
 
-/* [97] Select: выбор приложения (SA) */
-function _element97_struct($el) {
-	return array(
-		'num_1'   => _num($el['num_1']) //исключать дочерние приложения
-	) + _elementStruct($el);
-}
-function _element97_print($el, $prm) {
-	return
-	_select(array(
-		'attr_id' => _elemAttrId($el, $prm),
-		'placeholder' => 'не выбрано',
-		'width' => @$el['width'],
-		'value' => _elemPrintV($el, $prm, 0)
-	));
-}
-function _element97_vvv($prm) {
-	$send = array();
-
-	$sql = "SELECT *
-			FROM `_app`
-			ORDER BY `id`";
-	foreach(query_arr($sql) as $id => $r) {
-		$send[] = array(
-			'id' => $id,
-			'title' => $id.': '.$r['name']
-		);
-	}
-
-	return $send;
-}
-
 /* [102] Фильтр: Выбор нескольких групп значений */
 function _element102_struct($el) {
 	return array(

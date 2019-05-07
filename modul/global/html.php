@@ -578,6 +578,7 @@ function _app_list() {//список приложений, которые дос
 			FROM `_spisok`
 			WHERE `cnn_id`=".USER_ID."
 			  AND `dialog_id`=111
+			  AND !`deleted`
 			ORDER BY `dtime_add`";
 	if(!$spisok = query_arr($sql))
 		return
