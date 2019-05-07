@@ -478,7 +478,7 @@ function _hat_but_app() {//кнопка входа в приложение
 		return '';
 	if(!APP_ID)
 		return '';
-	if(!SA && !USER_CREATOR)
+	if(!SA && !USER_ADMIN)
 		return '';
 
 	return '<button class="vk small green ml10" onclick="location.href=\''.URL.'&p='._page('def').'\'">App</button>';
@@ -501,7 +501,7 @@ function _hat_but_admin() {//кнопки Администрирование
 		return '';
 	if(APP_IS_PID)
 		return '';
-	if(!SA && !USER_CREATOR)
+	if(!SA && !USER_ADMIN)
 		return '';
 	if(!APP_ID)
 		return '';
@@ -515,7 +515,7 @@ function _hat_but_pas() {//отображение кнопки настройк�
 		return '';
 	if(!SA && !APP_ID)
 		return '';
-	if(!SA && !USER_CREATOR)
+	if(!SA && !USER_ADMIN)
 		return '';
 	if(!$page_id = _page('cur'))
 		return '';

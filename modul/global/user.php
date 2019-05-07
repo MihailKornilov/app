@@ -7,7 +7,7 @@ function _user($user_id=USER_ID, $i='ass') {//получение данных о
 		return array();
 
 	if(!defined('USER_NAME')) {
-		define('USER_CREATOR', APP_ID && _app(APP_ID, 'user_id_add') == USER_ID);//создатель приложения
+		define('USER_ADMIN', _userAdmin());//создатель приложения
 		define('USER_NAME', $u['i'].' '.$u['f']);//Имя Фамилия
 
 		define('PIN', !empty($u['pin']));       //установлен ли у пользователя пин-код
@@ -29,6 +29,16 @@ function _user($user_id=USER_ID, $i='ass') {//получение данных о
 		return $u[$i];
 
 	return '';
+}
+function _userAdmin() {//получение флага администратора приложения
+	if(!APP_ID)
+		return false;
+	if(_app(APP_ID, 'user_id_add') == USER_ID)
+		return true;
+	if(!$ids = _idsAss(_app(APP_ID, 'user_admin')))
+		return false;
+
+	return isset($ids[USER_ID]);
 }
 function _userCache($user_id) {
 	$key = 'user'.$user_id;

@@ -5,7 +5,7 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID диалогового окна');
 		if(!$dialog = _dialogQuery($dialog_id))
 			jsonError('Диалога не существует');
-		if(!SA && !USER_CREATOR)
+		if(!SA && !USER_ADMIN)
 			jsonError('Нет доступа');
 
 		$menu = array(
@@ -318,7 +318,7 @@ switch(@$_POST['op']) {
 	case 'dialog_setup_save'://сохранение диалогового окна
 		if(!$dialog_id = _num($_POST['dialog_id']))
 			jsonError('Некорректный ID диалогового окна');
-		if(!SA && !USER_CREATOR)
+		if(!SA && !USER_ADMIN)
 			jsonError('Нет доступа');
 
 		_dialogSave($dialog_id);
@@ -1339,7 +1339,7 @@ function _dialogSetupAccess($dlg) {//права для настройки диа
 		return 1;
 	if(!$dlg['app_id'])
 		return 0;
-	if($dlg['app_id'] == APP_ID && USER_CREATOR)
+	if($dlg['app_id'] == APP_ID && USER_ADMIN)
 		return 1;
 	return 0;
 }
