@@ -125,6 +125,8 @@ function _authLoginSite() {//страница авторизации через 
 			'<button class="vk w200" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Войти через VK</button>'.
 			'<br>'.
 			'<button class="vk w200 grey mt10 dialog-open" val="dialog_id:99">Войти по логину и паролю</button>'.
+			'<br>'.
+			'<button class="vk small green mt10 dialog-open" val="dialog_id:98">Регистрация</button>'.
 		'</div>'.
 	'</div>'.
 (!LOCAL ?
