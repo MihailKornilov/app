@@ -213,6 +213,28 @@ switch(@$_POST['op']) {
 					'<tr><td class="grey r">Родительский диалог:'.
 						'<td><input type="hidden" id="dialog_id_parent" value="'.$dialog['dialog_id_parent'].'" />'.
 
+					'<tr><td colspan="2" class="line-t">&nbsp;'.
+					'<tr><td>'.
+						'<td>'._check(array(
+									'attr_id' => 'open_auto',
+									'title' => 'автоматическое открытие диалога',
+									'value' => $dialog['open_auto']
+							   )).
+					'<tr id="tr-open-auto" class="'._dn($dialog['open_auto']).'">'.
+						'<td class="r grey">При условиях:'.
+						'<td><div class="_spfl dib w125 prel">'.
+								'<div class="icon icon-filter pabs"></div>'.
+								'<div class="icon icon-del pl pabs'._dn($dialog['open_auto']).'"></div>'.
+								'<input type="text"'.
+									  ' id="open_filter"'.
+									  ' readonly'.
+									  ' class="inp color-del b pl25 curP w100p over3"'.
+									  ' placeholder="условий нет"'.
+									  ' value=""'.
+								' />'.
+							'</div>'.
+
+
 					'<tr><td colspan="2">&nbsp;'.
 					'<tr><td colspan="2" class="line-t">&nbsp;'.
 					'<tr><td class="grey r">Получает данные записи:'.
@@ -956,6 +978,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 
 	$spisok_on = _bool($_POST['spisok_on']);
 	$spisok_elem_id = $spisok_on ? _num($_POST['spisok_elem_id']) : 0;
+	$open_auto = _bool($_POST['open_auto']);
 
 	$dialog_id_parent =   _num($_POST['dialog_id_parent']);
 	if($dialog_id_parent == $dialog_id)
@@ -996,6 +1019,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 
 				`spisok_on`=".$spisok_on.",
 				`spisok_elem_id`=".$spisok_elem_id.",
+				`open_auto`=".$open_auto.",
 
 				`dialog_id_unit_get`=".$dialog_id_unit_get.",
 

@@ -667,6 +667,9 @@ function _emptyRed10($msg) {
 
 
 function _vkapi($method, $param=array()) {//получение данных из api вконтакте
+	if(LOCAL)
+		return array();
+
 	$param += array(
 		'v' => 5.64,
 		'lang' => 'ru',

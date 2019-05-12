@@ -604,7 +604,8 @@ function _pageShowScript($page_id, $prm) {
 	return
 	'<script>'.
 	(APP_ID && USER_ID ?
-		'var FILTER='._json(_spisokFilter('page_js'), 1).';'
+		'var FILTER='._json(_spisokFilter('page_js'), 1).';'.
+		_pageDlgOpenAuto()
 	: '').
 		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.
 	'</script>';
@@ -622,6 +623,17 @@ function _pageUnitGet($obj_name, $obj_id) {//получение данных з�
 		return array();
 
 	return _spisokUnitQuery($dialog, $get_id);
+}
+function _pageDlgOpenAuto() {
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `open_auto`
+			LIMIT 1";
+	if(!$dlg = query_assoc($sql))
+		return '';
+
+	return '_dialogLoad({dialog_id:'.$dlg['id'].'});';
 }
 
 

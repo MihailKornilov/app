@@ -6174,8 +6174,29 @@ function PHP12_v_choose($prm) {
 	);
 
 	return
-	'<div class="fs14 pad10 pl15 bg-orange line-b">'.$TITLE.' <b class="fs14">'.$NAME.'</b>:</div>'.
-	_blockHtml(OBJ_NAME_CHOOSE, $obj_id, $cond).
+($prm['dop']['first'] ?
+	'<div class="bg-gr2 pad10 pl5 line-b">'.
+		'<input type="hidden" id="choose-menu" value="2" />'.
+	'</div>'.
+
+	'<div class="choose-menu-1">'.
+		'<div class="prel pad10">'.
+			'<div class="elm-choose" val="-21"></div>'.
+			'<input type="text" class="over1 color-555 b w100p curP" readonly value="Текущий пользователь">'.
+		'</div>'.
+	'</div>'
+: '').
+
+	'<div class="choose-menu-2">'.
+		'<div class="fs14 pad10 pl15 bg-orange line-b">'.$TITLE.' <b class="fs14">'.$NAME.'</b>:</div>'.
+		_blockHtml(OBJ_NAME_CHOOSE, $obj_id, $cond).
+	'</div>'.
+
+($prm['dop']['first'] ?
+	'<div class="choose-menu-3">'.
+		'Стандартные значения'.
+	'</div>'
+: '').
 	'';
 }
 function PHP12_v_choose_vvv($prm) {

@@ -420,6 +420,26 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				DLG('.tr-spisok-col')._dn(v);
 			}
 		});
+
+		DLG('#open_auto')._check({
+			func:function(v) {
+				DLG('#tr-open-auto')._dn(v);
+			}
+		});
+		DLG('#open_filter').click(function() {
+			_dialogLoad({
+				dialog_id:41,
+//				block_id:OBJ.srce.block_id,
+				dss:o.dialog_id,
+//				dop:ATR_CMP.val(),
+				busy_obj:$(this),
+				busy_cls:'hold',
+				func_save:function(res) {
+				}
+			});
+		});
+
+
 		DLG('#spisok_elem_id')._select({
 			width:250,
 			title0:'не указана',
@@ -524,6 +544,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 				spisok_on:DLG('#spisok_on').val(),
 				spisok_elem_id:DLG('#spisok_elem_id').val(),
+				open_auto:DLG('#open_auto').val(),
 
 				table_1:DLG('#table_1').val(),
 				app_any:DLG('#app_any').val(),
@@ -3027,7 +3048,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	PHP12_v_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
 			VC = D(ATTR_EL(el.id)).find('.elm-choose'),//элементы в открытом диалоге для выбора
+			DSS = 0,
 			_nest = function(v, dbl) {//разрешение прохода по списку (открытие второго диалога)
+				if(v < 0)
+					return v;
 				if(vvv.sev)
 					return false;
 				if(!ELMM[v].issp)
@@ -3041,6 +3065,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
 		if(vvv.first) {
+			D(ATTR_EL(el.id)).find('#choose-menu')._menu({
+				spisok:[
+					{id:1,title:'Глобальные значения'},
+					{id:2,title:'Диалог'},
+					{id:3,title:'Стандартные значения'}
+				]
+			});
+
 			V11_CMP = D(ATTR_CMP(el.id));   //переменная в исходном диалоге для хранения значений
 			V11_DLG = [];                   //массив диалогов, открывающиеся последовательно
 			V11_V = vvv.sev ? _idsAss(vvv.sel) : []; //массив выбранных значений
@@ -3055,9 +3087,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//выбор одного из элеметов
 		VC.on('click dblclick', function(e) {
 			var t = $(this),
-				v = _num(t.attr('val'));
+				v = _num(t.attr('val'), true);
 
-			if(vvv.sev) {
+			if(vvv.sev) {//выбор нескольких значений
 				var sel = !t.hasClass('sel');
 				t[(sel ? 'add' : 'remove') + 'Class']('sel');
 				if(sel)
@@ -3080,16 +3112,26 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				V11_CMP.val(V11_V.join());
 			}
 
+
+
 			//нажатие по обычному элементу (не список)
-			if(!_nest(v, e.type == 'dblclick'))
-				return;
+			switch(_nest(v, e.type == 'dblclick')) {
+				default:
+					if(v == -21)
+						DSS = 1064;
+					break;
+				case true:
+					DSS = ELMM[v].num_1;
+					break;
+				case false: return;
+			}
 
 			V11_COUNT++;
 
 			_dialogLoad({
 				dialog_id:11,
 				block_id:obj.srce.block_id,
-				dss:ELMM[v].num_1,
+				dss:DSS,
 				dop:vvv,
 				func_open:PHP12_v_choose_submit
 			});
