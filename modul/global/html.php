@@ -526,7 +526,7 @@ function _hat_but_pas() {//отображение кнопки настройк�
 	if(!SA && !$page['app_id'])
 		return '';
 
-	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Page setup</button>';
+	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Настройка страницы</button>';
 }
 
 function _app_create($dialog, $app_id) {//привязка пользователя к приложению после его создания
