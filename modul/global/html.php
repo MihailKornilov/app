@@ -102,7 +102,9 @@ function _authLoginIframe() {//проверка авторизации чере�
 		if($auth_key != md5($vk_app_id.'_'.$viewer_id.'_'._app($app_id, 'vk_secret')))
 			return _authIframeError('Авторизация не пройдена.');
 
+
 		_authSuccess($auth_key, $user_id, $app_id);
+		setcookie('page_setup', '', time() - 1, '/');
 		header('Location:'.URL);
 	}
 
