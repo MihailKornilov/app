@@ -1012,40 +1012,70 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//Список - ТАБЛИЦА
 				case 23:
-					if(el.num_8 != 6161)
-						return;
+					//сортировка значений
+					if(el.num_8 == 6161)
+						ATR_EL.find('ol:first').nestedSortable({
+							forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
+							placeholder:'nested-placeholder', //класс, применяемый для подсветки места, откуда взялся элемент
+							listType:'ol',
+							items:'li',
+							handle:'.icon-move',
+							isTree:el.num_7 > 1,
+							maxLevels:el.num_7,
+							tabSize:30, //расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
+							revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
 
-					ATR_EL.find('ol:first').nestedSortable({
-						forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
-						placeholder:'nested-placeholder', //класс, применяемый для подсветки места, откуда взялся элемент
-						listType:'ol',
-						items:'li',
-						handle:'.icon-move',
-						isTree:el.num_7 > 1,
-						maxLevels:el.num_7,
-						tabSize:30, //расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
-						revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+							start:function(e, t) {//установка ширины placeholder
+								var w = $(t.item).find('._stab:first').width();
+								$(t.placeholder).width(w);
+							},
+							update:function(e, t) {
+	//							var pos = t.item.parent().attr('id');
+	//							t.item.find('a')._dn(!pos, 'b fs14');
 
-						start:function(e, t) {//установка ширины placeholder
-							var w = $(t.item).find('._stab:first').width();
-							$(t.placeholder).width(w);
-						},
-						update:function(e, t) {
-//							var pos = t.item.parent().attr('id');
-//							t.item.find('a')._dn(!pos, 'b fs14');
+								var send = {
+									op:'spisok_23_sort',
+									elem_id:elm_id,
+									arr:$(this).nestedSortable('toArray'),
+									busy_obj:ATR_EL,
+									busy_cls:'spisok-busy'
+								};
+								_post(send);
+							},
 
-							var send = {
-								op:'spisok_23_sort',
-								elem_id:elm_id,
-								arr:$(this).nestedSortable('toArray'),
-								busy_obj:ATR_EL,
-								busy_cls:'spisok-busy'
-							};
-							_post(send);
-						},
+							expandedClass:'pb10',//раскрытый список
+							errorClass:el.num_7 > 1 ? 'bg-fcc' : ''  //ошибка, если попытка переместить элемент на недоступный уровень
+						});
 
-						expandedClass:'pb10',//раскрытый список
-						errorClass:el.num_7 > 1 ? 'bg-fcc' : ''  //ошибка, если попытка переместить элемент на недоступный уровень
+					//выбор значений галочками
+					_forN(vvv, function(sp) {
+						if(sp.dialog_id == 91) {
+							_forEq(ATR_EL.find('._check'), function(eq) {
+								//получение id записи
+								var tdid = eq.attr('id').split('_')[1];
+
+								//выбор/снятие всех галочек
+								if(tdid == 'all') {
+									$('#sch' + sp.id + '_all')._check({
+										func:function(v) {
+											_forEq(ATR_EL.find('._check'), function(eqAll) {
+												var ch = eqAll.prev();
+												if(ch.attr('id').split('_')[1] == 'all')
+													return;
+												ch._check(v);
+											});
+										}
+									});
+									return;
+								}
+
+								eq.prev()._check({
+									func:function(v) {
+									}
+								});
+							});
+							return false;
+						}
 					});
 
 					return;

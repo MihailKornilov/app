@@ -683,8 +683,18 @@ function _spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT) {//ото
 		$send = $TABLE_BEGIN;
 
 	$send .= '<tr>';
-	foreach($ELEM['vvv'] as $tr)
-		$send .= '<th'._elemStyleWidth($tr).'>'.$tr['txt_7'];
+	foreach($ELEM['vvv'] as $tr) {
+		$txt = $tr['txt_7'];
+
+		//выбор галочками
+		if($tr['dialog_id'] == 91)
+			$txt = _check(array(
+				'attr_id' => 'sch'.$tr['id'].'_all',
+				'value' => 0
+			));
+
+		$send .= '<th'._elemStyleWidth($tr).'>'.$txt;
+	}
 
 	if($IS_SORT)
 		$send .= $TABLE_END;
