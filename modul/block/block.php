@@ -804,6 +804,18 @@ function _elemAction242($el, $prm) {//подмена цвета
 		$v = $u[$col];
 
 		switch($F['cond_id']) {
+			//отсутствует
+			case 1:
+				$v = is_array($v) ? $v['id'] : $v;
+				if(!$v)
+					return $act['v1'];
+				break;
+			//присутствует
+			case 2:
+				$v = is_array($v) ? $v['id'] : $v;
+				if($v)
+					return $act['v1'];
+				break;
 			//больше
 			case 5:
 				if($v > $F['txt'])
