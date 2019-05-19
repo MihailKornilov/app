@@ -2123,6 +2123,29 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 					ELM_RELOAD[el.num_1] = el.id;
 					return;
+				//Выбранные значения галочками
+				case 92:
+					var ids = [];
+					_forIn(vvv, function(did, elid) {
+						var c = 0;
+						_forEq(_attr_el(elid).find('._check'), function(eqAll) {
+							var ch = eqAll.prev(),
+								spid = ch.attr('id').split('_')[1];
+							if(spid == 'all')
+								return;
+							if(!_num(ch.val()))
+								return;
+							c++;
+							ids.push(spid);
+						});
+
+						if(c)
+							$('#el92_' + elid).html(c);
+					});
+
+
+
+					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102: ATR_EL._filter102(); return;
 				//Привязка пользователя к странице ВК

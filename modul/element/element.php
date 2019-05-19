@@ -4187,6 +4187,58 @@ function _element91_print($el, $prm) {
 	));
 }
 
+/* [92] Выбранные значения галочками */
+function _element92_struct($el) {
+	return array(
+		'req'     => _num($el['req']),
+		'req_msg' => $el['req_msg'],
+
+		'txt_1'   => $el['txt_1']     //списки
+	) + _elementStruct($el);
+}
+function _element92_print($el, $prm) {
+	if(!$dlg_ids = _elem92_dlgIds($el))
+		return _emptyMinRed('Списков не существует, в которых производится выбор значений');
+
+	$send = '<table class="_stab">'.
+				'<tr><th>Список'.
+					'<th>Кол-во</br>записей';
+//					'<th>Сумма';
+	foreach($dlg_ids as $elem_id => $id) {
+		if(!$DLG = _dialogQuery($id))
+			continue;
+		$send .= '<tr class="color-555">'.
+					'<td>'.$DLG['name'].
+					 '<td class="center b" id="el92_'.$elem_id.'">';
+//					 '<td class="r">';
+	}
+	$send .= '</table>';
+
+	return
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="" />'.
+	$send;
+}
+function _element92_vvv($el, $prm) {
+	return _elem92_dlgIds($el);
+}
+function _elem92_dlgIds($el) {
+	if(!$spisok_ids = _ids($el['txt_1'], 1))
+		return _emptyMinRed('Не указаны списки, в которых производится выбор значений');
+
+	$send = array();
+	foreach($spisok_ids as $id) {
+		if(!$ell = _elemOne($id))
+			continue;
+		if($ell['dialog_id'] != 23)
+			continue;
+		if(!$ell['num_1'])
+			continue;
+		$send[$id] = $ell['num_1'];
+	}
+
+	return $send;
+}
+
 /* [96] Количество значений связанного списка с учётом категорий */
 function _element96_struct($el) {
 	return array(
