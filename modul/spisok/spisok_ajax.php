@@ -362,6 +362,35 @@ switch(@$_POST['op']) {
 		$send['spisok'] = _elem72Sum($el, $year);
 		jsonSuccess($send);
 		break;
+	case 'spisok_92_sum'://Выбранные значения галочками - получение сумм
+		if(!$el = _elemOne($_POST['elem_id']))
+			jsonError('Не получен элемент');
+		if(!$ids = _ids($_POST['ids']))
+			jsonError('Не получены ID записей');
+
+		$DI = _elem92_dlgIds($el);
+		foreach(_elem92_dlgIds($el) as $elid => $r) {
+			$col = _elemCol($r['sid']);
+			$DI[$elid]['sid'] = $col;
+			$DI[$elid]['sum'] = $col ? 0 : '';
+		}
+
+		$sql = "SELECT *
+				FROM `_spisok`
+				WHERE `id` IN (".$ids.")
+				  AND !`deleted`";
+		if(!$spisok = query_arr($sql))
+			jsonError('Записей не существует');
+
+		foreach($spisok as $r)
+			foreach($DI as $elid => $rr)
+				if($r['dialog_id'] == $rr['did'])
+					if($col = $rr['sid']) {
+						$DI[$elid]['sum'] += $r[$col];
+					}
+
+		jsonSuccess($DI);
+		break;
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка

@@ -4203,15 +4203,16 @@ function _element92_print($el, $prm) {
 
 	$send = '<table class="_stab">'.
 				'<tr><th>Список'.
-					'<th>Кол-во</br>записей';
-//					'<th>Сумма';
-	foreach($dlg_ids as $elem_id => $id) {
-		if(!$DLG = _dialogQuery($id))
+					'<th>Кол-во</br>записей'.
+					'<th>Сумма';
+	foreach($dlg_ids as $elem_id => $r) {
+		if(!$DLG = _dialogQuery($r['did']))
 			continue;
 		$send .= '<tr class="color-555">'.
 					'<td>'.$DLG['name'].
-					 '<td class="center b" id="el92_'.$elem_id.'">';
-//					 '<td class="r">';
+					'<td class="center b" id="el92_'.$elem_id.'">'.
+					'<td class="sum92 r">'.
+						'<div class="icon spin"></div>';
 	}
 	$send .= '</table>';
 
@@ -4219,7 +4220,7 @@ function _element92_print($el, $prm) {
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm, $el['txt_2']).'" />'.
 	$send;
 }
-function _element92_vvv($el, $prm) {
+function _element92_vvv($el) {
 	return _elem92_dlgIds($el);
 }
 function _elem92_dlgIds($el) {
@@ -4228,18 +4229,30 @@ function _elem92_dlgIds($el) {
 
 	$send = array();
 	foreach($spisok_ids as $id) {
+		//элемент-список
 		if(!$ell = _elemOne($id))
 			continue;
 		if($ell['dialog_id'] != 23)
 			continue;
 		if(!$ell['num_1'])
 			continue;
-		$send[$id] = $ell['num_1'];
+
+		$sid = 0;
+		foreach($ell['vvv'] as $vv)
+			if($vv['dialog_id'] == 91) {
+				$sid = _num($vv['num_1']);
+				break;
+			}
+
+		$send[$id] = array(
+			'did' => $ell['num_1'],
+			'sid' => $sid
+		);
 	}
 
 	return $send;
 }
-function _elem92_cnn($dialog, $cmp, $unit) {//присвоение связанного списка у выбранных значений
+function _elem92_cnn($dialog, $cmp, $unit) {//присвоение (или удаление) связанного списка у выбранных значений
 	if(!$col = _elemCol($cmp))
 		return;
 	if(!$ids = _ids($unit[$col]))

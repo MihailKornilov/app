@@ -2147,6 +2147,27 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 
 					ATR_CMP.val(ids.join());
+
+					//запрос сумм
+					var send = {
+						op:'spisok_92_sum',
+						elem_id:elm_id,
+						ids:ids.join(),
+						func_err:function() {
+							_forIn(vvv, function(did, elid) {
+								$('#el92_' + elid)
+									.parent().find('.sum92')
+									.html('');
+							});
+						}
+					};
+					_post(send, function(res) {
+						_forIn(vvv, function(did, elid) {
+							$('#el92_' + elid)
+								.parent().find('.sum92')
+								.html(res[elid].sum);
+						});
+					});
 					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102: ATR_EL._filter102(); return;
