@@ -845,10 +845,19 @@ function _elemAction244($el, $prm) {//скрытие элемента
 			$F = $F[0];
 
 			switch($F['cond_id']) {
+				//отсутствует
 				case 1:
 					if(!$col = _elemCol($F['elem_id']))
 						return false;
 					if(empty($u[$col]))
+						return true;
+
+					return false;
+				//присутствует
+				case 2:
+					if(!$col = _elemCol($F['elem_id']))
+						return false;
+					if(!empty($u[$col]))
 						return true;
 
 					return false;
