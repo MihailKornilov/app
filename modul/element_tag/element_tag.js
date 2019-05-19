@@ -67,7 +67,23 @@ $.fn._check = function(o) {
 
 	checkPrint();
 
+
 	var CHECK = $('#' + attr_id + '_check');
+
+/*
+	$(document)
+		.off('click', '#' + attr_id + '_check')
+		 .on('click', '#' + attr_id + '_check', function() {
+			if($(this).hasClass('disabled'))
+				return;
+
+			var v = $(this).hasClass('on') ? 0 : 1;
+			setVal(v);
+			o.func(v, t);
+		 });
+*/
+
+
 
 	CHECK.click(function() {
 		if(CHECK.hasClass('disabled'))
@@ -77,6 +93,7 @@ $.fn._check = function(o) {
 		setVal(v);
 		o.func(v, t);
 	});
+
 
 	if(o.tooltip)
 		CHECK._tooltip(o.tooltip);

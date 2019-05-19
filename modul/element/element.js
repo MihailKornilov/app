@@ -1069,10 +1069,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									return;
 								}
 
-								eq.prev()._check({
-									func:function(v) {
-									}
-								});
+								eq.prev()._check();
 							});
 							return false;
 						}
@@ -2162,11 +2159,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						}
 					};
 					_post(send, function(res) {
+						var itogC = 0,
+							itogSum = 0;
 						_forIn(vvv, function(did, elid) {
-							$('#el92_' + elid)
-								.parent().find('.sum92')
+							var ob = $('#el92_' + elid);
+							ob.parent().find('.sum92')
 								.html(res[elid].sum);
+							itogC += _num(ob.html());
+							itogSum += res[elid].sum;
 						});
+						ATR_EL.find('.itog-c').html(itogC);
+						ATR_EL.find('.itog-sum').html(itogSum);
 					});
 					return;
 				//Фильтр - Выбор нескольких групп значений

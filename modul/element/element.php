@@ -4210,10 +4210,14 @@ function _element92_print($el, $prm) {
 			continue;
 		$send .= '<tr class="color-555">'.
 					'<td>'.$DLG['name'].
-					'<td class="center b" id="el92_'.$elem_id.'">'.
+					'<td class="center" id="el92_'.$elem_id.'">'.
 					'<td class="sum92 r">'.
 						'<div class="icon spin"></div>';
 	}
+	$send .= '<tr>'.
+				'<td class="r b">Итог:'.
+				'<td class="itog-c center">'.
+				'<td class="itog-sum r">';
 	$send .= '</table>';
 
 	return
