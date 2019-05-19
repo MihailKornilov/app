@@ -4216,8 +4216,8 @@ function _element92_print($el, $prm) {
 	}
 	$send .= '<tr>'.
 				'<td class="r b">Итог:'.
-				'<td class="itog-c center">'.
-				'<td class="itog-sum r">';
+				'<td class="itog-c center b">'.
+				'<td class="itog-sum r b">';
 	$send .= '</table>';
 
 	return
