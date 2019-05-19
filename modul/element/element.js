@@ -2125,6 +2125,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//Выбранные значения галочками
 				case 92:
+					if(unit.id)
+						return;
+
 					var ids = [];
 					_forIn(vvv, function(did, elid) {
 						var c = 0;
@@ -2143,8 +2146,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							$('#el92_' + elid).html(c);
 					});
 
-
-
+					ATR_CMP.val(ids.join());
 					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102: ATR_EL._filter102(); return;

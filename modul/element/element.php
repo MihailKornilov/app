@@ -4193,7 +4193,8 @@ function _element92_struct($el) {
 		'req'     => _num($el['req']),
 		'req_msg' => $el['req_msg'],
 
-		'txt_1'   => $el['txt_1']     //списки
+		'txt_1'   => $el['txt_1'],   //списки
+		'txt_2'   => $el['txt_2']    //значения
 	) + _elementStruct($el);
 }
 function _element92_print($el, $prm) {
@@ -4215,7 +4216,7 @@ function _element92_print($el, $prm) {
 	$send .= '</table>';
 
 	return
-	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="" />'.
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm, $el['txt_2']).'" />'.
 	$send;
 }
 function _element92_vvv($el, $prm) {
@@ -4237,6 +4238,33 @@ function _elem92_dlgIds($el) {
 	}
 
 	return $send;
+}
+function _elem92_cnn($dialog, $cmp, $unit) {//присвоение связанного списка у выбранных значений
+	if(!$col = _elemCol($cmp))
+		return;
+	if(!$ids = _ids($unit[$col]))
+		return;
+
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `id` IN (".$ids.")
+			  AND !`deleted`";
+	if(!$spisok = query_arr($sql))
+		return;
+
+	foreach($spisok as $r) {
+		if(!$DLG = _dialogQuery($r['dialog_id']))
+			continue;
+		foreach($DLG['cmp'] as $cmpp)
+			if(_elemIsConnect($cmpp))
+				if($cmpp['num_1'] == $dialog['id'])
+					if($coll = _elemCol($cmpp)) {
+						$sql = "UPDATE `_spisok`
+								SET `".$coll."`=".($unit['deleted'] ? 0 : $unit['id'])."
+								WHERE `id`=".$r['id'];
+						query($sql);
+					}
+	}
 }
 
 /* [96] Количество значений связанного списка с учётом категорий */

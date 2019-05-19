@@ -36,6 +36,7 @@ switch(@$_POST['op']) {
 			query($sql);
 			_historyInsert(3, $dialog, $unit_id);
 			_counterGlobal($dialog['id'], $dialog);
+			$unit['deleted'] = 1;
 			_SUN_AFTER($dialog, $unit);
 		} else {
 			$elem = array();

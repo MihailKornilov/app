@@ -1906,7 +1906,6 @@ function _count_update($app_id=APP_ID) {//обновление счётчико�
 
 
 
-/* ---=== CЧЁТЧИКИ: В РАБОТЕ ===--- */
 function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение действий после обновления или удаления записи
 	if($dialog['dialog_id_parent'])
 		$dialog = _dialogQuery($dialog['dialog_id_parent']) + $dialog;
@@ -1971,8 +1970,12 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 
 				_counterGlobal($cmp['num_1'], $dialog);
 				break;
+			//Выбранные значения галочками
+			case 92: _elem92_cnn($dialog, $cmp, $unit); break;
 		}
 }
+
+/* ---=== CЧЁТЧИКИ: В РАБОТЕ ===--- */
 function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт количеств привязаного списка
 	if(empty($cmp['col']))//имя колонки, по которой привязан список
 		return array();
