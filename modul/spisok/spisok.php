@@ -1363,6 +1363,10 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 		return $unit_id;
 	}
 
+	//указан вариант, когда диалоговое окно принимает данные записи
+	if($unit_id == -2)
+		return _num(@$prm['unit_get_id']);
+
 	//указан вариант, когда блок принимает данные записи
 	if($unit_id == -3)
 		return _num(@$prm['unit_get_id']);
