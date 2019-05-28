@@ -1526,7 +1526,7 @@ function _element29_print11($el, $u) {
 		}
 
 		if(!is_array($u[$col]))
-			if($pid = $u['parent_id'])
+			if($pid = @$u['parent_id'])
 				if($DLG = _dialogQuery($u['dialog_id']))
 					if($unit = _spisokUnitQuery($DLG, $pid))
 						if(!empty($unit[$col]))
@@ -3629,7 +3629,7 @@ function _elem102CnnList($ids, $return='select', $cond='') {//значения �
 			FROM   "._queryFrom($dlg)."
 			WHERE  "._queryWhere($dlg)."
 				   ".$cond."
-			ORDER BY `sort`,`id`
+			ORDER BY ".(_queryColReq($dlg, 'sort') ? "`sort`,`id`" : '`id`')."
 			LIMIT 200";
 	if(!$spisok = query_arr($sql))
 		return array();
