@@ -453,38 +453,11 @@ switch(@$_POST['op']) {
 				$r['x'] -= $cX;
 				$r['y'] = $r['y'] - $cY + $Y_START;
 			}
-			$sql = "INSERT INTO `_block` (
-						`obj_name`,
-						`obj_id`,
-						`x`,
-						`y`,
-						`w`,
-						`h`,
-						`width`,
-						`width_auto`,
-						`height`,
-						`pos`,
-						`bg`,
-						`bor`,
-						`hidden`,
-						`user_id_add`
-					) VALUES (
-						'".$obj_name."',
-						".$obj_id.",
-						".$r['x'].",
-						".$r['y'].",
-						".$r['w'].",
-						".$r['h'].",
-						".$r['width'].",
-						".$r['width_auto'].",
-						".$r['height'].",
-						'".$r['pos']."',
-						'".$r['bg']."',
-						'".$r['bor']."',
-						'".$r['hidden']."',
-						".USER_ID."
-					)";
-			$pasteIds[$id] = query_id($sql);
+
+			$r['obj_name'] = $obj_name;
+			$r['obj_id'] = $obj_id;
+
+			$pasteIds[$id] = _blockInsert($r);
 		}
 
 		//восстановление id родителей
@@ -637,38 +610,9 @@ switch(@$_POST['op']) {
 
 		$pasteIds = array();
 		foreach($PASTE as $id => $r) {
-			$sql = "INSERT INTO `_block` (
-						`obj_name`,
-						`obj_id`,
-						`x`,
-						`y`,
-						`w`,
-						`h`,
-						`width`,
-						`width_auto`,
-						`height`,
-						`pos`,
-						`bg`,
-						`bor`,
-						`hidden`,
-						`user_id_add`
-					) VALUES (
-						'".$obj_name."',
-						".$obj_id.",
-						".$r['x'].",
-						".$r['y'].",
-						".$r['w'].",
-						".$r['h'].",
-						".$r['width'].",
-						".$r['width_auto'].",
-						".$r['height'].",
-						'".$r['pos']."',
-						'".$r['bg']."',
-						'".$r['bor']."',
-						'".$r['hidden']."',
-						".USER_ID."
-					)";
-			$pasteIds[$id] = query_id($sql);
+			$r['obj_name'] = $obj_name;
+			$r['obj_id'] = $obj_id;
+			$pasteIds[$id] = _blockInsert($r);
 		}
 
 		//восстановление id родителей
@@ -908,6 +852,40 @@ switch(@$_POST['op']) {
 */
 }
 
+function _blockInsert($r) {//внесение нового блока (при копировании)
+	$sql = "INSERT INTO `_block` (
+				`obj_name`,
+				`obj_id`,
+				`x`,
+				`y`,
+				`w`,
+				`h`,
+				`width`,
+				`width_auto`,
+				`height`,
+				`pos`,
+				`bg`,
+				`bor`,
+				`hidden`,
+				`user_id_add`
+			) VALUES (
+				'".$r['obj_name']."',
+				".$r['obj_id'].",
+				".$r['x'].",
+				".$r['y'].",
+				".$r['w'].",
+				".$r['h'].",
+				".$r['width'].",
+				".$r['width_auto'].",
+				".$r['height'].",
+				'".$r['pos']."',
+				'".$r['bg']."',
+				'".$r['bor']."',
+				'".$r['hidden']."',
+				".USER_ID."
+			)";
+	return query_id($sql);
+}
 function _blockChild($BLK, $block_id) {
 	if(empty($BLK))
 		return array();
@@ -920,9 +898,6 @@ function _blockChild($BLK, $block_id) {
 
 	return array();
 }
-
-
-
 function _blockChildCountSet($obj_name, $obj_id) {//обновление количества дочерних блоков
 	$sql = "SELECT *
 			FROM `_block`
@@ -1138,108 +1113,79 @@ function _blockElementCopy($PASTE, $pasteIds) {
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($PASTE).")";
-	foreach(query_arr($sql) as $r) {
-		$block_id = $pasteIds[$r['block_id']];
+	if(!$ELM = query_arr($sql))
+		return;
 
-		//копировать можно пока не все элементы
-		switch($r['dialog_id']) {
-			case 1:
-			case 3:
-			case 5:
-			case 8:
-			case 9:
-			case 10:
-			case 21:
-			case 35:
-			case 57://меню переключения блоков
-			case 60:
-			case 300:
-				$sql = "INSERT INTO `_element` (
-							`app_id`,
-							`block_id`,
-							`dialog_id`,
-							`col`,
-							`name`,
-							`req`,
-							`req_msg`,
-							`nosel`,
-							`focus`,
-							`width`,
-							`color`,
-							`font`,
-							`size`,
-							`mar`,
-							`txt_1`,
-							`txt_2`,
-							`txt_3`,
-							`txt_4`,
-							`txt_5`,
-							`txt_6`,
-							`txt_7`,
-							`txt_8`,
-							`txt_9`,
-							`txt_10`,
-							`num_1`,
-							`num_2`,
-							`num_3`,
-							`num_4`,
-							`num_5`,
-							`num_6`,
-							`num_7`,
-							`num_8`,
-							`num_9`,
-							`num_10`,
-							`def`,
-							`sort`,
-							`user_id_add`
-						) VALUES (
-							(SELECT `app_id` FROM `_block` WHERE `id`=".$block_id."),
-							".$block_id.",
-							".$r['dialog_id'].",
-							'".$r['col']."',
-							'".$r['name']."',
-							".$r['req'].",
-							'".$r['req_msg']."',
-							".$r['nosel'].",
-							".$r['focus'].",
-							".$r['width'].",
-							'".$r['color']."',
-							'".$r['font']."',
-							".$r['size'].",
-							'".$r['mar']."',
-							'".addslashes($r['txt_1'])."',
-							'".addslashes($r['txt_2'])."',
-							'".addslashes($r['txt_3'])."',
-							'".addslashes($r['txt_4'])."',
-							'".addslashes($r['txt_5'])."',
-							'".addslashes($r['txt_6'])."',
-							'".addslashes($r['txt_7'])."',
-							'".addslashes($r['txt_8'])."',
-							'".addslashes($r['txt_9'])."',
-							'".addslashes($r['txt_10'])."',
-							".$r['num_1'].",
-							".$r['num_2'].",
-							".$r['num_3'].",
-							".$r['num_4'].",
-							".$r['num_5'].",
-							".$r['num_6'].",
-							".$r['num_7'].",
-							".$r['num_8'].",
-							".$r['num_9'].",
-							".$r['num_10'].",
-							".$r['def'].",
-							".$r['sort'].",
-							".USER_ID."
-						)";
-				$parent_id = query_id($sql);
-		}
+	foreach($ELM as $el) {
+		$block_id = $pasteIds[$el['block_id']];
+
+		if(!$fld = _element('copy_field', $el))
+			continue;
+
+		//колонки, содержащиеся в элементе
+		$cols = '';
+		foreach($fld as $i => $v)
+			$cols .= '`'.$i.'`,';
+
+		//значения колонок
+		$vals = '';
+		foreach($fld as $i => $v)
+			$vals .= "'".addslashes($v)."',";
+
+		$sql = "INSERT INTO `_element` (
+					`app_id`,
+					`block_id`,
+					`dialog_id`,
+					`col`,
+					`name`,
+					`req`,
+					`req_msg`,
+					`nosel`,
+					`focus`,
+					`width`,
+					`color`,
+					`font`,
+					`size`,
+					`mar`,
+					
+					".$cols."
+
+					`sort`,
+					`user_id_add`
+				) VALUES (
+					(SELECT `app_id` FROM `_block` WHERE `id`=".$block_id."),
+					".$block_id.",
+					".$el['dialog_id'].",
+					'".$el['col']."',
+					'".$el['name']."',
+					".$el['req'].",
+					'".$el['req_msg']."',
+					".$el['nosel'].",
+					".$el['focus'].",
+					".$el['width'].",
+					'".$el['color']."',
+					'".$el['font']."',
+					".$el['size'].",
+					'".$el['mar']."',
+					
+					".$vals."
+
+					".$el['sort'].",
+					".USER_ID."
+				)";
+		$new_id = query_id($sql);
+
+		_element('copy_vvv', $el, $new_id);
+
+		continue;
+
 
 		//копирование дочерних элементов
-		switch($r['dialog_id']) {
+		switch($el['dialog_id']) {
 			case 57://меню переключения блоков
 				$sql = "SELECT *
 						FROM `_element`
-						WHERE `parent_id`=".$r['id']."
+						WHERE `parent_id`=".$el['id']."
 						ORDER BY `sort`";
 				foreach(query_arr($sql) as $el) {
 					$blk = array();
@@ -1281,7 +1227,6 @@ function _blockElementCopy($PASTE, $pasteIds) {
 				query($sql);
 				break;
 		}
-
 	}
 }
 
