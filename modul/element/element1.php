@@ -1,11 +1,11 @@
 <?php
 
-/* [1] √‡ÎÓ˜Í‡ */
+/* [1] –ì–∞–ª–æ—á–∫–∞ */
 function _element1_struct($el) {
 	return array(
 		'def'   => _num($el['def']),
 
-		'txt_1' => $el['txt_1'] //ÚÂÍÒÚ ‰Îˇ „‡ÎÓ˜ÍË
+		'txt_1' => $el['txt_1'] //—Ç–µ–∫—Å—Ç –¥–ª—è –≥–∞–ª–æ—á–∫–∏
 	) + _elementStruct($el);
 }
 function _element1_struct_title($el) {

@@ -1,14 +1,14 @@
 <?php
 
 
-/* [9] Поле-пароль */
+/* [9] РџРѕР»Рµ-РїР°СЂРѕР»СЊ */
 function _element9_struct($el) {
 	return array(
 		'req'       => _num($el['req']),
 		'req_msg'   => $el['req_msg'],
 
-		'txt_1' => $el['txt_1'],     //текст для placeholder
-		'num_1' => _num($el['num_1'])//минимальное количество знаков
+		'txt_1' => $el['txt_1'],     //С‚РµРєСЃС‚ РґР»СЏ placeholder
+		'num_1' => _num($el['num_1'])//РјРёРЅРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р·РЅР°РєРѕРІ
 	) + _elementStruct($el);
 }
 function _element9_print($el, $prm) {

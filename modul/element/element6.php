@@ -1,16 +1,16 @@
 <?php
 
 
-/* [6] Select: выбор страницы */
+/* [6] Select: РІС‹Р±РѕСЂ СЃС‚СЂР°РЅРёС†С‹ */
 function _element6_struct($el) {
 	/*
-		содержание: PAGE_LIST
+		СЃРѕРґРµСЂР¶Р°РЅРёРµ: PAGE_LIST
 	*/
 	return array(
 		'req'       => _num($el['req']),
 		'req_msg'   => $el['req_msg'],
 
-		'txt_1' => $el['txt_1'] //текст, когда страница не выбрана
+		'txt_1' => $el['txt_1'] //С‚РµРєСЃС‚, РєРѕРіРґР° СЃС‚СЂР°РЅРёС†Р° РЅРµ РІС‹Р±СЂР°РЅР°
 	) + _elementStruct($el);
 }
 function _element6_js($el) {

@@ -1,9 +1,9 @@
 <?php
 
-/* [4] Заголовок */
+/* [4] Р—Р°РіРѕР»РѕРІРѕРє */
 function _element4_struct($el) {
 	return array(
-		'txt_1' => $el['txt_1'] //текст заголовка
+		'txt_1' => $el['txt_1'] //С‚РµРєСЃС‚ Р·Р°РіРѕР»РѕРІРєР°
 	) + _elementStruct($el);
 }
 function _element4_print($el) {

@@ -27,6 +27,7 @@ foreach(array(
 		require_once $file;
 }
 
+
 function _elementType($type, $el=array(), $prm=array()) {//все возможные варианты манипуляций
 	switch($type) {
 		//вывод элемента на экран
@@ -214,6 +215,7 @@ function _element($type, $el, $prm=array()) {//все манипуляции, с
 
 	return _elementType($type, $el, $prm);
 }
+
 
 /* [13] Выбор элемента из диалога или страницы */
 function _element13_struct($el) {

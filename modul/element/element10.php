@@ -1,9 +1,9 @@
 <?php
 
-/* [10] Произвольный текст */
+/* [10] РџСЂРѕРёР·РІРѕР»СЊРЅС‹Р№ С‚РµРєСЃС‚ */
 function _element10_struct($el) {
 	return array(
-		'txt_1' => $el['txt_1']     //текст
+		'txt_1' => $el['txt_1']     //С‚РµРєСЃС‚
 	) + _elementStruct($el);
 }
 function _element10_struct_title($el) {
