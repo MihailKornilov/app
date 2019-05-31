@@ -505,9 +505,9 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 		}
 	}
 
-	_spisokUnitUpd27($unit);
 	_spisokUnitUpd54($unit);
 	_spisokUnitUpd55($unit);
+	_spisokUnitUpd27($unit);
 
 	_counterGlobal($dialog['id'], $dialog);
 

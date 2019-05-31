@@ -1918,6 +1918,19 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 
 	foreach($dialog['cmp'] as $cmp_id => $cmp)
 		switch($cmp['dialog_id']) {
+			//Выбранные значения галочками
+			case 92: _elem92_cnn($dialog, $cmp, $unit); break;
+		}
+
+	foreach($dialog['cmp'] as $cmp_id => $cmp)
+		switch($cmp['dialog_id']) {
+			case 54: _spisokUnitUpd54($cmp); break;
+			case 55: _spisokUnitUpd55($cmp); break;
+			case 27: _spisokUnitUpd27($cmp); break;
+		}
+
+	foreach($dialog['cmp'] as $cmp_id => $cmp)
+		switch($cmp['dialog_id']) {
 			//обновление суммы, если какой-то элемент самого диалога участвует в подсчёте (для стартовых сумм)
 			case 27:
 				//получение компонентов диалога, которые отвечают за внесение данных (для поиска компонента, который участвует в подсчёте баланса)
@@ -1974,8 +1987,6 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 
 				_counterGlobal($cmp['num_1'], $dialog);
 				break;
-			//Выбранные значения галочками
-			case 92: _elem92_cnn($dialog, $cmp, $unit); break;
 		}
 }
 
