@@ -5288,6 +5288,76 @@ function _elem_11_dialog($el) {//получение данных диалога 
 
 
 
+
+
+
+
+
+function PHP12_counter_v($prm) {
+	if(!$u = $prm['unit_get'])
+		return _empty('Отсутствуют данные записи');
+	if(!$unit_id = _num($u['id']))
+		return _empty('Не получен ID записи');
+
+
+	$act = array(
+		1 => 'Внесение',
+		2 => 'Изменение',
+		3 => 'Удаление'
+	);
+
+	$actColor = array(
+		1 => 'bg-dfd',
+		2 => 'bg-ffc',
+		3 => 'bg-fcc'
+	);
+
+	$sql = "SELECT *
+			FROM `_counter_v`
+			WHERE `app_id`=".APP_ID."
+			  AND `unit_id`=".$unit_id."
+			ORDER BY `id` DESC
+			LIMIT 100";
+	if(!$spisok = query_arr($sql))
+		return _empty('Данных нет');
+
+
+	$send = '<table class="_stab small">'.
+				'<tr><th>Действие'.
+					'<th>Диалог'.
+					'<th>Сумма'.
+					'<th>Остаток'.
+					'<th>Дата внесения'.
+					'<th>Менеджер'.
+				'';
+
+	foreach($spisok as $r) {
+		$DLG = _dialogQuery($r['action_dialog_id']);
+		$send .= '<tr>'.
+					'<td class="'.$actColor[$r['action_type_id']].'">'.$act[$r['action_type_id']].
+					'<td>'.$DLG['name'].
+					'<td class="r">'.$r['sum'].
+					'<td class="r">'.$r['balans'].
+					'<td>'.$r['dtime_add'].
+					'<td>'._user($r['user_id_add'], 'name').
+					'';
+	}
+
+	$send .= '</table>';
+
+
+	return $send;
+}
+
+
+
+
+
+
+
+
+
+
 /* ---=== УКАЗАНИЕ ЭЛЕМЕНТОВ ПОД КОНКРЕТНОЕ ПРАВИЛО [1000] ===--- */
 function PHP12_elem_all_rule_setup($prm) {
 	if(!$rule_id = $prm['unit_get_id'])
