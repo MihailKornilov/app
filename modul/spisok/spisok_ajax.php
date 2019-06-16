@@ -661,6 +661,29 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 
 				$send[$COL_DLG_ID][$cmp_id] = $v;
 				break;
+			//Select: выбор колонки таблицы
+			case 37:
+				$send[$COL_DLG_ID][$cmp_id] = $v;
+				if(!$el = _elemOne($unit_id))
+					break;
+				if(!$v)
+					break;
+				if(empty($el['col']))
+					break;
+				if($el['col'] == $v)
+					break;
+
+				$old = explode('_', $el['col']);
+				$new = explode('_', $v);
+				if($old[0] != $new[0]) {
+					$is_err = 1;
+					$err_msg = 'Нельзя изменить тип колонки';
+					break;
+				}
+
+				//старое и новое имена колонки сохраняются для последующего переноса данных
+				define('ELEM37_CHANAGE_COL', $el['col'].'-'.$v);
+				break;
 			//страница ВК
 			case 300:
 				if(_elem300VkIdTest($DLG, $v, $unit_id)) {
@@ -1095,6 +1118,14 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 				SET `".$col."`='".addslashes($v)."'
 				WHERE `id`=".$uid[$tab];
 		query($sql);
+
+		$cmp = _elemOne($cmp_id);
+		//перенос данных, если было изменено имя колонки
+		if($cmp['dialog_id'] == 37)
+			if(defined('ELEM37_CHANAGE_COL')) {
+				$ex = explode('-', ELEM37_CHANAGE_COL);
+//				print_r($cmp);
+			}
 	}
 
 	return;

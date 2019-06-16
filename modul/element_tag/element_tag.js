@@ -521,11 +521,15 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 
 		if(tagret.hasClass('select-unit info'))
 			return;
+		if(tagret.hasClass('select-unit busy'))
+			return;
 		if(tagret.hasClass('select-unit')) {
 			valueSet(tagret.attr('val'));
 			o.func(VALUE);
 		} else {
 			var p = tagret.closest('.select-unit');
+			if(p.hasClass('busy'))
+				return;
 			if(p.hasClass('select-unit')) {
 				valueSet(p.attr('val'));
 				o.func(VALUE);
@@ -648,6 +652,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 				title:title,
 				content:content,
 				info:_num(sp.info),//флаг информационного значения. Значение нельзя выбрать.
+				busy:_num(sp.busy),//значение нельзя выбрать.
 				bg:sp.bg
 			};
 			MASS_SEL.push(unit);
@@ -671,9 +676,10 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 			if(is_sel[sp.id])
 				return;
 			var info = sp.info ? ' info' : '',
-				val = info ? '' : ' val="' + sp.id + '"',
+				busy = sp.busy ? ' busy' : '',
+				val = info || busy ? '' : ' val="' + sp.id + '"',
 				bg = sp.bg ? ' style="background-color:' + sp.bg + '"' : '';
-			html += '<div class="select-unit' + info + '"' + bg + val + '>' + sp.content + '</div>';
+			html += '<div class="select-unit' + info + busy + '"' + bg + val + '>' + sp.content + '</div>';
 		});
 
 		RES.html(html);

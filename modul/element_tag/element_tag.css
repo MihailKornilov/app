@@ -175,6 +175,10 @@
 	font-weight:bold;
 	cursor:default;
 }
+._select .select-unit.busy{
+	background-color:#FFF2EE;
+	cursor:default;
+}
 ._select .empty{
 	background-color:#eee;
 	padding:6px 8px;
