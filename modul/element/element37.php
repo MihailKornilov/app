@@ -177,4 +177,33 @@ function _elemVvv37parent($dlg_id, $send) {//колонки родительск
 
 	return $send;
 }
+function _elem37changeCol($cmp_id, $unit_id) {//перенос данных, если было изменено имя колонки
+	if(!defined('ELEM37_CHANAGE_COL'))
+		return;
+	if(!$cmp = _elemOne($cmp_id))
+		return;
+	if($cmp['dialog_id'] != 37)
+		return;
+	if(!$unit = _elemOne($unit_id))
+		return;
+	if(!$bl = _blockOne($unit['block_id']))
+		return;
+	if($bl['obj_name'] != 'dialog')
+		return;
+	//диалог, при помощи которого вносятся данные списка
+	if(!$DLG = _dialogQuery($bl['obj_id']))
+		return;
+
+	$ex = explode('-', ELEM37_CHANAGE_COL);
+
+	$sql = "UPDATE "._queryFrom($DLG)."
+			SET `".$ex[1]."`=`".$ex[0]."`,
+				`".$ex[0]."`=DEFAULT";
+	query($sql);
+}
+
+
+
+
+
 

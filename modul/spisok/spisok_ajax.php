@@ -1119,13 +1119,7 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 				WHERE `id`=".$uid[$tab];
 		query($sql);
 
-		$cmp = _elemOne($cmp_id);
-		//перенос данных, если было изменено имя колонки
-		if($cmp['dialog_id'] == 37)
-			if(defined('ELEM37_CHANAGE_COL')) {
-				$ex = explode('-', ELEM37_CHANAGE_COL);
-//				print_r($cmp);
-			}
+		_elem37changeCol($cmp_id, $unit_id);
 	}
 
 	return;
