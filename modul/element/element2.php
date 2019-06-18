@@ -8,8 +8,10 @@ function _element2_struct($el) {
 		'txt_1' => $el['txt_1'],        //текст кнопки
 		'num_1' => _num($el['num_1']),  //цвет
 		'num_2' => _num($el['num_2']),  //маленькая кнопка
-		'num_3' => _num($el['num_3']),  //передаёт данные записи
-		'num_4' => _num($el['num_4'])   //dialog_id, который назначен на эту кнопку
+		'num_3' => _num($el['num_3']),  //передаёт данные записи для отображения
+		'num_4' => _num($el['num_4']),  //dialog_id, который назначен на эту кнопку
+		'num_5' => _num($el['num_5']),  //передаёт данные записи для редактирования
+		'num_6' => _num($el['num_6'])   //передаёт данные записи для удаления
 	) + _elementStruct($el);
 }
 function _element2_struct_title($el) {
@@ -71,7 +73,7 @@ function _element2printVal($el, $prm) {//значения аттрибута val
 	$val = implode(',', $val);
 
 	if($dialog_id = $el['num_4'])
-		$val .= _dialogOpenVal($dialog_id, $prm, $el['num_3']);
+		$val .= _dialogOpenVal($dialog_id, $prm, $el);
 
 	return $val;
 }

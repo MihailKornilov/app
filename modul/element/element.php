@@ -4064,7 +4064,7 @@ function _dialogParent($dialog) {//получение диалога, отвеч
 	}
 	return $dialog;
 }
-function _dialogOpenVal($dialog_id, $prm, $unit_id_send) {//получение параметров открытия диалога для кнопки или блока
+function _dialogOpenVal($dialog_id, $prm, $EL_BUT) {//получение параметров открытия диалога для кнопки или блока
 	if(!$dialog_id)
 		return '';
 	if(!$dlg = _dialogQuery($dialog_id))
@@ -4081,10 +4081,15 @@ function _dialogOpenVal($dialog_id, $prm, $unit_id_send) {//получение �
 //				($dlg['spisok_on'] ? ',edit_id:'.$uid : '');
 
 	//передаёт id записи. Берётся со страницы, либо с единицы списка
-	if($unit_id_send)
-		return ',get_id:'.$uid;
+	$send = '';
+	if($EL_BUT['num_3'])
+		$send .= ',get_id:'.$uid;
+	if($EL_BUT['num_5'])
+		$send .= ',edit_id:'.$uid;
+	if($EL_BUT['num_6'])
+		$send .= ',del_id:'.$uid;
 
-	return '';
+	return $send;
 }
 function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
 	$cond = "`spisok_on`";
