@@ -198,7 +198,8 @@ function _elem37changeCol($cmp_id, $unit_id) {//перенос данных, е�
 
 	$sql = "UPDATE "._queryFrom($DLG)."
 			SET `".$ex[1]."`=`".$ex[0]."`,
-				`".$ex[0]."`=DEFAULT";
+				`".$ex[0]."`=DEFAULT
+			WHERE `dialog_id`=".$DLG['id'];
 	query($sql);
 }
 
