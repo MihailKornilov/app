@@ -282,7 +282,9 @@ body:not(.site){position:relative}
 	bottom:0;
 	left:0;
 	opacity:.6;
-	z-index:1;
+	z-index:2;
+	text-align:right;
+	font-size:11px;
 }
 .block-unit.level1{background:transparent repeat url("data:image/gif;base64,R0lGODlhEQARAJEAAAAAAP///8Hduv///yH5BAEAAAMALAAAAAARABEAAAIdnI+py+2vxJOILltvw4PH42khM4pQB05JGbbbOhUAOw==")}
 .block-unit.level2{background:transparent repeat url("data:image/gif;base64,R0lGODlhDwAPAJEAAAAAAP///8Hduv///yH5BAEAAAMALAAAAAAPAA8AAAIanI+py+0tYIqKzsuszWPL14WO9h2ecYomVAAAOw==")}
@@ -433,6 +435,25 @@ body:not(.site){position:relative}
 }
 #unit-flash.red div{background:#fcc}
 
+
+
+
+
+
+
+/* Имя колонки у элемента при настройке блоков */
+.elem-col{
+	position:absolute;
+	right:0;
+	top:0;
+	padding:2px 4px;
+	font-size:11px;
+	color:#00A000;
+	background-color:#efe;
+	border-bottom:#B7FFB7 solid 1px;
+	border-left:#B7FFB7 solid 1px;
+	z-index:1;
+}
 
 
 

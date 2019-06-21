@@ -694,7 +694,17 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 
 	$txt = _elemFormat($el, $prm, $txt);
 
-	return '<div'.$attr_id.$cls.$style.'>'.$txt.'</div>';
+	return
+	_elemDivCol($el, $prm).
+	'<div'.$attr_id.$cls.$style.'>'.$txt.'</div>';
+}
+function _elemDivCol($el, $prm) {
+	if(empty($el['col']))
+		return '';
+	if(!$prm['blk_setup'])
+		return '';
+
+	return '<div class="elem-col">'.$el['col'].'</div>';
 }
 function _elemFormat($el, $prm, $txt) {//формат значения элемента
 	$txt = _elemAction241($el, $prm, $txt);//подмена текста
