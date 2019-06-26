@@ -5,9 +5,8 @@ function _element52_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//разрешать комментарии к заметкам
 		'num_2'   => _num($el['num_2']) /* управление клавишами:
-											   0 - нет
-											9644 - внесение заметки при нажатии ENTER, перенос строки CTRL+ENTER
 											9645 - внесение заметки при нажатии CTRL+ENTER, перенос строки ENTER
+											9644 - внесение заметки при нажатии ENTER, перенос строки CTRL+ENTER
                                         */
 	) + _elementStruct($el);
 }
