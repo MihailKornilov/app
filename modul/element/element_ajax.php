@@ -497,11 +497,14 @@ switch(@$_POST['op']) {
 	case 'note_add'://добавление заметки
 		if(!$page_id = _num($_POST['page_id']))
 			jsonError('Некорректный ID страницы');
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента');
+		if(!$el = _elemOne($elem_id))
+			jsonError('Элемента '.$elem_id.' не существует');
 		if(!$txt = _txt(@$_POST['txt']))
 			jsonError('Отсутствует текст заметки');
 
 		$obj_id = _num($_POST['obj_id']);
-		$comm_on = _num($_POST['comm_on']);
 
 		$sql = "INSERT INTO `_note` (
 					`app_id`,
@@ -518,7 +521,7 @@ switch(@$_POST['op']) {
 				)";
 		query($sql);
 
-		$send['html'] = _noteList($page_id, $obj_id, $comm_on);
+		$send['html'] = _noteList($page_id, $obj_id, $el);
 
 		jsonSuccess($send);
 		break;
@@ -571,6 +574,10 @@ switch(@$_POST['op']) {
 		jsonSuccess();
 		break;
 	case 'note_comment_add'://добавление комментария
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента');
+		if(!$el = _elemOne($elem_id))
+			jsonError('Элемента '.$elem_id.' не существует');
 		if(!$note_id = _num($_POST['note_id']))
 			jsonError('Некорректный ID заметки');
 		if(!$txt = _txt(@$_POST['txt']))
@@ -603,7 +610,7 @@ switch(@$_POST['op']) {
 				  AND `parent_id`=".$note_id."
 				ORDER BY `id` DESC
 				LIMIT 1";
-		$send['html'] = _noteCommentUnit(query_assoc($sql));
+		$send['html'] = _noteCommentUnit($el, query_assoc($sql));
 
 		jsonSuccess($send);
 		break;

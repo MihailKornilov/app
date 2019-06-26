@@ -1466,19 +1466,37 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						NOTE_AREA = NOTE_TXT.find('textarea'),
 						NOTE_TXT_W = NOTE_TXT.width(),
 						noteAfterPrint = function() {
-							NOTE.find('textarea')._autosize();
+							NOTE.find('._note-list textarea').keyup(function(e) {
+									if(e.keyCode != 13)
+										return;
+
+									switch(el.num_2) {
+										case 9644://отправка сообщения по Enter
+											if(event.ctrlKey) {
+												this.value += "\n";
+												$(this)._autosize('update');
+												return;
+											}
+											break;
+										case 9645://отправка сообщения по CTRL+Enter
+											if(!event.ctrlKey)
+												return;
+											break;
+										default: return;
+									}
+									$(this).parents('._note-comment').find('.comment-ok').trigger('click');
+								});
 							NOTE.find('.comment-ok').click(function() {//внесение комментария
 								var t = $(this),
 									comm = t.parents('._note-comment'),
 									note = t.parents('._note-u'),
 									area = comm.find('textarea'),
 									txt = $.trim(area.val());
-								if(!txt) {
-									area.focus();
-									return;
-								}
+								if(!txt)
+									return area.focus();
 								var send = {
 									op:'note_comment_add',
+									elem_id:elm_id,
 									note_id:note.attr('val'),
 									txt:txt,
 									busy_cls:'busy',
@@ -1487,7 +1505,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								_post(send, function(res) {
 									t.closest('TABLE').before(res.html);
 									area.val('');
-									area.trigger('_autosize');
+									area._autosize('update');
 								});
 							});
 							NOTE.find('._note-to-cmnt').click(function() {//раскрытие комментариев
@@ -1522,7 +1540,23 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								});
 							});
 						};
-					NOTE_AREA.keyup(function() {
+					NOTE.find('textarea')._autosize();
+					NOTE_AREA.keyup(function(e) {
+						if(e.keyCode == 13)
+							switch(el.num_2) {
+								case 9644://отправка сообщения по Enter
+									if(event.ctrlKey) {
+										this.value += "\n";
+										$(this)._autosize('update');
+										return;
+									}
+									return NOTE.find('.note-ok').trigger('click');
+								case 9645://отправка сообщения по CTRL+Enter
+									if(!event.ctrlKey)
+										break;
+									return NOTE.find('.note-ok').trigger('click');
+							}
+
 						var v = $.trim(NOTE_AREA.val());
 						if(timer)
 							clearInterval(timer);
@@ -1540,15 +1574,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							return;
 						var send = {
 							op:'note_add',
+							elem_id:elm_id,
 							page_id:page_id,
 							obj_id:obj_id,
-							comm_on:el.num_1,
 							txt:txt,
 							busy_cls:'busy',
 							busy_obj:NOTE
 						};
 						_post(send, function(res) {
-							NOTE_AREA.val('').trigger('_autosize');
+							NOTE_AREA.val('')._autosize('update');
 							NOTE_TXT.width(NOTE_TXT_W);
 							NOTE.find('._note-list').html(res.html);
 							noteAfterPrint();
