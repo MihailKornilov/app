@@ -1618,27 +1618,27 @@ function _29cnnTitle($ids, $sp, $content=false) {//формирование со
 	//последний элемент для отображения
 	$last = _idsLast($ids);
 
-	if(!$el = _elemOne($last))
+	if(!$EL = _elemOne($last))
 		return $content ? '' : '- несуществующий элемент '.$last.' -';
 
-	switch($el['dialog_id']) {
+	switch($EL['dialog_id']) {
 		//текстовое поле
 		case 8:
 			$title = $sp;
 			foreach($ids as $id) {
-				if(!$el = _elemOne($id))
+				if(!$ell = _elemOne($id))
 					return $content ? '' : '- несуществующий элемент: '.$id.' -';
-				$title = $title[$el['col']];
+				$title = $title[$ell['col']];
 			}
 			return $title;
 		//сборный текст
 		case 44:
 			$prm = _blockParam();
 			$prm['unit_get'] = $sp;
-			return _element44_print($el, $prm);
+			return _element44_print($EL, $prm);
 	}
 
-	return $content ? '' : '- незвестный тип: '.$el['dialog_id'].' -';
+	return $content ? '' : '- незвестный тип: '.$EL['dialog_id'].' -';
 }
 
 
