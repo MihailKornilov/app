@@ -709,6 +709,7 @@ function _elemDivCol($el, $prm) {
 function _elemFormat($el, $prm, $txt) {//формат значения элемента
 	$txt = _elemAction241($el, $prm, $txt);//подмена текста
 	$txt = _elemAction243($el, $txt);//Формат для чисел
+	$txt = _elemAction245($el, $txt);//Формат для текста
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 	return $txt;
 }
@@ -877,6 +878,23 @@ function _elemAction244($el, $prm) {//скрытие элемента
 		}
 
 	return false;
+}
+function _elemAction245($el, $txt) {//Формат для текста
+	if(empty($el['action']))
+		return $txt;
+
+	foreach($el['action'] as $act) {
+		if($act['dialog_id'] != 245)
+			continue;
+		if(!$len = $act['apply_id'])
+			continue;
+		if($len >= mb_strlen($txt))
+			continue;
+
+		$txt = mb_substr($txt, 0, $len).'...';
+	}
+
+	return $txt;
 }
 function _elemStyle($el, $prm) {//стили css для элемента
 	$send = array();
