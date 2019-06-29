@@ -57,7 +57,7 @@ function _elem37v($el, $prm) {//получение значения колонк
 
 	$type = _elemColType($type_id);
 	foreach(_element37_vvv($el, $prm) as $r) {
-		if($r['busy'])
+		if(!empty($r['busy']))
 			continue;
 
 		$ex = explode('_', $r['id']);
