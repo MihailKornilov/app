@@ -711,6 +711,7 @@ function _elemFormat($el, $prm, $txt) {//формат значения элем�
 	$txt = _elemAction243($el, $txt);//Формат для чисел
 	$txt = _elemAction245($el, $txt);//Формат для текста
 	$txt = _spisokUnitUrl($el, $prm, $txt);
+	$txt = _noteLink($txt);
 	return $txt;
 }
 function _elemAction241($el, $prm, $txt) {//подмена текста
