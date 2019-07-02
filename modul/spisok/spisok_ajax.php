@@ -117,6 +117,8 @@ switch(@$_POST['op']) {
 			if(!_num($elem_filter))
 				continue;
 
+			$v = _element77filterSet($elem_filter, $v);
+
 			_spisokFilter('insert', array(
 				'spisok' => $elem_spisok,
 				'filter' => $elem_filter,
@@ -235,7 +237,7 @@ switch(@$_POST['op']) {
 				$mon = substr($v, 0, 7);
 				$dop = array(
 					'mon' => $mon,
-					'td_mon' => _filterCalendarMon($mon),
+					'td_mon' => _filterCalendarMon($r['elem'], $mon, $v),
 					'cnt' => _filterCalendarContent($r['elem'], $mon, $v)
 				);
 			}

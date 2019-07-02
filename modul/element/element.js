@@ -2036,6 +2036,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						});
 					});
 
+					//нажатие на месяц
+					CAL.click(function(e) {
+						var t = $(e.target);
+						if(!t.hasClass('monn'))
+							return;
+						CNT.find('.sel').removeClass('sel');
+						t.addClass('sel');
+						FILTER[el.num_1][elm_id] = t.attr('val');
+						_spisokUpdate(el.num_1);
+					});
+
 					//нажатие на неделю или на день
 					CNT.click(function(e) {
 						var t = $(e.target),
@@ -2043,6 +2054,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							week = t.hasClass('week-num'),
 							td = on ? t : t.parent();
 						if(on || week) {
+							CAL.find('.monn.sel').removeClass('sel');
 							CNT.find('.sel').removeClass('sel');
 							td.addClass('sel');
 							FILTER[el.num_1][elm_id] = t.attr('val');

@@ -487,9 +487,10 @@ switch(@$_POST['op']) {
 		else
 			$mon = !$next ? ($YEAR - 1).'-12' : $YEAR.'-'.($next < 10 ? 0 : '').$next;
 
+		$v = _spisokFilter('v', $el['id']);
 		$send['mon'] = $mon;
-		$send['td_mon'] = _filterCalendarMon($mon);
-		$send['cnt'] = _filterCalendarContent($el, $mon, _spisokFilter('v', $el['id']));
+		$send['td_mon'] = _filterCalendarMon($el, $mon, $v);
+		$send['cnt'] = _filterCalendarContent($el, $mon, $v);
 
 		jsonSuccess($send);
 		break;

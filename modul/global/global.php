@@ -28,9 +28,10 @@ require_once GLOBAL_DIR.'/modul/element_tag/element_tag.php';
 require_once GLOBAL_DIR.'/modul/element/element.php';
 require_once GLOBAL_DIR.'/modul/spisok/spisok.php';
 
+define('YEAR_CUR', strftime('%Y'));
+define('YEAR_MON', strftime('%Y-%m'));
 define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
-define('YEAR_CUR', strftime('%Y'));
 
 define('CODE', _txt(@$_COOKIE['code']));
 define('DEBUG', _num(@$_COOKIE['debug']));
