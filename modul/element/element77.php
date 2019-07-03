@@ -43,6 +43,9 @@ function _element77_print($el) {
 		'<div class="fc-cnt">'._filterCalendarContent($el, $mon, $v).'</div>'.
 	'</div>';
 }
+function _element77_title($el) {
+	return 'Фильтр-календарь '.$el['id'];
+}
 function _element77filterSet($elem_id, $v) {//подмена значения в фильтре, если встречается по умолчанию
 	if(!$el = _elemOne($elem_id))
 		return $v;
