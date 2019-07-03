@@ -3,7 +3,10 @@
 /* [73] Динамический путь даты */
 function _element73_struct($el) {
 	return array(
-		'num_1'   => _num($el['num_1'])//фильтр-календарь [13]
+		'num_1'   => _num($el['num_1']),//фильтр-календарь [13]
+		'num_2'   => _num($el['num_2']),//страница для годов
+		'num_3'   => _num($el['num_3']),//страница для месяцев
+		'num_4'   => _num($el['num_4']) //страница для дней
 	) + _elementStruct($el);
 }
 function _element73_print($el) {
@@ -14,10 +17,13 @@ function _element73_print($el) {
 	$ex = explode(':', $F['filter'][$el['num_1']]['v']);
 
 	$S = explode('-', $ex[0]);
-	$send =  $S[0].' » '._monthDef($S[1]);
+	$send =
+		($el['num_2'] ? '<a href="'.URL.'&p='.$el['num_2'].'" class="inhr">'.$S[0].'</a>' : $S[0]).
+		' » '.
+		($el['num_3'] ? '<a href="'.URL.'&p='.$el['num_3'].'&v1='.$S[0].'" class="inhr">'._monthDef($S[1]).'</a>' : _monthDef($S[1]));
 
 	if(isset($S[2]))
-		$send .= ' » '._num($S[2]);
+		$send .= ' » '.($el['num_4'] ? '<a href="'.URL.'&p='.$el['num_4'].'&v1='.'&v1='.$S[0].'-'.$S[1].'" class="inhr">'._num($S[2]).'</a>' : _num($S[2]));
 
 	if(isset($ex[1])) {
 		$E = explode('-', $ex[1]);
@@ -32,7 +38,10 @@ function _element73_print($el) {
 }
 function _element73_copy_field($el) {
 	return array(
-		'num_1'   => _num($el['num_1'])
+		'num_1' => _num($el['num_1']),
+		'num_2' => _num($el['num_2']),
+		'num_3' => _num($el['num_3']),
+		'num_4' => _num($el['num_4'])
 	);
 }
 function _element73filterUpd($send, $elem_spisok) {//обновление значения после применения фильтра
