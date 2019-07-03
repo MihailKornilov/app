@@ -20,12 +20,13 @@
 //подключение файлов-элементов
 foreach(array(
 			 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-			11,12,   14,
+			11,12,   14,15,
 			                        29,
 	                       36,37,
 			   52,
+			         64,
 			                           70,
-			                  77,      80,
+			      73,         77,   79,80,
 			            85,
 			                           90
         ) as $id) {
@@ -321,40 +322,6 @@ function PHP12_elem_rule7($prm) {/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МО
 	}
 
 	return $send;
-}
-
-/* [15] Количество строк списка */
-function _element15_struct($el) {
-	return array(
-		'num_1' => _num($el['num_1']),//id элемента, содержащего список, количество строк которого нужно выводить
-		'txt_1' => $el['txt_1'],      //показана "1"
-		'txt_2' => $el['txt_2'],      //запись   "1"
-		'txt_3' => $el['txt_3'],      //показано "2"
-		'txt_4' => $el['txt_4'],      //записи   "2"
-		'txt_5' => $el['txt_5'],      //показано "5"
-		'txt_6' => $el['txt_6'],      //записей  "5"
-		'txt_7' => $el['txt_7']       //сообщение об отсутствии записей
-	) + _elementStruct($el);
-}
-function _element15_print($el, $prm) {
-	return _elem15count($el, $prm);
-}
-function _elem15count($el, $prm=array()) {//формирование элемента с содержанием количества списка для вывода на страницу
-	if(!$elem_id = $el['num_1'])
-		return 'Список не указан.';
-	if(!$ELEM = _elemOne($elem_id))
-		return 'Элемента, содержащего список, не существует.';
-
-	//если результат нулевой, выводится сообщение из элемента, который размещает список
-	if(!$all = _spisokCountAll($ELEM, $prm))
-		return $el['txt_7'];
-
-	return
-	_end($all, $el['txt_1'], $el['txt_3'], $el['txt_5']).
-	' '.
-	$all.
-	' '.
-	_end($all, $el['txt_2'], $el['txt_4'], $el['txt_6']);
 }
 
 /* [16] Radio: произвольные значения */
@@ -1866,43 +1833,6 @@ function _element62_print($el, $prm) {
 	));
 }
 
-/* [64] Сумма значений списка */
-function _element64_struct($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),//список [13]
-		'num_2'   => _num($el['num_2']),//значение суммы [13]
-		'txt_1'   => $el['txt_1'],      //текст перед суммой
-		'txt_2'   => $el['txt_2']       //текст после суммой
-	) + _elementStruct($el);
-}
-function _element64_print($el, $prm) {
-	return _elem64sum($el, $prm);
-}
-function _elem64sum($el, $prm=array()) {
-	if(!$elem_id = $el['num_1'])
-		return '[64] Список не указан';
-	if(!$ELEM = _elemOne($elem_id))
-		return '[64] Элемента, содержащего список, не существует';
-
-	switch($ELEM['dialog_id']) {
-		case 14:
-		case 23: break;
-		default: return '[64] Элемент не является списком';
-	}
-
-	if(!$DLG = _dialogQuery($ELEM['num_1']))
-		return '[64] Диалога-списка не существует';
-	if(!$col = _elemCol($el['num_2']))
-		return '[64] Не найдена колонка значения суммы';
-
-	$sql = "SELECT SUM(`".$col."`)
-			FROM  "._queryFrom($DLG)."
-			WHERE "._spisokWhere($ELEM, $prm);
-	$sum = round(query_value($sql), 10);
-
-	return $el['txt_1'].' '._sumSpace($sum).' '.$el['txt_2'];
-}
-
 /* [66] Выбор цвета текста */
 function _element66_struct($el) {
 	return _elementStruct($el);
@@ -2206,82 +2136,6 @@ function _element78_print($el) {
 	}
 
 	return $send;
-}
-
-
-/* [79] Краткая сводка по списку */
-function _element79_struct($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),//id элемента, указывающего на список, по которому будет сводка [13]
-		'num_2'   => _num($el['num_2']),//id элемента, указывающего на сумму [13]
-		'txt_1'   => $el['txt_1'],      //текст, когда данных нет
-		'txt_2'   => $el['txt_2'],      //id элемента (с учётом вложений), указывающий на имена группировки [13]
-	) + _elementStruct($el);
-}
-function _element79_print($el) {
-	if(!$SPEL = _elemOne($el['num_1']))
-		return _emptyMinRed('[79] Не найден список');
-	if(!$DLG = _dialogQuery($SPEL['num_1']))
-		return _emptyMinRed('[79] Списка <b>'.$SPEL['num_1'].'</b> не существует.');
-
-	if(!$GROUP_EL = _elemOne(_idsFirst($el['txt_2'])))
-		return _emptyMinRed('[79] Отсутствует элемент для группировки');
-	if(!$GROUP_DLG = _dialogQuery($GROUP_EL['num_1']))
-		return _emptyMinRed('[79] Диалога <b>'.$GROUP_EL['num_1'].'</b> не существует.');
-	if(!$GROUP_COL_NAME = _elemCol(_idsLast($el['txt_2'])))
-		return _emptyMinRed('[79] Отсутствует колонка для имени груп');
-
-	if(!$GROUP_COL = _elemCol(_idsFirst($el['txt_2'])))
-		return _emptyMinRed('[79] Отсутствует колонка для группировки');
-	if($ism = $el['num_2'])
-		if(!$SUM_COL = _elemCol($ism))
-			return _emptyMinRed('[79] Отсутствует колонка для суммы');
-
-	$sql = "SELECT
-				`".$GROUP_COL."` `gid`,
-				COUNT(*) `c`
-				".($ism ? ",SUM(`".$SUM_COL."`) `sum`" : '')."
-			FROM   "._queryFrom($DLG)."
-			WHERE  "._spisokWhere($SPEL)."
-			GROUP BY `".$GROUP_COL."`";
-	if(!$arr = query_array($sql))
-		return $el['txt_1'];
-
-	//получение имён для групп
-	$sql = "SELECT
-				`t1`.`id`,
-				`".$GROUP_COL_NAME."`
-			FROM   "._queryFrom($GROUP_DLG)."
-			WHERE  "._queryWhere($GROUP_DLG)."
-			  AND `t1`.`id` IN ("._idsGet($arr, 'gid').")";
-	$ass = query_ass($sql);
-
-	$spisok = '';
-	$cAll = 0;
-	$sumAll = 0;
-	foreach($arr as $r) {
-		$spisok .=
-		'<tr><td>'.@$ass[$r['gid']].
-			'<td class="w70 center b color-555">'.$r['c'];
-		$cAll += $r['c'];
-		if($ism) {
-			$spisok .= '<td class="w90 r color-555">'._sumSpace($r['sum']);
-			$sumAll += $r['sum'];
-		}
-	}
-
-	return
-	'<table class="_stab small w100p">'.
-		'<tr><th>'.
-			'<th>Кол-во'.
-	($ism ? '<th>Сумма' : '').
-
-		$spisok.
-
-		'<tr><td class="r b">Всего:'.
-			'<td class="center b">'.$cAll.
-	($ism ? '<td class="r b">'._sumSpace($sumAll) : '').
-	'</table>';
 }
 
 /* [83] Фильтр: Select - привязанный список */

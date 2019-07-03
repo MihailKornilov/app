@@ -11,19 +11,12 @@ var _spisokUpdate = function(elem_spisok, func) {
 			if(res.clear_id)
 				_attr_cmp(res.clear_id)._dn(res.clear_diff);
 
-			//обновление количества [15], если есть
-			if(res.count_id)
-				_attr_el(res.count_id).html(res.count_html);
+			//обновление дополнительных значений
+			for(var i in res.upd) {
+				var u = res.upd[i];
+				_attr_el(u.id).html(u.html);
+			}
 
-			//обновление суммы [64], если есть
-			if(res.sum_id)
-				_attr_el(res.sum_id).html(res.sum_html);
-
-			//обновление группировки [79], если есть
-			if(res.group_id)
-				_attr_el(res.group_id).html(res.group_html);
-
-			_attr_el(res.spisok_id).html(res.spisok_html);
 			if(func)
 				func(res);
 		});

@@ -113,6 +113,12 @@ switch(@$_POST['op']) {
 		if(!is_array($elem_v))
 			jsonError('Некорректные значения фильров');
 
+		/* значения, которые будут обновлены вместе с обновлением списка
+				id - id элемента
+				html - содержание для обновления
+		*/
+		$send['upd'] = array();
+
 		foreach($elem_v as $elem_filter => $v) {
 			if(!_num($elem_filter))
 				continue;
@@ -126,38 +132,10 @@ switch(@$_POST['op']) {
 			));
 		}
 
-		//элемент количества, привязанный к списку
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=15
-				  AND `num_1`=".$elem_spisok."
-				LIMIT 1";
-		if($el15 = query_assoc($sql)) {
-			$send['count_id'] = $el15['id'];
-			$send['count_html'] = _elem15count($el15);
-		}
-
-		//элемент сумма, привязанный к списку
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=64
-				  AND `num_1`=".$elem_spisok."
-				LIMIT 1";
-		if($el64 = query_assoc($sql)) {
-			$send['sum_id'] = $el64['id'];
-			$send['sum_html'] = _elem64sum($el64);
-		}
-
-		//элемент группировки, привязанный к списку
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=79
-				  AND `num_1`=".$elem_spisok."
-				LIMIT 1";
-		if($el79 = query_assoc($sql)) {
-			$send['group_id'] = $el79['id'];
-			$send['group_html'] = _element79_print($el79);
-		}
+		$send = _element15filterUpd($send, $elem_spisok);
+		$send = _element64filterUpd($send, $elem_spisok);
+		$send = _element79filterUpd($send, $elem_spisok);
+		$send = _spisokFilterHtml($send, $elem_spisok);
 
 		//элемент "очистка фильтра", привязанный к списку
 		$sql = "SELECT *
@@ -170,9 +148,6 @@ switch(@$_POST['op']) {
 			$send['clear_diff'] = _spisokFilter('diff', $elem_spisok);
 		}
 
-		$send['spisok_id'] = $elem_spisok;
-		$spFunc = '_spisok'.$elSpisok['dialog_id'];
-		$send['spisok_html'] = $spFunc($elSpisok);
 		jsonSuccess($send);
 		break;
 	case 'spisok_filter_clear'://очистка фильтра
@@ -189,45 +164,14 @@ switch(@$_POST['op']) {
 
 		_spisokFilter('cache_clear');
 
-		//элемент количества, привязанный к списку
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=15
-				  AND `num_1`=".$spisok_id."
-				LIMIT 1";
-		if($elCount = query_assoc($sql)) {
-			$send['count_id'] = $elCount['id'];
-			$send['count_html'] = _elem15count($elCount);
-		}
-
-		//элемент сумма, привязанный к списку
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=64
-				  AND `num_1`=".$spisok_id."
-				LIMIT 1";
-		if($el64 = query_assoc($sql)) {
-			$send['sum_id'] = $el64['id'];
-			$send['sum_html'] = _elem64sum($el64);
-		}
-
-		//элемент группировки, привязанный к списку
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `dialog_id`=79
-				  AND `num_1`=".$spisok_id."
-				LIMIT 1";
-		if($el79 = query_assoc($sql)) {
-			$send['group_id'] = $el79['id'];
-			$send['group_html'] = _element79_print($el79);
-		}
-
-		$send['spisok_id'] = $spisok_id;
-		$spFunc = '_spisok'.$elSpisok['dialog_id'];
-		$send['spisok_html'] = $spFunc($elSpisok);
+		$send['upd'] = array();
+		$send = _element15filterUpd($send, $spisok_id);
+		$send = _element64filterUpd($send, $spisok_id);
+		$send = _element79filterUpd($send, $spisok_id);
+		$send = _spisokFilterHtml($send, $spisok_id);
 
 		//значения по умолчанию для фильтров списка
-		$def = array();
+		$send['def'] = array();
 		foreach(_spisokFilter('spisok', $spisok_id) as $r) {
 			$dialog_id = _num($r['elem']['dialog_id']);
 			$dop = array();
@@ -241,14 +185,13 @@ switch(@$_POST['op']) {
 					'cnt' => _filterCalendarContent($r['elem'], $mon, $v)
 				);
 			}
-			$def[] = array(
+			$send['def'][] = _arrNum(array(
 				'dialog_id' => $dialog_id,
 				'elem_id' => $r['elem']['id'],
 				'dop' => $dop,
 				'v' => $r['def']
-			);
+			));
 		}
-		$send['def'] = _arrNum($def);
 
 		$send['filter'] = _spisokFilter('page_js');
 

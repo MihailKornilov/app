@@ -152,6 +152,19 @@ function _spisokFilterInsert($spisok, $filter, $v) {//внесение ново�
 
 	return $v;
 }
+function _spisokFilterHtml($send, $spisok_id) {//получение данных списка после применения фильтра (через upd)
+	if(!$el = _elemOne($spisok_id))
+		return $send;
+
+	$spFunc = '_spisok'.$el['dialog_id'];
+
+	$send['upd'][] = array(
+		'id' => $spisok_id,
+		'html' => $spFunc($el)
+	);
+
+	return $send;
+}
 
 function _spisokIsSort($elem_id) {//определение, нужно ли производить сортировку этого списка (поиск элемента 71)
 	if(!$spisok_el = _BE('elem_arr', 'spisok', $elem_id))
