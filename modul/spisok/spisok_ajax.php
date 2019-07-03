@@ -1066,6 +1066,7 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 				WHERE `id`=".$uid[$tab];
 		query($sql);
 
+		_elem1def($cmp_id, $unit_id, $v);
 		_elem37changeCol($cmp_id, $unit_id);
 	}
 
