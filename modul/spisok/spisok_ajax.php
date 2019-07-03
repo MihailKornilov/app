@@ -134,6 +134,7 @@ switch(@$_POST['op']) {
 
 		$send = _element15filterUpd($send, $elem_spisok);
 		$send = _element64filterUpd($send, $elem_spisok);
+		$send = _element73filterUpd($send, $elem_spisok);
 		$send = _element79filterUpd($send, $elem_spisok);
 		$send = _spisokFilterHtml($send, $elem_spisok);
 
