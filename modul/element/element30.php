@@ -11,14 +11,11 @@ function _element30_struct($el) {
 function _element30_print($el, $prm) {
 	if(!$year = _num($_GET['v1']))
 		return _emptyMinRed('Не получен номер года для отображения списка');
-	if(!$spisok_id = $el['num_1'])
-		return _emptyMinRed('Не указан список');
-	if(!$DLG = _dialogQuery($spisok_id))
-		return _emptyMinRed('Не получены данные диалога '.$spisok_id);
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return _emptyMinRed('Не получены данные диалога '.$el['num_1']);
 	if(!$col = _elemCol($el['num_2']))
 		return _emptyMinRed('Не получено значение суммы');
-		
-	
+
 	$sql = "SELECT
 				DISTINCT(DATE_FORMAT(`dtime_add`,'%c')) AS `id`,
 				SUM(`".$col."`) `sum`

@@ -2267,7 +2267,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 400:
 					$('#chart_' + elm_id)
 						.height(300)
-						.width(980)
+						.width(window['WIDTH_' + elm_id])
 						.highcharts({
 							chart:{
 								type:'column'
@@ -2286,6 +2286,49 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							yAxis:{
 								title:{
 									text:'Количество'
+								},
+						        stackLabels:{
+							        enabled:true,
+							        style:{
+								        fontWeight:'bold',
+								        color:'black'
+							        }
+						        }
+							},
+							plotOptions:{
+								column:{
+									stacking:'normal',
+									dataLabels:{
+										enabled:false
+									}
+								}
+							},
+							series:window['SERIES_' + elm_id]
+						});
+					return;
+				//График по месяцам
+				case 401:
+					$('#chart_' + elm_id)
+						.height(300)
+						.width(window['WIDTH_' + elm_id])
+						.highcharts({
+							chart:{
+								type:'line'
+							},
+							title:{
+								text:el.txt_1
+							},
+							xAxis:{
+								categories:window['CAT_' + elm_id],
+								labels:{
+									style:{
+										color:'#333'
+									}
+								}
+							},
+							yAxis:{
+								title:{
+									text:'Сумма'
 								},
 						        stackLabels:{
 							        enabled:true,

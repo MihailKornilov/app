@@ -1,8 +1,18 @@
 <?php
-/* ---=== ЭЛЕМЕНТЫ-ГРАФИКИ ===--- */
 
-
-function _elem400($el, $prm) {//График: столбики
+/* [400] График: столбики */
+function _element400_struct($el) {
+	return array(
+		'txt_1'   => $el['txt_1'],     //заголовок
+		'num_1'   => _num($el['num_1'])//список (id диалога) [24]
+	) + _elementStruct($el);
+}
+function _element400_js($el) {
+	return array(
+		'txt_1' => $el['txt_1']
+	) + _elementJs($el);
+}
+function _element400_print($el, $prm) {
 	if(!$DLG = _dialogQuery($el['num_1']))
 		return _emptyMinRed('График-столбики: диалога '.$el['num_1'].' не существует.');
 	if($prm['blk_setup'])
@@ -39,14 +49,11 @@ function _elem400($el, $prm) {//График: столбики
 	return
 	'<div id="chart_'.$el['id'].'"></div>'.
 	'<script>'.
-		'var CAT_'.$el['id'].'=['.implode(',', $days).'],
+		'var WIDTH_'.$el['id'].'='._elemWidth($el).',
+			 CAT_'.$el['id'].'=['.implode(',', $days).'],
 			 SERIES_'.$el['id'].'=[{'.
 				'name:"Все записи",'.
 				'data:['.implode(',', $data).']'.
 			'}];'.
 	'</script>';
 }
-
-
-
-

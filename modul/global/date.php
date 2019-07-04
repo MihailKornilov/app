@@ -42,9 +42,8 @@ function _monthDef($n=0, $firstUp=false) {
 		$send[0] = strtoupper($send[0]);
 	return $send;
 }
-function _monthCut($n) {
+function _monthCut($n=0) {
 	$mon = array(
-		0 => '',
 		1 => 'янв',
 		2 => 'фев',
 		3 => 'мар',
@@ -58,7 +57,16 @@ function _monthCut($n) {
 		11 => 'ноя',
 		12 => 'дек'
 	);
-	return $mon[intval($n)];
+
+	if(!$n)
+		return $mon;
+
+	$n = intval($n);
+
+	if(!isset($mon[$n]))
+		return '';
+
+	return $mon[$n];
 }
 function _monthLost($dtime) {//проверка, прошло ли 30 дней
 	return strtotime($dtime) - time() + 60 * 60 * 24 * 30 > 0 ? 0 : 1;

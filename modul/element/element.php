@@ -35,6 +35,14 @@ foreach(array(
 		require_once $file;
 }
 
+//подключение элементов-графиков
+foreach(array(400,401) as $id) {
+	$file = GLOBAL_DIR.'/modul/element/chart/element'.$id.'.php';
+	if(file_exists($file))
+		require_once $file;
+}
+
+
 
 function _elementType($type, $el=array(), $prm=array()) {//все возможные варианты манипуляций
 	switch($type) {
@@ -2832,21 +2840,6 @@ function _elem300VkIdTest($DLG, $v, $user_id) {//проверка, чтобы д
 	return false;
 }
 
-/* [400] График: столбики */
-function _element400_struct($el) {
-	return array(
-		'txt_1'   => $el['txt_1'],     //заголовок
-		'num_1'   => _num($el['num_1'])//список (id диалога) [24]
-	) + _elementStruct($el);
-}
-function _element400_js($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	) + _elementJs($el);
-}
-function _element400_print($el, $prm) {
-	return _elem400($el, $prm);
-}
 
 
 
@@ -4261,6 +4254,26 @@ function _elemUids($ids, $u) {//получение значения записи
 	return '';
 }
 
+function _elemWidth($el) {//получение ширины поля, в котором расположен элемент
+	if(!is_array($el))
+		if($el = _num($el))
+			$el = _elemOne($el);
+	if(empty($el['block']))
+		return 0;
+
+	$BL = $el['block'];
+	$width = $BL['width'];
+
+	$mar = explode(' ', $el['mar']);
+	$width -= $mar[1];
+	$width -= $mar[3];
+
+	$bor = explode(' ', $BL['bor']);
+	$width -= $bor[1];
+	$width -= $bor[3];
+
+	return $width;
+}
 
 
 
