@@ -21,7 +21,7 @@
 foreach(array(
 			 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 			11,12,   14,15,
-			                        29,
+			                        29,30,
 	                       36,37,
 			   52,
 			         64,
@@ -762,50 +762,6 @@ function _element28_print11($el, $u) {
 	return _attachLink(@$u[$col], $width);
 }
 
-/* [30] Иконка удаления записи */
-function _element30_struct($el) {
-	return array(
-		'num_1'   => _num($el['num_1'])//иконка красного цвета
-	) + _elementStruct($el);
-}
-function _element30_struct_title($el) {
-	$el['title'] = 'DEL';
-	return $el;
-}
-function _element30_print($el, $prm) {
-	if($prm['blk_setup'])
-		return _iconDel(array(
-			'red' => $el['num_1'],
-			'class'=>'curD'
-		));
-	if(!$u = $prm['unit_get'])
-		return _iconDel(array(
-			'red' => $el['num_1'],
-			'class'=>'curD'
-		));
-
-	if(!$dlg_id = _num(@$u['dialog_id_use']))
-		return _msgRed('-dlg-id-yok-');
-	if(!$dlg = _dialogQuery($dlg_id))
-		return _msgRed('-dlg-yok-');
-	//иконка не выводится, если удаление запрещено
-	if(!$dlg['del_on'])
-		return '';
-	//иконка не выводится, если наступили другие сутки
-	if($dlg['del_cond']['num_2']) {
-		$day = explode(' ', $u['dtime_add']);
-		if(TODAY != $day[0])
-			return '';
-	}
-
-	return
-	_iconDel(array(
-		'red' => $el['num_1'],
-		'class' => 'dialog-open pl',
-		'val' => 'dialog_id:'.$dlg_id.',del_id:'.$u['id']
-	));
-}
-
 /* [31] Выбор нескольких значений галочками */
 function _element31_struct($el) {
 	return array(
@@ -1012,35 +968,6 @@ function _element33TT($el, $u, $data) {//подсказка кто внёс за
 	$tt = 'Вн'.($user['pol'] == 1 ? 'есла' : 'ёс').' '.$user['i'].' '.$user['f'];
 
 	return '<span class="inhr curD'._tooltip($tt, -40).$data.'<span>';
-}
-
-/* [34] Иконка редактирования записи */
-function _element34_struct($el) {
-	return _elementStruct($el);
-}
-function _element34_struct_title($el) {
-	$el['title'] = 'EDIT';
-	return $el;
-}
-function _element34_print($el, $prm) {
-	if($prm['blk_setup'])
-		return _iconEdit(array('class'=>'curD'));
-	if(!$u = $prm['unit_get'])
-		return _iconEdit(array('class'=>'curD'));
-	if(!$dlg_id = _num(@$u['dialog_id_use']))
-		return _msgRed('-dlg-id-yok-');
-	if(!$dlg = _dialogQuery($dlg_id))
-		return _msgRed('-dlg-yok-');
-
-	//иконка не выводится, если редактирование запрещено
-	if(!$dlg['edit_on'])
-		return '';
-
-	return
-	_iconEdit(array(
-		'class' => 'dialog-open pl',
-		'val' => 'dialog_id:'.$dlg_id.',edit_id:'.$u['id']
-	));
 }
 
 /* [35] Count: количество */
