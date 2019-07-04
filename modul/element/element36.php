@@ -3,7 +3,7 @@
 /* [36] Иконка */
 function _element36_struct($el) {
 	return array(
-		'num_1'   => _num($el['num_1']),//id иконки
+		'num_1'   => _num($el['num_1']),//id иконки из _element36type
 		'num_2'   => _num($el['num_2']),//изменять яркость при наведении мышкой
 		'num_3'   => _num($el['num_3']),//курсор рука при наведении, иначе стрелочка
 		'txt_1' => $el['txt_1']         //подсказка
