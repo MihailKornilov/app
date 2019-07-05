@@ -26,8 +26,8 @@ function _element30_print($el, $prm) {
 	$mon = query_ass($sql);
 
 	$itog = 0;
-	$send = '<table class="_stab">'.
-				'<tr><th>Месяц'.
+	$send = '<table class="_stab w100p">'.
+				'<tr><th class="w125">Месяц'.
 					'<th>Сумма';
 	for($n = 1; $n <= 12; $n++) {
 		$sum = '';
@@ -36,7 +36,8 @@ function _element30_print($el, $prm) {
 			$itog += $mon[$n];
 		}
 		$send .=
-			'<tr><td class="r color-555">'._monthDef($n, 1).' '.$year.
+			'<tr class="over1">'.
+				'<td class="r color-555">'._monthDef($n, 1).' '.$year.
 				'<td class="r">'.$sum;
 	}
 	$send .=
