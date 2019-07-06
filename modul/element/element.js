@@ -2158,6 +2158,38 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 					ELM_RELOAD[el.num_1] = el.id;
 					return;
+				//Таблица из нескольких списков
+				case 88:
+					//выбор значений галочками
+					_forN(vvv, function(sp) {
+						if(sp.dialog_id == 91) {
+							_forEq(ATR_EL.find('._check'), function(eq) {
+								//получение id записи
+								var tdid = eq.attr('id').split('_')[1];
+
+								//выбор/снятие всех галочек
+								if(tdid == 'all') {
+									$('#sch' + sp.id + '_all')._check({
+										func:function(v) {
+											_forEq(ATR_EL.find('._check'), function(eqAll) {
+												var ch = eqAll.prev();
+												if(ch.attr('id').split('_')[1] == 'all')
+													return;
+												ch._check(v);
+											});
+										}
+									});
+									return;
+								}
+
+								eq.prev()._check();
+							});
+							return false;
+						}
+					});
+
+					return;
+
 				//Выбранные значения галочками
 				case 92:
 					if(unit.id)
@@ -2901,18 +2933,27 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
-	_tdCss = function() {//настройка стилей в выплывающем окошке для ячейки таблицы
-		var INP = $(this),
-			v = {
-				id:_num(INP.attr('val')),
-				font:'',
-				color:''
-			};
+	_tdCss = function(inp) {//настройка стилей в выплывающем окошке для ячейки таблицы
+		var v = {
+			id:_num(inp.attr('val')),
+			font:'',
+			color:'',
+			pos:''
+		};
 
 		if(!v.id)
 			return;
 
-		INP._hint({
+		_forIn(inp.attr('class').split(' '), function(sp) {
+			if(sp == 'b' || sp == 'i' || sp == 'u')
+				v.font += ' ' + sp;
+			if(sp == 'center' || sp == 'r')
+				v.pos = sp;
+			if(ELEM_COLOR[sp])
+				v.color = sp;
+		});
+
+		inp._hint({
 			msg:'<table class="bs5">' +
 					'<tr><td class="pt3">' + _elemUnitFont(v) +
 						'<td class="pt3">' + _elemUnitColor(v) +
@@ -4217,7 +4258,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				});
 			})
 			//отображение выплывающего окна настройки стилей
-			.mouseenter(_tdCss)
+			.mouseenter(function() {
+				_tdCss($(this));
+			})
 			.end()
 			.find('.icon').click(function() {
 				var inp = $(this)._dn().next();
