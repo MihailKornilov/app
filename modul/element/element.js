@@ -2933,18 +2933,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
-	_tdCss = function(inp) {//настройка стилей в выплывающем окошке для ячейки таблицы
-		var v = {
-			id:_num(inp.attr('val')),
-			font:'',
-			color:'',
-			pos:''
-		};
+	_tdCss = function() {//настройка стилей в выплывающем окошке для ячейки таблицы
+		var t = $(this),
+			v = {
+				id:t.attr('id').split('_')[1],//если используется элемент не из базы, можно ставить id="el_sp14"
+				use:t.attr('data-use') || 'font color eye link place',//использование вариантов настроек
+				font:'',
+				color:'',
+				pos:''
+			};
 
 		if(!v.id)
 			return;
 
-		_forIn(inp.attr('class').split(' '), function(sp) {
+		_forIn(t.attr('class').split(' '), function(sp) {
 			if(sp == 'b' || sp == 'i' || sp == 'u')
 				v.font += ' ' + sp;
 			if(sp == 'center' || sp == 'r')
@@ -2953,17 +2955,29 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				v.color = sp;
 		});
 
-		inp._hint({
-			msg:'<table class="bs5">' +
-					'<tr><td class="pt3">' + _elemUnitFont(v) +
-						'<td class="pt3">' + _elemUnitColor(v) +
-						'<td class="pt3 pl10">' +
-							'<div class="icon icon-eye pl' + _tooltip('Условия отображения', -67) + '</div>' +
-						'<td class="pl3">' +
-							'<div class="icon icon-link pl' + _tooltip('Настроить ссылку', -57) + '</div>' +
-						'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v, true) +
-				'</table>' +
-				'',
+		//преобразование вариантов настроек в ассоциативный массив
+		var use = {};
+		_forIn(v.use.split(' '), function(sp) {
+			use[sp] = 1;
+		});
+
+		var msg = '<table class="bs5"><tr>';
+		if(use.font)
+			msg += '<td class="pt3">' + _elemUnitFont(v);
+		if(use.color)
+			msg += '<td class="pt3">' + _elemUnitColor(v);
+		if(use.eye)
+			msg += '<td class="pt3 pl10">' +
+					  '<div class="icon icon-eye pl' + _tooltip('Условия отображения', -67) + '</div>';
+		if(use.link)
+			msg += '<td class="pl3">' +
+					  '<div class="icon icon-link pl' + _tooltip('Настроить ссылку', -57) + '</div>';
+		if(use.place)
+			msg += '<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v, true);
+		msg += '</table>';
+
+		t._hint({
+			msg:msg,
 			side:'right',
 			show:1,
 			delayShow:700,
@@ -2987,6 +3001,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				});
 			}
 		});
+	},
+	_tdCssFontGet= function(sp) {//получение стилей для сохранения (выделение: b, i, u)
+		var arr = ['b', 'i', 'u'],
+			font = [];
+		for(var k in arr)
+			if(sp.hasClass(arr[k]))
+				font.push(arr[k]);
+		return font.join(' ');
+	},
+	_tdCssColorGet= function(sp) {//получение стилей для сохранения (цвет текста)
+		for(var k in ELEM_COLOR)
+			if(sp.hasClass(k))
+				return k;
+		return '';
 	},
 
 	/* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
@@ -3882,27 +3910,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			//TH-заголовок
 			v.txt_7 = sp.find('.th-name').val();
-
-			//выделение: b, i, u
-			var arr = ['b', 'i', 'u'],
-				font = [];
-			for(var k in arr)
-				if(inp.hasClass(arr[k]))
-					font.push(arr[k]);
-			v.font = font.join(' ');
+			v.font = _tdCssFontGet(inp);
+			v.color = _tdCssColorGet(inp);
 
 			//позиция
-			arr = ['center', 'r'];
+			var arr = ['center', 'r'];
 			v.txt_8 = '';
 			for(k in arr)
 				if(inp.hasClass(arr[k]))
 					v.txt_8 = arr[k];
 
-			//цвет текста
-			v.color = '';
-			for(k in ELEM_COLOR)
-				if(inp.hasClass(k))
-					v.color = k;
 
 			send.push(v);
 		});
@@ -4258,9 +4275,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				});
 			})
 			//отображение выплывающего окна настройки стилей
-			.mouseenter(function() {
-				_tdCss($(this));
-			})
+			.mouseenter(_tdCss)
 			.end()
 			.find('.icon').click(function() {
 				var inp = $(this)._dn().next();
@@ -4281,13 +4296,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(!v.id)
 				return;
 
-			//выделение: b, i, u
-			var arr = ['b', 'i', 'u'],
-				font = [];
-			for(var k in arr)
-				if(sp.hasClass(arr[k]))
-					font.push(arr[k]);
-			v.font = font.join(' ');
+			v.font = _tdCssFontGet(sp);
 
 			//позиция
 			arr = ['center', 'r'];
@@ -4669,13 +4678,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА [34] ===--- */
 	PHP12_elem34_setup = function(el, vvv, obj) {
+		if(!obj.unit.id)
+			return;
+
 		var ATR_EL = _attr_el(el.id),
 			html = '<dl></dl>' +
 				   '<table class="w100p"><tr>' +
 				        '<td><div class="fs15 color-555 pad10 center over1 curP add34-txt">Добавить текст</div>' +
 				        '<td><div class="fs15 color-555 pad10 center over1 curP add34-el">Добавить элемент</div>' +
 				   '</table>',
-			DL = ATR_EL.append(html).find('dl');
+			DL = ATR_EL.append(html).find('dl'),
+			NUM = 1;
 
 		ATR_EL.find('.add34-txt').click(addTxt);
 		ATR_EL.find('.add34-el').click(addEl);
@@ -4695,7 +4708,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//добавление текстового поля
 		function addTxt(v) {
 			v = $.extend({
-				txt:''      //содержание текста
+				txt:'',      //содержание текста
+				font:'',
+				color:''
 			}, v || {});
 
 			DL.append(
@@ -4703,15 +4718,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td><textarea class="w100p h25" style="background-color:#fff">' + v.txt + '</textarea>' +
+							'<td><textarea class="w100p h25 ' + v.font + ' ' + v.color + '"' +
+										 ' style="background-color:#fff"' +
+										 ' id="' + ATTR_EL('area' + NUM++, true) + '"' +
+										 ' data-use="font color">' + v.txt +
+								'</textarea>' +
 							'<td class="w50 r">' +
 								'<div class="icon icon-del-red pl' + _tooltip('Удалить', -25) + '</div>' +
 					'</table>' +
 				'</dd>'
 			);
 
-			var DD = DL.find('dd:last');
+			var DD = DL.find('dd:last'),
+				AREA = DD.find('textarea');
+
+			//отображение выплывающего окна настройки стилей
+			AREA.mouseenter(_tdCss);
+
 			DL.sortable({handle:'.icon-move-y'});
+
 			DD.find('.icon-del-red').click(function() {
 				$(this).closest('DD').remove();
 			});
@@ -4723,7 +4748,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			v = $.extend({
 				id:0,         //id элемента
 				dialog_id:50, //id диалога, через который был вставлен этот элемент
-				title:''      //имя элемента
+				title:'',     //имя элемента
+				font:'',
+				color:''
 			}, v || {});
 
 			DL.append(
@@ -4733,10 +4760,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="prel">' +
 								'<input type="text"' +
-									  ' class="inp w100p curP bg-gr2"' +
+									  ' id="' + ATTR_EL(v.id, true) + '"' +
+									  ' class="inp w100p curP bg-gr2 ' + v.font + ' ' + v.color + '"' +
 									  ' readonly' +
 									  ' placeholder="элемент не выбран"' +
 									  ' value="' + v.title + '"' +
+									  ' data-use="font color link eye"' +
 								' />' +
 								'<div class="icon icon-star pabs top6 r5"></div>' +
 							'<td class="w50 r">' +
@@ -4747,6 +4776,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			var DD = DL.find('dd:last'),
 				INP = DD.find('.inp');
+
 			INP.click(function() {
 				_dialogLoad({
 					dialog_id:v.dialog_id,
@@ -4766,7 +4796,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					}
 				});
 			});
+
+			//отображение выплывающего окна настройки стилей
+			INP.mouseenter(_tdCss);
+
 			DL.sortable({handle:'.icon-move-y'});
+
 			DD.find('.icon-del-red').click(function() {
 				$(this).closest('DD').remove();
 				v.id = 0;
@@ -4778,21 +4813,27 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			switch(sp.attr('data-type')) {
 				case 'txt':
-					var txt = sp.find('textarea').val();
+					var area = sp.find('textarea'),
+						txt = area.val();
 					if(!txt)
 						return;
 					send.push({
 						type:'txt',
-						txt:txt
+						txt:txt,
+						font:_tdCssFontGet(area),
+						color:_tdCssColorGet(area)
 					});
 					return;
 				case 'el':
-					var id = _num(sp.attr('val'));
+					var inp = sp.find('.inp'),
+						id = _num(sp.attr('val'));
 					if(!id)
 						return;
 					send.push({
 						type:'el',
-						id:id
+						id:id,
+						font:_tdCssFontGet(inp),
+						color:_tdCssColorGet(inp)
 					});
 					return;
 			}

@@ -14,6 +14,8 @@ function _element34_struct_vvv($el, $cl) {
 		'id'        => _num($cl['id']),
 		'title'     => $cl['title'],
 		'dialog_id' => _num($cl['dialog_id']),
+		'font'      => $cl['font'],
+		'color'     => $cl['color'],
 		'txt_1'     => $cl['txt_1'],      //для [10]
 		'txt_2'     => $cl['txt_2'],      //ids из [11]
 		'num_1'     => _num($cl['num_1']),
@@ -37,6 +39,7 @@ function _element34_print($el, $prm) {
 	foreach($json as $r)
 		switch($r['type']) {
 			case 'txt':
+				$r['txt'] = _elem34css($r['txt'], $r);
 				$send .= _br($r['txt']);
 				break;
 			case 'el':
@@ -44,6 +47,7 @@ function _element34_print($el, $prm) {
 					break;
 
 				$txt = _element('print', $ell, $prm);
+				$txt = _elem34css($txt, $ell);
 //				$txt = _elemFormat($ell, $prm, $txt);
 //				$txt = _spisokColSearchBg($el, $txt);
 				$send .= $txt;
@@ -52,7 +56,11 @@ function _element34_print($el, $prm) {
 
 	return $send;
 }
-
+function _elem34css($txt, $r) {//применение стилей к значению
+	if(empty($r['font']) && empty($r['color']))
+		return $txt;
+	return '<span class="'.$r['font'].' '.$r['color'].'" style="font-size:inherit">'.$txt.'</span>';
+}
 
 
 
@@ -66,6 +74,9 @@ function PHP12_elem34_setup($prm) {
 	/*
 		все действия через JS
 	*/
+	if(!$prm['unit_edit'])
+		return _emptyMin('Настройка сборного текста будет доступна<br>после вставки элемента в блок.');
+
 	return '';
 }
 function PHP12_elem34_setup_save($cmp, $val, $unit) {//сохранение содержания Сборного текста
@@ -103,6 +114,16 @@ function PHP12_elem34_setup_save($cmp, $val, $unit) {//сохранение со
 				case 'el':
 					if(!$id = _num($r['id']))
 						break;
+
+					$sql = "UPDATE `_element`
+							SET `font`='".$r['font']."',
+								`color`='".$r['color']."'
+							WHERE `id`=".$id;
+					query($sql);
+
+					unset($r['font']);
+					unset($r['color']);
+
 					$json[] = $r;
 					$ids .= ','.$id;
 					break;
@@ -145,6 +166,8 @@ function PHP12_elem34_setup_vvv($prm) {
 			$ell = $vvv[$r['id']];
 			$json[$n]['dialog_id'] = $ell['dialog_id'];
 			$json[$n]['title'] = $ell['title'];
+			$json[$n]['font'] = $ell['font'];
+			$json[$n]['color'] = $ell['color'];
 		}
 
 	return $json;
