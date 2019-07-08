@@ -3,66 +3,89 @@
 /* [44] Сборный текст */
 function _element44_struct($el) {
 	/*
-		настройка значений через PHP12_44_setup
+		настройка значений через PHP12_elem34_setup
 	*/
-	return _elementStruct($el);
+	return array(
+		'txt_1'   => $el['txt_1']//содержание (из настройки значений)
+	) +_elementStruct($el);
 }
 function _element44_struct_vvv($el, $cl) {
 	return array(
 		'id'        => _num($cl['id']),
 		'title'     => $cl['title'],
 		'dialog_id' => _num($cl['dialog_id']),
+		'font'      => $cl['font'],
+		'color'     => $cl['color'],
 		'txt_1'     => $cl['txt_1'],      //для [10]
 		'txt_2'     => $cl['txt_2'],      //ids из [11]
 		'num_1'     => _num($cl['num_1']),
 		'num_2'     => _num($cl['num_2']),
 		'num_3'     => _num($cl['num_3']),
 		'num_4'     => _num($cl['num_4']),
-		'num_5'     => _num($cl['num_5']),
-		'num_8'     => _num($cl['num_8']) //пробел справа
+		'num_5'     => _num($cl['num_5'])
 	);
 }
 function _element44_print($el, $prm) {
-	if(empty($el['vvv']))
+	if(empty($el['txt_1']))
 		return $el['title'];
 
+	$vvv = array();
+	if(!empty($el['vvv']))
+		foreach($el['vvv'] as $r)
+			$vvv[$r['id']] = $r;
+
+	$json = json_decode($el['txt_1'], true);
 	$send = '';
-	foreach($el['vvv'] as $ell) {
-		$txt = _element('print', $ell, $prm);
-		$txt = _elemFormat($ell, $prm, $txt);
-		$txt = _spisokColSearchBg($el, $txt);
-		$send .= $txt;
-		if($ell['num_8'])
-			$send .= ' ';
+	foreach($json as $r)
+		switch($r['type']) {
+			case 'txt':
+				$r['txt'] = _elem44css($r['txt'], $r);
+				$send .= _br($r['txt']);
+				break;
+			case 'el':
+				if(!$ell = $vvv[$r['id']])
+					break;
+
+				$txt = _element('print', $ell, $prm);
+				$txt = _elem44css($txt, $ell);
+				$txt = _elemFormat($ell, $prm, $txt);
+				$txt = _spisokColSearchBg($el, $txt);
+				$send .= $txt;
+			break;
 	}
 
 	return $send;
 }
-function _element44_print11($el, $u) {
+function _element34_print11($el, $u) {
 	$prm = _blockParam();
 	$prm['unit_get'] = $u;
 
 	return  _element44_print($el, $prm);
 }
+function _elem44css($txt, $r) {//применение стилей к значению
+	if(empty($r['font']) && empty($r['color']))
+		return $txt;
+	return '<span class="'.$r['font'].' '.$r['color'].'" style="font-size:inherit">'.$txt.'</span>';
+}
+
+
+
+
 
 
 
 
 /* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА для [44] ===--- */
-function PHP12_44_setup($prm) {
+function PHP12_elem44_setup($prm) {
 	/*
 		все действия через JS
-
-		num_8 - пробел справа от значения
-		txt_2 - ID элементов-значений, составляющих сборный текст
 	*/
-
 	if(!$prm['unit_edit'])
 		return _emptyMin('Настройка сборного текста будет доступна<br>после вставки элемента в блок.');
 
 	return '';
 }
-function PHP12_44_setup_save($cmp, $val, $unit) {//сохранение содержания Сборного текста
+function PHP12_elem44_setup_save($cmp, $val, $unit) {//сохранение содержания Сборного текста
 	/*
 		$cmp  - компонент-функция, размещающий в диалоге настройку значений сборного текста
 		$val  - значения, полученные для сохранения
@@ -72,52 +95,90 @@ function PHP12_44_setup_save($cmp, $val, $unit) {//сохранение соде
 	if(!$parent_id = _num($unit['id']))
 		return;
 
-	$ids = array();
-	$update = array();
+	//колонка, по которой сохраняется содержание
+	if(!$col = $cmp['col'])
+		return;
+
+	//содержание в виде JSON, которое будет сохранено
+	$json = array();
+
+	//идентификаторы, которые удалять не нужно
+	$ids = '0';
 
 	if(!empty($val)) {
 		if(!is_array($val))
 			return;
 
 		foreach($val as $r) {
-			if(!$id = _num($r['id']))
+			if(empty($r['type']))
 				continue;
-			$ids[] = $id;
-			$spc = _num($r['spc']);
-			$update[] = array(
-				'id' => $id,
-				'spc' => $spc
-			);
+			switch($r['type']) {
+				case 'txt':
+					if(!empty($r['txt']))
+						$json[] = $r;
+					break;
+				case 'el':
+					if(!$id = _num($r['id']))
+						break;
+
+					$sql = "UPDATE `_element`
+							SET `font`='".$r['font']."',
+								`color`='".$r['color']."'
+							WHERE `id`=".$id;
+					query($sql);
+
+					unset($r['font']);
+					unset($r['color']);
+
+					$json[] = $r;
+					$ids .= ','.$id;
+					break;
+			}
 		}
 	}
 
-	$ids = implode(',', $ids);
+	$json = empty($json) ? '' : json_encode($json);
+
+	$sql = "UPDATE `_element`
+			SET `".$col."`='".addslashes($json)."'
+			WHERE `id`=".$parent_id;
+	query($sql);
 
 	//удаление значений, которые были удалены при настройке
 	$sql = "DELETE FROM `_element`
 			WHERE `parent_id`=".$parent_id."
-			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
+			  AND `id` NOT IN (".$ids.")";
 	query($sql);
-
-	if(empty($update))
-		return;
-
-	foreach($update as $sort => $r) {
-		$sql = "UPDATE `_element`
-				SET `parent_id`=".$parent_id.",
-					`num_8`=".$r['spc'].",
-					`sort`=".$sort."
-				WHERE `id`=".$r['id'];
-		query($sql);
-	}
 
 	_BE('elem_clear');
 }
-function PHP12_44_setup_vvv($prm) {
+function PHP12_elem44_setup_vvv($prm) {
 	if(!$u = $prm['unit_edit'])
 		return array();
 	if(!$el = _elemOne($u['id']))
 		return array();
+	if(!$json = $el['txt_1'])
+		return array();
 
-	return _element('vvv', $el);
+	$json = json_decode($json, true);
+
+	$vvv = array();
+	if(!empty($el['vvv']))
+		foreach($el['vvv'] as $r)
+			$vvv[$r['id']] = $r;
+
+	foreach($json as $n => $r)
+		if($r['type'] == 'el') {
+			$ell = $vvv[$r['id']];
+			$json[$n]['dialog_id'] = $ell['dialog_id'];
+			$json[$n]['title'] = $ell['title'];
+			$json[$n]['font'] = $ell['font'];
+			$json[$n]['color'] = $ell['color'];
+		}
+
+	return $json;
 }
+
+
+
+

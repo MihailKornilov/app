@@ -671,7 +671,11 @@ function _spisokUnitUrlPage($el, $page_id, $u) {//получение id запи
 	if(!$col = _elemCol($elem_id))
 		return $u['id'];
 
-	return is_array($u[$col]) ? $u[$col]['id'] : $u['id'];
+	if(isset($u[$col]))
+		if(is_array($u[$col]))
+			$u[$col]['id'];
+
+	return $u['id'];
 }
 function _spisokUnitUrlDlg($u, $dlg_id) {//получение id записи согласно диалога
 	if(empty($u))

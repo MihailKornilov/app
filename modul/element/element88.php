@@ -56,7 +56,7 @@ function _element88_print($EL, $prm) {
 
 	//составление колонок для запроса
 	$COL = array();
-	foreach(_ids($spv, 1) as $id) {
+	foreach(_ids($spv, 'arr') as $id) {
 		if(!$DLG = _dialogQuery($id))
 			return _emptyRed('Диалога '.$id.' не существует');
 		if($DLG['table_name_1'] != '_spisok')
@@ -65,9 +65,13 @@ function _element88_print($EL, $prm) {
 		foreach(explode(',', _queryCol($DLG)) as $r)
 			$COL[$r] = 1;
 	}
+
 	$COLL = array();
-	foreach($COL as $c => $i)
+	foreach($COL as $c => $i) {
+		if(strpos($c, 'dialog_id_use'))
+			continue;
 		$COLL[] = $c;
+	}
 
 
 	//получение данных списка
@@ -80,8 +84,20 @@ function _element88_print($EL, $prm) {
 	if(!$spisok = query_arr($sql))
 		return _emptyMin($EL['txt_1']);
 
+	//вставка значений из вложенных списков по каждому dialog_id
+	$spInc = array();
+	foreach(_ids($spv, 'arr') as $id)
+		$spInc[$id] = array();
+	foreach($spisok as $uid => $r)
+		$spInc[$r['dialog_id']][$uid] = $r;
+	foreach(_ids($spv, 'arr') as $id)
+		$spInc[$id] = _spisokInclude($spInc[$id]);
+	foreach(_ids($spv, 'arr') as $id)
+		foreach($spInc[$id] as $uid => $r)
+			$spisok[$uid] = $r;
+
 	$TR = '';
-	foreach($spisok as $uid => $u)
+	foreach($spisok as $uid => $u) {
 		foreach(_ids($spv, 1) as $n => $dlg_id) {
 			if($u['dialog_id'] != $dlg_id)
 				continue;
@@ -93,6 +109,12 @@ function _element88_print($EL, $prm) {
 
 				if($elm_id = $col['elm'][$n])
 					if($ell = @$ELM[$elm_id]) {
+						switch($ell['dialog_id']) {
+							case 25: //кружок-статус
+							case 36: //иконка
+							case 71: //иконка сортировки
+								$cls[] = 'pad0';
+						}
 						$cls[] = $ell['font'];
 						$cls[] = $ell['txt_8'];//pos - позиция
 						$cls[] = _elemAction242($ell, $prm);//подмена цвета
@@ -107,6 +129,7 @@ function _element88_print($EL, $prm) {
 				$TR .= '<td'.$cls._elemStyleWidth($col).'>'.$txt;
 			}
 		}
+	}
 
 	//открытие и закрытие таблицы
 	$TABLE_BEGIN = '<table class="_stab'._dn(!$EL['num_3'], 'small').'">';
@@ -125,8 +148,9 @@ function _element88_th($el) {//показ имён колонок
 	$V = json_decode($el['txt_2'], true);
 
 	$eltd = array();
-	foreach($el['vvv'] as $r)
-		$eltd[$r['id']] = $r;
+	if(!empty($el['vvv']))
+		foreach($el['vvv'] as $r)
+			$eltd[$r['id']] = $r;
 
 	$send = '<tr>';
 	foreach($V['col'] as $r) {

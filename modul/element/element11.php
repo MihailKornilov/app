@@ -92,10 +92,10 @@ function _element11_js($el) {
 function _element11_print($el, $prm) {
 	if(!$u = @$prm['unit_get'])
 		return $el['title'];
-	if(empty($el['txt_2']))
+	if(!$ids = _ids($el['txt_2'], 'arr'))
 		return _msgRed('[11] нет ids элементов');
 
-	foreach(_ids($el['txt_2'], 'arr') as $id) {
+	foreach($ids as $id) {
 		if(!$ell = _elemOne($id))
 			return _msgRed('-ell-yok-');
 
