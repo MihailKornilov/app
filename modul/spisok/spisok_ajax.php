@@ -689,7 +689,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 		if($elem = $block['elem']) {
 			if($elem['dialog_id'] == 23//таблица
 			|| $elem['dialog_id'] == 27//баланс
-			|| $elem['dialog_id'] == 34//сборный текст
+			|| $elem['dialog_id'] == 44//сборный текст
 			|| $elem['dialog_id'] == 62//фильтр: галочка
 			|| $elem['dialog_id'] == 74//фильтр: радио
 			|| $elem['dialog_id'] == 88//таблица из нескольких списков
