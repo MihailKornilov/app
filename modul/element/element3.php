@@ -110,3 +110,18 @@ function _menuCount($menu) {//получение элемента-циферки
 	return $menu;
 }
 
+/* ---=== ВЫБОР ВНЕШНЕГО ВИДА МЕНЮ СТРАНИЦ [3] ===--- */
+function PHP12_page_menu_type($prm) {
+	$sel = _num($prm['el12']['txt_2']);
+	if($col = $prm['el12']['col'])
+		if($u = $prm['unit_edit'])
+			$sel = $u[$col];
+
+
+	$send = '';
+	for($n = 1; $n <= 5; $n++)
+		$send .= '<div class="page-menu type'.$n._dn($n != $sel, 'sel').'" val="'.$n.'"></div>';
+
+	return $send;
+}
+

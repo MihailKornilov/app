@@ -43,7 +43,7 @@ function _element44_print($el, $prm) {
 				$send .= _br($r['txt']);
 				break;
 			case 'el':
-				if(!$ell = $vvv[$r['id']])
+				if(!$ell = @$vvv[$r['id']])
 					break;
 
 				$txt = _element('print', $ell, $prm);
@@ -67,7 +67,34 @@ function _elem44css($txt, $r) {//применение стилей к значе
 		return $txt;
 	return '<span class="'.$r['font'].' '.$r['color'].'" style="font-size:inherit">'.$txt.'</span>';
 }
+function _elem44vvv($el) {//получение значений для некоторых элементов (для таблиц)
+	if($el['dialog_id'] != 44)
+		return $el;
 
+	if(!isset($el['vvv']))
+		$el['vvv'] = array();
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id`=".$el['id'];
+	if($arr = query_arr($sql)) {
+		foreach($arr as $id => $r) {
+			$r = _element('struct', $r);
+			$r['action'] = array();
+			$el['vvv'][$id] = $r;
+		}
+
+		//прикрепление действий
+		$sql = "SELECT *
+				FROM `_action`
+				WHERE `element_id` IN ("._idsGet($arr).")";
+		if($act = query_arr($sql))
+			foreach($act as $r)
+				$el['vvv'][$r['element_id']]['action'][] = $r;
+	}
+
+	return $el;
+}
 
 
 
@@ -144,18 +171,25 @@ function PHP12_elem44_setup_save($cmp, $val, $unit) {//сохранение со
 			WHERE `id`=".$parent_id;
 	query($sql);
 
+	//применение родительского элемента (для таблиц)
+	$sql = "UPDATE `_element`
+			SET `parent_id`=".$parent_id."
+			WHERE `id` IN (".$ids.")";
+	query($sql);
+
 	//удаление значений, которые были удалены при настройке
 	$sql = "DELETE FROM `_element`
 			WHERE `parent_id`=".$parent_id."
 			  AND `id` NOT IN (".$ids.")";
 	query($sql);
 
+
 	_BE('elem_clear');
 }
 function PHP12_elem44_setup_vvv($prm) {
 	if(!$u = $prm['unit_edit'])
 		return array();
-	if(!$el = _elemOne($u['id']))
+	if(!$el = _elemOne($u['id'], true))
 		return array();
 	if(!$json = $el['txt_1'])
 		return array();

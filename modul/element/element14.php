@@ -70,3 +70,36 @@ function _element14_copy_vvv($el, $obj_id) {
 	_blockChildCountSet('spisok', $obj_id);
 	_blockAppIdUpdate('spisok', $obj_id);
 }
+
+
+/* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
+function PHP12_spisok14_setup($prm) {//настройка шаблона
+	/*
+		имя объекта: spisok
+		 id объекта: id элемента, который размещает список
+	*/
+	if(!$unit = $prm['unit_edit'])
+		return
+		'<div class="bg-ffe pad10">'.
+			_emptyMin('Настройка шаблона будет доступна после вставки списка в блок.').
+		'</div>';
+
+	//определение ширины шаблона
+	if(!$block = _blockOne($unit['block_id']))
+		return 'Блока, в котором находится список, не существует.';
+
+	setcookie('block_level_spisok', 1, time() + 2592000, '/');
+	$_COOKIE['block_level_spisok'] = 1;
+
+	$width = _blockObjWidth('spisok', $unit['id']);
+
+	return
+	'<div class="bg-ffc pad10 line-b">'.
+		_blockLevelChange('spisok', $unit['id']).
+	'</div>'.
+	'<div class="block-content-spisok" style="width:'.$width.'px">'.
+		_blockHtml('spisok', $unit['id'], array('blk_setup' => 1)).
+	'</div>';
+}
+
+

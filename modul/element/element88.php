@@ -14,7 +14,7 @@ function _element88_struct($el) {
 	) + _elementStruct($el);
 }
 function _element88_struct_vvv($el, $cl) {
-	return array(
+	$send = array(
 		'id'        => _num($cl['id']),
 		'title'     => $cl['title'],
 		'parent_id' => _num($cl['parent_id']),
@@ -32,7 +32,12 @@ function _element88_struct_vvv($el, $cl) {
 		'num_5'     => _num($cl['num_5']),
 		'txt_1'     => $cl['txt_1'],//для [10]
 		'txt_2'     => $cl['txt_2'],//для [11]
+		'vvv'       => array()      //для [44]
 	);
+
+	$send = _elem44vvv($send);
+
+	return $send;
 }
 function _element88_print($EL, $prm) {
 	if($prm['blk_setup'])
@@ -172,7 +177,10 @@ function _element88_th($el) {//показ имён колонок
 
 	return $send;
 }
-function PHP12_elem88($prm) {//Настройка ячеек таблицы
+
+
+/* ---=== [88] Настройка ячеек таблицы ===--- */
+function PHP12_elem88($prm) {
 	if(!$u = $prm['unit_edit'])
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
 	if(!$BL = _blockOne($prm['srce']['block_id']))
@@ -238,15 +246,25 @@ function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
 		jsonError('Отсутствует содержание');
 	if(!is_array($val))
 		jsonError('Содержание не является массивом');
-//	if(!$val['spv'] = _ids($val['spv']))
-//		jsonError('Не выбраны списки');
 
-	$val = json_encode($val);
-
+	$json = json_encode($val);
 	$sql = "UPDATE `_element`
-			SET `txt_2`='".addslashes($val)."'
+			SET `txt_2`='".addslashes($json)."'
 			WHERE `id`=".$elem_id;
 	query($sql);
+
+	//удаление удалённых элементов
+	$elm = array();
+	foreach($val['col'] as $r)
+		foreach($r['elm'] as $id)
+			if($id = _num($id))
+				$elm[] = $id;
+	if(!empty($elm)) {
+		$sql = "DELETE FROM `_element`
+				WHERE `parent_id`=".$elem_id."
+				  AND `id` NOT IN (".implode(',', $elm).")";
+		query($sql);
+	}
 
 	_elemOne($elem_id, true);
 }

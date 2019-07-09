@@ -31,7 +31,7 @@ function _element23_struct_title($el, $DLG) {
 	return $el;
 }
 function _element23_struct_vvv($el, $cl) {
-	return array(
+	$send = array(
 		'id'        => _num($cl['id']),
 		'title'     => $cl['title'],
 		'parent_id' => _num($cl['parent_id']),
@@ -47,9 +47,14 @@ function _element23_struct_vvv($el, $cl) {
 		'num_3'     => _num($cl['num_3']),
 		'num_4'     => _num($cl['num_4']),
 		'num_5'     => _num($cl['num_5']),
-		'txt_1'     => $cl['txt_1'],//для [10]
+		'txt_1'     => $cl['txt_1'],//для [10][44]
 		'txt_2'     => $cl['txt_2'],//для [11]
+		'vvv'       => array()      //для [44]
 	);
+
+	$send = _elem44vvv($send);
+
+	return $send;
 }
 function _element23_js($el) {
 	return array(
@@ -242,4 +247,84 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 }
 
 
+
+/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ [23] ===--- */
+function PHP12_td_setup($prm) {//используется в диалоге [23]
+	/*
+		все действия через JS
+	*/
+
+	if(!$prm['unit_edit'])
+		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
+	if(!$BL = _blockOne($prm['srce']['block_id']))
+		return _emptyMin10('Отсутствует исходный блок.');
+
+	$ex = explode(' ', $BL['elem']['mar']);
+	$w = $BL['width'] - $ex[1] - $ex[3];
+
+
+	return '<div class="calc-div h25 line-b bg-efe">'.$w.'</div>';
+}
+function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данных ячеек таблицы
+	/*
+		$cmp  - компонент из диалога, отвечающий за настройку ячеек таблицы
+		$val  - значения, полученные для сохранения
+		$unit - элемент, в котором размещается таблица
+
+		Данные колонок таблицы записываются в _element
+		parent_id = $unit['id'] (ID элемента-таблицы [23])
+
+		num_8 - флаг активности ячейки. Если 1 - ячейка настроена и активна
+	*/
+
+	if(empty($unit['id']))
+		return;
+
+	//Сброс флага активности ячейки
+	$sql = "UPDATE `_element`
+			SET `num_8`=0
+			WHERE `parent_id`=".$unit['id'];
+	query($sql);
+
+	if(!empty($val) && is_array($val))
+		foreach($val as $sort => $r) {
+			if(!$id = _num($r['id']))
+				continue;
+
+			$sql = "UPDATE `_element`
+					SET `num_8`=1,
+						`width`="._num($r['width']).",
+						`font`='".$r['font']."',
+						`color`='".$r['color']."',
+						`txt_7`='".addslashes(_txt($r['txt_7']))."',
+						`txt_8`='".$r['txt_8']."',
+						`sort`=".$sort."
+					WHERE `parent_id`=".$unit['id']."
+					  AND `id`=".$id;
+			query($sql);
+		}
+
+	//удаление значений, которые были удалены при настройке
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `parent_id`=".$unit['id']."
+			  AND !`num_8`";
+	if($ids = query_ids($sql)) {
+		$sql = "DELETE FROM `_element` WHERE `id` IN (".$ids.")";
+		query($sql);
+
+		$sql = "DELETE FROM `_action` WHERE `element_id` IN (".$ids.")";
+		query($sql);
+	}
+
+	_BE('elem_clear');
+}
+function PHP12_td_setup_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+	if(!$el = _elemOne($u['id']))
+		return array();
+
+	return _element('vvv', $el);
+}
 

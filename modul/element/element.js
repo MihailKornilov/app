@@ -4700,6 +4700,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				_dialogLoad({
 					dialog_id:v.dialog_id,
 					block_id:obj.srce.block_id,
+					dss:obj.srce.dss,
 					edit_id:v.id,           //id выбранного элемента (при редактировании)
 					dop:{
 						rule_id:4,
