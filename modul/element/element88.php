@@ -45,7 +45,7 @@ function _element88_print($EL, $prm) {
 
 	$V = json_decode($EL['txt_2'], true);
 
-	if(!$spv = _ids($V['spv']))
+	if(empty($V['spv']))
 		return _emptyRed('Таблица из нескольких списков не настроена.');
 	if(empty($V['col']))
 		return _emptyRed('Таблица из нескольких списков не настроена');
@@ -60,15 +60,22 @@ function _element88_print($EL, $prm) {
 
 
 	//составление колонок для запроса
+	$SPV_IDS = array(); //ids диалогов
+	$SPV_COND = array();//массив условий для каждого диалога
 	$COL = array();
-	foreach(_ids($spv, 'arr') as $id) {
+	foreach($V['spv'] as $spv) {
+		if(!$id = $spv['dialog_id'])
+			return _emptyRed('Не выбран один из диалогов');
 		if(!$DLG = _dialogQuery($id))
 			return _emptyRed('Диалога '.$id.' не существует');
 		if($DLG['table_name_1'] != '_spisok')
 			return _emptyRed('Диалог '.$id.' использует неверную таблицу');
+		
+		$SPV_IDS[] = $id;
+		$SPV_COND[$id] = $spv['cond'];
 
-		foreach(explode(',', _queryCol($DLG)) as $r)
-			$COL[$r] = 1;
+		foreach(explode(',', _queryCol($DLG)) as $c)
+			$COL[$c] = 1;
 	}
 
 	$COLL = array();
@@ -78,12 +85,19 @@ function _element88_print($EL, $prm) {
 		$COLL[] = $c;
 	}
 
+	$cond = array();
+	foreach($SPV_COND as $id => $r) {
+		$c = "`dialog_id`=".$id;
+		if($r)
+			$c .= _40cond(array(), $r);
+		$cond[] = $c;
+	}
 
 	//получение данных списка
 	$sql = "SELECT ".implode(',', $COLL)."
 			FROM   `_spisok` `t1`
 			WHERE  !`deleted`
-			  AND  `dialog_id` in (".$spv.")
+			  AND  (".implode(' OR ', $cond).")
 			ORDER BY `dtime_add` ".$SC."
 			LIMIT ".$LIMIT;
 	if(!$spisok = query_arr($sql))
@@ -91,19 +105,19 @@ function _element88_print($EL, $prm) {
 
 	//вставка значений из вложенных списков по каждому dialog_id
 	$spInc = array();
-	foreach(_ids($spv, 'arr') as $id)
+	foreach($SPV_IDS as $id)
 		$spInc[$id] = array();
 	foreach($spisok as $uid => $r)
 		$spInc[$r['dialog_id']][$uid] = $r;
-	foreach(_ids($spv, 'arr') as $id)
+	foreach($SPV_IDS as $id)
 		$spInc[$id] = _spisokInclude($spInc[$id]);
-	foreach(_ids($spv, 'arr') as $id)
+	foreach($SPV_IDS as $id)
 		foreach($spInc[$id] as $uid => $r)
 			$spisok[$uid] = $r;
 
 	$TR = '';
 	foreach($spisok as $uid => $u) {
-		foreach(_ids($spv, 1) as $n => $dlg_id) {
+		foreach($SPV_IDS as $n => $dlg_id) {
 			if($u['dialog_id'] != $dlg_id)
 				continue;
 			$TR .= '<tr'.($EL['num_4'] ? ' class="over1"' : '').'>';
@@ -190,11 +204,11 @@ function PHP12_elem88($prm) {
 	$w = $BL['width'] - $ex[1] - $ex[3];
 
 	return
-	'<div class="fs16 b color-555 bg-gr1 pl20 pt5 pb5 line-t line-b">Списки:</div>'.
-	'<dl id="sp88" class="mt5 ml40"></dl>'.
+	'<div class="fs16 b color-555 bg-gr1 pl15 pt5 pb5 line-t line-b">Списки:</div>'.
+	'<dl id="sp88" class="mt5 ml10"></dl>'.
 	'<div class="fs15 color-555 pad10 center over1 curP">Добавить список</div>'.
 
-	'<div class="fs16 color-555 bg-gr1 pl20 pt5 pb5 mt10 line-t">Колонки:</div>'.
+	'<div class="fs16 color-555 bg-gr1 pl15 pt5 pb5 mt10 line-t">Колонки:</div>'.
 	'<div class="calc-div h25 line-t line-b bg-efe">'.$w.'</div>'.
 	'<dl id="col88" class="mt5"></dl>'.
 	'<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>';
@@ -214,11 +228,42 @@ function PHP12_elem88_vvv($prm) {//данные для настроек
 
 	$val = json_decode($u['txt_2'], true);
 
-	$send['spv'] = _ids($val['spv'], 1);
+	if(!empty($val['spv'])) {
+
+		//todo на удаление
+		if(!is_array($val['spv']))
+			if($ids = _ids($val['spv'], 'arr')) {
+				$val['spv'] = array();
+				foreach($ids as $n => $id)
+					$val['spv'][] = array(
+						'dialog_id' => $id,
+						'cond' => ''
+					);
+			}
+
+		foreach($val['spv'] as $n => $r) {
+			$val['spv'][$n]['dialog_id'] = _num($r['dialog_id']);
+			$c = $r['cond'] ? count($r['cond']) : '';
+			$val['spv'][$n]['c'] = $c ? $c.' услови'._end($c, 'е', 'я', 'й') : '';
+			if(!empty($r['cond']))
+				$val['spv'][$n]['cond'] = json_encode($r['cond']);
+		}
+	}
+
+	$send['spv'] = empty($val['spv']) ? array() : $val['spv'];
 	$send['col'] = empty($val['col']) ? array() : $val['col'];
 
 /*
-	$send['spv'] = array(1192,1193);
+	$send['spv'] = array(
+		array(
+			dialog_id:1192
+			cond:array()
+		),
+		array(
+			dialog_id:1193
+			cond:array()
+		)
+	);
 	$send['col'] = array(
 		array(
 			'width' => 200,
@@ -246,8 +291,19 @@ function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
 		jsonError('Отсутствует содержание');
 	if(!is_array($val))
 		jsonError('Содержание не является массивом');
+	if(empty($val['spv']))
+		jsonError('Не выбрано ни одного списка');
+
+	foreach($val['spv'] as $n => $r)
+		if(!empty($r['cond']))
+			$val['spv'][$n]['cond'] = json_decode($r['cond'], true);
+
+//	print_r($val); return;
 
 	$json = json_encode($val);
+
+//	echo $json; return;
+
 	$sql = "UPDATE `_element`
 			SET `txt_2`='".addslashes($json)."'
 			WHERE `id`=".$elem_id;

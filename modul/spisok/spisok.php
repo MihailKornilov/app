@@ -1059,11 +1059,12 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 	if(empty($cond))
 		return '';
 
-	if(!$arr = _elem40json($cond))
-		return " AND !`t1`.`id` /* [40] не получен массив условий */";
+	if(!is_array($cond))
+		if(!$cond = _elem40json($cond))
+			return " AND !`t1`.`id` /* [40] не получен массив условий */";
 
 	$send = '';
-	foreach($arr as $r) {
+	foreach($cond as $r) {
 		if(!$ids = _ids($r['elem_id']))
 			return " AND !`t1`.`id` /* [40] элемент не получен */";
 		if(_ids($r['elem_id'], 'count') > 2)
@@ -1143,6 +1144,9 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 	if($unit_id == -1) {
 		if(!$unit_id = _num(@$_GET['id']))
 			return '[40] страница не принимает данные записи';
+
+		if(empty($EL))
+			return $unit_id;
 
 		$dlg_id = $DLG_ID_CONN;
 

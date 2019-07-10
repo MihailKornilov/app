@@ -3957,12 +3957,22 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		//добавление нового списка
 		function spAdd(v) {
-			v = _num(v);
+			v = $.extend({
+				dialog_id:0,
+				cond:'',
+				c:''
+			}, v);
 
 			DL.append(
 				'<dd>' +
-					'<table class="bs5 ml40">' +
-						'<tr><td><input type="hidden" class="spv" value="' + v + '" />' +
+					'<table class="bs5 spv-tab">' +
+						'<tr><td><input type="hidden" class="cond" />' +
+								'<div class="_spfl dib w125 prel">' +
+									'<div class="icon icon-filter pabs"></div>' +
+									'<div class="icon icon-del pl pabs' + _dn(v.cond) + '"></div>' +
+									'<input type="text" readonly class="color-del b pl25 curP w100p over3" placeholder="условий нет" value="' + v.c + '" />' +
+								'</div>' +
+							'<td><input type="hidden" class="spv" value="' + v.dialog_id + '" />' +
 							'<td class="w25">' +
 								'<div class="icon icon-set-b pl' + _tooltip('Настроить колонки', -58) + '</div>' +
 							'<td class="w25">' +
@@ -3972,6 +3982,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			);
 
 			var DD = DL.find('dd:last');
+
+			DD.find('.cond').val(v.cond);
+
+			DD.find('._spfl').click(function() {
+				var t = $(this),
+					inp = t.find('input');
+				_dialogLoad({
+					dialog_id:41,
+					dss:DD.find('.spv').val(),
+					dop:t.prev().val(),
+					busy_obj:inp,
+					busy_cls:'hold',
+					func_save:function(res) {
+						t.prev().val(res.v);
+						inp.val(res.title);
+						t.find('.icon-del')._dn(1);
+					}
+				});
+			});
 
 			DD.find('.spv')._select({
 				width:390,
@@ -4212,13 +4241,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		PHP12_elem88_upd();
 
-		_forEq(_attr_el(el.id).find('.spv'), function(sp) {
-			var id = _num(sp.val());
-			spv.push(id);
+		_forEq(_attr_el(el.id).find('.spv-tab'), function(sp) {
+			var id = _num(sp.find('.spv').val());
+			spv.push({
+				dialog_id:id,
+				cond:sp.find('.cond').val()
+			});
 		});
 
 		return {
-			spv:spv.join(),
+			spv:spv,
 			col:window.COL88 ? COL88 : {}
 		};
 	},
