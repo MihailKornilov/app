@@ -39,8 +39,8 @@ function _element88_struct_vvv($el, $cl) {
 
 	return $send;
 }
-function _element88_print($EL, $prm) {
-	if($prm['blk_setup'])
+function _element88_print($EL, $prm, $next=0) {
+	if(!empty($prm['blk_setup']))
 		return _emptyMin('Таблица из нескольких списков');
 
 	$V = json_decode($EL['txt_2'], true);
@@ -57,7 +57,6 @@ function _element88_print($EL, $prm) {
 
 	$LIMIT = $EL['num_1'];
 	$SC = $EL['num_6'] ? 'DESC' : 'ASC';
-
 
 	//составление колонок для запроса
 	$SPV_IDS = array(); //ids диалогов
@@ -93,15 +92,17 @@ function _element88_print($EL, $prm) {
 		$cond[] = $c;
 	}
 
+	if(!$EL['all'] = _elem88countAll($cond))
+		return _emptyMin($EL['txt_1']);
+
 	//получение данных списка
 	$sql = "SELECT ".implode(',', $COLL)."
 			FROM   `_spisok` `t1`
 			WHERE  !`deleted`
 			  AND  (".implode(' OR ', $cond).")
 			ORDER BY `dtime_add` ".$SC."
-			LIMIT ".$LIMIT;
-	if(!$spisok = query_arr($sql))
-		return _emptyMin($EL['txt_1']);
+			LIMIT ".($LIMIT * $next).",".$LIMIT;
+	$spisok = query_arr($sql);
 
 	//вставка значений из вложенных списков по каждому dialog_id
 	$spInc = array();
@@ -151,17 +152,20 @@ function _element88_print($EL, $prm) {
 	}
 
 	//открытие и закрытие таблицы
-	$TABLE_BEGIN = '<table class="_stab'._dn(!$EL['num_3'], 'small').'">';
-	$TABLE_END = '</table>';
+	$TABLE_BEGIN = !$next ? '<table class="_stab'._dn(!$EL['num_3'], 'small').'">' : '';
+	$TABLE_END   = !$next ? '</table>' : '';
 
 	return
 	$TABLE_BEGIN.
-	_element88_th($EL).
+	_elem88th($EL, $next).
 	$TR.
+	_elem88next($EL, $next).
 	$TABLE_END;
 }
-function _element88_th($el) {//показ имён колонок
+function _elem88th($el, $next) {//показ имён колонок
 	if(!$el['num_5'])
+		return '';
+	if($next)
 		return '';
 
 	$V = json_decode($el['txt_2'], true);
@@ -190,6 +194,28 @@ function _element88_th($el) {//показ имён колонок
 	}
 
 	return $send;
+}
+function _elem88countAll($cond) {//общее количество строк списка
+	$sql = "SELECT COUNT(*)
+			FROM   `_spisok` `t1`
+			WHERE  !`deleted`
+			  AND  (".implode(' OR ', $cond).")";
+	return query_value($sql);
+}
+function _elem88next($EL, $next) {//tr-догрузка списка
+	if($EL['num_1'] * ($next + 1) >= $EL['all'])
+		return '';
+
+	$count_next = $EL['all'] - $EL['num_1'] * ($next + 1);
+	if($count_next > $EL['num_1'])
+		$count_next = $EL['num_1'];
+
+	return
+	'<tr class="over5 curP center blue" onclick="_elem88next($(this),'.$EL['id'].','.($next + 1).')">'.
+		'<td colspan="20">'.
+			'<tt class="db '.($EL['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
+				'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
+			'</tt>';
 }
 
 
@@ -229,18 +255,6 @@ function PHP12_elem88_vvv($prm) {//данные для настроек
 	$val = json_decode($u['txt_2'], true);
 
 	if(!empty($val['spv'])) {
-
-		//todo на удаление
-		if(!is_array($val['spv']))
-			if($ids = _ids($val['spv'], 'arr')) {
-				$val['spv'] = array();
-				foreach($ids as $n => $id)
-					$val['spv'][] = array(
-						'dialog_id' => $id,
-						'cond' => ''
-					);
-			}
-
 		foreach($val['spv'] as $n => $r) {
 			$val['spv'][$n]['dialog_id'] = _num($r['dialog_id']);
 			$c = $r['cond'] ? count($r['cond']) : '';

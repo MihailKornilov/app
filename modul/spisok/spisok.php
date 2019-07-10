@@ -1267,6 +1267,12 @@ function _40cond_dop($r, $val) {//дополнительные условия, �
 		case -14: return _num(strftime('%Y'));
 
 		case -21: return USER_ID;
+
+		case -31:
+			if(empty($_GET['v1']))
+				return "---###$$ /* v1 не получен */";
+			$v1 = _txt($_GET['v1']);
+			return $v1;
 	}
 
 	return $val;

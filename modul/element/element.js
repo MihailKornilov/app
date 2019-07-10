@@ -4348,6 +4348,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		return send;
 	},
+	_elem88next = function(t, elem_id, next) {//догрузка списка
+		var send = {
+			op:'elem88next',
+			elem_id:elem_id,
+			next:next,
+			busy_obj:t
+		};
+		_post(send, function(res) {
+			t.closest('._stab').append(res.spisok);
+			t.remove();
+		});
+	},
 
 	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ для [16][17][18] ===--- */
 	PHP12_radio_setup = function(el, vvv, obj) {

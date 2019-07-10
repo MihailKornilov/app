@@ -337,6 +337,19 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($DI);
 		break;
+	case 'elem88next':
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента станицы');
+		if(!$el = _elemOne($elem_id))
+			jsonError('Элемента id'.$elem_id.' не существует');
+		if($el['dialog_id'] != 88)
+			jsonError('Элемент не является списком-таблицей');
+		if(!$next = _num($_POST['next']))
+			jsonError('Некорректное значение очередного блока списка');
+
+		$send['spisok'] = _element88_print($el, array(), $next);
+		jsonSuccess($send);
+		break;
 }
 
 function _spisokUnitDialog($unit_id) {//получение данных о диалоге и проверка наличия единицы списка

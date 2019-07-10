@@ -156,7 +156,7 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 		$MASS[$uid] = $TR;
 	}
 
-	//tr догрузки списка
+	//tr-догрузка списка
 	if(!$IS_SORT && $limit * ($next + 1) < $all) {
 		$count_next = $all - $limit * ($next + 1);
 		if($count_next > $limit)
