@@ -3,12 +3,13 @@
 /* [34] Суммы нескольких списков по месяцам */
 function _element34_struct($el) {
 	return array(
-		'txt_1'   => $el['txt_1'] //данные о списках
+		'num_1'   => _num($el['num_1']),//страница, на которую будет переход при нажатии на название месяца
+		'txt_1'   => $el['txt_1']       //данные о списках
 	) + _elementStruct($el);
 }
 function _element34_print($el, $prm) {
 	if(!$year = _num(@$_GET['v1']))
-		return _emptyMinRed('Не получен номер года для отображения списка');
+		$year = YEAR_CUR;
 
 	$json = json_decode($el['txt_1'], true);
 	$mass = array();
@@ -33,9 +34,17 @@ function _element34_print($el, $prm) {
 				'<tr><th class="w125">Месяц'.
 					 _elem34th($json);
 	for($n = 1; $n <= 12; $n++) {
+		$mon = _monthDef($n, 1).' '.$year;
+		if($_GET['p'] = $el['num_1']) {
+			$_GET['v1'] = $year.'-'.($n < 10 ? '0' : '').$n;
+			$link = array();
+			foreach($_GET as $k => $v)
+				$link[] = $k.'='.$v;
+			$mon = '<a href="'.URL.'?'.implode('&', $link).'">'.$mon.'</a>';
+		}
 		$send .=
 			'<tr class="over1">'.
-				'<td class="r color-555">'._monthDef($n, 1).' '.$year.
+				'<td class="r color-555">'.$mon.
 				 _elem34td($mass, $n);
 	}
 	$send .=
@@ -44,7 +53,52 @@ function _element34_print($el, $prm) {
 				 _elem34itog($mass).
 		'</table>';
 
-	return $send;
+	return
+	_elem34year($json, $year).
+	$send;
+}
+function _elem34year($json, $year) {//ссылки на все года
+	$Y = array();
+	foreach($json as $n => $r) {
+		if(!$DLG = _dialogQuery($r['dialog_id']))
+			continue;
+		$sql = "SELECT
+					DISTINCT(DATE_FORMAT(`dtime_add`,'%Y')) AS `id`,
+					1
+				FROM   "._queryFrom($DLG)."
+				WHERE "._queryWhere($DLG)."
+				GROUP BY DATE_FORMAT(`dtime_add`,'%Y')
+				ORDER BY `dtime_add`";
+		$Y += query_ass($sql);
+	}
+
+	//определение минимального года
+	$min = empty($Y) ? YEAR_CUR : 0;
+	foreach($Y as $y => $i) {
+		if(!$min)
+			$min = $y;
+		if($min > $y)
+			$min = $y;
+	}
+
+	//определение максимального года
+	$max = YEAR_CUR;
+	foreach($Y as $y => $i)
+		if($max < $y)
+			$max = $y;
+
+	//формирование ссылок
+	$send = '';
+	for($y = $min; $y <= $max; $y++) {
+		$_GET['v1'] = $y;
+		$link = array();
+		foreach($_GET as $k => $v)
+			$link[] = $k.'='.$v;
+		$send .= '<a href="'.URL.'?'.implode('&', $link).'" class="fs14 mr10'.($y == $year ? ' b u' : '').'">'.$y.'</a>';
+	}
+
+
+	return '<div class="pb5">'.$send.'</div>';
 }
 function _elem34th($json) {//печать заголовков
 	if(empty($json))
