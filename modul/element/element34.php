@@ -35,12 +35,9 @@ function _element34_print($el, $prm) {
 					 _elem34th($json);
 	for($n = 1; $n <= 12; $n++) {
 		$mon = _monthDef($n, 1).' '.$year;
-		if($_GET['p'] = $el['num_1']) {
-			$_GET['v1'] = $year.'-'.($n < 10 ? '0' : '').$n;
-			$link = array();
-			foreach($_GET as $k => $v)
-				$link[] = $k.'='.$v;
-			$mon = '<a href="'.URL.'?'.implode('&', $link).'">'.$mon.'</a>';
+		if($p = $el['num_1']) {
+			$v1 = $year.'-'.($n < 10 ? '0' : '').$n;
+			$mon = '<a href="'.URL._elem34href($v1, $p).'">'.$mon.'</a>';
 		}
 		$send .=
 			'<tr class="over1">'.
@@ -56,6 +53,26 @@ function _element34_print($el, $prm) {
 	return
 	_elem34year($json, $year).
 	$send;
+}
+function _elem34href($v1, $p=0) {//формирование ссылки
+	$send = '';
+	$v1set = false;
+	foreach($_GET as $k => $v) {
+		if(!strlen($v))
+			continue;
+		if($k == 'v1') {
+			$v = $v1;
+			$v1set = true;
+		}
+		if($k == 'p' && $p)
+			$v = $p;
+		$send .= '&'.$k.'='.$v;
+	}
+
+	if(!$v1set)
+		$send .= '&v1='.$v1;
+
+	return $send;
 }
 function _elem34year($json, $year) {//ссылки на все года
 	$Y = array();
@@ -89,14 +106,8 @@ function _elem34year($json, $year) {//ссылки на все года
 
 	//формирование ссылок
 	$send = '';
-	for($y = $min; $y <= $max; $y++) {
-		$_GET['v1'] = $y;
-		$link = array();
-		foreach($_GET as $k => $v)
-			$link[] = $k.'='.$v;
-		$send .= '<a href="'.URL.'?'.implode('&', $link).'" class="fs14 mr10'.($y == $year ? ' b u' : '').'">'.$y.'</a>';
-	}
-
+	for($y = $min; $y <= $max; $y++)
+		$send .= '<a href="'.URL.'?'._elem34href($y).'" class="fs14 mr10'.($y == $year ? ' b u' : '').'">'.$y.'</a>';
 
 	return '<div class="pb5">'.$send.'</div>';
 }
