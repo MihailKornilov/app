@@ -1,6 +1,5 @@
 <?php
 
-
 /* [30] Суммы списка по месяцам */
 function _element30_struct($el) {
 	return array(
@@ -9,7 +8,7 @@ function _element30_struct($el) {
 	) + _elementStruct($el);
 }
 function _element30_print($el, $prm) {
-	if(!$year = _num($_GET['v1']))
+	if(!$year = _num(@$_GET['v1']))
 		return _emptyMinRed('Не получен номер года для отображения списка');
 	if(!$DLG = _dialogQuery($el['num_1']))
 		return _emptyMinRed('Не получены данные диалога '.$el['num_1']);

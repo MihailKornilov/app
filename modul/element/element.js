@@ -3927,6 +3927,118 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
+	/* [34] СУММЫ СПИСКОВ ПО МЕСЯЦАМ - НАСТРОЙКА */
+	PHP12_elem34 = function(el, vvv, obj) {
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить список</div>',
+			ATTR_EL = _attr_el(el.id),
+			DL = ATTR_EL.append(html).find('dl');
+
+		ATTR_EL.find('div:last').click(valueAdd);
+
+		if(!obj.unit.id) {
+			valueAdd();
+		} else
+			_forIn(vvv.val, valueAdd);
+
+		function valueAdd(v) {
+			v = $.extend({
+				title:'',    //заголовок
+				dialog_id:'',//id списка
+				sum_id:0,    //id элемента-суммы
+				sum_title:'',//имя элемента-суммы
+				cond:'',     //условия
+				c:''         //количество условий
+			}, v);
+
+			DL.append(
+				'<dd class="over5">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center top pt5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td><input type="text" class="title w100p" placeholder="Заголовок не указан" value="' + v.title + '">' +
+							'<td><input type="hidden" class="dlg34" value="' + v.dialog_id + '" />' +
+							'<td><input type="hidden" class="sum34" value="' + v.sum_id + '" />' +
+								'<div class="_selem dib prel bg-fff over3">' +
+									'<div class="icon icon-star pabs"></div>' +
+									'<div class="icon icon-del pl pabs' + _dn(v.sum_id) + '"></div>' +
+									'<input type="text" readonly class="w175 curP w100p color-pay" placeholder="сумма не выбрана" value="' + v.sum_title + '" />' +
+								'</div>' +
+							'<td><input type="hidden" class="cond" />' +
+								'<div class="_spfl dib w125 prel">' +
+									'<div class="icon icon-filter pabs"></div>' +
+									'<div class="icon icon-del pl pabs' + _dn(v.cond) + '"></div>' +
+									'<input type="text" readonly class="filter color-del b pl25 curP w100p over3" placeholder="условий нет" value="' + v.c + '" />' +
+								'</div>' +
+							'<td class="w25 r top pt5">' +
+								'<div class="icon icon-del pl' + _tooltip('Удалить список', -48) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			DL.sortable({handle:'.icon-move-y'});
+
+			var DD = DL.find('dd:last');
+
+			DD.find('.dlg34')._select({
+				width:260,
+				title0:'список не выбран',
+				spisok:vvv.sp
+			});
+
+			//выбор значения суммы
+			DD.find('._selem').click(function() {
+				var t = $(this),
+					cmp = t.prev(),
+					inp = t.find('input'),
+					del = t.find('.icon-del'),
+					dss = _num(DD.find('.dlg34').val());
+				if(!dss)
+					return false;
+
+				_dialogLoad({
+					dialog_id:11,
+					dss:dss,
+
+					dop:{
+						mysave:1,
+						sel:cmp.val()
+					},
+
+					busy_obj:cmp,
+					busy_cls:'hold',
+					func_save:function(res) {
+						cmp.val(res.v);
+						inp.val(res.title);
+						del._dn(1);
+					}
+				});
+			});
+
+			DD.find('.icon-del').click(function() {
+				$(this).closest('DD').remove();
+			});
+			//установка фокуса на новодобавленного значения
+			if(!v.id)
+				DD.find('.title').focus();
+		}
+	},
+	PHP12_elem34_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var dlg_id = _num(sp.find('.dlg34').val());
+			if(!dlg_id)
+				return;
+			send.push({
+				title:sp.find('.title').val(),
+				dialog_id:dlg_id,
+				sum_id:_num(sp.find('.sum34').val()),
+				cond:sp.find('.cond').val()
+			});
+		});
+		return send;
+	},
+
 	/* [88] Таблица из нескольких списков */
 	PHP12_elem88 = function(el, vvv, obj) {
 		if(!obj.unit.id)
