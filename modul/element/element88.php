@@ -312,11 +312,7 @@ function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
 		if(!empty($r['cond']))
 			$val['spv'][$n]['cond'] = json_decode($r['cond'], true);
 
-//	print_r($val); return;
-
 	$json = json_encode($val);
-
-//	echo $json; return;
 
 	$sql = "UPDATE `_element`
 			SET `txt_2`='".addslashes($json)."'

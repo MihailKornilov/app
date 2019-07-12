@@ -3986,6 +3986,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				spisok:vvv.sp
 			});
 
+			DD.find('.cond').val(v.cond);
+
 			//выбор значения суммы
 			DD.find('._selem').click(function() {
 				var t = $(this),
@@ -3993,6 +3995,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					inp = t.find('input'),
 					del = t.find('.icon-del'),
 					dss = _num(DD.find('.dlg34').val());
+
 				if(!dss)
 					return false;
 
@@ -4011,6 +4014,28 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						cmp.val(res.v);
 						inp.val(res.title);
 						del._dn(1);
+					}
+				});
+			});
+
+			DD.find('._spfl').click(function() {
+				var t = $(this),
+					inp = t.find('input'),
+					dss = _num(DD.find('.dlg34').val());
+
+				if(!dss)
+					return false;
+
+				_dialogLoad({
+					dialog_id:41,
+					dss:dss,
+					dop:t.prev().val(),
+					busy_obj:inp,
+					busy_cls:'hold',
+					func_save:function(res) {
+						t.prev().val(res.v);
+						inp.val(res.title);
+						t.find('.icon-del')._dn(1);
 					}
 				});
 			});

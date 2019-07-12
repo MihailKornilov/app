@@ -26,6 +26,7 @@ function _element34_print($el, $prm) {
 				FROM   "._queryFrom($DLG)."
 				WHERE "._queryWhere($DLG)."
 				  AND `dtime_add` LIKE '".$year."-%'
+					"._40cond(array(), $r['cond'])."
 				GROUP BY DATE_FORMAT(`dtime_add`,'%m')";
 		$mass[$n] = query_ass($sql);
 	}
@@ -84,6 +85,7 @@ function _elem34year($json, $year) {//ссылки на все года
 					1
 				FROM   "._queryFrom($DLG)."
 				WHERE "._queryWhere($DLG)."
+					"._40cond(array(), $r['cond'])."
 				GROUP BY DATE_FORMAT(`dtime_add`,'%Y')
 				ORDER BY `dtime_add`";
 		$Y += query_ass($sql);
@@ -164,6 +166,11 @@ function PHP12_elem34_vvv($prm) {//данные для настроек
 		if(!$el = _elemOne($r['sum_id']))
 			continue;
 		$send['val'][$n]['sum_title'] = $el['title'];
+		if(!empty($r['cond'])) {
+			$c = count($r['cond']);
+			$send['val'][$n]['c'] = $c.' услови'._end($c, 'е', 'я', 'й');
+			$send['val'][$n]['cond'] = json_encode($r['cond']);
+		}
 	}
 
 	return $send;
@@ -175,6 +182,10 @@ function PHP12_elem34_save($cmp, $val, $unit) {//сохранение
 		jsonError('Нет данных для сохранения');
 	if(!is_array($val))
 		jsonError('Данные не являются массивом');
+
+	foreach($val as $n => $r)
+		if(!empty($r['cond']))
+			$val[$n]['cond'] = json_decode($r['cond'], true);
 
 	$json = json_encode($val);
 
