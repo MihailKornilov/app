@@ -7,7 +7,7 @@ function _element34_struct($el) {
 		'txt_1'   => $el['txt_1']       //данные о списках
 	) + _elementStruct($el);
 }
-function _element34_print($el, $prm) {
+function _element34_print($el) {
 	if(!$year = _num(@$_GET['v1']))
 		$year = YEAR_CUR;
 
@@ -15,20 +15,36 @@ function _element34_print($el, $prm) {
 	$mass = array();
 	foreach($json as $n => $r) {
 		$mass[$n] = array();
+
 		if(!$DLG = _dialogQuery($r['dialog_id']))
 			continue;
+
+		//если не указан элемент-сумма, выводится количество
 		$sum = "COUNT(`id`)";
 		if($col = _elemCol($r['sum_id']))
 			$sum = "SUM(`".$col."`)";
+
+		//если v1 используется для другой колонки, dtime_add изменяется на неё
+		$colD = 'dtime_add';
+		if(!empty($r['cond']))
+			foreach($r['cond'] as $cn => $cnr)
+				if($cnr['unit_id'] == -31)
+					if($coll = _elemCol($cnr['elem_id'])) {
+						$colD = $coll;
+						unset($r['cond'][$cn]);
+						break;
+					}
+
 		$sql = "SELECT
-					DISTINCT(DATE_FORMAT(`dtime_add`,'%c')) AS `id`,
+					DISTINCT(SUBSTR(`".$colD."`,6,2)) AS `id`,
 					".$sum."  `sum`
 				FROM   "._queryFrom($DLG)."
 				WHERE "._queryWhere($DLG)."
-				  AND `dtime_add` LIKE '".$year."-%'
+				  AND `".$colD."` LIKE '".$year."-%'
 					"._40cond(array(), $r['cond'])."
-				GROUP BY DATE_FORMAT(`dtime_add`,'%m')";
-		$mass[$n] = query_ass($sql);
+				GROUP BY SUBSTR(`".$colD."`,6,2)";
+		foreach(query_ass($sql) as $m => $s)
+			$mass[$n][_num($m)] = $s;
 	}
 
 	$send = '<table class="_stab w100p">'.
@@ -80,14 +96,26 @@ function _elem34year($json, $year) {//ссылки на все года
 	foreach($json as $n => $r) {
 		if(!$DLG = _dialogQuery($r['dialog_id']))
 			continue;
+
+		//если v1 используется для другой колонки, dtime_add изменяется на неё
+		$colD = 'dtime_add';
+		if(!empty($r['cond']))
+			foreach($r['cond'] as $cn => $cnr)
+				if($cnr['unit_id'] == -31)
+					if($coll = _elemCol($cnr['elem_id'])) {
+						$colD = $coll;
+						unset($r['cond'][$cn]);
+						break;
+					}
+
 		$sql = "SELECT
-					DISTINCT(DATE_FORMAT(`dtime_add`,'%Y')) AS `id`,
+					DISTINCT(SUBSTR(`".$colD."`,1,4)) AS `id`,
 					1
 				FROM   "._queryFrom($DLG)."
 				WHERE "._queryWhere($DLG)."
 					"._40cond(array(), $r['cond'])."
-				GROUP BY DATE_FORMAT(`dtime_add`,'%Y')
-				ORDER BY `dtime_add`";
+				GROUP BY SUBSTR(`".$colD."`,1,4)
+				ORDER BY `".$colD."`";
 		$Y += query_ass($sql);
 	}
 
