@@ -129,6 +129,13 @@ function _element88_print($EL, $prm, $next=0) {
 
 				if($elm_id = $col['elm'][$n])
 					if($ell = @$ELM[$elm_id]) {
+
+						//если элемент скрыт
+						if(_elemAction244($ell, $prm)) {
+							$TR .= '<td'._elemStyleWidth($col).'>';
+							continue;
+						}
+
 						switch($ell['dialog_id']) {
 							case 25: //кружок-статус
 							case 36: //иконка

@@ -4120,8 +4120,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			var DD = DL.find('dd:last');
 
+			//вставка данных фильтра (прямая вставка в valut - не корректна)
 			DD.find('.cond').val(v.cond);
 
+			//настройка условий
 			DD.find('._spfl').click(function() {
 				var t = $(this),
 					inp = t.find('input');
@@ -4139,6 +4141,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				});
 			});
 
+			//вывод списков
 			DD.find('.spv')._select({
 				width:390,
 				title0:'список не выбран',
