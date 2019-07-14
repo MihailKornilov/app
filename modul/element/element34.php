@@ -52,12 +52,15 @@ function _element34_print($el) {
 					 _elem34th($json);
 	for($n = 1; $n <= 12; $n++) {
 		$mon = _monthDef($n, 1).' '.$year;
+		$bgCur = '';
 		if($p = $el['num_1']) {
 			$v1 = $year.'-'.($n < 10 ? '0' : '').$n;
 			$mon = '<a href="'.URL._elem34href($v1, $p).'">'.$mon.'</a>';
+			if($v1 == YEAR_MON)
+				$bgCur = ' bg-dfd';
 		}
 		$send .=
-			'<tr class="over1">'.
+			'<tr class="over1'.$bgCur.'">'.
 				'<td class="r color-555">'.$mon.
 				 _elem34td($mass, $n);
 	}
@@ -136,8 +139,11 @@ function _elem34year($json, $year) {//ссылки на все года
 
 	//формирование ссылок
 	$send = '';
-	for($y = $min; $y <= $max; $y++)
-		$send .= '<a href="'.URL.'?'._elem34href($y).'" class="fs14 mr10'.($y == $year ? ' b u' : '').'">'.$y.'</a>';
+	for($y = $min; $y <= $max; $y++) {
+		$cur = $y == $year ? ' b u' : '';
+		$emp = !isset($Y[$y]) ? ' pale' : '';
+		$send .= '<a href="'.URL.'?'._elem34href($y).'" class="fs14 mr10'.$cur.$emp.'">'.$y.'</a>';
+	}
 
 	return '<div class="pb5">'.$send.'</div>';
 }
