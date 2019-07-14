@@ -62,7 +62,7 @@ function _element34_print($el) {
 		$send .=
 			'<tr class="over1'.$bgCur.'">'.
 				'<td class="r color-555">'.$mon.
-				 _elem34td($mass, $n);
+				 _elem34td($mass, $n, _elemWidth($el)-125);
 	}
 	$send .=
 			'<tr class="bg-gr1">'.
@@ -157,10 +157,12 @@ function _elem34th($json) {//печать заголовков
 
 	return $send;
 }
-function _elem34td($mass, $mon) {//печать значений
+function _elem34td($mass, $mon, $width) {//печать значений
 	$send = '';
-	foreach($mass as $r) {
-		$send .= '<td class="r">';
+	$w = round($width/count($mass));
+	foreach($mass as $n => $r) {
+		$width = $n ? ' style="width:'.$w.'px"' : '';
+		$send .= '<td class="r"'.$width.'>';
 		if(empty($r[$mon]))
 			continue;
 		$send .= _sumSpace($r[$mon], 1);
