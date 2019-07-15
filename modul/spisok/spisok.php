@@ -693,9 +693,9 @@ function _unitUrlId($u, $dlg_id) {//получение id из записи дл
 	if(!is_array($u))
 		return 0;
 	if(!$DLG = _dialogQuery($dlg_id))
-		return 0;
+		return $u['id'];
 	if(!isset($u['dialog_id']))
-		return 0;
+		return $u['id'];
 	if($DLG['dialog_id_unit_get'])
 		$dlg_id = $DLG['dialog_id_unit_get'];
 	if($u['dialog_id'] == $dlg_id)
