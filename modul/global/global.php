@@ -505,7 +505,7 @@ function _pr($arr) {//аналог функции print_r
 		return $arr;
 
 	return
-	'<div class="dib pad5 bor-e8">'.
+	'<div class="dib pad5 bor-e8 l">'.
 		_prFor($arr).
 	'</div>';
 }

@@ -3658,22 +3658,6 @@ function _elemWidth($el) {//получение ширины поля, в кот�
 
 
 
-function _elem_11_dialog($el) {//получение данных диалога по элементу 11
-	if($el['dialog_id'] != 11)
-		return 0;
-	if(!$ell = _elemOne($el['txt_2']))
-		return 0;
-	if($ell['block']['obj_name'] != 'dialog')
-		return 0;
-	if(!$dialog_id = _num($ell['block']['obj_id']))
-		return 0;
-	if(!$dlg = _dialogQuery($dialog_id))
-		return 0;
-
-	return $dlg;
-}
-
-
 
 
 

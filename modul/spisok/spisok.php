@@ -613,7 +613,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 			//элемент передаёт id записи для отображения
 			if($func['apply_id'])
-				$val .= ',get_id:'.$u['id'];
+				$val .= ',get_id:'._unitUrlId($u, _num($func['target_ids']));
 
 			//блок передаёт id записи для редактирования
 			if($func['effect_id'])
@@ -642,18 +642,6 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 	}
 
 	return _spisokUnitTT($el, $u, $txt);
-
-	if(!$dlg = _elem_11_dialog($el))
-		return $txt;
-
-	//ссылка на страницу, если это список страниц
-	if(_table($dlg['table_1']) == '_page')
-		return '<a href="'.URL.'&p='.$u['id'].'" class="inhr">'.$txt.'</a>';
-
-	if(!$page_id = _page('dialog_id_unit_get', $dlg['id']))
-		return $txt;
-
-	return '<a href="'.URL.'&p='.$page_id.'&id='.$u['id'].'" class="inhr">'.$txt.'</a>';
 }
 function _spisokUnitUrlPage($el, $page_id, $u) {//получение id записи согласно странице
 	if(empty($u))
@@ -685,9 +673,9 @@ function _spisokUnitUrlDlg($u, $dlg_id) {//получение id записи с
 		return 0;
 	if(empty($u['dialog_id_use']))
 		return $u['id'];
-	if($u['dialog_id_use'] == $dlg_id)
+	if(isset($u['dialog_id_use']) && $u['dialog_id_use'] == $dlg_id)
 		return $u['id'];
-	if(!$DLG = _dialogQuery($u['dialog_id_use']))
+	if(!$DLG = _dialogQuery($dlg_id))
 		return 0;
 
 	foreach($DLG['cmp'] as $cmp)
@@ -697,6 +685,27 @@ function _spisokUnitUrlDlg($u, $dlg_id) {//получение id записи с
 					if(isset($u[$col]))
 						return is_array($u[$col]) ? _num($u[$col]['id']) : _num($u[$col]);
 
+	return $u['id'];
+}
+function _unitUrlId($u, $dlg_id) {//получение id из записи для ссылки
+	if(empty($u))
+		return 0;
+	if(!is_array($u))
+		return 0;
+	if(!$DLG = _dialogQuery($dlg_id))
+		return 0;
+	if(!isset($u['dialog_id']))
+		return 0;
+	if($DLG['dialog_id_unit_get'])
+		$dlg_id = $DLG['dialog_id_unit_get'];
+	if($u['dialog_id'] == $dlg_id)
+		return $u['id'];
+	foreach($u as $i => $v)
+		if(is_array($v))
+			foreach($v as $ii => $vv)
+				if($ii == 'dialog_id')
+					if($vv == $dlg_id)
+						return $v['id'];
 	return $u['id'];
 }
 function _spisokUnitTT($el, $u, $txt='">') {//действие: подсказка [223]
@@ -1054,6 +1063,7 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 		-13 => 'число текущего месяца',
 		-14 => 'число текущего года'
 		-21 => 'текущий пользователь'
+		-31 => 'значение v1'
 */
 
 	if(empty($cond))
