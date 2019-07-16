@@ -308,7 +308,7 @@ function _blockAction($r, $prm) {//действие при нажатии на �
 						WHERE `app_id`=".APP_ID."
 						  AND `id`="._num($act['target_ids']);
 				if($doc = query_assoc($sql))
-					$uid = _spisokUnitUrlDlg($u, $doc['spisok_id']);
+					$uid = _unitUrlId($u, $doc['spisok_id']);
 			}
 		}
 	}
