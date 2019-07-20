@@ -612,11 +612,11 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 			//блок передаёт id записи для редактирования
 			if($func['effect_id'])
-				$val .= ',edit_id:'._spisokUnitUrlDlg($u, $func['target_ids']);
+				$val .= ',edit_id:'._unitUrlId($u, $func['target_ids']);
 
 			//блок передаёт id записи для удаления
 			if($func['revers'])
-				$val .= ',del_id:'._spisokUnitUrlDlg($u, $func['target_ids']);
+				$val .= ',del_id:'._unitUrlId($u, $func['target_ids']);
 
 			if(preg_match('/"icon/', $txt))
 				return str_replace('class="', 'val="'.$val.'" class="dialog-open ', $txt);
@@ -662,25 +662,6 @@ function _spisokUnitUrlPage($el, $page_id, $u) {//получение id запи
 	return $u['id'];
 */
 	return is_array($u[$col]) ? $u[$col]['id'] : $u['id'];
-}
-function _spisokUnitUrlDlg($u, $dlg_id) {//получение id записи согласно диалога
-	if(empty($u))
-		return 0;
-	if(empty($u['dialog_id_use']))
-		return $u['id'];
-	if(isset($u['dialog_id_use']) && $u['dialog_id_use'] == $dlg_id)
-		return $u['id'];
-	if(!$DLG = _dialogQuery($dlg_id))
-		return 0;
-
-	foreach($DLG['cmp'] as $cmp)
-		if(_elemIsConnect($cmp))
-			if($cmp['num_1'] == $dlg_id)
-				if($col = _elemCol($cmp))
-					if(isset($u[$col]))
-						return is_array($u[$col]) ? _num($u[$col]['id']) : _num($u[$col]);
-
-	return $u['id'];
 }
 function _unitUrlId($u, $dlg_id) {//получение id из записи для ссылки
 	if(empty($u))
