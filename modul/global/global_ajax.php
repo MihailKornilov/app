@@ -39,6 +39,7 @@ switch(@$_POST['op']) {
 			case 12:
 				switch($el['txt_1']) {
 					case 'PHP12_dialog_app':
+					case 'PHP12_elem_choose':
 						foreach($sortIds as $n => $id) {
 							$sql = "UPDATE `_dialog` SET `sort`=".$n." WHERE `id`=".$id;
 							query($sql);

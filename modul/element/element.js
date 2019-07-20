@@ -3057,7 +3057,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		_forEq(D('#elem-group .cnt'), function(sp) {
-			sp._sort({table:'_dialog'});
+			sp._sort({elem_id:el.id});
 		});
 	},
 
