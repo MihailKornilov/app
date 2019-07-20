@@ -24,15 +24,14 @@ function _element79_print($el) {
 
 	if(!$GROUP_COL = _elemCol(_idsFirst($el['txt_2'])))
 		return _emptyMinRed('[79] Отсутствует колонка для группировки');
-	if(!$ism = $el['num_2'])
-		return _emptyMinRed('[79] Отсутствует элемент, указывающий на сумму');
-	if(!$SUM_COL = _elemCol($ism))
-		return _emptyMinRed('[79] Отсутствует колонка для суммы');
+
+	//колонка для суммы
+	$SUM_COL = _elemCol($el['num_2']);
 
 	$sql = "SELECT
 				`".$GROUP_COL."` `gid`,
 				COUNT(*) `c`
-				".($ism ? ",SUM(`".$SUM_COL."`) `sum`" : '')."
+				".($SUM_COL ? ",SUM(`".$SUM_COL."`) `sum`" : '')."
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._spisokWhere($SPEL)."
 			GROUP BY `".$GROUP_COL."`";
@@ -56,7 +55,7 @@ function _element79_print($el) {
 		'<tr><td>'.@$ass[$r['gid']].
 			'<td class="w70 center b color-555">'.$r['c'];
 		$cAll += $r['c'];
-		if($ism) {
+	if($SUM_COL) {
 			$spisok .= '<td class="w90 r color-555">'._sumSpace($r['sum']);
 			$sumAll += $r['sum'];
 		}
@@ -66,13 +65,13 @@ function _element79_print($el) {
 	'<table class="_stab small w100p">'.
 		'<tr><th>'.
 			'<th>Кол-во'.
-	($ism ? '<th>Сумма' : '').
+($SUM_COL ? '<th>Сумма' : '').
 
 		$spisok.
 
 		'<tr><td class="r b">Всего:'.
 			'<td class="center b">'.$cAll.
-	($ism ? '<td class="r b">'._sumSpace($sumAll) : '').
+($SUM_COL ? '<td class="r b">'._sumSpace($sumAll) : '').
 	'</table>';
 }
 function _element79filterUpd($send, $elem_spisok) {//обновление значения после применения фильтра
