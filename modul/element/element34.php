@@ -142,7 +142,8 @@ function _elem34year($json, $year) {//ссылки на все года
 	for($y = $min; $y <= $max; $y++) {
 		$cur = $y == $year ? ' b u' : '';
 		$emp = !isset($Y[$y]) ? ' pale' : '';
-		$send .= '<a href="'.URL.'?'._elem34href($y).'" class="fs14 mr10'.$cur.$emp.'">'.$y.'</a>';
+		$mr = $y != $max ? ' mr10' : '';
+		$send .= '<a href="'.URL.'?'._elem34href($y).'" class="dib fs14'.$mr.$cur.$emp.'">'.$y.'</a>';
 	}
 
 	return '<div class="pb5">'.$send.'</div>';
