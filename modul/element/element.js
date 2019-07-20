@@ -2197,22 +2197,22 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(unit.id)
 						return;
 
-					var ids = [];
-					_forIn(vvv, function(did, elid) {
-						var c = 0;
-						_forEq(_attr_el(elid).find('._check'), function(eqAll) {
+					var ids = [],
+						elmIds = {};//id элементов-списков, в которых выбираются значения
+					_forIn(vvv, function(sp) {
+						if(elmIds[sp.elm_id])
+							return;
+						elmIds[sp.elm_id] = 1;
+
+						_forEq(_attr_el(sp.elm_id).find('._check'), function(eqAll) {
 							var ch = eqAll.prev(),
 								spid = ch.attr('id').split('_')[1];
 							if(spid == 'all')
 								return;
 							if(!_num(ch.val()))
 								return;
-							c++;
 							ids.push(spid);
 						});
-
-						if(c)
-							$('#el92_' + elid).html(c);
 					});
 
 					ATR_CMP.val(ids.join());
@@ -2223,22 +2223,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						elem_id:elm_id,
 						ids:ids.join(),
 						func_err:function() {
-							_forIn(vvv, function(did, elid) {
-								$('#el92_' + elid)
+							_forIn(vvv, function(sp) {
+								$('#el92_' + sp.dlg_id)
 									.parent().find('.sum92')
 									.html('');
 							});
 						}
 					};
 					_post(send, function(res) {
+
+						console.log(res.data);
+
 						var itogC = 0,
 							itogSum = 0;
-						_forIn(vvv, function(did, elid) {
-							var ob = $('#el92_' + elid);
-							ob.parent().find('.sum92')
-								.html(res[elid].sum);
-							itogC += _num(ob.html());
-							itogSum += res[elid].sum;
+						_forIn(res.data, function(sp, dlg_id) {
+							var ob = $('#el92_' + dlg_id);
+							ob.html(sp.count ? sp.count : '').
+							   parent().find('.sum92').html(sp.sum ? sp.sum : '');
+							itogC += sp.count;
+							itogSum += sp.sum;
 						});
 						ATR_EL.find('.itog-c').html(itogC);
 						ATR_EL.find('.itog-sum').html(itogSum);

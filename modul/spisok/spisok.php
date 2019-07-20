@@ -189,8 +189,7 @@ function _spisokCountAll($el, $prm, $next=0) {//получение общего 
 	if(!$dialog['table_1'])
 		return 0;
 
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Кол-во списка ".$dialog['name']." */
-			SELECT COUNT(*)
+	$sql = "SELECT COUNT(*)
 			FROM  "._queryFrom($dialog)."
 			WHERE "._spisokWhere($el, $prm);
 	$all = _num(query_value($sql));
@@ -304,7 +303,7 @@ function _spisokInclude($spisok) {//вложенные списки
 	foreach($DLG_IDS as $dlg_id => $i) {
 		$dlg = _dialogQuery($dlg_id);
 		$CMP = $dlg['cmp'];
-		foreach($CMP as $cmp_id => $cmp) {//поиск компонента диалога с вложенным списком
+		foreach($CMP as $cmp) {//поиск компонента диалога с вложенным списком
 			//должен является вложенным списком
 			if(!_elemIsConnect($cmp))
 				continue;
@@ -322,8 +321,7 @@ function _spisokInclude($spisok) {//вложенные списки
 			//получение данных из вложенного списка
 			$incDialog = _dialogQuery($cmp['num_1']);
 
-			$sql = "/* ".__FUNCTION__.":".__LINE__." Вложенный список ".$incDialog['name']." */
-					SELECT "._queryCol($incDialog)."
+			$sql = "SELECT "._queryCol($incDialog)."
 					FROM   "._queryFrom($incDialog)."
 					WHERE `t1`.`id` IN (".$ids.")
 					  AND "._queryWhere($incDialog, 1);
@@ -369,7 +367,7 @@ function _spisokImage($spisok) {//вставка картинок
 
 	$DLG = _dialogQuery($sp0['dialog_id']);
 
-	foreach($DLG['cmp'] as $cmp_id => $cmp) {//поиск компонента диалога с изображениями
+	foreach($DLG['cmp'] as $cmp) {//поиск компонента диалога с изображениями
 		//должен является компонентом "загрузка изображений"
 		if($cmp['dialog_id'] != 60)
 			continue;
@@ -388,8 +386,7 @@ function _spisokImage($spisok) {//вставка картинок
 		}
 
 		if($image_ids) {
-			$sql = "/* ".__FUNCTION__.":".__LINE__." Картинки для списка ".$DLG['name']." */
-					SELECT *
+			$sql = "SELECT *
 					FROM `_image`
 					WHERE `id` IN (".implode(',', $image_ids).")";
 			if($img = query_arr($sql))
@@ -502,8 +499,7 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 		$order = "`sort`";
 
 	//получение данных списка
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Список-шаблон <u>".$DLG['name']."</u> */
-			SELECT "._queryCol($DLG)."
+	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._spisokWhere($ELEM)."
 			ORDER BY ".$order."
@@ -568,8 +564,7 @@ function _spisokUnitQuery($dialog, $unit_id, $nosuq=false) {//получение
 	if(!$dialog['table_1'])
 		return array();
 
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Данные записи */
-			SELECT "._queryCol($dialog)."
+	$sql = "SELECT "._queryCol($dialog)."
 			FROM   "._queryFrom($dialog)."
 			WHERE `t1`.`id`=".$unit_id."
 			  AND "._queryWhere($dialog);
@@ -1475,14 +1470,15 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 	$n = 1000;
 	$upd = array();
 	$cAss = count($ass);
-	foreach($ass as $id => $c) {
+	foreach($ass as $id => $count) {
+/*
 		$sql = "UPDATE "._queryFrom($DSrc)."
 				SET `".$unit['col']."`=".$c."
 				WHERE `t1`.`id`=".$id."
 				  AND "._queryWhere($DSrc);
 		query($sql);
-/*
-		$upd[] = "(".$id.",".$c.")";
+*/
+		$upd[] = "(".$id.",".$count.")";
 		if(!--$cAss || !--$n) {
 			$sql = "INSERT INTO `"._table($DSrc['table_1'])."`
 						(`id`,`".$unit['col']."`)
@@ -1493,7 +1489,6 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 			$n = 1000;
 			$upd = array();
 		}
-*/
 	}
 
 	//обновление сумм родительских значений, если есть дочерние
@@ -1565,13 +1560,49 @@ function _spisokUnitUpd55($unit) {//обновление сумм
 	if(!$ass = query_ass($sql))//выход, если нечего обновлять
 		return;
 
-	foreach($ass as $id => $c) {
+	//если присутствует второй диалог, подмена ids
+	if($DSrc['dialog_id_parent']) {
+		//сохраниние исходного списка
+		$saveAss = array();
+		foreach($ass as $id => $r)
+			$saveAss[$id] = $r;
+
+		$sql = "SELECT `id`,`cnn_id`
+				FROM `_spisok`
+				WHERE `cnn_id` IN ("._idsGet($saveAss, 'key').")
+				  AND `app_id`=".$DSrc['app_id']."
+				  AND !`deleted`";
+		if(!$ass = query_ass($sql))
+			return;
+
+		foreach($ass as $id => $cnn_id)
+			$ass[$id] = $saveAss[$cnn_id];
+	}
+
+	$n = 1000;
+	$upd = array();
+	$cAss = count($ass);
+	foreach($ass as $id => $sum) {
+/*
 		$sql = "UPDATE "._queryFrom($DSrc)."
 				SET `".$unit['col']."`=".$c."
 				WHERE `t1`.`id`=".$id."
 				  AND "._queryWhere($DSrc);
 		query($sql);
+*/
+		$upd[] = "(".$id.",".$sum.")";
+		if(!--$cAss || !--$n) {
+			$sql = "INSERT INTO `"._table($DSrc['table_1'])."`
+						(`id`,`".$unit['col']."`)
+						VALUES ".implode(',', $upd)."
+					ON DUPLICATE KEY UPDATE
+						`".$unit['col']."`=VALUES(`".$unit['col']."`)";
+			query($sql);
+			$n = 1000;
+			$upd = array();
+		}
 	}
+
 }
 
 function _count_update($app_id=APP_ID) {//обновление счётчиков
@@ -1609,20 +1640,23 @@ function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение д
 	if(!$dialog['table_1'])
 		return;
 
-	foreach($dialog['cmp'] as $cmp_id => $cmp)
+	foreach($dialog['cmp'] as $cmp)
 		switch($cmp['dialog_id']) {
 			//Выбранные значения галочками
-			case 92: _elem92_cnn($dialog, $cmp, $unit); break;
+			case 92:
+				_elem92_cnn($dialog, $cmp, $unit);
+
+				foreach($dialog['cmp'] as $cmpp)
+					switch($cmpp['dialog_id']) {
+						case 54: _spisokUnitUpd54($cmpp); break;
+						case 55: _spisokUnitUpd55($cmpp); break;
+						case 27: _spisokUnitUpd27($cmpp); break;
+					}
+
+				break;
 		}
 
-	foreach($dialog['cmp'] as $cmp_id => $cmp)
-		switch($cmp['dialog_id']) {
-			case 54: _spisokUnitUpd54($cmp); break;
-			case 55: _spisokUnitUpd55($cmp); break;
-			case 27: _spisokUnitUpd27($cmp); break;
-		}
-
-	foreach($dialog['cmp'] as $cmp_id => $cmp)
+	foreach($dialog['cmp'] as $cmp)
 		switch($cmp['dialog_id']) {
 			//обновление суммы, если какой-то элемент самого диалога участвует в подсчёте (для стартовых сумм)
 			case 27:

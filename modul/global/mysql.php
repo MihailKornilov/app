@@ -46,8 +46,19 @@ function query($sql) {
 	};
 	$t = microtime(true) - $t;
 
+	$sqlPath = '';
+	if(DEBUG) {
+		$DB = debug_backtrace();
+
+		$n = substr($DB[1]['function'], 0, 5) == 'query' ? 1 : 0;
+
+		$ex = explode('\\', $DB[$n]['file']);
+		$file = $ex[count($ex) - 1];
+		$sqlPath = '/* '.$file.':'.$DB[$n]['line'].' '.$DB[$n]['function'].' */'."\n";
+	}
+
 	$SQL_TIME += $t;
-	$SQL_QUERY[] = $sql;
+	$SQL_QUERY[] = $sqlPath.$sql;
 	$SQL_QUERY_T[] = round($t, 3);
 
 	return $res;

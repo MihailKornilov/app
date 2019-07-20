@@ -29,7 +29,8 @@ foreach(array(
 			                           70,
 			      73,         77,   79,80,
 			            85,      88,
-			                           90
+			                           90,
+			   92
         ) as $id) {
 	$file = GLOBAL_DIR.'/modul/element/element'.$id.'.php';
 	if(file_exists($file))
@@ -719,8 +720,7 @@ function _element31_print($el, $prm) {
 
 	//получение данных списка
 	$DLG = _dialogQuery($el['num_1']);
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Выбор галочками из ".$DLG['name']." */
-			SELECT "._queryCol($DLG)."
+	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
 			ORDER BY `sort`";
@@ -1554,8 +1554,7 @@ function _elem72Sum($el, $year) {//получение сумм для фильт
 	if(!$DLG = _dialogQuery($bl['obj_id']))
 		return $spisok;
 
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Суммы для фильтра [72] */
-			SELECT
+	$sql = "SELECT
 				DISTINCT(DATE_FORMAT(`dtime_add`,'%m')) AS `mon`,
 				SUM(`".$col."`) `sum`
 			FROM   "._queryFrom($DLG)."
@@ -1903,103 +1902,6 @@ function _element91_print($el, $prm) {
 		'attr_id' => 'sch'.$el['id'].'_'.$u['id'],
 		'value' => 0
 	));
-}
-
-/* [92] Выбранные значения галочками */
-function _element92_struct($el) {
-	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'txt_1'   => $el['txt_1'],   //списки
-		'txt_2'   => $el['txt_2']    //значения
-	) + _elementStruct($el);
-}
-function _element92_print($el, $prm) {
-	if(!$dlg_ids = _elem92_dlgIds($el))
-		return _emptyMinRed('Списков не существует, в которых производится выбор значений');
-
-	$send = '<table class="_stab">'.
-				'<tr><th>Список'.
-					'<th>Кол-во</br>записей'.
-					'<th>Сумма';
-	foreach($dlg_ids as $elem_id => $r) {
-		if(!$DLG = _dialogQuery($r['did']))
-			continue;
-		$send .= '<tr class="color-555">'.
-					'<td>'.$DLG['name'].
-					'<td class="center" id="el92_'.$elem_id.'">'.
-					'<td class="sum92 r">'.
-						'<div class="icon spin"></div>';
-	}
-	$send .= '<tr>'.
-				'<td class="r b">Итог:'.
-				'<td class="itog-c center b">'.
-				'<td class="itog-sum r b">';
-	$send .= '</table>';
-
-	return
-	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'._elemPrintV($el, $prm, $el['txt_2']).'" />'.
-	$send;
-}
-function _element92_vvv($el) {
-	return _elem92_dlgIds($el);
-}
-function _elem92_dlgIds($el) {
-	if(!$spisok_ids = _ids($el['txt_1'], 1))
-		return _emptyMinRed('Не указаны списки, в которых производится выбор значений');
-
-	$send = array();
-	foreach($spisok_ids as $id) {
-		//элемент-список
-		if(!$ell = _elemOne($id))
-			continue;
-		if($ell['dialog_id'] != 23)
-			continue;
-		if(!$ell['num_1'])
-			continue;
-
-		$sid = 0;
-		foreach($ell['vvv'] as $vv)
-			if($vv['dialog_id'] == 91) {
-				$sid = _num($vv['num_1']);
-				break;
-			}
-
-		$send[$id] = array(
-			'did' => $ell['num_1'],
-			'sid' => $sid
-		);
-	}
-
-	return $send;
-}
-function _elem92_cnn($dialog, $cmp, $unit) {//присвоение (или удаление) связанного списка у выбранных значений
-	if(!$col = _elemCol($cmp))
-		return;
-	if(!$ids = _ids($unit[$col]))
-		return;
-
-	$sql = "SELECT *
-			FROM `_spisok`
-			WHERE `id` IN (".$ids.")
-			  AND !`deleted`";
-	if(!$spisok = query_arr($sql))
-		return;
-
-	foreach($spisok as $r) {
-		if(!$DLG = _dialogQuery($r['dialog_id']))
-			continue;
-		foreach($DLG['cmp'] as $cmpp)
-			if(_elemIsConnect($cmpp))
-				if($cmpp['num_1'] == $dialog['id'])
-					if($coll = _elemCol($cmpp)) {
-						$sql = "UPDATE `_spisok`
-								SET `".$coll."`=".($unit['deleted'] ? 0 : $unit['id'])."
-								WHERE `id`=".$r['id'];
-						query($sql);
-					}
-	}
 }
 
 /* [96] Количество значений связанного списка с учётом категорий */
@@ -3073,7 +2975,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 		'<tr>'.
 			'<th class="w30">'.
 //			'<th class="w35">num'.
-//	  (SA ? '<th class="w50">ID' : '').
+	  (SA ? '<th class="w50">ID' : '').
 			'<th>Имя диалога'.
 			'<th class="w30">'.
 			'<th class="w50">Список'.
@@ -3111,7 +3013,7 @@ function PHP12_dialog_app_li($r) {
 				'<td class="w30 r">'.
 					'<div class="icon icon-move pl"></div>'.
 //				'<td class="w35 r grey">'.$r['num'].
-//		  (SA ? '<td class="w50 pale r">'.$r['id'] : '').
+		  (SA ? '<td class="w50 pale r">'.$r['id'] : '').
 				'<td class="d-name over5 curP dialog-open'._dn($r['pid'], 'b').'" val="dialog_id:'.$r['id'].'">'.$r['name'].
 				'<td class="w30 r">'.
 					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup'._tooltip('Редактировать диалог', -66).'</div>'.
@@ -5552,7 +5454,7 @@ function _historySpisok($EL, $prm) {//список истории действи
 			  "._historyUnitCond($EL, $prm)."
 			  AND `user_id_add`
 			  AND `dtime_add`
-			ORDER BY `dtime_add` DESC
+			ORDER BY `id` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
 		return _emptyMin('Истории нет.');
@@ -5742,7 +5644,7 @@ function _historyUnitCond($el, $prm) {//отображение истории д
 		default: return " AND !`id` /* не страница и не диалог */";
 	}
 
-	$ids = 0;
+	$ids = '0';
 
 	//получение id записей, которые были связаны с текущей записью
 	$sql = "SELECT `block_id`,`col`
@@ -5763,11 +5665,12 @@ function _historyUnitCond($el, $prm) {//отображение истории д
 			$cond[] = "`dialog_id`=".$r['obj_id']." AND `".$col."`=".$unit_id;
 		}
 
-		if(!empty($cond)) {
+		foreach($cond as $r) {
 			$sql = "SELECT `id`
 					FROM `_spisok`
-					WHERE ".implode(' OR ', $cond);
-			$ids = query_ids($sql);
+					WHERE ".$r;
+			if($res = query_ids($sql))
+				$ids .= ','.$res;
 		}
 	}
 

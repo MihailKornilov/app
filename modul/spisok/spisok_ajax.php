@@ -310,32 +310,40 @@ switch(@$_POST['op']) {
 		break;
 	case 'spisok_92_sum'://Выбранные значения галочками - получение сумм
 		if(!$el = _elemOne($_POST['elem_id']))
-			jsonError('Не получен элемент');
+			jsonError('[92] Не получен элемент');
+		if(!$ids = _ids($el['txt_1'], 1))
+			jsonError('[92] Не указаны списки, в которых производится выбор значений');
+		if(!is_array($DI = _elem92dlgIds($ids)))
+			jsonError($DI);
 		if(!$ids = _ids($_POST['ids']))
 			jsonError('Не получены ID записей');
 
-		$DI = _elem92_dlgIds($el);
-		foreach(_elem92_dlgIds($el) as $elid => $r) {
-			$col = _elemCol($r['sid']);
-			$DI[$elid]['sid'] = $col;
-			$DI[$elid]['sum'] = $col ? 0 : '';
-		}
-
 		$sql = "SELECT *
 				FROM `_spisok`
-				WHERE `id` IN (".$ids.")
+				WHERE `dialog_id` IN ("._idsGet($DI, 'dlg_id').")
+				  AND `id` IN (".$ids.")
 				  AND !`deleted`";
 		if(!$spisok = query_arr($sql))
 			jsonError('Записей не существует');
 
-		foreach($spisok as $r)
-			foreach($DI as $elid => $rr)
-				if($r['dialog_id'] == $rr['did'])
-					if($col = $rr['sid']) {
-						$DI[$elid]['sum'] += $r[$col];
-					}
+		$data = array();
+		foreach($DI as $r)
+			$data[$r['dlg_id']] = array(
+				'count' => 0,
+				'sum_col' => _elemCol($r['sum_id']),
+				'sum' => 0
+			);
 
-		jsonSuccess($DI);
+		foreach($spisok as $r) {
+			$dlg_id = _num($r['dialog_id']);
+			$data[$dlg_id]['count']++;
+			if($col = $data[$dlg_id]['sum_col'])
+				$data[$dlg_id]['sum'] += $r[$col];
+		}
+
+		$send['data'] = $data;
+
+		jsonSuccess($send);
 		break;
 	case 'elem88next':
 		if(!$elem_id = _num($_POST['elem_id']))

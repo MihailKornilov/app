@@ -105,8 +105,7 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 	}
 
 	//получение данных списка
-	$sql = "/* ".__FUNCTION__.":".__LINE__." Список-таблица <u>".$DLG['name']."</u> */
-			SELECT "._queryCol($DLG)."
+	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._spisokWhere($ELEM, $prm)."
 			ORDER BY ".$order." ".$SC."

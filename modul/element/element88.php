@@ -13,6 +13,10 @@ function _element88_struct($el) {
 		'txt_2' => $el['txt_2']       //содержание
 	) + _elementStruct($el);
 }
+function _element88_struct_title($el) {
+	$el['title'] = '[88]';
+	return $el;
+}
 function _element88_struct_vvv($el, $cl) {
 	$send = array(
 		'id'        => _num($cl['id']),
@@ -315,9 +319,17 @@ function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
 	if(empty($val['spv']))
 		jsonError('Не выбрано ни одного списка');
 
-	foreach($val['spv'] as $n => $r)
+	$rpt = array();
+	foreach($val['spv'] as $n => $r) {
 		if(!empty($r['cond']))
 			$val['spv'][$n]['cond'] = json_decode($r['cond'], true);
+
+		$id = $r['dialog_id'];
+		if(!isset($rpt[$id]))
+			$rpt[$id] = 1;
+		else
+			jsonError('Нельзя выбирать один и тот же список повторно');
+	}
 
 	$json = json_encode($val);
 
