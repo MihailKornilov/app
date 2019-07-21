@@ -483,6 +483,45 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			spisok:o.iuid_cols
 		});
 
+		//Загрузка изображения из файла
+		DLG('form input').change(function() {
+			var elimg = DLG('#element_img'),
+				load = elimg.next(),
+				xhr = new XMLHttpRequest(),
+				data = new FormData;
+
+			load.addClass('_busy');
+		    xhr.open('post', AJAX, true);
+
+		    data.append('f1', this.files[0]);
+		    data.append('op', 'element_image_upload');
+		    xhr.send(data);
+
+		    xhr.addEventListener('load', function() {
+		        load.removeClass('_busy');
+		        var res = JSON.parse(xhr.responseText);
+				if(!res.success) {
+					load._hint({
+						msg:res.text,
+						pad:10,
+						color:'red',
+						show:1
+					});
+					return;
+				}
+
+				elimg.val(res.img_id);
+				load.addClass('loaded')
+					.find('img').remove();
+				load.find('.eimg').append(res.html);
+		    });
+		});
+		DLG('.eimg-del').click(function() {
+			DLG('.el-img')
+				.removeClass('loaded')
+				.prev().val(0);
+		});
+
 		_dialogHeightCorrect(DLG);
 
 		//установка линии для настройки ширины диалога
@@ -553,6 +592,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				clone_on:DLG('#clone_on').val(),
 
 				element_group_id:DLG('#element_group_id').val(),
+				element_img:DLG('#element_img').val(),
 				element_width:DLG('#element_width').val(),
 				element_width_min:DLG('#element_width_min').val(),
 				element_type:DLG('#element_type').val(),

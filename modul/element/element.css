@@ -243,6 +243,20 @@
 
 
 
+/* Загрузка картинки для элемента */
+.el-img{
+	display:inline-block;
+	max-width:312px;
+}
+.el-img._busy form{visibility:hidden}
+.el-img.loaded form,
+.el-img:not(.loaded) .eimg{display:none}
+.el-img .eimg{
+	position:relative;
+	padding:5px;
+	background-color:#EBF0F3;
+	border:#CEDDE8 solid 1px;
+}
 
 
 

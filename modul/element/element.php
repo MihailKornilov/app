@@ -5454,7 +5454,7 @@ function _historySpisok($EL, $prm) {//список истории действи
 			  "._historyUnitCond($EL, $prm)."
 			  AND `user_id_add`
 			  AND `dtime_add`
-			ORDER BY `id` DESC
+			ORDER BY `dtime_add` DESC
 			LIMIT 50";
 	if(!$arr = query_arr($sql))
 		return _emptyMin('Истории нет.');

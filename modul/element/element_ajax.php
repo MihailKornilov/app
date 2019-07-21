@@ -464,6 +464,18 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
+	case 'element_image_upload'://загрузка изображения для элемента
+		if(!$f = @$_FILES['f1'])
+			jsonError('Файл отсутствует');
+
+		$img = _imageSave($f['type'], $f['tmp_name']);
+
+		$send['img_id'] = $img['id'];
+		$send['html'] = _elemImg($img['id']);
+
+		jsonSuccess($send);
+		break;
+
 	case 'filter_calendar_mon_change'://перелистывание фильтра-календаря
 		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Некорректный ID элемента');
@@ -862,7 +874,9 @@ function _dialogSetupSa2($dialog) {//пункт меню настройки ка
 		'</table>'.
 		'<div class="elememt-setup'._dn($group_id).'">'.
 		'<table class="bs5">'.
-			'<tr><td class="red r w150">Начальная ширина:'.
+			'<tr><td class="red r w150 topi">Изображение:'.
+				'<td>'._dialogSetupElemImg($dialog).
+			'<tr><td class="red r">Начальная ширина:'.
 				'<td><input type="hidden" id="element_width" value="'._num(@$dialog['element_width']).'" />'.
 			'<tr><td class="red r">Минимальная ширина:'.
 				'<td><input type="hidden" id="element_width_min" value="'._num(@$dialog['element_width_min']).'" />'.
@@ -884,6 +898,33 @@ function _dialogSetupSa2($dialog) {//пункт меню настройки ка
         _dialogSetupRule($dialog['id']).
 		'</div>'.
 	'</div>';
+}
+function _dialogSetupElemImg($dialog) {
+	$img_id = _num(@$dialog['element_img']);
+
+	return
+	'<input type="hidden" id="element_img" value="'.$img_id.'" />'.
+	'<div class="el-img'._dn(!$img_id, 'loaded').'">'.
+		'<form>'.
+			'<input type="file" accept="image/jpeg,image/png,image/gif,image/tiff" />'.
+		'</form>'.
+		'<div class="eimg'._dn($img_id, 'loaded').'">'.
+			'<div class="icon icon-del-red eimg-del pabs r3 pl"></div>'.
+			_elemImg($img_id).
+		'</div>'.
+	'</div>';
+}
+function _elemImg($img_id) {
+	if(!$img_id)
+		return '';
+
+	$sql = "SELECT *
+			FROM `_image`
+			WHERE `id`=".$img_id;
+	if(!$img = query_assoc($sql))
+		return '';
+
+	return _imageHtml($img, 300);
 }
 function _dialogSetupLoadUse($dialog) {//использование как элемента в других диалогах
 	if(empty($dialog['element_group_id']))
@@ -1062,6 +1103,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 	}
 
 	$element_group_id = _num($_POST['element_group_id']);
+	$element_img = _num($_POST['element_img']);
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
 	$element_type = _num($_POST['element_type']);
@@ -1080,6 +1122,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 				`clone_on`=".$clone_on.",
 
 				`element_group_id`=".$element_group_id.",
+				`element_img`=".$element_img.",
 				`element_width`=".$element_width.",
 				`element_width_min`=".$element_width_min.",
 				`element_type`=".$element_type.",
