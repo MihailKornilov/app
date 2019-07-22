@@ -485,7 +485,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		//Загрузка изображения из файла
 		DLG('form input').change(function() {
-			var elimg = DLG('#element_img'),
+			var elimg = DLG('#element_image_id'),
 				load = elimg.next(),
 				xhr = new XMLHttpRequest(),
 				data = new FormData;
@@ -592,7 +592,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				clone_on:DLG('#clone_on').val(),
 
 				element_group_id:DLG('#element_group_id').val(),
-				element_img:DLG('#element_img').val(),
+				element_image_id:DLG('#element_image_id').val(),
 				element_width:DLG('#element_width').val(),
 				element_width_min:DLG('#element_width_min').val(),
 				element_type:DLG('#element_type').val(),

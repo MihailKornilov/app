@@ -900,10 +900,10 @@ function _dialogSetupSa2($dialog) {//пункт меню настройки ка
 	'</div>';
 }
 function _dialogSetupElemImg($dialog) {
-	$img_id = _num(@$dialog['element_img']);
+	$img_id = _num(@$dialog['element_image_id']);
 
 	return
-	'<input type="hidden" id="element_img" value="'.$img_id.'" />'.
+	'<input type="hidden" id="element_image_id" value="'.$img_id.'" />'.
 	'<div class="el-img'._dn(!$img_id, 'loaded').'">'.
 		'<form>'.
 			'<input type="file" accept="image/jpeg,image/png,image/gif,image/tiff" />'.
@@ -1103,7 +1103,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 	}
 
 	$element_group_id = _num($_POST['element_group_id']);
-	$element_img = _num($_POST['element_img']);
+	$element_image_id = _num($_POST['element_image_id']);
 	$element_width = _num($_POST['element_width']);
 	$element_width_min = _num($_POST['element_width_min']);
 	$element_type = _num($_POST['element_type']);
@@ -1122,7 +1122,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 				`clone_on`=".$clone_on.",
 
 				`element_group_id`=".$element_group_id.",
-				`element_img`=".$element_img.",
+				`element_image_id`=".$element_image_id.",
 				`element_width`=".$element_width.",
 				`element_width_min`=".$element_width_min.",
 				`element_type`=".$element_type.",

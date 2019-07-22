@@ -3767,6 +3767,15 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 	if(!$elem = query_arr($sql))
 		return _emptyMin10('Нет элементов для отображения.');
 
+	$sql = "SELECT *
+			FROM `_image`
+			WHERE `id` IN ("._idsGet($elem, 'element_image_id').")";
+	if($img = query_arr($sql))
+		foreach($elem as $id => $r) {
+			$img_id = $r['element_image_id'];
+			$elem[$id]['img'] = empty($img[$img_id]) ? array() : $img[$img_id];
+		}
+
 	//правила для каждого элемента
 	$sql = "SELECT *
 			FROM `_element_rule_use`
@@ -3816,11 +3825,12 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 						'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
 							'<table class="w100p">'.
 								'<tr><td class="num w25 r top pr5 grey">'.$n++.'.'.
-									'<td class="b top">'.$el['name'].
-							  (SA ? '<td class="w50 top">'.
-										'<div class="icon icon-move-y fr pl"></div>'.
+									'<td class="b top">'.
+							  (SA ? 	'<div class="icon icon-move-y fr pl"></div>'.
 								        '<div class="icon icon-edit fr pl mr3 dialog-setup" val="dialog_id:'.$el['id'].'"></div>'
 							  : '').
+										$el['name'].
+						  ($el['img'] ? '<div class="mt5">'._imageHtml($el['img'], 300).'</div>' : '').
 							'</table>'.
 							'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
 						'</div>'.
