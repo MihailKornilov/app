@@ -3793,7 +3793,7 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 
 	//расстановка элементов в группы согласно правилу отображения
 	foreach($elem as $id => $r)
-		if(isset($r['rule'][$rule_id]))
+//		if(isset($r['rule'][$rule_id]))
 			$group[$r['element_group_id']]['elem'][] = $r;
 
 	//скрытие разделов без элементов
@@ -3832,7 +3832,6 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 										$el['name'].
 						  ($el['img'] ? '<div class="mt5">'._imageHtml($el['img'], 300).'</div>' : '').
 							'</table>'.
-							'<div class="elem-img eli'.$el['id'].' mt5"></div>'.
 						'</div>'.
 					'</dd>';
 		$content .=	'</dl>';
