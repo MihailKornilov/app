@@ -3793,7 +3793,7 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 
 	//расстановка элементов в группы согласно правилу отображения
 	foreach($elem as $id => $r)
-		if(isset($r['rule'][$rule_id]))
+//		if(isset($r['rule'][$rule_id]))
 			$group[$r['element_group_id']]['elem'][] = $r;
 
 	//скрытие разделов без элементов
@@ -3830,7 +3830,7 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 								        '<div class="icon icon-edit fr pl mr3 dialog-setup" val="dialog_id:'.$el['id'].'"></div>'
 							  : '').
 										$el['name'].
-						  ($el['img'] ? '<div class="mt5">'._imageHtml($el['img'], 300).'</div>' : '').
+						  ($el['img'] ? '<div class="mt5">'._imageHtml($el['img'], 300, 0, 0, 0).'</div>' : '').
 							'</table>'.
 						'</div>'.
 					'</dd>';
