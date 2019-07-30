@@ -168,6 +168,7 @@ switch(@$_POST['op']) {
 		$send['upd'] = array();
 		$send = _element15filterUpd($send, $spisok_id);
 		$send = _element64filterUpd($send, $spisok_id);
+		$send = _element73filterUpd($send, $spisok_id);
 		$send = _element79filterUpd($send, $spisok_id);
 		$send = _spisokFilterHtml($send, $spisok_id);
 

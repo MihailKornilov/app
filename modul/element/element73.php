@@ -11,11 +11,24 @@ function _element73_struct($el) {
 }
 function _element73_print($el) {
 	$F = _spisokFilter();
-	if(empty($F['filter'][$el['num_1']]))
+	if(!$fl = @$F['filter'][$el['num_1']])
 		return _msgRed('Отсутствует фильтр-календарь');
 
-	$ex = explode(':', $F['filter'][$el['num_1']]['v']);
+	$v = $fl['v'];
 
+	switch($v) {
+		case 2819:
+			$v = TODAY;
+			break;
+		case 2820:
+			$v = _calendarWeek();
+			break;
+		case 2821:
+			$v = YEAR_MON;
+			break;
+	}
+
+	$ex = explode(':', $v);
 	$S = explode('-', $ex[0]);
 	$send =
 		($el['num_2'] ? '<a href="'.URL.'&p='.$el['num_2'].'" class="inhr">'.$S[0].'</a>' : $S[0]).
