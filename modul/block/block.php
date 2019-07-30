@@ -411,7 +411,16 @@ function _blockLevelChange($obj_name, $obj_id) {//кнопки изменени�
 		$html.
 		_blockWidthChange($obj_name, $obj_id).
 		_blockChooseBut($obj_name, $obj_id).
+		_blockLevelPageEdit().
 	'</div>';
+}
+function _blockLevelPageEdit() {//отображение иконки редактирования страницы
+	if(!$page_id = _page('cur'))
+		return '';
+	if(!$page = _page($page_id))
+		return '';
+
+	return '<div val="dialog_id:'.$page['dialog_id'].',edit_id:'.$page_id.'" class="icon icon-edit pl fr dialog-open'._tooltip('Редактировать страницу', -140, 'r').'</div>';
 }
 function _blockLevelButArr($obj_name, $obj_id) {//кнопки для изменения уровня редактирования блоков в виде массива
 	if(!$arr = _BE('block_arr', $obj_name, $obj_id))
