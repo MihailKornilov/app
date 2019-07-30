@@ -354,45 +354,46 @@ function _blockActionView($bl, $prm) {//условия отображения б
 
 	foreach($bl['action'] as $act)
 		switch($act['dialog_id']) {
-			//скрытие блока, если нулевое значение элемента
+			//скрытие блока
 			case 231:
 				if(!$F = _elem40json($act['filter']))
 					break;
 
-				$F = $F[0];
-
-				if(!$el = _elemOne($F['elem_id']))
-					break;
-
-				$v = 0;
-
-				if($col = _elemCol($el))
-					if(!empty($u[$col]))
-						$v = is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
-
-				switch($F['cond_id']) {
-					//отсутствует
-					case 1:
-						if(!$v)
-							$bl['hidden'] = 1;
+				foreach($F as $ff) {
+					if(!$el = _elemOne($ff['elem_id']))
 						break;
-					//присутствует
-					case 2:
-						if($v)
-							$bl['hidden'] = 1;
-						break;
-					//равно
-					case 3:
-						if($v == $F['unit_id'])
-							$bl['hidden'] = 1;
-						break;
-					//не равно
-					case 4:
-						if($v != $F['unit_id'])
-							$bl['hidden'] = 1;
-						break;
+
+					$v = 0;
+
+					if($col = _elemCol($el))
+						if(!empty($u[$col]))
+							$v = is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
+
+					switch($ff['cond_id']) {
+						//отсутствует
+						case 1:
+							if($v)
+								return $bl;
+							break;
+						//присутствует
+						case 2:
+							if(!$v)
+								return $bl;
+							break;
+						//равно
+						case 3:
+							if($v != $ff['unit_id'])
+								return $bl;
+							break;
+						//не равно
+						case 4:
+							if($v == $ff['unit_id'])
+								return $bl;
+							break;
+					}
 				}
 
+				$bl['hidden'] = 1;
 				break;
 		}
 
@@ -411,10 +412,12 @@ function _blockLevelChange($obj_name, $obj_id) {//кнопки изменени�
 		$html.
 		_blockWidthChange($obj_name, $obj_id).
 		_blockChooseBut($obj_name, $obj_id).
-		_blockLevelPageEdit().
+		_blockLevelPageEdit($obj_name).
 	'</div>';
 }
-function _blockLevelPageEdit() {//отображение иконки редактирования страницы
+function _blockLevelPageEdit($obj_name) {//отображение иконки редактирования страницы
+	if($obj_name != 'page')
+		return '';
 	if(!$page_id = _page('cur'))
 		return '';
 	if(!$page = _page($page_id))
