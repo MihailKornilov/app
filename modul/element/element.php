@@ -58,6 +58,8 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 		case 'print11':
 			$PARAM = _blockParam();
 			$PARAM['unit_get'] = $prm;
+			if(!empty($prm['deleted']))
+				return '<s>'._element('print', $el, $PARAM).'</s>';
 			return _element('print', $el, $PARAM);
 
 		//печать значения истории действий

@@ -1705,14 +1705,7 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 
 	$UCOL = $cmp['col'];
 
-	if(empty($unit[$UCOL]))
-		return array();
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `dialog_id`=54
-			  AND `num_1`=".$cmp['id'];
-	if(!$arr = query_arr($sql))
+	if(!isset($unit[$UCOL]))
 		return array();
 
 	//значение, id записи привязанного списка
@@ -1722,6 +1715,18 @@ function _spisokUnitAfter54($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 	$connect_old = 0;
 	if(!empty($unitOld))
 		$connect_old = is_array($unitOld[$UCOL]) ? $unitOld[$UCOL]['id'] : $unitOld[$UCOL];
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=54
+			  AND `num_1`=".$cmp['id'];
+	if(!$arr = query_arr($sql))
+		return array();
+
+	//если была отвязка значения - пересчёт количества в обратную сторону
+	if(!$connect_id)
+		if(!$connect_id = $connect_old)
+			return array();
 
 	$send = array();
 	foreach($arr as $elem_id => $r) {
@@ -1820,15 +1825,7 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 
 	$col = $cmp['col'];
 
-	if(empty($unit[$col]))
-		return array();
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `dialog_id`=55
-			  AND `app_id`=".APP_ID."
-			  AND `num_1`=".$cmp['id'];
-	if(!$arr = query_arr($sql))
+	if(!isset($unit[$col]))
 		return array();
 
 	//значение, id записи привязанного списка
@@ -1838,6 +1835,19 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 	$connect_old = 0;
 	if(!empty($unitOld))
 		$connect_old = is_array($unitOld[$col]) ? $unitOld[$col]['id'] : $unitOld[$col];
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=55
+			  AND `app_id`=".APP_ID."
+			  AND `num_1`=".$cmp['id'];
+	if(!$arr = query_arr($sql))
+		return array();
+
+	//если была отвязка значения - пересчёт суммы в обратную сторону
+	if(!$connect_id)
+		if(!$connect_id = $connect_old)
+			return array();
 
 	$send = array();//значения, которые были пересчитаны. По ним будет потом посчитан баланс, если потребуется.
 	foreach($arr as $elem_id => $r) {
@@ -1881,8 +1891,6 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 						WHERE `t1`.`id`=".$connect_old."
 						  AND "._queryWhere($dlg);
 				query($sql);
-
-//echo 'sum_old='.$sum_old."\n";
 			}
 
 		$sumOld = 0;

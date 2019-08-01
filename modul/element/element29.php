@@ -57,6 +57,7 @@ function _element29_print($el, $prm) {
 function _element29_print11($el, $u) {
 
 	$parent = '';
+	$deleted = 0;
 
 	foreach(_ids($el['txt_2'], 'arr') as $id) {
 		if(!$ell = _elemOne($id))
@@ -84,8 +85,14 @@ function _element29_print11($el, $u) {
 						if(!empty($unit[$col]))
 							$parent = $unit[$col].' » ';
 
+
+		if(!empty($u['deleted']))
+			$deleted = 1;
 		$u = $u[$col];
 	}
+
+	if($deleted)
+		return '<s>'.$parent.$u.'</s>';
 
 	return $parent.$u;
 }
