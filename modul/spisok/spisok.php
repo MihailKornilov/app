@@ -591,50 +591,53 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 	if($prm['blk_setup'])
 		return '<a class="inhr">'.$txt.'</a>';
 
-	$func = $el['action'][0];
-	switch($func['dialog_id']) {
-		//переход на страницу
-		case 221:
-			$page_id = $func['target_ids'];
-			$id = _spisokUnitUrlPage($el, $page_id, $u);
-			return '<a href="'.URL.'&p='.$page_id.($id ? '&id='.$id : '').'" class="inhr'.
-						_spisokUnitTT($el, $u).
-						$txt.
-				   '</a>';
 
-		//открытие диалога
-		case 222:
-			$val = 'dialog_id:'.$func['target_ids'];
 
-			//элемент передаёт id записи для отображения
-			if($func['apply_id'])
-				$val .= ',get_id:'._unitUrlId($u, _num($func['target_ids']));
+	foreach($el['action'] as $func)
+		switch($func['dialog_id']) {
+			//переход на страницу
+			case 221:
+				$page_id = $func['target_ids'];
+				$id = _spisokUnitUrlPage($el, $page_id, $u);
+				return '<a href="'.URL.'&p='.$page_id.($id ? '&id='.$id : '').'" class="inhr'.
+							_spisokUnitTT($el, $u).
+							$txt.
+					   '</a>';
 
-			//блок передаёт id записи для редактирования
-			if($func['effect_id'])
-				$val .= ',edit_id:'._unitUrlId($u, $func['target_ids']);
+			//открытие диалога
+			case 222:
+				$val = 'dialog_id:'.$func['target_ids'];
 
-			//блок передаёт id записи для удаления
-			if($func['revers'])
-				$val .= ',del_id:'._unitUrlId($u, $func['target_ids']);
+				//элемент передаёт id записи для отображения
+				if($func['apply_id'])
+					$val .= ',get_id:'._unitUrlId($u, _num($func['target_ids']));
 
-			if(preg_match('/"icon/', $txt))
-				return str_replace('class="', 'val="'.$val.'" class="dialog-open ', $txt);
+				//блок передаёт id записи для редактирования
+				if($func['effect_id'])
+					$val .= ',edit_id:'._unitUrlId($u, $func['target_ids']);
 
-			return '<a val="'.$val.'" class="dialog-open inhr'.
-						_spisokUnitTT($el, $u).
-						$txt.
-				   '</a>';
+				//блок передаёт id записи для удаления
+				if($func['revers'])
+					$val .= ',del_id:'._unitUrlId($u, $func['target_ids']);
 
-		//внешняя ссылка
-		case 224:
-			$link = $func['target_ids'] ? $func['target_ids'] : $txt;
-			return '<a href="//'.$link.'" class="inhr" target="_blank">'.$txt.'</a>';
-		//открытие документа
-		case 227:
-			$doc_id = $func['target_ids'];
-			return '<a class="inhr" href="'.URL.'&p=9&doc_id='.$doc_id.'&id='.$u['id'].'">'.$txt.'</a>';
-	}
+				if(preg_match('/"icon/', $txt))
+					return str_replace('class="', 'val="'.$val.'" class="dialog-open ', $txt);
+
+				return '<a val="'.$val.'" class="dialog-open inhr'.
+							_spisokUnitTT($el, $u).
+							$txt.
+					   '</a>';
+
+			//внешняя ссылка
+			case 224:
+				$link = $func['target_ids'] ? $func['target_ids'] : $txt;
+				return '<a href="//'.$link.'" class="inhr" target="_blank">'.$txt.'</a>';
+
+			//открытие документа
+			case 227:
+				$doc_id = $func['target_ids'];
+				return '<a class="inhr" href="'.URL.'&p=9&doc_id='.$doc_id.'&id='.$u['id'].'">'.$txt.'</a>';
+		}
 
 	return _spisokUnitTT($el, $u, $txt);
 }
