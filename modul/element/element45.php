@@ -56,7 +56,8 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 		$exx = explode(':', $ex);
 		$UNS[] = array(
 			'id' => $exx[0],
-			'c' => $exx[1]
+			'count' => $exx[1],
+			'cena' => isset($exx[2]) ? round($exx[2], 2) : 0
 		);
 	}
 
@@ -87,8 +88,8 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 			if(isset($u[$col]))
 				$name = $u[$col];
 
-		$cena = 0;
-		if($cenaCol)
+		$cena = $r['cena'];
+		if($cenaCol && $r['cena'] < 0)
 			if(isset($u[$cenaCol]))
 				$cena = $u[$cenaCol];
 
@@ -100,7 +101,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 				'<td class="fs14">'.
 					'<div class="fs14">'.$name.'</div>'.
 				'<td class="w70 bg-ffd'._dn($el['num_3']).'">'.
-					'<input type="text" class="uinp w100p r b" val="'.$r['id'].'" value="'.$r['c'].'">'.
+					'<input type="text" class="uinp w100p r b" val="'.$r['id'].'" value="'.$r['count'].'">'.
 
 			($cenaCol ?
 				'<td class="w100 r'._dn($el['num_4']).'">'.
@@ -117,7 +118,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 		'<tr><td class="w35 grey r">'.$n++.
 			'<td>'.$name;
 		if($el['num_3'])
-			$send .='<td class="w50 r b">'.$r['c'];
+			$send .='<td class="w50 r b">'.$r['count'];
 	}
 
 	return
@@ -139,7 +140,9 @@ function _element45doc($el, $unit) {//вывод таблицы в докуме�
 		$ex = explode(':', $r);
 		$UNS[] = array(
 			'id' => _num($ex[0]),
-			'count' => round($ex[1])
+			'count' => round($ex[1], 2),
+			'cena' => isset($ex[2]) ? round($ex[2], 2) : 0
+
 		);
 	}
 
@@ -168,19 +171,14 @@ function _element45doc($el, $unit) {//вывод таблицы в докуме�
 			if(isset($u[$col]))
 				$name = $u[$col];
 
-		$cena = 0;
-		if($cenaCol)
-			if(isset($u[$cenaCol]))
-				$cena = $u[$cenaCol];
-
 		$TR .=
 		'<w:tr w:rsidR="003F55DD" w:rsidTr="003F55DD"><w:trPr><w:trHeight w:val="375"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="447" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:jc w:val="right"/><w:rPr><w:color w:val="7F7F7F" w:themeColor="text1" w:themeTint="80"/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr></w:pPr><w:r><w:rPr><w:color w:val="7F7F7F" w:themeColor="text1" w:themeTint="80"/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr>'.
 			'<w:t>'.($n++).'</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="4253" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r w:rsidRPr="003F55DD"><w:rPr><w:lang w:val="en-US"/></w:rPr>'.
 			'<w:t>'.$name.'</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="1302" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:jc w:val="center"/></w:pPr><w:r w:rsidRPr="003F55DD">'.
 			'<w:t>'.$r['count'].'</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="1534" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:jc w:val="right"/></w:pPr><w:r w:rsidRPr="003F55DD"><w:rPr><w:lang w:val="en-US"/></w:rPr>'.
-			'<w:t xml:space="preserve">'._sumSpace($cena, true).' </w:t></w:r><w:r w:rsidRPr="003F55DD">'.
+			'<w:t xml:space="preserve">'._sumSpace($r['cena'], true).' </w:t></w:r><w:r w:rsidRPr="003F55DD">'.
 			'<w:t>руб.</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="1950" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:jc w:val="right"/></w:pPr><w:r w:rsidRPr="003F55DD">'.
-			'<w:t>'._sumSpace($r['count']*$cena, true).' руб.</w:t></w:r></w:p></w:tc>'.
+			'<w:t>'._sumSpace($r['count']*$r['cena'], true).' руб.</w:t></w:r></w:p></w:tc>'.
 		'</w:tr>';
 	}
 

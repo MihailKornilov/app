@@ -1393,29 +1393,30 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//Выбор нескольких значений привязанного списка
 				case 45:
 					var UNS = ATR_CMP.next(),//размещение выбранных значений
-						CMP_UPD = function(id_new) {//сохранение значения
+						CMP_UPD = function() {//сохранение значения
 							var vv = [],
 								pos = 0,//общее количество
 								sum = 0,//общая сумма
 								itog = '';
+
 							_forEq(UNS.find('.uinp'), function(sp) {
 								var id = _num(sp.attr('val'));
 								if(!id)
 									return;
 
-								var count = _num(sp.val());
+								var count = _num(sp.val()),
+									cena = 0;//стоимость
 
 								pos += count;
 
-								if(el.num_4)
-									sum += sp.closest('tr').find('.ucena').html() * count;
+								if(el.num_4) {
+									cena = Math.round(sp.closest('tr').find('.ucena').html() * 100) / 100;
+									sum += cena * count;
+								}
 
-								vv.push(id + ':' + count);
+								vv.push(id + ':' + count + ':' + cena);
 							});
-							if(_num(id_new)) {
-								vv.push(id_new + ':1');
-								pos += 1;
-							}
+
 							ATR_CMP.val(vv.join());
 
 							//обновление итога
@@ -1455,25 +1456,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									if(!un.length)
 										return;
 
-									var id = _num(un.attr('val'));
-									if(!id)
+									var id_new = _num(un.attr('val'));
+									if(!id_new)
 										return;
 
-									CMP_UPD(id);
 									dlg.close();
 
 									//действие после выбора значения
 									var send = {
 										op:'spisok_45_uns',
 										elem_id:elm_id,
+										id_new:id_new,
 										v:ATR_CMP.val(),
 										busy_obj:ATR_CMP_AFICS
 									};
 									_post(send, function(res) {
 										UNS.html(res.html);
 										UNS_DEL();
-										UNS.find('.uinp:last').select();
 										CMP_UPD();
+										UNS.find('.uinp:last').select();
 									});
 								});
 							}

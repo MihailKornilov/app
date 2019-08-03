@@ -283,8 +283,11 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID компонента');
 		if(!$el = _elemOne($elem_id))
 			jsonError('Элемента '.$elem_id.' не существует');
+		if(!$id_new = _num($_POST['id_new']))
+			jsonError('Некорректный ID выбранного значения');
 
 		$v = _txt($_POST['v']);
+		$v .= ($v ? ',' : '').$id_new.':1:-1';
 
 		$send['html'] = _element45Uns($el, $v);
 		jsonSuccess($send);
