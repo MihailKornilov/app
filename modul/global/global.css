@@ -235,6 +235,14 @@ body:not(.site){position:relative}
 	padding-left:15px;
 }
 #hat.show{background-color:#D47E02}/* просмотр от имени другого пользователя */
+.hat-title{
+	display:inline-block;
+	margin-top:5px;
+	font-size:22px;
+	width:450px;
+	white-space:nowrap;
+	overflow-x:hidden;
+}
 
 /* Основное содержание сайта */
 #_content{

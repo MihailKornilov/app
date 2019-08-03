@@ -459,7 +459,7 @@ function _html_hat() {//верхняя строка приложения для 
 	return
 	'<div id="hat">'.
 		'<div class="w1000 mara pt3">'.
-			'<div class="dib mt5 fs22'._dn(!LOCAL, 'pale').'">'._html_title().(LOCAL ? ' - LOCAL' : '').'</div>'.
+			'<div class="hat-title'._dn(!LOCAL, 'pale').'">'._html_title()._dn(!LOCAL, '- LOCAL').'</div>'.
 
 			'<a href="'.URL.'&logout" class="fr white mt10">'.
 				'<span class="dib mr20 pale">'.USER_NAME.'</span>'.
