@@ -1419,9 +1419,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							ATR_CMP.val(vv.join());
 
 							//обновление итога
-							if(vv.length)
-								itog = 'Всего <b class="fsin">' + pos + '</b> позици' + _end(pos, ['я','и','й']) +
-						   (el.num_4 ? ' на сумму <b class="fsin">' + (Math.round(sum*100)/100) + '</b> руб.' : '');
+							if(vv.length) {
+								var summ = Math.round(sum * 100) / 100;
+								itog = 'Всего <b class="fsin">' + pos + '</b> позици' + _end(pos, ['я', 'и', 'й']) +
+						   (el.num_4 ? ' на сумму <b class="fsin">' + summ + '</b> руб.' : '');
+								//вставка итоговой суммы у указанное поле
+								if(el.num_5)
+									_attr_cmp(el.num_5).val(summ);
+							}
 							ATR_EL.find('.uns-itog').html(itog);
 						},
 						UNS_DEL = function() {//удаление значения

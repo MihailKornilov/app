@@ -9,15 +9,17 @@ function _element45_struct($el) {
 		'num_1'   => _num($el['num_1']),//список (из которого будут выбираться значения)
 		'txt_1'   => $el['txt_1'],      //имя кнопки
 		'num_2'   => _num($el['num_2']),//вспомогательный диалог
-		'txt_2'   => $el['txt_2'],      //путь к изображениям
+		'txt_2'   => $el['txt_2'],      //элемент-изображение [13]
 		'num_3'   => _num($el['num_3']),//указывать количество выбранных значений
-		'num_4'   => _num($el['num_4']) //элемент цены
+		'num_4'   => _num($el['num_4']),//элемент-цена [13]
+		'num_5'   => _num($el['num_5']) //элемент-итог [13]
 	) + _elementStruct($el);
 }
 function _element45_js($el) {
 	return array(
 		'num_2' => _num($el['num_2']),
-		'num_4' => _num($el['num_4'])
+		'num_4' => _num($el['num_4']),
+		'num_5' => _num($el['num_5'])
 	) + _elementJs($el);
 }
 function _element45_print($el, $prm) {
