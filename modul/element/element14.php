@@ -16,7 +16,8 @@ function _element14_struct($el) {
 											2318 - по дате добавления
 											2319 - сотрировка (на основании поля sort)
 									  */
-		'num_4' => _num($el['num_4']) //горизонтальное расположение списка
+		'num_4' => _num($el['num_4']),//горизонтальное расположение списка
+		'num_6' => _num($el['num_6']) //обратный порядок
 	) + _elementStruct($el);
 }
 function _element14_struct_title($el, $DLG) {

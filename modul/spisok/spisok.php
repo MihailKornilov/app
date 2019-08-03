@@ -486,23 +486,27 @@ function _spisok14($ELEM, $next=0) {//список-шаблон
 
 
 	$limit = $ELEM['num_2'];
+	$SC = $ELEM['num_6'] ? 'DESC' : 'ASC';
 
 	if(!$all = _spisokCountAll($ELEM, array(), $next))
 		return _emptyMin(_br($ELEM['txt_1']));
 
 	$IS_SORT = _spisokIsSort($ELEM['id']);
 
-	$order = "`t1`.`id` DESC";
-	if($tab = _queryTN($DLG, 'dtime_add'))
-		$order = "`".$tab."`.`dtime_add` DESC";
-	if($IS_SORT || $ELEM['num_3'] == 2319)
-		$order = "`sort`";
+	$order = "`t1`.`id`";
+	if($ELEM['num_3'] == 2318 && $tab = _queryTN($DLG, 'dtime_add'))
+		$order = "`".$tab."`.`dtime_add`";
+	if(_queryTN($DLG, 'sort'))
+		if($IS_SORT || $ELEM['num_3'] == 2319) {
+			$order = "`sort`";
+			$SC = 'ASC';
+		}
 
 	//получение данных списка
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._spisokWhere($ELEM)."
-			ORDER BY ".$order."
+			ORDER BY ".$order." ".$SC."
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
