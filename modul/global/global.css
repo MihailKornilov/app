@@ -521,6 +521,7 @@ body:not(.site){position:relative}
 .pr5{padding-right:5px}
 .pr10{padding-right:10px}
 .pr20{padding-right:20px}
+.pr40{padding-right:40px}
 .pb3{padding-bottom:3px}
 .pb10{padding-bottom:10px}
 .pb20{padding-bottom:20px}
@@ -660,6 +661,7 @@ td.bottom{vertical-align:bottom}
 .fs17{font-size:17px}
 .fs18{font-size:18px}
 .fs22{font-size:22px}
+.fsin{font-size:inherit}
 
 /* Курсоры */
 .curM{cursor:move}

@@ -1392,18 +1392,37 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//Выбор нескольких значений привязанного списка
 				case 45:
-					var UNS = ATR_CMP_AFICS.prev(),//размещение выбранных значений
+					var UNS = ATR_CMP.next(),//размещение выбранных значений
 						CMP_UPD = function(id_new) {//сохранение значения
-							var vv = [];
+							var vv = [],
+								pos = 0,//общее количество
+								sum = 0,//общая сумма
+								itog = '';
 							_forEq(UNS.find('.uinp'), function(sp) {
 								var id = _num(sp.attr('val'));
 								if(!id)
 									return;
-								vv.push(id + ':' + _num(sp.val()));
+
+								var count = _num(sp.val());
+
+								pos += count;
+
+								if(el.num_4)
+									sum += sp.closest('tr').find('.ucena').html() * count;
+
+								vv.push(id + ':' + count);
 							});
-							if(_num(id_new))
+							if(_num(id_new)) {
 								vv.push(id_new + ':1');
+								pos += 1;
+							}
 							ATR_CMP.val(vv.join());
+
+							//обновление итога
+							if(vv.length)
+								itog = 'Всего <b class="fsin">' + pos + '</b> позици' + _end(pos, ['я','и','й']) +
+						   (el.num_4 ? ' на сумму <b class="fsin">' + (Math.round(sum*100)/100) + '</b> руб.' : '');
+							ATR_EL.find('.uns-itog').html(itog);
 						},
 						UNS_DEL = function() {//удаление значения
 							UNS.find('.icon').click(function() {
@@ -1415,6 +1434,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							UNS.find('.uinp').keyup(CMP_UPD);
 						};
 					UNS_DEL();
+					CMP_UPD();
 					//нажатие на кнопку для открытыя диалога
 					ATR_CMP_AFICS.click(function() {
 						if(!el.num_2)
@@ -1448,6 +1468,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 										UNS.html(res.html);
 										UNS_DEL();
 										UNS.find('.uinp:last').select();
+										CMP_UPD();
 									});
 								});
 							}
