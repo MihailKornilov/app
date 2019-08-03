@@ -123,4 +123,73 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 	return
 	'<table class="_stab w100p small'._dn($is_show, 'mb5').'">'.$send.'</table>';
 }
+function _element45doc($el, $unit) {//вывод таблицы в документе WORD
+	if(!$col = $el['col'])
+		return '';
+	if(empty($unit[$col]))
+		return '';
 
+	if(!$BL = _blockOne($el['block_id']))
+		return '';
+	if($BL['obj_name'] != 'dialog')
+		return '';
+
+	$UNS = array();
+	foreach(explode(',', $unit[$col]) as $r) {
+		$ex = explode(':', $r);
+		$UNS[] = array(
+			'id' => _num($ex[0]),
+			'count' => round($ex[1])
+		);
+	}
+
+	if(empty($UNS))
+		return '';
+
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return '';
+
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE `t1`.`id` IN ("._idsGet($UNS).")
+			  AND "._queryWhere($DLG, 1);
+	if(!$arr = query_arr($sql))
+		return '';
+
+	$col = _elemCol($DLG['spisok_elem_id']);
+	$cenaCol = _elemCol($el['num_4']);
+	$n = 1;
+	$TR = '';
+	foreach($UNS as $r) {
+		$u = $arr[$r['id']];
+
+		$name = '';
+		if($col)
+			if(isset($u[$col]))
+				$name = $u[$col];
+
+		$cena = 0;
+		if($cenaCol)
+			if(isset($u[$cenaCol]))
+				$cena = $u[$cenaCol];
+
+		$TR .=
+		'<w:tr w:rsidR="003F55DD" w:rsidTr="003F55DD"><w:trPr><w:trHeight w:val="375"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="447" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:jc w:val="right"/><w:rPr><w:color w:val="7F7F7F" w:themeColor="text1" w:themeTint="80"/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr></w:pPr><w:r><w:rPr><w:color w:val="7F7F7F" w:themeColor="text1" w:themeTint="80"/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr>'.
+			'<w:t>'.($n++).'</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="4253" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r w:rsidRPr="003F55DD"><w:rPr><w:lang w:val="en-US"/></w:rPr>'.
+			'<w:t>'.$name.'</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="1302" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:jc w:val="center"/></w:pPr><w:r w:rsidRPr="003F55DD">'.
+			'<w:t>'.$r['count'].'</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="1534" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:jc w:val="right"/></w:pPr><w:r w:rsidRPr="003F55DD"><w:rPr><w:lang w:val="en-US"/></w:rPr>'.
+			'<w:t xml:space="preserve">'._sumSpace($cena, true).' </w:t></w:r><w:r w:rsidRPr="003F55DD">'.
+			'<w:t>руб.</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="1950" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="003F55DD" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="00054B3F"><w:pPr><w:jc w:val="right"/></w:pPr><w:r w:rsidRPr="003F55DD">'.
+			'<w:t>'._sumSpace($r['count']*$cena, true).' руб.</w:t></w:r></w:p></w:tc>'.
+		'</w:tr>';
+	}
+
+	return
+	'<w:tbl><w:tblPr><w:tblStyle w:val="a3"/><w:tblW w:w="0" w:type="auto"/><w:tblInd w:w="108" w:type="dxa"/><w:tblLook w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="447"/><w:gridCol w:w="4253"/><w:gridCol w:w="1302"/><w:gridCol w:w="1534"/><w:gridCol w:w="1950"/></w:tblGrid>'.
+
+		'<w:tr w:rsidR="009B4ACE" w:rsidTr="003F55DD"><w:tc><w:tcPr><w:tcW w:w="447" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="009B4ACE" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="003F55DD"><w:pPr><w:jc w:val="center"/><w:rPr><w:b/></w:rPr></w:pPr><w:r w:rsidRPr="003F55DD"><w:rPr><w:b/></w:rPr><w:t>№</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="4253" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="009B4ACE" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="003F55DD"><w:pPr><w:jc w:val="center"/><w:rPr><w:b/></w:rPr></w:pPr><w:r w:rsidRPr="003F55DD"><w:rPr><w:b/></w:rPr><w:t>Название</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="1302" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="009B4ACE" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="003F55DD"><w:pPr><w:jc w:val="center"/><w:rPr><w:b/></w:rPr></w:pPr><w:r w:rsidRPr="003F55DD"><w:rPr><w:b/></w:rPr><w:t>Кол-во</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="1534" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="009B4ACE" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="003F55DD"><w:pPr><w:jc w:val="center"/><w:rPr><w:b/></w:rPr></w:pPr><w:r w:rsidRPr="003F55DD"><w:rPr><w:b/></w:rPr><w:t>Цена</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="1950" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:left w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/><w:right w:val="single" w:sz="4" w:space="0" w:color="000000" w:themeColor="text1"/></w:tcBorders><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9" w:themeFill="background1" w:themeFillShade="D9"/><w:vAlign w:val="center"/><w:hideMark/></w:tcPr><w:p w:rsidR="009B4ACE" w:rsidRPr="003F55DD" w:rsidRDefault="003F55DD" w:rsidP="003F55DD"><w:pPr><w:jc w:val="center"/><w:rPr><w:b/></w:rPr></w:pPr><w:r w:rsidRPr="003F55DD"><w:rPr><w:b/></w:rPr><w:t>Сумма</w:t></w:r></w:p></w:tc></w:tr>'.
+
+		$TR.
+
+	'</w:tbl>';
+}

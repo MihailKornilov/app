@@ -681,8 +681,6 @@ function _document() {//формирование документа для вы�
 	if(!$unit = _spisokUnitQuery($DLG, $unit_id))
 		return _empty20('Записи '.$unit_id.' не существует'.PAGE_MSG_ERR);
 
-
-
 	require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
 	$document = new \PhpOffice\PhpWord\TemplateProcessor($att['path'].$att['fname']);
 
@@ -730,6 +728,8 @@ function _doctxt($el, $unit) {
 		case 32: return empty($unit['num']) ? $unit['id'] : $unit['num'];
 		//дата и время внесения записи
 		case 33: return _element33Data($el, $unit);
+		//выбор нескольких значений привязанного списка
+		case 45: return _element45doc($el, $unit);
 		//календарь
 		case 51:
 			$ex = explode('-', $unit[$col]);
