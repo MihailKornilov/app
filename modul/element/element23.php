@@ -133,6 +133,11 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 				$txt = _elemPrint($td, $prm);
 
 				switch($td['dialog_id']) {
+					case 11:
+						if($ell = _elemOne($td['txt_2']))
+							if($ell['dialog_id'] == 60)//картинка через [11]
+								$cls[] = 'pad0';
+						break;
 					case 25: //кружок-статус
 					case 36: //иконка
 					case 71: //иконка сортировки

@@ -57,7 +57,10 @@ function _element11_struct_title($el, $ELM, $DLGS=array()) {
 
 		//для изображения путь не пишется
 		if($ell['dialog_id'] == 60) {
-			$el['title'] = _imageNo($el['width'], $el['num_8']);
+			if($pid = _num($el['parent_id']))
+				$el['title'] = 'IMG';
+			else
+				$el['title'] = _imageNo($el['width'], $el['num_8']);
 			return $el;
 		}
 
