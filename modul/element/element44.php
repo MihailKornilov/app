@@ -56,6 +56,11 @@ function _element44_print($el, $prm) {
 
 	return $send;
 }
+function _element44_template_docx($el, $u) {
+	$prm = _blockParam();
+	$prm['unit_get'] = $u;
+	return _element44_print($el, $prm);
+}
 function _elem44css($txt, $r) {//применение стилей к значению
 	if(empty($r['font']) && empty($r['color']))
 		return $txt;

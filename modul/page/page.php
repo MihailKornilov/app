@@ -689,7 +689,7 @@ function _document() {//формирование документа для вы�
 			FROM `_element`
 			WHERE `id` IN ("._ids($doc['param_ids']).")";
 	foreach(query_arr($sql) as $el) {
-		$v = _docTxt($el, $unit);
+		$v = _element('template_docx', $el, $unit);
 		if(strpos($el['txt_10'], '_PROPIS}'))
 			if($sum = round($v))
 				$v = _numToWord($sum);
@@ -711,52 +711,6 @@ function _document() {//формирование документа для вы�
 	$document->saveAs('php://output');
 
 	exit;
-}
-function _doctxt($el, $unit) {
-	$col = $el['col'];
-	switch($el['dialog_id']) {
-		//многострочное поле
-		case 5: return _br($unit[$col], "<w:br/>");
-		//однострочное поле
-		case 8:
-		case 27: return $unit[$col];
-		//значение записи
-		case 11: return _doc11txt($el, $unit);
-		//Выбор нескольких значений галочками
-		case 31: return _val31($el, $unit[$col]);
-		//порядковый номер
-		case 32: return empty($unit['num']) ? $unit['id'] : $unit['num'];
-		//дата и время внесения записи
-		case 33: return _element33Data($el, $unit);
-		//выбор нескольких значений привязанного списка
-		case 45: return _element45doc($el, $unit);
-		//календарь
-		case 51:
-			$ex = explode('-', $unit[$col]);
-			return $ex[2].'/'.$ex[1].'/'.$ex[0];
-		//имя пользователя
-		case 69:
-			$prm = _blockParam();
-			$prm['unit_get'] = $unit;
-			return _element69_print($el, $prm);
-	}
-	return DEBUG ? '[DLG-'.$el['dialog_id'].']' : '';
-}
-function _doc11txt($el, $unit) {//значение элемента [11]
-	foreach(_ids($el['txt_2'], 'arr') as $id) {
-		if(!$ell = _elemOne($id))
-			return '';
-		//вложенное значение становится записью
-		if(_elemIsConnect($ell)) {
-			if(!$col = $ell['col'])
-				return '';
-			if(!$unit = $unit[$col])
-				return '';
-			continue;
-		}
-		return _doctxt($ell, $unit);
-	}
-	return '';
 }
 
 /* ----==== СПИСОК СТРАНИЦ (page12) ====---- */

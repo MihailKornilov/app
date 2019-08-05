@@ -124,10 +124,10 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 	return
 	'<table class="_stab w100p small'._dn($is_show, 'mb5').'">'.$send.'</table>';
 }
-function _element45doc($el, $unit) {//вывод таблицы в документе WORD
+function _element45_template_docx($el, $u) {
 	if(!$col = $el['col'])
 		return '';
-	if(empty($unit[$col]))
+	if(empty($u[$col]))
 		return '';
 
 	if(!$BL = _blockOne($el['block_id']))
@@ -136,7 +136,7 @@ function _element45doc($el, $unit) {//вывод таблицы в докуме�
 		return '';
 
 	$UNS = array();
-	foreach(explode(',', $unit[$col]) as $r) {
+	foreach(explode(',', $u[$col]) as $r) {
 		$ex = explode(':', $r);
 		$UNS[] = array(
 			'id' => _num($ex[0]),
@@ -160,7 +160,6 @@ function _element45doc($el, $unit) {//вывод таблицы в докуме�
 		return '';
 
 	$col = _elemCol($DLG['spisok_elem_id']);
-	$cenaCol = _elemCol($el['num_4']);
 	$n = 1;
 	$TR = '';
 	foreach($UNS as $r) {

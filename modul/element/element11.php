@@ -128,6 +128,22 @@ function _element11_print($el, $prm) {
 
 	return _msgRed('-11-yok-');
 }
+function _element11_template_docx($el, $u) {
+	foreach(_ids($el['txt_2'], 'arr') as $id) {
+		if(!$ell = _elemOne($id))
+			return '';
+		//вложенное значение становится записью
+		if(_elemIsConnect($ell)) {
+			if(!$col = $ell['col'])
+				return '';
+			if(!$u = $u[$col])
+				return '';
+			continue;
+		}
+		return _element('template_docx', $ell, $u);
+	}
+	return '';
+}
 
 /* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 function PHP12_v_choose($prm) {

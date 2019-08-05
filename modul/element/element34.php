@@ -143,7 +143,7 @@ function _elem34year($json, $year) {//ссылки на все года
 		$cur = $y == $year ? ' b u' : '';
 		$emp = !isset($Y[$y]) ? ' pale' : '';
 		$mr = $y != $max ? ' mr10' : '';
-		$send .= '<a href="'.URL.'?'._elem34href($y).'" class="dib fs14'.$mr.$cur.$emp.'">'.$y.'</a>';
+		$send .= '<a href="'.URL.'?'._elem34href($y).'" class="fs14'.$mr.$cur.$emp.'">'.$y.'</a>';
 	}
 
 	return '<div class="pb5">'.$send.'</div>';
@@ -165,6 +165,8 @@ function _elem34td($mass, $mon, $width) {//печать значений
 		$width = $n ? ' style="width:'.$w.'px"' : '';
 		$send .= '<td class="r"'.$width.'>';
 		if(empty($r[$mon]))
+			continue;
+		if(!round($r[$mon], 2))
 			continue;
 		$send .= _sumSpace($r[$mon], 1);
 	}

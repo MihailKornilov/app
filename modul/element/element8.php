@@ -1,6 +1,5 @@
 <?php
 
-
 /* [8] input:text (однострочное текстовое поле) */
 function _element8_struct($el) {
 	return array(
@@ -110,5 +109,9 @@ function _element8_copy_field($el) {
 		'txt_4' => $el['txt_4'],
 		'txt_3' => $el['txt_3']
 	);
+}
+function _element8_template_docx($el, $u) {
+	$col = $el['col'];
+	return $u[$col];
 }
 

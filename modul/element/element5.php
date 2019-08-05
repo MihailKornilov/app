@@ -65,4 +65,8 @@ function _element5_copy_field($el) {
 		'txt_3' => $el['txt_3']
 	);
 }
+function _element5_template_docx($el, $u) {
+	$col = $el['col'];
+	return _br($u[$col], "<w:br/>");
+}
 
