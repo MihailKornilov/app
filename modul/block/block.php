@@ -721,7 +721,7 @@ function _elemDivCol($el, $prm) {
 function _elemFormat($el, $prm, $txt) {//формат значения элемента
 	$txt = _elemAction241($el, $prm, $txt);//подмена текста
 	$txt = _elemAction243($el, $txt);//Формат для чисел
-	$txt = _elemAction245($el, $txt);//Формат для текста
+	$txt = _elemAction245($el, $txt, 1);//Формат для текста
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 	$txt = _elemLink($el, $txt);
 	return $txt;
@@ -899,9 +899,15 @@ function _elemAction244($el, $prm) {//скрытие элемента
 
 	return false;
 }
-function _elemAction245($el, $txt) {//Формат для текста
+function _elemAction245($el, $txt, $skip224=false) {//Формат для текста
 	if(empty($el['action']))
 		return $txt;
+
+	//если присутствует внешняя ссылка, выход. Обрезка будет далее в ссылке
+	if($skip224)
+		foreach($el['action'] as $act)
+			if($act['dialog_id'] == 224)
+				return $txt;
 
 	foreach($el['action'] as $act) {
 		if($act['dialog_id'] != 245)

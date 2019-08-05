@@ -635,7 +635,10 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 			//внешняя ссылка
 			case 224:
 				$link = $func['target_ids'] ? $func['target_ids'] : $txt;
-				return '<a href="//'.$link.'" class="inhr" target="_blank">'.$txt.'</a>';
+				return
+				'<a href="//'.$link.'" class="inhr" target="_blank">'.
+					_elemAction245($el, $txt).
+				'</a>';
 
 			//открытие документа
 			case 227:

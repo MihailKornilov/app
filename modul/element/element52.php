@@ -181,7 +181,7 @@ function _noteLink($txt, $fs14=false) {//поиск в тексте ссылок
 	        "'([^/])(www\.[A-z0-9\.\?\+\-/_=&%#:;,]+[\w/=]+)'si",
 	    ),
 	    'replacement' => array(
-	        '<a href="$0" target="_blank" rel="nofollow">$0</a>',
+	        '<a href="$0" target="_blank" class="inhr" rel="nofollow">$0</a>',
 	        '$1<a href="http://$2" target="_blank" rel="nofollow"'.$fs14.'>$2</a>',
 	    ));
 	$search = $preg_autolinks['pattern'];
