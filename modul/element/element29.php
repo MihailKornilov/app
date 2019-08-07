@@ -318,8 +318,14 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 	$spisok = _spisokInclude($spisok);
 
 	//формирование списка по уровням
-	if(!empty($EL['num_5']))
-		return _29cnnLevel($EL, $spisok);
+	if(!empty($EL['num_5'])) {
+		$child = array();
+		foreach($spisok as $id => $r)
+			$child[$r['parent_id']][$id] = $r;
+
+		$EL['v'] = $v;
+		return _29cnnChild($EL, $child);
+	}
 
 	//если значения не были настроены, берётся значение по умолчанию, настроенное в диалоге
 	if(empty($EL['txt_3']))
@@ -349,37 +355,27 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 
 	return $send;
 }
-function _29cnnLevel($EL, $spisok) {//вывод списка по уровням
-	$send = array();
+function _29cnnChild($EL, $child, $pid=0, $spisok=array(), $path='', $level=0) {//расстановка дочерних значений
+	if(!$send = @$child[$pid])
+		return $spisok;
 
-	$child = array();
-	foreach($spisok as $id => $sp)
-		if($sp['parent_id'])
-			$child[$sp['parent_id']][] = $sp;
-
-	foreach($spisok as $id => $sp) {
-		if($sp['parent_id'])
-			continue;
-
+	foreach($send as $id => $sp) {
 		$title = _29cnnTitle($EL['txt_3'], $sp);
-		$send[] = array(
+		$content = $title;
+		if($EL['v'])
+			$content = preg_replace(_regFilter($EL['v']), '<em class="fndd">\\1</em>', $content, 1);
+		$u = array(
 			'id' => $id,
-			'title' => $title,
-			'content' => '<b>'.$title.'</b>'
+			'title' => $path.$title,
+			'content' => '<b>'.$content.'</b>'
 		);
-
-		if(!empty($child[$id]))
-			foreach($child[$id] as $r) {
-				$ch = _29cnnTitle($EL['txt_3'], $r);
-				$send[] = array(
-					'id' => $r['id'],
-					'title' => $title.' » '.$ch,
-					'content' => '<div class="ml20">'.$ch.'</div>'
-				);
-			}
+		if($level)
+			$u['content'] = '<div class="ml'.($level*20).'">'.$content.'</div>';
+		$spisok[] = $u;
+		$spisok = _29cnnChild($EL, $child, $id, $spisok, $path.$title.' » ', $level+1);
 	}
 
-	return $send;
+	return $spisok;
 }
 function _29cnnSpisok($el, $v) {//значения списка для формирования содержания
 	$DLG = _dialogQuery($el['num_1']);
@@ -407,7 +403,25 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 			WHERE ".$cond."
 			ORDER BY `"._29cnnOrder($el, $DLG)."` ".$DESC."
 			".$LIMIT;
-	return query_arr($sql);
+
+	if(!$send = query_arr($sql))
+		return array();
+
+	if($v) {
+		$arr = $send;
+		while($ids = _idsGet($arr, 'parent_id')) {
+			$sql = "SELECT "._queryCol($DLG)."
+					FROM   "._queryFrom($DLG)."
+					WHERE !`t1`.`deleted`
+					  AND `id` IN (".$ids.")
+					ORDER BY `"._29cnnOrder($el, $DLG)."` ".$DESC."
+					".$LIMIT;
+			$arr = query_arr($sql);
+			$send += $arr;
+		}
+	}
+
+	return $send;
 }
 function _29cnnOrder($el, $DLG) {//порядок вывода
 	switch($el['num_8']) {
