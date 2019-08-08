@@ -61,7 +61,7 @@ function _element78_print($el) {
 
 	foreach($spisok[0] as $r) {
 		$child = '';
-		$child_sel = false;//список будет раскрыт, если в нём был выбранное значение
+		$child_sel = false;//список будет раскрыт, если в нём было выбранное значение
 		if(!empty($spisok[$r['id']]))
 			foreach($spisok[$r['id']] as $c) {
 				$sel = $v == $c['id'] ? ' sel' : '';

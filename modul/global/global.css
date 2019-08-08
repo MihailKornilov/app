@@ -521,6 +521,7 @@ body:not(.site){position:relative}
 .pr5{padding-right:5px}
 .pr10{padding-right:10px}
 .pr20{padding-right:20px}
+.pr30{padding-right:30px}
 .pr40{padding-right:40px}
 .pb3{padding-bottom:3px}
 .pb10{padding-bottom:10px}
@@ -575,6 +576,7 @@ body:not(.site){position:relative}
 .mb5{margin-bottom:5px}
 .mbm5{margin-bottom:-5px}
 .mb10{margin-bottom:10px}
+.mb15{margin-bottom:15px}
 .mb20{margin-bottom:20px}
 .mb30{margin-bottom:30px}
 .mb40{margin-bottom:40px}
