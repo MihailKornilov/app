@@ -4,8 +4,10 @@
 function _element75_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//[13] список, который фильтруется
+		'num_2'   => _num($el['num_2']),//[35] Кол-во колонок
+		'txt_2'   => $el['txt_2'],      //[13] путь к названиям
 		'txt_1'   => $el['txt_1'],      //[13] путь к иконкам
-		'txt_2'   => $el['txt_2']       //[13] путь к названиям
+		'num_3'   => _num($el['num_3']),//[35] Размер иконок
 	) + _elementStruct($el);
 }
 function _element75_print($el, $prm) {
@@ -43,7 +45,9 @@ function _element75_print($el, $prm) {
 	foreach($arr as $r)
 		$spisok[$r['parent_id']][] = $r;
 
-	$CC = 3;    //количество колонок
+	if(!$CC = $el['num_2'])
+		return _emptyMinRed('[75] не указано количетсво колонок.');
+
 	$CCcol = 1; //счётчик колонок
 	$count = count($spisok[0]);//общее количество записей
 	$CCcount = ceil($count / $CC);//максимальное количество записей в одной колонке
@@ -54,17 +58,16 @@ function _element75_print($el, $prm) {
 		if(!$n)
 			$send .= '<td class="top'.($CCcol != $CC ? ' pr20' : '').'">';
 
+		$n++;
+
 		$clk = !empty($spisok[$r['id']]) ? ' onclick="$(this).next().slideToggle(250)"' : '';
 
 		$send .=
-		'<table class="w100p mb20">'.
-			'<tr><td class="w50 top">'._imageHtml($r['txt_2'], 40, 40, false, false).
+		'<table class="w100p'._dn($n == $CCcount, 'mb20').'">'.
+			'<tr><td class="w50 top">'._imageHtml($r['txt_2'], $el['num_3'], $el['num_3'], false, false).
 				'<td class="top pt3"><a class="fs16 b"'.$clk.'>'.$r[$col].'</a>'.
 					_element75child($spisok, $r['id'], $col).
 		'</table>';
-
-
-		$n++;
 
 		if($n == $CCcount) {
 			$n = 0;
