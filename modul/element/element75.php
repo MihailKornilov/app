@@ -10,6 +10,11 @@ function _element75_struct($el) {
 		'num_3'   => _num($el['num_3']),//[35] Размер иконок
 	) + _elementStruct($el);
 }
+function _element75_js($el) {
+	return array(
+		'num_1' => _num($el['num_1'])
+	) + _elementJs($el);
+}
 function _element75_print($el, $prm) {
 	if(!$ids = _ids($el['txt_2'], 1))
 		return _emptyMinRed('[75] отсутствует путь к названиям.');
@@ -38,6 +43,8 @@ function _element75_print($el, $prm) {
 	if(!$arr = query_arr($sql))
 		return _emptyMin('[75] пустое меню.');
 
+	$v = _spisokFilter('vv', $el, 0);
+
 	//вставка картинок
 	$arr = _spisokImage($arr);
 
@@ -53,7 +60,7 @@ function _element75_print($el, $prm) {
 	$CCcount = ceil($count / $CC);//максимальное количество записей в одной колонке
 	$n = 0;
 
-	$send = '<table class="w100p"><tr>';
+	$send = '<table class="tab75 w100p'._dn(!$v).'"><tr>';
 	foreach($spisok[0] as $r) {
 		if(!$n)
 			$send .= '<td class="top'.($CCcol != $CC ? ' pr20' : '').'">';
@@ -76,7 +83,9 @@ function _element75_print($el, $prm) {
 	}
 	$send .= '</table>';
 
-	return $send;
+	return
+	_element75mp($v, $arr, $col, $DLG).
+	$send;
 }
 function _element75child($spisok, $parent_id, $col) {
 	if(empty($spisok[$parent_id]))
@@ -86,11 +95,38 @@ function _element75child($spisok, $parent_id, $col) {
 	foreach($spisok[$parent_id] as $i => $r)
 		$send .=
 			'<div class="'.($i ? 'mt5' : 'mt10').'">'.
-				'<a class="fs14">'.$r[$col].'</a>'.
+				'<a class="u75 fs14" val="'.$r['id'].'">'.$r[$col].'</a>'.
 			'</div>';
 
 	return '<div class="pb20 dn">'.$send.'</div>';
 }
+function _element75mp($v, $arr, $col, $DLG) {//путь меню (Menu Path)
+	$pname = '';
+	if($v) {
+		$pname = $arr[$v][$col];
+		$pid = $arr[$v]['parent_id'];
+		while($pid) {
+			$sql = "SELECT "._queryCol($DLG)."
+					FROM   "._queryFrom($DLG)."
+					WHERE  "._queryWhere($DLG)."
+					  AND `id`=".$pid;
+			if($r = query_assoc($sql)) {
+				$pname = $r[$col].' » '.$pname;
+				$pid = $r['parent_id'];
+			} else
+				$pid = 0;
+		}
+	}
+
+
+	return
+	'<div class="mp75'._dn($v).'">'.
+		'<div class="icon icon-del fr'._tooltip('Отменить выбор', -52).'</div>'.
+		'<div class="pname75 fs17 b">'.$pname.'</div>'.
+	'</div>';
+}
+
+
 
 
 

@@ -2083,6 +2083,28 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						}
 					});
 					return;
+				//Фильтр: фронтальное меню
+				case 75:
+					var UN = ATR_EL.find('.u75');
+					UN.click(function() {
+						var t = $(this),
+							pname = t.closest('td').find('a').html() + ' » ' + t.html();
+
+						ATR_EL.find('.pname75').html(pname);
+						ATR_EL.find('.mp75')._dn(true);
+						ATR_EL.find('.tab75')._dn();
+
+						FILTER[el.num_1][elm_id] = t.attr('val');
+						_spisokUpdate(el.num_1);
+					});
+					//отмена выбора
+					ATR_EL.find('.icon-del').click(function() {
+						ATR_EL.find('.mp75')._dn();
+						ATR_EL.find('.tab75')._dn(true);
+						FILTER[el.num_1][elm_id] = 0;
+						_spisokUpdate(el.num_1);
+					});
+					return;
 				//Фильтр-календарь
 				case 77:
 					var CAL = ATR_EL.find('._filter-calendar'),
@@ -2178,6 +2200,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									case 62: _attr_cmp(sp.elem_id)._check(sp.v); return;
 									//фильтр-радио
 									case 74:  _attr_cmp(sp.elem_id)._radio(sp.v); return;
+									case 75:
+										_attr_el(sp.elem_id).find('.mp75')._dn();
+										_attr_el(sp.elem_id).find('.tab75')._dn(true);
+									return;
 									//фильтр-календарь
 									case 77:
 										var CAL = _attr_el(sp.elem_id).find('._filter-calendar');

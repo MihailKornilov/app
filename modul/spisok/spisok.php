@@ -73,7 +73,8 @@ function _spisokFilter($i='all', $v=0, $vv='') {//получение значе�
 		return $F['spisok'][$v];
 	}
 
-	if($i == 'page_js') {//значения фильтров в формате JS по каждому списку во всём приложении
+	//значения фильтров в формате JS по каждому списку во всём приложении
+	if($i == 'page_js') {
 		$send = array();
 		foreach($F['spisok'] as $id => $arr)
 			foreach($arr as $elid => $el)
@@ -783,6 +784,7 @@ function _spisokWhere($el, $prm=array()) {//формирование строк�
 	$cond .= _spisokCond62($el);
 	$cond .= _spisokCond72($el);
 	$cond .= _spisokCond74($el);
+	$cond .= _spisokCond75($el);
 	$cond .= _spisokCond77($el);
 	$cond .= _spisokCond78($el);
 	$cond .= _spisokCond83($el);
@@ -904,6 +906,49 @@ function _spisokCond74($el) {//фильтр-радио
 		return ' AND !`t1`.`id` /* [74] отсутствует элемент '.$v.' пункта Радио */';
 
 	return _40cond($el, $ell['txt_2']);
+}
+function _spisokCond75($el) {//Фильтр: фронтальное меню
+	$filter = false;
+	$v = '';
+
+	//поиск элемента-фильтра-меню
+	foreach(_spisokFilter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 75) {
+			$filter = $r['elem'];
+			$v = _num($r['v']);
+			break;
+		}
+
+	if(!$filter)
+		return '';
+	if(!$v)
+		return '';
+
+	//элемент, указывающий на подключенный список
+	if(!$elem_id = _ids($filter['txt_1'], 'first'))
+		return " AND !`id`";
+	if(!$EL = _elemOne($elem_id))
+		return " AND !`id`";
+
+	//колонка, по которой будет производиться фильтрование
+	if(!$col = $EL['col'])
+		return " AND !`id`";
+
+	//получение диалога подключенного списка
+	if($EL['dialog_id'] == 29 && !$dialog_id = _num($EL['num_1']))
+		return " AND !`id`";
+	if(!$dialog = _dialogQuery($dialog_id))
+		return " AND !`id`";
+
+	if(isset($dialog['field1']['parent_id'])) {
+		$sql = "SELECT `id`
+				FROM `"._table($dialog['table_1'])."`
+				WHERE `parent_id`=".$v;
+		if($ids = query_ids($sql))
+			$v .= ','.$ids;
+	}
+
+	return " AND `".$col."` IN (".$v.")";
 }
 function _spisokCond77($el) {//фильтр-календарь
 	$filter = false;
