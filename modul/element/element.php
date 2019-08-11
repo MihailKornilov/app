@@ -20,13 +20,13 @@
 //подключение файлов-элементов
 foreach(array(
 			 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
-			11,12,   14,15,16,17,18,
-			      23,         27,   29,30,
-	        31,32,33,34,   36,37,   39,40,
+			11,12,13,14,15,16,17,18,
+			      23,24,   26,27,   29,30,
+	        31,32,33,34,35,36,37,38,39,40,
 			         44,45,
 			51,52,   54,55,   57,   59,60,
 			         64,            69,70,
-			      73,   75,   77,78,79,80,
+			   72,73,74,75,   77,78,79,80,
 			      83,   85,      88,   90,
 			   92,
 			300
@@ -239,105 +239,6 @@ function _element($type, $el, $prm=array()) {//все манипуляции, с
 }
 
 
-/* [13] Выбор элемента из диалога или страницы */
-function _element13_struct($el) {
-	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'txt_1'   => $el['txt_1'],      //текст для placeholder
-		'num_1'   => _num($el['num_1']),//элемент в исходном диалоге [13] (если num_3=8059)
-		'num_2'   => _num($el['num_2']),//разрешать выбирать только некоторые типы элементов (иначе любые)
-		'txt_2'   => $el['txt_2'],      //ids диалогов разрешённых элементов [12]
-		'num_3'   => _num($el['num_3']),/* где выбирать элементы:
-											8058: в исходном диалоге
-											8059: по элементу в исходном диалоге
-											8060: на текущей странице
-											8061: из диалога, данные которого получает страница
-                                        */
-		'num_5'   => _num($el['num_5']),//выбор значений во вложенных списках
-		'num_6'   => _num($el['num_6']) //выбор нескольких значений
-	) + _elementStruct($el);
-}
-function _element13_js($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),
-		'num_2'   => _num($el['num_2']),
-		'num_5'   => _num($el['num_5']),
-		'num_6'   => _num($el['num_6']),
-		'txt_2'   => $el['txt_2']
-	) + _elementJs($el);
-}
-function _element13_print($el, $prm) {
-	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
-	$disabled = $prm['blk_setup'] ? ' disabled' : '';
-
-	//в самом себе выбор элемента невозможен
-	if($block_id = $prm['srce']['block_id'])//должен быть блок 2214
-		if($BL = _blockOne($block_id))
-			if($BL['obj_name'] == 'dialog' && $BL['obj_id'] == 13)
-				$disabled = ' disabled';
-
-	$v = _elemPrintV($el, $prm, !$el['num_5'] && !$el['num_6'] ? 0 : '');
-
-	return
-	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-	'<div class="_selem dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
-		'<div class="icon icon-star pabs"></div>'.
-		'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-		'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
-	'</div>';
-}
-function PHP12_elem_rule7($prm) {/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МОЖНО ВЫБИРАТЬ В НАСТРОЙКЕ ДИАЛОГА [13] ===--- */
-	//элементы, используемые в правиле 7
-	$sql = "SELECT `dialog_id`
-			FROM `_element_rule_use`
-			WHERE `rule_id`=7";
-	if(!$ids = query_ids($sql))
-		return _emptyMin('Нет элементов для выбора');
-
-	//получение разрешённых элементов
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE `id` IN (".$ids.")
-			ORDER BY `sort`,`id`";
-	if(!$elem = query_arr($sql))
-		return _empty('Нет элементов для отображения.');
-
-	$sql = "SELECT *
-			FROM `_element_group`
-			WHERE `id` IN ("._idsGet($elem, 'element_group_id').")
-			ORDER BY `sort`";
-	if(!$group = query_arr($sql))
-		return _emptyMin('Отсутствуют группы элементов.');
-
-	foreach($group as $id => $r)
-		$group[$id]['elem'] = array();
-
-	//расстановка элементов в группы
-	foreach($elem as $id => $r)
-		$group[$r['element_group_id']]['elem'][] = $r;
-
-	$ass = _idsAss(_elemPrintV($prm['el12'], $prm));
-
-	$send = '';
-	foreach($group as $r) {
-		$send .= '<div class="fs15 mt15 mb5 color-555">'.$r['name'].':</div>';
-		foreach($r['elem'] as $el) {
-			$send .=
-			'<div class="ml15 mt3">'.
-				_check(array(
-					'attr_id' => 'rule7-el'.$el['id'],
-					'title' => $el['name'],
-					'value' => _num(@$ass[$el['id']]) ? 1 : 0
-				)).
-			'</div>';
-		}
-	}
-
-	return $send;
-}
-
 /* [21] Информационный блок */
 function _element21_struct($el) {
 	return array(
@@ -346,55 +247,6 @@ function _element21_struct($el) {
 }
 function _element21_print($el) {
 	return '<div class="_info">'._br($el['txt_1']).'</div>';
-}
-
-/* [24] Select: выбор списка приложения */
-function _element24_struct($el) {
-	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'width'   => _num($el['width']),
-
-		'txt_1'   => $el['txt_1'],     //текст, когда список не выбран
-		'num_1'   => _num($el['num_1'])/* содержание селекта:
-											0   - все списки приложения. Функция _dialogSpisokOn()
-											960 - размещённые на текущем объекте
-												  Списки размещаются диалогами 14(шаблон), 23(таблица), История действий
-												  Идентификаторами результата являются id элементов (а не диалогов)
-												  Функция _dialogSpisokOnPage()
-											961 - привязанные к данному диалогу
-												  Идентификаторами результата являются id элементов (а не диалогов)
-												  Функция _dialogSpisokOnConnect()
-									   */
-	) + _elementStruct($el);
-}
-function _element24_js($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	) + _elementJs($el);
-}
-function _element24_print($el, $prm) {
-	return
-	_select(array(
-		'attr_id' => _elemAttrId($el, $prm),
-		'placeholder' => $el['txt_1'],
-		'width' => @$el['width'],
-		'value' => _elemPrintV($el, $prm, 0)
-   ));
-}
-function _element24_vvv($el, $prm) {
-	$dialog_id = $prm['srce']['dialog_id'];
-	$block_id = $prm['srce']['block_id'];
-	switch($el['num_1']) {
-		//диалоги, которые могут быть списками: spisok_on=1 и размещены на текущей странице
-		case 960: return _dialogSpisokOnPage($block_id);
-		//диалоги, которые привязаны к выбранному диалогу
-		case 961: return _dialogSpisokOnConnect($block_id);
-	}
-
-	//все списки приложения
-	return _dialogSpisokOn($dialog_id, $block_id, $el['id']);
 }
 
 /* [25] Кружок с цветом статуса */
@@ -420,36 +272,6 @@ function _element25_print($el, $prm) {
 		$css .= 'background-color:'.$bg.';';
 
 	return '<div class="dib br1000" style="'.$css.'"></div>';
-}
-
-/* [26] Select: выбор документа (SA) */
-function _element26_struct($el) {
-	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'txt_1'   => $el['txt_1']  //нулевое значение
-	) + _elementStruct($el);
-}
-function _element26_js($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	) + _elementJs($el);
-}
-function _element26_print($el, $prm) {
-	return _select(array(
-		'attr_id' => _elemAttrId($el, $prm),
-		'placeholder' => $el['txt_1'],
-		'width' => @$el['width'],
-		'value' => _elemPrintV($el, $prm, 0)
-	));
-}
-function _element26_vvv() {
-	$sql = "SELECT `id`,`name`
-			FROM `_template`
-			WHERE `app_id`=".APP_ID."
-			ORDER BY `id` DESC";
-	return query_ass($sql);
 }
 
 /* [28] Загрузка файла */
@@ -496,97 +318,6 @@ function _element28_print11($el, $u) {
 		$width = $bl['width'];
 
 	return _attachLink(@$u[$col], $width);
-}
-
-/* [35] Count: количество */
-function _element35_struct($el) {
-	return array(
-		'def'   => _num($el['def']),
-
-		'num_1' => _num($el['num_1']),/* варианты значений:
-												3681 - диапазон значений
-												3682 - конкретные значения
-										*/
-		'num_2' => _num($el['num_2']),//разрешать минимум
-		'num_3' => _num($el['num_3']),//минимум
-		'num_4' => _num($el['num_4']),//минимум может быть отрицательным
-		'num_5' => _num($el['num_5']),//разрешать максимум
-		'num_6' => _num($el['num_6']),//максимум
-		'num_7' => _num($el['num_7']),//шаг
-		'num_8' => _num($el['num_8']),//разрешать переключение значений по кругу
-		'txt_1' => $el['txt_1']       //конкретные значения, если num_1=3682 (настраиваются через PHP12_count_value)
-	) + _elementStruct($el);
-}
-function _element35_js($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),
-		'num_2'   => _num($el['num_2']),
-		'num_3'   => _num($el['num_3']),
-		'num_4'   => _num($el['num_4']),
-		'num_5'   => _num($el['num_5']),
-		'num_6'   => _num($el['num_6']),
-		'num_7'   => _num($el['num_7']),
-		'num_8'   => _num($el['num_8'])
-	) + _elementJs($el);
-}
-function _element35_print($el, $prm) {
-	return _count(array(
-				'attr_id' => _elemAttrId($el, $prm),
-				'width' => $el['width'],
-				'value' => _elemPrintV($el, $prm, $el['def'])
-		   ));
-}
-function _element35_print11($el, $u) {
-	if(!$col = _elemCol($el))
-		return '';
-
-	$v = _num(@$u[$col]);
-
-	if($el['num_1'] == 3681)
-		return $v;
-
-	if(!$json = _elem40json($el['txt_1']))
-		return '';
-
-	foreach($json['ids'] as $n => $id)
-		if($v == $id)
-			return $json['title'][$n];
-
-	return '';
-}
-function _element35_vvv($el) {
-	if($el['num_1'] != 3682)
-		return array();
-
-	return json_decode($el['txt_1']);
-}
-
-/* [38] Select: выбор диалогового окна (SA) */
-function _element38_struct($el) {
-	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'txt_1'   => $el['txt_1'],      //нулевое значение
-		'num_1'   => _num($el['num_1']) //начальное значение
-	) + _elementStruct($el);
-}
-function _element38_js($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	) + _elementJs($el);
-}
-function _element38_print($el, $prm) {
-	return
-	_select(array(
-		'attr_id' => _elemAttrId($el, $prm),
-		'placeholder' => $el['txt_1'],
-		'width' => @$el['width'],
-		'value' => _elemPrintV($el, $prm, $el['num_1'])
-	));
-}
-function _element38_vvv() {
-	return _dialogSelArray();
 }
 
 /* [46] Данные текущего пользователя */
@@ -715,150 +446,6 @@ function _element71_struct_title($el) {
 }
 function _element71_print($el, $prm) {
 	return '<div class="icon icon-move '.($prm['unit_get'] ? 'pl' : 'curD').'"></div>';
-}
-
-/* [72] Фильтр: год и месяц */
-function _element72_struct($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),//id элемента - список, на который происходит воздействие
-		'num_2'   => _num($el['num_2']) //id элемента - путь к сумме для подсчёта по каждому месяцу
-	) + _elementStruct($el);
-}
-function _element72_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
-function _element72_print($el, $prm) {
-	$v = _spisokFilter('vv', $el, strftime('%Y-%m'));
-
-	$ex = explode('-', $v);
-	$year = $ex[0];
-	$mon  = $ex[1];
-
-
-	return
-	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-	_yearleaf(array(
-		'attr_id' => _elemAttrId($el, $prm).'yl',
-		'value' => $ex[0]
-	)).
-	'<div class="mt5">'.
-		_radio(array(
-			'attr_id' => _elemAttrId($el, $prm).'rd',
-			'width' => 0,
-			'block' => 1,
-			'light' => 1,
-			'interval' => 5,
-			'value' => $mon,
-			'spisok' => _elem72Sum($el, $year),
-			'disabled' => $prm['blk_setup']
-		)).
-	'</div>';
-}
-function _elem72Sum($el, $year) {//получение сумм для фильтра [72]
-	$spisok = _monthDef();
-
-	if(!$el = _elemOne($el['num_2']))
-		return $spisok;
-	if(!$col = $el['col'])
-		return $spisok;
-	if(!$bl = $el['block'])
-		return $spisok;
-	if($bl['obj_name'] != 'dialog')
-		return $spisok;
-	if(!$DLG = _dialogQuery($bl['obj_id']))
-		return $spisok;
-
-	$sql = "SELECT
-				DISTINCT(DATE_FORMAT(`dtime_add`,'%m')) AS `mon`,
-				SUM(`".$col."`) `sum`
-			FROM   "._queryFrom($DLG)."
-			WHERE "._queryWhere($DLG)."
-			  AND `dtime_add` LIKE '".$year."-%'
-			GROUP BY DATE_FORMAT(`dtime_add`,'%m')";
-	if(!$arr = query_array($sql))
-		return $spisok;
-
-	foreach($arr as $r) {
-		$mon = _num($r['mon']);
-		$txt = $spisok[$mon];
-		$spisok[$mon] = $txt.
-						'<span class="fr">'._sumSpace(round($r['sum'])).'</span>';
-	}
-
-	return $spisok;
-}
-
-/* [74] Фильтр: Radio */
-function _element74_struct($el) {
-	/*
-		значения: PHP12_filter_radio_setup
-	*/
-	return array(
-		'def'   => _num($el['def']),
-
-		'num_1' => _num($el['num_1'])//id элемента-список, к которому применяется фильтр
-	) + _elementStruct($el);
-}
-function _element74_struct_vvv($el, $cl) {
-	$c = '';
-	if($cl['txt_2']) {
-		$vv = htmlspecialchars_decode($cl['txt_2']);
-		$arr = json_decode($vv, true);
-		$c = count($arr);
-	}
-
-	return array(
-		'id'    => _num($cl['id']),
-		'txt_1' => $cl['txt_1'],        //имя пунтка
-		'def'   => _num($cl['def']),
-		'c'     => $c,                  //количество условий в пункте
-		'txt_2' => $cl['txt_2'],        //условия
-		'num_1' => _num($cl['num_1'])   //отображать количество значений в пункте
-	);
-}
-function _element74_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
-function _element74_print($el, $prm) {
-	if(empty($el['vvv']))
-		return _emptyMinRed('Значения фильтра не настроены');
-
-	//получение количества значений по каждому пункту
-	$EL = _elemOne($el['num_1']);
-	$DLG = _dialogQuery($EL['num_1']);
-	$spisok = array();
-	foreach($el['vvv'] as $n => $r) {
-		$spisok[$n] = array(
-			'id' => $r['id'],
-			'title' => $r['txt_1']
-		);
-
-		if(!$r['num_1'])
-			continue;
-
-		$sql = "SELECT COUNT(*)
-				FROM  "._queryFrom($DLG)."
-				WHERE "._queryWhere($DLG)."
-					"._40cond($EL, $r['txt_2']);
-		if($c = query_value($sql))
-			$spisok[$n]['title'] .= '<span class="fr inhr">'.$c.'</span>';
-	}
-
-	return
-	_radio(array(
-		'attr_id' => _elemAttrId($el, $prm),
-		'block' => 1,
-		'width' => '100%',
-		'interval' => 6,
-		'light' => 1,
-		'value' => _spisokFilter('vv', $el, $el['def']),
-		'spisok' => $spisok,
-		'disabled' => $prm['blk_setup']
-	));
 }
 
 /* [86] Значение записи: количество дней */
