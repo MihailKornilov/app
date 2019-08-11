@@ -470,6 +470,48 @@ body:not(.site){position:relative}
 
 
 
+/* Активность пользователей */
+#user-active .tdd{
+	width:100px;
+	border-bottom:#C5CCDC solid 1px;
+}
+#user-active .m10{
+	height:7px;
+	border-right:#C5CCDC solid 1px;
+}
+#user-active .m10.ll{border-left:#C5CCDC solid 1px}
+#user-active .m10num{
+	font-size:10px;
+	right:-6px;
+	top:-12px;
+	z-index:2;
+}
+#user-active .mu{
+	position:absolute;
+	top:-13px;
+	left:0;
+	width:10px;
+	height:20px;
+	background-color:#8f8;
+	opacity:.4;
+	z-index:1;
+}
+#user-active .mu.l1{left:10px}
+#user-active .mu.l2{left:20px}
+#user-active .mu.l3{left:30px}
+#user-active .mu.l4{left:40px}
+#user-active .mu.l5{left:50px}
+#user-active .mu.l6{left:60px}
+#user-active .mu.l7{left:70px}
+#user-active .mu.l8{left:80px}
+#user-active .mu.l9{left:90px}
+
+
+
+
+
+
+
 
 
 /* Короткие стили */
@@ -687,6 +729,7 @@ td.bottom{vertical-align:bottom}
 .line-b{border-bottom:#DEE3EF solid 1px} /* насыщенная нижняя линия */
 .line-t1{border-top:#EFF2F5 solid 1px}   /* светлая верхняя линия */
 .line-b1{border-bottom:#EFF2F5 solid 1px}/* светлая нижняя линия */
+.line-l{border-left:#DEE3EF solid 1px}
 .line-r{border-right:#DEE3EF solid 1px}
 
 /* Подсветка найденной подстроки */

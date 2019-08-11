@@ -160,6 +160,9 @@ function _userApp($app_id=APP_ID, $user_id=USER_ID) {//получение дан
 	return query_assoc($sql);
 }
 function _userActive($page_id) {//сохранение активности пользователя
+	if(PAS)
+		return;
+
 	$active_id = 0;
 	$data = array();
 
@@ -202,4 +205,61 @@ function _userActive($page_id) {//сохранение активности по
 }
 
 
+function PHP12_user_active() {
+	$data = array();
+	$sql = "SELECT
+				`id`,
+				DATE_FORMAT(`dtime_begin`,'%k') `h`,
+				`data`
+			FROM `_user_active`
+			WHERE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d')
+			ORDER BY `id`";
+	foreach(query_arr($sql) as $r) {
+		$h = $r['h'];
+		if(!isset($data[$h]))
+			$data[$h] = array();
+
+		foreach(json_decode($r['data'], true) as $min => $v)
+			$data[$h][$min] = 1;
+	}
+
+	$m10show = 0;
+	$m10step = 5;
+	$send = '<table>';
+	for($hour = 0; $hour < 24; $hour++) {
+		$send .= '<tr class="over3">'.
+					'<td class="h25 bg-fff fs16 r color-555 bottom pr5">'.$hour;
+		for($min = 0; $min < 6; $min++) {
+			$send .= '<td class="tdd bottom">'.
+						'<div class="m10'._dn($min, 'll').' prel">'.
+							_user_active_minute($data, $hour, $min).
+	((!$m10show || $hour == 23) && $min < 5 ? '<div class="m10num pabs pale">'.(($min+1)*10).'</div>' : '').
+						'</div>';
+		}
+		if($m10show++ >= $m10step)
+			$m10show = 0;
+	}
+	$send .= '</table>';
+
+	return '<div id="user-active">'.$send.'</div>';
+}
+function _user_active_minute($data, $hour, $min) {//вставка данный по минутам
+	if(empty($data[$hour]))
+		return '';
+
+	$send = '';
+	foreach($data[$hour] as $k => $v) {
+		$m = floor($k / 10);
+		if($m != $min)
+			continue;
+
+		$cls = '';
+		if($l = $k%10)
+			$cls = ' l'.$l;
+
+		$send .= '<div class="mu'.$cls.'"></div>';
+	}
+
+	return $send;
+}
 
