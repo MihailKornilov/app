@@ -167,7 +167,7 @@ function _userActive($page_id) {//сохранение активности по
 			FROM `_user_active`
 			WHERE `app_id`=".APP_ID."
 			  AND `user_id`=".USER_ID."
-			  AND `dtime_begin` LIKE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d %H%')
+			  AND DATE_FORMAT(`dtime_begin`,'%Y-%m-%d %H%')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d %H%')
 			LIMIT 1";
 	if($r = query_assoc($sql)) {
 		$active_id = $r['id'];
@@ -194,7 +194,6 @@ function _userActive($page_id) {//сохранение активности по
 				`data`=VALUES(`data`),
 				`dtime_end`=VALUES(`dtime_end`)";
 	query($sql);
-	echo $sql;
 }
 
 
