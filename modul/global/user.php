@@ -159,4 +159,43 @@ function _userApp($app_id=APP_ID, $user_id=USER_ID) {//получение дан
 			LIMIT 1";
 	return query_assoc($sql);
 }
+function _userActive($page_id) {//сохранение активности пользователя
+	$active_id = 0;
+	$data = array();
+
+	$sql = "SELECT *
+			FROM `_user_active`
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".USER_ID."
+			  AND `dtime_begin` LIKE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d %H%')
+			LIMIT 1";
+	if($r = query_assoc($sql)) {
+		$active_id = $r['id'];
+		$data = json_decode($r['data'], true);
+	}
+
+	$m = strftime('%M') * 1;
+	$data[$m][] = $page_id;
+	$data = json_encode($data);
+
+	$sql = "INSERT INTO `_user_active` (
+				`id`,
+				`app_id`,
+				`user_id`,
+				`data`,
+				`dtime_end`
+			) VALUES (
+				".$active_id.",
+				".APP_ID.",
+				".USER_ID.",
+				'".$data."',
+				CURRENT_TIMESTAMP
+			) ON DUPLICATE KEY UPDATE
+				`data`=VALUES(`data`),
+				`dtime_end`=VALUES(`dtime_end`)";
+	query($sql);
+	echo $sql;
+}
+
+
 

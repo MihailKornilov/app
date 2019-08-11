@@ -31,9 +31,8 @@ function _sa($user_id=USER_ID) {
 		error_reporting(E_ALL);
 		ini_set('display_errors', true);
 		ini_set('display_startup_errors', true);
-	} else {
+	} elseif(DEBUG)
 		setcookie('debug', 0, time() - 1, '/');
-	}
 
 	return $issa;
 }
@@ -612,6 +611,7 @@ function _app_content() {//центральное содержание
 		return '';
 
 	$page_id = _page('cur');//_app_page_get();
+	_userActive($page_id);
 
 	return
 	'<div id="_content" class="block-content-page '.SITE.'">'.
