@@ -174,8 +174,13 @@ function _userActive($page_id) {//сохранение активности по
 		$data = json_decode($r['data'], true);
 	}
 
+
+	$v = $page_id;
+	if($id = _num(@$_GET['id']))
+		$v .= ':'.$id;
+
 	$m = strftime('%M') * 1;
-	$data[$m][] = $page_id;
+	$data[$m][] = $v;
 	$data = json_encode($data);
 
 	$sql = "INSERT INTO `_user_active` (
