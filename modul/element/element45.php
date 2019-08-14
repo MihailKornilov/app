@@ -9,6 +9,8 @@ function _element45_struct($el) {
 		'num_1'   => _num($el['num_1']),//список (из которого будут выбираться значения)
 		'txt_1'   => $el['txt_1'],      //имя кнопки
 		'num_2'   => _num($el['num_2']),//вспомогательный диалог
+		'txt_3'   => $el['txt_3'],      //элемент-название [13]
+		'txt_4'   => $el['txt_4'],      //элемент-категория [13]
 		'txt_2'   => $el['txt_2'],      //элемент-изображение [13]
 		'num_3'   => _num($el['num_3']),//указывать количество выбранных значений
 		'num_4'   => _num($el['num_4']),//элемент-цена [13]
@@ -73,8 +75,23 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 	if(!$arr = query_arr($sql))
 		return '';
 
-	$col = _elemCol($DLG['spisok_elem_id']);
-	$cenaCol = _elemCol($el['num_4']);
+	//вставка значений из вложенных списков
+	$arr = _spisokInclude($arr);
+
+	//вставка картинок
+	$arr = _spisokImage($arr);
+
+	//элемент-название
+	if(!$colName = _elemCol($el['txt_3']))
+		$colName = _elemCol($DLG['spisok_elem_id']);
+
+
+	//элемент-изображение
+	$colImg = _elemCol($el['txt_2']);
+
+	//элемент-цена
+	$colCena = _elemCol($el['num_4']);
+
 	$send = '';
 	$n = 1;
 	foreach($UNS as $r) {
@@ -84,26 +101,28 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 		$name = '<span class="fs10 red">Отсутствует колонка для отображения названия</span>';
 
 		$u = $arr[$r['id']];
-		if($col)
-			if(isset($u[$col]))
-				$name = $u[$col];
+		if($colName)
+			if(isset($u[$colName]))
+				$name = $u[$colName];
 
 		$cena = $r['cena'];
-		if($cenaCol && $r['cena'] < 0)
-			if(isset($u[$cenaCol]))
-				$cena = $u[$cenaCol];
+		if($colCena && $r['cena'] < 0)
+			if(isset($u[$colCena]))
+				$cena = $u[$colCena];
 
 		//вариант вывода значений для редактирования
 		if(!$is_show) {
 			$send .=
 			'<tr><td class="w35">'.
 					'<div class="fs14 grey r">'.$n++.'</div>'.
-				'<td class="fs14">'.
-					'<div class="fs14">'.$name.'</div>'.
+	 ($colImg ? '<td class="pad0 w35 center">'._imageHtml($u[$colImg], 30, 30) : '').
+				'<td>'.
+	($el['txt_4'] ? '<div class="fs11 grey">'._elemUids($el['txt_4'], $u).'</div>' : '').
+					'<div class="fs15 mt2">'.$name.'</div>'.
 				'<td class="w70 bg-ffd'._dn($el['num_3']).'">'.
 					'<input type="text" class="uinp w100p r b" val="'.$r['id'].'" value="'.$r['count'].'">'.
 
-			($cenaCol ?
+			($colCena ?
 				'<td class="w100 r'._dn($el['num_4']).'">'.
 					'<b class="ucena">'.$cena.'</b> руб.'
 			: '').
@@ -121,8 +140,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 			$send .='<td class="w50 r b">'.$r['count'];
 	}
 
-	return
-	'<table class="_stab w100p small'._dn($is_show, 'mb5').'">'.$send.'</table>';
+	return '<table class="_stab w100p small'._dn($is_show, 'mb5').'">'.$send.'</table>';
 }
 function _element45_template_docx($el, $u) {
 	if(!$col = $el['col'])

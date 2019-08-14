@@ -16,12 +16,8 @@ function _element75_js($el) {
 	) + _elementJs($el);
 }
 function _element75_print($el, $prm) {
-	if(!$ids = _ids($el['txt_2'], 1))
+	if(!$elem_id = _idsLast($el['txt_2']))
 		return _emptyMinRed('[75] отсутствует путь к названиям.');
-
-	$c = count($ids) - 1;
-	$elem_id = $ids[$c];
-
 	if(!$EL = _elemOne($elem_id))
 		return _emptyMinRed('[75] отсутствует элемент-название.');
 	if(!$BL = $EL['block'])
