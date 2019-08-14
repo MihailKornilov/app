@@ -119,6 +119,18 @@ var ZINDEX = 1000,
 		var val = minus ? REGEXP_NUMERIC_MINUS.test(v) : REGEXP_NUMERIC.test(v);
 		return val ? v * 1 : 0;
 	},
+	_cena = function(v, minus) {//цена в виде: 100    16,34     0.5
+		//Может быть отрицательным значением
+		if(typeof v == 'string')
+			v = v.replace(',', '.');
+		if(!REGEXP_DROB.test(v))
+			return 0;
+		if(v == 0)
+			return 0;
+		if(minus && REGEXP_CENA_MINUS.test(v))
+			return v * 1;
+		return Math.round(v * 100) / 100;
+	},
 	_nol = function(v) {//вставка нуля перед цифрой - для времени
 		v = _num(v);
 		return (v > 9 ? '' : '0') + v;

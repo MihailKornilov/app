@@ -1404,14 +1404,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								if(!id)
 									return;
 
-								var count = _num(sp.val()),
+								var count = _cena(sp.val()),
 									cena = 0;//стоимость
 
 								pos += count;
 
 								if(el.num_4) {
-									cena = Math.round(sp.closest('tr').find('.ucena').html() * 100) / 100;
+									cena = _cena(sp.closest('tr').find('.ucena').html());
 									sum += cena * count;
+									console.log(sum);
 								}
 
 								vv.push(id + ':' + count + ':' + cena);
@@ -1421,8 +1422,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 							//обновление итога
 							if(vv.length) {
-								var summ = Math.round(sum * 100) / 100;
-								itog = 'Всего <b class="fsin">' + pos + '</b> позици' + _end(pos, ['я', 'и', 'й']) +
+								var summ = _cena(sum);
+								itog = 'Всего <b class="fsin">' + _cena(pos) + '</b> позици' + _end(pos, ['я', 'и', 'й']) +
 						   (el.num_4 ? ' на сумму <b class="fsin">' + summ + '</b> руб.' : '');
 								//вставка итоговой суммы у указанное поле
 								if(el.num_5)
