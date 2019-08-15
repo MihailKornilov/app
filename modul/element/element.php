@@ -21,15 +21,15 @@
 foreach(array(
 			 1, 2, 3, 4, 5, 6, 7, 8, 9,10,
 			11,12,13,14,15,16,17,18,
-			      23,24,   26,27,   29,30,
+			      23,24,25,26,27,28,29,30,
 	        31,32,33,34,35,36,37,38,39,40,
-			         44,45,
+			         44,45,46,
 			51,52,   54,55,   57,   59,60,
-			         64,            69,70,
-			   72,73,74,75,   77,78,79,80,
+			   62,   64,            69,70,
+			71,72,73,74,75,   77,78,79,80,
 			      83,   85,      88,   90,
-			   92,
-			300
+			91,92,
+			102,300
         ) as $id) {
 	$file = GLOBAL_DIR.'/modul/element/element'.$id.'.php';
 	if(file_exists($file))
@@ -249,102 +249,6 @@ function _element21_print($el) {
 	return '<div class="_info">'._br($el['txt_1']).'</div>';
 }
 
-/* [25] Кружок с цветом статуса */
-function _element25_struct($el) {
-	return array(
-		'txt_1' => $el['txt_1'],     //путь к заливке
-		'num_1' => _num($el['num_1'])//диаметр
-	) + _elementStruct($el);
-}
-function _element25_struct_title($el) {
-	$el['title'] = 'O';
-	return $el;
-}
-function _element25_print($el, $prm) {
-	$bg = $prm['blk_setup'] ? '#eee' : _elemUids($el['txt_1'], $prm['unit_get']);
-
-	$css = 'width:'.$el['num_1'].'px;'.
-		   'height:'.$el['num_1'].'px;'.
-		   'border:#EAEBEC solid 1px;'.
-		   'vertical-align:top;';
-
-	if(!empty($bg))
-		$css .= 'background-color:'.$bg.';';
-
-	return '<div class="dib br1000" style="'.$css.'"></div>';
-}
-
-/* [28] Загрузка файла */
-function _element28_struct($el) {
-	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'txt_1'   => $el['txt_1']  //нулевое значение
-	) + _elementStruct($el);
-}
-function _element28_print($el, $prm) {
-	$v = _elemPrintV($el, $prm, 0);
-
-	$width = 0;
-	if($bl = @$el['block'])
-		$width = $bl['width'];
-
-	return
-	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-	'<div class="_attach">'.
-		'<div id="'._elemAttrId($el, $prm).'_atup" class="atup'._dn(!$v).'"'._elemStyleWidth($el).'>'.
-			'<form method="post" action="'.AJAX.'" enctype="multipart/form-data" target="at-frame">'.
-				'<input type="hidden" name="op" value="attach_upload" />'.
-				'<input type="file" name="f1" class="at-file"'._elemStyleWidth($el).' />'.// accept="' + acceptMime() + '"
-			'</form>'.
-			'<button class="vk small grey w100p">'.$el['txt_1'].'</button>'.
-			'<iframe name="at-frame"></iframe>'.
-		'</div>'.
-		'<table class="atv'._dn($v).'">'.
-			'<tr><td class="top">'._attachLink($v, $width).
-				'<th class="top wsnw">'.
-//					'<div class="icon icon-set mtm2 ml5 pl'._tooltip('Параметры файла', -56).'</div>'.
-					'<div class="icon icon-del-red ml5 mtm2 pl'._tooltip('Отменить', -30).'</div>'.
-		'</table>'.
-	'</div>';
-}
-function _element28_print11($el, $u) {
-	if(!$col = _elemCol($el))
-		return '';
-
-	$width = 0;
-	if($bl = @$el['elp']['block'])
-		$width = $bl['width'];
-
-	return _attachLink(@$u[$col], $width);
-}
-
-/* [46] Данные текущего пользователя */
-function _element46_struct($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),//диалог пользователей, на основании которого будет выбираться значение [38]
-		'txt_2'   => _num($el['txt_2']) //id значения [13]
-	) + _element11_struct($el);
-}
-function _element46_js($el) {
-	return _element11_js($el);
-}
-function _element46_print($el, $prm) {
-	if(!APP_ID)
-		return '';
-	if(!$u = _user())
-		return '';
-
-	$u['dialog_id'] = 111;
-	$spisok[USER_ID] = $u;
-	$spisok = _spisokImage($spisok);
-
-	$prm['unit_get'] = $spisok[USER_ID];
-
-	return _element11_print($el, $prm);
-}
-
 /* [49] Выбор блоков из диалога или страницы */
 function _element49_struct($el) {
 	/*
@@ -386,34 +290,6 @@ function _element58_struct($el) {
 	) + _elementStruct($el);
 }
 
-/* [62] Фильтр: галочка */
-function _element62_struct($el) {
-	return array(
-		'txt_1'   => $el['txt_1'],      //текст для галочки
-		'txt_2'   => $el['txt_2'],      //фильтр настраивается через [40]
-		'num_1'   => _num($el['num_1']),//id элемента, размещающего список
-		'num_2'   => _num($el['num_2']),/* условие применяется:
-											1439 - галочка установлена
-											1440 - галочка снята
-										*/
-		'num_3'   => _num($el['num_3']) //начальное значение для галочки
-	) + _elementStruct($el);
-}
-function _element62_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
-function _element62_print($el, $prm) {
-	return
-	_check(array(
-		'attr_id' => _elemAttrId($el, $prm),
-		'title' => $el['txt_1'],
-		'disabled' => $prm['blk_setup'],
-		'value' => _spisokFilter('vv', $el, $el['num_3'])
-	));
-}
-
 /* [66] Выбор цвета текста */
 function _element66_struct($el) {
 	return _elementStruct($el);
@@ -434,18 +310,6 @@ function _element68_print($el, $prm) {
 		return _emptyMin('История действий');
 
 	return _historySpisok($el, $prm);
-}
-
-/* [71] Значение записи: иконка сортировки */
-function _element71_struct($el) {
-	return _elementStruct($el);
-}
-function _element71_struct_title($el) {
-	$el['title'] = 'SORT';
-	return $el;
-}
-function _element71_print($el, $prm) {
-	return '<div class="icon icon-move '.($prm['unit_get'] ? 'pl' : 'curD').'"></div>';
 }
 
 /* [86] Значение записи: количество дней */
@@ -529,25 +393,6 @@ function _element87_print($el, $prm) {
 	return 'Кол-во "'.$DLG['name'].'" '.($count ? '+'.$count : '0');
 }
 
-/* [91] Выбор галочками */
-function _element91_struct($el) {
-	return array(
-		'txt_1'   => $el['txt_1']  //подсказка для галочки
-	) + _elementStruct($el);
-}
-function _element91_struct_title($el) {
-	$el['title'] = '✓';
-	return $el;
-}
-function _element91_print($el, $prm) {
-	$u = $prm['unit_get'];
-
-	return _check(array(
-		'attr_id' => 'sch'.$el['id'].'_'.$u['id'],
-		'value' => 0
-	));
-}
-
 /* [96] Количество значений связанного списка с учётом категорий */
 function _element96_struct($el) {
 	return array(
@@ -581,94 +426,6 @@ function _element96_print($el, $prm) {
 	}
 
 	return $send;
-}
-
-/* [102] Фильтр: Выбор нескольких групп значений */
-function _element102_struct($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),//id элемента: список, на который воздействует фильтр [13]
-		'txt_1'   => $el['txt_1'],      //нулевое значение
-		'txt_2'   => $el['txt_2'],      //ids элементов: привязанный список (зависит от num_1) [13]
-		'txt_3'   => $el['txt_3'],      //ids элементов: счётчик количеств  (зависит от num_1) [13]
-		'txt_4'   => $el['txt_4'],      //ids элементов: путь к цветам (зависит от num_1) [13]
-		'txt_5'   => $el['txt_5']       //значение по умолчанию: настраивается через [40]
-	) + _elementStruct($el);
-}
-function _element102_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
-function _element102_print($el, $prm) {
-	$v = _spisokFilter('v', $el['id']);
-	if($v === false) {
-		$cond = _40cond($el, $el['txt_5']);
-		$v = _elem102CnnList($el['txt_2'], 'ids', $cond);
-		_spisokFilter('insert', array(
-			'spisok' => $el['num_1'],
-			'filter' => $el['id'],
-			'v' => $v
-		));
-	}
-
-	$vAss = _idsAss($v);
-
-	//ассоциативный массив с количествами
-	$countAss = _elem102CnnList($el['txt_3'], 'ass');
-
-	//ассоциативный массив с цветами
-	$bgAss = _elem102CnnList($el['txt_4'], 'ass');
-
-	$title = array();//ассоциативный массив с именами значений фильтра для JS
-	$spisok = '';
-	$sel = '';//выбранные значения
-	if($arr = _elem102CnnList($el['txt_2'])) {
-		$n = 0;
-		$selOne = '';
-		foreach($arr as $r) {
-			$id = $r['id'];
-			$bg = isset($bgAss[$id]) ? ' style="background-color:'.$bgAss[$id].'"' : '';
-			$c = _hide0(@$countAss[$id]);
-			$spisok .=
-				'<tr class="over1" val="'.$r['id'].'">'.
-					'<th class="w35 pad8 center"'.$bg.'>'.
-						_check(array(
-							'attr_id' => 'chk'.$id,
-							'value' => isset($vAss[$id])
-						)).
-					'<td class="wsnw">'.$r['title'].
-					'<td class="r fs12 grey b">'.$c;
-
-			$title[$id] = $r['title'];
-
-			if(isset($vAss[$id])) {
-				$c = _num($c);
-				$sel .= $c ? '<div'.$bg.' class="un'._tooltip($r['title'], -6, 'l').$c.'</div>' : '';
-				$selOne = '<div class="un"'.$bg.'>'.$r['title'].'</div>';
-				$n++;
-			}
-		}
-		if($n == 1)
-			$sel = $selOne;
-	}
-
-	return
-	'<div class="_filter102"'._elemStyleWidth($el).' id="'._elemAttrId($el, $prm).'_filter102">'.
-		'<div class="holder'._dn(!$sel).'">'.$el['txt_1'].'</div>'.
-		'<table class="w100p">'.
-			'<tr><td class="td-un">'.($sel ? $sel : '<div class="icon icon-empty"></div>').
-				'<td class="w25 top r">'.
-					'<div class="icon icon-del pl'._dn($sel, 'vh')._tooltip('Очистить фильтр', -53).'</div>'.
-		'</table>'.
-		'<div class="list">'.
-			'<table>'.$spisok.'</table>'.
-		'</div>'.
-	'</div>'.
-	'<script>'.
-		'var EL'.$el['id'].'_F102_TITLE='._json($title).','.
-			'EL'.$el['id'].'_F102_C='._json($countAss).','.
-			'EL'.$el['id'].'_F102_BG='._json($bgAss).';'.
-	'</script>';
 }
 
 /* [130] Пин-код */
@@ -1914,9 +1671,6 @@ function _elem201init($el85, $prm, $send) {//получение данных э�
 		case 6: return _elem201initCnn($send, _jsCachePage());
 
 		case 16:
-			$vvv = _element('vvv', $EL);
-			return _elem201initCnn($send, _sel($vvv));
-
 		case 17:
 		case 18: return _elem201initCnn($send, _element('vvv', $EL));
 

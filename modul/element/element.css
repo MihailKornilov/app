@@ -759,6 +759,8 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
+/* [23] скрытие подсказки при перетаскивании */
+.ui-sortable-helper .ttdiv{display:none}
 
 
 

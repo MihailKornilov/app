@@ -2644,7 +2644,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					switch(sp.initial_id) {
 						//значение было сброшено
 						case -1:
-						default:
 							if(v && sp.revers) {
 								is_set = is_set ? 0 : 1;
 								break;
@@ -2661,6 +2660,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							if(!v)
 								return;
 							break;
+						default:
+							if(!v)
+								return;
+							if(v != sp.initial_id)
+								return;
+							v = sp.apply_id;
+							break;
 					}
 
 					_forIn(_idsAss(sp.target_ids), function(ex, id) {
@@ -2675,7 +2681,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								break;
 							//select - привязанный список
 							case 29:
-								_attr_cmp(id)._select(0);
+								_attr_cmp(id)._select(v);
 								break;
 							//фильтр-галочка
 							case 62:
