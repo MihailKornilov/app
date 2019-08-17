@@ -115,7 +115,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 			$send .=
 			'<tr><td class="w35">'.
 					'<div class="fs14 grey r">'.$n++.'</div>'.
-	 ($colImg ? '<td class="pad2 top w35 center">'._imageHtml($u[$colImg], 30, 30) : '').
+	 ($colImg ? '<td class="pad0 w35 center">'._imageHtml($u[$colImg], 30, 30) : '').
 				'<td>'.
 	($el['txt_4'] ? '<div class="fs11 grey mb2">'._elemUids($el['txt_4'], $u).'</div>' : '').
 					'<div class="fs15">'.$name.'</div>'.
@@ -136,7 +136,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 		$imgW = $el['txt_4'] ? 30 : 20;
 		$send .=
 		'<tr><td class="w25 grey r">'.$n++.
- ($colImg ? '<td class="pad2 top '.($el['txt_4'] ? 'w35' : 'w25').' center">'._imageHtml($u[$colImg], $imgW, $imgW) : '').
+ ($colImg ? '<td class="pad0 '.($el['txt_4'] ? 'w35' : 'w25').' center">'._imageHtml($u[$colImg], $imgW, $imgW) : '').
 			'<td>'.
 ($el['txt_4'] ? '<div class="fs11 grey mb2">'._elemUids($el['txt_4'], $u).'</div>' : '').
 				$name;
