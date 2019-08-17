@@ -16,7 +16,6 @@ function _face() {//определение, как загружена стран
 function _sa($user_id=USER_ID) {
 	//Список пользователей - SA
 	$SA[1] = true;  //Михаил Корнилов
-//	$SA[57] = true; //Лена Навроцкая
 
 
 	$issa = isset($SA[$user_id]) ? 1 : 0;
