@@ -42,7 +42,9 @@ function _element29_js($el) {
 	) + _elementJs($el);
 }
 function _element29_print($el, $prm) {
-	$v = _elemPrintV($el, $prm, $el['num_6']);
+	$v = $el['num_6'];
+	if(!$el['num_10'])
+		$v = _elemPrintV($el, $prm, $el['num_6']);
 	$v = _elem29PageSel($el['num_1'], $v);
 	$v = _elem29DialogSel($prm, $v);
 	$v = _elem29UserSel($el, $prm, $v);
