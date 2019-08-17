@@ -117,13 +117,13 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 					'<div class="fs14 grey r">'.$n++.'</div>'.
 	 ($colImg ? '<td class="pad0 w35 center">'._imageHtml($u[$colImg], 30, 30) : '').
 				'<td>'.
-	($el['txt_4'] ? '<div class="fs11 grey">'._elemUids($el['txt_4'], $u).'</div>' : '').
-					'<div class="fs15 mt2">'.$name.'</div>'.
+	($el['txt_4'] ? '<div class="fs11 grey mb2">'._elemUids($el['txt_4'], $u).'</div>' : '').
+					'<div class="fs15">'.$name.'</div>'.
 				'<td class="w70 bg-ffd'._dn($el['num_3']).'">'.
 					'<input type="text" class="uinp w100p r b" val="'.$r['id'].'" value="'.$r['count'].'">'.
 
 			($colCena ?
-				'<td class="w100 r'._dn($el['num_4']).'">'.
+				'<td class="w100 r">'.
 					'<b class="ucena">'.$cena.'</b> руб.'
 			: '').
 
@@ -133,11 +133,19 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 		}
 
 		//вариант вывода значений для просмотра
+		$imgW = $el['txt_4'] ? 30 : 20;
 		$send .=
-		'<tr><td class="w35 grey r">'.$n++.
-			'<td>'.$name;
+		'<tr><td class="w25 grey r">'.$n++.
+ ($colImg ? '<td class="pad0 '.($el['txt_4'] ? 'w35' : 'w25').' center">'._imageHtml($u[$colImg], $imgW, $imgW) : '').
+			'<td>'.
+($el['txt_4'] ? '<div class="fs11 grey mb2">'._elemUids($el['txt_4'], $u).'</div>' : '').
+				$name;
 		if($el['num_3'])
-			$send .='<td class="w50 r b">'.$r['count'];
+			$send .= '<td class="w50 r b">'.$r['count'];
+
+		if($colCena)
+			$send .= '<td class="w70 r fs12">'.
+						'<b class="ucena fs12">'.$cena.'</b> руб.';
 	}
 
 	return '<table class="_stab w100p small'._dn($is_show, 'mb5').'">'.$send.'</table>';
