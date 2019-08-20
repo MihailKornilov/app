@@ -205,7 +205,9 @@ function _userActive($page_id) {//сохранение активности по
 }
 
 
-function PHP12_user_active() {
+function PHP12_user_active() {//общая картина использования приложений за сутки
+	define('USER_SKIP', " AND `user_id` NOT IN (1) ");
+
 	$data = array();
 	$sql = "SELECT
 				`id`,
@@ -213,6 +215,7 @@ function PHP12_user_active() {
 				`data`
 			FROM `_user_active`
 			WHERE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d')
+			".USER_SKIP."
 			ORDER BY `id`";
 	foreach(query_arr($sql) as $r) {
 		$h = $r['h'];
@@ -241,7 +244,9 @@ function PHP12_user_active() {
 	}
 	$send .= '</table>';
 
-	return '<div id="user-active">'.$send.'</div>';
+	return
+	'<div id="user-active">'.$send.'</div>'.
+	_user_active_itog();
 }
 function _user_active_minute($data, $hour, $min) {//вставка данный по минутам
 	if(empty($data[$hour]))
@@ -262,4 +267,26 @@ function _user_active_minute($data, $hour, $min) {//вставка данный 
 
 	return $send;
 }
+function _user_active_itog() {//общий итог использования приложений
+	$sql = "SELECT COUNT(*)
+			FROM `_user_active`
+			WHERE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d')".USER_SKIP;
+	$c_unit = query_value($sql);
 
+	$sql = "SELECT COUNT(DISTINCT `app_id`)
+			FROM `_user_active`
+			WHERE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d')".USER_SKIP;
+	$c_app = query_value($sql);
+
+	$sql = "SELECT COUNT(DISTINCT `user_id`)
+			FROM `_user_active`
+			WHERE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d')".USER_SKIP;
+	$c_user = query_value($sql);
+
+	return
+	'<table class="_stab mt20">'.
+		'<tr><td>Всего записей:<td>'.$c_unit.
+		'<tr><td>Приложения:<td>'.$c_app.
+		'<tr><td>Пользователи:<td>'.$c_user.
+	'</table>';
+}
