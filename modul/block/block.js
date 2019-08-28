@@ -39,11 +39,14 @@ var _ids = function(v, count) {
 
 		t._hint({
 			msg:'<div class="pad5">' +
-					'<div class="line-b">' +
-						'<span class="fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Блок</span>' +
-						'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl fr dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
-						'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl fr dialog-open' + _tooltip('Условия отображения', -67) + '</div>' +
-					'</div>' +
+					'<table class="w100p line-b">' +
+						'<tr><td class="w50 fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Блок' +
+							'<td><input type="hidden" id="block-hidden" value="' + BL.hidden + '" />' +
+							'<td class="w90 r pb2">' +
+								'<div val="dialog_id:43,block_id:' + block_id + ',edit_id:0" class="icon icon-hint pl curP dialog-open' + _tooltip('Настроить подсказку<br>для блока', -65, false, true) + '</div>' +
+								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +
+								'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
+					'</table>' +
 					_blockUnitBg(BL) +
 					_blockUnitBor(BL) +
 					_blockUnitBut(BL) +
@@ -98,7 +101,7 @@ var _ids = function(v, count) {
 					}
 				});
 				$('#block-hidden')._check({
-					title:'<div class="fs12">Скрыт</div>',
+					title:'скрытый',
 					func:function(v) {
 						BL.hidden = v;
 						BL.save = 1;
@@ -277,9 +280,7 @@ var _ids = function(v, count) {
 
 		return '<td class="bg-ffc bor-f0 pl5 pr3">' +
 			'<input type="hidden" id="block-width-auto" value="' + BL.width_auto + '" />' +
-			'<input type="hidden" id="block-sa-view" value="' + BL.sa + '" />' +
-			'<input type="hidden" id="block-hidden" value="' + BL.hidden + '" />' +
-			'';
+			'<input type="hidden" id="block-sa-view" value="' + BL.sa + '" />';
 	},
 	_blockUnitBut = function(BL) {//кнопки
 		if(BL.elem_id)
