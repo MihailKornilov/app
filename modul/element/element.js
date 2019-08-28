@@ -2285,7 +2285,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 
 					return;
-
 				//Выбранные значения галочками
 				case 92:
 					if(unit.id)
@@ -2343,6 +2342,31 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102: ATR_EL._filter102(); return;
+				//настройка доступа к страницам для пользователя
+				case 103:
+					var idsSet = function() {//вставка идентификаторов страниц для отправки данных
+						var ids = [];
+						_forEq(ATR_EL.find('._check'), function(sp) {
+							var ch = sp.prev(),
+								id = _num(ch.attr('id').split('_')[1]),
+								v = _num(ch.val());
+							if(v)
+								ids.push(id);
+						});
+
+						ATR_CMP.val(ids.join());
+					};
+					_forEq(ATR_EL.find('._check'), function(sp) {
+						var prev = sp.prev();
+						prev._check({
+							func:function(v) {
+								prev.parents('table').next()[v ? 'slideDown' : 'slideUp'](200);
+								idsSet();
+							}
+						});
+					});
+					idsSet();
+					return;
 				//Привязка пользователя к странице ВК
 				case 300:
 					var VK300 = ATR_CMP.next(),
@@ -5561,31 +5585,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			$(t).parents('._comment-u').removeClass('deleted');
 		});
 
-	},
-
-	//настройка доступа к страницам для пользователя
-	PHP12_page_access_for_user_setup = function(el, vvv, obj) {
-		_forEq(_attr_el(el.id).find('._check'), function(sp) {
-			var prev = sp.prev();
-			prev._check({
-				func:function(v) {
-					prev.parents('table').next()[v ? 'slideDown' : 'slideUp'](200);
-				}
-			});
-		});
-	},
-	PHP12_page_access_for_user_setup_get = function(el) {
-		var ids = [];
-
-		_forEq(_attr_el(el.id).find('._check'), function(sp) {
-			var ch = sp.prev(),
-				id = _num(ch.attr('id').split('_')[1]),
-				v = _num(ch.val());
-			if(v)
-				ids.push(id);
-		});
-
-		return ids.join(',');
 	},
 
 	//настройка входа в приложение для всех сотрудников

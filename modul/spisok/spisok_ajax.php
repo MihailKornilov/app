@@ -1093,6 +1093,7 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 
 		_elem1def($cmp_id, $unit_id, $v);
 		_elem37changeCol($cmp_id, $unit_id);
+		_elem103save($cmp_id, $unit_id, $v);
 	}
 
 	return;
