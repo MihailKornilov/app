@@ -28,7 +28,7 @@ foreach(array(
 			   62,   64,   66,   68,69,70,
 			71,72,73,74,75,   77,78,79,80,
 			      83,   85,86,87,88,   90,
-			91,92,         96,
+			91,92,93,      96,
 			102,103,130,300
         ) as $id) {
 	$file = GLOBAL_DIR.'/modul/element/element'.$id.'.php';
@@ -65,7 +65,7 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 		case 'history': return $prm;
 
 		//структура элемента: колонки, поля, подсказки, действия, форматирование
-		case 'struct':       return _elementStruct($el);
+		case 'struct':  return _elementStruct($el);
 		case 'struct_title':
 			$el['title'] = '';
 			if(!empty($el['name']))
