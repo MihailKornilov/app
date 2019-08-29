@@ -13,7 +13,7 @@ function PHP12_app_clear_list() {//список данных, которые б�
 		_app_clear_td('_user_page_access').
 		_app_clear_td('_block').
 		_app_clear_td('_element').
-		_app_clear_td('_element_hint').
+		_app_clear_td('_hint').
 		_app_clear_td('_dialog').
 		_app_clear_td('_action').
 		_app_clear_td('_counter').
@@ -129,7 +129,7 @@ function _appDel($app_id=APP_ID) {
 	query($sql);
 
 	//удаление подсказок
-	$sql = "DELETE FROM `_element_hint`
+	$sql = "DELETE FROM `_hint`
 			WHERE `app_id`=".$app_id;
 	query($sql);
 
@@ -1339,7 +1339,7 @@ function _clone_cron() {
 }
 function _clone_element_hint() {
 	$sql = "SELECT *
-			FROM `_element_hint`
+			FROM `_hint`
 			WHERE `app_id`=".CLONE_ID_SRC."
 			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
@@ -1349,7 +1349,7 @@ function _clone_element_hint() {
 	$assEL = $ass[_table('_element')];
 
 	foreach($arr as $r) {
-		$sql = "INSERT INTO `_element_hint` (
+		$sql = "INSERT INTO `_hint` (
 					`app_id`,
 
 					`element_id`,

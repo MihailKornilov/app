@@ -752,10 +752,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 				//присвоение id выплывающей подсказке
 				if(o.dialog_id == 43) {
-					ELMM[res.unit.element_id].hint = {
-						id:res.unit.id,
-						on:res.unit.on
-					};
+					var u = res.unit;
+					if(u.block_id)
+						BLKK[u.block_id].hint = {id:u.id};
+					if(u.element_id)
+						ELMM[u.element_id].hint = {id:u.id};
 				}
 			});
 		}

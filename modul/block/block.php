@@ -1539,6 +1539,7 @@ function _beBlock($app_id=0) {//кеш блоков
 			$BLK[$block_id] = $bl;
 		}
 
+		$BLK = _beBlockHint($BLK, $app_id);
 		$BLK = _beBlockAction($BLK, $app_id);
 
 		_cache_set($key, $BLK, $global);
@@ -1572,6 +1573,28 @@ function _beBlockStructure($bl) {//формирование массива бл�
 		'elem_id' => _num($bl['elem_id']),
 		'elem' => array()
 	);
+}
+function _beBlockHint($BLK, $app_id) {//подсказки, назначенные элементам
+	$sql = "SELECT *
+			FROM `_hint`
+			WHERE `app_id`=".$app_id."
+			  AND `block_id`
+			  AND `on`
+			  AND LENGTH(`msg`)";
+	foreach(query_arr($sql) as $r) {
+		$block_id = $r['block_id'];
+		if(!isset($BLK[$block_id]))
+			continue;
+		unset($r['app_id']);
+		unset($r['on']);
+		unset($r['block_id']);
+		unset($r['element_id']);
+		unset($r['user_id_add']);
+		unset($r['dtime_add']);
+		$BLK[$block_id]['hint'] = _arrNum($r);
+	}
+
+	return $BLK;
 }
 function _beBlockAction($blk, $app_id) {//вставка действий для блоков
 	$sql = "SELECT *
@@ -1734,8 +1757,9 @@ function _beElemDlg($el) {//настройки элемента из диало�
 }
 function _beElemHint($ELM, $app_id) {//подсказки, назначенные элементам
 	$sql = "SELECT *
-			FROM `_element_hint`
+			FROM `_hint`
 			WHERE `app_id`=".$app_id."
+			  AND `element_id`
 			  AND `on`
 			  AND LENGTH(`msg`)";
 	foreach(query_arr($sql) as $r) {
@@ -1744,6 +1768,7 @@ function _beElemHint($ELM, $app_id) {//подсказки, назначенны�
 			continue;
 		unset($r['app_id']);
 		unset($r['on']);
+		unset($r['block_id']);
 		unset($r['element_id']);
 		unset($r['user_id_add']);
 		unset($r['dtime_add']);

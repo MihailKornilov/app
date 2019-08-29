@@ -832,6 +832,9 @@ function _jsCacheBlkOne($block_id) {
 	$val['xx'] = $r['xx'];
 	$val['xx_ids'] = $r['xx_ids'];
 
+	if(!empty($r['hint']))
+		$val['hint'] = $r['hint'];
+
 	if(!empty($r['action'])) {
 		//удаление фильтров, ибо в JS они не требуются
 		foreach($r['action'] as $act) {

@@ -51,7 +51,7 @@ switch(@$_POST['op']) {
 				query($sql);
 
 				//удаление подсказок
-				$sql = "DELETE FROM `_element_hint` WHERE `element_id`=".$unit_id;
+				$sql = "DELETE FROM `_hint` WHERE `element_id`=".$unit_id;
 				query($sql);
 
 				//удаление фильтров
@@ -503,7 +503,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	}
 
 	//изменена выплывающая подсказка
-	if($dialog['table_name_1'] == '_element_hint') {
+	if($dialog['table_name_1'] == '_hint') {
 		_BE('elem_clear');
 		_jsCache();
 	}
@@ -893,17 +893,12 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 						query($sql);
 					}
 			}
-		if($tab == '_element_hint')
-			if($block_id)
-				if($BL = _blockOne($block_id))
-					if($elem_id = $BL['elem_id']) {
-						$sql = "UPDATE `_element_hint`
-								SET `app_id`=".$BL['app_id'].",
-									`element_id`=".$elem_id."
-								WHERE `id`=".$uid[$table_1];
-						query($sql);
-					}
-
+		if($tab == '_hint' && $element_id) {
+			$sql = "UPDATE `_hint`
+					SET `element_id`=".$element_id."
+					WHERE `id`=".$uid[$table_1];
+			query($sql);
+		}
 	}
 
 	//установка `app_id` для `_action`

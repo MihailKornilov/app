@@ -1353,7 +1353,7 @@ function PHP12_bug_element_elem102($ELM) {//Фильтр: Выбор неско�
 
 function PHP12_bug_element_hint() {
 	$sql = "SELECT *
-			FROM `_element_hint`
+			FROM `_hint`
 			WHERE `app_id`=".APP_ID;
 	$HINT = query_arr($sql);
 

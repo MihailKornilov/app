@@ -37,13 +37,14 @@ var _ids = function(v, count) {
 		if(BL.save || _attr_bl(BL.id).hasClass('_busy'))
 			return;
 
+		var hint_id = BL.hint ? BL.hint.id : 0;
 		t._hint({
 			msg:'<div class="pad5">' +
 					'<table class="w100p line-b">' +
 						'<tr><td class="w50 fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Блок' +
 							'<td><input type="hidden" id="block-hidden" value="' + BL.hidden + '" />' +
 							'<td class="w90 r pb2">' +
-								'<div val="dialog_id:43,block_id:' + block_id + ',edit_id:0" class="icon icon-hint pl curP dialog-open' + _tooltip('Настроить подсказку<br>для блока', -65, false, true) + '</div>' +
+								'<div val="dialog_id:43,block_id:' + block_id + ',edit_id:' + hint_id + '" class="icon icon-hint curP dialog-open' + _dn(!BL.hint, 'pl') + _tooltip('Настроить подсказку<br>для блока', -65, false, true) + '</div>' +
 								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +
 								'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
 					'</table>' +
@@ -376,10 +377,9 @@ var _ids = function(v, count) {
 	_elemUnitHint = function(EL) {//иконка для настройки выплывающей подсказки
 		if(!EL.rule15)
 			return '';
-		var hint_id = EL.hint ? EL.hint.id : 0,
-			pl = EL.hint && EL.hint.on;
-		return '<div val="dialog_id:43,block_id:' + EL.block_id + ',edit_id:' + hint_id + '"' +
-				   ' class="icon icon-hint ml3 curP dialog-open' + _dn(!pl, 'pl') + _tooltip('Настроить подсказку', -65) +
+		var hint_id = EL.hint ? EL.hint.id : 0;
+		return '<div val="dialog_id:43,element_id:' + EL.id + ',edit_id:' + hint_id + '"' +
+				   ' class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint, 'pl') + _tooltip('Настроить подсказку<br>для элемента', -65, false, true) +
 			   '</div>';
 	},
 	_elemUnitAction = function(EL) {//иконка для настройки действий
