@@ -886,8 +886,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(!ATR_EL.length)
 				return;
 
-			_elemHint(el);
-
 			switch(el.dialog_id) {
 				case 1://галочка
 					if(!el.action)
@@ -2526,47 +2524,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			focus7[0].setSelectionRange(l, l);//установка фокуса в конец строки
 		}
 
-	},
-	_elemHint = function(el) {//подключение подсказки к элементу
-		if(!el.hint)
-			return;
-
-		var hint = el.hint,
-			side = {
-				0:'auto',
-				755:'top',
-				756:'bottom',
-				757:'left',
-				758:'right'
-			},
-			sideObj = {
-				755:'h',
-				756:'h',
-				757:'v',
-				758:'v'
-			},
-			objPos = {
-				767:'center',
-				768:'left',
-				769:'right',
-
-				772:'center',
-				773:'top',
-				774:'bottom'
-			};
-		_attr_el(el.id).mouseenter(function() {
-			var o = {
-				msg:_br(hint.msg, 1),
-				pad:10,
-				side:side[hint.side],
-				show:1,
-				delayShow:hint.delay_show,
-				delayHide:hint.delay_hide
-			};
-			if(hint.side)
-				o.objPos = objPos[hint['pos_' + sideObj[hint.side]]];
-			$(this)._hint(o);
-		});
 	},
 	_elemAction = function(el, v, is_open) {//применение функций, привязанных к элементам
 		/*

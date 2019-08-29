@@ -221,6 +221,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$cls[] = $r['pos'];
 			$cls[] = _dn(!(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden']));
 			$cls[] = !$PARAM['blk_setup'] && _blockActionIsClick($r, $PARAM) ? 'curP' : '';
+			$cls[] = !$PARAM['blk_setup'] && !empty($r['hint']) ? 'hint-on' : '';//применение подсказки
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
@@ -701,6 +702,7 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 	$cls[] = _elemAction242($el, $prm);
 	$cls[] = @$el['font'];
 	$cls[] = _elemDivSize($el);
+	$cls[] = empty($prm['blk_setup']) && !empty($el['hint']) ? 'hint-on' : '';//применение подсказки
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 

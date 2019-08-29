@@ -928,6 +928,70 @@ $(document)
 			location.href = URL + link;
 			return false;
 		});
+	})
+	.on('mouseenter', '.hint-on', function() {//вывод подсказки для блока
+		var t = $(this),
+			spl = t.attr('id').split('_'),
+			id = _num(spl[1]),
+			obj,//объект - блок или элемент
+			h;  //данные по подсказке;
+
+		if(!id)
+			return;
+
+		switch(spl[0]) {
+			case 'bl':
+				if(!BLKK[id])
+					return;
+				h = BLKK[id].hint;
+				obj = _attr_bl(id);
+				break;
+			case 'el':
+				if(!ELMM[id])
+					return;
+				h = ELMM[id].hint;
+				obj = _attr_el(id);
+				break;
+			default: return;
+		}
+
+
+		if(!obj || !h)
+			return;
+
+		var side = {
+				0:'auto',
+				755:'top',
+				756:'bottom',
+				757:'left',
+				758:'right'
+			},
+			sideObj = {
+				755:'h',
+				756:'h',
+				757:'v',
+				758:'v'
+			},
+			objPos = {
+				767:'center',
+				768:'left',
+				769:'right',
+
+				772:'center',
+				773:'top',
+				774:'bottom'
+			};
+		var o = {
+			msg:_br(h.msg, 1),
+			pad:10,
+			side:side[h.side],
+			show:1,
+			delayShow:h.delay_show,
+			delayHide:h.delay_hide
+		};
+		if(h.side)
+			o.objPos = objPos[h['pos_' + sideObj[h.side]]];
+		obj._hint(o);
 	});
 
 $.fn._grid = function(o) {
