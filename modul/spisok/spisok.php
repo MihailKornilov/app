@@ -935,7 +935,9 @@ function _spisokCond75($el) {//Фильтр: фронтальное меню
 		return " AND !`id`";
 
 	//получение диалога подключенного списка
-	if($EL['dialog_id'] == 29 && !$dialog_id = _num($EL['num_1']))
+	if($EL['dialog_id'] != 29)
+		return " AND !`id`";
+	if(!$dialog_id = _num($EL['num_1']))
 		return " AND !`id`";
 	if(!$dialog = _dialogQuery($dialog_id))
 		return " AND !`id`";
