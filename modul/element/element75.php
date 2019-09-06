@@ -6,8 +6,9 @@ function _element75_struct($el) {
 		'num_1'   => _num($el['num_1']),//[13] список, который фильтруется
 		'num_2'   => _num($el['num_2']),//[35] Кол-во колонок
 		'txt_2'   => $el['txt_2'],      //[13] путь к названиям
+		'txt_3'   => $el['txt_3'],      //[13] путь к количествам
 		'txt_1'   => $el['txt_1'],      //[13] путь к иконкам
-		'num_3'   => _num($el['num_3']),//[35] Размер иконок
+		'num_3'   => _num($el['num_3']) //[35] Размер иконок
 	) + _elementStruct($el);
 }
 function _element75_js($el) {
@@ -29,7 +30,7 @@ function _element75_print($el, $prm) {
 	if(!$DLG = _dialogQuery($BL['obj_id']))
 		return _emptyMinRed('[75] диалога не существует.');
 
-	if(!$col = $EL['col'])
+	if(!$col = _elemCol($EL))
 		return _emptyMinRed('[75] отсутствует колонка элемента-названия.');
 
 	$sql = "SELECT "._queryCol($DLG)."
@@ -44,9 +45,16 @@ function _element75_print($el, $prm) {
 	//вставка картинок
 	$arr = _spisokImage($arr);
 
+	//получение имени колонки для количеств
+	$colCount = '';
+	if($id = _idsLast($el['txt_3']))
+		$colCount = _elemCol($id);
+
 	$spisok = array();
-	foreach($arr as $r)
+	foreach($arr as $r) {
+		$r['count'] = $colCount && isset($r[$colCount]) ? ' ('.$r[$colCount].')' : '';
 		$spisok[$r['parent_id']][] = $r;
+	}
 
 	if(!$CC = $el['num_2'])
 		return _emptyMinRed('[75] не указано количетсво колонок.');
@@ -68,7 +76,7 @@ function _element75_print($el, $prm) {
 		$send .=
 		'<table class="w100p'._dn($n == $CCcount, 'mb20').'">'.
 			'<tr><td class="w50 top">'._imageHtml($r['txt_2'], $el['num_3'], $el['num_3'], false, false).
-				'<td class="top pt3"><a class="fs16 b"'.$clk.'>'.$r[$col].'</a>'.
+				'<td class="top pt3"><a class="fs16 b"'.$clk.'>'.$r[$col].$r['count'].'</a>'.
 					_element75child($spisok, $r['id'], $col).
 		'</table>';
 
@@ -91,7 +99,7 @@ function _element75child($spisok, $parent_id, $col) {
 	foreach($spisok[$parent_id] as $i => $r)
 		$send .=
 			'<div class="'.($i ? 'mt5' : 'mt10').'">'.
-				'<a class="u75 fs14" val="'.$r['id'].'">'.$r[$col].'</a>'.
+				'<a class="u75 fs14" val="'.$r['id'].'">'.$r[$col].$r['count'].'</a>'.
 			'</div>';
 
 	return '<div class="pb20 dn">'.$send.'</div>';

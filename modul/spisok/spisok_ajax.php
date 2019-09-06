@@ -247,12 +247,31 @@ switch(@$_POST['op']) {
 			if(!$id = _num($r['id']))
 				continue;
 
-			$upd = "`sort`=".$n;
+			$parent = '';
 			if(isset($dialog['field1']['parent_id']))
-				$upd .= ",`parent_id`="._num($r['parent_id']);
+				$parent .= ",`parent_id`="._num($r['parent_id']);
+
+			$child = '';
+			if(isset($dialog['field1']['child_lvl'])) {
+				$lvl = 0;
+				$pid = _num($r['parent_id']);
+				while($pid) {
+					$lvl++;
+					$sql = "SELECT `parent_id`
+							FROM `".$dialog['table_name_1']."`
+							WHERE `id`=".$pid;
+					$pid = _num(query_value($sql));
+				}
+				$child .= ",`child_lvl`=".$lvl;
+			}
+
+			$child_lvl = 0;
+
 
 			$sql = "UPDATE `".$dialog['table_name_1']."`
-					SET ".$upd."
+					SET `sort`=".$n."
+						".$parent."
+						".$child."
 					WHERE `id`=".$id;
 			query($sql);
 		}

@@ -1487,7 +1487,6 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 	if(!$DSrc = _dialogQuery($BL['obj_id']))//диалог, к которому привязан список (данные этого списка будут обновляться)
 		return;
 
-
 	//предварительное обнуление значений перед обновлением
 	$sql = "UPDATE "._queryFrom($DSrc)."
 			SET `".$unit['col']."`=0
@@ -1532,25 +1531,30 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 	//обновление сумм родительских значений, если есть дочерние
 	if(!isset($DSrc['field1']['parent_id']))
 		return;
-
-	$sql = "SELECT DISTINCT `parent_id`
-			FROM `"._table($DSrc['table_1'])."`
-			WHERE `dialog_id`=".$BL['obj_id']."
-			  AND `parent_id`";
-	if(!$ids = query_ids($sql))
+	if(!isset($DSrc['field1']['child_lvl']))
 		return;
 
-	foreach(_ids($ids, 1) as $id) {
-		$sql = "SELECT SUM(`".$unit['col']."`)
-				FROM `"._table($DSrc['table_1'])."`
-				WHERE `parent_id`=".$id;
-		$count = query_value($sql);
-		$count += empty($ass[$id]) ? 0 : $ass[$id];
+	$sql = "SELECT MAX(`child_lvl`)
+			FROM `"._table($DSrc['table_1'])."`
+			WHERE `dialog_id`=".$BL['obj_id'];
+	if(!$lvl = _num(query_value($sql)))
+		return;
 
-		$sql = "UPDATE `"._table($DSrc['table_1'])."`
-				SET `".$unit['col']."`=".$count."
-				WHERE `id`=".$id;
-		query($sql);
+	for($n = $lvl; $n > 0; $n--) {
+		$sql = "SELECT
+					DISTINCT `parent_id`,
+					SUM(`".$unit['col']."`)
+				FROM `"._table($DSrc['table_1'])."`
+				WHERE `dialog_id`=".$BL['obj_id']."
+				  AND `child_lvl`=".$n."
+				GROUP BY `parent_id`";
+		if($ass = query_ass($sql))
+			foreach($ass as $id => $count) {
+				$sql = "UPDATE `"._table($DSrc['table_1'])."`
+						SET `".$unit['col']."`=`".$unit['col']."`+".$count."
+						WHERE `id`=".$id;
+				query($sql);
+			}
 	}
 }
 function _spisokUnitUpd55($unit) {//обновление сумм
@@ -1640,7 +1644,6 @@ function _spisokUnitUpd55($unit) {//обновление сумм
 			$upd = array();
 		}
 	}
-
 }
 
 function _count_update($app_id=APP_ID) {//обновление счётчиков
