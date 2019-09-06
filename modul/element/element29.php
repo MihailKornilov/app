@@ -97,6 +97,16 @@ function _element29_print11($el, $u) {
 	if($deleted)
 		return '<s>'.$parent.$u.'</s>';
 
+	//получение значения по умолчанию
+	if(is_array($u)) {
+		$name = '';
+		if($DLG = _dialogQuery($u['dialog_id']))
+			if($col = _elemCol($DLG['spisok_elem_id']))
+				if(!empty($u[$col]))
+					$name = $u[$col];
+		$u = $name;
+	}
+
 	return $parent.$u;
 }
 function _element29_vvv($el, $prm) {
