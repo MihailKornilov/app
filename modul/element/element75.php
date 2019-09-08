@@ -73,12 +73,16 @@ function _element75_print($el, $prm) {
 
 		$clk = !empty($spisok[$r['id']]) ? ' onclick="$(this).next().slideToggle(250)"' : '';
 
+		$u75 = '';
+		if(!$child = _element75child($spisok, $r['id'], $col))
+			$u75 = 'u75 ';
+
 		$send .=
 		'<table class="w100p'._dn($n == $CCcount, 'mb20').'">'.
 			'<tr><td class="w50 top">'._imageHtml($r['txt_2'], $el['num_3'], $el['num_3'], false, false).
 				'<td class="top pt3">'.
-					'<a class="fs16 b"'.$clk.'>'.$r[$col].$r['count'].'</a>'.
-					_element75child($spisok, $r['id'], $col).
+					'<a class="'.$u75.'fs16 b"'.$clk.' val="'.$r['id'].'">'.$r[$col].$r['count'].'</a>'.
+					$child.
 		'</table>';
 
 		if($n == $CCcount) {

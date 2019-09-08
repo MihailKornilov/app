@@ -2088,13 +2088,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					var UN = ATR_EL.find('.u75');
 					UN.click(function() {
 						var t = $(this),
-							pname = t.closest('td').find('a').html() + ' » ' + t.html();
+							pname = t.closest('td').find('a').html(),
+							v = t.attr('val');
+
+						if(!t.hasClass('fs16'))
+							pname += ' » ' + t.html();
 
 						ATR_EL.find('.pname75').html(pname);
 						ATR_EL.find('.mp75')._dn(true);
 						ATR_EL.find('.tab75')._dn();
 
-						FILTER[el.num_1][elm_id] = t.attr('val');
+						FILTER[el.num_1][elm_id] = v;
+						_elemAction(el, v);
 						_spisokUpdate(el.num_1);
 					});
 					//отмена выбора
@@ -2102,8 +2107,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						ATR_EL.find('.mp75')._dn();
 						ATR_EL.find('.tab75')._dn(true);
 						FILTER[el.num_1][elm_id] = 0;
+						_elemAction(el, 0);
 						_spisokUpdate(el.num_1);
 					});
+					if(el.action)
+						_elemAction(el, FILTER[el.num_1][elm_id], 1);
 					return;
 				//Фильтр-календарь
 				case 77:
