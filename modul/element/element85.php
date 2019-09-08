@@ -116,5 +116,147 @@ function _elem85mass($ell_id, $v, $send) {//получение значений 
 	return $send;
 }
 
+function _elem201init($el85, $prm, $send) {//получение данных элемента для настройки действия [201]
+	$srce = $prm['srce'];
+
+	//проверка, чтобы данные были получены только для действий
+	if(!$DLG = _dialogQuery($srce['dialog_id']))
+		return $send;
+	if($DLG['table_name_1'] != '_action')
+		return $send;
+
+	if($srce['dialog_id'] != 201)
+		if($srce['dialog_id'] == 202 && $el85['col'] != 'initial_id')
+			if($srce['dialog_id'] != 206)//установка фокуса
+				return $send;
+
+	//получение настраиваемого элемента
+	if(!$block_id = $srce['block_id'])
+		return $send;
+	if(!$BL = _blockOne($block_id))
+		return $send;
+	if(!$EL = $BL['elem'])
+		return $send;
+
+	switch($EL['dialog_id']) {
+		case 1://галочка
+		case 62://фильтр-галочка
+			array_unshift($send, array(
+				'id' => -2,
+				'title' => 'галочка установлена',
+				'content' => '<div class="color-pay b">галочка установлена</div>'.
+							 '<div class="grey i ml20">Действие будет совершено при установленной галочке</div>'
+			));
+			array_unshift($send, array(
+				'id' => -1,
+				'title' => 'галочка снята',
+				'content' => '<div class="color-ref b">галочка снята</div>'.
+							 '<div class="grey i ml20">Действие будет совершено, если галочка снята</div>'
+			));
+			break;
+		case 6: return _elem201initCnn($send, _jsCachePage());
+
+		case 16:
+		case 17:
+		case 18: return _elem201initCnn($send, _element('vvv', $EL));
+
+		case 24: return _elem201initCnn($send);
+
+		case 29:
+		case 59: return _elem201initCnn($send, _29cnn($EL['id']));
+
+		case 51://календарь
+			array_unshift($send, array(
+				'id' => -2,
+				'title' => 'выбран любой день'
+			));
+			break;
+
+		case 75:
+			array_unshift($send, array(
+				'id' => -2,
+				'title' => 'значение выбрано'
+			));
+			array_unshift($send, array(
+				'id' => -1,
+				'title' => 'значение НЕ выбрано'
+			));
+			break;
+	}
+
+	return $send;
+}
+function _elem201initCnn($send, $vvv=array()) {
+	foreach($vvv as $n => $r) {
+		$r['content'] = '<span class="color-pay">выбрано</span> <b>'.$r['title'].'</b>';
+		$r['title'] = 'выбрано "'.$r['title'].'"';
+		array_push($send, $r);
+	}
+
+	array_unshift($send, array(
+		'id' => -2,
+		'title' => 'выбрано любое значение',
+		'content' => '<div class="color-pay b">выбрано любое значение</div>'.
+					 '<div class="grey i ml20">Действие с блоками будет совершено при выборе любого значения</div>'
+	));
+	array_unshift($send, array(
+		'id' => -1,
+		'title' => 'значение сброшено',
+		'content' => '<div class="color-ref b">значение сброшено</div>'.
+					 '<div class="grey i ml20">Действие с блоками будет совершено, если значение было сброшено</div>'
+	));
+	return $send;
+}
+function _elem212ActionFormat($el85_id, $elv_id, $send) {//преобразование данных для выбора в действиях [212]
+	//СНАЧАЛА получение информации об элементе [85]
+	if(!$el85 = _elemOne($el85_id))
+		return $send;
+	if($el85['dialog_id'] != 85)
+		return $send;
+	if(!$BL = $el85['block'])
+		return $send;
+	if($BL['obj_name'] != 'dialog')
+		return $send;
+	//элемент [85] должен располагаться в диалоге [212]
+	if($BL['obj_id'] != 212)
+		if($BL['obj_id'] == 202)//либо в диалоге [202]
+			if($el85['col'] != 'apply_id')//и обязательно должен использовать колонку `apply_id`
+				return $send;
+
+	//ЗАТЕМ получение информации о выбранном элементе, который выбран для воздействия
+	if(!$elv = _elemOne($elv_id))
+		return $send;
+
+	switch($elv['dialog_id']) {
+		case 1://галочка
+		case 62://фильтр-галочка
+			array_unshift($send, array(
+				'id' => 1,
+				'title' => 'установить галочку'
+			));
+			array_unshift($send, array(
+				'id' => -1,
+				'title' => 'снять галочку'
+			));
+			break;
+		case 29://подключаемый список
+			foreach($send as $n => $r) {
+				if($r['id'] <= 0)
+					continue;
+				$send[$n]['title'] = 'установить "'.$r['title'].'"';
+				$send[$n]['content'] = 'установить "<b>'.$r['title'].'</b>"';
+			}
+			array_unshift($send, array(
+				'id' => -1,
+				'title' => 'Сбросить значение',
+				'content' => '<div class="color-ref">сбросить значение</div>'.
+							 '<div class="grey i ml20">При нажатии на блок значение будет сброшено, либо поле очищено</div>'
+			));
+			break;
+	}
+
+	return $send;
+}
+
 
 
