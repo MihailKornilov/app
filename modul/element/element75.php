@@ -52,12 +52,12 @@ function _element75_print($el, $prm) {
 
 	$spisok = array();
 	foreach($arr as $r) {
-		$r['count'] = $colCount && isset($r[$colCount]) ? ' ('.$r[$colCount].')' : '';
+		$r['count'] = $colCount && isset($r[$colCount]) ? '<span class="inhr"> ('.$r[$colCount].')</span>' : '';
 		$spisok[$r['parent_id']][] = $r;
 	}
 
 	if(!$CC = $el['num_2'])
-		return _emptyMinRed('[75] не указано количетсво колонок.');
+		return _emptyMinRed('[75] не указано количество колонок.');
 
 	$CCcol = 1; //счётчик колонок
 	$count = count($spisok[0]);//общее количество записей
@@ -76,7 +76,8 @@ function _element75_print($el, $prm) {
 		$send .=
 		'<table class="w100p'._dn($n == $CCcount, 'mb20').'">'.
 			'<tr><td class="w50 top">'._imageHtml($r['txt_2'], $el['num_3'], $el['num_3'], false, false).
-				'<td class="top pt3"><a class="fs16 b"'.$clk.'>'.$r[$col].$r['count'].'</a>'.
+				'<td class="top pt3">'.
+					'<a class="fs16 b"'.$clk.'>'.$r[$col].$r['count'].'</a>'.
 					_element75child($spisok, $r['id'], $col).
 		'</table>';
 
@@ -91,18 +92,29 @@ function _element75_print($el, $prm) {
 	_element75mp($v, $arr, $col, $DLG).
 	$send;
 }
-function _element75child($spisok, $parent_id, $col) {
+function _element75child($spisok, $parent_id, $col, $level=0) {
 	if(empty($spisok[$parent_id]))
 		return '';
 
 	$send = '';
-	foreach($spisok[$parent_id] as $i => $r)
+	foreach($spisok[$parent_id] as $i => $r) {
+		$fs = 'fs'.(14-$level);
+		$clk = !empty($spisok[$r['id']]) ? ' onclick="$(this).parent().next().slideToggle(250)"' : '';
+
+		$u75 = '';
+		if(!$child = _element75child($spisok, $r['id'], $col, $level+2))
+			$u75 = 'u75 ';
+
 		$send .=
 			'<div class="'.($i ? 'mt5' : 'mt10').'">'.
-				'<a class="u75 fs14" val="'.$r['id'].'">'.$r[$col].$r['count'].'</a>'.
-			'</div>';
+				'<a class="'.$u75.$fs.'" val="'.$r['id'].'"'.$clk.'>'.$r[$col].$r['count'].'</a>'.
+			'</div>'.
+			$child;
+	}
 
-	return '<div class="pb20 dn">'.$send.'</div>';
+	$ml = $level ? ' ml'.$level/2*10 : '';
+
+	return '<div class="pb20 dn'.$ml.'">'.$send.'</div>';
 }
 function _element75mp($v, $arr, $col, $DLG) {//путь меню (Menu Path)
 	$pname = '';
