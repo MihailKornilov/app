@@ -1716,8 +1716,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								//выбор значения списка
 								dlg.content.click(function(e) {
 									var un = $(e.target).parents('.sp-unit');
-									if(!un.length)
-										return;
+									if(!un.length) {
+										un = $(e.target).parents('.tr-unit');
+										if(!un.length)
+											return;
+									}
 
 									var id = _num(un.attr('val'));
 									if(!id)

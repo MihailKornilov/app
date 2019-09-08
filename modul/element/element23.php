@@ -122,7 +122,7 @@ function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в �
 
 	$MASS = array();
 	foreach($spisok as $uid => $u) {
-		$TR = '<tr'.($ELEM['num_4'] ? ' class="over1"' : '').'>';
+		$TR = '<tr class="tr-unit'.($ELEM['num_4'] ? ' over1' : '').'" val="'.$u['id'].'">';
 		$prm = _blockParam(array('unit_get'=>$u));
 		foreach($ELEM['vvv'] as $td) {
 			$cls = array();
