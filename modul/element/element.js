@@ -1453,8 +1453,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								//выбор значения списка
 								dlg.content.click(function(e) {
 									var un = $(e.target).parents('.sp-unit');
-									if(!un.length)
-										return;
+									if(!un.length) {
+										un = $(e.target).parents('.tr-unit');
+										if(!un.length)
+											return;
+									}
 
 									var id_new = _num(un.attr('val'));
 									if(!id_new)
@@ -1706,7 +1709,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(el.num_3)
 						return;
 
-					//нажатие на кнопку для открытыя диалога
+					//нажатие на кнопку для открытия диалога
 					ATR_CMP_AFICS.click(function() {
 						_dialogLoad({
 							block_id:el.block_id,
