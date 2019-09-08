@@ -18,6 +18,9 @@ function _element31_print($el, $prm) {
 			ORDER BY `sort`";
 	$spisok = query_arr($sql);
 
+	//вставка картинок
+	$spisok = _spisokImage($spisok);
+
 	$chk = '';
 	$n = 0;
 	$sel = _idsAss($v);
@@ -32,6 +35,15 @@ function _element31_print($el, $prm) {
 						$prm44 = _blockParam();
 						$prm44['unit_get'] = $r;
 						$title = _element44_print($ell, $prm44);
+						break;
+					case 60:
+						if(!$col = _elemCol($ell))
+							break;
+						if(!isset($r[$col]))
+							break;
+						if(!is_array($r[$col]))
+							break;
+						$title = _imageHtml($r[$col], 0, 0, false, false);
 						break;
 					default:
 						if($col = $ell['col'])
@@ -94,12 +106,20 @@ function _val31($el, $txt) {//Выбор нескольких значений �
 	if(!$spisok = query_arr($sql))
 		return '';
 
+	//вставка картинок
+	$spisok = _spisokImage($spisok);
 
 	$send = array();
 
-	foreach($spisok as $r)
-		if(!empty($sel[$r['id']]))
-			$send[] = $r['txt_1'];
+	foreach($spisok as $r) {
+		if(empty($sel[$r['id']]))
+			continue;
+		if(is_array($r['txt_1'])) {
+			$send[] = _imageHtml($r['txt_1'], 0, 0, false, false);
+			continue;
+		}
+		$send[] = $r['txt_1'];
+	}
 
 	return implode(', ', $send);
 }
