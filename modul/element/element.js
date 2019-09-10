@@ -2761,20 +2761,32 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						if(!elid)
 							continue;
 
-						var EL = _attr_cmp(elid);
+						var VN = 0,
+							EL = _attr_cmp(elid);
+						if(EL)
+							VN = _cena(EL.val());
+						else {
+							EL = _attr_el(elid);
+							if(EL)
+								VN = _cena(EL.html());
+						}
+
 						if(!EL)
 							continue;
 
-						if(!n) {
-							V = _cena(EL.val());
-						} else {
+						if(!n)
+							V = VN;
+						else
 							switch(_num(v1[n*2-1])) {
+								//сложение
+								case 1: V = V + VN; break;
+								//вычитание
+								case 2: V = V - VN; break;
 								//умножение
-								case 3: V = V * _cena(EL.val()); break;
+								case 3: V = V * VN; break;
 								//деление
-								case 4: V = V / _cena(EL.val()); break;
+								case 4: V = V / VN; break;
 							}
-						}
 					}
 
 					EA.val(Math.round(V*100)/100);
@@ -5225,6 +5237,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 						dop:{
 							mysave:1,
+							allow:'8,10',
 							sel:cmp.val()
 						},
 
@@ -5276,7 +5289,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			v = $.extend({
 				elem_id:0,
 				elem_name:'',
-				znak:3
+				znak:1
 			}, v);
 			html =
 				'<div class="dib w15 ml10">' +
@@ -5289,8 +5302,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			$('#znak' + NUM)._dropdown({
 				title0:'выбор знака',
 				spisok:[
-	//				{id:1,title:'<b class="fs17">+</b>'},
-	//				{id:2,title:'<b class="fs17">-</b>'},
+					{id:1,title:'<b class="fs17">+</b>'},
+					{id:2,title:'<b class="fs17">-</b>'},
 					{id:3,title:'<b class="fs17">*</b>'},
 					{id:4,title:'<b class="fs17">/</b>'}
 				]
