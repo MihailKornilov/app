@@ -2989,6 +2989,40 @@ function PHP12_action_224($r) {//ЭЛЕМЕНТ: внешняя ссылка
 }
 
 
+function PHP12_action208_formula($prm) {//составление формулы для действия 208
+	return '';
+}
+function PHP12_action208_formula_save($cmp, $val, $unit) {
+	if(!$action_id = _num($unit['id']))
+		return;
+
+	$sql = "UPDATE `_action`
+			SET `v1`='".$val."'
+			WHERE `id`=".$action_id;
+	query($sql);
+}
+function PHP12_action208_formula_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+	if(empty($u['v1']))
+		return array();
+
+	$send = array();
+	$ex = explode(',', $u['v1']);
+	$count = (count($ex) - 1) / 2;
+
+	for($n = 0; $n <= $count; $n++) {
+		$el = _elemOne($ex[$n*2]);
+		$send[] = array(
+			'elem_id' => $ex[$n*2],
+			'elem_name' => @$el['title'],
+			'znak' => $n ? $ex[$n*2-1] : 0
+		);
+	}
+
+	return _arrNum($send);
+}
+
 
 
 

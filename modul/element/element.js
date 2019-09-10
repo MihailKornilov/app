@@ -949,6 +949,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						}
 					});
 					return;
+				//однострочное текстовое поле
+				case 8:
+					if(!el.action)
+						return;
+					ATR_CMP.keyup(function() {
+						_elemAction(el);
+					});
+					return;
 				//Функция
 				case 12:
 					if(!window[el.txt_1])
@@ -2739,6 +2747,38 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 					location.href = URL + '&p=9&doc_id=' + doc_id + (GET_ID ? '&id=' + GET_ID : '');
 					break;
+				//формула
+				case 208:
+					var EA = _attr_cmp(sp.apply_id);
+					if(!EA)
+						break;
+
+					var V = 0,
+						v1 = sp.v1.split(','),
+						cc = (v1.length - 1) / 2;
+					for(var n = 0; n <= cc; n++) {
+						var elid = _num(v1[n*2]);
+						if(!elid)
+							continue;
+
+						var EL = _attr_cmp(elid);
+						if(!EL)
+							continue;
+
+						if(!n) {
+							V = _cena(EL.val());
+						} else {
+							switch(_num(v1[n*2-1])) {
+								//умножение
+								case 3: V = V * _cena(EL.val()); break;
+								//деление
+								case 4: V = V / _cena(EL.val()); break;
+							}
+						}
+					}
+
+					EA.val(Math.round(V*100)/100);
+					break;
 			}
 		});
 	},
@@ -4063,7 +4103,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<div class="_selem dib prel bg-fff over3">' +
 									'<div class="icon icon-star pabs"></div>' +
 									'<div class="icon icon-del pl pabs' + _dn(v.sum_id) + '"></div>' +
-									'<input type="text" readonly class="w175 curP w100p color-pay" placeholder="сумма не выбрана" value="' + v.sum_title + '" />' +
+									'<input type="text" readonly class="w175 curP color-pay" placeholder="сумма не выбрана" value="' + v.sum_title + '" />' +
 								'</div>' +
 							'<td><input type="hidden" class="cond" />' +
 								'<div class="_spfl dib w125 prel">' +
@@ -4109,7 +4149,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						sel:cmp.val()
 					},
 
-					busy_obj:cmp,
+					busy_obj:inp,
 					busy_cls:'hold',
 					func_save:function(res) {
 						cmp.val(res.v);
@@ -5158,6 +5198,125 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	/* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ИЛИ БЛОКУ ===--- */
 	PHP12_action_list = function(el) {
 		_attr_el(el.id).find('DL')._sort({table:'_action'});
+	},
+
+	/* ---=== НАСТРОЙКА ФОРМУЛЫ ДЛЯ ДЕЙСТВИЯ 208 ===--- */
+	PHP12_action208_formula = function(el, vvv, obj) {
+		var ATR_EL = _attr_el(el.id),
+			V1 = vvv.length ? vvv[0] : {},
+			ACT208_V = function(n, v_id, v_name) {//печать значения
+				return'<input type="hidden" class="v208" val="' + n + '" value="' + (v_id || 0) + '" />' +
+					'<div class="_selem dib prel bg-fff over3 mb10">' +
+						'<div class="icon icon-star pabs"></div>' +
+						'<div class="icon icon-del pl pabs' + _dn(v_id) + '"></div>' +
+						'<input type="text" readonly class="w125 curP color-pay" placeholder="Значение ' + n + '" value="' + (v_name || '') + '" />' +
+					'</div>';
+			},
+			ACT208_VSEL = function() {//выбор значения
+				ATR_EL.find('._selem:last').click(function() {
+					var t = $(this),
+						cmp = t.prev(),
+						inp = t.find('input'),
+						del = t.find('.icon-del');
+
+					_dialogLoad({
+						dialog_id:11,
+						block_id:obj.send.block_id,
+
+						dop:{
+							mysave:1,
+							sel:cmp.val()
+						},
+
+						busy_obj:inp,
+						busy_cls:'hold',
+						func_save:function(res) {
+							cmp.val(res.v);
+							inp.val(res.title);
+							del._dn(1);
+						}
+					});
+				});
+			},
+			html =
+				ACT208_V(1, V1.elem_id, V1.elem_name) +
+				'<div class="icon icon-add ml15 pl' + _tooltip('Добавить значение', -59) + '</div>' +
+				'<div class="icon icon-del-red ml3 pl' + _tooltip('Удалить последнее значение', -87) + '</div>',
+			ICON_ADD = ATR_EL.html(html).find('.icon-add'),
+			ICON_DEL = ICON_ADD.next(),
+			NUM = 2;
+
+		ACT208_VSEL();
+		ICON_ADD.click(_ADD);
+		ICON_DEL.click(function() {
+			var v208 = ATR_EL.find('.v208:last'),
+				n = _num(v208.attr('val'));
+
+			if(n == 1)
+				return;
+
+			v208.prev().remove();
+			v208.next().remove();
+			v208.remove();
+			NUM--;
+
+			if(n == 3)
+				ICON_DEL._dn();
+		});
+
+		if(!vvv.length)
+			_ADD();
+		else
+			_forN(vvv, function(v, n) {
+				if(n)
+					_ADD(v);
+			});
+
+		function _ADD(v) {
+			v = $.extend({
+				elem_id:0,
+				elem_name:'',
+				znak:3
+			}, v);
+			html =
+				'<div class="dib w15 ml10">' +
+					'<input type="hidden" id="znak' + NUM + '" value="' + v.znak + '" />' +
+				'</div>' +
+				ACT208_V(NUM, v.elem_id, v.elem_name);
+
+			ICON_ADD.before(html);
+
+			$('#znak' + NUM)._dropdown({
+				title0:'выбор знака',
+				spisok:[
+	//				{id:1,title:'<b class="fs17">+</b>'},
+	//				{id:2,title:'<b class="fs17">-</b>'},
+					{id:3,title:'<b class="fs17">*</b>'},
+					{id:4,title:'<b class="fs17">/</b>'}
+				]
+			});
+
+			ACT208_VSEL();
+
+			NUM++;
+
+			ICON_DEL._dn(NUM > 3);
+		}
+	},
+	PHP12_action208_formula_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('.v208'), function(sp) {
+			var elem_id = _num(sp.val()),
+				n = _num(sp.attr('val')) + 1;
+
+			send.push(elem_id);
+
+			if(!$('#znak' + n).length)
+				return;
+
+			send.push(_num($('#znak' + n).val()));
+		});
+		return send.join();
 	},
 
 	/* ---=== НАСТРОЙКА ПАРАМЕТРОВ ШАБЛОНА ДЛЯ ДОКУМЕНТОВ [114] ===--- */
