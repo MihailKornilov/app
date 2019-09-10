@@ -90,6 +90,7 @@ function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по ка
 		'app_id' => 1,
 		'cnn_id' => 1,
 		'parent_id' => 1,
+		'child_lvl' => 1,
 		'user_id' => 1,
 		'page_id' => 1,
 		'block_id' => 1,
