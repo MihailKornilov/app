@@ -360,7 +360,7 @@ function _html() {
 
 		_html_hat().
 		_pasMenu().
-		_pageInfo().
+//		_pageInfo().
 		_app_content().
 
 		_debug().
@@ -456,7 +456,7 @@ function _html_hat() {//верхняя строка приложения для 
 
 	return
 	'<div id="hat">'.
-		'<div class="w1000 mara pt3">'.
+		'<div class="w1000 mara pt3 pl15">'.
 			'<div class="hat-title'._dn(!LOCAL, 'pale').'">'._html_title()._dn(!LOCAL, '- LOCAL').'</div>'.
 
 			'<a href="'.URL.'&logout" class="fr white mt10">'.

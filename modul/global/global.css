@@ -4,9 +4,9 @@
 /*	font-family:-apple-system, BlinkMacSystemFont, Roboto, Open Sans, Helvetica Neue, sans-serif;*/
 /*	box-sizing:border-box;  */
 }
+html{margin-left:calc(100vw - 100%)}
 body{background:#fff}
 body.site{background:#f8fafc}
-body.site.scrl{margin-left:15px}
 a{	color:#2B587A;
 	text-decoration:none;
 	outline:none;
@@ -228,11 +228,10 @@ body:not(.site){position:relative}
 
 /* Верхняя полоса сайта - шапка */
 #hat{
+	margin-left:-15px;
 	height:42px;
 	background-color:#697F99;
 	color:#fff;
-	margin-left:-15px;
-	padding-left:15px;
 }
 #hat.show{background-color:#D47E02}/* просмотр от имени другого пользователя */
 .hat-title{
@@ -276,8 +275,6 @@ body:not(.site){position:relative}
 #pas{
 	background-color: #FFCB80;/*ffaf64*/
 	border-bottom:#C3864C solid 1px;
-	margin-left:-15px;
-	padding-left:15px;
 	height:55px;
 }
 

@@ -10,17 +10,15 @@ function _debug($i='') {
 
 	$goFace = SITE ? 'iframe' : 'site';
 	$send =
-		'<div id="debug-footer"'.(SITE ? ' style="bottom:0;position:fixed;width:100%"' : '').'>'.
-			'<div class="w1000 mara center">'.
-				'<a class="debug_toggle'.(DEBUG ? ' on' : '').'">'.(DEBUG ? 'От' : 'В').'ключить Debug</a> :: '.
-				'<a id="cookie_clear">Очисить cookie</a> :: '.
-				'<a id="count_update">Обновить суммы</a> :: '.
-				'<a id="cache_clear">Очисить кэш ('.SCRIPT.')</a> :: '.
-				'sql <b>'.count($SQL_QUERY).'</b> ('.round($SQL_TIME, 3).') :: '.
-				'php '.round(microtime(true) - TIME, 3).' :: '.
-				'js <em></em>'.
-	   (LOCAL ? ' :: <a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
-			'</div>'.
+		'<div id="debug-footer">'.
+			'<a class="debug_toggle'.(DEBUG ? ' on' : '').'">'.(DEBUG ? 'От' : 'В').'ключить Debug</a> :: '.
+			'<a id="cookie_clear">Очисить cookie</a> :: '.
+			'<a id="count_update">Обновить суммы</a> :: '.
+			'<a id="cache_clear">Очисить кэш ('.SCRIPT.')</a> :: '.
+			'sql <b>'.count($SQL_QUERY).'</b> ('.round($SQL_TIME, 3).') :: '.
+			'php '.round(microtime(true) - TIME, 3).' :: '.
+			'js <em></em>'.
+   (LOCAL ? ' :: <a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
 		'</div>'.
 		'<script src="modul/debug/debug'.MIN.'.js?'.SCRIPT.'"></script>';
 

@@ -52,21 +52,6 @@ $(document)
 				sp.addClass('sel');
 		});
 
-/*
-		if(_cookie('face') == 'iframe')
-			frame0.onresize = function() {
-				var inn = $(window).innerWidth(),
-					out = $(window).outerWidth(),
-					body = $('body');
-				if(out < 1003) {
-					body.removeClass('scrl');
-					return;
-				}
-				body._dn(!(out - inn), 'scrl');
-			};
-*/
-		//		$(window).resize();
-
 		$('#_debug .dmenu a').click(function() {
 			var t = $(this),
 				sel = t.html();

@@ -38,13 +38,14 @@
 #_debug #repeat{margin-left:20px}
 
 #debug-footer{
+	margin-left:-15px;
+	padding:2px 0 3px 15px;
+	text-align:center;
 	background:#F7F7F7;
 	border-top:#DDD solid 1px;
-	padding:2px 0 3px 8px;
-	margin-left:-15px;
 	z-index:1000;
 }
-body.scrl #debug-footer{padding-left:0}
 #debug-footer a{color:#888;font-size:11px}
 #debug-footer a._busy{color:transparent}
 #debug-footer .on{color:#0b0}
+body.site #debug-footer{position:fixed;bottom:0;width:100%}
