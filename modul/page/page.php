@@ -271,10 +271,10 @@ function _pasMenu() {//строка меню управления страниц
 
 	return
 	'<div id="pas">'.
-		'<div class="w1000 mara pt5">'.
+		'<div class="w1000 mara pt5 pl15">'.
 			'<div class="dib fs16 b">'._page('name').	'</div>'.
 		'</div>'.
-		'<div class="w1000 mara pt5">'.
+		'<div class="w1000 mara pt5 pl15">'.
 			_blockLevelChange('page', _page('cur')).
 		'</div>'.
 	'</div>';
