@@ -134,7 +134,9 @@ var FB,          //фрейм VK для изменения высоты $('body'
 			app_id:app_id
 		};
 
-		_post(send, 'reload');
+		_post(send, function() {
+			location.href = URL;
+		});
 	};
 
 	$(document).ready(_faceTest);

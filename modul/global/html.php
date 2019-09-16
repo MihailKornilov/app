@@ -165,7 +165,7 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение запис
 		setcookie('local', 1, time() + 2592000, '/');
 }
 function _authLogout() {//выход из приложения, если требуется
-	if(!isset($_GET['logout']) && @$_GET['p'] != 98)
+	if(!isset($_GET['logout']))
 		return;
 	if(!CODE)
 		return;
@@ -175,6 +175,7 @@ function _authLogout() {//выход из приложения, если тре�
 	_cache_clear('user'.USER_ID);
 	setcookie('page_setup', '', time() - 1, '/');
 
+/*
 	//выход только из приложения и попадание в список приложений
 	if(APP_ID) {
 		$sql = "UPDATE `_user_auth`
@@ -184,6 +185,7 @@ function _authLogout() {//выход из приложения, если тре�
 		header('Location:'.URL);
 		exit;
 	}
+*/
 
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes(CODE)."'";
 	query($sql);
@@ -448,53 +450,36 @@ function _html_hat() {//верхняя строка приложения для 
 		return '';
 	if(!SITE)
 		return '';
-	if(!defined('USER_NAME')) {
+	if(!defined('USER_NAME_FAM')) {
 		header('Location:'.URL.'&logout');
 		exit;
 	}
 
+	$local = LOCAL ? ' class="local"' : '';
 
 	return
-	'<div id="hat">'.
-		'<div class="w1000 mara pt3 pl15">'.
-			'<div class="hat-title'._dn(!LOCAL, 'pale').'">'._html_title()._dn(!LOCAL, '- LOCAL').'</div>'.
+	'<div id="hat"'.$local.'>'.
+		'<div class="w1000 mara pl15">'.
+			'<a href="'.URL.'" class="hat-title">'._html_title().'</a>'.
 
-			'<a href="'.URL.'&logout" class="fr white mt10">'.
-				'<span class="dib mr20 pale">'.USER_NAME.'</span>'.
-				'Выход'.
-			'</a>'.
+			'<div id="hat-user">'.
+				'<div>'.USER_NAME.'</div>'.
+				'<dl>'.
+					'<dd onclick="location.href=\''.URL.'&p=14\'">Мои настройки'.
+					'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
+//					'<dd>Баланс'.
+			  (SA ? '<dd onclick="location.href=\''.URL.'&p=1\'" class="sa b">SA' : '').
+					'<dd onclick="location.href=\''.URL.'&logout\'">Выход'.
+				'</dl>'.
+			'</div>'.
 
-			'<div class="fr mt8 r mr20">'.
-				_hat_but_sa().
+			'<div id="hat-but">'.
 				_hat_but_admin().
-				_hat_but_app().
 				_hat_but_pas().
 			'</div>'.
+
 		'</div>'.
 	'</div>';
-}
-function _hat_but_app() {//кнопка входа в приложение
-	if(PAS)
-		return '';
-	if(!APP_ID)
-		return '';
-	if(!SA && !USER_ADMIN)
-		return '';
-
-	return '<button class="vk small green ml10" onclick="location.href=\''.URL.'&p='._page('def').'\'">App</button>';
-}
-function _hat_but_sa() {//отображение кнопки списка страниц
-	if(!SA)
-		return '';
-	if(PAS)
-		return '';
-	if(!APP_ID)
-		return '';
-
-	return
-	'<button class="vk small cancel ml10" onclick="location.href=\''.URL.'&p=1\'">'.
-		'<b class="color-ref">SA</b>'.
-	'</button>';
 }
 function _hat_but_admin() {//кнопки Администрирование
 	if(PAS)
@@ -506,7 +491,7 @@ function _hat_but_admin() {//кнопки Администрирование
 	if(!APP_ID)
 		return '';
 
-	return '<button class="vk small red ml10" onclick="location.href=\''.URL.'&p=7\'">Admin</button>';
+	return '<button id="app-admin" onclick="location.href=\''.URL.'&p=7\'"></button>';
 }
 function _hat_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)
@@ -526,6 +511,7 @@ function _hat_but_pas() {//отображение кнопки настройк�
 	if(!SA && !$page['app_id'])
 		return '';
 
+	return '<button id="page_setup" class="'._dn(!PAS, 'ispas').'"></button>';
 	return '<button id="page_setup" class="vk small fr ml10 '.(PAS ? 'orange' : 'grey').'">Настройка страницы</button>';
 }
 
@@ -569,8 +555,6 @@ function _app_user_access($app_id) {//внесение доступа для п�
 function _app_list() {//список приложений, которые доступны пользователю
 	if(!USER_ID)
 		return '';
-	if(APP_ID)
-		return 'Здесь будет размещён список приложений.';
 
 	unset($_SESSION[PIN_KEY]);
 
@@ -591,8 +575,9 @@ function _app_list() {//список приложений, которые дос
 
 	$send = '';
 	foreach($spisok as $r) {
+		$bgCur = $r['app_id'] == APP_ID ? 'bg-dfd' : 'bg-gr2';
 		$send .=
-			'<div class="pad10 bg-gr2 mb10 over2 curP" onclick="_appEnter('.$r['app_id'].')">'.
+			'<div class="pad10 mb10 over2 curP '.$bgCur.'" onclick="_appEnter('.$r['app_id'].')">'.
 		  (SA ? '<span class="grey">'.$r['app_id'].'.</span> ' : '').
 				_app($r['app_id'], 'name').
 				'<div class="fr grey">'.FullData(_app($r['app_id'], 'dtime_add')).'</div>'.

@@ -8,7 +8,8 @@ function _user($user_id=USER_ID, $i='ass') {//получение данных о
 
 	if(!defined('USER_NAME')) {
 		define('USER_ADMIN', _userAdmin());//создатель приложения
-		define('USER_NAME', $u['i'].' '.$u['f']);//Имя Фамилия
+		define('USER_NAME', $u['i']);//Имя
+		define('USER_NAME_FAM', $u['i'].' '.$u['f']);//Имя Фамилия
 
 		define('PIN', !empty($u['pin']));       //установлен ли у пользователя пин-код
 		define('PIN_KEY', USER_ID.'-pin-key');  //ключ для сессии

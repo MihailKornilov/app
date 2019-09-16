@@ -236,12 +236,73 @@ body:not(.site){position:relative}
 #hat.show{background-color:#D47E02}/* просмотр от имени другого пользователя */
 .hat-title{
 	display:inline-block;
-	margin-top:5px;
+	margin-top:8px;
 	font-size:22px;
-	width:450px;
+	color:#fff;
+	max-width:450px;
 	white-space:nowrap;
 	overflow-x:hidden;
 }
+#hat.local{background-color:#777}
+
+#hat-but{
+	width:100px;
+	height:42px;
+	float:right;
+	text-align:right;
+	margin-right:40px;
+}
+#hat-but button{
+	cursor:pointer;
+	outline:none;
+	border:0;
+	width:42px;
+	height:42px;
+	background-color:inherit;
+	opacity:.5;
+}
+#hat-but button:hover{background-color:#5C738E;opacity:1}
+#hat-but button:active{background-position:5px 6px}
+/* кнопка включения настройки страницы */
+#page_setup{background:5px 5px url(../../img/_page.png?7) no-repeat}
+#page_setup.ispas{opacity:1}
+
+#app-admin{background:5px 5px url(../../img/_admin.png?7) no-repeat}
+
+#hat-user{
+	width:130px;
+	height:42px;
+	float:right;
+	text-align:right;
+	cursor:pointer;
+	position:relative;
+}
+#hat-user:hover{background-color:#5C738E}
+#hat-user div{
+	margin:13px 8px 0 0;
+	font-size:14px;
+}
+#hat-user dl{
+	position:absolute;
+	width:inherit;
+	top:42px;
+	background-color:inherit;
+	box-shadow:0 4px 6px 0 rgba(100,100,100,.4);
+	border-radius:0 0 3px 3px;
+	z-index:1000;
+}
+#hat-user dd{
+	text-align:left;
+	padding:10px 12px;
+	color:#C7D6E8;
+}
+#hat-user dd:hover{color:#fff}
+#hat-user dd.sa{color:#800}
+#hat-user dd.sa:hover{color:#e99}
+#hat-user:not(:hover) dl{display:none}
+
+
+
 
 /* Основное содержание сайта */
 #_content{
