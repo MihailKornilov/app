@@ -1760,6 +1760,21 @@ $.fn._hint = function(o) {//выплывающие подсказки
 
 	return t;
 };
+$.fn._hintOver = function(o) {//выплывающая подсказка от наведения
+							  //временная функция, которая позволяет добавлять независимые подсказки нескольким элементам на одной странице
+	var obj = $(this);
+
+	if(!obj.length)
+		return;
+
+	obj.mouseenter(function() {
+		o = $.extend({
+			show:1,
+			delayShow:500
+		}, o);
+		obj._hint(o);
+	});
+};
 $.fn._tooltip = function(msg, left, ugolSide) {
 	var t = $(this);
 

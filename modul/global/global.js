@@ -535,6 +535,8 @@ $(document)
 		location.reload();
 	})
 	.ready(function() {
+		$('#app-admin')._hintOver({msg:'<div class="center">Администрирование<br>приложения</div>',pad:15});
+		$('#page_setup')._hintOver({msg:'Включить настройку страницы',pad:15});
 		$("#debug-footer em").html(((new Date().getTime()) - TIME) / 1000);
 	});
 
