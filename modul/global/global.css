@@ -230,7 +230,6 @@ body:not(.site){position:relative}
 	height:42px;
 	background-color:#697F99;
 	color:#fff;
-	margin-left:-15px;
 }
 #hat.show{background-color:#D47E02}/* просмотр от имени другого пользователя */
 .hat-title{
@@ -304,11 +303,7 @@ body:not(.site){position:relative}
 
 
 /* Основное содержание сайта */
-#_content{
-	width:1000px;
-	margin:0 auto;
-	background-color:#fff;
-}
+#_content{background-color:#fff}
 #_content.site{
 	border-left:#EEEFF3 solid 1px;
 	border-right:#EEEFF3 solid 1px;
@@ -336,7 +331,6 @@ body:not(.site){position:relative}
 	background-color: #FFCB80;/*ffaf64*/
 	border-bottom:#C3864C solid 1px;
 	height:55px;
-	margin-left:-15px;
 }
 
 /* отдельный блок в редактировании */

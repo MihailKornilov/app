@@ -474,7 +474,7 @@ function _html_hat() {//верхняя строка приложения для 
 
 	return
 	'<div id="hat"'.$local.'>'.
-		'<div class="w1000 mara pl15">'.
+		'<div class="mara">'.
 			'<a href="'.URL.'" class="hat-title">'._html_title().'</a>'.
 
 			'<div id="hat-user">'.
