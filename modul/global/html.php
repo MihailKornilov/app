@@ -35,6 +35,17 @@ function _sa($user_id=USER_ID) {
 
 	return $issa;
 }
+function _isMobile() {//проверка: мобильная версия сайта или настольная
+	//https://xdan.ru/avtomaticheskoe-opredelenie-mobilnih-brauzerov.html
+	require_once GLOBAL_DIR.'/inc/MobileDetect/Mobile_Detect.php';
+
+	$detect = new Mobile_Detect();
+
+	if($detect->isMobile() or $detect->isTablet())
+		return true;
+
+	return false;
+}
 
 /* ---=== АВТОРИЗАЦИЯ ===--- */
 function _auth() {//получение данных об авторизации из кеша
@@ -410,6 +421,10 @@ function _html_script() {//скрипты и стили
 
 	'<link rel="stylesheet" type="text/css" href="modul/global/global'.MIN.'.css?'.SCRIPT.'" />'.
 	'<script src="modul/global/global'.MIN.'.js?'.SCRIPT.'"></script>'.
+
+(!_isMobile() ?
+	'<link rel="stylesheet" type="text/css" href="modul/global/nomobile'.MIN.'.css?'.SCRIPT.'" />'
+: '').
 
 	'<script src="js_cache/app0.js?'.JS_CACHE.'"></script>'.
 (APP_ID ?
