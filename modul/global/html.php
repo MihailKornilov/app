@@ -478,18 +478,20 @@ function _html_hat() {//верхняя строка приложения для 
 			'<a href="'.URL.'" class="hat-title">'._html_title().'</a>'.
 
 			'<div id="hat-user">'.
-				'<div>'.USER_NAME.'</div>'.
+				'<div class="uname">'.USER_NAME.'</div>'.
 				'<dl>'.
 					'<dd onclick="location.href=\''.URL.'&p=14\'">Мои настройки'.
 					'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
+					_hat_but_admin().
 //					'<dd>Баланс'.
 			  (SA ? '<dd onclick="location.href=\''.URL.'&p=1\'" class="sa b">SA' : '').
-					'<dd onclick="location.href=\''.URL.'&logout\'">Выход'.
+					'<dd onclick="location.href=\''.URL.'&logout\'">'.
+						'Выход'.
+						'<div class="icon icon-exit wh ml5 mbm3"></div>'.
 				'</dl>'.
 			'</div>'.
 
 			'<div id="hat-but">'.
-				_hat_but_admin().
 				_hat_but_pas().
 			'</div>'.
 
@@ -506,7 +508,8 @@ function _hat_but_admin() {//кнопки Администрирование
 	if(!APP_ID)
 		return '';
 
-	return '<button id="app-admin" onclick="location.href=\''.URL.'&p=7\'"></button>';
+//	return '<button id="app-admin" onclick="location.href=\''.URL.'&p=7\'"></button>';
+	return '<dd onclick="location.href=\''.URL.'&p=7\'">Администрирование';
 }
 function _hat_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)

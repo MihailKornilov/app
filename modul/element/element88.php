@@ -313,7 +313,8 @@ function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
 	if(!$elem_id = _num(@$unit['id']))
 		jsonError('Некорректный ID элемента');
 	if(empty($val))
-		jsonError('Отсутствует содержание');
+		return;
+//		jsonError('Отсутствует содержание');
 	if(!is_array($val))
 		jsonError('Содержание не является массивом');
 	if(empty($val['spv']))

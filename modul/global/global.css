@@ -95,7 +95,7 @@ body:not(.site){position:relative}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:-9999px 0 no-repeat url(../../img/icon18.png?43);
+	background:-9999px 0 no-repeat url(../../img/icon18.png?47);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -144,6 +144,7 @@ body:not(.site){position:relative}
 .icon-clock  {background-position-x:-840px}/* часы */
 .icon-cancel {background-position-x:-860px}/* отмена: перечёркнутый круг */
 .icon-hand   {background-position-x:-880px}/* рука: чёрный список */
+.icon-exit   {background-position-x:-900px}/* стрелка из квадратика: выход */
 
 /* настройка ширины блоков */
 .icon-width  {
@@ -265,10 +266,10 @@ body:not(.site){position:relative}
 #page_setup{background:5px 5px url(../../img/_page.png?7) no-repeat}
 #page_setup.ispas{opacity:1}
 
-#app-admin{background:5px 5px url(../../img/_admin.png?7) no-repeat}
+/*#app-admin{background:5px 5px url(../../img/_admin.png?7) no-repeat}*/
 
 #hat-user{
-	width:130px;
+	width:155px;
 	height:42px;
 	float:right;
 	text-align:right;
@@ -276,10 +277,7 @@ body:not(.site){position:relative}
 	position:relative;
 }
 #hat-user:hover{background-color:#5C738E}
-#hat-user div{
-	margin:13px 8px 0 0;
-	font-size:14px;
-}
+#hat-user .uname{margin:13px 8px 0 0;font-size:14px}
 #hat-user dl{
 	position:absolute;
 	width:inherit;
@@ -289,15 +287,12 @@ body:not(.site){position:relative}
 	border-radius:0 0 3px 3px;
 	z-index:1000;
 }
-#hat-user dd{
-	text-align:left;
-	padding:10px 12px;
-	color:#C7D6E8;
-}
+#hat-user dd{padding:10px;color:#BCCCE0}
 #hat-user dd:hover{color:#fff}
 #hat-user dd.sa{color:#800}
 #hat-user dd.sa:hover{color:#e99}
 #hat-user:not(:hover) dl{display:none}
+#hat-user dd:not(:hover) .icon{opacity:.7}
 
 
 
@@ -668,7 +663,7 @@ body:not(.site){position:relative}
 .mb1{margin-bottom:1px}
 .mb2{margin-bottom:2px}
 .mbm2{margin-bottom:-2px}
-.mbm5{margin-bottom:-5px}
+.mbm3{margin-bottom:-3px}
 .mb5{margin-bottom:5px}
 .mbm5{margin-bottom:-5px}
 .mb10{margin-bottom:10px}
