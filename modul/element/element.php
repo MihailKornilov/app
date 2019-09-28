@@ -37,7 +37,7 @@ foreach(array(
 }
 
 //подключение элементов-графиков
-foreach(array(400,401) as $id) {
+foreach(array(400,401,402) as $id) {
 	$file = GLOBAL_DIR.'/modul/element/chart/element'.$id.'.php';
 	if(file_exists($file))
 		require_once $file;
