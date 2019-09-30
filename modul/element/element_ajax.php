@@ -282,6 +282,12 @@ switch(@$_POST['op']) {
 							   )).
 					'<tr><td>'.
 						'<td>'._check(array(
+									'attr_id' => 'spisok_any',
+									'title' => 'данные, которые вносит диалог,<br>доступны во всех приложениях',
+									'value' => $dialog['spisok_any']
+							   )).
+					'<tr><td>'.
+						'<td>'._check(array(
 									'attr_id' => 'parent_any',
 									'title' => 'может быть выбран родительским во всех приложениях',
 									'value' => $dialog['parent_any']
@@ -1087,6 +1093,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 	if(!SA)
 		return;
 
+	$spisok_any = _bool($_POST['spisok_any']);
 	$sa = _bool($_POST['sa']);
 	$parent_any = _bool($_POST['parent_any']);
 	$width_auto = _num($_POST['width_auto']);
@@ -1113,6 +1120,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
+				`spisok_any`=".$spisok_any.",
 				`sa`=".$sa.",
 				`parent_any`=".$parent_any.",
 				`width_auto`=".$width_auto.",

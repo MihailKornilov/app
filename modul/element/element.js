@@ -587,6 +587,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 				table_1:DLG('#table_1').val(),
 				app_any:DLG('#app_any').val(),
+				spisok_any:DLG('#spisok_any').val(),
 				sa:DLG('#sa').val(),
 				parent_any:DLG('#parent_any').val(),
 				clone_on:DLG('#clone_on').val(),
