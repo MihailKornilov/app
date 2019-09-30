@@ -482,7 +482,8 @@ function _html_hat() {//верхняя строка приложения для 
 				'<dl>'.
 					'<dd onclick="location.href=\''.URL.'&p=14\'">Мои настройки'.
 					'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
-					_hat_but_admin().
+					_hat_link_admin().
+					_hat_link_task().
 //					'<dd>Баланс'.
 			  (SA ? '<dd onclick="location.href=\''.URL.'&p=1\'" class="sa b">SA' : '').
 					'<dd onclick="location.href=\''.URL.'&logout\'">'.
@@ -498,7 +499,7 @@ function _html_hat() {//верхняя строка приложения для 
 		'</div>'.
 	'</div>';
 }
-function _hat_but_admin() {//кнопки Администрирование
+function _hat_link_admin() {//кнопки Администрирование
 	if(PAS)
 		return '';
 	if(APP_IS_PID)
@@ -510,6 +511,18 @@ function _hat_but_admin() {//кнопки Администрирование
 
 //	return '<button id="app-admin" onclick="location.href=\''.URL.'&p=7\'"></button>';
 	return '<dd onclick="location.href=\''.URL.'&p=7\'">Администрирование';
+}
+function _hat_link_task() {//ссылка Задачи
+	if(PAS)
+		return '';
+	if(APP_IS_PID)
+		return '';
+	if(!SA && !USER_ADMIN)
+		return '';
+	if(!APP_ID)
+		return '';
+
+	return '<dd onclick="location.href=\''.URL.'&p=385\'">Задачи';
 }
 function _hat_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)
