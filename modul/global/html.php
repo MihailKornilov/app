@@ -522,7 +522,7 @@ function _hat_link_task() {//ссылка Задачи
 	if(!APP_ID)
 		return '';
 
-	return '<dd onclick="location.href=\''.URL.'&p=385\'">Задачи';
+	return '<dd onclick="location.href=\''.URL.'&p=385\'" class="b fs14">Задачи';
 }
 function _hat_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)

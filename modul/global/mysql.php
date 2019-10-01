@@ -285,14 +285,17 @@ function _queryWhere($DLG, $withDel=0) {//составление условий 
 	if(!$withDel)
 		if($tn = _queryTN($DLG, 'deleted'))
 			$send[] = "!`".$tn."`.`deleted`";
+
 	if($tn = _queryTN($DLG, 'app_id'))
-		switch($DLG['table_name_1']) {
-			case '_element': break;
-			case '_hint': break;
-			case '_action':  break;
-			case '_page':  break;
-			default: $send[] = "`".$tn."`.`app_id`=".APP_ID;
-		}
+		if(!$DLG['spisok_any'])
+			switch($DLG['table_name_1']) {
+				case '_element': break;
+				case '_hint': break;
+				case '_action':  break;
+				case '_page':  break;
+				default:
+					$send[] = "`".$tn."`.`app_id`=".APP_ID;
+			}
 
 
 	$send[] = _queryWhereDialogId($DLG);
