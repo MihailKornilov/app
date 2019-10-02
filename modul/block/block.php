@@ -14,7 +14,7 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 			'<div class="bg-ffe pad10">'.
 				'<div class="_empty min">'.
 					'Шаблон пуст.'.
-					'<div class="mt10 pale">Начните с настройки блоков.</div>'.
+					'<div class="mt10 pale">Начните с управления блоками.</div>'.
 				'</div>'.
 			'</div>',
 
@@ -639,7 +639,7 @@ function _blockGridIn($arr) {//подстановка флагов наличи�
 	foreach($arr as $id => $r) {
 		$arr[$id]['blin'] = 0;  //в блоке присутствуют дочерние блоки
 		$arr[$id]['blwmin'] = 0;//ограничивать минимальную ширину блока (по ширине дочерних блоков)
-		$arr[$id]['elin'] = 0;  //в блоке присутствует элемент
+		$arr[$id]['elin'] = '';  //в блоке присутствует элемент
 	}
 
 	$sql = "SELECT *
@@ -653,11 +653,14 @@ function _blockGridIn($arr) {//подстановка флагов наличи�
 			$arr[$id]['blwmin'] = $w;
 	}
 
-	$sql = "SELECT `block_id`
+	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($arr).")";
-	foreach(_ids(query_ids($sql), 'arr') as $id)
-		$arr[$id]['elin'] = 1;
+	foreach(query_arr($sql) as $r) {
+		$id = $r['block_id'];
+		$DLG = _dialogQuery($r['dialog_id']);
+		$arr[$id]['elin'] = (DEBUG ? '['.$r['dialog_id'].'] ' : '').$DLG['name'];
+	}
 
 	return $arr;
 }
@@ -678,7 +681,12 @@ function _blockGrid($arr, $width) {//режим деления на подбло
 			        '<div class="grid-info">'.$r['width'].'</div>'.
 			        '<div class="grid-edge"></div>'.
 			        '<div class="grid-edge er"></div>'.
-					'<div class="grid-content'.$blIn.$elIn.'"></div>'.
+					'<div class="grid-content'.$blIn.$elIn.'">'.
+		      ($elIn ? '<table>'.
+		                    '<tr><td>'.$r['elin'].
+		                '</table>'
+			  : '').
+		            '</div>'.
 					'<div class="grid-del">x</div>'.
 		    '</div>';
 	}

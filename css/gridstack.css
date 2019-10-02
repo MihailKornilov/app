@@ -121,9 +121,9 @@
 }
 
 /* содержание блока */
-.grid-content {
+.grid-content{
   background-color:#EFD7AE;
-  margin: 0;
+  margin:0;
   position: absolute;
   top: 0;
   left: 0;
@@ -132,6 +132,13 @@
   width: auto;
   z-index:10 !important;
   overflow: hidden;
+}
+.grid-content table{width:100%;height:100%}
+.grid-content td{
+  font-size:11px;
+  text-align:center;
+  vertical-align:middle;
+  color:#6C8F9C;
 }
 .grid-content.blin{background-color:#E6A059}/* в блоке присутсвтуют дочерние блоки, покраска в оранжевый цвет*/
 .grid-content.elin{background-color:#9FD3E6/*90b9d6*/}/* в блоке присутсвтует элемент, покраска в голубой цвет*/
