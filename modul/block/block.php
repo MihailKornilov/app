@@ -659,7 +659,10 @@ function _blockGridIn($arr) {//подстановка флагов наличи�
 	foreach(query_arr($sql) as $r) {
 		$id = $r['block_id'];
 		$DLG = _dialogQuery($r['dialog_id']);
-		$arr[$id]['elin'] = (DEBUG ? '['.$r['dialog_id'].'] ' : '').$DLG['name'];
+		$arr[$id]['elin'] =
+			(DEBUG ? '['.$r['dialog_id'].'] ' : '').
+			$DLG['name'].
+			($r['name'] ? '<br><b>'.$r['name'].'</b>' : '');
 	}
 
 	return $arr;

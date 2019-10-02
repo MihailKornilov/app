@@ -140,6 +140,7 @@
   vertical-align:middle;
   color:#6C8F9C;
 }
+.grid-content b{font-size:11px}
 .grid-content.blin{background-color:#E6A059}/* в блоке присутсвтуют дочерние блоки, покраска в оранжевый цвет*/
 .grid-content.elin{background-color:#9FD3E6/*90b9d6*/}/* в блоке присутсвтует элемент, покраска в голубой цвет*/
 .ui-draggable-dragging .grid-content,
