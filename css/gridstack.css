@@ -30,14 +30,14 @@
 /* Кнопка добавления нового блока */
 #grid-add{
   margin:1px 1px 0 0;
-  background-color:#DFEBF3;
-  color:#3C8AA0;
+  background-color:#EAE5DB;
+  color:#AE9974;
   font-size:14px;
   text-align:center;
   padding:8px 3px;
   cursor:pointer;
 }
-#grid-add:hover{background-color:#C4E0F3;color:#00719B}
+#grid-add:hover{background-color:#FFE8BF;color:#C78D31}
 
 
 
@@ -122,7 +122,7 @@
 
 /* содержание блока */
 .grid-content {
-  background-color:#EC9;
+  background-color:#EFD7AE;
   margin: 0;
   position: absolute;
   top: 0;
@@ -134,7 +134,7 @@
   overflow: hidden;
 }
 .grid-content.blin{background-color:#E6A059}/* в блоке присутсвтуют дочерние блоки, покраска в оранжевый цвет*/
-.grid-content.elin{background-color:#90b9d6}/* в блоке присутсвтует элемент, покраска в голубой цвет*/
+.grid-content.elin{background-color:#9FD3E6/*90b9d6*/}/* в блоке присутсвтует элемент, покраска в голубой цвет*/
 .ui-draggable-dragging .grid-content,
 .ui-resizable-resizing .grid-content {
   box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.2);

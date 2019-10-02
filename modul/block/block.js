@@ -289,7 +289,7 @@ var _ids = function(v, count) {
 
 		return '<div class="mt20 center">' +
 					'<button class="vk small orange mb5" onclick="_blockUnitGrid($(this),' + BL.id + ')">Настроить подблоки</button>' +
- (!BL.child_count ? '<button class="dialog-open vk small green" id="elem-hint-add" val="dialog_id:50,block_id:' + BL.id + '">Вставить элемент</button>' : '') +
+ (!BL.child_count ? '<button class="dialog-open vk small" id="elem-hint-add" val="dialog_id:50,block_id:' + BL.id + '">Вставить элемент</button>' : '') +
 				'</div>';
 	},
 	_blockUnitGrid = function(obj, block_id) {
