@@ -637,16 +637,21 @@ function _blockGridIn($arr) {//подстановка флагов наличи�
 		return array();
 
 	foreach($arr as $id => $r) {
-		$arr[$id]['blin'] = 0;//в блоке присутствуют дочерние блоки
-		$arr[$id]['elin'] = 0;//в блоке присутствует элемент
+		$arr[$id]['blin'] = 0;  //в блоке присутствуют дочерние блоки
+		$arr[$id]['blwmin'] = 0;//ограничивать минимальную ширину блока (по ширине дочерних блоков)
+		$arr[$id]['elin'] = 0;  //в блоке присутствует элемент
 	}
 
-	$sql = "SELECT `parent_id`
+	$sql = "SELECT *
 			FROM `_block`
-			WHERE `parent_id` IN ("._idsGet($arr).")
-			GROUP BY `parent_id`";
-	foreach(_ids(query_ids($sql), 'arr') as $id)
+			WHERE `parent_id` IN ("._idsGet($arr).")";
+	foreach(query_arr($sql) as $r) {
+		$id = $r['parent_id'];
 		$arr[$id]['blin'] = 1;
+		$w = $r['x'] + $r['w'];
+		if($arr[$id]['blwmin'] < $w)
+			$arr[$id]['blwmin'] = $w;
+	}
 
 	$sql = "SELECT `block_id`
 			FROM `_element`
@@ -662,12 +667,19 @@ function _blockGrid($arr, $width) {//режим деления на подбло
 		$blIn = $r['blin'] ? ' blin' : '';
 		$elIn = $r['elin'] ? ' elin' : '';
 		$spisok .=
-		    '<div id="pb_'.$r['id'].'" class="grid-item" data-gs-x="'.$r['x'].'" data-gs-y="'.$r['y'].'" data-gs-width="'.$r['w'].'" data-gs-height="'.$r['h'].'">'.
-		        '<div class="grid-info">'.$r['width'].'</div>'.
-		        '<div class="grid-edge"></div>'.
-		        '<div class="grid-edge er"></div>'.
-				'<div class="grid-content'.$blIn.$elIn.'"></div>'.
-				'<div class="grid-del">x</div>'.
+		    '<div id="pb_'.$r['id'].'"'.
+		        ' class="grid-item"'.
+		        ' data-gs-x="'.$r['x'].'"'.
+		        ' data-gs-y="'.$r['y'].'"'.
+		        ' data-gs-width="'.$r['w'].'"'.
+		        ' data-gs-height="'.$r['h'].'"'.
+($r['blwmin'] ? ' data-gs-min-width="'.$r['blwmin'].'"' : '').
+		    '>'.
+			        '<div class="grid-info">'.$r['width'].'</div>'.
+			        '<div class="grid-edge"></div>'.
+			        '<div class="grid-edge er"></div>'.
+					'<div class="grid-content'.$blIn.$elIn.'"></div>'.
+					'<div class="grid-del">x</div>'.
 		    '</div>';
 	}
 
