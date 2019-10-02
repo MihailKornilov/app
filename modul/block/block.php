@@ -601,8 +601,10 @@ function _blockStyleBG($bl, $prm) {//цвет фона из записи
 	return 'background-color:'.$bg;
 }
 function _blockChildHtml($block, $prm, $grid_id, $level, $width) {//деление блока на части
-	if($block['id'] == $grid_id)
+	if($block['id'] == $grid_id) {
+		$block['child'] = _blockGridIn($block['child']);
 		return _blockGrid($block['child'], $width);
+	}
 
 	if(!$prm['blk_setup'])
 		if(!is_array($prm = _blockUnitGet($block, $prm)))
@@ -630,15 +632,41 @@ function _blockUnitGet($bl, $prm, $is_elem=false) {//блок принимает
 
 	return $prm;
 }
+function _blockGridIn($arr) {//подстановка флагов наличия внутри блока элемента или дочерних блоков
+	if(empty($arr))
+		return array();
+
+	foreach($arr as $id => $r) {
+		$arr[$id]['blin'] = 0;//в блоке присутствуют дочерние блоки
+		$arr[$id]['elin'] = 0;//в блоке присутствует элемент
+	}
+
+	$sql = "SELECT `parent_id`
+			FROM `_block`
+			WHERE `parent_id` IN ("._idsGet($arr).")
+			GROUP BY `parent_id`";
+	foreach(_ids(query_ids($sql), 'arr') as $id)
+		$arr[$id]['blin'] = 1;
+
+	$sql = "SELECT `block_id`
+			FROM `_element`
+			WHERE `block_id` IN ("._idsGet($arr).")";
+	foreach(_ids(query_ids($sql), 'arr') as $id)
+		$arr[$id]['elin'] = 1;
+
+	return $arr;
+}
 function _blockGrid($arr, $width) {//режим деления на подблоки
 	$spisok = '';
 	foreach($arr as $r) {
+		$blIn = $r['blin'] ? ' blin' : '';
+		$elIn = $r['elin'] ? ' elin' : '';
 		$spisok .=
 		    '<div id="pb_'.$r['id'].'" class="grid-item" data-gs-x="'.$r['x'].'" data-gs-y="'.$r['y'].'" data-gs-width="'.$r['w'].'" data-gs-height="'.$r['h'].'">'.
 		        '<div class="grid-info">'.$r['width'].'</div>'.
 		        '<div class="grid-edge"></div>'.
 		        '<div class="grid-edge er"></div>'.
-				'<div class="grid-content"></div>'.
+				'<div class="grid-content'.$blIn.$elIn.'"></div>'.
 				'<div class="grid-del">x</div>'.
 		    '</div>';
 	}

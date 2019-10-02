@@ -13,6 +13,7 @@ switch(@$_POST['op']) {
 				  AND !`parent_id`
 				ORDER BY `y`,`x`";
 		$arr = query_arr($sql);
+		$arr = _blockGridIn($arr);
 
 		$send['obj_name'] = $obj_name;
 		$send['obj_id'] = $obj_id;
