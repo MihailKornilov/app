@@ -1090,8 +1090,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 	'<table class="_stab small w100p">'.
 		'<tr>'.
 			'<th class="w30">'.
-//			'<th class="w35">num'.
-	  (SA ? '<th class="w50">ID' : '').
+   (DEBUG ? '<th class="w50">ID' : '').
 			'<th>Имя диалога'.
 			'<th class="w30">'.
 			'<th class="w50">Список'.
@@ -1128,8 +1127,7 @@ function PHP12_dialog_app_li($r) {
 			'<tr class="over1">'.
 				'<td class="w30 r">'.
 					'<div class="icon icon-move pl"></div>'.
-//				'<td class="w35 r grey">'.$r['num'].
-		  (SA ? '<td class="w50 pale r">'.$r['id'] : '').
+	   (DEBUG ? '<td class="w50 pale r">'.$r['id'] : '').
 				'<td class="d-name over5 curP dialog-open'._dn($r['pid'], 'b').'" val="dialog_id:'.$r['id'].'">'.$r['name'].
 				'<td class="w30 r">'.
 					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup'._tooltip('Редактировать диалог', -66).'</div>'.
