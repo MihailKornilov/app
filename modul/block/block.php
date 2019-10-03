@@ -214,12 +214,15 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$cls[] = 'prel';
 			if($r['bg'] && !_ids($r['bg']))
 				$cls[] = $r['bg'];
+
+			if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden'])
+				$cls[] = 'vh';
+
 			$cls[] = trim($bt);
 			$cls[] = trim($bb);
 			$cls[] = !$xEnd ? trim($BR) : '';
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
-			$cls[] = _dn(!(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden']));
 			$cls[] = !$PARAM['blk_setup'] && _blockActionIsClick($r, $PARAM) ? 'curP' : '';
 			$cls[] = !$PARAM['blk_setup'] && !empty($r['hint']) ? 'hint-on' : '';//применение подсказки
 			$cls = array_diff($cls, array(''));
@@ -555,6 +558,8 @@ function _blockElemChoose($bl, $prm) {//подсветка элементов д
 function _blockStyle($bl, $prm, $width) {//стили css для блока
 	$send = array();
 
+	$send[] = ($bl['width_auto'] ? 'min-' : '').'width:'.$width.'px';
+
 	//границы
 	$bor = explode(' ', $bl['bor']);
 	foreach($bor as $i => $b) {
@@ -568,7 +573,6 @@ function _blockStyle($bl, $prm, $width) {//стили css для блока
 		}
 	}
 
-	$send[] = ($bl['width_auto'] ? 'min-' : '').'width:'.$width.'px';
 	$send[] = _blockStyleBG($bl, $prm);
 
 	$send = array_diff($send, array(''));
