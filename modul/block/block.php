@@ -188,7 +188,8 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		$table_w100p = count($xStr) == 1 && $r['width_auto'] ? 'w100p' : '';
 
 		//если скрывается вся строка, состоящая из одного блока, то этот блок становится как открытый TD внутри скрытого DIV
-		if($strHide && count($xStr) == 1 && ($r['hidden'] || $r['sa'] && !SA))
+//		if($strHide && count($xStr) == 1 && ($r['hidden'] || $r['sa'] && !SA))
+		if($strHide && count($xStr) == 1 && $r['hidden'])
 			$xStr[0]['hidden'] = 0;
 
 		$send .=
@@ -215,7 +216,8 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			if($r['bg'] && !_ids($r['bg']))
 				$cls[] = $r['bg'];
 
-			if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && ($r['hidden'] || $r['sa'] && !SA))
+//			if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && ($r['hidden'] || $r['sa'] && !SA))
+			if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden'])
 				$cls[] = 'vh';
 
 			$cls[] = trim($bt);
