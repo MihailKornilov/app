@@ -2735,7 +2735,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(ELMM[elem_id].dialog_id == 29)
 						return _attr_cmp(elem_id)._select('focus');
 
-					_attr_cmp(elem_id).focus();
+					_attr_cmp(elem_id).select();
 				//открытие документа (при определённом условии)
 				case 207:
 					if(is_open)
