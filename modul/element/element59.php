@@ -61,18 +61,28 @@ function _element59_history($el, $u) {
 
 	return $u[$col];
 }
-function _spisok59unit($elem_id, $unit_id) {//выбранное значение при связке списков через кнопку [59]
-	if(!$unit_id)
-		return '';
-	if(!$el = _elemOne($elem_id))
-		return '';
-	if(!$dialog_id = _num($el['num_1']))
-		return '';
-	if(!$dlg = _dialogQuery($dialog_id))
-		return '';
-	if(!$prm['unit_get'] = _spisokUnitQuery($dlg, $unit_id))
-		return '';
+function _spisok59unit($elem_id, $unit_id, $return='html') {//выбранное значение при связке списков через кнопку [59]
+	switch($return) {
+		case 'html': $send = ''; break;
+		case 'assoc':
+		default:
+			$send = array();
+	}
 
-	return _blockHtml('spisok', $elem_id, $prm);
+	if(!$unit_id)
+		return $send;
+	if(!$el = _elemOne($elem_id))
+		return $send;
+	if(!$dialog_id = _num($el['num_1']))
+		return $send;
+	if(!$dlg = _dialogQuery($dialog_id))
+		return $send;
+	if(!$prm['unit_get'] = _spisokUnitQuery($dlg, $unit_id))
+		return $send;
+
+	if($return == 'html')
+		return _blockHtml('spisok', $elem_id, $prm);
+
+	return $prm['unit_get'];
 }
 

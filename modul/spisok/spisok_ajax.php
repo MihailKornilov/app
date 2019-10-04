@@ -318,6 +318,7 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID выбранного элемента');
 
 		$send['html'] = _spisok59unit($cmp_id, $unit_id);
+		$send['unit'] = _spisok59unit($cmp_id, $unit_id, 'assoc');
 		jsonSuccess($send);
 		break;
 	case 'spisok_72_sum'://получение сумм для фильтра [72]
