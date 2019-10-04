@@ -409,7 +409,7 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 
 	$cond .= _40cond($el, $el['txt_5']);
 
-	$DESC = $el['num_9'] ? ' DESC' : '';
+	$DESC = @$el['num_9'] ? ' DESC' : '';
 
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
@@ -437,7 +437,7 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 	return $send;
 }
 function _29cnnOrder($el, $DLG) {//порядок вывода
-	switch($el['num_8']) {
+	switch(@$el['num_8']) {
 		case 10086: return 'dtime_add';
 		case 10087:
 			if(isset($DLG['field1']['sort']))
