@@ -1707,6 +1707,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								busy_obj:ATR_CMP_AFICS
 							};
 							_post(send, function(res) {
+								AG.unit = res.unit;
 								div.find('.un-html').html(res.html);
 								div._dn(1);
 								ATR_CMP_AFICS._dn();
@@ -2695,6 +2696,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								break;
 						}
 					});
+					break;
 				//открытие диалога
 				case 205:
 					if(is_open)
@@ -2736,7 +2738,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						return _attr_cmp(elem_id)._select('focus');
 
 					_attr_cmp(elem_id).select();
-				//открытие документа (при определённом условии)
+					break;
+				//открытие документа
 				case 207:
 					if(is_open)
 						break;
@@ -2791,6 +2794,41 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					}
 
 					EA.val(Math.round(V*100)/100);
+					break;
+				//вставка значения в блок
+				case 209:
+					if(is_open)
+						break;
+
+					var TRG = _attr_bl(_num(sp.target_ids));
+					if(!TRG)
+						break;
+
+					//если блок содержит другие блоки, выход
+					if(TRG.hasClass('bl-div'))
+						break;
+
+					//проверка на наличие элемента
+					var ell = TRG.find('div:first');
+					if(ell.length)
+						TRG = ell;//вставка будет происходить в элемент
+
+					var txt = AG.unit;
+					_forN(sp.v1.split(','), function(id, n) {
+						if(txt === undefined)
+							return;
+						if(!n)
+							return;
+						var EL = ELMM[id];
+						if(!EL)
+							return;
+						txt = txt[EL.col];
+					});
+
+					if(txt === false || txt === undefined || !txt.length)
+						break;
+
+					TRG.html(txt);
 					break;
 			}
 		});

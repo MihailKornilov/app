@@ -175,6 +175,8 @@ function _elementJs($el) {//структура элемента для JS
 		'mar'       => $el['mar']
 	);
 
+	if(!empty($el['col']))
+		$send['col'] = $el['col'];
 	if(!empty($el['width']))
 		$send['width'] = $el['width'];
 	if(!empty($el['focus']))
