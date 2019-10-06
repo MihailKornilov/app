@@ -20,6 +20,7 @@ function _element8_struct($el) {
                                             8063: произвольный текст
                                             8064: указанное значение
 									  */
+		'num_6' => _num($el['num_6']),//прижимать текст вправо
 		'txt_4' => $el['txt_4'],      //начальный текст: указанное значение [13]
 		'txt_3' => $el['txt_3']       //шаблон артикула (для 34)
 	) + _elementStruct($el);
@@ -64,7 +65,10 @@ function _element8_print($el, $prm) {
 			break;
 	}
 
-	return '<input type="text" id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
+	//прижимать текст вправо
+	$right = $el['num_6'] ? ' class="r"' : '';
+
+	return '<input type="text" id="'._elemAttrId($el, $prm).'"'.$right._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
 }
 function _element8_print11($el, $u) {
 	if(!$col = _elemCol($el))
