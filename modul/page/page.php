@@ -683,11 +683,38 @@ function PHP12_pin_dialog_open() {
 
 
 function _page_div() {//todo тест
-
-	$send = '';
-//	$send = _app(APP_ID, 'user_page_access');
-
 	return '';
+	$send = '';
+	$sql = "select * from _spisok where dialog_id=1266 order by id";
+	$arr = query_arr($sql);
+	$n = 1;
+	foreach($arr as $r)
+		foreach(explode(',', $r['txt_3']) as $v) {
+			$ex = explode(':', $v);
+			$send .= "INSERT INTO `_spisok` (
+						`app_id`,
+						`num`,
+						`dialog_id`,
+						`num_1`,
+						`num_2`,
+						`sum_1`,
+						`sum_2`,
+						`user_id_add`,
+						`dtime_add`
+					) VALUES (
+						".$r['app_id'].",
+						".$n++.",
+						1283,
+						".$r['id'].",
+						".$ex[0].",
+						".$ex[1].",
+						".round($ex[1]*$ex[2],2).",
+						".$r['user_id_add'].",
+						'".$r['dtime_add']."'
+					);<br>";
+		}
+
+	return ' delete from _spisok where dialog_id=1283;<br>'.$send;
 
 	for($n=0;$n<50;$n++) {
 		$a1 = rand(2,9);

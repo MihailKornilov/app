@@ -289,8 +289,8 @@ body:not(.site){position:relative}
 }
 #hat-user dd{padding:10px;color:#BCCCE0}
 #hat-user dd:hover{color:#fff}
-#hat-user dd.sa{color:#800}
-#hat-user dd.sa:hover{color:#e99}
+#hat-user .sa{color:#800;text-decoration:none}
+#hat-user .sa:hover{color:#e99}
 #hat-user:not(:hover) dl{display:none}
 #hat-user dd:not(:hover) .icon{opacity:.7}
 
