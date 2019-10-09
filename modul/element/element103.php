@@ -7,7 +7,8 @@ function _element103_struct($el) {
 }
 function _element103_print($el, $prm) {
 	if(!$u = $prm['unit_get'])
-		return _emptyMin10('Данные пользователя не получены.');
+		if(!$u = $prm['unit_edit'])
+			return _emptyMin('Данные пользователя не получены.');
 	if(_sa($u['id']))
 		return _empty('SA: Доступны все страницы.');
 	if($u['id'] == _app(APP_ID, 'user_id_add'))

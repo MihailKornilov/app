@@ -2367,6 +2367,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 102: ATR_EL._filter102(); return;
 				//настройка доступа к страницам для пользователя
 				case 103:
+					if(!ATR_EL.find('._check').length)
+						return;
 					var idsSet = function() {//вставка идентификаторов страниц для отправки данных
 						var ids = [];
 						_forEq(ATR_EL.find('._check'), function(sp) {
