@@ -484,9 +484,8 @@ function _html_hat() {//верхняя строка приложения для 
 					'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
 					_hat_link_admin().
 					_hat_link_task().
-//					'<dd>Баланс'.
 			  (SA ? '<dd onclick="location.href=\''.URL.'&p=1\'" class="sa b">SA' : '').
-			  (SA ? '<dd><a href="http://'.(LOCAL ? 'nyandoma/' : '').'gim-system.ru" target="_blank" class="sa">GIM-system.ru</a>' : '').
+			  (SA ? '<dd onclick="window.open(\'http://'.(LOCAL ? 'nyandoma/' : '').'gim-system.ru\', \'_blank\')" class="sa">GIM-system.ru' : '').
 					'<dd onclick="location.href=\''.URL.'&logout\'">'.
 						'Выход'.
 						'<div class="icon icon-exit wh ml5 mbm3"></div>'.
