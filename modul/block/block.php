@@ -778,9 +778,9 @@ function _elemDivCol($el, $prm) {
 	return '<div class="elem-col">'.$el['col'].'</div>';
 }
 function _elemFormat($el, $prm, $txt) {//формат значения элемента
-	$txt = _elemAction241($el, $prm, $txt);//подмена текста
-	$txt = _elemAction243($el, $txt);//Формат для чисел
-	$txt = _elemAction245($el, $txt, 1);//Формат для текста
+	$txt = _elemAction241($el, $prm, $txt); //подмена текста
+	$txt = _elemAction243($el, $txt);       //Формат для чисел
+	$txt = _elemAction245($el, $txt, 1);    //Формат для текста
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 	$txt = _elemLink($el, $txt);
 	return $txt;
@@ -823,6 +823,8 @@ function _elemAction241($el, $prm, $txt) {//подмена текста
 	return $txt;
 }
 function _elemAction243($el, $txt) {//Формат для чисел
+	if($el['dialog_id'] == 44)
+		return $txt;
 	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
 		return $txt;
 	if(empty($el['action'])) {

@@ -47,8 +47,8 @@ function _element44_print($el, $prm) {
 					break;
 
 				$txt = _element('print', $ell, $prm);
-				$txt = _elem44css($txt, $ell);
 				$txt = _elemFormat($ell, $prm, $txt);
+				$txt = _elem44css($txt, $ell);
 				$txt = _spisokColSearchBg($el, $txt);
 				$send .= $txt;
 			break;
