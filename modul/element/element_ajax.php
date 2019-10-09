@@ -199,48 +199,7 @@ switch(@$_POST['op']) {
 			'</div>'.
 
 			//Служебное
-			'<div class="dialog-menu-4 bg-gr2 pad10'._dn($dialog['menu_edit_last'] == 4).'">'.
-				'<table class="bs10">'.
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'spisok_on',
-									'title' => 'диалог вносит данные',
-									'value' => $dialog['spisok_on']
-							   )).
-					'<tr class="tr-spisok-col'._dn($dialog['spisok_on']).'">'.
-						'<td class="grey r">Колонка по умолчанию:'.
-						'<td><input type="hidden" id="spisok_elem_id" value="'.$dialog['spisok_elem_id'].'" />'.
-					'<tr><td class="grey r">Родительский диалог:'.
-						'<td><input type="hidden" id="dialog_id_parent" value="'.$dialog['dialog_id_parent'].'" />'.
-
-					'<tr><td colspan="2" class="line-t">&nbsp;'.
-					'<tr><td>'.
-						'<td>'._check(array(
-									'attr_id' => 'open_auto',
-									'title' => 'автоматическое открытие диалога',
-									'value' => $dialog['open_auto']
-							   )).
-					'<tr id="tr-open-auto" class="'._dn($dialog['open_auto']).'">'.
-						'<td class="r grey">При условиях:'.
-						'<td><div class="_spfl dib w125 prel">'.
-								'<div class="icon icon-filter pabs"></div>'.
-								'<div class="icon icon-del pl pabs'._dn($dialog['open_auto']).'"></div>'.
-								'<input type="text"'.
-									  ' id="open_filter"'.
-									  ' readonly'.
-									  ' class="inp color-del b pl25 curP w100p over3"'.
-									  ' placeholder="условий нет"'.
-									  ' value=""'.
-								' />'.
-							'</div>'.
-
-
-					'<tr><td colspan="2">&nbsp;'.
-					'<tr><td colspan="2" class="line-t">&nbsp;'.
-					'<tr><td class="grey r">Получает данные записи:'.
-						'<td><input type="hidden" id="dialog_id_unit_get" value="'.$dialog['dialog_id_unit_get'].'" />'.
-				'</table>'.
-			'</div>'.
+			_dialogSetupService($dialog).
 
 			//SA
 	  (SA ? '<div class="dialog-menu-9 pb20'._dn($dialog['menu_edit_last'] == 9).'">'.
@@ -844,6 +803,78 @@ function _dialogSetupHistoryTmp($arr) {
 	}
 
 	return $send;
+}
+function _dialogSetupService($DLG) {
+	$sql = "SELECT COUNT(*)
+			FROM  "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG, true);
+	$all = _num(query_value($sql));
+
+	$sql = "SELECT COUNT(*)
+			FROM  "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG);
+	$noDel = _num(query_value($sql));
+
+	$del = $all - $noDel;
+
+	return
+	'<div class="dialog-menu-4 bg-gr2'._dn($DLG['menu_edit_last'] == 4).'">'.
+
+		'<div class="mt5 bg-fff">'.
+            '<input type="hidden" id="menu_service" value="1" />'.
+		'</div>'.
+
+		'<div class="menu_service-1 pad10">'.
+			'<table class="bs10">'.
+				'<tr><td>'.
+					'<td>'._check(array(
+								'attr_id' => 'spisok_on',
+								'title' => 'диалог вносит данные',
+								'value' => $DLG['spisok_on']
+						   )).
+				'<tr class="tr-spisok-col'._dn($DLG['spisok_on']).'">'.
+					'<td class="grey r">Колонка по умолчанию:'.
+					'<td><input type="hidden" id="spisok_elem_id" value="'.$DLG['spisok_elem_id'].'" />'.
+				'<tr><td class="grey r">Родительский диалог:'.
+					'<td><input type="hidden" id="dialog_id_parent" value="'.$DLG['dialog_id_parent'].'" />'.
+
+				'<tr><td colspan="2" class="line-t">&nbsp;'.
+				'<tr><td>'.
+					'<td>'._check(array(
+								'attr_id' => 'open_auto',
+								'title' => 'автоматическое открытие диалога',
+								'value' => $DLG['open_auto']
+						   )).
+				'<tr id="tr-open-auto" class="'._dn($DLG['open_auto']).'">'.
+					'<td class="r grey">При условиях:'.
+					'<td><div class="_spfl dib w125 prel">'.
+							'<div class="icon icon-filter pabs"></div>'.
+							'<div class="icon icon-del pl pabs'._dn($DLG['open_auto']).'"></div>'.
+							'<input type="text"'.
+								  ' id="open_filter"'.
+								  ' readonly'.
+								  ' class="inp color-del b pl25 curP w100p over3"'.
+								  ' placeholder="условий нет"'.
+								  ' value=""'.
+							' />'.
+						'</div>'.
+
+
+				'<tr><td colspan="2">&nbsp;'.
+				'<tr><td colspan="2" class="line-t">&nbsp;'.
+				'<tr><td class="grey r">Получает данные записи:'.
+					'<td><input type="hidden" id="dialog_id_unit_get" value="'.$DLG['dialog_id_unit_get'].'" />'.
+			'</table>'.
+		'</div>'.
+
+		'<div class="menu_service-2 pad10">'.
+			'<table class="bs10">'.
+				'<tr><td class="grey">Количество записей:'.
+					'<td><b>'.$all.'</b>, из них удалены: '.$del.
+			'</table>'.
+		'</div>'.
+
+	'</div>';
 }
 function _dialogSetupRule($dialog_id) {//Правила для элемета
 	$sql = "SELECT `rule_id`,1

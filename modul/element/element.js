@@ -321,6 +321,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			type:3,
 			spisok:o.menu_sa
 		});
+		DLG('#menu_service')._menu({
+			type:3,
+			spisok:[
+				{id:1,title:'Настройка'},
+				{id:2,title:'Статистика'}
+			]
+		});
 		DLG('#width_auto')._check({
 			title:'автоматическая ширина'
 		});
