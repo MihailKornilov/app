@@ -804,19 +804,8 @@ function _dialogSetupHistoryTmp($arr) {
 
 	return $send;
 }
+
 function _dialogSetupService($DLG) {
-	$sql = "SELECT COUNT(*)
-			FROM  "._queryFrom($DLG)."
-			WHERE "._queryWhere($DLG, true);
-	$all = _num(query_value($sql));
-
-	$sql = "SELECT COUNT(*)
-			FROM  "._queryFrom($DLG)."
-			WHERE "._queryWhere($DLG);
-	$noDel = _num(query_value($sql));
-
-	$del = $all - $noDel;
-
 	return
 	'<div class="dialog-menu-4 bg-gr2'._dn($DLG['menu_edit_last'] == 4).'">'.
 
@@ -858,8 +847,6 @@ function _dialogSetupService($DLG) {
 								  ' value=""'.
 							' />'.
 						'</div>'.
-
-
 				'<tr><td colspan="2">&nbsp;'.
 				'<tr><td colspan="2" class="line-t">&nbsp;'.
 				'<tr><td class="grey r">Получает данные записи:'.
@@ -869,13 +856,145 @@ function _dialogSetupService($DLG) {
 
 		'<div class="menu_service-2 pad10">'.
 			'<table class="bs10">'.
-				'<tr><td class="grey">Количество записей:'.
-					'<td><b>'.$all.'</b>, из них удалены: '.$del.
+				'<tr><td class="grey r">Записи:'.
+					'<td>'._dialogSetupServiceCount($DLG).
+				'<tr><td class="grey r top curD'._tooltip('Размещён в других диалогах', -60).'Привязан:'.
+					'<td>'._dialogSetupServiceCnnOut($DLG).
+				'<tr><td class="grey r top curD'._tooltip('Диалоги размещены в этом', -60).'Привязки:'.
+					'<td>'._dialogSetupServiceCnnIn($DLG).
 			'</table>'.
 		'</div>'.
 
 	'</div>';
 }
+function _dialogSetupServiceCount($DLG) {//количество записей, внесённых диалогом
+	$sql = "SELECT COUNT(*)
+			FROM  "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG, true);
+	if(!$all = _num(query_value($sql)))
+		return '<span class="pale">нет</span>';
+
+	$send = '<b>'.$all.'</b>';
+
+	$sql = "SELECT COUNT(*)
+			FROM  "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG);
+	$noDel = _num(query_value($sql));
+
+	if($del = $all - $noDel)
+		$send .= '<span class="grey">'.
+					', из них: '.
+					'<b class="color-pay">'.$noDel.'</b> - активные, '.
+					'<b class="color-ref">'.$del.'</b> - удалены'.
+				'</span>';
+	else
+		$send .= '<span class="pale"> (удалённых нет)</span>';
+
+	return $send;//' <a>очистить</a>'
+}
+function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым привязан текущий диалог
+	//получение элементов-связок
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id` IN (29,59)
+			  AND `num_1`=".$DLG['id']."
+			ORDER BY `id`";
+	if(!$ELM = query_arr($sql))
+		return '<span class="pale">нет</span>';
+
+	//блоки, в которых размещаются элементы-связки. По ним будут определятся ID диалогов
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `obj_name`='dialog' 
+			  AND `id` IN ("._idsGet($ELM, 'block_id').")
+			ORDER BY `obj_id`";
+	if(!$BLK = query_arr($sql))
+		return '<span class="pale">нет</span>';
+
+	foreach($ELM as $el) {
+		if(!$block_id = $el['block_id'])
+			continue;
+		$BLK[$block_id]['col'] = _elemCol($el);
+	}
+
+	$send = '<table class="_stab small bg-fff">';
+	$n = 1;
+	foreach($BLK as $bl) {
+		$send .= '<tr class="over2">'.
+					'<td class="r pale">'.$n++;
+
+		if(!$dlg = _dialogQuery($bl['obj_id'])) {
+			$send .= '<td class="color-ref"><b>'.$bl['obj_id'].'</b> - диалог не найден</b><td>';
+			continue;
+		}
+
+		if(empty($bl['col'])) {
+			$send .= '<td class="color-ref">Отсутствует колонка</b><td>';
+			continue;
+		}
+
+		$sql = "SELECT COUNT(*)
+				FROM  "._queryFrom($dlg)."
+				WHERE "._queryWhere($dlg, true)."
+				  AND `".$bl['col']."`";
+		$c = _num(query_value($sql));
+
+		$send .= '<td class="w230">'.
+					$dlg['name'].
+					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD'._tooltip('Родительский диалог', -5)._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
+				'<td class="r">'._hide0($c);
+	}
+	$send .= '</table>';
+
+	return $send;
+}
+function _dialogSetupServiceCnnIn($DLG) {//диалоги, которые размещены в этом диалоге
+	$ELM = array();
+
+	foreach($DLG['cmp'] as $r)
+		if($r['dialog_id'] == 29 || $r['dialog_id'] == 59)
+			$ELM[] = $r;
+
+	if(empty($ELM))
+		return '<span class="pale">нет</span>';
+
+	$send = '<table class="_stab small bg-fff">';
+	$n = 1;
+	foreach($ELM as $el) {
+		$send .= '<tr class="over2">'.
+					'<td class="r pale">'.$n++;
+
+		if(!$dlg = _dialogQuery($el['num_1'])) {
+			$send .= '<td class="color-ref"><b>'.$el['num_1'].'</b> - диалог не найден</b><td>';
+			continue;
+		}
+
+		if(!$col = _elemCol($el)) {
+			$send .= '<td class="color-ref">Отсутствует колонка</b><td>';
+			continue;
+		}
+
+		$sql = "SELECT COUNT(*)
+				FROM  "._queryFrom($DLG)."
+				WHERE "._queryWhere($DLG, true)."
+				  AND `".$col."`";
+		$c = _num(query_value($sql));
+
+		$send .=
+			'<td class="w230">'.
+					'<div class="grey b fs13">'.
+						$el['name'].
+						($el['req'] ? '<span class="red fs16">*</span>' : '').
+					'</div>'.
+					$dlg['name'].
+					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD'._tooltip('Родительский диалог', -5)._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
+				'<td class="r">'._hide0($c);
+	}
+	$send .= '</table>';
+
+	return $send;
+}
+
 function _dialogSetupRule($dialog_id) {//Правила для элемета
 	$sql = "SELECT `rule_id`,1
 			FROM `_element_rule_use`
