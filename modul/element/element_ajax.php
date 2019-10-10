@@ -862,6 +862,8 @@ function _dialogSetupService($DLG) {
 					'<td>'._dialogSetupServiceCnnOut($DLG).
 				'<tr><td class="grey r top curD'._tooltip('Диалоги размещены в этом', -60).'Привязки:'.
 					'<td>'._dialogSetupServiceCnnIn($DLG).
+				'<tr><td class="grey r top'._tooltip('Используется в кнопках', -60).'Кнопки:'.
+					'<td>'._dialogSetupServiceButton($DLG).
 			'</table>'.
 		'</div>'.
 
@@ -924,12 +926,12 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 					'<td class="r pale">'.$n++;
 
 		if(!$dlg = _dialogQuery($bl['obj_id'])) {
-			$send .= '<td class="color-ref"><b>'.$bl['obj_id'].'</b> - диалог не найден</b><td>';
+			$send .= '<td class="color-ref"><b>'.$bl['obj_id'].'</b> - диалог не найден<td>';
 			continue;
 		}
 
 		if(empty($bl['col'])) {
-			$send .= '<td class="color-ref">Отсутствует колонка</b><td>';
+			$send .= '<td class="color-ref">Отсутствует колонка<td>';
 			continue;
 		}
 
@@ -965,12 +967,12 @@ function _dialogSetupServiceCnnIn($DLG) {//диалоги, которые раз
 					'<td class="r pale">'.$n++;
 
 		if(!$dlg = _dialogQuery($el['num_1'])) {
-			$send .= '<td class="color-ref"><b>'.$el['num_1'].'</b> - диалог не найден</b><td>';
+			$send .= '<td class="color-ref"><b>'.$el['num_1'].'</b> - диалог не найден<td>';
 			continue;
 		}
 
 		if(!$col = _elemCol($el)) {
-			$send .= '<td class="color-ref">Отсутствует колонка</b><td>';
+			$send .= '<td class="color-ref">Отсутствует колонка<td>';
 			continue;
 		}
 
@@ -989,6 +991,57 @@ function _dialogSetupServiceCnnIn($DLG) {//диалоги, которые раз
 					$dlg['name'].
 					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD'._tooltip('Родительский диалог', -5)._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
 				'<td class="r">'._hide0($c);
+	}
+	$send .= '</table>';
+
+	return $send;
+}
+function _dialogSetupServiceButton($DLG) {//диалог используется в кнопках
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=2
+			  AND `num_4`=".$DLG['id']."
+			ORDER BY `id`";
+	if(!$ELM = query_arr($sql))
+		return '<span class="pale">нет</span>';
+
+	$send = '<table class="_stab small bg-fff">';
+	$n = 1;
+	foreach($ELM as $el) {
+		$send .= '<tr class="over2">'.
+					'<td class="r pale">'.$n++;
+
+		if($parent_id = $el['parent_id']) {
+			$send .= '<td class="color-ref">Не в блоке';
+			continue;
+		}
+
+		if(!$el = _elemOne($el['id'])) {
+			$send .= '<td class="color-ref">Элемент не найден';
+			continue;
+		}
+
+		if(!$bl = $el['block']) {
+			$send .= '<td class="color-ref">Элемент без блока';
+			continue;
+		}
+
+		$objName = '---';
+		switch($bl['obj_name']) {
+			case 'page':
+				$page = _page($bl['obj_id']);
+				$objName = 'Страница <b>'.$page['name'].'<b>';
+				break;
+			case 'dialog':
+				$objName = 'Диалог <b>'._dialogParam($bl['obj_id'], 'name').'<b>';
+				break;
+			case 'spisok':
+				$objName = 'Список ';
+				break;
+		}
+
+		$send .= '<td>'.$objName;
+
 	}
 	$send .= '</table>';
 
