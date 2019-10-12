@@ -216,6 +216,9 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			if($r['bg'] && !_ids($r['bg']))
 				$cls[] = $r['bg'];
 
+			if($ov = $r['ov'])
+				$cls[] = str_replace('bg', 'ov', $ov);
+
 //			if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && ($r['hidden'] || $r['sa'] && !SA))
 			if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden'])
 				$cls[] = 'vh';
@@ -1628,6 +1631,7 @@ function _beBlockStructure($bl) {//формирование массива бл�
 		'height' => _num($bl['height']),
 		'pos' => $bl['pos'],
 		'bg' => $bl['bg'],
+		'ov' => $bl['ov'],
 		'bor' => $bl['bor'],
 		'hidden' => _num($bl['hidden']),
 		'action' => array(),

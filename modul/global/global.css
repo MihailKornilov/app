@@ -403,21 +403,7 @@ body:not(.site){position:relative}
 }
 
 /* цвета заливки блока в настройках */
-#block-set-bg div.curP{vertical-align:top}
-#block-set-bg div.curP:not(.sel):hover{border:#aaa solid 1px;}
-#block-set-bg div.curP:not(.sel){color:transparent}
-#block-set-bg .sel{border:#777 solid 1px;}
-#block-set-bg .galka{cursor:pointer}
-#block-set-bg .spin{left:3px;top:4px}
-#block-set-bg .bg70:not(.busy) .spin{display:none}
-
-
-#blk-setup-bg{}
-#blk-setup-bg .bg70:not(.busy) .spin{display:none}
-.bgu{/* квадратик с заливкой
-	font-size:17px;
-	color:#888;
- */
+.bgu{/* квадратик с заливкой */
 	display:inline-block;
 	height:25px;
 	width:25px;
@@ -450,6 +436,8 @@ body:not(.site){position:relative}
 #blk-bg:not(:hover) .bgu-list{display:none}
 #blk-ov:not(:hover) .bgu-list{display:none}
 
+#blk-bg70:not(.busy) .spin{display:none}
+#blk-bg70 .spin{left:3px;top:4px}
 
 .blk-line{/* выбор линий */
 	position:relative;
@@ -788,24 +776,24 @@ body:not(.site){position:relative}
 .bg-efe{background-color:#efe}  /* светло-зелёный */
 .bg-orange{background-color:#ffaf64}/* оранжевый-насыщенный */
 
-.bg0{background-color:#fff}
-.bg1{background-color:#ffe}
-.bg2{background-color:#f7f7ee}
-.bg3{background-color:#eff}
-.bg4{background-color:#F2F6F9}
-.bg5{background-color:#efe}
-.bg6{background-color:#f7f7f7}
-.bg7{background-color:#ffd}
-.bg8{background-color:#FaFaD6}
-.bg9{background-color:#dff}
-.bg10{background-color:#ECF9FE}
-.bg11{background-color:#dfd}
-.bg12{background-color:#f0f0f0}
-.bg13{background-color:#FFEfD3}
-.bg14{background-color:#fee}
-.bg15{background-color:#FfF4Ff}
-.bg16{background-color:#DFF1F6}
-.bg17{background-color:#ddf2dd}
+.bg0,.ov0:hover{background-color:#fff}
+.bg1,.ov1:hover{background-color:#ffe}
+.bg2,.ov2:hover{background-color:#f7f7ee}
+.bg3,.ov3:hover{background-color:#eff}
+.bg4,.ov4:hover{background-color:#F2F6F9}
+.bg5,.ov5:hover{background-color:#efe}
+.bg6,.ov6:hover{background-color:#f7f7f7}
+.bg7,.ov7:hover{background-color:#ffd}
+.bg8,.ov8:hover{background-color:#FaFaD6}
+.bg9,.ov9:hover{background-color:#dff}
+.bg10,.ov10:hover{background-color:#ECF9FE}
+.bg11,.ov11:hover{background-color:#dfd}
+.bg12,.ov12:hover{background-color:#f0f0f0}
+.bg13,.ov13:hover{background-color:#FFEfD3}
+.bg14,.ov14:hover{background-color:#fee}
+.bg15,.ov15:hover{background-color:#FfF4Ff}
+.bg16,.ov16:hover{background-color:#DFF1F6}
+.bg17,.ov17:hover{background-color:#ddf2dd}
 
 
 .db{display:block}

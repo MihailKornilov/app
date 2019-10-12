@@ -16,6 +16,7 @@ var _ids = function(v, count) {
 		return 0;
 	},
 	_blockUnit = function() {//настройка стилей блока в выплывающем окне
+
 		//если производится процесс деления блока на части, настройка стилей не выводится
 		if($('.block-unit-grid').length)
 			return;
@@ -41,7 +42,6 @@ var _ids = function(v, count) {
 								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +
 								'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
 					'</table>' +
-//					_blockUnitBg(BL) +
 					_blockUnitBgNew(BL) +
 					_blockUnitBut(BL) +
 				'</div>' +
@@ -148,55 +148,28 @@ var _ids = function(v, count) {
 			}
 		});
 	},
-	_blockUnitBg = function(BL) {//окраска блока
-		var BGS = 'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg-fee',
-			div = '';
-
-		$(document)
-			.off('click', '#block-set-bg div.curP')
-			.on('click', '#block-set-bg div.curP', function() {
-				var unit = $(this),
-					bg = unit.attr('val'),
-					sel = unit.hasClass('sel');
-
-				unit.parent().find('.sel').removeClass('sel');
-				_attr_bl(BL.id).removeClass(BGS);
-				$('#block-set-bg .bg70 .galka')._dn();
-
-				if(!sel) {
-					unit.addClass('sel');
-					_attr_bl(BL.id).addClass(bg);
-				}
-
-				BL.bg = sel ? '' : bg;
-				BL.save = 1;
-			});
-
-		_forN(BGS.split(' '), function(sp, n) {
-			var sel = BL.bg == sp ? ' sel' : '',
-				ml3 = n ? ' ml3' : '';
-			div += '<div class="dib center w25 h25 bor-e8 curP fs17 grey ' + sp + ml3 + sel + '" val="' + sp + '">&#10004;</div>';
-		});
-
-		return '<div class="color-555 fs14 mt5">Окраска:</div>' +
-			   '<div id="block-set-bg" class="mt3">' + div + _blockUnitBg70(BL, BGS) + '</div>';
-	},
 	_blockUnitBgNew = function(BL) {//окраска блока
 		var BGS = [], //'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg-fee',
 			BOR = BL.bor.split(' '),
 			BGU = '',
 			OVU = '',
-			BGSEL = '';
+			BGSEL = '',
+			OVSEL = '';
 
 		for(var n = 0; n < 18; n++) {
 			var bg = 'bg' + n,
-				on = BL.bg == bg ? ' on' : '';
+				on = BL.bg == bg ? ' on' : '',
+				ovon = BL.ov == bg ? ' on' : '';
+
+			BGS.push(bg);
+
 			if(on)
 				BGSEL = bg + on;
-			BGS.push(bg);
 			BGU += '<div class="bgu mt3 mr3 ' + bg + on + '" val="' + n + '">&#10004;</div>';
 
-			OVU += '<div class="bgu mt3 mr3 ' + bg + '" val="' + n + '">&#10057;</div>';
+			if(ovon)
+				OVSEL = bg + ovon;
+			OVU += '<div class="bgu mt3 mr3 ' + bg + ovon + '" val="' + n + '">&#10057;</div>';
 		}
 		BGS = BGS.join(' ');
 
@@ -245,6 +218,7 @@ var _ids = function(v, count) {
 		 		_bl.removeClass(BGS);
 		 		_bgu.removeClass(BGS + ' on');
 		 		$('#blk-bg .bgu').removeClass('on');
+				$('#blk-bg70 .galka')._dn();
 
 				BL.bg = '';
 				BL.save = 1;
@@ -307,11 +281,11 @@ var _ids = function(v, count) {
 									'</div>' +
 								'</div>' +
 
-								'<div id="blk-ov" class="bgu ml3 mr10">' +
+								'<div id="blk-ov" class="bgu ml3 mr10 ' + OVSEL + '">' +
 									'&#10057;' +
 									'<div class="bgu-list">' +
 										'<table>' +
-											'<tr><td><div class="bgu sel mr5 ml30">&#10057;</div>' +
+											'<tr><td><div class="bgu sel mr5 ml30 ' + OVSEL + '">&#10057;</div>' +
 												'<td class="fs12 color-555">Изменение окраски<br>при наведении' +
 										'</table>' +
 										OVU +
@@ -334,8 +308,8 @@ var _ids = function(v, count) {
 	},
 	_blockUnitBg70 = function(BL, BGS) {//динабическая окраска блока
 		$(document)
-			.off('click', '#block-set-bg .bg70')
-			.on('click', '#block-set-bg .bg70', function() {
+			.off('click', '#blk-bg70')
+			.on('click', '#blk-bg70', function() {
 				var t = $(this),
 					galka = t.find('.galka');
 
@@ -365,9 +339,9 @@ var _ids = function(v, count) {
 				});
 			});
 
-		return '<div class="bg70 prel dib center w25 bor-e8 grey mr10 mt3' +
+		return '<div id="blk-bg70" class="prel dib center w25 bor-e8 grey mr10 mt3' +
 						_tooltip('Окраска согласно<br>цвету фона записи', -54, '', 1) +
-					'<div class="galka pabs fs17 pl5' + _dn(_ids(BL.bg)) + '">&#10004;</div>' +
+					'<div class="galka pabs fs17 pl5 curP' + _dn(_ids(BL.bg)) + '">&#10004;</div>' +
 					'<div class="pabs icon spin"></div>' +
 					'<table class="w100p curP">' +
 						'<tr><td class="bg-efe" style="width:24px;height:8px">' +
