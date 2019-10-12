@@ -412,9 +412,75 @@ body:not(.site){position:relative}
 #block-set-bg .bg70:not(.busy) .spin{display:none}
 
 
+#blk-setup-bg{}
+#blk-setup-bg .bg70:not(.busy) .spin{display:none}
+.bgu{/* квадратик с заливкой
+	font-size:17px;
+	color:#888;
+ */
+	display:inline-block;
+	height:25px;
+	width:25px;
+	background-color:#fff;
+	border:#bbb solid 1px;
+	border-radius:3px;
+	cursor:pointer;
+	text-align:center;
+	font-size:17px;
+	color:#888;
+	position:relative;
+}
+.bgu:not(.sel):hover{border-color:#bbb}
+.bgu:not(.on){color:transparent;border-color:#e8e8e8}
+.bgu-list{/* варианты заливок */
+	position:absolute;
+	left:-35px;
+	top:-5px;
+	width:180px;
+	height:122px;
+	background-color:#fff;
+	border:#ddd solid 1px;
+	border-radius:3px;
+	box-shadow:0 0 14px 0 rgba(0,0,0,.2);
+	text-align:left;
+	padding:3px 0 0 3px;
+	cursor:default;
+	z-index:100;
+}
+#blk-bg:not(:hover) .bgu-list{display:none}
+#blk-ov:not(:hover) .bgu-list{display:none}
 
 
+.blk-line{/* выбор линий */
+	position:relative;
+	display:inline-block;
+	cursor:pointer;
+	border:#eee solid 1px;
+	border-radius:2px;
 
+	width:66px;/* горизонтальные */
+	height:15px;
+}
+.blk-line:hover{border-color:#d8d8d8}
+.blk-line.ver{/* вертикальные */
+	width:15px;
+	height:66px;
+}
+.blk-line span{
+	background-color:#DEE3EF;
+	position:absolute;
+	top:6px;
+	left:4px;
+	width:58px;
+	height:3px;
+}
+.blk-line.ver span{
+	top:4px;
+	left:6px;
+	width:3px;
+	height:58px;
+}
+.blk-line:not(.on) span{display:none}
 
 
 
@@ -721,6 +787,25 @@ body:not(.site){position:relative}
 .bg-dfd{background-color:#dfd}  /* зелёный */
 .bg-efe{background-color:#efe}  /* светло-зелёный */
 .bg-orange{background-color:#ffaf64}/* оранжевый-насыщенный */
+
+.bg0{background-color:#fff}
+.bg1{background-color:#ffe}
+.bg2{background-color:#f7f7ee}
+.bg3{background-color:#eff}
+.bg4{background-color:#F2F6F9}
+.bg5{background-color:#efe}
+.bg6{background-color:#f7f7f7}
+.bg7{background-color:#ffd}
+.bg8{background-color:#FaFaD6}
+.bg9{background-color:#dff}
+.bg10{background-color:#ECF9FE}
+.bg11{background-color:#dfd}
+.bg12{background-color:#f0f0f0}
+.bg13{background-color:#FFEfD3}
+.bg14{background-color:#fee}
+.bg15{background-color:#FfF4Ff}
+.bg16{background-color:#DFF1F6}
+.bg17{background-color:#ddf2dd}
 
 
 .db{display:block}

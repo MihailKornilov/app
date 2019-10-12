@@ -15,8 +15,7 @@ var _ids = function(v, count) {
 		}
 		return 0;
 	},
-	_blockUnitSetup = function() {//настройка стилей блока в выплывающем окне
-
+	_blockUnit = function() {//настройка стилей блока в выплывающем окне
 		//если производится процесс деления блока на части, настройка стилей не выводится
 		if($('.block-unit-grid').length)
 			return;
@@ -24,20 +23,14 @@ var _ids = function(v, count) {
 		var t = $(this),
 			block_id = _num(t.attr('val')),
 			BL = BLKK[block_id],
-			borSave = function() {//нажатие на галочку для установки/снятия бордюра
-				BL.bor = $('#block-unit-bor0').val() + ' ' +
-						 $('#block-unit-bor1').val() + ' ' +
-						 $('#block-unit-bor2').val() + ' ' +
-						 $('#block-unit-bor3').val();
-				BL.save = 1;
-			};
+			hint_id = BL.hint ? BL.hint.id : 0;
+
 		BL.id = block_id;
 
 		//идёт процес сохранения
 		if(BL.save || _attr_bl(BL.id).hasClass('_busy'))
 			return;
 
-		var hint_id = BL.hint ? BL.hint.id : 0;
 		t._hint({
 			msg:'<div class="pad5">' +
 					'<table class="w100p line-b">' +
@@ -48,8 +41,8 @@ var _ids = function(v, count) {
 								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +
 								'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
 					'</table>' +
-					_blockUnitBg(BL) +
-					_blockUnitBor(BL) +
+//					_blockUnitBg(BL) +
+					_blockUnitBgNew(BL) +
 					_blockUnitBut(BL) +
 				'</div>' +
 				_elemUnit(BL),
@@ -59,34 +52,6 @@ var _ids = function(v, count) {
 			delayShow:500,
 			delayHide:300,
 			func:function() {
-				$('#block-unit-bor0')._check({
-					tooltip:'сверху',
-					func:function(v) {
-						_attr_bl(BL.id).css('border-top', v ? '#DEE3EF solid 1px' : '');
-						borSave();
-					}
-				});
-				$('#block-unit-bor1')._check({
-					tooltip:'справа',
-					func:function(v) {
-						_attr_bl(BL.id).css('border-right', v ? '#DEE3EF solid 1px' : '');
-						borSave();
-					}
-				});
-				$('#block-unit-bor2')._check({
-					tooltip:'снизу',
-					func:function(v) {
-						_attr_bl(BL.id).css('border-bottom', v ? '#DEE3EF solid 1px' : '');
-						borSave();
-					}
-				});
-				$('#block-unit-bor3')._check({
-					tooltip:'слева',
-					func:function(v) {
-						_attr_bl(BL.id).css('border-left', v ? '#DEE3EF solid 1px' : '');
-						borSave();
-					}
-				});
 				$('#block-width-auto')._check({
 					title:'<div class="fs11">width auto</div>',
 					func:function(v) {
@@ -183,7 +148,7 @@ var _ids = function(v, count) {
 			}
 		});
 	},
-	_blockUnitBg = function(BL) {//заливка блока
+	_blockUnitBg = function(BL) {//окраска блока
 		var BGS = 'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg-fee',
 			div = '';
 
@@ -213,10 +178,161 @@ var _ids = function(v, count) {
 			div += '<div class="dib center w25 h25 bor-e8 curP fs17 grey ' + sp + ml3 + sel + '" val="' + sp + '">&#10004;</div>';
 		});
 
-		return '<div class="color-555 fs14 mt5">Заливка:</div>' +
+		return '<div class="color-555 fs14 mt5">Окраска:</div>' +
 			   '<div id="block-set-bg" class="mt3">' + div + _blockUnitBg70(BL, BGS) + '</div>';
 	},
-	_blockUnitBg70 = function(BL, BGS) {//динабическая заливка блока
+	_blockUnitBgNew = function(BL) {//окраска блока
+		var BGS = [], //'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg-fee',
+			BOR = BL.bor.split(' '),
+			BGU = '',
+			OVU = '',
+			BGSEL = '';
+
+		for(var n = 0; n < 18; n++) {
+			var bg = 'bg' + n,
+				on = BL.bg == bg ? ' on' : '';
+			if(on)
+				BGSEL = bg + on;
+			BGS.push(bg);
+			BGU += '<div class="bgu mt3 mr3 ' + bg + on + '" val="' + n + '">&#10004;</div>';
+
+			OVU += '<div class="bgu mt3 mr3 ' + bg + '" val="' + n + '">&#10057;</div>';
+		}
+		BGS = BGS.join(' ');
+
+		//установка/снятие границ
+		$(document)
+			.off('click', '.blk-line')
+			 .on('click', '.blk-line', function() {
+			 	var t = $(this),
+			        on = !t.hasClass('on'),
+			        mass = {
+			 		    0:'top',
+			 		    1:'right',
+			 		    2:'bottom',
+			 		    3:'left'
+			        },
+			        side = t.attr('id').split('bor')[1]*1,
+			        save = [0,0,0,0],
+			        ss = {//соотношения выводимых сторон к сохраняемым (SaveSide)
+			        	0:0,
+			        	1:3,
+			        	2:1,
+			        	3:2
+			        };
+
+		 		t[(on ? 'add' : 'remove') + 'Class']('on');
+		 		_attr_bl(BL.id).css('border-' + mass[side], on ? '#DEE3EF solid 1px' : '');
+
+		 		_forEq($('.blk-line'), function(sp, n) {
+		 			if(!sp.hasClass('on'))
+		 				return;
+		 			save[ss[n]] = 1;
+			    });
+	 			BL.bor = save.join(' ');
+		 		BL.save = 1;
+			 });
+
+		//установка/снятие заливки
+		$(document)
+			.off('click', '#blk-bg .bgu')
+			 .on('click', '#blk-bg .bgu', function() {
+			 	var t = $(this),
+			        on = !t.hasClass('on'),
+			        _bl = _attr_bl(BL.id),
+			        _bgu = $('#blk-bg,#blk-bg .sel');
+
+		 		_bl.removeClass(BGS);
+		 		_bgu.removeClass(BGS + ' on');
+		 		$('#blk-bg .bgu').removeClass('on');
+
+				BL.bg = '';
+				BL.save = 1;
+
+				//отмена выбора
+			 	if(t.hasClass('sel') || !on)
+				    return;
+
+				BL.bg = 'bg' + t.attr('val');
+				t.addClass('on');
+				_bl.addClass(BL.bg);
+				_bgu.addClass(BL.bg + ' on');
+			 });
+
+		//установка/снятие заливки при наведении
+		$(document)
+			.off('click', '#blk-ov .bgu')
+			 .on('click', '#blk-ov .bgu', function() {
+			 	var t = $(this),
+			        on = !t.hasClass('on'),
+			        _bgu = $('#blk-ov,#blk-ov .sel');
+
+		 		_bgu.removeClass(BGS + ' on');
+		 		$('#blk-ov .bgu').removeClass('on');
+
+				BL.ov = '';
+				BL.save = 1;
+
+				//отмена выбора
+			 	if(t.hasClass('sel') || !on)
+				    return;
+
+				BL.ov = 'bg' + t.attr('val');
+				t.addClass('on');
+				_bgu.addClass(BL.ov + ' on');
+			 });
+
+		return '<div class="color-555 fs14 mt5">Окраска и границы:</div>' +
+			   '<div id="blk-setup-bg" class="mt10 ml5 center">' +
+					'<table>' +
+
+						'<tr><td colspan="3">' +
+							'<div id="bor0" class="blk-line' + _dn(BOR[0]*1, 'on') + _tooltip('Граница сверху', -22) +
+								'<span></span>' +
+							'</div>' +
+
+						'<tr><td><div id="bor3" class="blk-line ver' + _dn(BOR[3]*1, 'on') + _tooltip('Граница слева', -46) +
+									'<span></span>' +
+								'</div>' +
+
+							'<td class="r">' +
+								'<div id="blk-bg" class="bgu ml10 ' + BGSEL + '">' +
+									'&#10004;' +
+									'<div class="bgu-list">' +
+										'<table>' +
+											'<tr><td><div class="bgu sel mr5 ml30 ' + BGSEL + '">&#10004;</div>' +
+												'<td class="fs14 color-555">Цвет окраски' +
+										'</table>' +
+										BGU +
+									'</div>' +
+								'</div>' +
+
+								'<div id="blk-ov" class="bgu ml3 mr10">' +
+									'&#10057;' +
+									'<div class="bgu-list">' +
+										'<table>' +
+											'<tr><td><div class="bgu sel mr5 ml30">&#10057;</div>' +
+												'<td class="fs12 color-555">Изменение окраски<br>при наведении' +
+										'</table>' +
+										OVU +
+									'</div>' +
+								'</div>' +
+								'<br>' +
+								_blockUnitBg70(BL, BGS) +
+
+							'<td><div id="bor1" class="blk-line ver' + _dn(BOR[1]*1, 'on') + _tooltip('Граница справа', -50) +
+									'<span></span>' +
+								'</div>' +
+
+						'<tr><td colspan="3">' +
+								'<div id="bor2" class="blk-line' + _dn(BOR[2]*1, 'on') + _tooltip('Граница снизу', -20) +
+									'<span></span>' +
+								'</div>' +
+
+					'</table>' +
+			   '</div>';
+	},
+	_blockUnitBg70 = function(BL, BGS) {//динабическая окраска блока
 		$(document)
 			.off('click', '#block-set-bg .bg70')
 			.on('click', '#block-set-bg .bg70', function() {
@@ -249,8 +365,8 @@ var _ids = function(v, count) {
 				});
 			});
 
-		return '<div class="bg70 prel dib center w25 bor-e8 grey ml3' +
-						_tooltip('Окраска блока согласно<br>цвету фона записи', -70, '', 1) +
+		return '<div class="bg70 prel dib center w25 bor-e8 grey mr10 mt3' +
+						_tooltip('Окраска согласно<br>цвету фона записи', -54, '', 1) +
 					'<div class="galka pabs fs17 pl5' + _dn(_ids(BL.bg)) + '">&#10004;</div>' +
 					'<div class="pabs icon spin"></div>' +
 					'<table class="w100p curP">' +
@@ -260,21 +376,7 @@ var _ids = function(v, count) {
 					'</table>' +
 			   '</div>';
 	},
-	_blockUnitBor = function(BL) {//границы блока
-		var bor = BL.bor.split(' ');
-		return '<table class="mt10">' +
-				'<tr><td class="color-555 fs14">Границы:' +
-					'<td class="pr3">' +
-						'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor0" value="' + bor[0] + '"></div>' +
-						'<table class="bs5">' +
-							'<tr>' +
-								'<td><input type="hidden" id="block-unit-bor3" value="' + bor[3] + '">' +
-								'<td class="pl20"><input type="hidden" id="block-unit-bor1" value="' + bor[1] + '">' +
-						'</table>' +
-						'<div class="ml20 pl5"><input type="hidden" id="block-unit-bor2" value="' + bor[2] + '"></div>' +
-					_blockUnitSa(BL) +
-				'</table>';
-	},
+
 	_blockUnitSa = function(BL) {//настройка блока для SA
 		if(!SA)
 			return '';
@@ -884,7 +986,7 @@ $(document)
 		});
 	})
 
-	.on('mouseenter', '.block-unit', _blockUnitSetup)
+	.on('mouseenter', '.block-unit', _blockUnit)
 	.on('click', '.block-unit', function() {//нажатие на блок для настройки
 
 		//если производится процесс деления блока на части, действие не производится
