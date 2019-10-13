@@ -15,6 +15,7 @@ function _element11_struct($el, $ELM=array()) {
 
 		'font'      => $el['font'],
 		'color'     => $el['color'],
+		'size'      => $el['size'] ? _num($el['size']) : 13,
 
 		'txt_2'     => $el['txt_2'],    //id элемента, выбранного из диалога, который вносит данные списка
 								        //возможна иерархия элементов через запятую: 256,1312,560
@@ -27,10 +28,8 @@ function _element11_struct($el, $ELM=array()) {
 			$el11 = $ELM[$last_id];
 
 			//разрешать настройку стилей (правило 11)
-			if(_elemRule($el11['dialog_id'], 11)) {
+			if(_elemRule($el11['dialog_id'], 11))
 				$send['stl'] = 1; //для JS
-				$send['size']  = $el['size'] ? _num($el['size']) : 13;
-			}
 
 			//разрешать настройку перехода на страницу или открытие диалога
 			if(_elemRule($el11['dialog_id'], 16))
@@ -50,8 +49,10 @@ function _element11_struct($el, $ELM=array()) {
 function _element11_struct_title($el, $ELM, $DLGS=array()) {
 	$el['title'] = '';
 	foreach(_ids($el['txt_2'], 'arr') as $id) {
-		if(!isset($ELM[$id]))
+		if(!isset($ELM[$id])) {
+			$el['title'] = '-title-no-find-';
 			return $el;
+		}
 
 		$ell = $ELM[$id];
 
