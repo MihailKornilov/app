@@ -658,21 +658,19 @@ function _spisokUnitUrlPage($el, $page_id, $u) {//получение id запи
 		return $u['id'];
 	if(!empty($u['dialog_id_use']) && $u['dialog_id_use'] == $page['dialog_id_unit_get'])
 		return $u['id'];
-	if($el['dialog_id'] != 11)
-		return $u['id'];
-	if(!$elem_id = _idsFirst($el['txt_2']))
-		return $u['id'];
-	if(!$col = _elemCol($elem_id))
-		return $u['id'];
 
-/*
-	if(isset($u[$col]))
-		if(is_array($u[$col]))
-			$u[$col]['id'];
+	switch($el['dialog_id']) {
+		case 11:
+			if(!$elem_id = _idsFirst($el['txt_2']))
+				return $u['id'];
+			if(!$col = _elemCol($elem_id))
+				return $u['id'];
+			return is_array($u[$col]) ? $u[$col]['id'] : $u['id'];
+		case 69://имя пользователя
+			return $u['user_id_add'];
+	}
 
 	return $u['id'];
-*/
-	return is_array($u[$col]) ? $u[$col]['id'] : $u['id'];
 }
 function _unitUrlId($u, $dlg_id) {//получение id из записи для ссылки
 	if(empty($u))
