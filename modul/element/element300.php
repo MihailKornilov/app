@@ -5,22 +5,7 @@ function _element300_struct($el) {
 	return _elementStruct($el);
 }
 function _element300_print($el, $prm) {
-	$vkRes = '';
-	if($user_id = _elemPrintV($el, $prm, 0)) {
-		$res = _vkapi('users.get', array(
-			'user_ids' => $user_id,
-			'fields' => 'photo,'.
-						'sex,'.
-						'country,'.
-						'city'
-		));
-
-		if(empty($res['response']))
-			$vkRes = '<div class="red">Данные из VK не получены';
-		else
-			$vkRes = _elem300Sel($res['response'][0]);
-	}
-
+	$user_id = _elemPrintV($el, $prm, 0);
 	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
 	return
@@ -28,8 +13,35 @@ function _element300_print($el, $prm) {
 	'<div id="'._elemAttrId($el, $prm).'_vk300" class="_vk300"'._elemStyleWidth($el).'>'.
 		'<div class="icon icon-vk curD'._dn(!$user_id).'"></div>'.
 		'<input type="text" class="w100p'._dn(!$user_id).'"'.$disabled.' />'.
-		'<div class="vk-res">'.$vkRes.'</div>'.
+		'<div class="vk-res">'._elem300vkRes($user_id).'</div>'.
 	'</div>';
+}
+function _element300_print11($el, $u) {
+	if(!$col = _elemCol($el))
+		return '';
+	if(!$vk_id = _num(@$u[$col]))
+		return '';
+	if(!$res = _elem300vkRes($vk_id, true))
+		return '';
+
+	return '<a href="//vk.com/id'.$vk_id.'" target="_blank" class="inhr">'.$res['first_name'].' '.$res['last_name'].'</a>';
+}
+function _elem300vkRes($user_id, $isArr=false) {//данные пользователя из VK
+	if(!$user_id)
+		return $isArr ? array() : '';
+
+	$res = _vkapi('users.get', array(
+		'user_ids' => $user_id,
+		'fields' => 'photo,'.
+					'sex,'.
+					'country,'.
+					'city'
+	));
+
+	if(empty($res['response']))
+		return $isArr ? array() : '<div class="red fs11">Данные из VK не получены</div>';
+
+	return $isArr ? $res['response'][0] : _elem300Sel($res['response'][0]);
 }
 function _elem300Place($res) {//страна и город пользователя ВК
 	$place = array();
