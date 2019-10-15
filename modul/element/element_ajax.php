@@ -870,6 +870,9 @@ function _dialogSetupService($DLG) {
 	'</div>';
 }
 function _dialogSetupServiceCount($DLG) {//количество записей, внесённых диалогом
+	if(!$DLG['table_1'])
+		return '<span class="pale">нет</span>';
+
 	$sql = "SELECT COUNT(*)
 			FROM  "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG, true);
