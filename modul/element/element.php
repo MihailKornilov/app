@@ -952,14 +952,14 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 		array_unshift($dlg_base, array(
 			'id' => -2,
 			'title' => $title,
-			'content' => '<div class="color-ref">'.$title.'</div>'.
+			'content' => '<div class="color-ref b">'.$title.'</div>'.
 						 '<div class="grey fs12">Будет открываться сам же диалог, если выведен список диалогов</div>'
 		));
 		$title = 'SA: всегда создавать новый диалог';
 		array_unshift($dlg_base, array(
 			'id' => -1,
 			'title' => $title,
-			'content' => '<div class="color-ref">'.$title.'</div>'
+			'content' => '<div class="color-ref b">'.$title.'</div>'
 		));
 		return array_merge($dlg_base, $dlg_app_spisok, $dlg_app, $dlg_elem, $dlg_sa);
 	}
@@ -2965,8 +2965,14 @@ function PHP12_action_221($r) {//ЭЛЕМЕНТ: переход на стран�
 function PHP12_action_222($r) {//ЭЛЕМЕНТ: открытие диалога
 	if($r['dialog_id'] != 222)
 		return '';
-	if(!$dlg_id = _num($r['target_ids']))
+	if(!$dlg_id = _num($r['target_ids'], 1))
 		return '<div class="red">Отсутствует id диалога</div>';
+
+	switch($dlg_id) {
+		case -1: return '<div class="color-ref b">SA: всегда создавать новый диалог</div>';
+		case -2: return '<div class="color-ref b">SA: открытие по ID</div>';
+	}
+
 	if(!$DLG = _dialogQuery($dlg_id))
 		return '<div class="red">Диалога не существует</div>';
 
