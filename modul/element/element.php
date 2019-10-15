@@ -948,11 +948,18 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 		return array_merge($dlg_app_spisok);
 
 	if(SA) {
+		$title = 'SA: открывать по ID';
+		array_unshift($dlg_base, array(
+			'id' => -2,
+			'title' => $title,
+			'content' => '<div class="color-ref">'.$title.'</div>'.
+						 '<div class="grey fs12">Будет открываться сам же диалог, если выведен список диалогов</div>'
+		));
 		$title = 'SA: всегда создавать новый диалог';
 		array_unshift($dlg_base, array(
 			'id' => -1,
 			'title' => $title,
-			'content' => '<div class="color-pay">'.$title.'</div>'
+			'content' => '<div class="color-ref">'.$title.'</div>'
 		));
 		return array_merge($dlg_base, $dlg_app_spisok, $dlg_app, $dlg_elem, $dlg_sa);
 	}
