@@ -1038,40 +1038,6 @@ function _dialogIUID($DLG, $unit_id=0) {//присвоение ID сторонн
 	query($sql);
 }
 
-function PHP12_dialog_sa() {//список диалоговых окон [12]
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE !`app_id`
-			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
-		return 'Диалоговых окон нет.';
-
-	$send = '<table class="_stab small">'.
-				'<tr>'.
-					'<th>ID'.
-					'<th>Таблица'.
-					'<th>Имя диалога'.
-					'<th>type'.
-					'<th>afics'.
-					'<th>col';
-	foreach($arr as $r) {
-		$color = '';
-		if(_table($r['table_1']) == '_element')
-			$color = 'b color-pay';
-		if(_table($r['table_1']) == '_action')
-			$color = 'red';
-		$send .= '<tr>'.
-					'<td class="w35 r grey'.($r['sa'] ? ' bg-fee' : '').'">'.$r['id'].
-					'<td class="'.$color.'">'._table($r['table_1']).
-					'<td class="over1 curP dialog-open" val="dialog_id:'.$r['id'].'">'.$r['name'].
-					'<td class="center">'._elemColType($r['element_type']).
-					'<td>'.$r['element_afics'].
-					'<td class="grey">'.PHP12_dialog_col($r['id']);
-	}
-	$send .= '</table>';
-
-	return $send;
-}
 function PHP12_dialog_app() {//список диалоговых окон для конкретного приложения (страница 123)
 	$sql = "SELECT *
 			FROM `_dialog`
