@@ -5756,6 +5756,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		};
 	},
 
+	//ссылка на приглашение для пользователя
+	PHP12_user_invite = function(el) {
+		var INP = _attr_el(el.id).find('input');
+		if(!INP.hasClass('blue'))
+			return;
+		_attr_el(el.id).find('input,.icon').click(function() {
+			INP.select();
+			document.execCommand("copy");
+			_msg('Скопировано в буфер обмена');
+		});
+	},
+
 	_noteCDel = function(t, id) {//удаление комментария
 		var send = {
 			op:'note_comment_del',

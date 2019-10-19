@@ -8,18 +8,14 @@ function _element103_struct($el) {
 function _element103_print($el, $prm) {
 	if(!$u = $prm['unit_get'])
 		if(!$u = $prm['unit_edit'])
-			return _emptyMin('Данные пользователя не получены.');
+			return _emptyMinRed('Данные пользователя не получены.');
 	if(_sa($u['id']))
 		return _empty('SA: Доступны все страницы.');
 	if($u['id'] == _app(APP_ID, 'user_id_add'))
 		return _empty('Создатель приложения: доступны все страницы.');
 
 	//доступные страницы
-	$sql = "SELECT `page_id`
-			FROM `_user_page_access`
-			WHERE `app_id`=".APP_ID."
-			  AND `user_id`=".$u['id'];
-	$ids = _idsAss(query_ids($sql));
+	$ids = _idsAss(_user($u['id'], 'access_pages'));
 
 	$arr = _page('app');
 	$sort = array();
@@ -62,25 +58,20 @@ function _element103spisok($arr, $sort) {//список страниц для н
 }
 function _elem103save($cmp_id, $user_id, $val) {//сохранение доступа к страницам для конкретного пользователя
 	if(!$cmp = _elemOne($cmp_id))
-		return;
+		return false;
 	if($cmp['dialog_id'] != 103)
-		return;
+		return false;
 	if(_sa($user_id))
-		return;
+		return false;
 	//создатель приложения
 	if($user_id == _app(APP_ID, 'user_id_add'))
-		return;
+		return false;
 
-	$sql = "DELETE FROM `_user_page_access`
-			WHERE `app_id`=".APP_ID."
-			  AND `user_id`=".$user_id;
-	query($sql);
-
+	$upd = array();
 	$ass = _idsAss($val);
 	$page = _page();
 
-	if($ids = _ids($val, 'arr')) {
-		$upd = array();
+	if($ids = _ids($val, 'arr'))
 		foreach($ids as $page_id) {
 			if(empty($page[$page_id]))
 				continue;
@@ -98,19 +89,18 @@ function _elem103save($cmp_id, $user_id, $val) {//сохранение дост�
 						continue;
 			}
 
-			$upd[] = "(".APP_ID.",".$user_id.",".$page_id.")";
+			$upd[] = $page_id;
 		}
 
-		if(!empty($upd)) {
-			$sql = "INSERT INTO `_user_page_access`
-						(`app_id`,`user_id`,`page_id`)
-					VALUES ".implode(',', $upd);
-			query($sql);
-		}
-	}
+	$sql = "UPDATE `_user_access`
+			SET `access_pages`='".implode(',', $upd)."'
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".$user_id;
+	query($sql);
 
 	_cache_clear('AUTH_'.CODE, 1);
 	_cache_clear('page');
 	_cache_clear('user'.$user_id);
-	_cache_clear('UserPageAccess'.$user_id);
+
+	return true;
 }

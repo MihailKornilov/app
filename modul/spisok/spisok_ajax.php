@@ -450,6 +450,8 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	_d119_app_clear($dialog);
 	//клонирование приложения [120] - перехват внесения данных
 	_clone_go($dialog, $POST_CMP);
+	//принятие приглашения в приложение [109] - перехват внесения данных
+	_user_invite_submit($dialog);
 
 
 
@@ -528,6 +530,17 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 		_jsCache();
 	}
 
+	//изменены данные пользователя
+	if($dialog['table_name_1'] == '_user')
+		_cache_clear('user'.$unit_id);
+	else {
+		$DLG = $dialog;
+		while($dip = $DLG['dialog_id_parent']) {
+			$DLG = _dialogQuery($dip);
+			if($DLG['table_name_1'] == '_user')
+				_cache_clear('user'.$unit_id);
+		}
+	}
 
 	_app_create($dialog, $unit_id);
 
@@ -966,6 +979,9 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 				query($sql);
 		}
 
+
+
+/*
 	//открытие доступа к новой странице пользователям, если в приложении установлен флаг user_page_access
 	if(APP_ID)
 		if($table_1 == '_page')
@@ -997,6 +1013,8 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 					query($sql);
 				}
 			}
+*/
+
 
 
 	_dialogIUID($DLG, $uid[$table_1]);
@@ -1100,8 +1118,20 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 	foreach($POST_CMP as $cmp_id => $v) {
 		if(!$col = _elemCol($cmp_id))
 			continue;
-		if(!$tab = _queryTN($DLG, $col, 1))
+
+		if(!$tab = _queryTN($DLG, $col, 1)) {
+			//если родительская таблица=`_user`, сохранение её колонок, если есть
+			if($dip && !empty($PAR))
+				if($PAR['table_1'] == 12)
+					if(!_elem103save($cmp_id, $unit_id, $v)) {
+						$sql = "UPDATE `_user_access`
+								SET `".$col."`='".addslashes($v)."'
+								WHERE `user_id`=".$unit_id."
+								  AND `app_id`=".APP_ID;
+						query($sql);
+					}
 			continue;
+		}
 
 		$sql = "UPDATE `".$tab."`
 				SET `".$col."`='".addslashes($v)."'
@@ -1110,7 +1140,6 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 
 		_elem1def($cmp_id, $unit_id, $v);
 		_elem37changeCol($cmp_id, $unit_id);
-		_elem103save($cmp_id, $unit_id, $v);
 	}
 
 	return;

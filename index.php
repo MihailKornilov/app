@@ -11,6 +11,7 @@ _sa();
 _user();
 _jsCacheAppControl();
 _pasDefine();
+_userInviteCookieSave();
 
 
 

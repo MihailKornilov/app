@@ -34,29 +34,20 @@ function _pageCache() {//получение массива страниц из �
 
 	return _cache_set($key, $page);
 }
-function _pageAccess($page_id) {//доступ к странице для конкретного пользователя
+function _pageAccess($page_id) {//доступ к конкретного странице для текущего пользователя
 	if(SA)
 		return true;
 	if(USER_ADMIN)
 		return true;
 
-	$key = 'UserPageAccess'.USER_ID;
+	$u = _user();
+	$ass = _idsAss($u['access_pages']);
 
-	if(!$ass = _cache_get($key)) {
-		$sql = "SELECT `page_id`,1
-				FROM `_user_page_access`
-				WHERE `app_id`=".APP_ID."
-				  AND `user_id`=".USER_ID;
-		$ass = query_ass($sql);
-
-		//разрешение страниц, видимых всем пользователям
-		foreach(_page() as $id => $p)
-			if($p['dialog_id'] == 101)
-				if(!$p['sa'] && !$p['creator'])
-					$ass[$id] = 1;
-
-		_cache_set($key, $ass);
-	}
+	//разрешение страниц, видимых всем пользователям
+	foreach(_page() as $id => $p)
+		if($p['dialog_id'] == 101)
+			if(!$p['sa'] && !$p['creator'])
+				$ass[$id] = 1;
 
 	return !empty($ass[$page_id]);
 }
@@ -144,7 +135,7 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		if(USER_ADMIN)
 			return 7;
 
-		return 105;
+		return 14;
 	}
 
 	//является ли страница родительской относительно текущей
@@ -312,22 +303,19 @@ function _pageInfo() {//информация о странице
 function PHP12_page_access_for_user_view($prm) {//отображение страниц, доступных пользователю
 	if(!$u = $prm['unit_get'])
 		return _emptyMin10('Данные пользователя не получены.');
-
 	if(_sa($u['id']))
 		return _emptyMin('SA: Доступны все страницы.');
 	if($u['id'] == _app(APP_ID, 'user_id_add'))
 		return _emptyMin('Создатель приложения: доступны все страницы.');
 
+	$user = _user($u['id']);
+
 	//доступ в приложение
-	if(!$u['num_1'])
+	if(!$user['access_enter'])
 		return _emptyRed10('Вход в приложение запрещён.');
 
 	//доступные страницы
-	$sql = "SELECT `page_id`
-			FROM `_user_page_access`
-			WHERE `app_id`=".APP_ID."
-			  AND `user_id`=".$u['id'];
-	$ids = _idsAss(query_ids($sql));
+	$ids = _idsAss($user['access_pages']);
 
 	$page = _page('app');
 	foreach($page as $id => $r)
@@ -367,14 +355,13 @@ function PHP12_page_access_for_user_view_spisok($arr, $parent_id=0) {//спис�
 function PHP12_app_enter_for_all_user() {//настройка входа в приложение всем пользователям
 	$sql = "SELECT
 				`u`.*,
-				`sp`.`num_1`
+				`ua`.`access_enter`
 			FROM
 				`_user` `u`,
-				`_spisok` `sp`
-			WHERE `sp`.`app_id`=".APP_ID."
-			  AND `u`.`id`=`sp`.`cnn_id`
-			  AND `sp`.`dialog_id`=111
-			ORDER BY `sp`.`dtime_add`";
+				`_user_access` `ua`
+			WHERE `ua`.`app_id`=".APP_ID."
+			  AND `u`.`id`=`ua`.`user_id`
+			ORDER BY `ua`.`id`";
 	if(!$user = query_arr($sql))
 		return _emptyMin10('Сотрудников нет.');
 
@@ -387,7 +374,7 @@ function PHP12_app_enter_for_all_user() {//настройка входа в пр
 				'<td class="w35">'.
 					_check(array(
 						'attr_id' => 'allAcc_'.$r['id'],
-						'value' => $r['num_1']
+						'value' => $r['access_enter']
 					));
 
 	$send .= '</table>';
@@ -395,19 +382,16 @@ function PHP12_app_enter_for_all_user() {//настройка входа в пр
 	return $send;
 }
 function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохранение доступа в приложение для всех пользователей
-	$sql = "UPDATE `_spisok`
-			SET `num_1`=0
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=111
-			  AND `cnn_id`";
+	$sql = "UPDATE `_user_access`
+			SET `access_enter`=0
+			WHERE `app_id`=".APP_ID;
 	query($sql);
 
 	if($ids = _ids($val)) {
-		$sql = "UPDATE `_spisok`
-				SET `num_1`=1
+		$sql = "UPDATE `_user_access`
+				SET `access_enter`=1
 				WHERE `app_id`=".APP_ID."
-				  AND `dialog_id`=111
-				  AND `cnn_id` IN (".$ids.")";
+				  AND `user_id` IN (".$ids.")";
 		query($sql);
 	}
 
@@ -421,12 +405,10 @@ function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохране�
 	_cache_clear('page');
 
 	$sql = "SELECT *
-			FROM `_spisok`
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=111
-			  AND `cnn_id`";
+			FROM `_user_access`
+			WHERE `app_id`=".APP_ID;
 	foreach(query_arr($sql) as $r)
-		_cache_clear('user'.$r['cnn_id']);
+		_cache_clear('user'.$r['user_id']);
 }
 
 
@@ -435,7 +417,7 @@ function _pageShow($page_id) {
 	define('PAGE_MSG_ERR', '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>');
 
 	//нет доступа в приложение
-	if(!SA && APP_ID && !APP_ACCESS)
+	if(!SA && APP_ID && !APP_ACCESS_ENTER)
 		$page_id = 105;
 
 	//требуется ввод пин-кода
@@ -454,7 +436,7 @@ function _pageShow($page_id) {
 		return _document();
 
 	//если доступ в приложение есть, но попали на страницу о недоступности, то переход на стартовую страницу
-	if($page_id == 105 && APP_ID && APP_ACCESS)
+	if($page_id == 105 && APP_ID && APP_ACCESS_ENTER)
 		$page_id = _page('def');
 
 	if(!$page = _page($page_id))
@@ -503,6 +485,7 @@ function _pageShowScript($page_id, $prm) {
 		_pageDlgOpenAuto()
 	: '').
 		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.
+		_userInviteDlgOpen().
 	'</script>';
 }
 function _pageUnitGet($obj_name, $obj_id) {//получение данных записи, которые принимает страница (для отображения в настройке страницы)
@@ -753,8 +736,6 @@ function _page_div() {//todo тест
 		'PAGE_ID='._page('cur').
 		'<br>'.
 		'APP_ID='.APP_ID.
-		'<br>'.
-		'APP_ACCESS='.APP_ACCESS.
 	'</div>';
 
 

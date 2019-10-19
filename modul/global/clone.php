@@ -10,7 +10,7 @@ function PHP12_app_clear_list() {//список данных, которые б�
 		_app_clear_td('_history_edited').
 		_app_clear_td('_user_spisok_filter').
 		_app_clear_td('_page').
-		_app_clear_td('_user_page_access').
+		_app_clear_td('_user_access').
 		_app_clear_td('_block').
 		_app_clear_td('_element').
 		_app_clear_td('_hint').
@@ -38,6 +38,10 @@ function _app_clear_td($tab) {//значение TD конкретной таб�
 function _d119_app_clear($DLG) {//очистка приложения - удаление всех данных
 	if($DLG['id'] != 119)
 		return;
+
+	jsonError('Требуется переделка функции');
+
+
 	if(!SA)
 		jsonError('Нет прав');
 	if(APP_IS_PID)
@@ -45,7 +49,7 @@ function _d119_app_clear($DLG) {//очистка приложения - удал
 
 	_appDel();
 
-	_app_user_access(APP_ID);
+//	_app_user_access(APP_ID);
 
 	_cache_clear('AUTH_'.CODE, 1);
 	_cache_clear('user'.USER_ID);
@@ -88,8 +92,8 @@ function _appDel($app_id=APP_ID) {
 			WHERE `app_id`=".$app_id;
 	query($sql);
 
-	//удаление доступа к страницам
-	$sql = "DELETE FROM `_user_page_access`
+	//удаление доступа к приложению
+	$sql = "DELETE FROM `_user_access`
 			WHERE `app_id`=".$app_id;
 	query($sql);
 
@@ -188,6 +192,10 @@ function PHP12_clone_on() {//получение диалогов, данные �
 function _clone_go($DLG, $CMP) {
 	if($DLG['id'] != 120)
 		return;
+
+	jsonError('Треуется переделка фукнции');
+
+
 	if(!SA)
 		jsonError('Нет прав');
 
@@ -212,7 +220,7 @@ function _clone_go($DLG, $CMP) {
 	$app_id = query_id($sql);
 
 	_clone($app_id);
-	_app_user_access($app_id);
+//	_app_user_access($app_id);
 
 	$send = array(
 		'action_id' => 2,

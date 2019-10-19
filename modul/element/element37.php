@@ -35,6 +35,11 @@ function _element37_vvv($el, $prm) {
 		//если таблицы одинаковые, отправка только родительских колонок
 		if(!$dlg['table_1'] || $dlg['table_1'] == $PAR['table_1'])
 			return $field;
+		//если диалог=`_user`, добавляются колонки из `_user_access`
+		if($PAR['table_1'] == 12) {
+			$DLG108 = _dialogQuery(108);
+			$field = _elemVvv37field($DLG108, $uCol, $field);
+		}
 	}
 
 	$field = _elemVvv37field($dlg, $uCol, $field);
@@ -109,7 +114,12 @@ function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по ка
 //		'dtime_add' => 1,
 		'dtime_del' => 1,
 		'dtime_create' => 1,
-		'app_id_last' => 1
+		'app_id_last' => 1,
+
+//		'access_pages' => 1,
+		'url_last' => 1,
+		'invite_hash' => 1,
+		'invite_user_id' => 1
 	);
 
 	foreach($dlg['field1'] as $col => $k) {

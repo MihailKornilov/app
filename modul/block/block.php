@@ -316,8 +316,8 @@ function _blockAction($r, $prm) {//действие при нажатии на �
 						FROM `_template`
 						WHERE `app_id`=".APP_ID."
 						  AND `id`="._num($act['target_ids']);
-				if($doc = query_assoc($sql))
-					$uid = _unitUrlId($u, $doc['spisok_id']);
+//				if($doc = query_assoc($sql))
+//					$uid = _unitUrlId($u, $doc['spisok_id']);
 			}
 		}
 	}

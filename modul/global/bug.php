@@ -59,9 +59,8 @@ function _bug_script($prm) {
 /* ---=== ПОЛЬЗОВАТЕЛИ ===--- */
 function PHP12_bug_user($prm) {
 	$sql = "SELECT COUNT(*)
-			FROM `_spisok`
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=111";
+			FROM `_user_access`
+			WHERE `app_id`=".APP_ID;
 	$USER = query_value($sql);
 
 	return
@@ -232,11 +231,7 @@ function PHP12_bug_page_user_access($PG) {//Доступ к страницам �
 	if(empty($PG))
 		return '';
 
-	$sql = "SELECT COUNT(*)
-			FROM `_user_page_access`
-			WHERE `app_id`=".APP_ID."
-			  AND `page_id` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return '';
 }
 
 

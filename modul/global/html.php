@@ -56,13 +56,13 @@ function _auth() {//получение данных об авторизации 
 				WHERE `code`='".addslashes(CODE)."'
 				LIMIT 1";
 		if($r = query_assoc($sql)) {
-			$u = _userApp($r['app_id'], $r['user_id']);
-			$r['access'] = _num(@$u['num_1']);
+			$UAA = _userAppAccess($r['user_id'], $r['app_id']);
+			$r['access_enter'] = _num($UAA['access_enter']);
 
 			$data = array(
 				'user_id' => $r['user_id'],
 				'app_id' => $r['app_id'],
-				'access' => $r['access']
+				'access_enter' => $r['access_enter']
 			);
 
 			_cache_set($key, $data, 1);
@@ -81,7 +81,7 @@ function _auth() {//получение данных об авторизации 
 
 	define('APP_PARENT', $PID);
 	define('APP_IS_PID', APP_ID && APP_ID != APP_PARENT);//приложение наследует родителя
-	define('APP_ACCESS', _num(@$r['access']));
+	define('APP_ACCESS_ENTER', _num(@$r['access_enter']));
 }
 function _authLoginIframe() {//проверка авторизации через iframe
 	if(!IFRAME)
@@ -551,36 +551,27 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 	//ID созданного приложения в таблице _app
 	if(!$app_id)
 		return;
-	if(_userApp($app_id))
+
+	$sql = "SELECT COUNT(*)
+			FROM `_user_access`
+			WHERE `app_id`=".$app_id."
+			  AND `user_id`=".USER_ID;
+	if(query_value($sql))
 		return;
 
-	_app_user_access($app_id);
-
-	_cache_clear('AUTH_'.CODE, 1);
-	_cache_clear('page');
-	_cache_clear('user'.USER_ID);
-
-	_auth();
-}
-function _app_user_access($app_id) {//внесение доступа для пользователя после создания нового приложения
-	$sql = "INSERT INTO `_spisok` (
-				`app_id`,
-				`dialog_id`,
-				`cnn_id`,
-				`num_1`     /* доступ в приложение */
-			) VALUES (
-				".$app_id.",
-				111,
-				".USER_ID.",
-				1
-			)";
-	query($sql);
+	_userAppAccessCreate($app_id);
 
 	//изменение текущего приложения на новое
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=".$app_id."
 			WHERE `code`='".CODE."'";
 	query($sql);
+
+	_cache_clear('AUTH_'.CODE, 1);
+	_cache_clear('page');
+	_cache_clear('user'.USER_ID);
+
+	_auth();
 }
 function _app_list() {//список приложений, которые доступны пользователю
 	if(!USER_ID)
@@ -589,18 +580,13 @@ function _app_list() {//список приложений, которые дос
 	unset($_SESSION[PIN_KEY]);
 
 	$sql = "SELECT *
-			FROM `_spisok`
-			WHERE `cnn_id`=".USER_ID."
-			  AND `dialog_id`=111
-			  AND !`deleted`
-			ORDER BY `dtime_add`";
+			FROM `_user_access`
+			WHERE `user_id`=".USER_ID."
+			ORDER BY `id`";
 	if(!$spisok = query_arr($sql))
 		return
 			'<div class="center pad30 color-555 fs15">'.
 				'Доступных приложений нет.'.
-				'<br>'.
-				'<br>'.
-		 (SA ? '<button class="vk green dialog-open" val="dialog_id:100">Создать приложение</div>' : '').
 			'</div>';
 
 	$send = '';
@@ -624,36 +610,13 @@ function _app_content() {//центральное содержание
 	if(!USER_ID)
 		return '';
 
-	$page_id = _page('cur');//_app_page_get();
+	$page_id = _page('cur');
 	_userActive($page_id);
 
 	return
 	'<div id="_content" class="block-content-page '.SITE.'">'.
 		_pageShow($page_id).
 	'</div>';
-}
-function _app_page_get() {//обновление текущей страницы, которую посетил пользователь, либо её получение, если повторный вход в программу
-	if(!APP_ID)
-		return _page('cur');
-
-	if($pid = _num(@$_GET['p'])) {
-		$sql = "UPDATE `_spisok`
-				SET `num_8`=".$pid.",
-					`num_9`="._num(@$_GET['id'])."
-				WHERE `app_id`=".APP_ID."
-				  AND `cnn_id`=".USER_ID;
-		query($sql);
-		return _page('cur');
-	}
-
-	$u = _userApp();
-	if(!$u['num_8'])
-		return _page('cur');
-
-	$_GET['p'] = $u['num_8'];
-	$_GET['id'] = $u['num_9'];
-
-	return $u['num_8'];
 }
 
 function _contentMsg($msg='') {

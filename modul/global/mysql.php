@@ -213,6 +213,15 @@ function _queryCol($DLG) {//получение колонок, для котор
 				$field[] = "IF(`".$col."`,1,'') `".$col."`";
 			else
 				$field[] = _queryColReq($DLG, $col);
+
+			//если родительская таблица=`_user`, прикрепление колонок `_user_access`
+			if($PAR['table_1'] == 12) {
+				$field[] = "`t3`.`access_enter`";
+				$field[] = "`t3`.`access_admin`";
+				$field[] = "`t3`.`access_task`";
+				$field[] = "`t3`.`access_pages`";
+				$field[] = "`t3`.`user_hidden`";
+			}
 		}
 	}
 
@@ -255,10 +264,13 @@ function _queryFrom($DLG) {//составление таблиц для запр
 	if($parent_id = $DLG['dialog_id_parent']) {
 		$PAR = _dialogQuery($parent_id);
 		$send = "`".$PAR['table_name_1']."` `t1` /* Таблица-родитель */";
-		if($PAR['table_1'] != $DLG['table_1'])
+		if($PAR['table_1'] != $DLG['table_1']) {
 			$send .= ",`".$DLG['table_name_1']."` `t2`";
+			//если родительская таблица=`_user`, прикрепление таблицы `_user_access`
+			if($PAR['table_1'] == 12)
+				$send .= ",`_user_access` `t3`";
+		}
 	}
-
 
 	define($key, $send);
 
@@ -275,11 +287,15 @@ function _queryWhere($DLG, $withDel=0) {//составление условий 
 	//если присутствует родительский диалог и разные таблицы, происходит связка через `cnn_id`
 	if($parent_id = $DLG['dialog_id_parent']) {
 		$PAR = _dialogQuery($parent_id);
-		if($PAR['table_1'] != $DLG['table_1'])
-			if(isset($PAR['field1']['cnn_id']))
-				$send[] = "`t1`.`cnn_id`=`t2`.`id`";
-			elseif(isset($DLG['field1']['cnn_id']))
-				$send[] = "`t2`.`cnn_id`=`t1`.`id`";
+		if($PAR['table_1'] != $DLG['table_1']) {
+			$send[] = "`t2`.`cnn_id`=`t1`.`id`";
+			//если родительская таблица=`_user`, добавление условий для `_user_access`
+			if($PAR['table_1'] == 12) {
+				$send[] = "`t3`.`user_id`=`t1`.`id`";
+				$send[] = "`t3`.`app_id`=".APP_ID;
+			}
+
+		}
 	}
 
 	if(!$withDel)
