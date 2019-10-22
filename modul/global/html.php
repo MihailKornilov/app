@@ -56,8 +56,8 @@ function _auth() {//получение данных об авторизации 
 				WHERE `code`='".addslashes(CODE)."'
 				LIMIT 1";
 		if($r = query_assoc($sql)) {
-			$UAA = _userAppAccess($r['user_id'], $r['app_id']);
-			$r['access_enter'] = _num($UAA['access_enter']);
+			$UAA = _userAppAccessGet($r['user_id'], $r['app_id']);
+			$r['access_enter'] = _num(@$UAA['access_enter']);
 
 			$data = array(
 				'user_id' => $r['user_id'],
@@ -185,18 +185,6 @@ function _authLogout() {//выход из приложения, если тре�
 	_cache_clear('page');
 	_cache_clear('user'.USER_ID);
 	setcookie('page_setup', '', time() - 1, '/');
-
-/*
-	//выход только из приложения и попадание в список приложений
-	if(APP_ID) {
-		$sql = "UPDATE `_user_auth`
-				SET `app_id`=0
-				WHERE `code`='".CODE."'";
-		query($sql);
-		header('Location:'.URL);
-		exit;
-	}
-*/
 
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes(CODE)."'";
 	query($sql);
@@ -552,14 +540,8 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 	if(!$app_id)
 		return;
 
-	$sql = "SELECT COUNT(*)
-			FROM `_user_access`
-			WHERE `app_id`=".$app_id."
-			  AND `user_id`=".USER_ID;
-	if(query_value($sql))
+	if(!_userAppAccessCreate($app_id))
 		return;
-
-	_userAppAccessCreate($app_id);
 
 	//изменение текущего приложения на новое
 	$sql = "UPDATE `_user_auth`

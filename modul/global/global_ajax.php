@@ -5,10 +5,8 @@ switch(@$_POST['op']) {
 			jsonError('Вход может осуществляться только на сайт');
 		if(!$app_id = _num($_POST['app_id']))
 			jsonError('Некорректный ID приложения');
-
-		$UAA = _userAppAccess(USER_ID, $app_id);
-		if(!$UAA['access_id'])
-			jsonError('Пользователя не существует');
+		if(!_userAppAccessGet(USER_ID, $app_id))
+			jsonError('Отсутствует регистрация в этом приложении');
 
 		$sql = "UPDATE `_user_auth`
 				SET `app_id`=".$app_id."

@@ -70,7 +70,15 @@ function _userCache($user_id) {//кеширование данных польз�
 			$u['src'] = _imageServer($img['server_id']).$img['80_name'];
 	}
 
-	$u = _userAppAccess($user_id) + $u;
+	$u['access_id'] = 0;    //идентификатор строки прав
+	$u['access_enter'] = 0; //вход в приложение
+	$u['access_admin'] = 0; //администрирование приложения
+	$u['access_task'] = 0;  //доступ к задачам
+	$u['access_pages'] = '';//доступные страницы в приложении
+	$u['user_hidden'] = 0;  //скрытый пользователь
+	$u['invite_hash'] = ''; //код для приглашения
+
+	$u = _userAppAccessGet($user_id) + $u;
 
 	//обновление активности в приложении
 	if($user_id == USER_ID) {
@@ -83,13 +91,12 @@ function _userCache($user_id) {//кеширование данных польз�
 
 	return _cache_set($key, $u);
 }
-function _userAppAccessCreate($app_id, $invite_id=0) {//создание записей для прав доступа для текущего пользователя к приложению. Если отсутствуют, то создание
+function _userAppAccessCreate($app_id, $user_id=USER_ID, $invite_id=0) {//создание записей для прав доступа для пользователя к приложению. Если отсутствуют, то создание
+	//флаг создания прав для пользователя. Если права уже были созданы ранее, возвращается ноль
+	$UA_CREATED = false;
+
 	//права доступа пользователя к приложению
-	$sql = "SELECT COUNT(*)
-			FROM `_user_access`
-			WHERE `app_id`=".$app_id."
-			  AND `user_id`=".USER_ID;
-	if(!query_value($sql)) {
+	if(!_userAppAccessGet($user_id, $app_id)) {
 		$sql = "INSERT INTO `_user_access` (
 					`app_id`,
 					`user_id`,
@@ -97,19 +104,20 @@ function _userAppAccessCreate($app_id, $invite_id=0) {//создание зап�
 					`invite_user_id`
 				) VALUES (
 					".$app_id.",
-					".USER_ID.",
+					".$user_id.",
 					1,
 					".$invite_id."
 				)";
 		query($sql);
+		$UA_CREATED = true;
 	}
 
-	//дополнительне параметры в приложении
+	//дополнительное параметры в приложении
 	$sql = "SELECT COUNT(*)
 			FROM `_spisok`
 			WHERE `app_id`=".$app_id."
 			  AND `dialog_id`=111
-			  AND `cnn_id`=".USER_ID."
+			  AND `cnn_id`=".$user_id."
 			  AND !`deleted`";
 	if(!query_value($sql)) {
 		$sql = "INSERT INTO `_spisok` (
@@ -119,23 +127,16 @@ function _userAppAccessCreate($app_id, $invite_id=0) {//создание зап�
 				) VALUES (
 					".$app_id.",
 					111,
-					".USER_ID."
+					".$user_id."
 				)";
 		query($sql);
 	}
+
+	return $UA_CREATED;
 }
-function _userAppAccess($user_id, $app_id=APP_ID) {//права пользователя в приложении
-	$send['access_id'] = 0;    //идентификатор строки прав
-
-	$send['access_enter'] = 0; //вход в приложение
-	$send['access_admin'] = 0; //администрирование приложения
-	$send['access_task'] = 0;  //доступ к задачам
-	$send['access_pages'] = '';//доступные страницы в приложении
-	$send['user_hidden'] = 0;  //скрытый пользователь
-	$send['invite_hash'] = ''; //код для приглашения
-
+function _userAppAccessGet($user_id, $app_id=APP_ID) {//права пользователя в приложении
 	if(!$app_id)
-		return $send;
+		return array();
 
 	$sql = "SELECT
 				`id` `access_id`,
@@ -150,6 +151,22 @@ function _userAppAccess($user_id, $app_id=APP_ID) {//права пользова
 			  AND `user_id`=".$user_id."
 			LIMIT 1";
 	return _arrNum(query_assoc($sql));
+}
+function _userAppAccessDel($DLG, $user_id) {//удаление прав пользователя из текущего приложения
+	if(!$pid = $DLG['dialog_id_parent'])
+		return;
+	if(!$PAR = _dialogQuery($pid))
+		return;
+	if($PAR['table_name_1'] != '_user')
+		return;
+
+	$sql = "DELETE FROM `_user_access`
+			WHERE `app_id`=".APP_ID."
+			  AND `user_id`=".$user_id;
+	query($sql);
+
+//	_cache_clear('page');
+	_cache_clear('user'.$user_id);
 }
 function _userVkUpdate($vk_id) {//Обновление пользователя из Контакта
 	if(LOCAL)
@@ -438,11 +455,7 @@ function _userInviteDlgOpen() {//автоматическое открытие �
 		return '';
 
 	//проверка, существует ли пользователь приложении
-	$sql = "SELECT COUNT(*)
-			FROM `_user_access`
-			WHERE `app_id`=".$r['app_id']."
-			  AND `user_id`=".USER_ID;
-	if(query_value($sql))
+	if(_userAppAccessGet(USER_ID, $r['app_id']))
 		return '';
 
 	//сохранение флага принятия приглашения
@@ -479,16 +492,10 @@ function _user_invite_submit($DLG) {//принятие приглашения
 		jsonError('Этого приглашения не существует.');
 
 	//проверка, существует ли пользователь приложении
-	$sql = "SELECT COUNT(*)
-			FROM `_user_access`
-			WHERE `app_id`=".$r['app_id']."
-			  AND `user_id`=".USER_ID;
-	if(query_value($sql))
+	if(!_userAppAccessCreate($r['app_id'], USER_ID, $r['user_id']))
 		jsonError('У вас уже есть доступ к приложению.');
 
 	setcookie('invite_submit', $hash, time()-1, '/');
-
-	_userAppAccessCreate($r['app_id'], $r['user_id']);
 
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=".$r['app_id']."

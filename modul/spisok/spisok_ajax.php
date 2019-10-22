@@ -34,8 +34,11 @@ switch(@$_POST['op']) {
 					WHERE "._queryWhere($dialog)."
 					  AND `t1`.`id`=".$unit_id;
 			query($sql);
+
+			_userAppAccessDel($dialog, $unit_id);
 			_historyInsert(3, $dialog, $unit_id);
 			_counterGlobal($dialog['id'], $dialog);
+
 			$unit['deleted'] = 1;
 			_SUN_AFTER($dialog, $unit);
 		} else {
@@ -788,6 +791,10 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 	if($table_2) {
 		$sql = "INSERT INTO `".$table_2."` (`cnn_id`) VALUES (".$uid[$table_1].")";
 		$uid[$table_2] = query_id($sql);
+
+		//если родительская таблица=`_user`, внесение записи для `_user_access`
+		if($table_1 == '_user')
+			_userAppAccessCreate(APP_ID, $uid[$table_1]);
 	}
 
 	/* ---=== Обновление обязательных колонок для обеих таблиц ===--- */
