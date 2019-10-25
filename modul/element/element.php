@@ -589,7 +589,8 @@ function _dialogParam($dialog_id, $param) {//получение конкретн
 }
 function _dialogParent($dialog) {//получение диалога, отвечающего за внесение записи
 	while($parent_id = $dialog['dialog_id_parent']) {
-		$PAR = _dialogQuery($parent_id);
+		if(!$PAR = _dialogQuery($parent_id))
+			break;
 
 		//диалог может быть родительским во всех приложениях
 		//в таком случае диалогом списка становится его первый последователь

@@ -727,6 +727,13 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 		VALUE = v;
 		t.val(v);
 		INP.val(MASS_ASS[v] ? String(MASS_ASS[v]).replace(/&quot;/g,'"') : '');
+
+		if(v && !MASS_ASS[v])
+			INP.val('Несуществующее значение ' + v)
+			   .addClass('red');
+		else
+			INP.removeClass('red');
+
 		ICON_DEL._dn(v && o.write);
 		if(BG_ASS[v]) {
 			SEL.css('background-color', BG_ASS[v]);
