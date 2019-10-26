@@ -592,12 +592,12 @@ function _dialogParent($dialog) {//получение диалога, отвеч
 		if(!$PAR = _dialogQuery($parent_id))
 			break;
 
+		$dialog = $PAR;
+
 		//диалог может быть родительским во всех приложениях
 		//в таком случае диалогом списка становится его первый последователь
 		if($PAR['parent_any'])
 			break;
-
-		$dialog = $PAR;
 	}
 	return $dialog;
 }

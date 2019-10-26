@@ -1103,8 +1103,6 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 	if(empty($POST_CMP))
 		return;
 
-	$DLG = _dialogParent($DLG);
-
 	$uid[$DLG['table_name_1']] = $unit_id;
 
 	//при наличии двух таблиц главной первой становится родительская
@@ -1147,17 +1145,6 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 
 		_elem1def($cmp_id, $unit_id, $v);
 		_elem37changeCol($cmp_id, $unit_id);
-	}
-
-	return;
-
-	//изменение элемента из временного в постоянный после использования предварительной вставки (функция _dialogOpenPreLoad)
-	if(IS_ELEM) {
-		$sql = "UPDATE `_element`
-				SET `user_id_add`=".USER_ID."
-				WHERE `id`=".$unit_id."
-				  AND `user_id_add`=-".USER_ID;
-		query($sql);
 	}
 }
 function _SUN_OTHER($arr) {//внесение данных из других диалогов

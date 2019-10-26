@@ -250,7 +250,55 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 	return
 		'<ol>'.$send.'</ol>';
 }
+function _element23_template_docx($ELEM, $u) {
+	if(!$dialog_id = $ELEM['num_1'])
+		return DEBUG ? '[23] Не указан список для вывода данных.' : '';
+	if(!$DLG = _dialogQuery($dialog_id))
+		return DEBUG ? '[23] Списка <b>'.$dialog_id.'</b> не существует.' : '';
 
+	$limit = $ELEM['num_2'];
+	$SC = $ELEM['num_6'] ? 'DESC' : 'ASC';
+	$order = "`t1`.`id`";
+	if($tab = _queryTN($DLG, 'dtime_add'))
+		$order = "`".$tab."`.`dtime_add`";
+	$IS_SORT = false;
+
+	switch($ELEM['num_8']) {
+		//по дате внесения
+		default:
+		case 6159: break;
+		//по значению из диалога
+		case 6160:
+			if(!$col = _elemCol($ELEM['num_10']))
+				break;
+			if($tab = _queryTN($DLG, $col))
+				$order = "`".$tab."`.`".$col."`";
+			break;
+		//ручная сортировка
+		case 6161:
+			$IS_SORT = true;
+			$order = "`sort`";
+			$limit = 1000;  //если включена сортировка, количество максимальное
+			$SC = 'ASC';
+			break;
+	}
+
+	//получение данных списка
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG).
+					_40cond($ELEM, $ELEM['txt_2'])."
+			ORDER BY ".$order." ".$SC."
+			LIMIT ".$limit;
+	$spisok = query_arr($sql);
+
+	$send = '';
+	foreach($spisok as $r) {
+		$send .= $r['id']."\n";
+	}
+
+	return $sql;
+}
 
 
 /* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ [23] ===--- */

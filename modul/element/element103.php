@@ -1,10 +1,7 @@
 <?php
 
 /* [103] Настройка доступа к страницам */
-function _element103_struct($el) {
-	return array(
-	) + _elementStruct($el);
-}
+
 function _element103_print($el, $prm) {
 	if(!$u = $prm['unit_get'])
 		if(!$u = $prm['unit_edit'])

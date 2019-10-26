@@ -1457,8 +1457,6 @@ function _dialogOpenLoad($dialog_id) {
 		}
 	}
 
-	_dialogOpenPreLoad($dialog_id);
-
 	/* --- Редактирование записи --- */
 	if($edit_id = _num(@$_POST['edit_id'])) {
 		$send['head'] = $dialog['edit_head'];
@@ -1466,7 +1464,7 @@ function _dialogOpenLoad($dialog_id) {
 		if(!$dialog['edit_on'])
 			return _dialogOpenErr($send, 'Редактирование записи запрещено.');
 		if(!$prm['unit_edit'] = _spisokUnitQuery($dialog, $edit_id))
-			return _dialogOpenErr($send, 'Записи '.$edit_id.' не существует.');
+			return _dialogOpenErr($send, 'Записи '.$dialog['id'].':'.$edit_id.' не существует.');
 
 		$send['edit_id'] = $edit_id;
 		$send['unit'] = $prm['unit_edit'];
@@ -1512,61 +1510,6 @@ function _dialogOpenLoad($dialog_id) {
 	$send['srce'] = $prm['srce'];
 
 	return $send;
-}
-function _dialogOpenPreLoad($dialog_id) {//предварительное внесение элемента, который использует доп.параметры. Нужно для возможности сразу настраивать доп.параметры
-	return;
-
-	//удаление элементов, которые в итоге не были вставлены после использования предварительной вставки
-	$sql = "DELETE FROM `_element`
-			WHERE `app_id`=".APP_ID."
-			  AND `dialog_id`=".$dialog_id."
-			  AND `user_id_add`=-".USER_ID;
-	query($sql);
-
-	if($_POST['edit_id'])
-		return;
-
-	//важное условие - только при вставке в блок
-	if(!$block_id = _num($_POST['block_id']))
-		return;
-
-	//только для некоторых элементов
-	switch($dialog_id) {
-		case 23: //список-таблица
-		case 44: //сборный текст
-			break;
-		//--- пока нет возможности
-		case 14: //список-шаблон
-		case 62: //фильтр: галочка
-		case 74: //фильтр: радио
-		case 102://фильтр: выбор нескольких групп значений
-		default: return;
-	}
-
-	//получение значения по умолчанию
-	$name = '';
-	$DLG = _dialogQuery($dialog_id);
-	foreach($DLG['cmp'] as $cmp)
-		if($cmp['col'] == 'name') {
-			$name = $cmp['txt_2'];
-			break;
-		}
-
-	//предварительная вставка определяется по отрицательному значению id пользователя, который вносит элемент
-	$sql = "INSERT INTO `_element` (
-				`app_id`,
-				`dialog_id`,
-				`name`,
-				`block_id`,
-				`user_id_add`
-			) VALUES (
-				".APP_ID.",
-				".$dialog_id.",
-				'".$name."',
-				".$block_id.",
-				-".USER_ID."
-			)";
-	$_POST['edit_id'] = query_id($sql);
 }
 function _dialogOpenUnitDelHtml($dialog, $unit) {//содержание диалога при удалении единицы списка
 	if(!$block = _BE('block_obj', 'dialog_del', $dialog['id']))
