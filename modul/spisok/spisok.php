@@ -563,9 +563,6 @@ function _spisokUnitQuery($dialog, $unit_id, $nosuq=false) {//получение
 	if(!$nosuq && isset($SUQ[$key]))
 		return $SUQ[$key];
 
-	//поиск диалога, который вносит данные именно для этой записи
-	$dialog = _dialogParent($dialog);
-
 	if(!$dialog['table_1'])
 		return array();
 
