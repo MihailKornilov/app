@@ -74,6 +74,7 @@ function _userCache($user_id) {//кеширование данных польз�
 	$u['access_enter'] = 0; //вход в приложение
 	$u['access_admin'] = 0; //администрирование приложения
 	$u['access_task'] = 0;  //доступ к задачам
+	$u['access_manual'] = 0;  //доступ к задачам
 	$u['access_pages'] = '';//доступные страницы в приложении
 	$u['user_hidden'] = 0;  //скрытый пользователь
 	$u['invite_hash'] = ''; //код для приглашения
@@ -143,6 +144,7 @@ function _userAppAccessGet($user_id, $app_id=APP_ID) {//права пользо�
 				`access_enter`,
 				`access_admin`,
 				`access_task`,
+				`access_manual`,
 				`access_pages`,
 				`user_hidden`,
 				`invite_hash`

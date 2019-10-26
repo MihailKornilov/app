@@ -219,6 +219,7 @@ function _queryCol($DLG) {//получение колонок, для котор
 				$field[] = "`t3`.`access_enter`";
 				$field[] = "`t3`.`access_admin`";
 				$field[] = "`t3`.`access_task`";
+				$field[] = "`t3`.`access_manual`";
 				$field[] = "`t3`.`access_pages`";
 				$field[] = "`t3`.`user_hidden`";
 			}
