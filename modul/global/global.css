@@ -113,7 +113,7 @@ body:not(.site){position:relative}
 .icon-set-b  {background-position-x:-120px}/* настройки: большая шестерёнка */
 .icon-off    {background-position-x:-140px}/* мусорная корзина */
 .icon-offf   {background-position-x:-160px}/* мусорный контейнер */
-.icon-doc-add{background-position-x:-180px}/* новый документ */
+.icon-doc    {background-position-x:-180px}/* новый документ */
 .icon-order  {background-position-x:-200px}/* тележка из маркета */
 .icon-client {background-position-x:-220px}/* бюст человечка */
 .icon-worker {background-position-x:-240px}/* сотрудник - бюст человечка в галстуке*/
