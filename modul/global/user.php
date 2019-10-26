@@ -19,7 +19,9 @@ function _user($user_id=USER_ID, $i='ass') {//получение данных о
 		return array();
 
 	if(!defined('USER_NAME')) {
-		define('USER_ADMIN', _userAdmin());//создатель приложения
+		define('USER_ADMIN', $u['access_admin']);    //администратор приложения
+		define('USER_ACCESS_TASK', $u['access_task']);//доступ к задачам
+		define('USER_ACCESS_MANUAL', $u['access_manual']);//доступ к задачам
 		define('USER_NAME', $u['i']);//Имя
 		define('USER_NAME_FAM', $u['i'].' '.$u['f']);//Имя Фамилия
 
@@ -42,16 +44,6 @@ function _user($user_id=USER_ID, $i='ass') {//получение данных о
 		return $u[$i];
 
 	return '';
-}
-function _userAdmin() {//получение флага администратора приложения
-	if(!APP_ID)
-		return false;
-	if(_app(APP_ID, 'user_id_add') == USER_ID)
-		return true;
-	if(!$ids = _idsAss(_app(APP_ID, 'user_admin')))
-		return false;
-
-	return isset($ids[USER_ID]);
 }
 function _userCache($user_id) {//кеширование данных пользователя для конктетного приложения
 	$key = 'user'.$user_id;

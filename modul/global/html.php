@@ -472,6 +472,7 @@ function _html_hat() {//верхняя строка приложения для 
 					'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
 					_hat_link_admin().
 					_hat_link_task().
+					_hat_link_manial().
 			  (SA ? '<dd onclick="location.href=\''.URL.'&p=1\'" class="sa b">SA' : '').
 			  (SA ? '<dd onclick="window.open(\'http://'.(LOCAL ? 'nyandoma/' : '').'gim-system.ru\', \'_blank\')" class="sa">GIM-system.ru' : '').
 					'<dd onclick="location.href=\''.URL.'&logout\'">'.
@@ -505,12 +506,24 @@ function _hat_link_task() {//ссылка Задачи
 		return '';
 	if(APP_IS_PID)
 		return '';
-	if(!SA && !USER_ADMIN)
+	if(!SA && !USER_ACCESS_TASK)
 		return '';
 	if(!APP_ID)
 		return '';
 
 	return '<dd onclick="location.href=\''.URL.'&p=385\'" class="b fs14">Задачи';
+}
+function _hat_link_manial() {//ссылка Руководство пользователя
+	if(PAS)
+		return '';
+	if(APP_IS_PID)
+		return '';
+	if(!SA && !USER_ACCESS_MANUAL)
+		return '';
+	if(!APP_ID)
+		return '';
+
+	return '<dd onclick="location.href=\''.URL.'&p=15\'">Руководство<br>пользователя';
 }
 function _hat_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)
