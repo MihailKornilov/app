@@ -95,7 +95,7 @@ body:not(.site){position:relative}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:-9999px 0 no-repeat url(../../img/icon18.png?49);
+	background:-9999px 0 no-repeat url(../../img/icon18.png?50);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -146,6 +146,7 @@ body:not(.site){position:relative}
 .icon-hand   {background-position-x:-880px}/* рука: чёрный список */
 .icon-exit   {background-position-x:-900px}/* стрелка из квадратика: выход */
 .icon-copy   {background-position-x:-920px}/* копирование: два прямоугольничка друг за другом */
+.icon-manual {background-position-x:-940px}/* руководство: раскрытая книжка */
 
 /* настройка ширины блоков */
 .icon-width  {

@@ -75,7 +75,10 @@ function _element36type($id='all') {//доступные варианты ико
 		37 => 'cube',
 		38 => 'filter',
 		39 => 'link',
-		40 => 'hand'
+		40 => 'hand',
+		41 => 'manual',
+		42 => 'copy',
+		43 => 'exit',
 	);
 
 	if($id == 'all')
