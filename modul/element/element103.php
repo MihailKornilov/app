@@ -4,15 +4,18 @@
 
 function _element103_print($el, $prm) {
 	if(!$u = $prm['unit_get'])
-		if(!$u = $prm['unit_edit'])
-			return _emptyMinRed('Данные пользователя не получены.');
-	if(_sa($u['id']))
-		return _empty('SA: Доступны все страницы.');
-	if($u['id'] == _app(APP_ID, 'user_id_add'))
-		return _empty('Создатель приложения: доступны все страницы.');
+		$u = $prm['unit_edit'];
 
 	//доступные страницы
-	$ids = _idsAss(_user($u['id'], 'access_pages'));
+	$pageIds = array();
+
+	if($u) {
+		if(_sa($u['id']))
+			return _empty('SA: Доступны все страницы.');
+		if($u['id'] == _app(APP_ID, 'user_id_add'))
+			return _empty('Создатель приложения: доступны все страницы.');
+		$pageIds = _idsAss(_user($u['id'], 'access_pages'));
+	}
 
 	$arr = _page('app');
 	$sort = array();
@@ -20,11 +23,11 @@ function _element103_print($el, $prm) {
 		if($r['parent_id']) {
 			if(empty($sort[$r['parent_id']]))
 				$sort[$r['parent_id']] = array();
-			$r['access'] = _num(@$ids[$id]);
+			$r['access'] = _num(@$pageIds[$id]);
 			$sort[$r['parent_id']][] = $r;
 			unset($arr[$id]);
 		} else
-			$arr[$id]['access'] = _num(@$ids[$id]);
+			$arr[$id]['access'] = _num(@$pageIds[$id]);
 	}
 
 
