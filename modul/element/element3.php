@@ -18,7 +18,7 @@ function _element3_print($el, $prm) {
 	foreach(_page() as $id => $r) {
 		if(!$r['app_id'])
 			continue;
-		if($r['sa'])
+		if(_pageSA($r))
 			continue;
 		if(!_pageAccess($id))
 			continue;

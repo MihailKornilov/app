@@ -25,29 +25,36 @@ function _pageCache() {//получение массива страниц из �
 		unset($page[$id]['about']);
 		unset($page[$id]['user_id_add']);
 		unset($page[$id]['dtime_add']);
-		unset($page[$id]['acs']);
 		$block_count = _num(@$block[$id]);
 		$page[$id]['del_allow'] = $block_count || $r['common_id'] ? 0 : 1;
-		$page[$id]['sa'] = $r['acs'] == 2 ? 1 : 0;
-		$page[$id]['creator'] = $r['acs'] == 1 ? 1 : 0;
 	}
 
 	return _cache_set($key, $page);
 }
+function _pageSA($p) {//определение страницы, доступной только SA
+	if(empty($p['acs']))
+		return false;
+	if($p['acs'] == 2)
+		return true;
+	return false;
+}
 function _pageAccess($page_id) {//доступ к конкретного странице для текущего пользователя
 	if(SA)
-		return true;
-	if(USER_ADMIN)
 		return true;
 
 	$u = _user();
 	$ass = _idsAss($u['access_pages']);
 
 	//разрешение страниц, видимых всем пользователям
-	foreach(_page() as $id => $p)
-		if($p['dialog_id'] == 101)
-			if(!$p['sa'] && !$p['creator'])
-				$ass[$id] = 1;
+	foreach(_page() as $id => $p) {
+		if($p['dialog_id'] != 101)
+			continue;
+		if(!$p['acs']
+		|| $p['acs'] == 1 && USER_ADMIN
+		|| $p['acs'] == 3 && USER_ACCESS_MANUAL
+		|| $p['acs'] == 4 && USER_ACCESS_TASK)
+			$ass[$id] = 1;
+	}
 
 	return !empty($ass[$page_id]);
 }
@@ -66,7 +73,7 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		foreach($page as $id => $r) {
 			if(!$r['app_id'])
 				continue;
-			if($r['sa'])
+			if(_pageSA($r))//только SA
 				continue;
 			$send[$id] = $r;
 		}
@@ -94,9 +101,7 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		//сначала поиск стартовой страницы приложения
 		$pageLost = array();
 		foreach($page as $id => $p) {
-			if($p['sa'])
-				continue;
-			if($p['creator'])
+			if(_pageSA($p))
 				continue;
 			if($id == 9)//печать шаблона
 				continue;
@@ -128,7 +133,7 @@ function _page($i='all', $i1=0) {//получение данных страни�
 		//затем страницы SA
 		if(SA)
 			foreach($page as $p)
-				if($p['sa'] && $p['def'])
+				if(_pageSA($p) && $p['def'])
 					return $p['id'];
 
 		//иначе Администрирование
@@ -207,7 +212,7 @@ function _page($i='all', $i1=0) {//получение данных страни�
 function _pageChildArr($arr, $child, $level=0) {//перечисление иерархии страниц для select
 	$send = array();
 	foreach($arr as $r) {
-		if($r['sa'])
+		if(_pageSA($r))
 			continue;
 		if(!$r['app_id'])
 			continue;
@@ -226,12 +231,12 @@ function _pageChildArr($arr, $child, $level=0) {//перечисление ие�
 function _pageSaForSelect($arr, $child) {//страницы SA для select
 	$send = array();
 	foreach($arr as $r) {
-		if(!$r['sa'] && $r['app_id'])
+		if(!_pageSA($r) && $r['app_id'])
 			continue;
 		$send[] = array(
 			'id' => _num($r['id']),
 			'title' => addslashes(htmlspecialchars_decode(trim($r['name']))),
-			'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">'.addslashes(htmlspecialchars_decode(trim($r['name']))).'</div>'
+			'content' => '<div class="'.(_pageSA($r) ? 'color-ref' : 'color-pay').'">'.addslashes(htmlspecialchars_decode(trim($r['name']))).'</div>'
 		);
 		if(!empty($child[$r['id']]))
 			foreach(_pageSaForSelect($child[$r['id']], $child) as $sub)
@@ -247,7 +252,7 @@ function _pasDefine() {//установка флага включения упр
 
 	if($page_id = _page('cur'))//страница существует
 		if($page = _page($page_id))//данные страницы получены
-			if(!($page['sa'] && !SA))
+			if(!(_pageSA($page) && !SA))
 				if(!(!$page['app_id'] && !SA))
 					$pas = _bool(@$_COOKIE['page_setup']);
 
@@ -291,7 +296,7 @@ function _pageInfo() {//информация о странице
 			'<table class="w300">'.
 				'<tr class="center">'.
 					'<td>APP_ID: '.$page['app_id'].
-					'<td class="'.($page['sa'] ? 'fs15 b color-ref' : 'pale').'">SA'.
+					'<td class="'.(_pageSA($page) ? 'fs15 b color-ref' : 'pale').'">SA'.
 					'<td>BLK: <b>'.count($blk).'</b>'.
 					'<td>ELM: <b>'.count($elm).'</b>'.
 			'</table>'.
@@ -441,10 +446,6 @@ function _pageShow($page_id) {
 
 	if(!$page = _page($page_id))
 		return _empty20('Несуществующая страница.'.PAGE_MSG_ERR);
-	if($page['sa'] && !SA)
-		return _empty20('Нет доступа.'.PAGE_MSG_ERR);
-	if(!SA && $page['creator'] && !USER_ADMIN)
-		return _empty20('Страница недоступна.'.PAGE_MSG_ERR);
 	if(!_pageAccess($page_id))
 		return _empty20('Страница недоступна или не существует.'.PAGE_MSG_ERR);
 
@@ -460,7 +461,6 @@ function _pageShow($page_id) {
 		if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $id))
 			return _empty20('Записи '.$id.' не существует.'.PAGE_MSG_ERR);
 	}
-
 
 	return
 	_blockHtml('page', $page_id, $prm).

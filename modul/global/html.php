@@ -538,7 +538,7 @@ function _hat_but_pas() {//отображение кнопки настройк�
 		return '';
 	if(!$page = _page($page_id))
 		return '';
-	if(!SA && $page['sa'])
+	if(!SA && _pageSA($page))
 		return '';
 	if(!SA && !$page['app_id'])
 		return '';
