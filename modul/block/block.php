@@ -381,28 +381,26 @@ function _blockActionView($bl, $prm) {//условия отображения б
 					switch($ff['cond_id']) {
 						//отсутствует
 						case 1:
-							if($v)
-								return $bl;
+							if(!$v)
+								$bl['hidden'] = 1;
 							break;
 						//присутствует
 						case 2:
-							if(!$v)
-								return $bl;
+							if($v)
+								$bl['hidden'] = 1;
 							break;
 						//равно
 						case 3:
-							if($v != $ff['unit_id'])
-								return $bl;
+							if($v == $ff['unit_id'])
+								$bl['hidden'] = 1;
 							break;
 						//не равно
 						case 4:
-							if($v == $ff['unit_id'])
-								return $bl;
+							if($v != $ff['unit_id'])
+								$bl['hidden'] = 1;
 							break;
 					}
 				}
-
-				$bl['hidden'] = 1;
 				break;
 		}
 
