@@ -222,7 +222,7 @@ function _pageChildArr($arr, $child, $level=0) {//перечисление ие�
 		$send[] = array(
 			'id' => _num($r['id']),
 			'title' => addslashes(htmlspecialchars_decode(trim($r['name']))),
-			'content' => '<div class="fs'.(14-$level).' '.($level ? 'ml'.($level*20) : 'b').'">'.addslashes(htmlspecialchars_decode(trim($r['name']))).'</div>'
+			'content' => '<div class="fs'.(15-$level).' '.($level ? 'ml'.($level*20) : 'b').'">'.addslashes(htmlspecialchars_decode(trim($r['name']))).'</div>'
 		);
 		if(!empty($child[$r['id']]))
 			foreach(_pageChildArr($child[$r['id']], $child, $level+1) as $sub)

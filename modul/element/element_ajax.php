@@ -1173,7 +1173,7 @@ function _dialogSetupLoadUse($dialog) {//использование как эл�
 					$use_page .=
 						'<div>'.
 							'<div class="dib w35 mr5">'.$r['obj_id'].':</div>'.
-							'<a class="'._dn(!$p['sa'], 'color-ref').'" href="'.URL.'&p='.$r['obj_id'].'">'.$p['name'].'</a>'.
+							'<a class="'._dn(!_pageSA($p), 'color-ref').'" href="'.URL.'&p='.$r['obj_id'].'">'.$p['name'].'</a>'.
 							$count.
 						'</div>';
 					break;
