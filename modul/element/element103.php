@@ -12,8 +12,8 @@ function _element103_print($el, $prm) {
 	if($u) {
 		if(_sa($u['id']))
 			return _empty('SA: Доступны все страницы.');
-		if($u['id'] == _app(APP_ID, 'user_id_add'))
-			return _empty('Создатель приложения: доступны все страницы.');
+		if($u['access_admin'])
+			return _empty('Администратор приложения: доступны все страницы.');
 		$pageIds = _idsAss(_user($u['id'], 'access_pages'));
 	}
 
@@ -29,7 +29,6 @@ function _element103_print($el, $prm) {
 		} else
 			$arr[$id]['access'] = _num(@$pageIds[$id]);
 	}
-
 
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" />'.

@@ -986,46 +986,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 				query($sql);
 		}
 
-
-
-/*
-	//открытие доступа к новой странице пользователям, если в приложении установлен флаг user_page_access
-	if(APP_ID)
-		if($table_1 == '_page')
-			if($dialog_id == 20)
-				if(_app(APP_ID, 'user_page_access')) {
-					$sql = "SELECT *
-							FROM `_spisok`
-							WHERE `app_id`=".APP_ID."
-							  AND `dialog_id`=111
-							  AND `cnn_id`";
-					foreach(query_arr($sql) as $r) {
-						$sql = "INSERT INTO `_user_page_access`
-									(`app_id`,`user_id`,`page_id`)
-								VALUES (".APP_ID.",".$r['cnn_id'].",".$uid[$table_1].")";
-						query($sql);
-					}
-				}
-
-	if(APP_ID)
-		if($table_1 == '_user')
-			if(_app(APP_ID, 'user_page_access')) {
-				$sql = "SELECT *
-						FROM `_page`
-						WHERE `app_id`=".APP_ID;
-				foreach(query_arr($sql) as $r) {
-					$sql = "INSERT INTO `_user_page_access`
-								(`app_id`,`user_id`,`page_id`)
-							VALUES (".APP_ID.",".$uid[$table_1].",".$r['id'].")";
-					query($sql);
-				}
-			}
-*/
-
-
-
 	_dialogIUID($DLG, $uid[$table_1]);
-
 	_historyInsert(1, $DLG, $uid[$table_1]);
 
 	return $uid[$table_1];

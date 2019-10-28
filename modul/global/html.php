@@ -553,13 +553,23 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 	if(!$app_id)
 		return;
 
-	if(!_userAppAccessCreate($app_id))
+	if(!$access_id = _userAppAccessCreate($app_id)) {
+		_cache_clear('app'.$app_id, 1);
 		return;
+	}
 
 	//изменение текущего приложения на новое
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=".$app_id."
 			WHERE `code`='".CODE."'";
+	query($sql);
+
+	//применение прав пользователю, создавшему приложение
+	$sql = "UPDATE `_user_access`
+			SET `access_admin`=1,
+				`access_task`=1,
+				`access_manual`=1
+			WHERE `id`=".$access_id;
 	query($sql);
 
 	_cache_clear('AUTH_'.CODE, 1);

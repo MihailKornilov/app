@@ -47,12 +47,15 @@ function _pageAccess($page_id) {//доступ к конкретного стр�
 
 	//разрешение страниц, видимых всем пользователям
 	foreach(_page() as $id => $p) {
-		if($p['dialog_id'] != 101)
+		if($p['dialog_id'] == 101) {
+			if(!$p['acs']
+			|| $p['acs'] == 1 && USER_ADMIN
+			|| $p['acs'] == 3 && USER_ACCESS_MANUAL
+			|| $p['acs'] == 4 && USER_ACCESS_TASK)
+				$ass[$id] = 1;
 			continue;
-		if(!$p['acs']
-		|| $p['acs'] == 1 && USER_ADMIN
-		|| $p['acs'] == 3 && USER_ACCESS_MANUAL
-		|| $p['acs'] == 4 && USER_ACCESS_TASK)
+		}
+		if(USER_ADMIN)
 			$ass[$id] = 1;
 	}
 
