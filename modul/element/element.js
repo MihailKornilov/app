@@ -3258,7 +3258,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	/* ---=== НАСТРОЙКА УСЛОВИЙ ДЛЯ СПИСКА [41] ===--- */
-	PHP12_spfl = function(el, vvv) {
+	PHP12_spfl = function(el, vvv, obj) {
 		var DS = vvv.dss;
 		if(!DS)
 			return;
@@ -3268,7 +3268,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
-			DROP = vvv.drop;
+			DROP = vvv.drop,
+			DS_4UNIT = 0,//id диалога, в котором размещён элемент, которому настраиваются условия (для значения unit_id=-4)
+			BL = BLKK[obj.send.block_id];
+
+		if(BL && BL.obj_name == 'dialog')
+			DS_4UNIT = BL.obj_id;
 
 		BUT_ADD.click(valueAdd);
 
@@ -3284,10 +3289,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				elem_id:0,      //id выбранного элемента из диалога, по которому будет выполняться условие фильтра
 				elem_title:'',  //имя выбранного элемента
 				cond_id:0,      //id условия из выпадающего списка
-				txt:'',         //текстовое значение
+				txt:'',         //текстовое значение, либо указанное значение из диалога (при unit_id=-4)
 				elem_issp:0,    //можно выбирать значения из списка. Только при условиях: [3:равно], [4:не равно]
 				spisok:[],      //содержание выпадающего списка
-				unit_id:''      //значение выпадающего списка
+				unit_id:'',     //значение выпадающего списка
+				unit4title:''   //имя выбранного значения (при unit_id=-4)
 			}, v);
 
 			var issp34 = v.elem_issp && (v.cond_id == 3 || v.cond_id == 4);
@@ -3295,15 +3301,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL.append(
 				'<dd class="over5">' +
 					'<table class="bs5 w100p">' +
-						'<tr><td class="w50 r color-sal">Если:' +
-							'<td><input type="text"' +
+						'<tr><td class="topi w50 r color-sal">Если:' +
+							'<td class="top"><input type="text"' +
 									  ' readonly' +
 									  ' class="title w175 curP color-pay"' +
 									  ' placeholder="выберите значение..."' +
 									  ' value="' + v.elem_title + '"' +
 									  ' val="' + v.elem_id + '"' +
 								' />' +
-							'<td class="td-cond' + _dn(v.elem_id) + '">' +
+							'<td class="td-cond top' + _dn(v.elem_id) + '">' +
 								'<input type="hidden" class="cond-id" value="' + v.cond_id + '" />' +
 							'<td class="w100p">' +
 								'<input type="text"' +
@@ -3316,18 +3322,26 @@ var DIALOG = {},    //массив диалоговых окон для упра
 										  ' class="cond-sel"' +
 										  ' value="' + v.unit_id + '"' +
 									' />' +
+
+									'<div class="_selem dib prel bg-fff over1 mt3 w100p' + _dn(v.unit_id == -4) + '">' +
+										'<div class="icon icon-star pabs"></div>' +
+										'<div class="icon icon-del pl pabs' + _dn(v.txt) + '"></div>' +
+										'<input type="text" readonly class="curP w100p color-pay" placeholder="значение не указано" value="' + v.unit4title + '" />' +
+									'</div>' +
+
 								'</div>' +
 							'<td class="td-drop' + _dn(!issp34 && v.cond_id > 2) + '">' +
 								'<input type="hidden" class="cond-drop" />' +
-							'<td class="pl15">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить условие', -52) + '</div>' +
+							'<td class="top pl15">' +
+								'<div class="mt5 icon icon-off pl' + _tooltip('Удалить условие', -52) + '</div>' +
 					'</table>' +
 				'</dd>'
 			);
 
 			var DD = DL.find('dd:last'),
 				TITLE = DD.find('.title'),
-				COND_ID = DD.find('.cond-id');
+				COND_ID = DD.find('.cond-id'),
+				SELEM = DD.find('._selem');
 			TITLE.click(function() {
 				_dialogLoad({
 					dialog_id:11,
@@ -3380,12 +3394,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					DD.find('.cond-sel')._select(0);
 					DD.find('.div-cond-sel')._dn(issp);
 					DD.find('.td-drop')._dn(!issp && vv > 2);
+					SELEM._dn().find('input').val('');
 				}
 			});
 			DD.find('.cond-sel')._select({
 				width:0,
 				title0:'не выбрано',
-				spisok:v.spisok
+				spisok:v.spisok,
+				func:function(id) {
+					SELEM._dn(id == -4);
+				}
 			});
 			DD.find('.cond-drop')._dropdown({
 				width:30,
@@ -3400,7 +3418,34 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					  .attr('readonly', true);
 				}
 			});
-			DD.find('.icon-del').click(function() {
+			SELEM.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					dss:DS_4UNIT,
+					dop:{
+						mysave:1,
+						allow:'29',
+						sel:v.txt,
+						nest:0,
+						sev:0
+					},
+					busy_obj:$(this).find('input'),
+					busy_cls:'hold',
+					func_save:function(res) {
+						v.txt = res.v;
+						DD.find('.cond-val').val(res.v);
+						SELEM.find('input').val(res.title);
+						SELEM.find('.icon-del')._dn(true);
+					}
+				});
+			});
+			SELEM.find('.icon-del').click(function(e) {
+				e.stopPropagation();
+				DD.find('.cond-val').val('');
+				SELEM.find('input').val('');
+				$(this)._dn();
+			});
+			DD.find('.icon-off').click(function() {
 				$(this).closest('DD').remove();
 			});
 		}

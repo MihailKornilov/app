@@ -2097,9 +2097,15 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 	foreach($arr as $n => $r) {
 		$arr[$n]['elem_title'] = _elemIdsTitle($r['elem_id']);
 		$arr[$n]['spisok'] = array();
+		$arr[$n]['unit4title'] = '';
 		if($arr[$n]['elem_issp'] = _elemIsConnect($r['elem_id'])) {
 			$spisok = _29cnn($r['elem_id']);
 			$arr[$n]['spisok'] = PHP12_spfl_vvv_unshift($spisok);
+			if($r['unit_id'] == -4) {
+				$arr[$n]['unit4title'] = '- имя не определено -';
+				if($el = _elemOne($r['txt']))
+					$arr[$n]['unit4title'] = $el['title'];
+			}
 		} else {
 			$last = _idsLast($r['elem_id']);
 			$el = _elemOne($last);
@@ -2131,8 +2137,8 @@ function PHP12_spfl_vvv_unshift($spisok) {//общие дополнительн�
 		$spisok,
 		array(
 			'id' => -4,
-			'title' => 'Значие в текущем диалоге',
-			'content' => '<div class="b color-pay">Значие в текущем диалоге</div>'.
+			'title' => 'Указанное значение',
+			'content' => '<div class="b color-pay">Указанное значение</div>'.
 						 '<div class="fs12 grey ml10 mt3 i">Указать элемент, значение которого будет использовано</div>'
 		)
 	);
