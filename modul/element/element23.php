@@ -5,8 +5,8 @@ function _element23_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//id диалога, который вносит данные списка (шаблон которого будет настраиваться)
 		'num_2'   => _num($el['num_2']),//длина (количество строк, выводимых за один раз)
-		'txt_1'   => $el['txt_1'],      //сообщение пустого запроса
-		'txt_2'   => $el['txt_2'],      //условия отображения, настраиваемые через [40]
+		'txt_1'   => $el['txt_1'],	  //сообщение пустого запроса
+		'txt_2'   => $el['txt_2'],	  //условия отображения, настраиваемые через [40]
 		'num_3'   => _num($el['num_3']),//узкие строки таблицы
 		'num_4'   => _num($el['num_4']),//подсвечивать строку при наведении мыши
 		'num_5'   => _num($el['num_5']),//показывать имена колонок
@@ -32,7 +32,7 @@ function _element23_struct_title($el, $DLG) {
 }
 function _element23_struct_vvv($el, $cl) {
 	$send = array(
-		'id'        => _num($cl['id']),
+		'id'		=> _num($cl['id']),
 		'title'     => $cl['title'],
 		'parent_id' => _num($cl['parent_id']),
 		'dialog_id' => _num($cl['dialog_id']),
@@ -283,23 +283,121 @@ function _element23_template_docx($ELEM, $u) {
 			break;
 	}
 
+	$prm = array('unit_edit'=>$u);
+
 	//получение данных списка
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG).
-					_40cond($ELEM, $ELEM['txt_2'])."
+					_40cond($ELEM, $ELEM['txt_2'], $prm)."
 			ORDER BY ".$order." ".$SC."
 			LIMIT ".$limit;
 	$spisok = query_arr($sql);
 
-	$send = '';
-	foreach($spisok as $r) {
-		$send .= $r['id']."\n";
+	//вставка значений из вложенных списков
+	$spisok = _spisokInclude($spisok);
+
+	//максимальная ширина таблицы. На основании её будет высчитываться ширина каждой колонки
+	$w100 = 9923;
+
+	$send =
+	'<w:tbl>'.
+		'<w:tblPr><w:tblW w:w="'.$w100.'" w:type="dxa"/>'.
+			'<w:tblInd w:w="-34" w:type="dxa"/>'.
+			'<w:tblBorders>'.
+				'<w:top w:val="single" w:sz="4" w:space="0" w:color="auto"/>'.
+				'<w:left w:val="single" w:sz="4" w:space="0" w:color="auto"/>'.
+				'<w:bottom w:val="single" w:sz="4" w:space="0" w:color="auto"/>'.
+				'<w:right w:val="single" w:sz="4" w:space="0" w:color="auto"/>'.
+				'<w:insideH w:val="single" w:sz="4" w:space="0" w:color="auto"/>'.
+				'<w:insideV w:val="single" w:sz="4" w:space="0" w:color="auto"/>'.
+			'</w:tblBorders>'.
+			'<w:tblLayout w:type="fixed"/>'.
+			'<w:tblLook w:val="01E0"/>'.
+		'</w:tblPr>';
+
+	//---=== ЗАГОЛОВКИ ===---
+
+	$WNUM = 40;//ширина колонки для порядкового номера
+
+	//получение общей ширины таблицы
+	$WTR = $WNUM;
+	foreach($ELEM['vvv'] as $tr)
+		$WTR += $tr['width'];
+
+	$send .=
+		'<w:tr w:rsidR="00112243" w:rsidRPr="00FA01DF">'.
+			'<w:trPr><w:trHeight w:val="295"/></w:trPr>';
+
+	$w = round($WNUM/$WTR*$w100);
+	$send .= _elem23docxTh('№ п/п', $w);
+
+	foreach($ELEM['vvv'] as $th) {
+		$w = round($th['width']/$WTR*$w100);
+		$send .= _elem23docxTh($th['txt_7'], $w);
+
+	}
+	$send .= '</w:tr>';
+
+
+	$num = 1;
+	foreach($spisok as $u) {
+		$send .=
+			'<w:tr w:rsidR="00112243" w:rsidRPr="00FA01DF">'.
+				'<w:trPr><w:trHeight w:val="295"/></w:trPr>';
+
+		$w = round($WNUM/$WTR*$w100);
+		$send .= _elem23docxTh($num++, $w);
+
+		$prm = _blockParam(array('unit_get'=>$u));
+
+		foreach($ELEM['vvv'] as $td) {
+			switch($td['txt_8']) {
+				case 'center'; $align = 'center'; break;
+				case 'r'; $align = 'right'; break;
+				default: $align = 'left';
+			}
+
+			$txt = _elemPrint($td, $prm);
+			$txt = _elemFormat($td, $prm, $txt);
+
+			$w = round($td['width']/$WTR*$w100);
+			$send .= _elem23docxTh($txt, $w, $align);
+		}
+
+		$send .= '</w:tr>';
 	}
 
-	return $sql;
-}
+	$send .= '</w:tbl>';
 
+
+	return $send;
+}
+function _elem23docxTh($txt, $w, $align='center') {//формирование одной ячейки для таблицы формата DOCX
+	return
+	'<w:tc>'.
+		'<w:tcPr>'.
+			'<w:tcW w:w="'.$w.'" w:type="dxa"/>'.
+			'<w:vAlign w:val="center"/>'.//позиция по вертикали
+		'</w:tcPr>'.
+		'<w:p w:rsidR="00951A33" w:rsidRPr="00FA01DF" w:rsidRDefault="00951A33" w:rsidP="00FA01DF">'.
+			'<w:pPr>'.
+				'<w:jc w:val="'.$align.'"/>'.
+				'<w:rPr>'.
+					'<w:sz w:val="20"/>'.
+					'<w:szCs w:val="20"/>'.
+				'</w:rPr>'.
+			'</w:pPr>'.
+			'<w:r w:rsidRPr="00FA01DF">'.
+				'<w:rPr>'.
+					'<w:sz w:val="20"/>'.
+					'<w:szCs w:val="20"/>'.
+				'</w:rPr>'.
+				'<w:t>'.$txt.'</w:t>'.
+			'</w:r>'.
+		'</w:p>'.
+	'</w:tc>';
+}
 
 /* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ [23] ===--- */
 function PHP12_td_setup($prm) {//используется в диалоге [23]

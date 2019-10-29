@@ -1270,14 +1270,14 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 			return 0;
 
 		//если создание записи
-		if($unit = $prm['unit_get']) {
+		if($unit = @$prm['unit_get']) {
 			if($el['num_6'] != -1)
 				return 'элемент не принимает данные записи';
 			return $unit['id'];
 		}
 
 		//если редактирование записи
-		if($unit = $prm['unit_edit']) {
+		if($unit = @$prm['unit_edit']) {
 			if(!$col = _elemCol($el))
 				return 'нет колонки';
 			if(empty($unit[$col]))
