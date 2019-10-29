@@ -300,6 +300,7 @@ function _element23_template_docx($ELEM, $u) {
 	//максимальная ширина таблицы. На основании её будет высчитываться ширина каждой колонки
 	$w100 = 9923;
 
+
 	$send =
 	'<w:tbl>'.
 		'<w:tblPr><w:tblW w:w="'.$w100.'" w:type="dxa"/>'.
@@ -315,7 +316,15 @@ function _element23_template_docx($ELEM, $u) {
 			'<w:tblLayout w:type="fixed"/>'.
 			'<w:tblLook w:val="01E0"/>'.
 		'</w:tblPr>';
-
+/*
+		'<w:tblGrid>'.
+			'<w:gridCol w:w="629"/>'.
+			'<w:gridCol w:w="6743"/>'.
+			'<w:gridCol w:w="654"/>'.
+			'<w:gridCol w:w="905"/>'.
+			'<w:gridCol w:w="992"/>'.
+		'</w:tblGrid>';
+*/
 	//---=== ЗАГОЛОВКИ ===---
 
 	$WNUM = 40;//ширина колонки для порядкового номера
@@ -324,6 +333,7 @@ function _element23_template_docx($ELEM, $u) {
 	$WTR = $WNUM;
 	foreach($ELEM['vvv'] as $tr)
 		$WTR += $tr['width'];
+
 
 	$send .=
 		'<w:tr w:rsidR="00112243" w:rsidRPr="00FA01DF">'.
@@ -338,7 +348,6 @@ function _element23_template_docx($ELEM, $u) {
 
 	}
 	$send .= '</w:tr>';
-
 
 	$num = 1;
 	foreach($spisok as $u) {
@@ -369,7 +378,6 @@ function _element23_template_docx($ELEM, $u) {
 	}
 
 	$send .= '</w:tbl>';
-
 
 	return $send;
 }
