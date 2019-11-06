@@ -391,12 +391,14 @@ function _blockActionView($bl, $prm) {//условия отображения б
 							break;
 						//равно
 						case 3:
-							if($v == $ff['unit_id'])
+							$vv = $ff['unit_id'] ? $ff['unit_id'] : $ff['txt'];
+							if($v == $vv)
 								$bl['hidden'] = 1;
 							break;
 						//не равно
 						case 4:
-							if($v != $ff['unit_id'])
+							$vv = $ff['unit_id'] ? $ff['unit_id'] : $ff['txt'];
+							if($v != $vv)
 								$bl['hidden'] = 1;
 							break;
 					}
