@@ -1,13 +1,4 @@
 <?php
-function _blockArrChild($child, $parent_id=0) {//расстановка дочерних блоков
-	if(!$send = @$child[$parent_id])
-		return array();
-
-	foreach($send as $id => $r)
-		$send[$id]['child'] = _blockArrChild($child, $id);
-
-	return $send;
-}
 function _blockName($name, $i='name', $obj_id=0) {//доступные варианты объектов для блоков
 	$empty = array(
 		'spisok' =>
@@ -1147,11 +1138,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			$blk[$id] = $r;
 		}
 
-		$child = array();
-		foreach($blk as $id => $r)
-			$child[$r['parent_id']][$id] = $r;
-
-		return _blockArrChild($child);
+		return _arrChild($blk);
 	}
 
 	//получение id дочерних блоков (с учётом вложенных) для конкретного блока. Возврат: ассоциативный массив
@@ -1255,11 +1242,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			);
 		}
 
-		$child = array();
-		foreach($blk as $id => $r)
-			$child[$r['parent_id']][$id] = $r;
-
-		$blk = _blockArrChild($child);
+		$blk = _arrChild($blk);
 		$blk = _beBlockSort($blk);
 
 		$send = array();
@@ -1316,11 +1299,7 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			);
 		}
 
-		$child = array();
-		foreach($blk as $id => $r)
-			$child[$r['parent_id']][$id] = $r;
-
-		$blk = _blockArrChild($child);
+		$blk = _arrChild($blk);
 		$blk = _beBlockSort($blk);
 
 		$send = array();

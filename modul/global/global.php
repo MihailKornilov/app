@@ -643,6 +643,22 @@ function _arrNum($arr) {//переделка значений массива в 
 	return $arr;
 }
 
+function _arrChild($arr) {//формирование массива с дочерними значеними по `parent_id`
+	$send = array();
+	foreach($arr as $id => $r)
+		$send[$r['parent_id']][$id] = $r;
+	return _arrChildOne($send);
+}
+function _arrChildOne($child, $parent_id=0) {//расстановка дочерних значений
+	if(!$send = @$child[$parent_id])
+		return array();
+
+	foreach($send as $id => $r)
+		$send[$id]['child'] = _arrChildOne($child, $id);
+
+	return $send;
+}
+
 function _empty($msg) {//Информация на сером фоне без отступов
 	return '<div class="_empty">'.$msg.'</div>';
 }
