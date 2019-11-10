@@ -279,6 +279,8 @@ body:not(.site){position:relative}
 	position:relative;
 }
 #hat-user:hover{background-color:#5C738E}
+#hat.local #hat-user:hover{background-color:#6A6A6A}
+
 #hat-user .uname{margin:13px 8px 0 0;font-size:14px}
 #hat-user dl{
 	position:absolute;
