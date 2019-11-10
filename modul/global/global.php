@@ -53,17 +53,9 @@ function _setting() {//установка констант-настроек
 				FROM `_setting`";
 		$arr = query_ass($sql);
 
-		if(empty($arr['SCRIPT'])) {
-			$sql = "INSERT INTO `_setting` (
-						`key`,
-						`v`
-					) VALUES (
-						'SCRIPT',
-						100
-					)";
-			query($sql);
-			$arr['SCRIPT'] = 100;
-		}
+		$arr = _settingInsert($arr, 'SCRIPT', 100);
+		$arr = _settingInsert($arr, 'JS_CACHE', 1);
+		$arr = _settingInsert($arr, 'APP_ACCESS', 1);
 
 		_cache_set($key, $arr, 1);
 	}
@@ -76,7 +68,26 @@ function _setting() {//установка констант-настроек
 	//версия скриптов
 	define('SCRIPT', _num($arr['SCRIPT']).(LOCAL ? rand(1, 9999) : ''));
 	//версия кеша JS - app0.js
-	define('JS_CACHE', _num(@$arr['JS_CACHE']));
+	define('JS_CACHE', _num($arr['JS_CACHE']));
+	//глобальный доступ к приложению
+	define('APP_ACCESS', 0); //_bool($arr['APP_ACCESS'])
+}
+function _settingInsert($arr, $key, $v) {//проверка наличия всех ключей. Если отсутствуют, то внесение
+	if(isset($arr[$key]))
+		return $arr;
+
+	$sql = "INSERT INTO `_setting` (
+				`key`,
+				`v`
+			) VALUES (
+				'".$key."',
+				".$v."
+			)";
+	query($sql);
+
+	$arr[$key] = $v;
+
+	return $arr;
 }
 
 function _app($app_id, $i='all') {//Получение данных о приложении

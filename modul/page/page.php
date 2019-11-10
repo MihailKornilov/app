@@ -424,6 +424,10 @@ function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохране�
 function _pageShow($page_id) {
 	define('PAGE_MSG_ERR', '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>');
 
+	//ведутся технические работы
+	if(!SA && !APP_ACCESS)
+		$page_id = 19;
+
 	//нет доступа в приложение
 	if(!SA && APP_ID && !APP_ACCESS_ENTER)
 		$page_id = 105;

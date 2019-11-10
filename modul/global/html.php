@@ -360,6 +360,7 @@ function _html() {
 		_authLoginSite().
 
 		_html_hat().
+		_html_sa_access_msg().
 		_pasMenu().
 //		_pageInfo().
 		_app_content().
@@ -458,7 +459,7 @@ function _html_hat() {//верхняя строка приложения для 
 		exit;
 	}
 
-	$local = LOCAL ? ' class="local"' : '';
+	$local = LOCAL || !SA && !APP_ACCESS ? ' class="local"' : '';
 
 	return
 	'<div id="hat"'.$local.'>'.
@@ -487,6 +488,13 @@ function _html_hat() {//верхняя строка приложения для 
 
 		'</div>'.
 	'</div>';
+}
+function _html_sa_access_msg() {//сообщение о закрытом доступе приложения для SA
+	if(!SA)
+		return '';
+	if(APP_ACCESS)
+		return '';
+	return '<div class="center pad10 line-b b fs16 red bg-fcc">ВХОД В ПРИЛОЖЕНИЕ ЗАКРЫТ</div>';
 }
 function _hat_link_admin() {//кнопки Администрирование
 	if(PAS)
