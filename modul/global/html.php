@@ -494,7 +494,10 @@ function _html_sa_access_msg() {//сообщение о закрытом дос�
 		return '';
 	if(APP_ACCESS)
 		return '';
-	return '<div class="center pad10 line-b b fs16 red bg-fcc">ВХОД В ПРИЛОЖЕНИЕ ЗАКРЫТ</div>';
+	return
+	'<div id="sa-access-msg" class="center pad10 line-b b fs16 red bg-fcc">'.
+		'ВХОД В ПРИЛОЖЕНИЕ ЗАКРЫТ'.
+	'</div>';
 }
 function _hat_link_admin() {//кнопки Администрирование
 	if(PAS)

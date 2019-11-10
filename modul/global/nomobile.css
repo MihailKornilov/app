@@ -6,6 +6,10 @@ html{margin-left:calc(100vw - 100%)}
 #hat .mara{width:1000px;padding-left:15px}
 
 
+/* Сообщение о закрытом доступе для SA */
+#sa-access-msg{margin-left:-15px}
+
+
 /* Строка управления страницей page_setup */
 #pas{margin-left:-15px}
 #pas .mara{width:1000px;padding-left:15px}
