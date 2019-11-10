@@ -70,7 +70,7 @@ function _setting() {//установка констант-настроек
 	//версия кеша JS - app0.js
 	define('JS_CACHE', _num($arr['JS_CACHE']));
 	//глобальный доступ к приложению
-	define('APP_ACCESS', 0); //_bool($arr['APP_ACCESS'])
+	define('APP_ACCESS', _bool($arr['APP_ACCESS']));
 }
 function _settingInsert($arr, $key, $v) {//проверка наличия всех ключей. Если отсутствуют, то внесение
 	if(isset($arr[$key]))

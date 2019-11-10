@@ -451,6 +451,8 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	PHP12_elem_all_rule_setup_save($dialog);
 	//очистка приложения [119] - перехват внесения данных
 	_d119_app_clear($dialog);
+	//Закрытие / открытие доступа к приложению [112] - перехват внесения данных
+	_d112_app_access($dialog, $POST_CMP);
 	//клонирование приложения [120] - перехват внесения данных
 	_clone_go($dialog, $POST_CMP);
 	//принятие приглашения в приложение [109] - перехват внесения данных
@@ -1321,6 +1323,32 @@ function _elem22_col_dop($DLG) {
 	);
 
 	jsonSuccess($u);
+}
+
+function _d112_app_access($DLG, $POST_CMP) {//Закрытие / открытие доступа к приложению
+	if($DLG['id'] != 112)
+		return;
+	if(!SA)
+		jsonError('Нет прав');
+	if(empty($POST_CMP))
+		jsonError('Нет данных');
+
+	$key = key($POST_CMP);
+
+	$v = _bool($POST_CMP[$key] - 12745);
+
+	$sql = "UPDATE `_setting`
+			SET `v`=".$v."
+			WHERE `key`='APP_ACCESS'";
+	query($sql);
+
+	_cache_clear('SETTING', 1);
+
+	$send = array(
+		'action_id' => 1 //обновить страницу
+	);
+
+	jsonSuccess($send);
 }
 
 
