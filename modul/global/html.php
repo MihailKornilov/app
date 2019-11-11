@@ -627,6 +627,7 @@ function PHP12_app_list() {//список приложений, которые �
 	$sql = "SELECT *
 			FROM `_user_access`
 			WHERE `user_id`=".USER_ID."
+			  AND !`app_archive`
 			ORDER BY `sort`";
 	if(!$spisok = query_arr($sql))
 		return
@@ -639,16 +640,15 @@ function PHP12_app_list() {//список приложений, которые �
 				COUNT(*)
 			FROM `_user_access`
 			WHERE `app_id` IN ("._idsGet($spisok, 'app_id').")
-			  AND !`app_archive`
 			GROUP BY `app_id`";
 	$userC = query_ass($sql);
 
 	$send = '';
-	foreach($spisok as $r) {
+	foreach($spisok as $id => $r) {
 		$bgCur = $r['app_id'] == APP_ID ? ' bg-dfd' : '';
 		$uc = _num($userC[$r['app_id']]);
 		$send .=
-		'<div class="line-b over1 over-parent'.$bgCur.'" val="'.$r['id'].'">'.
+		'<div class="line-b over1 over-parent'.$bgCur.'" val="'.$id.'">'.
 			'<table class="bs10 w100p">'.
 				'<tr><td class="w35">'.
 						_imageHtml(_app($r['app_id'], 'img'), 40).
@@ -656,7 +656,7 @@ function PHP12_app_list() {//список приложений, которые �
 						'<a class="dib mt3 fs16 blue" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
 						'<div class="mt5 fs12 pale">'.$uc.' пользовател'._end($uc, 'ь', 'я', 'ей').'</div>'.
 					'<td class="w300 top r">'.
-						'<a class="color-vin over-child">Отправить в архив</a>'.
+						'<a class="color-vin over-child dialog-open" val="dialog_id:107,edit_id:'.$id.'">Отправить в архив</a>'.
 					'<td class="top r">'.
 						'<div class="icon icon-move pl over-child"></div>'.
 			'</table>'.
