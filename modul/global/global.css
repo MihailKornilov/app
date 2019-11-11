@@ -851,6 +851,10 @@ td.bottom{vertical-align:bottom}
 
 .over3:not(:hover) .over3-show{display:none}
 
+/* Показ элемента "over-child" при наведении на "over-parent" */
+.over-parent:not(:hover) .over-child{display:none}
+
+
 /* Линии */
 .line-t{border-top:#DEE3EF solid 1px}    /* насыщенная верхняя линия */
 .line-b{border-bottom:#DEE3EF solid 1px} /* насыщенная нижняя линия */

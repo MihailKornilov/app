@@ -5895,6 +5895,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
+	//список приложений
+	PHP12_app_list = function(el) {
+		_attr_el(el.id)._sort({
+			items:'.line-b',
+			elem_id:el.id
+		});
+	},
+
 	//список диалоговых окон для конкретного приложения
 	PHP12_dialog_app = function(el) {
 		_attr_el(el.id).find('ol.dialog-sort').nestedSortable({

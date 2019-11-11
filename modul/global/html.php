@@ -557,6 +557,35 @@ function _hat_but_pas() {//отображение кнопки настройк�
 	return '<button id="page_setup" class="'._dn(!PAS, 'ispas').'"></button>';
 }
 
+function _app($app_id, $i='all') {//Получение данных о приложении
+	$key = 'app'.$app_id;
+	if(!$arr = _cache_get($key, 1)) {
+		$sql = "SELECT *
+				FROM `_app`
+				WHERE `id`=".$app_id;
+		if(!$arr = query_assoc($sql))
+			die('Невозможно получить данные приложения. Кеш: '.$key);
+
+		$arr['img'] = array();
+		if($image_id = _idsFirst($arr['image_ids'])) {
+			$sql = "SELECT *
+					FROM `_image`
+					WHERE `id`=".$image_id;
+			$arr['img'] = query_assoc($sql);
+		}
+
+
+		_cache_set($key, $arr, 1);
+	}
+
+	if($i == 'all')
+		return $arr;
+
+	if(!isset($arr[$i]))
+		return '_app: неизвестный ключ';
+
+	return $arr[$i];
+}
 function _app_create($dialog, $app_id) {//привязка пользователя к приложению после его создания
 	if($dialog['id'] != 100)
 		return;
@@ -589,7 +618,7 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 
 	_auth();
 }
-function _app_list() {//список приложений, которые доступны пользователю
+function PHP12_app_list() {//список приложений, которые доступны пользователю
 	if(!USER_ID)
 		return '';
 
@@ -598,22 +627,40 @@ function _app_list() {//список приложений, которые дос
 	$sql = "SELECT *
 			FROM `_user_access`
 			WHERE `user_id`=".USER_ID."
-			ORDER BY `id`";
+			ORDER BY `sort`";
 	if(!$spisok = query_arr($sql))
 		return
 			'<div class="center pad30 color-555 fs15">'.
 				'Доступных приложений нет.'.
 			'</div>';
 
+	$sql = "SELECT
+				`app_id`,
+				COUNT(*)
+			FROM `_user_access`
+			WHERE `app_id` IN ("._idsGet($spisok, 'app_id').")
+			  AND !`app_archive`
+			GROUP BY `app_id`";
+	$userC = query_ass($sql);
+
 	$send = '';
 	foreach($spisok as $r) {
-		$bgCur = $r['app_id'] == APP_ID ? 'bg-dfd' : 'bg-gr2';
+		$bgCur = $r['app_id'] == APP_ID ? ' bg-dfd' : '';
+		$uc = _num($userC[$r['app_id']]);
 		$send .=
-			'<div class="pad10 mb10 over2 curP '.$bgCur.'" onclick="_appEnter('.$r['app_id'].')">'.
-		  (SA ? '<span class="grey">'.$r['app_id'].'.</span> ' : '').
-				_app($r['app_id'], 'name').
-				'<div class="fr grey">'.FullData(_app($r['app_id'], 'dtime_add')).'</div>'.
-			'</div>';
+		'<div class="line-b over1 over-parent'.$bgCur.'" val="'.$r['id'].'">'.
+			'<table class="bs10 w100p">'.
+				'<tr><td class="w35">'.
+						_imageHtml(_app($r['app_id'], 'img'), 40).
+					'<td class="w500 top">'.
+						'<a class="dib mt3 fs16 blue" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
+						'<div class="mt5 fs12 pale">'.$uc.' пользовател'._end($uc, 'ь', 'я', 'ей').'</div>'.
+					'<td class="w300 top r">'.
+						'<a class="color-vin over-child">Отправить в архив</a>'.
+					'<td class="top r">'.
+						'<div class="icon icon-move pl over-child"></div>'.
+			'</table>'.
+		'</div>';
 	}
 
 	return $send;

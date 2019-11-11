@@ -46,6 +46,13 @@ switch(@$_POST['op']) {
 						}
 						jsonSuccess();
 						break;
+					case 'PHP12_app_list':
+						foreach($sortIds as $n => $id) {
+							$sql = "UPDATE `_user_access` SET `sort`=".$n." WHERE `id`=".$id;
+							query($sql);
+						}
+						jsonSuccess();
+						break;
 				}
 				jsonError('Не найдена функция [12]');
 				break;

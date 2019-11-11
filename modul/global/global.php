@@ -90,27 +90,6 @@ function _settingInsert($arr, $key, $v) {//проверка наличия вс�
 	return $arr;
 }
 
-function _app($app_id, $i='all') {//Получение данных о приложении
-	$key = 'app'.$app_id;
-	if(!$arr = _cache_get($key, 1)) {
-		$sql = "SELECT *
-				FROM `_app`
-				WHERE `id`=".$app_id;
-		if(!$arr = query_assoc($sql))
-			die('Невозможно получить данные приложения. Кеш: '.$key);
-
-		_cache_set($key, $arr, 1);
-	}
-
-	if($i == 'all')
-		return $arr;
-
-	if(!isset($arr[$i]))
-		return '_app: неизвестный ключ';
-
-	return $arr[$i];
-}
-
 function _regFilter($v) {//проверка регулярного выражения на недопустимые символы
 	$reg = '/(\[)/'; // скобка [
 	if(preg_match($reg, $v))
