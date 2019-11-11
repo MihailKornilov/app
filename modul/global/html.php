@@ -468,7 +468,7 @@ function _html_hat() {//верхняя строка приложения для 
 
 			'<div id="hat-user">'.
 				'<div class="uname">'.USER_NAME.'</div>'.
-				'<dl>'.
+				'<dl class="'._dn(!PAS).'">'.
 					'<dd onclick="location.href=\''.URL.'&p=14\'">Мои настройки'.
 					'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
 					_hat_link_admin().
