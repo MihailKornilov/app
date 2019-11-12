@@ -12,6 +12,7 @@ function _element57_struct($el) {
 											1158 - Маленькие синие кнопки
 											1159 - С нижним подчёркиванием
 										*/
+		'num_2'   => _num($el['num_2']),//запоминать выбранный пункт меню
 		'txt_1'   => $el['txt_1']       //ids дочерних элементов
 	) + _elementStruct($el);
 }
@@ -25,13 +26,18 @@ function _element57_struct_vvv($el, $cl) {//пункты меню
 }
 function _element57_js($el) {
 	return array(
-		'num_1' => _num($el['num_1'])
+		'num_1' => _num($el['num_1']),
+		'num_2' => _num($el['num_2'])
 	) + _elementJs($el);
 }
 function _element57_print($el, $prm) {
-	$EL_COO = '57_'.$el['id'];
-	if($def = _num(@$_COOKIE[$EL_COO]))
-		$el['def'] = $def;
+	//последняя позиция пункта меню
+	if($el['num_2']) {
+		$EL_COO = '57_'.$el['id'];
+		if($def = _num(@$_COOKIE[$EL_COO]))
+			$el['def'] = $def;
+	}
+
 	$v = _elemPrintV($el, $prm, $el['def']);
 
 	$type = array(

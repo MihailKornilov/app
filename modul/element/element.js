@@ -1682,7 +1682,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							1158:2,
 							1159:3
 						},
-						EL_COO = '57_' + elm_id;
+						EL_COO = '57_' + elm_id;//сохранение последней позиции
 						toggle = function(id) {
 							_forN(vvv, function(sp) {
 								_forN(_elemFuncBlockObj(_idsAss(sp.blk)), function(oo) {
@@ -1691,7 +1691,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									oo.obj[sp.id == id ? 'show' : 'hide']();
 								});
 							});
-							_cookie(EL_COO, id);
+							if(el.num_2)
+								_cookie(EL_COO, id);
 						};
 					toggle(_num(ATR_CMP.val()));
 					ATR_CMP._menu({
