@@ -128,14 +128,14 @@ var FB,          //фрейм VK для изменения высоты $('body'
 			$(but).removeClass('_busy');
 		});
 	},
-	_appEnter = function(app_id) {//вход в приложение из списка приложений
+	_appEnter = function(app_id, page_id) {//вход в приложение из списка приложений
 		var send = {
 			op:'app_enter',
 			app_id:app_id
 		};
 
 		_post(send, function() {
-			location.href = URL;
+			location.href = URL + (page_id ? '&p=' + page_id : '');
 		});
 	};
 

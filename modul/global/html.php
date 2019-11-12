@@ -655,9 +655,13 @@ function PHP12_app_list() {//список приложений, которые �
 					'<td class="w500 top">'.
 						'<a class="dib mt3 fs16 blue" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
 						'<div class="mt5 fs12 pale">'.$uc.' пользовател'._end($uc, 'ь', 'я', 'ей').'</div>'.
-					'<td class="w300 top r">'.
-						'<a class="color-vin over-child dialog-open" val="dialog_id:107,edit_id:'.$id.'">Отправить в архив</a>'.
 					'<td class="top r">'.
+						'<a class="color-vin over-child dialog-open" val="dialog_id:107,edit_id:'.$id.'">Отправить в архив</a>'.
+					'<td class="w35 top r">'.
+			($r['access_admin'] ?
+						'<div onclick="_appEnter('.$r['app_id'].',7)" class="icon icon-admin'._tooltip('Администрирование', -63).'</div>'
+			: '').
+					'<td class="w35 top r">'.
 						'<div class="icon icon-move pl over-child"></div>'.
 			'</table>'.
 		'</div>';

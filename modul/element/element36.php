@@ -79,6 +79,7 @@ function _element36type($id='all') {//доступные варианты ико
 		41 => 'manual',
 		42 => 'copy',
 		43 => 'exit',
+		44 => 'admin'
 	);
 
 	if($id == 'all')
