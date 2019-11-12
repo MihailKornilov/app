@@ -665,6 +665,37 @@ function PHP12_app_list() {//список приложений, которые �
 
 	return $send;
 }
+function PHP12_app_archive() {//список приложений, отправленные в архив
+	if(!USER_ID)
+		return '';
+
+	$sql = "SELECT *
+			FROM `_user_access`
+			WHERE `user_id`=".USER_ID."
+			  AND `app_archive`
+			ORDER BY `sort`";
+	if(!$spisok = query_arr($sql))
+		return
+			'<div class="center pad30 color-555 fs15">'.
+				'Архивных приложений нет.'.
+			'</div>';
+
+	$send = '';
+	foreach($spisok as $id => $r) {
+		$bgCur = $r['app_id'] == APP_ID ? ' bg-dfd' : '';
+		$send .=
+		'<div class="line-b over1 over-parent'.$bgCur.'" val="'.$id.'">'.
+			'<table class="bs10 w100p">'.
+				'<tr><td class="w500 top">'.
+						'<a class="dib mt3 fs16 blue" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
+					'<td class="w300 top r">'.
+						'<a class="color-pay over-child dialog-open" val="dialog_id:106,edit_id:'.$id.'">Восстановить из архива</a>'.
+			'</table>'.
+		'</div>';
+	}
+
+	return $send;
+}
 function _app_content() {//центральное содержание
 	if(IFRAME_AUTH_ERROR)
 		return '';
