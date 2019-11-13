@@ -70,7 +70,7 @@ function _blockParam($PARAM=array(), $obj_name='') {//значения-пара�
 	//условия для настройки блоков конкретного объекта
 	if(!isset($PARAM['blk_setup']))
 		if($obj_name == 'page')
-			$PARAM['blk_setup'] = PAS;
+			$PARAM['blk_setup'] = PAS ? 1 : 0;
 
 	if(!empty($PARAM['blk_choose']))
 		$PARAM['blk_setup'] = 1;
@@ -149,7 +149,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 	$BT = $PARAM['blk_setup'] && !$PARAM['elm_choose'] ? ' bor-t-dash' : '';
 	$BR = $PARAM['blk_setup'] && !$PARAM['elm_choose'] ? ' bor-r-dash' : '';
 	$BB = $PARAM['blk_setup'] && !$PARAM['elm_choose'] ? ' bor-b-dash' : '';
-	$br1px = $PARAM['blk_setup'];//место в 1px для показа красной разделительной линии справа
+	$br1px = $PARAM['blk_setup'] ? 1 : 0;//место в 1px для показа красной разделительной линии справа
 
 	foreach($block as $y => $str) {
 		$widthMax = $WM;

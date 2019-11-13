@@ -256,13 +256,13 @@ function _pasDefine() {//установка флага включения упр
 	if($page_id = _page('cur'))//страница существует
 		if($page = _page($page_id))//данные страницы получены
 			if(!(_pageSA($page) && !SA))
-				if(!(!$page['app_id'] && !SA)) {
-					$pas = _num(@$_COOKIE['page_setup']);
-					if($pas != $page_id) {
-						$pas = 0;
-						setcookie('page_setup', '', time() - 1, '/');
-					}
-				}
+				if(!(!$page['app_id'] && !SA))
+					if($pas = _num(@$_COOKIE['page_setup']))
+						if($pas != $page_id)
+							$pas = 0;
+
+	if(!$pas)
+		setcookie('page_setup', '', time() - 1, '/');
 
 	define('PAS', APP_ID && $pas ? $page_id : 0);
 //	define('PAS', 1);//для настройки страниц, которые доступны всем приложениям
@@ -461,7 +461,7 @@ function _pageShow($page_id) {
 	if(!_pageAccess($page_id))
 		return _empty20('Страница недоступна или не существует.'.PAGE_MSG_ERR);
 
-	$prm = _blockParam();
+	$prm = array();
 
 	//страница принимает данные записи
 	if($dialog_id = $page['dialog_id_unit_get']) {
