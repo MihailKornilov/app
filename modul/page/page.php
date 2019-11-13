@@ -461,7 +461,7 @@ function _pageShow($page_id) {
 	if(!_pageAccess($page_id))
 		return _empty20('Страница недоступна или не существует.'.PAGE_MSG_ERR);
 
-	$prm = array();
+	$prm = _blockParam();
 
 	//страница принимает данные записи
 	if($dialog_id = $page['dialog_id_unit_get']) {
