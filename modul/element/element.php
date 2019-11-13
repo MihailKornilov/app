@@ -1279,9 +1279,9 @@ function _elemOne($elem_id, $upd=false) {//запрос одного элеме�
 		$global = $el['app_id'] ? 0 : 1;
 		if(_cache_isset($key, $global)) {
 			$ELM = _cache_get($key, $global);
+			$el = _beElemDlg($el);
 			$el = _element('struct', $el);
 			$el = _elementTitle($el);
-			$el = _beElemDlg($el);
 
 			//дочерние элементы
 			$sql = "SELECT *
