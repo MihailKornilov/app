@@ -532,7 +532,7 @@ $(document)
 		});
 	})
 	.on('click', '#page_setup', function() {//включение/выключение управления страницей
-		_cookie('page_setup', _cookie('page_setup') == 1 ? 0 : 1);
+		_cookie('page_setup', _num(_cookie('page_setup')) ? 0 : PAGE_ID);
 		$(this).addClass('_busy');
 		location.reload();
 	})

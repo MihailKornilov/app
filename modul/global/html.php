@@ -466,9 +466,9 @@ function _html_hat() {//верхняя строка приложения для 
 		'<div class="mara">'.
 			'<a href="'.URL.'" class="hat-title">'._html_title().'</a>'.
 
-			'<div id="hat-user">'.
+			'<div id="hat-user" class="'._dn(!PAS, 'ispas').'">'.
 				'<div class="uname">'.USER_NAME.'</div>'.
-				'<dl class="'._dn(!PAS).'">'.
+				'<dl>'.
 					'<dd onclick="location.href=\''.URL.'&p=14\'">Мои настройки'.
 					'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
 					_hat_link_admin().
@@ -655,6 +655,7 @@ function PHP12_app_list() {//список приложений, которые �
 					'<td class="w500 top">'.
 						'<a class="dib mt3 fs16 blue" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
 						'<div class="mt5 fs12 pale">'.$uc.' пользовател'._end($uc, 'ь', 'я', 'ей').'</div>'.
+			  (SA ? '<td class="top center w50"><span class="pale fs16 ml30">'.$r['app_id'].'</span>' : '').
 					'<td class="top r">'.
 						'<a class="color-vin over-child dialog-open" val="dialog_id:107,edit_id:'.$id.'">Отправить в архив</a>'.
 					'<td class="w35 top r">'.

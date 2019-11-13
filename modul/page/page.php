@@ -256,10 +256,15 @@ function _pasDefine() {//установка флага включения упр
 	if($page_id = _page('cur'))//страница существует
 		if($page = _page($page_id))//данные страницы получены
 			if(!(_pageSA($page) && !SA))
-				if(!(!$page['app_id'] && !SA))
-					$pas = _bool(@$_COOKIE['page_setup']);
+				if(!(!$page['app_id'] && !SA)) {
+					$pas = _num(@$_COOKIE['page_setup']);
+					if($pas != $page_id) {
+						$pas = 0;
+						setcookie('page_setup', '', time() - 1, '/');
+					}
+				}
 
-	define('PAS', APP_ID && $pas ? 1 : 0);
+	define('PAS', APP_ID && $pas ? $page_id : 0);
 //	define('PAS', 1);//для настройки страниц, которые доступны всем приложениям
 }
 function _pasMenu() {//строка меню управления страницей

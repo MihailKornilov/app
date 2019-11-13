@@ -276,11 +276,10 @@ body:not(.site){position:relative}
 	height:42px;
 	float:right;
 	text-align:right;
-	cursor:pointer;
 	position:relative;
 }
-#hat-user:hover{background-color:#5C738E}
-#hat.local #hat-user:hover{background-color:#6A6A6A}
+#hat-user:not(.ispas):hover{background-color:#5C738E;cursor:pointer}
+#hat.local #hat-user:not(.ispas):hover{background-color:#6A6A6A;cursor:pointer}
 
 #hat-user .uname{margin:13px 8px 0 0;font-size:14px}
 #hat-user dl{
@@ -296,7 +295,8 @@ body:not(.site){position:relative}
 #hat-user dd:hover{color:#fff}
 #hat-user .sa{color:#800;text-decoration:none}
 #hat-user .sa:hover{color:#e99}
-#hat-user:not(:hover) dl{display:none}
+#hat-user:not(:hover) dl,
+#hat-user.ispas dl{display:none}
 #hat-user dd:not(:hover) .icon{opacity:.7}
 
 
