@@ -693,6 +693,7 @@ function PHP12_app_archive() {//список приложений, отправ�
 			'<table class="bs10 w100p">'.
 				'<tr><td class="w500 top">'.
 						'<a class="dib mt3 fs16 blue" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
+			  (SA ? '<td class="top center w50"><span class="pale fs16 ml30">'.$r['app_id'].'</span>' : '').
 					'<td class="w300 top r">'.
 						'<a class="color-pay over-child dialog-open" val="dialog_id:106,edit_id:'.$id.'">Восстановить из архива</a>'.
 			'</table>'.
