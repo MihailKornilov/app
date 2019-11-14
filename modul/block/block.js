@@ -118,7 +118,9 @@ var _ids = function(v, count) {
 					});
 					$('#elem-img-width')._count({
 						width:60,
-						step:[30,50,80,100,150,200,250],
+						step:10,
+						min:30,
+						max:1000,
 						func:function(v) {
 							_attr_el(BL.elem_id)
 								.find('img')
