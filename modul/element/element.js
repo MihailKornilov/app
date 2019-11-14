@@ -123,7 +123,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			dialog = $('body').append(html).find('._dialog:last'),
 			DBACK = dialog.prev(),
-			frameD = dialog.find('.frameD'),
 			iconEdit = dialog.find('.head .edit'),
 			content = dialog.find('.content'),
 			width = o.width || Math.round(content.width()),
@@ -139,7 +138,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			},
 			//функция, которая выполняется при отмене или закрытии диалога
 			closeFunc = function() {},
-			w2 = Math.round(width / 2), // ширина/2. Для определения положения по центру
+			w2 = Math.round(width / 2), //ширина/2. Для определения положения по центру
 			vkScroll = VK_SCROLL > 110 ? VK_SCROLL - 110 : 0;//корректировка скролла VK
 
 		dialog.find('.close').click(dialogClose);
@@ -181,12 +180,26 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		ZINDEX += 10;
 
+		//корректное закрытие окна клавишей ESC
+		var esci = ZINDEX;
+		$(document)
+			.off('keyup.esc' + esci)
+			.on('keyup.esc' + esci, function(e) {
+				if(e.which != 27)
+					return;
+				if(esci != ZINDEX)
+					return;
+				dialogClose();
+			});
+
+
 		_fbhs();
 		window['frameD' + DIALOG_NUM].onresize = _fbhs;
 
 		function dialogClose() {
 			DBACK.remove();
 			dialog.remove();
+			$(document).off('keyup.esc' + esci);
 			ZINDEX -= 10;
 			if(o.dialog_id)
 				delete DIALOG[o.dialog_id];
@@ -200,6 +213,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				show:1
 			});
 		}
+
+
+
+
 
 		var DLG = {
 			id:o.dialog_id,
@@ -959,11 +976,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 				//однострочное текстовое поле
 				case 8:
-					if(!el.action)
-						return;
-					ATR_CMP.keyup(function() {
-						_elemAction(el);
-					});
+					if(el.action || el.num_7)
+						ATR_CMP.keyup(function(e) {
+							if(el.action)
+								_elemAction(el);
+
+							//нажатие на Enter
+							if(el.num_7)
+								if(e.which == 13)
+									OBJ.dlg.go();
+						});
 					return;
 				//Функция
 				case 12:

@@ -21,9 +21,15 @@ function _element8_struct($el) {
                                             8064: указанное значение
 									  */
 		'num_6' => _num($el['num_6']),//прижимать текст вправо
+		'num_7' => _num($el['num_7']),//применять диалоговое окно по нажатию Enter
 		'txt_4' => $el['txt_4'],      //начальный текст: указанное значение [13]
 		'txt_3' => $el['txt_3']       //шаблон артикула (для 34)
 	) + _elementStruct($el);
+}
+function _element8_js($el) {
+	return array(
+		'num_7' => $el['num_7']
+	) + _elementJs($el);
 }
 function _element8_print($el, $prm) {
 	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
