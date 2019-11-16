@@ -628,7 +628,7 @@ function PHP12_app_list() {//список приложений, которые �
 			FROM `_user_access`
 			WHERE `user_id`=".USER_ID."
 			  AND !`app_archive`
-			ORDER BY `sort`";
+			ORDER BY `uasort`";
 	if(!$spisok = query_arr($sql))
 		return
 			'<div class="center pad30 color-555 fs15">'.
@@ -678,7 +678,7 @@ function PHP12_app_archive() {//список приложений, отправ�
 			FROM `_user_access`
 			WHERE `user_id`=".USER_ID."
 			  AND `app_archive`
-			ORDER BY `sort`";
+			ORDER BY `uasort`";
 	if(!$spisok = query_arr($sql))
 		return
 			'<div class="center pad30 color-555 fs15">'.

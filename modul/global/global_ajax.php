@@ -48,7 +48,7 @@ switch(@$_POST['op']) {
 						break;
 					case 'PHP12_app_list':
 						foreach($sortIds as $n => $id) {
-							$sql = "UPDATE `_user_access` SET `sort`=".$n." WHERE `id`=".$id;
+							$sql = "UPDATE `_user_access` SET `uasort`=".$n." WHERE `id`=".$id;
 							query($sql);
 						}
 						jsonSuccess();

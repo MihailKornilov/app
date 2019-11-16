@@ -95,7 +95,7 @@ body:not(.site){position:relative}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:-9999px 0 no-repeat url(../../img/icon18.png?51);
+	background:-9999px 0 no-repeat url(../../img/icon18.png?52);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -148,6 +148,7 @@ body:not(.site){position:relative}
 .icon-copy   {background-position-x:-920px}/* копирование: два прямоугольничка друг за другом */
 .icon-manual {background-position-x:-940px}/* руководство: раскрытая книжка */
 .icon-admin  {background-position-x:-960px}/* администратор: человек в кружках */
+.icon-video  {background-position-x:-980px}/* видеоролик: треугольник в квадратике */
 
 /* настройка ширины блоков */
 .icon-width  {
@@ -812,6 +813,7 @@ body:not(.site){position:relative}
 .prel{position:relative}
 .top5{top:5px}
 .top6{top:6px}
+.l5{left:5px}
 .r3{right:3px}
 .r5{right:5px}
 .pabs{position:absolute}
