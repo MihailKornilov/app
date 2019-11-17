@@ -42,6 +42,12 @@ function _element11_struct($el, $ELM=array()) {
 				$send['num_8'] = _num($el['num_8']);
 				$send['immg'] = 1;
 			}
+
+			//является видеороликом
+			if($el11['dialog_id'] == 76) {
+				$send['width'] = empty($el['width']) ? 150 : _num($el['width']);
+				$send['immg'] = 1;
+			}
 	}
 
 	return $send;
@@ -62,6 +68,12 @@ function _element11_struct_title($el, $ELM, $DLGS=array()) {
 				$el['title'] = 'IMG';
 			else
 				$el['title'] = _imageNo($el['width'], $el['num_8']);
+			return $el;
+		}
+
+		//для видеоролика путь не пишется
+		if($ell['dialog_id'] == 76) {
+			$el['title'] = _elem76novideo($el['width']);
 			return $el;
 		}
 

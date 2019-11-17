@@ -781,7 +781,13 @@ function _elemFormat($el, $prm, $txt) {//формат значения элем�
 }
 function _elemLink($el, $txt) {//нахождение ссылок и преобразование
 	switch($el['dialog_id']) {
-		case 11: return _noteLink($txt);
+		case 11:
+			if($last_id = _idsLast($el['txt_2']))
+				if($el11 = _elemOne($last_id))
+					if($el11['dialog_id'] == 76)//для видеороликов ссылка не делается
+						return $txt;
+
+			return _noteLink($txt);
 	}
 
 	return $txt;

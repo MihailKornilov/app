@@ -7,8 +7,6 @@ function _element76_struct($el) {
 	return array(
 	) + _elementStruct($el);
 }
-
-/* Вывод содержимого элемента на экран */
 function _element76_print($el, $prm) {
 	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
@@ -27,6 +25,16 @@ function _element76_print($el, $prm) {
 		$frame.
 	'</div>';
 }
+function _element76_print11($el, $u) {
+	$ELP = $el['elp'];
+
+	if(!$col = _elemCol($el))
+		return _elem76novideo($ELP['width']);
+	if(!$frame = _elem76iframe($ELP, $u[$col]))
+		return _elem76novideo($ELP['width']);
+
+	return $frame;
+}
 function _elem76iframe($el, $url) {//получение фрейма для вставки ролика
 	$code = '';
 	if(strpos($url, 'youtu.be')) {
@@ -35,8 +43,13 @@ function _elem76iframe($el, $url) {//получение фрейма для вс
 			$code = $ex[1];
 	} elseif(strpos($url, 'watch')) {
 		$ex = explode('watch?v=', $url);
-		if(!empty($ex[1]))
+		if(!empty($ex[1])) {
 			$code = $ex[1];
+			if(strpos($code, '&')) {
+				$ex = explode('&', $code);
+				$code = $ex[0];
+			}
+		}
 	}
 
 	if(!$code)
@@ -58,3 +71,11 @@ function _elem76iframe($el, $url) {//получение фрейма для вс
 		' allowfullscreen'.
 	'></iframe>';
 }
+function _elem76novideo($width) {//отсутствующий видеоролик
+	return '<img src="'.APP_HTML.'/img/novideo.png" width="'.$width.'" />';
+}
+
+
+
+
+

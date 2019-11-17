@@ -602,7 +602,7 @@ var _ids = function(v, count) {
 			return '';
 
 		return '<table class="bs5">' +
-			'<tr><td class="color-555 fs14">Ширина фото:' +
+			'<tr><td class="color-555 fs14">Ширина:' +
 				'<td><input type="hidden" id="elem-img-width" class="w15" value="' + EL.width + '" />' +
 				'<td class="pl5">' +
 					'<input type="hidden" id="elem-img-height" value="' + EL.num_7 + '" />' +
