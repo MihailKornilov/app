@@ -752,6 +752,17 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+
+	case 'el76_video'://получение готового фрейма для ролика Ютуб
+		if(!$el = _elemOne($_POST['elem_id']))
+			jsonError('Не получен id элемента');
+		if(!$url = _txt(@$_POST['url']))
+			jsonError('Отсутствует ссылка');
+		if(!$send['iframe'] = _elem76iframe($el, $url))
+			jsonError('Не получен код видео.');
+
+		jsonSuccess($send);
+		break;
 }
 
 function _dialogSetupHistory($DLG) {//раздел История действий

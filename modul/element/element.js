@@ -2159,6 +2159,42 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(el.action)
 						_elemAction(el, FILTER[el.num_1][elm_id], 1);
 					return;
+				//Видеоролик
+				case 76:
+					var CNT = ATR_EL.find('._video-cont'),
+						DEL = ATR_EL.find('.icon-del');
+					ATR_CMP.keyup(function() {
+						var url = $(this).val();
+						if(!url) {
+							DEL._dn();
+							return;
+						}
+
+						DEL._dn(true).addClass('spin');
+
+						var send = {
+							op:'el76_video',
+							elem_id:el.id,
+							url:url,
+							func_err:function(res) {
+								var msg = '<div class="center red">' + res.text + '</div>';
+								CNT.html(msg)._dn(true);
+								DEL.removeClass('spin');
+							}
+						};
+						_post(send, function(res) {
+							CNT.html(res.iframe)._dn(true);
+							DEL.removeClass('spin');
+						});
+					});
+					DEL.click(function() {
+						CNT.slideUp(200, function() {
+							CNT.html('').show()._dn();
+						});
+						DEL._dn();
+						ATR_CMP.val('').focus();
+					});
+					return;
 				//Фильтр-календарь
 				case 77:
 					var CAL = ATR_EL.find('._filter-calendar'),
