@@ -231,11 +231,20 @@ body:not(.site){position:relative}
 
 
 /* Верхняя полоса сайта - шапка */
+#hat-prel{
+	position:relative;
+	height:42px;
+}
 #hat{
+	position:fixed;
+	top:0;
+	left:0;
 	height:42px;
 	background-color:#697F99;
 	color:#fff;
+	z-index:3;
 }
+#hat-center{width:1000px;margin:0 auto}
 #hat.show{background-color:#D47E02}/* просмотр от имени другого пользователя */
 .hat-title{
 	display:inline-block;

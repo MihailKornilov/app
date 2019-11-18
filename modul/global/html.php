@@ -462,32 +462,43 @@ function _html_hat() {//верхняя строка приложения для 
 	$local = LOCAL || !SA && !APP_ACCESS ? ' class="local"' : '';
 
 	return
-	'<div id="hat"'.$local.'>'.
-		'<div class="mara">'.
-			'<a href="'.URL.'" class="hat-title">'._html_title().'</a>'.
+	'<div id="hat-prel">'.
 
-			'<div id="hat-user" class="'._dn(!PAS, 'ispas').'">'.
-				'<div class="uname">'.USER_NAME.'</div>'.
-				'<dl>'.
-					'<dd onclick="location.href=\''.URL.'&p=14\'">Мои настройки'.
-					'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
-					_hat_link_admin().
-					_hat_link_task().
-					_hat_link_manial().
-			  (SA ? '<dd onclick="location.href=\''.URL.'&p=1\'" class="sa b">SA' : '').
-			  (SA ? '<dd onclick="window.open(\'http://'.(LOCAL ? 'nyandoma/' : '').'gim-system.ru\', \'_blank\')" class="sa">GIM-system.ru' : '').
-					'<dd onclick="location.href=\''.URL.'&logout\'">'.
-						'Выход'.
-						'<div class="icon icon-exit wh ml5 mbm3"></div>'.
-				'</dl>'.
+		'<div id="hat"'.$local.'>'.
+			'<div id="hat-center">'.
+				'<a href="'.URL.'" class="hat-title">'._html_title().'</a>'.
+
+				'<div id="hat-user" class="'._dn(!PAS, 'ispas').'">'.
+					'<div class="uname">'.USER_NAME.'</div>'.
+					'<dl>'.
+						'<dd onclick="location.href=\''.URL.'&p=14\'">Мои настройки'.
+						'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
+						_hat_link_admin().
+						_hat_link_task().
+						_hat_link_manial().
+				  (SA ? '<dd onclick="location.href=\''.URL.'&p=1\'" class="sa b">SA' : '').
+				  (SA ? '<dd onclick="window.open(\'http://'.(LOCAL ? 'nyandoma/' : '').'gim-system.ru\', \'_blank\')" class="sa">GIM-system.ru' : '').
+						'<dd onclick="location.href=\''.URL.'&logout\'">'.
+							'Выход'.
+							'<div class="icon icon-exit wh ml5 mbm3"></div>'.
+					'</dl>'.
+				'</div>'.
+
+				'<div id="hat-but">'.
+					_hat_but_pas().
+				'</div>'.
+
 			'</div>'.
-
-			'<div id="hat-but">'.
-				_hat_but_pas().
-			'</div>'.
-
 		'</div>'.
-	'</div>';
+
+	'</div>'.
+
+	//шапка в зафиксированном состоянии. При изменеии ширины страницы шапка центрируется
+	'<script>'.
+		'function hatW(){var w=$(window).width();$("#hat").width(w<1000?1000:w)}'.
+		'$(window).resize(hatW);'.
+		'hatW();'.
+	'</script>';
 }
 function _html_sa_access_msg() {//сообщение о закрытом доступе приложения для SA
 	if(!SA)

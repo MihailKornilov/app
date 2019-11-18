@@ -1,14 +1,8 @@
 /* несдвигание при появление полосы прокрутки */
 html{margin-left:calc(100vw - 100%)}
 
-/* Верхняя полоса сайта - шапка */
-#hat{margin-left:-15px}
-#hat .mara{width:1000px;padding-left:15px}
-
-
 /* Сообщение о закрытом доступе для SA */
 #sa-access-msg{margin-left:-15px}
-
 
 /* Строка управления страницей page_setup */
 #pas{margin-left:-15px}
