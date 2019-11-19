@@ -783,12 +783,12 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	position:fixed;
 	width:60px;
 	height:60px;
-	background-color:#32CB31;
+	background-color:#ccc;
 	border-radius:100px;
 	z-index:10;
-	box-shadow: 0 0 15px rgba(0,0,0,0.4);
+	box-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
-.but97:hover{background-color:#35D934}
+.but97:hover{background-color:#d0d0d0}
 .b97-ver{
 	width:8px;
 	height:11px;
