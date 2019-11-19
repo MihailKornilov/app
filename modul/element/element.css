@@ -794,7 +794,9 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 	height:11px;
 	margin-left:26px;
 	background-color:#eee;
+	border-radius:2px 2px 0 0;
 }
+.b97-ver.bottom{border-radius:0 0 2px 2px}
 .b97-gor{
 	width:30px;
 	height:8px;
@@ -804,7 +806,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 }
 .but97:hover .b97-ver,
 .but97:hover .b97-gor{background-color:#fff}
-
+.but97:active .b97-ver:not(.bottom){margin-top:16px}
 
 
 

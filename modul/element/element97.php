@@ -22,14 +22,14 @@ function _elem97print($page_id) {//вывод кнопки на экран
 		if($el['dialog_id'] != 97)
 			continue;
 
-		$css = 'margin-top:'.$el['num_2'].';'.
-			   'margin-left:'.$el['num_3'].';';
+		$css = 'margin-top:'.$el['num_2'].'px;'.
+			   'margin-left:'.$el['num_3'].'px;';
 
 		$send .=
-		'<div class="but97'.(PAS ? '' : ' curP dialog-open').'" val="dialog_id:'.$el['num_1'].'" style="'.$css.'">'.
+		'<div class="but97 busy'.(PAS ? '' : ' curP dialog-open').'" val="dialog_id:'.$el['num_1'].'" style="'.$css.'">'.
 			'<div class="b97-ver mt15"></div>'.
 			'<div class="b97-gor"></div>'.
-			'<div class="b97-ver"></div>'.
+			'<div class="b97-ver bottom"></div>'.
 		'</div>';
 	}
 
