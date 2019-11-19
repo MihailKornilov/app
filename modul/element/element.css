@@ -769,3 +769,44 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 /* [75] */
 .pname75 span{display:none}
+
+
+
+
+
+
+
+
+
+/* [97] Независимая кнопка */
+.but97{
+	position:fixed;
+	width:60px;
+	height:60px;
+	background-color:#32CB31;
+	border-radius:100px;
+	z-index:10;
+	box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+.but97:hover{background-color:#35D934}
+.b97-ver{
+	width:8px;
+	height:11px;
+	margin-left:26px;
+	background-color:#eee;
+}
+.b97-gor{
+	width:30px;
+	height:8px;
+	margin-left:15px;
+	background-color:#eee;
+	border-radius:2px;
+}
+.but97:hover .b97-ver,
+.but97:hover .b97-gor{background-color:#fff}
+
+
+
+
+
+

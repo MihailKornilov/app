@@ -412,9 +412,6 @@ function _blockLevelChange($obj_name, $obj_id) {//кнопки изменени�
 		$html.
 		_blockWidthChange($obj_name, $obj_id).
 		_blockChooseBut($obj_name, $obj_id).
-
-		'<div val="dialog_id:97" class="icon icon-add fr dialog-open'._tooltip('Добавить независимый элемент', -188, 'r').'</div>'.
-
 	'</div>';
 }
 function _blockLevelPageEdit() {//отображение иконки редактирования страницы
@@ -1321,7 +1318,8 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		return $send;
 	}
 
-	if($i == 'elem_ids_js') {//массив ID элементов в формате JS
+	//массив ID элементов в формате JS
+	if($i == 'elem_ids_js') {
 		$obj_name = $i1;
 		if(!$obj_id = _num($i2))
 			return '[]';

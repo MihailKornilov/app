@@ -726,6 +726,7 @@ function _app_content() {//центральное содержание
 
 	return
 	'<div id="_content" class="block-content-page '.SITE.'">'.
+		_elem97print($page_id).
 		_pageShow($page_id).
 	'</div>';
 }
