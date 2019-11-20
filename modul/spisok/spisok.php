@@ -267,9 +267,13 @@ function _spisok7num($spisok, $el) {//добавление записи, есл�
 
 	$DLG = _dialogQuery($el['num_1']);
 
+	$col = 'num';
+	if(!$tab = _queryTN($DLG, 'num', 1))
+		$col = 'id';
+
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
-			WHERE `t1`.`num`=".$num."
+			WHERE `t1`.`".$col."`=".$num."
 			  AND "._queryWhere($DLG)."
 			LIMIT 1";
 	if(!$u = query_assoc($sql))
