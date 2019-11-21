@@ -429,7 +429,8 @@ function _html_script() {//скрипты и стили
 	'<script src="js/lodash.min.js"></script>'.
 	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css?8" />'.//'.SCRIPT.'
 	'<script src="js/gridstack'.MIN.'.js?2"></script>'.//'.SCRIPT.'
-	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'
+	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'.
+	'<script src="js/ckeditor5.js"></script>'
 : '').
 
 	'<script src="modul/page/page'.MIN.'.js?'.SCRIPT.'"></script>'.
@@ -604,6 +605,36 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 	if(!$app_id)
 		return;
 
+	if(!$access_id = _userAppAccessCreate($app_id)) {
+		_cache_clear('app'.$app_id, 1);
+		return;
+	}
+
+	//изменение текущего приложения на новое
+	$sql = "UPDATE `_user_auth`
+			SET `app_id`=".$app_id."
+			WHERE `code`='".CODE."'";
+	query($sql);
+
+	//применение прав пользователю, создавшему приложение
+	$sql = "UPDATE `_user_access`
+			SET `access_admin`=1,
+				`access_task`=1,
+				`access_manual`=1
+			WHERE `id`=".$access_id;
+	query($sql);
+
+	_cache_clear('AUTH_'.CODE, 1);
+	_cache_clear('page');
+	_cache_clear('user'.USER_ID);
+
+	_auth();
+}
+function _app_copy($dialog, $app_id) {//копирование приложения
+	if($dialog['id'] != 140)
+		return;
+	if(!$app_id)
+		return;
 	if(!$access_id = _userAppAccessCreate($app_id)) {
 		_cache_clear('app'.$app_id, 1);
 		return;

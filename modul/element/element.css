@@ -812,3 +812,39 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
+
+
+
+
+/* Форматированные текст ckeditor5 (через [5]) */
+.ck-content,
+.ck-content *{font-size:inherit}
+.ck-content i strong{font-style:italic}
+.ck-content strong{font-weight:bold}
+.ck-content p{margin:10px 0}
+.ck-content h1{
+	font-size:20px;
+	margin:10px 0;
+	padding-bottom:8px;
+	border-bottom:#DEE3EF solid 1px;
+}
+.ck-content h2{font-size:18px;margin:8px 0}
+.ck-content h3{font-size:16px;margin:8px 0}
+.ck-content blockquote{
+    border-left:#ccc solid 5px;
+    background-color:#f4f4f4;
+    margin:15px 0;
+    padding:1px 5px 1px 15px;
+}
+.ck-content ul,
+.ck-content ol{margin:10px 0 10px 40px}
+.ck-content ol{list-style-type:decimal}
+.ck-content li{padding:3px 0}
+
+/* Окошко для создания ссылки */
+.ck.ck-balloon-panel{z-index:1200}
+
+
+
+
+

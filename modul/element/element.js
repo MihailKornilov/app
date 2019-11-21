@@ -743,6 +743,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					ATR_CMP = _attr_cmp(id);
 
 				switch(sp.dialog_id) {
+					//многострочный текст
+					case 5:
+						if(!sp.num_2)
+							break;
+						if(!ATR_CMP)
+							return;
+						send.cmp[id] = _attr_el(id).find('.ck-content').html();
+						return;
+						break;
 					//подключаемая функция
 					case 12:
 						var func = sp.txt_1 + '_get';
@@ -923,7 +932,34 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					_elemAction(el, _num(ATR_CMP.val()), 1);
 					return;
 				//textarea
-				case 5:	ATR_CMP._autosize(); return;
+				case 5:
+					if(!el.num_2) {
+						ATR_CMP._autosize();
+						return;
+					}
+					//num_2: форматирование текста
+					ClassicEditor.create(document.querySelector(ATTR_CMP(elm_id)), {
+						toolbar: [
+							'heading',
+							'|',
+							'bold', 'italic', 'Underline',
+							'|',
+							'bulletedList', 'numberedList', 'blockQuote',
+							'|',
+							'link',
+							'|',
+							'undo', 'redo'
+						],
+						heading:{
+							options:[
+								{model:'paragraph', title:'Параграф', class:'ck-heading_paragraph' },
+								{model:'heading1', view:'h1', title:'Заголовок 1', class:'ck-heading_heading1' },
+								{model:'heading2', view:'h2', title:'Заголовок 2', class:'ck-heading_heading2' },
+								{model:'heading3', view:'h3', title:'Заголовок 3', class:'ck-heading_heading3' }
+							]
+						}
+					});
+					return;
 				//select - выбор страницы
 				case 6:
 					_elemAction(el, _num(ATR_CMP.val()), 1);

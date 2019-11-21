@@ -780,9 +780,12 @@ function _elemLink($el, $txt) {//нахождение ссылок и преоб
 	switch($el['dialog_id']) {
 		case 11:
 			if($last_id = _idsLast($el['txt_2']))
-				if($el11 = _elemOne($last_id))
+				if($el11 = _elemOne($last_id)) {
 					if($el11['dialog_id'] == 76)//для видеороликов ссылка не делается
 						return $txt;
+					if($el11['dialog_id'] == 5 && $el11['num_2'])
+						return $txt;
+				}
 
 			return _noteLink($txt);
 	}

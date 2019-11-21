@@ -11,9 +11,15 @@ function _element5_struct($el) {
                                             8051: произвольный текст
                                             8052: указанное значение
 									  */
+		'num_2' => _num($el['num_2']),//форматирование текста
 		'txt_2' => $el['txt_2'],//начальный текст: произвольный
 		'txt_3' => $el['txt_3'] //начальный текст: указанное значение [13]
 	) + _elementStruct($el);
+}
+function _element5_js($el) {
+	return array(
+		'num_2' => $el['num_2']
+	) + _elementJs($el);
 }
 function _element5_print($el, $prm) {
 	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
@@ -33,8 +39,12 @@ function _element5_print11($el, $u) {
 	if(!$txt = @$u[$col])
 		return '';
 
-	$txt = _spisokColSearchBg($el['elp'], $txt);
-	return _br($txt);
+	if(!$el['num_2']) {
+		$txt = _spisokColSearchBg($el['elp'], $txt);
+		return _br($txt);
+	}
+
+	return '<div class="ck-content">'.htmlspecialchars_decode($txt).'</div>';
 }
 function _element5vFromEl($el, $prm, $v) {//начальный текст из указанного значения
 	if($el['num_1'] != 8052)

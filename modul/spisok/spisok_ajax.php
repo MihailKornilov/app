@@ -548,6 +548,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	}
 
 	_app_create($dialog, $unit_id);
+	_app_copy($dialog, $unit_id);
 
 	$send = array(
 		'unit' => _arrNum($unit),
