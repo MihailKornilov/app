@@ -654,11 +654,108 @@ function _app_copy($dialog, $app_id) {//копирование приложен�
 			WHERE `id`=".$access_id;
 	query($sql);
 
+	_app_copy_spisok($app_id);
+
 	_cache_clear('AUTH_'.CODE, 1);
 	_cache_clear('page');
 	_cache_clear('user'.USER_ID);
 
 	_auth();
+}
+function _app_copy_spisok($app_id_dst) {//копирование разрешённых данных
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `clone_on`
+			  AND `table_1`=11
+			ORDER BY `name`";
+	if(!$dlg = query_arr($sql))
+		return;
+
+	foreach($dlg as $dlg_id => $d) {
+		$sql = "SELECT *
+				FROM `_spisok`
+				WHERE `app_id`=".APP_ID."
+				  AND `dialog_id`=".$dlg_id."
+				  AND !`deleted`
+				ORDER BY `id`";
+		if(!$spisok = query_arr($sql))
+			continue;
+
+		$pAss = array();//ассоциации parent_id
+		foreach($spisok as $id_old => $r) {
+			$sql = "INSERT INTO `_spisok` (
+						`id_old`,
+						`cnn_id`,
+						`app_id`,
+						`dialog_id`,
+						`num`,
+	
+						`parent_id`,
+						`child_lvl`,
+	
+						`txt_1`,`txt_2`,`txt_3`,`txt_4`,`txt_5`,`txt_6`,`txt_7`,`txt_8`,`txt_9`,`txt_10`,
+						`txt_11`,`txt_12`,`txt_13`,`txt_14`,`txt_15`,`txt_16`,`txt_17`,`txt_18`,`txt_19`,`txt_20`,
+						`txt_21`,`txt_22`,
+	
+						`num_1`,`num_2`,`num_3`,`num_4`,`num_5`,`num_6`,`num_7`,`num_8`,`num_9`,`num_10`,
+						`num_11`,`num_12`,`num_13`,`num_14`,`num_15`,`num_16`,`num_17`,`num_18`,`num_19`,`num_20`,
+	
+						`sum_1`,`sum_2`,`sum_3`,`sum_4`,`sum_5`,`sum_6`,`sum_7`,`sum_8`,`sum_9`,`sum_10`,
+						`sum_11`,`sum_12`,`sum_13`,`sum_14`,`sum_15`,
+	
+						`date_1`,`date_2`,`date_3`,`date_4`,`date_5`,
+	
+						`sort`,
+						`user_id_add`
+					) SELECT
+						".$id_old.",
+						`cnn_id`,
+						".$app_id_dst.",
+						`dialog_id`,
+						`num`,
+	
+						`parent_id`,
+						`child_lvl`,
+	
+						`txt_1`,`txt_2`,`txt_3`,`txt_4`,`txt_5`,`txt_6`,`txt_7`,`txt_8`,`txt_9`,`txt_10`,
+						`txt_11`,`txt_12`,`txt_13`,`txt_14`,`txt_15`,`txt_16`,`txt_17`,`txt_18`,`txt_19`,`txt_20`,
+						`txt_21`,`txt_22`,
+	
+						`num_1`,`num_2`,`num_3`,`num_4`,`num_5`,`num_6`,`num_7`,`num_8`,`num_9`,`num_10`,
+						`num_11`,`num_12`,`num_13`,`num_14`,`num_15`,`num_16`,`num_17`,`num_18`,`num_19`,`num_20`,
+	
+						`sum_1`,`sum_2`,`sum_3`,`sum_4`,`sum_5`,`sum_6`,`sum_7`,`sum_8`,`sum_9`,`sum_10`,
+						`sum_11`,`sum_12`,`sum_13`,`sum_14`,`sum_15`,
+	
+						`date_1`,`date_2`,`date_3`,`date_4`,`date_5`,
+	
+						`sort`,
+						".USER_ID."
+					  FROM `_spisok`
+					  WHERE `id`=".$id_old;
+			$unit_id = query_id($sql);
+
+			$pAss[$id_old] = $unit_id;
+		}
+
+		//расстановка новых parent_id
+		$sql = "SELECT *
+				FROM `_spisok`
+				WHERE `app_id`=".$app_id_dst."
+				  AND `dialog_id`=".$dlg_id."
+				  AND `parent_id`
+				ORDER BY `id`";
+		if($spisok = query_arr($sql))
+			foreach($spisok as $id => $r) {
+				$pid = _num(@$pAss[$r['parent_id']]);
+				$sql = "UPDATE `_spisok`
+						SET `parent_id`=".$pid."
+						WHERE `id`=".$id;
+				query($sql);
+			}
+	}
+
 }
 function PHP12_app_list() {//список приложений, которые доступны пользователю
 	if(!USER_ID)
