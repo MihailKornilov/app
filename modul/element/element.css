@@ -821,7 +821,6 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 .ck-content *{font-size:inherit}
 .ck-content i strong{font-style:italic}
 .ck-content strong{font-weight:bold}
-.ck-content p{margin:10px 0}
 .ck-content h1{
 	font-size:20px;
 	margin:10px 0;
