@@ -1,5 +1,4 @@
 <?php
-//die('Access denied.');
 
 require_once 'modul/global/global.php';
 

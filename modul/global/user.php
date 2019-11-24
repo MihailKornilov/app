@@ -325,7 +325,7 @@ function PHP12_user_active() {//общая картина использован
 	'<div id="user-active">'.$send.'</div>'.
 	_user_active_itog();
 }
-function _user_active_minute($data, $hour, $min) {//вставка данный по минутам
+function _user_active_minute($data, $hour, $min) {//вставка данных по минутам
 	if(empty($data[$hour]))
 		return '';
 

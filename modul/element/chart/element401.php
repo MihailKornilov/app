@@ -14,8 +14,8 @@ function _element401_js($el) {
 	) + _elementJs($el);
 }
 function _element401_print($el, $prm) {
-	if(!$year = _num($_GET['v1']))
-		return _emptyMinRed('[401] Не получен номер года для отображения графика');
+	if(!$year = _num(@$_GET['v1']))
+		$year = YEAR_CUR;
 	if(!$DLG = _dialogQuery($el['num_1']))
 		return _emptyMinRed('[401] Диалога '.$el['num_1'].' не существует.');
 	if($prm['blk_setup'])
