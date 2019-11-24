@@ -42,9 +42,9 @@ function _element29_js($el) {
 	) + _elementJs($el);
 }
 function _element29_print($el, $prm) {
-	$v = $el['num_6'];
+	$v = _elem29defGet($el['num_6']);
 	if(!$el['num_10'])
-		$v = _elemPrintV($el, $prm, $el['num_6']);
+		$v = _elemPrintV($el, $prm, $v);
 	$v = _elem29PageSel($el['num_1'], $v);
 	$v = _elem29DialogSel($prm, $v);
 	$v = _elem29UserSel($el, $prm, $v);
@@ -299,6 +299,22 @@ function _elem29defSet($dlg, $u) {//установка значения по у�
 			WHERE "._queryWhere($DLG)."
 			  AND !`".$col."`";
 	query($sql);
+}
+function _elem29defGet($v) {//получение значения по умолчанию для приложений-копий
+	if(!$v)
+		return 0;
+
+	//проверка приложения-копии
+	$app = _app(APP_ID);
+	if(!$pid = $app['pid'])
+		return $v;
+
+	$sql = "SELECT `id`
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `id_old`=".$v."
+			LIMIT 1";
+	return _num(query_value($sql));
 }
 
 function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select подключённого списка

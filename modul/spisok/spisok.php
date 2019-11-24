@@ -1682,6 +1682,11 @@ function _spisokUnitUpd55($unit) {//обновление сумм
 }
 
 function _count_update($app_id=APP_ID) {//обновление счётчиков
+	//установка родительского диалога, если нужно
+	$app = _app($app_id);
+	if($app['pid'])
+		$app_id = $app['pid'];
+
 	//пересчёт количеств [54]
 	$sql = "SELECT *
 			FROM `_element`
