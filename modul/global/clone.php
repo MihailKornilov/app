@@ -173,7 +173,8 @@ function PHP12_clone_on() {//получение диалогов, данные �
 				`dialog_id`,
 				COUNT(*)
 			FROM `_spisok`
-			WHERE `dialog_id` IN ("._idsGet($arr).")
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id` IN ("._idsGet($arr).")
 			GROUP BY `dialog_id`";
 	$ass = query_ass($sql);
 

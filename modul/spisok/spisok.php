@@ -1295,6 +1295,8 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 		return 'запись отсутствует';
 	}
 
+	$unit_id = _40condVcopy($unit_id);
+
 	//проверяются дочерние значения
 	$sql = "/* [40] проверка дочерних значений */
 			SELECT `id`
@@ -1302,7 +1304,6 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 			WHERE `parent_id`=".$unit_id;
 	if($ids = query_ids($sql))
 		$unit_id .= ','.$ids;
-
 
 	return $unit_id;
 }
@@ -1400,7 +1401,22 @@ function _40condV($act, $col, $val) {//значение запроса по ко
 
 	return " AND !`t1`.`id` /* _40condV: не найдено условие */";
 }
+function _40condVcopy($unit_id) {//подмена значения для копии из оригинала
+	if($unit_id <= 0)
+		return $unit_id;
 
+	//проверка приложения-копии
+	$app = _app(APP_ID);
+	if(!$pid = $app['pid'])
+		return $unit_id;
+
+	$sql = "SELECT `id`
+			FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `id_old`=".$unit_id."
+			LIMIT 1";
+	return _num(query_value($sql));
+}
 
 
 
@@ -1504,6 +1520,8 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 	if(!$cmp_id = _num($unit['num_1']))
 		return;
 	if(!$cmp = _elemOne($cmp_id))
+		return;
+	if(empty($cmp['col']))
 		return;
 
 	//id диалога, в котором размещается привязка

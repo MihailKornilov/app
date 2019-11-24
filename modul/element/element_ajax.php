@@ -254,7 +254,7 @@ switch(@$_POST['op']) {
 					'<tr><td>'.
 						'<td>'._check(array(
 									'attr_id' => 'clone_on',
-									'title' => 'данные диалога участвуют в клонировании',
+									'title' => 'данные диалога участвуют в клонировании и копировании',
 									'value' => $dialog['clone_on']
 							   )).
 				'</table>'.
