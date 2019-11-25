@@ -13,7 +13,7 @@ function _element80_js($el) {
 	) + _elementJs($el);
 }
 function _element80_print($el, $prm) {
-	$diff = _spisokFilter('diff', $el['num_1']);
+	$diff = _filter('diff', $el['num_1']);
 	return _button(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'name' => _br($el['txt_1']),

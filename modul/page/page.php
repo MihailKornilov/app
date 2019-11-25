@@ -496,7 +496,7 @@ function _pageShowScript($page_id, $prm) {
 	return
 	'<script>'.
 	(APP_ID && USER_ID ?
-		'var FILTER='._json(_spisokFilter('page_js'), 1).';'.
+		'var FILTER='._json(_filter('page_js'), 1).';'.
 		_pageDlgOpenAuto()
 	: '').
 		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.

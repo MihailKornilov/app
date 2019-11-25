@@ -20,7 +20,7 @@ function _element83_print($el, $prm) {
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
 		'width' => @$el['width'],
-		'value' => _spisokFilter('vv', $el, 0)
+		'value' => _filter('vv', $el, 0)
 	));
 }
 function _element83_vvv($el) {

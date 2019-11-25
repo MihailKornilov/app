@@ -22,7 +22,7 @@ function _element77_js($el) {
 	) + _elementJs($el);
 }
 function _element77_print($el) {
-	$v = _spisokFilter('vv', $el, $el['num_2']);
+	$v = _filter('vv', $el, $el['num_2']);
 	$v = _filterCalendarDef($v);
 	$mon = substr($v, 0, 7);
 

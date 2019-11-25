@@ -20,7 +20,7 @@ function _element7_print($el, $prm) {
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
 		'width' => $el['width'],
-		'v' => _spisokFilter('vv', $el),
+		'v' => _filter('vv', $el),
 		'disabled' => $prm['blk_setup']
 	));
 }

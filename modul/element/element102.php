@@ -17,11 +17,11 @@ function _element102_js($el) {
 	) + _elementJs($el);
 }
 function _element102_print($el, $prm) {
-	$v = _spisokFilter('v', $el['id']);
+	$v = _filter('v', $el['id']);
 	if($v === false) {
 		$cond = _40cond($el, $el['txt_5']);
 		$v = _elem102CnnList($el['txt_2'], 'ids', $cond);
-		_spisokFilter('insert', array(
+		_filter('insert', array(
 			'spisok' => $el['num_1'],
 			'filter' => $el['id'],
 			'v' => $v

@@ -13,7 +13,7 @@ function _element72_js($el) {
 	) + _elementJs($el);
 }
 function _element72_print($el, $prm) {
-	$v = _spisokFilter('vv', $el, strftime('%Y-%m'));
+	$v = _filter('vv', $el, strftime('%Y-%m'));
 
 	$ex = explode('-', $v);
 	$year = $ex[0];

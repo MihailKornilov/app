@@ -10,7 +10,7 @@ function _element73_struct($el) {
 	) + _elementStruct($el);
 }
 function _element73_print($el) {
-	$F = _spisokFilter();
+	$F = _filter();
 	if(!$fl = @$F['filter'][$el['num_1']])
 		return _msgRed('Отсутствует фильтр-календарь');
 

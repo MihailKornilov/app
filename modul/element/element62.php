@@ -24,7 +24,7 @@ function _element62_print($el, $prm) {
 		'attr_id' => _elemAttrId($el, $prm),
 		'title' => $el['txt_1'],
 		'disabled' => $prm['blk_setup'],
-		'value' => _spisokFilter('vv', $el, $el['num_3'])
+		'value' => _filter('vv', $el, $el['num_3'])
 	));
 }
 

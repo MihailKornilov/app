@@ -40,7 +40,7 @@ function _element75_print($el, $prm) {
 	if(!$arr = query_arr($sql))
 		return _emptyMin('[75] пустое меню.');
 
-	$v = _spisokFilter('vv', $el, 0);
+	$v = _filter('vv', $el, 0);
 
 	//вставка картинок
 	$arr = _spisokImage($arr);

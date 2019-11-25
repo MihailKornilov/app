@@ -53,7 +53,7 @@ function _element78_print($el) {
 		return _emptyMin('Фильтр-меню: пустое меню.');
 
 	$send = '';
-	$v = _spisokFilter('vv', $el, 0);
+	$v = _filter('vv', $el, 0);
 
 	$spisok = array();
 	foreach($arr as $r)

@@ -65,7 +65,7 @@ function _element74_print($el, $prm) {
 		'width' => '100%',
 		'interval' => 6,
 		'light' => 1,
-		'value' => _spisokFilter('vv', $el, $el['def']),
+		'value' => _filter('vv', $el, $el['def']),
 		'spisok' => $spisok,
 		'disabled' => $prm['blk_setup']
 	));

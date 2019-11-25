@@ -1,7 +1,6 @@
 <?php
-function _spisokFilterCache() {//кеширование фильтров списка
-	$key = 'filter_user'.USER_ID;
-	if($send = _cache_get($key))
+function _filterCache() {//кеширование фильтров списка
+	if($send = _cache_get(FILTER_KEY))
 		return $send;
 
 	$send = array(
@@ -11,7 +10,7 @@ function _spisokFilterCache() {//кеширование фильтров спи�
 
 	$sql = "SELECT *
 			FROM `_user_spisok_filter`
-			WHERE `app_id` IN (0,".APP_PARENT.")
+			WHERE `app_id` IN (0,".APP_ID.")
 			  and `user_id`=".USER_ID;
 	if($arr = query_arr($sql)) {
 		$sql = "SELECT *
@@ -33,13 +32,16 @@ function _spisokFilterCache() {//кеширование фильтров спи�
 		}
 	}
 
-	return _cache_set($key, $send);
+	return _cache_set(FILTER_KEY, $send);
 }
-function _spisokFilter($i='all', $v=0, $vv='') {//получение значений фильтров списка
-	if($i == 'cache_clear')
-		return _cache_clear('filter_user'.USER_ID);
+function _filter($i='all', $v=0, $vv='') {//получение значений фильтров списка
+	if(!defined('FILTER_KEY'))
+		define('FILTER_KEY', 'FILTER_user'.USER_ID);
 
-	$F = _spisokFilterCache();
+	if($i == 'cache_clear')
+		return _cache_clear(FILTER_KEY);
+
+	$F = _filterCache();
 
 	//значение конкретного элемента-фильтра
 	if($i == 'v') {
@@ -60,7 +62,7 @@ function _spisokFilter($i='all', $v=0, $vv='') {//получение значе�
 		if(!$elem_id = _num($el['id']))
 			return $vv;
 		if(!isset($F['filter'][$elem_id]))
-			return _spisokFilterInsert($el['num_1'], $el['id'], $vv);
+			return _filterInsert($el['num_1'], $el['id'], $vv);
 		return $F['filter'][$elem_id]['v'];
 	}
 
@@ -94,7 +96,7 @@ function _spisokFilter($i='all', $v=0, $vv='') {//получение значе�
 			return '';
 		$v = @$v['v'];
 
-		_spisokFilterInsert($spisok, $filter, $v);
+		_filterInsert($spisok, $filter, $v);
 	}
 
 	//определение отличия значений от условий по умолчанию
@@ -111,7 +113,7 @@ function _spisokFilter($i='all', $v=0, $vv='') {//получение значе�
 
 	return $F;
 }
-function _spisokFilterInsert($spisok, $filter, $v) {//внесение нового значения фильтра
+function _filterInsert($spisok, $filter, $v) {//внесение нового значения фильтра
 	if(!$spisok = _num($spisok))
 		return $v;
 	if(!$filter = _num($filter))
@@ -119,11 +121,9 @@ function _spisokFilterInsert($spisok, $filter, $v) {//внесение ново�
 	if(!$SP = _elemOne($spisok))
 		return $v;
 
-	$app_id = $SP['app_id'] ? APP_PARENT : 0;
-
 	$sql = "SELECT *
 			FROM `_user_spisok_filter`
-			WHERE `app_id`=".$app_id."
+			WHERE `app_id`=".APP_ID."
 			  AND `user_id`=".USER_ID."
 			  AND `element_id_spisok`=".$spisok."
 			  AND `element_id_filter`=".$filter;
@@ -139,7 +139,7 @@ function _spisokFilterInsert($spisok, $filter, $v) {//внесение ново�
 				`def`
 			) VALUES (
 				".$id.",
-				".$app_id.",
+				".APP_ID.",
 				".USER_ID.",
 				".$spisok.",
 				".$filter.",
@@ -149,11 +149,11 @@ function _spisokFilterInsert($spisok, $filter, $v) {//внесение ново�
 				`v`=VALUES(`v`)";
 	query($sql);
 
-	_spisokFilter('cache_clear');
+	_filter('cache_clear');
 
 	return $v;
 }
-function _spisokFilterHtml($send, $spisok_id) {//получение данных списка после применения фильтра (через upd)
+function _filterHtml($send, $spisok_id) {//получение данных списка после применения фильтра (через upd)
 	if(!$el = _elemOne($spisok_id))
 		return $send;
 
@@ -221,7 +221,7 @@ function _spisok7num($spisok, $el) {//добавление записи, есл�
 	$num = 0;
 
 	//1. Поиск элемента-фильтра-поиска
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 7) {
 			$search = $r['elem'];
 			$num = $r['v'];
@@ -742,7 +742,7 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения к
 	$v = '';
 
 	//поиск элемента-фильтра-поиска
-	foreach(_spisokFilter('spisok', $element_id_spisok) as $r)
+	foreach(_filter('spisok', $element_id_spisok) as $r)
 		if($r['elem']['dialog_id'] == 7) {
 			$search = $r['elem'];
 			$v = $r['v'];
@@ -801,7 +801,7 @@ function _spisokCond7($el) {//значения фильтра-поиска дл�
 	$v = '';
 
 	//поиск элемента-фильтра-поиска
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 7) {
 			$search = $r['elem'];
 			$v = $r['v'];
@@ -853,7 +853,7 @@ function _spisokCond62($el) {//фильтр-галочка
 	$send = '';
 
 	//поиск элемента-фильтра-галочки
-	foreach(_spisokFilter('spisok', $el['id']) as $F) {
+	foreach(_filter('spisok', $el['id']) as $F) {
 		$filter = $F['elem'];
 
 		if($filter['dialog_id'] != 62)
@@ -876,7 +876,7 @@ function _spisokCond72($el) {//фильтр: год и месяц
 	$search = false;
 
 	//поиск элемента-фильтра-галочки
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 72) {
 			$search = $r['elem'];
 			$v = $r['v'];
@@ -892,7 +892,7 @@ function _spisokCond74($el) {//фильтр-радио
 	$filter = false;
 
 	//поиск элемента-фильтра-радио
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 74) {
 			$filter = true;
 			if(!$v = _num($r['v']))
@@ -916,7 +916,7 @@ function _spisokCond75($el) {//Фильтр: фронтальное меню
 	$v = '';
 
 	//поиск элемента-фильтра-меню
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 75) {
 			$filter = $r['elem'];
 			$v = _num($r['v']);
@@ -961,7 +961,7 @@ function _spisokCond77($el) {//фильтр-календарь
 	$v = '';
 
 	//поиск элемента-фильтра-календаря
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 77) {
 			$filter = $r['elem'];
 			$v = $r['v'];
@@ -995,7 +995,7 @@ function _spisokCond78($el) {//фильтр-меню
 	$v = '';
 
 	//поиск элемента-фильтра-меню
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 78) {
 			$filter = $r['elem'];
 			$v = _num($r['v']);
@@ -1038,7 +1038,7 @@ function _spisokCond83($el) {//фильтр-select
 	$v = 0;
 
 	//поиск элемента-фильтра-select
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 83) {
 			$filter = $r['elem'];
 			$v = _num($r['v']);
@@ -1066,7 +1066,7 @@ function _spisokCond102($el) {//Фильтр - Выбор нескольких �
 	$v = 0;
 
 	//поиск элемента-фильтра-select
-	foreach(_spisokFilter('spisok', $el['id']) as $r)
+	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 102) {
 			$filter = $r['elem'];
 			$v = _ids($r['v']);

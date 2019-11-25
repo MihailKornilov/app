@@ -76,7 +76,7 @@ switch(@$_POST['op']) {
 			if($elem) {
 				_BE('block_clear');
 				_BE('elem_clear');
-				_spisokFilter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
+				_filter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
 				_jsCache();
 				$send['elem_del'] = $unit_id;
 			}
@@ -128,7 +128,7 @@ switch(@$_POST['op']) {
 
 			$v = _element77filterSet($elem_filter, $v);
 
-			_spisokFilter('insert', array(
+			_filter('insert', array(
 				'spisok' => $elem_spisok,
 				'filter' => $elem_filter,
 				'v' => $v
@@ -139,7 +139,7 @@ switch(@$_POST['op']) {
 		$send = _element64filterUpd($send, $elem_spisok);
 		$send = _element73filterUpd($send, $elem_spisok);
 		$send = _element79filterUpd($send, $elem_spisok);
-		$send = _spisokFilterHtml($send, $elem_spisok);
+		$send = _filterHtml($send, $elem_spisok);
 
 		//элемент "очистка фильтра", привязанный к списку
 		$sql = "SELECT *
@@ -149,7 +149,7 @@ switch(@$_POST['op']) {
 				LIMIT 1";
 		if($elClear = query_assoc($sql)) {
 			$send['clear_id'] = $elClear['id'];
-			$send['clear_diff'] = _spisokFilter('diff', $elem_spisok);
+			$send['clear_diff'] = _filter('diff', $elem_spisok);
 		}
 
 		jsonSuccess($send);
@@ -166,22 +166,22 @@ switch(@$_POST['op']) {
 				  AND `element_id_spisok`=".$spisok_id;
 		query($sql);
 
-		_spisokFilter('cache_clear');
+		_filter('cache_clear');
 
 		$send['upd'] = array();
 		$send = _element15filterUpd($send, $spisok_id);
 		$send = _element64filterUpd($send, $spisok_id);
 		$send = _element73filterUpd($send, $spisok_id);
 		$send = _element79filterUpd($send, $spisok_id);
-		$send = _spisokFilterHtml($send, $spisok_id);
+		$send = _filterHtml($send, $spisok_id);
 
 		//значения по умолчанию для фильтров списка
 		$send['def'] = array();
-		foreach(_spisokFilter('spisok', $spisok_id) as $r) {
+		foreach(_filter('spisok', $spisok_id) as $r) {
 			$dialog_id = _num($r['elem']['dialog_id']);
 			$dop = array();
 			if($dialog_id == 77) {//фильтр-календарь
-				$v = _spisokFilter('v', $r['elem']['id']);
+				$v = _filter('v', $r['elem']['id']);
 				$v = _filterCalendarDef($v);
 				$mon = substr($v, 0, 7);
 				$dop = array(
@@ -198,7 +198,7 @@ switch(@$_POST['op']) {
 			));
 		}
 
-		$send['filter'] = _spisokFilter('page_js');
+		$send['filter'] = _filter('page_js');
 
 		jsonSuccess($send);
 		break;
@@ -1059,7 +1059,7 @@ function _filterDefSet($dialog, $elem_id) {//обновление значени
 			$sql = "DELETE FROM `_user_spisok_filter`
 					WHERE `element_id_filter`=".$elem_id;
 			query($sql);
-			_spisokFilter('cache_clear');
+			_filter('cache_clear');
 			break;
 	}
 }
