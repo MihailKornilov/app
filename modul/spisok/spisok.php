@@ -1449,17 +1449,17 @@ function _spisokUnitBalansUpd($dialog, $POST_CMP) {//обновление зна
 		}
 	}
 }
-function _spisokUnitUpd27($unit) {//обновление сумм значений единицы списка (баланс).
+function _spisokUnitUpd27($EL, $unit_id=0) {//обновление сумм значений единицы списка (баланс).
 /*
 	Выполняется:
 		1. При настройке баланса (через диалог [27])
 */
-	if(!isset($unit['dialog_id']))
+	if(!isset($EL['dialog_id']))
 		return;
-	if($unit['dialog_id'] != 27)
+	if($EL['dialog_id'] != 27)
 		return;
 	//блок, в котором размещается "баланс"
-	if(!$block_id = _num($unit['block_id']))
+	if(!$block_id = _num($EL['block_id']))
 		return;
 	if(!$BL = _blockOne($block_id))
 		return;
@@ -1471,8 +1471,9 @@ function _spisokUnitUpd27($unit) {//обновление сумм значени
 
 	//предварительное обнуление значений перед обновлением
 	$sql = "UPDATE "._queryFrom($DSrc)."
-			SET `".$unit['col']."`=0
-			WHERE "._queryWhere($DSrc);
+			SET `".$EL['col']."`=0
+			WHERE "._queryWhere($DSrc).
+($unit_id ? " AND `id`=".$unit_id : '');
 	query($sql);
 
 	//получение всех слагаемых баланса
@@ -1481,7 +1482,7 @@ function _spisokUnitUpd27($unit) {//обновление сумм значени
 				`txt_2`,
 				`num_8`
 			FROM `_element`
-			WHERE `parent_id`=".$unit['id'];
+			WHERE `parent_id`=".$EL['id'];
 	if(!$item = query_arr($sql))
 		return;
 
@@ -1504,22 +1505,21 @@ function _spisokUnitUpd27($unit) {//обновление сумм значени
 
 	//процесс обновления
 	$sql = "UPDATE "._queryFrom($DSrc)."
-			SET `".$unit['col']."`=".$upd."
-			WHERE "._queryWhere($DSrc);
+			SET `".$EL['col']."`=".$upd."
+			WHERE "._queryWhere($DSrc).
+($unit_id ? " AND `id`=".$unit_id : '');
 	query($sql);
 }
-function _spisokUnitUpd54($unit) {//обновление количеств
-	if(!isset($unit['dialog_id']))
+function _spisokUnitUpd54($EL, $unit_id=0) {//обновление количеств
+	if(!isset($EL['dialog_id']))
 		return;
-	if($unit['dialog_id'] != 54)
+	if($EL['dialog_id'] != 54)
 		return;
-	if(empty($unit['col']))
+	if(empty($EL['col']))
 		return;
 
-	//id компонента в диалоге, в котором размещается привязка (количество этих значений будет считаться)
-	if(!$cmp_id = _num($unit['num_1']))
-		return;
-	if(!$cmp = _elemOne($cmp_id))
+	//компонент в диалоге, в котором размещается привязка (количество этих значений будет считаться)
+	if(!$cmp = _elemOne($EL['num_1']))
 		return;
 	if(empty($cmp['col']))
 		return;
@@ -1531,7 +1531,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 		return;
 
 	//блок, в котором размещается "количество"
-	if(!$block_id = _num($unit['block_id']))
+	if(!$block_id = _num($EL['block_id']))
 		return;
 	if(!$BL = _blockOne($block_id))
 		return;
@@ -1542,8 +1542,9 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 
 	//предварительное обнуление значений перед обновлением
 	$sql = "UPDATE "._queryFrom($DSrc)."
-			SET `".$unit['col']."`=0
-			WHERE "._queryWhere($DSrc);
+			SET `".$EL['col']."`=0
+			WHERE "._queryWhere($DSrc).
+($unit_id ? " AND `id`=".$unit_id : '');
 	query($sql);
 
 	$sql = "SELECT
@@ -1551,8 +1552,8 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 				COUNT(`id`)
 			FROM "._queryFrom($DConn)."
 			WHERE "._queryWhere($DConn)." 
-			  AND `".$cmp['col']."`
-			  "._40cond($cmp, $unit['txt_1'])."
+			  AND `".$cmp['col']."`".($unit_id ? "=".$unit_id : '')."
+			  "._40cond($cmp, $EL['txt_1'])."
 			GROUP BY `".$cmp['col']."`";
 	if(!$ass = query_ass($sql))//выход, если нечего обновлять
 		return;
@@ -1563,7 +1564,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 	foreach($ass as $id => $count) {
 /*
 		$sql = "UPDATE "._queryFrom($DSrc)."
-				SET `".$unit['col']."`=".$c."
+				SET `".$EL['col']."`=".$c."
 				WHERE `t1`.`id`=".$id."
 				  AND "._queryWhere($DSrc);
 		query($sql);
@@ -1571,10 +1572,10 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 		$upd[] = "(".$id.",".$count.")";
 		if(!--$cAss || !--$n) {
 			$sql = "INSERT INTO `"._table($DSrc['table_1'])."`
-						(`id`,`".$unit['col']."`)
+						(`id`,`".$EL['col']."`)
 						VALUES ".implode(',', $upd)."
 					ON DUPLICATE KEY UPDATE
-						`".$unit['col']."`=VALUES(`".$unit['col']."`)";
+						`".$EL['col']."`=VALUES(`".$EL['col']."`)";
 			query($sql);
 			$n = 1000;
 			$upd = array();
@@ -1596,7 +1597,7 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 	for($n = $lvl; $n > 0; $n--) {
 		$sql = "SELECT
 					DISTINCT `parent_id`,
-					SUM(`".$unit['col']."`)
+					SUM(`".$EL['col']."`)
 				FROM `"._table($DSrc['table_1'])."`
 				WHERE `dialog_id`=".$BL['obj_id']."
 				  AND `child_lvl`=".$n."
@@ -1604,18 +1605,18 @@ function _spisokUnitUpd54($unit) {//обновление количеств
 		if($ass = query_ass($sql))
 			foreach($ass as $id => $count) {
 				$sql = "UPDATE `"._table($DSrc['table_1'])."`
-						SET `".$unit['col']."`=`".$unit['col']."`+".$count."
+						SET `".$EL['col']."`=`".$EL['col']."`+".$count."
 						WHERE `id`=".$id;
 				query($sql);
 			}
 	}
 }
-function _spisokUnitUpd55($unit) {//обновление сумм
-	if(!isset($unit['dialog_id']))
+function _spisokUnitUpd55($EL, $unit_id=0) {//обновление сумм
+	if(!isset($EL['dialog_id']))
 		return;
-	if($unit['dialog_id'] != 55)
+	if($EL['dialog_id'] != 55)
 		return;
-	if(!$cmp_id = _num($unit['num_1']))//id компонента в диалоге, в котором размещается привязка (сумма этих значений будет считаться)
+	if(!$cmp_id = _num($EL['num_1']))//id компонента в диалоге, в котором размещается привязка (сумма этих значений будет считаться)
 		return;
 	if(!$cmp = _elemOne($cmp_id))
 		return;
@@ -1632,12 +1633,13 @@ function _spisokUnitUpd55($unit) {//обновление сумм
 
 	//предварительное обнуление значений перед обновлением
 	$sql = "UPDATE "._queryFrom($DSrc)."
-			SET `".$unit['col']."`=0
-			WHERE "._queryWhere($DSrc);
+			SET `".$EL['col']."`=0
+			WHERE "._queryWhere($DSrc).
+($unit_id ? " AND `id`=".$unit_id : '');
 	query($sql);
 
 	//получение элемента, который указывает на элемент, сумму значения которого нужно будет считать
-	if(!$elem_id = _num($unit['num_2']))
+	if(!$elem_id = _num($EL['num_2']))
 		return;
 	if(!$elForSum = _elemOne($elem_id))
 		return;
@@ -1649,8 +1651,8 @@ function _spisokUnitUpd55($unit) {//обновление сумм
 				SUM(`".$sum_col."`)
 			FROM "._queryFrom($DConn)."
 			WHERE "._queryWhere($DConn)."
-			  AND `".$cmp['col']."`
-			  "._40cond(array(), $unit['txt_1'])."
+			  AND `".$cmp['col']."`".($unit_id ? "=".$unit_id : '')."
+			  "._40cond(array(), $EL['txt_1'])."
 			GROUP BY `".$cmp['col']."`";
 	if(!$ass = query_ass($sql))//выход, если нечего обновлять
 		return;
@@ -1680,7 +1682,7 @@ function _spisokUnitUpd55($unit) {//обновление сумм
 	foreach($ass as $id => $sum) {
 /*
 		$sql = "UPDATE "._queryFrom($DSrc)."
-				SET `".$unit['col']."`=".$c."
+				SET `".$EL['col']."`=".$c."
 				WHERE `t1`.`id`=".$id."
 				  AND "._queryWhere($DSrc);
 		query($sql);
@@ -1688,10 +1690,10 @@ function _spisokUnitUpd55($unit) {//обновление сумм
 		$upd[] = "(".$id.",".$sum.")";
 		if(!--$cAss || !--$n) {
 			$sql = "INSERT INTO `"._table($DSrc['table_1'])."`
-						(`id`,`".$unit['col']."`)
+						(`id`,`".$EL['col']."`)
 						VALUES ".implode(',', $upd)."
 					ON DUPLICATE KEY UPDATE
-						`".$unit['col']."`=VALUES(`".$unit['col']."`)";
+						`".$EL['col']."`=VALUES(`".$EL['col']."`)";
 			query($sql);
 			$n = 1000;
 			$upd = array();

@@ -425,40 +425,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	$POST_CMP = !empty($CMP_ARR[$dialog['id']]) ? $CMP_ARR[$dialog['id']] : array();
 	unset($CMP_ARR[$dialog['id']]);
 
-
-
-	//регистрация нового пользователя [98] - перехват внесения данных
-	_auth98($dialog, $POST_CMP);
-	//авторизация по логину и паролю [99] - перехват внесения данных
-	_auth99($dialog, $POST_CMP);
-	//создание пин-кода [131] - перехват внесения данных
-	_pin131($dialog, $POST_CMP);
-	//изменение или удаление пин-кода [132] - перехват внесения данных
-	_pin132($dialog, $POST_CMP);
-	//ввод пин-кода, чтобы войти в приложение [133] - перехват внесения данных
-	_pin133($dialog, $POST_CMP);
-	//элемент выбирает значение из диалога [11] - перехват внесения данных
-	_elem11_choose_mysave($dialog, $POST_CMP);
-	//элемент выбирает блоки из диалога [19] - перехват внесения данных
-	_elem19_block_choose($dialog);
-	//выбор дополнительной колонки [22] - перехват внесения данных
-	_elem22_col_dop($dialog);
-	//сохранение условий для фильтра [41] - перехват внесения данных
-	PHP12_spfl_save($dialog);
-	//сохранение настройки истории действий [67] - перехват внесения данных
-	PHP12_history_setup_save($dialog);
-	//сохранение выбранных элементов для правила [1000] - перехват внесения данных
-	PHP12_elem_all_rule_setup_save($dialog);
-	//очистка приложения [119] - перехват внесения данных
-	_d119_app_clear($dialog);
-	//Закрытие / открытие доступа к приложению [112] - перехват внесения данных
-	_d112_app_access($dialog, $POST_CMP);
-	//клонирование приложения [120] - перехват внесения данных
-	_clone_go($dialog, $POST_CMP);
-	//принятие приглашения в приложение [109] - перехват внесения данных
-	_user_invite_submit($dialog);
-
-
+	_SUN_INTERCEPT($dialog, $POST_CMP);
 
 	$unit_id = _SUN_INSERT($dialog, $unit_id);
 
@@ -479,6 +446,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 
 	//получение обновлённых данных записи
 	$unit = IS_ELEM ? _elemOne($unit_id, true) : _spisokUnitQuery($dialog, $unit_id, true);
+	_spisokUnitDependUpd($dialog, $unitOld, $unit);
 	_historyInsertEdit($dialog, $unitOld, $unit);
 	_elem29defSet($dialog, $unit);
 
@@ -733,6 +701,38 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 		jsonError('Нет данных для внесения');
 
 	return $send;
+}
+function _SUN_INTERCEPT($dialog, $POST_CMP) {//перехват внесения данных
+	//регистрация нового пользователя [98]
+	_auth98($dialog, $POST_CMP);
+	//авторизация по логину и паролю [99]
+	_auth99($dialog, $POST_CMP);
+	//создание пин-кода [131]
+	_pin131($dialog, $POST_CMP);
+	//изменение или удаление пин-кода [132]
+	_pin132($dialog, $POST_CMP);
+	//ввод пин-кода, чтобы войти в приложение [133]
+	_pin133($dialog, $POST_CMP);
+	//элемент выбирает значение из диалога [11]
+	_elem11_choose_mysave($dialog, $POST_CMP);
+	//элемент выбирает блоки из диалога [19]
+	_elem19_block_choose($dialog);
+	//выбор дополнительной колонки [22]
+	_elem22_col_dop($dialog);
+	//сохранение условий для фильтра [41]
+	PHP12_spfl_save($dialog);
+	//сохранение настройки истории действий [67]
+	PHP12_history_setup_save($dialog);
+	//сохранение выбранных элементов для правила [1000]
+	PHP12_elem_all_rule_setup_save($dialog);
+	//очистка приложения [119]
+	_d119_app_clear($dialog);
+	//Закрытие / открытие доступа к приложению [112]
+	_d112_app_access($dialog, $POST_CMP);
+	//клонирование приложения [120]
+	_clone_go($dialog, $POST_CMP);
+	//принятие приглашения в приложение [109]
+	_user_invite_submit($dialog);
 }
 function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой записи, если отсутствует
 	if($unit_id)
@@ -1171,6 +1171,170 @@ function _spisokUnitUpd42($DLG, $cmp) {//обновление некоторых
 			  AND `t1`.`id`=".$unit_id;
 	query($sql);
 }
+function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id диалога при создании условий удаления записи
+	if($dialog['id'] != 58)
+		return;
+	if(!$dlg_id = _num($_POST['dss'])) {
+		$sql = "DELETE FROM `_element` WHERE `id`=".$unit_id;
+		query($sql);
+		jsonError('Отсутствует исходный диалог');
+	}
+
+	$sql = "UPDATE `_element`
+			SET `num_1`=".$dlg_id."
+			WHERE `id`=".$unit_id;
+	query($sql);
+}
+function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление зависимых привязанных списков
+	//дочерние диалоги не затрагиваются
+	if($dialog['dialog_id_parent'])
+		return;
+	//только диалог, управляющий данными
+	if($dialog['table_name_1'] != '_spisok')
+		return;
+
+
+
+	//получение диалогов, в которые встроен текущий (редактируемый) диалог
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=29
+			  AND `num_1`=".$dialog['id'];
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `obj_id`,1
+			FROM `_block`
+			WHERE `obj_name`='dialog'
+			  AND `id` IN ("._idsGet($arr, 'block_id').")";
+	if(!$DLG_CUR = query_ass($sql))
+		return;
+
+
+	$UPD = array();//собирание записей, которые участвовали в изменении (для дальнейшего обновления их счётчиков)
+	foreach($dialog['cmp'] as $cmp) {
+		if($cmp['dialog_id'] != 29)
+			continue;
+		if(!$col = $cmp['col'])
+			continue;
+
+		if(!isset($unitOld[$col]))
+			continue;
+		$old = $unitOld[$col];
+		if(is_array($old))
+			$old = $old['id'];
+
+		if(!isset($unit[$col]))
+			continue;
+		$new = $unit[$col];
+		if(is_array($new))
+			$new = $new['id'];
+
+		if($old == $new)
+			continue;
+
+
+
+
+		//получение диалогов, в которые встроен привязанный список
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=29
+				  AND `num_1`=".$cmp['num_1'];
+		if(!$arr = query_arr($sql))
+			continue;
+
+		$sql = "SELECT `obj_id`,1
+				FROM `_block`
+				WHERE `obj_name`='dialog'
+				  AND `id` IN ("._idsGet($arr, 'block_id').")";
+		if(!$DLG_SP = query_ass($sql))
+			continue;
+
+
+
+		//получение общих диалогов
+		$DLG_COM = array();
+		foreach($DLG_SP as $id => $i)
+			if(isset($DLG_CUR[$id]))
+				$DLG_COM[] = $id;
+
+		if(empty($DLG_COM))
+			continue;
+
+
+
+		//изменение значения в связанных записях
+		foreach($DLG_COM AS $id) {
+			if(!$dlg = _dialogQuery($id))
+				continue;
+			if($dlg['dialog_id_parent'])
+				continue;
+			if(!$dlg['table_1'])
+				continue;
+
+
+			//получение колонок, по которым будет получена связанная запись
+			$colCur = '';//колонка, значение которой является исходным диалогом
+			$colIn = ''; //колонка, значение которой произошло изменение в исходной записи
+			foreach($dlg['cmp'] as $comCmp) {
+				if($comCmp['dialog_id'] != 29)
+					continue;
+				if($comCmp['num_1'] == $dialog['id'])
+					$colCur = $comCmp['col'];
+				if($comCmp['num_1'] == $cmp['num_1'])
+					$colIn = $comCmp['col'];
+			}
+
+
+			if(!$colCur || !$colIn)
+				continue;
+
+			$sql = "SELECT `id`
+					FROM `".$dlg['table_name_1']."`
+					WHERE `dialog_id`=".$id."
+					  AND `".$colCur."`=".$unit['id']."
+					  AND `".$colIn."`=".$old;
+			if(!$spIds = query_ids($sql))
+				continue;
+
+			$sql = "UPDATE `".$dlg['table_name_1']."`
+					SET `".$colIn."`=".$new."
+					WHERE `id` IN (".$spIds.")";
+			query($sql);
+
+
+
+			//сбор значений, у которых потребуется обновлять счётчики
+			$UPD[] = array(
+				'dlg' => $cmp['num_1'],
+				'old' => $old,
+				'new' => $new
+			);
+		}
+	}
+
+	//обновление счётчиков у изменённых значений
+	foreach($UPD as $r) {
+		if(!$dlg = _dialogQuery($r['dlg']))
+			continue;
+
+		foreach($dlg['cmp'] as $cmp) {
+			if($cmp['dialog_id'] == 54) {
+				_spisokUnitUpd54($cmp, $r['old']);
+				_spisokUnitUpd54($cmp, $r['new']);
+			}
+			if($cmp['dialog_id'] == 55) {
+				_spisokUnitUpd55($cmp, $r['old']);
+				_spisokUnitUpd55($cmp, $r['new']);
+			}
+			if($cmp['dialog_id'] == 27) {
+				_spisokUnitUpd27($cmp, $r['old']);
+				_spisokUnitUpd27($cmp, $r['new']);
+			}
+		}
+	}
+}
 function _spisokAction3($dialog, $unit_id, $send) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
 	//должено быть действие над элементом
 	if($dialog['table_1'] != 5)
@@ -1201,20 +1365,6 @@ function _spisokAction4($send) {//действие 4 - обновление ис
 	return $send;
 }
 
-function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id диалога при создании условий удаления записи
-	if($dialog['id'] != 58)
-		return;
-	if(!$dlg_id = _num($_POST['dss'])) {
-		$sql = "DELETE FROM `_element` WHERE `id`=".$unit_id;
-		query($sql);
-		jsonError('Отсутствует исходный диалог');
-	}
-
-	$sql = "UPDATE `_element`
-			SET `num_1`=".$dlg_id."
-			WHERE `id`=".$unit_id;
-	query($sql);
-}
 
 function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значения из диалога через [11]
 	if(!IS_ELEM)
