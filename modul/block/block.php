@@ -330,14 +330,20 @@ function _blockActionFilter($u, $filter) {//дополнительные усл�
 		if(!$col = $ell['col'])
 			return 4;//отсутствует имя колонки (ошибка 4)
 
-		$connect_id = $u[$col];
-		if(is_array($connect_id))
-			$connect_id = $u[$col]['id'];
+		$unit_id = $u[$col];
+		if(is_array($unit_id))
+			$unit_id = $u[$col]['id'];
 
 		switch($r['cond_id']) {
 			//равно
 			case 3:
-				if($r['unit_id'] != $connect_id)
+				if(APP_IS_PID) {
+					$sql = "SELECT `id_old`
+							FROM `_spisok`
+							WHERE `id`=".$unit_id;
+					$unit_id = _num(query_value($sql));
+				}
+				if($r['unit_id'] != $unit_id)
 					return 1;
 				break;
 			default: return 5;//условие $r['cond_id'] не доделано  (ошибка 5)
