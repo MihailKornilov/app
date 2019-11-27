@@ -1959,7 +1959,6 @@ function _spisokUnitAfter55($cmp, $dialog, $unit, $unitOld) {//пересчёт 
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=55
-			  AND `app_id`=".APP_ID."
 			  AND `num_1`=".$cmp['id'];
 	if(!$arr = query_arr($sql))
 		return array();
