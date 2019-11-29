@@ -1548,7 +1548,7 @@ function PHP12_counter_v($prm) {
 			WHERE `app_id`=".APP_ID."
 			  AND `unit_id`=".$unit_id."
 			ORDER BY `id` DESC
-			LIMIT 100";
+			LIMIT 300";
 	if(!$spisok = query_arr($sql))
 		return _empty('Данных нет');
 
