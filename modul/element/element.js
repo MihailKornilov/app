@@ -1015,7 +1015,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(el.action || el.num_7)
 						ATR_CMP.keyup(function(e) {
 							if(el.action)
-								_elemAction(el);
+								_elemAction(el, ATR_CMP.val());
 
 							//нажатие на Enter
 							if(el.num_7)
@@ -2933,6 +2933,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						break;
 
 					TRG.html(txt);
+					break;
+				//обновление содержимого блока
+				case 228:
+					if(is_open)
+						break;
+
+					var TRG = _attr_bl(_num(sp.target_ids));
+					if(!TRG)
+						break;
+
+					TRG.html(v)
 					break;
 			}
 		});
