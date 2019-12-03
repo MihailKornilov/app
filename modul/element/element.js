@@ -1442,8 +1442,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					P.click(function() {
 						var dss = _dlg24(el.num_1, vvv);
 						dss = _blkSrce(dss);
-						if(!dss)
-							return;
 
 						_dialogLoad({
 							dialog_id:41,
