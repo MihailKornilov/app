@@ -42,7 +42,11 @@ var _ids = function(v, count) {
 								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +
 								'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
 					'</table>' +
-					_blockUnitBgNew(BL) +
+					'<table class="w100p">' +
+						'<tr>' +
+							'<td>' + _blockUnitBg(BL) +
+							'<td class="pt10">' + _blockUnitPlace(BL) +
+					'</table>' +
 					_blockUnitBut(BL) +
 				'</div>' +
 				_elemUnit(BL),
@@ -150,7 +154,7 @@ var _ids = function(v, count) {
 			}
 		});
 	},
-	_blockUnitBgNew = function(BL) {//окраска блока
+	_blockUnitBg = function(BL) {//окраска блока
 		var BGS = [], //'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg-fee',
 			BOR = BL.bor.split(' '),
 			BGU = '',
@@ -258,8 +262,8 @@ var _ids = function(v, count) {
 				_bgu.addClass(BL.ov + ' on');
 			 });
 
-		return '<div class="color-555 fs14 mt5">Окраска и границы:</div>' +
-			   '<div id="blk-setup-bg" class="mt10 ml5 center">' +
+		return '<div class="color-555 mt10">Окраска и границы:</div>' +
+			   '<div id="blk-setup-bg" class="mt5 ml5 center">' +
 					'<table>' +
 
 						'<tr><td colspan="3">' +
@@ -352,6 +356,18 @@ var _ids = function(v, count) {
 					'</table>' +
 			   '</div>';
 	},
+	_blockUnitPlace = function(BL) {//позиция элемента
+		return  '<table id="elem-pos" class="ml8">' +
+			'<tr><td class="color-555 pb3 center">Позиция' +
+			'<tr><td><div val="top" class="icon-wiki iw6 mr3' + _dn(BL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
+					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(BL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
+					'<div val="top r" class="icon-wiki iw8' + _dn(BL.pos == 'top r','on') + _tooltip('Вверх-вправо', -73, 'r') + '</div>' +
+			'<tr><td>' + _elemUnitPlaceMiddle(BL) +
+			'<tr><td><div val="bottom" class="icon-wiki iw9 mr3' + _dn(BL.pos == 'bottom','on') + _tooltip('Вниз-влево', -33) + '</div>' +
+					'<div val="bottom center" class="icon-wiki iw10 mr3' + _dn(BL.pos == 'bottom center','on') + _tooltip('Вниз-центр', -32) + '</div>' +
+					'<div val="bottom r" class="icon-wiki iw11' + _dn(BL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -65, 'r') + '</div>' +
+		'</table>';
+	},
 
 	_blockUnitSa = function(BL) {//настройка блока для SA
 		if(!SA)
@@ -433,11 +449,7 @@ var _ids = function(v, count) {
 				'</div>' +
 			'</div>' +
 
-			'<table class="w100p mt5">' +
-				'<tr><td>' + _elemUnitMar(EL) +
-					'<td>' + _elemUnitPlace(BL) +
-			'</table>' +
-
+			_elemUnitMar(EL) +
 			_elemUnitStyle(EL) +
 			_elemUnitImg(EL) +
 		'</div>';
@@ -467,7 +479,7 @@ var _ids = function(v, count) {
 	},
 	_elemUnitMar = function(EL) {
 		var mar = EL.mar.split(' ');
-		return  '<div class="ml30 pl3">' +
+		return  '<div class="mt5 ml30 pl3">' +
 					'<input type="hidden" id="el-mar0" value="' + mar[0] + '" />' +
 				'</div>' +
 				'<table class="mt5">' +
@@ -478,18 +490,6 @@ var _ids = function(v, count) {
 				'<div class="mt5 ml30 pl3">' +
 					'<input type="hidden" id="el-mar2" value="' + mar[2] + '" />' +
 				'</div>';
-	},
-	_elemUnitPlace = function(BL) {//позиция элемента
-		return  '<table id="elem-pos">' +
-			'<tr><td class="fs14 color-555 pb3 center">Позиция' +
-			'<tr><td><div val="top" class="icon-wiki iw6 mr3' + _dn(BL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
-					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(BL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
-					'<div val="top r" class="icon-wiki iw8' + _dn(BL.pos == 'top r','on') + _tooltip('Вверх-вправо', -73, 'r') + '</div>' +
-			'<tr><td>' + _elemUnitPlaceMiddle(BL) +
-			'<tr><td><div val="bottom" class="icon-wiki iw9 mr3' + _dn(BL.pos == 'bottom','on') + _tooltip('Вниз-влево', -33) + '</div>' +
-					'<div val="bottom center" class="icon-wiki iw10 mr3' + _dn(BL.pos == 'bottom center','on') + _tooltip('Вниз-центр', -32) + '</div>' +
-					'<div val="bottom r" class="icon-wiki iw11' + _dn(BL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -65, 'r') + '</div>' +
-		'</table>';
 	},
 	_elemUnitPlaceMiddle = function(BL, isTd) {//центральная часть позиции
 		$(document)
