@@ -888,8 +888,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	ATTR_BL = function(id) {
 		return '#bl_' + id;
 	},
-	_attr_bl = function(id) {//аттрибут блока
-		var send = $(ATTR_BL(id));
+	_attr_bl = function(block_id) {//аттрибут блока
+		block_id = _num(block_id);
+		if(!block_id)
+			return false;
+
+		var send = $(ATTR_BL(block_id));
 
 		if(!send.length)
 			return false;
@@ -2939,11 +2943,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(is_open)
 						break;
 
-					var TRG = _attr_bl(_num(sp.target_ids));
+					var block_id = _num(sp.target_ids),
+						TRG = _attr_bl(block_id),
+						send = {
+							op:'act228_block_upd',
+							block_id:block_id,
+							busy_obj:TRG
+						};
+
 					if(!TRG)
 						break;
 
-					TRG.html(v)
+					_post(send, function(res) {
+						TRG.html(res.html);
+					});
 					break;
 			}
 		});

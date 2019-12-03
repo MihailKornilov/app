@@ -763,6 +763,15 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+
+	case 'act228_block_upd'://действие 228: обновление содержимого блока
+		if(!$block_id = _num($_POST['block_id']))
+			jsonError('Некорректный id блока');
+
+		$send['html'] = 'Ok.';
+
+		jsonSuccess($send);
+		break;
 }
 
 function _dialogSetupHistory($DLG) {//раздел История действий
