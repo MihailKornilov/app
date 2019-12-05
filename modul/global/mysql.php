@@ -307,6 +307,8 @@ function _queryWhere($DLG, $withDel=0) {//составление условий 
 		if(!$DLG['spisok_any'])
 			switch($DLG['table_name_1']) {
 				case '_dialog':
+					if($DLG['id'] == 42)
+						break;
 					$send[] = "!`".$tn."`.`app_id`";
 					break;
 				case '_element': break;
