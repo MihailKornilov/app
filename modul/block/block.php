@@ -293,13 +293,13 @@ function _blockAction($r, $prm) {//действие при нажатии на �
 	if(!_blockActionIsClick($r, $prm))
 		return '';
 
-	$skip = array();//номера действия, которые нужно пропустить, если они не будут соответствовать условиям
+	$skip = array();//номера действий, которые нужно пропустить, если они не будут соответствовать условиям
 	$uid = 0;
 	if($u = $prm['unit_get']) {
 		$uid = $u['id'];
 		foreach($r['action'] as $n => $act) {
 			if($v = _blockActionFilter($u, $act['filter']))
-				$skip[$act['id']] = 1;
+				$skip[$act['id']] = $v;
 
 			//открытие документа на печать - подмена ID, соответствующего диалогу
 			if($act['dialog_id'] == 217) {
@@ -337,12 +337,6 @@ function _blockActionFilter($u, $filter) {//дополнительные усл�
 		switch($r['cond_id']) {
 			//равно
 			case 3:
-				if(APP_IS_PID) {
-					$sql = "SELECT `id_old`
-							FROM `_spisok`
-							WHERE `id`=".$unit_id;
-					$unit_id = _num(query_value($sql));
-				}
 				if($r['unit_id'] != $unit_id)
 					return 1;
 				break;
@@ -1664,6 +1658,9 @@ function _beBlockAction($blk, $app_id) {//вставка действий для
 	if(!$action = query_arr($sql))
 		return $blk;
 
+	$action = _beBlockAction212($app_id, $action);
+	$action = _beBlockAction215($app_id, $action);
+
 	foreach($action as $r) {
 		$block_id = $r['block_id'];
 
@@ -1681,6 +1678,91 @@ function _beBlockAction($blk, $app_id) {//вставка действий для
 	}
 
 	return $blk;
+}
+function _beBlockAction212($app_id, $action) {//действие 212: подмена значений для приложений-копий
+	if(!$app_id)
+		return $action;
+	if(!_app(APP_ID, 'pid'))
+		return $action;
+
+	$ids = array();
+	foreach($action as $r)
+		if($r['dialog_id'] == 212)
+			$ids[] = $r['apply_id'];
+
+	if(empty($ids))
+		return $action;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `id_old` IN (".implode(',', $ids).")";
+	if(!$ass = query_ass($sql))
+		return $action;
+
+	foreach($action as $id => $r)
+		if($r['dialog_id'] == 212) {
+			$apply_id = $r['apply_id'];
+			if(isset($ass[$apply_id]))
+				$action[$id]['apply_id'] = $ass[$apply_id];
+		}
+
+	return $action;
+}
+function _beBlockAction215($app_id, $action) {//действие 215: подмена значений для приложений-копий
+	if(!$app_id)
+		return $action;
+	if(!_app(APP_ID, 'pid'))
+		return $action;
+
+	$ids = array();
+	foreach($action as $r) {
+		if($r['dialog_id'] != 215)
+			continue;
+		if(!$r['filter'])
+			continue;
+
+		$filter = htmlspecialchars_decode($r['filter']);
+		if(!$F = json_decode($filter, true))
+			continue;
+
+		foreach($F as $ff) {
+			if(!$unit_id = _num($ff['unit_id']))
+				continue;
+			$ids[$unit_id] = 1;
+		}
+	}
+
+	if(empty($ids))
+		return $action;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `id_old` IN ("._idsGet($ids, 'key').")";
+	if(!$ass = query_ass($sql))
+		return $action;
+
+	foreach($action as $id => $r) {
+		if($r['dialog_id'] != 215)
+			continue;
+		if(!$r['filter'])
+			continue;
+
+		$filter = htmlspecialchars_decode($r['filter']);
+		if(!$F = json_decode($filter, true))
+			continue;
+
+		foreach($F as $fid => $ff) {
+			if(!$unit_id = _num($ff['unit_id']))
+				continue;
+			if(!isset($ass[$unit_id]))
+				continue;
+			$F[$fid]['unit_id'] = $ass[$unit_id];
+		}
+
+		$action[$id]['filter'] = json_encode($F);
+	}
+
+	return $action;
 }
 function _beBlockSort($BLK, $RES=array()) {//выстраивание блоков по порядку
 	//составление структуры блоков по строкам
