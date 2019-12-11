@@ -394,6 +394,31 @@ function _blockActionView($bl, $prm) {//условия отображения б
 							if($v != $vv)
 								$bl['hidden'] = 1;
 							break;
+						//больше
+						case 5:
+							if($v > _num($ff['txt']))
+								$bl['hidden'] = 1;
+							break;
+						//больше или равно
+						case 6:
+							if($v >= _num($ff['txt']))
+								$bl['hidden'] = 1;
+							break;
+						//меньше
+						case 7:
+							if($v < _num($ff['txt']))
+								$bl['hidden'] = 1;
+							break;
+						//меньше или равно
+						case 8:
+							if($v <= _num($ff['txt']))
+								$bl['hidden'] = 1;
+							break;
+						//содержит
+						case 9:
+
+						//не содержит
+						case 10: break;
 					}
 				}
 				break;
