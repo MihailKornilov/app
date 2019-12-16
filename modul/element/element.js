@@ -3147,7 +3147,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					if(!page_id)
 						break;
 
-					var link = '&p=' + page_id;
+					var link = '&p=' + page_id + '&pfrom=' + PAGE_ID;
 
 					if(sp.apply_id)
 						link += '&id=' + unit_id;

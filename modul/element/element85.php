@@ -109,7 +109,7 @@ function _elem85mass($ell_id, $v, $send) {//получение значений 
 		}
 		$send[] = array(
 			'id' => $id,
-			'title' => is_array($sp) ? _pr($sp) : $sp
+			'title' => is_array($sp) ? 'id'.$sp['id'] : $sp
 		);
 	}
 

@@ -365,7 +365,6 @@ function PHP12_elem89($prm) {//настройка колонок для конк
 		'Колонки списка <b class="fs15">'.$DLG['name'].'</b>:'.
 	'</div>'.
 	'<div id="col89" class="pad10"></div>'.
-//	_pr($prm).
 	'';
 }
 function PHP12_elem89_vvv($prm) {//данные колонок для конкретной таблицы

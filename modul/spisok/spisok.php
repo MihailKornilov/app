@@ -605,7 +605,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 			case 221:
 				$page_id = $func['target_ids'];
 				$id = _spisokUnitUrlPage($el, $page_id, $u);
-				return '<a href="'.URL.'&p='.$page_id.($id ? '&id='.$id : '').'" class="inhr'.
+				return '<a href="'.URL.'&p='.$page_id.'&pfrom='._page('cur').($id ? '&id='.$id : '').'" class="inhr'.
 							_spisokUnitTT($el, $u).
 							$txt.
 					   '</a>';

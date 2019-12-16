@@ -36,21 +36,23 @@ function _element3_print($el, $prm) {
 
 	$razdel = '';
 	foreach($menu as $page_id => $r) {
-		$sel = _page('is_cur_parent', $r['id']) ? ' sel' : '';
+		$sel = _page('is_cur_parent', $page_id) ? ' sel' : '';
 
 		//фактическая страница, на которую будет переход
 		$pid = $page_id;
 
 		//если страница является ссылкой на другую страницу, при этом она недоступна, поиск первой вложенной доступной
 		if($r['common_id'])
-			foreach(_page('child', $r['id']) as $p) {
+			foreach(_page('child', $page_id) as $p)
 				if(_pageAccess($p['id'])) {
 					$pid = $p['id'];
 					break;
 				}
-				if($r['common_id'] == $p['id'])
-					continue;
-			}
+
+		if($pfrom = _num(@$_GET['pfrom']))
+			foreach(_page('child', $page_id) as $p)
+				if($p['id'] == $pfrom)
+					$pid = $pfrom;
 
 		$href = $prm['blk_setup'] ? '' : ' href="'.URL.'&p='.$pid.'"';
 		$curd = _dn(!$prm['blk_setup'], 'curD');

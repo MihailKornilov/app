@@ -18,8 +18,6 @@ function _element60_print($el, $prm) {
 	return _image($el, $prm);
 }
 function _element60_print11($el, $u) {
-//	return _pr($el);
-
 	$ELP = $el['elp'];
 
 	//ячейка таблицы
