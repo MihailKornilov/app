@@ -471,6 +471,8 @@ $(document)
 			return;
 		if(txt.substr(0, 15) == '<!DOCTYPE html>')
 			return location.reload();
+		if(txt.substr(0, 6) == '<HTML>')
+			return location.reload();
 
 		txt = txt.replace(new RegExp('<br />', 'g'), '');
 		txt = txt.replace(new RegExp('<b>', 'g'), '');
