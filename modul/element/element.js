@@ -5810,7 +5810,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						v.id = res.unit.id;
 						v.dialog_id = res.unit.dialog_id;
 						DD.attr('val', v.id);
-						TITLE.val(res.unit.title);
+						TITLE.attr('id', ATTR_EL(v.id, true))
+							 .val(res.unit.title);
 						DD.find('.txt_8').focus();
 					}
 				});
