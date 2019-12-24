@@ -1097,6 +1097,10 @@ function PHP12_dialog_app_li($r) {
 	$parent = '';
 	if($parent_id = $r['dialog_id_parent'])
 		$parent = _dialogParam($parent_id, 'name');
+
+	//в истории действий дочених диалогов галочки не ставятся
+	$bgh = $parent ? ' bg6' : '';
+
 	return
 	'<li id="dlg_'.$r['id'].'" class="mt1 '.(!$r['pid'] ? 'mb5' : 'mb1').'">'.
 		'<table class="_stab small w100p">'.
@@ -1111,9 +1115,9 @@ function PHP12_dialog_app_li($r) {
 					($r['spisok_on'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w100 color-sal'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
 				'<td class="w70 grey">'.PHP12_dialog_col($r['id']).
-				'<td class="w30">'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-				'<td class="w30">'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-				'<td class="w30">'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+				'<td class="w30'.$bgh.'">'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+				'<td class="w30'.$bgh.'">'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+				'<td class="w30'.$bgh.'">'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w100 center'.(!empty($contentDelAss[$r['id']]) ? ' bg-dfd' : '').'">'.
 					_dialogContentDelSetup($r['id']).
 		'</table>';

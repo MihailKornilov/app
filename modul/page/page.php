@@ -682,7 +682,191 @@ function PHP12_pin_dialog_open() {
 
 function _page_div() {//todo тест
 	return '';
+
+
+	$API_KEY = '2riEmxYp5i4qurU2EEZnrPpfwUqA7fKq5QnYVBbTQAjVxe19keWAtAwFRbDJAKHcY36872VQp1cbfnqSWhvP4Bcg';
+
+	$url = 'https://btc-alpha.com/api/v1/wallets/'.
+				'?format=json'.
+				'&X-KEY=4LwLsbdqr9qJ2vreyebEZvFhjxKrFbfsH6sRXV1mVMxSXdEXfx3et4anTZmmrPumegY7xnrKSssm'.
+				'&X-SIGN='.
+				'&X-NONCE='.(microtime(true)*10000).
+				'';
+	$res = file_get_contents($url);
+	$res = json_decode($res, true);
+
+	return _pr($res);
+
+
+
+
+	return '';
+	$time = microtime(true);
+
+	$send = '';
+
+	$sum = 100;
+	$r = amShow('PZM_USD', 'sell', $sum, 'PZM');
+	$send .= $r['html'];
+
+	$r = amShow('BTC_USD', 'sell', $r['sum'], 'USD');
+	$send .= $r['html'];
+
+	$r = amShow('PZM_BTC', 'sell', $r['sum'], 'BTC');
+	$send .= $r['html'];
+
+	$send .= '<br>sum: '.$r['sum'];
+
+
+
+	return
+	round(microtime(true) - $time, 2).
+	'<br>'.
+	'<br>'.
+	'<div class="mar20">'.$send.'</div>'.
+//	_pr($res).
+	'';
 }
+function amPrice0($pair) {//количетсов нулей после запятой для разных пар
+	$arr = array(
+		'PZM_USD' => 4,
+		'BTC_USD' => 3,
+		'PZM_BTC' => 8
+	);
+
+	if(!isset($arr[$pair]))
+		return 0;
+
+	return $arr[$pair];
+}
+function amShow(
+		$pair,  //пара
+		$act,   //операция (buy: покупка, sell: продажа)
+		$amount,//сумма
+		$curr   //валюта
+) {
+	$url = 'https://btc-alpha.com/api/v1/orderbook/'.$pair.'/'.
+				'?format=json'.
+				'&limit_sell=20'.
+				'&limit_buy=20'.
+				'';
+echo $url;
+	$res = file_get_contents($url);
+	$res = json_decode($res, true);
+
+/*
+	foreach($res['sell'] as $i => $r)
+		if($r['amount'] < $amount)
+			unset($res['sell'][$i]);
+
+	foreach($res['buy'] as $i => $r)
+		if($r['amount'] < $amount)
+			unset($res['buy'][$i]);
+*/
+
+	$html =
+		'<div class="mt20 fs14 color-555 b">'.$pair.'</div>'.
+		'<table class="mt5">'.
+			'<tr><td>Продажа: '.orderTab($res['sell'], amPrice0($pair), 1, 'bg14').
+				'<td class="pl20">Покупка: '.orderTab($res['buy'], amPrice0($pair), 1).
+		'</table>';
+
+	$sum = 0;
+	$PR = explode('_', $pair);
+
+	if($PR[0] != $curr)
+		$act = $act == 'sell' ? 'buy' : 'sell';
+
+	switch($act) {
+		case 'sell':
+			if(empty($res['sell']))
+				return array(
+					'html' => $html.'Нет продаж',
+					'sum' => 0
+				);
+
+			$i0 = key($res['sell']);
+			$price = number_format($res['sell'][$i0]['price'], amPrice0($pair), '.', '');
+
+			if($PR[0] != $curr)
+				$amount = round($amount/$price, 8);
+
+			$put1 = amPut($amount, $price);
+
+			$html .=
+				'<div class="mt10 color-ref">'.
+					'Отдаю <b>'.$amount.'</b> '.$PR[0].' '.
+					'по цене <b>'.$price.'</b>, '.
+					'получаю <b>'.$put1.'<b> <span class="grey">(-'.amCms($put1).')</span> '.$PR[1].
+				'</div>';
+
+			$sum = $put1 - amCms($put1);
+			break;
+
+		case 'buy':
+			if(empty($res['buy']))
+				return array(
+					'html' => $html.'Нет покупок',
+					'sum' => 0
+				);
+
+			$i0 = key($res['buy']);
+			$price = number_format($res['buy'][$i0]['price'], amPrice0($pair), '.', '');
+
+			if($PR[0] != $curr)
+				$amount = round($amount/$price, 8);
+
+			$sum = amGet($amount);//получаю факт
+			$put0 = amPut($amount, $price);//отдаю факт
+
+			$html .=
+				'<div class="mt10 clr1">'.
+					'Получаю <b>'.$amount.'</b> <span class="grey">(-'.amCms($amount).')</span> '.$PR[0].' '.
+					'по цене <b>'.$price.'</b>, '.
+					'отдаю '.$put0.' '.$PR[1].
+				'</div>';
+
+//			$diff = number_format($put1 - amCms($put1) - $put0, 8);
+//			$send .= '<div class="mt10">Разница: <b class="color-'.($diff < 0 ? 'ref' : 'pay' ).'">'.$diff.'</b> '.$pair[1].'</div>';
+			break;
+	}
+
+	return array(
+		'html' => $html,
+		'sum' => $sum
+	);
+}
+function orderTab($arr, $price_0, $limit=1000, $bg='bg11') {
+	$send = '<table class="_stab small">';
+	$n = 1;
+	foreach($arr as $r) {
+		if($n++ > $limit)
+			break;
+		$send .=
+			'<tr class="'.$bg.'">'.
+				'<td class="r b">'.number_format($r['price'], $price_0, ',', '').
+				'<td class="r grey">'.number_format($r['amount'], 3, ',', '');
+	}
+	$send .= '</table>';
+
+	return $send;
+}
+function amGet($sum) {//получить
+	return $sum - amCms($sum);
+}
+function amPut($sum, $price) {//отдать
+	return round($sum*$price, 8);
+}
+function amCms($sum) {//комиссия
+	return number_format(round($sum*0.002, 8), 8);
+}
+
+
+
+
+
+
+
 function gridStackStyleGen() {//генерирование стилей для gridstack
 	$step = 50;    //шаг сетки по горизонтали
 	$send = '';
