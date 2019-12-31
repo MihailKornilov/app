@@ -207,7 +207,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			if($r['bg'] && !_ids($r['bg']))
 				$cls[] = $r['bg'];
 
-			if($ov = $r['ov'])
+			if(!$PARAM['blk_setup'] && $ov = $r['ov'])
 				$cls[] = str_replace('bg', 'ov', $ov);
 
 //			if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && ($r['hidden'] || $r['sa'] && !SA))
