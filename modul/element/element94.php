@@ -5,13 +5,15 @@ function _element94_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//список
 		'num_2'   => _num($el['num_2']),//элемент-сумма [13]
-		'num_3'   => _num($el['num_3']) /*период:
+		'num_3'   => _num($el['num_3']),/*период:
 												0 - всё время
 											11172 - сегодня
 											11173 - текущая неделя
 											11174 - текущий месяц
 											11175 - текущий год
+											13694 - особые условия
 										*/
+		'txt_1' => $el['txt_1']         //условия
 	) + _elementStruct($el);
 }
 function _element94_print($el) {
@@ -40,6 +42,14 @@ function _element94_print($el) {
 		//текущий год
 		case 11175:
 			$sql .= " AND DATE_FORMAT(`dtime_add`,'%Y')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y')";
+			break;
+		//особые условия
+		case 13694:
+			if(empty($el['txt_1'])) {
+				$sql .= " AND !`id`";
+				break;
+			}
+			$sql .= _40cond($el, $el['txt_1']);
 			break;
 	}
 
