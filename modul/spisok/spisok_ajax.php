@@ -515,6 +515,12 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 		}
 	}
 
+	if($dialog['id'] == 43) {
+		_BE('block_clear');
+		_jsCache();
+	}
+
+
 	_app_create($dialog, $unit_id);
 	_app_copy($dialog, $unit_id);
 
