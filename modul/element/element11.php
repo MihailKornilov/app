@@ -365,8 +365,8 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 	if($BL['obj_name'] == 'dialog') {
 		if(!$DLG = _dialogQuery($BL['obj_id']))
 			return 'Диалога '.$BL['obj_id'].' не существует.';
-		if($parent_id = $DLG['dialog_id_parent'])
-			return $parent_id;
+//		if($parent_id = $DLG['dialog_id_parent'])
+//			return $parent_id;
 
 		//выбор для ячейки диалога
 		if(!empty($BL['elem'])) {
