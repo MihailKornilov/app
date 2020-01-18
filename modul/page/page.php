@@ -686,17 +686,66 @@ function _page_div() {//todo тест
 
 	$API_KEY = '2riEmxYp5i4qurU2EEZnrPpfwUqA7fKq5QnYVBbTQAjVxe19keWAtAwFRbDJAKHcY36872VQp1cbfnqSWhvP4Bcg';
 
-	$url = 'https://btc-alpha.com/api/v1/wallets/'.
-				'?format=json'.
-				'&X-KEY=4LwLsbdqr9qJ2vreyebEZvFhjxKrFbfsH6sRXV1mVMxSXdEXfx3et4anTZmmrPumegY7xnrKSssm'.
-				'&X-SIGN='.
-				'&X-NONCE='.(microtime(true)*10000).
-				'';
-	$res = file_get_contents($url);
+	$param = array(
+//		'format' => 'json',
+		'X-KEY' => '4LwLsbdqr9qJ2vreyebEZvFhjxKrFbfsH6sRXV1mVMxSXdEXfx3et4anTZmmrPumegY7xnrKSssm',
+		'X-SIGN' => 'e6d3aefde9b4e07cc3565da1c144443d3476c0443a9e670199f6d64a41bc6f0e',
+		'X-NONCE' => round(microtime(true)*1000)
+	);
+
+//	$url = 'https://btc-alpha.com/api/v1/orders/own/?'.http_build_query($param);
+//	$url = 'https://btc-alpha.com/api/v1/pairs/';
+	$url = 'https://btc-alpha.com/api/v1/wallets/';
+//	$url = 'http://nyandoma/app/test.php';
+
+	$param = array(
+		'currency1'=> 'USD'
+	);
+
+	$opts = stream_context_create(array(
+	    'http' => array(
+	        'method'  => 'GET',
+			'headers' => "Accept:application/json\r\n".
+	                    "Content-type:application/json\r\n",
+						"X-KEY:4LwLsbdqr9qJ2vreyebEZvFhjxKrFbfsH6sRXV1mVMxSXdEXfx3et4anTZmmrPumegY7xnrKSssm\r\n",
+						"X-SIGN:e6d3aefde9b4e07cc3565da1c144443d3476c0443a9e670199f6d64a41bc6f0e\r\n",
+						"X-NONCE:".round(microtime(true)*1000)
+//	        'content' => http_build_query($param)
+	    )
+	));
+
+
+	$res = file_get_contents($url, false, $opts);
+//	$res = file_get_contents($url);
 	$res = json_decode($res, true);
 
 	return _pr($res);
 
+	if(!$CURL = curl_init())
+		return 'cURL err.';
+
+	curl_setopt($CURL, CURLOPT_URL, $url);//присвоение ссылки
+	curl_setopt($CURL, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($CURL, CURLOPT_SSL_VERIFYHOST, 0);
+
+	$headers = array();
+	$headers[] = "Content-Type: application/json; utf-8";
+	$headers[] = "Accept: application/json";
+	$headers[] = "Accept-Language: en";
+	curl_setopt($CURL, CURLOPT_HTTPHEADER, $headers);
+
+	$out = curl_exec($CURL);
+
+	if(curl_errno($CURL))
+	    echo 'Error:'.curl_error($CURL);
+
+	curl_close($CURL);
+	return $out;
+
+	return '';
+
+//1577909692535
+//1577909689234
 
 
 
