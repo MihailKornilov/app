@@ -410,7 +410,7 @@ function PHP12_user_invite() {//ссылка на приглашение для 
 		'<input type="text"'.
 			  ' class="w100p blue b bg4 pr30"'.
 			  ' readonly'.
-			  ' value="http'.(LOCAL ? '://nyandoma' : 's://fast-bpm.ru').'/app/index.php?invite='.$hash.'"'.
+			  ' value="http'.(LOCAL ? '://nyandoma' : 's://app.gim-system.ru').'/index.php?invite='.$hash.'"'.
 		'/>'.
 	'</div>';
 }
