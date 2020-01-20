@@ -212,6 +212,7 @@ function PHP12_v_choose($prm) {
 	if(!defined('OBJ_NAME_CHOOSE'))
 		define('OBJ_NAME_CHOOSE', 'dialog');
 
+	$DLG_PARENT = 'Нет.';
 	switch(OBJ_NAME_CHOOSE) {
 		case 'page':
 			if(!$page = _page($obj_id))
@@ -222,8 +223,19 @@ function PHP12_v_choose($prm) {
 		case 'dialog':
 			if(!$dialog = _dialogQuery($obj_id))
 				return _emptyMin10('Диалога '.$obj_id.' не существует.');
-			$TITLE = 'Диалоговое окно';
+			$TITLE = 'Диалог';
 			$NAME = $dialog['name'];
+
+			if($pid = _num($dialog['dialog_id_parent']))
+				if($DP = _dialogQuery($pid)) {
+					$cond = array(
+						'elm_choose' => 1,
+						'elm_sel' => $prm['dop']['sel'],
+						'elm_allow' => $prm['dop']['allow']
+					);
+					$DLG_PARENT = '<div class="fs14 pad10 pl15 bg-orange line-b">Диалог-родитель <b class="fs14">'.$DP['name'].'</b>:</div>'.
+								  _blockHtml('dialog', $pid, $cond);
+				}
 			break;
 		default:
 			return _emptyMin10('Неизвестный объект <b>'.OBJ_NAME_CHOOSE.'</b>.');
@@ -256,7 +268,9 @@ function PHP12_v_choose($prm) {
 	'</div>'.
 
 ($prm['dop']['first'] ?
-	'<div class="choose-menu-3">'.
+	'<div class="choose-menu-3">'.$DLG_PARENT.'</div>'.
+
+	'<div class="choose-menu-4">'.
 		'Стандартные значения'.
 	'</div>'
 : '').
