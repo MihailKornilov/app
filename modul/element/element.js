@@ -5426,10 +5426,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	/* ---=== НАСТРОЙКА ФОРМУЛЫ ДЛЯ ДЕЙСТВИЯ 208 ===--- */
 	PHP12_action208_formula = function(el, vvv, obj) {
+		console.log(obj);
 		var ATR_EL = _attr_el(el.id),
 			V1 = vvv.length ? vvv[0] : {},
 			ACT208_V = function(n, v_id, v_name) {//печать значения
-				return'<input type="hidden" class="v208" val="' + n + '" value="' + (v_id || 0) + '" />' +
+				return '<input type="hidden" class="v208" val="' + n + '" value="' + (v_id || 0) + '" />' +
 					'<div class="_selem dib prel bg-fff over3 mb10">' +
 						'<div class="icon icon-star pabs"></div>' +
 						'<div class="icon icon-del pl pabs' + _dn(v_id) + '"></div>' +
@@ -5461,6 +5462,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							del._dn(1);
 						}
 					});
+				});
+				//очистка выбранного значения
+				ATR_EL.find('._selem:last .icon-del').click(function(e) {
+					e.stopPropagation();
+					var t = $(this);
+					t._dn();
+					t.next().val('');
+					t.parents('._selem').prev().val(0);
 				});
 			},
 			html =

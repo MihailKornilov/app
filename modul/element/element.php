@@ -2679,6 +2679,10 @@ function PHP12_action_list($prm) {
 
 	$spisok = '';
 	foreach($arr as $id => $r) {
+		if(!$block_id = $r['block_id']) {
+			$el = _elemOne($r['element_id']);
+			$block_id = $el['block_id'];
+		}
 		$spisok .=
 			'<dd val="'.$id.'">'.
 			'<table class="w100p bs5 bor1 bg-gr2 over2 mb5 curD">'.
@@ -2701,7 +2705,7 @@ function PHP12_action_list($prm) {
 							PHP12_action_224($r).
 						'</div>'.
 					'<td class="w50 r top">'.
-						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
+						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',block_id:'.$block_id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
 						_iconDel(array(
 							'class' => 'pl ml5 dialog-open',
 							'val' => 'dialog_id:'.$r['dialog_id'].',del_id:'.$id.',dss:'.$dss
