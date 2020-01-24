@@ -2681,7 +2681,7 @@ function PHP12_action_list($prm) {
 	foreach($arr as $id => $r) {
 		if(!$block_id = $r['block_id']) {
 			$el = _elemOne($r['element_id']);
-			$block_id = $el['block_id'];
+			$block_id = _num(@$el['block_id']);
 		}
 		$spisok .=
 			'<dd val="'.$id.'">'.
