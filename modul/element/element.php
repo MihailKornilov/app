@@ -3609,6 +3609,11 @@ function _historyKit($el, $prm) {//составление одной сборк�
 					if($r['unit_id'] != $connect_id)
 						return '';
 					break;
+				//не равно
+				case 4:
+					if($r['unit_id'] == $connect_id)
+						return '';
+					break;
 				default: return _msgRed('условие '.$r['cond_id'].' не доделано');
 			}
 		}
