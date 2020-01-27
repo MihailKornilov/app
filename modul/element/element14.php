@@ -33,15 +33,78 @@ function _element14_js($el) {
 		'num_1' => _num($el['num_1'])
 	) + _elementJs($el);
 }
-function _element14_print($el, $prm) {
-	if(!$dialog_id = $el['num_1'])
-		return _emptyRed('Не указан список для вывода данных.');
-	if(!$DLG = _dialogQuery($dialog_id))
-		return _emptyRed('Списка <b>'.$dialog_id.'</b> не существует.');
-	if($prm['blk_setup'])
+function _element14_print($ELEM, $prm=array(), $next=0) {
+	if(!$DLG = _dialogQuery($ELEM['num_1']))
+		return _emptyRed('Диалога '.$ELEM['num_1'].' не существует.');
+	if(!empty($prm['blk_setup']))
 		return _emptyMin('Список-шаблон <b>'.$DLG['name'].'</b>');
+	if(!_BE('block_arr', 'spisok', $ELEM['id']))
+		return _emptyRed('Шаблон <b>'.$DLG['name'].'</b> не настроен.');
 
-	return _spisok14($el);
+	$limit = $ELEM['num_2'];
+	$SC = $ELEM['num_6'] ? 'DESC' : 'ASC';
+
+	if(!$all = _spisokCountAll($ELEM, array(), $next))
+		return _emptyMin(_br($ELEM['txt_1']));
+
+	$IS_SORT = _spisokIsSort($ELEM['id']);
+
+	$order = "`t1`.`id`";
+	if($ELEM['num_3'] == 2318 && $tab = _queryTN($DLG, 'dtime_add'))
+		$order = "`".$tab."`.`dtime_add`";
+	if(_queryTN($DLG, 'sort'))
+		if($IS_SORT || $ELEM['num_3'] == 2319) {
+			$order = "`sort`";
+			$SC = 'ASC';
+		}
+
+	//получение данных списка
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._spisokWhere($ELEM)."
+			ORDER BY ".$order." ".$SC."
+			LIMIT ".($limit * $next).",".$limit;
+	$spisok = query_arr($sql);
+
+	//добавление записи, если был быстрый поиск по номеру
+	if(!$next)
+		$spisok = _spisok7num($spisok, $ELEM);
+
+	//вставка значений из вложенных списков
+	$spisok = _spisokInclude($spisok);
+
+	//вставка картинок
+	$spisok = _spisokImage($spisok);
+
+	//вставка значений для элемента [96]
+	$spisok = _spisok96inc($ELEM, $spisok);
+
+	$send = '';
+	foreach($spisok as $id => $sp) {
+		$block = _BE('block_obj', 'spisok', $ELEM['id']);
+		$prm = array(
+			'unit_get' => $sp,
+			'td_no_end' => $ELEM['num_4']
+		);
+		$send .= '<div class="sp-unit'._dn(!$ELEM['num_4'], 'dib').'" val="'.$id.'">'.
+					_blockLevel($block, $prm).
+				 '</div>';
+	}
+
+	if($limit * ($next + 1) < $all) {
+		$count_next = $all - $limit * ($next + 1);
+		if($count_next > $limit)
+			$count_next = $limit;
+		$send .=
+			'<div class="over5" onclick="_spisok14Next($(this),'.$ELEM['id'].','.($next + 1).')">'.
+				'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
+			'</div>';
+	}
+
+	if($IS_SORT)
+		$send .= '<script>_spisokSort("'.$ELEM['id'].'")</script>';
+
+	return $send;
 }
 function _element14_copy_field($el) {
 	return array(

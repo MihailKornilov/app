@@ -43,7 +43,7 @@ function _element88_struct_vvv($el, $cl) {
 
 	return $send;
 }
-function _element88_print($EL, $prm, $next=0) {
+function _element88_print($EL, $prm=array(), $next=0) {
 	if(!empty($prm['blk_setup']))
 		return _emptyMin('Таблица из нескольких списков');
 
@@ -64,7 +64,6 @@ function _element88_print($EL, $prm, $next=0) {
 
 	//составление колонок для запроса
 	$SPV_IDS = array(); //ids диалогов
-	$SPV_COND = array();//массив условий для каждого диалога
 	$COL = array();
 	foreach($V['spv'] as $spv) {
 		if(!$id = $spv['dialog_id'])
@@ -75,7 +74,6 @@ function _element88_print($EL, $prm, $next=0) {
 			return _emptyRed('Диалог '.$id.' использует неверную таблицу');
 		
 		$SPV_IDS[] = $id;
-		$SPV_COND[$id] = $spv['cond'];
 
 		foreach(explode(',', _queryCol($DLG)) as $c)
 			$COL[$c] = 1;
@@ -88,22 +86,16 @@ function _element88_print($EL, $prm, $next=0) {
 		$COLL[] = $c;
 	}
 
-	$cond = array();
-	foreach($SPV_COND as $id => $r) {
-		$c = "`dialog_id`=".$id;
-		if($r)
-			$c .= _40cond(array(), $r);
-		$cond[] = $c;
-	}
 
-	if(!$EL['all'] = _elem88countAll($EL, $cond))
+	if(!$EL['all'] = _elem88countAll($EL))
 		return _emptyMin($EL['txt_1']);
 
 	//получение данных списка
 	$sql = "SELECT ".implode(',', $COLL)."
 			FROM   `_spisok` `t1`
 			WHERE  !`deleted`
-			  AND  (".implode(' OR ', $cond).")
+			  "._elem88cond($EL)."
+			  "._element77cond($EL)."
 			ORDER BY `dtime_add` ".$SC."
 			LIMIT ".($LIMIT * $next).",".$LIMIT;
 	$spisok = query_arr($sql);
@@ -173,6 +165,31 @@ function _element88_print($EL, $prm, $next=0) {
 	_elem88next($EL, $next).
 	$TABLE_END;
 }
+function _elem88cond($el) {//условия из настроек списка
+	$V = json_decode($el['txt_2'], true);
+
+	$SPV_COND = array();//массив условий для каждого диалога
+	foreach($V['spv'] as $spv) {
+		if(!$id = $spv['dialog_id'])
+			return " AND !`id`";
+		if(!$DLG = _dialogQuery($id))
+			return " AND !`id`";
+		if($DLG['table_name_1'] != '_spisok')
+			return " AND !`id`";
+
+		$SPV_COND[$id] = $spv['cond'];
+	}
+
+	$cond = array();
+	foreach($SPV_COND as $id => $r) {
+		$c = "`dialog_id`=".$id;
+		if($r)
+			$c .= _40cond(array(), $r);
+		$cond[] = $c;
+	}
+
+	return " AND (".implode(' OR ', $cond).")";
+}
 function _elem88th($el, $next) {//показ имён колонок
 	if(!$el['num_5'])
 		return '';
@@ -206,11 +223,11 @@ function _elem88th($el, $next) {//показ имён колонок
 
 	return $send;
 }
-function _elem88countAll($el, $cond) {//общее количество строк списка
+function _elem88countAll($el) {//общее количество строк списка
 	$sql = "SELECT COUNT(*)
 			FROM   `_spisok` `t1`
-			WHERE  !`deleted`
-			  AND  (".implode(' OR ', $cond).")".
+			WHERE  !`deleted`".
+			  _elem88cond($el).
 			  _element77cond($el);
 	return query_value($sql);
 }

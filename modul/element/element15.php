@@ -20,8 +20,18 @@ function _element15_print($el, $prm=array()) {
 		return 'Элемента, содержащего список, не существует.';
 
 	//если результат нулевой, выводится сообщение из элемента, который размещает список
-	if(!$all = _spisokCountAll($ELEM, $prm))
-		return $el['txt_7'];
+	switch($ELEM['dialog_id']) {
+		case 14://список-шаблон
+		case 23://список-таблица
+			if(!$all = _spisokCountAll($ELEM, $prm))
+				return $el['txt_7'];
+			break;
+		case 88://таблица из нескольких списков
+			if(!$all = _elem88countAll($ELEM))
+				return $el['txt_7'];
+			break;
+		default: return array();
+	}
 
 	return
 	_end($all, $el['txt_1'], $el['txt_3'], $el['txt_5']).

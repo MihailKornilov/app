@@ -62,13 +62,10 @@ function _element23_js($el) {
 		'num_8'   => _num($el['num_8'])
 	) + _elementJs($el);
 }
-function _element23_print($el, $prm) {
-	if($prm['blk_setup'])
-		return _emptyMin('Список-таблица <b>'._dialogParam($el['num_1'], 'name').'</b>');
+function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списка в виде таблицы
+	if(!empty($prm['blk_setup']))
+		return _emptyMin('Список-таблица <b>'._dialogParam($ELEM['num_1'], 'name').'</b>');
 
-	return _spisok23($el, $prm);
-}
-function _spisok23($ELEM, $prm=array(), $next=0) {//вывод списка в виде таблицы
 	//диалог, через который вносятся данные списка
 	if(!$dialog_id = $ELEM['num_1'])
 		return _emptyRed('Не указан список для вывода данных.');
