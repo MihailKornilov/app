@@ -789,7 +789,7 @@ function _spisokWhere($el, $prm=array()) {//формирование строк�
 	$cond .= _spisokCond72($el);
 	$cond .= _spisokCond74($el);
 	$cond .= _spisokCond75($el);
-	$cond .= _spisokCond77($el);
+	$cond .= _element77cond($el);
 	$cond .= _spisokCond78($el);
 	$cond .= _spisokCond83($el);
 	$cond .= _spisokCond102($el);
@@ -955,40 +955,6 @@ function _spisokCond75($el) {//Фильтр: фронтальное меню
 	}
 
 	return " AND `".$col."` IN (".$v.")";
-}
-function _spisokCond77($el) {//фильтр-календарь
-	$filter = false;
-	$v = '';
-
-	//поиск элемента-фильтра-календаря
-	foreach(_filter('spisok', $el['id']) as $r)
-		if($r['elem']['dialog_id'] == 77) {
-			$filter = $r['elem'];
-			$v = $r['v'];
-			break;
-		}
-
-	if(!$filter)
-		return '';
-	if(!$v)
-		return ' AND !`id`';
-
-	$v = _filterCalendarDef($v);
-	$ex = explode(':', $v);
-
-	$col = 'dtime_add';
-
-	if($filter['num_3'] == 6510) {
-		if(!$ELD = _elemOne($filter['num_4']))
-			return ' AND !`id`';
-		if(!$col = _elemCol($ELD))
-			return ' AND !`id`';
-	}
-
-	if(empty($ex[1]))
-		return " AND `".$col."` LIKE '".$v."%'";
-
-	return " AND `".$col."`>='".$ex[0]." 00:00:00' AND `".$col."`<='".$ex[1]." 23:59:59'";
 }
 function _spisokCond78($el) {//фильтр-меню
 	$filter = false;

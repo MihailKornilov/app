@@ -69,6 +69,41 @@ function _element77filterSet($elem_id, $v) {//подмена значения в
 	return $v;
 }
 
+function _element77cond($el) {//фильтр-календарь
+	$filter = false;
+	$v = '';
+
+	//поиск элемента-фильтра-календаря
+	foreach(_filter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 77) {
+			$filter = $r['elem'];
+			$v = $r['v'];
+			break;
+		}
+
+	if(!$filter)
+		return '';
+	if(!$v)
+		return ' AND !`id`';
+
+	$v = _filterCalendarDef($v);
+	$ex = explode(':', $v);
+
+	$col = 'dtime_add';
+
+	if($filter['num_3'] == 6510) {
+		if(!$ELD = _elemOne($filter['num_4']))
+			return ' AND !`id`';
+		if(!$col = _elemCol($ELD))
+			return ' AND !`id`';
+	}
+
+	if(empty($ex[1]))
+		return " AND `".$col."` LIKE '".$v."%'";
+
+	return " AND `".$col."`>='".$ex[0]." 00:00:00' AND `".$col."`<='".$ex[1]." 23:59:59'";
+}
+
 function _filterCalendarDef($v) {//получение значения по умолчанию
 	switch($v) {
 		//текущий день
@@ -88,22 +123,47 @@ function _filterCalendarMon($el, $mon, $v) {//имя месяца и год
 	//Определение, есть ли записи в месяце
 	if(!$elm = _elemOne($el['num_1']))
 		return $send;
-	if(!$DLG = _dialogQuery($elm['num_1']))
-		return $send;
 
 	$col = 'dtime_add';
 
-	if($el['num_3'] == 6510) {
-		if($ELD = _elemOne($el['num_4']))
-			return $send;
-		if($col = _elemCol($ELD))
-			return $send;
+	switch($elm['dialog_id']) {
+		case 14://список-шаблон
+		case 23://список-таблица
+			if(!$DLG = _dialogQuery($elm['num_1']))
+				return $send;
+			$from = _queryFrom($DLG);
+			$where = _queryWhere($DLG);
+			if($el['num_3'] == 6510) {
+				if(!$ELD = _elemOne($el['num_4']))
+					return $send;
+				if(!$col = _elemCol($ELD))
+					return $send;
+			}
+			break;
+		case 88://таблица из нескольких списков
+			$from = "`_spisok`";
+
+			$V = json_decode($elm['txt_2'], true);
+			if(empty($V['spv']))
+				return $send;
+
+			$ids = array();
+			foreach($V['spv'] as $spv)
+				if($id = $spv['dialog_id'])
+					$ids[] = $id;
+
+			if(empty($ids))
+				return $send;
+
+			$where = "dialog_id IN (".implode(',', $ids).")";
+			break;
+		default: return $send;
 	}
 
 	$sql = "SELECT COUNT(*)
-			FROM "._queryFrom($DLG)."
+			FROM ".$from."
 			WHERE `".$col."` LIKE ('".$mon."%')
-			  AND "._queryWhere($DLG);
+			  AND ".$where;
 	if(query_value($sql))
 		return '<div class="monn'.($mon == $v ? ' sel' : '').'" val="'.$mon.'">'._monthDef($ex[1]).'</div> '.$ex[0];
 
@@ -161,22 +221,47 @@ function _filterCalendarContent($el, $mon, $v) {
 function _filterCalendarDays($el, $mon) {//отметка дней в календаре, по которым есть записи
 	if(!$elm = _elemOne($el['num_1']))
 		return array();
-	if(!$DLG = _dialogQuery($elm['num_1']))
-		return array();
 
 	$col = 'dtime_add';
 
-	if($el['num_3'] == 6510) {
-		if(!$ELD = _elemOne($el['num_4']))
-			return array();
-		if(!$col = _elemCol($ELD))
-			return array();
+	switch($elm['dialog_id']) {
+		case 14://список-шаблон
+		case 23://список-таблица
+			if(!$DLG = _dialogQuery($elm['num_1']))
+				return array();
+			$from = _queryFrom($DLG);
+			$where = _queryWhere($DLG);
+			if($el['num_3'] == 6510) {
+				if(!$ELD = _elemOne($el['num_4']))
+					return array();
+				if(!$col = _elemCol($ELD))
+					return array();
+			}
+			break;
+		case 88://таблица из нескольких списков
+			$from = "`_spisok`";
+
+			$V = json_decode($elm['txt_2'], true);
+			if(empty($V['spv']))
+				return array();
+
+			$ids = array();
+			foreach($V['spv'] as $spv)
+				if($id = $spv['dialog_id'])
+					$ids[] = $id;
+
+			if(empty($ids))
+				return array();
+
+			$where = "dialog_id IN (".implode(',', $ids).")";
+			break;
+		default: return array();
 	}
 
 	$sql = "SELECT DATE_FORMAT(`".$col."`,'%Y-%m-%d'),1
-			FROM "._queryFrom($DLG)."
+			FROM ".$from."
 			WHERE `".$col."` LIKE ('".$mon."%')
-			  AND "._queryWhere($DLG)."
+			  AND ".$where."
 			GROUP BY DATE_FORMAT(`".$col."`,'%d')";
 	return query_ass($sql);
 }

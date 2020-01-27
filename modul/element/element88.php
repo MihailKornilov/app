@@ -96,7 +96,7 @@ function _element88_print($EL, $prm, $next=0) {
 		$cond[] = $c;
 	}
 
-	if(!$EL['all'] = _elem88countAll($cond))
+	if(!$EL['all'] = _elem88countAll($EL, $cond))
 		return _emptyMin($EL['txt_1']);
 
 	//получение данных списка
@@ -206,11 +206,12 @@ function _elem88th($el, $next) {//показ имён колонок
 
 	return $send;
 }
-function _elem88countAll($cond) {//общее количество строк списка
+function _elem88countAll($el, $cond) {//общее количество строк списка
 	$sql = "SELECT COUNT(*)
 			FROM   `_spisok` `t1`
 			WHERE  !`deleted`
-			  AND  (".implode(' OR ', $cond).")";
+			  AND  (".implode(' OR ', $cond).")".
+			  _element77cond($el);
 	return query_value($sql);
 }
 function _elem88next($EL, $next) {//tr-догрузка списка

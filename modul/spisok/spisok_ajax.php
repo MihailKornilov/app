@@ -109,8 +109,14 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID элемента-списка');
 		if(!$elSpisok = _elemOne($elem_spisok))
 			jsonError('Элемента-списка id'.$elem_spisok.' не существует');
-		if($elSpisok['dialog_id'] != 14 && $elSpisok['dialog_id'] != 23)
-			jsonError('Элемент id'.$elem_spisok.' не является списком');
+		switch($elSpisok['dialog_id']) {
+			case 14:
+			case 23:
+			case 88: break;
+			default:
+				jsonError('Элемент id'.$elem_spisok.' не является списком');
+
+		}
 		if(!$elem_v = $_POST['elem_v'])
 			jsonError('Отсутствуют значения фильтров');
 		if(!is_array($elem_v))
