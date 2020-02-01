@@ -983,7 +983,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 	//удаление предыдущего действия (когда разрешено назначать только оно действие)
 	if($table_1 == '_action')
 		switch($DLG['id']) {
-			case 221:
+//			case 221:
 			case 222:
 			case 224:
 			case 227:

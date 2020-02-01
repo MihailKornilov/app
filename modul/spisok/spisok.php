@@ -532,6 +532,23 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 		switch($func['dialog_id']) {
 			//переход на страницу
 			case 221:
+				$isFilter = false;//наличие фильтра
+				$fAccept = false; //фильтр подошёл
+				if($F = _elem40json($func['filter'])) {
+					$isFilter = true;
+					$F = $F[0];
+					switch($F['cond_id']) {
+						case 3: //равно
+							$v = _elemUids($F['elem_id'], $u);
+							if($v == $F['txt'])
+								$fAccept = true;
+							break;
+					}
+				}
+
+				if($isFilter && !$fAccept)
+					break;
+
 				$page_id = $func['target_ids'];
 				$id = _spisokUnitUrlPage($el, $page_id, $u);
 				return '<a href="'.URL.'&p='.$page_id.'&pfrom='._page('cur').($id ? '&id='.$id : '').'" class="inhr'.
