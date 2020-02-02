@@ -43,6 +43,9 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 	if($el['num_1'])//указание есть
 		return 0;
 
+	if($u = $prm['unit_edit'])
+		$prm['srce']['element_id'] = $u['element_id'];
+
 	//поиск элемента по ячейке таблицы
 	if($ell_id = $prm['srce']['element_id']) {
 		$sql = "SELECT *

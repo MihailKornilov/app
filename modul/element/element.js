@@ -1487,7 +1487,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								if(el.num_4) {
 									cena = _cena(sp.closest('tr').find('.ucena').html());
 									sum += cena * count;
-									console.log(sum);
 								}
 
 								vv.push(id + ':' + count + ':' + cena);
@@ -2452,9 +2451,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						}
 					};
 					_post(send, function(res) {
-
-						console.log(res.data);
-
 						var itogC = 0,
 							itogSum = 0;
 						_forIn(res.data, function(sp, dlg_id) {
@@ -5426,7 +5422,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	/* ---=== НАСТРОЙКА ФОРМУЛЫ ДЛЯ ДЕЙСТВИЯ 208 ===--- */
 	PHP12_action208_formula = function(el, vvv, obj) {
-		console.log(obj);
 		var ATR_EL = _attr_el(el.id),
 			V1 = vvv.length ? vvv[0] : {},
 			ACT208_V = function(n, v_id, v_name) {//печать значения

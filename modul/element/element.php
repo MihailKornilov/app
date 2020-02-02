@@ -2036,6 +2036,7 @@ function PHP12_dialog_del_setup($prm) {
 
 /* ---=== НАСТРОЙКА УСЛОВИЙ ДЛЯ СПИСКА [41] ===--- */
 function PHP12_spfl($prm) {
+//	print_r($prm);
 	if(!PHP12_spfl_dss($prm))
 		return _emptyMin('Отсутствует id исходного диалога');
 
@@ -2125,21 +2126,20 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 
 	return $send;
 }
-function PHP12_spfl_dss($prm) {
+function PHP12_spfl_dss($prm) {//получение id исходного диалога
 	if($dss = $prm['srce']['dss'])
 		return $dss;
-	if(!$block_id = $prm['srce']['block_id'])
-		return 0;
-	if(!$BL = _blockOne($block_id))
-		return 0;
-	if($BL['obj_name'] != 'dialog')
-		return 0;
-	if(!$DLG = _dialogQuery($BL['obj_id']))
-		return 0;
-	if($id = _num($DLG['dialog_id_unit_get']))
-		return $id;
 
-	return $BL['obj_id'];
+	if($block_id = $prm['srce']['block_id'])
+		if($BL = _blockOne($block_id))
+			if($BL['obj_name'] == 'dialog') {
+				if($DLG = _dialogQuery($BL['obj_id']))
+					if($id = _num($DLG['dialog_id_unit_get']))
+						return $id;
+				return $BL['obj_id'];
+			}
+
+	return 0;
 }
 function PHP12_spfl_drop() {
 	return array(
