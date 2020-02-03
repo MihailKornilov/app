@@ -68,6 +68,14 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 							if($nn == $n)
 								return $spv['dialog_id'];
 					}
+				//сборный текст
+				if($elp['dialog_id'] == 44)
+					foreach($elp['vvv'] as $vvv)
+						if($vvv['id'] == $ell_id)
+							if($vvv['dialog_id'] == 11) {
+								$el11 = _elemOne(_idsFirst($vvv['txt_2']));
+								return $el11['num_1'];
+							}
 			}
 	}
 

@@ -526,8 +526,6 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 	if($prm['blk_setup'])
 		return '<a class="inhr">'.$txt.'</a>';
 
-
-
 	foreach($el['action'] as $func)
 		switch($func['dialog_id']) {
 			//переход на страницу
