@@ -505,6 +505,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 
 	//изменена выплывающая подсказка
 	if($dialog['table_name_1'] == '_hint') {
+		_BE('block_clear');
 		_BE('elem_clear');
 		_jsCache();
 	}
@@ -520,12 +521,6 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 				_cache_clear('user'.$unit_id);
 		}
 	}
-
-	if($dialog['id'] == 43) {
-		_BE('block_clear');
-		_jsCache();
-	}
-
 
 	_app_create($dialog, $unit_id);
 	_app_copy($dialog, $unit_id);
@@ -834,6 +829,13 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 					$app_id = query_value($sql);
 				}
 			}
+			if($tab == '_hint') {
+				$sql = "SELECT `app_id`
+						FROM `_element`
+						WHERE `id`=".$element_id;
+				$app_id = query_value($sql);
+			}
+
 			$sql = "UPDATE `".$tab."`
 					SET `app_id`=".$app_id."
 					WHERE `id`=".$uid[$tab];
