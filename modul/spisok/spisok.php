@@ -1017,7 +1017,7 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 */
 
 	if(empty($cond))
-		return '';
+		return '/* [40] условия отсутствуют */';
 
 	if(!is_array($cond))
 		if(!$cond = _elem40json($cond))

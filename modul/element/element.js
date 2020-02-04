@@ -1443,6 +1443,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						var dss = _dlg24(el.num_1, vvv);
 						dss = _blkSrce(dss);
 
+						if(!dss)
+							return;
+
 						_dialogLoad({
 							dialog_id:41,
 							block_id:OBJ.srce.block_id,
