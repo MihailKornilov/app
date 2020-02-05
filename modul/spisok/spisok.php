@@ -1553,17 +1553,19 @@ function _spisokUnitUpd55($EL, $unit_id=0) {//обновление сумм
 		return;
 	if(!$elForSum = _elemOne($elem_id))
 		return;
-	if(!$sum_col = $elForSum['col'])
+	if(!$sum_col = _elemCol($elForSum))
 		return;
 
+	$col = _elemCol($cmp);
+
 	$sql = "SELECT
-				`".$cmp['col']."`,
+				`".$col."`,
 				SUM(`".$sum_col."`)
 			FROM "._queryFrom($DConn)."
 			WHERE "._queryWhere($DConn)."
-			  AND `".$cmp['col']."`".($unit_id ? "=".$unit_id : '')."
+			  AND `".$col."`".($unit_id ? "=".$unit_id : '')."
 			  "._40cond(array(), $EL['txt_1'])."
-			GROUP BY `".$cmp['col']."`";
+			GROUP BY `".$col."`";
 	if(!$ass = query_ass($sql))//выход, если нечего обновлять
 		return;
 
