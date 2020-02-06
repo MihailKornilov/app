@@ -201,7 +201,7 @@ body:not(.site){position:relative}
 	cursor:pointer;
 	width:24px;
 	height:24px;
-	background:0 0 url(../../img/wiki_icons.png?7) no-repeat;
+	background:0 0 url(../../img/wiki_icons.png?9) no-repeat;
 	opacity:.6;
 	border-radius:1px;
 }
@@ -219,10 +219,7 @@ body:not(.site){position:relative}
 .iw10{background-position:0 -240px}/* Вниз-центр */
 .iw11{background-position:0 -264px}/* Вниз-вправо */
 .iw12{background-position:0 -286px}/* url */
-
-.iw18{background-position:0 -432px}/*  */
-.iw19{background-position:0 -456px}/*  */
-.iw20{background-position:0 -480px}/*  */
+.iw13{background-position:0 -310px}/* скрытый блок */
 
 
 

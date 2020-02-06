@@ -36,7 +36,6 @@ var _ids = function(v, count) {
 			msg:'<div class="pad5">' +
 					'<table class="w100p line-b">' +
 						'<tr><td class="w50 fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Блок' +
-							'<td><input type="hidden" id="block-hidden" value="' + BL.hidden + '" />' +
 							'<td class="w90 r pb2">' +
 								'<div val="dialog_id:43,block_id:' + block_id + ',edit_id:' + hint_id + '" class="icon icon-hint curP dialog-open' + _dn(!BL.hint, 'pl') + _tooltip('Настроить подсказку<br>для блока', -65, false, true) + '</div>' +
 								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +
@@ -45,7 +44,9 @@ var _ids = function(v, count) {
 					'<table class="w100p">' +
 						'<tr>' +
 							'<td>' + _blockUnitBg(BL) +
-							'<td class="pt10">' + _blockUnitPlace(BL) +
+							'<td class="top">' +
+								_blockUnitPlace(BL) +
+								_blockUnitView(BL) +
 					'</table>' +
 					_blockUnitBut(BL) +
 				'</div>' +
@@ -70,12 +71,12 @@ var _ids = function(v, count) {
 						BL.save = 1;
 					}
 				});
-				$('#block-hidden')._check({
-					title:'скрытый',
-					func:function(v) {
-						BL.hidden = v;
-						BL.save = 1;
-					}
+				$('#block-hidden').click(function() {
+					var t = $(this),
+						v = t.hasClass('on') ? 0 : 1;
+					t[(v ? 'add' : 'remove') + 'Class']('on');
+					BL.hidden = v;
+					BL.save = 1;
 				});
 
 				if(BL.elem_id) {
@@ -356,8 +357,8 @@ var _ids = function(v, count) {
 					'</table>' +
 			   '</div>';
 	},
-	_blockUnitPlace = function(BL) {//позиция элемента
-		return  '<table id="elem-pos" class="ml8">' +
+	_blockUnitPlace = function(BL) {//позиция
+		return  '<table id="elem-pos" class="ml8 mt10">' +
 			'<tr><td class="color-555 pb3 center">Позиция' +
 			'<tr><td><div val="top" class="icon-wiki iw6 mr3' + _dn(BL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
 					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(BL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
@@ -368,14 +369,10 @@ var _ids = function(v, count) {
 					'<div val="bottom r" class="icon-wiki iw11' + _dn(BL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -65, 'r') + '</div>' +
 		'</table>';
 	},
-
-	_blockUnitSa = function(BL) {//настройка блока для SA
-		if(!SA)
-			return '';
-
-		return '<td class="bg-ffc bor-f0 pl5 pr3">' +
-			'<input type="hidden" id="block-width-auto" value="' + BL.width_auto + '" />' +
-			'<input type="hidden" id="block-sa-view" value="' + BL.sa + '" />';
+	_blockUnitView = function(BL) {//видимость
+		return '<div class="ml8 w80 mt3 line-t">' +
+					'<div id="block-hidden" class="icon-wiki iw13 mt5' + _dn(BL.hidden, 'on') + _tooltip('Скрытый блок', -42) + '</div>' +
+			   '</div>';
 	},
 	_blockUnitBut = function(BL) {//кнопки
 		if(BL.elem_id)
