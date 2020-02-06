@@ -75,6 +75,7 @@ var _ids = function(v, count) {
 					var t = $(this),
 						v = t.hasClass('on') ? 0 : 1;
 					t[(v ? 'add' : 'remove') + 'Class']('on');
+					t.next()[(v ? 'add' : 'remove') + 'Class']('dn');
 					BL.hidden = v;
 					BL.save = 1;
 				});
@@ -372,6 +373,10 @@ var _ids = function(v, count) {
 	_blockUnitView = function(BL) {//видимость
 		return '<div class="ml8 w80 mt3 line-t">' +
 					'<div id="block-hidden" class="icon-wiki iw13 mt5' + _dn(BL.hidden, 'on') + _tooltip('Скрытый блок', -42) + '</div>' +
+					'<div class="dib' + _dn(!BL.hidden) + '">' +
+						'<div class="icon-wiki iw14 mt5 ml3 on' + _tooltip('Показывать при<br>создании записи', -48, '', 1) + '</div>' +
+						'<div class="icon-wiki iw15 mt5 ml3 on' + _tooltip('Показывать при<br>изменении записи', -53, '', 1) + '</div>' +
+					'</div>' +
 			   '</div>';
 	},
 	_blockUnitBut = function(BL) {//кнопки
