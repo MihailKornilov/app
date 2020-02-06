@@ -43,7 +43,7 @@ var _ids = function(v, count) {
 					'</table>' +
 					'<table class="w100p">' +
 						'<tr>' +
-							'<td>' + _blockUnitBg(BL) +
+							'<td class="top">' + _blockUnitBg(BL) +
 							'<td class="top">' +
 								_blockUnitPlace(BL) +
 								_blockUnitView(BL) +
