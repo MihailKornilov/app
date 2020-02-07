@@ -841,6 +841,10 @@ function _jsCacheBlkOne($block_id) {
 
 	if(!empty($r['hint']))
 		$val['hint'] = $r['hint'];
+	if($r['obj_name'] == 'dialog') {
+		$val['show_create'] = $r['show_create'];
+		$val['show_edit'] = $r['show_edit'];
+	}
 
 	if(!empty($r['action'])) {
 		//удаление фильтров, ибо в JS они не требуются

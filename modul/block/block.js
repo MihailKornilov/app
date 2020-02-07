@@ -79,6 +79,20 @@ var _ids = function(v, count) {
 					BL.hidden = v;
 					BL.save = 1;
 				});
+				$('#block-show-create').click(function() {
+					var t = $(this),
+						v = t.hasClass('on') ? 0 : 1;
+					t[(v ? 'add' : 'remove') + 'Class']('on');
+					BL.show_create = v;
+					BL.save = 1;
+				});
+				$('#block-show-edit').click(function() {
+					var t = $(this),
+						v = t.hasClass('on') ? 0 : 1;
+					t[(v ? 'add' : 'remove') + 'Class']('on');
+					BL.show_edit = v;
+					BL.save = 1;
+				});
 
 				if(BL.elem_id) {
 					var EL = ELMM[BL.elem_id],
@@ -374,8 +388,10 @@ var _ids = function(v, count) {
 		return '<div class="ml8 w80 mt3 line-t">' +
 					'<div id="block-hidden" class="icon-wiki iw13 mt5' + _dn(BL.hidden, 'on') + _tooltip('Скрытый блок', -42) + '</div>' +
 					'<div class="dib' + _dn(!BL.hidden) + '">' +
-						'<div class="icon-wiki iw14 mt5 ml3 on' + _tooltip('Показывать при<br>создании записи', -48, '', 1) + '</div>' +
-						'<div class="icon-wiki iw15 mt5 ml3 on' + _tooltip('Показывать при<br>изменении записи', -53, '', 1) + '</div>' +
+					(BL.obj_name == 'dialog' ?
+						'<div id="block-show-create" class="icon-wiki iw14 mt5 ml3' + _dn(BL.show_create, 'on') + _tooltip('Показывать при<br>создании записи', -48, '', 1) + '</div>' +
+						'<div id="block-show-edit" class="icon-wiki iw15 mt5 ml3' + _dn(BL.show_edit, 'on') + _tooltip('Показывать при<br>изменении записи', -53, '', 1) + '</div>'
+					: '') +
 					'</div>' +
 			   '</div>';
 	},

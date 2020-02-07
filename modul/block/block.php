@@ -171,6 +171,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		if($strHide = (!$PARAM['blk_setup'] && !$PARAM['elm_choose']))
 			foreach($xStr as $n => $rr) {
 				$xStr[$n] = _blockActionView($rr, $PARAM);
+				$xStr[$n] = _blockDlgShow($rr, $PARAM);
 				if(!$xStr[$n]['hidden'])//если хотя бы один блок не скрыт, вся строка не будет скрыта
 					$strHide = 0;
 			}
@@ -423,6 +424,19 @@ function _blockActionView($bl, $prm) {//условия отображения б
 				}
 				break;
 		}
+
+	return $bl;
+}
+function _blockDlgShow($bl, $prm) {//отображение блока при создании или изменении диалога
+	if($bl['hidden'])
+		return $bl;
+	if($bl['obj_name'] != 'dialog')
+		return $bl;
+
+	if(!$prm['unit_edit'] && !$bl['show_create'])
+		$bl['hidden'] = 1;
+	if($prm['unit_edit'] && !$bl['show_edit'])
+		$bl['hidden'] = 1;
 
 	return $bl;
 }
@@ -1647,6 +1661,8 @@ function _beBlockStructure($bl) {//формирование массива бл�
 		'ov' => $bl['ov'],
 		'bor' => $bl['bor'],
 		'hidden' => _num($bl['hidden']),
+		'show_create' => _num($bl['show_create']),
+		'show_edit' => _num($bl['show_edit']),
 		'action' => array(),
 		'elem_id' => _num($bl['elem_id']),
 		'elem' => array()

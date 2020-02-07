@@ -280,6 +280,16 @@ switch(@$_POST['op']) {
 				WHERE `id`=".$block_id;
 		query($sql);
 
+		if($block['obj_name'] == 'dialog') {
+			$show_create = _num($_POST['show_create']);
+			$show_edit = _num($_POST['show_edit']);
+			$sql = "UPDATE `_block`
+					SET `show_create`='".$show_create."',
+						`show_edit`='".$show_edit."'
+					WHERE `id`=".$block_id;
+			query($sql);
+		}
+
 		_BE('block_clear');
 
 		$send = array();

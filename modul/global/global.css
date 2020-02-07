@@ -220,8 +220,8 @@ body:not(.site){position:relative}
 .iw11{background-position:0 -264px}/* Вниз-вправо */
 .iw12{background-position:0 -286px}/* url */
 .iw13{background-position:0 -310px}/* скрытый блок */
-.iw14{background-position:0 -334px}/* показывать при создании */
-.iw15{background-position:0 -358px}/* показывать при редактировании */
+.iw14{background-position:0 -334px}/* показывать блок при создании записи */
+.iw15{background-position:0 -358px}/* показывать блок при редактировании записи */
 
 
 
