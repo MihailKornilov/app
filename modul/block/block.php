@@ -170,7 +170,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		//скрытие всей строки, если все блоки в строке являются скрытыми
 		if($strHide = (!$PARAM['blk_setup'] && !$PARAM['elm_choose']))
 			foreach($xStr as $n => $rr) {
-				$xStr[$n] = _blockActionView($rr, $PARAM);
+				$rr = _blockActionView($rr, $PARAM);
 				$xStr[$n] = _blockDlgShow($rr, $PARAM);
 				if(!$xStr[$n]['hidden'])//если хотя бы один блок не скрыт, вся строка не будет скрыта
 					$strHide = 0;
@@ -433,9 +433,9 @@ function _blockDlgShow($bl, $prm) {//отображение блока при с
 	if($bl['obj_name'] != 'dialog')
 		return $bl;
 
-	if(!$prm['unit_edit'] && !$bl['show_create'])
+	if(empty($prm['unit_edit']) && !$bl['show_create'])
 		$bl['hidden'] = 1;
-	if($prm['unit_edit'] && !$bl['show_edit'])
+	if(!empty($prm['unit_edit']) && !$bl['show_edit'])
 		$bl['hidden'] = 1;
 
 	return $bl;
