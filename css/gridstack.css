@@ -58,12 +58,12 @@
   opacity:.7;
 }
 .grid-edge.er{right:0}
-/* Показ информации о блоке */
-.grid-info{
+/* Ширина и высота блока при перетаскивании */
+.grid-size-x,.grid-size-y{
   display:none;
   position:absolute;
-  right:-40px;
-  bottom:0;
+  right:5px;
+  bottom:-24px;
   width:35px;
   min-height:12px;
   padding:3px 0 4px;
@@ -74,6 +74,11 @@
   font:11px tahoma;
   box-shadow:0 0 4px rgba(50,50,0,.5);
   z-index:1000;
+}
+/* Высота блока при перетаскивании */
+.grid-size-y{
+  right:-38px;
+  bottom:0;
 }
 
 
@@ -160,7 +165,8 @@
 
 .grid-item.ui-draggable-dragging .grid-edge,
 .grid-item.ui-resizable-resizing .grid-edge,
-.grid-item.ui-resizable-resizing .grid-info{
+.grid-item.ui-resizable-resizing .grid-size-x,
+.grid-item.ui-resizable-resizing .grid-size-y{
   display:block;
 }
 

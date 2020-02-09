@@ -710,6 +710,8 @@ function _blockGrid($arr, $width) {//режим деления на подбло
 	foreach($arr as $r) {
 		$blIn = $r['blin'] ? ' blin' : '';
 		$elIn = $r['elin'] ? ' elin' : '';
+		$prc = floor($r['height'] / 100) * 10;//разница 1% от grid-высоты
+		$height = $r['height'] + $prc;
 		$spisok .=
 		    '<div id="pb_'.$r['id'].'"'.
 		        ' class="grid-item"'.
@@ -719,7 +721,8 @@ function _blockGrid($arr, $width) {//режим деления на подбло
 		        ' data-gs-height="'.$r['h'].'"'.
 ($r['blwmin'] ? ' data-gs-min-width="'.$r['blwmin'].'"' : '').
 		    '>'.
-			        '<div class="grid-info">'.$r['width'].'</div>'.
+			        '<div class="grid-size-x">'.$r['width'].'</div>'.
+			        '<div class="grid-size-y">'.$height.'</div>'.
 			        '<div class="grid-edge"></div>'.
 			        '<div class="grid-edge er"></div>'.
 					'<div class="grid-content'.$blIn.$elIn.'">'.

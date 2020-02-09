@@ -427,7 +427,7 @@ function _html_script() {//скрипты и стили
 	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?2"></script>'.
 
 	'<script src="js/lodash.min.js"></script>'.
-	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css?8" />'.//'.SCRIPT.'
+	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css?9" />'.//'.SCRIPT.'
 	'<script src="js/gridstack'.MIN.'.js?2"></script>'.//'.SCRIPT.'
 	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'.
 	'<script src="js/ckeditor5.js"></script>'

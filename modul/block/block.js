@@ -1095,6 +1095,7 @@ $.fn._grid = function(o) {
 
 	o = $.extend({
 		width:1000,
+		height:30,
 		parent_id:0,//родительский блок
 		obj_name:'page',//имя объекта, где располагаются блоки
 		obj_id:PAGE_ID  //id объекта
@@ -1120,7 +1121,8 @@ $.fn._grid = function(o) {
 	//добавление нового блока
 	$('#grid-add').click(function() {
 		grid.addWidget($('<div id="gn' + num++ + '">' +
-	        '<div class="grid-info">' + o.width + '</div>' +
+	        '<div class="grid-size-x">' + o.width + '</div>' +
+	        '<div class="grid-size-y">' + o.height + '</div>' +
 	        '<div class="grid-edge"></div>' +
 	        '<div class="grid-edge er"></div>' +
 			'<div class="grid-content"></div>' +
@@ -1179,18 +1181,18 @@ $.fn._grid = function(o) {
 			grid.resize(eq, null, h);
 		});
 	})
-	 .on('drag resize', function(e) {//действие во время перетаскивания блока
+	 .on('drag resize', function(e) {//действие во время перетаскивания блока и изменения размера
 		var item = $(e.target),
 			offset = item.offset(),
-			info = item.find('.grid-info'),
 			WH = $(window).height(),//высота экрана видимой области
 			scrollTop = $(window).scrollTop(),
 			cr = 50,//отступ линии сверху и снизу
-			сrt = scrollTop > cr ? cr : scrollTop;//корректировка при скролле
-		info.html(item.width());
+			CRT = scrollTop > cr ? cr : scrollTop;//корректировка при скролле
+		item.find('.grid-size-x').html(item.width());
+		item.find('.grid-size-y').html(Math.floor(item.height()/10)*10);
 		item.find('.grid-edge').css({
-			height:WH - 100 + сrt,
-			top:-offset.top + scrollTop + cr - сrt
+			height:WH - 100 + CRT,
+			top:-offset.top + scrollTop + cr - CRT
 		});
 	 })
 	 .on('dragstop', function(event) {//действие после остановки перетаскивания блока
