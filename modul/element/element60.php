@@ -28,7 +28,7 @@ function _element60_print11($el, $u) {
 					return '';//_imageNo(20);
 				if(empty($u[$col]['id']))
 					return '';//_imageNo(20);
-				return _imageHtml($u[$col], 28, 28, false, false);
+				return _imageHtml($u[$col], 28, 28, false, true);
 			}
 		return $el['title'];
 	}
