@@ -127,7 +127,7 @@ var _ids = function(v, count) {
 						});
 					$('#elem-size')._count({
 						min:10,
-						max:25,
+						max:50,
 						func:function(v) {
 							_attr_el(BL.elem_id)
 								.removeClass('fs' + EL.size)
