@@ -5404,6 +5404,51 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
+	/* ---=== КРАТКАЯ СВОДКА ПО СПИСКУ: НАСТРОЙКА ГРУППИРОВКИ [79] ===--- */
+	PHP12_elem79_group_setup = function(el, vvv, obj) {
+		if(!obj.unit.id)
+			return;
+
+		var ATR_EL = _attr_el(el.id),
+			_vSave = function() {
+				var arr = [];
+				_forEq(_attr_el(el.id).find('TR'), function(sp) {
+					var group_id = sp.find('.inp79').eq(0).attr('val'),
+						sum_id = sp.find('.inp79').eq(1).attr('val');
+					arr.push('["' + group_id + '","' + sum_id + '"]');
+				});
+				_attr_cmp(el.id).val('[' + arr.join() + ']');
+			};
+
+		ATR_EL.find('.inp79').click(function() {
+			var INP = $(this);
+
+			_dialogLoad({
+				dialog_id:11,
+				dss:INP.parents('TR').attr('data-dlg'),
+				dop:{
+					mysave:1,
+					nest:1,
+					allow:'5,8,29,59',
+					sel:INP.attr('val')
+				},
+				busy_obj:INP,
+				busy_cls:'hold',
+				func_save:function(ia) {
+					INP.attr('val', ia.v)
+					   .val(ia.title)
+					   .prev()._dn(true);
+					_vSave();
+				}
+			});
+		});
+		ATR_EL.find('.icon-del-red').click(function() {
+			var t = $(this);
+			t._dn().next().val('').attr('val', 0);
+			_vSave();
+		});
+	},
+
 	/* ---=== ВЫБОР ИКОНКИ [36] ===--- */
 	PHP12_icon18_list = function(el) {
 		var ICU = _attr_el(el.id).find('.icu');

@@ -91,8 +91,65 @@ function _element79filterUpd($send, $elem_spisok) {//обновление зна
 	return $send;
 }
 
+function PHP12_elem79_group_setup($prm) {//настройка группировки
+	if(!$u = $prm['unit_edit'])
+		return _emptyMin('Настройка группировки будет доступна<br>после вставки элемента в блок.');
+	if(!$elem_id = _num($u['num_1']))
+		return _emptyMinRed('Не указан список');
+	if(!$el = _elemOne($elem_id))
+		return _emptyMinRed('Не получены данные списка');
 
+	$val = array();
+	$col = $prm['el12']['col'];
+	if(!empty($u[$col])) {
+		$val = htmlspecialchars_decode($u[$col]);
+		$val = json_decode($val, true);
+	}
 
+	$groupTR = '';
+	switch($el['dialog_id']) {
+		case 14:
+		case 23:
+			$groupTR = _elem79_group_tr($el['num_1'], @$val[0][0], @$val[0][1]);
+			break;
+		case 88:
+			$V = json_decode($el['txt_2'], true);
+
+			if(empty($V['spv']))
+				return _emptyRed('Таблица из нескольких списков не настроена.');
+
+			foreach($V['spv'] as $n => $spv)
+				$groupTR .= _elem79_group_tr($spv['dialog_id'], @$val[$n][0], @$val[$n][1]);
+			break;
+		default:
+			return _emptyMinRed('Указанный элемент не является списком');
+	}
+
+	return '<table class="w100p">'.$groupTR.'</table>';
+}
+function _elem79_group_tr($dlg_id, $group_ids=0, $sum_ids=0) {
+	if(!$DLG = _dialogQuery($dlg_id))
+		return '';
+
+	$group_name = $group_ids ?  _elemIdsTitle($group_ids) : '';
+	$sum_name = $sum_ids ?  _elemIdsTitle($sum_ids) : '';
+
+	return
+	'<tr class="over1" data-dlg="'.$dlg_id.'">'.
+		'<td class="w150 pad5 fs14 b color-555">'.$DLG['name'].':'.
+		'<td class="r w175 pad5">'.
+			'<div class="_selem dib prel w150 bg-fff over1">'.
+				'<div class="icon icon-star pabs"></div>'.
+				'<div class="icon icon-del-red pl pabs'._dn($group_ids).'"></div>'.
+				'<input type="text" readonly class="inp79 curP w100p color-pay" placeholder="не указана" val="'.$group_ids.'" value="'.$group_name.'" />'.
+			'</div>'.
+		'<td class="r pad5">'.
+			'<div class="_selem dib prel w150 bg-fff over1">'.
+				'<div class="icon icon-star pabs"></div>'.
+				'<div class="icon icon-del-red pl pabs'._dn($sum_ids).'"></div>'.
+				'<input type="text" readonly class="inp79 curP w100p color-pay" placeholder="путь не указан" val="'.$sum_ids.'" value="'.$sum_name.'" />'.
+			'</div>';
+}
 
 
 
