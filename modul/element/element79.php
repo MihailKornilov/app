@@ -4,74 +4,121 @@
 function _element79_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//id элемента, указывающего на список, по которому будет сводка [13]
-		'num_2'   => _num($el['num_2']),//id элемента, указывающего на сумму [13]
 		'txt_1'   => $el['txt_1'],      //текст, когда данных нет
-		'txt_2'   => $el['txt_2'],      //id элемента (с учётом вложений), указывающий на имена группировки [13]
+		'txt_3'   => $el['txt_3']       //элементы для группировки и суммы в формате: [[123,456],[5,77], ...]
 	) + _elementStruct($el);
 }
 function _element79_print($el) {
+	if(empty($el['txt_3']))
+		return _emptyMinRed('[79] Не настроена группировка');
+
+	$GROUP = htmlspecialchars_decode($el['txt_3']);
+	$GROUP = json_decode($GROUP, true);
+
+	if(empty($GROUP))
+		return _emptyMinRed('[79] Некорректные данные для группировки');
 	if(!$SPEL = _elemOne($el['num_1']))
 		return _emptyMinRed('[79] Не найден список');
-	if(!$DLG = _dialogQuery($SPEL['num_1']))
-		return _emptyMinRed('[79] Списка <b>'.$SPEL['num_1'].'</b> не существует.');
 
-	if(!$GROUP_EL = _elemOne(_idsFirst($el['txt_2'])))
-		return _emptyMinRed('[79] Отсутствует элемент для группировки');
-	if(!$GROUP_DLG = _dialogQuery($GROUP_EL['num_1']))
-		return _emptyMinRed('[79] Диалога <b>'.$GROUP_EL['num_1'].'</b> не существует.');
-	if(!$GROUP_COL_NAME = _elemCol(_idsLast($el['txt_2'])))
-		return _emptyMinRed('[79] Отсутствует колонка для имени груп');
+	switch($SPEL['dialog_id']) {
+		case 14:
+		case 23:
+			if(!$GROUP[0][2] = _num($SPEL['num_1']))
+				return _emptyMinRed('[79] Не получен id диалога');
+			break;
+		case 88:
+			$V = json_decode($SPEL['txt_2'], true);
 
-	if(!$GROUP_COL = _elemCol(_idsFirst($el['txt_2'])))
-		return _emptyMinRed('[79] Отсутствует колонка для группировки');
+			if(empty($V['spv']))
+				return _emptyRed('Таблица из нескольких списков не настроена.');
 
-	//колонка для суммы
-	$SUM_COL = _elemCol($el['num_2']);
+			foreach($V['spv'] as $n => $spv)
+				$GROUP[$n][2] = $spv['dialog_id'];
+			break;
+		default:
+			return _emptyMinRed('[79] Элемент не является списком');
+	}
 
-	$sql = "SELECT
-				`".$GROUP_COL."` `gid`,
-				COUNT(*) `c`
-				".($SUM_COL ? ",SUM(`".$SUM_COL."`) `sum`" : '')."
-			FROM   "._queryFrom($DLG)."
-			WHERE  "._spisokWhere($SPEL)."
-			GROUP BY `".$GROUP_COL."`";
-	if(!$arr = query_array($sql))
+	$RES = array();
+	foreach($GROUP as $GR) {
+		if(!$GROUP_EL = _elemOne(_idsFirst($GR[0])))
+			return _emptyMinRed('[79] Отсутствует элемент для группировки');
+		if(!$GROUP_DLG = _dialogQuery($GROUP_EL['num_1']))
+			return _emptyMinRed('[79] Диалога <b>'.$GROUP_EL['num_1'].'</b> не существует.');
+		if(!$GROUP_COL_NAME = _elemCol(_idsLast($GR[0])))
+			return _emptyMinRed('[79] Не получена колонка для имени груп');
+		if(!$GROUP_COL = _elemCol(_idsFirst($GR[0])))
+			return _emptyMinRed('[79] Отсутствует колонка для группировки');
+		if(!$DLG = _dialogQuery($GR[2]))
+			return _emptyMinRed('[79] Списка <b>'.$GR[2].'</b> не существует.');
+
+		//колонка для суммы
+		$SUM_COL = _elemCol($GR[1]);
+
+		$sql = "SELECT
+					`".$GROUP_COL."` `gid`,
+					COUNT(*) `c`
+					".($SUM_COL ? ",SUM(`".$SUM_COL."`) `sum`" : '')."
+				FROM   "._queryFrom($DLG)."
+				WHERE  "._queryWhere($DLG)."
+					   "._element77cond($SPEL)."
+				GROUP BY `".$GROUP_COL."`";
+		if(!$arr = query_array($sql))
+			continue;
+
+		foreach($arr as $r) {
+			$gid = _num($r['gid']);
+			if(!isset($RES[$gid]))
+				$RES[$gid] = array(
+					'name' => '',
+					'count' => 0,
+					'sum' => 0
+				);
+			$RES[$gid]['count'] += $r['c'];
+
+			if($SUM_COL)
+				$RES[$gid]['sum'] += $r['sum'];
+		}
+
+		//получение имён для групп
+		$sql = "SELECT
+					`t1`.`id`,
+					`".$GROUP_COL_NAME."`
+				FROM   "._queryFrom($GROUP_DLG)."
+				WHERE  "._queryWhere($GROUP_DLG)."
+				  AND `t1`.`id` IN ("._idsGet($arr, 'gid').")";
+		if($ass = query_ass($sql))
+			foreach($ass as $id => $name)
+				if(!empty($RES[$id]))
+					$RES[$id]['name'] = $name;
+	}
+
+	if(empty($RES))
 		return $el['txt_1'];
-
-	//получение имён для групп
-	$sql = "SELECT
-				`t1`.`id`,
-				`".$GROUP_COL_NAME."`
-			FROM   "._queryFrom($GROUP_DLG)."
-			WHERE  "._queryWhere($GROUP_DLG)."
-			  AND `t1`.`id` IN ("._idsGet($arr, 'gid').")";
-	$ass = query_ass($sql);
 
 	$spisok = '';
 	$cAll = 0;
 	$sumAll = 0;
-	foreach($arr as $r) {
+	foreach($RES as $r) {
 		$spisok .=
-		'<tr><td>'.@$ass[$r['gid']].
-			'<td class="w70 center b color-555">'.$r['c'];
-		$cAll += $r['c'];
-	if($SUM_COL) {
-			$spisok .= '<td class="w90 r color-555">'._sumSpace($r['sum']);
-			$sumAll += $r['sum'];
-		}
+		'<tr><td>'.$r['name'].
+			'<td class="w70 center b color-555">'.$r['count'];
+		$cAll += $r['count'];
+		$spisok .= '<td class="w90 r color-555">'._sumSpace($r['sum']);
+		$sumAll += $r['sum'];
 	}
 
 	return
 	'<table class="_stab small w100p">'.
 		'<tr><th>'.
 			'<th>Кол-во'.
-($SUM_COL ? '<th>Сумма' : '').
+(true ? '<th>Сумма' : '').
 
 		$spisok.
 
 		'<tr><td class="r b">Всего:'.
 			'<td class="center b">'.$cAll.
-($SUM_COL ? '<td class="r b">'._sumSpace($sumAll) : '').
+(true ? '<td class="r b">'._sumSpace($sumAll) : '').
 	'</table>';
 }
 function _element79filterUpd($send, $elem_spisok) {//обновление значения после применения фильтра
