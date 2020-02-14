@@ -278,7 +278,7 @@ var _ids = function(v, count) {
 				_bgu.addClass(BL.ov + ' on');
 			 });
 
-		return '<div class="color-555 mt10">Окраска и границы:</div>' +
+		return '<div class="color-555 mt10">Окраска и границы</div>' +
 			   '<div id="blk-setup-bg" class="mt5 ml5 center">' +
 					'<table>' +
 
