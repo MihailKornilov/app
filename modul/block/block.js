@@ -138,8 +138,8 @@ var _ids = function(v, count) {
 					});
 					$('#elem-img-width')._count({
 						width:60,
-						step:10,
-						min:30,
+						step:5,
+						min:10,
 						max:1000,
 						func:function(v) {
 							_attr_el(BL.elem_id)
