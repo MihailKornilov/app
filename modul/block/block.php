@@ -952,14 +952,34 @@ function _elemAction242($el, $prm) {//подмена цвета
 				if($v)
 					return $act['v1'];
 				break;
+			//равно
+			case 3:
+				if($v == $F['txt'])
+					return $act['v1'];
+				break;
+			//не равно
+			case 4:
+				if($v != $F['txt'])
+					return $act['v1'];
+				break;
 			//больше
 			case 5:
 				if($v > $F['txt'])
 					return $act['v1'];
 				break;
+			//больше или равно
+			case 6:
+				if($v >= $F['txt'])
+					return $act['v1'];
+				break;
 			//меньше
 			case 7:
 				if($v < $F['txt'])
+					return $act['v1'];
+				break;
+			//меньше или равно
+			case 8:
+				if($v <= $F['txt'])
 					return $act['v1'];
 				break;
 		}
