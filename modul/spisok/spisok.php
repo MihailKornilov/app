@@ -274,8 +274,9 @@ function _spisok7num($spisok, $el) {//добавление записи, есл�
 
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
-			WHERE `t1`.`".$col."`=".$num."
-			  AND "._queryWhere($DLG)."
+			WHERE "._queryWhere($DLG)."
+			  "._40cond($el, $el['txt_2'])."
+			  AND `t1`.`".$col."`=".$num."
 			LIMIT 1";
 	if(!$u = query_assoc($sql))
 		return $spisok;
