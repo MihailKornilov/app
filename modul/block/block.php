@@ -849,15 +849,21 @@ function _elemAction241($el, $prm, $txt) {//подмена текста
 
 			$F = $F[0];
 
+			if(!$ell = _elemOne($F['elem_id']))
+				return $txt;
+			if(!$col = _elemCol($ell))
+				return $txt;
+
 			switch($F['cond_id']) {
+				//отсутствует
+				case 1:
+					if(!empty($u[$col]))
+						return $txt;
+					return $act['v1'];
+				//присутствует
 				case 2:
-					if(!$ell = _elemOne($F['elem_id']))
-						return $txt;
-					if(!$col = _elemCol($ell))
-						return $txt;
 					if(empty($u[$col]))
 						return $txt;
-
 					return $act['v1'];
 			}
 
