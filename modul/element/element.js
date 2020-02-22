@@ -990,7 +990,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				case 7:
 					focus7 = ATR_CMP;
 					var process = 0,
-						v_last = FILTER[el.num_1][elm_id],
+						v_last = FILTER[el.num_1] ? FILTER[el.num_1][elm_id] : '',
 						upd = function(v) {
 							process = 1;
 							FILTER[el.num_1][elm_id] = v;
