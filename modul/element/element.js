@@ -2467,6 +2467,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						ATR_EL.find('.itog-sum').html(itogSum);
 					});
 					return;
+				//независимая кнопка
+				case 97:
+					alert(2342)
+					ATR_EL.find('.but97').click(function() {
+						alert(2342)
+					});
+					return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102: ATR_EL._filter102(); return;
 				//настройка доступа к страницам для пользователя
@@ -3333,6 +3340,35 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(sp.hasClass(k))
 				return k;
 		return '';
+	},
+
+	//Перетаскивание независимой кнопки
+	_elem97move = function(elem_id) {
+		var startSet = false,
+			startX = 0,
+			startY = 0;
+		$('#but97_' + elem_id).draggable({
+			grid:[5,5],
+			start:function(event, ui) {
+				if(startSet)
+					return;
+				startX = ui.position.left;
+				startY = ui.position.top;
+				startSet = true;
+			},
+			stop:function(event, ui) {
+				var COORD = $(this).attr('data-coord').split(':'),
+					x = COORD[0] * 1,
+					y = COORD[1] * 1,
+					send = {
+						op:'el97_move_save',
+						elem_id:elem_id,
+						x:ui.position.left + x - startX,
+						y:ui.position.top + y - startY
+					}
+				_post(send);
+			}
+		});
 	},
 
 	/* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */

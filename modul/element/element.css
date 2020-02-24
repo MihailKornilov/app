@@ -807,7 +807,7 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 }
 .but97:hover .b97-ver,
 .but97:hover .b97-gor{background-color:#fff}
-.but97:active .b97-ver:not(.bottom){margin-top:16px}
+.but97:active:not(.curM) .b97-ver:not(.bottom){margin-top:16px}
 
 
 

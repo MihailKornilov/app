@@ -763,6 +763,27 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'el97_move_save'://сохранение координат независимой кнопки
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента');
+		if(!$el = _elemOne($elem_id))
+			jsonError('Элемента '.$elem_id.' не существует');
+		if($el['dialog_id'] != 97)
+			jsonError('Элемент не является независимой кнопкой');
+
+		$x = _num(@$_POST['x'], 1);
+		$y = _num(@$_POST['y'], 1);
+
+		$sql = "UPDATE `_element`
+				SET `num_3`=".$x.",
+					`num_2`=".$y."
+				WHERE `id`=".$elem_id;
+		query($sql);
+
+		_elemOne($elem_id, true);
+
+		jsonSuccess();
+		break;
 
 	case 'act228_block_upd'://действие 228: обновление содержимого блока
 		if(!$block_id = _num($_POST['block_id']))
