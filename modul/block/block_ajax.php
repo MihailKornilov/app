@@ -493,6 +493,7 @@ switch(@$_POST['op']) {
 		_BE('dialog_clear');
 		_jsCache();
 
+		$send['level'] = _blockLevelChange($obj_name, $obj_id);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
@@ -578,6 +579,7 @@ switch(@$_POST['op']) {
 		_BE('dialog_clear');
 		_jsCache();
 
+		$send['level'] = _blockLevelChange($obj_name, $obj_id);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
@@ -646,6 +648,7 @@ switch(@$_POST['op']) {
 		_BE('dialog_clear');
 		_jsCache();
 
+		$send['level'] = _blockLevelChange($obj_name, $obj_id);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
@@ -660,6 +663,9 @@ switch(@$_POST['op']) {
 			jsonError('Блок не существует, в который нужно делать перенос');
 		if($BL['elem_id'])
 			jsonError('Блок не должен содержать элемент');
+
+		$obj_name = $BL['obj_name'];
+		$obj_id = $BL['obj_id'];
 
 		$sql = "SELECT *
 				FROM `_block`
@@ -686,19 +692,23 @@ switch(@$_POST['op']) {
 
 		$sql = "UPDATE `_block`
 				SET `parent_id`=".$parent_id.",
-					`obj_name`='".$BL['obj_name']."',
-					`obj_id`=".$BL['obj_id']."
+					`obj_name`='".$obj_name."',
+					`obj_id`=".$obj_id."
 				WHERE `id` IN (".$ids.")";
 		query($sql);
 
-		_blockChildCountSet($BL['obj_name'], $BL['obj_id']);
-		_blockAppIdUpdate($BL['obj_name'], $BL['obj_id']);
+		_blockChildCountSet($obj_name, $obj_id);
+		_blockAppIdUpdate($obj_name, $obj_id);
 		_BE('elem_clear');
 		_BE('block_clear');
 		_BE('dialog_clear');
 		_jsCache();
 
-		jsonSuccess();
+		$send['level'] = _blockLevelChange($obj_name, $obj_id);
+		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
+		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
+
+		jsonSuccess($send);
 		break;
 
 /*

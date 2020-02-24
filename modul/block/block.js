@@ -708,11 +708,18 @@ $(document)
 						ids:BIM,
 						busy_obj:tt
 					};
-					_post(send, function() {
+					_post(send, function(res) {
+						p.html(res.level)
+						 .find('.block-grid-on')
+						 .removeClass('grey').trigger('click')
+						 .removeClass('_busy');
+
 						_cookie('block_ids_motion', '');
-						t.removeClass('grey').trigger('click');
-						t.removeClass('_busy');
-						_msg();
+
+						for(var i in res.blk)
+							BLKK[i] = res.blk[i];
+						for(var i in res.elm)
+							ELMM[i] = res.elm[i];
 					});
 					return;
 				}
@@ -959,17 +966,23 @@ $(document)
 					 	if(_num(_cookie('block_is_move')))
 					 		op = 'block_choose_paste_0_move';
 					 	var tt = $(this),
-							send = {
+							obj_name = p.attr('val').split(':')[0],
+						    obj_id = p.attr('val').split(':')[1],
+						    send = {
 								op:op,
-								obj_name:p.attr('val').split(':')[0],
-								obj_id:p.attr('val').split(':')[1],
+								obj_name:obj_name,
+								obj_id:obj_id,
 								ids:_cookie('block_ids_motion'),
 								busy_obj:tt
 							};
 						_post(send, function(res) {
-							GRID_ON.removeClass('grey').trigger('click');
-							GRID_ON.removeClass('_busy');
+							p.html(res.level)
+							 .find('.block-grid-on')
+							 .removeClass('grey').trigger('click')
+							 .removeClass('_busy');
+
 							_cookie('block_ids_motion', '');
+
 							for(var i in res.blk)
 								BLKK[i] = res.blk[i];
 							for(var i in res.elm)
