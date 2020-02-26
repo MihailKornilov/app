@@ -2881,11 +2881,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						var VN = 0,
 							EL = _attr_cmp(elid);
 						if(EL)
-							VN = _cena(EL.val());
+//							VN = _cena(EL.val(), true);
+							VN = EL.val() * 1;
 						else {
 							EL = _attr_el(elid);
 							if(EL)
-								VN = _cena(EL.html());
+//								VN = _cena(EL.html(), true);
+								VN = EL.html() * 1;
 						}
 
 						if(!EL)
