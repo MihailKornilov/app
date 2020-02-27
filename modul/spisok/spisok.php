@@ -1408,11 +1408,22 @@ function _spisokUnitUpd27($EL, $unit_id=0) {//обновление сумм зн
 
 	//составление суммы из слагаемых
 	$upd = '';
+	$ZNAK = array(
+		0 => '+',
+		1 => '-',
+		2 => '*',
+		3 => '/'
+	);
+	$n = 0;
 	foreach($item as $r) {
 		if(empty($colAss[$r['txt_2']]))
 			continue;
-		$znak = $r['num_8'] ? '-' : '+';
-		$upd .= $znak.'`'.$colAss[$r['txt_2']].'`';
+
+		$zn = $ZNAK[$r['num_8']];
+		if(!$n++ && $r['num_8'] != 1)
+			$zn = '';
+
+		$upd .= $zn."`".$colAss[$r['txt_2']]."`";
 	}
 
 	//процесс обновления
@@ -2030,18 +2041,26 @@ function _spisokUnitAfter27($DLG, $ass) {
 			if(!$dlgElUpd = query_arr($sql))
 				continue;
 
+			$ZNAK = array(
+				0 => '+',
+				1 => '-',
+				2 => '*',
+				3 => '/'
+			);
 			$upd = '';
+			$n = 0;
 			foreach($arr as $r) {
 				if(!$elUpd = $dlgElUpd[$r['txt_2']])
 					continue;
 				if(!$col = $elUpd['col'])
 					continue;
 
-				$znak = $r['num_8'] ? '-' : '+';
-				$upd .= $znak."`".$col."`";
+				$zn = $ZNAK[$r['num_8']];
+				if(!$n++ && $r['num_8'] != 1)
+					$zn = '';
+
+				$upd .= $zn."`".$col."`";
 			}
-
-
 
 			//получение баланса для обновления
 			$sql = "SELECT IFNULL(".$upd.",0)

@@ -5356,16 +5356,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
-			BUT_ADD = ATR_EL.find('div:last');
+			BUT_ADD = ATR_EL.find('div:last'),
+
+			znak = ['+','-','<div class="fs11">&#9913;</div>','/'],
+			znak_tt = ['Прибавить','Вычесть','Умножить','Делить'],
+			znak_ttm = [-25,-19,-22,-14],
+			znak_color = ['green','red','orange','blue'];
 
 		BUT_ADD.click(valueAdd);
 
-		_forIn(vvv, valueAdd);
+		if(!vvv.length) {
+			valueAdd();
+			valueAdd();
+		} else
+			_forIn(vvv, valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
-				id:0,       //id элемента
-				minus:0,    //минусовое значение
+				id:0,      //id элемента
+				znak:0,
 				title:''
 			}, v);
 
@@ -5375,7 +5384,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						'<tr><td class="w50 pl5">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w25 r">' +
-								'<button class="vk short ' + (v.minus ? 'red' : 'green') + ' w35">' + (v.minus ? '—' : '+') + '</button>' +
+								'<button class="vk short ' + znak_color[v.znak] +' w35' + _tooltip(znak_tt[v.znak], znak_ttm[v.znak]) + znak[v.znak] +'</button>' +
 							'<td><input type="text"' +
 									  ' class="inp w100p curP"' +
 									  ' readonly' +
@@ -5389,7 +5398,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			);
 
 			var DD = DL.find('dd:last'),
-				INP = DD.find('.inp');
+				INP = DD.find('.inp'),
+				BUT = DD.find('button');
 			INP.click(function() {
 				_dialogLoad({
 					dialog_id:11,
@@ -5412,16 +5422,26 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				axis:'y',
 				handle:'.icon-move-y'
 			});
-			DD.find('button')
-				._tooltip('Прибавление', -33)
-				.click(function() {
-					var t = $(this),
-						plus = t.hasClass('green');
-					t.html(plus ? '—' : '+');
-					t._dn(plus, 'green');
-					t._dn(!plus, 'red');
-					t._tooltip(plus ? 'Вычитание' : 'Прибавление', plus ? -26 : -33);
-				});
+			BUT.click(function() {
+				var t = $(this),
+					zid = 0;
+
+				if(t.hasClass('red'))
+					zid = 1;
+				if(t.hasClass('orange'))
+					zid = 2;
+				if(t.hasClass('blue'))
+					zid = 3;
+
+				zid++;
+				if(zid > 3)
+					zid = 0;
+
+				t.html(znak[zid]);
+				t.removeClass('green red orange blue');
+				t.addClass(znak_color[zid]);
+				t._tooltip(znak_tt[zid], znak_ttm[zid]);
+			});
 			DD.find('.icon-del').click(function() {
 				$(this).closest('DD').remove();
 				v.id = 0;
@@ -5431,12 +5451,23 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	PHP12_balans_setup_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			var id = _num(sp.attr('val'));
+			var id = _num(sp.attr('val')),
+				but = sp.find('button'),
+				znak = 0;
+
 			if(!id)
 				return;
+
+			if(but.hasClass('red'))
+				znak = 1;
+			if(but.hasClass('orange'))
+				znak = 2;
+			if(but.hasClass('blue'))
+				znak = 3;
+
 			send.push({
 				id:id,
-				minus:sp.find('button').hasClass('green') ? 0 : 1
+				znak:znak
 			});
 		});
 		return send;
