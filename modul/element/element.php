@@ -386,6 +386,8 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 				$filter = htmlspecialchars_decode($sp[$col]);
 				if(!$filter = json_decode($filter, true))
 					continue;
+				if(!is_array($filter))
+					continue;
 
 				foreach($filter as $f) {
 					$ass = _idsAss($f['elem_id']);
