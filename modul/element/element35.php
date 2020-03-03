@@ -63,3 +63,66 @@ function _element35_vvv($el) {
 	return json_decode($el['txt_1']);
 }
 
+/* ---=== НАСТРОЙКА КОНКРЕТНЫХ ЗНАЧЕНИЙ ===--- */
+function PHP12_count_value($prm) {
+	return '';
+}
+function PHP12_count_value_save($cmp, $val, $unit) {
+	if(!$unit_id = _num($unit['id']))
+		return;
+	if($unit['num_1'] != 3682)//изменения возможны если выбран пункт "конкретные значения"
+		return;
+	if(!$col = $cmp['col'])
+		return;
+
+	$txt = '';
+	$def = 0;
+
+	if(!empty($val)) {
+		if(!is_array($val))
+			return;
+
+		$ids = array();
+		$title = array();
+		foreach($val as $r) {
+			$id = _num($r['id'], 1);
+			$ids[] = $id;
+			$title[] = _txt($r['title']);
+			if($r['def'])
+				$def = $id;
+		}
+		$txt = json_encode(array(
+			'ids' => $ids,
+			'title' => $title
+		));
+	}
+
+	$sql = "UPDATE `_element`
+			SET `".$col."`='".addslashes($txt)."',
+				`def`=".$def."
+			WHERE `id`=".$unit_id;
+	query($sql);
+}
+function PHP12_count_value_vvv($prm) {
+	if(!$u = $prm['unit_edit'])
+		return array();
+	if(!$col = $prm['el12']['col'])
+		return array();
+	if(!$arr = $u[$col])
+		return array();
+
+	$arr = json_decode($arr, true);
+	$ids = $arr['ids'];
+	$title = $arr['title'];
+
+	$send = array();
+	foreach($ids as $n => $id) {
+		$send[] = array(
+			'id' => _num($id),
+			'title' => $title[$n],
+			'def' => $u['def'] == $id ? 1 : 0
+		);
+	}
+
+	return $send;
+}

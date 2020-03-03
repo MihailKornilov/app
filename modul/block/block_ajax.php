@@ -485,9 +485,12 @@ switch(@$_POST['op']) {
 		_blockChildCountSet($obj_name, $obj_id);
 		_blockAppIdUpdate($obj_name, $obj_id);
 		_blockElementCopy($PASTE, $pasteIds);
+		_blockActionCopy($PASTE, $pasteIds);
 
-		_BE('elem_clear');
+
+
 		_BE('block_clear');
+		_BE('elem_clear');
 		_BE('dialog_clear');
 		_jsCache();
 
@@ -1254,5 +1257,65 @@ function _blockElementCopy($PASTE, $pasteIds) {
 		}
 	}
 }
+function _blockActionCopy($PASTE, $pasteIds) {//перенос действий у скопированных блоков
+	$sql = "SELECT *
+			FROM `_action`
+			WHERE `block_id` IN ("._idsGet($PASTE).")";
+	if(!$arr = query_arr($sql))
+		return;
 
+	foreach($arr as $id => $r) {
+		if($r['dialog_id'] != 211)
+			continue;
+
+		//новый блок
+		if(!$block_id = _num(@$pasteIds[$r['block_id']]))
+			continue;
+
+		$target_ids = array();
+		foreach(_ids($r['target_ids'], 'arr') as $blid)
+			if(!empty($pasteIds[$blid]))
+				$target_ids[] = $pasteIds[$blid];
+		if(empty($target_ids))
+			continue;
+
+
+/*  пока не задействованы
+
+	element_id
+	filter
+	initial_id
+	v1
+
+*/
+
+		$sql = "SELECT `app_id`
+				FROM `_block`
+				WHERE `id`=".$block_id;
+		$app_id = _num(query_value($sql));
+
+		$sql = "INSERT INTO `_action` (
+					`app_id`,
+					`dialog_id`,
+					`block_id`,
+					`target_ids`,
+					`apply_id`,
+					`effect_id`,
+					`revers`,
+					`sort`,
+					`user_id_add`
+				) VALUES (
+					".$app_id.",
+					".$r['dialog_id'].",
+					".$block_id.",
+					'".implode(',', $target_ids)."',
+					".$r['apply_id'].",
+					".$r['effect_id'].",
+					".$r['revers'].",
+					".$r['sort'].",
+					".USER_ID."
+				)";
+		query($sql);
+	}
+}
 
