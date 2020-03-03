@@ -253,7 +253,6 @@ switch(@$_POST['op']) {
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
 
-		$sa = _bool($_POST['sa']);
 		$width_auto = _num($_POST['width_auto']);
 		$pos = _txt($_POST['pos']);
 		$bg = _txt($_POST['bg']);
@@ -270,8 +269,7 @@ switch(@$_POST['op']) {
 
 		//сохранение данных блока
 		$sql = "UPDATE `_block`
-				SET `sa`='".$sa."',
-					`width_auto`='".$width_auto."',
+				SET `width_auto`='".$width_auto."',
 					`pos`='".$pos."',
 					`bg`='".$bg."',
 					`ov`='".$ov."',
@@ -888,8 +886,11 @@ function _blockInsert($r) {//внесение нового блока (при к
 				`height`,
 				`pos`,
 				`bg`,
+				`ov`,
 				`bor`,
 				`hidden`,
+				`show_create`,
+				`show_edit`,
 				`user_id_add`
 			) VALUES (
 				'".$r['obj_name']."',
@@ -903,8 +904,11 @@ function _blockInsert($r) {//внесение нового блока (при к
 				".$r['height'].",
 				'".$r['pos']."',
 				'".$r['bg']."',
+				'".$r['ov']."',
 				'".$r['bor']."',
 				'".$r['hidden']."',
+				'".$r['show_create']."',
+				'".$r['show_edit']."',
 				".USER_ID."
 			)";
 	return query_id($sql);

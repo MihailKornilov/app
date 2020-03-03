@@ -826,7 +826,6 @@ function _jsCacheBlkOne($block_id) {
 	$val['obj_name'] = $r['obj_name'];
 	$val['obj_id'] = $r['obj_id'];
 	$val['elem_id'] = $r['elem_id'];
-	$val['sa'] = $r['sa'];
 	$val['width_auto'] = $r['width_auto'];
 	$val['bor'] = $r['bor'];
 	$val['pos'] = $r['pos'];

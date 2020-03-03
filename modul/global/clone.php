@@ -433,7 +433,6 @@ function _clone_block() {//клонирование: блоки
 		$sql = "INSERT INTO `_block` (
 					`app_id`,
 					`child_count`,
-					`sa`,
 					`obj_name`,
 					`obj_id`,
 					`x`,
@@ -446,13 +445,13 @@ function _clone_block() {//клонирование: блоки
 					`height`,
 					`pos`,
 					`bg`,
+					`ov`,
 					`bor`,
 					`hidden`,
 					`user_id_add`
 				) VALUES (
 					".CLONE_ID_DST.",
 					".$r['child_count'].",
-					".$r['sa'].",
 					'".$r['obj_name']."',
 					".$r['obj_id'].",
 					".$r['x'].",
@@ -465,6 +464,7 @@ function _clone_block() {//клонирование: блоки
 					".$r['height'].",
 					'".$r['pos']."',
 					'".$r['bg']."',
+					'".$r['ov']."',
 					'".$r['bor']."',
 					".$r['hidden'].",
 					".USER_ID."

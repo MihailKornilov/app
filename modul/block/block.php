@@ -180,7 +180,6 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		$table_w100p = count($xStr) == 1 && $r['width_auto'] ? 'w100p' : '';
 
 		//если скрывается вся строка, состоящая из одного блока, то этот блок становится как открытый TD внутри скрытого DIV
-//		if($strHide && count($xStr) == 1 && ($r['hidden'] || $r['sa'] && !SA))
 		if($strHide && count($xStr) == 1 && $r['hidden'])
 			$xStr[0]['hidden'] = 0;
 
@@ -211,7 +210,6 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			if(!$PARAM['blk_setup'] && $ov = $r['ov'])
 				$cls[] = str_replace('bg', 'ov', $ov);
 
-//			if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && ($r['hidden'] || $r['sa'] && !SA))
 			if(!$PARAM['blk_setup'] && !$PARAM['elm_choose'] && $r['hidden'])
 				$cls[] = 'vh';
 
@@ -1673,7 +1671,6 @@ function _beBlockStructure($bl) {//формирование массива бл�
 		'app_id' => _num($bl['app_id']),
 		'parent_id' => _num($bl['parent_id']),
 		'child_count' => _num($bl['child_count']),
-		'sa' => _num($bl['sa']),
 		'obj_name' => $bl['obj_name'],
 		'obj_id' => _num($bl['obj_id']),
 		'x' => _num($bl['x']),
