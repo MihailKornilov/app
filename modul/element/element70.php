@@ -52,9 +52,3 @@ function _element70_vvv($el, $prm) {
 	}
 	return '<div class="_color-bg-choose">'.$spisok.'</div>';
 }
-function _element70_copy_field($el) {
-	return array(
-		'def'   => 0,
-	);
-}
-

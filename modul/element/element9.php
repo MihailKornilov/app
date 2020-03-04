@@ -25,10 +25,3 @@ function _element9_print11($el, $u) {
 
 	return $u[$col];
 }
-function _element9_copy_field($el) {
-	return array(
-		'txt_1' => $el['txt_1'],
-		'num_1' => _num($el['num_1'])
-	);
-}
-

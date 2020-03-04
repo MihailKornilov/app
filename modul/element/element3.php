@@ -65,12 +65,6 @@ function _element3_print($el, $prm) {
 
 	return '<div class="_menu'.$el['num_2'].'">'.$razdel.'</div>';
 }
-function _element3_copy_field($el) {
-	return array(
-		'num_1' => _num($el['num_1']),
-		'num_2' => _num($el['num_2'])
-	);
-}
 function _menuCount($menu) {//получение элемента-циферки, размещённого на выводимых страницах
 	$sql = "SELECT
 				`el`.`id`,

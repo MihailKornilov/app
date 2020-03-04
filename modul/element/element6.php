@@ -26,9 +26,4 @@ function _element6_print($el, $prm) {
 		'value' => _elemPrintV($el, $prm, 0)
 	));
 }
-function _element6_copy_field($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	);
-}
 

@@ -99,8 +99,6 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 
 			return $el['title'];
 
-		//получение колонок при копировании элемента при переносе блоков
-		case 'copy_field': return array();
 		//копирование содержания элемента
 		case 'copy_vvv': return array();
 

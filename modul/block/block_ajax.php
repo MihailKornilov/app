@@ -1138,8 +1138,7 @@ function _blockChildClone($id_old, $id_new) {//внесение дочерних
 			_blockChildClone($r['id'], $block_id);
 	}
 }
-function _blockElementCopy($PASTE, $pasteIds) {
-	//копирование элементов
+function _blockElementCopy($PASTE, $pasteIds) {//копирование элементов
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($PASTE).")";
@@ -1149,112 +1148,29 @@ function _blockElementCopy($PASTE, $pasteIds) {
 	foreach($ELM as $el) {
 		$block_id = $pasteIds[$el['block_id']];
 
-		if(!$fld = _element('copy_field', $el))
-			continue;
-
 		//колонки, содержащиеся в элементе
-		$cols = '';
-		foreach($fld as $i => $v)
-			$cols .= '`'.$i.'`,';
-
+		$cols = array();
 		//значения колонок
-		$vals = '';
-		foreach($fld as $i => $v)
-			$vals .= "'".addslashes($v)."',";
+		$vals = array();
+		foreach($el as $col => $v) {
+			$cols[] = '`'.$col.'`';
+			switch($col) {
+				case 'id': $vals[] = 0; break;
+				case 'app_id':
+					$sql = "SELECT `app_id` FROM `_block` WHERE `id`=".$block_id;
+					$vals[] = _num(query_value($sql));
+					break;
+				case 'user_id_add': $vals[] = USER_ID;   break;
+				case 'block_id':    $vals[] = $block_id; break;
+				case 'dtime_add':	$vals[] = 'CURRENT_TIMESTAMP'; break;
+				default: $vals[] = "'".addslashes($v)."'";
+			}
+		}
 
-		$sql = "INSERT INTO `_element` (
-					`app_id`,
-					`block_id`,
-					`dialog_id`,
-					`col`,
-					`name`,
-					`req`,
-					`req_msg`,
-					`focus`,
-					`width`,
-					`color`,
-					`font`,
-					`size`,
-					`mar`,
-					
-					".$cols."
-
-					`sort`,
-					`user_id_add`
-				) VALUES (
-					(SELECT `app_id` FROM `_block` WHERE `id`=".$block_id."),
-					".$block_id.",
-					".$el['dialog_id'].",
-					'".$el['col']."',
-					'".$el['name']."',
-					".$el['req'].",
-					'".$el['req_msg']."',
-					".$el['focus'].",
-					".$el['width'].",
-					'".$el['color']."',
-					'".$el['font']."',
-					".$el['size'].",
-					'".$el['mar']."',
-					
-					".$vals."
-
-					".$el['sort'].",
-					".USER_ID."
-				)";
+		$sql = "INSERT INTO `_element` (".implode(',', $cols).") VALUES (".implode(',', $vals).")";
 		$new_id = query_id($sql);
 
 		_element('copy_vvv', $el, $new_id);
-
-		continue;
-
-
-		//копирование дочерних элементов
-		switch($el['dialog_id']) {
-			case 57://меню переключения блоков
-				$sql = "SELECT *
-						FROM `_element`
-						WHERE `parent_id`=".$el['id']."
-						ORDER BY `sort`";
-				foreach(query_arr($sql) as $el) {
-					$blk = array();
-					foreach(_ids($el['txt_2'], 'arr') as $bid) {
-						if(empty($pasteIds[$bid]))
-							continue;
-						$blk[] = $pasteIds[$bid];
-					}
-					$sql = "INSERT INTO `_element` (
-								`app_id`,
-								`parent_id`,
-								`txt_1`,
-								`txt_2`,
-								`def`,
-								`sort`,
-								`user_id_add`
-							) VALUES (
-								(SELECT `app_id` FROM `_block` WHERE `id`=".$block_id."),
-								".$parent_id.",
-								'".addslashes($el['txt_1'])."',
-								'".implode(',', $blk)."',
-								".$el['def'].",
-								".$el['sort'].",
-								".USER_ID."
-							)";
-					query($sql);
-				}
-				//установка нового значения по умолчанию
-				$sql = "SELECT `id`
-						FROM `_element`
-						WHERE `parent_id`=".$parent_id."
-						  AND `def`
-						LIMIT 1";
-				$def = _num(query_value($sql));
-
-				$sql = "UPDATE `_element`
-						SET `def`=".$def."
-						WHERE `id`=".$parent_id;
-				query($sql);
-				break;
-		}
 	}
 }
 function _blockActionCopy($PASTE, $pasteIds) {//перенос действий у скопированных блоков

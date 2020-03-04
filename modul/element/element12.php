@@ -45,11 +45,3 @@ function _element12_vvv($el, $prm) {
 
 	return $func($prm);
 }
-function _element12_copy_field($el) {
-	return array(
-		'txt_1' => $el['txt_1'],
-		'txt_2' => $el['txt_2'],
-		'num_1' => _num($el['num_1'])
-	);
-}
-

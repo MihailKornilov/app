@@ -107,19 +107,6 @@ function _element8vFromEl($el, $prm, $v) {//начальный текст из �
 
 	return _elemUids($el['txt_4'], $u);
 }
-function _element8_copy_field($el) {
-	return array(
-		'txt_1' => $el['txt_1'],
-		'txt_2' => $el['txt_2'],
-		'num_1' => _num($el['num_1']),
-		'num_2' => _num($el['num_2']),
-		'num_3' => _num($el['num_3']),
-		'num_4' => _num($el['num_4']),
-		'num_5' => _num($el['num_5']),
-		'txt_4' => $el['txt_4'],
-		'txt_3' => $el['txt_3']
-	);
-}
 function _element8_template_docx($el, $u) {
 	$col = $el['col'];
 	return $u[$col];

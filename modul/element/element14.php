@@ -106,17 +106,6 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 
 	return $send;
 }
-function _element14_copy_field($el) {
-	return array(
-//		'num_1' => _num($el['num_1']),
-		'num_2' => _num($el['num_2']),
-
-		'txt_1' => $el['txt_1'],
-//		'txt_2' => $el['txt_2'],
-		'num_3' => _num($el['num_3']),
-		'num_4' => _num($el['num_4'])
-	);
-}
 function _element14_copy_vvv($el, $obj_id) {
 	$sql = "SELECT *
 			FROM `_block`

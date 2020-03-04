@@ -37,13 +37,3 @@ function _element90_print($el) {
 
 	return _imageHtml($img, $w, $h, false, $el['num_4']);
 }
-function _element90_copy_field($el) {
-	return array(
-		'txt_1'   => $el['txt_1'],
-		'num_1'   => _num($el['num_1']),
-		'num_2'   => _num($el['num_2']),
-		'num_3'   => _num($el['num_3']),
-		'num_4'   => _num($el['num_4'])
-	);
-}
-

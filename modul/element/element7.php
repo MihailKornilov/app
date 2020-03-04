@@ -24,11 +24,4 @@ function _element7_print($el, $prm) {
 		'disabled' => $prm['blk_setup']
 	));
 }
-function _element7_copy_field($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-//		'num_1' => 0,
-//		'txt_2' => ''
-	);
-}
 

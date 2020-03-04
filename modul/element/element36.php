@@ -20,14 +20,6 @@ function _element36_print($el) {
 
 	return '<div class="icon icon-'.$type.$pl.$cur._element36TT($el).'</div>';
 }
-function _element36_copy_field($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),
-		'num_2'   => _num($el['num_2']),
-		'num_3'   => _num($el['num_3']),
-		'txt_1' => $el['txt_1']
-	);
-}
 function _element36TT($el) {
 	if(empty($el['txt_1']))
 		return '">';

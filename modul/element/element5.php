@@ -67,14 +67,6 @@ function _element5vFromEl($el, $prm, $v) {//начальный текст из �
 
 	return _elemUids($el['txt_3'], $u);
 }
-function _element5_copy_field($el) {
-	return array(
-		'txt_1' => $el['txt_1'],
-		'num_1' => _num($el['num_1']),
-		'txt_2' => $el['txt_2'],
-		'txt_3' => $el['txt_3']
-	);
-}
 function _element5_template_docx($el, $u) {
 	$col = $el['col'];
 	return _br($u[$col], "<w:br/>");

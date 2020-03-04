@@ -49,14 +49,6 @@ function _element73_print($el) {
 
 	return $send;
 }
-function _element73_copy_field($el) {
-	return array(
-		'num_1' => _num($el['num_1']),
-		'num_2' => _num($el['num_2']),
-		'num_3' => _num($el['num_3']),
-		'num_4' => _num($el['num_4'])
-	);
-}
 function _element73filterUpd($send, $elem_spisok) {//обновление значения после применения фильтра
 	//поиск фильтра-календаря, привязанного к списку
 	$sql = "SELECT *
