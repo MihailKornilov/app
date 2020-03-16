@@ -273,10 +273,11 @@ body:not(.site){position:relative}
 	opacity:.5;
 }
 #hat-but button:hover{background-color:#5C738E;opacity:1}
-#hat-but button:active{background-position:5px 6px}
+#app-error{background:8px 8px url(../../img/app-error.png?6) no-repeat}
 /* кнопка включения настройки страницы */
 #page_setup{background:5px 5px url(../../img/_page.png?7) no-repeat}
 #page_setup.ispas{opacity:1}
+#page_setup:active{background-position:5px 6px}
 
 /*#app-admin{background:5px 5px url(../../img/_admin.png?7) no-repeat}*/
 

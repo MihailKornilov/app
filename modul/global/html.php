@@ -486,6 +486,7 @@ function _html_hat() {//верхняя строка приложения для 
 				'</div>'.
 
 				'<div id="hat-but">'.
+//					_hat_but_alert().
 					_hat_but_pas().
 				'</div>'.
 
@@ -547,6 +548,16 @@ function _hat_link_manial() {//ссылка Руководство пользо�
 		return '';
 
 	return '<dd onclick="location.href=\''.URL.'&p=15\'">Руководство<br>пользователя';
+}
+function _hat_but_alert() {//отображение кнопки оповещения об ошибках
+	if(!APP_ID)
+		return '';
+	if(APP_IS_PID)
+		return '';
+	if(!SA && !USER_ADMIN)
+		return '';
+
+	return '<button id="app-error"></button>';
 }
 function _hat_but_pas() {//отображение кнопки настройки страницы
 	if(!APP_ID)
