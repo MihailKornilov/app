@@ -2012,9 +2012,72 @@ function _beElemAction($ELM, $app_id=APP_PARENT) {//действия, назна
 
 
 
+function PHP12_block_info($prm) {//информация о блоке (диалог 117)
+	if(!$block_id = _num($prm['unit_get_id']))
+		return _emptyRed('Данные блока не получены');
 
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `id`=".$block_id;
+	if(!$BL = query_assoc($sql))
+		return _emptyRed('Блока id'.$block_id.' нет в базе');
 
+	$BLCH = _blockOne($block_id);
 
+	$send =
+		'<table class="bs5">'.
+			'<tr><td class="grey">ID блока:'.
+				'<td><input type="text" class="w100" value="'.$block_id.'">'.
+		'</table>'.
+
+		'<table class="_stab mt10">'.
+			'<tr><th>Параметр'.
+				'<th>База'.
+				'<th>Кеш'.
+
+			_blockInfoTr('app_id', $BL, $BLCH).
+			_blockInfoTr('parent_id', $BL, $BLCH).
+			_blockInfoTr('child_count', $BL, $BLCH).
+			_blockInfoTr('obj_name', $BL, $BLCH).
+			_blockInfoTr('obj_id', $BL, $BLCH).
+			_blockInfoTr('x', $BL, $BLCH).
+			_blockInfoTr('xx', $BL, $BLCH).
+			_blockInfoTr('xx_ids', $BL, $BLCH).
+			_blockInfoTr('y', $BL, $BLCH).
+			_blockInfoTr('w', $BL, $BLCH).
+			_blockInfoTr('h', $BL, $BLCH).
+			_blockInfoTr('width', $BL, $BLCH).
+			_blockInfoTr('width_auto', $BL, $BLCH).
+			_blockInfoTr('height', $BL, $BLCH).
+			_blockInfoTr('pos', $BL, $BLCH).
+			_blockInfoTr('bg', $BL, $BLCH).
+			_blockInfoTr('ov', $BL, $BLCH).
+			_blockInfoTr('bor', $BL, $BLCH).
+			_blockInfoTr('hidden', $BL, $BLCH).
+			_blockInfoTr('show_create', $BL, $BLCH).
+			_blockInfoTr('show_edit', $BL, $BLCH).
+			_blockInfoTr('user_id_add', $BL, $BLCH).
+			_blockInfoTr('dtime_add', $BL, $BLCH).
+
+		'</table>';
+
+	return $send._pr($prm);
+}
+
+function _blockInfoTr($param, $BL, $BLCH) {
+	$blCache = isset($BLCH[$param]) ? $BLCH[$param] : '';
+
+	$color = '';
+	if(is_array($blCache))
+		$blCache = _pr($blCache);
+	elseif($BL[$param] != $blCache)
+		$color = 'red';
+
+	return
+	'<tr><td class="grey">'.$param.
+		'<td>'.$BL[$param].
+		'<td class="'.$color.'">'.$blCache;
+}
 
 
 

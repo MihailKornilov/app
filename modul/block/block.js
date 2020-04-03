@@ -35,7 +35,8 @@ var _ids = function(v, count) {
 		t._hint({
 			msg:'<div class="pad5">' +
 					'<table class="w100p line-b">' +
-						'<tr><td class="w50 fs16 blue' + (SA ? ' curD' + _tooltip('#' + BL.id, -8)  : '">') + 'Блок' +
+						'<tr><td class="w50">' +
+								'<a val="dialog_id:117,get_id:' + BL.id + '" class="dialog-open fs16 blue' + (SA ? _tooltip('info #' + BL.id, -23)  : '">') + 'Блок' + '</a>' +
 							'<td class="w90 r pb2">' +
 								'<div val="dialog_id:43,block_id:' + block_id + ',edit_id:' + hint_id + '" class="icon icon-hint curP dialog-open' + _dn(!BL.hint, 'pl') + _tooltip('Настроить подсказку<br>для блока', -65, false, true) + '</div>' +
 								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +

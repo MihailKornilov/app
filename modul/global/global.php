@@ -11,6 +11,9 @@ setlocale(LC_NUMERIC, 'en_US');
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 define('DOMAIN', $_SERVER['SERVER_NAME']);
 
+define('CACHE_USE', true); //включение кеша
+define('CACHE_TTL', 86400);//время в секундах, которое хранит кеш
+
 require_once GLOBAL_DIR.'/syncro.php';
 require_once GLOBAL_DIR.'/modul/global/regexp.php';
 require_once GLOBAL_DIR.'/modul/global/mysql.php';
@@ -50,8 +53,7 @@ session_start();
 function _setting() {//установка констант-настроек
 	$key = 'SETTING';
 	if(!$arr = _cache_get($key, 1)) {
-		$sql = "SELECT `key`,`v`
-				FROM `_setting`";
+		$sql = "SELECT `key`,`v` FROM `_setting`";
 		$arr = query_ass($sql);
 
 		$arr = _settingInsert($arr, 'SCRIPT', 100);
@@ -870,34 +872,30 @@ function _jsCacheElm($app_id=0) {
 	return _json($ELM);
 }
 
+
+
+
+
+
+
 function _cache($v=array()) {
-	if(!defined('CACHE_DEFINE')) {
-		define('CACHE_USE', true);//включение кеша
-		define('CACHE_TTL', 86400);//время в секундах, которое хранит кеш
-		define('CACHE_DEFINE', true);
-	}
+	/*
+		action (действие):
+			get - считывание данных из кеша (по умолчанию)
+			set - занесение данных в кеш
+			isset - проверка существования кеша
+			clear - очистка кеша
 
-	//действие:
-	//	get - считывание данных из кеша (по умолчанию)
-	//	set - занесение данных в кеш
-	//	clear - очистка кеша
-	$action = empty($v['action']) ? 'get' : $v['action'];
+		global:
+			1 - глобальные значения
+			0 - конкретное приложение
 
-	//глобальное значение: доступно для всех приложений
-	//если внутреннее, то к ключу будет прибавляться префикс
-	$global = !empty($v['global']);
+		key: ключ кеша
+	*/
 
-	if(empty($v['key']))
-		die('Отсутствует ключ кеша.');
+	$key = '__'._cachePrefix($v).'_'._cacheKey($v);
 
-	$key = $v['key'];
-
-	if(is_array($key))
-		die('Ключ кеша не может быть массивом.');
-
-	$key = '__'.($global || !_num(@APP_ID) ? 'GLOBAL' : 'APP'.APP_ID).'_'.$key;
-
-	switch($action) {
+	switch(_cacheAction($v)) {
 		case 'get': return CACHE_USE ? apcu_fetch($key) : false;
 		case 'set':
 //			if(!isset($v['data']))
@@ -914,6 +912,25 @@ function _cache($v=array()) {
 			return true;
 		default: die('Неизвестное действие кеша.');
 	}
+}
+function _cacheAction($v) {//получение действия кеша
+	if(empty($v['action']))
+		return 'get';
+	return $v['action'];
+}
+function _cacheKey($v) {//получение ключа кеша
+	if(empty($v['key']))
+		die('Отсутствует ключ кеша.');
+	if(is_array($v['key']))
+		die('Ключ кеша не может быть массивом.');
+	return $v['key'];
+}
+function _cachePrefix($v) {//получение префикса кеша
+	if(!empty($v['global']))
+		return 'GLOBAL';
+	if(empty(APP_ID))
+		return 'GLOBAL';
+	return 'APP'.APP_ID;
 }
 function _cache_get($key, $global=0) {//получение значений кеша
 	return _cache(array(
