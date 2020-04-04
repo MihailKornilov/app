@@ -2030,7 +2030,7 @@ function PHP12_block_info($prm) {//информация о блоке (диал�
 				'<td><input type="text" class="w100" value="'.$block_id.'">'.
 		'</table>'.
 
-		'<table class="_stab mt10">'.
+		'<table class="_stab small mt10">'.
 			'<tr><th>Параметр'.
 				'<th>База'.
 				'<th>Кеш'.
@@ -2059,17 +2059,18 @@ function PHP12_block_info($prm) {//информация о блоке (диал�
 			_blockInfoTr('user_id_add', $BL, $BLCH).
 			_blockInfoTr('dtime_add', $BL, $BLCH).
 
+			_blockInfoElem($prm, $block_id, $BLCH).
+
 		'</table>';
 
 	return $send._pr($prm);
 }
-
 function _blockInfoTr($param, $BL, $BLCH) {
 	$blCache = isset($BLCH[$param]) ? $BLCH[$param] : '';
 
 	$color = '';
 	if(is_array($blCache))
-		$blCache = _pr($blCache);
+		$blCache = _pr($blCache, true);
 	elseif($BL[$param] != $blCache)
 		$color = 'red';
 
@@ -2078,7 +2079,18 @@ function _blockInfoTr($param, $BL, $BLCH) {
 		'<td>'.$BL[$param].
 		'<td class="'.$color.'">'.$blCache;
 }
+function _blockInfoElem($prm, $block_id, $BLCH) {
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `block_id`=".$block_id;
+	$elem_id = query_value($sql);
 
+	$elem_id_cache = !empty($BLCH['elem']) ? $BLCH['elem']['id'] : '';
+	return
+	'<tr><td class="grey">Элемент'.
+		'<td><a class="dialog-open" val="dialog_close:'.$prm['srce']['dialog_id'].',dialog_id:118,get_id:'.$elem_id.'">'.$elem_id.'<a>'.
+		'<td>'.$elem_id_cache;
+}
 
 
 

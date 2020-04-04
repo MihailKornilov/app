@@ -490,9 +490,9 @@ function translit($str) {
 	return strtr($str, $list);
 }
 
-function _pr($arr) {//аналог функции print_r
+function _pr($arr, $emptyReturn=false) {//аналог функции print_r
 	if(empty($arr))
-		return _prMsg('массив пуст');
+		return $emptyReturn ? '' : _prMsg('массив пуст');
 
 	if(!is_array($arr))
 		return $arr;

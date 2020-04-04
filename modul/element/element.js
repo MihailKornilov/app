@@ -695,7 +695,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		_post(send, function(res) {
 			res.send = o;
-			o.func_open_before(res, dialog);
+			o.func_open_before(res);
 			var dialog = _dialogOpen(res);
 			o.func_open(res, dialog);
 		});
@@ -6200,6 +6200,12 @@ $(document)
 		_forN(val.split(','), function(sp) {
 			var spl = sp.split(':'),
 				k = spl[0];
+			if(k == 'dialog_close') {
+				send.func_open_before = function() {
+					DIALOG[_num(spl[1])].close();
+				};
+				return;
+			}
 			send[k] = _num(spl[1], 1);
 		});
 
