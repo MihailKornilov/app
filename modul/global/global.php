@@ -928,6 +928,8 @@ function _cacheKey($v) {//получение ключа кеша
 function _cachePrefix($v) {//получение префикса кеша
 	if(!empty($v['global']))
 		return 'GLOBAL';
+	if(!defined('APP_ID'))
+		return 'GLOBAL';
 	if(empty(APP_ID))
 		return 'GLOBAL';
 	return 'APP'.APP_ID;
