@@ -48,12 +48,12 @@ function _element3_print($el, $prm) {
 					$pid = $p['id'];
 					break;
 				}
-
+/*
 		if($pfrom = _num(@$_GET['pfrom']))
 			foreach(_page('child', $page_id) as $p)
 				if($p['id'] == $pfrom)
 					$pid = $pfrom;
-
+*/
 		$href = $prm['blk_setup'] ? '' : ' href="'.URL.'&p='.$pid.'"';
 		$curd = _dn(!$prm['blk_setup'], 'curD');
 

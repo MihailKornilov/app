@@ -1471,13 +1471,13 @@ function _spisokUnitUpd54($EL, $unit_id=0) {//обновление количе�
 	query($sql);
 
 	$sql = "SELECT
-				`".$cmp['col']."`,
+				`"._elemCol($cmp)."`,
 				COUNT(`id`)
 			FROM "._queryFrom($DConn)."
 			WHERE "._queryWhere($DConn)." 
-			  AND `".$cmp['col']."`".($unit_id ? "=".$unit_id : '')."
+			  AND `"._elemCol($cmp)."`".($unit_id ? "=".$unit_id : '')."
 			  "._40cond($cmp, $EL['txt_1'])."
-			GROUP BY `".$cmp['col']."`";
+			GROUP BY `"._elemCol($cmp)."`";
 	if(!$ass = query_ass($sql))//выход, если нечего обновлять
 		return;
 
