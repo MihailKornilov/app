@@ -788,9 +788,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				if(o.dialog_id == 43) {
 					var u = res.unit;
 					if(u.block_id)
-						BLKK[u.block_id].hint = {id:u.id};
+						BLKK[u.block_id].hint = u.id;
 					if(u.element_id)
-						ELMM[u.element_id].hint = {id:u.id};
+						ELMM[u.element_id].hint = u.id;
 				}
 			});
 		}
@@ -2823,6 +2823,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						dialog_id:dlg_id,
 						get_id:sp.apply_id ? GET_ID : 0,
 						edit_id:sp.effect_id ? GET_ID : 0,
+						del_id:sp.revers ? GET_ID : 0,
 						busy_obj:_attr_bl(ELMM[el.id].block_id)
 					};
 

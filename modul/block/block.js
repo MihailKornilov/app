@@ -38,7 +38,7 @@ var _ids = function(v, count) {
 						'<tr><td class="w50">' +
 								'<a val="dialog_id:117,get_id:' + BL.id + '" class="dialog-open fs16 blue' + (SA ? _tooltip('info #' + BL.id, -23)  : '">') + 'Блок' + '</a>' +
 							'<td class="w90 r pb2">' +
-								'<div val="dialog_id:43,block_id:' + block_id + ',edit_id:' + hint_id + '" class="icon icon-hint curP dialog-open' + _dn(!BL.hint, 'pl') + _tooltip('Настроить подсказку<br>для блока', -65, false, true) + '</div>' +
+								'<div val="dialog_id:43,block_id:' + block_id + ',edit_id:' + _num(BL.hint) + '" class="icon icon-hint curP dialog-open' + _dn(!BL.hint, 'pl') + _tooltip('Настроить подсказку<br>для блока', -65, false, true) + '</div>' +
 								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +
 								'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
 					'</table>' +
@@ -486,8 +486,7 @@ var _ids = function(v, count) {
 	_elemUnitHint = function(EL) {//иконка для настройки выплывающей подсказки
 		if(!EL.rule15)
 			return '';
-		var hint_id = EL.hint ? EL.hint.id : 0;
-		return '<div val="dialog_id:43,element_id:' + EL.id + ',edit_id:' + hint_id + '"' +
+		return '<div val="dialog_id:43,element_id:' + EL.id + ',edit_id:' + _num(EL.hint) + '"' +
 				   ' class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint, 'pl') + _tooltip('Настроить подсказку<br>для элемента', -65, false, true) +
 			   '</div>';
 	},
@@ -1039,27 +1038,19 @@ $(document)
 			return false;
 		});
 	})
-	.on('mouseenter', '.hint-on', function() {//вывод подсказки для блока
+	.on('mouseenter', '.hint-on', function() {//вывод подсказки для блока или элемента
 		var t = $(this),
+			attr_id = t.attr('id'),
 			spl = t.attr('id').split('_'),
 			id = _num(spl[1]),
 			obj,//объект - блок или элемент
-			h;  //данные по подсказке;
-
-		if(!id)
-			return;
+			h = HINT[attr_id];  //данные по подсказке;
 
 		switch(spl[0]) {
 			case 'bl':
-				if(!BLKK[id])
-					return;
-				h = BLKK[id].hint;
 				obj = _attr_bl(id);
 				break;
 			case 'el':
-				if(!ELMM[id])
-					return;
-				h = ELMM[id].hint;
 				obj = _attr_el(id);
 				break;
 			default: return;

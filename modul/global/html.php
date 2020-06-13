@@ -865,7 +865,7 @@ function _app_content() {//центральное содержание
 
 	return
 	'<div id="_content" class="block-content-page '.SITE.'">'.
-		_elem97print($page_id).
+		_elem97print($page_id).//независимая кнопка
 		_pageShow($page_id).
 	'</div>';
 }

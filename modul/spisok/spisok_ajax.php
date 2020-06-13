@@ -830,10 +830,18 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 				}
 			}
 			if($tab == '_hint') {
-				$sql = "SELECT `app_id`
-						FROM `_element`
-						WHERE `id`=".$element_id;
-				$app_id = query_value($sql);
+				if($element_id) {
+					$sql = "SELECT `app_id`
+							FROM `_element`
+							WHERE `id`=".$element_id;
+					$app_id = query_value($sql);
+				}
+				if($block_id) {
+					$sql = "SELECT `app_id`
+							FROM `_block`
+							WHERE `id`=".$block_id;
+					$app_id = query_value($sql);
+				}
 			}
 
 			$sql = "UPDATE `".$tab."`

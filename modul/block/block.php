@@ -19,7 +19,14 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 							'<div class="_empty min">'.
 								'Содержание удаления записи не настроено.'.
 							'</div>'.
-						'</div>'
+						'</div>',
+
+		'hint' =>
+			'<div class="bg-ffe pad10">'.
+				'<div class="_empty min">'.
+					'Пустое содержание подсказки.'.
+				'</div>'.
+			'</div>'
 	);
 
 	if($name == 'page') {
@@ -64,7 +71,8 @@ function _blockParam($PARAM=array(), $obj_name='') {//значения-пара�
 		'unit_get' => array(),      //данные записи для просмотра
 		'unit_edit' => array(),     //данные записи для редактирования
 
-		'dop' => array()            //дополнительные параметны для некоторых диалогов
+		'dop' => array(),           //дополнительные параметны для некоторых диалогов
+		'td_no_end' => 0            //не добавлять справа пустой блок
 	);
 
 	//условия для настройки блоков конкретного объекта
@@ -757,6 +765,7 @@ function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины
 				return 0;
 			$ex = explode(' ', $elm14['mar']);
 			return floor(($elm14['block']['width'] - $ex[1] - $ex[3]) / 10) * 10;
+		case 'hint': return 500;
 	}
 	return 0;
 }
@@ -1699,19 +1708,15 @@ function _beBlockHint($BLK, $app_id) {//подсказки, назначенны
 			FROM `_hint`
 			WHERE `app_id`=".$app_id."
 			  AND `block_id`
-			  AND `on`
-			  AND LENGTH(`msg`)";
-	foreach(query_arr($sql) as $r) {
+			  AND `on`";
+	if(!$hint = query_arr($sql))
+		return $BLK;
+
+	foreach(query_arr($sql) as $id => $r) {
 		$block_id = $r['block_id'];
-		if(!isset($BLK[$block_id]))
+		if(empty($BLK[$block_id]))
 			continue;
-		unset($r['app_id']);
-		unset($r['on']);
-		unset($r['block_id']);
-		unset($r['element_id']);
-		unset($r['user_id_add']);
-		unset($r['dtime_add']);
-		$BLK[$block_id]['hint'] = _arrNum($r);
+		$BLK[$block_id]['hint'] = $id;
 	}
 
 	return $BLK;
@@ -1968,19 +1973,15 @@ function _beElemHint($ELM, $app_id) {//подсказки, назначенны�
 			FROM `_hint`
 			WHERE `app_id`=".$app_id."
 			  AND `element_id`
-			  AND `on`
-			  AND LENGTH(`msg`)";
-	foreach(query_arr($sql) as $r) {
+			  AND `on`";
+	if(!$hint = query_arr($sql))
+		return $ELM;
+
+	foreach($hint as $id => $r) {
 		$elem_id = $r['element_id'];
-		if(!isset($ELM[$elem_id]))
+		if(empty($ELM[$elem_id]))
 			continue;
-		unset($r['app_id']);
-		unset($r['on']);
-		unset($r['block_id']);
-		unset($r['element_id']);
-		unset($r['user_id_add']);
-		unset($r['dtime_add']);
-		$ELM[$elem_id]['hint'] = _arrNum($r);
+		$ELM[$elem_id]['hint'] = $id;
 	}
 
 	return $ELM;

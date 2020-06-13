@@ -1234,6 +1234,29 @@ function PHP12_spisok23_app() {//списки-таблицы для текуще
 	return PHP12_spisok_app(23, 'Списков-таблиц нет.');
 }
 
+function PHP12_hint43_content($prm) {//содержание подсказки
+	/*
+		имя объекта: hint
+		 id объекта: id подсказки
+	*/
+	if(!$unit = $prm['unit_edit'])
+		return
+		'<div class="bg-ffe pad10">'.
+			_emptyMin('Настройка содержания будет доступна после создания подсказки.').
+		'</div>';
+
+	//максимальная ширина подсказки: 500
+	$width = 500;
+
+	return
+	'<div class="bg-ffc pad10 line-b">'.
+		_blockLevelChange('hint', $unit['id']).
+	'</div>'.
+	'<div class="block-content-hint" style="width:'.$width.'px">'.
+		_blockHtml('hint', $unit['id'], array('blk_setup' => 1)).
+	'</div>';
+}
+
 function _elemRule($i='all', $v=0) {//кеш правил для элементов
 	global  $RULE_USE,//массив всех правил
 			$DLG_ASS, //элемент содержит правило
@@ -1837,6 +1860,7 @@ function PHP12_elem_choose_rule($prm, $isMsg=0) {
 				return !$isMsg ? 2 : 'Блок с диалога.';
 			case 'dialog_del':  return !$isMsg ? 8 : 'Блок содержания удаления записи.';
 			case 'spisok':      return !$isMsg ? 3 : 'Блок единицы списка.';
+			case 'hint':        return !$isMsg ? 18 : 'Блок подсказки.';
 		}
 
 		return !$isMsg ? 0 : 'Неизвестное местоположение.';
