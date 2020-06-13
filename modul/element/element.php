@@ -1256,6 +1256,77 @@ function PHP12_hint43_content($prm) {//содержание подсказки
 		_blockHtml('hint', $unit['id'], array('blk_setup' => 1)).
 	'</div>';
 }
+function PHP12_hint_spisok() {//список подсказок для конкретного приложения в администрировании
+	$sql = "SELECT *
+			FROM `_hint`
+			WHERE `app_id`=".APP_ID."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return _empty('Подсказки не создавались');
+
+	$send = '<table class="_stab">'.
+				'<tr>'.
+			  (SA ? '<th>id' : '').
+					'<th>ВКЛ'.
+					'<th>Привязана'.
+					'<th>Размещена'.
+					'<th>Содержание'.
+					'<th>Создана'.
+					'<th>';
+	foreach($arr as $id => $r) {
+		$place = '';
+
+		$BL = array();
+		if($r['block_id'])
+			$BL = _blockOne($r['block_id']);
+		if($r['element_id'])
+			if($EL = _elemOne($r['element_id']))
+				$BL = $EL['block'];
+
+
+		if(!empty($BL))
+			switch($BL['obj_name']) {
+				case 'page':
+					$page = _page($BL['obj_id']);
+
+					//если страница получает данные списка, получение первого id значения этого списка
+					$unit = '';
+					if($did = $page['dialog_id_unit_get']) {
+						$sql = "SELECT `id`
+								FROM `_spisok`
+								WHERE `dialog_id`=".$did."
+								ORDER BY `id`
+								LIMIT 1";
+						$unit = '&id='.query_value($sql);
+					}
+					$place = '<a href="'.URL.'&p='.$page['id'].$unit.'">На странице <b>'.$page['name'].'</b></a>';
+					break;
+				case 'dialog':
+					$dlg = _dialogQuery($BL['obj_id']);
+					$place = '<a class="dialog-open" val="dialog_id:'.$dlg['id'].'">В диалоге <b>'.$dlg['name'].'</b></a>';
+					break;
+				case 'dialog_del':
+					$place = 'В содержании удаления';
+					break;
+				case 'spisok':
+					$place = 'В списке';
+					break;
+			}
+
+		$send .=
+			'<tr class="over1">'.
+		  (SA ? '<td class="r pale">'.$id : '').
+				'<td class="center">'.
+		($r['on'] ? '<div class="icon icon-ok"></div>' : '').
+				'<td>'.($r['block_id'] ? 'к блоку' : 'к элементу').
+				'<td>'.$place.
+				'<td>'._blockHtml('hint', $id, array('td_no_end'=>1)).
+				'<td class="r grey">'.FullDataTime($r['dtime_add']).
+				'<td><div class="icon icon-edit dialog-open" val="dialog_id:43,edit_id:'.$id.'"></div>';
+	}
+	$send .= '</table>';
+	return $send;
+}
 
 function _elemRule($i='all', $v=0) {//кеш правил для элементов
 	global  $RULE_USE,//массив всех правил
