@@ -1256,10 +1256,10 @@ function PHP12_hint43_content($prm) {//содержание подсказки
 		_blockHtml('hint', $unit['id'], array('blk_setup' => 1)).
 	'</div>';
 }
-function PHP12_hint_spisok() {//список подсказок для конкретного приложения в администрировании
+function PHP12_hint_spisok($prm) {//список подсказок для конкретного приложения в администрировании
 	$sql = "SELECT *
 			FROM `_hint`
-			WHERE `app_id`=".APP_ID."
+			WHERE `app_id`=".($prm['el12']['num_1'] ? APP_ID : 0)."
 			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
 		return _empty('Подсказки не создавались');
