@@ -12,7 +12,7 @@
 	box-sizing:border-box;
 }
 ._stab.small th{padding:3px;font-size:13px}
-._stab td{
+._stab > tbody > tr > td{
 	padding:8px;
 	border:#EFF2F5 solid 1px;
 	box-sizing:border-box;
