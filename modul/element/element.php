@@ -1256,7 +1256,11 @@ function PHP12_hint43_content($prm) {//содержание подсказки
 		_blockHtml('hint', $unit['id'], array('blk_setup' => 1)).
 	'</div>';
 }
-function PHP12_hint_spisok($prm) {//список подсказок для конкретного приложения в администрировании
+function PHP12_hint_spisok($prm) {//список подсказок для управления
+	//Используется в двух местах:
+	//      в Администрировании (условие 1 = 1: конктертное приложение)
+	//      в SA (условие 1 = 0: конструктор)
+
 	$sql = "SELECT *
 			FROM `_hint`
 			WHERE `app_id`=".($prm['el12']['num_1'] ? APP_ID : 0)."
@@ -1321,7 +1325,7 @@ function PHP12_hint_spisok($prm) {//список подсказок для ко�
 				'<td>'.($r['block_id'] ? 'к блоку' : 'к элементу').
 				'<td>'.$place.
 				'<td>'._blockHtml('hint', $id, array('td_no_end'=>1)).
-				'<td class="r grey">'.FullDataTime($r['dtime_add']).
+				'<td class="r grey">'.FullDataTime($r['dtime_add'], 1).
 				'<td><div class="icon icon-edit dialog-open" val="dialog_id:43,edit_id:'.$id.'"></div>';
 	}
 	$send .= '</table>';
