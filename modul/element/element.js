@@ -722,6 +722,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		o.dlg = dialog;
 		_ELM_ACT(o);
 
+		//подсветка блока, если нужно на него указать
+		if(o.send.block_flash)
+			_attr_bl(o.send.block_flash)._flash({color:'red'});
+
+		//вставка подсказок, прикреплённых к блоками или элементам
+		if(o.hint)
+			_forIn(o.hint, function(v, i) {
+				HINT[i] = v;
+			});
+
 		return dialog;
 
 		function submit() {

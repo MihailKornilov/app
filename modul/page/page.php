@@ -499,9 +499,10 @@ function _pageShowScript($page_id, $prm) {
 		'var FILTER='._json(_filter('page_js'), 1).';'.
 		_pageDlgOpenAuto()
 	: '').
-		'HINT='._json(_pageHint($page_id)).','.
+		'HINT='._json(_objHint('page', $page_id)).','.
 		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.
 		_userInviteDlgOpen().
+		_blockFlash().
 	'</script>';
 }
 function _pageUnitGet($obj_name, $obj_id) {//получение данных записи, которые принимает страница (для отображения в настройке страницы)
@@ -529,83 +530,11 @@ function _pageDlgOpenAuto() {
 
 	return '_dialogLoad({dialog_id:'.$dlg['id'].'});';
 }
-function _pageHint($page_id) {//подсказки, размещённые на странице
-	$sql = "SELECT `id`
-			FROM `_block`
-			WHERE `obj_name`='page'
-			  AND `obj_id`=".$page_id;
-	if(!$blkIds = query_ids($sql))
+function _blockFlash() {//подсветка блока, если нужно на него указать
+	if(!$block_id = _num(@$_GET['block_flash']))
 		return '';
 
-	$send = array();
-
-	//получение подсказок для блоков
-	$sql = "SELECT *
-			FROM `_hint`
-			WHERE `block_id` IN (".$blkIds.")
-			ORDER BY `id`";
-	if(!$hint = query_arr($sql))
-		return '';
-
-	foreach($hint as $id => $r) {
-		$block_id = $r['block_id'];
-		unset($r['app_id']);
-		unset($r['on']);
-		unset($r['block_id']);
-		unset($r['element_id']);
-		unset($r['user_id_add']);
-		unset($r['dtime_add']);
-
-		$prm = array('td_no_end' => 1);
-
-		if($BL = _blockOne($block_id)) {
-			switch($BL['obj_name']) {
-				case 'page':
-					if(!$page = _page($BL['obj_id']))
-						break;
-					if(!$dialog_id = $page['dialog_id_unit_get'])
-						break;
-					if(!$dialog = _dialogQuery($dialog_id))
-						break;
-					if(!$prm['unit_get_id'] = _num(@$_GET['id']))
-						break;
-					$prm['unit_get'] = _spisokUnitQuery($dialog, $prm['unit_get_id']);
-					break;
-			}
-		}
-
-		$r['msg'] = _blockHtml('hint', $id, $prm);
-		$send['bl_'.$block_id] = $r;
-	}
-
-
-	//получение подсказок для элементов
-	$sql = "SELECT `id`
-			FROM `_element`
-			WHERE `block_id` IN (".$blkIds.")";
-	if(!$elmIds = query_ids($sql))
-		return '';
-
-	$sql = "SELECT *
-			FROM `_hint`
-			WHERE `element_id` IN (".$elmIds.")
-			ORDER BY `id`";
-	if(!$hint = query_arr($sql))
-		return '';
-
-	foreach($hint as $id => $r) {
-		$elem_id = $r['element_id'];
-		unset($r['app_id']);
-		unset($r['on']);
-		unset($r['block_id']);
-		unset($r['element_id']);
-		unset($r['user_id_add']);
-		unset($r['dtime_add']);
-		$r['msg'] = _blockHtml('hint', $id, array('td_no_end'=>1));
-		$send['el_'.$elem_id] = $r;
-	}
-
-	return $send;
+	return '$("#bl_'.$block_id.'")._flash({color:"red"});';
 }
 
 

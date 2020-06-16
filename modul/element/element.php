@@ -1303,11 +1303,11 @@ function PHP12_hint_spisok($prm) {//список подсказок для уп�
 								LIMIT 1";
 						$unit = '&id='.query_value($sql);
 					}
-					$place = '<a href="'.URL.'&p='.$page['id'].$unit.'">На странице <b>'.$page['name'].'</b></a>';
+					$place = '<a href="'.URL.'&p='.$page['id'].$unit.'&block_flash='.$BL['id'].'">На странице <b>'.$page['name'].'</b></a>';
 					break;
 				case 'dialog':
 					$dlg = _dialogQuery($BL['obj_id']);
-					$place = '<a class="dialog-open" val="dialog_id:'.$dlg['id'].'">В диалоге <b>'.$dlg['name'].'</b></a>';
+					$place = '<a class="dialog-open" val="dialog_id:'.$dlg['id'].',block_flash:'.$BL['id'].'">В диалоге <b>'.$dlg['name'].'</b></a>';
 					break;
 				case 'dialog_del':
 					$place = 'В содержании удаления';
@@ -1331,6 +1331,83 @@ function PHP12_hint_spisok($prm) {//список подсказок для уп�
 	$send .= '</table>';
 	return $send;
 }
+function _objHint($obj_name, $obj_id) {//подсказки, размещённые на странице, в диалоге
+	$sql = "SELECT `id`
+			FROM `_block`
+			WHERE `obj_name`='".$obj_name."'
+			  AND `obj_id`=".$obj_id;
+	if(!$blkIds = query_ids($sql))
+		return '';
+
+	$send = array();
+
+	//получение подсказок для блоков
+	$sql = "SELECT *
+			FROM `_hint`
+			WHERE `block_id` IN (".$blkIds.")
+			ORDER BY `id`";
+	if($hint = query_arr($sql))
+		foreach($hint as $id => $r) {
+			$block_id = $r['block_id'];
+			unset($r['app_id']);
+			unset($r['on']);
+			unset($r['block_id']);
+			unset($r['element_id']);
+			unset($r['user_id_add']);
+			unset($r['dtime_add']);
+
+			$prm = array('td_no_end' => 1);
+
+			if($BL = _blockOne($block_id)) {
+				switch($BL['obj_name']) {
+					case 'page':
+						if(!$page = _page($BL['obj_id']))
+							break;
+						if(!$dialog_id = $page['dialog_id_unit_get'])
+							break;
+						if(!$dialog = _dialogQuery($dialog_id))
+							break;
+						if(!$prm['unit_get_id'] = _num(@$_GET['id']))
+							break;
+						$prm['unit_get'] = _spisokUnitQuery($dialog, $prm['unit_get_id']);
+						break;
+				}
+			}
+
+			$r['msg'] = _blockHtml('hint', $id, $prm);
+			$send['bl_'.$block_id] = $r;
+		}
+
+
+	//получение подсказок для элементов
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `block_id` IN (".$blkIds.")";
+	if(!$elmIds = query_ids($sql))
+		return $send;
+
+	$sql = "SELECT *
+			FROM `_hint`
+			WHERE `element_id` IN (".$elmIds.")
+			ORDER BY `id`";
+	if(!$hint = query_arr($sql))
+		return $send;
+
+	foreach($hint as $id => $r) {
+		$elem_id = $r['element_id'];
+		unset($r['app_id']);
+		unset($r['on']);
+		unset($r['block_id']);
+		unset($r['element_id']);
+		unset($r['user_id_add']);
+		unset($r['dtime_add']);
+		$r['msg'] = _blockHtml('hint', $id, array('td_no_end'=>1));
+		$send['el_'.$elem_id] = $r;
+	}
+
+	return $send;
+}
+
 
 function _elemRule($i='all', $v=0) {//кеш правил для элементов
 	global  $RULE_USE,//массив всех правил
