@@ -1331,7 +1331,7 @@ function PHP12_hint_spisok($prm) {//список подсказок для уп�
 	$send .= '</table>';
 	return $send;
 }
-function _objHint($obj_name, $obj_id) {//подсказки, размещённые на странице, в диалоге
+function _hintObj($obj_name, $obj_id) {//подсказки, размещённые на странице, в диалоге
 	$sql = "SELECT `id`
 			FROM `_block`
 			WHERE `obj_name`='".$obj_name."'

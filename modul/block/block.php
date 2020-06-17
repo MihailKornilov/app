@@ -830,13 +830,16 @@ function _elemFormat($el, $prm, $txt) {//формат значения элем�
 function _elemLink($el, $txt) {//нахождение ссылок и преобразование
 	switch($el['dialog_id']) {
 		case 11:
-			if($last_id = _idsLast($el['txt_2']))
-				if($el11 = _elemOne($last_id)) {
-					if($el11['dialog_id'] == 76)//для видеороликов ссылка не делается
-						return $txt;
-					if($el11['dialog_id'] == 5 && $el11['num_2'])
-						return $txt;
-				}
+			if(!$last_id = _idsLast($el['txt_2']))
+				break;
+			if(!$el11 = _elemOne($last_id))
+				break;
+
+			//для видеороликов ссылка не делается
+			if($el11['dialog_id'] == 76)
+				break;
+			if($el11['dialog_id'] == 5 && $el11['num_2'])
+				break;
 
 			return _noteLink($txt);
 	}

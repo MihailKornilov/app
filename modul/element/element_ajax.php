@@ -1463,7 +1463,7 @@ function _dialogOpenLoad($dialog_id) {
 
 
 
-	$send['hint'] = _arrNum(_objHint('dialog', $dialog_id));
+	$send['hint'] = _arrNum(_hintObj('dialog', $dialog_id));
 
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 

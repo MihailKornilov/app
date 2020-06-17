@@ -499,7 +499,7 @@ function _pageShowScript($page_id, $prm) {
 		'var FILTER='._json(_filter('page_js'), 1).';'.
 		_pageDlgOpenAuto()
 	: '').
-		'HINT='._json(_objHint('page', $page_id)).','.
+		'HINT='._json(_hintObj('page', $page_id)).','.
 		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.
 		_userInviteDlgOpen().
 		_blockFlash().
