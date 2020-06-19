@@ -74,7 +74,10 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 						if($vvv['id'] == $ell_id)
 							if($vvv['dialog_id'] == 11) {
 								$el11 = _elemOne(_idsFirst($vvv['txt_2']));
-								return $el11['num_1'];
+								$BL = _blockOne($el11['block_id']);
+								if($BL['obj_name'] == 'dialog')
+									return $BL['obj_id'];
+								return 0;
 							}
 			}
 	}
