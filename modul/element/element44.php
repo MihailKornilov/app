@@ -207,6 +207,13 @@ function PHP12_elem44_setup_vvv($prm) {
 			$json[$n]['title'] = $ell['title'];
 			$json[$n]['font'] = $ell['font'];
 			$json[$n]['color'] = $ell['color'];
+
+			//прикрепление id подсказок
+			$sql = "SELECT `id`
+					FROM `_hint`
+					WHERE `element_id`=".$r['id']."
+					LIMIT 1";
+			$json[$n]['hint_id'] = query_value($sql);
 		}
 
 	return $json;
