@@ -1332,14 +1332,16 @@ function PHP12_hint_spisok($prm) {//список подсказок для уп�
 	return $send;
 }
 function _hintObj($obj_name, $obj_id) {//подсказки, размещённые на странице, в диалоге
+	global $G_HINT;
+	$send = $G_HINT;
+
 	$sql = "SELECT `id`
 			FROM `_block`
 			WHERE `obj_name`='".$obj_name."'
 			  AND `obj_id`=".$obj_id;
 	if(!$blkIds = query_ids($sql))
-		return '';
+		return $send;
 
-	$send = array();
 
 	//получение подсказок для блоков
 	$sql = "SELECT *

@@ -39,7 +39,7 @@ function _element44_print($el, $prm) {
 	foreach($json as $r)
 		switch($r['type']) {
 			case 'txt':
-				$r['txt'] = _elem44css($r['txt'], $r);
+				$r['txt'] = _elem44css($r, $r['txt']);
 				$send .= _br($r['txt']);
 				break;
 			case 'el':
@@ -48,7 +48,7 @@ function _element44_print($el, $prm) {
 
 				$txt = _element('print', $ell, $prm);
 				$txt = _elemFormat($ell, $prm, $txt);
-				$txt = _elem44css($txt, $ell);
+				$txt = _elem44css($ell, $txt, $prm);
 				$txt = _spisokColSearchBg($el, $txt);
 				$send .= $txt;
 			break;
@@ -61,10 +61,45 @@ function _element44_template_docx($el, $u) {
 	$prm['unit_get'] = $u;
 	return _element44_print($el, $prm);
 }
-function _elem44css($txt, $r) {//применение стилей к значению
-	if(empty($r['font']) && empty($r['color']))
+function _elem44css($ell, $txt, $prm=array()) {//применение стилей к значению
+	global $G_HINT;
+
+	$cls = array();
+	$cls['font'] = $ell['font'];
+	$cls['color'] = $ell['color'];
+
+	$prm['td_no_end'] = 1;
+
+	//проверка наличия подсказки
+	$hint_id = 0;
+	if(!empty($ell['id'])) {
+		$sql = "SELECT *
+				FROM `_hint`
+				WHERE `element_id`=".$ell['id']."
+				LIMIT 1";
+		if($r = query_assoc($sql)) {
+			$hint_id = 'sp_'.rand(100000,999999);
+
+			unset($r['app_id']);
+			unset($r['on']);
+			unset($r['block_id']);
+			unset($r['element_id']);
+			unset($r['user_id_add']);
+			unset($r['dtime_add']);
+
+			$r['msg'] = _blockHtml('hint', $r['id'], $prm);
+
+			$G_HINT[$hint_id] = $r;
+			$cls['hint'] = $r ? 'hint-on' : '';
+		}
+	}
+
+	if(!$cls = array_diff($cls, array('')))
 		return $txt;
-	return '<span class="'.$r['font'].' '.$r['color'].'" style="font-size:inherit">'.$txt.'</span>';
+
+	$id = $hint_id ? ' id="'.$hint_id.'"' : '';
+
+	return '<span'.$id.' class="'.implode(' ', $cls).'" style="font-size:inherit">'.$txt.'</span>';
 }
 function _elem44vvv($el) {//получение значений для некоторых элементов (для таблиц)
 	if($el['dialog_id'] != 44)

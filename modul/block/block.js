@@ -1053,6 +1053,9 @@ $(document)
 			case 'el':
 				obj = _attr_el(id);
 				break;
+			case 'sp':
+				obj = $('#' + attr_id);
+				break;
 			default: return;
 		}
 

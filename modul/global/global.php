@@ -50,6 +50,9 @@ session_start();
 //$_SERVER["PHP_AUTH_USER"] = "admin";
 //$_SERVER["PHP_AUTH_PW"] = "6000030";
 
+//сборщик подсказок
+$G_HINT = array();
+
 function _setting() {//установка констант-настроек
 	$key = 'SETTING';
 	if(!$arr = _cache_get($key, 1)) {
