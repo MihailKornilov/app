@@ -112,6 +112,7 @@ function _elementStruct($el) {//структура элемента - базов
 	$send = array(
 		'id'        => _num($el['id']),
 		'app_id'    => _num($el['app_id']),
+		'parent_id' => _num($el['parent_id']),
 		'block_id'  => _num($el['block_id']),
 		'dialog_id' => _num($el['dialog_id']),
 		'mar'       =>      $el['mar'],
@@ -1634,6 +1635,29 @@ function _elemColDlgId($elem_id, $oo=false) {//получение id диало�
 
 	//сторонний диалог, от которого подключен элемент
 	return $BL['obj_id'];
+}
+
+function _elemDlgId($elem_id) {//получение id диалога на основании элемента
+	while($EL = _elemDlgIdEL($elem_id)) {
+		switch($EL['dialog_id']) {
+			case 23: return $EL['num_1'];
+		}
+		if(!$elem_id = _num(@$EL['parent_id'])) {
+			print_r($EL);
+			return 0;
+		}
+	}
+
+	return 0;
+}
+function _elemDlgIdEL($elem_id) {//получение данных элемента
+	if($EL = _elemOne($elem_id))
+		return $EL;
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id`=".$elem_id;
+	return query_assoc($sql);
 }
 
 function _elemAttrCmp($el) {
