@@ -1,10 +1,18 @@
 <?php
 /* Элементы-теги */
 
-function _element_tag_script() {//скрипты и стили элементов-тегов
+require_once GLOBAL_DIR.'/modul/tag/tag_select/tag_select.php';
+
+
+function _tag_script() {//скрипты и стили элементов-тегов
 	return
-	'<link rel="stylesheet" type="text/css" href="modul/element_tag/element_tag'.MIN.'.css?'.SCRIPT.'" />'.
-	'<script src="modul/element_tag/element_tag'.MIN.'.js?'.SCRIPT.'"></script>';
+	//общие скрипты
+	'<link rel="stylesheet" type="text/css" href="modul/tag/tag'.MIN.'.css?'.SCRIPT.'" />'.
+	'<script src="modul/tag/tag'.MIN.'.js?'.SCRIPT.'"></script>'.
+
+	//_select
+	'<link rel="stylesheet" type="text/css" href="modul/tag/tag_select/tag_select'.MIN.'.css?'.SCRIPT.'" />'.
+	'<script src="modul/tag/tag_select/tag_select'.MIN.'.js?'.SCRIPT.'"></script>';
 }
 
 function _check($v=array()) {//элемент ГАЛОЧКА
@@ -98,28 +106,6 @@ function _count($v=array()) {//поле количество
 		'<input type="text" readonly value="'.$value.'" />'.
 		'<div class="but"></div>'.
 		'<div class="but but-b"></div>'.
-	'</div>';
-}
-function _select($v=array()) {//выпадающее поле
-	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
-
-	$width = '150px';
-	if(isset($v['width']))
-		if(!$width = _num($v['width']))
-			$width = '100%';
-		else
-			$width .= 'px';
-	$width = ' style="width:'.$width.'"';
-
-	$placeholder = empty($v['placeholder']) ? '' : ' placeholder="'.trim($v['placeholder']).'"';
-
-	return
-	'<input type="hidden" id="'.$attr_id.'" value="'.@$v['value'].'" />'.
-	'<div class="_select disabled dib" id="'.$attr_id.'_select"'.$width.'">'.
-		'<table class="w100p">'.
-			'<tr><td><input type="text" class="select-inp w100p"'.$placeholder.' readonly />'.
-				'<td class="arrow">'.
-		'</table>'.
 	'</div>';
 }
 function _hint() {/* все действия через JS */}

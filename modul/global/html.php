@@ -435,7 +435,7 @@ function _html_script() {//скрипты и стили
 
 	'<script src="modul/page/page'.MIN.'.js?'.SCRIPT.'"></script>'.
 
-	_element_tag_script().
+	_tag_script().
 
 	'<link rel="stylesheet" type="text/css" href="modul/element/element'.MIN.'.css?'.SCRIPT.'" />'.
 	'<script src="modul/element/element'.MIN.'.js?'.SCRIPT.'"></script>'.

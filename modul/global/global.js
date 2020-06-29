@@ -1,7 +1,8 @@
 var ZINDEX = 1000,
 	REGEXP_NUMERIC =       /^\d+$/,
 	REGEXP_NUMERIC_MINUS = /^-?\d+$/,
-	REGEXP_DROB =          /^[\d]+(.[\d]+)?(,[\d]+)?$/,
+	REGEXP_FRACT =         /^[\d]+(.[\d]+)?(,[\d]+)?$/,
+	REGEXP_FRACT_MINUS =   /^-?[\d]+(.[\d]+)?(,[\d]+)?$/,
 	REGEXP_CENA =          /^[\d]+(.[\d]{1,2})?(,[\d]{1,2})?$/,
 	REGEXP_CENA_MINUS =    /^-?[\d]+(.[\d]{1,2})?(,[\d]{1,2})?$/,
 	REGEXP_SIZE =          /^[\d]+(.[\d]{1})?(,[\d]{1})?$/,
@@ -125,11 +126,11 @@ var ZINDEX = 1000,
 		//Может быть отрицательным значением
 		if(typeof v == 'string')
 			v = v.replace(',', '.');
-		if(!REGEXP_DROB.test(v))
+		if(!REGEXP_FRACT.test(v))
 			return 0;
 		if(v == 0)
 			return 0;
-		if(minus && REGEXP_CENA_MINUS.test(v))
+		if(minus && REGEXP_FRACT_MINUS.test(v))
 			return v * 1;
 		return Math.round(v * 100) / 100;
 	},
@@ -158,6 +159,16 @@ var ZINDEX = 1000,
 		if(back)
 			return v.replace(new RegExp("\n",'g'), '<br>');
 		return v.replace(new RegExp('<br>','g'), "\n");
+	},
+	_attrId = function(t) {//формирование аттрибута id
+		var attr_id = t.attr('id');
+
+		if(attr_id)
+			return attr_id;
+
+		attr_id = 'afics' + Math.round(Math.random() * 100000);
+		t.attr('id', attr_id);
+		return attr_id;
 	},
 	_copySel = function(arr, id) {//копирование массива для селекта. Если указан id - игнорируется
 		var send = [];
