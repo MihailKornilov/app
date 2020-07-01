@@ -1637,13 +1637,40 @@ function _elemColDlgId($elem_id, $oo=false) {//получение id диало�
 	return $BL['obj_id'];
 }
 
-function _elemDlgId($elem_id) {//получение id диалога на основании элемента
+function _elemDlgId($elem_id_src) {//получение id диалога на основании элемента
+	$elem_id = $elem_id_src;
 	while($EL = _elemDlgIdEL($elem_id)) {
 		switch($EL['dialog_id']) {
 			case 23: return $EL['num_1'];
+			case 88:
+				$V = json_decode($EL['txt_2'], true);
+
+				//распределение диалогов по порядковым номерам
+				$spv = array();
+				foreach($V['spv'] as $n => $r)
+					$spv[$n] = $r['dialog_id'];
+
+				//распределение элементов по порядковым номерам
+				$elmN = array();
+				foreach($V['col'] as $col)
+					foreach($col['elm'] as $n => $elm_id)
+						$elmN[$elm_id] = $n;
+
+
+				$EL_SRC = _elemDlgIdEL($elem_id_src);
+
+				//todo пока только поиск вложенного элемента, например в [44]
+				if(!$pid = $EL_SRC['parent_id'])
+					return 0;
+				if(!$dlgN = _num(@$elmN[$pid]))
+					return 0;
+				if(empty($spv[$dlgN]))
+					return 0;
+				return $spv[$dlgN];
 		}
+
+
 		if(!$elem_id = _num(@$EL['parent_id'])) {
-			print_r($EL);
 			return 0;
 		}
 	}
