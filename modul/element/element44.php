@@ -62,44 +62,17 @@ function _element44_template_docx($el, $u) {
 	return _element44_print($el, $prm);
 }
 function _elem44css($ell, $txt, $prm=array()) {//применение стилей к значению
-	global $G_HINT;
-
 	$cls = array();
-	$cls['font'] = $ell['font'];
-	$cls['color'] = $ell['color'];
+	$cls[] = $ell['font'];
+	$cls[] = $ell['color'];
 
-	$prm['td_no_end'] = 1;
-
-	//проверка наличия подсказки
-	$hint_id = 0;
-	if(!empty($ell['id'])) {
-		$sql = "SELECT *
-				FROM `_hint`
-				WHERE `element_id`=".$ell['id']."
-				LIMIT 1";
-		if($r = query_assoc($sql)) {
-			$hint_id = 'sp_'.rand(100000,999999);
-
-			unset($r['app_id']);
-			unset($r['on']);
-			unset($r['block_id']);
-			unset($r['element_id']);
-			unset($r['user_id_add']);
-			unset($r['dtime_add']);
-
-			$r['msg'] = _blockHtml('hint', $r['id'], $prm);
-
-			$G_HINT[$hint_id] = $r;
-			$cls['hint'] = $r ? 'hint-on' : '';
-		}
-	}
+	$dataHint = _elemDivDataHint($ell, $prm);
+	$cls[] = $dataHint ? 'hint-on' : '';
 
 	if(!$cls = array_diff($cls, array('')))
 		return $txt;
 
-	$id = $hint_id ? ' id="'.$hint_id.'"' : '';
-
-	return '<span'.$id.' class="'.implode(' ', $cls).'" style="font-size:inherit">'.$txt.'</span>';
+	return '<span class="'.implode(' ', $cls).'" style="font-size:inherit"'.$dataHint.'>'.$txt.'</span>';
 }
 function _elem44vvv($el) {//получение значений для некоторых элементов (для таблиц)
 	if($el['dialog_id'] != 44)
@@ -242,13 +215,6 @@ function PHP12_elem44_setup_vvv($prm) {
 			$json[$n]['title'] = $ell['title'];
 			$json[$n]['font'] = $ell['font'];
 			$json[$n]['color'] = $ell['color'];
-
-			//прикрепление id подсказок
-			$sql = "SELECT `id`
-					FROM `_hint`
-					WHERE `element_id`=".$r['id']."
-					LIMIT 1";
-			$json[$n]['hint_id'] = query_value($sql);
 		}
 
 	return $json;

@@ -348,7 +348,7 @@ function _html() {
 	'<head>'.
 		'<meta http-equiv="content-type" content="text/html; charset=utf-8" />'.
 //		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
-		'<title>'._html_title().'</title>'.
+		'<title>'._html_title(true).'</title>'.
 		'<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">'.
 		_html_script().
 	'</head>'.
@@ -368,13 +368,17 @@ function _html() {
 		_debug().
 	'</body></html>';
 }
-function _html_title() {
+function _html_title($nameOnly=false) {
 	if(!CODE)
 		return 'Авторизация';
 	if(!APP_ID)
 		return 'Мои приложения';
 
-	return _app(APP_ID, 'name');
+
+
+	return
+		($nameOnly ? '' : _imageHtml(_app(APP_ID, 'img'), 26).' ')
+		._app(APP_ID, 'name');
 }
 function _html_script() {//скрипты и стили
 	//глобальная ссылка для отправки запросов ajax
@@ -473,7 +477,9 @@ function _html_hat() {//верхняя строка приложения для 
 					'<div class="uname">'.USER_NAME.'</div>'.
 					'<dl>'.
 						'<dd onclick="location.href=\''.URL.'&p=14\'">Мои настройки'.
-						'<dd onclick="location.href=\''.URL.'&p=98\'">Мои приложения'.
+						'<dd id="hat-my-app">'.
+							'<span onclick="location.href=\''.URL.'&p=98\'">Мои приложения</span>'.
+							_html_hat_MyApp().
 						_hat_link_admin().
 						_hat_link_task().
 						_hat_link_manial().
@@ -501,6 +507,25 @@ function _html_hat() {//верхняя строка приложения для 
 		'$(window).resize(hatW);'.
 		'hatW();'.
 	'</script>';
+}
+function _html_hat_MyApp() {
+	if(!$arr = PHP12_app_list('arr'))
+		return '';
+
+	$send = '<div>'.
+				'<table class="w100p mt10 mb10">';
+
+	foreach($arr as $r) {
+		$on = $r['app_id'] == APP_ID;
+		$send .=
+			'<tr onclick="_appEnter('.$r['app_id'].')" class="'.($on ? 'on' : '').'">'.
+				'<td class="w20 pad5">'._imageHtml(_app($r['app_id'], 'img'), 25).
+				'<td class="l fs12 pl5'.($on ? ' b' : '').'">'._app($r['app_id'], 'name');
+	}
+
+	$send .= '</table></div>';
+
+	return $send;
 }
 function _html_sa_access_msg() {//сообщение о закрытом доступе приложения для SA
 	if(!SA)
@@ -768,7 +793,7 @@ function _app_copy_spisok($app_id_dst) {//копирование разрешё�
 	}
 
 }
-function PHP12_app_list() {//список приложений, которые доступны пользователю
+function PHP12_app_list($return='html') {//список приложений, которые доступны пользователю
 	if(!USER_ID)
 		return '';
 
@@ -780,10 +805,14 @@ function PHP12_app_list() {//список приложений, которые �
 			  AND !`app_archive`
 			ORDER BY `uasort`";
 	if(!$spisok = query_arr($sql))
-		return
+		return $return == 'arr' ? array() :
 			'<div class="center pad30 color-555 fs15">'.
 				'Доступных приложений нет.'.
 			'</div>';
+
+	if($return == 'arr')
+		return $spisok;
+
 
 	$sql = "SELECT
 				`app_id`,

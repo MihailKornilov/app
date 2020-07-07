@@ -3276,8 +3276,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				use:t.attr('data-use') || 'font color eye link place hint',//использование вариантов настроек
 				font:'',
 				color:'',
-				pos:'',
-				hint_id:_num(t.attr('data-hint-id'))
+				pos:''
 			};
 
 		if(!v.id)
@@ -3311,12 +3310,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					  '<div class="icon icon-link pl' + _tooltip('Настроить ссылку', -57) + '</div>';
 		if(use.place)
 			msg += '<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v, true);
-
-		if(use.hint)
-			msg += '<td class="pl3">' +
-					   '<div val="dialog_id:43,element_id:' + v.id + ',edit_id:'  + v.hint_id + '"' +
-						   ' class="icon icon-hint curP dialog-open' + _dn(!v.hint_id, 'pl') + _tooltip('Настроить подсказку', -65) +
-					   '</div>';
 
 		msg += '</table>';
 
@@ -5272,8 +5265,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				dialog_id:50, //id диалога, через который был вставлен этот элемент
 				title:'',     //имя элемента
 				font:'',
-				color:'',
-				hint_id:0
+				color:''
 			}, v || {});
 
 			DL.append(
@@ -5289,7 +5281,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									  ' placeholder="элемент не выбран"' +
 									  ' value="' + v.title + '"' +
 									  ' data-use="font color link eye hint"' +
-									  ' data-hint-id="' + v.hint_id + '"' +
 								' />' +
 								'<div class="icon icon-star pabs top6 r5"></div>' +
 							'<td class="w50 r">' +

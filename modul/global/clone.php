@@ -132,11 +132,6 @@ function _appDel($app_id=APP_ID) {
 			WHERE `app_id`=".$app_id;
 	query($sql);
 
-	//удаление подсказок
-	$sql = "DELETE FROM `_hint`
-			WHERE `app_id`=".$app_id;
-	query($sql);
-
 	//удаление шаблонов документов
 	$sql = "DELETE FROM `_template`
 			WHERE `app_id`=".$app_id;
@@ -248,7 +243,6 @@ function _clone($appDst) {//клонирование приложения
 	_clone_action();
 	_clone_counter();
 	_clone_cron();
-	_clone_element_hint();
 	_clone_spisok();
 
 	_debug_cache_clear();
@@ -1339,48 +1333,6 @@ function _clone_cron() {
 					'".addslashes( _clone_json($r['src_prm'], $assEL))."',
 					"._num(@$assDLG[$r['dst_spisok']]).",
 					'".$r['dst_prm']."',
-
-					".USER_ID."
-				)";
-		query($sql);
-	}
-}
-function _clone_element_hint() {
-	$sql = "SELECT *
-			FROM `_hint`
-			WHERE `app_id`=".CLONE_ID_SRC."
-			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
-		return;
-
-	$ass = _clone_ass();
-	$assEL = $ass[_table('_element')];
-
-	foreach($arr as $r) {
-		$sql = "INSERT INTO `_hint` (
-					`app_id`,
-
-					`element_id`,
-					`on`,
-					`msg`,
-					`side`,
-					`pos_h`,
-					`pos_v`,
-					`delay_show`,
-					`delay_hide`,
-
-					`user_id_add`
-				) VALUES (
-					".CLONE_ID_DST.",
-
-					"._num(@$assEL[$r['element_id']]).",
-					".$r['on'].",
-					'".addslashes($r['msg'])."',
-					".$r['side'].",
-					".$r['pos_h'].",
-					".$r['pos_v'].",
-					".$r['delay_show'].",
-					".$r['delay_hide'].",
 
 					".USER_ID."
 				)";

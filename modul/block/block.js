@@ -23,8 +23,7 @@ var _ids = function(v, count) {
 
 		var t = $(this),
 			block_id = _num(t.attr('val')),
-			BL = BLKK[block_id],
-			hint_id = BL.hint ? BL.hint.id : 0;
+			BL = BLKK[block_id];
 
 		BL.id = block_id;
 
@@ -38,7 +37,6 @@ var _ids = function(v, count) {
 						'<tr><td class="w50">' +
 								'<a val="dialog_id:117,get_id:' + BL.id + '" class="dialog-open fs16 blue' + (SA ? _tooltip('info #' + BL.id, -23)  : '">') + 'Блок' + '</a>' +
 							'<td class="w90 r pb2">' +
-								'<div val="dialog_id:43,block_id:' + block_id + ',edit_id:' + _num(BL.hint) + '" class="icon icon-hint curP dialog-open' + _dn(!BL.hint, 'pl') + _tooltip('Настроить подсказку<br>для блока', -65, false, true) + '</div>' +
 								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +
 								'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
 					'</table>' +
@@ -402,7 +400,7 @@ var _ids = function(v, count) {
 
 		return '<div class="mt20 center">' +
 					'<button class="vk small orange mb5" onclick="_blockUnitGrid($(this),' + BL.id + ')">Настроить подблоки</button>' +
- (!BL.child_count ? '<button class="dialog-open vk small" id="elem-hint-add" val="dialog_id:50,block_id:' + BL.id + '">Вставить элемент</button>' : '') +
+ (!BL.child_count ? '<button class="dialog-open vk small" id="elem-paste" val="dialog_id:50,block_id:' + BL.id + '">Вставить элемент</button>' : '') +
 				'</div>';
 	},
 	_blockUnitGrid = function(obj, block_id) {
@@ -455,13 +453,12 @@ var _ids = function(v, count) {
 		var EL = ELMM[BL.elem_id];
 		EL.id = BL.elem_id;
 
-		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-hint-' + EL.id + '">' +
+		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-edit-' + EL.id + '">' +
 			'<div class="line-b">' +
 				'<a val="dialog_id:118,get_id:' + EL.id + '" class="fs16 blue dialog-open' + _tooltip('Info #' + EL.id, -5) + 'Элемент</a>' +
 				'<div class="fr mtm3">' +
 					_elemUnitUrl(EL) +
 					_elemUnitFormat(EL) +
-					_elemUnitHint(EL) +
 					_elemUnitAction(EL) +
 					'<div val="dialog_id:' + EL.dialog_id + ',edit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
 					'<div val="dialog_id:' + EL.dialog_id + ',del_id:' + EL.id + '" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
@@ -482,13 +479,6 @@ var _ids = function(v, count) {
 		if(!EL.eye)
 			return '';
 		return '<div val="dialog_id:240,block_id:' + EL.block_id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
-	},
-	_elemUnitHint = function(EL) {//иконка для настройки выплывающей подсказки
-		if(!EL.rule15)
-			return '';
-		return '<div val="dialog_id:43,element_id:' + EL.id + ',edit_id:' + _num(EL.hint) + '"' +
-				   ' class="icon icon-hint ml3 curP dialog-open' + _dn(!EL.hint, 'pl') + _tooltip('Настроить подсказку<br>для элемента', -65, false, true) +
-			   '</div>';
 	},
 	_elemUnitAction = function(EL) {//иконка для настройки действий
 		if(!EL.eadi)
@@ -1009,9 +999,9 @@ $(document)
 			return;
 
 		if(BL.elem_id)
-			return $('#elem-hint-' + BL.elem_id + ' .icon-edit').trigger('click');
+			return $('#elem-edit-' + BL.elem_id + ' .icon-edit').trigger('click');
 
-		$('#elem-hint-add').trigger('click');
+		$('#elem-paste').trigger('click');
 	})
 	.on('click', '.block-click-page', function(e) {//нажатие на блок для перехода на страницу
 		e.stopPropagation();
@@ -1040,8 +1030,15 @@ $(document)
 	})
 	.on('mouseenter', '.hint-on', function() {//вывод подсказки для блока или элемента
 		var t = $(this),
-			attr_id = t.attr('id'),
-			spl = t.attr('id').split('_'),
+			attr_id = t.attr('data-hint-id');
+
+		if(!attr_id) {
+			attr_id = t.attr('id');
+			if(!attr_id)
+				throw new Error('Отсутствует идентификатор подсказки.');
+		}
+
+		var spl = attr_id.split('_'),
 			id = _num(spl[1]),
 			obj,//объект - блок или элемент
 			h = HINT[attr_id];  //данные по подсказке;
@@ -1056,6 +1053,9 @@ $(document)
 			case 'sp':
 				obj = $('#' + attr_id);
 				break;
+			case 'hint':
+				obj = t;
+				break;
 			default: return;
 		}
 
@@ -1063,27 +1063,54 @@ $(document)
 		if(!obj || !h)
 			return;
 
-		var side = {
+		var side = {//сторона всплытия
 				0:'auto',
 				755:'top',
 				756:'bottom',
 				757:'left',
-				758:'right'
+				758:'right',
+
+				15169:'top',
+				15170:'bottom',
+				15171:'left',
+				15172:'right'
 			},
 			sideObj = {
 				755:'h',
 				756:'h',
 				757:'v',
-				758:'v'
+				758:'v',
+
+				15169:'h',
+				15170:'h',
+				15171:'v',
+				15172:'v'
 			},
-			objPos = {
+			objPos = {//показ относительно элемента
 				767:'center',
 				768:'left',
 				769:'right',
 
+				15173:'center',
+				15174:'left',
+				15175:'right',
+
 				772:'center',
 				773:'top',
-				774:'bottom'
+				774:'bottom',
+
+				15176:'center',
+				15177:'left',
+				15178:'right'
+			},
+			ugPos = {//позиция уголка на подсказке
+				15210:'center',
+				15211:'left',
+				15212:'right',
+
+				15215:'center',
+				15216:'top',
+				15217:'bottom'
 			};
 		var o = {
 			msg:_br(h.msg, 1),
@@ -1093,8 +1120,12 @@ $(document)
 			delayShow:h.delay_show,
 			delayHide:h.delay_hide
 		};
-		if(h.side)
+		if(h.side) {
 			o.objPos = objPos[h['pos_' + sideObj[h.side]]];
+			o.ugPos = ugPos[h['ug_' + sideObj[h.side]]];
+		}
+		console.log(HINT[attr_id]);
+		console.log(o);
 		obj._hint(o);
 	});
 

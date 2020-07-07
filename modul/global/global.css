@@ -309,6 +309,27 @@ body:not(.site){position:relative}
 #hat-user.ispas dl{display:none}
 #hat-user dd:not(:hover) .icon{opacity:.7}
 
+/* подменю с моими приложениями в шапке */
+#hat-my-app{position:relative}
+
+#hat-my-app > div,
+#hat-my-app:hover{background-color:#697F99}
+#hat.local #hat-my-app > div,
+#hat.local #hat-my-app:hover{background-color:#777}
+
+#hat-my-app:not(:hover) > div{display:none}
+#hat-my-app > div{
+	position:absolute;
+	top:0;
+	left:-220px;
+	width:220px;
+	border-radius:3px 0 3px 3px;
+	box-shadow:-4px 4px 6px 0 rgba(100,100,100,.4);
+}
+#hat-my-app tr:not(:hover):not(.on){opacity:0.5}
+
+
+
 
 
 

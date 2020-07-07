@@ -51,7 +51,7 @@ session_start();
 //$_SERVER["PHP_AUTH_PW"] = "6000030";
 
 //сборщик подсказок
-$G_HINT = array();
+$HINT_MASS = array();
 
 function _setting() {//установка констант-настроек
 	$key = 'SETTING';
@@ -844,6 +844,7 @@ function _jsCacheBlkOne($block_id) {
 	$val['xx'] = $r['xx'];
 	$val['xx_ids'] = $r['xx_ids'];
 
+	// action229
 	if(!empty($r['hint']))
 		$val['hint'] = $r['hint'];
 	if($r['obj_name'] == 'dialog') {

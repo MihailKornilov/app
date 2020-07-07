@@ -769,6 +769,16 @@ function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины
 	}
 	return 0;
 }
+function _blockDlgId($block_id) {//получение id диалога по блоку
+	if(!$BL = _BE('block_one', $block_id))
+		return 0;
+
+	switch($BL['obj_name']) {
+		case 'spisok': return _elemDlgId($BL['obj_id']);
+	}
+
+	return 0;
+}
 
 function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элемента
 	//attr_id не ставится в элементе шаблона в рабочей версии
@@ -777,6 +787,23 @@ function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элеме�
 
 	return ' id="el_'.$el['id'].'"';
 }
+function _elemDivDataHint($el, $prm) {//аттрибут data-подсказка для элемента
+	global $HINT_MASS;
+
+	if(empty($el['id']))
+		return '';
+	if(!$hint = _BE('hint_elem_one', $el['id']))
+		return '';
+
+	$hint_attr = 'hint_'.rand(100000,999999);
+	$prm['td_no_end'] = 1;
+	$hint['msg'] = _blockHtml('hint', $hint['id'], $prm);
+	unset($hint['id']);
+	$HINT_MASS[$hint_attr] = $hint;
+
+	return ' data-hint-id="'.$hint_attr.'"';
+}
+
 function _elemDivSize($el) {//класс - размер шрифта
 	if(empty($el['size']))
 		return '';
@@ -809,7 +836,7 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 
 	return
 	_elemDivCol($el, $prm).
-	'<div'.$attr_id.$cls.$style.'>'.$txt.'</div>';
+	'<div'.$attr_id.$cls.$style._elemDivDataHint($el, $prm).'>'.$txt.'</div>';
 }
 function _elemDivCol($el, $prm) {
 	if(empty($el['col']))
@@ -1429,6 +1456,38 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		$BE_FLAG = 0;
 	}
 
+
+
+	if($i == 'hint_one') {//получение данных об одной подсказке по id
+		$key = 'HINT';
+		$hint = _cache_get($key);
+		if(APP_PARENT) {
+			$hintApp = _cache_get($key, APP_PARENT);
+			$hint['ht'] += $hintApp['ht'];
+		}
+
+		if(empty($hint['ht'][$i1]))
+			return array();
+
+		return $hint['ht'][$i1];
+	}
+
+	if($i == 'hint_elem_one') {//получение данных о подсказке для элемента
+		$key = 'HINT';
+		$hint = _cache_get($key);
+		if(APP_PARENT) {
+			$hintApp = _cache_get($key, APP_PARENT);
+			$hint['el'] += $hintApp['el'];
+		}
+
+		if(empty($hint['el'][$i1]))
+			return array();
+
+		return $hint['el'][$i1];
+	}
+
+
+
 	//получение данных одного диалога
 	if($i == 'dialog') {
 		//ID диалога
@@ -1474,6 +1533,10 @@ function _beDefine() {//получение блоков и элементов и
 	$G_ELEM = _beElem();
 	if(APP_PARENT)
 		$G_ELEM += _beElem(APP_PARENT);
+
+	_beHint();
+	if(APP_PARENT)
+		_beHint(APP_PARENT);
 
 	$BE_FLAG = 1;
 }
@@ -1636,6 +1699,55 @@ function _beDlgDelCond($DLG) {//дополнительные условия уд
 
 	return $DLG;
 }
+function _beHint($app_id=0) {//подсказки
+	$key = 'HINT';
+	$global = $app_id ? 0 : 1;
+
+	if(!$send = _cache_get($key, $global)) {
+		$send = array(
+			'el' => array(),//подсказки, прикреплённые к элементам
+			'bl' => array(),//подсказки, прикреплённые к блокам
+			'ht' => array() //все подсказки
+		);
+
+		$sql = "/* CACHE HINT APP".$app_id." */
+				SELECT *
+				FROM `_action`
+				WHERE `app_id`=".$app_id."
+				  AND `dialog_id`=229";
+		if(!$arr = query_arr($sql)) {
+			_cache_set($key, $send, $global);
+			return $send;
+		}
+
+		foreach($arr as $id => $r) {
+			$H = array(
+				'id' => $id,
+				'side' => _num($r['initial_id']),
+				'pos_h' => _num($r['apply_id']),
+				'pos_v' => _num($r['effect_id']),
+				'ug_h' => _num($r['target_ids']),
+				'ug_v' => _num($r['revers']),
+				'delay_show' => _num($r['v1']),
+				'delay_hide' => _num($r['v2']),
+			);
+
+			if($block_id = _num($r['block_id']))
+				$send['bl'][$block_id] = $H;
+			if($elem_id = _num($r['element_id']))
+				$send['el'][$elem_id] = $H;
+
+
+			$H['block_id'] = $block_id;
+			$H['element_id'] = $elem_id;
+			$send['ht'][$id] = $H;
+		}
+
+		_cache_set($key, $send, $global);
+	}
+
+	return $send;
+}
 
 function _beBlock($app_id=0) {//кеш блоков
 	$key = 'BLKK';
@@ -1708,10 +1820,10 @@ function _beBlockStructure($bl) {//формирование массива бл�
 }
 function _beBlockHint($BLK, $app_id) {//подсказки, назначенные элементам
 	$sql = "SELECT *
-			FROM `_hint`
+			FROM `_action`
 			WHERE `app_id`=".$app_id."
-			  AND `block_id`
-			  AND `on`";
+			  AND `dialog_id`=229
+			  AND `block_id`";
 	if(!$hint = query_arr($sql))
 		return $BLK;
 
@@ -1973,10 +2085,10 @@ function _beElemDlg($el) {//настройки элемента из диало�
 }
 function _beElemHint($ELM, $app_id) {//подсказки, назначенные элементам
 	$sql = "SELECT *
-			FROM `_hint`
+			FROM `_action`
 			WHERE `app_id`=".$app_id."
-			  AND `element_id`
-			  AND `on`";
+			  AND `dialog_id`=229
+			  AND `element_id`";
 	if(!$hint = query_arr($sql))
 		return $ELM;
 

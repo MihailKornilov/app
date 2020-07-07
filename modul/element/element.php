@@ -1235,183 +1235,6 @@ function PHP12_spisok23_app() {//списки-таблицы для текуще
 	return PHP12_spisok_app(23, 'Списков-таблиц нет.');
 }
 
-function PHP12_hint43_content($prm) {//содержание подсказки
-	/*
-		имя объекта: hint
-		 id объекта: id подсказки
-	*/
-	if(!$unit = $prm['unit_edit'])
-		return
-		'<div class="bg-ffe pad10">'.
-			_emptyMin('Настройка содержания будет доступна после создания подсказки.').
-		'</div>';
-
-	//максимальная ширина подсказки: 500
-	$width = 500;
-
-	return
-	'<div class="bg-ffc pad10 line-b">'.
-		_blockLevelChange('hint', $unit['id']).
-	'</div>'.
-	'<div class="block-content-hint" style="width:'.$width.'px">'.
-		_blockHtml('hint', $unit['id'], array('blk_setup' => 1)).
-	'</div>';
-}
-function PHP12_hint_spisok($prm) {//список подсказок для управления
-	//Используется в двух местах:
-	//      в Администрировании (условие 1 = 1: конктертное приложение)
-	//      в SA (условие 1 = 0: конструктор)
-
-	$sql = "SELECT *
-			FROM `_hint`
-			WHERE `app_id`=".($prm['el12']['num_1'] ? APP_ID : 0)."
-			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
-		return _empty('Подсказки не создавались');
-
-	$send = '<table class="_stab">'.
-				'<tr>'.
-			  (SA ? '<th>id' : '').
-					'<th>ВКЛ'.
-					'<th>Привязана'.
-					'<th>Размещена'.
-					'<th>Содержание'.
-					'<th>Создана'.
-					'<th>';
-	foreach($arr as $id => $r) {
-		$place = '';
-
-		$BL = array();
-		if($r['block_id'])
-			$BL = _blockOne($r['block_id']);
-		if($r['element_id'])
-			if($EL = _elemOne($r['element_id']))
-				$BL = $EL['block'];
-
-
-		if(!empty($BL))
-			switch($BL['obj_name']) {
-				case 'page':
-					$page = _page($BL['obj_id']);
-
-					//если страница получает данные списка, получение первого id значения этого списка
-					$unit = '';
-					if($did = $page['dialog_id_unit_get']) {
-						$sql = "SELECT `id`
-								FROM `_spisok`
-								WHERE `dialog_id`=".$did."
-								ORDER BY `id`
-								LIMIT 1";
-						$unit = '&id='.query_value($sql);
-					}
-					$place = '<a href="'.URL.'&p='.$page['id'].$unit.'&block_flash='.$BL['id'].'">На странице <b>'.$page['name'].'</b></a>';
-					break;
-				case 'dialog':
-					$dlg = _dialogQuery($BL['obj_id']);
-					$place = '<a class="dialog-open" val="dialog_id:'.$dlg['id'].',block_flash:'.$BL['id'].'">В диалоге <b>'.$dlg['name'].'</b></a>';
-					break;
-				case 'dialog_del':
-					$place = 'В содержании удаления';
-					break;
-				case 'spisok':
-					$place = 'В списке';
-					break;
-			}
-
-		$send .=
-			'<tr class="over1">'.
-		  (SA ? '<td class="r pale">'.$id : '').
-				'<td class="center">'.
-		($r['on'] ? '<div class="icon icon-ok"></div>' : '').
-				'<td>'.($r['block_id'] ? 'к блоку' : 'к элементу').
-				'<td>'.$place.
-				'<td>'._blockHtml('hint', $id, array('td_no_end'=>1)).
-				'<td class="r grey">'.FullDataTime($r['dtime_add'], 1).
-				'<td><div class="icon icon-edit dialog-open" val="dialog_id:43,edit_id:'.$id.'"></div>';
-	}
-	$send .= '</table>';
-	return $send;
-}
-function _hintObj($obj_name, $obj_id) {//подсказки, размещённые на странице, в диалоге
-	global $G_HINT;
-	$send = $G_HINT;
-
-	$sql = "SELECT `id`
-			FROM `_block`
-			WHERE `obj_name`='".$obj_name."'
-			  AND `obj_id`=".$obj_id;
-	if(!$blkIds = query_ids($sql))
-		return $send;
-
-
-	//получение подсказок для блоков
-	$sql = "SELECT *
-			FROM `_hint`
-			WHERE `block_id` IN (".$blkIds.")
-			ORDER BY `id`";
-	if($hint = query_arr($sql))
-		foreach($hint as $id => $r) {
-			$block_id = $r['block_id'];
-			unset($r['app_id']);
-			unset($r['on']);
-			unset($r['block_id']);
-			unset($r['element_id']);
-			unset($r['user_id_add']);
-			unset($r['dtime_add']);
-
-			$prm = array('td_no_end' => 1);
-
-			if($BL = _blockOne($block_id)) {
-				switch($BL['obj_name']) {
-					case 'page':
-						if(!$page = _page($BL['obj_id']))
-							break;
-						if(!$dialog_id = $page['dialog_id_unit_get'])
-							break;
-						if(!$dialog = _dialogQuery($dialog_id))
-							break;
-						if(!$prm['unit_get_id'] = _num(@$_GET['id']))
-							break;
-						$prm['unit_get'] = _spisokUnitQuery($dialog, $prm['unit_get_id']);
-						break;
-				}
-			}
-
-			$r['msg'] = _blockHtml('hint', $id, $prm);
-			$send['bl_'.$block_id] = $r;
-		}
-
-
-	//получение подсказок для элементов
-	$sql = "SELECT `id`
-			FROM `_element`
-			WHERE `block_id` IN (".$blkIds.")";
-	if(!$elmIds = query_ids($sql))
-		return $send;
-
-	$sql = "SELECT *
-			FROM `_hint`
-			WHERE `element_id` IN (".$elmIds.")
-			ORDER BY `id`";
-	if(!$hint = query_arr($sql))
-		return $send;
-
-	foreach($hint as $id => $r) {
-		$elem_id = $r['element_id'];
-		unset($r['app_id']);
-		unset($r['on']);
-		unset($r['block_id']);
-		unset($r['element_id']);
-		unset($r['user_id_add']);
-		unset($r['dtime_add']);
-		$r['msg'] = _blockHtml('hint', $id, array('td_no_end'=>1));
-		$send['el_'.$elem_id] = $r;
-	}
-
-	return $send;
-}
-
-
 function _elemRule($i='all', $v=0) {//кеш правил для элементов
 	global  $RULE_USE,//массив всех правил
 			$DLG_ASS, //элемент содержит правило
@@ -1641,6 +1464,7 @@ function _elemDlgId($elem_id_src) {//получение id диалога на �
 	$elem_id = $elem_id_src;
 	while($EL = _elemDlgIdEL($elem_id)) {
 		switch($EL['dialog_id']) {
+			case 14:
 			case 23: return $EL['num_1'];
 			case 88:
 				$V = json_decode($EL['txt_2'], true);
@@ -1667,12 +1491,14 @@ function _elemDlgId($elem_id_src) {//получение id диалога на �
 				if(empty($spv[$dlgN]))
 					return 0;
 				return $spv[$dlgN];
+			case 44:
+				if($block_id = $EL['block_id'])
+					return _blockDlgId($block_id);
+				break;
 		}
 
-
-		if(!$elem_id = _num(@$EL['parent_id'])) {
+		if(!$elem_id = _num(@$EL['parent_id']))
 			return 0;
-		}
 	}
 
 	return 0;

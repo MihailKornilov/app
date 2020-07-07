@@ -200,8 +200,8 @@ function PHP12_v_choose($prm) {
 		//настройка баланса [27]
 		$obj_id = PHP12_v_choose_27balans($BL, $obj_id);
 
-		//блок выплывающей подсказки [43]
-		$obj_id = PHP12_v_choose_43hint($BL, $obj_id);
+		//выплывающая подсказка [act229]
+		$obj_id = _hintDlgId($BL, $obj_id);
 	}
 
 	if($obj_id === false)
@@ -474,44 +474,6 @@ function PHP12_v_choose_27balans($BL, $obj_id) {//ячейка таблицы
 		return false;
 
 	return _num($BL['obj_id']);
-}
-function PHP12_v_choose_43hint($BL, $obj_id) {//выплывающая подсказка
-	if($obj_id)
-		return $obj_id;
-
-	//проверка, что подсказка именно из блока
-	if($BL['obj_name'] != 'hint')
-		return false;
-
-	//получение данных о подсказке
-	$sql = "SELECT *
-			FROM `_hint`
-			WHERE `id`=".$BL['obj_id'];
-	if(!$hint = query_assoc($sql))
-		return 'Не получены данные подсказки id:'.$BL['obj_id'];
-
-	//получение данных блока, к которому прикреплена подсказка
-	if($block_id = $hint['block_id']) {
-		if(!$BBL = _blockOne($block_id))
-			return 'Не получены данные блока, к которому прикреплена подсказка';
-
-		switch($BBL['obj_name']) {
-			case 'page':
-				if(!$page = _page($BBL['obj_id']))
-					return '[11] Не получены данные страницы';
-				if(!$dialog_id = $page['dialog_id_unit_get'])
-					return '[11] Страница не принимает данные записи';
-				return $dialog_id;
-			default:
-				return 'Не определено местоположение блока';
-		}
-
-	}
-
-	if($dlg_id = _elemDlgId($hint['element_id']))
-		return $dlg_id;
-
-	return 'Не определено местоположение подсказки';
 }
 
 
