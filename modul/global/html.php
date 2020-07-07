@@ -374,10 +374,8 @@ function _html_title($nameOnly=false) {
 	if(!APP_ID)
 		return 'Мои приложения';
 
-
-
 	return
-		($nameOnly ? '' : _imageHtml(_app(APP_ID, 'img'), 26).' ')
+		($nameOnly ? '' : '<span class="mr5">'._imageHtml(_app(APP_ID, 'img'), 26).'</span>')
 		._app(APP_ID, 'name');
 }
 function _html_script() {//скрипты и стили
