@@ -375,7 +375,7 @@ function _html_title($nameOnly=false) {
 		return 'Мои приложения';
 
 	return
-		($nameOnly ? '' : '<span class="mr5">'._imageHtml(_app(APP_ID, 'img'), 26).'</span>')
+		($nameOnly ? '' : '<span class="mr5">'._imageHtml(_app(APP_ID, 'img'), 26, 26, false, false).'</span>')
 		._app(APP_ID, 'name');
 }
 function _html_script() {//скрипты и стили
@@ -517,7 +517,7 @@ function _html_hat_MyApp() {
 		$on = $r['app_id'] == APP_ID;
 		$send .=
 			'<tr onclick="_appEnter('.$r['app_id'].')" class="'.($on ? 'on' : '').'">'.
-				'<td class="w20 pad5">'._imageHtml(_app($r['app_id'], 'img'), 25).
+				'<td class="w20 pad5">'._imageHtml(_app($r['app_id'], 'img'), 25, 25, false, false).
 				'<td class="l fs12 pl5'.($on ? ' b' : '').'">'._app($r['app_id'], 'name');
 	}
 

@@ -367,7 +367,14 @@ function _blockActionView($bl, $prm) {//условия отображения б
 					break;
 
 				foreach($F as $ff) {
-					$v = _elemUids($ff['elem_id'], $u);
+					if($el = _elemOne($ff['elem_id'])) {
+						$v = 0;
+						if($col = _elemCol($el))
+							if(!empty($u[$col]))
+								$v = is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
+					} else
+						$v = _elemUids($ff['elem_id'], $u);
+
 
 					switch($ff['cond_id']) {
 						//отсутствует
