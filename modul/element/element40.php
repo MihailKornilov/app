@@ -97,7 +97,7 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 		return $page['dialog_id_unit_get'];
 	}
 
-	return 0;
+	return _blockDlgId($block_id);
 }
 function _elem40json($cond) {//перевод данных фильтра из JSON в array
 	if(empty($cond))

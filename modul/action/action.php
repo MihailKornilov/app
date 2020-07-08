@@ -636,7 +636,7 @@ function _hintCacheClear($dlg) {//очистка кеша подсказок
 	_cache_clear('HINT', 1);
 	$BE_FLAG = 0;
 }
-function _hintDlgId($BL, $obj_id) {//поиск id диалога для подсказки
+function _hintDlgId($BL, $obj_id=0) {//поиск id диалога для подсказки
 	if($obj_id)
 		return $obj_id;
 

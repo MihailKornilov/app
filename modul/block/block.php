@@ -367,14 +367,7 @@ function _blockActionView($bl, $prm) {//условия отображения б
 					break;
 
 				foreach($F as $ff) {
-					if(!$el = _elemOne($ff['elem_id']))
-						break;
-
-					$v = 0;
-
-					if($col = _elemCol($el))
-						if(!empty($u[$col]))
-							$v = is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
+					$v = _elemUids($ff['elem_id'], $u);
 
 					switch($ff['cond_id']) {
 						//отсутствует
@@ -775,6 +768,7 @@ function _blockDlgId($block_id) {//получение id диалога по б�
 
 	switch($BL['obj_name']) {
 		case 'spisok': return _elemDlgId($BL['obj_id']);
+		case 'hint': return _hintDlgId($BL);
 	}
 
 	return 0;
