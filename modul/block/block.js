@@ -473,7 +473,7 @@ var _ids = function(v, count) {
 	_elemUnitUrl = function(EL) {//иконка для настройки ссылки
 		if(!EL.url_use)
 			return '';
-		return '<div val="dialog_id:220,block_id:' + EL.block_id + '" class="icon icon-link ml3 pl dialog-open' + _tooltip('Настроить ссылку', -56) + '</div>'
+		return '<div val="dialog_id:220,element_id:' + EL.id + '" class="icon icon-link ml3 pl dialog-open' + _tooltip('Настроить ссылку', -56) + '</div>'
 	},
 	_elemUnitFormat = function(EL) {//иконка с дополнительными условиями отображения
 		if(!EL.eye)

@@ -606,6 +606,10 @@ function _hintDlgId($BL, $obj_id=0) {//поиск id диалога для по�
 				if(!$dialog_id = $page['dialog_id_unit_get'])
 					return '[11] Страница не принимает данные записи';
 				return $dialog_id;
+			case 'spisok':
+				if(!$dlg_id = _elemDlgId($BBL['obj_id']))
+					return 0;
+				return $dlg_id;
 			default:
 				return 'Не определено местоположение блока';
 		}
