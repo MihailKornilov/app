@@ -226,8 +226,8 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 			$cls[] = !$xEnd ? trim($BR) : '';
 			$cls[] = $r['id'] == $grid_id ? 'block-unit-grid' : '';
 			$cls[] = $r['pos'];
-			$cls[] = !$PARAM['blk_setup'] && _blockActionIsClick($r, $PARAM) ? 'curP' : '';
-			$cls[] = !$PARAM['blk_setup'] && !empty($r['hint']) ? 'hint-on' : '';//применение подсказки
+			$cls[] = _blockActionIsClick($r, $PARAM);
+			$cls[] = _blockHintOn($r, $PARAM);//применение подсказки
 			$cls = array_diff($cls, array(''));
 			$cls = implode(' ', $cls);
 
@@ -242,6 +242,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 						' class="'.$cls.'"'.
 						_blockStyle($r, $PARAM, $width).
 						_blockAction($r, $PARAM).
+						_blockDataHint($r, $PARAM).
 					 '>'.
 							_blockSetka($r, $PARAM, $grid_id, $level).
 							_blockChoose($r, $PARAM, $level).
@@ -273,9 +274,9 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 }
 function _blockActionIsClick($r, $prm) {//проверка действий блока, если блок кликабельный - показ руки
 	if($prm['blk_setup'])
-		return false;
+		return '';
 	if(empty($r['action']))
-		return false;
+		return '';
 
 	foreach($r['action'] as $act)
 		switch($act['dialog_id']) {
@@ -287,16 +288,12 @@ function _blockActionIsClick($r, $prm) {//проверка действий бл
 			case 216:
 			case 217:
 			case 219:
-				return true;
+				return 'curP';
 		}
 
-	return false;
+	return '';
 }
 function _blockAction($r, $prm) {//действие при нажатии на блок
-	if($prm['blk_setup'])
-		return '';
-	if(empty($r['action']))
-		return '';
 	if(!_blockActionIsClick($r, $prm))
 		return '';
 
@@ -432,6 +429,27 @@ function _blockActionView($bl, $prm) {//условия отображения б
 		}
 
 	return $bl;
+}
+function _blockDataHint($bl, $prm) {//аттрибут data-подсказка для блока
+	if($prm['blk_setup'])
+		return '';
+	if(empty($bl['id']))
+		return '';
+	if(!$hint = _BE('hint_block_one', $bl['id']))
+		return '';
+
+	$prm['td_no_end'] = 1;
+	$hint['msg'] = _blockHtml('hint', $hint['id'], $prm);
+
+	return ' data-hint-id="'._hintMassPush($hint).'"';
+}
+function _blockHintOn($bl, $prm) {
+	if($prm['blk_setup'])
+		return '';
+	if(!_BE('hint_block_one', $bl['id']))
+		return '';
+
+	return 'hint-on';
 }
 function _blockDlgShow($bl, $prm) {//отображение блока при создании или изменении диалога
 	if($bl['hidden'])
@@ -781,6 +799,7 @@ function _blockDlgId($block_id) {//получение id диалога по б�
 	return 0;
 }
 
+
 function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элемента
 	//attr_id не ставится в элементе шаблона в рабочей версии
 	if(!$prm['blk_setup'] && $el['block']['obj_name'] == 'spisok')
@@ -789,20 +808,27 @@ function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элеме�
 	return ' id="el_'.$el['id'].'"';
 }
 function _elemDivDataHint($el, $prm) {//аттрибут data-подсказка для элемента
-	global $HINT_MASS;
-
+	if(!empty($prm['blk_setup']))
+		return '';
 	if(empty($el['id']))
 		return '';
 	if(!$hint = _BE('hint_elem_one', $el['id']))
 		return '';
 
-	$hint_attr = 'hint_'.rand(100000,999999);
 	$prm['td_no_end'] = 1;
 	$hint['msg'] = _blockHtml('hint', $hint['id'], $prm);
-	unset($hint['id']);
-	$HINT_MASS[$hint_attr] = $hint;
 
-	return ' data-hint-id="'.$hint_attr.'"';
+	return ' data-hint-id="'._hintMassPush($hint).'"';
+}
+function _elemHintOn($el, $prm=array()) {
+	if(!empty($prm['blk_setup']))
+		return '';
+	if(empty($el['id']))
+		return '';
+	if(!_BE('hint_elem_one', $el['id']))
+		return '';
+
+	return 'hint-on';
 }
 
 function _elemDivSize($el) {//класс - размер шрифта
@@ -829,7 +855,7 @@ function _elemDiv($bl, $prm=array()) {//формирование div элеме�
 	$cls[] = _elemAction242($el, $prm);
 	$cls[] = @$el['font'];
 	$cls[] = _elemDivSize($el);
-	$cls[] = empty($prm['blk_setup']) && !empty($el['hint']) ? 'hint-on' : '';//применение подсказки
+	$cls[] = _elemHintOn($el, $prm);;//наличие подсказки
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
@@ -1487,6 +1513,20 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		return $hint['el'][$i1];
 	}
 
+	if($i == 'hint_block_one') {//получение данных о подсказке для блока
+		$key = 'HINT';
+		$hint = _cache_get($key);
+		if(APP_PARENT) {
+			$hintApp = _cache_get($key, APP_PARENT);
+			$hint['bl'] += $hintApp['bl'];
+		}
+
+		if(empty($hint['bl'][$i1]))
+			return array();
+
+		return $hint['bl'][$i1];
+	}
+
 
 
 	//получение данных одного диалога
@@ -1782,7 +1822,6 @@ function _beBlock($app_id=0) {//кеш блоков
 			$BLK[$block_id] = $bl;
 		}
 
-		$BLK = _beBlockHint($BLK, $app_id);
 		$BLK = _beBlockAction($BLK, $app_id);
 
 		_cache_set($key, $BLK, $global);
@@ -1818,24 +1857,6 @@ function _beBlockStructure($bl) {//формирование массива бл�
 		'elem_id' => _num($bl['elem_id']),
 		'elem' => array()
 	);
-}
-function _beBlockHint($BLK, $app_id) {//подсказки, назначенные элементам
-	$sql = "SELECT *
-			FROM `_action`
-			WHERE `app_id`=".$app_id."
-			  AND `dialog_id`=229
-			  AND `block_id`";
-	if(!$hint = query_arr($sql))
-		return $BLK;
-
-	foreach(query_arr($sql) as $id => $r) {
-		$block_id = $r['block_id'];
-		if(empty($BLK[$block_id]))
-			continue;
-		$BLK[$block_id]['hint'] = $id;
-	}
-
-	return $BLK;
 }
 function _beBlockAction($blk, $app_id) {//вставка действий для блоков
 	$sql = "SELECT *
@@ -2019,7 +2040,6 @@ function _beElem($app_id=0) {
 			$ELM[$elem_id] = $el;
 		}
 
-		$ELM = _beElemHint($ELM, $app_id);
 		$ELM = _beElemAction($ELM, $app_id);
 
 		//вставка дочерних элементов к родителям
@@ -2083,24 +2103,6 @@ function _beElemDlg($el) {//настройки элемента из диало�
 			}
 
 	return $el;
-}
-function _beElemHint($ELM, $app_id) {//подсказки, назначенные элементам
-	$sql = "SELECT *
-			FROM `_action`
-			WHERE `app_id`=".$app_id."
-			  AND `dialog_id`=229
-			  AND `element_id`";
-	if(!$hint = query_arr($sql))
-		return $ELM;
-
-	foreach($hint as $id => $r) {
-		$elem_id = $r['element_id'];
-		if(empty($ELM[$elem_id]))
-			continue;
-		$ELM[$elem_id]['hint'] = $id;
-	}
-
-	return $ELM;
 }
 function _beElemAction($ELM, $app_id=APP_PARENT) {//действия, назначенные элементам
 	$sql = "SELECT *

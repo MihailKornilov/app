@@ -506,72 +506,18 @@ function PHP12_hint_spisok($prm) {//список подсказок для уп�
 	$send .= '</table>';
 	return $send;
 }
-function _hintObj($obj_name, $obj_id) {//подсказки, размещённые на странице, в диалоге
+function _hintMass() {//получение массива собранных подсказок
 	global $HINT_MASS;
-	$send = $HINT_MASS;
+	return _arrNum($HINT_MASS);
+}
+function _hintMassPush($ht) {//добавление данных подсказки в общий массив
+	global $HINT_MASS;
 
-	_BE('elem_hint_one');
+	$key = 'hint_'.rand(100000, 999999);
+	unset($ht['id']);
+	$HINT_MASS[$key] = $ht;
 
-	$sql = "SELECT `id`
-			FROM `_block`
-			WHERE `obj_name`='".$obj_name."'
-			  AND `obj_id`=".$obj_id;
-	if(!$blkIds = query_ids($sql))
-		return $send;
-
-
-	//получение подсказок для блоков
-	$sql = "SELECT *
-			FROM `_action`
-			WHERE `dialog_id`=229
-			  AND `block_id` IN (".$blkIds.")
-			ORDER BY `id`";
-	if($hint = query_arr($sql))
-		foreach($hint as $action_id => $r) {
-			$block_id = $r['block_id'];
-			$prm = array();
-
-			if($BL = _blockOne($block_id)) {
-				switch($BL['obj_name']) {
-					case 'page':
-						if(!$page = _page($BL['obj_id']))
-							break;
-						if(!$dialog_id = $page['dialog_id_unit_get'])
-							break;
-						if(!$dialog = _dialogQuery($dialog_id))
-							break;
-						if(!$prm['unit_get_id'] = _num(@$_GET['id']))
-							break;
-						$prm['unit_get'] = _spisokUnitQuery($dialog, $prm['unit_get_id']);
-						break;
-				}
-			}
-
-			$send['bl_'.$block_id] = _hintStruct($r, $action_id, $prm);
-		}
-
-/*
-	//получение подсказок для элементов
-	$sql = "SELECT `id`
-			FROM `_element`
-			WHERE `block_id` IN (".$blkIds.")";
-	if(!$elmIds = query_ids($sql))
-		return $send;
-
-	$sql = "SELECT *
-			FROM `_action`
-			WHERE `dialog_id`=229
-			  AND `element_id` IN (".$elmIds.")
-			ORDER BY `id`";
-	if(!$hint = query_arr($sql))
-		return $send;
-
-	foreach($hint as $action_id => $r) {
-		$elem_id = $r['element_id'];
-		$send['el_'.$elem_id] = _hintStruct($r, $action_id);
-	}
-*/
-	return $send;
+	return $key;
 }
 function _hintStruct($r, $id, $prm=array()) {//формирование данных подсказки
 	unset($r['app_id']);

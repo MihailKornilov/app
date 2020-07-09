@@ -80,6 +80,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			       '<table class="w200 bg-eee curP pabs">' + td + '</table>' +
 			   '</div>';
 	},
+	_hintPaste = function(o) {//вставка полученных подсказок в массив
+		if(!o.hint)
+			return;
+
+		if(!window.HINT)
+			HINT = {};
+
+		_forIn(o.hint, function(v, i) {
+			HINT[i] = v;
+		});
+	},
+
 
 	_dialog = function(o) {//диалоговое окно
 		o = $.extend({
@@ -727,10 +739,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			_attr_bl(o.send.block_flash)._flash({color:'red'});
 
 		//вставка подсказок, прикреплённых к блоками или элементам
-		if(o.hint)
-			_forIn(o.hint, function(v, i) {
-				HINT[i] = v;
-			});
+		_hintPaste(o);
 
 		return dialog;
 
@@ -792,15 +801,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					ELMM[res.unit.id] = res.elem_js;
 					if(res.unit.block_id > 0)
 						BLKK[res.unit.block_id].elem_id = res.unit.id;
-				}
-
-				//присвоение id выплывающей подсказке
-				if(o.dialog_id == 43) {
-					var u = res.unit;
-					if(u.block_id)
-						BLKK[u.block_id].hint = u.id;
-					if(u.element_id)
-						ELMM[u.element_id].hint = u.id;
 				}
 			});
 		}
@@ -2366,6 +2366,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								}
 							});
 							FILTER = res.filter;
+							_hintPaste(res);
 						});
 					});
 					return;

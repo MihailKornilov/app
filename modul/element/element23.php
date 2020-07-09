@@ -145,6 +145,7 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 				$cls[] = $td['font'];
 				$cls[] = $td['txt_8'];//pos - позиция
 				$cls[] = _elemAction242($td, $prm);//подмена цвета
+				$cls[] = _elemHintOn($td);//наличие подсказки
 
 				$txt = _elemFormat($td, $prm, $txt);//[23] форматирование для ячеек таблицы
 			}
@@ -153,7 +154,7 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';
 
-			$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
+			$TR .= '<td'.$cls._elemStyleWidth($td)._elemDivDataHint($td, $prm).'>'.$txt;
 		}
 		$MASS[$uid] = $TR;
 	}

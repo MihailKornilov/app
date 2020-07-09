@@ -65,14 +65,12 @@ function _elem44css($ell, $txt, $prm=array()) {//применение стиле
 	$cls = array();
 	$cls[] = $ell['font'];
 	$cls[] = $ell['color'];
-
-	$dataHint = _elemDivDataHint($ell, $prm);
-	$cls[] = $dataHint ? 'hint-on' : '';
+	$cls[] = _elemHintOn($ell, $prm);
 
 	if(!$cls = array_diff($cls, array('')))
 		return $txt;
 
-	return '<span class="'.implode(' ', $cls).'" style="font-size:inherit"'.$dataHint.'>'.$txt.'</span>';
+	return '<span class="'.implode(' ', $cls).'" style="font-size:inherit"'._elemDivDataHint($ell, $prm).'>'.$txt.'</span>';
 }
 function _elem44vvv($el) {//получение значений для некоторых элементов (для таблиц)
 	if($el['dialog_id'] != 44)

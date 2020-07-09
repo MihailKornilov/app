@@ -154,6 +154,8 @@ switch(@$_POST['op']) {
 			$send['clear_diff'] = _filter('diff', $elem_spisok);
 		}
 
+		$send['hint'] = _hintMass();
+
 		jsonSuccess($send);
 		break;
 	case 'spisok_filter_clear'://очистка фильтра
@@ -201,6 +203,7 @@ switch(@$_POST['op']) {
 		}
 
 		$send['filter'] = _filter('page_js');
+		$send['hint'] = _hintMass();
 
 		jsonSuccess($send);
 		break;
@@ -215,6 +218,8 @@ switch(@$_POST['op']) {
 			jsonError('Некорректное значение очередного блока');
 
 		$send['spisok'] = _element14_print($el, array(), $next);
+		$send['hint'] = _hintMass();
+
 		jsonSuccess($send);
 		break;
 	case 'spisok_23_next'://догрузка списка-таблицы
@@ -228,6 +233,8 @@ switch(@$_POST['op']) {
 			jsonError('Некорректное значение очередного блока списка');
 
 		$send['spisok'] = _element23_print($el, array(), $next);
+		$send['hint'] = _hintMass();
+
 		jsonSuccess($send);
 		break;
 	case 'spisok_23_sort':

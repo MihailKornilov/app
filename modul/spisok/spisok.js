@@ -19,6 +19,8 @@ var _spisokUpdate = function(elem_spisok, func) {
 
 			if(func)
 				func(res);
+
+			_hintPaste(res);
 		});
 	},
 	_spisok14Next = function(t, elem_id, next) {
@@ -32,6 +34,7 @@ var _spisokUpdate = function(elem_spisok, func) {
 			var obj = _attr_el(elem_id);
 			obj.append(res.spisok);
 			t.remove();
+			_hintPaste(res);
 		});
 	},
 	_spisok23next = function(t, elem_id, next) {//догрузка списка-таблицы
@@ -44,6 +47,7 @@ var _spisokUpdate = function(elem_spisok, func) {
 		_post(send, function(res) {
 			t.closest('._stab').append(res.spisok);
 			t.remove();
+			_hintPaste(res);
 		});
 	},
 	_spisokSort = function(elem_id) {

@@ -1461,10 +1461,6 @@ function _dialogOpenLoad($dialog_id) {
 		return $send;
 	}
 
-
-
-	$send['hint'] = _arrNum(_hintObj('dialog', $dialog_id));
-
 	$send['width'] = $dialog['width_auto'] ? 0 : _num($dialog['width']);
 
 	$prm['srce']['dss'] = _num(@$_POST['dss']);
@@ -1516,6 +1512,8 @@ function _dialogOpenLoad($dialog_id) {
 		$send['button_submit'] = $dialog['edit_button_submit'];
 		$send['button_cancel'] = $dialog['edit_button_cancel'];
 
+		$send['hint'] = _hintMass();
+
 		$prm = _blockParam($prm);
 		$send['srce'] = $prm['srce'];
 
@@ -1543,7 +1541,7 @@ function _dialogOpenLoad($dialog_id) {
 	$send['button_submit'] = $dialog['insert_button_submit'];
 	$send['button_cancel'] = $dialog['insert_button_cancel'];
 
-
+	$send['hint'] = _hintMass();
 
 	$prm = _blockParam($prm);
 	$send['srce'] = $prm['srce'];

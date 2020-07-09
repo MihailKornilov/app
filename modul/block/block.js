@@ -1032,76 +1032,34 @@ $(document)
 		var t = $(this),
 			attr_id = t.attr('data-hint-id');
 
-		if(!attr_id) {
-			attr_id = t.attr('id');
-			if(!attr_id)
-				throw new Error('Отсутствует идентификатор подсказки.');
-		}
+		if(!attr_id)
+			throw new Error('Отсутствует идентификатор подсказки.');
 
-		var spl = attr_id.split('_'),
-			id = _num(spl[1]),
-			obj,//объект - блок или элемент
-			h = HINT[attr_id];  //данные по подсказке;
-
-		switch(spl[0]) {
-			case 'bl':
-				obj = _attr_bl(id);
-				break;
-			case 'el':
-				obj = _attr_el(id);
-				break;
-			case 'sp':
-				obj = $('#' + attr_id);
-				break;
-			case 'hint':
-				obj = t;
-				break;
-			default: return;
-		}
-
-
-		if(!obj || !h)
+		var h = HINT[attr_id];  //данные по подсказке;
+		if(!h)
 			return;
 
 		var side = {//сторона всплытия
 				0:'auto',
-				755:'top',
-				756:'bottom',
-				757:'left',
-				758:'right',
-
 				15169:'top',
 				15170:'bottom',
 				15171:'left',
 				15172:'right'
 			},
 			sideObj = {
-				755:'h',
-				756:'h',
-				757:'v',
-				758:'v',
-
 				15169:'h',
 				15170:'h',
 				15171:'v',
 				15172:'v'
 			},
 			objPos = {//показ относительно элемента
-				767:'center',
-				768:'left',
-				769:'right',
-
 				15173:'center',
 				15174:'left',
 				15175:'right',
 
-				772:'center',
-				773:'top',
-				774:'bottom',
-
 				15176:'center',
-				15177:'left',
-				15178:'right'
+				15177:'top',
+				15178:'bottom'
 			},
 			ugPos = {//позиция уголка на подсказке
 				15210:'center',
@@ -1124,9 +1082,7 @@ $(document)
 			o.objPos = objPos[h['pos_' + sideObj[h.side]]];
 			o.ugPos = ugPos[h['ug_' + sideObj[h.side]]];
 		}
-		console.log(HINT[attr_id]);
-		console.log(o);
-		obj._hint(o);
+		t._hint(o);
 	});
 
 $.fn._grid = function(o) {
