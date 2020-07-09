@@ -318,7 +318,6 @@ switch(@$_POST['op']) {
 		foreach(_BE('elem_ids_arr', 'dialog', $dialog_id) as $id)
 			$ELM[$id] = array();
 
-		$ELM = _beElemHint($ELM, $DLG['app_id']);
 		$send['elm_js'] = _beElemAction($ELM, $DLG['app_id']);
 
 		jsonSuccess($send);
