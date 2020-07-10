@@ -131,12 +131,12 @@ function _elem201init($el85, $prm, $send) {//получение данных э�
 				return $send;
 
 	//получение настраиваемого элемента
-	if(!$block_id = $srce['block_id'])
-		return $send;
-	if(!$BL = _blockOne($block_id))
-		return $send;
-	if(!$EL = $BL['elem'])
-		return $send;
+	if(!$EL = _elemOne($srce['element_id'])) {
+		if(!$BL = _blockOne($srce['block_id']))
+			return $send;
+		if(!$EL = $BL['elem'])
+			return $send;
+	}
 
 	switch($EL['dialog_id']) {
 		case 1://галочка

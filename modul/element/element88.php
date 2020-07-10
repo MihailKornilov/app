@@ -256,7 +256,7 @@ function PHP12_elem88($prm) {
 	if(!$u = $prm['unit_edit'])
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
 	if(!$BL = _blockOne($prm['srce']['block_id']))
-		return _emptyMin10('Отсутствует исходный блок.');
+		return _emptyMin10('[88] Отсутствует исходный блок.');
 
 	$ex = explode(' ', $BL['elem']['mar']);
 	$w = $BL['width'] - $ex[1] - $ex[3];

@@ -1071,6 +1071,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						_dialogLoad({
 							dialog_id:11,
 							block_id:OBJ.srce.block_id,
+							element_id:OBJ.srce.element_id,
 							dss:OBJ.srce.dss,
 
 							dop:{
@@ -1582,6 +1583,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						_dialogLoad({
 							dialog_id:19,
 							block_id:OBJ.srce.block_id,
+							element_id:OBJ.srce.element_id,
 							dop:{
 								sel:ATR_CMP.val()
 							},

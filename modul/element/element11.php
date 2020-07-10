@@ -172,7 +172,11 @@ function PHP12_v_choose($prm) {
 	//В начале всегда проверяется прямое указание на диалог
 	if(!$obj_id = PHP12_v_choose_dss($prm)) {
 		if(!$block_id = _num($prm['srce']['block_id']))
-			return _emptyMin10('Отсутствует исходный блок.');
+			if($elem_id = _num($prm['srce']['element_id'])) {
+				if(!$EL = _elemOne($elem_id))
+					return _emptyMin10('[11] Отсутствует исходный блок.');
+				$block_id = $EL['block_id'];
+			}
 		if(!$BL = _blockOne($block_id))
 			return _emptyMin10('Блока '.$block_id.' не существует.');
 

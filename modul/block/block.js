@@ -478,12 +478,12 @@ var _ids = function(v, count) {
 	_elemUnitFormat = function(EL) {//иконка с дополнительными условиями отображения
 		if(!EL.eye)
 			return '';
-		return '<div val="dialog_id:240,block_id:' + EL.block_id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
+		return '<div val="dialog_id:240,element_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
 	},
 	_elemUnitAction = function(EL) {//иконка для настройки действий
 		if(!EL.eadi)
 			return '';
-		return '<div val="dialog_id:' + EL.eadi + ',block_id:' + EL.block_id + '" class="icon icon-usd ml3 dialog-open' + _tooltip('Настроить действия', -62) + '</div>';
+		return '<div val="dialog_id:' + EL.eadi + ',element_id:' + EL.id + '" class="icon icon-usd ml3 dialog-open' + _tooltip('Настроить действия', -62) + '</div>';
 	},
 	_elemUnitMar = function(EL) {
 		var mar = EL.mar.split(' ');

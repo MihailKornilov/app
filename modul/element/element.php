@@ -1902,7 +1902,7 @@ function PHP12_elem_choose_rule($prm, $isMsg=0) {
 		return !$isMsg ? 0 : 'Неизвестное местоположение.';
 	}
 
-	return !$isMsg ? 0 : 'Отсутствует исходный блок.';
+	return !$isMsg ? 0 : '[50] Отсутствует исходный блок.';
 }
 function PHP12_elem_choose_debug($prm) {//информация о месте куда происходит вставка элемента
 	if(!DEBUG)
@@ -1925,7 +1925,11 @@ function PHP12_elem_choose_debug($prm) {//информация о месте к�
 /* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 function PHP12_block_choose($prm) {
 	if(!$block_id = _num($prm['srce']['block_id']))
-		return _emptyMin10('Отсутствует исходный блок.');
+		if($elem_id = _num($prm['srce']['element_id'])) {
+			if(!$EL = _elemOne($elem_id))
+				return _emptyMin10('[19] Отсутствует исходный блок.');
+			$block_id = $EL['block_id'];
+		}
 	if(!$BL = _blockOne($block_id))
 		return _emptyMin10('Блока '.$block_id.' не существует.');
 
