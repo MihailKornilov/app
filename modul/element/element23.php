@@ -259,7 +259,6 @@ function _element23_template_docx($ELEM, $u) {
 	$order = "`t1`.`id`";
 	if($tab = _queryTN($DLG, 'dtime_add'))
 		$order = "`".$tab."`.`dtime_add`";
-	$IS_SORT = false;
 
 	switch($ELEM['num_8']) {
 		//по дате внесения
@@ -274,7 +273,6 @@ function _element23_template_docx($ELEM, $u) {
 			break;
 		//ручная сортировка
 		case 6161:
-			$IS_SORT = true;
 			$order = "`sort`";
 			$limit = 1000;  //если включена сортировка, количество максимальное
 			$SC = 'ASC';
