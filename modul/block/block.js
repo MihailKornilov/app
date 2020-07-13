@@ -6,7 +6,7 @@ var _ids = function(v, count) {
 		if(typeof v == 'string') {
 			var send = [];
 			_forN(v.split(','), function(id) {
-				id = _num(id);
+				id = _num(id, 1);
 				if(!id)
 					return;
 				send.push(id);

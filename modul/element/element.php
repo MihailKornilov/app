@@ -1526,11 +1526,24 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 		return '';
 
 	$send = '';
-	$znak = _elemIsConnect($ids[0]) ? ' » ' : ', ';
-	foreach($ids as $n => $id)
-		$send .= ($n ? $znak : '')._element('title', $id);
+	$znak = _elemIdsTitleZnak($ids[0]);
+	foreach($ids as $n => $id) {
+		switch($id) {
+			case -21: $send = 'Текущий пользователь'; break;
+			case -22: $send = 'Текущий диалог'; break;
+			case -23: $send = 'Текущая запись'; break;
+			default: $send .= ($n ? $znak : '')._element('title', $id);
+		}
+	}
 
 	return $send;
+}
+function _elemIdsTitleZnak($v) {
+	if(_elemIsConnect($v))//является списком
+		return ' » ';
+	if($v == -21)//текущий пользователь
+		return ' » ';
+	return ', ';
 }
 function _elemUids($ids, $u) {//получение значения записи по идентификаторам элементов (в основном для [11])
 	if(empty($u))
@@ -2171,18 +2184,15 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 		if($arr[$n]['elem_issp'] = _elemIsConnect($r['elem_id'])) {
 			$spisok = _29cnn($r['elem_id']);
 			$arr[$n]['spisok'] = PHP12_spfl_vvv_unshift($spisok);
-			if($r['unit_id'] == -4) {
-				$arr[$n]['unit4title'] = '- имя не определено -';
-				if($el = _elemOne($r['txt']))
-					$arr[$n]['unit4title'] = $el['title'];
-			}
+			if($r['unit_id'] == -4)
+				$arr[$n]['unit4title'] = _elemIdsTitle($r['txt']);
 		} else {
 			$last = _idsLast($r['elem_id']);
-			$el = _elemOne($last);
-			if($el['dialog_id'] == 17) {
-				$arr[$n]['elem_issp'] = 1;
-				$arr[$n]['spisok'] = _element('vvv', $r);
-			}
+			if($el = _elemOne($last))
+				if($el['dialog_id'] == 17) {
+					$arr[$n]['elem_issp'] = 1;
+					$arr[$n]['spisok'] = _element('vvv', $r);
+				}
 		}
 	}
 

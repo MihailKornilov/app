@@ -327,9 +327,9 @@ function _ids($ids, $return='ids') {//проверка корректности 
 	foreach(explode(',', $ids) as $id) {
 		if(!preg_match(REGEXP_INTEGER, $id))
 			return _idsReturn(0, $return);
-		if(!_num($id))
+		if(!_num($id, 1))
 			continue;
-		$arr[] = _num($id);
+		$arr[] = _num($id, 1);
 	}
 
 	return _idsReturn(implode(',', $arr), $return);
@@ -386,7 +386,7 @@ function _idsFirst($v) {//первое значение последовател
 	if(!isset($v[0]))
 		return 0;
 
-	return _num($v[0]);
+	return _num($v[0], 1);
 }
 function _idsLast($v) {//последнее значение последовательного массива (или идентификаторов через запятую)
 	if(empty($v))

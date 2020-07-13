@@ -1,6 +1,6 @@
 <?php
 
-/* [401] График по месяцам */
+/* [401] График по периодам */
 function _element401_struct($el) {
 	return array(
 		'txt_1'   => $el['txt_1'],      //заголовок

@@ -219,7 +219,7 @@ function PHP12_v_choose($prm) {
 	if(!defined('OBJ_NAME_CHOOSE'))
 		define('OBJ_NAME_CHOOSE', 'dialog');
 
-	$DLG_PARENT = 'Нет.';
+	$DLG_PARENT = '';
 	switch(OBJ_NAME_CHOOSE) {
 		case 'page':
 			if(!$page = _page($obj_id))
@@ -258,30 +258,59 @@ function PHP12_v_choose($prm) {
 	return
 ($prm['dop']['first'] ?
 	'<div class="bg-gr2 pad10 pl5 line-b">'.
-		'<input type="hidden" id="choose-menu" value="2" />'.
+		'<input type="hidden" id="choose-menu" value="'.PHP12_v_choose_menuSel($prm).'" />'.
 	'</div>'.
 
-	'<div class="choose-menu-1">'.
-		'<div class="prel pad10">'.
-			'<div class="elm-choose" val="-21"></div>'.
-			'<input type="text" class="over1 color-555 b w100p curP" readonly value="Текущий пользователь">'.
-		'</div>'.
-	'</div>'
+	'<div class="choose-menu-1">'.PHP12_v_choose_global($prm).'</div>'.
+	'<div class="choose-menu-2 pad10">id, дата внесения, кто внёс</div>'.
+	'<div class="choose-menu-3">'
 : '').
 
-	'<div class="choose-menu-2">'.
 		'<div class="fs14 pad10 pl15 bg-orange line-b">'.$TITLE.' <b class="fs14">'.$NAME.'</b>:</div>'.
 		_blockHtml(OBJ_NAME_CHOOSE, $obj_id, $cond).
-	'</div>'.
 
 ($prm['dop']['first'] ?
-	'<div class="choose-menu-3">'.$DLG_PARENT.'</div>'.
+	'</div>'.
 
-	'<div class="choose-menu-4">'.
-		'Стандартные значения'.
-	'</div>'
+($DLG_PARENT ?
+	'<div class="choose-menu-4">'.$DLG_PARENT.'</div>'
+: '')
+
 : '').
 	'';
+}
+function PHP12_v_choose_menuSel($prm) {//выбраный пункт меню
+	$sel = 3;
+
+	if(!$v = _idsFirst($prm['dop']['sel']))
+		return $sel;
+
+	if($v == -21)
+		return 1;
+	if($v == -22)
+		return 1;
+	if($v == -23)
+		return 1;
+
+	return $sel;
+}
+function PHP12_v_choose_global($prm) {//глобальные значения для выбора
+	$v = _idsFirst($prm['dop']['sel']);
+
+	return
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -21 ? ' sel' : '').'" val="-21"></div>'.
+		'<div class="fs17 b center pad10 color-555">Текущий пользователь</div>'.
+	'</div>'.
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -22 ? ' sel' : '').'" val="-22"></div>'.
+		'<div class="fs17 b center pad10 color-555">Текущий диалог</div>'.
+	'</div>'.
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -23 ? ' sel' : '').'" val="-23"></div>'.
+		'<div class="fs17 b center pad10 color-555">Текущая запись</div>'.
+		'<div class="center pad5 grey">Если открыт диалог для редактирования данных</div>'.
+	'</div>';
 }
 function PHP12_v_choose_vvv($prm) {
 	$dop = array(

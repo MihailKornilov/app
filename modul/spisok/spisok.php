@@ -1181,8 +1181,20 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 
 	//указан вариант, где по элементу в исходном диалоге будет получено значение
 	if($unit_id == -4) {
-		if(!$el = _elemOne($r['txt']))
+		if(!$el = _elemOne($r['txt'])) {
+			switch($r['txt']) {
+				//текущий пользватлель
+				case -21: return USER_ID;
+				//текущий диалог
+				case -22: return $prm['srce']['dialog_id'];
+				//текущая запись
+				case -23:
+					if(!$uid = _num(@$prm['unit_edit']['id']))
+						return 0;
+					return $uid;
+			}
 			return 0;
+		}
 		if($el['dialog_id'] != 29)//пока только для элемента [29]
 			return 0;
 
