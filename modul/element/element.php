@@ -28,7 +28,7 @@ foreach(array(
 			   62,   64,   66,   68,69,70,
 			71,72,73,74,75,76,77,78,79,80,
 			      83,   85,86,87,88,   90,
-			91,92,93,94,   96,97,
+			91,92,93,94,95,96,97,
 			102,103,130,300
         ) as $id) {
 	$file = GLOBAL_DIR.'/modul/element/element'.$id.'.php';
@@ -132,6 +132,8 @@ function _elementStruct($el) {//структура элемента - базов
 	if($el['width'] || !empty($el['width_min']))
 		$send['width'] = _num($el['width']);
 
+	if(!empty($el['noedit']))
+		$send['noedit'] = 1;
 	if(!empty($el['focus']))
 		$send['focus'] = 1;
 
@@ -178,6 +180,8 @@ function _elementJs($el) {//структура элемента для JS
 		$send['col'] = $el['col'];
 	if(!empty($el['width']))
 		$send['width'] = $el['width'];
+	if(!empty($el['noedit']))
+		$send['noedit'] = 1;
 	if(!empty($el['focus']))
 		$send['focus'] = 1;
 	if(!empty($el['afics']))

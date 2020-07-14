@@ -1625,6 +1625,29 @@ $.fn._yearleaf = function(o) {//перелистывание годов
 
 };
 
+$.fn._selem = function(o) {//выбор элемента - звезда
+	var t = $(this);
+
+	if(!t.length)
+		return;
+
+	var attr_id = _attrId(t);
+
+	o = $.extend({
+		width:175,
+		placeholder:'не выбрано',
+		title:''
+	}, o);
+
+	var html =
+		'<div class="_selem dib prel bg-fff over3" style="width:' + o.width + 'px">' +
+			'<div class="icon icon-star pabs"></div>' +
+			'<div class="icon icon-del pl pabs"></div>' +
+			'<input type="text" readonly class="w100p curP color-pay" placeholder="' + o.placeholder + '" value="' + o.title + '" />' +
+		'</div>';
+	t.after(html);
+};
+
 $.fn._filter102 = function() {//Фильтр - Выбор нескольких групп значений
 	var ATR_EL = $(this);
 

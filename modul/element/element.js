@@ -92,7 +92,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
-
 	_dialog = function(o) {//диалоговое окно
 		o = $.extend({
 			top:100,
@@ -1210,6 +1209,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					ATR_CMP._select({
 						width:_num(el.width),
 						title0:el.txt_1,
+						blocked:el.noedit && unit.id,
 						spisok:vvv,
 						func:function(v) {
 							_elemAction(el, v);
@@ -2480,13 +2480,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						ATR_EL.find('.itog-sum').html(itogSum);
 					});
 					return;
+				//Быстрое формирование списка
+				case 95: return _ELM_95(elm_id);
 				//независимая кнопка
-				case 97:
-					alert(2342)
-					ATR_EL.find('.but97').click(function() {
-						alert(2342)
-					});
-					return;
+				case 97: return;
 				//Фильтр - Выбор нескольких групп значений
 				case 102: ATR_EL._filter102(); return;
 				//настройка доступа к страницам для пользователя
@@ -2675,6 +2672,117 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		}
 
 	},
+
+	//Быстрое формирование списка
+	_ELM_95 = function(elm_id) {
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить</div>',
+			ATR_EL = _attr_el(elm_id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last');
+
+		BUT_ADD.click(vAdd);
+
+		vAdd();
+
+		function vAdd(v) {
+			v = $.extend({
+			}, v);
+
+			DL.append(
+				'<dd class="over1">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center">' +
+								'<div class="icon icon-move pl"></div>' +
+							'<td class="top">' +
+								'<input type="text"' +
+									  ' readonly' +
+									  ' class="title w175 curP"' +
+									  ' placeholder="выберите значение..."' +
+								' />' +
+							'<td class="top pl15">' +
+								'<div class="mt5 icon icon-off pl' + _tooltip('Удалить', -25) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			DL.sortable({handle:'.icon-move'});
+
+			var DD = DL.find('dd:last');
+			DD.find('.icon-off').click(function() {
+				DD.remove();
+			});
+		}
+	},
+	PHP12_elem95_setup = function(el, vvv, obj) {
+		if(!obj.unit.id)
+			return;
+
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить колонку</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last');
+
+		BUT_ADD.click(vAdd);
+
+		vAdd();
+
+		function vAdd(v) {
+			v = $.extend({
+			}, v);
+
+			DL.append(
+				'<dd class="over1">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center">' +
+								'<div class="icon icon-move pl"></div>' +
+							'<td class="w175"><input type="hidden" class="el95type">' +
+							'<td class="w300 el95cnt">' +
+							'<td class="pr5 r">' +
+								'<div class="icon icon-off el95del pl' + _tooltip('Удалить', -25) + '</div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			DL.sortable({handle:'.icon-move'});
+
+			var DD = DL.find('dd:last'),
+				CNT = DD.find('.el95cnt');
+
+			DD.find('.el95type')._select({
+				width:170,
+				title0:'выберите тип колонки',
+				spisok:[
+					{id:1,title:'Текст',content:'Текст<div class="fs12 pale">Указать текст, который будет отображаться в колонке</div>'},
+					{id:2,title:'Текстовое поле',content:'Текстовое поле<div class="fs12 pale">Возможность внесения данных вручную</div>'},
+					{id:3,title:'Выпадающий список',content:'Выпадающий список<div class="fs12 pale">Выбор значений из выпадающего списка</div>'}
+				],
+				func:function(id) {
+					switch(id) {
+						case 1:
+							CNT.html('<input type="text" class="w300" placeholder="напишите текст">')
+							   .find('input').focus();
+							break;
+						case 2:
+							CNT.html('<input type="hidden">')
+							   .find('input')
+							   ._selem({
+									width:300,
+									placeholder:'укажите значение'
+								});
+							break;
+						case 3: break;
+					}
+				}
+			});
+
+			DD.find('.el95del').click(function() {
+				DD.remove();
+			});
+		}
+	},
+
 	_elemAction = function(el, v, is_open) {//применение функций, привязанных к элементам
 		/*
 			is_open - окно открылось - применение функций без эффектов
@@ -3380,7 +3488,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						elem_id:elem_id,
 						x:ui.position.left + x - startX,
 						y:ui.position.top + y - startY
-					}
+					};
 				_post(send);
 			}
 		});
@@ -5023,7 +5131,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				return '<div class="icon icon-add cond-setup pl ml15' + _tooltip('Добавить условия', -57) + '</div>';
 			};
 
-//		ATR_SP._select('disable');
 		BUT_ADD.click(valueAdd);
 
 		if(!vvv.length)

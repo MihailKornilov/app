@@ -1497,7 +1497,7 @@ function _dialogOpenLoad($dialog_id) {
 
 		if(!$dialog['edit_on'])
 			return _dialogOpenErr($send, 'Редактирование записи запрещено.');
-		if(!$prm['unit_edit'] = _spisokUnitQuery($dialog, $edit_id))
+		if(!$prm['unit_edit'] = _arrNum(_spisokUnitQuery($dialog, $edit_id)))
 			return _dialogOpenErr($send, 'Записи '.$dialog['id'].':'.$edit_id.' не существует.');
 
 		$send['edit_id'] = $edit_id;
