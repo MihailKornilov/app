@@ -332,15 +332,15 @@ function _element23_template_docx($ELEM, $u) {
 
 
 	$send .=
-		'<w:tr w:rsidR="00112243" w:rsidRPr="00FA01DF">'.
+		'<w:tr>'.
 			'<w:trPr><w:trHeight w:val="295"/></w:trPr>';
 
 	$w = round($WNUM/$WTR*$w100);
-	$send .= _elem23docxTh('№ п/п', $w);
+	$send .= elem23docxCell('№ п/п', $w, 'center', true);
 
 	foreach($ELEM['vvv'] as $th) {
 		$w = round($th['width']/$WTR*$w100);
-		$send .= _elem23docxTh($th['txt_7'], $w);
+		$send .= elem23docxCell($th['txt_7'], $w, 'center', true);
 
 	}
 	$send .= '</w:tr>';
@@ -352,7 +352,7 @@ function _element23_template_docx($ELEM, $u) {
 				'<w:trPr><w:trHeight w:val="295"/></w:trPr>';
 
 		$w = round($WNUM/$WTR*$w100);
-		$send .= _elem23docxTh($num++, $w);
+		$send .= elem23docxCell($num++, $w);
 
 		$prm = _blockParam(array('unit_get'=>$u));
 
@@ -367,7 +367,7 @@ function _element23_template_docx($ELEM, $u) {
 			$txt = _elemFormat($td, $prm, $txt);
 
 			$w = round($td['width']/$WTR*$w100);
-			$send .= _elem23docxTh($txt, $w, $align);
+			$send .= elem23docxCell($txt, $w, $align);
 		}
 
 		$send .= '</w:tr>';
@@ -377,27 +377,29 @@ function _element23_template_docx($ELEM, $u) {
 
 	return $send;
 }
-function _elem23docxTh($txt, $w, $align='center') {//формирование одной ячейки для таблицы формата DOCX
+function elem23docxCell($txt, $w, $align='center', $th=false) {//формирование одной ячейки для таблицы формата DOCX
 	return
 	'<w:tc>'.
 		'<w:tcPr>'.
 			'<w:tcW w:w="'.$w.'" w:type="dxa"/>'.
 			'<w:vAlign w:val="center"/>'.//позиция по вертикали
 		'</w:tcPr>'.
-		'<w:p w:rsidR="00951A33" w:rsidRPr="00FA01DF" w:rsidRDefault="00951A33" w:rsidP="00FA01DF">'.
+		'<w:p>'.
 			'<w:pPr>'.
+				'<w:spacing w:after="0"/>'.
 				'<w:jc w:val="'.$align.'"/>'.
 				'<w:rPr>'.
 					'<w:sz w:val="20"/>'.
 					'<w:szCs w:val="20"/>'.
 				'</w:rPr>'.
 			'</w:pPr>'.
-			'<w:r w:rsidRPr="00FA01DF">'.
+			'<w:r>'.
 				'<w:rPr>'.
 					'<w:sz w:val="20"/>'.
 					'<w:szCs w:val="20"/>'.
+			 ($th ? '<w:b/>' : '').
 				'</w:rPr>'.
-				'<w:t>'.$txt.'</w:t>'.
+				'<w:t>'.strip_tags($txt).'</w:t>'.
 			'</w:r>'.
 		'</w:p>'.
 	'</w:tc>';
