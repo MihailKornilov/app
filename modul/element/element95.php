@@ -11,6 +11,11 @@ function _element95_struct($el) {
 		'txt_2'   => $el['txt_2']       //[12] данные колонок в формате JSON
 	) + _elementStruct($el);
 }
+function _element95_js($el) {
+	return array(
+		'num_2'   => _num($el['num_2'])
+	) + _elementJs($el);
+}
 
 /* Вывод содержимого элемента на экран */
 function _element95_print($el, $prm) {
@@ -68,6 +73,7 @@ function PHP12_elem95_setup($prm) {//настройка колонок спис�
 function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение данных колонок
 	/*
 		сохранение в формате JSON в txt_2:
+			name - имя колонки
 			type - тип колонки
 			v - значение
 	*/
@@ -93,6 +99,7 @@ function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение да
 					continue;
 
 				$save[] = array(
+					'name' => $r['name'],
 					'type' => $type,
 					'v' => $v
 				);
@@ -119,8 +126,5 @@ function PHP12_elem95_setup_vvv($prm) {
 			$VAL[$i]['title'] = _elemIdsTitle($r['v']);
 	}
 
-	return array(
-		'dss' => $u['num_1'],
-		'val' => $VAL
-	);
+	return $VAL;
 }

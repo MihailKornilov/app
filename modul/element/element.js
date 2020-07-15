@@ -2678,9 +2678,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!vvv.cols.length)
 			return;
 
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить</div>',
-			ATR_EL = _attr_el(el.id),
+		var colName = function() {//вывод названий колонок
+				if(!el.num_2)
+					return '';
+
+				var send =  '<table class="bs5 w100p">' +
+							'<tr><td class="w25">';
+
+				_forN(vvv.cols, function(col) {
+					send += '<td class="fs14 color-555">' + col.name;
+				});
+
+				send += '</table>';
+				return send;
+			},
+			html =  colName() +
+					'<dl></dl>' +
+					'<div class="fs15 color-555 pad10 center over5 curP">Добавить</div>';
+
+		var ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last');
 
@@ -2711,7 +2727,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						'</table>' +
 					'</dd>';
 			DL.append(html);
-			DL.sortable({handle:'.icon-move'});
+			DL._sort({handle:'.icon-move'});
 
 			var DD = DL.find('dd:last');
 
@@ -2745,35 +2761,46 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			vAdd();
 		});
 
-		if(!vvv.val)
+		//показ-скрытие настройки имён колонок
+		_attr_cmp(15415)._check({
+			func:function(v) {
+				obj.unit.num_2 = v;
+				DL.find('.el95colname')['slide' + (v ? 'Down' : 'Up')]();
+			}
+		});
+
+		if(!vvv)
 			vAdd();
 		else
-			_forIn(vvv.val, vAdd);
+			_forIn(vvv, vAdd);
 
 		function vAdd(v) {
 			v = $.extend({
+				width:170,
+				name:'',
 				type:0,
-				colname:'',
 				v:'',
 				title:''
 			}, v);
 
 			DL.append(
-				'<dd class="over1">' +
+				'<dd class="over1 pt5">' +
+					'<div class="ml5" style="width:' + v.width + 'px">' +
+						'<div class="el95colname' + _dn(obj.unit.num_2) + '">' +
+							'<input type="text"' +
+								  ' class="colname w100p bg-gr2 center fs14 blue mb1"' +
+								  ' placeholder="имя колонки"' +
+								  ' value="' + v.name + '"' +
+							' />' +
+						'</div>' +
+					'</div>' +
 					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center">' +
-								'<div class="icon icon-move pl"></div>' +
-							'<td class="w175">' +
-								'<div class="el95thname' + _dn(_num(obj.unit.num_2)) + '">' +
-									'<input type="text"' +
-										  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
-										  ' placeholder="имя колонки"' +
-										  ' value="' + v.colname + '"' +
-									' />' +
-								'</div>' +
+						'<tr><td class="w175">' +
 								'<input type="hidden" class="el95type" value="' + v.type + '">' +
 							'<td class="w300 el95cnt">' +
-							'<td class="pr5 r">' +
+							'<td class="r">' +
+								'<div class="icon icon-move pl"></div>' +
+							'<td class="w25 pr5 r">' +
 								'<div class="icon icon-off el95del pl' + _tooltip('Удалить', -25) + '</div>' +
 					'</table>' +
 				'</dd>'
@@ -2798,7 +2825,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								._selem({
 									width:300,
 									placeholder:'выберите содержание списка',
-									dss:vvv.dss,
+									dss:obj.unit.num_1,
 									title:v.title
 								});
 							break;
@@ -2842,6 +2869,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			}
 
 			send.push({
+				name:sp.find('.colname').val(),
 				type:type,
 				v:v
 			});
