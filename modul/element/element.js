@@ -2686,15 +2686,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<tr><td class="w25">';
 
 				_forN(vvv.cols, function(col) {
-					send += '<td class="fs14 color-555">' + col.name;
+					send += '<td class="fs14 color-555" style="width:' + (col.w-10) + 'px">' + col.name;
 				});
 
-				send += '</table>';
+				send += '<td></table>';
 				return send;
 			},
 			html =  colName() +
 					'<dl></dl>' +
-					'<div class="fs15 color-555 pad10 center over5 curP">Добавить</div>';
+					'<div class="fs15 color-555 pad10 center over5 curP">' + el.txt_1 + '</div>';
 
 		var ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
@@ -2714,10 +2714,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<div class="icon icon-move pl"></div>';
 
 			_forN(vvv.cols, function(col, i) {
-				html += '<td>';
+				html += '<td style="width:' + (col.w-10) + 'px">';
 				switch(col.type) {
 					case 1: html += col.v; break;
-					case 2: html += '<input type="text">'; break;
+					case 2: html += '<input type="text" class="w100p">'; break;
 					case 3: html += '<input type="hidden" class="col95type" value="0">'; break;
 				}
 			});
@@ -2735,7 +2735,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				if(col.type != 3)
 					return;
 				DD.find('.col95type')._select({
-					width:300,
+					width:0,
 					title0:'не выбрано',
 					write:1,
 					spisok:col.spisok
@@ -2755,7 +2755,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить колонку</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
-			BUT_ADD = ATR_EL.find('div:last');
+			CALC_DIV = ATR_EL.find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
+			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
+			BUT_ADD = ATR_EL.find('div:last'),
+			NUM = 1;
 
 		BUT_ADD.click(function() {
 			vAdd();
@@ -2774,9 +2777,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		else
 			_forIn(vvv, vAdd);
 
+		tdCalc();
+
 		function vAdd(v) {
 			v = $.extend({
-				width:170,
+				w:170,
 				name:'',
 				type:0,
 				v:'',
@@ -2784,18 +2789,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			}, v);
 
 			DL.append(
-				'<dd class="over1 pt5">' +
-					'<div class="ml5" style="width:' + v.width + 'px">' +
+				'<dd class="ov7 pt5">' +
+					'<div class="el95w bg4" style="width:' + v.w + 'px;min-height:10px;margin-left:35px">' +
 						'<div class="el95colname' + _dn(obj.unit.num_2) + '">' +
 							'<input type="text"' +
-								  ' class="colname w100p bg-gr2 center fs14 blue mb1"' +
+								  ' class="colname w100p bg4 center fs14 blue"' +
 								  ' placeholder="имя колонки"' +
 								  ' value="' + v.name + '"' +
 							' />' +
 						'</div>' +
 					'</div>' +
 					'<table class="bs5 w100p">' +
-						'<tr><td class="w175">' +
+						'<tr><td class="w25 r topi">' +
+								'<b class="bnum fs15 color-555">' + NUM++ + '</b>:' +
+							'<td class="w175">' +
 								'<input type="hidden" class="el95type" value="' + v.type + '">' +
 							'<td class="w300 el95cnt">' +
 							'<td class="r">' +
@@ -2832,6 +2839,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					}
 				};
 
+			resize95(DD.find('.el95w'));
+
 			DD.find('.el95type')._select({
 				width:170,
 				title0:'выберите тип колонки',
@@ -2852,6 +2861,62 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				DD.remove();
 			});
 		}
+
+		//включение изменения ширины
+		function resize95(div) {
+			if(div.hasClass('ui-resizable'))
+				return;
+
+			div.resizable({
+				minWidth:20,
+				maxWidth:530,
+				grid:10,
+				handles:'e',
+				stop:tdCalc
+			});
+		}
+
+		//пересчёт визуального отображения ячеек по диагонали
+		function tdCalc() {
+			var html = '',
+				DIV_W = 600,
+				i = DIV_W / CALC_W,
+				FULL_W = 0,
+				TDS = [],//массив ширин по каждой ячейке
+				ALL_W = 0;//сумма ширины всех ячеек, кроме последней
+
+			_forEq(DL.find('DD'), function(sp) {
+				var n = _num(sp.find('.bnum').html()),
+					w = sp.find('.el95w').width();
+				TDS.push({
+					n:n,
+					w:Math.round(w*i)-1
+				});
+				FULL_W += w;
+			});
+
+			_forN(TDS, function(o, n) {
+				var bg = 'ffc',
+					line = ' line-r';
+				if(FULL_W > CALC_W) {
+					bg = 'fcc';
+					i = CALC_W / FULL_W;
+					o.w = Math.round(o.w*i);
+				}
+				if(FULL_W >= CALC_W) {
+					ALL_W += (o.w+1);
+					if(n == (TDS.length-1)) {
+						line = '';
+						o.w = DIV_W - ALL_W + o.w + 1;
+					}
+				}
+
+				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
+							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
+						'</div>';
+			});
+			CALC_DIV.html(html);
+		}
 	},
 	PHP12_elem95_setup_get = function(el) {
 		var send = [];
@@ -2869,6 +2934,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			}
 
 			send.push({
+				w:sp.find('.el95w').width(),
 				name:sp.find('.colname').val(),
 				type:type,
 				v:v

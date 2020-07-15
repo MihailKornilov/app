@@ -13,6 +13,7 @@ function _element95_struct($el) {
 }
 function _element95_js($el) {
 	return array(
+		'txt_1'   => $el['txt_1'],
 		'num_2'   => _num($el['num_2'])
 	) + _elementJs($el);
 }
@@ -68,11 +69,19 @@ function _element95_vvv($el) {
 function PHP12_elem95_setup($prm) {//настройка колонок списка
 	if(!$prm['unit_edit'])
 		return _emptyMin10('Настройка колонок будет доступна после вставки элемента в блок.');
-	return '';
+
+	if(!$BL = _blockOne($prm['srce']['block_id']))
+		return _emptyMin10('[95] Отсутствует исходный блок.');
+
+	$ex = explode(' ', $BL['elem']['mar']);
+	$w = $BL['width'] - $ex[1] - $ex[3] - 60;
+
+	return '<div class="calc-div h25 line-b bg-efe">'.$w.'</div>';
 }
 function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение данных колонок
 	/*
 		сохранение в формате JSON в txt_2:
+			w - ширина
 			name - имя колонки
 			type - тип колонки
 			v - значение
@@ -99,6 +108,7 @@ function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение да
 					continue;
 
 				$save[] = array(
+					'w' => _num($r['w']),
 					'name' => $r['name'],
 					'type' => $type,
 					'v' => $v

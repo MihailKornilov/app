@@ -413,12 +413,12 @@ function PHP12_td_setup($prm) {//используется в диалоге [23]
 
 	if(!$prm['unit_edit'])
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
+
 	if(!$BL = _blockOne($prm['srce']['block_id']))
 		return _emptyMin10('[23] Отсутствует исходный блок.');
 
 	$ex = explode(' ', $BL['elem']['mar']);
 	$w = $BL['width'] - $ex[1] - $ex[3];
-
 
 	return '<div class="calc-div h25 line-b bg-efe">'.$w.'</div>';
 }
