@@ -2745,6 +2745,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DD.find('.icon-off').click(function() {
 				DD.remove();
 			});
+
 		}
 	},
 	PHP12_elem95_setup = function(el, vvv, obj) {
@@ -2813,7 +2814,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				'</dd>'
 			);
 
-			DL.sortable({handle:'.icon-move'});
+			DL.sortable({
+				handle:'.icon-move',
+				update:tdCalc
+			});
 
 			var DD = DL.find('dd:last'),
 				CNT = DD.find('.el95cnt'),
@@ -2839,8 +2843,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					}
 				};
 
-			resize95(DD.find('.el95w'));
-
 			DD.find('.el95type')._select({
 				width:170,
 				title0:'выберите тип колонки',
@@ -2856,9 +2858,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 
 			colChange();
+			resize95(DD.find('.el95w'));
+			if(!v.type)
+				tdCalc();
 
 			DD.find('.el95del').click(function() {
 				DD.remove();
+				tdCalc();
 			});
 		}
 
