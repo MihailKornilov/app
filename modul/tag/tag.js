@@ -1631,21 +1631,66 @@ $.fn._selem = function(o) {//выбор элемента - звезда
 	if(!t.length)
 		return;
 
-	var attr_id = _attrId(t);
+	var attr_id = _attrId(t),
+		V = _num(t.val());
 
 	o = $.extend({
 		width:175,
 		placeholder:'не выбрано',
-		title:''
+		title:'',
+		dss:0,      //ID диалога, из которого выбирается значение
+		nest:0,     //выбор во вложенных списках
+		sev:0       //выбор нескольких значений
 	}, o);
 
 	var html =
 		'<div class="_selem dib prel bg-fff over3" style="width:' + o.width + 'px">' +
 			'<div class="icon icon-star pabs"></div>' +
-			'<div class="icon icon-del pl pabs"></div>' +
+			'<div class="icon icon-del pl pabs' + _dn(V) + '"></div>' +
 			'<input type="text" readonly class="w100p curP color-pay" placeholder="' + o.placeholder + '" value="' + o.title + '" />' +
 		'</div>';
 	t.after(html);
+
+	var SELEM = t.next(),
+		INP = SELEM.find('input');
+
+	SELEM.click(function() {
+		if(!o.dss) {
+			SELEM._hint({
+				msg:'Не указан диалог для выбора значения',
+				color:'red',
+				pad:10,
+				show:1
+			});
+			return;
+		}
+		_dialogLoad({
+			dialog_id:11,
+			dss:o.dss,
+			dop:{
+				mysave:1,
+				sel:V,
+				nest:o.nest,
+				sev:o.sev
+			},
+			busy_obj:INP,
+			busy_cls:'hold',
+			func_save:function(res) {
+				t.val(res.v);
+				V = res.v;
+				INP.val(res.title);
+				SELEM.find('.icon-del')._dn(true);
+			}
+		});
+	});
+
+	SELEM.find('.icon-del').click(function(e) {
+		e.stopPropagation();
+		INP.val('');
+		V = 0;
+		$(this)._dn();
+	});
+
 };
 
 $.fn._filter102 = function() {//Фильтр - Выбор нескольких групп значений

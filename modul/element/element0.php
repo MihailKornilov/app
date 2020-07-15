@@ -26,3 +26,5 @@ function _element0_history($el, $cl) {}
 /* Структура данных элемента */
 function _element0_struct_vvv($el, $cl) {}
 
+/* отправка данных для JS */
+function _element0_vvv($el) {}

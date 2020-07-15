@@ -2481,7 +2481,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					});
 					return;
 				//Быстрое формирование списка
-				case 95: return _ELM_95(elm_id);
+				case 95: return _ELM_95(el, vvv);
 				//независимая кнопка
 				case 97: return;
 				//Фильтр - Выбор нескольких групп значений
@@ -2674,10 +2674,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	//Быстрое формирование списка
-	_ELM_95 = function(elm_id) {
+	_ELM_95 = function(el, vvv) {
+		if(!vvv.cols.length)
+			return;
+
 		var html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить</div>',
-			ATR_EL = _attr_el(elm_id),
+			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last');
 
@@ -2689,26 +2692,40 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			v = $.extend({
 			}, v);
 
-			DL.append(
-				'<dd class="over1">' +
+			html = 	'<dd class="over1">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center">' +
-								'<div class="icon icon-move pl"></div>' +
-							'<td class="top">' +
-								'<input type="text"' +
-									  ' readonly' +
-									  ' class="title w175 curP"' +
-									  ' placeholder="выберите значение..."' +
-								' />' +
-							'<td class="top pl15">' +
-								'<div class="mt5 icon icon-off pl' + _tooltip('Удалить', -25) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
+								'<div class="icon icon-move pl"></div>';
 
+			_forN(vvv.cols, function(col, i) {
+				html += '<td>';
+				switch(col.type) {
+					case 1: html += col.v; break;
+					case 2: html += '<input type="text">'; break;
+					case 3: html += '<input type="hidden" class="col95type" value="0">'; break;
+				}
+			});
+
+			html += 		'<td class="top pl15">' +
+								'<div class="mt5 icon icon-off pl' + _tooltip('Удалить', -25) + '</div>' +
+						'</table>' +
+					'</dd>';
+			DL.append(html);
 			DL.sortable({handle:'.icon-move'});
 
 			var DD = DL.find('dd:last');
+
+			_forN(vvv.cols, function(col) {
+				if(col.type != 3)
+					return;
+				DD.find('.col95type')._select({
+					width:300,
+					title0:'не выбрано',
+					write:1,
+					spisok:col.spisok
+				});
+			});
+
 			DD.find('.icon-off').click(function() {
 				DD.remove();
 			});
@@ -2724,12 +2741,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last');
 
-		BUT_ADD.click(vAdd);
+		BUT_ADD.click(function() {
+			vAdd();
+		});
 
-		vAdd();
+		if(!vvv.val)
+			vAdd();
+		else
+			_forIn(vvv.val, vAdd);
 
 		function vAdd(v) {
 			v = $.extend({
+				type:0,
+				colname:'',
+				v:'',
+				title:''
 			}, v);
 
 			DL.append(
@@ -2737,7 +2763,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center">' +
 								'<div class="icon icon-move pl"></div>' +
-							'<td class="w175"><input type="hidden" class="el95type">' +
+							'<td class="w175">' +
+								'<div class="el95thname' + _dn(_num(obj.unit.num_2)) + '">' +
+									'<input type="text"' +
+										  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
+										  ' placeholder="имя колонки"' +
+										  ' value="' + v.colname + '"' +
+									' />' +
+								'</div>' +
+								'<input type="hidden" class="el95type" value="' + v.type + '">' +
 							'<td class="w300 el95cnt">' +
 							'<td class="pr5 r">' +
 								'<div class="icon icon-off el95del pl' + _tooltip('Удалить', -25) + '</div>' +
@@ -2748,7 +2782,28 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL.sortable({handle:'.icon-move'});
 
 			var DD = DL.find('dd:last'),
-				CNT = DD.find('.el95cnt');
+				CNT = DD.find('.el95cnt'),
+				colChange = function() {
+					switch(v.type) {
+						case 1:
+							CNT.html('<input type="text" class="el95v w300" placeholder="напишите текст" value="' + v.v + '">')
+								.find('input').focus();
+							break;
+						case 2:
+							CNT.html('');
+							break;
+						case 3:
+							CNT.html('<input type="hidden" class="el95v" value="' + v.v + '">')
+								.find('input')
+								._selem({
+									width:300,
+									placeholder:'выберите содержание списка',
+									dss:vvv.dss,
+									title:v.title
+								});
+							break;
+					}
+				};
 
 			DD.find('.el95type')._select({
 				width:170,
@@ -2759,28 +2814,42 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					{id:3,title:'Выпадающий список',content:'Выпадающий список<div class="fs12 pale">Выбор значений из выпадающего списка</div>'}
 				],
 				func:function(id) {
-					switch(id) {
-						case 1:
-							CNT.html('<input type="text" class="w300" placeholder="напишите текст">')
-							   .find('input').focus();
-							break;
-						case 2:
-							CNT.html('<input type="hidden">')
-							   .find('input')
-							   ._selem({
-									width:300,
-									placeholder:'укажите значение'
-								});
-							break;
-						case 3: break;
-					}
+					v.type = id;
+					colChange();
 				}
 			});
+
+			colChange();
 
 			DD.find('.el95del').click(function() {
 				DD.remove();
 			});
 		}
+	},
+	PHP12_elem95_setup_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var type = _num(sp.find('.el95type').val()),
+				v = sp.find('.el95v').val();
+
+			if(!type)
+				return;
+
+			if(type == 3) {
+				v = _num(v);
+				if(!v)
+					return;
+			}
+
+			send.push({
+				type:type,
+				v:v
+			});
+		});
+
+		console.log(send);
+
+		return send;
 	},
 
 	_elemAction = function(el, v, is_open) {//применение функций, привязанных к элементам

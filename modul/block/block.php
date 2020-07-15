@@ -790,6 +790,7 @@ function _blockDlgId($block_id) {//получение id диалога по б�
 		return 0;
 
 	switch($BL['obj_name']) {
+		case 'dialog': return $BL['obj_id'];
 		case 'spisok': return _elemDlgId($BL['obj_id']);
 		case 'hint': return _hintDlgId($BL);
 	}
