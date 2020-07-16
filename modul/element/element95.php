@@ -38,27 +38,28 @@ function _element95_vvv($el) {
 	foreach($cols as $i => $r) {
 		if($r['type'] != 3)
 			continue;
-
-		$cols[$i]['spisok'] = array();
-
-		if(!$dlg_id = _elemDlgId($r['v']))
-			continue;
-		if(!$DLG = _dialogQuery($dlg_id))
-			continue;
-		if(!$col = _elemCol($r['v']))
-			continue;
-
-		$sql = "SELECT `id`,".$col." `title`
-				FROM   "._queryFrom($DLG)."
-				WHERE  "._queryWhere($DLG)."
-				ORDER BY `id` DESC
-				LIMIT 50";
-		$cols[$i]['spisok'] = query_ass($sql);
+		$cols[$i]['spisok'] = _elem95_spisok($r['v']);
 	}
 
 	return array(
 		'cols' => $cols
 	);
+}
+function _elem95_spisok($elem_id, $v='') {//получение данных для Select (type=3)
+	if(!$dlg_id = _elemDlgId($elem_id))
+		return array();
+	if(!$DLG = _dialogQuery($dlg_id))
+		return array();
+	if(!$col = _elemCol($elem_id))
+		return array();
+
+	$sql = "SELECT `id`,".$col." `title`
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+	".($v ? " AND `".$col."` LIKE '%".addslashes($v)."%'" : '')."
+			ORDER BY `id` DESC
+			LIMIT 50";
+	return query_ass($sql);
 }
 
 
@@ -138,3 +139,14 @@ function PHP12_elem95_setup_vvv($prm) {
 
 	return $VAL;
 }
+
+
+
+
+
+
+
+
+
+
+

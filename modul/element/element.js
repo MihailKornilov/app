@@ -2738,7 +2738,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					width:0,
 					title0:'не выбрано',
 					write:1,
-					spisok:col.spisok
+					spisok:col.spisok,
+					funcWrite:function(v, t) {
+						var send = {
+							op:'el95_spisok',
+							elem_id:col.v,
+							v:v,
+							busy_obj:t.icon_del,
+							busy_cls:'spin'
+						};
+						_post(send, function(res) {
+							t.spisok(res.spisok);
+						});
+					}
 				});
 			});
 
@@ -3967,7 +3979,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 	PHP12_v_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
-			VC = D(ATTR_EL(el.id)).find('.elm-choose'),//элементы в открытом диалоге для выбора
+			ATTR_EL = D(ATTR_EL(el.id)),
+			VC = ATTR_EL.find('.elm-choose'),//элементы в открытом диалоге для выбора
 			DSS = 0,
 			_nest = function(v, dbl) {//разрешение прохода по списку (открытие второго диалога)
 				if(v < 0)
@@ -3991,8 +4004,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				{id:3,title:'Исходный диалог'},
 				{id:4,title:'Родительский диалог'}
 			];
-			spisok.splice(3, 1);
-			D(ATTR_EL(el.id)).find('#choose-menu')._menu({
+
+			if(!ATTR_EL.find('choose-menu-4').length)
+				spisok.splice(3, 1);
+
+			ATTR_EL.find('#choose-menu')._menu({
 				spisok:spisok
 			});
 

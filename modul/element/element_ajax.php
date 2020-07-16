@@ -762,6 +762,15 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'el95_spisok':
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента');
+
+		$v = _txt($_POST['v']);
+
+		$send['spisok'] = _elem95_spisok($elem_id, $v);
+		jsonSuccess($send);
+		break;
 	case 'el97_move_save'://сохранение координат независимой кнопки
 		if(!$elem_id = _num($_POST['elem_id']))
 			jsonError('Некорректный ID элемента');
