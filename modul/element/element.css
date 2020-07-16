@@ -848,3 +848,28 @@ td.icon-image:not(:hover):not(.empty){opacity:.5}
 
 
 
+
+
+
+.el95col{
+	background-color:#efe;
+	border:solid 1px #ded;
+	color:#080;
+	font-size:11px;
+	text-align:center;
+	width:40px;
+	padding:5px 2px;
+	cursor:pointer;
+}
+.el95col:not(.on){
+	background-color:#f8f8f8;
+	border:solid 1px #eee;
+	color:#888;
+}
+
+
+
+
+
+
+

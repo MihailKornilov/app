@@ -83,8 +83,9 @@ function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение да
 	/*
 		сохранение в формате JSON в txt_2:
 			w - ширина
-			name - имя колонки
+			name - имя заголовка
 			type - тип колонки
+			col - имя колонки в таблице
 			v - значение
 	*/
 
@@ -102,6 +103,8 @@ function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение да
 
 				if(!isset($r['v']))
 					$r['v'] = '';
+				if(!isset($r['col']))
+					$r['col'] = '';
 
 				$v = $r['v'];
 
@@ -112,6 +115,7 @@ function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение да
 					'w' => _num($r['w']),
 					'name' => $r['name'],
 					'type' => $type,
+					'col' => $r['col'],
 					'v' => $v
 				);
 			}

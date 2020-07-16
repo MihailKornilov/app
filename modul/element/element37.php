@@ -217,5 +217,95 @@ function _elem37changeCol($cmp_id, $unit_id) {//перенос данных, е�
 
 
 
+function PHP12_col_select($prm) {//[30] диалог для выбора колонки
+	if(!$dlg_id = _num($prm['srce']['dss'])) {
+		if($elem_id = _num($prm['srce']['element_id']))
+			if(!$dlg_id = _elemDlgId($elem_id))
+				return _emptyMin('Не получен исходный диалог');
+	}
+	if(!$DLG = _dialogQuery($dlg_id))
+		return _emptyMin('Диалога id'.$dlg_id.' не существует');
+
+	$uCol = '123';
+
+	//получение используемых колонок
+	$COL_USE = array();
+	foreach($DLG['cmp'] as $r) {
+		if(empty($r['col']))
+			continue;
+		$COL_USE[$r['col']] = !empty($r['name']) ? $r['name'] : '';
+	}
+
+	$send =
+		'<div class="fs16 color-555 mb10 pad10 center bg4 line-b">'.
+			'Диалоговое окно <b class="fs16">'.$DLG['name'].'</b>:'.
+		'</div>'.
+		'<div class="mar10">';
+	foreach($DLG['field1'] as $col => $k) {
+		if(!_elem37FieldNo($col))
+			continue;
+
+		$color = '';
+		$busy = 0;//занята ли колонка
+		$name = '';
+		$bg = 'bg6';
+		if(isset($COL_USE[$col])) {
+			$color = $uCol == $col ? 'b color-pay' : 'b red';
+			$busy = $uCol == $col ? 0 : 1;
+			$name = '<span class="color-ref ml5">'.$COL_USE[$col].'<span>';
+			$bg = 'bg1';
+		}
+		$send .=
+			'<div class="el37u '.$bg.' ov7 pad5 mt5 grey curP">'.
+				'<span class="el37col '.$color.'">'.$col.'</span>'.
+				$name.
+			'</div>';
+	}
+
+	$send .= '</div>';
+
+	return $send;
+}
+function _elem37FieldNo($col) {//колонки, которые не должны выбираться
+	$ass = array(
+		'id' => 1,
+		'id_old' => 1,
+		'num' => 1,
+		'app_id' => 1,
+		'cnn_id' => 1,
+		'parent_id' => 1,
+		'child_lvl' => 1,
+		'user_id' => 1,
+		'page_id' => 1,
+		'block_id' => 1,
+		'element_id' => 1,
+		'dialog_id' => 1,
+		'obj_id' => 1,
+		'width' => 1,
+		'color' => 1,
+		'font' => 1,
+		'size' => 1,
+		'mar' => 1,
+		'sort' => 1,
+		'deleted' => 1,
+		'user_id_add' => 1,
+		'user_id_del' => 1,
+//		'dtime_add' => 1,
+		'dtime_del' => 1,
+		'dtime_create' => 1,
+		'app_id_last' => 1,
+
+//		'access_pages' => 1,
+		'url_last' => 1,
+		'invite_hash' => 1,
+		'invite_user_id' => 1
+	);
+
+	if(isset($ass[$col]))
+		return false;
+
+	return true;
+}
+
 
 

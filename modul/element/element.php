@@ -1500,8 +1500,7 @@ function _elemDlgId($elem_id_src) {//получение id диалога на �
 				if(empty($spv[$dlgN]))
 					return 0;
 				return $spv[$dlgN];
-			case 8:
-			case 44:
+			default:
 				if($block_id = $EL['block_id'])
 					return _blockDlgId($block_id);
 				break;

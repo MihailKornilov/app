@@ -2794,15 +2794,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		function vAdd(v) {
 			v = $.extend({
-				w:170,
-				name:'',
-				type:0,
-				v:'',
-				title:''
+				w:170,  //ширина
+				name:'',//заголовок
+				type:0, //тип значения: 1 - текст, 2 - поле, 3 - выпадающий список
+				col:'', //имя колонки в базе
+				v:'',   //дополнительное значение
+				title:''//имя значения
 			}, v);
 
 			DL.append(
-				'<dd class="ov7 pt5">' +
+				'<dd class="ov7 pt10 pb5 line-b1">' +
 					'<div class="el95w bg4" style="width:' + v.w + 'px;min-height:10px;margin-left:35px">' +
 						'<div class="el95colname' + _dn(obj.unit.num_2) + '">' +
 							'<input type="text"' +
@@ -2817,7 +2818,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<b class="bnum fs15 color-555">' + NUM++ + '</b>:' +
 							'<td class="w175">' +
 								'<input type="hidden" class="el95type" value="' + v.type + '">' +
-							'<td class="w300 el95cnt">' +
+							'<td class="w50 el95tdcol">' +
+							'<td class="w250 el95cnt">' +
 							'<td class="r">' +
 								'<div class="icon icon-move pl"></div>' +
 							'<td class="w25 pr5 r">' +
@@ -2834,9 +2836,31 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			var DD = DL.find('dd:last'),
 				CNT = DD.find('.el95cnt'),
 				colChange = function() {
+					//выбор имени колонки из базы для колонки
+					if(v.type > 1) {
+						html = '<div class="el95col' + _dn(v.col, 'on') + '" val="' + v.col + '">' + (v.col ? v.col : '-') + '</div>';
+						DD.find('.el95tdcol').html(html);
+						DD.find('.el95col').click(function() {
+							var t = $(this);
+							_dialogLoad({
+								dialog_id:30,
+								element_id:obj.unit.id,
+								busy_obj:t,
+								func_open:function(res, D) {
+									D.content.find('.el37u').click(function() {
+										var col = $(this).find('.el37col').html();
+										t.html(col).addClass('on').attr('val', col);
+										v.col = col;
+										D.close();
+									});
+								}
+							});
+						});
+					}
+
 					switch(v.type) {
 						case 1:
-							CNT.html('<input type="text" class="el95v w300" placeholder="напишите текст" value="' + v.v + '">')
+							CNT.html('<input type="text" class="el95v w250" placeholder="напишите текст" value="' + v.v + '">')
 								.find('input').focus();
 							break;
 						case 2:
@@ -2846,7 +2870,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							CNT.html('<input type="hidden" class="el95v" value="' + v.v + '">')
 								.find('input')
 								._selem({
-									width:300,
+									width:250,
 									placeholder:'выберите содержание списка',
 									dss:obj.unit.num_1,
 									title:v.title
@@ -2954,13 +2978,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			send.push({
 				w:sp.find('.el95w').width(),
 				name:sp.find('.colname').val(),
+				col:sp.find('.el95col').attr('val'),
 				type:type,
 				v:v
 			});
 		});
-
-		console.log(send);
-
 		return send;
 	},
 
@@ -3979,8 +4001,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 	PHP12_v_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
-			ATTR_EL = D(ATTR_EL(el.id)),
-			VC = ATTR_EL.find('.elm-choose'),//элементы в открытом диалоге для выбора
+			VC = D(ATTR_EL(el.id)).find('.elm-choose'),//элементы в открытом диалоге для выбора
 			DSS = 0,
 			_nest = function(v, dbl) {//разрешение прохода по списку (открытие второго диалога)
 				if(v < 0)
@@ -4005,10 +4026,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				{id:4,title:'Родительский диалог'}
 			];
 
-			if(!ATTR_EL.find('choose-menu-4').length)
+			if(!D(ATTR_EL(el.id)).find('.choose-menu-4').length)
 				spisok.splice(3, 1);
 
-			ATTR_EL.find('#choose-menu')._menu({
+			D(ATTR_EL(el.id)).find('#choose-menu')._menu({
 				spisok:spisok
 			});
 
