@@ -763,7 +763,7 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 	case 'el95_spisok':
-		if(!$elem_id = _num($_POST['elem_id']))
+		if(!$elem_id = _idsLast($_POST['elem_id']))
 			jsonError('Некорректный ID элемента');
 
 		$v = _txt($_POST['v']);

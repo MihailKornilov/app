@@ -781,6 +781,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						if(!sp.num_7)
 							break;
 						send.vvv[id] = ATR_CMP._select('inp');
+						break;
+					//быстрое формирование списка
+					case 95: send.vvv[id] = _ELM_95_GET(sp);
+						break;
 				}
 
 				if(ATR_CMP)
@@ -2760,6 +2764,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		}
 	},
+	_ELM_95_GET = function(el) {//получение данных для сохранения
+		return '';
+	},
 	PHP12_elem95_setup = function(el, vvv, obj) {
 		if(!obj.unit.id)
 			return;
@@ -2844,7 +2851,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							var t = $(this);
 							_dialogLoad({
 								dialog_id:30,
-								element_id:obj.unit.id,
+								dss:obj.unit.num_1,
 								busy_obj:t,
 								func_open:function(res, D) {
 									D.content.find('.el37u').click(function() {
@@ -2968,12 +2975,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			if(!type)
 				return;
-
-			if(type == 3) {
-				v = _num(v);
-				if(!v)
-					return;
-			}
 
 			send.push({
 				w:sp.find('.el95w').width(),

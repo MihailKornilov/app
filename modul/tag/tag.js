@@ -1632,7 +1632,7 @@ $.fn._selem = function(o) {//выбор элемента - звезда
 		return;
 
 	var attr_id = _attrId(t),
-		V = _num(t.val());
+		V = t.val();
 
 	o = $.extend({
 		width:175,

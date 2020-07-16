@@ -230,6 +230,12 @@ function _debugLog($txt) {//запись лога в файл
 	fwrite($fp, $save);
 	fclose($fp);
 }
+function _debugPrint($msg) {//вывод текста, если debug
+	if(!DEBUG)
+		return '';
+
+	return $msg;
+}
 
 
 function jsonDebugParam() {//возвращение дополнительных параметров json, если включен debug
