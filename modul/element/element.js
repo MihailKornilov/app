@@ -769,7 +769,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							return;
 						send.cmp[id] = _attr_el(id).find('.ck-content').html();
 						return;
-						break;
 					//подключаемая функция
 					case 12:
 						var func = sp.txt_1 + '_get';
@@ -784,7 +783,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						break;
 					//быстрое формирование списка
 					case 95: send.vvv[id] = _ELM_95_GET(sp);
-						break;
+						return;
 				}
 
 				if(ATR_CMP)
@@ -2706,23 +2705,30 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		BUT_ADD.click(vAdd);
 
-		vAdd();
+		if(vvv.mass.length)
+			_forIn(vvv.mass, vAdd);
+		else
+			vAdd({});
 
 		function vAdd(v) {
-			v = $.extend({
-			}, v);
-
-			html = 	'<dd class="over1">' +
+			v.id = _num(v.id);
+			_forN(vvv.cols, function(sp) {
+				if(v[sp.col] === undefined)
+					v[sp.col] = '';
+			});
+			html = 	'<dd class="over1" val="' + v.id + '">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center">' +
 								'<div class="icon icon-move pl"></div>';
 
-			_forN(vvv.cols, function(col, i) {
-				html += '<td style="width:' + (col.w-10) + 'px">';
-				switch(col.type) {
-					case 1: html += col.v; break;
-					case 2: html += '<input type="text" class="w100p">'; break;
-					case 3: html += '<input type="hidden" class="col95type" value="0">'; break;
+			_forN(vvv.cols, function(sp) {
+				html += '<td style="width:' + (sp.w-10) + 'px">';
+				//если колонка не указана, значение для сохранения данных выбираться не будет
+				var clsInp = sp.col ? 'el95inp ' : '';
+				switch(sp.type) {
+					case 1: html += sp.v; break;
+					case 2: html += '<input type="text" class="' + clsInp + 'w100p" value="' + v[sp.col] + '">'; break;
+					case 3: html += '<input type="hidden" class="' + clsInp + 'el95sel" value="' + _num(v[sp.col]) + '">'; break;
 				}
 			});
 
@@ -2735,10 +2741,22 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			var DD = DL.find('dd:last');
 
+			//todo только для мебельщиков
+			DD.find('.el95inp').eq(1).keyup(function() {
+				var count = $(this).val(),
+					cena = DD.find('.el95inp').eq(2).val();
+				DD.find('.el95inp').eq(3).val(_cena(count*cena));
+			});
+			DD.find('.el95inp').eq(2).keyup(function() {
+				var count = DD.find('.el95inp').eq(1).val(),
+					cena = $(this).val();
+				DD.find('.el95inp').eq(3).val(_cena(count*cena));
+			});
+
 			_forN(vvv.cols, function(col) {
 				if(col.type != 3)
 					return;
-				DD.find('.col95type')._select({
+				DD.find('.el95sel')._select({
 					width:0,
 					title0:'не выбрано',
 					write:1,
@@ -2754,6 +2772,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						_post(send, function(res) {
 							t.spisok(res.spisok);
 						});
+					},
+					func:function(id) {//todo пока толкьо для мебельщиков
+						var o = {};
+						_forIn(col.spisok, function(sp) {
+							if(sp.id == id) {
+								o = sp;
+								return false;
+							}
+						});
+						DD.find('.el95inp').eq(1).val(1);
+						DD.find('.el95inp').eq(2).val(o.sum_12);
+						DD.find('.el95inp').eq(3).val(o.sum_12);
 					}
 				});
 			});
@@ -2765,7 +2795,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		}
 	},
 	_ELM_95_GET = function(el) {//получение данных для сохранения
-		return '';
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(dd) {
+
+			var inp = [];
+			inp.push(dd.attr('val'));
+			_forEq(dd.find('.el95inp'), function(sp) {
+				inp.push(sp.val());
+			});
+
+			send.push(inp);
+		});
+
+		return send;
 	},
 	PHP12_elem95_setup = function(el, vvv, obj) {
 		if(!obj.unit.id)
