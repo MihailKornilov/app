@@ -164,6 +164,7 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 			'action_id' => _num($DLG[ACT.'_action_id']),
 			'action_page_id' => _num($DLG[ACT.'_action_page_id'])
 		);
+		_count_update();
 		jsonSuccess($send);
 	}
 
