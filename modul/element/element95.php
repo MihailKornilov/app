@@ -135,6 +135,8 @@ function _elem95_spisok($elem_ids, $v='', $ids=0) {//получение данн
 	if(!$arr = query_arr($sql))
 		return array();
 
+	$arr = _spisokInclude($arr);
+
 	$send = array();
 	foreach($arr as $r)
 		$send[] = $r;

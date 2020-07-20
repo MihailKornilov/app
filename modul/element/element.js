@@ -2745,11 +2745,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DD.find('.el95inp').eq(1).keyup(function() {
 				var count = $(this).val(),
 					cena = DD.find('.el95inp').eq(2).val();
+				count = count.replace(',', '.');
 				DD.find('.el95inp').eq(3).val(_cena(count*cena));
 			});
 			DD.find('.el95inp').eq(2).keyup(function() {
 				var count = DD.find('.el95inp').eq(1).val(),
 					cena = $(this).val();
+				cena = cena.replace(',', '.');
 				DD.find('.el95inp').eq(3).val(_cena(count*cena));
 			});
 
