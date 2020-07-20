@@ -2756,11 +2756,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			_forN(vvv.cols, function(col) {
 				if(col.type != 3)
 					return;
+
+				var spisok = col.spisok;
+
 				DD.find('.el95sel')._select({
 					width:0,
 					title0:'не выбрано',
 					write:1,
-					spisok:col.spisok,
+					spisok:spisok,
 					funcWrite:function(v, t) {
 						var send = {
 							op:'el95_spisok',
@@ -2770,17 +2773,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							busy_cls:'spin'
 						};
 						_post(send, function(res) {
-							t.spisok(res.spisok);
+							spisok = res.spisok;
+							t.spisok(spisok);
 						});
 					},
-					func:function(id) {//todo пока толкьо для мебельщиков
+					func:function(id) {//todo пока только для мебельщиков
 						var o = {};
-						_forIn(col.spisok, function(sp) {
+						_forIn(spisok, function(sp) {
 							if(sp.id == id) {
 								o = sp;
 								return false;
 							}
 						});
+
 						DD.find('.el95inp').eq(1).val(1);
 						DD.find('.el95inp').eq(2).val(o.sum_12);
 						DD.find('.el95inp').eq(3).val(o.sum_12);
