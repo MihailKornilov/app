@@ -793,6 +793,26 @@ switch(@$_POST['op']) {
 		jsonSuccess();
 		break;
 
+	case 'el400_chart':
+		if(!$elem_id = _num($_POST['elem_id']))
+			jsonError('Некорректный ID элемента');
+		if(!$el = _elemOne($elem_id))
+			jsonError('Элемента '.$elem_id.' не существует');
+		if(!$DLG = _dialogQuery($el['num_1']))
+			return _emptyMinRed('График-столбики: диалога '.$el['num_1'].' не существует.');
+		if(!$year = _num($_POST['year']))
+			jsonError('Не указан год');
+
+
+		$send = array(
+			'cat' => _elem400_monCat(),
+			'data' => _elem400_monData($DLG, $year)
+		);
+
+		jsonSuccess($send);
+		break;
+
+
 	case 'act228_block_upd'://действие 228: обновление содержимого блока
 		if(!$block_id = _num($_POST['block_id']))
 			jsonError('Некорректный id блока');

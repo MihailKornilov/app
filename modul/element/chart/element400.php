@@ -20,23 +20,29 @@ function _element400_print($el, $prm) {
 
 
 //	$data = _elem400_yearData($DLG);
-//	$title = _elem400_yearTitle($DLG);
+//	$cat = _elem400_yearCat($DLG);
 
 //	$data = _elem400_monData($DLG);
-//	$title = _elem400_monTitle();
+//	$cat = _elem400_monCat();
 
 	$data = _elem400_dayData($DLG);
-	$title = _elem400_dayTitle();
+	$cat = _elem400_dayCat();
 
 	return
+	'<div class="pad10 bg6 line-b">'.
+		'<a>Всё время</a> &raquo; '.
+		'<input type="hidden" id="hcYear'.$el['id'].'">'.
+		'<span id="hcMonDiv'.$el['id'].'" class="dn ml5">'.
+			'&raquo; <input type="hidden" id="hcMon'.$el['id'].'">'.
+		'</span>'.
+		'<div class="w35 fr" id="busy'.$el['id'].'">&nbsp;</div>'.
+	'</div>'.
 	'<div id="chart_'.$el['id'].'"></div>'.
 	'<script>'.
-		'var WIDTH_'.$el['id'].'='._elemWidth($el).',
-			 SERIES_'.$el['id'].'=[{'.
-				'name:"Все записи",'.
-				'data:['.$data.']'.
-			'}],
-			 CAT_'.$el['id'].'=['.$title.'];'.
+		'var YEAR_SPISOK_'.$el['id'].'='._elem400_yearSpisok($DLG).',
+			WIDTH_'.$el['id'].'='._elemWidth($el).',
+			DATA_'.$el['id'].'='._json($data).',
+			CAT_'.$el['id'].'='._json($cat).';'.
 	'</script>';
 }
 
@@ -64,9 +70,13 @@ function _elem400_yearData($DLG) {//данные для годов
 		$Y++;
 	}
 
-	return implode(',', $send);
+	$arr = array();
+	foreach($send as $r)
+		$arr[] = $r ? $r : '';
+
+	return $arr;
 }
-function _elem400_yearTitle($DLG) {//подписи для годов
+function _elem400_yearCat($DLG) {//подписи для годов
 	$sql = "SELECT DATE_FORMAT(`dtime_add`,'%Y') AS `year`
 			FROM "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG)."
@@ -89,10 +99,46 @@ function _elem400_yearTitle($DLG) {//подписи для годов
 	for($n = $first; $n <= $last; $n++)
 		$send[] = $n;
 
-	return implode(',', $send);
+	return $send;
+}
+function _elem400_yearSpisok($DLG) {//получение списка годов для JS, в которых есть записи
+	$send = array();
+	$send = _selArray($send);
+
+
+	$sql = "SELECT DATE_FORMAT(`dtime_add`,'%Y') AS `year`
+			FROM "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG)."
+			ORDER BY `year`
+			LIMIT 1";
+	if(!$first = query_value($sql)) {
+		$send[YEAR_CUR] = YEAR_CUR;
+		$send = _selArray($send);
+		return _json($send);
+	}
+
+	$sql = "SELECT DATE_FORMAT(`dtime_add`,'%Y') AS `year`
+			FROM "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG)."
+			ORDER BY `year` DESC
+			LIMIT 1";
+	$last = query_value($sql);
+
+	if($first == $last) {
+		$send[$first] = $first;
+		$send = _selArray($send);
+		return _json($send);
+	}
+
+	$send = array();
+	for($n = $first; $n <= $last; $n++)
+		$send[$n] = $n;
+
+	$send = _selArray($send);
+	return _json($send);
 }
 
-function _elem400_monData($DLG) {//данные для месяцев
+function _elem400_monData($DLG, $year=YEAR_CUR) {//данные для месяцев
 	$mon = array();
 	for($n = 1; $n <= 12; $n++)
 		$mon[$n] = 0;
@@ -102,19 +148,23 @@ function _elem400_monData($DLG) {//данные для месяцев
 				COUNT(`id`) `count`
 			FROM "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG)."
-			  AND `dtime_add` LIKE '2020-%'
+			  AND `dtime_add` LIKE '".$year."-%'
 			GROUP BY `mon`
 			ORDER BY `mon`";
 	foreach(query_ass($sql) as $d => $c)
 		$mon[_num($d)] = $c;
 
-	return implode(',', $mon);
+	$send = array();
+	foreach($mon as $m)
+		$send[] = $m ? $m : '';
+
+	return $send;
 }
-function _elem400_monTitle() {//подписи для месяцев
+function _elem400_monCat() {//подписи для месяцев
 	$send = array();
 	for($n = 1; $n <= 12; $n++)
-		$send[] = '"'._monthCut($n).'"';
-	return implode(',', $send);
+		$send[] = _monthCut($n);
+	return $send;
 }
 
 function _elem400_dayData($DLG, $mon=YEAR_MON) {
@@ -123,7 +173,7 @@ function _elem400_dayData($DLG, $mon=YEAR_MON) {
 	$unix = strtotime($mon.'-01');
 	$dayCount = date('t', $unix);   //Количество дней в месяце
 	for($n = 1; $n <= $dayCount; $n++)
-		$send[$n] = '""';
+		$send[$n] = '';
 
 	$sql = "SELECT
 				DATE_FORMAT(`dtime_add`,'%d') AS `day`,
@@ -139,27 +189,32 @@ function _elem400_dayData($DLG, $mon=YEAR_MON) {
 			$send[$d] = $c;
 	}
 
-	return implode(',', $send);
+	$arr = array();
+	foreach($send as $r)
+		$arr[] = $r ? $r : '';
+
+	return $arr;
 }
-function _elem400_dayTitle($mon=YEAR_MON) {
+function _elem400_dayCat($mon=YEAR_MON) {
 	$send = array();
 	$unix = strtotime($mon.'-01');
-	$dayCount = date('t', $unix);   //Количество дней в месяце
+	$dayCount = date('t', $unix);//Количество дней в месяце
 	$w = date('w', $unix);       //Номер первого дня недели
 	if(!$w)
 		$w = 7;
 
 	$mon = _monthCut(strftime('%m', $unix));
+	$curDay = _num(strftime('%d'));
 
 	for($n = 1; $n <= $dayCount; $n++) {
-		$send[] = '"<tspan'.(!$w || $w == 6 ? ' style=\"color:#d55\"' : '').'>'.
+		$send[] = '<tspan style="'.(!$w || $w == 6 ? 'color:#d55' : '').($n == $curDay ? ';font-weight:bold;text-decoration:underline' : '').'">'.
 			($n == 1 ? '<b>'.$mon.'</b> ' : '').
 			_week($w++).' '.
 			$n.
-			'</tspan>"';
+			'</tspan>';
 		if($w > 6)
 			$w = 0;
 	}
 
-	return implode(',', $send);
+	return $send;
 }

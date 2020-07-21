@@ -2568,48 +2568,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						});
 					return;
 				//График-столбики
-				case 400:
-					$('#chart_' + elm_id)
-						.height(300)
-						.width(window['WIDTH_' + elm_id])
-						.highcharts({
-							chart:{
-								type:'column'
-							},
-							title:{
-								text:el.txt_1
-							},
-							xAxis:{
-								categories:window['CAT_' + elm_id],
-								labels:{
-									style:{
-										color:'#333'
-									}
-								}
-							},
-							yAxis:{
-								title:{
-									text:'Количество'
-								},
-						        stackLabels:{
-							        enabled:true,
-							        style:{
-								        fontWeight:'bold',
-								        color:'black'
-							        }
-						        }
-							},
-							plotOptions:{
-								column:{
-									stacking:'normal',
-									dataLabels:{
-										enabled:false
-									}
-								}
-							},
-							series:window['SERIES_' + elm_id]
-						});
-					return;
+				case 400: return _ELM_400(el, vvv);
 				//График по месяцам
 				case 401:
 					$('#chart_' + elm_id)
@@ -3034,6 +2993,97 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 		});
 		return send;
+	},
+
+	//график Столбики
+	_ELM_400 = function(el) {
+		var CHART = {},
+			chartPrint = function(hc) {
+				if(CHART.chartHeight)
+					CHART.destroy();
+				CHART = Highcharts.chart('chart_' + el.id, {
+						chart:{
+							type:'column'
+						},
+						title:{
+							text:el.txt_1
+						},
+						xAxis:{
+							categories:hc.cat,
+							labels:{
+								style:{
+									color:'#333'
+								}
+							}
+						},
+						yAxis:{
+							title:{
+								text:'Количество'
+							},
+							stackLabels:{
+								enabled:true,
+								style:{
+									fontWeight:'bold',
+									color:'black'
+								}
+							}
+						},
+						plotOptions:{
+							column:{
+								stacking:'normal',
+								dataLabels:{
+									enabled:false
+								}
+							}
+						},
+						series:[{
+							name:'Все записи',
+							data:hc.data
+						}]
+					});
+			};
+		$('#hcYear' + el.id)._dropdown({
+			title0:'год',
+			spisok:window['YEAR_SPISOK_' + el.id],
+			func:function(y) {
+				$('#hcMonDiv' + el.id)._dn(y);
+				var send = {
+					op:'el400_chart',
+					elem_id:el.id,
+					year:y,
+					busy_obj:$('#busy' + el.id)
+				};
+				_post(send, function(res) {
+					chartPrint(res);
+				});
+			}
+		});
+		$('#hcMon' + el.id)._dropdown({
+			title0:'месяц',
+			spisok:[
+				{id:1,title:'январь'},
+				{id:2,title:'февраль'},
+				{id:3,title:'март'},
+				{id:4,title:'апрель'},
+				{id:5,title:'май'},
+				{id:6,title:'июнь'},
+				{id:7,title:'июль'},
+				{id:8,title:'август'},
+				{id:9,title:'сентябрь'},
+				{id:10,title:'октябрь'},
+				{id:11,title:'ноябрь'},
+				{id:12,title:'декабрь'}
+			]
+		});
+		$('#chart_' + el.id)
+			.html('')
+			.height(300)
+			.width(window['WIDTH_' + el.id]);
+
+		chartPrint({
+			cat:window['CAT_' + el.id],
+			data:window['DATA_' + el.id]
+		});
 	},
 
 	_elemAction = function(el, v, is_open) {//применение функций, привязанных к элементам
