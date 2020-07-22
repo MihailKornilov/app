@@ -33,7 +33,7 @@ function _element400_print($el, $prm) {
 	'<script>'.
 		'var YEAR_SPISOK_'.$el['id'].'='._elem400_yearSpisok($DLG).',
 			WIDTH_'.$el['id'].'='._elemWidth($el).',
-			HEIGHT_'.$el['id'].'='.$el['block']['height'].',
+			HEIGHT_'.$el['id'].'='.($el['block']['height'] < 200 ? 200 : $el['block']['height']).',
 			HEAD_'.$el['id'].'="'._elem400_monHead($el).'",
 			DATA_'.$el['id'].'='._json($data).',
 			CAT_'.$el['id'].'='._json($cat).';'.
