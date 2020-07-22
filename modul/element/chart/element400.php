@@ -18,21 +18,13 @@ function _element400_print($el, $prm) {
 	if($prm['blk_setup'])
 		return _emptyMin('График-столбики <b>'.$DLG['name'].'</b>');
 
-
-//	$data = _elem400_yearData($DLG);
-//	$cat = _elem400_yearCat($DLG);
-
-//	$data = _elem400_monData($DLG);
-//	$cat = _elem400_monCat();
-
-	$data = _elem400_dayData($DLG);
-	$cat = _elem400_dayCat();
+	$data = _elem400_monData($DLG);
+	$cat = _elem400_monCat();
 
 	return
 	'<div class="pad10 bg6 line-b">'.
-		'<a>Всё время</a> &raquo; '.
-		'<input type="hidden" id="hcYear'.$el['id'].'">'.
-		'<span id="hcMonDiv'.$el['id'].'" class="dn ml5">'.
+		'<input type="hidden" id="hcYear'.$el['id'].'" value="'.YEAR_CUR.'">'.
+		'<span id="hcMonDiv'.$el['id'].'" class="ml5">'.
 			'&raquo; <input type="hidden" id="hcMon'.$el['id'].'">'.
 		'</span>'.
 		'<div class="w35 fr" id="busy'.$el['id'].'">&nbsp;</div>'.
@@ -41,11 +33,16 @@ function _element400_print($el, $prm) {
 	'<script>'.
 		'var YEAR_SPISOK_'.$el['id'].'='._elem400_yearSpisok($DLG).',
 			WIDTH_'.$el['id'].'='._elemWidth($el).',
+			HEIGHT_'.$el['id'].'='.$el['block']['height'].',
+			HEAD_'.$el['id'].'="'._elem400_monHead($el).'",
 			DATA_'.$el['id'].'='._json($data).',
 			CAT_'.$el['id'].'='._json($cat).';'.
 	'</script>';
 }
 
+function _elem400_yearHead($el, $year=YEAR_CUR) {
+	return '<b>'.$el['txt_1'].'</b><br>за весь период';
+}
 function _elem400_yearData($DLG) {//данные для годов
 	$send = array();
 
@@ -138,6 +135,9 @@ function _elem400_yearSpisok($DLG) {//получение списка годов
 	return _json($send);
 }
 
+function _elem400_monHead($el, $year=YEAR_CUR) {
+	return '<b>'.$el['txt_1'].'</b><br>за '.$year.' год';
+}
 function _elem400_monData($DLG, $year=YEAR_CUR) {//данные для месяцев
 	$mon = array();
 	for($n = 1; $n <= 12; $n++)
@@ -167,6 +167,10 @@ function _elem400_monCat() {//подписи для месяцев
 	return $send;
 }
 
+function _elem400_dayHead($el, $mon) {
+	$ex = explode('-', $mon);
+	return '<b>'.$el['txt_1'].'</b><br>за '._monthDef($ex[1]).' '.$ex[0];
+}
 function _elem400_dayData($DLG, $mon=YEAR_MON) {
 	$send = array();
 
@@ -203,12 +207,16 @@ function _elem400_dayCat($mon=YEAR_MON) {
 	if(!$w)
 		$w = 7;
 
-	$mon = _monthCut(strftime('%m', $unix));
-	$curDay = _num(strftime('%d'));
+	$first = _monthCut(strftime('%m', $unix));
 
 	for($n = 1; $n <= $dayCount; $n++) {
-		$send[] = '<tspan style="'.(!$w || $w == 6 ? 'color:#d55' : '').($n == $curDay ? ';font-weight:bold;text-decoration:underline' : '').'">'.
-			($n == 1 ? '<b>'.$mon.'</b> ' : '').
+		$cur = $mon.'-'._0($n);
+		$send[] = '<tspan style="'.
+					(!$w || $w == 6 ? 'color:#d55;' : '').
+					($cur == TODAY ? 'font-weight:bold;text-decoration:underline;' : '').
+					(strtotime($cur) > TODAY_UNIXTIME ? 'opacity:.3;' : '').
+				  '">'.
+			($n == 1 ? $first.' ' : '').
 			_week($w++).' '.
 			$n.
 			'</tspan>';

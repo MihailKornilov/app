@@ -1346,6 +1346,16 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		S = window[win],
 		VALUE = _num(t.val());
 
+	switch(typeof o) {
+		default:
+		case 'undefined': break;
+		case 'object': break;
+		case 'number':
+		case 'string':
+			S.value(o);
+			return S;
+	}
+
 	o = $.extend({
 		head:'',        //если указано, то ставится в название ссылки, а список из spisok
 		title0:'',
@@ -1517,6 +1527,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 	}
 
 	t.ass = MASS_ASS;
+	t.value = valueSet;
 
 	window[win] = t;
 	return t;

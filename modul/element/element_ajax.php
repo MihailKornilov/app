@@ -800,13 +800,30 @@ switch(@$_POST['op']) {
 			jsonError('Элемента '.$elem_id.' не существует');
 		if(!$DLG = _dialogQuery($el['num_1']))
 			return _emptyMinRed('График-столбики: диалога '.$el['num_1'].' не существует.');
-		if(!$year = _num($_POST['year']))
-			jsonError('Не указан год');
 
+		if(!$year = _num(@$_POST['year'])) {
+			$send = array(
+				'head' => _elem400_yearHead($el),
+				'data' => _elem400_yearData($DLG),
+				'cat' => _elem400_yearCat($DLG)
+			);
+			jsonSuccess($send);
+		}
 
+		if(!$mon = _num(@$_POST['mon'])) {
+			$send = array(
+				'head' => _elem400_monHead($el, $year),
+				'data' => _elem400_monData($DLG, $year),
+				'cat' => _elem400_monCat()
+			);
+			jsonSuccess($send);
+		}
+
+		$mon = $year.'-'._0($mon);
 		$send = array(
-			'cat' => _elem400_monCat(),
-			'data' => _elem400_monData($DLG, $year)
+			'head' => _elem400_dayHead($el, $mon),
+			'data' => _elem400_dayData($DLG, $mon),
+			'cat' => _elem400_dayCat($mon)
 		);
 
 		jsonSuccess($send);

@@ -2998,6 +2998,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	//график Столбики
 	_ELM_400 = function(el) {
 		var CHART = {},
+			Y = (new Date).getFullYear(),//номер выбранного года
+			HCY = $('#hcYear' + el.id),
+			HCM = $('#hcMon' + el.id),
 			chartPrint = function(hc) {
 				if(CHART.chartHeight)
 					CHART.destroy();
@@ -3006,7 +3009,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							type:'column'
 						},
 						title:{
-							text:el.txt_1
+							text:window['HEAD_' + el.id]
 						},
 						xAxis:{
 							categories:hc.cat,
@@ -3029,36 +3032,64 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							}
 						},
 						plotOptions:{
+					        series:{
+						        cursor:_num(HCM.val()) ? 'default' :'pointer'
+					        },
 							column:{
 								stacking:'normal',
 								dataLabels:{
 									enabled:false
-								}
-							}
+								},
+					            events:{
+						            click:function(e) {
+						            	//если по дням, действия нет
+						            	if(_num(HCM.val()))
+						            		return;
+
+							            var i = e.point.index;
+
+						            	//нажатие на месяц
+							            if(_num(HCY.val())) {
+							            	HCM._dropdown(i+1);
+							            } else {//нажатие на год
+								            HCY._dropdown(e.point.series.xAxis.categories[i]);
+								            $('#hcMonDiv' + el.id)._dn(true);
+							            }
+										chartUpd();
+						            }
+					            }
+				            }
 						},
 						series:[{
 							name:'Все записи',
 							data:hc.data
 						}]
 					});
-			};
-		$('#hcYear' + el.id)._dropdown({
-			title0:'год',
-			spisok:window['YEAR_SPISOK_' + el.id],
-			func:function(y) {
-				$('#hcMonDiv' + el.id)._dn(y);
+			},
+			chartUpd = function() {
 				var send = {
 					op:'el400_chart',
 					elem_id:el.id,
-					year:y,
+					year:HCY.val(),
+					mon:HCM.val(),
 					busy_obj:$('#busy' + el.id)
 				};
 				_post(send, function(res) {
+					window['HEAD_' + el.id] = res.head;
 					chartPrint(res);
 				});
+			};
+		HCY._dropdown({
+			title0:'Всё время',
+			spisok:window['YEAR_SPISOK_' + el.id],
+			func:function(y) {
+				Y = y;
+				$('#hcMonDiv' + el.id)._dn(y);
+				HCM._dropdown(0);
+				chartUpd();
 			}
 		});
-		$('#hcMon' + el.id)._dropdown({
+		HCM._dropdown({
 			title0:'месяц',
 			spisok:[
 				{id:1,title:'январь'},
@@ -3073,12 +3104,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				{id:10,title:'октябрь'},
 				{id:11,title:'ноябрь'},
 				{id:12,title:'декабрь'}
-			]
+			],
+			func:chartUpd
 		});
 		$('#chart_' + el.id)
 			.html('')
-			.height(300)
-			.width(window['WIDTH_' + el.id]);
+			.width(window['WIDTH_' + el.id])
+			.height(window['HEIGHT_' + el.id]);
 
 		chartPrint({
 			cat:window['CAT_' + el.id],

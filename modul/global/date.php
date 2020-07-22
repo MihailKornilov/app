@@ -79,6 +79,7 @@ function _week($n) {
 		4 => 'чт',
 		5 => 'пт',
 		6 => 'сб',
+		7 => 'вс',
 		0 => 'вс'
 	);
 	return $week[intval($n)];
