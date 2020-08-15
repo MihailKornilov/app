@@ -965,6 +965,7 @@ function _remake74() {//[74] перенос данных в JSON
 }
 
 function _page_div() {//todo тест
+	return '';
 
 	_remake16();
 	_remake17();

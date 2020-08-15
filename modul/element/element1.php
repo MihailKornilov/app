@@ -16,7 +16,7 @@ function _element1_struct_title($el) {
 function _element1_print($el, $prm) {
 	return _check(array(
 		'attr_id' => _elemAttrId($el, $prm),
-		'title' => $el['txt_1'],
+		'title' => _br($el['txt_1']),
 		'disabled' => $prm['blk_setup'],
 		'value' => _elemPrintV($el, $prm, $el['def'])
 	));
@@ -27,7 +27,7 @@ function _element1_print11($el, $u) {
 	if(empty($u[$col]))
 		return '';
 
-	return '<div class="icon icon-ok curD"></div>';
+	return '<div class="icon icon-ok curD tool" data-tool="'._br($el['txt_1']).'"></div>';
 }
 function _element1_history($el, $v) {
 	return _daNet($v);

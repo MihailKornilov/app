@@ -126,12 +126,16 @@ var ZINDEX = 1000,
 		//Может быть отрицательным значением
 		if(typeof v == 'string')
 			v = v.replace(',', '.');
-		if(!REGEXP_FRACT.test(v))
-			return 0;
+
+		if(minus) {
+			if(REGEXP_FRACT_MINUS.test(v))
+				return v * 1;
+		} else {
+			if(!REGEXP_FRACT.test(v))
+				return 0;
+		}
 		if(v == 0)
 			return 0;
-		if(minus && REGEXP_FRACT_MINUS.test(v))
-			return v * 1;
 		return Math.round(v * 100) / 100;
 	},
 	_nol = function(v) {//вставка нуля перед цифрой - для времени
