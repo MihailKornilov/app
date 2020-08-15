@@ -438,10 +438,17 @@ function PHP12_v_choose_13($prm, $dialog_id) {//клик по элементу [
 function PHP12_v_choose_23($prm, $dialog_id) {//ячейка таблицы
 	if($dialog_id)
 		return $dialog_id;
-	if(!$EL = _elemOne($prm['srce']['element_id']))
+	if($EL = _elemOne($prm['srce']['element_id'])) {
+		if(!$EL23 = _elemOne($EL['parent_id']))
+			return false;
+	} else
+		if($BL = PHP12_v_choose_BL($prm))
+			if(!$EL23 = _elemOne($BL['elem_id']))
+				return false;
+
+	if(!isset($EL23))
 		return false;
-	if(!$EL23 = _elemOne($EL['parent_id']))
-		return false;
+
 	if($EL23['dialog_id'] != 23)
 		return false;
 
