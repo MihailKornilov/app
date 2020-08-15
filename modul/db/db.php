@@ -38,7 +38,6 @@ function _db_table() {//содержание таблицы
 
 	$sql = "SELECT * FROM `".$table."` LIMIT 100";
 	$arr = query_array($sql);
-//	print_r($arr[0]);
 	foreach($arr as $row)  {
 		$send .= '<tr class="over1">';
 		foreach($row as $r) {

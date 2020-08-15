@@ -172,8 +172,9 @@
 ._dialog .head.orange{background-color:#CC8E4F}
 ._dialog .head.red{background-color:#B66}
 ._dialog .head div{padding:12px 9px 8px 13px}
+._dialog .head .edit:hover .icon,
+._dialog .head .submit:hover .icon,
 ._dialog .head .close:hover .icon{opacity:1}
-._dialog .head .edit:hover .icon{opacity:1}
 ._dialog .btm {
 	background:#F8F9FA;
 	border-top:#EBEDF0 solid 1px;

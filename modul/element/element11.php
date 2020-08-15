@@ -6,9 +6,9 @@ function _element11_struct($el, $ELM=array()) {
 		Вставка элемента через функцию PHP12_v_choose
 	*/
 
-	global $G_ELEM;
+	global $G_ELM;
 	if(empty($ELM))
-		$ELM = $G_ELEM;
+		$ELM = $G_ELM;
 
 	$send = array(
 		'parent_id' => _num($el['parent_id']),
@@ -30,10 +30,6 @@ function _element11_struct($el, $ELM=array()) {
 			//разрешать настройку стилей (правило 11)
 			if(_elemRule($el11['dialog_id'], 11))
 				$send['stl'] = 1; //для JS
-
-			//разрешать настройку перехода на страницу или открытие диалога
-			if(_elemRule($el11['dialog_id'], 16))
-				$send['url_use'] = 1;
 
 			//является изображением
 			if($el11['dialog_id'] == 60) {
@@ -141,6 +137,9 @@ function _element11_print($el, $prm) {
 
 	return _msgRed('-11-yok-');
 }
+function _element11_v_get() {
+	return 'любое значение';
+}
 function _element11_template_docx($el, $u) {
 	foreach(_ids($el['txt_2'], 'arr') as $id) {
 		if(!$ell = _elemOne($id))
@@ -170,43 +169,34 @@ function PHP12_v_choose($prm) {
 
 	//Изначально obj_id = false. По этому флагу будет определяться, в какой именно функции будет производиться поиск объекта
 	//В начале всегда проверяется прямое указание на диалог
-	if(!$obj_id = PHP12_v_choose_dss($prm)) {
-		if(!$block_id = _num($prm['srce']['block_id']))
-			if($elem_id = _num($prm['srce']['element_id'])) {
-				if(!$EL = _elemOne($elem_id))
-					return _emptyMin10('[11] Отсутствует исходный блок.');
-				$block_id = $EL['block_id'];
-			}
-		if(!$BL = _blockOne($block_id))
-			return _emptyMin10('Блока '.$block_id.' не существует.');
+	$obj_id = PHP12_v_choose_dss($prm);
 
-		//выбор элемента-значения через [13]
-		$obj_id = PHP12_v_choose_13($BL, $prm, $obj_id);
+	//выбор элемента-значения через [13]
+	$obj_id = PHP12_v_choose_13($prm, $obj_id);
 
-		//ячейка таблицы
-		$obj_id = PHP12_v_choose_23($BL, $obj_id);
+	//ячейка таблицы
+	$obj_id = PHP12_v_choose_23($prm, $obj_id);
 
-		//сборный текст
-		$obj_id = PHP12_v_choose_44($BL, $obj_id);
+	//сборный текст
+	$obj_id = PHP12_v_choose_44($prm, $obj_id);
 
-		//блок со страницы
-		$obj_id = PHP12_v_choose_page($BL, $obj_id);
+	//блок со страницы
+	$obj_id = PHP12_v_choose_page($prm, $obj_id);
 
-		//блок из диалога
-		$obj_id = PHP12_v_choose_dialog($BL, $obj_id);
+	//блок из диалога
+	$obj_id = PHP12_v_choose_dialog($prm, $obj_id);
 
-		//элемент записи
-		$obj_id = PHP12_v_choose_spisok($BL, $obj_id);
+	//элемент записи
+	$obj_id = PHP12_v_choose_spisok($prm, $obj_id);
 
-		//блок из содержания удаления записи
-		$obj_id = PHP12_v_choose_dialog_del($BL, $obj_id);
+	//блок из содержания удаления записи
+	$obj_id = PHP12_v_choose_dialog_del($prm, $obj_id);
 
-		//настройка баланса [27]
-		$obj_id = PHP12_v_choose_27balans($BL, $obj_id);
+	//настройка баланса [27]
+	$obj_id = PHP12_v_choose_27($prm, $obj_id);
 
-		//выплывающая подсказка [act229]
-		$obj_id = _hintDlgId($BL, $obj_id);
-	}
+	//выплывающая подсказка [act229]
+	$obj_id = _hintDlgId($prm, $obj_id);
 
 	if($obj_id === false)
 		return _emptyMin10('Не найдена схема поиска объекта.');
@@ -248,12 +238,14 @@ function PHP12_v_choose($prm) {
 			return _emptyMin10('Неизвестный объект <b>'.OBJ_NAME_CHOOSE.'</b>.');
 	}
 
-
 	$cond = array(
 		'elm_choose' => 1,
 		'elm_sel' => $prm['dop']['sel'],
 		'elm_allow' => $prm['dop']['allow']
 	);
+
+	//для повторного (реального) вызова vvv, чтобы получить данные об блоках и элементах
+	define('OBJ_ID_CHOOSE', $obj_id);
 
 	return
 ($prm['dop']['first'] ?
@@ -279,7 +271,7 @@ function PHP12_v_choose($prm) {
 : '').
 	'';
 }
-function PHP12_v_choose_menuSel($prm) {//выбраный пункт меню
+function PHP12_v_choose_menuSel($prm) {//выбранный пункт меню
 	$sel = 3;
 
 	if(!$v = _idsFirst($prm['dop']['sel']))
@@ -314,18 +306,27 @@ function PHP12_v_choose_global($prm) {//глобальные значения д
 }
 function PHP12_v_choose_vvv($prm) {
 	$dop = array(
-		'mysave' => 0,  //сохранение данных будет происходить через собственную функцию
-		'is13' => 0,    //через элемент [13]
-		'sev' => 0,     //выбор нескольких значений-элементов
-		'nest' => 1,    //возможность выбора из вложенного списка
-		'dlg24' => 0,   //выбранный диалог через select [24]
-		'sel' => 0,     //выбранные значения
-		'allow' => '',  //разрешённые значения
-		'first' => 1    //открытие первого диалога [11]. При этом создаются глобальные переменные в JS
+		'mysave' => 0,      //сохранение данных будет происходить через собственную функцию
+		'is13' => 0,        //через элемент [13]
+		'sev' => 0,         //выбор нескольких значений-элементов
+		'nest' => 1,        //возможность выбора из вложенного списка
+		'dlg24' => 0,       //выбранный диалог через select [24]
+		'sel' => 0,         //выбранные значения
+		'allow' => '',      //разрешённые значения
+		'first' => 1,       //открытие первого диалога [11]. При этом создаются глобальные переменные в JS
+		'jselm' => array()  //данные об выбираемых элементах
 	);
 
-	if($u = $prm['unit_edit'])
-		$dop['sel'] = $u['txt_2'];
+	if(!empty($prm['unit_edit']))
+		$dop['sel'] = $prm['unit_edit']['txt_2'];
+	if(defined('OBJ_NAME_CHOOSE')) {
+		$dop['jselm'] = _elmJs(OBJ_NAME_CHOOSE, OBJ_ID_CHOOSE);
+		//добавление элементов из родительского диалога, если есть
+		if(OBJ_NAME_CHOOSE == 'dialog')
+			if($dlg = _dialogQuery(OBJ_ID_CHOOSE))
+				if($parent_id = $dlg['dialog_id_parent'])
+					$dop['jselm'] += _elmJs('dialog', $parent_id);
+	}
 
 	return $prm['dop'] + $dop;
 }
@@ -336,13 +337,19 @@ function PHP12_v_choose_dss($prm) {//ID диалога из dss
 		return false;
 	if($dss == 210)
 		return false;
-	if($dss == 220)
-		return false;
 	if($dss == 230)
 		return false;
 	return $dss;
 }
-function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элементу [13]
+function PHP12_v_choose_BL($prm) {//получение данных исходного блока
+	if($BL = _blockOne($prm['srce']['block_id']))
+		return $BL;
+	if($EL = _elemOne($prm['srce']['element_id']))
+		if($BL = _blockOne($EL['block_id']))
+			return $BL;
+	return array();
+}
+function PHP12_v_choose_13($prm, $dialog_id) {//клик по элементу [13]
 	if($dialog_id !== false)
 		return $dialog_id;
 	//передаёт id элемента, который размещает [13]
@@ -381,17 +388,17 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 
 
 
-//	return '[13] Не доделано';
-
-
+	if(!$BL = PHP12_v_choose_BL($prm))
+		return false;
 
 	//если список, получение id диалога, размещающего список
 	if($BL['obj_name'] == 'spisok') {
 		//определение местоположения элемента [13]
-		if($el13['block']['obj_name'] == 'dialog') {
-			if(!$DLG = _dialogQuery($el13['block']['obj_id']))
-				return 'Диалога '.$el13['block']['obj_id'].' не существует, содержащего элемент [13].';
-		}
+		if($bl13 = _blockOne($el13['block_id']))
+			if($bl13['obj_name'] == 'dialog') {
+				if(!$DLG = _dialogQuery($bl13['obj_id']))
+					return 'Диалога '.$bl13['obj_id'].' не существует, содержащего элемент [13].';
+			}
 		if(!$ell = _elemOne($BL['obj_id']))
 			return 'Элемента, размещающего список, не существует.';
 
@@ -419,31 +426,33 @@ function PHP12_v_choose_13($BL, $prm, $dialog_id) {//клик по элемен�
 //			return $parent_id;
 
 		//выбор для ячейки диалога
-		if(!empty($BL['elem'])) {
-			$ell = $BL['elem'];
+		if($ell = _elemOne($BL['elem_id']))
 			if($ell['dialog_id'] == 23)
 				return $ell['num_1'];
-		}
 
 		return $BL['obj_id'];
 	}
 
 	return '[13] неизвестно, где искать диалог';
 }
-function PHP12_v_choose_23($BL, $dialog_id) {//ячейка таблицы
+function PHP12_v_choose_23($prm, $dialog_id) {//ячейка таблицы
 	if($dialog_id)
 		return $dialog_id;
-	if(!$EL = $BL['elem'])
+	if(!$EL = _elemOne($prm['srce']['element_id']))
 		return false;
-	if($EL['dialog_id'] != 23)
+	if(!$EL23 = _elemOne($EL['parent_id']))
+		return false;
+	if($EL23['dialog_id'] != 23)
 		return false;
 
-	return _num($EL['num_1']);
+	return _num($EL23['num_1']);
 }
-function PHP12_v_choose_44($BL, $obj_id) {//сборный текст
+function PHP12_v_choose_44($prm, $obj_id) {//сборный текст
 	if($obj_id)
 		return $obj_id;
-	if(!$EL = $BL['elem'])
+	if(!$BL = PHP12_v_choose_BL($prm))
+		return false;
+	if(!$EL = _elemOne($BL['elem_id']))
 		return false;
 	if($EL['dialog_id'] != 44)
 		return false;
@@ -455,9 +464,11 @@ function PHP12_v_choose_44($BL, $obj_id) {//сборный текст
 	}
 	return 0;
 }
-function PHP12_v_choose_page($BL, $dialog_id) {//блок со страницы
+function PHP12_v_choose_page($prm, $dialog_id) {//блок со страницы
 	if($dialog_id !== false)
 		return $dialog_id;
+	if(!$BL = PHP12_v_choose_BL($prm))
+		return false;
 	if($BL['obj_name'] != 'page')
 		return false;
 	if(!$page = _page($BL['obj_id']))
@@ -467,9 +478,11 @@ function PHP12_v_choose_page($BL, $dialog_id) {//блок со страницы
 
 	return $dialog_id;
 }
-function PHP12_v_choose_dialog($BL, $dialog_id) {//блок из диалога
+function PHP12_v_choose_dialog($prm, $dialog_id) {//блок из диалога
 	if($dialog_id !== false)
 		return $dialog_id;
+	if(!$BL = PHP12_v_choose_BL($prm))
+		return false;
 	if($BL['obj_name'] != 'dialog')
 		return false;
 	if(!$DLG = _dialogQuery($BL['obj_id']))
@@ -480,9 +493,11 @@ function PHP12_v_choose_dialog($BL, $dialog_id) {//блок из диалога
 //		return $get_id;
 	return $BL['obj_id'];
 }
-function PHP12_v_choose_spisok($BL, $obj_id) {//элемент из записи
+function PHP12_v_choose_spisok($prm, $obj_id) {//элемент из записи
 	if($obj_id)
 		return $obj_id;
+	if(!$BL = PHP12_v_choose_BL($prm))
+		return false;
 	if($BL['obj_name'] != 'spisok')
 		return false;
 	if(!$el = _elemOne($BL['obj_id']))
@@ -490,18 +505,22 @@ function PHP12_v_choose_spisok($BL, $obj_id) {//элемент из записи
 
 	return $el['num_1'];
 }
-function PHP12_v_choose_dialog_del($BL, $obj_id) {//блок из содержания удаления единицы списка
+function PHP12_v_choose_dialog_del($prm, $obj_id) {//блок из содержания удаления единицы списка
 	if($obj_id)
 		return $obj_id;
+	if(!$BL = PHP12_v_choose_BL($prm))
+		return false;
 	if($BL['obj_name'] != 'dialog_del')
 		return false;
 
 	return _num($BL['obj_id']);
 }
-function PHP12_v_choose_27balans($BL, $obj_id) {//ячейка таблицы
+function PHP12_v_choose_27($prm, $obj_id) {//[27] значение баланса
 	if($obj_id)
 		return $obj_id;
-	if(!$EL = $BL['elem'])
+	if(!$BL = PHP12_v_choose_BL($prm))
+		return false;
+	if(!$EL = _elemOne($BL['elem_id']))
 		return false;
 	if($EL['dialog_id'] != 27)
 		return false;

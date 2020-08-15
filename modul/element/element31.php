@@ -25,7 +25,7 @@ function _element31_print($el, $prm) {
 	$n = 0;
 	$sel = _idsAss($v);
 	foreach($spisok as $r) {
-		$title = '<div class="fs10 red">содержание не настроено</div>';
+		$title = _msgRed('содержание не настроено');
 
 		if($elem_id = $el['num_2']) {
 			if($ell = _elemOne($elem_id)) {

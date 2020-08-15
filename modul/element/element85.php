@@ -54,8 +54,10 @@ function _element85_vvv($el, $prm) {
 
 	$send = _elem201init($el, $prm, $send);
 
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return $send;
+
+	$u = $prm['unit_edit'];
 
 	//колонка, по которой будет получено ID диалога-списка
 	if(!$col = _elemCol($el['num_1']))
@@ -109,7 +111,7 @@ function _elem85mass($ell_id, $v, $send) {//получение значений 
 		}
 		$send[] = array(
 			'id' => $id,
-			'title' => is_array($sp) ? 'id'.$sp['id'] : $sp
+			'title' => is_array($sp) ? $sp['txt_1'] : $sp
 		);
 	}
 
@@ -132,9 +134,11 @@ function _elem201init($el85, $prm, $send) {//получение данных э�
 
 	//получение настраиваемого элемента
 	if(!$EL = _elemOne($srce['element_id'])) {
-		if(!$BL = _blockOne($srce['block_id']))
-			return $send;
-		if(!$EL = $BL['elem'])
+		if($BL = _blockOne($srce['block_id'])) {
+			if(!$EL = _elemOne($BL['elem_id']))
+				return $send;
+		}
+		if(!$act = _BE('action_one', 0))
 			return $send;
 	}
 
@@ -154,8 +158,15 @@ function _elem201init($el85, $prm, $send) {//получение данных э�
 							 '<div class="grey i ml20">Действие будет совершено, если галочка снята</div>'
 			));
 			break;
-		case 6: return _elem201initCnn($send, _jsCachePage());
-
+		case 11:
+			array_unshift($send, array(
+				'id' => -2,
+				'title' => 'выбрано любое значение',
+				'content' => '<div class="color-pay b">выбрано любое значение</div>'.
+							 '<div class="grey i ml20">Действие будет совершено при выборе любого значения</div>'
+			));
+			break;
+		case 6:
 		case 16:
 		case 17:
 		case 18: return _elem201initCnn($send, _element('vvv', $EL));
@@ -213,7 +224,7 @@ function _elem212ActionFormat($el85_id, $elv_id, $send) {//преобразов�
 		return $send;
 	if($el85['dialog_id'] != 85)
 		return $send;
-	if(!$BL = $el85['block'])
+	if(!$BL = _blockOne($el85['block_id']))
 		return $send;
 	if($BL['obj_name'] != 'dialog')
 		return $send;

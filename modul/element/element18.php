@@ -12,16 +12,14 @@ function _element18_struct($el) {
 		'def'     => _num($el['def']),
 
 		'txt_1'   => $el['txt_1'],      //текст нулевого значения
+		'txt_2'   => $el['txt_2'],      /* содержание списка в формате JSON
+                                            id
+	                                        title
+                                            def
+                                        */
 		'num_1'   => _num($el['num_1']),//скрывать нулевое значение в меню выбора
 		'num_2'   => _num($el['num_2']) //не изменять имя нулевого значения после выбора
 	) + _elementStruct($el);
-}
-function _element18_struct_vvv($el, $cl) {
-	return array(
-		'id' => _num($cl['id']),
-		'title' => $cl['txt_1'],
-		'def' => _num($cl['def'])
-	);
 }
 function _element18_js($el) {
 	return array(
@@ -30,12 +28,33 @@ function _element18_js($el) {
 		'txt_1'   => $el['txt_1']
 	) + _elementJs($el);
 }
+function _element18_vvv($el) {
+	if(!$el['txt_2'])
+		return array();
+	if(!$send = json_decode($el['txt_2'], true))
+		return array();
+
+	return _arrNum($send);
+}
+function _element18_v_get($el, $id) {
+	foreach(_element18_vvv($el) as $r)
+		if($r['id'] == $id)
+			return $r['title'];
+
+	return '';
+}
 function _element18_print($el, $prm) {
+	$def = 0;
+	foreach(_element('vvv', $el) as $r)
+		if($r['def']) {
+			$def = $r['id'];
+			break;
+		}
 	return
 	_dropdown(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
-		'value' => _elemPrintV($el, $prm, $el['def'])
+		'value' => _elemPrintV($el, $prm, $def)
 	));
 }
 function _element18_print11($el, $u) {
@@ -43,12 +62,10 @@ function _element18_print11($el, $u) {
 		return '';
 	if(!$id = _num($u[$col]))
 		return '';
-	if(empty($el['vvv']))
-		return '';
 
-	foreach($el['vvv'] as $vv)
-		if($vv['id'] == $id)
-			return $vv['title'];
+	foreach(_element('vvv', $el) as $r)
+		if($r['id'] == $id)
+			return $r['title'];
 
 	return '';
 }

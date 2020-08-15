@@ -54,7 +54,7 @@ function _element8_print($el, $prm) {
 				break;
 			if(!$col = _elemCol($el))
 				break;
-			if(!$BL = $el['block'])
+			if(!$BL = _blockOne($el['block_id']))
 				break;
 			if($BL['obj_name'] != 'dialog')
 				break;

@@ -23,7 +23,7 @@ function _element24_struct($el) {
 }
 function _element24_js($el) {
 	return array(
-		'txt_1' => $el['txt_1']
+		'txt_1' => $el['txt_1'],
 	) + _elementJs($el);
 }
 function _element24_print($el, $prm) {
@@ -36,6 +36,9 @@ function _element24_print($el, $prm) {
    ));
 }
 function _element24_vvv($el, $prm) {
+	if(empty($prm['srce']))
+		return array();
+
 	$dialog_id = $prm['srce']['dialog_id'];
 	$block_id = $prm['srce']['block_id'];
 	switch($el['num_1']) {

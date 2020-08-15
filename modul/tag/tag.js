@@ -27,6 +27,31 @@ $(document)
 		p.prev().val(v);
 		p.find('.on').removeClass('on');
 		t.addClass('on');
+	})
+	.on('mouseenter', '.tool,.tool-l,.tool-r', function() {//показ сообщения на тёмном фоне
+		var t = $(this),
+			msg = t.attr('data-tool'),
+			side = '';
+
+		if(t.find('.tool-div').length)
+			return;
+		if(!msg)
+			return t.removeClass('tool');
+
+		//подсказка смещена влево
+		if(t.hasClass('tool-l'))
+			side = 'l';
+		//подсказка смещена вправо
+		if(t.hasClass('tool-r'))
+			side = 'r';
+
+
+		var html = '<div class="tool-div">' +
+					'<div class="tool-msg">' + msg + '</div>' +
+					'<div class="tool-ug ' + side + '"></div>' +
+				  '</div>';
+		t.removeAttr('data-tool');
+		t.append(html)._toolCss(side);
 	});
 
 $.fn._check = function(o) {
@@ -85,7 +110,7 @@ $.fn._check = function(o) {
 
 
 	if(o.tooltip)
-		CHECK._tooltip(o.tooltip);
+		CHECK._tool(o.tooltip);
 
 	function checkPrint() {//вывод галочки
 		var nx = t.next(),
@@ -152,6 +177,11 @@ $.fn._radio = function(o, oo) {
 		win = attr_id + 'win',
 		S = window[win];
 
+	//если элемент был выведен через PHP, переключение его на JS
+	var PHP = t.next('._radio.php');
+	if(PHP.length && S)
+		S = false;
+
 	if(S) {
 		switch(typeof o) {
 			case 'number': S.valSet(o);	break;
@@ -171,9 +201,7 @@ $.fn._radio = function(o, oo) {
 	// ---=== АКТИВАЦИЯ RADIO ===---
 
 
-	//если элемент был выведен через PHP, переключение его на JS
-	var PHP = t.next('._radio.php'),
-		PHP_O = o;  //сохранение для повторного вывода
+	var PHP_O = o;  //сохранение для повторного вывода
 	if(PHP.length) {
 		if(typeof o != 'object')
 			o = {};
@@ -220,7 +248,7 @@ $.fn._radio = function(o, oo) {
 	_active();
 
 	function _spisok() {//печать списка
-		var spisok = _copySel(o.spisok),
+		var spisok = _selCopy(o.spisok),
 			val = _num(t.val(), 1),
 			html = '';
 
@@ -333,7 +361,7 @@ $.fn._count = function(o) {//input с количеством
 	INP.val(valTitle());
 
 	if(o.tooltip)
-		PHP._tooltip(o.tooltip, -15);
+		PHP._tool(o.tooltip);
 
 	PHP.find('.but').click(function() {
 		if(PHP.hasClass('disabled'))
@@ -426,7 +454,7 @@ $.fn._hint = function(o) {//выплывающие подсказки
 		return t;
 
 	o = $.extend({
-		msg:'Пусто',//сообщение подсказки
+		msg:'--- Содержание подсказки отсутствует---',//содержание подсказки
 		color:'',   //цвет текста (стиль)
 		width:0,    //фиксированная ширина. Если 0 - автоматически
 		pad:1,      //внутренние отступы контента
@@ -798,25 +826,41 @@ $.fn._hintOver = function(o) {//выплывающая подсказка от �
 		obj._hint(o);
 	});
 };
-$.fn._tooltip = function(msg, left, ugolSide) {
+$.fn._tool = function(msg, side) {//подсказка на тёмном фоне
 	var t = $(this);
 
-	t.find('.ttdiv').remove();
-	t.addClass('_tooltip');
-	t.append(
-		'<div class="ttdiv"' + (left ? ' style="left:' + left + 'px"' : '') + '>' +
-			'<div class="ttmsg">' + msg + '</div>' +
-			'<div class="ttug' + (ugolSide ? ' ' + ugolSide : '') + '"></div>' +
-		'</div>'
-	);
-	//автопозиционирование подсказки
-	if(!left) {
-		var ttdiv = t.find('.ttdiv');
-		left = Math.ceil(ttdiv.width() / 2) - 9;
-		ttdiv.css('left', '-' + left + 'px');
+	switch(side) {
+		case 'l':
+		case 'r': break;
+		default: side = '';
 	}
 
+	t.find('.tool-div').remove();
+	t.addClass('tool' + (side ? '-' + side : ''));
+	var html = '<div class="tool-div">' +
+				'<div class="tool-msg">' + msg + '</div>' +
+				'<div class="tool-ug ' + side + '"></div>' +
+			  '</div>';
+	t.append(html)._toolCss(side);
 	return t;
+};
+$.fn._toolCss = function(side) {//выставление подсказки по ширине и высоте
+	var t = $(this),
+		toolW = t.width(),//ширина элемента, на который навели
+		div = t.find('.tool-div'),//ширина подсказки
+		left = 0,
+		top = Math.round(div.height() + 3) * -1;
+
+	switch(side) {
+		case 'r': left = Math.round(toolW/2 + 1) * -1; break;
+		case 'l': left = Math.round(div.width() + toolW/2 - 36) * -1; break;
+		default:  left = Math.round(div.width()/2 - toolW/2) * -1
+	}
+
+	div.css({
+		left:left,
+		top:top
+	});
 };
 $.fn._calendar = function(o) {
 	var t = $(this);
@@ -837,7 +881,36 @@ $.fn._calendar = function(o) {
 		func:function () {}    //исполняемая функция при выборе дня
 	}, o);
 
-	var D = new Date(),
+	var	MONTH_DEF = {
+			1:'Январь',
+			2:'Февраль',
+			3:'Март',
+			4:'Апрель',
+			5:'Май',
+			6:'Июнь',
+			7:'Июль',
+			8:'Август',
+			9:'Сентябрь',
+			10:'Октябрь',
+			11:'Ноябрь',
+			12:'Декабрь'
+		},
+		MONTH_DAT = {
+			1:'января',
+			2:'февраля',
+			3:'марта',
+			4:'апреля',
+			5:'мая',
+			6:'июня',
+			7:'июля',
+			8:'августа',
+			9:'сентября',
+			10:'октября',
+			11:'ноября',
+			12:'декабря'
+		},
+
+		D = new Date(),
 		CUR_YEAR = D.getFullYear(), //текущий год
 		CUR_MON =  D.getMonth() + 1,//текущий месяц
 		CUR_DAY =  D.getDate(),     //текущий день
@@ -1731,14 +1804,12 @@ $.fn._filter102 = function() {//Фильтр - Выбор нескольких �
 		TITLE = window['EL' + elem_id + '_F102_TITLE'],
 		COUNT = window['EL' + elem_id + '_F102_C'],
 		BG = window['EL' + elem_id + '_F102_BG'],
-		un = function(id, tl) {//формирование значения для вставки
+		un = function(id, not_count) {//формирование значения для вставки
 			var bg = BG[id] ? ' style="background-color:' + BG[id] + '"' : '',
-				title = tl ? TITLE[id] : _num(COUNT[id]);
+				title = not_count ? TITLE[id] : _num(COUNT[id]);
 			if(!title)
 				return '';
-			//отображение подсказки, если значение в виде цифры
-			tl = tl ? '">' : _tooltip(TITLE[id], -6, 'l');
-			return '<div' + bg + ' class="un' + tl + title +'</div>';
+			return '<div' + bg + ' class="un tool" data-tool="' + (not_count ? '' : TITLE[id]) + '">' + title +'</div>';
 		},
 		sevSet = function() {//обновление выбранных значений
 			var sel = '',

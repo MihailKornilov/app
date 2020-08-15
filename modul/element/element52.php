@@ -39,26 +39,7 @@ function _element52_print($el, $prm) {
 }
 
 function _noteWidth($el) {//получение ширины заметки
-	if(!is_array($el))
-		if($el = _num($el))
-			$el = _elemOne($el);
-	if(empty($el['block']))
-		return 0;
-
-	$BL = $el['block'];
-	$width = $BL['width'];
-
-	$mar = explode(' ', $el['mar']);
-	$width -= $mar[1];
-	$width -= $mar[3];
-
-	$bor = explode(' ', $BL['bor']);
-	$width -= $bor[1];
-	$width -= $bor[3];
-
-	$width -= 20;
-
-	return $width;
+	return _elemWidth($el) - 20;
 }
 function _noteList($page_id, $obj_id, $el) {
 	$sql = "SELECT *
@@ -98,8 +79,8 @@ function _noteList($page_id, $obj_id, $el) {
 						'<tr><td class="w35">'.
 								'<img class="ava40" src="'._user($r['user_id_add'], 'src').'">'.
 							'<td>'.
-								'<div class="note-del icon icon-del pl fr'._tooltip('Удалить заметку', -91, 'r').'</div>'.
-								'<div val="dialog_id:81,edit_id:'.$r['id'].'" class="dialog-open icon icon-edit pl fr'._tooltip('Изменить заметку', -98, 'r').'</div>'.
+								'<div class="note-del icon icon-del pl fr tool-l" data-tool="Удалить заметку"></div>'.
+								'<div val="dialog_id:81,edit_id:'.$r['id'].'" class="dialog-open icon icon-edit pl fr tool-l" data-tool="Изменить заметку"></div>'.
 								'<a class="b">'._user($r['user_id_add'], 'name').'</a>'.
 								'<div class="pale mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
 						'<tr>'.
@@ -109,8 +90,8 @@ function _noteList($page_id, $obj_id, $el) {
 								'</div>'.
 								_noteImg($r).
 					'</table>'.
+					_noteComment($el, $r, $n).
 				'</div>'.
-				_noteComment($el, $r, $n).
 				'<div class="_note-is-del">'.
 					'Заметка удалена.'.
 					'<a class="note-rest ml10">Восстановить</a>'.

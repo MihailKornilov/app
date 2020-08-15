@@ -31,7 +31,7 @@ function _elem102CnnList($ids, $return='select', $cond='') {//значения �
 		return array();
 	if(!$el = _elemOne($last_id))
 		return array();
-	if(!$bl = $el['block'])
+	if(!$bl = _blockOne($el['block_id']))
 		return array();
 	if($bl['obj_name'] != 'dialog')
 		return array();
@@ -68,5 +68,33 @@ function _elem102CnnList($ids, $return='select', $cond='') {//значения �
 		return _idsGet($select);
 
 	return $select;
+}
+function _elem83filter($el) {//фильтр-select
+	$filter = false;
+	$v = 0;
+
+	//поиск элемента-фильтра-select
+	foreach(_filter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 83) {
+			$filter = $r['elem'];
+			$v = _num($r['v']);
+			break;
+		}
+
+	if(!$filter)
+		return '';
+	if(!$v)
+		return '';
+	if(!$elem_ids = _ids($filter['txt_2'], 1))
+		return '';
+
+	$elem_id = $elem_ids[0];
+
+	if(!$ell = _elemOne($elem_id))
+		return '';
+	if(!$col = $ell['col'])
+		return '';
+
+	return " AND `".$col."`=".$v;
 }
 

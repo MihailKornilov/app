@@ -38,9 +38,9 @@ function _element70_vvv($el, $prm) {
 	);
 
 	$sel = '#fff';//выбранное значение
-	if($u = $prm['unit_edit']) {
+	if(!empty($prm['unit_edit'])) {
 		$col = $el['col'];
-		$sel = $u[$col];
+		$sel = $prm['unit_edit'][$col];
 	}
 
 	$spisok = '';

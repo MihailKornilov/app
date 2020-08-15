@@ -21,7 +21,7 @@ function _element75_print($el, $prm) {
 		return _emptyMinRed('[75] отсутствует путь к названиям.');
 	if(!$EL = _elemOne($elem_id))
 		return _emptyMinRed('[75] отсутствует элемент-название.');
-	if(!$BL = $EL['block'])
+	if(!$BL = _blockOne($EL['block_id']))
 		return _emptyMinRed('[75] блок не найден.');
 	if($BL['obj_name'] != 'dialog')
 		return _emptyMinRed('[75] блок не из диалога.');
@@ -74,7 +74,7 @@ function _element75_print($el, $prm) {
 		$clk = !empty($spisok[$r['id']]) ? ' onclick="$(this).next().slideToggle(250)"' : '';
 
 		$u75 = '';
-		if(!$child = _element75child($spisok, $r['id'], $col))
+		if(!$child = _elem75child($spisok, $r['id'], $col))
 			$u75 = 'u75 ';
 
 		$send .=
@@ -93,10 +93,10 @@ function _element75_print($el, $prm) {
 	$send .= '</table>';
 
 	return
-	_element75mp($v, $arr, $col, $DLG).
+	_elem75mp($v, $arr, $col, $DLG).
 	$send;
 }
-function _element75child($spisok, $parent_id, $col, $level=0) {
+function _elem75child($spisok, $parent_id, $col, $level=0) {
 	if(empty($spisok[$parent_id]))
 		return '';
 
@@ -106,7 +106,7 @@ function _element75child($spisok, $parent_id, $col, $level=0) {
 		$clk = !empty($spisok[$r['id']]) ? ' onclick="$(this).parent().next().slideToggle(250)"' : '';
 
 		$u75 = '';
-		if(!$child = _element75child($spisok, $r['id'], $col, $level+2))
+		if(!$child = _elem75child($spisok, $r['id'], $col, $level+2))
 			$u75 = 'u75 ';
 
 		$send .=
@@ -120,7 +120,7 @@ function _element75child($spisok, $parent_id, $col, $level=0) {
 
 	return '<div class="pb20 dn'.$ml.'">'.$send.'</div>';
 }
-function _element75mp($v, $arr, $col, $DLG) {//путь меню (Menu Path)
+function _elem75mp($v, $arr, $col, $DLG) {//путь меню (Menu Path)
 	$pname = '';
 	if($v) {
 		$pname = $arr[$v][$col];
@@ -141,9 +141,54 @@ function _element75mp($v, $arr, $col, $DLG) {//путь меню (Menu Path)
 
 	return
 	'<div class="mp75'._dn($v).'">'.
-		'<div class="icon icon-del fr'._tooltip('Отменить выбор', -52).'</div>'.
+		'<div class="icon icon-del fr tool" data-tool="Отменить выбор"></div>'.
 		'<div class="pname75 fs17 b">'.$pname.'</div>'.
 	'</div>';
+}
+function _elem75filter($el) {//Фильтр: фронтальное меню
+	$filter = false;
+	$v = '';
+
+	//поиск элемента-фильтра-меню
+	foreach(_filter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 75) {
+			$filter = $r['elem'];
+			$v = _num($r['v']);
+			break;
+		}
+
+	if(!$filter)
+		return '';
+	if(!$v)
+		return '';
+
+	//элемент, указывающий на подключенный список
+	if(!$elem_id = _ids($filter['txt_1'], 'first'))
+		return " AND !`id`";
+	if(!$EL = _elemOne($elem_id))
+		return " AND !`id`";
+
+	//колонка, по которой будет производиться фильтрование
+	if(!$col = $EL['col'])
+		return " AND !`id`";
+
+	//получение диалога подключенного списка
+	if($EL['dialog_id'] != 29)
+		return " AND !`id`";
+	if(!$dialog_id = _num($EL['num_1']))
+		return " AND !`id`";
+	if(!$dialog = _dialogQuery($dialog_id))
+		return " AND !`id`";
+
+	if(isset($dialog['field1']['parent_id'])) {
+		$sql = "SELECT `id`
+				FROM `"._table($dialog['table_1'])."`
+				WHERE `parent_id`=".$v;
+		if($ids = query_ids($sql))
+			$v .= ','.$ids;
+	}
+
+	return " AND `".$col."` IN (".$v.")";
 }
 
 

@@ -53,6 +53,14 @@ switch(@$_POST['op']) {
 						}
 						jsonSuccess();
 						break;
+					case 'PHP12_action_list':
+						foreach($sortIds as $n => $id) {
+							$sql = "UPDATE `_action` SET `sort`=".$n." WHERE `id`=".$id;
+							query($sql);
+							_BE('action_clear');
+						}
+						jsonSuccess();
+						break;
 				}
 				jsonError('Не найдена функция [12]');
 				break;

@@ -77,7 +77,7 @@ switch(@$_POST['op']) {
 		$IUID_dlg_id = 0;
 		$IUID_cols = array();
 		if($el = _elemOne($dialog['insert_unit_id_set_elem_id']))
-			if($BL = $el['block'])
+			if($BL = _blockOne($el['block_id']))
 				if($BL['obj_name'] == 'dialog') {
 					$IUID_dlg_id = $BL['obj_id'];
 					$IUID_cols = _dialogSpisokCmp($BL['obj_id']);
@@ -87,7 +87,7 @@ switch(@$_POST['op']) {
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
 
 			'<div class="pad10 center bg-gr3 line-b">'.
-				'<div class="fr mt5 b pale curD dw'._tooltip('Ширина диалога', -50).$dialog['width'].'</div>'.
+				'<div class="fr mt5 b pale curD dw tool" data-tool="Ширина диалога">'.$dialog['width'].'</div>'.
 				'<input type="hidden" id="dialog-menu" value="'.$dialog['menu_edit_last'].'" />'.
 			'</div>'.
 
@@ -174,7 +174,10 @@ switch(@$_POST['op']) {
 							'<tr><td class="grey r">Условия удаления:'.
 								'<td class="pale">'.
 									($del58 ? '' : 'условий нет. ').
-									'<div val="dialog_id:58,dss:'.$dialog_id.',edit_id:'.$del58.'" class="icon icon-set pl dialog-open'._tooltip('Настроить условия', -59).'</div>'.
+									'<div val="dialog_id:58,dss:'.$dialog_id.',edit_id:'.$del58.'"'.
+										' class="icon icon-set pl dialog-open tool"'.
+										' data-tool="Настроить условия">'.
+									'</div>'.
 							'<tr><td class="blue r">Дальнейшее действие:'.
 								'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
 							'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
@@ -282,6 +285,7 @@ switch(@$_POST['op']) {
 		$send['dlg_spisok_on'] = _dialogSelArray('spisok_only', $dialog_id);
 		$send['spisok_cmp'] = _dialogSpisokCmp($dialog_id);
 		$send['iuid_cols'] = $IUID_cols;
+		$send['page_list'] = _element6_vvv();
 
 		$dlgUnitGet = _dialogSelArray('unit_get', $dialog_id);
 		array_unshift($dlgUnitGet, array(
@@ -311,14 +315,6 @@ switch(@$_POST['op']) {
 		_dialogSave($dialog_id);
 
 		$send = _dialogOpenLoad($dialog_id);
-
-		//получение обновлённых подсказок действий
-		$DLG = _dialogQuery($dialog_id);
-		$ELM = array();
-		foreach(_BE('elem_ids_arr', 'dialog', $dialog_id) as $id)
-			$ELM[$id] = array();
-
-		$send['elm_js'] = _beElemAction($ELM, $DLG['app_id']);
 
 		jsonSuccess($send);
 		break;
@@ -358,7 +354,6 @@ switch(@$_POST['op']) {
 		query($sql);
 
 		_cache_clear('page');
-		_jsCache();
 
 		jsonSuccess();
 		break;
@@ -874,7 +869,9 @@ function _dialogSetupHistoryTmp($arr) {
 		return '';
 
 	$send = '';
-	foreach($arr as $el) {
+	foreach(_ids($arr, 'arr') as $elem_id) {
+		if(!$el = _elemOne($elem_id))
+			continue;
 		$title = '';
 		if($el['dialog_id']) {
 			$title = _element('title', $el);
@@ -944,11 +941,11 @@ function _dialogSetupService($DLG) {
 			'<table class="bs10">'.
 				'<tr><td class="grey r">Записи:'.
 					'<td>'._dialogSetupServiceCount($DLG).
-				'<tr><td class="grey r top curD'._tooltip('Размещён в других диалогах', -60).'Привязан:'.
+				'<tr><td class="grey r top curD tool" data-tool="Размещён в других диалогах">Привязан:'.
 					'<td>'._dialogSetupServiceCnnOut($DLG).
-				'<tr><td class="grey r top curD'._tooltip('Диалоги размещены в этом', -60).'Привязки:'.
+				'<tr><td class="grey r top curD tool" data-tool="Диалоги размещены в этом">Привязки:'.
 					'<td>'._dialogSetupServiceCnnIn($DLG).
-				'<tr><td class="grey r top'._tooltip('Используется в кнопках', -60).'Кнопки:'.
+				'<tr><td class="grey r top tool" data-tool="Используется в кнопках">Кнопки:'.
 					'<td>'._dialogSetupServiceButton($DLG).
 			'</table>'.
 		'</div>'.
@@ -1032,7 +1029,7 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 
 		$send .= '<td class="w230">'.
 					$dlg['name'].
-					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD'._tooltip('Родительский диалог', -5)._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
+					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD tool" data-tool="Родительский диалог">'._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
 				'<td class="r">'._hide0($c);
 	}
 	$send .= '</table>';
@@ -1078,7 +1075,7 @@ function _dialogSetupServiceCnnIn($DLG) {//диалоги, которые раз
 						($el['req'] ? '<span class="red fs16">*</span>' : '').
 					'</div>'.
 					$dlg['name'].
-					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD'._tooltip('Родительский диалог', -5)._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
+					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD tool" data-tool="Родительский диалог">'._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
 				'<td class="r">'._hide0($c);
 	}
 	$send .= '</table>';
@@ -1110,7 +1107,7 @@ function _dialogSetupServiceButton($DLG) {//диалог используетс�
 			continue;
 		}
 
-		if(!$bl = $el['block']) {
+		if(!$bl = _blockOne($el['block_id'])) {
 			$send .= '<td class="color-ref">Элемент без блока';
 			continue;
 		}
@@ -1182,8 +1179,6 @@ function _dialogSetupSa2($dialog) {//пункт меню настройки ка
 				'<td><input type="hidden" id="element_type" value="'._num(@$dialog['element_type']).'" />'.
 			'<tr><td class="red r">CMP-аффикс:'.
 				'<td><input type="text" id="element_afics" class="w150" value="'.@$dialog['element_afics'].'" />'.
-			'<tr><td class="red r">Диалог для функций:'.
-				'<td><input type="hidden" id="element_action_dialog_id" value="'._num(@$dialog['element_action_dialog_id']).'" />'.
 
 			'<tr><td>'.
 				'<td class="pt10">'.
@@ -1408,7 +1403,6 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 	$element_type = _num($_POST['element_type']);
 	$element_afics = _txt($_POST['element_afics']);
 	$element_hidden = _num($_POST['element_hidden']);
-	$element_action_dialog_id = _num($_POST['element_action_dialog_id']);
 
 	$sql = "UPDATE `_dialog`
 			SET `app_id`=".($app_any ? 0 : APP_ID).",
@@ -1427,8 +1421,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 				`element_width_min`=".$element_width_min.",
 				`element_type`=".$element_type.",
 				`element_afics`='".addslashes($element_afics)."',
-				`element_hidden`=".$element_hidden.",
-				`element_action_dialog_id`=".$element_action_dialog_id."
+				`element_hidden`=".$element_hidden."
 			WHERE `id`=".$dialog_id;
 	query($sql);
 
@@ -1513,8 +1506,6 @@ function _dialogOpenLoad($dialog_id) {
 	$prm['dop'] = _arrNum(@$_POST['dop']);
 	$prm['srce']['dop'] = $prm['dop'];
 
-	$ELM_IDS = _BE('elem_ids_arr', 'dialog', $dialog_id);
-
 	$get_id = _num(@$_POST['get_id']);
 
 	if($dialog['dialog_id_unit_get'] && !$get_id)
@@ -1547,16 +1538,17 @@ function _dialogOpenLoad($dialog_id) {
 			return _dialogOpenErr($send, 'Записи '.$dialog['id'].':'.$edit_id.' не существует.');
 
 		$send['edit_id'] = $edit_id;
+
 		$send['unit'] = $prm['unit_edit'];
 		$prm['srce']['block_id'] = _dialogOpenBlockIdUpd($dialog, $prm);
-
-		foreach($ELM_IDS as $elem_id)
-			$send['vvv'][$elem_id] = _element('vvv', $elem_id, $prm);
 
 		$send['html'] = _blockHtml('dialog', $dialog['id'], $prm);
 		$send['button_submit'] = $dialog['edit_button_submit'];
 		$send['button_cancel'] = $dialog['edit_button_cancel'];
 
+		$send['jsblk'] = _BE('block_arr', 'dialog', $dialog_id);
+		$send['jselm'] = _elmJs('dialog', $dialog_id, $prm);
+		$send['focus'] = _elemJsFocus('dialog', $dialog_id);
 		$send['hint'] = _hintMass();
 
 		$prm = _blockParam($prm);
@@ -1575,17 +1567,13 @@ function _dialogOpenLoad($dialog_id) {
 	if(!$dialog['insert_on'])
 		return _dialogOpenErr($send, 'Внесение новой записи запрещено.');
 
-	foreach($ELM_IDS as $elem_id)
-		$send['vvv'][$elem_id] = _element('vvv', $elem_id, _blockParam($prm));
-
-
-
-
-
 	$send['html'] = _blockHtml('dialog', $dialog_id, $prm);
 	$send['button_submit'] = $dialog['insert_button_submit'];
 	$send['button_cancel'] = $dialog['insert_button_cancel'];
 
+	$send['jsblk'] = _BE('block_arr', 'dialog', $dialog_id);
+	$send['jselm'] = _elmJs('dialog', $dialog_id, $prm);
+	$send['focus'] = _elemJsFocus('dialog', $dialog_id);
 	$send['hint'] = _hintMass();
 
 	$prm = _blockParam($prm);

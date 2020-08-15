@@ -98,7 +98,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 		if(!isset($arr[$r['id']]))
 			continue;
 
-		$name = '<span class="fs10 red">Отсутствует колонка для отображения названия</span>';
+		$name = _msgRed('Отсутствует колонка для отображения названия');
 
 		$u = $arr[$r['id']];
 		if($colName)
@@ -128,7 +128,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 			: '').
 
 				'<td class="pad0 w35 center">'.
-					'<div class="icon icon-del'._tooltip('Отменить выбор', -94, 'r').'</div>';
+					'<div class="icon icon-del tool-l" data-tool="Отменить выбор"></div>';
 			continue;
 		}
 

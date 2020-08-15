@@ -1,9 +1,346 @@
 <?php
 
+function _blockAction201($bl, $prm) {//установка исходного отображения блока на основании действия
+	global $G_ACT;
+
+	foreach($G_ACT['act'] as $r) {
+		if($r['dialog_id'] != 201)
+			continue;
+
+		$ass = _idsAss($r['target_ids']);
+		if(!isset($ass[$bl['id']]))
+			continue;
+		if(!$el = _elemOne($r['element_id']))
+			continue;
+
+		if($el['dialog_id'] != 1//галочка
+		&& $el['dialog_id'] != 6//select страниц
+		&& $el['dialog_id'] != 16//radio
+		&& $el['dialog_id'] != 17//select
+		&& $el['dialog_id'] != 18//dropdown
+		&& $el['dialog_id'] != 24//Выпадающее поле - выбор списка
+		&& $el['dialog_id'] != 29//Выпадающее поле - выбор записи из другого списка
+		&& $el['dialog_id'] != 59//Связка с другим списком через кнопку
+		&& $el['dialog_id'] != 62//Фильтр: галочка
+		&& $el['dialog_id'] != 75//Фильтр: фронтальное меню
+		) continue;
+
+		if(!$r['initial_id'])
+			continue;
+
+		switch($r['apply_id']) {
+			default:
+			//скрыть
+			case 2783: $hidden = true; break;
+			//показать
+			case 2784: $hidden = false; break;
+		}
+
+		//получение выбранного значения при редактировании записи
+		$v = isset($el['def']) ? $el['def'] : 0;
+		if($u = $prm['unit_edit']) {
+			$col = $el['col'];
+			if(isset($u[$col]))
+				$v = $u[$col];
+		}
+
+		//фильтры
+		switch($el['dialog_id']) {
+			case 62: $v = _filter('vv', $el, $el['num_3']); break;
+			case 75: $v = _filter('vv', $el, 0); break;
+		}
+
+
+		if($v) {//если галочка установлена
+			if($r['initial_id'] != -2 && $r['initial_id'] != $v)//действие при установленной галочке
+				if($r['revers'])
+					$hidden = !$hidden;
+				else
+					continue;
+
+		} else  //если галочка снята
+			if($r['initial_id'] != -1)//действие при снятой галочке
+				if($r['revers'])
+					$hidden = !$hidden;
+				else
+					continue;
+
+		$bl['hidden'] = $hidden;
+	}
+
+	return $bl;
+}
+function _blockAction211($bl) {
+	global $G_ACT;
+
+	foreach($G_ACT['act'] as $r) {
+		if($r['dialog_id'] != 211)
+			continue;
+		if(!$r['revers'])
+			continue;
+
+		$ass = _idsAss($r['target_ids']);
+		if(!isset($ass[$bl['id']]))
+			continue;
+
+		if($r['v1']) {
+			if(isset($_COOKIE['ACT211_'.$bl['id']])) {
+				$bl['hidden'] = !_bool($_COOKIE['ACT211_'.$bl['id']]);
+				return $bl;
+			}
+		}
+
+		switch($r['apply_id']) {
+			default:
+			//скрыть
+			case 3166: break;
+			//показать
+			case 3167: $bl['hidden'] = true; break;
+		}
+		return $bl;
+	}
+
+	return $bl;
+}
+
+function _elemAction223($el, $u, $txt) {//подсказка
+	if(!$action = _BE('elem_one_action', $el['id']))
+		return $txt;
+
+	foreach($action as $act)
+		if($act['dialog_id'] == 223)
+			if($tt = _elemUids($act['target_ids'], $u))
+				return '<span class="inhr tool" data-tool="'.$tt.'">'.$txt.'</a>';
+
+	return $txt;
+}
+function _elemAction241($el, $prm, $txt) {//подмена текста
+	if(!$action = _BE('elem_one_action', $el['id']))
+		return $txt;
+	if(!$u = $prm['unit_get'])
+		return $txt;
+
+	foreach($action as $act)
+		if($act['dialog_id'] == 241) {
+			if(!$F = _elem40json($act['filter']))
+				return $txt;
+
+			$F = $F[0];
+
+			if(!$ell = _elemOne($F['elem_id']))
+				return $txt;
+			if(!$col = _elemCol($ell))
+				return $txt;
+
+			switch($F['cond_id']) {
+				//отсутствует
+				case 1:
+					if(!empty($u[$col]))
+						return $txt;
+					return $act['v1'];
+				//присутствует
+				case 2:
+					if(empty($u[$col]))
+						return $txt;
+					return $act['v1'];
+			}
+
+			return $txt;
+		}
+
+	return $txt;
+}
+function _elemAction243($el, $txt) {//Формат для чисел
+	if($el['dialog_id'] == 44)
+		return $txt;
+	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
+		return $txt;
+	if(!$action = _BE('elem_one_action', $el['id'])) {
+		if($el['dialog_id'] == 11)
+			if(!$el = _elemOne(_idsLast($el['txt_2'])))
+				return $txt;
+
+		switch($el['dialog_id']) {
+			case 8:
+				if($el['num_1'] == 33)//цифры и числа
+					return round($txt, 10);
+				break;
+			case 27:
+			case 54:
+			case 55:
+				return round($txt, 10);
+		}
+
+		return $txt;
+	}
+
+	foreach($action as $act) {
+		if($act['dialog_id'] != 243)
+			continue;
+
+		//не показывать при нуле
+		if($act['apply_id'] && !round($txt, 10))
+			return '';
+
+		//пробелы в больших числах
+		if($act['effect_id'])
+			$txt = _sumSpace($txt, $act['revers'], $act['v1']);
+		else {
+			//не показывать нули в дробной части
+			if(!$act['revers'])
+				$txt = round($txt, 10);
+			$txt = str_replace('.', $act['v1'], $txt);
+		}
+
+		return $txt;
+	}
+
+	return round($txt, 10);
+}
+function _elemAction242($el, $prm) {//подмена цвета
+	$color = empty($el['color']) ? '' : $el['color'];
+
+	if(!$action = _BE('elem_one_action', $el['id']))
+		return $color;
+	if(!$u = $prm['unit_get'])
+		return $color;
+
+	foreach($action as $act) {
+		if($act['dialog_id'] != 242)
+			continue;
+
+		if(!$F = _elem40json($act['filter']))
+			return $color;
+
+		$F = $F[0];
+
+		if(!$ell = _elemOne($F['elem_id']))
+			return $color;
+		if(!$col = _elemCol($ell))
+			return $color;
+		if(!isset($u[$col]))
+			return $color;
+
+		$v = $u[$col];
+
+		switch($F['cond_id']) {
+			//отсутствует
+			case 1:
+				$v = is_array($v) ? $v['id'] : $v;
+				if(!$v)
+					return $act['v1'];
+				break;
+			//присутствует
+			case 2:
+				$v = is_array($v) ? $v['id'] : $v;
+				if($v)
+					return $act['v1'];
+				break;
+			//равно
+			case 3:
+				if($v == $F['txt'])
+					return $act['v1'];
+				break;
+			//не равно
+			case 4:
+				if($v != $F['txt'])
+					return $act['v1'];
+				break;
+			//больше
+			case 5:
+				if($v > $F['txt'])
+					return $act['v1'];
+				break;
+			//больше или равно
+			case 6:
+				if($v >= $F['txt'])
+					return $act['v1'];
+				break;
+			//меньше
+			case 7:
+				if($v < $F['txt'])
+					return $act['v1'];
+				break;
+			//меньше или равно
+			case 8:
+				if($v <= $F['txt'])
+					return $act['v1'];
+				break;
+		}
+	}
+
+	return $color;
+}
+function _elemAction244($el, $prm) {//скрытие элемента
+	if(!$action = _BE('elem_one_action', $el['id']))
+		return false;
+	if(!$u = $prm['unit_get'])
+		return false;
+
+	foreach($action as $act)
+		if($act['dialog_id'] == 244) {
+			if(!$F = _elem40json($act['filter']))
+				return false;
+
+			$F = $F[0];
+
+			switch($F['cond_id']) {
+				//отсутствует
+				case 1:
+					if(!$col = _elemCol($F['elem_id']))
+						return false;
+					if(empty($u[$col]))
+						return true;
+
+					return false;
+				//присутствует
+				case 2:
+					if(!$col = _elemCol($F['elem_id']))
+						return false;
+					if(!empty($u[$col]))
+						return true;
+
+					return false;
+			}
+
+			return false;
+		}
+
+	return false;
+}
+function _elemAction245($el, $txt, $skip224=false) {//Формат для текста
+	if(!$action = _BE('elem_one_action', $el['id']))
+		return $txt;
+
+	//если присутствует внешняя ссылка, выход. Обрезка будет далее в ссылке
+	if($skip224)
+		foreach($action as $act)
+			if($act['dialog_id'] == 224)
+				return $txt;
+
+	foreach($action as $act) {
+		if($act['dialog_id'] != 245)
+			continue;
+		if(!$len = $act['apply_id'])
+			continue;
+		if($len >= mb_strlen($txt))
+			continue;
+
+		$txt = mb_substr($txt, 0, $len).'...';
+	}
+
+	return $txt;
+}
+
+
+
+
+
 /* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ИЛИ БЛОКУ ===--- */
 function PHP12_action_list($prm) {
 	//текущий диалог для обновления списка действий после редактирования
-	$dss = $prm['el12']['block']['obj_id'];
+	$bl = _blockOne($prm['el12']['block_id']);
+	$dss = $bl['obj_id'];
 
 	switch($dss) {
 		//действия для элемента
@@ -49,37 +386,44 @@ function PHP12_action_list($prm) {
 				'<tr>'.
 					'<td class="w25 top">'.
 						'<div class="icon icon-move-y pl"></div>'.
-					'<td><div class="fs15 color-555">'._dialogParam($r['dialog_id'], 'name').'</div>'.
+					'<td><div class="fs15 color-555">'.
+							_dialogParam($r['dialog_id'], 'name').
+					 (SA ? '<span class="fs15 pale ml10">['.$r['dialog_id'].']</span>' : '').
+						'</div>'.
 						'<div class="mt3 ml10">'.
-							PHP12_action_201($r).
-							PHP12_action_205($r).
-							PHP12_action_211($r).
-							PHP12_action_212($r).
-							PHP12_action_213($r).
-							PHP12_action_214($r).
-							PHP12_action_215($r).
-							PHP12_action_216($r).
+							_action201info($r).
+							_action202info($r).
+							_action205info($r).
+							_action206info($r).
+							_action207info($r).
+							_action208info($r).
+							_action209info($r).
+
+							_action211info($r).
+							_action212info($r).
+							_action213info($r).
+							_action214info($r).
+							_action215info($r).
+							_action216info($r).
+							_action217info($r).
+							_action218info($r).
+							_action219info($r).
+
 							PHP12_action_221($r).
 							PHP12_action_222($r).
 							PHP12_action_223($r).
 							PHP12_action_224($r).
 						'</div>'.
 					'<td class="w50 r top">'.
-						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',block_id:'.$block_id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open'._tooltip('Настроить действие', -60).'</div>'.
-						_iconDel(array(
-							'class' => 'pl ml5 dialog-open',
-							'val' => 'dialog_id:'.$r['dialog_id'].',del_id:'.$id.',dss:'.$dss
-						)).
+						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',block_id:'.$block_id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open tool" data-tool="Настроить действие"></div>'.
+						'<div class="icon icon-del pl ml5 dialog-open tool" data-tool="Удалить" val="dialog_id:'.$r['dialog_id'].',del_id:'.$id.',dss:'.$dss.'"></div>'.
 			'</table>'.
 			'</dd>';
 	}
 
 	return '<dl>'.$spisok.'</dl>';
 }
-function PHP12_action_201($r) {//ЭЛЕМЕНТ: скрытие/показ блоков
-	if($r['dialog_id'] != 201)
-		return '';
-
+function _action201info($act) {//ЭЛЕМЕНТ: скрытие/показ блоков
 /*
 	apply_id: Действие с блоками: скрыть|показать
 	filter: Фильтр
@@ -87,69 +431,88 @@ function PHP12_action_201($r) {//ЭЛЕМЕНТ: скрытие/показ бл�
 					-1: значение сброшено
 					-2: выбрано любое значение
 	revers: Обратное действие
+	v1: запоминать состояние
 	target_ids: Блоки, на которые происходит воздействие
 	effect_id: Эффект
-
 */
 
+	if($act['dialog_id'] != 201)
+		return '';
 
-	//Названия действия
-	$sql = "SELECT `txt_1`
-			FROM `_element`
-			WHERE `id`=".$r['apply_id'];
-	$apply = query_value($sql);
-
-
-	$c = count(_ids($r['target_ids'], 1));
+	$c = count(_ids($act['target_ids'], 1));
 	$target = $c.' блок'._end($c, '', 'а', 'ов');
 
 	$initial = '-';
-	switch($r['initial_id']) {
+	switch($act['initial_id']) {
 		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
 		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
 		default:
-			if(!$el = _elemOne($r['element_id']))
+			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			switch($el['dialog_id']) {
-				case 29:
-				case 59:
-					if(!$DLG = _dialogQuery($el['num_1']))
-						break;
-					if(!$u = _spisokUnitQuery($DLG, $r['initial_id']))
-						break;
-					$initial = 'выбрано <b class="color-pay">'.$u['txt_1'].'</b>';
-			}
-
+			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
-
-	$effect = '';
-	if($r['effect_id']) {
-		//Названия эффектов
-		$sql = "SELECT `txt_1`
-				FROM `_element`
-				WHERE `id`=".$r['effect_id'];
-		$name = query_value($sql);
-		$effect =   '<div class="fs12 grey mt2">'.
-						'Эффект: '.
-						'<span class="fs12 color-sal">'.$name.'</span>'.
-					'</div>';
-
-	}
-
-	$revers = $r['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
+	$revers = $act['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
 
 	return
-	'<div class="b">'.$apply.' '.$target.'</div>'.
+	'<span class="grey">'._element('v_get', 2782, $act['apply_id']).'</span> '.
+	'<b>'.$target.'</b>'.
+	'<br>'.
 	'<span class="grey">если</span> '.$initial.
-	$effect.
+	'<div class="fs12 grey mt2">'.
+		'Эффект: '.
+		'<span class="fs12 color-sal">'._element('v_get', 2788, $act['effect_id']).'</span>'.
+	'</div>'.
 	$revers;
 }
-function PHP12_action_205($r) {//ЭЛЕМЕНТ: открытие диалога
-	if($r['dialog_id'] != 205)
+function _action202info($act) {//ЭЛЕМЕНТ: установка значения элементу
+/*
+	initial_id: [85] Условие для совершения действия:
+	target_ids: элемент-получатель, на которое происходит воздействие
+	apply_id: применяемое действие (устанавливаемое значение)
+	revers: Обратное действие
+*/
+
+	if($act['dialog_id'] != 202)
 		return '';
 
+	$initial = '-';
+	switch($act['initial_id']) {
+		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		default:
+			if(!$el = _elemOne($act['element_id']))
+				break;
+
+			$initial = '<span class="color-pay">выбрано</span> '.
+					   '<b>'._element('v_get', $el, $act['initial_id']).'</b>';
+	}
+
+	$apply = '-';
+	switch($act['apply_id']) {
+		case -1: $apply = '<b class="color-ref">сбросить значение</b>'; break;
+		default:
+			if(!$el = _elemOne($act['target_ids']))
+				break;
+
+			$apply = '<span class="color-pay">установить</span> '.
+					   '<b>'._element('v_get', $el, $act['apply_id']).'</b>';
+	}
+
+
+	$revers = $act['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
+
+	return
+	'<span class="grey">Если</span> '.$initial.
+	'<div>'.
+		'<span class="grey">то элементу</span> '.
+		'<u>'._elemIdsTitle($act['target_ids']).'</u> '.
+		$apply.
+	'<div>'.
+	$revers;
+}
+function _action205info($act) {//ЭЛЕМЕНТ: открытие диалога
 /*
 	initial_id: Значение, при котором происходит действие
 					-1: значение сброшено
@@ -158,134 +521,235 @@ function PHP12_action_205($r) {//ЭЛЕМЕНТ: открытие диалога
 	target_ids: id диалога
 	apply_id:  элемент передаёт данные записи для отображения
 	effect_id: элемент передаёт данные записи для редактирования
-
 */
 
-	if(!$DLG = _dialogQuery($r['target_ids']))
-		return '<div class="red">не получены данные диалога ['.$r['target_ids'].']</div>';
+	if($act['dialog_id'] != 205)
+		return '';
+
+	if(!$DLG = _dialogQuery($act['target_ids']))
+		return '<div class="red">не получены данные диалога ['.$act['target_ids'].']</div>';
 
 	$initial = '-';
-	switch($r['initial_id']) {
+	switch($act['initial_id']) {
 		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
 		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
 		default:
-			if(!$el = _elemOne($r['element_id']))
+			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			switch($el['dialog_id']) {
-				case 18:
-					foreach($el['vvv'] as $vv)
-						if($vv['id'] == $r['initial_id'])
-							$initial = 'выбрано <b class="color-sal">'.$vv['title'].'</b>';
-					break;
-				case 29:
-				case 59:
-					if(!$DLG = _dialogQuery($el['num_1']))
-						break;
-					if(!$u = _spisokUnitQuery($DLG, $r['initial_id']))
-						break;
-					$initial = 'выбрано <b class="color-pay">'.$u['txt_1'].'</b>';
-			}
-
+			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
-	$get  = $r['apply_id']  ? '<div class="fs11 i color-ref mt2">Элемент передаёт данные записи для отображения</div>' : '';
-	$edit = $r['effect_id'] ? '<div class="fs11 i color-ref mt2">Элемент передаёт данные записи для редактирования</div>' : '';
+	$get  = $act['apply_id']  ? '<div class="fs11 i color-ref mt2">Элемент передаёт данные записи для отображения</div>' : '';
+	$edit = $act['effect_id'] ? '<div class="fs11 i color-ref mt2">Элемент передаёт данные записи для редактирования</div>' : '';
 
 	return
-	'<span class="grey">Диалог: </span> <b>'.$DLG['name'].'</b>'.
+	'<span class="grey">Если</span> '.$initial.
 	'<br>'.
-	'<span class="grey">если</span> '.$initial.
+	'<span class="grey">открыть диалог </span> <b>'.$DLG['name'].'</b>'.
 	$get.
 	$edit;
 }
-function PHP12_action_211($r) {//БЛОК: скрытие/показ блоков
-	if($r['dialog_id'] != 211)
+function _action206info($act) {//ЭЛЕМЕНТ: установка фокуса на элемент
+/*
+	initial_id: [85] Условие для совершения действия:
+					-1: значение сброшено
+					-2: выбрано любое значение
+					id: конкретное значение
+	target_ids: [13] элемент, на который устанавливается фокус
+*/
+
+	if($act['dialog_id'] != 206)
 		return '';
 
-	//Название действия
-	$sql = "SELECT `txt_1`
-			FROM `_element`
-			WHERE `id`=".$r['apply_id'];
-	$apply = query_value($sql);
+	$initial = '-';
+	switch($act['initial_id']) {
+		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		default:
+			if(!$el = _elemOne($act['element_id']))
+				break;
 
-
-	$c = count(_ids($r['target_ids'], 1));
-	$target = $c.' блок'._end($c, '', 'а', 'ов');
-
-
-	$effect = '';
-	if($r['effect_id']) {
-		//Названия эффектов
-		$sql = "SELECT `txt_1`
-				FROM `_element`
-				WHERE `id`=".$r['effect_id'];
-		$name = query_value($sql);
-		$effect =   '<div class="fs12 grey mt2">'.
-						'Эффект: '.
-						'<span class="fs12 color-sal">'.$name.'</span>'.
-					'</div>';
-
+			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
-	$revers = $r['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
+	return
+	'<span class="grey">Если</span> '.$initial.
+	'<br>'.
+	'<span class="grey">установить фокус на элемент</span> <u>'._elemIdsTitle($act['target_ids']).'</u>';
+}
+function _action207info($act) {//ЭЛЕМЕНТ: открытие документа
+/*
+	initial_id: [85] Условие для совершения действия:
+	target_ids: [26] документ
+*/
+
+	if($act['dialog_id'] != 207)
+		return '';
+
+	$initial = '-';
+	switch($act['initial_id']) {
+		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		default:
+			if(!$el = _elemOne($act['element_id']))
+				break;
+
+			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
+	}
+
+	$docName = _msgRed('не получено имя документа');
+	if(!$doc_id = _num($act['target_ids']))
+		$docName = '<span class="red">документ не указан<span>';
+	elseif($el = _elemOne(3547))
+		$docName = _element('v_get', $el, $doc_id);
 
 	return
-	'<div class="b">'.$apply.' '.$target.'</div>'.
-	$effect.
-	$revers;
+	'<span class="grey">Если</span> '.$initial.
+	'<br>'.
+	'<span class="grey">открыть документ</span> <b>'.$docName.'</b>';
 }
-function PHP12_action_212($r) {//БЛОК: Установка значения элементу
-	if($r['dialog_id'] != 212)
+function _action208info($act) {//ЭЛЕМЕНТ: формула
+/*
+	v1: [12] функция
+			1: сложение
+			2: вычитание
+			3: умножение
+			4: деление
+	apply_id: [13] элемент-получатель
+*/
+
+	if($act['dialog_id'] != 208)
 		return '';
-	if(!$elem_id = _num($r['target_ids']))
+
+	$F = array();
+	$znak = false;
+	foreach(explode(',', $act['v1']) as $r) {
+		if(!$znak) {
+			$F[] = _elemIdsTitle($r);
+			$znak = true;
+			continue;
+		}
+		switch($r) {
+			case 1: $F[] = '+'; break;
+			case 2: $F[] = '-'; break;
+			case 3: $F[] = '*'; break;
+			case 4: $F[] = '/'; break;
+		}
+		$znak = false;
+	}
+
+	return
+	'<span class="grey">Применить формулу </span> <span class="color-sal">'.implode(' ', $F).'</span>'.
+	'<br>'.
+	'<span class="grey">к элементу</span> <b>'._elemIdsTitle($act['apply_id']).'</b>';
+}
+function _action209info($act) {//ЭЛЕМЕНТ: вставка значения в блок
+/*
+	initial_id: [85] Условие для совершения действия:
+	v1: [13] вставляемое значение
+	target_ids: [49] блок-получатель
+*/
+
+	if($act['dialog_id'] != 209)
+		return '';
+
+	$initial = '-';
+	switch($act['initial_id']) {
+		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		default:
+			if(!$el = _elemOne($act['element_id']))
+				break;
+
+			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
+	}
+
+	return
+	'<span class="grey">Если</span> '.$initial.
+	'<br>'.
+	'<span class="grey">вставить</span> <b>'._elemIdsTitle($act['v1']).'</b>';
+}
+
+function _action211info($act) {//БЛОК: скрытие/показ блоков
+/*
+	apply_id: Действие с блоками: скрыть|показать
+	revers: Обратное действие
+	target_ids: [49] Блоки, на которые происходит воздействие
+	effect_id: Эффект
+*/
+
+	if($act['dialog_id'] != 211)
+		return '';
+
+	$c = count(_ids($act['target_ids'], 1));
+	$target = $c.' блок'._end($c, '', 'а', 'ов');
+
+	$effect = '';
+	if($act['effect_id'])
+		$effect =
+			'<div class="fs12 grey mt2">'.
+				'Эффект: '.
+				'<span class="fs12 color-sal">'._element('v_get', 3170, $act['effect_id']).'</span>'.
+			'</div>';
+
+	$revers = $act['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
+	$v1 = $act['v1'] ? '<div class="fs11 i color-555 mt2">Запоминать состояние</div>' : '';
+
+	return
+	'<div class="b">'._element('v_get', 3165, $act['apply_id']).' '.$target.'</div>'.
+	$effect.
+	$revers.
+	$v1;
+}
+function _action212info($act) {//БЛОК: Установка значения элементу
+/*
+	target_ids: [13] элемент-получатель, на которое происходит воздействие
+	apply_id: [85] применяемое действие (устанавливаемое значение)
+*/
+
+	if($act['dialog_id'] != 212)
+		return '';
+	if(!$elem_id = _num($act['target_ids']))
 		return '<div class="red">Отсутствует id элемента</div>';
 	if(!$el = _elemOne($elem_id))
 		return '<div class="red">Элемента не существует</div>';
 
-	$send = '<div class="red">Неизвестный элемент ['.$el['dialog_id'].']</div>';
-
-	switch($el['dialog_id']) {
-		case 1:
-		case 62:
-			$send = '<div class="red">Неизвестное действие для галочки</div>';
-			if($r['apply_id'] == -1)
-				$send = '<b>Снять галочку</b>';
-			if($r['apply_id'] == 1)
-				$send = '<b>Установить галочку</b>';
-			break;
-	}
-
-
-	return $send;
+	return
+	'<span class="grey">Элементу</span> <b>'._elemIdsTitle($elem_id).'</b>'.
+	'<br>'.
+	'<span class="grey">применить:</span> <b class="color-sal">'._element('v_get', $el, $act['apply_id']).'</b>';
 }
-function PHP12_action_213($r) {//БЛОК: блокировка элементов
-	if($r['dialog_id'] != 213)
-		return '';
-	if(!$ids = _ids($r['target_ids'], 'arr'))
-		return '<div class="red">Отсутствует элементы для блокировки</div>';
+function _action213info($act) {//БЛОК: блокировка элементов
+/*
+	apply_id: [16] применяемое действие
+	target_ids: [13] элементы-получатели, на которые происходит воздействие
+*/
 
-	//Название действия
-	$sql = "SELECT `txt_1`
-			FROM `_element`
-			WHERE `id`=".$r['apply_id'];
-	$apply = query_value($sql);
+	if($act['dialog_id'] != 213)
+		return '';
+	if(!$ids = _ids($act['target_ids'], 'arr'))
+		return '<div class="red">Отсутствует элементы для блокировки</div>';
 
 	$elem = array();
 	foreach($ids as $id)
-		$elem[] = '<b>'._element('title', $id).'</b>';
-
-	$target = implode(', ', $elem);
+		$elem[] = '<b>'._elemIdsTitle($id).'</b>';
 
 	return
-	$apply.' '.
-	'элемент'.(count($elem) > 1 ? 'ы' : '').' '.
-	$target;
+	'<span class="grey">'.
+		_element('v_get', 3364, $act['apply_id']).' '.
+		'элемент'.(count($elem) > 1 ? 'ы' : '').
+	'</span> '.
+	implode(', ', $elem);
 }
-function PHP12_action_214($r) {//БЛОК: переход на страницу
-	if($r['dialog_id'] != 214)
+function _action214info($act) {//БЛОК: переход на страницу
+/*
+	target_ids: [6] страница
+	apply_id: [1] Блок передаёт данные записи
+*/
+	if($act['dialog_id'] != 214)
 		return '';
-	if(!$page_id = _num($r['target_ids']))
+	if(!$page_id = _num($act['target_ids']))
 		return '<div class="red">Отсутствует id страницы</div>';
 	if(!$page = _page($page_id))
 		return '<div class="red">Страницы не существует</div>';
@@ -293,12 +757,19 @@ function PHP12_action_214($r) {//БЛОК: переход на страницу
 	return
 	'<span class="grey">Cтраница:</span> '.
 	'<b>'.$page['name'].'</b>'.
-	($r['apply_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи</div>' : '');
+	($act['apply_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи</div>' : '');
 }
-function PHP12_action_215($r) {//БЛОК: открытие диалога
-	if($r['dialog_id'] != 215)
+function _action215info($act) {//БЛОК: открытие диалога
+/*
+	filter: дополнительные условия
+	target_ids: [38] диалог
+	apply_id: [1] Блок передаёт данные записи для отображения
+	effect_id: [1] Блок передаёт данные записи для редактирования
+	revers: [1] Блок передаёт данные записи для удаления
+*/
+	if($act['dialog_id'] != 215)
 		return '';
-	if(!$dlg_id = _num($r['target_ids']))
+	if(!$dlg_id = _num($act['target_ids']))
 		return '<div class="red">Отсутствует id диалога</div>';
 	if(!$DLG = _dialogQuery($dlg_id))
 		return '<div class="red">Диалога не существует</div>';
@@ -306,21 +777,72 @@ function PHP12_action_215($r) {//БЛОК: открытие диалога
 	return
 	'<span class="grey">Диалог:</span> '.
 	'<b>'.$DLG['name'].'</b>'.
-	($r['apply_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для отображения</div>' : '').
-	($r['effect_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для редактирования</div>' : '');
+	($act['apply_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для отображения</div>' : '').
+	($act['effect_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для редактирования</div>' : '').
+	($act['revers'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для удаления</div>' : '');
 }
-function PHP12_action_216($r) {//БЛОК: Установка фокуса на элемент
-	if($r['dialog_id'] != 216)
+function _action216info($act) {//БЛОК: Установка фокуса на элемент
+/*
+	target_ids: элемент, на который устанавливается фокус
+*/
+
+	if($act['dialog_id'] != 216)
 		return '';
-	if(!$elem_id = _num($r['target_ids']))
+	if(!$elem_id = _num($act['target_ids']))
 		return '<div class="red">Отсутствует id элемента</div>';
 
 	return '<span class="grey">Элемент:</span> <b>'._element('title', $elem_id).'</b>';
 }
-function PHP12_action_221($r) {//ЭЛЕМЕНТ: переход на страницу
-	if($r['dialog_id'] != 221)
+function _action217info($act) {//БЛОК: открытие документа
+/*
+	target_ids: [26] шаблон документа
+*/
+
+	if($act['dialog_id'] != 217)
 		return '';
-	if(!$page_id = _num($r['target_ids']))
+	if(!$elem_id = _num($act['target_ids']))
+		return '<div class="red">Отсутствует id элемента</div>';
+
+	$docName = _msgRed('не получено имя документа');
+	if(!$doc_id = _num($act['target_ids']))
+		$docName = '<span class="red">документ не указан<span>';
+	elseif($el = _elemOne(3737))
+		$docName = _element('v_get', $el, $doc_id);
+
+	return '<span class="grey">Документ:</span> <b>'.$docName.'</b>';
+}
+function _action218info($act) {//БЛОК: принимает данные записи
+/*
+	initial_id: [24] список
+	v1: [5] сообщение, если данные не получены
+*/
+
+	if($act['dialog_id'] != 218)
+		return '';
+
+	return
+	'<span class="grey">Список: </span> '.
+	'<b>'._dialogParam($act['initial_id'], 'name').'</b>'.
+	'<br>'.
+	'<span class="grey">Сообщение: </span> '.
+	'<u>'.$act['v1'].'</u>';
+}
+function _action219info($act) {//БЛОК: обновление содержимого блоков
+/*
+	target_ids: [49] блоки, содержимое который обновляется
+	v1: [70] Цвет, в который будет окрашен блок после нажатия на него.
+*/
+
+	if($act['dialog_id'] != 219)
+		return '';
+
+	return '';
+}
+
+function PHP12_action_221($act) {//ЭЛЕМЕНТ: переход на страницу
+	if($act['dialog_id'] != 221)
+		return '';
+	if(!$page_id = _num($act['target_ids']))
 		return '<div class="red">Отсутствует id страницы</div>';
 	if(!$page = _page($page_id))
 		return '<div class="red">Страницы не существует</div>';
@@ -329,10 +851,10 @@ function PHP12_action_221($r) {//ЭЛЕМЕНТ: переход на стран�
 	'<span class="grey">Cтраница:</span> '.
 	'<b>'.$page['name'].'</b>';
 }
-function PHP12_action_222($r) {//ЭЛЕМЕНТ: открытие диалога
-	if($r['dialog_id'] != 222)
+function PHP12_action_222($act) {//ЭЛЕМЕНТ: открытие диалога
+	if($act['dialog_id'] != 222)
 		return '';
-	if(!$dlg_id = _num($r['target_ids'], 1))
+	if(!$dlg_id = _num($act['target_ids'], 1))
 		return '<div class="red">Отсутствует id диалога</div>';
 
 	switch($dlg_id) {
@@ -347,24 +869,24 @@ function PHP12_action_222($r) {//ЭЛЕМЕНТ: открытие диалога
 	'<span class="grey">Диалог:</span> '.
 	'<b>'.$DLG['name'].'</b>';
 }
-function PHP12_action_223($r) {//ЭЛЕМЕНТ: тёмная подсказка
-	if($r['dialog_id'] != 223)
+function PHP12_action_223($act) {//ЭЛЕМЕНТ: тёмная подсказка
+	if($act['dialog_id'] != 223)
 		return '';
-	if(!$v = _ids($r['target_ids']))
+	if(!$v = _ids($act['target_ids']))
 		return '<div class="red">Отсутствует значение для подсказки</div>';
 
 	return
 	'<span class="grey">Значение:</span> '.
 	'<span class="color-pay">'._elemIdsTitle($v).'</span>';
 }
-function PHP12_action_224($r) {//ЭЛЕМЕНТ: внешняя ссылка
-	if($r['dialog_id'] != 224)
+function PHP12_action_224($act) {//ЭЛЕМЕНТ: внешняя ссылка
+	if($act['dialog_id'] != 224)
 		return '';
 
 	return
 	'<span class="grey">Ссылка:</span> '.
-	($r['target_ids'] ?
-		'<span class="blue">'.$r['target_ids'].'</span>'
+	($act['target_ids'] ?
+		'<span class="blue">'.$act['target_ids'].'</span>'
 	: '<span class="grey">совпадает с содержанием элемента</span>');
 }
 
@@ -382,13 +904,13 @@ function PHP12_action208_formula_save($cmp, $val, $unit) {
 	query($sql);
 }
 function PHP12_action208_formula_vvv($prm) {
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return array();
-	if(empty($u['v1']))
+	if(empty($prm['unit_edit']['v1']))
 		return array();
 
 	$send = array();
-	$ex = explode(',', $u['v1']);
+	$ex = explode(',', $prm['unit_edit']['v1']);
 	$count = (count($ex) - 1) / 2;
 
 	for($n = 0; $n <= $count; $n++) {
@@ -462,8 +984,7 @@ function PHP12_hint_spisok($prm) {//список подсказок для уп�
 			$BL = _blockOne($r['block_id']);
 		if($r['element_id'])
 			if($EL = _elemOne($r['element_id']))
-				$BL = $EL['block'];
-
+				$BL = _blockOne($EL['block_id']);
 
 		if(!empty($BL))
 			switch($BL['obj_name']) {
@@ -519,73 +1040,23 @@ function _hintMassPush($ht) {//добавление данных подсказ�
 
 	return $key;
 }
-function _hintStruct($r, $id, $prm=array()) {//формирование данных подсказки
-	unset($r['app_id']);
-	unset($r['dialog_id']);
-	unset($r['block_id']);
-	unset($r['element_id']);
-	unset($r['user_id_add']);
-	unset($r['dtime_add']);
-
-	unset($r['filter']);
-	unset($r['sort']);
-
-	if(isset($r['initial_id'])) {
-		$r['side'] = $r['initial_id'];
-		unset($r['initial_id']);
-	}
-
-	if(isset($r['apply_id'])) {
-		$r['pos_h'] = $r['apply_id'];
-		unset($r['apply_id']);
-	}
-
-	if(isset($r['effect_id'])) {
-		$r['pos_v'] = $r['effect_id'];
-		unset($r['effect_id']);
-	}
-
-	if(isset($r['target_ids'])) {
-		$r['ug_h'] = $r['target_ids'];
-		unset($r['target_ids']);
-	}
-
-	if(isset($r['revers'])) {
-		$r['ug_v'] = $r['revers'];
-		unset($r['revers']);
-	}
-
-	if(isset($r['v1'])) {
-		$r['delay_show'] = $r['v1'];
-		unset($r['v1']);
-	}
-
-	if(isset($r['v2'])) {
-		$r['delay_hide'] = $r['v2'];
-		unset($r['v2']);
-	}
-
-	$prm['td_no_end'] = 1;
-	$r['msg'] = _blockHtml('hint', $id, $prm);
-
-	return $r;
-}
 function _hintCacheClear($dlg) {//очистка кеша подсказок
 	if($dlg['table_name_1'] != '_action')
 		return;
 	if($dlg['id'] != 229)
 		return;
 
-	global $BE_FLAG;
-
+	echo 'HINT переделать!';
 	_cache_clear('HINT');
 	_cache_clear('HINT', 1);
-	$BE_FLAG = 0;
+//	_flag_('BE', true);
 }
-function _hintDlgId($BL, $obj_id=0) {//поиск id диалога для подсказки
+function _hintDlgId($prm, $obj_id=0) {//поиск id диалога для подсказки
 	if($obj_id)
 		return $obj_id;
 
+	if(!$BL = PHP12_v_choose_BL($prm))
+		return false;
 	//проверка, что подсказка именно из блока
 	if($BL['obj_name'] != 'hint')
 		return false;

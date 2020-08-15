@@ -47,7 +47,7 @@ function _elem72Sum($EL, $year) {//получение сумм для фильт
 		return $spisok;
 	if(!$col = $el['col'])
 		return $spisok;
-	if(!$bl = $el['block'])
+	if(!$bl = _blockOne($el['block_id']))
 		return $spisok;
 	if($bl['obj_name'] != 'dialog')
 		return $spisok;
@@ -73,5 +73,12 @@ function _elem72Sum($EL, $year) {//получение сумм для фильт
 	}
 
 	return $spisok;
+}
+function _elem72filter($el) {//фильтр: год и месяц
+	foreach(_filter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 72)
+			return " AND `t1`.`dtime_add` LIKE '".$r['v']."-%'";
+
+		return '';
 }
 

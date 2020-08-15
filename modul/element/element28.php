@@ -12,9 +12,7 @@ function _element28_struct($el) {
 function _element28_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, 0);
 
-	$width = 0;
-	if($bl = @$el['block'])
-		$width = $bl['width'];
+	$width = _num(_blockCh($el['block_id'], 'width'));
 
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
@@ -30,8 +28,8 @@ function _element28_print($el, $prm) {
 		'<table class="atv'._dn($v).'">'.
 			'<tr><td class="top">'._attachLink($v, $width).
 				'<th class="top wsnw">'.
-//					'<div class="icon icon-set mtm2 ml5 pl'._tooltip('Параметры файла', -56).'</div>'.
-					'<div class="icon icon-del-red ml5 mtm2 pl'._tooltip('Отменить', -30).'</div>'.
+//					'<div class="icon icon-set mtm2 ml5 pl tool" data-tool="Параметры файла"></div>'.
+					'<div class="icon icon-del-red ml5 mtm2 pl tool" data-tool="Отменить"></div>'.
 		'</table>'.
 	'</div>';
 }
@@ -39,9 +37,7 @@ function _element28_print11($el, $u) {
 	if(!$col = _elemCol($el))
 		return '';
 
-	$width = 0;
-	if($bl = @$el['elp']['block'])
-		$width = $bl['width'];
+	$width = _num(_blockCh($el['elp']['block_id'], 'width'));
 
 	return _attachLink(@$u[$col], $width);
 }

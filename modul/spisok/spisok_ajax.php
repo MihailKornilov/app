@@ -73,21 +73,16 @@ switch(@$_POST['op']) {
 				_BE('block_clear');
 				_BE('elem_clear');
 				_filter('cache_clear');//сброс кеша фильтра, так как возможно был удалён фильтр
-				_jsCache();
 				$send['elem_del'] = $unit_id;
 			}
 
 			//обновление кеша объекта, если это страница
-			if($dialog['table_name_1'] == '_page') {
+			if($dialog['table_name_1'] == '_page')
 				_cache_clear('page');
-				_jsCache();
-			}
 
 			if($dialog['table_name_1'] == '_action')
-				if(_elemOne($unit['element_id'])) {
+				if(_elemOne($unit['element_id']))
 					_BE('elem_clear');
-					_jsCache();
-				}
 
 			//удаление данных счётчика
 			if($dialog['table_name_1'] == '_counter') {
@@ -96,6 +91,7 @@ switch(@$_POST['op']) {
 			}
 		}
 
+		$send = _spisokAction1($send);
 		$send = _spisokAction4($send);
 
 		jsonSuccess($send);
@@ -117,6 +113,10 @@ switch(@$_POST['op']) {
 			jsonError('Отсутствуют значения фильтров');
 		if(!is_array($elem_v))
 			jsonError('Некорректные значения фильров');
+
+
+		//видимость блоков до и после обновления фильтров - исходные значения (до обновления)
+		$blkHiddenSouce = _filterUpdateBlkHidden($elSpisok['block_id']);
 
 		/* значения, которые будут обновлены вместе с обновлением списка
 				id - id элемента
@@ -155,6 +155,7 @@ switch(@$_POST['op']) {
 		}
 
 		$send['hint'] = _hintMass();
+		$send['blk_hidden_upd'] = _filterUpdateBlkHidden($elSpisok['block_id'], $blkHiddenSouce);
 
 		jsonSuccess($send);
 		break;
@@ -163,6 +164,9 @@ switch(@$_POST['op']) {
 			jsonError('Некорректный ID элемента-списка');
 		if(!$elSpisok = _elemOne($spisok_id))
 			jsonError('Элемента-списка id'.$spisok_id.' не существует');
+
+		//видимость блоков до и после обновления фильтров - исходные значения (до обновления)
+		$blkHiddenSouce = _filterUpdateBlkHidden($elSpisok['block_id']);
 
 		$sql = "UPDATE `_user_spisok_filter`
 				SET `v`=`def`
@@ -204,6 +208,7 @@ switch(@$_POST['op']) {
 
 		$send['filter'] = _filter('page_js');
 		$send['hint'] = _hintMass();
+		$send['blk_hidden_upd'] = _filterUpdateBlkHidden($elSpisok['block_id'], $blkHiddenSouce);
 
 		jsonSuccess($send);
 		break;
@@ -238,16 +243,12 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 	case 'spisok_23_sort':
-		if(!$elem_id = _num($_POST['elem_id']))
-			jsonError('Некорректный ID элемента');
-		if(!$el = _elemOne($elem_id))
-			jsonError('Элемента id'.$elem_id.' не существует');
+		if(!$el = _elemOne($_POST['elem_id']))
+			jsonError('[23] sort: Элемента не существует');
 		if($el['dialog_id'] != 23)
-			jsonError('Элемент не является списком-таблицей');
-		if(!$dialog_id = _num($el['num_1']))
-			jsonError('Отсутствует ID диалога');
-		if(!$dialog = _dialogQuery($dialog_id))
-			jsonError('Диалога не существует');
+			jsonError('[23] sort: Элемент не является списком-таблицей');
+		if(!$dialog = _dialogQuery($el['num_1']))
+			jsonError('[23] sort: Диалога не существует');
 
 		$arr = $_POST['arr'];
 		if(empty($arr))
@@ -290,13 +291,11 @@ switch(@$_POST['op']) {
 
 		//обновление количеств, если присутствуют
 		foreach($dialog['cmp'] as $r)
-			_spisokUnitUpd54($r);
+			_element54update($r);
 
 		//очистка кеша страниц
-		if($dialog['table_name_1'] == '_page') {
+		if($dialog['table_name_1'] == '_page')
 			_cache_clear('page');
-			_jsCache();
-		}
 
 		jsonSuccess();
 		break;
@@ -445,9 +444,9 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	_filterDefSet($dialog, $unit_id);
 
 	_SUN_CMP_UPDATE($dialog, $POST_CMP, $unit_id);
+
 	_spisokUnitUpd42($dialog, $POST_CMP);
 	_spisokUnitDelSetup($dialog, $unit_id);
-//	_spisokUnitBalansUpd($dialog, $POST_CMP);
 
 
 	//внесение данных из других диалогов (если есть)
@@ -455,15 +454,15 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 
 	//получение обновлённых данных записи
 	$unit = IS_ELEM ? _elemOne($unit_id, true) : _spisokUnitQuery($dialog, $unit_id, true);
+
+	if($dialog['id'] == 54)
+		_element54update($unit_id);
+	if($dialog['id'] == 55)
+		_element55update($unit_id);
+
 	_spisokUnitDependUpd($dialog, $unitOld, $unit);
 	_historyInsertEdit($dialog, $unitOld, $unit);
 	_elem29defSet($dialog, $unit);
-
-	if(IS_ELEM) {
-		//обновление данных блока в кеше
-		if($block_id = $unit['block_id'])
-			_blockOne($block_id, true);
-	}
 
 	foreach($dialog['cmp'] as $cmp_id => $cmp) {
 		switch($cmp['dialog_id']) {
@@ -480,9 +479,6 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 		}
 	}
 
-	_spisokUnitUpd54($unit);
-	_spisokUnitUpd55($unit);
-	_spisokUnitUpd27($unit);
 
 	_counterGlobal($dialog['id'], $dialog);
 
@@ -492,22 +488,15 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	if($dialog['table_name_1'] == '_counter')
 		_counterGlobal($unit['spisok_id'], $dialog);
 
-	if($dialog['table_name_1'] == '_page') {
+	if($dialog['table_name_1'] == '_page')
 		_cache_clear('page');
-		_jsCache();
-	}
 
 	//было назначено действие
-	if($dialog['table_name_1'] == '_action') {
-		if($unit['block_id'])
-			_BE('block_clear');
-		if($unit['element_id'])
-			_BE('elem_clear');
-		_jsCache();
-	}
+	if($dialog['table_name_1'] == '_action')
+		_BE('action_clear');
 
 	//изменена выплывающая подсказка
-	_hintCacheClear($dialog);
+//	_hintCacheClear($dialog);
 
 	//изменены данные пользователя
 	if($dialog['table_name_1'] == '_user')
@@ -530,12 +519,17 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 		'action_page_id' => _num($dialog[ACT.'_action_page_id'])
 	);
 
+	$send = _spisokAction1($send);
 	$send = _spisokAction3($dialog, $unit_id, $send);
 	$send = _spisokAction4($send);
 
 	if(IS_ELEM) {
-		$send['elem_js'] = _element('js', $unit);
-		_jsCache();
+		if($block_id = $unit['block_id']) {
+			$bl = _blockOne($block_id, true);
+			$send['js_upd'] = true;
+			$send['jsblk'] = _BE('block_arr', $bl['obj_name'], $bl['obj_id']);
+			$send['jselm'] = _elmJs($bl['obj_name'], $bl['obj_id']);
+		}
 	}
 
 	return $send;
@@ -756,12 +750,9 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 		if(!$block = _blockOne($block_id))
 			jsonError('Блока не сущетвует');
 		//если происходит вставка дочернего элемента, подмена блока на родителя
-		if($elem = $block['elem']) {
+		if($elem = _elemOne($block['elem_id'])) {
 			if($elem['dialog_id'] == 23//таблица
-			|| $elem['dialog_id'] == 27//баланс
 			|| $elem['dialog_id'] == 44//сборный текст
-			|| $elem['dialog_id'] == 62//фильтр: галочка
-			|| $elem['dialog_id'] == 74//фильтр: радио
 			|| $elem['dialog_id'] == 88//таблица из нескольких списков
 			) {
 				$block_id = 0;
@@ -992,7 +983,7 @@ function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//предварит�
 			return;
 		if(!$el = _elemOne($unit_id))
 			return;
-		if(!$bl = $el['block'])
+		if(!$bl = _blockOne($el['block_id']))
 			return;
 		if(!$ids = _BE('elem_ids_arr', $bl['obj_name'], $bl['obj_id']))
 			return;
@@ -1116,6 +1107,13 @@ function _SUN_OTHER($arr) {//внесение данных из других д�
 		_SUN_AFTER($dialog, $unit);
 	}
 }
+function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение действий после обновления или удаления записи
+	_element54unitUpd($dialog, $unit, $unitOld);
+	_element55unitUpd($dialog, $unit, $unitOld);
+	_element92unitUpd($dialog, $unit);
+	_element27inDialog($dialog, $unit, $unitOld);
+	_element27inFilter();
+}
 function _spisokUnitUpd42($DLG, $cmp) {//обновление некоторых данных другой записи [42]
 	if(!$elem_id = $DLG['insert_unit_change_elem_id'])
 		return;
@@ -1169,6 +1167,8 @@ function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id ди�
 	query($sql);
 }
 function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление зависимых привязанных списков
+														 //В случае если изменилось значение в привязанном списке, будут изменены все зависимые идентификаторы,
+														 //а также пересчитаны счётчики у старого и нового владельца
 	//дочерние диалоги не затрагиваются
 	if($dialog['dialog_id_parent'])
 		return;
@@ -1289,51 +1289,49 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 
 
 			//сбор значений, у которых потребуется обновлять счётчики
-			$UPD[] = array(
-				'dlg' => $cmp['num_1'],
-				'old' => $old,
-				'new' => $new
-			);
+			$UPD[$cmp['num_1']] = _ids($old.','.$new);
 		}
 	}
 
 	//обновление счётчиков у изменённых значений
-	foreach($UPD as $r) {
-		if(!$dlg = _dialogQuery($r['dlg']))
+	foreach($UPD as $dlg_id => $ids) {
+		if(!$dlg = _dialogQuery($dlg_id))
 			continue;
 
-		foreach($dlg['cmp'] as $cmp) {
-			if($cmp['dialog_id'] == 54) {
-				_spisokUnitUpd54($cmp, $r['old']);
-				_spisokUnitUpd54($cmp, $r['new']);
-			}
-			if($cmp['dialog_id'] == 55) {
-				_spisokUnitUpd55($cmp, $r['old']);
-				_spisokUnitUpd55($cmp, $r['new']);
-			}
-			if($cmp['dialog_id'] == 27) {
-				_spisokUnitUpd27($cmp, $r['old']);
-				_spisokUnitUpd27($cmp, $r['new']);
-			}
+		foreach($dlg['cmp'] as $id => $cmp) {
+			if($cmp['dialog_id'] == 54)
+				_element54update($id, $ids);
+			if($cmp['dialog_id'] == 55)
+				_element55update($id, $ids);
 		}
 	}
 }
-function _spisokAction3($dialog, $unit_id, $send) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
-	//должено быть действие над элементом
-	if($dialog['table_1'] != 5)
+function _spisokAction1($send) {//обновление страницы посредством AJAX
+	if($send['action_id'] != 1)
 		return $send;
-	if($send['action_id'] != 3)
-		return $send;
-	if(!$elem = _elemOne($unit_id))
-		return $send;
-	//была вставка доп-значения для элемета
-	if(!empty($elem['parent_id']))
-		return $send;
-	if(!$elem['block_id'])
+	if(!$page_id = _num(@$_POST['page_id']))
 		return $send;
 
-	$send['obj_name'] = $elem['block']['obj_name'];
-	$send['level'] = _blockLevelChange($elem['block']['obj_name'], $elem['block']['obj_id']);
+	$send['content'] = _pageShow($page_id);
+
+	return $send;
+}
+function _spisokAction3($dialog, $unit_id, $send) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
+	if($send['action_id'] != 3)
+		return $send;
+	//должно быть действие над элементом
+	if($dialog['table_1'] != 5)
+		return $send;
+	if(!$el = _elemOne($unit_id))
+		return $send;
+	//была вставка доп-значения для элемента
+	if(!empty($el['parent_id']))
+		return $send;
+	if(!$bl = _blockOne($el['block_id']))
+		return $send;
+
+	$send['obj_name'] = $bl['obj_name'];
+	$send['level'] = _blockLevelChange($bl['obj_name'], $bl['obj_id']);
 
 	return $send;
 }
@@ -1358,6 +1356,7 @@ function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значени�
 	//получение элемента-функции [12], отображающего диалог для выбора
 	if(empty($dialog['cmp']))
 		jsonError('Пустой диалог 11');
+
 
 	$elem_func_id = key($dialog['cmp']);
 
@@ -1447,8 +1446,10 @@ function _elem22_col_dop($DLG) {
 		jsonError('Элемента '.$col_id.' не существует');
 	if(!$col = $el['col'])
 		jsonError('Выбранный элемент не содержит колонку');
-	if(!$dlg = _dialogQuery($el['block']['obj_id']))
-		jsonError('Диалога '.$el['block']['obj_id'].' не существует');
+	if(!$bl = _blockOne($el['block_id']))
+		jsonError('Блока '.$el['block_id'].' не существует');
+	if(!$dlg = _dialogQuery($bl['obj_id']))
+		jsonError('Диалога '.$bl['obj_id'].' не существует');
 
 	$u = array(
 		'id' => $col_id,
@@ -1485,7 +1486,28 @@ function _d112_app_access($DLG, $POST_CMP) {//Закрытие / открыти�
 	jsonSuccess($send);
 }
 
+function _filterUpdateBlkHidden($block_id, $source=array()) {//получение блоков, которые нужно скрыть или показать после обновления фильтра через AJAX
+	if(!$bl = _blockOne($block_id))
+		return array();
 
+	$prm = _blockParam(array(), $bl['obj_name']);
+
+	$send = array();
+	foreach(_BE('block_arr', $bl['obj_name'], $bl['obj_id']) as $id => $r) {
+		$r = _blockAction201($r, $prm);
+		$send[$id] = $r['hidden'];
+	}
+
+	if(empty($source))
+		return $send;
+
+	$upd = array();
+	foreach($source as $id => $v)
+		if($send[$id] != $v)
+			$upd[$id] = $v;
+
+	return $upd;
+}
 
 
 

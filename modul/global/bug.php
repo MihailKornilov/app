@@ -249,7 +249,6 @@ function PHP12_bug_dialog($prm) {
 	$c = 0;
 	$parentC = 0;
 	$uGetC = 0;
-	$actC = 0;
 	foreach($DLG as $r) {
 		if($r['app_id'])
 			$c++;
@@ -262,10 +261,6 @@ function PHP12_bug_dialog($prm) {
 			if($uid > 0)
 				if(!isset($DLG[$uid]))
 					$uGetC++;
-
-		if($actId = $r['element_action_dialog_id'])
-			if(!isset($DLG[$actId]))
-				$actC++;
 	}
 
 	return
@@ -273,7 +268,6 @@ function PHP12_bug_dialog($prm) {
 		'<tr><td class="grey b">Всего диалогов:<td class="w50 r b color-pay">'._hide0($c).
 		'<tr><td class="color-del">Некорректный ID родителя `dialog_id_parent`:<td class="r b red">'._hide0($parentC).
 		'<tr><td class="color-del">Некорректный `dialog_id_unit_get` (принимает данные записи):<td class="r b red">'._hide0($uGetC).
-//		'<tr><td class="color-del">Некорректный `element_action_dialog_id` (действие для элемента):<td class="r b red">'._hide0($actC).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.

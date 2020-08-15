@@ -5,8 +5,9 @@ function _element23_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//id диалога, который вносит данные списка (шаблон которого будет настраиваться)
 		'num_2'   => _num($el['num_2']),//длина (количество строк, выводимых за один раз)
-		'txt_1'   => $el['txt_1'],	  //сообщение пустого запроса
-		'txt_2'   => $el['txt_2'],	  //условия отображения, настраиваемые через [40]
+		'txt_1'   => $el['txt_1'],	    //сообщение пустого запроса
+		'txt_2'   => $el['txt_2'],	    //[40] условия отображения
+		'txt_3'   => $el['txt_3'],	    //[12] содержание - ids элементов
 		'num_3'   => _num($el['num_3']),//узкие строки таблицы
 		'num_4'   => _num($el['num_4']),//подсвечивать строку при наведении мыши
 		'num_5'   => _num($el['num_5']),//показывать имена колонок
@@ -30,37 +31,22 @@ function _element23_struct_title($el, $DLG) {
 	$el['title'] = $DLG[$dlg_id]['name'];
 	return $el;
 }
-function _element23_struct_vvv($el, $cl) {
-	$send = array(
-		'id'		=> _num($cl['id']),
-		'title'     => $cl['title'],
-		'parent_id' => _num($cl['parent_id']),
-		'dialog_id' => _num($cl['dialog_id']),
-		'width'     => _num($cl['width']),
-		'font'      => $cl['font'],
-		'color'     => $cl['color'],
-		'txt_7'     => $cl['txt_7'],//название колонки
-		'txt_8'     => $cl['txt_8'],//pos: позиция
-
-		'num_1'     => _num($cl['num_1']),
-		'num_2'     => _num($cl['num_2']),
-		'num_3'     => _num($cl['num_3']),
-		'num_4'     => _num($cl['num_4']),
-		'num_5'     => _num($cl['num_5']),
-		'txt_1'     => $cl['txt_1'],//для [10][44]
-		'txt_2'     => $cl['txt_2'],//для [11]
-		'vvv'       => array()      //для [44]
-	);
-
-	$send = _elem44vvv($send);
-
-	return $send;
-}
 function _element23_js($el) {
 	return array(
 		'num_7'   => _num($el['num_7']),
 		'num_8'   => _num($el['num_8'])
 	) + _elementJs($el);
+}
+function _element23_vvv($el) {
+	if(!$ids = _ids($el['txt_3'], 'arr'))
+		return array();
+
+	$send = array();
+	foreach($ids as $elem_id)
+		if($ell = _elemOne($elem_id))
+			$send[] = $ell;
+
+	return $send;
 }
 function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списка в виде таблицы
 	if(!empty($prm['blk_setup']))
@@ -114,14 +100,14 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 	//вставка картинок
 	$spisok = _spisokImage($spisok);
 
-	if(empty($ELEM['vvv']))
+	if(!$vvv = _element('vvv', $ELEM))
 		return _emptyRed('Таблица не настроена.');
 
 	$MASS = array();
 	foreach($spisok as $uid => $u) {
 		$TR = '<tr class="tr-unit'.($ELEM['num_4'] ? ' over1' : '').'" val="'.$u['id'].'">';
 		$prm = _blockParam(array('unit_get'=>$u));
-		foreach($ELEM['vvv'] as $td) {
+		foreach($vvv as $td) {
 			$cls = array();
 			$txt = '';
 
@@ -216,7 +202,7 @@ function _spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT) {//ото
 		$send = $TABLE_BEGIN;
 
 	$send .= '<tr>';
-	foreach($ELEM['vvv'] as $tr) {
+	foreach(_element('vvv', $ELEM) as $tr) {
 		$txt = $tr['txt_7'];
 
 		//выбор галочками
@@ -325,9 +311,11 @@ function _element23_template_docx($ELEM, $u) {
 
 	$WNUM = 35;//ширина колонки для порядкового номера
 
+	$vvv = _element('vvv', $ELEM);
+
 	//получение общей ширины таблицы
 	$WTR = $WNUM;
-	foreach($ELEM['vvv'] as $tr)
+	foreach($vvv as $tr)
 		$WTR += $tr['width'];
 
 
@@ -338,7 +326,7 @@ function _element23_template_docx($ELEM, $u) {
 	$w = round($WNUM/$WTR*$w100);
 	$send .= elem23docxCell('№ п/п', $w, 'center', true);
 
-	foreach($ELEM['vvv'] as $th) {
+	foreach($vvv as $th) {
 		$w = round($th['width']/$WTR*$w100);
 		$send .= elem23docxCell($th['txt_7'], $w, 'center', true);
 
@@ -356,7 +344,7 @@ function _element23_template_docx($ELEM, $u) {
 
 		$prm = _blockParam(array('unit_get'=>$u));
 
-		foreach($ELEM['vvv'] as $td) {
+		foreach($vvv as $td) {
 			switch($td['txt_8']) {
 				case 'center'; $align = 'center'; break;
 				case 'r'; $align = 'right'; break;
@@ -413,14 +401,12 @@ function PHP12_td_setup($prm) {//используется в диалоге [23]
 
 	if(!$prm['unit_edit'])
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
-
 	if(!$BL = _blockOne($prm['srce']['block_id']))
 		return _emptyMin10('[23] Отсутствует исходный блок.');
+	if(!$el = _elemOne($BL['elem_id']))
+		return _emptyMin10('[23] Отсутствует элемент.');
 
-	$ex = explode(' ', $BL['elem']['mar']);
-	$w = $BL['width'] - $ex[1] - $ex[3];
-
-	return '<div class="calc-div h25 line-b bg-efe">'.$w.'</div>';
+	return '<div class="calc-div h25 line-b bg-efe">'._elemWidth($el).'</div>';
 }
 function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данных ячеек таблицы
 	/*
@@ -436,12 +422,11 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 
 	if(empty($unit['id']))
 		return;
+	if(!$col = $cmp['col'])
+		return;
 
-	//Сброс флага активности ячейки
-	$sql = "UPDATE `_element`
-			SET `num_8`=0
-			WHERE `parent_id`=".$unit['id'];
-	query($sql);
+	//идентификаторы, которые удалять не нужно
+	$ids = 0;
 
 	if(!empty($val) && is_array($val))
 		foreach($val as $sort => $r) {
@@ -449,8 +434,7 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 				continue;
 
 			$sql = "UPDATE `_element`
-					SET `num_8`=1,
-						`width`="._num($r['width']).",
+					SET `width`="._num($r['width']).",
 						`font`='".$r['font']."',
 						`color`='".$r['color']."',
 						`txt_7`='".addslashes(_txt($r['txt_7']))."',
@@ -459,27 +443,34 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 					WHERE `parent_id`=".$unit['id']."
 					  AND `id`=".$id;
 			query($sql);
+
+			$ids .= ','.$id;
 		}
 
 	//удаление значений, которые были удалены при настройке
+	$sql = "DELETE FROM `_element`
+			WHERE `parent_id`=".$unit['id']."
+			  AND `id` NOT IN (".$ids.")";
+	query($sql);
+
+	//прописывание идентификаторов ячеек
 	$sql = "SELECT `id`
 			FROM `_element`
 			WHERE `parent_id`=".$unit['id']."
-			  AND !`num_8`";
-	if($ids = query_ids($sql)) {
-		$sql = "DELETE FROM `_element` WHERE `id` IN (".$ids.")";
-		query($sql);
+			ORDER BY `sort`";
+	$ids = query_ids($sql);
 
-		$sql = "DELETE FROM `_action` WHERE `element_id` IN (".$ids.")";
-		query($sql);
-	}
+	$sql = "UPDATE `_element`
+			SET `".$col."`='".($ids ? $ids : '')."'
+			WHERE `id`=".$unit['id'];
+	query($sql);
 
 	_BE('elem_clear');
 }
 function PHP12_td_setup_vvv($prm) {
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return array();
-	if(!$el = _elemOne($u['id']))
+	if(!$el = _elemOne($prm['unit_edit']['id']))
 		return array();
 
 	return _element('vvv', $el);

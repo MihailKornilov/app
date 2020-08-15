@@ -3,43 +3,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	ELM_RELOAD = {},//массив элементов, ожидающих перезагрузки. В виде: [id кто перезагружает] = id кого перезагружают
 					//пезагрузка происходит при помощи фукнции _elemReload
 
-	MONTH_DEF = {
-		1:'Январь',
-		2:'Февраль',
-		3:'Март',
-		4:'Апрель',
-		5:'Май',
-		6:'Июнь',
-		7:'Июль',
-		8:'Август',
-		9:'Сентябрь',
-		10:'Октябрь',
-		11:'Ноябрь',
-		12:'Декабрь'
-	},
-	MONTH_DAT = {
-		1:'января',
-		2:'февраля',
-		3:'марта',
-		4:'апреля',
-		5:'мая',
-		6:'июня',
-		7:'июля',
-		8:'августа',
-		9:'сентября',
-		10:'октября',
-		11:'ноября',
-		12:'декабря'
-	},
-	WEEK_NAME = {
-		0:'вс',
-		1:'пн',
-		2:'вт',
-		3:'ср',
-		4:'чт',
-		5:'пт',
-		6:'сб',
-		7:'вс'
+	ELEM_COLOR = {
+		"":["#000", "Чёрный"],
+		"color-555":["#555", "Тёмно-серый"],
+		"grey":["#888", "Серый"],
+		"pale":["#aaa", "Бледный"],
+		"color-ccc":["#ccc", "Совсем бледный"],
+		"blue":["#2B587A", "Тёмно-синий"],
+		"color-acc":["#07a", "Синий"],
+		"color-sal":["#770", "Салатовый"],
+		"color-pay":["#090", "Зелёный"],
+		"color-aea":["#aea", "Ярко-зелёный"],
+		"red":["#e22", "Красный"],
+		"color-ref":["#800", "Тёмно-красный"],
+		"color-del":["#a66", "Тёмно-бордовый"],
+		"color-vin":["#c88", "Бордовый"]
 	},
 
 	_color = function(v, func) {
@@ -48,7 +26,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			.on('mouseenter', '._color td', function() {//показ цветов при наведении
 				var td = $(this),
 					v = td.attr('val');
-				td._tooltip(ELEM_COLOR[v][1]);
+				td._tool(ELEM_COLOR[v][1]);
 			})
 			.off('click', '._color td')
 			.on('click', '._color td', function() {//установка цвета при выборе
@@ -113,14 +91,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		}, o);
 
 		var DIALOG_NUM = $('._dialog').length,
-			editShow = _dn(!DIALOG_NUM && o.setup_access && _cookie('face') == 'site'),
+			editShow = !DIALOG_NUM && o.setup_access && _cookie('face') == 'site',
 			html =
 			'<div class="_dialog-back"></div>' +
 			'<div class="_dialog">' +
 				'<iframe class="frameD" name="frameD' + DIALOG_NUM + '"></iframe>' +
 				'<div class="head ' + o.color + '">' +
 					'<div class="close fr curP"><a class="icon icon-del wh pl"></a></div>' +
-		            '<div class="edit fr curP' + editShow + '"><a class="icon icon-edit wh pl"></a></div>' +
+					'<div class="submit fr curP' + _dn(o.butSubmit) + '"><a class="icon icon-ok wh pl"></a></div>' +
+					'<div class="edit fr curP' + _dn(editShow) + '"><a class="icon icon-edit wh pl"></a></div>' +
 					'<div class="fs14 white">' + o.head + '</div>' +
 				'</div>' +
 				'<div class="content bg-fff">' +
@@ -135,25 +114,41 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			dialog = $('body').append(html).find('._dialog:last'),
 			DBACK = dialog.prev(),
 			iconEdit = dialog.find('.head .edit'),
+			iconSubmit = dialog.find('.head .submit'),
 			content = dialog.find('.content'),
 			width = o.width || Math.round(content.width()),
 			bottom = dialog.find('.btm'),
 			butSubmit = bottom.find('.submit'),
 			butCancel = bottom.find('.cancel'),
-			submitFunc = function() {
-				if(butSubmit.hasClass('_busy'))
-					return;
-				o.submit();
-				if(o.dialog_id)
-					delete DIALOG[o.dialog_id];
-			},
 			//функция, которая выполняется при отмене или закрытии диалога
 			closeFunc = function() {},
 			w2 = Math.round(width / 2), //ширина/2. Для определения положения по центру
-			vkScroll = VK_SCROLL > 110 ? VK_SCROLL - 110 : 0;//корректировка скролла VK
+			vkScroll = VK_SCROLL > 110 ? VK_SCROLL - 110 : 0,//корректировка скролла VK
+			BUSY_OBJ,
+			BUSY_CLS;
 
+		dialog.find('.submit').click(function() {
+			if(butSubmit.hasClass('_busy'))
+				return;
+			if(iconSubmit.hasClass('spin'))
+				return;
+
+			switch($(this)[0].tagName) {
+				default:
+				case 'BUTTON':
+					BUSY_OBJ = $(this);
+					BUSY_CLS = '_busy';
+					break;
+				case 'DIV':
+					BUSY_OBJ = $(this).find('.icon');
+					BUSY_CLS = 'spin';
+					break;
+			}
+			o.submit();
+			if(o.dialog_id)
+				delete DIALOG[o.dialog_id];
+		});
 		dialog.find('.close').click(dialogClose);
-		butSubmit.click(submitFunc);
 		butCancel.click(function() {
 			if(butCancel.hasClass('_busy'))
 				return;
@@ -217,7 +212,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			closeFunc();
 		}
 		function dialogErr(msg) {
-			butSubmit._hint({
+			BUSY_OBJ._hint({
 				msg:msg,
 				color:'red',
 				pad:10,
@@ -277,8 +272,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				closeFunc = func;
 			},
 			post:function(send, success) {//отправка формы
-				send.busy_obj = butSubmit;
-				send.busy_cls = '_busy';
+				send.busy_obj = BUSY_OBJ;
+				send.busy_cls = BUSY_CLS;
 				send.func_err = function(res) {
 					dialogErr(res.text);
 					$(res.attr_cmp)
@@ -378,7 +373,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DLG('#' + act + '_action_page_id')._select({
 				width:270,
 				title0:'не выбрана',
-				spisok:PAGE_LIST
+				spisok:o.page_list
 			});
 			DLG('#history_' + act).click(function() {
 				var t = $(this);
@@ -444,11 +439,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			title0:'не указан',
 			width:100,
 			spisok:o.col_type
-		});
-		DLG('#element_action_dialog_id')._select({
-			width:280,
-			title0:'не указан',
-			spisok:o.dlg_func
 		});
 		DLG('#spisok_on')._check({
 			func:function(v) {
@@ -577,6 +567,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				}
 			});
 
+		BLKK = _objUpd(BLKK, o.blk);
+		ELMM = _objUpd(ELMM, o.cmp);
+
 		function submit() {
 			if(o.send)
 				delete o.send.op;
@@ -634,7 +627,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				element_type:DLG('#element_type').val(),
 				element_afics:DLG('#element_afics').val(),
 				element_hidden:DLG('#element_hidden').val(),
-				element_action_dialog_id:DLG('#element_action_dialog_id').val(),
 
 				menu_edit_last:DLG('#dialog-menu').val()
 			}, o.send || {});
@@ -655,14 +647,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			dialog.post(send, function(res) {
 				if(!o.send)
 					return;
-
-				//обновление подсказок действий в JS
-				_forIn(res.elm_js, function(sp, id) {
-					ELMM[id].hint = sp.hint;
-					ELMM[id].action = sp.action;
-				});
-
-				delete res.elm_js;
 
 				res.send = o.send;
 				_dialogOpen(res);
@@ -702,7 +686,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			func_save:null          //функция, применяется после успешного выполнения диалога (после нажатия кнопки submit)
 		}, o);
 
-		o = _copyObj(send);
+		if(o.dop)
+			delete o.dop.jselm;
+
+		o = _objCopy(send);
 
 		_post(send, function(res) {
 			res.send = o;
@@ -731,7 +718,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 
 		o.dlg = dialog;
-		_ELM_ACT(o);
+
+		BLKK = _objUpd(BLKK, o.jsblk);
+		ELMM = _objUpd(ELMM, o.jselm);
+
+		_ELM_JS(o.jselm, o);
+		_ELM_FOCUS(o.focus);
 
 		//подсветка блока, если нужно на него указать
 		if(o.send.block_flash)
@@ -756,38 +748,38 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			};
 
 			//получение значений компонентов
-			_forIn(o.vvv, function(vvv, id) {
-				var sp = ELMM[id],
-					ATR_CMP = _attr_cmp(id);
+			_forIn(o.jselm, function(el) {
+				var ATR_CMP = _attr_cmp(el.id);
 
-				switch(sp.dialog_id) {
+				switch(el.dialog_id) {
 					//многострочный текст
 					case 5:
-						if(!sp.num_2)
+						if(!el.num_2)
 							break;
 						if(!ATR_CMP)
 							return;
-						send.cmp[id] = _attr_el(id).find('.ck-content').html();
+						send.cmp[el.id] = _attr_el(el.id).find('.ck-content').html();
 						return;
 					//подключаемая функция
 					case 12:
-						var func = sp.txt_1 + '_get';
+						var func = el.txt_1 + '_get';
 						if(window[func])
-							send.vvv[id] = window[func](sp, o);
+							send.vvv[el.id] = window[func](el, o);
 						break;
 					//Select: выбор записи из другого списка (передача текста условии флага num_7)
 					case 29:
-						if(!sp.num_7)
+						if(!el.num_7)
 							break;
-						send.vvv[id] = ATR_CMP._select('inp');
+						send.vvv[el.id] = ATR_CMP._select('inp');
 						break;
 					//быстрое формирование списка
-					case 95: send.vvv[id] = _ELM_95_GET(sp);
+					case 95:
+						send.vvv[el.id] = _EL95_GET(el);
 						return;
 				}
 
 				if(ATR_CMP)
-					send.cmp[id] = ATR_CMP.val();
+					send.cmp[el.id] = ATR_CMP.val();
 			});
 
 			dialog.post(send, function(res) {
@@ -798,11 +790,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 //return;
 				_dialogOpenSubmitAction(res);
 
-				//обновление значения JS-кеша, если элемент вносился или изменялся
-				if(res.elem_js) {
-					ELMM[res.unit.id] = res.elem_js;
-					if(res.unit.block_id > 0)
-						BLKK[res.unit.block_id].elem_id = res.unit.id;
+				//обновление JS блоков и элементов, если элемент вносился или изменялся
+				if(res.js_upd) {
+					BLKK = _objUpd(BLKK, res.jsblk);
+					ELMM = _objUpd(ELMM, res.jselm);
 				}
 			});
 		}
@@ -821,6 +812,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			submit:function() {
 				var send = {
 					op:'spisok_del',
+					page_id:PAGE_ID,
 					dialog_id:o.dialog_id,
 					dss:o.send.dss,
 					unit_id:o.del_id
@@ -833,14 +825,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 	_dialogOpenSubmitAction = function(res) {//применение действий после выполнения диалога
 		switch(res.action_id) {
-			case 1: location.reload(); break;
+			//обновление страницы
+			case 1:
+				$('#_content').html(res.content);
+				break;
+			//переход на страницу
 			case 2:
 				var url = URL + '&p=' + res.action_page_id;
 				if(res.unit)
 					url += '&id=' + res.unit.id;
 				location.href = url;
 				break;
-			case 3://обновление содержимого блоков
+			//обновление содержимого блоков
+			case 3:
 				var bln = '#block-level-' + res.obj_name;
 				$(bln).after(res.level).remove();
 				$(bln)
@@ -848,7 +845,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					.removeClass('grey')
 					.trigger('click');
 				break;
-			case 4://обновление исходного диалога
+			//обновление исходного диалога
+			case 4:
 				var id = _num(res.dss4);
 				if(!id)
 					break;
@@ -913,2522 +911,738 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
-	_ELM_ACT = function(OBJ) {//активирование элементов
-		if(OBJ.dlgerr)
-			return;
-
-		var unit = OBJ.unit,
-			focus7; //если фокус не будет установлен ни на один элемент, а также на объекте присутствует быстрый поиск, установка фокуса на него
-
-		_forIn(OBJ.vvv, function(vvv, elm_id) {
-			elm_id *= 1;
-			var el = ELMM[elm_id];
-
-			if(!el)
-				throw('несуществующий элемент ' + elm_id);
-
-			el.id = elm_id;
-
-			var ATR_CMP = _attr_cmp(elm_id),
-				ATR_CMP_AFICS = _attr_cmp(elm_id, 1),
-				ATR_EL =  _attr_el(elm_id);
-
-			if(!ATR_EL.length)
+	//применение функций после печати элементов
+	_ELM_JS = function(ELM, OBJ) {
+		_forIn(ELM, function(el) {
+			var func = window['_EL' + el.dialog_id];
+			if(!func)
 				return;
-
-			switch(el.dialog_id) {
-				case 1://галочка
-					if(!el.action)
-						return;
-					ATR_CMP._check({
-						func:function(v) {
-							_elemAction(el, v);
-						}
-					});
-					_elemAction(el, _num(ATR_CMP.val()), 1);
-					return;
-				//textarea
-				case 5:
-					if(!el.num_2) {
-						ATR_CMP._autosize();
-						return;
-					}
-					//num_2: форматирование текста
-					ClassicEditor.create(document.querySelector(ATTR_CMP(elm_id)), {
-						toolbar: [
-							'heading',
-							'|',
-							'bold', 'italic', 'Underline',
-							'|',
-							'bulletedList', 'numberedList', 'blockQuote',
-							'|',
-							'link',
-							'|',
-							'undo', 'redo'
-						],
-						heading:{
-							options:[
-								{model:'paragraph', title:'Параграф', class:'ck-heading_paragraph' },
-								{model:'heading1', view:'h1', title:'Заголовок 1', class:'ck-heading_heading1' },
-								{model:'heading2', view:'h2', title:'Заголовок 2', class:'ck-heading_heading2' },
-								{model:'heading3', view:'h3', title:'Заголовок 3', class:'ck-heading_heading3' }
-							]
-						}
-					});
-					return;
-				//select - выбор страницы
-				case 6:
-					_elemAction(el, _num(ATR_CMP.val()), 1);
-					var spisok = _copySel(PAGE_LIST);
-
-					//если выбирается страница для ссылки, то добавляется вариант: 3 => Автоматически
-					if(elm_id == 1959)
-						spisok.unshift({
-							id:3,
-							title:'Автоматически',
-							content:'<b class="color-pay">Автоматически</b>'
-						});
-
-					ATR_CMP._select({
-						width:_num(el.width),
-						title0:el.txt_1,
-						spisok:spisok,
-						func:function(v) {
-							_elemAction(el, v);
-						}
-					});
-					return;
-				//search
-				case 7:
-					focus7 = ATR_CMP;
-					var process = 0,
-						v_last = FILTER[el.num_1] ? FILTER[el.num_1][elm_id] : '',
-						upd = function(v) {
-							process = 1;
-							FILTER[el.num_1][elm_id] = v;
-							_spisokUpdate(el.num_1, function() {
-								process = 0;
-								if(v_last != v)
-									upd(v_last);
-							});
-						};
-					ATR_CMP._search({
-						func:function(v) {
-							if(v_last == v)
-								return;
-
-							v_last = v;
-
-							if(process)
-								return;
-
-							upd(v);
-						}
-					});
-					return;
-				//однострочное текстовое поле
-				case 8:
-					if(el.action || el.num_7)
-						ATR_CMP.keyup(function(e) {
-							if(el.action)
-								_elemAction(el, ATR_CMP.val());
-
-							//нажатие на Enter
-							if(el.num_7)
-								if(e.which == 13)
-									OBJ.dlg.go();
-						});
-					return;
-				//Функция
-				case 12:
-					if(!window[el.txt_1])
-						return;
-					window[el.txt_1](el, vvv, OBJ);
-					return;
-				//Выбор элемента из диалога или страницы
-				case 13:
-					var P = ATR_CMP.next(),
-						INP = P.find('.inp'),
-						DEL = P.find('.icon-del');
-
-					if(INP.attr('disabled'))
-						return;
-
-					P.click(function() {
-						var dlg24 = 0;
-						if(el.num_1) {
-							dlg24 = _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
-							if(!dlg24) {
-								_attr_cmp(el.num_1, 1)._flash({color:'red'});
-								_attr_cmp(elm_id, 1)._hint({
-									msg:'Не выбрано значение',
-									color:'red',
-									pad:10,
-									show:1
-								});
-								return;
-							}
-						}
-
-						_dialogLoad({
-							dialog_id:11,
-							block_id:OBJ.srce.block_id,
-							element_id:OBJ.srce.element_id,
-							dss:OBJ.srce.dss,
-
-							dop:{
-								mysave:1,
-								is13:elm_id,
-								nest:_num(el.num_5),            //выбор значений во вложенных списках
-								sev:_num(el.num_6),             //выбор нескольких значений
-								dlg24:dlg24,                    //выбранный диалог в селекте, на который указывает num_1
-								sel:ATR_CMP.val(),              //выбранные элементы
-								allow:el.num_2 ? el.txt_2 : ''  //id типов элементов, которые разрешено выбирать
-							},
-
-							busy_obj:INP,
-							busy_cls:'hold',
-							func_save:function(res) {
-								ATR_CMP.val(res.v);
-								INP.val(res.title);
-								DEL._dn(1);
-								_elemReload(el, res);
-							}
-						});
-					});
-					DEL.click(function(e) {
-						e.stopPropagation();
-						ATR_CMP.val(0);
-						INP.val('');
-						DEL._dn();
-						_elemReload(el);
-					});
-					return;
-				//Радио
-				case 16:
-					if(!el.action)
-						return;
-					ATR_CMP._radio({
-						func:function(v) {
-							_elemAction(el, v);
-						}
-					});
-					_elemAction(el, _num(ATR_CMP.val()), 1);
-					return;
-				//select - произвольные значения
-				case 17:
-					_elemAction(el, _num(ATR_CMP.val()), 1);
-					ATR_CMP._select({
-						width:_num(el.width),
-						title0:el.txt_1,
-						spisok:vvv,
-						func:function(v) {
-							_elemAction(el, v);
-						}
-					});
-					return;
-				//dropdown
-				case 18:
-					_elemAction(el, _num(ATR_CMP.val()), 1);
-					ATR_CMP._dropdown({
-						title0:el.txt_1,
-						title0_hide:el.num_1,
-						nosel:el.num_2,
-						spisok:vvv,
-						func:function(v) {
-							_elemAction(el, v);
-						}
-					});
-					return;
-				//Список - ТАБЛИЦА
-				case 23:
-					//сортировка значений
-					if(el.num_8 == 6161)
-						ATR_EL.find('ol:first').nestedSortable({
-							forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
-							placeholder:'nested-placeholder', //класс, применяемый для подсветки места, откуда взялся элемент
-							listType:'ol',
-							items:'li',
-							handle:'.icon-move',
-							isTree:el.num_7 > 1,
-							maxLevels:el.num_7,
-							tabSize:30, //расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
-							revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
-
-							start:function(e, t) {//установка ширины placeholder
-								var w = $(t.item).find('._stab:first').width();
-								$(t.placeholder).width(w);
-							},
-							update:function(e, t) {
-	//							var pos = t.item.parent().attr('id');
-	//							t.item.find('a')._dn(!pos, 'b fs14');
-
-								var send = {
-									op:'spisok_23_sort',
-									elem_id:elm_id,
-									arr:$(this).nestedSortable('toArray'),
-									busy_obj:ATR_EL,
-									busy_cls:'spisok-busy'
-								};
-								_post(send);
-							},
-
-							expandedClass:'pb10',//раскрытый список
-							errorClass:el.num_7 > 1 ? 'bg-fcc' : ''  //ошибка, если попытка переместить элемент на недоступный уровень
-						});
-
-					//выбор значений галочками
-					_forN(vvv, function(sp) {
-						if(sp.dialog_id == 91) {
-							_forEq(ATR_EL.find('._check'), function(eq) {
-								//получение id записи
-								var tdid = eq.attr('id').split('_')[1];
-
-								//выбор/снятие всех галочек
-								if(tdid == 'all') {
-									$('#sch' + sp.id + '_all')._check({
-										func:function(v) {
-											_forEq(ATR_EL.find('._check'), function(eqAll) {
-												var ch = eqAll.prev();
-												if(ch.attr('id').split('_')[1] == 'all')
-													return;
-												ch._check(v);
-											});
-										}
-									});
-									return;
-								}
-
-								eq.prev()._check();
-							});
-							return false;
-						}
-					});
-
-					return;
-				//select - выбор списка (все списки приложения)
-				case 24:
-					_elemAction(el, _num(ATR_CMP.val()), 1);
-					ATR_CMP._select({
-						width:_num(el.width),
-						title0:el.txt_1,
-						blocked:el.noedit && unit.id,
-						spisok:vvv,
-						func:function(v) {
-							_elemAction(el, v);
-						}
-					});
-					return;
-				//SA: Select - выбор документа
-				case 26:
-					ATR_CMP._select({
-						width:_num(el.width),
-						title0:el.txt_1,
-						spisok:vvv
-					});
-					return;
-				//Загрузка файла
-				case 28:
-					var AT = ATR_EL.find('._attach'),
-						ATUP = AT.find('.atup'),    //div для загрузки
-						BUT = AT.find('.vk'),
-						FORM = AT.find('form'),
-						FILE = AT.find('.at-file'), //input file
-						ATV = AT.find('.atv'),      //загруженный файл
-						atmr;
-
-					AT.find('.icon-del-red').click(function() {
-						ATUP._dn(1);
-						ATV._dn();
-						ATR_CMP.val(0);
-					});
-					FILE.change(function() {
-						FILE._vh();
-						BUT.addClass('_busy');
-						_cookie('_attached', 0);
-						_cookie('_attached_id', 0);
-						atmr = setInterval(upload_start, 500);
-						FORM.submit();
-					});
-					function upload_start() {
-						switch(_num(_cookie('_attached'))) {
-							case 1:
-								var attach_id = _cookie('_attached_id');
-								ATUP._dn();
-								ATV._dn(1).find('td').html('&nbsp;');
-								ATR_CMP.val(attach_id);
-								var send = {
-									op:'attach_get',
-									id:attach_id,
-									busy_obj:ATV
-								};
-								_post(send, function(res) {
-									ATV.find('td').html(res.html);
-								});
-							case 2:
-							case 3:
-								FILE._vh(1);
-								BUT.removeClass('_busy');
-								clearInterval(atmr);
-						}
-					}
-					return;
-				//select: выбор единицы из другого списка (для связки)
-				case 29:
-					_elemAction(el, _num(ATR_CMP.val()), 1);
-					var o = {
-						width:_num(el.width),
-						title0:el.txt_1,
-						write:el.num_1 && el.num_3,
-						msg_empty:'Не найдено',
-						spisok:vvv,
-						blocked:el.num_4,
-						func:function(v) {
-							_elemAction(el, v);
-						},
-						funcWrite:function(v, t) {
-							var send = {
-								op:'spisok_29_connect',
-								cmp_id:elm_id,
-								v:v,
-								busy_obj:t.icon_del,
-								busy_cls:'spin'
-							};
-							_post(send, function(res) {
-								t.spisok(res.spisok);
-							});
-						}
-					};
-					//добавление записи через диалог
-					if(el.num_2)
-						o.funcAdd = function(t) {
-							_dialogLoad({
-								dialog_id:el.num_1,
-								busy_obj:t.icon_add,
-								busy_cls:'spin',
-								func_save:function(ia) {
-									t.unitUnshift({
-										id:ia.unit.id,
-										title:ia.unit.txt_1
-									});
-									t.value(ia.unit.id);
-								}
-							});
-						};
-					ATR_CMP._select(o);
-					return;
-				//Выбор нескольких значений галочками
-				case 31:
-					$(document).on('click', ATTR_EL(elm_id) + ' ._check', function() {
-						var cmpv = [];
-						_forEq(ATR_EL.find('._check.on'), function(sp) {
-							cmpv.push(sp.prev().attr('id').split('_')[1]);
-						});
-						if(cmpv.length) {
-							cmpv.unshift(0);
-							cmpv.push(0);
-						}
-						ATR_CMP.val(cmpv.join())
-					});
-					return;
-				//count - количество
-				case 35:
-					var obj = {
-						width:_num(el.width),
-						again:el.num_8
-					};
-					if(el.num_1 == 3681) {
-						obj.min = el.num_2 ? _num(el.num_3) : false;
-						obj.max = el.num_5 ? _num(el.num_6) : false;
-						obj.step = _num(el.num_7);
-						obj.minus = _num(el.num_4);
-					}
-					if(el.num_1 == 3682 && vvv) {
-						obj.step = vvv.ids;
-						obj.title = vvv.title;
-					}
-					ATR_CMP._count(obj);
-					return;
-				//SA: Select - выбор имени колонки
-				case 37:
-					ATR_CMP._select({
-						width:_num(el.width),
-						title0:'не выбрано',
-						msg_empty:'колонок нет',
-						spisok:vvv,
-						funcAdd:function(t) {
-							_dialogLoad({
-								dialog_id:22,
-								block_id:el.block_id,
-								busy_obj:t.icon_add,
-								busy_cls:'spin',
-								func_save:function(res) {
-									t.unitUnshift(res);
-									t.value(res.id);
-								}
-							});
-						}
-					});
-					return;
-				//SA: Select - выбор диалогового окна
-				case 38:
-					ATR_CMP._select({
-						width:_num(el.width),
-						title0:el.txt_1,
-						msg_empty:'диалоги ещё не были созданы',
-						spisok:vvv
-					});
-					return;
-				//Месяц и год
-				case 39:
-					var ATR_MON  = $(ATTR_CMP(elm_id) + '_mon'),
-						ATR_YEAR = $(ATTR_CMP(elm_id) + '_year'),
-						CMP_SET = function() {
-							var mon = _num(ATR_MON.val());
-							ATR_CMP.val(ATR_YEAR.val() + '-' + (mon > 9 ? '' : '0') + mon);
-						};
-					ATR_MON._count({
-						width:100,
-						step:[1,2,3,4,5,6,7,8,9,10,11,12],
-						title:['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'],
-						again:1,
-						func:CMP_SET
-					});
-					ATR_YEAR._count({
-						width:70,
-						min:1970,
-						max:2100,
-						func:CMP_SET
-					});
-					return;
-				//Фильтрование списка
-				case 40:
-					var P = ATR_CMP.next(),
-						INP = P.find('.inp'),
-						DEL = P.find('.icon-del'),
-						_dlg24 = function(id, dss) {//получение id диалога через указанный элемент
-							if(dss)
-								return dss;
-							if(!id)
-								return 0;
-							var dlg24 = _idsFirst(OBJ.dlg.D(ATTR_CMP(id)).val());
-							if(!dlg24) {
-								_attr_cmp(id, 1)
-									._flash({color:'red'})
-									._hint({
-										msg:'Не выбрано значение',
-										color:'red',
-										pad:10,
-										side:'left',
-										show:1
-									});
-								return 0;
-							}
-							return dlg24;
-						},
-						_blkSrce = function(dss) {//получение id диалога через исходный блок
-							if(dss)
-								return dss;
-
-							var block_id = OBJ.srce.block_id;
-							if(!block_id)
-								return 0;
-
-							var BL = BLKK[block_id];
-							if(!BL)
-								return 0;
-
-							if(BL.obj_name == 'spisok') {
-								var EL = ELMM[BL.obj_id];
-								if(!EL)
-									return 0;
-								if(EL.dialog_id != 14)
-									return 0;
-								return EL.num_1;
-							}
-
-							return 0;
-						};
-
-					if(INP.attr('disabled'))
-						return;
-
-					P.click(function() {
-						var dss = _dlg24(el.num_1, vvv);
-						dss = _blkSrce(dss);
-
-						if(!dss)
-							return;
-
-						_dialogLoad({
-							dialog_id:41,
-							block_id:OBJ.srce.block_id,
-							element_id:el.num_1,//id элемента, к которому привязан фильтр (по нему будет определяться id диалога)
-							dss:dss,
-							dop:ATR_CMP.val(),
-							busy_obj:INP,
-							busy_cls:'hold',
-							func_save:function(res) {
-								ATR_CMP.val(res.v);
-								INP.val(res.title);
-								DEL._dn(1);
-							}
-						});
-					});
-					DEL.click(function(e) {
-						e.stopPropagation();
-						ATR_CMP.val('');
-						INP.val('');
-						DEL._dn();
-					});
-					return;
-				//Выбор нескольких значений привязанного списка
-				case 45:
-					var UNS = ATR_CMP.next(),//размещение выбранных значений
-						CMP_UPD = function() {//сохранение значения
-							var vv = [],
-								pos = 0,//общее количество
-								sum = 0,//общая сумма
-								itog = '';
-
-							_forEq(UNS.find('.uinp'), function(sp) {
-								var id = _num(sp.attr('val'));
-								if(!id)
-									return;
-
-								var count = _cena(sp.val()),
-									cena = 0;//стоимость
-
-								pos += count;
-
-								if(el.num_4) {
-									cena = _cena(sp.closest('tr').find('.ucena').html());
-									sum += cena * count;
-								}
-
-								vv.push(id + ':' + count + ':' + cena);
-							});
-
-							ATR_CMP.val(vv.join());
-
-							//обновление итога
-							if(vv.length) {
-								var summ = _cena(sum);
-								itog = 'Всего <b class="fsin">' + _cena(pos) + '</b> позици' + _end(pos, ['я', 'и', 'й']) +
-						   (el.num_4 ? ' на сумму <b class="fsin">' + summ + '</b> руб.' : '');
-								//вставка итоговой суммы у указанное поле
-								if(el.num_5)
-									_attr_cmp(el.num_5).val(summ);
-							}
-							ATR_EL.find('.uns-itog').html(itog);
-						},
-						UNS_DEL = function() {//удаление значения
-							UNS.find('.icon').click(function() {
-								$(this).closest('tr').remove();
-								if(!UNS.find('tr').length)
-									UNS.html('');
-								CMP_UPD();
-							});
-							UNS.find('.uinp').keyup(CMP_UPD);
-						};
-					UNS_DEL();
-					CMP_UPD();
-					//нажатие на кнопку для открытыя диалога
-					ATR_CMP_AFICS.click(function() {
-						if(!el.num_2)
-							return;
-						_dialogLoad({
-							block_id:el.block_id,
-							dialog_id:el.num_2,
-							busy_obj:ATR_CMP_AFICS,
-							func_open:function(res, dlg) {
-								//выбор значения списка
-								dlg.content.click(function(e) {
-									var un = $(e.target).parents('.sp-unit');
-									if(!un.length) {
-										un = $(e.target).parents('.tr-unit');
-										if(!un.length)
-											return;
-									}
-
-									var id_new = _num(un.attr('val'));
-									if(!id_new)
-										return;
-
-									dlg.close();
-
-									//действие после выбора значения
-									var send = {
-										op:'spisok_45_uns',
-										elem_id:elm_id,
-										id_new:id_new,
-										v:ATR_CMP.val(),
-										busy_obj:ATR_CMP_AFICS
-									};
-									_post(send, function(res) {
-										UNS.html(res.html);
-										UNS_DEL();
-										CMP_UPD();
-										UNS.find('.uinp:last').select();
-									});
-								});
-							}
-						});
-					});
-					return;
-				//Выбор блоков из диалога или страницы
-				case 49:
-					var P = ATR_CMP.next(),
-						INP = P.find('.inp'),
-						DEL = P.find('.icon-del');
-
-					P.click(function() {
-						_dialogLoad({
-							dialog_id:19,
-							block_id:OBJ.srce.block_id,
-							element_id:OBJ.srce.element_id,
-							dop:{
-								sel:ATR_CMP.val()
-							},
-							busy_obj:INP,
-							busy_cls:'hold',
-							func_save:function(res) {
-								ATR_CMP.val(res.ids);
-								INP.val(res.title);
-								DEL._dn(res.ids);
-							}
-						});
-					});
-					DEL.click(function(e) {
-						e.stopPropagation();
-						ATR_CMP.val(0);
-						INP.val('');
-						DEL._dn();
-					});
-					return;
-				//Календарь
-				case 51:
-					ATR_CMP._calendar({
-						lost:el.num_1,
-						time:el.num_2,
-						func:function() {
-							_elemAction(el, 1);
-						}
-					});
-					return;
-				//Заметки
-				case 52:
-					if(!ATR_EL.length)
-						return;
-					var timer = 0,
-						NOTE = ATR_EL.find('._note'),
-						ex = NOTE.attr('val').split(':'),
-						page_id = _num(ex[0]),
-						obj_id = _num(ex[1]),
-						NOTE_TXT = NOTE.find('._note-txt'),
-						NOTE_AREA = NOTE_TXT.find('textarea'),
-						NOTE_TXT_W = NOTE_TXT.width(),
-						noteAfterPrint = function() {
-							NOTE.find('._note-list textarea').keyup(function(e) {
-									if(e.keyCode != 13)
-										return;
-
-									switch(el.num_2) {
-										case 9644://отправка сообщения по Enter
-											if(event.ctrlKey) {
-												this.value += "\n";
-												$(this)._autosize('update');
-												return;
-											}
-											break;
-										case 9645://отправка сообщения по CTRL+Enter
-											if(!event.ctrlKey)
-												return;
-											break;
-										default: return;
-									}
-									$(this).parents('._note-comment').find('.comment-ok').trigger('click');
-								});
-							NOTE.find('.comment-ok').click(function() {//внесение комментария
-								var t = $(this),
-									comm = t.parents('._note-comment'),
-									note = t.parents('._note-u'),
-									area = comm.find('textarea'),
-									txt = $.trim(area.val());
-								if(!txt)
-									return area.focus();
-								var send = {
-									op:'note_comment_add',
-									elem_id:elm_id,
-									note_id:note.attr('val'),
-									txt:txt,
-									busy_cls:'busy',
-									busy_obj:comm
-								};
-								_post(send, function(res) {
-									t.closest('TABLE').before(res.html);
-									area.val('');
-									area._autosize('update');
-								});
-							});
-							NOTE.find('._note-to-cmnt').click(function() {//раскрытие комментариев
-								var t = $(this);
-								t.next().show();
-								t.parents('._note-u').find('textarea').focus();
-								t.remove();
-							});
-							NOTE.find('.note-del').click(function() {//удаление заметки
-								var t = $(this),
-									note = t.parents('._note-u'),
-									send = {
-										op:'note_del',
-										note_id:note.attr('val'),
-										busy_cls:'spin',
-										busy_obj:t
-									};
-								_post(send, function() {
-									note.addClass('deleted');
-								});
-							});
-							NOTE.find('.note-rest').click(function() {//восстановление заметки
-								var t = $(this),
-									note = t.parents('._note-u'),
-									send = {
-										op:'note_rest',
-										note_id:note.attr('val'),
-										busy_obj:t
-									};
-								_post(send, function() {
-									note.removeClass('deleted');
-								});
-							});
-						};
-					NOTE.find('textarea')._autosize();
-					NOTE_AREA.keyup(function(e) {
-						if(e.keyCode == 13)
-							switch(el.num_2) {
-								case 9644://отправка сообщения по Enter
-									if(event.ctrlKey) {
-										this.value += "\n";
-										$(this)._autosize('update');
-										return;
-									}
-									return NOTE.find('.note-ok').trigger('click');
-								case 9645://отправка сообщения по CTRL+Enter
-									if(!event.ctrlKey)
-										break;
-									return NOTE.find('.note-ok').trigger('click');
-							}
-
-						var v = $.trim(NOTE_AREA.val());
-						if(timer)
-							clearInterval(timer);
-						timer = setInterval(function() {
-							NOTE_TXT
-								.stop()
-								.animate({width:NOTE_TXT_W - (v.length ? 33 : 0)}, 150);
-							clearInterval(timer);
-							timer = 0;
-						}, 300);
-					});
-					NOTE.find('.note-ok').click(function() {
-						var txt = $.trim(NOTE_AREA.val());
-						if(!txt)
-							return;
-						var send = {
-							op:'note_add',
-							elem_id:elm_id,
-							page_id:page_id,
-							obj_id:obj_id,
-							txt:txt,
-							busy_cls:'busy',
-							busy_obj:NOTE
-						};
-						_post(send, function(res) {
-							NOTE_AREA.val('')._autosize('update');
-							NOTE_TXT.width(NOTE_TXT_W);
-							NOTE.find('._note-list').html(res.html);
-							noteAfterPrint();
-						});
-					});
-					noteAfterPrint();
-					return;
-				//Меню переключения блоков
-				case 57:
-					var type = {
-							1158:2,
-							1159:3,
-							13534:4
-						},
-						EL_COO = '57_' + elm_id;//сохранение последней позиции
-						toggle = function(id) {
-							_forN(vvv, function(sp) {
-								_forN(_elemFuncBlockObj(_idsAss(sp.blk)), function(oo) {
-									if(!oo.obj.length)
-										return;
-									oo.obj[sp.id == id ? 'show' : 'hide']();
-								});
-							});
-							if(el.num_2)
-								_cookie(EL_COO, id);
-						};
-					toggle(_num(ATR_CMP.val()));
-					ATR_CMP._menu({
-						type:type[el.num_1],
-						spisok:vvv,
-						func:toggle
-					});
-					return;
-				//Связка списка при помощи кнопки
-				case 59:
-					//выполнение действия
-					_elemAction(el, _num(ATR_CMP.val()), 1);
-
-					var div = ATR_CMP_AFICS.next(),
-						unitSel = function(id) {//действие после выбора значения
-							var send = {
-								op:'spisok_59_unit',
-								cmp_id:elm_id,
-								unit_id:id,
-								busy_obj:ATR_CMP_AFICS
-							};
-							_post(send, function(res) {
-								AG.unit = res.unit;
-								div.find('.un-html').html(res.html);
-								div._dn(1);
-								ATR_CMP_AFICS._dn();
-								_elemAction(el, id);
-							});
-						};
-
-					//запрет перевыбора значения
-					if(el.num_3)
-						return;
-
-					//нажатие на кнопку для открытия диалога
-					ATR_CMP_AFICS.click(function() {
-						_dialogLoad({
-							block_id:el.block_id,
-							dialog_id:el.num_4,
-							busy_obj:ATR_CMP_AFICS,
-							func_open:function(res, dlg) {
-								//выбор значения списка
-								dlg.content.click(function(e) {
-									var un = $(e.target).parents('.sp-unit');
-									if(!un.length) {
-										un = $(e.target).parents('.tr-unit');
-										if(!un.length)
-											return;
-									}
-
-									var id = _num(un.attr('val'));
-									if(!id)
-										return;
-
-									ATR_CMP.val(id);
-									dlg.close();
-									unitSel(id);
-								});
-							}
-						});
-					});
-					//отмена выбора
-					div.find('.icon').click(function() {
-						ATR_CMP_AFICS._dn(1);
-						div._dn();
-						ATR_CMP.val(0);
-						_elemAction(el, 0);
-					});
-					return;
-				//Загрузка изображений
-				case 60:
-					var load = ATR_EL.find('._image-load'),
-						prc = ATR_EL.find('._image-prc'), //div для отображения процентов
-						II4 = ATR_EL.find('.ii4'),//корзина
-						ids_upd = function() {//обновление id загруженных изображений
-							var idsSave = ATR_CMP.val().split(','),//предварительное сохранение всех идентификаторов
-								ids = [],
-								ii4Empty = true;//статус для корзины
-
-							//приведение всех id в статус: удалён
-							_forN(idsSave, function(id, n) {
-								if(id > 0)
-									idsSave[n] = id * -1;
-							});
-
-							_forEq(ATR_EL.find('dd.curM'), function(sp) {
-								var idd = _num(sp.attr('val'));
-								ids.push(idd);
-								//если картинка существует, то убираем из удалённых
-								_forN(idsSave, function(id, n) {
-									if(idd == Math.abs(id)) {
-										delete idsSave[n];
-										return false;
-									}
-								});
-							});
-
-							//дополнение идентификаторов удалёнными
-							_forN(idsSave, function(id) {
-								if(id) {
-									ids.push(id);
-									ii4Empty = false;
-								}
-							});
-							//изменение статуса корзины, если есть удалённые изображения
-							II4._dn(!ii4Empty, 'empty');
-
-							ATR_CMP.val(ids.join(','));
-
-							//установка действия для удаления изображения
-							ATR_EL.find('.icon-off').off('click');
-							ATR_EL.find('.icon-off').on('click', function(e) {
-								e.stopPropagation();
-								var dd = $(this).parent();
-								$(this).remove();
-								dd.animate({width:0}, 300, function() {
-									dd.remove();
-									ids_upd();
-								});
-							});
-						},
-						xhr_upload = function(file) {//отправка выбранного файла или скрина на сервер
-						    var xhr = new XMLHttpRequest();
-
-						    (xhr.upload || xhr).addEventListener('progress', function(e) {
-						        var done = e.position || e.loaded,
-						            total = e.totalSize || e.total,
-						            itog = Math.round(done/total*100);
-
-						        if(itog == 100) {
-									load.removeClass('progress');
-									return;
-						        }
-
-						        prc.html(itog + '%');
-						        load.addClass('progress');
-						    });
-						    xhr.addEventListener('load', function() {
-						        load.removeClass('busy');
-						        var res = JSON.parse(xhr.responseText);
-								if(!res.success) {
-									load._hint({
-										msg:res.text,
-										pad:10,
-										color:'red',
-										show:1
-									});
-									return;
-								}
-								load.parent().before(res.html);
-								ids_upd();
-						    });
-						    xhr.open('post', AJAX, true);
-
-						    var data = new FormData;
-						    data.append('f1', file);
-						    data.append('op', 'image_upload');
-						    xhr.send(data);
-						};
-
-					ids_upd();
-					ATR_EL.find('dl').sortable({
-						items:'.curM',
-						placeholder:'ui-hold',
-						update:ids_upd
-					});
-
-					//Выбор способа загрузки
-					ATR_EL.find('.tab-load td').mouseenter(function() {
-						var t = $(this),
-							msg = 'Выбрать картинку из файлов.' +
-								  '<br>' +
-								  'Размер не менее 100х100 пикс.' +
-								  '<br>' +
-								  'Размер файла не более 15 мб.';
-						if(t.hasClass('ii2'))
-							msg = 'Указать ссылку на изображение';
-						if(t.hasClass('ii3'))
-							msg = 'Сделать фото с вебкамеры';
-						if(t.hasClass('ii4')) {
-							if(t.hasClass('empty'))
-								msg = 'Удалённых изображений нет';
-							else {
-								var c = _num(t.attr('val'));
-								msg = 'Удалено ' + c + ' изображени' + _end(c, ['е', 'я', 'й']) + '.' +
-									  '<br>' +
-									  'Нажмите для просмотра.';
-							}
-						}
-						t._hint({
-							msg:msg,
-							pad:10,
-							show:1,
-							delayShow:1000
-						});
-					});
-
-					//Загрузка изображения из файла
-					ATR_EL.find('form input').change(function() {
-						load.addClass('busy');
-						xhr_upload(this.files[0]);
-					});
-
-					//Загрузка изображения по ссылке
-					var linkDiv = ATR_EL.find('._image-link'), //поле с ссылкой на изображение
-						linkInp = linkDiv.find('input'),
-						iconOk = linkDiv.find('.icon-ok'),
-						linkOkFunc = function() {
-							var send = {
-								op:'image_link',
-								obj_name:'elem_' + elm_id + '_' + USER_ID,
-								obj_id:_num(unit.id),
-								url:$.trim(linkInp.val()),
-								busy_obj:iconOk,
-								busy_cls:'spin'
-							};
-							if(!send.url.length) {
-								linkInp.focus();
-								return;
-							}
-							_post(send, function(res) {
-								linkInp.val('');
-								load.parent().before(res.html);
-								ids_upd();
-								linkInp.focus();
-							});
-						};
-					ATR_EL.find('.ii2').click(function() {
-						load.addClass('dis');
-						linkDiv.slideDown(200);
-						linkInp.val('').focus();
-					});
-					linkDiv.find('.icon-del').click(function() {
-						load.removeClass('dis');
-						linkDiv.slideUp(200);
-					});
-					linkInp._enter(linkOkFunc);
-					iconOk.click(linkOkFunc);
-
-					//загрузка скриншота
-					linkInp[0].addEventListener('paste', function(e) {
-						if(!e.clipboardData)
-							return;
-
-						var blob;
-						_forN(e.clipboardData.items, function(sp) {
-							if(sp.type.substr(0, 5) == 'image') {
-								blob = sp.getAsFile();
-								return false;
-							}
-						});
-
-						if(!blob)
-							return;
-
-						load.removeClass('dis');
-						load.addClass('busy');
-						linkDiv.slideUp(200);
-						xhr_upload(blob);
-					});
-
-					//изображение с Веб-камеры
-					var b64ToUint6 = function(nChr) {//convert base64 encoded character to 6-bit integer
-							return nChr > 64 && nChr < 91 ? nChr - 65
-								 : nChr > 96 && nChr < 123 ? nChr - 71
-								 : nChr > 47 && nChr < 58 ? nChr + 4
-								 : nChr === 43 ? 62 : nChr === 47 ? 63 : 0;
-						},
-						base64DecToArr = function(sBase64, nBlocksSize) {// convert base64 encoded string to Uintarray
-							var sB64Enc = sBase64.replace(/[^A-Za-z0-9\+\/]/g, ""),
-								nInLen = sB64Enc.length,
-								nOutLen = nBlocksSize ? Math.ceil((nInLen * 3 + 1 >> 2) / nBlocksSize) * nBlocksSize : nInLen * 3 + 1 >> 2,
-								taBytes = new Uint8Array(nOutLen);
-
-							for(var nMod3, nMod4, nUint24 = 0, nOutIdx = 0, nInIdx = 0; nInIdx < nInLen; nInIdx++) {
-								nMod4 = nInIdx & 3;
-								nUint24 |= b64ToUint6(sB64Enc.charCodeAt(nInIdx)) << 18 - 6 * nMod4;
-								if(nMod4 === 3 || nInLen - nInIdx === 1) {
-									for(nMod3 = 0; nMod3 < 3 && nOutIdx < nOutLen; nMod3++, nOutIdx++) {
-										taBytes[nOutIdx] = nUint24 >>> (16 >>> nMod3 & 24) & 255;
-									}
-									nUint24 = 0;
-								}
-							}
-							return taBytes;
-						};
-					ATR_EL.find('.ii3').click(function() {
-						_dialogLoad({
-							dialog_id:61,
-							busy_obj:load,
-							busy_cls:'busy',
-							func_open:function(res, dlg) {
-								var webcam = dlg.content.find('embed')[0];
-								dlg.submit(function() {
-									var foto = base64DecToArr(webcam._snap()),
-										blob = new Blob([foto], {type:'image/jpeg'});
-									xhr_upload(blob);
-									load.addClass('busy');
-									dlg.close();
-								});
-							}
-						});
-					});
-
-					//Удалённые изображения
-					II4.click(function() {
-						if($(this).hasClass('empty'))
-							return;
-
-						_dialogLoad({
-							dialog_id:63,
-							dop:ATR_CMP.val(),
-							busy_obj:load,
-							busy_cls:'busy',
-							func_open:function(res, dlg) {
-								dlg.content.find('.icon-recover').click(function() {
-									var tt = $(this),
-										send = {
-											op:'image_recover',
-											id:tt.attr('val'),
-											busy_obj:tt,
-											busy_cls:'spin'
-										};
-									_post(send, function(res) {
-										tt.parent().remove();
-										load.parent().before(res.html);
-										ids_upd();
-									});
-								});
-							}
-						});
-					});
-					return;
-				//Фильтр-галочка
-				case 62:
-					ATR_CMP._check({
-						func:function(v) {
-							_elemAction(el, v);
-							FILTER[el.num_1][elm_id] = v;
-							_spisokUpdate(el.num_1);
-						}
-					});
-					if(el.action)
-						_elemAction(el, FILTER[el.num_1][elm_id], 1);
-					return;
-				//Выбор цвета текста
-				case 66:
-					var func = function(v) {
-							ATR_CMP.val(v);
-						},
-						html = _color(ATR_CMP.val(), func);
-					ATR_CMP.next().remove('._color');
-					ATR_CMP.after(html);
-					return;
-				//Выбор цвета фона
-				case 70:
-					ATR_CMP.next()._hint({
-						msg:vvv,
-						pad:3,
-						side:'right',
-						func:function(h) {
-							var div = h.find('._color-bg-choose div');
-							div.click(function() {
-								var t = $(this),
-									c = t.attr('val');
-								div.removeClass('sel');
-								t.addClass('sel');
-								ATR_CMP
-									.val(c)
-									.next().css('background-color', c);
-							});
-						}
-					});
-					return;
-				//Фильтр: год и месяц
-				case 72:
-					var YL = $(ATTR_CMP(elm_id) + 'yl'),
-						RD = $(ATTR_CMP(elm_id) + 'rd'),
-						YEAR_CUR = YL.val(),
-						CMP_SET = function() {
-							var mon = _num(RD.val()),
-								data = YL.val() + '-' + (mon > 9 ? '' : '0') + mon;
-							ATR_CMP.val(data);
-							FILTER[el.num_1][elm_id] = data;
-							_spisokUpdate(el.num_1);
-						};
-					YL._yearleaf({
-						func:function(v) {
-							RD._radio(YEAR_CUR < v ? 1 : 12);
-							CMP_SET();
-							YEAR_CUR = v;
-							var send = {
-								op:'spisok_72_sum',
-								elem_id:elm_id,
-								year:v
-							};
-							_post(send, function(res) {
-								RD._radio('spisok', _toSpisok(res.spisok));
-							});
-						}
-					});
-					RD._radio(CMP_SET);
-					return;
-				//Фильтр-радио
-				case 74:
-					if(!ATR_CMP)
-						return;
-					ATR_CMP._radio({
-						func:function(v) {
-							FILTER[el.num_1][elm_id] = v;
-							_spisokUpdate(el.num_1);
-						}
-					});
-					return;
-				//Фильтр: фронтальное меню
-				case 75:
-					var UN = ATR_EL.find('.u75');
-					UN.click(function() {
-						var t = $(this),
-							pname = t.closest('td').find('a').html(),
-							v = t.attr('val');
-
-						if(!t.hasClass('fs16'))
-							pname += ' » ' + t.html();
-
-						ATR_EL.find('.pname75').html(pname);
-						ATR_EL.find('.mp75')._dn(true);
-						ATR_EL.find('.tab75')._dn();
-
-						FILTER[el.num_1][elm_id] = v;
-						_elemAction(el, v);
-						_spisokUpdate(el.num_1);
-					});
-					//отмена выбора
-					ATR_EL.find('.icon-del').click(function() {
-						ATR_EL.find('.mp75')._dn();
-						ATR_EL.find('.tab75')._dn(true);
-						FILTER[el.num_1][elm_id] = 0;
-						_elemAction(el, 0);
-						_spisokUpdate(el.num_1);
-					});
-					if(el.action)
-						_elemAction(el, FILTER[el.num_1][elm_id], 1);
-					return;
-				//Видеоролик
-				case 76:
-					var CNT = ATR_EL.find('._video-cont'),
-						DEL = ATR_EL.find('.icon-del');
-					ATR_CMP.keyup(function() {
-						var url = $(this).val();
-						if(!url) {
-							DEL._dn();
-							return;
-						}
-
-						DEL._dn(true).addClass('spin');
-
-						var send = {
-							op:'el76_video',
-							elem_id:el.id,
-							url:url,
-							func_err:function(res) {
-								var msg = '<div class="center red">' + res.text + '</div>';
-								CNT.html(msg)._dn(true);
-								DEL.removeClass('spin');
-							}
-						};
-						_post(send, function(res) {
-							CNT.html(res.iframe)._dn(true);
-							DEL.removeClass('spin');
-						});
-					});
-					DEL.click(function() {
-						CNT.slideUp(200, function() {
-							CNT.html('').show()._dn();
-						});
-						DEL._dn();
-						ATR_CMP.val('').focus();
-					});
-					return;
-				//Фильтр-календарь
-				case 77:
-					var CAL = ATR_EL.find('._filter-calendar'),
-						CNT = CAL.find('.fc-cnt');
-
-					//перемотка месяцев
-					CAL.find('.laquo').click(function() {
-						var send = {
-							op:'filter_calendar_mon_change',
-							elem_id:elm_id,
-							mon:CAL.find('.mon-cur').val(),
-							side:$(this).attr('val'),
-							busy_cls:'busy',
-							busy_obj:CAL
-						};
-						_post(send, function(res) {
-							CAL.find('.mon-cur').val(res.mon);
-							CAL.find('.td-mon').html(res.td_mon);
-							CNT.html(res.cnt);
-						});
-					});
-
-					//нажатие на месяц
-					CAL.click(function(e) {
-						var t = $(e.target);
-						if(!t.hasClass('monn'))
-							return;
-						CNT.find('.sel').removeClass('sel');
-						t.addClass('sel');
-						FILTER[el.num_1][elm_id] = t.attr('val');
-						_spisokUpdate(el.num_1);
-					});
-
-					//нажатие на неделю или на день
-					CNT.click(function(e) {
-						var t = $(e.target),
-							on = t.hasClass('on'),
-							week = t.hasClass('week-num'),
-							td = on ? t : t.parent();
-						if(on || week) {
-							CAL.find('.monn.sel').removeClass('sel');
-							CNT.find('.sel').removeClass('sel');
-							td.addClass('sel');
-							FILTER[el.num_1][elm_id] = t.attr('val');
-							_spisokUpdate(el.num_1);
-						}
-					});
-					return;
-				//Фильтр-меню
-				case 78:
-					var FM = ATR_EL.find('.fm-unit');
-					ATR_EL.find('.fm-plus').click(function() {
-						var t = $(this),
-							plus = t.html() == '+',
-							div = t.closest('TABLE').next();
-						div['slide' + (plus ? 'Down' : 'Up')](200);
-						t.html(plus ? '-' : '+');
-					});
-					FM.click(function() {
-						var t = $(this),
-							sel = t.hasClass('sel');
-						FM.removeClass('sel');
-						if(!sel)
-							t.addClass('sel');
-						FILTER[el.num_1][elm_id] = sel ? 0 : t.attr('val');
-						_spisokUpdate(el.num_1);
-					});
-					return;
-				//Очистка фильтра
-				case 80:
-					ATR_CMP.click(function() {
-						var t = $(this),
-							send = {
-								op:'spisok_filter_clear',
-								spisok_id:el.num_1,
-								busy_obj:t
-							};
-						_post(send, function(res) {
-							//скрытие кнопки
-							t._dn();
-
-							//обновление дополнительных значений
-							for(var i in res.upd) {
-								var u = res.upd[i];
-								_attr_el(u.id).html(u.html);
-							}
-
-							_forIn(res.def, function(sp) {
-								switch(sp.dialog_id) {
-									//быстрый поиск
-									case 7:  _attr_cmp(sp.elem_id)._search('clear'); return;
-									//фильтр-галочка
-									case 62: _attr_cmp(sp.elem_id)._check(sp.v); return;
-									//фильтр-радио
-									case 74:  _attr_cmp(sp.elem_id)._radio(sp.v); return;
-									case 75:
-										_attr_el(sp.elem_id).find('.mp75')._dn();
-										_attr_el(sp.elem_id).find('.tab75')._dn(true);
-									return;
-									//фильтр-календарь
-									case 77:
-										var CAL = _attr_el(sp.elem_id).find('._filter-calendar');
-										CAL.find('.mon-cur').val(sp.dop.mon);
-										CAL.find('.td-mon').html(sp.dop.td_mon);
-										CAL.find('.fc-cnt').html(sp.dop.cnt);
-										return;
-									//фильтр-меню
-									case 78: _attr_el(sp.elem_id).find('.sel').removeClass('sel'); return;
-									//фильтр-select
-									case 83: _attr_cmp(sp.elem_id)._select(0); return;
-									//Фильтр - Выбор нескольких групп значений
-									case 102:
-//										_attr_el(sp.elem_id)._filter102();
-										_attr_el(sp.elem_id).find('.holder')._dn(1);
-										_attr_el(sp.elem_id).find('.td-un').html('<div class="icon icon-empty"></div>');
-										_attr_el(sp.elem_id).find('.icon-del')._vh();
-										return;
-								}
-							});
-							FILTER = res.filter;
-							_hintPaste(res);
-						});
-					});
-					return;
-				//Select - фильтр
-				case 83:
-					ATR_CMP._select({
-						width:_num(el.width),
-						title0:el.txt_1,
-						spisok:vvv,
-						func:function(v) {
-							FILTER[el.num_1][elm_id] = v;
-							_spisokUpdate(el.num_1);
-						}
-					});
-					return;
-				//Select - выбор значения списка
-				case 85:
-					ATR_CMP._select({
-						width:_num(el.width),
-						title0:el.txt_1,
-						spisok:vvv,
-						msg_empty:el.num_1 ? 'Список пуст' : 'Не указан список',
-						func:function(v) {
-//							_elemAction(el, v);
-						}
-					});
-					ELM_RELOAD[el.num_1] = el.id;
-					return;
-				//Таблица из нескольких списков
-				case 88:
-					//выбор значений галочками
-					_forN(vvv, function(sp) {
-						if(sp.dialog_id == 91) {
-							_forEq(ATR_EL.find('._check'), function(eq) {
-								//получение id записи
-								var tdid = eq.attr('id').split('_')[1];
-
-								//выбор/снятие всех галочек
-								if(tdid == 'all') {
-									$('#sch' + sp.id + '_all')._check({
-										func:function(v) {
-											_forEq(ATR_EL.find('._check'), function(eqAll) {
-												var ch = eqAll.prev();
-												if(ch.attr('id').split('_')[1] == 'all')
-													return;
-												ch._check(v);
-											});
-										}
-									});
-									return;
-								}
-
-								eq.prev()._check();
-							});
-							return false;
-						}
-					});
-
-					return;
-				//Выбранные значения галочками
-				case 92:
-					if(unit.id)
-						return;
-
-					var ids = [],
-						elmIds = {};//id элементов-списков, в которых выбираются значения
-					_forIn(vvv, function(sp) {
-						if(elmIds[sp.elm_id])
-							return;
-						elmIds[sp.elm_id] = 1;
-
-						_forEq(_attr_el(sp.elm_id).find('._check'), function(eqAll) {
-							var ch = eqAll.prev(),
-								spid = ch.attr('id').split('_')[1];
-							if(spid == 'all')
-								return;
-							if(!_num(ch.val()))
-								return;
-							ids.push(spid);
-						});
-					});
-
-					ATR_CMP.val(ids.join());
-
-					//запрос сумм
-					var send = {
-						op:'spisok_92_sum',
-						elem_id:elm_id,
-						ids:ids.join(),
-						func_err:function() {
-							_forIn(vvv, function(sp) {
-								$('#el92_' + sp.dlg_id)
-									.parent().find('.sum92')
-									.html('');
-							});
-						}
-					};
-					_post(send, function(res) {
-						var itogC = 0,
-							itogSum = 0;
-						_forIn(res.data, function(sp, dlg_id) {
-							var ob = $('#el92_' + dlg_id);
-							ob.html(sp.count ? sp.count : '').
-							   parent().find('.sum92').html(sp.sum ? sp.sum : '');
-							itogC += sp.count;
-							itogSum += sp.sum;
-						});
-						ATR_EL.find('.itog-c').html(itogC);
-						ATR_EL.find('.itog-sum').html(itogSum);
-					});
-					return;
-				//Быстрое формирование списка
-				case 95: return _ELM_95(el, vvv);
-				//независимая кнопка
-				case 97: return;
-				//Фильтр - Выбор нескольких групп значений
-				case 102: ATR_EL._filter102(); return;
-				//настройка доступа к страницам для пользователя
-				case 103:
-					if(!ATR_EL.find('._check').length)
-						return;
-					var idsSet = function() {//вставка идентификаторов страниц для отправки данных
-						var ids = [];
-						_forEq(ATR_EL.find('._check'), function(sp) {
-							var ch = sp.prev(),
-								id = _num(ch.attr('id').split('_')[1]),
-								v = _num(ch.val());
-							if(v)
-								ids.push(id);
-						});
-
-						ATR_CMP.val(ids.join());
-					};
-					_forEq(ATR_EL.find('._check'), function(sp) {
-						var prev = sp.prev();
-						prev._check({
-							func:function(v) {
-								prev.parents('table').next()[v ? 'slideDown' : 'slideUp'](200);
-								idsSet();
-							}
-						});
-					});
-					idsSet();
-					return;
-				//Привязка пользователя к странице ВК
-				case 300:
-					var VK300 = ATR_CMP.next(),
-						INP = VK300.find('input'),
-						VK_ICON = VK300.find('.icon-vk'),
-						VK_RES = INP.next(),
-						VK_SEL,                 //выбранный пользователь в виде html
-						VK_ID = ATR_CMP.val();  //id выбранного пользователя ВК
-					INP.keyup(function() {
-						var t = $(this),
-							val = $.trim(t.val());
-
-						if(!val) {
-							VK_RES.html('');
-							return;
-						}
-
-						var send = {
-							op:'vk_user_get',
-							val:val,
-							busy_obj:VK_ICON,
-							busy_cls:'spin',
-							func_err:function(res) {
-								VK_RES.html('<div class="mt10 red">' + res.text + '</div>');
-							}
-						};
-						_post(send, function(res) {
-							VK_RES.html(res.html);
-							VK_SEL = res.sel;
-							VK_ID = res.user_id
-						});
-					});
-
-					$(document)
-						//выбор пользователя
-					   .off('click', ATTR_EL(el.id) + ' button')
-						.on('click', ATTR_EL(el.id) + ' button', function() {
-							VK_RES.html(VK_SEL);
-							INP._dn();
-							VK_ICON._dn();
-							ATR_CMP.val(VK_ID);
-						})
-						//отмена выбранного пользователя
-					   .off('click', ATTR_EL(el.id) + ' .icon-del-red')
-						.on('click', ATTR_EL(el.id) + ' .icon-del-red', function() {
-							VK_RES.html('');
-							VK_ICON._dn(1);
-							ATR_CMP.val(0);
-							INP.val('')._dn(1).focus();
-						});
-					return;
-				//График-столбики
-				case 400: return _ELM_400(el, vvv);
-				//График по месяцам
-				case 401:
-					$('#chart_' + elm_id)
-						.height(300)
-						.width(window['WIDTH_' + elm_id])
-						.highcharts({
-							chart:{
-								type:'line'
-							},
-							title:{
-								text:el.txt_1
-							},
-							xAxis:{
-								categories:window['CAT_' + elm_id],
-								labels:{
-									style:{
-										color:'#333'
-									}
-								}
-							},
-							yAxis:{
-								title:{
-									text:'Сумма'
-								},
-						        stackLabels:{
-							        enabled:true,
-							        style:{
-								        fontWeight:'bold',
-								        color:'black'
-							        }
-						        }
-							},
-							plotOptions:{
-								column:{
-									stacking:'normal',
-									dataLabels:{
-										enabled:false
-									}
-								}
-							},
-							series:window['SERIES_' + elm_id]
-						});
-					return;
-			}
+			if(!OBJ)
+				OBJ = {};
+			func(el, OBJ);
 		});
-
-		//установка фокуса на первый указанный элемент
-		var focus_set = false,
-			l;
-		_forIn(OBJ.vvv, function(vvv, id) {
-			if(ELMM[id].focus) {
-				l = _attr_cmp(id).val().length;
-				_attr_cmp(id).focus();
-				_attr_cmp(id)[0].setSelectionRange(l, l);
-				focus_set = true;
-				return false;
-			}
-		});
-		if(!focus_set && focus7) {
-			l = focus7.val().length;
-			focus7.focus();
-			focus7[0].setSelectionRange(l, l);//установка фокуса в конец строки
-		}
-
 	},
 
-	//Быстрое формирование списка
-	_ELM_95 = function(el, vvv) {
-		if(!vvv.cols.length)
+	//установка фокуса на указанный элемент
+	_ELM_FOCUS = function(elem_id) {
+		if(!elem_id)
 			return;
-
-		var colName = function() {//вывод названий колонок
-				if(!el.num_2)
-					return '';
-
-				var send =  '<table class="bs5 w100p">' +
-							'<tr><td class="w25">';
-
-				_forN(vvv.cols, function(col) {
-					send += '<td class="fs14 color-555" style="width:' + (col.w-10) + 'px">' + col.name;
-				});
-
-				send += '<td></table>';
-				return send;
-			},
-			html =  colName() +
-					'<dl></dl>' +
-					'<div class="fs15 color-555 pad10 center over5 curP">' + el.txt_1 + '</div>';
-
-		var ATR_EL = _attr_el(el.id),
-			DL = ATR_EL.append(html).find('dl'),
-			BUT_ADD = ATR_EL.find('div:last');
-
-		BUT_ADD.click(vAdd);
-
-		if(vvv.mass.length)
-			_forIn(vvv.mass, vAdd);
-		else
-			vAdd({});
-
-		function vAdd(v) {
-			v.id = _num(v.id);
-			_forN(vvv.cols, function(sp) {
-				if(v[sp.col] === undefined)
-					v[sp.col] = '';
-			});
-			html = 	'<dd class="over1" val="' + v.id + '">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center">' +
-								'<div class="icon icon-move pl"></div>';
-
-			_forN(vvv.cols, function(sp) {
-				html += '<td style="width:' + (sp.w-10) + 'px">';
-				//если колонка не указана, значение для сохранения данных выбираться не будет
-				var clsInp = sp.col ? 'el95inp ' : '';
-				switch(sp.type) {
-					case 1: html += sp.v; break;
-					case 2: html += '<input type="text" class="' + clsInp + 'w100p" value="' + v[sp.col] + '">'; break;
-					case 3: html += '<input type="hidden" class="' + clsInp + 'el95sel" value="' + _num(v[sp.col]) + '">'; break;
-				}
-			});
-
-			html += 		'<td class="top pl15">' +
-								'<div class="mt5 icon icon-off pl' + _tooltip('Удалить', -25) + '</div>' +
-						'</table>' +
-					'</dd>';
-			DL.append(html);
-			DL._sort({handle:'.icon-move'});
-
-			var DD = DL.find('dd:last');
-
-			//todo только для мебельщиков
-			DD.find('.el95inp').eq(1).keyup(function() {
-				var count = $(this).val(),
-					cena = DD.find('.el95inp').eq(2).val();
-				count = count.replace(',', '.');
-				DD.find('.el95inp').eq(3).val(_cena(count*cena));
-			});
-			DD.find('.el95inp').eq(2).keyup(function() {
-				var count = DD.find('.el95inp').eq(1).val(),
-					cena = $(this).val();
-				cena = cena.replace(',', '.');
-				DD.find('.el95inp').eq(3).val(_cena(count*cena));
-			});
-
-			_forN(vvv.cols, function(col) {
-				if(col.type != 3)
-					return;
-
-				var spisok = col.spisok;
-
-				DD.find('.el95sel')._select({
-					width:0,
-					title0:'не выбрано',
-					write:1,
-					spisok:spisok,
-					funcWrite:function(v, t) {
-						var send = {
-							op:'el95_spisok',
-							elem_id:col.v,
-							v:v,
-							busy_obj:t.icon_del,
-							busy_cls:'spin'
-						};
-						_post(send, function(res) {
-							spisok = res.spisok;
-							t.spisok(spisok);
-						});
-					},
-					func:function(id) {//todo пока только для мебельщиков
-						var o = {};
-						_forIn(spisok, function(sp) {
-							if(sp.id == id) {
-								o = sp;
-								return false;
-							}
-						});
-
-						DD.find('.el95inp').eq(1).val(1);
-						DD.find('.el95inp').eq(2).val(o.sum_12);
-						DD.find('.el95inp').eq(3).val(o.sum_12);
-					}
-				});
-			});
-
-			DD.find('.icon-off').click(function() {
-				DD.remove();
-			});
-
-		}
-	},
-	_ELM_95_GET = function(el) {//получение данных для сохранения
-		var send = [];
-		_forEq(_attr_el(el.id).find('dd'), function(dd) {
-
-			var inp = [];
-			inp.push(dd.attr('val'));
-			_forEq(dd.find('.el95inp'), function(sp) {
-				inp.push(sp.val());
-			});
-
-			send.push(inp);
-		});
-
-		return send;
-	},
-	PHP12_elem95_setup = function(el, vvv, obj) {
-		if(!obj.unit.id)
+		var ATTR = _attr_cmp(elem_id);
+		if(!ATTR)
 			return;
-
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить колонку</div>',
-			ATR_EL = _attr_el(el.id),
-			DL = ATR_EL.append(html).find('dl'),
-			CALC_DIV = ATR_EL.find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
-			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
-			BUT_ADD = ATR_EL.find('div:last'),
-			NUM = 1;
-
-		BUT_ADD.click(function() {
-			vAdd();
-		});
-
-		//показ-скрытие настройки имён колонок
-		_attr_cmp(15415)._check({
-			func:function(v) {
-				obj.unit.num_2 = v;
-				DL.find('.el95colname')['slide' + (v ? 'Down' : 'Up')]();
-			}
-		});
-
-		if(!vvv)
-			vAdd();
-		else
-			_forIn(vvv, vAdd);
-
-		tdCalc();
-
-		function vAdd(v) {
-			v = $.extend({
-				w:170,  //ширина
-				name:'',//заголовок
-				type:0, //тип значения: 1 - текст, 2 - поле, 3 - выпадающий список
-				col:'', //имя колонки в базе
-				v:'',   //дополнительное значение
-				title:''//имя значения
-			}, v);
-
-			DL.append(
-				'<dd class="ov7 pt10 pb5 line-b1">' +
-					'<div class="el95w bg4" style="width:' + v.w + 'px;min-height:10px;margin-left:35px">' +
-						'<div class="el95colname' + _dn(obj.unit.num_2) + '">' +
-							'<input type="text"' +
-								  ' class="colname w100p bg4 center fs14 blue"' +
-								  ' placeholder="имя колонки"' +
-								  ' value="' + v.name + '"' +
-							' />' +
-						'</div>' +
-					'</div>' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 r topi">' +
-								'<b class="bnum fs15 color-555">' + NUM++ + '</b>:' +
-							'<td class="w175">' +
-								'<input type="hidden" class="el95type" value="' + v.type + '">' +
-							'<td class="w50 el95tdcol">' +
-							'<td class="w250 el95cnt">' +
-							'<td class="r">' +
-								'<div class="icon icon-move pl"></div>' +
-							'<td class="w25 pr5 r">' +
-								'<div class="icon icon-off el95del pl' + _tooltip('Удалить', -25) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			DL.sortable({
-				handle:'.icon-move',
-				update:tdCalc
-			});
-
-			var DD = DL.find('dd:last'),
-				CNT = DD.find('.el95cnt'),
-				colChange = function() {
-					//выбор имени колонки из базы для колонки
-					if(v.type > 1) {
-						html = '<div class="el95col' + _dn(v.col, 'on') + '" val="' + v.col + '">' + (v.col ? v.col : '-') + '</div>';
-						DD.find('.el95tdcol').html(html);
-						DD.find('.el95col').click(function() {
-							var t = $(this);
-							_dialogLoad({
-								dialog_id:30,
-								dss:obj.unit.num_1,
-								busy_obj:t,
-								func_open:function(res, D) {
-									D.content.find('.el37u').click(function() {
-										var col = $(this).find('.el37col').html();
-										t.html(col).addClass('on').attr('val', col);
-										v.col = col;
-										D.close();
-									});
-								}
-							});
-						});
-					}
-
-					switch(v.type) {
-						case 1:
-							CNT.html('<input type="text" class="el95v w250" placeholder="напишите текст" value="' + v.v + '">')
-								.find('input').focus();
-							break;
-						case 2:
-							CNT.html('');
-							break;
-						case 3:
-							CNT.html('<input type="hidden" class="el95v" value="' + v.v + '">')
-								.find('input')
-								._selem({
-									width:250,
-									placeholder:'выберите содержание списка',
-									dss:obj.unit.num_1,
-									title:v.title
-								});
-							break;
-					}
-				};
-
-			DD.find('.el95type')._select({
-				width:170,
-				title0:'выберите тип колонки',
-				spisok:[
-					{id:1,title:'Текст',content:'Текст<div class="fs12 pale">Указать текст, который будет отображаться в колонке</div>'},
-					{id:2,title:'Текстовое поле',content:'Текстовое поле<div class="fs12 pale">Возможность внесения данных вручную</div>'},
-					{id:3,title:'Выпадающий список',content:'Выпадающий список<div class="fs12 pale">Выбор значений из выпадающего списка</div>'}
-				],
-				func:function(id) {
-					v.type = id;
-					colChange();
-				}
-			});
-
-			colChange();
-			resize95(DD.find('.el95w'));
-			if(!v.type)
-				tdCalc();
-
-			DD.find('.el95del').click(function() {
-				DD.remove();
-				tdCalc();
-			});
-		}
-
-		//включение изменения ширины
-		function resize95(div) {
-			if(div.hasClass('ui-resizable'))
-				return;
-
-			div.resizable({
-				minWidth:20,
-				maxWidth:530,
-				grid:10,
-				handles:'e',
-				stop:tdCalc
-			});
-		}
-
-		//пересчёт визуального отображения ячеек по диагонали
-		function tdCalc() {
-			var html = '',
-				DIV_W = 600,
-				i = DIV_W / CALC_W,
-				FULL_W = 0,
-				TDS = [],//массив ширин по каждой ячейке
-				ALL_W = 0;//сумма ширины всех ячеек, кроме последней
-
-			_forEq(DL.find('DD'), function(sp) {
-				var n = _num(sp.find('.bnum').html()),
-					w = sp.find('.el95w').width();
-				TDS.push({
-					n:n,
-					w:Math.round(w*i)-1
-				});
-				FULL_W += w;
-			});
-
-			_forN(TDS, function(o, n) {
-				var bg = 'ffc',
-					line = ' line-r';
-				if(FULL_W > CALC_W) {
-					bg = 'fcc';
-					i = CALC_W / FULL_W;
-					o.w = Math.round(o.w*i);
-				}
-				if(FULL_W >= CALC_W) {
-					ALL_W += (o.w+1);
-					if(n == (TDS.length-1)) {
-						line = '';
-						o.w = DIV_W - ALL_W + o.w + 1;
-					}
-				}
-
-				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
-							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
-						'</div>';
-			});
-			CALC_DIV.html(html);
-		}
-	},
-	PHP12_elem95_setup_get = function(el) {
-		var send = [];
-		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			var type = _num(sp.find('.el95type').val()),
-				v = sp.find('.el95v').val();
-
-			if(!type)
-				return;
-
-			send.push({
-				w:sp.find('.el95w').width(),
-				name:sp.find('.colname').val(),
-				col:sp.find('.el95col').attr('val'),
-				type:type,
-				v:v
-			});
-		});
-		return send;
+		var l = ATTR.val().length;
+		ATTR.focus();
+		ATTR[0].setSelectionRange(l, l);
 	},
 
-	//график Столбики
-	_ELM_400 = function(el) {
-		var CHART = {},
-			Y = (new Date).getFullYear(),//номер выбранного года
-			HCY = $('#hcYear' + el.id),
-			HCM = $('#hcMon' + el.id),
-			chartPrint = function(hc) {
-				if(CHART.chartHeight)
-					CHART.destroy();
-				CHART = Highcharts.chart('chart_' + el.id, {
-						chart:{
-							type:'column'
-						},
-						title:{
-							text:window['HEAD_' + el.id]
-						},
-						xAxis:{
-							categories:hc.cat,
-							labels:{
-								style:{
-									color:'#333'
-								}
-							}
-						},
-						yAxis:{
-							title:{
-								text:'Количество'
-							},
-							stackLabels:{
-								enabled:true,
-								style:{
-									fontWeight:'bold',
-									color:'black'
-								}
-							}
-						},
-						plotOptions:{
-					        series:{
-						        cursor:_num(HCM.val()) ? 'default' :'pointer'
-					        },
-							column:{
-								stacking:'normal',
-								dataLabels:{
-									enabled:false
-								},
-					            events:{
-						            click:function(e) {
-						            	//если по дням, действия нет
-						            	if(_num(HCM.val()))
-						            		return;
-
-							            var i = e.point.index;
-
-						            	//нажатие на месяц
-							            if(_num(HCY.val())) {
-							            	HCM._dropdown(i+1);
-							            } else {//нажатие на год
-								            HCY._dropdown(e.point.series.xAxis.categories[i]);
-								            $('#hcMonDiv' + el.id)._dn(true);
-							            }
-										chartUpd();
-						            }
-					            }
-				            }
-						},
-						series:[{
-							name:'Все записи',
-							data:hc.data
-						}]
-					});
-			},
-			chartUpd = function() {
-				var send = {
-					op:'el400_chart',
-					elem_id:el.id,
-					year:HCY.val(),
-					mon:HCM.val(),
-					busy_obj:$('#busy' + el.id)
-				};
-				_post(send, function(res) {
-					window['HEAD_' + el.id] = res.head;
-					chartPrint(res);
-				});
-			};
-		HCY._dropdown({
-			title0:'Всё время',
-			spisok:window['YEAR_SPISOK_' + el.id],
-			func:function(y) {
-				Y = y;
-				$('#hcMonDiv' + el.id)._dn(y);
-				HCM._dropdown(0);
-				chartUpd();
-			}
-		});
-		HCM._dropdown({
-			title0:'месяц',
-			spisok:[
-				{id:1,title:'январь'},
-				{id:2,title:'февраль'},
-				{id:3,title:'март'},
-				{id:4,title:'апрель'},
-				{id:5,title:'май'},
-				{id:6,title:'июнь'},
-				{id:7,title:'июль'},
-				{id:8,title:'август'},
-				{id:9,title:'сентябрь'},
-				{id:10,title:'октябрь'},
-				{id:11,title:'ноябрь'},
-				{id:12,title:'декабрь'}
-			],
-			func:chartUpd
-		});
-		$('#chart_' + el.id)
-			.html('')
-			.width(window['WIDTH_' + el.id])
-			.height(window['HEIGHT_' + el.id]);
-
-		chartPrint({
-			cat:window['CAT_' + el.id],
-			data:window['DATA_' + el.id]
-		});
-	},
-
-	_elemAction = function(el, v, is_open) {//применение функций, привязанных к элементам
+	//применение действий, привязанных к элементам
+	_ELM_ACT = function(el, v, period) {
 		/*
-			is_open - окно открылось - применение функций без эффектов
+			period - если указано, то некоторые действия применяются только до либо после AJAX
+				before
+				after
 		*/
-
 		if(!el.action)
 			return;
 
-		_forN(el.action, function(sp) {
-			switch(sp.dialog_id) {
-				//показ/скрытие блоков
-				case 201:
-					var is_show = 0;//по умолчанию скрывать.
+		_forN(el.action, function(act) {
+			var func = window['_ACT' + act.dialog_id];
+			if(!func)
+				return;
 
-					//ДЕЙСТВИЕ
-					switch(sp.apply_id) {
-						//скрыть
-						case 2783:
-						default: break;
-						//показать
-						case 2784:
-							is_show = 1;
-							break;
-					}
+			act.el = el;
 
-					if(!sp.initial_id)
+			func(act, v, period);
+		});
+	},
+
+	//показ/скрытие блоков
+	_ACT201 = function(act, v, period) {
+		if(period == 'before')
+			return;
+
+		var is_show = 0;//по умолчанию скрывать
+
+		//ДЕЙСТВИЕ
+		switch(act.apply_id) {
+			//скрыть
+			case 2783:
+			default:
+				break;
+			//показать
+			case 2784:
+				is_show = 1;
+				break;
+		}
+
+		if(!act.initial_id)
+			return;
+
+		//значение установлено
+		if(v) {
+			//любое значение
+			if(act.initial_id != -2 && act.initial_id != v) {
+				if(act.revers)
+					is_show = is_show ? 0 : 1;
+				else
+					return;
+			}
+		}
+
+		//значение НЕ установлено
+		if(!v) {
+			if(act.initial_id != -1) {
+				if(act.revers)
+					is_show = is_show ? 0 : 1;
+				else
+					return;
+			}
+		}
+
+
+		//ПРОЦЕСС
+		_forN(_blockObj(act.target_ids), function(oo) {
+			if(!oo.obj.length)
+				return;
+
+			switch(act.effect_id) {
+				//исчезновение/появление
+				case 44:
+				case 715:
+				case 2789:
+					oo.obj._dn(1, 'vh');
+					oo.obj.animate({opacity:is_show}, 300, function() {
+						oo.obj._dn(is_show, 'vh');
+					});
+					return;
+				//сворачивание/разворачивание
+				case 45:
+				case 716:
+				case 2790:
+					if(!oo.slide) {
+						oo.obj._dn(is_show, 'vh');
 						return;
-
-					//значение установлено
-					if(v) {
-						//любое значение
-						if(sp.initial_id != -2 && sp.initial_id != v) {
-							if(sp.revers)
-								is_show = is_show ? 0 : 1;
-							else
-								return;
-						}
 					}
-
-					//значение НЕ установлено
-					if(!v) {
-						if(sp.initial_id != -1) {
-							if(sp.revers)
-								is_show = is_show ? 0 : 1;
-							else
-								return;
-						}
-					}
-
-
-					//ПРОЦЕСС
-					_forN(_elemFuncBlockObj(sp.target_ids), function(oo) {
-						if(!oo.obj.length)
-							return;
-
-						switch(sp.effect_id) {
-							//исчезновение/появление
-							case 44:
-							case 715:
-							case 2789:
-								if(is_open) {
-									oo.obj._dn(is_show, 'vh');
-									oo.obj.css({opacity:is_show});
-									return;
-								}
-								oo.obj._dn(1, 'vh');
-								oo.obj.animate({opacity:is_show}, 300, function() {
-									oo.obj._dn(is_show, 'vh');
-								});
-								return;
-							//сворачивание/разворачивание
-							case 45:
-							case 716:
-							case 2790:
-								if(!oo.slide) {
-									oo.obj._dn(is_show, 'vh');
-									return;
-								}
-								if(is_open) {
-									oo.obj[is_show ? 'show' : 'hide']();
-									return;
-								}
-								oo.obj['slide' + (is_show ? 'Down' : 'Up')](300);
-								return;
-							default:
-								if(!oo.slide) {
-									oo.obj._dn(is_show, 'vh');
-									return;
-								}
-								oo.obj[is_show ? 'show' : 'hide']();
-						}
-					});
-					break;
-				//установка/снятие значений
-				case 202:
-					var is_set = sp.apply_id == -1 ? 0 : 1;//начальное действие, которое будет установлено элементу-получателю
-
-					//ТИП СОБЫТИЯ - что должно быть на исходном элементе
-					switch(sp.initial_id) {
-						//значение было сброшено
-						case -1:
-							if(v && sp.revers) {
-								is_set = is_set ? 0 : 1;
-								break;
-							}
-							if(v)
-								return;
-							break;
-						//установлено какое-то значение
-						case -2:
-							if(!v && sp.revers) {
-								is_set = is_set ? 0 : 1;
-								break;
-							}
-							if(!v)
-								return;
-							break;
-						default:
-							if(!v)
-								return;
-							if(v != sp.initial_id)
-								return;
-							v = sp.apply_id;
-							break;
-					}
-
-					_forIn(_idsAss(sp.target_ids), function(ex, id) {
-						var EL = ELMM[id];
-						//свои способы действия на каждый элемент
-						switch(EL.dialog_id) {
-							//галочка
-							case 1:
-								_attr_cmp(id)
-									._check(is_set)
-									._check(is_set);
-								break;
-							//select - привязанный список
-							case 29:
-								_attr_cmp(id)._select(v);
-								break;
-							//фильтр-галочка
-							case 62:
-								_attr_cmp(id)._check(is_set);
-								FILTER[el.num_1][id] = is_set;
-								break;
-						}
-					});
-					break;
-				//открытие диалога
-				case 205:
-					if(is_open)
-						break;
-					if(v != sp.initial_id)
-						break;
-					var dlg_id = _num(sp.target_ids);
-					if(!dlg_id)
-						break;
-					var send = {
-						dialog_id:dlg_id,
-						get_id:sp.apply_id ? GET_ID : 0,
-						edit_id:sp.effect_id ? GET_ID : 0,
-						del_id:sp.revers ? GET_ID : 0,
-						busy_obj:_attr_bl(ELMM[el.id].block_id)
-					};
-
-					_dialogLoad(send);
-					break;
-				//установка фокуса
-				case 206:
-					var is_set = 0;//по умолчанию: сбросить значение
-
-					//ТИП СОБЫТИЯ - что должно быть на исходном элементе
-					switch(sp.initial_id) {
-						//значение было сброшено
-						case -1:
-						default: break;
-						//установлено какое-то значение
-						case -2:
-							is_set = 1;
-							break;
-					}
-
-					var elem_id = _num(sp.target_ids);
-					if(!elem_id)
+					oo.obj['slide' + (is_show ? 'Down' : 'Up')](300);
+					return;
+				default:
+					if(!oo.slide) {
+						oo.obj._dn(is_show, 'vh');
 						return;
-
-					if(ELMM[elem_id].dialog_id == 29)
-						return _attr_cmp(elem_id)._select('focus');
-
-					_attr_cmp(elem_id).select();
-					break;
-				//открытие документа
-				case 207:
-					if(is_open)
-						break;
-					if(v != sp.initial_id)
-						break;
-					var doc_id = _num(sp.target_ids);
-					if(!doc_id)
-						break;
-
-					location.href = URL + '&p=9&doc_id=' + doc_id + (GET_ID ? '&id=' + GET_ID : '');
-					break;
-				//формула
-				case 208:
-					var EA = _attr_cmp(sp.apply_id);
-					if(!EA)
-						break;
-
-					var V = 0,
-						v1 = sp.v1.split(','),
-						cc = (v1.length - 1) / 2;
-					for(var n = 0; n <= cc; n++) {
-						var elid = _num(v1[n*2]);
-						if(!elid)
-							continue;
-
-						var VN = 0,
-							EL = _attr_cmp(elid);
-						if(EL)
-							VN = _cena(EL.val(), true);
-						else {
-							EL = _attr_el(elid);
-							if(EL)
-								VN = _cena(EL.html(), true);
-						}
-
-						if(!EL)
-							continue;
-
-						if(!n)
-							V = VN;
-						else
-							switch(_num(v1[n*2-1])) {
-								//сложение
-								case 1: V = V + VN; break;
-								//вычитание
-								case 2: V = V - VN; break;
-								//умножение
-								case 3: V = V * VN; break;
-								//деление
-								case 4: V = V / VN; break;
-							}
 					}
+					oo.obj._dn(is_show);
+			}
+		});
+	},
 
-					EA.val(Math.round(V*100)/100);
+	//установка/снятие значений
+	_ACT202 = function(act, v, period) {
+		if(period == 'after')
+			return;
+
+		var is_set = act.apply_id == -1 ? 0 : 1;//начальное действие, которое будет установлено элементу-получателю
+
+		//условие для совершения действия
+		switch(act.initial_id) {
+			//значение было сброшено
+			case -1:
+				if(v && act.revers) {
+					is_set = is_set ? 0 : 1;
 					break;
-				//вставка значения в блок
-				case 209:
-					if(is_open)
-						break;
-
-					var TRG = _attr_bl(_num(sp.target_ids));
-					if(!TRG)
-						break;
-
-					//если блок содержит другие блоки, выход
-					if(TRG.hasClass('bl-div'))
-						break;
-
-					//проверка на наличие элемента
-					var ell = TRG.find('div:first');
-					if(ell.length)
-						TRG = ell;//вставка будет происходить в элемент
-
-					var txt = AG.unit;
-					_forN(sp.v1.split(','), function(id, n) {
-						if(txt === undefined)
-							return;
-						if(!n)
-							return;
-						var EL = ELMM[id];
-						if(!EL)
-							return;
-						txt = txt[EL.col];
-					});
-
-					if(txt === false || txt === undefined || !txt.length)
-						break;
-
-					TRG.html(txt);
+				}
+				if(v)
+					return;
+				break;
+			//установлено какое-то значение
+			case -2:
+				if(!v && act.revers) {
+					is_set = is_set ? 0 : 1;
 					break;
-				//обновление содержимого блока
-				case 228:
-					if(is_open)
-						break;
+				}
+				if(!v)
+					return;
+				break;
+			default:
+				if(!v)
+					return;
+				if(v != act.initial_id)
+					return;
+				v = act.apply_id;
+				break;
+		}
 
-					var block_id = _num(sp.target_ids),
-						TRG = _attr_bl(block_id),
-						send = {
-							op:'act228_block_upd',
-							block_id:block_id,
-							busy_obj:TRG
-						};
-
-					if(!TRG)
-						break;
-
-					_post(send, function(res) {
-						TRG.html(res.html);
-					});
+		_forIn(_idsAss(act.target_ids), function(i, id) {
+			var EL = ELMM[id];
+			//свои способы действия на каждый элемент
+			switch(EL.dialog_id) {
+				//галочка
+				case 1:
+					_attr_cmp(id)
+						._check(is_set)
+						._check(is_set);
+					break;
+				//select - привязанный список
+				case 29:
+					_attr_cmp(id)._select(v);
+					break;
+				//фильтр-галочка
+				case 62:
+					_attr_cmp(id)._check(is_set);
+					FILTER[EL.num_1][id] = is_set;
 					break;
 			}
 		});
 	},
-	_elemFuncBlockObj = function(blk_ass) {//получение $(obj) блоков
-		if(typeof blk_ass != 'object')
-			blk_ass = _idsAss(blk_ass);
+
+	//открытие диалога
+	_ACT205 = function(act, v) {
+		if(v != act.initial_id)
+			return;
+
+		var dlg_id = _num(act.target_ids);
+		if(!dlg_id)
+			return;
+
+		var send = {
+			dialog_id:dlg_id,
+			get_id:act.apply_id ? GET_ID : 0,
+			edit_id:act.effect_id ? GET_ID : 0,
+			del_id:act.revers ? GET_ID : 0,
+			busy_obj:_attr_bl(act.el.block_id)
+		};
+
+		_dialogLoad(send);
+	},
+
+	//установка фокуса
+	_ACT206 = function(act) {
+		var elem_id = _num(act.target_ids);
+		if(!elem_id)
+			return;
+
+		if(ELMM[elem_id].dialog_id == 29)
+			return _attr_cmp(elem_id)._select('focus');
+
+		_attr_cmp(elem_id).select();
+	},
+
+	//открытие документа
+	_ACT207 = function(act, v) {
+		if(v != act.initial_id)
+			return;
+
+		var doc_id = _num(act.target_ids);
+		if(!doc_id)
+			return;
+
+		location.href = URL +
+			'&p=9' +
+			'&doc_id=' + doc_id +
+			(GET_ID ? '&id=' + GET_ID : '') +
+			'&pfrom=' + PAGE_ID;
+	},
+
+	//формула
+	_ACT208 = function(act) {
+		var V = 0,
+			v1 = act.v1.split(','),
+			cc = (v1.length - 1) / 2;
+		for(var n = 0; n <= cc; n++) {
+			var elid = _num(v1[n*2]);
+			if(!elid)
+				continue;
+
+			var VN = 0,
+				EL = _attr_cmp(elid);
+			if(EL)
+				VN = _cena(EL.val(), true);
+			else {
+				EL = _attr_el(elid);
+				if(EL)
+					VN = _cena(EL.html(), true);
+			}
+
+			if(!EL)
+				continue;
+
+			if(!n)
+				V = VN;
+			else
+				switch(_num(v1[n*2-1])) {
+					//сложение
+					case 1: V = V + VN; break;
+					//вычитание
+					case 2: V = V - VN; break;
+					//умножение
+					case 3: V = V * VN; break;
+					//деление
+					case 4: V = V / VN; break;
+				}
+		}
+
+		V = Math.round(V*100)/100;
+
+		var EA = _attr_cmp(act.apply_id);
+		if(EA)
+			return EA.val(V);
+
+		_attr_el(act.apply_id).html(V);
+	},
+	// [208] Настройка формулы
+	PHP12_action208_formula = function(el, vvv, obj) {
+		var ATR_EL = _attr_el(el.id),
+			V1 = vvv.length ? vvv[0] : {},
+			ACT208_V = function(n, v_id, v_name) {//печать значения
+				return '<input type="hidden" class="v208" val="' + n + '" value="' + (v_id || 0) + '" />' +
+					'<div class="_selem dib prel bg-fff over3 mb10">' +
+						'<div class="icon icon-star pabs"></div>' +
+						'<div class="icon icon-del pl pabs' + _dn(v_id) + '"></div>' +
+						'<input type="text" readonly class="w125 curP color-pay" placeholder="Значение ' + n + '" value="' + (v_name || '') + '" />' +
+					'</div>';
+			},
+			ACT208_VSEL = function() {//выбор значения
+				ATR_EL.find('._selem:last').click(function() {
+					var t = $(this),
+						cmp = t.prev(),
+						inp = t.find('input'),
+						del = t.find('.icon-del');
+
+					_dialogLoad({
+						dialog_id:11,
+						block_id:obj.send.block_id,
+						element_id:obj.send.element_id,
+
+						dop:{
+							mysave:1,
+							allow:'8,10,11,29,59,54,55,27',
+							sel:cmp.val()
+						},
+
+						busy_obj:inp,
+						busy_cls:'hold',
+						func_save:function(res) {
+							cmp.val(res.v);
+							inp.val(res.title);
+							del._dn(1);
+						}
+					});
+				});
+				//очистка выбранного значения
+				ATR_EL.find('._selem:last .icon-del').click(function(e) {
+					e.stopPropagation();
+					var t = $(this);
+					t._dn();
+					t.next().val('');
+					t.parents('._selem').prev().val(0);
+				});
+			},
+			html =
+				ACT208_V(1, V1.elem_id, V1.elem_name) +
+				'<div class="icon icon-add ml15 pl tool" data-tool="Добавить значение"></div>' +
+				'<div class="icon icon-del-red ml3 pl tool" data-tool="Удалить последнее значение"></div>',
+			ICON_ADD = ATR_EL.html(html).find('.icon-add'),
+			ICON_DEL = ICON_ADD.next(),
+			NUM = 2;
+
+		ACT208_VSEL();
+		ICON_ADD.click(_ADD);
+		ICON_DEL.click(function() {
+			var v208 = ATR_EL.find('.v208:last'),
+				n = _num(v208.attr('val'));
+
+			if(n == 1)
+				return;
+
+			v208.prev().remove();
+			v208.next().remove();
+			v208.remove();
+			NUM--;
+
+			if(n == 3)
+				ICON_DEL._dn();
+		});
+
+		if(!vvv.length)
+			_ADD();
+		else
+			_forN(vvv, function(v, n) {
+				if(n)
+					_ADD(v);
+			});
+
+		function _ADD(v) {
+			v = $.extend({
+				elem_id:0,
+				elem_name:'',
+				znak:1
+			}, v);
+			html =
+				'<div class="dib w15 ml10">' +
+					'<input type="hidden" id="znak' + NUM + '" value="' + v.znak + '" />' +
+				'</div>' +
+				ACT208_V(NUM, v.elem_id, v.elem_name);
+
+			ICON_ADD.before(html);
+
+			$('#znak' + NUM)._dropdown({
+				title0:'выбор знака',
+				spisok:[
+					{id:1,title:'<b class="fs17">+</b>'},
+					{id:2,title:'<b class="fs17">-</b>'},
+					{id:3,title:'<b class="fs17">*</b>'},
+					{id:4,title:'<b class="fs17">/</b>'}
+				]
+			});
+
+			ACT208_VSEL();
+
+			NUM++;
+
+			ICON_DEL._dn(NUM > 3);
+		}
+	},
+	PHP12_action208_formula_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('.v208'), function(sp) {
+			var elem_id = _num(sp.val()),
+				n = _num(sp.attr('val')) + 1;
+
+			send.push(elem_id);
+
+			if(!$('#znak' + n).length)
+				return;
+
+			send.push(_num($('#znak' + n).val()));
+		});
+		return send.join();
+	},
+
+
+	//вставка значения в блок
+	_ACT209 = function(act, v) {
+		//условие для совершения действия
+		switch(act.initial_id) {
+			//значение было сброшено
+			case -1:
+				if(v)
+					return;
+				break;
+			//установлено какое-то значение
+			case -2:
+				if(!v)
+					return;
+				break;
+			case 0: return;
+			default:
+				if(!v)
+					return;
+				if(v != act.initial_id)
+					return;
+				break;
+		}
+
+		var BL = BLKK[_num(act.target_ids)];
+		if(!BL)
+			return;
+
+		var V = _elemUidsJS(act.v1, AG.unit);
+
+		//вставка в элемент, если есть
+		if(BL.elem_id) {
+			var ATTR = _attr_cmp(BL.elem_id);
+			if(ATTR.length)
+				return ATTR.val(V);
+
+			return _attr_el(BL.elem_id).html(V);
+		}
+
+		_attr_bl(BL.id).html(V);
+	},
+
+	//обновление содержимого блока
+	_ACT228 = function(act, v) {
+		var block_id = _num(act.target_ids),
+			TRG = _attr_bl(block_id),
+			send = {
+				op:'act228_block_upd',
+				block_id:block_id,
+				busy_obj:TRG
+			};
+
+		if(!TRG)
+			return;
+
+		_post(send, function(res) {
+			TRG.html(res.html);
+		});
+	},
+
+
+	//---- ДЕЙСТВИЯ ДЛЯ БЛОКОВ
+	_BLK_ACT = function(bo, block_id, unit_id, skip) {//выполнение действия при нажатии на блок
+		var bl = BLKK[block_id]
+		if(!bl)
+			return;
+
+		_forN(bl.action, function(act) {
+			//пропуск действий, которые были отмечены через PHP фильтрами
+			if(skip[act.id])
+				return;
+
+			var func = window['_ACT' + act.dialog_id];
+			if(!func)
+				return;
+
+			act.bo = $(bo); //block object - this
+			act.bl = bl;
+			act.unit_id = unit_id;
+
+			func(act);
+		});
+	},
+
+	//показ/скрытие блоков
+	_ACT211 = function(act) {
+		var to_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
+
+		//ДЕЙСТВИЕ
+		switch(act.apply_id) {
+			//скрыть
+			case 3166:
+			default:
+				break;
+			//показать
+			case 3167:
+				to_show = 1;
+				break;
+		}
+
+		if(act.revers) {
+			if(act.on)
+				to_show = !to_show;
+
+			act.on = act.on ? 0 : 1;
+
+			//получить и запомнить позицию отображения блока
+			if(act.v1) {
+				var ass = _idsAss(act.target_ids);
+				_forIn(ass, function(i, id) {
+					var on = _cookie('ACT211_' + id) * 1;
+					if(on !== undefined) {
+						to_show = !on;
+						act.on = on ? 0 : 1;
+					}
+					return false;
+				});
+
+				_forIn(ass, function(i, id) {
+					_cookie('ACT211_' + id, act.on);
+				});
+			}
+		}
+
+
+		//ПРОЦЕСС
+		_forN(_blockObj(act.target_ids), function(oo) {
+			if(!oo.obj.length)
+				return;
+
+			switch(act.effect_id) {
+				//исчезновение/появление
+				case 3171:
+					oo.obj._dn(1, 'vh');
+					oo.obj.animate({opacity:to_show}, 300, function() {
+						oo.obj._dn(to_show, 'vh');
+					});
+					return;
+				//сворачивание/разворачивание
+				case 3172:
+					if(!oo.slide) {
+						oo.obj._dn(to_show, 'vh');
+						return;
+					}
+					oo.obj['slide' + (to_show ? 'Down' : 'Up')](300);
+					return;
+				default:
+					if(!oo.slide) {
+						oo.obj._dn(to_show, 'vh');
+						return;
+					}
+					oo.obj[to_show ? 'show' : 'hide']();
+			}
+		});
+	},
+
+	//установка значения элементу
+	_ACT212 = function(act) {
+		var target_id = _num(act.target_ids),
+			ATR_CMP = _attr_cmp(target_id),
+			EL = ELMM[target_id],
+			v = act.apply_id;
+
+		if(!EL)
+			return;
+		if(!v)
+			return;
+
+		//-1 - означает сброс значения
+		if(v == -1)
+			v = 0;
+
+		switch(EL.dialog_id) {
+			case 1:
+				//активирование галочки, если требуется
+				if(ATR_CMP.next().hasClass('php'))
+					ATR_CMP._check();
+				ATR_CMP._check(v);
+				return;
+			case 29:
+				ATR_CMP._select(v);
+				return;
+		}
+	},
+
+	//блокировка элементов
+	_ACT213 = function(act) {
+		/*
+			3365 - заблокировать
+			3366 - разблокировать
+		*/
+		var lock = act.apply_id == 3365;
+
+		_forIn(_idsAss(act.target_ids), function(n, id) {
+			var EL = ELMM[id];
+			if(!EL)
+				return;
+			switch(EL.dialog_id) {
+				case 5:
+				case 8:
+					_attr_cmp(id).attr('disabled', lock);
+					break;
+			}
+		});
+	},
+
+	//переход на страницу
+	_ACT214 = function(act) {
+		var page_id = _num(act.target_ids);
+		if(!page_id)
+			return;
+
+		var link = '&p=' + page_id + '&pfrom=' + PAGE_ID;
+
+		if(act.apply_id)
+			link += '&id=' + act.unit_id;
+
+		act.bo.addClass('_busy');
+		location.href = URL + link;
+	},
+
+	//открытие диалога
+	_ACT215 = function(act) {
+		var dlg_id = _num(act.target_ids);
+		if(!dlg_id)
+			return;
+		var send = {
+			dialog_id:dlg_id,
+			block_id:act.bl.id,
+			busy_obj:act.bo
+		};
+
+		//блок передаёт id записи для отображения
+		if(act.apply_id)
+			send.get_id = act.unit_id;
+		//блок передаёт id записи для редактирования
+		if(act.effect_id)
+			send.edit_id = act.unit_id;
+		//блок передаёт id записи для удаления
+		if(act.revers)
+			send.del_id = act.unit_id;
+
+		_dialogLoad(send);
+	},
+
+	//установка фокуса на элемент
+	_ACT216 = function(act) {
+		var elem_id = _num(act.target_ids);
+		if(!elem_id)
+			return;
+
+		if(ELMM[elem_id].dialog_id == 29)
+			return _attr_cmp(elem_id)._select('focus');
+
+		_attr_cmp(elem_id).focus();
+	},
+
+	//открытие документа
+	_ACT217 = function(act) {
+		var doc_id = _num(act.target_ids);
+		if(!doc_id)
+			return;
+
+		location.href = URL +
+			'&p=9' +
+			'&doc_id=' + doc_id +
+			(act.unit_id ? '&id=' + act.unit_id : '') +
+			'&pfrom=' + PAGE_ID;
+	},
+
+	//обновление содержимого блоков
+	_ACT219 = function(act) {
+		//сохранение исходных заливок блоков, чтобы потом их восстанавливать
+		var actName = 'ACT_' + act.id,
+			attrBgId = 'dbg' + act.unit_id,
+			bg;
+		if(!window[actName])
+			window[actName] = {};
+
+		if(!$('#' + attrBgId).length) {
+			bg = act.bo.css('background-color');
+			act.bo
+				.attr('id', attrBgId)
+				.attr('data-bg', bg);
+			window[actName][act.unit_id] = true;
+		}
+
+		act.bo.attr('data-bg', act.bo.css('background-color'));
+
+		var ids = _ids(act.target_ids);
+		if(!ids)
+			return;
+
+		var send = {
+			op:'act219_block_upd',
+			src_id:act.bl.id,
+			action_id:act.id,
+			ids:ids,
+			unit_id:act.unit_id,
+			busy_obj:act.bo
+		};
+		_post(send, function(res) {
+			_forIn(res.blk, function(sp, id) {
+				var PL = _attr_bl(id).closest('.bl-div');
+				PL.css('background-color', '#999990');
+//				PL.after(sp).remove();
+			});
+			//восстановление окраски других блоков
+			_forIn(window[actName], function(sp, uid) {
+				if(act.unit_id == uid)
+					return;
+
+				bg = $('#dbg' + uid).attr('data-bg');
+				$('#dbg' + uid).css('background-color', bg);
+			});
+			if(res.bg)
+				act.bo.css('background-color', res.bg);
+		});
+	},
+
+	_blockObj = function(blk) {//получение $(obj) блоков для показа или скрытия
+		if(typeof blk != 'object')
+			blk = _idsAss(blk);
 
 		var arr = [],
-			TRG = _copyObj(blk_ass),
+			TRG = _objCopy(blk),
 			D = $;
 
 		_forIn(TRG, function(n, block_id) {
@@ -3480,7 +1694,36 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		return arr;
 	},
+	_elemUidsJS = function(ids, unit) {//получение значения записи по идентификаторам элементов (аналог _elemUids в PHP)
+		var txt = '';
+		_forN(ids.split(','), function(id, n) {
+			//todo временно
+			if(!n)
+				return;
 
+			var EL = ELMM[id];
+			if(!EL)
+				return;
+
+			//если имя колонки не получено, поиск останавливается
+			var col = EL.col;
+			if(!col)
+				return false;
+
+			//если значение не получено, поиск останавливается
+			if(unit[col] === undefined)
+				return false;
+
+			unit = unit[col];
+
+			if(typeof unit == 'object')
+				return;
+
+			txt = unit;
+		});
+
+		return txt;
+	},
 	_elemReload = function(el, res) {//перезагрузка элемента
 		//выход, если нечего перезагружать
 		if(!ELM_RELOAD[el.id])
@@ -3494,382 +1737,1202 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			._select('spisok', res ? res.spisok : []);
 	},
 
-	_blockActionJS = function(bo, block_id, unit_id, skip) {//выполнение действия при нажатии на блок
-		if(!BLKK[block_id])
+	//[1] галочка
+	_EL1 = function(el) {
+		if(!el.action)
 			return;
-
-		var BL = BLKK[block_id];
-
-		if(!BL.action)
-			return;
-
-		_forN(BL.action, function(sp) {
-			//пропуск действий, которые были отмечены через PHP фильтрами
-			if(skip[sp.id])
-				return;
-
-			switch(sp.dialog_id) {
-				//показ/скрытие блоков
-				case 211://По умолчанию - для остальных элементов
-					var is_show = 0;//скрывать или показывать блоки. По умолчанию скрывать.
-
-					//ДЕЙСТВИЕ
-					switch(sp.apply_id) {
-						//скрыть
-						case 3166:
-						default: break;
-						//показать
-						case 3167:
-							is_show = 1;
-							break;
-					}
-
-					if(sp.revers) {
-						if(sp.on)
-							is_show = is_show ? 0 : 1;
-						sp.on = sp.on ? 0 : 1;
-					}
-
-
-					//ПРОЦЕСС
-					_forN(_elemFuncBlockObj(sp.target_ids), function(oo) {
-						if(!oo.obj.length)
-							return;
-
-						switch(sp.effect_id) {
-							//исчезновение/появление
-							case 3171:
-								oo.obj._dn(1, 'vh');
-								oo.obj.animate({opacity:is_show}, 300, function() {
-									oo.obj._dn(is_show, 'vh');
-								});
-								return;
-							//сворачивание/разворачивание
-							case 3172:
-								if(!oo.slide) {
-									oo.obj._dn(is_show, 'vh');
-									return;
-								}
-								oo.obj['slide' + (is_show ? 'Down' : 'Up')](300);
-								return;
-							default:
-								if(!oo.slide) {
-									oo.obj._dn(is_show, 'vh');
-									return;
-								}
-								oo.obj[is_show ? 'show' : 'hide']();
-						}
-					});
-					break;
-				//установка значения элементу
-				case 212:
-					var target_id = _num(sp.target_ids),
-						ATR_CMP = _attr_cmp(target_id),
-						EL = ELMM[target_id],
-						v = sp.apply_id;
-
-					if(!EL)
-						return;
-					if(!v)
-						return;
-
-					//-1 - означает сброс значения
-					if(v == -1)
-						v = 0;
-
-					switch(EL.dialog_id) {
-						case 1:
-							//активирование галочки, если требуется
-							if(ATR_CMP.next().hasClass('php'))
-								ATR_CMP._check();
-							ATR_CMP._check(v);
-							return;
-						case 29: ATR_CMP._select(v); return;
-					}
-					break;
-				//блокировка элементов
-				case 213:
-					/*
-						3365 - заблокировать
-						3366 - разблокировать
-					*/
-					var lock = sp.apply_id == 3365;
-
-					_forIn(_idsAss(sp.target_ids), function(n, id) {
-						var EL = ELMM[id];
-						if(!EL)
-							return;
-						switch(EL.dialog_id) {
-							case 5:
-							case 8: _attr_cmp(id).attr('disabled', lock); break;
-						}
-					});
-					break;
-				//переход на страницу
-				case 214:
-					var page_id = _num(sp.target_ids);
-					if(!page_id)
-						break;
-
-					var link = '&p=' + page_id + '&pfrom=' + PAGE_ID;
-
-					if(sp.apply_id)
-						link += '&id=' + unit_id;
-
-					$(bo).addClass('_busy');
-					location.href = URL + link;
-
-					return false;
-				//открытие диалога
-				case 215:
-					var dlg_id = _num(sp.target_ids);
-					if(!dlg_id)
-						break;
-					var send = {
-						dialog_id:dlg_id,
-						block_id:block_id,
-						busy_obj:$(bo)
-					};
-
-					//блок передаёт id записи для отображения
-					if(sp.apply_id)
-						send.get_id = unit_id;
-					//блок передаёт id записи для редактирования
-					if(sp.effect_id)
-						send.edit_id = unit_id;
-					//блок передаёт id записи для удаления
-					if(sp.revers)
-						send.del_id = unit_id;
-
-					_dialogLoad(send);
-					break;
-				//установка фокуса на элемент
-				case 216:
-					var elem_id = _num(sp.target_ids);
-					if(!elem_id)
-						break;
-
-					if(ELMM[elem_id].dialog_id == 29)
-						return _attr_cmp(elem_id)._select('focus');
-
-					_attr_cmp(elem_id).focus();
-					break;
-				//открытие документа
-				case 217:
-					var doc_id = _num(sp.target_ids);
-					if(!doc_id)
-						break;
-
-					location.href = URL + '&p=9&doc_id=' + doc_id + (unit_id ? '&id=' + unit_id : '');
-					break;
-				//обновление содержимого блоков
-				case 219:
-					//сохранение исходных заливок блоков, чтобы потом их восстанавливать
-					var actName = 'ACT_' + sp.id,
-						attrBgId = 'dbg' + unit_id,
-						bg;
-					if(!window[actName])
-						window[actName] = {};
-
-					if(!$('#' + attrBgId).length) {
-						bg = $(bo).css('background-color');
-						$(bo)
-							.attr('id', attrBgId)
-							.attr('data-bg', bg);
-						window[actName][unit_id] = true;
-					}
-
-					$(bo).attr('data-bg', $(bo).css('background-color'));
-
-					var ids = _ids(sp.target_ids);
-					if(!ids)
-						return;
-
-					var send = {
-						op:'block_upd',
-						src_id:block_id,
-						action_id:sp.id,
-						ids:ids,
-						unit_id:unit_id,
-						busy_obj:bo
-					};
-					_post(send, function(res) {
-						_forIn(res.blk, function(sp, id) {
-							var PL = _attr_bl(id).closest('.bl-div');
-							PL.after(sp).remove();
-						});
-						//восстановление окраски других блоков
-						_forIn(window[actName], function(sp, uid) {
-							if(unit_id == uid)
-								return;
-
-							bg = $('#dbg' + uid).attr('data-bg');
-							$('#dbg' + uid).css('background-color', bg);
-						});
-						if(res.bg)
-							$(bo).css('background-color', res.bg);
-					});
-
-					break;
+		$(ATTR_CMP(el.id))._check({
+			func:function(v) {
+				_ELM_ACT(el, v);
 			}
 		});
 	},
 
-	_tdCss = function() {//настройка стилей в выплывающем окошке для ячейки таблицы
-		var t = $(this),
-			v = {
-				id:t.attr('id').split('_')[1],//если используется элемент не из базы, можно ставить id="el_sp14"
-				use:t.attr('data-use') || 'font color eye link place hint',//использование вариантов настроек
-				font:'',
-				color:'',
-				pos:''
+	//[5] textarea
+	_EL5 = function(el) {
+		if(!el.num_2)
+			return $(ATTR_CMP(el.id))._autosize();
+
+		//num_2: форматирование текста
+		ClassicEditor.create(document.querySelector(ATTR_CMP(el.id)), {
+			toolbar:[
+				'heading',
+				'|',
+				'bold', 'italic', 'Underline',
+				'|',
+				'bulletedList', 'numberedList', 'blockQuote',
+				'|',
+				'link',
+				'|',
+				'undo', 'redo'
+			],
+			heading:{
+				options:[
+					{model:'paragraph', title:'Параграф', class:'ck-heading_paragraph'},
+					{model:'heading1', view:'h1', title:'Заголовок 1', class:'ck-heading_heading1'},
+					{model:'heading2', view:'h2', title:'Заголовок 2', class:'ck-heading_heading2'},
+					{model:'heading3', view:'h3', title:'Заголовок 3', class:'ck-heading_heading3'}
+				]
+			}
+		});
+	},
+
+	//[6] select - выбор страницы
+	_EL6 = function(el) {
+		//если выбирается страница для ссылки, то добавляется вариант: 3 => Автоматически
+		if(el.id == 1959)
+			el.vvv.unshift({
+				id:3,
+				title:'Автоматически',
+				content:'<b class="color-pay">Автоматически</b>'
+			});
+
+		$(ATTR_CMP(el.id))._select({
+			width:_num(el.width),
+			title0:el.txt_1,
+			spisok:el.vvv,
+			func:function(v) {
+				_ELM_ACT(el, v);
+			}
+		});
+	},
+
+	//[7] Быстрый поиск
+	_EL7 = function(el) {
+		var process = 0,
+			v_last = FILTER[el.num_1] ? FILTER[el.num_1][el.id] : '',
+			upd = function(v) {
+				process = 1;
+				FILTER[el.num_1][el.id] = v;
+				_spisokUpdate(el.num_1, function() {
+					process = 0;
+					if(v_last != v)
+						upd(v_last);
+				});
+			};
+		$(ATTR_CMP(el.id))._search({
+			func:function(v) {
+				if(v_last == v)
+					return;
+
+				v_last = v;
+
+				if(process)
+					return;
+
+				upd(v);
+			}
+		});
+	},
+
+	//[8] однострочное текстовое поле
+	_EL8 = function(el) {
+		if(!el.action && !el.num_7)
+			return;
+
+		$(ATTR_CMP(el.id)).keyup(function(e) {
+			if(el.action)
+				_ELM_ACT(el, $(ATTR_CMP(el.id)).val());
+
+			//нажатие на Enter
+			if(el.num_7)
+				if(e.which == 13)
+					OBJ.dlg.go();
+		});
+	},
+
+	// [11] Выбор значения из диалога
+	PHP12_v_choose = function(el, vvv, obj) {
+		ELMM = _objUpd(ELMM, vvv.jselm);
+
+		var D = obj.dlg.D,
+			VC = D(ATTR_EL(el.id)).find('.elm-choose'),//элементы в открытом диалоге для выбора
+			DSS = 0,
+			_nest = function(v, dbl) {//разрешение прохода по списку (открытие второго диалога)
+				if(v < 0)
+					return v;
+				if(vvv.sev)
+					return false;
+				if(!ELMM[v].issp)
+					return false;
+				if(vvv.nest)
+					return true;
+				if(!dbl)
+					return false;
+				return true;
 			};
 
-		if(!v.id)
+		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
+		if(vvv.first) {
+			var spisok = [
+				{id:1,title:'Глобальные значения'},
+				{id:2,title:'Стандартные значения'},
+				{id:3,title:'Исходный диалог'},
+				{id:4,title:'Родительский диалог'}
+			];
+
+			if(!D(ATTR_EL(el.id)).find('.choose-menu-4').length)
+				spisok.splice(3, 1);
+
+			D(ATTR_EL(el.id)).find('#choose-menu')._menu({
+				spisok:spisok
+			});
+
+			V11_CMP = D(ATTR_CMP(el.id));   //переменная в исходном диалоге для хранения значений
+			V11_DLG = [];                   //массив диалогов, открывающиеся последовательно
+			V11_V = vvv.sev ? _idsAss(vvv.sel) : []; //массив выбранных значений
+			V11_COUNT = 0;                  //счётчик открытых диалогов
+
+			if(vvv.sel)
+				V11_CMP.val(vvv.sel);
+
+			vvv.first = 0;
+		}
+
+		//выбор одного из элеметов
+		VC.on('click dblclick', function(e) {
+			var t = $(this),
+				v = _num(t.attr('val'), true);
+
+			if(vvv.sev) {//выбор нескольких значений
+				var sel = !t.hasClass('sel');
+				t[(sel ? 'add' : 'remove') + 'Class']('sel');
+				if(sel)
+					V11_V[v] = 1;
+				else
+					delete V11_V[v];
+				var v11 = [];
+				for(var k in V11_V)
+					v11.push(k);
+				V11_CMP.val(v11.join());
+			} else {
+				VC.removeClass('sel');
+				t.addClass('sel');
+
+				V11_V.length = V11_COUNT;
+				V11_V[V11_COUNT] = v;
+				V11_DLG.length = V11_COUNT;
+				V11_DLG[V11_COUNT] = obj.dlg;
+
+				V11_CMP.val(V11_V.join());
+			}
+
+			//нажатие по обычному элементу (не список)
+			switch(_nest(v, e.type == 'dblclick')) {
+				default:
+					if(v == -21)
+						DSS = 111;
+					else if(v < 0)
+						return;
+					break;
+				case true:
+					DSS = ELMM[v].num_1;
+					break;
+				case false:
+					if(e.type == 'dblclick')
+						obj.dlg.go();
+					return;
+			}
+
+			V11_COUNT++;
+
+			_dialogLoad({
+				dialog_id:11,
+				block_id:obj.srce.block_id,
+				dss:DSS,
+				dop:vvv,
+				func_open:PHP12_v_choose_submit
+			});
+		});
+	},
+	PHP12_v_choose_submit = function(res, dlg) {//действие после выбора значений. Используется для всех элементов, которые открывают диалог [11]
+		dlg.submit(function() {
+			var sel = dlg.content.find('.elm-choose.sel');
+			if(!sel.length) {
+				dlg.err('Значение не выбрано');
+				return;
+			}
+
+			//проверка чтобы невозможно было выбрать элемент-список
+			var sel_v = sel.attr('val');
+			if(ELMM[sel_v].issp)
+				dlg.err('Не выбрано конечное значение ' + sel_v);
+
+			//закрытие всех открытых диалогов кроме последнего
+			_forIn(V11_DLG, function(sp, n) {
+				if(!_num(n))
+					return;
+				sp.close();
+			});
+
+			//запуск первого (исходного) диалога
+			V11_DLG[0].go();
+		});
+		dlg.closeFunc(function() {
+			V11_COUNT--;
+		});
+	},
+	PHP12_v_choose_get = function(el) {//отправка значений настройки для определения типа сохранения данных. Конкретно по "mysave"
+		return el.vvv;
+	},
+
+	//[12] Функция
+	_EL12 = function(el, OBJ) {
+		if(!window[el.txt_1])
+			return;
+		window[el.txt_1](el, el.vvv, OBJ);
+	},
+
+	//[13] Выбор элемента из диалога или страницы
+	_EL13 = function(el, OBJ) {
+		var P = $(ATTR_CMP(el.id)).next(),
+			INP = P.find('.inp'),
+			DEL = P.find('.icon-del');
+
+		if(INP.attr('disabled'))
 			return;
 
-		_forIn(t.attr('class').split(' '), function(sp) {
-			if(sp == 'b' || sp == 'i' || sp == 'u')
-				v.font += ' ' + sp;
-			if(sp == 'center' || sp == 'r')
-				v.pos = sp;
-			if(ELEM_COLOR[sp])
-				v.color = sp;
-		});
-
-		//преобразование вариантов настроек в ассоциативный массив
-		var use = {};
-		_forIn(v.use.split(' '), function(sp) {
-			use[sp] = 1;
-		});
-
-		var msg = '<table class="bs5"><tr>';
-		if(use.font)
-			msg += '<td class="pt3">' + _elemUnitFont(v);
-		if(use.color)
-			msg += '<td class="pt3">' + _elemUnitColor(v);
-		if(use.eye)
-			msg += '<td class="pt3 pl10">' +
-					  '<div class="icon icon-eye pl' + _tooltip('Условия отображения', -67) + '</div>';
-		if(use.link)
-			msg += '<td class="pl3">' +
-					  '<div class="icon icon-link pl' + _tooltip('Настроить ссылку', -57) + '</div>';
-		if(use.place)
-			msg += '<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v, true);
-
-		msg += '</table>';
-
-		t._hint({
-			msg:msg,
-			side:'right',
-			show:1,
-			delayShow:700,
-			delayHide:300,
-			func:function(o) {
-				o.find('.icon-link').click(function() {
-					_dialogLoad({
-						dialog_id:220,
-						element_id:v.id,
-						busy_obj:$(this),
-						busy_cls:'spin'
+		P.click(function() {
+			var dlg24 = 0;
+			if(el.num_1) {
+				dlg24 = _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
+				if(!dlg24) {
+					_attr_cmp(el.num_1, 1)._flash({color:'red'});
+					_attr_cmp(el.id, 1)._hint({
+						msg:'Не выбрано значение',
+						color:'red',
+						pad:10,
+						show:1
 					});
-				});
-				o.find('.icon-eye').click(function() {
-					_dialogLoad({
-						dialog_id:240,
-						element_id:v.id,
-						busy_obj:$(this),
-						busy_cls:'spin'
-					});
-				});
-			}
-		});
-	},
-	_tdCssFontGet= function(sp) {//получение стилей для сохранения (выделение: b, i, u)
-		var arr = ['b', 'i', 'u'],
-			font = [];
-		for(var k in arr)
-			if(sp.hasClass(arr[k]))
-				font.push(arr[k]);
-		return font.join(' ');
-	},
-	_tdCssColorGet= function(sp) {//получение стилей для сохранения (цвет текста)
-		for(var k in ELEM_COLOR)
-			if(sp.hasClass(k))
-				return k;
-		return '';
-	},
-
-	//Перетаскивание независимой кнопки
-	_elem97move = function(elem_id) {
-		var startSet = false,
-			startX = 0,
-			startY = 0;
-		$('#but97_' + elem_id).draggable({
-			grid:[5,5],
-			start:function(event, ui) {
-				if(startSet)
 					return;
-				startX = ui.position.left;
-				startY = ui.position.top;
-				startSet = true;
-			},
-			stop:function(event, ui) {
-				var COORD = $(this).attr('data-coord').split(':'),
-					x = COORD[0] * 1,
-					y = COORD[1] * 1,
-					send = {
-						op:'el97_move_save',
-						elem_id:elem_id,
-						x:ui.position.left + x - startX,
-						y:ui.position.top + y - startY
-					};
-				_post(send);
+				}
 			}
-		});
-	},
 
-	/* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
-	PHP12_elem_choose = function(el, vvv, obj) {
-		var D = obj.dlg.D;
-		D('.el-group-head').click(function() {//переключение меню
-			var t = $(this),
-				id = t.attr('val');
-			D('.el-group-head').removeClass('sel');
-			t.addClass('sel');
-
-			D('#elem-group .cnt')._dn(0);
-			D('#cnt_' + id)._dn(1);
-		});
-		D('.elem-unit').click(function(e) {//открытие диалога
-			if($(e.target).hasClass('dialog-setup'))
-				return;
-			var t = $(this);
 			_dialogLoad({
-				dialog_id:t.attr('val'),
-				block_id:obj.send.block_id,
-				dss:obj.send.dss,
-				busy_obj:t,
-				busy_cls:'_busy',
+				dialog_id:11,
+				block_id:OBJ.srce.block_id,
+				element_id:OBJ.srce.element_id,
+				dss:OBJ.srce.dss,
+
+				dop:{
+					mysave:1,
+					is13:el.id,
+					nest:_num(el.num_5),            //выбор значений во вложенных списках
+					sev:_num(el.num_6),             //выбор нескольких значений
+					dlg24:dlg24,                    //выбранный диалог в селекте, на который указывает num_1
+					sel:$(ATTR_CMP(el.id)).val(),              //выбранные элементы
+					allow:el.num_2 ? el.txt_2 : ''  //id типов элементов, которые разрешено выбирать
+				},
+
+				busy_obj:INP,
+				busy_cls:'hold',
 				func_save:function(res) {
-					obj.dlg.close();
-					if(obj.send.func_save)
-						return obj.send.func_save(res);
-					return true;
+					$(ATTR_CMP(el.id)).val(res.v);
+					INP.val(res.title);
+					DEL._dn(1);
+					_elemReload(el, res);
 				}
 			});
 		});
-
-		if(!SA)
-			return;
-
-		_forEq(D('#elem-group .cnt'), function(sp) {
-			sp._sort({elem_id:el.id});
+		DEL.click(function(e) {
+			e.stopPropagation();
+			$(ATTR_CMP(el.id)).val(0);
+			INP.val('');
+			DEL._dn();
+			_elemReload(el);
 		});
 	},
 
-	/* ---=== НАСТРОЙКА УСЛОВИЙ ДЛЯ СПИСКА [41] ===--- */
-	PHP12_spfl = function(el, vvv, obj) {
+	//[14] Список-шаблон
+	PHP12_spisok14_setup = function(el, vvv) {
+		BLKK = _objUpd(BLKK, vvv.jsblk);
+		ELMM = _objUpd(ELMM, vvv.jselm);
+	},
+
+	//[16] Радио
+	_EL16 = function(el) {
+		if(!el.action)
+			return;
+		$(ATTR_CMP(el.id))._radio(function(v) {
+			_ELM_ACT(el, v);
+		});
+	},
+	//[16][17][18] Настройка значений
+	PHP12_radio_setup = function(el, vvv, obj) {
+		/*
+			num_1 - использовать описание значений
+		*/
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			ATTR_EL = _attr_el(el.id),
+			DL = ATTR_EL.append(html).find('dl'),
+			BUT_ADD = ATTR_EL.find('div:last'),
+			ID_NEXT = 1,//следующий идентификатор с учётом существующих
+			NUM = 1;    //порядковый номер для визуального отображения
+
+		BUT_ADD.click(valueAdd);
+
+		if(!obj.unit.id) {
+			valueAdd();
+			valueAdd();
+		} else {
+			_forIn(vvv, function(v) {
+				if(ID_NEXT < v.id)
+					ID_NEXT = v.id + 1;
+			});
+			_forIn(vvv, valueAdd);
+		}
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:0,
+				title:'имя значения ' + NUM,
+				content:'',
+				def:0,
+				use:0
+			}, v);
+
+			if(!v.id)
+				v.id = ID_NEXT++;
+
+			DL.append(
+				'<dd class="over1" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center top pt5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w90 grey r topi">Значение ' + NUM + ':' +
+							'<td><input type="text" class="title w100p b" value="' + v.title + '" />' +
+								'<textarea class="w100p min mtm1' + _dn(el.num_1) + '" placeholder="описание значения">' + v.content + '</textarea>' +
+							'<td class="w15 topi">' +
+								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
+							'<td class="w50 r top pt5">' +
+					   (v.use ? '<div class="dib fs11 color-ccc mr3 curD tool" data-tool="Использование">' + v.use + '</div>'
+								:
+								'<div class="icon icon-del pl tool" data-tool="Удалить значение"></div>'
+					   ) +
+					'</table>' +
+				'</dd>'
+			);
+
+			DL.sortable({axis:'y',handle:'.icon-move-y'});
+			var DD = DL.find('dd:last');
+			DD.find('textarea')._autosize();
+			DD.find('.def')._check({
+				tooltip:'По умолчанию',
+				func:function(v, ch) {
+					if(!v)
+						return;
+					//снятие галочек с остальных значений
+					_forEq(DL.find('.def'), function(sp) {
+						if(sp.attr('id') == ch.attr('id'))
+							return;
+						sp._check(0);
+					});
+				}
+			});
+			DD.find('.icon-del').click(function() {
+				$(this).closest('DD').remove();
+			});
+			DD.find('.title').select();
+			NUM++;
+		}
+	},
+	PHP12_radio_setup_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			send.push({
+				id:_num(sp.attr('val')),
+				title:sp.find('.title').val(),
+				content:sp.find('textarea').val(),
+				def:_num(sp.find('.def').val())
+			});
+		});
+		return send;
+	},
+
+	//[17] select - произвольные значения
+	_EL17 = function(el) {
+		$(ATTR_CMP(el.id))._select({
+			width:_num(el.width),
+			title0:el.txt_1,
+			spisok:el.vvv,
+			func:function(v) {
+				_ELM_ACT(el, v);
+			}
+		});
+	},
+
+	//[18] dropdown
+	_EL18 = function(el) {
+		$(ATTR_CMP(el.id))._dropdown({
+			title0:el.txt_1,
+			title0_hide:el.num_1,
+			nosel:el.num_2,
+			spisok:el.vvv,
+			func:function(v) {
+				_ELM_ACT(el, v);
+			}
+		});
+	},
+
+	//[23] Список ТАБЛИЦА
+	_EL23 = function(el) {
+		//сортировка значений
+		if(el.num_8 == 6161)
+			$(ATTR_EL(el.id)).find('ol:first').nestedSortable({
+				forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
+				placeholder:'nested-placeholder', //класс, применяемый для подсветки места, откуда взялся элемент
+				listType:'ol',
+				items:'li',
+				handle:'.icon-move',
+				isTree:el.num_7 > 1,
+				maxLevels:el.num_7,
+				tabSize:30, //расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
+				revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+
+				start:function(e, t) {//установка ширины placeholder
+					var w = $(t.item).find('._stab:first').width();
+					$(t.placeholder).width(w);
+				},
+				update:function(e, t) {
+					//							var pos = t.item.parent().attr('id');
+					//							t.item.find('a')._dn(!pos, 'b fs14');
+
+					var send = {
+						op:'spisok_23_sort',
+						elem_id:el.id,
+						arr:$(this).nestedSortable('toArray'),
+						busy_obj:$(ATTR_EL(el.id)),
+						busy_cls:'spisok-busy'
+					};
+					_post(send);
+				},
+
+				expandedClass:'pb10',//раскрытый список
+				errorClass:el.num_7 > 1 ? 'bg-fcc' : ''  //ошибка, если попытка переместить элемент на недоступный уровень
+			});
+
+		//выбор значений галочками
+		_forN(el.vvv, function(sp) {
+			if(sp.dialog_id != 91)
+				return;
+
+			_forEq($(ATTR_EL(el.id)).find('._check'), function(eq) {
+				//получение id записи
+				var tdid = eq.attr('id').split('_')[1];
+
+				//выбор/снятие всех галочек
+				if(tdid == 'all') {
+					$('#sch' + sp.id + '_all')._check({
+						func:function(v) {
+							_forEq($(ATTR_EL(el.id)).find('._check'), function(eqAll) {
+								var ch = eqAll.prev();
+								if(ch.attr('id').split('_')[1] == 'all')
+									return;
+								ch._check(v);
+							});
+						}
+					});
+					return;
+				}
+
+				eq.prev()._check();
+			});
+			return false;
+		});
+	},
+	PHP12_td_setup = function(el, vvv, obj) {//настройка ячеек таблицы [23]
+		if(!obj.unit.id)
+			return;
+
+		var html = '<dl class="mt10"></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
+			DL = _attr_el(el.id).append(html).find('dl'),
+			CALC_DIV = _attr_el(el.id).find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
+			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
+			NUM = 1;
+
+		//кнопка добавления новой ячейки
+		_attr_el(el.id).find('div:last').click(tdAdd);
+
+		//показ-скрытие настройки TH-заголовков
+		_attr_cmp(531)._check({
+			func:function(v) {
+				obj.unit.num_5 = v;
+				DL.find('.div-th-name')['slide' + (v ? 'Down' : 'Up')]();
+			}
+		});
+
+		_forIn(vvv, tdAdd);
+		tdCalc();
+
+		//добавление новой колонки в таблицу
+		function tdAdd(v) {
+			v = $.extend({
+				id:0,        //id элемента
+				dialog_id:50,//id диалога, через который был вставлен этот элемент
+				title:'',    //имя значения
+				width:150,   //ширина колонки
+				font:'',     //выделение: b, i, u
+				color:'',    //цвет текста
+				txt_7:'',    //TH-заголовок колонки
+				txt_8:''     //позиция по горизонтали (l, center, r)
+			}, v.id ? v : {});
+
+			v.pos = v.txt_8;
+
+			DL.append(
+				'<dd class="over3" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w25 r topi">' +
+								'<b class="bnum fs15 color-555">' + NUM + '</b>:' +
+							'<td><div style="width:' + v.width + 'px">' +
+									'<div class="div-th-name' + _dn(_num(obj.unit.num_5)) + '">' +
+										'<input type="text"' +
+											  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
+											  ' placeholder="имя колонки"' +
+											  ' value="' + v.txt_7 + '"' +
+										' />' +
+									'</div>' +
+									'<input type="text"' +
+										  ' id="' + ATTR_EL(v.id, true) + '"' +
+										  ' class="inp w100p curP ' + v.font + ' ' + v.color + ' ' + v.txt_8 + '"' +
+										  ' readonly' +
+										  ' placeholder="значение не выбрано"' +
+										  ' value="' + v.title + '"' +
+									' />' +
+								'</div>' +
+							'<td class="w25 r top pt5">' +
+								'<div class="icon icon-del pl tool-l" data-tool="Удалить колонку"></div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				INP = DD.find('.inp');
+			tdResize(DD);
+
+			//открытие диалога для выбора элемента или его редактирования
+			INP.click(function() {
+				_dialogLoad({
+					dialog_id:v.dialog_id,
+					block_id:obj.srce.block_id,  //блок, в котором размещена таблица
+					edit_id:v.id,                //id выбранного элемента (при редактировании)
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_save:function(ia) {
+						DD.attr('val', ia.unit.id);
+						v.id = ia.unit.id;
+						v.dialog_id = ia.unit.dialog_id;
+						INP.val(ia.unit.title);
+						INP.attr('id', ATTR_EL(v.id, true));
+						tdResize(DD);
+						tdCalc();
+					}
+				});
+			});
+
+			INP.mouseenter(_tdCss);
+
+			//сортировка колонок
+			DL.sortable({
+				handle:'.icon-move-y',
+				update:tdCalc
+			});
+
+			//удаление элемента
+			DL.find('.icon-del:last').click(function() {
+				$(this).closest('DD').remove();
+				tdCalc();
+			});
+
+			NUM++;
+		}
+
+		//включение изменения ширины, если присутствует значение
+		function tdResize(dd) {
+			if(!_num(dd.attr('val')))
+				return;
+			var res = dd.find('.div-th-name').parent();
+			if(res.hasClass('ui-resizable'))
+				return;
+			res.resizable({
+				minWidth:30,
+				maxWidth:500,
+				grid:10,
+				handles:'e',
+				stop:tdCalc
+			});
+		}
+
+		//пересчёт визуального отображения ячеек по диагонали
+		function tdCalc() {
+			var html = '',
+				DIV_W = 600,
+				i = DIV_W / CALC_W,
+				FULL_W = 0,
+				TDS = [],//массив ширин по каждой ячейке
+				ALL_W = 0;//сумма ширины всех ячеек, кроме последней
+
+			_forEq(DL.find('DD'), function(sp) {
+				if(!_num(sp.attr('val')))
+					return;
+				var n = _num(sp.find('.bnum').html()),
+					w = sp.find('.div-th-name').parent().width();
+				TDS.push({
+					n:n,
+					w:Math.round(w*i)-1
+				});
+				FULL_W += w;
+			});
+
+			_forN(TDS, function(o, n) {
+				var bg = 'ffc',
+					line = ' line-r';
+				if(FULL_W > CALC_W) {
+					bg = 'fcc';
+					i = CALC_W / FULL_W;
+					o.w = Math.round(o.w*i);
+				}
+				if(FULL_W >= CALC_W) {
+					ALL_W += (o.w+1);
+					if(n == (TDS.length-1)) {
+						line = '';
+						o.w = DIV_W - ALL_W + o.w + 1;
+					}
+				}
+
+				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
+							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
+						'</div>';
+			});
+			CALC_DIV.html(html);
+		}
+	},
+	PHP12_td_setup_get = function(el) {//сохранение ячеек таблицы
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var v = {},
+				inp = sp.find('.inp');
+
+			v.id = _num(sp.attr('val'));
+
+			if(!v.id)
+				return;
+
+			//ширина
+			v.width = _num(sp.find('.div-th-name').parent().width());
+
+			//TH-заголовок
+			v.txt_7 = sp.find('.th-name').val();
+			v.font = _tdCssFontGet(inp);
+			v.color = _tdCssColorGet(inp);
+
+			//позиция
+			var arr = ['center', 'r'];
+			v.txt_8 = '';
+			for(k in arr)
+				if(inp.hasClass(arr[k]))
+					v.txt_8 = arr[k];
+
+
+			send.push(v);
+		});
+
+		return send;
+	},
+
+	//[24] select - выбор списка (все списки приложения)
+	_EL24 = function(el) {
+		$(ATTR_CMP(el.id))._select({
+			width:_num(el.width),
+			title0:el.txt_1,
+			blocked:el.noedit && unit.id,
+			spisok:el.vvv,
+			func:function(v) {
+				_ELM_ACT(el, v);
+			}
+		});
+	},
+
+	//[26] SA: Select - выбор документа
+	_EL26 = function(el) {
+		$(ATTR_CMP(el.id))._select({
+			width:_num(el.width),
+			title0:el.txt_1,
+			spisok:el.vvv
+		});
+	},
+
+	// [27] Баланс: сумма значений записи
+	PHP12_balans_setup = function(el, vvv, obj) {
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last'),
+
+			znak = {
+				'+':'+',
+				'-':'-',
+				'*':'<div class="fs11">&#9913;</div>',
+				'/':'/'
+			},
+			znak_n = ['+','-','*','/'],
+			znak_tool = {
+				'+':'Прибавить',
+				'-':'Вычесть',
+				'*':'Умножить',
+				'/':'Делить'
+			},
+			znak_color = {
+				'+':'green',
+				'-':'red',
+				'*':'orange',
+				'/':'blue'
+			};
+
+		BUT_ADD.click(valueAdd);
+
+		if(!vvv.length) {
+			valueAdd();
+			valueAdd();
+		} else
+			_forIn(vvv, valueAdd);
+
+		function valueAdd(v) {
+			v = $.extend({
+				znak:'+',
+				elem_id:0,
+				title:''
+			}, v);
+
+			DL.append(
+				'<dd class="over3" val="' + v.elem_id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w50 pl5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w25 r">' +
+								'<button class="vk short ' + znak_color[v.znak] +' w35 tool" data-tool="' + znak_tool[v.znak] + '">' + znak[v.znak] +'</button>' +
+							'<td><input type="text"' +
+									  ' class="inp w100p curP"' +
+									  ' readonly' +
+									  ' placeholder="значение не выбрано"' +
+									  ' value="' + v.title + '"' +
+								' />' +
+							'<td class="w50 r">' +
+								'<div class="icon icon-del pl tool" data-tool="Удалить значение"></div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				INP = DD.find('.inp'),
+				BUT = DD.find('button');
+			INP.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					block_id:obj.srce.block_id,
+					dop:{
+						mysave:1,
+						nest:0,
+						allow:'8,27,54,55',
+						sel:DD.attr('val')   //id выбранного элемента (при редактировании)
+					},
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_save:function(ia) {
+						DD.attr('val', ia.v);
+						INP.val(ia.title);
+					}
+				});
+			});
+			DL.sortable({
+				axis:'y',
+				handle:'.icon-move-y'
+			});
+			BUT.click(function() {
+				var t = $(this),
+					n = 0;
+
+				if(t.hasClass('red'))
+					n = 1;
+				if(t.hasClass('orange'))
+					n = 2;
+				if(t.hasClass('blue'))
+					n = 3;
+
+				n++;
+				if(n > 3)
+					n = 0;
+
+				t.html(znak[znak_n[n]]);
+				t.removeClass('green red orange blue');
+				t.addClass(znak_color[znak_n[n]]);
+				t._tool(znak_tool[znak_n[n]]);
+			});
+			DD.find('.icon-del').click(function() {
+				$(this).closest('DD').remove();
+			});
+		}
+	},
+	PHP12_balans_setup_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var elem_id = _num(sp.attr('val')),
+				but = sp.find('button'),
+				znak = '+';
+
+			if(!elem_id)
+				return;
+
+			if(but.hasClass('red'))
+				znak = '-';
+			if(but.hasClass('orange'))
+				znak = '*';
+			if(but.hasClass('blue'))
+				znak = '/';
+
+			send.push({
+				znak:znak,
+				elem_id:elem_id
+			});
+		});
+		return send;
+	},
+
+	//[28] Загрузка файла
+	_EL28 = function(el) {
+		var AT = _attr_el(el.id).find('._attach'),
+			ATUP = AT.find('.atup'),    //div для загрузки
+			BUT = AT.find('.vk'),
+			FORM = AT.find('form'),
+			FILE = AT.find('.at-file'), //input file
+			ATV = AT.find('.atv'),      //загруженный файл
+			atmr;
+
+		AT.find('.icon-del-red').click(function() {
+			ATUP._dn(1);
+			ATV._dn();
+			$(ATTR_CMP(el.id)).val(0);
+		});
+		FILE.change(function() {
+			FILE._vh();
+			BUT.addClass('_busy');
+			_cookie('_attached', 0);
+			_cookie('_attached_id', 0);
+			atmr = setInterval(upload_start, 500);
+			FORM.submit();
+		});
+
+		function upload_start() {
+			switch(_num(_cookie('_attached'))) {
+				case 1:
+					var attach_id = _cookie('_attached_id');
+					ATUP._dn();
+					ATV._dn(1).find('td').html('&nbsp;');
+					$(ATTR_CMP(el.id)).val(attach_id);
+					var send = {
+						op:'attach_get',
+						id:attach_id,
+						busy_obj:ATV
+					};
+					_post(send, function(res) {
+						ATV.find('td').html(res.html);
+					});
+				case 2:
+				case 3:
+					FILE._vh(1);
+					BUT.removeClass('_busy');
+					clearInterval(atmr);
+			}
+		}
+	},
+
+	//[29] select: выбор единицы из другого списка (для связки)
+	_EL29 = function(el) {
+		var o = {
+			width:_num(el.width),
+			title0:el.txt_1,
+			write:el.num_1 && el.num_3,
+			msg_empty:'Не найдено',
+			spisok:el.vvv,
+			blocked:el.num_4,
+			func:function(v) {
+				_ELM_ACT(el, v);
+			},
+			funcWrite:function(v, t) {
+				var send = {
+					op:'spisok_29_connect',
+					cmp_id:el.id,
+					v:v,
+					busy_obj:t.icon_del,
+					busy_cls:'spin'
+				};
+				_post(send, function(res) {
+					t.spisok(res.spisok);
+				});
+			}
+		};
+		//добавление записи через диалог
+		if(el.num_2)
+			o.funcAdd = function(t) {
+				_dialogLoad({
+					dialog_id:el.num_1,
+					busy_obj:t.icon_add,
+					busy_cls:'spin',
+					func_save:function(ia) {
+						t.unitUnshift({
+							id:ia.unit.id,
+							title:ia.unit.txt_1
+						});
+						t.value(ia.unit.id);
+					}
+				});
+			};
+		$(ATTR_CMP(el.id))._select(o);
+	},
+
+	//[31] Выбор нескольких значений галочками
+	_EL31 = function(el) {
+		$(document).on('click', ATTR_EL(el.id) + ' ._check', function() {
+			var cmpv = [];
+			_forEq(_attr_el(el.id).find('._check.on'), function(sp) {
+				cmpv.push(sp.prev().attr('id').split('_')[1]);
+			});
+			if(cmpv.length) {
+				cmpv.unshift(0);
+				cmpv.push(0);
+			}
+			$(ATTR_CMP(el.id)).val(cmpv.join())
+		});
+	},
+
+	//[35] Количество
+	_EL35 = function(el) {
+		var obj = {
+			width:_num(el.width),
+			again:el.num_8
+		};
+		if(el.num_1 == 3681) {
+			obj.min = el.num_2 ? _num(el.num_3) : false;
+			obj.max = el.num_5 ? _num(el.num_6) : false;
+			obj.step = _num(el.num_7);
+			obj.minus = _num(el.num_4);
+		}
+		if(el.num_1 == 3682 && el.vvv) {
+			obj.step = el.vvv.ids;
+			obj.title = el.vvv.title;
+		}
+		$(ATTR_CMP(el.id))._count(obj);
+	},
+	PHP12_count_value = function(el, vvv, obj) {//настройка конктерных значений [35]
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			ATTR_EL = _attr_el(el.id),
+			DL = ATTR_EL.append(html).find('dl'),
+			BUT_ADD = ATTR_EL.find('div:last'),
+			NUM = 1;
+
+		BUT_ADD.click(valueAdd);
+
+		if(obj.unit.id)
+			_forIn(vvv, valueAdd);
+
+		function valueAdd(v) {
+			v = $.extend({
+				id:NUM++,
+				title:'',
+				def:0
+			}, v);
+
+			DL.append(
+				'<dd class="over1">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center top pt5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w35 center">' +
+								'<input type="hidden" class="def" value="' + v.def + '" />' +
+							'<td class="w50">' +
+								'<input type="text" class="vid w50 r" value="' + v.id + '" />' +
+							'<td><input type="text" class="title w100p" placeholder="имя значения не обязательно" value="' + v.title + '" />' +
+							'<td class="w50 r top pt5">' +
+								'<div class="icon icon-del pl tool" data-tool="Удалить значение"></div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			DL.sortable({handle:'.icon-move-y'});
+			var DD = DL.find('dd:last');
+			DD.find('.def')._check({
+				tooltip:'Начальное значение',
+				func:function(v, ch) {
+					if(!v)
+						return;
+					//снятие галочек с остальных значений
+					_forEq(DL.find('.def'), function(sp) {
+						if(sp.attr('id') == ch.attr('id'))
+							return;
+						sp._check(0);
+					});
+				}
+			});
+			DD.find('.icon-del').click(function() {
+				$(this).closest('DD').remove();
+			});
+			DD.find('.vid').select();
+		}
+	},
+	PHP12_count_value_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			send.push({
+				id:_num(sp.find('.vid').val(), 1),
+				title:sp.find('.title').val(),
+				def:_num(sp.find('.def').val())
+			});
+		});
+		return send;
+	},
+
+	//[37] SA: Select - выбор имени колонки
+	_EL37 = function(el) {
+		$(ATTR_CMP(el.id))._select({
+			width:_num(el.width),
+			title0:'не выбрано',
+			msg_empty:'колонок нет',
+			spisok:el.vvv,
+			funcAdd:function(t) {
+				_dialogLoad({
+					dialog_id:22,
+					block_id:el.block_id,
+					busy_obj:t.icon_add,
+					busy_cls:'spin',
+					func_save:function(res) {
+						t.unitUnshift(res);
+						t.value(res.id);
+					}
+				});
+			}
+		});
+	},
+
+	//[38] SA: Select - выбор диалогового окна
+	_EL38 = function(el) {
+		$(ATTR_CMP(el.id))._select({
+			width:_num(el.width),
+			title0:el.txt_1,
+			msg_empty:'диалоги ещё не были созданы',
+			spisok:el.vvv
+		});
+	},
+
+	//[39] Месяц и год
+	_EL39 = function(el) {
+		var ATR_MON = $(ATTR_CMP(el.id) + '_mon'),
+			ATR_YEAR = $(ATTR_CMP(el.id) + '_year'),
+			CMP_SET = function() {
+				var mon = _num(ATR_MON.val());
+				$(ATTR_CMP(el.id)).val(ATR_YEAR.val() + '-' + (mon > 9 ? '' : '0') + mon);
+			};
+		ATR_MON._count({
+			width:100,
+			step:[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+			title:['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+			again:1,
+			func:CMP_SET
+		});
+		ATR_YEAR._count({
+			width:70,
+			min:1970,
+			max:2100,
+			func:CMP_SET
+		});
+	},
+
+	//[40] Фильтрование списка
+	_EL40 = function(el, OBJ) {
+		var P = $(ATTR_CMP(el.id)).next(),
+			INP = P.find('.inp'),
+			DEL = P.find('.icon-del'),
+			_dlg24 = function(id, dss) {//получение id диалога через указанный элемент
+				if(dss)
+					return dss;
+				if(!id)
+					return 0;
+				var dlg24 = _idsFirst(OBJ.dlg.D(ATTR_CMP(id)).val());
+				if(!dlg24) {
+					_attr_cmp(id, 1)
+						._flash({color:'red'})
+						._hint({
+							msg:'Не выбрано значение',
+							color:'red',
+							pad:10,
+							side:'left',
+							show:1
+						});
+					return 0;
+				}
+				return dlg24;
+			},
+			_blkSrce = function(dss) {//получение id диалога через исходный блок
+				if(dss)
+					return dss;
+
+				var block_id = OBJ.srce.block_id;
+				if(!block_id)
+					return 0;
+
+				var BL = BLKK[block_id];
+				if(!BL)
+					return 0;
+
+				if(BL.obj_name == 'spisok') {
+					var EL = ELMM[BL.obj_id];
+					if(!EL)
+						return 0;
+					if(EL.dialog_id != 14)
+						return 0;
+					return EL.num_1;
+				}
+
+				return 0;
+			};
+
+		if(INP.attr('disabled'))
+			return;
+
+		P.click(function() {
+			var dss = _dlg24(el.num_1, el.vvv);
+			dss = _blkSrce(dss);
+
+			if(!dss)
+				return;
+
+			_dialogLoad({
+				dialog_id:41,
+				block_id:OBJ.srce.block_id,
+				element_id:el.num_1,//id элемента, к которому привязан фильтр (по нему будет определяться id диалога)
+				dss:dss,
+				dop:$(ATTR_CMP(el.id)).val(),
+				busy_obj:INP,
+				busy_cls:'hold',
+				func_save:function(res) {
+					$(ATTR_CMP(el.id)).val(res.v);
+					INP.val(res.title);
+					DEL._dn(1);
+				}
+			});
+		});
+		DEL.click(function(e) {
+			e.stopPropagation();
+			$(ATTR_CMP(el.id)).val('');
+			INP.val('');
+			DEL._dn();
+		});
+	},
+	PHP12_spfl = function(el, vvv, obj) {//[41] настройка условий
 		var DS = vvv.dss;
 		if(!DS)
 			return;
@@ -3944,7 +3007,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<td class="td-drop' + _dn(!issp34 && v.cond_id > 2) + '">' +
 								'<input type="hidden" class="cond-drop" />' +
 							'<td class="top pl15">' +
-								'<div class="mt5 icon icon-off pl' + _tooltip('Удалить условие', -52) + '</div>' +
+								'<div class="mt5 icon icon-off pl tool" data-tool="Удалить условие"></div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -4074,220 +3137,297 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
-	/* ----==== СПИСОК СТРАНИЦ (page12) ====---- */
-	PHP12_page_list = function(el) {
-		_attr_el(el.id).find('ol.page-sort').nestedSortable({
-			forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
-			placeholder:'page-sort-hold', //класс, применяемый для подсветки места, откуда взялся элемент
-			listType:'ol',
-			items:'li',
-			handle:'.icon-move',
-			isTree:1,
-			maxLevels:6,
-			tabSize:20, //расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
-			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+	/* [44] Настройка сборного текста */
+	PHP12_elem44_setup = function(el, vvv, obj) {
+		if(!obj.unit.id)
+			return;
 
-			start:function(e, t) {//установка ширины placeholder
-				if($(t.placeholder).prev().hasClass('mb30'))
-					$(t.placeholder).addClass('mb30');
-				if($(t.placeholder).prev().hasClass('mb1'))
-					$(t.placeholder).addClass('mb1');
-			},
-			update:function(e, t) {
-				var send = {
-					op:'page_sort',
-					arr:$(this).nestedSortable('toArray'),
-					busy_obj:_attr_el(el.id),
-					busy_cls:'spisok-busy'
-				};
-				_post(send, function() {
-					var item = $(t.item),
-						p = item.parent(),
-						prn = p.hasClass('page-sort');
+		var ATR_EL = _attr_el(el.id),
+			html = '<dl></dl>' +
+				   '<table class="w100p"><tr>' +
+				        '<td><div class="fs15 color-555 pad10 center over1 curP add34-txt">Добавить текст</div>' +
+				        '<td><div class="fs15 color-555 pad10 center over1 curP add34-el">Добавить элемент</div>' +
+				   '</table>',
+			DL = ATR_EL.append(html).find('dl'),
+			NUM = 1;
 
-					item.removeClass(prn ? 'mb1' : 'mb30');
-					item.addClass(!prn ? 'mb1' : 'mb30');
-					item.find('.pg-name:first')[(prn ? 'add' : 'remove') + 'Class']('b fs14');
-				});
-			},
+		ATR_EL.find('.add34-txt').click(addTxt);
+		ATR_EL.find('.add34-el').click(addEl);
 
-			errorClass:'bg-fcc'  //ошибка, если попытка переместить элемент на недоступный уровень
-		});
-	},
-
-	/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МОЖНО ВЫБИРАТЬ В НАСТРОЙКЕ ДИАЛОГА [13] ===--- */
-	PHP12_elem_rule7_get = function(el) {
-		var ids = [];
-		_forEq(_attr_el(el.id).find('input'), function(sp) {
-			var id = _num(sp.attr('id').split('rule7-el')[1]),
-				v = _num(sp.val());
-			if(!id)
-				return;
-			if(!v)
-				return;
-			ids.push(id);
-		});
-		_attr_cmp(el.id).val(ids.join());
-	},
-
-	/* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
-	PHP12_v_choose = function(el, vvv, obj) {
-		var D = obj.dlg.D,
-			VC = D(ATTR_EL(el.id)).find('.elm-choose'),//элементы в открытом диалоге для выбора
-			DSS = 0,
-			_nest = function(v, dbl) {//разрешение прохода по списку (открытие второго диалога)
-				if(v < 0)
-					return v;
-				if(vvv.sev)
-					return false;
-				if(!ELMM[v].issp)
-					return false;
-				if(vvv.nest)
-					return true;
-				if(!dbl)
-					return false;
-				return true;
-			};
-
-		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога
-		if(vvv.first) {
-			var spisok = [
-				{id:1,title:'Глобальные значения'},
-				{id:2,title:'Стандартные значения'},
-				{id:3,title:'Исходный диалог'},
-				{id:4,title:'Родительский диалог'}
-			];
-
-			if(!D(ATTR_EL(el.id)).find('.choose-menu-4').length)
-				spisok.splice(3, 1);
-
-			D(ATTR_EL(el.id)).find('#choose-menu')._menu({
-				spisok:spisok
+		//вывод двух первых элементов, если начало настройки
+		if(!vvv.length) {
+			addTxt();
+			addEl();
+		} else
+			_forN(vvv, function(v) {
+				switch(v.type) {
+					case 'txt': addTxt(v); break;
+					case 'el': addEl(v); break;
+				}
 			});
 
-			V11_CMP = D(ATTR_CMP(el.id));   //переменная в исходном диалоге для хранения значений
-			V11_DLG = [];                   //массив диалогов, открывающиеся последовательно
-			V11_V = vvv.sev ? _idsAss(vvv.sel) : []; //массив выбранных значений
-			V11_COUNT = 0;                  //счётчик открытых диалогов
+		//добавление текстового поля
+		function addTxt(v) {
+			v = $.extend({
+				txt:'',      //содержание текста
+				font:'',
+				color:''
+			}, v || {});
 
-			if(vvv.sel)
-				V11_CMP.val(vvv.sel);
+			DL.append(
+				'<dd class="over3" data-type="txt">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td><textarea class="w100p h25 ' + v.font + ' ' + v.color + '"' +
+										 ' style="background-color:#fff"' +
+										 ' id="' + ATTR_EL('area' + NUM++, true) + '"' +
+										 ' data-use="font color">' + v.txt +
+								'</textarea>' +
+							'<td class="w50 r">' +
+								'<div class="icon icon-del-red pl tool" data-tool="Удалить"></div>' +
+					'</table>' +
+				'</dd>'
+			);
 
-			vvv.first = 0;
+			var DD = DL.find('dd:last'),
+				AREA = DD.find('textarea');
+
+			//отображение выплывающего окна настройки стилей
+			AREA.mouseenter(_tdCss);
+
+			DL.sortable({handle:'.icon-move-y'});
+
+			DD.find('.icon-del-red').click(function() {
+				$(this).closest('DD').remove();
+			});
+			DD.find('textarea')._autosize().focus();
 		}
 
-		//выбор одного из элеметов
-		VC.on('click dblclick', function(e) {
-			var t = $(this),
-				v = _num(t.attr('val'), true);
+		//добавление поля для выбора элемента
+		function addEl(v) {
+			v = $.extend({
+				id:0,         //id элемента
+				dialog_id:50, //id диалога, через который был вставлен этот элемент
+				title:'',     //имя элемента
+				font:'',
+				color:''
+			}, v || {});
 
-			if(vvv.sev) {//выбор нескольких значений
-				var sel = !t.hasClass('sel');
-				t[(sel ? 'add' : 'remove') + 'Class']('sel');
-				if(sel)
-					V11_V[v] = 1;
-				else
-					delete V11_V[v];
-				var v11 = [];
-				for(var k in V11_V)
-					v11.push(k);
-				V11_CMP.val(v11.join());
-			} else {
-				VC.removeClass('sel');
-				t.addClass('sel');
+			DL.append(
+				'<dd class="over3" data-type="el" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="prel">' +
+								'<input type="text"' +
+									  ' id="' + ATTR_EL(v.id, true) + '"' +
+									  ' class="inp w100p curP bg-gr2 ' + v.font + ' ' + v.color + '"' +
+									  ' readonly' +
+									  ' placeholder="элемент не выбран"' +
+									  ' value="' + v.title + '"' +
+									  ' data-use="font color link eye"' +
+								' />' +
+								'<div class="icon icon-star pabs top6 r5"></div>' +
+							'<td class="w50 r">' +
+								'<div class="icon icon-del-red pl tool" data-tool="Удалить"></div>' +
+					'</table>' +
+				'</dd>'
+			);
 
-				V11_V.length = V11_COUNT;
-				V11_V[V11_COUNT] = v;
-				V11_DLG.length = V11_COUNT;
-				V11_DLG[V11_COUNT] = obj.dlg;
+			var DD = DL.find('dd:last'),
+				INP = DD.find('.inp');
 
-				V11_CMP.val(V11_V.join());
-			}
+			INP.click(function() {
+				_dialogLoad({
+					dialog_id:v.dialog_id,
+					block_id:obj.srce.block_id,
+					dss:obj.srce.dss,
+					edit_id:v.id,           //id выбранного элемента (при редактировании)
+					dop:{
+						rule_id:4,
+						mysave:1
+					},
+					busy_obj:INP,
+					busy_cls:'hold',
+					func_save:function(ia) {
+						DD.attr('val', ia.unit.id);
+						v.id = ia.unit.id;
+						v.dialog_id = ia.unit.dialog_id;
+						INP.val(ia.unit.title);
+					}
+				});
+			});
 
-			//нажатие по обычному элементу (не список)
-			switch(_nest(v, e.type == 'dblclick')) {
-				default:
-					if(v == -21)
-						DSS = 111;
-					else if(v < 0)
+			//отображение выплывающего окна настройки стилей
+			INP.mouseenter(_tdCss);
+
+			DL.sortable({handle:'.icon-move-y'});
+
+			DD.find('.icon-del-red').click(function() {
+				$(this).closest('DD').remove();
+				v.id = 0;
+			});
+		}
+	},
+	PHP12_elem44_setup_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			switch(sp.attr('data-type')) {
+				case 'txt':
+					var area = sp.find('textarea'),
+						txt = area.val();
+					if(!txt)
 						return;
-					break;
-				case true:
-					DSS = ELMM[v].num_1;
-					break;
-				case false: return;
-			}
-
-			V11_COUNT++;
-
-			_dialogLoad({
-				dialog_id:11,
-				block_id:obj.srce.block_id,
-				dss:DSS,
-				dop:vvv,
-				func_open:PHP12_v_choose_submit
-			});
-		});
-	},
-	PHP12_v_choose_submit = function(res, dlg) {//действие после выбора значений. Используется для всех элементов, которые открывают диалог [11]
-		dlg.submit(function() {
-			var sel = dlg.content.find('.elm-choose.sel');
-			if(!sel.length) {
-				dlg.err('Значение не выбрано');
-				return;
-			}
-
-			//проверка чтобы невозможно было выбрать элемент-список
-			var sel_v = sel.attr('val');
-			if(ELMM[sel_v].issp)
-				dlg.err('Не выбрано конечное значение ' + sel_v);
-
-			//закрытие всех открытых диалогов кроме последнего
-			_forIn(V11_DLG, function(sp, n) {
-				if(!_num(n))
+					send.push({
+						type:'txt',
+						txt:txt,
+						font:_tdCssFontGet(area),
+						color:_tdCssColorGet(area)
+					});
 					return;
-				sp.close();
+				case 'el':
+					var inp = sp.find('.inp'),
+						id = _num(sp.attr('val'));
+					if(!id)
+						return;
+					send.push({
+						type:'el',
+						id:id,
+						font:_tdCssFontGet(inp),
+						color:_tdCssColorGet(inp)
+					});
+					return;
+			}
+		});
+		return send;
+	},
+
+	//[45] Выбор нескольких значений привязанного списка
+	_EL45 = function(el) {
+		var UNS = $(ATTR_CMP(el.id)).next(),//размещение выбранных значений
+			CMP_UPD = function() {//сохранение значения
+				var vv = [],
+					pos = 0,//общее количество
+					sum = 0,//общая сумма
+					itog = '';
+
+				_forEq(UNS.find('.uinp'), function(sp) {
+					var id = _num(sp.attr('val'));
+					if(!id)
+						return;
+
+					var count = _cena(sp.val()),
+						cena = 0;//стоимость
+
+					pos += count;
+
+					if(el.num_4) {
+						cena = _cena(sp.closest('tr').find('.ucena').html());
+						sum += cena * count;
+					}
+
+					vv.push(id + ':' + count + ':' + cena);
+				});
+
+				$(ATTR_CMP(el.id)).val(vv.join());
+
+				//обновление итога
+				if(vv.length) {
+					var summ = _cena(sum);
+					itog = 'Всего <b class="fsin">' + _cena(pos) + '</b> позици' + _end(pos, ['я', 'и', 'й']) +
+						(el.num_4 ? ' на сумму <b class="fsin">' + summ + '</b> руб.' : '');
+					//вставка итоговой суммы у указанное поле
+					if(el.num_5)
+						_attr_cmp(el.num_5).val(summ);
+				}
+				_attr_el(el.id).find('.uns-itog').html(itog);
+			},
+			UNS_DEL = function() {//удаление значения
+				UNS.find('.icon').click(function() {
+					$(this).closest('tr').remove();
+					if(!UNS.find('tr').length)
+						UNS.html('');
+					CMP_UPD();
+				});
+				UNS.find('.uinp').keyup(CMP_UPD);
+			};
+		UNS_DEL();
+		CMP_UPD();
+		//нажатие на кнопку для открытыя диалога
+		_attr_cmp(el.id, 1).click(function() {
+			if(!el.num_2)
+				return;
+			_dialogLoad({
+				block_id:el.block_id,
+				dialog_id:el.num_2,
+				busy_obj:_attr_cmp(el.id, 1),
+				func_open:function(res, dlg) {
+					//выбор значения списка
+					dlg.content.click(function(e) {
+						var un = $(e.target).parents('.sp-unit');
+						if(!un.length) {
+							un = $(e.target).parents('.tr-unit');
+							if(!un.length)
+								return;
+						}
+
+						var id_new = _num(un.attr('val'));
+						if(!id_new)
+							return;
+
+						dlg.close();
+
+						//действие после выбора значения
+						var send = {
+							op:'spisok_45_uns',
+							elem_id:el.id,
+							id_new:id_new,
+							v:$(ATTR_CMP(el.id)).val(),
+							busy_obj:_attr_cmp(el.id, 1)
+						};
+						_post(send, function(res) {
+							UNS.html(res.html);
+							UNS_DEL();
+							CMP_UPD();
+							UNS.find('.uinp:last').select();
+						});
+					});
+				}
 			});
-
-			//запуск первого (исходного) диалога
-			V11_DLG[0].go();
-		});
-		dlg.closeFunc(function() {
-			V11_COUNT--;
-		});
-	},
-	PHP12_v_choose_get = function(el, obj) {//отправка значений настройки для определения типа сохранения данных. Конкретно по "mysave"
-		return obj.vvv[el.id];
-	},
-
-	/* ---=== ВЫБОР ЦВЕТА КНОПКИ [2] ===--- */
-	PHP12_button_color = function(el) {
-		var DIV = _attr_el(el.id).find('div');
-		DIV.click(function() {
-			var t = $(this),
-				id = _num(t.attr('val'));
-
-			DIV.removeClass('sel');
-			t.addClass('sel');
-
-			_attr_cmp(el.id).val(id);
 		});
 	},
 
-	/* ---=== ВЫБОР ВНЕШНЕГО ВИДА МЕНЮ СТРАНИЦ [3] ===--- */
-	PHP12_page_menu_type = function(el) {
-		var DIV = _attr_el(el.id).find('div');
-		DIV.click(function() {
-			var t = $(this),
-				id = _num(t.attr('val'));
+	//[49] Выбор блоков из диалога или страницы
+	_EL49 = function(el, OBJ) {
+		var P = $(ATTR_CMP(el.id)).next(),
+			INP = P.find('.inp'),
+			DEL = P.find('.icon-del');
 
-			DIV.removeClass('sel');
-			t.addClass('sel');
-
-			_attr_cmp(el.id).val(id);
+		P.click(function() {
+			_dialogLoad({
+				dialog_id:19,
+				block_id:OBJ.srce.block_id,
+				element_id:OBJ.srce.element_id,
+				dop:{
+					sel:$(ATTR_CMP(el.id)).val()
+				},
+				busy_obj:INP,
+				busy_cls:'hold',
+				func_save:function(res) {
+					$(ATTR_CMP(el.id)).val(res.ids);
+					INP.val(res.title);
+					DEL._dn(res.ids);
+				}
+			});
+		});
+		DEL.click(function(e) {
+			e.stopPropagation();
+			$(ATTR_CMP(el.id)).val(0);
+			INP.val('');
+			DEL._dn();
 		});
 	},
-
 	/* ---=== ВЫБОР БЛОКОВ [19] ===--- */
 	PHP12_block_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
@@ -4300,6 +3440,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				send = {
 					op:'block_choose_level_change',
 					block_id:obj.srce.block_id,
+					element_id:obj.srce.element_id,
 					level:_num(t.html()),
 					busy_obj:ATR_EL.find('.level-hold')
 				};
@@ -4342,84 +3483,188 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send.join();
 	},
 
-	/* ---=== НАСТРОЙКА ВОЗДЕЙСТВИЯ НА ЗАПИСЬ ПОСЛЕ ВНЕСЕНИЯ ДАННЫХ [42] ===--- */
-	PHP12_insert_unit_change = function(el, vvv, obj) {
-		var ATR_EL = _attr_el(el.id),
-			html = '<dl></dl>',
-			DL = ATR_EL.append(html).find('dl');
+	//[51] Календарь
+	_EL51 = function(el) {
+		$(ATTR_CMP(el.id))._calendar({
+			lost:el.num_1,
+			time:el.num_2,
+			func:function() {
+				_ELM_ACT(el, 1);
+			}
+		});
+	},
 
-		_forN(vvv, function(sp) {
-			DL.append(
-				'<dd class="mt5">' +
-					'<table>' +
-						'<tr><td><input type="text"' +
-									  ' class="inp-dst w200 color-ref curD"' +
-									  ' readonly' +
-									  ' val="' + sp.dst_id + '"' +
-									  ' value="' + sp.dst_title + '"' +
-								' />' +
-							'<td class="w25 center fs17 grey"> &laquo; ' +
-							'<td><input type="text"' +
-									  ' class="inp-src w200 color-pay curP over1"' +
-									  ' readonly' +
-									  ' val="' + sp.src_id + '"' +
-									  ' value="' + sp.src_title + '"' +
-									  ' placeholder="не изменять"' +
-								' />' +
-							'<td><div class="icon icon-del pl' + _dn(sp.src_id) + _tooltip('Отменить выбор', -52) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-			var DD = DL.find('dd:last'),
-				SRC = DD.find('.inp-src'),
-				DEL = DD.find('.icon-del');
-			SRC.click(function() {
-				_dialogLoad({
-					dialog_id:11,
-					dss:obj.unit.id,
-					dop:{
-						mysave:1,
-						sel:_num($(this).attr('val')),
-						nest:0
-					},
-					busy_obj:$(this),
-					busy_cls:'hold',
-					func_save:function(res) {
-						SRC.attr('val', res.v);
-						SRC.val(res.title);
-						DEL._dn(1);
+	//[52] Заметки
+	_EL52 = function(el) {
+		if(!_attr_el(el.id).length)
+			return;
+		var timer = 0,
+			NOTE = _attr_el(el.id).find('._note'),
+			ex = NOTE.attr('val').split(':'),
+			page_id = _num(ex[0]),
+			obj_id = _num(ex[1]),
+			NOTE_TXT = NOTE.find('._note-txt'),
+			NOTE_AREA = NOTE_TXT.find('textarea'),
+			NOTE_TXT_W = NOTE_TXT.width(),
+			noteAfterPrint = function() {
+				NOTE.find('._note-list textarea').keyup(function(e) {
+					if(e.keyCode != 13)
+						return;
+
+					switch(el.num_2) {
+						case 9644://отправка сообщения по Enter
+							if(event.ctrlKey) {
+								this.value += "\n";
+								$(this)._autosize('update');
+								return;
+							}
+							break;
+						case 9645://отправка сообщения по CTRL+Enter
+							if(!event.ctrlKey)
+								return;
+							break;
+						default:
+							return;
 					}
+					$(this).parents('._note-comment').find('.comment-ok').trigger('click');
 				});
-			});
-			DEL.click(function() {
-				SRC.attr('val', 0);
-				SRC.val('');
-				DEL._dn();
-			});
+				NOTE.find('.comment-ok').click(function() {//внесение комментария
+					var t = $(this),
+						comm = t.parents('._note-comment'),
+						note = t.parents('._note-u'),
+						area = comm.find('textarea'),
+						txt = $.trim(area.val());
+					if(!txt)
+						return area.focus();
+					var send = {
+						op:'note_comment_add',
+						elem_id:el.id,
+						note_id:note.attr('val'),
+						txt:txt,
+						busy_cls:'busy',
+						busy_obj:comm
+					};
+					_post(send, function(res) {
+						t.closest('TABLE').before(res.html);
+						area.val('');
+						area._autosize('update');
+					});
+				});
+				NOTE.find('._note-to-cmnt').click(function() {//раскрытие комментариев
+					var t = $(this);
+					t.next().show();
+					t.parents('._note-u').find('textarea').focus();
+					t.remove();
+				});
+				NOTE.find('.note-del').click(function() {//удаление заметки
+					var t = $(this),
+						note = t.parents('._note-u'),
+						send = {
+							op:'note_del',
+							note_id:note.attr('val'),
+							busy_cls:'spin',
+							busy_obj:t
+						};
+					_post(send, function() {
+						note.addClass('deleted');
+					});
+				});
+				NOTE.find('.note-rest').click(function() {//восстановление заметки
+					var t = $(this),
+						note = t.parents('._note-u'),
+						send = {
+							op:'note_rest',
+							note_id:note.attr('val'),
+							busy_obj:t
+						};
+					_post(send, function() {
+						note.removeClass('deleted');
+					});
+				});
+			};
+		NOTE.find('textarea')._autosize();
+		NOTE_AREA.keyup(function(e) {
+			if(e.keyCode == 13)
+				switch(el.num_2) {
+					case 9644://отправка сообщения по Enter
+						if(event.ctrlKey) {
+							this.value += "\n";
+							$(this)._autosize('update');
+							return;
+						}
+						return NOTE.find('.note-ok').trigger('click');
+					case 9645://отправка сообщения по CTRL+Enter
+						if(!event.ctrlKey)
+							break;
+						return NOTE.find('.note-ok').trigger('click');
+				}
+
+			var v = $.trim(NOTE_AREA.val());
+			if(timer)
+				clearInterval(timer);
+			timer = setInterval(function() {
+				NOTE_TXT
+					.stop()
+					.animate({width:NOTE_TXT_W - (v.length ? 33 : 0)}, 150);
+				clearInterval(timer);
+				timer = 0;
+			}, 300);
 		});
-	},
-	PHP12_insert_unit_change_get = function(el) {//получение данных для сохранения
-		var send = [];
-		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			var src_id = _num(sp.find('.inp-src').attr('val'));
-			if(!src_id)
+		NOTE.find('.note-ok').click(function() {
+			var txt = $.trim(NOTE_AREA.val());
+			if(!txt)
 				return;
-			send.push(
-				_num(sp.find('.inp-dst').attr('val')) +
-				':' +
-				src_id
-			);
+			var send = {
+				op:'note_add',
+				elem_id:el.id,
+				page_id:page_id,
+				obj_id:obj_id,
+				txt:txt,
+				busy_cls:'busy',
+				busy_obj:NOTE
+			};
+			_post(send, function(res) {
+				NOTE_AREA.val('')._autosize('update');
+				NOTE_TXT.width(NOTE_TXT_W);
+				NOTE.find('._note-list').html(res.html)
+					.find('textarea')._autosize();
+				noteAfterPrint();
+			});
 		});
-		_attr_cmp(el.id).val(send.join());
+		noteAfterPrint();
 	},
 
-	/* ---=== НАСТРОЙКА МЕНЮ ПЕРЕКЛЮЧЕНИЯ БЛОКОВ [57] ===--- */
-	PHP12_menu_block_setup = function(el, vvv, obj) {//используется в диалоге [57]
+	//[57] Меню переключения блоков
+	_EL57 = function(el) {
+		var type = {
+				1158:2,
+				1159:3,
+				13534:4
+			},
+			EL_COO = '57_' + el.id;//сохранение последней позиции
+		$(ATTR_CMP(el.id))._menu({
+			type:type[el.num_1],
+			spisok:el.vvv,
+			func:function(id) {
+				_forN(el.vvv, function(sp) {
+					_forN(_blockObj(_idsAss(sp.blk)), function(oo) {
+						if(!oo.obj.length)
+							return;
+						oo.obj._dn(sp.id == id);
+					});
+				});
+				if(el.num_2)
+					_cookie(EL_COO, id);
+			}
+		});
+	},
+	PHP12_menu_block_setup = function(el, vvv, obj) {//[57] настройка пунктов меню
 		var ATR_EL = _attr_el(el.id),
 			html = '<dl></dl>' +
 				   '<div class="fs15 color-555 pad10 center over5 curP">Новый пункт меню</div>',
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
+			ID_NEXT = 1,//следующий идентификатор с учётом существующих
 			NUM = 1,
 			blkTitle = function(ids) {//текст с количеством блоков
 				if(!ids)
@@ -4435,8 +3680,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		if(!vvv.length)
 			valueAdd();
-		else
+		else {
+			_forIn(vvv, function(v) {
+				if(ID_NEXT < v.id)
+					ID_NEXT = v.id + 1;
+			});
 			_forIn(vvv, valueAdd);
+		}
 
 		function valueAdd(v) {
 			v = $.extend({
@@ -4446,6 +3696,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				blk:'',
 				def:0
 			}, v);
+
+			if(!v.id)
+				v.id = ID_NEXT++;
 
 			DL.append(
 				'<dd class="over5" val="' + v.id + '" data-num="' + v.num + '">' +
@@ -4468,7 +3721,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									  ' val="' + v.blk + '"' +
 								' />' +
 							'<td class="w35 r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить пункт', -44) + '</div>' +
+								'<div class="icon icon-del pl tool" data-tool="Удалить пункт"></div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -4544,297 +3797,473 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
-	/* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ [23] ===--- */
-	PHP12_td_setup = function(el, vvv, obj) {
+	//[59] Связка списка при помощи кнопки
+	_EL59 = function(el) {
+		var div = _attr_cmp(el.id, 1).next(),
+			unitSel = function(id) {//действие после выбора значения
+				var send = {
+					op:'spisok_59_unit',
+					cmp_id:el.id,
+					unit_id:id,
+					busy_obj:_attr_cmp(el.id, 1)
+				};
+				_post(send, function(res) {
+					AG.unit = res.unit;
+					div.find('.un-html').html(res.html);
+					div._dn(1);
+					_attr_cmp(el.id, 1)._dn();
+					_ELM_ACT(el, id);
+				});
+			};
+
+		//запрет перевыбора значения
+		if(el.num_3)
+			return;
+
+		//нажатие на кнопку для открытия диалога
+		_attr_cmp(el.id, 1).click(function() {
+			_dialogLoad({
+				block_id:el.block_id,
+				dialog_id:el.num_4,
+				busy_obj:_attr_cmp(el.id, 1),
+				func_open:function(res, dlg) {
+					//выбор значения списка
+					dlg.content.click(function(e) {
+						var un = $(e.target).parents('.sp-unit');
+						if(!un.length) {
+							un = $(e.target).parents('.tr-unit');
+							if(!un.length)
+								return;
+						}
+
+						var id = _num(un.attr('val'));
+						if(!id)
+							return;
+
+						$(ATTR_CMP(el.id)).val(id);
+						dlg.close();
+						unitSel(id);
+					});
+				}
+			});
+		});
+		//отмена выбора
+		div.find('.icon').click(function() {
+			_attr_cmp(el.id, 1)._dn(1);
+			div._dn();
+			$(ATTR_CMP(el.id)).val(0);
+			_ELM_ACT(el, 0);
+		});
+	},
+
+	//[60] Загрузка изображений
+	_EL60 = function(el) {
+		var load = _attr_el(el.id).find('._image-load'),
+			prc = _attr_el(el.id).find('._image-prc'), //div для отображения процентов
+			II4 = _attr_el(el.id).find('.ii4'),//корзина
+			ids_upd = function() {//обновление id загруженных изображений
+				var idsSave = $(ATTR_CMP(el.id)).val().split(','),//предварительное сохранение всех идентификаторов
+					ids = [],
+					ii4Empty = true;//статус для корзины
+
+				//приведение всех id в статус: удалён
+				_forN(idsSave, function(id, n) {
+					if(id > 0)
+						idsSave[n] = id * -1;
+				});
+
+				_forEq(_attr_el(el.id).find('dd.curM'), function(sp) {
+					var idd = _num(sp.attr('val'));
+					ids.push(idd);
+					//если картинка существует, то убираем из удалённых
+					_forN(idsSave, function(id, n) {
+						if(idd == Math.abs(id)) {
+							delete idsSave[n];
+							return false;
+						}
+					});
+				});
+
+				//дополнение идентификаторов удалёнными
+				_forN(idsSave, function(id) {
+					if(id) {
+						ids.push(id);
+						ii4Empty = false;
+					}
+				});
+				//изменение статуса корзины, если есть удалённые изображения
+				II4._dn(!ii4Empty, 'empty');
+
+				$(ATTR_CMP(el.id)).val(ids.join(','));
+
+				//установка действия для удаления изображения
+				_attr_el(el.id).find('.icon-off').off('click');
+				_attr_el(el.id).find('.icon-off').on('click', function(e) {
+					e.stopPropagation();
+					var dd = $(this).parent();
+					$(this).remove();
+					dd.animate({width:0}, 300, function() {
+						dd.remove();
+						ids_upd();
+					});
+				});
+			},
+			xhr_upload = function(file) {//отправка выбранного файла или скрина на сервер
+				var xhr = new XMLHttpRequest();
+
+				(xhr.upload || xhr).addEventListener('progress', function(e) {
+					var done = e.position || e.loaded,
+						total = e.totalSize || e.total,
+						itog = Math.round(done / total * 100);
+
+					if(itog == 100) {
+						load.removeClass('progress');
+						return;
+					}
+
+					prc.html(itog + '%');
+					load.addClass('progress');
+				});
+				xhr.addEventListener('load', function() {
+					load.removeClass('busy');
+					var res = JSON.parse(xhr.responseText);
+					if(!res.success) {
+						load._hint({
+							msg:res.text,
+							pad:10,
+							color:'red',
+							show:1
+						});
+						return;
+					}
+					load.parent().before(res.html);
+					ids_upd();
+				});
+				xhr.open('post', AJAX, true);
+
+				var data = new FormData;
+				data.append('f1', file);
+				data.append('op', 'image_upload');
+				xhr.send(data);
+			};
+
+		ids_upd();
+		_attr_el(el.id).find('dl').sortable({
+			items:'.curM',
+			placeholder:'ui-hold',
+			update:ids_upd
+		});
+
+		//Выбор способа загрузки
+		_attr_el(el.id).find('.tab-load td').mouseenter(function() {
+			var t = $(this),
+				msg = 'Выбрать картинку из файлов.' +
+					'<br>' +
+					'Размер не менее 100х100 пикс.' +
+					'<br>' +
+					'Размер файла не более 15 мб.';
+			if(t.hasClass('ii2'))
+				msg = 'Указать ссылку на изображение';
+			if(t.hasClass('ii3'))
+				msg = 'Сделать фото с вебкамеры';
+			if(t.hasClass('ii4')) {
+				if(t.hasClass('empty'))
+					msg = 'Удалённых изображений нет';
+				else {
+					var c = _num(t.attr('val'));
+					msg = 'Удалено ' + c + ' изображени' + _end(c, ['е', 'я', 'й']) + '.' +
+						'<br>' +
+						'Нажмите для просмотра.';
+				}
+			}
+			t._hint({
+				msg:msg,
+				pad:10,
+				show:1,
+				delayShow:1000
+			});
+		});
+
+		//Загрузка изображения из файла
+		_attr_el(el.id).find('form input').change(function() {
+			load.addClass('busy');
+			xhr_upload(this.files[0]);
+		});
+
+		//Загрузка изображения по ссылке
+		var linkDiv = _attr_el(el.id).find('._image-link'), //поле с ссылкой на изображение
+			linkInp = linkDiv.find('input'),
+			iconOk = linkDiv.find('.icon-ok'),
+			linkOkFunc = function() {
+				var send = {
+					op:'image_link',
+					obj_name:'elem_' + el.id + '_' + USER_ID,
+					obj_id:_num(unit.id),
+					url:$.trim(linkInp.val()),
+					busy_obj:iconOk,
+					busy_cls:'spin'
+				};
+				if(!send.url.length) {
+					linkInp.focus();
+					return;
+				}
+				_post(send, function(res) {
+					linkInp.val('');
+					load.parent().before(res.html);
+					ids_upd();
+					linkInp.focus();
+				});
+			};
+		_attr_el(el.id).find('.ii2').click(function() {
+			load.addClass('dis');
+			linkDiv.slideDown(200);
+			linkInp.val('').focus();
+		});
+		linkDiv.find('.icon-del').click(function() {
+			load.removeClass('dis');
+			linkDiv.slideUp(200);
+		});
+		linkInp._enter(linkOkFunc);
+		iconOk.click(linkOkFunc);
+
+		//загрузка скриншота
+		linkInp[0].addEventListener('paste', function(e) {
+			if(!e.clipboardData)
+				return;
+
+			var blob;
+			_forN(e.clipboardData.items, function(sp) {
+				if(sp.type.substr(0, 5) == 'image') {
+					blob = sp.getAsFile();
+					return false;
+				}
+			});
+
+			if(!blob)
+				return;
+
+			load.removeClass('dis');
+			load.addClass('busy');
+			linkDiv.slideUp(200);
+			xhr_upload(blob);
+		});
+
+		//изображение с Веб-камеры
+		var b64ToUint6 = function(nChr) {//convert base64 encoded character to 6-bit integer
+				return nChr > 64 && nChr < 91 ? nChr - 65
+					: nChr > 96 && nChr < 123 ? nChr - 71
+						: nChr > 47 && nChr < 58 ? nChr + 4
+							: nChr === 43 ? 62 : nChr === 47 ? 63 : 0;
+			},
+			base64DecToArr = function(sBase64, nBlocksSize) {// convert base64 encoded string to Uintarray
+				var sB64Enc = sBase64.replace(/[^A-Za-z0-9\+\/]/g, ""),
+					nInLen = sB64Enc.length,
+					nOutLen = nBlocksSize ? Math.ceil((nInLen * 3 + 1 >> 2) / nBlocksSize) * nBlocksSize : nInLen * 3 + 1 >> 2,
+					taBytes = new Uint8Array(nOutLen);
+
+				for(var nMod3, nMod4, nUint24 = 0, nOutIdx = 0, nInIdx = 0; nInIdx < nInLen; nInIdx++) {
+					nMod4 = nInIdx & 3;
+					nUint24 |= b64ToUint6(sB64Enc.charCodeAt(nInIdx)) << 18 - 6 * nMod4;
+					if(nMod4 === 3 || nInLen - nInIdx === 1) {
+						for(nMod3 = 0; nMod3 < 3 && nOutIdx < nOutLen; nMod3++, nOutIdx++) {
+							taBytes[nOutIdx] = nUint24 >>> (16 >>> nMod3 & 24) & 255;
+						}
+						nUint24 = 0;
+					}
+				}
+				return taBytes;
+			};
+		_attr_el(el.id).find('.ii3').click(function() {
+			_dialogLoad({
+				dialog_id:61,
+				busy_obj:load,
+				busy_cls:'busy',
+				func_open:function(res, dlg) {
+					var webcam = dlg.content.find('embed')[0];
+					dlg.submit(function() {
+						var foto = base64DecToArr(webcam._snap()),
+							blob = new Blob([foto], {type:'image/jpeg'});
+						xhr_upload(blob);
+						load.addClass('busy');
+						dlg.close();
+					});
+				}
+			});
+		});
+
+		//Удалённые изображения
+		II4.click(function() {
+			if($(this).hasClass('empty'))
+				return;
+
+			_dialogLoad({
+				dialog_id:63,
+				dop:$(ATTR_CMP(el.id)).val(),
+				busy_obj:load,
+				busy_cls:'busy',
+				func_open:function(res, dlg) {
+					dlg.content.find('.icon-recover').click(function() {
+						var tt = $(this),
+							send = {
+								op:'image_recover',
+								id:tt.attr('val'),
+								busy_obj:tt,
+								busy_cls:'spin'
+							};
+						_post(send, function(res) {
+							tt.parent().remove();
+							load.parent().before(res.html);
+							ids_upd();
+						});
+					});
+				}
+			});
+		});
+	},
+
+	//[62] Фильтр-галочка
+	_EL62 = function(el) {
+		$(ATTR_CMP(el.id))._check({
+			func:function(v) {
+				_ELM_ACT(el, v, 'before');
+				FILTER[el.num_1][el.id] = v;
+				_spisokUpdate(el.num_1, function() {
+					_ELM_ACT(el, v, 'after');
+				});
+			}
+		});
+	},
+
+	//[66] Выбор цвета текста
+	_EL66 = function(el) {
+		var func = function(v) {
+				$(ATTR_CMP(el.id)).val(v);
+			},
+			html = _color($(ATTR_CMP(el.id)).val(), func);
+		$(ATTR_CMP(el.id)).next().remove('._color');
+		$(ATTR_CMP(el.id)).after(html);
+	},
+
+	//[70] Выбор цвета фона
+	_EL70 = function(el) {
+		$(ATTR_CMP(el.id)).next()._hint({
+			msg:el.vvv,
+			pad:3,
+			side:'right',
+			func:function(h) {
+				var div = h.find('._color-bg-choose div');
+				div.click(function() {
+					var t = $(this),
+						c = t.attr('val');
+					div.removeClass('sel');
+					t.addClass('sel');
+					$(ATTR_CMP(el.id))
+						.val(c)
+						.next().css('background-color', c);
+				});
+			}
+		});
+	},
+
+	//[72] Фильтр: год и месяц
+	_EL72 = function(el) {
+		var YL = $(ATTR_CMP(el.id) + 'yl'),
+			RD = $(ATTR_CMP(el.id) + 'rd'),
+			YEAR_CUR = YL.val(),
+			CMP_SET = function() {
+				var mon = _num(RD.val()),
+					data = YL.val() + '-' + (mon > 9 ? '' : '0') + mon;
+				$(ATTR_CMP(el.id)).val(data);
+				FILTER[el.num_1][el.id] = data;
+				_spisokUpdate(el.num_1);
+			};
+		YL._yearleaf({
+			func:function(v) {
+				RD._radio(YEAR_CUR < v ? 1 : 12);
+				CMP_SET();
+				YEAR_CUR = v;
+				var send = {
+					op:'spisok_72_sum',
+					elem_id:el.id,
+					year:v
+				};
+				_post(send, function(res) {
+					RD._radio('spisok', _toSpisok(res.spisok));
+				});
+			}
+		});
+		RD._radio(CMP_SET);
+	},
+
+	//[74] Фильтр-радио
+	_EL74 = function(el) {
+		$(ATTR_CMP(el.id))._radio({
+			func:function(v) {
+				FILTER[el.num_1][el.id] = v;
+				_spisokUpdate(el.num_1);
+			}
+		});
+	},
+	PHP12_filter_radio_setup = function(el, vvv, obj) {//[74] настройка значений
 		if(!obj.unit.id)
 			return;
 
-		var html = '<dl class="mt10"></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
-			DL = _attr_el(el.id).append(html).find('dl'),
-			CALC_DIV = _attr_el(el.id).find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
-			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
-			NUM = 1;
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last'),
+			ATR_SP = _attr_cmp(2585),
+			ID_NEXT = 1,//следующий идентификатор с учётом существующих
+			NUM = 1,
+			_CS = function(count) {//отобажение иконки настройки условий
+				if(count)
+					return '<span class="cond-setup ml20 curP tool" data-tool="Настроить">' + count  + ' услови' + _end(count, ['е', 'я', 'й']) + '</span>';
 
-		//кнопка добавления новой ячейки
-		_attr_el(el.id).find('div:last').click(tdAdd);
+				return '<div class="icon icon-add cond-setup pl ml15 tool" data-tool="Добавить условия"></div>';
+			};
 
-		//показ-скрытие настройки TH-заголовков
-		$('#cmp_531')._check({
-			func:function(v) {
-				obj.unit.num_5 = v;
-				DL.find('.div-th-name')['slide' + (v ? 'Down' : 'Up')]();
-			}
-		});
+		BUT_ADD.click(valueAdd);
 
-		_forIn(vvv, tdAdd);
-		tdCalc();
+		if(!vvv.length)
+			valueAdd();
+		else
+			_forIn(vvv, function(v) {
+				if(ID_NEXT < v.id)
+					ID_NEXT = v.id + 1;
+				valueAdd(v);
+			});
 
-		//добавление новой колонки в таблицу
-		function tdAdd(v) {
+		function valueAdd(v) {
 			v = $.extend({
-				id:0,        //id элемента
-				dialog_id:50,//id диалога, через который был вставлен этот элемент
-				title:'',    //имя значения
-				width:150,   //ширина колонки
-				font:'',     //выделение: b, i, u
-				color:'',    //цвет текста
-				txt_7:'',    //TH-заголовок колонки
-				txt_8:'',    //позиция по горизонтали (l, center, r)
-				eye:1        //форматирование доступно для всех значений
-			}, v.id ? v : {});
+				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
+				title:'Значение ' + NUM++,
+				def:0,
+				c:0,       //количество условий в пункте
+				cond:'',   //сами условия
+				eye:1      //отображть количество для пункта фильтра
+			}, v);
 
-			v.pos = v.txt_8;
+			if(!v.id)
+				v.id = ID_NEXT++;
 
 			DL.append(
 				'<dd class="over3" val="' + v.id + '">' +
 					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w25 r topi">' +
-								'<b class="bnum fs15 color-555">' + NUM + '</b>:' +
-							'<td><div style="width:' + v.width + 'px">' +
-									'<div class="div-th-name' + _dn(_num(obj.unit.num_5)) + '">' +
-										'<input type="text"' +
-											  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
-											  ' placeholder="имя колонки"' +
-											  ' value="' + v.txt_7 + '"' +
-										' />' +
-									'</div>' +
-									'<input type="text"' +
-										  ' id="' + ATTR_EL(v.id, true) + '"' +
-										  ' class="inp w100p curP ' + v.font + ' ' + v.color + ' ' + v.txt_8 + '"' +
-										  ' readonly' +
-										  ' placeholder="значение не выбрано"' +
-										  ' value="' + v.title + '"' +
-									' />' +
-								'</div>' +
-							'<td class="w25 r top pt5">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить колонку', -52) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			var DD = DL.find('dd:last'),
-				INP = DD.find('.inp');
-			tdResize(DD);
-
-			//открытие диалога для выбора элемента или его редактирования
-			INP.click(function() {
-				_dialogLoad({
-					dialog_id:v.dialog_id,
-					block_id:obj.srce.block_id,  //блок, в котором размещена таблица
-					edit_id:v.id,                //id выбранного элемента (при редактировании)
-					busy_obj:INP,
-					busy_cls:'hold',
-					func_save:function(ia) {
-						DD.attr('val', ia.unit.id);
-						v.id = ia.unit.id;
-						v.dialog_id = ia.unit.dialog_id;
-						INP.val(ia.unit.title);
-						INP.attr('id', ATTR_EL(v.id, true));
-						tdResize(DD);
-						tdCalc();
-					}
-				});
-			});
-
-			//отображение выплывающего окна настройки стилей
-			INP.mouseenter(function() {
-				if(INP.hasClass('_busy'))
-					return;
-				if(!INP.parent().hasClass('ui-resizable'))
-					return;
-				if(INP.parent().hasClass('ui-resizable-resizing'))
-					return;
-				INP._hint({
-					msg:'<table class="bs5">' +
-							'<tr><td class="pt3">' + _elemUnitFont(v) +
-								'<td class="pt3">' + _elemUnitColor(v) +
-								'<td class="pt3 pl10">' +
-									'<div class="icon icon-eye pl' + _tooltip('Условия отображения', -67) + '</div>' +
-								'<td class="pl3">' +
-									'<div class="icon icon-link pl' + _tooltip('Настроить ссылку', -57) + '</div>' +
-								'<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v, true) +
-						'</table>' +
-						'',
-					side:'right',
-					show:1,
-					delayShow:700,
-					delayHide:300,
-					func:function(o) {
-						o.find('.icon-link').click(function() {
-							_dialogLoad({
-								dialog_id:220,
-								element_id:v.id,
-								busy_obj:$(this),
-								busy_cls:'spin'
-							});
-						});
-						o.find('.icon-eye').click(function() {
-							_dialogLoad({
-								dialog_id:240,
-								element_id:v.id,
-								busy_obj:$(this),
-								busy_cls:'spin'
-							});
-						});
-					}
-				});
-			});
-
-			//сортировка колонок
-			DL.sortable({
-				handle:'.icon-move-y',
-				update:tdCalc
-			});
-
-			//удаление элемента
-			DL.find('.icon-del:last').click(function() {
-				$(this).closest('DD').remove();
-				tdCalc();
-			});
-
-			NUM++;
-		}
-
-		//включение изменения ширины, если присутствует значение
-		function tdResize(dd) {
-			if(!_num(dd.attr('val')))
-				return;
-			var res = dd.find('.div-th-name').parent();
-			if(res.hasClass('ui-resizable'))
-				return;
-			res.resizable({
-				minWidth:30,
-				maxWidth:500,
-				grid:10,
-				handles:'e',
-				stop:tdCalc
-			});
-		}
-
-		//пересчёт визуального отображения ячеек по диагонали
-		function tdCalc() {
-			var html = '',
-				DIV_W = 600,
-				i = DIV_W / CALC_W,
-				FULL_W = 0,
-				TDS = [],//массив ширин по каждой ячейке
-				ALL_W = 0;//сумма ширины всех ячеек, кроме последней
-
-			_forEq(DL.find('DD'), function(sp) {
-				if(!_num(sp.attr('val')))
-					return;
-				var n = _num(sp.find('.bnum').html()),
-					w = sp.find('.div-th-name').parent().width();
-				TDS.push({
-					n:n,
-					w:Math.round(w*i)-1
-				});
-				FULL_W += w;
-			});
-
-			_forN(TDS, function(o, n) {
-				var bg = 'ffc',
-					line = ' line-r';
-				if(FULL_W > CALC_W) {
-					bg = 'fcc';
-					i = CALC_W / FULL_W;
-					o.w = Math.round(o.w*i);
-				}
-				if(FULL_W >= CALC_W) {
-					ALL_W += (o.w+1);
-					if(n == (TDS.length-1)) {
-						line = '';
-						o.w = DIV_W - ALL_W + o.w + 1;
-					}
-				}
-
-				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
-							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
-						'</div>';
-			});
-			CALC_DIV.html(html);
-		}
-	},
-	PHP12_td_setup_get = function(el) {//сохранение ячеек таблицы
-		var send = [];
-		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			var v = {},
-				inp = sp.find('.inp');
-
-			v.id = _num(sp.attr('val'));
-
-			if(!v.id)
-				return;
-
-			//ширина
-			v.width = _num(sp.find('.div-th-name').parent().width());
-
-			//TH-заголовок
-			v.txt_7 = sp.find('.th-name').val();
-			v.font = _tdCssFontGet(inp);
-			v.color = _tdCssColorGet(inp);
-
-			//позиция
-			var arr = ['center', 'r'];
-			v.txt_8 = '';
-			for(k in arr)
-				if(inp.hasClass(arr[k]))
-					v.txt_8 = arr[k];
-
-
-			send.push(v);
-		});
-
-		return send;
-	},
-
-	/* [34] СУММЫ СПИСКОВ ПО МЕСЯЦАМ - НАСТРОЙКА */
-	PHP12_elem34 = function(el, vvv, obj) {
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить список</div>',
-			ATTR_EL = _attr_el(el.id),
-			DL = ATTR_EL.append(html).find('dl');
-
-		ATTR_EL.find('div:last').click(valueAdd);
-
-		if(!obj.unit.id) {
-			valueAdd();
-		} else
-			_forIn(vvv.val, valueAdd);
-
-		function valueAdd(v) {
-			v = $.extend({
-				title:'',    //заголовок
-				dialog_id:'',//id списка
-				sum_id:0,    //id элемента-суммы
-				sum_title:'',//имя элемента-суммы
-				cond:'',     //условия
-				c:''         //количество условий
-			}, v);
-
-			DL.append(
-				'<dd class="over5">' +
-					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td><input type="text" class="title w100p" placeholder="Заголовок не указан" value="' + v.title + '">' +
-							'<td><input type="hidden" class="dlg34" value="' + v.dialog_id + '" />' +
-							'<td><input type="hidden" class="sum34" value="' + v.sum_id + '" />' +
-								'<div class="_selem dib prel bg-fff over3">' +
-									'<div class="icon icon-star pabs"></div>' +
-									'<div class="icon icon-del pl pabs' + _dn(v.sum_id) + '"></div>' +
-									'<input type="text" readonly class="w175 curP color-pay" placeholder="сумма не выбрана" value="' + v.sum_title + '" />' +
-								'</div>' +
-							'<td><input type="hidden" class="cond" />' +
-								'<div class="_spfl dib w125 prel">' +
-									'<div class="icon icon-filter pabs"></div>' +
-									'<div class="icon icon-del pl pabs' + _dn(v.cond) + '"></div>' +
-									'<input type="text" readonly class="filter color-del b pl25 curP w100p over3" placeholder="условий нет" value="' + v.c + '" />' +
-								'</div>' +
-							'<td class="w25 r top pt5">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить список', -48) + '</div>' +
+							'<td><input type="text"' +
+									  ' class="title w200 mr10"' +
+									  ' placeholder="имя значения"' +
+									  ' value="' + v.title + '"' +
+								' />' +
+								'<input type="hidden" class="def" value="' + v.def + '" />' +
+								'<span class="span-cs grey">' + _CS(v.c) + '</span>' +
+								'<input type="hidden" class="cond" />' +
+							'<td class="w100">' +
+								'<div class="icon icon-eye tool' + _dn(!v.eye, 'over3-show pl') + '" data-tool="Отображать<br>количество"></div>' +
+							'<td class="w35 r">' +
+								'<div class="icon icon-del-red pl tool" data-tool="Удалить значение"></div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -4843,92 +4272,336 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			var DD = DL.find('dd:last');
 
-			DD.find('.dlg34')._select({
-				width:260,
-				title0:'список не выбран',
-				spisok:vvv.sp
-			});
-
 			DD.find('.cond').val(v.cond);
 
-			//выбор значения суммы
-			DD.find('._selem').click(function() {
-				var t = $(this),
-					cmp = t.prev(),
-					inp = t.find('input'),
-					del = t.find('.icon-del'),
-					dss = _num(DD.find('.dlg34').val());
-
-				if(!dss)
-					return false;
-
-				_dialogLoad({
-					dialog_id:11,
-					dss:dss,
-
-					dop:{
-						mysave:1,
-						sel:cmp.val()
-					},
-
-					busy_obj:inp,
-					busy_cls:'hold',
-					func_save:function(res) {
-						cmp.val(res.v);
-						inp.val(res.title);
-						del._dn(1);
-					}
-				});
+			//установка галочки по умолчанию
+			DD.find('.def')._check({
+				tooltip:'По умолчанию',
+				func:function(v, ch) {
+					if(!v)
+						return;
+					//снятие галочек с остальных значений
+					_forEq(DL.find('.def'), function(sp) {
+						if(sp.attr('id') == ch.attr('id'))
+							return;
+						sp._check(0);
+					});
+				}
 			});
 
-			DD.find('._spfl').click(function() {
-				var t = $(this),
-					inp = t.find('input'),
-					dss = _num(DD.find('.dlg34').val());
-
-				if(!dss)
-					return false;
-
+			//добавление условия к значению
+			DD.find('.span-cs').click(function() {
 				_dialogLoad({
 					dialog_id:41,
-					dss:dss,
-					dop:t.prev().val(),
-					busy_obj:inp,
-					busy_cls:'hold',
+					dss:ATR_SP.val(),
+					element_id:2585,
+					dop:v.cond,
+					busy_obj:$(this).find('.cond-setup'),
+					busy_cls:v.c ? '_busy' : 'spin',
 					func_save:function(res) {
-						t.prev().val(res.v);
-						inp.val(res.title);
-						t.find('.icon-del')._dn(1);
+						v.cond = res.v;
+						DD.find('.cond').val(res.v);
+						v.c = res.c;
+						DD.find('.span-cs').html(_CS(res.c));
 					}
 				});
 			});
 
-			DD.find('.icon-del').click(function() {
+			//включение/выключение отображения количества для каждого пункта фильтра
+			DD.find('.icon-eye').click(function() {
+				var t = $(this),
+					show = !t.hasClass('over3-show');
+				t._dn(!show, 'over3-show pl');
+			});
+
+			//удаление значения radio вместе с условиями
+			DD.find('.icon-del-red').click(function() {
 				$(this).closest('DD').remove();
 			});
-			//установка фокуса на новодобавленного значения
-			if(!v.id)
-				DD.find('.title').focus();
 		}
 	},
-	PHP12_elem34_get = function(el) {
+	PHP12_filter_radio_setup_get = function(el) {//получение данных для сохранения
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			var dlg_id = _num(sp.find('.dlg34').val());
-			if(!dlg_id)
-				return;
 			send.push({
+				id:_num(sp.attr('val')),
 				title:sp.find('.title').val(),
-				dialog_id:dlg_id,
-				sum_id:_num(sp.find('.sum34').val()),
-				cond:sp.find('.cond').val()
+				cond:sp.find('.cond').val(),
+				def:sp.find('.def').val(),
+				eye:sp.find('.icon-eye').hasClass('pl') ? 0 : 1
 			});
 		});
 		return send;
 	},
 
-	/* [88] Таблица из нескольких списков */
-	PHP12_elem88 = function(el, vvv, obj) {
+	//[75] Фильтр: фронтальное меню
+	_EL75 = function(el) {
+		var UN = _attr_el(el.id).find('.u75');
+		UN.click(function() {
+			var t = $(this),
+				pname = t.closest('td').find('a').html(),
+				v = t.attr('val');
+
+			if(!t.hasClass('fs16'))
+				pname += ' » ' + t.html();
+
+			_attr_el(el.id).find('.pname75').html(pname);
+			_attr_el(el.id).find('.mp75')._dn(true);
+			_attr_el(el.id).find('.tab75')._dn();
+
+			_ELM_ACT(el, v);
+			FILTER[el.num_1][el.id] = v;
+			_spisokUpdate(el.num_1);
+		});
+		//отмена выбора
+		_attr_el(el.id).find('.icon-del').click(function() {
+			_attr_el(el.id).find('.mp75')._dn();
+			_attr_el(el.id).find('.tab75')._dn(true);
+			_ELM_ACT(el, 0);
+			FILTER[el.num_1][el.id] = 0;
+			_spisokUpdate(el.num_1);
+		});
+	},
+
+	//[76] Видеоролик
+	_EL76 = function(el) {
+		var CNT = _attr_el(el.id).find('._video-cont'),
+			DEL = _attr_el(el.id).find('.icon-del');
+		$(ATTR_CMP(el.id)).keyup(function() {
+			var url = $(this).val();
+			if(!url) {
+				DEL._dn();
+				return;
+			}
+
+			DEL._dn(true).addClass('spin');
+
+			var send = {
+				op:'el76_video',
+				elem_id:el.id,
+				url:url,
+				func_err:function(res) {
+					var msg = '<div class="center red">' + res.text + '</div>';
+					CNT.html(msg)._dn(true);
+					DEL.removeClass('spin');
+				}
+			};
+			_post(send, function(res) {
+				CNT.html(res.iframe)._dn(true);
+				DEL.removeClass('spin');
+			});
+		});
+		DEL.click(function() {
+			CNT.slideUp(200, function() {
+				CNT.html('').show()._dn();
+			});
+			DEL._dn();
+			$(ATTR_CMP(el.id)).val('').focus();
+		});
+	},
+
+	//[77] Фильтр-календарь
+	_EL77 = function(el) {
+		var CAL = _attr_el(el.id).find('._filter-calendar'),
+			CNT = CAL.find('.fc-cnt');
+
+		//перемотка месяцев
+		CAL.find('.laquo').click(function() {
+			var send = {
+				op:'filter_calendar_mon_change',
+				elem_id:el.id,
+				mon:CAL.find('.mon-cur').val(),
+				side:$(this).attr('val'),
+				busy_cls:'busy',
+				busy_obj:CAL
+			};
+			_post(send, function(res) {
+				CAL.find('.mon-cur').val(res.mon);
+				CAL.find('.td-mon').html(res.td_mon);
+				CNT.html(res.cnt);
+			});
+		});
+
+		//нажатие на месяц
+		CAL.click(function(e) {
+			var t = $(e.target);
+			if(!t.hasClass('monn'))
+				return;
+			CNT.find('.sel').removeClass('sel');
+			t.addClass('sel');
+			FILTER[el.num_1][el.id] = t.attr('val');
+			_spisokUpdate(el.num_1);
+		});
+
+		//нажатие на неделю или на день
+		CNT.click(function(e) {
+			var t = $(e.target),
+				on = t.hasClass('on'),
+				week = t.hasClass('week-num'),
+				td = on ? t : t.parent();
+			if(on || week) {
+				CAL.find('.monn.sel').removeClass('sel');
+				CNT.find('.sel').removeClass('sel');
+				td.addClass('sel');
+				FILTER[el.num_1][el.id] = t.attr('val');
+				_spisokUpdate(el.num_1);
+			}
+		});
+	},
+
+	//[78] Фильтр-меню
+	_EL78 = function(el) {
+		var FM = _attr_el(el.id).find('.fm-unit');
+		_attr_el(el.id).find('.fm-plus').click(function() {
+			var t = $(this),
+				plus = t.html() == '+',
+				div = t.closest('TABLE').next();
+			div['slide' + (plus ? 'Down' : 'Up')](200);
+			t.html(plus ? '-' : '+');
+		});
+		FM.click(function() {
+			var t = $(this),
+				sel = t.hasClass('sel');
+			FM.removeClass('sel');
+			if(!sel)
+				t.addClass('sel');
+			FILTER[el.num_1][el.id] = sel ? 0 : t.attr('val');
+			_spisokUpdate(el.num_1);
+		});
+	},
+
+	//[80] Очистка фильтров
+	_EL80 = function(el) {
+		$(ATTR_CMP(el.id)).click(function() {
+			var t = $(this),
+				send = {
+					op:'spisok_filter_clear',
+					spisok_id:el.num_1,
+					busy_obj:t
+				};
+			_post(send, function(res) {
+				//скрытие кнопки
+				t._dn();
+
+				//обновление дополнительных значений
+				for(var i in res.upd) {
+					var u = res.upd[i];
+					_attr_el(u.id).html(u.html);
+				}
+
+				_forIn(res.def, function(sp) {
+					switch(sp.dialog_id) {
+						//быстрый поиск
+						case 7:
+							_attr_cmp(sp.elem_id)._search('clear');
+							return;
+						//фильтр-галочка
+						case 62:
+							_attr_cmp(sp.elem_id)._check(sp.v);
+							return;
+						//фильтр-радио
+						case 74:
+							_attr_cmp(sp.elem_id)._radio(sp.v);
+							return;
+						case 75:
+							_attr_el(sp.elem_id).find('.mp75')._dn();
+							_attr_el(sp.elem_id).find('.tab75')._dn(true);
+							return;
+						//фильтр-календарь
+						case 77:
+							var CAL = _attr_el(sp.elem_id).find('._filter-calendar');
+							CAL.find('.mon-cur').val(sp.dop.mon);
+							CAL.find('.td-mon').html(sp.dop.td_mon);
+							CAL.find('.fc-cnt').html(sp.dop.cnt);
+							return;
+						//фильтр-меню
+						case 78:
+							_attr_el(sp.elem_id).find('.sel').removeClass('sel');
+							return;
+						//фильтр-select
+						case 83:
+							_attr_cmp(sp.elem_id)._select(0);
+							return;
+						//Фильтр - Выбор нескольких групп значений
+						case 102:
+							//_attr_el(sp.elem_id)._filter102();
+							_attr_el(sp.elem_id).find('.holder')._dn(1);
+							_attr_el(sp.elem_id).find('.td-un').html('<div class="icon icon-empty"></div>');
+							_attr_el(sp.elem_id).find('.icon-del')._vh();
+							return;
+					}
+				});
+				FILTER = res.filter;
+				_hintPaste(res);
+
+				if(res.blk_hidden_upd) {
+					_forIn(res.blk_hidden_upd, function(v, block_id) {
+						_blockObj(block_id)[0].obj._dn(v)
+					});
+				}
+			});
+		});
+	},
+
+	//[83] Select - фильтр
+	_EL83 = function(el) {
+		$(ATTR_CMP(el.id))._select({
+			width:_num(el.width),
+			title0:el.txt_1,
+			spisok:el.vvv,
+			func:function(v) {
+				FILTER[el.num_1][el.id] = v;
+				_spisokUpdate(el.num_1);
+			}
+		});
+	},
+
+	//[85] Select - выбор значения списка
+	_EL85 = function(el) {
+		$(ATTR_CMP(el.id))._select({
+			width:_num(el.width),
+			title0:el.txt_1,
+			spisok:el.vvv,
+			msg_empty:el.num_1 ? 'Список пуст' : 'Не указан список',
+			func:function(v) {
+				_ELM_ACT(el, v);
+			}
+		});
+		ELM_RELOAD[el.num_1] = el.id;
+	},
+
+	//[88] Таблица из нескольких списков
+	_EL88 = function(el) {
+		//выбор значений галочками
+		_forIn(el.vvv, function(sp) {
+			if(sp.dialog_id != 91)
+				return;
+
+			_forEq($(ATTR_EL(el.id)).find('._check'), function(eq) {
+				//получение id записи
+				var tdid = eq.attr('id').split('_')[1];
+
+				//выбор/снятие всех галочек
+				if(tdid == 'all') {
+					$('#sch' + sp.id + '_all')._check({
+						func:function(v) {
+							_forEq($(ATTR_EL(el.id)).find('._check'), function(eqAll) {
+								var ch = eqAll.prev();
+								if(ch.attr('id').split('_')[1] == 'all')
+									return;
+								ch._check(v);
+							});
+						}
+					});
+					return;
+				}
+
+				eq.prev()._check();
+			});
+			return false;
+		});
+	},
+	PHP12_elem88 = function(el, vvv, obj) {//[88] настройка таблицы
 		if(!obj.unit.id)
 			return;
 
@@ -4974,9 +4647,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'</div>' +
 							'<td><input type="hidden" class="spv" value="' + v.dialog_id + '" />' +
 							'<td class="w25">' +
-								'<div class="icon icon-set-b pl' + _tooltip('Настроить колонки', -58) + '</div>' +
+								'<div class="icon icon-set-b pl tool" data-tool="Настроить колонки"></div>' +
 							'<td class="w25">' +
-								'<div val="' + (NUM++) + '" class="icon icon-del-red pl' + _tooltip('Удалить список', -48) + '</div>' +
+								'<div val="' + (NUM++) + '" class="icon icon-del-red pl tool" data-tool="Удалить список"></div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -5094,7 +4767,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									' />' +
 								'</div>' +
 							'<td class="w25 r top pt5">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить колонку', -51) + '</div>' +
+								'<div class="icon icon-del pl tool" data-tool="Удалить колонку"></div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -5364,145 +5037,1024 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
-	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ для [16][17][18] ===--- */
-	PHP12_radio_setup = function(el, vvv, obj) {
-		/*
-			num_1 - использовать описание значений
-		*/
+	//[92] Выбранные значения галочками
+	_EL92 = function(el, OBJ) {
+		if(OBJ.unit.id)
+			return;
+
+		var ids = [],
+			elmIds = {};//id элементов-списков, в которых выбираются значения
+		_forIn(el.vvv, function(sp) {
+			if(elmIds[sp.elm_id])
+				return;
+
+			elmIds[sp.elm_id] = 1;
+
+			_forEq(_attr_el(sp.elm_id).find('._check'), function(eqAll) {
+				var ch = eqAll.prev(),
+					spid = ch.attr('id').split('_')[1];
+				if(spid == 'all')
+					return;
+				if(!_num(ch.val()))
+					return;
+				ids.push(spid);
+			});
+		});
+
+		$(ATTR_CMP(el.id)).val(ids.join());
+
+		//запрос сумм
+		var send = {
+			op:'spisok_92_sum',
+			elem_id:el.id,
+			ids:ids.join(),
+			func_err:function() {
+				_forIn(el.vvv, function(sp) {
+					$('#el92_' + sp.dlg_id)
+						.parent().find('.sum92')
+						.html('');
+				});
+			}
+		};
+		_post(send, function(res) {
+			var itogC = 0,
+				itogSum = 0;
+			_forIn(res.data, function(sp, dlg_id) {
+				var ob = $('#el92_' + dlg_id);
+				ob.html(sp.count ? sp.count : '').parent().find('.sum92').html(sp.sum ? sp.sum : '');
+				itogC += sp.count;
+				itogSum += sp.sum;
+			});
+			_attr_el(el.id).find('.itog-c').html(itogC);
+			_attr_el(el.id).find('.itog-sum').html(itogSum);
+		});
+	},
+
+	//[95] Быстрое формирование списка
+	_EL95 = function(el, vvv) {
+		if(!vvv.cols.length)
+			return;
+
+		var colName = function() {//вывод названий колонок
+				if(!el.num_2)
+					return '';
+
+				var send =  '<table class="bs5 w100p">' +
+							'<tr><td class="w25">';
+
+				_forN(vvv.cols, function(col) {
+					send += '<td class="fs14 color-555" style="width:' + (col.w-10) + 'px">' + col.name;
+				});
+
+				send += '<td></table>';
+				return send;
+			},
+			html =  colName() +
+					'<dl></dl>' +
+					'<div class="fs15 color-555 pad10 center over5 curP">' + el.txt_1 + '</div>';
+
+		var ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last');
+
+		BUT_ADD.click(vAdd);
+
+		if(vvv.mass.length)
+			_forIn(vvv.mass, vAdd);
+		else
+			vAdd({});
+
+		function vAdd(v) {
+			v.id = _num(v.id);
+			_forN(vvv.cols, function(sp) {
+				if(v[sp.col] === undefined)
+					v[sp.col] = '';
+			});
+			html = 	'<dd class="over1" val="' + v.id + '">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 center">' +
+								'<div class="icon icon-move pl"></div>';
+
+			_forN(vvv.cols, function(sp) {
+				html += '<td style="width:' + (sp.w-10) + 'px">';
+				//если колонка не указана, значение для сохранения данных выбираться не будет
+				var clsInp = sp.col ? 'el95inp ' : '';
+				switch(sp.type) {
+					case 1: html += sp.v; break;
+					case 2: html += '<input type="text" class="' + clsInp + 'w100p" value="' + v[sp.col] + '">'; break;
+					case 3: html += '<input type="hidden" class="' + clsInp + 'el95sel" value="' + _num(v[sp.col]) + '">'; break;
+				}
+			});
+
+			html += 		'<td class="top pl15">' +
+								'<div class="mt5 icon icon-off pl tool" data-tool="Удалить"></div>' +
+						'</table>' +
+					'</dd>';
+			DL.append(html);
+			DL._sort({handle:'.icon-move'});
+
+			var DD = DL.find('dd:last');
+
+			//todo только для мебельщиков
+			DD.find('.el95inp').eq(1).keyup(function() {
+				var count = $(this).val(),
+					cena = DD.find('.el95inp').eq(2).val();
+				count = count.replace(',', '.');
+				DD.find('.el95inp').eq(3).val(_cena(count*cena));
+			});
+			DD.find('.el95inp').eq(2).keyup(function() {
+				var count = DD.find('.el95inp').eq(1).val(),
+					cena = $(this).val();
+				cena = cena.replace(',', '.');
+				DD.find('.el95inp').eq(3).val(_cena(count*cena));
+			});
+
+			_forN(vvv.cols, function(col) {
+				if(col.type != 3)
+					return;
+
+				var spisok = col.spisok;
+
+				DD.find('.el95sel')._select({
+					width:0,
+					title0:'не выбрано',
+					write:1,
+					spisok:spisok,
+					funcWrite:function(v, t) {
+						var send = {
+							op:'el95_spisok',
+							elem_id:col.v,
+							v:v,
+							busy_obj:t.icon_del,
+							busy_cls:'spin'
+						};
+						_post(send, function(res) {
+							spisok = res.spisok;
+							t.spisok(spisok);
+						});
+					},
+					func:function(id) {//todo пока только для мебельщиков
+						var o = {};
+						_forIn(spisok, function(sp) {
+							if(sp.id == id) {
+								o = sp;
+								return false;
+							}
+						});
+
+						DD.find('.el95inp').eq(1).val(1);
+						DD.find('.el95inp').eq(2).val(o.sum_12);
+						DD.find('.el95inp').eq(3).val(o.sum_12);
+					}
+				});
+			});
+
+			DD.find('.icon-off').click(function() {
+				DD.remove();
+			});
+
+		}
+	},
+	_EL95_GET = function(el) {//получение данных для сохранения
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(dd) {
+
+			var inp = [];
+			inp.push(dd.attr('val'));
+			_forEq(dd.find('.el95inp'), function(sp) {
+				inp.push(sp.val());
+			});
+
+			send.push(inp);
+		});
+
+		return send;
+	},
+	PHP12_elem95_setup = function(el, vvv, obj) {
+		if(!obj.unit.id)
+			return;
+
 		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
-			ATTR_EL = _attr_el(el.id),
-			DL = ATTR_EL.append(html).find('dl'),
-			BUT_ADD = ATTR_EL.find('div:last'),
+				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить колонку</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			CALC_DIV = ATR_EL.find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
+			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
+			BUT_ADD = ATR_EL.find('div:last'),
 			NUM = 1;
 
-		BUT_ADD.click(valueAdd);
+		BUT_ADD.click(function() {
+			vAdd();
+		});
+
+		//показ-скрытие настройки имён колонок
+		_attr_cmp(15415)._check({
+			func:function(v) {
+				obj.unit.num_2 = v;
+				DL.find('.el95colname')['slide' + (v ? 'Down' : 'Up')]();
+			}
+		});
+
+		if(!vvv)
+			vAdd();
+		else
+			_forIn(vvv, vAdd);
+
+		tdCalc();
+
+		function vAdd(v) {
+			v = $.extend({
+				w:170,  //ширина
+				name:'',//заголовок
+				type:0, //тип значения: 1 - текст, 2 - поле, 3 - выпадающий список
+				col:'', //имя колонки в базе
+				v:'',   //дополнительное значение
+				title:''//имя значения
+			}, v);
+
+			DL.append(
+				'<dd class="ov7 pt10 pb5 line-b1">' +
+					'<div class="el95w bg4" style="width:' + v.w + 'px;min-height:10px;margin-left:35px">' +
+						'<div class="el95colname' + _dn(obj.unit.num_2) + '">' +
+							'<input type="text"' +
+								  ' class="colname w100p bg4 center fs14 blue"' +
+								  ' placeholder="имя колонки"' +
+								  ' value="' + v.name + '"' +
+							' />' +
+						'</div>' +
+					'</div>' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 r topi">' +
+								'<b class="bnum fs15 color-555">' + NUM++ + '</b>:' +
+							'<td class="w175">' +
+								'<input type="hidden" class="el95type" value="' + v.type + '">' +
+							'<td class="w50 el95tdcol">' +
+							'<td class="w250 el95cnt">' +
+							'<td class="r">' +
+								'<div class="icon icon-move pl"></div>' +
+							'<td class="w25 pr5 r">' +
+								'<div class="icon icon-off el95del pl tool" data-tool="Удалить"></div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			DL.sortable({
+				handle:'.icon-move',
+				update:tdCalc
+			});
+
+			var DD = DL.find('dd:last'),
+				CNT = DD.find('.el95cnt'),
+				colChange = function() {
+					//выбор имени колонки из базы для колонки
+					if(v.type > 1) {
+						html = '<div class="el95col' + _dn(v.col, 'on') + '" val="' + v.col + '">' + (v.col ? v.col : '-') + '</div>';
+						DD.find('.el95tdcol').html(html);
+						DD.find('.el95col').click(function() {
+							var t = $(this);
+							_dialogLoad({
+								dialog_id:30,
+								dss:obj.unit.num_1,
+								busy_obj:t,
+								func_open:function(res, D) {
+									D.content.find('.el37u').click(function() {
+										var col = $(this).find('.el37col').html();
+										t.html(col).addClass('on').attr('val', col);
+										v.col = col;
+										D.close();
+									});
+								}
+							});
+						});
+					}
+
+					switch(v.type) {
+						case 1:
+							CNT.html('<input type="text" class="el95v w250" placeholder="напишите текст" value="' + v.v + '">')
+								.find('input').focus();
+							break;
+						case 2:
+							CNT.html('');
+							break;
+						case 3:
+							CNT.html('<input type="hidden" class="el95v" value="' + v.v + '">')
+								.find('input')
+								._selem({
+									width:250,
+									placeholder:'выберите содержание списка',
+									dss:obj.unit.num_1,
+									title:v.title
+								});
+							break;
+					}
+				};
+
+			DD.find('.el95type')._select({
+				width:170,
+				title0:'выберите тип колонки',
+				spisok:[
+					{id:1,title:'Текст',content:'Текст<div class="fs12 pale">Указать текст, который будет отображаться в колонке</div>'},
+					{id:2,title:'Текстовое поле',content:'Текстовое поле<div class="fs12 pale">Возможность внесения данных вручную</div>'},
+					{id:3,title:'Выпадающий список',content:'Выпадающий список<div class="fs12 pale">Выбор значений из выпадающего списка</div>'}
+				],
+				func:function(id) {
+					v.type = id;
+					colChange();
+				}
+			});
+
+			colChange();
+			resize95(DD.find('.el95w'));
+			if(!v.type)
+				tdCalc();
+
+			DD.find('.el95del').click(function() {
+				DD.remove();
+				tdCalc();
+			});
+		}
+
+		//включение изменения ширины
+		function resize95(div) {
+			if(div.hasClass('ui-resizable'))
+				return;
+
+			div.resizable({
+				minWidth:20,
+				maxWidth:530,
+				grid:10,
+				handles:'e',
+				stop:tdCalc
+			});
+		}
+
+		//пересчёт визуального отображения ячеек по диагонали
+		function tdCalc() {
+			var html = '',
+				DIV_W = 600,
+				i = DIV_W / CALC_W,
+				FULL_W = 0,
+				TDS = [],//массив ширин по каждой ячейке
+				ALL_W = 0;//сумма ширины всех ячеек, кроме последней
+
+			_forEq(DL.find('DD'), function(sp) {
+				var n = _num(sp.find('.bnum').html()),
+					w = sp.find('.el95w').width();
+				TDS.push({
+					n:n,
+					w:Math.round(w*i)-1
+				});
+				FULL_W += w;
+			});
+
+			_forN(TDS, function(o, n) {
+				var bg = 'ffc',
+					line = ' line-r';
+				if(FULL_W > CALC_W) {
+					bg = 'fcc';
+					i = CALC_W / FULL_W;
+					o.w = Math.round(o.w*i);
+				}
+				if(FULL_W >= CALC_W) {
+					ALL_W += (o.w+1);
+					if(n == (TDS.length-1)) {
+						line = '';
+						o.w = DIV_W - ALL_W + o.w + 1;
+					}
+				}
+
+				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
+							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
+						'</div>';
+			});
+			CALC_DIV.html(html);
+		}
+	},
+	PHP12_elem95_setup_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var type = _num(sp.find('.el95type').val()),
+				v = sp.find('.el95v').val();
+
+			if(!type)
+				return;
+
+			send.push({
+				w:sp.find('.el95w').width(),
+				name:sp.find('.colname').val(),
+				col:sp.find('.el95col').attr('val'),
+				type:type,
+				v:v
+			});
+		});
+		return send;
+	},
+
+	//[102] Фильтр - Выбор нескольких групп значений
+	_EL102 = function(el) {
+		_attr_el(el.id)._filter102();
+	},
+
+	//[103] настройка доступа к страницам для пользователя
+	_EL103 = function(el) {
+		if(!_attr_el(el.id).find('._check').length)
+			return;
+		var idsSet = function() {//вставка идентификаторов страниц для отправки данных
+			var ids = [];
+			_forEq(_attr_el(el.id).find('._check'), function(sp) {
+				var ch = sp.prev(),
+					id = _num(ch.attr('id').split('_')[1]),
+					v = _num(ch.val());
+				if(v)
+					ids.push(id);
+			});
+
+			$(ATTR_CMP(el.id)).val(ids.join());
+		};
+		_forEq(_attr_el(el.id).find('._check'), function(sp) {
+			var prev = sp.prev();
+			prev._check({
+				func:function(v) {
+					prev.parents('table').next()[v ? 'slideDown' : 'slideUp'](200);
+					idsSet();
+				}
+			});
+		});
+		idsSet();
+	},
+
+	//[300] Привязка пользователя к странице ВК
+	_EL300 = function(el) {
+		var VK300 = $(ATTR_CMP(el.id)).next(),
+			INP = VK300.find('input'),
+			VK_ICON = VK300.find('.icon-vk'),
+			VK_RES = INP.next(),
+			VK_SEL,                 //выбранный пользователь в виде html
+			VK_ID = $(ATTR_CMP(el.id)).val();  //id выбранного пользователя ВК
+		INP.keyup(function() {
+			var t = $(this),
+				val = $.trim(t.val());
+
+			if(!val) {
+				VK_RES.html('');
+				return;
+			}
+
+			var send = {
+				op:'vk_user_get',
+				val:val,
+				busy_obj:VK_ICON,
+				busy_cls:'spin',
+				func_err:function(res) {
+					VK_RES.html('<div class="mt10 red">' + res.text + '</div>');
+				}
+			};
+			_post(send, function(res) {
+				VK_RES.html(res.html);
+				VK_SEL = res.sel;
+				VK_ID = res.user_id
+			});
+		});
+
+		$(document)
+		//выбор пользователя
+			.off('click', ATTR_EL(el.id) + ' button')
+			.on('click', ATTR_EL(el.id) + ' button', function() {
+				VK_RES.html(VK_SEL);
+				INP._dn();
+				VK_ICON._dn();
+				$(ATTR_CMP(el.id)).val(VK_ID);
+			})
+			//отмена выбранного пользователя
+			.off('click', ATTR_EL(el.id) + ' .icon-del-red')
+			.on('click', ATTR_EL(el.id) + ' .icon-del-red', function() {
+				VK_RES.html('');
+				VK_ICON._dn(1);
+				$(ATTR_CMP(el.id)).val(0);
+				INP.val('')._dn(1).focus();
+			});
+	},
+
+	//график Столбики
+	_EL400 = function(el) {
+		var CHART = {},
+			Y = (new Date).getFullYear(),//номер выбранного года
+			HCY = $('#hcYear' + el.id),
+			HCM = $('#hcMon' + el.id),
+			chartPrint = function(hc) {
+				if(CHART.chartHeight)
+					CHART.destroy();
+				CHART = Highcharts.chart('chart_' + el.id, {
+						chart:{
+							type:'column'
+						},
+						title:{
+							text:window['HEAD_' + el.id]
+						},
+						xAxis:{
+							categories:hc.cat,
+							labels:{
+								style:{
+									color:'#333'
+								}
+							}
+						},
+						yAxis:{
+							title:{
+								text:'Количество'
+							},
+							stackLabels:{
+								enabled:true,
+								style:{
+									fontWeight:'bold',
+									color:'black'
+								}
+							}
+						},
+						plotOptions:{
+					        series:{
+						        cursor:_num(HCM.val()) ? 'default' :'pointer'
+					        },
+							column:{
+								stacking:'normal',
+								dataLabels:{
+									enabled:false
+								},
+					            events:{
+						            click:function(e) {
+						            	//если по дням, действия нет
+						            	if(_num(HCM.val()))
+						            		return;
+
+							            var i = e.point.index;
+
+						            	//нажатие на месяц
+							            if(_num(HCY.val())) {
+							            	HCM._dropdown(i+1);
+							            } else {//нажатие на год
+								            HCY._dropdown(e.point.series.xAxis.categories[i]);
+								            $('#hcMonDiv' + el.id)._dn(true);
+							            }
+										chartUpd();
+						            }
+					            }
+				            }
+						},
+						series:[{
+							name:'Все записи',
+							data:hc.data
+						}]
+					});
+			},
+			chartUpd = function() {
+				var send = {
+					op:'el400_chart',
+					elem_id:el.id,
+					year:HCY.val(),
+					mon:HCM.val(),
+					busy_obj:$('#busy' + el.id)
+				};
+				_post(send, function(res) {
+					window['HEAD_' + el.id] = res.head;
+					chartPrint(res);
+				});
+			};
+		HCY._dropdown({
+			title0:'Всё время',
+			spisok:window['YEAR_SPISOK_' + el.id],
+			func:function(y) {
+				Y = y;
+				$('#hcMonDiv' + el.id)._dn(y);
+				HCM._dropdown(0);
+				chartUpd();
+			}
+		});
+		HCM._dropdown({
+			title0:'месяц',
+			spisok:[
+				{id:1,title:'январь'},
+				{id:2,title:'февраль'},
+				{id:3,title:'март'},
+				{id:4,title:'апрель'},
+				{id:5,title:'май'},
+				{id:6,title:'июнь'},
+				{id:7,title:'июль'},
+				{id:8,title:'август'},
+				{id:9,title:'сентябрь'},
+				{id:10,title:'октябрь'},
+				{id:11,title:'ноябрь'},
+				{id:12,title:'декабрь'}
+			],
+			func:chartUpd
+		});
+		$('#chart_' + el.id)
+			.html('')
+			.width(window['WIDTH_' + el.id])
+			.height(window['HEIGHT_' + el.id]);
+
+		chartPrint({
+			cat:window['CAT_' + el.id],
+			data:window['DATA_' + el.id]
+		});
+	},
+
+	//[401] График по месяцам
+	_EL401 = function(el) {
+		$('#chart_' + el.id)
+			.height(300)
+			.width(window['WIDTH_' + el.id])
+			.highcharts({
+				chart:{
+					type:'line'
+				},
+				title:{
+					text:el.txt_1
+				},
+				xAxis:{
+					categories:window['CAT_' + el.id],
+					labels:{
+						style:{
+							color:'#333'
+						}
+					}
+				},
+				yAxis:{
+					title:{
+						text:'Сумма'
+					},
+					stackLabels:{
+						enabled:true,
+						style:{
+							fontWeight:'bold',
+							color:'black'
+						}
+					}
+				},
+				plotOptions:{
+					column:{
+						stacking:'normal',
+						dataLabels:{
+							enabled:false
+						}
+					}
+				},
+				series:window['SERIES_' + el.id]
+			});
+	},
+
+	_tdCss = function() {//настройка стилей в выплывающем окошке для ячейки таблицы
+		var t = $(this),
+			v = {
+				id:t.attr('id').split('_')[1],//если используется элемент не из базы, можно ставить id="el_sp14"
+				use:t.attr('data-use') || 'font color eye link place',//использование вариантов настроек
+				font:'',
+				color:'',
+				pos:''
+			};
+
+		if(!v.id)
+			return;
+
+		_forIn(t.attr('class').split(' '), function(sp) {
+			if(sp == 'b' || sp == 'i' || sp == 'u')
+				v.font += ' ' + sp;
+			if(sp == 'center' || sp == 'r')
+				v.pos = sp;
+			if(ELEM_COLOR[sp])
+				v.color = sp;
+		});
+
+		//преобразование вариантов настроек в ассоциативный массив
+		var use = {};
+		_forIn(v.use.split(' '), function(sp) {
+			use[sp] = 1;
+		});
+
+		var msg = '<table class="bs5"><tr>';
+		if(use.font)
+			msg += '<td class="pt3">' + _elemUnitFont(v);
+		if(use.color)
+			msg += '<td class="pt3">' + _elemUnitColor(v);
+		if(use.eye)
+			msg += '<td class="pt3 pl10">' +
+					  '<div class="icon icon-eye pl tool" data-tool="Условия отображения"></div>';
+		if(use.link)
+			msg += '<td class="pl3">' +
+					  '<div class="icon icon-usd pl tool" data-tool="Настроить действия"></div>';
+		if(use.place)
+			msg += '<td class="pt3 pl10" id="elem-pos">' + _elemUnitPlaceMiddle(v, true);
+
+		msg += '</table>';
+
+		t._hint({
+			msg:msg,
+			side:'right',
+			show:1,
+			delayShow:700,
+			delayHide:300,
+			func:function(o) {
+				o.find('.icon-usd').click(function() {
+					_dialogLoad({
+						dialog_id:200,
+						element_id:v.id,
+						busy_obj:$(this),
+						busy_cls:'spin'
+					});
+				});
+				o.find('.icon-eye').click(function() {
+					_dialogLoad({
+						dialog_id:240,
+						element_id:v.id,
+						busy_obj:$(this),
+						busy_cls:'spin'
+					});
+				});
+			}
+		});
+	},
+	_tdCssFontGet= function(sp) {//получение стилей для сохранения (выделение: b, i, u)
+		var arr = ['b', 'i', 'u'],
+			font = [];
+		for(var k in arr)
+			if(sp.hasClass(arr[k]))
+				font.push(arr[k]);
+		return font.join(' ');
+	},
+	_tdCssColorGet= function(sp) {//получение стилей для сохранения (цвет текста)
+		for(var k in ELEM_COLOR)
+			if(sp.hasClass(k))
+				return k;
+		return '';
+	},
+
+	//Перетаскивание независимой кнопки
+	_elem97move = function(elem_id) {
+		var startSet = false,
+			startX = 0,
+			startY = 0;
+		$('#but97_' + elem_id).draggable({
+			grid:[5,5],
+			start:function(event, ui) {
+				if(startSet)
+					return;
+				startX = ui.position.left;
+				startY = ui.position.top;
+				startSet = true;
+			},
+			stop:function(event, ui) {
+				var COORD = $(this).attr('data-coord').split(':'),
+					x = COORD[0] * 1,
+					y = COORD[1] * 1,
+					send = {
+						op:'el97_move_save',
+						elem_id:elem_id,
+						x:ui.position.left + x - startX,
+						y:ui.position.top + y - startY
+					};
+				_post(send);
+			}
+		});
+	},
+
+	/* ---=== ВЫБОР ЭЛЕМЕНТА [50] ===--- */
+	PHP12_elem_choose = function(el, vvv, obj) {
+		var D = obj.dlg.D;
+		D('.el-group-head').click(function() {//переключение меню
+			var t = $(this),
+				id = t.attr('val');
+			D('.el-group-head').removeClass('sel');
+			t.addClass('sel');
+
+			D('#elem-group .cnt')._dn(0);
+			D('#cnt_' + id)._dn(1);
+		});
+		D('.elem-unit').click(function(e) {//открытие диалога
+			if($(e.target).hasClass('dialog-setup'))
+				return;
+			var t = $(this);
+			_dialogLoad({
+				dialog_id:t.attr('val'),
+				block_id:obj.send.block_id,
+				dss:obj.send.dss,
+				busy_obj:t,
+				busy_cls:'_busy',
+				func_save:function(res) {
+					obj.dlg.close();
+					if(obj.send.func_save)
+						return obj.send.func_save(res);
+					return true;
+				}
+			});
+		});
+
+		if(!SA)
+			return;
+
+		_forEq(D('#elem-group .cnt'), function(sp) {
+			sp._sort({elem_id:el.id});
+		});
+	},
+
+	/* ----==== СПИСОК СТРАНИЦ (page12) ====---- */
+	PHP12_page_list = function(el) {
+		_attr_el(el.id).find('ol.page-sort').nestedSortable({
+			forcePlaceholderSize:true,//сохранять размер места, откуда был взят элемент
+			placeholder:'page-sort-hold', //класс, применяемый для подсветки места, откуда взялся элемент
+			listType:'ol',
+			items:'li',
+			handle:'.icon-move',
+			isTree:1,
+			maxLevels:6,
+			tabSize:20, //расстояние, на которое надо сместить элемент, чтобы он перешёл на другой уровень
+			revert:200, //плавное возвращение (полёт) элемента на своё место. Цифра - скорость в миллисекундах.
+
+			start:function(e, t) {//установка ширины placeholder
+				if($(t.placeholder).prev().hasClass('mb30'))
+					$(t.placeholder).addClass('mb30');
+				if($(t.placeholder).prev().hasClass('mb1'))
+					$(t.placeholder).addClass('mb1');
+			},
+			update:function(e, t) {
+				var send = {
+					op:'page_sort',
+					arr:$(this).nestedSortable('toArray'),
+					busy_obj:_attr_el(el.id),
+					busy_cls:'spisok-busy'
+				};
+				_post(send, function() {
+					var item = $(t.item),
+						p = item.parent(),
+						prn = p.hasClass('page-sort');
+
+					item.removeClass(prn ? 'mb1' : 'mb30');
+					item.addClass(!prn ? 'mb1' : 'mb30');
+					item.find('.pg-name:first')[(prn ? 'add' : 'remove') + 'Class']('b fs14');
+				});
+			},
+
+			errorClass:'bg-fcc'  //ошибка, если попытка переместить элемент на недоступный уровень
+		});
+	},
+
+	/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МОЖНО ВЫБИРАТЬ В НАСТРОЙКЕ ДИАЛОГА [13] ===--- */
+	PHP12_elem_rule7_get = function(el) {
+		var ids = [];
+		_forEq(_attr_el(el.id).find('input'), function(sp) {
+			var id = _num(sp.attr('id').split('rule7-el')[1]),
+				v = _num(sp.val());
+			if(!id)
+				return;
+			if(!v)
+				return;
+			ids.push(id);
+		});
+		_attr_cmp(el.id).val(ids.join());
+	},
+
+	/* ---=== ВЫБОР ЦВЕТА КНОПКИ [2] ===--- */
+	PHP12_button_color = function(el) {
+		var DIV = _attr_el(el.id).find('div');
+		DIV.click(function() {
+			var t = $(this),
+				id = _num(t.attr('val'));
+
+			DIV.removeClass('sel');
+			t.addClass('sel');
+
+			_attr_cmp(el.id).val(id);
+		});
+	},
+
+	/* ---=== ВЫБОР ВНЕШНЕГО ВИДА МЕНЮ СТРАНИЦ [3] ===--- */
+	PHP12_page_menu_type = function(el) {
+		var DIV = _attr_el(el.id).find('div');
+		DIV.click(function() {
+			var t = $(this),
+				id = _num(t.attr('val'));
+
+			DIV.removeClass('sel');
+			t.addClass('sel');
+
+			_attr_cmp(el.id).val(id);
+		});
+	},
+
+	/* ---=== НАСТРОЙКА ВОЗДЕЙСТВИЯ НА ЗАПИСЬ ПОСЛЕ ВНЕСЕНИЯ ДАННЫХ [42] ===--- */
+	PHP12_insert_unit_change = function(el, vvv, obj) {
+		var ATR_EL = _attr_el(el.id),
+			html = '<dl></dl>',
+			DL = ATR_EL.append(html).find('dl');
+
+		_forN(vvv, function(sp) {
+			DL.append(
+				'<dd class="mt5">' +
+					'<table>' +
+						'<tr><td><input type="text"' +
+									  ' class="inp-dst w200 color-ref curD"' +
+									  ' readonly' +
+									  ' val="' + sp.dst_id + '"' +
+									  ' value="' + sp.dst_title + '"' +
+								' />' +
+							'<td class="w25 center fs17 grey"> &laquo; ' +
+							'<td><input type="text"' +
+									  ' class="inp-src w200 color-pay curP over1"' +
+									  ' readonly' +
+									  ' val="' + sp.src_id + '"' +
+									  ' value="' + sp.src_title + '"' +
+									  ' placeholder="не изменять"' +
+								' />' +
+							'<td><div class="icon icon-del pl' + _dn(sp.src_id) + ' tool" data-tool="Отменить выбор"></div>' +
+					'</table>' +
+				'</dd>'
+			);
+			var DD = DL.find('dd:last'),
+				SRC = DD.find('.inp-src'),
+				DEL = DD.find('.icon-del');
+			SRC.click(function() {
+				_dialogLoad({
+					dialog_id:11,
+					dss:obj.unit.id,
+					dop:{
+						mysave:1,
+						sel:_num($(this).attr('val')),
+						nest:0
+					},
+					busy_obj:$(this),
+					busy_cls:'hold',
+					func_save:function(res) {
+						SRC.attr('val', res.v);
+						SRC.val(res.title);
+						DEL._dn(1);
+					}
+				});
+			});
+			DEL.click(function() {
+				SRC.attr('val', 0);
+				SRC.val('');
+				DEL._dn();
+			});
+		});
+	},
+	PHP12_insert_unit_change_get = function(el) {//получение данных для сохранения
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var src_id = _num(sp.find('.inp-src').attr('val'));
+			if(!src_id)
+				return;
+			send.push(
+				_num(sp.find('.inp-dst').attr('val')) +
+				':' +
+				src_id
+			);
+		});
+		_attr_cmp(el.id).val(send.join());
+	},
+
+	/* [34] СУММЫ СПИСКОВ ПО МЕСЯЦАМ - НАСТРОЙКА */
+	PHP12_elem34 = function(el, vvv, obj) {
+		var html = '<dl></dl>' +
+				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить список</div>',
+			ATTR_EL = _attr_el(el.id),
+			DL = ATTR_EL.append(html).find('dl');
+
+		ATTR_EL.find('div:last').click(valueAdd);
 
 		if(!obj.unit.id) {
 			valueAdd();
-			valueAdd();
 		} else
-			_forIn(vvv, valueAdd);
+			_forIn(vvv.val, valueAdd);
 
 		function valueAdd(v) {
 			v = $.extend({
-				id:0,
-				title:'имя значения ' + NUM,
-				content:'',
-				def:0,
-				use:0
+				title:'',    //заголовок
+				dialog_id:'',//id списка
+				sum_id:0,    //id элемента-суммы
+				sum_title:'',//имя элемента-суммы
+				cond:'',     //условия
+				c:''         //количество условий
 			}, v);
 
 			DL.append(
-				'<dd class="over1" val="' + v.id + '">' +
+				'<dd class="over5">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w90 grey r topi">Значение ' + NUM + ':' +
-							'<td><input type="text" class="title w100p b" value="' + v.title + '" />' +
-								'<textarea class="w100p min mtm1' + _dn(el.num_1) + '" placeholder="описание значения">' + v.content + '</textarea>' +
-							'<td class="w15 topi">' +
-								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
-							'<td class="w50 r top pt5">' +
-					   (v.use ? '<div class="dib fs11 color-ccc mr3 curD' + _tooltip('Использование', -53) + v.use + '</div>'
-								:
-								'<div class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>'
-					   ) +
-					'</table>' +
-				'</dd>'
-			);
-
-			DL.sortable({axis:'y',handle:'.icon-move-y'});
-			var DD = DL.find('dd:last');
-			DD.find('textarea')._autosize();
-			DD.find('.def')._check({
-				tooltip:'По умолчанию',
-				func:function(v, ch) {
-					if(!v)
-						return;
-					//снятие галочек с остальных значений
-					_forEq(DL.find('.def'), function(sp) {
-						if(sp.attr('id') == ch.attr('id'))
-							return;
-						sp._check(0);
-					});
-				}
-			});
-			DD.find('.icon-del').click(function() {
-				$(this).closest('DD').remove();
-			});
-			//выделение текста новодобавленного значения
-			if(!v.id)
-				DD.find('.title').select();
-			NUM++;
-		}
-	},
-	PHP12_radio_setup_get = function(el) {
-		var send = [];
-		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			send.push({
-				id:_num(sp.attr('val')),
-				title:sp.find('.title').val(),
-				content:sp.find('textarea').val(),
-				def:_num(sp.find('.def').val())
-			});
-		});
-		return send;
-	},
-
-	/* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ФИЛЬТРА RADIO для [74] ===--- */
-	PHP12_filter_radio_setup = function(el, vvv, obj) {
-		if(!obj.unit.id)
-			return;
-
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
-			ATR_EL = _attr_el(el.id),
-			DL = ATR_EL.append(html).find('dl'),
-			BUT_ADD = ATR_EL.find('div:last'),
-			ATR_SP = _attr_cmp(2585),
-			NUM = 1,
-			_CS = function(count) {//отобажение иконки настройки условий
-				if(count)
-					return '<span class="cond-setup ml20 curP' + _tooltip('Настроить', -10) + count  + ' услови' + _end(count, ['е', 'я', 'й']) + '</span>';
-
-				return '<div class="icon icon-add cond-setup pl ml15' + _tooltip('Добавить условия', -57) + '</div>';
-			};
-
-		BUT_ADD.click(valueAdd);
-
-		if(!vvv.length)
-			valueAdd();
-		else
-			_forIn(vvv, valueAdd);
-
-		function valueAdd(v) {
-			v = $.extend({
-				id:0,     //id элемента из диалога, по которому будет выполняться условие фильтра
-				txt_1:'Значение ' + NUM++,
-				def:0,
-				c:0,       //количество условий в пункте
-				txt_2:'',   //сами условия
-				num_1:1     //отображть количество для пункта фильтра
-			}, v);
-
-			DL.append(
-				'<dd class="over3" val="' + v.id + '">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center top pt5">' +
-								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td><input type="text"' +
-									  ' class="title w200 mr10"' +
-									  ' placeholder="имя значения"' +
-									  ' value="' + v.txt_1 + '"' +
-								' />' +
-								'<input type="hidden" class="def" value="' + v.def + '" />' +
-								'<span class="span-cs grey">' + _CS(v.c) + '</span>' +
-								'<input type="hidden" class="txt_2" value="' + v.txt_2 + '" />' +
-							'<td class="w100">' +
-								'<div class="icon icon-eye' + _dn(!v.num_1, 'over3-show pl') + _tooltip('Отображать<br>количество', -38, '', 1) + '</div>' +
-							'<td class="w35 r">' +
-								'<div class="icon icon-del-red pl' + _tooltip('Удалить значение', -54) + '</div>' +
+							'<td><input type="text" class="title w100p" placeholder="Заголовок не указан" value="' + v.title + '">' +
+							'<td><input type="hidden" class="dlg34" value="' + v.dialog_id + '" />' +
+							'<td><input type="hidden" class="sum34" value="' + v.sum_id + '" />' +
+								'<div class="_selem dib prel bg-fff over3">' +
+									'<div class="icon icon-star pabs"></div>' +
+									'<div class="icon icon-del pl pabs' + _dn(v.sum_id) + '"></div>' +
+									'<input type="text" readonly class="w175 curP color-pay" placeholder="сумма не выбрана" value="' + v.sum_title + '" />' +
+								'</div>' +
+							'<td><input type="hidden" class="cond" />' +
+								'<div class="_spfl dib w125 prel">' +
+									'<div class="icon icon-filter pabs"></div>' +
+									'<div class="icon icon-del pl pabs' + _dn(v.cond) + '"></div>' +
+									'<input type="text" readonly class="filter color-del b pl25 curP w100p over3" placeholder="условий нет" value="' + v.c + '" />' +
+								'</div>' +
+							'<td class="w25 r top pt5">' +
+								'<div class="icon icon-del pl tool" data-tool="Удалить список"></div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -5511,423 +6063,85 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			var DD = DL.find('dd:last');
 
-			//установка галочки по умолчанию
-			DD.find('.def')._check({
-				tooltip:'По умолчанию',
-				func:function(v, ch) {
-					if(!v)
-						return;
-					//снятие галочек с остальных значений
-					_forEq(DL.find('.def'), function(sp) {
-						if(sp.attr('id') == ch.attr('id'))
-							return;
-						sp._check(0);
-					});
-				}
+			DD.find('.dlg34')._select({
+				width:260,
+				title0:'список не выбран',
+				spisok:vvv.sp
 			});
 
-			//добавление условия к значению
-			DD.find('.span-cs').click(function() {
-				_dialogLoad({
-					dialog_id:41,
-					dss:ATR_SP.val(),
-					element_id:2585,
-					dop:v.txt_2,
-					busy_obj:$(this).find('.cond-setup'),
-					busy_cls:v.c ? '_busy' : 'spin',
-					func_save:function(res) {
-						v.txt_2 = res.v;
-						DD.find('.txt_2').val(res.v);
-						v.c = res.c;
-						DD.find('.span-cs').html(_CS(res.c));
-					}
-				});
-			});
+			DD.find('.cond').val(v.cond);
 
-			//включение/выключение отображения количества для каждого пункта фильтра
-			DD.find('.icon-eye').click(function() {
+			//выбор значения суммы
+			DD.find('._selem').click(function() {
 				var t = $(this),
-					show = !t.hasClass('over3-show');
-				t._dn(!show, 'over3-show pl');
-			});
+					cmp = t.prev(),
+					inp = t.find('input'),
+					del = t.find('.icon-del'),
+					dss = _num(DD.find('.dlg34').val());
 
-			//удаление значения radio вместе с условиями
-			DD.find('.icon-del-red').click(function() {
-				$(this).closest('DD').remove();
-			});
-		}
-	},
-	PHP12_filter_radio_setup_get = function(el) {//получение данных для сохранения
-		var send = [];
-		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			send.push({
-				id:_num(sp.attr('val')),
-				txt_1:sp.find('.title').val(),
-				txt_2:sp.find('.txt_2').val(),
-				def:sp.find('.def').val(),
-				num_1:sp.find('.icon-eye').hasClass('pl') ? 0 : 1
-			});
-		});
-		return send;
-	},
+				if(!dss)
+					return false;
 
-	/* ---=== НАСТРОЙКА КОНКРЕТНЫХ ЗНАЧЕНИЙ ЭЛЕМЕНТА COUNT [35] ===--- */
-	PHP12_count_value = function(el, vvv, obj) {
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
-			ATTR_EL = _attr_el(el.id),
-			DL = ATTR_EL.append(html).find('dl'),
-			BUT_ADD = ATTR_EL.find('div:last'),
-			NUM = 1;
-
-		BUT_ADD.click(valueAdd);
-
-		if(obj.unit.id)
-			_forIn(vvv, valueAdd);
-
-		function valueAdd(v) {
-			v = $.extend({
-				id:NUM++,
-				title:'',
-				def:0
-			}, v);
-
-			DL.append(
-				'<dd class="over1">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center top pt5">' +
-								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w35 center">' +
-								'<input type="hidden" class="def" value="' + v.def + '" />' +
-							'<td class="w50">' +
-								'<input type="text" class="vid w50 r" value="' + v.id + '" />' +
-							'<td><input type="text" class="title w100p" placeholder="имя значения не обязательно" value="' + v.title + '" />' +
-							'<td class="w50 r top pt5">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить значение', -55) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			DL.sortable({handle:'.icon-move-y'});
-			var DD = DL.find('dd:last');
-			DD.find('.def')._check({
-				tooltip:'Начальное значение',
-				func:function(v, ch) {
-					if(!v)
-						return;
-					//снятие галочек с остальных значений
-					_forEq(DL.find('.def'), function(sp) {
-						if(sp.attr('id') == ch.attr('id'))
-							return;
-						sp._check(0);
-					});
-				}
-			});
-			DD.find('.icon-del').click(function() {
-				$(this).closest('DD').remove();
-			});
-			DD.find('.vid').select();
-		}
-	},
-	PHP12_count_value_get = function(el) {
-		var send = [];
-		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			send.push({
-				id:_num(sp.find('.vid').val(), 1),
-				title:sp.find('.title').val(),
-				def:_num(sp.find('.def').val())
-			});
-		});
-		return send;
-	},
-
-	/* ---=== НАСТРОЙКА СБОРНОГО ТЕКСТА [44] ===--- */
-	PHP12_elem44_setup = function(el, vvv, obj) {
-		if(!obj.unit.id)
-			return;
-
-		var ATR_EL = _attr_el(el.id),
-			html = '<dl></dl>' +
-				   '<table class="w100p"><tr>' +
-				        '<td><div class="fs15 color-555 pad10 center over1 curP add34-txt">Добавить текст</div>' +
-				        '<td><div class="fs15 color-555 pad10 center over1 curP add34-el">Добавить элемент</div>' +
-				   '</table>',
-			DL = ATR_EL.append(html).find('dl'),
-			NUM = 1;
-
-		ATR_EL.find('.add34-txt').click(addTxt);
-		ATR_EL.find('.add34-el').click(addEl);
-
-		//вывод двух первых элементов, если начало настройки
-		if(!vvv.length) {
-			addTxt();
-			addEl();
-		} else
-			_forN(vvv, function(v) {
-				switch(v.type) {
-					case 'txt': addTxt(v); break;
-					case 'el': addEl(v); break;
-				}
-			});
-
-		//добавление текстового поля
-		function addTxt(v) {
-			v = $.extend({
-				txt:'',      //содержание текста
-				font:'',
-				color:''
-			}, v || {});
-
-			DL.append(
-				'<dd class="over3" data-type="txt">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center">' +
-								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td><textarea class="w100p h25 ' + v.font + ' ' + v.color + '"' +
-										 ' style="background-color:#fff"' +
-										 ' id="' + ATTR_EL('area' + NUM++, true) + '"' +
-										 ' data-use="font color">' + v.txt +
-								'</textarea>' +
-							'<td class="w50 r">' +
-								'<div class="icon icon-del-red pl' + _tooltip('Удалить', -25) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			var DD = DL.find('dd:last'),
-				AREA = DD.find('textarea');
-
-			//отображение выплывающего окна настройки стилей
-			AREA.mouseenter(_tdCss);
-
-			DL.sortable({handle:'.icon-move-y'});
-
-			DD.find('.icon-del-red').click(function() {
-				$(this).closest('DD').remove();
-			});
-			DD.find('textarea')._autosize().focus();
-		}
-
-		//добавление поля для выбора элемента
-		function addEl(v) {
-			v = $.extend({
-				id:0,         //id элемента
-				dialog_id:50, //id диалога, через который был вставлен этот элемент
-				title:'',     //имя элемента
-				font:'',
-				color:''
-			}, v || {});
-
-			DL.append(
-				'<dd class="over3" data-type="el" val="' + v.id + '">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w25 center">' +
-								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td class="prel">' +
-								'<input type="text"' +
-									  ' id="' + ATTR_EL(v.id, true) + '"' +
-									  ' class="inp w100p curP bg-gr2 ' + v.font + ' ' + v.color + '"' +
-									  ' readonly' +
-									  ' placeholder="элемент не выбран"' +
-									  ' value="' + v.title + '"' +
-									  ' data-use="font color link eye hint"' +
-								' />' +
-								'<div class="icon icon-star pabs top6 r5"></div>' +
-							'<td class="w50 r">' +
-								'<div class="icon icon-del-red pl' + _tooltip('Удалить', -25) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			var DD = DL.find('dd:last'),
-				INP = DD.find('.inp');
-
-			INP.click(function() {
-				_dialogLoad({
-					dialog_id:v.dialog_id,
-					block_id:obj.srce.block_id,
-					dss:obj.srce.dss,
-					edit_id:v.id,           //id выбранного элемента (при редактировании)
-					dop:{
-						rule_id:4,
-						mysave:1
-					},
-					busy_obj:INP,
-					busy_cls:'hold',
-					func_save:function(ia) {
-						DD.attr('val', ia.unit.id);
-						v.id = ia.unit.id;
-						v.dialog_id = ia.unit.dialog_id;
-						INP.val(ia.unit.title);
-					}
-				});
-			});
-
-			//отображение выплывающего окна настройки стилей
-			INP.mouseenter(_tdCss);
-
-			DL.sortable({handle:'.icon-move-y'});
-
-			DD.find('.icon-del-red').click(function() {
-				$(this).closest('DD').remove();
-				v.id = 0;
-			});
-		}
-	},
-	PHP12_elem44_setup_get = function(el) {
-		var send = [];
-		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			switch(sp.attr('data-type')) {
-				case 'txt':
-					var area = sp.find('textarea'),
-						txt = area.val();
-					if(!txt)
-						return;
-					send.push({
-						type:'txt',
-						txt:txt,
-						font:_tdCssFontGet(area),
-						color:_tdCssColorGet(area)
-					});
-					return;
-				case 'el':
-					var inp = sp.find('.inp'),
-						id = _num(sp.attr('val'));
-					if(!id)
-						return;
-					send.push({
-						type:'el',
-						id:id,
-						font:_tdCssFontGet(inp),
-						color:_tdCssColorGet(inp)
-					});
-					return;
-			}
-		});
-		return send;
-	},
-
-	/* ---=== НАСТРОЙКА БАЛАНСА - СУММ ЗНАЧЕНИЙ ЕДИНИЦЫ СПИСКА для [27] ===--- */
-	PHP12_balans_setup = function(el, vvv, obj) {
-		if(!obj.unit.id)
-			return;
-
-		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
-			ATR_EL = _attr_el(el.id),
-			DL = ATR_EL.append(html).find('dl'),
-			BUT_ADD = ATR_EL.find('div:last'),
-
-			znak = ['+','-','<div class="fs11">&#9913;</div>','/'],
-			znak_tt = ['Прибавить','Вычесть','Умножить','Делить'],
-			znak_ttm = [-25,-19,-22,-14],
-			znak_color = ['green','red','orange','blue'];
-
-		BUT_ADD.click(valueAdd);
-
-		if(!vvv.length) {
-			valueAdd();
-			valueAdd();
-		} else
-			_forIn(vvv, valueAdd);
-
-		function valueAdd(v) {
-			v = $.extend({
-				id:0,      //id элемента
-				znak:0,
-				title:''
-			}, v);
-
-			DL.append(
-				'<dd class="over3" val="' + v.id + '">' +
-					'<table class="bs5 w100p">' +
-						'<tr><td class="w50 pl5">' +
-								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w25 r">' +
-								'<button class="vk short ' + znak_color[v.znak] +' w35' + _tooltip(znak_tt[v.znak], znak_ttm[v.znak]) + znak[v.znak] +'</button>' +
-							'<td><input type="text"' +
-									  ' class="inp w100p curP"' +
-									  ' readonly' +
-									  ' placeholder="значение не выбрано"' +
-									  ' value="' + v.title + '"' +
-								' />' +
-							'<td class="w50 r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить значение', -54) + '</div>' +
-					'</table>' +
-				'</dd>'
-			);
-
-			var DD = DL.find('dd:last'),
-				INP = DD.find('.inp'),
-				BUT = DD.find('button');
-			INP.click(function() {
 				_dialogLoad({
 					dialog_id:11,
-					block_id:obj.srce.block_id,
-					edit_id:v.id,      //id выбранного элемента (при редактировании)
+					dss:dss,
+
 					dop:{
-						nest:0,
-						allow:'8,27,54,55'
+						mysave:1,
+						sel:cmp.val()
 					},
-					busy_obj:INP,
+
+					busy_obj:inp,
 					busy_cls:'hold',
-					func_save:function(ia) {
-						DD.attr('val', ia.unit.id);
-						v.id = ia.unit.id;
-						INP.val(ia.unit.title);
+					func_save:function(res) {
+						cmp.val(res.v);
+						inp.val(res.title);
+						del._dn(1);
 					}
 				});
 			});
-			DL.sortable({
-				axis:'y',
-				handle:'.icon-move-y'
-			});
-			BUT.click(function() {
+
+			DD.find('._spfl').click(function() {
 				var t = $(this),
-					zid = 0;
+					inp = t.find('input'),
+					dss = _num(DD.find('.dlg34').val());
 
-				if(t.hasClass('red'))
-					zid = 1;
-				if(t.hasClass('orange'))
-					zid = 2;
-				if(t.hasClass('blue'))
-					zid = 3;
+				if(!dss)
+					return false;
 
-				zid++;
-				if(zid > 3)
-					zid = 0;
-
-				t.html(znak[zid]);
-				t.removeClass('green red orange blue');
-				t.addClass(znak_color[zid]);
-				t._tooltip(znak_tt[zid], znak_ttm[zid]);
+				_dialogLoad({
+					dialog_id:41,
+					dss:dss,
+					dop:t.prev().val(),
+					busy_obj:inp,
+					busy_cls:'hold',
+					func_save:function(res) {
+						t.prev().val(res.v);
+						inp.val(res.title);
+						t.find('.icon-del')._dn(1);
+					}
+				});
 			});
+
 			DD.find('.icon-del').click(function() {
 				$(this).closest('DD').remove();
-				v.id = 0;
 			});
+			//установка фокуса на новодобавленного значения
+			if(!v.id)
+				DD.find('.title').focus();
 		}
 	},
-	PHP12_balans_setup_get = function(el) {
+	PHP12_elem34_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
-			var id = _num(sp.attr('val')),
-				but = sp.find('button'),
-				znak = 0;
-
-			if(!id)
+			var dlg_id = _num(sp.find('.dlg34').val());
+			if(!dlg_id)
 				return;
-
-			if(but.hasClass('red'))
-				znak = 1;
-			if(but.hasClass('orange'))
-				znak = 2;
-			if(but.hasClass('blue'))
-				znak = 3;
-
 			send.push({
-				id:id,
-				znak:znak
+				title:sp.find('.title').val(),
+				dialog_id:dlg_id,
+				sum_id:_num(sp.find('.sum34').val()),
+				cond:sp.find('.cond').val()
 			});
 		});
 		return send;
@@ -5994,135 +6208,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	/* ---=== СПИСОК ДЕЙСТВИЙ, НАЗНАЧЕННЫЕ ЭЛЕМЕНТУ ИЛИ БЛОКУ ===--- */
 	PHP12_action_list = function(el) {
-		_attr_el(el.id).find('DL')._sort({table:'_action'});
-	},
-
-	/* ---=== НАСТРОЙКА ФОРМУЛЫ ДЛЯ ДЕЙСТВИЯ 208 ===--- */
-	PHP12_action208_formula = function(el, vvv, obj) {
-		var ATR_EL = _attr_el(el.id),
-			V1 = vvv.length ? vvv[0] : {},
-			ACT208_V = function(n, v_id, v_name) {//печать значения
-				return '<input type="hidden" class="v208" val="' + n + '" value="' + (v_id || 0) + '" />' +
-					'<div class="_selem dib prel bg-fff over3 mb10">' +
-						'<div class="icon icon-star pabs"></div>' +
-						'<div class="icon icon-del pl pabs' + _dn(v_id) + '"></div>' +
-						'<input type="text" readonly class="w125 curP color-pay" placeholder="Значение ' + n + '" value="' + (v_name || '') + '" />' +
-					'</div>';
-			},
-			ACT208_VSEL = function() {//выбор значения
-				ATR_EL.find('._selem:last').click(function() {
-					var t = $(this),
-						cmp = t.prev(),
-						inp = t.find('input'),
-						del = t.find('.icon-del');
-
-					_dialogLoad({
-						dialog_id:11,
-						block_id:obj.send.block_id,
-
-						dop:{
-							mysave:1,
-							allow:'8,10,11,29,59',
-							sel:cmp.val()
-						},
-
-						busy_obj:inp,
-						busy_cls:'hold',
-						func_save:function(res) {
-							cmp.val(res.v);
-							inp.val(res.title);
-							del._dn(1);
-						}
-					});
-				});
-				//очистка выбранного значения
-				ATR_EL.find('._selem:last .icon-del').click(function(e) {
-					e.stopPropagation();
-					var t = $(this);
-					t._dn();
-					t.next().val('');
-					t.parents('._selem').prev().val(0);
-				});
-			},
-			html =
-				ACT208_V(1, V1.elem_id, V1.elem_name) +
-				'<div class="icon icon-add ml15 pl' + _tooltip('Добавить значение', -59) + '</div>' +
-				'<div class="icon icon-del-red ml3 pl' + _tooltip('Удалить последнее значение', -87) + '</div>',
-			ICON_ADD = ATR_EL.html(html).find('.icon-add'),
-			ICON_DEL = ICON_ADD.next(),
-			NUM = 2;
-
-		ACT208_VSEL();
-		ICON_ADD.click(_ADD);
-		ICON_DEL.click(function() {
-			var v208 = ATR_EL.find('.v208:last'),
-				n = _num(v208.attr('val'));
-
-			if(n == 1)
-				return;
-
-			v208.prev().remove();
-			v208.next().remove();
-			v208.remove();
-			NUM--;
-
-			if(n == 3)
-				ICON_DEL._dn();
-		});
-
-		if(!vvv.length)
-			_ADD();
-		else
-			_forN(vvv, function(v, n) {
-				if(n)
-					_ADD(v);
-			});
-
-		function _ADD(v) {
-			v = $.extend({
-				elem_id:0,
-				elem_name:'',
-				znak:1
-			}, v);
-			html =
-				'<div class="dib w15 ml10">' +
-					'<input type="hidden" id="znak' + NUM + '" value="' + v.znak + '" />' +
-				'</div>' +
-				ACT208_V(NUM, v.elem_id, v.elem_name);
-
-			ICON_ADD.before(html);
-
-			$('#znak' + NUM)._dropdown({
-				title0:'выбор знака',
-				spisok:[
-					{id:1,title:'<b class="fs17">+</b>'},
-					{id:2,title:'<b class="fs17">-</b>'},
-					{id:3,title:'<b class="fs17">*</b>'},
-					{id:4,title:'<b class="fs17">/</b>'}
-				]
-			});
-
-			ACT208_VSEL();
-
-			NUM++;
-
-			ICON_DEL._dn(NUM > 3);
-		}
-	},
-	PHP12_action208_formula_get = function(el) {
-		var send = [];
-		_forEq(_attr_el(el.id).find('.v208'), function(sp) {
-			var elem_id = _num(sp.val()),
-				n = _num(sp.attr('val')) + 1;
-
-			send.push(elem_id);
-
-			if(!$('#znak' + n).length)
-				return;
-
-			send.push(_num($('#znak' + n).val()));
-		});
-		return send.join();
+		_attr_el(el.id).find('DL')._sort({table:'_action',elem_id:el.id});
 	},
 
 	/* ---=== НАСТРОЙКА ПАРАМЕТРОВ ШАБЛОНА ДЛЯ ДОКУМЕНТОВ [114] ===--- */
@@ -6175,7 +6261,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									  ' value="' + (v.title || v.id || '') + '"' +
 								' />' +
 							'<td class="w50 r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить параметр', -55) + '</div>' +
+								'<div class="icon icon-del pl tool" data-tool="Удалить параметр"></div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -6247,7 +6333,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									  ' value="' + sp.src_title + '"' +
 									  ' placeholder="авто"' +
 								' />' +
-							'<td><div class="icon icon-del pl' + _dn(sp.src_id) + _tooltip('Отменить выбор', -52) + '</div>' +
+							'<td><div class="icon icon-del pl' + _dn(sp.src_id) + ' tool" data-tool="Отменить выбор"></div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -6333,7 +6419,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						'<tr><td class="w25 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w100 center">' +
-								'<a class="cs ' + (v.c ? 'color-ref b' : 'pale') + _tooltip('Настроить условия<br>показа сборки', -40, false, true) + _cc(v.c) + '</a>' +
+								'<a class="cs ' + (v.c ? 'color-ref b' : 'pale') + ' tool" data-tool="Настроить условия<br>показа сборки">' + _cc(v.c) + '</a>' +
 								'<input type="hidden" class="txt_9" value="' + v.txt_9 + '" />' +
 							'<td class="w250">' +
 								'<input type="text"' +
@@ -6356,7 +6442,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									  ' value="' + v.txt_8 + '"' +
 								' />' +
 							'<td class="r">' +
-								'<div class="icon icon-del pl' + _tooltip('Удалить сборку', -48) + '</div>' +
+								'<div class="icon icon-del pl tool" data-tool="Удалить сборку"></div>' +
 					'</table>' +
 				'</dd>'
 			);
@@ -6412,7 +6498,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<td class="pt3">' + _elemUnitColor(v) +
 								'<td class="pt3">' + _elemUnitFormat(v) +
 								'<td class="pt3">' +
-									'<div class="icon-wiki iw12 ml3' + _tooltip('Ссылка', -22) + '</div>' +
+									'<div class="icon-wiki iw12 ml3 tool" data-tool="Ссылка"></div>' +
 						'</table>',
 					side:'top',
 					ugPos:'left',

@@ -11,19 +11,33 @@ function _element17_struct($el) {
 
 		'def'     => _num($el['def']),
 
-		'txt_1'   => $el['txt_1']      //текст нулевого значения
+		'txt_1'   => $el['txt_1'],  //текст нулевого значения
+		'txt_2'   => $el['txt_2']   /* содержание списка в формате JSON
+                                        id
+                                        title
+                                        content
+                                        def
+                                    */
 	) + _elementStruct($el);
 }
-function _element17_struct_vvv($el, $cl) {
-	$send = array(
-		'id' => _num($cl['id']),
-		'title' => $cl['txt_1']
-	);
+function _element17_vvv($el) {
+	if(!$el['txt_2'])
+		return array();
+	if(!$send = json_decode($el['txt_2'], true))
+		return array();
 
-	if($cl['txt_2'])
-		$send['content'] = $cl['txt_1'].'<div class="fs12 grey ml10 mt3">'.$cl['txt_2'].'</div>';
+	foreach($send as $id => $r)
+		if($r['content'])
+			$send[$id]['content'] = $r['content'].'<div class="fs12 grey ml10 mt3">'.$r['content'].'</div>';
 
-	return $send;
+	return _arrNum($send);
+}
+function _element17_v_get($el, $id) {
+	foreach(_element17_vvv($el) as $r)
+		if($r['id'] == $id)
+			return $r['title'];
+
+	return '';
 }
 function _element17_js($el) {
 	return array(
@@ -31,12 +45,18 @@ function _element17_js($el) {
 	) + _elementJs($el);
 }
 function _element17_print($el, $prm) {
+	$def = 0;
+	foreach(_element('vvv', $el) as $r)
+		if($r['def']) {
+			$def = $r['id'];
+			break;
+		}
 	return
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
 		'width' => @$el['width'],
-		'value' => _elemPrintV($el, $prm, $el['def'])
+		'value' => _elemPrintV($el, $prm, $def)
 	));
 }
 function _element17_print11($el, $u) {
@@ -44,13 +64,16 @@ function _element17_print11($el, $u) {
 		return '';
 	if(!$id = _num($u[$col]))
 		return '';
-	if(empty($el['vvv']))
-		return '';
 
-	foreach($el['vvv'] as $vv)
-		if($vv['id'] == $id)
-			return $vv['title'];
+	foreach(_element('vvv', $el) as $r)
+		if($r['id'] == $id)
+			return $r['title'];
 
 	return '';
 }
+
+
+
+
+
 

@@ -13,6 +13,8 @@ function _element37_print($el, $prm) {
 	));
 }
 function _element37_vvv($el, $prm) {
+	if(empty($prm['srce']))
+		return array();
 	if(!$block = _blockOne($prm['srce']['block_id']))
 		return array();
 	//список колонок может быть получен при условии, если элемент размещается в диалоге
@@ -23,8 +25,8 @@ function _element37_vvv($el, $prm) {
 
 	//выбранная колонка, если редактирование записи
 	$uCol = '';
-	if($u = $prm['unit_edit'])
-		$uCol = $u['col'];
+	if(!empty($prm['unit_edit']))
+		$uCol = $prm['unit_edit']['col'];
 
 	$field = _elemVvv37fieldDop($uCol);
 
@@ -160,7 +162,9 @@ function _elemVvv37fieldDop($uCol) {//дополнительная колонк�
 		return $send;
 	if(!$col = $el['col'])
 		return $send;
-	if(!$DLG = _dialogQuery($el['block']['obj_id']))
+	if(!$bl = _blockOne($el['block_id']))
+		return $send;
+	if(!$DLG = _dialogQuery($bl['obj_id']))
 		return $send;
 
 	$send[] = array(

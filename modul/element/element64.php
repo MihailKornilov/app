@@ -37,15 +37,15 @@ function _element64filterUpd($send, $elem_spisok) {//обновление зна
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `dialog_id`=64
-			  AND `num_1`=".$elem_spisok."
-			LIMIT 1";
-	if(!$el = query_assoc($sql))
+			  AND `num_1`=".$elem_spisok;
+	if(!$arr = query_arr($sql))
 		return $send;
 
-	$send['upd'][] = array(
-		'id' => $el['id'],
-		'html' => _element64_print($el)
-	);
+	foreach($arr as $el)
+		$send['upd'][] = array(
+			'id' => $el['id'],
+			'html' => _element64_print($el)
+		);
 
 	return $send;
 }

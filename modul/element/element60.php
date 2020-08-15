@@ -394,7 +394,7 @@ function _imageSave($file_type, $file_tmp_name, $return='arr') {//сохране
 function _imageDD($img) {//единица изображения для настройки
 	return
 	'<dd class="dib mr3 curM" val="'.$img['id'].'">'.
-		'<div class="icon icon-off'._tooltip('Переместить в корзину', -70).'</div>'.
+		'<div class="icon icon-off tool" data-tool="Переместить в корзину"></div>'.
 		'<table class="_image-unit">'.
 			'<tr><td>'.
 				_imageHtml($img, 80, 1).
@@ -510,7 +510,7 @@ function PHP12_image_deleted($prm) {//удалённые изображения 
 	foreach($arr as $r) {
 		$html .=
 		'<div class="prel dib ml3 mr3">'.
-			'<div val="'.$r['id'].'" class="icon icon-recover'._tooltip('Восстановить', -43).'</div>'.
+			'<div val="'.$r['id'].'" class="icon icon-recover tool" data-tool="Восстановить"></div>'.
 			'<table class="_image-unit">'.
 				'<tr><td>'.
 					_imageHtml($r, 80, 1).
@@ -522,7 +522,7 @@ function PHP12_image_deleted($prm) {//удалённые изображения 
 }
 function PHP12_image_webcam($prm) {//Веб-камера [61]
 	$el = $prm['el12'];
-	$width = $el['block']['width'];
+	$width = _blockCh($el['block_id'], 'width');
 	$mar = explode(' ', $el['mar']);
 	$width = round($width - $mar[1] - $mar[3]);
 	$height = round($width * 0.75);

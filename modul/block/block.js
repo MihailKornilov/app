@@ -20,6 +20,8 @@ var _ids = function(v, count) {
 		//если производится процесс деления блока на части, настройка стилей не выводится
 		if($('.block-unit-grid').length)
 			return;
+		if(!window['BLKK'])
+			return;
 
 		var t = $(this),
 			block_id = _num(t.attr('val')),
@@ -31,14 +33,25 @@ var _ids = function(v, count) {
 		if(BL.save || _attr_bl(BL.id).hasClass('_busy'))
 			return;
 
+		var c = BL.action.length;
 		t._hint({
 			msg:'<div class="pad5">' +
 					'<table class="w100p line-b">' +
 						'<tr><td class="w50">' +
-								'<a val="dialog_id:117,get_id:' + BL.id + '" class="dialog-open fs16 blue' + (SA ? _tooltip('info #' + BL.id, -23)  : '">') + 'Блок' + '</a>' +
+								'<a val="dialog_id:117,get_id:' + BL.id + '"' +
+								  ' data-tool="info #' + BL.id + '"' +
+								  ' class="dialog-open fs16 blue tool">' +
+									'Блок' +
+								'</a>' +
 							'<td class="w90 r pb2">' +
-								'<div val="dialog_id:230,block_id:' + BL.id + '" class="icon icon-eye pl dialog-open ml3' + _tooltip('Условия отображения', -67) + '</div>' +
-								'<div val="dialog_id:210,block_id:' + BL.id + '" class="icon icon-usd pl dialog-open ml3' + _tooltip('Настроить действия', -62) + '</div>' +
+								'<div val="dialog_id:230,block_id:' + BL.id + '"' +
+									' class="icon icon-eye pl dialog-open ml3 tool-l"' +
+									' data-tool="Условия отображения">' +
+								'</div>' +
+								'<div val="dialog_id:210,block_id:' + BL.id + '"' +
+									' class="icon icon-usd ' + _dn(!c, 'pl') + ' dialog-open ml3 tool-l"' +
+									' data-tool="' + (c ? 'Назначено ' + c + ' действи' + _end(c, ['е', 'я', 'й']) : 'Назначить действия') + '">' +
+								'</div>' +
 					'</table>' +
 					'<table class="w100p">' +
 						'<tr>' +
@@ -282,12 +295,16 @@ var _ids = function(v, count) {
 					'<table>' +
 
 						'<tr><td colspan="3">' +
-							'<div id="bor0" class="blk-line' + _dn(BOR[0]*1, 'on') + _tooltip('Граница сверху', -22) +
-								'<span></span>' +
+							'<div id="bor0"' +
+								' class="blk-line tool' + _dn(BOR[0]*1, 'on') + '"' +
+								' data-tool="Граница сверху">' +
+									'<span></span>' +
 							'</div>' +
 
-						'<tr><td><div id="bor3" class="blk-line ver' + _dn(BOR[3]*1, 'on') + _tooltip('Граница слева', -46) +
-									'<span></span>' +
+						'<tr><td><div id="bor3"' +
+									' class="blk-line ver tool' + _dn(BOR[3]*1, 'on') + '"' +
+									' data-tool="Граница слева">' +
+										'<span></span>' +
 								'</div>' +
 
 							'<td class="r">' +
@@ -315,13 +332,17 @@ var _ids = function(v, count) {
 								'<br>' +
 								_blockUnitBg70(BL, BGS) +
 
-							'<td><div id="bor1" class="blk-line ver' + _dn(BOR[1]*1, 'on') + _tooltip('Граница справа', -50) +
-									'<span></span>' +
+							'<td><div id="bor1"' +
+									' class="blk-line ver tool' + _dn(BOR[1]*1, 'on') + '"' +
+									' data-tool="Граница справа">' +
+										'<span></span>' +
 								'</div>' +
 
 						'<tr><td colspan="3">' +
-								'<div id="bor2" class="blk-line' + _dn(BOR[2]*1, 'on') + _tooltip('Граница снизу', -20) +
-									'<span></span>' +
+								'<div id="bor2"' +
+									' class="blk-line tool' + _dn(BOR[2]*1, 'on') + '"' +
+									' data-tool="Граница снизу">' +
+										'<span></span>' +
 								'</div>' +
 
 					'</table>' +
@@ -360,8 +381,9 @@ var _ids = function(v, count) {
 				});
 			});
 
-		return '<div id="blk-bg70" class="prel dib center w25 bor-e8 grey mr10 mt3' +
-						_tooltip('Окраска согласно<br>цвету фона записи', -54, '', 1) +
+		return '<div id="blk-bg70"' +
+				   ' class="prel dib center w25 bor-e8 grey mr10 mt3 tool"' +
+				   ' data-tool="Окраска согласно<br>цвету фона записи">' +
 					'<div class="galka pabs fs17 pl5 curP' + _dn(_ids(BL.bg)) + '">&#10004;</div>' +
 					'<div class="pabs icon spin"></div>' +
 					'<table class="w100p curP">' +
@@ -374,22 +396,49 @@ var _ids = function(v, count) {
 	_blockUnitPlace = function(BL) {//позиция
 		return  '<table id="elem-pos" class="ml8 mt10">' +
 			'<tr><td class="color-555 pb3 center">Позиция' +
-			'<tr><td><div val="top" class="icon-wiki iw6 mr3' + _dn(BL.pos == 'top','on') + _tooltip('Вверх-влево', -37) + '</div>' +
-					'<div val="top center" class="icon-wiki iw7 mr3' + _dn(BL.pos == 'top center','on') + _tooltip('Вверх-центр', -35) + '</div>' +
-					'<div val="top r" class="icon-wiki iw8' + _dn(BL.pos == 'top r','on') + _tooltip('Вверх-вправо', -73, 'r') + '</div>' +
+			'<tr><td><div val="top"' +
+						' class="icon-wiki iw6 mr3 tool' + _dn(BL.pos == 'top','on') + '"' +
+						' data-tool="Вверх-влево">' +
+					'</div>' +
+					'<div val="top center"' +
+						' class="icon-wiki iw7 mr3 tool' + _dn(BL.pos == 'top center','on') + '"' +
+						' data-tool="Вверх-центр">' +
+					'</div>' +
+					'<div val="top r"' +
+						' class="icon-wiki iw8 tool' + _dn(BL.pos == 'top r','on') + '"' +
+						' data-tool="Вверх-вправо">' +
+					'</div>' +
 			'<tr><td>' + _elemUnitPlaceMiddle(BL) +
-			'<tr><td><div val="bottom" class="icon-wiki iw9 mr3' + _dn(BL.pos == 'bottom','on') + _tooltip('Вниз-влево', -33) + '</div>' +
-					'<div val="bottom center" class="icon-wiki iw10 mr3' + _dn(BL.pos == 'bottom center','on') + _tooltip('Вниз-центр', -32) + '</div>' +
-					'<div val="bottom r" class="icon-wiki iw11' + _dn(BL.pos == 'bottom r','on') + _tooltip('Вниз-вправо', -65, 'r') + '</div>' +
+			'<tr><td><div val="bottom"' +
+						' class="icon-wiki iw9 mr3 tool' + _dn(BL.pos == 'bottom','on') + '"' +
+						' data-tool="Вниз-влево">' +
+					'</div>' +
+					'<div val="bottom center"' +
+						' class="icon-wiki iw10 mr3 tool' + _dn(BL.pos == 'bottom center','on') + '"' +
+						' data-tool="Вниз-центр">' +
+					'</div>' +
+					'<div val="bottom r"' +
+						' class="icon-wiki iw11 tool' + _dn(BL.pos == 'bottom r','on') + '"' +
+						' data-tool="Вниз-вправо">' +
+					'</div>' +
 		'</table>';
 	},
 	_blockUnitView = function(BL) {//видимость
 		return '<div class="ml8 w80 mt3 line-t">' +
-					'<div id="block-hidden" class="icon-wiki iw13 mt5' + _dn(BL.hidden, 'on') + _tooltip('Скрытый блок', -42) + '</div>' +
+					'<div id="block-hidden"' +
+						' class="icon-wiki iw13 mt5 tool' + _dn(BL.hidden, 'on') + '"' +
+						' data-tool="Скрытый блок">' +
+					'</div>' +
 					'<div class="dib' + _dn(!BL.hidden) + '">' +
 					(BL.obj_name == 'dialog' ?
-						'<div id="block-show-create" class="icon-wiki iw14 mt5 ml3' + _dn(BL.show_create, 'on') + _tooltip('Показывать при<br>создании записи', -48, '', 1) + '</div>' +
-						'<div id="block-show-edit" class="icon-wiki iw15 mt5 ml3' + _dn(BL.show_edit, 'on') + _tooltip('Показывать при<br>изменении записи', -53, '', 1) + '</div>'
+						'<div id="block-show-create"' +
+							' class="icon-wiki iw14 mt5 ml3 tool' + _dn(BL.show_create, 'on') + '"' +
+							' data-tool="Показывать при<br>создании записи">' +
+						'</div>' +
+						'<div id="block-show-edit"' +
+							' class="icon-wiki iw15 mt5 ml3 tool' + _dn(BL.show_edit, 'on') + '"' +
+							' data-tool="Показывать при<br>изменении записи">' +
+						'</div>'
 					: '') +
 					'</div>' +
 			   '</div>';
@@ -441,8 +490,8 @@ var _ids = function(v, count) {
 
 		_post(BL, function(res) {
 			BL.save = 0;
-			if(res.elem_js)
-				ELMM[BL.elem_id] = res.elem_js;
+			BLKK = _objUpd(BLKK, res.jsblk);
+			ELMM = _objUpd(ELMM, res.jselm);
 		});
 	},
 
@@ -455,13 +504,23 @@ var _ids = function(v, count) {
 
 		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-edit-' + EL.id + '">' +
 			'<div class="line-b">' +
-				'<a val="dialog_id:118,get_id:' + EL.id + '" class="fs16 blue dialog-open' + _tooltip('Info #' + EL.id, -5) + 'Элемент</a>' +
+				'<a val="dialog_id:118,get_id:' + EL.id + '"' +
+				  ' class="fs16 blue dialog-open tool' + '"' +
+				  ' data-tool="Info #' + EL.id + '">' +
+					'Элемент' +
+				'</a>' +
+		  (SA ? ' <span class="pale fs16 curD">[' + EL.dialog_id + ']</span>' : '') +
 				'<div class="fr mtm3">' +
-					_elemUnitUrl(EL) +
 					_elemUnitFormat(EL) +
 					_elemUnitAction(EL) +
-					'<div val="dialog_id:' + EL.dialog_id + ',edit_id:' + EL.id + '" class="icon icon-edit dialog-open ml3' + _tooltip('Редактировать элемент', -134, 'r') + '</div>' +
-					'<div val="dialog_id:' + EL.dialog_id + ',del_id:' + EL.id + '" class="icon icon-del-red dialog-open ml3' + _tooltip('Удалить элемент', -94, 'r') + '</div>' +
+					'<div val="dialog_id:' + EL.dialog_id + ',edit_id:' + EL.id + '"' +
+						' class="icon icon-edit dialog-open ml3 tool-l' + '"' +
+						' data-tool="Редактировать элемент">' +
+					'</div>' +
+					'<div val="dialog_id:' + EL.dialog_id + ',del_id:' + EL.id + '"' +
+						' class="icon icon-del-red dialog-open ml3 tool-l' + '"' +
+						' data-tool="Удалить элемент">' +
+					'</div>' +
 				'</div>' +
 			'</div>' +
 
@@ -470,20 +529,20 @@ var _ids = function(v, count) {
 			_elemUnitImg(EL) +
 		'</div>';
 	},
-	_elemUnitUrl = function(EL) {//иконка для настройки ссылки
-		if(!EL.url_use)
-			return '';
-		return '<div val="dialog_id:220,element_id:' + EL.id + '" class="icon icon-link ml3 pl dialog-open' + _tooltip('Настроить ссылку', -56) + '</div>'
-	},
 	_elemUnitFormat = function(EL) {//иконка с дополнительными условиями отображения
 		if(!EL.eye)
 			return '';
-		return '<div val="dialog_id:240,element_id:' + EL.id + '" class="icon icon-eye ml3 dialog-open pl' + _tooltip('Условия отображения', -67) + '</div>';
+		return '<div val="dialog_id:240,element_id:' + EL.id + '"' +
+				   ' class="icon icon-eye ml3 dialog-open pl tool"' +
+				   ' data-tool="Условия отображения">' +
+			   '</div>';
 	},
 	_elemUnitAction = function(EL) {//иконка для настройки действий
-		if(!EL.eadi)
-			return '';
-		return '<div val="dialog_id:' + EL.eadi + ',element_id:' + EL.id + '" class="icon icon-usd ml3 dialog-open' + _tooltip('Настроить действия', -62) + '</div>';
+		var c = EL.action.length;
+		return '<div val="dialog_id:200,element_id:' + EL.id + '"' +
+				   ' class="icon icon-usd ' + _dn(!c, 'pl') + ' ml3 dialog-open tool-l"' +
+				   ' data-tool="' + (c ? 'Назначено ' + c + ' действи' + _end(c, ['е', 'я', 'й']) : 'Назначить действия') + '">' +
+			   '</div>';
 	},
 	_elemUnitMar = function(EL) {
 		var mar = EL.mar.split(' ');
@@ -524,9 +583,18 @@ var _ids = function(v, count) {
 				BL.pos = v;
 				BL.save = 1;
 			});
-		return  '<div val="" class="icon-wiki iw3 mr3' + _dn(!BL.pos,'on') + _tooltip('Влево', -15) + '</div>' +
-				'<div val="center" class="icon-wiki iw4 mr3' + _dn(BL.pos == 'center','on') + _tooltip('По центру', -28) + '</div>' +
-				'<div val="r" class="icon-wiki iw5' + _dn(BL.pos == 'r','on') + _tooltip('Вправо', -34, 'r') + '</div>';
+		return  '<div val=""' +
+					' class="icon-wiki iw3 mr3 tool' + _dn(!BL.pos,'on') + '"' +
+					' data-tool="Влево">' +
+				'</div>' +
+				'<div val="center"' +
+					' class="icon-wiki iw4 mr3 tool' + _dn(BL.pos == 'center','on') + '"' +
+					' data-tool="По центру">' +
+				'</div>' +
+				'<div val="r"' +
+					' class="icon-wiki iw5 tool' + _dn(BL.pos == 'r','on') + '"' +
+					' data-tool="Вправо">' +
+				'</div>';
 	},
 	_elemUnitStyle = function(EL) {
 		if(!EL.stl)
@@ -579,9 +647,18 @@ var _ids = function(v, count) {
 			});
 
 		return '<div id="elem-font" class="dib">' +
-			'<div val="b" class="icon-wiki ml3' + font.b + _tooltip('Жирный', -23) + '</div>' +
-			'<div val="i" class="icon-wiki iw1 ml3' + font.i + _tooltip('Наклонный', -31) + '</div>' +
-			'<div val="u" class="icon-wiki iw2 ml3' + font.u + _tooltip('Подчёкнутый', -39) + '</div>' +
+			'<div val="b"' +
+				' class="icon-wiki ml3 tool' + font.b + '"' +
+				' data-tool="Жирный">' +
+			'</div>' +
+			'<div val="i"' +
+				' class="icon-wiki iw1 ml3 tool' + font.i + '"' +
+				' data-tool="Наклонный">' +
+			'</div>' +
+			'<div val="u"' +
+				' class="icon-wiki iw2 ml3 tool' + font.u + '"' +
+				' data-tool="Подчёкнутый">' +
+			'</div>' +
 		'</div>';
 	},
 	_elemUnitColor = function(EL) {//стили элемента: цвет текста

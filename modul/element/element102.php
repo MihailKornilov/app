@@ -60,7 +60,7 @@ function _element102_print($el, $prm) {
 
 			if(isset($vAss[$id])) {
 				$c = _num($c);
-				$sel .= $c ? '<div'.$bg.' class="un'._tooltip($r['title'], -6, 'l').$c.'</div>' : '';
+				$sel .= $c ? '<div'.$bg.' class="un tool" data-tool="'.$r['title'].'">'.$c.'</div>' : '';
 				$selOne = '<div class="un"'.$bg.'>'.$r['title'].'</div>';
 				$n++;
 			}
@@ -75,7 +75,7 @@ function _element102_print($el, $prm) {
 		'<table class="w100p">'.
 			'<tr><td class="td-un">'.($sel ? $sel : '<div class="icon icon-empty"></div>').
 				'<td class="w25 top r">'.
-					'<div class="icon icon-del pl'._dn($sel, 'vh')._tooltip('Очистить фильтр', -53).'</div>'.
+					'<div class="icon icon-del pl tool'._dn($sel, 'vh').'" data-tool="Очистить фильтр"></div>'.
 		'</table>'.
 		'<div class="list">'.
 			'<table>'.$spisok.'</table>'.
@@ -86,5 +86,33 @@ function _element102_print($el, $prm) {
 			'EL'.$el['id'].'_F102_C='._json($countAss).','.
 			'EL'.$el['id'].'_F102_BG='._json($bgAss).';'.
 	'</script>';
+}
+function _elem102filter($el) {//Фильтр - Выбор нескольких групп значений
+	$filter = false;
+	$v = 0;
+
+	//поиск элемента-фильтра-select
+	foreach(_filter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 102) {
+			$filter = $r['elem'];
+			$v = _ids($r['v']);
+			break;
+		}
+
+	if(!$filter)
+		return '';
+	if(!$v)
+		return '';
+	if(!$elem_ids = _ids($filter['txt_2'], 1))
+		return '';
+
+	$elem_id = $elem_ids[0];
+
+	if(!$ell = _elemOne($elem_id))
+		return '';
+	if(!$col = $ell['col'])
+		return '';
+
+	return " AND `".$col."` IN (".$v.")";
 }
 

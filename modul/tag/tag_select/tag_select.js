@@ -47,7 +47,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 			 (o.multi ? '<dl>' : '') +
 							'<input type="text" class="select-inp ' + (!o.multi ? 'w100p' : 'w50') + '"' + placeholder + readonly + ' />' +
 			 (o.multi ? '</dl>' : '') +
-					'<td class="w15' + _dn(o.write) + '"><div class="icon icon-del clear pl dn"></div>' +
+					'<td class="w15' + _dn(o.write) + '"><div class="icon icon-del clear pl dn tool" data-tool="Очистить"></div>' +
 					'<td class="w25 r' + _dn(iconAddFlag) + '"><div class="icon icon-add pl"></div>'+
 					'<td class="arrow">' +
 			'</table>' +
@@ -190,7 +190,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 					content:sp
 				};
 				MASS_SEL.push(unit);
-				MASS_SEL_SAVE.push(_copyObj(unit));
+				MASS_SEL_SAVE.push(_objCopy(unit));
 			});
 			return;
 		}
@@ -232,7 +232,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 				bg:sp.bg
 			};
 			MASS_SEL.push(unit);
-			MASS_SEL_SAVE.push(_copyObj(unit));
+			MASS_SEL_SAVE.push(_objCopy(unit));
 			BG_ASS[id] = sp.bg;
 		});
 	}
@@ -276,7 +276,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 03.01.2
 			find = [],
 			reg = new RegExp(v, 'i'); // для замены найденного значения
 		_forN(MASS_SEL_SAVE, function(sp) {
-			var un = _copyObj(sp),
+			var un = _objCopy(sp),
 				arr = un.content.split(TAG); // разбивка на массив согласно тегам
 			_forN(arr, function(r, k) {
 				if(!r.length)    //если строка пустая
@@ -546,7 +546,7 @@ $.fn._select1 = function(o, o1, o2) {
 							//		(o.write && !o.disabled? '' : ';cursor:default') + '"' +
 									(o.write && !o.disabled? '' : ' readonly') +
 						' />' +
-					(o.clear ? '<div class="icon icon-del mt5 fr' + _dn(val) + _tooltip('Очистить', -49, 'r') + '</div>' : '') +
+					(o.clear ? '<div class="icon icon-del mt5 fr' + _dn(val) + ' tool-r" data-tool="Очистить"></div>' : '') +
 	   (o.funcAdd ? '<td class="seladd">' : '') +
 					'<td class="selug">' +
 			'</table>' +

@@ -154,5 +154,13 @@ function PHP12_spisok14_setup($prm) {//настройка шаблона
 		_blockHtml('spisok', $unit['id'], array('blk_setup' => 1)).
 	'</div>';
 }
+function PHP12_spisok14_setup_vvv($prm) {
+	if(!$unit = $prm['unit_edit'])
+		return array();
 
+	$send['jsblk'] = _BE('block_arr', 'spisok', $unit['id']);
+	$send['jselm'] = _elmJs('spisok', $unit['id'], $prm);
+
+	return $send;
+}
 

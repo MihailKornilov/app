@@ -69,7 +69,7 @@ function _element77filterSet($elem_id, $v) {//подмена значения в
 	return $v;
 }
 
-function _element77cond($el) {//фильтр-календарь
+function _elem77filter($el) {//фильтр-календарь
 	$filter = false;
 	$v = '';
 

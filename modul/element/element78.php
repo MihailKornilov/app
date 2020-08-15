@@ -22,7 +22,7 @@ function _element78_print($el) {
 
 	if(!$EL = _elemOne($elem_id))
 		return _emptyMin('Фильтр-меню: значение отсутствует.');
-	if(!$BL = $EL['block'])
+	if(!$BL = _blockOne($EL['block_id']))
 		return _emptyMin('Фильтр-меню: нет блока.');
 	if($BL['obj_name'] != 'dialog')
 		return _emptyMin('Фильтр-меню: блок не из диалога.');
@@ -87,5 +87,48 @@ function _element78_print($el) {
 	}
 
 	return $send;
+}
+function _elem78filter($el) {//фильтр-меню
+	$filter = false;
+	$v = '';
+
+	//поиск элемента-фильтра-меню
+	foreach(_filter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 78) {
+			$filter = $r['elem'];
+			$v = _num($r['v']);
+			break;
+		}
+
+	if(!$filter)
+		return '';
+	if(!$v)
+		return '';
+
+	//элемент, указывающий на подключенный список
+	if(!$elem_id = _ids($filter['txt_1'], 'first'))
+		return " AND !`id`";
+	if(!$EL = _elemOne($elem_id))
+		return " AND !`id`";
+
+	//колонка, по которой будет производиться фильтрование
+	if(!$col = $EL['col'])
+		return " AND !`id`";
+
+	//получение диалога подключенного списка
+	if($EL['dialog_id'] == 29 && !$dialog_id = _num($EL['num_1']))
+		return " AND !`id`";
+	if(!$dialog = _dialogQuery($dialog_id))
+		return " AND !`id`";
+
+	if(isset($dialog['field1']['parent_id'])) {
+		$sql = "SELECT `id`
+				FROM `"._table($dialog['table_1'])."`
+				WHERE `parent_id`=".$v;
+		if($ids = query_ids($sql))
+			$v .= ','.$ids;
+	}
+
+	return " AND `".$col."` IN (".$v.")";
 }
 

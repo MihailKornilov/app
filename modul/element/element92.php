@@ -67,7 +67,7 @@ function _elem92dlg23($ell) {//значения для обычной табли
 
 	//элемент-сумма для подсчёта, на который указывает галочка
 	$sumId = 0;
-	foreach($ell['vvv'] as $vv)
+	foreach(_element('vvv', $ell) as $vv)
 		if($vv['dialog_id'] == 91) {
 			$sumId = _num($vv['num_1']);
 			break;
@@ -79,12 +79,12 @@ function _elem92dlg23($ell) {//значения для обычной табли
 		'sum_id' => $sumId
 	);
 }
-function _elem92dlg88($ell, $send) {//значения для таблицы их нескольких списков
+function _elem92dlg88($ell, $send) {//значения для таблицы из нескольких списков
 	if($ell['dialog_id'] != 88)
 		return $send;
 
 	$V = json_decode($ell['txt_2'], true);
-	$vvv = _arrKey($ell['vvv']);
+	$vvv = _element('vvv', $ell);
 
 	if(empty($V['spv']))
 		return $send;
@@ -111,30 +111,59 @@ function _elem92dlg88($ell, $send) {//значения для таблицы и�
 	}
 	return $send;
 }
-function _elem92_cnn($dialog, $cmp, $unit) {//присвоение (или удаление) связанного списка у выбранных значений
-	if(!$col = _elemCol($cmp))
-		return;
-	if(!$ids = _ids($unit[$col]))
-		return;
-
-	$sql = "SELECT *
-			FROM `_spisok`
-			WHERE `id` IN (".$ids.")
-			  AND !`deleted`";
-	if(!$spisok = query_arr($sql))
-		return;
-
-	foreach($spisok as $r) {
-		if(!$DLG = _dialogQuery($r['dialog_id']))
+function _element92unitUpd($dlg, $unit) {//присвоение (или удаление) связанного списка у выбранных значений
+	$countUpdate = false;
+	foreach($dlg['cmp'] as $r) {
+		if($r['dialog_id'] != 92)
 			continue;
-		foreach($DLG['cmp'] as $cmpp)
-			if(_elemIsConnect($cmpp))
-				if($cmpp['num_1'] == $dialog['id'])
-					if($coll = _elemCol($cmpp)) {
-						$sql = "UPDATE `_spisok`
-								SET `".$coll."`=".($unit['deleted'] ? 0 : $unit['id'])."
-								WHERE `id`=".$r['id'];
-						query($sql);
-					}
+		if(!$col = _elemCol($r))
+			continue;
+		if(empty($unit[$col]))
+			continue;
+
+		$sql = "SELECT *
+				FROM `_spisok`
+				WHERE `id` IN (".$unit[$col].")
+				  AND !`deleted`";
+		if(!$spisok = query_arr($sql))
+			continue;
+
+		$dlgAss = array();
+		foreach($spisok as $sp)
+			$dlgAss[$sp['dialog_id']][] = $sp['id'];
+
+		$unit_id = $unit['deleted'] ? 0 : $unit['id'];
+
+		foreach($dlgAss as $dialog_id => $ids) {
+			if(!$DLG = _dialogQuery($dialog_id))
+				continue;
+
+			foreach($DLG['cmp'] as $cmpp) {
+				if(!_elemIsConnect($cmpp))
+					continue;
+				if($cmpp['num_1'] != $dlg['id'])
+					continue;
+				if(!$coll = _elemCol($cmpp))
+					continue;
+
+				$sql = "UPDATE `_spisok`
+						SET `".$coll."`=".$unit_id."
+						WHERE `id` IN ("._ids($ids).")";
+				query($sql);
+
+				$countUpdate = true;
+			}
+		}
+	}
+
+	if(!$countUpdate)
+		return;
+
+	//обновление счётчиков
+	foreach($dlg['cmp'] as $elem_id => $r) {
+		if($r['dialog_id'] == 54)
+			_element54update($elem_id, $unit['id']);
+		if($r['dialog_id'] == 55)
+			_element55update($elem_id, $unit['id']);
 	}
 }

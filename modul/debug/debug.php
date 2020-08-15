@@ -161,7 +161,6 @@ function _debug_cache_clear() {//очистка кеша
 
 	_attachLinkRepair();
 	_userImageRepair();
-	_jsCache();
 }
 
 function _debug_sql() {//получение всех запросов
@@ -237,6 +236,36 @@ function _debugPrint($msg) {//вывод текста, если debug
 	return $msg;
 }
 
+function _count_update($app_id=APP_ID) {//обновление счётчиков
+	//установка родительского диалога, если нужно
+	$app = _app($app_id);
+	if($app['pid'])
+		$app_id = $app['pid'];
+
+	//пересчёт количеств [54]
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".$app_id."
+			  AND `dialog_id`=54";
+	foreach(query_arr($sql) as $r)
+		_element54update($r['id']);
+
+	//пересчёт сумм [55]
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".$app_id."
+			  AND `dialog_id`=55";
+	foreach(query_arr($sql) as $r)
+		_element55update($r['id']);
+
+	//пересчёт сумм [27]
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `app_id`=".$app_id."
+			  AND `dialog_id`=27";
+	foreach(query_arr($sql) as $r)
+		_element27update($r['id']);
+}
 
 function jsonDebugParam() {//возвращение дополнительных параметров json, если включен debug
 	if(!@DEBUG)

@@ -18,6 +18,7 @@ function _element400_print($el, $prm) {
 	if($prm['blk_setup'])
 		return _emptyMin('График-столбики <b>'.$DLG['name'].'</b>');
 
+	$bl = _blockOne($el['block_id']);
 	$data = _elem400_monData($DLG);
 	$cat = _elem400_monCat();
 
@@ -33,7 +34,7 @@ function _element400_print($el, $prm) {
 	'<script>'.
 		'var YEAR_SPISOK_'.$el['id'].'='._elem400_yearSpisok($DLG).',
 			WIDTH_'.$el['id'].'='._elemWidth($el).',
-			HEIGHT_'.$el['id'].'='.($el['block']['height'] < 200 ? 200 : $el['block']['height']).',
+			HEIGHT_'.$el['id'].'='.($bl['height'] < 200 ? 200 : $bl['height']).',
 			HEAD_'.$el['id'].'="'._elem400_monHead($el).'",
 			DATA_'.$el['id'].'='._json($data).',
 			CAT_'.$el['id'].'='._json($cat).';'.

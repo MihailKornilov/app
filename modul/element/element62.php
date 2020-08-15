@@ -27,4 +27,27 @@ function _element62_print($el, $prm) {
 		'value' => _filter('vv', $el, $el['num_3'])
 	));
 }
+function _elem62filter($el) {//фильтр-галочка
+	$send = '';
+
+	//поиск элемента-фильтра-галочки
+	foreach(_filter('spisok', $el['id']) as $F) {
+		$filter = $F['elem'];
+
+		if($filter['dialog_id'] != 62)
+			continue;
+
+		$v = $F['v'];
+
+		//условие срабатывает, если 1439: установлена, 1440 - снята
+		if($filter['num_2'] == 1439 && !$v)
+			continue;
+		if($filter['num_2'] == 1440 && $v)
+			continue;
+
+		$send .= _40cond($el, $filter['txt_2']);
+	}
+
+	return $send;
+}
 

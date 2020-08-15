@@ -21,6 +21,22 @@ function _element59_js($el) {
 		'num_4' => _num($el['num_4'])
 	) + _elementJs($el);
 }
+function _element59_v_get($el, $unit_id) {
+	if(!$dialog_id = _num($el['num_1']))
+		return '';
+	if(!$dlg = _dialogQuery($dialog_id))
+		return '';
+	if(!$dlg['spisok_elem_id'])
+		return _msgRed('<a class="dialog-setup inhr" val="dialog_id:'.$dlg['id'].',menu:4">Диалог '.$dlg['id'].'</a> колонка по умолчанию не настроено');
+	if(!$u = _spisokUnitQuery($dlg, $unit_id))
+		return '';
+	if(!$col = _elemCol($dlg['spisok_elem_id']))
+		return '';
+	if(!isset($u[$col]))
+		return '';
+
+	return $u[$col];
+}
 function _element59_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, $el['num_6']);
 	$v = _elem29PageSel($el['num_1'], $v);
@@ -38,7 +54,7 @@ function _element59_print($el, $prm) {
 	)).
 	'<div class="prel'._dn($v).'">'.
 	(!$el['num_3'] ?
-		'<div style="position:absolute;top:2px;right:3px;z-index:100" class="icon icon-del-red pl'._tooltip('Отменить выбор', -52).'</div>'
+		'<div style="position:absolute;top:2px;right:3px;z-index:100" class="icon icon-del-red pl tool" data-tool="Отменить выбор"></div>'
 	: '').
 		'<div class="un-html">'._spisok59unit($el['id'], $v).'</div>'.
 	'</div>';
@@ -84,6 +100,6 @@ function _spisok59unit($elem_id, $unit_id, $return='html') {//выбранное
 	if($return == 'html')
 		return _blockHtml('spisok', $elem_id, $prm);
 
-	return $prm['unit_get'];
+	return _arrNum($prm['unit_get']);
 }
 

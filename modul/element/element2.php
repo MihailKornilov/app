@@ -57,9 +57,9 @@ function _element2printVal($el, $prm) {//значения аттрибута val
 	//если кнопка расположена в диалоговом окне, то указывается id этого окна как исходное
 	//а также вставка исходного блока для передачи как промежуточного значения, если кнопка расположена в диалоге
 	//Нужно для назначения функций (пока)
-	if(!empty($el['block']))
-		if($el['block']['obj_name'] == 'dialog') {
-			$ass['dss'] = $el['block']['obj_id'];
+	if($bl = _blockOne($el['block_id']))
+		if($bl['obj_name'] == 'dialog') {
+			$ass['dss'] = $bl['obj_id'];
 			if($prm['srce']['block_id'])
 				$ass['block_id'] = $prm['srce']['block_id'];
 			if($prm['srce']['element_id'])

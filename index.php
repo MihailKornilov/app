@@ -8,7 +8,6 @@ _auth();
 _authLogout();
 _sa();
 _user();
-_jsCacheAppControl();
 _pasDefine();
 _userInviteCookieSave();
 

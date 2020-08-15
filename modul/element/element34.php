@@ -195,9 +195,9 @@ function PHP12_elem34_vvv($prm) {//данные для настроек
 	//списки для выбора
 	$send['sp'] = _dialogSelArray('spisok_only');
 
-	if(!$u = $prm['unit_edit'])
+	if(empty( $prm['unit_edit']))
 		return $send;
-	if(!$EL = _elemOne($u['id']))
+	if(!$EL = _elemOne($prm['unit_edit']['id']))
 		return $send;
 
 	$send['val'] = json_decode($EL['txt_1'], true);

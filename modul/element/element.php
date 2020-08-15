@@ -4,7 +4,6 @@
 		1. Визуальное отображение в блоке {print}
 		2. Структура элемента {struct}
 		3. Title элемента {struct_title}
-		4. Дочерние элементы или значения {struct_vvv} - статическое формирование (сохранение в кеш)
 		5. Дочерние элементы или значения {vvv} - динамическое формирование
 		6. Настройка ширины (в PageSetup) ['width']
 		7. Наличие флага обязательного заполнения ['req']
@@ -29,7 +28,7 @@ foreach(array(
 			71,72,73,74,75,76,77,78,79,80,
 			      83,   85,86,87,88,   90,
 			91,92,93,94,95,96,97,
-			102,103,130,300
+			102,103,116,130,300
         ) as $id) {
 	$file = GLOBAL_DIR.'/modul/element/element'.$id.'.php';
 	if(file_exists($file))
@@ -51,7 +50,7 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 		case 'print':
 			if(empty($el['dialog_id']))
 				return '';
-			return DEBUG ? '<span class="fs11 red">['.$el['dialog_id'].']</span>' : '';
+			return _msgRed('['.$el['dialog_id'].']');
 
 		//вывод значения на экран через [11]
 		case 'print11':
@@ -71,14 +70,12 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 			if(!empty($el['name']))
 				$el['title'] = $el['name'];
 			return $el;
-		//структура содержания: дочерние элементы или значения
-		case 'struct_vvv': return array();
 
 		//содержание элемента (ячейки таблицы, значения выпадающего списка, ...)
-		case 'vvv':
-			if(!empty($el['vvv']))
-				return $el['vvv'];
-			return array();
+		case 'vvv': return array();
+
+		//получение имени значения по id
+		case 'v_get': return _msgRed('['.$el['dialog_id'].'] не настроено');
 
 		//структура элемента для JS
 		case 'js':
@@ -116,8 +113,14 @@ function _elementStruct($el) {//структура элемента - базов
 		'block_id'  => _num($el['block_id']),
 		'dialog_id' => _num($el['dialog_id']),
 		'mar'       =>      $el['mar'],
+		'font'      =>      $el['font'],
 
-		'txt_10'    => $el['txt_10']     //для шаблонов документов todo временно
+		'txt_1'     => $el['txt_1'],     //для истории действий: для [10]
+		'txt_2'     => $el['txt_2'],     //для истории действий: ids из [11]
+		'txt_7'     => $el['txt_7'],     //для истории действий: текст слева
+		'txt_8'     => $el['txt_8'],     //для истории действий: текст справа
+		'txt_9'     => $el['txt_9'],     //для истории действий: условия [40]
+		'txt_10'    => $el['txt_10']     //todo временно: для шаблонов документов
 	);
 
 	if(!empty($el['name']))
@@ -150,20 +153,16 @@ function _elementStruct($el) {//структура элемента - базов
 		$send['size']  = $el['size'] ? _num($el['size']) : 13;
 	}
 
-	//диалог для управления действиями
-	if(!empty($el['eadi']))
-		$send['eadi'] = _num($el['eadi']);
-
 	return $send;
 }
 function _elementTitle($el) {//вставка title элемента (после сформированного кеша)
 	if(empty($el['dialog_id']))
 		return $el;
 
-	global $G_DLG, $G_ELEM;
+	global $G_DLG, $G_ELM;
 
 	if($el['dialog_id'] == 11)
-		$el = _element11_struct_title($el, $G_ELEM, $G_DLG);
+		$el = _element11_struct_title($el, $G_ELM, $G_DLG);
 	else
 		$el = _element('struct_title', $el, $G_DLG);
 
@@ -171,6 +170,7 @@ function _elementTitle($el) {//вставка title элемента (после
 }
 function _elementJs($el) {//структура элемента для JS
 	$send = array(
+		'id' => $el['id'],
 		'dialog_id' => $el['dialog_id'],
 		'block_id'  => $el['block_id'],
 		'mar'       => $el['mar']
@@ -197,10 +197,6 @@ function _elementJs($el) {//структура элемента для JS
 		$send['size']  = _num($el['size']);
 	}
 
-	//диалог для управления действиями
-	if(!empty($el['eadi']))
-		$send['eadi'] = $el['eadi'];
-
 	//элемент является подключаемым списком
 	if(_elemIsConnect($el))
 		$send['issp'] = 1;
@@ -208,10 +204,6 @@ function _elementJs($el) {//структура элемента для JS
 	//разрешать прикрепление подсказки
 	if(_elemRule($el['dialog_id'], 15))
 		$send['rule15'] = 1;
-
-	//разрешать настройку перехода на страницу или открытие диалога
-	if(_elemRule($el['dialog_id'], 13) || !empty($el['url_use']))
-		$send['url_use'] = 1;
 
 	//разрешать настройку условий отображения
 	if(_elemRule($el['dialog_id'], 17))
@@ -486,25 +478,6 @@ function PHP12_elem_info_elemLink($elem_id, $empty='-') {//формирован�
 	return '<a class="dialog-open" val="dialog_id:118,get_id:'.$elem_id.'">'.$elem_id.'</a>';
 }
 
-function _colorJS() {//массив цветов для текста в формате JS, доступных элементам
-	return '{'.
-		'"":["#000","Чёрный"],'.
-		'"color-555":["#555","Тёмно-серый"],'.
-		'"grey":["#888","Серый"],'.
-		'"pale":["#aaa","Бледный"],'.
-		'"color-ccc":["#ccc","Совсем бледный"],'.
-		'"blue":["#2B587A","Тёмно-синий"],'.
-		'"color-acc":["#07a","Синий"],'.
-		'"color-sal":["#770","Салатовый"],'.
-		'"color-pay":["#090","Зелёный"],'.
-		'"color-aea":["#aea","Ярко-зелёный"],'.
-		'"red":["#e22","Красный"],'.
-		'"color-ref":["#800","Тёмно-красный"],'.
-		'"color-del":["#a66","Тёмно-бордовый"],'.
-		'"color-vin":["#c88","Бордовый"]'.
-	'}';
-}
-
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
 	//если dialog_id получен - отправка его
 	if($dialog_id = _num(@$_POST['dialog_id']))
@@ -567,9 +540,10 @@ function _dialogTest() {//проверка id диалога, создание �
 function _dialogQuery($dialog_id) {//данные конкретного диалогового окна
 	global $_DQ;
 
+	if(!$dialog_id = _num($dialog_id))
+		return array();
 	if(isset($_DQ[$dialog_id]))
 		return $_DQ[$dialog_id];
-
 	if(!$dialog = _BE('dialog', $dialog_id))
 		return array();
 
@@ -687,7 +661,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение 
 			$send[] = array(
 				'id' => _num($r['id']),
 				'title' => $r['name'],
-				'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">'.$r['name'].'</div>'
+				'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">['.$r['id'].'] '.$r['name'].'</div>'
 			);
 	}
 
@@ -805,7 +779,9 @@ function _dialogSel24($elem_id, $dlg_id) {//получение id диалога
 		if($el['num_1'] == 961) {
 			if(!$ell = _elemOne($dlg_id))
 				return 0;
-			return $ell['block']['obj_id'];
+			if(!$bl = _blockOne($ell['block_id']))
+				return 0;
+			return $bl['obj_id'];
 		}
 
 		return $dlg_id;
@@ -1011,18 +987,18 @@ function _dialogSpisokCmp($dialog_id) {//список колонок, испол
 
 function _dialogContentDelSetup($dialog_id) {//иконка настройки содежания удаления записи (единицы списка)
 	$isSetup = _BE('block_obj', 'dialog_del', $dialog_id);
-	$tooltip = _tooltip(($isSetup ? 'Изменить' : 'Настроить').' содержание', -70);
 	return
 	($isSetup ?'<span class="color-pay b">Настроено.</span> ' : '').
 	'<div val="dialog_id:56,dss:'.$dialog_id.'"'.
-		' class="icon icon-set pl dialog-open'.$tooltip.
+		' class="icon icon-set pl dialog-open tool"'.
+		' data-tool="'.($isSetup ? 'Изменить' : 'Настроить').' содержание">'.
 	'</div>';
 }
 
 function _dialogIUID($DLG, $unit_id=0) {//присвоение ID стороннего диалога (InsertUnitID)
 	if(!$el = _elemOne($DLG['insert_unit_id_set_elem_id']))
 		return;
-	if(!$BL = $el['block'])
+	if(!$BL = _blockOne($el['block_id']))
 		return;
 	if($BL['obj_name'] != 'dialog')
 		return;
@@ -1115,7 +1091,7 @@ function PHP12_dialog_app_li($r) {
 	   (DEBUG ? '<td class="w50 pale r">'.$r['id'] : '').
 				'<td class="d-name over5 curP dialog-open'._dn($r['pid'], 'b').'" val="dialog_id:'.$r['id'].'">'.$r['name'].
 				'<td class="w30 r">'.
-					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup'._tooltip('Редактировать диалог', -66).'</div>'.
+					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup tool" data-tool="Редактировать диалог"></div>'.
 				'<td class="w50 center">'.
 					($r['spisok_on'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w100 color-sal'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
@@ -1138,7 +1114,7 @@ function PHP12_dialog_col($dialog_id) {//колонки, используемы�
 				if(@$ell['col'] == 'col')
 					if($el['dialog_id'] != 12) {
 						$dlg = _dialogQuery($el['dialog_id']);
-						$col = '<span class="bg-fee'._tooltip('Отсутствует имя колонки<br>'.$dlg['name'], 5, 'l', 1).'--- ['.$el['dialog_id'].']</span>';
+						$col = '<span class="bg-fee tool" data-tool="Отсутствует имя колонки<br>'.$dlg['name'].'">--- ['.$el['dialog_id'].']</span>';
 						break;
 					}
 
@@ -1242,9 +1218,9 @@ function PHP12_spisok23_app() {//списки-таблицы для текуще
 function _elemRule($i='all', $v=0) {//кеш правил для элементов
 	global  $RULE_USE,//массив всех правил
 			$DLG_ASS, //элемент содержит правило
-		    $RULE_ASS;//правило содержит элемен
+		    $RULE_ASS;//правило содержит элемент
 
-	if(!defined('RULE_USE')) {
+	if(!_defined('RULE_USE')) {
 		$key = 'RULE_USE';
 		if(!$RULE_USE = _cache_get($key, 1)) {
 			$sql = "SELECT *
@@ -1262,8 +1238,6 @@ function _elemRule($i='all', $v=0) {//кеш правил для элемент�
 			$DLG_ASS[$did][$rid] = 1;
 			$RULE_ASS[$rid][$did] = 1;
 		}
-
-		define('RULE_USE', 1);
 	}
 
 	//содержит ли элемент правило
@@ -1274,82 +1248,77 @@ function _elemRule($i='all', $v=0) {//кеш правил для элемент�
 }
 
 function _elemOne($elem_id, $upd=false) {//запрос одного элемента
-	global $BE_FLAG;
+	if(!$elem_id = _num($elem_id))
+		return array();
+	if(!$upd)
+		return _BE('elem_one', $elem_id);
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id`=".$elem_id;
+	if(!$el = query_assoc($sql))
+		return array();
 
 	//обновление данных элемента в кеше
-	if($upd) {
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id`=".$elem_id;
-		if(!$el = query_assoc($sql))
-			return array();
+	$key = 'GELM';
+	$global = $el['app_id'] ? 0 : 1;
+	if(!_cache_isset($key, $global))
+		return array();
 
-		$key = 'ELMM';
-		$global = $el['app_id'] ? 0 : 1;
-		if(_cache_isset($key, $global)) {
-			$ELM = _cache_get($key, $global);
-			$el = _beElemDlg($el);
-			$el = _element('struct', $el);
-			$el = _elementTitle($el);
+	global $G_ELM;
 
-			//дочерние элементы
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `parent_id`=".$elem_id."
-					ORDER BY `sort`";
-			if($ELMCH = query_arr($sql)) {
-				$ELMCH = _beElemAction($ELMCH);
-				$el['vvv'] = array();
-				foreach($ELMCH as $id => $ell) {
-					$ell = _elementTitle($ell);
-					$ell = _element('struct_vvv', $el, $ell);
+	$ELM = _cache_get($key, $global);
+	$el = _beElmDlg($el);
+	$el = _element('struct', $el);
+	$el = _elementTitle($el);
+	$ELM[$elem_id] = $el;
 
-					if(!empty($ELMCH[$id]['action']))
-						$ell['action'] = $ELMCH[$id]['action'];
+	_cache_set($key, $ELM, $global);
 
-					$el['vvv'][] = $ell;
-				}
-			}
+	$G_ELM[$elem_id] = $el;
 
-			$ELM[$elem_id] = $el;
-			_cache_set($key, $ELM, $global);
-			$BE_FLAG = 0;
-		}
-	}
-
-	return _BE('elem_one', $elem_id);
+	return $el;
 }
 function _blockOne($block_id, $upd=false) {//запрос одного блока
-	global $BE_FLAG;
+	if(!$upd)
+		return _BE('block_one', $block_id);
 
 	//обновление данных блока в кеше
-	if($upd) {
-		$sql = "SELECT *
-				FROM `_block`
-				WHERE `id`=".$block_id;
-		if(!$bl = query_assoc($sql))
-			return array();
+	$sql = "SELECT *
+			FROM `_block`
+			WHERE `id`=".$block_id;
+	if(!$bl = query_assoc($sql))
+		return array();
 
-		$sql = "SELECT `id`
-				FROM `_element`
-				WHERE `block_id`=".$block_id."
-				LIMIT 1";
-		$bl['elem_id'] = _num(query_value($sql));
+	$sql = "SELECT `id`
+			FROM `_element`
+			WHERE `block_id`=".$block_id."
+			LIMIT 1";
+	$bl['elem_id'] = _num(query_value($sql));
 
-		$key = 'BLKK';
-		$global = $bl['app_id'] ? 0 : 1;
-		if(_cache_isset($key, $global)) {
-			$BLK = _cache_get($key, $global);
-			$bl = _beBlockStructure($bl);
-			$BLK[$block_id] = $bl;
-			_cache_set($key, $BLK, $global);
-			$BE_FLAG = 0;
-		}
-	}
+	$key = 'GBLK';
+	$global = $bl['app_id'] ? 0 : 1;
+	if(!_cache_isset($key, $global))
+		return array();
 
-	return _BE('block_one', $block_id);
+	global $G_BLK;
+
+	$BLK = _cache_get($key, $global);
+	$bl = _beBlkStruct($bl);
+	$BLK[$block_id] = $bl;
+	_cache_set($key, $BLK, $global);
+
+	$G_BLK[$block_id] = $bl;
+
+	return $bl;
 }
-
+function _blockCh($block_id, $param) {//получение конкретного параметра блока
+	if(!$bl = _BE('block_one', $block_id))
+		return '';
+	if(!isset($bl[$param]))
+		return '';
+	return $bl[$param];
+}
 
 function _elemColType($id='all') {//тип данных, используемый элементом _dialog:element_type
 	$col_type = array(
@@ -1434,7 +1403,7 @@ function _elemColDlgId($elem_id, $oo=false) {//получение id диало�
 		return 0;
 
 	//определение диалога, в котором расположен элемент
-	if(!$BL = $el['block'])
+	if(!$BL = _blockOne($el['block_id']))
 		return 0;
 	if($BL['obj_name'] != 'dialog')
 		return 0;
@@ -1449,7 +1418,7 @@ function _elemColDlgId($elem_id, $oo=false) {//получение id диало�
 
 	if(!$ell = _elemOne($id))
 		return 0;
-	if(!$BL = $ell['block'])
+	if(!$BL = _blockOne($ell['block_id']))
 		return 0;
 	if($BL['obj_name'] != 'dialog')
 		return 0;
@@ -1572,15 +1541,69 @@ function _elemUids($ids, $u) {//получение значения записи
 
 	return '';
 }
+function _elemArr($ids) {//получение массива элементов по id
+	if(!$ids = _ids($ids, 'arr'))
+		return array();
+
+	$send = array();
+	foreach($ids as $elem_id) {
+		if(!$el = _elemOne($elem_id))
+			continue;
+		$send[] = $el;
+	}
+
+	return $send;
+}
+function _elmJs($obj_name, $obj_id, $prm=array()) {//список элементов, которым требуется выполнение JS после печати
+	if(!$ELM = _BE('elem_arr', $obj_name, $obj_id))
+		return array();
+
+	$send = array();
+	$elmDop = array();//поиск элементов сторонних объектов (в действиях), которые потребуются
+	foreach($ELM as $elem_id => $el) {
+		$elJS = _element('js', $el);
+		$elJS['action'] = _BE('elem_one_action', $el['id']);
+		$elJS['vvv'] = _element('vvv', $el, $prm);
+
+		foreach($elJS['action'] as $act) {
+			if($act['dialog_id'] == 209)//вставка значения в блок
+				$elmDop += _idsAss($act['v1']);
+		}
+
+		$send[$elem_id] = $elJS;
+	}
+
+	foreach($elmDop as $elem_id => $n) {
+		if(isset($send[$elem_id]))
+			continue;
+		$send[$elem_id] = _element('js', $elem_id);
+	}
+
+	return $send;
+}
+function _elemJsFocus($obj_name, $obj_id) {//id элемента, на который будует установлен фокус
+	if(!$ELM = _BE('elem_arr', $obj_name, $obj_id))
+		return 0;
+
+	foreach($ELM as $el)
+		if(!empty($el['focus']))
+			return $el['id'];
+
+	//если фокус установлен не был, но присутствует [7] быстрый поиск, установка фокуса на него
+	foreach($ELM as $el)
+		if($el['dialog_id'] == 7)
+			return $el['id'];
+
+	return 0;
+}
 
 function _elemWidth($el) {//получение ширины поля, в котором расположен элемент
 	if(!is_array($el))
 		if($el = _num($el))
 			$el = _elemOne($el);
-	if(empty($el['block']))
+	if(!$BL = _blockOne($el['block_id']))
 		return 0;
 
-	$BL = $el['block'];
 	$width = $BL['width'];
 
 	$mar = explode(' ', $el['mar']);
@@ -1599,66 +1622,206 @@ function _elemWidth($el) {//получение ширины поля, в кот�
 
 
 
+function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элемента
+	if(!$bl = _blockOne($el['block_id']))
+		return '';
+	//attr_id не ставится в элементе шаблона в рабочей версии
+	if(!$prm['blk_setup'] && $bl['obj_name'] == 'spisok')
+		return '';
 
+	return ' id="el_'.$el['id'].'"';
+}
+function _elemDivDataHint($el, $prm) {//аттрибут data-подсказка для элемента
+	if(!empty($prm['blk_setup']))
+		return '';
+	if(empty($el['id']))
+		return '';
+	if(!$hint = _BE('hint_elem_one', $el['id']))
+		return '';
 
+	$prm['td_no_end'] = 1;
+	$hint['msg'] = _blockHtml('hint', $hint['id'], $prm);
 
+	return ' data-hint-id="'._hintMassPush($hint).'"';
+}
+function _elemHintOn($el, $prm=array()) {
+	if(!empty($prm['blk_setup']))
+		return '';
+	if(empty($el['id']))
+		return '';
+	if(!_BE('hint_elem_one', $el['id']))
+		return '';
 
+	return 'hint-on';
+}
 
-function PHP12_counter_v($prm) {
-	if(!$u = $prm['unit_get'])
-		return _empty('Отсутствуют данные записи');
-	if(!$unit_id = _num($u['id']))
-		return _empty('Не получен ID записи');
+function _elemDivSize($el) {//класс - размер шрифта
+	if(empty($el['size']))
+		return '';
+	if($el['size'] == 13)
+		return '';
+	return 'fs'.$el['size'];
+}
+function _elemDiv($elem_id, $prm=array()) {//формирование div элемента
+	if(!$el = _elemOne($elem_id))
+		return '';
+	if(_elemAction244($el, $prm))
+		return '';
 
+	$attr_id = _elemDivAttrId($el, $prm);
+	$style = _elemStyle($el, $prm);
 
-	$act = array(
-		1 => 'Внесение',
-		2 => 'Изменение',
-		3 => 'Удаление'
-	);
+	//блок принимает данные записи
+	$bl = _blockOne($el['block_id']);
+	if(!is_array($prm = _blockUnitGet($bl, $prm, true)))
+		return '<div'.$attr_id.$style.'>'.$prm.'</div>';
 
-	$actColor = array(
-		1 => 'bg-dfd',
-		2 => 'bg-ffc',
-		3 => 'bg-fcc'
-	);
+	$txt = _elemPrint($el, $prm);
 
-	$sql = "SELECT *
-			FROM `_counter_v`
-			WHERE `app_id`=".APP_ID."
-			  AND `unit_id`=".$unit_id."
-			ORDER BY `id` DESC
-			LIMIT 300";
-	if(!$spisok = query_arr($sql))
-		return _empty('Данных нет');
+	$cls = array();
+	$cls[] = _elemAction242($el, $prm);
+	$cls[] = @$el['font'];
+	$cls[] = _elemDivSize($el);
+	$cls[] = _elemHintOn($el, $prm);;//наличие подсказки
+	$cls = array_diff($cls, array(''));
+	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
+	$txt = _elemFormat($el, $prm, $txt);
 
-	$send = '<table class="_stab small">'.
-				'<tr><th>Действие'.
-					'<th>Диалог'.
-					'<th>Сумма'.
-					'<th>Остаток'.
-					'<th>Дата внесения'.
-					'<th>Менеджер'.
-				'';
+	return
+	_elemDivCol($el, $prm).
+	'<div'.$attr_id.$cls.$style._elemDivDataHint($el, $prm).'>'.$txt.'</div>';
+}
+function _elemDivCol($el, $prm) {
+	if(empty($el['col']))
+		return '';
+	if(!$prm['blk_setup'])
+		return '';
 
-	foreach($spisok as $r) {
-		$DLG = _dialogQuery($r['action_dialog_id']);
-		$send .= '<tr>'.
-					'<td class="'.$actColor[$r['action_type_id']].'">'.$act[$r['action_type_id']].
-					'<td>'.$DLG['name'].
-					'<td class="r">'.$r['sum'].
-					'<td class="r">'.$r['balans'].
-					'<td>'.$r['dtime_add'].
-					'<td>'._user($r['user_id_add'], 'name').
-					'';
+	return '<div class="elem-col">'.$el['col'].'</div>';
+}
+function _elemFormat($el, $prm, $txt) {//формат значения элемента
+	$txt = _elemAction241($el, $prm, $txt); //подмена текста
+	$txt = _elemAction243($el, $txt);       //Формат для чисел
+	$txt = _elemAction245($el, $txt, 1);    //Формат для текста
+	$txt = _spisokUnitUrl($el, $prm, $txt);
+	$txt = _elemLink($el, $txt);
+	return $txt;
+}
+function _elemLink($el, $txt) {//нахождение ссылок и преобразование
+	switch($el['dialog_id']) {
+		case 11:
+			if(!$last_id = _idsLast($el['txt_2']))
+				break;
+			if(!$el11 = _elemOne($last_id))
+				break;
+
+			//для видеороликов ссылка не делается
+			if($el11['dialog_id'] == 76)
+				break;
+			if($el11['dialog_id'] == 5 && $el11['num_2'])
+				break;
+
+			return _noteLink($txt);
 	}
 
-	$send .= '</table>';
-
-
-	return $send;
+	return $txt;
 }
+function _elemStyle($el, $prm) {//стили css для элемента
+	$send = array();
+
+	//отступы
+	$ex = explode(' ', $el['mar']);
+	foreach($ex as $px)
+		if($px) {
+			$send[] = 'margin:'.
+				$ex[0].($ex[0] ? 'px' : '').' '.
+				$ex[1].($ex[1] ? 'px' : '').' '.
+				$ex[2].($ex[2] ? 'px' : '').' '.
+				$ex[3].($ex[3] ? 'px' : '');
+			break;
+		}
+
+	//когда включена настройка ширины элементов,
+	//те элементы, которые могут настраиваться, остаются, остальные скрываются
+	if($prm['elm_width_change'] && !_dialogParam($el['dialog_id'], 'element_width'))
+		$send[] = 'visibility:hidden';
+
+	if(!$send)
+		return '';
+
+	return ' style="'.implode(';', $send).'"';
+}
+
+function _elemAttrId($el, $prm) {//аттрибут id для DIV элемента
+	$attr_id = 'cmp_'.$el['id'];
+
+	if($prm['blk_setup'])
+		$attr_id .= '_edit';
+
+	return $attr_id;
+}
+function _elemStyleWidth($el) {//ширина элемента
+	if(!isset($el['width']))
+		return '';
+	if(!$width = _num($el['width']))
+		return ' style="width:100%"';
+
+	return ' style="width:'.$width.'px"';
+}
+function _elemPrint($el, $prm) {//формирование и отображение элемента
+	//если элемент вносит данные из другого диалога - удаление данных записи, чтобы не было подстановки данных
+	if($prm['unit_edit'])
+		if(_elemColDlgId($el['id'], true))
+			$prm['unit_edit'] = array();
+
+	return _element('print', $el, $prm);
+}
+function _elemPrintV($el, $prm, $def='') {//значение записи при редактировании
+	if(empty($prm['unit_edit']))
+		return $def;
+	if(empty($el['col']))
+		return $def;
+
+	$col = $el['col'];
+
+	//имя колонки является id элемента из родительского диалога
+	if($id = _num($col)) {
+		if(!$elp = _elemOne($id))
+			return $def;
+		if(!$col = $elp['col'])
+			return $def;
+	}
+
+	$v = $prm['unit_edit'][$col];
+
+	if(is_array($v)) {
+		//идентификаторы изображений
+		if($ids = @$v['ids'])
+			return $ids;
+		if($id = _num(@$v['id']))
+			return $id;
+		return $def;
+	}
+
+	//если текстовое поле и не число, возврат просто значения
+	if($el['dialog_id'] == 8 && $el['num_1'] != 33)
+		return  $v;
+
+	if(is_string($v) && preg_match(REGEXP_INTEGER, $v) && preg_match(REGEXP_INTEGER, $def))
+		return $v * 1;
+
+	return $v;
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1892,11 +2055,12 @@ function PHP12_elem_choose_rule($prm, $isMsg=0) {
 		if(!$BL = _blockOne($block_id))
 			return !$isMsg ? 0 : 'Исходного блока '.$block_id.' не существует.';
 
-		if($EL = $BL['elem'])
+		if($EL = _elemOne($BL['elem_id']))
 			switch($EL['dialog_id']) {
 				case 23: return !$isMsg ? 5 : 'Ячейка таблицы.';
 				case 44: return !$isMsg ? 4 : 'Сборный текст.';
 			}
+
 
 		switch($BL['obj_name']) {
 			case 'page':
@@ -1939,93 +2103,6 @@ function PHP12_elem_choose_debug($prm) {//информация о месте к�
 
 
 
-/* ---=== ВЫБОР БЛОКОВ [19] ===--- */
-function PHP12_block_choose($prm) {
-	if(!$block_id = _num($prm['srce']['block_id']))
-		if($elem_id = _num($prm['srce']['element_id'])) {
-			if(!$EL = _elemOne($elem_id))
-				return _emptyMin10('[19] Отсутствует исходный блок.');
-			$block_id = $EL['block_id'];
-		}
-	if(!$BL = _blockOne($block_id))
-		return _emptyMin10('Блока '.$block_id.' не существует.');
-
-	$title = 'Страница';
-	$obj_name = $BL['obj_name'];
-	$obj_id = $BL['obj_id'];
-
-	switch($obj_name) {
-		case 'page':
-			if(!$page = _page($obj_id))
-				return _emptyMin10('Страницы '.$obj_id.' не существует.');
-			$name = $page['name'];
-			break;
-		case 'dialog':
-			$title = 'Диалог';
-			if(!$dlg = _dialogQuery($obj_id))
-				return _emptyMin10('Диалога '.$obj_id.' не существует.');
-			$name = $dlg['name'];
-			break;
-		case 'spisok':
-			if(!$el = _elemOne($obj_id))
-				return _emptyMin10('Элемента '.$obj_id.' не существует.');
-
-			$obj_name = $el['block']['obj_name'];
-			$obj_id = $el['block']['obj_id'];
-			if($obj_name == 'dialog') {
-				$title = 'Диалог';
-				if(!$dlg = _dialogQuery($el['num_1']))
-					return _emptyMin10('Диалога-списка '.$obj_id.' не существует.');
-				$name = $dlg['name'];
-			} else {
-				if(!$page = _page($obj_id))
-					return _emptyMin10('Страницы '.$obj_id.' не существует.');
-				$name = $page['name'];
-			}
-			break;
-		default:
-			return _emptyMin10('Выбор блоков возможен только на страницах и в диалоговых окнах.');
-	}
-
-	//доп.параметны, отправленные из JS
-	$prm['dop'] += array(
-		'level_deny' => 0,  //запрет изменения уровня блоков. Только верхний (первый) уровень
-		'blk_deny' => 0,    //блоки, которые запрещено выбирать
-		'sel' => 0          //выбранные блоки
-	);
-
-	$cond = array(
-		'blk_choose' => 1,
-		'blk_level' => $prm['dop']['level_deny'] ? 1 : _blockLevelDefine($obj_name),
-		'blk_deny' => $prm['dop']['blk_deny'],
-		'blk_sel' => $prm['dop']['sel']
-	);
-
-	return
-	'<div class="fs14 pad10 pl15 bg-orange">'.$title.' <b class="fs14">'.$name.'</b>:</div>'.
-	($prm['dop']['level_deny'] ? '' : PHP12_block_choose_but_level($obj_name, $obj_id)).
-	'<div id="block-choose-div">'.
-		_blockHtml($obj_name, $obj_id, $cond).
-	'</div>';
-}
-function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уровня блоков
-	$arr = _blockLevelButArr($obj_name, $obj_id);
-	if(count($arr) < 2)
-		return '';
-
-	$html = '';
-	foreach($arr as $n => $color)
-		$html .= '<button class="block-choose-level-change vk small ml5 '.$color.'">'.$n.'</button>';
-
-	return
-	'<div class="bg-ffc">'.
-		'<table class="bs5 ml10">'.
-			'<tr><td class="color-sal">Уровни блоков:'.
-				'<td>'.$html.
-				'<td class="w50 level-hold">'.
-		'</table>'.
-	'</div>';
-}
 
 
 
@@ -2115,167 +2192,6 @@ function PHP12_dialog_del_setup($prm) {
 
 
 
-/* ---=== НАСТРОЙКА УСЛОВИЙ ДЛЯ СПИСКА [41] ===--- */
-function PHP12_spfl($prm) {
-//	print_r($prm);
-	if(!PHP12_spfl_dss($prm))
-		return _emptyMin('Отсутствует id исходного диалога');
-
-	return '';
-}
-function PHP12_spfl_save($DLG) {
-	if($DLG['id'] != 41)
-		return;
-
-	//поиск id элемента, который является подключаемой PHP функцией
-	$vvv_id = 0;
-
-	foreach($DLG['cmp'] as $cmp)
-		if($cmp['dialog_id'] == 12)
-			if($cmp['txt_1'] == 'PHP12_spfl')
-				$vvv_id = $cmp['id'];
-
-	if(!$vvv_id)
-		jsonError('Не найдена подключаемая функция');
-
-	$send['v'] = '';
-	$send['title'] = '';
-
-	if(!empty($_POST['vvv']))
-		if($arr = $_POST['vvv'][$vvv_id])
-			if(is_array($arr))
-				if(!empty($arr)) {
-					$v = array();
-					foreach($arr as $r) {
-						if(!$r['elem_id'] = _ids($r['elem_id']))
-							continue;
-						if(!$r['cond_id'] = _num($r['cond_id']))
-							continue;
-						$r['unit_id'] = _num($r['unit_id'], 1);
-						$v[] = $r;
-					}
-					$send['v'] = json_encode($v);
-					$c = count($v);
-					$send['c'] = $c;
-					$send['title'] = $c.' услови'._end($c, 'е', 'я', 'й');
-				}
-
-	jsonSuccess($send);
-}
-function PHP12_spfl_vvv($prm) {//получение настроек для редактирования
-
-	$send = array(
-		'dss' => PHP12_spfl_dss($prm),
-		'vvv' => array(),
-		'drop' => PHP12_spfl_drop()//стандартные значения выпадающего списка
-	);
-
-	//получение id диалога по элементу, через который был выбор
-	if($elem_id = $prm['srce']['element_id'])
-		$send['dss'] = _dialogSel24($elem_id, $prm['srce']['dss']);
-
-	if(!$arr = $prm['srce']['dop'])
-		return $send;
-
-	$arr = htmlspecialchars_decode($arr);
-	if(!$arr = json_decode($arr, true))
-		return $send;
-
-	foreach($arr as $n => $r) {
-		$arr[$n]['elem_title'] = _elemIdsTitle($r['elem_id']);
-		$arr[$n]['spisok'] = array();
-		$arr[$n]['unit4title'] = '';
-		if($arr[$n]['elem_issp'] = _elemIsConnect($r['elem_id'])) {
-			$spisok = _29cnn($r['elem_id']);
-			$arr[$n]['spisok'] = PHP12_spfl_vvv_unshift($spisok);
-			if($r['unit_id'] == -4)
-				$arr[$n]['unit4title'] = _elemIdsTitle($r['txt']);
-		} else {
-			$last = _idsLast($r['elem_id']);
-			if($el = _elemOne($last))
-				if($el['dialog_id'] == 17) {
-					$arr[$n]['elem_issp'] = 1;
-					$arr[$n]['spisok'] = _element('vvv', $r);
-				}
-		}
-	}
-
-	$send['vvv'] = $arr;
-
-	return $send;
-}
-function PHP12_spfl_dss($prm) {//получение id исходного диалога
-	if($dss = $prm['srce']['dss'])
-		return $dss;
-
-	if($block_id = $prm['srce']['block_id'])
-		if($BL = _blockOne($block_id))
-			if($BL['obj_name'] == 'dialog') {
-				if($DLG = _dialogQuery($BL['obj_id']))
-					if($id = _num($DLG['dialog_id_unit_get']))
-						return $id;
-				return $BL['obj_id'];
-			}
-
-	return 0;
-}
-function PHP12_spfl_drop() {
-	return array(
-		-11 => 'число текущего дня',
-		-12 => 'число текущей недели',
-		-13 => 'число текущего месяца',
-		-14 => 'число текущего года',
-
-		-21 => 'текущий пользователь',
-
-		-31 => 'значение v1'
-	);
-}
-function PHP12_spfl_vvv_unshift($spisok) {//общие дополнительные значения
-	array_unshift(
-		$spisok,
-		array(
-			'id' => -4,
-			'title' => 'Указанное значение',
-			'content' => '<div class="b color-pay">Указанное значение</div>'.
-						 '<div class="fs12 grey ml10 mt3 i">Указать элемент, значение которого будет использовано</div>'
-		)
-	);
-	array_unshift(
-		$spisok,
-		array(
-			'id' => -3,
-			'title' => 'Совпадает с данными, которые принимает блок',
-			'content' => '<div class="b color-pay">Совпадает с данными, которые принимает блок</div>'.
-						 '<div class="fs12 grey ml10 mt3 i">Будет выбрана запись, которую принимает блок</div>'
-		)
-	);
-	array_unshift(
-		$spisok,
-		array(
-			'id' => -2,
-			'title' => 'Совпадает с данными, которые принимает диалоговое окно',
-			'content' => '<div class="b color-pay">Совпадает с данными, которые принимает диалоговое окно</div>'.
-						 '<div class="fs12 grey ml10 mt3 i">Будет выбрана запись, которую принимает диалоговое окно</div>'
-		)
-	);
-	array_unshift(
-		$spisok,
-		array(
-			'id' => -1,
-			'title' => 'Совпадает с текущей страницей',
-			'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
-						 '<div class="fs12 grey ml10 mt3 i">Будет выбрана запись, которую принимает текущая страница</div>'
-		)
-	);
-
-	return $spisok;
-}
-
-
-
-
-
 /* ---=== НАСТРОЙКА ПАРАМЕТРОВ ШАБЛОНА ДЛЯ ДОКУМЕНТОВ [114] ===--- */
 function PHP12_template_param($prm) {
 	if(!$prm['unit_edit'])
@@ -2346,9 +2262,9 @@ function PHP12_template_param_save($cmp, $val, $unit) {
 	_BE('elem_clear');
 }
 function PHP12_template_param_vvv($prm) {//получение значений для настройки истории действий
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return array();
-	if(!$ids = _ids($u['param_ids']))
+	if(!$ids = _ids($prm['unit_edit']['param_ids']))
 		return array();
 
 	$send = array();
@@ -2371,9 +2287,9 @@ function PHP12_template_param_vvv($prm) {//получение значений �
 
 /* ---=== НАСТРОЙКА ЗНАЧЕНИЙ ДЛЯ ПЛАНИРОВЩИКА [115] ===--- */
 function PHP12_cron_dst_prm($prm) {
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return _emptyMin('Настройка данных будет доступна<br>после выбора списка для внесения данных.');
-	if(!$u['dst_spisok'])
+	if(!$prm['unit_edit']['dst_spisok'])
 		return _emptyMin('Выберите список для внесения данных,<br>сохраните окно и откройте снова.');
 
 	return '';
@@ -2579,21 +2495,24 @@ function PHP12_history_setup_vvv($prm) {//получение значений д
 		return array();
 
 	$act = $prm['dop']['act'];
-	if(!$arr = $DLG[$act.'_history_elem'])
+	if(!$ids = $DLG[$act.'_history_elem'])
 		return array();
 
-	foreach($arr as $id => $r) {
+	$send = array();
+	foreach(_ids($ids, 'arr') as $elem_id) {
+		if(!$el = _elemOne($elem_id))
+			continue;
 		$c = 0;
-		if($r['txt_9']) {
-			$vv = htmlspecialchars_decode($r['txt_9']);
+		if($el['txt_9']) {
+			$vv = htmlspecialchars_decode($el['txt_9']);
 			$vv = json_decode($vv, true);
 			$c = count($vv);
 		}
-		$arr[$id]['c'] = $c;
-		$arr[$id]['title'] = _element('title', $r);
-		unset($arr[$id]['action']);
+		$el['c'] = $c;
+		$el['title'] = _element('title', $el);
+		$send[] = $el;
 	}
-	return ($arr);
+	return $send;
 }
 
 function _historyAct($i='all') {//действия истории - ассоциативный массив
@@ -2780,8 +2699,8 @@ function _historySpisok($EL, $prm) {//список истории действи
 			} else {
 				$prm['unit_get'] = $unitArr[$r['unit_id']];
 				$prm = _blockParam($prm);
-				foreach($dlg[$type] as $hel)
-					$msg .= _historyKit($hel, $prm);
+				foreach(_ids($dlg[$type], 'arr') as $elem_id)
+					$msg .= _historyKit($elem_id, $prm);
 			}
 
 			$is_last = $n == $last;//последняя запись
@@ -2798,7 +2717,7 @@ function _historySpisok($EL, $prm) {//список истории действи
 								'<div class="history-o o'.$r['type_id'].'"></div>'.
 								'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
 							'<td>'.
-				   (SA && DEBUG ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-setup'._tooltip('Настроить историю', -60).'</div>' : '').
+				   (SA && DEBUG ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-setup tool" data-tool="Настроить историю"></div>' : '').
 								$msg.
 								_historySpisokEdited($r).
 					'</table>';
@@ -2812,9 +2731,11 @@ function _historySpisok($EL, $prm) {//список истории действи
 
 	return $send;
 }
-function _historyKit($el, $prm) {//составление одной сборки
+function _historyKit($elem_id, $prm) {//составление одной сборки
 	if(!$u = $prm['unit_get'])
 		return _msgRed('отсутствует запись');
+	if(!$el = _elemOne($elem_id))
+		return _msgRed('элемента '.$elem_id.' не существует');
 
 	//показ сборки по условиям, если есть
 	if($cond = $el['txt_9']) {
@@ -2900,22 +2821,22 @@ function _historySpisokEdited($hist) {//история при редактиро
 function _historyUnitCond($el, $prm) {//отображение истории для конкретной записи, которую принимает страница
 	if(!$el['num_8'])
 		return '';
+	if(!$bl = _blockOne($el['block_id']))
+		return '';
 
 	//история может быть размещёна либо на странице, либо в диалоге
-	switch($el['block']['obj_name']) {
+	switch($bl['obj_name']) {
 		case 'page':
-			$page_id = $el['block']['obj_id'];
-			if(!$page = _page($page_id))
-				return " AND !`id` /* страницы ".$page_id." не существует */";
+			if(!$page = _page($bl['obj_id']))
+				return " AND !`id` /* страницы ".$bl['obj_id']." не существует */";
 			if(!$dialog_id = $page['dialog_id_unit_get'])
 				return " AND !`id` /* страница не принимает данные записи */";
 			if(!$unit_id = _num(@$_GET['id']))
 				return " AND !`id` /* идентификатор записи не получен */";
 			break;
 		case 'dialog':
-			$dlg_id = $el['block']['obj_id'];
-			if(!$DLG = _dialogQuery($dlg_id))
-				return " AND !`id` /* диалога ".$dlg_id." не существует */";
+			if(!$DLG = _dialogQuery($bl['obj_id']))
+				return " AND !`id` /* диалога ".$bl['obj_id']." не существует */";
 			if(!$dialog_id = $DLG['dialog_id_unit_get'])
 				return " AND !`id` /* диалог не принимает данные записи */";
 			if(!$unit_id = $prm['unit_get_id'])
@@ -3033,11 +2954,6 @@ function _attachSize($v) {//оформление размера файла в б
 	$v = round($v / 1024);
 	return $v.'G';
 }
-
-
-
-
-
 
 
 

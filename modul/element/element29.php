@@ -110,7 +110,7 @@ function _element29_print11($el, $u) {
 	return $parent.$u;
 }
 function _element29_vvv($el, $prm) {
-	if($prm['unit_edit'])
+	if(!empty($prm['unit_edit']))
 		if(_elemColDlgId($el['id'], true))
 			$prm['unit_edit'] = array();
 
@@ -118,6 +118,13 @@ function _element29_vvv($el, $prm) {
 	$sel_id = _elem29PageSel($el['num_1'], $sel_id);
 	$sel_id = _elem29DialogSel($prm, $sel_id);
 	return _29cnn($el['id'], '', $sel_id);
+}
+function _element29_v_get($el, $sel_id) {
+	foreach(_29cnn($el['id'], '', $sel_id) as $r)
+		if($r['id'] == $sel_id)
+			return $r['title'];
+
+	return '';
 }
 function _element29_history($el, $u) {
 	if(empty($u))
@@ -179,7 +186,7 @@ function _elem29DialogSel($prm, $sel_id) {//подстановка id запис
 	if($sel_id != -2)
 		return $sel_id;
 	//должен передаваться id записи
-	if(!$get_id = $prm['unit_get_id'])
+	if(!$get_id = _num(@$prm['unit_get_id']))
 		return 0;
 	if(!$block_id = $prm['srce']['block_id'])
 		return 0;
@@ -264,7 +271,7 @@ function _elem29ValAuto($el, $txt) {//автоматическое внесен�
 			)";
 	return query_id($sql);
 }
-function _elem29defSet($dlg, $u) {//установка значения по умолчанию существующим значениям в списке
+function _elem29defSet($dlg, $el) {//установка значения по умолчанию существующим значениям в списке
 /*
 	Значения будут изменены при трёх условиях:
 		1. Требуется обязательный выбор значения
@@ -273,18 +280,17 @@ function _elem29defSet($dlg, $u) {//установка значения по у�
 */
 	if($dlg['id'] != 29)
 		return;
-	if(!$u['req'])
+	if(!$el['req'])
 		return;
-	if(!$u['num_6'])
+	if(!$el['num_6'])
 		return;
-	if(!$col = _elemCol($u))
+	if(!$col = _elemCol($el))
 		return;
-
-	//диалог, в котором размещается элемент
-	if($u['block']['obj_name'] != 'dialog')
+	if(!$bl = _blockOne($el['block_id']))
 		return;
-	$did = $u['block']['obj_id'];
-	if(!$DLG = _dialogQuery($did))
+	if($bl['obj_name'] != 'dialog')//диалог, в котором размещается элемент
+		return;
+	if(!$DLG = _dialogQuery($bl['obj_id']))
 		return;
 
 	$sql = "SELECT COUNT(*)
@@ -295,7 +301,7 @@ function _elem29defSet($dlg, $u) {//установка значения по у�
 		return;
 
 	$sql = "UPDATE "._queryFrom($DLG)."
-			SET `".$col."`=".$u['num_6']."
+			SET `".$col."`=".$el['num_6']."
 			WHERE "._queryWhere($DLG)."
 			  AND !`".$col."`";
 	query($sql);

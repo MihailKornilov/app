@@ -21,10 +21,7 @@ function _element0_print($el) {}
 function _element0_print11($el, $u) {}
 
 /*  */
-function _element0_history($el, $cl) {}
-
-/* Структура данных элемента */
-function _element0_struct_vvv($el, $cl) {}
+function _element0_history($el) {}
 
 /* отправка данных для JS */
 function _element0_vvv($el) {}

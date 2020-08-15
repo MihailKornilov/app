@@ -61,7 +61,7 @@ function _element79_print($el) {
 					".($SUM_COL ? ",SUM(`".$SUM_COL."`) `sum`" : '')."
 				FROM   "._queryFrom($DLG)."
 				WHERE  "._queryWhere($DLG)."
-					   "._element77cond($SPEL)."
+					   "._elem77filter($SPEL)."
 				GROUP BY `".$GROUP_COL."`";
 		if(!$arr = query_array($sql))
 			continue;

@@ -285,14 +285,12 @@ function _elem95_deleted($DLG, $DLG_INS, $ids=0) {
 function PHP12_elem95_setup($prm) {//настройка колонок списка
 	if(!$prm['unit_edit'])
 		return _emptyMin10('Настройка колонок будет доступна после вставки элемента в блок.');
-
 	if(!$BL = _blockOne($prm['srce']['block_id']))
 		return _emptyMin10('[95] Отсутствует исходный блок.');
+	if(!$el = _elemOne($BL['elem_id']))
+		return _emptyMin10('[95] Отсутствует элемент.');
 
-	$ex = explode(' ', $BL['elem']['mar']);
-	$w = $BL['width'] - $ex[1] - $ex[3] - 60;
-
-	return '<div class="calc-div h25 line-b bg-efe">'.$w.'</div>';
+	return '<div class="calc-div h25 line-b bg-efe">'._elemWidth($el).'</div>';
 }
 function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение данных колонок
 	/*

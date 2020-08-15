@@ -32,6 +32,14 @@ function _element1_print11($el, $u) {
 function _element1_history($el, $v) {
 	return _daNet($v);
 }
+function _element1_v_get($el, $v) {
+	switch($v) {
+		case 1: return 'установить галочку';
+		case 0:
+		case -1: return 'снять галочку';
+	}
+	return _msgRed('[1] неизвестное значение');
+}
 function _elem1def($cmp_id, $unit_id, $v) {//сброс значений у других галочек, если стоит флаг num_1
 	if(!$cmp = _elemOne($cmp_id))
 		return;
@@ -47,7 +55,7 @@ function _elem1def($cmp_id, $unit_id, $v) {//сброс значений у др
 	if(!$v)
 		return;
 
-	if(!$BL = $cmp['block'])
+	if(!$BL = _blockOne($cmp['block_id']))
 		return;
 	if($BL['obj_name'] != 'dialog')
 		return;

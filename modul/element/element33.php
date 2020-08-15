@@ -79,7 +79,7 @@ function _element33TT($el, $u, $data) {//подсказка кто внёс за
 
 	$tt = 'Вн'.($user['pol'] == 1 ? 'есла' : 'ёс').' '.$user['i'].' '.$user['f'];
 
-	return '<span class="inhr curD'._tooltip($tt, -40).$data.'<span>';
+	return '<span class="inhr curD tool" data-tool="'.$tt.'">'.$data.'<span>';
 }
 function _element33_template_docx($el, $u) {
 	return _element33Data($el, $u);

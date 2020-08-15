@@ -234,7 +234,6 @@ switch(@$_POST['op']) {
 
 		_BE('block_clear');
 		_BE('elem_clear');
-		_jsCache();
 
 		$prm = array(
 			'blk_setup' => 1,
@@ -317,12 +316,10 @@ switch(@$_POST['op']) {
 				query($sql);
 
 				_BE('elem_clear');
-
-				$el = _elemOne($elem_id);
-				$send['elem_js'] = _element('js', $el);
 			}
 
-		_jsCache();
+		$send['jsblk'] = _BE('block_arr', $block['obj_name'], $block['obj_id']);
+		$send['jselm'] = _elmJs($block['obj_name'], $block['obj_id']);
 
 		jsonSuccess($send);
 		break;
@@ -351,48 +348,17 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
-	case 'block_upd'://обновление содержимого блока
-		if(!$action_id = _num($_POST['action_id']))
-			jsonError('Не получен id действия');
-		if(!$src_id = _num($_POST['src_id']))
-			jsonError('Не получен исходный блок');
-		if(!$SRC = _blockOne($src_id))
-			jsonError('Исходного блока id'.$src_id.' не существует');
-		if(!$block_id = _num($_POST['ids']))
-			jsonError('Функция работает пока только для одного блока');
-		if(!$unit_id = _num($_POST['unit_id']))
-			jsonError('Не получен id записи');
-		if(!$bl = _blockOne($block_id))
-			jsonError('Блока id'.$block_id.' не существует');
-
-		if(empty($SRC['action']))
-			jsonError('Исходному блоку не назначены действия');
-
-		//заливка, в которую будет окрашен выбранный (исходный) блок
-		$send['bg'] = '';
-		foreach($SRC['action'] as $r)
-			if($r['id'] == $action_id)
-				$send['bg'] = $r['v1'];
-
-		$BLK = _BE('block_obj', $bl['obj_name'], $bl['obj_id']);
-
-		$bll[$block_id] = _blockChild($BLK, $block_id);
-
-		$prm = _blockParam(array(), $bl['obj_name']);
-		$prm['unit_get_id'] = $unit_id;
-
-		$send['blk'][$block_id] = _blockLevel($bll, $prm, 0, 2, $bl['width']);
-
-		jsonSuccess($send);
-		break;
-
 	case 'block_choose_level_change'://переключение уровней во время выбора блоков
 		if(!$block_id = _num($_POST['block_id']))
-			jsonError('Некорректный ID блока');
-		if(!$level = _num($_POST['level']))
-			jsonError('Некорректный уровень блоков');
+			if($elem_id = _num($_POST['element_id'])) {
+				if(!$EL = _elemOne($elem_id))
+					return _emptyMin10('Отсутствует элемент');
+				$block_id = $EL['block_id'];
+			}
 		if(!$BL = _blockOne($block_id))
 			jsonError('Блока id'.$block_id.' не существует');
+		if(!$level = _num($_POST['level']))
+			jsonError('Некорректный уровень блоков');
 
 		$obj_name = $BL['obj_name'];
 		$obj_id = $BL['obj_id'];
@@ -401,9 +367,11 @@ switch(@$_POST['op']) {
 		if($obj_name == 'spisok') {
 			if(!$el = _elemOne($obj_id))
 				jsonError('Элемента '.$obj_id.' не существует.');
+			if(!$bl = _blockOne($el['block_id']))
+				jsonError('Блока '.$el['block_id'].' не существует.');
 
-			$obj_name = $el['block']['obj_name'];
-			$obj_id = $el['block']['obj_id'];
+			$obj_name = $bl['obj_name'];
+			$obj_id = $bl['obj_id'];
 		}
 
 		$prm = array(
@@ -492,7 +460,6 @@ switch(@$_POST['op']) {
 		_BE('block_clear');
 		_BE('elem_clear');
 		_BE('dialog_clear');
-		_jsCache();
 
 		$send['level'] = _blockLevelChange($obj_name, $obj_id);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
@@ -578,7 +545,6 @@ switch(@$_POST['op']) {
 		_BE('elem_clear');
 		_BE('block_clear');
 		_BE('dialog_clear');
-		_jsCache();
 
 		$send['level'] = _blockLevelChange($obj_name, $obj_id);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
@@ -647,7 +613,6 @@ switch(@$_POST['op']) {
 		_BE('elem_clear');
 		_BE('block_clear');
 		_BE('dialog_clear');
-		_jsCache();
 
 		$send['level'] = _blockLevelChange($obj_name, $obj_id);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
@@ -703,7 +668,6 @@ switch(@$_POST['op']) {
 		_BE('elem_clear');
 		_BE('block_clear');
 		_BE('dialog_clear');
-		_jsCache();
 
 		$send['level'] = _blockLevelChange($obj_name, $obj_id);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
@@ -787,7 +751,6 @@ switch(@$_POST['op']) {
 
 		_blockChildCountSet($obj_name, $obj_id);
 		_BE('block_clear');
-		_jsCache();
 
 		jsonSuccess();
 		break;
@@ -869,7 +832,6 @@ switch(@$_POST['op']) {
 		_blockChildCountSet($obj_name, $obj_id);
 		_BE('elem_clear');
 		_BE('block_clear');
-		_jsCache();
 
 		jsonSuccess();
 		break;

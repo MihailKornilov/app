@@ -430,8 +430,6 @@ function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохране�
 
 
 function _pageShow($page_id) {
-	define('PAGE_MSG_ERR', '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>');
-
 	//ведутся технические работы
 	if(!SA && !APP_ACCESS)
 		$page_id = 19;
@@ -460,9 +458,9 @@ function _pageShow($page_id) {
 		$page_id = _page('def');
 
 	if(!$page = _page($page_id))
-		return _empty20('Несуществующая страница.'.PAGE_MSG_ERR);
+		return _empty20('Несуществующая страница.'._pageUrlBack());
 	if(!_pageAccess($page_id))
-		return _empty20('Страница недоступна или не существует.'.PAGE_MSG_ERR);
+		return _empty20('Страница недоступна или не существует.'._pageUrlBack());
 
 	$prm = array();
 
@@ -470,40 +468,56 @@ function _pageShow($page_id) {
 	if($dialog_id = $page['dialog_id_unit_get']) {
 		if(!$id = $page['unit_id'])
 			if(!$id = _num(@$_GET['id']))
-				return _empty20('Некорректный идентификатор записи.'.PAGE_MSG_ERR);
+				return _empty20('Некорректный идентификатор записи.'._pageUrlBack());
 		if(!$dialog = _dialogQuery($dialog_id))
-			return _empty20('Отсутствует диалог, который вносит данные записи.'.PAGE_MSG_ERR);
+			return _empty20('Отсутствует диалог, который вносит данные записи.'._pageUrlBack());
 		if(!$prm['unit_get'] = _spisokUnitQuery($dialog, $id))
-			return _empty20('Записи '.$id.' не существует.'.PAGE_MSG_ERR);
+			return _empty20('Записи '.$id.' не существует.'._pageUrlBack());
 	}
 
 	return
 	_blockHtml('page', $page_id, $prm).
 	_page_div().
-	_pageShowScript($page_id, $prm);
+	_pageScript($page_id, $prm);
 }
-function _pageShowScript($page_id, $prm) {
-	if(PAS)
+function _pageScript($page_id, $prm) {
+
+	$send = 'var BLKK='._json(_BE('block_arr', 'page', $page_id)).';'.
+			'var ELMM='._json(_elmJs('page', $page_id, $prm)).';';
+
+	if(!PAS) {
+		if(APP_ID && USER_ID)
+			$send .= 'var FILTER='._json(_filter('page_js'), 1).';';
+		$send .=
+			'_ELM_JS(ELMM);'.
+			_pageJsElmFocus($page_id).
+			'var HINT='._json(_hintMass()).';'.
+			_pageJsDlgOpenAuto().
+			_userInviteDlgOpen().
+			_blockFlash();
+	}
+
+	return '<script>'.$send.'</script>';
+}
+function _pageJsElmFocus($page_id) {//установка фокуса на указанный элемент
+	if(!$elem_id = _elemJsFocus('page', $page_id))
+		return '';
+	return '_ELM_FOCUS('.$elem_id.');';
+}
+function _pageJsDlgOpenAuto() {//автоматическое открытие указанного диалога после печати страницы
+	if(!APP_ID)
+		return '';
+	if(!USER_ID)
+		return '';
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND `open_auto`
+			LIMIT 1";
+	if(!$dlg = query_assoc($sql))
 		return '';
 
-	$prm = _blockParam($prm, 'page');
-
-	//значения элементов страницы
-	$vvv = array();
-	foreach(_BE('elem_ids_arr', 'page', $page_id) as $elem_id)
-		$vvv[$elem_id] = _element('vvv', $elem_id, $prm);
-
-	return
-	'<script>'.
-	(APP_ID && USER_ID ?
-		'var FILTER='._json(_filter('page_js'), 1).';'.
-		_pageDlgOpenAuto()
-	: '').
-		'HINT='._json(_hintMass()).','.
-		'_ELM_ACT({vvv:'._json($vvv).',unit:[]});'.
-		_userInviteDlgOpen().
-		_blockFlash().
-	'</script>';
+	return '_dialogLoad({dialog_id:'.$dlg['id'].'});';
 }
 function _pageUnitGet($obj_name, $obj_id) {//получение данных записи, которые принимает страница (для отображения в настройке страницы)
 	if($obj_name != 'page')
@@ -519,30 +533,28 @@ function _pageUnitGet($obj_name, $obj_id) {//получение данных з�
 
 	return _spisokUnitQuery($dialog, $get_id);
 }
-function _pageDlgOpenAuto() {
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE `app_id`=".APP_ID."
-			  AND `open_auto`
-			LIMIT 1";
-	if(!$dlg = query_assoc($sql))
-		return '';
-
-	return '_dialogLoad({dialog_id:'.$dlg['id'].'});';
-}
 function _blockFlash() {//подсветка блока, если нужно на него указать
 	if(!$block_id = _num(@$_GET['block_flash']))
 		return '';
 
 	return '$("#bl_'.$block_id.'")._flash({color:"red"});';
 }
+function _pageUrlBack() {//ссылка возврата на предыдущую страницу
+	if(!$pfrom = _num(@$_GET['pfrom']))
+		return '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>';
 
+	$uid = '';
+	if($id = _num($_GET['id']))
+		$uid = '&id='.$id;
+	
+	return '<br><br><a href="'.URL.'&p='.$pfrom.$uid.'">Вернуться на предыдущую страницу</a>';
+}
 
 function _document() {//формирование документа для вывода на печать
 	if(!APP_ID)
-		return _empty20('Не выполнен вход в приложение'.PAGE_MSG_ERR);
+		return _empty20('Не выполнен вход в приложение'._pageUrlBack());
 	if(!$doc_id = _num(@$_GET['doc_id']))
-		return _empty20('Некорректный id шаблона документа'.PAGE_MSG_ERR);
+		return _empty20('Некорректный id шаблона документа'._pageUrlBack());
 
 	//получение данных шаблона
 	$sql = "SELECT *
@@ -550,7 +562,7 @@ function _document() {//формирование документа для вы�
 			WHERE `app_id`=".APP_ID."
 			  AND `id`=".$doc_id;
 	if(!$doc = query_assoc($sql))
-		return _empty20('Шаблона документа '.$doc_id.' не существует'.PAGE_MSG_ERR);
+		return _empty20('Шаблона документа '.$doc_id.' не существует'._pageUrlBack());
 
 	//получение данных файла-шаблона
 	if(!$attach_id = $doc['attach_id'])
@@ -561,26 +573,30 @@ function _document() {//формирование документа для вы�
 			WHERE `app_id`=".APP_ID."
 			  AND `id`=".$attach_id;
 	if(!$att = query_assoc($sql))
-		return _empty20('Файла-шаблона '.$attach_id.' не существует'.PAGE_MSG_ERR);
+		return _empty20('Файла-шаблона '.$attach_id.' не существует'._pageUrlBack());
 
 	if(!file_exists($att['path'].$att['fname']))
-		return _empty20('Файл-шаблон отсутствует на сервере'.PAGE_MSG_ERR);
+		return _empty20(
+					'Файл-шаблон <b>'.$att['oname'].'</b> отсутствует на сервере. '.
+					'<a href="'.URL.'&p=8">Настроить</a>'.
+					_pageUrlBack()
+			   );
 
 	//проверка корректности расширения файла-шаблона
 	$ex = explode('.', $att['fname']);
 	$c = count($ex) - 1;
 	if($ex[$c] != 'docx')
-		return _empty20('Некорректный файл-шаблон'.PAGE_MSG_ERR);
+		return _empty20('Некорректный файл-шаблон'._pageUrlBack());
 
 	//получение данных записи
 	if(!$dlg_id = $doc['spisok_id'])
-		return _empty20('Не указан список, из которого берутся данные'.PAGE_MSG_ERR);
+		return _empty20('Не указан список, из которого берутся данные'._pageUrlBack());
 	if(!$DLG = _dialogQuery($dlg_id))
-		return _empty20('Диалога '.$dlg_id.' не существует'.PAGE_MSG_ERR);
+		return _empty20('Диалога '.$dlg_id.' не существует'._pageUrlBack());
 	if(!$unit_id = _num(@$_GET['id']))
-		return _empty20('Отсутствует id записи'.PAGE_MSG_ERR);
+		return _empty20('Отсутствует id записи'._pageUrlBack());
 	if(!$unit = _spisokUnitQuery($DLG, $unit_id))
-		return _empty20('Записи '.$unit_id.' не существует'.PAGE_MSG_ERR);
+		return _empty20('Записи '.$unit_id.' не существует'._pageUrlBack());
 
 	require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
 	$document = new \PhpOffice\PhpWord\TemplateProcessor($att['path'].$att['fname']);
@@ -655,10 +671,10 @@ function PHP12_page_list_li($r, $level=0) {//данные одной стран�
 					'<td class="w25"><div class="icon icon-move pl"></div>'.
 					'<td>'.
 						'<a href="'.URL.'&p='.$r['id'].'" class="pg-name'._dn($r['parent_id'], 'b fs14').'">'.$r['name'].'</a>'.
-		   ($r['def'] ? '<div class="icon icon-ok curD ml10'._tooltip('Стартовая страница', -61).'</div>' : '').
+		   ($r['def'] ? '<div class="icon icon-ok curD ml10 tool" data-tool="Стартовая страница"></div>' : '').
 					'<td class="w50">'.
-						'<div val="dialog_id:20,edit_id:'.$r['id'].'" class="icon icon-edit pl dialog-open'._tooltip('Редактировать страницу', -74).'</div>'.
-	($r['del_allow'] ? '<div val="dialog_id:20,del_id:'.$r['id'].'" class="icon icon-del-red pl dialog-open'._tooltip('Удалить страницу', -54).'</div>' : '').
+						'<div val="dialog_id:20,edit_id:'.$r['id'].'" class="icon icon-edit pl dialog-open tool" data-tool="Редактировать страницу"></div>'.
+	($r['del_allow'] ? '<div val="dialog_id:20,del_id:'.$r['id'].'" class="icon icon-del-red pl dialog-open tool" data-tool="Удалить страницу"></div>' : '').
 			'</table>';
 }
 
@@ -686,9 +702,285 @@ function PHP12_pin_dialog_open() {
 
 
 
+function _remake16() {//[16] перенос данных в JSON
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=16";
+	$ids = query_ids($sql);
 
+	$mass = array();
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id` IN (".$ids.")
+			ORDER BY `parent_id`,`sort`";
+
+	if($arr = query_arr($sql)) {
+		foreach($arr as $r) {
+			$parent_id = $r['parent_id'];
+			if(!isset($mass[$parent_id]))
+				$mass[$parent_id] = array();
+			$mass[$parent_id][] = array(
+				'id' => $r['id'],
+				'title' => $r['txt_1'],
+				'def' => $r['def']
+			);
+		}
+
+		foreach($mass as $id => $r) {
+			$sql = "UPDATE `_element`
+					SET `txt_2`='".addslashes(json_encode($r))."'
+					WHERE `id`=".$id;
+			query($sql);
+		}
+
+		$sql = "DELETE FROM `_element` WHERE `parent_id` IN (".$ids.")";
+		query($sql);
+	}
+}
+function _remake17() {//[17] перенос данных в JSON
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=17";
+	$ids = query_ids($sql);
+
+	$mass = array();
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id` IN (".$ids.")
+			ORDER BY `parent_id`,`sort`";
+	if($arr = query_arr($sql)) {
+		foreach($arr as $r) {
+			$parent_id = $r['parent_id'];
+			if(!isset($mass[$parent_id]))
+				$mass[$parent_id] = array();
+			$mass[$parent_id][] = array(
+				'id' => $r['id'],
+				'title' => $r['txt_1'],
+				'content' => $r['txt_2'],
+				'def' => $r['def']
+			);
+		}
+
+		foreach($mass as $id => $r) {
+			$sql = "UPDATE `_element`
+					SET `txt_2`='".addslashes(json_encode($r))."'
+					WHERE `id`=".$id;
+			query($sql);
+		}
+
+		$sql = "DELETE FROM `_element` WHERE `parent_id` IN (".$ids.")";
+		query($sql);
+	}
+}
+function _remake18() {//[18] перенос данных в JSON
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=18";
+	$ids = query_ids($sql);
+
+	$mass = array();
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id` IN (".$ids.")
+			ORDER BY `parent_id`,`sort`";
+	if($arr = query_arr($sql)) {
+		foreach($arr as $r) {
+			$parent_id = $r['parent_id'];
+			if(!isset($mass[$parent_id]))
+				$mass[$parent_id] = array();
+			$mass[$parent_id][] = array(
+				'id' => $r['id'],
+				'title' => $r['txt_1'],
+				'def' => $r['def']
+			);
+		}
+
+		foreach($mass as $id => $r) {
+			$sql = "UPDATE `_element`
+					SET `txt_2`='".addslashes(json_encode($r))."'
+					WHERE `id`=".$id;
+			query($sql);
+		}
+
+		$sql = "DELETE FROM `_element` WHERE `parent_id` IN (".$ids.")";
+		query($sql);
+	}
+}
+function _remake23() {
+	$sql = "SELECT `txt_3`
+			FROM `_element`
+			WHERE `dialog_id`=23
+			LIMIT 1";
+	if(query_value($sql))
+		return;
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=23";
+	$ids = query_ids($sql);
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id` IN (".$ids.")
+			ORDER BY `parent_id`,`sort`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$parent_id = $r['parent_id'];
+		if(!isset($mass[$parent_id]))
+			$mass[$parent_id] = array();
+		$mass[$parent_id][] = $id;
+	}
+
+	foreach($mass as $id => $r) {
+		$sql = "UPDATE `_element`
+				SET `txt_3`='".implode(',', $mass[$id])."'
+				WHERE `id`=".$id;
+		query($sql);
+	}
+}
+function _remake27() {//[27] перенос данных в JSON
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=27";
+	$ids = query_ids($sql);
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id` IN (".$ids.")
+			ORDER BY `parent_id`,`sort`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $r) {
+		$parent_id = $r['parent_id'];
+		if(!isset($mass[$parent_id]))
+			$mass[$parent_id] = array();
+
+		$znak = array(
+			0 => '+',
+			1 => '-',
+			2 => '*',
+			3 => '/'
+		);
+
+		$mass[$parent_id][] = array(
+			'znak' => $znak[$r['num_8']],
+			'elem_id' => _num($r['txt_2'])
+		);
+	}
+
+	foreach($mass as $id => $r) {
+		$sql = "UPDATE `_element`
+				SET `txt_1`='".addslashes(json_encode($r))."'
+				WHERE `id`=".$id;
+		query($sql);
+	}
+
+	$sql = "DELETE FROM `_element` WHERE `parent_id` IN (".$ids.")";
+	query($sql);
+}
+function _remake57() {//[57] перенос данных в JSON
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=57";
+	$ids = query_ids($sql);
+
+	$mass = array();
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id` IN (".$ids.")
+			ORDER BY `parent_id`,`sort`";
+	if($arr = query_arr($sql)) {
+		foreach($arr as $r) {
+			$parent_id = $r['parent_id'];
+			if(!isset($mass[$parent_id]))
+				$mass[$parent_id] = array();
+			$mass[$parent_id][] = array(
+				'id' => $r['id'],
+				'title' => $r['txt_1'],
+				'blk' => $r['txt_2'],
+				'def' => $r['def']
+			);
+		}
+
+		foreach($mass as $id => $r) {
+			$sql = "UPDATE `_element`
+					SET `txt_1`='".addslashes(json_encode($r))."',
+						`txt_2`=''
+					WHERE `id`=".$id;
+			query($sql);
+		}
+
+		$sql = "DELETE FROM `_element` WHERE `parent_id` IN (".$ids.")";
+		query($sql);
+	}
+}
+function _remake74() {//[74] перенос данных в JSON
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id`=74";
+	$ids = query_ids($sql);
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `parent_id` IN (".$ids.")
+			ORDER BY `parent_id`,`sort`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $r) {
+		$parent_id = $r['parent_id'];
+		if(!isset($mass[$parent_id]))
+			$mass[$parent_id] = array();
+
+		$cond = '';
+		if(!empty($r['txt_2'])) {
+			$cond = htmlspecialchars_decode($r['txt_2']);
+			$cond = json_decode($cond, true);
+		}
+
+		$mass[$parent_id][] = array(
+			'id' => $r['id'],
+			'title' => $r['txt_1'],
+			'cond' => $cond,
+			'def' => $r['def'],
+			'eye' => $r['num_1']
+		);
+	}
+
+	foreach($mass as $id => $r) {
+		$sql = "UPDATE `_element`
+				SET `txt_1`='".addslashes(json_encode($r))."'
+				WHERE `id`=".$id;
+		query($sql);
+	}
+
+	$sql = "DELETE FROM `_element` WHERE `parent_id` IN (".$ids.")";
+	query($sql);
+}
 
 function _page_div() {//todo тест
+
+	_remake16();
+	_remake17();
+	_remake18();
+	_remake23();
+	_remake27();
+	_remake57();
+	_remake74();
+
+
+
+
+
+
+
+
 	return '';
 
 

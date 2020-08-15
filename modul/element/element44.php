@@ -29,11 +29,6 @@ function _element44_print($el, $prm) {
 	if(empty($el['txt_1']))
 		return $el['title'];
 
-	$vvv = array();
-	if(!empty($el['vvv']))
-		foreach($el['vvv'] as $r)
-			$vvv[$r['id']] = $r;
-
 	$json = json_decode($el['txt_1'], true);
 	$send = '';
 	foreach($json as $r)
@@ -43,7 +38,7 @@ function _element44_print($el, $prm) {
 				$send .= _br($r['txt']);
 				break;
 			case 'el':
-				if(!$ell = @$vvv[$r['id']])
+				if(!$ell = _elemOne($r['id']))
 					break;
 
 				$txt = _element('print', $ell, $prm);
@@ -71,34 +66,6 @@ function _elem44css($ell, $txt, $prm=array()) {//применение стиле
 		return $txt;
 
 	return '<span class="'.implode(' ', $cls).'" style="font-size:inherit"'._elemDivDataHint($ell, $prm).'>'.$txt.'</span>';
-}
-function _elem44vvv($el) {//получение значений для некоторых элементов (для таблиц)
-	if($el['dialog_id'] != 44)
-		return $el;
-
-	if(!isset($el['vvv']))
-		$el['vvv'] = array();
-
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `parent_id`=".$el['id'];
-	if($arr = query_arr($sql)) {
-		foreach($arr as $id => $r) {
-			$r = _element('struct', $r);
-			$r['action'] = array();
-			$el['vvv'][$id] = $r;
-		}
-
-		//прикрепление действий
-		$sql = "SELECT *
-				FROM `_action`
-				WHERE `element_id` IN ("._idsGet($arr).")";
-		if($act = query_arr($sql))
-			foreach($act as $r)
-				$el['vvv'][$r['element_id']]['action'][] = $r;
-	}
-
-	return $el;
 }
 
 
@@ -188,32 +155,26 @@ function PHP12_elem44_setup_save($cmp, $val, $unit) {//сохранение со
 			  AND `id` NOT IN (".$ids.")";
 	query($sql);
 
-
 	_BE('elem_clear');
 }
 function PHP12_elem44_setup_vvv($prm) {
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return array();
-	if(!$el = _elemOne($u['id'], true))
+	if(!$el = _elemOne($prm['unit_edit']['id'], true))
 		return array();
 	if(!$json = $el['txt_1'])
 		return array();
 
 	$json = json_decode($json, true);
 
-	$vvv = array();
-	if(!empty($el['vvv']))
-		foreach($el['vvv'] as $r)
-			$vvv[$r['id']] = $r;
-
 	foreach($json as $n => $r)
-		if($r['type'] == 'el') {
-			$ell = $vvv[$r['id']];
-			$json[$n]['dialog_id'] = $ell['dialog_id'];
-			$json[$n]['title'] = $ell['title'];
-			$json[$n]['font'] = $ell['font'];
-			$json[$n]['color'] = $ell['color'];
-		}
+		if($r['type'] == 'el')
+			if($ell = _elemOne($r['id'])) {
+				$json[$n]['dialog_id'] = $ell['dialog_id'];
+				$json[$n]['title'] = $ell['title'];
+				$json[$n]['font'] = $ell['font'];
+				$json[$n]['color'] = $ell['color'];
+			}
 
 	return $json;
 }

@@ -97,7 +97,7 @@ var ZINDEX = 1000,
 			if(k[0] == name)
 				return k[1];
 		}
-		return '';
+		return undefined;
 	},
 	_toSpisok = function(s) {
 		var a=[];
@@ -170,7 +170,7 @@ var ZINDEX = 1000,
 		t.attr('id', attr_id);
 		return attr_id;
 	},
-	_copySel = function(arr, id) {//копирование массива для селекта. Если указан id - игнорируется
+	_selCopy = function(arr, id) {//копирование массива для селекта. Если указан id - игнорируется
 		var send = [];
 		_forN(arr, function(sp) {
 			if(!sp.info && sp.id == id)
@@ -179,22 +179,18 @@ var ZINDEX = 1000,
 		});
 		return send;
 	},
-	_copyObj = function(arr) {//копирование ассоциативного массива
+	_objCopy = function(arr) {//копирование ассоциативного массива
 		var send = {};
 		_forIn(arr, function(v, i) {
 			send[i] = v;
 		});
 		return send;
 	},
-	_tooltip = function(msg, left, ugolSide, x2) {
-		left = left ? ' style="left:' + left + 'px"' : '';
-		x2 = x2 ? ' x2' : '';
-		ugolSide = ugolSide ? ' ' + ugolSide : '';
-		return ' _tooltip">' +
-		'<div class="ttdiv' + x2 + '"' + left +'>' +
-			'<div class="ttmsg">' + msg + '</div>' +
-			'<div class="ttug' + ugolSide + '"></div>' +
-		'</div>';
+	_objUpd = function(OBJ, arr) {//обновление (дополнение) ассоциативного массива
+		_forIn(arr, function(r, id) {
+			OBJ[id] = r;
+		});
+		return OBJ;
 	},
 	_forEq = function(arr, func) {//перечисление последовательного массива jQuery $(...)
 

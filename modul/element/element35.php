@@ -104,11 +104,11 @@ function PHP12_count_value_save($cmp, $val, $unit) {
 	query($sql);
 }
 function PHP12_count_value_vvv($prm) {
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return array();
 	if(!$col = $prm['el12']['col'])
 		return array();
-	if(!$arr = $u[$col])
+	if(!$arr = $prm['unit_edit'][$col])
 		return array();
 
 	$arr = json_decode($arr, true);
@@ -120,7 +120,7 @@ function PHP12_count_value_vvv($prm) {
 		$send[] = array(
 			'id' => _num($id),
 			'title' => $title[$n],
-			'def' => $u['def'] == $id ? 1 : 0
+			'def' => $prm['unit_edit']['def'] == $id ? 1 : 0
 		);
 	}
 

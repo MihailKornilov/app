@@ -417,11 +417,6 @@ function _html_script() {//скрипты и стили
 	'<link rel="stylesheet" type="text/css" href="modul/global/nomobile'.MIN.'.css?'.SCRIPT.'" />'
 : '').
 
-	'<script src="js_cache/app0.js?'.JS_CACHE.'"></script>'.
-(APP_ID ?
-	'<script src="js_cache/app'.APP_ID.'.js?'.JS_CACHE.'"></script>'
-: '').
-
 (CODE ?
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
@@ -837,7 +832,7 @@ function PHP12_app_list($return='html') {//список приложений, к
 						'<a class="color-vin over-child dialog-open" val="dialog_id:107,edit_id:'.$id.'">Отправить в архив</a>'.
 					'<td class="w35 top r">'.
 			($r['access_admin'] ?
-						'<div onclick="_appEnter('.$r['app_id'].',7)" class="icon icon-admin'._tooltip('Администрирование', -63).'</div>'
+						'<div onclick="_appEnter('.$r['app_id'].',7)" class="icon icon-admin tool" data-tool="Администрирование"></div>'
 			: '').
 					'<td class="w35 top r">'.
 						'<div class="icon icon-move pl over-child"></div>'.

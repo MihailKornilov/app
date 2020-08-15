@@ -27,9 +27,8 @@ function _element96_print($el, $prm) {
 	$send = '';
 	foreach($u[$key] as $id => $r) {
 		$bg = $r['bg'] ? ' style="background-color:'.$r['bg'].'"' : '';
-		$name = $r['name'] ? _tooltip($r['name'], -6, 'l') : '">';
 		$mr = $id != $end ? ' mr3' : '';
-		$send .= '<div'.$bg.' class="el96-u'.$mr.$name.$r['count'].'</div>';
+		$send .= '<div'.$bg.' class="el96-u'.$mr.' tool" data-tool="'.$r['name'].'">'.$r['count'].'</div>';
 	}
 
 	return $send;

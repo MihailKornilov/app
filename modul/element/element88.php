@@ -17,31 +17,18 @@ function _element88_struct_title($el) {
 	$el['title'] = '[88]';
 	return $el;
 }
-function _element88_struct_vvv($el, $cl) {
-	$send = array(
-		'id'        => _num($cl['id']),
-		'title'     => $cl['title'],
-		'parent_id' => _num($cl['parent_id']),
-		'dialog_id' => _num($cl['dialog_id']),
-		'width'     => _num($cl['width']),
-		'font'      => $cl['font'],
-		'color'     => $cl['color'],
-		'txt_7'     => $cl['txt_7'],//название колонки
-		'txt_8'     => $cl['txt_8'],//pos: позиция
+function _element88_vvv($el) {
+	if(!$V = json_decode($el['txt_2'], true))
+		return array();
 
-		'num_1'     => _num($cl['num_1']),
-		'num_2'     => _num($cl['num_2']),
-		'num_3'     => _num($cl['num_3']),
-		'num_4'     => _num($cl['num_4']),
-		'num_5'     => _num($cl['num_5']),
-		'txt_1'     => $cl['txt_1'],//для [10]
-		'txt_2'     => $cl['txt_2'],//для [11]
-		'vvv'       => array()      //для [44]
-	);
-
-	$send = _elem44vvv($send);
+	$send = array();
+	foreach($V['col'] as $r)
+		foreach($r['elm'] as $id)
+			if($ell = _elemOne($id))
+				$send[$id] = $ell;
 
 	return $send;
+
 }
 function _element88_print($EL, $prm=array(), $next=0) {
 	if(!empty($prm['blk_setup']))
@@ -53,11 +40,6 @@ function _element88_print($EL, $prm=array(), $next=0) {
 		return _emptyRed('Таблица из нескольких списков не настроена.');
 	if(empty($V['col']))
 		return _emptyRed('Таблица из нескольких списков не настроена');
-
-	$ELM = array();
-	if(!empty($EL['vvv']))
-		foreach($EL['vvv'] as $ell)
-			$ELM[$ell['id']] = $ell;
 
 	$LIMIT = $EL['num_1'];
 	$SC = $EL['num_6'] ? 'DESC' : 'ASC';
@@ -95,7 +77,7 @@ function _element88_print($EL, $prm=array(), $next=0) {
 			FROM   `_spisok` `t1`
 			WHERE  !`deleted`
 			  "._elem88cond($EL)."
-			  "._element77cond($EL)."
+			  "._elem77filter($EL)."
 			ORDER BY `dtime_add` ".$SC."
 			LIMIT ".($LIMIT * $next).",".$LIMIT;
 	$spisok = query_arr($sql);
@@ -125,7 +107,7 @@ function _element88_print($EL, $prm=array(), $next=0) {
 				$dataHint = '';
 
 				if($elm_id = $col['elm'][$n])
-					if($ell = @$ELM[$elm_id]) {
+					if($ell = _elemOne($elm_id)) {
 
 						//если элемент скрыт
 						if(_elemAction244($ell, $prm)) {
@@ -201,16 +183,11 @@ function _elem88th($el, $next) {//показ имён колонок
 
 	$V = json_decode($el['txt_2'], true);
 
-	$eltd = array();
-	if(!empty($el['vvv']))
-		foreach($el['vvv'] as $r)
-			$eltd[$r['id']] = $r;
-
 	$send = '<tr>';
 	foreach($V['col'] as $r) {
 		$txt = $r['title'];
 		foreach($r['elm'] as $id) {
-			if(!$ell = @$eltd[$id])
+			if(!$ell = _elemOne($id))
 				continue;
 			if($ell['dialog_id'] != 91)
 				continue;
@@ -231,7 +208,7 @@ function _elem88countAll($el) {//общее количество строк сп
 			FROM   `_spisok` `t1`
 			WHERE  !`deleted`".
 			  _elem88cond($el).
-			  _element77cond($el);
+			  _elem77filter($el);
 	return query_value($sql);
 }
 function _elem88next($EL, $next) {//tr-догрузка списка
@@ -253,13 +230,12 @@ function _elem88next($EL, $next) {//tr-догрузка списка
 
 /* ---=== [88] Настройка ячеек таблицы ===--- */
 function PHP12_elem88($prm) {
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return _emptyMin10('Настройка таблицы будет доступна после вставки списка в блок.');
-	if(!$BL = _blockOne($prm['srce']['block_id']))
+	if(!$bl = _blockOne($prm['srce']['block_id']))
 		return _emptyMin10('[88] Отсутствует исходный блок.');
-
-	$ex = explode(' ', $BL['elem']['mar']);
-	$w = $BL['width'] - $ex[1] - $ex[3];
+	if(!$el = _elemOne($bl['elem_id']))
+		return _emptyMin10('[88] Отсутствует элемент.');
 
 	return
 	'<div class="fs16 b color-555 bg-gr1 pl15 pt5 pb5 line-t line-b">Списки:</div>'.
@@ -267,14 +243,14 @@ function PHP12_elem88($prm) {
 	'<div class="fs15 color-555 pad10 center over1 curP">Добавить список</div>'.
 
 	'<div class="fs16 color-555 bg-gr1 pl15 pt5 pb5 mt10 line-t">Колонки:</div>'.
-	'<div class="calc-div h25 line-t line-b bg-efe">'.$w.'</div>'.
+	'<div class="calc-div h25 line-t line-b bg-efe">'._elemWidth($el).'</div>'.
 	'<dl id="col88" class="mt5"></dl>'.
 	'<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>';
 }
 function PHP12_elem88_vvv($prm) {//данные для настроек
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return array();
-	if(!$EL = _elemOne($u['id']))
+	if(!$EL = _elemOne($prm['unit_edit']['id']))
 		return array();
 
 	//передача блока при выборе элемента для конкретном списке
@@ -284,7 +260,7 @@ function PHP12_elem88_vvv($prm) {//данные для настроек
 	//списки для выбора
 	$send['sp'] = _dialogSelArray('spisok_only');
 
-	$val = json_decode($u['txt_2'], true);
+	$val = json_decode($prm['unit_edit']['txt_2'], true);
 
 	if(!empty($val['spv'])) {
 		foreach($val['spv'] as $n => $r) {
@@ -396,10 +372,10 @@ function PHP12_elem89_vvv($prm) {//данные колонок для конкр
 
 	if(!$bl = _blockOne($send['block_id']))
 		return $send;
-	if(!$EL = _elemOne($bl['elem_id']))
+	if(!$el = _elemOne($bl['elem_id']))
 		return $send;
 
-	$send['elm'] = empty($EL['vvv']) ? array() : _arrKey($EL['vvv']);
+	$send['elm'] = _element('vvv', $el);
 
 	return $send;
 }

@@ -21,6 +21,12 @@ var _spisokUpdate = function(elem_spisok, func) {
 				func(res);
 
 			_hintPaste(res);
+
+			if(res.blk_hidden_upd) {
+				_forIn(res.blk_hidden_upd, function(v, block_id) {
+					_blockObj(block_id)[0].obj._dn(v)
+				});
+			}
 		});
 	},
 	_spisok14Next = function(t, elem_id, next) {

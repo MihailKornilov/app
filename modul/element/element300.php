@@ -56,7 +56,7 @@ function _elem300Sel($res) {//выбранный пользователь ВК
 	return
 	'<table>'.
 		'<tr><td class="pr5"><img src="'.$res['photo'].'" class="ava35">'.
-			'<td><div class="icon icon-del-red pl fr ml20 mtm2'._tooltip('Отменить', -31).'</div>'.
+			'<td><div class="icon icon-del-red pl fr ml20 mtm2 tool" data-tool="Отменить"></div>'.
 				'<a href="//vk.com/id'.$res['id'].'" target="_blank">'.
 					$res['first_name'].' '.$res['last_name'].
 				'</a>'.

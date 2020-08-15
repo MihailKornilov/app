@@ -18,13 +18,7 @@ function _element36_print($el) {
 	$pl = _dn(!$el['num_2'], 'pl');
 	$cur = $el['num_3'] ? ' curP' : ' curD';
 
-	return '<div class="icon icon-'.$type.$pl.$cur._element36TT($el).'</div>';
-}
-function _element36TT($el) {
-	if(empty($el['txt_1']))
-		return '">';
-
-	return _tooltip($el['txt_1'], -10, 'l');
+	return '<div class="icon icon-'.$type.$pl.$cur.' tool" data-tool="'._br($el['txt_1']).'"></div>';
 }
 function _element36type($id='all') {//доступные варианты иконок
 	$icon = array(

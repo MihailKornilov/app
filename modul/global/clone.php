@@ -57,7 +57,6 @@ function _d119_app_clear($DLG) {//очистка приложения - удал
 	_BE('block_clear');
 	_BE('elem_clear');
 	_BE('dialog_clear');
-	_jsCache();
 
 	$send = array(
 		'action_id' => 2,
@@ -614,7 +613,6 @@ function _clone_dialog() {//клонирование: диалоги
 				`element_width_min`,
 				`element_type`,
 				`element_afics`,
-				`element_action_dialog_id`,
 				`element_hidden`,
 				`cmp_no_req`,
 		*/

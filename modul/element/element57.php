@@ -14,16 +14,8 @@ function _element57_struct($el) {
                                             13534 - вертикальное
 										*/
 		'num_2'   => _num($el['num_2']),//запоминать выбранный пункт меню
-		'txt_1'   => $el['txt_1']       //ids дочерних элементов
+		'txt_1'   => $el['txt_1']       //содержание в формате JS
 	) + _elementStruct($el);
-}
-function _element57_struct_vvv($el, $cl) {//пункты меню
-	return array(
-		'id' => _num($cl['id']),
-		'title'   => $cl['txt_1'], //название пункта меню
-		'blk'   => $cl['txt_2'],   //блоки
-		'def'   => _num($cl['def'])//по умолчанию
-	);
 }
 function _element57_js($el) {
 	return array(
@@ -32,14 +24,22 @@ function _element57_js($el) {
 	) + _elementJs($el);
 }
 function _element57_print($el, $prm) {
+	$vvv = _element('vvv', $el);
+	$def = 0;
+	foreach($vvv as $r)
+		if($r['def']) {
+			$def = $r['id'];
+			break;
+		}
+
 	//последняя позиция пункта меню
 	if($el['num_2']) {
 		$EL_COO = '57_'.$el['id'];
-		if($def = _num(@$_COOKIE[$EL_COO]))
-			$el['def'] = $def;
+		if($v = _num(@$_COOKIE[$EL_COO]))
+			$def = $v;
 	}
 
-	$v = _elemPrintV($el, $prm, $el['def']);
+	$v = _elemPrintV($el, $prm, $def);
 
 	$type = array(
 		1158 => 2,
@@ -48,115 +48,92 @@ function _element57_print($el, $prm) {
 	);
 
 	$razdel = '';
-	if(!empty($el['vvv']))
-		foreach($el['vvv'] as $r) {
-			$sel = _dn($v != $r['id'], 'sel');
-			$curd = _dn(!$prm['blk_setup'], 'curD');
-			$razdel .= '<a class="link'.$sel.$curd.'">'.$r['title'].'</a>';
-		}
+	foreach($vvv as $r) {
+		$sel = _dn($v != $r['id'], 'sel');
+		$curd = _dn(!$prm['blk_setup'], 'curD');
+		$razdel .= '<a class="link'.$sel.$curd.'">'.$r['title'].'</a>';
+	}
 
 	return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 		   '<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
 }
+function _element57_vvv($el) {//пункты меню
+	return _decode($el['txt_1']);
+}
+function _element57punkt($bl) {//скрытие блока, если он является пунктом меню и пока не отображается
+	global $_57PUNKT;
+
+	if(!isset($_57PUNKT)) {
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `app_id` IN (0,".APP_ID.") 
+				  AND `dialog_id`=57";
+		if(!$_57PUNKT = query_arr($sql))
+			return $bl;
+	}
+
+	foreach($_57PUNKT as $r) {
+		if(!$vvv = _decode($r['txt_1']))
+			continue;
+
+		foreach($vvv as $v) {
+			if(!isset($_COOKIE['57_'.$r['id']])) {
+				if($v['def'])
+					continue;
+			} else
+				if($_COOKIE['57_'.$r['id']] == $v['id'])
+					continue;
+
+			$ass = _idsAss($v['blk']);
+			if(!isset($ass[$bl['id']]))
+				continue;
+			$bl['hidden'] = true;
+			return $bl;
+		}
+	}
+
+	return $bl;
+}
+
 function PHP12_menu_block_setup() {//используется в диалоге [57]
 	return '';
 }
 function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение данных о пунктах меню
-	if(!$parent_id = _num($unit['id']))
+	if(empty($unit['id']))
+		return;
+	if(!$col = $cmp['col'])
 		return;
 
-	//получение id приложения у родительского элемента
-	$sql = "SELECT `app_id`
-			FROM `_element`
-			WHERE `id`=".$parent_id;
-	$app_id = query_value($sql);
+	$save = array();
 
-	$ids = array();
-	$update = array();
+	if(!empty($val))
+		if(is_array($val))
+			foreach($val as $r) {
+				if(!$id = _num($r['id']))
+					continue;
+				if(!$title = _txt($r['title']))
+					continue;
+				$save[] = array(
+					'id' => $id,
+					'title' => $title,
+					'blk' => _ids($r['blk']),
+					'def' =>_num($r['def'])
+				);
+			}
 
-	if(!empty($val)) {
-		if(!is_array($val))
-			return;
+	$save = json_encode($save);
 
-		foreach($val as $sort => $r) {
-			if($id = _num($r['id']))
-				$ids[] = $id;
-			if(!$title = _txt($r['title']))
-				continue;
-			$blk = _ids($r['blk']);
-			$update[] = "(
-				".$id.",
-				".$app_id.",
-				".$parent_id.",
-				'".addslashes($title)."',
-				'".($blk ? $blk : '')."',
-				"._num($r['def']).",
-				".$sort."
-			)";
-		}
-	}
-
-	$ids = implode(',', $ids);
-
-	//удаление значений, которые были удалены при настройке
-	$sql = "DELETE FROM `_element`
-			WHERE `parent_id`=".$parent_id."
-			  AND `id` NOT IN (0".($ids ? ',' : '').$ids.")";
-	query($sql);
-
-	//ID элементов-значений, составляющих сборный текст
 	$sql = "UPDATE `_element`
-			SET `txt_2`='".$ids."'
-			WHERE `id`=".$parent_id;
-	query($sql);
-
-	//сброс значения по умолчанию
-	$sql = "UPDATE `_element`
-			SET `def`=0
+			SET `".$col."`='".addslashes($save)."'
 			WHERE `id`=".$unit['id'];
 	query($sql);
 
-	if(empty($update)) {
-		_BE('elem_clear');
-		return;
-	}
-
-	$sql = "INSERT INTO `_element` (
-				`id`,
-				`app_id`,
-				`parent_id`,
-				`txt_1`,
-				`txt_2`,
-				`def`,
-				`sort`
-			)
-			VALUES ".implode(',', $update)."
-			ON DUPLICATE KEY UPDATE
-				`txt_1`=VALUES(`txt_1`),
-				`txt_2`=VALUES(`txt_2`),
-				`def`=VALUES(`def`),
-				`sort`=VALUES(`sort`)";
-	query($sql);
-
-	//установка нового значения по умолчанию
-	$sql = "SELECT `id`
-			FROM `_element`
-			WHERE `parent_id`=".$parent_id."
-			  AND `def`
-			LIMIT 1";
-	$def = _num(query_value($sql));
-
-	$sql = "UPDATE `_element`
-			SET `def`=".$def."
-			WHERE `id`=".$parent_id;
-	query($sql);
-
-	_BE('elem_clear');
+	_elemOne($unit['id'], true);
 }
 function PHP12_menu_block_setup_vvv($prm) {
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return array();
-	if(!$el = _elemOne($u['id']))
+	if(!$el = _elemOne($prm['unit_edit']['id']))
 		return array();
 
 	return _element('vvv', $el);

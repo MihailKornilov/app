@@ -13,6 +13,7 @@ require_once 'modul/global/global_ajax.php';
 require_once 'modul/block/block_ajax.php';
 require_once 'modul/element/element_ajax.php';
 require_once 'modul/spisok/spisok_ajax.php';
+require_once 'modul/action/action_ajax.php';
 require_once 'modul/debug/debug_ajax.php';
 
 

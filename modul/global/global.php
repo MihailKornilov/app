@@ -317,7 +317,7 @@ function _0($num) {//добавление нуля к числу, если ме�
 function _ids($ids, $return='ids') {//проверка корректности списка id, составленные через запятую
 	/*
 		$return - формат возвращаемого значения
-				ids: id через запятую (по умолчанию)
+				ids: числа через запятую (по умолчанию)
 				arr: массив (также если 1)
 			  count: количество
 		count_empty: количество, если = 0, то пустота
@@ -325,9 +325,11 @@ function _ids($ids, $return='ids') {//проверка корректности 
 	if(!$ids)
 		return _idsReturn(0, $return);
 
-	$arr = array();
+	if(!is_array($ids))
+		$ids = explode(',', $ids);
 
-	foreach(explode(',', $ids) as $id) {
+	$arr = array();
+	foreach($ids as $id) {
 		if(!preg_match(REGEXP_INTEGER, $id))
 			return _idsReturn(0, $return);
 		if(!_num($id, 1))
@@ -494,6 +496,13 @@ function translit($str) {
 		'¦' => ''
 	);
 	return strtr($str, $list);
+}
+
+function _decode($js) {//декодирование JSON
+	if(empty($js))
+		return array();
+	$js = htmlspecialchars_decode($js);
+	return json_decode($js, true);
 }
 
 function _pr($arr, $emptyReturn=false) {//аналог функции print_r
@@ -680,6 +689,33 @@ function _emptyRed10($msg) {
 	return '<div class="_empty red mar10">'.$msg.'</div>';
 }
 
+function _defined($key) {//проверка наличия константы. Если нет, то создание
+	if(defined($key))
+		return true;
+	define($key, true);
+	return false;
+}
+function _flag($key, $reset=false) {//установка либо сброс флага
+	//если $reset == false, флаг устанавливатся и затем при повторном вызове функции будет сообщаться, что он установлен
+	//если $reset == true - сброс флага
+
+	global $$key;
+
+	if(!isset($$key))
+		$$key = false;
+
+	if($reset) {
+		$$key = false;
+		return false;
+	}
+
+	if($$key)
+		return true;
+
+	$$key = true;
+
+	return false;
+}
 
 function _vkapi($method, $param=array()) {//получение данных из api вконтакте
 	if(LOCAL)
@@ -697,188 +733,6 @@ function _vkapi($method, $param=array()) {//получение данных из
 
 	return $res;
 }
-
-/*
-function appUpdate() {//применение app_id к блокам и элементам - разовая функция
-	$sql = "select * from _block group by obj_name,obj_id";
-	foreach(query_arr($sql) as $r) {
-		_blockAppIdUpdate($r['obj_name'], $r['obj_id']);
-	}
-
-	$sql = "update _element e set app_id=IFNULL((select app_id from _block where e.block_id=id),0)";
-	query($sql);
-
-	$sql = "SELECT
-				distinct `parent_id` id,
-				(select app_id from _element where id=e.parent_id) app_id
-			FROM _element e
-			WHERE parent_id";
-	foreach(query_arr($sql) as $r) {
-		$sql = "UPDATE _element
-				SET app_id=".$r['app_id']."
-				WHERE parent_id=".$r['id'];
-		query($sql);
-	}
-
-	//ids элементов истории действий в диалогах
-	$dlgHist = array();
-	$sql = "SELECT *
-			FROM `_dialog`
-			WHERE `app_id`=1";
-	foreach(query_arr($sql) as $r) {
-		$dlgHist[] = $r['insert_history_elem'];
-		$dlgHist[] = $r['edit_history_elem'];
-		$dlgHist[] = $r['del_history_elem'];
-	}
-	$dlgHist = array_diff($dlgHist, array(''));
-	$dlgHist = implode(',', $dlgHist);
-
-	$sql = "UPDATE `_element`
-			SET `app_id`=1
-			WHERE `id` IN (".$dlgHist.")";
-	query($sql);
-}
-*/
-
-function _jsCache() {//файл JS с блоками и элементами
-	$save =
-	'var PAGE_LIST=[],'.
-		"\n".
-		'PLSA='._jsCachePageSa().','.//страницы SA
-		"\n\n".
-		'ELEM_COLOR='._colorJS().','.
-		"\n\n".
-		'BLKK='._jsCacheBlk().','.
-		"\n\n".
-		'ELMM='._jsCacheElm().';';
-
-	$fp = fopen(APP_PATH.'/js_cache/app0.js', 'w+');
-	fwrite($fp, $save);
-	fclose($fp);
-
-	if(APP_ID) {
-		$save =
-			'PAGE_LIST='._json(_jsCachePage()).';'.
-			"\n".'if(SA)for(i in PLSA)PAGE_LIST.push(PLSA[i]);'.
-			"\n\n".
-		'var TMP='._jsCacheBlk(APP_PARENT).';'."\n".'for(i in TMP)BLKK[i]=TMP[i];'.
-			"\n\n".
-			'TMP='._jsCacheElm(APP_PARENT).';'."\n".'for(i in TMP)ELMM[i]=TMP[i];'.
-			"\n\n";
-
-		$fp = fopen(APP_PATH.'/js_cache/app'.APP_ID.'.js', 'w+');
-		fwrite($fp, $save);
-		fclose($fp);
-	}
-
-	$sql = "UPDATE `_setting`
-			SET `v`=`v`+1
-			WHERE `key`='JS_CACHE'";
-	query($sql);
-
-	_cache_clear('SETTING', 1);
-}
-function _jsCacheAppControl() {//проверка наличия файла JS для текущего приложения
-	if(!APP_ID)
-		return;
-	if(file_exists(APP_PATH.'/js_cache/app'.APP_ID.'.js'))
-		return;
-	_jsCache();
-	_count_update();//обновление счётчиков, если приложение клонировано
-}
-function _jsCachePageSa() {//страницы SA для select
-	$page = _pageCache();
-	$child = array();
-	$send[] = array(
-		'title' => 'Страницы SA',
-		'info' => 1
-	);
-	foreach(_pageSaForSelect($page, $child) as $r)
-		$send[] = $r;
-	return _json($send);
-}
-function _jsCachePage() {//страницы APP для select
-	$page = _pageCache();
-	$child = array();
-	foreach($page as $id => $r) {
-		if(!$r['parent_id'])
-			continue;
-
-		if(empty($child[$r['parent_id']]))
-			$child[$r['parent_id']] = array();
-
-		$child[$r['parent_id']][] = $r;
-		unset($page[$id]);
-	}
-	$send = _pageChildArr($page, $child);
-	return $send;
-}
-function _jsCacheBlk($app_id=0) {
-	$BLK = array();
-
-	$sql = "SELECT *
-			FROM `_block`
-			WHERE `app_id`=".$app_id."
-			ORDER BY `id`";
-	$arr = query_arr($sql);
-	foreach($arr as $block_id => $r)
-		$BLK[$block_id] = _jsCacheBlkOne($block_id);
-
-	return _json($BLK);
-}
-function _jsCacheBlkOne($block_id) {
-	if(!$r = _blockOne($block_id))
-		return array();
-
-	$val = array();
-	$val['parent_id'] = $r['parent_id'];
-	$val['obj_name'] = $r['obj_name'];
-	$val['obj_id'] = $r['obj_id'];
-	$val['elem_id'] = $r['elem_id'];
-	$val['width_auto'] = $r['width_auto'];
-	$val['bor'] = $r['bor'];
-	$val['pos'] = $r['pos'];
-	$val['bg'] = $r['bg'];
-	$val['ov'] = $r['ov'];
-	$val['child_count'] = $r['child_count'];
-	$val['hidden'] = $r['hidden'];
-
-	//скрытие/показ блоков - действие для элементов
-	$val['xx'] = $r['xx'];
-	$val['xx_ids'] = $r['xx_ids'];
-
-	// action229
-	if(!empty($r['hint']))
-		$val['hint'] = $r['hint'];
-	if($r['obj_name'] == 'dialog') {
-		$val['show_create'] = $r['show_create'];
-		$val['show_edit'] = $r['show_edit'];
-	}
-
-	if(!empty($r['action'])) {
-		//удаление фильтров, ибо в JS они не требуются
-		foreach($r['action'] as $act) {
-			unset($act['filter']);
-			$val['action'][] = $act;
-		}
-	}
-
-	return $val;
-}
-function _jsCacheElm($app_id=0) {
-	$ELM = array();
-
-	foreach(_BE('elem_all') as $elem_id => $r) {
-		if($r['app_id'] != $app_id)
-			continue;
-		if(!$el = _element('js', $r))
-			continue;
-		$ELM[$elem_id] = $el;
-	}
-
-	return _json($ELM);
-}
-
 
 
 
