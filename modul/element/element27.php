@@ -108,6 +108,9 @@ function _element27update($elem_id, $unit_ids=0) {//пересчёт сумм з
 		return;
 	if($el['dialog_id'] != 27)
 		return;
+	if(!$colSrc = _elemCol($el))
+		return;
+
 	//блок, в котором размещается "баланс"
 	if(!$block_id = _num($el['block_id']))
 		return;
@@ -121,7 +124,7 @@ function _element27update($elem_id, $unit_ids=0) {//пересчёт сумм з
 
 	//предварительное обнуление значений перед обновлением
 	$sql = "UPDATE "._queryFrom($DSrc)."
-			SET `".$el['col']."`=0
+			SET `".$colSrc."`=0
 			WHERE "._queryWhere($DSrc).
 ($unit_ids ? " AND `t1`.`id` IN (".$unit_ids.")" : '');
 	query($sql);
@@ -148,7 +151,7 @@ function _element27update($elem_id, $unit_ids=0) {//пересчёт сумм з
 
 	//процесс обновления
 	$sql = "UPDATE "._queryFrom($DSrc)."
-			SET `".$el['col']."`=".$upd."
+			SET `".$colSrc."`=".$upd."
 			WHERE "._queryWhere($DSrc).
 ($unit_ids ? " AND `t1`.`id` IN (".$unit_ids.")" : '');
 	query($sql);
