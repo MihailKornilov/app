@@ -2427,9 +2427,10 @@ function PHP12_history_setup_save($dlg) {//сохранение настройк
 
 	//удаление элементов, которые были удалены
 	$keyAct = HISTORY_ACT.'_history_elem';
+
 	if(!empty($dialog[$keyAct])) {
 		$sql = "DELETE FROM `_element`
-				WHERE `id` IN ("._idsGet($dialog[$keyAct]).")
+				WHERE `id` IN ("._ids($dialog[$keyAct]).")
 				  AND `id` NOT IN ("._ids($ids).")";
 		query($sql);
 	}

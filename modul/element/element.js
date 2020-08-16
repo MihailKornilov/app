@@ -6491,7 +6491,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<td class="pt3">' + _elemUnitColor(v) +
 								'<td class="pt3">' + _elemUnitFormat(v) +
 								'<td class="pt3">' +
-									'<div class="icon-wiki iw12 ml3 tool" data-tool="Ссылка"></div>' +
+									'<div class="icon icon-usd ml3 tool" data-tool="Настроить действия"></div>' +
 						'</table>',
 					side:'top',
 					ugPos:'left',
@@ -6500,7 +6500,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					delayShow:500,
 					delayHide:300,
 					func:function(o) {
-						o.find('.iw12').click(function() {
+						o.find('.icon-usd').click(function() {
 							var url = $(this);
 
 							//снятие ссылки
@@ -6511,7 +6511,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							}
 
 							_dialogLoad({
-								dialog_id:220,
+								dialog_id:200,
 								element_id:v.id,
 								busy_obj:$(this),
 								func_save:function(res) {
