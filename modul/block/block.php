@@ -143,6 +143,8 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 
 		$bl = _blockAction201($bl, $PARAM);
 		$bl = _blockAction211($bl);
+		$bl = _blockAction231($bl, $PARAM);
+		$bl = _blockDlgShow($bl, $PARAM);
 		$bl = _element57punkt($bl);
 		$block[$bl['y']][$bl['x']] = $bl;
 	}
@@ -178,12 +180,9 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 
 		//скрытие всей строки, если все блоки в строке являются скрытыми
 		if($strHide = (!$PARAM['blk_setup'] && !$PARAM['elm_choose']))
-			foreach($xStr as $n => $bl) {
-				$bl = _blockActionView($bl, $PARAM);
-				$xStr[$n] = _blockDlgShow($bl, $PARAM);
-				if(!$xStr[$n]['hidden'])//если хотя бы один блок не скрыт, вся строка не будет скрыта
+			foreach($xStr as $n => $bl)
+				if(!$bl['hidden'])//если хотя бы один блок не скрыт, вся строка не будет скрыта
 					$strHide = 0;
-			}
 
 		//если скрывается вся строка, то все блоки в строке становятся как открытые TD внутри скрытого DIV
 		if($strHide)
@@ -251,6 +250,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 							_blockElemChoose($r, $PARAM).
 							_blockChildHtml($r, $PARAM, $grid_id, $level + 1, $width).
 	    					_elemDiv($r['elem_id'], $PARAM).
+//(is_array(_blockAction231($r, $PARAM)) ? '' : _blockAction231($r, $PARAM)).
 					'';
 
 			$widthMax -= $r['width'];
@@ -353,84 +353,6 @@ function _blockActionFilter($u, $filter) {//дополнительные усл�
 	}
 
 	return 0;
-}
-function _blockActionView($bl, $prm) {//условия отображения блока
-	if(!$action =  _BE('block_one_action', $bl['id']))
-		return $bl;
-	if(!$u = $prm['unit_get'])
-		return $bl;
-
-	foreach($action as $act)
-		switch($act['dialog_id']) {
-			//скрытие блока
-			case 231:
-				if(!$F = _elem40json($act['filter']))
-					break;
-
-				foreach($F as $ff) {
-					if($el = _elemOne($ff['elem_id'])) {
-						$v = 0;
-						if($col = _elemCol($el))
-							if(!empty($u[$col]))
-								$v = is_array($u[$col]) ? $u[$col]['id'] : $u[$col];
-					} else
-						$v = _elemUids($ff['elem_id'], $u);
-
-					switch($ff['cond_id']) {
-						//отсутствует
-						case 1:
-							if(!$v)
-								$bl['hidden'] = 1;
-							break;
-						//присутствует
-						case 2:
-							if($v)
-								$bl['hidden'] = 1;
-							break;
-						//равно
-						case 3:
-							$ff['unit_id'] = _40condVcopy($ff['unit_id']);
-							$vv = $ff['unit_id'] ? $ff['unit_id'] : $ff['txt'];
-							if($v == $vv)
-								$bl['hidden'] = 1;
-							break;
-						//не равно
-						case 4:
-							$ff['unit_id'] = _40condVcopy($ff['unit_id']);
-							$vv = $ff['unit_id'] ? $ff['unit_id'] : $ff['txt'];
-							if($v != $vv)
-								$bl['hidden'] = 1;
-							break;
-						//больше
-						case 5:
-							if($v > _num($ff['txt']))
-								$bl['hidden'] = 1;
-							break;
-						//больше или равно
-						case 6:
-							if($v >= _num($ff['txt']))
-								$bl['hidden'] = 1;
-							break;
-						//меньше
-						case 7:
-							if($v < _num($ff['txt']))
-								$bl['hidden'] = 1;
-							break;
-						//меньше или равно
-						case 8:
-							if($v <= _num($ff['txt']))
-								$bl['hidden'] = 1;
-							break;
-						//содержит
-						case 9: break;
-						//не содержит
-						case 10: break;
-					}
-				}
-				break;
-		}
-
-	return $bl;
 }
 function _blockDataHint($bl, $prm) {//аттрибут data-подсказка для блока
 	if($prm['blk_setup'])

@@ -292,6 +292,7 @@ body:not(.site){position:relative}
 #hat.local #hat-user:not(.ispas):hover{background-color:#6A6A6A;cursor:pointer}
 
 #hat-user .uname{margin:13px 8px 0 0;font-size:14px}
+#hat-user.ispas .uname{opacity:.5}
 #hat-user dl{
 	position:absolute;
 	width:inherit;

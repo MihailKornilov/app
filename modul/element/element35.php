@@ -47,7 +47,7 @@ function _element35_print11($el, $u) {
 	if($el['num_1'] == 3681)
 		return $v;
 
-	if(!$json = _elem40json($el['txt_1']))
+	if(!$json = _decode($el['txt_1']))
 		return '';
 
 	foreach($json['ids'] as $n => $id)

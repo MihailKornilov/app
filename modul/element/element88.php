@@ -18,7 +18,7 @@ function _element88_struct_title($el) {
 	return $el;
 }
 function _element88_vvv($el) {
-	if(!$V = json_decode($el['txt_2'], true))
+	if(!$V = _decode($el['txt_2']))
 		return array();
 
 	$send = array();
@@ -28,7 +28,6 @@ function _element88_vvv($el) {
 				$send[$id] = $ell;
 
 	return $send;
-
 }
 function _element88_print($EL, $prm=array(), $next=0) {
 	if(!empty($prm['blk_setup']))
@@ -151,7 +150,7 @@ function _element88_print($EL, $prm=array(), $next=0) {
 	$TABLE_END;
 }
 function _elem88cond($el) {//условия из настроек списка
-	$V = json_decode($el['txt_2'], true);
+	$V = _decode($el['txt_2']);
 
 	$SPV_COND = array();//массив условий для каждого диалога
 	foreach($V['spv'] as $spv) {
@@ -225,6 +224,23 @@ function _elem88next($EL, $next) {//tr-догрузка списка
 			'<tt class="db '.($EL['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
 				'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
 			'</tt>';
+}
+function _elem88dlgId($elem_id) {//получение id диалога по элементу, если таблица содежит этот элемент
+	if(!$el = _elemOne($elem_id))
+		return 0;
+	if(!$elp = _elemOne($el['parent_id']))
+		return 0;
+	if($elp['dialog_id'] != 88)
+		return 0;
+	if(!$V = _decode($elp['txt_2']))
+		return 0;
+
+	foreach($V['col'] as $r)
+		foreach($r['elm'] as $n => $id)
+			if($elem_id == $id)
+				return _num($V['spv'][$n]['dialog_id']);
+
+	return 0;
 }
 
 

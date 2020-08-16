@@ -535,7 +535,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 			case 221:
 				$isFilter = false;//наличие фильтра
 				$fAccept = false; //фильтр подошёл
-				if($F = _elem40json($func['filter'])) {
+				if($F = _decode($func['filter'])) {
 					$isFilter = true;
 					$F = $F[0];
 					switch($F['cond_id']) {

@@ -501,6 +501,7 @@ function translit($str) {
 function _decode($js) {//декодирование JSON
 	if(empty($js))
 		return array();
+
 	$js = htmlspecialchars_decode($js);
 	return json_decode($js, true);
 }

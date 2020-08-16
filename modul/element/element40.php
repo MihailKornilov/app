@@ -40,9 +40,13 @@ function _element40_js($el) {
 	) + _elementJs($el);
 }
 function _element40_vvv($el, $prm) {//получение id диалога на основании исходного блока (если нет указания на диалог в настройке)
-	if($el['num_1'])//указание есть
+	if($el['num_1'])//указание есть. Диалог будет получен динамически из элемента
 		return 0;
 
+	$dss = _elem40dss_14($prm);
+	$dss = _elem40dss_88($prm, $dss);
+
+	return $dss;
 	if(!empty($prm['unit_edit']))
 		$prm['srce']['element_id'] = $prm['unit_edit']['element_id'];
 
@@ -99,14 +103,104 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 
 	return _blockDlgId($block_id);
 }
-function _elem40json($cond) {//перевод данных фильтра из JSON в array
-	if(empty($cond))
-		return array();
+function _elem40dss_14($prm) {//получение id диалога из списка-шаблона
+	if(!$bl = _blockOne($prm['srce']['block_id']))
+		if($el = _elemOne($prm['srce']['element_id']))
+			if(!$bl = _blockOne($el['block_id']))
+				return 0;
+	if(empty($bl))
+		return 0;
+	if($bl['obj_name'] != 'spisok')
+		return 0;
+	if(!$el = _elemOne($bl['obj_id']))
+		return 0;
 
-	$arr = htmlspecialchars_decode($cond);
-	return json_decode($arr, true);
+	return _num($el['num_1']);
 }
+function _elem40dss_88($prm, $dss) {//получение id диалога из ячейки элемента Несколько таблиц
+	if($dss)
+		return $dss;
+	if($dss = _elem88dlgId($prm['srce']['element_id']))
+		return $dss;
+	if(!$u = $prm['unit_edit'])
+		return 0;
+	if(!$elem_id = _elemId($u['dialog_id'], $u['id']))
+		return 0;
+	if($dss = _elem88dlgId($elem_id))
+		return $dss;
 
+	return 0;
+}
+function _elem40res($filter, $u) {
+	$send = true;
+	foreach($filter as $ff) {
+		$v = _elemUids($ff['elem_id'], $u);
+		switch($ff['cond_id']) {
+			//отсутствует
+			case 1:
+				if(!$v)
+					break;
+				$send = false;
+				break;
+			//присутствует
+			case 2:
+				if($v)
+					break;
+				$send = false;
+				break;
+			//равно
+			case 3:
+				$ff['unit_id'] = _40condVcopy($ff['unit_id']);
+				$vv = $ff['unit_id'] ? $ff['unit_id'] : $ff['txt'];
+				if($v == $vv)
+					break;
+				$send = false;
+				break;
+			//не равно
+			case 4:
+				$ff['unit_id'] = _40condVcopy($ff['unit_id']);
+				$vv = $ff['unit_id'] ? $ff['unit_id'] : $ff['txt'];
+				if($v != $vv)
+					break;
+				$send = false;
+				break;
+			//больше
+			case 5:
+				if($v > _num($ff['txt']))
+					break;
+				$send = false;
+				break;
+			//больше или равно
+			case 6:
+				if($v >= _num($ff['txt']))
+					break;
+				$send = false;
+				break;
+			//меньше
+			case 7:
+				if($v < _num($ff['txt']))
+					break;
+				$send = false;
+				break;
+			//меньше или равно
+			case 8:
+				if($v <= _num($ff['txt']))
+					break;
+				$send = false;
+				break;
+			//содержит
+			case 9:
+				$send = false;
+				break;
+			//не содержит
+			case 10:
+				$send = false;
+				break;
+		}
+	}
+
+	return $send;
+}
 
 /* [40] Применение условий */
 function _40cond($EL, $cond, $prm=array()) {//изначальные условия отображения списка
@@ -128,7 +222,7 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 		return '/* [40] условия отсутствуют */';
 
 	if(!is_array($cond))
-		if(!$cond = _elem40json($cond))
+		if(!$cond = _decode($cond))
 			return " AND !`t1`.`id` /* [40] не получен массив условий */";
 
 	$send = '';

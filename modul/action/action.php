@@ -102,6 +102,28 @@ function _blockAction211($bl) {
 
 	return $bl;
 }
+function _blockAction231($bl, $prm) {//условия отображения блока: скрытие
+	if($bl['hidden'])
+		return $bl;
+	if(!$u = $prm['unit_get'])
+		return $bl;
+	if(!$action =  _BE('block_one_action', $bl['id']))
+		return $bl;
+
+	foreach($action as $act) {
+		if($act['dialog_id'] != 231)
+			continue;
+		if(!$F = _decode($act['filter']))
+			return $bl;
+
+//return _elem40res($F, $u);
+
+		$bl['hidden'] = _elem40res($F, $u);
+		return $bl;
+	}
+
+	return $bl;
+}
 
 function _elemAction223($el, $u, $txt) {//подсказка
 	if(!$action = _BE('elem_one_action', $el['id']))
@@ -120,33 +142,16 @@ function _elemAction241($el, $prm, $txt) {//подмена текста
 	if(!$u = $prm['unit_get'])
 		return $txt;
 
-	foreach($action as $act)
-		if($act['dialog_id'] == 241) {
-			if(!$F = _elem40json($act['filter']))
-				return $txt;
-
-			$F = $F[0];
-
-			if(!$ell = _elemOne($F['elem_id']))
-				return $txt;
-			if(!$col = _elemCol($ell))
-				return $txt;
-
-			switch($F['cond_id']) {
-				//отсутствует
-				case 1:
-					if(!empty($u[$col]))
-						return $txt;
-					return $act['v1'];
-				//присутствует
-				case 2:
-					if(empty($u[$col]))
-						return $txt;
-					return $act['v1'];
-			}
-
+	foreach($action as $act) {
+		if($act['dialog_id'] != 241)
+				continue;
+		if(!$F = _decode($act['filter']))
 			return $txt;
-		}
+		if(!_elem40res($F, $u))
+			return $txt;
+
+		return $act['v1'];
+	}
 
 	return $txt;
 }
@@ -208,65 +213,12 @@ function _elemAction242($el, $prm) {//подмена цвета
 	foreach($action as $act) {
 		if($act['dialog_id'] != 242)
 			continue;
-
-		if(!$F = _elem40json($act['filter']))
+		if(!$F = _decode($act['filter']))
+			return $color;
+		if(!_elem40res($F, $u))
 			return $color;
 
-		$F = $F[0];
-
-		if(!$ell = _elemOne($F['elem_id']))
-			return $color;
-		if(!$col = _elemCol($ell))
-			return $color;
-		if(!isset($u[$col]))
-			return $color;
-
-		$v = $u[$col];
-
-		switch($F['cond_id']) {
-			//отсутствует
-			case 1:
-				$v = is_array($v) ? $v['id'] : $v;
-				if(!$v)
-					return $act['v1'];
-				break;
-			//присутствует
-			case 2:
-				$v = is_array($v) ? $v['id'] : $v;
-				if($v)
-					return $act['v1'];
-				break;
-			//равно
-			case 3:
-				if($v == $F['txt'])
-					return $act['v1'];
-				break;
-			//не равно
-			case 4:
-				if($v != $F['txt'])
-					return $act['v1'];
-				break;
-			//больше
-			case 5:
-				if($v > $F['txt'])
-					return $act['v1'];
-				break;
-			//больше или равно
-			case 6:
-				if($v >= $F['txt'])
-					return $act['v1'];
-				break;
-			//меньше
-			case 7:
-				if($v < $F['txt'])
-					return $act['v1'];
-				break;
-			//меньше или равно
-			case 8:
-				if($v <= $F['txt'])
-					return $act['v1'];
-				break;
-		}
+		return $act['v1'];
 	}
 
 	return $color;
@@ -277,34 +229,14 @@ function _elemAction244($el, $prm) {//скрытие элемента
 	if(!$u = $prm['unit_get'])
 		return false;
 
-	foreach($action as $act)
-		if($act['dialog_id'] == 244) {
-			if(!$F = _elem40json($act['filter']))
-				return false;
-
-			$F = $F[0];
-
-			switch($F['cond_id']) {
-				//отсутствует
-				case 1:
-					if(!$col = _elemCol($F['elem_id']))
-						return false;
-					if(empty($u[$col]))
-						return true;
-
-					return false;
-				//присутствует
-				case 2:
-					if(!$col = _elemCol($F['elem_id']))
-						return false;
-					if(!empty($u[$col]))
-						return true;
-
-					return false;
-			}
-
+	foreach($action as $act) {
+		if($act['dialog_id'] != 244)
+			continue;
+		if(!$F = _decode($act['filter']))
 			return false;
-		}
+
+		return _elem40res($F, $u);
+	}
 
 	return false;
 }

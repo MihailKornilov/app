@@ -227,6 +227,8 @@ function _element($type, $el, $prm=array()) {//все манипуляции, с
 	if(!$dlg_id = _num(@$el['dialog_id']))
 		return _elementType($type);
 
+	$prm = _blockParam($prm);
+
 	//тип манипуляции добавляется в конце функции. Например: _element1_struct
 	$fname = '_element'.$dlg_id.'_'.$type;
 	if(function_exists($fname))
@@ -1433,6 +1435,21 @@ function _elemColDlgId($elem_id, $oo=false) {//получение id диало�
 	return $BL['obj_id'];
 }
 
+function _elemId($dlg_id, $unit_id) {//получение id элемента на основании записи
+	if(!$DLG = _dialogQuery($dlg_id))
+		return 0;
+	if(!$unit_id = _num($unit_id))
+		return 0;
+
+	switch($DLG['table_name_1']) {
+		case '_action':
+			if(!$act = _BE('action_one', $unit_id))
+				return 0;
+			return _num($act['element_id']);
+	}
+
+	return 0;
+}
 function _elemDlgId($elem_id_src) {//получение id диалога на основании элемента
 	$elem_id = $elem_id_src;
 	while($EL = _elemDlgIdEL($elem_id)) {
@@ -1457,7 +1474,6 @@ function _elemDlgId($elem_id_src) {//получение id диалога на �
 						if($elm_id == $elem_id_src)
 							return  $spv[$n];
 					}
-
 
 				$EL_SRC = _elemDlgIdEL($elem_id_src);
 
@@ -1525,21 +1541,15 @@ function _elemUids($ids, $u) {//получение значения записи
 		return '';
 
 	foreach($ids as $k => $id) {
-		if(!$el = _elemOne($id))
+		if(!$col = _elemCol($id))
 			return '';
-		if(empty($el['col']))
-			return '';
-
-		$col = $el['col'];
-
 		if(!isset($u[$col]))
 			return '';
-		if(!is_array($u[$col]))
-			return $u[$col];
+
 		$u = $u[$col];
 	}
 
-	return '';
+	return is_array($u) ? $u['id'] : $u;
 }
 function _elemArr($ids) {//получение массива элементов по id
 	if(!$ids = _ids($ids, 'arr'))

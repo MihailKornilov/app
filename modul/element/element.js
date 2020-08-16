@@ -170,6 +170,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				_dialogSetup(res);
 			});
 		});
+		iconSubmit.mouseover(function() {
+			$(this)._hint({
+				msg:o.butSubmit,
+				pad:10,
+				side:'left',
+				delayShow:500,
+				show:1
+			});
+		});
 
 		$('._hint').remove();
 		DBACK.css({
@@ -2856,64 +2865,48 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		var P = $(ATTR_CMP(el.id)).next(),
 			INP = P.find('.inp'),
 			DEL = P.find('.icon-del'),
-			_dlg24 = function(id, dss) {//получение id диалога через указанный элемент
-				if(dss)
-					return dss;
-				if(!id)
-					return 0;
-				var dlg24 = _idsFirst(OBJ.dlg.D(ATTR_CMP(id)).val());
-				if(!dlg24) {
-					_attr_cmp(id, 1)
-						._flash({color:'red'})
-						._hint({
-							msg:'Не выбрано значение',
-							color:'red',
-							pad:10,
-							side:'left',
-							show:1
-						});
-					return 0;
-				}
-				return dlg24;
-			},
-			_blkSrce = function(dss) {//получение id диалога через исходный блок
-				if(dss)
-					return dss;
+			dssGet = function() {//получение id диалога из указанного элемента
+				if(!el.num_1)
+					return el.vvv;
 
-				var block_id = OBJ.srce.block_id;
-				if(!block_id)
-					return 0;
+				var send = _idsFirst(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
+				if(send)
+					return send;
 
-				var BL = BLKK[block_id];
-				if(!BL)
-					return 0;
+				_attr_cmp(el.num_1, 1)
+					._flash({color:'red'})
+					._hint({
+						msg:'Не выбрано значение',
+						color:'red',
+						pad:10,
+						side:'left',
+						show:1
+					});
 
-				if(BL.obj_name == 'spisok') {
-					var EL = ELMM[BL.obj_id];
-					if(!EL)
-						return 0;
-					if(EL.dialog_id != 14)
-						return 0;
-					return EL.num_1;
-				}
-
-				return 0;
+				return -1;
 			};
+
 
 		if(INP.attr('disabled'))
 			return;
 
 		P.click(function() {
-			var dss = _dlg24(el.num_1, el.vvv);
-			dss = _blkSrce(dss);
+			var dss = dssGet();
 
-			if(!dss)
+			if(dss == -1)
 				return;
+			if(!dss)
+				return $(this)._hint({
+					msg:'Не получен диалог<br>для настройки фильтра',
+					color:'red',
+					pad:10,
+					show:1
+				});
 
 			_dialogLoad({
 				dialog_id:41,
 				block_id:OBJ.srce.block_id,
-				element_id:el.num_1,//id элемента, к которому привязан фильтр (по нему будет определяться id диалога)
+//				element_id:el.num_1,//id элемента, к которому привязан фильтр (по нему будет определяться id диалога)
 				dss:dss,
 				dop:$(ATTR_CMP(el.id)).val(),
 				busy_obj:INP,
