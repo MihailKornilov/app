@@ -116,8 +116,6 @@ function _blockAction231($bl, $prm) {//условия отображения б�
 		if(!$F = _decode($act['filter']))
 			return $bl;
 
-//return _elem40res($F, $u);
-
 		$bl['hidden'] = _elem40res($F, $u);
 		return $bl;
 	}
@@ -312,6 +310,14 @@ function PHP12_action_list($prm) {
 			$el = _elemOne($r['element_id']);
 			$block_id = _num(@$el['block_id']);
 		}
+		$val = array();
+		$val[] = 'dialog_id:'.$r['dialog_id'];
+		$val[] = 'edit_id:'.$id;
+		if($block_id)
+			$val[] = 'block_id:'.$block_id;
+		if($r['element_id'])
+			$val[] = 'element_id:'.$r['element_id'];
+		$val[] = 'dss:'.$dss;
 		$spisok .=
 			'<dd val="'.$id.'">'.
 			'<table class="w100p bs5 bor1 bg-gr2 over2 mb5 curD">'.
@@ -347,7 +353,10 @@ function PHP12_action_list($prm) {
 							PHP12_action_224($r).
 						'</div>'.
 					'<td class="w50 r top">'.
-						'<div val="dialog_id:'.$r['dialog_id'].',edit_id:'.$id.',block_id:'.$block_id.',dss:'.$dss.'" class="icon icon-edit pl dialog-open tool" data-tool="Настроить действие"></div>'.
+						'<div val="'.implode(',', $val).'"'.
+							' class="icon icon-edit pl dialog-open tool"'.
+							' data-tool="Настроить действие">'.
+						'</div>'.
 						'<div class="icon icon-del pl ml5 dialog-open tool" data-tool="Удалить" val="dialog_id:'.$r['dialog_id'].',del_id:'.$id.',dss:'.$dss.'"></div>'.
 			'</table>'.
 			'</dd>';

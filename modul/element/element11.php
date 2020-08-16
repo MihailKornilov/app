@@ -408,7 +408,7 @@ function PHP12_v_choose_13($prm, $dialog_id) {//клик по элементу [
 	//также может происходить выбор со страницы
 	if($BL['obj_name'] == 'page') {
 		//запрос произошёл из ячейки таблицы, находящейся на странице
-		if($dlg_id = PHP12_v_choose_23($BL, 0))
+		if($dlg_id = PHP12_v_choose_23($prm, 0))
 			return $dlg_id;
 		if(!$page = _page($BL['obj_id']))
 			return 'Страницы '.$BL['obj_id'].' не существует.';

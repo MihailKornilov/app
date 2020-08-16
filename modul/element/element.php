@@ -227,8 +227,6 @@ function _element($type, $el, $prm=array()) {//все манипуляции, с
 	if(!$dlg_id = _num(@$el['dialog_id']))
 		return _elementType($type);
 
-	$prm = _blockParam($prm);
-
 	//тип манипуляции добавляется в конце функции. Например: _element1_struct
 	$fname = '_element'.$dlg_id.'_'.$type;
 	if(function_exists($fname))

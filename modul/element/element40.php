@@ -43,6 +43,8 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 	if($el['num_1'])//указание есть. Диалог будет получен динамически из элемента
 		return 0;
 
+	$prm = _blockParam($prm);
+
 	$dss = _elem40dss_14($prm);
 	$dss = _elem40dss_88($prm, $dss);
 
