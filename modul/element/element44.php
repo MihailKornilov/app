@@ -9,27 +9,14 @@ function _element44_struct($el) {
 		'txt_1'   => $el['txt_1']//содержание (из настройки значений)
 	) +_elementStruct($el);
 }
-function _element44_struct_vvv($el, $cl) {
-	return array(
-		'id'        => _num($cl['id']),
-		'title'     => $cl['title'],
-		'dialog_id' => _num($cl['dialog_id']),
-		'font'      => $cl['font'],
-		'color'     => $cl['color'],
-		'txt_1'     => $cl['txt_1'],      //для [10]
-		'txt_2'     => $cl['txt_2'],      //ids из [11]
-		'num_1'     => _num($cl['num_1']),
-		'num_2'     => _num($cl['num_2']),
-		'num_3'     => _num($cl['num_3']),
-		'num_4'     => _num($cl['num_4']),
-		'num_5'     => _num($cl['num_5'])
-	);
+function _element44_vvv($el) {
+	return _decode($el['txt_1']);
 }
 function _element44_print($el, $prm) {
 	if(empty($el['txt_1']))
 		return $el['title'];
 
-	$json = json_decode($el['txt_1'], true);
+	$json = _decode($el['txt_1']);
 	$send = '';
 	foreach($json as $r)
 		switch($r['type']) {
