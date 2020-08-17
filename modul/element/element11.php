@@ -189,6 +189,9 @@ function PHP12_v_choose($prm) {
 	//элемент записи
 	$obj_id = PHP12_v_choose_spisok($prm, $obj_id);
 
+	//шаблон записи
+	$obj_id = PHP12_v_choose_43($prm, $obj_id);
+
 	//блок из содержания удаления записи
 	$obj_id = PHP12_v_choose_dialog_del($prm, $obj_id);
 
@@ -199,9 +202,9 @@ function PHP12_v_choose($prm) {
 	$obj_id = _hintDlgId($prm, $obj_id);
 
 	if($obj_id === false)
-		return _emptyMin10('Не найдена схема поиска объекта.');
+		return _emptyMin10('[11] Не найдена схема поиска объекта.');
 	if(!$obj_id)
-		return _emptyMin10('Объект не найден.');
+		return _emptyMin10('[11] Объект не найден.');
 	//сообщение об ошибке из одной из схем поиска
 	if(!_num($obj_id))
 		return _emptyMin10($obj_id);
@@ -508,19 +511,25 @@ function PHP12_v_choose_spisok($prm, $obj_id) {//элемент из запис�
 	if($BL['obj_name'] != 'spisok')
 		return false;
 	if(!$el = _elemOne($BL['obj_id']))
+		return '[11] Элемента-списка не существует';
+
+	return $el['num_1'];
+}
+function PHP12_v_choose_43($prm, $obj_id) {//шаблон записи
+	if($obj_id)
+		return $obj_id;
+	if(!$BL = PHP12_v_choose_BL($prm))
+		return false;
+	if($BL['obj_name'] != 'tmp43')
+		return false;
+	if(!$el = _elemOne($BL['obj_id']))
 		return 'Элемента-списка не существует';
+	if(!$bl = _blockOne($el['block_id']))
+		return '[43] Не получен блок, в котором размещается элемент-список';
+	if($bl['obj_name'] != 'dialog')
+		return '[43] Блок размещается не в диалоге '._pr($bl);
 
-	switch($el['dialog_id']) {
-		case 14: return $el['num_1'];
-		case 43:
-			if(!$bl = _blockOne($el['block_id']))
-				return '[43] Не получен блок, в котором размещается элемент-список';
-			if($bl['obj_name'] != 'dialog')
-				return '[43] Блок размещается не в диалоге '._pr($bl);
-			return $bl['obj_id'];
-	}
-
-	return 'Неизвестно где размещается шаблон списка';
+	return $bl['obj_id'];
 }
 function PHP12_v_choose_dialog_del($prm, $obj_id) {//блок из содержания удаления единицы списка
 	if($obj_id)

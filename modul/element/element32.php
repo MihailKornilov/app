@@ -17,8 +17,8 @@ function _element32_struct_title($el) {
 function _element32_print($el, $prm) {
 	if(empty($prm['unit_get']))
 		return $el['title'];
-	if(!$u = $prm['unit_get'])
-		return $el['title'];
+
+	$u = $prm['unit_get'];
 
 
 	if(!$num = _num($u))

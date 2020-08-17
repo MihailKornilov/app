@@ -493,10 +493,10 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 
 	//было назначено действие
 	if($dialog['table_name_1'] == '_action')
-		_BE('action_clear');
-
-	//изменена выплывающая подсказка
-//	_hintCacheClear($dialog);
+		if($dialog['id'] == 229)
+			_BE('hint_clear');
+		else
+			_BE('action_clear');
 
 	//изменены данные пользователя
 	if($dialog['table_name_1'] == '_user')

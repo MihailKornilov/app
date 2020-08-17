@@ -119,6 +119,9 @@ function _elem85mass($ell_id, $v, $send) {//получение значений 
 }
 
 function _elem201init($el85, $prm, $send) {//получение данных элемента для настройки действия [201]
+	if(empty($prm['srce']))
+		return $send;
+
 	$srce = $prm['srce'];
 
 	//проверка, чтобы данные были получены только для действий

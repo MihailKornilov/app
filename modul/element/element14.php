@@ -3,7 +3,7 @@
 /* [14] Список-шаблон */
 function _element14_struct($el) {
 	/*
-		настройка шаблона через функцию PHP12_spisok14_setup
+		настройка шаблона через функцию PHP12_tmp_setup
 	*/
 	return array(
 		'num_1' => _num($el['num_1']),//id диалога, который вносит данные списка (шаблон которого будет настраиваться)
@@ -122,45 +122,5 @@ function _element14_copy_vvv($el, $obj_id) {
 
 	_blockChildCountSet('spisok', $obj_id);
 	_blockAppIdUpdate('spisok', $obj_id);
-}
-
-
-/* ---=== ШАБЛОН ЕДИНИЦЫ СПИСКА [14] ===--- */
-function PHP12_spisok14_setup($prm) {//настройка шаблона
-	/*
-		имя объекта: spisok
-		 id объекта: id элемента, который размещает список
-	*/
-	if(!$unit = $prm['unit_edit'])
-		return
-		'<div class="bg-ffe pad10">'.
-			_emptyMin('Настройка шаблона будет доступна после вставки списка в блок.').
-		'</div>';
-
-	//определение ширины шаблона
-	if(!$block = _blockOne($unit['block_id']))
-		return 'Блока, в котором находится список, не существует.';
-
-	setcookie('block_level_spisok', 1, time() + 2592000, '/');
-	$_COOKIE['block_level_spisok'] = 1;
-
-	$width = _blockObjWidth('spisok', $unit['id']);
-
-	return
-	'<div class="bg-ffc pad10 line-b">'.
-		_blockLevelChange('spisok', $unit['id']).
-	'</div>'.
-	'<div class="block-content-spisok" style="width:'.$width.'px">'.
-		_blockHtml('spisok', $unit['id'], array('blk_setup' => 1)).
-	'</div>';
-}
-function PHP12_spisok14_setup_vvv($prm) {
-	if(empty($prm['unit_edit']))
-		return array();
-
-	$send['jsblk'] = _BE('block_arr', 'spisok', $prm['unit_edit']['id']);
-	$send['jselm'] = _elmJs('spisok', $prm['unit_edit']['id'], $prm);
-
-	return $send;
 }
 

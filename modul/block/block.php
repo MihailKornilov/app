@@ -24,6 +24,11 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 		'hint' =>
 			'<div class="_empty min">'.
 				'Cодержание подсказки не настроено.'.
+			'</div>',
+
+		'tmp43' =>
+			'<div class="_empty min">'.
+				'Cодержание шаблона записи не настроено.'.
 			'</div>'
 	);
 
@@ -700,6 +705,7 @@ function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины
 		case 'page': return 1000;
 		case 'dialog': return _dialogParam($obj_id, 'width');
 		case 'dialog_del': return 500;
+		case 'tmp43':
 		case 'spisok':
 			//получение элемента, который содержит список (для корректировки ширины с отступами)
 			if(!$elm14 = _elemOne($obj_id))
@@ -1009,6 +1015,13 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		return $G_HINT['bl'][$i1];
 	}
 
+	//очистка кеша действий
+	if($i == 'hint_clear') {
+		_cache_clear('HINT');
+		_cache_clear('HINT', 1);
+		_beHintCache();
+	}
+
 
 
 
@@ -1053,25 +1066,15 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 	return false;
 }
 function _beDefine() {//получение блоков и элементов из кеша
-	global $G_HINT;
-
 	//если флаг установлен, значит кеш был обновлён, глобальные элементы заполнены
 	if(_flag('BE'))
 		return;
-
-	$G_HINT = array(
-		'el' => array(),//подсказки, прикреплённые к элементам
-		'bl' => array(),//подсказки, прикреплённые к блокам
-		'ht' => array() //все подсказки
-	);
 
 	_beDlgCache();
 	_beBlkCache();
 	_beElmCache();
 	_beActCache();
-
-	_beHint();
-	_beHint(APP_PARENT);
+	_beHintCache();
 }
 
 function _beDlgCache() {//кеширование диалогов
@@ -1351,7 +1354,7 @@ function _beActCache() {//кеш действий
 	_beAct();
 	_beAct(APP_PARENT);
 }
-function _beAct($app_id=0) {//вставка действий для блоков
+function _beAct($app_id=0) {//кеш действий
 	if(_flag('ACT_APP'.$app_id))
 		return;
 
@@ -1402,8 +1405,24 @@ function _beAct($app_id=0) {//вставка действий для блоко�
 //	$action = _beBlockAction215($app_id, $action);
 }
 
+function _beHintCache() {//кеш действий
+	global $G_HINT;
+
+	$G_HINT = array(
+		'el' => array(),//подсказки, прикреплённые к элементам
+		'bl' => array(),//подсказки, прикреплённые к блокам
+		'ht' => array() //все подсказки
+	);
+
+	//если функция вызывается повторно, очищаются флаги
+	_flag('HINT_APP0', true);
+	_flag('HINT_APP'.APP_PARENT, true);
+
+	_beHint();
+	_beHint(APP_PARENT);
+}
 function _beHint($app_id=0) {//подсказки
-	if(_defined('HINT_APP'.$app_id))
+	if(_flag('HINT_APP'.$app_id))
 		return;
 
 	global $G_HINT;
