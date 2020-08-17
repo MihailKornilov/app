@@ -123,16 +123,29 @@ function _blockAction231($bl, $prm) {//условия отображения б�
 	return $bl;
 }
 
-function _elemAction223($el, $u, $txt) {//подсказка
+function _elemAction223($el, $u, $txt) {//подсказка на тёмном фоне
 	if(!$action = _BE('elem_one_action', $el['id']))
 		return $txt;
 
-	foreach($action as $act)
-		if($act['dialog_id'] == 223)
-			if($tt = _elemUids($act['target_ids'], $u))
-				return '<span class="inhr tool" data-tool="'.$tt.'">'.$txt.'</a>';
+	foreach($action as $act) {
+		if($act['dialog_id'] != 223)
+			continue;
+		if(!$tt = _elemUids($act['target_ids'], $u))
+			return $txt;
+
+		return '<span class="inhr tool" data-tool="'.$tt.'">'.$txt.'</a>';
+	}
 
 	return $txt;
+}
+function _elemAction229Hint($el, $prm, $txt) {//выплывающая подсказка
+	if(!$hint = _BE('hint_elem_one', $el['id']))
+		return $txt;
+
+	$prm['td_no_end'] = 1;
+	$hint['msg'] = _blockHtml('hint', $hint['id'], $prm);
+
+	return '<span class="inhr hint-on" data-hint-id="'._hintMassPush($hint).'">'.$txt.'</a>';
 }
 function _elemAction241($el, $prm, $txt) {//подмена текста
 	if(!$action = _BE('elem_one_action', $el['id']))
@@ -975,7 +988,17 @@ function _hintMass() {//получение массива собранных п�
 function _hintMassPush($ht) {//добавление данных подсказки в общий массив
 	global $HINT_MASS;
 
-	$key = 'hint_'.rand(100000, 999999);
+	//сборщик подсказок
+	if(!isset($HINT_MASS))
+		$HINT_MASS = array();
+
+	$key = false;
+	while(!$key) {
+		$key = rand(100000, 999999);
+		if(isset($HINT_MASS[$key]))
+			$key = false;
+	}
+
 	unset($ht['id']);
 	$HINT_MASS[$key] = $ht;
 

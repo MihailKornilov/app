@@ -1639,30 +1639,6 @@ function _elemDivAttrId($el, $prm) {//аттрибут id для DIV элеме�
 
 	return ' id="el_'.$el['id'].'"';
 }
-function _elemDivDataHint($el, $prm) {//аттрибут data-подсказка для элемента
-	if(!empty($prm['blk_setup']))
-		return '';
-	if(empty($el['id']))
-		return '';
-	if(!$hint = _BE('hint_elem_one', $el['id']))
-		return '';
-
-	$prm['td_no_end'] = 1;
-	$hint['msg'] = _blockHtml('hint', $hint['id'], $prm);
-
-	return ' data-hint-id="'._hintMassPush($hint).'"';
-}
-function _elemHintOn($el, $prm=array()) {
-	if(!empty($prm['blk_setup']))
-		return '';
-	if(empty($el['id']))
-		return '';
-	if(!_BE('hint_elem_one', $el['id']))
-		return '';
-
-	return 'hint-on';
-}
-
 function _elemDivSize($el) {//класс - размер шрифта
 	if(empty($el['size']))
 		return '';
@@ -1690,7 +1666,6 @@ function _elemDiv($elem_id, $prm=array()) {//формирование div эле
 	$cls[] = _elemAction242($el, $prm);
 	$cls[] = @$el['font'];
 	$cls[] = _elemDivSize($el);
-	$cls[] = _elemHintOn($el, $prm);;//наличие подсказки
 	$cls = array_diff($cls, array(''));
 	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
@@ -1698,7 +1673,7 @@ function _elemDiv($elem_id, $prm=array()) {//формирование div эле
 
 	return
 	_elemDivCol($el, $prm).
-	'<div'.$attr_id.$cls.$style._elemDivDataHint($el, $prm).'>'.$txt.'</div>';
+	'<div'.$attr_id.$cls.$style.'>'.$txt.'</div>';
 }
 function _elemDivCol($el, $prm) {
 	if(empty($el['col']))
@@ -1712,6 +1687,7 @@ function _elemFormat($el, $prm, $txt) {//формат значения элем�
 	$txt = _elemAction241($el, $prm, $txt); //подмена текста
 	$txt = _elemAction243($el, $txt);       //Формат для чисел
 	$txt = _elemAction245($el, $txt, 1);    //Формат для текста
+	$txt = _elemAction229Hint($el, $prm, $txt);//выплывающая подсказка
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 	$txt = _elemLink($el, $txt);
 	return $txt;

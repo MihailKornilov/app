@@ -30,7 +30,7 @@ function _element44_print($el, $prm) {
 
 				$txt = _element('print', $ell, $prm);
 				$txt = _elemFormat($ell, $prm, $txt);
-				$txt = _elem44css($ell, $txt, $prm);
+				$txt = _elem44css($ell, $txt);
 				$txt = _spisokColSearchBg($el, $txt);
 				$send .= $txt;
 			break;
@@ -43,16 +43,15 @@ function _element44_template_docx($el, $u) {
 	$prm['unit_get'] = $u;
 	return _element44_print($el, $prm);
 }
-function _elem44css($ell, $txt, $prm=array()) {//применение стилей к значению
+function _elem44css($ell, $txt) {//применение стилей к значению
 	$cls = array();
 	$cls[] = $ell['font'];
 	$cls[] = $ell['color'];
-	$cls[] = _elemHintOn($ell, $prm);
 
 	if(!$cls = array_diff($cls, array('')))
 		return $txt;
 
-	return '<span class="'.implode(' ', $cls).'" style="font-size:inherit"'._elemDivDataHint($ell, $prm).'>'.$txt.'</span>';
+	return '<span class="'.implode(' ', $cls).'" style="font-size:inherit">'.$txt.'</span>';
 }
 
 

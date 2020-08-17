@@ -103,7 +103,6 @@ function _element88_print($EL, $prm=array(), $next=0) {
 			foreach($V['col'] as $col) {
 				$cls = array();
 				$txt = '';
-				$dataHint = '';
 
 				if($elm_id = $col['elm'][$n])
 					if($ell = _elemOne($elm_id)) {
@@ -123,8 +122,6 @@ function _element88_print($EL, $prm=array(), $next=0) {
 						$cls[] = $ell['font'];
 						$cls[] = $ell['txt_8'];//pos - позиция
 						$cls[] = _elemAction242($ell, $prm);//подмена цвета
-						$cls[] = _elemHintOn($ell);//наличие подсказки
-						$dataHint = _elemDivDataHint($ell, $prm);
 						$txt = _elemPrint($ell, $prm);
 						$txt = _elemFormat($ell, $prm, $txt);//форматирование для ячеек таблицы
 				}
@@ -133,7 +130,7 @@ function _element88_print($EL, $prm=array(), $next=0) {
 				$cls = implode(' ', $cls);
 				$cls = $cls ? ' class="'.$cls.'"' : '';
 
-				$TR .= '<td'.$cls._elemStyleWidth($col).$dataHint.'>'.$txt;
+				$TR .= '<td'.$cls._elemStyleWidth($col).'>'.$txt;
 			}
 		}
 	}
