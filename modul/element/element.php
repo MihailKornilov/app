@@ -22,7 +22,7 @@ foreach(array(
 			11,12,13,14,15,16,17,18,
 			21,   23,24,25,26,27,28,29,30,
 	        31,32,33,34,35,36,37,38,39,40,
-			         44,45,46,      49,
+			      43,44,45,46,      49,
 			51,52,   54,55,   57,58,59,60,
 			   62,   64,   66,   68,69,70,
 			71,72,73,74,75,76,77,78,79,80,
@@ -2319,6 +2319,58 @@ function PHP12_cron_dst_prm_ass($dst) {//ассоциативный массив
 
 	return $ass;
 }
+
+
+
+
+
+// Настройка шаблона данных записи
+function PHP12_tmp_setup($prm) {
+	/*
+		txt_2: имя объекта
+		       id объекта = id элемента, который размещает шаблон
+		txt_3: максимальная ширина шаблона. Если равно нулю - получение ширины блока, в котором размещён элемент
+		txt_4: сообщение о том, что настройка будет доступна после создания элемента
+	*/
+	$el12 = $prm['el12'];
+	if(!$unit = $prm['unit_edit'])
+		return '<div class="bg-ffe pad10">'._emptyMin($el12['txt_4']).'</div>';
+	if(!$obj_name = _txt($el12['txt_2']))
+		return _emptyRed10('Отсутствует имя объекта');
+
+	$obj_id = $unit['id'];
+
+	setcookie('block_level_'.$obj_name, 1, time() + 2592000, '/');
+	$_COOKIE['block_level_'.$obj_name] = 1;
+
+	//определение ширины шаблона
+	if(!$width = _num($el12['txt_3']))
+		$width = _blockObjWidth($obj_name, $obj_id);
+
+	return
+	'<div class="bg-ffc pad10 line-b">'.
+		_blockLevelChange($obj_name, $obj_id).
+	'</div>'.
+	'<div class="block-content-'.$obj_name.'" style="width:'.$width.'px">'.
+		_blockHtml($obj_name, $obj_id, array('blk_setup' => 1)).
+	'</div>';
+}
+function PHP12_tmp_setup_vvv($prm) {
+	if(empty($prm['unit_edit']))
+		return array();
+	if(!$obj_name = $prm['el12']['txt_2'])
+		return array();
+
+	$obj_id = $prm['unit_edit']['id'];
+
+	$send['jsblk'] = _BE('block_arr', $obj_name, $obj_id);
+	$send['jselm'] = _elmJs($obj_name, $obj_id, $prm);
+
+	return $send;
+}
+
+
+
 
 
 

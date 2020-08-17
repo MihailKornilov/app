@@ -2052,12 +2052,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
-	//[14] Список-шаблон
-	PHP12_spisok14_setup = function(el, vvv) {
-		BLKK = _objUpd(BLKK, vvv.jsblk);
-		ELMM = _objUpd(ELMM, vvv.jselm);
-	},
-
 	//[16] Радио
 	_EL16 = function(el) {
 		if(!el.action)
@@ -6561,6 +6555,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			act:obj.srce.dop.act,
 			v:send
 		};
+	},
+
+	//Шаблон данных записи
+	PHP12_tmp_setup = function(el, vvv) {
+		BLKK = _objUpd(BLKK, vvv.jsblk);
+		ELMM = _objUpd(ELMM, vvv.jselm);
 	},
 
 	/* ---=== УКАЗАНИЕ ЭЛЕМЕНТОВ ПОД КОНКРЕТНОЕ ПРАВИЛО [1000] ===--- */

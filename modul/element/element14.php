@@ -155,11 +155,11 @@ function PHP12_spisok14_setup($prm) {//настройка шаблона
 	'</div>';
 }
 function PHP12_spisok14_setup_vvv($prm) {
-	if(!$unit = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return array();
 
-	$send['jsblk'] = _BE('block_arr', 'spisok', $unit['id']);
-	$send['jselm'] = _elmJs('spisok', $unit['id'], $prm);
+	$send['jsblk'] = _BE('block_arr', 'spisok', $prm['unit_edit']['id']);
+	$send['jselm'] = _elmJs('spisok', $prm['unit_edit']['id'], $prm);
 
 	return $send;
 }

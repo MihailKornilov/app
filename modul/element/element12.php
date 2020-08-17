@@ -10,7 +10,9 @@ function _element12_struct($el) {
 		'req_msg'   => $el['req_msg'],
 
 		'txt_1' => $el['txt_1'],     //имя функции (начинается с PHP12)
-		'txt_2' => $el['txt_2'],     //начальное значение
+		'txt_2' => $el['txt_2'],     //значение 1
+		'txt_3' => $el['txt_3'],     //значение 2
+		'txt_4' => $el['txt_4'],     //значение 3
 		'num_1' => _num($el['num_1'])//условие 1
 	) + _elementStruct($el);
 }
