@@ -110,6 +110,8 @@ function _element55update($elem_id, $unit_ids=0) {//обновление сум�
 	_element27childChange($elem_id, $unit_ids);
 }
 function _element55unitUpd($dlg, $unitNew, $unitOld) {//обновить сумму, если была внесена или удалена запись
+	$dlg = _dialogParent($dlg);
+
 	//поиск элементов-связок в диалоге
 	$ids = array();
 	foreach($dlg['cmp'] as $id => $r) {

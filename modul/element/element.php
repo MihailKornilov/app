@@ -525,6 +525,7 @@ function _dialogParam($dialog_id, $param) {//получение конкретн
 	return $send;
 }
 function _dialogParent($dialog) {//получение диалога, отвечающего за внесение записи
+	$act = $dialog['act'];
 	while($parent_id = $dialog['dialog_id_parent']) {
 		if(!$PAR = _dialogQuery($parent_id))
 			break;
@@ -536,6 +537,7 @@ function _dialogParent($dialog) {//получение диалога, отвеч
 		if($PAR['parent_any'])
 			break;
 	}
+	$dialog['act'] = $act;
 	return $dialog;
 }
 function _dialogOpenVal($dialog_id, $prm, $EL_BUT) {//получение параметров открытия диалога для кнопки или блока
@@ -711,6 +713,8 @@ function _dialogSpisokOnConnect($block_id) {//получение диалого�
 		$BL = $block[$r['block_id']];
 		$obj_id = _num($BL['obj_id']);
 		$dialog = _dialogQuery($obj_id);
+		if($dialog['dialog_id_parent'])
+			continue;
 		$send[_num($elem_id)] = $dialog['name'].($cc[$obj_id] ? ' (в блоке '.$r['block_id'].')' : '');
 	}
 

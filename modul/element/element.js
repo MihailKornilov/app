@@ -836,6 +836,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		switch(res.action_id) {
 			//обновление страницы
 			case 1:
+				//console.log(DIALOG)
 				$('#_content').html(res.content);
 				break;
 			//переход на страницу
@@ -2901,7 +2902,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			_dialogLoad({
 				dialog_id:41,
 				block_id:OBJ.srce.block_id,
-//				element_id:el.num_1,//id элемента, к которому привязан фильтр (по нему будет определяться id диалога)
+				element_id:el.num_1,//id элемента, к которому привязан фильтр (по нему будет определяться id диалога)
 				dss:dss,
 				dop:$(ATTR_CMP(el.id)).val(),
 				busy_obj:INP,

@@ -119,6 +119,8 @@ function _element54update($elem_id, $unit_ids=0) {//обновление кол�
 	}
 }
 function _element54unitUpd($dlg, $unit, $unitOld) {//обновить количество, если была внесена или удалена запись
+	$dlg = _dialogParent($dlg);
+
 	//поиск элементов-связок в диалоге
 	$ids = array();
 	foreach($dlg['cmp'] as $id => $r) {
@@ -152,6 +154,7 @@ function _element54unitUpd($dlg, $unit, $unitOld) {//обновить колич
 			FROM `_element`
 			WHERE `dialog_id`=54
 			  AND `num_1` IN ("._idsGet($ids, 'key').")";
+
 	if(!$arr = query_arr($sql))
 		return;
 

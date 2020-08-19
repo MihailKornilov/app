@@ -262,7 +262,7 @@ function PHP12_v_choose_vvv($prm) {
 
 	if(!empty($prm['unit_edit']))
 		$dop['sel'] = $prm['unit_edit']['txt_2'];
-	if(defined('OBJ_NAME_CHOOSE')) {
+	if(defined('OBJ_NAME_CHOOSE') && defined('OBJ_ID_CHOOSE')) {
 		$dop['jselm'] = _elmJs(OBJ_NAME_CHOOSE, OBJ_ID_CHOOSE);
 		//добавление элементов из родительского диалога, если есть
 		if(OBJ_NAME_CHOOSE == 'dialog')
