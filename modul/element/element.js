@@ -836,7 +836,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		switch(res.action_id) {
 			//обновление страницы
 			case 1:
-				//console.log(DIALOG)
+				_forIn(DIALOG, function(dlg) {
+					dlg.close();
+				});
 				$('#_content').html(res.content);
 				break;
 			//переход на страницу
@@ -4961,7 +4963,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					busy_obj:t,
 					busy_cls:'hold',
 					func_save:function(ia) {
-						console.log(ia);
 						t.val(ia.unit.title);
 						t.attr('data-did', ia.unit.dialog_id);
 						t.attr('val', ia.unit.id);
