@@ -99,12 +99,19 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 
 	return _blockDlgId($block_id);
 }
-function _elem40dss_14($prm) {//получение id диалога из списка-шаблона
+function _elem40dss_bl($prm) {//получение данных блока
 	if(!$bl = _blockOne($prm['srce']['block_id']))
 		if($el = _elemOne($prm['srce']['element_id']))
 			if(!$bl = _blockOne($el['block_id']))
-				return 0;
+				return $bl;
+
 	if(empty($bl))
+		return array();
+
+	return $bl;
+}
+function _elem40dss_14($prm) {//получение id диалога из списка-шаблона
+	if(!$bl = _elem40dss_bl($prm))
 		return 0;
 	if($bl['obj_name'] != 'spisok')
 		return 0;
@@ -130,10 +137,8 @@ function _elem40dss_88($prm, $dss) {//получение id диалога из 
 function _elem40dss_43($prm, $dss) {//получение id диалога из Шаблона записи
 	if($dss)
 		return $dss;
-	if(!$bl = _blockOne($prm['srce']['block_id']))
-		if($el = _elemOne($prm['srce']['element_id']))
-			if(!$bl = _blockOne($el['block_id']))
-				return 0;
+	if(!$bl = _elem40dss_bl($prm))
+		return 0;
 	if($bl['obj_name'] != 'tmp43')
 		return 0;
 	if(!$el = _elemOne($bl['obj_id']))
@@ -148,7 +153,7 @@ function _elem40dss_43($prm, $dss) {//получение id диалога из 
 function _elem40dss_page($prm, $dss) {//получение id диалога из Страницы, принимающей данные записи
 	if($dss)
 		return $dss;
-	if(!$bl = _blockOne($prm['srce']['block_id']))
+	if(!$bl = _elem40dss_bl($prm))
 		return 0;
 	if($bl['obj_name'] != 'page')
 		return 0;
