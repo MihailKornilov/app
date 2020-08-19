@@ -140,6 +140,7 @@ function _authLoginSite() {//страница авторизации через 
 			'<button class="vk small green mt10 dialog-open" val="dialog_id:98">Регистрация</button>'.
 		'</div>'.
 	'</div>'.
+	_pageScript(98, array()).
 (!LOCAL ?
 	'<script src="https://vk.com/js/api/openapi.js?152"></script>'.
 	'<script>VK.init({apiId:'.AUTH_APP_ID.'});</script>'
