@@ -3,11 +3,6 @@
 /* [24] Select: выбор списка приложения */
 function _element24_struct($el) {
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'width'   => _num($el['width']),
-
 		'txt_1'   => $el['txt_1'],     //текст, когда список не выбран
 		'num_1'   => _num($el['num_1'])/* содержание селекта:
 											0   - все списки приложения. Функция _dialogSpisokOn()
@@ -20,11 +15,6 @@ function _element24_struct($el) {
 												  Функция _dialogSpisokOnConnect()
 									   */
 	) + _elementStruct($el);
-}
-function _element24_js($el) {
-	return array(
-		'txt_1' => $el['txt_1'],
-	) + _elementJs($el);
 }
 function _element24_print($el, $prm) {
 	return

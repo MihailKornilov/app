@@ -11,14 +11,6 @@ function _element95_struct($el) {
 		'txt_2'   => $el['txt_2']       //[12] данные колонок в формате JSON
 	) + _elementStruct($el);
 }
-function _element95_js($el) {
-	return array(
-		'txt_1'   => $el['txt_1'],
-		'num_2'   => _num($el['num_2'])
-	) + _elementJs($el);
-}
-
-/* Вывод содержимого элемента на экран */
 function _element95_print($el, $prm) {
 	if(!empty($prm['blk_setup']))
 		return _emptyMin(_debugPrint('[95] ').$el['name']);
@@ -29,7 +21,6 @@ function _element95_print($el, $prm) {
 
 	return '';
 }
-
 function _element95_vvv($el, $prm) {
 	if(empty($el['txt_2']))
 		return array();

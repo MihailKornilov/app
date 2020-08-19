@@ -99,6 +99,21 @@ function _filter($i='all', $v=0, $vv='') {//получение значений 
 		_filterInsert($spisok, $filter, $v);
 	}
 
+	//обновление значения по умолчанию
+	if($i == 'def_update') {
+		if(!$filter_id = _num($v))
+			return false;
+
+		$def = $vv;
+
+		$sql = "UPDATE `_user_spisok_filter`
+				SET `def`='".addslashes($def)."'
+				WHERE `element_id_filter`=".$filter_id;
+		query($sql);
+
+		_filter('cache_clear');
+	}
+
 	//определение отличия значений от условий по умолчанию
 	if($i == 'diff') {
 		if(!$v)
@@ -647,6 +662,12 @@ function _unitUrlId($u, $dlg_id) {//получение id из записи дл
 					if($vv == $dlg_id)
 						return $v['id'];
 	return $u['id'];
+}
+
+function _unitGet($prm) {//получение данных записи
+	if(empty($prm['unit_get']))
+		return array();
+	return $prm['unit_get'];
 }
 
 function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстовом (быстром) поиске

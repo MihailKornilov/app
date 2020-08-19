@@ -3,6 +3,8 @@
 /* [2] Кнопка */
 function _element2_struct($el) {
 	return array(
+		'width'   => _num($el['width']),
+
 		'parent_id' => _num($el['parent_id']),//если кнопка расположена в ячейке таблицы
 
 		'txt_1' => $el['txt_1'],        //текст кнопки
@@ -14,9 +16,8 @@ function _element2_struct($el) {
 		'num_6' => _num($el['num_6'])   //передаёт данные записи для удаления
 	) + _elementStruct($el);
 }
-function _element2_struct_title($el) {
-	$el['title'] = $el['txt_1'];
-	return $el;
+function _element2_title($el) {
+	return $el['txt_1'];
 }
 function _element2_print($el, $prm) {
 	$color = array(

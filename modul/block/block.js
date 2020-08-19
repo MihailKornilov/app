@@ -738,9 +738,10 @@ $(document)
 					obj_id:res.obj_id,
 					width:res.width
 				});
-			else
-				for(var i in res.blk)
-					BLKK[i] = res.blk[i];
+			else {
+				BLKK = _objUpd(BLKK, res.blk);
+				ELMM = _objUpd(ELMM, res.elm);
+			}
 
 
 			BCO.find('b').html(_ids(BIM, 1));

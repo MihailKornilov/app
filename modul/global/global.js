@@ -271,18 +271,6 @@ var ZINDEX = 1000,
 		send += '</table></div>';
 		return send;
 	},
-	_cons = function(v) {//вывод значения как в console.log
-		if(!$('#_debug').length)
-			return;
-		var cons = $('#_debug .cons'),
-			tpf = typeof v,
-			log = '<div class="fs14 mb5 grey">' + tpf + '</div>' +
-				  (tpf == 'object' ? _pr(v) : v) +
-				  '<div class="line-t mt10">&nbsp;</div>';
-		cons.find('.cons-div').prepend(log);
-		if(!cons.hasClass('dn'))
-			cons._flash();
-	},
 	_bug = function(block_id) {//вставка количества ошибок по каждому виду структуры приложения (страница 132)
 		var BL = _attr_bl(block_id),
 			c = 0;

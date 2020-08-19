@@ -13,11 +13,6 @@ function _element62_struct($el) {
 		'num_3'   => _num($el['num_3']) //начальное значение для галочки
 	) + _elementStruct($el);
 }
-function _element62_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element62_print($el, $prm) {
 	return
 	_check(array(

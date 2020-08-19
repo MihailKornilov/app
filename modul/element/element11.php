@@ -1,141 +1,81 @@
 <?php
 
 /* [11] Вставка значения записи */
-function _element11_struct($el, $ELM=array()) {
+function _element11_struct($el) {
 	/*
 		Вставка элемента через функцию PHP12_v_choose
 	*/
 
-	global $G_ELM;
-	if(empty($ELM))
-		$ELM = $G_ELM;
-
-	$send = array(
+	return array(
 		'parent_id' => _num($el['parent_id']),
 
 		'font'      => $el['font'],
 		'color'     => $el['color'],
 		'size'      => $el['size'] ? _num($el['size']) : 13,
 
-		'txt_2'     => $el['txt_2'],    //id элемента, выбранного из диалога, который вносит данные списка
-								        //возможна иерархия элементов через запятую: 256,1312,560
-		'txt_7'     => $el['txt_7'],    //текст слева (для истории действий)
-		'txt_8'     => $el['txt_8']     //текст справа (для истории действий)
+		'txt_2'     => $el['txt_2'],   //id элемента, выбранного из диалога, который вносит данные списка
+								       //возможна иерархия элементов через запятую: 256,1312,560
+		'num_7' => _num($el['num_7']),//ограничение высоты (настройка стилей для [60] изображения)
+		'num_8' => _num($el['num_8']) //закруглённые углы (настройка стилей для [60] изображения)
 	) + _elementStruct($el);
-
-	if($last_id = _idsLast($el['txt_2']))
-		if(isset($ELM[$last_id])) {
-			$el11 = $ELM[$last_id];
-
-			//разрешать настройку стилей (правило 11)
-			if(_elemRule($el11['dialog_id'], 11))
-				$send['stl'] = 1; //для JS
-
-			//является изображением
-			if($el11['dialog_id'] == 60) {
-				$send['width'] = empty($el['width']) ? 30 : _num($el['width']);
-				$send['num_7'] = _num($el['num_7']);
-				$send['num_8'] = _num($el['num_8']);
-				$send['immg'] = 1;
-			}
-
-			//является видеороликом
-			if($el11['dialog_id'] == 76) {
-				$send['width'] = empty($el['width']) ? 150 : _num($el['width']);
-				$send['immg'] = 1;
-			}
-	}
-
-	return $send;
 }
-function _element11_struct_title($el, $ELM, $DLGS=array()) {
-	$el['title'] = '';
-	foreach(_ids($el['txt_2'], 'arr') as $id) {
-		if(!isset($ELM[$id])) {
-			$el['title'] = '-title-no-find-';
-			return $el;
-		}
+function _element11_title($el) {
+	$send = '';
+	foreach(_ids($el['txt_2'], 'arr') as $elem_id) {
+		if(!$ell = _elemOne($elem_id))
+			return '-[11:'.$elem_id.']-not-elem-';
 
-		$ell = $ELM[$id];
-
-		//для изображения путь не пишется
-		if($ell['dialog_id'] == 60) {
-			if($pid = _num($el['parent_id']))
-				$el['title'] = 'IMG';
-			else
-				$el['title'] = _imageNo($el['width'], $el['num_8']);
-			return $el;
-		}
-
-		//для видеоролика путь не пишется
-		if($ell['dialog_id'] == 76) {
-			$el['title'] = _elem76novideo($el['width']);
-			return $el;
+		//элементы, для которых путь не пишется
+		switch($ell['dialog_id']) {
+			case 60: //изображение
+			case 76: //видеоролик
+				$ell['elp'] = $el;
+				return _element('title', $ell);
 		}
 
 		//вложенное значение
-		if(_elemIsConnect($ell)) {
-			$dlg = $DLGS[$ell['num_1']];
-			$el['title'] .= $dlg['name'].' » ';
-			continue;
-		}
-
-		$el['title'] .= _element('title', $ell);
-	}
-	return $el;
-}
-function _element11_js($el) {
-	$send = _elementJs($el);
-
-	//дополнительные значения для изображений
-	if($last = _idsLast($el['txt_2']))
-		if($ell = _elemOne($last)) {
-			if($ell['dialog_id'] == 60)
-				$send += array(
-					'num_7' => _num(@$el['num_7']),//[60] ограничение высоты
-					'num_8' => _num(@$el['num_8']) //[60] закруглённые углы
-				);
-			//разрешать настройку условий отображения
-			if(_elemRule($ell['dialog_id'], 14))
-				$send['eye'] = 1;
+		if(!empty($ell['issp']))
+			if($dlg_id = _num($ell['num_1'])) {
+				$send .= _dialogParam($dlg_id, 'name').' » ';
+				continue;
 			}
 
+		$send .= _element('title', $ell);
+	}
 	return $send;
 }
 function _element11_print($el, $prm) {
-	if(!$u = @$prm['unit_get'])
-		return $el['title'];
+	if(!$u = _unitGet($prm))
+		return _element('title', $el);
 	if(!$ids = _ids($el['txt_2'], 'arr'))
 		return _msgRed('[11] нет ids элементов');
 
-	foreach($ids as $id) {
-		if(!$ell = _elemOne($id))
-			return _msgRed('-ell-yok-');
+	foreach($ids as $elem_id) {
+		if(!$ell = _elemOne($elem_id))
+			return _msgRed('[11:'.$elem_id.'] not_exist');
 
-		if(_elemIsConnect($ell))
-			return _element29_print11($el, $u);
+		if(!empty($ell['issp'])) {
+			if(!$col = _elemCol($ell))
+				return _msgRed('[11:'.$elem_id.'] not_col');
+			if(!isset($u[$col]))
+				return _msgRed('[11:'.$elem_id.'] not_val');
 
-		if(!_elemIsConnect($ell)) {
-			$ell['elp'] = $el;//вставка родительского элемента (для подсветки при быстром поиске)
-			return _element('print11', $ell, $u);
+			$u = $u[$col];
+
+			if(!is_array($u)) {
+				if(empty($u))
+					return '';
+				return $u;
+			}
+
+			continue;
 		}
 
-		if(empty($ell['col']))
-			return _msgRed('-cnn-col-yok-');
-
-		$col = $ell['col'];
-		$u = $u[$col];
-
-		if(is_array($u))
-			continue;
-
-		if($ell['dialog_id'] == 29)
-			return $ell['txt_1'];
-
-		return _msgRed('значение отсутствует');
+		$ell['elp'] = $el;
+		return _element('print11', $ell, $u);
 	}
 
-	return _msgRed('-11-yok-');
+	return _msgRed('[11] ('.$el['txt_2'].') no_print');
 }
 function _element11_v_get() {
 	return 'любое значение';

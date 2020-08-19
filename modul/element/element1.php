@@ -9,9 +9,8 @@ function _element1_struct($el) {
 		'num_1' => _num($el['num_1']) //уникальное значение (для "по умолчанию")
 	) + _elementStruct($el);
 }
-function _element1_struct_title($el) {
-	$el['title'] = '? '.$el['txt_1'];
-	return $el;
+function _element1_title($el) {
+	return '✓ '.$el['txt_1'];
 }
 function _element1_print($el, $prm) {
 	return _check(array(

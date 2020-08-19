@@ -43,7 +43,7 @@
 	text-align:center;
 	background:#F7F7F7;
 	border-top:#DDD solid 1px;
-	z-index:1000;
+	z-index:10000;
 }
 #debug-footer a{color:#888;font-size:11px}
 #debug-footer a._busy{color:transparent}

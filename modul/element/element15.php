@@ -13,6 +13,9 @@ function _element15_struct($el) {
 		'txt_7' => $el['txt_7']       //сообщение об отсутствии записей
 	) + _elementStruct($el);
 }
+function _element15_title() {
+	return 'Количество строк списка';
+}
 function _element15_print($el, $prm=array()) {
 	if(!$elem_id = $el['num_1'])
 		return 'Список не указан.';

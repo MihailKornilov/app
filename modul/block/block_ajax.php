@@ -43,6 +43,7 @@ switch(@$_POST['op']) {
 
 		$send['html'] = _blockHtml($obj_name, $obj_id,  $prm);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
+		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;

@@ -1072,7 +1072,7 @@ function _dialogSetupServiceCnnIn($DLG) {//диалоги, которые раз
 			'<td class="w230">'.
 					'<div class="grey b fs13">'.
 						$el['name'].
-						($el['req'] ? '<span class="red fs16">*</span>' : '').
+						(!empty($el['req']) ? '<span class="red fs16">*</span>' : '').
 					'</div>'.
 					$dlg['name'].
 					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD tool" data-tool="Родительский диалог">'._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').

@@ -10,12 +10,6 @@ function _element52_struct($el) {
                                         */
 	) + _elementStruct($el);
 }
-function _element52_js($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),
-		'num_2'   => _num($el['num_2'])
-	) + _elementJs($el);
-}
 function _element52_print($el, $prm) {
 	if($prm['blk_setup'])
 		return _emptyMin('Заметки');

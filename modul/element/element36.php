@@ -9,16 +9,15 @@ function _element36_struct($el) {
 		'txt_1' => $el['txt_1']         //подсказка
 	) + _elementStruct($el);
 }
-function _element36_struct_title($el) {
-	$el['title'] = 'ICON';
-	return $el;
-}
 function _element36_print($el) {
 	$type = _element36type($el['num_1']);
 	$pl = _dn(!$el['num_2'], 'pl');
 	$cur = $el['num_3'] ? ' curP' : ' curD';
 
 	return '<div class="icon icon-'.$type.$pl.$cur.' tool" data-tool="'._br($el['txt_1']).'"></div>';
+}
+function _element36_title() {
+	return 'icon';
 }
 function _element36type($id='all') {//доступные варианты иконок
 	$icon = array(

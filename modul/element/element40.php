@@ -6,9 +6,6 @@ function _element40_struct($el) {
 		Работает совместно с PHP12_spfl [41] - настройка значений
 	*/
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
 		'num_1'   => _num($el['num_1']),//id элемента - путь к списку [13]
 		'txt_1'   => $el['txt_1']       //текст нулевого значения
 	) + _elementStruct($el);
@@ -34,11 +31,6 @@ function _element40_print($el, $prm) {
 		'<input type="text" readonly class="inp color-del b pl25 curP w100p over3"'.$placeholder.$disabled.' value="'.$title.'" />'.
 	'</div>';
 }
-function _element40_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element40_vvv($el, $prm) {//получение id диалога на основании исходного блока (если нет указания на диалог в настройке)
 	if($el['num_1'])//указание есть. Диалог будет получен динамически из элемента
 		return 0;
@@ -47,6 +39,8 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 
 	$dss = _elem40dss_14($prm);
 	$dss = _elem40dss_88($prm, $dss);
+	$dss = _elem40dss_43($prm, $dss);
+	$dss = _elem40dss_page($prm, $dss);
 
 	return $dss;
 	if(!empty($prm['unit_edit']))
@@ -132,6 +126,36 @@ function _elem40dss_88($prm, $dss) {//получение id диалога из 
 		return $dss;
 
 	return 0;
+}
+function _elem40dss_43($prm, $dss) {//получение id диалога из Шаблона записи
+	if($dss)
+		return $dss;
+	if(!$bl = _blockOne($prm['srce']['block_id']))
+		if($el = _elemOne($prm['srce']['element_id']))
+			if(!$bl = _blockOne($el['block_id']))
+				return 0;
+	if($bl['obj_name'] != 'tmp43')
+		return 0;
+	if(!$el = _elemOne($bl['obj_id']))
+		return 0;
+	if(!$bl = _blockOne($el['block_id']))
+		return 0;
+	if($bl['obj_name'] != 'dialog')
+		return 0;
+
+	return $bl['obj_id'];
+}
+function _elem40dss_page($prm, $dss) {//получение id диалога из Страницы, принимающей данные записи
+	if($dss)
+		return $dss;
+	if(!$bl = _blockOne($prm['srce']['block_id']))
+		return 0;
+	if($bl['obj_name'] != 'page')
+		return 0;
+	if(!$page = _page($bl['obj_id']))
+		return 0;
+
+	return _num($page['dialog_id_unit_get']);
 }
 function _elem40res($filter, $u) {
 	$send = true;

@@ -8,11 +8,6 @@ function _element401_struct($el) {
 		'num_2'   => _num($el['num_2']) //элемент суммы [13]
 	) + _elementStruct($el);
 }
-function _element401_js($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	) + _elementJs($el);
-}
 function _element401_print($el, $prm) {
 	if(!$year = _num(@$_GET['v1']))
 		$year = YEAR_CUR;

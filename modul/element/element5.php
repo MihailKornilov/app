@@ -3,9 +3,6 @@
 /* [5] textarea (многострочное текстовое поле) */
 function _element5_struct($el) {
 	return array(
-		'req'       => _num($el['req']),
-		'req_msg'   => $el['req_msg'],
-
 		'txt_1' => $el['txt_1'],//текст для placeholder
 		'num_1' => _num($el['num_1']),/* тип начального текста
                                             8051: произвольный текст
@@ -15,11 +12,6 @@ function _element5_struct($el) {
 		'txt_2' => $el['txt_2'],//начальный текст: произвольный
 		'txt_3' => $el['txt_3'] //начальный текст: указанное значение [13]
 	) + _elementStruct($el);
-}
-function _element5_js($el) {
-	return array(
-		'num_2' => $el['num_2']
-	) + _elementJs($el);
 }
 function _element5_print($el, $prm) {
 	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';

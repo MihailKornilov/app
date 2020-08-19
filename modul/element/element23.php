@@ -23,20 +23,6 @@ function _element23_struct($el) {
 		'num_10'  => _num($el['num_10'])//выбранное значение для порядка (при num_8=6160)
 	) + _elementStruct($el);
 }
-function _element23_struct_title($el, $DLG) {
-	if(!$dlg_id = $el['num_1'])
-		return $el;
-	if(empty($DLG[$dlg_id]))
-		return $el;
-	$el['title'] = $DLG[$dlg_id]['name'];
-	return $el;
-}
-function _element23_js($el) {
-	return array(
-		'num_7'   => _num($el['num_7']),
-		'num_8'   => _num($el['num_8'])
-	) + _elementJs($el);
-}
 function _element23_vvv($el) {
 	if(!$ids = _ids($el['txt_3'], 'arr'))
 		return array();

@@ -871,7 +871,7 @@ function PHP12_action208_formula_vvv($prm) {
 		$el = _elemOne($ex[$n*2]);
 		$send[] = array(
 			'elem_id' => $ex[$n*2],
-			'elem_name' => @$el['title'],
+			'elem_name' => _element('title', $el),
 			'znak' => $n ? $ex[$n*2-1] : 0
 		);
 	}

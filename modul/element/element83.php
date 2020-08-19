@@ -8,12 +8,6 @@ function _element83_struct($el) {
 		'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений) - привязанный список (через [13])
 	) + _elementStruct($el);
 }
-function _element83_js($el) {
-	return array(
-		'txt_1' => $el['txt_1'],
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element83_print($el, $prm) {
 	return
 	_select(array(

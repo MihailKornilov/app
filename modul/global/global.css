@@ -771,8 +771,10 @@ body:not(.site){position:relative}
 .bs10{border-spacing:10px}
 .bs15{border-spacing:15px}
 .bor1{border:#E2E7EC solid 1px}
+.bor-dash{border:#ddd dashed 1px}
 .bor-e8{border:#e8e8e8 solid 1px}
 .bor-f0{border:#f0f0f0 solid 1px}
+
 /* для настройки блоков */
 .bor-t-dash{border-top:#f77 dashed 1px}
 .bor-r-dash{border-right:#f77 dashed 1px}
@@ -858,6 +860,7 @@ td.bottom{vertical-align:bottom}
 .r{text-align:right}
 .fr{float:right}
 .fl{float:left}
+.br3{border-radius:3px}
 .br1000{border-radius:1000px}
 
 .fs10{font-size:10px}

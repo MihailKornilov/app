@@ -14,7 +14,7 @@ function _element44_vvv($el) {
 }
 function _element44_print($el, $prm) {
 	if(empty($el['txt_1']))
-		return $el['title'];
+		return _element('title', $el);
 
 	$json = _decode($el['txt_1']);
 	$send = '';
@@ -37,6 +37,11 @@ function _element44_print($el, $prm) {
 	}
 
 	return $send;
+}
+function _element44_print11($el, $u) {
+	$prm = _blockParam();
+	$prm['unit_get'] = $u;
+	return _element('print', $el, $prm);
 }
 function _element44_template_docx($el, $u) {
 	$prm = _blockParam();
@@ -157,7 +162,7 @@ function PHP12_elem44_setup_vvv($prm) {
 		if($r['type'] == 'el')
 			if($ell = _elemOne($r['id'])) {
 				$json[$n]['dialog_id'] = $ell['dialog_id'];
-				$json[$n]['title'] = $ell['title'];
+				$json[$n]['title'] = _element('title', $ell);
 				$json[$n]['font'] = $ell['font'];
 				$json[$n]['color'] = $ell['color'];
 			}

@@ -3,9 +3,6 @@
 /* [8] input:text (однострочное текстовое поле) */
 function _element8_struct($el) {
 	return array(
-		'req'       => _num($el['req']),
-		'req_msg'   => $el['req_msg'],
-
 		'txt_1' => $el['txt_1'],      //текст для placeholder
 		'txt_2' => $el['txt_2'],      //текст по умолчанию
 		'num_1' => _num($el['num_1']),/* формат:
@@ -25,11 +22,6 @@ function _element8_struct($el) {
 		'txt_4' => $el['txt_4'],      //начальный текст: указанное значение [13]
 		'txt_3' => $el['txt_3']       //шаблон артикула (для 34)
 	) + _elementStruct($el);
-}
-function _element8_js($el) {
-	return array(
-		'num_7' => $el['num_7']
-	) + _elementJs($el);
 }
 function _element8_print($el, $prm) {
 	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';

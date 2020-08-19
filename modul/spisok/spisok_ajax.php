@@ -581,14 +581,14 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 		switch($cmp['dialog_id']) {
 			//текстовое поле
 			case 8:
-				if($cur && $cmp['req'] && !strlen($v))
+				if($cur && !empty($cmp['req']) && !strlen($v))
 					$is_err = 1;
 				//цифры и числа
 				if($cmp['num_1'] == 33) {
 					$v = str_replace(',', '.', $v);
 					$v = round($v, $cmp['num_2']);
 					//разрешение вностиь Ноль
-					if($cur && $cmp['req'] && !$v && !$cmp['num_4'])
+					if($cur && !empty($cmp['req']) && !$v && !$cmp['num_4'])
 						$is_err = 1;
 					if($v < 0 && !$cmp['num_3']) {
 						$is_err = 1;
@@ -613,7 +613,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				break;
 			//поле-пароль
 			case 9:
-				if($cur && $cmp['req'] && !strlen($v)) {
+				if($cur && !empty($cmp['req']) && !strlen($v)) {
 					$is_err = 1;
 					break;
 				}
@@ -634,7 +634,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				if($cmp['num_7'] && !$v)
 					$v = _elem29ValAuto($cmp, $_POST['vvv'][$cmp_id]);
 
-				if($cur && $cmp['req'] && !$v)
+				if($cur && !empty($cmp['req']) && !$v)
 					$is_err = 1;
 
 				$send[$COL_DLG_ID][$cmp_id] = $v;
@@ -1093,7 +1093,7 @@ function _SUN_OTHER($arr) {//внесение данных из других д�
 		$insert = true;
 		foreach($val as $cmp_id => $v) {
 			$cmp = _elemOne($cmp_id);
-			if($cmp['req'] && !$v)
+			if(!empty($cmp['req']) && !$v)
 				$insert = false;
 		}
 		if(!$insert)

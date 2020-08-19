@@ -11,11 +11,6 @@ function _element75_struct($el) {
 		'num_3'   => _num($el['num_3']) //[35] Размер иконок
 	) + _elementStruct($el);
 }
-function _element75_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element75_print($el, $prm) {
 	if(!$elem_id = _idsLast($el['txt_2']))
 		return _emptyMinRed('[75] отсутствует путь к названиям.');

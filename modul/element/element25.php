@@ -7,10 +7,6 @@ function _element25_struct($el) {
 		'num_1' => _num($el['num_1'])//диаметр
 	) + _elementStruct($el);
 }
-function _element25_struct_title($el) {
-	$el['title'] = 'O';
-	return $el;
-}
 function _element25_print($el, $prm) {
 	$bg = $prm['blk_setup'] ? '#eee' : _elemUids($el['txt_1'], $prm['unit_get']);
 

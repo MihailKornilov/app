@@ -18,10 +18,6 @@ function _element33_struct($el) {
 		'num_5'   => _num($el['num_5']) //показывать пользователя, внёсшего запись (при наведении на дату)
 	) + _elementStruct($el);
 }
-function _element33_struct_title($el) {
-	$el['title'] = 'Дата';
-	return $el;
-}
 function _element33_print($el, $prm) {
 	if($prm['blk_setup'])
 		return 'дата';
@@ -32,6 +28,9 @@ function _element33_print($el, $prm) {
 	$data = _element33TT($el, $u, $data);
 
 	return $data;
+}
+function _element33_title() {
+	return 'дата';
 }
 function _element33Data($el, $u) {//Значение записи: дата [33]
 	if(empty($u['dtime_add']))

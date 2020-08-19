@@ -3,9 +3,6 @@
 /* [28] Загрузка файла */
 function _element28_struct($el) {
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
 		'txt_1'   => $el['txt_1']  //нулевое значение
 	) + _elementStruct($el);
 }

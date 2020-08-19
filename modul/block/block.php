@@ -898,6 +898,8 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			return array();
 		if(!isset($G_ELM[$i1]))
 			return array();
+		if($G_ELM[$i1]['dialog_id'])
+			$G_ELM[$i1]['title'] = _element('title', $G_ELM[$i1]);
 		return $G_ELM[$i1];
 	}
 
@@ -1266,12 +1268,15 @@ function _beElmCache() {//кеш элементов
 
 	_beElm();
 	_beElm(APP_PARENT);
+
+	foreach($G_ELM as $elem_id => $el)
+		_beElmStruct11($el);
 }
 function _beElm($app_id=0) {
 	if(_flag('ELM_APP'.$app_id))
 		return;
 
-	global $G_DLG, $G_ELM;
+	global $G_ELM;
 
 	$key = 'GELM';
 	$global = $app_id ? 0 : 1;
@@ -1280,9 +1285,6 @@ function _beElm($app_id=0) {
 
 		if(_cache_isset($key, $global))
 			return;
-
-//		$keyHist = 'DIALOG_HISTORY_IDS';
-//		$IDS_HIST = _ids(_cache_get($keyHist, $global));
 
 		//получение всех элементов
 		$sql = "SELECT *
@@ -1293,23 +1295,23 @@ function _beElm($app_id=0) {
 			return;
 
 		$ELM = array();
+		$elm11 = array();
 		foreach($arr as $elem_id => $el) {
 			switch($el['dialog_id']) {
 				case 0:
 					unset($el['user_id_add']);
 					unset($el['dtime_add']);
 					break;
-				case 11:
-					$el = _element11_struct($el, $ELM);
-					$el = _element11_struct_title($el, $ELM, $G_DLG);
-					break;
 				default:
 					$el = _beElmDlg($el);
 					$el = _element('struct', $el);
-					$el = _element('struct_title', $el, $G_DLG);
+					if($el['dialog_id'] == 11)
+						$elm11[$elem_id] = $el;
 			}
 			$ELM[$elem_id] = $el;
 		}
+
+
 
 		_cache_set($key, $ELM, $global);
 	}
@@ -1320,6 +1322,8 @@ function _beElmDlg($el) {//настройки элемента из диалог
 	global $G_DLG, $G_BLK;
 
 	if(!$dialog_id = _num($el['dialog_id']))
+		return $el;
+	if($dialog_id == 11)
 		return $el;
 	if(!$DLG = @$G_DLG[$dialog_id])
 		return $el;
@@ -1336,6 +1340,34 @@ function _beElmDlg($el) {//настройки элемента из диалог
 				$el['width_max'] = floor(_elemWidth($el) / 10) * 10;
 
 	return $el;
+}
+function _beElmStruct11($el11) {
+	global $G_ELM;
+
+	if($el11['dialog_id'] != 11)
+		return $el11;
+	if(!$last_id = _idsLast($el11['txt_2']))
+		return $el11;
+	if(empty($G_ELM[$last_id]))
+		return $el11;
+
+	$el = $G_ELM[$last_id];
+
+	//разрешать настройку стилей, если элемент вставлен через [11]
+	if(_elemRule($el['dialog_id'], 11))
+		$el11['stl'] = 1; //для JS
+
+	//разрешать настройку условий отображения, если элемент вставлен через [11]
+	if(_elemRule($el['dialog_id'], 14))
+		$el11['eye'] = 1;
+
+	//является изоображением, вставленным через [11]
+	if($el['dialog_id'] == 60)
+		$el11['immg'] = 1;
+
+	$G_ELM[$el11['id']] = $el11;
+
+	return $el11;
 }
 
 function _beActCache() {//кеш действий

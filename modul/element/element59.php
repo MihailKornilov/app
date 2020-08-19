@@ -3,23 +3,15 @@
 /* [59] Связка списка при помощи кнопки */
 function _element59_struct($el) {
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
 		'txt_1'   => $el['txt_1'],        //текст кнопки
 		'txt_5'   => $el['txt_5'],        //НЕ ЗАНИМАТЬ (используется под фильтр в [29])
 		'num_1'   => _num($el['num_1']),  //id диалога, через который вносятся данные выбираемого списка
 		'num_3'   => _num($el['num_3']),  //блокировать выбор
 		'num_4'   => _num($el['num_4']),  //id диалога, которое открывается при нажатии на кнопку
-		'num_6'   => _num($el['num_6'], 1)//по умолчанию [85]
+		'num_6'   => _num($el['num_6'], 1),//по умолчанию [85]
+
+		'issp' => 1
 	) + _elementStruct($el);
-}
-function _element59_js($el) {
-	return array(
-		'num_1' => _num($el['num_1']),
-		'num_3' => _num($el['num_3']),
-		'num_4' => _num($el['num_4'])
-	) + _elementJs($el);
 }
 function _element59_v_get($el, $unit_id) {
 	if(!$dialog_id = _num($el['num_1']))

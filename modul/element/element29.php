@@ -7,11 +7,6 @@ function _element29_struct($el) {
 		Список нельзя связывать самого с собой
 	*/
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'width'   => _num($el['width']),
-
 		'num_1'   => _num($el['num_1']),//id диалога, через который вносятся данные выбираемого списка [24]
 		'txt_1'   => $el['txt_1'],      //текст, когда запись не выбрана
 		'txt_3'   => $el['txt_3'],      //первый id элемента, составляющие содержание Select. Выбор через [13]
@@ -28,18 +23,10 @@ function _element29_struct($el) {
                                                 10087 - ручная сортировка
                                         */
 		'num_9'   => _num($el['num_9']),//обратный порядок
-		'num_10'  => _num($el['num_10'])//всегда устанавливать значение по умолчанию
+		'num_10'  => _num($el['num_10']),//всегда устанавливать значение по умолчанию
+
+		'issp' => 1
 	) + _elementStruct($el);
-}
-function _element29_js($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),
-		'num_2'   => _num($el['num_2']),
-		'num_3'   => _num($el['num_3']),
-		'num_4'   => _num($el['num_4']),
-		'num_7'   => _num($el['num_7']),
-		'txt_1'   => $el['txt_1']
-	) + _elementJs($el);
 }
 function _element29_print($el, $prm) {
 	$v = _40condVcopy($el['num_6']);
@@ -56,58 +43,6 @@ function _element29_print($el, $prm) {
 		'width' => @$el['width'],
 		'value' => $v
 	));
-}
-function _element29_print11($el, $u) {
-
-	$parent = '';
-	$deleted = 0;
-
-	foreach(_ids($el['txt_2'], 'arr') as $id) {
-		if(!$ell = _elemOne($id))
-			return '';
-
-		if($ell['dialog_id'] == 44) {
-			$ell['elp'] = $el;
-			return _element('print11', $ell, $u);
-		}
-
-		if(!$col = _elemCol($ell))
-			return '---';
-		if(empty($u[$col]))
-			return '';
-
-		if($ell['dialog_id'] == 60) {
-			$ell['elp'] = $el;
-			return _element('print11', $ell, $u);
-		}
-
-		if(!is_array($u[$col]))
-			if($pid = @$u['parent_id'])
-				if($DLG = _dialogQuery($u['dialog_id']))
-					if($unit = _spisokUnitQuery($DLG, $pid))
-						if(!empty($unit[$col]))
-							$parent = $unit[$col].' » ';
-
-
-		if(!empty($u['deleted']))
-			$deleted = 1;
-		$u = $u[$col];
-	}
-
-	if($deleted)
-		return '<s>'.$parent.$u.'</s>';
-
-	//получение значения по умолчанию
-	if(is_array($u)) {
-		$name = '';
-		if($DLG = _dialogQuery($u['dialog_id']))
-			if($col = _elemCol($DLG['spisok_elem_id']))
-				if(!empty($u[$col]))
-					$name = $u[$col];
-		$u = $name;
-	}
-
-	return $parent.$u;
 }
 function _element29_vvv($el, $prm) {
 	if(!empty($prm['unit_edit']))
@@ -280,7 +215,7 @@ function _elem29defSet($dlg, $el) {//установка значения по у
 */
 	if($dlg['id'] != 29)
 		return;
-	if(!$el['req'])
+	if(empty($el['req']))
 		return;
 	if(!$el['num_6'])
 		return;

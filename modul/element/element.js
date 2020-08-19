@@ -1982,6 +1982,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 	PHP12_v_choose_get = function(el) {//отправка значений настройки для определения типа сохранения данных. Конкретно по "mysave"
+		delete el.vvv.jselm;
 		return el.vvv;
 	},
 
@@ -4959,6 +4960,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					busy_obj:t,
 					busy_cls:'hold',
 					func_save:function(ia) {
+						console.log(ia);
 						t.val(ia.unit.title);
 						t.attr('data-did', ia.unit.dialog_id);
 						t.attr('val', ia.unit.id);
@@ -6722,6 +6724,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			errorClass:'bg-fcc'  //ошибка, если попытка переместить элемент на недоступный уровень
 		});
+	},
+
+	//[118] Информация об элементе
+	PHP12_elem_info = function(el) {
+		if(!el.vvv)
+			return;
+		if(!ELMM[el.vvv])
+			return;
+		_attr_el(el.id).find('.js').html(_pr(ELMM[el.vvv]));
 	};
 
 $(document)

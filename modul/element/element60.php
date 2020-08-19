@@ -3,16 +3,16 @@
 /* [60] Загрузка изображений */
 function _element60_struct($el) {
 	return array(
-		'width' => _num($el['width']),//нужно для 'struct_title'
-
-		'num_1' => _num($el['num_1']),//максимальное количество изображений, которое разрешено загрузить
-		'num_7' => _num($el['num_7']),//ограничение высоты (настройка стилей)
-		'num_8' => _num($el['num_8']) //закруглённые углы (настройка стилей)
+		'num_1' => _num($el['num_1'])//максимальное количество изображений, которое разрешено загрузить
 	) + _elementStruct($el);
 }
-function _element60_struct_title($el) {
-	$el['title'] = 'IMG';//_imageNo($el['width'], $el['num_8']);
-	return $el;
+function _element60_title($el) {
+	if(empty($el['elp']))
+		return _imageNo();
+
+	$elp = $el['elp'];
+
+	return _imageNo($elp['width'], $elp['num_8']);
 }
 function _element60_print($el, $prm) {
 	return _image($el, $prm);
@@ -35,11 +35,11 @@ function _element60_print11($el, $u) {
 
 
 	if(!$col = _elemCol($el))
-		return _imageNo($ELP['width'], @$ELP['num_8']);
+		return _imageNo($ELP['width'], $ELP['num_8']);
 	if(empty($u[$col]['id']))
-		return _imageNo($ELP['width'], @$ELP['num_8']);
+		return _imageNo($ELP['width'], $ELP['num_8']);
 
-	return _imageHtml($u[$col], $ELP['width'], @$ELP['num_7'], @$ELP['num_8']);
+	return _imageHtml($u[$col], $ELP['width'], $ELP['num_7'], $ELP['num_8']);
 }
 
 

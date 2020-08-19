@@ -10,16 +10,14 @@ function _element32_struct($el) {
 									  */
 	) + _elementStruct($el);
 }
-function _element32_struct_title($el) {
-	$el['title'] = $el['num_1'] == 1 ? 'ID' : 'NUM';
-	return $el;
+function _element32_title($el) {
+	return $el['num_1'] == 1 ? 'ID' : 'NUM';
 }
 function _element32_print($el, $prm) {
 	if(empty($prm['unit_get']))
-		return $el['title'];
+		return _element('title', $el);
 
 	$u = $prm['unit_get'];
-
 
 	if(!$num = _num($u))
 		if(is_array($u)) {
@@ -37,7 +35,7 @@ function _element32_print($el, $prm) {
 
 
 	if(!$num)
-		return $el['title'];
+		return _element('title', $el);
 
 	$num = _spisokColSearchBg($el, $num);
 

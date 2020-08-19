@@ -6,14 +6,12 @@ function _element74_struct($el) {
 		значения: PHP12_filter_radio_setup
 	*/
 	return array(
-		'def'   => _num($el['def']),
-
 		'num_1' => _num($el['num_1']),//id элемента-список, к которому применяется фильтр
 		'txt_1' => $el['txt_1']       //[12] содержание фильтра
 	) + _elementStruct($el);
 }
 function _element74_vvv($el) {
-	if(!$send = json_decode($el['txt_1'], true))
+	if(!$send = _decode($el['txt_1']))
 		return array();
 
 	foreach($send as $i => $r) {
@@ -23,11 +21,6 @@ function _element74_vvv($el) {
 
 	return $send;
 }
-function _element74_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element74_print($el, $prm) {
 	if(!$vvv = _element('vvv', $el))
 		return _emptyMinRed('Значения фильтра не настроены');
@@ -36,14 +29,19 @@ function _element74_print($el, $prm) {
 	$EL = _elemOne($el['num_1']);
 	$DLG = _dialogQuery($EL['num_1']);
 	$spisok = array();
+	$def = 0;
 	foreach($vvv as $n => $r) {
 		$spisok[$n] = array(
 			'id' => $r['id'],
 			'title' => $r['title']
 		);
 
+		if($r['def'])
+			$def = $r['id'];
+
 		if(!$r['eye'])
 			continue;
+
 
 		$sql = "SELECT COUNT(*)
 				FROM  "._queryFrom($DLG)."
@@ -60,7 +58,7 @@ function _element74_print($el, $prm) {
 		'width' => '100%',
 		'interval' => 6,
 		'light' => 1,
-		'value' => _filter('vv', $el, $el['def']),
+		'value' => _filter('vv', $el, $def),
 		'spisok' => $spisok,
 		'disabled' => $prm['blk_setup']
 	));
@@ -72,7 +70,7 @@ function _elem74filter($el) {//применение фильтра к списк
 			if(!$v = _num($F['v']))
 				return ' AND !`t1`.`id` /* [74] некорректное значение фильтра */';
 			if(!empty($F['elem']['txt_1']))
-				if($arr = json_decode($F['elem']['txt_1'], true))
+				if($arr = _decode($F['elem']['txt_1']))
 					foreach($arr as $r)
 						if($v == $r['id']) {
 							if(empty($r['cond']))
@@ -107,6 +105,7 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 
 	$save = array();
 
+	$def = '';
 	if(!empty($val))
 		if(is_array($val))
 			foreach($val as $r) {
@@ -115,16 +114,13 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 				if(!$title = _txt($r['title']))
 					continue;
 
-				$cond = '';
-				if(!empty($r['cond'])) {
-					$cond = htmlspecialchars_decode($r['cond']);
-					$cond = json_decode($cond, true);
-				}
+				if(_num($r['def']))
+					$def = $id;
 
 				$save[] = array(
 					'id' => $id,
 					'title' => $title,
-					'cond' => $cond,
+					'cond' => _decode($r['cond'], ''),
 					'def' =>_num($r['def']),
 					'eye' =>_num($r['eye'])
 				);
@@ -136,6 +132,8 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 			SET `".$col."`='".addslashes($save)."'
 			WHERE `id`=".$unit['id'];
 	query($sql);
+
+	_filter('def_update', $unit['id'], $def);
 
 	_elemOne($unit['id'], true);
 }

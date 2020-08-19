@@ -5,7 +5,11 @@
 /* Структура элемента */
 function _element76_struct($el) {
 	return array(
+		'width' => empty($el['width']) ? 150 : _num($el['width'])
 	) + _elementStruct($el);
+}
+function _element76_title($el) {
+	return _elem76novideo($el['width']);
 }
 function _element76_print($el, $prm) {
 	$disabled = $prm['blk_setup'] ? ' disabled' : '';
@@ -29,9 +33,9 @@ function _element76_print11($el, $u) {
 	$ELP = $el['elp'];
 
 	if(!$col = _elemCol($el))
-		return _elem76novideo($ELP['width']);
+		return _elem76novideo($el['width']);
 	if(!$frame = _elem76iframe($ELP, $u[$col]))
-		return _elem76novideo($ELP['width']);
+		return _elem76novideo($el['width']);
 
 	return $frame;
 }
@@ -57,7 +61,7 @@ function _elem76iframe($el, $url) {//получение фрейма для вс
 
 	//делитель соотношения сторон
 	$del = 0.5625;
-	$w = $el['width'] ? $el['width'] : _elemWidth($el);
+	$w = !empty($el['width']) ? $el['width'] : _elemWidth($el);
 	$w -= 12;
 	$h = round($w * $del);
 

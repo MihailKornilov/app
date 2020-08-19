@@ -13,10 +13,6 @@ function _element88_struct($el) {
 		'txt_2' => $el['txt_2']       //содержание
 	) + _elementStruct($el);
 }
-function _element88_struct_title($el) {
-	$el['title'] = '[88]';
-	return $el;
-}
 function _element88_vvv($el) {
 	if(!$V = _decode($el['txt_2']))
 		return array();

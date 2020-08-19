@@ -495,9 +495,9 @@ function translit($str) {
 	return strtr($str, $list);
 }
 
-function _decode($js) {//декодирование JSON
+function _decode($js, $return=array()) {//декодирование JSON
 	if(empty($js))
-		return array();
+		return $return;
 
 	$js = htmlspecialchars_decode($js);
 	return json_decode($js, true);

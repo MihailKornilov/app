@@ -11,11 +11,6 @@ function _element102_struct($el) {
 		'txt_5'   => $el['txt_5']       //значение по умолчанию: настраивается через [40]
 	) + _elementStruct($el);
 }
-function _element102_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element102_print($el, $prm) {
 	$v = _filter('v', $el['id']);
 	if($v === false) {

@@ -65,6 +65,9 @@ function _element3_print($el, $prm) {
 
 	return '<div class="_menu'.$el['num_2'].'">'.$razdel.'</div>';
 }
+function _element3_title() {
+	return 'Меню страниц';
+}
 function _menuCount($menu) {//получение элемента-циферки, размещённого на выводимых страницах
 	$sql = "SELECT
 				`el`.`id`,

@@ -3,14 +3,11 @@
 /* [80] Очистка фильтров */
 function _element80_struct($el) {
 	return array(
+		'width'   => _num($el['width']),
+
 		'txt_1'   => $el['txt_1'],     //имя кнопки
 		'num_1'   => _num($el['num_1'])//id элемента, размещающего список
 	) + _elementStruct($el);
-}
-function _element80_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
 }
 function _element80_print($el, $prm) {
 	$diff = _filter('diff', $el['num_1']);

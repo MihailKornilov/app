@@ -8,12 +8,6 @@ function _element0_struct($el) {
 	) + _elementStruct($el);
 }
 
-//структура элемента для JS
-function _element0_js($el) {
-	return array(
-	) + _elementJs($el);
-}
-
 /* Вывод содержимого элемента на экран */
 function _element0_print($el) {}
 

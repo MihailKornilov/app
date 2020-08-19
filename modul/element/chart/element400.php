@@ -7,11 +7,6 @@ function _element400_struct($el) {
 		'num_1'   => _num($el['num_1'])//[24] список
 	) + _elementStruct($el);
 }
-function _element400_js($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	) + _elementJs($el);
-}
 function _element400_print($el, $prm) {
 	if(!$DLG = _dialogQuery($el['num_1']))
 		return _emptyMinRed('График-столбики: диалога '.$el['num_1'].' не существует.');

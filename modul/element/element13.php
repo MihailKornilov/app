@@ -3,9 +3,6 @@
 /* [13] Выбор элемента из диалога или страницы */
 function _element13_struct($el) {
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
 		'txt_1'   => $el['txt_1'],      //текст для placeholder
 		'num_1'   => _num($el['num_1']),//элемент в исходном диалоге [13] (если num_3=8059)
 		'num_2'   => _num($el['num_2']),//разрешать выбирать только некоторые типы элементов (иначе любые)
@@ -19,15 +16,6 @@ function _element13_struct($el) {
 		'num_5'   => _num($el['num_5']),//выбор значений во вложенных списках
 		'num_6'   => _num($el['num_6']) //выбор нескольких значений
 	) + _elementStruct($el);
-}
-function _element13_js($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),
-		'num_2'   => _num($el['num_2']),
-		'num_5'   => _num($el['num_5']),
-		'num_6'   => _num($el['num_6']),
-		'txt_2'   => $el['txt_2']
-	) + _elementJs($el);
 }
 function _element13_print($el, $prm) {
 	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';

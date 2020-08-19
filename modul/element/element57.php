@@ -6,8 +6,6 @@ function _element57_struct($el) {
 		для настройки блоков используется функция PHP12_menu_block_setup
 	*/
 	return array(
-		'def'     => _num($el['def']),
-
 		'num_1'   => _num($el['num_1']),/* внешний вид меню:
 											1158 - Маленькие синие кнопки
 											1159 - С нижним подчёркиванием
@@ -16,12 +14,6 @@ function _element57_struct($el) {
 		'num_2'   => _num($el['num_2']),//запоминать выбранный пункт меню
 		'txt_1'   => $el['txt_1']       //содержание в формате JS
 	) + _elementStruct($el);
-}
-function _element57_js($el) {
-	return array(
-		'num_1' => _num($el['num_1']),
-		'num_2' => _num($el['num_2'])
-	) + _elementJs($el);
 }
 function _element57_print($el, $prm) {
 	$vvv = _element('vvv', $el);

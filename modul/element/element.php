@@ -1,14 +1,14 @@
 <?php
 /*
+	✓
+
 	Каждый элемент должен пройти проверку:
 		1. Визуальное отображение в блоке {print}
 		2. Структура элемента {struct}
-		3. Title элемента {struct_title}
 		5. Дочерние элементы или значения {vvv} - динамическое формирование
 		6. Настройка ширины (в PageSetup) ['width']
 		7. Наличие флага обязательного заполнения ['req']
 		8. Установка фокуса ['focus']
-		9. Значения для JS
 	   10. Действия
 	   11. Подсказки
 	   12. Элемент [11]: вывод значения {print11}
@@ -50,10 +50,10 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 		case 'print':
 			if(empty($el['dialog_id']))
 				return '';
-			return _msgRed('['.$el['dialog_id'].']');
+			return _msgRed('['.$el['dialog_id'].'] print');
 
 		//вывод значения на экран через [11]
-		case 'print11':
+		case 'print11': return _msgRed('['.$el['dialog_id'].'] print11');
 			$PARAM = _blockParam();
 			$PARAM['unit_get'] = $prm;
 			if(!empty($prm['deleted']))
@@ -65,11 +65,6 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 
 		//структура элемента: колонки, поля, подсказки, действия, форматирование
 		case 'struct':  return _elementStruct($el);
-		case 'struct_title':
-			$el['title'] = '';
-			if(!empty($el['name']))
-				$el['title'] = $el['name'];
-			return $el;
 
 		//содержание элемента (ячейки таблицы, значения выпадающего списка, ...)
 		case 'vvv': return array();
@@ -77,24 +72,13 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 		//получение имени значения по id
 		case 'v_get': return _msgRed('['.$el['dialog_id'].'] не настроено');
 
-		//структура элемента для JS
-		case 'js':
-			if(empty($el))
-				return array();
-			return _elementJs($el);
-
 		//получение названия элемента
 		case 'title':
-			if(!empty($el['title']))
-				return $el['title'];
 			if(!empty($el['name']))
 				return $el['name'];
-			if(empty($el['dialog_id']))
+			if(!$el['dialog_id'])
 				return '';
-
-			$el = _elementTitle($el);
-
-			return $el['title'];
+			return '-['.$el['dialog_id'].']-type-title-no-';
 
 		//копирование содержания элемента
 		case 'copy_vvv': return array();
@@ -114,6 +98,8 @@ function _elementStruct($el) {//структура элемента - базов
 		'dialog_id' => _num($el['dialog_id']),
 		'mar'       =>      $el['mar'],
 		'font'      =>      $el['font'],
+		'color'      =>     $el['color'],
+		'size'      =>      $el['size'] ? _num($el['size']) : 13,
 
 		'txt_1'     => $el['txt_1'],     //для истории действий: для [10]
 		'txt_2'     => $el['txt_2'],     //для истории действий: ids из [11]
@@ -123,17 +109,24 @@ function _elementStruct($el) {//структура элемента - базов
 		'txt_10'    => $el['txt_10']     //todo временно: для шаблонов документов
 	);
 
+	if(!empty($el['req']))
+		$send['req'] = 1;
+	if(!empty($send['req']) && !empty($el['req_msg']))
+		$send['req_msg'] = $el['req_msg'];
+
 	if(!empty($el['name']))
 		$send['name'] = $el['name'];
 	if(!empty($el['col']))
 		$send['col'] = $el['col'];
 
+	if(!empty($el['width']))
+		$send['width'] = _num($el['width']);
 	if(!empty($el['width_min']))
 		$send['width_min'] = _num($el['width_min']);
 	if(!empty($el['width_max']))
 		$send['width_max'] = _num($el['width_max']);
-	if($el['width'] || !empty($el['width_min']))
-		$send['width'] = _num($el['width']);
+	if(empty($send['width']) && !empty($send['width_min']))
+		$send['width'] = 0;
 
 	if(!empty($el['noedit']))
 		$send['noedit'] = 1;
@@ -145,75 +138,13 @@ function _elementStruct($el) {//структура элемента - базов
 	if(!empty($el['afics']))
 		$send['afics'] = $el['afics'];
 
-	//разрешать настройку стилей (правило 12)
-	if(_elemRule($el['dialog_id'], 12)) {
-		$send['stl'] = 1; //для JS
-		$send['color'] = $el['color'];
-		$send['font']  = $el['font'];
-		$send['size']  = $el['size'] ? _num($el['size']) : 13;
-	}
-
-	return $send;
-}
-function _elementTitle($el) {//вставка title элемента (после сформированного кеша)
-	if(empty($el['dialog_id']))
-		return $el;
-
-	global $G_DLG, $G_ELM;
-
-	if($el['dialog_id'] == 11)
-		$el = _element11_struct_title($el, $G_ELM, $G_DLG);
-	else
-		$el = _element('struct_title', $el, $G_DLG);
-
-	return $el;
-}
-function _elementJs($el) {//структура элемента для JS
-	$send = array(
-		'id' => $el['id'],
-		'dialog_id' => $el['dialog_id'],
-		'block_id'  => $el['block_id'],
-		'mar'       => $el['mar']
-	);
-
-	if(!empty($el['col']))
-		$send['col'] = $el['col'];
-	if(!empty($el['width']))
-		$send['width'] = $el['width'];
-	if(!empty($el['noedit']))
-		$send['noedit'] = 1;
-	if(!empty($el['focus']))
-		$send['focus'] = 1;
-	if(!empty($el['afics']))
-		$send['afics'] = $el['afics'];
-	if(!empty($el['hint']))
-		$send['hint'] = $el['hint'];
-
-	//разрешать настройку стилей (правило 12)
-	if(!empty($el['stl'])) {
+	//разрешать настройку стилей
+	if(_elemRule($el['dialog_id'], 12))
 		$send['stl'] = 1;
-		$send['color'] = $el['color'];
-		$send['font']  = $el['font'];
-		$send['size']  = _num($el['size']);
-	}
-
-	//элемент является подключаемым списком
-	if(_elemIsConnect($el))
-		$send['issp'] = 1;
-
-	//разрешать прикрепление подсказки
-	if(_elemRule($el['dialog_id'], 15))
-		$send['rule15'] = 1;
 
 	//разрешать настройку условий отображения
 	if(_elemRule($el['dialog_id'], 17))
 		$send['eye'] = 1;
-
-	if(!empty($el['action']))
-		$send['action'] = $el['action'];
-
-	if(!empty($el['immg']))
-		$send['immg'] = 1;
 
 	return $send;
 }
@@ -225,7 +156,7 @@ function _element($type, $el, $prm=array()) {//все манипуляции, с
 		$el = _elemOne($el);
 
 	if(!$dlg_id = _num(@$el['dialog_id']))
-		return _elementType($type);
+		return _elementType($type, $el, $prm);
 
 	//тип манипуляции добавляется в конце функции. Например: _element1_struct
 	$fname = '_element'.$dlg_id.'_'.$type;
@@ -264,6 +195,8 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 	if(!$elem_id = $prm['unit_get_id'])
 		return _emptyRed('Не получен id элемента.');
 
+	$EL_VAR = _elemInfoVar($elem_id);
+
 	$el = _elemOne($elem_id, true);
 
 	$send = '<tr><td class="r w250">Элемент ID:<td class="b">'.$elem_id.
@@ -284,7 +217,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 
 	$send .='<tr><td class="r grey">Расположен в блоке:'.
 				'<td>'.($el['block_id'] ? '<a class="dialog-open color-sal" val="dialog_id:117,get_id:'.$el['block_id'].'">'.$el['block_id'].'</a>' : '-').
-			'<tr><td class="r grey">Элемент-родитель:<td>'.PHP12_elem_info_elemLink(@$el['parent_id']);
+			'<tr><td class="r grey">Элемент-родитель:<td>'._elemInfoLink(@$el['parent_id']);
 
 	//Дочерние элементы
 	$td = '-';
@@ -295,7 +228,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 	if($arr = query_arr($sql)) {
 		$ids = array();
 		foreach($arr as $id => $r)
-			$ids[] = PHP12_elem_info_elemLink($id);
+			$ids[] = _elemInfoLink($id);
 		$td = implode(', ', $ids);
 	}
 	$send .='<tr><td class="r grey top">Дочерние элементы:<td>'.$td;
@@ -313,7 +246,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 		foreach($arr as $id => $r) {
 			$ass = _idsAss($r['txt_2']);
 			if(isset($ass[$elem_id]))
-				$ids[] = PHP12_elem_info_elemLink($id);
+				$ids[] = _elemInfoLink($id);
 		}
 		if(!empty($ids))
 			$td = implode(', ', $ids);
@@ -439,7 +372,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 				foreach($filter as $f) {
 					$ass = _idsAss($f['elem_id']);
 					if(isset($ass[$elem_id]))
-						$mass[] = PHP12_elem_info_elemLink($r['id']);
+						$mass[] = _elemInfoLink($r['id']);
 				}
 			}
 			if($mass)
@@ -460,7 +393,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 			ORDER BY `id`";
 	if($arr = query_arr($sql)) {
 		foreach($arr as $r)
-			$mass[] = PHP12_elem_info_elemLink($r['id']);
+			$mass[] = _elemInfoLink($r['id']);
 		$td = implode(', ', $mass);
 	}
 	$send .='<tr><td class="r grey">Является указателем на список в исходном диалоге в элементе [13]:<td>'.$td;
@@ -469,13 +402,38 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 	$send .='<tr><td class="r grey">Был выбран в элементе [13]:<td>---';
 	$send .='<tr><td class="r grey">Является указателем на колонку родительского диалога:<td>---';
 
-	return '<table class="bs10">'.$send.'</table>';
+	return
+	$EL_VAR.
+	'<table class="bs10">'.$send.'</table>';
 }
-function PHP12_elem_info_elemLink($elem_id, $empty='-') {//формирование ссылки на элемент
+function PHP12_elem_info_vvv($prm) {
+	return _num($prm['unit_get_id']);
+}
+function _elemInfoLink($elem_id, $empty='-') {//формирование ссылки на элемент
 	if(!$elem_id)
 		return $empty;
 
 	return '<a class="dialog-open" val="dialog_id:118,get_id:'.$elem_id.'">'.$elem_id.'</a>';
+}
+function _elemInfoVar($elem_id) {
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id`=".$elem_id;
+	$elBase = query_assoc($sql);
+	$elCashe = _elemOne($elem_id);
+	$elCasheUpd = _elemOne($elem_id, true);
+
+	return
+	'<table class="_stab">'.
+		'<tr><th>Base'.
+			'<th>Cache'.
+			'<th>Cache-upd'.
+			'<th>JS'.
+		'<tr><td>'._pr($elBase).
+			'<td class="top">'._pr($elCashe).
+			'<td class="top">'._pr($elCasheUpd).
+			'<td class="top js">'.
+	'</table>';
 }
 
 function _dialogTest() {//проверка id диалога, создание нового нового, если это кнопка
@@ -1265,17 +1223,15 @@ function _elemOne($elem_id, $upd=false) {//запрос одного элеме�
 	if(!_cache_isset($key, $global))
 		return array();
 
-	global $G_ELM;
-
 	$ELM = _cache_get($key, $global);
 	$el = _beElmDlg($el);
 	$el = _element('struct', $el);
-	$el = _elementTitle($el);
 	$ELM[$elem_id] = $el;
 
 	_cache_set($key, $ELM, $global);
 
-	$G_ELM[$elem_id] = $el;
+	if($el['dialog_id'])
+		$el['title'] = _element('title', $el);
 
 	return $el;
 }
@@ -1569,22 +1525,20 @@ function _elmJs($obj_name, $obj_id, $prm=array()) {//список элемент
 	$send = array();
 	$elmDop = array();//поиск элементов сторонних объектов (в действиях), которые потребуются
 	foreach($ELM as $elem_id => $el) {
-		$elJS = _element('js', $el);
-		$elJS['action'] = _BE('elem_one_action', $el['id']);
-		$elJS['vvv'] = _element('vvv', $el, $prm);
+//		$elJS['action'] = _BE('elem_one_action', $el['id']);
+		$el['vvv'] = _element('vvv', $el, $prm);
 
-		foreach($elJS['action'] as $act) {
+		foreach($el['action'] as $act)
 			if($act['dialog_id'] == 209)//вставка значения в блок
 				$elmDop += _idsAss($act['v1']);
-		}
 
-		$send[$elem_id] = $elJS;
+		$send[$elem_id] = $el;
 	}
 
 	foreach($elmDop as $elem_id => $n) {
 		if(isset($send[$elem_id]))
 			continue;
-		$send[$elem_id] = _element('js', $elem_id);
+		$send[$elem_id] = _elemOne($elem_id);
 	}
 
 	return $send;
@@ -1866,7 +1820,7 @@ function PHP12_elem_all_rule_setup($prm) {
 			'<div class="ml30 mt3">'.
 				_check(array(
 					'attr_id' => 'rule-el'.$el['id'],
-					'title' => $el['name'].' <span class="pale">['.$el['id'].']</span>',
+					'title' => '<span class="dib w30 r pale mr5">['.$el['id'].']</span>'.$el['name'],
 					'value' => _num(@$ass[$el['id']])
 				)).
 			'</div>';

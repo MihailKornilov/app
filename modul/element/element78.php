@@ -8,11 +8,6 @@ function _element78_struct($el) {
 		'txt_2'   => $el['txt_2']       //id элемента (с учётом вложений), содержащего количество записей по каждому пункту
 	) + _elementStruct($el);
 }
-function _element78_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element78_print($el) {
 	if(!$ids = _ids($el['txt_1'], 1))
 		return _emptyMin('Фильтр-меню: отсутствуют ID значений.');

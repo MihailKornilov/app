@@ -6,11 +6,6 @@ function _element17_struct($el) {
 		значения: PHP12_select_setup
 	*/
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'def'     => _num($el['def']),
-
 		'txt_1'   => $el['txt_1'],  //текст нулевого значения
 		'txt_2'   => $el['txt_2']   /* содержание списка в формате JSON
                                         id
@@ -38,11 +33,6 @@ function _element17_v_get($el, $id) {
 			return $r['title'];
 
 	return '';
-}
-function _element17_js($el) {
-	return array(
-		'txt_1' => $el['txt_1']
-	) + _elementJs($el);
 }
 function _element17_print($el, $prm) {
 	$def = 0;

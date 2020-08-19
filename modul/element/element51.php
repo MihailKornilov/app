@@ -7,12 +7,6 @@ function _element51_struct($el) {
 		'num_2'   => _num($el['num_2']) //показывать время
 	) + _elementStruct($el);
 }
-function _element51_js($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),
-		'num_2'   => _num($el['num_2'])
-	) + _elementJs($el);
-}
 function _element51_print($el, $prm) {
 	return
 	_calendar(array(

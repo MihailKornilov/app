@@ -3,11 +3,6 @@
 /* [16] Radio: произвольные значения */
 function _element16_struct($el) {
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'def'     => _num($el['def']),
-
 		'txt_1'   => $el['txt_1'],      //текст нулевого значения
 		'txt_2'   => $el['txt_2'],  /* содержание списка в формате JSON
                                         id

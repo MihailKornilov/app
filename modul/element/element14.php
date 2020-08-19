@@ -20,18 +20,8 @@ function _element14_struct($el) {
 		'num_6' => _num($el['num_6']) //обратный порядок
 	) + _elementStruct($el);
 }
-function _element14_struct_title($el, $DLG) {
-	if(!$dlg_id = $el['num_1'])
-		return $el;
-	if(empty($DLG[$dlg_id]))
-		return $el;
-	$el['title'] = $DLG[$dlg_id]['name'];
-	return $el;
-}
-function _element14_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
+function _element14_title() {
+	return 'Список ШАБЛОН';
 }
 function _element14_print($ELEM, $prm=array(), $next=0) {
 	if(!$DLG = _dialogQuery($ELEM['num_1']))

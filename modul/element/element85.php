@@ -10,12 +10,6 @@ function _element85_struct($el) {
 		'num_4'   => _num($el['num_4']) //разрешать выбор текущего пользователя
 	) + _elementStruct($el);
 }
-function _element85_js($el) {
-	return array(
-		'txt_1' => $el['txt_1'],
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element85_print($el, $prm) {
 	return
 	_select(array(

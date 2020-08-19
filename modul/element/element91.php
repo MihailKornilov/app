@@ -7,10 +7,6 @@ function _element91_struct($el) {
 		'num_1'   => $el['num_1']  //[13] Поле для подсчёта суммы
 	) + _elementStruct($el);
 }
-function _element91_struct_title($el) {
-	$el['title'] = '✓';
-	return $el;
-}
 function _element91_print($el, $prm) {
 	$u = $prm['unit_get'];
 

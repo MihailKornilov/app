@@ -4,9 +4,6 @@
 /* [9] Поле-пароль */
 function _element9_struct($el) {
 	return array(
-		'req'       => _num($el['req']),
-		'req_msg'   => $el['req_msg'],
-
 		'txt_1' => $el['txt_1'],     //текст для placeholder
 		'num_1' => _num($el['num_1'])//минимальное количество знаков
 	) + _elementStruct($el);

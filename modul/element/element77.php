@@ -16,11 +16,6 @@ function _element77_struct($el) {
 		'num_4'   => _num($el['num_4']),//значение даты (если выбрано 6510)
 	) + _elementStruct($el);
 }
-function _element77_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element77_print($el) {
 	$v = _filter('vv', $el, $el['num_2']);
 	$v = _filterCalendarDef($v);

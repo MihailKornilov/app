@@ -6,11 +6,6 @@ function _element18_struct($el) {
 		значения через PHP12_radio_setup
 	*/
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
-		'def'     => _num($el['def']),
-
 		'txt_1'   => $el['txt_1'],      //текст нулевого значения
 		'txt_2'   => $el['txt_2'],      /* содержание списка в формате JSON
                                             id
@@ -20,13 +15,6 @@ function _element18_struct($el) {
 		'num_1'   => _num($el['num_1']),//скрывать нулевое значение в меню выбора
 		'num_2'   => _num($el['num_2']) //не изменять имя нулевого значения после выбора
 	) + _elementStruct($el);
-}
-function _element18_js($el) {
-	return array(
-		'num_1'   => _num($el['num_1']),
-		'num_2'   => _num($el['num_2']),
-		'txt_1'   => $el['txt_1']
-	) + _elementJs($el);
 }
 function _element18_vvv($el) {
 	if(!$el['txt_2'])

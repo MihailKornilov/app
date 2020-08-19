@@ -3,9 +3,6 @@
 /* [92] Выбранные значения галочками */
 function _element92_struct($el) {
 	return array(
-		'req'     => _num($el['req']),
-		'req_msg' => $el['req_msg'],
-
 		'txt_1'   => $el['txt_1']   //списки
 	) + _elementStruct($el);
 }

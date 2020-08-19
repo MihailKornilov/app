@@ -7,21 +7,22 @@ function _element43_struct($el) {
 	) + _elementStruct($el);
 }
 
-function _element43_print($el, $prm) {
-	if(!empty($prm['blk_setup']))
-		return
-		'<div class="center pad10">'.
-			'Шаблон записи'.
-			'<br>'.
-			'<b>'.$el['title'].'</b>'.
-		'</div>';
+function _element43_print($el) {
+	return
+	'<div class="center pad10 bg9 bor-dash br3">'.
+		'<div class="fs14 grey">Шаблон записи:</div>'.
+		'<div class="fs14 b">'._element('title', $el).'</div>'.
+	'</div>';
+}
+function _element43_print11($el, $u) {
+	if(empty($u))
+		return _emptyMinRed('Не получены данные записи');
 
-	if(empty($prm['unit_get']))
-		return $el['title'].': данные записи не получены.';
+	$prm = _blockParam();
+	$prm['unit_get'] = $u;
 
 	return _blockHtml('tmp43', $el['id'], $prm);
 }
-
 
 
 

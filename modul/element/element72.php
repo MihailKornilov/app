@@ -8,11 +8,6 @@ function _element72_struct($el) {
 		'txt_1' => $el['txt_1']         //дополнительные условия для отображения сумм
 	) + _elementStruct($el);
 }
-function _element72_js($el) {
-	return array(
-		'num_1' => _num($el['num_1'])
-	) + _elementJs($el);
-}
 function _element72_print($el, $prm) {
 	$v = _filter('vv', $el, strftime('%Y-%m'));
 
