@@ -216,6 +216,8 @@ function _elemAction243($el, $txt) {//Формат для чисел
 function _elemAction242($el, $prm) {//подмена цвета
 	$color = empty($el['color']) ? '' : $el['color'];
 
+	if(empty($el['id']))
+		return $color;
 	if(!$action = _BE('elem_one_action', $el['id']))
 		return $color;
 	if(!$u = $prm['unit_get'])

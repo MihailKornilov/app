@@ -21,7 +21,7 @@ function _element44_print($el, $prm) {
 	foreach($json as $r)
 		switch($r['type']) {
 			case 'txt':
-				$r['txt'] = _elem44css($r, $r['txt']);
+				$r['txt'] = _elem44css($r, $prm, $r['txt']);
 				$send .= _br($r['txt']);
 				break;
 			case 'el':
@@ -30,7 +30,7 @@ function _element44_print($el, $prm) {
 
 				$txt = _element('print', $ell, $prm);
 				$txt = _elemFormat($ell, $prm, $txt);
-				$txt = _elem44css($ell, $txt);
+				$txt = _elem44css($ell, $prm, $txt);
 				$txt = _spisokColSearchBg($el, $txt);
 				$send .= $txt;
 			break;
@@ -48,10 +48,10 @@ function _element44_template_docx($el, $u) {
 	$prm['unit_get'] = $u;
 	return _element44_print($el, $prm);
 }
-function _elem44css($ell, $txt) {//применение стилей к значению
+function _elem44css($ell, $prm, $txt) {//применение стилей к значению
 	$cls = array();
 	$cls[] = $ell['font'];
-	$cls[] = $ell['color'];
+	$cls[] = _elemAction242($ell, $prm);
 
 	if(!$cls = array_diff($cls, array('')))
 		return $txt;

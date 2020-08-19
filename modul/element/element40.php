@@ -40,6 +40,7 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 	$dss = _elem40dss_14($prm);
 	$dss = _elem40dss_88($prm, $dss);
 	$dss = _elem40dss_43($prm, $dss);
+	$dss = _elem40dss_44($prm, $dss);
 	$dss = _elem40dss_page($prm, $dss);
 
 	return $dss;
@@ -149,6 +150,27 @@ function _elem40dss_43($prm, $dss) {//получение id диалога из 
 		return 0;
 
 	return $bl['obj_id'];
+}
+function _elem40dss_44($prm, $dss) {//получение id диалога из Сборного текста
+	if($dss)
+		return $dss;
+	if(!$el = _elemOne($prm['srce']['element_id']))
+		return 0;
+	if(!$el = _elemOne($el['parent_id']))
+		return 0;
+	if($el['dialog_id'] != 44)
+		return 0;
+	if(!$bl = _blockOne($el['block_id']))
+		return 0;
+
+	switch($bl['obj_name']) {
+		case 'page':
+			if(!$page = _page($bl['obj_id']))
+				return 0;
+			return _num($page['dialog_id_unit_get']);
+	}
+
+	return 0;
 }
 function _elem40dss_page($prm, $dss) {//получение id диалога из Страницы, принимающей данные записи
 	if($dss)
