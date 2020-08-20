@@ -1227,12 +1227,18 @@ function _elemOne($elem_id, $upd=false) {//запрос одного элеме�
 	if(!_cache_isset($key, $global))
 		return array();
 
+	global $G_ELM;
+
 	$ELM = _cache_get($key, $global);
 	$el = _beElmDlg($el);
 	$el = _element('struct', $el);
 	$ELM[$elem_id] = $el;
 
 	_cache_set($key, $ELM, $global);
+
+	$el = _beElmStruct11($el);
+
+	$G_ELM[$elem_id] = $el;
 
 	if($el['dialog_id'])
 		$el['title'] = _element('title', $el);
@@ -1529,7 +1535,6 @@ function _elmJs($obj_name, $obj_id, $prm=array()) {//список элемент
 	$send = array();
 	$elmDop = array();//поиск элементов сторонних объектов (в действиях), которые потребуются
 	foreach($ELM as $elem_id => $el) {
-//		$elJS['action'] = _BE('elem_one_action', $el['id']);
 		$el['vvv'] = _element('vvv', $el, $prm);
 
 		foreach($el['action'] as $act)

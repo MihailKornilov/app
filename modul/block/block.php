@@ -1270,7 +1270,7 @@ function _beElmCache() {//кеш элементов
 	_beElm(APP_PARENT);
 
 	foreach($G_ELM as $elem_id => $el)
-		_beElmStruct11($el);
+		$G_ELM[$elem_id] = _beElmStruct11($el);
 }
 function _beElm($app_id=0) {
 	if(_flag('ELM_APP'.$app_id))
@@ -1310,8 +1310,6 @@ function _beElm($app_id=0) {
 			}
 			$ELM[$elem_id] = $el;
 		}
-
-
 
 		_cache_set($key, $ELM, $global);
 	}
@@ -1364,8 +1362,6 @@ function _beElmStruct11($el11) {
 	//является изоображением, вставленным через [11]
 	if($el['dialog_id'] == 60)
 		$el11['immg'] = 1;
-
-	$G_ELM[$el11['id']] = $el11;
 
 	return $el11;
 }
@@ -1695,7 +1691,7 @@ function _blockInfoElem($prm, $block_id, $BLCH) {
 	if($elem_id = query_value($sql))
 		$elem_html = '<a class="dialog-open" val="dialog_close:'.$prm['srce']['dialog_id'].',dialog_id:118,get_id:'.$elem_id.'">'.$elem_id.'<a>';
 
-	$elem_id_cache = !empty($BLCH['elem']) ? $BLCH['elem']['id'] : '';
+	$elem_id_cache = $BLCH['elem_id'];
 	return
 	'<tr class="over1">'.
 		'<td class="grey b">Элемент'.
