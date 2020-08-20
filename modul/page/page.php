@@ -239,7 +239,7 @@ function _pageSaForSelect($arr, $child) {//страницы SA для select
 		$send[] = array(
 			'id' => _num($r['id']),
 			'title' => addslashes(htmlspecialchars_decode(trim($r['name']))),
-			'content' => '<div class="'.(_pageSA($r) ? 'color-ref' : 'color-pay').'">'.addslashes(htmlspecialchars_decode(trim($r['name']))).'</div>'
+			'content' => '<div class="'.(_pageSA($r) ? 'clr8' : 'clr11').'">'.addslashes(htmlspecialchars_decode(trim($r['name']))).'</div>'
 		);
 		if(!empty($child[$r['id']]))
 			foreach(_pageSaForSelect($child[$r['id']], $child) as $sub)
@@ -307,7 +307,7 @@ function _pageInfo() {//информация о странице
 			'<table class="w300">'.
 				'<tr class="center">'.
 					'<td>APP_ID: '.$page['app_id'].
-					'<td class="'.(_pageSA($page) ? 'fs15 b color-ref' : 'pale').'">SA'.
+					'<td class="'.(_pageSA($page) ? 'fs15 b clr8' : 'clr2').'">SA'.
 					'<td>BLK: <b>'.count($blk).'</b>'.
 					'<td>ELM: <b>'.count($elm).'</b>'.
 			'</table>'.

@@ -200,7 +200,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 	$el = _elemOne($elem_id, true);
 
 	$send = '<tr><td class="r w250">Элемент ID:<td class="b">'.$elem_id.
-			'<tr><td class="r color-ref b">app_id:'.
+			'<tr><td class="r clr8 b">app_id:'.
 				'<td>'.($el['app_id'] ? '<span class="b">'.$el['app_id'].'</span>' : '-');
 
 
@@ -209,15 +209,15 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 	if($dialog_id = $el['dialog_id']) {
 		$dlgPaste = '['.$dialog_id.'] ';
 		if(!$DLG = _dialogQuery($dialog_id))
-			$dlgPaste .= '<span class="red">- диалога не существует</span>';
+			$dlgPaste .= '<span class="clr5">- диалога не существует</span>';
 		else
 			$dlgPaste .= ' '.$DLG['name'];
 	}
-	$send .='<tr><td class="r grey">Создан через диалог:<td>'.$dlgPaste;
+	$send .='<tr><td class="r clr1">Создан через диалог:<td>'.$dlgPaste;
 
-	$send .='<tr><td class="r grey">Расположен в блоке:'.
-				'<td>'.($el['block_id'] ? '<a class="dialog-open color-sal" val="dialog_id:117,get_id:'.$el['block_id'].'">'.$el['block_id'].'</a>' : '-').
-			'<tr><td class="r grey">Элемент-родитель:<td>'._elemInfoLink(@$el['parent_id']);
+	$send .='<tr><td class="r clr1">Расположен в блоке:'.
+				'<td>'.($el['block_id'] ? '<a class="dialog-open clr13" val="dialog_id:117,get_id:'.$el['block_id'].'">'.$el['block_id'].'</a>' : '-').
+			'<tr><td class="r clr1">Элемент-родитель:<td>'._elemInfoLink(@$el['parent_id']);
 
 	//Дочерние элементы
 	$td = '-';
@@ -231,7 +231,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 			$ids[] = _elemInfoLink($id);
 		$td = implode(', ', $ids);
 	}
-	$send .='<tr><td class="r grey top">Дочерние элементы:<td>'.$td;
+	$send .='<tr><td class="r clr1 top">Дочерние элементы:<td>'.$td;
 
 
 	//Использование в элементе [11]
@@ -251,7 +251,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 		if(!empty($ids))
 			$td = implode(', ', $ids);
 	}
-	$send .='<tr><td class="r grey top">Используется в элементе [11]:<td>'.$td;
+	$send .='<tr><td class="r clr1 top">Используется в элементе [11]:<td>'.$td;
 
 	//Прикреплены функции
 	$td = '-';
@@ -261,7 +261,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 			ORDER BY `id`";
 	if($ids = query_ids($sql))
 		$td = $ids;
-	$send .='<tr><td class="r grey">IDs прикрепленых функций:<td>'.$td;
+	$send .='<tr><td class="r clr1">IDs прикрепленых функций:<td>'.$td;
 
 
 	//Функции, которые воздействуют на этот элемент
@@ -280,7 +280,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 		if(!empty($ids))
 			$td = implode(', ', $ids);
 	}
-	$send .='<tr><td class="r grey">Воздействующие функции:<td>'.$td;
+	$send .='<tr><td class="r clr1">Воздействующие функции:<td>'.$td;
 
 
 	//Использование в содержании фильтра [40]
@@ -321,7 +321,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 					$ass = _idsAss($f['elem_id']);
 					if(isset($ass[$elem_id]))
 						$mass[] = '<a class="dialog-open" val="dialog_id:'.$DLG['id'].',edit_id:'.$sp['id'].'">'.
-									'<span class="color-pay">`'.$DLG['table_name_1'].'`</span> '.
+									'<span class="clr11">`'.$DLG['table_name_1'].'`</span> '.
 									'['.$DLG['id'].'] '.$DLG['name'].
 									' - <b>id'.$sp['id'].'<b>'.
 								  '</a>';
@@ -331,7 +331,7 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 		if(!empty($mass))
 			$td = implode('<br>', $mass);
 	}
-	$send .='<tr><td class="r grey top">Используется в фильтре [40]:<td>'.$td;
+	$send .='<tr><td class="r clr1 top">Используется в фильтре [40]:<td>'.$td;
 
 	//Использование в фильтрах шаблона истории действий (а также в самой истории действий)
 	$td = '-';
@@ -379,9 +379,9 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 				$td = implode(', ', $mass);
 		}
 	}
-	$send .='<tr><td class="r grey top">В истории действий диалогов:<td>'.($hist ? implode('<br>', $hist) : '-');
-	$send .='<tr><td class="r grey top">IDs элементов шаблонов истории действий, в фильтрах которых используется данный элемент:<td>'.$td;
-	$send .='<tr><td class="r grey">Является колонкой по умолчанию в диалоге:<td>'.$colDef;
+	$send .='<tr><td class="r clr1 top">В истории действий диалогов:<td>'.($hist ? implode('<br>', $hist) : '-');
+	$send .='<tr><td class="r clr1 top">IDs элементов шаблонов истории действий, в фильтрах которых используется данный элемент:<td>'.$td;
+	$send .='<tr><td class="r clr1">Является колонкой по умолчанию в диалоге:<td>'.$colDef;
 
 
 	//Является указателем на список в исходном диалоге в элементе [13]
@@ -396,11 +396,11 @@ function PHP12_elem_info($prm) {//информация об элементе [11
 			$mass[] = _elemInfoLink($r['id']);
 		$td = implode(', ', $mass);
 	}
-	$send .='<tr><td class="r grey">Является указателем на список в исходном диалоге в элементе [13]:<td>'.$td;
+	$send .='<tr><td class="r clr1">Является указателем на список в исходном диалоге в элементе [13]:<td>'.$td;
 
-	$send .='<tr><td class="r grey">Используется в фильтре элемента [74]:<td>---';
-	$send .='<tr><td class="r grey">Был выбран в элементе [13]:<td>---';
-	$send .='<tr><td class="r grey">Является указателем на колонку родительского диалога:<td>---';
+	$send .='<tr><td class="r clr1">Используется в фильтре элемента [74]:<td>---';
+	$send .='<tr><td class="r clr1">Был выбран в элементе [13]:<td>---';
+	$send .='<tr><td class="r clr1">Является указателем на колонку родительского диалога:<td>---';
 
 	return
 	$EL_VAR.
@@ -621,7 +621,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение 
 			$send[] = array(
 				'id' => _num($r['id']),
 				'title' => $r['name'],
-				'content' => '<div class="'.($r['sa'] ? 'color-ref' : 'color-pay').'">['.$r['id'].'] '.$r['name'].'</div>'
+				'content' => '<div class="'.($r['sa'] ? 'clr8' : 'clr11').'">['.$r['id'].'] '.$r['name'].'</div>'
 			);
 	}
 
@@ -896,14 +896,14 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 		array_unshift($dlg_base, array(
 			'id' => -2,
 			'title' => $title,
-			'content' => '<div class="color-ref b">'.$title.'</div>'.
-						 '<div class="grey fs12">Будет открываться сам же диалог, если выведен список диалогов</div>'
+			'content' => '<div class="clr8 b">'.$title.'</div>'.
+						 '<div class="clr1 fs12">Будет открываться сам же диалог, если выведен список диалогов</div>'
 		));
 		$title = 'SA: всегда создавать новый диалог';
 		array_unshift($dlg_base, array(
 			'id' => -1,
 			'title' => $title,
-			'content' => '<div class="color-ref b">'.$title.'</div>'
+			'content' => '<div class="clr8 b">'.$title.'</div>'
 		));
 		return array_merge($dlg_base, $dlg_app_spisok, $dlg_app, $dlg_elem, $dlg_sa);
 	}
@@ -918,11 +918,11 @@ function _dialogSelArrayUnit($r, $idShow=0) {//составление едини
 
 	$color = '';
 	if(!$r['app_id'])
-		$color = 'color-pay';
+		$color = 'clr11';
 	if($r['spisok_on'])
-		$color = 'color-sal'.(!$r['app_id'] ? ' b' : '');
+		$color = 'clr13'.(!$r['app_id'] ? ' b' : '');
 	if($r['sa'])
-		$color = 'color-ref';
+		$color = 'clr8';
 
 	$u['content'] = '<div class="'.$color.'">'.
 			 ($idShow ? '<b>'.$r['id'].'</b>. ' : '').
@@ -950,7 +950,7 @@ function _dialogSpisokCmp($dialog_id) {//список колонок, испол
 function _dialogContentDelSetup($dialog_id) {//иконка настройки содежания удаления записи (единицы списка)
 	$isSetup = _BE('block_obj', 'dialog_del', $dialog_id);
 	return
-	($isSetup ?'<span class="color-pay b">Настроено.</span> ' : '').
+	($isSetup ?'<span class="clr11 b">Настроено.</span> ' : '').
 	'<div val="dialog_id:56,dss:'.$dialog_id.'"'.
 		' class="icon icon-set pl dialog-open tool"'.
 		' data-tool="'.($isSetup ? 'Изменить' : 'Настроить').' содержание">'.
@@ -1050,14 +1050,14 @@ function PHP12_dialog_app_li($r) {
 			'<tr class="over1">'.
 				'<td class="w30 r">'.
 					'<div class="icon icon-move pl"></div>'.
-	   (DEBUG ? '<td class="w50 pale r">'.$r['id'] : '').
+	   (DEBUG ? '<td class="w50 clr2 r">'.$r['id'] : '').
 				'<td class="d-name over5 curP dialog-open'._dn($r['pid'], 'b').'" val="dialog_id:'.$r['id'].'">'.$r['name'].
 				'<td class="w30 r">'.
 					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup tool" data-tool="Редактировать диалог"></div>'.
 				'<td class="w50 center">'.
 					($r['spisok_on'] ? '<div class="icon icon-ok curD"></div>' : '').
-				'<td class="w100 color-sal'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
-				'<td class="w70 grey">'.PHP12_dialog_col($r['id']).
+				'<td class="w100 clr13'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
+				'<td class="w70 clr1">'.PHP12_dialog_col($r['id']).
 				'<td class="w30'.$bgh.'">'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w30'.$bgh.'">'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w30'.$bgh.'">'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
@@ -1092,11 +1092,11 @@ function PHP12_dialog_col($dialog_id) {//колонки, используемы�
 		}
 
 		if($col == 'col')
-			$send[$col] = '<span class="red b">'.$colName.'</span>';
+			$send[$col] = '<span class="clr5 b">'.$colName.'</span>';
 		elseif($col == 'name')
-			$send[$col] = '<span class="color-pay b">'.$colName.'</span>';
+			$send[$col] = '<span class="clr11 b">'.$colName.'</span>';
 		elseif($col == 'req' || $col == 'req_msg')
-			$send[$col] = '<span class="color-ref b">'.$colName.'</span>';
+			$send[$col] = '<span class="clr8 b">'.$colName.'</span>';
 		else
 			$send[$col] = $colName;
 	}
@@ -1136,7 +1136,7 @@ function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод спис
 	foreach($arr as $r) {
 		if(!$el = _elemOne($r['id'])) {
 			$send .=
-				'<tr><td colspan="10" class="red">'.
+				'<tr><td colspan="10" class="clr5">'.
 						'Элемента '.$r['id'].' нет в кеше.';
 			continue;
 		}
@@ -1147,7 +1147,7 @@ function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод спис
 		//ссылка на страницу, в котором расположен список
 		if($bl['obj_name'] == 'page') {
 			$page = _page($bl['obj_id']);
-			$link = '<a href="'.URL.'&p='.$bl['obj_id'].'" class="color-pay">Страница '.$bl['obj_id'].' - '.$page['name'].'</a>';
+			$link = '<a href="'.URL.'&p='.$bl['obj_id'].'" class="clr11">Страница '.$bl['obj_id'].' - '.$page['name'].'</a>';
 		}
 		//диалог, в котором расположен список
 		if($bl['obj_name'] == 'dialog') {
@@ -1156,7 +1156,7 @@ function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод спис
 		}
 
 		$send .= '<tr>'.
-					'<td class="r grey">'.$r['id'].
+					'<td class="r clr1">'.$r['id'].
 					'<td class="b over1 curP dialog-open" val="dialog_id:'.$r['dlg']['id'].'"">'.$r['dlg']['name'].
 					'<td>'.$link;
 	}
@@ -1829,7 +1829,7 @@ function PHP12_elem_all_rule_setup($prm) {
 			'<div class="ml30 mt3">'.
 				_check(array(
 					'attr_id' => 'rule-el'.$el['id'],
-					'title' => '<span class="dib w30 r pale mr5">['.$el['id'].']</span>'.$el['name'],
+					'title' => '<span class="dib w30 r clr2 mr5">['.$el['id'].']</span>'.$el['name'],
 					'value' => _num(@$ass[$el['id']])
 				)).
 			'</div>';
@@ -1837,7 +1837,7 @@ function PHP12_elem_all_rule_setup($prm) {
 	}
 
 	return
-	'<div class="fs16 color-555">'.
+	'<div class="fs16 clr9">'.
 		'Элементы, используемые в правиле'.
 		'<br>'.
 		'<b class="fs16">'.$rule['name'].'</b>:'.
@@ -1960,7 +1960,7 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 			'<table class="el-group-head'.$first.$sel.'" val="'.$id.'">'.
 				'<tr>'.
 	   ($r['img'] ? '<td class="w50 center"><img src="img/'.$r['img'].'">' : '').
-					'<td class="fs14 '.($r['sa'] ? 'red pl5' : 'blue').'">'._br($r['name']).
+					'<td class="fs14 '.($r['sa'] ? 'clr5 pl5' : 'clr15').'">'._br($r['name']).
 			'</table>';
 
 		$content .= '<dl id="cnt_'.$id.'" class="cnt'._dn($id == $firstId).'">';
@@ -1968,9 +1968,9 @@ function PHP12_elem_choose($prm) {//выбор элемента для вста�
 		foreach($r['elem'] as $el)
 				$content .=
 					'<dd val="'.$el['id'].'">'.
-						'<div class="elem-unit '.($el['sa'] ? 'red' : 'color-555').'" val="'.$el['id'].'">'.
+						'<div class="elem-unit '.($el['sa'] ? 'clr5' : 'clr9').'" val="'.$el['id'].'">'.
 							'<table class="w100p">'.
-								'<tr><td class="num w25 r top pr5 grey">'.$n++.'.'.
+								'<tr><td class="num w25 r top pr5 clr1">'.$n++.'.'.
 									'<td class="b top">'.
 							  (SA ? 	'<div class="icon icon-move-y fr pl"></div>'.
 								        '<div class="icon icon-edit fr pl mr3 dialog-setup" val="dialog_id:'.$el['id'].'"></div>'
@@ -2696,7 +2696,7 @@ function _historySpisok($EL, $prm) {//список истории действи
 
 			$msg = '';
 			if(empty($dlg[$type])) {
-				$msg = '<span class="red">['.$dlg['id'].'] история не настроена</span>';
+				$msg = '<span class="clr5">['.$dlg['id'].'] история не настроена</span>';
 			} else {
 				$prm['unit_get'] = $unitArr[$r['unit_id']];
 				$prm = _blockParam($prm);
@@ -2716,7 +2716,7 @@ function _historySpisok($EL, $prm) {//список истории действи
 			$un .= '<table class="history-un'._dn($is_last, 'mb5').'">'.
 						'<tr><td class="top tdo">'.
 								'<div class="history-o o'.$r['type_id'].'"></div>'.
-								'<span class="dib pale w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
+								'<span class="dib clr2 w35 mr5">'.substr($r['dtime_add'], 11, 5).'</span>'.
 							'<td>'.
 				   (SA && DEBUG ? '<div val="dialog_id:'.$r['dialog_id'].',menu:2" class="icon icon-edit fr pl dialog-setup tool" data-tool="Настроить историю"></div>' : '').
 								$msg.
@@ -2792,7 +2792,7 @@ function _historySpisokU($user_id, $un) {//вывод пользователя �
 	'<table class="mt5">'.
 		'<tr><td class="top">'._user($user_id, 'ava30').
 			'<td class="top">'.
-				'<div class="fs12 ml5 color-555">'._user($user_id, 'name').'</div>'.
+				'<div class="fs12 ml5 clr9">'._user($user_id, 'name').'</div>'.
 				$un.
 	'</table>';
 }
@@ -2809,10 +2809,10 @@ function _historySpisokEdited($hist) {//история при редактиро
 	$send = '<table class="_stab hist">';
 	foreach($hist['edited'] as $r) {
 		$send .=
-			'<tr><td class="grey r b">'.$r['name'].
-				'<td class="grey">'.$r['old'].
-				'<td class="grey">»'.
-				'<td class="grey">'.$r['new'];
+			'<tr><td class="clr1 r b">'.$r['name'].
+				'<td class="clr1">'.$r['old'].
+				'<td class="clr1">»'.
+				'<td class="clr1">'.$r['new'];
 	}
 
 	$send .= '</table>';

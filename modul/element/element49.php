@@ -23,7 +23,7 @@ function _element49_print($el, $prm) {
 	'<div class="_sebl dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_sebl"'._elemStyleWidth($el).'>'.
 		'<div class="icon icon-cube pabs"></div>'.
 		'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-		'<input type="text" readonly class="inp curP w100p color-ref"'.$placeholder.$disabled.' value="'.$title.'" />'.
+		'<input type="text" readonly class="inp curP w100p clr8"'.$placeholder.$disabled.' value="'.$title.'" />'.
 	'</div>';
 }
 
@@ -110,7 +110,7 @@ function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уро
 	return
 	'<div class="bg-ffc">'.
 		'<table class="bs5 ml10">'.
-			'<tr><td class="color-sal">Уровни блоков:'.
+			'<tr><td class="clr13">Уровни блоков:'.
 				'<td>'.$html.
 				'<td class="w50 level-hold">'.
 		'</table>'.

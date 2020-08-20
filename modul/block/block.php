@@ -17,7 +17,7 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 			'<div class="bg-ffe pad10">'.
 				'<div class="_empty min">'.
 					'Шаблон пуст.'.
-					'<div class="mt10 pale">Начните с управления блоками.</div>'.
+					'<div class="mt10 clr2">Начните с управления блоками.</div>'.
 				'</div>'.
 			'</div>',
 
@@ -36,7 +36,7 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 		$pName = '';
 		if($page = _page($obj_id))
 			$pName = $page['name'];
-		$empty['page'] = '<div class="_empty mar20 fs17 color-ref bg-fee">'.
+		$empty['page'] = '<div class="_empty mar20 fs17 clr8 bg-fee">'.
 							'Cтраница <b>'.$pName.'</b> пустая и ещё не была настроена.'.
 						 '</div>';
 	}
@@ -1629,7 +1629,7 @@ function PHP12_block_info($prm) {//информация о блоке (диал�
 
 	$send =
 		'<table class="bs5">'.
-			'<tr><td class="grey">ID блока:'.
+			'<tr><td class="clr1">ID блока:'.
 				'<td><input type="text" class="w100" value="'.$block_id.'">'.
 		'</table>'.
 
@@ -1675,11 +1675,11 @@ function _blockInfoTr($param, $BL, $BLCH) {
 	if(is_array($blCache))
 		$blCache = _pr($blCache, true);
 	elseif($BL[$param] != $blCache)
-		$color = 'red';
+		$color = 'clr5';
 
 	return
 	'<tr class="over1">'.
-		'<td class="grey">'.$param.
+		'<td class="clr1">'.$param.
 		'<td>'.$BL[$param].
 		'<td class="'.$color.'">'.$blCache;
 }
@@ -1694,7 +1694,7 @@ function _blockInfoElem($prm, $block_id, $BLCH) {
 	$elem_id_cache = $BLCH['elem_id'];
 	return
 	'<tr class="over1">'.
-		'<td class="grey b">Элемент'.
+		'<td class="clr1 b">Элемент'.
 		'<td>'.$elem_html.
 		'<td>'.$elem_id_cache;
 }

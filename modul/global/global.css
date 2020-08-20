@@ -789,51 +789,21 @@ body:not(.site){position:relative}
 
 /* Цвета */
 .clr0{color:#000 !important}/* чёрный */
-.black{color:#000 !important}
-
 .clr1{color:#888 !important}/* серый */
-.grey{color:#888 !important}/* серый */
-
 .clr2{color:#aaa !important}/* бледный */
-.pale{color:#aaa !important}/* бледный */
-
 .clr3{color:#ccc !important}/* совсем бледный */
-.color-ccc{color:#ccc !important}/* совсем бледный */
-
 .clr4{color:#fff !important}/* белый */
-.white{color:#fff !important}
-
 .clr5{color:#E22 !important}/* красный */
-.red{color:#E22 !important}
-
 .clr6{color:#c88 !important}/* бордовый */
-.color-vin{color:#c88 !important}/* бордовый */
-
 .clr7{color:#a66 !important}/* удалено: тёмно-бордовый */
-.color-del{color:#a66 !important}/* удалено: тёмно-бордовый */
-
 .clr8{color:#800 !important}/* тёмно-красный - возврат */
-.color-ref{color:#800 !important}/* тёмно-красный - возврат */
-
 .clr9{color:#555 !important}/* тёмно-серый */
-.color-555{color:#555 !important}/* тёмно-серый */
-
 .clr10{color:#aea !important}/* светло-зелёный */
-.color-aea{color:#aea !important}/* светло-зелёный */
-
 .clr11{color:#090 !important}/* зелёный - платёж */
-.color-pay{color:#090 !important}/* зелёный - платёж */
-
 .clr12{color:#070 !important}/* тёмно-зелёный */
-
 .clr13{color:#770 !important}/* салатовый - расчётный счёт */
-.color-sal{color:#770 !important}/* салатовый - расчётный счёт */
-
 .clr14{color:#07a}/* голубой - начисление */
-.color-acc{color:#07a}/* голубой - начисление */
-
 .clr15{color:#2B587A !important}  /* синий - как ссылка */
-.blue{color:#2B587A !important}  /* синий - как ссылка */
 
 
 

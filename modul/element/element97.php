@@ -11,7 +11,7 @@ function _element97_struct($el) {
 }
 function _element97_print($el) {
 	$DLG = _dialogQuery($el['num_1']);
-	return '<span class="fs11 pale">[Независимая кнопка: '.$DLG['name'].']</span>';
+	return '<span class="fs11 clr2">[Независимая кнопка: '.$DLG['name'].']</span>';
 }
 function _elem97print($page_id) {//вывод кнопки на экран
 	if(!$ELM = _BE('elem_arr', 'page', $page_id))

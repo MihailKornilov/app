@@ -61,7 +61,7 @@ function _element34_print($el) {
 		}
 		$send .=
 			'<tr class="over1'.$bgCur.'">'.
-				'<td class="r color-555">'.$mon.
+				'<td class="r clr9">'.$mon.
 				 _elem34td($mass, $n, _elemWidth($el)-125);
 	}
 	$send .=
@@ -141,7 +141,7 @@ function _elem34year($json, $year) {//ссылки на все года
 	$send = '';
 	for($y = $min; $y <= $max; $y++) {
 		$cur = $y == $year ? ' b u' : '';
-		$emp = !isset($Y[$y]) ? ' pale' : '';
+		$emp = !isset($Y[$y]) ? ' clr2' : '';
 		$mr = $y != $max ? ' mr10' : '';
 		$send .= '<a href="'.URL.'?'._elem34href($y).'" class="fs14'.$mr.$cur.$emp.'">'.$y.'</a>';
 	}

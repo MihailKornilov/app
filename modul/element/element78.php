@@ -64,7 +64,7 @@ function _element78_print($el) {
 					$child_sel = true;
 				$child .= '<div class="fm-unit'.$sel.'" val="'.$c['id'].'">'.
 							$c[$col].
-							($colCount ? '<span class="ml10 pale b">'.$c[$colCount].'</span>' : '').
+							($colCount ? '<span class="ml10 clr2 b">'.$c[$colCount].'</span>' : '').
 						'</div>';
 			}
 
@@ -75,7 +75,7 @@ function _element78_print($el) {
 		  ($child ? '<td class="fm-plus">'.($child_sel ? '-' : '+') : '<td class="w25">').//—
 					'<td><div class="fm-unit b fs14'.$sel.'" val="'.$r['id'].'">'.
 							$r[$col].
-							($colCount ? '<span class="ml10 pale b">'.$r[$colCount].'</span>' : '').
+							($colCount ? '<span class="ml10 clr2 b">'.$r[$colCount].'</span>' : '').
 						'</div>'.
 			'</table>'.
 			($child ? '<div class="ml40'._dn($child_sel).'">'.$child.'</div>' : '');

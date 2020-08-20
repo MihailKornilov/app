@@ -76,7 +76,7 @@ function _noteList($page_id, $obj_id, $el) {
 								'<div class="note-del icon icon-del pl fr tool-l" data-tool="Удалить заметку"></div>'.
 								'<div val="dialog_id:81,edit_id:'.$r['id'].'" class="dialog-open icon icon-edit pl fr tool-l" data-tool="Изменить заметку"></div>'.
 								'<a class="b">'._user($r['user_id_add'], 'name').'</a>'.
-								'<div class="pale mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
+								'<div class="clr2 mt3">'.FullDataTime($r['dtime_add'], 1).'</div>'.
 						'<tr>'.
 							'<td colspan="2">'.
 								'<div style="word-wrap:break-word;width:'._noteWidth($el).'px" class="fs14">'.
@@ -134,7 +134,7 @@ function _noteCommentUnit($el, $c) {//html одного комментария
 						'<div class="comment-del icon icon-del pl" onclick="_noteCDel(this,'.$c['id'].')"></div>'.
 					'</div>'.
 					'<a class="fs12">'._user($c['user_id_add'], 'name').'</a>'.
-					'<div class="fs12 pale mt2">'.FullDataTime($c['dtime_add'], 1).'</div>'.
+					'<div class="fs12 clr2 mt2">'.FullDataTime($c['dtime_add'], 1).'</div>'.
 			'<tr>'.
 				'<td colspan="2">'.
 					'<div style="word-wrap:break-word;width:'.(_noteWidth($el)-50).'px;">'.

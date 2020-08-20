@@ -23,7 +23,7 @@ function _element17_vvv($el) {
 
 	foreach($send as $id => $r)
 		if($r['content'])
-			$send[$id]['content'] = $r['content'].'<div class="fs12 grey ml10 mt3">'.$r['content'].'</div>';
+			$send[$id]['content'] = $r['content'].'<div class="fs12 clr1 ml10 mt3">'.$r['content'].'</div>';
 
 	return _arrNum($send);
 }

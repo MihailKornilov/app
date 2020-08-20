@@ -274,7 +274,7 @@ function _authIframeError($msg='Вход в приложение недосту�
 	define('IFRAME_AUTH_ERROR', 1);
 	return
 	'<div class="bg-gr1 pad30">'.
-		'<div class="fs14 center bor-e8 bg-fff pad30 grey">'.
+		'<div class="fs14 center bor-e8 bg-fff pad30 clr1">'.
 			$msg.
 		'</div>'.
 	'</div>';
@@ -527,7 +527,7 @@ function _html_sa_access_msg() {//сообщение о закрытом дос�
 	if(APP_ACCESS)
 		return '';
 	return
-	'<div id="sa-access-msg" class="center pad10 line-b b fs16 red bg-fcc">'.
+	'<div id="sa-access-msg" class="center pad10 line-b b fs16 clr5 bg-fcc">'.
 		'ВХОД В ПРИЛОЖЕНИЕ ЗАКРЫТ'.
 	'</div>';
 }
@@ -800,7 +800,7 @@ function PHP12_app_list($return='html') {//список приложений, к
 			ORDER BY `uasort`";
 	if(!$spisok = query_arr($sql))
 		return $return == 'arr' ? array() :
-			'<div class="center pad30 color-555 fs15">'.
+			'<div class="center pad30 clr9 fs15">'.
 				'Доступных приложений нет.'.
 			'</div>';
 
@@ -826,11 +826,11 @@ function PHP12_app_list($return='html') {//список приложений, к
 				'<tr><td class="w35">'.
 						_imageHtml(_app($r['app_id'], 'img'), 40).
 					'<td class="w500 top">'.
-						'<a class="dib mt3 fs16 blue" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
-						'<div class="mt5 fs12 pale">'.$uc.' пользовател'._end($uc, 'ь', 'я', 'ей').'</div>'.
-			  (SA ? '<td class="top center w50"><span class="pale fs16 ml30">'.$r['app_id'].'</span>' : '').
+						'<a class="dib mt3 fs16 clr15" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
+						'<div class="mt5 fs12 clr2">'.$uc.' пользовател'._end($uc, 'ь', 'я', 'ей').'</div>'.
+			  (SA ? '<td class="top center w50"><span class="clr2 fs16 ml30">'.$r['app_id'].'</span>' : '').
 					'<td class="top r">'.
-						'<a class="color-vin over-child dialog-open" val="dialog_id:107,edit_id:'.$id.'">Отправить в архив</a>'.
+						'<a class="clr6 over-child dialog-open" val="dialog_id:107,edit_id:'.$id.'">Отправить в архив</a>'.
 					'<td class="w35 top r">'.
 			($r['access_admin'] ?
 						'<div onclick="_appEnter('.$r['app_id'].',7)" class="icon icon-admin tool" data-tool="Администрирование"></div>'
@@ -854,7 +854,7 @@ function PHP12_app_archive() {//список приложений, отправ�
 			ORDER BY `uasort`";
 	if(!$spisok = query_arr($sql))
 		return
-			'<div class="center pad30 color-555 fs15">'.
+			'<div class="center pad30 clr9 fs15">'.
 				'Архивных приложений нет.'.
 			'</div>';
 
@@ -865,10 +865,10 @@ function PHP12_app_archive() {//список приложений, отправ�
 		'<div class="line-b over1 over-parent'.$bgCur.'" val="'.$id.'">'.
 			'<table class="bs10 w100p">'.
 				'<tr><td class="w500 top">'.
-						'<a class="dib mt3 fs16 blue" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
-			  (SA ? '<td class="top center w50"><span class="pale fs16 ml30">'.$r['app_id'].'</span>' : '').
+						'<a class="dib mt3 fs16 clr15" onclick="_appEnter('.$r['app_id'].')">'._app($r['app_id'], 'name').'</a>'.
+			  (SA ? '<td class="top center w50"><span class="clr2 fs16 ml30">'.$r['app_id'].'</span>' : '').
 					'<td class="w300 top r">'.
-						'<a class="color-pay over-child dialog-open" val="dialog_id:106,edit_id:'.$id.'">Восстановить из архива</a>'.
+						'<a class="clr11 over-child dialog-open" val="dialog_id:106,edit_id:'.$id.'">Восстановить из архива</a>'.
 			'</table>'.
 		'</div>';
 	}

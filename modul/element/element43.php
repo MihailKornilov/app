@@ -10,7 +10,7 @@ function _element43_struct($el) {
 function _element43_print($el) {
 	return
 	'<div class="center pad10 bg9 bor-dash br3">'.
-		'<div class="fs14 grey">Шаблон записи:</div>'.
+		'<div class="fs14 clr1">Шаблон записи:</div>'.
 		'<div class="fs14 b">'._element('title', $el).'</div>'.
 	'</div>';
 }

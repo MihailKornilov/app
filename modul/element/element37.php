@@ -86,7 +86,7 @@ function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по ка
 	foreach($dlg['cmp'] as $r) {
 		if(empty($r['col']))
 			continue;
-		$colUse[$r['col']] = !empty($r['name']) ? '<i class="color-555 ml10">('.$r['name'].')</i>' : '';
+		$colUse[$r['col']] = !empty($r['name']) ? '<i class="clr9 ml10">('.$r['name'].')</i>' : '';
 	}
 
 	//колонки, которые не должны выбираться
@@ -132,7 +132,7 @@ function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по ка
 		$busy = 0;//занята ли колонка
 		$name = '';
 		if(isset($colUse[$col])) {
-			$color = $uCol == $col ? 'b color-pay' : 'b red';
+			$color = $uCol == $col ? 'b clr11' : 'b clr5';
 			$busy = $uCol == $col ? 0 : 1;
 			$name = $colUse[$col];
 		}
@@ -142,7 +142,7 @@ function _elemVvv37field($dlg, $uCol, $send=array()) {//колонки по ка
 			'busy' => $busy,
 			'content' =>
 				'<div class="'.$color.'">'.
-					'<span class="pale">'.$dlg['name'].'.</span>'.
+					'<span class="clr2">'.$dlg['name'].'.</span>'.
 					$col.
 					$name.
 				'</div>'
@@ -170,7 +170,7 @@ function _elemVvv37fieldDop($uCol) {//дополнительная колонк�
 	$send[] = array(
 		'id' => $col_id,
 		'title' => $DLG['name'].': '.$el['name'],
-		'content' => $DLG['name'].': '.$el['name'].' <b class="pale">'.$col.'</b>'
+		'content' => $DLG['name'].': '.$el['name'].' <b class="clr2">'.$col.'</b>'
 	);
 
 	return $send;
@@ -186,7 +186,7 @@ function _elemVvv37parent($dlg_id, $send) {//колонки родительск
 		$send[] = array(
 			'id' => $id,
 			'title' => $dlg['name'].': '.$cmp['name'],
-			'content' => $dlg['name'].': '.$cmp['name'].' <b class="pale">'.$cmp['col'].'</b>'
+			'content' => $dlg['name'].': '.$cmp['name'].' <b class="clr2">'.$cmp['col'].'</b>'
 		);
 	}
 
@@ -241,7 +241,7 @@ function PHP12_col_select($prm) {//[30] диалог для выбора кол�
 	}
 
 	$send =
-		'<div class="fs16 color-555 mb10 pad10 center bg4 line-b">'.
+		'<div class="fs16 clr9 mb10 pad10 center bg4 line-b">'.
 			'Диалоговое окно <b class="fs16">'.$DLG['name'].'</b>:'.
 		'</div>'.
 		'<div class="mar10">';
@@ -254,13 +254,13 @@ function PHP12_col_select($prm) {//[30] диалог для выбора кол�
 		$name = '';
 		$bg = 'bg6';
 		if(isset($COL_USE[$col])) {
-			$color = $uCol == $col ? 'b color-pay' : 'b red';
+			$color = $uCol == $col ? 'b clr11' : 'b clr5';
 			$busy = $uCol == $col ? 0 : 1;
-			$name = '<span class="color-ref ml5">'.$COL_USE[$col].'<span>';
+			$name = '<span class="clr8 ml5">'.$COL_USE[$col].'<span>';
 			$bg = 'bg1';
 		}
 		$send .=
-			'<div class="el37u '.$bg.' ov7 pad5 mt5 grey curP">'.
+			'<div class="el37u '.$bg.' ov7 pad5 mt5 clr1 curP">'.
 				'<span class="el37col '.$color.'">'.$col.'</span>'.
 				$name.
 			'</div>';

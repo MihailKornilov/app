@@ -87,7 +87,7 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 			$count_next = $limit;
 		$send .=
 			'<div class="over5" onclick="_spisok14Next($(this),'.$ELEM['id'].','.($next + 1).')">'.
-				'<tt class="db center curP fs14 blue pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
+				'<tt class="db center curP fs14 clr15 pad10">Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').'</tt>'.
 			'</div>';
 	}
 

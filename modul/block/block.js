@@ -40,7 +40,7 @@ var _ids = function(v, count) {
 						'<tr><td class="w50">' +
 								'<a val="dialog_id:117,get_id:' + BL.id + '"' +
 								  ' data-tool="info #' + BL.id + '"' +
-								  ' class="dialog-open fs16 blue tool">' +
+								  ' class="dialog-open fs16 clr15 tool">' +
 									'Блок' +
 								'</a>' +
 							'<td class="w90 r pb2">' +
@@ -290,7 +290,7 @@ var _ids = function(v, count) {
 				_bgu.addClass(BL.ov + ' on');
 			 });
 
-		return '<div class="color-555 mt10">Окраска и границы</div>' +
+		return '<div class="clr9 mt10">Окраска и границы</div>' +
 			   '<div id="blk-setup-bg" class="mt5 ml5 center">' +
 					'<table>' +
 
@@ -313,7 +313,7 @@ var _ids = function(v, count) {
 									'<div class="bgu-list">' +
 										'<table>' +
 											'<tr><td><div class="bgu sel mr5 ml30 ' + BGSEL + '">&#10004;</div>' +
-												'<td class="fs14 color-555">Цвет окраски' +
+												'<td class="fs14 clr9">Цвет окраски' +
 										'</table>' +
 										BGU +
 									'</div>' +
@@ -324,7 +324,7 @@ var _ids = function(v, count) {
 									'<div class="bgu-list">' +
 										'<table>' +
 											'<tr><td><div class="bgu sel mr5 ml30 ' + OVSEL + '">&#10057;</div>' +
-												'<td class="fs12 color-555">Изменение окраски<br>при наведении' +
+												'<td class="fs12 clr9">Изменение окраски<br>при наведении' +
 										'</table>' +
 										OVU +
 									'</div>' +
@@ -382,7 +382,7 @@ var _ids = function(v, count) {
 			});
 
 		return '<div id="blk-bg70"' +
-				   ' class="prel dib center w25 bor-e8 grey mr10 mt3 tool"' +
+				   ' class="prel dib center w25 bor-e8 clr1 mr10 mt3 tool"' +
 				   ' data-tool="Окраска согласно<br>цвету фона записи">' +
 					'<div class="galka pabs fs17 pl5 curP' + _dn(_ids(BL.bg)) + '">&#10004;</div>' +
 					'<div class="pabs icon spin"></div>' +
@@ -395,7 +395,7 @@ var _ids = function(v, count) {
 	},
 	_blockUnitPlace = function(BL) {//позиция
 		return  '<table id="elem-pos" class="ml8 mt10">' +
-			'<tr><td class="color-555 pb3 center">Позиция' +
+			'<tr><td class="clr9 pb3 center">Позиция' +
 			'<tr><td><div val="top"' +
 						' class="icon-wiki iw6 mr3 tool' + _dn(BL.pos == 'top','on') + '"' +
 						' data-tool="Вверх-влево">' +
@@ -505,11 +505,11 @@ var _ids = function(v, count) {
 		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-edit-' + EL.id + '">' +
 			'<div class="line-b">' +
 				'<a val="dialog_id:118,get_id:' + EL.id + '"' +
-				  ' class="fs16 blue dialog-open tool' + '"' +
+				  ' class="fs16 clr15 dialog-open tool' + '"' +
 				  ' data-tool="Info #' + EL.id + '">' +
 					'Элемент' +
 				'</a>' +
-		  (SA ? ' <span class="pale fs16 curD">[' + EL.dialog_id + ']</span>' : '') +
+		  (SA ? ' <span class="clr2 fs16 curD">[' + EL.dialog_id + ']</span>' : '') +
 				'<div class="fr mtm3">' +
 					_elemUnitFormat(EL) +
 					_elemUnitAction(EL) +
@@ -687,11 +687,11 @@ var _ids = function(v, count) {
 			return '';
 
 		return '<table class="bs5">' +
-			'<tr><td class="color-555 fs14">Ширина:' +
+			'<tr><td class="clr9 fs14">Ширина:' +
 				'<td><input type="hidden" id="elem-img-width" class="w15" value="' + EL.width + '" />' +
 				'<td class="pl5">' +
 					'<input type="hidden" id="elem-img-height" value="' + EL.num_7 + '" />' +
-			'<tr><td class="color-555 r" colspan="3">' +
+			'<tr><td class="clr9 r" colspan="3">' +
 					'Закруглённые углы: ' +
 					'<input type="hidden" id="elem-img-circle" value="' + EL.num_8 + '" />' +
 		'</table>'
@@ -874,7 +874,7 @@ $(document)
 
 		t._hint({
 			msg:'<input type="hidden" id="elem-width-max" value="' + val + '" />' +
-				'<div class="mt5 ml20 fs11 i pale">' +
+				'<div class="mt5 ml20 fs11 i clr2">' +
 					'<b class="i fs11">Размер элемента</b> будет ' +
 					'<br>' +
 					'подстраиваться под <b class="i fs11">размер блока</b>,' +
@@ -962,19 +962,19 @@ $(document)
 				return '<table class="bs5">' +
 					'<tr><td class="line-b pb3">' +
 							'<button class="vk small w90 fl mr3 bco-copy">копировать</button>'+
-							'<div class="grey fs11"><b class="fs11 color-555">Продублировать</b> выделенные блоки в указанном месте.<div>' +
+							'<div class="clr1 fs11"><b class="fs11 clr9">Продублировать</b> выделенные блоки в указанном месте.<div>' +
 
 					'<tr><td class="pb3">' +
 							'<button class="vk small w90 fl mr3 red bco-move">вырезать</button>'+
-							'<div class="grey fs11">Выделенные блоки будут <b class="fs11 color-555">перенесены</b> в указанное место.<div>' +
+							'<div class="clr1 fs11">Выделенные блоки будут <b class="fs11 clr9">перенесены</b> в указанное место.<div>' +
 				'</table>';
 			},
 			bcoMotion = function() {//сообщение когда блоки выбраны для копирования
 				var isMove = _num(_cookie('block_is_move'));
-				return '<div class="b color-555 mar10 center">' +
+				return '<div class="b clr9 mar10 center">' +
 							'Выбран' + _end(c, ['', 'о']) + ' ' + c + ' блок' + _end(c, ['', 'а', 'ов']) +
 							'<br>' +
-							'для ' + (isMove ? '<b class="red">переноса</b>' : 'копирования') +
+							'для ' + (isMove ? '<b class="clr5">переноса</b>' : 'копирования') +
 					   '</div>' +
 					'<div class="_info ml10 mr10">' +
 						'Укажите <b>пустой блок</b> для вставки.' +

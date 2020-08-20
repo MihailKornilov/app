@@ -23,7 +23,7 @@ var ZINDEX = 1000,
 				if(v.busy_obj)
 					$(v.busy_obj)._hint({
 						msg:res.text,
-						color:'red',
+						color:'clr5',
 						pad:10,
 						show:1
 					});
@@ -253,7 +253,7 @@ var ZINDEX = 1000,
 	},
 	_pr = function(v) {//представление массива в виде таблицы
 		if(v instanceof jQuery)
-			return '<div class="fs11 red">jQuery</div>';
+			return '<div class="fs11 clr5">jQuery</div>';
 		var send = '<div class="dib bor1 pad5 mt2 bg-gr1">' +
 				   '<table>',
 			i;
@@ -262,9 +262,9 @@ var ZINDEX = 1000,
 			if(typeof v[i] == 'object')
 				txt = _pr(v[i]);
 			if(typeof v[i] == 'function')
-				txt = '<div class="fs11 color-acc">Function</div>';
+				txt = '<div class="fs11 clr14">Function</div>';
 			if(typeof v[i] == 'undefined')
-				txt = '<div class="fs11 pale">undefined</div>';
+				txt = '<div class="fs11 clr2">undefined</div>';
 			send += '<tr><td class="r top b pr3">' + i + ': ' +
 						'<td>' + txt;
 		}
@@ -275,7 +275,7 @@ var ZINDEX = 1000,
 		var BL = _attr_bl(block_id),
 			c = 0;
 
-		_forEq(BL.find('.red'), function(sp) {
+		_forEq(BL.find('.clr5'), function(sp) {
 			c += _num(sp.html());
 		});
 
@@ -285,7 +285,7 @@ var ZINDEX = 1000,
 		BL.closest('.bl-div')
 		  .prev()
 		  .find('.bg-fee')
-		  .addClass('red b center fs16')
+		  .addClass('clr5 b center fs16')
 		  .css('vertical-align', 'middle')
 		  .html(c ? c : '');
 	};
@@ -411,13 +411,13 @@ $(document)
 				'<div class="pad5 ' + _dn(req.success, 'bg-dfd') + _dn(req.error, 'bg-fcc') + '">' +
 					'<b>post</b>' +
 					'<a id="repeat">повтор</a>' +
-	 (req.success ? '<b class="color-pay fr">success</b>' : '') +
-	   (req.error ? '<b class="color-ref fr">error</b>' : '') +
+	 (req.success ? '<b class="clr11 fr">success</b>' : '') +
+	   (req.error ? '<b class="clr8 fr">error</b>' : '') +
 				'</div>' +
 				'<div class="mt3">' + _pr(req.post) + '</div>',
 			link =  '<div class="bg-gr1 bor1 pad5 mt10">' +
 						'<b>link:</b> ' +
-						'<span class="color-acc">' + req.link + '</span>' +
+						'<span class="clr14">' + req.link + '</span>' +
 					'</div>',
 			file =  '<div class="bg-gr1 bor1 pad5 mt3">' +
 						'<b>file:</b> ' +
@@ -436,7 +436,7 @@ $(document)
 					sql = '<div class="mt20">' + req[i] + '</div>';
 					break;
 				default:
-					var len = req[i] && req[i].length ? '<b class="pale ml10">' + req[i].length + '</b>' : '';
+					var len = req[i] && req[i].length ? '<b class="clr2 ml10">' + req[i].length + '</b>' : '';
 					html += '<div class="bg-eee bor1 pad5 mt20 curP over1" onclick="$(this).next().slideToggle()">' +
 								'<b>' + i + '</b>' +
 								len +

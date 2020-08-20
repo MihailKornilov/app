@@ -174,7 +174,7 @@ function _dropdown($v=array()) {//выпадающее поле - ссылка
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
 	'<div class="_dropdown">'.
-		'<a class="dd-head grey">'.$v['placeholder'].'</a>'.
+		'<a class="dd-head clr1">'.$v['placeholder'].'</a>'.
 	'</div>';
 }
 function _yearleaf($v=array()) {//перелистывание годов

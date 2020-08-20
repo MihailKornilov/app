@@ -302,7 +302,7 @@ function _daNet($v) {//$v: 1 -> да, 0 -> нет
 function _msgRed($msg) {//сообщение об ошибке красного цвета
 	if(!DEBUG)
 		return '';
-	return '<div class="fs10 red">'.$msg.'</div>';
+	return '<div class="fs10 clr5">'.$msg.'</div>';
 }
 function _hide0($v) {//возвращает пустоту, если значение 0 или негатив
 	return $v ? $v : '';
@@ -516,17 +516,17 @@ function _pr($arr, $emptyReturn=false) {//аналог функции print_r
 	'</div>';
 }
 function _prMsg($msg) {
-	return '<div class="dib grey i pad5 bor-e8">'.$msg.'</div>';
+	return '<div class="dib clr1 i pad5 bor-e8">'.$msg.'</div>';
 }
 function _prFor($arr, $sub=0) {//перебор массива
 	$send = '';
 	foreach($arr as $id => $r) {
 		$send .=
 			'<div class="'.($sub ? 'ml20' : '').(is_array($r) ? '' : ' mtm2').'">'.
-				'<span class="'.($sub ? 'fs11 color-acc' : 'fs12 black').(is_array($r) ? ' b u curP' : '').'"'.(is_array($r) ? ' onclick="$(this).next().slideToggle(300)"' : '').'>'.
+				'<span class="'.($sub ? 'fs11 clr14' : 'fs12 clr0').(is_array($r) ? ' b u curP' : '').'"'.(is_array($r) ? ' onclick="$(this).next().slideToggle(300)"' : '').'>'.
 					$id.':'.
 				'</span> '.
-				'<span class="grey fs11">'.
+				'<span class="clr1 fs11">'.
 					(is_array($r) ? _prFor($r, 1) : $r).
 				'</span>'.
 			'</div>';

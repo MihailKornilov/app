@@ -78,11 +78,11 @@ function _debug_cache() {//результат использования кеш�
 		'<table class="_stab small mar10">'.
 			'<tr><td class="">Общий кеш:'.
 				'<td class="r"><b>'.$size.'</b> mb'.
-			'<tr><td class="r color-ref">Занято:'.
-				'<td class="color-ref r"><b>'.$busy.'</b> mb'.
-				'<td class="grey">'.($cc ? $cc.' запис'._end($cc, 'ь', 'и', 'ей') : 'записей нет').
-			'<tr><td class="r color-pay">Свободно:'.
-				'<td class="color-pay r"><b>'.$avail.'</b> mb'.
+			'<tr><td class="r clr8">Занято:'.
+				'<td class="clr8 r"><b>'.$busy.'</b> mb'.
+				'<td class="clr1">'.($cc ? $cc.' запис'._end($cc, 'ь', 'и', 'ей') : 'записей нет').
+			'<tr><td class="r clr11">Свободно:'.
+				'<td class="clr11 r"><b>'.$avail.'</b> mb'.
 		'</table>';
 
 
@@ -143,12 +143,12 @@ function _debug_cache_tr($r, $n) {
 	if($t < 60)
 		$t .= ' s';
 	else
-		$t = '<b class="grey">'.floor($t / 60).'</b> m';
+		$t = '<b class="clr1">'.floor($t / 60).'</b> m';
 	return '<tr>'.
-		'<td class="r grey">'.($n + 1).
+		'<td class="r clr1">'.($n + 1).
 		'<td><a class="fs12" onclick=_cacheContentOpen("'.$r['info'].'")>'.$r['info'].'</a>'.
 		'<td class="r">'._sumSpace($r['mem_size']).
-		'<td class="r pale">'.$t;
+		'<td class="r clr2">'.$t;
 
 }
 function _debug_cache_clear() {//очистка кеша
@@ -171,10 +171,10 @@ function _debug_sql() {//получение всех запросов
 		$t = $SQL_QUERY_T[$n];
 		$txt .=
 			'<tr class="over5">'.
-				'<td class="w25 pale r top">'.($n+1).
+				'<td class="w25 clr2 r top">'.($n+1).
 				'<td class="top '.($t > 0.05 ? 'bg-fcc' : 'bg-dfd').'">'.
 					'<textarea class="w100p h20 bg-fff fs12">'.$r.';</textarea>'.
-				'<td class="w35 r top '.($t > 0.05 ? 'b red' : 'grey').'">'._hide0($t);
+				'<td class="w35 r top '.($t > 0.05 ? 'b clr5' : 'clr1').'">'._hide0($t);
 	}
 	$txt .= '</table>';
 

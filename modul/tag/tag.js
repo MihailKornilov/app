@@ -1583,7 +1583,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		LIST.html(html);
 	}
 	function valueSet(v) {
-		HEAD._dn(!(o.title0_grey && (!v || o.nosel)), 'grey');
+		HEAD._dn(!(o.title0_grey && (!v || o.nosel)), 'clr1');
 		if(o.nosel)
 			return;
 		HEAD.html(MASS_ASS[v]);
@@ -1731,7 +1731,7 @@ $.fn._selem = function(o) {//выбор элемента - звезда
 		'<div class="_selem dib prel bg-fff over3" style="width:' + o.width + 'px">' +
 			'<div class="icon icon-star pabs"></div>' +
 			'<div class="icon icon-del pl pabs' + _dn(V) + '"></div>' +
-			'<input type="text" readonly class="w100p curP color-pay" placeholder="' + o.placeholder + '" value="' + o.title + '" />' +
+			'<input type="text" readonly class="w100p curP clr11" placeholder="' + o.placeholder + '" value="' + o.title + '" />' +
 		'</div>';
 	t.after(html);
 
@@ -1742,7 +1742,7 @@ $.fn._selem = function(o) {//выбор элемента - звезда
 		if(!o.dss) {
 			SELEM._hint({
 				msg:'Не указан диалог для выбора значения',
-				color:'red',
+				color:'clr5',
 				pad:10,
 				show:1
 			});

@@ -308,12 +308,12 @@ function PHP12_user_active() {//общая картина использован
 	$send = '<table>';
 	for($hour = 0; $hour < 24; $hour++) {
 		$send .= '<tr class="over3">'.
-					'<td class="h25 bg-fff fs16 r color-555 bottom pr5">'.$hour;
+					'<td class="h25 bg-fff fs16 r clr9 bottom pr5">'.$hour;
 		for($min = 0; $min < 6; $min++) {
 			$send .= '<td class="tdd bottom">'.
 						'<div class="m10'._dn($min, 'll').' prel">'.
 							_user_active_minute($data, $hour, $min).
-	((!$m10show || $hour == 23) && $min < 5 ? '<div class="m10num pabs pale">'.(($min+1)*10).'</div>' : '').
+	((!$m10show || $hour == 23) && $min < 5 ? '<div class="m10num pabs clr2">'.(($min+1)*10).'</div>' : '').
 						'</div>';
 		}
 		if($m10show++ >= $m10step)
@@ -392,7 +392,7 @@ function PHP12_user_invite() {//ссылка на приглашение для 
 		if(query_value($sql))
 			return
 			'<input type="text"'.
-			  ' class="w100p color-vin bg14"'.
+			  ' class="w100p clr6 bg14"'.
 			  ' readonly'.
 			  ' value="Для получения ссылки приглашения перезагрузите страницу"'.
 			'/>';
@@ -408,7 +408,7 @@ function PHP12_user_invite() {//ссылка на приглашение для 
 	'<div class="prel">'.
 		'<div class="icon icon-copy pabs r5 top5"></div>'.
 		'<input type="text"'.
-			  ' class="w100p blue b bg4 pr30"'.
+			  ' class="w100p clr15 b bg4 pr30"'.
 			  ' readonly'.
 			  ' value="http'.(LOCAL ? '://nyandoma' : 's://app.gim-system.ru').'/index.php?invite='.$hash.'"'.
 		'/>'.

@@ -25,7 +25,7 @@ function _element76_print($el, $prm) {
 	'<div id="'._elemAttrId($el, $prm).'_video" class="_video prel"'._elemStyleWidth($el).'>'.
 		'<div class="icon icon-video pabs l5 top5"></div>'.
 		'<div class="icon icon-del pl pabs r5 top5'._dn($v).'"></div>'.
-		'<input type="text" id="'._elemAttrId($el, $prm).'" class="w100p b blue pl25"'.$disabled.' value="'.$v.'" />'.
+		'<input type="text" id="'._elemAttrId($el, $prm).'" class="w100p b clr15 pl25"'.$disabled.' value="'.$v.'" />'.
 		$frame.
 	'</div>';
 }

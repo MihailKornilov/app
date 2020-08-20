@@ -19,7 +19,7 @@ function _element92_print($el, $prm) {
 	foreach($dlgIds as $r) {
 		if(!$DLG = _dialogQuery($r['dlg_id']))
 			continue;
-		$send .= '<tr class="color-555">'.
+		$send .= '<tr class="clr9">'.
 					'<td>'.$DLG['name'].
 					'<td class="center" id="el92_'.$r['dlg_id'].'">'.
 					'<td class="sum92 r">'.

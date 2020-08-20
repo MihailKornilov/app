@@ -187,7 +187,7 @@ function _filterCalendarContent($el, $mon, $v) {
 		$day = $mon.'-'.($n < 10 ? '0' : '').$n;
 		$cur = TODAY == $day ? ' b' : '';
 		$on = empty($days[$day]) ? '' : ' on';
-		$old = $unix + $n * 86400 <= TODAY_UNIXTIME ? ' grey' : '';
+		$old = $unix + $n * 86400 <= TODAY_UNIXTIME ? ' clr1' : '';
 		$sel = $day == $v ? ' sel' : '';
 		$val = $on ? ' val="'.$day.'"' : '';
 		$send .= '<td class="d '.$cur.$on.$old.$sel.'"'.$val.'>'.$n;

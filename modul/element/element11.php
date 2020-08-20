@@ -235,16 +235,16 @@ function PHP12_v_choose_global($prm) {//глобальные значения д
 	return
 	'<div class="prel pad10">'.
 		'<div class="elm-choose'.($v == -21 ? ' sel' : '').'" val="-21"></div>'.
-		'<div class="fs17 b center pad10 color-555">Текущий пользователь</div>'.
+		'<div class="fs17 b center pad10 clr9">Текущий пользователь</div>'.
 	'</div>'.
 	'<div class="prel pad10">'.
 		'<div class="elm-choose'.($v == -22 ? ' sel' : '').'" val="-22"></div>'.
-		'<div class="fs17 b center pad10 color-555">Текущий диалог</div>'.
+		'<div class="fs17 b center pad10 clr9">Текущий диалог</div>'.
 	'</div>'.
 	'<div class="prel pad10">'.
 		'<div class="elm-choose'.($v == -23 ? ' sel' : '').'" val="-23"></div>'.
-		'<div class="fs17 b center pad10 color-555">Текущая запись</div>'.
-		'<div class="center pad5 grey">Если открыт диалог для редактирования данных</div>'.
+		'<div class="fs17 b center pad10 clr9">Текущая запись</div>'.
+		'<div class="center pad5 clr1">Если открыт диалог для редактирования данных</div>'.
 	'</div>';
 }
 function PHP12_v_choose_vvv($prm) {

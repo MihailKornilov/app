@@ -39,7 +39,7 @@ function _elem300vkRes($user_id, $isArr=false) {//данные пользова�
 	));
 
 	if(empty($res['response']))
-		return $isArr ? array() : '<div class="red fs11">Данные из VK не получены</div>';
+		return $isArr ? array() : '<div class="clr5 fs11">Данные из VK не получены</div>';
 
 	return $isArr ? $res['response'][0] : _elem300Sel($res['response'][0]);
 }
@@ -60,7 +60,7 @@ function _elem300Sel($res) {//выбранный пользователь ВК
 				'<a href="//vk.com/id'.$res['id'].'" target="_blank">'.
 					$res['first_name'].' '.$res['last_name'].
 				'</a>'.
-				'<div class="grey mt3">'._elem300Place($res).'</div>'.
+				'<div class="clr1 mt3">'._elem300Place($res).'</div>'.
 	'</table>';
 }
 function _elem300VkIdTest($DLG, $v, $user_id) {//проверка, чтобы два одинаковый `vk_id` не попали в таблицу `_user`

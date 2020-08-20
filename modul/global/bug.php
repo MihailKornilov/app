@@ -65,7 +65,7 @@ function PHP12_bug_user($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего зарегистрировано пользователей:<td class="w50 r b color-pay">'.$USER.
+		'<tr><td class="clr1 b">Всего зарегистрировано пользователей:<td class="w50 r b clr11">'.$USER.
 	'</table>'.
 	_bug_script($prm);
 }
@@ -96,34 +96,34 @@ function PHP12_bug_page($prm) {//страницы
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего страниц:<td class="w50 r b color-pay">'.count($PG).
-		'<tr><td class="color-del">Некорректный ID родителя `parent_id`:<td class="r b red">'._hide0($parentC).
-		'<tr><td class="color-del">Некорректный ID связки `common_id`:<td class="r b red">'._hide0($commonC).
-		'<tr><td class="color-del">Блоки от потерянных или удалённых страниц:<td class="r b red">'.PHP12_bug_page_blk($PG).
-		'<tr><td class="color-del">Заметки от потерянных страниц:<td class="r b red">'.PHP12_bug_page_note($PG).
+		'<tr><td class="clr1 b">Всего страниц:<td class="w50 r b clr11">'.count($PG).
+		'<tr><td class="clr7">Некорректный ID родителя `parent_id`:<td class="r b clr5">'._hide0($parentC).
+		'<tr><td class="clr7">Некорректный ID связки `common_id`:<td class="r b clr5">'._hide0($commonC).
+		'<tr><td class="clr7">Блоки от потерянных или удалённых страниц:<td class="r b clr5">'.PHP12_bug_page_blk($PG).
+		'<tr><td class="clr7">Заметки от потерянных страниц:<td class="r b clr5">'.PHP12_bug_page_note($PG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Диалоги:'.
-		'<tr><td class="color-del">Переход на страницу после внесения:<td class="w50 r b red">'.PHP12_bug_page_dlg_insert($PG).
-		'<tr><td class="color-del">Переход на страницу после редактирования:<td class="r b red">'.PHP12_bug_page_dlg_edit($PG).
-		'<tr><td class="color-del">Переход на страницу после удаления:<td class="r b red">'.PHP12_bug_page_dlg_del($PG).
+		'<tr><td class="clr9 b" colspan="2">Диалоги:'.
+		'<tr><td class="clr7">Переход на страницу после внесения:<td class="w50 r b clr5">'.PHP12_bug_page_dlg_insert($PG).
+		'<tr><td class="clr7">Переход на страницу после редактирования:<td class="r b clr5">'.PHP12_bug_page_dlg_edit($PG).
+		'<tr><td class="clr7">Переход на страницу после удаления:<td class="r b clr5">'.PHP12_bug_page_dlg_del($PG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Элементы:'.
-		'<tr><td class="color-del">[3] Меню страниц - некорректное указание страницы:<td class="w50 r b red">'.PHP12_bug_page_3menu($PG).
+		'<tr><td class="clr9 b" colspan="2">Элементы:'.
+		'<tr><td class="clr7">[3] Меню страниц - некорректное указание страницы:<td class="w50 r b clr5">'.PHP12_bug_page_3menu($PG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Действия:'.
-		'<tr><td class="color-del">204 - переход на страницу (элемент):<td class="w50 r b red">'.PHP12_bug_page_204act($PG).
-		'<tr><td class="color-del">214 - переход на страницу (блок):<td class="r b red">'.PHP12_bug_page_214act($PG).
-		'<tr><td class="color-del">221 - переход на страницу (клик по элементу):<td class="r b red">'.PHP12_bug_page_221act($PG).
+		'<tr><td class="clr9 b" colspan="2">Действия:'.
+		'<tr><td class="clr7">204 - переход на страницу (элемент):<td class="w50 r b clr5">'.PHP12_bug_page_204act($PG).
+		'<tr><td class="clr7">214 - переход на страницу (блок):<td class="r b clr5">'.PHP12_bug_page_214act($PG).
+		'<tr><td class="clr7">221 - переход на страницу (клик по элементу):<td class="r b clr5">'.PHP12_bug_page_221act($PG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-del">Доступ к страницам для пользователей:<td class="w50 r b red">'.PHP12_bug_page_user_access($PG).
+		'<tr><td class="clr7">Доступ к страницам для пользователей:<td class="w50 r b clr5">'.PHP12_bug_page_user_access($PG).
 	'</table>'.
 	_bug_script($prm);
 }
@@ -265,47 +265,47 @@ function PHP12_bug_dialog($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего диалогов:<td class="w50 r b color-pay">'._hide0($c).
-		'<tr><td class="color-del">Некорректный ID родителя `dialog_id_parent`:<td class="r b red">'._hide0($parentC).
-		'<tr><td class="color-del">Некорректный `dialog_id_unit_get` (принимает данные записи):<td class="r b red">'._hide0($uGetC).
+		'<tr><td class="clr1 b">Всего диалогов:<td class="w50 r b clr11">'._hide0($c).
+		'<tr><td class="clr7">Некорректный ID родителя `dialog_id_parent`:<td class="r b clr5">'._hide0($parentC).
+		'<tr><td class="clr7">Некорректный `dialog_id_unit_get` (принимает данные записи):<td class="r b clr5">'._hide0($uGetC).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-del">Страница принимает данные записи:<td class="w50 r b red">'.PHP12_bug_dialog_page_get($DLG).
-		'<tr><td class="color-del">Блоки потерянных диалогов:<td class="r b red">'.PHP12_bug_dialog_blk($DLG).
-		'<tr><td class="color-del">История действий:<td class="r b red">'.PHP12_bug_dialog_history($DLG).
-		'<tr><td class="color-del">Шаблоны документов:<td class="r b red">'.PHP12_bug_dialog_template($DLG).
+		'<tr><td class="clr7">Страница принимает данные записи:<td class="w50 r b clr5">'.PHP12_bug_dialog_page_get($DLG).
+		'<tr><td class="clr7">Блоки потерянных диалогов:<td class="r b clr5">'.PHP12_bug_dialog_blk($DLG).
+		'<tr><td class="clr7">История действий:<td class="r b clr5">'.PHP12_bug_dialog_history($DLG).
+		'<tr><td class="clr7">Шаблоны документов:<td class="r b clr5">'.PHP12_bug_dialog_template($DLG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Элементы:'.
-		'<tr><td class="color-del">[2] Кнопка:<td class="w50 r b red">'.PHP12_bug_dialog_elem2($DLG).
-		'<tr><td class="color-del">[14] Список-шаблон:<td class="r b red">'.PHP12_bug_dialog_elem14($DLG).
-		'<tr><td class="color-del">[23] Список-таблица:<td class="r b red">'.PHP12_bug_dialog_elem23($DLG).
-		'<tr><td class="color-del">[29] Select-связка:<td class="r b red">'.PHP12_bug_dialog_elem29($DLG).
-		'<tr><td class="color-del">[31] Выбор галочками:<td class="r b red">'.PHP12_bug_dialog_elem31($DLG).
-		'<tr><td class="color-del">[59] Кнопка-связка:<td class="r b red">'.PHP12_bug_dialog_elem59($DLG).
-		'<tr><td class="color-del">[87] Циферка в меню:<td class="r b red">'.PHP12_bug_dialog_elem87($DLG).
+		'<tr><td class="clr9 b" colspan="2">Элементы:'.
+		'<tr><td class="clr7">[2] Кнопка:<td class="w50 r b clr5">'.PHP12_bug_dialog_elem2($DLG).
+		'<tr><td class="clr7">[14] Список-шаблон:<td class="r b clr5">'.PHP12_bug_dialog_elem14($DLG).
+		'<tr><td class="clr7">[23] Список-таблица:<td class="r b clr5">'.PHP12_bug_dialog_elem23($DLG).
+		'<tr><td class="clr7">[29] Select-связка:<td class="r b clr5">'.PHP12_bug_dialog_elem29($DLG).
+		'<tr><td class="clr7">[31] Выбор галочками:<td class="r b clr5">'.PHP12_bug_dialog_elem31($DLG).
+		'<tr><td class="clr7">[59] Кнопка-связка:<td class="r b clr5">'.PHP12_bug_dialog_elem59($DLG).
+		'<tr><td class="clr7">[87] Циферка в меню:<td class="r b clr5">'.PHP12_bug_dialog_elem87($DLG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Планировщик:'.
-		'<tr><td class="color-del">Исходный список:<td class="w50 r b red">'.PHP12_bug_dialog_cron_src($DLG).
-		'<tr><td class="color-del">Список-получатель:<td class="r b red">'.PHP12_bug_cron_dst($DLG).
+		'<tr><td class="clr9 b" colspan="2">Планировщик:'.
+		'<tr><td class="clr7">Исходный список:<td class="w50 r b clr5">'.PHP12_bug_dialog_cron_src($DLG).
+		'<tr><td class="clr7">Список-получатель:<td class="r b clr5">'.PHP12_bug_cron_dst($DLG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Глобальные счётчики:'.
-		'<tr><td class="color-del">ID диалога в настройках:<td class="w50 r b red">'.PHP12_bug_dialog_counter($DLG).
-		'<tr><td class="color-del">ID диалога в содержании:<td class="r b red">'.PHP12_bug_dialog_counter_v($DLG).
+		'<tr><td class="clr9 b" colspan="2">Глобальные счётчики:'.
+		'<tr><td class="clr7">ID диалога в настройках:<td class="w50 r b clr5">'.PHP12_bug_dialog_counter($DLG).
+		'<tr><td class="clr7">ID диалога в содержании:<td class="r b clr5">'.PHP12_bug_dialog_counter_v($DLG).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Действия:'.
-		'<tr><td class="color-del">205 - открытие диалога (элемент):<td class="w50 r b red">'.PHP12_bug_dialog_205act($DLG).
-		'<tr><td class="color-del">215 - открытие диалога (блок):<td class="r b red">'.PHP12_bug_dialog_215act($DLG).
-		'<tr><td class="color-del">218 - Блок принимает данные записи:<td class="r b red">'.PHP12_bug_dialog_218act($DLG).
-		'<tr><td class="color-del">222 - открытие диалога (клик по элементу):<td class="r b red">'.PHP12_bug_dialog_222act($DLG).
+		'<tr><td class="clr9 b" colspan="2">Действия:'.
+		'<tr><td class="clr7">205 - открытие диалога (элемент):<td class="w50 r b clr5">'.PHP12_bug_dialog_205act($DLG).
+		'<tr><td class="clr7">215 - открытие диалога (блок):<td class="r b clr5">'.PHP12_bug_dialog_215act($DLG).
+		'<tr><td class="clr7">218 - Блок принимает данные записи:<td class="r b clr5">'.PHP12_bug_dialog_218act($DLG).
+		'<tr><td class="clr7">222 - открытие диалога (клик по элементу):<td class="r b clr5">'.PHP12_bug_dialog_222act($DLG).
 	'</table>'.
 	_bug_script($prm);
 }
@@ -546,21 +546,21 @@ function PHP12_bug_block($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего блоков:<td class="w50 r b color-pay">'.count($BLK).
-		'<tr><td class="color-del">Некорректный ID родителя `parent_id`:<td class="r b red">'._hide0($parentC).
-		'<tr><td class="color-del">Рядом стоящие блоки `xx_ids`:<td class="r b red">'._hide0($xxC).
+		'<tr><td class="clr1 b">Всего блоков:<td class="w50 r b clr11">'.count($BLK).
+		'<tr><td class="clr7">Некорректный ID родителя `parent_id`:<td class="r b clr5">'._hide0($parentC).
+		'<tr><td class="clr7">Рядом стоящие блоки `xx_ids`:<td class="r b clr5">'._hide0($xxC).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Элементы:'.
-		'<tr><td class="color-del">Размещение в блоках:<td class="w50 r b red">'.PHP12_bug_block_elem_parent().
-		'<tr><td class="color-del">[57] Меню переключения блоков:<td class="r b red">'.PHP12_bug_block_elem57($BLK).
+		'<tr><td class="clr9 b" colspan="2">Элементы:'.
+		'<tr><td class="clr7">Размещение в блоках:<td class="w50 r b clr5">'.PHP12_bug_block_elem_parent().
+		'<tr><td class="clr7">[57] Меню переключения блоков:<td class="r b clr5">'.PHP12_bug_block_elem57($BLK).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Действия - потерянные блоки:'.
-		'<tr><td class="color-del">201 - скрытие/показ блоков (для элемента):<td class="w50 r b red">'.PHP12_bug_block_act201($BLK).
-		'<tr><td class="color-del">211 - скрытие/показ блоков (для блоков):<td class="r b red">'.PHP12_bug_block_act211($BLK).
+		'<tr><td class="clr9 b" colspan="2">Действия - потерянные блоки:'.
+		'<tr><td class="clr7">201 - скрытие/показ блоков (для элемента):<td class="w50 r b clr5">'.PHP12_bug_block_act201($BLK).
+		'<tr><td class="clr7">211 - скрытие/показ блоков (для блоков):<td class="r b clr5">'.PHP12_bug_block_act211($BLK).
 	'</table>'.
 	_bug_script($prm);
 }
@@ -662,74 +662,74 @@ function PHP12_bug_element($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего элементов:<td class="w50 r b color-pay">'.$c.
-		'<tr><td class="color-del">Некорректный ID родителя `parent_id`:<td class="r b red">'._hide0($parentC).
-		'<tr><td class="color-del">Некорректный ID элемента-колонки:<td class="r b red">'._hide0($colC).
+		'<tr><td class="clr1 b">Всего элементов:<td class="w50 r b clr11">'.$c.
+		'<tr><td class="clr7">Некорректный ID родителя `parent_id`:<td class="r b clr5">'._hide0($parentC).
+		'<tr><td class="clr7">Некорректный ID элемента-колонки:<td class="r b clr5">'._hide0($colC).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-del">Динамическая заливка в блоке:<td class="w50 r b red">'.PHP12_bug_element_block_bg($ELM).
-		'<tr><td class="color-del">Параметры в шаблонах документов:<td class="r b red">'.PHP12_bug_element_template_prm($ELM).
-		'<tr><td class="color-del">Данные фильтров:<td class="r b red">'.PHP12_bug_element_filter($ELM).
+		'<tr><td class="clr7">Динамическая заливка в блоке:<td class="w50 r b clr5">'.PHP12_bug_element_block_bg($ELM).
+		'<tr><td class="clr7">Параметры в шаблонах документов:<td class="r b clr5">'.PHP12_bug_element_template_prm($ELM).
+		'<tr><td class="clr7">Данные фильтров:<td class="r b clr5">'.PHP12_bug_element_filter($ELM).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Диалоги:'.
-		'<tr><td class="color-del">История действий:<td class="w50 r b red">'.PHP12_bug_element_dlg_history($ELM).
-		'<tr><td class="color-del">Подмена значений через [42]:<td class="r b red">'.PHP12_bug_element_dlg_42($ELM).
-		'<tr><td class="color-del">Колонка по умолчанию:<td class="r b red">'.PHP12_bug_element_dlg_col_def($ELM).
+		'<tr><td class="clr9 b" colspan="2">Диалоги:'.
+		'<tr><td class="clr7">История действий:<td class="w50 r b clr5">'.PHP12_bug_element_dlg_history($ELM).
+		'<tr><td class="clr7">Подмена значений через [42]:<td class="r b clr5">'.PHP12_bug_element_dlg_42($ELM).
+		'<tr><td class="clr7">Колонка по умолчанию:<td class="r b clr5">'.PHP12_bug_element_dlg_col_def($ELM).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Действия:'.
-		'<tr><td class="color-del">202 - Установка значения элементу (для элемента):<td class="w50 r b red">'.PHP12_bug_element_act202($ELM).
-		'<tr><td class="color-del">203 - Блокировка элементов (для элемента):<td class="r b red">'.PHP12_bug_element_act203($ELM).
-		'<tr><td class="color-del">206 - Установка фокуса (для элемента):<td class="r b red">'.PHP12_bug_element_act206($ELM).
-		'<tr><td class="color-del">212 - Установка значения элементу (для блока):<td class="r b red">'.PHP12_bug_element_act212($ELM).
-		'<tr><td class="color-del">213 - Блокировка элементов (для блока):<td class="r b red">'.PHP12_bug_element_act213($ELM).
-		'<tr><td class="color-del">216 - Установка фокуса (для блока):<td class="r b red">'.PHP12_bug_element_act216($ELM).
-		'<tr><td class="color-del">223 - Тёмная подсказка при наведении (для элемента):<td class="r b red">'.PHP12_bug_element_act223($ELM).
+		'<tr><td class="clr9 b" colspan="2">Действия:'.
+		'<tr><td class="clr7">202 - Установка значения элементу (для элемента):<td class="w50 r b clr5">'.PHP12_bug_element_act202($ELM).
+		'<tr><td class="clr7">203 - Блокировка элементов (для элемента):<td class="r b clr5">'.PHP12_bug_element_act203($ELM).
+		'<tr><td class="clr7">206 - Установка фокуса (для элемента):<td class="r b clr5">'.PHP12_bug_element_act206($ELM).
+		'<tr><td class="clr7">212 - Установка значения элементу (для блока):<td class="r b clr5">'.PHP12_bug_element_act212($ELM).
+		'<tr><td class="clr7">213 - Блокировка элементов (для блока):<td class="r b clr5">'.PHP12_bug_element_act213($ELM).
+		'<tr><td class="clr7">216 - Установка фокуса (для блока):<td class="r b clr5">'.PHP12_bug_element_act216($ELM).
+		'<tr><td class="clr7">223 - Тёмная подсказка при наведении (для элемента):<td class="r b clr5">'.PHP12_bug_element_act223($ELM).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Глобальные счётчики:'.
-		'<tr><td class="color-del">Настройка счётчика:<td class="w50 r b red">'.PHP12_bug_element_counter($ELM).
-		'<tr><td class="color-del">Данные счётчика:<td class="r b red">'.PHP12_bug_element_counter_v($ELM).
+		'<tr><td class="clr9 b" colspan="2">Глобальные счётчики:'.
+		'<tr><td class="clr7">Настройка счётчика:<td class="w50 r b clr5">'.PHP12_bug_element_counter($ELM).
+		'<tr><td class="clr7">Данные счётчика:<td class="r b clr5">'.PHP12_bug_element_counter_v($ELM).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Планировщик:'.
-		'<tr><td class="color-del">Условия [40]:<td class="w50 r b red">'.PHP12_bug_element_cron_src($ELM).
-		'<tr><td class="color-del">Значения для внесения:<td class="r b red">'.PHP12_bug_element_cron_dst($ELM).
+		'<tr><td class="clr9 b" colspan="2">Планировщик:'.
+		'<tr><td class="clr7">Условия [40]:<td class="w50 r b clr5">'.PHP12_bug_element_cron_src($ELM).
+		'<tr><td class="clr7">Значения для внесения:<td class="r b clr5">'.PHP12_bug_element_cron_dst($ELM).
 	'</table>'.
 
 	'<table class="_stab w100p mt10">'.
-		'<tr><td class="color-555 b" colspan="2">Элементы в элементах:'.
-		'<tr><td class="color-del">[7] Фильтр-поиск:                            <td class="w50 r b red">'.PHP12_bug_element_elem7($ELM).
-		'<tr><td class="color-del">[11] Вставка значения:                       <td class="r b red">'.PHP12_bug_element_elem11($ELM).
-		'<tr><td class="color-del">[14] Список-шаблон:                          <td class="r b red">'.PHP12_bug_element_elem14($ELM).
-		'<tr><td class="color-del">[15] Количество строк списка:                <td class="r b red">'.PHP12_bug_element_elem15($ELM).
-		'<tr><td class="color-del">[16] Radio - произвольные значения:          <td class="r b red">'.PHP12_bug_element_elem16($ELM).
-		'<tr><td class="color-del">[23] Список-таблица:                         <td class="r b red">'.PHP12_bug_element_elem23($ELM).
-		'<tr><td class="color-del">[29] Select: выбор записи из другого списка: <td class="r b red">'.PHP12_bug_element_elem29($ELM).
-		'<tr><td class="color-del">[31] Выбор нескольких значений галочками:    <td class="r b red">'.PHP12_bug_element_elem31($ELM).
-		'<tr><td class="color-del">[40] Фильтрование списка:                    <td class="r b red">'.PHP12_bug_element_elem40($ELM).
-		'<tr><td class="color-del">[44] Сборный текст:                          <td class="r b red">'.PHP12_bug_element_elem44($ELM).
-		'<tr><td class="color-del">[54] Количество значений привязанного списка:<td class="r b red">'.PHP12_bug_element_elem54($ELM).
-		'<tr><td class="color-del">[55] Сумма значений привязанного списка:     <td class="r b red">'.PHP12_bug_element_elem55($ELM).
-		'<tr><td class="color-del">[57] Меню переключения блоков:               <td class="r b red">'.PHP12_bug_element_elem57($ELM).
-		'<tr><td class="color-del">[62] Фильтр: галочка:                        <td class="r b red">'.PHP12_bug_element_elem62($ELM).
-		'<tr><td class="color-del">[72] Фильтр: год и месяц:                    <td class="r b red">'.PHP12_bug_element_elem72($ELM).
-		'<tr><td class="color-del">[74] Фильтр: Radio:                          <td class="r b red">'.PHP12_bug_element_elem74($ELM).
-		'<tr><td class="color-del">[77] Фильтр: календарь:                      <td class="r b red">'.PHP12_bug_element_elem77($ELM).
-		'<tr><td class="color-del">[78] Фильтр: меню:                           <td class="r b red">'.PHP12_bug_element_elem78($ELM).
-		'<tr><td class="color-del">[80] Очистка фильтра:                        <td class="r b red">'.PHP12_bug_element_elem80($ELM).
-		'<tr><td class="color-del">[83] Фильтр: Select - привязанный список:    <td class="r b red">'.PHP12_bug_element_elem83($ELM).
-		'<tr><td class="color-del">[85] Select - выбор значения списка по умолчанию:<td class="r b red">'.PHP12_bug_element_elem85($ELM).
-		'<tr><td class="color-del">[86] Значение записи: количество дней:       <td class="r b red">'.PHP12_bug_element_elem86($ELM).
-		'<tr><td class="color-del">[87] Циферка в меню страниц:                 <td class="r b red">'.PHP12_bug_element_elem87($ELM).
-		'<tr><td class="color-del">[96] Количество значений связанного списка с учётом категорий:<td class="r b red">'.PHP12_bug_element_elem96($ELM).
-		'<tr><td class="color-del">[102] Фильтр: Выбор нескольких групп значений:<td class="r b red">'.PHP12_bug_element_elem102($ELM).
+		'<tr><td class="clr9 b" colspan="2">Элементы в элементах:'.
+		'<tr><td class="clr7">[7] Фильтр-поиск:                            <td class="w50 r b clr5">'.PHP12_bug_element_elem7($ELM).
+		'<tr><td class="clr7">[11] Вставка значения:                       <td class="r b clr5">'.PHP12_bug_element_elem11($ELM).
+		'<tr><td class="clr7">[14] Список-шаблон:                          <td class="r b clr5">'.PHP12_bug_element_elem14($ELM).
+		'<tr><td class="clr7">[15] Количество строк списка:                <td class="r b clr5">'.PHP12_bug_element_elem15($ELM).
+		'<tr><td class="clr7">[16] Radio - произвольные значения:          <td class="r b clr5">'.PHP12_bug_element_elem16($ELM).
+		'<tr><td class="clr7">[23] Список-таблица:                         <td class="r b clr5">'.PHP12_bug_element_elem23($ELM).
+		'<tr><td class="clr7">[29] Select: выбор записи из другого списка: <td class="r b clr5">'.PHP12_bug_element_elem29($ELM).
+		'<tr><td class="clr7">[31] Выбор нескольких значений галочками:    <td class="r b clr5">'.PHP12_bug_element_elem31($ELM).
+		'<tr><td class="clr7">[40] Фильтрование списка:                    <td class="r b clr5">'.PHP12_bug_element_elem40($ELM).
+		'<tr><td class="clr7">[44] Сборный текст:                          <td class="r b clr5">'.PHP12_bug_element_elem44($ELM).
+		'<tr><td class="clr7">[54] Количество значений привязанного списка:<td class="r b clr5">'.PHP12_bug_element_elem54($ELM).
+		'<tr><td class="clr7">[55] Сумма значений привязанного списка:     <td class="r b clr5">'.PHP12_bug_element_elem55($ELM).
+		'<tr><td class="clr7">[57] Меню переключения блоков:               <td class="r b clr5">'.PHP12_bug_element_elem57($ELM).
+		'<tr><td class="clr7">[62] Фильтр: галочка:                        <td class="r b clr5">'.PHP12_bug_element_elem62($ELM).
+		'<tr><td class="clr7">[72] Фильтр: год и месяц:                    <td class="r b clr5">'.PHP12_bug_element_elem72($ELM).
+		'<tr><td class="clr7">[74] Фильтр: Radio:                          <td class="r b clr5">'.PHP12_bug_element_elem74($ELM).
+		'<tr><td class="clr7">[77] Фильтр: календарь:                      <td class="r b clr5">'.PHP12_bug_element_elem77($ELM).
+		'<tr><td class="clr7">[78] Фильтр: меню:                           <td class="r b clr5">'.PHP12_bug_element_elem78($ELM).
+		'<tr><td class="clr7">[80] Очистка фильтра:                        <td class="r b clr5">'.PHP12_bug_element_elem80($ELM).
+		'<tr><td class="clr7">[83] Фильтр: Select - привязанный список:    <td class="r b clr5">'.PHP12_bug_element_elem83($ELM).
+		'<tr><td class="clr7">[85] Select - выбор значения списка по умолчанию:<td class="r b clr5">'.PHP12_bug_element_elem85($ELM).
+		'<tr><td class="clr7">[86] Значение записи: количество дней:       <td class="r b clr5">'.PHP12_bug_element_elem86($ELM).
+		'<tr><td class="clr7">[87] Циферка в меню страниц:                 <td class="r b clr5">'.PHP12_bug_element_elem87($ELM).
+		'<tr><td class="clr7">[96] Количество значений связанного списка с учётом категорий:<td class="r b clr5">'.PHP12_bug_element_elem96($ELM).
+		'<tr><td class="clr7">[102] Фильтр: Выбор нескольких групп значений:<td class="r b clr5">'.PHP12_bug_element_elem102($ELM).
 	'</table>'.
 	_bug_script($prm);
 }
@@ -1359,8 +1359,8 @@ function PHP12_bug_element_hint() {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего подсказок:<td class="w50 r b color-pay">'._hide0(count($HINT)).
-		'<tr><td class="color-del">Подсказки от потерянных элементов:<td class="w50 r b red">'._hide0($lost).
+		'<tr><td class="clr1 b">Всего подсказок:<td class="w50 r b clr11">'._hide0(count($HINT)).
+		'<tr><td class="clr7">Подсказки от потерянных элементов:<td class="w50 r b clr5">'._hide0($lost).
 	'</table>';
 }
 
@@ -1382,10 +1382,10 @@ function PHP12_bug_action($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего действий:<td class="w50 r b color-pay">'.count($ACT).
-		'<tr><td class="color-del">Нет привязки к элементу или блоку:<td class="r b red">'._hide0($cnnC).
-		'<tr><td class="color-del">Привязка к потерянным блокам:<td class="r b red">'.PHP12_bug_action_blk().
-		'<tr><td class="color-del">Привязка к потерянным элементам:<td class="r b red">'.PHP12_bug_action_elm().
+		'<tr><td class="clr1 b">Всего действий:<td class="w50 r b clr11">'.count($ACT).
+		'<tr><td class="clr7">Нет привязки к элементу или блоку:<td class="r b clr5">'._hide0($cnnC).
+		'<tr><td class="clr7">Привязка к потерянным блокам:<td class="r b clr5">'.PHP12_bug_action_blk().
+		'<tr><td class="clr7">Привязка к потерянным элементам:<td class="r b clr5">'.PHP12_bug_action_elm().
 	'</table>'.
 	_bug_script($prm);
 }
@@ -1432,9 +1432,9 @@ function PHP12_bug_counter($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего счётчиков:<td class="w50 r b color-pay">'.count($COUNTER).
-		'<tr><td class="grey">Кол-во записей по счётчикам:<td class="r pale">'._hide0($COUNTER_V).
-		'<tr><td class="color-del">Кол-во записей от удалённых счётчиков:<td class="r b red">'.PHP12_bug_counter_v_lost().
+		'<tr><td class="clr1 b">Всего счётчиков:<td class="w50 r b clr11">'.count($COUNTER).
+		'<tr><td class="clr1">Кол-во записей по счётчикам:<td class="r clr2">'._hide0($COUNTER_V).
+		'<tr><td class="clr7">Кол-во записей от удалённых счётчиков:<td class="r b clr5">'.PHP12_bug_counter_v_lost().
 	'</table>'.
 	_bug_script($prm);
 }
@@ -1464,7 +1464,7 @@ function PHP12_bug_cron($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего заданий:<td class="w50 r b color-pay">'.count($CRON).
+		'<tr><td class="clr1 b">Всего заданий:<td class="w50 r b clr11">'.count($CRON).
 	'</table>'.
 	_bug_script($prm);
 }
@@ -1482,7 +1482,7 @@ function PHP12_bug_image($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего изображений:<td class="w70 r b color-pay">'.$IMG.
+		'<tr><td class="clr1 b">Всего изображений:<td class="w70 r b clr11">'.$IMG.
 	'</table>'.
 	_bug_script($prm);
 }
@@ -1500,7 +1500,7 @@ function PHP12_bug_attach($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего файлов:<td class="w50 r b color-pay">'.count($ATTACH).
+		'<tr><td class="clr1 b">Всего файлов:<td class="w50 r b clr11">'.count($ATTACH).
 	'</table>'.
 	_bug_script($prm);
 }
@@ -1518,7 +1518,7 @@ function PHP12_bug_template($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего шаблонов:<td class="w50 r b color-pay">'.count($TMP).
+		'<tr><td class="clr1 b">Всего шаблонов:<td class="w50 r b clr11">'.count($TMP).
 	'</table>'.
 	_bug_script($prm);
 }
@@ -1543,8 +1543,8 @@ function PHP12_bug_note($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего заметок:<td class="w70 r b color-pay">'.$NOTE.
-		'<tr><td class="grey b">Комментарии к заметкам:<td class="w70 r b color-pay">'.$COMM.
+		'<tr><td class="clr1 b">Всего заметок:<td class="w70 r b clr11">'.$NOTE.
+		'<tr><td class="clr1 b">Комментарии к заметкам:<td class="w70 r b clr11">'.$COMM.
 	'</table>'.
 	_bug_script($prm);
 }
@@ -1562,7 +1562,7 @@ function PHP12_bug_history($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего записей истории:<td class="w70 r b color-pay">'.$HIST.
+		'<tr><td class="clr1 b">Всего записей истории:<td class="w70 r b clr11">'.$HIST.
 	'</table>'.
 	_bug_script($prm);
 }
@@ -1580,7 +1580,7 @@ function PHP12_bug_spisok($prm) {
 
 	return
 	'<table class="_stab w100p">'.
-		'<tr><td class="grey b">Всего записей:<td class="w70 r b color-pay">'._sumSpace($SPISOK).
+		'<tr><td class="clr1 b">Всего записей:<td class="w70 r b clr11">'._sumSpace($SPISOK).
 	'</table>'.
 	_bug_script($prm);
 }

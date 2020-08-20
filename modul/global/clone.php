@@ -176,7 +176,7 @@ function PHP12_clone_on() {//получение диалогов, данные �
 	foreach($arr as $id => $r)
 		$send .= '<div class="mt3">'.
 					'&bull; '.$r['name'].
-					'<span class="pale ml10">'.
+					'<span class="clr2 ml10">'.
 						'(<b>'._num(@$ass[$id]).'</b>)'.
 					'</span>'.
 				 '</div>';

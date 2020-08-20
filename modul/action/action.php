@@ -339,9 +339,9 @@ function PHP12_action_list($prm) {
 				'<tr>'.
 					'<td class="w25 top">'.
 						'<div class="icon icon-move-y pl"></div>'.
-					'<td><div class="fs15 color-555">'.
+					'<td><div class="fs15 clr9">'.
 							_dialogParam($r['dialog_id'], 'name').
-					 (SA ? '<span class="fs15 pale ml10">['.$r['dialog_id'].']</span>' : '').
+					 (SA ? '<span class="fs15 clr2 ml10">['.$r['dialog_id'].']</span>' : '').
 						'</div>'.
 						'<div class="mt3 ml10">'.
 							_action201info($r).
@@ -400,25 +400,25 @@ function _action201info($act) {//ЭЛЕМЕНТ: скрытие/показ бл�
 
 	$initial = '-';
 	switch($act['initial_id']) {
-		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
-		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		case -1: $initial = '<b class="clr8">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="clr11">выбрано любое значение</b>'; break;
 		default:
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
-	$revers = $act['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
+	$revers = $act['revers'] ? '<div class="fs11 i clr9 mt2">Применяется обратное действие</div>' : '';
 
 	return
-	'<span class="grey">'._element('v_get', 2782, $act['apply_id']).'</span> '.
+	'<span class="clr1">'._element('v_get', 2782, $act['apply_id']).'</span> '.
 	'<b>'.$target.'</b>'.
 	'<br>'.
-	'<span class="grey">если</span> '.$initial.
-	'<div class="fs12 grey mt2">'.
+	'<span class="clr1">если</span> '.$initial.
+	'<div class="fs12 clr1 mt2">'.
 		'Эффект: '.
-		'<span class="fs12 color-sal">'._element('v_get', 2788, $act['effect_id']).'</span>'.
+		'<span class="fs12 clr13">'._element('v_get', 2788, $act['effect_id']).'</span>'.
 	'</div>'.
 	$revers;
 }
@@ -435,34 +435,34 @@ function _action202info($act) {//ЭЛЕМЕНТ: установка значен
 
 	$initial = '-';
 	switch($act['initial_id']) {
-		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
-		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		case -1: $initial = '<b class="clr8">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="clr11">выбрано любое значение</b>'; break;
 		default:
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = '<span class="color-pay">выбрано</span> '.
+			$initial = '<span class="clr11">выбрано</span> '.
 					   '<b>'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
 	$apply = '-';
 	switch($act['apply_id']) {
-		case -1: $apply = '<b class="color-ref">сбросить значение</b>'; break;
+		case -1: $apply = '<b class="clr8">сбросить значение</b>'; break;
 		default:
 			if(!$el = _elemOne($act['target_ids']))
 				break;
 
-			$apply = '<span class="color-pay">установить</span> '.
+			$apply = '<span class="clr11">установить</span> '.
 					   '<b>'._element('v_get', $el, $act['apply_id']).'</b>';
 	}
 
 
-	$revers = $act['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
+	$revers = $act['revers'] ? '<div class="fs11 i clr9 mt2">Применяется обратное действие</div>' : '';
 
 	return
-	'<span class="grey">Если</span> '.$initial.
+	'<span class="clr1">Если</span> '.$initial.
 	'<div>'.
-		'<span class="grey">то элементу</span> '.
+		'<span class="clr1">то элементу</span> '.
 		'<u>'._elemIdsTitle($act['target_ids']).'</u> '.
 		$apply.
 	'<div>'.
@@ -483,26 +483,26 @@ function _action205info($act) {//ЭЛЕМЕНТ: открытие диалога
 		return '';
 
 	if(!$DLG = _dialogQuery($act['target_ids']))
-		return '<div class="red">не получены данные диалога ['.$act['target_ids'].']</div>';
+		return '<div class="clr5">не получены данные диалога ['.$act['target_ids'].']</div>';
 
 	$initial = '-';
 	switch($act['initial_id']) {
-		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
-		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		case -1: $initial = '<b class="clr8">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="clr11">выбрано любое значение</b>'; break;
 		default:
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
-	$get  = $act['apply_id']  ? '<div class="fs11 i color-ref mt2">Элемент передаёт данные записи для отображения</div>' : '';
-	$edit = $act['effect_id'] ? '<div class="fs11 i color-ref mt2">Элемент передаёт данные записи для редактирования</div>' : '';
+	$get  = $act['apply_id']  ? '<div class="fs11 i clr8 mt2">Элемент передаёт данные записи для отображения</div>' : '';
+	$edit = $act['effect_id'] ? '<div class="fs11 i clr8 mt2">Элемент передаёт данные записи для редактирования</div>' : '';
 
 	return
-	'<span class="grey">Если</span> '.$initial.
+	'<span class="clr1">Если</span> '.$initial.
 	'<br>'.
-	'<span class="grey">открыть диалог </span> <b>'.$DLG['name'].'</b>'.
+	'<span class="clr1">открыть диалог </span> <b>'.$DLG['name'].'</b>'.
 	$get.
 	$edit;
 }
@@ -520,19 +520,19 @@ function _action206info($act) {//ЭЛЕМЕНТ: установка фокуса
 
 	$initial = '-';
 	switch($act['initial_id']) {
-		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
-		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		case -1: $initial = '<b class="clr8">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="clr11">выбрано любое значение</b>'; break;
 		default:
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
 	return
-	'<span class="grey">Если</span> '.$initial.
+	'<span class="clr1">Если</span> '.$initial.
 	'<br>'.
-	'<span class="grey">установить фокус на элемент</span> <u>'._elemIdsTitle($act['target_ids']).'</u>';
+	'<span class="clr1">установить фокус на элемент</span> <u>'._elemIdsTitle($act['target_ids']).'</u>';
 }
 function _action207info($act) {//ЭЛЕМЕНТ: открытие документа
 /*
@@ -545,25 +545,25 @@ function _action207info($act) {//ЭЛЕМЕНТ: открытие докумен
 
 	$initial = '-';
 	switch($act['initial_id']) {
-		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
-		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		case -1: $initial = '<b class="clr8">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="clr11">выбрано любое значение</b>'; break;
 		default:
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
 	$docName = _msgRed('не получено имя документа');
 	if(!$doc_id = _num($act['target_ids']))
-		$docName = '<span class="red">документ не указан<span>';
+		$docName = '<span class="clr5">документ не указан<span>';
 	elseif($el = _elemOne(3547))
 		$docName = _element('v_get', $el, $doc_id);
 
 	return
-	'<span class="grey">Если</span> '.$initial.
+	'<span class="clr1">Если</span> '.$initial.
 	'<br>'.
-	'<span class="grey">открыть документ</span> <b>'.$docName.'</b>';
+	'<span class="clr1">открыть документ</span> <b>'.$docName.'</b>';
 }
 function _action208info($act) {//ЭЛЕМЕНТ: формула
 /*
@@ -596,9 +596,9 @@ function _action208info($act) {//ЭЛЕМЕНТ: формула
 	}
 
 	return
-	'<span class="grey">Применить формулу </span> <span class="color-sal">'.implode(' ', $F).'</span>'.
+	'<span class="clr1">Применить формулу </span> <span class="clr13">'.implode(' ', $F).'</span>'.
 	'<br>'.
-	'<span class="grey">к элементу</span> <b>'._elemIdsTitle($act['apply_id']).'</b>';
+	'<span class="clr1">к элементу</span> <b>'._elemIdsTitle($act['apply_id']).'</b>';
 }
 function _action209info($act) {//ЭЛЕМЕНТ: вставка значения в блок
 /*
@@ -612,19 +612,19 @@ function _action209info($act) {//ЭЛЕМЕНТ: вставка значения
 
 	$initial = '-';
 	switch($act['initial_id']) {
-		case -1: $initial = '<b class="color-ref">значение сброшено</b>'; break;
-		case -2: $initial = '<b class="color-pay">выбрано любое значение</b>'; break;
+		case -1: $initial = '<b class="clr8">значение сброшено</b>'; break;
+		case -2: $initial = '<b class="clr11">выбрано любое значение</b>'; break;
 		default:
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="color-sal">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
 	return
-	'<span class="grey">Если</span> '.$initial.
+	'<span class="clr1">Если</span> '.$initial.
 	'<br>'.
-	'<span class="grey">вставить</span> <b>'._elemIdsTitle($act['v1']).'</b>';
+	'<span class="clr1">вставить</span> <b>'._elemIdsTitle($act['v1']).'</b>';
 }
 
 function _action211info($act) {//БЛОК: скрытие/показ блоков
@@ -644,13 +644,13 @@ function _action211info($act) {//БЛОК: скрытие/показ блоко�
 	$effect = '';
 	if($act['effect_id'])
 		$effect =
-			'<div class="fs12 grey mt2">'.
+			'<div class="fs12 clr1 mt2">'.
 				'Эффект: '.
-				'<span class="fs12 color-sal">'._element('v_get', 3170, $act['effect_id']).'</span>'.
+				'<span class="fs12 clr13">'._element('v_get', 3170, $act['effect_id']).'</span>'.
 			'</div>';
 
-	$revers = $act['revers'] ? '<div class="fs11 i color-555 mt2">Применяется обратное действие</div>' : '';
-	$v1 = $act['v1'] ? '<div class="fs11 i color-555 mt2">Запоминать состояние</div>' : '';
+	$revers = $act['revers'] ? '<div class="fs11 i clr9 mt2">Применяется обратное действие</div>' : '';
+	$v1 = $act['v1'] ? '<div class="fs11 i clr9 mt2">Запоминать состояние</div>' : '';
 
 	return
 	'<div class="b">'._element('v_get', 3165, $act['apply_id']).' '.$target.'</div>'.
@@ -667,14 +667,14 @@ function _action212info($act) {//БЛОК: Установка значения �
 	if($act['dialog_id'] != 212)
 		return '';
 	if(!$elem_id = _num($act['target_ids']))
-		return '<div class="red">Отсутствует id элемента</div>';
+		return '<div class="clr5">Отсутствует id элемента</div>';
 	if(!$el = _elemOne($elem_id))
-		return '<div class="red">Элемента не существует</div>';
+		return '<div class="clr5">Элемента не существует</div>';
 
 	return
-	'<span class="grey">Элементу</span> <b>'._elemIdsTitle($elem_id).'</b>'.
+	'<span class="clr1">Элементу</span> <b>'._elemIdsTitle($elem_id).'</b>'.
 	'<br>'.
-	'<span class="grey">применить:</span> <b class="color-sal">'._element('v_get', $el, $act['apply_id']).'</b>';
+	'<span class="clr1">применить:</span> <b class="clr13">'._element('v_get', $el, $act['apply_id']).'</b>';
 }
 function _action213info($act) {//БЛОК: блокировка элементов
 /*
@@ -685,14 +685,14 @@ function _action213info($act) {//БЛОК: блокировка элементо
 	if($act['dialog_id'] != 213)
 		return '';
 	if(!$ids = _ids($act['target_ids'], 'arr'))
-		return '<div class="red">Отсутствует элементы для блокировки</div>';
+		return '<div class="clr5">Отсутствует элементы для блокировки</div>';
 
 	$elem = array();
 	foreach($ids as $id)
 		$elem[] = '<b>'._elemIdsTitle($id).'</b>';
 
 	return
-	'<span class="grey">'.
+	'<span class="clr1">'.
 		_element('v_get', 3364, $act['apply_id']).' '.
 		'элемент'.(count($elem) > 1 ? 'ы' : '').
 	'</span> '.
@@ -706,14 +706,14 @@ function _action214info($act) {//БЛОК: переход на страницу
 	if($act['dialog_id'] != 214)
 		return '';
 	if(!$page_id = _num($act['target_ids']))
-		return '<div class="red">Отсутствует id страницы</div>';
+		return '<div class="clr5">Отсутствует id страницы</div>';
 	if(!$page = _page($page_id))
-		return '<div class="red">Страницы не существует</div>';
+		return '<div class="clr5">Страницы не существует</div>';
 
 	return
-	'<span class="grey">Cтраница:</span> '.
+	'<span class="clr1">Cтраница:</span> '.
 	'<b>'.$page['name'].'</b>'.
-	($act['apply_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи</div>' : '');
+	($act['apply_id'] ? '<div class="clr9 i fs12 mt3">Блок передаёт данные записи</div>' : '');
 }
 function _action215info($act) {//БЛОК: открытие диалога
 /*
@@ -726,16 +726,16 @@ function _action215info($act) {//БЛОК: открытие диалога
 	if($act['dialog_id'] != 215)
 		return '';
 	if(!$dlg_id = _num($act['target_ids']))
-		return '<div class="red">Отсутствует id диалога</div>';
+		return '<div class="clr5">Отсутствует id диалога</div>';
 	if(!$DLG = _dialogQuery($dlg_id))
-		return '<div class="red">Диалога не существует</div>';
+		return '<div class="clr5">Диалога не существует</div>';
 
 	return
-	'<span class="grey">Диалог:</span> '.
+	'<span class="clr1">Диалог:</span> '.
 	'<b>'.$DLG['name'].'</b>'.
-	($act['apply_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для отображения</div>' : '').
-	($act['effect_id'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для редактирования</div>' : '').
-	($act['revers'] ? '<div class="color-555 i fs12 mt3">Блок передаёт данные записи для удаления</div>' : '');
+	($act['apply_id'] ? '<div class="clr9 i fs12 mt3">Блок передаёт данные записи для отображения</div>' : '').
+	($act['effect_id'] ? '<div class="clr9 i fs12 mt3">Блок передаёт данные записи для редактирования</div>' : '').
+	($act['revers'] ? '<div class="clr9 i fs12 mt3">Блок передаёт данные записи для удаления</div>' : '');
 }
 function _action216info($act) {//БЛОК: Установка фокуса на элемент
 /*
@@ -745,9 +745,9 @@ function _action216info($act) {//БЛОК: Установка фокуса на 
 	if($act['dialog_id'] != 216)
 		return '';
 	if(!$elem_id = _num($act['target_ids']))
-		return '<div class="red">Отсутствует id элемента</div>';
+		return '<div class="clr5">Отсутствует id элемента</div>';
 
-	return '<span class="grey">Элемент:</span> <b>'._element('title', $elem_id).'</b>';
+	return '<span class="clr1">Элемент:</span> <b>'._element('title', $elem_id).'</b>';
 }
 function _action217info($act) {//БЛОК: открытие документа
 /*
@@ -757,15 +757,15 @@ function _action217info($act) {//БЛОК: открытие документа
 	if($act['dialog_id'] != 217)
 		return '';
 	if(!$elem_id = _num($act['target_ids']))
-		return '<div class="red">Отсутствует id элемента</div>';
+		return '<div class="clr5">Отсутствует id элемента</div>';
 
 	$docName = _msgRed('не получено имя документа');
 	if(!$doc_id = _num($act['target_ids']))
-		$docName = '<span class="red">документ не указан<span>';
+		$docName = '<span class="clr5">документ не указан<span>';
 	elseif($el = _elemOne(3737))
 		$docName = _element('v_get', $el, $doc_id);
 
-	return '<span class="grey">Документ:</span> <b>'.$docName.'</b>';
+	return '<span class="clr1">Документ:</span> <b>'.$docName.'</b>';
 }
 function _action218info($act) {//БЛОК: принимает данные записи
 /*
@@ -777,10 +777,10 @@ function _action218info($act) {//БЛОК: принимает данные за�
 		return '';
 
 	return
-	'<span class="grey">Список: </span> '.
+	'<span class="clr1">Список: </span> '.
 	'<b>'._dialogParam($act['initial_id'], 'name').'</b>'.
 	'<br>'.
-	'<span class="grey">Сообщение: </span> '.
+	'<span class="clr1">Сообщение: </span> '.
 	'<u>'.$act['v1'].'</u>';
 }
 function _action219info($act) {//БЛОК: обновление содержимого блоков
@@ -799,51 +799,51 @@ function PHP12_action_221($act) {//ЭЛЕМЕНТ: переход на стра�
 	if($act['dialog_id'] != 221)
 		return '';
 	if(!$page_id = _num($act['target_ids']))
-		return '<div class="red">Отсутствует id страницы</div>';
+		return '<div class="clr5">Отсутствует id страницы</div>';
 	if(!$page = _page($page_id))
-		return '<div class="red">Страницы не существует</div>';
+		return '<div class="clr5">Страницы не существует</div>';
 
 	return
-	'<span class="grey">Cтраница:</span> '.
+	'<span class="clr1">Cтраница:</span> '.
 	'<b>'.$page['name'].'</b>';
 }
 function PHP12_action_222($act) {//ЭЛЕМЕНТ: открытие диалога
 	if($act['dialog_id'] != 222)
 		return '';
 	if(!$dlg_id = _num($act['target_ids'], 1))
-		return '<div class="red">Отсутствует id диалога</div>';
+		return '<div class="clr5">Отсутствует id диалога</div>';
 
 	switch($dlg_id) {
-		case -1: return '<div class="color-ref b">SA: всегда создавать новый диалог</div>';
-		case -2: return '<div class="color-ref b">SA: открытие по ID</div>';
+		case -1: return '<div class="clr8 b">SA: всегда создавать новый диалог</div>';
+		case -2: return '<div class="clr8 b">SA: открытие по ID</div>';
 	}
 
 	if(!$DLG = _dialogQuery($dlg_id))
-		return '<div class="red">Диалога не существует</div>';
+		return '<div class="clr5">Диалога не существует</div>';
 
 	return
-	'<span class="grey">Диалог:</span> '.
+	'<span class="clr1">Диалог:</span> '.
 	'<b>'.$DLG['name'].'</b>';
 }
 function PHP12_action_223($act) {//ЭЛЕМЕНТ: тёмная подсказка
 	if($act['dialog_id'] != 223)
 		return '';
 	if(!$v = _ids($act['target_ids']))
-		return '<div class="red">Отсутствует значение для подсказки</div>';
+		return '<div class="clr5">Отсутствует значение для подсказки</div>';
 
 	return
-	'<span class="grey">Значение:</span> '.
-	'<span class="color-pay">'._elemIdsTitle($v).'</span>';
+	'<span class="clr1">Значение:</span> '.
+	'<span class="clr11">'._elemIdsTitle($v).'</span>';
 }
 function PHP12_action_224($act) {//ЭЛЕМЕНТ: внешняя ссылка
 	if($act['dialog_id'] != 224)
 		return '';
 
 	return
-	'<span class="grey">Ссылка:</span> '.
+	'<span class="clr1">Ссылка:</span> '.
 	($act['target_ids'] ?
-		'<span class="blue">'.$act['target_ids'].'</span>'
-	: '<span class="grey">совпадает с содержанием элемента</span>');
+		'<span class="clr15">'.$act['target_ids'].'</span>'
+	: '<span class="clr1">совпадает с содержанием элемента</span>');
 }
 
 
@@ -951,11 +951,11 @@ function PHP12_hint_spisok($prm) {//список подсказок для уп�
 
 		$send .=
 			'<tr class="over1">'.
-		  (SA ? '<td class="r pale">'.$id : '').
+		  (SA ? '<td class="r clr2">'.$id : '').
 				'<td>'.($r['block_id'] ? 'к блоку' : 'к элементу').
 				'<td>'.$place.
 				'<td>'._blockHtml('hint', $id, array('td_no_end'=>1)).
-				'<td class="r grey">'.FullDataTime($r['dtime_add'], 1).
+				'<td class="r clr1">'.FullDataTime($r['dtime_add'], 1).
 				'<td><div class="icon icon-edit dialog-open" val="dialog_id:229,edit_id:'.$id.'"></div>';
 	}
 	$send .= '</table>';

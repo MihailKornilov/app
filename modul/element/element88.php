@@ -212,7 +212,7 @@ function _elem88next($EL, $next) {//tr-догрузка списка
 		$count_next = $EL['num_1'];
 
 	return
-	'<tr class="over5 curP center blue" onclick="_elem88next($(this),'.$EL['id'].','.($next + 1).')">'.
+	'<tr class="over5 curP center clr15" onclick="_elem88next($(this),'.$EL['id'].','.($next + 1).')">'.
 		'<td colspan="20">'.
 			'<tt class="db '.($EL['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
 				'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
@@ -247,14 +247,14 @@ function PHP12_elem88($prm) {
 		return _emptyMin10('[88] Отсутствует элемент.');
 
 	return
-	'<div class="fs16 b color-555 bg-gr1 pl15 pt5 pb5 line-t line-b">Списки:</div>'.
+	'<div class="fs16 b clr9 bg-gr1 pl15 pt5 pb5 line-t line-b">Списки:</div>'.
 	'<dl id="sp88" class="mt5 ml10"></dl>'.
-	'<div class="fs15 color-555 pad10 center over1 curP">Добавить список</div>'.
+	'<div class="fs15 clr9 pad10 center over1 curP">Добавить список</div>'.
 
-	'<div class="fs16 color-555 bg-gr1 pl15 pt5 pb5 mt10 line-t">Колонки:</div>'.
+	'<div class="fs16 clr9 bg-gr1 pl15 pt5 pb5 mt10 line-t">Колонки:</div>'.
 	'<div class="calc-div h25 line-t line-b bg-efe">'._elemWidth($el).'</div>'.
 	'<dl id="col88" class="mt5"></dl>'.
-	'<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>';
+	'<div class="fs15 clr9 pad10 center over1 curP">Добавить колонку</div>';
 }
 function PHP12_elem88_vvv($prm) {//данные для настроек
 	if(empty($prm['unit_edit']))

@@ -49,7 +49,7 @@ function _element102_print($el, $prm) {
 							'value' => isset($vAss[$id])
 						)).
 					'<td class="wsnw">'.$r['title'].
-					'<td class="r fs12 grey b">'.$c;
+					'<td class="r fs12 clr1 b">'.$c;
 
 			$title[$id] = $r['title'];
 

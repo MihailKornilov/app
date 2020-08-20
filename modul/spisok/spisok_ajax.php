@@ -1454,7 +1454,7 @@ function _elem22_col_dop($DLG) {
 	$u = array(
 		'id' => $col_id,
 		'title' => $dlg['name'].': '.$el['name'],
-		'content' => $dlg['name'].': '.$el['name'].' <b class="pale">'.$col.'</b>'
+		'content' => $dlg['name'].': '.$el['name'].' <b class="clr2">'.$col.'</b>'
 	);
 
 	jsonSuccess($u);

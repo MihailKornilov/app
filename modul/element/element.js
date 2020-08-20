@@ -5,19 +5,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	ELEM_COLOR = {
 		"":["#000", "Чёрный"],
-		"color-555":["#555", "Тёмно-серый"],
-		"grey":["#888", "Серый"],
-		"pale":["#aaa", "Бледный"],
-		"color-ccc":["#ccc", "Совсем бледный"],
-		"blue":["#2B587A", "Тёмно-синий"],
-		"color-acc":["#07a", "Синий"],
-		"color-sal":["#770", "Салатовый"],
-		"color-pay":["#090", "Зелёный"],
-		"color-aea":["#aea", "Ярко-зелёный"],
-		"red":["#e22", "Красный"],
-		"color-ref":["#800", "Тёмно-красный"],
-		"color-del":["#a66", "Тёмно-бордовый"],
-		"color-vin":["#c88", "Бордовый"]
+		"clr9":["#555", "Тёмно-серый"],
+		"clr1":["#888", "Серый"],
+		"clr2":["#aaa", "Бледный"],
+		"clr3":["#ccc", "Совсем бледный"],
+		"clr15":["#2B587A", "Тёмно-синий"],
+		"clr14":["#07a", "Синий"],
+		"clr13":["#770", "Салатовый"],
+		"clr11":["#090", "Зелёный"],
+		"clr10":["#aea", "Ярко-зелёный"],
+		"clr5":["#e22", "Красный"],
+		"clr8":["#800", "Тёмно-красный"],
+		"clr7":["#a66", "Тёмно-бордовый"],
+		"clr6":["#c88", "Бордовый"]
 	},
 
 	_color = function(v, func) {
@@ -80,7 +80,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			color:'',   //цвет диалога: заголовка и кнопки
 			head:'head: Название заголовка',
-			content:'<div class="pad30 pale">content: содержимое центрального поля</div>',
+			content:'<div class="pad30 clr2">content: содержимое центрального поля</div>',
 
 			butSubmit:'Внести',
 			butCancel:'Отмена',
@@ -100,7 +100,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'<div class="close fr curP"><a class="icon icon-del wh pl"></a></div>' +
 					'<div class="submit fr curP' + _dn(o.butSubmit) + '"><a class="icon icon-ok wh pl"></a></div>' +
 					'<div class="edit fr curP' + _dn(editShow) + '"><a class="icon icon-edit wh pl"></a></div>' +
-					'<div class="fs14 white">' + o.head + '</div>' +
+					'<div class="fs14 clr4">' + o.head + '</div>' +
 				'</div>' +
 				'<div class="content bg-fff">' +
 					o.content +
@@ -223,7 +223,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		function dialogErr(msg) {
 			BUSY_OBJ._hint({
 				msg:msg,
-				color:'red',
+				color:'clr5',
 				pad:10,
 				show:1
 			});
@@ -300,7 +300,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				});
 			},
 			head:function(v) {//установка текста заголовка
-				dialog.find('.head .white').html(v);
+				dialog.find('.head .clr4').html(v);
 			},
 			width:function(v) {//установка ширины окна
 				w2 = Math.round(v / 2);
@@ -398,7 +398,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						t.find('div')._vh(1);
 					},
 					func_save:function(res) {
-						t.find('.pale')._dn(!res.tmp);
+						t.find('.clr2')._dn(!res.tmp);
 						t.find('.msg').html(res.tmp);
 						t._flash();
 					}
@@ -538,7 +538,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					load._hint({
 						msg:res.text,
 						pad:10,
-						color:'red',
+						color:'clr5',
 						show:1
 					});
 					return;
@@ -836,8 +836,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		switch(res.action_id) {
 			//обновление страницы
 			case 1:
-				_forIn(DIALOG, function(dlg) {
-					dlg.close();
+				console.log(DIALOG)
+				_forIn(DIALOG, function() {
+
 				});
 				$('#_content').html(res.content);
 				break;
@@ -1209,7 +1210,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'<div class="_selem dib prel bg-fff over3 mb10">' +
 						'<div class="icon icon-star pabs"></div>' +
 						'<div class="icon icon-del pl pabs' + _dn(v_id) + '"></div>' +
-						'<input type="text" readonly class="w125 curP color-pay" placeholder="Значение ' + n + '" value="' + (v_name || '') + '" />' +
+						'<input type="text" readonly class="w125 curP clr11" placeholder="Значение ' + n + '" value="' + (v_name || '') + '" />' +
 					'</div>';
 			},
 			ACT208_VSEL = function() {//выбор значения
@@ -1796,7 +1797,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			el.vvv.unshift({
 				id:3,
 				title:'Автоматически',
-				content:'<b class="color-pay">Автоматически</b>'
+				content:'<b class="clr11">Автоматически</b>'
 			});
 
 		$(ATTR_CMP(el.id))._select({
@@ -2013,7 +2014,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					_attr_cmp(el.num_1, 1)._flash({color:'red'});
 					_attr_cmp(el.id, 1)._hint({
 						msg:'Не выбрано значение',
-						color:'red',
+						color:'clr5',
 						pad:10,
 						show:1
 					});
@@ -2070,7 +2071,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			num_1 - использовать описание значений
 		*/
 		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+				   '<div class="fs15 clr9 pad10 center over1 curP">Добавить значение</div>',
 			ATTR_EL = _attr_el(el.id),
 			DL = ATTR_EL.append(html).find('dl'),
 			BUT_ADD = ATTR_EL.find('div:last'),
@@ -2107,13 +2108,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
-							'<td class="w90 grey r topi">Значение ' + NUM + ':' +
+							'<td class="w90 clr1 r topi">Значение ' + NUM + ':' +
 							'<td><input type="text" class="title w100p b" value="' + v.title + '" />' +
 								'<textarea class="w100p min mtm1' + _dn(el.num_1) + '" placeholder="описание значения">' + v.content + '</textarea>' +
 							'<td class="w15 topi">' +
 								'<input type="hidden" class="def" id="el-def-' + NUM + '" value="' + v.def + '" />' +
 							'<td class="w50 r top pt5">' +
-					   (v.use ? '<div class="dib fs11 color-ccc mr3 curD tool" data-tool="Использование">' + v.use + '</div>'
+					   (v.use ? '<div class="dib fs11 clr3 mr3 curD tool" data-tool="Использование">' + v.use + '</div>'
 								:
 								'<div class="icon icon-del pl tool" data-tool="Удалить значение"></div>'
 					   ) +
@@ -2253,7 +2254,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		var html = '<dl class="mt10"></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить колонку</div>',
+				   '<div class="fs15 clr9 pad10 center over1 curP">Добавить колонку</div>',
 			DL = _attr_el(el.id).append(html).find('dl'),
 			CALC_DIV = _attr_el(el.id).find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
 			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
@@ -2293,11 +2294,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w25 r topi">' +
-								'<b class="bnum fs15 color-555">' + NUM + '</b>:' +
+								'<b class="bnum fs15 clr9">' + NUM + '</b>:' +
 							'<td><div style="width:' + v.width + 'px">' +
 									'<div class="div-th-name' + _dn(_num(obj.unit.num_5)) + '">' +
 										'<input type="text"' +
-											  ' class="th-name w100p bg-gr2 center fs14 blue mb1"' +
+											  ' class="th-name w100p bg-gr2 center fs14 clr15 mb1"' +
 											  ' placeholder="имя колонки"' +
 											  ' value="' + v.txt_7 + '"' +
 										' />' +
@@ -2411,7 +2412,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				}
 
 				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
-							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
+							'<div class="fs15 b clr9 pt5">' + o.n + '</div>' +
 						'</div>';
 			});
 			CALC_DIV.html(html);
@@ -2475,7 +2476,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	// [27] Баланс: сумма значений записи
 	PHP12_balans_setup = function(el, vvv, obj) {
 		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+				   '<div class="fs15 clr9 pad10 center over1 curP">Добавить значение</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
@@ -2736,7 +2737,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 	PHP12_count_value = function(el, vvv, obj) {//настройка конктерных значений [35]
 		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+				   '<div class="fs15 clr9 pad10 center over1 curP">Добавить значение</div>',
 			ATTR_EL = _attr_el(el.id),
 			DL = ATTR_EL.append(html).find('dl'),
 			BUT_ADD = ATTR_EL.find('div:last'),
@@ -2875,7 +2876,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					._flash({color:'red'})
 					._hint({
 						msg:'Не выбрано значение',
-						color:'red',
+						color:'clr5',
 						pad:10,
 						side:'left',
 						show:1
@@ -2896,7 +2897,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(!dss)
 				return $(this)._hint({
 					msg:'Не получен диалог<br>для настройки фильтра',
-					color:'red',
+					color:'clr5',
 					pad:10,
 					show:1
 				});
@@ -2929,7 +2930,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить условие</div>',
+				   '<div class="fs15 clr9 pad10 center over5 curP">Добавить условие</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
@@ -2966,10 +2967,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL.append(
 				'<dd class="over5">' +
 					'<table class="bs5 w100p">' +
-						'<tr><td class="topi w50 r color-sal">Если:' +
+						'<tr><td class="topi w50 r clr13">Если:' +
 							'<td class="top"><input type="text"' +
 									  ' readonly' +
-									  ' class="title w175 curP color-pay"' +
+									  ' class="title w175 curP clr11"' +
 									  ' placeholder="выберите значение..."' +
 									  ' value="' + v.elem_title + '"' +
 									  ' val="' + v.elem_id + '"' +
@@ -2991,7 +2992,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									'<div class="_selem dib prel bg-fff over1 mt3 w100p' + _dn(v.unit_id == -4) + '">' +
 										'<div class="icon icon-star pabs"></div>' +
 										'<div class="icon icon-del pl pabs' + _dn(v.txt) + '"></div>' +
-										'<input type="text" readonly class="curP w100p color-pay" placeholder="значение не указано" value="' + v.unit4title + '" />' +
+										'<input type="text" readonly class="curP w100p clr11" placeholder="значение не указано" value="' + v.unit4title + '" />' +
 									'</div>' +
 
 								'</div>' +
@@ -3136,8 +3137,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		var ATR_EL = _attr_el(el.id),
 			html = '<dl></dl>' +
 				   '<table class="w100p"><tr>' +
-				        '<td><div class="fs15 color-555 pad10 center over1 curP add34-txt">Добавить текст</div>' +
-				        '<td><div class="fs15 color-555 pad10 center over1 curP add34-el">Добавить элемент</div>' +
+				        '<td><div class="fs15 clr9 pad10 center over1 curP add34-txt">Добавить текст</div>' +
+				        '<td><div class="fs15 clr9 pad10 center over1 curP add34-el">Добавить элемент</div>' +
 				   '</table>',
 			DL = ATR_EL.append(html).find('dl'),
 			NUM = 1;
@@ -3652,7 +3653,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	PHP12_menu_block_setup = function(el, vvv, obj) {//[57] настройка пунктов меню
 		var ATR_EL = _attr_el(el.id),
 			html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over5 curP">Новый пункт меню</div>',
+				   '<div class="fs15 clr9 pad10 center over5 curP">Новый пункт меню</div>',
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
 			ID_NEXT = 1,//следующий идентификатор с учётом существующих
@@ -3705,7 +3706,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								' />' +
 							'<td class="w125">' +
 								'<input type="text"' +
-									  ' class="pk-block w100p curP color-ref over1"' +
+									  ' class="pk-block w100p curP clr8 over1"' +
 									  ' readonly' +
 									  ' placeholder="выбрать блоки"' +
 									  ' value="' + blkTitle(v.blk) + '"' +
@@ -3922,7 +3923,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						load._hint({
 							msg:res.text,
 							pad:10,
-							color:'red',
+							color:'clr5',
 							show:1
 						});
 						return;
@@ -4200,7 +4201,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить значение</div>',
+				   '<div class="fs15 clr9 pad10 center over1 curP">Добавить значение</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
@@ -4249,7 +4250,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 									  ' value="' + v.title + '"' +
 								' />' +
 								'<input type="hidden" class="def" value="' + v.def + '" />' +
-								'<span class="span-cs grey">' + _CS(v.c) + '</span>' +
+								'<span class="span-cs clr1">' + _CS(v.c) + '</span>' +
 								'<input type="hidden" class="cond" />' +
 							'<td class="w100">' +
 								'<div class="icon icon-eye tool' + _dn(!v.eye, 'over3-show pl') + '" data-tool="Отображать<br>количество"></div>' +
@@ -4372,7 +4373,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				elem_id:el.id,
 				url:url,
 				func_err:function(res) {
-					var msg = '<div class="center red">' + res.text + '</div>';
+					var msg = '<div class="center clr5">' + res.text + '</div>';
 					CNT.html(msg)._dn(true);
 					DEL.removeClass('spin');
 				}
@@ -4634,7 +4635,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<div class="_spfl dib w125 prel">' +
 									'<div class="icon icon-filter pabs"></div>' +
 									'<div class="icon icon-del pl pabs' + _dn(v.cond) + '"></div>' +
-									'<input type="text" readonly class="color-del b pl25 curP w100p over3" placeholder="условий нет" value="' + v.c + '" />' +
+									'<input type="text" readonly class="clr7 b pl25 curP w100p over3" placeholder="условий нет" value="' + v.c + '" />' +
 								'</div>' +
 							'<td><input type="hidden" class="spv" value="' + v.dialog_id + '" />' +
 							'<td class="w25">' +
@@ -4749,10 +4750,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center top pt5"><div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w25 r topi">' +
-								'<b class="bnum fs15 color-555">' + NUM + '</b>:' +
+								'<b class="bnum fs15 clr9">' + NUM + '</b>:' +
 							'<td><div style="width:' + v.width + 'px">' +
 									'<input type="text"' +
-										  ' class="th-name w100p bg-gr2 fs14 blue"' +
+										  ' class="th-name w100p bg-gr2 fs14 clr15"' +
 										  ' placeholder="имя колонки"' +
 										  ' value="' + v.title + '"' +
 									' />' +
@@ -4840,7 +4841,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				}
 
 				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
-							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
+							'<div class="fs15 b clr9 pt5">' + o.n + '</div>' +
 						'</div>';
 			});
 			CALC_DIV.html(html);
@@ -4932,7 +4933,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					font:''
 				}, vvv.elm[elm_id]);
 			html +=
-			'<div class="fs14 grey">' + sp.title + '</div>' +
+			'<div class="fs14 clr1">' + sp.title + '</div>' +
 			'<div class="prel" style="width:' + sp.width + 'px">' +
 				'<div class="icon icon-del-red pl pabs r3 top5' + _dn(elm.id) + '"></div>' +
 				'<input type="text"' +
@@ -4963,6 +4964,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					busy_obj:t,
 					busy_cls:'hold',
 					func_save:function(ia) {
+						console.log(ia);
 						t.val(ia.unit.title);
 						t.attr('data-did', ia.unit.dialog_id);
 						t.attr('val', ia.unit.id);
@@ -5094,7 +5096,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<tr><td class="w25">';
 
 				_forN(vvv.cols, function(col) {
-					send += '<td class="fs14 color-555" style="width:' + (col.w-10) + 'px">' + col.name;
+					send += '<td class="fs14 clr9" style="width:' + (col.w-10) + 'px">' + col.name;
 				});
 
 				send += '<td></table>';
@@ -5102,7 +5104,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			},
 			html =  colName() +
 					'<dl></dl>' +
-					'<div class="fs15 color-555 pad10 center over5 curP">' + el.txt_1 + '</div>';
+					'<div class="fs15 clr9 pad10 center over5 curP">' + el.txt_1 + '</div>';
 
 		var ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
@@ -5226,7 +5228,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить колонку</div>',
+				   '<div class="fs15 clr9 pad10 center over5 curP">Добавить колонку</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			CALC_DIV = ATR_EL.find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
@@ -5268,7 +5270,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'<div class="el95w bg4" style="width:' + v.w + 'px;min-height:10px;margin-left:35px">' +
 						'<div class="el95colname' + _dn(obj.unit.num_2) + '">' +
 							'<input type="text"' +
-								  ' class="colname w100p bg4 center fs14 blue"' +
+								  ' class="colname w100p bg4 center fs14 clr15"' +
 								  ' placeholder="имя колонки"' +
 								  ' value="' + v.name + '"' +
 							' />' +
@@ -5276,7 +5278,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'</div>' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 r topi">' +
-								'<b class="bnum fs15 color-555">' + NUM++ + '</b>:' +
+								'<b class="bnum fs15 clr9">' + NUM++ + '</b>:' +
 							'<td class="w175">' +
 								'<input type="hidden" class="el95type" value="' + v.type + '">' +
 							'<td class="w50 el95tdcol">' +
@@ -5344,9 +5346,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				width:170,
 				title0:'выберите тип колонки',
 				spisok:[
-					{id:1,title:'Текст',content:'Текст<div class="fs12 pale">Указать текст, который будет отображаться в колонке</div>'},
-					{id:2,title:'Текстовое поле',content:'Текстовое поле<div class="fs12 pale">Возможность внесения данных вручную</div>'},
-					{id:3,title:'Выпадающий список',content:'Выпадающий список<div class="fs12 pale">Выбор значений из выпадающего списка</div>'}
+					{id:1,title:'Текст',content:'Текст<div class="fs12 clr2">Указать текст, который будет отображаться в колонке</div>'},
+					{id:2,title:'Текстовое поле',content:'Текстовое поле<div class="fs12 clr2">Возможность внесения данных вручную</div>'},
+					{id:3,title:'Выпадающий список',content:'Выпадающий список<div class="fs12 clr2">Выбор значений из выпадающего списка</div>'}
 				],
 				func:function(id) {
 					v.type = id;
@@ -5415,7 +5417,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				}
 
 				html += '<div class="h25 dib center bg-' + bg + line + '" style="width:' + o.w + 'px">' +
-							'<div class="fs15 b color-555 pt5">' + o.n + '</div>' +
+							'<div class="fs15 b clr9 pt5">' + o.n + '</div>' +
 						'</div>';
 			});
 			CALC_DIV.html(html);
@@ -5497,7 +5499,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				busy_obj:VK_ICON,
 				busy_cls:'spin',
 				func_err:function(res) {
-					VK_RES.html('<div class="mt10 red">' + res.text + '</div>');
+					VK_RES.html('<div class="mt10 clr5">' + res.text + '</div>');
 				}
 			};
 			_post(send, function(res) {
@@ -5941,14 +5943,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				'<dd class="mt5">' +
 					'<table>' +
 						'<tr><td><input type="text"' +
-									  ' class="inp-dst w200 color-ref curD"' +
+									  ' class="inp-dst w200 clr8 curD"' +
 									  ' readonly' +
 									  ' val="' + sp.dst_id + '"' +
 									  ' value="' + sp.dst_title + '"' +
 								' />' +
-							'<td class="w25 center fs17 grey"> &laquo; ' +
+							'<td class="w25 center fs17 clr1"> &laquo; ' +
 							'<td><input type="text"' +
-									  ' class="inp-src w200 color-pay curP over1"' +
+									  ' class="inp-src w200 clr11 curP over1"' +
 									  ' readonly' +
 									  ' val="' + sp.src_id + '"' +
 									  ' value="' + sp.src_title + '"' +
@@ -6004,7 +6006,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	/* [34] СУММЫ СПИСКОВ ПО МЕСЯЦАМ - НАСТРОЙКА */
 	PHP12_elem34 = function(el, vvv, obj) {
 		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить список</div>',
+				   '<div class="fs15 clr9 pad10 center over5 curP">Добавить список</div>',
 			ATTR_EL = _attr_el(el.id),
 			DL = ATTR_EL.append(html).find('dl');
 
@@ -6036,13 +6038,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<div class="_selem dib prel bg-fff over3">' +
 									'<div class="icon icon-star pabs"></div>' +
 									'<div class="icon icon-del pl pabs' + _dn(v.sum_id) + '"></div>' +
-									'<input type="text" readonly class="w175 curP color-pay" placeholder="сумма не выбрана" value="' + v.sum_title + '" />' +
+									'<input type="text" readonly class="w175 curP clr11" placeholder="сумма не выбрана" value="' + v.sum_title + '" />' +
 								'</div>' +
 							'<td><input type="hidden" class="cond" />' +
 								'<div class="_spfl dib w125 prel">' +
 									'<div class="icon icon-filter pabs"></div>' +
 									'<div class="icon icon-del pl pabs' + _dn(v.cond) + '"></div>' +
-									'<input type="text" readonly class="filter color-del b pl25 curP w100p over3" placeholder="условий нет" value="' + v.c + '" />' +
+									'<input type="text" readonly class="filter clr7 b pl25 curP w100p over3" placeholder="условий нет" value="' + v.c + '" />' +
 								'</div>' +
 							'<td class="w25 r top pt5">' +
 								'<div class="icon icon-del pl tool" data-tool="Удалить список"></div>' +
@@ -6209,7 +6211,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		var ATR_EL = _attr_el(el.id),
 			html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over5 curP">Добавить параметр</div>',
+				   '<div class="fs15 clr9 pad10 center over5 curP">Добавить параметр</div>',
 			DL = ATR_EL.append(html).find('dl'),
 			ATR_SP = _attr_cmp(3528),
 			DLG_ID = _num(ATR_SP.val()),//список, из которого будут выбираться значения
@@ -6246,7 +6248,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								' />' +
 							'<td class="w100p">' +
 								'<input type="text"' +
-									  ' class="inp w250 curP color-pay"' +
+									  ' class="inp w250 curP clr11"' +
 									  ' readonly' +
 									  ' placeholder="значение не выбрано"' +
 									  ' value="' + (v.title || v.id || '') + '"' +
@@ -6311,14 +6313,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				'<dd class="mt5">' +
 					'<table>' +
 						'<tr><td><input type="text"' +
-									  ' class="inp-dst w200 color-ref curD"' +
+									  ' class="inp-dst w200 clr8 curD"' +
 									  ' readonly' +
 									  ' val="' + sp.dst_id + '"' +
 									  ' value="' + sp.dst_title + '"' +
 								' />' +
-							'<td class="w25 center fs17 grey"> &laquo; ' +
+							'<td class="w25 center fs17 clr1"> &laquo; ' +
 							'<td><input type="text"' +
-									  ' class="inp-src w200 color-pay curP over1"' +
+									  ' class="inp-src w200 clr11 curP over1"' +
 									  ' readonly' +
 									  ' val="' + sp.src_id + '"' +
 									  ' value="' + sp.src_title + '"' +
@@ -6371,7 +6373,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	/* ---=== НАСТРОЙКА ШАБЛОНА ИСТОРИИ ДЕЙСТВИЙ [67] ===--- */
 	PHP12_history_setup = function(el, vvv, obj) {
 		var html = '<dl></dl>' +
-				   '<div class="fs15 color-555 pad10 center over1 curP">Добавить сборку</div>',
+				   '<div class="fs15 clr9 pad10 center over1 curP">Добавить сборку</div>',
 			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
@@ -6410,7 +6412,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						'<tr><td class="w25 center">' +
 								'<div class="icon icon-move-y pl curM"></div>' +
 							'<td class="w100 center">' +
-								'<a class="cs ' + (v.c ? 'color-ref b' : 'pale') + ' tool" data-tool="Настроить условия<br>показа сборки">' + _cc(v.c) + '</a>' +
+								'<a class="cs ' + (v.c ? 'clr8 b' : 'clr2') + ' tool" data-tool="Настроить условия<br>показа сборки">' + _cc(v.c) + '</a>' +
 								'<input type="hidden" class="txt_9" value="' + v.txt_9 + '" />' +
 							'<td class="w250">' +
 								'<input type="text"' +
@@ -6452,8 +6454,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						DD.find('.txt_9').val(res.v);
 						DD.find('.cs')
 							.html(_cc(res.c))
-							._dn(res.c, 'pale')
-							._dn(!res.c, 'color-ref b');
+							._dn(res.c, 'clr2')
+							._dn(!res.c, 'clr8 b');
 					}
 				});
 			});
@@ -6588,7 +6590,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	//ссылка на приглашение для пользователя
 	PHP12_user_invite = function(el) {
 		var INP = _attr_el(el.id).find('input');
-		if(!INP.hasClass('blue'))
+		if(!INP.hasClass('clr15'))
 			return;
 		_attr_el(el.id).find('input,.icon').click(function() {
 			INP.select();

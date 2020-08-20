@@ -13,7 +13,7 @@ switch(@$_POST['op']) {
 			2 => 'История',
 			3 => 'Содержание',
 	  		4 => 'Служебное',
-			9 => '<b class=red>SA</b>'
+			9 => '<b class=clr5>SA</b>'
 		);
 		$action = array(//действие, которое будет происходить после внесения или изменения единицы списка
 			3 => 'Обновить содержимое блоков',
@@ -51,7 +51,7 @@ switch(@$_POST['op']) {
 				$group[] = array(
 					'id' => _num($r['id']),
 					'title' => _br($r['name'], ' '),
-					'content' => '<div class="'._dn(!$r['sa'], 'red').'">'._br($r['name']).'</div>'
+					'content' => '<div class="'._dn(!$r['sa'], 'clr5').'">'._br($r['name']).'</div>'
 				);
 			}
 
@@ -87,7 +87,7 @@ switch(@$_POST['op']) {
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
 
 			'<div class="pad10 center bg-gr3 line-b">'.
-				'<div class="fr mt5 b pale curD dw tool" data-tool="Ширина диалога">'.$dialog['width'].'</div>'.
+				'<div class="fr mt5 b clr2 curD dw tool" data-tool="Ширина диалога">'.$dialog['width'].'</div>'.
 				'<input type="hidden" id="dialog-menu" value="'.$dialog['menu_edit_last'].'" />'.
 			'</div>'.
 
@@ -96,7 +96,7 @@ switch(@$_POST['op']) {
 
 				'<div class="pad10 bg-gr2 line-b">'.
 					'<table class="bs5 w100p">'.
-						'<tr><td class="w150 r color-555">Имя диалогового окна:'.
+						'<tr><td class="w150 r clr9">Имя диалогового окна:'.
 							'<td><input type="text" id="dialog_name" class="w100p b" maxlength="100" value="'.$dialog['name'].'" />'.
 					'</table>'.
 				'</div>'.
@@ -110,21 +110,21 @@ switch(@$_POST['op']) {
 					'</div>'.
 					'<div class="'._dn($dialog['insert_on']).'">'.
 						'<table class="bs5 w100p">'.
-							'<tr><td class="grey w150 r">Заголовок:'.
+							'<tr><td class="clr1 w150 r">Заголовок:'.
 								'<td><input type="text" id="insert_head" class="w100p" maxlength="200" placeholder="название диалогового окна - новая запись" value="'.$dialog['insert_head'].'" />'.
-							'<tr><td class="grey r">Текст кнопок:'.
+							'<tr><td class="clr1 r">Текст кнопок:'.
 								'<td><input type="text" id="insert_button_submit" class="w150" maxlength="100" value="'.$dialog['insert_button_submit'].'" />'.
 									'<input type="text" id="insert_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['insert_button_cancel'].'" />'.
-							'<tr><td class="blue r">Дальнейшее действие:'.
+							'<tr><td class="clr15 r">Дальнейшее действие:'.
 								'<td><input type="hidden" id="insert_action_id" value="'.$dialog['insert_action_id'].'" />'.
 							'<tr class="td-insert-action-page'._dn($dialog['insert_action_id'] == 2).'">'.
-								'<td class="grey r">Страница:'.
+								'<td class="clr1 r">Страница:'.
 								'<td><input type="hidden" id="insert_action_page_id" value="'.$dialog['insert_action_page_id'].'" />'.
 
-							'<tr><td class="blue r h35">Воздействие на запись:'.
-								'<td><a id="insert_unit_change" class="'.($dialog['insert_unit_change_elem_id'] ? 'color-pay b">' : 'grey">не ').'настроено</a>'.
+							'<tr><td class="clr15 r h35">Воздействие на запись:'.
+								'<td><a id="insert_unit_change" class="'.($dialog['insert_unit_change_elem_id'] ? 'clr11 b">' : 'clr1">не ').'настроено</a>'.
 
-							'<tr><td class="blue r">Присвоение ID:'.
+							'<tr><td class="clr15 r">Присвоение ID:'.
 								'<td><input type="hidden" id="IUID_dlg_id" value="'.$IUID_dlg_id.'" />'.
 							'<tr class="tr-iuid'._dn($dialog['insert_unit_id_set_elem_id']).'">'.
 								'<td>'.
@@ -142,15 +142,15 @@ switch(@$_POST['op']) {
 					'</div>'.
 					'<div class="'._dn($dialog['edit_on']).'">'.
 						'<table class="bs5 w100p">'.
-							'<tr><td class="grey w150 r">Заголовок:'.
+							'<tr><td class="clr1 w150 r">Заголовок:'.
 								'<td><input type="text" id="edit_head" class="w100p" maxlength="200" placeholder="название диалогового окна - редактирование" value="'.$dialog['edit_head'].'" />'.
-							'<tr><td class="grey r">Текст кнопок:'.
+							'<tr><td class="clr1 r">Текст кнопок:'.
 								'<td><input type="text" id="edit_button_submit" class="w150" maxlength="100" value="'.$dialog['edit_button_submit'].'" />'.
 									'<input type="text" id="edit_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['edit_button_cancel'].'" />'.
-							'<tr><td class="blue r">Дальнейшее действие:'.
+							'<tr><td class="clr15 r">Дальнейшее действие:'.
 								'<td><input type="hidden" id="edit_action_id" value="'.$dialog['edit_action_id'].'" />'.
 							'<tr class="td-edit-action-page'._dn($dialog['edit_action_id'] == 2).'">'.
-								'<td class="grey r">Страница:'.
+								'<td class="clr1 r">Страница:'.
 								'<td><input type="hidden" id="edit_action_page_id" value="'.$dialog['edit_action_page_id'].'" />'.
 						'</table>'.
 					'</div>'.
@@ -164,24 +164,24 @@ switch(@$_POST['op']) {
 					'</div>'.
 					'<div class="'._dn($dialog['del_on']).'">'.
 						'<table class="bs5 w100p">'.
-							'<tr><td class="grey w150 r">Заголовок:'.
+							'<tr><td class="clr1 w150 r">Заголовок:'.
 								'<td><input type="text" id="del_head" class="w100p" maxlength="200" placeholder="название диалогового окна - удаление" value="'.$dialog['del_head'].'" />'.
-							'<tr><td class="grey r">Текст кнопок:'.
+							'<tr><td class="clr1 r">Текст кнопок:'.
 								'<td><input type="text" id="del_button_submit" class="w150" maxlength="100" value="'.$dialog['del_button_submit'].'" />'.
 									'<input type="text" id="del_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['del_button_cancel'].'" />'.
-							'<tr><td class="grey r h35">Содержание удаления:'.
+							'<tr><td class="clr1 r h35">Содержание удаления:'.
 								'<td>'._dialogContentDelSetup($dialog_id).
-							'<tr><td class="grey r">Условия удаления:'.
-								'<td class="pale">'.
+							'<tr><td class="clr1 r">Условия удаления:'.
+								'<td class="clr2">'.
 									($del58 ? '' : 'условий нет. ').
 									'<div val="dialog_id:58,dss:'.$dialog_id.',edit_id:'.$del58.'"'.
 										' class="icon icon-set pl dialog-open tool"'.
 										' data-tool="Настроить условия">'.
 									'</div>'.
-							'<tr><td class="blue r">Дальнейшее действие:'.
+							'<tr><td class="clr15 r">Дальнейшее действие:'.
 								'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
 							'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
-								'<td class="grey r">Страница:'.
+								'<td class="clr1 r">Страница:'.
 								'<td><input type="hidden" id="del_action_page_id" value="'.$dialog['del_action_page_id'].'" />'.
 						'</table>'.
 					'</div>'.
@@ -211,11 +211,11 @@ switch(@$_POST['op']) {
 				'</div>'.
 
 				'<table class="menu_sa-1 bs10">'.
-					'<tr><td class="red r w80">ID:<td class="b">'.$dialog['id'].
-					'<tr><td class="red r">Ширина:'.
+					'<tr><td class="clr5 r w80">ID:<td class="b">'.$dialog['id'].
+					'<tr><td class="clr5 r">Ширина:'.
 		                '<td><div id="dialog-width" class="dib w50">'.$dialog['width'].'</div>'.
 		                    '<input type="hidden" id="width_auto" value="'.$dialog['width_auto'].'" />'.
-					'<tr><td class="red r">Таблица 1:'.
+					'<tr><td class="clr5 r">Таблица 1:'.
 						'<td><input type="hidden" id="table_1"   value="'.$dialog['table_1'].'" />'.
 					'<tr><td>'.
 						'<td>'._check(array(
@@ -291,8 +291,8 @@ switch(@$_POST['op']) {
 		array_unshift($dlgUnitGet, array(
 			'id' => -1,
 			'title' => 'Совпадает с текущей страницей',
-			'content' => '<div class="b color-pay">Совпадает с текущей страницей</div>'.
-						 '<div class="fs12 grey ml10 mt3 i">Диалог будет принимать данные списка, которые принимает страница</div>'
+			'content' => '<div class="b clr11">Совпадает с текущей страницей</div>'.
+						 '<div class="fs12 clr1 ml10 mt3 i">Диалог будет принимать данные списка, которые принимает страница</div>'
 		));
 		$send['dlg_unit_get'] = $dlgUnitGet;
 
@@ -664,7 +664,7 @@ switch(@$_POST['op']) {
 						'<a href="//vk.com/id'.$res['id'].'" class="b" target="_blank">'.
 							$res['first_name'].' '.$res['last_name'].
 						'</a>'.
-						'<div class="grey mt3">'._elem300Place($res).'</div>'.
+						'<div class="clr1 mt3">'._elem300Place($res).'</div>'.
 						'<button class="vk small mt3">выбрать</button>'.
 			'</table>';
 
@@ -844,21 +844,21 @@ function _dialogSetupHistory($DLG) {//раздел История действи
 		'<div class="pad10 pb20 bg-dfd">'.
 			'<div class="hd2 mt5">Внесение новой записи</div>'.
 			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_insert">'.
-				'<div class="mar10 pale'._dn(!$DLG['insert_history_elem']).'">шаблон истории действий для внесения новой записи</div>'.
+				'<div class="mar10 clr2'._dn(!$DLG['insert_history_elem']).'">шаблон истории действий для внесения новой записи</div>'.
 				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['insert_history_elem']).'</div>'.
 			'</div>'.
 		'</div>'.
 		'<div class="pad10 pb20 bg-ffd line-t1">'.
 			'<div class="hd2 mt5">Редактирование записи</div>'.
 			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_edit">'.
-				'<div class="mar10 pale'._dn(!$DLG['edit_history_elem']).'">шаблон истории действий для редактирования записи</div>'.
+				'<div class="mar10 clr2'._dn(!$DLG['edit_history_elem']).'">шаблон истории действий для редактирования записи</div>'.
 				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['edit_history_elem']).'</div>'.
 			'</div>'.
 		'</div>'.
 		'<div class="pad10 pb20 bg-fee line-t1">'.
 			'<div class="hd2 mt5">Удаление записи</div>'.
 			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_del">'.
-				'<div class="mar10 pale'._dn(!$DLG['del_history_elem']).'">шаблон истории действий для удаления записи</div>'.
+				'<div class="mar10 clr2'._dn(!$DLG['del_history_elem']).'">шаблон истории действий для удаления записи</div>'.
 				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['del_history_elem']).'</div>'.
 			'</div>'.
 		'</div>'.
@@ -905,9 +905,9 @@ function _dialogSetupService($DLG) {
 								'value' => $DLG['spisok_on']
 						   )).
 				'<tr class="tr-spisok-col'._dn($DLG['spisok_on']).'">'.
-					'<td class="grey r">Колонка по умолчанию:'.
+					'<td class="clr1 r">Колонка по умолчанию:'.
 					'<td><input type="hidden" id="spisok_elem_id" value="'.$DLG['spisok_elem_id'].'" />'.
-				'<tr><td class="grey r">Родительский диалог:'.
+				'<tr><td class="clr1 r">Родительский диалог:'.
 					'<td><input type="hidden" id="dialog_id_parent" value="'.$DLG['dialog_id_parent'].'" />'.
 
 				'<tr><td colspan="2" class="line-t">&nbsp;'.
@@ -918,34 +918,34 @@ function _dialogSetupService($DLG) {
 								'value' => $DLG['open_auto']
 						   )).
 				'<tr id="tr-open-auto" class="'._dn($DLG['open_auto']).'">'.
-					'<td class="r grey">При условиях:'.
+					'<td class="r clr1">При условиях:'.
 					'<td><div class="_spfl dib w125 prel">'.
 							'<div class="icon icon-filter pabs"></div>'.
 							'<div class="icon icon-del pl pabs'._dn($DLG['open_auto']).'"></div>'.
 							'<input type="text"'.
 								  ' id="open_filter"'.
 								  ' readonly'.
-								  ' class="inp color-del b pl25 curP w100p over3"'.
+								  ' class="inp clr7 b pl25 curP w100p over3"'.
 								  ' placeholder="условий нет"'.
 								  ' value=""'.
 							' />'.
 						'</div>'.
 				'<tr><td colspan="2">&nbsp;'.
 				'<tr><td colspan="2" class="line-t">&nbsp;'.
-				'<tr><td class="grey r">Получает данные записи:'.
+				'<tr><td class="clr1 r">Получает данные записи:'.
 					'<td><input type="hidden" id="dialog_id_unit_get" value="'.$DLG['dialog_id_unit_get'].'" />'.
 			'</table>'.
 		'</div>'.
 
 		'<div class="menu_service-2 pad10">'.
 			'<table class="bs10">'.
-				'<tr><td class="grey r">Записи:'.
+				'<tr><td class="clr1 r">Записи:'.
 					'<td>'._dialogSetupServiceCount($DLG).
-				'<tr><td class="grey r top curD tool" data-tool="Размещён в других диалогах">Привязан:'.
+				'<tr><td class="clr1 r top curD tool" data-tool="Размещён в других диалогах">Привязан:'.
 					'<td>'._dialogSetupServiceCnnOut($DLG).
-				'<tr><td class="grey r top curD tool" data-tool="Диалоги размещены в этом">Привязки:'.
+				'<tr><td class="clr1 r top curD tool" data-tool="Диалоги размещены в этом">Привязки:'.
 					'<td>'._dialogSetupServiceCnnIn($DLG).
-				'<tr><td class="grey r top tool" data-tool="Используется в кнопках">Кнопки:'.
+				'<tr><td class="clr1 r top tool" data-tool="Используется в кнопках">Кнопки:'.
 					'<td>'._dialogSetupServiceButton($DLG).
 			'</table>'.
 		'</div>'.
@@ -954,13 +954,13 @@ function _dialogSetupService($DLG) {
 }
 function _dialogSetupServiceCount($DLG) {//количество записей, внесённых диалогом
 	if(!$DLG['table_1'])
-		return '<span class="pale">нет</span>';
+		return '<span class="clr2">нет</span>';
 
 	$sql = "SELECT COUNT(*)
 			FROM  "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG, true);
 	if(!$all = _num(query_value($sql)))
-		return '<span class="pale">нет</span>';
+		return '<span class="clr2">нет</span>';
 
 	$send = '<b>'.$all.'</b>';
 
@@ -970,13 +970,13 @@ function _dialogSetupServiceCount($DLG) {//количество записей, 
 	$noDel = _num(query_value($sql));
 
 	if($del = $all - $noDel)
-		$send .= '<span class="grey">'.
+		$send .= '<span class="clr1">'.
 					', из них: '.
-					'<b class="color-pay">'.$noDel.'</b> - активные, '.
-					'<b class="color-ref">'.$del.'</b> - удалены'.
+					'<b class="clr11">'.$noDel.'</b> - активные, '.
+					'<b class="clr8">'.$del.'</b> - удалены'.
 				'</span>';
 	else
-		$send .= '<span class="pale"> (удалённых нет)</span>';
+		$send .= '<span class="clr2"> (удалённых нет)</span>';
 
 	return $send;//' <a>очистить</a>'
 }
@@ -988,7 +988,7 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 			  AND `num_1`=".$DLG['id']."
 			ORDER BY `id`";
 	if(!$ELM = query_arr($sql))
-		return '<span class="pale">нет</span>';
+		return '<span class="clr2">нет</span>';
 
 	//блоки, в которых размещаются элементы-связки. По ним будут определятся ID диалогов
 	$sql = "SELECT *
@@ -997,7 +997,7 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 			  AND `id` IN ("._idsGet($ELM, 'block_id').")
 			ORDER BY `obj_id`";
 	if(!$BLK = query_arr($sql))
-		return '<span class="pale">нет</span>';
+		return '<span class="clr2">нет</span>';
 
 	foreach($ELM as $el) {
 		if(!$block_id = $el['block_id'])
@@ -1009,15 +1009,15 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 	$n = 1;
 	foreach($BLK as $bl) {
 		$send .= '<tr class="over2">'.
-					'<td class="r pale">'.$n++;
+					'<td class="r clr2">'.$n++;
 
 		if(!$dlg = _dialogQuery($bl['obj_id'])) {
-			$send .= '<td class="color-ref"><b>'.$bl['obj_id'].'</b> - диалог не найден<td>';
+			$send .= '<td class="clr8"><b>'.$bl['obj_id'].'</b> - диалог не найден<td>';
 			continue;
 		}
 
 		if(empty($bl['col'])) {
-			$send .= '<td class="color-ref">Отсутствует колонка<td>';
+			$send .= '<td class="clr8">Отсутствует колонка<td>';
 			continue;
 		}
 
@@ -1029,7 +1029,7 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 
 		$send .= '<td class="w230">'.
 					$dlg['name'].
-					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD tool" data-tool="Родительский диалог">'._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
+					($dlg['dialog_id_parent'] ? '<br><span class="clr13 fs11 b curD tool" data-tool="Родительский диалог">'._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
 				'<td class="r">'._hide0($c);
 	}
 	$send .= '</table>';
@@ -1044,21 +1044,21 @@ function _dialogSetupServiceCnnIn($DLG) {//диалоги, которые раз
 			$ELM[] = $r;
 
 	if(empty($ELM))
-		return '<span class="pale">нет</span>';
+		return '<span class="clr2">нет</span>';
 
 	$send = '<table class="_stab small bg-fff">';
 	$n = 1;
 	foreach($ELM as $el) {
 		$send .= '<tr class="over2">'.
-					'<td class="r pale">'.$n++;
+					'<td class="r clr2">'.$n++;
 
 		if(!$dlg = _dialogQuery($el['num_1'])) {
-			$send .= '<td class="color-ref"><b>'.$el['num_1'].'</b> - диалог не найден<td>';
+			$send .= '<td class="clr8"><b>'.$el['num_1'].'</b> - диалог не найден<td>';
 			continue;
 		}
 
 		if(!$col = _elemCol($el)) {
-			$send .= '<td class="color-ref">Отсутствует колонка<td>';
+			$send .= '<td class="clr8">Отсутствует колонка<td>';
 			continue;
 		}
 
@@ -1070,12 +1070,12 @@ function _dialogSetupServiceCnnIn($DLG) {//диалоги, которые раз
 
 		$send .=
 			'<td class="w230">'.
-					'<div class="grey b fs13">'.
+					'<div class="clr1 b fs13">'.
 						$el['name'].
-						(!empty($el['req']) ? '<span class="red fs16">*</span>' : '').
+						(!empty($el['req']) ? '<span class="clr5 fs16">*</span>' : '').
 					'</div>'.
 					$dlg['name'].
-					($dlg['dialog_id_parent'] ? '<br><span class="color-sal fs11 b curD tool" data-tool="Родительский диалог">'._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
+					($dlg['dialog_id_parent'] ? '<br><span class="clr13 fs11 b curD tool" data-tool="Родительский диалог">'._dialogParam($dlg['dialog_id_parent'], 'name').'</span>' : '').
 				'<td class="r">'._hide0($c);
 	}
 	$send .= '</table>';
@@ -1089,26 +1089,26 @@ function _dialogSetupServiceButton($DLG) {//диалог используетс�
 			  AND `num_4`=".$DLG['id']."
 			ORDER BY `id`";
 	if(!$ELM = query_arr($sql))
-		return '<span class="pale">нет</span>';
+		return '<span class="clr2">нет</span>';
 
 	$send = '<table class="_stab small bg-fff">';
 	$n = 1;
 	foreach($ELM as $el) {
 		$send .= '<tr class="over2">'.
-					'<td class="r pale">'.$n++;
+					'<td class="r clr2">'.$n++;
 
 		if($parent_id = $el['parent_id']) {
-			$send .= '<td class="color-ref">Не в блоке';
+			$send .= '<td class="clr8">Не в блоке';
 			continue;
 		}
 
 		if(!$el = _elemOne($el['id'])) {
-			$send .= '<td class="color-ref">Элемент не найден';
+			$send .= '<td class="clr8">Элемент не найден';
 			continue;
 		}
 
 		if(!$bl = _blockOne($el['block_id'])) {
-			$send .= '<td class="color-ref">Элемент без блока';
+			$send .= '<td class="clr8">Элемент без блока';
 			continue;
 		}
 
@@ -1164,20 +1164,20 @@ function _dialogSetupSa2($dialog) {//пункт меню настройки ка
 	return
 	'<div class="menu_sa-2">'.
 		'<table class="bs5">'.
-			'<tr><td class="red r w150">Группа элемента:'.
+			'<tr><td class="clr5 r w150">Группа элемента:'.
                 '<td><input type="hidden" id="element_group_id" value="'.$group_id.'" />'.
 		'</table>'.
 		'<div class="elememt-setup'._dn($group_id).'">'.
 		'<table class="bs5">'.
-			'<tr><td class="red r w150 topi">Изображение:'.
+			'<tr><td class="clr5 r w150 topi">Изображение:'.
 				'<td>'._dialogSetupElemImg($dialog).
-			'<tr><td class="red r">Начальная ширина:'.
+			'<tr><td class="clr5 r">Начальная ширина:'.
 				'<td><input type="hidden" id="element_width" value="'._num(@$dialog['element_width']).'" />'.
-			'<tr><td class="red r">Минимальная ширина:'.
+			'<tr><td class="clr5 r">Минимальная ширина:'.
 				'<td><input type="hidden" id="element_width_min" value="'._num(@$dialog['element_width_min']).'" />'.
-			'<tr><td class="red r">Тип данных:'.
+			'<tr><td class="clr5 r">Тип данных:'.
 				'<td><input type="hidden" id="element_type" value="'._num(@$dialog['element_type']).'" />'.
-			'<tr><td class="red r">CMP-аффикс:'.
+			'<tr><td class="clr5 r">CMP-аффикс:'.
 				'<td><input type="text" id="element_afics" class="w150" value="'.@$dialog['element_afics'].'" />'.
 
 			'<tr><td>'.
@@ -1238,7 +1238,7 @@ function _dialogSetupLoadUse($dialog) {//использование как эл�
 				GROUP BY `obj_name`,`obj_id`
 				ORDER BY `obj_name`,`obj_id`";
 		foreach(query_array($sql) as $r) {
-			$count = $r['c'] > 1 ? ' <span class="grey">('.$r['c'].'x)</span>' : '';
+			$count = $r['c'] > 1 ? ' <span class="clr1">('.$r['c'].'x)</span>' : '';
 			switch($r['obj_name']) {
 				case 'dialog':
 					$use_dialog .=
@@ -1254,7 +1254,7 @@ function _dialogSetupLoadUse($dialog) {//использование как эл�
 					$use_page .=
 						'<div>'.
 							'<div class="dib w35 mr5">'.$r['obj_id'].':</div>'.
-							'<a class="'._dn(!_pageSA($p), 'color-ref').'" href="'.URL.'&p='.$r['obj_id'].'">'.$p['name'].'</a>'.
+							'<a class="'._dn(!_pageSA($p), 'clr8').'" href="'.URL.'&p='.$r['obj_id'].'">'.$p['name'].'</a>'.
 							$count.
 						'</div>';
 					break;
@@ -1264,9 +1264,9 @@ function _dialogSetupLoadUse($dialog) {//использование как эл�
 
 	return
 	'<table class="menu_sa-3 bs10">'.
-		'<tr><td class="w125 r color-pay top">В диалогах:'.
+		'<tr><td class="w125 r clr11 top">В диалогах:'.
 			'<td>'.($use_dialog ? $use_dialog : '-').
-		'<tr><td class="r color-pay top">На страницах:'.
+		'<tr><td class="r clr11 top">На страницах:'.
 			'<td>'.($use_page ? $use_page : '-').
 	'</table>';
 }
@@ -1586,7 +1586,7 @@ function _dialogOpenUnitDelHtml($dialog, $unit) {//содержание диал
 		return
 		'<div class="pad20">'.
 			'<div class="_info">'.
-				'<div class="fs15 center color-ref pad30">'.
+				'<div class="fs15 center clr8 pad30">'.
 					'Подтвердите удаление.'.
 				'</div>'.
 			'</div>'.

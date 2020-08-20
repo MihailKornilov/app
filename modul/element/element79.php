@@ -102,9 +102,9 @@ function _element79_print($el) {
 	foreach($RES as $r) {
 		$spisok .=
 		'<tr><td>'.$r['name'].
-			'<td class="w70 center b color-555">'.$r['count'];
+			'<td class="w70 center b clr9">'.$r['count'];
 		$cAll += $r['count'];
-		$spisok .= '<td class="w90 r color-555">'._sumSpace($r['sum']);
+		$spisok .= '<td class="w90 r clr9">'._sumSpace($r['sum']);
 		$sumAll += $r['sum'];
 	}
 
@@ -183,18 +183,18 @@ function _elem79_group_tr($dlg_id, $group_ids=0, $sum_ids=0) {
 
 	return
 	'<tr class="over1" data-dlg="'.$dlg_id.'">'.
-		'<td class="w150 pad5 fs14 b color-555">'.$DLG['name'].':'.
+		'<td class="w150 pad5 fs14 b clr9">'.$DLG['name'].':'.
 		'<td class="r w175 pad5">'.
 			'<div class="_selem dib prel w150 bg-fff over1">'.
 				'<div class="icon icon-star pabs"></div>'.
 				'<div class="icon icon-del-red pl pabs'._dn($group_ids).'"></div>'.
-				'<input type="text" readonly class="inp79 curP w100p color-pay" placeholder="не указана" val="'.$group_ids.'" value="'.$group_name.'" />'.
+				'<input type="text" readonly class="inp79 curP w100p clr11" placeholder="не указана" val="'.$group_ids.'" value="'.$group_name.'" />'.
 			'</div>'.
 		'<td class="r pad5">'.
 			'<div class="_selem dib prel w150 bg-fff over1">'.
 				'<div class="icon icon-star pabs"></div>'.
 				'<div class="icon icon-del-red pl pabs'._dn($sum_ids).'"></div>'.
-				'<input type="text" readonly class="inp79 curP w100p color-pay" placeholder="путь не указан" val="'.$sum_ids.'" value="'.$sum_name.'" />'.
+				'<input type="text" readonly class="inp79 curP w100p clr11" placeholder="путь не указан" val="'.$sum_ids.'" value="'.$sum_name.'" />'.
 			'</div>';
 }
 

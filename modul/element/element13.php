@@ -34,7 +34,7 @@ function _element13_print($el, $prm) {
 	'<div class="_selem dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
 		'<div class="icon icon-star pabs"></div>'.
 		'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
-		'<input type="text" readonly class="inp curP w100p color-pay"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
+		'<input type="text" readonly class="inp curP w100p clr11"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
 	'</div>';
 }
 function PHP12_elem_rule7($prm) {/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МОЖНО ВЫБИРАТЬ В НАСТРОЙКЕ ДИАЛОГА [13] ===--- */
@@ -71,7 +71,7 @@ function PHP12_elem_rule7($prm) {/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МО
 
 	$send = '';
 	foreach($group as $r) {
-		$send .= '<div class="fs15 mt15 mb5 color-555">'.$r['name'].':</div>';
+		$send .= '<div class="fs15 mt15 mb5 clr9">'.$r['name'].':</div>';
 		foreach($r['elem'] as $el) {
 			$send .=
 			'<div class="ml15 mt3">'.

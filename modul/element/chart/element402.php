@@ -30,7 +30,7 @@ function _element402_print($EL, $prm=array()) {
 	$n = 1;
 	foreach($spisok as $r) {
 		$send .=
-			'<tr><td class="r grey">'.$n++.
+			'<tr><td class="r clr1">'.$n++.
 				'<td>'.$r[$col];
 	}
 	$send .= '</table>';
