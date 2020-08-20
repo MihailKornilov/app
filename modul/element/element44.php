@@ -21,8 +21,7 @@ function _element44_print($el, $prm) {
 	foreach($json as $r)
 		switch($r['type']) {
 			case 'txt':
-				$r['txt'] = _elem44css($r, $prm, $r['txt']);
-				$send .= _br($r['txt']);
+				$send .= _elem44css($r, $prm, _br($r['txt']));
 				break;
 			case 'el':
 				if(!$ell = _elemOne($r['id']))
@@ -50,11 +49,11 @@ function _element44_template_docx($el, $u) {
 }
 function _elem44css($ell, $prm, $txt) {//применение стилей к значению
 	$cls = array();
+	$cls[] = 'inhr';
 	$cls[] = $ell['font'];
 	$cls[] = _elemAction242($ell, $prm);
 
-	if(!$cls = array_diff($cls, array('')))
-		return $txt;
+	$cls = array_diff($cls, array(''));
 
 	return '<span class="'.implode(' ', $cls).'" style="font-size:inherit">'.$txt.'</span>';
 }
