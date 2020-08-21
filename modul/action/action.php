@@ -122,6 +122,25 @@ function _blockAction231($bl, $prm) {//условия отображения б�
 
 	return $bl;
 }
+function _blockAction232($bl, $prm, $bg='') {//условия отображения блока: подмена заливки
+	if(!$u = $prm['unit_get'])
+		return $bg;
+	if(!$action =  _BE('block_one_action', $bl['id']))
+		return $bg;
+
+	foreach($action as $act) {
+		if($act['dialog_id'] != 232)
+			continue;
+		if(!$F = _decode($act['filter']))
+			continue;
+		if(!_elem40res($F, $u))
+			continue;
+
+		return $act['v1'];
+	}
+
+	return $bg;
+}
 
 function _elemAction223($el, $u, $txt) {//подсказка на тёмном фоне
 	if(!$action = _BE('elem_one_action', $el['id']))
@@ -165,6 +184,29 @@ function _elemAction241($el, $prm, $txt) {//подмена текста
 	}
 
 	return $txt;
+}
+function _elemAction242($el, $prm) {//подмена цвета
+	$color = empty($el['color']) ? '' : $el['color'];
+
+	if(empty($el['id']))
+		return $color;
+	if(!$action = _BE('elem_one_action', $el['id']))
+		return $color;
+	if(!$u = $prm['unit_get'])
+		return $color;
+
+	foreach($action as $act) {
+		if($act['dialog_id'] != 242)
+			continue;
+		if(!$F = _decode($act['filter']))
+			continue;
+		if(!_elem40res($F, $u))
+			continue;
+
+		return $act['v1'];
+	}
+
+	return $color;
 }
 function _elemAction243($el, $txt) {//Формат для чисел
 	if($el['dialog_id'] == 44)
@@ -212,29 +254,6 @@ function _elemAction243($el, $txt) {//Формат для чисел
 	}
 
 	return round($txt, 10);
-}
-function _elemAction242($el, $prm) {//подмена цвета
-	$color = empty($el['color']) ? '' : $el['color'];
-
-	if(empty($el['id']))
-		return $color;
-	if(!$action = _BE('elem_one_action', $el['id']))
-		return $color;
-	if(!$u = $prm['unit_get'])
-		return $color;
-
-	foreach($action as $act) {
-		if($act['dialog_id'] != 242)
-			continue;
-		if(!$F = _decode($act['filter']))
-			return $color;
-		if(!_elem40res($F, $u))
-			return $color;
-
-		return $act['v1'];
-	}
-
-	return $color;
 }
 function _elemAction244($el, $prm) {//скрытие элемента
 	if(!$action = _BE('elem_one_action', $el['id']))

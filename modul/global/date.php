@@ -152,3 +152,6 @@ function _dateLost($v) {//проверка, прошла ли дата
 
 	return false;
 }
+function isDate($v) {//проверка значения на дату
+	return preg_match(REGEXP_DATE, $v);
+}

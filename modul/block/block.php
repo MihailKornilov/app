@@ -218,6 +218,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 
 			$cls = array('bl-td');
 			$cls[] = 'prel';
+
 			if($r['bg'] && !_ids($r['bg']))
 				$cls[] = $r['bg'];
 
@@ -588,7 +589,7 @@ function _blockStyleBG($bl, $prm) {//цвет фона из записи
 		$bg = $bg[$col];
 	}
 
-	return 'background-color:'.$bg;
+	return 'background-color:'._blockAction232($bl, $prm, $bg);
 }
 function _blockChildHtml($block, $prm, $grid_id, $level, $width) {//деление блока на части
 	if($block['id'] == $grid_id) {

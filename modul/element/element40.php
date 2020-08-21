@@ -205,7 +205,7 @@ function _elem40res($filter, $u) {
 			case 3:
 				$ff['unit_id'] = _40condVcopy($ff['unit_id']);
 				$vv = $ff['unit_id'] ? $ff['unit_id'] : $ff['txt'];
-				if($v == $vv)
+				if($v == _40cond_dop($ff, $vv))
 					break;
 				$send = false;
 				break;
@@ -231,8 +231,17 @@ function _elem40res($filter, $u) {
 				break;
 			//меньше
 			case 7:
-				if($v < _num($ff['txt']))
-					break;
+				if($vv = _40cond_dop($ff, $ff['unit_id'])) {
+					if(isDate($vv))
+						if(isDate($v)) {
+							$v = strtotime($v);
+							$vv = strtotime($vv);
+							if($v < $vv)
+								break;
+						}
+				} else
+					if($v < _num($ff['txt']))
+						break;
 				$send = false;
 				break;
 			//меньше или равно
@@ -267,6 +276,7 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 		-12 => 'число текущей недели',
 		-13 => 'число текущего месяца',
 		-14 => 'число текущего года'
+		-15 => 'сегодня'
 		-21 => 'текущий пользователь'
 		-31 => 'значение v1'
 */
@@ -518,14 +528,14 @@ function _40cond_dop($r, $val) {//дополнительные условия, �
 			return 7;
 		case -13: return _num(strftime('%m'));
 		case -14: return _num(strftime('%Y'));
+		case -15: return TODAY;
 
 		case -21: return USER_ID;
 
 		case -31:
 			if(empty($_GET['v1']))
 				return "---###$$ /* v1 не получен */";
-			$v1 = _txt($_GET['v1']);
-			return $v1;
+			return _txt($_GET['v1']);
 	}
 
 	return $val;
@@ -537,39 +547,45 @@ function _40cond_err($val) {//определение, была ли ошибка
 	return " AND !`t1`.`id` /* ".$val." */";
 }
 function _40condV($act, $col, $val) {//значение запроса по конкретному условию
-	/*
-		 1: отсутствует
-		 2: присутствует
-		 3: равно
-		 4: не равно
-		 5: больше
-		 6: больше или равно
-		 7: меньше
-		 8: меньше или равно
-		 9: содержит
-		10: не содержит
-	*/
-
 	if(!$col)
 		return '';
 
 	$val = addslashes($val);
 	switch($act) {
+		//отсутствует
 		case 1: return " AND ".$col."=DEFAULT(".$col.")";
+
+		//присутствует
 		case 2: return " AND ".$col."!=DEFAULT(".$col.")";
+
+		//равно
 		case 3:
 			if(!_num($val) && _ids($val))
 				return " AND ".$col." IN (".$val.")";
 			return " AND ".$col."='".$val."'";
+
+		//не равно
 		case 4:
 			if(!_num($val) && _ids($val))
 				return " AND ".$col." NOT IN (".$val.")";
 			return " AND ".$col."!='".$val."'";
+
+		//больше
 		case 5: return " AND ".$col.">'".$val."'";
+
+		//больше или равно
 		case 6: return " AND ".$col.">='".$val."'";
+
+		//меньше
 		case 7: return " AND ".$col."<'".$val."'";
+
+		//меньше или равно
 		case 8: return " AND ".$col."<='".$val."'";
+
+		//содержит
 		case 9: return " AND ".$col." LIKE '%".$val."%'";
+
+		//не содержит
 		case 10:return " AND ".$col." NOT LIKE '%".$val."%'";
 	}
 
@@ -702,6 +718,7 @@ function PHP12_spfl_drop() {
 		-12 => 'число текущей недели',
 		-13 => 'число текущего месяца',
 		-14 => 'число текущего года',
+		-15 => 'сегодня',
 
 		-21 => 'текущий пользователь',
 
