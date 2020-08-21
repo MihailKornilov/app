@@ -312,7 +312,6 @@ function _queryWhere($DLG, $withDel=0) {//составление условий 
 					$send[] = "!`".$tn."`.`app_id`";
 					break;
 				case '_element': break;
-				case '_hint': break;
 				case '_action':  break;
 				case '_page':  break;
 				default:
