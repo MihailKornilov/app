@@ -2085,7 +2085,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			valueAdd();
 		} else {
 			_forIn(vvv, function(v) {
-				if(ID_NEXT < v.id)
+				if(ID_NEXT <= v.id)
 					ID_NEXT = v.id + 1;
 			});
 			_forIn(vvv, valueAdd);

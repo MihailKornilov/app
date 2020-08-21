@@ -14,9 +14,11 @@ function _element14_struct($el) {
 		'num_3' => _num($el['num_3']),/* порядок:
 											0 - автоматически
 											2318 - по дате добавления
+											2320 - значение из диалога
 											2319 - сотрировка (на основании поля sort)
 									  */
 		'num_4' => _num($el['num_4']),//горизонтальное расположение списка
+		'num_5' => _num($el['num_5']),//значение из диалога (для num_3=2320)
 		'num_6' => _num($el['num_6']) //обратный порядок
 	) + _elementStruct($el);
 }
@@ -40,13 +42,28 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 	$IS_SORT = _spisokIsSort($ELEM['id']);
 
 	$order = "`t1`.`id`";
-	if($ELEM['num_3'] == 2318 && $tab = _queryTN($DLG, 'dtime_add'))
-		$order = "`".$tab."`.`dtime_add`";
-	if(_queryTN($DLG, 'sort'))
-		if($IS_SORT || $ELEM['num_3'] == 2319) {
+	switch($ELEM['num_3']) {
+		//по дате добавления
+		case 2318:
+			if($tab = _queryTN($DLG, 'dtime_add'))
+				$order = "`".$tab."`.`dtime_add`";
+			break;
+		//ручная сортировка
+		case 2319:
+			if(!_queryTN($DLG, 'sort'))
+				break;
+			if($IS_SORT)
+				break;
 			$order = "`sort`";
 			$SC = 'ASC';
-		}
+			break;
+		//значение из диалога
+		case 2320:
+			if(!$col = _elemCol($ELEM['num_5']))
+				break;
+				$order = "`".$col."`";
+			break;
+	}
 
 	//получение данных списка
 	$sql = "SELECT "._queryCol($DLG)."
