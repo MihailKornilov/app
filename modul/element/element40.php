@@ -38,6 +38,7 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 	$prm = _blockParam($prm);
 
 	$dss = _elem40dss_14($prm);
+	$dss = _elem40dss_23($prm, $dss);
 	$dss = _elem40dss_88($prm, $dss);
 	$dss = _elem40dss_43($prm, $dss);
 	$dss = _elem40dss_44($prm, $dss);
@@ -121,7 +122,19 @@ function _elem40dss_14($prm) {//получение id диалога из спи
 
 	return _num($el['num_1']);
 }
-function _elem40dss_88($prm, $dss) {//получение id диалога из ячейки элемента Несколько таблиц
+function _elem40dss_23($prm, $dss=0) {//получение id диалога из Списка-таблицы
+	if($dss)
+		return $dss;
+	if(!$el = _elemOne($prm['srce']['element_id']))
+		return 0;
+	if(!$el = _elemOne($el['parent_id']))
+		return 0;
+	if($el['dialog_id'] != 23)
+		return 0;
+
+	return $el['num_1'];
+}
+function _elem40dss_88($prm, $dss=8) {//получение id диалога из ячейки элемента Несколько таблиц
 	if($dss)
 		return $dss;
 	if($dss = _elem88dlgId($prm['srce']['element_id']))
@@ -160,8 +173,22 @@ function _elem40dss_44($prm, $dss) {//получение id диалога из 
 		return 0;
 	if($el['dialog_id'] != 44)
 		return 0;
-	if(!$bl = _blockOne($el['block_id']))
+
+	if(!$bl = _blockOne($el['block_id'])) {
+		if(!$parent_id = $el['parent_id'])
+			return 0;
+
+		//сборный текст вставлен в ячейку [23] Список-таблица
+		$prm['srce']['element_id'] = $el['id'];
+		if($dss = _elem40dss_23($prm))
+			return $dss;
+
+		//сборный текст вставлен в ячейку [88] Таблица из нескольких списков
+		if($dss = _elem40dss_88($prm))
+			return $dss;
+
 		return 0;
+	}
 
 	switch($bl['obj_name']) {
 		case 'page':
@@ -219,7 +246,7 @@ function _elem40res($filter, $u) {
 				break;
 			//больше
 			case 5:
-				if($v > _num($ff['txt']))
+				if($v*1 > _num($ff['txt']))
 					break;
 				$send = false;
 				break;

@@ -149,10 +149,11 @@ function _elemAction223($el, $u, $txt) {//подсказка на тёмном �
 	foreach($action as $act) {
 		if($act['dialog_id'] != 223)
 			continue;
-		if(!$tt = _elemUids($act['target_ids'], $u))
-			return $txt;
+		if(!$tool = _elemUids($act['target_ids'], $u))
+			if(!$tool = _txt($act['v1']))
+				return $txt;
 
-		return '<span class="inhr tool" data-tool="'.$tt.'">'.$txt.'</a>';
+		return '<span class="inhr tool" data-tool="'._br($tool).'">'.$txt.'</a>';
 	}
 
 	return $txt;
