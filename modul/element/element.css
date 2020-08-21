@@ -320,6 +320,7 @@
 	text-align:center;
 	cursor:default;
 }
+._filter-calendar td.grey{color:#999}
 ._filter-calendar td.on{
 	text-decoration:underline;
 	color:#07c;
