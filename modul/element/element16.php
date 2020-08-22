@@ -57,7 +57,7 @@ function _element16_vvv($el) {
 
 	if(!$el['txt_2'])
 		return array();
-	if(!$send = json_decode($el['txt_2'], true))
+	if(!$send = _decode($el['txt_2']))
 		return array();
 
 	return _arrNum($send);
@@ -125,7 +125,7 @@ function PHP12_radio_setup_vvv($prm) {
 	if(!$el = _elemOne($prm['unit_edit']['id']))
 		return array();
 
-	return _element('vvv', $el);
+	return _decode($el['txt_2']);
 }
 
 
