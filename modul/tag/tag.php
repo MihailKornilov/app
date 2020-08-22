@@ -21,6 +21,7 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 	$cls = '_check php ';
 	$cls .= empty($v['block']) ?    '' : ' block';       //display:block, иначе inline-block
 	$cls .= empty($v['disabled']) ? '' : ' disabled';    //неактивное состояние
+	$cls .= empty($v['ignore']) ? '' : ' ignore';        //игнорирование (неактивное, слабо видно)
 	$cls .= isset($v['light']) && empty($v['light']) ?    '' : ' light';       //если галочка не стоит, текст бледный
 	$cls .= empty($v['class']) ?    '' : ' '.$v['class'];//дополнительные классы
 
@@ -42,6 +43,7 @@ function _radio($v=array()) {//элемент RADIO
 	$spisok = @$v['spisok'] ? $v['spisok'] : array();//содержание в виде id => title
 	$value = _num(@$v['value']);
 	$dis = empty($v['disabled']) ? '' : ' disabled';
+	$ignore = empty($v['ignore']) ? '' : ' ignore';        //игнорирование (неактивное, слабо видно)
 	$light = _num(@$v['light']) ? ' light' : '';
 	$block = _bool(@$v['block']) ? ' block' : '';
 	$interval = _num(@$v['interval']) ? _num(@$v['interval']) : 7;
@@ -67,7 +69,7 @@ function _radio($v=array()) {//элемент RADIO
 
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
-	'<div id="'.$attr_id.'_radio" class="_radio php'.$block.$dis.$light.'"'.$width.'>'.
+	'<div id="'.$attr_id.'_radio" class="_radio php'.$block.$dis.$ignore.$light.'"'.$width.'>'.
 		$html.
 	'</div>';
 }

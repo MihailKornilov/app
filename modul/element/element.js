@@ -4482,12 +4482,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				//скрытие кнопки
 				t._dn();
 
-				//обновление дополнительных значений
-				for(var i in res.upd) {
-					var u = res.upd[i];
-					_attr_el(u.id).html(u.html);
-				}
-
 				_forIn(res.def, function(sp) {
 					switch(sp.dialog_id) {
 						//быстрый поиск
@@ -4531,13 +4525,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					}
 				});
 				FILTER = res.filter;
-				_hintPaste(res);
-
-				if(res.blk_hidden_upd) {
-					_forIn(res.blk_hidden_upd, function(v, block_id) {
-						_blockObj(block_id)[0].obj._dn(v)
-					});
-				}
+				_filterAfter(res);
 			});
 		});
 	},

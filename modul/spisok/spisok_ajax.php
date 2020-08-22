@@ -123,7 +123,6 @@ switch(@$_POST['op']) {
 				html - содержание для обновления
 		*/
 		$send['upd'] = array();
-
 		foreach($elem_v as $elem_filter => $v) {
 			if(!_num($elem_filter))
 				continue;
@@ -156,6 +155,7 @@ switch(@$_POST['op']) {
 
 		$send['hint'] = _hintMass();
 		$send['blk_hidden_upd'] = _filterUpdateBlkHidden($elSpisok['block_id'], $blkHiddenSouce);
+		$send['ignore'] = _filterSpisokIgnore($elem_spisok);
 
 		jsonSuccess($send);
 		break;
@@ -209,6 +209,7 @@ switch(@$_POST['op']) {
 		$send['filter'] = _filter('page_js');
 		$send['hint'] = _hintMass();
 		$send['blk_hidden_upd'] = _filterUpdateBlkHidden($elSpisok['block_id'], $blkHiddenSouce);
+		$send['ignore'] = _filterSpisokIgnore($spisok_id);
 
 		jsonSuccess($send);
 		break;
@@ -1507,7 +1508,19 @@ function _filterUpdateBlkHidden($block_id, $source=array()) {//получени�
 
 	return $upd;
 }
+function _filterSpisokIgnore($spisok_id) {//игнорирование одних фильтров другими
+	$send = array();
+	foreach(_filter('spisok', $spisok_id) as $F) {
+		$el = $F['elem'];
+		$send[] = _arrNum(array(
+			'id' => $el['id'],
+			'dialog_id' => $el['dialog_id'],
+			'ignore' => _filterIgnore($el)
+		));
+	}
 
+	return $send;
+}
 
 
 

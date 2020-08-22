@@ -60,7 +60,8 @@ function _element74_print($el, $prm) {
 		'light' => 1,
 		'value' => _filter('vv', $el, $def),
 		'spisok' => $spisok,
-		'disabled' => $prm['blk_setup']
+		'disabled' => $prm['blk_setup'],
+		'ignore' => _filterIgnore($el['id'])
 	));
 }
 function _element74_title() {
@@ -68,21 +69,24 @@ function _element74_title() {
 }
 function _elem74filter($el) {//применение фильтра к списку
 	//поиск элемента-фильтра-радио
-	foreach(_filter('spisok', $el['id']) as $F)
-		if($F['elem']['dialog_id'] == 74) {
-			if(!$v = _num($F['v']))
-				return ' AND !`t1`.`id` /* [74] некорректное значение фильтра */';
-			if(!empty($F['elem']['txt_1']))
-				if($arr = _decode($F['elem']['txt_1']))
-					foreach($arr as $r)
-						if($v == $r['id']) {
-							if(empty($r['cond']))
-								return '';
-							$cond = json_encode($r['cond']);
-							return _40cond($el, $cond);
-						}
-			return ' AND !`t1`.`id` /* [74] отсутствует элемент '.$v.' пункта Радио */';
-		}
+	foreach(_filter('spisok', $el['id']) as $F) {
+		if($F['elem']['dialog_id'] != 74)
+			continue;
+		if(!$v = _num($F['v']))
+			return ' AND !`t1`.`id` /* [74:'.$F['elem']['id'].'] некорректное значение фильтра */';
+		if(_filterIgnore($F['elem']))
+			continue;
+		if(!$arr = _decode($F['elem']['txt_1']))
+			continue;
+		foreach($arr as $r)
+			if($v == $r['id']) {
+				if(empty($r['cond']))
+					return '';
+				$cond = json_encode($r['cond']);
+				return _40cond($el, $cond);
+			}
+		return ' AND !`t1`.`id` /* [74:'.$F['elem']['id'].'] отсутствует элемент '.$v.' пункта Радио */';
+	}
 
 	return '';
 }

@@ -12,13 +12,16 @@
 ._check.on:hover{background-position:0 -300px}
 ._check.title{padding-left:20px}
 ._check.block{display:block}
-._check.light:not(.on){color:#888}
-._check.disabled{
+._check.light:not(.on):not(.ignore){color:#888}
+._check.disabled,
+._check.ignore{
 	background-position:0 -400px;
 	color:#999;
 	cursor:default;
 }
-._check.disabled.on{background-position:0 -500px}
+._check.ignore{opacity:.4}
+._check.disabled.on,
+._check.ignore.on{background-position:0 -500px}
 
 
 
@@ -46,12 +49,16 @@
 ._radio div.on:hover{background-position:0 -300px}
 ._radio.light:not(.disabled) div:not(.on){color:#999}
 ._radio div.title0{color:#999}
-._radio.disabled div{
+._radio.disabled div,
+._radio.ignore div{
 	background-position:0 -400px;
 	color:#999;
 	cursor:default;
 }
-._radio.disabled div.on{background-position:0 -500px}
+._radio.ignore div{opacity:.4}
+._radio.disabled div.on,
+._radio.ignore div.on
+{background-position:0 -500px}
 
 
 

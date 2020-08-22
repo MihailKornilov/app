@@ -182,6 +182,33 @@ function _filterHtml($send, $spisok_id) {//получение данных сп�
 
 	return $send;
 }
+function _filterIgnore($el) {//определение игнорируется ли данный фильтр
+	if($elem_id = _num($el))
+		if(!$el = _elemOne($el))
+			return true;
+	if(!$bl = _blockOne($el['block_id']))
+		return true;
+	if(!$elm = _BE('elem_arr', $bl['obj_name'], $bl['obj_id']))
+		return false;
+
+	//поиск фильтров, которые требуют игнорирования
+	foreach($elm as $id => $r)
+		switch($r['dialog_id']) {
+			//быстрый поиск
+			case 7:
+				if(!_filter('v', $id))
+					return false;
+				if(!$r['num_2'])
+					return false;
+				if(!$ass = _idsAss($r['txt_3']))
+					return false;
+				if(!isset($ass[$el['id']]))
+					return false;
+				return true;
+		}
+
+	return false;
+}
 
 function _spisokIsSort($elem_id) {//определение, нужно ли производить сортировку этого списка (поиск элемента 71)
 	if(!$spisok_el = _BE('elem_arr', 'spisok', $elem_id))

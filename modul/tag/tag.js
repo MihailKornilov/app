@@ -7,6 +7,8 @@ $(document)
 			return;
 		if(t.hasClass('disabled'))
 			return;
+		if(t.hasClass('ignore'))
+			return;
 
 		var p = t.prev(),
 			v = _num(p.val()) ? 0 : 1;
@@ -20,6 +22,8 @@ $(document)
 		if(!p.hasClass('php'))//если элемент был выведен через JS, а не через PHP, то действия нет
 			return;
 		if(p.hasClass('disabled'))
+			return;
+		if(p.hasClass('ignore'))
 			return;
 
 		var v = _num(t.attr('val'));
@@ -54,7 +58,7 @@ $(document)
 		t.append(html)._toolCss(side);
 	});
 
-$.fn._check = function(o) {
+$.fn._check = function(o, oo) {
 	var t = $(this);
 
 	if(!t.length)
@@ -70,6 +74,8 @@ $.fn._check = function(o) {
 			case 'string':
 				if(o == 'disable')
 					S.dis();
+				if(o == 'ignore')
+					S.ignore(oo);
 				if(o == 'enable')
 					S.enab();
 				if(o == 'func')
@@ -80,7 +86,6 @@ $.fn._check = function(o) {
 	}
 
 	checkPrint();
-
 
 	var CHECK = $('#' + attr_id + '_check');
 
@@ -101,6 +106,8 @@ $.fn._check = function(o) {
 
 	CHECK.click(function() {
 		if(CHECK.hasClass('disabled'))
+			return;
+		if(CHECK.hasClass('ignore'))
 			return;
 
 		var v = CHECK.hasClass('on') ? 0 : 1;
@@ -161,6 +168,9 @@ $.fn._check = function(o) {
 	t.dis = function() {//перевод галочки в неактивное состояние
 		CHECK.addClass('disabled');
 	};
+	t.ignore = function(i) {//перевод галочки в неактивное состояние
+		CHECK[(i === false ? 'remove' : 'add') + 'Class']('ignore');
+	};
 	t.enab = function() {//перевод галочки в активное состояние
 		CHECK.removeClass('disabled');
 	};
@@ -188,6 +198,8 @@ $.fn._radio = function(o, oo) {
 			case 'string':
 				if(o == 'spisok')
 					S.spisok(oo);
+				if(o == 'ignore')
+					S.ignore(oo);
 				break;
 			case 'function': S.func(o);	break;
 		}
@@ -210,6 +222,7 @@ $.fn._radio = function(o, oo) {
 		o.title0   = PHP.find('.title0').html();
 		o.block    = PHP.hasClass('block');
 		o.dis      = PHP.hasClass('disabled');
+		o.ignore   = PHP.hasClass('ignore');
 		o.light    = PHP.hasClass('light');
 		o.interval = PHP.find('div:first').css('margin-bottom').split('px')[0] * 1;
 		if(!o.interval)
@@ -222,7 +235,8 @@ $.fn._radio = function(o, oo) {
 	o = $.extend({
 		title0:'',  //текст нулевого значения
 		spisok:[],  //список значений в виде id => title
-		dis:0,      //выбор значений заблокирован
+		dis:0,      //серое состояние, выбор значений заблокирован
+		ignore:0,   //бледное состояние, выбор значений заблокирован
 		light:0,    //невыбранные значения показываются бледным цветом
 		block:1,    //вертикальное, либо горизонтальное отображение значений
 		interval:7, //интервал между значениями
@@ -237,6 +251,7 @@ $.fn._radio = function(o, oo) {
 			'<div class="_radio' + 
 						_dn(o.block, 'block') + 
 						_dn(o.dis, 'disabled') + 
+						_dn(o.ignore, 'ignore') +
 						_dn(o.light, 'light') + '"' +
 				' id="' + attr_id + '_radio">'   +
 			'</div>';
@@ -268,6 +283,8 @@ $.fn._radio = function(o, oo) {
 	function _active() {//активирование нажания
 		RD.find('div').click(function() {
 			if(RD.hasClass('disabled'))
+				return;
+			if(RD.hasClass('ignore'))
 				return;
 
 			var v = _num($(this).attr('val'));
@@ -301,6 +318,9 @@ $.fn._radio = function(o, oo) {
 		o.spisok = spisok;
 		_spisok();
 		_active();
+	};
+	t.ignore = function(i) {//перевод в неактивное состояние
+		RD[(i === false ? 'remove' : 'add') + 'Class']('ignore');
 	};
 
 	window[win] = t;
