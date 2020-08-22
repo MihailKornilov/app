@@ -1397,7 +1397,6 @@ function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значени�
 				LIMIT 1";
 		if($el_id = query_value($sql))
 			$send['spisok'] = _elem212ActionFormat($el_id, $v, $send['spisok']);
-
 	}
 
 	jsonSuccess($send);

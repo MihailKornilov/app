@@ -74,6 +74,8 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 
 		//получение названия элемента
 		case 'title':
+			if(empty($el))
+				return '';
 			if(!empty($el['name']))
 				return $el['name'];
 			if(!$el['dialog_id'])

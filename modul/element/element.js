@@ -1094,6 +1094,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						._check(is_set)
 						._check(is_set);
 					break;
+				//выбор значений
+				case 13:
+					_attr_cmp(id)
+						.val(0)
+						.next().find('.inp').val('')
+						.prev()._dn();
+					break;
 				//select - привязанный список
 				case 29:
 					_attr_cmp(id)._select(v);

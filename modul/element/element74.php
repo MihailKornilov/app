@@ -63,6 +63,9 @@ function _element74_print($el, $prm) {
 		'disabled' => $prm['blk_setup']
 	));
 }
+function _element74_title() {
+	return 'Фильтр-радио';
+}
 function _elem74filter($el) {//применение фильтра к списку
 	//поиск элемента-фильтра-радио
 	foreach(_filter('spisok', $el['id']) as $F)

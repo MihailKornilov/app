@@ -22,6 +22,9 @@ function _element62_print($el, $prm) {
 		'value' => _filter('vv', $el, $el['num_3'])
 	));
 }
+function _element62_title($el) {
+	return $el['txt_1'];
+}
 function _elem62filter($el) {//фильтр-галочка
 	$send = '';
 
