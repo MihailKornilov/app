@@ -225,8 +225,9 @@ function _element27inDialog($DLG, $unitNew, $unitOld) {//пересчёт бал
 		if(!isset($unitNew[$col]))
 			continue;
 		if(!empty($unitOld))
-			if($unitNew[$col] == $unitOld[$col])
-				continue;
+			if(isset($unitNew[$col]) && isset($unitOld[$col]))
+				if($unitNew[$col] == $unitOld[$col])
+					continue;
 		_element27childChange($el['id'], $unit_ids=0);
 	}
 }
