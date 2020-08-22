@@ -25,6 +25,11 @@ function _blockAction201($bl, $prm) {//установка исходного о�
 		&& $el['dialog_id'] != 75//Фильтр: фронтальное меню
 		) continue;
 
+		if(_filterIgnore($el)) {
+			$bl['hidden'] = true;
+			return $bl;
+		}
+
 		if(!$r['initial_id'])
 			continue;
 
@@ -70,7 +75,7 @@ function _blockAction201($bl, $prm) {//установка исходного о�
 
 	return $bl;
 }
-function _blockAction211($bl) {
+function _blockAction211($bl) {//БЛОК: скрытие/показ блоков
 	global $G_ACT;
 
 	foreach($G_ACT['act'] as $r) {
