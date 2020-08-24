@@ -1288,21 +1288,6 @@ function _blockCh($block_id, $param) {//получение конкретног�
 	return $bl[$param];
 }
 
-function _elemColType($id='all') {//тип данных, используемый элементом _dialog:element_type
-	$col_type = array(
-		1 => 'txt',
-		2 => 'num',
-		3 => 'sum',
-		4 => 'date'
-	);
-
-	if($id == 'all')
-		return $col_type;
-	if(!isset($col_type[$id]))
-		return '';
-
-	return $col_type[$id];
-}
 
 function _elemIsConnect($el) {//определение, является ли элемент подключаемым списком
 	if(empty($el))
@@ -1360,13 +1345,26 @@ function _elemCol($el) {//получение имени колонки
 
 	return $ell['col'];
 }
+function _elemColType($id='all') {//тип данных, используемый элементом _dialog:element_type
+	$col_type = array(
+		1 => 'txt',
+		2 => 'num',
+		3 => 'sum',
+		4 => 'date'
+	);
+
+	if($id == 'all')
+		return $col_type;
+	if(!isset($col_type[$id]))
+		return '';
+
+	return $col_type[$id];
+}
 function _elemColDlgId($elem_id, $oo=false) {//получение id диалога по имени колонки (для определения, вносит ли элемент данные из другого диалога)
 /*
 	$oo - OtherOnly: отправлять только флаг: елемент из своего диалога или нет
 */
 
-	if(!$elem_id = _num($elem_id))
-		return 0;
 	if(!$el = _elemOne($elem_id))
 		return 0;
 
@@ -1415,6 +1413,11 @@ function _elemId($dlg_id, $unit_id) {//получение id элемента н
 	}
 
 	return 0;
+}
+function _elemDlg($elem_id) {//получение данных диалога на основании элемента
+	if(!$dlg_id = _elemDlgId($elem_id))
+		return array();
+	return _dialogQuery($dlg_id);
 }
 function _elemDlgId($elem_id_src) {//получение id диалога на основании элемента
 	$elem_id = $elem_id_src;

@@ -82,6 +82,77 @@ function _element102_print($el, $prm) {
 			'EL'.$el['id'].'_F102_BG='._json($bgAss).';'.
 	'</script>';
 }
+function _elem102CnnList($ids, $return='select', $cond='') {//значения привязанного списка (пока для фильтра 102)
+	/*
+		$return - варианты возврата:
+			select - по умолчанию
+			ass
+			ids
+	*/
+
+
+	if(!$last_id = _idsLast($ids))
+		return array();
+	if(!$dlg = _elemDlg($last_id))
+		return array();
+	if(!$col = _elemCol($last_id))
+		return array();
+
+	//получение данных списка
+	$sql = "SELECT "._queryCol($dlg)."
+			FROM   "._queryFrom($dlg)."
+			WHERE  "._queryWhere($dlg)."
+				   ".$cond."
+			ORDER BY ".(_queryColReq($dlg, 'sort') ? "`sort`,`id`" : '`id`');
+	if(!$spisok = query_arr($sql))
+		return array();
+
+	//требуется ли вывод списка по уровням
+	if($return == 'select')
+		foreach($spisok as $r)
+			if($r['parent_id']) {
+				$child = array();
+				foreach($spisok as $id => $sp)
+					$child[$sp['parent_id']][$id] = $sp;
+				return _elem102CnnChild($col, $child);
+			}
+
+	$select = array();
+	$ass = array();
+	foreach($spisok as $id => $r) {
+		$select[] = array(
+			'id' => $id,
+			'title' => $r[$col]
+		);
+		$ass[$id] = $r[$col];
+	}
+
+	if($return == 'ass')
+		return $ass;
+	if($return == 'ids')
+		return _idsGet($select);
+
+	return $select;
+}
+function _elem102CnnChild($col, $child, $pid=0, $spisok=array(), $path='', $level=0) {//расстановка дочерних значений
+	if(!$send = @$child[$pid])
+		return $spisok;
+
+	foreach($send as $id => $sp) {
+		$content = $sp[$col];
+		$u = array(
+			'id' => $id,
+			'title' => $path.$sp[$col],
+			'content' => '<b>'.$content.'</b>'
+		);
+		if($level)
+			$u['content'] = '<div class="ml'.($level*20).'">'.$content.'</div>';
+		$spisok[] = $u;
+		$spisok = _elem102CnnChild($col, $child, $id, $spisok, $path.$sp[$col].' » ', $level+1);
+	}
+
+	return $spisok;
+}
 function _elem102filter($el) {//Фильтр - Выбор нескольких групп значений
 	$filter = false;
 	$v = 0;
@@ -89,23 +160,20 @@ function _elem102filter($el) {//Фильтр - Выбор нескольких �
 	//поиск элемента-фильтра-select
 	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 102) {
-			$filter = $r['elem'];
-			$v = _ids($r['v']);
+			if(!$filter = $r['elem'])
+				return '';
+			if(!$v = _num($r['v']))
+				return '';
 			break;
 		}
 
-	if(!$filter)
+	if(empty($filter))
 		return '';
-	if(!$v)
+	if(!$elem_id = _idsFirst($filter['txt_2']))
 		return '';
-	if(!$elem_ids = _ids($filter['txt_2'], 1))
-		return '';
-
-	$elem_id = $elem_ids[0];
-
 	if(!$ell = _elemOne($elem_id))
 		return '';
-	if(!$col = $ell['col'])
+	if(!$col = _elemCol($ell))
 		return '';
 
 	return " AND `".$col."` IN (".$v.")";
