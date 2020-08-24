@@ -1,63 +1,473 @@
 /* Элементы-теги */
 
-$(document)
-	.on('click', '._check', function() {//установка/снятие галочки, если была выведена через PHP
-		var t = $(this);
-		if(!t.hasClass('php'))//если галочка выведена через JS, а не через PHP, то действия нет
+
+
+$.fn._select = function(o, o1) {//выпадающий список от 24.08.2020
+	var t = $(this);
+
+	if(!t.length)
+		return;
+
+	var attr_id = _attrId(t),
+		VALUE = t.val(),
+		win = attr_id + 'win',
+		s = window[win];
+
+	switch(typeof o) {
+		default:
+		case 'undefined': break;
+		case 'object': break;
+		case 'number':
+		case 'string': return action();
+	}
+
+	o = $.extend({
+		width:150,			// ширина. Если 0 = 100%
+		disabled:0,         // нельзя выбирать, серые стили
+		blocked:0,          // заблокировано. Нельзя выбирать, но выглядит ярко
+		block:0,       	    // расположение селекта
+		title0:'',			// поле с нулевым значением
+		spisok:[],			// результаты в формате json
+		write:0,            // возможность вводить значения
+		write_save:0,       // сохранять текст, если даже не выбран элемент
+		msg_empty:'Список пуст',
+		multi:0,            // возможность выбирать несколько значений. Идентификаторы перечисляются через запятую
+		func:function() {},	// функция, выполняемая при выборе значения
+		funcWrite:funcWrite,// функция, выполняемая при вводе в INPUT в селекте. Нужна для вывода списка из вне, например, Ajax-запроса, либо из vk api.
+		funcAdd:null	    // добавления новой единицы. Если указана, показывает плюсик.
+	}, o);
+
+	var dis = o.disabled ? ' disabled' : '',
+		blocked = o.blocked ? ' blocked' : '',
+		dib = o.block ? '' : ' dib',
+		width = 'width:' + (o.width ? o.width + 'px' : '100%'),
+		readonly = o.write ? '' : ' readonly',
+		placeholder = o.title0 ? ' placeholder="' + o.title0 + '"' : '',
+		iconAddFlag = o.funcAdd && !dis && !blocked,
+		html =
+		'<div class="_select' + dis + blocked + dib + '" id="' + attr_id + '_select" style="' + width + '">' +
+			'<table class="w100p">' +
+				'<tr><td>' +
+			 (o.multi ? '<dl>' : '') +
+							'<input type="text" class="select-inp ' + (!o.multi ? 'w100p' : 'w50') + '"' + placeholder + readonly + ' />' +
+			 (o.multi ? '</dl>' : '') +
+					'<td class="w15' + _dn(o.write) + '"><div class="icon icon-del clear pl dn tool" data-tool="Очистить"></div>' +
+					'<td class="w25 r' + _dn(iconAddFlag) + '"><div class="icon icon-add pl"></div>'+
+					'<td class="arrow">' +
+			'</table>' +
+			'<div class="select-res"></div>' +
+		'</div>';
+	t.next().remove('._select');
+	t.after(html);
+
+	if(blocked)
+		dis = 1;
+
+	var SEL = t.next(),
+		DL = SEL.find('dl'),
+		DLW = o.multi ? Math.round(DL.width()) : 0,
+		INP = SEL.find('.select-inp'),
+		RES = SEL.find('.select-res'),
+		ICON_DEL = SEL.find('.clear'),
+		ICON_ADD = SEL.find('.icon-add'),
+		MASS_ASS,//ассоциативный массив в виде {1:'text'}
+		MASS_SEL,//массив в виде [{id:1,title:'text1'},{id:2,title:'text2'}]
+		MASS_SEL_SAVE,//дублирование MASS_SEL
+		TAG = /(<[\/]?[_a-zA-Z0-9=\"' ]*>)/i, // поиск всех тегов
+		BG_ASS;  //ассоциативный массив цветов фона
+
+	massCreate();
+	o.multi ? multiPrint() : spisokPrint();
+	valueSet(o.multi ? '' : VALUE);
+
+	INP.keydown(function() {
+		if(dis)
 			return;
-		if(t.hasClass('disabled'))
-			return;
-		if(t.hasClass('ignore'))
-			return;
 
-		var p = t.prev(),
-			v = _num(p.val()) ? 0 : 1;
+		SEL.addClass('rs');
 
-		p.val(v);
-		t._dn(!v, 'on');
-	})
-	.on('click', '._radio div', function() {//выбор значения radio, если был выведен через PHP
-		var t = $(this),
-			p = t.parent();
-		if(!p.hasClass('php'))//если элемент был выведен через JS, а не через PHP, то действия нет
-			return;
-		if(p.hasClass('disabled'))
-			return;
-		if(p.hasClass('ignore'))
-			return;
-
-		var v = _num(t.attr('val'));
-
-		p.prev().val(v);
-		p.find('.on').removeClass('on');
-		t.addClass('on');
-	})
-	.on('mouseenter', '.tool,.tool-l,.tool-r', function() {//показ сообщения на тёмном фоне
-		var t = $(this),
-			msg = t.attr('data-tool'),
-			side = '';
-
-		if(t.find('.tool-div').length)
-			return;
-		if(!msg)
-			return t.removeClass('tool');
-
-		//подсказка смещена влево
-		if(t.hasClass('tool-l'))
-			side = 'l';
-		//подсказка смещена вправо
-		if(t.hasClass('tool-r'))
-			side = 'r';
-
-
-		var html = '<div class="tool-div">' +
-					'<div class="tool-msg">' + msg + '</div>' +
-					'<div class="tool-ug ' + side + '"></div>' +
-				  '</div>';
-		t.removeAttr('data-tool');
-		t.append(html)._toolCss(side);
+		setTimeout(function() {
+			if(!o.multi) {
+				VALUE = 0;
+				t.val(0);
+			}
+			var v = INP.val();
+			ICON_DEL._dn(v && !o.multi);
+			o.funcWrite(v, t);
+		}, 0);
 	});
 
+	SEL.click(function(e) {
+		if(dis)
+			return;
+
+		var rs = SEL.hasClass('rs'),
+			TRG = $(e.target),
+			su = TRG;
+
+		if(!su.hasClass('select-unit'))
+			su = TRG.closest('.select-unit');
+
+		if(su.hasClass('select-unit')) {
+			if(su.hasClass('info'))
+				return;
+			if(su.hasClass('busy'))
+				return;
+
+			valueSet(su.attr('val'));
+			o.func(VALUE);
+			if(o.multi) {
+				su._dn();
+				if(o.write)
+					INP.focus();
+				return;
+			}
+		}
+
+		if(rs && o.write && TRG.hasClass('select-inp'))
+			return;
+		if(TRG.hasClass('icon-add'))
+			return;
+		if(TRG.hasClass('icon-del'))
+			return;
+		if(TRG.hasClass('empty'))
+			return;
+
+		SEL._dn(rs, 'rs');
+		RES._dn(RES.height() < 250, 'h250');
+
+		//открытие списка
+		if(!rs) {
+			spisokPrint();
+			//выделение выбранного значения
+			_forEq(RES.find('.select-unit'), function(sp) {
+				if(VALUE == sp.attr('val')) {
+					RES.find('.select-unit').removeClass('ov');
+					if(sp.hasClass('info'))
+						return false;
+					sp.addClass('ov');
+					//установка выбранного значения в области видимости
+					sp = sp[0];
+					var showTop = Math.round((250 - sp.offsetHeight) / 2);
+					RES[0].scrollTop = sp.offsetTop - showTop;
+					return false;
+				}
+			});
+		}
+	});
+
+	ICON_DEL.click(function() {
+		valueSet(0);
+		o.funcWrite('', t);
+	});
+
+	if(iconAddFlag)
+		SEL.find('.icon-add').click(function() {
+			o.funcAdd(t);
+		});
+
+	if(o.multi)
+		DL.sortable({
+			items:'.mu',
+			update:multiValueSet
+		});
+
+	$(document)
+		.off('click._select')
+		 .on('click._select', function(e) {
+			var cur = $(e.target).parents('._select'),
+				attr = '';
+
+			//закрытие селектов, когда нажатие было в стороне
+			if(cur.hasClass('_select'))
+				attr = ':not(#' + cur.attr('id') + ')';
+
+			$('._select' + attr).removeClass('rs');
+		});
+
+	function massCreate() {//создание массива для корректного вывода списка
+		var unit;
+
+		MASS_ASS = {};
+		MASS_SEL = [];
+		MASS_SEL_SAVE = [];
+		BG_ASS = {};
+
+		if(o.title0)
+			MASS_ASS[0] = '';
+
+		//исходный список является ассоциативным объектом {1:'title1',2:'title2'}
+		if(!o.spisok.length) {
+			_forIn(o.spisok, function(sp, id) {
+				if(!id)
+					return;
+				MASS_ASS[id] = sp;
+				unit = {
+					id:id,
+					title:sp,
+					content:sp
+				};
+				MASS_SEL.push(unit);
+				MASS_SEL_SAVE.push(_objCopy(unit));
+			});
+			return;
+		}
+
+		//исходный список является последовательным массивом [{id:1,title:'name1'},{id:2,title:'name2'}]
+		_forN(o.spisok, function(sp, n) {
+			var id,
+				title,
+				content;
+
+			//проверка на одномерный последовательный массив
+			if(typeof sp == 'number' || typeof sp == 'string') {
+				id = n + 1;
+				title = sp;
+			} else {
+				id = sp.uid;
+				if(id === undefined)
+					id = sp.id;
+				if(sp.info)
+					id = -9999999999;
+				if(!id)
+					return;
+				title = sp.title;
+				if(title === undefined)
+					return;
+				content = sp.content;
+			}
+
+			MASS_ASS[id] = title || ' ';
+			title = title || '&nbsp;';
+			if(!content)
+				content = title;
+			unit = {
+				id:id,
+				title:title,
+				content:content,
+				info:_num(sp.info),//флаг информационного значения. Значение нельзя выбрать.
+				busy:_num(sp.busy),//значение нельзя выбрать.
+				bg:sp.bg
+			};
+			MASS_SEL.push(unit);
+			MASS_SEL_SAVE.push(_objCopy(unit));
+			BG_ASS[id] = sp.bg;
+		});
+	}
+	function spisokPrint() {//вставка списка в select
+		RES.removeClass('h250');
+		if(!MASS_SEL.length && !o.title0)
+			return RES.html('<div class="empty">' + o.msg_empty + '</div>');
+
+		var html = '',
+			is_sel = o.multi ? _idsAss(t.val()) : {}; //выбранные значения (нельзя выбрать повторно при multi)
+
+		if(o.title0 && !o.write && !o.multi)
+			html += '<div class="select-unit title0" val="0">' + o.title0 + '</div>';
+
+		_forN(MASS_SEL, function(sp) {
+			if(is_sel[sp.id])
+				return;
+			var info = sp.info ? ' info' : '',
+				busy = sp.busy ? ' busy' : '',
+				val = info || busy ? '' : ' val="' + sp.id + '"',
+				bg = sp.bg ? ' style="background-color:' + sp.bg + '"' : '';
+			html += '<div class="select-unit' + info + busy + '"' + bg + val + '>' + sp.content + '</div>';
+		});
+
+		RES.html(html);
+
+		var h = RES.height();
+		RES._dn(h < 250, 'h250');
+
+		RES.find('.select-unit').mouseenter(function() {
+			var sp = $(this);
+			RES.find('.ov').removeClass('ov');
+			if(sp.hasClass('info'))
+				return;
+			sp.addClass('ov');
+		});
+	}
+	function funcWrite() {//выделение символов при поиске
+		var v = $.trim(INP.val()),
+			find = [],
+			reg = new RegExp(v, 'i'); // для замены найденного значения
+
+		_forN(MASS_SEL_SAVE, function(sp) {
+			var un = _objCopy(sp),
+				arr = un.content.split(TAG); // разбивка на массив согласно тегам
+			_forN(arr, function(r, k) {
+				if(!r.length)    //если строка пустая
+					return;
+				if(TAG.test(r))  //если это тег
+					return;
+				if(!reg.test(r)) //если нет совпадения
+					return;
+
+				arr[k] = r.replace(reg, '<em class="fndd">$&</em>'); // производится замена
+				un.content = arr.join('');
+				find.push(un);
+				return false; // и сразу выход из массива
+			});
+		});
+
+		MASS_SEL = find;
+		spisokPrint();
+	}
+	function valueSet(v) {//установка значения
+		if(o.multi)
+			return multiValueSet(v);
+		if(REGEXP_CENA_MINUS.test(v))
+			v = _num(v, 1);
+
+		VALUE = v;
+		t.val(v);
+
+		INP.val(MASS_ASS[v] ? String(MASS_ASS[v]).replace(/&quot;/g,'"') : '');
+
+		if(v && !MASS_ASS[v])
+			INP.val('Несуществующее значение ' + v)
+			   .addClass('clr5');
+		else
+			INP.removeClass('clr5');
+
+		ICON_DEL._dn(v && o.write);
+		if(BG_ASS[v]) {
+			SEL.css('background-color', BG_ASS[v]);
+			INP.css('background-color', BG_ASS[v]);
+		}
+	}
+	function multiValueSet(v) {//обновление массива и ширины инпута после вставки значения, если мульти-выбор
+		v = _num(v);
+		multiBefore(v);
+
+		var dd = DL.find('dd:last'),
+			w = DLW - 10,
+			vv = [];
+
+		if(dd.length) {
+			var ol = dd[0].offsetLeft,
+				ow = dd[0].offsetWidth,
+				inpW = DLW - ol - ow - 10;
+			w = inpW < 30 ? w : inpW;
+			_forEq(DL.find('dd'), function(sp) {
+				vv.push(sp.attr('val'));
+			});
+		}
+
+		INP.width(w);
+		INP.attr('placeholder', dd.length ? '' : o.title0);
+		t.val(vv.join(','));
+		MASS_SEL = MASS_SEL_SAVE;
+	}
+	function multiPrint() {//вывод выбранных значений при мульти-выборе
+		_forIn(_idsAss(t.val()), function(i, id) {
+			multiBefore(id);
+		});
+	}
+	function multiBefore(v) {//вставка значения, если мульти-выбор
+		if(!v)
+			return;
+		if(!MASS_ASS[v])
+			return;
+		INP.before(
+			'<dd class="mu" val="' + v + '">' +
+				MASS_ASS[v] +
+				'<div class="icon icon-del pl"></div>' +
+			'</dd>'
+		);
+		DL.find('.icon:last').click(function() {
+			$(this).parent().remove();
+			multiValueSet();
+		});
+	}
+	function action() {//выполнение действия в существующем селекте
+		if(s === undefined)
+			return t;
+
+		if(typeof o == 'number') {
+			s.value(o);
+			return s;
+		}
+
+		switch(o) {
+			case 'disable': s.disable(); break;
+			case 'enable': s.enable(); break;
+			case 'inp': return s.inp();
+			case 'spisok': s.spisok(o1); break;
+			case 'process': s.process(); break;
+			case 'cancel': s.cancel(); break;
+			case 'focus': s.focus(); break;
+		}
+
+		return s;
+	}
+
+	t.value = valueSet;
+	t.icon_del = ICON_DEL;
+	t.icon_add = ICON_ADD;
+	t.inp = function() {//получение введённого значения
+		return INP.val();
+	};
+	t.disable = function() {//делание неактивным
+		SEL.addClass('disabled')
+		   .removeClass('rs');
+		INP.attr('readonly', true);
+		SEL.find('.td-add')._dn();
+		dis = true;
+	};
+	t.enable = function() {//делание активным
+		SEL.removeClass('disabled');
+		dis = false;
+	};
+	t.process = function() {//показ процесса ожидания
+		if(!o.write)
+			ICON_DEL.parent().removeClass('dn');
+		ICON_DEL.addClass('spin');
+	};
+	t.isProcess = function() {//получение флага процесса ожидания
+		return ICON_DEL.hasClass('spin');
+	};
+	t.cancel = function() {//отмена процесса ожидания
+		if(!o.write)
+			ICON_DEL.parent().addClass('dn');
+		ICON_DEL.removeClass('spin');
+	};
+	t.spisok = function(spisok) {//вставка нового списка
+		t.cancel();
+		o.spisok = spisok;
+		massCreate();
+		spisokPrint();
+	};
+	t.unitUnshift = function(unit) {//вставка единицы в начало существующего списка
+		o.spisok.unshift(unit);
+		massCreate();
+		spisokPrint();
+	};
+	t.focus = function() {//установка фокуса на input
+		if(o.write)
+			INP.focus();
+	};
+
+	window[win] = t;
+	return t;
+};
+
+$(document).on('click', '._check', function() {//установка/снятие галочки, если была выведена через PHP
+	var t = $(this);
+	if(!t.hasClass('php'))//если галочка выведена через JS, а не через PHP, то действия нет
+		return;
+	if(t.hasClass('disabled'))
+		return;
+	if(t.hasClass('ignore'))
+		return;
+
+	var p = t.prev(),
+		v = _num(p.val()) ? 0 : 1;
+
+	p.val(v);
+	t._dn(!v, 'on');
+});
 $.fn._check = function(o, oo) {
 	var t = $(this);
 
@@ -177,6 +587,23 @@ $.fn._check = function(o, oo) {
 	window[win] = t;
 	return t;
 };
+
+$(document).on('click', '._radio div', function() {//выбор значения radio, если был выведен через PHP
+	var t = $(this),
+		p = t.parent();
+	if(!p.hasClass('php'))//если элемент был выведен через JS, а не через PHP, то действия нет
+		return;
+	if(p.hasClass('disabled'))
+		return;
+	if(p.hasClass('ignore'))
+		return;
+
+	var v = _num(t.attr('val'));
+
+	p.prev().val(v);
+	p.find('.on').removeClass('on');
+	t.addClass('on');
+});
 $.fn._radio = function(o, oo) {
 	var t = $(this);
 
@@ -332,6 +759,7 @@ $.fn._radio = function(o, oo) {
 
 	return t;
 };
+
 $.fn._count = function(o) {//input с количеством
 	var t = $(this),
 		S;
@@ -459,6 +887,7 @@ $.fn._count = function(o) {//input с количеством
 	window[win] = t;
 	return t;
 };
+
 $.fn._hint = function(o) {//выплывающие подсказки
 	var t = $(this);
 
@@ -846,6 +1275,32 @@ $.fn._hintOver = function(o) {//выплывающая подсказка от �
 		obj._hint(o);
 	});
 };
+
+$(document).on('mouseenter', '.tool,.tool-l,.tool-r', function() {//показ сообщения на тёмном фоне
+	var t = $(this),
+		msg = t.attr('data-tool'),
+		side = '';
+
+	if(t.find('.tool-div').length)
+		return;
+	if(!msg)
+		return t.removeClass('tool');
+
+	//подсказка смещена влево
+	if(t.hasClass('tool-l'))
+		side = 'l';
+	//подсказка смещена вправо
+	if(t.hasClass('tool-r'))
+		side = 'r';
+
+
+	var html = '<div class="tool-div">' +
+		'<div class="tool-msg">' + msg + '</div>' +
+		'<div class="tool-ug ' + side + '"></div>' +
+		'</div>';
+	t.removeAttr('data-tool');
+	t.append(html)._toolCss(side);
+});
 $.fn._tool = function(msg, side) {//подсказка на тёмном фоне
 	var t = $(this);
 
@@ -882,6 +1337,7 @@ $.fn._toolCss = function(side) {//выставление подсказки по
 		top:top
 	});
 };
+
 $.fn._calendar = function(o) {
 	var t = $(this);
 
@@ -1216,6 +1672,7 @@ $.fn._calendar = function(o) {
 
 	return t;
 };
+
 $.fn._search = function(o, v) {//поисковая строка
 	/*
 		Оборачивается input:text
@@ -1340,6 +1797,7 @@ $.fn._search = function(o, v) {//поисковая строка
 
 	return t;
 };
+
 $.fn._menu = function(o) {//меню переключения
 	var tMain = $(this),
 		attr_id = tMain.attr('id'),
@@ -1428,6 +1886,7 @@ $.fn._menu = function(o) {//меню переключения
 	window[win] = tMain;
 	return tMain;
 };
+
 $.fn._dropdown = function(o) {//выпадающий список в виде ссылки
 	var t = $(this);
 
@@ -1625,6 +2084,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 	window[win] = t;
 	return t;
 };
+
 $.fn._yearleaf = function(o) {//перелистывание годов
 	var t = $(this);
 

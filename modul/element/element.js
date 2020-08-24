@@ -2464,6 +2464,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			width:_num(el.width),
 			title0:el.txt_1,
 			blocked:el.noedit && unit.id,
+			write:1,
+			multi:el.num_2,
 			spisok:el.vvv,
 			func:function(v) {
 				_ELM_ACT(el, v);

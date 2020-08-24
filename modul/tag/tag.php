@@ -1,18 +1,33 @@
 <?php
 /* Элементы-теги */
 
-require_once GLOBAL_DIR.'/modul/tag/tag_select/tag_select.php';
-
-
 function _tag_script() {//скрипты и стили элементов-тегов
 	return
-	//общие скрипты
 	'<link rel="stylesheet" type="text/css" href="modul/tag/tag'.MIN.'.css?'.SCRIPT.'" />'.
-	'<script src="modul/tag/tag'.MIN.'.js?'.SCRIPT.'"></script>'.
+	'<script src="modul/tag/tag'.MIN.'.js?'.SCRIPT.'"></script>';
+}
 
-	//_select
-	'<link rel="stylesheet" type="text/css" href="modul/tag/tag_select/tag_select'.MIN.'.css?'.SCRIPT.'" />'.
-	'<script src="modul/tag/tag_select/tag_select'.MIN.'.js?'.SCRIPT.'"></script>';
+function _select($v=array()) {//выпадающее поле
+	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
+
+	$width = '150px';
+	if(isset($v['width']))
+		if(!$width = _num($v['width']))
+			$width = '100%';
+		else
+			$width .= 'px';
+	$width = ' style="width:'.$width.'"';
+
+	$placeholder = empty($v['placeholder']) ? '' : ' placeholder="'.trim($v['placeholder']).'"';
+
+	return
+	'<input type="hidden" id="'.$attr_id.'" value="'.@$v['value'].'" />'.
+	'<div class="_select disabled dib" id="'.$attr_id.'_select"'.$width.'">'.
+		'<table class="w100p">'.
+			'<tr><td><input type="text" class="select-inp w100p"'.$placeholder.' readonly />'.
+				'<td class="arrow">'.
+		'</table>'.
+	'</div>';
 }
 
 function _check($v=array()) {//элемент ГАЛОЧКА
@@ -37,6 +52,7 @@ function _check($v=array()) {//элемент ГАЛОЧКА
 		$title.
 	'</div>';
 }
+
 function _radio($v=array()) {//элемент RADIO
 	$attr_id = empty($v['attr_id']) ? 'radio'.rand(1, 100000) : $v['attr_id'];
 	$title0 = @$v['title0'];
@@ -87,6 +103,7 @@ function _radioUnit($id, $block, $title, $interval, $on) {
 		$title.
 	'</div>';
 }
+
 function _count($v=array()) {//поле количество
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
 
@@ -110,7 +127,9 @@ function _count($v=array()) {//поле количество
 		'<div class="but but-b"></div>'.
 	'</div>';
 }
+
 function _hint() {/* все действия через JS */}
+
 function _calendar($v=array()) {//поле Календарь
 	$attr_id = empty($v['attr_id']) ? 'calendar'.rand(1, 100000) : $v['attr_id'];
 	$time = _num($v['time']); //показывать время
@@ -141,6 +160,7 @@ function _calendar($v=array()) {//поле Календарь
 
 	'</div>';
 }
+
 function _search($v=array()) {//поле ПОИСК
 	$attr_id = empty($v['attr_id']) ? 'search'.rand(1, 100000) : $v['attr_id'];
 
@@ -168,6 +188,7 @@ function _search($v=array()) {//поле ПОИСК
 		'</table>'.
 	'</div>';
 }
+
 function _dropdown($v=array()) {//выпадающее поле - ссылка
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
 
@@ -179,6 +200,7 @@ function _dropdown($v=array()) {//выпадающее поле - ссылка
 		'<a class="dd-head clr1">'.$v['placeholder'].'</a>'.
 	'</div>';
 }
+
 function _yearleaf($v=array()) {//перелистывание годов
 	$attr_id = empty($v['attr_id']) ? 'select'.rand(1, 100000) : $v['attr_id'];
 
