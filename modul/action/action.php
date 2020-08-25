@@ -3,75 +3,96 @@
 function _blockAction201($bl, $prm) {//установка исходного отображения блока на основании действия
 	global $G_ACT;
 
-	foreach($G_ACT['act'] as $r) {
+	//расстановка выполнения действий в порядке добавления
+	//первым будет выполняться действие, которое было добавлено первым
+	$action = array();
+	foreach($G_ACT['act'] as $id => $r) {
 		if($r['dialog_id'] != 201)
 			continue;
 
-		$ass = _idsAss($r['target_ids']);
+		if(!$ass = _idsAss($r['target_ids']))
+			continue;
 		if(!isset($ass[$bl['id']]))
 			continue;
 		if(!$el = _elemOne($r['element_id']))
 			continue;
 
-		if($el['dialog_id'] != 1//галочка
-		&& $el['dialog_id'] != 6//select страниц
-		&& $el['dialog_id'] != 16//radio
-		&& $el['dialog_id'] != 17//select
-		&& $el['dialog_id'] != 18//dropdown
-		&& $el['dialog_id'] != 24//Выпадающее поле - выбор списка
-		&& $el['dialog_id'] != 29//Выпадающее поле - выбор записи из другого списка
-		&& $el['dialog_id'] != 59//Связка с другим списком через кнопку
-		&& $el['dialog_id'] != 62//Фильтр: галочка
-		&& $el['dialog_id'] != 75//Фильтр: фронтальное меню
-		) continue;
-
-		if(_filterIgnore($el)) {
-			$bl['hidden'] = true;
-			return $bl;
-		}
-
-		if(!$r['initial_id'])
-			continue;
-
-		switch($r['apply_id']) {
-			default:
-			//скрыть
-			case 2783: $hidden = true; break;
-			//показать
-			case 2784: $hidden = false; break;
-		}
-
-		//получение выбранного значения при редактировании записи
-		$v = isset($el['def']) ? $el['def'] : 0;
-		if($u = $prm['unit_edit']) {
-			$col = $el['col'];
-			if(isset($u[$col]))
-				$v = $u[$col];
-		}
-
-		//фильтры
-		switch($el['dialog_id']) {
-			case 62: $v = _filter('vv', $el, $el['num_3']); break;
-			case 75: $v = _filter('vv', $el, 0); break;
-		}
-
-
-		if($v) {//если галочка установлена
-			if($r['initial_id'] != -2 && $r['initial_id'] != $v)//действие при установленной галочке
-				if($r['revers'])
-					$hidden = !$hidden;
-				else
-					continue;
-
-		} else  //если галочка снята
-			if($r['initial_id'] != -1)//действие при снятой галочке
-				if($r['revers'])
-					$hidden = !$hidden;
-				else
-					continue;
-
-		$bl['hidden'] = $hidden;
+		$action[$id][] = $r['element_id'];
 	}
+
+	if(empty($action))
+		return $bl;
+
+	ksort($action);
+
+	$hidden = $bl['hidden'];
+
+	foreach($action as $id => $elm) {
+		$r = $G_ACT['act'][$id];
+		foreach($elm as $elem_id) {
+			if(!$el = _elemOne($elem_id))
+				continue;
+
+			if($el['dialog_id'] != 1//галочка
+			&& $el['dialog_id'] != 6//select страниц
+			&& $el['dialog_id'] != 7//быстрый поиск
+			&& $el['dialog_id'] != 16//radio
+			&& $el['dialog_id'] != 17//select
+			&& $el['dialog_id'] != 18//dropdown
+			&& $el['dialog_id'] != 24//Выпадающее поле - выбор списка
+			&& $el['dialog_id'] != 29//Выпадающее поле - выбор записи из другого списка
+			&& $el['dialog_id'] != 59//Связка с другим списком через кнопку
+			&& $el['dialog_id'] != 62//Фильтр: галочка
+			&& $el['dialog_id'] != 75//Фильтр: фронтальное меню
+			) continue;
+
+			if(_filterIgnore($el)) {
+				$bl['hidden'] = true;
+				continue;
+			}
+
+			if(!$r['initial_id'])
+				continue;
+
+			switch($r['apply_id']) {
+				default:
+				//скрыть
+				case 2783: $hidden = true; break;
+				//показать
+				case 2784: $hidden = false; break;
+			}
+
+			//получение выбранного значения при редактировании записи
+			$v = isset($el['def']) ? $el['def'] : 0;
+			if($u = $prm['unit_edit'])
+				if($col = _elemCol($el))
+					if(isset($u[$col]))
+						$v = $u[$col];
+
+			//фильтры
+			switch($el['dialog_id']) {
+				case 7: $v = _filter('vv', $el); break;
+				case 62: $v = _filter('vv', $el, $el['num_3']); break;
+				case 75: $v = _filter('vv', $el, 0); break;
+			}
+
+			if($v) {//если галочка установлена
+				if($r['initial_id'] != -2 && $r['initial_id'] != $v)//действие при установленной галочке
+					if($r['revers'])
+						$hidden = !$hidden;
+					else
+						continue;
+
+			} else  //если галочка снята
+				if($r['initial_id'] != -1)//действие при снятой галочке
+					if($r['revers'])
+						$hidden = !$hidden;
+					else
+						continue;
+		}
+	}
+
+	$bl['hidden'] = $hidden;
 
 	return $bl;
 }
@@ -434,6 +455,14 @@ function _action201info($act) {//ЭЛЕМЕНТ: скрытие/показ бл�
 			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
 	}
 
+	$effect = '';
+	if($act['effect_id'])
+		$effect =
+			'<div class="fs12 clr1 mt2">'.
+				'Эффект: '.
+				'<span class="fs12 clr13">'._element('v_get', 2788, $act['effect_id']).'</span>'.
+			'</div>';
+
 	$revers = $act['revers'] ? '<div class="fs11 i clr9 mt2">Применяется обратное действие</div>' : '';
 
 	return
@@ -441,10 +470,7 @@ function _action201info($act) {//ЭЛЕМЕНТ: скрытие/показ бл�
 	'<b>'.$target.'</b>'.
 	'<br>'.
 	'<span class="clr1">если</span> '.$initial.
-	'<div class="fs12 clr1 mt2">'.
-		'Эффект: '.
-		'<span class="fs12 clr13">'._element('v_get', 2788, $act['effect_id']).'</span>'.
-	'</div>'.
+	$effect.
 	$revers;
 }
 function _action202info($act) {//ЭЛЕМЕНТ: установка значения элементу

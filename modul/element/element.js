@@ -1841,6 +1841,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return;
 
 				upd(v);
+				_ELM_ACT(el, v);
 			}
 		});
 	},
@@ -5081,7 +5082,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	//[95] Быстрое формирование списка
-	_EL95 = function(el, vvv) {
+	_EL95 = function(el) {
+		var vvv = el.vvv;
 		if(!vvv.cols.length)
 			return;
 

@@ -14,20 +14,21 @@ function _element95_struct($el) {
 function _element95_print($el, $prm) {
 	if(!empty($prm['blk_setup']))
 		return _emptyMin(_debugPrint('[95] ').$el['name']);
-
-	$cols = json_decode($el['txt_2'], true);
-	if(empty($cols))
+	if(!_decode($el['txt_2']))
 		return _emptyMinRed(_debugPrint('[95] ').'Не настроены колонки');
 
 	return '';
 }
 function _element95_vvv($el, $prm) {
-	if(empty($el['txt_2']))
-		return array();
 
-	$mass = _element95_mass($el, $prm);
+	$send = array(
+		'cols' => array(),
+		'mass' => _element95_mass($el, $prm)
+	);
 
-	$cols = json_decode($el['txt_2'], true);
+	if(!$cols = _decode($el['txt_2']))
+		return $send;
+
 	foreach($cols as $i => $r) {
 		if($r['type'] != 3)
 			continue;
@@ -36,7 +37,7 @@ function _element95_vvv($el, $prm) {
 
 		//сборка id, которые были внесены ранее (для редактирования)
 		$ids = array();
-		foreach($mass as $m)
+		foreach($send['mass'] as $m)
 			$ids[] = _num($m[$r['col']]);
 
 		$ids = array_unique($ids);
@@ -47,10 +48,9 @@ function _element95_vvv($el, $prm) {
 		}
 	}
 
-	return array(
-		'cols' => $cols,
-		'mass' => $mass
-	);
+	$send['cols'] = $cols;
+
+	return $send;
 }
 function _element95_mass($el, $prm) {//данные для редактирования
 	if(!$DLG_INS = _dialogQuery($el['num_1']))
@@ -86,9 +86,9 @@ function _element95_mass($el, $prm) {//данные для редактиров�
 
 	//получение имён колонок элемента [95]
 	$cols95 = array();
-	$json = json_decode($el['txt_2'], true);
-	if(empty($json))
+	if(!$json = _decode($el['txt_2']))
 		return array();
+
 	foreach($json as $c)
 		if($c['col'])
 			$cols95[] = $c['col'];
@@ -98,7 +98,7 @@ function _element95_mass($el, $prm) {//данные для редактиров�
 		$v = array('id'=>$id);
 		foreach($cols95 as $col) {
 			if(preg_match(REGEXP_CENA_MINUS, $r[$col]))
-				$r[$col] = $r[$col] * 1;
+				$r[$col] *= 1;
 			$v[$col] = $r[$col];
 		}
 
@@ -295,8 +295,10 @@ function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение да
 
 	if(empty($unit['id']))
 		return;
-	if(!$col = $cmp['col'])
+	if(!$col = _elemCol($cmp))
 		return;
+
+	echo $col;
 
 	$save = array();
 	if(!empty($val))
@@ -331,8 +333,8 @@ function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение да
 function PHP12_elem95_setup_vvv($prm) {
 	if(!$u = @$prm['unit_edit'])
 		return array();
-
-	$VAL = json_decode($u['txt_2'], true);
+	if(!$VAL = _decode($u['txt_2']))
+		return array();
 
 	foreach($VAL as $i => $r) {
 		$VAL[$i]['title'] = '';
