@@ -1110,6 +1110,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					_attr_cmp(id)._check(is_set);
 					FILTER[EL.num_1][id] = is_set;
 					break;
+				//фронтальное меню
+				case 75:
+					_attr_el(id).find('.mp75')._dn();
+					_attr_el(id).find('.tab75')._dn(true);
+					FILTER[EL.num_1][id] = 0;
+					break;
 			}
 		});
 	},

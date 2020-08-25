@@ -11,7 +11,7 @@ function _element75_struct($el) {
 		'num_3'   => _num($el['num_3']) //[35] Размер иконок
 	) + _elementStruct($el);
 }
-function _element75_print($el, $prm) {
+function _element75_print($el) {
 	if(!$elem_id = _idsLast($el['txt_2']))
 		return _emptyMinRed('[75] отсутствует путь к названиям.');
 	if(!$EL = _elemOne($elem_id))
@@ -90,6 +90,9 @@ function _element75_print($el, $prm) {
 	return
 	_elem75mp($v, $arr, $col, $DLG).
 	$send;
+}
+function _element75_title() {
+	return 'Фронтальное меню';
 }
 function _elem75child($spisok, $parent_id, $col, $level=0) {
 	if(empty($spisok[$parent_id]))

@@ -265,7 +265,9 @@ function _elem212ActionFormat($el85_id, $elv_id, $send) {//преобразов�
 			break;
 
 		//выбор значений
+		default:
 		case 13:
+		case 75:
 			array_unshift($send, array(
 				'id' => -1,
 				'title' => 'Сбросить значение'
