@@ -499,21 +499,6 @@ $.fn._check = function(o, oo) {
 
 	var CHECK = $('#' + attr_id + '_check');
 
-/*
-	$(document)
-		.off('click', '#' + attr_id + '_check')
-		 .on('click', '#' + attr_id + '_check', function() {
-			if($(this).hasClass('disabled'))
-				return;
-
-			var v = $(this).hasClass('on') ? 0 : 1;
-			setVal(v);
-			o.func(v, t);
-		 });
-*/
-
-
-
 	CHECK.click(function() {
 		if(CHECK.hasClass('disabled'))
 			return;
@@ -530,19 +515,8 @@ $.fn._check = function(o, oo) {
 		CHECK._tool(o.tooltip);
 
 	function checkPrint() {//вывод галочки
-		var nx = t.next(),
-			cls = '';//дополнительные стили, которые были вставлены через PHP
-		if(nx.hasClass('_check')) {  //если галочка была выведена через PHP - обновление и применение функций
-			o = $.extend({
-				title:nx.html() == '&nbsp;' ? '' : nx.html(),
-				disabled:nx.hasClass('disabled'),
-				light:nx.hasClass('light'),
-				block:nx.hasClass('block')
-			}, o);
-			nx.removeClass('_check title light block disabled on php');
-			cls = ' ' + nx.attr('class');
-			nx.remove();
-		}
+		if(t.next().hasClass('_check'))  //если галочка была выведена через PHP - обновление и применение функций
+			return t.next().removeClass('php');
 
 		o = $.extend({
 			title:'',
@@ -560,7 +534,7 @@ $.fn._check = function(o, oo) {
 			block = o.block ? ' block' : '',
 			dis = o.disabled ? ' disabled' : '',
 			html =
-				'<div id="' + attr_id + '_check" class="_check' + on + title + light + block + dis + cls + '">' +
+				'<div id="' + attr_id + '_check" class="_check' + on + title + light + block + dis + '">' +
 					(o.title ? o.title : '&nbsp;') +
 				'</div>';
 
