@@ -600,7 +600,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 				$page_id = $func['target_ids'];
 				$id = _spisokUnitUrlPage($el, $page_id, $u);
-				return '<a href="'.URL.'&p='.$page_id.'&pfrom='._page('cur').($id ? '&id='.$id : '').'" class="inhr">'._elemAction223($el, $u, $txt).'</a>';
+				return '<a href="'.URL.'&p='.$page_id.'&pfrom='._page('cur').($id ? '&id='.$id : '').'" class="inhr">'.$txt.'</a>';
 
 			//открытие диалога
 			case 205:
@@ -625,10 +625,10 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 				if($func['revers'])
 					$val .= ',del_id:'._unitUrlId($u, $func['target_ids']);
 
-				if(preg_match('/"icon/', $txt))
-					return str_replace('class="', 'val="'.$val.'" class="dialog-open ', $txt);
+				if(preg_match('/class="/', $txt))
+					return preg_replace('/class="/', 'val="'.$val.'" class="dialog-open ', $txt, 1);
 
-				return '<a val="'.$val.'" class="dialog-open inhr">'._elemAction223($el, $u, $txt).'</a>';
+				return '<a val="'.$val.'" class="dialog-open inhr">'.$txt.'</a>';
 
 			//внешняя ссылка
 			case 224:
@@ -646,7 +646,7 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 				return '<a class="inhr" href="'.URL.'&p=9&doc_id='.$doc_id.'&id='.$u['id'].'">'.$txt.'</a>';
 		}
 
-	return _elemAction223($el, $u, $txt);
+	return $txt;
 }
 function _spisokUnitUrlPage($el, $page_id, $u) {//получение id записи согласно странице
 	if(empty($u))

@@ -14,6 +14,9 @@ function _element36_print($el) {
 	$pl = _dn(!$el['num_2'], 'pl');
 	$cur = $el['num_3'] ? ' curP' : ' curD';
 
+	if(empty($el['txt_1']))
+		return '<div class="icon icon-'.$type.$pl.$cur.'"></div>';
+
 	return '<div class="icon icon-'.$type.$pl.$cur.' tool" data-tool="'._br($el['txt_1']).'"></div>';
 }
 function _element36_title() {

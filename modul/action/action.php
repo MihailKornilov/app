@@ -168,16 +168,25 @@ function _blockAction232($bl, $prm, $bg='') {//условия отображен
 	return $bg;
 }
 
-function _elemAction223($el, $u, $txt) {//подсказка на тёмном фоне
+function _elemAction223($el, $prm, $txt) {//подсказка на тёмном фоне
 	if(!$action = _BE('elem_one_action', $el['id']))
 		return $txt;
 
 	foreach($action as $act) {
 		if($act['dialog_id'] != 223)
 			continue;
-		if(!$tool = _elemUids($act['target_ids'], $u))
-			if(!$tool = _txt($act['v1']))
+		if(preg_match('/data-tool/', $txt))
+			return $txt;
+
+		if(!$tool = _txt($act['v1'])) {
+			if(!$u = $prm['unit_get'])
 				return $txt;
+			if(!$tool = _elemUids($act['target_ids'], $u))
+				return $txt;
+		}
+
+		if(preg_match('/class="/', $txt))
+			return preg_replace('/class="/', 'data-tool="'._br($tool).'" class="tool ', $txt, 1);
 
 		return '<span class="inhr tool" data-tool="'._br($tool).'">'.$txt.'</a>';
 	}
@@ -189,11 +198,16 @@ function _elemAction229Hint($el, $prm, $txt) {//выплывающая подс�
 		return $txt;
 	if(!$hint = _BE('hint_elem_one', $el['id']))
 		return $txt;
+	if(preg_match('/data-hint-id/', $txt))
+		return $txt;
 
 	$prm['td_no_end'] = 1;
 	$hint['msg'] = _blockHtml('hint', $hint['id'], $prm);
 
-	return '<span class="inhr hint-on" data-hint-id="'._hintMassPush($hint).'">'.$txt.'</a>';
+	if(preg_match('/class="/', $txt))
+		return preg_replace('/class="/', 'data-hint-id="'._hintMassPush($hint).'" class="hint-on ', $txt, 1);
+
+	return '<span class="inhr hint-on" data-hint-id="'._hintMassPush($hint).'">'.$txt.'</span>';
 }
 function _elemAction241($el, $prm, $txt) {//подмена текста
 	if(!$action = _BE('elem_one_action', $el['id']))

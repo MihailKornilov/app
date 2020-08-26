@@ -26,6 +26,9 @@ function _element1_print11($el, $u) {
 	if(empty($u[$col]))
 		return '';
 
+	if(empty($el['txt_1']))
+		return '<div class="icon icon-ok curD"></div>';
+
 	return '<div class="icon icon-ok curD tool" data-tool="'._br($el['txt_1']).'"></div>';
 }
 function _element1_history($el, $v) {
