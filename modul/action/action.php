@@ -185,6 +185,8 @@ function _elemAction223($el, $u, $txt) {//подсказка на тёмном �
 	return $txt;
 }
 function _elemAction229Hint($el, $prm, $txt) {//выплывающая подсказка
+	if(!empty($prm['blk_setup']))
+		return $txt;
 	if(!$hint = _BE('hint_elem_one', $el['id']))
 		return $txt;
 

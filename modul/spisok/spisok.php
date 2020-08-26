@@ -563,6 +563,8 @@ function _spisokUnitQuery($dialog, $unit_id, $nosuq=false) {//получение
 	return $SUQ[$key];
 }
 function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в ссылку
+	if(!empty($prm['blk_setup']))
+		return $txt;
 	if(!$action = _BE('elem_one_action', $el['id']))
 		return $txt;
 
