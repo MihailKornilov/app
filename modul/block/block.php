@@ -649,11 +649,12 @@ function _blockGridIn($arr) {//подстановка флагов наличи�
 			WHERE `block_id` IN ("._idsGet($arr).")";
 	foreach(query_arr($sql) as $r) {
 		$id = $r['block_id'];
+		$title = _element('title', $r);
 		$DLG = _dialogQuery($r['dialog_id']);
 		$arr[$id]['elin'] =
 			(DEBUG ? '['.$r['dialog_id'].'] ' : '').
 			$DLG['name'].
-			($r['name'] ? '<br><b>'.$r['name'].'</b>' : '');
+			($title ? '<br><b>'.$title.'</b>' : '');
 	}
 
 	return $arr;
