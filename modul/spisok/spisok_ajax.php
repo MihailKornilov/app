@@ -734,6 +734,9 @@ function _SUN_INTERCEPT($dialog, $POST_CMP) {//перехват внесения
 	_user_invite_submit($dialog);
 	//[95] быстрое наполнение списка
 	_elem95_save($dialog, $POST_CMP, @$_POST['vvv']);
+
+	//[129] КОМТЕКС - перенос
+	_elem129_comtex($dialog, $POST_CMP);
 }
 function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой записи, если отсутствует
 	if($unit_id)

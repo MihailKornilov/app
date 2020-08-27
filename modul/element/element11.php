@@ -8,6 +8,7 @@ function _element11_struct($el) {
 
 	return array(
 		'parent_id' => _num($el['parent_id']),
+		'width' => _num($el['width']),
 
 		'font'      => $el['font'],
 		'color'     => $el['color'],
