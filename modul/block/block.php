@@ -805,12 +805,13 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			$r['action'] = isset($G_ACT['bl'][$id]) ? $G_ACT['bl'][$id] : array();
 			$send[$id] = _arrNum($r);
 			$send = _BE('block_spisok_14', $r, $send);
+			$send = _BE('block_hint', $r, $send);
 		}
 
 		return $send;
 	}
 
-	//получение данных блока для списка-шаблона
+	//получение данных блоков списка-шаблона, если этот список вставлен блок
 	if($i == 'block_spisok_14') {
 		$bl = $i1;
 		$send = $i2;
@@ -826,6 +827,31 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 			if($r['obj_name'] != 'spisok')
 				continue;
 			if($r['obj_id'] != $elem_id)
+				continue;
+
+			$r['action'] = isset($G_ACT['bl'][$id]) ? $G_ACT['bl'][$id] : array();
+			$send[$id] = _arrNum($r);
+		}
+
+		return $send;
+	}
+
+	//получение данных блоков подсказок, если к данному блоку или элементу в нём прикреплена подсказка
+	if($i == 'block_hint') {
+		$bl = $i1;
+		$send = $i2;
+
+		if(!$elem_id = $bl['elem_id'])
+			return $send;
+		if(empty($G_HINT['el'][$elem_id]))
+			return $send;
+
+		$hint = $G_HINT['el'][$elem_id];
+
+		foreach($G_BLK as $id => $r) {
+			if($r['obj_name'] != 'hint')
+				continue;
+			if($r['obj_id'] != $hint['id'])
 				continue;
 
 			$r['action'] = isset($G_ACT['bl'][$id]) ? $G_ACT['bl'][$id] : array();
