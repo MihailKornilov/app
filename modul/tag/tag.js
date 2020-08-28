@@ -51,7 +51,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 			 (o.multi ? '<dl>' : '') +
 							'<input type="text" class="select-inp ' + (!o.multi ? 'w100p' : 'w50') + '"' + placeholder + readonly + ' />' +
 			 (o.multi ? '</dl>' : '') +
-					'<td class="w15' + _dn(o.write) + '"><div class="icon icon-del clear pl dn tool" data-tool="Очистить"></div>' +
+					'<td class="w15' + _dn(!blocked && o.write) + '"><div class="icon icon-del clear pl dn tool" data-tool="Очистить"></div>' +
 					'<td class="w25 r' + _dn(iconAddFlag) + '"><div class="icon icon-add pl"></div>'+
 					'<td class="arrow">' +
 			'</table>' +

@@ -2466,11 +2466,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	//[24] select - выбор списка (все списки приложения)
-	_EL24 = function(el) {
+	_EL24 = function(el, OBJ) {
 		$(ATTR_CMP(el.id))._select({
 			width:_num(el.width),
 			title0:el.txt_1,
-			blocked:el.noedit && unit.id,
+			blocked:el.noedit && OBJ.unit.id,
 			write:1,
 			multi:el.num_2,
 			spisok:el.vvv,

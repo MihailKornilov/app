@@ -290,7 +290,7 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 		$title = _29cnnTitle($EL['txt_3'], $sp);
 		$u = array(
 			'id' => $sid,
-			'title' => $title,
+			'title' => strip_tags($title),
 			'content' => $title
 		);
 
@@ -435,7 +435,6 @@ function _29cnnTitle($ids, $sp, $content=false) {//формирование со
 
 	return $content ? '' : '- незвестный тип: '.$EL['dialog_id'].' -';
 }
-
 
 
 
