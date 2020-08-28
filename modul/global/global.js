@@ -43,6 +43,14 @@ var ZINDEX = 1000,
 
 		POST_SEND = send;
 
+		if(!window.LOCAL)
+			if('onLine' in navigator)
+				if(!navigator.onLine) {
+					if(v.busy_obj)
+						$(v.busy_obj).removeClass(v.busy_cls);
+					return _msg('<div class="clr6 b center">ОТСУТСТВУЕТ СОЕДИНЕНИЕ С ИНТЕРНЕТОМ</div>');
+				}
+
 		$.post(AJAX, send, function(res) {
 			if(v.busy_obj)
 				$(v.busy_obj).removeClass(v.busy_cls);

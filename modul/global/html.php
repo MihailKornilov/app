@@ -401,6 +401,7 @@ function _html_script() {//скрипты и стили
 			'SA='.SA.','.
 			'USER_ID='.USER_ID.','.
 			'PAGE_ID='._page('cur').','.
+   (LOCAL ? 'LOCAL=true,' : '').
 			'GET_ID='._num(@$_GET['id']).';'.
 	'</script>'.
 
