@@ -20,20 +20,17 @@ function _element7_print($el, $prm) {
 	));
 }
 function _elem7filter($el) {//значения фильтра-поиска для списка
-	$search = false;
-	$v = '';
-
 	//поиск элемента-фильтра-поиска
 	foreach(_filter('spisok', $el['id']) as $r)
 		if($r['elem']['dialog_id'] == 7) {
-			$search = $r['elem'];
-			$v = $r['v'];
+			if(!$search = $r['elem'])
+				return '';
+			if(!$v = $r['v'])
+				return '';
 			break;
 		}
 
-	if(!$search)
-		return '';
-	if(!$v)
+	if(!isset($search))
 		return '';
 
 	//если поиск не производится ни по каким колонкам, то выход
@@ -72,4 +69,128 @@ function _elem7filter($el) {//значения фильтра-поиска дл�
 
 	return " AND (".implode($arr, ' OR ').")";
 }
+function _elem7num14($el, $spisok=array()) {//добавление записи для списка-шаблона, если был быстрый поиск по номеру
+	/*
+		Запись с найденным номером будет добавляться при двух условиях:
+		  1. Если существует быстрый поиск по этому списку
+		  2. Если в шаблоне списка вставлен номер
 
+		Найденное значение будет перемещено или вставлено в начало списка
+	*/
+
+	if($el['dialog_id'] != 14)
+		return $spisok;
+
+	//1. Поиск элемента-фильтра-поиска
+	foreach(_filter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 7) {
+			if(!$search = $r['elem'])
+				return $spisok;
+			if(!$num = _num($r['v']))
+				return $spisok;
+			break;
+		}
+
+	if(!isset($search))
+		return $spisok;
+
+	//2. Определение, есть ли в шаблоне номер списка
+	//получение элементов, находящихся в блоках
+	if(!$ELM = _BE('elem_arr', 'spisok', $el['id']))
+		return $spisok;
+	if(!$col = _elem7numCol($ELM))
+		return $spisok;
+
+	$DLG = _dialogQuery($el['num_1']);
+
+	if($col == 'num')
+		if(!$tab = _queryTN($DLG, 'num', 1))
+			$col = 'id';
+
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG)."
+			  "._40cond($el, $el['txt_2'])."
+			  AND `t1`.`".$col."`=".$num."
+			LIMIT 1";
+	if(!$u = query_assoc($sql))
+		return $spisok;
+
+	array_unshift($spisok, $u);
+	$spisok[0] = $u;
+
+	return $spisok;
+}
+function _elem7num23($el, $spisok=array()) {//добавление записи для списка-таблицы, если был быстрый поиск по номеру
+	if($el['dialog_id'] != 23)
+		return $spisok;
+
+	//1. Поиск элемента-фильтра-поиска
+	foreach(_filter('spisok', $el['id']) as $r)
+		if($r['elem']['dialog_id'] == 7) {
+			if(!$search = $r['elem'])
+				return $spisok;
+			if(!$num = _num($r['v']))
+				return $spisok;
+			break;
+		}
+
+	if(!isset($search))
+		return $spisok;
+
+	//2. Определение, есть ли в таблице номер списка
+	if(!$vvv = _element('vvv', $el))
+		return $spisok;
+	if(!$col = _elem7numCol($vvv))
+		return $spisok;
+
+	$DLG = _dialogQuery($el['num_1']);
+
+	if($col == 'num')
+		if(!$tab = _queryTN($DLG, 'num', 1))
+			$col = 'id';
+
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG)."
+			  "._40cond($el, $el['txt_2'])."
+			  AND `t1`.`".$col."`=".$num."
+			LIMIT 1";
+	if(!$u = query_assoc($sql))
+		return $spisok;
+
+	array_unshift($spisok, $u);
+	$spisok[0] = $u;
+
+	return $spisok;
+}
+function _elem7numCol($vvv) {//получение колонки, по которой искать порядковый номер
+	foreach($vvv as $r) {
+		//сам порядковый номер
+		if($r['dialog_id'] == 32)
+			return $r['num_1'] == 1 ? 'id' : 'num';
+
+		//сборный текст
+		if($r['dialog_id'] == 44)
+			foreach(_element('vvv', $r) as $v) {
+				if($v['type'] != 'el')
+					continue;
+				if(!$ell = _elemOne($v['id']))
+					continue;
+				if($ell['dialog_id'] == 32)
+					return $ell['num_1'] == 1 ? 'id' : 'num';
+			}
+
+		if($r['dialog_id'] == 11) {
+			if(!$last_id = _idsLast($r['txt_2']))
+				continue;
+			if(!$ell = _elemOne($last_id))
+				continue;
+			if(!$col = _elem7numCol(array($ell)))
+				continue;
+			return $col;
+		}
+	}
+
+	return false;
+}

@@ -239,7 +239,7 @@ function _spisokCountAll($el, $prm, $next=0) {//получение общего 
 	$all = _num(query_value($sql));
 
 	//проверка, есть ли единица списка, которую нашли по номеру (num)
-	if(!$next && _spisok7num(array(), $el))
+	if(!$next && (_elem7num14($el) || _elem7num23($el)))
 		$all++;
 
 	define($key, $all);
@@ -247,91 +247,6 @@ function _spisokCountAll($el, $prm, $next=0) {//получение общего 
 	return $all;
 }
 
-function _spisok7num($spisok, $el) {//добавление записи, если был быстрый поиск по номеру
-	/*
-		Единица списка с найденным номером будет добавляться при двух условиях:
-		  1. Если существует быстрый поиск по этому списку
-		  2. Если в шаблоне списка вставлен номер
-
-		Найденное значение будет перемещено или вставлено в начало списка
-	*/
-
-	//пока только для списков-шаблонов
-	if($el['dialog_id'] != 14)
-		return $spisok;
-
-	$search = false;
-	$num = 0;
-
-	//1. Поиск элемента-фильтра-поиска
-	foreach(_filter('spisok', $el['id']) as $r)
-		if($r['elem']['dialog_id'] == 7) {
-			$search = $r['elem'];
-			$num = $r['v'];
-			break;
-		}
-
-	if(!$search)
-		return $spisok;
-	if(!_num($num))
-		return $spisok;
-	if(!strlen($num))
-		return $spisok;
-	if(!$num[0])
-		return $spisok;
-
-	//2. Определение, есть ли в шаблоне номер списка
-	//получение элементов, находящихся в блоках
-	if(!$ELM = _BE('elem_arr', 'spisok', $el['id']))
-		return $spisok;
-
-	$is_num = false;
-	foreach($ELM as $r) {
-		//сам порядковый номер
-		if($r['dialog_id'] == 32)
-			$is_num = true;
-
-		//сборный текст
-		if($r['dialog_id'] == 44)
-			foreach(_element('vvv', $r) as $v) {
-				if($v['type'] != 'el')
-					continue;
-				if(!$ell = _elemOne($v['id']))
-					continue;
-				if($ell['dialog_id'] == 32) {
-					$is_num = true;
-					break;
-				}
-			}
-
-		if($is_num)
-			break;
-	}
-
-	//в шаблоне нет номера списка
-	if(!$is_num)
-		return $spisok;
-
-	$DLG = _dialogQuery($el['num_1']);
-
-	$col = 'num';
-	if(!$tab = _queryTN($DLG, 'num', 1))
-		$col = 'id';
-
-	$sql = "SELECT "._queryCol($DLG)."
-			FROM   "._queryFrom($DLG)."
-			WHERE "._queryWhere($DLG)."
-			  "._40cond($el, $el['txt_2'])."
-			  AND `t1`.`".$col."`=".$num."
-			LIMIT 1";
-	if(!$u = query_assoc($sql))
-		return $spisok;
-
-	array_unshift($spisok, $u);
-	$spisok[0] = $u;
-
-	return $spisok;
-}
 function _spisokInclude($spisok) {//вложенные списки
 	global $_SI;
 

@@ -75,7 +75,7 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 
 	//добавление записи, если был быстрый поиск по номеру
 	if(!$next)
-		$spisok = _spisok7num($spisok, $ELEM);
+		$spisok = _elem7num14($ELEM, $spisok);
 
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);

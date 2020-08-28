@@ -81,6 +81,10 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);
 
+	//добавление записи, если был быстрый поиск по номеру
+	if(!$next)
+		$spisok = _elem7num23($ELEM, $spisok);
+
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);
 	//вставка картинок
