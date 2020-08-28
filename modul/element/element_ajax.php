@@ -263,7 +263,7 @@ switch(@$_POST['op']) {
 				'</table>'.
 
 				_dialogSetupSa2($dialog).
-				_dialogSetupLoadUse($dialog).
+				_dialogSetupUse($dialog).
 
 			'</div>'
 	  : '');
@@ -430,7 +430,7 @@ switch(@$_POST['op']) {
 		$img = _imageSave($f['type'], $f['tmp_name']);
 
 		$send['img_id'] = $img['id'];
-		$send['html'] = _elemImg($img['id']);
+		$send['html'] = _imageFromId($img['id']);
 
 		jsonSuccess($send);
 		break;
@@ -1203,72 +1203,170 @@ function _dialogSetupElemImg($dialog) {
 		'</form>'.
 		'<div class="eimg'._dn($img_id, 'loaded').'">'.
 			'<div class="icon icon-del-red eimg-del pabs r3 pl"></div>'.
-			_elemImg($img_id).
+			_imageFromId($img_id).
 		'</div>'.
 	'</div>';
 }
-function _elemImg($img_id) {
-	if(!$img_id)
-		return '';
-
-	$sql = "SELECT *
-			FROM `_image`
-			WHERE `id`=".$img_id;
-	if(!$img = query_assoc($sql))
-		return '';
-
-	return _imageHtml($img, 300);
-}
-function _dialogSetupLoadUse($dialog) {//использование как элемента в других диалогах
+function _dialogSetupUse($dialog) {//использование как элемента в других диалогах
 	if(empty($dialog['element_group_id']))
 		return '';
 
-	$use_dialog = '';
-	$use_page = '';
+	return
+	'<div class="menu_sa-3 ml20 mr20">'.
+		_dialogSetupUseCount($dialog).
+		_dialogSetupUseDialog($dialog).
+		_dialogSetupUsePage($dialog).
+	'</div>';
+}
+function _dialogSetupUseCount($dialog) {//количество использования элемента
+	$sql = "SELECT COUNT(*)
+			FROM `_element`
+			WHERE `dialog_id`=".$dialog['id'];
+	if($count = query_value($sql)) {
+		$sql = "SELECT COUNT(DISTINCT `app_id`)
+				FROM `_element`
+				WHERE `dialog_id`=".$dialog['id'];
+		$appC = query_value($sql);
+		return
+			'<div class="fs14">'.
+				'Использование '.
+				$count.' раз'._end($count, '', 'а', '').
+				' в '.$appC.' приложени'._end($appC, 'ии', 'ях').'.'.
+			'</div>';
+	}
+	return '';
+}
+function _dialogSetupUseDialog($dialog) {//использование элемента в диалогах
 	$sql = "SELECT `block_id`
 			FROM `_element`
 			WHERE `dialog_id`=".$dialog['id'];
-	if($block_ids = query_ids($sql)) {
-		$sql = "SELECT
-					DISTINCT `obj_id`,
-					`obj_name`,
-					COUNT(`id`) `c`
+	if(!$block_ids = query_ids($sql))
+		return '';
+
+	$sql = "SELECT `id`
+			FROM `_block`
+			WHERE `id` IN (".$block_ids.")
+			  AND `obj_name`='dialog'";
+	if(!$block_ids = query_ids($sql))
+		return '';
+
+	//имена приложений
+	$sql = "SELECT `id`,`name`
+			FROM `_app`
+			WHERE `id` IN (
+				SELECT DISTINCT `app_id`
 				FROM `_block`
 				WHERE `id` IN (".$block_ids.")
-				GROUP BY `obj_name`,`obj_id`
-				ORDER BY `obj_name`,`obj_id`";
-		foreach(query_array($sql) as $r) {
-			$count = $r['c'] > 1 ? ' <span class="clr1">('.$r['c'].'x)</span>' : '';
-			switch($r['obj_name']) {
-				case 'dialog':
-					$use_dialog .=
-						'<div>'.
-							'<div class="dib w35 mr5">'.$r['obj_id'].':</div>'.
-							'<a class="dialog-open" val="dialog_id:'.$r['obj_id'].'">'._dialogParam($r['obj_id'], 'name').'</a>'.
-							$count.
-						'</div>';
-					break;
-				case 'page':
-					if(!$p = _page($r['obj_id']))
-						break;
-					$use_page .=
-						'<div>'.
-							'<div class="dib w35 mr5">'.$r['obj_id'].':</div>'.
-							'<a class="'._dn(!_pageSA($p), 'clr8').'" href="'.URL.'&p='.$r['obj_id'].'">'.$p['name'].'</a>'.
-							$count.
-						'</div>';
-					break;
-			}
+			)";
+	$appAss = query_ass($sql);
+
+	//имена диалогов
+	$sql = "SELECT `id`,`name`
+			FROM `_dialog`
+			WHERE `id` IN (
+				SELECT DISTINCT `obj_id`
+				FROM `_block`
+				WHERE `id` IN (".$block_ids.")
+			)";
+	$dlgAss = query_ass($sql);
+
+	$send = '';
+	$app_id = -1;
+	$sql = "SELECT
+				DISTINCT `obj_id`,
+				`app_id`,
+				COUNT(`id`) `c`
+			FROM `_block`
+			WHERE `id` IN (".$block_ids.")
+			GROUP BY `obj_id`
+			ORDER BY `app_id`,`obj_id`";
+	foreach(query_array($sql) as $r) {
+		if($app_id != $r['app_id']) {
+			$app_id = $r['app_id'];
+			$send .= '<div class="b mt10 ml20 mb5">'.
+						'<b class="fs14 clr9">app'.$app_id.'</b>'.
+		($r['app_id'] ? '<span class="fs14 clr1 ml5">'.$appAss[$r['app_id']].'</span>' : '').
+					 '</div>';
 		}
+		$count = $r['c'] > 1 ? ' <span class="clr1">('.$r['c'].'x)</span>' : '';
+		$send .=
+			'<div class="ml30">'.
+				'<div class="dib w35 r mr5">'.$r['obj_id'].':</div>'.
+				'<a class="dialog-open" val="dialog_id:'.$r['obj_id'].'">'.$dlgAss[$r['obj_id']].'</a>'.
+				$count.
+			'</div>';
 	}
 
+
 	return
-	'<table class="menu_sa-3 bs10">'.
-		'<tr><td class="w125 r clr11 top">В диалогах:'.
-			'<td>'.($use_dialog ? $use_dialog : '-').
-		'<tr><td class="r clr11 top">На страницах:'.
-			'<td>'.($use_page ? $use_page : '-').
-	'</table>';
+	'<div class="fs14 clr11 mt15 bg17 pad5">В диалогах:</div>'.
+	$send;
+}
+function _dialogSetupUsePage($dialog) {//использование элемента на страницах
+	$sql = "SELECT `block_id`
+			FROM `_element`
+			WHERE `dialog_id`=".$dialog['id'];
+	if(!$block_ids = query_ids($sql))
+		return '';
+
+	$sql = "SELECT `id`
+			FROM `_block`
+			WHERE `id` IN (".$block_ids.")
+			  AND `obj_name`='page'";
+	if(!$block_ids = query_ids($sql))
+		return '';
+
+	//имена приложений
+	$sql = "SELECT `id`,`name`
+			FROM `_app`
+			WHERE `id` IN (
+				SELECT DISTINCT `app_id`
+				FROM `_block`
+				WHERE `id` IN (".$block_ids.")
+			)";
+	$appAss = query_ass($sql);
+
+	//имена страниц
+	$sql = "SELECT `id`,`name`
+			FROM `_page`
+			WHERE `id` IN (
+				SELECT DISTINCT `obj_id`
+				FROM `_block`
+				WHERE `id` IN (".$block_ids.")
+			)";
+	$pageAss = query_ass($sql);
+
+	$send = '';
+	$app_id = -1;
+	$sql = "SELECT
+				DISTINCT `obj_id`,
+				`app_id`,
+				COUNT(`id`) `c`
+			FROM `_block`
+			WHERE `id` IN (".$block_ids.")
+			GROUP BY `obj_id`
+			ORDER BY `app_id`,`obj_id`";
+	foreach(query_array($sql) as $r) {
+		if($app_id != $r['app_id']) {
+			$app_id = $r['app_id'];
+			$send .= '<div class="b mt10 ml20 mb5">'.
+						'<b class="fs14 clr9">app'.$app_id.'</b>'.
+		($r['app_id'] ? '<span class="fs14 clr1 ml5">'.$appAss[$r['app_id']].'</span>' : '').
+					 '</div>';
+		}
+		$count = $r['c'] > 1 ? ' <span class="clr1">('.$r['c'].'x)</span>' : '';
+		$send .=
+			'<div class="ml30">'.
+				'<div class="dib w35 r mr5">'.$r['obj_id'].':</div>'.
+				'<a class="" href="'.URL.'&p='.$r['obj_id'].'">'.$pageAss[$r['obj_id']].'</a>'.
+				$count.
+			'</div>';
+	}
+
+
+	return
+	'<div class="fs14 clr11 mt15 bg17 pad5">На страницах:</div>'.
+	$send;
 }
 function _dialogSave($dialog_id) {//сохранение диалога
 	if(!_dialogQuery($dialog_id))

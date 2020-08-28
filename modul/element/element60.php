@@ -421,6 +421,20 @@ function _image60_save($cmp, $unit) {//Применение загруженны
 	}
 }
 
+function _imageFromId($img_id) {//получение картинки по ID
+	if(!$img_id)
+		return '';
+
+	$sql = "SELECT *
+			FROM `_image`
+			WHERE `id`=".$img_id;
+	if(!$img = query_assoc($sql))
+		return '';
+
+	return _imageHtml($img, 300);
+}
+
+
 
 function PHP12_image_show($prm) {//просмотр изображений
 	$image = 'Изображение отсутствует.';//основная картинка, на которую нажали. Выводится первой
