@@ -276,9 +276,7 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 		$child = array();
 		foreach($spisok as $id => $r)
 			$child[$r['parent_id']][$id] = $r;
-
-		$EL['v'] = $v;
-		return _29cnnChild($EL, $child);
+		$spisok = _29cnnChild($EL, $child);
 	}
 
 	//если значения не были настроены, берётся значение по умолчанию, настроенное в диалоге
@@ -286,25 +284,17 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 		$EL['txt_3'] = $DLG['spisok_elem_id'];
 
 	$send = array();
-	foreach($spisok as $sid => $sp) {
-		$title = _29cnnTitle($EL['txt_3'], $sp);
-		$u = array(
-			'id' => $sid,
+	foreach($spisok as $sp) {
+		$title = _29cnnTitle($EL, $sp);
+
+		if(isset($sp['path']))
+			$title = $sp['path'].$title;
+
+		$send[] = array(
+			'id' => $sp['id'],
 			'title' => strip_tags($title),
-			'content' => $title
+			'content' => _29cnnContent($EL, $sp, $v)
 		);
-
-		if($v)
-			$u['content'] = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $u['content'], 1);
-
-		if($content = _29cnnTitle(@$EL['txt_4'], $sp, 1)) {
-			if($v)
-				$content = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $content, 1);
-			$u['content'] = $u['content'].'<div class="clr1 fs12">'.$content.'</div>';
-		}
-
-
-		$send[] = $u;
 	}
 
 	return $send;
@@ -314,19 +304,10 @@ function _29cnnChild($EL, $child, $pid=0, $spisok=array(), $path='', $level=0) {
 		return $spisok;
 
 	foreach($send as $id => $sp) {
-		$title = _29cnnTitle($EL['txt_3'], $sp);
-		$content = $title;
-		if($EL['v'])
-			$content = preg_replace(_regFilter($EL['v']), '<em class="fndd">\\1</em>', $content, 1);
-		$u = array(
-			'id' => $id,
-			'title' => $path.$title,
-			'content' => '<b>'.$content.'</b>'
-		);
-		if($level)
-			$u['content'] = '<div class="ml'.($level*20).'">'.$content.'</div>';
-		$spisok[] = $u;
-		$spisok = _29cnnChild($EL, $child, $id, $spisok, $path.$title.' » ', $level+1);
+		$sp['level'] = $level;
+		$sp['path'] = $path;
+		$spisok[] = $sp;
+		$spisok = _29cnnChild($EL, $child, $id, $spisok, $path._29cnnTitle($EL, $sp).' » ', $level+1);
 	}
 
 	return $spisok;
@@ -334,23 +315,19 @@ function _29cnnChild($EL, $child, $pid=0, $spisok=array(), $path='', $level=0) {
 function _29cnnSpisok($el, $v) {//значения списка для формирования содержания
 	$DLG = _dialogQuery($el['num_1']);
 
-	//если учитываются уровни, отключается лимит списка
-	$LIMIT = @$el['num_5'] ? '' : "LIMIT 50";
-
 	$cond = _queryWhere($DLG);
 
-	$C = array();
-	if($el['dialog_id'] == 29) {
-		$C[] = _29cnnCond($el['txt_3'], $v);
-		$C[] = _29cnnCond($el['txt_4'], $v);
-	}
+	$C[] = _29cnnCond($el['txt_3'], $v);
+	$C[] = _29cnnCond($el['txt_4'], $v);
 	$C = array_diff($C, array(''));
 	if(!empty($C))
 		$cond .= " AND (".implode(' OR ', $C).")";
 
 	$cond .= _40cond($el, $el['txt_5']);
 
-	$DESC = @$el['num_9'] ? ' DESC' : '';
+	//если учитываются уровни, отключается лимит списка
+	$LIMIT = !empty($el['num_5']) ? '' : "LIMIT 50";
+	$DESC = !empty($el['num_9']) ? ' DESC' : '';
 
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
@@ -389,52 +366,156 @@ function _29cnnOrder($el, $DLG) {//порядок вывода
 function _29cnnCond($ids, $v) {//получение условия при быстром поиске
 	if(empty($v))
 		return '';
-	if(!$ids = _ids($ids, 1))
+	if(!$ids = _ids($ids, 'arr'))
 		return '';
 	if(count($ids) != 1)//пока только для прямых значений (без вложенных списков)
 		return '';
 
-	$last = _idsLast($ids);
+	$last_id = _idsLast($ids);
 
-	if(!$el = _elemOne($last))
-		return '';
-	if($el['dialog_id'] != 8)//пока только для текстового поля
-		return '';
-	if(!$col = $el['col'])
+	if(!$el = _elemOne($last_id))
 		return '';
 
-	return "`".$col."` LIKE '%".addslashes($v)."%'";
+	switch($el['dialog_id']) {
+		//текстовое поле
+		case 8:
+			if(!$col = _elemCol($el))
+				return '';
+			return "`".$col."` LIKE '%".addslashes($v)."%'";
+
+		//шаблон записи
+		case 43:
+			if(!$elm = _BE('elem_arr', 'tmp43', $el['id']))
+				return '';
+
+			$send = array();
+			foreach($elm as $ell) {
+				if($ell['dialog_id'] == 11) {
+					if(count(_ids($ell['txt_2'], 'arr')) > 1)
+						continue;
+					$ell = _elemOne($ell['txt_2']);
+				}
+
+				if($col = _elemCol($ell))
+					$send[] = "`".$col."` LIKE '%".addslashes($v)."%'";
+			}
+
+			return implode(' OR ', $send);
+
+		//сборный текст
+		case 44:
+			if(!$vvv = _element44_vvv($el))
+				return '';
+
+			$send = array();
+			foreach($vvv as $r)
+				if($r['type'] == 'el')
+					if($ell = _elemOne($r['id']))
+						if($ell['dialog_id'] == 11)
+							if($col = _elemCol(_idsLast($ell['txt_2'])))
+								$send[] = "`".$col."` LIKE '%".addslashes($v)."%'";
+
+			return implode(' OR ', $send);
+	}
+
+	return '';
 }
-function _29cnnTitle($ids, $sp, $content=false) {//формирование содержания для одной единицы списка
+function _29cnnTitle($EL, $sp) {//формирование содержания для одной единицы списка
 	//элементы для отображения
-	if(!$ids = _ids($ids, 'arr'))
-		return $content ? '' : '- значение не настроено -';
+	if(!$ids = _ids($EL['txt_3'], 'arr'))
+		return '- Выбранные значения не настроены -';
 
 	//последний элемент для отображения
-	$last = _idsLast($ids);
+	$last_id = _idsLast($ids);
 
-	if(!$EL = _elemOne($last))
-		return $content ? '' : '- несуществующий элемент '.$last.' -';
+	if(!$elT = _elemOne($last_id))
+		return '- несуществующий элемент '.$last_id.' -';
 
-	switch($EL['dialog_id']) {
+	switch($elT['dialog_id']) {
 		//текстовое поле
 		case 8:
 			$title = $sp;
 			foreach($ids as $id) {
 				if(!$ell = _elemOne($id))
-					return $content ? '' : '- несуществующий элемент: '.$id.' -';
+					return '- несуществующий элемент: '.$id.' -';
 				$title = $title[$ell['col']];
 			}
-			return $title;
+			break;
+
 		//сборный текст
 		case 44:
 			$prm = _blockParam();
 			$prm['unit_get'] = $sp;
-			return _element44_print($EL, $prm);
+			$title = _element44_print($elT, $prm);
+			break;
+
+		default:
+			return '- незвестный тип значения: ['.$elT['dialog_id'].'] -';
 	}
 
-	return $content ? '' : '- незвестный тип: '.$EL['dialog_id'].' -';
+	return $title;
 }
+function _29cnnContent($EL, $sp, $v) {
+	$content = '';
+	if($ids = _ids($EL['txt_4'], 'arr')) {
+		$last_id = _idsLast($ids);
 
+		if($elT = _elemOne($last_id))
+			switch($elT['dialog_id']) {
+				//текстовое поле
+				case 8:
+					$content = $sp;
+					foreach($ids as $id) {
+						if(!$col = _elemCol($id))
+							break;
+						$content =
+							_29cnnTitle($EL, $sp).
+							'<div class="clr1 fs12">'.$content[$col].'</div>';
+					}
+					break;
 
+				//шаблон записи
+				case 43:
+					$content = _element43_print11($elT, $sp);
+					break;
+
+				//сборный текст
+				case 44:
+					$prm = _blockParam();
+					$prm['unit_get'] = $sp;
+					$content = _element44_print($elT, $prm);
+					break;
+			}
+	}
+
+	if(!$content)
+		$content = _29cnnTitle($EL, $sp);
+
+	if(isset($sp['level'])) {
+		if($sp['level'] > 0)
+			$content = '<div class="ml'.($sp['level']*20).'">'.$content.'</div>';
+		else
+			$content = '<b>'.$content.'</b>';
+	}
+
+	return _29cnnContentV($content, $v);
+}
+function _29cnnContentV($content, $v) {//подсветка значений при поиске
+	if(!$v)
+		return $content;
+
+	if($content == strip_tags($content))
+		return preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $content, 1);
+
+	$ex = explode('>', $content);
+	foreach($ex as $i => $r) {
+		if(preg_match('/</', $r)) {
+			$exx = explode('<', $r);
+			$exx[0] = preg_replace(_regFilter($v), '<em class="fndd">\\1</em>', $exx[0], 1);
+			$ex[$i] = implode('<', $exx);
+		}
+	}
+
+	return implode('>', $ex);
+}
 
