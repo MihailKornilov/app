@@ -110,7 +110,7 @@ function _elem102CnnList($ids, $return='select', $cond='') {//значения �
 	//требуется ли вывод списка по уровням
 	if($return == 'select')
 		foreach($spisok as $r)
-			if($r['parent_id']) {
+			if(!empty($r['parent_id'])) {
 				$child = array();
 				foreach($spisok as $id => $sp)
 					$child[$sp['parent_id']][$id] = $sp;
