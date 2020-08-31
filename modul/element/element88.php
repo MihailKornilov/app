@@ -28,11 +28,10 @@ function _element88_vvv($el) {
 function _element88_print($EL, $prm=array(), $next=0) {
 	if(!empty($prm['blk_setup']))
 		return _emptyMin('Таблица из нескольких списков');
-
-	$V = json_decode($EL['txt_2'], true);
-
+	if(!$V = _decode($EL['txt_2']))
+		return _emptyMin('Таблица из нескольких списков не настроена');
 	if(empty($V['spv']))
-		return _emptyRed('Таблица из нескольких списков не настроена.');
+		return _emptyRed('Таблица из нескольких списков не настроена');
 	if(empty($V['col']))
 		return _emptyRed('Таблица из нескольких списков не настроена');
 

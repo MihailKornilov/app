@@ -527,7 +527,7 @@ function _dialogParam($dialog_id, $param) {//получение конкретн
 	return $send;
 }
 function _dialogParent($dialog) {//получение диалога, отвечающего за внесение записи
-	$act = $dialog['act'];
+	$act = _num(@$dialog['act']);
 	while($parent_id = $dialog['dialog_id_parent']) {
 		if(!$PAR = _dialogQuery($parent_id))
 			break;

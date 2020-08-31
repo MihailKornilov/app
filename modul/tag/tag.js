@@ -474,6 +474,9 @@ $.fn._check = function(o, oo) {
 	if(!t.length)
 		return;
 
+	if(o === undefined)
+		o = {};
+
 	var attr_id = _attrId(t),
 		win = attr_id + 'win',
 		S = window[win];
