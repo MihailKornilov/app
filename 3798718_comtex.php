@@ -1,5 +1,8 @@
 <?php
-/* ОСОБЕННОСТИ ПЕРЕНОСА:
+/*
+	Комтекс: 3798718
+
+	ОСОБЕННОСТИ ПЕРЕНОСА:
 	1. В клиентах убрано поле Факс. Всего содержится 14 записей. Перенесено в поле Телефон.
 */
 
@@ -17,12 +20,15 @@ function _elem129_comtex($DLG, $POST_CMP) {
 		//полный перенос
 		case 1:
 			_comtexDataDel();
+
 			_comtex_client();
+
 			_comtex_tovar_category();
+			_comtex_tovar();
 
 		//частичный
 		case 2:
-			_comtex_tovar();
+			_comtex_zayav_place();
 			break;
 
 		default:
@@ -80,6 +86,7 @@ function _comtexDataDel() {// Удаление всех данных в прил
 	$sql = "DELETE FROM `_user_spisok_filter` WHERE `app_id`=".APP_ID;
 	query($sql);
 }
+
 function _comtex_client() {//Клиенты
 	$dialog_id = _comtexSpisokClear(1234);
 
@@ -138,6 +145,46 @@ function _comtex_client() {//Клиенты
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
+
+function _comtex_zayav_place() {//местонахождения устройств
+	$dialog_id = _comtexSpisokClear(1406);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_zayav_tovar_place`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['place']."',
+
+				".$r['id']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  txt_1,
+
+				  `sort`
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+
+
 function _comtex_tovar_category() {//категории товаров
 	$dialog_id = _comtexSpisokClear(1404);
 
