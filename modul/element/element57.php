@@ -52,7 +52,7 @@ function _element57_print($el, $prm) {
 function _element57_vvv($el) {//пункты меню
 	return _decode($el['txt_1']);
 }
-function _element57punkt($bl) {//скрытие блока, если он является пунктом меню и пока не отображается
+function _element57punkt($bl, $prm) {//скрытие блока, если он является пунктом меню и пока не отображается
 	global $_57PUNKT;
 
 	if(!isset($_57PUNKT)) {
@@ -68,13 +68,23 @@ function _element57punkt($bl) {//скрытие блока, если он явл
 		if(!$vvv = _decode($r['txt_1']))
 			continue;
 
+		$sel = 0;
+		if($u = $prm['unit_edit'])
+			if($col = $r['col'])
+				if(!empty($u[$col]))
+					$sel = $u[$col];
+
 		foreach($vvv as $v) {
-			if(!isset($_COOKIE['57_'.$r['id']])) {
-				if($v['def'])
+			if($sel) {
+				if($sel == $v['id'])
 					continue;
 			} else
-				if($_COOKIE['57_'.$r['id']] == $v['id'])
-					continue;
+				if(!isset($_COOKIE['57_'.$r['id']])) {
+					if($v['def'])
+						continue;
+				} else
+					if($_COOKIE['57_'.$r['id']] == $v['id'])
+						continue;
 
 			$ass = _idsAss($v['blk']);
 			if(!isset($ass[$bl['id']]))

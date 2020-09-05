@@ -150,7 +150,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 		$bl = _blockAction211($bl);
 		$bl = _blockAction231($bl, $PARAM);
 		$bl = _blockDlgShow($bl, $PARAM);
-		$bl = _element57punkt($bl);
+		$bl = _element57punkt($bl, $PARAM);
 		$block[$bl['y']][$bl['x']] = $bl;
 	}
 

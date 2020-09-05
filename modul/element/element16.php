@@ -11,17 +11,19 @@ function _element16_struct($el) {
                                     */
 		'num_1'   => _num($el['num_1']),//горизонтальное положение
 		'num_2'   => _num($el['num_2']),/* значения:
-											3876 - произвольные значения (настраиваются через PHP12_radio_setup)
-											3877 - значения существующего элемента
+											3876 - произвольные (настраиваются через PHP12_radio_setup)
+											3877 - существующий элемент
+											3878 - список
 										*/
-		'num_3'   => _num($el['num_3']) //элемент, если выбрано num_2:3877
+		'num_3'   => _num($el['num_3']),//элемент, если выбрано num_2:3877
+		'num_4'   => _num($el['num_4']) //список, если выбрано num_2:3878
 	) + _elementStruct($el);
 }
 function _element16_print($el, $prm) {
 	$vvv = _element('vvv', $el);
 	$def = 0;
 	foreach($vvv as $r)
-		if($r['def']) {
+		if(!empty($r['def'])) {
 			$def = $r['id'];
 			break;
 		}
@@ -50,6 +52,34 @@ function _element16_print11($el, $u) {
 	return '';
 }
 function _element16_vvv($el) {
+	//значения из списка
+	if($el['num_2'] == 3878) {
+		if(!$DLG = _dialogQuery($el['num_4']))
+			return array();
+
+		$sql = "SELECT "._queryCol($DLG)."
+				FROM   "._queryFrom($DLG)."
+				WHERE  "._queryWhere($DLG)."
+				ORDER BY `sort`
+				LIMIT 30";
+		if(!$arr = query_arr($sql))
+			return array();
+
+		$send = array();
+		foreach($arr as $id => $r) {
+			$title = '- значение не настроено -';
+			if($col = _elemCol($DLG['spisok_elem_id']))
+				if(isset($r[$col]))
+					$title = $r[$col];
+			$send[] = array(
+				'id' => $id,
+				'title' => $title
+			);
+		}
+
+		return $send;
+	}
+
 	//значения из существующего (другого) элемента
 	if($el['num_2'] == 3877)
 		if(!$el = _elemOne($el['num_3']))

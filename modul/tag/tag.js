@@ -628,7 +628,7 @@ $.fn._radio = function(o, oo) {
 		o.dis      = PHP.hasClass('disabled');
 		o.ignore   = PHP.hasClass('ignore');
 		o.light    = PHP.hasClass('light');
-		o.interval = PHP.find('div:first').css('margin-bottom').split('px')[0] * 1;
+		o.interval = PHP.find('div:first').length ? PHP.find('div:first').css('margin-bottom').split('px')[0] * 1 : 0;
 		if(!o.interval)
 			delete o.interval;
 
