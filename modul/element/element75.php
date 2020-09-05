@@ -127,7 +127,7 @@ function _elem75mp($v, $arr, $col, $DLG) {//путь меню (Menu Path)
 			$sql = "SELECT "._queryCol($DLG)."
 					FROM   "._queryFrom($DLG)."
 					WHERE  "._queryWhere($DLG)."
-					  AND `id`=".$pid;
+					  AND "._queryCol_id($DLG)."=".$pid;
 			if($r = query_assoc($sql)) {
 				$pname = $r[$col].' » '.$pname;
 				$pid = $r['parent_id'];

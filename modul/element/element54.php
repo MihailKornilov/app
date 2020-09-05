@@ -53,7 +53,7 @@ function _element54update($elem_id, $unit_ids=0) {//обновление кол�
 	$sql = "UPDATE "._queryFrom($DSrc)."
 			SET `".$col."`=0
 			WHERE "._queryWhere($DSrc).
-($unit_ids ? " AND `t1`.`id` IN (".$unit_ids.")" : '');
+($unit_ids ? " AND "._queryCol_id($DSrc)." IN (".$unit_ids.")" : '');
 	query($sql);
 
 	$sql = "SELECT

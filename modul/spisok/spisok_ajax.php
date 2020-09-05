@@ -32,7 +32,7 @@ switch(@$_POST['op']) {
 						`user_id_del`=".USER_ID.",
 						`dtime_del`=CURRENT_TIMESTAMP
 					WHERE "._queryWhere($dialog)."
-					  AND `t1`.`id`=".$unit_id;
+					  AND "._queryCol_id($dialog)."=".$unit_id;
 			query($sql);
 
 			_userAppAccessDel($dialog, $unit_id);
@@ -602,8 +602,8 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 						$sql = "SELECT COUNT(*)
 								FROM  "._queryFrom($DLG)."
 								WHERE "._queryWhere($DLG)."
-								  AND `t1`.`id`!=".$unit_id."
-								  AND `t1`.`".$col."`='".addslashes($v)."'";
+								  AND "._queryCol_id($DLG)."!=".$unit_id."
+								  AND "._queryColReq($DLG, $col)."='".addslashes($v)."'";
 						if(query_value($sql)) {
 							$is_err = 1;
 							$err_msg = 'Данное значение содержится в другой записи<br>и не может повторяться';
@@ -1044,7 +1044,7 @@ function _filterDefSet($dialog, $elem_id) {//обновление значени
 function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление компонентов единицы списка
 	if(empty($POST_CMP))
 		return;
-
+/*
 	$uid[$DLG['table_name_1']] = $unit_id;
 
 	//при наличии двух таблиц главной первой становится родительская
@@ -1061,11 +1061,13 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 			$uid[$DLG['table_name_1']] = $id2;
 		}
 	}
+*/
+	$DLG = _dialogParent($DLG);
 
 	foreach($POST_CMP as $cmp_id => $v) {
 		if(!$col = _elemCol($cmp_id))
 			continue;
-
+/*
 		if(!$tab = _queryTN($DLG, $col, 1)) {
 			//если родительская таблица=`_user`, сохранение её колонок, если есть
 			if($dip && !empty($PAR))
@@ -1079,10 +1081,19 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 					}
 			continue;
 		}
+*/
+		$sql = "UPDATE "._queryFrom($DLG)."
+				SET "._queryColReq($DLG, $col)."='".addslashes($v)."'
+				WHERE "._queryWhere($DLG)."
+				  AND "._queryCol_id($DLG)."=".$unit_id;
+/*
+echo $sql.'
 
+';
 		$sql = "UPDATE `".$tab."`
 				SET `".$col."`='".addslashes($v)."'
 				WHERE `id`=".$uid[$tab];
+*/
 		query($sql);
 
 		_elem1def($cmp_id, $unit_id, $v);
@@ -1153,7 +1164,7 @@ function _spisokUnitUpd42($DLG, $cmp) {//обновление некоторых
 	$sql = "UPDATE "._queryFrom($DST)."
 			SET ".implode(',', $upd)."
 			WHERE "._queryWhere($DST)."
-			  AND `t1`.`id`=".$unit_id;
+			  AND "._queryCol_id($DST)."=".$unit_id;
 	query($sql);
 }
 function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id диалога при создании условий удаления записи

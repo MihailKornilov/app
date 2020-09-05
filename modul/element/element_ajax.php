@@ -287,15 +287,6 @@ switch(@$_POST['op']) {
 		$send['iuid_cols'] = $IUID_cols;
 		$send['page_list'] = _element6_vvv();
 
-		$dlgUnitGet = _dialogSelArray('unit_get', $dialog_id);
-		array_unshift($dlgUnitGet, array(
-			'id' => -1,
-			'title' => 'Совпадает с текущей страницей',
-			'content' => '<div class="b clr11">Совпадает с текущей страницей</div>'.
-						 '<div class="fs12 clr1 ml10 mt3 i">Диалог будет принимать данные списка, которые принимает страница</div>'
-		));
-		$send['dlg_unit_get'] = $dlgUnitGet;
-
 		jsonSuccess($send);
 		break;
 	case 'dialog_setup_cols'://получение колонок конктетного диалога
@@ -898,17 +889,16 @@ function _dialogSetupService($DLG) {
 
 		'<div class="menu_service-1 pad10">'.
 			'<table class="bs10">'.
-				'<tr><td>'.
-					'<td>'._check(array(
-								'attr_id' => 'spisok_on',
-								'title' => 'диалог вносит данные',
-								'value' => $DLG['spisok_on']
-						   )).
-				'<tr class="tr-spisok-col'._dn($DLG['spisok_on']).'">'.
-					'<td class="clr1 r">Колонка по умолчанию:'.
+				'<tr><td class="clr1 r">Колонка по умолчанию:'.
 					'<td><input type="hidden" id="spisok_elem_id" value="'.$DLG['spisok_elem_id'].'" />'.
 				'<tr><td class="clr1 r">Родительский диалог:'.
 					'<td><input type="hidden" id="dialog_id_parent" value="'.$DLG['dialog_id_parent'].'" />'.
+				'<tr><td>'.
+					'<td>'._check(array(
+								'attr_id' => 'is_unit_get',
+								'title' => 'диалог получает данные записи',
+								'value' => $DLG['is_unit_get']
+						   )).
 
 				'<tr><td colspan="2" class="line-t">&nbsp;'.
 				'<tr><td>'.
@@ -930,10 +920,6 @@ function _dialogSetupService($DLG) {
 								  ' value=""'.
 							' />'.
 						'</div>'.
-				'<tr><td colspan="2">&nbsp;'.
-				'<tr><td colspan="2" class="line-t">&nbsp;'.
-				'<tr><td class="clr1 r">Получает данные записи:'.
-					'<td><input type="hidden" id="dialog_id_unit_get" value="'.$DLG['dialog_id_unit_get'].'" />'.
 			'</table>'.
 		'</div>'.
 
@@ -1297,7 +1283,6 @@ function _dialogSetupUseDialog($dialog) {//использование элеме
 			'</div>';
 	}
 
-
 	return
 	'<div class="fs14 clr11 mt15 bg17 pad5">В диалогах:</div>'.
 	$send;
@@ -1416,17 +1401,14 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	if(!$name = _txt($_POST['name']))
 		jsonError('Укажите имя диалогового окна');
 
-	$spisok_on = _bool($_POST['spisok_on']);
-	$spisok_elem_id = $spisok_on ? _num($_POST['spisok_elem_id']) : 0;
+	$spisok_elem_id = _num($_POST['spisok_elem_id']);
 	$open_auto = _bool($_POST['open_auto']);
 
 	$dialog_id_parent =   _num($_POST['dialog_id_parent']);
 	if($dialog_id_parent == $dialog_id)
 		jsonError('Диалог не может родительским для самого себя');
 
-	$dialog_id_unit_get = _num($_POST['dialog_id_unit_get'], 1);
-	if($dialog_id_unit_get == $dialog_id)
-		jsonError('Диалог не может принимать значения самого себя');
+	$is_unit_get = _bool($_POST['is_unit_get']);
 
 	$menu_edit_last = _num($_POST['menu_edit_last']);
 
@@ -1457,11 +1439,10 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`del_action_id`=".$del_action_id.",
 				`del_action_page_id`=".$del_action_page_id.",
 
-				`spisok_on`=".$spisok_on.",
 				`spisok_elem_id`=".$spisok_elem_id.",
 				`open_auto`=".$open_auto.",
 
-				`dialog_id_unit_get`=".$dialog_id_unit_get.",
+				`is_unit_get`=".$is_unit_get.",
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;
@@ -1606,24 +1587,15 @@ function _dialogOpenLoad($dialog_id) {
 
 	$get_id = _num(@$_POST['get_id']);
 
-	if($dialog['dialog_id_unit_get'] && !$get_id)
+	if($dialog['is_unit_get'] && !$get_id)
 		return _dialogOpenErr($send, 'Не получены данные записи');
 
 	//если получен id записи
 	if($get_id) {
 		$send['get_id'] = $get_id;
 		$prm['unit_get_id'] = $get_id;
-		//в диалоге должна быть настройка, какого списка принимать данные записи
-		if($dlgGetId = $dialog['dialog_id_unit_get']) {
-			//диалог принимает данные записи, которые принимает страница
-			if($dlgGetId == -1) {
-				$page = _page($page_id);
-				if(!$dlgGetId = $page['dialog_id_unit_get'])
-					return _dialogOpenErr($send, 'Текущая страница не принимает данные записи');
-			}
-			$DLG_GET = _dialogQuery($dlgGetId);
-			$prm['unit_get'] = _spisokUnitQuery($DLG_GET, $get_id);
-		}
+		if($dialog['is_unit_get'])
+			$prm['unit_get'] = _spisokUnitQuery($dialog, $get_id);
 	}
 
 	/* --- Редактирование записи --- */
@@ -1632,7 +1604,7 @@ function _dialogOpenLoad($dialog_id) {
 
 		if(!$dialog['edit_on'])
 			return _dialogOpenErr($send, 'Редактирование записи запрещено.');
-		if(!$prm['unit_edit'] = _arrNum(_spisokUnitQuery($dialog, $edit_id)))
+		if(!$prm['unit_edit'] = _spisokUnitQuery($dialog, $edit_id))
 			return _dialogOpenErr($send, 'Записи '.$dialog['id'].':'.$edit_id.' не существует.');
 
 		$send['edit_id'] = $edit_id;

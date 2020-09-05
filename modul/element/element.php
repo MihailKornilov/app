@@ -532,12 +532,12 @@ function _dialogParent($dialog) {//получение диалога, отвеч
 		if(!$PAR = _dialogQuery($parent_id))
 			break;
 
-		$dialog = $PAR;
-
 		//диалог может быть родительским во всех приложениях
 		//в таком случае диалогом списка становится его первый последователь
 		if($PAR['parent_any'])
 			break;
+
+		$dialog = $PAR;
 	}
 	$dialog['act'] = $act;
 	return $dialog;
@@ -556,7 +556,6 @@ function _dialogOpenVal($dialog_id, $prm, $EL_BUT) {//получение пар�
 	//Будут переданы значения и для отображения, и для редактирования
 	if($dlg['dialog_id_parent'])
 		return ',get_id:'.$uid.',edit_id:'.$uid;
-//				($dlg['spisok_on'] ? ',edit_id:'.$uid : '');
 
 	//передаёт id записи. Берётся со страницы, либо с единицы списка
 	$send = '';
@@ -569,8 +568,17 @@ function _dialogOpenVal($dialog_id, $prm, $EL_BUT) {//получение пар�
 
 	return $send;
 }
-function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1
-	$cond = "`spisok_on`";
+function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//диалоги, которые являются списками: insert_on=1, не дочерние
+	//диалоги, которые могут быть родительскими во всех приложениях. Они не учитываются как родители
+	$sql = "SELECT `id`
+			FROM `_dialog`
+			WHERE `parent_any`";
+	$ids = query_ids($sql);
+
+	$cond = "`insert_on`";
+	$cond .= " AND `dialog_id_parent` IN (0,".$ids.")";
+	$cond .= " AND !`element_group_id`";
+	$cond .= " AND `table_1` NOT IN (6)";
 	$cond .= " AND `app_id` IN (0,".APP_ID.")";
 
 	//получение id диалога, который является списком, чтобы было нельзя его выбирать в самом себе (для связок)
@@ -629,7 +637,7 @@ function _dialogSpisokOn($dialog_id, $block_id, $elem_id) {//получение 
 
 	return $send;
 }
-function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые могут быть списками: spisok_on=1 (размещённые на странице)
+function _dialogSpisokOnPage($block_id) {//получение массива диалогов, которые могут быть списками: insert_on=1 (размещённые на странице)
 /*
 	получены будут списки, размещёные в текущем объекте
 	$elem_id - размещённый на странице или в диалоге, по которому определяется объект
@@ -774,14 +782,17 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 		return array();
 
 
+	$PA = array();//диалоги, которые могут быть родительскими во всех приложениях
 
 	//Базовые диалоги
 	$dlg_base = array();
-	foreach($arr as $r) {
+	foreach($arr as $id => $r) {
 		if($r['element_group_id'])
 			continue;
 		if(!$r['parent_any'])
 			continue;
+		else
+			$PA[$id] = true;
 		if($r['app_id'])
 			continue;
 
@@ -794,8 +805,6 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 		));
 
 
-
-
 	//Списки приложения
 	$dlg_app_spisok = array();
 	foreach($arr as $r) {
@@ -805,7 +814,9 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 			continue;
 		if(!$r['app_id'])
 			continue;
-		if(!$r['spisok_on'])
+		if(!$r['insert_on'])
+			continue;
+		if($r['dialog_id_parent'] && !isset($PA[$r['dialog_id_parent']]))
 			continue;
 		if($r['id'] == $skip)
 			continue;
@@ -830,7 +841,7 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 			continue;
 		if(!$r['app_id'])
 			continue;
-		if($r['spisok_on'])
+		if($r['insert_on'])
 			continue;
 
 		$dlg_app[] = _dialogSelArrayUnit($r);
@@ -921,7 +932,7 @@ function _dialogSelArrayUnit($r, $idShow=0) {//составление едини
 	$color = '';
 	if(!$r['app_id'])
 		$color = 'clr11';
-	if($r['spisok_on'])
+	if($r['insert_on'])
 		$color = 'clr13'.(!$r['app_id'] ? ' b' : '');
 	if($r['sa'])
 		$color = 'clr8';
@@ -978,9 +989,9 @@ function _dialogIUID($DLG, $unit_id=0) {//присвоение ID сторонн
 		return;
 
 	$sql = "UPDATE "._queryFrom($UDLG)."
-			SET `t1`.`".$col."`=".$unit_id."
+			SET "._queryColReq($DLG, $col)."=".$unit_id."
 			WHERE "._queryWhere($UDLG)."
-			  AND `t1`.`id`=".$get_id;
+			  AND "._queryCol_id($UDLG)."=".$get_id;
 	query($sql);
 }
 
@@ -1057,7 +1068,7 @@ function PHP12_dialog_app_li($r) {
 				'<td class="w30 r">'.
 					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup tool" data-tool="Редактировать диалог"></div>'.
 				'<td class="w50 center">'.
-					($r['spisok_on'] ? '<div class="icon icon-ok curD"></div>' : '').
+					($r['insert_on'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w100 clr13'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
 				'<td class="w70 clr1">'.PHP12_dialog_col($r['id']).
 				'<td class="w30'.$bgh.'">'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
@@ -1735,8 +1746,8 @@ function _elemPrintV($el, $prm, $def='') {//значение записи при
 		return $def;
 	if(empty($el['col']))
 		return $def;
-
-	$col = $el['col'];
+	if(!$col = _elemCol($el))
+		return $def;
 
 	//имя колонки является id элемента из родительского диалога
 	if($id = _num($col)) {
@@ -2025,7 +2036,7 @@ function PHP12_elem_choose_rule($prm, $isMsg=0) {
 			case 'dialog':
 				if(!$dlg = _dialogQuery($BL['obj_id']))
 					return !$isMsg ? 0 : 'Несуществующий диалог '.$BL['obj_id'].'.';
-				if($dlg['dialog_id_unit_get'])
+				if($dlg['is_unit_get'])
 					return !$isMsg ? 10 : 'Блок диалога, принимающего данные записи.';
 				return !$isMsg ? 2 : 'Блок с диалога.';
 			case 'dialog_del':  return !$isMsg ? 8 : 'Блок содержания удаления записи.';
@@ -2844,10 +2855,13 @@ function _historyUnitCond($el, $prm) {//отображение истории д
 		case 'dialog':
 			if(!$DLG = _dialogQuery($bl['obj_id']))
 				return " AND !`id` /* диалога ".$bl['obj_id']." не существует */";
-			if(!$dialog_id = $DLG['dialog_id_unit_get'])
+			if(!$DLG['is_unit_get'])
 				return " AND !`id` /* диалог не принимает данные записи */";
 			if(!$unit_id = $prm['unit_get_id'])
 				return " AND !`id` /* id записи не получен */";
+
+			$DLG = _dialogParent($DLG);
+			$dialog_id = $DLG['id'];
 			break;
 		default: return " AND !`id` /* не страница и не диалог */";
 	}

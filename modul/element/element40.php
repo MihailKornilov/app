@@ -416,7 +416,7 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 			case 'dialog':
 //							if(!$DLG = _dialogQuery($BL['obj_id']))
 //								return ' AND !`t1`.`id` /* [40] диалога '.$dlg_id.' не существует */';
-//							if(!$dlg_id = $DLG['dialog_id_unit_get'])
+//							if(!$DLG['is_unit_get'])
 //								return ' AND !`t1`.`id` /* [40] диалог не принимает данные записи */';
 //							if(!$unit_id = _num(@$_GET['id']))
 //								return ' AND !`t1`.`id` /* no dialog unit_id */';
@@ -732,8 +732,10 @@ function PHP12_spfl_dss($prm) {//получение id исходного диа
 		if($BL = _blockOne($block_id))
 			if($BL['obj_name'] == 'dialog') {
 				if($DLG = _dialogQuery($BL['obj_id']))
-					if($id = _num($DLG['dialog_id_unit_get']))
-						return $id;
+					if($DLG['is_unit_get']) {
+						$PAR = _dialogParent($DLG);
+						return $PAR['id'];
+					}
 				return $BL['obj_id'];
 			}
 

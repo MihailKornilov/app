@@ -706,6 +706,51 @@ function _page_div() {//todo тест
 
 
 	return '';
+
+	$sql = "SELECT *
+			FROM `_dialog`
+			WHERE !`dialog_id_parent`
+			  AND !`insert_on`
+			ORDER BY `id`";
+	$arr = query_arr($sql);
+
+	$sql = "SELECT *
+			FROM `_dialog`
+			ORDER BY `id`";
+	$DLG = query_arr($sql);
+
+	$send = '<div>Всего: '.count($arr).'</div>';
+
+	$send .= '<table class="_stab small">'.
+				'<tr><th>APP_ID'.
+					'<th>DLG_ID'.
+					'<th>Таблица'.
+					'<th>Имя диалога'.
+					'<th>dialog_id_parent';
+//					'<th>Род.таблица'.
+//					'<th>Родитель<br>в родителе';
+	foreach($arr as $id => $r) {
+//		$PAR = $DLG[$r['dialog_id_parent']];
+
+		$send .=
+			'<tr><td class="r">'.$r['app_id'].
+				'<td class="r">'.$id.
+				'<td>'._table($r['table_1']).
+				'<td>'.$r['name'].
+				'<td class="r">'.$r['dialog_id_parent'];
+//				'<td>'._table($PAR['table_1']).
+//				'<td class="r">'.$PAR['dialog_id_parent'];
+	}
+	$send .= '</table>';
+
+
+	return $send;
+
+
+
+
+
+	return '';
 }
 
 

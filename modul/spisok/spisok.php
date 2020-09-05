@@ -288,10 +288,11 @@ function _spisokInclude($spisok) {//вложенные списки
 
 			//получение данных из вложенного списка
 			$incDialog = _dialogQuery($cmp['num_1']);
+			$incDialog = _dialogParent($incDialog);
 
 			$sql = "SELECT "._queryCol($incDialog)."
 					FROM   "._queryFrom($incDialog)."
-					WHERE `t1`.`id` IN (".$ids.")
+					WHERE "._queryCol_id($incDialog)." IN (".$ids.")
 					  AND "._queryWhere($incDialog, 1);
 			$key = md5($sql);
 			if(!isset($_SI[$key])) {
@@ -460,12 +461,14 @@ function _spisokUnitQuery($dialog, $unit_id, $nosuq=false) {//получение
 	if(!$nosuq && isset($SUQ[$key]))
 		return $SUQ[$key];
 
+	$dialog = _dialogParent($dialog);
+
 	if(!$dialog['table_1'])
 		return array();
 
 	$sql = "SELECT "._queryCol($dialog)."
 			FROM   "._queryFrom($dialog)."
-			WHERE `t1`.`id`=".$unit_id."
+			WHERE "._queryCol_id($dialog)."=".$unit_id."
 			  AND "._queryWhere($dialog);
 	if(!$spisok[$unit_id] = query_assoc($sql))
 		return array();
@@ -570,8 +573,8 @@ function _spisokUnitUrlPage($el, $page_id, $u) {//получение id запи
 		return $u['id'];
 	if(empty($page['dialog_id_unit_get']))
 		return $u['id'];
-	if(!empty($u['dialog_id_use']) && $u['dialog_id_use'] == $page['dialog_id_unit_get'])
-		return $u['id'];
+//	if(!empty($u['dialog_id_use']) && $u['dialog_id_use'] == $page['dialog_id_unit_get'])
+//		return $u['id'];
 
 	switch($el['dialog_id']) {
 		case 11:
@@ -595,8 +598,10 @@ function _unitUrlId($u, $dlg_id) {//получение id из записи дл
 		return $u['id'];
 	if(!$DLG = _dialogQuery($dlg_id))
 		return $u['id'];
-	if($DLG['dialog_id_unit_get'])
-		$dlg_id = $DLG['dialog_id_unit_get'];
+	if($DLG['is_unit_get']) {
+		$PAR = _dialogParent($DLG);
+		$dlg_id = $PAR['id'];
+	}
 	if($u['dialog_id'] == $dlg_id)
 		return $u['id'];
 	foreach($u as $i => $v)
@@ -675,11 +680,11 @@ function _spisokColSearchBg($el, $txt) {//подсветка значения к
 function _spisokWhere($el, $prm=array()) {//формирование строки с условиями поиска
 	//$el - элемент, который размещает список 14 или 23.
 
-	if($el['dialog_id'] != 14 && $el['dialog_id'] != 23)
-		return "!`t1`.`id`";
-
 	//диалог, через который вносятся данные списка
 	$dlg = _dialogQuery($el['num_1']);
+
+	if($el['dialog_id'] != 14 && $el['dialog_id'] != 23)
+		return "!"._queryCol_id($dlg);
 
 	$cond = _queryWhere($dlg);
 	$cond .= _40cond($el, $el['txt_2'], $prm);

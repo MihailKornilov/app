@@ -41,7 +41,7 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 
 	$IS_SORT = _spisokIsSort($ELEM['id']);
 
-	$order = "`t1`.`id`";
+	$order = _queryCol_id($DLG);
 	switch($ELEM['num_3']) {
 		//по дате добавления
 		case 2318:
@@ -52,7 +52,7 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 		case 2319:
 			if(!_queryTN($DLG, 'sort'))
 				break;
-			if($IS_SORT)
+			if(!$IS_SORT)
 				break;
 			$order = "`sort`";
 			$SC = 'ASC';
@@ -61,7 +61,7 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 		case 2320:
 			if(!$col = _elemCol($ELEM['num_5']))
 				break;
-				$order = "`".$col."`";
+			$order = "`".$col."`";
 			break;
 	}
 

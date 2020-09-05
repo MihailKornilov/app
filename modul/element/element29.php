@@ -344,7 +344,7 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 			$sql = "SELECT "._queryCol($DLG)."
 					FROM   "._queryFrom($DLG)."
 					WHERE !`t1`.`deleted`
-					  AND `id` IN (".$ids.")
+					  AND "._queryCol_id($DLG)." IN (".$ids.")
 					ORDER BY `"._29cnnOrder($el, $DLG)."` ".$DESC."
 					".$LIMIT;
 			$arr = query_arr($sql);

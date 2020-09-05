@@ -52,22 +52,17 @@ function _element88_print($EL, $prm=array(), $next=0) {
 		$SPV_IDS[] = $id;
 
 		foreach(explode(',', _queryCol($DLG)) as $c)
-			$COL[$c] = 1;
+			$COL[] = $c;
 	}
-
-	$COLL = array();
-	foreach($COL as $c => $i) {
-		if(strpos($c, 'dialog_id_use'))
-			continue;
-		$COLL[] = $c;
-	}
-
 
 	if(!$EL['all'] = _elem88countAll($EL))
 		return _emptyMin($EL['txt_1']);
 
+	$COL = array_unique($COL);
+	$COL = implode(',', $COL);
+
 	//получение данных списка
-	$sql = "SELECT ".implode(',', $COLL)."
+	$sql = "SELECT ".$COL."
 			FROM   `_spisok` `t1`
 			WHERE  !`deleted`
 			  "._elem88cond($EL)."

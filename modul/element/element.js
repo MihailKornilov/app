@@ -449,11 +449,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			width:100,
 			spisok:o.col_type
 		});
-		DLG('#spisok_on')._check({
-			func:function(v) {
-				DLG('.tr-spisok-col')._dn(v);
-			}
-		});
 
 		DLG('#open_auto')._check({
 			func:function(v) {
@@ -483,11 +478,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			width:250,
 			title0:'нет',
 			spisok:o.dlg_spisok_on
-		});
-		DLG('#dialog_id_unit_get')._select({
-			width:250,
-			title0:'нет',
-			spisok:o.dlg_unit_get
 		});
 
 		DLG('#IUID_dlg_id')._select({
@@ -588,7 +578,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				page_id:PAGE_ID,
 				dialog_id:o.dialog_id,
 				dialog_id_parent:DLG('#dialog_id_parent').val(),
-				dialog_id_unit_get:DLG('#dialog_id_unit_get').val(),
+				is_unit_get:DLG('#is_unit_get').val(),
 
 				name:DLG('#dialog_name').val(),
 
@@ -618,7 +608,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				del_action_id:DLG('#del_action_id').val(),
 				del_action_page_id:DLG('#del_action_page_id').val(),
 
-				spisok_on:DLG('#spisok_on').val(),
 				spisok_elem_id:DLG('#spisok_elem_id').val(),
 				open_auto:DLG('#open_auto').val(),
 

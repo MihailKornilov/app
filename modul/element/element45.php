@@ -60,7 +60,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
-			WHERE `t1`.`id` IN ("._idsGet($UNS).")
+			WHERE "._queryCol_id($DLG)." IN ("._idsGet($UNS).")
 			  AND "._queryWhere($DLG, 1);
 	if(!$arr = query_arr($sql))
 		return '';
@@ -170,7 +170,7 @@ function _element45_template_docx($el, $u) {
 
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
-			WHERE `t1`.`id` IN ("._idsGet($UNS).")
+			WHERE "._queryCol_id($DLG)." IN ("._idsGet($UNS).")
 			  AND "._queryWhere($DLG, 1);
 	if(!$arr = query_arr($sql))
 		return '';

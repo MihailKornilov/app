@@ -48,7 +48,7 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 
 	$limit = $ELEM['num_2'];
 	$SC = $ELEM['num_6'] ? 'DESC' : 'ASC';
-	$order = "`t1`.`id`";
+	$order = _queryCol_id($DLG);
 	if($tab = _queryTN($DLG, 'dtime_add'))
 		$order = "`".$tab."`.`dtime_add`";
 	$IS_SORT = false;
@@ -231,7 +231,7 @@ function _element23_template_docx($ELEM, $u) {
 
 	$limit = $ELEM['num_2'];
 	$SC = $ELEM['num_6'] ? 'DESC' : 'ASC';
-	$order = "`t1`.`id`";
+	$order = _queryCol_id($DLG);
 	if($tab = _queryTN($DLG, 'dtime_add'))
 		$order = "`".$tab."`.`dtime_add`";
 

@@ -33,7 +33,7 @@ function _element24_vvv($el, $prm) {
 	$dialog_id = $prm['srce']['dialog_id'];
 	$block_id = $prm['srce']['block_id'];
 	switch($el['num_1']) {
-		//диалоги, которые могут быть списками: spisok_on=1 и размещены на текущей странице
+		//диалоги, которые могут быть списками: insert_on=1 и размещены на текущей странице
 		case 960: return _dialogSpisokOnPage($block_id);
 		//диалоги, которые привязаны к выбранному диалогу
 		case 961: return _dialogSpisokOnConnect($block_id);

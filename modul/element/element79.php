@@ -82,11 +82,11 @@ function _element79_print($el) {
 
 		//получение имён для групп
 		$sql = "SELECT
-					`t1`.`id`,
+					"._queryCol_id($GROUP_DLG).",
 					`".$GROUP_COL_NAME."`
-				FROM   "._queryFrom($GROUP_DLG)."
-				WHERE  "._queryWhere($GROUP_DLG)."
-				  AND `t1`.`id` IN ("._idsGet($arr, 'gid').")";
+				FROM  "._queryFrom($GROUP_DLG)."
+				WHERE "._queryWhere($GROUP_DLG)."
+				  AND "._queryCol_id($GROUP_DLG)." IN ("._idsGet($arr, 'gid').")";
 		if($ass = query_ass($sql))
 			foreach($ass as $id => $name)
 				if(!empty($RES[$id]))

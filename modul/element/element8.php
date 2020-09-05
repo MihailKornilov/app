@@ -52,10 +52,10 @@ function _element8_print($el, $prm) {
 				break;
 			if(!$DLG = _dialogQuery($BL['obj_id']))
 				break;
-			$sql = "SELECT MAX(`t1`.`".$col."`)+1
+			$sql = "SELECT MAX("._queryColReq($DLG, $col).")+1
 					FROM  "._queryFrom($DLG)."
 					WHERE "._queryWhere($DLG)."
-					  AND LENGTH(`t1`.`".$col."`)=".strlen($el['txt_3']);
+					  AND LENGTH("._queryColReq($DLG, $col).")=".strlen($el['txt_3']);
 			$v = query_value($sql);
 			if(($diff = strlen($el['txt_3']) - strlen($v)) > 0)
 				for($n = 0; $n < $diff; $n++)

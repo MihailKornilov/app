@@ -126,7 +126,7 @@ function _element27update($elem_id, $unit_ids=0) {//пересчёт сумм з
 	$sql = "UPDATE "._queryFrom($DSrc)."
 			SET `".$colSrc."`=0
 			WHERE "._queryWhere($DSrc).
-($unit_ids ? " AND `t1`.`id` IN (".$unit_ids.")" : '');
+($unit_ids ? " AND "._queryCol_id($DSrc)." IN (".$unit_ids.")" : '');
 	query($sql);
 
 	//получение всех слагаемых баланса
@@ -153,7 +153,7 @@ function _element27update($elem_id, $unit_ids=0) {//пересчёт сумм з
 	$sql = "UPDATE "._queryFrom($DSrc)."
 			SET `".$colSrc."`=".$upd."
 			WHERE "._queryWhere($DSrc).
-($unit_ids ? " AND `t1`.`id` IN (".$unit_ids.")" : '');
+($unit_ids ? " AND "._queryCol_id($DSrc)." IN (".$unit_ids.")" : '');
 	query($sql);
 
 	_element27accum($elem_id);

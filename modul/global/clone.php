@@ -372,7 +372,7 @@ function _clone_page() {//клонирование: страницы
 					`app_id`,
 					`acs`,
 					`dialog_id`,
-					`dialog_id_unit_get`,
+					`is_unit_get`,
 					`name`,
 					`about`,
 					`image_ids`,
@@ -383,7 +383,7 @@ function _clone_page() {//клонирование: страницы
 					".CLONE_ID_DST.",
 					".$r['acs'].",
 					".$r['dialog_id'].",
-					".$r['dialog_id_unit_get'].",
+					".$r['is_unit_get'].",
 					'".addslashes($r['name'])."',
 					'".addslashes($r['about'])."',
 					'".addslashes($r['image_ids'])."',
@@ -648,7 +648,6 @@ function _clone_dialog() {//клонирование: диалоги
 					`del_history_elem`,
 					`table_1`,
 					`sort`,
-					`spisok_on`,
 					`spisok_elem_id`,
 					`menu_edit_last`,
 					`user_id_add`
@@ -687,7 +686,6 @@ function _clone_dialog() {//клонирование: диалоги
 
 					".$r['table_1'].",
 					".$r['sort'].",
-					".$r['spisok_on'].",
 					"._num(@$assEL[$r['spisok_elem_id']]).",
 					".$r['menu_edit_last'].",
 
@@ -704,9 +702,10 @@ function _clone_dialog() {//клонирование: диалоги
 			continue;
 
 		$sql = "UPDATE `_dialog`
-				SET `dialog_id_parent`="._num(@$assDLG[$r['dialog_id_unit_get']]).",
-					`dialog_id_unit_get`="._num(@$assDLG[$r['dialog_id_unit_get']])."
+				SET `dialog_id_parent`="._num(@$assDLG[$r['is_unit_get']]).",
+					`is_unit_get`="._num(@$assDLG[$r['is_unit_get']])."
 				WHERE `id`=".$assDLG[$id];
+		echo 'Переделать! '.$sql;
 		query($sql);
 	}
 

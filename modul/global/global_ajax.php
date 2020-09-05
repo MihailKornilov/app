@@ -78,7 +78,7 @@ switch(@$_POST['op']) {
 			$sql = "UPDATE "._queryFrom($DLG)."
 					SET ".$sortCol."=".$n."
 					WHERE "._queryWhere($DLG)."
-					  AND `t1`.`id`=".$id;
+					  AND "._queryCol_id($DLG)."=".$id;
 			query($sql);
 		}
 

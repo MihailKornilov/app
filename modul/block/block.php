@@ -1154,28 +1154,12 @@ function _beDlg($app_id=0) {//получение данных диалогов �
 	$G_DLG += $DLG;
 }
 function _beDlgField($DLG) {//вставка колонок таблиц в диалоги
-	//колонки по каждой таблице, используемые в диалогах
-	$key = 'DIALOG_FIELD';
-	if(!$field = _cache_get($key, 1)) {
-		$sql = "SELECT DISTINCT(`table_1`)
-				FROM `_dialog`
-				WHERE `table_1`";
-		$ids = _ids(query_ids($sql), 1);
-		foreach($ids as $table_id) {
-			$sql = "DESCRIBE `"._table($table_id)."`";
-			foreach(query_array($sql) as $r)
-				$field[$table_id][$r['Field']] = 1;
-		}
-
-		_cache_set($key, $field, 1);
-	}
-
 	//список колонок, присутствующих в таблицах
 	foreach($DLG as $id => $r) {
 		$DLG[$id]['field1'] = array();
 		$table_id = $r['table_1'];
 		if($DLG[$id]['table_name_1'] = _table($table_id))
-			$DLG[$id]['field1'] = $field[$table_id];
+			$DLG[$id]['field1'] = _field($table_id);
 	}
 
 	return $DLG;
