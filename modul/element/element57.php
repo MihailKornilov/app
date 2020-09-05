@@ -127,6 +127,13 @@ function PHP12_menu_block_setup_vvv($prm) {
 		return array();
 	if(!$el = _elemOne($prm['unit_edit']['id']))
 		return array();
+	if(!$arr = _element('vvv', $el))
+		return array();
 
-	return _element('vvv', $el);
+	foreach($arr as $id => $r) {
+		$arr[$id]['id'] = _num($r['id']);
+		$arr[$id]['def'] = _num($r['def']);
+	}
+
+	return $arr;
 }
