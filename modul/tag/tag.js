@@ -94,6 +94,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 			var v = INP.val();
 			ICON_DEL._dn(v && !o.multi);
 			o.funcWrite(v, t);
+			o.func(0);
 		}, 0);
 	});
 
@@ -115,7 +116,6 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 				return;
 
 			valueSet(su.attr('val'));
-			o.func(VALUE);
 			if(o.multi) {
 				su._dn();
 				if(o.write)
@@ -322,6 +322,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 
 		VALUE = v;
 		t.val(v);
+		o.func(v);
 
 		INP.val(MASS_ASS[v] ? String(MASS_ASS[v]).replace(/&quot;/g,'"') : '');
 
@@ -336,6 +337,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 			SEL.css('background-color', BG_ASS[v]);
 			INP.css('background-color', BG_ASS[v]);
 		}
+
 	}
 	function multiValueSet(v) {//обновление массива и ширины инпута после вставки значения, если мульти-выбор
 		v = _num(v);
@@ -358,6 +360,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 		INP.width(w);
 		INP.attr('placeholder', dd.length ? '' : o.title0);
 		t.val(vv.join(','));
+		o.func(vv.join(','));
 		MASS_SEL = MASS_SEL_SAVE;
 	}
 	function multiPrint() {//вывод выбранных значений при мульти-выборе

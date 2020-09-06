@@ -192,8 +192,8 @@ function _comtex_zayav_equip() {//комплектации оборудован�
 			  e.id,
 			  e.name,
 			  b.sort
-		  FROM _global._tovar_equip e,
-		       _global._tovar_equip_bind b
+		  FROM _tovar_equip e,
+		       _tovar_equip_bind b
 		  WHERE e.id=b.equip_id
 		    AND b.app_id=".APP_ID_OLD."
 		  GROUP BY e.id
