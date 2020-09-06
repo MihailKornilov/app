@@ -25,10 +25,11 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 			_comtex_tovar_category();
 			_comtex_tovar();
+			_comtex_zayav_place();
 
 		//частичный
 		case 2:
-			_comtex_zayav_place();
+			_comtex_zayav_equip();
 			break;
 
 		default:
@@ -179,6 +180,47 @@ function _comtex_zayav_place() {//местонахождения устройс�
 				
 				  txt_1,
 
+				  `sort`
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_zayav_equip() {//комплектации оборудования
+	$dialog_id = _comtexSpisokClear(1407);
+
+	_db2();
+	$sql = "SELECT
+			  e.id,
+			  e.name,
+			  b.sort
+		  FROM _global._tovar_equip e,
+		       _global._tovar_equip_bind b
+		  WHERE e.id=b.equip_id
+		    AND b.app_id=".APP_ID_OLD."
+		  GROUP BY e.id
+		  ORDER BY e.id";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['name']."',
+				".$r['sort']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  txt_1,
 				  `sort`
 			) VALUES ".implode(',', $mass);
 	query($sql);
