@@ -4,7 +4,8 @@
 function _element31_struct($el) {
 	return array(
 		'num_1'   => _num($el['num_1']),//id диалога - список, из которого будут выбираться галочки
-		'num_2'   => _num($el['num_2']) //id элемента - содержание
+		'num_2'   => _num($el['num_2']),//id элемента - содержание
+		'num_3'   => _num($el['num_3']) //[15] количество рядов
 	) + _elementStruct($el);
 }
 function _element31_print($el, $prm) {
@@ -21,7 +22,7 @@ function _element31_print($el, $prm) {
 	//вставка картинок
 	$spisok = _spisokImage($spisok);
 
-	$chk = '';
+	$chk = array();
 	$n = 0;
 	$sel = _idsAss($v);
 	foreach($spisok as $r) {
@@ -54,7 +55,7 @@ function _element31_print($el, $prm) {
 		} elseif($col = _elemCol($DLG['spisok_elem_id']))
 				$title = $r[$col];
 
-		$chk .=
+		$chk[] =
 			'<div class="'._dn(!$n++, 'mt5').'">'.
 				_check(array(
 					'attr_id' => 'chk31_'.$r['id'],
@@ -64,6 +65,24 @@ function _element31_print($el, $prm) {
 				)).
 			'</div>';
 	}
+
+	if($el['num_3'] > 1) {
+		$tab = '<table>';
+		$c = ceil(count($chk) / $el['num_3']);//количество значений в одном столбце
+		for($i = 0; $i < $c; $i++) {
+			$tab .= '<tr>';
+			for($n = 0; $n < $el['num_3']; $n++) {
+				$key = $n * $c + $i;
+				$tab .= '<td class="pr10">';
+				if(isset($chk[$key]))
+					$tab .= $chk[$key];
+			}
+		}
+
+		$tab .= '</table>';
+		$chk = $tab;
+	} else
+		$chk = implode('', $chk);
 
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
