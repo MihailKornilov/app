@@ -451,7 +451,7 @@ $(document)
 								'<em class="fr">' + typeof req[i] + '</em>' +
 							'</div>';
 					if(typeof req[i] == 'object') {
-						html += _pr(req[i]);
+//						html += _pr(req[i]);
 						break;
 					}
 					if(typeof req[i] === 'string')
