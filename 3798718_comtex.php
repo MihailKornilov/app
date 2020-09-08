@@ -458,7 +458,7 @@ function _comtex_zayav() {//заявки-оборудование
 
 	_db2();
 	$sql = "SELECT *
-			FROM _global._zayav
+			FROM _zayav
 			WHERE `app_id`=".APP_ID_OLD."
 			  AND `service_id`=5
 			ORDER BY `id`";
