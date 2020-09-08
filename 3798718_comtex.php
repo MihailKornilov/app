@@ -1,6 +1,6 @@
 <?php
 /*
-	Комтекс: 3798718
+	Комтекс: 3798718 -> 6
 
 	ОСОБЕННОСТИ ПЕРЕНОСА:
 	1. В клиентах убрано поле Факс. Всего содержится 14 записей. Перенесено в поле Телефон.
@@ -26,10 +26,13 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_tovar_category();
 			_comtex_tovar();
 			_comtex_zayav_place();
+			_comtex_zayav_equip();
+			_comtex_zayav_status();
 
 		//частичный
 		case 2:
-			_comtex_zayav_equip();
+			_comtex_zayav();
+			_comtex_zayav_tovar();
 			break;
 
 		default:
@@ -146,86 +149,6 @@ function _comtex_client() {//Клиенты
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
-
-function _comtex_zayav_place() {//местонахождения устройств
-	$dialog_id = _comtexSpisokClear(1406);
-
-	_db2();
-	$sql = "SELECT *
-			FROM `_zayav_tovar_place`
-			WHERE `app_id`=".APP_ID_OLD."
-			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
-		return;
-
-	$mass = array();
-	foreach($arr as $id => $r) {
-		$mass[] = "(
-				".$id.",
-				".APP_ID.",
-				".$id.",
-				".$dialog_id.",
-				
-				'".$r['place']."',
-
-				".$r['id']."
-			)";
-	}
-
-	$sql = "INSERT INTO `_spisok` (
-				  `id_old`,
-				  `app_id`,
-				  `num`,
-				  `dialog_id`,
-				
-				  txt_1,
-
-				  `sort`
-			) VALUES ".implode(',', $mass);
-	query($sql);
-}
-function _comtex_zayav_equip() {//комплектации оборудования
-	$dialog_id = _comtexSpisokClear(1407);
-
-	_db2();
-	$sql = "SELECT
-			  e.id,
-			  e.name,
-			  b.sort
-		  FROM _tovar_equip e,
-		       _tovar_equip_bind b
-		  WHERE e.id=b.equip_id
-		    AND b.app_id=".APP_ID_OLD."
-		  GROUP BY e.id
-		  ORDER BY e.id";
-	if(!$arr = query_arr($sql))
-		return;
-
-	$mass = array();
-	foreach($arr as $id => $r) {
-		$mass[] = "(
-				".$id.",
-				".APP_ID.",
-				".$id.",
-				".$dialog_id.",
-				
-				'".$r['name']."',
-				".$r['sort']."
-			)";
-	}
-
-	$sql = "INSERT INTO `_spisok` (
-				  `id_old`,
-				  `app_id`,
-				  `num`,
-				  `dialog_id`,
-				
-				  txt_1,
-				  `sort`
-			) VALUES ".implode(',', $mass);
-	query($sql);
-}
-
 
 function _comtex_tovar_category() {//категории товаров
 	$dialog_id = _comtexSpisokClear(1404);
@@ -384,3 +307,285 @@ function _comtex_tovar() {//товары
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
+
+function _comtex_zayav_place() {//местонахождения устройств
+	$dialog_id = _comtexSpisokClear(1406);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_zayav_tovar_place`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	$mass[] = "(
+			1,
+			".APP_ID.",
+			1,
+			".$dialog_id.",
+			'в сервисном центре',
+			1
+		)";
+	$mass[] = "(
+			2,
+			".APP_ID.",
+			2,
+			".$dialog_id.",
+			'у клиента',
+			2
+		)";
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['place']."',
+
+				".$r['id']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  txt_1,
+
+				  `sort`
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_zayav_equip() {//комплектации оборудования
+	$dialog_id = _comtexSpisokClear(1407);
+
+	_db2();
+	$sql = "SELECT
+			  e.id,
+			  e.name,
+			  b.sort
+		  FROM _tovar_equip e,
+		       _tovar_equip_bind b
+		  WHERE e.id=b.equip_id
+		    AND b.app_id=".APP_ID_OLD."
+		  GROUP BY e.id
+		  ORDER BY e.id";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['name']."',
+				".$r['sort']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  txt_1,
+				  `sort`
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_zayav_status() {//статусы заявок-оборудования
+	$dialog_id = _comtexSpisokClear(1408);
+
+	_db2();
+	$sql = "SELECT
+			    id,
+			
+			    `name`,
+			    `about`,
+			    CONCAT('#',`color`) `color`,
+			    `default`,
+			
+			    `sort`
+			  FROM _zayav_status
+			  WHERE `app_id`=".APP_ID_OLD."
+			  ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['name']."',
+				'".$r['about']."',
+				'".$r['color']."',
+				".$r['default'].",
+
+				".$r['sort']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  txt_1,
+				  txt_2,
+				  txt_3,
+				  num_1,
+
+				  `sort`
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_zayav() {//заявки-оборудование
+	$dialog_id = _comtexSpisokClear(1402);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _global._zayav
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `service_id`=5
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1234";
+	$CLIENT = query_ass($sql);
+
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1408";
+	$STATUS = query_ass($sql);
+
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1407";
+	$EQUIP = query_ass($sql);
+
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1406";
+	$PLACE = query_ass($sql);
+
+
+
+	$mass = array();
+	foreach($arr as $zayav_id => $r) {
+		$eq = '';
+		if($ids = _ids($r['tovar_equip_ids'], 'arr')) {
+			$eqArr = array();
+			foreach($ids as $id)
+				if(isset($EQUIP[$id]))
+					$eqArr[] = $EQUIP[$id];
+			if($eqArr)
+				$eq = '0,'.implode(',', $eqArr).',0';
+		}
+		$mass[] = "(
+				".$zayav_id.",
+				".APP_ID.",
+				".$r['nomer'].",
+				".$dialog_id.",
+				
+				"._num(@$CLIENT[$r['client_id']]).",
+				"._num(@$STATUS[$r['status_id']]).",
+				'".$eq."',
+				'".$r['serial']."',
+				"._num(@$PLACE[$r['tovar_place_id']]).",
+				".$r['sum_cost'].",
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_5,
+				  txt_3,
+				  txt_1,
+				  num_4,
+				  num_2,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_zayav_tovar() {//прикрепление товаров к заявкам-оборудование
+	$sql = "DELETE FROM `_spisok` WHERE !`dialog_id`";
+	query($sql);
+
+	//товары в заявках
+	_db2();
+	$sql = "SELECT *
+			  FROM _zayav_tovar
+			  WHERE `app_id`=".APP_ID_OLD."
+			  ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1402";
+	$ZAYAV = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1403";
+	$TOVAR = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+
+		if(!isset($ZAYAV[$r['zayav_id']]))
+			jsonError($r['zayav_id']);
+
+
+		$mass[] = "(
+			"._num(@$ZAYAV[$r['zayav_id']]).",
+			"._num(@$TOVAR[$r['tovar_id']])."
+		)";
+	}
+
+	$sql = "INSERT INTO _spisok (
+			  id,
+			  num_3
+			) VALUES ".implode(',', $mass)."
+			ON DUPLICATE KEY UPDATE
+			  `num_3`=VALUES(`num_3`)";
+	query($sql);
+
+
+
+}
+
+
