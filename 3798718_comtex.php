@@ -39,6 +39,9 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			jsonError('Выберите тип переноса');
 	}
 
+	global $SQL_QUERY;
+	$SQL_QUERY = array();
+
 	jsonSuccess();
 }
 
