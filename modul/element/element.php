@@ -431,7 +431,7 @@ function _elemInfoVar($elem_id) {
 			'<th>Cache'.
 			'<th>Cache-upd'.
 			'<th>JS'.
-		'<tr><td>'._pr($elBase).
+		'<tr><td class="top">'._pr($elBase).
 			'<td class="top">'._pr($elCashe).
 			'<td class="top">'._pr($elCasheUpd).
 			'<td class="top js">'.

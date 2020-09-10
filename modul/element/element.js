@@ -1555,12 +1555,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//открытие диалога
 	_ACT215 = function(act) {
-		var dlg_id = _num(act.target_ids);
+		var dlg_id = _num(act.target_ids),
+			dss = 0;
 		if(!dlg_id)
 			return;
+
+		if(act.bl.obj_name == 'dialog')
+			dss = act.bl.obj_id;
+
 		var send = {
 			dialog_id:dlg_id,
 			block_id:act.bl.id,
+			dss:dss,
 			busy_obj:act.bo
 		};
 
