@@ -21,6 +21,9 @@ function _elem129_comtex($DLG, $POST_CMP) {
 		case 1:
 			_comtexDataDel();
 
+			_comtex_user();
+			_comtex_user_cnn();
+
 			_comtex_client();
 
 			_comtex_tovar_category();
@@ -28,11 +31,14 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_zayav_place();
 			_comtex_zayav_equip();
 			_comtex_zayav_status();
+			_comtex_zayav();
+			_comtex_zayav_tovar();
+			_comtex_accrual();
 
 		//частичный
 		case 2:
-			_comtex_zayav();
-			_comtex_zayav_tovar();
+			_comtex_user();
+			_comtex_user_cnn();
 			break;
 
 		default:
@@ -45,7 +51,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 	jsonSuccess();
 }
 
-function _comtexUserId($r) {//получение id пользователя, который вносил запись
+function _comtexUserId($r, $i='viewer_id_add') {//получение id пользователя, который вносил запись
 	global $USERVK;
 
 	if(!isset($USERVK)) {
@@ -55,10 +61,10 @@ function _comtexUserId($r) {//получение id пользователя, к
 		$USERVK = query_ass($sql);
 	}
 
-	if(!isset($USERVK[$r['viewer_id_add']]))
+	if(!isset($USERVK[$r[$i]]))
 		return 0;
 
-	return _num($USERVK[$r['viewer_id_add']]);
+	return _num($USERVK[$r[$i]]);
 }
 function _comtexSpisokClear($dialog_id) {//очистка списка по конкретному диалогу
 	$sql = "DELETE FROM `_spisok` WHERE `dialog_id`=".$dialog_id;
@@ -91,6 +97,171 @@ function _comtexDataDel() {// Удаление всех данных в прил
 //	query($sql);
 
 	$sql = "DELETE FROM `_user_spisok_filter` WHERE `app_id`=".APP_ID;
+	query($sql);
+}
+
+function _comtex_user() {//пользователи приложения
+
+	//колонки, по которым будут отобраны id пользователей
+	$UF = array(
+		'viewer_id_add' => 1,
+		'viewer_id_del' => 1,
+		'worker_id' => 1,
+		'executer_id' => 1,
+		'v1_viewer_id' => 1
+	);
+
+	//получение всех таблиц
+	_db2();
+	$sql = "SHOW TABLES";
+	$arr = query_array($sql);
+
+	$UIDS = array();
+	foreach($arr as $r) {
+		$key = key($r);
+		$table = $r[$key];
+
+		//получение таблиц с колонками app_id
+		_db2();
+		$sql = "DESCRIBE `".$table."`";
+		$FLD = query_array($sql);
+		foreach($FLD as $rr)
+			if($rr['Field'] == 'app_id') {
+				foreach($FLD as $F)
+					if(isset($UF[$F['Field']])) {
+						_db2();
+						$sql = "SELECT DISTINCT(`".$F['Field']."`) `id`
+								FROM `".$table."`
+								WHERE `app_id`=".APP_ID_OLD."
+								  AND `".$F['Field']."`";
+						if($ids = query_ids($sql))
+							$UIDS = _ids($ids, 'arr') + $UIDS;
+					}
+				break;
+			}
+	}
+
+	_db2();
+	$sql = "SELECT `viewer_id`
+			FROM `_vkuser`
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `worker`
+			  AND `viewer_id`";
+	if($ids = query_ids($sql))
+		$UIDS = _ids($ids, 'arr') + $UIDS;
+
+	$UIDS = array_unique($UIDS);
+	$UIDS = implode(',', $UIDS);
+
+	//новые пользователи, существующие в базе
+	$sql = "SELECT DISTINCT `vk_id` FROM `_user` WHERE `vk_id`";
+	$uNew = query_ids($sql);
+
+	_db2();
+	$sql = "SELECT
+	            `id`,
+				`viewer_id`,
+				IFNULL(last_name,'') `last_name`,
+				IFNULL(first_name,'') `first_name`,
+				IFNULL(middle_name,'') `middle_name`,
+				`sex`,
+				`dtime_add`,
+				`last_seen`
+			FROM `_vkuser`
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `viewer_id` NOT IN (".$uNew.")
+			  AND `viewer_id` IN (".$UIDS.")";
+	if(!$users = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($users as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".$r['viewer_id'].",
+				'".$r['last_name']."',
+				'".$r['first_name']."',
+				'".$r['middle_name']."',
+				".$r['sex'].",
+				'".$r['dtime_add']."',
+				'".$r['last_seen']."'
+			)";
+	}
+
+	$sql = "INSERT INTO `_user` (
+			  id_old,
+			  vk_id,
+			  f,
+			  i,
+			  o,
+			  pol,
+			  dtime_create,
+			  dtime_last
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_user_cnn() {//привязка пользователей к приложению
+	$sql = "DELETE FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=111";
+	query($sql);
+
+	$sql = "DELETE FROM `_user_access`
+			WHERE `app_id`=".APP_ID;
+	query($sql);
+
+	_db2();
+	$sql = "SELECT
+				`viewer_id` `id`,
+				`post`,
+				`dtime_add`
+			FROM `_vkuser`
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `worker`
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	$rule = array();
+	foreach($arr as $id => $r) {
+		if(!$cnn_id = _comtexUserId($r, 'id'))
+			continue;
+		$mass[] = "(
+				".APP_ID.",
+				".$id.",
+				111,
+				
+				".$cnn_id.",
+				'".$r['post']."',
+
+				1,
+				'".$r['dtime_add']."'
+			)";
+		$rule[] = "(
+				".APP_ID.",
+				".$cnn_id."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				app_id,
+				num,
+				dialog_id,
+				
+				cnn_id,     /* _user.id */
+				txt_1,      /* post */
+				
+				user_id_add,
+				dtime_add
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	//Права доступа для пользователей
+	$sql = "INSERT INTO `_user_access` (
+			  app_id,
+			  user_id
+			) VALUES ".implode(',', $rule);
 	query($sql);
 }
 
@@ -568,11 +739,6 @@ function _comtex_zayav_tovar() {//прикрепление товаров к з�
 
 	$mass = array();
 	foreach($arr as $id => $r) {
-
-		if(!isset($ZAYAV[$r['zayav_id']]))
-			jsonError($r['zayav_id']);
-
-
 		$mass[] = "(
 			"._num(@$ZAYAV[$r['zayav_id']]).",
 			"._num(@$TOVAR[$r['tovar_id']])."
@@ -586,9 +752,65 @@ function _comtex_zayav_tovar() {//прикрепление товаров к з�
 			ON DUPLICATE KEY UPDATE
 			  `num_3`=VALUES(`num_3`)";
 	query($sql);
+}
 
+function _comtex_accrual() {//начисления
+	$dialog_id = _comtexSpisokClear(1409);
 
+	//товары в заявках
+	_db2();
+	$sql = "SELECT *
+			  FROM _money_accrual
+			  WHERE `app_id`=".APP_ID_OLD."
+			  ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
 
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1234";
+	$CLIENT = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1402";
+	$ZAYAV = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				".$r['sum'].",
+				'".$r['about']."',
+				"._num(@$CLIENT[$r['client_id']]).",
+				"._num(@$ZAYAV[$r['zayav_id']]).",
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  sum_1,
+				  txt_1,
+				  num_1,
+				  num_2,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
 }
 
 
