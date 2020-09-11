@@ -64,8 +64,11 @@ function _element11_print($el, $prm) {
 			$u = $u[$col];
 
 			if(!is_array($u)) {
-				if(empty($u))
+				if(empty($u)) {
+					if($ell['dialog_id'] == 29)
+						return $ell['txt_1'];
 					return '';
+				}
 				return $u;
 			}
 
