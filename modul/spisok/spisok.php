@@ -543,8 +543,8 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 				if($func['revers'])
 					$val .= ',del_id:'._unitUrlId($u, $func['target_ids']);
 
-				if(preg_match('/class="/', $txt))
-					return preg_replace('/class="/', 'val="'.$val.'" class="dialog-open ', $txt, 1);
+//				if(preg_match('/class="/', $txt))
+//					return preg_replace('/class="/', 'val="'.$val.'" class="dialog-open curP ', $txt, 1);
 
 				return '<a val="'.$val.'" class="dialog-open inhr">'.$txt.'</a>';
 
