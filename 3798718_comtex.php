@@ -37,8 +37,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_user();
-			_comtex_user_cnn();
+			_comtex_invoice();
 			break;
 
 		default:
@@ -813,4 +812,47 @@ function _comtex_accrual() {//начисления
 	query($sql);
 }
 
+function _comtex_invoice() {//Расчётные счета
+	$dialog_id = _comtexSpisokClear(1412);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_money_invoice`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['name']."',
+				'".$r['about']."',
+				".$r['start'].",
+
+				".$r['sort'].",
+				".$r['deleted']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  num,
+				  dialog_id,
+
+				  txt_1,/* name */
+				  txt_2,/* about */
+				  sum_1,/* start */
+
+				  sort,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
 

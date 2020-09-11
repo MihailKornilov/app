@@ -2678,6 +2678,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			msg_empty:'Не найдено',
 			spisok:el.vvv,
 			blocked:el.num_4,
+			multi:el.num_11,
 			func:function(v) {
 				_ELM_ACT(el, v);
 			},

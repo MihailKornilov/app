@@ -468,7 +468,7 @@ function _spisokUnitQuery($dialog, $unit_id, $nosuq=false) {//получение
 
 	$sql = "SELECT "._queryCol($dialog)."
 			FROM   "._queryFrom($dialog)."
-			WHERE "._queryCol_id($dialog)."=".$unit_id."
+			WHERE "._queryCol_id($dialog)." IN (".$unit_id.")
 			  AND "._queryWhere($dialog);
 	if(!$spisok[$unit_id] = query_assoc($sql))
 		return array();
@@ -543,8 +543,8 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 				if($func['revers'])
 					$val .= ',del_id:'._unitUrlId($u, $func['target_ids']);
 
-//				if(preg_match('/class="/', $txt))
-//					return preg_replace('/class="/', 'val="'.$val.'" class="dialog-open curP ', $txt, 1);
+				if(preg_match('/class="icon/', $txt))
+					return preg_replace('/class="icon/', 'val="'.$val.'" class="icon dialog-open curP ', $txt, 1);
 
 				return '<a val="'.$val.'" class="dialog-open inhr">'.$txt.'</a>';
 

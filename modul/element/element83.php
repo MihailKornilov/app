@@ -21,22 +21,22 @@ function _element83_vvv($el) {
 	return _elem102CnnList($el['txt_2']);
 }
 function _elem83filter($el) {//фильтр-select
-	$filter = false;
-	$v = 0;
-
+	$send = '';
 	//поиск элемента-фильтра-select
-	foreach(_filter('spisok', $el['id']) as $r)
-		if($r['elem']['dialog_id'] == 83) {
-			if(!$filter = $r['elem'])
-				return '';
-			if(!$v = _num($r['v']))
-				return '';
-			break;
-		}
+	foreach(_filter('spisok', $el['id']) as $r) {
+		if($r['elem']['dialog_id'] != 83)
+			continue;
+		if(!$filter = $r['elem'])
+			continue;
+		if(!$v = _num($r['v']))
+			continue;
 
-	if(empty($filter))
-		return '';
+		$send .= _elem83filterWhere($filter, $v);
+	}
 
+	return $send;
+}
+function _elem83filterWhere($filter, $v) {
 	//проверка, нужно ли добавлять дочерние значения
 	if(!$last_id = _idsLast($filter['txt_2']))
 		return '';

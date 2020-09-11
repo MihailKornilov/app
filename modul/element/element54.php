@@ -135,9 +135,11 @@ function _element54unitUpd($dlg, $unit, $unitOld) {//обновить колич
 		$uidOld = 0;
 
 		if(!empty($unit[$col]))
-			$uid = $unit[$col]['id'];
+			if(isset($unit[$col]['id']))
+				$uid = $unit[$col]['id'];
 		if(!empty($unitOld[$col]))
-			$uidOld = $unitOld[$col]['id'];
+			if(isset($unitOld[$col]['id']))
+				$uidOld = $unitOld[$col]['id'];
 
 		if($uid != $uidOld) {
 			if($uid)

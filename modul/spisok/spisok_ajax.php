@@ -630,7 +630,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				break;
 			//Select: выбор записи из другого списка
 			case 29:
-				$v = _num($v);
+				$v = $cmp['num_11'] ? _ids($v) : _num($v);
 
 				if($cmp['num_7'] && !$v)
 					$v = _elem29ValAuto($cmp, $_POST['vvv'][$cmp_id]);
