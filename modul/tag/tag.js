@@ -116,6 +116,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 				return;
 
 			valueSet(su.attr('val'));
+			o.func(su.attr('val'));
 			if(o.multi) {
 				su._dn();
 				if(o.write)
@@ -158,6 +159,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 
 	ICON_DEL.click(function() {
 		valueSet(0);
+		o.func(0);
 		o.funcWrite('', t);
 	});
 
@@ -322,7 +324,6 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 
 		VALUE = v;
 		t.val(v);
-		o.func(v);
 
 		INP.val(MASS_ASS[v] ? String(MASS_ASS[v]).replace(/&quot;/g,'"') : '');
 
