@@ -26,7 +26,7 @@ function _element44_print($el, $prm) {
 			case 'el':
 				if(!$ell = _elemOne($r['id']))
 					break;
-				if(_elemAction244($ell, $prm))
+				if(_elemAction244($ell, $prm))//скрытие элемента
 					break;
 
 				$txt = _element('print', $ell, $prm);

@@ -28,16 +28,20 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 			_comtex_tovar_category();
 			_comtex_tovar();
+
 			_comtex_zayav_place();
 			_comtex_zayav_equip();
 			_comtex_zayav_status();
 			_comtex_zayav();
 			_comtex_zayav_tovar();
+
 			_comtex_accrual();
+			_comtex_invoice();
+			_comtex_income();
 
 		//частичный
 		case 2:
-			_comtex_invoice();
+			_comtex_income();
 			break;
 
 		default:
@@ -811,7 +815,6 @@ function _comtex_accrual() {//начисления
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
-
 function _comtex_invoice() {//Расчётные счета
 	$dialog_id = _comtexSpisokClear(1412);
 
@@ -851,6 +854,70 @@ function _comtex_invoice() {//Расчётные счета
 				  sum_1,/* start */
 
 				  sort,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_income() {//платежи
+	$dialog_id = _comtexSpisokClear(1413);
+
+	_db2();
+	$sql = "SELECT *
+			  FROM _money_income
+			  WHERE `app_id`=".APP_ID_OLD."
+			  ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1412";
+	$INVOICE = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1234";
+	$CLIENT = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1402";
+	$ZAYAV = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				".$r['sum'].",
+				'".$r['about']."',
+				"._num(@$INVOICE[$r['invoice_id']]).",
+				"._num(@$CLIENT[$r['client_id']]).",
+				"._num(@$ZAYAV[$r['zayav_id']]).",
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  sum_1,
+				  txt_1,
+				  num_1,
+				  num_2,
+				  num_3,
+
+				  user_id_add,
+				  dtime_add,
 				  deleted
 			) VALUES ".implode(',', $mass);
 	query($sql);

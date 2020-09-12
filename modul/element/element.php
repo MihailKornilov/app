@@ -1668,7 +1668,7 @@ function _elemFormat($el, $prm, $txt) {//формат значения элем�
 	$txt = _elemAction245($el, $txt, 1);    //Формат для текста
 	$txt = _spisokUnitUrl($el, $prm, $txt);
 	$txt = _elemAction229Hint($el, $prm, $txt);//выплывающая подсказка
-	$txt = _elemAction223($el, $prm, $txt);
+	$txt = _elemAction223($el, $prm, $txt);//подсказка на тёмном фоне
 	$txt = _elemLink($el, $txt);
 	return $txt;
 }
