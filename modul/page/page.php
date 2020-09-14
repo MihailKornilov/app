@@ -607,6 +607,7 @@ function _document() {//формирование документа для вы�
 			WHERE `id` IN ("._ids($doc['param_ids']).")";
 	foreach(query_arr($sql) as $el) {
 		$v = _element('template_docx', $el, $unit);
+		$v = strip_tags($v);
 		if(strpos($el['txt_10'], '_PROPIS}'))
 			if($sum = round($v))
 				$v = _numToWord($sum);
