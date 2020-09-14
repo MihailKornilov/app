@@ -52,6 +52,19 @@ function _element11_print($el, $prm) {
 		return _msgRed('[11] нет ids элементов');
 
 	foreach($ids as $elem_id) {
+		if($elem_id < 0) {
+			switch($elem_id) {
+				case -31://значение v1
+					if(!$v1 = @$_GET['v1'])
+						return '';
+					if(preg_match(REGEXP_YEARMON, $v1)) {
+						$ex = explode('-', $v1);
+						return _monthDef($ex[1]).' '.$ex[0];
+					}
+					return $v1;
+			}
+			return _msgRed('[11:'.$elem_id.'] sub_sero');
+		}
 		if(!$ell = _elemOne($elem_id))
 			return _msgRed('[11:'.$elem_id.'] not_exist');
 
@@ -230,6 +243,8 @@ function PHP12_v_choose_menuSel($prm) {//выбранный пункт меню
 		return 1;
 	if($v == -23)
 		return 1;
+	if($v == -31)
+		return 1;
 
 	return $sel;
 }
@@ -249,6 +264,10 @@ function PHP12_v_choose_global($prm) {//глобальные значения д
 		'<div class="elm-choose'.($v == -23 ? ' sel' : '').'" val="-23"></div>'.
 		'<div class="fs17 b center pad10 clr9">Текущая запись</div>'.
 		'<div class="center pad5 clr1">Если открыт диалог для редактирования данных</div>'.
+	'</div>'.
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -31 ? ' sel' : '').'" val="-31"></div>'.
+		'<div class="fs17 b center pad10 clr9">Значение v1</div>'.
 	'</div>';
 }
 function PHP12_v_choose_vvv($prm) {
