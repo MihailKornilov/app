@@ -1358,8 +1358,11 @@ function _beElmStruct11($el11) {
 		return $el11;
 	if(!$last_id = _idsLast($el11['txt_2']))
 		return $el11;
-	if(empty($G_ELM[$last_id]))
+	if(empty($G_ELM[$last_id])) {
+		if($last_id < 0)
+			$el11['stl'] = 1;
 		return $el11;
+	}
 
 	$el = $G_ELM[$last_id];
 
