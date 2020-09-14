@@ -2,12 +2,21 @@
 
 /* [39] Месяц и год */
 function _element39_struct($el) {
-	return _elementStruct($el);
+	return array(
+		'num_1'   => _num($el['num_1']) //[18] начальное значение
+										//     0 - текущий год и месяц
+										//     1 - v1
+	) + _elementStruct($el);
 }
 function _element39_print($el, $prm) {
-	$def = strftime('%Y-%m');
-	if(!$v = _elemPrintV($el, $prm, $def))
-		$v = $def;
+	if(!$v = _elemPrintV($el, $prm)) {
+		$cur = strftime('%Y-%m');
+		if($el['num_1'] && $v = @$_GET['v1']) {
+			if(!preg_match(REGEXP_YEARMON, $v))
+				$v = $cur;
+		} else
+			$v = $cur;
+	}
 
 	$ex = explode('-', $v);
 
