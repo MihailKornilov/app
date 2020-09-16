@@ -4,6 +4,7 @@
 
 	ОСОБЕННОСТИ ПЕРЕНОСА:
 	1. В клиентах убрано поле Факс. Всего содержится 14 записей. Перенесено в поле Телефон.
+	2. Картриджи переносены в Товары
 */
 
 function _elem129_comtex($DLG, $POST_CMP) {
@@ -28,6 +29,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 			_comtex_tovar_category();
 			_comtex_tovar();
+			_comtex_tovar_cartridge();
 
 			_comtex_zayav_place();
 			_comtex_zayav_equip();
@@ -37,11 +39,18 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 			_comtex_accrual();
 			_comtex_invoice();
+			_comtex_invoice_transfer();
 			_comtex_income();
+
+			_comtex_expense_category();
+			_comtex_expense();
+			_comtex_worker_zp();
+
+			_comtex_refund();
 
 		//частичный
 		case 2:
-			_comtex_income();
+			_comtex_tovar_cartridge();
 			break;
 
 		default:
@@ -68,6 +77,14 @@ function _comtexUserId($r, $i='viewer_id_add') {//получение id поль
 		return 0;
 
 	return _num($USERVK[$r[$i]]);
+}
+function _comtexErrMsg($dialog_id, $col,  $about) {
+	$sql = "SELECT COUNT(*)
+			FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND !`".$col."`";
+	if($c = query_value($sql))
+		echo $dialog_id.': '.$col.' - '.$about.' ('.$c.')'."\n\n";
 }
 function _comtexSpisokClear($dialog_id) {//очистка списка по конкретному диалогу
 	$sql = "DELETE FROM `_spisok` WHERE `dialog_id`=".$dialog_id;
@@ -484,6 +501,9 @@ function _comtex_tovar() {//товары
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
+function _comtex_tovar_cartridge() {//картриджи
+
+}
 
 function _comtex_zayav_place() {//местонахождения устройств
 	$dialog_id = _comtexSpisokClear(1406);
@@ -858,6 +878,58 @@ function _comtex_invoice() {//Расчётные счета
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
+function _comtex_invoice_transfer() {//переводы между счетами
+	$dialog_id = _comtexSpisokClear(1414);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _money_invoice_transfer
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1412";
+	$INVOICE = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				"._num(@$INVOICE[$r['invoice_id_from']]).",
+				"._num(@$INVOICE[$r['invoice_id_to']]).",
+				".$r['sum'].",
+				'".$r['about']."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_2,
+				  sum_1,
+				  txt_1,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
 function _comtex_income() {//платежи
 	$dialog_id = _comtexSpisokClear(1413);
 
@@ -922,4 +994,231 @@ function _comtex_income() {//платежи
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
+
+function _comtex_expense_category() {//категории расходов
+	$dialog_id = _comtexSpisokClear(1415);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_money_expense_category`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['name']."',
+
+				".$r['sort']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  num,
+				  dialog_id,
+
+				  txt_1,/* name */
+
+				  sort
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_expense() {//расходы
+	$dialog_id = _comtexSpisokClear(1416);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _money_expense
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND !`worker_id`
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1415";
+	$CAT = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1412";
+	$INVOICE = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				"._num(@$CAT[$r['category_id']]).",
+				"._num(@$INVOICE[$r['invoice_id']]).",
+				".$r['sum'].",
+				'".$r['about']."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_2,
+				  sum_1,
+				  txt_1,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_2', 'счета');
+}
+function _comtex_worker_zp() {//зарплата сотрудников
+	$dialog_id = _comtexSpisokClear(1417);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _money_expense
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `worker_id`
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1412";
+	$INVOICE = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mon = $r['year'].'-'.($r['mon'] < 10 ? '0' : '').$r['mon'];
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				"._comtexUserId($r, 'worker_id').",
+				"._num(@$INVOICE[$r['invoice_id']]).",
+				".$r['sum'].",
+				'".$r['about']."',
+				'".$mon."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_2,
+				  sum_1,
+				  txt_1,
+				  txt_2,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+//	_comtexErrMsg($dialog_id, 'num_1', 'сотрудники');
+	_comtexErrMsg($dialog_id, 'num_2', 'счета');
+}
+
+function _comtex_refund() {//платежи
+	$dialog_id = _comtexSpisokClear(1418);
+
+	_db2();
+	$sql = "SELECT *
+			  FROM _money_refund
+			  WHERE `app_id`=".APP_ID_OLD."
+			  ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1412";
+	$INVOICE = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1234";
+	$CLIENT = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1402";
+	$ZAYAV = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				".$r['sum'].",
+				'".$r['about']."',
+				"._num(@$INVOICE[$r['invoice_id']]).",
+				"._num(@$CLIENT[$r['client_id']]).",
+				"._num(@$ZAYAV[$r['zayav_id']]).",
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  sum_1,
+				  txt_1,
+				  num_1,
+				  num_2,
+				  num_3,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_1', 'счета');
+//	_comtexErrMsg($dialog_id, 'num_2', 'клиенты');
+}
+
+
 
