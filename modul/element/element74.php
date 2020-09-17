@@ -29,7 +29,7 @@ function _element74_print($el, $prm) {
 	if(!$EL = _elemOne($el['num_1']))
 		return _emptyMinRed('[74] Несуществующий элемент '.$el['num_1']);
 	if(!$DLG = _dialogQuery($EL['num_1']))
-		return _emptyMinRed('[74] Несуществующий элемент '.$el['num_1']);
+		return _emptyMinRed('[74] Несуществующий элемент '.$EL['num_1']);
 
 	$spisok = array();
 	$def = 0;
