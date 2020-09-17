@@ -26,8 +26,11 @@ function _element74_print($el, $prm) {
 		return _emptyMinRed('Значения фильтра не настроены');
 
 	//получение количества значений по каждому пункту
-	$EL = _elemOne($el['num_1']);
-	$DLG = _dialogQuery($EL['num_1']);
+	if(!$EL = _elemOne($el['num_1']))
+		return _emptyMinRed('[74] Несуществующий элемент '.$el['num_1']);
+	if(!$DLG = _dialogQuery($EL['num_1']))
+		return _emptyMinRed('[74] Несуществующий элемент '.$el['num_1']);
+
 	$spisok = array();
 	$def = 0;
 	foreach($vvv as $n => $r) {
