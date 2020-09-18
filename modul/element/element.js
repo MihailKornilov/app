@@ -477,6 +477,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		DLG('#dialog_id_parent')._select({
 			width:250,
 			title0:'нет',
+			write:1,
 			spisok:o.dlg_spisok_on
 		});
 
@@ -2843,6 +2844,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		$(ATTR_CMP(el.id))._select({
 			width:_num(el.width),
 			title0:el.txt_1,
+			write:1,
 			msg_empty:'диалоги ещё не были созданы',
 			spisok:el.vvv
 		});

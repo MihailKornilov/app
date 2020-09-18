@@ -783,6 +783,7 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 
 
 	$PA = array();//диалоги, которые могут быть родительскими во всех приложениях
+	$ASS = array();//диалоги, которые уже были учтены
 
 	//Базовые диалоги
 	$dlg_base = array();
@@ -797,6 +798,7 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 			continue;
 
 		$dlg_base[] = _dialogSelArrayUnit($r);
+		$ASS[$id] = 1;
 	}
 	if(!empty($dlg_base))
 		array_unshift($dlg_base, array(
@@ -807,7 +809,7 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 
 	//Списки приложения
 	$dlg_app_spisok = array();
-	foreach($arr as $r) {
+	foreach($arr as $id => $r) {
 		if($r['element_group_id'])
 			continue;
 		if($r['parent_any'])
@@ -822,6 +824,7 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 			continue;
 
 		$dlg_app_spisok[] = _dialogSelArrayUnit($r);
+		$ASS[$id] = 1;
 	}
 	if(!empty($dlg_app_spisok))
 		array_unshift($dlg_app_spisok, array(
@@ -834,14 +837,14 @@ function _dialogSelArray($v='all', $skip=0) {//список диалогов д�
 
 	//Не являются списками
 	$dlg_app = array();
-	foreach($arr as $r) {
+	foreach($arr as $id => $r) {
 		if($r['element_group_id'])
 			continue;
 		if($r['parent_any'])
 			continue;
 		if(!$r['app_id'])
 			continue;
-		if($r['insert_on'])
+		if(isset($ASS[$id]))
 			continue;
 
 		$dlg_app[] = _dialogSelArrayUnit($r);
