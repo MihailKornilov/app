@@ -41,16 +41,20 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_invoice();
 			_comtex_invoice_transfer();
 			_comtex_income();
+			_comtex_refund();
 
 			_comtex_expense_category();
 			_comtex_expense();
 			_comtex_worker_zp();
 
-			_comtex_refund();
+			_comtex_remind_status();
+			_comtex_remind_reason();
+			_comtex_remind();
 
 		//частичный
 		case 2:
-			_comtex_tovar_cartridge();
+//			_comtex_tovar_cartridge();
+			_comtex_remind();
 			break;
 
 		default:
@@ -935,9 +939,9 @@ function _comtex_income() {//платежи
 
 	_db2();
 	$sql = "SELECT *
-			  FROM _money_income
-			  WHERE `app_id`=".APP_ID_OLD."
-			  ORDER BY `id`";
+			FROM _money_income
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
 		return;
 
@@ -993,6 +997,73 @@ function _comtex_income() {//платежи
 				  deleted
 			) VALUES ".implode(',', $mass);
 	query($sql);
+}
+function _comtex_refund() {//платежи
+	$dialog_id = _comtexSpisokClear(1418);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _money_refund
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1412";
+	$INVOICE = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1234";
+	$CLIENT = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1402";
+	$ZAYAV = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				".$r['sum'].",
+				'".$r['about']."',
+				"._num(@$INVOICE[$r['invoice_id']]).",
+				"._num(@$CLIENT[$r['client_id']]).",
+				"._num(@$ZAYAV[$r['zayav_id']]).",
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  sum_1,
+				  txt_1,
+				  num_1,
+				  num_2,
+				  num_3,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_1', 'счета');
+//	_comtexErrMsg($dialog_id, 'num_2', 'клиенты');
 }
 
 function _comtex_expense_category() {//категории расходов
@@ -1152,21 +1223,72 @@ function _comtex_worker_zp() {//зарплата сотрудников
 	_comtexErrMsg($dialog_id, 'num_2', 'счета');
 }
 
-function _comtex_refund() {//платежи
-	$dialog_id = _comtexSpisokClear(1418);
+function _comtex_remind_status() {//статусы напоминаний
+	$dialog_id = _comtexSpisokClear(1420);
+
+	$sql = "INSERT INTO _spisok (app_id,dialog_id,id_old,txt_1,txt_2,sort,user_id_add) VALUES (".APP_ID.",".$dialog_id.",1,'Активные','#D7EBFF',0,1)";
+	$status_id = query_id($sql);
+
+	$sql = "INSERT INTO _spisok (app_id,dialog_id,id_old,txt_1,txt_2,sort,user_id_add) VALUES (".APP_ID.",".$dialog_id.",2,'Выполненные','#cfc',1,1)";
+	query($sql);
+
+	$sql = "INSERT INTO _spisok (app_id,dialog_id,id_old,txt_1,txt_2,sort,user_id_add) VALUES (".APP_ID.",".$dialog_id.",3,'Отменены','#ededed',2,1)";
+	query($sql);
+
+	$sql = "UPDATE `_element`
+			SET `num_6`=".$status_id."
+			WHERE `id`=16166";
+	query($sql);
+}
+function _comtex_remind_reason() {//причины переноса напоминаний
+	$dialog_id = _comtexSpisokClear(1421);
+
+	//категории
+	_db2();
+	$sql = "SELECT *
+			FROM `_remind_reason`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `count` DESC";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['txt']."'
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  txt_1
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_remind() {//напоминания
+	$dialog_id = _comtexSpisokClear(1419);
 
 	_db2();
 	$sql = "SELECT *
-			  FROM _money_refund
-			  WHERE `app_id`=".APP_ID_OLD."
-			  ORDER BY `id`";
+			FROM _remind
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
 		return;
 
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
-			WHERE `dialog_id`=1412";
-	$INVOICE = query_ass($sql);
+			WHERE `dialog_id`=1420";
+	$STATUS = query_ass($sql);
 
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
@@ -1186,15 +1308,15 @@ function _comtex_refund() {//платежи
 				".$id.",
 				".$dialog_id.",
 
-				".$r['sum'].",
+				'".$r['txt']."',
 				'".$r['about']."',
-				"._num(@$INVOICE[$r['invoice_id']]).",
+				'".$r['day']."',
+				"._num(@$STATUS[$r['status']]).",
 				"._num(@$CLIENT[$r['client_id']]).",
 				"._num(@$ZAYAV[$r['zayav_id']]).",
 
 				"._comtexUserId($r).",
-				'".$r['dtime_add']."',
-				".$r['deleted']."
+				'".$r['dtime_add']."'
 		)";
 	}
 
@@ -1204,21 +1326,17 @@ function _comtex_refund() {//платежи
 				  `num`,
 				  `dialog_id`,
 				
-				  sum_1,
 				  txt_1,
+				  txt_2,
+				  date_1,
 				  num_1,
 				  num_2,
 				  num_3,
 
 				  user_id_add,
-				  dtime_add,
-				  deleted
+				  dtime_add
 			) VALUES ".implode(',', $mass);
 	query($sql);
-
-	_comtexErrMsg($dialog_id, 'num_1', 'счета');
-//	_comtexErrMsg($dialog_id, 'num_2', 'клиенты');
 }
-
 
 
