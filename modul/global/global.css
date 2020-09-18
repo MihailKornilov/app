@@ -311,23 +311,23 @@ body:not(.site){position:relative}
 #hat-user dd:not(:hover) .icon{opacity:.7}
 
 /* подменю с моими приложениями в шапке */
-#hat-my-app{position:relative}
+#hat-sub{position:relative}
 
-#hat-my-app > div,
-#hat-my-app:hover{background-color:#697F99}
-#hat.local #hat-my-app > div,
-#hat.local #hat-my-app:hover{background-color:#777}
+#hat-sub > div,
+#hat-sub:hover{background-color:#697F99}
+#hat.local #hat-sub > div,
+#hat.local #hat-sub:hover{background-color:#777}
 
-#hat-my-app:not(:hover) > div{display:none}
-#hat-my-app > div{
+#hat-sub:not(:hover) > div{display:none}
+#hat-sub > div{
 	position:absolute;
 	top:0;
-	left:-220px;
 	width:220px;
+	left:-220px;
 	border-radius:3px 0 3px 3px;
 	box-shadow:-4px 4px 6px 0 rgba(100,100,100,.4);
 }
-#hat-my-app tr:not(:hover):not(.on){opacity:0.5}
+#hat-sub tr:not(:hover):not(.on){opacity:0.5}
 
 
 

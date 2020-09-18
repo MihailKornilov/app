@@ -472,7 +472,7 @@ function _html_hat() {//верхняя строка приложения для 
 					'<div class="uname">'.USER_NAME.'</div>'.
 					'<dl>'.
 						'<dd onclick="location.href=\''.URL.'&p=14\'">Мои настройки'.
-						'<dd id="hat-my-app">'.
+						'<dd id="hat-sub">'.
 							'<span onclick="location.href=\''.URL.'&p=98\'">Мои приложения</span>'.
 							_html_hat_MyApp().
 						_hat_link_admin().
@@ -542,8 +542,39 @@ function _hat_link_admin() {//кнопки Администрирование
 	if(!APP_ID)
 		return '';
 
-//	return '<button id="app-admin" onclick="location.href=\''.URL.'&p=7\'"></button>';
-	return '<dd onclick="location.href=\''.URL.'&p=7\'">Администрирование';
+	$ass = array(
+		'Страницы' => 12,
+		'Диалоговые окна' => 123,
+		'Подсказки' => 66,
+		'Пользователи' => 4,
+		'Шаблоны документов' => 8,
+		'' => 0,
+		'Счётчики' => 11,
+		'Планировщик' => 10,
+		'Изображения' => 17,
+		'Файлы' => 18
+	);
+
+	$send = '<div style="width:160px;left:-160px">'.
+				'<table class="w100p mt10 mb10">';
+
+	foreach($ass as $name => $page_id) {
+		if(!$name) {
+			$send .= '<tr><td>&nbsp;';
+			continue;
+		}
+		$send .=
+			'<tr onclick="location.href=\''.URL.'&p='.$page_id.'\'">'.
+				'<td class="l fs12 pl15 pt5 pb5">'.$name;
+	}
+
+	$send .= '</table></div>';
+
+
+	return
+	'<dd id="hat-sub">'.
+		'<span onclick="location.href=\''.URL.'&p=7\'">Администрирование</span>'.
+		$send;
 }
 function _hat_link_task() {//ссылка Задачи
 	if(PAS)
