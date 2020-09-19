@@ -50,11 +50,12 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_remind_status();
 			_comtex_remind_reason();
 			_comtex_remind();
+			_comtex_remind_action();
 
 		//частичный
 		case 2:
 //			_comtex_tovar_cartridge();
-			_comtex_remind();
+			_comtex_remind_action();
 			break;
 
 		default:
@@ -94,6 +95,48 @@ function _comtexSpisokClear($dialog_id) {//очистка списка по ко
 	$sql = "DELETE FROM `_spisok` WHERE `dialog_id`=".$dialog_id;
 	query($sql);
 	return $dialog_id;
+}
+function _comtexHistory($dialog_id) {//История по конкретному диалогу
+	$sql = "DELETE FROM `_history`
+			WHERE `app_id`=".APP_ID."
+			  AND `type_id`=1
+			  AND `dialog_id`=".$dialog_id;
+	query($sql);
+
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".APP_ID.",
+				1,
+				".$dialog_id.",
+				".$id.",
+				".$r['user_id_add'].",
+				'".$r['dtime_add']."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_history` (
+				app_id,
+				type_id,
+				dialog_id,
+				unit_id,
+				user_id_add,
+				dtime_add
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	//активирование истории
+	$sql = "UPDATE `_history`
+			SET `active`=1
+			WHERE `dialog_id`=".$dialog_id;
+	query($sql);
 }
 function _comtexDataDel() {// Удаление всех данных в приложении
 	$sql = "DELETE FROM `_spisok` WHERE `app_id`=".APP_ID." AND `id` NOT IN (0) AND !`cnn_id`";/* todo переделать */
@@ -1337,6 +1380,83 @@ function _comtex_remind() {//напоминания
 				  dtime_add
 			) VALUES ".implode(',', $mass);
 	query($sql);
-}
 
+	_comtexHistory($dialog_id);
+}
+function _comtex_remind_action() {//действие с напоминаниями
+	$dialog_id = _comtexSpisokClear(1424);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_remind_history`
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `viewer_id_add`
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1419";
+	$REMIND = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1420";
+	$STATUS = query_ass($sql);
+
+	$sql = "SELECT DISTINCT `txt_1`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1421 limit 10";
+	$REASON = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				"._num(@$REMIND[$r['remind_id']]).",
+				"._num(@$STATUS[$r['status']]).",
+				'".$r['day']."',
+				"._num(@$REASON[$r['txt']]).",
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_2,
+				  date_1,
+				  num_3,
+
+				  user_id_add,
+				  dtime_add
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	$sql = "SELECT `id`
+			FROM _spisok
+			WHERE `id_old`=1
+			  AND dialog_id=1420
+			LIMIT 1";
+	$status_id = query_value($sql);
+
+	$sql = "DELETE FROM `_spisok`
+			WHERE dialog_id=".$dialog_id."
+			  AND num_2=".$status_id."
+			  AND !num_3";
+	query($sql);
+
+	_comtexHistory($dialog_id);
+}
 
