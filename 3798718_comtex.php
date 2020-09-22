@@ -29,6 +29,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 			_comtex_tovar_category();
 			_comtex_tovar();
+			_comtex_tovar_avai();
 			_comtex_tovar_cartridge();
 
 			_comtex_zayav_place();
@@ -55,12 +56,21 @@ function _elem129_comtex($DLG, $POST_CMP) {
 		//частичный
 		case 2:
 //			_comtex_tovar_cartridge();
-			_comtex_remind_action();
+			_comtex_tovar_avai();
 			break;
 
 		default:
 			jsonError('Выберите тип переноса');
 	}
+
+	//очищение истории от пустых значений
+	$sql = "DELETE FROM _history
+			WHERE app_id=".APP_ID."
+			  AND unit_id NOT IN (
+				SELECT `id` FROM _spisok WHERE app_id=".APP_ID."
+			)";
+	query($sql);
+
 
 	global $SQL_QUERY;
 	$SQL_QUERY = array();
@@ -389,6 +399,8 @@ function _comtex_client() {//Клиенты
 				  deleted
 			) VALUES ".implode(',', $mass);
 	query($sql);
+
+	_comtexHistory($dialog_id);
 }
 
 function _comtex_tovar_category() {//категории товаров
@@ -547,6 +559,66 @@ function _comtex_tovar() {//товары
 				  dtime_add
 			) VALUES ".implode(',', $mass);
 	query($sql);
+}
+function _comtex_tovar_avai() {//наличие товара
+	$dialog_id = _comtexSpisokClear(1425);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _tovar_move
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `type_id`=1
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1403";
+	$TOVAR = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				"._num(@$TOVAR[$r['tovar_id']]).",
+				".$r['count'].",
+				".$r['cena'].",
+				'".$r['about']."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."'
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  sum_1,
+				  sum_2,
+				  txt_1,
+
+				  user_id_add,
+				  dtime_add
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexHistory($dialog_id);
+
+//	_comtexErrMsg($dialog_id, 'num_1', 'товары');
+	$sql = "DELETE FROM `_spisok`
+			WHERE dialog_id=".$dialog_id."
+			  AND !num_1";
+	query($sql);
+
 }
 function _comtex_tovar_cartridge() {//картриджи
 
@@ -790,9 +862,9 @@ function _comtex_zayav_tovar() {//прикрепление товаров к з�
 	//товары в заявках
 	_db2();
 	$sql = "SELECT *
-			  FROM _zayav_tovar
-			  WHERE `app_id`=".APP_ID_OLD."
-			  ORDER BY `id`";
+			FROM _zayav_tovar
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
 		return;
 
