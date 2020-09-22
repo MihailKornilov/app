@@ -55,8 +55,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-//			_comtex_tovar_cartridge();
-			_comtex_tovar_avai();
+			_comtex_tovar_cartridge();
 			break;
 
 		default:
@@ -621,7 +620,86 @@ function _comtex_tovar_avai() {//наличие товара
 
 }
 function _comtex_tovar_cartridge() {//картриджи
+	$sql = "SELECT `id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1404
+			  AND `txt_1`='Картриджи'
+			LIMIT 1";
+	if(!$parent_id = query_value($sql))
+		jsonError('Картриджи: не получен id категории');
 
+	$sql = "SELECT `id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1404
+			  AND `txt_1`='Лазерные'
+			LIMIT 1";
+	if(!$lazerId = query_value($sql)) {
+		$sql = "INSERT INTO _spisok (app_id,dialog_id,parent_id,txt_1,sort,user_id_add) VALUES (".APP_ID.",1404,".$parent_id.",'Лазерные',1000,1)";
+		$lazerId = query_id($sql);
+	}
+
+	$sql = "SELECT `id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1404
+			  AND `txt_1`='Струйные'
+			LIMIT 1";
+	if(!$struyId = query_value($sql)) {
+		$sql = "INSERT INTO _spisok (app_id,dialog_id,parent_id,txt_1,sort,user_id_add) VALUES (".APP_ID.",1404,".$parent_id.",'Струйные',1001,1)";
+		$struyId = query_id($sql);
+	}
+
+
+	$dialog_id = 1403;//товары
+
+	$sql = "DELETE FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND `num_1` IN (".$lazerId.",".$struyId.")";
+	query($sql);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_setup_cartridge`
+			ORDER BY `name`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	$sort = 0;
+	foreach($arr as $id => $r) {
+		$catId = $r['type_id'] == 1 ? $lazerId : $struyId;
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				".$catId.",
+				'Картридж ".$r['name']."',
+				".$r['cost_filling'].",
+				".$r['cost_restore'].",
+				".$r['cost_chip'].",
+
+				".($sort++).",
+				1
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  txt_1,
+				  num_2,
+				  num_3,
+				  num_4,
+
+				  `sort`,
+				  `user_id_add`
+			) VALUES ".implode(',', $mass);
+	query($sql);
 }
 
 function _comtex_zayav_place() {//местонахождения устройств
@@ -1531,4 +1609,37 @@ function _comtex_remind_action() {//действие с напоминаниям
 
 	_comtexHistory($dialog_id);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
