@@ -240,8 +240,15 @@ function _elem40res($filter, $u) {
 			case 4:
 				$ff['unit_id'] = _40condVcopy($ff['unit_id']);
 				$vv = $ff['unit_id'] ? $ff['unit_id'] : $ff['txt'];
-				if($v != $vv)
+
+				//$v - значение, которое проверяется (которое пришло)
+				//$vv - значение, установленное в фильтре
+
+				$vv = _elemUidsChild($ff['elem_id'], $vv);
+
+				if(!isset($vv[$v]))
 					break;
+
 				$send = false;
 				break;
 			//больше
@@ -619,7 +626,7 @@ function _40condV($act, $col, $val) {//значение запроса по ко
 	return " AND !`t1`.`id` /* _40condV: не найдено условие */";
 }
 function _40condVcopy($unit_id) {//подмена значения для копии из оригинала
-	if($unit_id <= 0)
+//	if($unit_id <= 0)
 		return $unit_id;
 
 	//проверка приложения-копии

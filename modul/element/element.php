@@ -1534,6 +1534,25 @@ function _elemUids($ids, $u) {//получение значения записи
 
 	return is_array($u) ? $u['id'] : $u;
 }
+function _elemUidsChild($elem_id, $v) {//получение всех дочерних значений родительского
+	$send[$v] = 1;
+
+	if(!$el = _elemOne($elem_id))
+		return $send;
+	if(!$el['issp'])
+		return $send;
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return $send;
+
+	$sql = "SELECT `id`,1
+			FROM   "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG)."
+			  AND `parent_id`=".$v;
+	if($ass = query_ass($sql))
+		$send += $ass;
+
+	return $send;
+}
 function _elemArr($ids) {//получение массива элементов по id
 	if(!$ids = _ids($ids, 'arr'))
 		return array();
