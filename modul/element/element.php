@@ -1539,7 +1539,7 @@ function _elemUidsChild($elem_id, $v) {//получение всех дочер�
 
 	if(!$el = _elemOne($elem_id))
 		return $send;
-	if(!$el['issp'])
+	if(empty($el['issp']))
 		return $send;
 	if(!$DLG = _dialogQuery($el['num_1']))
 		return $send;

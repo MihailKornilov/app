@@ -76,6 +76,15 @@ function _element8_print11($el, $u) {
 
 	$txt = _spisokColSearchBg($el['elp'], $txt);
 
+	if(!empty($u['parent_id']))
+		if($DLG = _dialogQuery($u['dialog_id']))
+			while($pid = $u['parent_id']) {
+				if(!$u = _spisokUnitQuery($DLG, $pid))
+					break;
+				if(!empty($u[$col]))
+					$txt = $u[$col].' &raquo; '.$txt;
+			}
+
 	return _br($txt);
 }
 function _element8vFromEl($el, $prm, $v) {//начальный текст из указанного значения

@@ -663,6 +663,12 @@ function _comtex_tovar_cartridge() {//картриджи
 	if(!$arr = query_arr($sql))
 		return;
 
+	$sql = "SELECT MAX(`txt_3`)
+			FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			LIMIT 1";
+	$articul = _num(query_value($sql)) + 1;
+
 	$mass = array();
 	$sort = 0;
 	foreach($arr as $id => $r) {
@@ -675,6 +681,7 @@ function _comtex_tovar_cartridge() {//картриджи
 
 				".$catId.",
 				'Картридж ".$r['name']."',
+				'0".($articul++)."',
 				".$r['cost_filling'].",
 				".$r['cost_restore'].",
 				".$r['cost_chip'].",
@@ -692,6 +699,7 @@ function _comtex_tovar_cartridge() {//картриджи
 				
 				  num_1,
 				  txt_1,
+				  txt_3,
 				  num_2,
 				  num_3,
 				  num_4,
