@@ -37,6 +37,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_zayav_status();
 			_comtex_zayav();
 			_comtex_zayav_tovar();
+			_comtex_zayav_cartridge();
 
 			_comtex_accrual();
 			_comtex_invoice();
@@ -55,7 +56,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_tovar_cartridge();
+			_comtex_zayav_cartridge();
 			break;
 
 		default:
@@ -979,6 +980,57 @@ function _comtex_zayav_tovar() {//прикрепление товаров к з�
 			) VALUES ".implode(',', $mass)."
 			ON DUPLICATE KEY UPDATE
 			  `num_3`=VALUES(`num_3`)";
+	query($sql);
+}
+function _comtex_zayav_cartridge() {//заявки-картриджи
+	$dialog_id = _comtexSpisokClear(1429);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _zayav
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `service_id`=6
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1234";
+	$CLIENT = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $zayav_id => $r) {
+		$mass[] = "(
+				".$zayav_id.",
+				".APP_ID.",
+				".$r['nomer'].",
+				".$dialog_id.",
+				
+				"._num(@$CLIENT[$r['client_id']]).",
+				".$r['count'].",
+				".$r['pay_type'].",
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_2,
+				  num_3,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
 	query($sql);
 }
 

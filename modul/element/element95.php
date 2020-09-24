@@ -298,8 +298,6 @@ function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение да
 	if(!$col = _elemCol($cmp))
 		return;
 
-	echo $col;
-
 	$save = array();
 	if(!empty($val))
 		if(is_array($val))

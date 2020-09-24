@@ -45,10 +45,10 @@ function _element2_print($el, $prm) {
 		'width' => _num(@$el['width']),
 		'small' => $el['num_2'],
 		'class' => $prm['blk_setup'] ? 'curD' : 'dialog-open',
-		'val' => _element2printVal($el, $prm)
+		'val' => _elem2printVal($el, $prm)
 	));
 }
-function _element2printVal($el, $prm) {//значения аттрибута val для кнопки
+function _elem2printVal($el, $prm) {//значения аттрибута val для кнопки
 	$ass['dialog_id'] = $el['num_4'];
 
 	//Если кнопка новая, будет создаваться новый диалог для неё. На основании блока, в который она вставлена.

@@ -76,6 +76,7 @@ function _element8_print11($el, $u) {
 
 	$txt = _spisokColSearchBg($el['elp'], $txt);
 
+	//печать родительских значений, если есть
 	if(!empty($u['parent_id']))
 		if($DLG = _dialogQuery($u['dialog_id']))
 			while($pid = $u['parent_id']) {
