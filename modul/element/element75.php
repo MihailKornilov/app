@@ -88,7 +88,10 @@ function _element75_print($el) {
 	$send .= '</table>';
 
 	return
-	_elem75mp($v, $arr, $col, $DLG).
+	'<div class="mp75'._dn($v).'">'.
+		'<div class="icon icon-del fr tool" data-tool="Отменить выбор"></div>'.
+		'<div class="pname75 fs17 b">'._elem75mp($DLG, $v, $col).'</div>'.
+	'</div>'.
 	$send;
 }
 function _element75_title() {
@@ -118,30 +121,24 @@ function _elem75child($spisok, $parent_id, $col, $level=0) {
 
 	return '<div class="pb20 dn'.$ml.'">'.$send.'</div>';
 }
-function _elem75mp($v, $arr, $col, $DLG) {//путь меню (Menu Path)
-	$pname = '';
-	if($v) {
-		$pname = $arr[$v][$col];
-		$pid = $arr[$v]['parent_id'];
-		while($pid) {
-			$sql = "SELECT "._queryCol($DLG)."
-					FROM   "._queryFrom($DLG)."
-					WHERE  "._queryWhere($DLG)."
-					  AND "._queryCol_id($DLG)."=".$pid;
-			if($r = query_assoc($sql)) {
-				$pname = $r[$col].' » '.$pname;
-				$pid = $r['parent_id'];
-			} else
-				$pid = 0;
-		}
+function _elem75mp($DLG, $v, $col) {//путь меню (Menu Path)
+	if(!$v)
+		return '';
+
+	$send = '';
+	while(true) {
+		if(!$u = _spisokUnitQuery($DLG, $v))
+			break;
+		if(empty($u[$col]))
+			break;
+
+		$send = $u[$col].($send ? ' » ' : '').$send;
+
+		if(!$v = $u['parent_id'])
+			break;
 	}
 
-
-	return
-	'<div class="mp75'._dn($v).'">'.
-		'<div class="icon icon-del fr tool" data-tool="Отменить выбор"></div>'.
-		'<div class="pname75 fs17 b">'.$pname.'</div>'.
-	'</div>';
+	return $send;
 }
 function _elem75filter($el) {//Фильтр: фронтальное меню
 	$filter = false;

@@ -162,7 +162,8 @@ function _element54unitUpd($dlg, $unit, $unitOld) {//обновить колич
 
 	foreach($arr as $elem_id => $r) {
 		$id = $r['num_1'];
-		_element54update($elem_id, _ids($ids[$id]));
+//		_element54update($elem_id, _ids($ids[$id]));
+		_element54update($elem_id);
 		foreach($ids[$id] as $uid)
 			_element54Counter($r, $uid, $dlg, $unit);
 	}
