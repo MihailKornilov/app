@@ -6,7 +6,9 @@ function _element60_struct($el) {
 		'num_1' => _num($el['num_1'])//максимальное количество изображений, которое разрешено загрузить
 	) + _elementStruct($el);
 }
-function _element60_title($el) {
+function _element60_title($el, $isPath=false) {
+	if($isPath)
+		return 'IMAGE';
 	if(empty($el['elp']))
 		return _imageNo();
 

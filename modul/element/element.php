@@ -1504,7 +1504,9 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 			case -21: $send = 'Текущий пользователь'; break;
 			case -22: $send = 'Текущий диалог'; break;
 			case -23: $send = 'Текущая запись'; break;
-			default: $send .= ($n ? $znak : '')._element('title', $id);
+			default:
+				$send .= ($n ? $znak : '').
+						 _element('title', $id, true);
 		}
 	}
 
