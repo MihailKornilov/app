@@ -34,6 +34,8 @@ function _element3_print($el, $prm) {
 	$menu = _spisokImage($menu);
 	$menu = _menuCount($menu);
 
+	$pfrom = _num(@$_GET['pfrom']);
+
 	$razdel = '';
 	foreach($menu as $page_id => $r) {
 		$sel = _page('is_cur_parent', $page_id) ? ' sel' : '';
@@ -48,12 +50,15 @@ function _element3_print($el, $prm) {
 					$pid = $p['id'];
 					break;
 				}
-/*
-		if($pfrom = _num(@$_GET['pfrom']))
+
+		//если страница пришла из второго уровня, то при нажатии на первый уровень будет переход на предыдущую страницу второго уровня
+		if($sel)
 			foreach(_page('child', $page_id) as $p)
-				if($p['id'] == $pfrom)
-					$pid = $pfrom;
-*/
+				if($pfrom == $p['id']) {
+					$pid = $p['id'];
+					break;
+				}
+
 		$href = $prm['blk_setup'] ? '' : ' href="'.URL.'&p='.$pid.'"';
 		$curd = _dn(!$prm['blk_setup'], 'curD');
 
