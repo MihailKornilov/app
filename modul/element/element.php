@@ -2792,19 +2792,29 @@ function _historyKit($elem_id, $prm) {//составление одной сбо
 				return _msgRed('отсутствует имя колонки');
 
 
-			$connect_id = $u[$col];
-			if(is_array($connect_id))
-				$connect_id = $u[$col]['id'];
+			$v = $u[$col];
+			if(is_array($v))
+				$v = $u[$col]['id'];
 
 			switch($r['cond_id']) {
+				//отсутствует
+				case 1:
+					if($v)
+						return '';
+					break;
+				//присутствует
+				case 2:
+					if(!$v)
+						return '';
+					break;
 				//равно
 				case 3:
-					if($r['unit_id'] != $connect_id)
+					if($r['unit_id'] != $v)
 						return '';
 					break;
 				//не равно
 				case 4:
-					if($r['unit_id'] == $connect_id)
+					if($r['unit_id'] == $v)
 						return '';
 					break;
 				default: return _msgRed('условие '.$r['cond_id'].' не доделано');
