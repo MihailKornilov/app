@@ -296,6 +296,33 @@ var ZINDEX = 1000,
 		  .addClass('clr5 b center fs16')
 		  .css('vertical-align', 'middle')
 		  .html(c ? c : '');
+	},
+	_url = function(param) {//составление URL страницы
+		if(!param)
+			param = {};
+
+		var str = document.location.search, // ?page=4&limit=10&sortby=desc
+			mass = str.split('&'),
+			send = URL;
+
+
+		_forN(mass, function(v, n) {
+			if(!n)
+				return;
+			var ex = v.split('=');
+			if(param[ex[0]] !== undefined)
+				return;
+
+			param[ex[0]] = ex[1];
+		});
+
+		_forIn(param, function(v, i) {
+			send += '&' + i;
+			if(v)
+				send += '=' + v;
+		});
+
+		return send;
 	};
 
 $.fn._enter = function(func) {

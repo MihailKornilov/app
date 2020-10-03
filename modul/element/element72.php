@@ -3,24 +3,40 @@
 /* [72] Фильтр: год и месяц */
 function _element72_struct($el) {
 	return array(
-		'num_1'   => _num($el['num_1']),//id элемента - список, на который происходит воздействие
+		'num_1'   => _num($el['num_1']),//id элемента - список, на который происходит воздействие (num_3 = 1)
 		'num_2'   => _num($el['num_2']),//id элемента - путь к сумме для подсчёта по каждому месяцу
+		'num_3'   => _num($el['num_3']),/* [17] воздействие на:
+											1 - список
+											2 - страница
+										*/
 		'txt_1' => $el['txt_1']         //дополнительные условия для отображения сумм
 	) + _elementStruct($el);
 }
 function _element72_print($el, $prm) {
-	$v = _filter('vv', $el, strftime('%Y-%m'));
+	$v = YEAR_MON;
+	switch($el['num_3']) {
+		case 1://список
+			if(!$el['num_1'])
+				return _emptyMinRed('[72] Не выбран список');
+			$v = _filter('vv', $el, $v);
+			break;
+		case 2://страница
+			if(preg_match(REGEXP_YEARMON, @$_GET['v1']))
+				$v = $_GET['v1'];
+			break;
+		default:
+			return _emptyMinRed('[72] Не указан объект воздействия');
+	}
 
 	$ex = explode('-', $v);
 	$year = $ex[0];
 	$mon  = $ex[1];
 
-
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 	_yearleaf(array(
 		'attr_id' => _elemAttrId($el, $prm).'yl',
-		'value' => $ex[0]
+		'value' => $year
 	)).
 	'<div class="mt5">'.
 		_radio(array(
@@ -38,9 +54,11 @@ function _element72_print($el, $prm) {
 function _elem72Sum($EL, $year) {//получение сумм для фильтра [72]
 	$spisok = _monthDef();
 
+	if($EL['num_3'] != 1)
+		return $spisok;
 	if(!$el = _elemOne($EL['num_2']))
 		return $spisok;
-	if(!$col = $el['col'])
+	if(!$col = _elemCol($el))
 		return $spisok;
 	if(!$bl = _blockOne($el['block_id']))
 		return $spisok;
@@ -74,6 +92,6 @@ function _elem72filter($el) {//фильтр: год и месяц
 		if($r['elem']['dialog_id'] == 72)
 			return " AND `t1`.`dtime_add` LIKE '".$r['v']."-%'";
 
-		return '';
+	return '';
 }
 

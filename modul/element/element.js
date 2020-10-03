@@ -826,10 +826,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		switch(res.action_id) {
 			//обновление страницы
 			case 1:
-				console.log(DIALOG)
-				_forIn(DIALOG, function() {
-
-				});
 				$('#_content').html(res.content);
 				break;
 			//переход на страницу
@@ -4179,14 +4175,27 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			CMP_SET = function() {
 				var mon = _num(RD.val()),
 					data = YL.val() + '-' + (mon > 9 ? '' : '0') + mon;
-				$(ATTR_CMP(el.id)).val(data);
-				FILTER[el.num_1][el.id] = data;
-				_spisokUpdate(el.num_1);
+
+				switch(el.num_3) {
+					case 1://список
+						$(ATTR_CMP(el.id)).val(data);
+						FILTER[el.num_1][el.id] = data;
+						_spisokUpdate(el.num_1);
+						break;
+					case 2://страница
+						location.href = _url({v1:data});
+						break;
+				}
+
 			};
 		YL._yearleaf({
 			func:function(v) {
 				RD._radio(YEAR_CUR < v ? 1 : 12);
 				CMP_SET();
+
+				if(el.num_3 != 1)
+					return;
+
 				YEAR_CUR = v;
 				var send = {
 					op:'spisok_72_sum',
