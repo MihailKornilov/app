@@ -518,7 +518,17 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 				$page_id = $func['target_ids'];
 				$id = _spisokUnitUrlPage($el, $page_id, $u);
-				return '<a href="'.URL.'&p='.$page_id.'&pfrom='._page('cur').($id ? '&id='.$id : '').'" class="inhr">'.$txt.'</a>';
+				$id = $id ? '&id='.$id : '';
+
+				$v1 = '';
+				if($func['v1']) {
+					$v1 = str_replace('{CURRENT_YEAR_MON}', YEAR_MON, $func['v1']);
+					foreach($u as $key => $v)
+						if(!is_array($v))
+							$v1 = str_replace('{'.$key.'}', $v, $v1);
+				}
+
+				return '<a href="'.URL.'&p='.$page_id.'&pfrom='._page('cur').$id.$v1.'" class="inhr">'.$txt.'</a>';
 
 			//открытие диалога
 			case 205:
