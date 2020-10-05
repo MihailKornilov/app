@@ -14,9 +14,15 @@ function _element69_struct($el) {
 function _element69_print($el, $prm) {
 	if(!$u = $prm['unit_get'])
 		return $el['title'];
-	if(empty($u['user_id_add']))
-		return 'no user';
-	if(!$us = _user($u['user_id_add']))
+	if(isset($u['ava']))
+		$us = $u;
+	else {
+		if(empty($u['user_id_add']))
+			return 'no user';
+		$us = _user($u['user_id_add']);
+	}
+
+	if(empty($us))
 		return '';
 
 	switch($el['num_1']) {
