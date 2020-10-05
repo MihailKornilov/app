@@ -6,7 +6,8 @@ function _element64_struct($el) {
 		'num_1'   => _num($el['num_1']),//список [13]
 		'num_2'   => _num($el['num_2']),//значение суммы [13]
 		'txt_1'   => $el['txt_1'],      //текст перед суммой
-		'txt_2'   => $el['txt_2']       //текст после суммой
+		'txt_2'   => $el['txt_2'],      //текст после суммой
+		'txt_3'   => $el['txt_3']       //условия
 	) + _elementStruct($el);
 }
 function _element64_print($el, $prm=array()) {
@@ -28,7 +29,8 @@ function _element64_print($el, $prm=array()) {
 
 	$sql = "SELECT SUM(`".$col."`)
 			FROM  "._queryFrom($DLG)."
-			WHERE "._spisokWhere($ELEM, $prm);
+			WHERE "._spisokWhere($ELEM, $prm).
+					_40cond($el, $el['txt_3'], $prm);
 	$sum = round(query_value($sql), 10);
 
 	return $el['txt_1'].' '._sumSpace($sum).' '.$el['txt_2'];
