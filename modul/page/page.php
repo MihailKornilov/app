@@ -431,7 +431,7 @@ function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохране�
 
 function _pageShow($page_id) {
 	//ведутся технические работы
-	if(!SA && !APP_ACCESS)
+	if(!SA && !@APP_ACCESS)
 		$page_id = 19;
 
 	//нет доступа в приложение
