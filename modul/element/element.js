@@ -1546,6 +1546,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(act.apply_id)
 			link += '&id=' + act.unit_id;
 
+		if(act.v1) {
+			var D = new Date(),
+				YEAR_MON = D.getFullYear() + '-' + _nol(D.getMonth() + 1); //текущий год и месяц
+
+			act.v1 = act.v1.replace(/&amp;/g, '&');
+			act.v1 = act.v1.replace(/{CURRENT_YEAR_MON}/g, YEAR_MON);
+
+			link += act.v1;
+		}
+
 		act.bo.addClass('_busy');
 		location.href = URL + link;
 	},
