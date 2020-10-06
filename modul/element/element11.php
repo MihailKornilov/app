@@ -209,7 +209,7 @@ function PHP12_v_choose($prm) {
 
 	return
 ($prm['dop']['first'] ?
-	'<div class="bg-gr2 pad10 pl5 line-b">'.
+	'<div class="bg4 pad10 pl5 line-b">'.
 		'<input type="hidden" id="choose-menu" value="'.PHP12_v_choose_menuSel($prm).'" />'.
 	'</div>'.
 

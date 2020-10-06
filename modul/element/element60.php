@@ -462,7 +462,7 @@ function PHP12_image_show($prm) {//просмотр изображений
 					ORDER BY `sort`";
 			$arr = query_arr($sql);
 			if(count($arr) > 1) {
-				$spisok = '<div class="line-t pad10 center bg-gr2">';
+				$spisok = '<div class="line-t pad10 center bg4">';
 				foreach($arr as $r) {
 					$sel = $r['id'] == $image_id ? ' sel' : '';
 					$spisok .=

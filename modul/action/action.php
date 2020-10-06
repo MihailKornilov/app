@@ -397,7 +397,7 @@ function PHP12_action_list($prm) {
 		$val[] = 'dss:'.$dss;
 		$spisok .=
 			'<dd val="'.$id.'">'.
-			'<table class="w100p bs5 bor1 bg-gr2 over2 mb5 curD">'.
+			'<table class="w100p bs5 bor1 bg4 over2 mb5 curD">'.
 				'<tr>'.
 					'<td class="w25 top">'.
 						'<div class="icon icon-move-y pl"></div>'.

@@ -94,7 +94,7 @@ switch(@$_POST['op']) {
 			//Заголовок и кнопки
 			'<div class="dialog-menu-1'._dn($dialog['menu_edit_last'] == 1).'">'.
 
-				'<div class="pad10 bg-gr2 line-b">'.
+				'<div class="pad10 bg4 line-b">'.
 					'<table class="bs5 w100p">'.
 						'<tr><td class="w150 r clr9">Имя диалогового окна:'.
 							'<td><input type="text" id="dialog_name" class="w100p b" maxlength="100" value="'.$dialog['name'].'" />'.
@@ -881,7 +881,7 @@ function _dialogSetupHistoryTmp($arr) {
 
 function _dialogSetupService($DLG) {
 	return
-	'<div class="dialog-menu-4 bg-gr2'._dn($DLG['menu_edit_last'] == 4).'">'.
+	'<div class="dialog-menu-4 bg4'._dn($DLG['menu_edit_last'] == 4).'">'.
 
 		'<div class="mt5 bg0">'.
             '<input type="hidden" id="menu_service" value="1" />'.

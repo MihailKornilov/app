@@ -2314,7 +2314,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<td><div style="width:' + v.width + 'px">' +
 									'<div class="div-th-name' + _dn(_num(obj.unit.num_5)) + '">' +
 										'<input type="text"' +
-											  ' class="th-name w100p bg-gr2 center fs14 clr15 mb1"' +
+											  ' class="th-name w100p bg4 center fs14 clr15 mb1"' +
 											  ' placeholder="имя колонки"' +
 											  ' value="' + v.txt_7 + '"' +
 										' />' +
@@ -3234,7 +3234,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<td class="prel">' +
 								'<input type="text"' +
 									  ' id="' + ATTR_EL(v.id, true) + '"' +
-									  ' class="inp w100p curP bg-gr2 ' + v.font + ' ' + v.color + '"' +
+									  ' class="inp w100p curP bg4 ' + v.font + ' ' + v.color + '"' +
 									  ' readonly' +
 									  ' placeholder="элемент не выбран"' +
 									  ' value="' + v.title + '"' +
@@ -4774,7 +4774,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<b class="bnum fs15 clr9">' + NUM + '</b>:' +
 							'<td><div style="width:' + v.width + 'px">' +
 									'<input type="text"' +
-										  ' class="th-name w100p bg-gr2 fs14 clr15"' +
+										  ' class="th-name w100p bg4 fs14 clr15"' +
 										  ' placeholder="имя колонки"' +
 										  ' value="' + v.title + '"' +
 									' />' +

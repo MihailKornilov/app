@@ -812,8 +812,6 @@ body:not(.site){position:relative}
 /* фоны */
 .bg-eee{background-color:#eee}
 .bg-gr1{background-color:#FaFaFa}/* светло-серый */
-.bg-gr2{background-color:#F2F6F9}/* бледно-серо-синий */
-.bg-ffe{background-color:#ffe}
 .bg-ffd{background-color:#ffd}
 .bg-ffc{background-color:#ffc}  /* жёлтый - данные изменены */
 .bg-fcc{background-color:#fcc}  /* красный - ошибка */

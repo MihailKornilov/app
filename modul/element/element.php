@@ -2339,7 +2339,7 @@ function PHP12_tmp_setup($prm) {
 	*/
 	$el12 = $prm['el12'];
 	if(!$unit = $prm['unit_edit'])
-		return '<div class="bg-ffe pad10">'._emptyMin($el12['txt_4']).'</div>';
+		return '<div class="bg1 pad10">'._emptyMin($el12['txt_4']).'</div>';
 	if(!$obj_name = _txt($el12['txt_2']))
 		return _emptyRed10('Отсутствует имя объекта');
 

@@ -14,7 +14,7 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 						'</div>',
 
 		'spisok' =>
-			'<div class="bg-ffe pad10">'.
+			'<div class="bg1 pad10">'.
 				'<div class="_empty min">'.
 					'Шаблон пуст.'.
 					'<div class="mt10 clr2">Начните с управления блоками.</div>'.
