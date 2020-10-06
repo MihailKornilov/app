@@ -60,10 +60,12 @@ function _element34_print($el) {
 		if($p = $el['num_1']) {
 			$yearMon = $year.'-'._nol($n);
 			$mon = '<a href="'.URL._elem34href($yearMon, $p).'">'.$mon.'</a>';
-			if($yearMon == $v1)
-				$bgCur = ' bg11';
-			elseif($yearMon == YEAR_MON)
-				$bgCur = ' bg11';
+			if(preg_match(REGEXP_YEARMON, $v1)) {
+				if($yearMon == $v1)
+					$bgCur = ' bg11';
+			} else
+				if($yearMon == YEAR_MON)
+					$bgCur = ' bg11';
 		}
 		$send .=
 			'<tr class="over1'.$bgCur.'">'.
