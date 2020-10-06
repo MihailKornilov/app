@@ -813,12 +813,10 @@ body:not(.site){position:relative}
 .bg-eee{background-color:#eee}
 .bg-gr1{background-color:#FaFaFa}/* светло-серый */
 .bg-gr2{background-color:#F2F6F9}/* бледно-серо-синий */
-.bg-gr3{background-color:#F7F7F7}/* стандарт светло-серый */
 .bg-ffe{background-color:#ffe}
 .bg-ffd{background-color:#ffd}
 .bg-ffc{background-color:#ffc}  /* жёлтый - данные изменены */
 .bg-fcc{background-color:#fcc}  /* красный - ошибка */
-.bg-efe{background-color:#efe}  /* светло-зелёный */
 .bg-orange{background-color:#ffaf64}/* оранжевый-насыщенный */
 
 .bg0,.ov0:hover{background-color:#fff}

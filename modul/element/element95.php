@@ -281,7 +281,7 @@ function PHP12_elem95_setup($prm) {//настройка колонок спис�
 	if(!$el = _elemOne($BL['elem_id']))
 		return _emptyMin10('[95] Отсутствует элемент.');
 
-	return '<div class="calc-div h25 line-b bg-efe">'._elemWidth($el).'</div>';
+	return '<div class="calc-div h25 line-b bg5">'._elemWidth($el).'</div>';
 }
 function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение данных колонок
 	/*

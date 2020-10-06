@@ -395,7 +395,7 @@ function PHP12_td_setup($prm) {//используется в диалоге [23]
 	if(!$el = _elemOne($BL['elem_id']))
 		return _emptyMin10('[23] Отсутствует элемент.');
 
-	return '<div class="calc-div h25 line-b bg-efe">'._elemWidth($el).'</div>';
+	return '<div class="calc-div h25 line-b bg5">'._elemWidth($el).'</div>';
 }
 function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данных ячеек таблицы
 	/*

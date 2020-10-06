@@ -86,7 +86,7 @@ switch(@$_POST['op']) {
 		$html =
 			'<div id="dialog-w-change"></div>'.//правая вертикальная линия для изменения ширины диалога
 
-			'<div class="pad10 center bg-gr3 line-b">'.
+			'<div class="pad10 center bg6 line-b">'.
 				'<div class="fr mt5 b clr2 curD dw tool" data-tool="Ширина диалога">'.$dialog['width'].'</div>'.
 				'<input type="hidden" id="dialog-menu" value="'.$dialog['menu_edit_last'].'" />'.
 			'</div>'.

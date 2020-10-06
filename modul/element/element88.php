@@ -246,7 +246,7 @@ function PHP12_elem88($prm) {
 	'<div class="fs15 clr9 pad10 center over1 curP">Добавить список</div>'.
 
 	'<div class="fs16 clr9 bg-gr1 pl15 pt5 pb5 mt10 line-t">Колонки:</div>'.
-	'<div class="calc-div h25 line-t line-b bg-efe">'._elemWidth($el).'</div>'.
+	'<div class="calc-div h25 line-t line-b bg5">'._elemWidth($el).'</div>'.
 	'<dl id="col88" class="mt5"></dl>'.
 	'<div class="fs15 clr9 pad10 center over1 curP">Добавить колонку</div>';
 }

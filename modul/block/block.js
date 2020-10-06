@@ -183,7 +183,7 @@ var _ids = function(v, count) {
 		});
 	},
 	_blockUnitBg = function(BL) {//окраска блока
-		var BGS = [], //'bg0 bg-gr3 bg-ffe bg-efe bg-gr2 bg14',
+		var BGS = [], //'bg0 bg6 bg-ffe bg5 bg-gr2 bg14',
 			BOR = BL.bor.split(' '),
 			BGU = '',
 			OVU = '',
@@ -387,7 +387,7 @@ var _ids = function(v, count) {
 					'<div class="galka pabs fs17 pl5 curP' + _dn(_ids(BL.bg)) + '">&#10004;</div>' +
 					'<div class="pabs icon spin"></div>' +
 					'<table class="w100p curP">' +
-						'<tr><td class="bg-efe" style="width:24px;height:8px">' +
+						'<tr><td class="bg5" style="width:24px;height:8px">' +
 						'<tr><td class="bg-ffe" style="width:24px;height:9px">' +
 						'<tr><td class="bg14" style="height:8px">' +
 					'</table>' +
