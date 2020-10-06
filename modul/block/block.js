@@ -183,7 +183,7 @@ var _ids = function(v, count) {
 		});
 	},
 	_blockUnitBg = function(BL) {//окраска блока
-		var BGS = [], //'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg14',
+		var BGS = [], //'bg0 bg-gr3 bg-ffe bg-efe bg-gr2 bg14',
 			BOR = BL.bor.split(' '),
 			BGU = '',
 			OVU = '',

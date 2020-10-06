@@ -173,7 +173,7 @@ function _debug_sql() {//получение всех запросов
 			'<tr class="over5">'.
 				'<td class="w25 clr2 r top">'.($n+1).
 				'<td class="top '.($t > 0.05 ? 'bg-fcc' : 'bg11').'">'.
-					'<textarea class="w100p h20 bg-fff fs12">'.$r.';</textarea>'.
+					'<textarea class="w100p h20 bg0 fs12">'.$r.';</textarea>'.
 				'<td class="w35 r top '.($t > 0.05 ? 'b clr5' : 'clr1').'">'._hide0($t);
 	}
 	$txt .= '</table>';

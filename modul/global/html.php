@@ -274,7 +274,7 @@ function _authIframeError($msg='Вход в приложение недосту�
 	define('IFRAME_AUTH_ERROR', 1);
 	return
 	'<div class="bg-gr1 pad30">'.
-		'<div class="fs14 center bor-e8 bg-fff pad30 clr1">'.
+		'<div class="fs14 center bor-e8 bg0 pad30 clr1">'.
 			$msg.
 		'</div>'.
 	'</div>';

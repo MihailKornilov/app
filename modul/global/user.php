@@ -308,7 +308,7 @@ function PHP12_user_active() {//общая картина использован
 	$send = '<table>';
 	for($hour = 0; $hour < 24; $hour++) {
 		$send .= '<tr class="over3">'.
-					'<td class="h25 bg-fff fs16 r clr9 bottom pr5">'.$hour;
+					'<td class="h25 bg0 fs16 r clr9 bottom pr5">'.$hour;
 		for($min = 0; $min < 6; $min++) {
 			$send .= '<td class="tdd bottom">'.
 						'<div class="m10'._dn($min, 'll').' prel">'.

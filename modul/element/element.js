@@ -102,7 +102,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'<div class="edit fr curP' + _dn(editShow) + '"><a class="icon icon-edit wh pl"></a></div>' +
 					'<div class="fs14 clr4">' + o.head + '</div>' +
 				'</div>' +
-				'<div class="content bg-fff">' +
+				'<div class="content bg0">' +
 					o.content +
 				'</div>' +
 				'<div class="btm">' +
@@ -1206,7 +1206,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			V1 = vvv.length ? vvv[0] : {},
 			ACT208_V = function(n, v_id, v_name) {//печать значения
 				return '<input type="hidden" class="v208" val="' + n + '" value="' + (v_id || 0) + '" />' +
-					'<div class="_selem dib prel bg-fff over3 mb10">' +
+					'<div class="_selem dib prel bg0 over3 mb10">' +
 						'<div class="icon icon-star pabs"></div>' +
 						'<div class="icon icon-del pl pabs' + _dn(v_id) + '"></div>' +
 						'<input type="text" readonly class="w125 curP clr11" placeholder="Значение ' + n + '" value="' + (v_name || '') + '" />' +
@@ -3009,7 +3009,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 										  ' value="' + v.unit_id + '"' +
 									' />' +
 
-									'<div class="_selem dib prel bg-fff over1 mt3 w100p' + _dn(v.unit_id == -4) + '">' +
+									'<div class="_selem dib prel bg0 over1 mt3 w100p' + _dn(v.unit_id == -4) + '">' +
 										'<div class="icon icon-star pabs"></div>' +
 										'<div class="icon icon-del pl pabs' + _dn(v.txt) + '"></div>' +
 										'<input type="text" readonly class="curP w100p clr11" placeholder="значение не указано" value="' + v.unit4title + '" />' +
@@ -6057,7 +6057,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<td><input type="text" class="title w100p" placeholder="Заголовок не указан" value="' + v.title + '">' +
 							'<td><input type="hidden" class="dlg34" value="' + v.dialog_id + '" />' +
 							'<td><input type="hidden" class="sum34" value="' + v.sum_id + '" />' +
-								'<div class="_selem dib prel bg-fff over3">' +
+								'<div class="_selem dib prel bg0 over3">' +
 									'<div class="icon icon-star pabs"></div>' +
 									'<div class="icon icon-del pl pabs' + _dn(v.sum_id) + '"></div>' +
 									'<input type="text" readonly class="w175 curP clr11" placeholder="сумма не выбрана" value="' + v.sum_title + '" />' +

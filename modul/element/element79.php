@@ -185,13 +185,13 @@ function _elem79_group_tr($dlg_id, $group_ids=0, $sum_ids=0) {
 	'<tr class="over1" data-dlg="'.$dlg_id.'">'.
 		'<td class="w150 pad5 fs14 b clr9">'.$DLG['name'].':'.
 		'<td class="r w175 pad5">'.
-			'<div class="_selem dib prel w150 bg-fff over1">'.
+			'<div class="_selem dib prel w150 bg0 over1">'.
 				'<div class="icon icon-star pabs"></div>'.
 				'<div class="icon icon-del-red pl pabs'._dn($group_ids).'"></div>'.
 				'<input type="text" readonly class="inp79 curP w100p clr11" placeholder="не указана" val="'.$group_ids.'" value="'.$group_name.'" />'.
 			'</div>'.
 		'<td class="r pad5">'.
-			'<div class="_selem dib prel w150 bg-fff over1">'.
+			'<div class="_selem dib prel w150 bg0 over1">'.
 				'<div class="icon icon-star pabs"></div>'.
 				'<div class="icon icon-del-red pl pabs'._dn($sum_ids).'"></div>'.
 				'<input type="text" readonly class="inp79 curP w100p clr11" placeholder="путь не указан" val="'.$sum_ids.'" value="'.$sum_name.'" />'.

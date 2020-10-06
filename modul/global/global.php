@@ -848,7 +848,7 @@ function _cache_content() {//содержание кеша в диалоге [84
 			}
 		}
 	return
-	'<div style="height:700px;width:560px;overflow-y:scroll;word-wrap:break-word" class="bg-fff bor-e8 pad10">'.
+	'<div style="height:700px;width:560px;overflow-y:scroll;word-wrap:break-word" class="bg0 bor-e8 pad10">'.
 		$send.
 	'</div>';
 }

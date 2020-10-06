@@ -834,21 +834,21 @@ function _dialogSetupHistory($DLG) {//раздел История действи
 	'<div class="dialog-menu-2'._dn($DLG['menu_edit_last'] == 2).'">'.
 		'<div class="pad10 pb20 bg11">'.
 			'<div class="hd2 mt5">Внесение новой записи</div>'.
-			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_insert">'.
+			'<div class="mt5 bg0 bor-e8 over1 curP" id="history_insert">'.
 				'<div class="mar10 clr2'._dn(!$DLG['insert_history_elem']).'">шаблон истории действий для внесения новой записи</div>'.
 				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['insert_history_elem']).'</div>'.
 			'</div>'.
 		'</div>'.
 		'<div class="pad10 pb20 bg-ffd line-t1">'.
 			'<div class="hd2 mt5">Редактирование записи</div>'.
-			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_edit">'.
+			'<div class="mt5 bg0 bor-e8 over1 curP" id="history_edit">'.
 				'<div class="mar10 clr2'._dn(!$DLG['edit_history_elem']).'">шаблон истории действий для редактирования записи</div>'.
 				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['edit_history_elem']).'</div>'.
 			'</div>'.
 		'</div>'.
 		'<div class="pad10 pb20 bg14 line-t1">'.
 			'<div class="hd2 mt5">Удаление записи</div>'.
-			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_del">'.
+			'<div class="mt5 bg0 bor-e8 over1 curP" id="history_del">'.
 				'<div class="mar10 clr2'._dn(!$DLG['del_history_elem']).'">шаблон истории действий для удаления записи</div>'.
 				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['del_history_elem']).'</div>'.
 			'</div>'.
@@ -883,7 +883,7 @@ function _dialogSetupService($DLG) {
 	return
 	'<div class="dialog-menu-4 bg-gr2'._dn($DLG['menu_edit_last'] == 4).'">'.
 
-		'<div class="mt5 bg-fff">'.
+		'<div class="mt5 bg0">'.
             '<input type="hidden" id="menu_service" value="1" />'.
 		'</div>'.
 
@@ -991,7 +991,7 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 		$BLK[$block_id]['col'] = _elemCol($el);
 	}
 
-	$send = '<table class="_stab small bg-fff">';
+	$send = '<table class="_stab small bg0">';
 	$n = 1;
 	foreach($BLK as $bl) {
 		$send .= '<tr class="over2">'.
@@ -1032,7 +1032,7 @@ function _dialogSetupServiceCnnIn($DLG) {//диалоги, которые раз
 	if(empty($ELM))
 		return '<span class="clr2">нет</span>';
 
-	$send = '<table class="_stab small bg-fff">';
+	$send = '<table class="_stab small bg0">';
 	$n = 1;
 	foreach($ELM as $el) {
 		$send .= '<tr class="over2">'.
@@ -1077,7 +1077,7 @@ function _dialogSetupServiceButton($DLG) {//диалог используетс�
 	if(!$ELM = query_arr($sql))
 		return '<span class="clr2">нет</span>';
 
-	$send = '<table class="_stab small bg-fff">';
+	$send = '<table class="_stab small bg0">';
 	$n = 1;
 	foreach($ELM as $el) {
 		$send .= '<tr class="over2">'.

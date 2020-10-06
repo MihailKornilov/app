@@ -2189,7 +2189,7 @@ $.fn._selem = function(o) {//выбор элемента - звезда
 	}, o);
 
 	var html =
-		'<div class="_selem dib prel bg-fff over3" style="width:' + o.width + 'px">' +
+		'<div class="_selem dib prel bg0 over3" style="width:' + o.width + 'px">' +
 			'<div class="icon icon-star pabs"></div>' +
 			'<div class="icon icon-del pl pabs' + _dn(V) + '"></div>' +
 			'<input type="text" readonly class="w100p curP clr11" placeholder="' + o.placeholder + '" value="' + o.title + '" />' +

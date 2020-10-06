@@ -20,7 +20,7 @@ function _element49_print($el, $prm) {
 
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-	'<div class="_sebl dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_sebl"'._elemStyleWidth($el).'>'.
+	'<div class="_sebl dib prel bg0 over1" id="'._elemAttrId($el, $prm).'_sebl"'._elemStyleWidth($el).'>'.
 		'<div class="icon icon-cube pabs"></div>'.
 		'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
 		'<input type="text" readonly class="inp curP w100p clr8"'.$placeholder.$disabled.' value="'.$title.'" />'.

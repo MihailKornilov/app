@@ -31,7 +31,7 @@ function _element13_print($el, $prm) {
 
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-	'<div class="_selem dib prel bg-fff over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
+	'<div class="_selem dib prel bg0 over1" id="'._elemAttrId($el, $prm).'_selem"'._elemStyleWidth($el).'>'.
 		'<div class="icon icon-star pabs"></div>'.
 		'<div class="icon icon-del pl pabs'._dn($v).'"></div>'.
 		'<input type="text" readonly class="inp curP w100p clr11"'.$placeholder.$disabled.' value="'._elemIdsTitle($v).'" />'.
