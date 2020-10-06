@@ -273,7 +273,7 @@ function _auth99($dialog, $cmp) {//авторизация по логину и �
 function _authIframeError($msg='Вход в приложение недоступен.') {//сообщение об ошибке входа в приложение через VK iframe
 	define('IFRAME_AUTH_ERROR', 1);
 	return
-	'<div class="bg-gr1 pad30">'.
+	'<div class="bg6 pad30">'.
 		'<div class="fs14 center bor-e8 bg0 pad30 clr1">'.
 			$msg.
 		'</div>'.

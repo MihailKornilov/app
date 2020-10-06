@@ -109,7 +109,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 				'<td>'.
 	($el['txt_4'] ? '<div class="fs11 clr1 mb2">'._elemUids($el['txt_4'], $u).'</div>' : '').
 					'<div class="fs15">'.$name.'</div>'.
-				'<td class="w70 bg-ffd'._dn($el['num_3']).'">'.
+				'<td class="w70 bg7'._dn($el['num_3']).'">'.
 					'<input type="text" class="uinp w100p r b" val="'.$r['id'].'" value="'.$r['count'].'">'.
 
 			($colCena ?

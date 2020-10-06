@@ -241,11 +241,11 @@ function PHP12_elem88($prm) {
 		return _emptyMin10('[88] Отсутствует элемент.');
 
 	return
-	'<div class="fs16 b clr9 bg-gr1 pl15 pt5 pb5 line-t line-b">Списки:</div>'.
+	'<div class="fs16 b clr9 bg6 pl15 pt5 pb5 line-t line-b">Списки:</div>'.
 	'<dl id="sp88" class="mt5 ml10"></dl>'.
 	'<div class="fs15 clr9 pad10 center over1 curP">Добавить список</div>'.
 
-	'<div class="fs16 clr9 bg-gr1 pl15 pt5 pb5 mt10 line-t">Колонки:</div>'.
+	'<div class="fs16 clr9 bg6 pl15 pt5 pb5 mt10 line-t">Колонки:</div>'.
 	'<div class="calc-div h25 line-t line-b bg5">'._elemWidth($el).'</div>'.
 	'<dl id="col88" class="mt5"></dl>'.
 	'<div class="fs15 clr9 pad10 center over1 curP">Добавить колонку</div>';
@@ -361,7 +361,7 @@ function PHP12_elem89($prm) {//настройка колонок для конк
 		return _emptyMin10('Диалога '.$dss.' не существует');
 
 	return
-	'<div class="line-b bg-gr1 pad10 fs15">'.
+	'<div class="line-b bg6 pad10 fs15">'.
 		'Колонки списка <b class="fs15">'.$DLG['name'].'</b>:'.
 	'</div>'.
 	'<div id="col89" class="pad10"></div>'.

@@ -73,7 +73,7 @@ function _element34_print($el) {
 				 _elem34td($mass, $n, _elemWidth($el)-125);
 	}
 	$send .=
-			'<tr class="bg-gr1">'.
+			'<tr class="bg6">'.
 				'<td class="r b">Итог:'.
 				 _elem34itog($mass).
 		'</table>';

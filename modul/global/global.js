@@ -262,7 +262,7 @@ var ZINDEX = 1000,
 	_pr = function(v) {//представление массива в виде таблицы
 		if(v instanceof jQuery)
 			return '<div class="fs11 clr5">jQuery</div>';
-		var send = '<div class="dib bor1 pad5 mt2 bg-gr1">' +
+		var send = '<div class="dib bor1 pad5 mt2 bg6">' +
 				   '<table>',
 			i;
 		for(i in v) {
@@ -450,11 +450,11 @@ $(document)
 	   (req.error ? '<b class="clr8 fr">error</b>' : '') +
 				'</div>' +
 				'<div class="mt3">' + _pr(req.post) + '</div>',
-			link =  '<div class="bg-gr1 bor1 pad5 mt10">' +
+			link =  '<div class="bg6 bor1 pad5 mt10">' +
 						'<b>link:</b> ' +
 						'<span class="clr14">' + req.link + '</span>' +
 					'</div>',
-			file =  '<div class="bg-gr1 bor1 pad5 mt3">' +
+			file =  '<div class="bg6 bor1 pad5 mt3">' +
 						'<b>file:</b> ' +
 						req.file +
 					'</div>',

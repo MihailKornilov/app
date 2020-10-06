@@ -502,7 +502,7 @@ var _ids = function(v, count) {
 		var EL = ELMM[BL.elem_id];
 		EL.id = BL.elem_id;
 
-		return '<div class="mar5 pad5 bor-e8 bg-gr1" id="elem-edit-' + EL.id + '">' +
+		return '<div class="mar5 pad5 bor-e8 bg6" id="elem-edit-' + EL.id + '">' +
 			'<div class="line-b">' +
 				'<a val="dialog_id:118,get_id:' + EL.id + '"' +
 				  ' class="fs16 clr15 dialog-open tool' + '"' +

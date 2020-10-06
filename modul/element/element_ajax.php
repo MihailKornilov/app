@@ -133,7 +133,7 @@ switch(@$_POST['op']) {
 						'</table>'.
 					'</div>'.
 				'</div>'.
-				'<div class="bg-ffd line-t1 pad10">'.
+				'<div class="bg7 line-t1 pad10">'.
 					'<div class="hd2 mt5">'.
 						'Редактирование записи'.
 						'<div class="fr">'.
@@ -839,7 +839,7 @@ function _dialogSetupHistory($DLG) {//раздел История действи
 				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['insert_history_elem']).'</div>'.
 			'</div>'.
 		'</div>'.
-		'<div class="pad10 pb20 bg-ffd line-t1">'.
+		'<div class="pad10 pb20 bg7 line-t1">'.
 			'<div class="hd2 mt5">Редактирование записи</div>'.
 			'<div class="mt5 bg0 bor-e8 over1 curP" id="history_edit">'.
 				'<div class="mar10 clr2'._dn(!$DLG['edit_history_elem']).'">шаблон истории действий для редактирования записи</div>'.
