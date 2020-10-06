@@ -183,7 +183,7 @@ var _ids = function(v, count) {
 		});
 	},
 	_blockUnitBg = function(BL) {//окраска блока
-		var BGS = [], //'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg-fee',
+		var BGS = [], //'bg-fff bg-gr3 bg-ffe bg-efe bg-gr2 bg14',
 			BOR = BL.bor.split(' '),
 			BGU = '',
 			OVU = '',
@@ -389,7 +389,7 @@ var _ids = function(v, count) {
 					'<table class="w100p curP">' +
 						'<tr><td class="bg-efe" style="width:24px;height:8px">' +
 						'<tr><td class="bg-ffe" style="width:24px;height:9px">' +
-						'<tr><td class="bg-fee" style="height:8px">' +
+						'<tr><td class="bg14" style="height:8px">' +
 					'</table>' +
 			   '</div>';
 	},

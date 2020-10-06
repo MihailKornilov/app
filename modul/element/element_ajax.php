@@ -101,7 +101,7 @@ switch(@$_POST['op']) {
 					'</table>'.
 				'</div>'.
 
-				'<div class="pad10 bg-dfd">'.
+				'<div class="pad10 bg11">'.
 					'<div class="hd2 mt5">'.
 						'Внесение новой записи'.
 						'<div class="fr">'.
@@ -155,7 +155,7 @@ switch(@$_POST['op']) {
 						'</table>'.
 					'</div>'.
 				'</div>'.
-				'<div class="bg-fee line-t1 pad10">'.
+				'<div class="bg14 line-t1 pad10">'.
 					'<div class="hd2 mt5">'.
 						'Удаление записи'.
 						'<div class="fr">'.
@@ -805,7 +805,7 @@ switch(@$_POST['op']) {
 			jsonSuccess($send);
 		}
 
-		$mon = $year.'-'._0($mon);
+		$mon = $year.'-'._nol($mon);
 		$send = array(
 			'head' => _elem400_dayHead($el, $mon),
 			'data' => _elem400_dayData($DLG, $mon),
@@ -832,7 +832,7 @@ function _dialogSetupHistory($DLG) {//раздел История действи
 
 	return
 	'<div class="dialog-menu-2'._dn($DLG['menu_edit_last'] == 2).'">'.
-		'<div class="pad10 pb20 bg-dfd">'.
+		'<div class="pad10 pb20 bg11">'.
 			'<div class="hd2 mt5">Внесение новой записи</div>'.
 			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_insert">'.
 				'<div class="mar10 clr2'._dn(!$DLG['insert_history_elem']).'">шаблон истории действий для внесения новой записи</div>'.
@@ -846,7 +846,7 @@ function _dialogSetupHistory($DLG) {//раздел История действи
 				'<div class="mar10 msg">'._dialogSetupHistoryTmp($DLG['edit_history_elem']).'</div>'.
 			'</div>'.
 		'</div>'.
-		'<div class="pad10 pb20 bg-fee line-t1">'.
+		'<div class="pad10 pb20 bg14 line-t1">'.
 			'<div class="hd2 mt5">Удаление записи</div>'.
 			'<div class="mt5 bg-fff bor-e8 over1 curP" id="history_del">'.
 				'<div class="mar10 clr2'._dn(!$DLG['del_history_elem']).'">шаблон истории действий для удаления записи</div>'.

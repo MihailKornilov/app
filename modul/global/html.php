@@ -850,7 +850,7 @@ function PHP12_app_list($return='html') {//список приложений, к
 
 	$send = '';
 	foreach($spisok as $id => $r) {
-		$bgCur = $r['app_id'] == APP_ID ? ' bg-dfd' : '';
+		$bgCur = $r['app_id'] == APP_ID ? ' bg11' : '';
 		$uc = _num($userC[$r['app_id']]);
 		$send .=
 		'<div class="line-b over1 over-parent'.$bgCur.'" val="'.$id.'">'.
@@ -892,7 +892,7 @@ function PHP12_app_archive() {//список приложений, отправ�
 
 	$send = '';
 	foreach($spisok as $id => $r) {
-		$bgCur = $r['app_id'] == APP_ID ? ' bg-dfd' : '';
+		$bgCur = $r['app_id'] == APP_ID ? ' bg11' : '';
 		$send .=
 		'<div class="line-b over1 over-parent'.$bgCur.'" val="'.$id.'">'.
 			'<table class="bs10 w100p">'.

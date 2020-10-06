@@ -1077,7 +1077,7 @@ function PHP12_dialog_app_li($r) {
 				'<td class="w30'.$bgh.'">'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w30'.$bgh.'">'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w30'.$bgh.'">'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-				'<td class="w100 center'.(!empty($contentDelAss[$r['id']]) ? ' bg-dfd' : '').'">'.
+				'<td class="w100 center'.(!empty($contentDelAss[$r['id']]) ? ' bg11' : '').'">'.
 					_dialogContentDelSetup($r['id']).
 		'</table>';
 
@@ -1092,7 +1092,7 @@ function PHP12_dialog_col($dialog_id) {//колонки, используемы�
 				if(@$ell['col'] == 'col')
 					if($el['dialog_id'] != 12) {
 						$dlg = _dialogQuery($el['dialog_id']);
-						$col = '<span class="bg-fee tool" data-tool="Отсутствует имя колонки<br>'.$dlg['name'].'">--- ['.$el['dialog_id'].']</span>';
+						$col = '<span class="bg14 tool" data-tool="Отсутствует имя колонки<br>'.$dlg['name'].'">--- ['.$el['dialog_id'].']</span>';
 						break;
 					}
 

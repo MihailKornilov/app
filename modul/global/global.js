@@ -292,7 +292,7 @@ var ZINDEX = 1000,
 
 		BL.closest('.bl-div')
 		  .prev()
-		  .find('.bg-fee')
+		  .find('.bg14')
 		  .addClass('clr5 b center fs16')
 		  .css('vertical-align', 'middle')
 		  .html(c ? c : '');
@@ -443,7 +443,7 @@ $(document)
 
 		var html = '',
 			post =
-				'<div class="pad5 ' + _dn(req.success, 'bg-dfd') + _dn(req.error, 'bg-fcc') + '">' +
+				'<div class="pad5 ' + _dn(req.success, 'bg11') + _dn(req.error, 'bg-fcc') + '">' +
 					'<b>post</b>' +
 					'<a id="repeat">повтор</a>' +
 	 (req.success ? '<b class="clr11 fr">success</b>' : '') +

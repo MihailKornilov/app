@@ -8,10 +8,12 @@ function _element34_struct($el) {
 	) + _elementStruct($el);
 }
 function _element34_print($el) {
-	if(!$year = _num(@$_GET['v1']))
+	$v1 = @$_GET['v1'];
+
+	if(!$year = _num($v1))
 		$year = YEAR_CUR;
 
-	$json = json_decode($el['txt_1'], true);
+	$json = _decode($el['txt_1']);
 	$mass = array();
 	foreach($json as $n => $r) {
 		$mass[$n] = array();
@@ -47,6 +49,8 @@ function _element34_print($el) {
 			$mass[$n][_num($m)] = $s;
 	}
 
+
+
 	$send = '<table class="_stab w100p">'.
 				'<tr><th class="w125">Месяц'.
 					 _elem34th($json);
@@ -54,10 +58,12 @@ function _element34_print($el) {
 		$mon = _monthDef($n, 1).' '.$year;
 		$bgCur = '';
 		if($p = $el['num_1']) {
-			$v1 = $year.'-'.($n < 10 ? '0' : '').$n;
-			$mon = '<a href="'.URL._elem34href($v1, $p).'">'.$mon.'</a>';
-			if($v1 == YEAR_MON)
-				$bgCur = ' bg-dfd';
+			$yearMon = $year.'-'._nol($n);
+			$mon = '<a href="'.URL._elem34href($yearMon, $p).'">'.$mon.'</a>';
+			if($yearMon == $v1)
+				$bgCur = ' bg11';
+			elseif($yearMon == YEAR_MON)
+				$bgCur = ' bg11';
 		}
 		$send .=
 			'<tr class="over1'.$bgCur.'">'.

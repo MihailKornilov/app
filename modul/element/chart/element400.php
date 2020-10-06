@@ -206,7 +206,7 @@ function _elem400_dayCat($mon=YEAR_MON) {
 	$first = _monthCut(strftime('%m', $unix));
 
 	for($n = 1; $n <= $dayCount; $n++) {
-		$cur = $mon.'-'._0($n);
+		$cur = $mon.'-'._nol($n);
 		$send[] = '<tspan style="'.
 					(!$w || $w == 6 ? 'color:#d55;' : '').
 					($cur == TODAY ? 'font-weight:bold;text-decoration:underline;' : '').

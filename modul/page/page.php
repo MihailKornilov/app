@@ -301,7 +301,7 @@ function _pageInfo() {//информация о странице
 	$elm = _BE('elem_arr', 'page', $page_id);
 
 	return
-	'<div class="bg-fee line-b">'.
+	'<div class="bg14 line-b">'.
 		'<div class="w1000 mara pad5">'.
 
 			'<table class="w300">'.

@@ -143,7 +143,7 @@ function PHP12_counter_v($prm) {
 	);
 
 	$actColor = array(
-		1 => 'bg-dfd',
+		1 => 'bg11',
 		2 => 'bg-ffc',
 		3 => 'bg-fcc'
 	);

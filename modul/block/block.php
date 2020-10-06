@@ -36,7 +36,7 @@ function _blockName($name, $i='name', $obj_id=0) {//доступные вари�
 		$pName = '';
 		if($page = _page($obj_id))
 			$pName = $page['name'];
-		$empty['page'] = '<div class="_empty mar20 fs17 clr8 bg-fee">'.
+		$empty['page'] = '<div class="_empty mar20 fs17 clr8 bg14">'.
 							'Cтраница <b>'.$pName.'</b> пустая и ещё не была настроена.'.
 						 '</div>';
 	}
