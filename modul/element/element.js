@@ -1855,7 +1855,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	//[8] однострочное текстовое поле
-	_EL8 = function(el) {
+	_EL8 = function(el, OBJ) {
 		if(!el.action && !el.num_7)
 			return;
 
