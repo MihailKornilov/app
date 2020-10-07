@@ -164,6 +164,15 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 	if(LOCAL)
 		die('Данные пользователя VK не были получены <b>'.$vk_id.'</b> в LOCAL версии.');
 
+	$sql = "SELECT `id`
+			FROM `_user`
+			WHERE `vk_id`=".$vk_id."
+			LIMIT 1";
+	$user_id = _num(query_value($sql));
+
+	if($vk_id > 2147000000)
+		return $user_id;
+
 	$res = _vkapi('users.get', array(
 		'user_ids' => $vk_id,
 		'fields' => 'photo_200,'.
@@ -176,6 +185,9 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 
 	$res = $res['response'][0];
 
+	if($res['first_name'] == 'DELETED')
+		return $user_id;
+
 	$photo = '';
 	if(!empty($res['photo_200']))
 		$photo = $res['photo_200'];
@@ -187,12 +199,6 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 		$photo = '';
 
 	$image_id = $photo ? _imageLink($photo, 'id') : '';
-
-	$sql = "SELECT `id`
-			FROM `_user`
-			WHERE `vk_id`=".$vk_id."
-			LIMIT 1";
-	$user_id = _num(query_value($sql));
 
 	$sql = "INSERT INTO `_user` (
 				`id`,

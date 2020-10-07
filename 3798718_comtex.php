@@ -22,6 +22,8 @@ function _elem129_comtex($DLG, $POST_CMP) {
 		case 1:
 			_comtexDataDel();
 
+			_comtex_user_name_correct();
+
 			_comtex_user();
 			_comtex_user_cnn();
 
@@ -48,6 +50,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_expense_category();
 			_comtex_expense();
 			_comtex_worker_zp();
+			_comtex_salary_accrual();
 
 			_comtex_remind_status();
 			_comtex_remind_reason();
@@ -56,7 +59,8 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_zayav_cartridge();
+			_comtex_user_name_correct();
+//			_comtex_zayav_cartridge();
 			break;
 
 		default:
@@ -177,6 +181,35 @@ function _comtexDataDel() {// Удаление всех данных в прил
 	query($sql);
 }
 
+function _comtex_user_name_correct() {//восстановление имён у пользователей DELETED
+	$sql = "SELECT `vk_id`,`id`
+			FROM `_user`
+			WHERE `i`='DELETED'
+			  AND `vk_id`";
+	$ass = query_ass($sql);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_vkuser`
+			WHERE `viewer_id` IN ("._idsGet($ass, 'key').")
+			  AND `first_name` NOT IN ('DELETED', 'onpay')
+			GROUP BY `viewer_id`";
+	$vk = array();
+	foreach(query_arr($sql) as $r)
+		$vk[$r['viewer_id']] = $r;
+
+	foreach($ass as $vk_id => $id) {
+		if(!$u = @$vk[$vk_id])
+			continue;
+		$sql = "UPDATE `_user`
+				SET `f`='".$u['last_name']."',
+					`i`='".$u['first_name']."',
+					`o`='".$u['middle_name']."'
+				WHERE `id`=".$id;
+		query($sql);
+	}
+}
+
 function _comtex_user() {//пользователи приложения
 
 	//колонки, по которым будут отобраны id пользователей
@@ -211,8 +244,10 @@ function _comtex_user() {//пользователи приложения
 								FROM `".$table."`
 								WHERE `app_id`=".APP_ID_OLD."
 								  AND `".$F['Field']."`";
-						if($ids = query_ids($sql))
-							$UIDS = _ids($ids, 'arr') + $UIDS;
+						if($ids = query_ids($sql)) {
+							$UIDS = array_merge($UIDS, _ids($ids, 'arr'));
+							$UIDS = array_unique($UIDS);
+						}
 					}
 				break;
 			}
@@ -224,10 +259,11 @@ function _comtex_user() {//пользователи приложения
 			WHERE `app_id`=".APP_ID_OLD."
 			  AND `worker`
 			  AND `viewer_id`";
-	if($ids = query_ids($sql))
-		$UIDS = _ids($ids, 'arr') + $UIDS;
+	if($ids = query_ids($sql)) {
+		$UIDS = array_merge($UIDS, _ids($ids, 'arr'));
+		$UIDS = array_unique($UIDS);
+	}
 
-	$UIDS = array_unique($UIDS);
 	$UIDS = implode(',', $UIDS);
 
 	//новые пользователи, существующие в базе
@@ -1491,6 +1527,54 @@ function _comtex_worker_zp() {//зарплата сотрудников
 
 //	_comtexErrMsg($dialog_id, 'num_1', 'сотрудники');
 	_comtexErrMsg($dialog_id, 'num_2', 'счета');
+}
+function _comtex_salary_accrual() {//начисления зп сотрудникам
+	$dialog_id = _comtexSpisokClear(1441);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _salary_accrual
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mon = $r['year'].'-'.($r['mon'] < 10 ? '0' : '').$r['mon'];
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				"._comtexUserId($r, 'worker_id').",
+				".$r['sum'].",
+				'".$r['about']."',
+				'".$mon."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  sum_1,
+				  txt_1,
+				  txt_2,
+
+				  user_id_add,
+				  dtime_add
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_1', 'сотрудники');
 }
 
 function _comtex_remind_status() {//статусы напоминаний
