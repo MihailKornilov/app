@@ -929,9 +929,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		var ATTR = _attr_cmp(elem_id);
 		if(!ATTR)
 			return;
-		var l = ATTR.val().length;
-		ATTR.focus();
-		ATTR[0].setSelectionRange(l, l);
+		ATTR.select();
 	},
 
 	//применение действий, привязанных к элементам
