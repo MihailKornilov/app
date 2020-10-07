@@ -51,6 +51,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_expense();
 			_comtex_worker_zp();
 			_comtex_salary_accrual();
+			_comtex_salary_deduct();
 
 			_comtex_remind_status();
 			_comtex_remind_reason();
@@ -59,7 +60,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_user_name_correct();
+			_comtex_salary_deduct();
 //			_comtex_zayav_cartridge();
 			break;
 
@@ -1534,6 +1535,54 @@ function _comtex_salary_accrual() {//начисления зп сотрудни�
 	_db2();
 	$sql = "SELECT *
 			FROM _salary_accrual
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mon = $r['year'].'-'.($r['mon'] < 10 ? '0' : '').$r['mon'];
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				"._comtexUserId($r, 'worker_id').",
+				".$r['sum'].",
+				'".$r['about']."',
+				'".$mon."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  sum_1,
+				  txt_1,
+				  txt_2,
+
+				  user_id_add,
+				  dtime_add
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_1', 'сотрудники');
+}
+function _comtex_salary_deduct() {//вычеты зп сотрудникам
+	$dialog_id = _comtexSpisokClear(1442);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _salary_deduct
 			WHERE `app_id`=".APP_ID_OLD."
 			ORDER BY `id`";
 	if(!$arr = query_arr($sql))

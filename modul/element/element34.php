@@ -10,8 +10,11 @@ function _element34_struct($el) {
 function _element34_print($el) {
 	$v1 = @$_GET['v1'];
 
-	if(!$year = _num($v1))
-		$year = YEAR_CUR;
+	if(!$year = _num($v1)) {
+		$ex = explode('-', $v1);
+		if(!$year = _num($ex[0]))
+			$year = YEAR_CUR;
+	}
 
 	$json = _decode($el['txt_1']);
 	$mass = array();
