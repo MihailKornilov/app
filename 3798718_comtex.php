@@ -299,6 +299,19 @@ function _comtex_user_cnn() {//привязка пользователей к п
 	if(!$arr = query_arr($sql))
 		return;
 
+
+	//Отображение в списке зп сотрудников
+	$showZP = array();
+	_db2();
+	$sql = "SELECT *
+			FROM `_vkuser_rule`
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `key`='RULE_SALARY_SHOW'
+			  AND `value`";
+	foreach(query_arr($sql) as $r)
+		if($user_id = _comtexUserId($r, 'viewer_id'))
+			$showZP[$user_id] = 1;
+
 	$mass = array();
 	$rule = array();
 	foreach($arr as $id => $r) {
@@ -311,6 +324,7 @@ function _comtex_user_cnn() {//привязка пользователей к п
 				
 				".$cnn_id.",
 				'".$r['post']."',
+				"._num(@$showZP[$cnn_id]).",
 
 				1,
 				'".$r['dtime_add']."'
@@ -328,6 +342,7 @@ function _comtex_user_cnn() {//привязка пользователей к п
 				
 				cnn_id,     /* _user.id */
 				txt_1,      /* post */
+				num_2,
 				
 				user_id_add,
 				dtime_add
@@ -340,6 +355,8 @@ function _comtex_user_cnn() {//привязка пользователей к п
 			  user_id
 			) VALUES ".implode(',', $rule);
 	query($sql);
+
+
 }
 
 function _comtex_client() {//Клиенты
