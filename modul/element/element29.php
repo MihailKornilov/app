@@ -294,7 +294,8 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 		$send[] = array(
 			'id' => $sp['id'],
 			'title' => strip_tags($title),
-			'content' => _29cnnContent($EL, $sp, $v)
+			'content' => _29cnnContent($EL, $sp, $v),
+			'sp' => $sp
 		);
 	}
 

@@ -115,8 +115,16 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 			if(su.hasClass('busy'))
 				return;
 
-			valueSet(su.attr('val'));
-			o.func(su.attr('val'));
+			var i = su.attr('val'),
+				sp = {};
+			valueSet(i);
+			_forN(MASS_SEL, function(v, n) {
+				if(i == v.id) {
+					sp = v;
+					return false;
+				}
+			});
+			o.func(i, sp);
 			if(o.multi) {
 				su._dn();
 				if(o.write)
@@ -251,6 +259,8 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 				busy:_num(sp.busy),//значение нельзя выбрать.
 				bg:sp.bg
 			};
+			if(sp.sp)
+				unit.sp = sp.sp;
 			MASS_SEL.push(unit);
 			MASS_SEL_SAVE.push(_objCopy(unit));
 			BG_ASS[id] = sp.bg;

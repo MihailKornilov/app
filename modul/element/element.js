@@ -2684,7 +2684,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			spisok:el.vvv,
 			blocked:el.num_4,
 			multi:el.num_11,
-			func:function(v) {
+			func:function(v, sp) {
+				if(sp && sp.sp)
+					AG.unit = sp.sp;
 				_ELM_ACT(el, v);
 			},
 			funcWrite:function(v, t) {
@@ -4983,7 +4985,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					busy_obj:t,
 					busy_cls:'hold',
 					func_save:function(ia) {
-						console.log(ia);
 						t.val(ia.unit.title);
 						t.attr('data-did', ia.unit.dialog_id);
 						t.attr('val', ia.unit.id);
