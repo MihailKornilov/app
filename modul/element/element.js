@@ -1190,7 +1190,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				}
 		}
 
-		V = Math.round(V*100)/100;
+		var rc = 1;
+		if(act.effect_id)
+			for(n = 0; n < act.effect_id; n++)
+				rc *= 10;
+
+		V = Math.round(V*rc)/rc;
 
 		var EA = _attr_cmp(act.apply_id);
 		if(EA)
@@ -1224,7 +1229,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 						dop:{
 							mysave:1,
-							allow:'8,10,11,29,59,54,55,27',
+							allow:'8,10,11,29,35,59,54,55,27',
 							sel:cmp.val()
 						},
 
@@ -2740,7 +2745,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	_EL35 = function(el) {
 		var obj = {
 			width:_num(el.width),
-			again:el.num_8
+			again:el.num_8,
+			func:function(v) {
+				_ELM_ACT(el, v);
+			}
 		};
 		if(el.num_1 == 3681) {
 			obj.min = el.num_2 ? _num(el.num_3) : false;
