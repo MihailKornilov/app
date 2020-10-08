@@ -96,6 +96,52 @@ function _blockAction201($bl, $prm) {//установка исходного о�
 
 	return $bl;
 }
+function _blockAction209($bl, $prm, $txt='') {//установка ранее выбранного значения в блок
+	global $G_ACT;
+
+	foreach($G_ACT['act'] as $r) {
+		if($r['dialog_id'] != 209)
+			continue;
+
+		$ass = _idsAss($r['target_ids']);
+		if(!isset($ass[$bl['id']]))
+			continue;
+
+		if(!$el = _elemOne($r['element_id']))
+			return $txt;
+
+		//пока только для элемента [29]
+		if($el['dialog_id'] != 29)
+			return $txt;
+
+		$v = _40condVcopy($el['num_6']);
+		if(!$el['num_10'])
+			$v = _elemPrintV($el, $prm, $v);
+		$v = _elem29PageSel($el['num_1'], $v);
+		$v = _elem29DialogSel($prm, $v);
+		$v = _elem29UserSel($el, $prm, $v);
+
+		if(!$v)
+			return $txt;
+
+		if(!$spisok = _element29_vvv($el, $prm))
+			return $txt;
+
+		foreach($spisok as $sp) {
+			if($sp['id'] != $v)
+				continue;
+			if(!isset($sp['sp']))
+				return $txt;
+
+			return _elemUids(_idsLast($r['v1']), $sp['sp']);
+		}
+
+		return $txt;
+	}
+
+
+	return $txt;
+}
 function _blockAction211($bl) {//БЛОК: скрытие/показ блоков
 	global $G_ACT;
 

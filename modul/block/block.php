@@ -255,6 +255,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 							_blockChoose($r, $PARAM, $level).
 							_blockElemChoose($r, $PARAM).
 							_blockChildHtml($r, $PARAM, $grid_id, $level + 1, $width).
+		  (!$r['elem_id'] ? _blockAction209($r, $PARAM) : '').
 	    					_elemDiv($r['elem_id'], $PARAM).
 					'';
 

@@ -1674,6 +1674,8 @@ function _elemDiv($elem_id, $prm=array()) {//формирование div эле
 
 	$txt = _elemFormat($el, $prm, $txt);
 
+	$txt = _blockAction209($bl, $prm, $txt);
+
 	return
 	_elemDivCol($el, $prm).
 	'<div'.$attr_id.$cls.$style.'>'.$txt.'</div>';
