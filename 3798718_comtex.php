@@ -40,6 +40,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_zayav();
 			_comtex_zayav_tovar();
 			_comtex_zayav_cartridge();
+			_comtex_zayav_worker_acc();
 
 			_comtex_accrual();
 			_comtex_invoice();
@@ -60,7 +61,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_salary_deduct();
+			_comtex_zayav_worker_acc();
 //			_comtex_zayav_cartridge();
 			break;
 
@@ -1087,6 +1088,66 @@ function _comtex_zayav_cartridge() {//заявки-картриджи
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
+function _comtex_zayav_worker_acc() {//начисления зп сотрудникам в заявке
+	$dialog_id = _comtexSpisokClear(1444);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _zayav_expense
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `category_id`=14
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1402";
+	$ZAYAV = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mon = $r['year'].'-'.($r['mon'] < 10 ? '0' : '').$r['mon'];
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				"._num(@$ZAYAV[$r['zayav_id']]).",
+				"._comtexUserId($r, 'worker_id').",
+				".$r['sum'].",
+				'".$mon."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_2,
+				  sum_1,
+				  txt_1,
+
+				  user_id_add,
+				  dtime_add
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+//	_comtexErrMsg($dialog_id, 'num_1', 'заявки');
+	_comtexErrMsg($dialog_id, 'num_2', 'сотрудники');
+
+	$sql = "DELETE FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND !`num_1`";
+	query($sql);
+}
 
 function _comtex_accrual() {//начисления
 	$dialog_id = _comtexSpisokClear(1409);
@@ -1529,7 +1590,7 @@ function _comtex_worker_zp() {//зарплата сотрудников
 //	_comtexErrMsg($dialog_id, 'num_1', 'сотрудники');
 	_comtexErrMsg($dialog_id, 'num_2', 'счета');
 }
-function _comtex_salary_accrual() {//начисления зп сотрудникам
+function _comtex_salary_accrual() {//произвольные начисления зп сотрудникам
 	$dialog_id = _comtexSpisokClear(1441);
 
 	_db2();
