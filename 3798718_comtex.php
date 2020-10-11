@@ -40,6 +40,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_zayav();
 			_comtex_zayav_tovar();
 			_comtex_zayav_cartridge();
+			_comtex_zayav_vyzov();
 			_comtex_zayav_worker_acc();
 			_comtex_zayav_expense_other();
 			_comtex_zayav_expense_tovar();
@@ -63,8 +64,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_zayav_expense_tovar();
-//			_comtex_zayav_cartridge();
+			_comtex_zayav_vyzov();
 			break;
 
 		default:
@@ -1056,6 +1056,11 @@ function _comtex_zayav_cartridge() {//заявки-картриджи
 			WHERE `dialog_id`=1234";
 	$CLIENT = query_ass($sql);
 
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1408";
+	$STATUS = query_ass($sql);
+
 	$mass = array();
 	foreach($arr as $zayav_id => $r) {
 		$mass[] = "(
@@ -1067,6 +1072,7 @@ function _comtex_zayav_cartridge() {//заявки-картриджи
 				"._num(@$CLIENT[$r['client_id']]).",
 				".$r['count'].",
 				".$r['pay_type'].",
+				"._num(@$STATUS[$r['status_id']]).",
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
@@ -1083,12 +1089,81 @@ function _comtex_zayav_cartridge() {//заявки-картриджи
 				  num_1,
 				  num_2,
 				  num_3,
+				  num_4,
 
 				  user_id_add,
 				  dtime_add,
 				  deleted
 			) VALUES ".implode(',', $mass);
 	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_1', 'клиенты');
+	_comtexErrMsg($dialog_id, 'num_4', 'статус');
+
+}
+function _comtex_zayav_vyzov() {//заявки-вызов специалиста
+	$dialog_id = _comtexSpisokClear(1447);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _zayav
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `service_id`=7
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1234";
+	$CLIENT = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1408";
+	$STATUS = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $zayav_id => $r) {
+		$mass[] = "(
+				".$zayav_id.",
+				".APP_ID.",
+				".$r['nomer'].",
+				".$dialog_id.",
+				
+				"._num(@$CLIENT[$r['client_id']]).",
+				"._num(@$STATUS[$r['status_id']]).",
+				'".addslashes($r['adres'])."',
+				'".addslashes($r['about'])."',
+				'".$r['srok']."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_2,
+				  txt_1,
+				  txt_2,
+				  date_1,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_1', 'клиенты');
+	_comtexErrMsg($dialog_id, 'num_2', 'статус');
+
 }
 function _comtex_zayav_worker_acc() {//начисления зп сотрудникам в заявке
 	$dialog_id = _comtexSpisokClear(1444);
@@ -1206,7 +1281,7 @@ function _comtex_zayav_expense_other() {//расход по заявке: про
 			  AND !`num_1`";
 	query($sql);
 }
-function _comtex_zayav_expense_tovar() {//расход по заявке: прочее
+function _comtex_zayav_expense_tovar() {//расход по заявке: запчасти
 	$dialog_id = _comtexSpisokClear(1446);
 
 	_db2();
