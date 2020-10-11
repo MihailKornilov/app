@@ -580,9 +580,7 @@ function _blockStyleBG($bl, $prm) {//цвет фона из записи
 
 	$bg = $u;
 	foreach($ids as $id) {
-		if(!$el = _elemOne($id))
-			return '';
-		if(!$col = $el['col'])
+		if(!$col = _elemCol($id))
 			return '';
 		if(!isset($bg[$col]))
 			return '';

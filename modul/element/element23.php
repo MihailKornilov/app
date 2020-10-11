@@ -19,8 +19,9 @@ function _element23_struct($el) {
 											6161 - ручная сортировка (если выбрано, длина списка становится 1000)
 										*/
 
-		'num_9'   => _num($el['num_9']),//включение отображения сообщения пустого запроса
-		'num_10'  => _num($el['num_10'])//выбранное значение для порядка (при num_8=6160)
+		'num_9'   => _num($el['num_9']), //включение отображения сообщения пустого запроса
+		'num_10'  => _num($el['num_10']),//выбранное значение для порядка (при num_8=6160)
+		'txt_4'  => $el['txt_4']         //[13] динамическая окраска строки
 	) + _elementStruct($el);
 }
 function _element23_vvv($el) {
@@ -95,7 +96,9 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 
 	$MASS = array();
 	foreach($spisok as $uid => $u) {
-		$TR = '<tr class="tr-unit'.($ELEM['num_4'] ? ' over1' : '').'" val="'.$u['id'].'">';
+		$ov = $ELEM['num_4'] ? ' over1' : '';
+		$bg = _elem23bg($ELEM, $u);
+		$TR = '<tr class="tr-unit'.$ov.'"'.$bg.' val="'.$u['id'].'">';
 		$prm = _blockParam(array('unit_get'=>$u));
 		foreach($vvv as $td) {
 			$cls = array();
@@ -222,6 +225,22 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {
 			'</li>';
 	return
 		'<ol>'.$send.'</ol>';
+}
+function _elem23bg($el, $u) {//динамическая окраска строки
+	if(!$ids = _ids($el['txt_4'], 'arr'))
+		return '';
+
+	$bg = $u;
+	foreach($ids as $id) {
+		if(!$col = _elemCol($id))
+			return '';
+		if(!isset($bg[$col]))
+			return '';
+
+		$bg = $bg[$col];
+	}
+
+	return ' style="background-color:'.$bg.'"';
 }
 function _element23_template_docx($ELEM, $u) {
 	if(!$dialog_id = $ELEM['num_1'])
