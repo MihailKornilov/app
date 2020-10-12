@@ -64,7 +64,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_zayav_vyzov();
+			_comtex_accrual();
 			break;
 
 		default:
@@ -768,6 +768,21 @@ function _comtex_tovar_cartridge() {//картриджи
 	query($sql);
 }
 
+function _comtexAss($dialog_id, $id) {//получение нового id по старому
+	global $COMTEX_ASS;
+
+	if(!isset($COMTEX_ASS[$dialog_id])) {
+		$sql = "SELECT `id_old`,`id`
+				FROM `_spisok`
+				WHERE `app_id`=".APP_ID."
+				  AND `dialog_id`=".$dialog_id."
+				  AND `id_old`";
+		$COMTEX_ASS[$dialog_id] = query_ass($sql);
+	}
+
+	return _num(@$COMTEX_ASS[$dialog_id][$id]);
+}
+
 function _comtex_zayav_place() {//местонахождения устройств
 	$dialog_id = _comtexSpisokClear(1406);
 
@@ -1163,7 +1178,6 @@ function _comtex_zayav_vyzov() {//заявки-вызов специалиста
 
 	_comtexErrMsg($dialog_id, 'num_1', 'клиенты');
 	_comtexErrMsg($dialog_id, 'num_2', 'статус');
-
 }
 function _comtex_zayav_worker_acc() {//начисления зп сотрудникам в заявке
 	$dialog_id = _comtexSpisokClear(1444);
@@ -1349,24 +1363,13 @@ function _comtex_zayav_expense_tovar() {//расход по заявке: зап
 function _comtex_accrual() {//начисления
 	$dialog_id = _comtexSpisokClear(1409);
 
-	//товары в заявках
 	_db2();
 	$sql = "SELECT *
-			  FROM _money_accrual
-			  WHERE `app_id`=".APP_ID_OLD."
-			  ORDER BY `id`";
+			FROM _money_accrual
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
 		return;
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1234";
-	$CLIENT = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1402";
-	$ZAYAV = query_ass($sql);
 
 	$mass = array();
 	foreach($arr as $id => $r) {
@@ -1378,8 +1381,9 @@ function _comtex_accrual() {//начисления
 
 				".$r['sum'].",
 				'".$r['about']."',
-				"._num(@$CLIENT[$r['client_id']]).",
-				"._num(@$ZAYAV[$r['zayav_id']]).",
+				"._comtexAss(1234, $r['client_id']).",
+				"._comtexAss(1402, $r['zayav_id']).",
+				"._comtexAss(1447, $r['zayav_id']).",
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
@@ -1397,11 +1401,18 @@ function _comtex_accrual() {//начисления
 				  txt_1,
 				  num_1,
 				  num_2,
+				  num_3,
 
 				  user_id_add,
 				  dtime_add,
 				  deleted
 			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	$sql = "DELETE FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND !`num_2`
+			  AND !`num_3`";
 	query($sql);
 }
 function _comtex_invoice() {//Расчётные счета
