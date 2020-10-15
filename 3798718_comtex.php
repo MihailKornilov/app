@@ -64,7 +64,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_accrual();
+			_comtex_income();
 			break;
 
 		default:
@@ -942,12 +942,6 @@ function _comtex_zayav() {//заявки-оборудование
 
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
-			WHERE `dialog_id`=1234";
-	$CLIENT = query_ass($sql);
-
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
 			WHERE `dialog_id`=1408";
 	$STATUS = query_ass($sql);
 
@@ -982,7 +976,7 @@ function _comtex_zayav() {//заявки-оборудование
 				".$r['nomer'].",
 				".$dialog_id.",
 				
-				"._num(@$CLIENT[$r['client_id']]).",
+				"._comtexAss(1234, $r['client_id']).",
 				"._num(@$STATUS[$r['status_id']]).",
 				'".$eq."',
 				'".$r['serial']."',
@@ -1027,12 +1021,6 @@ function _comtex_zayav_tovar() {//прикрепление товаров к з�
 	if(!$arr = query_arr($sql))
 		return;
 
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1402";
-	$ZAYAV = query_ass($sql);
-
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
 			WHERE `dialog_id`=1403";
@@ -1041,7 +1029,7 @@ function _comtex_zayav_tovar() {//прикрепление товаров к з�
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
-			"._num(@$ZAYAV[$r['zayav_id']]).",
+			"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 			"._num(@$TOVAR[$r['tovar_id']])."
 		)";
 	}
@@ -1068,11 +1056,6 @@ function _comtex_zayav_cartridge() {//заявки-картриджи
 
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
-			WHERE `dialog_id`=1234";
-	$CLIENT = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
 			WHERE `dialog_id`=1408";
 	$STATUS = query_ass($sql);
 
@@ -1084,7 +1067,7 @@ function _comtex_zayav_cartridge() {//заявки-картриджи
 				".$r['nomer'].",
 				".$dialog_id.",
 				
-				"._num(@$CLIENT[$r['client_id']]).",
+				"._comtexAss(1234, $r['client_id']).",
 				".$r['count'].",
 				".$r['pay_type'].",
 				"._num(@$STATUS[$r['status_id']]).",
@@ -1130,11 +1113,6 @@ function _comtex_zayav_vyzov() {//заявки-вызов специалиста
 
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
-			WHERE `dialog_id`=1234";
-	$CLIENT = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
 			WHERE `dialog_id`=1408";
 	$STATUS = query_ass($sql);
 
@@ -1146,7 +1124,7 @@ function _comtex_zayav_vyzov() {//заявки-вызов специалиста
 				".$r['nomer'].",
 				".$dialog_id.",
 				
-				"._num(@$CLIENT[$r['client_id']]).",
+				"._comtexAss(1234, $r['client_id']).",
 				"._num(@$STATUS[$r['status_id']]).",
 				'".addslashes($r['adres'])."',
 				'".addslashes($r['about'])."',
@@ -1191,11 +1169,6 @@ function _comtex_zayav_worker_acc() {//начисления зп сотрудн�
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1402";
-	$ZAYAV = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mon = $r['year'].'-'.($r['mon'] < 10 ? '0' : '').$r['mon'];
@@ -1205,7 +1178,7 @@ function _comtex_zayav_worker_acc() {//начисления зп сотрудн�
 				".$id.",
 				".$dialog_id.",
 
-				"._num(@$ZAYAV[$r['zayav_id']]).",
+				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 				"._comtexUserId($r, 'worker_id').",
 				".$r['sum'].",
 				'".$mon."',
@@ -1251,11 +1224,6 @@ function _comtex_zayav_expense_other() {//расход по заявке: про
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1402";
-	$ZAYAV = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
@@ -1264,7 +1232,7 @@ function _comtex_zayav_expense_other() {//расход по заявке: про
 				".$id.",
 				".$dialog_id.",
 
-				"._num(@$ZAYAV[$r['zayav_id']]).",
+				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 				'".addslashes($r['txt'])."',
 				".$r['sum'].",
 
@@ -1309,11 +1277,6 @@ function _comtex_zayav_expense_tovar() {//расход по заявке: зап
 
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
-			WHERE `dialog_id`=1402";
-	$ZAYAV = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
 			WHERE `dialog_id`=1403";
 	$TOVAR = query_ass($sql);
 
@@ -1325,7 +1288,7 @@ function _comtex_zayav_expense_tovar() {//расход по заявке: зап
 				".$id.",
 				".$dialog_id.",
 
-				"._num(@$ZAYAV[$r['zayav_id']]).",
+				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 				"._num(@$TOVAR[$r['tovar_id']]).",
 				".($r['tovar_count'] ? $r['tovar_count'] : 1).",
 				".$r['sum'].",
@@ -1382,8 +1345,8 @@ function _comtex_accrual() {//начисления
 				".$r['sum'].",
 				'".$r['about']."',
 				"._comtexAss(1234, $r['client_id']).",
-				"._comtexAss(1402, $r['zayav_id']).",
-				"._comtexAss(1447, $r['zayav_id']).",
+				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
+				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
@@ -1469,11 +1432,6 @@ function _comtex_invoice_transfer() {//переводы между счетам�
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1412";
-	$INVOICE = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
@@ -1482,8 +1440,8 @@ function _comtex_invoice_transfer() {//переводы между счетам�
 				".$id.",
 				".$dialog_id.",
 
-				"._num(@$INVOICE[$r['invoice_id_from']]).",
-				"._num(@$INVOICE[$r['invoice_id_to']]).",
+				"._comtexAss(1412, $r['invoice_id_from']).", /* расчётные счета */
+				"._comtexAss(1412, $r['invoice_id_to']).", /* расчётные счета */
 				".$r['sum'].",
 				'".$r['about']."',
 
@@ -1521,21 +1479,6 @@ function _comtex_income() {//платежи
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1412";
-	$INVOICE = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1234";
-	$CLIENT = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1402";
-	$ZAYAV = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
@@ -1546,9 +1489,10 @@ function _comtex_income() {//платежи
 
 				".$r['sum'].",
 				'".$r['about']."',
-				"._num(@$INVOICE[$r['invoice_id']]).",
-				"._num(@$CLIENT[$r['client_id']]).",
-				"._num(@$ZAYAV[$r['zayav_id']]).",
+				"._comtexAss(1412, $r['invoice_id']).", /* расчётные счета */
+				"._comtexAss(1234, $r['client_id']).",
+				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
+				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
@@ -1567,11 +1511,18 @@ function _comtex_income() {//платежи
 				  num_1,
 				  num_2,
 				  num_3,
+				  num_4,
 
 				  user_id_add,
 				  dtime_add,
 				  deleted
 			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	$sql = "DELETE FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND !`num_3`
+			  AND !`num_4`";
 	query($sql);
 }
 function _comtex_refund() {//платежи
@@ -1585,21 +1536,6 @@ function _comtex_refund() {//платежи
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1412";
-	$INVOICE = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1234";
-	$CLIENT = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1402";
-	$ZAYAV = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
@@ -1610,9 +1546,9 @@ function _comtex_refund() {//платежи
 
 				".$r['sum'].",
 				'".$r['about']."',
-				"._num(@$INVOICE[$r['invoice_id']]).",
-				"._num(@$CLIENT[$r['client_id']]).",
-				"._num(@$ZAYAV[$r['zayav_id']]).",
+				"._comtexAss(1412, $r['invoice_id']).", /* расчётные счета */
+				"._comtexAss(1234, $r['client_id']).",
+				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
@@ -1696,11 +1632,6 @@ function _comtex_expense() {//расходы
 			WHERE `dialog_id`=1415";
 	$CAT = query_ass($sql);
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1412";
-	$INVOICE = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
@@ -1710,7 +1641,7 @@ function _comtex_expense() {//расходы
 				".$dialog_id.",
 
 				"._num(@$CAT[$r['category_id']]).",
-				"._num(@$INVOICE[$r['invoice_id']]).",
+				"._comtexAss(1412, $r['invoice_id']).", /* расчётные счета */
 				".$r['sum'].",
 				'".$r['about']."',
 
@@ -1751,11 +1682,6 @@ function _comtex_worker_zp() {//зарплата сотрудников
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1412";
-	$INVOICE = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mon = $r['year'].'-'.($r['mon'] < 10 ? '0' : '').$r['mon'];
@@ -1766,7 +1692,7 @@ function _comtex_worker_zp() {//зарплата сотрудников
 				".$dialog_id.",
 
 				"._comtexUserId($r, 'worker_id').",
-				"._num(@$INVOICE[$r['invoice_id']]).",
+				"._comtexAss(1412, $r['invoice_id']).", /* расчётные счета */
 				".$r['sum'].",
 				'".$r['about']."',
 				'".$mon."',
@@ -1957,21 +1883,6 @@ function _comtex_remind() {//напоминания
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1420";
-	$STATUS = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1234";
-	$CLIENT = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1402";
-	$ZAYAV = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
@@ -1983,9 +1894,9 @@ function _comtex_remind() {//напоминания
 				'".$r['txt']."',
 				'".$r['about']."',
 				'".$r['day']."',
-				"._num(@$STATUS[$r['status']]).",
-				"._num(@$CLIENT[$r['client_id']]).",
-				"._num(@$ZAYAV[$r['zayav_id']]).",
+				"._comtexAss(1420, $r['status']).", /* статусы напоминаний */
+				"._comtexAss(1234, $r['client_id']).",
+				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."'
@@ -2024,19 +1935,9 @@ function _comtex_remind_action() {//действие с напоминаниям
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1419";
-	$REMIND = query_ass($sql);
-
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1420";
-	$STATUS = query_ass($sql);
-
 	$sql = "SELECT DISTINCT `txt_1`,`id`
 			FROM `_spisok`
-			WHERE `dialog_id`=1421 limit 10";
+			WHERE `dialog_id`=1421";
 	$REASON = query_ass($sql);
 
 	$mass = array();
@@ -2047,8 +1948,8 @@ function _comtex_remind_action() {//действие с напоминаниям
 				".$id.",
 				".$dialog_id.",
 
-				"._num(@$REMIND[$r['remind_id']]).",
-				"._num(@$STATUS[$r['status']]).",
+				"._comtexAss(1419, $r['remind_id']).", /* напоминания */
+				"._comtexAss(1420, $r['status']).", /* статусы напоминаний */
 				'".$r['day']."',
 				"._num(@$REASON[$r['txt']]).",
 

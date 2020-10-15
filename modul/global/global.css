@@ -802,7 +802,7 @@ body:not(.site){position:relative}
 .clr11{color:#090 !important}/* зелёный - платёж */
 .clr12{color:#070 !important}/* тёмно-зелёный */
 .clr13{color:#770 !important}/* салатовый - расчётный счёт */
-.clr14{color:#07a}/* голубой - начисление */
+.clr14{color:#07A !important}/* голубой - начисление */
 .clr15{color:#2B587A !important}  /* синий - как ссылка */
 
 
