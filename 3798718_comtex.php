@@ -64,7 +64,8 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_income();
+			_comtex_remind();
+			_comtex_remind_action();
 			break;
 
 		default:
@@ -1897,6 +1898,7 @@ function _comtex_remind() {//напоминания
 				"._comtexAss(1420, $r['status']).", /* статусы напоминаний */
 				"._comtexAss(1234, $r['client_id']).",
 				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
+				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."'
@@ -1915,6 +1917,7 @@ function _comtex_remind() {//напоминания
 				  num_1,
 				  num_2,
 				  num_3,
+				  num_4,
 
 				  user_id_add,
 				  dtime_add
