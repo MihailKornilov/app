@@ -64,8 +64,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_remind();
-			_comtex_remind_action();
+			_comtex_zayav_worker_acc();
 			break;
 
 		default:
@@ -1181,6 +1180,7 @@ function _comtex_zayav_worker_acc() {//начисления зп сотрудн�
 
 				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 				"._comtexUserId($r, 'worker_id').",
+				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
 				".$r['sum'].",
 				'".$mon."',
 
@@ -1197,6 +1197,7 @@ function _comtex_zayav_worker_acc() {//начисления зп сотрудн�
 				
 				  num_1,
 				  num_2,
+				  num_3,
 				  sum_1,
 				  txt_1,
 
@@ -1210,7 +1211,8 @@ function _comtex_zayav_worker_acc() {//начисления зп сотрудн�
 
 	$sql = "DELETE FROM `_spisok`
 			WHERE `dialog_id`=".$dialog_id."
-			  AND !`num_1`";
+			  AND !`num_1`
+			  AND !`num_3`";
 	query($sql);
 }
 function _comtex_zayav_expense_other() {//расход по заявке: прочее
@@ -1671,7 +1673,7 @@ function _comtex_expense() {//расходы
 
 	_comtexErrMsg($dialog_id, 'num_2', 'счета');
 }
-function _comtex_worker_zp() {//зарплата сотрудников
+function _comtex_worker_zp() {//выдача зарплата сотрудников
 	$dialog_id = _comtexSpisokClear(1417);
 
 	_db2();

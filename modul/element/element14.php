@@ -37,7 +37,7 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 	$SC = $ELEM['num_6'] ? 'DESC' : 'ASC';
 
 	if(!$all = _spisokCountAll($ELEM, array(), $next))
-		return _emptyMin(_br($ELEM['txt_1']));
+		return $ELEM['txt_1'] ? _emptyMin(_br($ELEM['txt_1'])) : '';
 
 	$IS_SORT = _spisokIsSort($ELEM['id']);
 
