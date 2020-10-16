@@ -117,6 +117,20 @@ function _comtexSpisokClear($dialog_id) {//очистка списка по ко
 	query($sql);
 	return $dialog_id;
 }
+function _comtexAss($dialog_id, $id) {//получение нового id по старому
+	global $COMTEX_ASS;
+
+	if(!isset($COMTEX_ASS[$dialog_id])) {
+		$sql = "SELECT `id_old`,`id`
+				FROM `_spisok`
+				WHERE `app_id`=".APP_ID."
+				  AND `dialog_id`=".$dialog_id."
+				  AND `id_old`";
+		$COMTEX_ASS[$dialog_id] = query_ass($sql);
+	}
+
+	return _num(@$COMTEX_ASS[$dialog_id][$id]);
+}
 function _comtexHistory($dialog_id) {//История по конкретному диалогу
 	$sql = "DELETE FROM `_history`
 			WHERE `app_id`=".APP_ID."
@@ -769,21 +783,6 @@ function _comtex_tovar_cartridge() {//картриджи
 				  `user_id_add`
 			) VALUES ".implode(',', $mass);
 	query($sql);
-}
-
-function _comtexAss($dialog_id, $id) {//получение нового id по старому
-	global $COMTEX_ASS;
-
-	if(!isset($COMTEX_ASS[$dialog_id])) {
-		$sql = "SELECT `id_old`,`id`
-				FROM `_spisok`
-				WHERE `app_id`=".APP_ID."
-				  AND `dialog_id`=".$dialog_id."
-				  AND `id_old`";
-		$COMTEX_ASS[$dialog_id] = query_ass($sql);
-	}
-
-	return _num(@$COMTEX_ASS[$dialog_id][$id]);
 }
 
 function _comtex_zayav_place() {//местонахождения устройств
