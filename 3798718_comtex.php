@@ -44,6 +44,8 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_zayav_worker_acc();
 			_comtex_zayav_expense_other();
 			_comtex_zayav_expense_tovar();
+			_comtex_zayav_note();
+			_comtex_zayav_note_comment();
 
 			_comtex_accrual();
 			_comtex_invoice();
@@ -64,7 +66,8 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_zayav_worker_acc();
+			_comtex_zayav_note();
+			_comtex_zayav_note_comment();
 			break;
 
 		default:
@@ -1097,7 +1100,6 @@ function _comtex_zayav_cartridge() {//заявки-картриджи
 
 	_comtexErrMsg($dialog_id, 'num_1', 'клиенты');
 	_comtexErrMsg($dialog_id, 'num_4', 'статус');
-
 }
 function _comtex_zayav_vyzov() {//заявки-вызов специалиста
 	$dialog_id = _comtexSpisokClear(1447);
@@ -1993,6 +1995,120 @@ function _comtex_remind_action() {//действие с напоминаниям
 	query($sql);
 
 	_comtexHistory($dialog_id);
+}
+
+function _comtex_zayav_note() {//заметки в заявках
+	$sql = "DELETE FROM `_note` WHERE `app_id`=".APP_ID;
+	query($sql);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_note`
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `page_name`=45
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$page_id = 0;
+		if($obj_id = _comtexAss(1402, $r['page_id'])) // заявки-оборудование
+			$page_id = 473;
+		elseif($obj_id = _comtexAss(1447, $r['page_id']))//заявки-вызов специалиста
+			$page_id = 492;
+		elseif($obj_id = _comtexAss(1429, $r['page_id']))//заявки-картриджи
+			$page_id = 481;
+
+		if(!$page_id)
+			continue;
+
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+
+				".$page_id.",
+				".$obj_id.",
+				'".addslashes($r['txt'])."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted'].",
+				"._comtexUserId($r, 'viewer_id_del').",
+				'".$r['dtime_del']."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_note` (
+				id_old,
+				app_id,
+				
+				page_id,
+				obj_id,
+				txt,
+				
+				user_id_add,
+				dtime_add,
+				deleted,
+				user_id_del,
+				dtime_del
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _comtex_zayav_note_comment() {//комментарии к заметкам в заявках
+	$sql = "DELETE FROM `_note`
+			WHERE `app_id`=".APP_ID."
+			  AND `parent_id`";
+	query($sql);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_note_comment`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_note`
+			WHERE `app_id`=".APP_ID."
+			  AND !`parent_id`";
+	$NOTE = query_ass($sql);
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		if(!$parent_id = _num(@$NOTE[$r['note_id']]))
+			continue;
+
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$parent_id.",
+
+				'".addslashes($r['txt'])."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted'].",
+				"._comtexUserId($r, 'viewer_id_del').",
+				'".$r['dtime_del']."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_note` (
+				id_old,
+				app_id,
+				parent_id,
+
+				txt,
+				
+				user_id_add,
+				dtime_add,
+				deleted,
+				user_id_del,
+				dtime_del
+			) VALUES ".implode(',', $mass);
+	query($sql);
 }
 
 
