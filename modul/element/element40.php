@@ -722,7 +722,7 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 			if($el = _elemOne($last))
 				if($el['dialog_id'] == 17) {
 					$arr[$n]['elem_issp'] = 1;
-					$arr[$n]['spisok'] = _element('vvv', $r);
+					$arr[$n]['spisok'] = _element('vvv', $el);
 				}
 		}
 	}

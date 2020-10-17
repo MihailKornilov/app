@@ -2286,8 +2286,11 @@ function PHP12_cron_dst_prm($prm) {
 	return '';
 }
 function PHP12_cron_dst_prm_vvv($prm) {
-	if(!$u = $prm['unit_edit'])
+	if(empty($prm['unit_edit']))
 		return array();
+
+	$u = $prm['unit_edit'];
+
 	if(!$dlg_id = $u['dst_spisok'])
 		return array();
 	if(!$dlg = _dialogQuery($dlg_id))
