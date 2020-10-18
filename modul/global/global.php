@@ -71,7 +71,7 @@ function _setting() {//установка констант-настроек
 	}
 
 	//версия скриптов
-	define('SCRIPT', _num($arr['SCRIPT']).(LOCAL ? rand(1, 9999) : ''));
+	define('SCRIPT', _num($arr['SCRIPT']).'1'.(LOCAL ? rand(1, 9999) : ''));
 	//версия кеша JS - app0.js
 	define('JS_CACHE', _num($arr['JS_CACHE']));
 	//глобальный доступ к приложению

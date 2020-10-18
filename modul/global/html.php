@@ -9,7 +9,8 @@ function _face() {//определение, как загружена стран
 
 	_cookie('face', $face);
 
-	define('FACE', $face);
+//	define('FACE', $face);
+	define('FACE', 'site');
 	define('SITE', FACE == 'site' ? 'site' : '');
 	define('IFRAME', FACE == 'iframe');
 }

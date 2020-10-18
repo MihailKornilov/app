@@ -11,7 +11,7 @@ var FB,          //фрейм VK для изменения высоты $('body'
 
 		if(_cookie('face') != face) {
 			_cookie('face', face);
-			location.reload();
+//			location.reload();
 			return;
 		}
 
