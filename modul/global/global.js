@@ -96,12 +96,7 @@ var ZINDEX = 1000,
 		if(value !== undefined) {
 			var exdate = new Date();
 			exdate.setDate(exdate.getDate() + 1);
-			document.cookie =
-				name + '=' + value + '; ' +
-				'path=/; ' +
-				'expires=' + exdate.toGMTString() + '; ' +
-				'SameSite=None;' +
-				'Secure';
+			document.cookie = name + '=' + value + '; path=/; expires=' + exdate.toGMTString();
 			return '';
 		}
 		var r = document.cookie.split('; ');

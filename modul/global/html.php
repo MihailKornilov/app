@@ -50,6 +50,7 @@ function _isMobile() {//проверка: мобильная версия сай
 /* ---=== АВТОРИЗАЦИЯ ===--- */
 function _auth() {//получение данных об авторизации из кеша
 	$key = 'AUTH_'.CODE;
+
 	if(!$r = _cache_get($key, 1)) {
 		$sql = "SELECT *
 				FROM `_user_auth`
@@ -68,6 +69,7 @@ function _auth() {//получение данных об авторизации 
 			_cache_set($key, $data, 1);
 		}
 	};
+
 
 	if(defined('USER_ID'))
 		return;
@@ -110,7 +112,6 @@ function _authLoginIframe() {//проверка авторизации чере�
 
 		if($auth_key != md5($vk_app_id.'_'.$viewer_id.'_'._app($app_id, 'vk_secret')))
 			return _authIframeError('Авторизация не пройдена.');
-
 
 		_authSuccess($auth_key, $user_id, $app_id);
 		_cookie('page_setup', 'clear');
@@ -365,6 +366,8 @@ function _html() {
 		_pasMenu().
 //		_pageInfo().
 		_app_content().
+
+//	(SA ? _pr($_COOKIE) : '').
 
 		_debug().
 	'</body></html>';

@@ -40,8 +40,7 @@ define('TODAY_UNIXTIME', strtotime(TODAY));
 
 define('CODE', _txt(_cookie('code')));
 define('DEBUG', _num(_cookie('debug')));
-//define('MIN', DEBUG ? '' : '.min');
-define('MIN', DEBUG ? '' : '');
+define('MIN', DEBUG ? '' : '.min');
 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);
@@ -114,12 +113,12 @@ function _cookie($key, $v=false, $time=2592000) {//установка, полу�
 
 	//очистка
 	if($v == 'clear') {
-		setcookie($key, '', time() - 1, '/');
+		setcookie($key, '', time() - 3600, '/');
 		return true;
 	}
 
 
-	setcookie($key, $v, time() + $time, '/');
+	setcookie($key, $v, time() + $time, '/');//, 'app.gim-system.ru', 1
 
 	return true;
 }
