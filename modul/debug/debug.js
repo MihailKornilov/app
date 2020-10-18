@@ -18,7 +18,7 @@ var debugCookieUpdate = function(t) {//обновление COOKIE
 
 $(document)
 	.on('click', '.debug_toggle', function() {//включение-выключение debug (нажатие на строку снизу)
-		_cookie('debug', _cookie('debug') == 1 ? 0 : 1);
+		_cookie('debug', _cookie('debug')*1 ? 0 : 1);
 		_msg();
 		location.reload();
 	})

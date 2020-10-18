@@ -262,7 +262,7 @@ function _pasDefine() {//установка флага включения упр
 							$pas = 0;
 
 	if(!$pas)
-		setcookie('page_setup', '', time() - 1, '/');
+		_cookie('page_setup', 'clear');
 
 	define('PAS', APP_ID && $pas ? $page_id : 0);
 //	define('PAS', 1);//для настройки страниц, которые доступны всем приложениям

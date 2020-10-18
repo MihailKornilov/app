@@ -96,7 +96,12 @@ var ZINDEX = 1000,
 		if(value !== undefined) {
 			var exdate = new Date();
 			exdate.setDate(exdate.getDate() + 1);
-			document.cookie = name + '=' + value + '; path=/; expires=' + exdate.toGMTString();
+			document.cookie =
+				name + '=' + value + '; ' +
+				'path=/; ' +
+				'expires=' + exdate.toGMTString() + '; ' +
+				'SameSite=None;' +
+				'Secure';
 			return '';
 		}
 		var r = document.cookie.split('; ');
@@ -575,6 +580,7 @@ $(document)
 	.ready(function() {
 //		$('#app-admin')._hintOver({msg:'<div class="center">Администрирование<br>приложения</div>',pad:15});
 		$('#page_setup:not(.ispas)')._hintOver({msg:'Настройка страницы',pad:15});
-		$("#debug-footer em").html(((new Date().getTime()) - TIME) / 1000);
+		if(SA)
+			$("#debug-footer em").html(((new Date().getTime()) - TIME) / 1000);
 	});
 

@@ -6712,6 +6712,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//список приложений
 	PHP12_app_list = function(el) {
+		if(!_attr_el(el.id))
+			return;
 		_attr_el(el.id)._sort({
 			items:'.line-b',
 			elem_id:el.id

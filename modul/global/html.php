@@ -7,7 +7,7 @@ function _face() {//определение, как загружена стран
 	if(!empty($_GET['referrer']))
 		$face = 'iframe';
 
-	setcookie('face', $face, time() + 2592000, '/');
+	_cookie('face', $face);
 
 	define('FACE', $face);
 	define('SITE', FACE == 'site' ? 'site' : '');
@@ -31,7 +31,7 @@ function _sa($user_id=USER_ID) {
 		ini_set('display_errors', true);
 		ini_set('display_startup_errors', true);
 	} elseif(DEBUG)
-		setcookie('debug', 0, time() - 1, '/');
+		_cookie('debug', 1);
 
 	return $issa;
 }
@@ -106,14 +106,14 @@ function _authLoginIframe() {//проверка авторизации чере�
 				WHERE `vk_id`=".$viewer_id."
 				LIMIT 1";
 		if(!$user_id = _num(query_value($sql)))
-			return _authIframeError($sql.'Пользователя нет.');
+			return _authIframeError('Пользователя нет.');
 
 		if($auth_key != md5($vk_app_id.'_'.$viewer_id.'_'._app($app_id, 'vk_secret')))
 			return _authIframeError('Авторизация не пройдена.');
 
 
 		_authSuccess($auth_key, $user_id, $app_id);
-		setcookie('page_setup', '', time() - 1, '/');
+		_cookie('page_setup', 'clear');
 		header('Location:'.URL);
 	}
 
@@ -167,14 +167,14 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение запис
 			)";
 	query($sql);
 
-	setcookie('code', $code, time() + 2592000, '/');
+	_cookie('code', $code);
 
 	_cache_clear('AUTH_'.$code, 1);
 	_cache_clear('page');
 	_cache_clear('user'.$user_id);
 
 	if(LOCAL)
-		setcookie('local', 1, time() + 2592000, '/');
+		_cookie('local', 1);
 }
 function _authLogout() {//выход из приложения, если требуется
 	if(!isset($_GET['logout']))
@@ -185,12 +185,12 @@ function _authLogout() {//выход из приложения, если тре�
 	_cache_clear('AUTH_'.CODE, 1);
 	_cache_clear('page');
 	_cache_clear('user'.USER_ID);
-	setcookie('page_setup', '', time() - 1, '/');
+	_cookie('page_setup', 'clear');
 
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes(CODE)."'";
 	query($sql);
 
-	setcookie('code', '', time() - 1, '/');
+	_cookie('code', 'clear');
 	header('Location:'.URL);
 	exit;
 }

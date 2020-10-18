@@ -2350,8 +2350,9 @@ function PHP12_tmp_setup($prm) {
 
 	$obj_id = $unit['id'];
 
-	setcookie('block_level_'.$obj_name, 1, time() + 2592000, '/');
-	$_COOKIE['block_level_'.$obj_name] = 1;
+	$key = 'block_level_'.$obj_name;
+	_cookie($key, 1);
+	$_COOKIE[$key] = 1;
 
 	//определение ширины шаблона
 	if(!$width = _num($el12['txt_3']))

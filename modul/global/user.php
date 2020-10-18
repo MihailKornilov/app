@@ -433,7 +433,7 @@ function _userInviteCookieSave() {//сохранение кода приглаш
 	if(USER_ID)
 		return;
 
-	setcookie('invite_hash', $hash, time() + 3600, '/');
+	_cookie('invite_hash', $hash);
 }
 function _userInviteDlgOpen() {//автоматическое открытие диалога для приглашения
 	if(!USER_ID)
@@ -443,7 +443,7 @@ function _userInviteDlgOpen() {//автоматическое открытие �
 			return '';
 
 	//очистка куки приглашения
-	setcookie('invite_hash', '', time()-1, '/');
+	_cookie('invite_hash', 'clear');
 
 	//получение данных приглашения по хешу
 	$sql = "SELECT *
@@ -457,7 +457,7 @@ function _userInviteDlgOpen() {//автоматическое открытие �
 		return '';
 
 	//сохранение флага принятия приглашения
-	setcookie('invite_submit', $hash, time()+600, '/');
+	_cookie('invite_hash', $hash, 600);
 
 	return '_dialogLoad({dialog_id:109});';
 }
@@ -493,7 +493,7 @@ function _user_invite_submit($DLG) {//принятие приглашения
 	if(!_userAppAccessCreate($r['app_id'], USER_ID, $r['user_id']))
 		jsonError('У вас уже есть доступ к приложению.');
 
-	setcookie('invite_submit', $hash, time()-1, '/');
+	_cookie('invite_submit', 'clear');
 
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=".$r['app_id']."

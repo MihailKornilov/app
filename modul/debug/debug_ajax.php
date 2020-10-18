@@ -13,7 +13,7 @@ switch(@$_POST['op']) {
 	case 'cookie_clear':
 		if(!empty($_COOKIE))
 			foreach($_COOKIE as $key => $val)
-				setcookie($key, '', time() - 3600, '/');
+				_cookie($key, 'clear');
 		jsonSuccess();
 		break;
 

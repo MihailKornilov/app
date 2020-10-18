@@ -38,9 +38,10 @@ define('YEAR_MON', strftime('%Y-%m'));
 define('TODAY', strftime('%Y-%m-%d'));
 define('TODAY_UNIXTIME', strtotime(TODAY));
 
-define('CODE', _txt(@$_COOKIE['code']));
-define('DEBUG', _num(@$_COOKIE['debug']));
-define('MIN', DEBUG ? '' : '.min');
+define('CODE', _txt(_cookie('code')));
+define('DEBUG', _num(_cookie('debug')));
+//define('MIN', DEBUG ? '' : '.min');
+define('MIN', DEBUG ? '' : '');
 
 define('URL', APP_HTML.'/index.php?'.TIME);
 define('AJAX', APP_HTML.'/ajax.php?'.TIME);
@@ -100,6 +101,27 @@ function _regFilter($v) {//проверка регулярного выраже�
 	if(preg_match($reg, $v))
 		return '';
 	return '/('.$v.')/iu';
+}
+
+function _cookie($key, $v=false, $time=2592000) {//установка, получение куков
+
+	//получение
+	if($v === false) {
+		if(empty($_COOKIE[$key]))
+			return '';
+		return $_COOKIE[$key];
+	}
+
+	//очистка
+	if($v == 'clear') {
+		setcookie($key, '', time() - 1, '/');
+		return true;
+	}
+
+
+	setcookie($key, $v, time() + $time, '/');
+
+	return true;
 }
 
 function _end($count, $o1, $o2, $o5=false) {

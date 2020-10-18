@@ -687,7 +687,7 @@ switch(@$_POST['op']) {
 				break;
 			default:
 				//неверный формат
-				setcookie('_attached', 2, time() + 3600, '/');
+				_cookie('_attached', 2, 3600);
 				exit;
 		}
 
@@ -721,13 +721,13 @@ switch(@$_POST['op']) {
 			$id = query_id($sql);
 
 			//успешно
-			setcookie('_attached', 1, time() + 3600, '/');
-			setcookie('_attached_id', $id, time() + 3600, '/');
+			_cookie('_attached', 1, 3600);
+			_cookie('_attached_id', $id, 3600);
 			exit;
 		}
 
 		//загрузить не удалось
-		setcookie('_attached', 3, time() + 3600, '/');
+		_cookie('_attached', 3, 3600);
 		exit;
 	case 'attach_get'://получение данных файла
 		if(!$id = _num($_POST['id']))
