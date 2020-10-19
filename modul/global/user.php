@@ -443,7 +443,7 @@ function _userInviteDlgOpen() {//автоматическое открытие �
 			return '';
 
 	//очистка куки приглашения
-	_cookie('invite_hash', 'clear');
+	_cookieDel('invite_hash');
 
 	//получение данных приглашения по хешу
 	$sql = "SELECT *
@@ -493,7 +493,7 @@ function _user_invite_submit($DLG) {//принятие приглашения
 	if(!_userAppAccessCreate($r['app_id'], USER_ID, $r['user_id']))
 		jsonError('У вас уже есть доступ к приложению.');
 
-	_cookie('invite_submit', 'clear');
+	_cookieDel('invite_submit');
 
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=".$r['app_id']."

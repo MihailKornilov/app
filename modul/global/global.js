@@ -92,20 +92,35 @@ var ZINDEX = 1000,
 
 		return send;
 	},
-	_cookie = function(name, value) {
+	_cookie = function(key, value) {
 		if(value !== undefined) {
 			var exdate = new Date();
 			exdate.setDate(exdate.getDate() + 1);
-			document.cookie = name + '=' + value + '; path=/; expires=' + exdate.toGMTString();
+			document.cookie =
+				key + '=' + value + '; ' +
+				'path=/; ' +
+				'samesite=none; ' +
+				'secure; ' +
+				'expires=' + exdate.toGMTString();
 			return '';
 		}
 		var r = document.cookie.split('; ');
 		for(var i = 0; i < r.length; i++) {
 			var k = r[i].split('=');
-			if(k[0] == name)
+			if(k[0] == key)
 				return k[1];
 		}
 		return undefined;
+	},
+	_cookieDel = function(key) {//удаление cookie
+		var exdate = new Date();
+		exdate.setDate(exdate.getDate() + 1);
+		document.cookie =
+			key + '=; ' +
+			'path=/; ' +
+			'samesite=none; ' +
+			'secure; ' +
+			'expires=Thu, 01 Jan 1970 00:00:01 GMT';
 	},
 	_toSpisok = function(s) {
 		var a=[];

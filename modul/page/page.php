@@ -262,7 +262,7 @@ function _pasDefine() {//установка флага включения упр
 							$pas = 0;
 
 	if(!$pas)
-		_cookie('page_setup', 'clear');
+		_cookieDel('page_setup');
 
 	define('PAS', APP_ID && $pas ? $page_id : 0);
 //	define('PAS', 1);//для настройки страниц, которые доступны всем приложениям
@@ -703,8 +703,34 @@ function PHP12_pin_dialog_open() {
 
 
 
-function _page_div() {//todo тест
+function _page_div($issa=false) {//todo тест
+	if(!SA && !$issa)
+		return '';
 
+
+	if(@$_GET['set'])
+		_cookie('AAA', 122);
+
+	if(@$_GET['clear']) {
+		_cookieDel('AAA');
+	}
+
+
+
+	return
+	'<a href="'.URL.'&set=1">set</a>'.
+	'<br>'.
+	'<a onclick="_cookie(\'AAA\',300);alert(\'setted\')">JS set</a>'.
+	'<br>'.
+	'<br>'.
+	'<a href="'.URL.'&clear=1">clear</a>'.
+	'<br>'.
+	'<a onclick="_cookieDel(\'AAA\');alert(\'deleted\')">JS del</a>'.
+	'<br>'.
+	'<br>'.
+	'<a href="'.URL.'" class="b">UPD</a>'.
+	'<br>'.
+	_pr($_COOKIE);
 
 	return '';
 

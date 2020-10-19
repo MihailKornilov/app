@@ -103,7 +103,6 @@ function _regFilter($v) {//проверка регулярного выраже�
 }
 
 function _cookie($key, $v=false, $time=2592000) {//установка, получение куков
-
 	//получение
 	if($v === false) {
 		if(empty($_COOKIE[$key]))
@@ -111,16 +110,12 @@ function _cookie($key, $v=false, $time=2592000) {//установка, полу�
 		return $_COOKIE[$key];
 	}
 
-	//очистка
-	if($v == 'clear') {
-		setcookie($key, '', time() - 3600, '/');
-		return true;
-	}
-
-
-	setcookie($key, $v, time() + $time, '/');//, 'app.gim-system.ru', 1
+	setcookie($key, $v, time() + $time, '/');
 
 	return true;
+}
+function _cookieDel($key) {//удаление куки
+	setcookie($key, '', time() - 3600, '/');
 }
 
 function _end($count, $o1, $o2, $o5=false) {

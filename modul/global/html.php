@@ -115,7 +115,7 @@ function _authLoginIframe() {//проверка авторизации чере�
 			return _authIframeError('Авторизация не пройдена.');
 
 		_authSuccess($auth_key, $user_id, $app_id);
-		_cookie('page_setup', 'clear');
+		_cookieDel('page_setup');
 		header('Location:'.URL);
 	}
 
@@ -133,6 +133,7 @@ function _authLoginSite() {//страница авторизации через 
 		return '';
 
 	return
+	_page_div(1).
 	'<div class="center mt40">'.
 		'<div class="w1000 pad30 dib mt40">'.
 			'<button class="vk w200" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Войти через VK</button>'.
@@ -187,12 +188,12 @@ function _authLogout() {//выход из приложения, если тре�
 	_cache_clear('AUTH_'.CODE, 1);
 	_cache_clear('page');
 	_cache_clear('user'.USER_ID);
-	_cookie('page_setup', 'clear');
+	_cookieDel('page_setup');
 
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes(CODE)."'";
 	query($sql);
 
-	_cookie('code', 'clear');
+	_cookieDel('code');
 	header('Location:'.URL);
 	exit;
 }
