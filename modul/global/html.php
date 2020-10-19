@@ -133,7 +133,6 @@ function _authLoginSite() {//страница авторизации через 
 		return '';
 
 	return
-	_page_div(1).
 	'<div class="center mt40">'.
 		'<div class="w1000 pad30 dib mt40">'.
 			'<button class="vk w200" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Войти через VK</button>'.
