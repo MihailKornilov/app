@@ -65,13 +65,11 @@ function _setting() {//установка констант-настроек
 		_cache_set($key, $arr, 1);
 	}
 
-	if(empty($arr)) {
-		echo 'Global SETTING yok.';
-		exit;
-	}
+	if(empty($arr))
+		die('Global SETTING yok.');
 
 	//версия скриптов
-	define('SCRIPT', _num($arr['SCRIPT']).'1'.(LOCAL ? rand(1, 9999) : ''));
+	define('SCRIPT', _num($arr['SCRIPT']).(LOCAL ? rand(1, 99999) : ''));
 	//версия кеша JS - app0.js
 	define('JS_CACHE', _num($arr['JS_CACHE']));
 	//глобальный доступ к приложению

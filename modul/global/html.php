@@ -2,15 +2,14 @@
 function _face() {//определение, как загружена страница: iframe или сайт
 	$face = 'site';
 
-	if(@$_COOKIE['face'] == 'iframe')
+	if(_cookie('face') == 'iframe')
 		$face = 'iframe';
 	if(!empty($_GET['referrer']))
 		$face = 'iframe';
 
 	_cookie('face', $face);
 
-//	define('FACE', $face);
-	define('FACE', 'site');
+	define('FACE', $face);
 	define('SITE', FACE == 'site' ? 'site' : '');
 	define('IFRAME', FACE == 'iframe');
 }

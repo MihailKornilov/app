@@ -7,6 +7,7 @@ var FB,          //фрейм VK для изменения высоты $('body'
 			return;
 
 		//если текущее значение не совпадает, то установка и перезагрузка страницы
+		//window != window.top || document != top.document || self.location != top.location
 		var face = window == window.top ? 'site' : 'iframe';
 
 		if(_cookie('face') != face) {

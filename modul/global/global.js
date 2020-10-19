@@ -113,8 +113,6 @@ var ZINDEX = 1000,
 		return undefined;
 	},
 	_cookieDel = function(key) {//удаление cookie
-		var exdate = new Date();
-		exdate.setDate(exdate.getDate() + 1);
 		document.cookie =
 			key + '=; ' +
 			'path=/; ' +
