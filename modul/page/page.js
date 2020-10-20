@@ -1,3 +1,5 @@
+/*
+
 var FB,          //фрейм VK для изменения высоты $('body')
 	FBH_CUR = 0, //текущая высота врейма, установленная в последний раз
 	VK_SCROLL = 0,
@@ -94,8 +96,9 @@ var FB,          //фрейм VK для изменения высоты $('body'
 		FBH_CUR = h;
 		VK.callMethod('resizeWindow', 1000, h);
 	},
+*/
 
-	_authVk = function(but) {//авторазация через VK
+var _authVk = function(but) {//авторазация через VK
 		but = $(but);
 		but.addClass('_busy');
 
@@ -140,4 +143,4 @@ var FB,          //фрейм VK для изменения высоты $('body'
 		});
 	};
 
-	$(document).ready(_faceTest);
+//	$(document).ready(_faceTest);

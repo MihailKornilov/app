@@ -424,13 +424,13 @@ function _userInviteCookieSave() {//сохранение кода приглаш
 	if(!$hash = _txt(@$_GET['invite']))
 		return;
 
+	if(USER_ID)
+		return;
+
 	$sql = "SELECT COUNT(*)
 			FROM `_user_access`
 			WHERE `invite_hash`='".$hash."'";
 	if(!query_value($sql))
-		return;
-
-	if(USER_ID)
 		return;
 
 	_cookie('invite_hash', $hash);

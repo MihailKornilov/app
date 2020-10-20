@@ -51,7 +51,9 @@ function _isMobile() {//проверка: мобильная версия сай
 function _auth() {//получение данных об авторизации из кеша
 	$key = 'AUTH_'.CODE;
 
-	if(!$r = _cache_get($key, 1)) {
+	$r = _cache_get($key, 1);
+
+	if(!$r) {
 		$sql = "SELECT *
 				FROM `_user_auth`
 				WHERE `code`='".addslashes(CODE)."'
@@ -83,8 +85,9 @@ function _auth() {//получение данных об авторизации 
 
 	define('APP_PARENT', $PID);
 	define('APP_IS_PID', APP_ID && APP_ID != APP_PARENT);//приложение наследует родителя
-	define('APP_ACCESS_ENTER', _num(@$r['access_enter']));
+	define('USER_ACCESS', _num(@$r['access_enter']));
 }
+/*
 function _authLoginIframe() {//проверка авторизации через iframe
 	if(!IFRAME)
 		return '';
@@ -123,30 +126,9 @@ function _authLoginIframe() {//проверка авторизации чере�
 
 	return '';
 }
-function _authLoginSite() {//страница авторизации через сайт
-	if(!defined('IFRAME_AUTH_ERROR'))
-		define('IFRAME_AUTH_ERROR', 0);
-	if(CODE)
-		return '';
-	if(!SITE)
-		return '';
+*/
 
-	return
-	'<div class="center mt40">'.
-		'<div class="w1000 pad30 dib mt40">'.
-			'<button class="vk w200" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Войти через VK</button>'.
-			'<br>'.
-			'<button class="vk w200 grey mt10 dialog-open" val="dialog_id:99">Войти по логину и паролю</button>'.
-			'<br>'.
-			'<button class="vk small green mt10 dialog-open" val="dialog_id:98">Регистрация</button>'.
-		'</div>'.
-	'</div>'.
-	_pageScript(98, array()).
-(!LOCAL ?
-	'<script src="https://vk.com/js/api/openapi.js?152"></script>'.
-	'<script>VK.init({apiId:'.AUTH_APP_ID.'});</script>'
-: '');
-}
+
 function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной авторизации
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes($code)."'";
 	query($sql);
@@ -342,45 +324,28 @@ function _pin133($dialog, $cmp) {//пользователь вводит пин-
 
 
 /* ---=== СОДЕРЖАНИЕ ===--- */
-function _html() {
+function _html($title, $content) {
 	return
 	'<!DOCTYPE html>'.
 	'<html lang="ru">'.
 
 	'<head>'.
 		'<meta http-equiv="content-type" content="text/html; charset=utf-8" />'.
-//		'<meta http-equiv="content-type" content="text/html; charset=windows-1251" />'.
-		'<title>'._html_title(true).'</title>'.
+		'<title>'.$title.'</title>'.
 		'<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">'.
 		_html_script().
 	'</head>'.
 
-	'<body class="'.SITE.'">'.
-		(IFRAME ? '<iframe id="frame0" name="frame0"></iframe>' : '').
+	'<body class="site">'.//'.SITE.'
+//		(IFRAME ? '<iframe id="frame0" name="frame0"></iframe>' : '').
 
-		_authLoginIframe().
-		_authLoginSite().
+		$content.
 
-		_html_hat().
-		_html_sa_access_msg().
-		_pasMenu().
+//		_pasMenu().
 //		_pageInfo().
-		_app_content().
-
-//	(SA ? _pr($_COOKIE) : '').
 
 		_debug().
 	'</body></html>';
-}
-function _html_title($nameOnly=false) {
-	if(!CODE)
-		return 'Авторизация';
-	if(!APP_ID)
-		return 'Мои приложения';
-
-	return
-		($nameOnly ? '' : '<span class="mr5">'._imageHtml(_app(APP_ID, 'img'), 26, 26, false, false).'</span>')
-		._app(APP_ID, 'name');
 }
 function _html_script() {//скрипты и стили
 	//глобальная ссылка для отправки запросов ajax
@@ -393,10 +358,12 @@ function _html_script() {//скрипты и стили
 	//Отслеживание ошибок в скриптах
 (SA ? '<script src="js/errors.js"></script>' : '').
 
+/*
 (IFRAME && !LOCAL ?
 	'<script src="https://vk.com/js/api/xd_connection.js?2"></script>'.
 	'<script>VK.init(function() {},function() {},"5.60");</script>'
 : '').
+*/
 
 	'<script>'.
 		'var URL="'.URL.'",'.
@@ -410,7 +377,6 @@ function _html_script() {//скрипты и стили
 
 	'<script src="js/jquery-3.2.1.min.js?3"></script>'.
 	'<script src="js/autosize.min.js?5"></script>'.
-	'<script src="js/highcharts.js"></script>'.
 
 	//Установка начального значения таймера JS
 	(SA ? '<script>var TIME=(new Date()).getTime();</script>' : '').
@@ -425,6 +391,8 @@ function _html_script() {//скрипты и стили
 (CODE ?
 	'<link rel="stylesheet" type="text/css" href="css/jquery-ui'.MIN.'.css?3" />'.
 	'<script src="js/jquery-ui.min.js?3"></script>'.
+
+	'<script src="js/highcharts.js"></script>'.
 
 	'<script src="js/jquery.mjs.nestedSortable'.MIN.'.js?2"></script>'.
 
@@ -451,12 +419,6 @@ function _html_script() {//скрипты и стили
 	_debug('style');
 }
 function _html_hat() {//верхняя строка приложения для сайта
-	if(IFRAME_AUTH_ERROR)
-		return '';
-	if(!CODE)
-		return '';
-	if(!SITE)
-		return '';
 	if(!defined('USER_NAME_FAM')) {
 		header('Location:'.URL.'&logout');
 		exit;
@@ -464,12 +426,20 @@ function _html_hat() {//верхняя строка приложения для 
 
 	$local = LOCAL || !SA && !APP_ACCESS ? ' class="local"' : '';
 
+	$title = 'Мои приложения';
+	if(APP_ID)
+		$title =
+			'<span class="mr5">'.
+				_imageHtml(_app(APP_ID, 'img'), 26, 26, false, false).
+			'</span>'.
+			_app(APP_ID, 'name');
+
 	return
 	'<div id="hat-prel">'.
 
 		'<div id="hat"'.$local.'>'.
 			'<div id="hat-center">'.
-				'<a href="'.URL.'" class="hat-title">'._html_title().'</a>'.
+				'<a href="'.URL.'" class="hat-title">'.$title.'</a>'.
 
 				'<div id="hat-user" class="'._dn(!PAS, 'ispas').'">'.
 					'<div class="uname">'.USER_NAME.'</div>'.
@@ -650,7 +620,6 @@ function _app($app_id, $i='all') {//Получение данных о прил�
 					WHERE `id`=".$image_id;
 			$arr['img'] = query_assoc($sql);
 		}
-
 
 		_cache_set($key, $arr, 1);
 	}
@@ -909,23 +878,6 @@ function PHP12_app_archive() {//список приложений, отправ�
 	}
 
 	return $send;
-}
-function _app_content() {//центральное содержание
-	if(IFRAME_AUTH_ERROR)
-		return '';
-	if(!CODE)
-		return '';
-	if(!USER_ID)
-		return '';
-
-	$page_id = _page('cur');
-	_userActive($page_id);
-
-	return
-	'<div id="_content" class="block-content-page '.SITE.'">'.
-		_elem97print($page_id).//независимая кнопка
-		_pageShow($page_id).
-	'</div>';
 }
 
 function _contentMsg($msg='') {

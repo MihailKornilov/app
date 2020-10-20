@@ -8,7 +8,7 @@ function _debug($i='') {
 
 	global $SQL_TIME, $SQL_QUERY, $SQL_QUERY_T;
 
-	$goFace = SITE ? 'iframe' : 'site';
+//	$goFace = SITE ? 'iframe' : 'site';
 	$send =
 		'<div id="debug-footer">'.
 			'<a class="debug_toggle'.(DEBUG ? ' on' : '').'">'.(DEBUG ? 'От' : 'В').'ключить Debug</a> :: '.
@@ -18,7 +18,7 @@ function _debug($i='') {
 			'sql <b>'.count($SQL_QUERY).'</b> ('.round($SQL_TIME, 3).') :: '.
 			'php '.round(microtime(true) - TIME, 3).' :: '.
 			'js <em></em>'.
-   (LOCAL ? ' :: <a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
+//   (LOCAL ? ' :: <a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
 		'</div>'.
 		'<script src="modul/debug/debug'.MIN.'.js?'.SCRIPT.'"></script>';
 

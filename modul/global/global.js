@@ -169,7 +169,7 @@ var ZINDEX = 1000,
 		$('#_msg').remove();
 		$('body').append('<div id="_msg">' + txt + '</div>');
 		$('#_msg')
-			.css('top', $(this).scrollTop() + 200 + VK_SCROLL)
+			.css('top', $(this).scrollTop() + 200)// + VK_SCROLL
 			.css('left', $(document).width() / 2 - 200)
 			.delay(1200)
 			.fadeOut(400, function() {

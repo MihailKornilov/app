@@ -250,6 +250,92 @@ function _pageSaForSelect($arr, $child) {//страницы SA для select
 
 }
 
+function _pageIframe() {//показ страницы, если приложение было запущено через фрейм в ВК
+	if(empty($_GET['referrer']))
+		return;
+
+	die(_html('iframe', _blockHtml('page', 20)));
+}
+function _pageAuth() {//страница авторизации
+	if(USER_ID)
+		return;
+
+	$content =
+	'<div class="center mt40">'.
+		'<div class="w1000 pad30 dib mt40">'.
+			'<button class="vk w200" onclick="_authVk'.(LOCAL ? 'Local' : '').'(this)">Войти через VK</button>'.
+			'<br>'.
+			'<button class="vk w200 grey mt10 dialog-open" val="dialog_id:99">Войти по логину и паролю</button>'.
+			'<br>'.
+			'<button class="vk small green mt10 dialog-open" val="dialog_id:98">Регистрация</button>'.
+		'</div>'.
+	'</div>'.
+	_pageScript(98).
+(!LOCAL ?
+	'<script src="https://vk.com/js/api/openapi.js?152"></script>'.
+	'<script>VK.init({apiId:'.AUTH_APP_ID.'});</script>'
+: '');
+
+	die(_html('Авторизация', $content));
+}
+function _pageGlobalDeny() {//страница (19) с сообщением о тех-работах
+	if(SA)
+		return;
+	if(APP_ACCESS)
+		return;
+
+	$CNT = '<div id="_content">'._blockHtml('page', 19).'</div>';
+
+	die(_html('Тех-работы', $CNT));
+}
+function _pageAppUserAccess() {//страница (105): доступ пользователю в приложение запрещён
+	if(SA)
+		return;
+	if(!APP_ID)
+		return;
+	if(USER_ACCESS)
+		return;
+	if(_page('cur') == 98)
+		return;
+
+	$app = _app(APP_ID);
+
+	$CNT =
+		_html_hat().
+		'<div id="_content">'._blockHtml('page', 105).'</div>';
+
+	die(_html($app['name'], $CNT));
+}
+function _pageContent() {//приложение в работе
+	if(!USER_ID)
+		return '';
+	if(!APP_ID)
+		return '';
+
+	$page_id = _page('cur');
+	_userActive($page_id);
+
+	$app = _app(APP_ID);
+
+	$CNT =
+	_html_sa_access_msg().
+	_html_hat().
+	'<div id="_content" class="block-content-page site">'.
+		_elem97print($page_id).//независимая кнопка
+		_pageShow($page_id).
+	'</div>';
+
+	die(_html($app['name'], $CNT));
+}
+function _page98() {//список приложений пользователя
+	$CNT =
+		_html_hat().
+		'<div id="_content">'._blockHtml('page', 98).'</div>'.
+		_pageScript(98);
+
+	die(_html('Мои приложения', $CNT));
+}
+
 function _pasDefine() {//установка флага включения управления страницей PAS: page_setup
 	$pas = 0;
 
@@ -268,8 +354,8 @@ function _pasDefine() {//установка флага включения упр
 //	define('PAS', 1);//для настройки страниц, которые доступны всем приложениям
 }
 function _pasMenu() {//строка меню управления страницей
-	if(IFRAME_AUTH_ERROR)
-		return '';
+//	if(IFRAME_AUTH_ERROR)
+//		return '';
 	if(!PAS)
 		return '';
 
@@ -289,8 +375,8 @@ function _pasMenu() {//строка меню управления страниц
 function _pageInfo() {//информация о странице
 	if(!SA)
 		return '';
-	if(IFRAME_AUTH_ERROR)
-		return '';
+//	if(IFRAME_AUTH_ERROR)
+//		return '';
 	if(!PAS)
 		return '';
 
@@ -430,14 +516,6 @@ function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохране�
 
 
 function _pageShow($page_id) {
-	//ведутся технические работы
-	if(!SA && !@APP_ACCESS)
-		$page_id = 19;
-
-	//нет доступа в приложение
-	if(!SA && APP_ID && !APP_ACCESS_ENTER)
-		$page_id = 105;
-
 	//требуется ввод пин-кода
 	if(PIN_ENTER && $page_id != 98)
 		$page_id = 13;
@@ -454,7 +532,7 @@ function _pageShow($page_id) {
 		return _document();
 
 	//если доступ в приложение есть, но попали на страницу о недоступности, то переход на стартовую страницу
-	if($page_id == 105 && APP_ID && APP_ACCESS_ENTER)
+	if($page_id == 105 && APP_ID && USER_ACCESS)
 		$page_id = _page('def');
 
 	if(!$page = _page($page_id))
@@ -480,7 +558,7 @@ function _pageShow($page_id) {
 	_page_div().
 	_pageScript($page_id, $prm);
 }
-function _pageScript($page_id, $prm) {
+function _pageScript($page_id, $prm=array()) {
 
 	$send = 'var BLKK='._json(_BE('block_arr', 'page', $page_id)).';'.
 			'var ELMM='._json(_elmJs('page', $page_id, $prm)).';';

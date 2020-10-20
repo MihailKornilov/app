@@ -91,11 +91,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		}, o);
 
 		var DIALOG_NUM = $('._dialog').length,
-			editShow = !DIALOG_NUM && o.setup_access && _cookie('face') == 'site',
+			editShow = !DIALOG_NUM && o.setup_access,// && _cookie('face') == 'site',
 			html =
 			'<div class="_dialog-back"></div>' +
 			'<div class="_dialog">' +
-				'<iframe class="frameD" name="frameD' + DIALOG_NUM + '"></iframe>' +
+//				'<iframe class="frameD" name="frameD' + DIALOG_NUM + '"></iframe>' + //для изменения высоты фрейма в ВК
 				'<div class="head ' + o.color + '">' +
 					'<div class="close fr curP"><a class="icon icon-del wh pl"></a></div>' +
 					'<div class="submit fr curP' + _dn(o.butSubmit) + '"><a class="icon icon-ok wh pl"></a></div>' +
@@ -123,7 +123,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			//функция, которая выполняется при отмене или закрытии диалога
 			closeFunc = function() {},
 			w2 = Math.round(width / 2), //ширина/2. Для определения положения по центру
-			vkScroll = VK_SCROLL > 110 ? VK_SCROLL - 110 : 0,//корректировка скролла VK
+			vkScroll = 0, //VK_SCROLL > 110 ? VK_SCROLL - 110 : 0,//корректировка скролла VK
 			BUSY_OBJ,
 			BUSY_CLS;
 
@@ -208,8 +208,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 
 
-		_fbhs();
-		window['frameD' + DIALOG_NUM].onresize = _fbhs;
+//		_fbhs();
+//		window['frameD' + DIALOG_NUM].onresize = _fbhs;
 
 		function dialogClose() {
 			DBACK.remove();
