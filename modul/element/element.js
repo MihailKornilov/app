@@ -826,6 +826,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		switch(res.action_id) {
 			//обновление страницы
 			case 1:
+				if(!$('#_content').length) {
+					location.reload();
+					break;
+				}
 				$('#_content').html(res.content);
 				break;
 			//переход на страницу
