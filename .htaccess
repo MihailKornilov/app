@@ -1,2 +1,2 @@
 Options All -Indexes
-Header always edit Set-Cookie ^(.*)$ "$1; HttpOnly; Secure; SameSite=None"
+#Header always edit Set-Cookie ^(.*)$ "$1; HttpOnly; Secure; SameSite=None"

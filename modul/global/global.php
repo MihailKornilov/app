@@ -109,7 +109,16 @@ function _cookie($key, $v=false, $time=2592000) {//установка, полу�
 	}
 
 	setcookie($key, $v, time() + $time, '/');
-
+/*
+	setcookie($key, $v, array(
+		'expires' => time()  + $time,
+//		'domain' => '.example.com',
+//		'httponly' => true,
+		'path' => '/'
+//		'samesite' => 'None',
+//		'secure' => true
+	));
+*/
 	return true;
 }
 function _cookieDel($key) {//удаление куки

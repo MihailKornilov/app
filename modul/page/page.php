@@ -800,6 +800,8 @@ function _page_div($issa=false) {//todo тест
 	'<br>'.
 	'<a onclick="_cookie(\'AAA\',300);alert(\'setted\')">JS set</a>'.
 	'<br>'.
+	'<a onclick="alert(_cookie(\'AAA\'))">JS get</a>'.
+	'<br>'.
 	'<br>'.
 	'<a href="'.URL.'&clear=1">clear</a>'.
 	'<br>'.

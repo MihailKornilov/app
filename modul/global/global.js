@@ -99,8 +99,8 @@ var ZINDEX = 1000,
 			document.cookie =
 				key + '=' + value + '; ' +
 				'path=/; ' +
-				'samesite=none; ' +
-				'secure; ' +
+//				'samesite=none; ' +
+//				'secure; ' +
 				'expires=' + exdate.toGMTString();
 			return '';
 		}
@@ -116,8 +116,8 @@ var ZINDEX = 1000,
 		document.cookie =
 			key + '=; ' +
 			'path=/; ' +
-			'samesite=none; ' +
-			'secure; ' +
+//			'samesite=none; ' +
+//			'secure; ' +
 			'expires=Thu, 01 Jan 1970 00:00:01 GMT';
 	},
 	_toSpisok = function(s) {
