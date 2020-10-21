@@ -791,11 +791,14 @@ function _page_div($issa=false) {//todo тест
 
 	if(@$_GET['clear']) {
 		_cookieDel('AAA');
+		_cookieDel('debug');
 	}
 
 
 
 	return
+	'debug='._cookie('debug').
+	'<br>'.
 	'<a href="'.URL.'&set=1">set</a>'.
 	'<br>'.
 	'<a onclick="_cookie(\'AAA\',300);alert(\'setted\')">JS set</a>'.
@@ -805,7 +808,7 @@ function _page_div($issa=false) {//todo тест
 	'<br>'.
 	'<a href="'.URL.'&clear=1">clear</a>'.
 	'<br>'.
-	'<a onclick="_cookieDel(\'AAA\');alert(\'deleted\')">JS del</a>'.
+	'<a onclick="_cookieDel(\'AAA\');_cookieDel(\'debug\');alert(\'deleted\')">JS del</a>'.
 	'<br>'.
 	'<br>'.
 	'<a href="'.URL.'" class="b">UPD</a>'.

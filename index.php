@@ -11,7 +11,7 @@ echo '<br>';
 echo 'CODE='.CODE;
 echo '<br>';
 */
-//_cookieDel('code');
+//_cookieDel('debug');
 
 //установка глобальных настроек - констант: SCRIPT, JS_CACHE, APP_ACCESS
 _setting();
