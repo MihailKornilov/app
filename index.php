@@ -1,18 +1,6 @@
 <?php
 require_once 'modul/global/global.php';
 
-/*
-echo 'COOKIE:';
-echo '<br>';
-echo _pr($_COOKIE);
-echo '<br>';
-echo '<br>';
-
-echo 'CODE='.CODE;
-echo '<br>';
-*/
-//_cookieDel('debug');
-
 //установка глобальных настроек - констант: SCRIPT, JS_CACHE, APP_ACCESS
 _setting();
 
@@ -21,20 +9,6 @@ _setting();
 
 //проверка авторизации. Установка констант: USER_ID, APP_ID
 _auth();
-
-/*
-echo 'USER_ID='.USER_ID;
-echo '<br>';
-echo 'APP_ID='.APP_ID;
-echo '<br>';
-echo 'APP_PARENT='.APP_PARENT;
-echo '<br>';
-echo 'APP_IS_PID='.APP_IS_PID;
-echo '<br>';
-echo 'USER_ACCESS='.USER_ACCESS;
-echo '<br>';
-*/
-
 
 //выход, если требуется
 _authLogout();
