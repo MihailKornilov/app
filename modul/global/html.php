@@ -339,9 +339,8 @@ function _html($title, $content) {
 	'<body class="site">'.//'.SITE.'
 //		(IFRAME ? '<iframe id="frame0" name="frame0"></iframe>' : '').
 
-		$content.
+	$content.
 
-//		_pasMenu().
 //		_pageInfo().
 
 		_debug().
