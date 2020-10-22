@@ -103,9 +103,14 @@ function _elem85mass($ell_id, $v, $send) {//получение значений 
 			}
 			$sp = $sp[$col];
 		}
+		if(is_array($sp))
+			if(!empty($sp['txt_1']))
+				$sp = $sp['txt_1'];
+			else
+				$sp = '- значение отсутствует -';
 		$send[] = array(
 			'id' => $id,
-			'title' => is_array($sp) ? $sp['txt_1'] : $sp
+			'title' => $sp
 		);
 	}
 
