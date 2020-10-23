@@ -1364,7 +1364,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!BL)
 			return;
 
-		var V = _elemUidsJS(act.v1, AG.unit);
+		var V = _elemUidsJS(act.v1);
+
+		if(V === false)
+			throw new Error('Значение не получено.');
 
 		//вставка в элемент, если есть
 		if(BL.elem_id) {
@@ -1729,12 +1732,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		return arr;
 	},
-	_elemUidsJS = function(ids, unit) {//получение значения записи по идентификаторам элементов (аналог _elemUids в PHP)
-		var txt = '';
-		_forN(ids.split(','), function(id, n) {
-			//todo временно
-			if(!n)
+	_elemUidsJS = function(ids) {//получение значения записи по идентификаторам элементов (аналог _elemUids в PHP)
+		ids += '';
+
+		var txt = false,
+			unit = AG,
+			split = ids.split(',');
+
+		_forN(split, function(id, n) {
+			if(unit[id]) {
+				unit = unit[id];
 				return;
+			}
 
 			var EL = ELMM[id];
 			if(!EL)
@@ -2695,7 +2704,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			multi:el.num_11,
 			func:function(v, sp) {
 				if(sp && sp.sp)
-					AG.unit = sp.sp;
+					AG[el.id] = sp.sp;
 				_ELM_ACT(el, v);
 			},
 			funcWrite:function(v, t) {
@@ -2728,6 +2737,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				});
 			};
 		$(ATTR_CMP(el.id))._select(o);
+
+		//вставка выбранного значения в глобальную переменную AG
+		var sel_id = _num(_attr_cmp(el.id).val());
+		if(!sel_id)
+			return;
+
+		_forIn(el.vvv, function(sp) {
+			if(sp.id != sel_id)
+				return;
+			AG[el.id] = sp.sp;
+			return false;
+		});
 	},
 
 	//[31] Выбор нескольких значений галочками
@@ -3832,7 +3853,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					busy_obj:_attr_cmp(el.id, 1)
 				};
 				_post(send, function(res) {
-					AG.unit = res.unit;
+					AG[el.id] = res.unit;
 					div.find('.un-html').html(res.html);
 					div._dn(1);
 					_attr_cmp(el.id, 1)._dn();
