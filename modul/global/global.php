@@ -711,6 +711,9 @@ function _emptyMinRed($msg) {
 function _emptyRed10($msg) {
 	return '<div class="_empty red mar10">'.$msg.'</div>';
 }
+function _emptyMinRed10($msg) {
+	return '<div class="_empty min red mar10">'.$msg.'</div>';
+}
 
 function _defined($key) {//проверка наличия константы. Если нет, то создание
 	if(defined($key))

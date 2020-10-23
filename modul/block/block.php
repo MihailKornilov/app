@@ -719,8 +719,10 @@ function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины
 	}
 	return 0;
 }
-function _blockDlgId($block_id) {//получение id диалога по блоку
+function _blockDlgId($block_id, $obj_name='') {//получение id диалога по блоку
 	if(!$BL = _BE('block_one', $block_id))
+		return 0;
+	if($obj_name && $obj_name != $BL['obj_name'])
 		return 0;
 
 	switch($BL['obj_name']) {

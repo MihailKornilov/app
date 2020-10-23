@@ -5151,12 +5151,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			vAdd({});
 
 		function vAdd(v) {
-			v.id = _num(v.id);
 			_forN(vvv.cols, function(sp) {
 				if(v[sp.col] === undefined)
 					v[sp.col] = '';
 			});
-			html = 	'<dd class="over1" val="' + v.id + '">' +
+			html = 	'<dd class="over1">' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 center">' +
 								'<div class="icon icon-move pl"></div>';
@@ -5246,7 +5245,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		_forEq(_attr_el(el.id).find('dd'), function(dd) {
 
 			var inp = [];
-			inp.push(dd.attr('val'));
 			_forEq(dd.find('.el95inp'), function(sp) {
 				inp.push(sp.val());
 			});
@@ -5260,9 +5258,15 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!obj.unit.id)
 			return;
 
-		var html = '<dl></dl>' +
+		var ATR_EL = _attr_el(el.id),
+			CD = ATR_EL.find('.calc-div');
+
+		if(!CD.length)
+			return;
+
+		var DLG_ID = _num(CD.attr('val')),//диалог, по которому будут устанавливаться колонки
+			html = '<dl></dl>' +
 				   '<div class="fs15 clr9 pad10 center over5 curP">Добавить колонку</div>',
-			ATR_EL = _attr_el(el.id),
 			DL = ATR_EL.append(html).find('dl'),
 			CALC_DIV = ATR_EL.find('.calc-div'),//div, в котором располагается визуальный подсчёт ячеек
 			CALC_W = _num(CALC_DIV.html()),//изначальная ширина блока, в котором размещена таблица
@@ -5281,7 +5285,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			}
 		});
 
-		if(!vvv)
+		if(!vvv.length)
 			vAdd();
 		else
 			_forIn(vvv, vAdd);
@@ -5301,7 +5305,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL.append(
 				'<dd class="ov7 pt10 pb5 line-b1">' +
 					'<div class="el95w bg4" style="width:' + v.w + 'px;min-height:10px;margin-left:35px">' +
-						'<div class="el95colname' + _dn(obj.unit.num_2) + '">' +
+						'<div class="el95colname' + _dn(_num(obj.unit.num_2)) + '">' +
 							'<input type="text"' +
 								  ' class="colname w100p bg4 center fs14 clr15"' +
 								  ' placeholder="имя колонки"' +
@@ -5311,7 +5315,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					'</div>' +
 					'<table class="bs5 w100p">' +
 						'<tr><td class="w25 r topi">' +
-								'<b class="bnum fs15 clr9">' + NUM++ + '</b>:' +
+								'<b class="bnum fs15 clr9">' + (NUM++) + '</b>:' +
 							'<td class="w175">' +
 								'<input type="hidden" class="el95type" value="' + v.type + '">' +
 							'<td class="w50 el95tdcol">' +
@@ -5340,7 +5344,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							var t = $(this);
 							_dialogLoad({
 								dialog_id:30,
-								dss:obj.unit.num_1,
+								dss:DLG_ID,
 								busy_obj:t,
 								func_open:function(res, D) {
 									D.content.find('.el37u').click(function() {
@@ -5355,6 +5359,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					}
 
 					switch(v.type) {
+						case 0:
+							DD.find('.el95tdcol').html('');
+							CNT.html('');
+							break;
 						case 1:
 							CNT.html('<input type="text" class="el95v w250" placeholder="напишите текст" value="' + v.v + '">')
 								.find('input').focus();
@@ -5368,7 +5376,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								._selem({
 									width:250,
 									placeholder:'выберите содержание списка',
-									dss:obj.unit.num_1,
+									dss:DLG_ID,
 									title:v.title
 								});
 							break;
@@ -5384,7 +5392,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					{id:3,title:'Выпадающий список',content:'Выпадающий список<div class="fs12 clr2">Выбор значений из выпадающего списка</div>'}
 				],
 				func:function(id) {
-					v.type = id;
+					v.type = _num(id);
 					colChange();
 				}
 			});

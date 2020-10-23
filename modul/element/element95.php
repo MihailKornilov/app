@@ -1,11 +1,11 @@
 <?php
 
-/* [95] Быстрое формирование списка */
+/* [95] Быстрое формирование списка
+	Диалог, в который вставлен этот элемент, требует указания родительского диалога
+*/
 
-/* Структура элемента */
 function _element95_struct($el) {
 	return array(
-		'num_1'   => _num($el['num_1']),//[24] список
 		'num_2'   => _num($el['num_2']),//[1] показывать имена колонок
 		'txt_1'   => $el['txt_1'],      //[8] текст кнопки добавления
 		'txt_2'   => $el['txt_2']       //[12] данные колонок в формате JSON
@@ -53,7 +53,7 @@ function _element95_vvv($el, $prm) {
 	return $send;
 }
 function _element95_mass($el, $prm) {//данные для редактирования
-	if(!$DLG_INS = _dialogQuery($el['num_1']))
+//	if(!$DLG_INS = _dialogQuery($el['num_1']))
 		return array();
 	if(!$tab = $DLG_INS['table_name_1'])
 		return array();
@@ -113,10 +113,10 @@ function _elem95_spisok($elem_ids, $v='', $ids=0) {//получение данн
 		return array();
 	if(!$DLG = _dialogQuery($dlg_id))
 		return array();
-	if(!$col = _elemCol($elem_id))
+	if(!$col = _elemCol($DLG['spisok_elem_id']))
 		return array();
 
-	$sql = "SELECT *,".$col." `title`
+	$sql = "SELECT *
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
 	".($v ? " AND `".$col."` LIKE '%".addslashes($v)."%'" : '')."
@@ -128,9 +128,29 @@ function _elem95_spisok($elem_ids, $v='', $ids=0) {//получение данн
 
 	$arr = _spisokInclude($arr);
 
+	if(!$elT = _elemOne($elem_id))
+		return array();
+
 	$send = array();
-	foreach($arr as $r)
+	foreach($arr as $r) {
+		$r['title'] = $r[$col];
+
+		switch($elT['dialog_id']) {
+			//шаблон записи
+			case 43:
+				$r['content'] = _element43_print11($elT, $r);
+				break;
+
+			//сборный текст
+			case 44:
+				$prm = _blockParam();
+				$prm['unit_get'] = $r;
+				$r['content'] = _element44_print($elT, $prm);
+				break;
+		}
+
 		$send[] = $r;
+	}
 
 	return _arrNum($send);
 }
@@ -146,8 +166,12 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 	//получение id диалога, по которому будут вноситься данные
 	if(!$el95 = _elemOne($el95_id))
 		jsonError(_debugPrint('[95] ').'Не получены данные элемента');
-	if(!$DLG_INS = _dialogQuery($el95['num_1']))
-		jsonError(_debugPrint('[95] ').'Не получены данные диалога '.$el95['num_1']);
+	if(!$dlg_id = _blockDlgId($el95['block_id']))
+		jsonError(_debugPrint('[95] ').'Не получен id диалога, в котором расположен элемент');
+	if(!$DLG = _dialogQuery($dlg_id))
+		jsonError(_debugPrint('[95] ').'Не получены данные диалога '.$dlg_id);
+	if(!$DLG_INS = _dialogQuery($DLG['dialog_id_parent']))
+		jsonError(_debugPrint('[95] ').'Не получены данные родительского диалога ');
 	if(!$tab = $DLG_INS['table_name_1'])
 		jsonError(_debugPrint('[95] ').'Не получена таблица для внесения данных');
 
@@ -186,7 +210,7 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 		if($col = _elemCol($cmp_id))
 			$cols[] = '`'.$col.'`';
 
-	$cols[] = '`id`';
+//	$cols[] = '`id`';
 	foreach($cols95 as $r)
 		$cols[] = '`'.$r['col'].'`';
 
@@ -205,12 +229,7 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 				$val[] = "'".addslashes($CMP[$cmp_id])."'";
 
 		foreach($mass as $i => $v) {
-			if(!$i) {
-				$val[] = $v;//id
-				continue;
-			}
-
-			$ex = explode('_', $cols95[$i-1]['col']);
+			$ex = explode('_', $cols95[$i]['col']);
 			if($ex[0] == 'num')
 				$v = _num($v, 1);
 			if($ex[0] == 'sum')
@@ -280,8 +299,14 @@ function PHP12_elem95_setup($prm) {//настройка колонок спис�
 		return _emptyMin10('[95] Отсутствует исходный блок.');
 	if(!$el = _elemOne($BL['elem_id']))
 		return _emptyMin10('[95] Отсутствует элемент.');
+	if($BL['obj_name'] != 'dialog')
+		return _emptyMin10('[95] Элемент вставлен не в диалог.');
+	if(!$DLG = _dialogQuery($BL['obj_id']))
+		return _emptyMin10('[95] Диалога '.$BL['obj_id'].' не существует.');
+	if(!$dialog_id = $DLG['dialog_id_parent'])
+		return _emptyMinRed10('[95] Необходимо указать родительский диалог.');
 
-	return '<div class="calc-div h25 line-b bg5">'._elemWidth($el).'</div>';
+	return '<div class="calc-div h25 line-b bg5" val="'.$dialog_id.'">'._elemWidth($el).'</div>';
 }
 function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение данных колонок
 	/*
