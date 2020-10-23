@@ -674,7 +674,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				$send[$COL_DLG_ID][$cmp_id] = $v;
 				break;
 			default:
-				if($cur && !empty($cmp['req']) && !$v)
+				if($cur && !empty($cmp['req']) && !$v && !strlen($v))
 					$is_err = 1;
 
 				$ex = explode('_', $col);
