@@ -176,12 +176,13 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 		jsonError(_debugPrint('[95] ').'Не получена таблица для внесения данных');
 
 	if(empty($VVV[$el95_id])) {
-		_elem95_deleted($DLG, $DLG_INS);
+//		_elem95_deleted($DLG, $DLG_INS);
 		$send = array(
 			'action_id' => _num($DLG[ACT.'_action_id']),
-			'action_page_id' => _num($DLG[ACT.'_action_page_id'])
+			'action_page_id' => _num($DLG[ACT.'_action_page_id']),
+			'content' => _pageShow(_page('cur'))
 		);
-		_count_update();
+//		_count_update();
 		jsonSuccess($send);
 	}
 
@@ -210,7 +211,6 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 		if($col = _elemCol($cmp_id))
 			$cols[] = '`'.$col.'`';
 
-//	$cols[] = '`id`';
 	foreach($cols95 as $r)
 		$cols[] = '`'.$r['col'].'`';
 
@@ -242,10 +242,12 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 	}
 
 	//удаление удалённых строк
+/*
 	if($idsNoDel) {
 		$ids = implode(',', $idsNoDel);
 		_elem95_deleted($DLG, $DLG_INS, $ids);
 	}
+*/
 
 	//составление колонок для обновления значений, если редактирование
 	$upd = array();
@@ -260,7 +262,8 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 
 	$send = array(
 		'action_id' => _num($DLG[ACT.'_action_id']),
-		'action_page_id' => _num($DLG[ACT.'_action_page_id'])
+		'action_page_id' => _num($DLG[ACT.'_action_page_id']),
+		'content' => _pageShow(_page('cur'))
 	);
 
 	_count_update();

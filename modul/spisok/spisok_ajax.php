@@ -674,14 +674,15 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 				$send[$COL_DLG_ID][$cmp_id] = $v;
 				break;
 			default:
-				if($cur && !empty($cmp['req']) && !$v && !strlen($v))
-					$is_err = 1;
-
 				$ex = explode('_', $col);
 				if($ex[0] == 'num')
 					$v = _num($v, 1);
 				if($ex[0] == 'sum')
 					$v = _cena($v, 1);
+
+				if($cur && !empty($cmp['req']) && !$v)
+					if(strlen($v) && $ex[0] != 'txt')
+						$is_err = 1;
 
 				$send[$COL_DLG_ID][$cmp_id] = $v;
 		}
