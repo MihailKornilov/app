@@ -399,7 +399,7 @@ function _html_script() {//скрипты и стили
 	'<link rel="stylesheet" href="css/gridstack'.MIN.'.css?9" />'.//'.SCRIPT.'
 	'<script src="js/gridstack'.MIN.'.js?2"></script>'.//'.SCRIPT.'
 	'<script src="js/gridstack.jQueryUI'.MIN.'.js"></script>'.
-	'<script src="js/ckeditor5.js"></script>'
+	'<script src="js/ckeditor5.js?1"></script>'
 : '').
 
 	'<script src="modul/page/page'.MIN.'.js?'.SCRIPT.'"></script>'.
