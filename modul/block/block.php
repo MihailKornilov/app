@@ -125,7 +125,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 	if($level == 1)
 		$WM = _blockObjWidth($FIRST['obj_name'], $FIRST['obj_id']);
 	$MN = 10;//множитель
-	$wMax = round($WM / $MN);
+	$wMax = round((int)$WM / $MN);
 
 	//если дочерний уровень, получение высоты родительского блока
 	$hMax = 0;  //высота родительского блока (для отображения нижней разделительной полосы при редактировании)
@@ -240,7 +240,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 
 			$bor = explode(' ', $r['bor']);
 			$borPx = $bor[3] + ($PARAM['blk_setup'] ? 0 : $bor[1]);
-			$width = $r['width'] - ($xEnd ? 0 : $br1px) - $borPx;
+			$width = (int)$r['width'] - ($xEnd ? 0 : $br1px) - $borPx;
 
 			//если блок списка шаблона, attr_id не ставится
 			$attr_id = !$PARAM['blk_setup'] && $r['obj_name'] == 'spisok' ? '' : ' id="bl_'.$r['id'].'"';
@@ -259,7 +259,7 @@ function _blockLevel($BLK, $PARAM=array(), $grid_id=0, $level=1, $WM=0) {//фо�
 	    					_elemDiv($r['elem_id'], $PARAM).
 					'';
 
-			$widthMax -= $r['width'];
+			$widthMax -= (int)$r['width'];
 
 			//пустота в середине
 			if($next)
