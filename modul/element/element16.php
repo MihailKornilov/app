@@ -2,7 +2,7 @@
 
 /* [16] Radio: произвольные значения */
 function _element16_struct($el) {
-	return array(
+	$send = array(
 		'txt_1'   => $el['txt_1'],      //текст нулевого значения
 		'txt_2'   => $el['txt_2'],  /* содержание списка в формате JSON
                                         id
@@ -18,6 +18,11 @@ function _element16_struct($el) {
 		'num_3'   => _num($el['num_3']),//элемент, если выбрано num_2:3877
 		'num_4'   => _num($el['num_4']) //список, если выбрано num_2:3878
 	) + _elementStruct($el);
+
+	if($send['num_2'] == 3878 && $send['num_4'])
+		$send['issp'] = $send['num_4'];
+
+	return $send;
 }
 function _element16_print($el, $prm) {
 	$vvv = _element('vvv', $el);

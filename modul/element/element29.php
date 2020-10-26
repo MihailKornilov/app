@@ -26,7 +26,7 @@ function _element29_struct($el) {
 		'num_10'  => _num($el['num_10']),//всегда устанавливать значение по умолчанию
 		'num_11'  => _num($el['num_11']),//возможность выбора нескольких значений
 
-		'issp' => 1
+		'issp' => _num($el['num_1'])
 	) + _elementStruct($el);
 }
 function _element29_print($el, $prm) {

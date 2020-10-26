@@ -10,7 +10,7 @@ function _element59_struct($el) {
 		'num_4'   => _num($el['num_4']),  //id диалога, которое открывается при нажатии на кнопку
 		'num_6'   => _num($el['num_6'], 1),//по умолчанию [85]
 
-		'issp' => 1
+		'issp' => _num($el['num_1'])
 	) + _elementStruct($el);
 }
 function _element59_v_get($el, $unit_id) {

@@ -273,7 +273,7 @@ function _spisokInclude($spisok) {//вложенные списки
 		$CMP = $dlg['cmp'];
 		foreach($CMP as $cmp) {//поиск компонента диалога с вложенным списком
 			//должен является вложенным списком
-			if(!_elemIsConnect($cmp))
+			if(empty($cmp['issp']))
 				continue;
 
 			//должно быть присвоено имя колонки
@@ -287,7 +287,7 @@ function _spisokInclude($spisok) {//вложенные списки
 				continue;
 
 			//получение данных из вложенного списка
-			$incDialog = _dialogQuery($cmp['num_1']);
+			$incDialog = _dialogQuery($cmp['issp']);
 			$incDialog = _dialogParent($incDialog);
 
 			$sql = "SELECT "._queryCol($incDialog)."

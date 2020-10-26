@@ -1970,9 +1970,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					else if(v < 0)
 						return;
 					break;
-				case true:
-					DSS = ELMM[v].num_1;
-					break;
+				case true: DSS = ELMM[v].issp; break;
 				case false:
 					if(e.type == 'dblclick')
 						obj.dlg.go();
@@ -2066,7 +2064,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					nest:_num(el.num_5),            //выбор значений во вложенных списках
 					sev:_num(el.num_6),             //выбор нескольких значений
 					dlg24:dlg24,                    //выбранный диалог в селекте, на который указывает num_1
-					sel:$(ATTR_CMP(el.id)).val(),              //выбранные элементы
+					sel:$(ATTR_CMP(el.id)).val(),   //выбранные элементы
 					allow:el.num_2 ? el.txt_2 : ''  //id типов элементов, которые разрешено выбирать
 				},
 
