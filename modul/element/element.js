@@ -1082,6 +1082,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						._check(is_set)
 						._check(is_set);
 					break;
+				//однострочный текст
+				case 8:
+					_attr_cmp(id).val(act.v1);
+					break;
 				//выбор значений
 				case 13:
 					_attr_cmp(id)

@@ -540,6 +540,7 @@ function _action202info($act) {//ЭЛЕМЕНТ: установка значен
 	initial_id: [85] Условие для совершения действия:
 	target_ids: элемент-получатель, на которое происходит воздействие
 	apply_id: применяемое действие (устанавливаемое значение)
+	v1: устанавливаемое значение вручную
 	revers: Обратное действие
 */
 
@@ -565,8 +566,13 @@ function _action202info($act) {//ЭЛЕМЕНТ: установка значен
 			if(!$el = _elemOne($act['target_ids']))
 				break;
 
-			$apply = '<span class="clr11">установить</span> '.
-					   '<b>'._element('v_get', $el, $act['apply_id']).'</b>';
+			$apply = '<span class="clr11">установить</span> ';
+			if($act['apply_id'])
+				$apply .= '<b>'._element('v_get', $el, $act['apply_id']).'</b>';
+			elseif(strlen($act['v1']))
+				$apply .= '<b>'.$act['v1'].'</b>';
+			else
+				$apply = _msgRed('Устанавливаемое значение не настроено');
 	}
 
 
