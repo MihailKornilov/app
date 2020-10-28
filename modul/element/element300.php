@@ -45,7 +45,9 @@ function _elem300p301($el, $u, $last_id) {//вывод значения поль
 
 	switch($last_id) {
 		//ava
-		case 16977: return '<img src="'.$res['photo'].'">';
+		case 16977: return '<img src="'.$res['photo'].'" class="br1000" width="'._elemWidth($el['elp']).'">';
+		case 16978: return $res['first_name'].' '.$res['last_name'];
+		case 16979: return $res['last_name'].' '.$res['first_name'];
 	}
 
 	return '<a href="//vk.com/id'.$vk_id.'" target="_blank" class="inhr">'.$res['first_name'].' '.$res['last_name'].'</a>';

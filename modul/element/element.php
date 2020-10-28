@@ -1712,6 +1712,10 @@ function _elemLink($el, $txt) {//нахождение ссылок и преоб
 			if($el11['dialog_id'] == 5 && $el11['num_2'])
 				break;
 
+			//аватарка ВК
+			if($last_id == 16977)
+				break;
+
 			return _noteLink($txt);
 	}
 

@@ -94,6 +94,7 @@ function _element11_print($el, $prm) {
 						return $ell['txt_1'];
 					return '';
 				}
+				$ell['elp'] = $el;
 				if($ell['dialog_id'] == 300)
 					return _elem300p301($ell, $unit, _idsLast($el['txt_2']));
 				return $u;
