@@ -290,6 +290,9 @@ function _spisokInclude($spisok) {//вложенные списки
 			$incDialog = _dialogQuery($cmp['issp']);
 			$incDialog = _dialogParent($incDialog);
 
+			if(!$incDialog['table_1'])
+				continue;
+
 			$sql = "SELECT "._queryCol($incDialog)."
 					FROM   "._queryFrom($incDialog)."
 					WHERE "._queryCol_id($incDialog)." IN (".$ids.")

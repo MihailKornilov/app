@@ -2,7 +2,9 @@
 
 /* [300] Привязка пользователя к странице ВК */
 function _element300_struct($el) {
-	return _elementStruct($el);
+	return array(
+		'issp' => 301
+	) + _elementStruct($el);
 }
 function _element300_print($el, $prm) {
 	$user_id = _elemPrintV($el, $prm, 0);

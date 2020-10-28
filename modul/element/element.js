@@ -1906,9 +1906,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					return false;
 				if(vvv.nest)
 					return true;
-				if(!dbl)
-					return false;
-				return true;
+				return dbl;
 			};
 
 		//описание глобальных переменных при открытии исходного (первого, невложенного) диалога

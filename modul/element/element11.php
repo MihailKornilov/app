@@ -35,11 +35,21 @@ function _element11_title($el) {
 		}
 
 		//вложенное значение
-		if(!empty($ell['issp']))
-			if($dlg_id = _num($ell['num_1'])) {
-				$send .= _dialogParam($dlg_id, 'name').' » ';
-				continue;
+		if(!empty($ell['issp'])) {
+			switch($ell['dialog_id']) {
+				case 16:
+					$send .= _dialogParam($ell['num_4'], 'name').' » ';
+					break;
+				case 29:
+				case 59:
+					$send .= _dialogParam($ell['num_1'], 'name').' » ';
+					break;
+				case 300:
+					$send .= 'VK » ';
+					break;
 			}
+			continue;
+		}
 
 		$send .= _element('title', $ell);
 	}
