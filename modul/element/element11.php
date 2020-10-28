@@ -61,6 +61,8 @@ function _element11_print($el, $prm) {
 	if(!$ids = _ids($el['txt_2'], 'arr'))
 		return _msgRed('[11] нет ids элементов');
 
+	$unit = $u;
+
 	foreach($ids as $elem_id) {
 		if($elem_id < 0) {
 			switch($elem_id) {
@@ -92,6 +94,8 @@ function _element11_print($el, $prm) {
 						return $ell['txt_1'];
 					return '';
 				}
+				if($ell['dialog_id'] == 300)
+					return _elem300p301($ell, $unit, _idsLast($el['txt_2']));
 				return $u;
 			}
 

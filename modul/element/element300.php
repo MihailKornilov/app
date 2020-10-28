@@ -19,12 +19,34 @@ function _element300_print($el, $prm) {
 	'</div>';
 }
 function _element300_print11($el, $u) {
+//	return _pr($el);
 	if(!$col = _elemCol($el))
 		return '';
 	if(!$vk_id = _num(@$u[$col]))
 		return '';
 	if(!$res = _elem300vkRes($vk_id, true))
 		return '';
+
+	return '<a href="//vk.com/id'.$vk_id.'" target="_blank" class="inhr">'.$res['first_name'].' '.$res['last_name'].'</a>';
+}
+function _elem300p301($el, $u, $last_id) {//вывод значения пользователя из ВК
+	/*
+		16977 - ava
+		16978 - Имя Фамилия
+		16979 - Фамилия Имя
+	*/
+
+	if(!$col = _elemCol($el))
+		return '';
+	if(!$vk_id = _num(@$u[$col]))
+		return '';
+	if(!$res = _elem300vkRes($vk_id, true))
+		return '';
+
+	switch($last_id) {
+		//ava
+		case 16977: return '<img src="'.$res['photo'].'">';
+	}
 
 	return '<a href="//vk.com/id'.$vk_id.'" target="_blank" class="inhr">'.$res['first_name'].' '.$res['last_name'].'</a>';
 }
