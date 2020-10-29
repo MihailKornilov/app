@@ -524,7 +524,8 @@ $.fn._check = function(o, oo) {
 
 		var v = CHECK.hasClass('on') ? 0 : 1;
 		setVal(v);
-		o.func(v, t);
+		if(o.func)
+			o.func(v, t);
 	});
 
 
