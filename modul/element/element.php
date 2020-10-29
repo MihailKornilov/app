@@ -1715,6 +1715,9 @@ function _elemLink($el, $txt) {//нахождение ссылок и преоб
 			//аватарка ВК
 			if($last_id == 16977)
 				break;
+			//аватарка ВК + ссылка
+			if($last_id == 16982)
+				break;
 
 			return _noteLink($txt);
 	}

@@ -19,7 +19,6 @@ function _element300_print($el, $prm) {
 	'</div>';
 }
 function _element300_print11($el, $u) {
-//	return _pr($el);
 	if(!$col = _elemCol($el))
 		return '';
 	if(!$vk_id = _num(@$u[$col]))
@@ -34,6 +33,7 @@ function _elem300p301($el, $u, $last_id) {//вывод значения поль
 		16977 - ava
 		16978 - Имя Фамилия
 		16979 - Фамилия Имя
+		16982 - ava + link (ссылка на страницу пользователя)
 	*/
 
 	if(!$col = _elemCol($el))
@@ -44,10 +44,12 @@ function _elem300p301($el, $u, $last_id) {//вывод значения поль
 		return '';
 
 	switch($last_id) {
-		//ava
 		case 16977: return '<img src="'.$res['photo'].'" class="br1000" width="'._elemWidth($el['elp']).'">';
 		case 16978: return $res['first_name'].' '.$res['last_name'];
 		case 16979: return $res['last_name'].' '.$res['first_name'];
+		case 16982: return '<a href="//vk.com/id'.$vk_id.'" target="_blank">'.
+								'<img src="'.$res['photo'].'" class="br1000" width="'._elemWidth($el['elp']).'">'.
+						   '</a>';
 	}
 
 	return '<a href="//vk.com/id'.$vk_id.'" target="_blank" class="inhr">'.$res['first_name'].' '.$res['last_name'].'</a>';
