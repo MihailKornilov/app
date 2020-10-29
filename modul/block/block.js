@@ -1304,6 +1304,60 @@ $.fn._grid = function(o) {
 			var t = $(this),
 				p = t.parent();
 			grid.removeWidget(p);
+		})
+		//подгонка ширины блока к ширине первого вышестоящего при двойном клике
+		.off('dblclick', '.grid-item .ui-resizable-se')
+		.on('dblclick', '.grid-item .ui-resizable-se', function() {
+			var t = $(this),
+				p = t.parent(),
+				curY = p.attr('data-gs-y')*1,
+				attr_id = p.attr('id');
+
+			var getX = 0,//
+				getY = 0,//
+				setX = 0,
+				setW = 0;
+
+			//определение стоят ли с именяемым блоком в одной строке ещё блоки
+			var near2 = false;
+			_forEq($('.grid-item'), function(eq) {
+				if(eq.attr('id') == attr_id)
+					return;
+
+				var gsy = eq.attr('data-gs-y')*1;
+
+				if(gsy == curY) {
+					near2 = true;
+					return false;
+				}
+
+				if(gsy > curY)
+					return;
+
+				if(getY > gsy)
+					return;
+
+				var gsx = eq.attr('data-gs-x')*1;
+				var gsw = eq.attr('data-gs-width')*1;
+
+				if(getY == gsy) {
+					if(setX > gsx) {
+						setX = gsx;
+						setW = gsw;
+					}
+					return;
+				}
+
+				getY = gsy;
+				setX = gsx;
+				setW = gsw;
+			});
+
+			if(near2 || !setW)
+				return;
+
+			grid.resize(p, setW, null);
+			grid.move(p, setX, null);
 		});
 };
 
