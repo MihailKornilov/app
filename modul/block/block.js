@@ -1254,7 +1254,7 @@ $.fn._grid = function(o) {
 			grid.resize(eq, null, h);
 		});
 	})
-	 .on('drag resize', function(e) {//действие во время перетаскивания блока и изменения размера
+	 .on('drag resize', function(e, elem) {//действие во время перетаскивания блока и изменения размера
 		var item = $(e.target),
 			offset = item.offset(),
 			WH = $(window).height(),//высота экрана видимой области
@@ -1313,8 +1313,7 @@ $.fn._grid = function(o) {
 				curY = p.attr('data-gs-y')*1,
 				attr_id = p.attr('id');
 
-			var getX = 0,//
-				getY = 0,//
+			var getY = -1,//
 				setX = 0,
 				setW = 0;
 
@@ -1340,7 +1339,7 @@ $.fn._grid = function(o) {
 				var gsx = eq.attr('data-gs-x')*1;
 				var gsw = eq.attr('data-gs-width')*1;
 
-				if(getY == gsy) {
+				if(setW && getY == gsy) {
 					if(setX > gsx) {
 						setX = gsx;
 						setW = gsw;
