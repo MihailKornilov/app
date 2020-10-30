@@ -435,6 +435,7 @@ function _29cnnTitle($EL, $sp) {//формирование содержания 
 
 	switch($elT['dialog_id']) {
 		//текстовое поле
+		case 5:
 		case 8:
 			$title = $sp;
 			foreach($ids as $id) {
