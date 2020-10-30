@@ -133,7 +133,7 @@ var _ids = function(v, count) {
 										left + (left ? 'px' : '')
 									});
 
-								EL.mar = top + ' ' + right + ' ' + bottom + ' ' + left;
+								ELMM[BL.elem_id].mar = top + ' ' + right + ' ' + bottom + ' ' + left;
 								BL.save = 1;
 							}
 						});
@@ -144,7 +144,7 @@ var _ids = function(v, count) {
 							_attr_el(BL.elem_id)
 								.removeClass('fs' + EL.size)
 								.addClass('fs' + v);
-							EL.size = v;
+							ELMM[BL.elem_id].size = v;
 							BL.save = 1;
 						}
 					});
@@ -158,20 +158,20 @@ var _ids = function(v, count) {
 								.find('img')
 								.width(v)
 								.height('auto');
-							EL.width = v;
+							ELMM[BL.elem_id].width = v;
 							BL.save = 1;
 						}
 					});
 					$('#elem-img-height')._check({
 						tooltip:'Также ограничивать высоту',
 						func:function(v) {
-							EL.num_7 = v;
+							ELMM[BL.elem_id].num_7 = v;
 							BL.save = 1;
 						}
 					});
 					$('#elem-img-circle')._check({
 						func:function(v) {
-							EL.num_8 = v;
+							ELMM[BL.elem_id].num_8 = v;
 							BL.save = 1;
 						}
 					});
@@ -677,6 +677,7 @@ var _ids = function(v, count) {
 			if(!EL.block_id)
 				return;
 
+			ELMM[EL.id].color = v;
 			BLKK[EL.block_id].save = 1;
 		};
 
