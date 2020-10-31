@@ -4043,7 +4043,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				var send = {
 					op:'image_link',
 					obj_name:'elem_' + el.id + '_' + USER_ID,
-					obj_id:_num(unit.id),
+					obj_id:_num(el.id),
 					url:$.trim(linkInp.val()),
 					busy_obj:iconOk,
 					busy_cls:'spin'
