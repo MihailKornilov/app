@@ -890,9 +890,13 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 	}
 
 	//установка начальной ширины элементу
-	if(IS_ELEM && @$DLG['element_width']) {
+	if(IS_ELEM && $w = _num($DLG['element_width'])) {
+		if($bl = _blockOne($block_id))
+			if($w > $bl['width'])
+				$w = $bl['width'];
+
 		$sql = "UPDATE `_element`
-				SET `width`=".$DLG['element_width']."
+				SET `width`=".$w."
 				WHERE `id`=".$uid[$table_1];
 		query($sql);
 	}
