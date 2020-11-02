@@ -1531,7 +1531,10 @@ function _elemUids($ids, $u) {//получение значения записи
 		if(!isset($u[$col]))
 			return '';
 
-		$u = $u[$col];
+		if(!empty($u[$col.'_title']))
+			$u = $u[$col.'_title'];
+		else
+			$u = $u[$col];
 	}
 
 	return is_array($u) ? $u['id'] : $u;

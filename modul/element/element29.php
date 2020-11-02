@@ -118,12 +118,15 @@ function _elem29PageSel($dlg_cur, $sel_id) {//подмена id записи, е
 	return 0;
 }
 function _elem29DialogSel($prm, $sel_id) {//подстановка id записи, которая приходит на диалоговое окно
-	//id записи берётся с текущей страницы
+	//id записи берётся с диалога
 	if($sel_id != -2)
 		return $sel_id;
 	//должен передаваться id записи
 	if(!$get_id = _num(@$prm['unit_get_id']))
 		return 0;
+
+	return $get_id;
+
 	if(!$block_id = $prm['srce']['block_id'])
 		return 0;
 	if(!$blk = _blockOne($block_id))

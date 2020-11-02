@@ -325,6 +325,8 @@ function _spisokInclude($spisok) {//вложенные списки
 		}
 	}
 
+	$spisok = _elem57inc($spisok);
+
 	return $spisok;
 }
 function _spisokImage($spisok) {//вставка картинок

@@ -113,6 +113,25 @@ function _element57punkt($bl, $prm) {//скрытие блока, если он 
 
 	return $bl;
 }
+function _elem57inc($spisok) {
+	foreach($spisok as $id => $sp) {
+		if(!$dlg_id = _num(@$sp['dialog_id']))
+			continue;
+		if(!$DLG = _dialogQuery($dlg_id))
+			continue;
+
+		foreach($DLG['cmp'] as $el) {
+			if($el['dialog_id'] != 57)
+				continue;
+			if(!$col = $el['col'])
+				continue;
+
+			$spisok[$id][$col.'_title'] = _element57_print11($el, $sp);
+		}
+	}
+
+	return $spisok;
+}
 
 function PHP12_menu_block_setup() {//используется в диалоге [57]
 	return '';
