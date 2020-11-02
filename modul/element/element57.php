@@ -39,15 +39,18 @@ function _element57_print($el, $prm) {
 		13534 => 4
 	);
 
+	$type_id = $type[$el['num_1']];
+
 	$razdel = '';
-	foreach($vvv as $r) {
+	foreach($vvv as $n => $r) {
 		$sel = _dn($v != $r['id'], 'sel');
 		$curd = _dn(!$prm['blk_setup'], 'curD');
-		$razdel .= '<a class="link'.$sel.$curd.'">'.$r['title'].'</a>';
+		$ml10 = $type_id == 2 && $n ? ' ml10' : '';
+		$razdel .= '<a class="link'.$ml10.$sel.$curd.'">'.$r['title'].'</a>';
 	}
 
 	return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
-		   '<div class="_menu'.$type[$el['num_1']].'">'.$razdel.'</div>';
+		   '<div class="_menu'.$type_id.'">'.$razdel.'</div>';
 }
 function _element57_vvv($el) {//пункты меню
 	return _decode($el['txt_1']);

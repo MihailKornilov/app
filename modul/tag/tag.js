@@ -1833,9 +1833,10 @@ $.fn._menu = function(o) {//меню переключения
 
 		for(n = 0; n < o.spisok.length; n++) {
 			var sp = o.spisok[n],
-				sel = val == sp.id ? ' sel' : '';
+				sel = val == sp.id ? ' sel' : '',
+				ml10 = o.type == 2 && n ? ' ml10' : '';
 			html +=
-				'<a class="link' + sel + '" val="' + sp.id + '">' +
+				'<a class="link' + ml10 + sel + '" val="' + sp.id + '">' +
 					sp.title +
 				'</a>';
 		}

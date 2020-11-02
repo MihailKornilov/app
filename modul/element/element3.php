@@ -37,6 +37,7 @@ function _element3_print($el, $prm) {
 	$pfrom = _num(@$_GET['pfrom']);
 
 	$razdel = '';
+	$n = 0;
 	foreach($menu as $page_id => $r) {
 		$sel = _page('is_cur_parent', $page_id) ? ' sel' : '';
 
@@ -61,11 +62,12 @@ function _element3_print($el, $prm) {
 
 		$href = $prm['blk_setup'] ? '' : ' href="'.URL.'&p='.$pid.'"';
 		$curd = _dn(!$prm['blk_setup'], 'curD');
+		$ml10 = $el['num_2'] == 2 && $n++ ? ' ml10' : '';
 
 		if($el['num_2'] == 5)
 			$r['name'] = _imageHtml($r['image_ids'], $r['image_width'], 0, false, false);
 
-		$razdel .= '<a class="link'.$sel.$curd.'"'.$href.'>'.$r['name'].'</a>';
+		$razdel .= '<a class="link'.$ml10.$sel.$curd.'"'.$href.'>'.$r['name'].'</a>';
 	}
 
 	return '<div class="_menu'.$el['num_2'].'">'.$razdel.'</div>';
