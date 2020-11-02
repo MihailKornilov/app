@@ -43,6 +43,7 @@ var _ids = function(v, count) {
 								  ' class="dialog-open fs16 clr15 tool">' +
 									'Блок' +
 								'</a>' +
+								'<span class="ml20 fs16 clr3 curD tool" data-tool="Ширина блока">w' + BL.width + '</span>' +
 							'<td class="w90 r pb2">' +
 								'<div val="dialog_id:230,block_id:' + BL.id + '"' +
 									' class="icon icon-eye pl dialog-open ml3 tool-l"' +
