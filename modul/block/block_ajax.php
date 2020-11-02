@@ -41,9 +41,10 @@ switch(@$_POST['op']) {
 			'unit_get' => _pageUnitGet($obj_name, $obj_id)
 		);
 
-		$send['html'] = _blockHtml($obj_name, $obj_id,  $prm);
 		$send['blk'] = _BE('block_arr', $obj_name, $obj_id);
 		$send['elm'] = _BE('elem_arr', $obj_name, $obj_id);
+		$send['html'] = _blockHtml($obj_name, $obj_id,  $prm);
+		$send['w_change'] = !_blockWidthChangeOn($obj_name, $obj_id);
 
 		jsonSuccess($send);
 		break;

@@ -405,7 +405,7 @@ function _blockLevelChange($obj_name, $obj_id) {//кнопки изменени�
 	'<div id="block-level-'.$obj_name.'" val="'.$obj_name.':'.$obj_id.'">'.
 		'<button class="vk small grey block-grid-on">Управление блоками</button>'.
 		$html.
-		_blockWidthChange($obj_name, $obj_id).
+		'<div class="icon icon-width ml40 elem-width-change tool '._blockWidthChangeOn($obj_name, $obj_id).'" data-tool="Настройка ширины элементов"></div>'.
 		_blockChooseBut($obj_name, $obj_id).
 	'</div>';
 }
@@ -451,15 +451,15 @@ function _blockLevelButArr($obj_name, $obj_id) {//кнопки для измен
 
 	return $send;
 }
-function _blockWidthChange($obj_name, $obj_id) {//кнопка изменения ширины элементов
+function _blockWidthChangeOn($obj_name, $obj_id) {//отображение кнопки изменения ширины элементов
 	if(!$arr = _BE('elem_arr', $obj_name, $obj_id))
-		return '';
+		return 'dn';
 
 	foreach($arr as $r)
 		if(_dialogParam($r['dialog_id'], 'element_width'))
-			return '<div class="icon icon-width ml40 elem-width-change tool" data-tool="Настройка ширины элементов"></div>';
+			return '';
 
-	return '';
+	return 'dn';
 }
 function _blockChooseBut($obj_name, $obj_id) {//кнопка включения выбора блоков
 //	if(!$arr = _BE('block_arr', $obj_name, $obj_id))

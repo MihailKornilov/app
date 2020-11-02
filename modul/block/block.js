@@ -728,7 +728,7 @@ $(document)
 			t._dn(v, 'grey');
 			t._dn(!v, 'orange');
 			p.find('.block-level-change')._dn(!v);
-			p.find('.elem-width-change')._dn(!v);
+			p.find('.elem-width-change')._dn(res.w_change);
 			BCO._dn(!v).removeClass('_busy');
 
 			CONTENT.html(res.html);
