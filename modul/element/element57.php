@@ -52,6 +52,20 @@ function _element57_print($el, $prm) {
 	return '<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
 		   '<div class="_menu'.$type_id.'">'.$razdel.'</div>';
 }
+function _element57_print11($el, $u) {
+	if(!$col = _elemCol($el))
+		return '';
+	if(!$id = _num(@$u[$col]))
+		return '';
+	if(!$vvv = _decode($el['txt_1']))
+		return '';
+
+	foreach($vvv as $r)
+		if($r['id'] == $id)
+			return $r['title'];
+
+	return '';
+}
 function _element57_vvv($el) {//пункты меню
 	return _decode($el['txt_1']);
 }
