@@ -123,7 +123,7 @@ function _elem57inc($spisok) {
 		foreach($DLG['cmp'] as $el) {
 			if($el['dialog_id'] != 57)
 				continue;
-			if(!$col = $el['col'])
+			if(!$col = _elemCol($el))
 				continue;
 
 			$spisok[$id][$col.'_title'] = _element57_print11($el, $sp);
