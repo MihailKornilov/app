@@ -31,6 +31,8 @@ function _element8_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, $el['txt_2']);
 	$v = _element8vFromEl($el, $prm, $v);
 
+	$art = '---';
+
 	switch($el['num_1']) {
 		default:
 		//произвольный текст
@@ -52,14 +54,51 @@ function _element8_print($el, $prm) {
 				break;
 			if(!$DLG = _dialogQuery($BL['obj_id']))
 				break;
-			$sql = "SELECT MAX("._queryColReq($DLG, $col).")+1
+
+			$qCol = _queryColReq($DLG, $col);
+			$sql = "SELECT MAX(".$qCol.")
 					FROM  "._queryFrom($DLG)."
 					WHERE "._queryWhere($DLG)."
-					  AND LENGTH("._queryColReq($DLG, $col).")=".strlen($el['txt_3']);
-			$v = query_value($sql);
-			if(($diff = strlen($el['txt_3']) - strlen($v)) > 0)
-				for($n = 0; $n < $diff; $n++)
-					$v = '0'.$v;
+					  AND LENGTH(".$qCol.")=".mb_strlen($el['txt_3']);
+			if(!$v = query_value($sql))
+				$v = $el['txt_3'];
+
+			//исходный шаблон
+			$tmp = preg_split("//u", $el['txt_3'] , -1, PREG_SPLIT_NO_EMPTY);
+
+			//полученный максимальный артикул из базы
+			$art = preg_split("//u", $v , -1, PREG_SPLIT_NO_EMPTY);
+
+			//выделение числовых символов из артикула и увеличение на единицу
+			$sum = '';
+			foreach($art as $r) {
+				if(!preg_match(REGEXP_NUMERIC, $r))
+					continue;
+				$sum .= $r;
+			}
+			$sum *= 1;
+			$sum++;
+
+			$itog = array();
+			$sum = preg_split("//u", $sum , -1, PREG_SPLIT_NO_EMPTY);
+			$sumN = count($sum)-1;
+			for($n = count($tmp)-1; $n >= 0; $n--) {
+				if(!preg_match(REGEXP_NUMERIC, $tmp[$n])) {
+					$itog[] = $tmp[$n];
+					continue;
+				}
+
+				if($sumN < 0) {
+					$itog[] = 0;
+					continue;
+				}
+
+				$itog[] = $sum[$sumN--];
+			}
+
+			$itog = array_reverse($itog);
+			$v = implode('', $itog);
+
 			break;
 	}
 

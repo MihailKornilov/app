@@ -783,8 +783,8 @@ function PHP12_pin_dialog_open() {
 
 
 function _page_div($issa=false) {//todo тест
-//	if(!SA && !$issa)
-		return '';
+
+	return '';
 
 
 	if(@$_GET['set'])
