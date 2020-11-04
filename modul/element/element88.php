@@ -56,7 +56,7 @@ function _element88_print($EL, $prm=array(), $next=0) {
 	}
 
 	if(!$EL['all'] = _elem88countAll($EL))
-		return _emptyMin($EL['txt_1']);
+		return $EL['num_2'] ? _emptyMin($EL['txt_1']) : '';
 
 	$COL = array_unique($COL);
 	$COL = implode(',', $COL);
