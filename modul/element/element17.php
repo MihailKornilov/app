@@ -62,6 +62,25 @@ function _element17_print11($el, $u) {
 	return '';
 }
 
+function _elem17inc($spisok) {
+	foreach($spisok as $id => $sp) {
+		if(!$dlg_id = _num(@$sp['dialog_id']))
+			continue;
+		if(!$DLG = _dialogQuery($dlg_id))
+			continue;
+
+		foreach($DLG['cmp'] as $el) {
+			if($el['dialog_id'] != 17)
+				continue;
+			if(!$col = _elemCol($el))
+				continue;
+
+			$spisok[$id][$col.'_title'] = _element17_print11($el, $sp);
+		}
+	}
+
+	return $spisok;
+}
 
 
 
