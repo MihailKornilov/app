@@ -64,10 +64,11 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_remind();
 			_comtex_remind_action();
 
+			_comtex_schet_pay();
+
 		//частичный
 		case 2:
-			_comtex_zayav_note();
-			_comtex_zayav_note_comment();
+			_comtex_schet_pay();
 			break;
 
 		default:
@@ -2110,7 +2111,69 @@ function _comtex_zayav_note_comment() {//комментарии к заметк�
 	query($sql);
 }
 
+function _comtex_schet_pay() {//счета на оплату
+	$dialog_id = _comtexSpisokClear(1431);
 
+	_db2();
+	$sql = "SELECT *
+			FROM _schet_pay
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				1352491, /* Организация-получатель */
+				1352542, /* Банк */
+				'".$r['prefix'].$r['nomer']."',
+				'".$r['date_create']."',
+				"._comtexAss(1234, $r['client_id']).",
+				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
+				".$r['sum'].",
+
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_4,
+				  txt_1,
+				  date_1,
+				  num_2,
+				  num_3,
+				  sum_1,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+//	_comtexErrMsg($dialog_id, 'num_2', 'клиенты');
+//	_comtexErrMsg($dialog_id, 'num_3', 'заявки');
+
+	$sql = "DELETE FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND !`num_3`";
+	query($sql);
+
+}
 
 
 
