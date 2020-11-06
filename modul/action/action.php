@@ -99,6 +99,10 @@ function _blockAction201($bl, $prm) {//установка исходного о�
 function _blockAction209($bl, $prm, $txt='') {//установка ранее выбранного значения в блок
 	global $G_ACT;
 
+	if($el = _elemOne($bl['elem_id']))
+		if($el['dialog_id'] != 10)
+			return $txt;
+
 	foreach($G_ACT['act'] as $r) {
 		if($r['dialog_id'] != 209)
 			continue;
