@@ -580,6 +580,13 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 		$err_msg = !empty($cmp['req_msg']) ? $cmp['req_msg'] : 'Необходимо заполнить поле,<br>либо выбрать значение';
 
 		switch($cmp['dialog_id']) {
+			//многострочное текстовое поле
+			case 5:
+				if($cur && !empty($cmp['req']) && !strlen($v))
+					$is_err = 1;
+
+				$send[$COL_DLG_ID][$cmp_id] = $v;
+				break;
 			//текстовое поле
 			case 8:
 				if($cur && !empty($cmp['req']) && !strlen($v))

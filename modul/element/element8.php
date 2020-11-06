@@ -31,8 +31,6 @@ function _element8_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, $el['txt_2']);
 	$v = _element8vFromEl($el, $prm, $v);
 
-	$art = '---';
-
 	switch($el['num_1']) {
 		default:
 		//произвольный текст
@@ -40,7 +38,8 @@ function _element8_print($el, $prm) {
 		//цифры и числа
 		case 33:
 			$v = round($v, $el['num_2']);
-			$v = $v || $el['num_4'] ? $v : '';
+			if(empty($prm['unit_edit']))
+				$v = _hide0($v);
 			break;
 		//артикул
 		case 34:

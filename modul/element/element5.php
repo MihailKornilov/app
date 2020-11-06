@@ -28,8 +28,10 @@ function _element5_print($el, $prm) {
 function _element5_print11($el, $u) {
 	if(!$col = _elemCol($el))
 		return '';
-	if(!$txt = @$u[$col])
+	if(!isset($u[$col]))
 		return '';
+
+	$txt = $u[$col];
 
 	if(!$el['num_2']) {
 		$txt = _spisokColSearchBg($el['elp'], $txt);
