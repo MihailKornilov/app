@@ -68,7 +68,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_refund();
+			_comtex_accrual();
 			break;
 
 		default:
@@ -1335,6 +1335,7 @@ function _comtex_accrual() {//начисления
 	$sql = "SELECT *
 			FROM _money_accrual
 			WHERE `app_id`=".APP_ID_OLD."
+			  AND !`schet_id`
 			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
 		return;

@@ -492,6 +492,9 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	if($dialog['table_name_1'] == '_page')
 		_cache_clear('page');
 
+	if($dialog['table_name_1'] == '_dialog')
+		_BE('dialog_clear');
+
 	//было назначено действие
 	if($dialog['table_name_1'] == '_action')
 		if($dialog['id'] == 229)
