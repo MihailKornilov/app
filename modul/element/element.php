@@ -2954,6 +2954,21 @@ function _historyUnitCond($el, $prm) {//отображение истории д
 
 
 
+function PHP12_schetPayContent($prm) {//содержание счёта на оплату
+	/*
+		num_2 - элемент: Итоговая сумма
+	*/
+	return '';
+}
+function PHP12_schetPayContent_vvv($prm) {
+	return array();
+}
+
+
+
+
+
+
 
 
 
@@ -2986,8 +3001,6 @@ function _attachLinkRepair() {//временная фукнция для пер�
 		query($sql);
 	}
 }
-
-
 function _attachLink($attach_id, $width=0) {//формирование ссылки на файл
 	if(!$attach_id)
 		return '';

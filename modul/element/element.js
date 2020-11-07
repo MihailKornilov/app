@@ -6631,7 +6631,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		ELMM = _objUpd(ELMM, vvv.jselm);
 	},
 
-	/* ---=== УКАЗАНИЕ ЭЛЕМЕНТОВ ПОД КОНКРЕТНОЕ ПРАВИЛО [1000] ===--- */
+	// ---=== УКАЗАНИЕ ЭЛЕМЕНТОВ ПОД КОНКРЕТНОЕ ПРАВИЛО [1000] ===---
 	PHP12_elem_all_rule_setup_get = function(el, obj) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('input'), function(sp) {
@@ -6801,6 +6801,105 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!ELMM[el.vvv])
 			return;
 		_attr_el(el.id).find('.js').html(_pr(ELMM[el.vvv]));
+	},
+
+	//содержание счёта на оплату
+	PHP12_schetPayContent = function(el, vvv, obj) {
+		var html = '<table class="_stab w100p mb1">' +
+						'<tr><th class="w35">№' +
+							'<th>Наименование товара' +
+							'<th class="w70">Кол-во' +
+							'<th class="w70">Ед.изм.' +
+							'<th class="w100">Цена' +
+							'<th class="w100">Сумма' +
+							'<th class="w70">' +
+				   '</table>' +
+				   '<dl></dl>' +
+				   '<div class="fs15 bg6 ov4 clr9 bor-f0 pad10 center curP">Добавить позицию</div>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('div:last'),
+			NUM = 1,
+			_itog = function() {
+				var summa = 0;
+				_forEq(_attr_el(el.id).find('dd'), function(sp) {
+					summa += _cena(sp.find('.sum').val());
+				});
+				_attr_cmp(el.num_2).val(summa);
+			};
+
+		DL.sortable({handle:'.icon-move'});
+		BUT_ADD.click(vAdd);
+
+		if(!vvv.length)
+			vAdd();
+		else
+			_forIn(vvv, vAdd);
+
+		function vAdd(v) {
+			v = $.extend({
+				txt:'',   //текст строки
+				count:1,  //количество
+				cena:'',  //цена
+				sum:''    //сумма
+			}, v || {});
+
+			DL.append(
+				'<dd class="mb1 bg0">' +
+					'<table class="_stab w100p collaps">' +
+						'<tr><td class="w35 r clr1 top">' +
+								'<div class="mt5">' + NUM++ + '</div>' +
+							'<td class="">' +
+								'<textarea class="txt w100p h20">' + v.txt + '</textarea>' +
+							'<td class="w70 top">' +
+								'<input type="text"' +
+									  ' class="count w100p r"' +
+									  ' value="' + v.count + '"' +
+								' />' +
+							'<td class="w70 center top">' +
+								'<div class="mt5">шт.</div>' +
+							'<td class="w100 top">' +
+								'<input type="text"' +
+									  ' class="cena w100p r"' +
+									  ' value="' + v.cena + '"' +
+								' />' +
+							'<td class="w100 top">' +
+								'<input type="text"' +
+									  ' class="bor-f0 sum w100p r curD"' +
+									  ' readonly' +
+									  ' value="' + v.sum + '"' +
+								' />' +
+							'<td class="w25 center top">' +
+								'<div class="icon icon-move pl curM mt5"></div>' +
+							'<td class="w35 r pr3 bg0 top">' +
+								'<div class="icon icon-del-red pl mt5 tool" data-tool="Удалить позицию"></div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last');
+
+			DD.find('.txt')
+				.focus()
+				._autosize()
+				.keyup(function() {
+					var t = $(this),
+						c = $.trim(t.val()).length;
+					t[(c ? 'remove' : 'add') + 'Class']('bg14');
+				})
+				.trigger('keyup');
+			DD.find('.count,.cena').keyup(function() {
+				var count = _cena(DD.find('.count').val()),
+					cena = _cena(DD.find('.cena').val());
+				DD.find('.sum').val(count * cena);
+
+				_itog();
+			});
+			DD.find('.icon-del-red').click(function() {
+				$(this).closest('DD').remove();
+				_itog();
+			});
+		}
 	};
 
 $(document)
