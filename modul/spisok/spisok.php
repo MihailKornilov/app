@@ -634,6 +634,11 @@ function _unitGet($prm) {//получение данных записи
 		return array();
 	return $prm['unit_get'];
 }
+function _unitEdit($prm) {//получение данных записи для редактирования
+	if(empty($prm['unit_edit']))
+		return array();
+	return $prm['unit_edit'];
+}
 
 function _spisokColSearchBg($el, $txt) {//подсветка значения колонки при текстовом (быстром) поиске
 	$element_id_spisok = 0;

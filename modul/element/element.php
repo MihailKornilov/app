@@ -2960,9 +2960,6 @@ function PHP12_schetPayContent($prm) {//содержание счёта на о�
 	*/
 	return '';
 }
-function PHP12_schetPayContent_vvv($prm) {
-	return array();
-}
 function PHP12_schetPayContent_save($cmp, $val, $unit) {
 	if(empty($unit['id']))
 		return;
@@ -2992,7 +2989,16 @@ function PHP12_schetPayContent_save($cmp, $val, $unit) {
 			WHERE `id`=".$unit['id'];
 	query($sql);
 }
+function PHP12_schetPayContent_vvv($prm) {
+	if(!$col = @$prm['el12']['col'])
+		return array();
+	if(!$u = _unitEdit($prm))
+		return array();
+	if(!isset($u[$col]))
+		return array();
 
+	return _decode($u[$col]);
+}
 
 
 
