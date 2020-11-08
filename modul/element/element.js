@@ -6900,6 +6900,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				_itog();
 			});
 		}
+	},
+	PHP12_schetPayContent_get = function(el, obj) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			send.push({
+				txt:sp.find('.txt').val(),
+				count:_cena(sp.find('.count').val()),
+				cena:_cena(sp.find('.cena').val()),
+				sum:_cena(sp.find('.sum').val())
+			});
+		});
+		return send;
 	};
 
 $(document)

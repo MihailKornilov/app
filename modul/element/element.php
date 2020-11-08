@@ -2963,6 +2963,35 @@ function PHP12_schetPayContent($prm) {//содержание счёта на о�
 function PHP12_schetPayContent_vvv($prm) {
 	return array();
 }
+function PHP12_schetPayContent_save($cmp, $val, $unit) {
+	if(empty($unit['id']))
+		return;
+	if(!$col = $cmp['col'])
+		return;
+
+	$save = array();
+
+	if(!empty($val))
+		if(is_array($val))
+			foreach($val as $r) {
+				if(!$txt = _txt($r['txt']))
+					continue;
+
+				$save[] = array(
+					'txt' => $txt,
+					'count' => _cena($r['count']),
+					'cena' => _cena($r['cena']),
+					'sum' => _cena($r['sum'])
+				);
+			}
+
+	$save = json_encode($save);
+
+	$sql = "UPDATE `_spisok`
+			SET `".$col."`='".addslashes($save)."'
+			WHERE `id`=".$unit['id'];
+	query($sql);
+}
 
 
 
