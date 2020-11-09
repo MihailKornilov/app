@@ -783,46 +783,6 @@ function PHP12_pin_dialog_open() {
 
 
 function _page_div($issa=false) {//todo тест
-	$sql = "SELECT * from _action where dialog_id=208 order by id";
-	$ZN = array(
-		1 => '+',
-		2 => '-',
-		3 => '*',
-		4 => '/'
-	);
-	foreach(query_arr($sql) as $r) {
-		$ex = explode(',', $r['v1']);
-		if(!_num(@$ex[0]))
-			continue;
-
-		$save = array();
-
-		$isZnak = false;
-		foreach($ex as $n => $i) {
-			if(!$n)
-				$znak = '+';
-
-			if(!$isZnak) {
-				$save[] = array(
-					'znak' => $znak,
-					'elem_id' => $i,
-					'v' => 0
-				);
-				$isZnak = true;
-				continue;
-			}
-			$znak = $ZN[$i];
-			$isZnak = false;
-		}
-
-		$save = json_encode($save);
-
-		$sql = "UPDATE `_action`
-				SET `v1`='".addslashes($save)."'
-				WHERE `id`=".$r['id'];
-		query($sql);
-	}
-
 
 	return '';
 
