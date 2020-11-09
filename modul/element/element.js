@@ -1269,11 +1269,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 
 		if(!vvv.length)
-			_ADD();
+			_ADD({});
 		 else
 			_forN(vvv, _ADD);
 
 		function _ADD(v) {
+			if(v.pole == undefined)
+				v.pole = !v.elem_id
+
 			v = $.extend({
 				pole:false,
 				znak:'+',
@@ -1281,8 +1284,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				title:'',
 				v:''
 			}, v);
-
-			v.pole = !v.elem_id;
 
 			DL.append(
 				'<dd class="over3">' +
