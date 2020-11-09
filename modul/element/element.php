@@ -1580,9 +1580,15 @@ function _elmJs($obj_name, $obj_id, $prm=array()) {//список элемент
 	foreach($ELM as $elem_id => $el) {
 		$el['vvv'] = _element('vvv', $el, $prm);
 
-		foreach($el['action'] as $act)
-			if($act['dialog_id'] == 209)//вставка значения в блок
+		foreach($el['action'] as $i => $act) {
+			//применение формулы
+			if($act['dialog_id'] == 208)
+				$el['action'][$i]['v1'] = _decode($act['v1']);
+
+			//вставка значения в блок
+			if($act['dialog_id'] == 209)
 				$elmDop += _idsAss($act['v1']);
+		}
 
 		$send[$elem_id] = $el;
 	}

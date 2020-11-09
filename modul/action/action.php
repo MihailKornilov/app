@@ -691,10 +691,9 @@ function _action207info($act) {//ЭЛЕМЕНТ: открытие докумен
 function _action208info($act) {//ЭЛЕМЕНТ: формула
 /*
 	v1: [12] функция
-			1: сложение
-			2: вычитание
-			3: умножение
-			4: деление
+			znak
+			elem_id
+			v
 	apply_id: [13] элемент-получатель
 	effect_id: [35] округление результата 0-3 знаков
 */
@@ -703,20 +702,10 @@ function _action208info($act) {//ЭЛЕМЕНТ: формула
 		return '';
 
 	$F = array();
-	$znak = false;
-	foreach(explode(',', $act['v1']) as $r) {
-		if(!$znak) {
-			$F[] = _elemIdsTitle($r);
-			$znak = true;
-			continue;
-		}
-		switch($r) {
-			case 1: $F[] = '+'; break;
-			case 2: $F[] = '-'; break;
-			case 3: $F[] = '*'; break;
-			case 4: $F[] = '/'; break;
-		}
-		$znak = false;
+	foreach(_decode($act['v1']) as $n => $r) {
+		if($n || !$n && $r['znak'] == '-')
+			$F[] = $r['znak'];
+		$F[] = $r['elem_id'] ? _elemIdsTitle($r['elem_id']) : $r['v'];
 	}
 
 	return
@@ -971,15 +960,49 @@ function PHP12_action_224($act) {//ЭЛЕМЕНТ: внешняя ссылка
 }
 
 
-function PHP12_action208_formula($prm) {//составление формулы для действия 208
+function PHP12_action208_formula() {//составление формулы для действия 208
 	return '';
 }
 function PHP12_action208_formula_save($cmp, $val, $unit) {
 	if(!$action_id = _num($unit['id']))
 		return;
 
+	$ZN = array(
+		'+' => 1,
+		'-' => 1,
+		'*' => 1,
+		'/' => 1
+	);
+
+	$save = array();
+
+	if(!empty($val))
+		if(is_array($val))
+			foreach($val as $n => $r) {
+				if(!isset($ZN[$r['znak']]))
+					continue;
+
+				$znak = $r['znak'];
+				if(!$n && ($znak == '*' || $znak == '/'))
+					$znak = '+';
+
+				$elem_id = _num($r['elem_id']);
+				$v = _cena($r['v']);
+
+				if(!$elem_id && !$v)
+					continue;
+
+				$save[] = array(
+					'znak' => $znak,
+					'elem_id' => $elem_id,
+					'v' => $v
+				);
+			}
+
+	$save = json_encode($save);
+
 	$sql = "UPDATE `_action`
-			SET `v1`='".$val."'
+			SET `v1`='".addslashes($save)."'
 			WHERE `id`=".$action_id;
 	query($sql);
 }
@@ -989,17 +1012,11 @@ function PHP12_action208_formula_vvv($prm) {
 	if(empty($prm['unit_edit']['v1']))
 		return array();
 
-	$send = array();
-	$ex = explode(',', $prm['unit_edit']['v1']);
-	$count = (count($ex) - 1) / 2;
-
-	for($n = 0; $n <= $count; $n++) {
-		$el = _elemOne($ex[$n*2]);
-		$send[] = array(
-			'elem_id' => $ex[$n*2],
-			'elem_name' => _element('title', $el),
-			'znak' => $n ? $ex[$n*2-1] : 0
-		);
+	$send = _decode($prm['unit_edit']['v1']);
+	foreach($send as $n => $r) {
+		$send[$n]['title'] = '';
+		if($el = _elemOne($r['elem_id']))
+			$send[$n]['title'] = _element('title', $el);
 	}
 
 	return _arrNum($send);

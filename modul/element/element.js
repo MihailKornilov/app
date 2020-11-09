@@ -1162,45 +1162,65 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//формула
 	_ACT208 = function(act) {
-		var V = 0,
-			v1 = act.v1.split(','),
-			cc = (v1.length - 1) / 2;
-		for(var n = 0; n <= cc; n++) {
-			var elid = _num(v1[n*2]);
-			if(!elid)
-				continue;
+		if(!act.v1.length)
+			return;
 
-			var VN = 0,
-				EL = _attr_cmp(elid);
-			if(EL)
-				VN = _cena(EL.val(), true);
-			else {
-				EL = _attr_el(elid);
+		var elV = function(elid) {//получение значения из элемента
+				var VN = 0,
+					EL = _attr_cmp(elid);
 				if(EL)
-					VN = _cena(EL.html(), true);
-			}
-
-			if(!EL)
-				continue;
-
-			if(!n)
-				V = VN;
-			else
-				switch(_num(v1[n*2-1])) {
-					//сложение
-					case 1: V = V + VN; break;
-					//вычитание
-					case 2: V = V - VN; break;
-					//умножение
-					case 3: V = V * VN; break;
-					//деление
-					case 4: V = V / VN; break;
+					VN = _cena(EL.val(), true);
+				else {
+					EL = _attr_el(elid);
+					if(EL)
+						VN = _cena(EL.html(), true);
 				}
-		}
+				return VN;
+			},
+			mass = [],
+			V = 0;
+
+		//получение значений и запись в новый массив
+		_forN(act.v1, function(sp) {
+			mass.push({
+				znak:sp.znak,
+				v:sp.elem_id ? elV(sp.elem_id) : sp.v
+			});
+		});
+
+		//выполнение умножений и делений
+		_forN(mass, function(sp, n) {
+			if(!n)
+				return;
+
+			switch(sp.znak) {
+				case '*':
+					mass[n].v = mass[n-1].v * sp.v;
+					mass[n].znak = mass[n-1].znak;
+					mass[n-1] = null;
+					return;
+				case '/':
+					mass[n].v = mass[n-1].v / sp.v;
+					mass[n].znak = mass[n-1].znak;
+					mass[n-1] = null;
+					return;
+			}
+		});
+
+		//выполнение сложений и вычитаний
+		_forN(mass, function(sp, n) {
+			if(!sp)
+				return;
+
+			switch(sp.znak) {
+				case '+': return V += sp.v;
+				case '-': return V -= sp.v;
+			}
+		});
 
 		var rc = 1;
 		if(act.effect_id)
-			for(n = 0; n < act.effect_id; n++)
+			for(var n = 0; n < act.effect_id; n++)
 				rc *= 10;
 
 		V = Math.round(V*rc)/rc;
@@ -1213,22 +1233,87 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 	// [208] Настройка формулы
 	PHP12_action208_formula = function(el, vvv, obj) {
-		var ATR_EL = _attr_el(el.id),
-			V1 = vvv.length ? vvv[0] : {},
-			ACT208_V = function(n, v_id, v_name) {//печать значения
-				return '<input type="hidden" class="v208" val="' + n + '" value="' + (v_id || 0) + '" />' +
-					'<div class="_selem dib prel bg0 over3 mb10">' +
-						'<div class="icon icon-star pabs"></div>' +
-						'<div class="icon icon-del pl pabs' + _dn(v_id) + '"></div>' +
-						'<input type="text" readonly class="w125 curP clr11" placeholder="Значение ' + n + '" value="' + (v_name || '') + '" />' +
-					'</div>';
+		var html = '<dl></dl>' +
+					'<table class="w100p">' +
+						'<tr><td><div class="add fs15 bg6 clr9 pad10 center over1 curP">Добавить элемент</div>' +
+						    '<td><div class="add fs15 bg6 clr9 pad10 center over1 curP ml10">Добавить поле</div>' +
+					'</table>',
+			ATR_EL = _attr_el(el.id),
+			DL = ATR_EL.append(html).find('dl'),
+			BUT_ADD = ATR_EL.find('.add'),
+
+			znak = {
+				'+':'+',
+				'-':'-',
+				'*':'<div class="fs11">&#9913;</div>',
+				'/':'/'
 			},
-			ACT208_VSEL = function() {//выбор значения
-				ATR_EL.find('._selem:last').click(function() {
+			znak_n = ['+','-','*','/'],
+			znak_tool = {
+				'+':'Прибавить',
+				'-':'Вычесть',
+				'*':'Умножить',
+				'/':'Делить'
+			},
+			znak_color = {
+				'+':'green',
+				'-':'red',
+				'*':'orange',
+				'/':'blue'
+			};
+
+		BUT_ADD.click(function() {
+			_ADD({
+				pole:$(this).hasClass('ml10')
+			});
+		});
+
+		if(!vvv.length)
+			_ADD();
+		 else
+			_forN(vvv, _ADD);
+
+		function _ADD(v) {
+			v = $.extend({
+				pole:false,
+				znak:'+',
+				elem_id:0,
+				title:'',
+				v:''
+			}, v);
+
+			v.pole = !v.elem_id;
+
+			DL.append(
+				'<dd class="over3">' +
+					'<table class="bs5 w100p">' +
+						'<tr><td class="w25 r">' +
+								'<button class="vk short ' + znak_color[v.znak] +' w35 tool" data-tool="' + znak_tool[v.znak] + '">' + znak[v.znak] +'</button>' +
+							'<td><input type="hidden" class="el208" value="' + v.elem_id + '" />' +
+								'<div class="_selem dib prel bg0 over3' + _dn(!v.pole) + '">' +
+									'<div class="icon icon-star pabs"></div>' +
+									'<input type="text" readonly class="w100p curP clr11" placeholder="значение не выбрано" value="' + v.title + '" />' +
+								'</div>'+
+								'<input type="text" class="v208 w70 r' + _dn(v.pole) + '" value="' + v.v + '" />' +
+							'<td class="w25 pl5">' +
+								'<div class="icon icon-move-y pl curM"></div>' +
+							'<td class="w25 r">' +
+								'<div class="icon icon-del-red pl tool" data-tool="Удалить значение"></div>' +
+					'</table>' +
+				'</dd>'
+			);
+
+			var DD = DL.find('dd:last'),
+				SELEM = DD.find('._selem'),
+				BUT = DD.find('button');
+
+			if(v.pole)
+				DD.find('.v208').focus();
+
+			SELEM.click(function() {
 					var t = $(this),
 						cmp = t.prev(),
-						inp = t.find('input'),
-						del = t.find('.icon-del');
+						inp = t.find('input');
 
 					_dialogLoad({
 						dialog_id:11,
@@ -1246,98 +1331,56 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						func_save:function(res) {
 							cmp.val(res.v);
 							inp.val(res.title);
-							del._dn(1);
 						}
 					});
-				});
-				//очистка выбранного значения
-				ATR_EL.find('._selem:last .icon-del').click(function(e) {
-					e.stopPropagation();
-					var t = $(this);
-					t._dn();
-					t.next().val('');
-					t.parents('._selem').prev().val(0);
-				});
-			},
-			html =
-				ACT208_V(1, V1.elem_id, V1.elem_name) +
-				'<div class="icon icon-add ml15 pl tool" data-tool="Добавить значение"></div>' +
-				'<div class="icon icon-del-red ml3 pl tool" data-tool="Удалить последнее значение"></div>',
-			ICON_ADD = ATR_EL.html(html).find('.icon-add'),
-			ICON_DEL = ICON_ADD.next(),
-			NUM = 2;
-
-		ACT208_VSEL();
-		ICON_ADD.click(_ADD);
-		ICON_DEL.click(function() {
-			var v208 = ATR_EL.find('.v208:last'),
-				n = _num(v208.attr('val'));
-
-			if(n == 1)
-				return;
-
-			v208.prev().remove();
-			v208.next().remove();
-			v208.remove();
-			NUM--;
-
-			if(n == 3)
-				ICON_DEL._dn();
-		});
-
-		if(!vvv.length)
-			_ADD();
-		else
-			_forN(vvv, function(v, n) {
-				if(n)
-					_ADD(v);
 			});
 
-		function _ADD(v) {
-			v = $.extend({
-				elem_id:0,
-				elem_name:'',
-				znak:1
-			}, v);
-			html =
-				'<div class="dib w15 ml10">' +
-					'<input type="hidden" id="znak' + NUM + '" value="' + v.znak + '" />' +
-				'</div>' +
-				ACT208_V(NUM, v.elem_id, v.elem_name);
+			DL.sortable({handle:'.icon-move-y'});
+			BUT.click(function() {
+				var t = $(this),
+					n = 0;
 
-			ICON_ADD.before(html);
+				if(t.hasClass('red'))
+					n = 1;
+				if(t.hasClass('orange'))
+					n = 2;
+				if(t.hasClass('blue'))
+					n = 3;
 
-			$('#znak' + NUM)._dropdown({
-				title0:'выбор знака',
-				spisok:[
-					{id:1,title:'<b class="fs17">+</b>'},
-					{id:2,title:'<b class="fs17">-</b>'},
-					{id:3,title:'<b class="fs17">*</b>'},
-					{id:4,title:'<b class="fs17">/</b>'}
-				]
+				n++;
+				if(n > 3)
+					n = 0;
+
+				t.html(znak[znak_n[n]]);
+				t.removeClass('green red orange blue');
+				t.addClass(znak_color[znak_n[n]]);
+				t._tool(znak_tool[znak_n[n]]);
 			});
-
-			ACT208_VSEL();
-
-			NUM++;
-
-			ICON_DEL._dn(NUM > 3);
+			DD.find('.icon-del-red').click(function() {
+				$(this).closest('DD').remove();
+			});
 		}
 	},
 	PHP12_action208_formula_get = function(el) {
 		var send = [];
-		_forEq(_attr_el(el.id).find('.v208'), function(sp) {
-			var elem_id = _num(sp.val()),
-				n = _num(sp.attr('val')) + 1;
+		_forEq(_attr_el(el.id).find('dd'), function(sp) {
+			var but = sp.find('button'),
+				znak = '+';
 
-			send.push(elem_id);
+			if(but.hasClass('red'))
+				znak = '-';
+			if(but.hasClass('orange'))
+				znak = '*';
+			if(but.hasClass('blue'))
+				znak = '/';
 
-			if(!$('#znak' + n).length)
-				return;
-
-			send.push(_num($('#znak' + n).val()));
+			send.push({
+				znak:znak,
+				elem_id:_num(sp.find('.el208').val()),
+				v:_cena(sp.find('.v208').val())
+			});
 		});
-		return send.join();
+		return send;
 	},
 
 
