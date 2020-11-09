@@ -19,14 +19,21 @@ function _element8_struct($el) {
 									  */
 		'num_6' => _num($el['num_6']),//прижимать текст вправо
 		'num_7' => _num($el['num_7']),//применять диалоговое окно по нажатию Enter
+		'num_8' => _num($el['num_8']),//только для чтения
 		'txt_4' => $el['txt_4'],      //начальный текст: указанное значение [13]
 		'txt_3' => $el['txt_3']       //шаблон артикула (для 34)
 	) + _elementStruct($el);
 }
 function _element8_print($el, $prm) {
 	$placeholder = $el['txt_1'] ? ' placeholder="'.$el['txt_1'].'"' : '';
+	$readonly = $el['num_8'] ? ' readonly' : '';
 	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
+	$cls = array();
+	$cls[] = $el['num_6'] ? 'r' : '';//прижимать текст вправо
+	$cls[] = $readonly ? 'readonly' : '';
+	$cls = array_diff($cls, array(''));
+	$cls = $cls ? ' class="'.implode(' ', $cls).'"' : '';
 
 	$v = _elemPrintV($el, $prm, $el['txt_2']);
 	$v = _element8vFromEl($el, $prm, $v);
@@ -101,10 +108,8 @@ function _element8_print($el, $prm) {
 			break;
 	}
 
-	//прижимать текст вправо
-	$right = $el['num_6'] ? ' class="r"' : '';
 
-	return '<input type="text" id="'._elemAttrId($el, $prm).'"'.$right._elemStyleWidth($el).$placeholder.$disabled.' value="'.$v.'" />';
+	return '<input type="text" id="'._elemAttrId($el, $prm).'"'.$cls._elemStyleWidth($el).$placeholder.$readonly.$disabled.' value="'.$v.'" />';
 }
 function _element8_print11($el, $u) {
 	if(!$col = _elemCol($el))

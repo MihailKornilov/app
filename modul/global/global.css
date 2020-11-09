@@ -26,6 +26,12 @@ input,textarea{
 input::-webkit-input-placeholder{color:#bbb}
 input::-moz-placeholder{color:#999}
 input.err{background-color:#fff2f2}
+input.readonly{
+	cursor:default;
+	background-color:transparent;
+	border-color:#DEE3EF;
+	color:#555;
+}
 
 textarea{
 	resize:none;
