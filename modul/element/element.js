@@ -2744,7 +2744,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			write:el.num_1 && el.num_3,
 			msg_empty:'Не найдено',
 			spisok:el.vvv,
-			blocked:el.num_4,
+			blocked:el.num_4 || el.noedit && OBJ.unit.id,
 			multi:el.num_11,
 			func:function(v, sp) {
 				if(sp && sp.sp)
