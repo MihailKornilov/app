@@ -2737,7 +2737,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	//[29] select: выбор единицы из другого списка (для связки)
-	_EL29 = function(el) {
+	_EL29 = function(el, OBJ) {
 		var o = {
 			width:_num(el.width),
 			title0:el.txt_1,
