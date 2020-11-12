@@ -43,63 +43,9 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 	$dss = _elem40dss_43($prm, $dss);
 	$dss = _elem40dss_44($prm, $dss);
 	$dss = _elem40dss_page($prm, $dss);
+	$dss = _elem40dss_11($prm, $dss);
 
 	return $dss;
-	if(!empty($prm['unit_edit']))
-		$prm['srce']['element_id'] = $prm['unit_edit']['element_id'];
-
-	//поиск элемента по ячейке таблицы
-	if($ell_id = $prm['srce']['element_id']) {
-		$sql = "SELECT *
-				FROM `_element`
-				WHERE `id`=".$ell_id;
-		if($ell = query_assoc($sql))
-			if($elp = _elemOne($ell['parent_id'])) {
-				//таблица
-				if($elp['dialog_id'] == 23)
-					return $elp['num_1'];
-				//таблица из нескольких списков
-				if($elp['dialog_id'] == 88)
-					if($json = json_decode($elp['txt_2'], true)) {
-						$n = 0;
-						foreach($json['col'] as $col)
-							foreach($col['elm'] as $nn => $elm_id)
-								if($elm_id == $ell_id)
-									$n = $nn;
-						foreach($json['spv'] as $nn => $spv)
-							if($nn == $n)
-								return $spv['dialog_id'];
-					}
-				//сборный текст
-				if($elp['dialog_id'] == 44)
-					foreach($elp['vvv'] as $vvv)
-						if($vvv['id'] == $ell_id)
-							if($vvv['dialog_id'] == 11) {
-								$el11 = _elemOne(_idsFirst($vvv['txt_2']));
-								$BL = _blockOne($el11['block_id']);
-								if($BL['obj_name'] == 'dialog')
-									return $BL['obj_id'];
-								return 0;
-							}
-			}
-	}
-
-	if(!$block_id = $prm['srce']['block_id'])
-		return 0;
-	if(!$BL = _blockOne($block_id))
-		return 0;
-
-	if($EL = _elemOne($BL['elem_id']))
-		if(_elemIsConnect($EL))//если является списком - отправка диалога списка
-			return _num($EL['num_1']);
-
-	if($BL['obj_name'] == 'page') {
-		if(!$page = _page($BL['obj_id']))
-			return 0;
-		return $page['dialog_id_unit_get'];
-	}
-
-	return _blockDlgId($block_id);
 }
 function _elem40dss_bl($prm) {//получение данных блока
 	if(!$bl = _blockOne($prm['srce']['block_id']))
@@ -211,6 +157,16 @@ function _elem40dss_page($prm, $dss) {//получение id диалога и�
 
 	return _num($page['dialog_id_unit_get']);
 }
+function _elem40dss_11($prm, $dss=0) {//получение id диалога из Списка-таблицы
+	if($dss)
+		return $dss;
+	if(!$el = _elemOne($prm['srce']['element_id']))
+		return 0;
+	if(!$el = _elemOne($el['txt_2']))
+		return 0;
+
+	return _blockDlgId($el['block_id']);
+}
 function _elem40res($filter, $u) {
 	$send = true;
 	foreach($filter as $ff) {
@@ -244,9 +200,12 @@ function _elem40res($filter, $u) {
 				//$v - значение, которое проверяется (которое пришло)
 				//$vv - значение, установленное в фильтре
 
-				$vv = _elemUidsChild($ff['elem_id'], $vv);
+//				$vv = _elemUidsChild($ff['elem_id'], $vv);
 
-				if(!isset($vv[$v]))
+//				if(!isset($vv[$v]))
+//					break;
+
+				if($v != _40cond_dop($ff, $vv))
 					break;
 
 				$send = false;
