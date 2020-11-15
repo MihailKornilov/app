@@ -4235,22 +4235,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//[70] Выбор цвета фона
 	_EL70 = function(el) {
-		$(ATTR_CMP(el.id)).next()._hint({
-			msg:el.vvv,
-			pad:3,
-			side:'right',
-			func:function(h) {
-				var div = h.find('._color-bg-choose div');
-				div.click(function() {
-					var t = $(this),
-						c = t.attr('val');
-					div.removeClass('sel');
-					t.addClass('sel');
-					$(ATTR_CMP(el.id))
-						.val(c)
-						.next().css('background-color', c);
-				});
-			}
+		$(ATTR_CMP(el.id)).next().mouseenter(function() {
+			$(this)._hint({
+				msg:el.vvv,
+				pad:3,
+				side:'right',
+				show:1,
+				func:function(h) {
+					var div = h.find('._color-bg-choose div');
+					div.click(function() {
+						var t = $(this),
+							c = t.attr('val');
+						div.removeClass('sel');
+						t.addClass('sel');
+						$(ATTR_CMP(el.id))
+							.val(c)
+							.next().css('background-color', c);
+					});
+				}
+			});
 		});
 	},
 
