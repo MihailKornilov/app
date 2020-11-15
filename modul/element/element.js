@@ -4235,7 +4235,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//[70] Выбор цвета фона
 	_EL70 = function(el) {
-		$(ATTR_CMP(el.id)).next().mouseenter(function() {
+		var CMP = $(ATTR_CMP(el.id));
+		CMP.next().mouseenter(function() {
 			$(this)._hint({
 				msg:el.vvv,
 				pad:3,
@@ -4243,14 +4244,23 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				show:1,
 				func:function(h) {
 					var div = h.find('._color-bg-choose div');
+
+					//установка выбранного цвета после всплытия подсказки
+					div.removeClass('sel');
+					_forEq(div, function(sp) {
+						var v = CMP.val();
+						if(v == sp.attr('val')) {
+							sp.addClass('sel');
+							return false;
+						}
+					});
+
 					div.click(function() {
 						var t = $(this),
 							c = t.attr('val');
 						div.removeClass('sel');
 						t.addClass('sel');
-						$(ATTR_CMP(el.id))
-							.val(c)
-							.next().css('background-color', c);
+						CMP.val(c).next().css('background-color', c);
 					});
 				}
 			});
