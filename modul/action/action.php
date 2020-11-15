@@ -941,12 +941,15 @@ function PHP12_action_222($act) {//ЭЛЕМЕНТ: открытие диалог
 function PHP12_action_223($act) {//ЭЛЕМЕНТ: тёмная подсказка
 	if($act['dialog_id'] != 223)
 		return '';
-	if(!$v = _ids($act['target_ids']))
-		return '<div class="clr5">Отсутствует значение для подсказки</div>';
 
-	return
-	'<span class="clr1">Значение:</span> '.
-	'<span class="clr11">'._elemIdsTitle($v).'</span>';
+	if($v = $act['v1'])
+		return '<span class="clr1">Значение:</span> <b>'.$v.'</b>';
+
+	if($ids = _ids($act['target_ids']))
+		return '<span class="clr1">Значение:</span> '.
+			   '<span class="clr11">'._elemIdsTitle($ids).'</span>';
+
+	return '<div class="clr5">Отсутствует значение для подсказки</div>';
 }
 function PHP12_action_224($act) {//ЭЛЕМЕНТ: внешняя ссылка
 	if($act['dialog_id'] != 224)
