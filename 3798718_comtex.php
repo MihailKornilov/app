@@ -68,7 +68,8 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
-			_comtex_accrual();
+			_comtex_remind();
+			_comtex_remind_action();
 			break;
 
 		default:
@@ -1918,6 +1919,7 @@ function _comtex_remind() {//напоминания
 				"._comtexAss(1234, $r['client_id']).",
 				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
+				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."'
@@ -1937,10 +1939,18 @@ function _comtex_remind() {//напоминания
 				  num_2,
 				  num_3,
 				  num_4,
+				  num_5,
 
 				  user_id_add,
 				  dtime_add
 			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	$sql = "DELETE FROM `_spisok`
+			WHERE dialog_id=".$dialog_id."
+			  AND !num_3
+			  AND !num_4
+			  AND !num_5";
 	query($sql);
 
 	_comtexHistory($dialog_id);
@@ -2007,6 +2017,11 @@ function _comtex_remind_action() {//действие с напоминаниям
 			WHERE dialog_id=".$dialog_id."
 			  AND num_2=".$status_id."
 			  AND !num_3";
+	query($sql);
+
+	$sql = "DELETE FROM `_spisok`
+			WHERE dialog_id=".$dialog_id."
+			  AND !num_1";
 	query($sql);
 
 	_comtexHistory($dialog_id);
