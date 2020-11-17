@@ -930,10 +930,32 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	_ELM_FOCUS = function(elem_id) {
 		if(!elem_id)
 			return;
+
 		var ATTR = _attr_cmp(elem_id);
 		if(!ATTR)
 			return;
+
+		if(_ELM_FOCUS29(elem_id))
+			return;
+
 		ATTR.select();
+	},
+	_ELM_FOCUS29 = function(elem_id) {
+		var el = ELMM[elem_id];
+		if(!el)
+			return false;
+		if(el.dialog_id != 29)
+			return false;
+		if(!el.num_3)
+			return false;
+		if(_num(_attr_cmp(elem_id).val()))
+			return false;
+
+		_attr_el(elem_id)
+			.find('._select').addClass('rs')
+			.find('.select-inp').focus();
+
+		return true;
 	},
 
 	//применение действий, привязанных к элементам

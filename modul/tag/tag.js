@@ -41,7 +41,7 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 		blocked = o.blocked ? ' blocked' : '',
 		dib = o.block ? '' : ' dib',
 		width = 'width:' + (o.width ? o.width + 'px' : '100%'),
-		readonly = o.write ? '' : ' readonly',
+		readonly = o.write && !dis && !blocked  ? '' : ' readonly',
 		placeholder = o.title0 ? ' placeholder="' + o.title0 + '"' : '',
 		iconAddFlag = o.funcAdd && !dis && !blocked,
 		html =
