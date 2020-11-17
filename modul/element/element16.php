@@ -159,8 +159,10 @@ function PHP12_radio_setup_vvv($prm) {
 		return array();
 	if(!$el = _elemOne($prm['unit_edit']['id']))
 		return array();
+	if(!$send = _decode($el['txt_2']))
+		return array();
 
-	return _decode($el['txt_2']);
+	return _arrNum($send);
 }
 
 

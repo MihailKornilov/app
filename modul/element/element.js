@@ -2160,9 +2160,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			valueAdd();
 			valueAdd();
 		} else {
-			_forIn(vvv, function(v) {
-				if(ID_NEXT <= v.id)
-					ID_NEXT = v.id + 1;
+			_forIn(vvv, function(sp) {
+				if(ID_NEXT <= sp.id)
+					ID_NEXT = sp.id + 1;
 			});
 			_forIn(vvv, valueAdd);
 		}

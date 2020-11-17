@@ -19,7 +19,7 @@ function _element18_struct($el) {
 function _element18_vvv($el) {
 	if(!$el['txt_2'])
 		return array();
-	if(!$send = json_decode($el['txt_2'], true))
+	if(!$send = _decode($el['txt_2']))
 		return array();
 
 	return _arrNum($send);

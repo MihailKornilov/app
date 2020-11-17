@@ -18,7 +18,7 @@ function _element17_struct($el) {
 function _element17_vvv($el) {
 	if(!$el['txt_2'])
 		return array();
-	if(!$send = json_decode($el['txt_2'], true))
+	if(!$send = _decode($el['txt_2']))
 		return array();
 
 	foreach($send as $id => $r)
