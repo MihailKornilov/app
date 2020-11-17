@@ -41,7 +41,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_zayav_tovar();
 			_comtex_zayav_cartridge();
 			_comtex_zayav_vyzov();
-			_comtex_zayav_worker_acc();
+			_comtex_zayav_expense_worker();
 			_comtex_zayav_expense_other();
 			_comtex_zayav_expense_tovar();
 			_comtex_zayav_note();
@@ -1160,7 +1160,7 @@ function _comtex_zayav_vyzov() {//заявки-вызов специалиста
 	_comtexErrMsg($dialog_id, 'num_1', 'клиенты');
 	_comtexErrMsg($dialog_id, 'num_2', 'статус');
 }
-function _comtex_zayav_worker_acc() {//начисления зп сотрудникам в заявке
+function _comtex_zayav_expense_worker() {//начисления зп сотрудникам в заявке
 	$dialog_id = _comtexSpisokClear(1444);
 
 	_db2();
@@ -1184,6 +1184,7 @@ function _comtex_zayav_worker_acc() {//начисления зп сотрудн�
 				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 				"._comtexUserId($r, 'worker_id').",
 				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
+				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
 				".$r['sum'].",
 				'".$mon."',
 
@@ -1201,6 +1202,7 @@ function _comtex_zayav_worker_acc() {//начисления зп сотрудн�
 				  num_1,
 				  num_2,
 				  num_3,
+				  num_4,
 				  sum_1,
 				  txt_1,
 
@@ -1215,7 +1217,8 @@ function _comtex_zayav_worker_acc() {//начисления зп сотрудн�
 	$sql = "DELETE FROM `_spisok`
 			WHERE `dialog_id`=".$dialog_id."
 			  AND !`num_1`
-			  AND !`num_3`";
+			  AND !`num_3`
+			  AND !`num_4`";
 	query($sql);
 }
 function _comtex_zayav_expense_other() {//расход по заявке: прочее
@@ -1239,6 +1242,7 @@ function _comtex_zayav_expense_other() {//расход по заявке: про
 				".$dialog_id.",
 
 				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
+				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
 				'".addslashes($r['txt'])."',
 				".$r['sum'].",
 
@@ -1254,6 +1258,7 @@ function _comtex_zayav_expense_other() {//расход по заявке: про
 				  `dialog_id`,
 				
 				  num_1,
+				  num_2,
 				  txt_1,
 				  sum_1,
 
@@ -1266,7 +1271,8 @@ function _comtex_zayav_expense_other() {//расход по заявке: про
 
 	$sql = "DELETE FROM `_spisok`
 			WHERE `dialog_id`=".$dialog_id."
-			  AND !`num_1`";
+			  AND !`num_1`
+			  AND !`num_2`";
 	query($sql);
 }
 function _comtex_zayav_expense_tovar() {//расход по заявке: запчасти
