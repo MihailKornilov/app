@@ -363,10 +363,18 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 }
 function _29cnnOrder($el, $DLG) {//порядок вывода
 	switch(@$el['num_8']) {
+		//по дате добавления
 		case 10086: return 'dtime_add';
+		//ручная сортировка
 		case 10087:
 			if(isset($DLG['field1']['sort']))
 				return 'sort';
+			break;
+		//по значению из диалога
+		case 10088:
+			if(!$col = _elemCol($el['num_12']))
+				break;
+			return $col;
 	}
 	return 'id';
 }
