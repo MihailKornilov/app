@@ -258,6 +258,8 @@ function PHP12_v_choose_menuSel($prm) {//выбранный пункт меню
 		return 1;
 	if($v == -23)
 		return 1;
+	if($v == -24)
+		return 1;
 	if($v == -31)
 		return 1;
 
@@ -270,6 +272,10 @@ function PHP12_v_choose_global($prm) {//глобальные значения д
 	'<div class="prel pad10">'.
 		'<div class="elm-choose'.($v == -21 ? ' sel' : '').'" val="-21"></div>'.
 		'<div class="fs17 b center pad10 clr9">Текущий пользователь</div>'.
+	'</div>'.
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -24 ? ' sel' : '').'" val="-24"></div>'.
+		'<div class="fs17 b center pad10 clr9">Текущая страница</div>'.
 	'</div>'.
 	'<div class="prel pad10">'.
 		'<div class="elm-choose'.($v == -22 ? ' sel' : '').'" val="-22"></div>'.

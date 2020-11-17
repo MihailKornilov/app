@@ -458,6 +458,8 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 					if(!$uid = _num(@$prm['unit_edit']['id']))
 						return 0;
 					return $uid;
+				//текущая страница
+				case -24: return $prm['srce']['page_id'];
 			}
 			return 0;
 		}
