@@ -259,6 +259,8 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 	*/
 	if(!$EL = _elemOne($elem_id))
 		return array();
+	if($EL['dialog_id'] != 29)
+		return array();
 	//диалог привязанного списка
 	if(!$DLG = _dialogQuery($EL['num_1']))
 		return array();
