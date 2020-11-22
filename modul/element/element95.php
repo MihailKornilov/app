@@ -260,13 +260,13 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 			ON DUPLICATE KEY UPDATE ".implode(',', $upd);
 	query($sql);
 
+	_count_update();
+
 	$send = array(
 		'action_id' => _num($DLG[ACT.'_action_id']),
 		'action_page_id' => _num($DLG[ACT.'_action_page_id']),
 		'content' => _pageShow(_page('cur'))
 	);
-
-	_count_update();
 
 	jsonSuccess($send);
 }
