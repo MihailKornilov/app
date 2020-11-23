@@ -194,23 +194,41 @@ function _spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT) {//ото
 		$send = $TABLE_BEGIN;
 
 	$send .= '<tr>';
-	foreach(_element('vvv', $ELEM) as $tr) {
-		$txt = $tr['txt_7'];
-
-		//выбор галочками
-		if($tr['dialog_id'] == 91)
-			$txt = _check(array(
-				'attr_id' => 'sch'.$tr['id'].'_all',
-				'value' => 0
-			));
-
-		$send .= '<th'._elemStyleWidth($tr).'>'.$txt;
-	}
+	foreach(_element('vvv', $ELEM) as $tr)
+		$send .= '<th'._elemStyleWidth($tr).'>'._spisok23thCHK($tr, $tr['txt_7']);
 
 	if($IS_SORT)
 		$send .= $TABLE_END;
 
 	return $send;
+}
+function _spisok23thCHK($el, $txt) {//вставка галочки в заголовок, которая будет выбирать все галочки
+	if($el['dialog_id'] != 91)
+		if($el['dialog_id'] != 44)
+			return $txt;
+		else {
+			if(!$vvv = _element('vvv', $el))
+				return $txt;
+			$is91 = false;
+			foreach($vvv as $r) {
+				if($r['type'] != 'el')
+					continue;
+				if(!$ell = _elemOne($r['id']))
+					continue;
+				if($ell['dialog_id'] != 91)
+					continue;
+
+				$is91 = true;
+				break;
+			}
+			if(!$is91)
+				return $txt;
+		}
+
+	return _check(array(
+		'attr_id' => 'sch'.$el['id'].'_all',
+		'value' => 0
+	));
 }
 function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {//формирование табличного списка по уровням
 	if(!$arr = @$child[$parent_id])

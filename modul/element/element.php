@@ -3016,8 +3016,11 @@ function PHP12_schetPayContent_vvv($prm) {
 	//элемент-таблица, где были выбраны галочки
 	if(!$el = _elemOne($el12['num_3']))
 		return array();
-	if(!$ids = _ids(@$CHK[$el['id']]))
+	if(!$ids = _ids(@$CHK[$el['id']], 'arr'))
 		return array();
+
+	$ids = array_unique($ids);
+	$ids = _ids($ids);
 
 	//пока только для [23]
 	if($el['dialog_id'] != 23)
