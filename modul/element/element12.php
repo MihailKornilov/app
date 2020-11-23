@@ -11,7 +11,8 @@ function _element12_struct($el) {
 		'txt_3' => $el['txt_3'],      //значение 2
 		'txt_4' => $el['txt_4'],      //значение 3
 		'num_1' => _num($el['num_1']),//условие 1
-		'num_2' => _num($el['num_2']) //элемент 1
+		'num_2' => _num($el['num_2']),//элемент 1
+		'num_3' => _num($el['num_3']) //элемент 2 (на странице)
 	) + _elementStruct($el);
 }
 function _element12_print($el, $prm) {
