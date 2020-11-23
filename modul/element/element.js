@@ -2334,7 +2334,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							return;
 						arr.push(_num(eq.parents('.tr-unit').attr('val')));
 					});
-					CHK[el.id] = arr;
+					CHK[el.id] = arr.join();
 				};
 
 			_forEq(EL_CHK, function(eq) {
@@ -6927,19 +6927,24 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		if(!vvv.length)
 			vAdd();
-		else
+		else {
 			_forIn(vvv, vAdd);
+			_itog();
+		}
 
 		function vAdd(v) {
 			v = $.extend({
-				txt:'',   //текст строки
-				count:1,  //количество
-				cena:'',  //цена
-				sum:''    //сумма
+				id:0,   //id записи
+				txt:'', //текст строки
+				count:1,//количество
+				cena:'',//цена
+				sum:''  //сумма
 			}, v || {});
 
+			var ro = v.id ? ' readonly' : '';
+
 			DL.append(
-				'<dd class="mb1 bg0">' +
+				'<dd class="mb1 bg0" val="' + v.id + '">' +
 					'<table class="_stab w100p collaps">' +
 						'<tr><td class="w35 r clr1 top">' +
 								'<div class="mt5">' + NUM++ + '</div>' +
@@ -6947,14 +6952,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 								'<textarea class="txt w100p h20">' + v.txt + '</textarea>' +
 							'<td class="w70 top">' +
 								'<input type="text"' +
-									  ' class="count w100p r"' +
+									  ' class="count w100p r' + ro + '"' +
+									  ro +
 									  ' value="' + v.count + '"' +
 								' />' +
 							'<td class="w70 center top">' +
 								'<div class="mt5">шт.</div>' +
 							'<td class="w100 top">' +
 								'<input type="text"' +
-									  ' class="cena w100p r"' +
+									  ' class="cena w100p r' + ro + '"' +
+									  ro +
 									  ' value="' + v.cena + '"' +
 								' />' +
 							'<td class="w100 top">' +
@@ -6966,7 +6973,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 							'<td class="w25 center top">' +
 								'<div class="icon icon-move pl curM mt5"></div>' +
 							'<td class="w35 r pr3 bg0 top">' +
-								'<div class="icon icon-del-red pl mt5 tool" data-tool="Удалить позицию"></div>' +
+				   (v.id ? '' : '<div class="icon icon-del-red pl mt5 tool" data-tool="Удалить позицию"></div>') +
 					'</table>' +
 				'</dd>'
 			);

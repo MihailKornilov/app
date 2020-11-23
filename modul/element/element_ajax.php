@@ -1585,6 +1585,9 @@ function _dialogOpenLoad($dialog_id) {
 	$prm['dop'] = _arrNum(@$_POST['dop']);
 	$prm['srce']['dop'] = $prm['dop'];
 
+	//выбранные значения галочками (глобальная переменная CHK)
+	$prm['srce']['chk'] = _arrNum(@$_POST['chk']);
+
 	$get_id = _num(@$_POST['get_id']);
 
 	if($dialog['is_unit_get'] && !$get_id)

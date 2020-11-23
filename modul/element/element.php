@@ -2964,6 +2964,7 @@ function _historyUnitCond($el, $prm) {//отображение истории д
 function PHP12_schetPayContent($prm) {//содержание счёта на оплату
 	/*
 		num_2 - элемент: Итоговая сумма
+		num_3 - элемент: список, где есть выбор галочками (получение значений для вставки в счёт)
 	*/
 	return '';
 }
@@ -2997,14 +2998,59 @@ function PHP12_schetPayContent_save($cmp, $val, $unit) {
 	query($sql);
 }
 function PHP12_schetPayContent_vvv($prm) {
-	if(!$col = @$prm['el12']['col'])
+	$el12 = $prm['el12'];
+	if(!$col = @$el12['col'])
 		return array();
-	if(!$u = _unitEdit($prm))
+	if($u = _unitEdit($prm)) {
+		if(!isset($u[$col]))
+			return array();
+		return _decode($u[$col]);
+	}
+
+	//формирование списка для счёта на основании выбранных галочек
+	if(!$CHK = @$prm['srce']['chk'])
 		return array();
-	if(!isset($u[$col]))
+	if(!is_array($CHK))
 		return array();
 
-	return _decode($u[$col]);
+	//элемент-таблица, где были выбраны галочки
+	if(!$el = _elemOne($el12['num_3']))
+		return array();
+	if(!$ids = _ids(@$CHK[$el['id']]))
+		return array();
+
+	//пока только для [23]
+	if($el['dialog_id'] != 23)
+		return array();
+	if(!$DLG = _dialogQuery($el['num_1']))
+		return array();
+
+	//получение данных списка
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			  AND `id` IN (".$ids.")
+			ORDER BY `id`";
+	if(!$spisok = query_arr($sql))
+		return array();
+
+	$spisok = _spisokInclude($spisok);
+
+	$send = array();
+	foreach(_ids($ids, 'arr') as $id) {
+		if(!$u = @$spisok[$id])
+			continue;
+
+		$send[] = array(
+			'id' => $id,
+			'txt' => strip_tags(_element('print11', 17780, $u)),
+			'count' => 1,
+			'cena' => $spisok[$id]['num_6'],
+			'sum' => $spisok[$id]['num_6']
+		);
+	}
+
+	return $send;
 }
 
 
