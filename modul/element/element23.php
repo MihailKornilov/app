@@ -400,6 +400,9 @@ function elem23docxCell($txt, $w, $align='center', $th=false) {//формиро�
 		'</w:p>'.
 	'</w:tc>';
 }
+function _element23_title($el) {
+	return 'Список-таблица '._dialogParam($el['num_1'], 'name');
+}
 
 /* ---=== НАСТРОЙКА ЯЧЕЕК ТАБЛИЦЫ [23] ===--- */
 function PHP12_td_setup($prm) {//используется в диалоге [23]
