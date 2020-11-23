@@ -66,8 +66,11 @@ function _blockAction201($bl, $prm) {//установка исходного о�
 			$v = isset($el['def']) ? $el['def'] : 0;
 			if($u = $prm['unit_edit'])
 				if($col = _elemCol($el))
-					if(isset($u[$col]))
+					if(isset($u[$col])) {
 						$v = $u[$col];
+						if(is_array($v))
+							$v = _num(@$v['id']);
+					}
 
 			//фильтры
 			switch($el['dialog_id']) {
