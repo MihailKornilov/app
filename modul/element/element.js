@@ -2,7 +2,6 @@
 var DIALOG = {},    //массив диалоговых окон для управления другими элементами
 	ELM_RELOAD = {},//массив элементов, ожидающих перезагрузки. В виде: [id кто перезагружает] = id кого перезагружают
 					//пезагрузка происходит при помощи фукнции _elemReload
-
 	ELEM_COLOR = {
 		"":["#000", "Чёрный"],
 		"clr9":["#555", "Тёмно-серый"],
@@ -662,16 +661,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			op:'dialog_open_load',
 			page_id:PAGE_ID,
 
-			dialog_id:0,     //диалог, который вносит элемент
-			dss:0,           //id исходного диалога, либо настраиваемого
-			block_id:0,      //id блока в который вставляется элемент
-			element_id:0,    //id элемента
+			dialog_id:0,    //диалог, который вносит элемент
+			dss:0,          //id исходного диалога, либо настраиваемого
+			block_id:0,     //id блока в который вставляется элемент
+			element_id:0,   //id элемента
 
-			get_id:0,        //id записи, содержание которой будет размещаться в диалоге
-			edit_id:0,       //id записи при редактировании
-			del_id:0,        //id записи при удалении
+			get_id:0,       //id записи, содержание которой будет размещаться в диалоге
+			edit_id:0,      //id записи при редактировании
+			del_id:0,       //id записи при удалении
 
-			dop:'',          //дополнительные параметры для некоторых элементов
+			dop:'',         //дополнительные параметры для некоторых элементов
+			chk:CHK,        //выбранные значения галочками для конкретных элементов
 
 			busy_obj:null,   //объект, к которому применяется процесс ожидания
 			busy_cls:'_busy',/* класс, показвыающий процесс ожидания
@@ -2323,7 +2323,21 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(sp.dialog_id != 91)
 				return;
 
-			_forEq($(ATTR_EL(el.id)).find('._check'), function(eq) {
+			var EL_CHK = $(ATTR_EL(el.id)).find('._check'),
+				CKH_SAVE = function() {
+					var arr = [];
+					_forEq(EL_CHK, function(eq) {
+						var tdid = eq.attr('id').split('_')[1];
+						if(tdid == 'all')
+							return;
+						if(!eq.hasClass('on'))
+							return;
+						arr.push(_num(eq.parents('.tr-unit').attr('val')));
+					});
+					CHK[el.id] = arr;
+				};
+
+			_forEq(EL_CHK, function(eq) {
 				//получение id записи
 				var tdid = eq.attr('id').split('_')[1];
 
@@ -2331,18 +2345,19 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				if(tdid == 'all') {
 					$('#sch' + sp.id + '_all')._check({
 						func:function(v) {
-							_forEq($(ATTR_EL(el.id)).find('._check'), function(eqAll) {
+							_forEq(EL_CHK, function(eqAll) {
 								var ch = eqAll.prev();
 								if(ch.attr('id').split('_')[1] == 'all')
 									return;
 								ch._check(v);
 							});
+							CKH_SAVE();
 						}
 					});
 					return;
 				}
 
-				eq.prev()._check();
+				eq.prev()._check({func:CKH_SAVE});
 			});
 			return false;
 		});
