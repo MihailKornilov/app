@@ -2975,6 +2975,7 @@ function PHP12_schetPayContent_save($cmp, $val, $unit) {
 		return;
 
 	$save = array();
+	$ids = array();
 
 	if(!empty($val))
 		if(is_array($val))
@@ -2982,7 +2983,11 @@ function PHP12_schetPayContent_save($cmp, $val, $unit) {
 				if(!$txt = _txt($r['txt']))
 					continue;
 
+				if($id = _num($r['id']))
+					$ids[] = $id;
+
 				$save[] = array(
+					'id' => $id,
 					'txt' => $txt,
 					'count' => _cena($r['count']),
 					'cena' => _cena($r['cena']),
@@ -3046,7 +3051,7 @@ function PHP12_schetPayContent_vvv($prm) {
 
 		$send[] = array(
 			'id' => $id,
-			'txt' => strip_tags(_element('print11', 17780, $u)),
+			'txt' => strip_tags(_element('print11', 17834, $u)),
 			'count' => 1,
 			'cena' => $spisok[$id]['num_6'],
 			'sum' => $spisok[$id]['num_6']

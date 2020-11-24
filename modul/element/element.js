@@ -2318,6 +2318,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				errorClass:el.num_7 > 1 ? 'bg-fcc' : ''  //ошибка, если попытка переместить элемент на недоступный уровень
 			});
 
+		console.log(el.vvv);
 		//выбор значений галочками
 		_forN(el.vvv, function(sp) {
 			if(sp.dialog_id != 91)
@@ -7006,6 +7007,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
+				id:sp.attr('val'),
 				txt:sp.find('.txt').val(),
 				count:_cena(sp.find('.count').val()),
 				cena:_cena(sp.find('.cena').val()),

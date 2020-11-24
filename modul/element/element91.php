@@ -15,4 +15,6 @@ function _element91_print($el, $prm) {
 		'value' => 0
 	));
 }
-
+function _element91_title() {
+	return '[91] Выбор галочками';
+}
