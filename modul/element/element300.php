@@ -40,8 +40,9 @@ function _elem300p301($el, $u, $last_id) {//вывод значения поль
 		return '';
 	if(!$vk_id = _num(@$u[$col]))
 		return '';
-	if(!$res = _elem300vkRes($vk_id, true))
-		return '';
+	if(!$res = @$u[$col.'_assoc'])
+		if(!$res = _elem300vkRes($vk_id, true))
+			return '';
 
 	switch($last_id) {
 		case 16977: return '<img src="'.$res['photo'].'" class="br1000" width="'._elemWidth($el['elp']).'">';
@@ -112,6 +113,65 @@ function _elem300VkIdTest($DLG, $v, $user_id) {//проверка, чтобы д
 	}
 
 	return false;
+}
+function _elem300inc($spisok) {//получение данных пользователей VK для списка
+	$spkey = key($spisok);
+	$sp0 = $spisok[$spkey];
+	if(!isset($sp0['dialog_id']))
+		return $spisok;
+
+	if(!$DLG = _dialogQuery($sp0['dialog_id']))
+		return $spisok;
+
+	//получение имени колонки, по которой располагаются vk_id
+	$col = '';
+	foreach($DLG['cmp'] as $el) {
+		if($el['dialog_id'] != 300)
+			continue;
+		if(!$col = _elemCol($el))
+			continue;
+
+		break;
+	}
+
+	if(!$col)
+		return $spisok;
+
+	//сбор всех ID пользователей из VK
+	$ids = array();
+	foreach($spisok as $id => $sp)
+		if(!empty($sp[$col]))
+			$ids[] = $sp[$col];
+
+	if(empty($ids))
+		return $spisok;
+
+
+	$res = _vkapi('users.get', array(
+		'user_ids' => _ids($ids),
+		'fields' => 'photo'
+	));
+
+	if(empty($res['response']))
+		return $spisok;
+
+	$ass = array();
+	foreach($res['response'] as $r)
+		$ass[$r['id']] = array(
+			'first_name' => $r['first_name'],
+			'last_name' => $r['last_name'],
+			'photo' => $r['photo']
+		);
+
+	foreach($spisok as $id => $sp) {
+		if(empty($sp[$col]))
+			continue;
+		if(!isset($ass[$sp[$col]]))
+			continue;
+		$spisok[$id][$col.'_assoc'] = $ass[$sp[$col]];
+	}
+
+	return $spisok;
 }
 
 

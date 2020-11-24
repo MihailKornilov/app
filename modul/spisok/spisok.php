@@ -327,6 +327,7 @@ function _spisokInclude($spisok) {//вложенные списки
 
 	$spisok = _elem57inc($spisok);
 	$spisok = _elem17inc($spisok);
+	$spisok = _elem300inc($spisok);
 
 	return $spisok;
 }
