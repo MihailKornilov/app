@@ -2968,6 +2968,36 @@ function PHP12_schetPayContent($prm) {//содержание счёта на о�
 	*/
 	return '';
 }
+function PHP12_schetPayContent_cnn($unit, $ids, $clear=false) {//установка ID диалога значениям для привязки
+	if(!$ids)
+		return;
+
+	$sql = "SELECT DISTINCT `dialog_id`
+			FROM `_spisok`
+			WHERE `id` IN ("._ids($ids).")";
+	$arr = query_array($sql);
+
+	if(count($arr) > 1)
+		echo 'Больше 1 диалога';
+
+	if(!$DLG = _dialogQuery($arr[0]['dialog_id']))
+		return;
+
+	foreach($DLG['cmp'] as $r) {
+		if($r['dialog_id'] != 29)
+			continue;
+		if(!$col = $r['col'])
+			continue;
+		if($r['num_1'] != $unit['dialog_id'])
+			continue;
+
+		$sql = "UPDATE `_spisok`
+				SET `".$col."`=".($clear ? 0 : $unit['id'])."
+				WHERE `id` IN ("._ids($ids).")";
+		query($sql);
+		break;
+	}
+}
 function PHP12_schetPayContent_save($cmp, $val, $unit) {
 	if(empty($unit['id']))
 		return;
@@ -3001,6 +3031,37 @@ function PHP12_schetPayContent_save($cmp, $val, $unit) {
 			SET `".$col."`='".addslashes($save)."'
 			WHERE `id`=".$unit['id'];
 	query($sql);
+
+	PHP12_schetPayContent_cnn($unit, $ids);
+}
+function PHP12_schetPayContent_del($unit) {//отвязка значений при удалении
+	if(empty($unit['dialog_id']))
+		return;
+	if(!$DLG = _dialogQuery($unit['dialog_id']))
+		return;
+
+	foreach($DLG['cmp'] as $r) {
+		if($r['dialog_id'] != 12)
+			continue;
+		if($r['txt_1'] != 'PHP12_schetPayContent')
+			continue;
+		if(!$col = $r['col'])
+			continue;
+		if(empty($unit[$col]))
+			continue;
+		if(!$json = _decode($unit[$col]))
+			continue;
+
+		$ids = array();
+		foreach($json as $v)
+			if($id = _num(@$v['id']))
+				$ids[] = $id;
+
+		if(empty($ids))
+			continue;
+
+		PHP12_schetPayContent_cnn($unit, $ids, true);
+	}
 }
 function PHP12_schetPayContent_vvv($prm) {
 	$el12 = $prm['el12'];

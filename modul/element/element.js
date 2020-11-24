@@ -2318,7 +2318,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				errorClass:el.num_7 > 1 ? 'bg-fcc' : ''  //ошибка, если попытка переместить элемент на недоступный уровень
 			});
 
-		console.log(el.vvv);
 		//выбор значений галочками
 		_forN(el.vvv, function(sp) {
 			if(sp.dialog_id != 91)

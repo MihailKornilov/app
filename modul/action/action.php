@@ -357,16 +357,19 @@ function _elemAction244($el, $prm) {//скрытие элемента
 	if(!$u = $prm['unit_get'])
 		return false;
 
+	$send = false;
+
 	foreach($action as $act) {
 		if($act['dialog_id'] != 244)
 			continue;
 		if(!$F = _decode($act['filter']))
-			return false;
+			continue;
 
-		return _elem40res($F, $u);
+		if(_elem40res($F, $u))
+			$send = true;
 	}
 
-	return false;
+	return $send;
 }
 function _elemAction245($el, $txt, $skip224=false) {//Формат для текста
 	if(!$action = _BE('elem_one_action', $el['id']))

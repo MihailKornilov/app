@@ -35,6 +35,8 @@ switch(@$_POST['op']) {
 					  AND "._queryCol_id($dialog)."=".$unit_id;
 			query($sql);
 
+			PHP12_schetPayContent_del($unit);
+
 			_userAppAccessDel($dialog, $unit_id);
 			_historyInsert(3, $dialog, $unit_id);
 			_counterGlobal($dialog['id'], $dialog);
