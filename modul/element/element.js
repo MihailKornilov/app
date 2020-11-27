@@ -2155,6 +2155,31 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
+	//[14] Список-ШАБЛОН
+	_EL14 = function(el) {
+		if(!el.vvv)
+			return;
+
+		var EL_CHK = $(ATTR_EL(el.id)).find('._check'),
+			CKH_SAVE = function() {
+				var arr = [];
+				_forEq(EL_CHK, function(eq) {
+					var tdid = eq.attr('id').split('_')[1];
+					if(!eq.hasClass('on'))
+						return;
+					arr.push(_num(eq.parents('.sp-unit').attr('val')));
+				});
+				CHK[el.id] = arr.join();
+			};
+
+		_forEq(EL_CHK, function(eq) {
+			//получение id записи
+			var tdid = eq.attr('id').split('_')[1];
+
+			eq.prev()._check({func:CKH_SAVE});
+		});
+	},
+
 	//[16] Радио
 	_EL16 = function(el) {
 		if(!el.action)

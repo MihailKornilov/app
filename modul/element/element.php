@@ -3089,8 +3089,11 @@ function PHP12_schetPayContent_vvv($prm) {
 	$ids = _ids($ids);
 
 	//пока только для [23]
-	if($el['dialog_id'] != 23)
-		return array();
+	switch($el['dialog_id']) {
+		case 14:
+		case 23: break;
+		default: return array();
+	}
 	if(!$DLG = _dialogQuery($el['num_1']))
 		return array();
 

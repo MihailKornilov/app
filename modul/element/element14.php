@@ -22,6 +22,14 @@ function _element14_struct($el) {
 		'num_6' => _num($el['num_6']) //обратный порядок
 	) + _elementStruct($el);
 }
+function _element14_vvv($el) {
+	//получение элемента-галочки для применения функции
+	foreach(_BE('elem_arr', 'spisok', $el['id']) as $sp)
+		if($sp['dialog_id'] == 91)
+			return $sp;
+
+	return false;
+}
 function _element14_title() {
 	return 'Список ШАБЛОН';
 }
