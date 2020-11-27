@@ -65,11 +65,11 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_remind_action();
 
 			_comtex_schet_pay();
+			_comtex_cartridge_in_zayav();
 
 		//частичный
 		case 2:
-			_comtex_remind();
-			_comtex_remind_action();
+			_comtex_cartridge_in_zayav();
 			break;
 
 		default:
@@ -2209,6 +2209,65 @@ function _comtex_schet_pay() {//счета на оплату
 			  AND !`num_3`";
 	query($sql);
 
+}
+function _comtex_cartridge_in_zayav() {//картриджи в заявках
+	$dialog_id = _comtexSpisokClear(1432);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _zayav_cartridge
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1403
+			  AND `num_1` IN (1273455,1273456)
+			  AND `id_old`";
+	$CART = query_ass($sql);
+
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
+				"._num(@$CART[$r['cartridge_id']]).",
+				
+				".$r['filling'].",
+				".$r['restore'].",
+				".$r['chip'].",
+				".$r['cost'].",
+
+				'".addslashes($r['prim'])."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_2,
+
+				  num_3,
+				  num_4,
+				  num_5,
+				  num_6,
+
+				  txt_1
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_1', 'заявки');
+	_comtexErrMsg($dialog_id, 'num_2', 'картриджи');
 }
 
 

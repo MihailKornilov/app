@@ -8,7 +8,10 @@ function _element91_struct($el) {
 	) + _elementStruct($el);
 }
 function _element91_print($el, $prm) {
-	$u = $prm['unit_get'];
+	if($prm['blk_setup'])
+		return _check(array('disabled'=>1));
+	if(!$u = _unitGet($prm))
+		return _msgRed('[91]-no-unit-get');
 
 	return _check(array(
 		'attr_id' => 'sch'.$el['id'].'_'.$u['id'],
