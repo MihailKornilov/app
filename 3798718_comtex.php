@@ -2236,6 +2236,7 @@ function _comtex_cartridge_in_zayav() {//картриджи в заявках
 				".$id.",
 				".$dialog_id.",
 
+				"._comtexAss(1431, $r['schet_id']).", /* счета на оплату */
 				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
 				"._num(@$CART[$r['cartridge_id']]).",
 				
@@ -2254,6 +2255,7 @@ function _comtex_cartridge_in_zayav() {//картриджи в заявках
 				  `num`,
 				  `dialog_id`,
 				
+				  num_8,
 				  num_1,
 				  num_2,
 
