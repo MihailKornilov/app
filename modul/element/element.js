@@ -2160,6 +2160,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!el.vvv)
 			return;
 
+		CHK = {};
 		var EL_CHK = $(ATTR_EL(el.id)).find('._check'),
 			CKH_SAVE = function() {
 				var arr = [];
@@ -2348,6 +2349,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(sp.dialog_id != 91)
 				return;
 
+			CHK = {};
 			var EL_CHK = $(ATTR_EL(el.id)).find('._check'),
 				CKH_SAVE = function() {
 					var arr = [];
