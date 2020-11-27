@@ -575,20 +575,24 @@ function _blockStyleBG($bl, $prm) {//цвет фона из записи
 		return '';
 	if(!$u = $prm['unit_get'])
 		return '';
-	if(!$ids = _ids($bl['bg'], 'arr'))
-		return '';
 
-	$bg = $u;
-	foreach($ids as $id) {
-		if(!$col = _elemCol($id))
-			return '';
-		if(!isset($bg[$col]))
-			return '';
+	$bg = '';
+	if($ids = _ids($bl['bg'], 'arr')) {
+		$bg = $u;
+		foreach($ids as $id) {
+			if(!$col = _elemCol($id))
+				return '';
+			if(!isset($bg[$col]))
+				return '';
 
-		$bg = $bg[$col];
+			$bg = $bg[$col];
+		}
 	}
 
-	return 'background-color:'._blockAction232($bl, $prm, $bg);
+	if(!$bg = _blockAction232($bl, $prm, $bg))
+		return '';
+
+	return 'background-color:'.$bg;
 }
 function _blockChildHtml($block, $prm, $grid_id, $level, $width) {//деление блока на части
 	if($block['id'] == $grid_id) {
