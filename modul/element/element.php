@@ -3158,7 +3158,7 @@ function PHP12_schetPayContent_print($el, $u) {
 
 	if($CNT)
 		$send .=
-			'<div class="mt10 fs14">'.
+			'<div class="mt8">'.
 				'Всего наименований <b>'.count($CNT).'</b>, на сумму <b>'._sumSpace($sum, true).'</b> руб.'.
 			'</div>';
 
