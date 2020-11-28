@@ -121,6 +121,11 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 
 	return $send;
 }
+function _element14_print11($el, $u) {
+	$prm = _blockParam();
+	$prm['unit_get_id'] = $u['id'];
+	return _element14_print($el, $prm);
+}
 function _element14_copy_vvv($el, $obj_id) {
 	$sql = "SELECT *
 			FROM `_block`

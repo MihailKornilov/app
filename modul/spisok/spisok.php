@@ -222,7 +222,8 @@ function _spisokIsSort($elem_id) {//определение, нужно ли пр
 }
 
 function _spisokCountAll($el, $prm, $next=0) {//получение общего количества строк списка
-	$key = 'SPISOK_COUNT_ALL'.$el['id'];
+	$unt_id = _num(@$prm['unit_get_id']);
+	$key = 'SPISOK_COUNT_ALL'.$el['id'].$unt_id;
 
 	if(defined($key))
 		return constant($key);
