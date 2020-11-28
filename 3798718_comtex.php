@@ -69,6 +69,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 
 		//частичный
 		case 2:
+			_comtex_schet_pay();
 			_comtex_cartridge_in_zayav();
 			break;
 
@@ -2158,8 +2159,33 @@ function _comtex_schet_pay() {//счета на оплату
 	if(!$arr = query_arr($sql))
 		return;
 
+	//формирование содержания для счетов
+	_db2();
+	$SC = array();
+	$sql = "SELECT *
+			FROM _schet_pay_content
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	foreach(query_arr($sql) as $r) {
+		$schet_id = _num($r['schet_id']);
+
+		if(!isset($SC[$schet_id]))
+			$SC[$schet_id] = array();
+
+		$SC[$schet_id][] = array(
+			'id' => 10,
+			'txt' => $r['name'],
+			'count' => $r['count'],
+			'cena' => $r['cena'],
+			'sum' => $r['count']*$r['cena']
+		);
+	}
+
+
 	$mass = array();
 	foreach($arr as $id => $r) {
+		$txt_2 = isset($SC[$id]) ? json_encode($SC[$id]) : '';
+
 		$mass[] = "(
 				".$id.",
 				".APP_ID.",
@@ -2172,8 +2198,8 @@ function _comtex_schet_pay() {//счета на оплату
 				'".$r['date_create']."',
 				"._comtexAss(1234, $r['client_id']).",
 				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
+				'".addslashes($txt_2)."',
 				".$r['sum'].",
-
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
@@ -2193,6 +2219,7 @@ function _comtex_schet_pay() {//счета на оплату
 				  date_1,
 				  num_2,
 				  num_3,
+				  txt_2,
 				  sum_1,
 
 				  user_id_add,
