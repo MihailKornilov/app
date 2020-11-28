@@ -44,7 +44,7 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 	$limit = $ELEM['num_2'];
 	$SC = $ELEM['num_6'] ? 'DESC' : 'ASC';
 
-	if(!$all = _spisokCountAll($ELEM, array(), $next))
+	if(!$all = _spisokCountAll($ELEM, $prm, $next))
 		return $ELEM['txt_1'] ? _emptyMin(_br($ELEM['txt_1'])) : '';
 
 	$IS_SORT = _spisokIsSort($ELEM['id']);
@@ -76,7 +76,7 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 	//получение данных списка
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
-			WHERE  "._spisokWhere($ELEM)."
+			WHERE  "._spisokWhere($ELEM, $prm)."
 			ORDER BY ".$order." ".$SC."
 			LIMIT ".($limit * $next).",".$limit;
 	$spisok = query_arr($sql);

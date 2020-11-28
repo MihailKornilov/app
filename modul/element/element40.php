@@ -369,8 +369,9 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 		return '[40] отсутствует id диалога, размещающего список';
 	if($r['cond_id'] != 3 && $r['cond_id'] != 4)
 		return $v;
-	if(!$unit_id = _num($r['unit_id'], 1))
+	if(!$unit_id = _num($r['unit_id'], true))
 		return 0;
+
 	//указан вариант, когда страница принимает данные записи
 	if($unit_id == -1) {
 		if(!$unit_id = _num(@$_GET['id']))
