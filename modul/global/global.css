@@ -360,8 +360,15 @@ body:not(.site){position:relative}
 	right:0;
 }
 .bl-td:not(:hover) .ui-resizable-e{opacity:.4}
-.bl-td._busy *{visibility:hidden}
-
+.bl-td .dbusy{
+	position:absolute;
+	top:0;
+	width:100%;
+	height:100%;
+	background-color:#fff;
+	opacity:.0
+}
+.bl-td._busy .dbusy{opacity:.5}
 
 
 /* Строка управления страницей page_setup */

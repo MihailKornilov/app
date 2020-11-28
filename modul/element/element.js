@@ -1472,7 +1472,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//---- ДЕЙСТВИЯ ДЛЯ БЛОКОВ
 	_BLK_ACT = function(bo, block_id, unit_id, skip) {//выполнение действия при нажатии на блок
-		var bl = BLKK[block_id]
+		var bl = BLKK[block_id];
 		if(!bl)
 			return;
 
@@ -1636,7 +1636,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			link += act.v1;
 		}
 
-		act.bo.addClass('_busy');
+		if(act.bo.hasClass('_busy'))
+			return;
+		act.bo
+			.addClass('_busy')
+			.append('<div class="dbusy"></div>');
+
 		location.href = URL + link;
 	},
 
@@ -1666,6 +1671,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		//блок передаёт id записи для удаления
 		if(act.revers)
 			send.del_id = act.unit_id;
+
+		if(act.bo.hasClass('_busy'))
+			return;
+		act.bo.find('.dbusy').remove();
+		act.bo.append('<div class="dbusy"></div>');
+
 
 		_dialogLoad(send);
 	},
