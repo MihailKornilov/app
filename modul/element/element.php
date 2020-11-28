@@ -3131,7 +3131,39 @@ function PHP12_schetPayContent_vvv($prm) {
 
 	return $send;
 }
+function PHP12_schetPayContent_print($el, $u) {
+	$send =
+		'<table class="_stab w100p">'.
+			'<tr><th class="w35">№'.
+				'<th>Наименование товара'.
+				'<th class="w70">Кол-во'.
+				'<th class="w70">Ед.изм'.
+				'<th class="w100">Цена'.
+				'<th class="w100">Сумма';
 
+	$sum = 0;
+	if($CNT = _decode($u['txt_2']))
+		foreach($CNT as $n => $r) {
+			$send .=
+				'<tr><td class="r">'.($n+1).
+					'<td>'.$r['txt'].
+					'<td class="center">'.$r['count'].
+					'<td class="center">шт.'.
+					'<td class="r">'._sumSpace($r['cena'], true).
+					'<td class="r">'._sumSpace($r['sum'], true);
+			$sum += $r['sum'];
+		}
+
+	$send .= '</table>';
+
+	if($CNT)
+		$send .=
+			'<div class="mt10 fs14">'.
+				'Всего наименований <b>'.count($CNT).'</b>, на сумму <b>'._sumSpace($sum, true).'</b> руб.'.
+			'</div>';
+
+	return $send;
+}
 
 
 

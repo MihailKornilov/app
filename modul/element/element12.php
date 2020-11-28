@@ -31,6 +31,14 @@ function _element12_print($el, $prm) {
 	: '').
 		$el['txt_1']($prm);
 }
+function _element12_print11($el, $u) {//вывод содержания на основании функции
+	$func = $el['txt_1'].'_print';
+
+	if(!function_exists($func))
+		return _msgRed('Отсутствует функция '.$func);
+
+	return $func($el, $u);
+}
 function _element12_vvv($el, $prm) {
 	$func = $el['txt_1'].'_vvv';
 
