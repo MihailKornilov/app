@@ -15,6 +15,11 @@ function _element12_struct($el) {
 		'num_3' => _num($el['num_3']) //элемент 2 (на странице)
 	) + _elementStruct($el);
 }
+function _element12_title($el) {
+	if(empty($el['name']))
+		return '[12] --=-';
+	return _emptyMin('Функция '.$el['txt_1'].'<br><b>'.$el['name'].'</b>');
+}
 function _element12_print($el, $prm) {
 	if(!$el['txt_1'])
 		return _emptyMin('Отсутствует имя функции.');
