@@ -2968,7 +2968,7 @@ function PHP12_schetPayContent($prm) {//содержание счёта на о�
 	*/
 	return '';
 }
-function PHP12_schetPayContent_cnn($unit, $ids, $clear=false) {//установка ID диалога значениям для привязки
+function PHP12_schetPayContent_cnn($unit, $ids) {//установка ID диалога значениям для привязки
 	if(!$ids)
 		return;
 
@@ -2992,7 +2992,7 @@ function PHP12_schetPayContent_cnn($unit, $ids, $clear=false) {//установ�
 			continue;
 
 		$sql = "UPDATE `_spisok`
-				SET `".$col."`=".($clear ? 0 : $unit['id'])."
+				SET `".$col."`=".$unit['id']."
 				WHERE `id` IN ("._ids($ids).")";
 		query($sql);
 		break;
@@ -3045,22 +3045,29 @@ function PHP12_schetPayContent_del($unit) {//отвязка значений п�
 			continue;
 		if($r['txt_1'] != 'PHP12_schetPayContent')
 			continue;
-		if(!$col = $r['col'])
-			continue;
-		if(empty($unit[$col]))
-			continue;
-		if(!$json = _decode($unit[$col]))
-			continue;
 
-		$ids = array();
-		foreach($json as $v)
-			if($id = _num(@$v['id']))
-				$ids[] = $id;
+		//поиск привязанных счетов в других диалогах (пока только в одном)
+		$sql = "SELECT *
+				FROM `_element`
+				WHERE `dialog_id`=29
+				  AND `num_1`=".$DLG['id']."
+				LIMIT 1";
+		if(!$el29 = query_assoc($sql))
+			return;
+		if(!$col = _elemCol($el29))
+			return;
+		if(!$bl = _blockOne($el29['block_id']))
+			return;
+		if($bl['obj_name'] != 'dialog')
+			return;
 
-		if(empty($ids))
-			continue;
+		$sql = "UPDATE `_spisok`
+				SET `".$col."`=0
+				WHERE `dialog_id`=".$bl['obj_id']."
+				  AND `".$col."`=".$unit['id'];
+		query($sql);
 
-		PHP12_schetPayContent_cnn($unit, $ids, true);
+		return;
 	}
 }
 function PHP12_schetPayContent_vvv($prm) {
