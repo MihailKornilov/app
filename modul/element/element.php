@@ -3133,7 +3133,7 @@ function PHP12_schetPayContent_vvv($prm) {
 }
 function PHP12_schetPayContent_print($el, $u) {
 	$send =
-		'<table class="_stab w100p">'.
+		'<table class="_stab small w100p">'.
 			'<tr><th class="w35">№'.
 				'<th>Наименование товара'.
 				'<th class="w70">Кол-во'.
