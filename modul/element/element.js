@@ -1820,7 +1820,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			unit = AG,
 			split = ids.split(',');
 
-		_forN(split, function(id, n) {
+		_forN(split, function(id) {
 			if(unit[id]) {
 				unit = unit[id];
 				return;
@@ -1839,7 +1839,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(unit[col] === undefined)
 				return false;
 
-			unit = unit[col];
+			if(unit[col + '_title'] != undefined)
+				unit = unit[col + '_title'];
+			else
+				unit = unit[col];
 
 			if(typeof unit == 'object')
 				return;
