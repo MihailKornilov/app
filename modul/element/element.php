@@ -966,9 +966,8 @@ function _dialogSpisokCmp($dialog_id) {//список колонок, испол
 function _dialogContentDelSetup($dialog_id) {//иконка настройки содежания удаления записи (единицы списка)
 	$isSetup = _BE('block_obj', 'dialog_del', $dialog_id);
 	return
-	($isSetup ?'<span class="clr11 b">Настроено.</span> ' : '').
 	'<div val="dialog_id:56,dss:'.$dialog_id.'"'.
-		' class="icon icon-set pl dialog-open tool"'.
+		' class="icon icon-'.($isSetup ? 'ok' : 'set pl').' dialog-open tool"'.
 		' data-tool="'.($isSetup ? 'Изменить' : 'Настроить').' содержание">'.
 	'</div>';
 }
@@ -1006,20 +1005,43 @@ function PHP12_dialog_app() {//список диалоговых окон для
 	if(!$arr = query_arr($sql))
 		return 'Диалоговых окон нет.';
 
+	//настроено ли содержание удаления
+	$sql = "SELECT `obj_id`,1
+			FROM `_block`
+			WHERE `obj_name`='dialog_del'
+			  AND `obj_id` IN ("._idsGet($arr).")";
+	$CntDelAss = query_ass($sql);
+
+	//количество записей по каждому диалогу (для таблицы _spisok)
+	$sql = "SELECT
+				`dialog_id`,
+				COUNT(`id`)
+			FROM `_spisok`
+			WHERE `dialog_id` IN ("._idsGet($arr).")
+			  AND !`deleted`
+			GROUP BY `dialog_id`";
+	$cAss = query_ass($sql);
+
+	//количество удалённых записей по каждому диалогу (для таблицы _spisok)
+	$sql = "SELECT
+				`dialog_id`,
+				COUNT(`id`)
+			FROM `_spisok`
+			WHERE `dialog_id` IN ("._idsGet($arr).")
+			  AND `deleted`
+			GROUP BY `dialog_id`";
+	$cAssDel = query_ass($sql);
+
 	foreach($arr as $id => $r) {
+		$arr[$id]['cnt_del_bg'] = !empty($CntDelAss[$id]) ? ' bg11' : '';
+		$arr[$id]['unit_count'] = !empty($cAss[$id]) ? $cAss[$id] : '';
+		$arr[$id]['unit_count_del'] = !empty($cAssDel[$id]) ? '<div class="clr2 fs11">'.$cAssDel[$id].'</div>' : '';
 		if(!isset($r['child']))
 			$arr[$id]['child'] = array();
 		if($pid = _num($r['pid']))
 			if(isset($arr[$pid]))
 				$arr[$pid]['child'][] = $r;
 	}
-
-
-	$sql = "SELECT `obj_id`,1
-			FROM `_block`
-			WHERE `obj_name`='dialog_del'
-			  AND `obj_id` IN ("._idsGet($arr).")";
-	$contentDelAss = query_ass($sql);
 
 	return
 	'<table class="_stab small w100p">'.
@@ -1029,12 +1051,13 @@ function PHP12_dialog_app() {//список диалоговых окон для
 			'<th>Имя диалога'.
 			'<th class="w30">'.
 			'<th class="w50">Список'.
+			'<th class="w50">Кол-во<br>записей'.
 			'<th class="w100">Родитель'.
 			'<th class="w70">Колонки'.
 			'<th class="w30">h1'.
 			'<th class="w30">h2'.
 			'<th class="w30">h3'.
-			'<th class="w100">content<br>del'.
+			'<th class="w70">content<br>del'.
 	'</table>'.
 	PHP12_dialog_app_child($arr);
 }
@@ -1072,12 +1095,13 @@ function PHP12_dialog_app_li($r) {
 					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup tool" data-tool="Редактировать диалог"></div>'.
 				'<td class="w50 center">'.
 					($r['insert_on'] ? '<div class="icon icon-ok curD"></div>' : '').
+				'<td class="w50 center">'.$r['unit_count'].$r['unit_count_del'].
 				'<td class="w100 clr13'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
 				'<td class="w70 clr1">'.PHP12_dialog_col($r['id']).
 				'<td class="w30'.$bgh.'">'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w30'.$bgh.'">'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w30'.$bgh.'">'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-				'<td class="w100 center'.(!empty($contentDelAss[$r['id']]) ? ' bg11' : '').'">'.
+				'<td class="w70 center'.$r['cnt_del_bg'].'">'.
 					_dialogContentDelSetup($r['id']).
 		'</table>';
 
