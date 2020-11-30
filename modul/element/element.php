@@ -1051,7 +1051,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 			'<th>Имя диалога'.
 			'<th class="w30">'.
 			'<th class="w50">Список'.
-			'<th class="w50">Кол-во<br>записей'.
+			'<th class="w70">Кол-во<br>записей'.
 			'<th class="w100">Родитель'.
 			'<th class="w70">Колонки'.
 			'<th class="w30">h1'.
@@ -1095,7 +1095,7 @@ function PHP12_dialog_app_li($r) {
 					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup tool" data-tool="Редактировать диалог"></div>'.
 				'<td class="w50 center">'.
 					($r['insert_on'] ? '<div class="icon icon-ok curD"></div>' : '').
-				'<td class="w50 center">'.$r['unit_count'].$r['unit_count_del'].
+				'<td class="w70 center">'.$r['unit_count'].$r['unit_count_del'].
 				'<td class="w100 clr13'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
 				'<td class="w70 clr1">'.PHP12_dialog_col($r['id']).
 				'<td class="w30'.$bgh.'">'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
