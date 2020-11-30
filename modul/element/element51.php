@@ -3,16 +3,24 @@
 /* [51] Календарь */
 function _element51_struct($el) {
 	return array(
-		'num_1'   => _num($el['num_1']),//разрешать выбор прошедших дней
-		'num_2'   => _num($el['num_2']) //показывать время
+		'num_1'   => _num($el['num_1']),//[1] разрешать выбор прошедших дней
+		'num_2'   => _num($el['num_2']),//[1] показывать время
+		'num_3'   => _num($el['num_3']),//[18] начальная дата: 0 - текущая, 1 - указанная
+		'num_4'   => _num($el['num_4']),//[1] устанавливать начальную дату в том числе и при редактировании
+		'txt_1'   => $el['txt_1']       //[51] указанная дата (при num_3=1)
 	) + _elementStruct($el);
 }
 function _element51_print($el, $prm) {
+	$v = $el['num_3'] ? $el['txt_1'] : strftime('%Y-%m-%d %H:%M-%S');
+
+	if(!$el['num_4'])
+		$v = _elemPrintV($el, $prm, $v);
+
 	return
 	_calendar(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'time' => $el['num_2'],
-		'value' => _elemPrintV($el, $prm)
+		'value' => $v
 	));
 }
 function _element51_print11($el, $u) {

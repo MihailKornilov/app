@@ -6,18 +6,24 @@ function _element1_struct($el) {
 		'def'   => _num($el['def']),
 
 		'txt_1' => $el['txt_1'],      //текст для галочки
-		'num_1' => _num($el['num_1']) //уникальное значение (для "по умолчанию")
+		'num_1' => _num($el['num_1']),//уникальное значение (для "по умолчанию")
+		'num_2' => _num($el['num_2']) //устанавливать начальное значение также при редактировании
 	) + _elementStruct($el);
 }
 function _element1_title($el) {
 	return '✓ '.$el['txt_1'];
 }
 function _element1_print($el, $prm) {
+	$v = $el['def'];
+
+	if(!$el['num_2'])
+		$v = _elemPrintV($el, $prm, $el['def']);
+
 	return _check(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'title' => _br($el['txt_1']),
 		'disabled' => $prm['blk_setup'],
-		'value' => _elemPrintV($el, $prm, $el['def'])
+		'value' => $v
 	));
 }
 function _element1_print11($el, $u) {
