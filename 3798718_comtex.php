@@ -50,7 +50,6 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_accrual();
 			_comtex_invoice();
 			_comtex_invoice_transfer();
-			_comtex_income();
 			_comtex_refund();
 
 			_comtex_expense_category();
@@ -67,10 +66,10 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_schet_pay();
 			_comtex_cartridge_in_zayav();
 
+			_comtex_income();
 		//частичный
 		case 2:
-			_comtex_schet_pay();
-			_comtex_cartridge_in_zayav();
+			_comtex_income();
 			break;
 
 		default:
@@ -1485,66 +1484,6 @@ function _comtex_invoice_transfer() {//переводы между счетам�
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
-function _comtex_income() {//платежи
-	$dialog_id = _comtexSpisokClear(1413);
-
-	_db2();
-	$sql = "SELECT *
-			FROM _money_income
-			WHERE `app_id`=".APP_ID_OLD."
-			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
-		return;
-
-	$mass = array();
-	foreach($arr as $id => $r) {
-		$mass[] = "(
-				".$id.",
-				".APP_ID.",
-				".$id.",
-				".$dialog_id.",
-
-				".$r['sum'].",
-				'".$r['about']."',
-				"._comtexAss(1412, $r['invoice_id']).", /* расчётные счета */
-				"._comtexAss(1234, $r['client_id']).",
-				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
-				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
-				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
-
-				"._comtexUserId($r).",
-				'".$r['dtime_add']."',
-				".$r['deleted']."
-		)";
-	}
-
-	$sql = "INSERT INTO `_spisok` (
-				  `id_old`,
-				  `app_id`,
-				  `num`,
-				  `dialog_id`,
-				
-				  sum_1,
-				  txt_1,
-				  num_1,
-				  num_2,
-				  num_3,
-				  num_4,
-				  num_5,
-
-				  user_id_add,
-				  dtime_add,
-				  deleted
-			) VALUES ".implode(',', $mass);
-	query($sql);
-
-	$sql = "DELETE FROM `_spisok`
-			WHERE `dialog_id`=".$dialog_id."
-			  AND !`num_3`
-			  AND !`num_4`
-			  AND !`num_5`";
-	query($sql);
-}
 function _comtex_refund() {//возвраты
 	$dialog_id = _comtexSpisokClear(1418);
 
@@ -2297,6 +2236,73 @@ function _comtex_cartridge_in_zayav() {//картриджи в заявках
 
 	_comtexErrMsg($dialog_id, 'num_1', 'заявки');
 	_comtexErrMsg($dialog_id, 'num_2', 'картриджи');
+}
+
+function _comtex_income() {//платежи
+	$dialog_id = _comtexSpisokClear(1413);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _money_income
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				".$r['sum'].",
+				'".$r['about']."',
+				"._comtexAss(1412, $r['invoice_id']).", /* расчётные счета */
+				"._comtexAss(1234, $r['client_id']).",
+				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
+				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
+				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
+				"._comtexAss(1431, $r['schet_id']).", /* счета на оплату */
+				'".$r['schet_paid_day']."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  sum_1,
+				  txt_1,
+				  num_1,
+				  num_2,
+				  num_3,
+				  num_4,
+				  num_5,
+				  num_6,
+				  date_1,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+/*
+	$sql = "DELETE FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND !`num_3`
+			  AND !`num_4`
+			  AND !`num_5`";
+	query($sql);
+*/
 }
 
 
