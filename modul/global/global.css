@@ -368,7 +368,8 @@ body:not(.site){position:relative}
 	background-color:#fff;
 	opacity:.0
 }
-.bl-td._busy .dbusy{opacity:.5}
+.bl-td._busy *{visibility:hidden}
+/*.bl-td._busy .dbusy{opacity:.5}*/
 
 
 /* Строка управления страницей page_setup */
