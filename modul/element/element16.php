@@ -3,7 +3,7 @@
 /* [16] Radio: произвольные значения */
 function _element16_struct($el) {
 	$send = array(
-		'txt_1'   => $el['txt_1'],      //текст нулевого значения
+		'txt_1'   => $el['txt_1'],  //текст нулевого значения
 		'txt_2'   => $el['txt_2'],  /* содержание списка в формате JSON
                                         id
                                         title
@@ -15,8 +15,8 @@ function _element16_struct($el) {
 											3877 - существующий элемент
 											3878 - список
 										*/
-		'num_3'   => _num($el['num_3']),//элемент, если выбрано num_2:3877
-		'num_4'   => _num($el['num_4']) //список, если выбрано num_2:3878
+		'num_3'   => _num($el['num_3']),//элемент, если выбрано num_2=3877
+		'num_4'   => _num($el['num_4']) //список, если выбрано num_2=3878
 	) + _elementStruct($el);
 
 	if($send['num_2'] == 3878 && $send['num_4'])
@@ -90,8 +90,6 @@ function _element16_vvv($el) {
 		if(!$el = _elemOne($el['num_3']))
 			return array();
 
-	if(!$el['txt_2'])
-		return array();
 	if(!$send = _decode($el['txt_2']))
 		return array();
 

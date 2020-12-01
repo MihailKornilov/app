@@ -540,6 +540,8 @@ function _spisokUnitUrl($el, $prm, $txt) {//обёртка значения в �
 
 			//открытие диалога
 			case 205:
+				if($el['dialog_id'] == 18)
+					break;
 				if($func['initial_id'] != -2)
 					break;
 			case 222:

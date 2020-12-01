@@ -1136,8 +1136,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//открытие диалога
 	_ACT205 = function(act, v) {
-		if(v != act.initial_id)
-			return;
+		if(act.initial_id != -2)
+			if(act.initial_id == v)
+				v = GET_ID;
+			else
+				return;
 
 		var dlg_id = _num(act.target_ids);
 		if(!dlg_id)
@@ -1145,9 +1148,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		var send = {
 			dialog_id:dlg_id,
-			get_id:act.apply_id ? GET_ID : 0,
-			edit_id:act.effect_id ? GET_ID : 0,
-			del_id:act.revers ? GET_ID : 0,
+			get_id:act.apply_id ? v : 0,
+			edit_id:act.effect_id ? v : 0,
+			del_id:act.revers ? v : 0,
 			busy_obj:_attr_bl(act.el.block_id)
 		};
 
