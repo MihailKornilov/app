@@ -193,10 +193,10 @@ function _blockAction231($bl, $prm) {//условия отображения б�
 		if($act['dialog_id'] != 231)
 			continue;
 		if(!$F = _decode($act['filter']))
-			return $bl;
+			continue;
 
-		$bl['hidden'] = _elem40res($F, $u);
-		return $bl;
+		if(_elem40res($F, $u))
+			$bl['hidden'] = true;
 	}
 
 	return $bl;
