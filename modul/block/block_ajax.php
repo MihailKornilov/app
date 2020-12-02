@@ -484,7 +484,6 @@ switch(@$_POST['op']) {
 		if(!$BLK = query_arr($sql))
 			jsonError('Выбранные блоки не существуют');
 
-
 		//определение координаты Y текущего объекта, с которой нужно начинать вставку блоков
 		$Y_START = 0;
 		foreach(_BE('block_arr', $obj_name, $obj_id) as $r) {
@@ -511,12 +510,13 @@ switch(@$_POST['op']) {
 
 
 		foreach($BLK as $id => $r) {
-			//коррекция координат
+			//коррекция координат и установка нулевого уровня
 			$r['x'] -= $cX;
 			$r['y'] = $r['y'] - $cY + $Y_START;
 			$sql = "UPDATE `_block`
 					SET `x`=".$r['x'].",
-						`y`=".$r['y']."
+						`y`=".$r['y'].",
+						`parent_id`=0
 					WHERE `id`=".$id;
 			query($sql);
 		}
