@@ -701,19 +701,18 @@ function _document() {//формирование документа для вы�
 			require_once GLOBAL_DIR.'/inc/PHPSpreadsheet/vendor/autoload.php';
 
 			$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader('Xlsx');
-			$reader->setReadDataOnly(TRUE);
 			$spreadsheet = $reader->load($ATT['path'].$ATT['fname']);
 			$sheet = $spreadsheet->getActiveSheet();
 
-			$sheet->setCellValue('A4', 'PhpSpreadsheet');
-/*
 			$ass = array();
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `id` IN ("._ids($TMP['param_ids']).")";
 			foreach(query_arr($sql) as $el) {
 				$i = $el['txt_10'];
-				$ass[$i] = _element('template_docx', $el, $unit);
+				$v = _element('template_docx', $el, $unit);
+				$v = strip_tags($v);
+				$ass[$i] = $v;
 			}
 
 			$send = '<table class="_stab">';
@@ -732,7 +731,7 @@ function _document() {//формирование документа для вы�
 			    }
 			}
 			$send .= '</table>';
-*/
+
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 			header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 			header('Content-Disposition: attachment; filename="'._document_fname($ATT, $TMP, 'xlsx').'"');
