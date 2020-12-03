@@ -27,7 +27,7 @@ function _element17_vvv($el) {
 
 	return _arrNum($send);
 }
-function _element17_v_get($el, $id) {
+function _element17_title_get($el, $id) {
 	foreach(_element17_vvv($el) as $r)
 		if($r['id'] == $id)
 			return $r['title'];

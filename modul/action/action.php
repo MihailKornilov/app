@@ -1,6 +1,6 @@
 <?php
 
-function _blockAction201($bl, $prm) {//установка исходного отображения блока на основании действия
+function _blockAction201($bl, $prm) {//действие для элемента: скрытие/показ блоков - установка исходного отображения блока на основании действия
 	global $G_ACT;
 
 	//расстановка выполнения действий в порядке добавления
@@ -62,8 +62,9 @@ function _blockAction201($bl, $prm) {//установка исходного о�
 				case 2784: $hidden = false; break;
 			}
 
+			$v = _element('v_get', $el, $prm);
+
 			//получение выбранного значения при редактировании записи
-			$v = isset($el['def']) ? $el['def'] : 0;
 			if($u = $prm['unit_edit'])
 				if($col = _elemCol($el))
 					if(isset($u[$col])) {
@@ -79,15 +80,15 @@ function _blockAction201($bl, $prm) {//установка исходного о�
 				case 75: $v = _filter('vv', $el, 0); break;
 			}
 
-			if($v) {//если галочка установлена
-				if($r['initial_id'] != -2 && $r['initial_id'] != $v)//действие при установленной галочке
+			if($v) {//если значение было выбрано (установлено)
+				if($r['initial_id'] != -2 && $r['initial_id'] != $v)
 					if($r['revers'])
 						$hidden = !$hidden;
 					else
 						continue;
 
-			} else  //если галочка снята
-				if($r['initial_id'] != -1)//действие при снятой галочке
+			} else  //если значение было снято
+				if($r['initial_id'] != -1)
 					if($r['revers'])
 						$hidden = !$hidden;
 					else
@@ -184,6 +185,11 @@ function _blockAction211($bl) {//БЛОК: скрытие/показ блоко�
 function _blockAction231($bl, $prm) {//условия отображения блока: скрытие
 	if($bl['hidden'])
 		return $bl;
+
+//if($bl['id'] != 18536) return $bl;
+
+//print_r($prm);
+
 	if(!$u = $prm['unit_get'])
 		return $bl;
 	if(!$action =  _BE('block_one_action', $bl['id']))
@@ -194,7 +200,6 @@ function _blockAction231($bl, $prm) {//условия отображения б�
 			continue;
 		if(!$F = _decode($act['filter']))
 			continue;
-
 		if(_elem40res($F, $u))
 			$bl['hidden'] = true;
 	}
@@ -524,7 +529,7 @@ function _action201info($act) {//ЭЛЕМЕНТ: скрытие/показ бл�
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('title_get', $el, $act['initial_id']).'</b>';
 	}
 
 	$effect = '';
@@ -532,13 +537,13 @@ function _action201info($act) {//ЭЛЕМЕНТ: скрытие/показ бл�
 		$effect =
 			'<div class="fs12 clr1 mt2">'.
 				'Эффект: '.
-				'<span class="fs12 clr13">'._element('v_get', 2788, $act['effect_id']).'</span>'.
+				'<span class="fs12 clr13">'._element('title_get', 2788, $act['effect_id']).'</span>'.
 			'</div>';
 
 	$revers = $act['revers'] ? '<div class="fs11 i clr9 mt2">Применяется обратное действие</div>' : '';
 
 	return
-	'<span class="clr1">'._element('v_get', 2782, $act['apply_id']).'</span> '.
+	'<span class="clr1">'._element('title_get', 2782, $act['apply_id']).'</span> '.
 	'<b>'.$target.'</b>'.
 	'<br>'.
 	'<span class="clr1">если</span> '.$initial.
@@ -566,7 +571,7 @@ function _action202info($act) {//ЭЛЕМЕНТ: установка значен
 				break;
 
 			$initial = '<span class="clr11">выбрано</span> '.
-					   '<b>'._element('v_get', $el, $act['initial_id']).'</b>';
+					   '<b>'._element('title_get', $el, $act['initial_id']).'</b>';
 	}
 
 	$apply = '-';
@@ -578,7 +583,7 @@ function _action202info($act) {//ЭЛЕМЕНТ: установка значен
 
 			$apply = '<span class="clr11">установить</span> ';
 			if($act['apply_id'])
-				$apply .= '<b>'._element('v_get', $el, $act['apply_id']).'</b>';
+				$apply .= '<b>'._element('title_get', $el, $act['apply_id']).'</b>';
 			elseif(strlen($act['v1']))
 				$apply .= '<b>'.$act['v1'].'</b>';
 			else
@@ -622,7 +627,7 @@ function _action205info($act) {//ЭЛЕМЕНТ: открытие диалога
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('title_get', $el, $act['initial_id']).'</b>';
 	}
 
 	$get  = $act['apply_id']  ? '<div class="fs11 i clr8 mt2">Элемент передаёт данные записи для отображения</div>' : '';
@@ -655,7 +660,7 @@ function _action206info($act) {//ЭЛЕМЕНТ: установка фокуса
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('title_get', $el, $act['initial_id']).'</b>';
 	}
 
 	return
@@ -680,14 +685,14 @@ function _action207info($act) {//ЭЛЕМЕНТ: открытие докумен
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('title_get', $el, $act['initial_id']).'</b>';
 	}
 
 	$docName = _msgRed('не получено имя документа');
 	if(!$doc_id = _num($act['target_ids']))
 		$docName = '<span class="clr5">документ не указан<span>';
 	elseif($el = _elemOne(3547))
-		$docName = _element('v_get', $el, $doc_id);
+		$docName = _element('title_get', $el, $doc_id);
 
 	return
 	'<span class="clr1">Если</span> '.$initial.
@@ -737,7 +742,7 @@ function _action209info($act) {//ЭЛЕМЕНТ: вставка значения
 			if(!$el = _elemOne($act['element_id']))
 				break;
 
-			$initial = 'выбрано <b class="clr13">'._element('v_get', $el, $act['initial_id']).'</b>';
+			$initial = 'выбрано <b class="clr13">'._element('title_get', $el, $act['initial_id']).'</b>';
 	}
 
 	return
@@ -765,14 +770,14 @@ function _action211info($act) {//БЛОК: скрытие/показ блоко�
 		$effect =
 			'<div class="fs12 clr1 mt2">'.
 				'Эффект: '.
-				'<span class="fs12 clr13">'._element('v_get', 3170, $act['effect_id']).'</span>'.
+				'<span class="fs12 clr13">'._element('title_get', 3170, $act['effect_id']).'</span>'.
 			'</div>';
 
 	$revers = $act['revers'] ? '<div class="fs11 i clr9 mt2">Применяется обратное действие</div>' : '';
 	$v1 = $act['v1'] ? '<div class="fs11 i clr9 mt2">Запоминать состояние</div>' : '';
 
 	return
-	'<div class="b">'._element('v_get', 3165, $act['apply_id']).' '.$target.'</div>'.
+	'<div class="b">'._element('title_get', 3165, $act['apply_id']).' '.$target.'</div>'.
 	$effect.
 	$revers.
 	$v1;
@@ -793,7 +798,7 @@ function _action212info($act) {//БЛОК: Установка значения �
 	return
 	'<span class="clr1">Элементу</span> <b>'._elemIdsTitle($elem_id).'</b>'.
 	'<br>'.
-	'<span class="clr1">применить:</span> <b class="clr13">'._element('v_get', $el, $act['apply_id']).'</b>';
+	'<span class="clr1">применить:</span> <b class="clr13">'._element('title_get', $el, $act['apply_id']).'</b>';
 }
 function _action213info($act) {//БЛОК: блокировка элементов
 /*
@@ -812,7 +817,7 @@ function _action213info($act) {//БЛОК: блокировка элементо
 
 	return
 	'<span class="clr1">'.
-		_element('v_get', 3364, $act['apply_id']).' '.
+		_element('title_get', 3364, $act['apply_id']).' '.
 		'элемент'.(count($elem) > 1 ? 'ы' : '').
 	'</span> '.
 	implode(', ', $elem);
@@ -882,7 +887,7 @@ function _action217info($act) {//БЛОК: открытие документа
 	if(!$doc_id = _num($act['target_ids']))
 		$docName = '<span class="clr5">документ не указан<span>';
 	elseif($el = _elemOne(3737))
-		$docName = _element('v_get', $el, $doc_id);
+		$docName = _element('title_get', $el, $doc_id);
 
 	return '<span class="clr1">Документ:</span> <b>'.$docName.'</b>';
 }

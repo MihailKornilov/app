@@ -13,7 +13,7 @@ function _element59_struct($el) {
 		'issp' => _num($el['num_1'])
 	) + _elementStruct($el);
 }
-function _element59_v_get($el, $unit_id) {
+function _element59_title_get($el, $unit_id) {
 	if(!$dialog_id = _num($el['num_1']))
 		return '';
 	if(!$dlg = _dialogQuery($dialog_id))

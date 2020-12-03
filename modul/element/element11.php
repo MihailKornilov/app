@@ -109,7 +109,7 @@ function _element11_print($el, $prm) {
 
 	return _msgRed('[11] ('.$el['txt_2'].') no_print');
 }
-function _element11_v_get() {
+function _element11_title_get() {
 	return 'любое значение';
 }
 function _element11_template_docx($el, $u) {

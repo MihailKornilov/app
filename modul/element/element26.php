@@ -21,7 +21,7 @@ function _element26_vvv() {
 			ORDER BY `id` DESC";
 	return query_ass($sql);
 }
-function _element26_v_get($el, $unit_id) {
+function _element26_title_get($el, $unit_id) {
 	if(!$vvv = _element26_vvv())
 		return '';
 	if(!isset($vvv[$unit_id]))

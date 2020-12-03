@@ -69,8 +69,11 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 		//содержание элемента (ячейки таблицы, значения выпадающего списка, ...)
 		case 'vvv': return array();
 
+		//получение исходного значения после вывода элемента
+		case 'v_get': return isset($el['def']) ? $el['def'] : 0;
+
 		//получение имени значения по id
-		case 'v_get': return _msgRed('['.$el['dialog_id'].'] не настроено');
+		case 'title_get': return _msgRed('['.$el['dialog_id'].'] не настроено');
 
 		//получение названия элемента
 		case 'title':

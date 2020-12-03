@@ -35,16 +35,13 @@ function _element29_print($el, $prm) {
 	$v = _40condVcopy($el['num_6']);
 	if(!$el['num_10'])
 		$v = _elemPrintV($el, $prm, $v);
-	$v = _elem29PageSel($el['num_1'], $v);
-	$v = _elem29DialogSel($prm, $v);
-	$v = _elem29UserSel($el, $prm, $v);
 
 	return
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
 		'width' => @$el['width'],
-		'value' => $v
+		'value' => _element29_v_get($el, $prm, $v)
 	));
 }
 function _element29_vvv($el, $prm) {
@@ -52,12 +49,22 @@ function _element29_vvv($el, $prm) {
 		if(_elemColDlgId($el['id'], true))
 			$prm['unit_edit'] = array();
 
-	$sel_id = _elemPrintV($el, $prm, $el['num_6']);
-	$sel_id = _elem29PageSel($el['num_1'], $sel_id);
-	$sel_id = _elem29DialogSel($prm, $sel_id);
+	$sel_id = _element29_v_get($el, $prm);
+
 	return _29cnn($el['id'], '', $sel_id);
 }
-function _element29_v_get($el, $sel_id) {
+
+function _element29_v_get($el, $prm, $v=false) {//исходное значение после вывода элемента
+	if($v === false)
+		$v = $el['num_6'];
+
+	$v = _elem29PageSel($el['num_1'], $v);
+	$v = _elem29DialogSel($prm, $v);
+	$v = _elem29UserSel($el, $prm, $v);
+
+	return $v;
+}
+function _element29_title_get($el, $sel_id) {
 	foreach(_29cnn($el['id'], '', $sel_id) as $r)
 		if($r['id'] == $sel_id)
 			return $r['title'];
@@ -306,7 +313,7 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 		);
 	}
 
-	return $send;
+	return _arrNum($send);
 }
 function _29cnnChild($EL, $child, $pid=0, $spisok=array(), $path='', $level=0) {//расстановка дочерних значений
 	if(!$send = @$child[$pid])

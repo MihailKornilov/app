@@ -2830,6 +2830,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			func:function(v, sp) {
 				if(sp && sp.sp)
 					AG[el.id] = sp.sp;
+				console.log(sp);
 				_ELM_ACT(el, v);
 			},
 			funcWrite:function(v, t) {
