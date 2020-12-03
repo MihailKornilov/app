@@ -640,35 +640,29 @@ function _document() {//формирование документа для вы�
 			FROM `_template`
 			WHERE `app_id`=".APP_ID."
 			  AND `id`=".$doc_id;
-	if(!$doc = query_assoc($sql))
+	if(!$TMP = query_assoc($sql))
 		return _empty20('Шаблона документа '.$doc_id.' не существует'._pageUrlBack());
 
 	//получение данных файла-шаблона
-	if(!$attach_id = $doc['attach_id'])
+	if(!$attach_id = $TMP['attach_id'])
 		return _empty20('Не настроен файл-шаблон');
 
 	$sql = "SELECT *
 			FROM `_attach`
 			WHERE `app_id`=".APP_ID."
 			  AND `id`=".$attach_id;
-	if(!$att = query_assoc($sql))
+	if(!$ATT = query_assoc($sql))
 		return _empty20('Файла-шаблона '.$attach_id.' не существует'._pageUrlBack());
 
-	if(!file_exists($att['path'].$att['fname']))
+	if(!file_exists($ATT['path'].$ATT['fname']))
 		return _empty20(
-					'Файл-шаблон <b>'.$att['oname'].'</b> отсутствует на сервере. '.
+					'Файл-шаблон <b>'.$ATT['oname'].'</b> отсутствует на сервере. '.
 					'<a href="'.URL.'&p=8">Настроить</a>'.
 					_pageUrlBack()
 			   );
 
-	//проверка корректности расширения файла-шаблона
-	$ex = explode('.', $att['fname']);
-	$c = count($ex) - 1;
-	if($ex[$c] != 'docx')
-		return _empty20('Некорректный файл-шаблон'._pageUrlBack());
-
 	//получение данных записи
-	if(!$dlg_id = $doc['spisok_id'])
+	if(!$dlg_id = $TMP['spisok_id'])
 		return _empty20('Не указан список, из которого берутся данные'._pageUrlBack());
 	if(!$DLG = _dialogQuery($dlg_id))
 		return _empty20('Диалога '.$dlg_id.' не существует'._pageUrlBack());
@@ -677,38 +671,90 @@ function _document() {//формирование документа для вы�
 	if(!$unit = _spisokUnitQuery($DLG, $unit_id))
 		return _empty20('Записи '.$unit_id.' не существует'._pageUrlBack());
 
-	require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
-	$document = new \PhpOffice\PhpWord\TemplateProcessor($att['path'].$att['fname']);
+	//получение расширения файла
+	$ex = explode('.', $ATT['fname']);
+	$c = count($ex) - 1;
+	switch($ex[$c]) {
+		case 'docx':
+			require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
+			$document = new \PhpOffice\PhpWord\TemplateProcessor($ATT['path'].$ATT['fname']);
 
-	//подстановка данных
-	$sql = "SELECT *
-			FROM `_element`
-			WHERE `id` IN ("._ids($doc['param_ids']).")";
-	foreach(query_arr($sql) as $el) {
-		$v = _element('template_docx', $el, $unit);
-		$v = strip_tags($v);
-		if(strpos($el['txt_10'], '_PROPIS}'))
-			if($sum = round($v))
-				$v = _numToWord($sum);
-		$document->setValue($el['txt_10'], $v);
+			//подстановка данных
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id` IN ("._ids($TMP['param_ids']).")";
+			foreach(query_arr($sql) as $el) {
+				$v = _element('template_docx', $el, $unit);
+				$v = strip_tags($v);
+				if(strpos($el['txt_10'], '_PROPIS}'))
+					if($sum = round($v))
+						$v = _numToWord($sum);
+				$document->setValue($el['txt_10'], $v);
+			}
+
+			header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+			header('Content-Disposition: attachment; filename="'._document_fname($ATT, $TMP, 'docx').'"');
+			$document->saveAs('php://output');
+			exit;
+
+		case 'xlsx':
+			require_once GLOBAL_DIR.'/inc/PHPSpreadsheet/vendor/autoload.php';
+
+			$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader('Xlsx');
+			$reader->setReadDataOnly(TRUE);
+			$spreadsheet = $reader->load($ATT['path'].$ATT['fname']);
+			$sheet = $spreadsheet->getActiveSheet();
+
+			$sheet->setCellValue('A4', 'PhpSpreadsheet');
+/*
+			$ass = array();
+			$sql = "SELECT *
+					FROM `_element`
+					WHERE `id` IN ("._ids($TMP['param_ids']).")";
+			foreach(query_arr($sql) as $el) {
+				$i = $el['txt_10'];
+				$ass[$i] = _element('template_docx', $el, $unit);
+			}
+
+			$send = '<table class="_stab">';
+			foreach($sheet->getRowIterator() as $row) {
+			    $send .= '<tr>';
+			    $cellIterator = $row->getCellIterator();
+			    $cellIterator->setIterateOnlyExistingCells(FALSE);
+			    foreach($cellIterator as $cell) {
+			    	$v = $cell->getValue();
+			    	if(strpos($v, '{') !== false)
+			    	    foreach($ass as $i => $txt) {
+					        $v = str_replace($i, $txt, $v);
+					        $cell->setValue($v);
+				        }
+				    $send .= '<td>'.$v;
+			    }
+			}
+			$send .= '</table>';
+*/
+			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+			header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			header('Content-Disposition: attachment; filename="'._document_fname($ATT, $TMP, 'xlsx').'"');
+			$writer->save('php://output');
+//			return $send;
+			exit;
+
+		default: return _empty20('Некорректный файл-шаблон'._pageUrlBack());
 	}
-
-	//формирование имени файла-шаблона для загрузки
-	$fname = $att['fname'];
-	if($doc['fname']) {
-		$fname = $doc['fname'];
+}
+function _document_fname($ATT, $TMP, $type) {//формирование имени файла-шаблона для загрузки
+	$fname = $ATT['fname'];
+	if($TMP['fname']) {
+		$fname = $TMP['fname'];
 		$ex = explode('.', $fname);
 		$c = count($ex) - 1;
-		if($ex[$c] != 'docx')
-			$fname .='.docx';
+		if($ex[$c] != $type)
+			$fname .='.'.$type;
 	}
-
-	header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-	header('Content-Disposition: attachment; filename="'.$fname.'"');
-	$document->saveAs('php://output');
-
-	exit;
+	return $fname;
 }
+
 
 /* ----==== СПИСОК СТРАНИЦ (page12) ====---- */
 function PHP12_page_list() {
