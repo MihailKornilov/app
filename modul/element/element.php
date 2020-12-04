@@ -1283,8 +1283,10 @@ function _elemOne($elem_id, $upd=false) {//запрос одного элеме�
 
 	$G_ELM[$elem_id] = $el;
 
-	if($el['dialog_id'])
+	if($el['dialog_id']) {
 		$el['title'] = _element('title', $el);
+		$el['title_notag'] = strip_tags($el['title']);
+	}
 
 	return $el;
 }
@@ -1538,7 +1540,7 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 		}
 	}
 
-	return $send;
+	return strip_tags($send);
 }
 function _elemIdsTitleZnak($v) {
 	if(_elemIsConnect($v))//является списком
@@ -2310,7 +2312,7 @@ function PHP12_template_param_vvv($prm) {//получение значений �
 			'id' => _num($id),
 			'txt_10' => $el['txt_10'],
 			'dialog_id' => _num($el['dialog_id']),
-			'title' => $el['title']
+			'title' => strip_tags($el['title'])
 		);
 	}
 

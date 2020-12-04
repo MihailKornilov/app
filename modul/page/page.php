@@ -712,12 +712,13 @@ function _document() {//формирование документа для вы�
 				$i = $el['txt_10'];
 				$v = _element('template_docx', $el, $unit);
 				$v = strip_tags($v);
+				if(strpos($el['txt_10'], '_PROPIS}'))
+					if($sum = round($v))
+						$v = _numToWord($sum, true, true);
 				$ass[$i] = $v;
 			}
 
-			$send = '<table class="_stab">';
 			foreach($sheet->getRowIterator() as $row) {
-			    $send .= '<tr>';
 			    $cellIterator = $row->getCellIterator();
 			    $cellIterator->setIterateOnlyExistingCells(FALSE);
 			    foreach($cellIterator as $cell) {
@@ -727,16 +728,13 @@ function _document() {//формирование документа для вы�
 					        $v = str_replace($i, $txt, $v);
 					        $cell->setValue($v);
 				        }
-				    $send .= '<td>'.$v;
 			    }
 			}
-			$send .= '</table>';
 
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 			header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 			header('Content-Disposition: attachment; filename="'._document_fname($ATT, $TMP, 'xlsx').'"');
 			$writer->save('php://output');
-//			return $send;
 			exit;
 
 		default: return _empty20('Некорректный файл-шаблон'._pageUrlBack());

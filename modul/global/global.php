@@ -227,7 +227,8 @@ function _sumSpace($sum, $oo=0, $znak=',') {//Приведение суммы к
 	$send = $oo && !$drob ? $send.$znak.'00' : $send;
 	return ($minus < 0 ? '-' : '').$send;
 }
-function _numToWord($num, $firstSymbolUp=false) {
+
+function _numToWord($num, $fsUp=false, $rub=false) {
 	$num = intval($num);
 	$one = array(
 		0 => 'ноль',
@@ -274,7 +275,7 @@ function _numToWord($num, $firstSymbolUp=false) {
 	);
 
 	if($num < 20)
-		return $one[$num];
+		return _numToWordFsUp($one[$num], $fsUp)._numToWordRub($num, $rub);
 
 	$word = '';
 	if($num % 100 > 0)
@@ -304,10 +305,28 @@ function _numToWord($num, $firstSymbolUp=false) {
 		if($t >= 100)
 			$word = $hundred[floor($t / 100) % 10].' '.$word;
 	}
-	if($firstSymbolUp)
-		$word[0] = strtoupper($word[0]);
-	return trim($word);
+
+	$word = trim($word);
+
+	return _numToWordFsUp($word, $fsUp)._numToWordRub($num, $rub);
 }
+function _numToWordFsUp($word, $fsUp) {//делание первого символа заглавным
+	if(!$fsUp)
+		return $word;
+
+	$FS = mb_substr($word, 0, 1);
+	$word = mb_substr($word, 1, mb_strlen($word));
+	$word = mb_strtoupper($FS).$word;
+
+	return $word;
+}
+function _numToWordRub($sum, $rub) {//добавление слова рублей
+	if(!$rub)
+		return '';
+
+	return ' рубл'._end($sum, 'ь', 'я', 'ей');
+}
+
 function _txt($v, $notrim=false) {
 	if(!isset($v))
 		return '';

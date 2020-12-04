@@ -6419,7 +6419,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			BUT_ADD = ATR_EL.find('div:last'),
 			NUM = 1;
 
-		ATR_SP._select('disable');
 		BUT_ADD.click(valueAdd);
 
 		//показ одного значения, если начало настройки
@@ -6477,7 +6476,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						DD.attr('id', 'dd' + ia.unit.id);
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
-						INP.val(ia.unit.title || ia.unit.id);
+						INP.val(ia.unit.title_notag || ia.unit.id);
 					}
 				});
 			});
