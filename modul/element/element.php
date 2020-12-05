@@ -91,7 +91,7 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 				return '';
 			return '-['.$el['dialog_id'].']-type-title-no-';
 
-		//формирование значения для шаблона WORD
+		//формирование значения для шаблона
 		case 'template_docx': return DEBUG ? '[DLG-'.$el['dialog_id'].']' : '';
 	}
 
@@ -3207,6 +3207,39 @@ function PHP12_schetPayContent_print($el, $u) {
 			'</div>';
 
 	return $send;
+}
+function PHP12_schetPayContent_template_docx($prm) {
+	if(empty($prm['document_ext']))
+		return array();
+	if(!$col = @$prm['el12']['col'])
+		return false;
+	if(!isset($prm[$col]))
+		return false;
+
+	$vvv = _decode($prm[$col]);
+
+	if(!$c = count($vvv))
+		return false;
+
+	$sheet = $prm['sheet'];
+	$row = $prm['row'];
+
+	if($c > 1)
+		$sheet->insertNewRowBefore($row+1, $c-1);
+
+	$n = 1;
+	foreach($vvv as $v) {
+		$sheet
+			->setCellValue('A'.$row, $n++)
+			->setCellValue('B'.$row, $v['txt'])
+			->setCellValue('C'.$row, $v['count'])
+			->setCellValue('D'.$row, 'шт.')
+			->setCellValue('E'.$row, $v['cena'])
+			->setCellValue('F'.$row, $v['sum']);
+		$row++;
+	}
+
+	return false;
 }
 
 

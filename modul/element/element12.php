@@ -71,3 +71,17 @@ function _element12_vvv_count($el, $prm) {
 
 	return count($vvv);
 }
+function _element12_template_docx($el, $prm) {
+	if(!$el['txt_1'])
+		return '';
+
+	$func = $el['txt_1'].'_template_docx';
+
+	if(!function_exists($func))
+		return '';
+
+	$prm['el12'] = $el;
+
+	return $func($prm);
+}
+

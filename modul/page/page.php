@@ -704,11 +704,24 @@ function _document() {//формирование документа для вы�
 			    	$v = $cell->getValue();
 			    	if(strpos($v, '{') !== false)
 			    	    foreach($ass as $i => $txt) {
+			    		    if(is_array($txt)) {
+						        if($v == $i) {
+							        $ass[$i]['unit']['row'] = $cell->getRow();
+							        $ass[$i]['unit']['document_ext'] = 'xslx';
+							        $ass[$i]['unit']['sheet'] = $sheet;
+						        }
+						        continue;
+					        }
 					        $v = str_replace($i, $txt, $v);
 					        $cell->setValue($v);
 				        }
 			    }
 			}
+
+			//вставка списков, если есть
+			foreach($ass as $i => $v)
+				if(is_array($v))
+					_element('template_docx', $v['el'], $v['unit']);
 
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 			header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -741,13 +754,27 @@ function _document_values($TMP, $unit) {//получение значений д
 
 	foreach($arr as $el) {
 		$i = $el['txt_10'];
-		$v = _element('template_docx', $el, $unit);
-		$v = strip_tags($v);
-		if(strpos($el['txt_10'], '_PROPIS}'))
-			if($sum = round($v))
-				$v = _numToWord($sum, true, true);
-		if(strpos($el['txt_10'], '_COUNT}'))
+
+		if(strpos($i, '_COUNT}'))
 			$v = _element('vvv_count', $el, $unit);
+		else {
+			$v = _element('template_docx', $el, $unit);
+
+			//если получен массив, это означает, что будет вставляться список. Подготовка данных для вставки списка
+			if(is_array($v)) {
+				$v = array(
+					'el' => $el,
+					'unit' => $unit
+				);
+			} else {
+				if(strpos($i, '_PROPIS}'))
+					if($sum = round($v))
+						$v = _numToWord($sum, true, true);
+				$v = strip_tags($v);
+			}
+		}
+
+
 		$ass[$i] = $v;
 	}
 
