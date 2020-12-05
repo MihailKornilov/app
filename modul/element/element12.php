@@ -17,7 +17,7 @@ function _element12_struct($el) {
 }
 function _element12_title($el) {
 	if(empty($el['name']))
-		return '[12] --=-';
+		return '[12] Функция '.$el['txt_1'];
 	return _emptyMin('Функция '.$el['txt_1'].'<br><b>'.$el['name'].'</b>');
 }
 function _element12_print($el, $prm) {
@@ -53,4 +53,14 @@ function _element12_vvv($el, $prm) {
 	$prm['el12'] = $el;
 
 	return $func($prm);
+}
+function _element12_vvv_count($el, $prm) {
+	$func = $el['txt_1'].'_vvv';
+
+	if(!function_exists($func))
+		return 0;
+
+	$vvv = $func($prm);
+
+	return count($vvv);
 }

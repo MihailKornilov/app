@@ -126,7 +126,7 @@ function _element14_print11($el, $u) {
 	$prm['unit_get_id'] = $u['id'];
 	return _element14_print($el, $prm);
 }
-function _element14_copy_vvv($el, $obj_id) {
+function _element14_vvv_copy($el, $obj_id) {
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `obj_name`='spisok'

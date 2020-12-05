@@ -69,6 +69,12 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 		//содержание элемента (ячейки таблицы, значения выпадающего списка, ...)
 		case 'vvv': return array();
 
+		//количество значений содержания в элементе или записи
+		case 'vvv_count': return 0;
+
+		//копирование содержания элемента
+		case 'vvv_copy': return array();
+
 		//получение исходного значения после вывода элемента
 		case 'v_get': return isset($el['def']) ? $el['def'] : 0;
 
@@ -84,9 +90,6 @@ function _elementType($type, $el=array(), $prm=array()) {//все возможн
 			if(!$el['dialog_id'])
 				return '';
 			return '-['.$el['dialog_id'].']-type-title-no-';
-
-		//копирование содержания элемента
-		case 'copy_vvv': return array();
 
 		//формирование значения для шаблона WORD
 		case 'template_docx': return DEBUG ? '[DLG-'.$el['dialog_id'].']' : '';
@@ -3160,6 +3163,7 @@ function PHP12_schetPayContent_vvv($prm) {
 
 	return $send;
 }
+
 function PHP12_schetPayContent_print($el, $u) {
 	$send =
 		'<table class="_stab small w100p">'.

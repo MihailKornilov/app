@@ -1134,7 +1134,7 @@ function _blockElementCopy($PASTE, $pasteIds) {//копирование элем
 		$sql = "INSERT INTO `_element` (".implode(',', $cols).") VALUES (".implode(',', $vals).")";
 		$new_id = query_id($sql);
 
-		_element('copy_vvv', $el, $new_id);
+		_element('vvv_copy', $el, $new_id);
 	}
 }
 function _blockActionCopy($PASTE, $pasteIds) {//перенос действий у скопированных блоков
