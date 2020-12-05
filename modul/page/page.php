@@ -680,17 +680,8 @@ function _document() {//формирование документа для вы�
 			$document = new \PhpOffice\PhpWord\TemplateProcessor($ATT['path'].$ATT['fname']);
 
 			//подстановка данных
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id` IN ("._ids($TMP['param_ids']).")";
-			foreach(query_arr($sql) as $el) {
-				$v = _element('template_docx', $el, $unit);
-				$v = strip_tags($v);
-				if(strpos($el['txt_10'], '_PROPIS}'))
-					if($sum = round($v))
-						$v = _numToWord($sum);
-				$document->setValue($el['txt_10'], $v);
-			}
+			foreach(_document_values($TMP, $unit) as $i => $v)
+				$document->setValue($i, $v);
 
 			header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 			header('Content-Disposition: attachment; filename="'._document_fname($ATT, $TMP, 'docx').'"');
@@ -704,19 +695,7 @@ function _document() {//формирование документа для вы�
 			$spreadsheet = $reader->load($ATT['path'].$ATT['fname']);
 			$sheet = $spreadsheet->getActiveSheet();
 
-			$ass = array();
-			$sql = "SELECT *
-					FROM `_element`
-					WHERE `id` IN ("._ids($TMP['param_ids']).")";
-			foreach(query_arr($sql) as $el) {
-				$i = $el['txt_10'];
-				$v = _element('template_docx', $el, $unit);
-				$v = strip_tags($v);
-				if(strpos($el['txt_10'], '_PROPIS}'))
-					if($sum = round($v))
-						$v = _numToWord($sum, true, true);
-				$ass[$i] = $v;
-			}
+			$ass = _document_values($TMP, $unit);
 
 			foreach($sheet->getRowIterator() as $row) {
 			    $cellIterator = $row->getCellIterator();
@@ -750,6 +729,29 @@ function _document_fname($ATT, $TMP, $type) {//формирование имен
 			$fname .='.'.$type;
 	}
 	return $fname;
+}
+function _document_values($TMP, $unit) {//получение значений для подмены (ассоциативный массив)
+	$ass = array();
+
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `id` IN ("._ids($TMP['param_ids']).")";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	foreach($arr as $el) {
+		$i = $el['txt_10'];
+		$v = _element('template_docx', $el, $unit);
+		$v = strip_tags($v);
+		if(strpos($el['txt_10'], '_PROPIS}'))
+			if($sum = round($v))
+				$v = _numToWord($sum, true, true);
+		if(strpos($el['txt_10'], '_COUNT}'))
+			$v = _element('vvv_count', $el, $unit);
+		$ass[$i] = $v;
+	}
+
+	return $ass;
 }
 
 

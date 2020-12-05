@@ -128,6 +128,12 @@ function _element11_template_docx($el, $u) {
 	}
 	return '';
 }
+function _element11_vvv_count($el, $prm) {
+	if(!$last_id = _idsLast($el['txt_2']))
+		return 0;
+
+	return _element('vvv_count', $last_id, $prm);
+}
 
 /* ---=== ВЫБОР ЗНАЧЕНИЯ ИЗ ДИАЛОГА [11] ===--- */
 function PHP12_v_choose($prm) {

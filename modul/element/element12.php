@@ -55,12 +55,19 @@ function _element12_vvv($el, $prm) {
 	return $func($prm);
 }
 function _element12_vvv_count($el, $prm) {
-	$func = $el['txt_1'].'_vvv';
+	$func_vvv = $el['txt_1'].'_vvv';
 
-	if(!function_exists($func))
+	if(!function_exists($func_vvv))
 		return 0;
 
-	$vvv = $func($prm);
+	$prm['el12'] = $el;
+
+	$func_vvv_count = $el['txt_1'].'_vvv_count';
+
+	if(function_exists($func_vvv_count))
+		return $func_vvv_count($prm);
+
+	$vvv = $func_vvv($prm);
 
 	return count($vvv);
 }

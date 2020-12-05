@@ -3163,7 +3163,18 @@ function PHP12_schetPayContent_vvv($prm) {
 
 	return $send;
 }
+function PHP12_schetPayContent_vvv_count($prm) {//количество строк в содержании счёта
+	$el12 = $prm['el12'];
 
+	if(!$col = @$el12['col'])
+		return 0;
+	if(!isset($prm[$col]))
+		return 0;
+
+	$vvv = _decode($prm[$col]);
+
+	return count($vvv);
+}
 function PHP12_schetPayContent_print($el, $u) {
 	$send =
 		'<table class="_stab small w100p">'.
