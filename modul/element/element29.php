@@ -36,12 +36,15 @@ function _element29_print($el, $prm) {
 	if(!$el['num_10'])
 		$v = _elemPrintV($el, $prm, $v);
 
+	$v = _element29_v_get($el, $prm, $v);
+	$v = _elem29UserSel($el, $prm, $v);
+
 	return
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
 		'width' => @$el['width'],
-		'value' => _element29_v_get($el, $prm, $v)
+		'value' => $v
 	));
 }
 function _element29_vvv($el, $prm) {
@@ -60,7 +63,6 @@ function _element29_v_get($el, $prm, $v=false) {//исходное значен�
 
 	$v = _elem29PageSel($el['num_1'], $v);
 	$v = _elem29DialogSel($prm, $v);
-	$v = _elem29UserSel($el, $prm, $v);
 
 	return $v;
 }
