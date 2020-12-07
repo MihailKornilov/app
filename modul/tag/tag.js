@@ -115,8 +115,10 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 			if(su.hasClass('busy'))
 				return;
 
-			var i = su.attr('val') * 1,
+			var i = su.attr('val'),
 				sp = {};
+			if(_num(i))
+				i *= 1;
 			valueSet(i);
 			_forN(MASS_SEL, function(v, n) {
 				if(i == v.id) {
