@@ -63,8 +63,6 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 			}
 
 			$v = _element('v_get', $el, $prm);
-			if(!_40check($r['filter'], $v))
-				$v = 0;
 
 			//получение выбранного значения при редактировании записи
 			if($u = $prm['unit_edit'])
@@ -74,6 +72,9 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 						if(is_array($v))
 							$v = _num(@$v['id']);
 					}
+
+			if(!_40check($r['filter'], $v))
+				$v = 0;
 
 			//фильтры
 			switch($el['dialog_id']) {
