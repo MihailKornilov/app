@@ -555,12 +555,12 @@ function _40cond_err($val) {//определение, была ли ошибка
 
 	return " AND !`t1`.`id` /* ".$val." */";
 }
-function _40condV($act, $col, $val) {//значение запроса по конкретному условию
+function _40condV($cond_id, $col, $val) {//значение запроса по конкретному условию
 	if(!$col)
 		return '';
 
 	$val = addslashes($val);
-	switch($act) {
+	switch($cond_id) {
 		//отсутствует
 		case 1: return " AND ".$col."=DEFAULT(".$col.")";
 
@@ -615,6 +615,30 @@ function _40condVcopy($unit_id) {//подмена значения для коп
 			  AND `id_old`=".$unit_id."
 			LIMIT 1";
 	return _num(query_value($sql));
+}
+
+
+//получение ассоциативного массива значений по фильтру
+function _40check($filter, $v) {
+	if(!$F = _decode($filter))
+		return false;
+
+	$F = $F[0];
+
+	if(!$elem_id = _idsLast($F['elem_id']))
+		return false;
+	if(!$DLG = _elemDlg($elem_id))
+		return false;
+	if(!$col = _elemCol($elem_id))
+		return false;
+
+
+	$sql = "SELECT COUNT(*)
+			FROM  "._queryFrom($DLG)."
+			WHERE "._queryWhere($DLG).
+					_40condV($F['cond_id'], $col, 0)."
+			  AND `id`=".$v;
+	return query_value($sql);
 }
 
 

@@ -63,6 +63,8 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 			}
 
 			$v = _element('v_get', $el, $prm);
+			if(!_40check($r['filter'], $v))
+				$v = 0;
 
 			//получение выбранного значения при редактировании записи
 			if($u = $prm['unit_edit'])
@@ -79,7 +81,6 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 				case 62: $v = _filter('vv', $el, $el['num_3']); break;
 				case 75: $v = _filter('vv', $el, 0); break;
 			}
-
 			if($v) {//если значение было выбрано (установлено)
 				if($r['initial_id'] != -2 && $r['initial_id'] != $v)
 					if($r['revers'])
