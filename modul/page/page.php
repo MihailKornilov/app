@@ -693,35 +693,40 @@ function _document() {//формирование документа для вы�
 
 			$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader('Xlsx');
 			$spreadsheet = $reader->load($ATT['path'].$ATT['fname']);
-			$sheet = $spreadsheet->getActiveSheet();
+			foreach($spreadsheet->getSheetNames() as $sheet_id => $name) {
+				$spreadsheet->setActiveSheetIndex($sheet_id);
+				$sheet = $spreadsheet->getActiveSheet();
 
-			$ass = _document_values($TMP, $unit);
+				$ass = _document_values($TMP, $unit);
 
-			foreach($sheet->getRowIterator() as $row) {
-			    $cellIterator = $row->getCellIterator();
-			    $cellIterator->setIterateOnlyExistingCells(FALSE);
-			    foreach($cellIterator as $cell) {
-			    	$v = $cell->getValue();
-			    	if(strpos($v, '{') !== false)
-			    	    foreach($ass as $i => $txt) {
-			    		    if(is_array($txt)) {
-						        if($v == $i) {
-							        $ass[$i]['unit']['row'] = $cell->getRow();
-							        $ass[$i]['unit']['document_ext'] = 'xslx';
-							        $ass[$i]['unit']['sheet'] = $sheet;
+				foreach($sheet->getRowIterator() as $row) {
+				    $cellIterator = $row->getCellIterator();
+				    $cellIterator->setIterateOnlyExistingCells(FALSE);
+				    foreach($cellIterator as $cell) {
+				        $v = $cell->getValue();
+				        if(strpos($v, '{') !== false)
+				            foreach($ass as $i => $txt) {
+				                if(is_array($txt)) {
+							        if($v == $i) {
+								        $ass[$i]['unit']['row'] = $cell->getRow();
+								        $ass[$i]['unit']['document_ext'] = 'xslx';
+								        $ass[$i]['unit']['sheet'] = $sheet;
+							        }
+							        continue;
 						        }
-						        continue;
+						        $v = str_replace($i, $txt, $v);
+						        $cell->setValue($v);
 					        }
-					        $v = str_replace($i, $txt, $v);
-					        $cell->setValue($v);
-				        }
-			    }
+				    }
+				}
+
+				//вставка списков, если есть
+				foreach($ass as $i => $v)
+					if(is_array($v))
+						_element('template_docx', $v['el'], $v['unit']);
 			}
 
-			//вставка списков, если есть
-			foreach($ass as $i => $v)
-				if(is_array($v))
-					_element('template_docx', $v['el'], $v['unit']);
+			$spreadsheet->setActiveSheetIndex(0);
 
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
 			header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
