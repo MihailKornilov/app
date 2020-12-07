@@ -715,6 +715,7 @@ function _document() {//формирование документа для вы�
 							        continue;
 						        }
 						        $v = str_replace($i, $txt, $v);
+						        $v = str_replace('&quot;', '"', $v);
 						        $cell->setValue($v);
 					        }
 				    }
