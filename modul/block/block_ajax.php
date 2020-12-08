@@ -1046,6 +1046,13 @@ function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id при
 					break;
 			}
 			break;
+		case 'hint':
+			$sql = "SELECT *
+					FROM `_action`
+					WHERE `id`=".$obj_id;
+			if($act = query_assoc($sql))
+				$app_id = $act['app_id'];
+			break;
 	}
 
 	$sql = "UPDATE `_block`
