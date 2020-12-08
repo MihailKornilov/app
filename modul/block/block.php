@@ -845,23 +845,39 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 	if($i == 'block_hint') {
 		$bl = $i1;
 		$send = $i2;
+		$block_id = $bl['id'];
 
-		if(!$elem_id = $bl['elem_id'])
-			return $send;
-		if(empty($G_HINT['el'][$elem_id]))
-			return $send;
+		//подсказки к блокам
+		if(!empty($G_HINT['bl'][$block_id])) {
+			$hint = $G_HINT['bl'][$block_id];
 
-		$hint = $G_HINT['el'][$elem_id];
+			foreach($G_BLK as $id => $r) {
+				if($r['obj_name'] != 'hint')
+					continue;
+				if($r['obj_id'] != $hint['id'])
+					continue;
 
-		foreach($G_BLK as $id => $r) {
-			if($r['obj_name'] != 'hint')
-				continue;
-			if($r['obj_id'] != $hint['id'])
-				continue;
-
-			$r['action'] = isset($G_ACT['bl'][$id]) ? $G_ACT['bl'][$id] : array();
-			$send[$id] = _arrNum($r);
+				$r['action'] = isset($G_ACT['bl'][$id]) ? $G_ACT['bl'][$id] : array();
+				$send[$id] = _arrNum($r);
+			}
 		}
+
+
+		//подсказки к элементам
+		if($elem_id = $bl['elem_id'])
+			if(!empty($G_HINT['el'][$elem_id])) {
+				$hint = $G_HINT['el'][$elem_id];
+
+				foreach($G_BLK as $id => $r) {
+					if($r['obj_name'] != 'hint')
+						continue;
+					if($r['obj_id'] != $hint['id'])
+						continue;
+
+					$r['action'] = isset($G_ACT['bl'][$id]) ? $G_ACT['bl'][$id] : array();
+					$send[$id] = _arrNum($r);
+				}
+			}
 
 		return $send;
 	}
