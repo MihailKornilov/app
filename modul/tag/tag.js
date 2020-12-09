@@ -641,6 +641,7 @@ $.fn._radio = function(o, oo) {
 
 		o.php = 1;  //флаг, чтобы не перерисовывать заново содержание, а только применить функции
 		o.title0   = PHP.find('.title0').html();
+		o.right    = PHP.hasClass('rr');
 		o.block    = PHP.hasClass('block');
 		o.dis      = PHP.hasClass('disabled');
 		o.ignore   = PHP.hasClass('ignore');
@@ -656,6 +657,7 @@ $.fn._radio = function(o, oo) {
 	o = $.extend({
 		title0:'',  //текст нулевого значения
 		spisok:[],  //список значений в виде id => title
+		right:0,    //кружки справа
 		dis:0,      //серое состояние, выбор значений заблокирован
 		ignore:0,   //бледное состояние, выбор значений заблокирован
 		light:0,    //невыбранные значения показываются бледным цветом
@@ -670,8 +672,9 @@ $.fn._radio = function(o, oo) {
 	if(!RD.length) {
 		var html =
 			'<div class="_radio' + 
-						_dn(o.block, 'block') + 
-						_dn(o.dis, 'disabled') + 
+						_dn(o.right, 'rr') +
+						_dn(o.block, 'block') +
+						_dn(o.dis, 'disabled') +
 						_dn(o.ignore, 'ignore') +
 						_dn(o.light, 'light') + '"' +
 				' id="' + attr_id + '_radio">'   +
@@ -695,6 +698,7 @@ $.fn._radio = function(o, oo) {
 			html += '<div class="' + _dn(val == sp.id, 'on') + '"' +
 						' val="' + sp.id + '"' +
 						' style="margin-bottom:' + o.interval + 'px">' +
+						'<span class="o"></span>' +
 						sp.title +
 					'</div>';
 		});

@@ -16,7 +16,8 @@ function _element16_struct($el) {
 											3878 - список
 										*/
 		'num_3'   => _num($el['num_3']),//элемент, если выбрано num_2=3877
-		'num_4'   => _num($el['num_4']) //список, если выбрано num_2=3878
+		'num_4'   => _num($el['num_4']),//список, если выбрано num_2=3878
+		'num_5'   => _num($el['num_5']) //кружки справа
 	) + _elementStruct($el);
 
 	if($send['num_2'] == 3878 && $send['num_4'])
@@ -36,6 +37,7 @@ function _element16_print($el, $prm) {
 	_radio(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'light' => 1,
+		'right' => $el['num_5'],
 		'block' => !$el['num_1'],
 		'interval' => 5,
 		'value' => _elemPrintV($el, $prm, $def),

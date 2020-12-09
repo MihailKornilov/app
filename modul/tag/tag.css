@@ -135,27 +135,39 @@
 /* ---=== РАДИО ===--- */
 ._radio{display:inline-block}
 ._radio div{
+	position:relative;
 	display:inline-block;
 	cursor:pointer;
 	min-height:15px;
 	padding-left:18px;
+	text-align:left;
+}
+._radio .o{
+	display:inline-block;
+	position:absolute;
+	top:0;
+	left:0;
+	width:14px;
+	height:14px;
 	background:0 0 no-repeat url("data:image/png;base64,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");
 }
+._radio.rr div{
+	text-align:right;
+	padding-left:0;
+	padding-right:18px;
+}
+._radio.rr .o{left:auto;right:0}
 ._radio.block div{display:block}
-._radio div:hover{background-position:0 -200px}
-._radio div.on{background-position:0 -100px}
-._radio div.on:hover{background-position:0 -300px}
+._radio:not(.disabled):not(.ignore) div:hover .o{background-position:0 -200px}
+._radio div.on .o{background-position:0 -100px}
+._radio:not(.disabled):not(.ignore) div.on:hover .o{background-position:0 -300px}
 ._radio.light:not(.disabled) div:not(.on){color:#999}
 ._radio div.title0{color:#999}
-._radio.disabled div,
-._radio.ignore div{
-	background-position:0 -400px;
-	color:#999;
-	cursor:default;
-}
+._radio.disabled div,._radio.ignore div{color:#999;cursor:default}
+._radio.disabled .o,._radio.ignore .o{background-position:0 -400px}
 ._radio.ignore div{opacity:.4}
-._radio.disabled div.on,
-._radio.ignore div.on
+._radio.disabled div.on .o,
+._radio.ignore div.on .o
 {background-position:0 -500px}
 
 

@@ -58,6 +58,7 @@ function _radio($v=array()) {//элемент RADIO
 	$title0 = @$v['title0'];
 	$spisok = @$v['spisok'] ? $v['spisok'] : array();//содержание в виде id => title
 	$value = _num(@$v['value']);
+	$rr = empty($v['right']) ? '' : ' rr';
 	$dis = empty($v['disabled']) ? '' : ' disabled';
 	$ignore = empty($v['ignore']) ? '' : ' ignore';        //игнорирование (неактивное, слабо видно)
 	$light = _num(@$v['light']) ? ' light' : '';
@@ -85,7 +86,7 @@ function _radio($v=array()) {//элемент RADIO
 
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$value.'" />'.
-	'<div id="'.$attr_id.'_radio" class="_radio php'.$block.$dis.$ignore.$light.'"'.$width.'>'.
+	'<div id="'.$attr_id.'_radio" class="_radio php'.$rr.$block.$dis.$ignore.$light.'"'.$width.'>'.
 		$html.
 	'</div>';
 }
@@ -100,6 +101,7 @@ function _radioUnit($id, $block, $title, $interval, $on) {
 	$interval = $interval ? ' style="margin-'.$ms.':'.$interval.'px"' : '';
 	return
 	'<div class="'.$title0.$on.'" val="'.$id.'"'.$interval.'>'.
+		'<span class="o"></span>'.
 		$title.
 	'</div>';
 }
