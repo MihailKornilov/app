@@ -67,6 +67,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_cartridge_in_zayav();
 
 			_comtex_income();
+			break;
 		//частичный
 		case 2:
 			_comtex_zayav_note();
@@ -177,10 +178,20 @@ function _comtexHistory($dialog_id) {//История по конкретном�
 	query($sql);
 }
 function _comtexDataDel() {// Удаление всех данных в приложении
-	$sql = "DELETE FROM `_spisok` WHERE `app_id`=".APP_ID." AND `id` NOT IN (0) AND !`cnn_id`";/* todo переделать */
+	$sql = "DELETE FROM `_spisok`
+			WHERE `app_id`=".APP_ID."
+			  AND `id` NOT IN (
+					1352491,/* Данные организации */
+					1352542,/* Реквизиты банка */
+					1246258,1246259,1246260 /* Статусы напоминаний */
+				) AND !`cnn_id`";
 	query($sql);
 
-	$sql = "DELETE FROM `_image` WHERE `app_id`=".APP_ID." AND `id` NOT IN (0)";
+	$sql = "DELETE FROM `_image`
+			WHERE `app_id`=".APP_ID."
+			  AND `id` NOT IN (
+			    51665,51666 /* Иконки для печати документов */
+			  )";
 	query($sql);
 
 	$sql = "DELETE FROM `_attach` WHERE `app_id`=".APP_ID;
@@ -932,6 +943,19 @@ function _comtex_zayav_status() {//статусы заявок-оборудов�
 				  `sort`
 			) VALUES ".implode(',', $mass);
 	query($sql);
+
+	//установка статуса по умолчанию всем видам заявок
+	$sql = "SELECT `id`
+			FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND `num_1`
+			LIMIT 1";
+	if($def = query_value($sql)) {
+		$sql = "UPDATE `_element`
+				SET `num_6`=".$def."
+				WHERE `id` IN (15773,16732,16745)";
+		query($sql);
+	}
 }
 function _comtex_zayav() {//заявки-оборудование
 	$dialog_id = _comtexSpisokClear(1402);
@@ -1390,6 +1414,7 @@ function _comtex_accrual() {//начисления
 
 	$sql = "DELETE FROM `_spisok`
 			WHERE `dialog_id`=".$dialog_id."
+			  AND !`num_1`
 			  AND !`num_2`
 			  AND !`num_3`
 			  AND !`num_4`";
@@ -1790,6 +1815,7 @@ function _comtex_salary_deduct() {//вычеты зп сотрудникам
 }
 
 function _comtex_remind_status() {//статусы напоминаний
+	return;
 	$dialog_id = _comtexSpisokClear(1420);
 
 	$sql = "INSERT INTO _spisok (app_id,dialog_id,id_old,txt_1,txt_2,sort,user_id_add) VALUES (".APP_ID.",".$dialog_id.",1,'Активные','#D7EBFF',0,1)";
@@ -2249,7 +2275,7 @@ function _comtex_cartridge_in_zayav() {//картриджи в заявках
 	query($sql);
 
 	_comtexErrMsg($dialog_id, 'num_1', 'заявки');
-	_comtexErrMsg($dialog_id, 'num_2', 'картриджи');
+//	_comtexErrMsg($dialog_id, 'num_2', 'картриджи');
 }
 
 function _comtex_income() {//платежи
