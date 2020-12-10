@@ -111,6 +111,10 @@ function _element16_history($el, $v) {
 
 	return '';
 }
+function _element16_template_docx($el, $u) {
+	return _element16_print11($el, $u);
+}
+
 
 /* ---=== НАСТРОЙКА ЗНАЧЕНИЙ для [16][17][18] ===--- */
 function PHP12_radio_setup() {
