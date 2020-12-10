@@ -69,7 +69,8 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_income();
 		//частичный
 		case 2:
-			_comtex_income();
+			_comtex_zayav_note();
+			_comtex_zayav_note_comment();
 			break;
 
 		default:
@@ -2029,6 +2030,19 @@ function _comtex_zayav_note() {//заметки в заявках
 				user_id_del,
 				dtime_del
 			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	// Вставка первого комментария в описание неисправности в заявке
+	$sql = "UPDATE `_spisok` `t`
+			SET `txt_2`=IFNULL((
+							SELECT `txt`
+							FROM `_note`
+							WHERE `obj_id`=`t`.`id`
+							  AND `app_id`=".APP_ID."
+							ORDER BY `id`
+							LIMIT 1
+						),'')
+			WHERE dialog_id=1402";
 	query($sql);
 }
 function _comtex_zayav_note_comment() {//комментарии к заметкам в заявках
