@@ -2177,6 +2177,8 @@ function _comtex_schet_pay() {//счета на оплату
 				'".$r['date_create']."',
 				"._comtexAss(1234, $r['client_id']).",
 				"._comtexAss(1429, $r['zayav_id']).", /* заявки-картриджи */
+				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
+				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
 				'".addslashes($txt_2)."',
 				".$r['sum'].",
 
@@ -2198,6 +2200,8 @@ function _comtex_schet_pay() {//счета на оплату
 				  date_1,
 				  num_2,
 				  num_3,
+				  num_7,
+				  num_8,
 				  txt_2,
 				  sum_1,
 
@@ -2209,12 +2213,6 @@ function _comtex_schet_pay() {//счета на оплату
 
 //	_comtexErrMsg($dialog_id, 'num_2', 'клиенты');
 //	_comtexErrMsg($dialog_id, 'num_3', 'заявки');
-
-	$sql = "DELETE FROM `_spisok`
-			WHERE `dialog_id`=".$dialog_id."
-			  AND !`num_3`";
-	query($sql);
-
 }
 function _comtex_cartridge_in_zayav() {//картриджи в заявках
 	$dialog_id = _comtexSpisokClear(1432);
