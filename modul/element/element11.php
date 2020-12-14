@@ -335,6 +335,8 @@ function PHP12_v_choose_dss($prm) {//ID диалога из dss
 	return $dss;
 }
 function PHP12_v_choose_BL($prm) {//получение данных исходного блока
+	if(empty($prm['srce']))
+		return array();
 	if($BL = _blockOne($prm['srce']['block_id']))
 		return $BL;
 	if($EL = _elemOne($prm['srce']['element_id']))
