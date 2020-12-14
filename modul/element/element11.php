@@ -381,8 +381,6 @@ function PHP12_v_choose_13($prm, $dialog_id) {//клик по элементу [
 			return $dlg_id;
 	}
 
-
-
 	if(!$BL = PHP12_v_choose_BL($prm))
 		return false;
 
