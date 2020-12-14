@@ -222,7 +222,7 @@ function _blockAction232($bl, $prm, $bg='') {//условия отображен
 		if(!_elem40res($F, $u))
 			continue;
 
-		return $act['v1'];
+		$bg = $act['v1'];
 	}
 
 	return $bg;
@@ -277,13 +277,13 @@ function _elemAction241($el, $prm, $txt) {//подмена текста
 
 	foreach($action as $act) {
 		if($act['dialog_id'] != 241)
-				continue;
+			continue;
 		if(!$F = _decode($act['filter']))
-			return $txt;
+			continue;
 		if(!_elem40res($F, $u))
-			return $txt;
+			continue;
 
-		return $act['v1'];
+		$txt = $act['v1'];
 	}
 
 	return $txt;
@@ -306,7 +306,7 @@ function _elemAction242($el, $prm) {//подмена цвета
 		if(!_elem40res($F, $u))
 			continue;
 
-		return $act['v1'];
+		$color = $act['v1'];
 	}
 
 	return $color;
