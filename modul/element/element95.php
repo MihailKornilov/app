@@ -70,7 +70,7 @@ function _element95_mass($el, $prm) {//данные для редактиров�
 		if($cmp['dialog_id'] == 29) {
 			$sel_id = _elemPrintV($cmp, $prm, $cmp['num_6']);
 			$sel_id = _elem29PageSel($cmp['num_1'], $sel_id);
-			$sel_id = _elem29DialogSel($prm, $sel_id);
+			$sel_id = _elem29DialogSel($cmp, $prm, $sel_id);
 			$qDop = " AND `"._elemCol($cmp)."`=".$sel_id;
 		}
 
@@ -278,7 +278,7 @@ function _elem95_deleted($DLG, $DLG_INS, $ids=0) {
 			$prm = _blockParam();
 			$sel_id = _elemPrintV($cmp, $prm, $cmp['num_6']);
 			$sel_id = _elem29PageSel($cmp['num_1'], $sel_id);
-			$sel_id = _elem29DialogSel($prm, $sel_id);
+			$sel_id = _elem29DialogSel($cmp, $prm, $sel_id);
 			$qDop = " AND `"._elemCol($cmp)."`=".$sel_id;
 		}
 

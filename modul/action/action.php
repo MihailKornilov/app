@@ -128,7 +128,7 @@ function _blockAction209($bl, $prm, $txt='') {//установка ранее в
 		if(!$el['num_10'])
 			$v = _elemPrintV($el, $prm, $v);
 		$v = _elem29PageSel($el['num_1'], $v);
-		$v = _elem29DialogSel($prm, $v);
+		$v = _elem29DialogSel($el, $prm, $v);
 		$v = _elem29UserSel($el, $prm, $v);
 
 		if(!$v)

@@ -32,7 +32,7 @@ function _element59_title_get($el, $unit_id) {
 function _element59_print($el, $prm) {
 	$v = _elemPrintV($el, $prm, $el['num_6']);
 	$v = _elem29PageSel($el['num_1'], $v);
-	$v = _elem29DialogSel($prm, $v);
+	$v = _elem29DialogSel($el, $prm, $v);
 
 	return
 	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.

@@ -62,7 +62,7 @@ function _element29_v_get($el, $prm, $v=false) {//исходное значен�
 		$v = $el['num_6'];
 
 	$v = _elem29PageSel($el['num_1'], $v);
-	$v = _elem29DialogSel($prm, $v);
+	$v = _elem29DialogSel($el, $prm, $v);
 
 	return $v;
 }
@@ -128,7 +128,7 @@ function _elem29PageSel($dlg_cur, $sel_id) {//подмена id записи, е
 
 	return 0;
 }
-function _elem29DialogSel($prm, $sel_id) {//подстановка id записи, которая приходит на диалоговое окно
+function _elem29DialogSel($el, $prm, $sel_id) {//подстановка id записи, которая приходит на диалоговое окно
 	//id записи берётся с диалога
 	if($sel_id != -2)
 		return $sel_id;
@@ -136,23 +136,28 @@ function _elem29DialogSel($prm, $sel_id) {//подстановка id запис
 	if(!$get_id = _num(@$prm['unit_get_id']))
 		return 0;
 
-	return $get_id;
-
-	if(!$block_id = $prm['srce']['block_id'])
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `id`=".$get_id;
+	if(!$unit = query_assoc($sql))
 		return 0;
-	if(!$blk = _blockOne($block_id))
+	if(!$UDLG = _dialogQuery($unit['dialog_id']))
 		return 0;
-	//поиск id диалога: пока только получение из данных списка
-	if($blk['obj_name'] != 'spisok')
-		return 0;
-	if(!$el = _elemOne($blk['obj_id']))
-		return 0;
-	if(!$DLG = _dialogQuery($el['num_1']))
-		return 0;
-	if(!$u = _spisokUnitQuery($DLG, $get_id))
+	if(!$u = _spisokUnitQuery($UDLG, $get_id))
 		return 0;
 
-	return $get_id;
+	//если диалог значения совпадает с элементом, отправка самого значения
+	if($el['num_1'] == $UDLG['id'])
+		return $get_id;
+
+	//отправка связанного значения на основании элемента
+	foreach($UDLG['cmp'] as $cmp)
+		if(_elemIsConnect($cmp))
+			if($cmp['num_1'] == $el['num_1'])
+				if($col = _elemCol($cmp))
+					return _num($unit[$col]);
+
+	return 0;
 }
 function _elem29UserSel($el, $prm, $v) {//возвращение ID текущего пользователя
 	if($v != -21)
