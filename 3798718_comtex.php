@@ -1462,6 +1462,19 @@ function _comtex_invoice() {//Расчётные счета
 				  deleted
 			) VALUES ".implode(',', $mass);
 	query($sql);
+
+	//Установка счёта по умолчанию при внесении платежа для Счёта на оплату
+	$sql = "SELECT `id`
+			FROM `_spisok`
+			WHERE `dialog_id`=".$dialog_id."
+			  AND `txt_1`='Безналичный'
+			LIMIT 1";
+	if($def = query_value($sql)) {
+		$sql = "UPDATE `_element`
+				SET `num_6`=".$def."
+				WHERE `id`=18274";
+		query($sql);
+	}
 }
 function _comtex_invoice_transfer() {//переводы между счетами
 	$dialog_id = _comtexSpisokClear(1414);
