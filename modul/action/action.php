@@ -47,7 +47,7 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 			) continue;
 
 			if(_filterIgnore($el)) {
-				$bl['hidden'] = true;
+				$hidden = true;
 				continue;
 			}
 
