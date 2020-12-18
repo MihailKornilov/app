@@ -1208,8 +1208,6 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 	if($dialog['table_name_1'] != '_spisok')
 		return;
 
-
-
 	//получение диалогов, в которые встроен текущий (редактируемый) диалог
 	$sql = "SELECT *
 			FROM `_element`
@@ -1230,6 +1228,8 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 	foreach($dialog['cmp'] as $cmp) {
 		if($cmp['dialog_id'] != 29)
 			continue;
+		if($cmp['num_11'])
+			continue;
 		if(!$col = $cmp['col'])
 			continue;
 
@@ -1247,9 +1247,6 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 
 		if($old == $new)
 			continue;
-
-
-
 
 		//получение диалогов, в которые встроен привязанный список
 		$sql = "SELECT *
@@ -1309,7 +1306,7 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 					FROM `".$dlg['table_name_1']."`
 					WHERE `dialog_id`=".$id."
 					  AND `".$colCur."`=".$unit['id']."
-					  AND `".$colIn."`=".$old;
+					  AND `".$colIn."` IN (".$old.")";
 			if(!$spIds = query_ids($sql))
 				continue;
 
