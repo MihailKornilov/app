@@ -318,8 +318,8 @@ function _pageContent() {//приложение в работе
 	$app = _app(APP_ID);
 
 	$CNT =
-	_html_sa_access_msg().
 	_html_hat().
+	_html_sa_access_msg().
 	_pasMenu().
 	'<div id="_content" class="block-content-page site">'.
 		_elem97print($page_id).//независимая кнопка
