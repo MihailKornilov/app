@@ -2240,6 +2240,8 @@ function _comtex_schet_pay() {//счета на оплату
 				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
 				"._comtexAss(1447, $r['zayav_id']).", /* заявки-вызов специалиста */
 				'".addslashes($txt_2)."',
+				".$r['pass'].",
+				'".$r['pass_day']."',
 				".$r['sum'].",
 
 				"._comtexUserId($r).",
@@ -2263,6 +2265,8 @@ function _comtex_schet_pay() {//счета на оплату
 				  num_7,
 				  num_8,
 				  txt_2,
+				  num_5,
+				  date_2,
 				  sum_1,
 
 				  user_id_add,
