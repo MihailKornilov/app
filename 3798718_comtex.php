@@ -32,6 +32,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_tovar_category();
 			_comtex_tovar();
 			_comtex_tovar_avai();
+			_comtex_tovar_fail();
 			_comtex_tovar_cartridge();
 
 			_comtex_zayav_place();
@@ -121,19 +122,24 @@ function _comtexSpisokClear($dialog_id) {//очистка списка по ко
 	query($sql);
 	return $dialog_id;
 }
-function _comtexAss($dialog_id, $id) {//получение нового id по старому
+function _comtexAss($dialog_id, $id, $return='id') {//получение нового id по старому
 	global $COMTEX_ASS;
 
-	if(!isset($COMTEX_ASS[$dialog_id])) {
-		$sql = "SELECT `id_old`,`id`
+	$key = $dialog_id.$return;
+
+	if(!isset($COMTEX_ASS[$key])) {
+		$sql = "SELECT `id_old`,`".$return."`
 				FROM `_spisok`
 				WHERE `app_id`=".APP_ID."
 				  AND `dialog_id`=".$dialog_id."
 				  AND `id_old`";
-		$COMTEX_ASS[$dialog_id] = query_ass($sql);
+		$COMTEX_ASS[$key] = query_ass($sql);
 	}
 
-	return _num(@$COMTEX_ASS[$dialog_id][$id]);
+	if(!isset($COMTEX_ASS[$key][$id]))
+		return 0;
+
+	return $COMTEX_ASS[$key][$id];
 }
 function _comtexHistory($dialog_id) {//История по конкретному диалогу
 	$sql = "DELETE FROM `_history`
@@ -660,11 +666,6 @@ function _comtex_tovar_avai() {//наличие товара
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1403";
-	$TOVAR = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
@@ -673,7 +674,7 @@ function _comtex_tovar_avai() {//наличие товара
 				".$id.",
 				".$dialog_id.",
 				
-				"._num(@$TOVAR[$r['tovar_id']]).",
+				"._comtexAss(1403, $r['tovar_id']).", /* товары */
 				".$r['count'].",
 				".$r['cena'].",
 				'".$r['about']."',
@@ -702,6 +703,58 @@ function _comtex_tovar_avai() {//наличие товара
 	_comtexHistory($dialog_id);
 
 //	_comtexErrMsg($dialog_id, 'num_1', 'товары');
+	$sql = "DELETE FROM `_spisok`
+			WHERE dialog_id=".$dialog_id."
+			  AND !num_1";
+	query($sql);
+
+}
+function _comtex_tovar_fail() {//списание товаров
+	$dialog_id = _comtexSpisokClear(1427);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _tovar_move
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `type_id` IN (4,5,6)
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				"._comtexAss(1403, $r['tovar_id']).", /* товары */
+				".$r['count'].",
+				'".$r['about']."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."'
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  sum_1,
+				  txt_1,
+
+				  user_id_add,
+				  dtime_add
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexHistory($dialog_id);
+
 	$sql = "DELETE FROM `_spisok`
 			WHERE dialog_id=".$dialog_id."
 			  AND !num_1";
@@ -1050,16 +1103,11 @@ function _comtex_zayav_tovar() {//прикрепление товаров к з�
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1403";
-	$TOVAR = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
 			"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
-			"._num(@$TOVAR[$r['tovar_id']])."
+			"._comtexAss(1403, $r['tovar_id'])."  /* товары */
 		)";
 	}
 
@@ -1312,11 +1360,6 @@ function _comtex_zayav_expense_tovar() {//расход по заявке: зап
 	if(!$arr = query_arr($sql))
 		return;
 
-	$sql = "SELECT `id_old`,`id`
-			FROM `_spisok`
-			WHERE `dialog_id`=1403";
-	$TOVAR = query_ass($sql);
-
 	$mass = array();
 	foreach($arr as $id => $r) {
 		$mass[] = "(
@@ -1326,7 +1369,7 @@ function _comtex_zayav_expense_tovar() {//расход по заявке: зап
 				".$dialog_id.",
 
 				"._comtexAss(1402, $r['zayav_id']).", /* заявки-оборудование */
-				"._num(@$TOVAR[$r['tovar_id']]).",
+				"._comtexAss(1403, $r['tovar_id']).", /* товары */
 				".($r['tovar_count'] ? $r['tovar_count'] : 1).",
 				".$r['sum'].",
 
@@ -2262,7 +2305,10 @@ function _comtex_cartridge_in_zayav() {//картриджи в заявках
 				".$r['chip'].",
 				".$r['cost'].",
 
-				'".addslashes($r['prim'])."'
+				'".addslashes($r['prim'])."',
+
+				'"._comtexAss(1429, $r['zayav_id'], 'user_id_add')."', /* заявки-картриджи: кто внёс */
+				'"._comtexAss(1429, $r['zayav_id'], 'dtime_add')."'    /* заявки-картриджи: дата внесения */
 		)";
 	}
 
@@ -2281,7 +2327,10 @@ function _comtex_cartridge_in_zayav() {//картриджи в заявках
 				  num_5,
 				  num_6,
 
-				  txt_1
+				  txt_1,
+
+				  user_id_add,
+				  dtime_add
 			) VALUES ".implode(',', $mass);
 	query($sql);
 
