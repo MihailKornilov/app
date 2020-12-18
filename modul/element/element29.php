@@ -33,9 +33,6 @@ function _element29_struct($el) {
 }
 function _element29_print($el, $prm) {
 	$v = _40condVcopy($el['num_6']);
-	if(!$el['num_10'])
-		$v = _elemPrintV($el, $prm, $v);
-
 	$v = _element29_v_get($el, $prm, $v);
 	$v = _elem29UserSel($el, $prm, $v);
 
@@ -56,10 +53,11 @@ function _element29_vvv($el, $prm) {
 
 	return _29cnn($el['id'], '', $sel_id);
 }
-
 function _element29_v_get($el, $prm, $v=false) {//исходное значение после вывода элемента
 	if($v === false)
 		$v = $el['num_6'];
+	if(!$el['num_10'])
+		$v = _elemPrintV($el, $prm, $v);
 
 	$v = _elem29PageSel($el['num_1'], $v);
 	$v = _elem29DialogSel($el, $prm, $v);
@@ -284,6 +282,7 @@ function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select по�
 
 	//добавление единицы списка, которая была выбрана ранее
 	if($sel_id && empty($spisok[$sel_id]))
+//		echo $DLG['id'].':'.$DLG['name'].':'.$sel_id."\n";
 		if($sel = _spisokUnitQuery($DLG, $sel_id))
 			$spisok[$sel_id] = $sel;
 

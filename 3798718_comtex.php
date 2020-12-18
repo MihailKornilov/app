@@ -5,6 +5,8 @@
 	ОСОБЕННОСТИ ПЕРЕНОСА:
 	1. В клиентах убрано поле Факс. Всего содержится 14 записей. Перенесено в поле Телефон.
 	2. Картриджи переносены в Товары
+	3. Удалены ознакомительные счета (всего было 3)
+	4. Отображение начальной проблемы в заявках-оборудование
 */
 
 function _elem129_comtex($DLG, $POST_CMP) {
@@ -1622,8 +1624,7 @@ function _comtex_refund() {//возвраты
 
 	$sql = "DELETE FROM `_spisok`
 			WHERE `dialog_id`=".$dialog_id."
-			  AND !`num_3`
-			  AND !`num_4`";
+			  AND !`num_2`";
 	query($sql);
 }
 
@@ -2190,6 +2191,7 @@ function _comtex_schet_pay() {//счета на оплату
 	$sql = "SELECT *
 			FROM _schet_pay
 			WHERE `app_id`=".APP_ID_OLD."
+			  AND type_id=1
 			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
 		return;
