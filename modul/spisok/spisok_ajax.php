@@ -1084,6 +1084,13 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 	foreach($POST_CMP as $cmp_id => $v) {
 		if(!$col = _elemCol($cmp_id))
 			continue;
+		if(!$cmp = _elemOne($cmp_id))
+			continue;
+		//[29] при выборе нескольких значений по краям ставятся нули с зяпятыми для фильра в будущем
+		if($cmp['dialog_id'] == 29 && $cmp['num_11'])
+			if($v = _ids($v))
+				$v = '0,'.$v.',0';
+
 /*
 		if(!$tab = _queryTN($DLG, $col, 1)) {
 			//если родительская таблица=`_user`, сохранение её колонок, если есть
@@ -1103,14 +1110,6 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 				SET "._queryColReq($DLG, $col)."='".addslashes($v)."'
 				WHERE "._queryWhere($DLG)."
 				  AND "._queryCol_id($DLG)."=".$unit_id;
-/*
-echo $sql.'
-
-';
-		$sql = "UPDATE `".$tab."`
-				SET `".$col."`='".addslashes($v)."'
-				WHERE `id`=".$uid[$tab];
-*/
 		query($sql);
 
 		_elem1def($cmp_id, $unit_id, $v);
