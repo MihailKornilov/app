@@ -75,8 +75,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
-			_comtex_zayav_note();
-			_comtex_zayav_note_comment();
+			_comtex_cartridge_in_zayav();
 			break;
 
 		default:
@@ -2291,7 +2290,7 @@ function _comtex_cartridge_in_zayav() {//картриджи в заявках
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
 			WHERE `dialog_id`=1403
-			  AND `num_1` IN (1273455,1273456)
+			  AND `num_1` IN (1457227,1457228)
 			  AND `id_old`";
 	$CART = query_ass($sql);
 
