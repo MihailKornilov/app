@@ -1086,8 +1086,8 @@ function PHP12_dialog_app_li($r) {
 	if($parent_id = $r['dialog_id_parent'])
 		$parent = _dialogParam($parent_id, 'name');
 
-	//в истории действий дочених диалогов галочки не ставятся
-	$bgh = $parent ? ' bg6' : '';
+	//Диалог-список
+	$r['issp'] = $r['insert_on'] && $r['insert_button_submit'] && !$r['dialog_id_parent'];
 
 	return
 	'<li id="dlg_'.$r['id'].'" class="mt1 '.(!$r['pid'] ? 'mb5' : 'mb1').'">'.
@@ -1100,19 +1100,19 @@ function PHP12_dialog_app_li($r) {
 				'<td class="w30 r">'.
 					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup tool" data-tool="Редактировать диалог"></div>'.
 				'<td class="w50 center">'.
-					($r['insert_on'] ? '<div class="icon icon-ok curD"></div>' : '').
+					($r['issp'] ? '<div class="icon icon-ok curD"></div>' : '').
 				'<td class="w70 center">'.$r['unit_count'].$r['unit_count_del'].
 				'<td class="w100 clr13'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
-				'<td class="w70 clr1">'.PHP12_dialog_col($r['id']).
-				'<td class="w30'.$bgh.'">'.($r['insert_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-				'<td class="w30'.$bgh.'">'.($r['edit_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
-				'<td class="w30'.$bgh.'">'.($r['del_history_elem'] ? '<div class="icon icon-ok curD"></div>' : '').
+				'<td class="w70 clr1">'.PHP12_dialog_app_col($r['id']).
+				PHP12_dialog_app_hist($r, 'insert').
+				PHP12_dialog_app_hist($r, 'edit').
+				PHP12_dialog_app_hist($r, 'del').
 				'<td class="w70 center'.$r['cnt_del_bg'].'">'.
 					_dialogContentDelSetup($r['id']).
 		'</table>';
 
 }
-function PHP12_dialog_col($dialog_id) {//колонки, используемые в элементе
+function PHP12_dialog_app_col($dialog_id) {//колонки, используемые в элементе
 	$send = array();
 	$dub = false;//флаг повторяющейся колонки
 	foreach(_BE('elem_arr', 'dialog', $dialog_id) as $el) {
@@ -1155,6 +1155,22 @@ function PHP12_dialog_col($dialog_id) {//колонки, используемы�
 	return
 	'<div class="curP center'._dn(!$dub, 'bg-fcc').'" onclick="$(this).slideUp().next().slideDown()">'.count($send).'</div>'.
 	'<div class="dn">'.implode('<br>', $send).'</div>';
+}
+function PHP12_dialog_app_hist($r, $type) {//TD история действий
+	//История действий не настраивается для диалогов НЕ списков
+	$bgh = !$r['issp'] ? ' bg6' : '';
+
+	$send = '<td class="w30'.$bgh.'">';
+
+	if(!$r['issp'])
+		return $send;
+
+	$send .= '<div val="dialog_id:'.$r['id'].',menu:2"'.
+				 ' class="icon icon-'.($r[$type.'_history_elem'] ? 'ok' : 'del-red pl').' dialog-setup tool"'.
+				 ' data-tool="Настроить историю">'.
+			  '</div>';
+
+	return $send;
 }
 
 function PHP12_spisok_app($type_id, $msgEmpty, $appAll=0) {//вывод списков по условиям
