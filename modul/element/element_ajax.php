@@ -307,6 +307,10 @@ switch(@$_POST['op']) {
 
 		$send = _dialogOpenLoad($dialog_id);
 
+		//если на странице диалогов, при сохранении диалога обновляется страница
+		if($_POST['page_id'] == 123)
+			$send['content'] = _pageShow(123);
+
 		jsonSuccess($send);
 		break;
 	case 'dialog_open_load'://получение данных диалога

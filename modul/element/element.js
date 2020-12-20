@@ -646,6 +646,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				if(!o.send)
 					return;
 
+				if(res.content)
+					$('#_content').html(res.content);
+
 				res.send = o.send;
 				_dialogOpen(res);
 			});
