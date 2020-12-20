@@ -643,11 +643,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			send.element_rule = rule.join();
 
 			dialog.post(send, function(res) {
-				if(!o.send)
-					return;
-
 				if(res.content)
 					$('#_content').html(res.content);
+
+				if(!o.send)
+					return;
 
 				res.send = o.send;
 				_dialogOpen(res);
