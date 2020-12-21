@@ -1138,13 +1138,6 @@ function _SUN_OTHER($arr) {//внесение данных из других д�
 		_SUN_AFTER($dialog, $unit);
 	}
 }
-function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение действий после обновления или удаления записи
-	_element54unitUpd($dialog, $unit, $unitOld);
-	_element55unitUpd($dialog, $unit, $unitOld);
-	_element92unitUpd($dialog, $unit);
-	_element27inDialog($dialog, $unit, $unitOld);
-	_element27inFilter();
-}
 function _spisokUnitUpd42($DLG, $cmp) {//обновление некоторых данных другой записи [42]
 	if(!$elem_id = $DLG['insert_unit_change_elem_id'])
 		return;

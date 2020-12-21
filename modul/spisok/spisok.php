@@ -726,3 +726,10 @@ function _spisokWhere($el, $prm=array()) {//формирование строк�
 	return $cond;
 }
 
+function _SUN_AFTER($dialog, $unit, $unitOld=array()) {//выполнение действий после обновления или удаления записи
+	_element54unitUpd($dialog, $unit, $unitOld);
+	_element55unitUpd($dialog, $unit, $unitOld);
+	_element92unitUpd($dialog, $unit);
+	_element27inDialog($dialog, $unit, $unitOld);
+	_element27inFilter();
+}
