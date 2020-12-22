@@ -9,6 +9,7 @@ function _element8_struct($el) {
 											32 - произвольный текст
 											33 - цифры и числа
 											34 - артикул
+											35 - номер телефона в формате +7 (***) ***-**-**
 									  */
 		'num_2' => _num($el['num_2']),//количество знаков после запятой (для 33)
 		'num_3' => _num($el['num_3']),//разрешать отрицательные значения (для 33)
@@ -108,8 +109,10 @@ function _element8_print($el, $prm) {
 			break;
 	}
 
-
-	return '<input type="text" id="'._elemAttrId($el, $prm).'"'.$cls._elemStyleWidth($el).$placeholder.$readonly.$disabled.' value="'.$v.'" />';
+	return
+	//подключение маски ввода номера телефона
+	($el['num_1'] == 35 ? '<script src="js/jquery.maskedinput.min.js?1"></script>' : '').
+	'<input type="text" id="'._elemAttrId($el, $prm).'"'.$cls._elemStyleWidth($el).$placeholder.$readonly.$disabled.' value="'.$v.'" />';
 }
 function _element8_print11($el, $u) {
 	if(!$col = _elemCol($el))
