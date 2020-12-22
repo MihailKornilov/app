@@ -95,7 +95,7 @@ function _element16_v_get($el, $prm, $v=0) {
 		return $v;
 
 	foreach(_element16_vvv($el) as $r)
-		if($r['def'])
+		if(!empty($r['def']))
 			return $r['id'];
 
 	return $v;
