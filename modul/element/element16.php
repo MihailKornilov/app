@@ -1,6 +1,6 @@
 <?php
 
-/* [16] Radio: произвольные значения */
+/* [16] Radio */
 function _element16_struct($el) {
 	$send = array(
 		'txt_1'   => $el['txt_1'],  //текст нулевого значения
@@ -26,13 +26,6 @@ function _element16_struct($el) {
 	return $send;
 }
 function _element16_print($el, $prm) {
-	$vvv = _element('vvv', $el);
-	$def = 0;
-	foreach($vvv as $r)
-		if(!empty($r['def'])) {
-			$def = $r['id'];
-			break;
-		}
 	return
 	_radio(array(
 		'attr_id' => _elemAttrId($el, $prm),
@@ -40,9 +33,9 @@ function _element16_print($el, $prm) {
 		'right' => $el['num_5'],
 		'block' => !$el['num_1'],
 		'interval' => 5,
-		'value' => _elemPrintV($el, $prm, $def),
+		'value' => _element16_v_get($el, $prm),
 		'title0' => $el['txt_1'],
-		'spisok' => $vvv,
+		'spisok' => _element16_vvv($el),
 		'disabled' => $prm['blk_setup']
 	));
 }
@@ -96,6 +89,16 @@ function _element16_vvv($el) {
 		return array();
 
 	return _arrNum($send);
+}
+function _element16_v_get($el, $prm, $v=0) {
+	if($v = _elemPrintV($el, $prm, $v))
+		return $v;
+
+	foreach(_element16_vvv($el) as $r)
+		if($r['def'])
+			return $r['id'];
+
+	return $v;
 }
 function _element16_title_get($el, $id) {
 	foreach(_element16_vvv($el) as $r)

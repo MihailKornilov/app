@@ -27,6 +27,16 @@ function _element17_vvv($el) {
 
 	return _arrNum($send);
 }
+function _element17_v_get($el, $prm, $v=0) {
+	if($v = _elemPrintV($el, $prm, $v))
+		return $v;
+
+	foreach(_decode($el['txt_2']) as $r)
+		if($r['def'])
+			return $r['id'];
+
+	return $v;
+}
 function _element17_title_get($el, $id) {
 	foreach(_element17_vvv($el) as $r)
 		if($r['id'] == $id)
@@ -35,18 +45,12 @@ function _element17_title_get($el, $id) {
 	return '';
 }
 function _element17_print($el, $prm) {
-	$def = 0;
-	foreach(_element('vvv', $el) as $r)
-		if($r['def']) {
-			$def = $r['id'];
-			break;
-		}
 	return
 	_select(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'placeholder' => $el['txt_1'],
 		'width' => @$el['width'],
-		'value' => _elemPrintV($el, $prm, $def)
+		'value' => _element17_v_get($el, $prm)
 	));
 }
 function _element17_print11($el, $u) {
