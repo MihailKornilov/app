@@ -62,7 +62,7 @@ function _element18_v_get($el, $prm, $v=0) {
 		return $v;
 
 	foreach(_decode($el['txt_2']) as $r)
-		if($r['def'])
+		if(!empty($r['def']))
 			return $r['id'];
 
 	return $v;
