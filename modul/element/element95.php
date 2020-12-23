@@ -179,7 +179,7 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 //		_elem95_deleted($DLG, $DLG_INS);
 		$send = array(
 			'action_id' => _num($DLG[ACT.'_action_id']),
-			'action_page_id' => _num($DLG[ACT.'_action_page_id']),
+			'action_obj_id' => _num($DLG[ACT.'_action_obj_id']),
 			'content' => _pageShow(_page('cur'))
 		);
 //		_count_update();
@@ -264,7 +264,7 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 
 	$send = array(
 		'action_id' => _num($DLG[ACT.'_action_id']),
-		'action_page_id' => _num($DLG[ACT.'_action_page_id']),
+		'action_obj_id' => _num($DLG[ACT.'_action_obj_id']),
 		'content' => _pageShow(_page('cur'))
 	);
 

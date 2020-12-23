@@ -20,7 +20,7 @@ switch(@$_POST['op']) {
 		$dialog['act'] = 3;
 
 		$send['action_id'] = _num($dialog['del_action_id']);
-		$send['action_page_id'] = _num($dialog['del_action_page_id']);
+		$send['action_obj_id'] = _num($dialog['del_action_obj_id']);
 		$send = _spisokAction3($dialog, $unit_id, $send);
 		_dialogIUID($dialog);
 
@@ -522,7 +522,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 	$send = array(
 		'unit' => _arrNum($unit),
 		'action_id' => _num($dialog[ACT.'_action_id']),
-		'action_page_id' => _num($dialog[ACT.'_action_page_id'])
+		'action_obj_id' => _num($dialog[ACT.'_action_obj_id'])
 	);
 
 	$send = _spisokAction1($send);
@@ -1328,7 +1328,7 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 	}
 }
 function _spisokAction1($send) {//обновление страницы посредством AJAX
-	if($send['action_id'] != 1)
+	if($send['action_id'] != 1 && $send['action_id'] != 5)
 		return $send;
 	if(!$page_id = _num(@$_POST['page_id']))
 		return $send;

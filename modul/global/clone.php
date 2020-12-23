@@ -60,7 +60,7 @@ function _d119_app_clear($DLG) {//очистка приложения - удал
 
 	$send = array(
 		'action_id' => 2,
-		'action_page_id' => 7
+		'action_obj_id' => 7
 	);
 
 	jsonSuccess($send);
@@ -218,7 +218,7 @@ function _clone_go($DLG, $CMP) {
 
 	$send = array(
 		'action_id' => 2,
-		'action_page_id' => 0
+		'action_obj_id' => 0
 	);
 
 	jsonSuccess($send);
@@ -628,7 +628,7 @@ function _clone_dialog() {//клонирование: диалоги
 					`insert_button_submit`,
 					`insert_button_cancel`,
 					`insert_action_id`,
-					`insert_action_page_id`,
+					`insert_action_obj_id`,
 					`insert_history_elem`,
 					`insert_unit_change_elem_id`,
 					`insert_unit_change_v`,
@@ -637,14 +637,14 @@ function _clone_dialog() {//клонирование: диалоги
 					`edit_button_submit`,
 					`edit_button_cancel`,
 					`edit_action_id`,
-					`edit_action_page_id`,
+					`edit_action_obj_id`,
 					`edit_history_elem`,
 					`del_on`,
 					`del_head`,
 					`del_button_submit`,
 					`del_button_cancel`,
 					`del_action_id`,
-					`del_action_page_id`,
+					`del_action_obj_id`,
 					`del_history_elem`,
 					`table_1`,
 					`sort`,
@@ -663,7 +663,7 @@ function _clone_dialog() {//клонирование: диалоги
 					'".addslashes($r['insert_button_submit'])."',
 					'".addslashes($r['insert_button_cancel'])."',
 					".$r['insert_action_id'].",
-					"._num(@$assPG[$r['insert_action_page_id']]).",
+					"._num(@$assPG[$r['insert_action_obj_id']]).",
 					'"._clone_ids($r['insert_history_elem'], $assEL)."',
 					"._num(@$assEL[$r['insert_unit_change_elem_id']]).",
 					'".$r['insert_unit_change_v']."',
@@ -673,7 +673,7 @@ function _clone_dialog() {//клонирование: диалоги
 					'".addslashes($r['edit_button_submit'])."',
 					'".addslashes($r['edit_button_cancel'])."',
 					".$r['edit_action_id'].",
-					"._num(@$assPG[$r['edit_action_page_id']]).",
+					"._num(@$assPG[$r['edit_action_obj_id']]).",
 					'"._clone_ids($r['edit_history_elem'], $assEL)."',
 
 					".$r['del_on'].",
@@ -681,7 +681,7 @@ function _clone_dialog() {//клонирование: диалоги
 					'".addslashes($r['del_button_submit'])."',
 					'".addslashes($r['del_button_cancel'])."',
 					".$r['del_action_id'].",
-					"._num(@$assPG[$r['del_action_page_id']]).",
+					"._num(@$assPG[$r['del_action_obj_id']]).",
 					'"._clone_ids($r['del_history_elem'], $assEL)."',
 
 					".$r['table_1'].",

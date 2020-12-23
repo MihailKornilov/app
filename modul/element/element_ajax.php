@@ -19,7 +19,8 @@ switch(@$_POST['op']) {
 			3 => 'Обновить содержимое блоков',
 			1 => 'Обновить страницу',
 			2 => 'Перейти на страницу',
-			4 => 'Обновить исходный диалог'
+			4 => 'Обновить исходный диалог',
+			5 => 'Открыть диалог'
 		);
 
 		if(!SA) {
@@ -117,9 +118,9 @@ switch(@$_POST['op']) {
 									'<input type="text" id="insert_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['insert_button_cancel'].'" />'.
 							'<tr><td class="clr15 r">Дальнейшее действие:'.
 								'<td><input type="hidden" id="insert_action_id" value="'.$dialog['insert_action_id'].'" />'.
-							'<tr class="td-insert-action-page'._dn($dialog['insert_action_id'] == 2).'">'.
-								'<td class="clr1 r">Страница:'.
-								'<td><input type="hidden" id="insert_action_page_id" value="'.$dialog['insert_action_page_id'].'" />'.
+							'<tr class="td-insert-action-obj'._dn($dialog['insert_action_id'] == 2 || $dialog['insert_action_id'] == 5).'">'.
+								'<td class="clr1 r td-insert-action-title">'.
+								'<td><input type="hidden" id="insert_action_obj_id" value="'.$dialog['insert_action_obj_id'].'" />'.
 
 							'<tr><td class="clr15 r h35">Воздействие на запись:'.
 								'<td><a id="insert_unit_change" class="'.($dialog['insert_unit_change_elem_id'] ? 'clr11 b">' : 'clr1">не ').'настроено</a>'.
@@ -149,9 +150,9 @@ switch(@$_POST['op']) {
 									'<input type="text" id="edit_button_cancel" class="w125 ml5" maxlength="100" value="'.$dialog['edit_button_cancel'].'" />'.
 							'<tr><td class="clr15 r">Дальнейшее действие:'.
 								'<td><input type="hidden" id="edit_action_id" value="'.$dialog['edit_action_id'].'" />'.
-							'<tr class="td-edit-action-page'._dn($dialog['edit_action_id'] == 2).'">'.
-								'<td class="clr1 r">Страница:'.
-								'<td><input type="hidden" id="edit_action_page_id" value="'.$dialog['edit_action_page_id'].'" />'.
+							'<tr class="td-edit-action-obj'._dn($dialog['edit_action_id'] == 2 || $dialog['edit_action_id'] == 5).'">'.
+								'<td class="clr1 r td-edit-action-title">'.
+								'<td><input type="hidden" id="edit_action_obj_id" value="'.$dialog['edit_action_obj_id'].'" />'.
 						'</table>'.
 					'</div>'.
 				'</div>'.
@@ -180,9 +181,9 @@ switch(@$_POST['op']) {
 									'</div>'.
 							'<tr><td class="clr15 r">Дальнейшее действие:'.
 								'<td><input type="hidden" id="del_action_id" value="'.$dialog['del_action_id'].'" />'.
-							'<tr class="td-del-action-page'._dn($dialog['del_action_id'] == 2).'">'.
-								'<td class="clr1 r">Страница:'.
-								'<td><input type="hidden" id="del_action_page_id" value="'.$dialog['del_action_page_id'].'" />'.
+							'<tr class="td-del-action-obj'._dn($dialog['del_action_id'] == 2 || $dialog['del_action_id'] == 5).'">'.
+								'<td class="clr1 r td-del-action-title">'.
+								'<td><input type="hidden" id="del_action_obj_id" value="'.$dialog['del_action_obj_id'].'" />'.
 						'</table>'.
 					'</div>'.
 				'</div>'.
@@ -281,6 +282,7 @@ switch(@$_POST['op']) {
 		$send['sa'] = SA;
 		$send['tables'] = SA ? _table() : array();
 		$send['group'] = $group;
+		$send['dlg_all'] = _dialogSelArray();
 		$send['dlg_func'] = _dialogSelArray('dlg_func');
 		$send['dlg_spisok_on'] = _dialogSelArray('spisok_only', $dialog_id);
 		$send['spisok_cmp'] = _dialogSpisokCmp($dialog_id);
@@ -1369,7 +1371,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	if(!$insert_button_cancel = _txt($_POST['insert_button_cancel']))
 		jsonError('Не указан текст кнопки отмены для новой записи');
 	$insert_action_id = _num($_POST['insert_action_id']);
-	$insert_action_page_id = _num($_POST['insert_action_page_id']);
+	$insert_action_obj_id = _num($_POST['insert_action_obj_id']);
 	$insert_unit_id_set_elem_id = _num($_POST['insert_unit_id_set_elem_id']);
 
 
@@ -1381,7 +1383,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	if(!$edit_button_cancel = _txt($_POST['edit_button_cancel']))
 		jsonError('Не указан текст кнопки отмены редактирования');
 	$edit_action_id = _num($_POST['edit_action_id']);
-	$edit_action_page_id = _num($_POST['edit_action_page_id']);
+	$edit_action_obj_id = _num($_POST['edit_action_obj_id']);
 
 
 	/* ---=== Настройки удаления данных ===--- */
@@ -1393,7 +1395,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	if(!$del_button_cancel = _txt($_POST['del_button_cancel']))
 		jsonError('Не указан текст кнопки отмены удаления');
 	$del_action_id = _num($_POST['del_action_id']);
-	$del_action_page_id = _num($_POST['del_action_page_id']);
+	$del_action_obj_id = _num($_POST['del_action_obj_id']);
 
 
 	/* ---=== Настройки ширины ===--- */
@@ -1426,7 +1428,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`insert_button_submit`='".addslashes($insert_button_submit)."',
 				`insert_button_cancel`='".addslashes($insert_button_cancel)."',
 				`insert_action_id`=".$insert_action_id.",
-				`insert_action_page_id`=".$insert_action_page_id.",
+				`insert_action_obj_id`=".$insert_action_obj_id.",
 				`insert_unit_id_set_elem_id`=".$insert_unit_id_set_elem_id.",
 
 				`edit_on`=".$edit_on.",
@@ -1434,14 +1436,14 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`edit_button_submit`='".addslashes($edit_button_submit)."',
 				`edit_button_cancel`='".addslashes($edit_button_cancel)."',
 				`edit_action_id`=".$edit_action_id.",
-				`edit_action_page_id`=".$edit_action_page_id.",
+				`edit_action_obj_id`=".$edit_action_obj_id.",
 
 				`del_on`=".$del_on.",
 				`del_head`='".addslashes($del_head)."',
 				`del_button_submit`='".addslashes($del_button_submit)."',
 				`del_button_cancel`='".addslashes($del_button_cancel)."',
 				`del_action_id`=".$del_action_id.",
-				`del_action_page_id`=".$del_action_page_id.",
+				`del_action_obj_id`=".$del_action_obj_id.",
 
 				`spisok_elem_id`=".$spisok_elem_id.",
 				`open_auto`=".$open_auto.",

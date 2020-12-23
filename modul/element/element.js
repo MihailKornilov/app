@@ -367,22 +367,40 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			insert:'внесения',
 			edit:'редактирования',
 			del:'удаления'
-		};
+		},
+			actionObj = function(act, v) {//вывод select'a для действия открытия страницы или диалога
+				var title = 'Страница:',
+					t0 = 'а',
+					spisok = o.page_list;
+				switch(v) {
+					case 2:break; //страница
+					case 5://диалог
+						title = 'Диалог:';
+						t0 = '';
+						spisok = o.dlg_all;
+						break;
+					default: return;
+				}
+				DLG('.td-' + act + '-action-title').html(title);
+				DLG('#' + act + '_action_obj_id')._select({
+					width:280,
+					title0:'не выбран' + t0,
+					spisok:spisok,
+					write:1
+				});
+			};
 		_forN(['insert', 'edit', 'del'], function(act) {
 			DLG('#' + act + '_action_id')._select({
-				width:270,
+				width:280,
 				title0:'действия нет, закрыть окно',
 				spisok:o.action,
 				func:function(v) {
-					DLG('.td-' + act + '-action-page')._dn(v == 2);
-					DLG('#' + act + '_action_page_id')._select(0);
+					DLG('.td-' + act + '-action-obj')._dn(v == 2 || v == 5);
+					DLG('#' + act + '_action_obj_id')._select(0);
+					actionObj(act, v);
 				}
 			});
-			DLG('#' + act + '_action_page_id')._select({
-				width:270,
-				title0:'не выбрана',
-				spisok:o.page_list
-			});
+			actionObj(act, _num(DLG('#' + act + '_action_id').val()));
 			DLG('#history_' + act).click(function() {
 				var t = $(this);
 				t.find('div')._vh();
@@ -591,7 +609,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				insert_button_submit:DLG('#insert_button_submit').val(),
 				insert_button_cancel:DLG('#insert_button_cancel').val(),
 				insert_action_id:DLG('#insert_action_id').val(),
-				insert_action_page_id:DLG('#insert_action_page_id').val(),
+				insert_action_obj_id:DLG('#insert_action_obj_id').val(),
 				insert_unit_id_set_elem_id:DLG('#insert_unit_id_set_elem_id').val(),
 
 				edit_on:DLG('#edit_on').val(),
@@ -599,14 +617,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				edit_button_submit:DLG('#edit_button_submit').val(),
 				edit_button_cancel:DLG('#edit_button_cancel').val(),
 				edit_action_id:DLG('#edit_action_id').val(),
-				edit_action_page_id:DLG('#edit_action_page_id').val(),
+				edit_action_obj_id:DLG('#edit_action_obj_id').val(),
 
 				del_on:DLG('#del_on').val(),
 				del_head:DLG('#del_head').val(),
 				del_button_submit:DLG('#del_button_submit').val(),
 				del_button_cancel:DLG('#del_button_cancel').val(),
 				del_action_id:DLG('#del_action_id').val(),
-				del_action_page_id:DLG('#del_action_page_id').val(),
+				del_action_obj_id:DLG('#del_action_obj_id').val(),
 
 				spisok_elem_id:DLG('#spisok_elem_id').val(),
 				open_auto:DLG('#open_auto').val(),
@@ -837,7 +855,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				break;
 			//переход на страницу
 			case 2:
-				var url = URL + '&p=' + res.action_page_id;
+				var url = URL + '&p=' + res.action_obj_id;
 				if(res.unit)
 					url += '&id=' + res.unit.id;
 				location.href = url;
@@ -866,6 +884,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				};
 
 				_dialogLoad(send);
+				break;
+			//открытие диалога
+			case 5:
+				$('#_content').html(res.content);
+				if(!res.action_obj_id)
+					return;
+				_dialogLoad({
+					dialog_id:res.action_obj_id,
+					get_id:res.unit.id
+				});
 				break;
 		}
 

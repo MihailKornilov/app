@@ -168,8 +168,8 @@ function PHP12_bug_page_dlg_insert($PG) {//Переход на страницу 
 	$sql = "SELECT COUNT(*)
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID."
-			  AND `insert_action_page_id`
-			  AND `insert_action_page_id` NOT IN ("._idsGet($PG).")";
+			  AND `insert_action_obj_id`
+			  AND `insert_action_obj_id` NOT IN ("._idsGet($PG).")";
 	return _hide0(query_value($sql));
 }
 function PHP12_bug_page_dlg_edit($PG) {//Переход на страницу после редактирования
@@ -179,8 +179,8 @@ function PHP12_bug_page_dlg_edit($PG) {//Переход на страницу п
 	$sql = "SELECT COUNT(*)
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID."
-			  AND `edit_action_page_id`
-			  AND `edit_action_page_id` NOT IN ("._idsGet($PG).")";
+			  AND `edit_action_obj_id`
+			  AND `edit_action_obj_id` NOT IN ("._idsGet($PG).")";
 	return _hide0(query_value($sql));
 }
 function PHP12_bug_page_dlg_del($PG) {//Переход на страницу после удаления
@@ -190,8 +190,8 @@ function PHP12_bug_page_dlg_del($PG) {//Переход на страницу п�
 	$sql = "SELECT COUNT(*)
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID."
-			  AND `del_action_page_id`
-			  AND `del_action_page_id` NOT IN ("._idsGet($PG).")";
+			  AND `del_action_obj_id`
+			  AND `del_action_obj_id` NOT IN ("._idsGet($PG).")";
 	return _hide0(query_value($sql));
 }
 function PHP12_bug_page_204act($PG) {//204 - переход на страницу (элемент)
