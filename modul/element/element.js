@@ -6976,7 +6976,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		DL.sortable({handle:'.icon-move'});
 		BUT_ADD.click(vAdd);
 
-		if(!vvv.length)
+		if(!vvv || !vvv.length)
 			vAdd();
 		else {
 			_forIn(vvv, vAdd);
@@ -7031,15 +7031,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			var DD = DL.find('dd:last');
 
-			DD.find('.txt')
-				.focus()
-				._autosize()
-				.keyup(function() {
-					var t = $(this),
-						c = $.trim(t.val()).length;
-					t[(c ? 'remove' : 'add') + 'Class']('bg14');
-				})
-				.trigger('keyup');
+			DD.find('.txt').focus()._autosize();
 			DD.find('.count,.cena').keyup(function() {
 				var count = _cena(DD.find('.count').val()),
 					cena = _cena(DD.find('.cena').val());

@@ -3058,7 +3058,9 @@ function PHP12_schetPayContent_save($cmp, $val, $unit) {
 	if(!empty($val))
 		if(is_array($val))
 			foreach($val as $r) {
-				if(!$txt = _txt($r['txt']))
+				if(!$count = _cena($r['count']))
+					continue;
+				if(!$cena = _cena($r['cena']))
 					continue;
 
 				if($id = _num($r['id']))
@@ -3066,9 +3068,9 @@ function PHP12_schetPayContent_save($cmp, $val, $unit) {
 
 				$save[] = array(
 					'id' => $id,
-					'txt' => $txt,
-					'count' => _cena($r['count']),
-					'cena' => _cena($r['cena']),
+					'txt' => _txt($r['txt']),
+					'count' => $count,
+					'cena' => $cena,
 					'sum' => _cena($r['sum'])
 				);
 			}
