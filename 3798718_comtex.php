@@ -24,6 +24,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 	switch($POST_CMP[$key]) {
 		//полный перенос
 		case 1:
+			jsonError('Перенос завершён');
 			_comtexDataDel();
 
 			_comtex_user_name_correct();
@@ -75,7 +76,6 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
-			_comtex_cartridge_in_zayav();
 			break;
 
 		default:

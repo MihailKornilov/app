@@ -31,7 +31,8 @@ require_once GLOBAL_DIR.'/modul/element/element.php';
 require_once GLOBAL_DIR.'/modul/action/action.php';
 require_once GLOBAL_DIR.'/modul/spisok/spisok.php';
 
-require_once GLOBAL_DIR.'/3798718_comtex.php';
+//require_once GLOBAL_DIR.'/3798718_comtex.php';
+require_once GLOBAL_DIR.'/3495523_kupez.php';
 
 define('YEAR_CUR', strftime('%Y'));
 define('YEAR_MON', strftime('%Y-%m'));
