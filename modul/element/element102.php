@@ -134,12 +134,36 @@ function _elem102CnnList($ids, $return='select', $cond='') {//значения �
 
 	return $select;
 }
+function _elem102CnnCount($spisok, $pid=0) {//присвоение количеств родителям суммы дочерних значений
+	if(empty($spisok[$pid]))
+		return $spisok;
+	if(!empty($spisok[$pid]['id']))
+		return $spisok;
+
+	foreach($spisok[$pid] as $id => $sp) {
+		$spisok[$pid] = _elem102CnnCount($spisok[$pid], $id);
+
+		if(empty($spisok[$id]))
+			continue;
+
+		foreach($spisok[$id] as $r)
+			if(!empty($r['cc'])) {
+				if(!isset($spisok[$pid][$id]['cc']))
+					$spisok[$pid][$id]['cc'] = 0;
+				$spisok[$pid][$id]['cc'] += $r['cc'];
+			}
+
+	}
+
+	return $spisok;
+}
 function _elem102CnnChild($col, $child, $pid=0, $spisok=array(), $path='', $level=0) {//расстановка дочерних значений
 	if(!$send = @$child[$pid])
 		return $spisok;
 
 	foreach($send as $id => $sp) {
-		$content = $sp[$col];
+		$cc = !empty($sp['cc']) ? '<div class="fr clr2 b fs12">'.$sp['cc'].'</div>' : '';
+		$content = $sp[$col].$cc;
 		$u = array(
 			'id' => $id,
 			'title' => $path.$sp[$col],
