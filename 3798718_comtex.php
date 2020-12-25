@@ -76,6 +76,7 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
+			_comtex_devices_lost();
 			break;
 
 		default:
@@ -2412,7 +2413,51 @@ function _comtex_income() {//платежи
 */
 }
 
+function _comtex_devices_lost() {//восстановление потерянных устройств в заявках
+	$sql = "SELECT id_old,id
+			FROM `_spisok`
+			WHERE `dialog_id`=1402
+			  AND !`num_3`";
+	if(!$ASS = query_ass($sql))
+		return;
 
+	_db2();
+	$sql = "SELECT *
+			FROM _zayav
+			WHERE `id` IN ("._idsGet($ASS, 'key').")";
+	if(!$zayav = query_arr($sql))
+		return;
+
+	foreach($zayav as $r) {
+		$sql = "SELECT `id`
+				FROM `_spisok`
+				WHERE `dialog_id`=1403
+				  AND `txt_1`='".$r['name']."'
+				LIMIT 1";
+		if(!$tovar_id = query_value($sql)) {
+			$sql = "INSERT INTO `_spisok` (
+						`app_id`,
+						`dialog_id`,
+						`num_1`,
+						`txt_1`,
+						`user_id_add`
+					) VALUES (
+						".APP_ID.",
+						1403,
+						1451283,
+						'".$r['name']."',
+						1
+					)";
+			$tovar_id = query_id($sql);
+		}
+		$sql = "UPDATE `_spisok`
+				SET `num_3`=".$tovar_id."
+				WHERE `id`=".$ASS[$r['id']];
+		query($sql);
+	}
+
+
+}
 
 
 
