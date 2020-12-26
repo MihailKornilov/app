@@ -84,9 +84,14 @@ function PHP12_block_choose($prm) {
 		'sel' => 0          //выбранные блоки
 	);
 
+	$level = 1;
+	if(!$prm['dop']['level_deny'])
+		if($ids = _ids($prm['dop']['sel'], 'arr'))
+			$level = _BE('block_level', $ids[0]);
+
 	$cond = array(
 		'blk_choose' => 1,
-		'blk_level' => $prm['dop']['level_deny'] ? 1 : _blockLevelDefine($obj_name),
+		'blk_level' => _blockLevelDefine($obj_name, $level),
 		'blk_deny' => $prm['dop']['blk_deny'],
 		'blk_sel' => $prm['dop']['sel']
 	);

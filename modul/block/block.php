@@ -471,7 +471,7 @@ function _blockChooseBut($obj_name, $obj_id) {//кнопка включения 
 		'<b class="ml5 fs12">0</b>'.
 	'</button>';
 }
-function _blockLevelDefine($obj_name, $v = 0) {//уровень редактируемых блоков
+function _blockLevelDefine($obj_name, $v=0) {//уровень редактируемых блоков
 	$key = 'block_level_'.$obj_name;
 	if($v) {
 		$_COOKIE[$key] = $v;
@@ -923,6 +923,15 @@ function _BE($i, $i1=0, $i2=0) {//кеширование элементов пр
 		unset($send[$parent_id]);
 
 		return $send;
+	}
+
+	if($i == 'block_level') {//получение уровня, на котором находится блок
+		$level = 0;
+		while($bl = @$G_BLK[$i1]) {
+			$i1 = $bl['parent_id'];
+			$level++;
+		}
+		return $level;
 	}
 
 	//очистка кеша блоков
