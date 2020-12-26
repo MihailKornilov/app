@@ -436,8 +436,6 @@ function _comtex_user_cnn() {//привязка пользователей к п
 			  user_id
 			) VALUES ".implode(',', $rule);
 	query($sql);
-
-
 }
 
 function _comtex_client() {//Клиенты
