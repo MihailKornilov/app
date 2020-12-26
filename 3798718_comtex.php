@@ -73,10 +73,10 @@ function _elem129_comtex($DLG, $POST_CMP) {
 			_comtex_cartridge_in_zayav();
 
 			_comtex_income();
+			_comtex_devices_lost();
 			break;
 		//частичный
 		case 2:
-			_comtex_devices_lost();
 			break;
 
 		default:
