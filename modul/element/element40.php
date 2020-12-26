@@ -299,6 +299,7 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 		-14 => 'число текущего года'
 		-15 => 'сегодня'
 		-21 => 'текущий пользователь'
+		-23 => 'текущая запись'
 		-31 => 'значение v1'
 */
 
@@ -316,26 +317,17 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 		if(_ids($r['elem_id'], 'count') > 2)
 			return " AND !`t1`.`id` /* [40] уровень вложения > 2 не отработан */";
 
-		$elem_id = _idsLast($r['elem_id']);
+		$col = _40cond_col($r);
 
-		if(!$ell = _elemOne($elem_id))
-			return " AND !`t1`.`id` /* [40] элемента ".$elem_id." не существует */";
-		if(!$col = _elemCol($ell))
-			return " AND !`t1`.`id` /* [40] отсутствует имя колонки */";
-		if(!$BL = _blockOne($ell['block_id']))
-			return " AND !`t1`.`id` /* [40] элемент не содержится блок */";
-		if($BL['obj_name'] != 'dialog')
-			return " AND !`t1`.`id` /* [40] элемент не из диалога */";
-		if(!$DLG = _dialogQuery($BL['obj_id']))
-			return " AND !`t1`.`id` /* [40] диалога не существует */";
+		if($err = _40cond_err($col))
+			return $err;
 
-		$col = '`'._queryTN($DLG, $col).'`.`'.$col.'`';
 
-		$val = _40cond_cnn($EL, $r, $ell, $r['txt'], $prm);
-		$val = _40cond_17($r, $ell, $val);
-		$val = _40cond_date($ell, $val);
+		$val = _40cond_cnn($EL, $r, $r['txt'], $prm);
+		$val = _40cond_17($r, $val);
+		$val = _40cond_date($r, $val);
 		$val = _40cond_dop($r, $val);
-		$val = _40cond_contain($r, $ell, $val);
+		$val = _40cond_contain($r, $val);
 
 		if($err = _40cond_err($val))
 			return $err;
@@ -374,7 +366,38 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 
 	return $send;
 }
-function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключаемого списка
+function _40cond_ell($r) {
+	$elem_id = _idsLast($r['elem_id']);
+
+	return _elemOne($elem_id);
+}
+function _40cond_col($r) {//получение имени колонки
+	$elem_id = _idsLast($r['elem_id']);
+
+	switch($elem_id) {
+		case -41: return "`t1`.`id`";
+		case -42: return "`t1`.`num`";
+		case -43: return "`t1`.`dtime_add`";
+		case -44: return "`t1`.`user_id_add`";
+	}
+
+	if(!$ell = _elemOne($elem_id))
+		return " AND !`t1`.`id` /* [40] элемента ".$elem_id." не существует */";
+	if(!$col = _elemCol($ell))
+		return " AND !`t1`.`id` /* [40] отсутствует имя колонки */";
+	if(!$BL = _blockOne($ell['block_id']))
+		return " AND !`t1`.`id` /* [40] элемент не содержится блок */";
+	if($BL['obj_name'] != 'dialog')
+		return " AND !`t1`.`id` /* [40] элемент не из диалога */";
+	if(!$DLG = _dialogQuery($BL['obj_id']))
+		return " AND !`t1`.`id` /* [40] диалога не существует */";
+
+
+	return '`'._queryTN($DLG, $col).'`.`'.$col.'`';
+}
+function _40cond_cnn($EL, $r, $v, $prm) {//значение подключаемого списка
+	if(!$ell = _40cond_ell($r))
+		return $v;
 	if(!_elemIsConnect($r['elem_id']))
 		return $v;
 	if(!$DLG_ID_CONN = $ell['num_1'])
@@ -512,16 +535,20 @@ function _40cond_cnn($EL, $r, $ell, $v, $prm) {//значение подключ
 
 	return $unit_id;
 }
-function _40cond_17($r, $ell, $val) {//значения _select [17]
+function _40cond_17($r, $val) {//значения _select [17]
 	if(_40cond_err($val))
+		return $val;
+	if(!$ell = _40cond_ell($r))
 		return $val;
 	if($ell['dialog_id'] != 17)
 		return $val;
 
 	return _num($r['unit_id']);
 }
-function _40cond_date($ell, $val) {//если элемент является датой, преобразование значения в дату, если это число.
+function _40cond_date($r, $val) {//если элемент является датой, преобразование значения в дату, если это число.
 	if(_40cond_err($val))
+		return $val;
+	if(!$ell = _40cond_ell($r))
 		return $val;
 	if(!_elemIsDate($ell))
 		return $val;
@@ -552,6 +579,10 @@ function _40cond_dop($r, $val) {//дополнительные условия, �
 		case -15: return TODAY;
 
 		case -21: return USER_ID;
+		case -23:
+			if(empty($_GET['id']))
+				return "/* id не получен */";
+			return _num($_GET['id']);
 
 		case -31:
 			if(empty($_GET['v1']))
@@ -561,10 +592,11 @@ function _40cond_dop($r, $val) {//дополнительные условия, �
 
 	return $val;
 }
-function _40cond_contain($r, $ell, $val) {//подготовка значения для условия "содержит / не содержит"
+function _40cond_contain($r, $val) {//подготовка значения для условия "содержит / не содержит"
 	if($r['cond_id'] != 9 && $r['cond_id'] != 10)
 		return $val;
-
+	if(!$ell = _40cond_ell($r))
+		return $val;
 	if($ell['dialog_id'] == 29 && $ell['num_11'])
 		return ','.$val.',';
 	if($ell['dialog_id'] == 31)//Выбор нескольких значений галочками
@@ -779,6 +811,7 @@ function PHP12_spfl_drop() {
 		-15 => 'сегодня',
 
 		-21 => 'текущий пользователь',
+		-23 => 'текущая запись',
 
 		-31 => 'значение v1'
 	);

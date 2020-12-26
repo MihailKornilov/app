@@ -235,7 +235,7 @@ function PHP12_v_choose($prm) {
 	'</div>'.
 
 	'<div class="choose-menu-1">'.PHP12_v_choose_global($prm).'</div>'.
-	'<div class="choose-menu-2 pad10">id, дата внесения, кто внёс</div>'.
+	'<div class="choose-menu-2 pad10">'.PHP12_v_choose_unit($prm).'</div>'.
 	'<div class="choose-menu-3">'
 : '').
 
@@ -258,16 +258,17 @@ function PHP12_v_choose_menuSel($prm) {//выбранный пункт меню
 	if(!$v = _idsFirst($prm['dop']['sel']))
 		return $sel;
 
-	if($v == -21)
-		return 1;
-	if($v == -22)
-		return 1;
-	if($v == -23)
-		return 1;
-	if($v == -24)
-		return 1;
-	if($v == -31)
-		return 1;
+	switch($v) {
+		case -21:
+		case -22:
+		case -23:
+		case -24:
+		case -31: return 1;
+		case -41:
+		case -42:
+		case -43:
+		case -44: return 2;
+	}
 
 	return $sel;
 }
@@ -295,6 +296,27 @@ function PHP12_v_choose_global($prm) {//глобальные значения д
 	'<div class="prel pad10">'.
 		'<div class="elm-choose'.($v == -31 ? ' sel' : '').'" val="-31"></div>'.
 		'<div class="fs17 b center pad10 clr9">Значение v1</div>'.
+	'</div>';
+}
+function PHP12_v_choose_unit($prm) {//данные записи
+	$v = _idsFirst($prm['dop']['sel']);
+
+	return
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -41 ? ' sel' : '').'" val="-41"></div>'.
+		'<div class="fs17 b center pad10 clr9">ID - идентификатор</div>'.
+	'</div>'.
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -42 ? ' sel' : '').'" val="-42"></div>'.
+		'<div class="fs17 b center pad10 clr9">NUM - номер</div>'.
+	'</div>'.
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -43 ? ' sel' : '').'" val="-43"></div>'.
+		'<div class="fs17 b center pad10 clr9">Дата внесения</div>'.
+	'</div>'.
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -44 ? ' sel' : '').'" val="-44"></div>'.
+		'<div class="fs17 b center pad10 clr9">Кто внёс</div>'.
 	'</div>';
 }
 function PHP12_v_choose_vvv($prm) {

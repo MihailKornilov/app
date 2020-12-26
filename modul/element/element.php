@@ -1553,6 +1553,11 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 			case -22: $send = 'Текущий диалог'; break;
 			case -23: $send = 'Текущая запись'; break;
 			case -24: $send = 'Текущая страница'; break;
+
+			case -41: $send = 'UNIT:ID'; break;
+			case -42: $send = 'UNIT:NUM'; break;
+			case -43: $send = 'UNIT:Дата внесения'; break;
+			case -44: $send = 'UNIT:Кто внёс'; break;
 			default:
 				$send .= ($n ? $znak : '').
 						 _element('title', $id, true);
