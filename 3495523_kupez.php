@@ -21,15 +21,17 @@ function _elem129_kupez($DLG, $POST_CMP) {
 		case 1:
 			_kupezDataDel();
 
-//			_comtex_user();
-//			_comtex_user_cnn();
+			_comtex_user();
+			_comtex_user_cnn();
 
 			_kupez_client();
 
-
+			_kupez_rubric();
+			_kupez_zayav_ob();
 			break;
 		//частичный
 		case 2:
+			_kupez_zayav_ob();
 			break;
 
 		default:
@@ -55,7 +57,7 @@ function _kupezDataDel() {// Удаление всех данных в прил�
 	$sql = "DELETE FROM `_spisok`
 			WHERE `app_id`=".APP_ID."
 			  AND `id` NOT IN (
-					0
+					1526000 /* настройка стоимости длины объявлений */
 				) AND !`cnn_id`";
 	query($sql);
 
@@ -150,6 +152,158 @@ function _kupez_client() {//Клиенты
 	_comtexHistory($dialog_id);
 }
 
+function _kupez_rubric() {//рубрики объявлений
+	$dialog_id = _comtexSpisokClear(1478);
+
+	//категории
+	_db2();
+	$sql = "SELECT *
+			FROM `_setup_rubric`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['name']."',
+
+				".$r['sort']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  txt_1,/* name */
+
+				  `sort`
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok` 
+			WHERE `dialog_id`=".$dialog_id;
+	$PAR = query_ass($sql);
+
+
+	//подрубрики
+	_db2();
+	$sql = "SELECT *
+			FROM `_setup_rubric_sub`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				"._num(@$PAR[$r['rubric_id']]).",
+				
+				'".$r['name']."',
+
+				".$r['sort']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				  `parent_id`,
+				
+				  txt_1,/* name */
+
+				  `sort`
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _kupez_zayav_ob() {//заявки-объявления
+	$dialog_id = _comtexSpisokClear(1477);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1478
+			  AND `parent_id`";
+	$RUBSUB = query_ass($sql);
+
+	$x = 1000;
+
+	for($n = 0; $n < 1000; $n++) {
+		_db2();
+		$sql = "SELECT *
+				FROM _zayav
+				WHERE `app_id`=".APP_ID_OLD."
+				  AND `service_id`=8
+				ORDER BY `id`
+				LIMIT ".($n*$x).",".$x;
+		if(!$arr = query_arr($sql))
+			return;
+
+		$mass = array();
+		foreach($arr as $zayav_id => $r) {
+			if($r['rubric_id_sub'])
+				$rubric = _num(@$RUBSUB[$r['rubric_id_sub']]);
+			else
+				$rubric = _comtexAss(1478, $r['rubric_id']);
+
+			$mass[] = "(
+					".$zayav_id.",
+					".APP_ID.",
+					".$r['nomer'].",
+					".$dialog_id.",
+					
+					"._comtexAss(1040, $r['client_id']).",/* клиент */
+					".$rubric.",
+					'".addslashes($r['about'])."',
+					'".addslashes($r['phone'])."',
+					'".addslashes($r['adres'])."',
+					".$r['sum_manual'].",
+					".$r['sum_cost'].",
+	
+					"._comtexUserId($r).",
+					'".$r['dtime_add']."',
+					".$r['deleted']."
+				)";
+		}
+
+		$sql = "INSERT INTO `_spisok` (
+					  `id_old`,
+					  `app_id`,
+					  `num`,
+					  `dialog_id`,
+					
+					  num_1,
+					  num_2,
+					  txt_1,
+					  txt_2,
+					  txt_3,
+					  num_4,
+					  sum_1,
+	
+					  user_id_add,
+					  dtime_add,
+					  deleted
+				) VALUES ".implode(',', $mass);
+		query($sql);
+	}
+}
 
 
 
