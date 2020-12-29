@@ -240,12 +240,18 @@ function _kupez_zayav_ob() {//заявки-объявления
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
 			WHERE `dialog_id`=1478
+			  AND !`parent_id`";
+	$RUB = query_ass($sql);
+
+	$sql = "SELECT `id_old`,`id`
+			FROM `_spisok`
+			WHERE `dialog_id`=1478
 			  AND `parent_id`";
 	$RUBSUB = query_ass($sql);
 
 	$x = 1000;
 
-	for($n = 0; $n < 1000; $n++) {
+	for($n = 0; $n < $x; $n++) {
 		_db2();
 		$sql = "SELECT *
 				FROM _zayav
@@ -258,10 +264,10 @@ function _kupez_zayav_ob() {//заявки-объявления
 
 		$mass = array();
 		foreach($arr as $zayav_id => $r) {
-			if($r['rubric_id_sub'])
-				$rubric = _num(@$RUBSUB[$r['rubric_id_sub']]);
+			if($sub_id = $r['rubric_id_sub'])
+				$rubric = $RUBSUB[$sub_id];
 			else
-				$rubric = _comtexAss(1478, $r['rubric_id']);
+				$rubric = $RUB[$r['rubric_id']];
 
 			$mass[] = "(
 					".$zayav_id.",
