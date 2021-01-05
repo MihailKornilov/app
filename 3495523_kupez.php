@@ -28,10 +28,15 @@ function _elem129_kupez($DLG, $POST_CMP) {
 
 			_kupez_rubric();
 			_kupez_zayav_ob();
+
+			_kupez_invoice();
+			_kupez_expense_category();
+			_kupez_expense();
+
 			break;
 		//частичный
 		case 2:
-			_kupez_invoice();
+			_kupez_expense();
 			break;
 
 		default:
@@ -58,7 +63,9 @@ function _kupezDataDel() {// Удаление всех данных в прил�
 			WHERE `app_id`=".APP_ID."
 			  AND `id` NOT IN (
 					1526000, /* настройка стоимости длины объявлений */
-					1594431,1594432 /* доп.параметры объявлений */
+					1594431,1594432, /* доп.параметры объявлений */
+					1599857, /* категория расходов: зарплата */
+					0
 				) AND !`cnn_id`";
 	query($sql);
 
@@ -312,6 +319,49 @@ function _kupez_zayav_ob() {//заявки-объявления
 	}
 }
 
+function _kupez_invoice() {//Расчётные счета
+	$dialog_id = _comtexSpisokClear(1483);
+
+	_db2();
+	$sql = "SELECT *
+			FROM `_money_invoice`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".$r['name']."',
+				'".$r['about']."',
+				".$r['start'].",
+
+				".$r['sort'].",
+				".$r['deleted']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  num,
+				  dialog_id,
+
+				  txt_1,/* name */
+				  txt_2,/* about */
+				  sum_1,/* start */
+
+				  sort,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
 function _kupez_expense_category() {//категории расходов
 	$dialog_id = _comtexSpisokClear(1482);
 
@@ -393,12 +443,12 @@ function _kupez_expense_category() {//категории расходов
 			) VALUES ".implode(',', $mass);
 	query($sql);
 }
-function _kupez_invoice() {//Расчётные счета
-	$dialog_id = _comtexSpisokClear(1483);
+function _kupez_expense() {//расходы
+	$dialog_id = _comtexSpisokClear(1484);
 
 	_db2();
 	$sql = "SELECT *
-			FROM `_money_invoice`
+			FROM _money_expense
 			WHERE `app_id`=".APP_ID_OLD."
 			ORDER BY `id`";
 	if(!$arr = query_arr($sql))
@@ -406,35 +456,52 @@ function _kupez_invoice() {//Расчётные счета
 
 	$mass = array();
 	foreach($arr as $id => $r) {
+		if($r['worker_id']) {
+			$cat = 1599857;
+		} else
+			if($r['category_sub_id'])
+				$cat = _comtexAss(1482, $r['category_sub_id'], 'id', 'AND `parent_id`');
+			else
+				$cat = _comtexAss(1482, $r['category_id'], 'id', 'AND !`parent_id`');
+
+
 		$mass[] = "(
 				".$id.",
 				".APP_ID.",
 				".$id.",
 				".$dialog_id.",
-				
-				'".$r['name']."',
-				'".$r['about']."',
-				".$r['start'].",
 
-				".$r['sort'].",
+				".$cat.",
+				"._comtexAss(1483, $r['invoice_id']).", /* расчётные счета */
+				"._comtexUserId($r, 'worker_id').",
+				".$r['sum'].",
+				'".$r['about']."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
 				".$r['deleted']."
-			)";
+		)";
 	}
 
 	$sql = "INSERT INTO `_spisok` (
 				  `id_old`,
 				  `app_id`,
-				  num,
-				  dialog_id,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  num_2,
+				  num_3,
+				  sum_1,
+				  txt_1,
 
-				  txt_1,/* name */
-				  txt_2,/* about */
-				  sum_1,/* start */
-
-				  sort,
+				  user_id_add,
+				  dtime_add,
 				  deleted
 			) VALUES ".implode(',', $mass);
 	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_2', 'счета');
 }
 
 
