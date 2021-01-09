@@ -3343,3 +3343,31 @@ function _attachSize($v) {//оформление размера файла в б
 
 
 
+
+function PHP12_kupez_gnGet() {//Купец: выбор номеров газет
+	return
+	'<script>'.
+		'GN_DOP='.PHP12_kupez_gnGet_dop().';'.
+	'</script>';
+}
+function PHP12_kupez_gnGet_dop() {//допольнительне параметры объявлений или рекламы
+	$DLG = _dialogQuery(1481);
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			ORDER BY `sort`";
+	$arr = query_arr($sql);
+
+	$send = array();
+	foreach($arr as $id => $r) {
+		$send[] = array(
+			'id' => $id,
+			'title' => $r['txt_1']
+		);
+	}
+
+	return json_encode($send);
+}
+
+
+

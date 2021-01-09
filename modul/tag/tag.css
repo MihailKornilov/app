@@ -882,3 +882,87 @@ button.vk._busy{color:transparent}
 /* Фильтрование списка */
 ._spfl .icon-filter{left:5px;top:5px}
 ._spfl .icon-del{right:5px;top:5px}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Купец: список номеров газеты при внесении и редактировании заявок */
+#gnGet ._menu2 a{margin-right:5px}
+
+/*
+#gnGet ._dropdown{margin-right:5px}
+#gnGet #dopDef_dropdown{margin:-4px 0 0 4px}
+#gnGet .gn-spisok{margin-left:-127px}
+#gnGet #darr{
+	font-size:12px;
+	text-align:center;
+	color:#AAA;
+	height:15px;
+	width:252px;
+	cursor:pointer;
+	padding:1px 0 3px;
+}
+#gnGet #darr:hover{background-color:#e1e7ed;color:#444}
+#gnGet .gns-week {
+	width:252px;
+	background-color:#FFF;
+	border:#DDD solid 1px;
+	margin-bottom:2px;
+	height:19px;
+}
+#gnGet .gns-week:not(.schet):hover{border:#99A solid 1px}
+#gnGet .td {padding:2px 3px;color:#333;font-size:10px}
+#gnGet .td b,#gnGet .td tt{font-size:10px}
+#gnGet .g{color:#888;margin-left:3px;font-size:10px}
+#gnGet .cena {
+	width:70px;
+	border:none;
+	padding:0 2px;
+	text-align:right;
+	border-left:#FFF solid 1px;
+	color:#FFF;
+	overflow: hidden;
+}
+#gnGet .gnsel{background-color:#BFB}
+#gnGet .prev{background-color:#FFB}
+#gnGet .gnsel .cena{
+	border-left:#DDD solid 1px;
+	background-color:#EFE;
+	color:#444;
+}
+#gnGet .schet,
+#gnGet .schet .cena{background-color:#eee}
+#gnGet .vdop{padding-left:8px}
+#gnGet #selCount{
+	width:127px;
+	vertical-align:top;
+	text-align:right;
+	color:#666;
+	font:bold 10px Tahoma;
+	padding-right:5px;
+}
+#gnGet #selCount a{font-size:10px;display:block;color:#aaa}
+*/
+
+
+
+
+
+
+
+

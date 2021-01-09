@@ -579,29 +579,6 @@ function _prFor($arr, $sub=0) {//перебор массива
 	return $send;
 }
 
-function _arr($arr, $i=false) {//Последовательный массив
-	$send = array();
-	foreach($arr as $r) {
-		$v = $i === false ? $r : $r[$i];
-		$send[] = preg_match(REGEXP_CENA, $v) ? _cena($v) : htmlspecialchars_decode($v);
-	}
-	return $send;
-}
-function _arrKey($arr, $key='id') {//расстановка значений массива согласно ключу
-	if(empty($arr))
-		return array();
-	if(!is_array($arr))
-		return array();
-
-	$send = array();
-	foreach($arr as $r) {
-		if(!isset($r[$key]))
-			continue;
-		$send[$r[$key]] = $r;
-	}
-
-	return $send;
-}
 function _sel($arr) {
 	$send = array();
 	foreach($arr as $id => $title) {
@@ -612,23 +589,6 @@ function _sel($arr) {
 	}
 	return $send;
 }
-function _selJson($arr) {
-	$send = array();
-	foreach($arr as $uid => $title) {
-		$content = '';
-		if(is_array($title)) {
-			$r = $title;
-			$title = $r['title'];
-			$content = isset($r['content']) ? $r['content'] : '';
-		}
-		$send[] = '{'.
-			'uid:'.$uid.','.
-			'title:"'.addslashes($title).'"'.
-			($content ? ',content:"'.addslashes($content).'"' : '').
-		'}';
-	}
-	return '['.implode(',',$send).']';
-}
 function _selArray($arr) {//список для _select при отправке через ajax
 	$send = array();
 	foreach($arr as $id => $title) {
@@ -638,23 +598,6 @@ function _selArray($arr) {//список для _select при отправке 
 		);
 	}
 	return $send;
-}
-function _assJson($arr) {//Ассоциативный массив одного элемента
-	$send = array();
-	foreach($arr as $id => $v)
-		$send[] =
-			(preg_match(REGEXP_NUMERIC, $id) ? $id : '"'.$id.'"').
-			':'.
-			(preg_match(REGEXP_NUMERIC, $v) ? $v : '"'.$v.'"');
-	return '{'.implode(',', $send).'}';
-}
-function _arrJson($arr, $i=false) {//Последовательный массив
-	$send = array();
-	foreach($arr as $r) {
-		$v = $i === false ? $r : $r[$i];
-		$send[] = preg_match(REGEXP_CENA, $v) ? $v : '"'.addslashes(htmlspecialchars_decode($v)).'"';
-	}
-	return '['.implode(',', $send).']';
 }
 function _json($arr, $n=0, $ass_empty=false) {//перевод массива в JS
 	if(empty($arr))
