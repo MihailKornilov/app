@@ -2547,6 +2547,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				tdCalc();
 			});
 
+			DD.find('.th-name').focus();
+
 			NUM++;
 		}
 

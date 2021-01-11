@@ -26,6 +26,8 @@ function _elem129_kupez($DLG, $POST_CMP) {
 
 			_kupez_client();
 
+			_kupez_gazeta_nomer();
+
 			_kupez_rubric();
 			_kupez_zayav_ob();
 			_kupez_zayav_rek();
@@ -42,7 +44,7 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
-			_kupez_invoice_in_out();
+			_kupez_gazeta_nomer();
 			break;
 
 		default:
@@ -164,6 +166,49 @@ function _kupez_client() {//Клиенты
 	query($sql);
 
 	_comtexHistory($dialog_id);
+}
+
+function _kupez_gazeta_nomer() {//номера газет
+	$dialog_id = _comtexSpisokClear(1489);
+
+	//категории
+	_db2();
+	$sql = "SELECT *
+			FROM `_setup_gazeta_nomer`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `general_nomer`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				".$r['general_nomer'].",
+				".$r['week_nomer'].",
+				'".$r['day_print']."',
+				'".$r['day_public']."',
+				".$r['polosa_count']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				`id_old`,
+				`app_id`,
+				`num`,
+				`dialog_id`,
+
+				num_2,
+				num_1,
+				date_1,
+				date_2,
+				num_3
+			) VALUES ".implode(',', $mass);
+	query($sql);
 }
 
 function _kupez_rubric() {//рубрики объявлений
