@@ -9,35 +9,44 @@ function _element72_struct($el) {
 											1 - список
 											2 - страница
 										*/
+		'num_4'   => _num($el['num_4']),/* [17] период фильтрации:
+											1 - по году
+											2 - по году и месяцу
+										*/
+		'num_5'   => _num($el['num_5']),//[13] фильтр по значению
 		'txt_1' => $el['txt_1']         //дополнительные условия для отображения сумм
 	) + _elementStruct($el);
 }
 function _element72_print($el, $prm) {
-	$v = YEAR_MON;
+	$isMon = $el['num_4'] == 2;
+	$year = $isMon ? YEAR_MON : YEAR_CUR;
 	switch($el['num_3']) {
 		case 1://список
 			if(!$el['num_1'])
 				return _emptyMinRed('[72] Не выбран список');
-			$v = _filter('vv', $el, $v);
+			$year = _filter('vv', $el, $year);
 			break;
 		case 2://страница
 			if(preg_match(REGEXP_YEARMON, @$_GET['v1']))
-				$v = $_GET['v1'];
+				$year = $_GET['v1'];
 			break;
 		default:
 			return _emptyMinRed('[72] Не указан объект воздействия');
 	}
 
-	$ex = explode('-', $v);
-	$year = $ex[0];
-	$mon  = $ex[1];
+	if($isMon) {
+		$ex = explode('-', $year);
+		$year = $ex[0];
+		$mon  = $ex[1];
+	}
 
 	return
-	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$v.'" />'.
+	'<input type="hidden" id="'._elemAttrId($el, $prm).'" value="'.$year.'" />'.
 	_yearleaf(array(
 		'attr_id' => _elemAttrId($el, $prm).'yl',
 		'value' => $year
 	)).
+($isMon ?
 	'<div class="mt5">'.
 		_radio(array(
 			'attr_id' => _elemAttrId($el, $prm).'rd',
@@ -49,7 +58,8 @@ function _element72_print($el, $prm) {
 			'spisok' => _elem72Sum($el, $year),
 			'disabled' => $prm['blk_setup']
 		)).
-	'</div>';
+	'</div>'
+: '');
 }
 function _elem72Sum($EL, $year) {//получение сумм для фильтра [72]
 	$spisok = _monthDef();
@@ -89,8 +99,12 @@ function _elem72Sum($EL, $year) {//получение сумм для фильт
 }
 function _elem72filter($el) {//фильтр: год и месяц
 	foreach(_filter('spisok', $el['id']) as $r)
-		if($r['elem']['dialog_id'] == 72)
-			return " AND `t1`.`dtime_add` LIKE '".$r['v']."-%'";
+		if($r['elem']['dialog_id'] == 72) {
+			$col = 'dtime_add';
+			if($col5 = _elemCol($r['elem']['num_5']))
+				$col = $col5;
+			return " AND `t1`.`".$col."` LIKE '".$r['v']."-%'";
+		}
 
 	return '';
 }

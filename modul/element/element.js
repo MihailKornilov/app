@@ -4389,11 +4389,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	//[72] Фильтр: год и месяц
 	_EL72 = function(el) {
 		var YL = $(ATTR_CMP(el.id) + 'yl'),
+			isMon = el.num_4 == 2,
 			RD = $(ATTR_CMP(el.id) + 'rd'),
 			YEAR_CUR = YL.val(),
 			CMP_SET = function() {
-				var mon = _num(RD.val()),
-					data = YL.val() + '-' + (mon > 9 ? '' : '0') + mon;
+				var data = YL.val();
+
+				if(isMon) {
+					var mon = _num(RD.val());
+					data = data + '-' + (mon > 9 ? '' : '0') + mon
+				}
 
 				switch(el.num_3) {
 					case 1://список
@@ -4409,9 +4414,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			};
 		YL._yearleaf({
 			func:function(v) {
-				RD._radio(YEAR_CUR < v ? 1 : 12);
+				if(isMon)
+					RD._radio(YEAR_CUR < v ? 1 : 12);
+
 				CMP_SET();
 
+				if(!isMon)
+					return;
 				if(el.num_3 != 1)
 					return;
 
