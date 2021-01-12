@@ -3344,13 +3344,16 @@ function _attachSize($v) {//оформление размера файла в б
 
 
 
-function PHP12_kupez_gnGet() {//Купец: выбор номеров газет
+function PHP12_kupez_gnGet($prm) {//Купец: выбор номеров газет
 	return
 	'<script>'.
-		'GN_DOP='.PHP12_kupez_gnGet_dop().';'.
+		'GN_DOP_TITLE0="'.PHP12_kupez_gnGet_dopTitle0($prm).'";'.//нулевое значение дополнительного параметра
+		'GN_DOP_SPISOK='.PHP12_kupez_gnGet_dop($prm).';'.//дополнительные параметры для объявлений и рекламы
+		'GN_ASS='.PHP12_kupez_gnGet_spisok($prm).';'.//список номеров газет
+		'GN_LAST='.PHP12_kupez_gnGet_last().';'.//последний общий номер газеты
 	'</script>';
 }
-function PHP12_kupez_gnGet_dop() {//допольнительне параметры объявлений или рекламы
+function PHP12_kupez_gnGet_dop($prm) {//допольнительне параметры объявлений или рекламы
 	$DLG = _dialogQuery(1481);
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
@@ -3368,6 +3371,56 @@ function PHP12_kupez_gnGet_dop() {//допольнительне парамет�
 
 	return json_encode($send);
 }
+function PHP12_kupez_gnGet_dopTitle0($prm) {//нулевое значение для доп.параметра
+	switch($prm['srce']['dialog_id']) {
+		//объявления
+		case 1477: return 'Доп.параметр не указан';
+		//реклама
+		case 1486: return 'Полоса не указана';
+	}
+	return '';
+}
+function PHP12_kupez_gnGet_spisok($prm) {//список номеров газеты
+	$send = array();
 
+	$DLG = _dialogQuery(1489);
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			  AND `date_2`>'".TODAY."'
+			ORDER BY `num_2`";
+	if(!$arr = query_arr($sql))
+		return '{}';
 
+	foreach($arr as $id => $r)
+		array_push($send, "\n".$id.':{'.
+			'week:'.$r['num_1'].','.
+			'gen:'.$r['num_2'].','.
+			'pub:"'.$r['date_2'].'",'.
+			'txt:"'.FullData($r['date_2'], 0, 1, 1).'",'.
+			'pc:'.$r['num_3'].
+		'}');
+
+	return '{'.implode(',', $send).'}';
+
+/*		$send[$id] = array(
+			'week' => $r['num_1'],
+			'gen' => $r['num_2'],
+			'pub' => $r['date_2'],
+			'txt' => FullData($r['date_2'], 0, 1, 1),
+			'pc' => $r['num_3']
+		);
+	$send = _arrNum($send);
+	return json_encode($send);
+*/
+}
+function PHP12_kupez_gnGet_last() {//последний общий номер газеты
+	$DLG = _dialogQuery(1489);
+	$sql = "SELECT `num_2`
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			ORDER BY `num_2` DESC
+			LIMIT 1";
+	return query_value($sql);
+}
 

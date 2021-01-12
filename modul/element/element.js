@@ -7099,7 +7099,9 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	PHP12_kupez_gnGet = function(el) {//Купец: выбор номеров газет
-		_attr_cmp(el.id).gnGet();
+		_attr_cmp(el.id).gnGet({
+			selCnt:_attr_el(el.num_2)
+		});
 	};
 
 $(document)

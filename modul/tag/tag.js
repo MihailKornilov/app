@@ -1903,6 +1903,11 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		case 'object': break;
 		case 'number':
 		case 'string':
+			switch(o) {
+				case 'remove':
+					S.next().remove('._dropdown');
+					return false;
+			}
 			S.value(o);
 			return S;
 	}
@@ -1918,7 +1923,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		func:function() {}
 	}, o);
 
-	if(o.title0)
+	if(!o.head && o.title0)
 		o.head = o.title0;
 
 	t.next().remove('._dropdown');
@@ -1956,7 +1961,8 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 			$('._dropdown' + attr).removeClass('rs');
 		});
 
-	HEAD.on('click mouseenter', function() {
+	HEAD.on('click mouseenter', function() {//открытие списка
+		$('._dropdown').removeClass('rs');
 		timerClear();
 		_forEq(DDU, function(sp) {
 			if(VALUE == sp.attr('val')) {
@@ -2399,21 +2405,30 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		return t;
 	}
 
+	/* Глобальные переменные:
+		GN_DOP_TITLE0
+		GN_DOP_SPISOK
+		GN_ASS
+		GN_LAST
+	*/
+
 	o = $.extend({
 		show:4,     // количество номеров, которые показываются изначально, а также отступ от уже выбранных
 		add:8,      // количество номеров, добавляющихся к показу
-		gns:{},   // выбранные номера (для редактирования)
-		dop_title0:'',//Доп. параметр не указан           Полоса не указана
-		dop_spisok:[],
+		gns:{},     // выбранные номера (для редактирования)
 		four_free:0,// каждый 4-й номер бесплатно
 		pn_show:0,  // показывать выбор номеров полос
 		skidka:0,
 		manual:0,   // установлена ли галочка для ввода общей суммы вручную
 		summa:0,    // Нужно если установлена галочка manual: общая стоимость всех объявлений, получаемая снаружи. Затем она делится на все активные номера.
+		selCnt:null,// указатель на элемент, в котором будет выводиться количество выбранных номеров
 		func:function() {}
 	}, o);
 
-	var pix = 21, // высота поля номера в пикселях
+	if(!o.selCnt)
+		throw new Error('Не указан параметр selCnt');
+
+	var pix = 24, // высота поля номера в пикселях
 		html =
 			'<div id="gnGet">' +
 				'<table>' +
@@ -2425,10 +2440,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 							'</div>' +
 						'<td><input type="hidden" id="dopDef">' +
 				'</table>' +
-				'<table class="gn-spisok">' +
-					'<tr><td id="selCount">' +
-						'<td><div id="gns"></div>' +
-				'</table>' +
+				'<div id="gns" class="mt5"></div>' +
 			'</div>';
 	t.after(html);
 
@@ -2436,22 +2448,19 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		.off('click', '#darr')
 		.on('click', '#darr', function() {// Разворачивание списка
 			var t = $(this),
-				begin = _num(t.prev().find('.gns-week').attr('val'));
+				start = _num(t.prev().attr('val'));
 
-			if(!begin)
+			if(!start)
 				return;
 
-			gnsPrint(begin + 1, o.add);
+			gnsPrint(++start, o.add);
 		})
 		.off('click', '.gns-week')
 		.on('click', '.gns-week', function() {// Действие по нажатию на номер газеты
-			dopMenuA.removeClass('sel'); //очищение выделения периода, если был выбран
+			menuA.removeClass('sel'); //очищение выделения периода, если был выбран
 			var th = $(this),
 				sel = !th.hasClass('gnsel'),
 				v = th.attr('val');
-
-			if(th.hasClass('schet'))
-				return;
 
 			th[(sel ? 'add': 'remove') + 'Class']('gnsel');
 			th.removeClass('prev');
@@ -2464,18 +2473,17 @@ $.fn.gnGet = function(o, o1) {//номера газет
 
 	var gnGet = $('#gnGet'),                 // Основная форма
 		gns = gnGet.find('#gns'),            // Список номеров
-		dopMenuA = gnGet.find('#dopLinks a'),// Список меню с периодами
+		menuA = gnGet.find('._menu2 .link'), // Список меню с периодами
 		dopDef = gnGet.find("#dopDef"),      // Выбор дополнительных параметров по умолчанию
-		selCount = gnGet.find('#selCount'),  // Количество выбранных номеров
 		gnCena = 0;   // Цена за один номер
 
 	//выпадающий список с дополнительным параметром для установки всем выбранным номерам
-	dopDef._dropdown(!GN_DOP.length ? 'remove' : {
+	dopDef._dropdown(!GN_DOP_SPISOK.length ? 'remove' : {
 		head:'всем...',
 		headgrey:1,
-		title0:o.dop_title0,
+		title0:GN_DOP_TITLE0,
 		nosel:1,
-		spisok:GN_DOP,
+		spisok:GN_DOP_SPISOK,
 		func:function(id) {
 			gnsAA(function(sp, nn, prev) {
 				if(!prev) {
@@ -2488,8 +2496,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		}
 	});
 
-	return t;
-
+/*
 	// Выделение выбранных номеров при редактировании
 	var gn_sel_end = 0,
 		count = 0;
@@ -2505,22 +2512,20 @@ $.fn.gnGet = function(o, o1) {//номера газет
 				continue;
 			count++;
 		}
-	gnsPrint(GN_FIRST, count + o.show);
-	gnsDopAll();
+*/
+	gnsPrint();
 	gnsValUpdate();
 
-//	o.gns = {};
-
-	dopMenuA.click(function() {// выбор номеров на месяц, 3 месяца, полгода и год, начиная сначала
+	menuA.click(function() {// выбор номеров на месяц, 3 месяца, полгода и год, начиная сначала
 		var t = $(this),
 			sel = !t.hasClass('sel'),
 			v = sel ? _num(t.attr('val')) : 0;
 
-		dopMenuA.removeClass('sel');
+		menuA.removeClass('sel');
 		if(sel)
 			t.addClass('sel');
 
-		gnsPrint(GN_FIRST, v + o.show);
+		gnsPrint(0, v + o.show);
 
 		$('.gns-week').addClass(function(i) {
 			return i < v ? 'gnsel' : '';
@@ -2529,89 +2534,88 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		gnsAA(function(sp, nn) {
 			gnsDop(nn, 1);
 		});
+		gnsValUpdate();
+
+return;
 
 		cenaSet();
-		gnsValUpdate();
 	});
 	function gnsPrint(start, count) {// Вывод списка номеров
-		/*
-			start - первый номер, с которого выводить
-			count - количество номеров к показу
-		*/
-
-		//если первый номер не указан, значит первым будет указанный в глобальных настройках
-		if(!start)
-			start = GN_FIRST;
+		var //polosa = _toAss(GAZETA_POLOSA_SPISOK),
+			html = '',
+			last = 0;//хранение последнего выведенного номера
 
 		if(!count)
 			count = o.show;
-
-		var polosa = _toAss(GAZETA_POLOSA_SPISOK),
-			html = '';
+		if(!start) {
+			gns.html('');
+			start = 0;
+		}
 
 		gnGet.find('#darr').remove();
 
-		for(var n in GN_ASS) {
+		for(var id in GN_ASS) {
 			if(!count)
 				break;
 
-			var sp = GN_ASS[n],
+			var sp = GN_ASS[id],
 				prev = ' curP',
-				schet = 0,
 				dop = 0,
 				pn = 0,
 				skidka = o.skidka,
 				cena = '',
 				gnid = 0;
 
-			if(n < start)
+			if(start > sp.gen)
 				continue;
-
-			if(o.gns[n]) {
-				schet = o.gns[n][5];
-				prev = ' gnsel ' + (schet ? 'schet' : 'prev curP');
-				dop = o.gns[n][0];
-				pn = o.gns[n][1];
-				skidka = o.gns[n][2];
-				cena = o.gns[n][3];
-				gnid = o.gns[n][4];
+/*
+			if(o.gns[id]) {
+				prev = ' gnsel prev curP';
+				dop = o.gns[id][0];
+				pn = o.gns[id][1];
+				skidka = o.gns[id][2];
+				cena = o.gns[id][3];
+				gnid = o.gns[id][4];
 			}
-
+*/
 			count--;
+			last = sp.gen;
 
 			html +=
-				'<table><tr>' +
-					'<td><table class="gns-week' + prev + '" val="' + n + '">' +
-							'<tr><td class="td"><b>' + sp.week + '</b><span class="g">(' + sp.gen + ')</span>' +
-								'<td class="td r">' +
-									'<span class="g">выход</span> ' + sp.txt +
-									'<input type="hidden" id="skidka' + n + '" value="' + skidka + '" />' + //скидка в процентах
-									'<input type="hidden" id="exact' + n + '" value="' + cena + '" />' + //точная цена: миллионные доли
-									'<input type="hidden" class="gnid" id="gnid' + n + '" value="' + gnid + '" />' +    //id номера, если редактируется
-								'<td class="cena" id="cena' + n + '">' + (Math.round(cena * 100) / 100) +
-						'</table>' +
-					'<td class="vdop">' +
-						(schet && polosa[dop] ? polosa[dop] : '') +
-						'<input type="hidden" id="vdop' + n + '" value="' + dop + '" /> ' +
-						'<input type="hidden" id="pn' + n + '" value="' + pn + '" />' +
+				'<table class="mb2" val="' + sp.gen + '">' +
+					'<tr><td><table class="gns-week' + prev + '" val="' + id + '">' +
+								'<tr><td class="pad3 clr9 fs12">' +
+										'<b class="fs12 ml3">' + sp.week + '</b>' +
+										'<span class="clr1 ml3 fs12">(' + sp.gen + ')</span>' +
+									'<td class="pad3 clr9 fs12 r">' +
+										'<span class="clr1 ml3 fs12">выход</span> ' + sp.txt +
+										'<input type="hidden" class="skidka" value="' + skidka + '" />' + //скидка в процентах
+										'<input type="hidden" class="exact" value="' + cena + '" />' +    //точная цена: миллионные доли
+										'<input type="hidden" class="gnid" value="' + gnid + '" />' +     //id номера, если редактируется
+									'<td class="cena">' + (Math.round(cena * 100) / 100) +
+							'</table>' +
+						'<td class="pl10">' +
+//  						(polosa[dop] ? polosa[dop] : '') +
+							'<input type="hidden" id="vdop' + id + '" value="' + dop + '" /> ' +
+							'<input type="hidden" id="pn' + id + '" value="' + pn + '" />' +
 				'</table>';
 		}
-		html += n != GN_LAST ? '<div id="darr">&darr; &darr; &darr;</div>' : '';
-		gns[start == GN_FIRST ? 'html' : 'append'](html);
-		gns.animate({height:(gns.find('.gns-week').length * pix) + 'px'}, 300);
+		html += last < GN_LAST ? '<div id="darr">&darr; &darr; &darr;</div>' : '';
+		gns.append(html);
+		gns.animate({height:(gns.find('.gns-week').length * pix + 19) + 'px'}, 300);
 		gnsAA(function(sp, nn) {
 			gnsDop(nn, 1);
-			gnsDopPolosa(nn);
+//			gnsDopPolosa(nn);
 		});
 	}
 	function gnsDop(nn, sel) {//выпадающий список с дополнительным параметром для конкретного номера газеты
-		if(!o.dop_spisok.length)
+		if(!GN_DOP_SPISOK.length)
 			return;
 		if(!sel)
 			$('#vdop' + nn).val(0);
 		$('#vdop' + nn)._dropdown(!sel ? 'remove' : {
-			title0:o.dop_title0,
-			spisok:o.dop_spisok,
+			title0:GN_DOP_TITLE0,
+			spisok:GN_DOP_SPISOK,
 			func:function() {
 				gnsDopPolosa(nn);
 				cenaSet();
@@ -2628,7 +2632,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 			return;
 		}
 		var pc = [];
-		for(n = 2; n < GN_ASS[nn].pc; n++)
+		for(var n = 2; n < GN_ASS[nn].pc; n++)
 			pc.push({uid:n,title:n + '-я'});
 		$('#pn' + nn)._dropdown({
 			title0:'??',
@@ -2637,25 +2641,14 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		});
 	}
 	function gnsAA(func, all) {// gnsActionActive: Применение действия к выбранным номерам
-		var week = $('.gns-week'),
-			gnsel = [];
-		for(var n = 0; n < week.length; n++) {
-			var sp = week.eq(n),
-				sel = sp.hasClass('gnsel'),
+		_forEq($('.gns-week'), function(sp) {
+			var sel = sp.hasClass('gnsel'),
 				prev = sp.hasClass('prev'),
-				schet = sp.hasClass('schet'),
 				v = _num(sp.attr('val'));
-
-			if(schet)
-				continue;
 
 			if(all || sel)
 				func(sp, v, prev);
-		}
-	}
-	function gnsClear() {// Очистка выбранных номеров
-		gnGet.find('.gnsel').removeClass('gnsel');
-		gnsValUpdate();
+		});
 	}
 	function cenaSet() {// Установка цены в выбранные номера
 		var four = o.four_free ? 4 : 1000,
@@ -2708,9 +2701,8 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		gnsAA(function(sp, v, prev) {
 			var dop = _num($('#vdop' + v).val()),
 				pn = _num($('#pn' + v).val()),
-				skidka = _num($('#skidka' + v).val()),
-				c = $('#exact' + v).val() * 1;
-//				gnid = _num($('#gnid' + v).val());//todo id номера при редактировании. пока не используется
+				skidka = _num(sp.find('.skidka').val()),
+				c = sp.find('.exact').val() * 1;
 			arr.push(v + ':' + dop + ':' + pn + ':' + skidka + ':' + c);
 
 			if(!prev)
@@ -2720,7 +2712,6 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		});
 
 		t.val(arr.join('###'));
-//		$('#ze-note').val(t.val()); //todo удалить
 
 		o.func({
 			summa:Math.round(sum * 100) / 100,
@@ -2729,15 +2720,24 @@ $.fn.gnGet = function(o, o1) {//номера газет
 
 		//вывод количества выбранных номеров
 		var countHtml = 'Выбран' + _end(count, ['', 'о']) + ' ' +
-						 count + ' номер' + _end(count, ['', 'a', 'ов']) +
-						 '<a>очистить</a>';
-		selCount
+						count + ' номер' + _end(count, ['', 'a', 'ов']) +
+						'<br>' +
+						'<a class="clr2">очистить</a>';
+		o.selCnt
 			.html(count ? countHtml : '')
 			.find('a').click(function() {
-				gnsClear();
+				menuA.removeClass('sel');
 				gnsPrint();
-				dopMenuA.removeClass('sel');
+				gnsValUpdate();
 			});
+
+
+
+		if(_attr_bl(19019))
+			_attr_bl(19019).html(arr.join('<br>'));
+
+
+
 	}
 
 	t.cenaSet = function(c) {
