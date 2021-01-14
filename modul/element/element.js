@@ -1912,30 +1912,81 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//[5] textarea
 	_EL5 = function(el) {
-		if(!el.num_2)
-			return $(ATTR_CMP(el.id))._autosize();
+		//форматирование текста
+		if(el.num_2)
+			return ClassicEditor.create(document.querySelector(ATTR_CMP(el.id)), {
+				toolbar:[
+					'heading',
+					'|',
+					'bold', 'italic', 'Underline',
+					'|',
+					'bulletedList', 'numberedList', 'blockQuote',
+					'|',
+					'link',
+					'|',
+					'undo', 'redo'
+				],
+				heading:{
+					options:[
+						{model:'paragraph', title:'Параграф', class:'ck-heading_paragraph'},
+						{model:'heading1', view:'h1', title:'Заголовок 1', class:'ck-heading_heading1'},
+						{model:'heading2', view:'h2', title:'Заголовок 2', class:'ck-heading_heading2'},
+						{model:'heading3', view:'h3', title:'Заголовок 3', class:'ck-heading_heading3'}
+					]
+				}
+			});
 
-		//num_2: форматирование текста
-		ClassicEditor.create(document.querySelector(ATTR_CMP(el.id)), {
-			toolbar:[
-				'heading',
-				'|',
-				'bold', 'italic', 'Underline',
-				'|',
-				'bulletedList', 'numberedList', 'blockQuote',
-				'|',
-				'link',
-				'|',
-				'undo', 'redo'
-			],
-			heading:{
-				options:[
-					{model:'paragraph', title:'Параграф', class:'ck-heading_paragraph'},
-					{model:'heading1', view:'h1', title:'Заголовок 1', class:'ck-heading_heading1'},
-					{model:'heading2', view:'h2', title:'Заголовок 2', class:'ck-heading_heading2'},
-					{model:'heading3', view:'h3', title:'Заголовок 3', class:'ck-heading_heading3'}
-				]
+		_kupezTxtCost(el);
+
+		$(ATTR_CMP(el.id))._autosize();
+	},
+	_kupezTxtCost = function(el) {//Купец: подсчёт стоимости теста
+		if(!el.num_15)
+			return;
+
+		var ATTR = _attr_el(el.id),
+			CALC = ATTR.find('.kupez-calc');
+
+		if(!CALC.length)
+			return;
+
+		ATTR.find('textarea').keyup(function() {
+			var txt_sum = 0,    //сумма только за текст
+				podr_about = '',//подробное расписывание длины объявления
+				txt = $(this).val()
+						.replace(/\./g, '')    //точки
+						.replace(/,/g, '')     //запятые
+						.replace(/\//g, '')    //слеш /
+						.replace(/\"/g, '')    //двойные кавычки
+						.replace(/( +)/g, ' ') //вторые пробелы
+						.replace( /^\s+/g, '') //пробелы в начале
+						.replace( /\s+$/g, '');//пробелы в конце
+
+			if(!txt.length)
+				return CALC.html('');
+
+			txt_sum += TXT_CENA_FIRST * 1;
+			if(txt.length > TXT_LEN_FIRST) {
+				podr_about = ' = ' + TXT_LEN_FIRST;
+
+				var CEIL = Math.ceil((txt.length - TXT_LEN_FIRST) / TXT_LEN_NEXT),
+					LAST = txt.length - TXT_LEN_FIRST - (CEIL - 1) * TXT_LEN_NEXT;
+
+				txt_sum += CEIL * TXT_CENA_NEXT;
+
+				if(TXT_LEN_NEXT == LAST)
+					CEIL++;
+				if(CEIL > 1)
+					podr_about += ' + ' + TXT_LEN_NEXT;
+				if(CEIL > 2)
+					podr_about += 'x' + (CEIL - 1);
+				if(TXT_LEN_NEXT > LAST)
+					podr_about += ' + ' + LAST;
 			}
+
+			CALC.html('Длина: <b>' + txt.length + '</b>' + podr_about +
+					  '<br>' +
+					  'Цена: <b>' + txt_sum + '</b> руб. <span class="fs11 clr2">(без учёта доп. параметров)</span>');
 		});
 	},
 
@@ -2008,7 +2059,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		});
 	},
 
-	// [11] Выбор значения из диалога
+	//[11] Выбор значения из диалога
 	PHP12_v_choose = function(el, vvv, obj) {
 		ELMM = _objUpd(ELMM, vvv.jselm);
 
@@ -7099,7 +7150,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	PHP12_kupez_gnGet = function(el) {//Купец: выбор номеров газет
-		_attr_cmp(el.id).gnGet({
+		GN_ATTR = _attr_cmp(el.id);
+		GN_ATTR.gnGet({
 			selCnt:_attr_el(el.num_2)
 		});
 	};

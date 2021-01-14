@@ -10,7 +10,9 @@ function _element5_struct($el) {
 									  */
 		'num_2' => _num($el['num_2']),//форматирование текста
 		'txt_2' => $el['txt_2'],//начальный текст: произвольный
-		'txt_3' => $el['txt_3'] //начальный текст: указанное значение [13]
+		'txt_3' => $el['txt_3'],//начальный текст: указанное значение [13]
+
+		'num_15' => _num($el['num_15'])//Купец: подсчёт стоимости текста
 	) + _elementStruct($el);
 }
 function _element5_print($el, $prm) {
@@ -23,7 +25,8 @@ function _element5_print($el, $prm) {
 	return
 	'<textarea id="'._elemAttrId($el, $prm).'"'._elemStyleWidth($el).$placeholder.$disabled.'>'.
 		$v.
-	'</textarea>';
+	'</textarea>'.
+	_element5_kupezTxtCost($el);
 }
 function _element5_print11($el, $u) {
 	if(!$col = _elemCol($el))
@@ -65,4 +68,26 @@ function _element5_template_docx($el, $u) {
 	$col = $el['col'];
 	return _br($u[$col], "<w:br/>");
 }
+
+function _element5_kupezTxtCost($el) {
+	if(!$el['num_15'])
+		return '';
+
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `id`=1526000";
+	$r = query_assoc($sql);
+
+	return
+	'<script>'.
+		'TXT_LEN_FIRST='.$r['num_1'].';'.
+		'TXT_LEN_NEXT='.$r['num_3'].';'.
+		'TXT_CENA_FIRST='.$r['num_2'].';'.
+		'TXT_CENA_NEXT='.$r['num_4'].';'.
+	'</script>'.
+	'<div class="bg1"'._elemStyleWidth($el).'>'.
+		'<div class="kupez-calc pad5 pl8 line-b line-l line-r fs12 clr11"></div>'.
+	'</div>';
+}
+
 

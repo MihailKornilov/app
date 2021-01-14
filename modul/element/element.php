@@ -3347,14 +3347,22 @@ function _attachSize($v) {//оформление размера файла в б
 function PHP12_kupez_gnGet($prm) {//Купец: выбор номеров газет
 	return
 	'<script>'.
+		'GN_ATTR=null;'.//объект для создания выбора номеров
 		'GN_DOP_TITLE0="'.PHP12_kupez_gnGet_dopTitle0($prm).'";'.//нулевое значение дополнительного параметра
 		'GN_DOP_SPISOK='.PHP12_kupez_gnGet_dop($prm).';'.//дополнительные параметры для объявлений и рекламы
-		'GN_ASS='.PHP12_kupez_gnGet_spisok($prm).';'.//список номеров газет
+		'GN_ASS='.PHP12_kupez_gnGet_spisok().';'.//список номеров газет
 		'GN_LAST='.PHP12_kupez_gnGet_last().';'.//последний общий номер газеты
 	'</script>';
 }
-function PHP12_kupez_gnGet_dop($prm) {//допольнительне параметры объявлений или рекламы
-	$DLG = _dialogQuery(1481);
+function PHP12_kupez_gnGet_dop($prm) {//дополнительне параметры объявлений или рекламы
+	switch($prm['srce']['dialog_id']) {
+		//объявления
+		case 1477: $DLG = _dialogQuery(1481); break;
+		//реклама
+		case 1486: $DLG = _dialogQuery(1490); break;
+		default: return '[]';
+	}
+
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
@@ -3380,7 +3388,7 @@ function PHP12_kupez_gnGet_dopTitle0($prm) {//нулевое значение д
 	}
 	return '';
 }
-function PHP12_kupez_gnGet_spisok($prm) {//список номеров газеты
+function PHP12_kupez_gnGet_spisok() {//список номеров газеты
 	$send = array();
 
 	$DLG = _dialogQuery(1489);
@@ -3402,17 +3410,6 @@ function PHP12_kupez_gnGet_spisok($prm) {//список номеров газе�
 		'}');
 
 	return '{'.implode(',', $send).'}';
-
-/*		$send[$id] = array(
-			'week' => $r['num_1'],
-			'gen' => $r['num_2'],
-			'pub' => $r['date_2'],
-			'txt' => FullData($r['date_2'], 0, 1, 1),
-			'pc' => $r['num_3']
-		);
-	$send = _arrNum($send);
-	return json_encode($send);
-*/
 }
 function PHP12_kupez_gnGet_last() {//последний общий номер газеты
 	$DLG = _dialogQuery(1489);
