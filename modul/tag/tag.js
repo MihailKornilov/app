@@ -2722,7 +2722,7 @@ return;
 		var countHtml = 'Выбран' + _end(count, ['', 'о']) + ' ' +
 						count + ' номер' + _end(count, ['', 'a', 'ов']) +
 						'<br>' +
-						'<a class="clr2">очистить</a>';
+						'<a class="clr6">очистить</a>';
 		o.selCnt
 			.html(count ? countHtml : '')
 			.find('a').click(function() {
@@ -2733,8 +2733,10 @@ return;
 
 
 
-		if(_attr_bl(19019))
-			_attr_bl(19019).html(arr.join('<br>'));
+		if(_attr_bl(19038))
+			_attr_bl(19038).html(arr.join('<br>'));
+		if(_attr_bl(19206))
+			_attr_bl(19206).html(arr.join('<br>'));
 
 
 
