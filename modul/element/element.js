@@ -1189,13 +1189,20 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	//установка фокуса
-	_ACT206 = function(act) {
+	_ACT206 = function(act, v) {
 		var elem_id = _num(act.target_ids);
 		if(!elem_id)
 			return;
 
 		if(ELMM[elem_id].dialog_id == 29)
 			return _attr_cmp(elem_id)._select('focus');
+
+		if(act.el.dialog_id == 1) {
+			if(!v && act.initial_id == -1
+			 || v && act.initial_id == -2)
+				_attr_cmp(elem_id).select();
+			return;
+		}
 
 		_attr_cmp(elem_id).select();
 	},
@@ -1901,7 +1908,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 	//[1] галочка
 	_EL1 = function(el) {
-		if(!el.action)
+		if(!el.action.length)
 			return;
 		$(ATTR_CMP(el.id))._check({
 			func:function(v) {
@@ -1951,8 +1958,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		ATTR.find('textarea').keyup(function() {
-			var txt_sum = 0,    //сумма только за текст
-				podr_about = '',//подробное расписывание длины объявления
+			GN_CENA = 0;
+			var podr_about = '',//подробное расписывание длины объявления
 				txt = $(this).val()
 						.replace(/\./g, '')    //точки
 						.replace(/,/g, '')     //запятые
@@ -1965,14 +1972,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			if(!txt.length)
 				return CALC.html('');
 
-			txt_sum += TXT_CENA_FIRST * 1;
+			GN_CENA += TXT_CENA_FIRST * 1;
 			if(txt.length > TXT_LEN_FIRST) {
 				podr_about = ' = ' + TXT_LEN_FIRST;
 
 				var CEIL = Math.ceil((txt.length - TXT_LEN_FIRST) / TXT_LEN_NEXT),
 					LAST = txt.length - TXT_LEN_FIRST - (CEIL - 1) * TXT_LEN_NEXT;
 
-				txt_sum += CEIL * TXT_CENA_NEXT;
+				GN_CENA += CEIL * TXT_CENA_NEXT;
 
 				if(TXT_LEN_NEXT == LAST)
 					CEIL++;
@@ -1986,7 +1993,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 			CALC.html('Длина: <b>' + txt.length + '</b>' + podr_about +
 					  '<br>' +
-					  'Цена: <b>' + txt_sum + '</b> руб. <span class="fs11 clr2">(без учёта доп. параметров)</span>');
+					  'Цена: <b>' + GN_CENA + '</b> руб. <span class="fs11 clr2">(без учёта доп. параметров)</span>');
+			GN_ATTR.gnGet('update');
 		});
 	},
 
@@ -7150,9 +7158,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	PHP12_kupez_gnGet = function(el) {//Купец: выбор номеров газет
+		console.log(el);
 		GN_ATTR = _attr_cmp(el.id);
 		GN_ATTR.gnGet({
-			selCnt:_attr_el(el.num_2)
+			attrCount:_attr_el(el.num_2),
+			attrManual:_attr_cmp(el.num_4),
+			attrSum:_attr_cmp(el.num_5)
 		});
 	};
 

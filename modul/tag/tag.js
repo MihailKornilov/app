@@ -2391,44 +2391,32 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		win = attr_id + 'win';
 
 	if(typeof o == 'string') {
-		if(o == 'cena')
-			window[win].cenaSet(o1);
 		if(o == 'update')
 			window[win].update();
-		if(o == 'summa')
-			window[win].summa(o1);
-		if(o == 'manual')
-			window[win].manual(o1);
 		if(o == 'skidka')
 			window[win].skidka(o1);
 
 		return t;
 	}
 
-	/* Глобальные переменные:
-		GN_DOP_TITLE0
-		GN_DOP_SPISOK
-		GN_ASS
-		GN_LAST
-	*/
-
 	o = $.extend({
 		show:4,     // количество номеров, которые показываются изначально, а также отступ от уже выбранных
 		add:8,      // количество номеров, добавляющихся к показу
 		gns:{},     // выбранные номера (для редактирования)
-		four_free:0,// каждый 4-й номер бесплатно
 		pn_show:0,  // показывать выбор номеров полос
 		skidka:0,
-		manual:0,   // установлена ли галочка для ввода общей суммы вручную
-		summa:0,    // Нужно если установлена галочка manual: общая стоимость всех объявлений, получаемая снаружи. Затем она делится на все активные номера.
-		selCnt:null,// указатель на элемент, в котором будет выводиться количество выбранных номеров
-		func:function() {}
+		attrCount:null, //указатель на элемент, в котором будет выводиться количество выбранных номеров
+		attrManual:null,//указатель на галочку, которая позволяет вводить сумму вручную
+		attrSum:null    //указатель на поле с Итоговой суммой
 	}, o);
 
-	if(!o.selCnt)
-		throw new Error('Не указан параметр selCnt');
+	if(!o.attrCount)
+		throw new Error('Не указан параметр attrCount');
+	if(!o.attrSum)
+		throw new Error('Не указан параметр attrSum');
 
-	var pix = 24, // высота поля номера в пикселях
+	var pix = 24,   //высота поля номера в пикселях
+		MANUAL = 1, //установлена ли галочка для ввода общей суммы вручную
 		html =
 			'<div id="gnGet">' +
 				'<table>' +
@@ -2443,6 +2431,20 @@ $.fn.gnGet = function(o, o1) {//номера газет
 				'<div id="gns" class="mt5"></div>' +
 			'</div>';
 	t.after(html);
+
+	//установка галочки "Ввод суммы вручную"
+	if(o.attrManual) {
+		MANUAL = _num(o.attrManual.val());
+		o.attrManual._check({
+			func:gnsManualSet
+		});
+	}
+	gnsManualSet();
+
+	o.attrSum.keyup(function() {
+		cenaSet();
+		gnsValUpdate();
+	});
 
 	$(document)
 		.off('click', '#darr')
@@ -2474,8 +2476,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 	var gnGet = $('#gnGet'),                 // Основная форма
 		gns = gnGet.find('#gns'),            // Список номеров
 		menuA = gnGet.find('._menu2 .link'), // Список меню с периодами
-		dopDef = gnGet.find("#dopDef"),      // Выбор дополнительных параметров по умолчанию
-		gnCena = 0;   // Цена за один номер
+		dopDef = gnGet.find("#dopDef");      // Выбор дополнительных параметров по умолчанию
 
 	//выпадающий список с дополнительным параметром для установки всем выбранным номерам
 	dopDef._dropdown(!GN_DOP_SPISOK.length ? 'remove' : {
@@ -2534,12 +2535,18 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		gnsAA(function(sp, nn) {
 			gnsDop(nn, 1);
 		});
-		gnsValUpdate();
-
-return;
-
 		cenaSet();
+		gnsValUpdate();
 	});
+	function gnsManualSet(v) {
+		MANUAL = v;
+		o.attrSum.attr('readonly', !v);
+		o.attrSum[(v ? 'remove' : 'add') + 'Class']('bg6');
+		cenaSet();
+		gnsValUpdate();
+		if(v)
+			o.attrSum.select();
+	}
 	function gnsPrint(start, count) {// Вывод списка номеров
 		var //polosa = _toAss(GAZETA_POLOSA_SPISOK),
 			html = '',
@@ -2650,48 +2657,55 @@ return;
 				func(sp, v, prev);
 		});
 	}
-	function cenaSet() {// Установка цены в выбранные номера
-		var four = o.four_free ? 4 : 1000,
-			count = 0,
-			cena = 0;
-		//подсчёт количества объявлений, в которые нужно вписать стоимость (с учётом бесплатного номера)
-		if(o.manual) {
-			gnsAA(function(sp, nn, prev) {
-				if(!prev) {
-					four--;
-					if(!four)
-						four = 4;
-					else
-						count++;
-				}
-			});
-			cena = Math.round((o.summa / count) * 1000000) / 1000000;
-		}
+	function cenaGet() {//получение цены за один номер
+		if(!MANUAL)
+			return GN_CENA;
 
-		four = o.four_free ? 4 : 1000;
+		var free = GN_FREE,
+			count = 0;
+
+		//подсчёт количества объявлений, в которые нужно вписать стоимость (с учётом бесплатного номера)
 		gnsAA(function(sp, nn, prev) {
 			if(!prev) {
-				var c = 0,
-					dop = _num($('#vdop' + nn).val());
-				four--;
-				if(!four) {
-					four = 4;
-					c = 0;
-				} else
-					if(o.manual)
-						c = cena;
-					else {
-						//Определение объявление это или реклама производится на основании pn_show
-						if(o.pn_show) {
-							c = gnCena && dop ? gnCena * GAZETA_POLOSA_CENA[dop] : 0;
-							if(o.skidka)
-								c = c - c / 100 * o.skidka
-						} else
-							c = gnCena ? gnCena + (dop ? GAZETA_OBDOP_CENA[dop] : 0) : 0;
-					}
-				$('#cena' + nn).html(Math.round(c * 100) / 100);
-				$('#exact' + nn).val(c);
+				free--;
+				if(!free)
+					free = GN_FREE;
+				else
+					count++;
 			}
+		});
+		return Math.round((_cena(o.attrSum.val()) / count) * 1000000) / 1000000;
+	}
+	function cenaSet() {//установка цены в выбранные номера
+		var free = GN_FREE,
+			cena = cenaGet();
+
+		gnsAA(function(sp, nn, prev) {
+			if(prev)
+				return;
+
+			var c = 0,
+				dop = _num($('#vdop' + nn).val());
+			free--;
+			if(!free) {
+				free = GN_FREE;
+				c = 0;
+			} else
+				if(MANUAL)
+					c = cena;
+				else {
+					c = GN_CENA ? GN_CENA + (dop ? GN_DOP_ASS[dop] : 0) : 0;
+/*
+					//Определение объявление это или реклама производится на основании pn_show
+					if(o.pn_show) {
+						c = GN_CENA && dop ? GN_CENA * GAZETA_POLOSA_CENA[dop] : 0;
+						if(o.skidka)
+							c = c - c / 100 * o.skidka
+					}
+*/
+				}
+			sp.find('.cena').html(Math.round(c * 100) / 100);
+			sp.find('.exact').val(c);
 		});
 	}
 	function gnsValUpdate() {//обновление выбранных значений номеров
@@ -2713,17 +2727,17 @@ return;
 
 		t.val(arr.join('###'));
 
-		o.func({
-			summa:Math.round(sum * 100) / 100,
-			skidka_sum:o.skidka ? Math.round((sum / (100 - o.skidka) * 100 - sum) * 100) / 100 : 0
-		});
+		if(!MANUAL)
+			o.attrSum.val(Math.round(sum * 100) / 100);
+
+//		skidka_sum:o.skidka ? Math.round((sum / (100 - o.skidka) * 100 - sum) * 100) / 100 : 0
 
 		//вывод количества выбранных номеров
 		var countHtml = 'Выбран' + _end(count, ['', 'о']) + ' ' +
 						count + ' номер' + _end(count, ['', 'a', 'ов']) +
 						'<br>' +
 						'<a class="clr6">очистить</a>';
-		o.selCnt
+		o.attrCount
 			.html(count ? countHtml : '')
 			.find('a').click(function() {
 				menuA.removeClass('sel');
@@ -2742,20 +2756,9 @@ return;
 
 	}
 
-	t.cenaSet = function(c) {
-		gnCena = c || 0;
-		cenaSet();
-		gnsValUpdate();
-	};
 	t.update = function() {
 		cenaSet();
 		gnsValUpdate();
-	};
-	t.summa = function(v) {
-		o.summa = v;
-	};
-	t.manual = function(v) {
-		o.manual = v;
 	};
 	t.skidka = function(v) {
 		o.skidka = v;

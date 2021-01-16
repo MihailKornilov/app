@@ -11,8 +11,11 @@ function _element12_struct($el) {
 		'txt_3' => $el['txt_3'],      //значение 2
 		'txt_4' => $el['txt_4'],      //значение 3
 		'num_1' => _num($el['num_1']),//условие 1
-		'num_2' => _num($el['num_2']),//элемент 1
-		'num_3' => _num($el['num_3']) //элемент 2 (на странице)
+		'num_2' => _num($el['num_2']),//элемент 1 (диалог)
+		'num_4' => _num($el['num_4']),//элемент 2 (диалог)
+		'num_5' => _num($el['num_5']),//элемент 3 (диалог)
+		'num_6' => _num($el['num_6']),//элемент 4 (диалог)
+		'num_3' => _num($el['num_3']) //элемент 5 (страницa)
 	) + _elementStruct($el);
 }
 function _element12_title($el) {
