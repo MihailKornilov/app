@@ -266,6 +266,8 @@ switch(@$_POST['op']) {
 			$parent = '';
 			if(isset($dialog['field1']['parent_id']))
 				$parent .= ",`parent_id`="._num($r['parent_id']);
+			elseif(isset($dialog['field1']['sort_pid']))
+				$parent .= ",`sort_pid`="._num($r['parent_id']);
 
 			$child = '';
 			if(isset($dialog['field1']['child_lvl'])) {

@@ -161,8 +161,14 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 	if($IS_SORT) {
 		if($ELEM['num_7'] > 1) {
 			$child = array();
-			foreach($spisok as $id => $r)
-				$child[$r['parent_id']][$id] = $r;
+			foreach($spisok as $id => $r) {
+				$pid = 0;
+				if(isset($r['parent_id']))
+					$pid = $r['parent_id'];
+				elseif(isset($r['sort_pid']))
+					$pid = $r['sort_pid'];
+				$child[$pid][$id] = $r;
+			}
 			$TR = _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child);
 		} else {
 			$TR = '';

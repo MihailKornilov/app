@@ -213,19 +213,16 @@ function _queryCol($DLG) {//получение колонок, для котор
 	if(defined($key))
 		return constant($key);
 
-
 	$field[] = _queryCol_id($DLG);
 	$field[] = _queryColReq($DLG, 'dialog_id');
 	$field[] = _queryColReq($DLG, 'block_id');
 	$field[] = _queryColReq($DLG, 'element_id');
 	$field[] = _queryColReq($DLG, 'parent_id');
 	$field[] = _queryColReq($DLG, 'num');
+	$field[] = _queryColReq($DLG, 'sort_pid');
 	$field[] = _queryColReq($DLG, 'dtime_add');
 	$field[] = _queryColReq($DLG, 'user_id_add');
 	$field[] = _queryColReq($DLG, 'deleted');
-
-	//id диалога, который использовался при создании записи
-//	$field[] = $DLG['id'].' `dialog_id_use`';
 
 	$D = $DLG;
 	while(true) {
