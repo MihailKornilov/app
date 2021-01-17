@@ -978,7 +978,7 @@ function PHP12_action_224($act) {//ЭЛЕМЕНТ: внешняя ссылка
 	: '<span class="clr1">совпадает с содержанием элемента</span>');
 }
 
-function _action243info($r) {//Формат для чисел
+function _action243info($act) {//Формат для чисел
 /*
 	apply_id: не показывать при нуле
 	effect_id: пробелы в больших числах
@@ -987,19 +987,22 @@ function _action243info($r) {//Формат для чисел
 	v1: Символ дроби
 */
 
-	$arr = array();
-	if($r['apply_id'])
-		$arr[] = 'Не показывать при нуле';
-	if($r['effect_id'])
-		$arr[] = 'Пробелы в больших числах';
-	if($r['revers'])
-		$arr[] = 'Показывать нули в дробной части';
-	if($r['initial_id'])
-		$arr[] = 'Округление <b>'.$r['initial_id'].'</b> знак'._end($r['initial_id'], '', 'а', 'ов').' после запятой';
+	if($act['dialog_id'] != 243)
+		return '';
 
-	$arr[] = 'Символ дроби: "<b>'.$r['v1'].'</b>"';
+	$mass = array();
+	if($act['apply_id'])
+		$mass[] = 'Не показывать при нуле';
+	if($act['effect_id'])
+		$mass[] = 'Пробелы в больших числах';
+	if($act['revers'])
+		$mass[] = 'Показывать нули в дробной части';
+	if($act['initial_id'])
+		$mass[] = 'Округление <b>'.$act['initial_id'].'</b> знак'._end($act['initial_id'], '', 'а', 'ов').' после запятой';
 
-	return '<div class="fs12 i clr7">'.implode('<br>', $arr).'</div>';
+	$mass[] = 'Символ дроби: "<b>'.$act['v1'].'</b>"';
+
+	return '<div class="fs12 i clr7">'.implode('<br>', $mass).'</div>';
 }
 
 
