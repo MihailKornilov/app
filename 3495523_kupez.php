@@ -12,6 +12,8 @@ function _elem129_kupez($DLG, $POST_CMP) {
 	if(APP_ID != 4)
 		jsonError('Нужно находиться в приложении Купец');
 
+	set_time_limit(300);
+
 	define('APP_ID_OLD', 3495523);
 
 	$key = key($POST_CMP);
@@ -35,6 +37,8 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			_kupez_zayav_poz();
 			_kupez_zayav_poz_image();
 
+			_kupez_zayav_gn();
+
 			_kupez_invoice();
 			_kupez_invoice_transfer();
 			_kupez_invoice_in_out();
@@ -44,7 +48,7 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
-			_kupez_gazeta_nomer();
+			_kupez_zayav_gn();
 			break;
 
 		default:
@@ -172,7 +176,6 @@ function _kupez_client() {//Клиенты
 function _kupez_gazeta_nomer() {//номера газет
 	$dialog_id = _comtexSpisokClear(1489);
 
-	//категории
 	_db2();
 	$sql = "SELECT *
 			FROM `_setup_gazeta_nomer`
@@ -626,6 +629,99 @@ function _kupez_zayav_poz_image() {//изображения к рекламе
 			ON DUPLICATE KEY UPDATE
 				`txt_1`=VALUES(`txt_1`)";
 	query($sql);
+}
+
+function _kupez_zayav_gn() {//номера выпусков в заявках
+	$dialog_id = _comtexSpisokClear(1491);
+
+	_kupez_zayav_gnService($dialog_id, 8, 'num_2', 1477);//объявления
+	_kupez_zayav_gnService($dialog_id, 9, 'num_3', 1486);//реклама
+	_kupez_zayav_gnService($dialog_id, 10, 'num_4', 1487);//поздравления
+
+	_comtexErrMsg($dialog_id, 'num_5', 'номер газеты');
+}
+function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {//номера выпусков для конкретного типа заявок
+	$x = 1000;
+
+	//ассоциации доп.параметров
+	$DOP = array();
+	switch($service_id) {
+		case 8:
+			$DOP = array(
+				1 => 1594431,
+				2 => 1594432
+			);
+			break;
+		case 9:
+		case 10:
+		case 11:
+			$DOP = array(
+				1 => 1613229,
+				2 => 1613232,
+				3 => 1613230,
+				4 => 1613231
+			);
+			break;
+	}
+
+	for($n = 0; $n < $x; $n++) {
+		_db2();
+		$sql = "SELECT *
+				FROM `_zayav_gazeta_nomer`
+				WHERE `app_id`=".APP_ID_OLD."
+				  AND `zayav_id` IN (
+							SELECT `id`
+							FROM `_zayav`
+							WHERE `service_id`=".$service_id."
+							ORDER BY `id`
+						)
+				ORDER BY `id`
+				LIMIT ".($n*$x).",".$x;
+		if(!$arr = query_arr($sql))
+			break;
+
+		$mass = array();
+		foreach($arr as $id => $r) {
+			$mass[] = "(
+					".$id.",
+					".APP_ID.",
+					".$id.",
+					".$dialog_id.",
+					
+					"._comtexAss(1040, $r['client_id']).",/* клиент */
+					"._comtexAss($zayav_dlg_id, $r['zayav_id']).",/* заявка */
+					"._comtexAss(1489, $r['gazeta_nomer_id']).",/* номер выхода */
+					"._num(@$DOP[$r['dop']]).",
+					".$r['polosa'].",
+					".$r['cena'].",
+					".$r['skidka'].",
+					".$r['skidka_sum'].",				
+
+					"._comtexAss($zayav_dlg_id, $r['zayav_id'], 'user_id_add').",
+					'"._comtexAss($zayav_dlg_id, $r['zayav_id'], 'dtime_add')."'
+				)";
+		}
+
+		$sql = "INSERT INTO `_spisok` (
+					`id_old`,
+					`app_id`,
+					`num`,
+					`dialog_id`,
+	
+					`num_1`,    /* клиент */
+					`".$col."`, /* заявка */
+					`num_5`,    /* номер выхода */
+					`num_6`,    /* доп.параметр */
+					`num_7`,    /* номер полосы */
+					`sum_16`,   /* стоимость */
+					`num_8`,    /* скидка */
+					`sum_17`,   /* сумма скидки */
+					
+					`user_id_add`,
+				    `dtime_add`					
+				) VALUES ".implode(',', $mass);
+		query($sql);
+	}
 }
 
 function _kupez_invoice() {//Расчётные счета
