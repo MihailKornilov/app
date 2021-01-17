@@ -3,10 +3,7 @@ var ZINDEX = 1000,
 	REGEXP_NUMERIC_MINUS =  /^-?\d+$/,
 	REGEXP_FRACT =          /^[\d]+(.[\d]+)?(,[\d]+)?$/,
 	REGEXP_FRACT_MINUS =    /^-?[\d]+(.[\d]+)?(,[\d]+)?$/,
-	REGEXP_CENA =           /^[\d]+(.[\d]{1,2})?(,[\d]{1,2})?$/,
 	REGEXP_CENA_MINUS =     /^-?[\d]+(.[\d]{1,2})?(,[\d]{1,2})?$/,
-	REGEXP_SIZE =           /^[\d]+(.[\d]{1})?(,[\d]{1})?$/,
-	REGEXP_MS =             /^[\d]+(.[\d]{1,3})?(,[\d]{1,3})?$/,
 	REGEXP_DATE =           /^(\d{4})-(\d{1,2})-(\d{1,2})( [0-9]{2}:[0-9]{2}:[0-9]{2})?$/,
 
 	POST_SEND,              //отправленные данные в _post

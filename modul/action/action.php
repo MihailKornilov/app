@@ -314,7 +314,7 @@ function _elemAction242($el, $prm) {//подмена цвета
 function _elemAction243($el, $txt) {//Формат для чисел
 	if($el['dialog_id'] == 44)
 		return $txt;
-	if(is_string($txt) && !preg_match(REGEXP_CENA_MINUS, $txt))
+	if(is_string($txt) && !preg_match(REGEXP_FRACT, $txt))
 		return $txt;
 	if(!$action = _BE('elem_one_action', $el['id'])) {
 		if($el['dialog_id'] == 11)
@@ -491,6 +491,9 @@ function PHP12_action_list($prm) {
 							PHP12_action_222($r).
 							PHP12_action_223($r).
 							PHP12_action_224($r).
+
+							//условия отображения элемента
+							_action243info($r).
 						'</div>'.
 					'<td class="w50 r top">'.
 						'<div val="'.implode(',', $val).'"'.
@@ -973,6 +976,30 @@ function PHP12_action_224($act) {//ЭЛЕМЕНТ: внешняя ссылка
 	($act['target_ids'] ?
 		'<span class="clr15">'.$act['target_ids'].'</span>'
 	: '<span class="clr1">совпадает с содержанием элемента</span>');
+}
+
+function _action243info($r) {//Формат для чисел
+/*
+	apply_id: не показывать при нуле
+	effect_id: пробелы в больших числах
+	revers: показывать нули в дробной части
+	initial_id: округление знаков после запятой
+	v1: Символ дроби
+*/
+
+	$arr = array();
+	if($r['apply_id'])
+		$arr[] = 'Не показывать при нуле';
+	if($r['effect_id'])
+		$arr[] = 'Пробелы в больших числах';
+	if($r['revers'])
+		$arr[] = 'Показывать нули в дробной части';
+	if($r['initial_id'])
+		$arr[] = 'Округление <b>'.$r['initial_id'].'</b> знак'._end($r['initial_id'], '', 'а', 'ов').' после запятой';
+
+	$arr[] = 'Символ дроби: "<b>'.$r['v1'].'</b>"';
+
+	return '<div class="fs12 i clr7">'.implode('<br>', $arr).'</div>';
 }
 
 

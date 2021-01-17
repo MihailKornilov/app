@@ -364,7 +364,7 @@ switch(@$_POST['op']) {
 			if(!$id = _num($r['id']))
 				continue;
 			$parent_id = _num($r['parent_id']);
-			$update[] = "(".$id.",".$parent_id.",".$n.")";
+			$update[] = "(".$id.",".$n.",".$parent_id.")";
 		}
 
 		if(empty($update))
@@ -372,12 +372,12 @@ switch(@$_POST['op']) {
 
 		$sql = "INSERT INTO `_dialog` (
 					`id`,
-					`pid`,
-					`sort`
+					`sort`,
+					`sort_pid`
 				) VALUES ".implode(',', $update)."
 				ON DUPLICATE KEY UPDATE
-					`pid`=VALUES(`pid`),
-					`sort`=VALUES(`sort`)";
+					`sort`=VALUES(`sort`),
+					`sort_pid`=VALUES(`sort_pid`)";
 		query($sql);
 
 		_cache_clear('DIALOG');

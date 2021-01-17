@@ -1007,7 +1007,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID."
-			ORDER BY `pid`,`sort`";
+			ORDER BY `sort_pid`,`sort`";
 	if(!$arr = query_arr($sql))
 		return 'Диалоговых окон нет.';
 
@@ -1044,7 +1044,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 		$arr[$id]['unit_count_del'] = !empty($cAssDel[$id]) ? '<div class="clr2 fs11">'.$cAssDel[$id].'</div>' : '';
 		if(!isset($r['child']))
 			$arr[$id]['child'] = array();
-		if($pid = _num($r['pid']))
+		if($pid = _num($r['sort_pid']))
 			if(isset($arr[$pid]))
 				$arr[$pid]['child'][] = $r;
 	}
@@ -1070,7 +1070,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 function PHP12_dialog_app_child($arr, $pid=0) {
 	$send = '';
 	foreach($arr as $id => $r) {
-		if($r['pid'] != $pid)
+		if($r['sort_pid'] != $pid)
 			continue;
 		$send .= PHP12_dialog_app_li($r);
 		if(!empty($r['child']))
@@ -1090,13 +1090,13 @@ function PHP12_dialog_app_li($r) {
 	$r['issp'] = $r['insert_on'] && $r['insert_button_submit'] && !$r['dialog_id_parent'];
 
 	return
-	'<li id="dlg_'.$r['id'].'" class="mt1 '.(!$r['pid'] ? 'mb5' : 'mb1').'">'.
+	'<li id="dlg_'.$r['id'].'" class="mt1 '.(!$r['sort_pid'] ? 'mb5' : 'mb1').'">'.
 		'<table class="_stab small w100p">'.
 			'<tr class="over1">'.
 				'<td class="w30 r">'.
 					'<div class="icon icon-move pl"></div>'.
 	   (DEBUG ? '<td class="w50 clr2 r">'.$r['id'] : '').
-				'<td class="d-name over5 curP dialog-open'._dn($r['pid'], 'b').'" val="dialog_id:'.$r['id'].'">'.$r['name'].
+				'<td class="d-name over5 curP dialog-open'._dn($r['sort_pid'], 'b').'" val="dialog_id:'.$r['id'].'">'.$r['name'].
 				'<td class="w30 r">'.
 					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup tool" data-tool="Редактировать диалог"></div>'.
 				'<td class="w50 center">'.

@@ -194,21 +194,6 @@ function _cena($v, $minus=0, $kop=0, $del='.') {//проверка на цену
 
 	return $v;
 }
-function _ms($v, $del='.') {//проверка на единицу измерения с дробями 0.000
-	/*
-		$del - знак после запятой
-	*/
-	if(empty($v) || is_array($v) || !preg_match(REGEXP_MS, $v))
-		return 0;
-
-	$v = str_replace(',', '.', $v);
-	$v = round($v, 3);
-
-	$v = str_replace(',', $del, $v);
-	$v = str_replace('.', $del, $v);
-
-	return $v;
-}
 function _sumSpace($sum, $oo=0, $znak=',') {//Приведение суммы к удобному виду с пробелами
 	$minus = $sum < 0 ? -1 : 1;
 	$sum *= $minus;
