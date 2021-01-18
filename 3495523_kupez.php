@@ -44,11 +44,11 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			_kupez_invoice_in_out();
 			_kupez_expense_category();
 			_kupez_expense();
-
+			_kupez_refund();
 			break;
 		//частичный
 		case 2:
-			_kupez_zayav_gn();
+			_kupez_refund();
 			break;
 
 		default:
@@ -1012,6 +1012,61 @@ function _kupez_expense() {//расходы
 	query($sql);
 
 	_comtexErrMsg($dialog_id, 'num_2', 'счета');
+}
+function _kupez_refund() {//возвраты
+	$dialog_id = _comtexSpisokClear(1485);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _money_refund
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				".$r['sum'].",
+				'".$r['about']."',
+				"._comtexAss(1483, $r['invoice_id']).", /* расчётные счета */
+				"._comtexAss(1040, $r['client_id']).",
+				"._comtexAss(1477, $r['zayav_id']).", /* заявки-обявления */
+				"._comtexAss(1486, $r['zayav_id']).", /* заявки-реклама */
+				"._comtexAss(1487, $r['zayav_id']).", /* заявки-поздравления */
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  sum_1,
+				  txt_1,
+				  num_1,
+				  num_2,
+				  num_3,
+				  num_4,
+				  num_5,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	_comtexErrMsg($dialog_id, 'num_1', 'счета');
 }
 
 
