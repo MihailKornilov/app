@@ -644,10 +644,11 @@ function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {/
 	$x = 1000;
 
 	//ассоциации доп.параметров
-	$DOP = array();
+	$OB = array();
+	$REK = array();
 	switch($service_id) {
 		case 8:
-			$DOP = array(
+			$OB = array(
 				1 => 1594431,
 				2 => 1594432
 			);
@@ -655,7 +656,7 @@ function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {/
 		case 9:
 		case 10:
 		case 11:
-			$DOP = array(
+			$REK = array(
 				1 => 1613229,
 				2 => 1613232,
 				3 => 1613230,
@@ -688,10 +689,11 @@ function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {/
 					".$id.",
 					".$dialog_id.",
 					
-					"._comtexAss(1040, $r['client_id']).",/* клиент */
-					"._comtexAss($zayav_dlg_id, $r['zayav_id']).",/* заявка */
-					"._comtexAss(1489, $r['gazeta_nomer_id']).",/* номер выхода */
-					"._num(@$DOP[$r['dop']]).",
+					"._comtexAss(1040, $r['client_id']).",          /* клиент */
+					"._comtexAss($zayav_dlg_id, $r['zayav_id']).",  /* заявка */
+					"._comtexAss(1489, $r['gazeta_nomer_id']).",    /* номер выхода */
+					"._num(@$OB[$r['dop']]).",
+					"._num(@$REK[$r['dop']]).",
 					".$r['polosa'].",
 					".$r['cena'].",
 					".$r['skidka'].",
@@ -711,10 +713,11 @@ function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {/
 					`num_1`,    /* клиент */
 					`".$col."`, /* заявка */
 					`num_5`,    /* номер выхода */
-					`num_6`,    /* доп.параметр */
-					`num_7`,    /* номер полосы */
+					`num_6`,    /* доп.параметр объявления */
+					`num_7`,    /* полоса рекламы */
+					`num_8`,    /* номер полосы */
 					`sum_16`,   /* стоимость */
-					`num_8`,    /* скидка */
+					`num_9`,    /* скидка */
 					`sum_17`,   /* сумма скидки */
 					
 					`user_id_add`,

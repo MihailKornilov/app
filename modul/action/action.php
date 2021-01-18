@@ -401,6 +401,36 @@ function _elemAction245($el, $txt, $skip224=false) {//Формат для тек
 
 	return $txt;
 }
+function _elemAction246($el, $txt) {//Формат даты
+	if(!$action = _BE('elem_one_action', $el['id']))
+		return $txt;
+
+	foreach($action as $act) {
+		if($act['dialog_id'] != 246)
+			continue;
+		if(!preg_match(REGEXP_DATE, $txt))
+			return $txt;
+
+		$ex = explode(' ', $txt);
+
+		switch($act['initial_id']) {
+			case 1: $txt = FullData($txt, $act['apply_id']); break;
+			case 2: $txt = FullData($txt, $act['apply_id'], 1); break;
+			case 3: $txt = FullData($txt, $act['apply_id'], 1, 1); break;
+			case 4:
+				$exx = explode('-', $ex[0]);
+				$txt = $exx[2].'/'.$exx[1].'/'.$exx[0];
+				break;
+		}
+
+		if($act['effect_id'] && isset($ex[1])) {
+			$exx = explode(':', $ex[0]);
+			$txt .= ' в '.$exx[0].':'.$exx[1];
+		}
+	}
+
+	return $txt;
+}
 
 
 
@@ -494,6 +524,7 @@ function PHP12_action_list($prm) {
 
 							//условия отображения элемента
 							_action243info($r).
+							_action246info($r).
 						'</div>'.
 					'<td class="w50 r top">'.
 						'<div val="'.implode(',', $val).'"'.
@@ -1001,6 +1032,31 @@ function _action243info($act) {//Формат для чисел
 		$mass[] = 'Округление <b>'.$act['initial_id'].'</b> знак'._end($act['initial_id'], '', 'а', 'ов').' после запятой';
 
 	$mass[] = 'Символ дроби: "<b>'.$act['v1'].'</b>"';
+
+	return '<div class="fs12 i clr7">'.implode('<br>', $mass).'</div>';
+}
+function _action246info($act) {//Формат даты
+/*
+	initial_id: формат
+	apply_id: не показывать текущий год
+	effect_id: показывать время в формате 12:45
+*/
+
+	if($act['dialog_id'] != 246)
+		return '';
+	if(!$el = _elemOne(19144))
+		return _msgRed('Не получен элемент 19144');
+
+	$mass = array();
+
+	foreach(_decode($el['txt_2']) as $r)
+		if($r['id'] == $act['initial_id'])
+			$mass[] = 'Формат: <b>'.$r['title'].'</b>';
+
+	if($act['apply_id'])
+		$mass[] = 'Не показывать текущий год';
+	if($act['effect_id'])
+		$mass[] = 'Показывать время в формате 12:45';
 
 	return '<div class="fs12 i clr7">'.implode('<br>', $mass).'</div>';
 }

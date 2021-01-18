@@ -28,12 +28,17 @@ function _element51_print11($el, $u) {
 		return '';
 	if(!$txt = @$u[$col])
 		return '';
+
+	$txt = _elemAction246($el['elp'], $txt);       //Формат даты
+
+	if(!preg_match(REGEXP_DATE, $txt))
+		return $txt;
 	if($txt == '0000-00-00')
-		return '-';
+		return '';
 	if($el['num_2'] && $txt == '0000-00-00 00:00:00')
 		return '';
 
-	$v = FullData($txt);
+	$v = FullData($txt, 0, 1, 1);
 	if($el['num_2'])
 		$v .= ' в '._num(substr($txt, 11, 2)).
 				':'.substr($txt, 14, 2);
