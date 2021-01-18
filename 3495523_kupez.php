@@ -45,10 +45,11 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			_kupez_expense_category();
 			_kupez_expense();
 			_kupez_refund();
+			_kupez_income();
 			break;
 		//частичный
 		case 2:
-			_kupez_refund();
+			_kupez_income();
 			break;
 
 		default:
@@ -641,8 +642,6 @@ function _kupez_zayav_gn() {//номера выпусков в заявках
 	_comtexErrMsg($dialog_id, 'num_5', 'номер газеты');
 }
 function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {//номера выпусков для конкретного типа заявок
-	$x = 1000;
-
 	//ассоциации доп.параметров
 	$OB = array();
 	$REK = array();
@@ -665,6 +664,7 @@ function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {/
 			break;
 	}
 
+	$x = 1000;
 	for($n = 0; $n < $x; $n++) {
 		_db2();
 		$sql = "SELECT *
@@ -989,7 +989,9 @@ function _kupez_expense() {//расходы
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
-				".$r['deleted']."
+				".$r['deleted'].",
+				"._comtexUserId($r, 'viewer_id_del').",
+				'".$r['dtime_del']."'
 		)";
 	}
 
@@ -1007,7 +1009,9 @@ function _kupez_expense() {//расходы
 
 				  user_id_add,
 				  dtime_add,
-				  deleted
+				  deleted,
+				  user_id_del,
+				  dtime_del
 			) VALUES ".implode(',', $mass);
 	query($sql);
 
@@ -1042,7 +1046,9 @@ function _kupez_refund() {//возвраты
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
-				".$r['deleted']."
+				".$r['deleted'].",
+				"._comtexUserId($r, 'viewer_id_del').",
+				'".$r['dtime_del']."'
 		)";
 	}
 
@@ -1062,11 +1068,79 @@ function _kupez_refund() {//возвраты
 
 				  user_id_add,
 				  dtime_add,
-				  deleted
+				  deleted,
+				  user_id_del,
+				  dtime_del
 			) VALUES ".implode(',', $mass);
 	query($sql);
 
 	_comtexErrMsg($dialog_id, 'num_1', 'счета');
+}
+function _kupez_income() {//платежи
+	$dialog_id = _comtexSpisokClear(1493);
+
+	$x = 1000;
+	for($n = 0; $n < $x; $n++)
+		if(!_kupez_income1000($dialog_id, $x, $n))
+			return;
+}
+function _kupez_income1000($dialog_id, $x, $n) {//платежи (каждые 1000 записей)
+	_db2();
+	$sql = "SELECT *
+			FROM _money_income
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`
+			LIMIT ".($n*$x).",".$x;
+	if(!$arr = query_arr($sql))
+		return false;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				".$r['sum'].",
+				'".$r['about']."',
+				"._comtexAss(1483, $r['invoice_id']).", /* расчётные счета */
+				"._comtexAss(1040, $r['client_id']).",
+				"._comtexAss(1477, $r['zayav_id']).",   /* заявки-обявления */
+				"._comtexAss(1486, $r['zayav_id']).",   /* заявки-реклама */
+				"._comtexAss(1487, $r['zayav_id']).",   /* заявки-поздравления */
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted'].",
+				"._comtexUserId($r, 'viewer_id_del').",
+				'".$r['dtime_del']."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  sum_1,
+				  txt_1,
+				  num_1,
+				  num_2,
+				  num_3,
+				  num_4,
+				  num_5,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted,
+				  user_id_del,
+				  dtime_del
+			) VALUES ".implode(',', $mass);
+	query($sql);
+
+	return true;
 }
 
 
