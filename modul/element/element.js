@@ -3512,17 +3512,18 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					dss:obj.srce.dss,
 					edit_id:v.id,           //id выбранного элемента (при редактировании)
 					dop:{
-						rule_id:4,
-						mysave:1
+						rule_id:4
 					},
 					busy_obj:INP,
 					busy_cls:'hold',
 					func_save:function(ia) {
-						DD.attr('val', ia.unit.id);
-						v.id = ia.unit.id;
-						v.dialog_id = ia.unit.dialog_id;
+						if(!v.id) {
+							v.id = ia.unit.id;
+							DD.attr('val', v.id);
+							INP.attr('id', 'el_' + v.id);
+							v.dialog_id = ia.unit.dialog_id;
+						}
 						INP.val(ia.unit.title);
-						INP.attr('id', 'el_' + ia.unit.id);
 					}
 				});
 			});
