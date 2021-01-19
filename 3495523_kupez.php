@@ -69,6 +69,7 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
+			_kupez_refund();
 			break;
 
 		default:
@@ -1207,7 +1208,7 @@ function _kupez_refund() {//возвраты
 				".$dialog_id.",
 
 				".$r['sum'].",
-				'".$r['about']."',
+				'".strip_tags($r['about'])."',
 				"._comtexAss(1483, $r['invoice_id']).", /* расчётные счета */
 				"._comtexAss(1040, $r['client_id']).",
 				"._comtexAss(1477, $r['zayav_id']).", /* заявки-объявления */
