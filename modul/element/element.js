@@ -3412,14 +3412,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		var ATR_EL = _attr_el(el.id),
 			html = '<dl></dl>' +
 				   '<table class="w100p"><tr>' +
-				        '<td><div class="fs15 clr9 pad10 center over1 curP add34-txt">Добавить текст</div>' +
-				        '<td><div class="fs15 clr9 pad10 center over1 curP add34-el">Добавить элемент</div>' +
+				        '<td><div class="fs15 clr9 pad10 center over1 curP add44-txt">Добавить текст</div>' +
+				        '<td><div class="fs15 clr9 pad10 center over1 curP add44-el">Добавить элемент</div>' +
 				   '</table>',
 			DL = ATR_EL.append(html).find('dl'),
 			NUM = 1;
 
-		ATR_EL.find('.add34-txt').click(addTxt);
-		ATR_EL.find('.add34-el').click(addEl);
+		ATR_EL.find('.add44-txt').click(addTxt);
+		ATR_EL.find('.add44-el').click(addEl);
 
 		//вывод двух первых элементов, если начало настройки
 		if(!vvv.length) {
@@ -3522,6 +3522,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						v.id = ia.unit.id;
 						v.dialog_id = ia.unit.dialog_id;
 						INP.val(ia.unit.title);
+						INP.attr('id', 'el_' + ia.unit.id);
 					}
 				});
 			});
@@ -6004,7 +6005,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	_tdCss = function() {//настройка стилей в выплывающем окошке для ячейки таблицы
 		var t = $(this),
 			v = {
-				id:t.attr('id').split('_')[1],//если используется элемент не из базы, можно ставить id="el_sp14"
+				id:t.attr('id').split('_')[1] * 1,//если используется элемент не из базы, можно ставить id="el_sp14"
 				use:t.attr('data-use') || 'font color eye link place',//использование вариантов настроек
 				font:'',
 				color:'',
