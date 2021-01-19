@@ -69,12 +69,6 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
-			_kupez_zayav_art();
-			_kupez_zayav_shit();
-			_kupez_zayav_gn();
-			_kupez_accrual();
-			_kupez_refund();
-			_kupez_income();
 			break;
 
 		default:
@@ -750,12 +744,11 @@ function _kupez_zayav_shit() {//заявки-щиты
 }
 
 function _kupez_zayav_gn() {//номера выпусков в заявках
-//	$dialog_id = _comtexSpisokClear(1491);
-	$dialog_id = 1491;
+	$dialog_id = _comtexSpisokClear(1491);
 
-//	_kupez_zayav_gnService($dialog_id, 8, 'num_2', 1477);  //объявления
-//	_kupez_zayav_gnService($dialog_id, 9, 'num_3', 1486);  //реклама
-//	_kupez_zayav_gnService($dialog_id, 10, 'num_4', 1487); //поздравления
+	_kupez_zayav_gnService($dialog_id, 8, 'num_2', 1477);  //объявления
+	_kupez_zayav_gnService($dialog_id, 9, 'num_3', 1486);  //реклама
+	_kupez_zayav_gnService($dialog_id, 10, 'num_4', 1487); //поздравления
 	_kupez_zayav_gnService($dialog_id, 11, 'num_10', 1495);//статья
 
 	_comtexErrMsg($dialog_id, 'num_5', 'номер газеты');
