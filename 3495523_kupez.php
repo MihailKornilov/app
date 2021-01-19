@@ -4,6 +4,22 @@
 
 	ОСОБЕННОСТИ ПЕРЕНОСА:
 		1. Внесения и выводы денег убраны (перенесены в переводы между счетами)
+
+
+
+
+//Количество заявок по каждому виду, в котором есть НОМЕРА ГАЗЕТ
+select service_id,count(id) from _zayav where id in (select zayav_id from _zayav_gazeta_nomer where app_id=3495523 and zayav_id) group by service_id;
+
+//Количество заявок по каждому виду, в котором есть НАЧИСЛЕНИЯ
+select service_id,count(id) from _zayav where id in (select zayav_id from _money_accrual where app_id=3495523 and zayav_id) group by service_id;
+
+//Количество заявок по каждому виду, в котором есть ПЛАТЕЖИ
+select service_id,count(id) from _zayav where id in (select zayav_id from _money_income where app_id=3495523 and zayav_id) group by service_id;
+
+//Количество заявок по каждому виду, в котором есть ВОЗВРАТЫ
+select service_id,count(id) from _zayav where id in (select zayav_id from _money_refund where app_id=3495523 and zayav_id) group by service_id;
+
 */
 
 function _elem129_kupez($DLG, $POST_CMP) {
@@ -36,8 +52,12 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			_kupez_zayav_rek_image();
 			_kupez_zayav_poz();
 			_kupez_zayav_poz_image();
+			_kupez_zayav_art();
+			_kupez_zayav_shit();
 
 			_kupez_zayav_gn();
+
+			_kupez_accrual();
 
 			_kupez_invoice();
 			_kupez_invoice_transfer();
@@ -49,6 +69,11 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
+			_kupez_zayav_art();
+			_kupez_zayav_shit();
+			_kupez_zayav_gn();
+			_kupez_accrual();
+			_kupez_refund();
 			_kupez_income();
 			break;
 
@@ -631,13 +656,107 @@ function _kupez_zayav_poz_image() {//изображения к рекламе
 				`txt_1`=VALUES(`txt_1`)";
 	query($sql);
 }
+function _kupez_zayav_art() {//заявки-статьи
+	$dialog_id = _comtexSpisokClear(1495);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _zayav
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `service_id`=11
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $zayav_id => $r) {
+		$mass[] = "(
+				".$zayav_id.",
+				".APP_ID.",
+				".$r['nomer'].",
+				".$dialog_id.",
+				
+				"._comtexAss(1040, $r['client_id']).",/* клиент */
+
+				".$r['sum_cost'].",
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+
+				  sum_1,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _kupez_zayav_shit() {//заявки-щиты
+	$dialog_id = _comtexSpisokClear(1496);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _zayav
+			WHERE `app_id`=".APP_ID_OLD."
+			  AND `service_id`=12
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $zayav_id => $r) {
+		$mass[] = "(
+				".$zayav_id.",
+				".APP_ID.",
+				".$r['nomer'].",
+				".$dialog_id.",
+				
+				"._comtexAss(1040, $r['client_id']).",/* клиент */
+				'".$r['adres']."',
+				'".$r['about']."',
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted']."
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  num_1,
+				  txt_1,
+				  txt_2,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
 
 function _kupez_zayav_gn() {//номера выпусков в заявках
-	$dialog_id = _comtexSpisokClear(1491);
+//	$dialog_id = _comtexSpisokClear(1491);
+	$dialog_id = 1491;
 
-	_kupez_zayav_gnService($dialog_id, 8, 'num_2', 1477);//объявления
-	_kupez_zayav_gnService($dialog_id, 9, 'num_3', 1486);//реклама
-	_kupez_zayav_gnService($dialog_id, 10, 'num_4', 1487);//поздравления
+//	_kupez_zayav_gnService($dialog_id, 8, 'num_2', 1477);  //объявления
+//	_kupez_zayav_gnService($dialog_id, 9, 'num_3', 1486);  //реклама
+//	_kupez_zayav_gnService($dialog_id, 10, 'num_4', 1487); //поздравления
+	_kupez_zayav_gnService($dialog_id, 11, 'num_10', 1495);//статья
 
 	_comtexErrMsg($dialog_id, 'num_5', 'номер газеты');
 }
@@ -725,6 +844,64 @@ function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {/
 				) VALUES ".implode(',', $mass);
 		query($sql);
 	}
+}
+
+function _kupez_accrual() {//начисления
+	$dialog_id = _comtexSpisokClear(1494);
+
+	_db2();
+	$sql = "SELECT *
+			FROM _money_accrual
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+
+				".$r['sum'].",
+				'".$r['about']."',
+				"._comtexAss(1040, $r['client_id']).",
+				"._comtexAss(1477, $r['zayav_id']).", /* заявки-объявления */
+				"._comtexAss(1486, $r['zayav_id']).", /* заявки-реклама */
+				"._comtexAss(1487, $r['zayav_id']).", /* заявки-поздравления */
+				"._comtexAss(1496, $r['zayav_id']).", /* заявки-щиты */
+
+				"._comtexUserId($r).",
+				'".$r['dtime_add']."',
+				".$r['deleted'].",
+				"._comtexUserId($r, 'viewer_id_del').",
+				'".$r['dtime_del']."'
+		)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  sum_1,
+				  txt_1,
+				  num_1,
+				  num_2,
+				  num_3,
+				  num_4,
+				  num_5,
+
+				  user_id_add,
+				  dtime_add,
+				  deleted,
+				  user_id_del,
+				  dtime_del
+			) VALUES ".implode(',', $mass);
+	query($sql);
 }
 
 function _kupez_invoice() {//Расчётные счета
@@ -1040,9 +1217,10 @@ function _kupez_refund() {//возвраты
 				'".$r['about']."',
 				"._comtexAss(1483, $r['invoice_id']).", /* расчётные счета */
 				"._comtexAss(1040, $r['client_id']).",
-				"._comtexAss(1477, $r['zayav_id']).", /* заявки-обявления */
+				"._comtexAss(1477, $r['zayav_id']).", /* заявки-объявления */
 				"._comtexAss(1486, $r['zayav_id']).", /* заявки-реклама */
 				"._comtexAss(1487, $r['zayav_id']).", /* заявки-поздравления */
+				"._comtexAss(1496, $r['zayav_id']).", /* заявки-щиты */
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
@@ -1065,6 +1243,7 @@ function _kupez_refund() {//возвраты
 				  num_3,
 				  num_4,
 				  num_5,
+				  num_6,
 
 				  user_id_add,
 				  dtime_add,
@@ -1106,9 +1285,11 @@ function _kupez_income1000($dialog_id, $x, $n) {//платежи (каждые 1
 				'".$r['about']."',
 				"._comtexAss(1483, $r['invoice_id']).", /* расчётные счета */
 				"._comtexAss(1040, $r['client_id']).",
-				"._comtexAss(1477, $r['zayav_id']).",   /* заявки-обявления */
+				"._comtexAss(1477, $r['zayav_id']).",   /* заявки-объявления */
 				"._comtexAss(1486, $r['zayav_id']).",   /* заявки-реклама */
 				"._comtexAss(1487, $r['zayav_id']).",   /* заявки-поздравления */
+				"._comtexAss(1495, $r['zayav_id']).",   /* заявки-статьи */
+				"._comtexAss(1496, $r['zayav_id']).",   /* заявки-щиты */
 
 				"._comtexUserId($r).",
 				'".$r['dtime_add']."',
@@ -1131,6 +1312,8 @@ function _kupez_income1000($dialog_id, $x, $n) {//платежи (каждые 1
 				  num_3,
 				  num_4,
 				  num_5,
+				  num_6,
+				  num_7,
 
 				  user_id_add,
 				  dtime_add,
