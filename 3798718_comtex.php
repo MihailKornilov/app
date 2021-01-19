@@ -126,19 +126,21 @@ function _comtexSpisokClear($dialog_id) {//очистка списка по ко
 	query($sql);
 	return $dialog_id;
 }
-function _comtexAss($dialog_id, $id, $return='id', $and='') {//получение нового id по старому
+function _comtexAss($dialog_id, $id, $col='id', $and='') {//получение нового id по старому
 	global $COMTEX_ASS;
 
-	$key = md5($dialog_id.$return.$and);
+	$key = md5($dialog_id.$col.$and);
 
 	if(!isset($COMTEX_ASS[$key])) {
-		$sql = "SELECT `id_old`,`".$return."`
+		$sql = "SELECT `id_old`,`".$col."`
 				FROM `_spisok`
 				WHERE `app_id`=".APP_ID."
 				  AND `dialog_id`=".$dialog_id."
 				  AND `id_old`
 				".$and;
 		$COMTEX_ASS[$key] = query_ass($sql);
+
+//		echo $dialog_id.'='.count($COMTEX_ASS[$key])."\n";
 	}
 
 	if(!isset($COMTEX_ASS[$key][$id]))
