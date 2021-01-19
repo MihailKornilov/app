@@ -177,6 +177,9 @@ var ZINDEX = 1000,
 				$(this).remove();
 				if(typeof func == 'function')
 					func();
+			})
+			.mouseover(function() {
+				$(this).remove();
 			});
 	},
 	_br = function(v, back) {
