@@ -6006,14 +6006,14 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	_tdCss = function() {//настройка стилей в выплывающем окошке для ячейки таблицы
 		var t = $(this),
 			v = {
-				id:t.attr('id').split('_')[1] * 1,//если используется элемент не из базы, можно ставить id="el_sp14"
+				id:t.attr('id').split('_')[1],//если используется элемент не из базы, можно ставить id="el_sp14"
 				use:t.attr('data-use') || 'font color eye link place',//использование вариантов настроек
 				font:'',
 				color:'',
 				pos:''
 			};
 
-		if(!v.id)
+		if(v.id == '0')
 			return;
 
 		_forIn(t.attr('class').split(' '), function(sp) {
