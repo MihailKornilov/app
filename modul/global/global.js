@@ -164,7 +164,7 @@ var ZINDEX = 1000,
 		v = _num(v);
 		return (v > 9 ? '' : '0') + v;
 	},
-	_msg = function(txt, func) {//Сообщение о результате выполненных действий
+	_msg = function(txt) {//Сообщение о результате выполненных действий
 		if(!txt)
 			txt = 'Выполнено';
 		$('#_msg').remove();
@@ -175,8 +175,6 @@ var ZINDEX = 1000,
 			.delay(1200)
 			.fadeOut(400, function() {
 				$(this).remove();
-				if(typeof func == 'function')
-					func();
 			})
 			.mouseover(function() {
 				$(this).remove();
