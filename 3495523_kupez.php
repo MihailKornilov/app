@@ -75,6 +75,7 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
+			_kupez_zayav_gn();
 			break;
 
 		default:
@@ -817,6 +818,8 @@ function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {/
 					".$r['skidka'].",
 					".$r['skidka_sum'].",				
 
+					"._comtexAss(1489, $r['gazeta_nomer_id']).",    /* порядок (определяется по номеру выхода) */
+
 					"._comtexAss($zayav_dlg_id, $r['zayav_id'], 'user_id_add').",
 					'"._comtexAss($zayav_dlg_id, $r['zayav_id'], 'dtime_add')."'
 				)";
@@ -838,6 +841,8 @@ function _kupez_zayav_gnService($dialog_id, $service_id, $col, $zayav_dlg_id) {/
 					`num_9`,    /* скидка */
 					`sum_17`,   /* сумма скидки */
 					
+					`sort`,
+
 					`user_id_add`,
 				    `dtime_add`					
 				) VALUES ".implode(',', $mass);
