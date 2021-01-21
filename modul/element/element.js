@@ -2926,7 +2926,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			func:function(v, sp) {
 				if(sp && sp.sp)
 					AG[el.id] = sp.sp;
-				console.log(sp);
 				_ELM_ACT(el, v);
 			},
 			funcWrite:function(v, t) {
@@ -7049,7 +7048,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	},
 
 	//содержание счёта на оплату
-	PHP12_schetPayContent = function(el, vvv, obj) {
+	PHP12_schetPayContent = function(el, vvv) {
 		var html = '<table class="_stab w100p mb1">' +
 						'<tr><th class="w35">№' +
 							'<th>Наименование товара' +
@@ -7145,7 +7144,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 		}
 	},
-	PHP12_schetPayContent_get = function(el, obj) {
+	PHP12_schetPayContent_get = function(el) {
 		var send = [];
 		_forEq(_attr_el(el.id).find('dd'), function(sp) {
 			send.push({
@@ -7159,14 +7158,33 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
-	PHP12_kupez_gnGet = function(el) {//Купец: выбор номеров газет
-		console.log(el);
+	PHP12_kupez_gn = function(el, vvv) {//Купец: выбор номеров газет
 		GN_ATTR = _attr_cmp(el.id);
 		GN_ATTR.gnGet({
 			attrCount:_attr_el(el.num_2),
 			attrManual:_attr_cmp(el.num_4),
 			attrSum:_attr_cmp(el.num_5)
 		});
+
+		//обновление счётчика символов объявления
+		if(el.num_6)
+			_attr_cmp(el.num_6).trigger('keyup');
+	},
+	PHP12_kupez_gn_get = function(el) {
+		var send = [];
+		_forEq(_attr_el(el.id).find('.gns-week'), function(sp) {
+			if(!sp.hasClass('gnsel'))
+				return;
+			send.push({
+				id:_num(sp.attr('data-id')),
+				gnid:_num(sp.attr('val')),
+				dop:_num(sp.parent().next().find('.vdop').val()),
+				pn:_num(sp.parent().next().find('.pn').val()),
+				skidka:_num(sp.find('.skidka').val()),
+				cena:sp.find('.exact').val()*1
+			});
+		});
+		return send;
 	};
 
 $(document)

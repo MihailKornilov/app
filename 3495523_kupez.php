@@ -75,8 +75,6 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
-			_kupez_zayav_note();
-			_kupez_zayav_note_comment();
 			break;
 
 		default:

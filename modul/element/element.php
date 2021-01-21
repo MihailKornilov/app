@@ -3014,7 +3014,7 @@ function _historyUnitCond($el, $prm) {//отображение истории д
 
 
 
-function PHP12_schetPayContent($prm) {//содержание счёта на оплату
+function PHP12_schetPayContent() {//содержание счёта на оплату
 	/*
 		num_2 - элемент: Итоговая сумма
 		num_3 - элемент: список, где есть выбор галочками (получение значений для вставки в счёт)
@@ -3344,32 +3344,37 @@ function _attachSize($v) {//оформление размера файла в б
 
 
 
-function PHP12_kupez_gnGet($prm) {//Купец: выбор номеров газет
+function PHP12_kupez_gn($prm) {//Купец: выбор номеров газет
 	/*
 		num_2 (Элемент 1): указатель на элемент для вывода количества выбранных номеров
 		num_4 (Элемент 2): указатель на галочку "Указать стоимость вручную"
-		num_5 (Элемент 2): указатель на "Итоговую стоимость"
+		num_5 (Элемент 3): указатель на "Итоговая стоимость"
+		num_6 (Элемент 4): указатель на элемент Текст в объявлениях
 	*/
 
 	return
 	'<script>'.
 		'GN_ATTR=null;'.//объект для создания выбора номеров
 		'GN_CENA=0;'.   //вычисленная цена за один номер в объявлении или рекламе
-		'GN_DOP_TITLE0="'.PHP12_kupez_gnGet_dopTitle0($prm).'";'.//нулевое значение дополнительного параметра
-		'GN_DOP_SPISOK='.PHP12_kupez_gnGet_dop($prm).';'.//дополнительные параметры для объявлений и рекламы
-		'GN_DOP_ASS='.PHP12_kupez_gnGet_dop($prm, 'ass').';'.
-		'GN_ASS='.PHP12_kupez_gnGet_spisok().';'.//список номеров газет
-		'GN_LAST='.PHP12_kupez_gnGet_last().';'.//последний общий номер газеты
+		'GN_DOP_TITLE0="'.PHP12_kupez_gn_dopTitle0($prm).'";'.//нулевое значение дополнительного параметра
+		'GN_DOP_SPISOK='.PHP12_kupez_gn_dop($prm).';'.//дополнительные параметры для объявлений и рекламы
+		'GN_DOP_ASS='.PHP12_kupez_gn_dop($prm, 'ass').';'.
+		'GN_ASS='.PHP12_kupez_gn_spisok($prm).';'.  //список номеров газет
+		'GN_LAST='.PHP12_kupez_gn_last().';'.       //последний общий номер газеты
+		'GN_LAST_SHOW='.LAST_SHOW.';'.              //последний выбранный номер газеты
 		'GN_FREE='.($prm['srce']['dialog_id'] == 1477 ? 4 : 1000).';'.//бесплатный номер
 	'</script>';
 }
-function PHP12_kupez_gnGet_dop($prm, $ret='spisok') {//дополнительне параметры объявлений или рекламы
+function PHP12_kupez_gn_dop($prm, $ret='spisok') {//дополнительне параметры объявлений или рекламы
 	switch($prm['srce']['dialog_id']) {
 		//объявления
 		case 1477: $DLG = _dialogQuery(1481); break;
 		//реклама
-		case 1486: $DLG = _dialogQuery(1490); break;
-		default: return '[]';
+		case 1486:
+		//поздравления
+		case 1487:
+			$DLG = _dialogQuery(1490); break;
+		default: return $ret == 'ass' ? array() : '[]';
 	}
 
 	$sql = "SELECT "._queryCol($DLG)."
@@ -3400,7 +3405,7 @@ function PHP12_kupez_gnGet_dop($prm, $ret='spisok') {//дополнительн�
 
 	return json_encode($send);
 }
-function PHP12_kupez_gnGet_dopTitle0($prm) {//нулевое значение для доп.параметра
+function PHP12_kupez_gn_dopTitle0($prm) {//нулевое значение для доп.параметра
 	switch($prm['srce']['dialog_id']) {
 		//объявления
 		case 1477: return 'Доп.параметр не указан';
@@ -3409,7 +3414,7 @@ function PHP12_kupez_gnGet_dopTitle0($prm) {//нулевое значение д
 	}
 	return '';
 }
-function PHP12_kupez_gnGet_spisok() {//список номеров газеты
+function PHP12_kupez_gn_spisok($prm) {//список номеров газеты
 	$send = array();
 
 	$DLG = _dialogQuery(1489);
@@ -3421,18 +3426,41 @@ function PHP12_kupez_gnGet_spisok() {//список номеров газеты
 	if(!$arr = query_arr($sql))
 		return '{}';
 
-	foreach($arr as $id => $r)
-		array_push($send, "\n".$id.':{'.
-			'week:'.$r['num_1'].','.
-			'gen:'.$r['num_2'].','.
-			'pub:"'.$r['date_2'].'",'.
-			'txt:"'.FullData($r['date_2'], 0, 1, 1).'",'.
-			'pc:'.$r['num_3'].
-		'}');
+	//для доп.параметров: проверка объявление или нет
+	$ISOB = $prm['srce']['dialog_id'] == 1477;
+
+	//выбранные выходы
+	$SEL = PHP12_kupez_gn_sel($prm);
+
+	//последний выбранный номер газеты
+	$LAST_SHOW = 0;
+
+	foreach($arr as $id => $r) {
+		$mass = array();
+		$mass[] = 'gnid:'.$id;
+		$mass[] = 'week:'.$r['num_1'];
+		$mass[] = 'gen:'.$r['num_2'];
+		$mass[] = 'pub:"'.FullData($r['date_2'], 0, 1, 1).'"';
+		$mass[] = 'pc:'.$r['num_3'];
+
+		$mass[] = 'id:'.(isset($SEL[$id]) ? $SEL[$id]['id'] : 0);
+		$mass[] = 'cls:'.(isset($SEL[$id]) ? '" gnsel prev"' : '""');
+		$mass[] = 'dop:'.(isset($SEL[$id]) ? $SEL[$id][$ISOB ? 'num_6' : 'num_7'] : 0);
+		$mass[] = 'pn:'.(isset($SEL[$id]) ? $SEL[$id]['num_8'] : 0);
+		$mass[] = 'cena:'.(isset($SEL[$id]) ? $SEL[$id]['sum_16']*1 : 0);
+		$mass[] = 'skidka:'.(isset($SEL[$id]) ? $SEL[$id]['num_9'] : 0);
+
+		if(isset($SEL[$id]) && $LAST_SHOW < $r['num_2'])
+			$LAST_SHOW = $r['num_2'];
+
+		array_push($send, "\n".$id.':{'.implode(',', $mass).'}');
+	}
+
+	define('LAST_SHOW', $LAST_SHOW);
 
 	return '{'.implode(',', $send).'}';
 }
-function PHP12_kupez_gnGet_last() {//последний общий номер газеты
+function PHP12_kupez_gn_last() {//последний общий номер газеты
 	$DLG = _dialogQuery(1489);
 	$sql = "SELECT `num_2`
 			FROM   "._queryFrom($DLG)."
@@ -3441,4 +3469,114 @@ function PHP12_kupez_gnGet_last() {//последний общий номер г
 			LIMIT 1";
 	return query_value($sql);
 }
+function PHP12_kupez_gn_col($dialog_id) {//получение имени колонки по dialog_id
+	//колонки, соответствующие типам заявок
+	$cols = array(
+		1477 => 'num_2',//объявления
+		1486 => 'num_3',//реклама
+		1487 => 'num_4',//поздравления
+		1495 => 'num_10'//статьи
+	);
 
+	return @$cols[$dialog_id];
+}
+function PHP12_kupez_gn_sel($prm) {//выбранные выходы
+	if(!$u = _unitEdit($prm))
+		return array();
+	if(!$col = PHP12_kupez_gn_col($u['dialog_id']))
+		return array();
+	if(!$DLG = _dialogQuery(1491))
+		return array();
+
+	$sql = "SELECT "._queryCol($DLG)."
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			  AND `".$col."`=".$u['id']."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return array();
+
+	$send = array();
+	foreach($arr as $id => $r)
+		$send[$r['num_5']] = $r;
+
+	return $send;
+}
+function PHP12_kupez_gn_save($cmp, $val, $unit) {
+	if(empty($unit['id']))
+		return;
+	if(!$col = PHP12_kupez_gn_col($unit['dialog_id']))
+		return;
+
+	$save = array();
+	$ids = '0';
+
+	if(!empty($val))
+		if(is_array($val)) {
+			//получение данных о номерах газеты для формирования сотрировки
+			$gns = array();
+			foreach($val as $r)
+				if($gnid = _num($r['gnid']))
+					$gns[] = $gnid;
+
+			$DLG = _dialogQuery(1489);
+			$sql = "SELECT `id`,`num_2`
+					FROM   "._queryFrom($DLG)."
+					WHERE  "._queryWhere($DLG);
+			$ASS = query_ass($sql);
+
+			foreach($val as $r) {
+				if(!$gnid = _num($r['gnid']))
+					continue;
+				if($id = _num($r['id']))
+					$ids .= ','.$id;
+
+				$save[] = '('.
+					$id.','.
+					APP_ID.','.
+					'1491,'.
+					$unit['id'].','.
+					$gnid.','.
+					_num($r['dop']).','.
+					$r['cena'].','.
+					_num(@$ASS[$gnid]).
+				')';
+			}
+		}
+
+	//удаление удалённых выходов
+	//получение выходов, которые можно удалять
+	$DLG = _dialogQuery(1489);
+	$sql = "SELECT `id`
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG)."
+			  AND `date_2`>'".TODAY."'";
+	if($gns = query_ids($sql)) {
+		$sql = "DELETE FROM `_spisok`
+				WHERE `dialog_id`=1491
+				  AND `".$col."`=".$unit['id']."
+				  AND `num_5` IN (".$gns.")
+				  AND `id` NOT IN (".$ids.")";
+		query($sql);
+	}
+
+	if(empty($save))
+		return;
+
+	$colDop = $unit['dialog_id'] == 1477 ? 'num_6' : 'num_7';
+
+	$sql = "INSERT INTO `_spisok` (
+				`id`,
+				`app_id`,
+				`dialog_id`,
+				`".$col."`,
+				`num_5`,
+				`".$colDop."`,
+				`sum_16`,
+				`sort`
+			) VALUES ".implode(',', $save)."
+			ON DUPLICATE KEY UPDATE
+				`".$colDop."`=VALUES(`".$colDop."`),
+				`sum_16`=VALUES(`sum_16`)";
+	query($sql);
+}
