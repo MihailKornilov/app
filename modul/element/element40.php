@@ -391,7 +391,6 @@ function _40cond_col($r) {//получение имени колонки
 	if(!$DLG = _dialogQuery($BL['obj_id']))
 		return "[40] диалога не существует";
 
-
 	return '`'._queryTN($DLG, $col).'`.`'.$col.'`';
 }
 function _40cond_cnn($EL, $r, $v, $prm) {//значение подключаемого списка
