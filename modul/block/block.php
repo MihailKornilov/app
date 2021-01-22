@@ -730,6 +730,10 @@ function _blockDlgId($block_id, $obj_name='') {//получение id диал�
 		return 0;
 
 	switch($BL['obj_name']) {
+		case 'page':
+			if(!$p = _page($BL['obj_id']))
+				break;
+			return $p['dialog_id_unit_get'];
 		case 'dialog': return $BL['obj_id'];
 		case 'spisok': return _elemDlgId($BL['obj_id']);
 		case 'hint': return _hintDlgId($BL);
