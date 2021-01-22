@@ -484,6 +484,8 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 		}
 	}
 
+	//todo повторное получение обновлённых данных записи
+	$unit = IS_ELEM ? _elemOne($unit_id, true) : _spisokUnitQuery($dialog, $unit_id, true);
 
 	_counterGlobal($dialog['id'], $dialog);
 

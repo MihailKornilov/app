@@ -3579,4 +3579,31 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 				`".$colDop."`=VALUES(`".$colDop."`),
 				`sum_16`=VALUES(`sum_16`)";
 	query($sql);
+
+
+	//обновление количеств
+	$sql = "SELECT `id` FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=54
+			  AND `num_1` IN (
+					SELECT `id` FROM `_element`
+					WHERE `dialog_id` IN (29,59)
+					  AND `num_1`=".$unit['dialog_id']."
+			  )";
+	if($ids = query_ids($sql))
+		foreach(_ids($ids, 'arr') as $id)
+			_element54update($id, $unit['id']);
+
+	//обновление сумм
+	$sql = "SELECT `id` FROM `_element`
+			WHERE `app_id`=".APP_ID."
+			  AND `dialog_id`=55
+			  AND `num_1` IN (
+					SELECT `id` FROM `_element`
+					WHERE `dialog_id` IN (29,59)
+					  AND `num_1`=".$unit['dialog_id']."
+			  )";
+	if($ids = query_ids($sql))
+		foreach(_ids($ids, 'arr') as $id)
+			_element55update($id, $unit['id']);
 }
