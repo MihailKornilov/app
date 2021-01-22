@@ -379,6 +379,8 @@ switch(@$_POST['op']) {
 		$prm = array(
 			'blk_choose' => 1,
 			'blk_level' => $level,
+			'blk_deny' => _ids(@$_POST['blk_deny']),
+			'blk_sel' => _ids(@$_POST['blk_sel']),
 			'unit_get' => _pageUnitGet($obj_name, $obj_id)
 		);
 

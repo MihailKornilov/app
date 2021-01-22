@@ -98,12 +98,12 @@ function PHP12_block_choose($prm) {
 
 	return
 	'<div class="fs14 pad10 pl15 bg-orange">'.$title.' <b class="fs14">'.$name.'</b>:</div>'.
-	($prm['dop']['level_deny'] ? '' : PHP12_block_choose_but_level($obj_name, $obj_id)).
+	($prm['dop']['level_deny'] ? '' : PHP12_block_choose_but_level($obj_name, $obj_id, $prm['dop']['sel'])).
 	'<div id="block-choose-div">'.
 		_blockHtml($obj_name, $obj_id, $cond).
 	'</div>';
 }
-function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уровня блоков
+function PHP12_block_choose_but_level($obj_name, $obj_id, $blk_sel) {//кнопки уровня блоков
 	$arr = _blockLevelButArr($obj_name, $obj_id);
 	if(count($arr) < 2)
 		return '';
@@ -113,11 +113,12 @@ function PHP12_block_choose_but_level($obj_name, $obj_id) {//кнопки уро
 		$html .= '<button class="block-choose-level-change vk small ml5 '.$color.'">'.$n.'</button>';
 
 	return
-	'<div class="bg-ffc">'.
+	'<div class="bg7">'.
 		'<table class="bs5 ml10">'.
 			'<tr><td class="clr13">Уровни блоков:'.
 				'<td>'.$html.
 				'<td class="w50 level-hold">'.
+				'<td class="w200 clr9 block-choose-sel" val="0'.($blk_sel ? ','.$blk_sel : '').'">'.
 		'</table>'.
 	'</div>';
 }

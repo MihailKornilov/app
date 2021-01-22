@@ -3700,7 +3700,52 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	PHP12_block_choose = function(el, vvv, obj) {
 		var D = obj.dlg.D,
 			ATR_EL = D(ATTR_EL(el.id)),
-			LEVEL = ATR_EL.find('.block-choose-level-change');
+			LEVEL = ATR_EL.find('.block-choose-level-change'),
+			BLKC = ATR_EL.find('.block-choose-sel'), //хранение выбранных блоков
+			_blkValUpd = function(block_id, sel) {//обновление значения после выбора блоков
+				var ids = BLKC.attr('val').split(','),
+					html = '';
+				if(!sel)
+					_forN(ids, function(id, n) {
+						if(id == block_id)
+							ids.splice(n, 1);
+					});
+				else
+					ids.push(block_id);
+
+				var c = ids.length-1;
+				if(c)
+					html = 'Выбран' + _end(c, [' ', 'о ']) +
+						   (ids.length-1) +
+						   ' блок' + _end(c, ['', 'а', 'ов']) +
+						   ' <a class="clr2">очистить</a>';
+
+				BLKC.attr('val', ids.join())
+					.html(html);
+
+				if(c)
+					BLKC.find('a').click(function() {
+						BLKC.attr('val', '0').html('');
+						ATR_EL.find('.blk-choose').removeClass('sel');
+					});
+
+			},
+			_blockChooseBC = function() {//обновление кликов по блокам
+				var bc = ATR_EL.find('.blk-choose');
+
+				//подсветка блока при выборе
+				bc.click(function() {
+					var t = $(this),
+						v = t.attr('val'),
+						sel = !t.hasClass('sel');
+
+					if(t.hasClass('deny'))
+						return;
+
+					t[(sel ? 'add' : 'remove') + 'Class']('sel');
+					_blkValUpd(v, sel);
+				});
+			};
 
 		//переключение уровней блоков
 		LEVEL.click(function() {
@@ -3710,8 +3755,11 @@ var DIALOG = {},    //массив диалоговых окон для упра
 					block_id:obj.srce.block_id,
 					element_id:obj.srce.element_id,
 					level:_num(t.html()),
+					blk_deny:obj.srce.dop.blk_deny,
+					blk_sel:BLKC.attr('val'),
 					busy_obj:ATR_EL.find('.level-hold')
 				};
+
 			if(t.hasClass('orange'))
 				return;
 
@@ -3720,35 +3768,17 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				LEVEL.removeClass('orange')
 					.addClass('cancel');
 				t.removeClass('cancel').addClass('orange');
-				PHP12_block_choose_bc(el, obj);
+				_blockChooseBC();
 			});
 		});
 
-		PHP12_block_choose_bc(el, obj);
-	},
-	PHP12_block_choose_bc = function(el, obj) {//получение блоков в открытом диалоге для выбора, а также обновление кликов по ним
-		var D = obj.dlg.D,
-			ATR_EL = D(ATTR_EL(el.id)),
-			bc = ATR_EL.find('.blk-choose');
-
-		//подсветка блока при выборе
-		bc.click(function() {
-			var t = $(this),
-				v = t.attr('val'),
-				sel = t.hasClass('sel');
-
-			t[(sel ? 'remove' : 'add') + 'Class']('sel');
-		});
-
-		return bc;
+		_blockChooseBC();
+		_blkValUpd(-1, false);
 	},
 	PHP12_block_choose_get = function(el, obj) {
-		var send = [];
-		_forEq(PHP12_block_choose_bc(el, obj), function(sp) {
-			if(sp.hasClass('sel'))
-				send.push(sp.attr('val'));
-		});
-		return send.join();
+		var D = obj.dlg.D,
+			ATR_EL = D(ATTR_EL(el.id));
+		return ATR_EL.find('.block-choose-sel').attr('val');
 	},
 
 	//[51] Календарь
