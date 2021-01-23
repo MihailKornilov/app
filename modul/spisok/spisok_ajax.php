@@ -395,6 +395,7 @@ switch(@$_POST['op']) {
 		if(!$next = _num($_POST['next']))
 			jsonError('Некорректное значение очередного блока списка');
 
+		$el['mon_cut'] = _txt(@$_POST['mon']);
 		$send['spisok'] = _element88_print($el, array(), $next);
 		jsonSuccess($send);
 		break;

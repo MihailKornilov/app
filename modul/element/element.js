@@ -5345,11 +5345,12 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		return send;
 	},
-	_elem88next = function(t, elem_id, next) {//догрузка списка
+	_elem88next = function(t, elem_id, next, mon) {//догрузка списка
 		var send = {
 			op:'elem88next',
 			elem_id:elem_id,
 			next:next,
+			mon:mon,    //если указано деление по месяцам: отправка последнено выведенного месяца
 			busy_obj:t
 		};
 		_post(send, function(res) {

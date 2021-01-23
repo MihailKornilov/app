@@ -9,6 +9,7 @@ function _element88_struct($el) {
 		'num_4' => _num($el['num_4']),//подсвечивать строку при наведении мыши
 		'num_5' => _num($el['num_5']),//показывать имена колонок
 		'num_6' => _num($el['num_6']),//обратный порядок
+		'num_7' => _num($el['num_7']),//разделять таблицу по месяцам
 		'txt_1' => $el['txt_1'],      //текст, если нет данных
 		'txt_2' => $el['txt_2']       //содержание
 	) + _elementStruct($el);
@@ -84,7 +85,17 @@ function _element88_print($EL, $prm=array(), $next=0) {
 			$spisok[$uid] = $r;
 
 	$TR = '';
+	$MON_CUT = @$EL['mon_cut']; //деление таблицы по месяцам
 	foreach($spisok as $uid => $u) {
+		if($EL['num_7']) {
+			$mon = substr($u['dtime_add'], 0, 7);
+			if($MON_CUT != $mon) {
+				$MON_CUT = $mon;
+				$ex = explode('-', $mon);
+				$TR .= '<tr><td colspan="20" class=" bg6">'.
+								'<div class="ml10 fs15 clr9">'._monthDef($ex[1]).' '.$ex[0].'</div>';
+			}
+		}
 		foreach($SPV_IDS as $n => $dlg_id) {
 			if($u['dialog_id'] != $dlg_id)
 				continue;
@@ -133,7 +144,7 @@ function _element88_print($EL, $prm=array(), $next=0) {
 	$TABLE_BEGIN.
 	_elem88th($EL, $next).
 	$TR.
-	_elem88next($EL, $next).
+	_elem88next($EL, $next, $MON_CUT).
 	$TABLE_END;
 }
 function _elem88cond($el) {//условия из настроек списка
@@ -197,7 +208,7 @@ function _elem88countAll($el) {//общее количество строк сп
 			  _elem77filter($el);
 	return query_value($sql);
 }
-function _elem88next($EL, $next) {//tr-догрузка списка
+function _elem88next($EL, $next, $mon) {//tr-догрузка списка
 	if($EL['num_1'] * ($next + 1) >= $EL['all'])
 		return '';
 
@@ -206,7 +217,7 @@ function _elem88next($EL, $next) {//tr-догрузка списка
 		$count_next = $EL['num_1'];
 
 	return
-	'<tr class="over5 curP center clr15" onclick="_elem88next($(this),'.$EL['id'].','.($next + 1).')">'.
+	'<tr class="over5 curP center clr15" onclick="_elem88next($(this),'.$EL['id'].','.($next + 1).',\''.$mon.'\')">'.
 		'<td colspan="20">'.
 			'<tt class="db '.($EL['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
 				'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
