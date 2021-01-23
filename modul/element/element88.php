@@ -92,8 +92,8 @@ function _element88_print($EL, $prm=array(), $next=0) {
 			if($MON_CUT != $mon) {
 				$MON_CUT = $mon;
 				$ex = explode('-', $mon);
-				$TR .= '<tr><td colspan="20" class=" bg6">'.
-								'<div class="ml10 fs15 clr9">'._monthDef($ex[1]).' '.$ex[0].'</div>';
+				$TR .= '<tr><td colspan="20" class="bg12">'.
+								'<div class="ml10 fs14 b clr9">'._monthDef($ex[1]).' '.$ex[0].'</div>';
 			}
 		}
 		foreach($SPV_IDS as $n => $dlg_id) {
