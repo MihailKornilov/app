@@ -7189,7 +7189,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return send;
 	},
 
-	PHP12_kupez_gn = function(el, vvv) {//Купец: выбор номеров газет
+	PHP12_kupez_gn = function(el) {//Купец: выбор номеров газет
 		GN_ATTR = _attr_cmp(el.id);
 		GN_ATTR.gnGet({
 			attrCount:_attr_el(el.num_2),

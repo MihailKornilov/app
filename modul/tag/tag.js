@@ -2531,11 +2531,17 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		GN_LAST_SHOW = 0;
 	}
 	function gnsManualSet(v) {
+		if(!o.attrManual)
+			return;
+		if(v == undefined)
+			v = o.attrManual ? _num(o.attrManual.val()) : 1;
+
 		MANUAL = v;
-		o.attrSum.attr('readonly', !v);
-		o.attrSum[(v ? 'remove' : 'add') + 'Class']('bg6');
+		o.attrSum[(v ? 'remove' : 'add') + 'Class']('bg6')
+				 .attr('readonly', !v);
 		cenaSet();
 		gnsValUpdate();
+
 		if(v)
 			o.attrSum.select();
 	}
