@@ -2402,11 +2402,10 @@ $.fn.gnGet = function(o, o1) {//номера газет
 	o = $.extend({
 		show:4,     // количество номеров, которые показываются изначально, а также отступ от уже выбранных
 		add:8,      // количество номеров, добавляющихся к показу
-		pn_show:0,  // показывать выбор номеров полос
-		skidka:0,
 		attrCount:null, //указатель на элемент, в котором будет выводиться количество выбранных номеров
 		attrManual:null,//указатель на галочку, которая позволяет вводить сумму вручную
-		attrSum:null    //указатель на поле с Итоговой суммой
+		attrSum:null,   //указатель на поле с Итоговой суммой
+		attrSkidka:null //указатель на поле Скидка
 	}, o);
 
 	if(!o.attrCount)
@@ -2614,8 +2613,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		});
 	}
 	function gnsDopPolosa(nn) {//выпадающий список с номерами полос, если нужен
-		if(!o.pn_show)
-			return;
+return;
 		var dop_id = _num($('#vdop' + nn).val());
 		if(!dop_id || !GAZETA_POLOSA_POLOSA[dop_id]) {
 			$('#pn' + nn).val(0)._dropdown('remove');
@@ -2669,20 +2667,37 @@ $.fn.gnGet = function(o, o1) {//номера газет
 			} else
 				if(MANUAL)
 					c = cena;
-				else {
-					c = GN_CENA ? GN_CENA + (dop ? GN_DOP_ASS[dop] : 0) : 0;
-/*
-					//Определение объявление это или реклама производится на основании pn_show
-					if(o.pn_show) {
-						c = GN_CENA && dop ? GN_CENA * GAZETA_POLOSA_CENA[dop] : 0;
-						if(o.skidka)
-							c = c - c / 100 * o.skidka
+				else
+					switch(GN_TYPE) {
+						case 'ob':
+							c = GN_CENA ? GN_CENA + (dop ? GN_DOP_ASS[dop] : 0) : 0;
+							break;
+						case 'rek':
+							c = GN_CENA * (dop ? GN_DOP_ASS[dop] : 0);
+							c = c - c / 100 * gnsSkidka();
+							break;
 					}
-*/
-				}
 			sp.find('.cena').html(Math.round(c * 100) / 100);
 			sp.find('.exact').val(c);
 		});
+	}
+	function gnsSkidka() {//получение скидки
+		if(!o.attrSkidka)
+			return 0;
+		return _num(o.attrSkidka.val());
+	}
+	function gnsSkidkaPrint(sum) {//печать суммы скидки
+		var ATR = _attr_el(19681);
+		if(!ATR)
+			return;
+		if(!gnsSkidka() || MANUAL)
+			return ATR.html('');
+
+		return ATR.html(
+			'Сумма скидки: ' +
+			(Math.round((sum / (100 - gnsSkidka()) * 100 - sum) * 100) / 100) +
+			' руб.'
+		);
 	}
 	function gnsValUpdate() {//обновление выбранных значений номеров
 		var sum = 0,
@@ -2695,7 +2710,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		if(!MANUAL)
 			o.attrSum.val(Math.round(sum * 100) / 100);
 
-//		skidka_sum:o.skidka ? Math.round((sum / (100 - o.skidka) * 100 - sum) * 100) / 100 : 0
+		gnsSkidkaPrint(sum);
 
 		//вывод количества выбранных номеров
 		var countHtml = 'Выбран' + _end(count, ['', 'о']) + ' ' +

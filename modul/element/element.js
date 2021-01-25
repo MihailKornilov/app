@@ -2994,6 +2994,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			again:el.num_8,
 			func:function(v) {
 				_ELM_ACT(el, v);
+				if(GN_ATTR)
+					GN_ATTR.gnGet('update');
 			}
 		};
 		if(el.num_1 == 3681) {
@@ -7194,12 +7196,25 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		GN_ATTR.gnGet({
 			attrCount:_attr_el(el.num_2),
 			attrManual:_attr_cmp(el.num_4),
-			attrSum:_attr_cmp(el.num_5)
+			attrSum:_attr_cmp(el.num_5),
+			attrSkidka:_attr_cmp(el.num_6)
 		});
 
 		//обновление счётчика символов объявления
-		if(el.num_6)
+		if(GN_TYPE == 'ob' && el.num_6)
 			_attr_cmp(el.num_6).trigger('keyup');
+
+		//получение площади рекламы
+		if(GN_TYPE == 'rek') {
+			_attr_cmp(18950).keyup(function() {
+				GN_CENA = _attr_cmp(18954).val()*1;//площадь объявления рекламы
+				GN_ATTR.gnGet('update');
+			});
+			_attr_cmp(18952).keyup(function() {
+				GN_CENA = _attr_cmp(18954).val()*1;
+				GN_ATTR.gnGet('update');
+			});
+		}
 	},
 	PHP12_kupez_gn_get = function(el) {
 		var send = [];

@@ -3363,7 +3363,16 @@ function PHP12_kupez_gn($prm) {//Купец: выбор номеров газе�
 		'GN_LAST='.PHP12_kupez_gn_last().';'.       //последний общий номер газеты
 		'GN_LAST_SHOW='.LAST_SHOW.';'.              //последний выбранный номер газеты
 		'GN_FREE='.($prm['srce']['dialog_id'] == 1477 ? 4 : 1000).';'.//бесплатный номер
+		'GN_TYPE="'.PHP12_kupez_gn_type($prm).'";'.//бесплатный номер
 	'</script>';
+}
+function PHP12_kupez_gn_type($prm) {
+	switch($prm['srce']['dialog_id']) {
+		case 1477: return 'ob';
+		case 1486: return 'rek';
+		case 1487: return 'poz';
+	}
+	return '';
 }
 function PHP12_kupez_gn_dop($prm, $ret='spisok') {//дополнительне параметры объявлений или рекламы
 	switch($prm['srce']['dialog_id']) {
