@@ -3588,7 +3588,8 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 			) VALUES ".implode(',', $save)."
 			ON DUPLICATE KEY UPDATE
 				`".$colDop."`=VALUES(`".$colDop."`),
-				`sum_16`=VALUES(`sum_16`)";
+				`sum_16`=VALUES(`sum_16`),
+				`num_9`=VALUES(`num_9`)";
 	query($sql);
 
 
