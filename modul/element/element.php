@@ -3381,8 +3381,7 @@ function PHP12_kupez_gn_dop($prm, $ret='spisok') {//дополнительне �
 		//реклама
 		case 1486:
 		//поздравления
-		case 1487:
-			$DLG = _dialogQuery(1490); break;
+		case 1487: $DLG = _dialogQuery(1490); break;
 		default: return $ret == 'ass' ? array() : '[]';
 	}
 
@@ -3397,17 +3396,19 @@ function PHP12_kupez_gn_dop($prm, $ret='spisok') {//дополнительне �
 	switch($ret) {
 		default:
 		case 'spisok':
-			foreach($arr as $id => $r) {
+			foreach($arr as $id => $r)
 				$send[] = array(
 					'id' => $id,
 					'title' => $r['txt_1']
 				);
-			}
 			break;
 
 		case 'ass':
 			foreach($arr as $id => $r)
-				$send[$id] = $r['num_1'];
+				$send[$id] = array(
+					'sum' => $r['num_1'],
+					'pnp' => $r['num_2']
+				);
 	}
 
 	$send = _arrNum($send);
@@ -3446,16 +3447,16 @@ function PHP12_kupez_gn_spisok($prm) {//список номеров газеты
 
 	foreach($arr as $id => $r) {
 		$mass = array();
-		$mass[] = 'gnid:'.$id;
-		$mass[] = 'week:'.$r['num_1'];
-		$mass[] = 'gen:'.$r['num_2'];
-		$mass[] = 'pub:"'.FullData($r['date_2'], 0, 1, 1).'"';
-		$mass[] = 'pc:'.$r['num_3'];
+		$mass[] = 'gnid:'.$id;              //ID номера выхода
+		$mass[] = 'week:'.$r['num_1'];      //номер недели
+		$mass[] = 'gen:'.$r['num_2'];       //общий порядковый номер
+		$mass[] = 'pub:"'.FullData($r['date_2'], 0, 1, 1).'"';//дата выхода
+		$mass[] = 'pc:'.$r['num_3'];        //количество полос в номере (PolosaCount)
 
 		$mass[] = 'id:'.(isset($SEL[$id]) ? $SEL[$id]['id'] : 0);
 		$mass[] = 'cls:'.(isset($SEL[$id]) ? '" gnsel prev"' : '""');
 		$mass[] = 'dop:'.(isset($SEL[$id]) ? $SEL[$id][$ISOB ? 'num_6' : 'num_7'] : 0);
-		$mass[] = 'pn:'.(isset($SEL[$id]) ? $SEL[$id]['num_8'] : 0);
+		$mass[] = 'pn:'.(isset($SEL[$id]) ? $SEL[$id]['num_8'] : 0);    //номер полосы
 		$mass[] = 'cena:'.(isset($SEL[$id]) ? $SEL[$id]['sum_16']*1 : 0);
 		$mass[] = 'skidka:'.(isset($SEL[$id]) ? $SEL[$id]['num_9'] : 0);
 
@@ -3550,6 +3551,7 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 					$unit['id'].','.
 					$gnid.','.
 					_num($r['dop']).','.
+					_num($r['pn']).','.
 					$r['cena'].','.
 					$skidka.','.
 					$skidkaSum.','.
@@ -3586,6 +3588,7 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 				`".$col."`,
 				`num_5`,
 				`".$colDop."`,
+				`num_8`,
 				`sum_16`,
 				`num_9`,
 				`sum_17`,

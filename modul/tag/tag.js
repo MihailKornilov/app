@@ -1903,8 +1903,11 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		case 'object': break;
 		case 'number':
 		case 'string':
+			if(!S)
+				return t;
 			switch(o) {
 				case 'remove':
+					console.log(S);
 					S.next().remove('._dropdown');
 					return false;
 			}
@@ -2467,6 +2470,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 			th.attr('data-id', 0);
 
 			gnsDop(v, sel);
+			gnsDopPolosa(v);
 			cenaSet();
 			gnsValUpdate();
 		});
@@ -2545,8 +2549,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 			o.attrSum.select();
 	}
 	function gnsPrint(start, count) {// Вывод списка номеров
-		var //polosa = _toAss(GAZETA_POLOSA_SPISOK),
-			html = '',
+		var html = '',
 			skidka = gnsSkidka(),
 			last = 0;//хранение последнего выведенного номера
 
@@ -2585,7 +2588,6 @@ $.fn.gnGet = function(o, o1) {//номера газет
 									'<td class="cena">' + (Math.round(sp.cena * 100) / 100) +
 							'</table>' +
 						'<td class="pl10">' +
-//  						(polosa[dop] ? polosa[dop] : '') +
 							'<input type="hidden" id="vdop' + gnid + '" class="vdop" value="' + sp.dop + '" /> ' +
 							'<input type="hidden" id="pn' + gnid + '" class="pn" value="' + sp.pn + '" />' +
 				'</table>';
@@ -2595,7 +2597,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		ATTR_GNS.animate({height:(ATTR_GNS.find('.gns-week').length * pix + 19) + 'px'}, 300);
 		gnsAA(function(sp, nn) {
 			gnsDop(nn, 1);
-//			gnsDopPolosa(nn);
+			gnsDopPolosa(nn);
 		});
 	}
 	function gnsDop(nn, sel) {//выпадающий список с дополнительным параметром для конкретного номера газеты
@@ -2614,15 +2616,19 @@ $.fn.gnGet = function(o, o1) {//номера газет
 		});
 	}
 	function gnsDopPolosa(nn) {//выпадающий список с номерами полос, если нужен
-return;
-		var dop_id = _num($('#vdop' + nn).val());
-		if(!dop_id || !GAZETA_POLOSA_POLOSA[dop_id]) {
-			$('#pn' + nn).val(0)._dropdown('remove');
+		if(GN_TYPE == 'ob')
 			return;
-		}
+
+		var dop_id = _num($('#vdop' + nn).val());
+
+		if(!dop_id || !GN_DOP_ASS[dop_id].pnp)
+			return $('#pn' + nn).val(0)._dropdown('remove');
+
 		var pc = [];
+
 		for(var n = 2; n < GN_ASS[nn].pc; n++)
-			pc.push({uid:n,title:n + '-я'});
+			pc.push({id:n,title:n + '-я'});
+
 		$('#pn' + nn)._dropdown({
 			title0:'??',
 			spisok:pc,
@@ -2675,7 +2681,7 @@ return;
 							c = GN_CENA ? GN_CENA + (dop ? GN_DOP_ASS[dop] : 0) : 0;
 							break;
 						case 'rek':
-							c = GN_CENA * (dop ? GN_DOP_ASS[dop] : 0);
+							c = GN_CENA * (dop ? GN_DOP_ASS[dop].sum : 0);
 							c = c - c / 100 * skidka;
 							break;
 					}

@@ -275,6 +275,7 @@ var ZINDEX = 1000,
 		return _num(ids.split(',')[0]);
 	},
 	_pr = function(v) {//представление массива в виде таблицы
+		return '';
 		if(v instanceof jQuery)
 			return '<div class="fs11 clr5">jQuery</div>';
 		var send = '<div class="dib bor1 pad5 mt2 bg6">' +
