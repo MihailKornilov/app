@@ -2656,7 +2656,8 @@ return;
 	}
 	function cenaSet() {//установка цены в выбранные номера
 		var free = GN_FREE,
-			cena = cenaGet();
+			cena = cenaGet(),
+			skidka = gnsSkidka();
 
 		gnsAA(function(sp, nn) {
 			var c = 0,
@@ -2675,9 +2676,10 @@ return;
 							break;
 						case 'rek':
 							c = GN_CENA * (dop ? GN_DOP_ASS[dop] : 0);
-							c = c - c / 100 * gnsSkidka();
+							c = c - c / 100 * skidka;
 							break;
 					}
+			sp.find('.skidka').val(skidka);
 			sp.find('.cena').html(Math.round(c * 100) / 100);
 			sp.find('.exact').val(c);
 		});
