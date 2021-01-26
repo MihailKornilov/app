@@ -3539,6 +3539,9 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 					continue;
 				if($id = _num($r['id']))
 					$ids .= ','.$id;
+				$skidkaSum = 0;
+				if($skidka = _num($r['skidka']))
+					$skidkaSum = round(($r['cena'] / (100 - $skidka) * 100 - $r['cena']), 2);
 
 				$save[] = '('.
 					$id.','.
@@ -3548,7 +3551,8 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 					$gnid.','.
 					_num($r['dop']).','.
 					$r['cena'].','.
-					_num($r['skidka']).','.
+					$skidka.','.
+					$skidkaSum.','.
 					_num(@$ASS[$gnid]).
 				')';
 			}
@@ -3584,12 +3588,14 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 				`".$colDop."`,
 				`sum_16`,
 				`num_9`,
+				`sum_17`,
 				`sort`
 			) VALUES ".implode(',', $save)."
 			ON DUPLICATE KEY UPDATE
 				`".$colDop."`=VALUES(`".$colDop."`),
 				`sum_16`=VALUES(`sum_16`),
-				`num_9`=VALUES(`num_9`)";
+				`num_9`=VALUES(`num_9`),
+				`sum_17`=VALUES(`sum_17`)";
 	query($sql);
 
 
