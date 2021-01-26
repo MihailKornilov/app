@@ -2547,6 +2547,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 	function gnsPrint(start, count) {// Вывод списка номеров
 		var //polosa = _toAss(GAZETA_POLOSA_SPISOK),
 			html = '',
+			skidka = gnsSkidka(),
 			last = 0;//хранение последнего выведенного номера
 
 		if(!count)
@@ -2579,7 +2580,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 										'<span class="clr1 ml3 fs12">(' + sp.gen + ')</span>' +
 									'<td class="pad3 clr9 fs12 r">' +
 										'<span class="clr1 ml3 fs12">выход</span> ' + sp.pub +
-										'<input type="hidden" class="skidka" value="' + sp.skidka + '" />' + //скидка в процентах
+										'<input type="hidden" class="skidka" value="' + skidka + '" />' + //скидка в процентах
 										'<input type="hidden" class="exact" value="' + sp.cena + '" />' + //точная цена: миллионные доли
 									'<td class="cena">' + (Math.round(sp.cena * 100) / 100) +
 							'</table>' +
@@ -2690,7 +2691,7 @@ return;
 		var ATR = _attr_el(19681);
 		if(!ATR)
 			return;
-		if(!gnsSkidka() || MANUAL)
+		if(!gnsSkidka() || !sum || MANUAL)
 			return ATR.html('');
 
 		return ATR.html(

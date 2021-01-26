@@ -3548,6 +3548,7 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 					$gnid.','.
 					_num($r['dop']).','.
 					$r['cena'].','.
+					_num($r['skidka']).','.
 					_num(@$ASS[$gnid]).
 				')';
 			}
@@ -3582,6 +3583,7 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 				`num_5`,
 				`".$colDop."`,
 				`sum_16`,
+				`num_9`,
 				`sort`
 			) VALUES ".implode(',', $save)."
 			ON DUPLICATE KEY UPDATE

@@ -7214,6 +7214,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				GN_CENA = _attr_cmp(18954).val()*1;
 				GN_ATTR.gnGet('update');
 			});
+			_attr_cmp(18950).trigger('keyup');
 		}
 	},
 	PHP12_kupez_gn_get = function(el) {
