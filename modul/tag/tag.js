@@ -2678,7 +2678,7 @@ $.fn.gnGet = function(o, o1) {//номера газет
 				else
 					switch(GN_TYPE) {
 						case 'ob':
-							c = GN_CENA ? GN_CENA + (dop ? GN_DOP_ASS[dop] : 0) : 0;
+							c = GN_CENA ? GN_CENA + (dop ? GN_DOP_ASS[dop].sum : 0) : 0;
 							break;
 						case 'rek':
 							c = GN_CENA * (dop ? GN_DOP_ASS[dop].sum : 0);

@@ -3404,11 +3404,11 @@ function PHP12_kupez_gn_dop($prm, $ret='spisok') {//дополнительне �
 			break;
 
 		case 'ass':
-			foreach($arr as $id => $r)
-				$send[$id] = array(
-					'sum' => $r['num_1'],
-					'pnp' => $r['num_2']
-				);
+			foreach($arr as $id => $r) {
+				$send[$id]['sum'] = $r['num_1'];
+				if(isset($r['num_2']))
+					$send[$id]['pnp'] = $r['num_2'];
+			}
 	}
 
 	$send = _arrNum($send);
