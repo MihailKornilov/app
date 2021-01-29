@@ -874,11 +874,19 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 
 	//установка порядкового номера
 	if($tab = _queryTN($DLG, 'num', 1)) {
+		$ngIds = $dialog_id;
+		if($ng = $DLG['num_group']) {
+			$sql = "SELECT `id`
+					FROM `_dialog`
+					WHERE `num_group`=".$ng;
+			if($ids = query_ids($sql))
+				$ngIds = $ids;
+		}
 		$sql = "SELECT IFNULL(MAX(`num`),0)+1
 				FROM `".$tab."`
-				WHERE `app_id`=".APP_ID."
-				  AND `dialog_id`=".$dialog_id;
+				WHERE `dialog_id` IN (".$ngIds.")";
 		$num = query_value($sql);
+
 		$sql = "UPDATE `".$tab."`
 				SET `num`=".$num."
 				WHERE `id`=".$uid[$tab];

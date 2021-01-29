@@ -907,6 +907,12 @@ function _dialogSetupService($DLG) {
 						   )).
 
 				'<tr><td colspan="2" class="line-t">&nbsp;'.
+
+				'<tr><td class="clr1 r topi">Общий порядковый номер:'.
+					'<td><input type="hidden" id="num_group" value="'._dialogSetupServiceNumGroupIds($DLG).'" />'.
+
+				'<tr><td colspan="2" class="line-t">&nbsp;'.
+
 				'<tr><td>'.
 					'<td>'._check(array(
 								'attr_id' => 'open_auto',
@@ -1124,6 +1130,16 @@ function _dialogSetupServiceButton($DLG) {//диалог используетс�
 	$send .= '</table>';
 
 	return $send;
+}
+function _dialogSetupServiceNumGroupIds($DLG) {
+	if(!$DLG['num_group'])
+		return '';
+
+	$sql = "SELECT `id`
+			FROM `_dialog`
+			WHERE `id`!=".$DLG['id']."
+			  AND `num_group`=".$DLG['num_group'];
+	return query_ids($sql);
 }
 
 function _dialogSetupRule($dialog_id) {//Правила для элемета
@@ -1455,6 +1471,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	query($sql);
 
 	_dialogSaveSA($dialog_id);
+	_dialogSaveNumGroup($dialog_id);
 
 	_BE('dialog_clear');
 	_cache_clear('RULE_USE', 1);
@@ -1522,6 +1539,65 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 							(".$dialog_id.",".$id.")";
 				query($sql);
 			}
+}
+function _dialogSaveNumGroup($dialog_id) {//формирование группировки порядкового номера
+	$num_group = _dialogParam($dialog_id, 'num_group');
+
+	if(!$ids = _ids($_POST['num_group'])) {
+		if(!$num_group)
+			return;
+
+		//удаление группировки
+		$sql = "UPDATE `_dialog`
+				SET `num_group`=0
+				WHERE `num_group`=".$num_group;
+		query($sql);
+
+		return;
+	}
+
+	//получение диалогов, которые будут сгруппированы
+	$sql = "SELECT `id`
+			FROM `_dialog`
+			WHERE `app_id`=".APP_ID."
+			  AND !`parent_any`
+			  AND !`dialog_id_parent`
+			  AND `num_group` IN (0,".$num_group.")
+			  AND `id`!=".$dialog_id."
+			  AND `id` IN (".$ids.")";
+	if(!$ids = query_ids($sql)) {
+		if(!$num_group)
+			return;
+
+		//удаление группировки
+		$sql = "UPDATE `_dialog`
+				SET `num_group`=0
+				WHERE `num_group`=".$num_group;
+		query($sql);
+
+		return;
+	}
+
+	$ids = _ids($ids, 'arr');
+
+	array_push($ids, $dialog_id);
+
+	if(!$num_group) {
+		$sql = "SELECT IFNULL(MAX(`num_group`),0)+1 FROM `_dialog`";
+		$num_group = query_value($sql);
+	} else {
+		//удаление диалогов из группировки
+		$sql = "UPDATE `_dialog`
+				SET `num_group`=0
+				WHERE `num_group`=".$num_group."
+				  AND `id` NOT IN ("._ids($ids).")";
+		query($sql);
+	}
+
+	$sql = "UPDATE `_dialog`
+			SET `num_group`=".$num_group."
+			WHERE `id` IN ("._ids($ids).")";
+	query($sql);
 }
 
 function _dialogOpenParam($dlg) {//все возможные параметны для диалогового окна
