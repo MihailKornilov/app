@@ -909,7 +909,7 @@ function _dialogSetupService($DLG) {
 				'<tr><td colspan="2" class="line-t">&nbsp;'.
 
 				'<tr><td class="clr1 r topi">Общий порядковый номер:'.
-					'<td><input type="hidden" id="num_group" value="'._dialogSetupServiceNumGroupIds($DLG).'" />'.
+					'<td><input type="hidden" id="spisok_num_group" value="'._dialogSetupServiceNumGroupIds($DLG).'" />'.
 
 				'<tr><td colspan="2" class="line-t">&nbsp;'.
 
@@ -1132,13 +1132,13 @@ function _dialogSetupServiceButton($DLG) {//диалог используетс�
 	return $send;
 }
 function _dialogSetupServiceNumGroupIds($DLG) {
-	if(!$DLG['num_group'])
+	if(!$DLG['spisok_num_group'])
 		return '';
 
 	$sql = "SELECT `id`
 			FROM `_dialog`
 			WHERE `id`!=".$DLG['id']."
-			  AND `num_group`=".$DLG['num_group'];
+			  AND `spisok_num_group`=".$DLG['spisok_num_group'];
 	return query_ids($sql);
 }
 
@@ -1541,16 +1541,16 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 			}
 }
 function _dialogSaveNumGroup($dialog_id) {//формирование группировки порядкового номера
-	$num_group = _dialogParam($dialog_id, 'num_group');
+	$spisok_num_group = _dialogParam($dialog_id, 'spisok_num_group');
 
-	if(!$ids = _ids($_POST['num_group'])) {
-		if(!$num_group)
+	if(!$ids = _ids($_POST['spisok_num_group'])) {
+		if(!$spisok_num_group)
 			return;
 
 		//удаление группировки
 		$sql = "UPDATE `_dialog`
-				SET `num_group`=0
-				WHERE `num_group`=".$num_group;
+				SET `spisok_num_group`=0
+				WHERE `spisok_num_group`=".$spisok_num_group;
 		query($sql);
 
 		return;
@@ -1562,17 +1562,17 @@ function _dialogSaveNumGroup($dialog_id) {//формирование групп�
 			WHERE `app_id`=".APP_ID."
 			  AND !`parent_any`
 			  AND !`dialog_id_parent`
-			  AND `num_group` IN (0,".$num_group.")
+			  AND `spisok_num_group` IN (0,".$spisok_num_group.")
 			  AND `id`!=".$dialog_id."
 			  AND `id` IN (".$ids.")";
 	if(!$ids = query_ids($sql)) {
-		if(!$num_group)
+		if(!$spisok_num_group)
 			return;
 
 		//удаление группировки
 		$sql = "UPDATE `_dialog`
-				SET `num_group`=0
-				WHERE `num_group`=".$num_group;
+				SET `spisok_num_group`=0
+				WHERE `spisok_num_group`=".$spisok_num_group;
 		query($sql);
 
 		return;
@@ -1582,20 +1582,20 @@ function _dialogSaveNumGroup($dialog_id) {//формирование групп�
 
 	array_push($ids, $dialog_id);
 
-	if(!$num_group) {
-		$sql = "SELECT IFNULL(MAX(`num_group`),0)+1 FROM `_dialog`";
-		$num_group = query_value($sql);
+	if(!$spisok_num_group) {
+		$sql = "SELECT IFNULL(MAX(`spisok_num_group`),0)+1 FROM `_dialog`";
+		$spisok_num_group = query_value($sql);
 	} else {
 		//удаление диалогов из группировки
 		$sql = "UPDATE `_dialog`
-				SET `num_group`=0
-				WHERE `num_group`=".$num_group."
+				SET `spisok_num_group`=0
+				WHERE `spisok_num_group`=".$spisok_num_group."
 				  AND `id` NOT IN ("._ids($ids).")";
 		query($sql);
 	}
 
 	$sql = "UPDATE `_dialog`
-			SET `num_group`=".$num_group."
+			SET `spisok_num_group`=".$spisok_num_group."
 			WHERE `id` IN ("._ids($ids).")";
 	query($sql);
 }

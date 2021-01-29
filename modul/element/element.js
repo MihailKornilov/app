@@ -497,7 +497,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			write:1,
 			spisok:o.dlg_spisok_on
 		});
-		DLG('#num_group')._select({
+		DLG('#spisok_num_group')._select({
 			width:250,
 			title0:'нет',
 			write:1,
@@ -603,7 +603,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 				page_id:PAGE_ID,
 				dialog_id:o.dialog_id,
 				dialog_id_parent:DLG('#dialog_id_parent').val(),
-				num_group:DLG('#num_group').val(),
+				spisok_num_group:DLG('#spisok_num_group').val(),
 				is_unit_get:DLG('#is_unit_get').val(),
 
 				name:DLG('#dialog_name').val(),

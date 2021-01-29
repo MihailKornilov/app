@@ -875,10 +875,10 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 	//установка порядкового номера
 	if($tab = _queryTN($DLG, 'num', 1)) {
 		$ngIds = $dialog_id;
-		if($ng = $DLG['num_group']) {
+		if($ng = $DLG['spisok_num_group']) {
 			$sql = "SELECT `id`
 					FROM `_dialog`
-					WHERE `num_group`=".$ng;
+					WHERE `spisok_num_group`=".$ng;
 			if($ids = query_ids($sql))
 				$ngIds = $ids;
 		}
