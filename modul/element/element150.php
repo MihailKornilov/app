@@ -7,6 +7,9 @@ function _element150_struct($el) {
 	) + _elementStruct($el);
 }
 function _element150_print($el, $prm) {
+	if(!$el['num_1'])
+		return '';
+
 	return _check(array(
 		'attr_id' => _elemAttrId($el, $prm),
 		'disabled' => $prm['blk_setup']
