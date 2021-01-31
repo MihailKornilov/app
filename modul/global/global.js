@@ -275,24 +275,54 @@ var ZINDEX = 1000,
 		return _num(ids.split(',')[0]);
 	},
 	_pr = function(v) {//представление массива в виде таблицы
-		return '';
 		if(v instanceof jQuery)
 			return '<div class="fs11 clr5">jQuery</div>';
+
 		var send = '<div class="dib bor1 pad5 mt2 bg6">' +
 				   '<table>',
-			i;
+			i,
+			txt;
+
 		for(i in v) {
-			var txt = v[i];
-			if(typeof v[i] == 'object')
-				txt = _pr(v[i]);
-			if(typeof v[i] == 'function')
-				txt = '<div class="fs11 clr14">Function</div>';
-			if(typeof v[i] == 'undefined')
-				txt = '<div class="fs11 clr2">undefined</div>';
+			switch(typeof v[i]) {
+				default:
+				case 'number':
+					txt = v[i];
+					break;
+				case 'string':
+					txt = '<span class="clr3 i">"</span>' +
+						  (v[i] ? '<span class="clr9 i">' + v[i] + '</span>' : '') +
+						  '<span class="clr3 i">"</span>';
+					break;
+				case 'object':
+					if(v[i] == null) {
+						txt = '<div class="fs11 clr2">null</div>';
+						break;
+					}
+					if(v[i].length == undefined) {
+						txt = _pr(v[i]);
+						break;
+					}
+					if(!v[i].length) {
+						txt = '<div class="fs11 clr2">[]</div>';
+						break;
+					}
+					txt = _pr(v[i]);
+					break;
+				case 'function':
+					txt = '<div class="fs11 clr14">Function</div>';
+					break;
+				case 'undefined':
+					txt = '<div class="fs11 clr2">undefined</div>';
+					break;
+			}
+
 			send += '<tr><td class="r top b pr3">' + i + ': ' +
 						'<td>' + txt;
 		}
+
 		send += '</table></div>';
+
 		return send;
 	},
 	_bug = function(block_id) {//вставка количества ошибок по каждому виду структуры приложения (страница 132)
