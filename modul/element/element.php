@@ -3177,6 +3177,7 @@ function PHP12_schetPayContent_vvv($prm) {
 			continue;
 
 		$txt = trim(strip_tags(_element('print11', 17834, $u)));
+		$txt = preg_replace('/[\s]{2,}/', ' ', $txt);
 		$hash = md5($txt.$spisok[$id]['num_6']);
 
 		//группировка одинаковых строк
