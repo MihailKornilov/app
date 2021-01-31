@@ -46,6 +46,7 @@ function _element40_vvv($el, $prm) {//получение id диалога на 
 	$dss = _elem40dss_11($prm, $dss);
 	$dss = _elem40dss_dialog($prm, $dss);
 	$dss = _elem40dss_hint($prm, $dss);
+	$dss = _elem40dss_parent($prm, $dss);
 
 	return $dss;
 }
@@ -194,6 +195,18 @@ function _elem40dss_hint($prm, $dss) {//получение id диалога и�
 		return 0;
 
 	return _blockDlgId($hint['block_id']);
+}
+function _elem40dss_parent($prm, $dss) {//получение id диалога на основании родительского элемента
+	if($dss)
+		return $dss;
+	if(!$el = _elemOne($prm['srce']['element_id']))
+		return 0;
+	if(!$ell = _elemOne($el['parent_id']))
+		return 0;
+	if($ell['dialog_id'] != 44)
+		return 0;
+
+	return _blockDlgId($ell['block_id']);
 }
 function _elem40res($filter, $u) {
 	$send = true;
