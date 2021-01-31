@@ -3068,8 +3068,9 @@ function PHP12_schetPayContent_save($cmp, $val, $unit) {
 				if(!$cena = _cena($r['cena']))
 					continue;
 
-				if($id = _num($r['id']))
-					$ids[] = $id;
+				if($id = _ids($r['id']))
+					foreach(_ids($r['id'], 'arr') as $i)
+						$ids[] = $i;
 
 				$save[] = array(
 					'id' => $id,
@@ -3170,21 +3171,36 @@ function PHP12_schetPayContent_vvv($prm) {
 
 	$spisok = _spisokInclude($spisok);
 
-	$send = array();
+	$mass = array();
 	foreach(_ids($ids, 'arr') as $id) {
 		if(!$u = @$spisok[$id])
 			continue;
 
-		$send[] = array(
+		$txt = trim(strip_tags(_element('print11', 17834, $u)));
+		$hash = md5($txt.$spisok[$id]['num_6']);
+
+		//группировка одинаковых строк
+		if(isset($mass[$hash])) {
+			$mass[$hash]['id'] .= ','.$id;
+			$mass[$hash]['count']++;
+			$mass[$hash]['sum'] = $mass[$hash]['count'] * $mass[$hash]['cena'];
+			continue;
+		}
+
+		$mass[$hash] = array(
 			'id' => $id,
-			'txt' => strip_tags(_element('print11', 17834, $u)),
+			'txt' => $txt,
 			'count' => 1,
 			'cena' => $spisok[$id]['num_6'],
 			'sum' => $spisok[$id]['num_6']
 		);
 	}
 
-	return $send;
+	$send = array();
+	foreach($mass as $r)
+		$send[] = $r;
+
+	return _arrNum($send);
 }
 function PHP12_schetPayContent_vvv_count($prm) {//количество строк в содержании счёта
 	$el12 = $prm['el12'];
