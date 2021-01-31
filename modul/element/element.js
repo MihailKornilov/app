@@ -5824,6 +5824,30 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		idsSet();
 	},
 
+	//[150] Выделение/снятие всех галочек в списке
+	_EL150 = function(el) {
+		if(!el.num_1)
+			return;
+
+		var EL_CHK = _attr_el(el.num_1).find('._check');
+		if(!EL_CHK.length)
+			return;
+
+		CHK = {};
+		_attr_cmp(el.id)._check({
+			func:function(v) {
+				var arr = [];
+				_forEq(EL_CHK, function(eq) {
+					eq.prev()._check(v);
+					if(v)
+						arr.push(_num(eq.attr('id').split('_')[1]));
+				});
+				CHK[el.num_1] = arr.join();
+			}
+		});
+
+	},
+
 	//[300] Привязка пользователя к странице ВК
 	_EL300 = function(el) {
 		var VK300 = $(ATTR_CMP(el.id)).next(),
