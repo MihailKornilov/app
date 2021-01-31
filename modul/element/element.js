@@ -5830,10 +5830,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		var EL_CHK = _attr_el(el.num_1).find('._check');
-		if(!EL_CHK.length) {
-			_attr_el(el.id)._dn();
-			return;
-		}
+		if(!EL_CHK.length)
+			return _attr_el(el.id)._dn();
 
 		CHK = {};
 		_attr_cmp(el.id)._check({
