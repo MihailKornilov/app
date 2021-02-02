@@ -7,6 +7,7 @@ function _element12_struct($el) {
 	*/
 	return array(
 		'txt_1' => $el['txt_1'],      //имя функции (начинается с PHP12)
+		'num_7' => _num($el['num_7']),//список (для указания связки)
 		'txt_2' => $el['txt_2'],      //значение 1
 		'txt_3' => $el['txt_3'],      //значение 2
 		'txt_4' => $el['txt_4'],      //значение 3
@@ -15,7 +16,9 @@ function _element12_struct($el) {
 		'num_4' => _num($el['num_4']),//элемент 2 (диалог)
 		'num_5' => _num($el['num_5']),//элемент 3 (диалог)
 		'num_6' => _num($el['num_6']),//элемент 4 (диалог)
-		'num_3' => _num($el['num_3']) //элемент 5 (страницa)
+		'num_3' => _num($el['num_3']),//элемент 5 (страницa)
+
+		'issp' => _num($el['num_7'])
 	) + _elementStruct($el);
 }
 function _element12_title($el) {
