@@ -98,13 +98,17 @@ function _elem72Sum($EL, $year) {//получение сумм для фильт
 	return $spisok;
 }
 function _elem72filter($el) {//фильтр: год и месяц
-	foreach(_filter('spisok', $el['id']) as $r)
-		if($r['elem']['dialog_id'] == 72) {
-			$col = 'dtime_add';
-			if($col5 = _elemCol($r['elem']['num_5']))
-				$col = $col5;
-			return " AND `t1`.`".$col."` LIKE '".$r['v']."-%'";
-		}
+	foreach(_filter('spisok', $el['id']) as $r) {
+		if($r['elem']['dialog_id'] != 72)
+			continue;
+		if(_filterIgnore($r['elem']))
+			continue;
+
+		$col = 'dtime_add';
+		if($col5 = _elemCol($r['elem']['num_5']))
+			$col = $col5;
+		return " AND `t1`.`".$col."` LIKE '".$r['v']."-%'";
+	}
 
 	return '';
 }
