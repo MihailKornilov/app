@@ -37,14 +37,14 @@ var _ids = function(v, count) {
 		t._hint({
 			msg:'<div class="pad5">' +
 					'<table class="w100p line-b">' +
-						'<tr><td class="w50">' +
+						'<tr><td class="w70">' +
 								'<a val="dialog_id:117,get_id:' + BL.id + '"' +
 								  ' data-tool="info #' + BL.id + '"' +
 								  ' class="dialog-open fs16 clr15 tool">' +
 									'Блок' +
 								'</a>' +
-								'<span class="ml20 fs16 clr3 curD tool" data-tool="Ширина блока">w' + BL.width + '</span>' +
-							'<td class="w90 r pb2">' +
+								'<span class="dib fr fs16 clr3 curD tool" data-tool="Ширина блока">w' + BL.width + '</span>' +
+							'<td class="w70 r pb2">' +
 								'<div val="dialog_id:230,block_id:' + BL.id + '"' +
 									' class="icon icon-eye pl dialog-open ml3 tool-l"' +
 									' data-tool="Условия отображения">' +
