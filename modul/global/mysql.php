@@ -359,6 +359,9 @@ function _queryWhere($DLG, $withDel=0) {//составление условий 
 			if(isset($tab[12])) {
 				$send[] = "`".$tab[32]."`.`user_id`="._queryCol_id($DLG);
 				$send[] = "`".$tab[32]."`.`app_id`=".APP_ID;
+
+				$tn = _queryTN($DLG, 'app_id');
+				$send[] = "`".$tn."`.`app_id`=".APP_ID;
 			}
 			break;
 		}
@@ -380,7 +383,7 @@ function _queryWhere($DLG, $withDel=0) {//составление условий 
 					break;
 				case '_element': break;
 				case '_action':  break;
-				case '_page':  break;
+				case '_page':    break;
 				case '_spisok':  break;
 				default:
 					$send[] = "`".$tn."`.`app_id`=".APP_ID;
