@@ -16,12 +16,11 @@ function _element40_print($el, $prm) {
 	$disabled = $prm['blk_setup'] ? ' disabled' : '';
 
 	$title = '';
-	if($v = _elemPrintV($el, $prm)) {
-		$vv = htmlspecialchars_decode($v);
-		$arr = json_decode($vv, true);
-		$c = count($arr);
-		$title = $c.' услови'._end($c, 'е', 'я', 'й');
-	}
+	if($v = _elemPrintV($el, $prm))
+		if($arr = _decode($v)) {
+			$c = count($arr);
+			$title = $c.' услови'._end($c, 'е', 'я', 'й');
+		}
 
 	return
 	'<input type="hidden" id="'.$attr_id.'" value="'.$v.'" />'.
