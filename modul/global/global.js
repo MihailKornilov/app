@@ -268,11 +268,21 @@ var ZINDEX = 1000,
 	_idsFirst = function(ids) {//первый id в списке
 		if(!ids)
 			return 0;
-
 		if(typeof ids == 'number')
 			return ids;
 
 		return _num(ids.split(',')[0]);
+	},
+	_idsLast = function(ids) {//последний id в списке
+		if(!ids)
+			return 0;
+		if(typeof ids == 'number')
+			return ids;
+
+		var ex = ids.split(','),
+			l = ex.length;
+
+		return _num(ex[l - 1]);
 	},
 	_pr = function(v) {//представление массива в виде таблицы
 		if(v instanceof jQuery)

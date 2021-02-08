@@ -345,7 +345,11 @@ switch(@$_POST['op']) {
 		if(!$year = _num($_POST['year']))
 			jsonError('Некорректный год');
 
-		$send['spisok'] = _elem72Sum($el, $year);
+		$send['value'] = _elem72radioValue($el, $year);
+
+		$spisok = _elem72radioSpisok($el, $year);
+		$send['spisok'] = _elem72Calc($el, $spisok, $year);
+
 		jsonSuccess($send);
 		break;
 	case 'spisok_92_sum'://Выбранные значения галочками - получение сумм

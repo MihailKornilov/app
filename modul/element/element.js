@@ -2226,7 +2226,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		P.click(function() {
 			var dlg24 = 0;
 			if(el.num_1) {
-				dlg24 = _num(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
+				dlg24 = _idsLast(OBJ.dlg.D(ATTR_CMP(el.num_1)).val());
 				if(!dlg24) {
 					_attr_cmp(el.num_1, 1)._flash({color:'red'});
 					_attr_cmp(el.id, 1)._hint({
@@ -4489,15 +4489,13 @@ var DIALOG = {},    //массив диалоговых окон для упра
 	//[72] Фильтр: год и месяц
 	_EL72 = function(el) {
 		var YL = $(ATTR_CMP(el.id) + 'yl'),
-			isMon = el.num_4 == 2,
 			RD = $(ATTR_CMP(el.id) + 'rd'),
-			YEAR_CUR = YL.val(),
 			CMP_SET = function() {
 				var data = YL.val();
 
-				if(isMon) {
-					var mon = _num(RD.val());
-					data = data + '-' + (mon > 9 ? '' : '0') + mon
+				if(RD.length) {
+					var m = _num(RD.val());
+					data += '-' + (m < 10 ? '0' : '') + m;
 				}
 
 				switch(el.num_3) {
@@ -4511,30 +4509,23 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						break;
 				}
 
-			};
-		YL._yearleaf({
-			func:function(v) {
-				if(isMon)
-					RD._radio(YEAR_CUR < v ? 1 : 12);
+			},
+			YEAR_CNANGE = function(year) {
+				if(!el.num_5)
+					return CMP_SET();
 
-				CMP_SET();
-
-				if(!isMon)
-					return;
-				if(el.num_3 != 1)
-					return;
-
-				YEAR_CUR = v;
 				var send = {
 					op:'spisok_72_sum',
 					elem_id:el.id,
-					year:v
+					year:year
 				};
 				_post(send, function(res) {
+					RD._radio(res.value);
 					RD._radio('spisok', _toSpisok(res.spisok));
+					CMP_SET();
 				});
-			}
-		});
+			};
+		YL._yearleaf({func:YEAR_CNANGE});
 		RD._radio(CMP_SET);
 	},
 

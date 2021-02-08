@@ -179,6 +179,9 @@ function PHP12_v_choose($prm) {
 	//выплывающая подсказка [act229]
 	$obj_id = _hintDlgId($prm, $obj_id);
 
+	//значение dlg24 является элементом
+	$obj_id = PHP12_v_choose_isElem($prm, $obj_id);
+
 	if($obj_id === false)
 		return _emptyMin10('[11] Не найдена схема поиска объекта.');
 	if(!$obj_id)
@@ -496,7 +499,8 @@ function PHP12_v_choose_page($prm, $dialog_id) {//блок со страницы
 	if(!$page = _page($BL['obj_id']))
 		return 'Страницы '.$BL['obj_id'].' не существует.';
 	if(!$dialog_id = $page['dialog_id_unit_get'])
-		return 'Страница не принимает данные записи';
+		return false;
+//		return 'Страница не принимает данные записи';
 
 	return $dialog_id;
 }
@@ -565,6 +569,15 @@ function PHP12_v_choose_27($prm, $obj_id) {//[27] значение баланс�
 
 	return _num($BL['obj_id']);
 }
+function PHP12_v_choose_isElem($prm, $obj_id) {//dlg24 является элементом
+	if($obj_id)
+		return $obj_id;
+	if(!$dlg24 = _num($prm['dop']['dlg24']))
+		return false;
+	if(!$el = _elemOne($dlg24))
+		return false;
 
+	return _elemDlgId($el['id']);
+}
 
 
