@@ -1687,6 +1687,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 		if(act.bo.hasClass('_busy'))
 			return;
+
 		act.bo
 			.addClass('_busy')
 			.append('<div class="dbusy"></div>');
@@ -1748,11 +1749,16 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!doc_id)
 			return;
 
+		if(act.v1)
+			act.v1 = act.v1.replace(/&amp;/g, '&');
+
+
 		location.href = URL +
 			'&p=9' +
 			'&doc_id=' + doc_id +
 			(act.unit_id ? '&id=' + act.unit_id : '') +
-			'&pfrom=' + PAGE_ID;
+			'&pfrom=' + PAGE_ID +
+			act.v1;
 	},
 
 	//обновление содержимого блоков

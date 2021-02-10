@@ -623,7 +623,7 @@ function _pageUrlBack() {//ссылка возврата на предыдущу
 		return '<br><br><a href="'.URL.'&p='._page('def').'">Перейти на <b>стартовую страницу</b></a>';
 
 	$uid = '';
-	if($id = _num($_GET['id']))
+	if($id = _num(@$_GET['id']))
 		$uid = '&id='.$id;
 	
 	return '<br><br><a href="'.URL.'&p='.$pfrom.$uid.'">Вернуться на предыдущую страницу</a>';
@@ -645,7 +645,11 @@ function _document() {//формирование документа для вы�
 
 	//получение данных файла-шаблона
 	if(!$attach_id = $TMP['attach_id'])
-		return _empty20('Не настроен файл-шаблон');
+		return _empty20(
+				'Не настроен файл-шаблон. '.
+				'<a href="'.URL.'&p=8">Настроить</a>'.
+				_pageUrlBack()
+		);
 
 	$sql = "SELECT *
 			FROM `_attach`
@@ -678,6 +682,8 @@ function _document() {//формирование документа для вы�
 		case 'docx':
 			require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
 			$document = new \PhpOffice\PhpWord\TemplateProcessor($ATT['path'].$ATT['fname']);
+
+			_kupez_ob_print($document);
 
 			//подстановка данных
 			foreach(_document_values($TMP, $unit) as $i => $v)
@@ -786,6 +792,56 @@ function _document_values($TMP, $unit) {//получение значений д
 
 	return $ass;
 }
+//todo Купец: формирование списка объявлений по номеру газеты
+function _kupez_ob_print($document) {
+	if(APP_ID != 4)
+		return false;
+	if(!$elem_id = _num(@$_GET['elem_filter']))
+		return false;
+	if(!$v = _filter('v', $elem_id))
+		return false;
+
+	$ex = explode('-', $v);
+
+	if(!$id = _num(@$ex[1]))
+		return false;
+
+	//данные номера выпуска
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `id`=".$id;
+	if(!$gn = query_assoc($sql))
+		return false;
+
+	$document->setValue('{NOMER}', $gn['num_1'].' ('.$gn['num_2'].')');
+
+	//выходы по номеру выпуска
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `num_5`=".$gn['id']."
+			  AND `num_2`";
+	if(!$gns = query_arr($sql))
+		return $document->setValue('{COUNT}', 'Выходов нет');
+
+	//объявления по номеру выпуска
+	$sql = "SELECT *
+			FROM `_spisok`
+			WHERE `id` IN ("._idsGet($gns, 'num_2').")
+			  AND !`deleted`
+			ORDER BY `txt_1`";
+	if(!$ob = query_arr($sql))
+		return $document->setValue('{COUNT}', 'Объявлений нет');
+
+	$send = '';
+	foreach($ob as $r) {
+		$send .= $r['txt_1'];
+	}
+
+
+
+	$document->setValue('{COUNT}', $send);
+}
+
 
 
 /* ----==== СПИСОК СТРАНИЦ (page12) ====---- */
