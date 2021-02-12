@@ -683,14 +683,15 @@ function _document() {//формирование документа для вы�
 			require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
 			$document = new \PhpOffice\PhpWord\TemplateProcessor($ATT['path'].$ATT['fname']);
 
-			_kupez_ob_print($document);
+			$fname = _document_fname($ATT, $TMP, 'docx');
+			_kupez_ob($fname);
 
 			//подстановка данных
 			foreach(_document_values($TMP, $unit) as $i => $v)
 				$document->setValue($i, $v);
 
 			header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-			header('Content-Disposition: attachment; filename="'._document_fname($ATT, $TMP, 'docx').'"');
+			header('Content-Disposition: attachment; filename="'.$fname.'"');
 			$document->saveAs('php://output');
 			exit;
 
@@ -793,54 +794,247 @@ function _document_values($TMP, $unit) {//получение значений д
 	return $ass;
 }
 //todo Купец: формирование списка объявлений по номеру газеты
-function _kupez_ob_print($document) {
+function _kupez_ob($fname) {
 	if(APP_ID != 4)
 		return false;
 	if(!$elem_id = _num(@$_GET['elem_filter']))
 		return false;
-	if(!$v = _filter('v', $elem_id))
-		return false;
+
+	$word = new \PhpOffice\PhpWord\PhpWord();
+
+	$section = $word->addSection(
+		array(
+			'orientation' => 'portrait',
+			'marginLeft' => floor(10*56.7),
+			'marginRight' => floor(10*56.7),
+			'marginTop' => floor(5*56.7),
+			'marginBottom' => floor(5*56.7)
+         )
+	);
+	header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+	header('Content-Disposition: attachment; filename="'.$fname.'"');
+
+	//стили для вывода ошибки
+	$errStyle = array(
+		'color' => 'EE0000',
+		'size' => 11,
+		'bold' => true
+	);
+
+	if(!$v = _filter('v', $elem_id)) {
+		$section->addText('Не получено значение фильтра', $errStyle);
+		$word->save('php://output');
+		exit;
+	}
+
 
 	$ex = explode('-', $v);
-
-	if(!$id = _num(@$ex[1]))
-		return false;
+	if(!$id = _num(@$ex[1])) {
+		$section->addText('Не получен идентификатор номера газеты из фильтра', $errStyle);
+		$word->save('php://output');
+		exit;
+	}
 
 	//данные номера выпуска
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `id`=".$id;
-	if(!$gn = query_assoc($sql))
-		return false;
+	if(!$gn = query_assoc($sql)) {
+		$section->addText('Не получены данные номера газеты', $errStyle);
+		$word->save('php://output');
+		exit;
+	}
 
-	$document->setValue('{NOMER}', $gn['num_1'].' ('.$gn['num_2'].')');
+	$txt = $section->addTextRun();
+	$txt->addText('Список объявлений для номера ', array('size' => 12));
+	$txt->addText($gn['num_2'], array('size' => 12, 'bold' => true));
+	$txt->addText(':', array('size' => 12));
 
 	//выходы по номеру выпуска
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `num_5`=".$gn['id']."
 			  AND `num_2`";
-	if(!$gns = query_arr($sql))
-		return $document->setValue('{COUNT}', 'Выходов нет');
+	if(!$gns = query_arr($sql)) {
+		$section->addText('Выходов объявлений по номеру нет', $errStyle);
+		$word->save('php://output');
+		exit;
+	}
 
 	//объявления по номеру выпуска
-	$sql = "SELECT *
+	$sql = "SELECT
+				*,
+				'' `dop`
 			FROM `_spisok`
 			WHERE `id` IN ("._idsGet($gns, 'num_2').")
+			  AND `dialog_id`=1477
 			  AND !`deleted`
 			ORDER BY `txt_1`";
-	if(!$ob = query_arr($sql))
-		return $document->setValue('{COUNT}', 'Объявлений нет');
+	if(!$ob = query_arr($sql)) {
+		$section->addText('Объявлений по номеру нет', $errStyle);
+		$word->save('php://output');
+		exit;
+	}
 
-	$send = '';
-	foreach($ob as $r) {
-		$send .= $r['txt_1'];
+	//доп. параметры объявлений
+	$sql = "SELECT
+				`id`,
+				`txt_1`
+			FROM `_spisok`
+			WHERE `dialog_id`=1481
+			  AND !`deleted`";
+	$dop = query_ass($sql);
+
+	foreach($gns as $r) {
+		$obid = $r['num_2'];
+		if(!isset($ob[$obid]))
+			continue;
+		if(!$r['num_6'])
+			continue;
+		if(!isset($dop[$r['num_6']]))
+			continue;
+
+		$ob[$obid]['dop'] = $dop[$r['num_6']];
 	}
 
 
+	//рубрики
+	$sql = "SELECT
+				`id`,
+				`parent_id`,
+				`txt_1`,
+				0 `obc` /* количество объявлений в рубрике */
+			FROM `_spisok`
+			WHERE `dialog_id`=1478
+			  AND !`deleted`
+			ORDER BY `sort`";
+	if(!$rub = query_arr($sql)) {
+		$section->addText('Не получены рубрики объявлений', $errStyle);
+		$word->save('php://output');
+		exit;
+	}
 
-	$document->setValue('{COUNT}', $send);
+	//расстановка объявлений по рубрикам
+	foreach($ob as $r) {
+		if(!$rub_id = _num($r['num_2'])) {
+			$section->addText('У объявления '.$r['num'].' отсутствует рубрика', $errStyle);
+			$word->save('php://output');
+			exit;
+		}
+
+		if(!isset($rub[$rub_id]['ob']))
+			$rub[$rub_id]['ob'] = array();
+
+		$rub[$rub_id]['ob'][] = $r;
+		$rub[$rub_id]['obc']++;
+	}
+
+	//вставка подрубрик в рубрики
+	foreach($rub as $id => $r) {
+		if(!$pid = _num($r['parent_id']))
+			continue;
+
+		if(!isset($rub[$pid]['sub']))
+			$rub[$pid]['sub'] = array();
+
+		$rub[$pid]['sub'][] = $r;
+
+		if(!empty($r['ob']))
+			$rub[$pid]['obc'] += count($r['ob']);
+	}
+
+
+	foreach($rub as $id => $r) {
+		if($r['parent_id'])
+			continue;
+		if(!$r['obc'])
+			continue;
+
+		$section->addText(
+			$r['txt_1'],
+			array(
+				'size' => 13.5,
+				'bold' => true
+			),
+			array(
+				'spaceBefore' => 300,
+				'spaceAfter' => 0
+			)
+		);
+
+		if(!empty($r['sub']))
+			foreach($r['sub'] as $sub) {
+				if(empty($sub['ob']))
+					continue;
+
+				//печать названия подрубрики
+				$section->addText(
+					'        '.$sub['txt_1'],
+					array(
+						'name' => 'Times New Roman',
+						'size' => 12,
+						'bold' => true
+					),
+					array(
+						'spaceBefore' => 70,
+						'spaceAfter' => 0
+					)
+				);
+
+				foreach($sub['ob'] as $ob)
+					_kupez_ob_txt($section, $ob);
+			}
+
+
+		if(empty($r['ob']))
+			continue;
+
+		foreach($r['ob'] as $ob)
+			_kupez_ob_txt($section, $ob);
+	}
+
+	header('Content-Disposition: attachment; filename="'.str_replace('.', '-'.$gn['num_2'].'.', $fname).'"');
+	$word->save('php://output');
+	exit;
 }
+function _kupez_ob_txt($section, $ob) {
+	$txt = $section->addTextRun(
+		array(
+			'size' => 10.5,
+			'spaceBefore' => 0,
+			'spaceAfter' => 0
+		)
+	);
+	$txt->addText(
+		$ob['txt_1'],
+		array('name' => 'Times New Roman')
+	);
+	if($ob['txt_2'])
+		$txt->addText(
+			' Тел.: '.$ob['txt_2'],
+			array(
+				'name' => 'Times New Roman',
+				'bold' => true
+			)
+		);
+	if($ob['txt_3'])
+		$txt->addText(
+			' Адрес: '.$ob['txt_3'],
+			array(
+				'name' => 'Times New Roman',
+				'bold' => true
+			)
+		);
+	if($ob['dop'])
+		$txt->addText(
+			' ('.$ob['dop'].')',
+			array(
+				'name' => 'Times New Roman',
+				'italic' => true
+			)
+		);
+}
+
 
 
 
