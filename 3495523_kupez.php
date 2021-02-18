@@ -75,6 +75,13 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
+			_kupez_zayav_ob();
+			_kupez_zayav_gn();
+			_kupez_accrual();
+			_kupez_refund();
+			_kupez_income();
+			_kupez_zayav_note();
+			_kupez_zayav_note_comment();
 			break;
 
 		default:
@@ -358,6 +365,20 @@ function _kupez_zayav_ob() {//заявки-объявления
 			else
 				$rubric = $RUB[$r['rubric_id']];
 
+			$num_6 = 1;//публикация разрешена
+			switch($r['onpay_checked']) {
+				//публикация разрешена
+				case 1: break;
+
+				//ожидает действия
+				case 2: $num_6 = 2; break;
+
+				//публикация запрещена
+				case 3: $num_6 = 0; break;
+			}
+
+
+
 			$mass[] = "(
 					".$zayav_id.",
 					".APP_ID.",
@@ -371,6 +392,9 @@ function _kupez_zayav_ob() {//заявки-объявления
 					'".addslashes($r['adres'])."',
 					".$r['sum_manual'].",
 					".$r['sum_cost'].",
+					
+					".($r['onpay_checked'] ? 1 : 0).",/* интернет-объявление */
+					".$num_6.",
 	
 					"._comtexUserId($r).",
 					'".$r['dtime_add']."',
@@ -391,6 +415,9 @@ function _kupez_zayav_ob() {//заявки-объявления
 					  txt_3,
 					  num_4,
 					  sum_1,
+					  
+					  num_5,
+					  num_6,
 	
 					  user_id_add,
 					  dtime_add,

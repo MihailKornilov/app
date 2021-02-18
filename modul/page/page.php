@@ -868,6 +868,7 @@ function _kupez_ob($fname) {
 			FROM `_spisok`
 			WHERE `id` IN ("._idsGet($gns, 'num_2').")
 			  AND `dialog_id`=1477
+			  AND `num_6`=1
 			  AND !`deleted`
 			ORDER BY `txt_1`";
 	if(!$ob = query_arr($sql)) {
@@ -896,7 +897,6 @@ function _kupez_ob($fname) {
 
 		$ob[$obid]['dop'] = $dop[$r['num_6']];
 	}
-
 
 	//рубрики
 	$sql = "SELECT

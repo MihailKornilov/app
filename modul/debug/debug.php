@@ -237,6 +237,8 @@ function _debugPrint($msg) {//вывод текста, если debug
 }
 
 function _count_update($app_id=APP_ID) {//обновление счётчиков
+	set_time_limit(300);
+
 	//установка родительского диалога, если нужно
 	$app = _app($app_id);
 	if($app['pid'])
