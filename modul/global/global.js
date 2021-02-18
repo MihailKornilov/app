@@ -187,16 +187,6 @@ var ZINDEX = 1000,
 			return v.replace(new RegExp("\n",'g'), '<br>');
 		return v.replace(new RegExp('<br>','g'), "\n");
 	},
-	_attrId = function(t) {//формирование аттрибута id
-		var attr_id = t.attr('id');
-
-		if(attr_id)
-			return attr_id;
-
-		attr_id = 'afics' + Math.round(Math.random() * 100000);
-		t.attr('id', attr_id);
-		return attr_id;
-	},
 	_selCopy = function(arr, id) {//копирование массива для селекта. Если указан id - игнорируется
 		var send = [];
 		_forN(arr, function(sp) {

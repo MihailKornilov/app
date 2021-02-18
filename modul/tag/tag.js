@@ -1,6 +1,15 @@
 /* Элементы-теги */
 
+var _attrId = function(t) {//формирование аттрибута id
+	var attr_id = t.attr('id');
 
+	if(attr_id)
+		return attr_id;
+
+	attr_id = 'afics' + Math.round(Math.random() * 100000);
+	t.attr('id', attr_id);
+	return attr_id;
+};
 
 $.fn._select = function(o, o1) {//выпадающий список от 24.08.2020
 	var t = $(this);

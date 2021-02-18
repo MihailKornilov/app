@@ -376,6 +376,77 @@ function _user_active_itog() {//общий итог использования �
 
 
 
+function PHP12_user_data() {//данные, которые вносил пользователь. Испольуется на странице 131 Gim-System
+	if(!$user_id = $_GET['id'])
+		return _emptyMinRed('Отсутствует идентификатор пользователя');
+
+
+
+	return
+	PHP12_user_data_insert($user_id);
+}
+function PHP12_user_data_insert($user_id) {
+	$send = '';
+
+	foreach(_table() as $id => $table) {
+		$F = _field($id);
+
+		$insert = '';
+
+		$del = '';
+		$del_bg = ' bg7';
+		$del_clr = ' clr3';
+
+		$apps = array();
+
+		if(isset($F['user_id_add'])) {
+			$sql = "SELECT COUNT(*)
+					FROM `".$table."`
+					WHERE `user_id_add`=".$user_id;
+			if($insert = query_value($sql))
+				if(isset($F['app_id'])) {
+					$sql = "SELECT DISTINCT `app_id`
+							FROM `".$table."`
+							WHERE `user_id_add`=".$user_id;
+					foreach(_ids(query_ids($sql), 'arr') as $app_id)
+						$apps[$app_id] = '<span class="fs12 curD tool" data-tool="'._app($app_id, 'name').'">'.$app_id.'</span>';
+				}
+		}
+
+		if(isset($F['user_id_del'])) {
+			$sql = "SELECT COUNT(*)
+					FROM `".$table."`
+					WHERE `user_id_del`=".$user_id;
+			if($del = query_value($sql))
+				$del_clr = ' clr7';
+
+			$del_bg = '';
+		}
+
+		if(!$insert && !$del)
+			continue;
+
+		$send .=
+		'<tr><td class="clr1">'.$table.
+			'<td class="r clr11">'._hide0($insert).
+			'<td class="r'.$del_clr.$del_bg.'">'.$del.
+			'<td class="r">'.implode(', ', $apps);
+	}
+
+	if(!$send)
+		return '';
+
+	return
+	'<div class="fs15">Внесение и удаление данных</div>'.
+	'<table class="_stab small mt5">'.
+		'<tr><th>Таблица'.
+			'<th>Внесено'.
+			'<th>Удалено'.
+			'<th>Приложения'.
+		$send.
+	'</table>';
+}
+
 /* ---=== ПРИГЛАШЕНИЕ ПОЛЬЗОВАТЕЛЯ ПО ССЫЛКЕ ===---
 	1. PHP12_user_invite - отображение ссылки для приглашения
 	        Формируется уникальный хеш, проверяется совпадение на существование в базе.
