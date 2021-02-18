@@ -19,6 +19,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		"clr6":["#c88", "Бордовый"]
 	},
 
+	GN_ATTR = null, //todo Купец: атрибут элемента номеров газет
+
 	_color = function(v, func) {
 		$(document)
 			.off('mouseenter', '._color td')

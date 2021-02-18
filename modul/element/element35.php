@@ -50,7 +50,7 @@ function _element35_vvv($el) {
 	if($el['num_1'] != 3682)
 		return array();
 
-	return json_decode($el['txt_1']);
+	return _decode($el['txt_1']);
 }
 
 /* ---=== НАСТРОЙКА КОНКРЕТНЫХ ЗНАЧЕНИЙ ===--- */
