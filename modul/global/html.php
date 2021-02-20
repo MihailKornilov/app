@@ -331,7 +331,7 @@ function _html($title, $content) {
 
 	'<head>'.
 		'<meta http-equiv="content-type" content="text/html; charset=utf-8" />'.
-		'<title>'.$title.'</title>'.
+		'<title>'.$title.(LOCAL ? ' - LOCAL' : '').'</title>'.
 		'<link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">'.
 		_html_script().
 	'</head>'.
