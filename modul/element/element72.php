@@ -126,7 +126,7 @@ function _elem72Calc($el, $spisok, $year=false) {//добавление счёт
 		//сумма
 		case 2:	break;
 
-		default:return $spisok;
+		default: return $spisok;
 	}
 
 	if(!$idsArr = _ids($el['txt_2'], 'arr'))//отсутствует путь к значению (данные по дате внесения)
@@ -144,13 +144,28 @@ function _elem72Calc($el, $spisok, $year=false) {//добавление счёт
 	if(!$col2 = _elemCol($el2))//не получена колонка вложенного списка
 		return $spisok;
 
-	if(count($idsArr) == 2)
-		return $spisok;
-
 	if(!$elSp = _elemOne($el['num_1']))//не получены данные элемента-списка
 		return $spisok;
 	if(!$DLG2 = _elemDlg($el2['id']))//не получены данные диалога 2
 		return $spisok;
+
+	if(count($idsArr) == 2) {
+		$sql = "SELECT
+					DISTINCT `".$col2."`,
+					COUNT(*)
+				FROM   "._queryFrom($DLG2)."
+				WHERE  "._queryWhere($DLG2)."
+				  AND `".$col2."` IN ("._idsGet($spisok, 'key').")
+				  "._40cond(array(), $el['txt_1'])."
+				GROUP BY `".$col2."`";
+		if(!$ass = query_ass($sql))//нет значений во вложенном списке 3-го уровня
+			return $spisok;
+
+		foreach($ass as $id => $c)
+			$spisok[$id] .= '<span class="fr">'._sumSpace(round($c)).'</span>';
+
+		return $spisok;
+	}
 
 	$col3 = '';
 	foreach($DLG2['cmp'] as $cmp) {
@@ -170,6 +185,7 @@ function _elem72Calc($el, $spisok, $year=false) {//добавление счёт
 			WHERE  "._queryWhere($DLG2)."
 			  AND `".$col2."` IN ("._idsGet($spisok, 'key').")
 			  AND `".$col3."`
+			  "._40cond(array(), $el['txt_1'])."
 			GROUP BY `".$col2."`";
 	if(!$ass = query_ass($sql))//нет значений во вложенном списке 3-го уровня
 		return $spisok;
