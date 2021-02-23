@@ -324,6 +324,12 @@ function _blockAction($bl, $prm) {//действие при нажатии на 
 				if($doc = query_assoc($sql))
 					$uid = _unitUrlId($u, $doc['spisok_id']);
 			}
+
+			//переход на страницу - подмена ID, соответствующего диалогу
+			if($act['dialog_id'] == 214)
+				if($page = _page($act['target_ids']))
+					if($dlg_id = $page['dialog_id_unit_get'])
+						$uid = _unitUrlId($u, $dlg_id);
 		}
 	}
 
