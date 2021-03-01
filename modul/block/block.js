@@ -1109,6 +1109,8 @@ $(document)
 		});
 	})
 	.on('mouseenter', '.hint-on', function() {//вывод подсказки для блока или элемента
+		if(!HINT)
+			return;
 		var t = $(this),
 			attr_id = t.attr('data-hint-id');
 

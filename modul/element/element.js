@@ -2056,6 +2056,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 
 				if(process)
 					return;
+				if(v.length && v.length < el.num_3)
+					return;
 
 				upd(v);
 				_ELM_ACT(el, v);
