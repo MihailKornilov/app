@@ -1549,6 +1549,7 @@ function _elemIdsTitle($v) {//получение имён по id элемент
 	$znak = _elemIdsTitleZnak($ids[0]);
 	foreach($ids as $n => $id) {
 		switch($id) {
+			case -20: $send = 'Приложение'; break;
 			case -21: $send = 'Текущий пользователь'; break;
 			case -22: $send = 'Текущий диалог'; break;
 			case -23: $send = 'Текущая запись'; break;

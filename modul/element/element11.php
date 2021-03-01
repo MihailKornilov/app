@@ -262,6 +262,7 @@ function PHP12_v_choose_menuSel($prm) {//выбранный пункт меню
 		return $sel;
 
 	switch($v) {
+		case -20:
 		case -21:
 		case -22:
 		case -23:
@@ -279,6 +280,10 @@ function PHP12_v_choose_global($prm) {//глобальные значения д
 	$v = _idsFirst($prm['dop']['sel']);
 
 	return
+	'<div class="prel pad10">'.
+		'<div class="elm-choose'.($v == -20 ? ' sel' : '').'" val="-20"></div>'.
+		'<div class="fs17 b center pad10 clr9">Приложение</div>'.
+	'</div>'.
 	'<div class="prel pad10">'.
 		'<div class="elm-choose'.($v == -21 ? ' sel' : '').'" val="-21"></div>'.
 		'<div class="fs17 b center pad10 clr9">Текущий пользователь</div>'.
