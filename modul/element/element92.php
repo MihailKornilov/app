@@ -14,7 +14,7 @@ function _element92_print($el, $prm) {
 
 	$send = '<table class="_stab">'.
 				'<tr><th>Список'.
-					'<th>Кол-во</br>записей'.
+					'<th>Кол-во<br>записей'.
 					'<th>Сумма';
 	foreach($dlgIds as $r) {
 		if(!$DLG = _dialogQuery($r['dlg_id']))

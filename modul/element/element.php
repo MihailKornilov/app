@@ -1041,7 +1041,7 @@ function PHP12_dialog_app() {//список диалоговых окон для
 	foreach($arr as $id => $r) {
 		$arr[$id]['cnt_del_bg'] = !empty($CntDelAss[$id]) ? ' bg11' : '';
 		$arr[$id]['unit_count'] = !empty($cAss[$id]) ? $cAss[$id] : '';
-		$arr[$id]['unit_count_del'] = !empty($cAssDel[$id]) ? '<div class="clr2 fs11">'.$cAssDel[$id].'</div>' : '';
+		$arr[$id]['unit_count_del'] = !empty($cAssDel[$id]) ? '<div class="clr6 fs11">'.$cAssDel[$id].'</div>' : '';
 		if(!isset($r['child']))
 			$arr[$id]['child'] = array();
 		if($pid = _num($r['sort_pid']))
@@ -1101,7 +1101,7 @@ function PHP12_dialog_app_li($r) {
 					'<div val="dialog_id:'.$r['id'].'" class="icon icon-edit pl dialog-setup tool" data-tool="Редактировать диалог"></div>'.
 				'<td class="w50 center">'.
 					($r['issp'] ? '<div class="icon icon-ok curD"></div>' : '').
-				'<td class="w70 center">'.$r['unit_count'].$r['unit_count_del'].
+				'<td class="w70 center b">'.$r['unit_count'].$r['unit_count_del'].
 				'<td class="w100 clr13'.($parent ? ' over1 curP dialog-open' : '').'" val="dialog_id:'.$parent_id.'">'.$parent.
 				'<td class="w70 clr1">'.PHP12_dialog_app_col($r['id']).
 				PHP12_dialog_app_hist($r, 'insert').
