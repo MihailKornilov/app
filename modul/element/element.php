@@ -1024,7 +1024,6 @@ function PHP12_dialog_app() {//список диалоговых окон для
 				COUNT(`id`)
 			FROM `_spisok`
 			WHERE `dialog_id` IN ("._idsGet($arr).")
-			  AND !`deleted`
 			GROUP BY `dialog_id`";
 	$cAss = query_ass($sql);
 

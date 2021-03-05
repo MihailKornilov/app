@@ -7319,6 +7319,18 @@ $(document)
 			dop:id,
 			busy_obj:t.parent()
 		});
+	})
+	.on('click', '.dialog-spisok-clear', function() {
+		var t = $(this),
+			send = {
+				op:'dialog_spisok_clear',
+				dialog_id:t.attr('val'),
+				busy_obj:t
+			};
+
+		_post(send, function() {
+			t.parent().html('нет');
+		});
 	});
 
 

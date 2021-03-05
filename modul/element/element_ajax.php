@@ -384,6 +384,29 @@ switch(@$_POST['op']) {
 
 		jsonSuccess();
 		break;
+	case 'dialog_spisok_clear':
+		if(!SA && !USER_ADMIN)
+			jsonError('Нет доступа');
+		if(!$dialog_id = _num($_POST['dialog_id']))
+			jsonError('Некорректный ID диалогового окна');
+		if(!$DLG = _dialogQuery($dialog_id))
+			jsonError('Диалога id'.$dialog_id.' не существует');
+		if($DLG['table_name_1'] != '_spisok')
+			jsonError('Удаление возможно только из таблицы `_spisok`');
+
+		$sql = "SELECT COUNT(*)
+				FROM `_spisok`
+				WHERE `dialog_id`=".$dialog_id;
+		if(!query_value($sql))
+			jsonError('Отсутствуют записи для удаления');
+
+		$sql = "DELETE
+				FROM `_spisok`
+				WHERE `dialog_id`=".$dialog_id;
+		query($sql);
+
+		jsonSuccess();
+		break;
 
 	case 'image_upload'://добавление изображения
 		if(!$f = @$_FILES['f1'])
@@ -821,7 +844,6 @@ switch(@$_POST['op']) {
 		jsonSuccess($send);
 		break;
 
-
 	case 'act228_block_upd'://действие 228: обновление содержимого блока
 		if(!$block_id = _num($_POST['block_id']))
 			jsonError('Некорректный id блока');
@@ -938,13 +960,15 @@ function _dialogSetupService($DLG) {
 		'<div class="menu_service-2 pad10">'.
 			'<table class="bs10">'.
 				'<tr><td class="clr1 r">Записи:'.
-					'<td>'._dialogSetupServiceCount($DLG).
+					'<td class="clr2">'._dialogSetupServiceCount($DLG).
 				'<tr><td class="clr1 r top curD tool" data-tool="Размещён в других диалогах">Привязан:'.
 					'<td>'._dialogSetupServiceCnnOut($DLG).
 				'<tr><td class="clr1 r top curD tool" data-tool="Диалоги размещены в этом">Привязки:'.
 					'<td>'._dialogSetupServiceCnnIn($DLG).
 				'<tr><td class="clr1 r top tool" data-tool="Используется в кнопках">Кнопки:'.
 					'<td>'._dialogSetupServiceButton($DLG).
+				'<tr><td class="clr1 r top tool" data-tool="Данные выводятся в списках">Списки:'.
+					'<td>'._dialogSetupServiceSpisok($DLG).
 			'</table>'.
 		'</div>'.
 
@@ -952,15 +976,15 @@ function _dialogSetupService($DLG) {
 }
 function _dialogSetupServiceCount($DLG) {//количество записей, внесённых диалогом
 	if(!$DLG['table_1'])
-		return '<span class="clr2">нет</span>';
+		return 'нет';
 
 	$sql = "SELECT COUNT(*)
 			FROM  "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG, true);
 	if(!$all = _num(query_value($sql)))
-		return '<span class="clr2">нет</span>';
+		return 'нет';
 
-	$send = '<b>'.$all.'</b>';
+	$send = '<b class="clr0">'.$all.'</b>';
 
 	$sql = "SELECT COUNT(*)
 			FROM  "._queryFrom($DLG)."
@@ -976,7 +1000,7 @@ function _dialogSetupServiceCount($DLG) {//количество записей, 
 	else
 		$send .= '<span class="clr2"> (удалённых нет)</span>';
 
-	return $send;//' <a>очистить</a>'
+	return $send.' <a class="dialog-spisok-clear ml20 clr5 tool" data-tool="Все записи будут<br>удалены из базы" val="'.$DLG['id'].'"><tt>Очистить</tt></a>';
 }
 function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым привязан текущий диалог
 	//получение элементов-связок
@@ -1130,6 +1154,17 @@ function _dialogSetupServiceButton($DLG) {//диалог используетс�
 	$send .= '</table>';
 
 	return $send;
+}
+function _dialogSetupServiceSpisok($DLG) {//данные диалога выводятся с списках
+	$sql = "SELECT *
+			FROM `_element`
+			WHERE `dialog_id` IN (29,59)
+			  AND `num_1`=".$DLG['id']."
+			ORDER BY `id`";
+	if(!$ELM = query_arr($sql))
+		return '<span class="clr2">нет</span>';
+
+	return '<b>да</b>';
 }
 function _dialogSetupServiceNumGroupIds($DLG) {
 	if(!$DLG['spisok_num_group'])
