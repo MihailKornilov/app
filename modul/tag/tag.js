@@ -2036,7 +2036,8 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		//исходный список является последовательным массивом
 		_forN(o.spisok, function(sp, n) {
 			var id,
-				title;
+				title,
+				content;
 
 			//проверка на одномерный последовательный массив
 			if(typeof sp == 'number' || typeof sp == 'string') {
@@ -2052,13 +2053,15 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 				if(!id)
 					return;
 				title = sp.title;
+				content = sp.content ? sp.content : sp.title;
 			}
 
 			MASS_ASS[id] = title || ' ';
 			title = title || '&nbsp;';
 			unit = {
 				id:id,
-				title:title
+				title:title,
+				content:content
 			};
 			MASS.push(unit);
 		});
@@ -2072,7 +2075,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		_forN(MASS, function(sp) {
 			var on = VALUE == sp.id ? ' on' : '';
 			html += '<div class="ddu' + on + '" val="' + sp.id + '">' +
-						sp.title +
+						sp.content +
 					'</div>';
 		});
 

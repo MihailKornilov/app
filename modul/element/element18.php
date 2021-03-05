@@ -39,14 +39,19 @@ function _element18_vvv($el) {
 
 		$send = array();
 		foreach($arr as $id => $r) {
+
 			$title = '- значение не настроено -';
 			if($col = _elemCol($DLG['spisok_elem_id']))
 				if(isset($r[$col]))
 					$title = $r[$col];
-			$send[] = array(
+
+			$u = array(
 				'id' => $id,
 				'title' => $title
 			);
+			if($r['parent_id'])
+				$u['content'] = '<div class="ml20">'.$title.'</div>';
+			$send[] = $u;
 		}
 
 		return $send;
