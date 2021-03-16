@@ -94,16 +94,14 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 	if(!$vvv = _element('vvv', $ELEM))
 		return _emptyRed('Таблица не настроена.');
 
-	$MASS = array();
 	$MASS0 = array();
 	$ov = $ELEM['num_4'] ? ' over1' : '';
 	foreach($spisok as $uid => $u) {
 		$bg = _elem23bg($ELEM, $u);
-		$TR = '<tr class="tr-unit'.$ov.'"'.$bg.' val="'.$uid.'">';
 		$prm = _blockParam(array('unit_get'=>$u));
 		$mu = array(
 			'pid' => 0,
-			'tr' => $TR,
+			'tr' => '<tr class="tr-unit'.$ov.'"'.$bg.' val="'.$uid.'">',
 			'td' => array()
 		);
 		if(isset($u['parent_id']))
@@ -142,29 +140,13 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 			$cls = implode(' ', $cls);
 			$cls = $cls ? ' class="'.$cls.'"' : '';
 
-			$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
-
 			$mu['td'][] = array(
 				'cls' => $cls,
 				'w' => _elemStyleWidth($td, true),
 				'txt' => $txt
 			);
 		}
-		$MASS[$uid] = $TR;
 		$MASS0[$uid] = $mu;
-	}
-
-	//tr-догрузка списка
-	if(!$IS_SORT && $limit * ($next + 1) < $all) {
-		$count_next = $all - $limit * ($next + 1);
-		if($count_next > $limit)
-			$count_next = $limit;
-		$MASS[] =
-			'<tr class="over5 curP center clr15" onclick="_spisok23next($(this),'.$ELEM['id'].','.($next + 1).')">'.
-				'<td colspan="20">'.
-					'<tt class="db '.($ELEM['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
-						'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
-					'</tt>';
 	}
 
 	//открытие и закрытие таблицы
@@ -178,6 +160,7 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 	$BEGIN.
 	_spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT).
 	_spisok23tr($ELEM, $TABLE_BEGIN, $TABLE_END, $MASS0, $IS_SORT).
+	_spisok23next($ELEM, $IS_SORT, $limit, $next, $all).
 	$END;
 }
 function _spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT) {//отображение названий колонок
@@ -271,6 +254,23 @@ function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS0, $child, $parent_id=0, 
 		'</li>';
 
 	return '<ol>'.$send.'</ol>';
+}
+function _spisok23next($ELEM, $IS_SORT, $limit, $next, $all) {//кнопка догрузки списка
+	if($IS_SORT)
+		return '';
+	if($limit * ($next + 1) >= $all)
+		return '';
+
+	$count_next = $all - $limit * ($next + 1);
+	if($count_next > $limit)
+		$count_next = $limit;
+
+	return
+	'<tr class="over5 curP center clr15" onclick="_spisok23next($(this),'.$ELEM['id'].','.($next + 1).')">'.
+		'<td colspan="20">'.
+			'<tt class="db '.($ELEM['num_3'] ? 'fs13 pt3 pb3' : 'fs14 pad5').'">'.
+				'Показать ещё '.$count_next.' запис'._end($count_next, 'ь', 'и', 'ей').
+			'</tt>';
 }
 function _elem23bg($el, $u) {//динамическая окраска строки
 	if(!$ids = _ids($el['txt_4'], 'arr'))
