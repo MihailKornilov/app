@@ -95,11 +95,21 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 		return _emptyRed('Таблица не настроена.');
 
 	$MASS = array();
+	$MASS0 = array();
+	$ov = $ELEM['num_4'] ? ' over1' : '';
 	foreach($spisok as $uid => $u) {
-		$ov = $ELEM['num_4'] ? ' over1' : '';
 		$bg = _elem23bg($ELEM, $u);
-		$TR = '<tr class="tr-unit'.$ov.'"'.$bg.' val="'.$u['id'].'">';
+		$TR = '<tr class="tr-unit'.$ov.'"'.$bg.' val="'.$uid.'">';
 		$prm = _blockParam(array('unit_get'=>$u));
+		$mu = array(
+			'pid' => 0,
+			'tr' => $TR,
+			'td' => array()
+		);
+		if(isset($u['parent_id']))
+			$mu['pid'] = $u['parent_id'];
+		elseif(isset($u['sort_pid']))
+			$mu['pid'] = $u['sort_pid'];
 		foreach($vvv as $td) {
 			$cls = array();
 			$txt = '';
@@ -133,8 +143,15 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 			$cls = $cls ? ' class="'.$cls.'"' : '';
 
 			$TR .= '<td'.$cls._elemStyleWidth($td).'>'.$txt;
+
+			$mu['td'][] = array(
+				'cls' => $cls,
+				'w' => _elemStyleWidth($td, true),
+				'txt' => $txt
+			);
 		}
 		$MASS[$uid] = $TR;
+		$MASS0[$uid] = $mu;
 	}
 
 	//tr-догрузка списка
@@ -157,35 +174,10 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 	$BEGIN = !$next && !$IS_SORT ? $TABLE_BEGIN : '';
 	$END = !$next && !$IS_SORT ? $TABLE_END : '';
 
-	//включено условие сортировки
-	if($IS_SORT) {
-		if($ELEM['num_7'] > 1) {
-			$child = array();
-			foreach($spisok as $id => $r) {
-				$pid = 0;
-				if(isset($r['parent_id']))
-					$pid = $r['parent_id'];
-				elseif(isset($r['sort_pid']))
-					$pid = $r['sort_pid'];
-				$child[$pid][$id] = $r;
-			}
-			$TR = _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child);
-		} else {
-			$TR = '';
-			foreach($MASS as $id => $sp)
-				$TR .=
-					'<li class="mt1" id="sp_'.$id.'">'.
-						$TABLE_BEGIN.$sp.$TABLE_END.
-					'</li>';
-			$TR = '<ol>'.$TR.'</ol>';
-		}
-	} else
-		$TR = implode('', $MASS);
-
 	return
 	$BEGIN.
 	_spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT).
-	$TR.
+	_spisok23tr($ELEM, $TABLE_BEGIN, $TABLE_END, $MASS0, $IS_SORT).
 	$END;
 }
 function _spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT) {//отображение названий колонок
@@ -194,19 +186,14 @@ function _spisok23th($ELEM, $next, $TABLE_BEGIN, $TABLE_END, $IS_SORT) {//ото
 	if(!$ELEM['num_5'])
 		return '';
 
-	$send = '';
-
-	if($IS_SORT)
-		$send = $TABLE_BEGIN;
-
-	$send .= '<tr>';
+	$send = '<tr>';
 	foreach(_element('vvv', $ELEM) as $tr)
 		$send .= '<th'._elemStyleWidth($tr).'>'._spisok23thCHK($tr, $tr['txt_7']);
 
-	if($IS_SORT)
-		$send .= $TABLE_END;
+	if(!$IS_SORT)
+		return $send;
 
-	return $send;
+	return $TABLE_BEGIN.$send.$TABLE_END;
 }
 function _spisok23thCHK($el, $txt) {//вставка галочки в заголовок, которая будет выбирать все галочки
 	if($el['dialog_id'] == 91)
@@ -236,19 +223,54 @@ function _spisok23thCHK($el, $txt) {//вставка галочки в заго�
 
 	return $txt;
 }
-function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $parent_id=0) {//формирование табличного списка по уровням
+function _spisok23tr($ELEM, $TABLE_BEGIN, $TABLE_END, $MASS0, $IS_SORT) {//вывод содержания таблицы
+	if(!$IS_SORT) {
+		$send = '';
+		foreach($MASS0 as $r)
+			$send .= _spisok23tru($r);
+		return $send;
+	}
+
+	if($ELEM['num_7'] > 1) {
+		$child = array();
+		foreach($MASS0 as $id => $r) {
+			$pid = $r['pid'];
+			$child[$pid][$id] = $r;
+		}
+		return _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS0, $child);
+	}
+
+	$send = '';
+	foreach($MASS0 as $id => $sp)
+		$send .=
+			'<li class="mt1" id="sp_'.$id.'">'.
+				$TABLE_BEGIN._spisok23tru($sp).$TABLE_END.
+			'</li>';
+	return '<ol>'.$send.'</ol>';
+}
+function _spisok23tru($r, $level=0) {//вывод одной строки содержания
+	$send = $r['tr'];
+	foreach($r['td'] as $n => $td) {
+		if($n == 1)
+			$td['w'] -= $level * 30;
+		$send .= '<td'.$td['cls'].' style="width:'.$td['w'].'px"'.'>'.$td['txt'];
+	}
+
+	return $send;
+}
+function _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS0, $child, $parent_id=0, $level=0) {//формирование табличного списка по уровням
 	if(!$arr = @$child[$parent_id])
 		return '';
 
 	$send = '';
 	foreach($arr as $id => $r)
 		$send .=
-			'<li class="mt1" id="sp_'.$id.'">'.
-				$TABLE_BEGIN.$MASS[$id].$TABLE_END.
-				(!empty($child[$id]) ? _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS, $child, $id) : '').
-			'</li>';
-	return
-		'<ol>'.$send.'</ol>';
+		'<li class="mt1" id="sp_'.$id.'">'.
+			$TABLE_BEGIN._spisok23tru($r, $level).$TABLE_END.
+			(!empty($child[$id]) ? _spisok23Child($TABLE_BEGIN, $TABLE_END, $MASS0, $child, $id, $level+1) : '').
+		'</li>';
+
+	return '<ol>'.$send.'</ol>';
 }
 function _elem23bg($el, $u) {//динамическая окраска строки
 	if(!$ids = _ids($el['txt_4'], 'arr'))

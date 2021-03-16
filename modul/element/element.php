@@ -1821,13 +1821,13 @@ function _elemAttrId($el, $prm) {//аттрибут id для DIV элемент
 
 	return $attr_id;
 }
-function _elemStyleWidth($el) {//ширина элемента
+function _elemStyleWidth($el, $retW=false) {//ширина элемента
 	if(!isset($el['width']))
-		return '';
+		return $retW ? 0 : '';
 	if(!$width = _num($el['width']))
-		return ' style="width:100%"';
+		return $retW ? 0 : ' style="width:100%"';
 
-	return ' style="width:'.$width.'px"';
+	return $retW ? $width : ' style="width:'.$width.'px"';
 }
 function _elemPrint($el, $prm) {//формирование и отображение элемента
 	//если элемент вносит данные из другого диалога - удаление данных записи, чтобы не было подстановки данных
