@@ -46,7 +46,7 @@ function _element8_print($el, $prm) {
 		//цифры и числа
 		case 33:
 			$v = round($v, $el['num_2']);
-			if(empty($prm['unit_edit']))
+			if(empty($prm['unit_edit']) && $el['txt_2'] !== '0')
 				$v = _hide0($v);
 			break;
 		//артикул
