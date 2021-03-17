@@ -1591,7 +1591,12 @@ function _elemUids($ids, $u) {//получение значения записи
 			$u = $u[$col];
 	}
 
-	return is_array($u) ? $u['id'] : $u;
+	if(is_array($u))
+		if(!empty($u['id']))
+			return $u['id'];
+		else return 0;
+
+	return $u;
 }
 function _elemUidsChild($elem_id, $v) {//получение всех дочерних значений родительского
 	$send[$v] = 1;
