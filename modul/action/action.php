@@ -258,6 +258,13 @@ function _elemAction229Hint($el, $prm, $txt) {//выплывающая подс�
 		return $txt;
 	if(!$hint = _BE('hint_elem_one', $el['id']))
 		return $txt;
+	if($F = _decode($hint['filter'])) {
+		if(!$u = _unitGet($prm))
+			return $txt;
+		if(!_elem40res($F, $u))
+			return $txt;
+	}
+
 	if(preg_match('/data-hint-id/', $txt))
 		return $txt;
 

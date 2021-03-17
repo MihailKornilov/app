@@ -373,6 +373,12 @@ function _blockDataHint($bl, $prm) {//аттрибут data-подсказка �
 		return '';
 	if(!$hint = _BE('hint_block_one', $bl['id']))
 		return '';
+	if($F = _decode($hint['filter'])) {
+		if(!$u = _unitGet($prm))
+			return '';
+		if(!_elem40res($F, $u))
+			return '';
+	}
 
 	$prm['td_no_end'] = 1;
 	$hint['msg'] = _blockHtml('hint', $hint['id'], $prm);
@@ -382,8 +388,14 @@ function _blockDataHint($bl, $prm) {//аттрибут data-подсказка �
 function _blockHintOn($bl, $prm) {
 	if($prm['blk_setup'])
 		return '';
-	if(!_BE('hint_block_one', $bl['id']))
+	if(!$hint = _BE('hint_block_one', $bl['id']))
 		return '';
+	if($F = _decode($hint['filter'])) {
+		if(!$u = _unitGet($prm))
+			return '';
+		if(!_elem40res($F, $u))
+			return '';
+	}
 
 	return 'hint-on';
 }
@@ -1546,6 +1558,7 @@ function _beHint($app_id=0) {//подсказки
 			'ug_v' => _num($r['revers']),
 			'delay_show' => _num($r['v1']),
 			'delay_hide' => _num($r['v2']),
+			'filter' => $r['filter']
 		);
 
 		if($block_id = _num($r['block_id']))
