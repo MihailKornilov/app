@@ -68,7 +68,8 @@ function _element36type($id='all') {//доступные варианты ико
 		42 => 'copy',
 		43 => 'exit',
 		44 => 'admin',
-		45 => 'video'
+		45 => 'video',
+		46 => 'sciss'
 	);
 
 	if($id == 'all')

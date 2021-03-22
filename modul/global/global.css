@@ -101,7 +101,7 @@ body:not(.site){position:relative}
 /* Иконки */
 .icon{
 	display:inline-block;
-	background:-9999px 0 no-repeat url(../../img/icon18.png?53);
+	background:-9999px 0 no-repeat url(../../img/icon18.png?55);
 	width:18px;
 	height:18px;
 	cursor:pointer;
@@ -155,6 +155,7 @@ body:not(.site){position:relative}
 .icon-manual {background-position-x:-940px}/* руководство: раскрытая книжка */
 .icon-admin  {background-position-x:-960px}/* администратор: человек в кружках */
 .icon-video  {background-position-x:-980px}/* видеоролик: треугольник в квадратике */
+.icon-sciss  {background-position-x:-1020px}/* ножницы */
 
 /* настройка ширины блоков */
 .icon-width  {
