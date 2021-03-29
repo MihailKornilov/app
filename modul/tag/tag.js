@@ -1916,7 +1916,6 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 				return t;
 			switch(o) {
 				case 'remove':
-					console.log(S);
 					S.next().remove('._dropdown');
 					return false;
 			}

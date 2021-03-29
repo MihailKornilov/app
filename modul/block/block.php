@@ -733,8 +733,11 @@ function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины
 			//получение элемента, который содержит список (для корректировки ширины с отступами)
 			if(!$elm14 = _elemOne($obj_id))
 				return 0;
+			if($width = _num(@$elm14['width']))
+				return $width;
 			if(!$bl = _blockOne($elm14['block_id']))
 				return 0;
+
 			$ex = explode(' ', $elm14['mar']);
 			return floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
 		case 'hint': return 500;

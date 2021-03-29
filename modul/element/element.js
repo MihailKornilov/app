@@ -7147,8 +7147,6 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			_itog();
 		}
 
-		console.log(vvv);
-
 		function vAdd(v) {
 			v = $.extend({
 				id:0,   //id записи
