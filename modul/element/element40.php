@@ -779,11 +779,7 @@ function PHP12_spfl_vvv($prm) {//получение настроек для ре
 	if($elem_id = $prm['srce']['element_id'])
 		$send['dss'] = _dialogSel24($elem_id, $prm['srce']['dss']);
 
-	if(!$arr = $prm['srce']['dop'])
-		return $send;
-
-	$arr = htmlspecialchars_decode($arr);
-	if(!$arr = json_decode($arr, true))
+	if(!$arr = _decode($prm['srce']['dop']))
 		return $send;
 
 	foreach($arr as $n => $r) {
