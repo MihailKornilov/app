@@ -697,7 +697,7 @@ function _40condVcopy($unit_id) {//подмена значения для коп
 }
 
 
-//получение ассоциативного массива значений по фильтру
+//получение количества
 function _40check($filter, $v) {
 	if(!$F = _decode($filter))
 		return true;

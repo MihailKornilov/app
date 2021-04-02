@@ -1640,6 +1640,10 @@ function _elmJs($obj_name, $obj_id, $prm=array()) {//список элемент
 		$el['vvv'] = _element('vvv', $el, $prm);
 
 		foreach($el['action'] as $i => $act) {
+			//декодирование условий
+			if(!empty($act['filter']))
+				$el['action'][$i]['filter'] = _decode($act['filter']);
+
 			//применение формулы
 			if($act['dialog_id'] == 208)
 				$el['action'][$i]['v1'] = _decode($act['v1']);

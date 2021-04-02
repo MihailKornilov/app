@@ -2983,10 +2983,10 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			return;
 
 		_forIn(el.vvv, function(sp) {
-			if(sp.id != sel_id)
-				return;
-			AG[el.id] = sp.sp;
-			return false;
+			if(sp.id == sel_id) {
+				AG[el.id] = sp.sp;
+				return false;
+			}
 		});
 	},
 
