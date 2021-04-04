@@ -1042,60 +1042,75 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(!act.initial_id)
 			return;
 
-		//значение установлено
-		if(v) {
-			//любое значение
-			if(act.initial_id != -2 && act.initial_id != v) {
-				if(act.revers)
-					is_show = is_show ? 0 : 1;
-				else
-					return;
-			}
-		}
-
-		//значение НЕ установлено
-		if(!v) {
-			if(act.initial_id != -1) {
-				if(act.revers)
-					is_show = is_show ? 0 : 1;
-				else
-					return;
-			}
-		}
-
-
-		//ПРОЦЕСС
-		_forN(_blockObj(act.target_ids), function(oo) {
-			if(!oo.obj.length)
-				return;
-
-			switch(act.effect_id) {
-				//исчезновение/появление
-				case 44:
-				case 715:
-				case 2789:
-					oo.obj._dn(1, 'vh');
-					oo.obj.animate({opacity:is_show}, 300, function() {
-						oo.obj._dn(is_show, 'vh');
-					});
-					return;
-				//сворачивание/разворачивание
-				case 45:
-				case 716:
-				case 2790:
-					if(!oo.slide) {
-						oo.obj._dn(is_show, 'vh');
+		var actApply = function() {
+			//значение установлено
+			if(v) {
+				//любое значение
+				if(act.initial_id != -2 && act.initial_id != v) {
+					if(act.revers)
+						is_show = is_show ? 0 : 1;
+					else
 						return;
-					}
-					oo.obj['slide' + (is_show ? 'Down' : 'Up')](300);
-					return;
-				default:
-					if(!oo.slide) {
-						oo.obj._dn(is_show, 'vh');
-						return;
-					}
-					oo.obj._dn(is_show);
+				}
 			}
+
+			//значение НЕ установлено
+			if(!v) {
+				if(act.initial_id != -1) {
+					if(act.revers)
+						is_show = is_show ? 0 : 1;
+					else
+						return;
+				}
+			}
+
+			//ПРОЦЕСС
+			_forN(_blockObj(act.target_ids), function(oo) {
+				if(!oo.obj.length)
+					return;
+
+				switch(act.effect_id) {
+					//исчезновение/появление
+					case 44:
+					case 715:
+					case 2789:
+						oo.obj._dn(1, 'vh');
+						oo.obj.animate({opacity:is_show}, 300, function() {
+							oo.obj._dn(is_show, 'vh');
+						});
+						return;
+					//сворачивание/разворачивание
+					case 45:
+					case 716:
+					case 2790:
+						if(!oo.slide) {
+							oo.obj._dn(is_show, 'vh');
+							return;
+						}
+						oo.obj['slide' + (is_show ? 'Down' : 'Up')](300);
+						return;
+					default:
+						if(!oo.slide) {
+							oo.obj._dn(is_show, 'vh');
+							return;
+						}
+						oo.obj._dn(is_show);
+				}
+			});
+		};
+
+		if(!act.filter)
+			return actApply();
+
+		var send = {
+			op:'act201_filter',
+			action_id:act.id,
+			unit_id:v,
+			busy_obj:_blockObj(act.target_ids)[0].obj
+		};
+		_post(send, function(res) {
+			v = res.v;
+			actApply();
 		});
 	},
 

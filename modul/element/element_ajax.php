@@ -852,6 +852,25 @@ switch(@$_POST['op']) {
 
 		jsonSuccess($send);
 		break;
+	case 'act201_filter'://подтверждение выбранного значения по фильтру
+		if(!$action_id = _num($_POST['action_id']))
+			jsonError('Некорректный id действия');
+		if(!$unit_id = _num($_POST['unit_id']))
+			jsonError('Некорректный id значения');
+
+		$sql = "SELECT *
+				FROM `_action`
+				WHERE `id`=".$action_id;
+		if(!$act = query_assoc($sql))
+			jsonError('Действия '.$action_id.' не существует');
+
+		$send['v'] = $unit_id;
+
+		if(!_40check($act['filter'], $unit_id))
+			$send['v'] = 0;
+
+		jsonSuccess($send);
+		break;
 }
 
 function _dialogSetupHistory($DLG) {//раздел История действий
