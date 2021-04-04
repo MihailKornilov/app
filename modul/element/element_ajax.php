@@ -855,8 +855,11 @@ switch(@$_POST['op']) {
 	case 'act201_filter'://подтверждение выбранного значения по фильтру
 		if(!$action_id = _num($_POST['action_id']))
 			jsonError('Некорректный id действия');
+
+		$send['v'] = 0;
+
 		if(!$unit_id = _num($_POST['unit_id']))
-			jsonError('Некорректный id значения');
+			jsonSuccess($send);
 
 		$sql = "SELECT *
 				FROM `_action`
@@ -864,10 +867,8 @@ switch(@$_POST['op']) {
 		if(!$act = query_assoc($sql))
 			jsonError('Действия '.$action_id.' не существует');
 
-		$send['v'] = $unit_id;
-
-		if(!_40check($act['filter'], $unit_id))
-			$send['v'] = 0;
+		if(_40check($act['filter'], $unit_id))
+			$send['v'] = $unit_id;
 
 		jsonSuccess($send);
 		break;
