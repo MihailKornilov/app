@@ -62,7 +62,17 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 					break;
 				default:
 					if(!$v = _element('v_get', $el, $prm))
+						if($u = _unitEdit($prm))
+							if($col = _elemCol($el))
+								if(isset($u[$col])) {
+									$v = $u[$col];
+									if(is_array($v))
+										$v = _num(@$v['id']);
+								}
+
+					if(!$v)
 						break;
+
 					if(!_40check($act['filter'], $v))
 						$v = 0;
 			}
