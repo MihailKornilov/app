@@ -6,18 +6,18 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 	//расстановка выполнения действий в порядке добавления
 	//первым будет выполняться действие, которое было добавлено первым
 	$action = array();
-	foreach($G_ACT['act'] as $id => $r) {
-		if($r['dialog_id'] != 201)
+	foreach($G_ACT['act'] as $id => $act) {
+		if($act['dialog_id'] != 201)
 			continue;
 
-		if(!$ass = _idsAss($r['target_ids']))
+		if(!$ass = _idsAss($act['target_ids']))
 			continue;
 		if(!isset($ass[$bl['id']]))
 			continue;
-		if(!$el = _elemOne($r['element_id']))
+		if(!$el = _elemOne($act['element_id']))
 			continue;
 
-		$action[$id][] = $r['element_id'];
+		$action[$id][] = $act['element_id'];
 	}
 
 	if(empty($action))
@@ -28,33 +28,20 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 	$hidden = $bl['hidden'];
 
 	foreach($action as $id => $elm) {
-		$r = $G_ACT['act'][$id];
+		$act = $G_ACT['act'][$id];
 		foreach($elm as $elem_id) {
 			if(!$el = _elemOne($elem_id))
 				continue;
-
-			if($el['dialog_id'] != 1//галочка
-			&& $el['dialog_id'] != 6//select страниц
-			&& $el['dialog_id'] != 7//быстрый поиск
-			&& $el['dialog_id'] != 16//radio
-			&& $el['dialog_id'] != 17//select
-			&& $el['dialog_id'] != 18//dropdown
-			&& $el['dialog_id'] != 24//Выпадающее поле - выбор списка
-			&& $el['dialog_id'] != 29//Выпадающее поле - выбор записи из другого списка
-			&& $el['dialog_id'] != 59//Связка с другим списком через кнопку
-			&& $el['dialog_id'] != 62//Фильтр: галочка
-			&& $el['dialog_id'] != 75//Фильтр: фронтальное меню
-			) continue;
-
+			if(!_blockAction201use($el['dialog_id']))
+				continue;
 			if(_filterIgnore($el)) {
 				$hidden = true;
 				continue;
 			}
-
-			if(!$r['initial_id'])
+			if(!$act['initial_id'])
 				continue;
 
-			switch($r['apply_id']) {
+			switch($act['apply_id']) {
 				default:
 				//скрыть
 				case 2783: $hidden = true; break;
@@ -62,36 +49,34 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 				case 2784: $hidden = false; break;
 			}
 
-			$v = _element('v_get', $el, $prm);
-
-			//получение выбранного значения при редактировании записи
-			if($u = $prm['unit_edit'])
-				if($col = _elemCol($el))
-					if(isset($u[$col])) {
-						$v = $u[$col];
-						if(is_array($v))
-							$v = _num(@$v['id']);
-					}
-
-			if(!_40check($r['filter'], $v))
-				$v = 0;
-
 			//фильтры
 			switch($el['dialog_id']) {
-				case 7: $v = _filter('vv', $el); break;
-				case 62: $v = _filter('vv', $el, $el['num_3']); break;
-				case 75: $v = _filter('vv', $el, 0); break;
+				case 7: //фильтр: Быстрый поиск
+					$v = _filter('vv', $el);
+					break;
+				case 62: //фильтр: Галочка
+					$v = _filter('vv', $el, $el['num_3']);
+					break;
+				case 75: //фильтр: фронтальное меню
+					$v = _filter('vv', $el, 0);
+					break;
+				default:
+					if(!$v = _element('v_get', $el, $prm))
+						break;
+					if(!_40check($act['filter'], $v))
+						$v = 0;
 			}
+
 			if($v) {//если значение было выбрано (установлено)
-				if($r['initial_id'] != -2 && $r['initial_id'] != $v)
-					if($r['revers'])
+				if($act['initial_id'] != -2 && $act['initial_id'] != $v)
+					if($act['revers'])
 						$hidden = !$hidden;
 					else
 						continue;
 
 			} else  //если значение было снято
-				if($r['initial_id'] != -1)
-					if($r['revers'])
+				if($act['initial_id'] != -1)
+					if($act['revers'])
 						$hidden = !$hidden;
 					else
 						continue;
@@ -101,6 +86,23 @@ function _blockAction201($bl, $prm) {//действие для элемента:
 	$bl['hidden'] = $hidden;
 
 	return $bl;
+}
+function _blockAction201use($dialog_id) {//элементы, которые могут использовать действие 201
+	switch($dialog_id) {
+		case 1: //галочка
+		case 6: //select страниц
+		case 7: //быстрый поиск
+		case 16: //radio
+		case 17: //select
+		case 18: //dropdown
+		case 24: //Выпадающее поле - выбор списка
+		case 29: //Выпадающее поле - выбор записи из другого списка
+		case 59: //Связка с другим списком через кнопку
+		case 62: //Фильтр: галочка
+		case 75: //Фильтр: фронтальное меню
+			return true;
+	}
+	return false;
 }
 function _blockAction209($bl, $prm, $txt='') {//установка ранее выбранного значения в блок
 	global $G_ACT;

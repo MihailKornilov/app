@@ -697,8 +697,8 @@ function _40condVcopy($unit_id) {//подмена значения для коп
 }
 
 
-//получение количества
-function _40check($filter, $v) {
+//проверка: соответствует ли запись условию
+function _40check($filter, $uid) {
 	if(!$F = _decode($filter))
 		return true;
 
@@ -711,12 +711,13 @@ function _40check($filter, $v) {
 	if(!$col = _elemCol($elem_id))
 		return false;
 
+	$v = $F['unit_id'] ? $F['unit_id'] : $F['txt'];
 
-	$sql = "SELECT COUNT(*)
+	$sql = "SELECT `id`
 			FROM  "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG).
-					_40condV($F['cond_id'], $col, 0)."
-			  AND `id`=".$v;
+					_40condV($F['cond_id'], $col, $v)."
+			  AND `id`=".$uid;
 	return query_value($sql);
 }
 
