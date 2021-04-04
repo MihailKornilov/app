@@ -731,14 +731,14 @@ function _blockObjWidth($obj_name, $obj_id=0) {//получение ширины
 		case 'tmp43':
 		case 'spisok':
 			//получение элемента, который содержит список (для корректировки ширины с отступами)
-			if(!$elm14 = _elemOne($obj_id))
+			if(!$elm = _elemOne($obj_id))
 				return 0;
-			if($width = _num(@$elm14['width']))
+			if($elm['dialog_id'] == 14 && $width = _num(@$elm['width']))
 				return $width;
-			if(!$bl = _blockOne($elm14['block_id']))
+			if(!$bl = _blockOne($elm['block_id']))
 				return 0;
 
-			$ex = explode(' ', $elm14['mar']);
+			$ex = explode(' ', $elm['mar']);
 			return floor(($bl['width'] - $ex[1] - $ex[3]) / 10) * 10;
 		case 'hint': return 500;
 	}
