@@ -60,8 +60,6 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 		case 2319:
 			if(!_queryTN($DLG, 'sort'))
 				break;
-			if(!$IS_SORT)
-				break;
 			$order = "`sort`";
 			$SC = 'ASC';
 			break;
