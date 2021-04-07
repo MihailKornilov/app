@@ -103,7 +103,6 @@ $.fn._select = function(o, o1) {//выпадающий список от 24.08.2
 			var v = INP.val();
 			ICON_DEL._dn(v && !o.multi);
 			o.funcWrite(v, t);
-			o.func(0);
 		}, 0);
 	});
 
