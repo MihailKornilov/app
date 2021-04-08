@@ -199,14 +199,9 @@ function _blockAction211($bl) {//БЛОК: скрытие/показ блоко�
 function _blockAction231($bl, $prm) {//условия отображения блока: скрытие
 	if($bl['hidden'])
 		return $bl;
-
-//if($bl['id'] != 18536) return $bl;
-
-//print_r($prm);
-
-	if(!$u = $prm['unit_get'])
-		return $bl;
 	if(!$action =  _BE('block_one_action', $bl['id']))
+		return $bl;
+	if(!$u = _unitGet($prm))
 		return $bl;
 
 	foreach($action as $act) {

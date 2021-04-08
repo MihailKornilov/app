@@ -219,7 +219,7 @@ function _elem40dss_el($prm, $dss) {//получение id диалога на 
 function _elem40res($filter, $u) {
 	$send = true;
 	foreach($filter as $ff) {
-		$v = _elemUids($ff['elem_id'], $u);
+		$v = _elemUids($ff['elem_id'], $u, true);
 		switch($ff['cond_id']) {
 			//отсутствует
 			case 1:

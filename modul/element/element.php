@@ -1573,7 +1573,7 @@ function _elemIdsTitleZnak($v) {
 		return ' » ';
 	return ', ';
 }
-function _elemUids($ids, $u) {//получение значения записи по идентификаторам элементов (в основном для [11])
+function _elemUids($ids, $u, $onlyV=false) {//получение значения записи по идентификаторам элементов (в основном для [11])
 	if(empty($u))
 		return '';
 	if(!$ids = _ids($ids, 'arr'))
@@ -1585,7 +1585,7 @@ function _elemUids($ids, $u) {//получение значения записи
 		if(!isset($u[$col]))
 			return '';
 
-		if(!empty($u[$col.'_title']))
+		if(!$onlyV && !empty($u[$col.'_title']))
 			$u = $u[$col.'_title'];
 		else
 			$u = $u[$col];
