@@ -2735,6 +2735,8 @@ function _historyInsertEdit($dialog, $unitOld, $unit) {//внесение ист
 
 		if($hidden)
 			continue;
+		if(empty($el))
+			continue;
 
 		$edited[] = array(
 			'name' => $name,
