@@ -77,19 +77,21 @@ function _element8_print($el, $prm) {
 			$art = preg_split("//u", $v , -1, PREG_SPLIT_NO_EMPTY);
 
 			//выделение числовых символов из артикула и увеличение на единицу
+			$txt = '';
 			$sum = '';
-			foreach($art as $r) {
+			foreach($art as $r)
 				if(!preg_match(REGEXP_NUMERIC, $r))
-					continue;
-				$sum .= $r;
-			}
+					$txt .= $r;
+				else
+					$sum .= $r;
+
 			$sum *= 1;
 			$sum++;
 
 			$itog = array();
 			$sum = preg_split("//u", $sum , -1, PREG_SPLIT_NO_EMPTY);
 			$sumN = count($sum)-1;
-			for($n = count($tmp)-1; $n >= 0; $n--) {
+			for($n = count($tmp)-strlen($txt)-1; $n >= 0; $n--) {
 				if(!preg_match(REGEXP_NUMERIC, $tmp[$n])) {
 					$itog[] = $tmp[$n];
 					continue;
@@ -104,7 +106,7 @@ function _element8_print($el, $prm) {
 			}
 
 			$itog = array_reverse($itog);
-			$v = implode('', $itog);
+			$v = $txt.implode('', $itog);
 
 			break;
 	}
