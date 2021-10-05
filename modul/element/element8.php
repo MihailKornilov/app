@@ -70,9 +70,6 @@ function _element8_print($el, $prm) {
 			if(!$v = query_value($sql))
 				$v = $el['txt_3'];
 
-			//исходный шаблон
-			$tmp = preg_split("//u", $el['txt_3'] , -1, PREG_SPLIT_NO_EMPTY);
-
 			//полученный максимальный артикул из базы
 			$art = preg_split("//u", $v , -1, PREG_SPLIT_NO_EMPTY);
 
@@ -88,26 +85,15 @@ function _element8_print($el, $prm) {
 			$sum *= 1;
 			$sum++;
 
-			$itog = array();
 			$sum = preg_split("//u", $sum , -1, PREG_SPLIT_NO_EMPTY);
-			$sumN = count($sum)-1;
-			for($n = count($tmp)-strlen($txt)-1; $n >= 0; $n--) {
-				if(!preg_match(REGEXP_NUMERIC, $tmp[$n])) {
-					$itog[] = $tmp[$n];
-					continue;
-				}
 
-				if($sumN < 0) {
-					$itog[] = 0;
-					continue;
-				}
+			//добавление нулей спереди к числовому значению
+			$add0 = count($art) - mb_strlen($txt) - count($sum);
+			if($add0 > 0)
+				for($n = 0; $n < $add0; $n++)
+					array_unshift($sum, 0);
 
-				$itog[] = $sum[$sumN--];
-			}
-
-			$itog = array_reverse($itog);
-			$v = $txt.implode('', $itog);
-
+			$v = $txt.implode('', $sum);
 			break;
 	}
 
