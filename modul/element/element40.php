@@ -340,6 +340,7 @@ function _40cond($EL, $cond, $prm=array()) {//изначальные услов�
 			return " AND !`t1`.`id` /* [40] уровень вложения > 2 не отработан */";
 
 		$col = _40cond_col($r);
+		$r['col'] = $col;
 
 		if($err = _40cond_err($col))
 			return $err;
@@ -609,8 +610,11 @@ function _40cond_dop($r, $val) {//дополнительные условия, �
 			return _num($_GET['id']);
 
 		case -31:
-			if(empty($_GET['v1']))
+			if(empty($_GET['v1'])) {
+				if(preg_match('/dtime_add/', $r['col']))
+					return '0000';
 				return "---###$$ /* v1 не получен */";
+			}
 			return _txt($_GET['v1']);
 	}
 
