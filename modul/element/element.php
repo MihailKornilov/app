@@ -3463,8 +3463,10 @@ function PHP12_kupez_gn_spisok($prm) {//список номеров газеты
 			WHERE  "._queryWhere($DLG)."
 			  AND `date_2`>'".TODAY."'
 			ORDER BY `num_2`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = query_arr($sql)) {
+		define('LAST_SHOW', 0);
 		return '{}';
+	}
 
 	//для доп.параметров: проверка объявление или нет
 	$ISOB = $prm['srce']['dialog_id'] == 1477;
