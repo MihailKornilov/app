@@ -72,16 +72,14 @@ function _elem129_kupez($DLG, $POST_CMP) {
 
 			_kupez_zayav_note();
 			_kupez_zayav_note_comment();
+
+			_kupez_setup_org();
+			_kupez_setup_bank();
 			break;
 		//частичный
 		case 2:
-			_kupez_zayav_ob();
-			_kupez_zayav_gn();
-			_kupez_accrual();
-			_kupez_refund();
-			_kupez_income();
-			_kupez_zayav_note();
-			_kupez_zayav_note_comment();
+			_kupez_setup_org();
+			_kupez_setup_bank();
 			break;
 
 		default:
@@ -1463,6 +1461,98 @@ function _kupez_zayav_note_comment() {//комментарии к заметка
 	query($sql);
 }
 
+function _kupez_setup_org() {//настройки: данные организации
+	$dialog_id = _comtexSpisokClear(1501);
+
+	//категории
+	_db2();
+	$sql = "SELECT *
+			FROM `_setup_org`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".addslashes($r['name'])."',
+				'".addslashes($r['name_yur'])."',
+				'".addslashes($r['phone'])."',
+				'".addslashes($r['adres_yur'])."',
+				'".addslashes($r['adres_ofice'])."',
+				'".addslashes($r['time_work'])."',
+				'".addslashes($r['ogrn'])."',
+				'".addslashes($r['kpp'])."',
+				'".addslashes($r['post_boss'])."',
+				'".addslashes($r['post_accountant'])."'
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  txt_1,/* name */
+				  txt_2,/* name_yur */
+				  txt_3,/* phone */
+				  txt_4,/* adres_yur */
+				  txt_5,/* adres_ofice */
+				  txt_6,/* time_work */
+				  txt_7,/* ogrn */
+				  txt_8,/* kpp */
+				  txt_9,/* post_boss */
+				  txt_10/* post_accountant */
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
+function _kupez_setup_bank() {//настройки: данные банков
+	$dialog_id = _comtexSpisokClear(1502);
+
+	//категории
+	_db2();
+	$sql = "SELECT *
+			FROM `_setup_org_bank`
+			WHERE `app_id`=".APP_ID_OLD."
+			ORDER BY `id`";
+	if(!$arr = query_arr($sql))
+		return;
+
+	$mass = array();
+	foreach($arr as $id => $r) {
+		$mass[] = "(
+				".$id.",
+				".APP_ID.",
+				".$id.",
+				".$dialog_id.",
+				
+				'".addslashes($r['bik'])."',
+				'".addslashes($r['name'])."',
+				'".addslashes($r['account'])."',
+				'".addslashes($r['account_corr'])."'
+			)";
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				  `id_old`,
+				  `app_id`,
+				  `num`,
+				  `dialog_id`,
+				
+				  txt_1,/* bik */
+				  txt_2,/* name */
+				  txt_3,/* account */
+				  txt_4 /* account_corr */
+			) VALUES ".implode(',', $mass);
+	query($sql);
+}
 
 
 
