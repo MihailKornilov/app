@@ -1541,8 +1541,14 @@ function _d1503_kupez($DLG, $POST_CMP) {//Закрытие / открытие д
 	if(empty($POST_CMP))
 		jsonError('Нет данных');
 
-
 	$year = substr($POST_CMP[20134], 0, 4);
+
+	$sql = "SELECT COUNT(*)
+			FROM `_spisok`
+			WHERE `dialog_id`=1489
+			  AND `date_1` LIKE '".$year."-%'";
+	if(query_value($sql))
+		jsonError('Создание номеров невозможно.<br>В '.$year.' году уже есть созданные номера.');
 
 	$insert = [];
 	$dPrint = strtotime($POST_CMP[20134]);
@@ -1585,6 +1591,8 @@ function _d1503_kupez($DLG, $POST_CMP) {//Закрытие / открытие д
 	$send = array(
 		'action_id' => 1 //обновить страницу
 	);
+	if($page_id = _num(@$_POST['page_id']))
+		$send['content'] = _pageShow($page_id);
 
 	jsonSuccess($send);
 }
