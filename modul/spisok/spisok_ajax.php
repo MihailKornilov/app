@@ -762,6 +762,10 @@ function _SUN_INTERCEPT($dialog, $POST_CMP) {//перехват внесения
 
 	//[129] КУПЕЦ - перенос
 	_elem129_kupez($dialog, $POST_CMP);
+
+	//[1503] КУПЕЦ - создание списка номеров газет
+	_d1503_kupez($dialog, $POST_CMP);
+
 }
 function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой записи, если отсутствует
 	if($unit_id)
@@ -1515,6 +1519,68 @@ function _d112_app_access($DLG, $POST_CMP) {//Закрытие / открыти�
 	query($sql);
 
 	_cache_clear('SETTING', 1);
+
+	$send = array(
+		'action_id' => 1 //обновить страницу
+	);
+
+	jsonSuccess($send);
+}
+function _d1503_kupez($DLG, $POST_CMP) {//Закрытие / открытие доступа к приложению
+	/*
+		1489: диалог, который вносит номера газеты по одному
+
+		[20125] => 1            первый номер в году
+		[20121] => 456          общий номер
+		[20134] => 2022-06-01   день отправки в печать
+		[20123] => 2022-06-01   день выхода
+		[20124] => 8            количество полос в газете
+	*/
+	if($DLG['id'] != 1503)
+		return;
+	if(empty($POST_CMP))
+		jsonError('Нет данных');
+
+
+	$year = substr($POST_CMP[20134], 0, 4);
+
+	$insert = [];
+	$dPrint = strtotime($POST_CMP[20134]);
+	$dOut = strtotime($POST_CMP[20123]);
+
+	for($n = 0; $n < 100; $n++) {
+		$insert[] = "(
+			".$DLG['app_id'].",
+			1489,
+
+			".($POST_CMP[20125]+$n).",
+			".($POST_CMP[20121]+$n).",
+			'".strftime('%Y-%m-%d', $dPrint)."',
+			'".strftime('%Y-%m-%d', $dOut)."',
+			".$POST_CMP[20124].",
+
+			".USER_ID."
+			)";
+		$dPrint += 604800;
+		$dOut += 604800;
+
+		if(strftime('%Y', $dPrint) != $year)
+			break;
+	}
+
+	$sql = "INSERT INTO `_spisok` (
+				`app_id`,
+				`dialog_id`,
+
+				`num_1`,
+				`num_2`,
+				`date_1`,
+				`date_2`,
+				`num_3`,
+
+				`user_id_add`
+			) VALUES ".implode(',', $insert);
+	query($sql);
 
 	$send = array(
 		'action_id' => 1 //обновить страницу
