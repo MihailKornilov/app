@@ -68,7 +68,7 @@ function _elem300vkRes($user_id, $isArr=false) {//данные пользова�
 	));
 
 	if(empty($res['response']))
-		return $isArr ? array() : '<div class="clr5 fs11">Данные из VK не получены</div>';
+		return $isArr ? array() : '<div class="clr5 fs11">Данные из VK не получены</div>';//._pr($res)
 
 	return $isArr ? $res['response'][0] : _elem300Sel($res['response'][0]);
 }
