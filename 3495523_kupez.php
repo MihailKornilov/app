@@ -78,8 +78,7 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
-			_kupez_setup_org();
-			_kupez_setup_bank();
+			_kupez_zayav_rek();
 			break;
 
 		default:
@@ -483,6 +482,7 @@ function _kupez_zayav_rek() {//заявки-реклама
 	query($sql);
 
 	_comtexErrMsg($dialog_id, 'num_1', 'Клиенты');
+//	_comtexErrMsg($dialog_id, 'sum_2', 'size_x');
 }
 function _kupez_zayav_rek_image() {//изображения к рекламе
 	$sql = "DELETE FROM `_image` WHERE `app_id`=".APP_ID;
@@ -1488,7 +1488,7 @@ function _kupez_setup_org() {//настройки: данные организа
 				'".addslashes($r['adres_ofice'])."',
 				'".addslashes($r['time_work'])."',
 				'".addslashes($r['ogrn'])."',
-				'".addslashes($r['kpp'])."',
+				'".addslashes($r['inn'])."',
 				'".addslashes($r['post_boss'])."',
 				'".addslashes($r['post_accountant'])."'
 			)";
@@ -1507,7 +1507,7 @@ function _kupez_setup_org() {//настройки: данные организа
 				  txt_5,/* adres_ofice */
 				  txt_6,/* time_work */
 				  txt_7,/* ogrn */
-				  txt_8,/* kpp */
+				  txt_8,/* inn */
 				  txt_9,/* post_boss */
 				  txt_10/* post_accountant */
 			) VALUES ".implode(',', $mass);
