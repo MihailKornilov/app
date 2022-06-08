@@ -672,26 +672,23 @@ function _document() {//формирование документа для вы�
 		return _empty20('Диалога '.$dlg_id.' не существует'._pageUrlBack());
 	if(!$unit_id = _num(@$_GET['id']))
 		return _empty20('Отсутствует id записи'._pageUrlBack());
+
+	_kupez_ob($ATT, $TMP);//todo формирование объявлений Купец в формате WORD
+
 	if(!$unit = _spisokUnitQuery($DLG, $unit_id))
 		return _empty20('Записи '.$unit_id.' не существует'._pageUrlBack());
 
-	//получение расширения файла
-	$ex = explode('.', $ATT['fname']);
-	$c = count($ex) - 1;
-	switch($ex[$c]) {
+	switch(_document_ftype($ATT)) {
 		case 'docx':
 			require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
 			$document = new \PhpOffice\PhpWord\TemplateProcessor($ATT['path'].$ATT['fname']);
-
-			$fname = _document_fname($ATT, $TMP, 'docx');
-			_kupez_ob($fname);
 
 			//подстановка данных
 			foreach(_document_values($TMP, $unit) as $i => $v)
 				$document->setValue($i, $v);
 
 			header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-			header('Content-Disposition: attachment; filename="'.$fname.'"');
+			header('Content-Disposition: attachment; filename="'._document_fname($ATT, $TMP, 'docx').'"');
 			$document->saveAs('php://output');
 			exit;
 
@@ -745,6 +742,11 @@ function _document() {//формирование документа для вы�
 		default: return _empty20('Некорректный файл-шаблон'._pageUrlBack());
 	}
 }
+function _document_ftype($ATT) {//получение расширения файла
+	$ex = explode('.', $ATT['fname']);
+	$c = count($ex) - 1;
+	return $ex[$c];
+}
 function _document_fname($ATT, $TMP, $type) {//формирование имени файла-шаблона для загрузки
 	$fname = $ATT['fname'];
 	if($TMP['fname']) {
@@ -794,13 +796,15 @@ function _document_values($TMP, $unit) {//получение значений д
 	return $ass;
 }
 //todo Купец: формирование списка объявлений по номеру газеты
-function _kupez_ob($fname) {
+function _kupez_ob($ATT, $TMP) {
 	if(APP_ID != 4)
 		return false;
 	if(!$elem_id = _num(@$_GET['elem_filter']))
 		return false;
 
+	require_once GLOBAL_DIR.'/inc/PhpWord/vendor/autoload.php';
 	$word = new \PhpOffice\PhpWord\PhpWord();
+	$fname = _document_fname($ATT, $TMP, 'docx');
 
 	$section = $word->addSection(
 		array(
