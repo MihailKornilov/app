@@ -40,6 +40,8 @@ function _elem129_kupez($DLG, $POST_CMP) {
 	switch($POST_CMP[$key]) {
 		//полный перенос
 		case 1:
+			jsonError('Перенос завершён');
+
 			_kupezDataDel();
 
 			_comtex_user();
@@ -78,7 +80,7 @@ function _elem129_kupez($DLG, $POST_CMP) {
 			break;
 		//частичный
 		case 2:
-			_kupez_zayav_rek();
+			jsonError('Перенос завершён');
 			break;
 
 		default:
