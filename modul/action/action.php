@@ -242,6 +242,7 @@ function _elemAction223($el, $prm, $txt) {//подсказка на тёмном
 	foreach($action as $act) {
 		if($act['dialog_id'] != 223)
 			continue;
+
 		if(preg_match('/data-tool/', $txt))
 			return $txt;
 
@@ -251,6 +252,9 @@ function _elemAction223($el, $prm, $txt) {//подсказка на тёмном
 			if(!$tool = _elemUids($act['target_ids'], $u))
 				return $txt;
 		}
+
+		if(preg_match('/https/', $tool))
+			return $txt;
 
 		if(preg_match('/class="/', $txt))
 			return preg_replace('/class="/', 'data-tool="'._br($tool).'" class="tool ', $txt, 1);
