@@ -3580,6 +3580,7 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 					$id.','.
 					APP_ID.','.
 					'1491,'.
+					$unit['num_1']['id'].','.
 					$unit['id'].','.
 					$gnid.','.
 					_num($r['dop']).','.
@@ -3617,6 +3618,7 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 				`id`,
 				`app_id`,
 				`dialog_id`,
+				`num_1`,
 				`".$col."`,
 				`num_5`,
 				`".$colDop."`,
@@ -3634,30 +3636,42 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 				`sum_17`=VALUES(`sum_17`)";
 	query($sql);
 
+	//обновление количеств и сумм у исходного диалога
+	PHP12_kupez_gn_upd($unit);
 
-	//обновление количеств
+
+	//обновление количеств и сумм у дочерних диалогов
+	$DLG = _dialogQuery($unit['dialog_id']);
+	foreach($DLG['cmp'] as $el)
+		if($el['dialog_id'] == 29)
+			if(!empty($unit[$el['col']]))
+				PHP12_kupez_gn_upd($unit[$el['col']]);
+}
+
+function PHP12_kupez_gn_upd($el) {//обновление количеств и сумм
+	//количества
 	$sql = "SELECT `id` FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=54
 			  AND `num_1` IN (
 					SELECT `id` FROM `_element`
 					WHERE `dialog_id` IN (29,59)
-					  AND `num_1`=".$unit['dialog_id']."
+					  AND `num_1`=".$el['dialog_id']."
 			  )";
 	if($ids = query_ids($sql))
 		foreach(_ids($ids, 'arr') as $id)
-			_element54update($id, $unit['id']);
+			_element54update($id, $el['id']);
 
-	//обновление сумм
+	//суммы
 	$sql = "SELECT `id` FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=55
 			  AND `num_1` IN (
 					SELECT `id` FROM `_element`
 					WHERE `dialog_id` IN (29,59)
-					  AND `num_1`=".$unit['dialog_id']."
+					  AND `num_1`=".$el['dialog_id']."
 			  )";
 	if($ids = query_ids($sql))
 		foreach(_ids($ids, 'arr') as $id)
-			_element55update($id, $unit['id']);
+			_element55update($id, $el['id']);
 }
