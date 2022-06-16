@@ -3550,6 +3550,12 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 	if(!$col = PHP12_kupez_gn_col($unit['dialog_id']))
 		return;
 
+/*
+kupezFix('num_2', 1477);
+kupezFix('num_3', 1486);
+kupezFix('num_4', 1487);
+*/
+
 	$save = array();
 	$ids = '0';
 
@@ -3580,7 +3586,7 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 					$id.','.
 					APP_ID.','.
 					'1491,'.
-					$unit['num_1']['id'].','.
+					_num(@$unit['num_1']['id']).','.
 					$unit['id'].','.
 					$gnid.','.
 					_num($r['dop']).','.
@@ -3588,7 +3594,8 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 					$r['cena'].','.
 					$skidka.','.
 					$skidkaSum.','.
-					_num(@$ASS[$gnid]).
+					_num(@$ASS[$gnid]).','.
+					USER_ID.
 				')';
 			}
 		}
@@ -3626,14 +3633,16 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 				`sum_16`,
 				`num_9`,
 				`sum_17`,
-				`sort`
+				`sort`,
+				`user_id_add`
 			) VALUES ".implode(',', $save)."
 			ON DUPLICATE KEY UPDATE
 				`".$colDop."`=VALUES(`".$colDop."`),
 				`sum_16`=VALUES(`sum_16`),
 				`num_8`=VALUES(`num_8`),
 				`num_9`=VALUES(`num_9`),
-				`sum_17`=VALUES(`sum_17`)";
+				`sum_17`=VALUES(`sum_17`),
+				`sort`=VALUES(`sort`)";
 	query($sql);
 
 	//обновление количеств и сумм у исходного диалога
@@ -3647,7 +3656,6 @@ function PHP12_kupez_gn_save($cmp, $val, $unit) {
 			if(!empty($unit[$el['col']]))
 				PHP12_kupez_gn_upd($unit[$el['col']]);
 }
-
 function PHP12_kupez_gn_upd($el) {//обновление количеств и сумм
 	//количества
 	$sql = "SELECT `id` FROM `_element`
@@ -3674,4 +3682,22 @@ function PHP12_kupez_gn_upd($el) {//обновление количеств и �
 	if($ids = query_ids($sql))
 		foreach(_ids($ids, 'arr') as $id)
 			_element55update($id, $el['id']);
+}
+
+
+//todo восстановление клиентов у некоторых номеров газет после переноса (2022-06-16)
+function kupezFix($col, $dlg_id) {
+	//список номеров газет без клиентов в объявлениях
+	$sql = "SELECT * FROM `_spisok` WHERE dialog_id=1491 AND !user_id_add and ".$col;
+	if($arr = query_arr($sql))
+		foreach($arr as $r) {
+			$sql = "SELECT * FROM _spisok WHERE dialog_id=".$dlg_id." and id=".$r[$col];
+			if(!$zayav = query_assoc($sql))
+				continue;
+			if(!$zayav['num_1'])
+				continue;
+
+			$sql = "UPDATE _spisok set num_1=".$zayav['num_1']." where id=".$r['id'];
+			query($sql);
+		}
 }
