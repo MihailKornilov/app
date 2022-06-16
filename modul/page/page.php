@@ -42,6 +42,11 @@ function _pageAccess($page_id) {//доступ к конкретного стр�
 	if(SA)
 		return true;
 
+	//скрытая страница
+	$page = _page($page_id);
+	if($page['hidden'])
+		return false;
+
 	$u = _user();
 	$ass = _idsAss($u['access_pages']);
 
@@ -540,6 +545,7 @@ function _pageShow($page_id) {
 		return _empty20('Несуществующая страница.'._pageUrlBack());
 	if(!_pageAccess($page_id))
 		return _empty20('Страница недоступна или не существует.'._pageUrlBack());
+
 
 	$prm = array();
 
@@ -1084,9 +1090,11 @@ function PHP12_page_list_li($r, $level=0) {//данные одной стран�
 					'<td>'.
 						'<a href="'.URL.'&p='.$r['id'].'" class="pg-name'._dn($r['parent_id'], 'b fs14').'">'.$r['name'].'</a>'.
 		   ($r['def'] ? '<div class="icon icon-ok curD ml10 tool" data-tool="Стартовая страница"></div>' : '').
+					'<td class="w25">'.
+		($r['hidden'] ? '<div class="icon icon-cancel tool" data-tool="Скрытая страница"></div>' : '').
 					'<td class="w50">'.
 						'<div val="dialog_id:20,edit_id:'.$r['id'].'" class="icon icon-edit pl dialog-open tool" data-tool="Редактировать страницу"></div>'.
-	($r['del_allow'] ? '<div val="dialog_id:20,del_id:'.$r['id'].'" class="icon icon-del-red pl dialog-open tool" data-tool="Удалить страницу"></div>' : '').
+	 ($r['del_allow'] ? '<div val="dialog_id:20,del_id:'.$r['id'].'" class="icon icon-del-red pl dialog-open tool" data-tool="Удалить страницу"></div>' : '').
 			'</table>';
 }
 
