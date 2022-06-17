@@ -3614,10 +3614,25 @@ kupezFix('num_4', 1487);
 				  AND `num_5` IN (".$gns.")
 				  AND `id` NOT IN (".$ids.")";
 		query($sql);
+
+
 	}
 
-	if(empty($save))
+	if(empty($save)) {
+		if($gns) {
+		//обновление количеств и сумм у исходного диалога
+		PHP12_kupez_gn_upd($unit);
+
+
+		//обновление количеств и сумм у дочерних диалогов
+		$DLG = _dialogQuery($unit['dialog_id']);
+		foreach($DLG['cmp'] as $el)
+			if($el['dialog_id'] == 29)
+				if(!empty($unit[$el['col']]))
+					PHP12_kupez_gn_upd($unit[$el['col']]);
+		}
 		return;
+	}
 
 	$colDop = $unit['dialog_id'] == 1477 ? 'num_6' : 'num_7';
 
