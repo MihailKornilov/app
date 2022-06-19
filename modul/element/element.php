@@ -3556,6 +3556,9 @@ kupezFix('num_3', 1486);
 kupezFix('num_4', 1487);
 */
 
+//kupezGnsSort();
+
+
 	$save = array();
 	$ids = '0';
 
@@ -3715,4 +3718,34 @@ function kupezFix($col, $dlg_id) {
 			$sql = "UPDATE _spisok set num_1=".$zayav['num_1']." where id=".$r['id'];
 			query($sql);
 		}
+}
+
+//todo переделка порядковых номеров у номеров газет
+function kupezGnsSort() {
+	$DLG = _dialogQuery(1489);
+	$sql = "SELECT `id`,`num_2`
+			FROM   "._queryFrom($DLG)."
+			WHERE  "._queryWhere($DLG);
+	$ASS = query_ass($sql);
+
+	$n = 0;
+	while(true) {
+		$sql = "SELECT *
+				FROM `_spisok`
+				WHERE `dialog_id`=1491
+				ORDER BY `id` DESC
+				LIMIT ".$n.",5000";
+		if(!$arr = query_arr($sql))
+			return;
+
+		foreach($arr as $r) {
+			if(!$sort = _num(@$ASS[$r['num_5']]))
+				continue;
+			$sql = "UPDATE `_spisok`
+					SET `sort`=".$sort."
+					WHERE `id`=".$r['id'];
+			query($sql);
+		}
+		$n += 5000;
+	}
 }
