@@ -293,6 +293,8 @@ function _spisokInclude($spisok) {//вложенные списки
 
 			if(!$incDialog['table_1'])
 				continue;
+			if($incDialog['id'] == 1491)//todo kupez
+				continue;
 
 			$sql = "SELECT "._queryCol($incDialog)."
 					FROM   "._queryFrom($incDialog)."
