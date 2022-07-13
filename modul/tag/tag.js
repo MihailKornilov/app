@@ -1933,6 +1933,7 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 		func:function() {}
 	}, o);
 
+
 	if(!o.head && o.title0)
 		o.head = o.title0;
 
@@ -2024,7 +2025,8 @@ $.fn._dropdown = function(o) {//выпадающий список в виде с
 				MASS_ASS[id] = sp;
 				unit = {
 					id:id,
-					title:sp
+					title:sp,
+					content:sp
 				};
 				MASS.push(unit);
 			});
