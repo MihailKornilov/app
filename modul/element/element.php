@@ -3559,8 +3559,8 @@ kupezFix('num_4', 1487);
 //kupezGnsSort();
 
 
-	$save = array();
-	$ids = '0';
+	$save = [];
+	$gnIds = '0';//номера газет, у которых нужно будет обновлять счётчики
 
 	if(!empty($val))
 		if(is_array($val)) {
@@ -3579,14 +3579,12 @@ kupezFix('num_4', 1487);
 			foreach($val as $r) {
 				if(!$gnid = _num($r['gnid']))
 					continue;
-				if($id = _num($r['id']))
-					$ids .= ','.$id;
 				$skidkaSum = 0;
 				if($skidka = _num($r['skidka']))
 					$skidkaSum = round(($r['cena'] / (100 - $skidka) * 100 - $r['cena']), 2);
 
 				$save[] = '('.
-					$id.','.
+					_num($r['id']).','.
 					APP_ID.','.
 					'1491,'.
 					_num(@$unit['num_1']['id']).','.
@@ -3600,6 +3598,8 @@ kupezFix('num_4', 1487);
 					_num(@$ASS[$gnid]).','.
 					USER_ID.
 				')';
+
+				$gnIds .= ','.$gnid;
 			}
 		}
 
@@ -3611,28 +3611,49 @@ kupezFix('num_4', 1487);
 			WHERE  "._queryWhere($DLG)."
 			  AND `date_1`>'".TODAY."'";
 	if($gns = query_ids($sql)) {
-		$sql = "DELETE FROM `_spisok`
+		$sql = "SELECT * FROM `_spisok`
 				WHERE `dialog_id`=1491
 				  AND `".$col."`=".$unit['id']."
 				  AND `num_5` IN (".$gns.")
-				  AND `id` NOT IN (".$ids.")";
-		query($sql);
+				  AND `num_5` NOT IN (".$gnIds.")";
+		if($arr = query_arr($sql)) {
+			$sql = "DELETE FROM `_spisok`
+					WHERE `dialog_id`=1491
+					  AND `".$col."`=".$unit['id']."
+					  AND `num_5` IN (".$gns.")
+					  AND `num_5` NOT IN (".$gnIds.")";
+			query($sql);
 
-
+			foreach($arr as $r)
+				$gnIds .= ','.$r['num_5'];
+		}
 	}
 
+
+	$gnIds = array_unique(_ids($gnIds, 'arr'));
+	$gnIds = _ids($gnIds);
+
 	if(empty($save)) {
-		if($gns) {
-		//обновление количеств и сумм у исходного диалога
-		PHP12_kupez_gn_upd($unit);
+		if($gnIds) {
+			//обновление количеств и сумм у исходного диалога
+			PHP12_kupez_gn_upd($unit);
 
+			//обновление количеств и сумм у дочерних диалогов
+			$DLG = _dialogQuery($unit['dialog_id']);
+			foreach($DLG['cmp'] as $el)
+				if($el['dialog_id'] == 29)
+					if(!empty($unit[$el['col']]))
+						PHP12_kupez_gn_upd($unit[$el['col']]);
 
-		//обновление количеств и сумм у дочерних диалогов
-		$DLG = _dialogQuery($unit['dialog_id']);
-		foreach($DLG['cmp'] as $el)
-			if($el['dialog_id'] == 29)
-				if(!empty($unit[$el['col']]))
-					PHP12_kupez_gn_upd($unit[$el['col']]);
+			//обновление количеств и сумм у номеров газет
+			$DLG = _dialogQuery(1489);
+			foreach($DLG['cmp'] as $el) {
+				if($el['dialog_id'] == 54)
+					_element54update($el['id'], $gnIds);
+				if($el['dialog_id'] == 55)
+					_element55update($el['id'], $gnIds);
+			}
+
 		}
 		return;
 	}
@@ -3673,6 +3694,18 @@ kupezFix('num_4', 1487);
 		if($el['dialog_id'] == 29)
 			if(!empty($unit[$el['col']]))
 				PHP12_kupez_gn_upd($unit[$el['col']]);
+
+	if(!$gnIds)
+		return;
+
+	//обновление количеств и сумм у номеров газет
+	$DLG = _dialogQuery(1489);
+	foreach($DLG['cmp'] as $el) {
+		if($el['dialog_id'] == 54)
+			_element54update($el['id'], $gnIds);
+		if($el['dialog_id'] == 55)
+			_element55update($el['id'], $gnIds);
+	}
 }
 function PHP12_kupez_gn_upd($el) {//обновление количеств и сумм
 	//количества
