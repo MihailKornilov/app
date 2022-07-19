@@ -3461,7 +3461,7 @@ function PHP12_kupez_gn_spisok($prm) {//список номеров газеты
 	$sql = "SELECT "._queryCol($DLG)."
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
-			  AND `date_1`>'".TODAY."'
+			  AND `date_1`>='".TODAY."'
 			ORDER BY `num_2`";
 	if(!$arr = query_arr($sql)) {
 		define('LAST_SHOW', 0);
@@ -3609,7 +3609,7 @@ kupezFix('num_4', 1487);
 	$sql = "SELECT `id`
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
-			  AND `date_1`>'".TODAY."'";
+			  AND `date_1`>='".TODAY."'";
 	if($gns = query_ids($sql)) {
 		$sql = "SELECT * FROM `_spisok`
 				WHERE `dialog_id`=1491
