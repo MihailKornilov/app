@@ -62,8 +62,6 @@ function query($sql) {
 	$SQL_QUERY[] = $sqlPath.$sql;
 	$SQL_QUERY_T[] = round($t, 3);
 
-	_db1();
-
 	return $res;
 }
 function query_value($sql) {//запрос одного значения
@@ -412,44 +410,6 @@ function _queryWhere_dialog_id($DLG) {//получение условия по `
 	return "`".$tn."`.`dialog_id`=".$dialog_id;
 }
 
-
-
-
-
-
-
-
-
-
-//ВТОРАЯ БАЗА
-_db_connect2();
-
-function _db_connect2() {//подключение ко второй базе данных
-	global  $CNN2,   //соединение со второй базой
-			$SQL_CNN,
-	        $CNN1;   //хранение первого подключения к базе, чтобы всегда переключаться на него после каждого запроса ко второй
-
-	$CNN1 = $SQL_CNN;
-
-	if(!$CNN2 = mysqli_connect(
-		MYSQLI_HOST,
-		MYSQLI_USER2,
-		MYSQLI_PASS2,
-		MYSQLI_DATABASE2
-	))
-	    die('Can`t mysql connect BAZE2: '.mysqli_connect_error());
-
-	$sql = "SET NAMES '".MYSQLI_NAMES."'";
-	mysqli_query($CNN2, $sql);
-}
-function _db1() {//переключение на первую базу
-	global $SQL_CNN, $CNN1;
-	$SQL_CNN = $CNN1;
-}
-function _db2() {//переключение на вторую базу
-	global $SQL_CNN, $CNN2;
-	$SQL_CNN = $CNN2;
-}
 
 
 
