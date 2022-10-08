@@ -61,7 +61,7 @@ function PHP12_bug_user($prm) {
 	$sql = "SELECT COUNT(*)
 			FROM `_user_access`
 			WHERE `app_id`=".APP_ID;
-	$USER = query_value($sql);
+	$USER = DB1::value($sql);
 
 	return
 	'<table class="_stab w100p">'.
@@ -80,7 +80,7 @@ function PHP12_bug_page($prm) {//страницы
 	$sql = "SELECT *
 			FROM `_page`
 			WHERE `app_id`=".APP_ID;
-	$PG = query_arr($sql);
+	$PG = DB1::arr($sql);
 
 	$parentC = 0;
 	$commonC = 0;
@@ -136,7 +136,7 @@ function PHP12_bug_page_blk($PG) {//Блоки от потерянных стр�
 			WHERE `app_id`=".APP_ID."
 			  AND `obj_name`='page'
 			  AND `obj_id` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_page_note($PG) {//Заметки
 	if(empty($PG))
@@ -147,7 +147,7 @@ function PHP12_bug_page_note($PG) {//Заметки
 			WHERE `app_id`=".APP_ID."
 			  AND !`parent_id`
 			  AND `page_id` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_page_3menu($PG) {//[3] Меню страниц
 	if(empty($PG))
@@ -159,7 +159,7 @@ function PHP12_bug_page_3menu($PG) {//[3] Меню страниц
 			  AND `dialog_id`=3
 			  AND `num_1`
 			  AND `num_1` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_page_dlg_insert($PG) {//Переход на страницу после внесения
 	if(empty($PG))
@@ -170,7 +170,7 @@ function PHP12_bug_page_dlg_insert($PG) {//Переход на страницу 
 			WHERE `app_id`=".APP_ID."
 			  AND `insert_action_obj_id`
 			  AND `insert_action_obj_id` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_page_dlg_edit($PG) {//Переход на страницу после редактирования
 	if(empty($PG))
@@ -181,7 +181,7 @@ function PHP12_bug_page_dlg_edit($PG) {//Переход на страницу п
 			WHERE `app_id`=".APP_ID."
 			  AND `edit_action_obj_id`
 			  AND `edit_action_obj_id` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_page_dlg_del($PG) {//Переход на страницу после удаления
 	if(empty($PG))
@@ -192,7 +192,7 @@ function PHP12_bug_page_dlg_del($PG) {//Переход на страницу п�
 			WHERE `app_id`=".APP_ID."
 			  AND `del_action_obj_id`
 			  AND `del_action_obj_id` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_page_204act($PG) {//204 - переход на страницу (элемент)
 	if(empty($PG))
@@ -203,7 +203,7 @@ function PHP12_bug_page_204act($PG) {//204 - переход на страниц�
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=204
 			  AND `target_ids` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_page_214act($PG) {//214 - переход на страницу (блок)
 	if(empty($PG))
@@ -214,7 +214,7 @@ function PHP12_bug_page_214act($PG) {//214 - переход на страниц�
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=214
 			  AND `target_ids` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_page_221act($PG) {//221 - переход на страницу (клик по элементу)
 	if(empty($PG))
@@ -225,7 +225,7 @@ function PHP12_bug_page_221act($PG) {//221 - переход на страниц�
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=221
 			  AND `target_ids` NOT IN ("._idsGet($PG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_page_user_access($PG) {//Доступ к страницам для пользователей
 	if(empty($PG))
@@ -244,7 +244,7 @@ function PHP12_bug_dialog($prm) {
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id` IN (".APP_ID.",0)";
-	$DLG = query_arr($sql);
+	$DLG = DB1::arr($sql);
 
 	$c = 0;
 	$parentC = 0;
@@ -311,7 +311,7 @@ function PHP12_bug_dialog_page_get($DLG) {//ID диалога, которого 
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id_unit_get`
 			  AND `dialog_id_unit_get` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_blk($DLG) {//Блоки от потерянных диалогов
 	if(empty($DLG))
@@ -322,7 +322,7 @@ function PHP12_bug_dialog_blk($DLG) {//Блоки от потерянных ди
 			WHERE `app_id`=".APP_ID."
 			  AND `obj_name` IN ('dialog','dialog_del')
 			  AND `obj_id` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_history($DLG) {//История действий
 	if(empty($DLG))
@@ -332,7 +332,7 @@ function PHP12_bug_dialog_history($DLG) {//История действий
 			FROM `_history`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_template($DLG) {//Шаблоны документов
 	if(empty($DLG))
@@ -342,7 +342,7 @@ function PHP12_bug_dialog_template($DLG) {//Шаблоны документов
 			FROM `_template`
 			WHERE `app_id`=".APP_ID."
 			  AND `spisok_id` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 
 function PHP12_bug_dialog_elem2($DLG) {
@@ -354,7 +354,7 @@ function PHP12_bug_dialog_elem2($DLG) {
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=2
 			  AND `num_4` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_elem14($DLG) {
 	if(empty($DLG))
@@ -365,7 +365,7 @@ function PHP12_bug_dialog_elem14($DLG) {
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=14
 			  AND `num_1` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_elem23($DLG) {
 	if(empty($DLG))
@@ -376,7 +376,7 @@ function PHP12_bug_dialog_elem23($DLG) {
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=23
 			  AND `num_1` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_elem29($DLG) {
 	if(empty($DLG))
@@ -387,7 +387,7 @@ function PHP12_bug_dialog_elem29($DLG) {
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=29
 			  AND `num_1` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_elem31($DLG) {
 	if(empty($DLG))
@@ -398,7 +398,7 @@ function PHP12_bug_dialog_elem31($DLG) {
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=31
 			  AND `num_1` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_elem59($DLG) {
 	if(empty($DLG))
@@ -411,7 +411,7 @@ function PHP12_bug_dialog_elem59($DLG) {
 			  AND (`num_1` NOT IN ("._idsGet($DLG).")
 			    OR `num_4` NOT IN ("._idsGet($DLG).")
 			   )";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_elem87($DLG) {
 	if(empty($DLG))
@@ -422,7 +422,7 @@ function PHP12_bug_dialog_elem87($DLG) {
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=87
 			  AND `num_1` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 
 function PHP12_bug_dialog_cron_src($DLG) {
@@ -433,7 +433,7 @@ function PHP12_bug_dialog_cron_src($DLG) {
 			FROM `_cron`
 			WHERE `app_id`=".APP_ID."
 			  AND `src_spisok` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_cron_dst($DLG) {
 	if(empty($DLG))
@@ -443,7 +443,7 @@ function PHP12_bug_cron_dst($DLG) {
 			FROM `_cron`
 			WHERE `app_id`=".APP_ID."
 			  AND `dst_spisok` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 
 function PHP12_bug_dialog_counter($DLG) {
@@ -454,7 +454,7 @@ function PHP12_bug_dialog_counter($DLG) {
 			FROM `_counter`
 			WHERE `app_id`=".APP_ID."
 			  AND `spisok_id` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_counter_v($DLG) {
 	if(empty($DLG))
@@ -464,7 +464,7 @@ function PHP12_bug_dialog_counter_v($DLG) {
 			FROM `_counter_v`
 			WHERE `app_id`=".APP_ID."
 			  AND `action_dialog_id` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 
 function PHP12_bug_dialog_205act($DLG) {//действие 205 - открытие диалога (элемент)
@@ -476,7 +476,7 @@ function PHP12_bug_dialog_205act($DLG) {//действие 205 - открыти�
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=205
 			  AND `target_ids` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_215act($DLG) {//действие 215 - открытие диалога (блок)
 	if(empty($DLG))
@@ -487,7 +487,7 @@ function PHP12_bug_dialog_215act($DLG) {//действие 215 - открыти�
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=215
 			  AND `target_ids` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_218act($DLG) {//действие 218 - Блок принимает данные записи
 	if(empty($DLG))
@@ -498,7 +498,7 @@ function PHP12_bug_dialog_218act($DLG) {//действие 218 - Блок при
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=218
 			  AND `initial_id` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_dialog_222act($DLG) {//действие 215 - открытие диалога (блок)
 	if(empty($DLG))
@@ -509,7 +509,7 @@ function PHP12_bug_dialog_222act($DLG) {//действие 215 - открыти�
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=222
 			  AND `target_ids` NOT IN ("._idsGet($DLG).")";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 
 
@@ -522,7 +522,7 @@ function PHP12_bug_block($prm) {
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `app_id`=".APP_ID;
-	$BLK = query_arr($sql);
+	$BLK = DB1::arr($sql);
 
 	$parentC = 0;
 	$xxC = 0;
@@ -567,7 +567,7 @@ function PHP12_bug_block_elem_parent() {
 				FROM `_block`
 				WHERE `app_id`=".APP_ID."
 			  )";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_block_elem57($BLK) {//Меню переключения блоков
 	if(empty($BLK))
@@ -583,7 +583,7 @@ function PHP12_bug_block_elem57($BLK) {//Меню переключения бл�
 				  AND `dialog_id`=57
 
 			)";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $BLK, 'txt_2');
@@ -596,7 +596,7 @@ function PHP12_bug_block_act201($BLK) {//201 - скрытие/показ бло�
 			FROM `_action`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=201";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $BLK, 'target_ids');
@@ -609,7 +609,7 @@ function PHP12_bug_block_act211($BLK) {//211 - скрытие/показ бло�
 			FROM `_action`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=211";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $BLK, 'target_ids');
@@ -625,7 +625,7 @@ function PHP12_bug_element($prm) {
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `app_id`=".APP_ID;
-	$ELM = query_arr($sql);
+	$ELM = DB1::arr($sql);
 
 	$c = count($ELM);
 
@@ -638,7 +638,7 @@ function PHP12_bug_element($prm) {
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id` IN (".$bldIds.")";
-	$ELM += query_arr($sql);
+	$ELM += DB1::arr($sql);
 
 
 	$parentC = 0;
@@ -735,7 +735,7 @@ function PHP12_bug_element_block_bg($ELM) {
 			FROM `_block`
 			WHERE `app_id`=".APP_ID."
 			  AND LENGTH(`bg`)";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'bg');
@@ -748,7 +748,7 @@ function PHP12_bug_element_template_prm($ELM) {
 			FROM `_template`
 			WHERE `app_id`=".APP_ID."
 			  AND `param_ids`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'param_ids');
@@ -760,7 +760,7 @@ function PHP12_bug_element_filter($ELM) {
 	$sql = "SELECT *
 			FROM `_user_spisok_filter`
 			WHERE `app_id`=".APP_ID;
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'element_id_spisok', true);
@@ -776,7 +776,7 @@ function PHP12_bug_element_dlg_history($ELM) {//Диалоги - история 
 	$sql = "SELECT *
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID;
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'insert_history_elem', true);
@@ -793,7 +793,7 @@ function PHP12_bug_element_dlg_42($ELM) {//Диалоги - Подмена зн�
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID."
 			  AND `insert_unit_change_elem_id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'insert_unit_change_elem_id', true);
@@ -809,7 +809,7 @@ function PHP12_bug_element_dlg_col_def($ELM) {//Диалоги - Колонка 
 			FROM `_dialog`
 			WHERE `app_id`=".APP_ID."
 			  AND `spisok_elem_id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'spisok_elem_id');
@@ -823,7 +823,7 @@ function PHP12_bug_element_act202($ELM) {
 			FROM `_action`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=202";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'target_ids');
@@ -836,7 +836,7 @@ function PHP12_bug_element_act203($ELM) {
 			FROM `_action`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=203";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'target_ids');
@@ -849,7 +849,7 @@ function PHP12_bug_element_act206($ELM) {
 			FROM `_action`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=206";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'target_ids');
@@ -862,7 +862,7 @@ function PHP12_bug_element_act212($ELM) {
 			FROM `_action`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=212";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'target_ids');
@@ -875,7 +875,7 @@ function PHP12_bug_element_act213($ELM) {
 			FROM `_action`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=213";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'target_ids');
@@ -888,7 +888,7 @@ function PHP12_bug_element_act216($ELM) {
 			FROM `_action`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=216";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'target_ids');
@@ -901,7 +901,7 @@ function PHP12_bug_element_act223($ELM) {
 			FROM `_action`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=223";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'target_ids');
@@ -914,7 +914,7 @@ function PHP12_bug_element_counter($ELM) {
 	$sql = "SELECT *
 			FROM `_counter`
 			WHERE `app_id`=".APP_ID;
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'sum_elem_id', true);
@@ -929,7 +929,7 @@ function PHP12_bug_element_counter_v($ELM) {
 	$sql = "SELECT *
 			FROM `_counter_v`
 			WHERE `app_id`=".APP_ID;
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'element_id');
@@ -942,7 +942,7 @@ function PHP12_bug_element_cron_src($ELM) {
 	$sql = "SELECT *
 			FROM `_cron`
 			WHERE `app_id`=".APP_ID;
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_json_elm($arr, $ELM, 'src_prm');
@@ -954,7 +954,7 @@ function PHP12_bug_element_cron_dst($ELM) {
 	$sql = "SELECT *
 			FROM `_cron`
 			WHERE `app_id`=".APP_ID;
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_elm_ass($arr, $ELM, 'dst_prm');
@@ -968,7 +968,7 @@ function PHP12_bug_element_elem7($ELM) {//Фильтр-поиск
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=7";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c =  _bug_ids_count($arr, $ELM, 'num_1', true);
@@ -984,7 +984,7 @@ function PHP12_bug_element_elem11($ELM) {//Вставка значения
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=11";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'txt_2');
@@ -998,7 +998,7 @@ function PHP12_bug_element_elem14($ELM) {//Список-шаблон
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=14
 			  AND LENGTH(`txt_2`)";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_json_elm($arr, $ELM, 'txt_2');
@@ -1011,7 +1011,7 @@ function PHP12_bug_element_elem15($ELM) {//Количество строк сп�
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=15";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'num_1');
@@ -1025,7 +1025,7 @@ function PHP12_bug_element_elem16($ELM) {//Radio - произвольные зн
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=16
 			  AND `num_3`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'num_3');
@@ -1039,7 +1039,7 @@ function PHP12_bug_element_elem23($ELM) {//Список-таблица
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=23
 			  AND LENGTH(`txt_2`)";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'num_10', true);
@@ -1055,7 +1055,7 @@ function PHP12_bug_element_elem29($ELM) {//Select: выбор записи из 
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=29";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c = _bug_ids_count($arr, $ELM, 'txt_1', true);
@@ -1073,7 +1073,7 @@ function PHP12_bug_element_elem31($ELM) {//Выбор нескольких зн�
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=31
 			  AND `num_2`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'num_2');
@@ -1087,7 +1087,7 @@ function PHP12_bug_element_elem40($ELM) {//Фильтрование списка
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=40
 			  AND `num_1`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'num_1');
@@ -1101,7 +1101,7 @@ function PHP12_bug_element_elem44($ELM) {//Сборный текст
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=44
 			  AND LENGTH(`txt_2`)";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'txt_2');
@@ -1114,7 +1114,7 @@ function PHP12_bug_element_elem54($ELM) {//количество значений
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=54";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
@@ -1130,7 +1130,7 @@ function PHP12_bug_element_elem55($ELM) {//Сумма значений прив�
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=55";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
@@ -1148,7 +1148,7 @@ function PHP12_bug_element_elem57($ELM) {//Меню переключения б�
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=57
 			  AND LENGTH(`txt_2`)";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'txt_2');
@@ -1161,7 +1161,7 @@ function PHP12_bug_element_elem62($ELM) {//Фильтр: галочка
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=62";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
@@ -1177,7 +1177,7 @@ function PHP12_bug_element_elem72($ELM) {//Фильтр: год и месяц
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=72";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
@@ -1193,7 +1193,7 @@ function PHP12_bug_element_elem74($ELM) {//Фильтр: Radio
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=74";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'num_1');
@@ -1206,7 +1206,7 @@ function PHP12_bug_element_elem77($ELM) {//Фильтр: календарь
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=77";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'num_1');
@@ -1219,7 +1219,7 @@ function PHP12_bug_element_elem78($ELM) {//Фильтр: меню
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=78";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
@@ -1236,7 +1236,7 @@ function PHP12_bug_element_elem80($ELM) {//Очистка фильтра
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=80";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'num_1');
@@ -1249,7 +1249,7 @@ function PHP12_bug_element_elem83($ELM) {//Фильтр: Select - привяза
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=83";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
@@ -1265,7 +1265,7 @@ function PHP12_bug_element_elem85($ELM) {//Select - выбор значения 
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=85";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'num_1');
@@ -1278,7 +1278,7 @@ function PHP12_bug_element_elem86($ELM) {//Значение записи: кол
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=86";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_ids_count($arr, $ELM, 'num_1');
@@ -1291,7 +1291,7 @@ function PHP12_bug_element_elem87($ELM) {//Циферка в меню стран
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=87";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	return _bug_json_elm($arr, $ELM, 'txt_1');
@@ -1304,7 +1304,7 @@ function PHP12_bug_element_elem96($ELM) {//Количество значений
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=96";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
@@ -1321,7 +1321,7 @@ function PHP12_bug_element_elem102($ELM) {//Фильтр: Выбор неско�
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=102";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$c  = _bug_ids_count($arr, $ELM, 'num_1', true);
@@ -1338,12 +1338,12 @@ function PHP12_bug_element_hint() {
 	$sql = "SELECT *
 			FROM `__hint`
 			WHERE `app_id`=".APP_ID;
-	$HINT = query_arr($sql);
+	$HINT = DB1::arr($sql);
 
 	$sql = "SELECT `id`,1
 			FROM `_element`
 			WHERE `app_id`=".APP_ID;
-	$ass = query_arr($sql);
+	$ass = DB1::arr($sql);
 
 	$lost = 0;
 	foreach($HINT as $r)
@@ -1366,7 +1366,7 @@ function PHP12_bug_action($prm) {
 	$sql = "SELECT *
 			FROM `_action`
 			WHERE `app_id`=".APP_ID;
-	$ACT = query_arr($sql);
+	$ACT = DB1::arr($sql);
 
 	$cnnC = 0;
 	foreach($ACT as $r)
@@ -1392,7 +1392,7 @@ function PHP12_bug_action_blk() {
 				FROM `_block`
 				WHERE `app_id`=".APP_ID."
 			  )";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 function PHP12_bug_action_elm() {
 	$sql = "SELECT COUNT(*)
@@ -1404,7 +1404,7 @@ function PHP12_bug_action_elm() {
 				FROM `_element`
 				WHERE `app_id`=".APP_ID."
 			  )";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 
 
@@ -1416,12 +1416,12 @@ function PHP12_bug_counter($prm) {
 	$sql = "SELECT *
 			FROM `_counter`
 			WHERE `app_id`=".APP_ID;
-	$COUNTER = query_arr($sql);
+	$COUNTER = DB1::arr($sql);
 
 	$sql = "SELECT COUNT(*)
 			FROM `_counter_v`
 			WHERE `app_id`=".APP_ID;
-	$COUNTER_V = query_value($sql);
+	$COUNTER_V = DB1::value($sql);
 
 	return
 	'<table class="_stab w100p">'.
@@ -1441,7 +1441,7 @@ function PHP12_bug_counter_v_lost() {
 				FROM `_counter`
 				WHERE `app_id`=".APP_ID."
 			  )";
-	return _hide0(query_value($sql));
+	return _hide0(DB1::value($sql));
 }
 
 
@@ -1453,7 +1453,7 @@ function PHP12_bug_cron($prm) {
 	$sql = "SELECT *
 			FROM `_cron`
 			WHERE `app_id`=".APP_ID;
-	$CRON = query_arr($sql);
+	$CRON = DB1::arr($sql);
 
 	return
 	'<table class="_stab w100p">'.
@@ -1471,7 +1471,7 @@ function PHP12_bug_image($prm) {
 	$sql = "SELECT COUNT(*)
 			FROM `_image`
 			WHERE `app_id`=".APP_ID;
-	$IMG = query_value($sql);
+	$IMG = DB1::value($sql);
 
 	return
 	'<table class="_stab w100p">'.
@@ -1489,7 +1489,7 @@ function PHP12_bug_attach($prm) {
 	$sql = "SELECT *
 			FROM `_attach`
 			WHERE `app_id`=".APP_ID;
-	$ATTACH = query_arr($sql);
+	$ATTACH = DB1::arr($sql);
 
 	return
 	'<table class="_stab w100p">'.
@@ -1507,7 +1507,7 @@ function PHP12_bug_template($prm) {
 	$sql = "SELECT *
 			FROM `_template`
 			WHERE `app_id`=".APP_ID;
-	$TMP = query_arr($sql);
+	$TMP = DB1::arr($sql);
 
 	return
 	'<table class="_stab w100p">'.
@@ -1526,13 +1526,13 @@ function PHP12_bug_note($prm) {
 			FROM `_note`
 			WHERE `app_id`=".APP_ID."
 			  AND !`parent_id`";
-	$NOTE = query_value($sql);
+	$NOTE = DB1::value($sql);
 
 	$sql = "SELECT COUNT(*)
 			FROM `_note`
 			WHERE `app_id`=".APP_ID."
 			  AND `parent_id`";
-	$COMM = query_value($sql);
+	$COMM = DB1::value($sql);
 
 	return
 	'<table class="_stab w100p">'.
@@ -1551,7 +1551,7 @@ function PHP12_bug_history($prm) {
 	$sql = "SELECT COUNT(*)
 			FROM `_history`
 			WHERE `app_id`=".APP_ID;
-	$HIST = query_value($sql);
+	$HIST = DB1::value($sql);
 
 	return
 	'<table class="_stab w100p">'.
@@ -1569,7 +1569,7 @@ function PHP12_bug_spisok($prm) {
 	$sql = "SELECT COUNT(*)
 			FROM `_spisok`
 			WHERE `app_id`=".APP_ID;
-	$SPISOK = query_value($sql);
+	$SPISOK = DB1::value($sql);
 
 	return
 	'<table class="_stab w100p">'.

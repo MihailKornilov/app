@@ -21,7 +21,7 @@ switch(@$_POST['op']) {
 				FROM `_user`
 				WHERE `vk_id`=".$vkUser_id."
 				LIMIT 1";
-		if(!$user_id = _num(query_value($sql))) {
+		if(!$user_id = _num(DB1::value($sql))) {
 
 			//если пользователя в базе нет - получение данных из VK
 			if(!$user_id = _userVkUpdate($vkUser_id))
@@ -33,7 +33,7 @@ switch(@$_POST['op']) {
 		$sql = "SELECT `app_id_last`
 				FROM `_user`
 				WHERE `id`=".$user_id;
-		$app_id_last = _num(query_value($sql));
+		$app_id_last = _num(DB1::value($sql));
 
 		_authSuccess($sig, $user_id, $app_id_last);
 
@@ -44,7 +44,7 @@ switch(@$_POST['op']) {
 				FROM `_user`
 				WHERE `vk_id`=982006
 				LIMIT 1";
-		if(!$user = query_assoc($sql))
+		if(!$user = DB1::assoc($sql))
 			jsonError('Пользователь не найден');
 
 		_authSuccess(md5('local'.$user['id']), $user['id'], $user['app_id_last']);

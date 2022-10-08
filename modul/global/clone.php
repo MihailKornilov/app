@@ -29,7 +29,7 @@ function _app_clear_td($tab) {//значение TD конкретной таб�
 	$sql = "SELECT COUNT(*)
 			FROM `".$tab."`
 			WHERE `app_id`=".APP_ID;
-	$c = query_value($sql);
+	$c = DB1::value($sql);
 
 	return
 	'<tr><td class="w100">'.$tab.
@@ -69,87 +69,87 @@ function _appDel($app_id=APP_ID) {
 	//удаление данных
 	$sql = "DELETE FROM `_spisok`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление истории действий
 	$sql = "DELETE FROM `_history`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 	$sql = "DELETE FROM `_history_edited`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление значений фильтров пользователей
 	$sql = "DELETE FROM `_user_spisok_filter`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 
 
 	//удаление страниц
 	$sql = "DELETE FROM `_page`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление доступа к приложению
 	$sql = "DELETE FROM `_user_access`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление блоков
 	$sql = "DELETE FROM `_block`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление элементов
 	$sql = "DELETE FROM `_element`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление диалогов
 	$sql = "DELETE FROM `_dialog`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление действий
 	$sql = "DELETE FROM `_action`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление счётчиков
 	$sql = "DELETE FROM `_counter`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление значений счётчиков
 	$sql = "DELETE FROM `_counter_v`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление планировщиков
 	$sql = "DELETE FROM `_cron`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление шаблонов документов
 	$sql = "DELETE FROM `_template`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление файлов
 	$sql = "DELETE FROM `_attach`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление изображений
 	$sql = "DELETE FROM `_image`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 
 	//удаление заметок
 	$sql = "DELETE FROM `_note`
 			WHERE `app_id`=".$app_id;
-	query($sql);
+	DB1::query($sql);
 }
 
 
@@ -160,7 +160,7 @@ function PHP12_clone_on() {//получение диалогов, данные �
 			  AND `clone_on`
 			  AND `table_1`=11
 			ORDER BY `name`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return _emptyMin('<b>Данные переноситься не будут.</b><br>Только структура приложения.');
 
 	$sql = "SELECT
@@ -170,7 +170,7 @@ function PHP12_clone_on() {//получение диалогов, данные �
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id` IN ("._idsGet($arr).")
 			GROUP BY `dialog_id`";
-	$ass = query_ass($sql);
+	$ass = DB1::ass($sql);
 
 	$send = '';
 	foreach($arr as $id => $r)
@@ -211,7 +211,7 @@ function _clone_go($DLG, $CMP) {
 				'".addslashes($name)."',
 				".USER_ID."
 			)";
-	$app_id = query_id($sql);
+	$app_id = DB1::insert_id($sql);
 
 	_clone($app_id);
 //	_app_user_access($app_id);
@@ -251,7 +251,7 @@ function _clone_clear() {
 	$sql = "DELETE FROM `_clone`
 			WHERE `app_id_src`=".CLONE_ID_SRC."
 			  AND `app_id_dst`=".CLONE_ID_DST;
-	query($sql);
+	DB1::query($sql);
 
 	_appDel(CLONE_ID_DST);
 }
@@ -270,14 +270,14 @@ function _clone_ass_save($tName, $src_id, $dst_id) {//сохранение со�
 				".$src_id.",
 				".$dst_id."
 			)";
-	query($sql);
+	DB1::query($sql);
 }
 function _clone_ass($table_id=0) {//получение соответствий идентификаторов
 	$sql = "SELECT *
 			FROM `_clone`
 			WHERE `app_id_src`=".CLONE_ID_SRC."
 			  AND `app_id_dst`=".CLONE_ID_DST;
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return array();
 
 	$send = array();
@@ -328,7 +328,7 @@ function _clone_base() {//сохранение соответствий базо
 			WHERE !`app_id`
 			  AND `parent_any`
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $id => $r)
@@ -338,7 +338,7 @@ function _clone_base() {//сохранение соответствий базо
 			FROM `_block`
 			WHERE `obj_name`='dialog'
 			  AND `obj_id` IN ("._idsGet($arr).")";
-	if(!$BLK = query_arr($sql))
+	if(!$BLK = DB1::arr($sql))
 		return;
 
 	foreach($BLK as $id => $r)
@@ -347,7 +347,7 @@ function _clone_base() {//сохранение соответствий базо
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($BLK).")";
-	if(!$ELM = query_arr($sql))
+	if(!$ELM = DB1::arr($sql))
 		return;
 
 	foreach($ELM as $id => $r)
@@ -359,7 +359,7 @@ function _clone_page() {//клонирование: страницы
 			FROM `_page`
 			WHERE `app_id`=".CLONE_ID_SRC."
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return false;
 
 	foreach($arr as $r) {
@@ -391,7 +391,7 @@ function _clone_page() {//клонирование: страницы
 					".$r['sort'].",
 					".USER_ID."
 				)";
-		_clone_ass_save('_page', $r['id'], query_id($sql));
+		_clone_ass_save('_page', $r['id'], DB1::insert_id($sql));
 	}
 
 	$ass = _clone_ass(_table('_page'));
@@ -404,7 +404,7 @@ function _clone_page() {//клонирование: страницы
 				SET `parent_id`="._num(@$ass[$r['parent_id']]).",
 					`common_id`="._num(@$ass[$r['common_id']])."
 				WHERE `id`=".$ass[$id];
-		query($sql);
+		DB1::query($sql);
 	}
 
 	return true;
@@ -414,7 +414,7 @@ function _clone_block() {//клонирование: блоки
 			FROM `_block`
 			WHERE `app_id`=".CLONE_ID_SRC."
 			ORDER BY `parent_id`,`y`,`x`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $r) {
@@ -462,7 +462,7 @@ function _clone_block() {//клонирование: блоки
 					".$r['hidden'].",
 					".USER_ID."
 				)";
-		_clone_ass_save('_block', $r['id'], query_id($sql));
+		_clone_ass_save('_block', $r['id'], DB1::insert_id($sql));
 	}
 
 	$ass = _clone_ass();
@@ -476,7 +476,7 @@ function _clone_block() {//клонирование: блоки
 				SET `parent_id`="._num(@$assBlk[$r['parent_id']]).",
 					`xx_ids`='"._clone_ids($r['xx_ids'], $assBlk)."'
 				WHERE `id`=".$assBlk[$id];
-		query($sql);
+		DB1::query($sql);
 	}
 }
 function _clone_element() {//клонирование: элементы
@@ -484,7 +484,7 @@ function _clone_element() {//клонирование: элементы
 			FROM `_element`
 			WHERE `app_id`=".CLONE_ID_SRC."
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$ass = _clone_ass(_table('_block'));
@@ -569,7 +569,7 @@ function _clone_element() {//клонирование: элементы
 					".$r['sort'].",
 					".USER_ID."
 				)";
-		_clone_ass_save('_element', $r['id'], query_id($sql));
+		_clone_ass_save('_element', $r['id'], DB1::insert_id($sql));
 	}
 
 	$ass = _clone_ass();
@@ -586,7 +586,7 @@ function _clone_element() {//клонирование: элементы
 				SET `parent_id`="._num(@$assElm[$r['parent_id']]).",
 					`col`='".$r['col']."'
 				WHERE `id`=".$assElm[$id];
-		query($sql);
+		DB1::query($sql);
 	}
 }
 function _clone_dialog() {//клонирование: диалоги
@@ -594,7 +594,7 @@ function _clone_dialog() {//клонирование: диалоги
 			FROM `_dialog`
 			WHERE `app_id`=".CLONE_ID_SRC."
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$assPG = _clone_ass(_table('_page'));
@@ -691,7 +691,7 @@ function _clone_dialog() {//клонирование: диалоги
 
 					".USER_ID."
 				)";
-		_clone_ass_save('_dialog', $r['id'], query_id($sql));
+		_clone_ass_save('_dialog', $r['id'], DB1::insert_id($sql));
 	}
 
 	$ass = _clone_ass();
@@ -706,7 +706,7 @@ function _clone_dialog() {//клонирование: диалоги
 					`is_unit_get`="._num(@$assDLG[$r['is_unit_get']])."
 				WHERE `id`=".$assDLG[$id];
 		echo 'Переделать! '.$sql;
-		query($sql);
+		DB1::query($sql);
 	}
 
 	//страницы, принимающие значения записи
@@ -715,11 +715,11 @@ function _clone_dialog() {//клонирование: диалоги
 			WHERE `app_id`=".CLONE_ID_DST."
 			  AND `dialog_id_unit_get`
 			ORDER BY `id`";
-	foreach(query_arr($sql) as $r) {
+	foreach(DB1::arr($sql) as $r) {
 		$sql = "UPDATE `_page`
 				SET `dialog_id_unit_get`="._num(@$assDLG[$r['dialog_id_unit_get']])."
 				WHERE `id`=".$r['id'];
-		query($sql);
+		DB1::query($sql);
 	}
 }
 
@@ -728,7 +728,7 @@ function _clone_blk_upd() {//обновление объектов для диа
 			FROM `_block`
 			WHERE `app_id`=".CLONE_ID_DST."
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$ass = _clone_ass();
@@ -758,7 +758,7 @@ function _clone_blk_upd() {//обновление объектов для диа
 				SET `obj_id`=".$r['obj_id'].",
 					`bg`='".$r['bg']."'
 				WHERE `id`=".$block_id;
-		query($sql);
+		DB1::query($sql);
 	}
 
 }
@@ -767,7 +767,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 			FROM `_element`
 			WHERE `app_id`=".CLONE_ID_DST."
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$ass = _clone_ass();
@@ -783,7 +783,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_4`="._num(@$assDLG[$r['num_4']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Меню страниц
@@ -791,7 +791,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_1`="._num(@$assPG[$r['num_1']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Фильтр - быстрый поиск
@@ -800,7 +800,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assEL[$r['num_1']]).",
 							`txt_2`='"._clone_ids($r['txt_2'], $assEL)."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Вставка значения записи
@@ -808,7 +808,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `txt_2`='"._clone_ids($r['txt_2'], $assEL)."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Выбор элемента из диалога или страницы
@@ -816,7 +816,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_1`="._num(@$assDLG[$r['num_1']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Список-шаблон
@@ -825,7 +825,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assDLG[$r['num_1']]).",
 							`txt_2`='".addslashes(_clone_json($r['txt_2'], $assEL))."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Количество строк списка
@@ -833,7 +833,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_1`="._num(@$assEL[$r['num_1']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Radio - произвольные значения
@@ -843,7 +843,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_3`="._num(@$assEL[$r['num_3']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Список-таблица
@@ -852,7 +852,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assDLG[$r['num_1']]).",
 							`txt_2`='".addslashes(_clone_json($r['txt_2'], $assEL))."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Select: выбор записи из другого списка
@@ -863,7 +863,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 							`txt_4`='"._clone_ids($r['txt_4'], $assEL)."',
 							`txt_5`='".addslashes(_clone_json($r['txt_5'], $assEL))."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Выбор нескольких значений галочками
@@ -872,7 +872,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assDLG[$r['num_1']]).",
 							`num_2`="._num(@$assEL[$r['num_2']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Фильтрование списка
@@ -880,7 +880,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_1`="._num(@$assEL[$r['num_1']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Сборный текст
@@ -888,7 +888,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `txt_2`='"._clone_ids($r['txt_2'], $assEL)."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//количество значений привязанного списка
@@ -897,7 +897,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assEL[$r['num_1']]).",
 							`txt_1`='".addslashes(_clone_json($r['txt_1'], $assEL))."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//сумма значений привязанного списка
@@ -907,7 +907,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 							`txt_1`='".addslashes(_clone_json($r['txt_1'], $assEL))."',
 							`num_2`="._num(@$assEL[$r['num_2']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Меню переключения блоков
@@ -916,16 +916,16 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `txt_2`='"._clone_ids($r['txt_2'], $assEL)."',
 							`def`="._num(@$assEL[$r['def']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 
 				$sql = "SELECT *
 						FROM `_element`
 						WHERE `parent_id`=".$elem_id;
-				foreach(query_arr($sql) as $ell) {
+				foreach(DB1::arr($sql) as $ell) {
 					$sql = "UPDATE `_element`
 							SET `txt_2`='"._clone_ids($ell['txt_2'], $assBL)."'
 							WHERE `id`=".$ell['id'];
-					query($sql);
+					DB1::query($sql);
 				}
 				break;
 
@@ -935,7 +935,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assDLG[$r['num_1']]).",
 							`num_4`="._num(@$assDLG[$r['num_4']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Фильтр: галочка
@@ -944,7 +944,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assEL[$r['num_1']]).",
 							`txt_2`='".addslashes(_clone_json($r['txt_2'], $assEL))."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Фильтр: год и месяц
@@ -953,7 +953,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assEL[$r['num_1']]).",
 							`num_2`="._num(@$assEL[$r['num_2']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Фильтр - Radio
@@ -962,16 +962,16 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assEL[$r['num_1']]).",
 							`def`="._num(@$assEL[$r['def']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 
 				$sql = "SELECT *
 						FROM `_element`
 						WHERE `parent_id`=".$elem_id;
-				foreach(query_arr($sql) as $ell) {
+				foreach(DB1::arr($sql) as $ell) {
 					$sql = "UPDATE `_element`
 							SET `txt_2`='".addslashes(_clone_json($ell['txt_2'], $assEL))."'
 							WHERE `id`=".$ell['id'];
-					query($sql);
+					DB1::query($sql);
 				}
 				break;
 
@@ -980,7 +980,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_1`="._num(@$assEL[$r['num_1']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Фильтр: меню
@@ -990,7 +990,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 							`txt_1`='"._clone_ids($r['txt_1'], $assEL)."',
 							`txt_2`='"._clone_ids($r['txt_2'], $assEL)."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Очистка фильтра
@@ -998,7 +998,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_1`="._num(@$assEL[$r['num_1']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Фильтр: Select - привязанный список
@@ -1007,7 +1007,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assEL[$r['num_1']]).",
 							`txt_2`='"._clone_ids($r['txt_2'], $assEL)."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Select - выбор значения списка по умолчанию
@@ -1015,7 +1015,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_1`="._num(@$assEL[$r['num_1']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Значение записи: количество дней
@@ -1023,7 +1023,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 				$sql = "UPDATE `_element`
 						SET `num_1`="._num(@$assEL[$r['num_1']])."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Циферка в меню страниц
@@ -1032,7 +1032,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 						SET `num_1`="._num(@$assDLG[$r['num_1']]).",
 							`txt_1`='".addslashes(_clone_json($r['txt_1'], $assEL))."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Количество значений связанного списка с учётом категорий
@@ -1042,7 +1042,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 							`txt_1`='"._clone_ids($r['txt_1'], $assEL)."',
 							`txt_2`='"._clone_ids($r['txt_2'], $assEL)."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 
 			//Фильтр - Выбор нескольких групп значений
@@ -1054,7 +1054,7 @@ function _clone_elm_upd() {//клонирование: обновление зн
 							`txt_4`='"._clone_ids($r['txt_4'], $assEL)."',
 							`txt_5`='".addslashes(_clone_json($r['txt_5'], $assEL))."'
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 				break;
 		}
 }
@@ -1064,7 +1064,7 @@ function _clone_template() {
 			FROM `_template`
 			WHERE `app_id`=".CLONE_ID_SRC."
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$ass = _clone_ass();
@@ -1093,7 +1093,7 @@ function _clone_template() {
 
 					".USER_ID."
 				)";
-		_clone_ass_save('_template', $r['id'], query_id($sql));
+		_clone_ass_save('_template', $r['id'], DB1::insert_id($sql));
 	}
 }
 function _clone_action() {
@@ -1101,7 +1101,7 @@ function _clone_action() {
 			FROM `_action`
 			WHERE `app_id`=".CLONE_ID_SRC."
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$ass = _clone_ass();
@@ -1236,7 +1236,7 @@ function _clone_action() {
 					".$r['sort'].",
 					".USER_ID."
 				)";
-		query($sql);
+		DB1::query($sql);
 	}
 }
 function _clone_counter() {
@@ -1244,7 +1244,7 @@ function _clone_counter() {
 			FROM `_counter`
 			WHERE `app_id`=".CLONE_ID_SRC."
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$ass = _clone_ass();
@@ -1275,7 +1275,7 @@ function _clone_counter() {
 
 					".USER_ID."
 				)";
-		query($sql);
+		DB1::query($sql);
 	}
 }
 function _clone_cron() {
@@ -1283,7 +1283,7 @@ function _clone_cron() {
 			FROM `_cron`
 			WHERE `app_id`=".CLONE_ID_SRC."
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$ass = _clone_ass();
@@ -1333,7 +1333,7 @@ function _clone_cron() {
 
 					".USER_ID."
 				)";
-		query($sql);
+		DB1::query($sql);
 	}
 }
 function _clone_spisok() {
@@ -1343,14 +1343,14 @@ function _clone_spisok() {
 			  AND `clone_on`
 			  AND `table_1`=11
 			ORDER BY `name`";
-	if(!$dlg = query_arr($sql))
+	if(!$dlg = DB1::arr($sql))
 		return;
 
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `dialog_id` IN ("._idsGet($dlg).")
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$ass = _clone_ass();
@@ -1389,7 +1389,7 @@ function _clone_spisok() {
 					".USER_ID."
 				  FROM `_spisok`
 				  WHERE `id`=".$id;
-		_clone_ass_save('_spisok', $id, query_id($sql));
+		_clone_ass_save('_spisok', $id, DB1::insert_id($sql));
 	}
 
 	$ass = _clone_ass();
@@ -1399,7 +1399,7 @@ function _clone_spisok() {
 		$sql = "UPDATE `_spisok`
 				SET `parent_id`="._num(@$assSP[$r['parent_id']])."
 				WHERE `id`="._num($assSP[$id]);
-		query($sql);
+		DB1::query($sql);
 	}
 }
 
