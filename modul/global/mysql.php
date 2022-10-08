@@ -163,6 +163,7 @@ class mysqlClass {
     private $count = 0; //количество сделанных запросов
     private $dur = 0;   //общая продолжительность выполнения запросов
     private $mass = []; //список запросов
+    private const CACHE_TTL = 600;
 
     function __construct($host, $user, $pass, $base) {
         if(!$this->cnn = mysqli_connect($host, $user, $pass, $base))
@@ -240,7 +241,7 @@ class mysqlClass {
         }
 
         $v = $this->value($sql);
-        apcu_store($cacheKey, $v, 60);
+        apcu_store($cacheKey, $v, CACHE_TTL);
 
         return $v;
     }
@@ -265,7 +266,7 @@ class mysqlClass {
             return apcu_fetch($cacheKey);
 
         $v = $this->arr($sql, $key);
-        apcu_store($cacheKey, $v, 60);
+        apcu_store($cacheKey, $v, CACHE_TTL);
 
         return $v;
     }
@@ -292,7 +293,7 @@ class mysqlClass {
             return apcu_fetch($cacheKey);
 
         $v = $this->array($sql);
-        apcu_store($cacheKey, $v, 60);
+        apcu_store($cacheKey, $v, CACHE_TTL);
 
         return $v;
     }
@@ -318,7 +319,7 @@ class mysqlClass {
             return apcu_fetch($cacheKey);
 
         $v = $this->assoc($sql);
-        apcu_store($cacheKey, $v, 60);
+        apcu_store($cacheKey, $v, CACHE_TTL);
 
         return $v;
     }
@@ -345,7 +346,7 @@ class mysqlClass {
             return apcu_fetch($cacheKey);
 
         $v = $this->ass($sql);
-        apcu_store($cacheKey, $v, 60);
+        apcu_store($cacheKey, $v, CACHE_TTL);
 
         return $v;
     }
@@ -372,7 +373,7 @@ class mysqlClass {
             return apcu_fetch($cacheKey);
 
         $v = $this->ids($sql);
-        apcu_store($cacheKey, $v, 60);
+        apcu_store($cacheKey, $v, CACHE_TTL);
 
         return $v;
     }
@@ -715,151 +716,6 @@ function _queryWhere_dialog_id($DLG) {//получение условия по `
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-_db_connect();
-
-function _db_connect() {//подключение к базе данных
-    global $SQL_CNN,    //соединение с базой
-           $SQL_TIME,   //общее время выполнения запросов
-           $SQL_QUERY,  //массив запросов
-           $SQL_QUERY_T;//массив времени выполнения по каждому запросу
-
-
-    $SQL_TIME = 0;
-    $SQL_QUERY = array();
-    $SQL_QUERY_T = array();
-
-    if(!$SQL_CNN = mysqli_connect(
-        MYSQLI_HOST,
-        MYSQLI_USER,
-        MYSQLI_PASS,
-        MYSQLI_DATABASE
-    ))
-        die('Can`t mysql connect: '.mysqli_connect_error());
-
-    $sql = "SET NAMES '".MYSQLI_NAMES."'";
-    mysqli_query($SQL_CNN, $sql);
-}
-
-function query($sql) {
-    global $SQL_CNN, $SQL_TIME, $SQL_QUERY, $SQL_QUERY_T;
-
-    $t = microtime(true);
-    if(!$res = mysqli_query($SQL_CNN, $sql)) {
-        $path = array();
-        $DD = debug_backtrace();
-        foreach($DD as $n => $r)
-            $path[] = $r['function'].' - '.$r['file'].':'.$r['line'];
-        $msg =  $sql."\n\n".
-            mysqli_error($SQL_CNN)."\n".
-            "---------------------------------\n".
-            implode("\n", $path);
-
-        $c = count($DD) - 1;
-        if($DD[$c]['function'] == '_html')
-            $msg = _br($msg);
-
-        die($msg);
-    };
-    $t = microtime(true) - $t;
-
-    $sqlPath = '';
-    if(DEBUG) {
-        $DB = debug_backtrace();
-
-        $n = substr($DB[1]['function'], 0, 5) == 'query' ? 1 : 0;
-
-        $ex = explode('\\', $DB[$n]['file']);
-        $file = $ex[count($ex) - 1];
-        $sqlPath = '/* '.$file.':'.$DB[$n]['line'].' '.$DB[$n]['function'].' */'."\n";
-    }
-
-    $SQL_TIME += $t;
-    $SQL_QUERY[] = $sqlPath.$sql;
-    $SQL_QUERY_T[] = round($t, 3);
-
-    return $res;
-}
-function query_value($sql) {//запрос одного значения
-    $q = query($sql);
-
-    if(!$r = mysqli_fetch_row($q))
-        return 0;
-    if(preg_match(REGEXP_INTEGER, $r[0]))
-        return $r[0] * 1;
-
-    return $r[0];
-}
-function query_arr($sql, $key='id') {//массив по ключу
-    $q = query($sql);
-
-    $send = array();
-    while($r = mysqli_fetch_assoc($q))
-        $send[$r[$key]] = $r;
-
-    return $send;
-}
-function query_array($sql) {//последовательный массив без ключей
-    $q = query($sql);
-
-    $send = array();
-    while($r = mysqli_fetch_assoc($q))
-        $send[] = $r;
-
-    return $send;
-}
-function query_ass($sql) {//ассоциативный массив из двух значений: a => b
-    $q = query($sql);
-
-    $send = array();
-    while($r = mysqli_fetch_row($q))
-        $send[$r[0]] = preg_match(REGEXP_NUMERIC, $r[1]) ? $r[1] * 1 : $r[1];
-
-    return $send;
-}
-function query_assoc($sql) {//ассоциативный массив одной записи
-    $q = query($sql);
-    if(!$r = mysqli_fetch_assoc($q))
-        return array();
-    return $r;
-}
-function query_ids($sql) {//идентификаторы через запятую
-    $q = query($sql);
-
-    $send = array();
-    while($r = mysqli_fetch_row($q))
-        $send[] = $r[0];
-
-    return !$send ? 0 : implode(',', array_unique($send));
-}
-function query_id($sql) {//получение id внесённой записи
-    global $SQL_CNN;
-
-    query($sql);
-
-    return _num(mysqli_insert_id($SQL_CNN));
-}
-function query_insert_id($tab) {//id последнего внесённого элемента
-    $sql = "SELECT `id` FROM `".$tab."` ORDER BY `id` DESC LIMIT 1";
-    return query_value($sql);
-}
 
 
 
