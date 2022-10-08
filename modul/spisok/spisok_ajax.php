@@ -33,7 +33,7 @@ switch(@$_POST['op']) {
 						`dtime_del`=CURRENT_TIMESTAMP
 					WHERE "._queryWhere($dialog)."
 					  AND "._queryCol_id($dialog)."=".$unit_id;
-			query($sql);
+			DB1::query($sql);
 
 			PHP12_schetPayContent_del($unit);
 
@@ -49,26 +49,26 @@ switch(@$_POST['op']) {
 				$elem = _elemOne($unit_id);
 				//удаление значений
 				$sql = "DELETE FROM `_element` WHERE `parent_id`=".$unit_id;
-				query($sql);
+				DB1::query($sql);
 
 				//удаление функций
 				$sql = "DELETE FROM `_action` WHERE `element_id`=".$unit_id;
-				query($sql);
+				DB1::query($sql);
 
 				//удаление фильтров
 				$sql = "DELETE FROM `_user_spisok_filter` WHERE `element_id_filter`=".$unit_id;
-				query($sql);
+				DB1::query($sql);
 
 				//установка позиции в блоке по умолчанию
 				$sql = "UPDATE `_block` SET `pos`='top' WHERE `id`=".$elem['block_id'];
-				query($sql);
+				DB1::query($sql);
 			}
 
 			$sql = "SELECT * FROM `"._table($dialog['table_1'])."` WHERE `id`=".$unit_id;
-			$unit = query_assoc($sql);
+			$unit = DB1::assoc($sql);
 
 			$sql = "DELETE FROM `"._table($dialog['table_1'])."` WHERE `id`=".$unit_id;
-			query($sql);
+			DB1::query($sql);
 
 			//обновление кеша объекта, если это элемент
 			if($elem) {
@@ -89,7 +89,7 @@ switch(@$_POST['op']) {
 			//удаление данных счётчика
 			if($dialog['table_name_1'] == '_counter') {
 				$sql = "DELETE FROM `_counter_v` WHERE `counter_id`=".$unit_id;
-				query($sql);
+				DB1::query($sql);
 			}
 		}
 
@@ -150,7 +150,7 @@ switch(@$_POST['op']) {
 				WHERE `dialog_id`=80
 				  AND `num_1`=".$elem_spisok."
 				LIMIT 1";
-		if($elClear = query_assoc($sql)) {
+		if($elClear = DB1::assoc($sql)) {
 			$send['clear_id'] = $elClear['id'];
 			$send['clear_diff'] = _filter('diff', $elem_spisok);
 		}
@@ -174,7 +174,7 @@ switch(@$_POST['op']) {
 				SET `v`=`def`
 				WHERE `user_id`=".USER_ID."
 				  AND `element_id_spisok`=".$spisok_id;
-		query($sql);
+		DB1::query($sql);
 
 		_filter('cache_clear');
 
@@ -278,7 +278,7 @@ switch(@$_POST['op']) {
 					$sql = "SELECT `parent_id`
 							FROM `".$dialog['table_name_1']."`
 							WHERE `id`=".$pid;
-					$pid = _num(query_value($sql));
+					$pid = _num(DB1::value($sql));
 				}
 				$child .= ",`child_lvl`=".$lvl;
 			}
@@ -291,7 +291,7 @@ switch(@$_POST['op']) {
 						".$parent."
 						".$child."
 					WHERE `id`=".$id;
-			query($sql);
+			DB1::query($sql);
 		}
 
 		//обновление количеств, если присутствуют
@@ -367,7 +367,7 @@ switch(@$_POST['op']) {
 				WHERE `dialog_id` IN ("._idsGet($DI, 'dlg_id').")
 				  AND `id` IN (".$ids.")
 				  AND !`deleted`";
-		if(!$spisok = query_arr($sql))
+		if(!$spisok = DB1::arr($sql))
 			jsonError('Записей не существует');
 
 		$data = array();
@@ -417,7 +417,7 @@ function _spisokUnitDialog($unit_id) {//получение данных о ди�
 
 	//проверка наличия таблицы для внесения данных
 	$sql = "SHOW TABLES LIKE '"._table($dialog['table_1'])."'";
-	if(!mysqli_num_rows(query($sql)))
+	if(!DB1::num_rows($sql))
 		jsonError('Таблицы не существует');
 
 	//получение данных единицы списка, если редактируется
@@ -625,7 +625,7 @@ function _SUN_CMP_TEST($dialog, $unit_id) {//проверка корректно
 								WHERE "._queryWhere($DLG)."
 								  AND "._queryCol_id($DLG)."!=".$unit_id."
 								  AND "._queryColReq($DLG, $col)."='".addslashes($v)."'";
-						if(query_value($sql)) {
+						if(DB1::value($sql)) {
 							$is_err = 1;
 							$err_msg = 'Данное значение содержится в другой записи<br>и не может повторяться';
 						}
@@ -819,11 +819,11 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 	}
 
 	$sql = "INSERT INTO `".$table_1."` (`id`) VALUES (0)";
-	$uid[$table_1] = query_id($sql);
+	$uid[$table_1] = DB1::insert_id($sql);
 
 	if($table_2) {
 		$sql = "INSERT INTO `".$table_2."` (`cnn_id`) VALUES (".$uid[$table_1].")";
-		$uid[$table_2] = query_id($sql);
+		$uid[$table_2] = DB1::insert_id($sql);
 
 		//если родительская таблица=`_user`, внесение записи для `_user_access`
 		if($table_1 == '_user')
@@ -843,13 +843,13 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 					$sql = "SELECT `app_id`
 							FROM `_block`
 							WHERE `id`=".$block_id;
-					$app_id = query_value($sql);
+					$app_id = DB1::value($sql);
 				}
 				if($parent_id) {
 					$sql = "SELECT `app_id`
 							FROM `_element`
 							WHERE `id`=".$parent_id;
-					$app_id = query_value($sql);
+					$app_id = DB1::value($sql);
 				}
 			}
 			if($tab == '_hint') {
@@ -857,27 +857,27 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 					$sql = "SELECT `app_id`
 							FROM `_element`
 							WHERE `id`=".$element_id;
-					$app_id = query_value($sql);
+					$app_id = DB1::value($sql);
 				}
 				if($block_id) {
 					$sql = "SELECT `app_id`
 							FROM `_block`
 							WHERE `id`=".$block_id;
-					$app_id = query_value($sql);
+					$app_id = DB1::value($sql);
 				}
 			}
 
 			$sql = "UPDATE `".$tab."`
 					SET `app_id`=".$app_id."
 					WHERE `id`=".$uid[$tab];
-			query($sql);
+			DB1::query($sql);
 		}
 
 	if($tab = _queryTN($DLG, 'dialog_id', 1)) {
 		$sql = "UPDATE `".$tab."`
 				SET `dialog_id`=".$dialog_id."
 				WHERE `id`=".$uid[$tab];
-		query($sql);
+		DB1::query($sql);
 	}
 
 	//установка порядкового номера
@@ -887,18 +887,18 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 			$sql = "SELECT `id`
 					FROM `_dialog`
 					WHERE `spisok_num_group`=".$ng;
-			if($ids = query_ids($sql))
+			if($ids = DB1::ids($sql))
 				$ngIds = $ids;
 		}
 		$sql = "SELECT IFNULL(MAX(`num`),0)+1
 				FROM `".$tab."`
 				WHERE `dialog_id` IN (".$ngIds.")";
-		$num = query_value($sql);
+		$num = DB1::value($sql);
 
 		$sql = "UPDATE `".$tab."`
 				SET `num`=".$num."
 				WHERE `id`=".$uid[$tab];
-		query($sql);
+		DB1::query($sql);
 	}
 
 	if($tab = _queryTN($DLG, 'page_id', 1))
@@ -906,7 +906,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 			$sql = "UPDATE `".$tab."`
 					SET `page_id`=".$page_id."
 					WHERE `id`=".$uid[$tab];
-			query($sql);
+			DB1::query($sql);
 		}
 
 	if($block_id)
@@ -914,7 +914,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 			$sql = "UPDATE `".$tab."`
 					SET `block_id`=".$block_id."
 					WHERE `id`=".$uid[$tab];
-			query($sql);
+			DB1::query($sql);
 		}
 
 	//присвоение родительского значения элементу
@@ -922,7 +922,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 		$sql = "UPDATE `_element`
 				SET `parent_id`=".$parent_id."
 				WHERE `id`=".$uid[$table_1];
-		query($sql);
+		DB1::query($sql);
 	}
 
 	//установка начальной ширины элементу
@@ -934,26 +934,26 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 		$sql = "UPDATE `_element`
 				SET `width`=".$w."
 				WHERE `id`=".$uid[$table_1];
-		query($sql);
+		DB1::query($sql);
 	}
 
 	if($tab = _queryTN($DLG, 'sort', 1)) {
 		$sql = "SELECT IFNULL(MAX(`sort`)+1,1)
 				FROM `".$tab."`
 				WHERE `id`";
-		$sort = query_value($sql);
+		$sort = DB1::value($sql);
 
 		$sql = "UPDATE `".$tab."`
 				SET `sort`=".$sort."
 				WHERE `id`=".$uid[$tab];
-		query($sql);
+		DB1::query($sql);
 	}
 
 	if($tab = _queryTN($DLG, 'user_id_add', 1)) {
 		$sql = "UPDATE `".$tab."`
 				SET `user_id_add`=".USER_ID."
 				WHERE `id`=".$uid[$tab];
-		query($sql);
+		DB1::query($sql);
 	}
 
 	if($tab = _queryTN($DLG, 'element_id', 1))
@@ -962,7 +962,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 				$sql = "UPDATE `_action`
 						SET `element_id`=".$element_id."
 						WHERE `id`=".$uid[$tab];
-				query($sql);
+				DB1::query($sql);
 			}
 
 	//установка `app_id` для `_action`
@@ -972,18 +972,18 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 			$sql = "SELECT `app_id`
 					FROM `_block`
 					WHERE `id`=".$block_id;
-			$app_id = query_value($sql);
+			$app_id = DB1::value($sql);
 		}
 		if($element_id) {
 			$sql = "SELECT `app_id`
 					FROM `_element`
 					WHERE `id`=".$element_id;
-			$app_id = query_value($sql);
+			$app_id = DB1::value($sql);
 		}
 		$sql = "UPDATE `_action`
 				SET `app_id`=".$app_id."
 				WHERE `id`=".$uid[$tab];
-		query($sql);
+		DB1::query($sql);
 	}
 
 	//удаление предыдущего действия (когда разрешено назначать только оно действие)
@@ -996,7 +996,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 				$sql = "SELECT *
 						FROM `_action`
 						WHERE `id`=".$uid[$table_1];
-				if(!$r = query_assoc($sql))
+				if(!$r = DB1::assoc($sql))
 					break;
 
 				$sql = "DELETE
@@ -1005,7 +1005,7 @@ function _SUN_INSERT($DLG, $unit_id=0) {//внесение новой запис
 						  AND `element_id`=".$r['element_id']."
 						  AND `dialog_id` IN (221,222,224,227)
 						  AND `id`!=".$uid[$table_1];
-				query($sql);
+				DB1::query($sql);
 		}
 
 	_dialogIUID($DLG, $uid[$table_1]);
@@ -1036,7 +1036,7 @@ function _elementFocusClear($dialog, $POST_CMP, $unit_id) {//предварит�
 		$sql = "UPDATE `_element`
 				SET `focus`=0
 				WHERE `id` IN (".implode(',', $ids).")";
-		query($sql);
+		DB1::query($sql);
 
 		return;
 	}
@@ -1058,7 +1058,7 @@ function _pageDefClear($dialog, $POST_CMP) {//для таблицы _page: оч�
 				SET `def`=0
 				WHERE `dialog_id`=".$dialog['id'].
 			($dialog['id'] == 20 ? " AND `app_id`=".APP_ID : '');
-		query($sql);
+		DB1::query($sql);
 
 		return;
 	}
@@ -1077,7 +1077,7 @@ function _filterDefSet($dialog, $elem_id) {//обновление значени
 		case 102:
 			$sql = "DELETE FROM `_user_spisok_filter`
 					WHERE `element_id_filter`=".$elem_id;
-			query($sql);
+			DB1::query($sql);
 			_filter('cache_clear');
 			break;
 	}
@@ -1097,7 +1097,7 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 					WHERE `cnn_id`=".$unit_id."
 					  AND `app_id`=".APP_ID."
 					LIMIT 1";
-			$id2 = query_value($sql);
+			$id2 = DB1::value($sql);
 			$uid[$PAR['table_name_1']] = $unit_id;
 			$uid[$DLG['table_name_1']] = $id2;
 		}
@@ -1125,7 +1125,7 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 								SET `".$col."`='".addslashes($v)."'
 								WHERE `user_id`=".$unit_id."
 								  AND `app_id`=".APP_ID;
-						query($sql);
+						DB1::query($sql);
 					}
 			continue;
 		}
@@ -1134,7 +1134,7 @@ function _SUN_CMP_UPDATE($DLG, $POST_CMP, $unit_id) {//обновление ко
 				SET "._queryColReq($DLG, $col)."='".addslashes($v)."'
 				WHERE "._queryWhere($DLG)."
 				  AND "._queryCol_id($DLG)."=".$unit_id;
-		query($sql);
+		DB1::query($sql);
 
 		_elem1def($cmp_id, $unit_id, $v);
 		_elem37changeCol($cmp_id, $unit_id);
@@ -1198,21 +1198,21 @@ function _spisokUnitUpd42($DLG, $cmp) {//обновление некоторых
 			SET ".implode(',', $upd)."
 			WHERE "._queryWhere($DST)."
 			  AND "._queryCol_id($DST)."=".$unit_id;
-	query($sql);
+	DB1::query($sql);
 }
 function _spisokUnitDelSetup($dialog, $unit_id) {//присвоение id диалога при создании условий удаления записи
 	if($dialog['id'] != 58)
 		return;
 	if(!$dlg_id = _num($_POST['dss'])) {
 		$sql = "DELETE FROM `_element` WHERE `id`=".$unit_id;
-		query($sql);
+		DB1::query($sql);
 		jsonError('Отсутствует исходный диалог');
 	}
 
 	$sql = "UPDATE `_element`
 			SET `num_1`=".$dlg_id."
 			WHERE `id`=".$unit_id;
-	query($sql);
+	DB1::query($sql);
 }
 function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление зависимых привязанных списков
 														 //В случае если изменилось значение в привязанном списке, будут изменены все зависимые идентификаторы,
@@ -1228,14 +1228,14 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 			FROM `_element`
 			WHERE `dialog_id`=29
 			  AND `num_1`=".$dialog['id'];
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	$sql = "SELECT `obj_id`,1
 			FROM `_block`
 			WHERE `obj_name`='dialog'
 			  AND `id` IN ("._idsGet($arr, 'block_id').")";
-	if(!$DLG_CUR = query_ass($sql))
+	if(!$DLG_CUR = DB1::ass($sql))
 		return;
 
 
@@ -1268,14 +1268,14 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 				FROM `_element`
 				WHERE `dialog_id`=29
 				  AND `num_1`=".$cmp['num_1'];
-		if(!$arr = query_arr($sql))
+		if(!$arr = DB1::arr($sql))
 			continue;
 
 		$sql = "SELECT `obj_id`,1
 				FROM `_block`
 				WHERE `obj_name`='dialog'
 				  AND `id` IN ("._idsGet($arr, 'block_id').")";
-		if(!$DLG_SP = query_ass($sql))
+		if(!$DLG_SP = DB1::ass($sql))
 			continue;
 
 
@@ -1322,13 +1322,13 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 					WHERE `dialog_id`=".$id."
 					  AND `".$colCur."`=".$unit['id']."
 					  AND `".$colIn."` IN (".$old.")";
-			if(!$spIds = query_ids($sql))
+			if(!$spIds = DB1::ids($sql))
 				continue;
 
 			$sql = "UPDATE `".$dlg['table_name_1']."`
 					SET `".$colIn."`=".$new."
 					WHERE `id` IN (".$spIds.")";
-			query($sql);
+			DB1::query($sql);
 
 
 
@@ -1437,7 +1437,7 @@ function _elem11_choose_mysave($dialog, $POST_CMP) {//выбор значени�
 				WHERE `dialog_id`=85
 				  AND `num_1`=".$el13_id."
 				LIMIT 1";
-		if($el_id = query_value($sql))
+		if($el_id = DB1::value($sql))
 			$send['spisok'] = _elem212ActionFormat($el_id, $v, $send['spisok']);
 	}
 
@@ -1516,7 +1516,7 @@ function _d112_app_access($DLG, $POST_CMP) {//Закрытие / открыти�
 	$sql = "UPDATE `_setting`
 			SET `v`=".$v."
 			WHERE `key`='APP_ACCESS'";
-	query($sql);
+	DB1::query($sql);
 
 	_cache_clear('SETTING', 1);
 
@@ -1547,7 +1547,7 @@ function _d1503_kupez($DLG, $POST_CMP) {//Купец: создание спис�
 			FROM `_spisok`
 			WHERE `dialog_id`=1489
 			  AND `date_1` LIKE '".$year."-%'";
-	if(query_value($sql))
+	if(DB1::value($sql))
 		jsonError('Создание номеров невозможно.<br>В '.$year.' году уже есть созданные номера.');
 
 	$insert = [];
@@ -1586,7 +1586,7 @@ function _d1503_kupez($DLG, $POST_CMP) {//Купец: создание спис�
 
 				`user_id_add`
 			) VALUES ".implode(',', $insert);
-	query($sql);
+	DB1::query($sql);
 
 	$send = array(
 		'action_id' => 1 //обновить страницу

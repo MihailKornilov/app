@@ -12,11 +12,11 @@ function _filterCache() {//кеширование фильтров списка
 			FROM `_user_spisok_filter`
 			WHERE `app_id` IN (0,".APP_ID.")
 			  and `user_id`=".USER_ID;
-	if($arr = query_arr($sql)) {
+	if($arr = DB1::arr($sql)) {
 		$sql = "SELECT *
 				FROM `_element`
 				WHERE `id` IN ("._idsGet($arr,'element_id_filter').")";
-		$elFilter = query_arr($sql);
+		$elFilter = DB1::arr($sql);
 		foreach($arr as $r) {
 			$filter_id = $r['element_id_filter'];
 			$spisok_id = $r['element_id_spisok'];
@@ -109,7 +109,7 @@ function _filter($i='all', $v=0, $vv='') {//получение значений 
 		$sql = "UPDATE `_user_spisok_filter`
 				SET `def`='".addslashes($def)."'
 				WHERE `element_id_filter`=".$filter_id;
-		query($sql);
+		DB1::query($sql);
 
 		_filter('cache_clear');
 	}
@@ -142,7 +142,7 @@ function _filterInsert($spisok, $filter, $v) {//внесение нового з
 			  AND `user_id`=".USER_ID."
 			  AND `element_id_spisok`=".$spisok."
 			  AND `element_id_filter`=".$filter;
-	$id = _num(query_value($sql));
+	$id = _num(DB1::value($sql));
 
 	$sql = "INSERT INTO `_user_spisok_filter` (
 				`id`,
@@ -162,7 +162,7 @@ function _filterInsert($spisok, $filter, $v) {//внесение нового з
 				'".addslashes(_txt($v))."'
 			) ON DUPLICATE KEY UPDATE
 				`v`=VALUES(`v`)";
-	query($sql);
+	DB1::query($sql);
 
 	_filter('cache_clear');
 
@@ -237,7 +237,7 @@ function _spisokCountAll($el, $prm, $next=0) {//получение общего 
 	$sql = "SELECT COUNT(*)
 			FROM  "._queryFrom($dialog)."
 			WHERE "._spisokWhere($el, $prm);
-	$all = _num(query_value($sql));
+	$all = DB1::value_cache($sql);
 
 	//проверка, есть ли единица списка, которую нашли по номеру (num)
 	if(!$next && (_elem7num14($el) || _elem7num23($el)))
@@ -302,7 +302,7 @@ function _spisokInclude($spisok) {//вложенные списки
 					  AND "._queryWhere($incDialog, 1);
 			$key = md5($sql);
 			if(!isset($_SI[$key])) {
-				if($arr = query_arr($sql)) {
+				if($arr = DB1::arr($sql)) {
 					//вложения во вложенных списках
 					$arr = _spisokInclude($arr);
 					$arr = _spisokImage($arr);
@@ -368,7 +368,7 @@ function _spisokImage($spisok) {//вставка картинок
 			$sql = "SELECT *
 					FROM `_image`
 					WHERE `id` IN (".implode(',', $image_ids).")";
-			if($img = query_arr($sql))
+			if($img = DB1::arr($sql))
 				foreach($spisok as $id => $r)
 					if($image_id = _num(@$image_ids[$id]))
 						if(!empty($img[$image_id]))
@@ -407,7 +407,7 @@ function _spisok96inc($EL, $spisok) {//получение значений, ес
 				FROM   "._queryFrom($dlg)."
 				WHERE  "._queryWhere($dlg)."
 				  AND `".$col."` IN ("._idsGet($spisok).")";
-		if(!$inc = query_arr($sql))
+		if(!$inc = DB1::arr($sql))
 			continue;
 		$inc = _spisokInclude($inc);
 
@@ -480,7 +480,7 @@ function _spisokUnitQuery($dialog, $unit_id, $nosuq=false) {//получение
 			FROM   "._queryFrom($dialog)."
 			WHERE "._queryCol_id($dialog)." IN (".$unit_id.")
 			  AND "._queryWhere($dialog);
-	if(!$spisok[$unit_id] = query_assoc($sql))
+	if(!$spisok[$unit_id] = DB1::assoc($sql))
 		return array();
 
 	$spisok = _spisokInclude($spisok);
