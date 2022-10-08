@@ -77,7 +77,7 @@ function _element57punkt($bl, $prm) {//скрытие блока, если он 
 				FROM `_element`
 				WHERE `app_id` IN (0,".APP_ID.") 
 				  AND `dialog_id`=57";
-		if(!$_57PUNKT = query_arr($sql))
+		if(!$_57PUNKT = DB1::arr($sql))
 			return $bl;
 	}
 
@@ -164,7 +164,7 @@ function PHP12_menu_block_setup_save($cmp, $val, $unit) {//сохранение 
 	$sql = "UPDATE `_element`
 			SET `".$col."`='".addslashes($save)."'
 			WHERE `id`=".$unit['id'];
-	query($sql);
+	DB1::query($sql);
 
 	_elemOne($unit['id'], true);
 }

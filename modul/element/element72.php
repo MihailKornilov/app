@@ -110,7 +110,7 @@ function _elem72radioSpisok($el, $year=false) {//получение списка
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
 			  AND `".$col2."` LIKE '"._elem72year($el, $year)."%'";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return array();
 
 	$send = array();
@@ -158,7 +158,7 @@ function _elem72Calc($el, $spisok, $year=false) {//добавление счёт
 				  AND `".$col2."` IN ("._idsGet($spisok, 'key').")
 				  "._40cond(array(), $el['txt_1'])."
 				GROUP BY `".$col2."`";
-		if(!$ass = query_ass($sql))//нет значений во вложенном списке 3-го уровня
+		if(!$ass = DB1::ass_cache($sql))//нет значений во вложенном списке 3-го уровня
 			return $spisok;
 
 		foreach($ass as $id => $c)
@@ -187,7 +187,7 @@ function _elem72Calc($el, $spisok, $year=false) {//добавление счёт
 			  AND `".$col3."`
 			  "._40cond(array(), $el['txt_1'])."
 			GROUP BY `".$col2."`";
-	if(!$ass = query_ass($sql))//нет значений во вложенном списке 3-го уровня
+	if(!$ass = DB1::ass_cache($sql))//нет значений во вложенном списке 3-го уровня
 		return $spisok;
 
 	foreach($ass as $id => $c)
@@ -215,7 +215,7 @@ function _elem72CalcData($el, $spisok, $year=false) {//получение кол
 				  "._40cond(array(), $el['txt_1'])."
 			  AND `dtime_add` LIKE '"._elem72year($el, $year)."-%'
 			GROUP BY DATE_FORMAT(`dtime_add`,'%m')";
-	if(!$ass = query_ass($sql))
+	if(!$ass = DB1::ass($sql))
 		return $spisok;
 
 	foreach($ass as $id => $c)
@@ -272,7 +272,7 @@ function _elem72filterCnn($el, $filterV) {//значение указано в �
 	if($idV = _num(@$ex[1]))
 		$sql .= " AND `id`=".$idV;
 
-	if(!$idsLast = query_ids($sql))
+	if(!$idsLast = DB1::ids($sql))
 		return " AND !`t1`.`id` /* [72] нет значений во вложенном списке */";
 
 
@@ -304,7 +304,7 @@ function _elem72filterCnn($el, $filterV) {//значение указано в �
 			FROM   "._queryFrom($DLG2)."
 			WHERE  "._queryWhere($DLG2)."
 			  AND `".$col2."` IN (".$idsLast.")";
-	if(!$ids3 = query_ids($sql))
+	if(!$ids3 = DB1::ids_cache($sql))
 		return " AND !`t1`.`id` /* [72] нет значений во вложенном списке 3-го уровня */";
 
 	return " AND `id` IN (".$ids3.")";

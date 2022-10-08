@@ -76,7 +76,7 @@ function _elem85mass($ell_id, $v, $send) {//получение значений 
 			WHERE  "._queryWhere($dlg)."
 			ORDER BY `id`
 			LIMIT 200";
-	if(!$spisok = query_arr($sql))
+	if(!$spisok = DB1::arr($sql))
 		return $send;
 
 	$spisok = _spisokInclude($spisok);

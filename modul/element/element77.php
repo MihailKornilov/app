@@ -159,7 +159,7 @@ function _filterCalendarMon($el, $mon, $v) {//имя месяца и год
 			FROM ".$from."
 			WHERE `".$col."` LIKE ('".$mon."%')
 			  AND ".$where;
-	if(query_value($sql))
+	if(DB1::value_cache($sql))
 		return '<div class="monn'.($mon == $v ? ' sel' : '').'" val="'.$mon.'">'._monthDef($ex[1]).'</div> '.$ex[0];
 
 	return $send;
@@ -258,7 +258,7 @@ function _filterCalendarDays($el, $mon) {//отметка дней в кален
 			WHERE `".$col."` LIKE ('".$mon."%')
 			  AND ".$where."
 			GROUP BY DATE_FORMAT(`".$col."`,'%d')";
-	return query_ass($sql);
+	return DB1::ass_cache($sql);
 }
 
 function _calendarFilter($data=array()) {

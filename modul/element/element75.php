@@ -32,7 +32,7 @@ function _element75_print($el) {
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
 			ORDER BY `sort`,`id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return _emptyMin('[75] пустое меню.');
 
 	$v = _filter('vv', $el, 0);
@@ -179,7 +179,7 @@ function _elem75filter($el) {//Фильтр: фронтальное меню
 		$sql = "SELECT `id`
 				FROM `"._table($dialog['table_1'])."`
 				WHERE `parent_id`=".$v;
-		if($ids = query_ids($sql))
+		if($ids = DB1::ids($sql))
 			$v .= ','.$ids;
 	}
 

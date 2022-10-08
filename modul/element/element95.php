@@ -81,7 +81,7 @@ function _element95_mass($el, $prm) {//данные для редактиров�
 			  ".$qDop."
 			  AND !`deleted`
 			ORDER BY `sort`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return array();
 
 	//получение имён колонок элемента [95]
@@ -123,7 +123,7 @@ function _elem95_spisok($elem_ids, $v='', $ids=0) {//получение данн
   ".($ids ? " AND `id` IN (".$ids.")" : '')."			
 			ORDER BY `id` DESC
 			LIMIT ".($ids ? 100 : 50);
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return array();
 
 	$arr = _spisokInclude($arr);
@@ -258,7 +258,7 @@ function _elem95_save($DLG, $CMP, $VVV) {//сохранение данных
 	$sql = "INSERT INTO `".$tab."` (".implode(',', $cols).")
 			VALUES ".implode(',', $values)."
 			ON DUPLICATE KEY UPDATE ".implode(',', $upd);
-	query($sql);
+	DB1::query($sql);
 
 	_count_update();
 
@@ -290,7 +290,7 @@ function _elem95_deleted($DLG, $DLG_INS, $ids=0) {
 			  AND `dialog_id`=".$DLG_INS['id']."
 			  ".$qDop."
   ".($ids ? " AND `id` NOT IN (".$ids.")" : '');
-	query($sql);
+	DB1::query($sql);
 }
 
 
@@ -352,7 +352,7 @@ function PHP12_elem95_setup_save($cmp, $val, $unit) {//сохранение да
 	$sql = "UPDATE `_element`
 			SET `".$col."`='".addslashes($save)."'
 			WHERE `id`=".$unit['id'];
-	query($sql);
+	DB1::query($sql);
 
 	_BE('elem_clear');
 }

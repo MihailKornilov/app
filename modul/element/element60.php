@@ -78,7 +78,7 @@ function _image($el, $prm) {//элемент - загрузка изображе
 				FROM `_image`
 				WHERE `id` IN ("._ids($v).")
 				ORDER BY `sort`";
-		foreach(query_arr($sql) as $r)
+		foreach(DB1::arr($sql) as $r)
 			$html .= _imageDD($r);
 	}
 
@@ -124,7 +124,7 @@ function _imageServerCache() {//кеширование серверов изоб
 		return $arr;
 
 	$sql = "SELECT `id`,`path` FROM `_image_server`";
-	return _cache_set($key, query_ass($sql), 1);
+	return _cache_set($key, DB1::ass($sql), 1);
 }
 function _imageServer($v) {//получение сервера (пути) для изображнения
 /*
@@ -156,7 +156,7 @@ function _imageServer($v) {//получение сервера (пути) для
 				'".addslashes($v)."',
 				"._num(@USER_ID)."
 			)";
-	$insert_id = query_id($sql);
+	$insert_id = DB1::insert_id($sql);
 
 	_cache_clear('IMG_SERVER', 1);
 
@@ -348,7 +348,7 @@ function _imageSave($file_type, $file_tmp_name, $return='arr') {//сохране
 	$_80 = _imageImCreate($im, $x, $y, 80, 80, $IMAGE_PATH.'/'.$NAME_80, $exp);
 
 	$sql = "SELECT IFNULL(MAX(`sort`)+1,0) FROM `_image`";
-	$sort = query_value($sql);
+	$sort = DB1::value($sql);
 
 	$sql = "INSERT INTO `_image` (
 				`app_id`,
@@ -383,7 +383,7 @@ function _imageSave($file_type, $file_tmp_name, $return='arr') {//сохране
 				".$sort.",
 				"._num(@USER_ID)."
 		)";
-	$image_id = query_id($sql);
+	$image_id = DB1::insert_id($sql);
 
 	if($return == 'id')
 		return $image_id;
@@ -391,7 +391,7 @@ function _imageSave($file_type, $file_tmp_name, $return='arr') {//сохране
 	$sql = "SELECT *
 			FROM `_image`
 			WHERE `id`=".$image_id;
-	return query_assoc($sql);
+	return DB1::assoc($sql);
 }
 function _imageDD($img) {//единица изображения для настройки
 	return
@@ -419,7 +419,7 @@ function _image60_save($cmp, $unit) {//Применение загруженны
 		$sql = "UPDATE `_image`
 				SET `sort`=".$n."
 				WHERE `id`=".$id;
-		query($sql);
+		DB1::query($sql);
 	}
 }
 
@@ -430,7 +430,7 @@ function _imageFromId($img_id) {//получение картинки по ID
 	$sql = "SELECT *
 			FROM `_image`
 			WHERE `id`=".$img_id;
-	if(!$img = query_assoc($sql))
+	if(!$img = DB1::assoc($sql))
 		return '';
 
 	return _imageHtml($img, 300);
@@ -449,7 +449,7 @@ function PHP12_image_show($prm) {//просмотр изображений
 		$sql = "SELECT *
 				FROM `_image`
 				WHERE `id`="._idsFirst($ids);
-		if($im = query_assoc($sql)) {
+		if($im = DB1::assoc($sql)) {
 			$image_id = $im['id'];
 			$image = '<img src="'._imageServer($im['server_id']).$im['max_name'].'"'.
 						 ' width="'.$im['max_x'].'"'.
@@ -460,7 +460,7 @@ function PHP12_image_show($prm) {//просмотр изображений
 					FROM `_image`
 					WHERE `id` IN (".$ids.")
 					ORDER BY `sort`";
-			$arr = query_arr($sql);
+			$arr = DB1::arr($sql);
 			if(count($arr) > 1) {
 				$spisok = '<div class="line-t pad10 center bg4">';
 				foreach($arr as $r) {
@@ -519,7 +519,7 @@ function PHP12_image_deleted($prm) {//удалённые изображения 
 			FROM `_image`
 			WHERE `id` IN (".implode(',', $ids).")
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '<div class="_empty min">Удалённые изображения не найдены</div>';
 
 	$html = '';

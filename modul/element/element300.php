@@ -109,7 +109,7 @@ function _elem300VkIdTest($DLG, $v, $user_id) {//проверка, чтобы д
 				FROM `_user`
 				WHERE `vk_id`=".$vk_id.
 	($user_id ? " AND `id`!=".$user_id : '');
-		return query_value($sql);
+		return DB1::value($sql);
 	}
 
 	return false;

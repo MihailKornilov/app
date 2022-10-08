@@ -48,7 +48,7 @@ switch(@$_POST['op']) {
 			$sql = "SELECT *
 					FROM `_element_group`
 					ORDER BY `sort`";
-			foreach(query_arr($sql) as $r) {
+			foreach(DB1::arr($sql) as $r) {
 				$group[] = array(
 					'id' => _num($r['id']),
 					'title' => _br($r['name'], ' '),
@@ -71,7 +71,7 @@ switch(@$_POST['op']) {
 				WHERE `dialog_id`=58
 				  AND `num_1`=".$dialog_id."
 				LIMIT 1";
-		$del58 = _num(query_value($sql));
+		$del58 = _num(DB1::value($sql));
 
 
 		//присвоение ID стороннего диалога
@@ -348,7 +348,7 @@ switch(@$_POST['op']) {
 				ON DUPLICATE KEY UPDATE
 					`parent_id`=VALUES(`parent_id`),
 					`sort`=VALUES(`sort`)";
-		query($sql);
+		DB1::query($sql);
 
 		_cache_clear('page');
 
@@ -378,7 +378,7 @@ switch(@$_POST['op']) {
 				ON DUPLICATE KEY UPDATE
 					`sort`=VALUES(`sort`),
 					`sort_pid`=VALUES(`sort_pid`)";
-		query($sql);
+		DB1::query($sql);
 
 		_cache_clear('DIALOG');
 
@@ -397,13 +397,13 @@ switch(@$_POST['op']) {
 		$sql = "SELECT COUNT(*)
 				FROM `_spisok`
 				WHERE `dialog_id`=".$dialog_id;
-		if(!query_value($sql))
+		if(!DB1::value($sql))
 			jsonError('Отсутствуют записи для удаления');
 
 		$sql = "DELETE
 				FROM `_spisok`
 				WHERE `dialog_id`=".$dialog_id;
-		query($sql);
+		DB1::query($sql);
 
 		jsonSuccess();
 		break;
@@ -436,7 +436,7 @@ switch(@$_POST['op']) {
 		$sql = "SELECT *
 				FROM `_image`
 				WHERE `id`=".$image_id;
-		if(!$img = query_assoc($sql))
+		if(!$img = DB1::assoc($sql))
 			jsonError('Изображения не существует');
 
 		$send['html'] = _imageDD($img);
@@ -511,7 +511,7 @@ switch(@$_POST['op']) {
 					'".addslashes($txt)."',
 					".USER_ID."
 				)";
-		query($sql);
+		DB1::query($sql);
 
 		$send['html'] = _noteList($page_id, $obj_id, $el);
 
@@ -526,7 +526,7 @@ switch(@$_POST['op']) {
 				WHERE `app_id`=".APP_ID."
 				  AND !`parent_id`
 				  AND `id`=".$note_id;
-		if(!$note = query_assoc($sql))
+		if(!$note = DB1::assoc($sql))
 			jsonError('Заметки не существует');
 
 		if($note['deleted'])
@@ -537,7 +537,7 @@ switch(@$_POST['op']) {
 					`user_id_del`=".USER_ID.",
 					`dtime_del`=CURRENT_TIMESTAMP
 				WHERE `id`=".$note_id;
-		query($sql);
+		DB1::query($sql);
 
 		jsonSuccess();
 		break;
@@ -550,7 +550,7 @@ switch(@$_POST['op']) {
 				WHERE `app_id`=".APP_ID."
 				  AND !`parent_id`
 				  AND `id`=".$note_id;
-		if(!$note = query_assoc($sql))
+		if(!$note = DB1::assoc($sql))
 			jsonError('Заметки не существует');
 
 		if(!$note['deleted'])
@@ -561,7 +561,7 @@ switch(@$_POST['op']) {
 					`user_id_del`=0,
 					`dtime_del`='0000-00-00 00:00:00'
 				WHERE `id`=".$note_id;
-		query($sql);
+		DB1::query($sql);
 
 		jsonSuccess();
 		break;
@@ -580,7 +580,7 @@ switch(@$_POST['op']) {
 				WHERE `app_id`=".APP_ID."
 				  AND !`parent_id`
 				  AND `id`=".$note_id;
-		if(!$note = query_assoc($sql))
+		if(!$note = DB1::assoc($sql))
 			jsonError('Заметки не существует');
 
 		$sql = "INSERT INTO `_note` (
@@ -594,7 +594,7 @@ switch(@$_POST['op']) {
 					'".addslashes($txt)."',
 					".USER_ID."
 				)";
-		query($sql);
+		DB1::query($sql);
 
 		$sql = "SELECT *
 				FROM `_note`
@@ -602,7 +602,7 @@ switch(@$_POST['op']) {
 				  AND `parent_id`=".$note_id."
 				ORDER BY `id` DESC
 				LIMIT 1";
-		$send['html'] = _noteCommentUnit($el, query_assoc($sql));
+		$send['html'] = _noteCommentUnit($el, DB1::assoc($sql));
 
 		jsonSuccess($send);
 		break;
@@ -615,7 +615,7 @@ switch(@$_POST['op']) {
 				WHERE `app_id`=".APP_ID."
 				  AND `parent_id`
 				  AND `id`=".$note_id;
-		if(!$note = query_assoc($sql))
+		if(!$note = DB1::assoc($sql))
 			jsonError('Комментария не существует');
 
 		if($note['deleted'])
@@ -626,7 +626,7 @@ switch(@$_POST['op']) {
 					`user_id_del`=".USER_ID.",
 					`dtime_del`=CURRENT_TIMESTAMP
 				WHERE `id`=".$note_id;
-		query($sql);
+		DB1::query($sql);
 
 		jsonSuccess();
 		break;
@@ -639,7 +639,7 @@ switch(@$_POST['op']) {
 				WHERE `app_id`=".APP_ID."
 				  AND `parent_id`
 				  AND `id`=".$note_id;
-		if(!$note = query_assoc($sql))
+		if(!$note = DB1::assoc($sql))
 			jsonError('Комментарий не существует');
 
 		if(!$note['deleted'])
@@ -650,7 +650,7 @@ switch(@$_POST['op']) {
 					`user_id_del`=0,
 					`dtime_del`='0000-00-00 00:00:00'
 				WHERE `id`=".$note_id;
-		query($sql);
+		DB1::query($sql);
 
 		jsonSuccess();
 		break;
@@ -747,7 +747,7 @@ switch(@$_POST['op']) {
 						".$f['size'].",
 						".USER_ID."
 					)";
-			$id = query_id($sql);
+			$id = DB1::insert_id($sql);
 
 			//успешно
 			_cookie('_attached', 1, 3600);
@@ -801,7 +801,7 @@ switch(@$_POST['op']) {
 				SET `num_3`=".$x.",
 					`num_2`=".$y."
 				WHERE `id`=".$elem_id;
-		query($sql);
+		DB1::query($sql);
 
 		_elemOne($elem_id, true);
 
@@ -864,7 +864,7 @@ switch(@$_POST['op']) {
 		$sql = "SELECT *
 				FROM `_action`
 				WHERE `id`=".$action_id;
-		if(!$act = query_assoc($sql))
+		if(!$act = DB1::assoc($sql))
 			jsonError('Действия '.$action_id.' не существует');
 
 		if(_40check($act['filter'], $unit_id))
@@ -1001,7 +1001,7 @@ function _dialogSetupServiceCount($DLG) {//количество записей, 
 	$sql = "SELECT COUNT(*)
 			FROM  "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG, true);
-	if(!$all = _num(query_value($sql)))
+	if(!$all = _num(DB1::value($sql)))
 		return 'нет';
 
 	$send = '<b class="clr0">'.$all.'</b>';
@@ -1009,7 +1009,7 @@ function _dialogSetupServiceCount($DLG) {//количество записей, 
 	$sql = "SELECT COUNT(*)
 			FROM  "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG);
-	$noDel = _num(query_value($sql));
+	$noDel = _num(DB1::value($sql));
 
 	if($del = $all - $noDel)
 		$send .= '<span class="clr1">'.
@@ -1029,7 +1029,7 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 			WHERE `dialog_id` IN (29,59)
 			  AND `num_1`=".$DLG['id']."
 			ORDER BY `id`";
-	if(!$ELM = query_arr($sql))
+	if(!$ELM = DB1::arr($sql))
 		return '<span class="clr2">нет</span>';
 
 	//блоки, в которых размещаются элементы-связки. По ним будут определятся ID диалогов
@@ -1038,7 +1038,7 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 			WHERE `obj_name`='dialog' 
 			  AND `id` IN ("._idsGet($ELM, 'block_id').")
 			ORDER BY `obj_id`";
-	if(!$BLK = query_arr($sql))
+	if(!$BLK = DB1::arr($sql))
 		return '<span class="clr2">нет</span>';
 
 	foreach($ELM as $el) {
@@ -1067,7 +1067,7 @@ function _dialogSetupServiceCnnOut($DLG) {//диалоги, к которым п
 				FROM  "._queryFrom($dlg)."
 				WHERE "._queryWhere($dlg, true)."
 				  AND `".$bl['col']."`";
-		$c = _num(query_value($sql));
+		$c = _num(DB1::value($sql));
 
 		$send .= '<td class="w230">'.
 					$dlg['name'].
@@ -1108,7 +1108,7 @@ function _dialogSetupServiceCnnIn($DLG) {//диалоги, которые раз
 				FROM  "._queryFrom($DLG)."
 				WHERE "._queryWhere($DLG, true)."
 				  AND `".$col."`";
-		$c = _num(query_value($sql));
+		$c = _num(DB1::value($sql));
 
 		$send .=
 			'<td class="w230">'.
@@ -1130,7 +1130,7 @@ function _dialogSetupServiceButton($DLG) {//диалог используетс�
 			WHERE `dialog_id`=2
 			  AND `num_4`=".$DLG['id']."
 			ORDER BY `id`";
-	if(!$ELM = query_arr($sql))
+	if(!$ELM = DB1::arr($sql))
 		return '<span class="clr2">нет</span>';
 
 	$send = '<table class="_stab small bg0">';
@@ -1181,7 +1181,7 @@ function _dialogSetupServiceSpisok($DLG) {//данные диалога выво
 			WHERE `dialog_id` IN (29,59)
 			  AND `num_1`=".$DLG['id']."
 			ORDER BY `id`";
-	if(!$ELM = query_arr($sql))
+	if(!$ELM = DB1::arr($sql))
 		return '<span class="clr2">нет</span>';
 
 	return '<b>да</b>';
@@ -1194,20 +1194,20 @@ function _dialogSetupServiceNumGroupIds($DLG) {
 			FROM `_dialog`
 			WHERE `id`!=".$DLG['id']."
 			  AND `spisok_num_group`=".$DLG['spisok_num_group'];
-	return query_ids($sql);
+	return DB1::ids($sql);
 }
 
 function _dialogSetupRule($dialog_id) {//Правила для элемета
 	$sql = "SELECT `rule_id`,1
 			FROM `_element_rule_use`
 			WHERE `dialog_id`=".$dialog_id;
-	$ass = query_ass($sql);
+	$ass = DB1::ass($sql);
 
 	$send = '';
 	$sql = "SELECT *
 			FROM `_element_rule_name`
 			ORDER BY `sort`";
-	foreach(query_arr($sql) as $id => $r) {
+	foreach(DB1::arr($sql) as $id => $r) {
 		$send .=
 		'<tr><td class="w150">'.
 			'<td>'._check(array(
@@ -1285,11 +1285,11 @@ function _dialogSetupUseCount($dialog) {//количество использо�
 	$sql = "SELECT COUNT(*)
 			FROM `_element`
 			WHERE `dialog_id`=".$dialog['id'];
-	if($count = query_value($sql)) {
+	if($count = DB1::value($sql)) {
 		$sql = "SELECT COUNT(DISTINCT `app_id`)
 				FROM `_element`
 				WHERE `dialog_id`=".$dialog['id'];
-		$appC = query_value($sql);
+		$appC = DB1::value($sql);
 		return
 			'<div class="fs14">'.
 				'Использование '.
@@ -1303,14 +1303,14 @@ function _dialogSetupUseDialog($dialog) {//использование элеме
 	$sql = "SELECT `block_id`
 			FROM `_element`
 			WHERE `dialog_id`=".$dialog['id'];
-	if(!$block_ids = query_ids($sql))
+	if(!$block_ids = DB1::ids($sql))
 		return '';
 
 	$sql = "SELECT `id`
 			FROM `_block`
 			WHERE `id` IN (".$block_ids.")
 			  AND `obj_name`='dialog'";
-	if(!$block_ids = query_ids($sql))
+	if(!$block_ids = DB1::ids($sql))
 		return '';
 
 	//имена приложений
@@ -1321,7 +1321,7 @@ function _dialogSetupUseDialog($dialog) {//использование элеме
 				FROM `_block`
 				WHERE `id` IN (".$block_ids.")
 			)";
-	$appAss = query_ass($sql);
+	$appAss = DB1::ass($sql);
 
 	//имена диалогов
 	$sql = "SELECT `id`,`name`
@@ -1331,7 +1331,7 @@ function _dialogSetupUseDialog($dialog) {//использование элеме
 				FROM `_block`
 				WHERE `id` IN (".$block_ids.")
 			)";
-	$dlgAss = query_ass($sql);
+	$dlgAss = DB1::ass($sql);
 
 	$send = '';
 	$app_id = -1;
@@ -1343,7 +1343,7 @@ function _dialogSetupUseDialog($dialog) {//использование элеме
 			WHERE `id` IN (".$block_ids.")
 			GROUP BY `obj_id`
 			ORDER BY `app_id`,`obj_id`";
-	foreach(query_array($sql) as $r) {
+	foreach(DB1::array($sql) as $r) {
 		if($app_id != $r['app_id']) {
 			$app_id = $r['app_id'];
 			$send .= '<div class="b mt10 ml20 mb5">'.
@@ -1368,14 +1368,14 @@ function _dialogSetupUsePage($dialog) {//использование элемен
 	$sql = "SELECT `block_id`
 			FROM `_element`
 			WHERE `dialog_id`=".$dialog['id'];
-	if(!$block_ids = query_ids($sql))
+	if(!$block_ids = DB1::ids($sql))
 		return '';
 
 	$sql = "SELECT `id`
 			FROM `_block`
 			WHERE `id` IN (".$block_ids.")
 			  AND `obj_name`='page'";
-	if(!$block_ids = query_ids($sql))
+	if(!$block_ids = DB1::ids($sql))
 		return '';
 
 	//имена приложений
@@ -1386,7 +1386,7 @@ function _dialogSetupUsePage($dialog) {//использование элемен
 				FROM `_block`
 				WHERE `id` IN (".$block_ids.")
 			)";
-	$appAss = query_ass($sql);
+	$appAss = DB1::ass($sql);
 
 	//имена страниц
 	$sql = "SELECT `id`,`name`
@@ -1396,7 +1396,7 @@ function _dialogSetupUsePage($dialog) {//использование элемен
 				FROM `_block`
 				WHERE `id` IN (".$block_ids.")
 			)";
-	$pageAss = query_ass($sql);
+	$pageAss = DB1::ass($sql);
 
 	$send = '';
 	$app_id = -1;
@@ -1408,7 +1408,7 @@ function _dialogSetupUsePage($dialog) {//использование элемен
 			WHERE `id` IN (".$block_ids.")
 			GROUP BY `obj_id`
 			ORDER BY `app_id`,`obj_id`";
-	foreach(query_array($sql) as $r) {
+	foreach(DB1::array($sql) as $r) {
 		if($app_id != $r['app_id']) {
 			$app_id = $r['app_id'];
 			$send .= '<div class="b mt10 ml20 mb5">'.
@@ -1523,7 +1523,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 
 				`menu_edit_last`=".$menu_edit_last."
 			WHERE `id`=".$dialog_id;
-	query($sql);
+	DB1::query($sql);
 
 	_dialogSaveSA($dialog_id);
 	_dialogSaveNumGroup($dialog_id);
@@ -1549,7 +1549,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 		if(!$table = _table($table_1))
 			jsonError('Указана несуществующая таблица 1');
 		$sql = "SHOW TABLES LIKE '".$table."'";
-		if(!query_array($sql))
+		if(!DB1::array($sql))
 			jsonError('Указана несуществующая таблица 1: "'.$table.'"');
 	}
 
@@ -1580,11 +1580,11 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 				`element_afics`='".addslashes($element_afics)."',
 				`element_hidden`=".$element_hidden."
 			WHERE `id`=".$dialog_id;
-	query($sql);
+	DB1::query($sql);
 
 	//Обновление правил элемента
 	$sql = "DELETE FROM `_element_rule_use` WHERE `dialog_id`=".$dialog_id;
-	query($sql);
+	DB1::query($sql);
 	if($element_group_id)
 		if($ids = _ids($_POST['element_rule'], 'arr'))
 			foreach($ids as $id) {
@@ -1592,7 +1592,7 @@ function _dialogSaveSA($dialog_id) {//сохрание настроек диал
 							(`dialog_id`,`rule_id`)
 						VALUES
 							(".$dialog_id.",".$id.")";
-				query($sql);
+				DB1::query($sql);
 			}
 }
 function _dialogSaveNumGroup($dialog_id) {//формирование группировки порядкового номера
@@ -1606,7 +1606,7 @@ function _dialogSaveNumGroup($dialog_id) {//формирование групп�
 		$sql = "UPDATE `_dialog`
 				SET `spisok_num_group`=0
 				WHERE `spisok_num_group`=".$spisok_num_group;
-		query($sql);
+		DB1::query($sql);
 
 		return;
 	}
@@ -1620,7 +1620,7 @@ function _dialogSaveNumGroup($dialog_id) {//формирование групп�
 			  AND `spisok_num_group` IN (0,".$spisok_num_group.")
 			  AND `id`!=".$dialog_id."
 			  AND `id` IN (".$ids.")";
-	if(!$ids = query_ids($sql)) {
+	if(!$ids = DB1::ids($sql)) {
 		if(!$spisok_num_group)
 			return;
 
@@ -1628,7 +1628,7 @@ function _dialogSaveNumGroup($dialog_id) {//формирование групп�
 		$sql = "UPDATE `_dialog`
 				SET `spisok_num_group`=0
 				WHERE `spisok_num_group`=".$spisok_num_group;
-		query($sql);
+		DB1::query($sql);
 
 		return;
 	}
@@ -1639,20 +1639,20 @@ function _dialogSaveNumGroup($dialog_id) {//формирование групп�
 
 	if(!$spisok_num_group) {
 		$sql = "SELECT IFNULL(MAX(`spisok_num_group`),0)+1 FROM `_dialog`";
-		$spisok_num_group = query_value($sql);
+		$spisok_num_group = DB1::value($sql);
 	} else {
 		//удаление диалогов из группировки
 		$sql = "UPDATE `_dialog`
 				SET `spisok_num_group`=0
 				WHERE `spisok_num_group`=".$spisok_num_group."
 				  AND `id` NOT IN ("._ids($ids).")";
-		query($sql);
+		DB1::query($sql);
 	}
 
 	$sql = "UPDATE `_dialog`
 			SET `spisok_num_group`=".$spisok_num_group."
 			WHERE `id` IN ("._ids($ids).")";
-	query($sql);
+	DB1::query($sql);
 }
 
 function _dialogOpenParam($dlg) {//все возможные параметны для диалогового окна

@@ -95,7 +95,7 @@ function _elem103save($cmp_id, $user_id, $val) {//сохранение дост�
 			SET `access_pages`='".implode(',', $upd)."'
 			WHERE `app_id`=".APP_ID."
 			  AND `user_id`=".$user_id;
-	query($sql);
+	DB1::query($sql);
 
 	_cache_clear('AUTH_'.CODE, 1);
 	_cache_clear('page');

@@ -54,7 +54,7 @@ function _element54update($elem_id, $unit_ids=0) {//обновление кол�
 			SET `".$col."`=0
 			WHERE "._queryWhere($DSrc).
 ($unit_ids ? " AND "._queryCol_id($DSrc)." IN (".$unit_ids.")" : '');
-	query($sql);
+	DB1::query($sql);
 
 	$sql = "SELECT
 				`".$cmpCol."`,
@@ -64,7 +64,7 @@ function _element54update($elem_id, $unit_ids=0) {//обновление кол�
 			  AND `".$cmpCol."`".($unit_ids ? " IN (".$unit_ids.")" : '')."
 			  "._40cond($cmp, $el['txt_1'])."
 			GROUP BY `".$cmpCol."`";
-	if(!$ass = query_ass($sql)) {//выход, если нечего обновлять
+	if(!$ass = DB1::ass($sql)) {//выход, если нечего обновлять
 		if($unit_ids)
 			_element27childChange($elem_id, $unit_ids);
 		return;
@@ -81,7 +81,7 @@ function _element54update($elem_id, $unit_ids=0) {//обновление кол�
 						VALUES ".implode(',', $upd)."
 					ON DUPLICATE KEY UPDATE
 						`".$col."`=VALUES(`".$col."`)";
-			query($sql);
+			DB1::query($sql);
 			$n = 1000;
 			$upd = array();
 		}
@@ -98,7 +98,7 @@ function _element54update($elem_id, $unit_ids=0) {//обновление кол�
 	$sql = "SELECT MAX(`child_lvl`)
 			FROM `"._table($DSrc['table_1'])."`
 			WHERE `dialog_id`=".$BL['obj_id'];
-	if(!$lvl = _num(query_value($sql)))
+	if(!$lvl = _num(DB1::value($sql)))
 		return;
 
 	for($n = $lvl; $n > 0; $n--) {
@@ -109,12 +109,12 @@ function _element54update($elem_id, $unit_ids=0) {//обновление кол�
 				WHERE `dialog_id`=".$BL['obj_id']."
 				  AND `child_lvl`=".$n."
 				GROUP BY `parent_id`";
-		if($ass = query_ass($sql))
+		if($ass = DB1::ass($sql))
 			foreach($ass as $id => $count) {
 				$sql = "UPDATE `"._table($DSrc['table_1'])."`
 						SET `".$col."`=`".$col."`+".$count."
 						WHERE `id`=".$id;
-				query($sql);
+				DB1::query($sql);
 			}
 	}
 }
@@ -157,7 +157,7 @@ function _element54unitUpd($dlg, $unit, $unitOld) {//обновить колич
 			WHERE `dialog_id`=54
 			  AND `num_1` IN ("._idsGet($ids, 'key').")";
 
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $elem_id => $r) {

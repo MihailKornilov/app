@@ -63,7 +63,7 @@ function _element79_print($el) {
 				WHERE  "._queryWhere($DLG)."
 					   "._elem77filter($SPEL)."
 				GROUP BY `".$GROUP_COL."`";
-		if(!$arr = query_array($sql))
+		if(!$arr = DB1::array_cache($sql))
 			continue;
 
 		foreach($arr as $r) {
@@ -87,7 +87,7 @@ function _element79_print($el) {
 				FROM  "._queryFrom($GROUP_DLG)."
 				WHERE "._queryWhere($GROUP_DLG)."
 				  AND "._queryCol_id($GROUP_DLG)." IN ("._idsGet($arr, 'gid').")";
-		if($ass = query_ass($sql))
+		if($ass = DB1::ass($sql))
 			foreach($ass as $id => $name)
 				if(!empty($RES[$id]))
 					$RES[$id]['name'] = $name;
@@ -127,7 +127,7 @@ function _element79filterUpd($send, $elem_spisok) {//обновление зна
 			WHERE `dialog_id`=79
 			  AND `num_1`=".$elem_spisok."
 			LIMIT 1";
-	if(!$el = query_assoc($sql))
+	if(!$el = DB1::assoc($sql))
 		return $send;
 
 	$send['upd'][] = array(

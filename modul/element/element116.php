@@ -11,7 +11,7 @@ function _counterGlobal($dialog_id, $dlgAct) {
 	$sql = "SELECT *
 			FROM `_counter`
 			WHERE `spisok_id`=".$dialog_id;
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $counter_id => $r)
@@ -22,7 +22,7 @@ function _counterGlobal($dialog_id, $dlgAct) {
 						FROM  "._queryFrom($DLG)."
 						WHERE "._queryWhere($DLG).
 							_40cond(array(), $r['filter']);
-				$count = _num(query_value($sql));
+				$count = _num(DB1::value($sql));
 
 				if(!_counterGlobalInsertAccess($counter_id, $count))
 					break;
@@ -41,7 +41,7 @@ function _counterGlobal($dialog_id, $dlgAct) {
 						FROM  "._queryFrom($DLG)."
 						WHERE "._queryWhere($DLG).
 							_40cond(array(), $r['filter']);
-				$sum = query_value($sql);
+				$sum = DB1::value($sql);
 
 				if(!_counterGlobalInsertAccess($counter_id, $sum))
 					break;
@@ -57,7 +57,7 @@ function _counterGlobalInsertAccess($counter_id, $v) {//разрешение н�
 			WHERE `counter_id`=".$counter_id."
 			ORDER BY `id` DESC
 			LIMIT 1";
-	if(!$cv = query_assoc($sql))
+	if(!$cv = DB1::assoc($sql))
 		return true;
 
 	if($v != $cv['balans'])
@@ -81,7 +81,7 @@ function _counterGlobalInsert($counter_id, $balans, $dlgAct) {//внесение
 				".$balans.",
 				".USER_ID."
 			)";
-	query($sql);
+	DB1::query($sql);
 }
 
 function _counterV($elem_id, $owner_id,  $dlg, $unit_id, $balans, $sum=0, $sumOld=0) {//внесение данных по конкретному счётчику
@@ -92,7 +92,7 @@ function _counterV($elem_id, $owner_id,  $dlg, $unit_id, $balans, $sum=0, $sumOl
 			  AND `owner_id`=".$owner_id."
 			ORDER BY `id` DESC
 			LIMIT 1";
-	if($cv = query_assoc($sql))
+	if($cv = DB1::assoc($sql))
 		//если значение совпадает, запись не вносится
 		if($balans == $cv['balans'])
 			return;
@@ -126,7 +126,7 @@ function _counterV($elem_id, $owner_id,  $dlg, $unit_id, $balans, $sum=0, $sumOl
 
 				".USER_ID."
 			)";
-	query($sql);
+	DB1::query($sql);
 }
 
 function PHP12_counter_v($prm) {
@@ -154,7 +154,7 @@ function PHP12_counter_v($prm) {
 			  AND `owner_id`=".$unit_id."
 			ORDER BY `id` DESC
 			LIMIT 300";
-	if(!$spisok = query_arr($sql))
+	if(!$spisok = DB1::arr($sql))
 		return _empty('Данных нет');
 
 

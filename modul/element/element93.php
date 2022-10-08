@@ -40,5 +40,5 @@ function _element93_print($el) {
 			break;
 	}
 
-	return _num(query_value($sql));
+	return _num(DB1::value($sql));
 }

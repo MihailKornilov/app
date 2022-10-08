@@ -31,7 +31,7 @@ function _element64_print($el, $prm=array()) {
 			FROM  "._queryFrom($DLG)."
 			WHERE "._spisokWhere($ELEM, $prm).
 					_40cond($el, $el['txt_3'], $prm);
-	$sum = round(query_value($sql), 10);
+	$sum = round(DB1::value($sql), 10);
 
 	return $el['txt_1'].' '._sumSpace($sum).' '.$el['txt_2'];
 }
@@ -40,7 +40,7 @@ function _element64filterUpd($send, $elem_spisok) {//обновление зна
 			FROM `_element`
 			WHERE `dialog_id`=64
 			  AND `num_1`=".$elem_spisok;
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return $send;
 
 	foreach($arr as $el)

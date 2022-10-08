@@ -44,7 +44,7 @@ function _element78_print($el) {
 			FROM `"._table($dialog['table_1'])."`
 			WHERE ".$cond."
 			ORDER BY `sort`,`id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return _emptyMin('Фильтр-меню: пустое меню.');
 
 	$send = '';
@@ -120,7 +120,7 @@ function _elem78filter($el) {//фильтр-меню
 		$sql = "SELECT `id`
 				FROM `"._table($dialog['table_1'])."`
 				WHERE `parent_id`=".$v;
-		if($ids = query_ids($sql))
+		if($ids = DB1::ids($sql))
 			$v .= ','.$ids;
 	}
 

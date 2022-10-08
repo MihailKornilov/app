@@ -122,7 +122,7 @@ function _element92unitUpd($dlg, $unit) {//присвоение (или удал
 				FROM `_spisok`
 				WHERE `id` IN (".$unit[$col].")
 				  AND !`deleted`";
-		if(!$spisok = query_arr($sql))
+		if(!$spisok = DB1::arr($sql))
 			continue;
 
 		$dlgAss = array();
@@ -146,7 +146,7 @@ function _element92unitUpd($dlg, $unit) {//присвоение (или удал
 				$sql = "UPDATE `_spisok`
 						SET `".$coll."`=".$unit_id."
 						WHERE `id` IN ("._ids($ids).")";
-				query($sql);
+				DB1::query($sql);
 
 				$countUpdate = true;
 			}

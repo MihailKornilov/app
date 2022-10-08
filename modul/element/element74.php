@@ -50,7 +50,7 @@ function _element74_print($el, $prm) {
 				FROM  "._queryFrom($DLG)."
 				WHERE "._queryWhere($DLG)."
 					"._40cond($EL, $r['cond']);
-		if($c = query_value($sql))
+		if($c = DB1::value_cache($sql))
 			$spisok[$n]['title'] .= '<span class="fr inhr">'.$c.'</span>';
 	}
 
@@ -141,7 +141,7 @@ function PHP12_filter_radio_setup_save($cmp, $val, $unit) {//сохранени�
 	$sql = "UPDATE `_element`
 			SET `".$col."`='".addslashes($save)."'
 			WHERE `id`=".$unit['id'];
-	query($sql);
+	DB1::query($sql);
 
 	_filter('def_update', $unit['id'], $def);
 

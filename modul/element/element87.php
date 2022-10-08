@@ -17,7 +17,7 @@ function _element87_print($el, $prm) {
 			FROM  "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG).
 				_40cond(array(), $el['txt_1']);
-	$count = query_value($sql);
+	$count = DB1::value($sql);
 
 	return 'Кол-во "'.$DLG['name'].'" '.($count ? '+'.$count : '0');
 }

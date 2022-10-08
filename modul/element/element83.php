@@ -43,7 +43,7 @@ function _element83_vvv($el) {
 					WHERE  "._queryWhere($DLG)."
 					  AND `".$col."`
 					GROUP BY `".$col."` /* [83-] ".$n." */";
-			$CC = query_ass($sql);
+			$CC = DB1::ass_cache($sql);
 			continue;
 		}
 
@@ -58,7 +58,7 @@ function _element83_vvv($el) {
 				FROM   "._queryFrom($DLG)."
 				WHERE  "._queryWhere($DLG)."
 				  AND `id` IN ("._idsGet($CC, 'key').") /* [83-] ".$n." */";
-		foreach(query_ass($sql) as $id => $ccid) {
+		foreach(DB1::ass($sql) as $id => $ccid) {
 			if(!isset($mass[$ccid]))
 				$mass[$ccid] = 0;
 			$mass[$ccid] += $CC[$id];
@@ -75,7 +75,7 @@ function _element83_vvv($el) {
 			WHERE  "._queryWhere($DLG)."
 			  AND `id` IN ("._idsGet($CC, 'key').")
 			ORDER BY ".(_queryColReq($DLG, 'sort') ? "`sort`,`id`" : '`id`');
-	if(!$spisok = query_arr($sql))
+	if(!$spisok = DB1::arr($sql))
 		return array();
 
 	$parentLost = array();
@@ -97,7 +97,7 @@ function _element83_vvv($el) {
 				FROM   "._queryFrom($DLG)."
 				WHERE  "._queryWhere($DLG)."
 				  AND `id` IN ("._idsGet($parentLost, 'key').")";
-		foreach(query_arr($sql) as $id => $r)
+		foreach(DB1::arr($sql) as $id => $r)
 			$spisok[$id] = $r;
 	}
 
@@ -167,7 +167,7 @@ function _elem83filterWhere($filter, $v) {
 					FROM   "._queryFrom($DLG)."
 					WHERE  "._queryWhere($DLG)."
 					  AND `parent_id` IN (".$PIDS.")";
-			if($PIDS = query_ids($sql))
+			if($PIDS = DB1::ids($sql))
 				$ass += _idsAss($PIDS);
 		}
 		return " AND `".$col."` IN ("._idsGet($ass, 'key').") /* [83] level 2 */";
@@ -189,7 +189,7 @@ function _elem83filterWhere($filter, $v) {
 				FROM   "._queryFrom($DLG2)."
 				WHERE  "._queryWhere($DLG2)."
 				  AND `parent_id` IN (".$PIDS.")";
-		if($PIDS = query_ids($sql))
+		if($PIDS = DB1::ids($sql))
 			$ass += _idsAss($PIDS);
 	}
 
@@ -197,7 +197,7 @@ function _elem83filterWhere($filter, $v) {
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
 			  AND `".$col1."` IN ("._idsGet($ass, 'key').")";
-	if(!$ids = query_ids($sql))
+	if(!$ids = DB1::ids($sql))
 		return ' AND !`id` /* [83] level 3 empty */';
 
 	return " AND `".$col."` IN (".$ids.") /* [83] level 3 */";

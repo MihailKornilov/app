@@ -44,7 +44,7 @@ function _noteList($page_id, $obj_id, $el) {
 			  AND `page_id`=".$page_id."
 			  AND `obj_id`=".$obj_id."
 			ORDER BY `dtime_add` DESC";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	foreach($arr as $id => $r)
@@ -57,7 +57,7 @@ function _noteList($page_id, $obj_id, $el) {
 			WHERE `parent_id` IN ("._idsGet($arr).")
 			  AND !`deleted`
 			ORDER BY `dtime_add`";
-	if($comm = query_arr($sql)) {
+	if($comm = DB1::arr($sql)) {
 		$comm = _noteImgArr($comm);
 		foreach($comm as $r)
 			$arr[$r['parent_id']]['comment'][] = $r;
@@ -179,7 +179,7 @@ function _noteImgArr($arr) {//подмена id изображений на да
 	$sql = "SELECT *
 			FROM `_image`
 			WHERE `id` IN (".implode(',', $imgIds).")";
-	if(!$img = query_arr($sql))
+	if(!$img = DB1::arr($sql))
 		return $arr;
 
 	foreach($arr as $note_id => $r) {

@@ -56,7 +56,7 @@ function _element73filterUpd($send, $elem_spisok) {//обновление зна
 			WHERE `dialog_id`=77
 			  AND `num_1`=".$elem_spisok."
 			LIMIT 1";
-	if(!$el = query_assoc($sql))
+	if(!$el = DB1::assoc($sql))
 		return $send;
 
 	//поиск элемента-пути, привязанного к календарю
@@ -65,7 +65,7 @@ function _element73filterUpd($send, $elem_spisok) {//обновление зна
 			WHERE `dialog_id`=73
 			  AND `num_1`=".$el['id']."
 			LIMIT 1";
-	if(!$elp = query_assoc($sql))
+	if(!$elp = DB1::assoc($sql))
 		return $send;
 
 	$send['upd'][] = array(

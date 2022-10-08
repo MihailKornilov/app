@@ -104,7 +104,7 @@ function _elem102CnnList($ids, $return='select', $cond='') {//значения �
 			WHERE  "._queryWhere($dlg)."
 				   ".$cond."
 			ORDER BY ".(_queryColReq($dlg, 'sort') ? "`sort`,`id`" : '`id`');
-	if(!$spisok = query_arr($sql))
+	if(!$spisok = DB1::arr($sql))
 		return array();
 
 	//требуется ли вывод списка по уровням

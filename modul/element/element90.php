@@ -23,7 +23,7 @@ function _element90_print($el) {
 	$sql = "SELECT *
 			FROM `_image`
 			WHERE `id`=".$image_id;
-	if(!$img = query_assoc($sql))
+	if(!$img = DB1::assoc($sql))
 		return _imageNo($w);
 
 	//если присутствует высота - подгонка картинки под размеры

@@ -52,7 +52,7 @@ function _element55update($elem_id, $unit_ids=0) {//обновление сум�
 			SET `".$col."`=0
 			WHERE "._queryWhere($DSrc).
 ($unit_ids ? " AND "._queryCol_id($DSrc)." IN (".$unit_ids.")" : '');
-	query($sql);
+	DB1::query($sql);
 
 	//получение колонки, по которой нужно будет считать сумму значения
 	if(!$sumCol = _elemCol($el['num_2']))
@@ -66,7 +66,7 @@ function _element55update($elem_id, $unit_ids=0) {//обновление сум�
 			  AND `".$cmpCol."`".($unit_ids ? " IN (".$unit_ids.")" : '')."
 			  "._40cond(array(), $el['txt_1'])."
 			GROUP BY `".$cmpCol."`";
-	if(!$ass = query_ass($sql)) {//выход, если нечего обновлять
+	if(!$ass = DB1::ass($sql)) {//выход, если нечего обновлять
 		_element27childChange($elem_id, $unit_ids);
 		return;
 	}
@@ -83,7 +83,7 @@ function _element55update($elem_id, $unit_ids=0) {//обновление сум�
 				WHERE `cnn_id` IN ("._idsGet($saveAss, 'key').")
 				  AND `app_id`=".$DSrc['app_id']."
 				  AND !`deleted`";
-		if(!$ass = query_ass($sql))
+		if(!$ass = DB1::ass($sql))
 			return;
 
 		foreach($ass as $id => $cnn_id)
@@ -101,7 +101,7 @@ function _element55update($elem_id, $unit_ids=0) {//обновление сум�
 						VALUES ".implode(',', $upd)."
 					ON DUPLICATE KEY UPDATE
 						`".$col."`=VALUES(`".$col."`)";
-			query($sql);
+			DB1::query($sql);
 			$n = 1000;
 			$upd = array();
 		}
@@ -139,7 +139,7 @@ function _element55unitUpd($dlg, $unitNew, $unitOld) {//обновить сум�
 			FROM `_element`
 			WHERE `dialog_id`=55
 			  AND `num_1` IN ("._idsGet($ids, 'key').")";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $elem_id => $r) {

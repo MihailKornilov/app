@@ -70,7 +70,7 @@ function _element88_print($EL, $prm=array(), $next=0) {
 			  "._elem77filter($EL)."
 			ORDER BY `dtime_add` ".$SC."
 			LIMIT ".($LIMIT * $next).",".$LIMIT;
-	$spisok = query_arr($sql);
+	$spisok = DB1::arr_cache($sql);
 
 	//вставка значений из вложенных списков по каждому dialog_id
 	$spInc = array();
@@ -206,7 +206,7 @@ function _elem88countAll($el) {//общее количество строк сп
 			WHERE  !`deleted`".
 			  _elem88cond($el).
 			  _elem77filter($el);
-	return query_value($sql);
+	return DB1::value_cache($sql);
 }
 function _elem88next($EL, $next, $mon) {//tr-догрузка списка
 	if($EL['num_1'] * ($next + 1) >= $EL['all'])
@@ -348,7 +348,7 @@ function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
 	$sql = "UPDATE `_element`
 			SET `txt_2`='".addslashes($json)."'
 			WHERE `id`=".$elem_id;
-	query($sql);
+    DB1::query($sql);
 
 	//удаление удалённых элементов
 	$elm = array();
@@ -360,7 +360,7 @@ function PHP12_elem88_save($cmp, $val, $unit) {//сохранение
 		$sql = "DELETE FROM `_element`
 				WHERE `parent_id`=".$elem_id."
 				  AND `id` NOT IN (".implode(',', $elm).")";
-		query($sql);
+        DB1::query($sql);
 	}
 
 	_elemOne($elem_id, true);
@@ -410,7 +410,7 @@ function PHP12_elem89_save($cmp, $val, $unit) {//сохранение
 					`color`='".$r['color']."',
 					`txt_8`='".$r['txt_8']."'
 				WHERE `id`=".$id;
-		query($sql);
+		DB1::query($sql);
 	}
 
 	_elemOne($elem_id, true);

@@ -53,5 +53,5 @@ function _element94_print($el) {
 			break;
 	}
 
-	return _sumSpace(query_value($sql));
+	return _sumSpace(DB1::value($sql));
 }
