@@ -31,7 +31,7 @@ function _cronStart() {//просмотр и выполнение всех за�
 	$sql = "SELECT *
 			FROM `_cron`
 			ORDER BY `app_id`,`id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		exit;
 
 
@@ -69,7 +69,7 @@ function _cronTask() {//выполнение конкретной задачи
 	$sql = "SELECT *
 			FROM `_cron`
 			WHERE `id`=".$task_id;
-	if(!$task = query_assoc($sql))
+	if(!$task = DB1::assoc($sql))
 		die('task id'.$task_id.' not exists');
 
 	define('APP_ID', $task['app_id']);
@@ -86,7 +86,7 @@ function _cronTask() {//выполнение конкретной задачи
 			FROM  "._queryFrom($SRC)."
 			WHERE "._queryWhere($SRC).
 				_40cond(array(), $task['src_prm']);
-	if(!$SRC_ARR = query_arr($sql))
+	if(!$SRC_ARR = DB1::arr($sql))
 		die('no data for insert');
 		
 	//id списка-получателя
@@ -144,7 +144,7 @@ function _cronTask() {//выполнение конкретной задачи
 					".$DST['id'].",
 					".implode(',', $data)."
 				)";
-		$unit_id = query_id($sql);
+		$unit_id = DB1::insert_id($sql);
 		$unit = _spisokUnitQuery($DST, $unit_id);
 
 		//обновление счётчиков
@@ -156,7 +156,7 @@ function _cronTask() {//выполнение конкретной задачи
 	$sql = "UPDATE `_cron`
 			SET `exec_time_last`=CURRENT_TIMESTAMP
 			WHERE `id`=".$task_id;
-	query($sql);
+	DB1::query($sql);
 
 	$duration = round(microtime(true) - TIME, 3);
 
@@ -170,7 +170,7 @@ function _cronTask() {//выполнение конкретной задачи
 				".$task_id.",
 				".$duration."
 			)";
-	query($sql);
+	DB1::query($sql);
 
 	echo
 	'all='.count($SRC_ARR).
