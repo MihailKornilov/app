@@ -22,7 +22,7 @@ switch(@$_POST['op']) {
 		$explain = _bool($_POST['explain']);
 
 		$sql = ($explain ? 'EXPLAIN ' : '').trim($_POST['query']);
-		$q = query($sql);
+		$q = DB1::query($sql);
 
 		if($nocache)
 			$sql = preg_replace('/SELECT/', 'SELECT NO_SQL_CACHE', $sql);

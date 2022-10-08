@@ -6,8 +6,6 @@ function _debug($i='') {
 	if($i == 'style')
 		return '<link rel="stylesheet" type="text/css" href="modul/debug/debug'.MIN.'.css?'.SCRIPT.'" />';
 
-	global $SQL_TIME, $SQL_QUERY, $SQL_QUERY_T;
-
 //	$goFace = SITE ? 'iframe' : 'site';
 	$send =
 		'<div id="debug-footer">'.
@@ -15,7 +13,7 @@ function _debug($i='') {
 			'<a id="cookie_clear">Очисить cookie</a> :: '.
 			'<a id="count_update">Обновить суммы</a> :: '.
 			'<a id="cache_clear">Очисить кэш ('.SCRIPT.')</a> :: '.
-			'sql <b>'.count($SQL_QUERY).'</b> ('.round($SQL_TIME, 3).') :: '.
+			'sql <b>'.DB1::QueryCount().'</b> ('.DB1::QueryDur().') :: '.
 			'php '.round(microtime(true) - TIME, 3).' :: '.
 			'js <em></em>'.
 //   (LOCAL ? ' :: <a onclick="_faceGo(\''.$goFace.'\')">go '.$goFace.'</a>' : '').
@@ -155,7 +153,7 @@ function _debug_cache_clear() {//очистка кеша
 	$sql = "UPDATE `_setting`
 			SET `v`=`v`+1
 			WHERE `key`='SCRIPT'";
-	query($sql);
+	DB1::query($sql);
 
 	_cache_clear('all');
 
@@ -163,25 +161,27 @@ function _debug_cache_clear() {//очистка кеша
 	_userImageRepair();
 }
 
-function _debug_sql() {//получение всех запросов
-	global $SQL_TIME, $SQL_QUERY, $SQL_QUERY_T;
-
-	$txt = '<table class="_stab small w100p mt5">';
-	foreach($SQL_QUERY as $n => $r) {
-		$t = $SQL_QUERY_T[$n];
+function _debug_sql():string {//получение всех запросов
+	$txt = '';
+	foreach(DB1::QueryMass() as $n => $r) {
+        $bg = $r['t'] > 0.05 ? ' bg-fcc' : ' bg11';
+        $clr = $r['t'] > 0.05 ? 'b clr5' : 'clr1';
 		$txt .=
-			'<tr class="over5">'.
-				'<td class="w25 clr2 r top">'.($n+1).
-				'<td class="top '.($t > 0.05 ? 'bg-fcc' : 'bg11').'">'.
-					'<textarea class="w100p h20 bg0 fs12">'.$r.';</textarea>'.
-				'<td class="w35 r top '.($t > 0.05 ? 'b clr5' : 'clr1').'">'._hide0($t);
+        '<div class="mt8">'.
+            '<div class="pad5'.$bg.'">'.
+                '<span class="clr2">'.($n+1).'.</span> '.
+                $r['path'].
+                '<div class="fr '.$clr.'">'._hide0($r['t']).'</div>'.
+            '</div>'.
+            '<textarea class="w100p h20 bg0 fs12">'.$r['sql'].';</textarea>'.
+//            '<div>'.$r['a'].'</div>'.
+        '</div>';
 	}
-	$txt .= '</table>';
 
 	return
 	'<div class="bg-eee bor1 pad5 curP over1" onclick="$(this).next().slideToggle()">'.
-		'sql <b>'.count($SQL_QUERY).'</b> '.
-		'('.round($SQL_TIME, 3).')'.
+		'sql <b>'.DB1::QueryCount().'</b> '.
+		'('.DB1::QueryDur().')'.
 		' :: '.
 		'php '.round(microtime(true) - TIME, 3).
 	'</div>'.
@@ -249,7 +249,7 @@ function _count_update($app_id=APP_ID) {//обновление счётчико�
 			FROM `_element`
 			WHERE `app_id`=".$app_id."
 			  AND `dialog_id`=54";
-	foreach(query_arr($sql) as $r)
+	foreach(DB1::arr($sql) as $r)
 		_element54update($r['id']);
 
 	//пересчёт сумм [55]
@@ -257,7 +257,7 @@ function _count_update($app_id=APP_ID) {//обновление счётчико�
 			FROM `_element`
 			WHERE `app_id`=".$app_id."
 			  AND `dialog_id`=55";
-	foreach(query_arr($sql) as $r)
+	foreach(DB1::arr($sql) as $r)
 		_element55update($r['id']);
 
 	//пересчёт сумм [27]
@@ -265,7 +265,7 @@ function _count_update($app_id=APP_ID) {//обновление счётчико�
 			FROM `_element`
 			WHERE `app_id`=".$app_id."
 			  AND `dialog_id`=27";
-	foreach(query_arr($sql) as $r)
+	foreach(DB1::arr($sql) as $r)
 		_element27update($r['id']);
 }
 
@@ -279,7 +279,7 @@ function jsonDebugParam() {//возвращение дополнительных
 		'post' => $_POST,
 		'link' => 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'],
 		'file' => $d[1]['file'].':<b>'.$d[1]['line'].'</b>',
-		'sql' => _debug_sql(),
+		'sql' => _debug_sql()
 	);
 }
 
