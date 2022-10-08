@@ -11,11 +11,10 @@ setlocale(LC_NUMERIC, 'en_US');
 define('GLOBAL_DIR', dirname(dirname(dirname(__FILE__))));
 define('DOMAIN', $_SERVER['SERVER_NAME']);
 
-define('CACHE_USE', true); //включение кеша
-define('CACHE_TTL', 86400);//время в секундах, которое хранит кеш
 
 require_once GLOBAL_DIR.'/syncro.php';
 require_once GLOBAL_DIR.'/modul/global/regexp.php';
+require_once GLOBAL_DIR.'/modul/global/cache.php';
 require_once GLOBAL_DIR.'/modul/global/mysql.php';
 require_once GLOBAL_DIR.'/modul/global/date.php';
 require_once GLOBAL_DIR.'/modul/global/bug.php';
@@ -30,9 +29,6 @@ require_once GLOBAL_DIR.'/modul/tag/tag.php';
 require_once GLOBAL_DIR.'/modul/element/element.php';
 require_once GLOBAL_DIR.'/modul/action/action.php';
 require_once GLOBAL_DIR.'/modul/spisok/spisok.php';
-
-require_once GLOBAL_DIR.'/3798718_comtex.php';
-require_once GLOBAL_DIR.'/3495523_kupez.php';
 
 define('YEAR_CUR', strftime('%Y'));
 define('YEAR_MON', strftime('%Y-%m'));
@@ -57,7 +53,7 @@ function _setting() {//установка констант-настроек
 	$key = 'SETTING';
 	if(!$arr = _cache_get($key, 1)) {
 		$sql = "SELECT `key`,`v` FROM `_setting`";
-		$arr = query_ass($sql);
+		$arr = DB1::ass($sql);
 
 		$arr = _settingInsert($arr, 'SCRIPT', 100);
 		$arr = _settingInsert($arr, 'JS_CACHE', 1);
@@ -87,7 +83,7 @@ function _settingInsert($arr, $key, $v) {//проверка наличия вс�
 				'".$key."',
 				".$v."
 			)";
-	query($sql);
+	DB1::query($sql);
 
 	$arr[$key] = $v;
 
@@ -340,19 +336,19 @@ function _hide0($v) {//возвращает пустоту, если значе�
 function _nol($num) {//добавление нуля к числу, если меньше 10
 	return ($num < 10 ? '0' : '').$num;
 }
-
 function _ids($ids, $return='ids') {//проверка корректности списка id, составленные через запятую
-	/*
-		$return - формат возвращаемого значения
-				ids: числа через запятую (по умолчанию)
-				arr: массив (также если 1)
-			  count: количество
-		count_empty: количество, если = 0, то пустота
-	*/
-	if(!$ids)
-		return _idsReturn(0, $return);
+    if(!$ids)
+        return _idsReturn(0, $return);
 
-	if(!is_array($ids))
+    /*
+
+        $return - формат возвращаемого значения
+                ids: числа через запятую (по умолчанию)
+                arr: массив (также если 1)
+              count: количество
+        count_empty: количество, если = 0, то пустота
+    */
+    if(!is_array($ids))
 		$ids = explode(',', $ids);
 
 	$arr = array();
@@ -535,7 +531,7 @@ function _decode($js, $return=array()) {//декодирование JSON
 
 function _pr($arr, $emptyReturn=false) {//аналог функции print_r
 	if(empty($arr))
-		return $emptyReturn ? '' : _prMsg('массив пуст');
+		return $emptyReturn ? '' : '<div class="dib clr1 i pad5 bor-e8">массив пуст</div>';
 
 	if(!is_array($arr))
 		return $arr;
@@ -545,9 +541,6 @@ function _pr($arr, $emptyReturn=false) {//аналог функции print_r
 		_prFor($arr).
 	'</div>';
 }
-function _prMsg($msg) {
-	return '<div class="dib clr1 i pad5 bor-e8">'.$msg.'</div>';
-}
 function _prFor($arr, $sub=0) {//перебор массива
 	$send = '';
 	foreach($arr as $id => $r) {
@@ -556,12 +549,19 @@ function _prFor($arr, $sub=0) {//перебор массива
 				'<span class="'.($sub ? 'fs11 clr14' : 'fs12 clr0').(is_array($r) ? ' b u curP' : '').'"'.(is_array($r) ? ' onclick="$(this).next().slideToggle(300)"' : '').'>'.
 					$id.':'.
 				'</span> '.
-				'<span class="clr1 fs11">'.
-					(is_array($r) ? _prFor($r, 1) : $r).
-				'</span>'.
+				'<span class="clr1 fs11">'._prType($r).'</span>'.
 			'</div>';
 	}
 	return $send;
+}
+function _prType($r) {
+    switch(gettype($r)) {
+        default:
+        case 'string':
+        case 'integer': return $r; break;
+        case 'array': return _prFor($r, 1); break;
+        case 'object': return _prFor((array)$r, 1); break;
+    }
 }
 
 function _sel($arr) {
@@ -711,118 +711,3 @@ function _vkapi($method, $param=array()) {//получение данных из
 
 
 
-
-
-function _cache($v=array()) {
-	/*
-		action (действие):
-			get - считывание данных из кеша (по умолчанию)
-			set - занесение данных в кеш
-			isset - проверка существования кеша
-			clear - очистка кеша
-
-		global:
-			1 - глобальные значения
-			0 - конкретное приложение
-
-		key: ключ кеша
-	*/
-
-	$key = '__'._cachePrefix($v).'_'._cacheKey($v);
-
-	switch(_cacheAction($v)) {
-		case 'get': return CACHE_USE ? apcu_fetch($key) : false;
-		case 'set':
-//			if(!isset($v['data']))
-//				die('Отсутствуют данные для внесения в кеш. Key: '.$key);
-
-			if(CACHE_USE)
-				apcu_store($key, $v['data'], CACHE_TTL);
-
-			return $v['data'];
-		case 'isset': return CACHE_USE ? apcu_exists($key) : false;
-		case 'clear':
-			if(CACHE_USE)
-				apcu_delete($key);
-			return true;
-		default: die('Неизвестное действие кеша.');
-	}
-}
-function _cacheAction($v) {//получение действия кеша
-	if(empty($v['action']))
-		return 'get';
-	return $v['action'];
-}
-function _cacheKey($v) {//получение ключа кеша
-	if(empty($v['key']))
-		die('Отсутствует ключ кеша.');
-	if(is_array($v['key']))
-		die('Ключ кеша не может быть массивом.');
-	return $v['key'];
-}
-function _cachePrefix($v) {//получение префикса кеша
-	if(!empty($v['global']))
-		return 'GLOBAL';
-	if(!defined('APP_ID'))
-		return 'GLOBAL';
-	if(empty(APP_ID))
-		return 'GLOBAL';
-	return 'APP'.APP_ID;
-}
-function _cache_get($key, $global=0) {//получение значений кеша
-	return _cache(array(
-		'action' => 'get',
-		'key' => $key,
-		'global' => $global
-	));
-}
-function _cache_set($key, $data, $global=0) {//запись значений в кеш
-	return _cache(array(
-		'action' => 'set',
-		'key' => $key,
-		'data' => $data,
-		'global' => $global
-	));
-}
-function _cache_isset($key, $global=0) {//проверка, производилась ли запись в кеш
-	return _cache(array(
-		'action' => 'isset',
-		'key' => $key,
-		'global' => $global
-	));
-}
-function _cache_clear($key, $global=0) {//очистка кеша
-	if($key == 'all') {
-		if(CACHE_USE)
-			apcu_clear_cache();
-		return true;
-	}
-
-	return _cache(array(
-		'action' => 'clear',
-		'key' => $key,
-		'global' => $global
-	));
-}
-function _cache_content() {//содержание кеша в диалоге [84] (подключаемая функция [12])
-	if(!CACHE_USE)
-		$send = 'Кеш отключен.';
-	elseif(!$name = @$_COOKIE['cache_content_name'])
-			$send = 'Отсутствует имя кеша.';
-		else {
-			if(!apcu_exists($name))
-				$send = '<b>'.$name.'</b>: кеш не сохранён.';
-			else {
-				if(!$arr = apcu_fetch($name))
-					$send = '<b>'.$name.'</b>: кеш пуст.';
-				else
-					$send =
-						'<div class="fs15 b mb10">'.$name.'</div>'.
-						_pr($arr);
-			}
-		}
-	return
-	'<div style="height:700px;width:560px;overflow-y:scroll;word-wrap:break-word" class="bg0 bor-e8 pad10">'.
-		$send.
-	'</div>';
-}

@@ -11,12 +11,12 @@ switch(@$_POST['op']) {
 		$sql = "UPDATE `_user_auth`
 				SET `app_id`=".$app_id."
 				WHERE `code`='".CODE."'";
-		query($sql);
+		DB1::query($sql);
 
 		$sql = "UPDATE `_user`
 				SET `app_id_last`=".$app_id."
 				WHERE `id`=".USER_ID;
-		query($sql);
+		DB1::query($sql);
 
 		_cache_clear('AUTH_'.CODE, 1);
 		_cache_clear('page');
@@ -42,21 +42,21 @@ switch(@$_POST['op']) {
 					case 'PHP12_elem_choose':
 						foreach($sortIds as $n => $id) {
 							$sql = "UPDATE `_dialog` SET `sort`=".$n." WHERE `id`=".$id;
-							query($sql);
+							DB1::query($sql);
 						}
 						jsonSuccess();
 						break;
 					case 'PHP12_app_list':
 						foreach($sortIds as $n => $id) {
 							$sql = "UPDATE `_user_access` SET `uasort`=".$n." WHERE `id`=".$id;
-							query($sql);
+							DB1::query($sql);
 						}
 						jsonSuccess();
 						break;
 					case 'PHP12_action_list':
 						foreach($sortIds as $n => $id) {
 							$sql = "UPDATE `_action` SET `sort`=".$n." WHERE `id`=".$id;
-							query($sql);
+							DB1::query($sql);
 							_BE('action_clear');
 						}
 						jsonSuccess();
@@ -79,7 +79,7 @@ switch(@$_POST['op']) {
 					SET ".$sortCol."=".$n."
 					WHERE "._queryWhere($DLG)."
 					  AND "._queryCol_id($DLG)."=".$id;
-			query($sql);
+			DB1::query($sql);
 		}
 
 		jsonSuccess();
