@@ -58,7 +58,7 @@ function _auth() {//получение данных об авторизации 
 				FROM `_user_auth`
 				WHERE `code`='".addslashes(CODE)."'
 				LIMIT 1";
-		if($r = query_assoc($sql)) {
+		if($r = DB1::assoc($sql)) {
 			$UAA = _userAppAccessGet($r['user_id'], $r['app_id']);
 			$r['access_enter'] = _num(@$UAA['access_enter']);
 
@@ -100,7 +100,7 @@ function _authLoginIframe() {//проверка авторизации чере�
 				FROM `_app`
 				WHERE `vk_app_id`=".$vk_app_id."
 				LIMIT 1";
-		if(!$app_id = _num(query_value($sql)))
+		if(!$app_id = _num(DB1::value($sql)))
 			return _authIframeError('Приложение не зарегистрировано.');
 
 		if(!$viewer_id = _num(@$_GET['viewer_id']))
@@ -110,7 +110,7 @@ function _authLoginIframe() {//проверка авторизации чере�
 				FROM `_user`
 				WHERE `vk_id`=".$viewer_id."
 				LIMIT 1";
-		if(!$user_id = _num(query_value($sql)))
+		if(!$user_id = _num(DB1::value($sql)))
 			return _authIframeError('Пользователя нет.');
 
 		if($auth_key != md5($vk_app_id.'_'.$viewer_id.'_'._app($app_id, 'vk_secret')))
@@ -131,7 +131,7 @@ function _authLoginIframe() {//проверка авторизации чере�
 
 function _authSuccess($code, $user_id, $app_id=0) {//внесение записи об успешной авторизации
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes($code)."'";
-	query($sql);
+	DB1::query($sql);
 
 	$ip = $_SERVER['REMOTE_ADDR'];
 	$browser = _txt($_SERVER['HTTP_USER_AGENT']);
@@ -148,7 +148,7 @@ function _authSuccess($code, $user_id, $app_id=0) {//внесение запис
 				'".$ip."',
 				'".addslashes($browser)."'
 			)";
-	query($sql);
+	DB1::query($sql);
 
 	_cookie('code', $code);
 
@@ -171,7 +171,7 @@ function _authLogout() {//выход из приложения, если тре�
 	_cookieDel('page_setup');
 
 	$sql = "DELETE FROM `_user_auth` WHERE `code`='".addslashes(CODE)."'";
-	query($sql);
+	DB1::query($sql);
 
 	_cookieDel('code');
 	header('Location:'.URL);
@@ -221,7 +221,7 @@ function _auth98($dialog, $cmp) {//регистрация нового поль�
 				'".addslashes($login)."',
 				'".$pass."'
 			)";
-	$user_id = query_id($sql);
+	$user_id = DB1::insert_id($sql);
 
 	$sig = md5($login.$pass.$_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR']);
 	_authSuccess($sig, $user_id);
@@ -244,7 +244,7 @@ function _auth99($dialog, $cmp) {//авторизация по логину и �
 			WHERE `login`='".addslashes($login)."'
 			  AND `pass`='".$pass."'
 			LIMIT 1";
-	if(!$user_id = query_value($sql))
+	if(!$user_id = DB1::value($sql))
 		jsonError('Неверный логин или пароль');
 
 	$sig = md5($login.$pass.$_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR']);
@@ -274,7 +274,7 @@ function _pin131($dialog, $cmp) {//пользователь устанавлив
 	$sql = "UPDATE `_user`
 			SET `pin`='".$pin."'
 			WHERE `id`=".USER_ID;
-	query($sql);
+	DB1::query($sql);
 
 	unset($_SESSION[PIN_KEY]);
 	_cache_clear('user'.USER_ID);
@@ -299,7 +299,7 @@ function _pin132($dialog, $cmp) {//пользователь изменяет и�
 	$sql = "UPDATE `_user`
 			SET `pin`='".$new."'
 			WHERE `id`=".USER_ID;
-	query($sql);
+	DB1::query($sql);
 
 	unset($_SESSION[PIN_KEY]);
 	_cache_clear('user'.USER_ID);
@@ -609,7 +609,7 @@ function _app($app_id, $i='all') {//Получение данных о прил�
 		$sql = "SELECT *
 				FROM `_app`
 				WHERE `id`=".$app_id;
-		if(!$arr = query_assoc($sql))
+		if(!$arr = DB1::assoc($sql))
 			die('Невозможно получить данные приложения. Кеш: '.$key);
 
 		$arr['img'] = array();
@@ -617,7 +617,7 @@ function _app($app_id, $i='all') {//Получение данных о прил�
 			$sql = "SELECT *
 					FROM `_image`
 					WHERE `id`=".$image_id;
-			$arr['img'] = query_assoc($sql);
+			$arr['img'] = DB1::assoc($sql);
 		}
 
 		_cache_set($key, $arr, 1);
@@ -647,7 +647,7 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=".$app_id."
 			WHERE `code`='".CODE."'";
-	query($sql);
+	DB1::query($sql);
 
 	//применение прав пользователю, создавшему приложение
 	$sql = "UPDATE `_user_access`
@@ -655,7 +655,7 @@ function _app_create($dialog, $app_id) {//привязка пользовате�
 				`access_task`=1,
 				`access_manual`=1
 			WHERE `id`=".$access_id;
-	query($sql);
+	DB1::query($sql);
 
 	_cache_clear('AUTH_'.CODE, 1);
 	_cache_clear('page');
@@ -677,7 +677,7 @@ function _app_copy($dialog, $app_id) {//копирование приложен�
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=".$app_id."
 			WHERE `code`='".CODE."'";
-	query($sql);
+	DB1::query($sql);
 
 	//применение прав пользователю, создавшему приложение
 	$sql = "UPDATE `_user_access`
@@ -685,7 +685,7 @@ function _app_copy($dialog, $app_id) {//копирование приложен�
 				`access_task`=1,
 				`access_manual`=1
 			WHERE `id`=".$access_id;
-	query($sql);
+	DB1::query($sql);
 
 	_app_copy_spisok($app_id);
 
@@ -702,7 +702,7 @@ function _app_copy_spisok($app_id_dst) {//копирование разрешё�
 			  AND `clone_on`
 			  AND `table_1`=11
 			ORDER BY `name`";
-	if(!$dlg = query_arr($sql))
+	if(!$dlg = DB1::arr($sql))
 		return;
 
 	foreach($dlg as $dlg_id => $d) {
@@ -712,7 +712,7 @@ function _app_copy_spisok($app_id_dst) {//копирование разрешё�
 				  AND `dialog_id`=".$dlg_id."
 				  AND !`deleted`
 				ORDER BY `id`";
-		if(!$spisok = query_arr($sql))
+		if(!$spisok = DB1::arr($sql))
 			continue;
 
 		$pAss = array();//ассоциации parent_id
@@ -767,7 +767,7 @@ function _app_copy_spisok($app_id_dst) {//копирование разрешё�
 						".USER_ID."
 					  FROM `_spisok`
 					  WHERE `id`=".$id_old;
-			$unit_id = query_id($sql);
+			$unit_id = DB1::insert_id($sql);
 
 			$pAss[$id_old] = $unit_id;
 		}
@@ -779,13 +779,13 @@ function _app_copy_spisok($app_id_dst) {//копирование разрешё�
 				  AND `dialog_id`=".$dlg_id."
 				  AND `parent_id`
 				ORDER BY `id`";
-		if($spisok = query_arr($sql))
+		if($spisok = DB1::arr($sql))
 			foreach($spisok as $id => $r) {
 				$pid = _num(@$pAss[$r['parent_id']]);
 				$sql = "UPDATE `_spisok`
 						SET `parent_id`=".$pid."
 						WHERE `id`=".$id;
-				query($sql);
+				DB1::query($sql);
 			}
 	}
 
@@ -801,7 +801,7 @@ function PHP12_app_list($return='html') {//список приложений, к
 			WHERE `user_id`=".USER_ID."
 			  AND !`app_archive`
 			ORDER BY `uasort`";
-	if(!$spisok = query_arr($sql))
+	if(!$spisok = DB1::arr($sql))
 		return $return == 'arr' ? array() :
 			'<div class="center pad30 clr9 fs15">'.
 				'Доступных приложений нет.'.
@@ -817,7 +817,7 @@ function PHP12_app_list($return='html') {//список приложений, к
 			FROM `_user_access`
 			WHERE `app_id` IN ("._idsGet($spisok, 'app_id').")
 			GROUP BY `app_id`";
-	$userC = query_ass($sql);
+	$userC = DB1::ass($sql);
 
 	$send = '';
 	foreach($spisok as $id => $r) {
@@ -855,7 +855,7 @@ function PHP12_app_archive() {//список приложений, отправ�
 			WHERE `user_id`=".USER_ID."
 			  AND `app_archive`
 			ORDER BY `uasort`";
-	if(!$spisok = query_arr($sql))
+	if(!$spisok = DB1::arr($sql))
 		return
 			'<div class="center pad30 clr9 fs15">'.
 				'Архивных приложений нет.'.
