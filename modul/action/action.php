@@ -489,7 +489,7 @@ function PHP12_action_list($prm) {
 			FROM `_action`
 			WHERE ".$where."
 			ORDER BY `sort`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return _emptyMin('Действий не назначено.');
 
 	$spisok = '';
@@ -1124,7 +1124,7 @@ function PHP12_action208_formula_save($cmp, $val, $unit) {
 	$sql = "UPDATE `_action`
 			SET `v1`='".addslashes($save)."'
 			WHERE `id`=".$action_id;
-	query($sql);
+	DB1::query($sql);
 }
 function PHP12_action208_formula_vvv($prm) {
 	if(empty($prm['unit_edit']))
@@ -1160,7 +1160,7 @@ function PHP12_hint_spisok($prm) {//список подсказок для уп�
 			WHERE `app_id`=".($prm['el12']['num_1'] ? APP_ID : 0)."
 			  AND `dialog_id`=229
 			ORDER BY `id`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return _empty('Подсказки не создавались');
 
 	$send = '<table class="_stab">'.
@@ -1194,7 +1194,7 @@ function PHP12_hint_spisok($prm) {//список подсказок для уп�
 								WHERE `dialog_id`=".$did."
 								ORDER BY `id`
 								LIMIT 1";
-						$unit = '&id='.query_value($sql);
+						$unit = '&id='.DB1::value($sql);
 					}
 					$place = '<a href="'.URL.'&p='.$page['id'].$unit.'&block_flash='.$BL['id'].'">На странице <b>'.$page['name'].'</b></a>';
 					break;

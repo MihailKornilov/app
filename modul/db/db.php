@@ -3,7 +3,7 @@
 /* ---=== Управление базой данных ===--- */
 function _db() {//заглавная страница
 	$sql = "SHOW TABLES";
-	$arr = query_array($sql);
+	$arr = DB1::array($sql);
 
 	$send = '';
 	foreach($arr as $r) {
@@ -24,11 +24,11 @@ function _db_table() {//содержание таблицы
 	$table = $_GET['table'];
 
 	$sql = "SHOW TABLES LIKE '".$table."'";
-		if(!mysqli_num_rows(query($sql)))
+		if(!DB1::num_rows($sql))
 			return 'Таблицы <b>'.$table.'</b> не существует';
 
 	$sql = "DESCRIBE `".$table."`";
-	$arr = query_array($sql);
+	$arr = DB1::array($sql);
 
 	$send = '<table class="_stab small">'.
 				'<tr>';
@@ -37,7 +37,7 @@ function _db_table() {//содержание таблицы
 	}
 
 	$sql = "SELECT * FROM `".$table."` LIMIT 100";
-	$arr = query_array($sql);
+	$arr = DB1::array($sql);
 	foreach($arr as $row)  {
 		$send .= '<tr class="over1">';
 		foreach($row as $r) {
