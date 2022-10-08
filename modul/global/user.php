@@ -51,13 +51,13 @@ function _userCache($user_id) {//кеширование данных польз�
 		return $u;
 
 	$sql = "SELECT * FROM `_user` WHERE `id`=".$user_id;
-	if(!$u = query_assoc($sql))
+	if(!$u = DB1::assoc($sql))
 		return array();
 
 	$u['src'] = 'https://vk.com/images/camera_50.png';
 	if($image_id = _idsFirst($u['ava'])) {
 		$sql = "SELECT * FROM `_image` WHERE `id`=".$image_id;
-		if($img = query_assoc($sql))
+		if($img = DB1::assoc($sql))
 			$u['src'] = _imageServer($img['server_id']).$img['80_name'];
 	}
 
@@ -77,7 +77,7 @@ function _userCache($user_id) {//кеширование данных польз�
 		$sql = "UPDATE `_user`
 				SET `dtime_last`=CURRENT_TIMESTAMP
 				WHERE `id`=".USER_ID;
-		query($sql);
+		DB1::query($sql);
 		$u['dtime_last'] = TODAY.strftime(' %H:%M:%S');
 	}
 
@@ -100,7 +100,7 @@ function _userAppAccessCreate($app_id, $user_id=USER_ID, $invite_id=0) {//соз
 					1,
 					".$invite_id."
 				)";
-		$UA_CREATED = query_id($sql);
+		$UA_CREATED = DB1::insert_id($sql);
 	}
 
 	//дополнительное параметры в приложении
@@ -110,7 +110,7 @@ function _userAppAccessCreate($app_id, $user_id=USER_ID, $invite_id=0) {//соз
 			  AND `dialog_id`=111
 			  AND `cnn_id`=".$user_id."
 			  AND !`deleted`";
-	if(!query_value($sql)) {
+	if(!DB1::value($sql)) {
 		$sql = "INSERT INTO `_spisok` (
 					`app_id`,
 					`dialog_id`,
@@ -120,7 +120,7 @@ function _userAppAccessCreate($app_id, $user_id=USER_ID, $invite_id=0) {//соз
 					111,
 					".$user_id."
 				)";
-		query($sql);
+		DB1::query($sql);
 	}
 
 	return $UA_CREATED;
@@ -142,7 +142,7 @@ function _userAppAccessGet($user_id, $app_id=APP_ID) {//права пользо�
 			WHERE `app_id`=".$app_id."
 			  AND `user_id`=".$user_id."
 			LIMIT 1";
-	return _arrNum(query_assoc($sql));
+	return _arrNum(DB1::assoc($sql));
 }
 function _userAppAccessDel($DLG, $user_id) {//удаление прав пользователя из текущего приложения
 	if(!$pid = $DLG['dialog_id_parent'])
@@ -155,7 +155,7 @@ function _userAppAccessDel($DLG, $user_id) {//удаление прав поль
 	$sql = "DELETE FROM `_user_access`
 			WHERE `app_id`=".APP_ID."
 			  AND `user_id`=".$user_id;
-	query($sql);
+	DB1::query($sql);
 
 //	_cache_clear('page');
 	_cache_clear('user'.$user_id);
@@ -168,7 +168,7 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 			FROM `_user`
 			WHERE `vk_id`=".$vk_id."
 			LIMIT 1";
-	$user_id = _num(query_value($sql));
+	$user_id = _num(DB1::value($sql));
 
 	if($vk_id > 2147000000)
 		return $user_id;
@@ -219,10 +219,12 @@ function _userVkUpdate($vk_id) {//Обновление пользователя 
 				`i`=VALUES(`i`),
 				`pol`=VALUES(`pol`),
 				`ava`=VALUES(`ava`)";
-	query($sql);
+	DB1::query($sql);
 
-	if(!$user_id)
-		$user_id = query_insert_id('_user');
+	if(!$user_id) {
+        $sql = "SELECT `id` FROM `_user` ORDER BY `id` DESC LIMIT 1";
+        $user_id = DB1::value($sql);
+    }
 
 	return $user_id;
 }
@@ -236,7 +238,7 @@ function _userImageRepair() {//восстановление аватарок п�
 			  AND `vk_id`<2147000000
 			  AND !LENGTH(`ava`)
 			ORDER BY `id`";
-	foreach(query_arr($sql) as $r)
+	foreach(DB1::arr($sql) as $r)
 		_userVkUpdate($r['vk_id']);
 }
 
@@ -256,7 +258,7 @@ function _userActive($page_id) {//сохранение активности по
 			  AND `user_id`=".USER_ID."
 			  AND DATE_FORMAT(`dtime_begin`,'%Y-%m-%d %H%')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d %H%')
 			LIMIT 1";
-	if($r = query_assoc($sql)) {
+	if($r = DB1::assoc($sql)) {
 		$active_id = $r['id'];
 		$data = json_decode($r['data'], true);
 	}
@@ -285,10 +287,10 @@ function _userActive($page_id) {//сохранение активности по
 			) ON DUPLICATE KEY UPDATE
 				`data`=VALUES(`data`),
 				`dtime_end`=VALUES(`dtime_end`)";
-	query($sql);
+	DB1::query($sql);
 }
 
-function PHP12_user_active() {//общая картина использования приложений за сутки
+function PHP12_user_active():string {//общая картина использования приложений за сутки
 	define('USER_SKIP', " AND `user_id` NOT IN (1) ");
 
 	$data = array();
@@ -300,7 +302,7 @@ function PHP12_user_active() {//общая картина использован
 			WHERE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d')
 			".USER_SKIP."
 			ORDER BY `id`";
-	foreach(query_arr($sql) as $r) {
+	foreach(DB1::arr($sql) as $r) {
 		$h = $r['h'];
 		if(!isset($data[$h]))
 			$data[$h] = array();
@@ -354,17 +356,17 @@ function _user_active_itog() {//общий итог использования �
 	$sql = "SELECT COUNT(*)
 			FROM `_user_active`
 			WHERE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d')".USER_SKIP;
-	$c_unit = query_value($sql);
+	$c_unit = DB1::value($sql);
 
 	$sql = "SELECT COUNT(DISTINCT `app_id`)
 			FROM `_user_active`
 			WHERE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d')".USER_SKIP;
-	$c_app = query_value($sql);
+	$c_app = DB1::value($sql);
 
 	$sql = "SELECT COUNT(DISTINCT `user_id`)
 			FROM `_user_active`
 			WHERE DATE_FORMAT(`dtime_begin`,'%Y-%m-%d')=DATE_FORMAT(CURRENT_TIMESTAMP,'%Y-%m-%d')".USER_SKIP;
-	$c_user = query_value($sql);
+	$c_user = DB1::value($sql);
 
 	return
 	'<table class="_stab mt20">'.
@@ -403,12 +405,12 @@ function PHP12_user_data_insert($user_id) {
 			$sql = "SELECT COUNT(*)
 					FROM `".$table."`
 					WHERE `user_id_add`=".$user_id;
-			if($insert = query_value($sql))
+			if($insert = DB1::value($sql))
 				if(isset($F['app_id'])) {
 					$sql = "SELECT DISTINCT `app_id`
 							FROM `".$table."`
 							WHERE `user_id_add`=".$user_id;
-					foreach(_ids(query_ids($sql), 'arr') as $app_id)
+					foreach(_ids(DB1::ids($sql), 'arr') as $app_id)
 						$apps[$app_id] = '<span class="fs12 curD tool" data-tool="'._app($app_id, 'name').'">'.$app_id.'</span>';
 				}
 		}
@@ -417,7 +419,7 @@ function PHP12_user_data_insert($user_id) {
 			$sql = "SELECT COUNT(*)
 					FROM `".$table."`
 					WHERE `user_id_del`=".$user_id;
-			if($del = query_value($sql))
+			if($del = DB1::value($sql))
 				$del_clr = ' clr7';
 
 			$del_bg = '';
@@ -466,7 +468,7 @@ function PHP12_user_invite() {//ссылка на приглашение для 
 		$sql = "SELECT COUNT(*)
 				FROM `_user_access`
 				WHERE `invite_hash`='".$hash."'";
-		if(query_value($sql))
+		if(DB1::value($sql))
 			return
 			'<input type="text"'.
 			  ' class="w100p clr6 bg14"'.
@@ -477,7 +479,7 @@ function PHP12_user_invite() {//ссылка на приглашение для 
 		$sql = "UPDATE `_user_access`
 				SET `invite_hash`='".$hash."'
 				WHERE `id`=".$u['access_id'];
-		query($sql);
+		DB1::query($sql);
 		_cache_clear('user'.USER_ID);
 	}
 
@@ -501,7 +503,7 @@ function _userInviteCookieSave() {//сохранение кода приглаш
 	$sql = "SELECT COUNT(*)
 			FROM `_user_access`
 			WHERE `invite_hash`='".$hash."'";
-	if(!query_value($sql))
+	if(!DB1::value($sql))
 		return;
 
 	_cookie('invite_hash', $hash);
@@ -520,7 +522,7 @@ function _userInviteDlgOpen() {//автоматическое открытие �
 	$sql = "SELECT *
 			FROM `_user_access`
 			WHERE `invite_hash`='".$hash."'";
-	if(!$r = query_assoc($sql))
+	if(!$r = DB1::assoc($sql))
 		return '';
 
 	//проверка, существует ли пользователь приложении
@@ -539,7 +541,7 @@ function PHP12_user_invite_msg() {//сообщение о приглашении
 	$sql = "SELECT *
 			FROM `_user_access`
 			WHERE `invite_hash`='".$hash."'";
-	if(!$r = query_assoc($sql))
+	if(!$r = DB1::assoc($sql))
 		return _emptyRed('Приглашение отсутствует.');
 
 	return
@@ -557,7 +559,7 @@ function _user_invite_submit($DLG) {//принятие приглашения
 	$sql = "SELECT *
 			FROM `_user_access`
 			WHERE `invite_hash`='".$hash."'";
-	if(!$r = query_assoc($sql))
+	if(!$r = DB1::assoc($sql))
 		jsonError('Этого приглашения не существует.');
 
 	//проверка, существует ли пользователь приложении
@@ -569,12 +571,12 @@ function _user_invite_submit($DLG) {//принятие приглашения
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=".$r['app_id']."
 			WHERE `code`='".CODE."'";
-	query($sql);
+	DB1::query($sql);
 
 	$sql = "UPDATE `_user`
 			SET `app_id_last`=".$r['app_id']."
 			WHERE `id`=".USER_ID;
-	query($sql);
+	DB1::query($sql);
 
 	_cache_clear('AUTH_'.CODE, 1);
 	_cache_clear('page');
