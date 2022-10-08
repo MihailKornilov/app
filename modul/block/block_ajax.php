@@ -12,7 +12,7 @@ switch(@$_POST['op']) {
 				  AND `obj_id`=".$obj_id."
 				  AND !`parent_id`
 				ORDER BY `y`,`x`";
-		$arr = query_arr($sql);
+		$arr = DB1::arr($sql);
 		$arr = _blockGridIn($arr);
 
 		$send['obj_name'] = $obj_name;
@@ -81,7 +81,7 @@ switch(@$_POST['op']) {
 		$sql = "UPDATE `_element`
 				SET `width`=".$width."
 				WHERE `id`=".$elem_id;
-		query($sql);
+		DB1::query($sql);
 
 		_BE('elem_clear');
 
@@ -101,7 +101,7 @@ switch(@$_POST['op']) {
 					WHERE `obj_name`='".$obj_name."'
 					  AND `obj_id`=".$obj_id."
 					  AND `id`=".$parent_id;
-			if(!$parent = query_ass($sql))
+			if(!$parent = DB1::ass($sql))
 				jsonError('Родительского блока не существует');
 		}
 
@@ -111,11 +111,11 @@ switch(@$_POST['op']) {
 				FROM `_block`
 				WHERE `obj_name`='".$obj_name."'
 				  AND `obj_id`=".$obj_id;
-		if($block_ids = query_ids($sql)) {
+		if($block_ids = DB1::ids($sql)) {
 			$sql = "SELECT `id`
 					FROM `_element`
 					WHERE `block_id` IN (".$block_ids.")";
-			$elemIdsPrev = query_ids($sql);
+			$elemIdsPrev = DB1::ids($sql);
 		}
 
 		$idsNotDel = array(0);
@@ -155,14 +155,14 @@ switch(@$_POST['op']) {
 				  AND `obj_id`=".$obj_id."
 				  AND `parent_id`=".$parent_id."
 				  AND `id` NOT IN (".implode(',', $idsNotDel).")";
-		query($sql);
+		DB1::query($sql);
 
 		//удаление потомков удалённых блоков
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `obj_name`='".$obj_name."'
 				  AND `obj_id`=".$obj_id;
-		if($arr = query_arr($sql)) {
+		if($arr = DB1::arr($sql)) {
 			$idsForDel = array();
 			foreach($arr as $id => $r) {
 				if(!$parent_id = $r['parent_id'])
@@ -185,7 +185,7 @@ switch(@$_POST['op']) {
 
 			if($idsForDel) {
 				$sql = "DELETE FROM `_block` WHERE `id` IN (".implode(',', $idsForDel).")";
-				query($sql);
+				DB1::query($sql);
 			}
 		}
 
@@ -195,16 +195,16 @@ switch(@$_POST['op']) {
 				FROM `_block`
 				WHERE `obj_name`='".$obj_name."'
 				  AND `obj_id`=".$obj_id;
-		if($block_ids = query_ids($sql)) {
+		if($block_ids = DB1::ids($sql)) {
 			$sql = "SELECT `id`
 					FROM `_element`
 					WHERE `block_id` IN (".$block_ids.")";
-			$elemIdsNotDel = query_ids($sql);
+			$elemIdsNotDel = DB1::ids($sql);
 		}
 		$sql = "DELETE FROM `_element`
 				WHERE `id` IN (".$elemIdsPrev.")
 				  AND `id` NOT IN (".$elemIdsNotDel.")";
-		query($sql);
+		DB1::query($sql);
 
 
 		if($insert) {
@@ -228,7 +228,7 @@ switch(@$_POST['op']) {
 						`h`=VALUES(`h`),
 						`width`=VALUES(`width`),
 						`height`=VALUES(`height`)";
-			query($sql);
+			DB1::query($sql);
 		}
 
 		_blockChildCountSet($obj_name, $obj_id);
@@ -277,7 +277,7 @@ switch(@$_POST['op']) {
 					`bor`='".$bor."',
 					`hidden`=".$hidden."
 				WHERE `id`=".$block_id;
-		query($sql);
+		DB1::query($sql);
 
 		if($block['obj_name'] == 'dialog') {
 			$show_create = _num($_POST['show_create']);
@@ -286,7 +286,7 @@ switch(@$_POST['op']) {
 					SET `show_create`='".$show_create."',
 						`show_edit`='".$show_edit."'
 					WHERE `id`=".$block_id;
-			query($sql);
+			DB1::query($sql);
 		}
 
 		_BE('block_clear');
@@ -315,7 +315,7 @@ switch(@$_POST['op']) {
 							`num_7`=".$num_7.",
 							`num_8`=".$num_8."
 						WHERE `id`=".$elem_id;
-				query($sql);
+				DB1::query($sql);
 
 				_BE('elem_clear');
 			}
@@ -400,7 +400,7 @@ switch(@$_POST['op']) {
 				FROM `_block`
 				WHERE `id` IN (".$ids.")
 				ORDER BY `parent_id`,`y`,`x`";
-		if(!$BLK = query_arr($sql))
+		if(!$BLK = DB1::arr($sql))
 			jsonError('Выбранные блоки не существуют');
 
 
@@ -451,7 +451,7 @@ switch(@$_POST['op']) {
 			$sql = "UPDATE `_block`
 					SET `parent_id`=".$pasteIds[$r['parent_id']]."
 					WHERE `id`=".$pasteIds[$id];
-			query($sql);
+			DB1::query($sql);
 		}
 
 		_blockChildCountSet($obj_name, $obj_id);
@@ -483,7 +483,7 @@ switch(@$_POST['op']) {
 				FROM `_block`
 				WHERE `id` IN (".$ids.")
 				ORDER BY `parent_id`,`y`,`x`";
-		if(!$BLK = query_arr($sql))
+		if(!$BLK = DB1::arr($sql))
 			jsonError('Выбранные блоки не существуют');
 
 		//определение координаты Y текущего объекта, с которой нужно начинать вставку блоков
@@ -520,7 +520,7 @@ switch(@$_POST['op']) {
 						`y`=".$r['y'].",
 						`parent_id`=0
 					WHERE `id`=".$id;
-			query($sql);
+			DB1::query($sql);
 		}
 
 
@@ -529,7 +529,7 @@ switch(@$_POST['op']) {
 				SET `obj_name`='".$obj_name."',
 					`obj_id`=".$obj_id."
 				WHERE `id` IN ("._idsGet($PASTE).")";
-		query($sql);
+		DB1::query($sql);
 
 
 		_blockChildCountSet($obj_name, $obj_id);
@@ -543,7 +543,7 @@ switch(@$_POST['op']) {
 					WHERE `id`=`el`.`block_id`
 				)
 				WHERE `block_id` IN ("._idsGet($PASTE).")";
-		query($sql);
+		DB1::query($sql);
 
 
 		_BE('elem_clear');
@@ -573,7 +573,7 @@ switch(@$_POST['op']) {
 				FROM `_block`
 				WHERE `id` IN (".$ids.")
 				ORDER BY `parent_id`,`y`,`x`";
-		if(!$BLK = query_arr($sql))
+		if(!$BLK = DB1::arr($sql))
 			jsonError('Выбранные блоки не существуют');
 
 		foreach(_ids($ids, 'arr') as $id) {
@@ -607,7 +607,7 @@ switch(@$_POST['op']) {
 			$sql = "UPDATE `_block`
 					SET `parent_id`=".$pid."
 					WHERE `id`=".$pasteIds[$id];
-			query($sql);
+			DB1::query($sql);
 		}
 
 		_blockChildCountSet($obj_name, $obj_id);
@@ -641,7 +641,7 @@ switch(@$_POST['op']) {
 				FROM `_block`
 				WHERE `id` IN (".$ids.")
 				ORDER BY `parent_id`,`y`,`x`";
-		if(!$BLK = query_arr($sql))
+		if(!$BLK = DB1::arr($sql))
 			jsonError('Выбранные блоки не существуют');
 
 		foreach(_ids($ids, 'arr') as $id) {
@@ -665,7 +665,7 @@ switch(@$_POST['op']) {
 					`obj_name`='".$obj_name."',
 					`obj_id`=".$obj_id."
 				WHERE `id` IN (".$ids.")";
-		query($sql);
+		DB1::query($sql);
 
 		_blockChildCountSet($obj_name, $obj_id);
 		_blockAppIdUpdate($obj_name, $obj_id);
@@ -689,7 +689,7 @@ switch(@$_POST['op']) {
 				FROM `_block`
 				WHERE `id` IN (".$ids.")
 				ORDER BY `parent_id`,`y`,`x`";
-		if(!$arr = query_arr($sql))
+		if(!$arr = DB1::arr($sql))
 			jsonError('Выбранные блоки не существуют');
 
 		$key0 = key($arr);
@@ -746,7 +746,7 @@ switch(@$_POST['op']) {
 						'".$r['hidden']."',
 						".USER_ID."
 					)";
-			$cloneIds[$id] = query_id($sql);
+			$cloneIds[$id] = DB1::insert_id($sql);
 		}
 
 		//внесение дочерних блоков
@@ -768,7 +768,7 @@ switch(@$_POST['op']) {
 				FROM `_block`
 				WHERE `id` IN (".$ids.")
 				ORDER BY `parent_id`,`y`,`x`";
-		if(!$arr = query_arr($sql))
+		if(!$arr = DB1::arr($sql))
 			jsonError('Выбранные блоки не существуют');
 
 		$key0 = key($arr);
@@ -787,51 +787,51 @@ switch(@$_POST['op']) {
 		$sql = "SELECT `id`
 				FROM `_element`
 				WHERE `block_id` IN (".$blkIds.")";
-		if($elmIds = query_ids($sql)) {
+		if($elmIds = DB1::ids($sql)) {
 			//удаление дочерних элементов
 			$sql = "DELETE FROM `_element`
 					WHERE `parent_id` IN (".$elmIds.")";
-			query($sql);
+			DB1::query($sql);
 
 			//удаление элементов, являющихся списками-шаблонами
 			$sql = "SELECT `id`
 					FROM `_block`
 					WHERE `obj_name`='spisok'
 					  AND `obj_id` IN (".$elmIds.")";
-			if($spisokIds = query_ids($sql)) {
+			if($spisokIds = DB1::ids($sql)) {
 				$sql = "DELETE FROM `_element`
 						WHERE `block_id` IN (".$spisokIds.")";
-				query($sql);
+				DB1::query($sql);
 
 				$sql = "DELETE FROM `_block`
 						WHERE `id` IN (".$spisokIds.")";
-				query($sql);
+				DB1::query($sql);
 			}
 
 			$sql = "DELETE FROM `_element`
 					WHERE `parent_id` IN (".$elmIds.")";
-			query($sql);
+			DB1::query($sql);
 
 			//удаление функций у элементов
 			$sql = "DELETE FROM `_action`
 					WHERE `element_id` IN (".$elmIds.")";
-			query($sql);
+			DB1::query($sql);
 
 			//удаление фильтров
 			$sql = "DELETE FROM `_user_spisok_filter`
 					WHERE `element_id_filter` IN (".$elmIds.")";
-			query($sql);
+			DB1::query($sql);
 		}
 
 		//удаление самих элементов
 		$sql = "DELETE FROM `_element`
 				WHERE `id` IN (".$elmIds.")";
-		query($sql);
+		DB1::query($sql);
 
 		//удаление блоков
 		$sql = "DELETE FROM `_block`
 				WHERE `id` IN (".$blkIds.")";
-		query($sql);
+		DB1::query($sql);
 
 		_blockChildCountSet($obj_name, $obj_id);
 		_BE('elem_clear');
@@ -880,7 +880,7 @@ function _blockInsert($r) {//внесение нового блока (при к
 				'".$r['show_edit']."',
 				".USER_ID."
 			)";
-	return query_id($sql);
+	return DB1::insert_id($sql);
 }
 function _blockChild($BLK, $block_id) {
 	if(empty($BLK))
@@ -900,7 +900,7 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление кол�
 			WHERE `obj_name`='".$obj_name."'
 			  AND `obj_id`=".$obj_id."
 			ORDER BY `parent_id`,`y`,`x`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	//предварительное обнуление количества дочерних блоков
@@ -909,7 +909,7 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление кол�
 				`xx`=1,
 				`xx_ids`=''
 			WHERE `id` IN ("._idsGet($arr).")";
-	query($sql);
+	DB1::query($sql);
 
 	$child = array();
 	foreach($arr as $id => $r)
@@ -929,7 +929,7 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление кол�
 				) VALUES ".implode(',', $countUpdate)."
 				ON DUPLICATE KEY UPDATE
 					`child_count`=VALUES(`child_count`)";
-		query($sql);
+		DB1::query($sql);
 	}
 
 	//подсчёт количества рядом стоящих Х-блоков в каждой Y-строке
@@ -960,7 +960,7 @@ function _blockChildCountSet($obj_name, $obj_id) {//обновление кол�
 				ON DUPLICATE KEY UPDATE
 					`xx`=VALUES(`xx`),
 					`xx_ids`=VALUES(`xx_ids`)";
-		query($sql);
+		DB1::query($sql);
 	}
 }
 function _blockChildGet($BLK) {//получение всех дочерних блоков в выбранных блоках
@@ -974,7 +974,7 @@ function _blockChildGet($BLK) {//получение всех дочерних б
 		$sql = "SELECT *
 				FROM `_block`
 				WHERE `parent_id`=".$bl['id'];
-		if(!$arr = query_arr($sql))
+		if(!$arr = DB1::arr($sql))
 			continue;
 
 		$arr = _blockChildGet($arr);
@@ -988,12 +988,12 @@ function _blockChildGet($BLK) {//получение всех дочерних б
 /*
 function _blockChildCountAllUpdate() {//обновление количества дочерних блоков у всех объектов (разовая функция)
 	$sql = " SELECT DISTINCT `obj_name` FROM `_block`";
-	foreach(query_array($sql) as $arr)
+	foreach(DB1::array($sql) as $arr)
 		foreach($arr as $name) {
 			$sql = "SELECT DISTINCT `obj_id`
 					FROM `_block`
 					WHERE `obj_name`='".$name."'";
-			foreach(_ids(query_ids($sql), 'arr') as $id)
+			foreach(_ids(DB1::ids($sql), 'arr') as $id)
 				_blockChildCountSet($name, $id);
 		}
 }
@@ -1005,7 +1005,7 @@ function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id при
 			$sql = "SELECT *
 					FROM `_page`
 					WHERE `id`=".$obj_id;
-			if($page = query_assoc($sql))
+			if($page = DB1::assoc($sql))
 				$app_id = $page['app_id'];
 			break;
 		case 'dialog':
@@ -1013,21 +1013,21 @@ function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id при
 			$sql = "SELECT *
 					FROM `_dialog`
 					WHERE `id`=".$obj_id;
-			if($dlg = query_assoc($sql))
+			if($dlg = DB1::assoc($sql))
 				$app_id = $dlg['app_id'];
 			break;
 		case 'spisok':
 			$sql = "SELECT *
 					FROM `_element`
 					WHERE `id`=".$obj_id;
-			if(!$elm = query_assoc($sql))
+			if(!$elm = DB1::assoc($sql))
 				jsonError('Несуществующий элемент '.$obj_id.', размещающий список.');
 			if(!$block_id = $elm['block_id'])
 				jsonError('Отсутствует блок, размещающий элемент со списком.');
 			$sql = "SELECT *
 					FROM `_block`
 					WHERE `id`=".$block_id;
-			if(!$blk = query_assoc($sql))
+			if(!$blk = DB1::assoc($sql))
 				jsonError('Несуществующий блок '.$block_id.', размещающий элемент со списком.');
 
 			switch($blk['obj_name']) {
@@ -1035,7 +1035,7 @@ function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id при
 					$sql = "SELECT *
 							FROM `_page`
 							WHERE `id`=".$blk['obj_id'];
-					if($page = query_assoc($sql))
+					if($page = DB1::assoc($sql))
 						$app_id = $page['app_id'];
 					break;
 				case 'dialog':
@@ -1043,7 +1043,7 @@ function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id при
 					$sql = "SELECT *
 							FROM `_dialog`
 							WHERE `id`=".$blk['obj_id'];
-					if($dlg = query_assoc($sql))
+					if($dlg = DB1::assoc($sql))
 						$app_id = $dlg['app_id'];
 					break;
 			}
@@ -1052,7 +1052,7 @@ function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id при
 			$sql = "SELECT *
 					FROM `_action`
 					WHERE `id`=".$obj_id;
-			if($act = query_assoc($sql))
+			if($act = DB1::assoc($sql))
 				$app_id = $act['app_id'];
 			break;
 	}
@@ -1061,14 +1061,14 @@ function _blockAppIdUpdate($obj_name, $obj_id) {//обновление id при
 			SET `app_id`=".$app_id."
 			WHERE `obj_name`='".$obj_name."'
 			  AND `obj_id`=".$obj_id;
-	query($sql);
+	DB1::query($sql);
 }
 function _blockChildClone($id_old, $id_new) {//внесение дочерних блоков в скопированные
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `parent_id`=".$id_old."
 			ORDER BY `parent_id`,`y`,`x`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $r) {
@@ -1105,7 +1105,7 @@ function _blockChildClone($id_old, $id_new) {//внесение дочерних
 					'".$r['hidden']."',
 					".USER_ID."
 				)";
-		$block_id = query_id($sql);
+		$block_id = DB1::insert_id($sql);
 
 		if($r['child_count'])
 			_blockChildClone($r['id'], $block_id);
@@ -1115,7 +1115,7 @@ function _blockElementCopy($PASTE, $pasteIds) {//копирование элем
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($PASTE).")";
-	if(!$ELM = query_arr($sql))
+	if(!$ELM = DB1::arr($sql))
 		return;
 
 	foreach($ELM as $el) {
@@ -1131,7 +1131,7 @@ function _blockElementCopy($PASTE, $pasteIds) {//копирование элем
 				case 'id': $vals[] = 0; break;
 				case 'app_id':
 					$sql = "SELECT `app_id` FROM `_block` WHERE `id`=".$block_id;
-					$vals[] = _num(query_value($sql));
+					$vals[] = _num(DB1::value($sql));
 					break;
 				case 'user_id_add': $vals[] = USER_ID;   break;
 				case 'block_id':    $vals[] = $block_id; break;
@@ -1141,7 +1141,7 @@ function _blockElementCopy($PASTE, $pasteIds) {//копирование элем
 		}
 
 		$sql = "INSERT INTO `_element` (".implode(',', $cols).") VALUES (".implode(',', $vals).")";
-		$new_id = query_id($sql);
+		$new_id = DB1::insert_id($sql);
 
 		_element('vvv_copy', $el, $new_id);
 	}
@@ -1150,7 +1150,7 @@ function _blockActionCopy($PASTE, $pasteIds) {//перенос действий 
 	$sql = "SELECT *
 			FROM `_action`
 			WHERE `block_id` IN ("._idsGet($PASTE).")";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $id => $r) {
@@ -1181,7 +1181,7 @@ function _blockActionCopy($PASTE, $pasteIds) {//перенос действий 
 		$sql = "SELECT `app_id`
 				FROM `_block`
 				WHERE `id`=".$block_id;
-		$app_id = _num(query_value($sql));
+		$app_id = _num(DB1::value($sql));
 
 		$sql = "INSERT INTO `_action` (
 					`app_id`,
@@ -1204,7 +1204,7 @@ function _blockActionCopy($PASTE, $pasteIds) {//перенос действий 
 					".$r['sort'].",
 					".USER_ID."
 				)";
-		query($sql);
+		DB1::query($sql);
 	}
 }
 

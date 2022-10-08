@@ -321,7 +321,7 @@ function _blockAction($bl, $prm) {//действие при нажатии на 
 						FROM `_template`
 						WHERE `app_id`=".APP_ID."
 						  AND `id`="._num($act['target_ids']);
-				if($doc = query_assoc($sql))
+				if($doc = DB1::assoc($sql))
 					$uid = _unitUrlId($u, $doc['spisok_id']);
 			}
 
@@ -657,7 +657,7 @@ function _blockGridIn($arr) {//подстановка флагов наличи�
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `parent_id` IN ("._idsGet($arr).")";
-	foreach(query_arr($sql) as $r) {
+	foreach(DB1::arr($sql) as $r) {
 		$id = $r['parent_id'];
 		$arr[$id]['blin'] = 1;
 		$w = $r['x'] + $r['w'];
@@ -668,7 +668,7 @@ function _blockGridIn($arr) {//подстановка флагов наличи�
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `block_id` IN ("._idsGet($arr).")";
-	foreach(query_arr($sql) as $r) {
+	foreach(DB1::arr($sql) as $r) {
 		$id = $r['block_id'];
 		$title = _element('title', $r);
 		$DLG = _dialogQuery($r['dialog_id']);
@@ -1192,7 +1192,7 @@ function _beDlg($app_id=0) {//получение данных диалогов �
 				SELECT *
 				FROM `_dialog`
 				WHERE `app_id`=".$app_id;
-		if(!$DLG = query_arr($sql))
+		if(!$DLG = DB1::arr($sql))
 			return;
 
 		foreach($DLG as $id => $r) {
@@ -1231,7 +1231,7 @@ function _beDlgDelCond($DLG) {//дополнительные условия уд
 			WHERE `dialog_id`=58
 			  AND `num_1` IN ("._idsGet($DLG).")
 			  AND `num_2`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return $DLG;
 
 	foreach($arr as $r) {
@@ -1284,7 +1284,7 @@ function _beBlk($app_id=0) {//кеш блоков
 					
 				WHERE `bl`.`app_id`=".$app_id."
 				ORDER BY `bl`.`parent_id`,`y`,`x`";
-		if(!$arr = query_arr($sql))
+		if(!$arr = DB1::arr($sql))
 			return;
 
 		$BLK = array();
@@ -1358,7 +1358,7 @@ function _beElm($app_id=0) {
 				FROM `_element`
 				WHERE `app_id`=".$app_id."
 				ORDER BY `id`";
-		if(!$arr = query_arr($sql))
+		if(!$arr = DB1::arr($sql))
 			return;
 
 		$ELM = array();
@@ -1472,7 +1472,7 @@ function _beAct($app_id=0) {//кеш действий
 				WHERE `app_id`=".$app_id."
 				  AND `dialog_id` NOT IN (229) /* За исключением подсказок */
 				ORDER BY `sort`";
-		if($arr = query_arr($sql))
+		if($arr = DB1::arr($sql))
 			foreach($arr as $id => $r) {
 				unset($r['app_id']);
 				unset($r['sort']);
@@ -1539,7 +1539,7 @@ function _beHint($app_id=0) {//подсказки
 				FROM `_action`
 				WHERE `app_id`=".$app_id."
 				  AND `dialog_id`=229";
-		if($arr = query_arr($sql))
+		if($arr = DB1::arr($sql))
 			foreach($arr as $id => $r) {
 				unset($r['app_id']);
 				unset($r['sort']);
@@ -1612,7 +1612,7 @@ function _beBlockAction212($app_id, $action) {//действие 212: подме
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
 			WHERE `id_old` IN (".implode(',', $ids).")";
-	if(!$ass = query_ass($sql))
+	if(!$ass = DB1::ass($sql))
 		return $action;
 
 	foreach($action as $id => $r)
@@ -1654,7 +1654,7 @@ function _beBlockAction215($app_id, $action) {//действие 215: подме
 	$sql = "SELECT `id_old`,`id`
 			FROM `_spisok`
 			WHERE `id_old` IN ("._idsGet($ids, 'key').")";
-	if(!$ass = query_ass($sql))
+	if(!$ass = DB1::ass($sql))
 		return $action;
 
 	foreach($action as $id => $r) {
@@ -1693,7 +1693,7 @@ function PHP12_block_info($prm) {//информация о блоке (диал�
 	$sql = "SELECT *
 			FROM `_block`
 			WHERE `id`=".$block_id;
-	if(!$BL = query_assoc($sql))
+	if(!$BL = DB1::assoc($sql))
 		return _emptyRed('Блока id'.$block_id.' нет в базе');
 
 	$BLCH = _blockOne($block_id);
@@ -1759,7 +1759,7 @@ function _blockInfoElem($prm, $block_id, $BLCH) {
 	$sql = "SELECT `id`
 			FROM `_element`
 			WHERE `block_id`=".$block_id;
-	if($elem_id = query_value($sql))
+	if($elem_id = DB1::value($sql))
 		$elem_html = '<a class="dialog-open" val="dialog_close:'.$prm['srce']['dialog_id'].',dialog_id:118,get_id:'.$elem_id.'">'.$elem_id.'<a>';
 
 	$elem_id_cache = $BLCH['elem_id'];
