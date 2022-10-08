@@ -74,5 +74,5 @@ function _elem1def($cmp_id, $unit_id, $v) {//сброс значений у др
 			SET `".$col."`=0
 			WHERE "._queryWhere($DLG)."
 			  AND `id`!=".$unit_id;
-	query($sql);
+	DB1::query($sql);
 }

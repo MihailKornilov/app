@@ -137,7 +137,7 @@ function _elem29DialogSel($el, $prm, $sel_id) {//подстановка id за�
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `id`=".$get_id;
-	if(!$unit = query_assoc($sql))
+	if(!$unit = DB1::assoc($sql))
 		return 0;
 	if(!$UDLG = _dialogQuery($unit['dialog_id']))
 		return 0;
@@ -194,18 +194,18 @@ function _elem29ValAuto($el, $txt) {//автоматическое внесен�
 			WHERE  "._queryWhere($DLG)."
 			  AND `".$col."`='".addslashes($txt)."'
 			LIMIT 1";
-	if($id = query_value($sql))
+	if($id = DB1::value($sql))
 		return $id;
 
 	$sql = "SELECT IFNULL(MAX(`num`),0)+1
 			FROM `_spisok`
 			WHERE `dialog_id`=".$DLG['id'];
-	$num = query_value($sql);
+	$num = DB1::value($sql);
 
 	$sql = "SELECT IFNULL(MAX(`sort`)+1,1)
 			FROM `_spisok`
 			WHERE `dialog_id`=".$DLG['id'];
-	$sort = query_value($sql);
+	$sort = DB1::value($sql);
 
 	$sql = "INSERT INTO `_spisok` (
 				`app_id`,
@@ -222,7 +222,7 @@ function _elem29ValAuto($el, $txt) {//автоматическое внесен�
 				".$sort.",
 				".USER_ID."
 			)";
-	return query_id($sql);
+	return DB1::insert_id($sql);
 }
 function _elem29defSet($dlg, $el) {//установка значения по умолчанию существующим значениям в списке
 /*
@@ -250,14 +250,14 @@ function _elem29defSet($dlg, $el) {//установка значения по у
 			FROM "._queryFrom($DLG)."
 			WHERE "._queryWhere($DLG)."
 			  AND !`".$col."`";
-	if(!query_value($sql))
+	if(!DB1::value($sql))
 		return;
 
 	$sql = "UPDATE "._queryFrom($DLG)."
 			SET `".$col."`=".$el['num_6']."
 			WHERE "._queryWhere($DLG)."
 			  AND !`".$col."`";
-	query($sql);
+	DB1::query($sql);
 }
 
 function _29cnn($elem_id, $v='', $sel_id=0) {//содержание Select подключённого списка
@@ -357,7 +357,7 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 			ORDER BY `"._29cnnOrder($el, $DLG)."` ".$DESC."
 			".$LIMIT;
 
-	if(!$send = query_arr($sql))
+	if(!$send = DB1::arr($sql))
 		return array();
 
 	if($v) {
@@ -369,7 +369,7 @@ function _29cnnSpisok($el, $v) {//значения списка для форм�
 					  AND "._queryCol_id($DLG)." IN (".$ids.")
 					ORDER BY `"._29cnnOrder($el, $DLG)."` ".$DESC."
 					".$LIMIT;
-			$arr = query_arr($sql);
+			$arr = DB1::arr($sql);
 			$send += $arr;
 		}
 	}

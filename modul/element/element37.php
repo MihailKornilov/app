@@ -215,7 +215,7 @@ function _elem37changeCol($cmp_id, $unit_id) {//перенос данных, е�
 			SET `".$ex[1]."`=`".$ex[0]."`,
 				`".$ex[0]."`=DEFAULT
 			WHERE `dialog_id`=".$DLG['id'];
-	query($sql);
+	DB1::query($sql);
 }
 
 

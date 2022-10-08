@@ -88,7 +88,7 @@ function PHP12_balans_setup_save($cmp, $val, $unit) {//сохранение со
 	$sql = "UPDATE `_element`
 			SET `".$col."`='".addslashes($save)."'
 			WHERE `id`=".$unit['id'];
-	query($sql);
+	DB1::query($sql);
 
 	_elemOne($unit['id'], true);
 	_element27update($unit['id']);
@@ -127,7 +127,7 @@ function _element27update($elem_id, $unit_ids=0) {//пересчёт сумм з
 			SET `".$colSrc."`=0
 			WHERE "._queryWhere($DSrc).
 ($unit_ids ? " AND "._queryCol_id($DSrc)." IN (".$unit_ids.")" : '');
-	query($sql);
+	DB1::query($sql);
 
 	//получение всех слагаемых баланса
 	if(!$item = _element('vvv', $el))
@@ -154,7 +154,7 @@ function _element27update($elem_id, $unit_ids=0) {//пересчёт сумм з
 			SET `".$colSrc."`=".$upd."
 			WHERE "._queryWhere($DSrc).
 ($unit_ids ? " AND "._queryCol_id($DSrc)." IN (".$unit_ids.")" : '');
-	query($sql);
+	DB1::query($sql);
 
 	_element27accum($elem_id);
 }
@@ -163,7 +163,7 @@ function _element27childChange($child_id, $unit_ids=0) {//если было из
 			FROM `_element`
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=27";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $elem_id => $el) {
@@ -182,7 +182,7 @@ function _element27counter($child_id, $uid, $dlg, $unit, $sum=0, $sumOld=0) {//�
 			WHERE `app_id`=".APP_ID."
 			  AND `dialog_id`=27
 			  AND `num_3`";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $elem_id => $el) {
@@ -255,7 +255,7 @@ function _element27inFilter() {//пересчёт значения счётчи�
 			WHERE `dialog_id`=55
 			  AND `app_id`=".APP_ID."
 			  AND LENGTH(`txt_1`)";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return;
 
 	foreach($arr as $r) {

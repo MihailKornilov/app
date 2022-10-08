@@ -76,7 +76,7 @@ function _element5_kupezTxtCost($el) {
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `id`=1526000";
-	$r = query_assoc($sql);
+	$r = DB1::assoc($sql);
 
 	return
 	'<script>'.

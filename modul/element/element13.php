@@ -42,7 +42,7 @@ function PHP12_elem_rule7($prm) {/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МО
 	$sql = "SELECT `dialog_id`
 			FROM `_element_rule_use`
 			WHERE `rule_id`=7";
-	if(!$ids = query_ids($sql))
+	if(!$ids = DB1::ids($sql))
 		return _emptyMin('Нет элементов для выбора');
 
 	//получение разрешённых элементов
@@ -50,14 +50,14 @@ function PHP12_elem_rule7($prm) {/* ---=== ЭЛЕМЕНТЫ, КОТОРЫЕ МО
 			FROM `_dialog`
 			WHERE `id` IN (".$ids.")
 			ORDER BY `sort`,`id`";
-	if(!$elem = query_arr($sql))
+	if(!$elem = DB1::arr($sql))
 		return _empty('Нет элементов для отображения.');
 
 	$sql = "SELECT *
 			FROM `_element_group`
 			WHERE `id` IN ("._idsGet($elem, 'element_group_id').")
 			ORDER BY `sort`";
-	if(!$group = query_arr($sql))
+	if(!$group = DB1::arr($sql))
 		return _emptyMin('Отсутствуют группы элементов.');
 
 	foreach($group as $id => $r)

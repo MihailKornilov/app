@@ -116,7 +116,7 @@ function PHP12_elem44_setup_save($cmp, $val, $unit) {//сохранение со
 							SET `font`='".$r['font']."',
 								`color`='".$r['color']."'
 							WHERE `id`=".$id;
-					query($sql);
+					DB1::query($sql);
 
 					unset($r['font']);
 					unset($r['color']);
@@ -133,19 +133,19 @@ function PHP12_elem44_setup_save($cmp, $val, $unit) {//сохранение со
 	$sql = "UPDATE `_element`
 			SET `".$col."`='".addslashes($json)."'
 			WHERE `id`=".$parent_id;
-	query($sql);
+	DB1::query($sql);
 
 	//применение родительского элемента (для таблиц)
 	$sql = "UPDATE `_element`
 			SET `parent_id`=".$parent_id."
 			WHERE `id` IN (".$ids.")";
-	query($sql);
+	DB1::query($sql);
 
 	//удаление значений, которые были удалены при настройке
 	$sql = "DELETE FROM `_element`
 			WHERE `parent_id`=".$parent_id."
 			  AND `id` NOT IN (".$ids.")";
-	query($sql);
+	DB1::query($sql);
 
 	_BE('elem_clear');
 }

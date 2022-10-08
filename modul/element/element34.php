@@ -48,7 +48,7 @@ function _element34_print($el) {
 				  AND `".$colD."` LIKE '".$year."-%'
 					"._40cond(array(), $r['cond'])."
 				GROUP BY SUBSTR(`".$colD."`,6,2)";
-		foreach(query_ass($sql) as $m => $s)
+		foreach(DB1::ass($sql) as $m => $s)
 			$mass[$n][_num($m)] = $s;
 	}
 
@@ -130,7 +130,7 @@ function _elem34year($json, $year) {//ссылки на все года
 					"._40cond(array(), $r['cond'])."
 				GROUP BY SUBSTR(`".$colD."`,1,4)
 				ORDER BY `".$colD."`";
-		$Y += query_ass($sql);
+		$Y += DB1::ass($sql);
 	}
 
 	//определение минимального года
@@ -242,7 +242,7 @@ function PHP12_elem34_save($cmp, $val, $unit) {//сохранение
 	$sql = "UPDATE `_element`
 			SET `txt_1`='".addslashes($json)."'
 			WHERE `id`=".$elem_id;
-	query($sql);
+	DB1::query($sql);
 
 	_elemOne($elem_id, true);
 }

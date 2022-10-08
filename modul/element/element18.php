@@ -34,7 +34,7 @@ function _element18_vvv($el) {
 				WHERE  "._queryWhere($DLG)."
 				ORDER BY `sort`
 				LIMIT 30";
-		if(!$arr = query_arr($sql))
+		if(!$arr = DB1::arr($sql))
 			return array();
 
 		$send = array();

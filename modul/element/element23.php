@@ -80,7 +80,7 @@ function _element23_print($ELEM, $prm=array(), $next=0) {//вывод списк
 			WHERE  "._spisokWhere($ELEM, $prm)."
 			ORDER BY ".$order." ".$SC."
 			LIMIT ".($limit * $next).",".$limit;
-	$spisok = query_arr($sql);
+	$spisok = DB1::arr_cache($sql);
 
 	//добавление записи, если был быстрый поиск по номеру
 	if(!$next)
@@ -328,7 +328,7 @@ function _element23_template_docx($ELEM, $u) {
 					_40cond($ELEM, $ELEM['txt_2'], $prm)."
 			ORDER BY ".$order." ".$SC."
 			LIMIT ".$limit;
-	$spisok = query_arr($sql);
+	$spisok = DB1::arr($sql);
 
 	//вставка значений из вложенных списков
 	$spisok = _spisokInclude($spisok);
@@ -499,7 +499,7 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 						`sort`=".$sort."
 					WHERE `parent_id`=".$unit['id']."
 					  AND `id`=".$id;
-			query($sql);
+			DB1::query($sql);
 
 			$ids .= ','.$id;
 		}
@@ -508,19 +508,19 @@ function PHP12_td_setup_save($cmp, $val, $unit) {//сохранение данн
 	$sql = "DELETE FROM `_element`
 			WHERE `parent_id`=".$unit['id']."
 			  AND `id` NOT IN (".$ids.")";
-	query($sql);
+	DB1::query($sql);
 
 	//прописывание идентификаторов ячеек
 	$sql = "SELECT `id`
 			FROM `_element`
 			WHERE `parent_id`=".$unit['id']."
 			ORDER BY `sort`";
-	$ids = query_ids($sql);
+	$ids = DB1::ids($sql);
 
 	$sql = "UPDATE `_element`
 			SET `".$col."`='".($ids ? $ids : '')."'
 			WHERE `id`=".$unit['id'];
-	query($sql);
+	DB1::query($sql);
 
 	_BE('elem_clear');
 }

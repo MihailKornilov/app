@@ -19,7 +19,7 @@ function _element26_vvv() {
 			FROM `_template`
 			WHERE `app_id`=".APP_ID."
 			ORDER BY `id` DESC";
-	return query_ass($sql);
+	return DB1::ass($sql);
 }
 function _element26_title_get($el, $unit_id) {
 	if(!$vvv = _element26_vvv())

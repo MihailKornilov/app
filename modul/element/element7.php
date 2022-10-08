@@ -114,7 +114,7 @@ function _elem7num14($el, $spisok=array()) {//добавление записи 
 			  "._40cond($el, $el['txt_2'])."
 			  AND `t1`.`".$col."`=".$num."
 			LIMIT 1";
-	if(!$u = query_assoc($sql))
+	if(!$u = DB1::assoc($sql))
 		return $spisok;
 
 	array_unshift($spisok, $u);
@@ -157,7 +157,7 @@ function _elem7num23($el, $spisok=array()) {//добавление записи 
 			  "._40cond($el, $el['txt_2'])."
 			  AND `t1`.`".$col."`=".$num."
 			LIMIT 1";
-	if(!$u = query_assoc($sql))
+	if(!$u = DB1::assoc($sql))
 		return $spisok;
 
 	array_unshift($spisok, $u);

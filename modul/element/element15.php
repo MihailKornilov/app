@@ -49,7 +49,7 @@ function _element15filterUpd($send, $elem_spisok) {//обновление зна
 			WHERE `dialog_id`=15
 			  AND `num_1`=".$elem_spisok."
 			LIMIT 1";
-	if(!$el = query_assoc($sql))
+	if(!$el = DB1::assoc($sql))
 		return $send;
 
 	$send['upd'][] = array(

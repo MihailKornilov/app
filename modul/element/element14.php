@@ -77,7 +77,7 @@ function _element14_print($ELEM, $prm=array(), $next=0) {
 			WHERE  "._spisokWhere($ELEM, $prm)."
 			ORDER BY ".$order." ".$SC."
 			LIMIT ".($limit * $next).",".$limit;
-	$spisok = query_arr($sql);
+	$spisok = DB1::arr($sql);
 
 	//добавление записи, если был быстрый поиск по номеру
 	if(!$next)
@@ -130,7 +130,7 @@ function _element14_vvv_copy($el, $obj_id) {
 			WHERE `obj_name`='spisok'
 			  AND `obj_id`=".$el['id']."
 			ORDER BY `parent_id`,`y`,`x`";
-	if(!$BLK = query_arr($sql))
+	if(!$BLK = DB1::arr($sql))
 		return;
 
 	foreach($BLK as $r) {

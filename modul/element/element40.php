@@ -554,7 +554,7 @@ function _40cond_cnn($EL, $r, $v, $prm) {//значение подключаем
 			SELECT `id`
 			FROM `_spisok`
 			WHERE `parent_id`=".$unit_id;
-	if($ids = query_ids($sql))
+	if($ids = DB1::ids($sql))
 		$unit_id .= ','.$ids;
 
 	return $unit_id;
@@ -697,7 +697,7 @@ function _40condVcopy($unit_id) {//подмена значения для коп
 			WHERE `app_id`=".APP_ID."
 			  AND `id_old`=".$unit_id."
 			LIMIT 1";
-	return _num(query_value($sql));
+	return _num(DB1::value($sql));
 }
 
 
@@ -722,7 +722,7 @@ function _40check($filter, $uid) {
 			WHERE "._queryWhere($DLG).
 					_40condV($F['cond_id'], $col, $v)."
 			  AND `id`=".$uid;
-	return query_value($sql);
+	return DB1::value($sql);
 }
 
 

@@ -67,7 +67,7 @@ function _element8_print($el, $prm) {
 					FROM  "._queryFrom($DLG)."
 					WHERE "._queryWhere($DLG)."
 					  AND LENGTH(".$qCol.")=".mb_strlen($el['txt_3']);
-			if(!$v = query_value($sql))
+			if(!$v = DB1::value($sql))
 				$v = $el['txt_3'];
 
 			//полученный максимальный артикул из базы

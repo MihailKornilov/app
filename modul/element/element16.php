@@ -62,7 +62,7 @@ function _element16_vvv($el) {
 				WHERE  "._queryWhere($DLG)."
 				ORDER BY `sort`
 				LIMIT 30";
-		if(!$arr = query_arr($sql))
+		if(!$arr = DB1::arr($sql))
 			return array();
 
 		$send = array();
@@ -157,7 +157,7 @@ function PHP12_radio_setup_save($cmp, $val, $unit) {//сохранение зн�
 	$sql = "UPDATE `_element`
 			SET `".$col."`='".addslashes($save)."'
 			WHERE `id`=".$unit['id'];
-	query($sql);
+	DB1::query($sql);
 
 	_elemOne($unit['id'], true);
 }

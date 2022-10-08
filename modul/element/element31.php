@@ -17,7 +17,7 @@ function _element31_print($el, $prm) {
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
 			ORDER BY `sort`";
-	$spisok = query_arr($sql);
+	$spisok = DB1::arr($sql);
 
 	//вставка картинок
 	$spisok = _spisokImage($spisok);
@@ -122,7 +122,7 @@ function _val31($el, $txt) {//Выбор нескольких значений �
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
 			ORDER BY `sort`";
-	if(!$spisok = query_arr($sql))
+	if(!$spisok = DB1::arr($sql))
 		return '';
 
 	//вставка картинок

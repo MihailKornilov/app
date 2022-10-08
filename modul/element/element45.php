@@ -62,7 +62,7 @@ function _element45Uns($el, $v, $is_show=false) {//выбранные значе
 			FROM   "._queryFrom($DLG)."
 			WHERE "._queryCol_id($DLG)." IN ("._idsGet($UNS).")
 			  AND "._queryWhere($DLG, 1);
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	//вставка значений из вложенных списков
@@ -172,7 +172,7 @@ function _element45_template_docx($el, $u) {
 			FROM   "._queryFrom($DLG)."
 			WHERE "._queryCol_id($DLG)." IN ("._idsGet($UNS).")
 			  AND "._queryWhere($DLG, 1);
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return '';
 
 	$col = _elemCol($DLG['spisok_elem_id']);

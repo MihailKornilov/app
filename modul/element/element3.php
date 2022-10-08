@@ -87,7 +87,7 @@ function _menuCount($menu) {//получение элемента-циферки
 			  AND `el`.`app_id`=".APP_ID."
 			  AND `dialog_id`=87
 			  AND `bl`.`obj_name`='page'";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return $menu;
 
 	foreach($arr as $r) {
@@ -107,7 +107,7 @@ function _menuCount($menu) {//получение элемента-циферки
 				FROM  "._queryFrom($DLG)."
 				WHERE "._queryWhere($DLG).
 					_40cond(array(), $r['txt_1']);
-		if(!$count = query_value($sql))
+		if(!$count = DB1::value($sql))
 			continue;
 
 		$menu[$pid]['name'] .= '<b class="ml5">+'.$count.'</b>';

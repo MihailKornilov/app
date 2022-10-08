@@ -91,7 +91,7 @@ function PHP12_count_value_save($cmp, $val, $unit) {
 			SET `".$col."`='".addslashes($txt)."',
 				`def`=".$def."
 			WHERE `id`=".$unit_id;
-	query($sql);
+	DB1::query($sql);
 }
 function PHP12_count_value_vvv($prm) {
 	if(empty($prm['unit_edit']))
