@@ -8,7 +8,7 @@ function _pageCache() {//получение массива страниц из �
 			FROM `_page`
 			WHERE `app_id` IN (0,".APP_PARENT.")
 			ORDER BY `sort`";
-	if(!$page = query_arr($sql))
+	if(!$page = DB1::arr($sql))
 		return array();
 
 	//получение количества блоков по каждой странице
@@ -19,7 +19,7 @@ function _pageCache() {//получение массива страниц из �
 			WHERE `obj_name`='page'
 			  AND `obj_id` IN ("._idsGet($page).")
 			GROUP BY `obj_id`";
-	$block = query_ass($sql);
+	$block = DB1::ass($sql);
 
 	foreach($page as $id => $r) {
 		unset($page[$id]['about']);
@@ -470,7 +470,7 @@ function PHP12_app_enter_for_all_user() {//настройка входа в пр
 			WHERE `ua`.`app_id`=".APP_ID."
 			  AND `u`.`id`=`ua`.`user_id`
 			ORDER BY `ua`.`id`";
-	if(!$user = query_arr($sql))
+	if(!$user = DB1::arr($sql))
 		return _emptyMin10('Сотрудников нет.');
 
 	$send = '<table class="">';
@@ -493,21 +493,21 @@ function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохране�
 	$sql = "UPDATE `_user_access`
 			SET `access_enter`=0
 			WHERE `app_id`=".APP_ID;
-	query($sql);
+	DB1::query($sql);
 
 	if($ids = _ids($val)) {
 		$sql = "UPDATE `_user_access`
 				SET `access_enter`=1
 				WHERE `app_id`=".APP_ID."
 				  AND `user_id` IN (".$ids.")";
-		query($sql);
+		DB1::query($sql);
 	}
 
 	$sql = "UPDATE `_user_auth`
 			SET `app_id`=0
 			WHERE `app_id`=".APP_ID."
 			  AND `user_id` NOT IN (".$ids.")";
-	query($sql);
+	DB1::query($sql);
 
 	_cache_clear('AUTH _'.CODE, 1);
 	_cache_clear('page');
@@ -515,7 +515,7 @@ function PHP12_app_enter_for_all_user_save($cmp, $val, $unit) {//сохране�
 	$sql = "SELECT *
 			FROM `_user_access`
 			WHERE `app_id`=".APP_ID;
-	foreach(query_arr($sql) as $r)
+	foreach(DB1::arr($sql) as $r)
 		_cache_clear('user'.$r['user_id']);
 }
 
@@ -599,7 +599,7 @@ function _pageJsDlgOpenAuto() {//автоматическое открытие �
 			WHERE `app_id`=".APP_ID."
 			  AND `open_auto`
 			LIMIT 1";
-	if(!$dlg = query_assoc($sql))
+	if(!$dlg = DB1::assoc($sql))
 		return '';
 
 	return '_dialogLoad({dialog_id:'.$dlg['id'].'});';
@@ -646,7 +646,7 @@ function _document() {//формирование документа для вы�
 			FROM `_template`
 			WHERE `app_id`=".APP_ID."
 			  AND `id`=".$doc_id;
-	if(!$TMP = query_assoc($sql))
+	if(!$TMP = DB1::assoc($sql))
 		return _empty20('Шаблона документа '.$doc_id.' не существует'._pageUrlBack());
 
 	//получение данных файла-шаблона
@@ -661,7 +661,7 @@ function _document() {//формирование документа для вы�
 			FROM `_attach`
 			WHERE `app_id`=".APP_ID."
 			  AND `id`=".$attach_id;
-	if(!$ATT = query_assoc($sql))
+	if(!$ATT = DB1::assoc($sql))
 		return _empty20('Файла-шаблона '.$attach_id.' не существует'._pageUrlBack());
 
 	if(!file_exists($ATT['path'].$ATT['fname']))
@@ -770,7 +770,7 @@ function _document_values($TMP, $unit) {//получение значений д
 	$sql = "SELECT *
 			FROM `_element`
 			WHERE `id` IN ("._ids($TMP['param_ids']).")";
-	if(!$arr = query_arr($sql))
+	if(!$arr = DB1::arr($sql))
 		return array();
 
 	foreach($arr as $el) {
@@ -849,7 +849,7 @@ function _kupez_ob($ATT, $TMP) {
 	$sql = "SELECT *
 			FROM `_spisok`
 			WHERE `id`=".$id;
-	if(!$gn = query_assoc($sql)) {
+	if(!$gn = DB1::assoc($sql)) {
 		$section->addText('Не получены данные номера газеты', $errStyle);
 		$word->save('php://output');
 		exit;
@@ -865,7 +865,7 @@ function _kupez_ob($ATT, $TMP) {
 			FROM `_spisok`
 			WHERE `num_5`=".$gn['id']."
 			  AND `num_2`";
-	if(!$gns = query_arr($sql)) {
+	if(!$gns = DB1::arr($sql)) {
 		$section->addText('Выходов объявлений по номеру нет', $errStyle);
 		$word->save('php://output');
 		exit;
@@ -881,7 +881,7 @@ function _kupez_ob($ATT, $TMP) {
 			  AND `num_6`=1
 			  AND !`deleted`
 			ORDER BY `txt_1`";
-	if(!$ob = query_arr($sql)) {
+	if(!$ob = DB1::arr($sql)) {
 		$section->addText('Объявлений по номеру нет', $errStyle);
 		$word->save('php://output');
 		exit;
@@ -894,7 +894,7 @@ function _kupez_ob($ATT, $TMP) {
 			FROM `_spisok`
 			WHERE `dialog_id`=1481
 			  AND !`deleted`";
-	$dop = query_ass($sql);
+	$dop = DB1::ass($sql);
 
 	foreach($gns as $r) {
 		$obid = $r['num_2'];
@@ -918,7 +918,7 @@ function _kupez_ob($ATT, $TMP) {
 			WHERE `dialog_id`=1478
 			  AND !`deleted`
 			ORDER BY `sort`";
-	if(!$rub = query_arr($sql)) {
+	if(!$rub = DB1::arr($sql)) {
 		$section->addText('Не получены рубрики объявлений', $errStyle);
 		$word->save('php://output');
 		exit;
@@ -1163,12 +1163,12 @@ function _page_div($issa=false) {//todo тест
 			WHERE !`dialog_id_parent`
 			  AND !`insert_on`
 			ORDER BY `id`";
-	$arr = query_arr($sql);
+	$arr = DB1::arr($sql);
 
 	$sql = "SELECT *
 			FROM `_dialog`
 			ORDER BY `id`";
-	$DLG = query_arr($sql);
+	$DLG = DB1::arr($sql);
 
 	$send = '<div>Всего: '.count($arr).'</div>';
 
