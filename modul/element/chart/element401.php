@@ -33,7 +33,7 @@ function _element401_print($el, $prm) {
 			WHERE "._queryWhere($DLG)."
 			  AND `dtime_add` LIKE '".$year."-%'
 			GROUP BY DATE_FORMAT(`dtime_add`,'%m')";
-	foreach(query_ass($sql) as $n => $sum)
+	foreach(DB1::ass($sql) as $n => $sum)
 		$data[$n] = $sum;
 
 	return

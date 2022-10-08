@@ -50,7 +50,7 @@ function _elem400_yearData($DLG) {//данные для годов
 			GROUP BY `year`
 			ORDER BY `year`";
 	$Y = 0;
-	foreach(query_ass($sql) as $year => $c) {
+	foreach(DB1::ass($sql) as $year => $c) {
 		if(!$Y)
 			$Y = $year;
 
@@ -75,7 +75,7 @@ function _elem400_yearCat($DLG) {//подписи для годов
 			WHERE "._queryWhere($DLG)."
 			ORDER BY `year`
 			LIMIT 1";
-	if(!$first = query_value($sql))
+	if(!$first = DB1::value($sql))
 		return '';
 
 	$sql = "SELECT DATE_FORMAT(`dtime_add`,'%Y') AS `year`
@@ -83,7 +83,7 @@ function _elem400_yearCat($DLG) {//подписи для годов
 			WHERE "._queryWhere($DLG)."
 			ORDER BY `year` DESC
 			LIMIT 1";
-	$last = query_value($sql);
+	$last = DB1::value($sql);
 
 	if($first == $last)
 		return $first;
@@ -104,7 +104,7 @@ function _elem400_yearSpisok($DLG) {//получение списка годов
 			WHERE "._queryWhere($DLG)."
 			ORDER BY `year`
 			LIMIT 1";
-	if(!$first = query_value($sql)) {
+	if(!$first = DB1::value($sql)) {
 		$send[YEAR_CUR] = YEAR_CUR;
 		$send = _selArray($send);
 		return _json($send);
@@ -115,7 +115,7 @@ function _elem400_yearSpisok($DLG) {//получение списка годов
 			WHERE "._queryWhere($DLG)."
 			ORDER BY `year` DESC
 			LIMIT 1";
-	$last = query_value($sql);
+	$last = DB1::value($sql);
 
 	if($first == $last) {
 		$send[$first] = $first;
@@ -147,7 +147,7 @@ function _elem400_monData($DLG, $year=YEAR_CUR) {//данные для меся�
 			  AND `dtime_add` LIKE '".$year."-%'
 			GROUP BY `mon`
 			ORDER BY `mon`";
-	foreach(query_ass($sql) as $d => $c)
+	foreach(DB1::ass($sql) as $d => $c)
 		$mon[_num($d)] = $c;
 
 	$send = array();
@@ -183,7 +183,7 @@ function _elem400_dayData($DLG, $mon=YEAR_MON) {
 			  AND `dtime_add` LIKE '".$mon."-%'
 			GROUP BY `day`
 			ORDER BY `day`";
-	foreach(query_ass($sql) as $d => $c) {
+	foreach(DB1::ass($sql) as $d => $c) {
 		$d = _num($d);
 		if(isset($send[$d]))
 			$send[$d] = $c;

@@ -22,7 +22,7 @@ function _element402_print($EL, $prm=array()) {
 			FROM   "._queryFrom($DLG)."
 			WHERE  "._queryWhere($DLG)."
 			ORDER BY `dtime_add`";
-	if(!$spisok = query_arr($sql))
+	if(!$spisok = DB1::arr($sql))
 		return _empty('Данных нет.');
 
 	$col = _elemCol($DLG['spisok_elem_id']);
