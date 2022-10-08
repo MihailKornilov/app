@@ -829,7 +829,7 @@ body:not(.site){position:relative}
 /* фоны */
 .bg-eee{background-color:#eee}
 .bg-ffc{background-color:#ffc}  /* жёлтый - данные изменены */
-.bg-fcc{background-color:#fcc}  /* красный - ошибка */
+.bg-fcc,.ov-fcc:hover{background-color:#fcc}  /* красный - ошибка */
 .bg-orange{background-color:#ffaf64}/* оранжевый-насыщенный */
 
 .bg0,.ov0:hover{background-color:#fff}
