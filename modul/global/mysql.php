@@ -163,7 +163,8 @@ class mysqlClass {
     private $count = 0; //количество сделанных запросов
     private $dur = 0;   //общая продолжительность выполнения запросов
     private $mass = []; //список запросов
-    private const CACHE_TTL = 600;
+    private $CACHE_USE = false;
+    private $CACHE_TTL = 30;
 
     function __construct($host, $user, $pass, $base) {
         if(!$this->cnn = mysqli_connect($host, $user, $pass, $base))
@@ -233,15 +234,16 @@ class mysqlClass {
         return $r[0];
     }
     public function value_cache($sql) {
+        if(!$this->CACHE_USE)
+            return $this->value($sql);
+
         $cacheKey = md5($sql);
 
-        if(apcu_exists($cacheKey)) {
-//            echo "<br><br><br><br><br>".$key.' '.$sql;
+        if(apcu_exists($cacheKey))
             return apcu_fetch($cacheKey);
-        }
 
         $v = $this->value($sql);
-        apcu_store($cacheKey, $v, CACHE_TTL);
+        apcu_store($cacheKey, $v, $this->CACHE_TTL);
 
         return $v;
     }
@@ -260,13 +262,16 @@ class mysqlClass {
         return $send;
     }
     public function arr_cache($sql, $key):array {
+        if(!$this->CACHE_USE)
+            return $this->arr($sql, $key);
+
         $cacheKey = md5($sql);
 
         if(apcu_exists($cacheKey))
             return apcu_fetch($cacheKey);
 
         $v = $this->arr($sql, $key);
-        apcu_store($cacheKey, $v, CACHE_TTL);
+        apcu_store($cacheKey, $v, $this->CACHE_TTL);
 
         return $v;
     }
@@ -287,13 +292,16 @@ class mysqlClass {
         return $send;
     }
     public function array_cache($sql):array {
+        if(!$this->CACHE_USE)
+            return $this->array($sql);
+
         $cacheKey = md5($sql);
 
         if(apcu_exists($cacheKey))
             return apcu_fetch($cacheKey);
 
         $v = $this->array($sql);
-        apcu_store($cacheKey, $v, CACHE_TTL);
+        apcu_store($cacheKey, $v, $this->CACHE_TTL);
 
         return $v;
     }
@@ -313,13 +321,16 @@ class mysqlClass {
         return $r;
     }
     public function assoc_cache($sql):array {
+        if(!$this->CACHE_USE)
+            return $this->assoc($sql);
+
         $cacheKey = md5($sql);
 
         if(apcu_exists($cacheKey))
             return apcu_fetch($cacheKey);
 
         $v = $this->assoc($sql);
-        apcu_store($cacheKey, $v, CACHE_TTL);
+        apcu_store($cacheKey, $v, $this->CACHE_TTL);
 
         return $v;
     }
@@ -340,13 +351,16 @@ class mysqlClass {
         return $send;
     }
     public function ass_cache($sql):array {
+        if(!$this->CACHE_USE)
+            return $this->ass($sql);
+
         $cacheKey = md5($sql);
 
         if(apcu_exists($cacheKey))
             return apcu_fetch($cacheKey);
 
         $v = $this->ass($sql);
-        apcu_store($cacheKey, $v, CACHE_TTL);
+        apcu_store($cacheKey, $v, $this->CACHE_TTL);
 
         return $v;
     }
@@ -367,13 +381,16 @@ class mysqlClass {
         return !$send ? 0 : implode(',', array_unique($send));
     }
     public function ids_cache($sql) {
+        if(!$this->CACHE_USE)
+            return $this->ids($sql);
+
         $cacheKey = md5($sql);
 
         if(apcu_exists($cacheKey))
             return apcu_fetch($cacheKey);
 
         $v = $this->ids($sql);
-        apcu_store($cacheKey, $v, CACHE_TTL);
+        apcu_store($cacheKey, $v, $this->CACHE_TTL);
 
         return $v;
     }
