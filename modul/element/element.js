@@ -395,6 +395,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DLG('#' + act + '_action_id')._select({
 				width:280,
 				title0:'действия нет, закрыть окно',
+				multi:1,
 				spisok:o.action,
 				func:function(v) {
 					DLG('.td-' + act + '-action-obj')._dn(v == 2 || v == 5);
@@ -759,7 +760,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		if(o.send.block_flash)
 			_attr_bl(o.send.block_flash)._flash({color:'red'});
 
-		//вставка подсказок, прикреплённых к блоками или элементам
+		//вставка подсказок, прикреплённых к блокам или элементам
 		_hintPaste(o);
 
 		return dialog;
@@ -796,7 +797,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 						if(window[func])
 							send.vvv[el.id] = window[func](el, o);
 						break;
-					//Select: выбор записи из другого списка (передача текста условии флага num_7)
+					//Select: выбор записи из другого списка (передача текста при условии флага num_7)
 					case 29:
 						if(!el.num_7)
 							break;
@@ -813,7 +814,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			});
 
 			dialog.post(send, function(res) {
-				//если присутствует функция, выполняется она. Для того, чтобы продолжить выполнение после функции, нужно чтобы она вернула любой результат
+				//если присутствует функция, выполняется она. Для того чтобы продолжить выполнение после функции, нужно чтобы она вернула любой результат
 				if(o.send.func_save)
 					if(!o.send.func_save(res))
 						return;
@@ -854,7 +855,8 @@ var DIALOG = {},    //массив диалоговых окон для упра
 		return dialog;
 	},
 	_dialogOpenSubmitAction = function(res) {//применение действий после выполнения диалога
-		switch(res.action_id) {
+		for(var actId in _idsAss(res.action_id))
+		switch(_num(actId)) {
 			//обновление страницы
 			case 1:
 				if(!$('#_content').length) {
@@ -3244,7 +3246,7 @@ var DIALOG = {},    //массив диалоговых окон для упра
 			DL = ATR_EL.append(html).find('dl'),
 			BUT_ADD = ATR_EL.find('div:last'),
 			DROP = vvv.drop,
-			DS_4UNIT = 0,//id диалога, в котором размещён элемент, которому настраиваются условия (для значения unit_id=-4)
+			DS_4UNIT = 0,//id диалога, в котором размещён элемент, настраиваются условия (для значения unit_id=-4)
 			BL = BLKK[obj.send.block_id];
 
 		if(BL && BL.obj_name == 'dialog')

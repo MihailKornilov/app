@@ -1441,7 +1441,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$insert_button_submit = _txt($_POST['insert_button_submit']);
 	if(!$insert_button_cancel = _txt($_POST['insert_button_cancel']))
 		jsonError('Не указан текст кнопки отмены для новой записи');
-	$insert_action_id = _num($_POST['insert_action_id']);
+	$insert_action_id = _ids($_POST['insert_action_id']);
 	$insert_action_obj_id = _num($_POST['insert_action_obj_id']);
 	$insert_unit_id_set_elem_id = _num($_POST['insert_unit_id_set_elem_id']);
 
@@ -1453,7 +1453,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 	$edit_button_submit = _txt($_POST['edit_button_submit']);
 	if(!$edit_button_cancel = _txt($_POST['edit_button_cancel']))
 		jsonError('Не указан текст кнопки отмены редактирования');
-	$edit_action_id = _num($_POST['edit_action_id']);
+	$edit_action_id = _ids($_POST['edit_action_id']);
 	$edit_action_obj_id = _num($_POST['edit_action_obj_id']);
 
 
@@ -1465,7 +1465,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 		jsonError('Не указан текст кнопки удаления');
 	if(!$del_button_cancel = _txt($_POST['del_button_cancel']))
 		jsonError('Не указан текст кнопки отмены удаления');
-	$del_action_id = _num($_POST['del_action_id']);
+	$del_action_id = _ids($_POST['del_action_id']);
 	$del_action_obj_id = _num($_POST['del_action_obj_id']);
 
 
@@ -1498,7 +1498,7 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`insert_head`='".addslashes($insert_head)."',
 				`insert_button_submit`='".addslashes($insert_button_submit)."',
 				`insert_button_cancel`='".addslashes($insert_button_cancel)."',
-				`insert_action_id`=".$insert_action_id.",
+				`insert_action_id`='".$insert_action_id."',
 				`insert_action_obj_id`=".$insert_action_obj_id.",
 				`insert_unit_id_set_elem_id`=".$insert_unit_id_set_elem_id.",
 
@@ -1506,14 +1506,14 @@ function _dialogSave($dialog_id) {//сохранение диалога
 				`edit_head`='".addslashes($edit_head)."',
 				`edit_button_submit`='".addslashes($edit_button_submit)."',
 				`edit_button_cancel`='".addslashes($edit_button_cancel)."',
-				`edit_action_id`=".$edit_action_id.",
+				`edit_action_id`='".$edit_action_id."',
 				`edit_action_obj_id`=".$edit_action_obj_id.",
 
 				`del_on`=".$del_on.",
 				`del_head`='".addslashes($del_head)."',
 				`del_button_submit`='".addslashes($del_button_submit)."',
 				`del_button_cancel`='".addslashes($del_button_cancel)."',
-				`del_action_id`=".$del_action_id.",
+				`del_action_id`='".$del_action_id."',
 				`del_action_obj_id`=".$del_action_obj_id.",
 
 				`spisok_elem_id`=".$spisok_elem_id.",

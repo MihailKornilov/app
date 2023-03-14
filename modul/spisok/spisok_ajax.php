@@ -19,7 +19,7 @@ switch(@$_POST['op']) {
 		$dialog = _spisokUnitDialog($unit_id);
 		$dialog['act'] = 3;
 
-		$send['action_id'] = _num($dialog['del_action_id']);
+		$send['action_id'] = _ids($dialog['del_action_id']);
 		$send['action_obj_id'] = _num($dialog['del_action_obj_id']);
 		$send = _spisokAction3($dialog, $unit_id, $send);
 		_dialogIUID($dialog);
@@ -530,7 +530,7 @@ function _SUN($unit_id=0) {//SpisokUnitUpdate: внесение/редактир
 
 	$send = array(
 		'unit' => _arrNum($unit),
-		'action_id' => _num($dialog[ACT.'_action_id']),
+		'action_id' => _ids($dialog[ACT.'_action_id']),
 		'action_obj_id' => _num($dialog[ACT.'_action_obj_id'])
 	);
 
@@ -1351,7 +1351,8 @@ function _spisokUnitDependUpd($dialog, $unitOld, $unit) {//обновление 
 	}
 }
 function _spisokAction1($send) {//обновление страницы посредством AJAX
-	if($send['action_id'] != 1 && $send['action_id'] != 5)
+    $ass = _idsAss($send['action_id']);
+	if(empty($ass[1]) && empty($ass[5]))
 		return $send;
 	if(!$page_id = _num(@$_POST['page_id']))
 		return $send;
@@ -1361,7 +1362,8 @@ function _spisokAction1($send) {//обновление страницы поср
 	return $send;
 }
 function _spisokAction3($dialog, $unit_id, $send) {//добавление значений для отправки, если действие 3 - обновление содержания блоков
-	if($send['action_id'] != 3)
+    $ass = _idsAss($send['action_id']);
+    if(empty($ass[3]))
 		return $send;
 	//должно быть действие над элементом
 	if($dialog['table_1'] != 5)
@@ -1380,7 +1382,8 @@ function _spisokAction3($dialog, $unit_id, $send) {//добавление зна
 	return $send;
 }
 function _spisokAction4($send) {//действие 4 - обновление исходного диалога
-	if($send['action_id'] != 4)
+    $ass = _idsAss($send['action_id']);
+    if(empty($ass[4]))
 		return $send;
 	if(!$dialog_id = _num(@$_POST['dss']))
 		return $send;
