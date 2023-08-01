@@ -318,7 +318,7 @@ function _pageContent() {//приложение в работе
 		return '';
 
 	$page_id = _page('cur');
-	_userActive($page_id);
+	//_userActive($page_id);
 
 	$app = _app(APP_ID);
 
